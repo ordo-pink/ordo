@@ -1,7 +1,7 @@
 import type { Folder } from "../../../../main/apis/fs/types"
 
 import React from "react"
-import { DragDropContext, Droppable, DropResult, ResponderProvided } from "react-beautiful-dnd"
+import { DragDropContext, Droppable, DropResult } from "react-beautiful-dnd"
 import { Column } from "./column"
 
 export const Kanban: React.FC<{
@@ -34,7 +34,7 @@ export const Kanban: React.FC<{
 	// 	setPath(tree.path, tree.path.replace(tree.readableName, e.target.textContent))
 	// }
 
-	const onDragEnd = (result: DropResult, provided: ResponderProvided) => {
+	const onDragEnd = (result: DropResult) => {
 		// TODO: Adding files in column, adding columns on the board!!!
 		if (result.source.droppableId !== result.destination.droppableId) {
 			window.fileSystemAPI

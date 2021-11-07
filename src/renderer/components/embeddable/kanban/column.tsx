@@ -4,7 +4,6 @@ import React from "react"
 import { Draggable, Droppable } from "react-beautiful-dnd"
 import { Card } from "./card"
 import { Conditional } from "../../conditional"
-import { Emoji } from "../../emoji"
 
 export const Column: React.FC<{
 	tree: Folder

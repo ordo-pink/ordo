@@ -19,6 +19,7 @@ export const Kanban: React.FC<{
 		window.fileSystemAPI.listFolder(folder).then((data) => {
 			setTree(data)
 			setHash(data.hash)
+			window.dispatchEvent(new CustomEvent("update-tree"))
 		})
 	}
 

@@ -41,6 +41,19 @@ export const App: React.FC = () => {
 	const [renderContent, setRenderContent] = React.useState("")
 	const [unsavedFiles, setUnsavedFiles] = React.useState([])
 
+	useEventListener("update-tree" as any, () => {
+		listFolder(path).then((data) => {
+			setFileTree(data)
+			setHash(data.hash)
+
+			window.settingsAPI.get("application.last-open-file").then((value) => {
+				if (value) {
+					setCurrentFilePath(value)
+				}
+			})
+		})
+	})
+
 	// useEventListener("keydown", ({ key, metaKey }) => {
 
 	// })

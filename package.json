@@ -1,0 +1,119 @@
+{
+	"name": "ordo",
+	"productName": "ORDO",
+	"version": "1.0.0",
+	"description": "My Electron application description",
+	"main": ".webpack/main",
+	"scripts": {
+		"start": "electron-forge start",
+		"package": "electron-forge package",
+		"make": "electron-forge make",
+		"publish": "electron-forge publish",
+		"lint": "eslint --ext .ts,.tsx ."
+	},
+	"keywords": [],
+	"author": {
+		"name": "Sergei Orlov",
+		"email": "hello@orlow.dev"
+	},
+	"license": "MIT",
+	"config": {
+		"forge": {
+			"packagerConfig": {},
+			"makers": [
+				{
+					"name": "@electron-forge/maker-squirrel",
+					"config": {
+						"name": "ordo_electron"
+					}
+				},
+				{
+					"name": "@electron-forge/maker-zip",
+					"platforms": [
+						"darwin"
+					]
+				},
+				{
+					"name": "@electron-forge/maker-deb",
+					"config": {}
+				},
+				{
+					"name": "@electron-forge/maker-rpm",
+					"config": {}
+				}
+			],
+			"plugins": [
+				[
+					"@electron-forge/plugin-webpack",
+					{
+						"mainConfig": "./webpack.main.config.js",
+						"renderer": {
+							"config": "./webpack.renderer.config.js",
+							"entryPoints": [
+								{
+									"html": "./src/renderer/index.html",
+									"js": "./src/renderer/renderer.tsx",
+									"name": "main_window",
+									"preload": {
+										"js": "./src/preload.ts"
+									}
+								}
+							]
+						}
+					}
+				],
+				[
+					"@electron-forge/plugin-electronegativity",
+					{
+						"isSarif": true
+					}
+				]
+			]
+		}
+	},
+	"devDependencies": {
+		"@electron-forge/cli": "^6.0.0-beta.61",
+		"@electron-forge/maker-deb": "^6.0.0-beta.61",
+		"@electron-forge/maker-rpm": "^6.0.0-beta.61",
+		"@electron-forge/maker-squirrel": "^6.0.0-beta.61",
+		"@electron-forge/maker-zip": "^6.0.0-beta.61",
+		"@electron-forge/plugin-electronegativity": "^6.0.0-beta.61",
+		"@electron-forge/plugin-webpack": "6.0.0-beta.61",
+		"@types/mdx-js__react": "^1.5.5",
+		"@types/react": "^17.0.33",
+		"@types/react-beautiful-dnd": "^13.1.2",
+		"@types/react-dom": "^17.0.10",
+		"@typescript-eslint/eslint-plugin": "^4.0.1",
+		"@typescript-eslint/parser": "^4.0.1",
+		"@vercel/webpack-asset-relocator-loader": "1.7.0",
+		"autoprefixer": "^10.3.7",
+		"css-loader": "^6.0.0",
+		"electron": "15.3.0",
+		"electron-typescript-ipc": "^1.0.1",
+		"eslint": "^7.6.0",
+		"eslint-config-prettier": "^8.3.0",
+		"eslint-plugin-import": "^2.20.0",
+		"fork-ts-checker-webpack-plugin": "^6.0.1",
+		"node-loader": "^2.0.0",
+		"postcss": "^8.3.11",
+		"postcss-loader": "^6.2.0",
+		"style-loader": "^3.0.0",
+		"ts-loader": "^9.2.2",
+		"typescript": "^4.0.2"
+	},
+	"dependencies": {
+		"@mdx-js/mdx": "^1.6.22",
+		"@uiw/react-md-editor": "^3.6.5",
+		"electron-squirrel-startup": "^1.0.0",
+		"react": "^17.0.2",
+		"react-beautiful-dnd": "^13.1.0",
+		"react-dom": "^17.0.2",
+		"react-spring": "^9.3.0",
+		"remark": "^14.0.1",
+		"remark-frontmatter": "^4.0.1",
+		"remark-html": "^15.0.0",
+		"remark-preset-lint-recommended": "^6.1.1",
+		"tailwindcss": "^2.2.17",
+		"yaml": "^1.10.2"
+	}
+}

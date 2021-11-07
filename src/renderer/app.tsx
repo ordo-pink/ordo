@@ -41,7 +41,7 @@ export const App: React.FC = () => {
 	const [renderContent, setRenderContent] = React.useState("")
 	const [unsavedFiles, setUnsavedFiles] = React.useState([])
 
-	useEventListener("update-tree" as any, () => {
+	const updateFileTreeListener = () => {
 		listFolder(path).then((data) => {
 			setFileTree(data)
 			setHash(data.hash)
@@ -52,7 +52,22 @@ export const App: React.FC = () => {
 				}
 			})
 		})
-	})
+	}
+
+	const setCurrentFileListener = ({ detail }: any) => {
+		console.log(detail)
+		setCurrentFilePath(detail.path)
+	}
+
+	React.useEffect(() => {
+		window.addEventListener("set-current-file", setCurrentFileListener)
+		// window.addEventListener("update-tree", updateFileTreeListener)
+
+		return () => {
+			window.removeEventListener("set-current-file", setCurrentFileListener)
+			// window.removeEventListener("update-tree", updateFileTreeListener)
+		}
+	}, [])
 
 	// useEventListener("keydown", ({ key, metaKey }) => {
 

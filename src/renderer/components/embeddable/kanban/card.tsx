@@ -25,10 +25,27 @@ export const Card: React.FC<{
 						suppressContentEditableWarning={true}
 						onBlur={onBlur}
 					>
-						{item.readableName}
+						{item.readableName}{" "}
 					</div>
-					<div className="text-xl self-start" {...provided.dragHandleProps}>
-						𐄞
+
+					<div className="self-start flex flex-col">
+						<div className="text-xl" {...provided.dragHandleProps}>
+							𐄞
+						</div>
+
+						<button
+							className="text-xl"
+							onClick={(e) => {
+								e.preventDefault()
+								window.dispatchEvent(
+									new CustomEvent("set-current-file", {
+										detail: { path: item.path },
+									}),
+								)
+							}}
+						>
+							⇱
+						</button>
 					</div>
 				</div>
 			)}

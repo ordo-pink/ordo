@@ -1,7 +1,6 @@
 import React from "react"
 import { Folder as TFolder } from "../../../main/apis/fs/types"
 
-import { Conditional } from "../conditional"
 import { Emoji } from "../emoji"
 
 export const Folder: React.FC<{

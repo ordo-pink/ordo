@@ -1,12 +1,15 @@
 import React from "react"
 
-export const useEventListener = <K extends keyof WindowEventMap>(
+export const useEventListener = <K extends keyof WindowEventMap | string>(
 	eventName: K,
-	handler: (event: WindowEventMap[K]) => void,
+	handler: (event: K extends keyof WindowEventMap ? WindowEventMap[K] : CustomEvent) => void,
 	element: Window | HTMLElement = window,
 ): void => {
 	// Create a ref that stores handler
-	const savedHandler = React.useRef<(event: WindowEventMap[K]) => void>()
+	const savedHandler =
+		React.useRef<
+			(event: K extends keyof WindowEventMap ? WindowEventMap[K] : CustomEvent) => void
+		>()
 
 	// Update ref.current value if handler changes.
 	// This allows our effect below to always get latest handler ...
@@ -24,7 +27,9 @@ export const useEventListener = <K extends keyof WindowEventMap>(
 			if (!isSupported) return
 
 			// Create event listener that calls handler function stored in ref
-			const eventListener = (event: WindowEventMap[K]) => savedHandler.current(event)
+			const eventListener = (
+				event: K extends keyof WindowEventMap ? WindowEventMap[K] : CustomEvent,
+			) => savedHandler.current(event)
 
 			// Add event listener
 			element.addEventListener(eventName, eventListener)

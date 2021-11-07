@@ -55,17 +55,16 @@ export const App: React.FC = () => {
 	}
 
 	const setCurrentFileListener = ({ detail }: any) => {
-		console.log(detail)
 		setCurrentFilePath(detail.path)
 	}
 
 	React.useEffect(() => {
 		window.addEventListener("set-current-file", setCurrentFileListener)
-		// window.addEventListener("update-tree", updateFileTreeListener)
+		window.addEventListener("update-tree", updateFileTreeListener)
 
 		return () => {
 			window.removeEventListener("set-current-file", setCurrentFileListener)
-			// window.removeEventListener("update-tree", updateFileTreeListener)
+			window.removeEventListener("update-tree", updateFileTreeListener)
 		}
 	}, [])
 

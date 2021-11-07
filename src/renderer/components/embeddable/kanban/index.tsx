@@ -15,13 +15,19 @@ export const Kanban: React.FC<{
 	const [tree, setTree] = React.useState<Folder>({} as Folder)
 	const [hash, setHash] = React.useState("")
 
-	const setPath = (oldPath: string, newPath: string) => {
-		window.fileSystemAPI.move(oldPath, newPath).then(() => {
-			window.fileSystemAPI.listFolder(folder).then((data) => {
-				setTree(data)
-				setHash(data.hash)
-			})
+	const updateFileTree = () => {
+		window.fileSystemAPI.listFolder(folder).then((data) => {
+			setTree(data)
+			setHash(data.hash)
 		})
+	}
+
+	const setPath = (oldPath: string, newPath: string) => {
+		window.fileSystemAPI.move(oldPath, newPath).then(updateFileTree)
+	}
+
+	const createCard = (cardPath: string) => {
+		window.fileSystemAPI.createFile(cardPath).then(updateFileTree)
 	}
 
 	// const onBlur = (e: React.FocusEvent<HTMLDivElement, Element>) => {
@@ -29,18 +35,14 @@ export const Kanban: React.FC<{
 	// }
 
 	const onDragEnd = (result: DropResult, provided: ResponderProvided) => {
+		// TODO: Adding files in column, adding columns on the board!!!
 		if (result.source.droppableId !== result.destination.droppableId) {
 			window.fileSystemAPI
 				.move(
 					`${result.source.droppableId}/${result.draggableId}.md`,
 					`${result.destination.droppableId}/${result.draggableId}.md`,
 				)
-				.then(() => {
-					window.fileSystemAPI.listFolder(folder).then((data) => {
-						setTree(data)
-						setHash(data.hash)
-					})
-				})
+				.then(updateFileTree)
 		}
 	}
 
@@ -75,7 +77,13 @@ export const Kanban: React.FC<{
 									{tree.children.map(
 										(column: Folder, index) =>
 											column.isFolder && (
-												<Column key={column.path} tree={column} index={index} setPath={setPath} />
+												<Column
+													key={column.path}
+													tree={column}
+													index={index}
+													updateColumnName={setPath}
+													createCard={createCard}
+												/>
 											),
 									)}
 									{provided.placeholder}

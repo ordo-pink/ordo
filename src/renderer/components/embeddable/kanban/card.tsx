@@ -5,10 +5,10 @@ import { FileMetadata } from "../../../../main/apis/fs/types"
 export const Card: React.FC<{
 	item: FileMetadata
 	index: number
-	setPath: (oldPath: string, newPath: string) => void
-}> = ({ item, index, setPath }) => {
+	updateCardName: (oldPath: string, newPath: string) => void
+}> = ({ item, index, updateCardName }) => {
 	const onBlur = (e: React.FocusEvent<HTMLDivElement, Element>) => {
-		setPath(item.path, item.path.replace(item.readableName, e.target.textContent))
+		updateCardName(item.path, item.path.replace(item.readableName, e.target.textContent))
 	}
 
 	return (
@@ -17,7 +17,7 @@ export const Card: React.FC<{
 				<div
 					ref={provided.innerRef}
 					{...provided.draggableProps}
-					className="bg-gray-50 dark:bg-gray-700 rounded-lg shadow-lg w-full flex items-center justify-between p-4"
+					className="bg-gray-50 dark:bg-gray-700 rounded-lg shadow-lg w-full flex items-center justify-between px-4 py-2"
 				>
 					<div
 						className="outline-none"
@@ -27,7 +27,7 @@ export const Card: React.FC<{
 					>
 						{item.readableName}
 					</div>
-					<div className="text-2xl" {...provided.dragHandleProps}>
+					<div className="text-xl self-start" {...provided.dragHandleProps}>
 						𐄞
 					</div>
 				</div>

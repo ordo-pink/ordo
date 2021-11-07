@@ -3,7 +3,6 @@ import { Folder } from "../main/apis/fs/types"
 import { Editor } from "./components/editor"
 import { FileExplorer } from "./components/file-explorer"
 import { RenderWindow } from "./components/render-window"
-import { useEventListener } from "./hooks/use-event-listener"
 
 const listFolder = window.fileSystemAPI.listFolder
 
@@ -54,7 +53,7 @@ export const App: React.FC = () => {
 		})
 	}
 
-	const setCurrentFileListener = ({ detail }: any) => {
+	const setCurrentFileListener = ({ detail }: CustomEvent) => {
 		setCurrentFilePath(detail.path)
 	}
 

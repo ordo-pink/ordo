@@ -17,6 +17,8 @@ export interface IFileSystemAPI {
 	move: (oldPath: string, newPath: string) => Promise<void>
 	createFile: (path: string) => Promise<void>
 	createFolder: (path: string) => Promise<string>
+	deleteFile: (path: string) => Promise<void>
+	deleteFolder: (path: string) => Promise<void>
 }
 
 export interface IDarkModeAPI {

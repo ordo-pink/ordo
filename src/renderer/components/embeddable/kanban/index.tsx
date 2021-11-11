@@ -31,6 +31,10 @@ export const Kanban: React.FC<{
 		window.fileSystemAPI.createFile(cardPath).then(updateFileTree)
 	}
 
+	const deleteCard = (cardPath: string) => {
+		window.fileSystemAPI.deleteFile(cardPath).then(updateFileTree)
+	}
+
 	// const onBlur = (e: React.FocusEvent<HTMLDivElement, Element>) => {
 	// 	setPath(tree.path, tree.path.replace(tree.readableName, e.target.textContent))
 	// }
@@ -84,6 +88,7 @@ export const Kanban: React.FC<{
 													index={index}
 													updateColumnName={setPath}
 													createCard={createCard}
+													deleteCard={deleteCard}
 												/>
 											),
 									)}

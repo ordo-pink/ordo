@@ -6,7 +6,8 @@ export const Card: React.FC<{
 	item: FileMetadata
 	index: number
 	updateCardName: (oldPath: string, newPath: string) => void
-}> = ({ item, index, updateCardName }) => {
+	deleteCard: (cardName: string) => void
+}> = ({ item, index, updateCardName, deleteCard }) => {
 	const onBlur = (e: React.FocusEvent<HTMLDivElement, Element>) => {
 		updateCardName(item.path, item.path.replace(item.readableName, e.target.textContent))
 	}
@@ -17,7 +18,7 @@ export const Card: React.FC<{
 				<div
 					ref={provided.innerRef}
 					{...provided.draggableProps}
-					className="bg-gray-50 dark:bg-gray-700 rounded-lg shadow-lg w-full flex items-center justify-between px-4 py-2"
+					className="bg-gray-50 dark:bg-gray-700 rounded-lg shadow-lg w-full flex flex-col justify-between px-4 py-2"
 				>
 					<div
 						className="outline-none"
@@ -28,7 +29,7 @@ export const Card: React.FC<{
 						{item.readableName}{" "}
 					</div>
 
-					<div className="self-start flex flex-col">
+					<div className="flex space-x-2">
 						<div className="text-xl" {...provided.dragHandleProps}>
 							𐄞
 						</div>
@@ -45,6 +46,15 @@ export const Card: React.FC<{
 							}}
 						>
 							⇱
+						</button>
+
+						<button
+							className="text-sxl"
+							onClick={() => {
+								deleteCard(item.path)
+							}}
+						>
+							⤫
 						</button>
 					</div>
 				</div>

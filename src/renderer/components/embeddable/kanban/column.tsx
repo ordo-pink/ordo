@@ -10,7 +10,8 @@ export const Column: React.FC<{
 	index: number
 	updateColumnName: (oldPath: string, newPath: string) => void
 	createCard: (cardName: string) => void
-}> = ({ tree, index, updateColumnName, createCard }) => {
+	deleteCard: (cardName: string) => void
+}> = ({ tree, index, updateColumnName, createCard, deleteCard }) => {
 	const [isAddingCard, setIsAddingCard] = React.useState(false)
 	const [newCardName, setNewCardName] = React.useState("")
 
@@ -52,7 +53,12 @@ export const Column: React.FC<{
 									tree.children.map((item, index) => (
 										<div key={item.path}>
 											{item.isFile ? (
-												<Card item={item} index={index} updateCardName={updateColumnName} />
+												<Card
+													item={item}
+													index={index}
+													updateCardName={updateColumnName}
+													deleteCard={deleteCard}
+												/>
 											) : (
 												<></>
 											)}

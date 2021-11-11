@@ -13,6 +13,8 @@ contextBridge.exposeInMainWorld("fileSystemAPI", {
 	move: (oldPath: string, newPath: string) => ipcRenderer.invoke("fs:move", oldPath, newPath),
 	createFile: (path: string) => ipcRenderer.invoke("fs:create-file", path),
 	createFolder: (path: string) => ipcRenderer.invoke("fs:create-folder", path),
+	deleteFile: (path: string) => ipcRenderer.invoke("fs:delete-file", path),
+	deleteFolder: (path: string) => ipcRenderer.invoke("fs:delete-folder", path),
 })
 
 contextBridge.exposeInMainWorld("settingsAPI", {

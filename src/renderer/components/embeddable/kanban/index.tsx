@@ -3,6 +3,7 @@ import type { Folder } from "../../../../main/apis/fs/types"
 import React from "react"
 import { DragDropContext, Droppable, DropResult } from "react-beautiful-dnd"
 import { Column } from "./column"
+import { Conditional } from "../../conditional"
 
 export const Kanban: React.FC<{
 	folder: string
@@ -14,6 +15,8 @@ export const Kanban: React.FC<{
 }> = ({ folder }) => {
 	const [tree, setTree] = React.useState<Folder>({} as Folder)
 	const [hash, setHash] = React.useState("")
+	const [isAddingColumn, setIsAddingColumn] = React.useState(false)
+	const [newColumnName, setNewColumnName] = React.useState("")
 
 	const updateFileTree = () => {
 		window.fileSystemAPI.listFolder(folder).then((data) => {
@@ -29,6 +32,10 @@ export const Kanban: React.FC<{
 
 	const createCard = (cardPath: string) => {
 		window.fileSystemAPI.createFile(cardPath).then(updateFileTree)
+	}
+
+	const createColumn = (columnPath: string) => {
+		window.fileSystemAPI.createFolder(columnPath).then(updateFileTree)
 	}
 
 	const deleteCard = (cardPath: string) => {
@@ -99,6 +106,32 @@ export const Kanban: React.FC<{
 					)}
 				</div>
 			</DragDropContext>
+			<Conditional when={isAddingColumn}>
+				<input
+					autoFocus={true}
+					className="w-full outline-none text-left rounded-lg mt-2 p-2 text-xs text-gray-500 border border-dashed border-gray-500"
+					value={newColumnName}
+					onChange={(e) => setNewColumnName(e.target.value)}
+					onKeyDown={(e) => {
+						if (e.key === "Enter") {
+							createColumn(`${tree.path}/${newColumnName}`)
+							setNewColumnName("")
+						}
+					}}
+					onBlur={() => setIsAddingColumn(false)}
+				/>
+				<button
+					onClick={() => setIsAddingColumn(true)}
+					className={`w-full text-left rounded-lg mt-2 p-2 text-xs text-gray-500 border border-dashed border-gray-500 ${
+						!isAddingColumn && Boolean(newColumnName) && "border-yellow-700 text-yellow-700"
+					}`}
+				>
+					+ Add column
+					<Conditional when={!isAddingColumn && Boolean(newColumnName)}>
+						<span className="ml-4">🟡</span>
+					</Conditional>
+				</button>
+			</Conditional>
 		</div>
 	)
 }

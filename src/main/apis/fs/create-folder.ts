@@ -2,12 +2,11 @@ import { mkdir, writeFile } from "fs"
 import { join } from "path"
 
 const folderMetadataContent = (path: string) => `---
----
 color: default
 collapsed: true
 ---
 
-<List folder="${path}" />
+<Kanban folder="${path}" />
 `
 
 export const createFolder = (path: string): Promise<string> =>

@@ -22,6 +22,7 @@ export const Settings: TSettings = {
 		"appearance.dark-mode.theme": "system",
 		"application.global-settings-path": "",
 		"application.last-open-file": "",
+		"application.root-folder-path": "",
 	},
 	get: (key) => Settings[SETTINGS_MAP][key],
 	set: (key, value) => {

@@ -4,8 +4,6 @@ import { Editor } from "./components/editor"
 import { FileExplorer } from "./components/file-explorer"
 import { RenderWindow } from "./components/render-window"
 
-const listFolder = window.fileSystemAPI.listFolder
-
 const ExtensionWidth = {
 	"1/12": "w-1/12",
 	"2/12": "w-2/12",
@@ -21,8 +19,6 @@ const ExtensionWidth = {
 	"12/12": "w-full",
 }
 
-const path = "mock-data"
-
 const BlockHeading: React.FC<{ text: string }> = ({ text }) => (
 	<h2 className="w-full uppercase text-sm text-center text-gray-600 dark:text-gray-500">{text}</h2>
 )
@@ -34,6 +30,7 @@ const ExtensionWindow: React.FC<{ width: keyof typeof ExtensionWidth }> = ({ chi
 )
 
 export const App: React.FC = () => {
+	const [rootPath, setRootPath] = React.useState("")
 	const [fileTree, setFileTree] = React.useState<Folder>({} as Folder)
 	const [hash, setHash] = React.useState("")
 	const [currentFilePath, setCurrentFilePath] = React.useState("")
@@ -41,7 +38,7 @@ export const App: React.FC = () => {
 	const [unsavedFiles, setUnsavedFiles] = React.useState([])
 
 	const updateFileTreeListener = () => {
-		listFolder(path).then((data) => {
+		window.fileSystemAPI.listFolder(rootPath).then((data) => {
 			setFileTree(data)
 			setHash(data.hash)
 
@@ -67,10 +64,6 @@ export const App: React.FC = () => {
 		}
 	}, [])
 
-	// useEventListener("keydown", ({ key, metaKey }) => {
-
-	// })
-
 	const toggleUnsavedFileStatus = (path: string, saved: boolean) => {
 		const unsavedFilesCopy = [...unsavedFiles]
 
@@ -89,30 +82,55 @@ export const App: React.FC = () => {
 	}
 
 	React.useEffect(() => {
-		listFolder(path).then((data) => {
-			setFileTree(data)
-			setHash(data.hash)
+		window.settingsAPI.get("application.root-folder-path").then((path) => {
+			setRootPath(path)
 
-			window.settingsAPI.get("application.last-open-file").then((value) => {
-				if (value) {
-					setCurrentFilePath(value)
-				}
+			window.fileSystemAPI.listFolder(path).then((data) => {
+				setFileTree(data)
+				setHash(data.hash)
+
+				window.settingsAPI.get("application.last-open-file").then((value) => {
+					if (value) {
+						setCurrentFilePath(value)
+					}
+				})
 			})
 		})
-	}, [hash])
+	}, [hash, rootPath])
+
+	const selectRootDir = (e: React.MouseEvent<HTMLInputElement, MouseEvent>) => {
+		e.preventDefault()
+
+		window.fileSystemAPI.selectRootFolder().then((path) => {
+			setCurrentFilePath("")
+			setRenderContent("")
+			setRootPath(path)
+		})
+	}
 
 	return (
 		<div className="w-full flex flex-col h-screen">
 			<div className="flex flex-grow w-full h-screen">
-				<div className="w-2/12 border-r border-gray-300 dark:border-gray-900 py-4 bg-gray-100 dark:bg-gray-700">
-					<BlockHeading text="Explorer" />
-					<FileExplorer
-						unsavedFiles={unsavedFiles}
-						tree={fileTree}
-						root={path}
-						currentFile={currentFilePath}
-						setCurrentFile={assignCurrentPath}
-					/>
+				<div className="flex flex-col justify-between w-2/12 border-r border-gray-300 dark:border-gray-900 py-4 bg-gray-100 dark:bg-gray-700">
+					<div>
+						<BlockHeading text="Explorer" />
+						<FileExplorer
+							unsavedFiles={unsavedFiles}
+							tree={fileTree}
+							root={rootPath}
+							currentFile={currentFilePath}
+							setCurrentFile={assignCurrentPath}
+						/>
+					</div>
+
+					<div className="px-2">
+						<button
+							onClick={selectRootDir}
+							className={`w-full text-left rounded-lg p-2 text-xs text-gray-500 border border-dashed border-gray-500`}
+						>
+							⤴ Open Workspace
+						</button>
+					</div>
 				</div>
 				<ExtensionWindow width="2/12">
 					<Editor

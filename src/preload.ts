@@ -15,6 +15,7 @@ contextBridge.exposeInMainWorld("fileSystemAPI", {
 	createFolder: (path: string) => ipcRenderer.invoke("fs:create-folder", path),
 	deleteFile: (path: string) => ipcRenderer.invoke("fs:delete-file", path),
 	deleteFolder: (path: string) => ipcRenderer.invoke("fs:delete-folder", path),
+	selectRootFolder: () => ipcRenderer.invoke("fs:select-root-folder"),
 })
 
 contextBridge.exposeInMainWorld("settingsAPI", {

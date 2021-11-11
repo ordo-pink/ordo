@@ -8,4 +8,5 @@ export type Configuration = {
 	"appearance.dark-mode.theme": ColorTheme
 	"application.global-settings-path": string
 	"application.last-open-file": string
+	"application.root-folder-path": string
 }

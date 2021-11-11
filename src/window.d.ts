@@ -19,6 +19,7 @@ export interface IFileSystemAPI {
 	createFolder: (path: string) => Promise<string>
 	deleteFile: (path: string) => Promise<void>
 	deleteFolder: (path: string) => Promise<void>
+	selectRootFolder: () => Promise<string>
 }
 
 export interface IDarkModeAPI {

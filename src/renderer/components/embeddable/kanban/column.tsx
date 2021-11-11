@@ -72,7 +72,7 @@ export const Column: React.FC<{
 					<Conditional when={isAddingCard}>
 						<input
 							autoFocus={true}
-							className="rounded-lg mx-2 p-2 text-center text-xs text-gray-500 border border-dashed border-gray-500"
+							className="rounded-lg outline-none mx-2 p-2 text-left text-xs text-gray-500 border border-dashed border-gray-500"
 							value={newCardName}
 							onChange={(e) => setNewCardName(e.target.value)}
 							onKeyDown={(e) => {
@@ -85,7 +85,7 @@ export const Column: React.FC<{
 						/>
 						<button
 							onClick={() => setIsAddingCard(true)}
-							className={`rounded-lg mx-2 p-2 text-center text-xs text-gray-500 border border-dashed border-gray-500 ${
+							className={`rounded-lg mx-2 p-2 text-left text-xs text-gray-500 border border-dashed border-gray-500 ${
 								!isAddingCard && Boolean(newCardName) && "border-yellow-700 text-yellow-700"
 							}`}
 						>

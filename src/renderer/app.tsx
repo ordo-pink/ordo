@@ -33,7 +33,6 @@ export const App: React.FC = () => {
 	const [fileTree, setFileTree] = React.useState<Folder>({} as Folder)
 	const [hash, setHash] = React.useState("")
 	const [currentFilePath, setCurrentFilePath] = React.useState("")
-	const [renderContent, setRenderContent] = React.useState("")
 	const [unsavedFiles, setUnsavedFiles] = React.useState([])
 
 	const updateFileTreeListener = () => {
@@ -102,7 +101,6 @@ export const App: React.FC = () => {
 
 		window.fileSystemAPI.selectRootFolder().then((path) => {
 			setCurrentFilePath("")
-			setRenderContent("")
 			setRootPath(path)
 		})
 	}

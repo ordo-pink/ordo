@@ -12,7 +12,8 @@ export const Column: React.FC<{
 	createCard: (cardName: string) => void
 	deleteCard: (cardName: string) => void
 }> = ({ tree, index, updateColumnName, createCard, deleteCard }) => {
-	const [isAddingCard, setIsAddingCard] = React.useState(false)
+	const [isAddingCardAtTheTop, setIsAddingCardAtTheTop] = React.useState(false)
+	const [isAddingCardAtTheBottom, setIsAddingCardAtTheBottom] = React.useState(false)
 	const [newCardName, setNewCardName] = React.useState("")
 
 	const onBlur = (e: React.FocusEvent<HTMLDivElement, Element>) => {
@@ -42,6 +43,33 @@ export const Column: React.FC<{
 						</div>
 					</div>
 
+					<Conditional when={isAddingCardAtTheTop}>
+						<input
+							autoFocus={true}
+							className="rounded-lg outline-none mx-2 p-2 text-left text-xs text-gray-500 border border-dashed border-gray-500"
+							value={newCardName}
+							onChange={(e) => setNewCardName(e.target.value)}
+							onKeyDown={(e) => {
+								if (e.key === "Enter") {
+									createCard(`${tree.path}/${newCardName}.md`)
+									setNewCardName("")
+								}
+							}}
+							onBlur={() => setIsAddingCardAtTheTop(false)}
+						/>
+						<button
+							onClick={() => setIsAddingCardAtTheTop(true)}
+							className={`rounded-lg mx-2 p-2 text-left text-xs text-gray-500 border border-dashed border-gray-500 ${
+								!isAddingCardAtTheTop && Boolean(newCardName) && "border-yellow-700 text-yellow-700"
+							}`}
+						>
+							+ Add card
+							<Conditional when={!isAddingCardAtTheTop && Boolean(newCardName)}>
+								<span className="ml-4">🟡</span>
+							</Conditional>
+						</button>
+					</Conditional>
+
 					<Droppable direction="vertical" droppableId={tree.path} type="card">
 						{(provided) => (
 							<div
@@ -69,31 +97,35 @@ export const Column: React.FC<{
 						)}
 					</Droppable>
 
-					<Conditional when={isAddingCard}>
-						<input
-							autoFocus={true}
-							className="rounded-lg outline-none mx-2 p-2 text-left text-xs text-gray-500 border border-dashed border-gray-500"
-							value={newCardName}
-							onChange={(e) => setNewCardName(e.target.value)}
-							onKeyDown={(e) => {
-								if (e.key === "Enter") {
-									createCard(`${tree.path}/${newCardName}.md`)
-									setNewCardName("")
-								}
-							}}
-							onBlur={() => setIsAddingCard(false)}
-						/>
-						<button
-							onClick={() => setIsAddingCard(true)}
-							className={`rounded-lg mx-2 p-2 text-left text-xs text-gray-500 border border-dashed border-gray-500 ${
-								!isAddingCard && Boolean(newCardName) && "border-yellow-700 text-yellow-700"
-							}`}
-						>
-							+ Add card
-							<Conditional when={!isAddingCard && Boolean(newCardName)}>
-								<span className="ml-4">🟡</span>
-							</Conditional>
-						</button>
+					<Conditional when={tree.children && tree.children.length > 0}>
+						<Conditional when={isAddingCardAtTheBottom}>
+							<input
+								autoFocus={true}
+								className="rounded-lg outline-none mx-2 p-2 text-left text-xs text-gray-500 border border-dashed border-gray-500"
+								value={newCardName}
+								onChange={(e) => setNewCardName(e.target.value)}
+								onKeyDown={(e) => {
+									if (e.key === "Enter") {
+										createCard(`${tree.path}/${newCardName}.md`)
+										setNewCardName("")
+									}
+								}}
+								onBlur={() => setIsAddingCardAtTheBottom(false)}
+							/>
+							<button
+								onClick={() => setIsAddingCardAtTheBottom(true)}
+								className={`rounded-lg mx-2 p-2 text-left text-xs text-gray-500 border border-dashed border-gray-500 ${
+									!isAddingCardAtTheBottom &&
+									Boolean(newCardName) &&
+									"border-yellow-700 text-yellow-700"
+								}`}
+							>
+								+ Add card
+								<Conditional when={!isAddingCardAtTheBottom && Boolean(newCardName)}>
+									<span className="ml-4">🟡</span>
+								</Conditional>
+							</button>
+						</Conditional>
 					</Conditional>
 				</div>
 			)}

@@ -1,8 +1,7 @@
 import * as React from "react"
 import { Folder } from "../main/apis/fs/types"
-import { Editor } from "./components/editor"
 import { FileExplorer } from "./components/file-explorer"
-import { RenderWindow } from "./components/render-window"
+import { Workspace } from "./components/workplace"
 
 const ExtensionWidth = {
 	"1/12": "w-1/12",
@@ -132,15 +131,8 @@ export const App: React.FC = () => {
 						</button>
 					</div>
 				</div>
-				<ExtensionWindow width="2/12">
-					<Editor
-						setRenderContent={setRenderContent}
-						currentFilePath={currentFilePath}
-						toggleSaved={toggleUnsavedFileStatus}
-					/>
-				</ExtensionWindow>
-				<ExtensionWindow width="8/12">
-					<RenderWindow content={renderContent} />
+				<ExtensionWindow width="12/12">
+					<Workspace currentFilePath={currentFilePath} toggleSaved={toggleUnsavedFileStatus} />
 				</ExtensionWindow>
 				{/* <div className="flex flex-col ml-4 w-2/12 h-full space-y-4">
 					<div className="p-2 h-1/3 bg-gray-100 dark:bg-gray-700 rounded-lg shadow-lg">

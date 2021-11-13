@@ -8,7 +8,7 @@ export const WelcomePage: React.FC = () => (
 	</div>
 )
 
-const components = {
+const components: Record<string, React.FunctionComponent> = {
 	Kanban,
 }
 
@@ -17,7 +17,7 @@ const renderEmbeddable = (line: string) => {
 		const attributes = line.match(/(\S+)=["']?((?:.(?!["']?\s+(?:\S+)=|[>"']))+.)["']?/g)
 
 		const componentName = line.match(/<([^\s>]+)(\s|>)+/)[1]
-		const Component = (components as any)[componentName]
+		const Component = components[componentName]
 
 		const props = (attributes || []).reduce((acc, v) => {
 			const pair = v.split("=")

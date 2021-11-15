@@ -47,6 +47,7 @@ const applyStyles = (line: string) => {
 	if (isEmbeddableComponent(line)) {
 		return <span className="text-sm font-mono text-gray-500">{line}</span>
 	}
+
 	return <span className="whitespace-pre-wrap leading-7">{transformed}</span>
 }
 
@@ -249,7 +250,6 @@ export const Workspace: React.FC<{
 										onInput={() => onChangeEditableDiv(index)}
 										onKeyDown={onKeyDown}
 										suppressContentEditableWarning={true}
-										// dangerouslySetInnerHTML={{ __html: applyStyles(line) }}
 									>
 										{applyStyles(line)}
 									</div>

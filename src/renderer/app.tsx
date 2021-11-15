@@ -127,10 +127,10 @@ export const App: React.FC = () => {
 	}
 
 	return (
-		<div className="w-full flex flex-col h-screen">
-			<div className="flex flex-grow w-full h-screen">
-				<div className="flex flex-col justify-between w-2/12 border-r border-gray-300 dark:border-gray-900 py-4 bg-gray-100 dark:bg-gray-700">
-					<div>
+		<div className="w-full flex flex-col">
+			<div className="flex flex-grow w-full">
+				<div className="h-screen overflow-y-auto flex flex-col justify-between w-2/12 border-r border-gray-300 dark:border-gray-900 py-4 bg-gray-100 dark:bg-gray-700">
+					<div className="">
 						<BlockHeading text="Explorer" />
 						<FileExplorer
 							unsavedFiles={unsavedFiles}
@@ -150,9 +150,9 @@ export const App: React.FC = () => {
 						</button>
 					</div>
 				</div>
-				<ExtensionWindow width="12/12">
+				<div className="h-screen overflow-y-auto w-10/12 bg-gray-100">
 					<Workspace currentFilePath={currentFilePath} toggleSaved={toggleUnsavedFileStatus} />
-				</ExtensionWindow>
+				</div>
 				{/* <div className="flex flex-col ml-4 w-2/12 h-full space-y-4">
 					<div className="p-2 h-1/3 bg-gray-100 dark:bg-gray-700 rounded-lg shadow-lg">
 						<BlockHeading text="Recent Files" />

@@ -31,17 +31,6 @@ export enum NodeType {
 	EMBEDDABLE_COMPONENT,
 }
 
-const createNode = (nodeType: NodeType, line: string, index: number): MarkdownTree => {
-	const tree: MarkdownTree = {
-		nodeType,
-		index,
-		raw: line,
-		children: [],
-	}
-
-	return tree
-}
-
 export const createTree = (markdown: string): MarkdownTree => {
 	const result: MarkdownTree = {
 		children: [],

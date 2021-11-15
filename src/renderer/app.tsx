@@ -1,6 +1,5 @@
 import * as React from "react"
-import { findPathByName } from "../utils/tree"
-import { FileMetadata, Folder } from "../main/apis/fs/types"
+import { Folder } from "../main/apis/fs/types"
 import { FileExplorer } from "./components/file-explorer"
 import { Workspace } from "./components/workplace"
 
@@ -60,7 +59,8 @@ export const App: React.FC = () => {
 			let l = chunks.length - 1
 
 			while (l >= 0) {
-				node = node.children.find((child) => child.readableName === chunks[i]) as any
+				node = node.children.find((child) => child.readableName === chunks[i]) as Folder
+
 				if (node.isFile && !l) {
 					setCurrentFilePath(node.path)
 				}

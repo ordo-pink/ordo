@@ -1,5 +1,5 @@
 import type { ColorTheme } from "./apis/appearance/types"
-import { app, BrowserWindow, dialog, ipcMain } from "electron"
+import { app, BrowserWindow, dialog, ipcMain, shell } from "electron"
 import { join, normalize, resolve } from "path"
 import { debounce } from "../utils/function"
 import { Settings } from "./apis/settings"
@@ -51,6 +51,8 @@ ipcMain.handle("settings:set", (_, key, value) => {
 })
 ipcMain.handle("settings:get", (_, key) => Settings.get(key))
 
+ipcMain.handle("shell:open-external", (_, url) => shell.openExternal(url))
+
 const createWindow = (): void => {
 	// TODO: mainWindow.setProgressBar
 	// TODO: mainWindow.setRepresentedFileName - shows path to the given file in the title bar
@@ -84,7 +86,7 @@ const createWindow = (): void => {
 		}, 300),
 	)
 
-	ipcMain.handle("fs:select-root-folder", async () =>
+	ipcMain.handle("fs:select-root-folder", () =>
 		dialog
 			.showOpenDialog(mainWindow, {
 				properties: ["openDirectory", "createDirectory", "promptToCreate"],

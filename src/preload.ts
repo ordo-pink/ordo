@@ -23,3 +23,7 @@ contextBridge.exposeInMainWorld("settingsAPI", {
 		ipcRenderer.invoke("settings:set", key, value),
 	get: <K extends keyof Configuration>(key: K) => ipcRenderer.invoke("settings:get", key),
 })
+
+contextBridge.exposeInMainWorld("shellAPI", {
+	openExternal: (url: string) => ipcRenderer.invoke("shell:open-external", url),
+})

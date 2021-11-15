@@ -1,5 +1,6 @@
 import * as React from "react"
-import { Folder } from "../main/apis/fs/types"
+import { findPathByName } from "../utils/tree"
+import { FileMetadata, Folder } from "../main/apis/fs/types"
 import { FileExplorer } from "./components/file-explorer"
 import { Workspace } from "./components/workplace"
 
@@ -49,7 +50,27 @@ export const App: React.FC = () => {
 	}
 
 	const setCurrentFileListener = ({ detail }: CustomEvent) => {
-		setCurrentFilePath(detail.path)
+		if (detail.path.startsWith("https://") || detail.path.startsWith("http://")) {
+			window.shellAPI.openExternal(detail.path)
+		} else if (!detail.path.startsWith("/")) {
+			const chunks = detail.path.split("/")
+
+			let node: Folder = fileTree
+			let i = 0
+			let l = chunks.length - 1
+
+			while (l >= 0) {
+				node = node.children.find((child) => child.readableName === chunks[i]) as any
+				if (node.isFile && !l) {
+					setCurrentFilePath(node.path)
+				}
+
+				l--
+				i++
+			}
+		} else {
+			setCurrentFilePath(detail.path)
+		}
 	}
 
 	React.useEffect(() => {
@@ -60,7 +81,7 @@ export const App: React.FC = () => {
 			window.removeEventListener("set-current-file", setCurrentFileListener)
 			window.removeEventListener("update-tree", updateFileTreeListener)
 		}
-	}, [])
+	}, [hash])
 
 	const toggleUnsavedFileStatus = (path: string, saved: boolean) => {
 		const unsavedFilesCopy = [...unsavedFiles]

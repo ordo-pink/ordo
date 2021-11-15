@@ -1,94 +1,109 @@
 import React from "react"
 import { Conditional } from "../conditional"
-import { Kanban } from "../embeddable/kanban"
+import { isEmbeddableComponent, renderEmbeddable } from "./render-embeddable"
+import { WelcomePage } from "./welcome-page"
+import { getCaretPosition, setCaretPosition } from "./caret"
 
-export const WelcomePage: React.FC = () => (
-	<div className="flex flex-grow align-middle items-center justify-center h-full">
-		<p className="text-gray-900 dark:text-gray-100 text-2xl text-center w-64">Welcome to ||DO!</p>
-	</div>
-)
+const applyStyles = (line: string) => {
+	line = line
+		.replace(/\*\*([^**]+)\*\*/g, (value) => `<strong>${value}</strong>`)
+		.replace(/_([^_]+)_/g, (value) => `<em>${value}</em>`)
+		.replace(/~~([^~~]+)~~/g, (value) => `<strike>${value}</strike>`)
+		.replace(
+			/`([^`]+)`/g,
+			(value) => `<code class="bg-pink-200 p-1 rounded-lg shadow-sm">${value}</code>`,
+		)
+		.replace(
+			/\[\[(.*)\]\]/g,
+			(value) =>
+				`<span class="text-blue-600 underline cursor-pointer" onclick="window.dispatchEvent(new CustomEvent('set-current-file', { detail: { path: '${value
+					.replace("[[", "")
+					.replace("]]", "")}' }}))">${value}</span>`,
+		)
 
-const components: Record<string, React.FunctionComponent> = {
-	Kanban,
-}
+	let transformed
 
-const renderEmbeddable = (line: string) => {
-	try {
-		const attributes = line.match(/(\S+)=["']?((?:.(?!["']?\s+(?:\S+)=|[>"']))+.)["']?/g)
-
-		const componentName = line.match(/<([^\s>]+)(\s|>)+/)[1]
-		const Component = components[componentName]
-
-		const props = (attributes || []).reduce((acc, v) => {
-			const pair = v.split("=")
-			acc[pair[0]] = pair[1].slice(1, -1)
-			return acc
-		}, {} as Record<string, string>)
-
-		return <Component {...props} />
-	} catch (e) {
-		return (
-			<div
-				className=""
-				dangerouslySetInnerHTML={{
-					__html: `<p class="text-red-700">Error loading component: ${e.message}</p>`,
-				}}
+	if (line.startsWith("# ")) {
+		transformed = <h1 className="text-4xl" dangerouslySetInnerHTML={{ __html: line }} />
+	} else if (line.startsWith("## ")) {
+		transformed = <h2 className="text-3xl" dangerouslySetInnerHTML={{ __html: line }} />
+	} else if (line.startsWith("### ")) {
+		transformed = <h3 className="text-2xl" dangerouslySetInnerHTML={{ __html: line }} />
+	} else if (line.startsWith("#### ")) {
+		transformed = <h4 className="text-xl" dangerouslySetInnerHTML={{ __html: line }} />
+	} else if (line.startsWith("##### ")) {
+		transformed = <h5 className="text-lg" dangerouslySetInnerHTML={{ __html: line }} />
+	} else if (line.startsWith("> ")) {
+		transformed = (
+			<blockquote
+				className="border-l-2 border-gray-600 pl-2"
+				dangerouslySetInnerHTML={{ __html: line }}
 			/>
 		)
+	} else {
+		transformed = <span dangerouslySetInnerHTML={{ __html: line }} />
 	}
+
+	if (isEmbeddableComponent(line)) {
+		return <span className="text-sm font-mono text-gray-500">{line}</span>
+	}
+	return <span className="whitespace-pre-wrap leading-7">{transformed}</span>
 }
 
-const getClassName = (line: string) =>
-	"bg-transparent w-full outline-none leading-7 ".concat(
-		line.startsWith("# ") ? "text-4xl " : "",
-		line.startsWith("## ") ? "text-3xl " : "",
-		line.startsWith("### ") ? "text-2xl " : "",
-		line.startsWith("#### ") ? "text-xl " : "",
-		line.startsWith("##### ") ? "text-lg " : "",
-		line.startsWith("> ") ? "border-l-2 border-gray-600 pl-2 " : "",
-		isEmbeddableComponent(line) ? "text-sm font-mono text-gray-500 " : "",
-	)
+// const getLineElement = (index: number): HTMLInputElement =>
+// 	document.getElementById(`line-${index}`) as HTMLInputElement
 
-const isEmbeddableComponent = (line: string) =>
-	/^<[A-Z][a-zA-Zа-яА-Я";/=\-[\]{}.,'/ ]+\/>/.test(line)
-
-const getLineElement = (index: number): HTMLInputElement =>
-	document.getElementById(`line-${index}`) as HTMLInputElement
+const getDivElement = (index: number): HTMLDivElement =>
+	document.querySelector(`[data-id="${index}"]`)
 
 export const Workspace: React.FC<{
 	currentFilePath: string
 	toggleSaved: (path: string, saved: boolean) => void
 }> = ({ currentFilePath, toggleSaved }) => {
-	const [content, setContent] = React.useState([])
+	const [content, setContent] = React.useState<string[]>([])
 	const [hash, setHash] = React.useState("")
-	const [lastCaretPosition, setLastCaretPosition] = React.useState<[number, number]>([0, 0])
+	const [savedCaretPosition, setSavedCaretPosition] = React.useState(0)
 	const [currentLine, setCurrentLine] = React.useState(0)
 
-	const onClick = (event: React.MouseEvent<HTMLInputElement>) => {
-		const focusedLineIndex = Number(event.currentTarget.dataset.id)
+	React.useEffect(() => {
+		const line = getDivElement(currentLine)
 
-		const focusedLine: HTMLInputElement = document.getElementById(
-			`line-${focusedLineIndex}`,
-		) as HTMLInputElement
+		if (line) {
+			setCaretPosition(line, savedCaretPosition)
+		}
+	}, [savedCaretPosition, currentLine])
 
-		setCurrentLine(focusedLineIndex)
-		setLastCaretPosition([focusedLine.selectionStart, focusedLine.selectionEnd])
+	React.useEffect(() => {
+		currentFilePath &&
+			window.fileSystemAPI.getFile(currentFilePath).then(({ data, hash }) => {
+				setContent(data.split("\n"))
+				setHash(hash)
+			})
+	}, [hash, currentFilePath])
+
+	const onClickEditableDiv = (index: number) => {
+		const element = getDivElement(index)
+		const position = getCaretPosition(element)
+
+		setCurrentLine(index)
+		setSavedCaretPosition(position)
 	}
 
-	const onChange = (event: React.FormEvent<HTMLInputElement>, index: number) => {
+	const onChangeEditableDiv = (index: number) => {
 		toggleSaved(currentFilePath, false)
 
-		setLastCaretPosition([event.currentTarget.selectionStart, event.currentTarget.selectionEnd])
-		setCurrentLine(Number(event.currentTarget.dataset.id))
+		const element = getDivElement(index)
+		const position = getCaretPosition(element)
+
+		setCurrentLine(index)
+		setSavedCaretPosition(position)
 
 		const contentCopy = [...content]
-		contentCopy[index] = event.currentTarget.value
+		contentCopy[index] = element.textContent
 		setContent(contentCopy)
 	}
 
-	const onKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
-		const [selectionStart, selectionEnd] = lastCaretPosition
-
+	const onKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
 		const currentLineIndex = Number(event.currentTarget.dataset.id)
 		const previousLineIndex = Number(event.currentTarget.dataset.id) - 1
 		const nextLineIndex = Number(event.currentTarget.dataset.id) + 1
@@ -96,8 +111,8 @@ export const Workspace: React.FC<{
 		const isFirstLine = currentLine === 0
 		const isLastLine = currentLine === content.length - 1
 
-		const isLineStart = selectionStart === 0
-		const isLineEnd = selectionStart === content[currentLineIndex].length
+		const isLineStart = savedCaretPosition === 0
+		const isLineEnd = savedCaretPosition === content[currentLineIndex].length
 
 		if (event.metaKey && event.key === "s") {
 			window.fileSystemAPI.saveFile(currentFilePath, content.join("\n")).then(() => {
@@ -106,60 +121,23 @@ export const Workspace: React.FC<{
 		}
 
 		if (event.key === "ArrowLeft") {
-			event.preventDefault()
-
 			if (!isLineStart) {
-				const oneCharLeftIndex = event.currentTarget.selectionStart - 1
-				const currentLine = getLineElement(currentLineIndex)
-
-				currentLine.setSelectionRange(oneCharLeftIndex, oneCharLeftIndex)
-
-				setLastCaretPosition([oneCharLeftIndex, oneCharLeftIndex])
-				return
+				const currentLine = getDivElement(currentLineIndex)
+				setSavedCaretPosition(getCaretPosition(currentLine) - 1)
+			} else if (!isFirstLine) {
+				setCurrentLine(previousLineIndex)
+				setSavedCaretPosition(content[previousLineIndex].length)
 			}
-
-			if (isFirstLine) {
-				return
-			}
-
-			const previousLine: HTMLInputElement = document.getElementById(
-				`line-${previousLineIndex}`,
-			) as HTMLInputElement
-
-			previousLine.focus()
-			previousLine.setSelectionRange(
-				content[previousLineIndex].length,
-				content[previousLineIndex].length,
-			)
-
-			setLastCaretPosition([content[previousLineIndex].length, content[previousLineIndex].length])
-			setCurrentLine(previousLineIndex)
 		}
 
 		if (event.key === "ArrowRight") {
-			event.preventDefault()
-
 			if (!isLineEnd) {
-				const oneCharRightIndex = event.currentTarget.selectionEnd + 1
-				const currentLine = getLineElement(currentLineIndex)
-
-				currentLine.setSelectionRange(oneCharRightIndex, oneCharRightIndex)
-
-				setLastCaretPosition([oneCharRightIndex, oneCharRightIndex])
-				return
+				const currentLine = getDivElement(currentLineIndex)
+				setSavedCaretPosition(getCaretPosition(currentLine) + 1)
+			} else if (!isLastLine) {
+				setCurrentLine(nextLineIndex)
+				setSavedCaretPosition(0)
 			}
-
-			if (isLastLine) {
-				return
-			}
-
-			const nextLine: HTMLInputElement = getLineElement(nextLineIndex)
-
-			nextLine.focus()
-			nextLine.setSelectionRange(0, 0)
-
-			setLastCaretPosition([0, 0])
-			setCurrentLine(nextLineIndex)
 		}
 
 		if (event.key === "ArrowUp") {
@@ -169,12 +147,12 @@ export const Workspace: React.FC<{
 				return
 			}
 
-			const previousLine = getLineElement(previousLineIndex)
-
-			previousLine.focus()
-			previousLine.setSelectionRange(selectionEnd, selectionEnd)
-
 			setCurrentLine(previousLineIndex)
+			setSavedCaretPosition(
+				content[previousLineIndex].length < savedCaretPosition
+					? content[previousLineIndex].length
+					: savedCaretPosition,
+			)
 		}
 
 		if (event.key === "ArrowDown") {
@@ -184,12 +162,12 @@ export const Workspace: React.FC<{
 				return
 			}
 
-			const nextLine = getLineElement(nextLineIndex)
-
-			nextLine.focus()
-			nextLine.setSelectionRange(selectionEnd, selectionEnd)
-
 			setCurrentLine(nextLineIndex)
+			setSavedCaretPosition(
+				content[nextLineIndex].length < savedCaretPosition
+					? content[nextLineIndex].length
+					: savedCaretPosition,
+			)
 		}
 
 		if (event.key === "Backspace") {
@@ -205,7 +183,7 @@ export const Workspace: React.FC<{
 				setContent(contentCopy)
 				setCurrentLine(previousLineIndex)
 				toggleSaved(currentFilePath, false)
-				setLastCaretPosition([indexBeforeMergingLines, indexBeforeMergingLines])
+				setSavedCaretPosition(indexBeforeMergingLines)
 			}
 		}
 
@@ -213,73 +191,41 @@ export const Workspace: React.FC<{
 			event.preventDefault()
 
 			const contentCopy: string[] = [...content]
-			const postCaretContent = contentCopy[currentLineIndex].slice(
-				selectionEnd,
+			const contentAfterCaret = contentCopy[currentLineIndex].slice(
+				savedCaretPosition,
 				contentCopy[currentLineIndex].length,
 			)
 
-			contentCopy.splice(nextLineIndex, 0, postCaretContent)
-			contentCopy[currentLineIndex] = contentCopy[currentLineIndex].slice(0, selectionEnd)
+			contentCopy.splice(nextLineIndex, 0, contentAfterCaret)
+			contentCopy[currentLineIndex] = contentCopy[currentLineIndex].slice(0, savedCaretPosition)
 
 			setContent(contentCopy)
 			setCurrentLine(nextLineIndex)
 			toggleSaved(currentFilePath, false)
-			setLastCaretPosition([0, 0])
+			setSavedCaretPosition(0)
 		}
 
 		if (event.metaKey && event.key === "a") {
-			// event.preventDefault()
-			// const editor = document.getElementById("editor") as HTMLDivElement
-			// const range = new Range()
-			// range.setStart(editor, 0)
-			// range.setEnd(editor, content.join("\n").length)
-			// document.getSelection().removeAllRanges()
-			// document.getSelection().addRange(range)
+			event.preventDefault()
+			// TODO
 		}
 
 		if (event.key === "Tab") {
 			event.preventDefault()
-
 			const contentCopy = [...content]
 
-			contentCopy[currentLineIndex] = `	${contentCopy[currentLineIndex]}`
+			if (!event.shiftKey) {
+				contentCopy[currentLineIndex] = `	${contentCopy[currentLineIndex]}`
+				setSavedCaretPosition(savedCaretPosition + 1)
+			} else if (content[currentLineIndex].startsWith("	")) {
+				contentCopy[currentLineIndex] = contentCopy[currentLineIndex].slice(1)
+				setSavedCaretPosition(savedCaretPosition - 1)
+			}
 
-			setLastCaretPosition([selectionStart + 1, selectionEnd + 1])
 			toggleSaved(currentFilePath, false)
 			setContent(contentCopy)
 		}
-
-		if (event.key === "Tab" && event.shiftKey) {
-			event.preventDefault()
-
-			if (content[currentLineIndex].startsWith("	")) {
-				const contentCopy = [...content]
-
-				contentCopy[currentLineIndex] = contentCopy[currentLineIndex].slice(1)
-
-				setLastCaretPosition([selectionStart - 1, selectionEnd - 1])
-				toggleSaved(currentFilePath, false)
-				setContent(contentCopy)
-			}
-		}
 	}
-
-	React.useEffect(() => {
-		const line = getLineElement(currentLine)
-
-		if (line) {
-			line.focus()
-			line.setSelectionRange(...lastCaretPosition)
-		}
-	})
-
-	React.useEffect(() => {
-		currentFilePath &&
-			window.fileSystemAPI.getFile(currentFilePath).then(({ data, hash }) => {
-				setContent(data.split("\n"))
-				setHash(hash)
-			})
-	}, [hash, currentFilePath])
 
 	return (
 		<Conditional when={Boolean(currentFilePath)}>
@@ -288,22 +234,26 @@ export const Workspace: React.FC<{
 					{content &&
 						content.map((line, index) => (
 							<div
-								className={`flex items-baseline ${index === currentLine && "bg-gray-200"}`}
+								className={`flex items-center ${index === currentLine && "bg-gray-200"}`}
 								key={`${line}-${index}`}
 							>
-								<div className="text-right w-12 px-2 leading-7 text-gray-700 dark:text-gray-300 font-thin">
+								<div className="text-right w-12 px-2 text-gray-700 dark:text-gray-300 font-mono">
 									{index + 1}
 								</div>
-								<div className="pl-2 w-full border-l dark:border-gray-900 border-gray-300 ">
-									<input
-										id={`line-${index}`}
+								<div className="px-2 w-full border-l dark:border-gray-900 border-gray-300 ">
+									<div
+										className="outline-none"
+										contentEditable={true}
 										data-id={index}
-										onClick={onClick}
-										className={getClassName(line)}
-										onChange={(e) => onChange(e, index)}
+										onClick={() => onClickEditableDiv(index)}
+										onInput={() => onChangeEditableDiv(index)}
 										onKeyDown={onKeyDown}
-										value={line}
-									/>
+										suppressContentEditableWarning={true}
+										// dangerouslySetInnerHTML={{ __html: applyStyles(line) }}
+									>
+										{applyStyles(line)}
+									</div>
+
 									<Conditional when={isEmbeddableComponent(line)}>
 										{renderEmbeddable(line)}
 									</Conditional>

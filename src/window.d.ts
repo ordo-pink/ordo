@@ -7,6 +7,7 @@ declare global {
 		darkModeAPI: IDarkModeAPI
 		fileSystemAPI: IFileSystemAPI
 		settingsAPI: ISettingsAPI
+		shellAPI: IShellAPI
 	}
 }
 
@@ -20,6 +21,10 @@ export interface IFileSystemAPI {
 	deleteFile: (path: string) => Promise<void>
 	deleteFolder: (path: string) => Promise<void>
 	selectRootFolder: () => Promise<string>
+}
+
+export interface IShellAPI {
+	openExternal: (url: string) => Promise<void>
 }
 
 export interface IDarkModeAPI {

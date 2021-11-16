@@ -2,6 +2,7 @@ import type { Folder } from "../../../../main/apis/fs/types"
 
 import React from "react"
 import { DragDropContext, Droppable, DropResult } from "react-beautiful-dnd"
+
 import { Column } from "./column"
 import { Conditional } from "../../conditional"
 import { findFileByPath } from "../../../../utils/tree"
@@ -75,38 +76,12 @@ export const Kanban: React.FC<{
 			<div
 				// contentEditable={true}
 				// suppressContentEditableWarning={true}
-				className="text-center text-xs text-gray-700 dark:text-gray-300 outline-none"
+				className="text-xs text-gray-700 dark:text-gray-300 outline-none"
 				// onBlur={onBlur}
 			>
 				{tree.readableName}
-				<Conditional when={isAddingColumn}>
-					<input
-						autoFocus={isAddingColumn}
-						className="ml-4 w-64 outline-none text-left rounded-lg p-2 text-xs text-gray-500 border border-dashed border-gray-500"
-						value={newColumnName}
-						onChange={(e) => setNewColumnName(e.target.value)}
-						onKeyDown={(e) => {
-							if (e.key === "Enter") {
-								e.preventDefault()
-								createColumn(`${tree.path}/${newColumnName.trim()}`)
-								setNewColumnName("")
-							}
-						}}
-						onBlur={() => setIsAddingColumn(false)}
-					/>
-					<button
-						onClick={() => setIsAddingColumn(true)}
-						className={`ml-4 w-64 text-left rounded-lg p-2 text-xs text-gray-500 border border-dashed border-gray-500 ${
-							!isAddingColumn && Boolean(newColumnName) && "border-yellow-700 text-yellow-700"
-						}`}
-					>
-						+ Add column
-						<Conditional when={!isAddingColumn && Boolean(newColumnName)}>
-							<span className="ml-4">🟡</span>
-						</Conditional>
-					</button>
-				</Conditional>
 			</div>
+
 			<DragDropContext onDragEnd={onDragEnd}>
 				<div className={`bg-${tree.color}-200 dark:bg-gray-500 rounded-lg py-2`}>
 					{tree.children && (
@@ -137,6 +112,34 @@ export const Kanban: React.FC<{
 					)}
 				</div>
 			</DragDropContext>
+
+			<Conditional when={isAddingColumn}>
+				<input
+					autoFocus={isAddingColumn}
+					className="w-72 outline-none text-left rounded-lg p-2 text-xs text-gray-500 border border-dashed border-gray-500"
+					value={newColumnName}
+					onChange={(e) => setNewColumnName(e.target.value)}
+					onKeyDown={(e) => {
+						if (e.key === "Enter") {
+							e.preventDefault()
+							createColumn(`${tree.path}/${newColumnName.trim()}`)
+							setNewColumnName("")
+						}
+					}}
+					onBlur={() => setIsAddingColumn(false)}
+				/>
+				<button
+					onClick={() => setIsAddingColumn(true)}
+					className={`mt-2 w-72 text-left rounded-lg p-2 text-xs text-gray-500 border border-dashed border-gray-500 ${
+						!isAddingColumn && Boolean(newColumnName) && "border-yellow-700 text-yellow-700"
+					}`}
+				>
+					+ Add column
+					<Conditional when={!isAddingColumn && Boolean(newColumnName)}>
+						<span className="ml-4">🟡</span>
+					</Conditional>
+				</button>
+			</Conditional>
 		</div>
 	)
 }

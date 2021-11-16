@@ -60,8 +60,7 @@ const getDivElement = (index: number): HTMLDivElement =>
 export const Workspace: React.FC<{
 	currentFilePath: string
 	toggleSaved: (path: string, saved: boolean) => void
-	setFocused: React.Dispatch<React.SetStateAction<boolean>>
-}> = ({ currentFilePath, toggleSaved, setFocused }) => {
+}> = ({ currentFilePath, toggleSaved }) => {
 	const [content, setContent] = React.useState<string[]>([])
 	const [hash, setHash] = React.useState("")
 	const [savedCaretPosition, setSavedCaretPosition] = React.useState(0)
@@ -88,7 +87,6 @@ export const Workspace: React.FC<{
 		const position = getCaretPosition(element)
 
 		setCurrentLine(index)
-		setFocused(true)
 		setSavedCaretPosition(position)
 	}
 
@@ -99,7 +97,6 @@ export const Workspace: React.FC<{
 		const position = getCaretPosition(element)
 
 		setCurrentLine(index)
-		setFocused(true)
 		setSavedCaretPosition(position)
 
 		const contentCopy = [...content]
@@ -255,7 +252,6 @@ export const Workspace: React.FC<{
 											onClick={() => onClickEditableDiv(index)}
 											onInput={() => onChangeEditableDiv(index)}
 											onKeyDown={onKeyDown}
-											onBlur={() => setFocused(false)}
 											suppressContentEditableWarning={true}
 										>
 											{applyStyles(line)}

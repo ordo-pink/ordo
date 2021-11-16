@@ -61,7 +61,8 @@ export const Column: React.FC<{
 							onChange={(e) => setNewCardName(e.target.value)}
 							onKeyDown={(e) => {
 								if (e.key === "Enter") {
-									createCard(`${tree.path}/${newCardName}.md`)
+									e.preventDefault()
+									createCard(`${tree.path}/${newCardName.trim()}.md`)
 									setNewCardName("")
 								}
 							}}
@@ -116,7 +117,8 @@ export const Column: React.FC<{
 								onChange={(e) => setNewCardName(e.target.value)}
 								onKeyDown={(e) => {
 									if (e.key === "Enter") {
-										createCard(`${tree.path}/${newCardName}.md`)
+										e.preventDefault()
+										createCard(`${tree.path}/${newCardName.trim()}.md`)
 										setNewCardName("")
 									}
 								}}

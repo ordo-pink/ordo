@@ -10,24 +10,6 @@ export const App: React.FC = () => {
 	const [hash, setHash] = React.useState("")
 	const [currentFilePath, setCurrentFilePath] = React.useState("")
 	const [unsavedFiles, setUnsavedFiles] = React.useState<string[]>([])
-	const [workspaceFocused, setWorkspaceFocused] = React.useState(false)
-
-	const globalKeyUpListener = (e: KeyboardEvent) => {
-		if (workspaceFocused) {
-			return
-		}
-
-		if (currentFilePath && e.key === "Backspace" && e.metaKey) {
-			window.fileSystemAPI.deleteFile(currentFilePath).then(() => {
-				setCurrentFilePath("")
-				updateFileTreeListener()
-			})
-		}
-
-		if (currentFilePath && e.key === "Enter") {
-			console.log("here")
-		}
-	}
 
 	const updateFileTreeListener = () => {
 		window.fileSystemAPI.listFolder(rootPath).then((data) => {
@@ -76,12 +58,10 @@ export const App: React.FC = () => {
 	React.useEffect(() => {
 		window.addEventListener("set-current-file", setCurrentFileListener)
 		window.addEventListener("update-tree", updateFileTreeListener)
-		window.addEventListener("keydown", globalKeyUpListener)
 
 		return () => {
 			window.removeEventListener("set-current-file", setCurrentFileListener)
 			window.removeEventListener("update-tree", updateFileTreeListener)
-			window.removeEventListener("keydown", globalKeyUpListener)
 		}
 	}, [hash, currentFilePath])
 
@@ -166,11 +146,7 @@ export const App: React.FC = () => {
 					</div>
 				</div>
 				<div className="h-screen overflow-y-auto w-10/12 bg-gray-100">
-					<Workspace
-						currentFilePath={currentFilePath}
-						toggleSaved={toggleUnsavedFileStatus}
-						setFocused={setWorkspaceFocused}
-					/>
+					<Workspace currentFilePath={currentFilePath} toggleSaved={toggleUnsavedFileStatus} />
 				</div>
 				{/* <div className="flex flex-col ml-4 w-2/12 h-full space-y-4">
 					<div className="p-2 h-1/3 bg-gray-100 dark:bg-gray-700 rounded-lg shadow-lg">

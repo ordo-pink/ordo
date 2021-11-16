@@ -4,14 +4,10 @@ import React from "react"
 import { DragDropContext, Droppable, DropResult } from "react-beautiful-dnd"
 import { Column } from "./column"
 import { Conditional } from "../../conditional"
+import { findFileByPath } from "../../../../utils/tree"
 
 export const Kanban: React.FC<{
 	folder: string
-	// actionProperty: string
-	// bottomLeft: string
-	// bottomRight: string
-	// topLeft: string
-	// topRight: string
 }> = ({ folder }) => {
 	const [tree, setTree] = React.useState<Folder>({} as Folder)
 	const [hash, setHash] = React.useState("")
@@ -26,15 +22,23 @@ export const Kanban: React.FC<{
 		})
 	}
 
-	const setPath = (oldPath: string, newPath: string) => {
+	const updateColumnName = (oldPath: string, newPath: string) => {
 		window.fileSystemAPI.move(oldPath, newPath).then(updateFileTree)
 	}
 
 	const createCard = (cardPath: string) => {
+		if (cardPath.endsWith("/.md")) {
+			return
+		}
+
 		window.fileSystemAPI.createFile(cardPath).then(updateFileTree)
 	}
 
 	const createColumn = (columnPath: string) => {
+		if (findFileByPath(tree, columnPath)) {
+			return
+		}
+
 		window.fileSystemAPI.createFolder(columnPath).then(updateFileTree)
 	}
 
@@ -43,7 +47,7 @@ export const Kanban: React.FC<{
 	}
 
 	// const onBlur = (e: React.FocusEvent<HTMLDivElement, Element>) => {
-	// 	setPath(tree.path, tree.path.replace(tree.readableName, e.target.textContent))
+	// 	updateColumnName(tree.path, tree.path.replace(tree.readableName, e.target.textContent))
 	// }
 
 	const onDragEnd = (result: DropResult) => {
@@ -83,7 +87,8 @@ export const Kanban: React.FC<{
 						onChange={(e) => setNewColumnName(e.target.value)}
 						onKeyDown={(e) => {
 							if (e.key === "Enter") {
-								createColumn(`${tree.path}/${newColumnName}`)
+								e.preventDefault()
+								createColumn(`${tree.path}/${newColumnName.trim()}`)
 								setNewColumnName("")
 							}
 						}}
@@ -119,7 +124,7 @@ export const Kanban: React.FC<{
 													key={column.path}
 													tree={column}
 													index={index}
-													updateColumnName={setPath}
+													updateColumnName={updateColumnName}
 													createCard={createCard}
 													deleteCard={deleteCard}
 												/>

@@ -233,35 +233,40 @@ export const Workspace: React.FC<{
 
 	return (
 		<Conditional when={Boolean(currentFilePath)}>
-			<form className="pb-80 mb-80">
+			<form className="pb-80 mb-80 overflow-x-hidden">
 				<div id="editor" className="pb-80 mb-80">
 					{content &&
 						content.map((line, index) => (
-							<div
-								className={`flex items-center ${index === currentLine && "bg-gray-200"}`}
-								key={`${line}-${index}`}
-							>
-								<div className="text-right w-12 px-2 text-gray-700 dark:text-gray-300 font-mono">
-									{index + 1}
-								</div>
-								<div className="px-2 w-full border-l dark:border-gray-900 border-gray-300 ">
-									<div
-										className="outline-none"
-										contentEditable={true}
-										data-id={index}
-										onClick={() => onClickEditableDiv(index)}
-										onInput={() => onChangeEditableDiv(index)}
-										onKeyDown={onKeyDown}
-										onBlur={() => setFocused(false)}
-										suppressContentEditableWarning={true}
-									>
-										{applyStyles(line)}
+							<div>
+								<div
+									className={`w-full flex items-center ${index === currentLine && "bg-gray-200"}`}
+									key={`${line}-${index}`}
+								>
+									<div className="text-right w-12 px-2 text-gray-700 dark:text-gray-300 font-mono">
+										{index + 1}
 									</div>
-
-									<Conditional when={isEmbeddableComponent(line)}>
-										{renderEmbeddable(line)}
-									</Conditional>
+									<div
+										style={{ maxWidth: "1000px" }}
+										className="px-2 w-full border-l dark:border-gray-900 border-gray-300 "
+									>
+										<div
+											className="w-full outline-none"
+											contentEditable={true}
+											data-id={index}
+											onClick={() => onClickEditableDiv(index)}
+											onInput={() => onChangeEditableDiv(index)}
+											onKeyDown={onKeyDown}
+											onBlur={() => setFocused(false)}
+											suppressContentEditableWarning={true}
+										>
+											{applyStyles(line)}
+										</div>
+									</div>
 								</div>
+
+								<Conditional when={isEmbeddableComponent(line)}>
+									<div className="p-2">{renderEmbeddable(line)}</div>
+								</Conditional>
 							</div>
 						))}
 				</div>

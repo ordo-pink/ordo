@@ -26,7 +26,8 @@ export const Column: React.FC<{
 				<div
 					ref={provided.innerRef}
 					{...provided.draggableProps}
-					className={`w-full bg-gray-200 dark:bg-gray-600 bg-${tree.color}-100 dark:bg-${tree.color}-300 rounded-lg shadow-lg flex flex-col pb-2 space-y-2`}
+					style={{ minWidth: "18rem" }}
+					className={`bg-gray-200 dark:bg-gray-600 bg-${tree.color}-100 dark:bg-${tree.color}-300 rounded-lg shadow-md flex flex-col pb-2 space-y-2`}
 				>
 					<div className="flex justify-between items-center p-2">
 						<div
@@ -34,6 +35,15 @@ export const Column: React.FC<{
 							suppressContentEditableWarning={true}
 							className={`text-center outline-none text-xs text-${tree.color}-900`}
 							onBlur={onBlur}
+							onKeyDown={(e) => {
+								if (e.key === "Enter") {
+									e.preventDefault()
+									updateColumnName(
+										tree.path,
+										tree.path.replace(tree.readableName, e.currentTarget.textContent),
+									)
+								}
+							}}
 						>
 							{tree.readableName}
 						</div>
@@ -45,7 +55,7 @@ export const Column: React.FC<{
 
 					<Conditional when={isAddingCardAtTheTop}>
 						<input
-							autoFocus={true}
+							autoFocus={isAddingCardAtTheTop}
 							className="rounded-lg outline-none mx-2 p-2 text-left text-xs text-gray-500 border border-dashed border-gray-500"
 							value={newCardName}
 							onChange={(e) => setNewCardName(e.target.value)}
@@ -100,7 +110,7 @@ export const Column: React.FC<{
 					<Conditional when={tree.children && tree.children.length > 0}>
 						<Conditional when={isAddingCardAtTheBottom}>
 							<input
-								autoFocus={true}
+								autoFocus={isAddingCardAtTheBottom}
 								className="rounded-lg outline-none mx-2 p-2 text-left text-xs text-gray-500 border border-dashed border-gray-500"
 								value={newCardName}
 								onChange={(e) => setNewCardName(e.target.value)}

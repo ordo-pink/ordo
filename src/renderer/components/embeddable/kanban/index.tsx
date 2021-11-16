@@ -67,7 +67,7 @@ export const Kanban: React.FC<{
 
 	// TODO: Collect colors in one place
 	return (
-		<div className="shadow-inner bg-gray-50 dark:bg-gray-500 rounded-lg p-4">
+		<div className="w-full overflow-x-auto p-2 rounded-lg">
 			<div
 				// contentEditable={true}
 				// suppressContentEditableWarning={true}
@@ -75,9 +75,35 @@ export const Kanban: React.FC<{
 				// onBlur={onBlur}
 			>
 				{tree.readableName}
+				<Conditional when={isAddingColumn}>
+					<input
+						autoFocus={isAddingColumn}
+						className="ml-4 w-64 outline-none text-left rounded-lg p-2 text-xs text-gray-500 border border-dashed border-gray-500"
+						value={newColumnName}
+						onChange={(e) => setNewColumnName(e.target.value)}
+						onKeyDown={(e) => {
+							if (e.key === "Enter") {
+								createColumn(`${tree.path}/${newColumnName}`)
+								setNewColumnName("")
+							}
+						}}
+						onBlur={() => setIsAddingColumn(false)}
+					/>
+					<button
+						onClick={() => setIsAddingColumn(true)}
+						className={`ml-4 w-64 text-left rounded-lg p-2 text-xs text-gray-500 border border-dashed border-gray-500 ${
+							!isAddingColumn && Boolean(newColumnName) && "border-yellow-700 text-yellow-700"
+						}`}
+					>
+						+ Add column
+						<Conditional when={!isAddingColumn && Boolean(newColumnName)}>
+							<span className="ml-4">🟡</span>
+						</Conditional>
+					</button>
+				</Conditional>
 			</div>
 			<DragDropContext onDragEnd={onDragEnd}>
-				<div className={`w-full bg-${tree.color}-200 dark:bg-gray-500 rounded-lg py-2`}>
+				<div className={`bg-${tree.color}-200 dark:bg-gray-500 rounded-lg py-2`}>
 					{tree.children && (
 						<Droppable droppableId={tree.path} direction="horizontal" type="column">
 							{(provided) => (
@@ -106,32 +132,6 @@ export const Kanban: React.FC<{
 					)}
 				</div>
 			</DragDropContext>
-			<Conditional when={isAddingColumn}>
-				<input
-					autoFocus={true}
-					className="w-full outline-none text-left rounded-lg mt-2 p-2 text-xs text-gray-500 border border-dashed border-gray-500"
-					value={newColumnName}
-					onChange={(e) => setNewColumnName(e.target.value)}
-					onKeyDown={(e) => {
-						if (e.key === "Enter") {
-							createColumn(`${tree.path}/${newColumnName}`)
-							setNewColumnName("")
-						}
-					}}
-					onBlur={() => setIsAddingColumn(false)}
-				/>
-				<button
-					onClick={() => setIsAddingColumn(true)}
-					className={`w-full text-left rounded-lg mt-2 p-2 text-xs text-gray-500 border border-dashed border-gray-500 ${
-						!isAddingColumn && Boolean(newColumnName) && "border-yellow-700 text-yellow-700"
-					}`}
-				>
-					+ Add column
-					<Conditional when={!isAddingColumn && Boolean(newColumnName)}>
-						<span className="ml-4">🟡</span>
-					</Conditional>
-				</button>
-			</Conditional>
 		</div>
 	)
 }

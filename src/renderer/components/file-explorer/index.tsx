@@ -14,7 +14,18 @@ export const FileExplorer: React.FC<{
 	setCurrentFile: (page: string) => void
 	unsavedFiles: string[]
 	depth?: number
-}> = ({ tree, root, setCurrentFile, currentFile, unsavedFiles, depth = 1 }) => {
+	createFile: (path: string) => Promise<void>
+	createFolder: (path: string) => Promise<void>
+}> = ({
+	tree,
+	root,
+	setCurrentFile,
+	currentFile,
+	unsavedFiles,
+	createFile,
+	createFolder,
+	depth = 1,
+}) => {
 	const [collapsed, setCollapsed] = React.useState(true)
 
 	useEffect(() => {
@@ -25,7 +36,14 @@ export const FileExplorer: React.FC<{
 
 	return (
 		<div className="w-full">
-			<Folder depth={depth} collapsed={collapsed} setCollapsed={setCollapsed} folder={tree} />
+			<Folder
+				depth={depth}
+				collapsed={collapsed}
+				setCollapsed={setCollapsed}
+				folder={tree}
+				createFile={createFile}
+				createFolder={createFolder}
+			/>
 
 			<div className={`${collapsed ? "hidden" : "block"} w-full`}>
 				{tree.children &&
@@ -39,6 +57,8 @@ export const FileExplorer: React.FC<{
 								setCurrentFile={setCurrentFile}
 							/>
 							<FileExplorer
+								createFile={createFile}
+								createFolder={createFolder}
 								tree={fileOrFileTree as TFolder}
 								unsavedFiles={unsavedFiles}
 								root={root}

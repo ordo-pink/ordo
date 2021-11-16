@@ -1,39 +1,32 @@
-import * as React from "react"
+import React from "react"
 import { Folder } from "../main/apis/fs/types"
 import { FileExplorer } from "./components/file-explorer"
 import { Workspace } from "./components/workplace"
-
-const ExtensionWidth = {
-	"1/12": "w-1/12",
-	"2/12": "w-2/12",
-	"3/12": "w-3/12",
-	"4/12": "w-4/12",
-	"5/12": "w-5/12",
-	"6/12": "w-6/12",
-	"7/12": "w-7/12",
-	"8/12": "w-8/12",
-	"9/12": "w-9/12",
-	"10/12": "w-10/12",
-	"11/12": "w-11/12",
-	"12/12": "w-full",
-}
-
-const BlockHeading: React.FC<{ text: string }> = ({ text }) => (
-	<h2 className="w-full uppercase text-sm text-center text-gray-600 dark:text-gray-500">{text}</h2>
-)
-
-const ExtensionWindow: React.FC<{ width: keyof typeof ExtensionWidth }> = ({ children, width }) => (
-	<div className={`${ExtensionWidth[width]} overflow-auto bg-gray-100 dark:bg-gray-700 h-full p-4`}>
-		{children}
-	</div>
-)
 
 export const App: React.FC = () => {
 	const [rootPath, setRootPath] = React.useState("")
 	const [fileTree, setFileTree] = React.useState<Folder>({} as Folder)
 	const [hash, setHash] = React.useState("")
 	const [currentFilePath, setCurrentFilePath] = React.useState("")
-	const [unsavedFiles, setUnsavedFiles] = React.useState([])
+	const [unsavedFiles, setUnsavedFiles] = React.useState<string[]>([])
+	const [workspaceFocused, setWorkspaceFocused] = React.useState(false)
+
+	const globalKeyUpListener = (e: KeyboardEvent) => {
+		if (workspaceFocused) {
+			return
+		}
+
+		if (currentFilePath && e.key === "Backspace" && e.metaKey) {
+			window.fileSystemAPI.deleteFile(currentFilePath).then(() => {
+				setCurrentFilePath("")
+				updateFileTreeListener()
+			})
+		}
+
+		if (currentFilePath && e.key === "Enter") {
+			console.log("here")
+		}
+	}
 
 	const updateFileTreeListener = () => {
 		window.fileSystemAPI.listFolder(rootPath).then((data) => {
@@ -76,12 +69,14 @@ export const App: React.FC = () => {
 	React.useEffect(() => {
 		window.addEventListener("set-current-file", setCurrentFileListener)
 		window.addEventListener("update-tree", updateFileTreeListener)
+		window.addEventListener("keydown", globalKeyUpListener)
 
 		return () => {
 			window.removeEventListener("set-current-file", setCurrentFileListener)
 			window.removeEventListener("update-tree", updateFileTreeListener)
+			window.removeEventListener("keydown", globalKeyUpListener)
 		}
-	}, [hash])
+	}, [hash, currentFilePath])
 
 	const toggleUnsavedFileStatus = (path: string, saved: boolean) => {
 		const unsavedFilesCopy = [...unsavedFiles]
@@ -94,6 +89,15 @@ export const App: React.FC = () => {
 
 		setUnsavedFiles(unsavedFilesCopy)
 	}
+
+	const createFile = (path: string) =>
+		window.fileSystemAPI
+			.createFile(path)
+			.then(() => setCurrentFilePath(path))
+			.then(updateFileTreeListener)
+
+	const createFolder = (path: string) =>
+		window.fileSystemAPI.createFolder(path).then(updateFileTreeListener)
 
 	const assignCurrentPath = (path: string) => {
 		window.settingsAPI.set("application.last-open-file", path)
@@ -131,9 +135,13 @@ export const App: React.FC = () => {
 			<div className="flex flex-grow w-full">
 				<div className="h-screen overflow-y-auto flex flex-col justify-between w-2/12 border-r border-gray-300 dark:border-gray-900 py-4 bg-gray-100 dark:bg-gray-700">
 					<div className="">
-						<BlockHeading text="Explorer" />
+						<h2 className="w-full uppercase text-sm text-center text-gray-600 dark:text-gray-500">
+							Explorer
+						</h2>
 						<FileExplorer
 							unsavedFiles={unsavedFiles}
+							createFile={createFile}
+							createFolder={createFolder}
 							tree={fileTree}
 							root={rootPath}
 							currentFile={currentFilePath}
@@ -151,7 +159,11 @@ export const App: React.FC = () => {
 					</div>
 				</div>
 				<div className="h-screen overflow-y-auto w-10/12 bg-gray-100">
-					<Workspace currentFilePath={currentFilePath} toggleSaved={toggleUnsavedFileStatus} />
+					<Workspace
+						currentFilePath={currentFilePath}
+						toggleSaved={toggleUnsavedFileStatus}
+						setFocused={setWorkspaceFocused}
+					/>
 				</div>
 				{/* <div className="flex flex-col ml-4 w-2/12 h-full space-y-4">
 					<div className="p-2 h-1/3 bg-gray-100 dark:bg-gray-700 rounded-lg shadow-lg">

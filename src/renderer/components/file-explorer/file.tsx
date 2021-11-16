@@ -9,17 +9,19 @@ export const File: React.FC<{
 	depth: number
 	unsavedFiles: string[]
 	setCurrentFile: (page: string) => void
-}> = ({ file, setCurrentFile, currentFile, unsavedFiles, depth }) => (
-	<div
-		style={{ paddingLeft: `${(depth + 1) * 20}px` }}
-		onClick={() => setCurrentFile(file.path)}
-		className={`w-full flex justify-between cursor-pointer py-1 pl-4 select-none truncate ${
-			file.path === currentFile ? "bg-gray-300 dark:bg-gray-600" : ""
-		}`}
-	>
-		<Emoji icon="📄">{file.readableName}</Emoji>
-		<Conditional when={unsavedFiles.includes(file.path)}>
-			<Emoji icon="🔴" />
-		</Conditional>
-	</div>
-)
+}> = ({ file, setCurrentFile, currentFile, unsavedFiles, depth }) => {
+	return (
+		<div
+			style={{ paddingLeft: `${(depth + 1) * 20}px` }}
+			onClick={() => setCurrentFile(file.path)}
+			className={`w-full flex justify-between cursor-pointer py-1 pl-4 select-none truncate ${
+				file.path === currentFile ? "bg-gray-300 dark:bg-gray-600" : ""
+			}`}
+		>
+			<Emoji icon="📄">{file.readableName}</Emoji>
+			<Conditional when={unsavedFiles.includes(file.path)}>
+				<Emoji icon="🔴" />
+			</Conditional>
+		</div>
+	)
+}

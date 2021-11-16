@@ -1,4 +1,5 @@
 import React from "react"
+import { findFileByName } from "../utils/tree"
 import { Folder } from "../main/apis/fs/types"
 import { FileExplorer } from "./components/file-explorer"
 import { Workspace } from "./components/workplace"
@@ -45,21 +46,27 @@ export const App: React.FC = () => {
 		if (detail.path.startsWith("https://") || detail.path.startsWith("http://")) {
 			window.shellAPI.openExternal(detail.path)
 		} else if (!detail.path.startsWith("/")) {
-			const chunks = detail.path.split("/")
-
 			let node: Folder = fileTree
-			let i = 0
-			let l = chunks.length - 1
 
-			while (l >= 0) {
-				node = node.children.find((child) => child.readableName === chunks[i]) as Folder
+			if (~detail.path.indexOf("/")) {
+				const chunks = detail.path.split("/")
 
-				if (node.isFile && !l) {
-					setCurrentFilePath(node.path)
+				let i = 0
+				let l = chunks.length - 1
+
+				while (l >= 0) {
+					node = node.children.find((child) => child.readableName === chunks[i]) as Folder
+
+					if (node.isFile && !l) {
+						setCurrentFilePath(node.path)
+					}
+
+					l--
+					i++
 				}
-
-				l--
-				i++
+			} else {
+				node = findFileByName(fileTree, detail.path) as any
+				setCurrentFilePath(node.path)
 			}
 		} else {
 			setCurrentFilePath(detail.path)

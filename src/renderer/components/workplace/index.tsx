@@ -14,7 +14,7 @@ const applyStyles = (line: string) => {
 			(value) => `<code class="bg-pink-200 p-1 rounded-lg shadow-sm">${value}</code>`,
 		)
 		.replace(
-			/\[\[(.*)\]\]/g,
+			/\[\[([^[\]]+)\]\]/g,
 			(value) =>
 				`<span class="text-blue-600 underline cursor-pointer" onclick="window.dispatchEvent(new CustomEvent('set-current-file', { detail: { path: '${value
 					.replace("[[", "")

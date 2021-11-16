@@ -25,12 +25,46 @@ export const hasCurrentlyOpenedFile = (tree: Folder, path: string): boolean =>
 		  )
 		: false
 
-export const findFile = (tree: Folder, path: string): FileMetadata =>
-	tree.children.find((item) =>
-		item.isFolder ? findFile(item, path) : item.path === path,
-	) as FileMetadata
+export const findFileByPath = (tree: Folder, path: string): FileMetadata => {
+	if (tree.isFile) {
+		return tree.path === path ? (tree as any) : null
+	}
 
-export const findPathByName = (tree: Folder, name: string): FileMetadata =>
-	tree.children.find((item) =>
-		item.isFolder ? findPathByName(item, name) : item.readableName === name,
-	) as FileMetadata
+	for (const child of tree.children) {
+		if (child.isFolder) {
+			const found = findFileByName(child, path)
+
+			if (found) {
+				return found
+			}
+		}
+
+		if (child.path === path) {
+			return child as any
+		}
+	}
+
+	return null
+}
+
+export const findFileByName = (tree: Folder, name: string): FileMetadata | null => {
+	if (tree.isFile) {
+		return tree.readableName === name ? (tree as any) : null
+	}
+
+	for (const child of tree.children) {
+		if (child.isFolder) {
+			const found = findFileByName(child, name)
+
+			if (found) {
+				return found
+			}
+		}
+
+		if (child.readableName === name) {
+			return child as any
+		}
+	}
+
+	return null
+}

@@ -237,10 +237,9 @@ export const Workspace: React.FC<{
 				<div id="editor" className="pb-80 mb-80">
 					{content &&
 						content.map((line, index) => (
-							<div>
+							<div key={`${line}-${index}`}>
 								<div
 									className={`w-full flex items-center ${index === currentLine && "bg-gray-200"}`}
-									key={`${line}-${index}`}
 								>
 									<div className="text-right w-12 px-2 text-gray-700 dark:text-gray-300 font-mono">
 										{index + 1}

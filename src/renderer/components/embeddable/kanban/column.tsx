@@ -26,7 +26,7 @@ export const Column: React.FC<{
 				<div
 					ref={provided.innerRef}
 					{...provided.draggableProps}
-					style={{ minWidth: "18rem" }}
+					style={{ minWidth: "18rem", maxWidth: "18rem" }}
 					className={`bg-gray-200 dark:bg-gray-600 bg-${tree.color}-100 dark:bg-${tree.color}-300 rounded-lg shadow-md flex flex-col pb-2 space-y-2`}
 				>
 					<div className="flex justify-between items-center p-2">

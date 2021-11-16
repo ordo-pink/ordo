@@ -16,6 +16,13 @@ export const Column: React.FC<{
 	const [isAddingCardAtTheBottom, setIsAddingCardAtTheBottom] = React.useState(false)
 	const [newCardName, setNewCardName] = React.useState("")
 
+	const onKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
+		if (e.key === "Enter") {
+			e.preventDefault()
+			updateColumnName(tree.path, tree.path.replace(tree.readableName, e.currentTarget.textContent))
+		}
+	}
+
 	const onBlur = (e: React.FocusEvent<HTMLDivElement, Element>) => {
 		updateColumnName(tree.path, tree.path.replace(tree.readableName, e.target.textContent))
 	}
@@ -35,15 +42,7 @@ export const Column: React.FC<{
 							suppressContentEditableWarning={true}
 							className={`text-center outline-none text-xs text-${tree.color}-900`}
 							onBlur={onBlur}
-							onKeyDown={(e) => {
-								if (e.key === "Enter") {
-									e.preventDefault()
-									updateColumnName(
-										tree.path,
-										tree.path.replace(tree.readableName, e.currentTarget.textContent),
-									)
-								}
-							}}
+							onKeyDown={onKeyDown}
 						>
 							{tree.readableName}
 						</div>
@@ -59,13 +58,7 @@ export const Column: React.FC<{
 							className="rounded-lg outline-none mx-2 p-2 text-left text-xs text-gray-500 border border-dashed border-gray-500"
 							value={newCardName}
 							onChange={(e) => setNewCardName(e.target.value)}
-							onKeyDown={(e) => {
-								if (e.key === "Enter") {
-									e.preventDefault()
-									createCard(`${tree.path}/${newCardName.trim()}.md`)
-									setNewCardName("")
-								}
-							}}
+							onKeyDown={onKeyDown}
 							onBlur={() => setIsAddingCardAtTheTop(false)}
 						/>
 						<button

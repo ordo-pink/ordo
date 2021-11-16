@@ -15,7 +15,10 @@ export const FileExplorer: React.FC<{
 	unsavedFiles: string[]
 	depth?: number
 	createFile: (path: string) => Promise<void>
+	deleteFile: (path: string) => Promise<void>
 	createFolder: (path: string) => Promise<void>
+	deleteFolder: (path: string) => Promise<void>
+	rename: (oldPath: string, newPath: string) => Promise<void>
 }> = ({
 	tree,
 	root,
@@ -23,7 +26,10 @@ export const FileExplorer: React.FC<{
 	currentFile,
 	unsavedFiles,
 	createFile,
+	deleteFile,
 	createFolder,
+	deleteFolder,
+	rename,
 	depth = 1,
 }) => {
 	const [collapsed, setCollapsed] = React.useState(true)
@@ -43,6 +49,8 @@ export const FileExplorer: React.FC<{
 				folder={tree}
 				createFile={createFile}
 				createFolder={createFolder}
+				rename={rename}
+				deleteFolder={deleteFolder}
 			/>
 
 			<div className={`${collapsed ? "hidden" : "block"} w-full`}>
@@ -54,11 +62,16 @@ export const FileExplorer: React.FC<{
 								file={fileOrFileTree as FileMetadata}
 								currentFile={currentFile}
 								depth={depth}
+								deleteFile={deleteFile}
+								rename={rename}
 								setCurrentFile={setCurrentFile}
 							/>
 							<FileExplorer
 								createFile={createFile}
 								createFolder={createFolder}
+								rename={rename}
+								deleteFile={deleteFile}
+								deleteFolder={deleteFolder}
 								tree={fileOrFileTree as TFolder}
 								unsavedFiles={unsavedFiles}
 								root={root}

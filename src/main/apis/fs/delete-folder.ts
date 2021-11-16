@@ -1,8 +1,8 @@
-import { rmdir } from "fs"
+import { rm } from "fs"
 
 export const deleteFolder = (path: string): Promise<string> =>
 	new Promise((resolve, reject) =>
-		rmdir(path, { recursive: true }, (err) => {
+		rm(path, { recursive: true }, (err) => {
 			if (err) {
 				reject(err)
 			}

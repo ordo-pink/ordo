@@ -47,12 +47,7 @@ export const Kanban: React.FC<{
 		window.fileSystemAPI.deleteFile(cardPath).then(updateFileTree)
 	}
 
-	// const onBlur = (e: React.FocusEvent<HTMLDivElement, Element>) => {
-	// 	updateColumnName(tree.path, tree.path.replace(tree.readableName, e.target.textContent))
-	// }
-
 	const onDragEnd = (result: DropResult) => {
-		// TODO: Adding files in column, adding columns on the board!!!
 		if (result.source.droppableId !== result.destination.droppableId) {
 			window.fileSystemAPI
 				.move(
@@ -70,15 +65,9 @@ export const Kanban: React.FC<{
 		})
 	}, [folder, hash])
 
-	// TODO: Collect colors in one place
 	return (
 		<div className="w-full overflow-x-auto p-2 rounded-lg">
-			<div
-				// contentEditable={true}
-				// suppressContentEditableWarning={true}
-				className="text-xs text-gray-700 dark:text-gray-300 outline-none"
-				// onBlur={onBlur}
-			>
+			<div className="text-xs text-gray-700 dark:text-gray-300 outline-none">
 				{tree.readableName}
 			</div>
 

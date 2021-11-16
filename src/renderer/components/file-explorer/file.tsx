@@ -9,7 +9,12 @@ export const File: React.FC<{
 	depth: number
 	unsavedFiles: string[]
 	setCurrentFile: (page: string) => void
-}> = ({ file, setCurrentFile, currentFile, unsavedFiles, depth }) => {
+	deleteFile: (path: string) => Promise<void>
+	rename: (oldPath: string, newPath: string) => Promise<void>
+}> = ({ file, setCurrentFile, currentFile, unsavedFiles, depth, deleteFile, rename }) => {
+	const [newName, setNewName] = React.useState(file.readableName)
+	const [isRenaming, setIsRenaming] = React.useState(false)
+
 	return (
 		<div
 			style={{ paddingLeft: `${(depth + 1) * 20}px` }}
@@ -18,10 +23,42 @@ export const File: React.FC<{
 				file.path === currentFile ? "bg-gray-300 dark:bg-gray-600" : ""
 			}`}
 		>
-			<Emoji icon="📄">{file.readableName}</Emoji>
-			<Conditional when={unsavedFiles.includes(file.path)}>
-				<Emoji icon="🔴" />
+			<Conditional when={!isRenaming}>
+				<span className="flex-nowrap truncate">
+					<Emoji icon="📄">{file.readableName}</Emoji>
+				</span>
+				<input
+					autoFocus={true}
+					className="rounded-lg outline-none p-1 text-left text-xs text-gray-500"
+					value={newName}
+					onChange={(e) => setNewName(e.target.value)}
+					onKeyDown={(e) => {
+						if (e.key === "Enter") {
+							rename(file.path, file.path.replace(file.readableName, newName))
+						}
+					}}
+					onBlur={() => setIsRenaming(false)}
+				/>
 			</Conditional>
+			<div className="flex space-x-2 pr-2">
+				<Conditional when={unsavedFiles.includes(file.path)}>
+					<Emoji icon="🔴" />
+				</Conditional>
+
+				<button
+					className="rounded-lg p-1 text-left text-xs text-gray-500"
+					onClick={() => setIsRenaming(true)}
+				>
+					✏️
+				</button>
+
+				<button
+					className="rounded-lg p-1 text-left text-xs text-gray-500"
+					onClick={() => deleteFile(file.path)}
+				>
+					❌
+				</button>
+			</div>
 		</div>
 	)
 }

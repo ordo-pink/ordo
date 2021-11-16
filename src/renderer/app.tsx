@@ -1,12 +1,12 @@
 import React from "react"
 import { findFileByName } from "../utils/tree"
-import { Folder } from "../main/apis/fs/types"
+import { FileMetadata, Folder } from "../main/apis/fs/types"
 import { FileExplorer } from "./components/file-explorer"
 import { Workspace } from "./components/workplace"
 
 export const App: React.FC = () => {
 	const [rootPath, setRootPath] = React.useState("")
-	const [fileTree, setFileTree] = React.useState<Folder>({} as Folder)
+	const [fileTree, setFileTree] = React.useState({} as Folder)
 	const [hash, setHash] = React.useState("")
 	const [currentFilePath, setCurrentFilePath] = React.useState("")
 	const [unsavedFiles, setUnsavedFiles] = React.useState<string[]>([])
@@ -16,11 +16,7 @@ export const App: React.FC = () => {
 			setFileTree(data)
 			setHash(data.hash)
 
-			window.settingsAPI.get("application.last-open-file").then((value) => {
-				if (value) {
-					setCurrentFilePath(value)
-				}
-			})
+			window.settingsAPI.get("application.last-open-file").then(setCurrentFilePath)
 		})
 	}
 
@@ -28,26 +24,20 @@ export const App: React.FC = () => {
 		if (detail.path.startsWith("https://") || detail.path.startsWith("http://")) {
 			window.shellAPI.openExternal(detail.path)
 		} else if (!detail.path.startsWith("/")) {
-			let node: Folder = fileTree
+			let node: Folder | FileMetadata = fileTree
 
 			if (~detail.path.indexOf("/")) {
 				const chunks = detail.path.split("/")
 
-				let i = 0
-				let l = chunks.length - 1
+				for (const chunk of chunks) {
+					node = node.isFolder ? node.children.find((child) => child.readableName === chunk) : node
 
-				while (l >= 0) {
-					node = node.children.find((child) => child.readableName === chunks[i]) as Folder
-
-					if (node.isFile && !l) {
+					if (node.isFile && chunks.indexOf(chunk) === chunks.length - 1) {
 						setCurrentFilePath(node.path)
 					}
-
-					l--
-					i++
 				}
 			} else {
-				node = findFileByName(fileTree, detail.path) as any
+				node = findFileByName(fileTree, detail.path)
 				setCurrentFilePath(node.path)
 			}
 		} else {
@@ -86,6 +76,15 @@ export const App: React.FC = () => {
 	const createFolder = (path: string) =>
 		window.fileSystemAPI.createFolder(path).then(updateFileTreeListener)
 
+	const rename = (oldPath: string, newPath: string) =>
+		window.fileSystemAPI.move(oldPath, newPath).then(updateFileTreeListener)
+
+	const deleteFile = (path: string) =>
+		window.fileSystemAPI.deleteFile(path).then(updateFileTreeListener)
+
+	const deleteFolder = (path: string) =>
+		window.fileSystemAPI.deleteFolder(path).then(updateFileTreeListener)
+
 	const assignCurrentPath = (path: string) => {
 		window.settingsAPI.set("application.last-open-file", path)
 		setCurrentFilePath(path)
@@ -94,17 +93,7 @@ export const App: React.FC = () => {
 	React.useEffect(() => {
 		window.settingsAPI.get("application.root-folder-path").then((path) => {
 			setRootPath(path)
-
-			window.fileSystemAPI.listFolder(path).then((data) => {
-				setFileTree(data)
-				setHash(data.hash)
-
-				window.settingsAPI.get("application.last-open-file").then((value) => {
-					if (value) {
-						setCurrentFilePath(value)
-					}
-				})
-			})
+			updateFileTreeListener()
 		})
 	}, [hash, rootPath])
 
@@ -118,28 +107,31 @@ export const App: React.FC = () => {
 	}
 
 	return (
-		<div className="w-full flex flex-col">
+		<div className="flex flex-col">
 			<div className="flex flex-grow w-full">
 				<div className="h-screen overflow-y-auto flex flex-col justify-between w-2/12 border-r border-gray-300 dark:border-gray-900 py-4 bg-gray-100 dark:bg-gray-700">
-					<div className="">
-						<h2 className="w-full uppercase text-sm text-center text-gray-600 dark:text-gray-500">
+					<div>
+						<h2 className="uppercase text-sm text-center text-gray-600 dark:text-gray-500">
 							Explorer
 						</h2>
 						<FileExplorer
 							unsavedFiles={unsavedFiles}
-							createFile={createFile}
-							createFolder={createFolder}
-							tree={fileTree}
-							root={rootPath}
 							currentFile={currentFilePath}
 							setCurrentFile={assignCurrentPath}
+							createFile={createFile}
+							deleteFile={deleteFile}
+							createFolder={createFolder}
+							deleteFolder={deleteFolder}
+							rename={rename}
+							tree={fileTree}
+							root={rootPath}
 						/>
 					</div>
 
 					<div className="px-2">
 						<button
 							onClick={selectRootDir}
-							className={`w-full text-left rounded-lg p-2 text-xs text-gray-500 border border-dashed border-gray-500`}
+							className="w-full text-left rounded-lg p-2 text-xs text-gray-500 border border-dashed border-gray-500"
 						>
 							⤴ Open Workspace
 						</button>
@@ -148,17 +140,6 @@ export const App: React.FC = () => {
 				<div className="h-screen overflow-y-auto w-10/12 bg-gray-100">
 					<Workspace currentFilePath={currentFilePath} toggleSaved={toggleUnsavedFileStatus} />
 				</div>
-				{/* <div className="flex flex-col ml-4 w-2/12 h-full space-y-4">
-					<div className="p-2 h-1/3 bg-gray-100 dark:bg-gray-700 rounded-lg shadow-lg">
-						<BlockHeading text="Recent Files" />
-					</div>
-					<div className="p-2 h-1/3 bg-gray-100 dark:bg-gray-700 rounded-lg shadow-lg">
-						<BlockHeading text="Favourite Files" />
-					</div>
-					<div className="p-2 h-1/3 bg-gray-100 dark:bg-gray-700 rounded-lg shadow-lg">
-						<BlockHeading text="Tags" />
-					</div>
-				</div> */}
 			</div>
 		</div>
 	)

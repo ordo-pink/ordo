@@ -1,12 +1,7 @@
 import { readFile, stat } from "fs"
 import YAML from "yaml"
-import { remark } from "remark"
-import remarkFrontmatter from "remark-frontmatter"
-import remarkHtml from "remark-html"
 
 import { IFile, FileMetadata } from "./types"
-
-const mdParser = remark().use(remarkFrontmatter, ["yaml", "toml"]).use(remarkHtml)
 
 const appendBody = (page: FileMetadata, body: string): IFile => ({
 	...page,
@@ -25,13 +20,16 @@ export const getFileMetadata = (file: string, withBody = false): Promise<FileMet
 					reject(err)
 				}
 
-				const result = await mdParser.parse(data)
-
 				let frontmatter
 
-				try {
-					frontmatter = YAML.parse((result.children[0] as any).value)
-				} catch (_) {
+				if (data.startsWith("---")) {
+					try {
+						const frontmatterText = data.split("---\n")[1].replace(/\t/g, "  ")
+						frontmatter = YAML.parse(frontmatterText)
+					} catch (e) {
+						frontmatter = {}
+					}
+				} else {
 					frontmatter = {}
 				}
 

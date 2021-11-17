@@ -35,53 +35,56 @@ export const FileExplorer: React.FC<{
 	const [collapsed, setCollapsed] = React.useState(true)
 
 	useEffect(() => {
-		if (hasCurrentlyOpenedFile(tree, currentFile)) {
+		if (currentFile && hasCurrentlyOpenedFile(tree, currentFile)) {
 			setCollapsed(false)
 		}
 	}, [currentFile])
 
 	return (
-		<div className="w-full">
-			<Folder
-				depth={depth}
-				collapsed={collapsed}
-				setCollapsed={setCollapsed}
-				folder={tree}
-				createFile={createFile}
-				createFolder={createFolder}
-				rename={rename}
-				deleteFolder={deleteFolder}
-			/>
+		tree && (
+			<div className="w-full">
+				<Folder
+					depth={depth}
+					collapsed={collapsed}
+					setCollapsed={setCollapsed}
+					folder={tree}
+					createFile={createFile}
+					createFolder={createFolder}
+					rename={rename}
+					deleteFolder={deleteFolder}
+				/>
 
-			<div className={`${collapsed ? "hidden" : "block"} w-full`}>
-				{tree.children &&
-					tree.children.map((fileOrFileTree) => (
-						<Conditional key={fileOrFileTree.path} when={!(fileOrFileTree as TFolder).children}>
-							<File
-								unsavedFiles={unsavedFiles}
-								file={fileOrFileTree as FileMetadata}
-								currentFile={currentFile}
-								depth={depth}
-								deleteFile={deleteFile}
-								rename={rename}
-								setCurrentFile={setCurrentFile}
-							/>
-							<FileExplorer
-								createFile={createFile}
-								createFolder={createFolder}
-								rename={rename}
-								deleteFile={deleteFile}
-								deleteFolder={deleteFolder}
-								tree={fileOrFileTree as TFolder}
-								unsavedFiles={unsavedFiles}
-								root={root}
-								setCurrentFile={setCurrentFile}
-								currentFile={currentFile}
-								depth={depth + 1}
-							/>
-						</Conditional>
-					))}
+				<div className={`${collapsed ? "hidden" : "block"} w-full`}>
+					{tree &&
+						tree.children &&
+						tree.children.map((fileOrFileTree) => (
+							<Conditional key={fileOrFileTree.path} when={!(fileOrFileTree as TFolder).children}>
+								<File
+									unsavedFiles={unsavedFiles}
+									file={fileOrFileTree as FileMetadata}
+									currentFile={currentFile}
+									depth={depth}
+									deleteFile={deleteFile}
+									rename={rename}
+									setCurrentFile={setCurrentFile}
+								/>
+								<FileExplorer
+									createFile={createFile}
+									createFolder={createFolder}
+									rename={rename}
+									deleteFile={deleteFile}
+									deleteFolder={deleteFolder}
+									tree={fileOrFileTree as TFolder}
+									unsavedFiles={unsavedFiles}
+									root={root}
+									setCurrentFile={setCurrentFile}
+									currentFile={currentFile}
+									depth={depth + 1}
+								/>
+							</Conditional>
+						))}
+				</div>
 			</div>
-		</div>
+		)
 	)
 }

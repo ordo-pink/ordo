@@ -1,7 +1,15 @@
 import { Color } from "../appearance/get-color"
-import { Hashed } from "../hash-response"
 
 export type FrontmatterField = string | number | boolean | Date | FrontmatterField[]
+
+export type SortOrder = {
+	property: string
+	direction: "ASC" | "DESC"
+}
+
+export type FileOrder = string[]
+
+export type FolderOrder = string[]
 
 export type Folder = {
 	path: FolderPath
@@ -11,6 +19,9 @@ export type Folder = {
 	isFile: false
 	color: Color
 	collapsed: boolean
+	sort: SortOrder
+	fileOrder: FileOrder
+	folderOrder: FolderOrder
 }
 
 export type FolderPath = string

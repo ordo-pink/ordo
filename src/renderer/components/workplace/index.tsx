@@ -1,8 +1,20 @@
 import React from "react"
+
 import { Conditional } from "../conditional"
 import { isEmbeddableComponent, renderEmbeddable } from "./render-embeddable"
 import { WelcomePage } from "./welcome-page"
 import { getCaretPosition, setCaretPosition } from "./caret"
+import { FileMetadata } from "../../../main/apis/fs/types"
+import { Emoji } from "../emoji"
+
+const readableSize = (a: number, b = 2, k = 1024) => {
+	const d = Math.floor(Math.log(a) / Math.log(k))
+	return 0 == a
+		? "0 Bytes"
+		: parseFloat((a / Math.pow(k, d)).toFixed(Math.max(0, b))) +
+				" " +
+				["Bytes", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"][d]
+}
 
 const applyStyles = (line: string) => {
 	line = line
@@ -51,16 +63,14 @@ const applyStyles = (line: string) => {
 	return <span className="whitespace-pre-wrap leading-7">{transformed}</span>
 }
 
-// const getLineElement = (index: number): HTMLInputElement =>
-// 	document.getElementById(`line-${index}`) as HTMLInputElement
-
 const getDivElement = (index: number): HTMLDivElement =>
 	document.querySelector(`[data-id="${index}"]`)
 
 export const Workspace: React.FC<{
 	currentFilePath: string
+	metadata: FileMetadata
 	toggleSaved: (path: string, saved: boolean) => void
-}> = ({ currentFilePath, toggleSaved }) => {
+}> = ({ currentFilePath, toggleSaved, metadata }) => {
 	const [content, setContent] = React.useState<string[]>([])
 	const [hash, setHash] = React.useState("")
 	const [savedCaretPosition, setSavedCaretPosition] = React.useState(0)
@@ -229,45 +239,90 @@ export const Workspace: React.FC<{
 	}
 
 	return (
-		<Conditional when={Boolean(currentFilePath)}>
-			<form className="pb-80 mb-80 overflow-x-hidden">
-				<div id="editor" className="pb-80 mb-80">
-					{content &&
-						content.map((line, index) => (
-							<div key={`${line}-${index}`}>
-								<div
-									className={`w-full flex items-center ${index === currentLine && "bg-gray-200"}`}
-								>
-									<div className="text-right w-12 px-2 text-gray-700 dark:text-gray-300 font-mono">
-										{index + 1}
-									</div>
+		<>
+			{metadata && metadata.readableName && (
+				<div className="flex flex-col w-6/12 mx-auto mt-72">
+					<div className="text-5xl">{metadata.readableName}</div>
+					<details>
+						<summary className="text-xs text-gray-500">File Stats</summary>
+						<div className="pt-4">
+							<div className="flex justify-between text-sm text-gray-500 leading-7">
+								<div className="w-4/12">
+									{" "}
+									<Emoji icon="🕛">Created</Emoji>
+								</div>
+								<div className="w-8/12">{metadata.createdAt.toLocaleDateString()}</div>
+							</div>
+							<div className="flex justify-between text-sm text-gray-500 leading-7">
+								<div className="w-4/12">
+									<Emoji icon="✍️">Last Updated</Emoji>
+								</div>
+								<div className="w-8/12">{metadata.updatedAt.toLocaleDateString()}</div>
+							</div>
+							<div className="flex justify-between text-sm text-gray-500 leading-7">
+								<div className="w-4/12">
+									<Emoji icon="👆">Last Accessed</Emoji>
+								</div>
+								<div className="w-8/12">{metadata.accessedAt.toLocaleDateString()}</div>
+							</div>
+							<div className="flex justify-between text-sm text-gray-500 leading-7">
+								<div className="w-4/12">
+									{" "}
+									<Emoji icon="🛣">File Path</Emoji>
+								</div>
+								<div className="w-8/12">{metadata.path}</div>
+							</div>
+							<div className="flex justify-between text-sm text-gray-500 leading-7">
+								<div className="w-4/12">
+									{" "}
+									<Emoji icon="🚛">File Size</Emoji>
+								</div>
+								<div className="w-8/12">{readableSize(metadata.size)}</div>
+							</div>
+						</div>
+					</details>
+				</div>
+			)}
+			<Conditional when={Boolean(currentFilePath)}>
+				<form className="pb-80 mb-80 overflow-x-hidden">
+					<div id="editor" className="pb-80 mb-80">
+						{content &&
+							content.map((line, index) => (
+								<div key={`${line}-${index}`}>
 									<div
-										style={{ maxWidth: "1000px" }}
-										className="px-2 w-full border-l dark:border-gray-900 border-gray-300 "
+										className={`w-full flex items-center ${index === currentLine && "bg-gray-200"}`}
 									>
+										<div className="text-right w-12 px-2 text-gray-700 dark:text-gray-300 font-mono">
+											{index + 1}
+										</div>
 										<div
-											className="w-full outline-none"
-											contentEditable={true}
-											data-id={index}
-											onClick={() => onClickEditableDiv(index)}
-											onInput={() => onChangeEditableDiv(index)}
-											onKeyDown={onKeyDown}
-											suppressContentEditableWarning={true}
+											style={{ maxWidth: "1000px" }}
+											className="px-2 w-full border-l dark:border-gray-900 border-gray-300 "
 										>
-											{applyStyles(line)}
+											<div
+												className="w-full outline-none"
+												contentEditable={true}
+												data-id={index}
+												onClick={() => onClickEditableDiv(index)}
+												onInput={() => onChangeEditableDiv(index)}
+												onKeyDown={onKeyDown}
+												suppressContentEditableWarning={true}
+											>
+												{applyStyles(line)}
+											</div>
 										</div>
 									</div>
+
+									<Conditional when={isEmbeddableComponent(line)}>
+										<div className="p-2">{renderEmbeddable(line)}</div>
+									</Conditional>
 								</div>
+							))}
+					</div>
+				</form>
 
-								<Conditional when={isEmbeddableComponent(line)}>
-									<div className="p-2">{renderEmbeddable(line)}</div>
-								</Conditional>
-							</div>
-						))}
-				</div>
-			</form>
-
-			<WelcomePage />
-		</Conditional>
+				<WelcomePage />
+			</Conditional>
+		</>
 	)
 }

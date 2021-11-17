@@ -25,14 +25,14 @@ export const hasCurrentlyOpenedFile = (tree: Folder, path: string): boolean =>
 		  )
 		: false
 
-export const findFileByPath = (tree: Folder, path: string): FileMetadata => {
+export const findFileByPath = (tree: Folder, path: string): FileMetadata | null => {
 	if (tree.isFile) {
 		return tree.path === path ? (tree as any) : null
 	}
 
 	for (const child of tree.children) {
 		if (child.isFolder) {
-			const found = findFileByName(child, path)
+			const found = findFileByPath(child, path)
 
 			if (found) {
 				return found

@@ -7,13 +7,13 @@ import { getCaretPosition, setCaretPosition } from "./caret"
 import { FileMetadata } from "../../../main/apis/fs/types"
 import { Emoji } from "../emoji"
 
-const readableSize = (a: number, b = 2, k = 1024) => {
+const readableSize = (a: number, b = 2, k = 1024): string => {
 	const d = Math.floor(Math.log(a) / Math.log(k))
 	return 0 == a
 		? "0 Bytes"
-		: parseFloat((a / Math.pow(k, d)).toFixed(Math.max(0, b))) +
-				" " +
-				["Bytes", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"][d]
+		: `${parseFloat((a / Math.pow(k, d)).toFixed(Math.max(0, b)))}${
+				["B", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"][d]
+		  }`
 }
 
 const applyStyles = (line: string) => {
@@ -241,7 +241,7 @@ export const Workspace: React.FC<{
 	return (
 		<>
 			{Boolean(currentFilePath) && metadata && metadata.readableName && (
-				<div className="flex flex-col w-6/12 mx-auto mt-72">
+				<div className="flex flex-col w-6/12 mx-auto mt-64 mb-12">
 					<div className="text-5xl">{metadata.readableName}</div>
 					<details>
 						<summary className="text-xs text-gray-500">File Stats</summary>

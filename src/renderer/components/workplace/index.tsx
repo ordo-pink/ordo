@@ -6,6 +6,8 @@ import { WelcomePage } from "./welcome-page"
 import { getCaretPosition, setCaretPosition } from "./caret"
 import { FileMetadata } from "../../../main/apis/fs/types"
 import { Emoji } from "../emoji"
+import { isEmbeddableContent, EmbeddableContent } from "./render-embeddable-content"
+import { applyLineStyling } from "./apply-line-styling"
 
 const readableSize = (a: number, b = 2, k = 1024): string => {
 	const d = Math.floor(Math.log(a) / Math.log(k))
@@ -14,53 +16,6 @@ const readableSize = (a: number, b = 2, k = 1024): string => {
 		: `${parseFloat((a / Math.pow(k, d)).toFixed(Math.max(0, b)))}${
 				["B", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"][d]
 		  }`
-}
-
-const applyStyles = (line: string) => {
-	line = line
-		.replace(/\*\*([^**]+)\*\*/g, (value) => `<strong>${value}</strong>`)
-		.replace(/_([^_]+)_/g, (value) => `<em>${value}</em>`)
-		.replace(/~~([^~~]+)~~/g, (value) => `<strike>${value}</strike>`)
-		.replace(
-			/`([^`]+)`/g,
-			(value) => `<code class="bg-pink-200 p-1 rounded-lg shadow-sm">${value}</code>`,
-		)
-		.replace(
-			/\[\[([^[\]]+)\]\]/g,
-			(value) =>
-				`<span class="text-blue-600 underline cursor-pointer" onclick="window.dispatchEvent(new CustomEvent('set-current-file', { detail: { path: '${value
-					.replace("[[", "")
-					.replace("]]", "")}' }}))">${value}</span>`,
-		)
-
-	let transformed
-
-	if (line.startsWith("# ")) {
-		transformed = <h1 className="text-4xl" dangerouslySetInnerHTML={{ __html: line }} />
-	} else if (line.startsWith("## ")) {
-		transformed = <h2 className="text-3xl" dangerouslySetInnerHTML={{ __html: line }} />
-	} else if (line.startsWith("### ")) {
-		transformed = <h3 className="text-2xl" dangerouslySetInnerHTML={{ __html: line }} />
-	} else if (line.startsWith("#### ")) {
-		transformed = <h4 className="text-xl" dangerouslySetInnerHTML={{ __html: line }} />
-	} else if (line.startsWith("##### ")) {
-		transformed = <h5 className="text-lg" dangerouslySetInnerHTML={{ __html: line }} />
-	} else if (line.startsWith("> ")) {
-		transformed = (
-			<blockquote
-				className="border-l-2 border-gray-600 pl-2"
-				dangerouslySetInnerHTML={{ __html: line }}
-			/>
-		)
-	} else {
-		transformed = <span dangerouslySetInnerHTML={{ __html: line }} />
-	}
-
-	if (isEmbeddableComponent(line)) {
-		return <span className="text-sm font-mono text-gray-500">{line}</span>
-	}
-
-	return <span className="whitespace-pre-wrap leading-7">{transformed}</span>
 }
 
 const getDivElement = (index: number): HTMLDivElement =>
@@ -308,10 +263,16 @@ export const Workspace: React.FC<{
 												onKeyDown={onKeyDown}
 												suppressContentEditableWarning={true}
 											>
-												{applyStyles(line)}
+												{applyLineStyling(line)}
 											</div>
 										</div>
 									</div>
+
+									<Conditional when={isEmbeddableContent(line)}>
+										<div className="p-2">
+											<EmbeddableContent currentContent={content.join("\n")} line={line} />
+										</div>
+									</Conditional>
 
 									<Conditional when={isEmbeddableComponent(line)}>
 										<div className="p-2">{renderEmbeddable(line)}</div>

@@ -1,5 +1,5 @@
 import type { Hashed } from "./main/apis/hash-response"
-import type { FileMetadata, Folder } from "./main/apis/fs/types"
+import type { FileMetadata, Folder, IFile } from "./main/apis/fs/types"
 import type { Configuration } from "./main/apis/settings/types"
 
 declare global {
@@ -20,6 +20,7 @@ export interface IFileSystemAPI {
 	createFolder: (folder: Folder, name: string) => Promise<Folder>
 	deleteFile: (path: string) => Promise<void>
 	deleteFolder: (path: string) => Promise<void>
+	findFileBySubPath: (subPath: string) => Promise<IFile>
 	selectRootFolder: () => Promise<string>
 }
 

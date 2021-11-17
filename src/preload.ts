@@ -9,6 +9,7 @@ contextBridge.exposeInMainWorld("darkModeAPI", {
 })
 
 contextBridge.exposeInMainWorld("fileSystemAPI", {
+	selectRootFolder: () => ipcRenderer.invoke("fs:select-root-folder"),
 	listFolder: (path: string) => ipcRenderer.invoke("fs:list-folder", path),
 	getFile: (path: string) => ipcRenderer.invoke("fs:get-file", path),
 	saveFile: (path: string, data: string) => ipcRenderer.invoke("fs:save-file", path, data),
@@ -18,7 +19,7 @@ contextBridge.exposeInMainWorld("fileSystemAPI", {
 		ipcRenderer.invoke("fs:create-folder", folder, name),
 	deleteFile: (path: string) => ipcRenderer.invoke("fs:delete-file", path),
 	deleteFolder: (path: string) => ipcRenderer.invoke("fs:delete-folder", path),
-	selectRootFolder: () => ipcRenderer.invoke("fs:select-root-folder"),
+	findFileBySubPath: (subPath: string) => ipcRenderer.invoke("fs:find-file-by-subpath", subPath),
 })
 
 contextBridge.exposeInMainWorld("settingsAPI", {

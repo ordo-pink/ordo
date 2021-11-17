@@ -82,7 +82,7 @@ export const App: React.FC = () => {
 		window.fileSystemAPI
 			.createFile(folder, name)
 			.then(updateFileTreeListener)
-			.then(() => assignCurrentPath(`${folder}/${name}.md`))
+			.then(() => assignCurrentPath(`${folder.path}/${name}.md`))
 
 	const createFolder = (folder: Folder, name: string) =>
 		window.fileSystemAPI.createFolder(folder, name).then(updateFileTreeListener)

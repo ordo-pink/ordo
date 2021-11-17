@@ -13,6 +13,7 @@ import { createFile } from "./apis/fs/create-file"
 import { createFolder } from "./apis/fs/create-folder"
 import { deleteFile } from "./apis/fs/delete-file"
 import { deleteFolder } from "./apis/fs/delete-folder"
+import { findFileBySubPath } from "./apis/fs/find-file-by-subpath"
 
 declare const MAIN_WINDOW_WEBPACK_ENTRY: string
 declare const MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY: string
@@ -43,6 +44,11 @@ ipcMain.handle("fs:save-file", (_, path, data) => saveFile(getAbsolute(path), da
 ipcMain.handle("fs:move", (_, oldPath, newPath) => move(getAbsolute(oldPath), getAbsolute(newPath)))
 ipcMain.handle("fs:create-file", (_, folder, name) => createFile(folder, name))
 ipcMain.handle("fs:create-folder", (_, folder, name) => createFolder(folder, name))
+ipcMain.handle("fs:find-file-by-subpath", (_, subPath) =>
+	listFolder(Settings.get("application.root-folder-path")).then((f) =>
+		findFileBySubPath(subPath, f),
+	),
+)
 
 ipcMain.handle("settings:set", (_, key, value) => {
 	Settings.set(key, value).persist(Settings.get("application.global-settings-path"))

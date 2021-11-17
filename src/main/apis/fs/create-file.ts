@@ -1,12 +1,10 @@
-import { writeFile } from "fs"
+import type { FileMetadata, Folder } from "./types"
 
-export const createFile = (path: string): Promise<void> =>
-	new Promise((resolve, reject) =>
-		writeFile(path, "\n", (err) => {
-			if (err) {
-				reject(err)
-			}
+import { join } from "path"
+import { promises } from "fs"
+import { getFileMetadata } from "./get-file-metadata"
 
-			resolve()
-		}),
-	)
+export const createFile = (folder: Folder, name: string): Promise<FileMetadata> => {
+	const path = join(folder.path, `${name}.md`)
+	return promises.writeFile(path, `\n`).then(() => getFileMetadata(path))
+}

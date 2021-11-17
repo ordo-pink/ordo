@@ -78,14 +78,14 @@ export const App: React.FC = () => {
 		setUnsavedFiles(unsavedFilesCopy)
 	}
 
-	const createFile = (path: string) =>
+	const createFile = (folder: Folder, name: string) =>
 		window.fileSystemAPI
-			.createFile(path)
-			.then(() => assignCurrentPath(path))
+			.createFile(folder, name)
 			.then(updateFileTreeListener)
+			.then(() => assignCurrentPath(`${folder}/${name}.md`))
 
-	const createFolder = (path: string) =>
-		window.fileSystemAPI.createFolder(path).then(updateFileTreeListener)
+	const createFolder = (folder: Folder, name: string) =>
+		window.fileSystemAPI.createFolder(folder, name).then(updateFileTreeListener)
 
 	const rename = (oldPath: string, newPath: string) =>
 		window.fileSystemAPI

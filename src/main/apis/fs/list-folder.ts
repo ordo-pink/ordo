@@ -52,7 +52,7 @@ export const listFolder = (path: string, tree: Folder = {} as Folder): Promise<F
 
 						if (fileOrFolder.name === ".folder-metadata.md") {
 							tree.color = getColor(fileMetadata.frontmatter.color)
-							tree.collapsed = fileMetadata.frontmatter.collapsed.toString() === "true"
+							// tree.collapsed = fileMetadata.frontmatter.collapsed.toString() === "true"
 						} else if (!fileOrFolder.name.startsWith(".")) {
 							tree.children.push(fileMetadata)
 						}

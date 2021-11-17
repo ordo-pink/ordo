@@ -1,7 +1,9 @@
-import React from "react"
-import { Folder as TFolder } from "../../../main/apis/fs/types"
-import { Conditional } from "../conditional"
+import type { Folder as TFolder } from "../../../main/apis/fs/types"
 
+import React from "react"
+
+import { useDropdown } from "../../hooks/use-dropdown"
+import { Conditional } from "../conditional"
 import { Emoji } from "../emoji"
 
 export const Folder: React.FC<{
@@ -9,8 +11,8 @@ export const Folder: React.FC<{
 	collapsed: boolean
 	folder: TFolder
 	depth: number
-	createFile: (path: string) => Promise<void>
-	createFolder: (path: string) => Promise<void>
+	createFile: (folder: TFolder, name: string) => Promise<void>
+	createFolder: (folder: TFolder, name: string) => Promise<void>
 	deleteFolder: (path: string) => Promise<void>
 	rename: (oldPath: string, newPath: string) => Promise<void>
 }> = ({
@@ -23,12 +25,11 @@ export const Folder: React.FC<{
 	deleteFolder,
 	rename,
 }) => {
-	const [isAddingFile, setIsAddingFile] = React.useState(false)
-	const [isAddingFolder, setIsAddingFolder] = React.useState(false)
-	const [isRenaming, setIsRenaming] = React.useState(false)
-	const [newFileName, setNewFileName] = React.useState("")
-	const [newName, setNewName] = React.useState(folder.readableName)
-	const [newFolderName, setNewFolderName] = React.useState("")
+	const [name, setName] = React.useState(folder.readableName)
+	const [ref, isOpen, open] = useDropdown<HTMLDivElement>()
+	const [creatorRef, creatorIsOpen, openCreator, closeCreator] = useDropdown<HTMLDivElement>()
+	const [entityType, setEntityType] = React.useState<"Folder" | "file" | "">("")
+	const [creationName, setCreationName] = React.useState("")
 
 	const icon = collapsed ? "▶" : "▼"
 
@@ -38,86 +39,110 @@ export const Folder: React.FC<{
 
 	return (
 		<div className="w-full cursor-pointer py-1">
-			<div
-				style={{ paddingLeft: `${depth * 20}px` }}
-				className="flex flex-shrink justify-between select-none"
-			>
-				<Conditional when={!isRenaming}>
+			<div style={{ paddingLeft: `${depth * 20}px` }} className="flex justify-between select-none">
+				<Conditional when={!isOpen}>
 					<span className="flex-nowrap truncate" onClick={toggleFolder}>
 						<Emoji icon={icon}>{folder.readableName}</Emoji>
 					</span>
 					<input
-						autoFocus={true}
+						autoFocus={isOpen}
 						className="rounded-lg outline-none p-1 text-left text-xs text-gray-500"
-						value={newName}
-						onChange={(e) => setNewName(e.target.value)}
+						value={name}
+						onChange={(e) => setName(e.target.value)}
 						onKeyDown={(e) => {
 							if (e.key === "Enter") {
-								rename(folder.path, folder.path.replace(folder.readableName, newName))
+								e.preventDefault()
+
+								rename(folder.path, folder.path.replace(folder.readableName, name))
 							}
 						}}
-						onBlur={() => setIsRenaming(false)}
 					/>
 				</Conditional>
 
-				<div className="flex align-middle justify-end space-x-2 pr-2">
-					<Conditional when={isAddingFile}>
-						<input
-							autoFocus={true}
-							className="rounded-lg outline-none p-1 text-left text-xs text-gray-500"
-							value={newFileName}
-							style={{ marginLeft: `${depth * 20}px` }}
-							onChange={(e) => setNewFileName(e.target.value)}
-							onKeyDown={(e) => {
-								if (e.key === "Enter") {
-									createFile(`${folder.path}/${newFileName}.md`)
-									setNewFileName("")
-								}
-							}}
-							onBlur={() => setIsAddingFile(false)}
-						/>
-						<button
-							onClick={() => setIsAddingFile(true)}
-							className={`rounded-lg p-1 text-left text-xs text-gray-500`}
-						>
-							📑
+				<div ref={ref} className="flex space-x-2 text-xs pr-2">
+					{!isOpen && (
+						<div>
+							<button
+								onClick={() => {
+									setEntityType("file")
+									openCreator()
+								}}
+								className="p-1"
+							>
+								📑
+							</button>
+
+							<button
+								onClick={() => {
+									setEntityType("Folder")
+									openCreator()
+								}}
+								className="p-1"
+							>
+								🗂
+							</button>
+
+							<button className="p-1" onClick={open}>
+								⚙️
+							</button>
+						</div>
+					)}
+
+					{isOpen && (
+						<button className="p-1" onClick={() => deleteFolder(folder.path)}>
+							❌
 						</button>
-					</Conditional>
-					<Conditional when={isAddingFolder}>
-						<input
-							autoFocus={true}
-							className="rounded-lg outline-none p-1 text-left text-xs text-gray-500"
-							value={newFolderName}
-							onChange={(e) => setNewFolderName(e.target.value)}
-							onKeyDown={(e) => {
-								if (e.key === "Enter") {
-									createFolder(`${folder.path}/${newFolderName}`)
-									setNewFolderName("")
-								}
-							}}
-							onBlur={() => setIsAddingFolder(false)}
-						/>
-						<button
-							onClick={() => setIsAddingFolder(true)}
-							className="rounded-lg p-1 text-left text-xs text-gray-500"
-						>
-							🗂
-						</button>
-					</Conditional>
-					<button
-						className="rounded-lg p-1 text-left text-xs text-gray-500"
-						onClick={() => setIsRenaming(true)}
-					>
-						✏️
-					</button>
-					<button
-						className="rounded-lg p-1 text-left text-xs text-gray-500"
-						onClick={() => deleteFolder(folder.path)}
-					>
-						❌
-					</button>
+					)}
 				</div>
 			</div>
+
+			{creatorIsOpen && (
+				<div
+					ref={creatorRef}
+					style={{
+						top: "20%",
+						left: "50%",
+						transform: "translate(-50%, 0)",
+						width: "40%",
+						minWidth: "400px",
+					}}
+					className="fixed rounded-lg shadow-xl p-4 bg-gray-50"
+				>
+					<label className="p-1 flex">
+						<span>{folder.path}/</span>
+						<input
+							autoFocus={creatorIsOpen}
+							className="w-full outline-none bg-gray-50"
+							type="text"
+							onChange={(e) => setCreationName(e.target.value)}
+							value={creationName}
+							onKeyDown={(e) => {
+								if (e.key === "Enter") {
+									e.preventDefault()
+
+									if (entityType === "file") {
+										createFile(folder, creationName)
+									} else if (entityType === "Folder") {
+										createFolder(folder, creationName)
+									}
+
+									setEntityType("")
+									setCreationName("")
+									closeCreator()
+								}
+							}}
+						/>
+						<Conditional when={entityType === "file"}>
+							<span>.md</span>
+						</Conditional>
+					</label>
+
+					<div className="text-xs text-gray-600 text-center mt-2">
+						Press <kbd className="bg-pink-300 p-1 rounded-md">Enter</kbd> to apply changes or{" "}
+						<kbd className="bg-pink-300 p-1 rounded-md">Esc</kbd> to drop.
+					</div>
+				</div>
+			)}
 		</div>
 	)
 }

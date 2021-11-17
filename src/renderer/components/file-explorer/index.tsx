@@ -14,9 +14,9 @@ export const FileExplorer: React.FC<{
 	setCurrentFile: (page: string) => void
 	unsavedFiles: string[]
 	depth?: number
-	createFile: (path: string) => Promise<void>
+	createFile: (folder: TFolder, name: string) => Promise<void>
+	createFolder: (folder: TFolder, name: string) => Promise<void>
 	deleteFile: (path: string) => Promise<void>
-	createFolder: (path: string) => Promise<void>
 	deleteFolder: (path: string) => Promise<void>
 	rename: (oldPath: string, newPath: string) => Promise<void>
 }> = ({

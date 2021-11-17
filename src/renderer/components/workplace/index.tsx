@@ -240,7 +240,7 @@ export const Workspace: React.FC<{
 
 	return (
 		<>
-			{metadata && metadata.readableName && (
+			{Boolean(currentFilePath) && metadata && metadata.readableName && (
 				<div className="flex flex-col w-6/12 mx-auto mt-72">
 					<div className="text-5xl">{metadata.readableName}</div>
 					<details>

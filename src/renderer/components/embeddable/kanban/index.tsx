@@ -27,20 +27,20 @@ export const Kanban: React.FC<{
 		window.fileSystemAPI.move(oldPath, newPath).then(updateFileTree)
 	}
 
-	const createCard = (cardPath: string) => {
-		if (cardPath.endsWith("/.md")) {
+	const createCard = (column: Folder, name: string) => {
+		if (name.endsWith("/.md")) {
 			return
 		}
 
-		window.fileSystemAPI.createFile(cardPath).then(updateFileTree)
+		window.fileSystemAPI.createFile(column, name).then(updateFileTree)
 	}
 
-	const createColumn = (columnPath: string) => {
-		if (findFileByPath(tree, columnPath)) {
+	const createColumn = (column: Folder, name: string) => {
+		if (findFileByPath(tree, name)) {
 			return
 		}
 
-		window.fileSystemAPI.createFolder(columnPath).then(updateFileTree)
+		window.fileSystemAPI.createFolder(column, name).then(updateFileTree)
 	}
 
 	const deleteCard = (cardPath: string) => {
@@ -111,7 +111,7 @@ export const Kanban: React.FC<{
 					onKeyDown={(e) => {
 						if (e.key === "Enter") {
 							e.preventDefault()
-							createColumn(`${tree.path}/${newColumnName.trim()}`)
+							createColumn(tree, newColumnName)
 							setNewColumnName("")
 						}
 					}}

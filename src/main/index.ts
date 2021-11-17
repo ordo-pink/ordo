@@ -41,10 +41,8 @@ ipcMain.handle("fs:get-file", async (_, path) =>
 )
 ipcMain.handle("fs:save-file", (_, path, data) => saveFile(getAbsolute(path), data))
 ipcMain.handle("fs:move", (_, oldPath, newPath) => move(getAbsolute(oldPath), getAbsolute(newPath)))
-ipcMain.handle("fs:create-file", (_, path) => createFile(getAbsolute(path)))
-ipcMain.handle("fs:create-folder", (_, path) => createFolder(getAbsolute(path)))
-ipcMain.handle("fs:delete-file", (_, path) => deleteFile(getAbsolute(path)))
-ipcMain.handle("fs:delete-folder", (_, path) => deleteFolder(getAbsolute(path)))
+ipcMain.handle("fs:create-file", (_, folder, name) => createFile(folder, name))
+ipcMain.handle("fs:create-folder", (_, folder, name) => createFolder(folder, name))
 
 ipcMain.handle("settings:set", (_, key, value) => {
 	Settings.set(key, value).persist(Settings.get("application.global-settings-path"))
@@ -86,6 +84,43 @@ const createWindow = (): void => {
 		}, 300),
 	)
 
+	ipcMain.handle("fs:delete-file", (_, path) => {
+		const response = dialog.showMessageBoxSync(mainWindow, {
+			type: "question",
+			buttons: ["Yes", "No"],
+			title: "Confirm removal",
+			message: `Are you sure you want to remove "${path}"`,
+		})
+
+		if (response === 0) {
+			if (getAbsolute(path) === Settings.get("application.last-open-file")) {
+				Settings.set("application.last-open-file", "").persist(
+					Settings.get("application.global-settings-path"),
+				)
+			}
+
+			return deleteFile(getAbsolute(path))
+		}
+	})
+	ipcMain.handle("fs:delete-folder", (_, path) => {
+		const response = dialog.showMessageBoxSync(mainWindow, {
+			type: "question",
+			buttons: ["Yes", "No"],
+			title: "Confirm removal",
+			message: `Are you sure you want to remove "${path}"`,
+		})
+
+		if (response === 0) {
+			if (Settings.get("application.last-open-file").startsWith(getAbsolute(path))) {
+				Settings.set("application.last-open-file", "").persist(
+					Settings.get("application.global-settings-path"),
+				)
+			}
+
+			return deleteFolder(getAbsolute(path))
+		}
+	})
+
 	ipcMain.handle("fs:select-root-folder", () =>
 		dialog
 			.showOpenDialog(mainWindow, {
@@ -100,7 +135,6 @@ const createWindow = (): void => {
 			}),
 	)
 
-	// and load the index.html of the app.
 	mainWindow.loadURL(MAIN_WINDOW_WEBPACK_ENTRY)
 }
 

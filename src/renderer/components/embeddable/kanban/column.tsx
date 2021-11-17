@@ -9,7 +9,7 @@ export const Column: React.FC<{
 	tree: Folder
 	index: number
 	updateColumnName: (oldPath: string, newPath: string) => void
-	createCard: (cardName: string) => void
+	createCard: (column: Folder, cardName: string) => void
 	deleteCard: (cardName: string) => void
 }> = ({ tree, index, updateColumnName, createCard, deleteCard }) => {
 	const [isAddingCardAtTheTop, setIsAddingCardAtTheTop] = React.useState(false)
@@ -111,7 +111,7 @@ export const Column: React.FC<{
 								onKeyDown={(e) => {
 									if (e.key === "Enter") {
 										e.preventDefault()
-										createCard(`${tree.path}/${newCardName.trim()}.md`)
+										createCard(tree, newCardName)
 										setNewCardName("")
 									}
 								}}

@@ -1,4 +1,5 @@
 import React from "react"
+import { useDropdown } from "../../hooks/use-dropdown"
 import { FileMetadata } from "../../../main/apis/fs/types"
 import { Conditional } from "../conditional"
 import { Emoji } from "../emoji"
@@ -13,7 +14,7 @@ export const File: React.FC<{
 	rename: (oldPath: string, newPath: string) => Promise<void>
 }> = ({ file, setCurrentFile, currentFile, unsavedFiles, depth, deleteFile, rename }) => {
 	const [newName, setNewName] = React.useState(file ? file.readableName : "")
-	const [isRenaming, setIsRenaming] = React.useState(false)
+	const [ref, isOpen, open] = useDropdown<HTMLDivElement>()
 
 	return (
 		file && (
@@ -24,41 +25,42 @@ export const File: React.FC<{
 					file.path === currentFile ? "bg-gray-300 dark:bg-gray-600" : ""
 				}`}
 			>
-				<Conditional when={!isRenaming}>
+				<Conditional when={!isOpen}>
 					<span className="flex-nowrap truncate">
 						<Emoji icon="📄">{file.readableName}</Emoji>
 					</span>
 					<input
-						autoFocus={true}
+						autoFocus={isOpen}
 						className="rounded-lg outline-none p-1 text-left text-xs text-gray-500"
 						value={newName}
 						onChange={(e) => setNewName(e.target.value)}
 						onKeyDown={(e) => {
 							if (e.key === "Enter") {
+								e.preventDefault()
 								rename(file.path, file.path.replace(file.readableName, newName))
 							}
 						}}
-						onBlur={() => setIsRenaming(false)}
 					/>
 				</Conditional>
-				<div className="flex space-x-2 pr-2">
-					<Conditional when={unsavedFiles.includes(file.path)}>
-						<Emoji icon="🔴" />
-					</Conditional>
 
-					<button
-						className="rounded-lg p-1 text-left text-xs text-gray-500"
-						onClick={() => setIsRenaming(true)}
-					>
-						✏️
-					</button>
+				<Conditional when={unsavedFiles.includes(file.path)}>
+					<Emoji icon="🔴" />
+				</Conditional>
 
-					<button
-						className="rounded-lg p-1 text-left text-xs text-gray-500"
-						onClick={() => deleteFile(file.path)}
-					>
-						❌
-					</button>
+				<div ref={ref} className="flex space-x-2 pr-2 text-xs">
+					{!isOpen && (
+						<button className="p-1" onClick={open}>
+							⚙️
+						</button>
+					)}
+
+					{isOpen && (
+						<div>
+							<button className="p-1" onClick={() => deleteFile(file.path)}>
+								❌
+							</button>
+						</div>
+					)}
 				</div>
 			</div>
 		)

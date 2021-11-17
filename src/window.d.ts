@@ -1,6 +1,6 @@
-import { Hashed } from "./main/apis/hash-response"
-import { Folder } from "./main/apis/fs/types"
-import { Configuration } from "./main/apis/settings/types"
+import type { Hashed } from "./main/apis/hash-response"
+import type { FileMetadata, Folder } from "./main/apis/fs/types"
+import type { Configuration } from "./main/apis/settings/types"
 
 declare global {
 	interface Window {
@@ -16,8 +16,8 @@ export interface IFileSystemAPI {
 	getFile: (path: string) => Promise<Hashed<{ data: string }>>
 	saveFile: (path: string, data: string) => Promise<void>
 	move: (oldPath: string, newPath: string) => Promise<void>
-	createFile: (path: string) => Promise<void>
-	createFolder: (path: string) => Promise<string>
+	createFile: (folder: Folder, name: string) => Promise<FileMetadata>
+	createFolder: (folder: Folder, name: string) => Promise<Folder>
 	deleteFile: (path: string) => Promise<void>
 	deleteFolder: (path: string) => Promise<void>
 	selectRootFolder: () => Promise<string>

@@ -1,4 +1,4 @@
-import type { Folder } from "../../../../main/apis/fs/types"
+import type { ArbitraryFolder } from "../../../../global-context/types"
 
 import React from "react"
 import { DragDropContext, Droppable, DropResult } from "react-beautiful-dnd"
@@ -10,7 +10,7 @@ import { findFileByPath } from "../../../../utils/tree"
 export const Kanban: React.FC<{
 	folder: string
 }> = ({ folder }) => {
-	const [tree, setTree] = React.useState<Folder>({} as Folder)
+	const [tree, setTree] = React.useState({} as ArbitraryFolder)
 	const [hash, setHash] = React.useState("")
 	const [isAddingColumn, setIsAddingColumn] = React.useState(false)
 	const [newColumnName, setNewColumnName] = React.useState("")
@@ -27,7 +27,7 @@ export const Kanban: React.FC<{
 		window.fileSystemAPI.move(oldPath, newPath).then(updateFileTree)
 	}
 
-	const createCard = (column: Folder, name: string) => {
+	const createCard = (column: ArbitraryFolder, name: string) => {
 		if (name.endsWith("/.md")) {
 			return
 		}
@@ -35,7 +35,7 @@ export const Kanban: React.FC<{
 		window.fileSystemAPI.createFile(column, name).then(updateFileTree)
 	}
 
-	const createColumn = (column: Folder, name: string) => {
+	const createColumn = (column: ArbitraryFolder, name: string) => {
 		if (findFileByPath(tree, name)) {
 			return
 		}
@@ -44,7 +44,7 @@ export const Kanban: React.FC<{
 	}
 
 	const deleteCard = (cardPath: string) => {
-		window.fileSystemAPI.deleteFile(cardPath).then(updateFileTree)
+		window.fileSystemAPI.delete(cardPath).then(updateFileTree)
 	}
 
 	const onDragEnd = (result: DropResult) => {
@@ -72,7 +72,7 @@ export const Kanban: React.FC<{
 			</div>
 
 			<DragDropContext onDragEnd={onDragEnd}>
-				<div className={`bg-${tree.color}-200 dark:bg-gray-500 rounded-lg py-2`}>
+				<div className={`dark:bg-gray-500 rounded-lg py-2`}>
 					{tree.children && (
 						<Droppable droppableId={tree.path} direction="horizontal" type="column">
 							{(provided) => (
@@ -82,8 +82,8 @@ export const Kanban: React.FC<{
 									{...provided.droppableProps}
 								>
 									{tree.children.map(
-										(column: Folder, index) =>
-											column.isFolder && (
+										(column: ArbitraryFolder, index) =>
+											!column.isFile && (
 												<Column
 													key={column.path}
 													tree={column}

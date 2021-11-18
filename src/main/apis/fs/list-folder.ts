@@ -1,12 +1,15 @@
-import { readdir } from "fs"
+import { promises } from "fs"
 import { join } from "path"
-import { getColor } from "../appearance/get-color"
-import { getFileMetadata } from "./get-file-metadata"
-import { FileMetadata, Folder } from "./types"
+import {
+	createArbitraryFolder,
+	createMDFolder,
+	createMDFolderFrontmatter,
+	isFolder,
+} from "../../../global-context/init"
+import { ArbitraryFolder } from "../../../global-context/types"
+import { getMarkdownFile } from "./get-markdown-file"
 
-const isFolder = (x: Folder | FileMetadata): x is Folder => x.isFolder
-
-const sortTree = (tree: Folder) => {
+const sortTree = (tree: ArbitraryFolder) => {
 	tree.children = tree.children.sort((a, b) => {
 		if (isFolder(a)) {
 			sortTree(a)
@@ -30,40 +33,26 @@ const sortTree = (tree: Folder) => {
 	return tree
 }
 
-export const listFolder = (path: string, tree: Folder = {} as Folder): Promise<Folder> =>
-	new Promise((resolve, reject) => {
-		readdir(path, { withFileTypes: true, encoding: "utf8" }, async (err, files) => {
-			if (err) {
-				reject(err)
+export async function listFolder(path: string): Promise<ArbitraryFolder> {
+	const folder = await promises.readdir(path, { withFileTypes: true, encoding: "utf-8" })
+	const stats = await promises.stat(path)
+
+	let tree = createArbitraryFolder(path, stats)
+
+	for (const item of folder) {
+		const newPath = join(path, item.name)
+		if (item.isDirectory()) {
+			tree.children.push(await listFolder(newPath))
+		} else if (item.isFile() && item.name.endsWith(".md")) {
+			const mdFile = await getMarkdownFile(newPath)
+
+			if (item.name === ".folder-metadata.md") {
+				tree = createMDFolder(tree, createMDFolderFrontmatter(mdFile.frontmatter))
+			} else {
+				tree.children.push(mdFile)
 			}
+		}
+	}
 
-			if (!tree.children) {
-				tree.isFile = false
-				tree.isFolder = true
-				tree.path = path
-				tree.readableName = path.slice(path.lastIndexOf("/") + 1)
-				tree.children = []
-			}
-
-			for (const fileOrFolder of files) {
-				if (fileOrFolder.isFile()) {
-					try {
-						const fileMetadata = await getFileMetadata(join(path, fileOrFolder.name))
-
-						if (fileOrFolder.name === ".folder-metadata.md") {
-							tree.color = getColor(fileMetadata.frontmatter.color)
-							// tree.collapsed = fileMetadata.frontmatter.collapsed.toString() === "true"
-						} else if (!fileOrFolder.name.startsWith(".")) {
-							tree.children.push(fileMetadata)
-						}
-					} catch (e) {
-						return reject(e)
-					}
-				} else if (fileOrFolder.isDirectory()) {
-					tree.children.push(await listFolder(join(path, fileOrFolder.name)))
-				}
-			}
-
-			resolve(sortTree(tree))
-		})
-	})
+	return sortTree(tree)
+}

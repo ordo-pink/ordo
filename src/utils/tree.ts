@@ -1,37 +1,37 @@
-import { FileMetadata, Folder } from "../main/apis/fs/types"
+import { isFolder } from "../global-context/init"
+import type { ArbitraryFolder, MDFile } from "../global-context/types"
 
 export const reduce = <T>(
-	reducer: (acc: T, v: FileMetadata) => T,
+	reducer: (acc: T, v: MDFile) => T,
 	accumulator: T,
-	tree: Folder,
+	tree: ArbitraryFolder,
 ): T =>
 	tree.children.reduce(
-		(acc, item) =>
-			item.isFolder ? reduce(reducer, acc, item) : reducer(acc, item as FileMetadata),
+		(acc, item) => (isFolder(item) ? reduce(reducer, acc, item) : reducer(acc, item as MDFile)),
 		accumulator,
 	)
 
-export const hasUnsavedFiles = (tree: Folder, unsavedFiles: string[]): boolean =>
-	tree.isFolder && tree.children
+export const hasUnsavedFiles = (tree: ArbitraryFolder, unsavedFiles: string[]): boolean =>
+	isFolder(tree) && tree.children
 		? tree.children.some((item) =>
-				item.isFolder ? hasUnsavedFiles(item, unsavedFiles) : unsavedFiles.includes(item.path),
+				isFolder(item) ? hasUnsavedFiles(item, unsavedFiles) : unsavedFiles.includes(item.path),
 		  )
 		: false
 
-export const hasCurrentlyOpenedFile = (tree: Folder, path: string): boolean =>
-	tree.isFolder && tree.children
+export const hasCurrentlyOpenedFile = (tree: ArbitraryFolder, path: string): boolean =>
+	isFolder(tree) && tree.children
 		? tree.children.some((item) =>
-				item.isFolder ? hasCurrentlyOpenedFile(item, path) : item.path === path,
+				isFolder(item) ? hasCurrentlyOpenedFile(item, path) : item.path === path,
 		  )
 		: false
 
-export const findFileByPath = (tree: Folder, path: string): FileMetadata | null => {
+export const findFileByPath = (tree: ArbitraryFolder, path: string): MDFile | null => {
 	if (tree.isFile) {
 		return tree.path === path ? (tree as any) : null
 	}
 
 	for (const child of tree.children) {
-		if (child.isFolder) {
+		if (isFolder(child)) {
 			const found = findFileByPath(child, path)
 
 			if (found) {
@@ -47,13 +47,13 @@ export const findFileByPath = (tree: Folder, path: string): FileMetadata | null 
 	return null
 }
 
-export const findFileByName = (tree: Folder, name: string): FileMetadata | null => {
+export const findFileByName = (tree: ArbitraryFolder, name: string): MDFile | null => {
 	if (tree.isFile) {
 		return tree.readableName === name ? (tree as any) : null
 	}
 
 	for (const child of tree.children) {
-		if (child.isFolder) {
+		if (isFolder(child)) {
 			const found = findFileByName(child, name)
 
 			if (found) {

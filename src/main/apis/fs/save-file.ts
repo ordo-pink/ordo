@@ -1,12 +1,5 @@
-import { writeFile } from "fs"
+import { promises } from "fs"
 
-export const saveFile = (path: string, content: string): Promise<void> =>
-	new Promise((resolve, reject) =>
-		writeFile(path, content, "utf8", (err) => {
-			if (err) {
-				reject(err)
-			}
-
-			resolve()
-		}),
-	)
+export function saveFile(path: string, body: string): Promise<void> {
+	return promises.writeFile(path, body, "utf-8")
+}

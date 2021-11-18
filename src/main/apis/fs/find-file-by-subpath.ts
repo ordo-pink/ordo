@@ -1,26 +1,22 @@
-import type { FileMetadata, Folder, IFile } from "./types"
+import { isFile } from "../../../global-context/init"
+import { ArbitraryFile, ArbitraryFolder } from "../../../global-context/types"
+import { getFileContent } from "./get-file-content"
 
-import { getFile } from "./get-file"
-
-export const findFileBySubPath = async (
+export async function findFileBySubPath(
 	subPath: string,
-	tree: Folder | FileMetadata,
-): Promise<IFile | null> => {
-	if (tree.isFile) {
+	tree: ArbitraryFolder | ArbitraryFile,
+): Promise<ArbitraryFile> {
+	if (isFile(tree)) {
 		if (tree.path.endsWith(subPath)) {
-			const body = await getFile(tree.path)
-			return {
-				...(tree as unknown as FileMetadata),
-				body,
-			}
+			return getFileContent(tree.path)
 		}
 
 		return null
 	}
 
-	let found: IFile
+	let found: ArbitraryFile
 
-	for (const child of (tree as Folder).children) {
+	for (const child of tree.children) {
 		if (found) {
 			break
 		}

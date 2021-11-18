@@ -1,4 +1,4 @@
-import type { IFile } from "../../../main/apis/fs/types"
+import type { MDFile, WithBody } from "../../../global-context/types"
 
 import React from "react"
 
@@ -14,7 +14,7 @@ export const EmbeddableContent: React.FC<{ line: string; currentContent: string 
 }) => {
 	const strippedContent = line.replace(/^!\[\[/, "").replace(/\]\]$/, "")
 
-	const [node, setNode] = React.useState<IFile>(null)
+	const [node, setNode] = React.useState<WithBody<MDFile>>(null)
 	const [hash, setHash] = React.useState("")
 
 	const isUrl = strippedContent.startsWith("http://") || strippedContent.startsWith("https://")

@@ -1,4 +1,4 @@
-import type { Folder } from "../../../../main/apis/fs/types"
+import type { ArbitraryFolder, MDFile } from "../../../../global-context/types"
 
 import React from "react"
 import { Draggable, Droppable } from "react-beautiful-dnd"
@@ -6,10 +6,10 @@ import { Card } from "./card"
 import { Conditional } from "../../conditional"
 
 export const Column: React.FC<{
-	tree: Folder
+	tree: ArbitraryFolder
 	index: number
 	updateColumnName: (oldPath: string, newPath: string) => void
-	createCard: (column: Folder, cardName: string) => void
+	createCard: (column: ArbitraryFolder, cardName: string) => void
 	deleteCard: (cardName: string) => void
 }> = ({ tree, index, updateColumnName, createCard, deleteCard }) => {
 	const [isAddingCardAtTheTop, setIsAddingCardAtTheTop] = React.useState(false)
@@ -34,13 +34,13 @@ export const Column: React.FC<{
 					ref={provided.innerRef}
 					{...provided.draggableProps}
 					style={{ minWidth: "18rem", maxWidth: "18rem" }}
-					className={`bg-gray-200 dark:bg-gray-600 bg-${tree.color}-100 dark:bg-${tree.color}-300 rounded-lg shadow-md flex flex-col pb-2 space-y-2`}
+					className={`bg-gray-200 dark:bg-gray-600 rounded-lg shadow-md flex flex-col pb-2 space-y-2`}
 				>
 					<div className="flex justify-between items-center p-2">
 						<div
 							contentEditable={true}
 							suppressContentEditableWarning={true}
-							className={`text-center outline-none text-xs text-${tree.color}-900`}
+							className={`text-center outline-none text-xs`}
 							onBlur={onBlur}
 							onKeyDown={onKeyDown}
 						>
@@ -86,7 +86,7 @@ export const Column: React.FC<{
 										<div key={item.path}>
 											{item.isFile ? (
 												<Card
-													item={item}
+													item={item as MDFile}
 													index={index}
 													updateCardName={updateColumnName}
 													deleteCard={deleteCard}

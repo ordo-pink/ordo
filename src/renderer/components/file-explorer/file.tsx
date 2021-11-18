@@ -1,18 +1,20 @@
+import type { MDFile } from "../../../global-context/types"
+
 import React from "react"
+
 import { useDropdown } from "../../hooks/use-dropdown"
-import { FileMetadata } from "../../../main/apis/fs/types"
 import { Conditional } from "../conditional"
 import { Emoji } from "../emoji"
 
 export const File: React.FC<{
-	file: FileMetadata
+	file: MDFile
 	currentFile: string
 	depth: number
 	unsavedFiles: string[]
 	setCurrentFile: (page: string) => void
-	deleteFile: (path: string) => Promise<void>
+	deleteItem: (path: string) => Promise<void>
 	rename: (oldPath: string, newPath: string) => Promise<void>
-}> = ({ file, setCurrentFile, currentFile, unsavedFiles, depth, deleteFile, rename }) => {
+}> = ({ file, setCurrentFile, currentFile, unsavedFiles, depth, deleteItem, rename }) => {
 	const [newName, setNewName] = React.useState(file ? file.readableName : "")
 	const [ref, isOpen, open] = useDropdown<HTMLDivElement>()
 
@@ -56,7 +58,7 @@ export const File: React.FC<{
 
 					{isOpen && (
 						<div>
-							<button className="p-1" onClick={() => deleteFile(file.path)}>
+							<button className="p-1" onClick={() => deleteItem(file.path)}>
 								❌
 							</button>
 						</div>

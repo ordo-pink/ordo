@@ -3,17 +3,16 @@ import { app, BrowserWindow, dialog, ipcMain, shell } from "electron"
 import { join, normalize, resolve } from "path"
 import { debounce } from "../utils/function"
 import { Settings } from "./apis/settings"
-import { getFile } from "./apis/fs/get-file"
+import { getMarkdownFile } from "./apis/fs/get-markdown-file"
 import { listFolder } from "./apis/fs/list-folder"
 import { saveFile } from "./apis/fs/save-file"
 import { hashResponse } from "./apis/hash-response"
 import { setTheme } from "./apis/appearance"
-import { move } from "./apis/fs/move-file"
+import { move } from "./apis/fs/move"
 import { createFile } from "./apis/fs/create-file"
 import { createFolder } from "./apis/fs/create-folder"
-import { deleteFile } from "./apis/fs/delete-file"
-import { deleteFolder } from "./apis/fs/delete-folder"
 import { findFileBySubPath } from "./apis/fs/find-file-by-subpath"
+import { MDTree } from "../global-context/types"
 
 declare const MAIN_WINDOW_WEBPACK_ENTRY: string
 declare const MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY: string
@@ -36,9 +35,7 @@ ipcMain.handle("dark-mode:set", (_, theme): ColorTheme => setTheme(theme))
 
 ipcMain.handle("fs:list-folder", (_, path) => listFolder(getAbsolute(path)).then(hashResponse))
 ipcMain.handle("fs:get-file", async (_, path) =>
-	getFile(getAbsolute(path))
-		.then((data) => ({ data }))
-		.then(hashResponse),
+	getMarkdownFile(getAbsolute(path)).then(hashResponse),
 )
 ipcMain.handle("fs:save-file", (_, path, data) => saveFile(getAbsolute(path), data))
 ipcMain.handle("fs:move", (_, oldPath, newPath) => move(getAbsolute(oldPath), getAbsolute(newPath)))
@@ -90,7 +87,7 @@ const createWindow = (): void => {
 		}, 300),
 	)
 
-	ipcMain.handle("fs:delete-file", (_, path) => {
+	ipcMain.handle("fs:delete", (_, path: string): Promise<void> => {
 		const response = dialog.showMessageBoxSync(mainWindow, {
 			type: "question",
 			buttons: ["Yes", "No"],
@@ -99,31 +96,7 @@ const createWindow = (): void => {
 		})
 
 		if (response === 0) {
-			if (getAbsolute(path) === Settings.get("application.last-open-file")) {
-				Settings.set("application.last-open-file", "").persist(
-					Settings.get("application.global-settings-path"),
-				)
-			}
-
-			return deleteFile(getAbsolute(path))
-		}
-	})
-	ipcMain.handle("fs:delete-folder", (_, path) => {
-		const response = dialog.showMessageBoxSync(mainWindow, {
-			type: "question",
-			buttons: ["Yes", "No"],
-			title: "Confirm removal",
-			message: `Are you sure you want to remove "${path}"`,
-		})
-
-		if (response === 0) {
-			if (Settings.get("application.last-open-file").startsWith(getAbsolute(path))) {
-				Settings.set("application.last-open-file", "").persist(
-					Settings.get("application.global-settings-path"),
-				)
-			}
-
-			return deleteFolder(getAbsolute(path))
+			return shell.trashItem(path)
 		}
 	})
 

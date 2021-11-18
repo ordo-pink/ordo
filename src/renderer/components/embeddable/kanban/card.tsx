@@ -1,9 +1,11 @@
+import type { MDFile } from "../../../../global-context/types"
+
 import React from "react"
+
 import { Draggable } from "react-beautiful-dnd"
-import { FileMetadata } from "../../../../main/apis/fs/types"
 
 export const Card: React.FC<{
-	item: FileMetadata
+	item: MDFile
 	index: number
 	updateCardName: (oldPath: string, newPath: string) => void
 	deleteCard: (cardName: string) => void

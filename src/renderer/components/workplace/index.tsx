@@ -1,9 +1,10 @@
+import type { MDFile } from "../../../global-context/types"
+
 import React from "react"
 
 import { Conditional } from "../conditional"
 import { WelcomePage } from "./welcome-page"
 import { getCaretPosition, setCaretPosition } from "./caret"
-import { FileMetadata } from "../../../main/apis/fs/types"
 import { Emoji } from "../emoji"
 import { MemoLine } from "./memo-line"
 
@@ -21,7 +22,7 @@ const getDivElement = (index: number): HTMLDivElement =>
 
 export const Workspace: React.FC<{
 	currentFilePath: string
-	metadata: FileMetadata
+	metadata: MDFile
 	toggleSaved: (path: string, saved: boolean) => void
 }> = ({ currentFilePath, toggleSaved, metadata }) => {
 	const [content, setContent] = React.useState<string[]>([])
@@ -39,8 +40,8 @@ export const Workspace: React.FC<{
 
 	React.useEffect(() => {
 		currentFilePath &&
-			window.fileSystemAPI.getFile(currentFilePath).then(({ data, hash }) => {
-				setContent(data.split("\n"))
+			window.fileSystemAPI.getFile(currentFilePath).then(({ body, hash }) => {
+				setContent(body.split("\n"))
 				setHash(hash)
 			})
 	}, [hash, currentFilePath])

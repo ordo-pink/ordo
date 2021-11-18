@@ -1,16 +1,19 @@
+import type { ArbitraryFolder, MDFile } from "../global-context/types"
+
 import React from "react"
+
 import { findFileByName, findFileByPath } from "../utils/tree"
-import { FileMetadata, Folder } from "../main/apis/fs/types"
 import { FileExplorer } from "./components/file-explorer"
 import { Workspace } from "./components/workplace"
+import { isFolder } from "../global-context/init"
 
 export const App: React.FC = () => {
 	const [rootPath, setRootPath] = React.useState("")
-	const [fileTree, setFileTree] = React.useState(null as Folder)
+	const [fileTree, setFileTree] = React.useState(null as ArbitraryFolder)
 	const [hash, setHash] = React.useState("")
 	const [currentFilePath, setCurrentFilePath] = React.useState("")
 	const [unsavedFiles, setUnsavedFiles] = React.useState<string[]>([])
-	const [currentFileMetadata, setCurrentFileMetadata] = React.useState({} as FileMetadata)
+	const [currentFileMetadata, setCurrentFileMetadata] = React.useState({} as MDFile)
 
 	const updateFileTreeListener = () => {
 		window.fileSystemAPI.listFolder(rootPath).then((data) => {
@@ -31,13 +34,15 @@ export const App: React.FC = () => {
 		if (detail.path.startsWith("https://") || detail.path.startsWith("http://")) {
 			window.shellAPI.openExternal(detail.path)
 		} else if (!detail.path.startsWith("/")) {
-			let node: Folder | FileMetadata = fileTree
+			let node: ArbitraryFolder | MDFile = { ...fileTree }
 
 			if (~detail.path.indexOf("/")) {
 				const chunks = detail.path.split("/")
 
 				for (const chunk of chunks) {
-					node = node.isFolder ? node.children.find((child) => child.readableName === chunk) : node
+					node = isFolder(node)
+						? (node.children.find((child) => child.readableName === chunk) as MDFile)
+						: node
 
 					if (node.isFile && chunks.indexOf(chunk) === chunks.length - 1) {
 						setCurrentFileMetadata(node)
@@ -46,8 +51,11 @@ export const App: React.FC = () => {
 				}
 			} else {
 				node = findFileByName(fileTree, detail.path)
-				setCurrentFileMetadata(node)
-				setCurrentFilePath(node.path)
+
+				if (node.isFile) {
+					setCurrentFileMetadata(node)
+					setCurrentFilePath(node.path)
+				}
 			}
 		} else {
 			const node = findFileByPath(fileTree, detail.path)
@@ -78,13 +86,13 @@ export const App: React.FC = () => {
 		setUnsavedFiles(unsavedFilesCopy)
 	}
 
-	const createFile = (folder: Folder, name: string) =>
+	const createFile = (folder: ArbitraryFolder, name: string) =>
 		window.fileSystemAPI
-			.createFile(folder, name)
+			.createFile(folder, `${name}.md`)
 			.then(updateFileTreeListener)
 			.then(() => assignCurrentPath(`${folder.path}/${name}.md`))
 
-	const createFolder = (folder: Folder, name: string) =>
+	const createFolder = (folder: ArbitraryFolder, name: string) =>
 		window.fileSystemAPI.createFolder(folder, name).then(updateFileTreeListener)
 
 	const rename = (oldPath: string, newPath: string) =>
@@ -93,18 +101,15 @@ export const App: React.FC = () => {
 			.then(() => assignCurrentPath(newPath))
 			.then(updateFileTreeListener)
 
-	const deleteFile = (path: string) =>
+	const deleteItem = (path: string) =>
 		window.fileSystemAPI
-			.deleteFile(path)
+			.delete(path)
 			.then(() => {
 				if (currentFilePath === path) {
 					assignCurrentPath("")
 				}
 			})
 			.then(updateFileTreeListener)
-
-	const deleteFolder = (path: string) =>
-		window.fileSystemAPI.deleteFolder(path).then(updateFileTreeListener)
 
 	const assignCurrentPath = (path: string) => {
 		window.settingsAPI.set("application.last-open-file", path)
@@ -147,9 +152,8 @@ export const App: React.FC = () => {
 							currentFile={currentFilePath}
 							setCurrentFile={assignCurrentPath}
 							createFile={createFile}
-							deleteFile={deleteFile}
+							deleteItem={deleteItem}
 							createFolder={createFolder}
-							deleteFolder={deleteFolder}
 							rename={rename}
 							tree={fileTree}
 							root={rootPath}

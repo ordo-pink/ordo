@@ -1,4 +1,4 @@
-import type { Folder as TFolder } from "../../../main/apis/fs/types"
+import type { ArbitraryFolder } from "../../../global-context/types"
 
 import React from "react"
 
@@ -9,22 +9,13 @@ import { Emoji } from "../emoji"
 export const Folder: React.FC<{
 	setCollapsed: React.Dispatch<React.SetStateAction<boolean>>
 	collapsed: boolean
-	folder: TFolder
+	folder: ArbitraryFolder
 	depth: number
-	createFile: (folder: TFolder, name: string) => Promise<void>
-	createFolder: (folder: TFolder, name: string) => Promise<void>
-	deleteFolder: (path: string) => Promise<void>
+	createFile: (folder: ArbitraryFolder, name: string) => Promise<void>
+	createFolder: (folder: ArbitraryFolder, name: string) => Promise<void>
+	deleteItem: (path: string) => Promise<void>
 	rename: (oldPath: string, newPath: string) => Promise<void>
-}> = ({
-	setCollapsed,
-	collapsed,
-	folder,
-	depth,
-	createFile,
-	createFolder,
-	deleteFolder,
-	rename,
-}) => {
+}> = ({ setCollapsed, collapsed, folder, depth, createFile, createFolder, deleteItem, rename }) => {
 	const [name, setName] = React.useState(folder.readableName)
 	const [ref, isOpen, open] = useDropdown<HTMLDivElement>()
 	const [creatorRef, creatorIsOpen, openCreator, closeCreator] = useDropdown<HTMLDivElement>()
@@ -89,7 +80,7 @@ export const Folder: React.FC<{
 					)}
 
 					{isOpen && (
-						<button className="p-1" onClick={() => deleteFolder(folder.path)}>
+						<button className="p-1" onClick={() => deleteItem(folder.path)}>
 							❌
 						</button>
 					)}

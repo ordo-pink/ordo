@@ -1,4 +1,4 @@
-import type { FileMetadata } from "../../../main/apis/fs/types"
+import type { MDFile } from "../../../global-context/types"
 
 import React from "react"
 
@@ -13,7 +13,7 @@ const readableSize = (a: number, b = 2, k = 1024): string => {
 		  }`
 }
 
-export const Metadata: React.FC<{ metadata: FileMetadata }> = ({ metadata }) => {
+export const Metadata: React.FC<{ metadata: MDFile }> = ({ metadata }) => {
 	return (
 		metadata &&
 		metadata.readableName && (

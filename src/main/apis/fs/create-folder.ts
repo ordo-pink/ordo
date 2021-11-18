@@ -1,20 +1,9 @@
-import type { Folder } from "./types"
+import type { ArbitraryFolder } from "../../../global-context/types"
 
 import { promises } from "fs"
 import { join } from "path"
-import { listFolder } from "./list-folder"
 
-const folderMetadataContent = (path: string) => `---
-color: default
----
-
-<Kanban folder="${path}" />
-`
-
-export const createFolder = (folder: Folder, name: string): Promise<Folder> => {
+export async function createFolder(folder: ArbitraryFolder, name: string): Promise<string> {
 	const path = join(folder.path, name)
-	return promises
-		.mkdir(path, { recursive: true })
-		.then(() => promises.writeFile(join(path, ".folder-metadata.md"), folderMetadataContent(path)))
-		.then(() => listFolder(path))
+	return promises.mkdir(path, { recursive: true })
 }

@@ -36,7 +36,6 @@ export const MemoLine = React.memo<{
 						className="px-2 w-full border-l dark:border-gray-900 border-gray-300 "
 					>
 						<div
-							// ref={ref}
 							className="w-full outline-none"
 							contentEditable={true}
 							data-id={index}

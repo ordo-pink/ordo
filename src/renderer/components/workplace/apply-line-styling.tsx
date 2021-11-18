@@ -3,7 +3,7 @@ import React from "react"
 import { isEmbeddableComponent } from "./render-embeddable"
 import { isEmbeddableContent } from "./render-embeddable-content"
 
-export const applyLineStyling = (line: string) => {
+export const applyLineStyling = (line: string): JSX.Element => {
 	line = line
 		.replace(/\*\*([^**]+)\*\*/g, (value) => `<strong>${value}</strong>`)
 		.replace(/_([^_]+)_/g, (value) => `<em>${value}</em>`)

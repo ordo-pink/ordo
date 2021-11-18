@@ -1,13 +1,11 @@
 import React from "react"
 
 import { Conditional } from "../conditional"
-import { isEmbeddableComponent, renderEmbeddable } from "./render-embeddable"
 import { WelcomePage } from "./welcome-page"
 import { getCaretPosition, setCaretPosition } from "./caret"
 import { FileMetadata } from "../../../main/apis/fs/types"
 import { Emoji } from "../emoji"
-import { isEmbeddableContent, EmbeddableContent } from "./render-embeddable-content"
-import { applyLineStyling } from "./apply-line-styling"
+import { MemoLine } from "./memo-line"
 
 const readableSize = (a: number, b = 2, k = 1024): string => {
 	const d = Math.floor(Math.log(a) / Math.log(k))
@@ -243,41 +241,16 @@ export const Workspace: React.FC<{
 					<div id="editor" className="pb-80 mb-80">
 						{content &&
 							content.map((line, index) => (
-								<div key={`${line}-${index}`}>
-									<div
-										className={`w-full flex items-center ${index === currentLine && "bg-gray-200"}`}
-									>
-										<div className="text-right w-12 px-2 text-gray-700 dark:text-gray-300 font-mono">
-											{index + 1}
-										</div>
-										<div
-											style={{ maxWidth: "1000px" }}
-											className="px-2 w-full border-l dark:border-gray-900 border-gray-300 "
-										>
-											<div
-												className="w-full outline-none"
-												contentEditable={true}
-												data-id={index}
-												onClick={() => onClickEditableDiv(index)}
-												onInput={() => onChangeEditableDiv(index)}
-												onKeyDown={onKeyDown}
-												suppressContentEditableWarning={true}
-											>
-												{applyLineStyling(line)}
-											</div>
-										</div>
-									</div>
-
-									<Conditional when={isEmbeddableContent(line)}>
-										<div className="p-2">
-											<EmbeddableContent currentContent={content.join("\n")} line={line} />
-										</div>
-									</Conditional>
-
-									<Conditional when={isEmbeddableComponent(line)}>
-										<div className="p-2">{renderEmbeddable(line)}</div>
-									</Conditional>
-								</div>
+								<MemoLine
+									key={`${line}-${index}`}
+									onClick={onClickEditableDiv}
+									onChange={onChangeEditableDiv}
+									onKeyDown={onKeyDown}
+									line={line}
+									index={index}
+									currentLine={currentLine}
+									content={content}
+								/>
 							))}
 					</div>
 				</form>

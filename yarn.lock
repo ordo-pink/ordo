@@ -7315,6 +7315,16 @@ optionator@^0.9.1:
     type-check "^0.4.0"
     word-wrap "^1.2.3"
 
+or-else@^0.1.0:
+  version "0.1.0"
+  resolved "https://registry.yarnpkg.com/or-else/-/or-else-0.1.0.tgz#4cd3a47d57d036bd3f9b92e5ff5d11e7af50ce84"
+  integrity sha512-cSjJeFOH55jndVQXWbh3AIHGUeUY2agmnit0D/dXrpeAr8xd7+jJaq5Z0YtlyHBMg0vFxO3XzJCvSxKcqEMoJg==
+
+or-pipets@^1.0.1:
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/or-pipets/-/or-pipets-1.0.1.tgz#0699c99f95a535614a585cd7fb3a1a216a47b5c0"
+  integrity sha512-xgIIdB4w00pbhtNPYLF/caifwbc4KrE7jy4WqiDRzRrC2g3YVR4ypRwbKRA/bXzftQEA2SK8c+wKI2R7kqKiLQ==
+
 ora@^5.0.0, ora@^5.1.0, ora@^5.4.1:
   version "5.4.1"
   resolved "https://registry.yarnpkg.com/ora/-/ora-5.4.1.tgz#1b2678426af4ac4a509008e5e4ac9e9959db9e18"

@@ -12,7 +12,6 @@ import { move } from "./apis/fs/move"
 import { createFile } from "./apis/fs/create-file"
 import { createFolder } from "./apis/fs/create-folder"
 import { findFileBySubPath } from "./apis/fs/find-file-by-subpath"
-import { MDTree } from "../global-context/types"
 
 declare const MAIN_WINDOW_WEBPACK_ENTRY: string
 declare const MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY: string

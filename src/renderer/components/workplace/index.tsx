@@ -195,7 +195,7 @@ export const Workspace: React.FC<{
 			)}
 			<Conditional when={Boolean(currentFilePath)}>
 				<form className="pb-80 mb-80 overflow-x-hidden">
-					<div id="editor" className="pb-80 mb-80">
+					<div id="editor" className="pb-80 mb-80 font-mono">
 						{content &&
 							content.map((line, index) => (
 								<MemoLine

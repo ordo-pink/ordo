@@ -66,7 +66,7 @@ export const Kanban: React.FC<{
 	}, [folder, hash])
 
 	return (
-		<div className="overflow-x-auto bg-gray-50 dark:bg-gray-500 rounded-lg p-4 border border-gray-300 mx-auto">
+		<div className="overflow-x-auto font-sans bg-gray-50 dark:bg-gray-500 rounded-lg p-4 border border-gray-300 mx-auto">
 			<div className="text-xs mb-2 text-gray-700 dark:text-gray-300 outline-none">
 				{tree.readableName}
 			</div>

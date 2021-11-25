@@ -16,7 +16,6 @@ export const App: React.FC = () => {
 	const [hash, setHash] = React.useState("")
 	const [currentFilePath, setCurrentFilePath] = React.useState("")
 	const [unsavedFiles, setUnsavedFiles] = React.useState<string[]>([])
-	const [currentFileMetadata, setCurrentFileMetadata] = React.useState({} as MDFile)
 	const [currentView, setCurrentView] = React.useState<"workspace" | "graph" | "settings">(
 		"workspace",
 	)
@@ -28,19 +27,9 @@ export const App: React.FC = () => {
 		window.fileSystemAPI.listFolder(rootPath).then((data) => {
 			setFileTree(data)
 			setHash(data.hash)
-
-			console.log(data)
-
 			window.settingsAPI.get("application.last-open-file").then(setCurrentFilePath)
 		})
 	}
-
-	React.useEffect(() => {
-		if (currentFilePath) {
-			const node = findFileByPath(fileTree, currentFilePath)
-			setCurrentFileMetadata(node)
-		}
-	}, [currentFilePath, fileTree, hash])
 
 	const createFileOrFolderListener = (e: KeyboardEvent) => {
 		if (e.metaKey && e.key === "n") {
@@ -64,7 +53,6 @@ export const App: React.FC = () => {
 						: node
 
 					if (node.isFile && chunks.indexOf(chunk) === chunks.length - 1) {
-						setCurrentFileMetadata(node)
 						setCurrentFilePath(node.path)
 						setCurrentView("workspace")
 					}
@@ -73,26 +61,32 @@ export const App: React.FC = () => {
 				node = findFileByName(fileTree, detail.path)
 
 				if (node.isFile) {
-					setCurrentFileMetadata(node)
 					setCurrentFilePath(node.path)
 					setCurrentView("workspace")
 				}
 			}
 		} else {
-			const node = findFileByPath(fileTree, detail.path)
-			setCurrentFileMetadata(node)
 			setCurrentFilePath(detail.path)
 			setCurrentView("workspace")
 		}
 	}
 
+	const createFileListener = ({ detail }: CustomEvent) => {
+		window.fileSystemAPI.createFile(fileTree, detail.path).then(() => {
+			setCurrentFilePath(detail.path)
+			setCurrentView("workspace")
+		})
+	}
+
 	React.useEffect(() => {
 		window.addEventListener("set-current-file", setCurrentFileListener)
+		window.addEventListener("create-file", createFileListener)
 		window.addEventListener("update-tree", updateFileTreeListener)
 		window.addEventListener("keydown", createFileOrFolderListener)
 
 		return () => {
 			window.removeEventListener("set-current-file", setCurrentFileListener)
+			window.removeEventListener("create-file", createFileListener)
 			window.removeEventListener("update-tree", updateFileTreeListener)
 			window.removeEventListener("keydown", createFileOrFolderListener)
 		}
@@ -173,11 +167,7 @@ export const App: React.FC = () => {
 						<FileTreeGraph data={{ ...fileTree, hash }} />
 					</div>
 					<div className="mr-96 flex flex-col w-full flex-grow overflow-y-auto overflow-x-auto">
-						<Workspace
-							currentFilePath={currentFilePath}
-							metadata={currentFileMetadata}
-							toggleSaved={toggleUnsavedFileStatus}
-						/>
+						<Workspace currentFilePath={currentFilePath} toggleSaved={toggleUnsavedFileStatus} />
 					</div>
 				</Conditional>
 			</div>

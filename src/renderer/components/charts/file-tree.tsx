@@ -1,5 +1,5 @@
 import type { Hashed } from "../../../main/apis/hash-response"
-import type { ArbitraryFolder, ArbitraryFile, MDFile } from "../../../global-context/types"
+import type { ArbitraryFolder, ArbitraryFile } from "../../../global-context/types"
 
 import React from "react"
 import {
@@ -61,6 +61,40 @@ export const FileTreeGraph: React.FC<{ data: Hashed<ArbitraryFolder> }> = ({ dat
 		const links: any = hierarchy.links()
 		const nodes: any = hierarchy.descendants()
 
+		data.links.forEach((link: any) => {
+			let target
+			const source = nodes.find((node: any) => node.data.path === link.source)
+
+			if (!link.exists) {
+				const readableName = link.target.slice(
+					link.target.lastIndexOf("/") + 1,
+					link.target.lastIndexOf("."),
+				)
+
+				target = {
+					readableName,
+					path: link.target,
+					type: "absent",
+					data: {
+						readableName,
+						path: link.target,
+						type: "absent",
+					},
+				}
+
+				nodes.push(target)
+			} else {
+				target = nodes.find((node: any) => node.data.path === link.target)
+			}
+
+			links.push({
+				source,
+				target,
+				pageRelation: true,
+				index: links.length,
+			})
+		})
+
 		data.tags.forEach((tag: any) => {
 			const node = {
 				readableName: tag.name,
@@ -68,7 +102,7 @@ export const FileTreeGraph: React.FC<{ data: Hashed<ArbitraryFolder> }> = ({ dat
 				type: "tag",
 				data: {
 					readableName: tag.name,
-					path: tag.path,
+					path: tag.name,
 					type: "tag",
 				},
 			}
@@ -79,7 +113,7 @@ export const FileTreeGraph: React.FC<{ data: Hashed<ArbitraryFolder> }> = ({ dat
 				links.push({
 					source: node,
 					target: nodes.find((n: any) => n.data.path === child.path),
-					index: links.length - 1,
+					index: links.length,
 				})
 			})
 		})
@@ -116,8 +150,18 @@ export const FileTreeGraph: React.FC<{ data: Hashed<ArbitraryFolder> }> = ({ dat
 			.selectAll("line")
 			.data(links)
 			.join("line")
-			.attr("stroke", (d: any) => (d.source.type === "tag" ? "#832161" : null))
-			.attr("stroke-width", (d: any) => (d.source.type === "tag" ? 0.8 : null))
+			.attr("stroke", (d: any) => {
+				if (d.source.type === "tag") {
+					return "#EAB464"
+				}
+
+				if (d.pageRelation) {
+					return "#DCCCBB"
+				}
+
+				return "#646E78"
+			})
+			.attr("stroke-width", (d: any) => (d.source.type === "tag" || d.pageRelation ? 0.8 : null))
 
 		const node = container
 			.append("g")
@@ -126,34 +170,44 @@ export const FileTreeGraph: React.FC<{ data: Hashed<ArbitraryFolder> }> = ({ dat
 			.selectAll("g")
 			.data(nodes)
 			.join("g")
-			.attr("class", (d: any) => (d.data.isFile ? "cursor-pointer" : null))
+			.attr("class", (d: any) =>
+				d.data.isFile || d.data.type === "absent" ? "cursor-pointer" : null,
+			)
 			.attr("stroke-width", 0.5)
 
 			.call(drag(simulation))
 			.on("click", (_, n: any) => {
-				if (!n.data.isFile) {
-					return
+				if (n.data.isFile) {
+					window.dispatchEvent(
+						new CustomEvent("set-current-file", {
+							detail: { path: n.data.path },
+						}),
+					)
+				} else if (n.data.type === "absent") {
+					window.dispatchEvent(
+						new CustomEvent("create-file", {
+							detail: { path: n.data.path },
+						}),
+					)
 				}
-
-				window.dispatchEvent(
-					new CustomEvent("set-current-file", {
-						detail: { path: n.data.path },
-					}),
-				)
 			})
 
 		node
 			.append("circle")
 			.attr("fill", (d: any) => {
 				if (d.data.isFile) {
-					return "#ccc"
+					return "#8D98A7"
 				}
 
 				if (d.data.type === "tag") {
-					return "#832161"
+					return "#EAB464"
 				}
 
-				return "#eee"
+				if (d.data.type === "absent") {
+					return "#DA4167"
+				}
+
+				return "#646E78"
 			})
 			.attr("stroke", (d: any) => (d.data.isFile ? null : "#fff"))
 			.attr("r", 3.5)

@@ -13,13 +13,13 @@ const getDivElement = (index: number): HTMLDivElement =>
 
 export const Workspace: React.FC<{
 	currentFilePath: string
-	metadata: MDFile
 	toggleSaved: (path: string, saved: boolean) => void
-}> = ({ currentFilePath, toggleSaved, metadata }) => {
+}> = ({ currentFilePath, toggleSaved }) => {
 	const [content, setContent] = React.useState<string[]>([])
 	const [hash, setHash] = React.useState("")
 	const [savedCaretPosition, setSavedCaretPosition] = React.useState(0)
 	const [currentLine, setCurrentLine] = React.useState(0)
+	const [metadata, setMetadata] = React.useState<any>(null)
 
 	React.useEffect(() => {
 		const line = getDivElement(currentLine)
@@ -31,9 +31,14 @@ export const Workspace: React.FC<{
 
 	React.useEffect(() => {
 		currentFilePath &&
-			window.fileSystemAPI.getFile(currentFilePath).then(({ body, hash }) => {
-				setContent(body.split("\n"))
-				setHash(hash)
+			window.fileSystemAPI.getFile(currentFilePath).then((data) => {
+				setContent(data.body.split("\n"))
+				setHash(data.hash)
+				setMetadata({
+					...data,
+					body: undefined,
+					hash: undefined,
+				})
 			})
 	}, [hash, currentFilePath])
 

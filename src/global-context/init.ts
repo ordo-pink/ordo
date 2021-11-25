@@ -3,7 +3,6 @@ import {
 	ArbitraryFile,
 	ArbitraryFolder,
 	Editor,
-	FileExtension,
 	Frontmatter,
 	MDFile,
 	MDFileFrontmatter,
@@ -11,7 +10,6 @@ import {
 	MDFolderFrontmatter,
 	Nullable,
 	Path,
-	ReadableName,
 	WithBody,
 } from "./types"
 
@@ -116,10 +114,10 @@ export function createMDFolder(
 	}
 }
 
-export function isFile(x: any): x is ArbitraryFile {
-	return x && x.isFile
+export function isFile(x: Record<string, unknown>): x is ArbitraryFile {
+	return x && Boolean(x.isFile)
 }
 
-export function isFolder(x: any): x is ArbitraryFolder {
+export function isFolder(x: Record<string, unknown>): x is ArbitraryFolder {
 	return x && !x.isFile
 }

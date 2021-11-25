@@ -238,3 +238,12 @@ export function createTagNode(
 ): AstNode<AstNodeType.TAG> {
 	return createNode(AstNodeType.TAG, start, end, raw, 0, content)
 }
+
+export function createLinkNode(
+	start: number,
+	end: number,
+	raw: string,
+	content: AstNode[] = [],
+): AstNode<AstNodeType.WIKI_LINK> {
+	return createNode(AstNodeType.WIKI_LINK, start, end, raw, 0, content)
+}

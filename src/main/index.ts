@@ -17,6 +17,7 @@ import { parseMarkdown } from "../md-tools/parse"
 import { tokenizeMarkdown } from "../md-tools/tokenise"
 import { visit } from "../md-tools/visit-node"
 import { AstNodeType } from "../md-tools/types"
+import { findFileByPath } from "../utils/tree"
 
 declare const MAIN_WINDOW_WEBPACK_ENTRY: string
 declare const MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY: string
@@ -51,6 +52,7 @@ ipcMain.handle("fs:list-folder", async (_, path) => {
 	const tree = await listFolder(getAbsolute(path))
 
 	const tags: any[] = []
+	const links: any[] = []
 
 	visitFile(tree, (file) => {
 		if (file.extension === ".md") {
@@ -66,10 +68,34 @@ ipcMain.handle("fs:list-folder", async (_, path) => {
 
 				tag.children.push(file)
 			})
+
+			visit(ast)(AstNodeType.WIKI_LINK, (node) => {
+				const link = node.raw.slice(2, -2)
+
+				if (link.startsWith("http:") || link.startsWith("https:")) {
+					return
+				}
+
+				if (link.startsWith("/")) {
+					links.push({
+						source: file.path,
+						target: link,
+					})
+				}
+
+				const linkPath = resolve(tree.path, `${link}.md`)
+
+				links.push({
+					source: file.path,
+					target: linkPath,
+					exists: Boolean(findFileByPath(tree, linkPath)),
+				})
+			})
 		}
 	})
 
 	tree.tags = tags
+	tree.links = links
 
 	return hashResponse(tree)
 })

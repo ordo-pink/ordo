@@ -51,6 +51,7 @@ export type ArbitraryFolder = {
 	children: Array<ArbitraryFolder | ArbitraryFile>
 	isFile: false
 	tags?: any
+	links?: any
 }
 
 export type MDFileFrontmatter = {

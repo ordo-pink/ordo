@@ -10,8 +10,23 @@ export const Card: React.FC<{
 	updateCardName: (oldPath: string, newPath: string) => void
 	deleteCard: (cardName: string) => void
 }> = ({ item, index, updateCardName, deleteCard }) => {
-	const onBlur = (e: React.FocusEvent<HTMLDivElement, Element>) => {
-		updateCardName(item.path, item.path.replace(item.readableName, e.target.textContent))
+	const [editable, setEditable] = React.useState(false)
+	const ref = React.useRef(null)
+
+	const onBlur = () => {
+		updateCardName(item.path, item.path.replace(item.readableName, ref.current.textContent))
+	}
+
+	const onClick = () => setEditable(true)
+
+	const onKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
+		if (e.key === "Enter") {
+			e.preventDefault()
+
+			updateCardName(item.path, item.path.replace(item.readableName, ref.current.textContent))
+
+			setEditable(false)
+		}
 	}
 
 	return (
@@ -23,9 +38,12 @@ export const Card: React.FC<{
 					className="bg-gray-50 dark:bg-gray-700 rounded-lg shadow-lg w-full flex flex-col justify-between px-4 py-2"
 				>
 					<div
+						ref={ref}
 						className="outline-none"
-						contentEditable={true}
+						contentEditable={editable}
 						suppressContentEditableWarning={true}
+						onKeyDown={onKeyDown}
+						onClick={onClick}
 						onBlur={onBlur}
 					>
 						{item.readableName}{" "}

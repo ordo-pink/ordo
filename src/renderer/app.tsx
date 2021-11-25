@@ -111,20 +111,22 @@ export const App: React.FC = () => {
 		setUnsavedFiles(unsavedFilesCopy)
 	}
 
-	const createFile = (folder: ArbitraryFolder, name: string) =>
-		window.fileSystemAPI
+	const createFile = (folder: ArbitraryFolder, name: string) => {
+		if (!name) {
+			return
+		}
+
+		return window.fileSystemAPI
 			.createFile(folder, `${name}.md`)
 			.then(updateFileTreeListener)
 			.then(() => assignCurrentPath(`${folder.path}/${name}.md`))
+	}
 
 	const createFolder = (folder: ArbitraryFolder, name: string) =>
 		window.fileSystemAPI.createFolder(folder, name).then(updateFileTreeListener)
 
 	const rename = (oldPath: string, newPath: string) =>
-		window.fileSystemAPI
-			.move(oldPath, newPath)
-			.then(() => assignCurrentPath(newPath))
-			.then(updateFileTreeListener)
+		window.fileSystemAPI.move(oldPath, newPath).then(updateFileTreeListener)
 
 	const deleteItem = (path: string) =>
 		window.fileSystemAPI
@@ -264,6 +266,12 @@ export const App: React.FC = () => {
 						<div className="text-xs text-gray-600 text-center mt-2">
 							Press <kbd className="bg-pink-300 p-1 rounded-md">Enter</kbd> to apply changes or{" "}
 							<kbd className="bg-pink-300 p-1 rounded-md">Esc</kbd> to drop.
+						</div>
+
+						<div className="text-xs text-gray-600 text-center mt-2">
+							Ending with a <kbd className="bg-pink-300 p-1 rounded-md">/</kbd> will create a
+							folder. Any other case will create an{" "}
+							<kbd className="bg-pink-300 p-1 rounded-md">.md</kbd> file.
 						</div>
 					</div>
 				</div>

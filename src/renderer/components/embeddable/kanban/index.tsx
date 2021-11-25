@@ -28,7 +28,7 @@ export const Kanban: React.FC<{
 	}
 
 	const createCard = (column: ArbitraryFolder, name: string) => {
-		if (name.endsWith("/.md")) {
+		if (name === ".md") {
 			return
 		}
 

@@ -72,6 +72,10 @@ export const App: React.FC = () => {
 	}
 
 	const createFileListener = ({ detail }: CustomEvent) => {
+		if (!detail.path || detail.path.endsWith("/.md")) {
+			return
+		}
+
 		window.fileSystemAPI.createFile(fileTree, detail.path).then(() => {
 			setCurrentFilePath(detail.path)
 			setCurrentView("workspace")
@@ -105,7 +109,7 @@ export const App: React.FC = () => {
 	}
 
 	const createFile = (folder: ArbitraryFolder, name: string) => {
-		if (!name) {
+		if (!name || name.endsWith("/.md")) {
 			return
 		}
 

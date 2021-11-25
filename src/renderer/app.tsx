@@ -158,14 +158,12 @@ export const App: React.FC = () => {
 					<div className="flex flex-col w-full flex-grow">
 						<FileTreeGraph hierarchy={hierarchy} />
 					</div>
-					<div className="flex flex-col w-full flex-grow overflow-y-auto overflow-x-auto">
-						<div style={{ maxWidth: "1000px" }} className="w-full mx-auto">
-							<Workspace
-								currentFilePath={currentFilePath}
-								metadata={currentFileMetadata}
-								toggleSaved={toggleUnsavedFileStatus}
-							/>
-						</div>
+					<div className="mr-96 flex flex-col w-full flex-grow overflow-y-auto overflow-x-auto">
+						<Workspace
+							currentFilePath={currentFilePath}
+							metadata={currentFileMetadata}
+							toggleSaved={toggleUnsavedFileStatus}
+						/>
 					</div>
 				</Conditional>
 			</div>

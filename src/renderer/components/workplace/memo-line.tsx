@@ -20,21 +20,21 @@ export const MemoLine = React.memo<{
 
 		return (
 			<div key={line ? line : index}>
-				<div className={`w-full flex items-center ${index === currentLine && "bg-gray-200"}`}>
+				<div
+					style={{ maxWidth: "1000px" }}
+					className={`mx-auto flex items-center ${index === currentLine && "bg-gray-200"}`}
+				>
 					<Conditional when={isEmbeddableComponent(line) || isEmbeddableContent(line)}>
 						<span className="w-4 pl-2 cursor-pointer" onClick={() => setCollapsed(!collapsed)}>
 							{icon}
 						</span>
-						<span className="w-4" />
+						<span className="w-4 pl-2 invisible">{icon}</span>
 					</Conditional>
 
 					<div className="text-right w-16 px-2 text-gray-700 dark:text-gray-300 font-mono">
 						{index + 1}
 					</div>
-					<div
-						style={{ maxWidth: "1000px" }}
-						className="px-2 w-full border-l dark:border-gray-900 border-gray-300 "
-					>
+					<div className="px-2 w-full border-l dark:border-gray-900 border-gray-300 ">
 						<div
 							className="w-full outline-none"
 							contentEditable={true}
@@ -50,13 +50,15 @@ export const MemoLine = React.memo<{
 				</div>
 
 				<Conditional when={isEmbeddableContent(line) && !collapsed}>
-					<div className="p-2">
+					<div style={{ maxWidth: "1100px" }} className="p-2 mx-auto">
 						<EmbeddableContent currentContent={content.join("\n")} line={line} />
 					</div>
 				</Conditional>
 
 				<Conditional when={isEmbeddableComponent(line) && !collapsed}>
-					<div className="p-2">{renderEmbeddable(line)}</div>
+					<div style={{ maxWidth: "90%", width: "auto" }} className="p-2 mx-auto">
+						{renderEmbeddable(line)}
+					</div>
 				</Conditional>
 			</div>
 		)

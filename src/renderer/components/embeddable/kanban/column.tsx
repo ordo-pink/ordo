@@ -19,7 +19,16 @@ export const Column: React.FC<{
 	const onKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
 		if (e.key === "Enter") {
 			e.preventDefault()
-			updateColumnName(tree.path, tree.path.replace(tree.readableName, e.currentTarget.textContent))
+
+			if (isAddingCardAtTheBottom || isAddingCardAtTheTop) {
+				createCard(tree, `${newCardName}.md`)
+				setNewCardName("")
+			} else {
+				updateColumnName(
+					tree.path,
+					tree.path.replace(tree.readableName, e.currentTarget.textContent),
+				)
+			}
 		}
 	}
 
@@ -47,8 +56,19 @@ export const Column: React.FC<{
 							{tree.readableName}
 						</div>
 
-						<div className="text-2xl" {...provided.dragHandleProps}>
-							𐄞
+						<div className="flex space-x-2 items-center">
+							<button
+								className="text-sxl"
+								onClick={() => {
+									deleteCard(tree.path)
+								}}
+							>
+								⤫
+							</button>
+
+							<div className="text-2xl" {...provided.dragHandleProps}>
+								𐄞
+							</div>
 						</div>
 					</div>
 

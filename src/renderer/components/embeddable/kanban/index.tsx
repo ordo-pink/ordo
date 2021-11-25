@@ -66,13 +66,13 @@ export const Kanban: React.FC<{
 	}, [folder, hash])
 
 	return (
-		<div className="w-full overflow-x-auto p-2 rounded-lg">
-			<div className="text-xs text-gray-700 dark:text-gray-300 outline-none">
+		<div className="overflow-x-auto bg-gray-50 dark:bg-gray-500 rounded-lg p-4 border border-gray-300 mx-auto">
+			<div className="text-xs mb-2 text-gray-700 dark:text-gray-300 outline-none">
 				{tree.readableName}
 			</div>
 
 			<DragDropContext onDragEnd={onDragEnd}>
-				<div className={`dark:bg-gray-500 rounded-lg py-2`}>
+				<div>
 					{tree.children && (
 						<Droppable droppableId={tree.path} direction="horizontal" type="column">
 							{(provided) => (
@@ -105,7 +105,7 @@ export const Kanban: React.FC<{
 			<Conditional when={isAddingColumn}>
 				<input
 					autoFocus={isAddingColumn}
-					className="w-72 outline-none text-left rounded-lg p-2 text-xs text-gray-500 border border-dashed border-gray-500"
+					className="mt-2 w-72 outline-none text-left rounded-lg p-2 text-xs text-gray-500 border border-dashed border-gray-500"
 					value={newColumnName}
 					onChange={(e) => setNewColumnName(e.target.value)}
 					onKeyDown={(e) => {

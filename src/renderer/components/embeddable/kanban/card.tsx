@@ -35,11 +35,12 @@ export const Card: React.FC<{
 				<div
 					ref={provided.innerRef}
 					{...provided.draggableProps}
+					{...provided.dragHandleProps}
 					className="bg-gray-50 dark:bg-gray-700 rounded-lg shadow-lg w-full flex flex-col justify-between px-4 py-2"
 				>
 					<div
 						ref={ref}
-						className="outline-none"
+						className="outline-none cursor-text"
 						contentEditable={editable}
 						suppressContentEditableWarning={true}
 						onKeyDown={onKeyDown}
@@ -50,10 +51,6 @@ export const Card: React.FC<{
 					</div>
 
 					<div className="flex space-x-2">
-						<div className="text-xl" {...provided.dragHandleProps}>
-							𐄞
-						</div>
-
 						<button
 							className="text-xl"
 							onClick={(e) => {

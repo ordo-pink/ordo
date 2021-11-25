@@ -1,4 +1,4 @@
-import type { ArbitraryFolder, MDFile } from "../../../global-context/types"
+import type { MDFile } from "../../../global-context/types"
 
 import React from "react"
 

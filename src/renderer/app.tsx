@@ -1,127 +1,15 @@
 import type { ArbitraryFolder, MDFile } from "../global-context/types"
+import type { Hashed } from "../main/apis/hash-response"
 
 import React from "react"
+import { hierarchy as createHierarchy, HierarchyNode } from "d3"
 
 import { findFileByName, findFileByPath } from "../utils/tree"
 import { FileExplorer } from "./components/file-explorer"
 import { Workspace } from "./components/workplace"
 import { isFolder } from "../global-context/init"
-
-import {
-	hierarchy as createHierarchy,
-	HierarchyNode,
-	forceSimulation,
-	forceLink,
-	forceManyBody,
-	forceX,
-	forceY,
-	Simulation,
-	drag as d3Drag,
-	zoom,
-	select,
-} from "d3"
-import { Hashed } from "../main/apis/hash-response"
-import { useD3 } from "./hooks/use-d3"
 import { Conditional } from "./components/conditional"
-
-const drag = (simulation: Simulation<any, any>) =>
-	d3Drag()
-		.on("start", (event, d: any) => {
-			if (!event.active) {
-				simulation.alphaTarget(0.3).restart()
-			}
-
-			d.fx = d.x
-			d.fy = d.y
-		})
-		.on("drag", (event, d: any) => {
-			d.fx = event.x
-			d.fy = event.y
-		})
-		.on("end", (event, d: any) => {
-			if (!event.active) {
-				simulation.alphaTarget(0)
-			}
-
-			d.fx = null
-			d.fy = null
-		})
-
-export const D3View: React.FC<{ hierarchy: HierarchyNode<Hashed<ArbitraryFolder>> }> = ({
-	hierarchy,
-}) => {
-	const svgRef = React.useRef(null)
-
-	React.useEffect(() => {
-		if (!svgRef) {
-			return
-		}
-
-		const links: any = hierarchy.links()
-		const nodes: any = hierarchy.descendants()
-
-		const simulation = forceSimulation(nodes)
-			.force(
-				"link",
-				forceLink(links)
-					.id((d: any) => {
-						return d.data.index
-					})
-					.distance(0)
-					.strength(1),
-			)
-			.force("change", forceManyBody().strength(-50))
-			.force("x", forceX())
-			.force("y", forceY())
-
-		const container = select(svgRef.current)
-
-		container
-			.attr(
-				"viewBox",
-				`${-window.innerWidth / 2}, ${-window.innerHeight / 2}, ${window.innerWidth}, ${
-					window.innerHeight
-				}`,
-			)
-			.call(zoom().on("zoom", (e) => container.attr("transform", e.transform)))
-
-		const link = container
-			.append("g")
-			.attr("stroke", "#999")
-			.attr("stroke-width", 0.2)
-			.attr("stroke-opacity", 0.6)
-			.selectAll("line")
-			.data(links)
-			.join("line")
-
-		const node = container
-			.append("g")
-			.attr("fill", "#fff")
-			.attr("stroke", "#000")
-			.attr("stroke-width", 0.5)
-			.selectAll("circle")
-			.data(nodes)
-			.join("circle")
-			.attr("fill", (d: any) => (d.children ? null : "#000"))
-			.attr("stroke", (d: any) => (d.children ? null : "#fff"))
-			.attr("r", 3.5)
-			.call(drag(simulation))
-
-		node.append("text").text((d: any) => d.data.readableName)
-
-		simulation.on("tick", () => {
-			link
-				.attr("x1", (d: any) => d.source.x)
-				.attr("y1", (d: any) => d.source.y)
-				.attr("x2", (d: any) => d.target.x)
-				.attr("y2", (d: any) => d.target.y)
-
-			node.attr("cx", (d: any) => d.x).attr("cy", (d: any) => d.y)
-		})
-	}, [svgRef.current, hierarchy.data.hash])
-
-	return <svg ref={svgRef} width={window.innerWidth} height={window.innerHeight} />
-}
+import { FileTreeGraph } from "./components/charts/file-tree"
 
 export const App: React.FC = () => {
 	const [rootPath, setRootPath] = React.useState("")
@@ -168,6 +56,7 @@ export const App: React.FC = () => {
 					if (node.isFile && chunks.indexOf(chunk) === chunks.length - 1) {
 						setCurrentFileMetadata(node)
 						setCurrentFilePath(node.path)
+						setCurrentView("workspace")
 					}
 				}
 			} else {
@@ -176,12 +65,14 @@ export const App: React.FC = () => {
 				if (node.isFile) {
 					setCurrentFileMetadata(node)
 					setCurrentFilePath(node.path)
+					setCurrentView("workspace")
 				}
 			}
 		} else {
 			const node = findFileByPath(fileTree, detail.path)
 			setCurrentFileMetadata(node)
 			setCurrentFilePath(detail.path)
+			setCurrentView("workspace")
 		}
 	}
 
@@ -265,7 +156,7 @@ export const App: React.FC = () => {
 			<div className="flex flex-grow w-full overflow-y-hidden overflow-x-hidden">
 				<Conditional when={currentView === "graph" && Boolean(hierarchy)}>
 					<div className="flex flex-col w-full flex-grow">
-						<D3View hierarchy={hierarchy} />
+						<FileTreeGraph hierarchy={hierarchy} />
 					</div>
 					<div className="flex flex-col w-full flex-grow overflow-y-auto  overflow-x-auto">
 						<Workspace

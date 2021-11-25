@@ -158,7 +158,7 @@ export const App: React.FC = () => {
 					<div className="flex flex-col w-full flex-grow">
 						<FileTreeGraph hierarchy={hierarchy} />
 					</div>
-					<div className="flex flex-col w-full flex-grow overflow-y-auto  overflow-x-auto">
+					<div className="flex flex-col w-full flex-grow overflow-y-auto overflow-x-auto">
 						<Workspace
 							currentFilePath={currentFilePath}
 							metadata={currentFileMetadata}
@@ -169,7 +169,7 @@ export const App: React.FC = () => {
 			</div>
 
 			<Conditional when={currentView === "workspace"}>
-				<div className="fixed right-16 top-0 h-screen overflow-y-auto flex flex-col justify-between w-2/12 border-l border-gray-300 dark:border-gray-900 py-4 bg-gray-100 dark:bg-gray-700">
+				<div className="fixed right-16 top-0 h-screen overflow-y-auto flex flex-col justify-between w-72 border-l border-gray-300 dark:border-gray-900 py-4 bg-gray-100 dark:bg-gray-700">
 					<div>
 						<h2 className="uppercase text-sm text-center text-gray-600 dark:text-gray-500">
 							Explorer

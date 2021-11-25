@@ -15,7 +15,7 @@ export const MemoLine = React.memo<{
 	onKeyDown: (event: React.KeyboardEvent<HTMLDivElement>) => void
 }>(
 	({ line, index, content, currentLine, onClick, onChange, onKeyDown }) => {
-		const [collapsed, setCollapsed] = React.useState(true)
+		const [collapsed, setCollapsed] = React.useState(line.includes(":collapsed"))
 		const icon = collapsed ? "▶" : "▼"
 
 		return (

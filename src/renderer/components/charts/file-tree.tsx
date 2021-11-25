@@ -1,9 +1,9 @@
 import type { Hashed } from "../../../main/apis/hash-response"
-import type { ArbitraryFolder } from "../../../global-context/types"
+import type { ArbitraryFolder, ArbitraryFile, MDFile } from "../../../global-context/types"
 
 import React from "react"
 import {
-	HierarchyNode,
+	hierarchy as createHierarchy,
 	forceSimulation,
 	forceLink,
 	forceManyBody,
@@ -38,9 +38,7 @@ const drag = (simulation: Simulation<any, any>) =>
 			d.fy = null
 		})
 
-export const FileTreeGraph: React.FC<{ hierarchy: HierarchyNode<Hashed<ArbitraryFolder>> }> = ({
-	hierarchy,
-}) => {
+export const FileTreeGraph: React.FC<{ data: Hashed<ArbitraryFolder> }> = ({ data = {} }) => {
 	const svgRef = React.useRef(null)
 
 	React.useEffect(() => {
@@ -48,16 +46,49 @@ export const FileTreeGraph: React.FC<{ hierarchy: HierarchyNode<Hashed<Arbitrary
 			return
 		}
 
+		const visitFile = (tree: ArbitraryFolder, cb: (x: ArbitraryFile) => void) => {
+			tree.children.forEach((child) => {
+				if (child.isFile) {
+					cb(child)
+				} else {
+					visitFile(child as ArbitraryFolder, cb)
+				}
+			})
+		}
+
+		const hierarchy = createHierarchy(data)
+
 		const links: any = hierarchy.links()
 		const nodes: any = hierarchy.descendants()
+
+		data.tags.forEach((tag: any) => {
+			const node = {
+				readableName: tag.name,
+				path: tag.name,
+				type: "tag",
+				data: {
+					readableName: tag.name,
+					path: tag.path,
+					type: "tag",
+				},
+			}
+
+			nodes.push(node)
+
+			tag.children.forEach((child: any) => {
+				links.push({
+					source: node,
+					target: nodes.find((n: any) => n.data.path === child.path),
+					index: links.length - 1,
+				})
+			})
+		})
 
 		const simulation = forceSimulation(nodes)
 			.force(
 				"link",
 				forceLink(links)
-					.id((d: any) => {
-						return d.data.index
-					})
+					.id((d: any) => d.data.path)
 					.distance(50)
 					.strength(2),
 			)
@@ -85,11 +116,13 @@ export const FileTreeGraph: React.FC<{ hierarchy: HierarchyNode<Hashed<Arbitrary
 			.selectAll("line")
 			.data(links)
 			.join("line")
+			.attr("stroke", (d: any) => (d.source.type === "tag" ? "#832161" : null))
+			.attr("stroke-width", (d: any) => (d.source.type === "tag" ? 0.8 : null))
 
 		const node = container
 			.append("g")
 			.attr("fill", "#fff")
-			.attr("stroke", "#000")
+			.attr("stroke", "#fff")
 			.selectAll("g")
 			.data(nodes)
 			.join("g")
@@ -111,7 +144,17 @@ export const FileTreeGraph: React.FC<{ hierarchy: HierarchyNode<Hashed<Arbitrary
 
 		node
 			.append("circle")
-			.attr("fill", (d: any) => (d.data.isFile ? null : "#000"))
+			.attr("fill", (d: any) => {
+				if (d.data.isFile) {
+					return "#ccc"
+				}
+
+				if (d.data.type === "tag") {
+					return "#832161"
+				}
+
+				return "#eee"
+			})
 			.attr("stroke", (d: any) => (d.data.isFile ? null : "#fff"))
 			.attr("r", 3.5)
 
@@ -134,7 +177,7 @@ export const FileTreeGraph: React.FC<{ hierarchy: HierarchyNode<Hashed<Arbitrary
 
 			node.attr("transform", (d: any) => `translate(${d.x},${d.y})`)
 		})
-	}, [svgRef.current, hierarchy.data.hash])
+	}, [svgRef.current, data.hash])
 
 	return <svg ref={svgRef} width={window.innerWidth} height={window.innerHeight} />
 }

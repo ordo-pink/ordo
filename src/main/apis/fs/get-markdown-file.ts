@@ -8,5 +8,5 @@ export async function getMarkdownFile(path: Path): Promise<WithBody<MDFile>> {
 	const arbitraryFile = await getFileContent(path)
 	const frontmatter = createMDFileFrontmatter(getFrontmatter(arbitraryFile.body))
 
-	return createMDFile(arbitraryFile, frontmatter) as WithBody<MDFile>
+	return createMDFile(arbitraryFile, frontmatter, arbitraryFile.body) as WithBody<MDFile>
 }

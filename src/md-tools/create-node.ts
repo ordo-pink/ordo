@@ -229,3 +229,12 @@ export function createItalicTextNode(
 ): AstNode<AstNodeType.TEXT_ITALIC> {
 	return createNode(AstNodeType.TEXT_ITALIC, start, end, raw, 0, content)
 }
+
+export function createTagNode(
+	start: number,
+	end: number,
+	raw: string,
+	content: AstNode[] = [],
+): AstNode<AstNodeType.TAG> {
+	return createNode(AstNodeType.TAG, start, end, raw, 0, content)
+}

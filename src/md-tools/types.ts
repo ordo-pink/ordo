@@ -23,6 +23,7 @@ export enum AstNodeType {
 	FOOTNOTE = "footnote",
 	DEFINITION_LIST = "definition_list",
 
+	TAG = "tag",
 	TASK_LIST = "task_list",
 	LIST_ITEM = "list_item",
 	HEADING_ID = "heading_id",

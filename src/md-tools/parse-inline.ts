@@ -1,5 +1,5 @@
-import { createTextNode } from "./create-node"
-import { getNextTokenSet } from "./tokenise"
+import { createTagNode, createTextNode } from "./create-node"
+import { getNextTokenSet, hasNext } from "./tokenise"
 import { AstToken, AstNode, AstTokenType } from "./types"
 
 export function parseInline(tokens: AstToken[], ast: AstNode): AstNode {
@@ -8,22 +8,53 @@ export function parseInline(tokens: AstToken[], ast: AstNode): AstNode {
 	let tokenSet = next()
 
 	while (tokenSet.token && tokenSet.token.type !== AstTokenType.EOF) {
-		const preservedTokens: AstToken[] = []
+		if (
+			tokenSet.token &&
+			hasNext(tokenSet) &&
+			tokenSet.token.type === AstTokenType.HASH &&
+			tokenSet.nextToken.type !== AstTokenType.WHITESPACE &&
+			tokenSet.nextToken.type !== AstTokenType.EOL &&
+			tokenSet.nextToken.type !== AstTokenType.EOF
+		) {
+			const preservedTokens: AstToken[] = []
 
-		while (tokenSet.token && tokenSet.token.type !== AstTokenType.EOF) {
-			preservedTokens.push(tokenSet.token)
+			while (
+				tokenSet.token &&
+				tokenSet.token.type !== AstTokenType.EOF &&
+				tokenSet.token.type !== AstTokenType.EOL &&
+				tokenSet.token.type !== AstTokenType.WHITESPACE
+			) {
+				preservedTokens.push(tokenSet.token)
+				tokenSet = next()
+			}
+
+			const tree = createTagNode(
+				preservedTokens[0].index,
+				preservedTokens[preservedTokens.length - 1].index,
+				preservedTokens.map((t) => t.value).join(""),
+			)
+
+			ast.content.push(tree)
+
+			tokenSet = next()
+		} else {
+			const preservedTokens: AstToken[] = []
+
+			while (tokenSet.token && tokenSet.token.type !== AstTokenType.EOF) {
+				preservedTokens.push(tokenSet.token)
+				tokenSet = next()
+			}
+
+			const tree = createTextNode(
+				preservedTokens[0].index,
+				preservedTokens[preservedTokens.length - 1].index,
+				preservedTokens.map((t) => t.value).join(""),
+			)
+
+			ast.content.push(tree)
+
 			tokenSet = next()
 		}
-
-		const tree = createTextNode(
-			preservedTokens[0].index,
-			preservedTokens[preservedTokens.length - 1].index,
-			preservedTokens.map((t) => t.value).join(""),
-		)
-
-		ast.content.push(tree)
-
-		tokenSet = next()
 	}
 
 	return ast

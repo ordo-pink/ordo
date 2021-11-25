@@ -19,6 +19,7 @@ export const applyLineStyling = (line: string): JSX.Element => {
 					.replace("[[", "")
 					.replace("]]", "")}' }}))">${value}</span>`,
 		)
+		.replace(/#[^\s](\w+[/-_]?)+/g, (value) => `<span class="text-purple-700">${value}</span>`)
 
 	let transformed
 

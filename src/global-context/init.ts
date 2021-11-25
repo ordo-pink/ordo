@@ -78,10 +78,15 @@ export function createArbitraryFile(path: Path, stats: Stats): Nullable<Arbitrar
 	}
 }
 
-export function createMDFile(file: ArbitraryFile, frontmatter: MDFileFrontmatter): MDFile {
+export function createMDFile(
+	file: ArbitraryFile,
+	frontmatter: MDFileFrontmatter,
+	body: string,
+): MDFile {
 	return {
 		...file,
 		frontmatter,
+		body,
 	}
 }
 
@@ -97,6 +102,7 @@ export function createArbitraryFolder(path: Path, stats: Stats): Nullable<Arbitr
 		readableName,
 		isFile: false,
 		children: [],
+		id: path,
 	}
 }
 

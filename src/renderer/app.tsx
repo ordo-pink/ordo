@@ -1,8 +1,6 @@
 import type { ArbitraryFolder, MDFile } from "../global-context/types"
-import type { Hashed } from "../main/apis/hash-response"
 
 import React from "react"
-import { hierarchy as createHierarchy, HierarchyNode } from "d3"
 
 import { findFileByName, findFileByPath } from "../utils/tree"
 import { FileExplorer } from "./components/file-explorer"
@@ -22,7 +20,6 @@ export const App: React.FC = () => {
 	const [currentView, setCurrentView] = React.useState<"workspace" | "graph" | "settings">(
 		"workspace",
 	)
-	const [hierarchy, setHierarchy] = React.useState<HierarchyNode<Hashed<ArbitraryFolder>>>(null)
 
 	const [creatorRef, creatorIsOpen, openCreator, closeCreator] = useDropdown<HTMLDivElement>()
 	const [creationName, setCreationName] = React.useState("")
@@ -30,8 +27,10 @@ export const App: React.FC = () => {
 	const updateFileTreeListener = () => {
 		window.fileSystemAPI.listFolder(rootPath).then((data) => {
 			setFileTree(data)
-			setHierarchy(createHierarchy(data))
 			setHash(data.hash)
+
+			console.log(data)
+
 			window.settingsAPI.get("application.last-open-file").then(setCurrentFilePath)
 		})
 	}
@@ -169,9 +168,9 @@ export const App: React.FC = () => {
 	return (
 		<div className="flex">
 			<div className="flex flex-grow w-full overflow-y-hidden overflow-x-hidden">
-				<Conditional when={currentView === "graph" && Boolean(hierarchy)}>
+				<Conditional when={currentView === "graph" && Boolean(fileTree)}>
 					<div className="flex flex-col w-full flex-grow">
-						<FileTreeGraph hierarchy={hierarchy} />
+						<FileTreeGraph data={{ ...fileTree, hash }} />
 					</div>
 					<div className="mr-96 flex flex-col w-full flex-grow overflow-y-auto overflow-x-auto">
 						<Workspace

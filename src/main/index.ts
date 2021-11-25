@@ -12,6 +12,11 @@ import { move } from "./apis/fs/move"
 import { createFile } from "./apis/fs/create-file"
 import { createFolder } from "./apis/fs/create-folder"
 import { findFileBySubPath } from "./apis/fs/find-file-by-subpath"
+import { ArbitraryFolder, ArbitraryFile, MDFile } from "../global-context/types"
+import { parseMarkdown } from "../md-tools/parse"
+import { tokenizeMarkdown } from "../md-tools/tokenise"
+import { visit } from "../md-tools/visit-node"
+import { AstNodeType } from "../md-tools/types"
 
 declare const MAIN_WINDOW_WEBPACK_ENTRY: string
 declare const MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY: string
@@ -20,6 +25,16 @@ const getAbsolute = (path: string) => {
 	return resolve(path) === normalize(path)
 		? path
 		: join(Settings.get("application.root-folder-path"), path)
+}
+
+const visitFile = (tree: ArbitraryFolder, cb: (x: ArbitraryFile) => void) => {
+	tree.children.forEach((child) => {
+		if (child.isFile) {
+			cb(child)
+		} else {
+			visitFile(child as ArbitraryFolder, cb)
+		}
+	})
 }
 
 const settingsFilePath = join(app.getPath("userData"), "configuration.yaml")
@@ -32,7 +47,32 @@ if (!Settings.get("application.global-settings-path")) {
 
 ipcMain.handle("dark-mode:set", (_, theme): ColorTheme => setTheme(theme))
 
-ipcMain.handle("fs:list-folder", (_, path) => listFolder(getAbsolute(path)).then(hashResponse))
+ipcMain.handle("fs:list-folder", async (_, path) => {
+	const tree = await listFolder(getAbsolute(path))
+
+	const tags: any[] = []
+
+	visitFile(tree, (file) => {
+		if (file.extension === ".md") {
+			const ast = parseMarkdown(tokenizeMarkdown((file as MDFile).body))
+
+			visit(ast)(AstNodeType.TAG, (node) => {
+				let tag: any = tags.find((tag) => tag.name === (node.raw as any))
+
+				if (!tag) {
+					tag = { name: node.raw, children: [], id: node.raw }
+					tags.push(tag)
+				}
+
+				tag.children.push(file)
+			})
+		}
+	})
+
+	tree.tags = tags
+
+	return hashResponse(tree)
+})
 ipcMain.handle("fs:get-file", async (_, path) =>
 	getMarkdownFile(getAbsolute(path)).then(hashResponse),
 )

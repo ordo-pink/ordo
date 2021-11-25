@@ -1,3 +1,5 @@
+import { AstNode } from "../md-tools/types"
+
 export type Nullable<T> = T | null
 
 export type TagName = string
@@ -39,13 +41,16 @@ export type ArbitraryFile = {
 	updatedAt: Date
 	accessedAt: Date
 	size: number
+	ast?: AstNode
 }
 
 export type ArbitraryFolder = {
+	id: Path
 	path: Path
 	readableName: ReadableName
 	children: Array<ArbitraryFolder | ArbitraryFile>
 	isFile: false
+	tags?: any
 }
 
 export type MDFileFrontmatter = {
@@ -65,7 +70,7 @@ export type MDFolderFrontmatter = {
 }
 
 export type MDFolder = WithFrontmatter<ArbitraryFolder, MDFolderFrontmatter>
-export type MDFile = WithFrontmatter<ArbitraryFile, MDFileFrontmatter>
+export type MDFile = WithBody<WithFrontmatter<ArbitraryFile, MDFileFrontmatter>>
 
 export type MDTree = MDFolder | MDFile
 

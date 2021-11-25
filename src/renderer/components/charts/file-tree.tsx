@@ -90,16 +90,21 @@ export const FileTreeGraph: React.FC<{ hierarchy: HierarchyNode<Hashed<Arbitrary
 			.append("g")
 			.attr("fill", "#fff")
 			.attr("stroke", "#000")
-			.attr("class", "cursor-pointer")
-			.attr("stroke-width", 0.5)
 			.selectAll("g")
 			.data(nodes)
 			.join("g")
+			.attr("class", (d: any) => (d.data.isFile ? "cursor-pointer" : null))
+			.attr("stroke-width", 0.5)
+
 			.call(drag(simulation))
-			.on("click", (_, node: any) => {
+			.on("click", (_, n: any) => {
+				if (!n.data.isFile) {
+					return
+				}
+
 				window.dispatchEvent(
 					new CustomEvent("set-current-file", {
-						detail: { path: node.data.path },
+						detail: { path: n.data.path },
 					}),
 				)
 			})

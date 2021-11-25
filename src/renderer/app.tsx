@@ -10,6 +10,7 @@ import { Workspace } from "./components/workplace"
 import { isFolder } from "../global-context/init"
 import { Conditional } from "./components/conditional"
 import { FileTreeGraph } from "./components/charts/file-tree"
+import { useDropdown } from "./hooks/use-dropdown"
 
 export const App: React.FC = () => {
 	const [rootPath, setRootPath] = React.useState("")
@@ -22,6 +23,9 @@ export const App: React.FC = () => {
 		"workspace",
 	)
 	const [hierarchy, setHierarchy] = React.useState<HierarchyNode<Hashed<ArbitraryFolder>>>(null)
+
+	const [creatorRef, creatorIsOpen, openCreator, closeCreator] = useDropdown<HTMLDivElement>()
+	const [creationName, setCreationName] = React.useState("")
 
 	const updateFileTreeListener = () => {
 		window.fileSystemAPI.listFolder(rootPath).then((data) => {
@@ -38,6 +42,13 @@ export const App: React.FC = () => {
 			setCurrentFileMetadata(node)
 		}
 	}, [currentFilePath, fileTree, hash])
+
+	const createFileOrFolderListener = (e: KeyboardEvent) => {
+		if (e.metaKey && e.key === "n") {
+			e.preventDefault()
+			openCreator()
+		}
+	}
 
 	const setCurrentFileListener = ({ detail }: CustomEvent) => {
 		if (detail.path.startsWith("https://") || detail.path.startsWith("http://")) {
@@ -79,10 +90,12 @@ export const App: React.FC = () => {
 	React.useEffect(() => {
 		window.addEventListener("set-current-file", setCurrentFileListener)
 		window.addEventListener("update-tree", updateFileTreeListener)
+		window.addEventListener("keydown", createFileOrFolderListener)
 
 		return () => {
 			window.removeEventListener("set-current-file", setCurrentFileListener)
 			window.removeEventListener("update-tree", updateFileTreeListener)
+			window.removeEventListener("keydown", createFileOrFolderListener)
 		}
 	}, [hash, currentFilePath])
 
@@ -209,6 +222,52 @@ export const App: React.FC = () => {
 					⚙️
 				</button>
 			</div>
+
+			{creatorIsOpen && (
+				<div className="fixed top-0 bottom-0 left-0 right-0 bg-gray-900 bg-opacity-40">
+					<div
+						ref={creatorRef}
+						style={{
+							top: "20%",
+							left: "50%",
+							transform: "translate(-50%, 0)",
+							width: "40%",
+							minWidth: "400px",
+						}}
+						className="fixed rounded-lg shadow-xl p-4 bg-gray-50"
+					>
+						<label className="p-1 flex">
+							<span>{fileTree.path}/</span>
+							<input
+								autoFocus={creatorIsOpen}
+								className="w-full outline-none bg-gray-50"
+								type="text"
+								onChange={(e) => setCreationName(e.target.value)}
+								value={creationName}
+								onKeyDown={(e) => {
+									if (e.key === "Enter") {
+										e.preventDefault()
+
+										if (!creationName.endsWith("/")) {
+											createFile(fileTree, creationName)
+										} else if (creationName.endsWith("/")) {
+											createFolder(fileTree, creationName)
+										}
+
+										setCreationName("")
+										closeCreator()
+									}
+								}}
+							/>
+						</label>
+
+						<div className="text-xs text-gray-600 text-center mt-2">
+							Press <kbd className="bg-pink-300 p-1 rounded-md">Enter</kbd> to apply changes or{" "}
+							<kbd className="bg-pink-300 p-1 rounded-md">Esc</kbd> to drop.
+						</div>
+					</div>
+				</div>
+			)}
 		</div>
 	)
 }

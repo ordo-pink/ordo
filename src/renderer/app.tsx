@@ -19,6 +19,7 @@ export const App: React.FC = () => {
 	const [currentView, setCurrentView] = React.useState<"workspace" | "graph" | "settings">(
 		"workspace",
 	)
+	const [displayExplorer, setDisplayExplorer] = React.useState<boolean>(false)
 
 	const [creatorRef, creatorIsOpen, openCreator, closeCreator] = useDropdown<HTMLDivElement>()
 	const [creationName, setCreationName] = React.useState("")
@@ -35,6 +36,11 @@ export const App: React.FC = () => {
 		if (e.metaKey && e.key === "n") {
 			e.preventDefault()
 			openCreator()
+		}
+
+		if (e.metaKey && e.key === "b") {
+			e.preventDefault()
+			setDisplayExplorer((current) => !current)
 		}
 	}
 
@@ -170,14 +176,18 @@ export const App: React.FC = () => {
 					<div className="flex flex-col w-full flex-grow">
 						<FileTreeGraph data={{ ...fileTree, hash }} />
 					</div>
-					<div className="mr-96 flex flex-col w-full flex-grow overflow-y-auto overflow-x-auto">
+					<div
+						className={`${
+							displayExplorer ? "mr-96" : "mr-14"
+						} flex flex-col w-full flex-grow overflow-y-auto overflow-x-auto`}
+					>
 						<Workspace currentFilePath={currentFilePath} toggleSaved={toggleUnsavedFileStatus} />
 					</div>
 				</Conditional>
 			</div>
 
-			<Conditional when={currentView === "workspace"}>
-				<div className="fixed right-16 top-0 h-screen overflow-y-auto flex flex-col justify-between w-72 border-l border-gray-300 dark:border-gray-900 py-4 bg-gray-100 dark:bg-gray-700">
+			<Conditional when={displayExplorer}>
+				<div className="fixed right-14 top-0 h-screen overflow-y-auto flex flex-col justify-between w-72 border-l border-gray-300 dark:border-gray-900 py-4 bg-gray-100 dark:bg-gray-700">
 					<div>
 						<h2 className="uppercase text-sm text-center text-gray-600 dark:text-gray-500">
 							Explorer
@@ -206,7 +216,7 @@ export const App: React.FC = () => {
 				</div>
 			</Conditional>
 
-			<div className="fixed right-0 w-16 top-0 h-screen overflow-y-visible overflow-x-hidden items-center flex flex-col p-4 space-y-4 border-l border-gray-300 dark:border-gray-900 py-4 bg-gray-100 dark:bg-gray-700">
+			<div className="fixed right-0 w-14 top-0 h-screen overflow-y-visible overflow-x-hidden items-center flex flex-col p-4 space-y-4 border-l border-gray-300 dark:border-gray-900 py-4 bg-gray-100 dark:bg-gray-700">
 				<button className="text-4xl" onClick={() => setCurrentView("workspace")}>
 					🗄
 				</button>

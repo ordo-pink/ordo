@@ -1,14 +1,30 @@
-import type { ArbitraryFolder, MDFile } from "../global-context/types"
+import type { ArbitraryFile, ArbitraryFolder, MDFile } from "../global-context/types"
 
 import React from "react"
+import Fuse from "fuse.js"
 
-import { findFileByName, findFileByPath } from "../utils/tree"
+import { findFileByName } from "../utils/tree"
 import { FileExplorer } from "./components/file-explorer"
 import { Workspace } from "./components/workplace"
 import { isFolder } from "../global-context/init"
 import { Conditional } from "./components/conditional"
 import { FileTreeGraph } from "./components/charts/file-tree"
 import { useDropdown } from "./hooks/use-dropdown"
+
+const createSearchTerms = (data: ArbitraryFolder | ArbitraryFile, terms: any[] = []) => {
+	if (!isFolder(data)) {
+		terms.push({
+			readableName: data.readableName,
+			path: data.path,
+		})
+	} else {
+		for (const child of data.children) {
+			createSearchTerms(child, terms)
+		}
+	}
+
+	return terms
+}
 
 export const App: React.FC = () => {
 	const [rootPath, setRootPath] = React.useState("")
@@ -22,12 +38,40 @@ export const App: React.FC = () => {
 	const [displayExplorer, setDisplayExplorer] = React.useState<boolean>(false)
 
 	const [creatorRef, creatorIsOpen, openCreator, closeCreator] = useDropdown<HTMLDivElement>()
+	const [searcherRef, searcherIsOpen, openSearcher, closeSearcher] = useDropdown<HTMLDivElement>()
 	const [creationName, setCreationName] = React.useState("")
+	const [search, setSearch] = React.useState("")
+	const [searchTerms, setSearchTerms] = React.useState(null)
+	const [fuse, setFuse] = React.useState(null)
+	const [found, setFound] = React.useState(null)
+	const [preselectedSearchItem, setPreselectedSearchItem] = React.useState(0)
+
+	React.useEffect(() => {
+		if (currentFilePath) {
+			window.settingsAPI.set("application.last-open-file", currentFilePath)
+		}
+	}, [currentFilePath])
+
+	React.useEffect(() => {
+		if (searchTerms) {
+			setFuse(
+				new Fuse(searchTerms, {
+					includeScore: true,
+					keys: [
+						{ name: "readableName", weight: 0.7 },
+						{ name: "path", weight: 0.3 },
+					],
+				}),
+			)
+		}
+	}, [searchTerms, setFuse])
 
 	const updateFileTreeListener = () => {
 		window.fileSystemAPI.listFolder(rootPath).then((data) => {
 			setFileTree(data)
 			setHash(data.hash)
+			setSearchTerms(createSearchTerms(data))
+
 			window.settingsAPI.get("application.last-open-file").then(setCurrentFilePath)
 		})
 	}
@@ -36,6 +80,11 @@ export const App: React.FC = () => {
 		if (e.metaKey && e.key === "n") {
 			e.preventDefault()
 			openCreator()
+		}
+
+		if (e.metaKey && e.key === "p") {
+			e.preventDefault()
+			openSearcher()
 		}
 
 		if (e.metaKey && e.key === "b") {
@@ -275,6 +324,94 @@ export const App: React.FC = () => {
 							Ending with a <kbd className="bg-pink-300 p-1 rounded-md">/</kbd> will create a
 							folder. Any other case will create an{" "}
 							<kbd className="bg-pink-300 p-1 rounded-md">.md</kbd> file.
+						</div>
+					</div>
+				</div>
+			)}
+
+			{searcherIsOpen && (
+				<div className="fixed top-0 bottom-0 left-0 right-0 bg-gray-900 bg-opacity-40">
+					<div
+						ref={searcherRef}
+						style={{
+							top: "20%",
+							left: "50%",
+							transform: "translate(-50%, 0)",
+							width: "70%",
+							minWidth: "400px",
+						}}
+						className="fixed rounded-lg shadow-xl p-4 bg-gray-50"
+					>
+						<label className="flex-col space-y-2">
+							<span className="text-xl">Looking for something?</span>
+							<input
+								placeholder="Drama queen..."
+								autoFocus={searcherIsOpen}
+								className="w-full outline-none bg-gray-50"
+								type="text"
+								onChange={(e) => {
+									setSearch(e.target.value)
+									setFound(fuse.search(e.target.value))
+
+									if (found && found.length) {
+										setPreselectedSearchItem(0)
+									}
+								}}
+								value={search}
+								onKeyDown={(e) => {
+									if (e.key === "ArrowUp") {
+										e.preventDefault()
+
+										if (preselectedSearchItem === 0) {
+											setPreselectedSearchItem(found.length ? found.length - 1 : 0)
+										} else {
+											setPreselectedSearchItem((item) => item - 1)
+										}
+									}
+
+									if (e.key === "ArrowDown") {
+										e.preventDefault()
+
+										if (preselectedSearchItem === found.length - 1) {
+											setPreselectedSearchItem(0)
+										} else {
+											setPreselectedSearchItem((item) => item + 1)
+										}
+									}
+
+									if (e.key === "Enter") {
+										e.preventDefault()
+
+										setCurrentFilePath(found[preselectedSearchItem].item.path)
+
+										setPreselectedSearchItem(0)
+										setFound(null)
+										setSearch("")
+										closeSearcher()
+									}
+								}}
+							/>
+						</label>
+
+						<div className="rounded-xl shadow-xl mt-4 overflow-y-auto">
+							{found &&
+								found.slice(0, 6).map((page: any, i: number) => (
+									<div
+										onClick={() => {
+											setCurrentFilePath(page.item.path)
+											setFound(null)
+											setPreselectedSearchItem(0)
+											setSearch("")
+										}}
+										key={page.item.path}
+										className={`p-2 w-full flex flex-col space-y-2 cursor-pointer ${
+											preselectedSearchItem === i && " bg-purple-300"
+										}`}
+									>
+										<div className="text-sm text-gray-700">{page.item.readableName}</div>
+										<div className="text-xs text-mono text-gray-500">{page.item.path}</div>
+									</div>
+								))}
 						</div>
 					</div>
 				</div>

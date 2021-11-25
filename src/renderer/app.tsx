@@ -7,6 +7,122 @@ import { FileExplorer } from "./components/file-explorer"
 import { Workspace } from "./components/workplace"
 import { isFolder } from "../global-context/init"
 
+import {
+	hierarchy as createHierarchy,
+	HierarchyNode,
+	forceSimulation,
+	forceLink,
+	forceManyBody,
+	forceX,
+	forceY,
+	Simulation,
+	drag as d3Drag,
+	zoom,
+	select,
+} from "d3"
+import { Hashed } from "../main/apis/hash-response"
+import { useD3 } from "./hooks/use-d3"
+import { Conditional } from "./components/conditional"
+
+const drag = (simulation: Simulation<any, any>) =>
+	d3Drag()
+		.on("start", (event, d: any) => {
+			if (!event.active) {
+				simulation.alphaTarget(0.3).restart()
+			}
+
+			d.fx = d.x
+			d.fy = d.y
+		})
+		.on("drag", (event, d: any) => {
+			d.fx = event.x
+			d.fy = event.y
+		})
+		.on("end", (event, d: any) => {
+			if (!event.active) {
+				simulation.alphaTarget(0)
+			}
+
+			d.fx = null
+			d.fy = null
+		})
+
+export const D3View: React.FC<{ hierarchy: HierarchyNode<Hashed<ArbitraryFolder>> }> = ({
+	hierarchy,
+}) => {
+	const svgRef = React.useRef(null)
+
+	React.useEffect(() => {
+		if (!svgRef) {
+			return
+		}
+
+		const links: any = hierarchy.links()
+		const nodes: any = hierarchy.descendants()
+
+		const simulation = forceSimulation(nodes)
+			.force(
+				"link",
+				forceLink(links)
+					.id((d: any) => {
+						return d.data.index
+					})
+					.distance(0)
+					.strength(1),
+			)
+			.force("change", forceManyBody().strength(-50))
+			.force("x", forceX())
+			.force("y", forceY())
+
+		const container = select(svgRef.current)
+
+		container
+			.attr(
+				"viewBox",
+				`${-window.innerWidth / 2}, ${-window.innerHeight / 2}, ${window.innerWidth}, ${
+					window.innerHeight
+				}`,
+			)
+			.call(zoom().on("zoom", (e) => container.attr("transform", e.transform)))
+
+		const link = container
+			.append("g")
+			.attr("stroke", "#999")
+			.attr("stroke-width", 0.2)
+			.attr("stroke-opacity", 0.6)
+			.selectAll("line")
+			.data(links)
+			.join("line")
+
+		const node = container
+			.append("g")
+			.attr("fill", "#fff")
+			.attr("stroke", "#000")
+			.attr("stroke-width", 0.5)
+			.selectAll("circle")
+			.data(nodes)
+			.join("circle")
+			.attr("fill", (d: any) => (d.children ? null : "#000"))
+			.attr("stroke", (d: any) => (d.children ? null : "#fff"))
+			.attr("r", 3.5)
+			.call(drag(simulation))
+
+		node.append("text").text((d: any) => d.data.readableName)
+
+		simulation.on("tick", () => {
+			link
+				.attr("x1", (d: any) => d.source.x)
+				.attr("y1", (d: any) => d.source.y)
+				.attr("x2", (d: any) => d.target.x)
+				.attr("y2", (d: any) => d.target.y)
+
+			node.attr("cx", (d: any) => d.x).attr("cy", (d: any) => d.y)
+		})
+	}, [svgRef.current, hierarchy.data.hash])
+
+	return <svg ref={svgRef} width={window.innerWidth} height={window.innerHeight} />
+}
+
 export const App: React.FC = () => {
 	const [rootPath, setRootPath] = React.useState("")
 	const [fileTree, setFileTree] = React.useState(null as ArbitraryFolder)
@@ -14,10 +130,15 @@ export const App: React.FC = () => {
 	const [currentFilePath, setCurrentFilePath] = React.useState("")
 	const [unsavedFiles, setUnsavedFiles] = React.useState<string[]>([])
 	const [currentFileMetadata, setCurrentFileMetadata] = React.useState({} as MDFile)
+	const [currentView, setCurrentView] = React.useState<"workspace" | "graph" | "settings">(
+		"workspace",
+	)
+	const [hierarchy, setHierarchy] = React.useState<HierarchyNode<Hashed<ArbitraryFolder>>>(null)
 
 	const updateFileTreeListener = () => {
 		window.fileSystemAPI.listFolder(rootPath).then((data) => {
 			setFileTree(data)
+			setHierarchy(createHierarchy(data))
 			setHash(data.hash)
 			window.settingsAPI.get("application.last-open-file").then(setCurrentFilePath)
 		})
@@ -140,9 +261,24 @@ export const App: React.FC = () => {
 	}
 
 	return (
-		<div className="flex flex-col">
-			<div className="flex flex-grow w-full">
-				<div className="h-screen overflow-y-auto flex flex-col justify-between w-2/12 border-r border-gray-300 dark:border-gray-900 py-4 bg-gray-100 dark:bg-gray-700">
+		<div className="flex">
+			<div className="flex flex-grow w-full overflow-y-hidden overflow-x-hidden">
+				<Conditional when={currentView === "graph" && Boolean(hierarchy)}>
+					<div className="flex flex-col w-full flex-grow">
+						<D3View hierarchy={hierarchy} />
+					</div>
+					<div className="flex flex-col w-full flex-grow overflow-y-auto  overflow-x-auto">
+						<Workspace
+							currentFilePath={currentFilePath}
+							metadata={currentFileMetadata}
+							toggleSaved={toggleUnsavedFileStatus}
+						/>
+					</div>
+				</Conditional>
+			</div>
+
+			<Conditional when={currentView === "workspace"}>
+				<div className="fixed right-16 top-0 h-screen overflow-y-auto flex flex-col justify-between w-2/12 border-l border-gray-300 dark:border-gray-900 py-4 bg-gray-100 dark:bg-gray-700">
 					<div>
 						<h2 className="uppercase text-sm text-center text-gray-600 dark:text-gray-500">
 							Explorer
@@ -169,13 +305,18 @@ export const App: React.FC = () => {
 						</button>
 					</div>
 				</div>
-				<div className="h-screen overflow-y-auto w-10/12 bg-gray-100">
-					<Workspace
-						currentFilePath={currentFilePath}
-						metadata={currentFileMetadata}
-						toggleSaved={toggleUnsavedFileStatus}
-					/>
-				</div>
+			</Conditional>
+
+			<div className="fixed right-0 w-16 top-0 h-screen overflow-y-visible overflow-x-hidden items-center flex flex-col p-4 space-y-4 border-l border-gray-300 dark:border-gray-900 py-4 bg-gray-100 dark:bg-gray-700">
+				<button className="text-4xl" onClick={() => setCurrentView("workspace")}>
+					🗄
+				</button>
+				<button className="text-4xl" onClick={() => setCurrentView("graph")}>
+					🌲
+				</button>
+				<button className="text-4xl" onClick={() => setCurrentView("settings")}>
+					⚙️
+				</button>
 			</div>
 		</div>
 	)

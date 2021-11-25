@@ -42,6 +42,10 @@ export async function listFolder(path: string): Promise<ArbitraryFolder> {
 	for (const item of folder) {
 		const newPath = join(path, item.name)
 		if (item.isDirectory()) {
+			if (item.name.slice(item.name.lastIndexOf("/") + 1).startsWith(".")) {
+				continue
+			}
+
 			tree.children.push(await listFolder(newPath))
 		} else if (item.isFile() && item.name.endsWith(".md")) {
 			const mdFile = await getMarkdownFile(newPath)

@@ -266,7 +266,16 @@ export const App: React.FC = () => {
 			</Conditional>
 
 			<div className="fixed right-0 w-14 top-0 h-screen overflow-y-visible overflow-x-hidden items-center flex flex-col p-4 space-y-4 border-l border-gray-300 dark:border-gray-900 py-4 bg-gray-100 dark:bg-gray-700">
-				<button className="text-4xl" onClick={() => setCurrentView("workspace")}>
+				<button
+					className="text-4xl"
+					onClick={() => {
+						setCurrentView("workspace")
+
+						if (currentView === "workspace") {
+							setDisplayExplorer((v) => !v)
+						}
+					}}
+				>
 					🗄
 				</button>
 				<button className="text-4xl" onClick={() => setCurrentView("graph")}>
@@ -285,14 +294,15 @@ export const App: React.FC = () => {
 							top: "20%",
 							left: "50%",
 							transform: "translate(-50%, 0)",
-							width: "40%",
+							width: "70%",
 							minWidth: "400px",
 						}}
 						className="fixed rounded-lg shadow-xl p-4 bg-gray-50"
 					>
-						<label className="p-1 flex">
+						<label className="p-1 flex flex-col space-y-2">
 							<span>{fileTree.path}/</span>
 							<input
+								placeholder="Type here..."
 								autoFocus={creatorIsOpen}
 								className="w-full outline-none bg-gray-50"
 								type="text"

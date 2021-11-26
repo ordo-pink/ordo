@@ -87,9 +87,10 @@ export const App: React.FC = () => {
 			openSearcher()
 		}
 
-		if (e.metaKey && e.key === "b") {
+		if (e.metaKey && e.key === "b" && currentView === "workspace") {
 			e.preventDefault()
-			setDisplayExplorer((current) => !current)
+
+			setDisplayExplorer((v) => !v)
 		}
 	}
 
@@ -149,7 +150,7 @@ export const App: React.FC = () => {
 			window.removeEventListener("update-tree", updateFileTreeListener)
 			window.removeEventListener("keydown", createFileOrFolderListener)
 		}
-	}, [hash, currentFilePath])
+	}, [hash, currentFilePath, currentView])
 
 	const toggleUnsavedFileStatus = (path: string, saved: boolean) => {
 		const unsavedFilesCopy = [...unsavedFiles]

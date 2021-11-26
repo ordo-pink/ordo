@@ -80,6 +80,8 @@ ipcMain.handle("fs:list-folder", async (_, path) => {
 					links.push({
 						source: file.path,
 						target: link,
+						exists: Boolean(findFileByPath(tree, link)),
+						type: "wiki-link",
 					})
 				}
 
@@ -89,6 +91,33 @@ ipcMain.handle("fs:list-folder", async (_, path) => {
 					source: file.path,
 					target: linkPath,
 					exists: Boolean(findFileByPath(tree, linkPath)),
+					type: "wiki-link",
+				})
+			})
+
+			visit(ast)(AstNodeType.EMBEDDED_WIKI_LINK, (node) => {
+				const link = node.raw.trim().slice(3, -2)
+
+				if (link.startsWith("http:") || link.startsWith("https:")) {
+					return
+				}
+
+				if (link.startsWith("/")) {
+					links.push({
+						source: file.path,
+						target: link,
+						exists: Boolean(findFileByPath(tree, link)),
+						type: "wiki-link",
+					})
+				}
+
+				const linkPath = resolve(tree.path, `${link}.md`)
+
+				links.push({
+					source: file.path,
+					target: linkPath,
+					exists: Boolean(findFileByPath(tree, linkPath)),
+					type: "embedded-wiki-link",
 				})
 			})
 		}

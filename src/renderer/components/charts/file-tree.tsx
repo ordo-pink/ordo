@@ -46,16 +46,6 @@ export const FileTreeGraph: React.FC<{ data: Hashed<ArbitraryFolder> }> = ({ dat
 			return
 		}
 
-		const visitFile = (tree: ArbitraryFolder, cb: (x: ArbitraryFile) => void) => {
-			tree.children.forEach((child) => {
-				if (child.isFile) {
-					cb(child)
-				} else {
-					visitFile(child as ArbitraryFolder, cb)
-				}
-			})
-		}
-
 		const hierarchy = createHierarchy(data)
 
 		const links: any = hierarchy.links()
@@ -63,7 +53,11 @@ export const FileTreeGraph: React.FC<{ data: Hashed<ArbitraryFolder> }> = ({ dat
 
 		data.links.forEach((link: any) => {
 			let target
+
 			const source = nodes.find((node: any) => node.data.path === link.source)
+			const parentNode = nodes.find(
+				(node: any) => node.data.path === link.target.slice(0, link.target.lastIndexOf("/")),
+			)
 
 			if (!link.exists) {
 				const readableName = link.target.slice(
@@ -93,6 +87,14 @@ export const FileTreeGraph: React.FC<{ data: Hashed<ArbitraryFolder> }> = ({ dat
 				pageRelation: true,
 				index: links.length,
 			})
+
+			if (parentNode) {
+				links.push({
+					source: parentNode,
+					target,
+					index: links.length,
+				})
+			}
 		})
 
 		data.tags.forEach((tag: any) => {

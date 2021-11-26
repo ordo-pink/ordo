@@ -279,10 +279,22 @@ export const App: React.FC = () => {
 				>
 					🗄
 				</button>
-				<button className="text-4xl" onClick={() => setCurrentView("graph")}>
+				<button
+					className="text-4xl"
+					onClick={() => {
+						setCurrentView("graph")
+						setDisplayExplorer(false)
+					}}
+				>
 					🌲
 				</button>
-				<button className="text-4xl" onClick={() => setCurrentView("settings")}>
+				<button
+					className="text-4xl"
+					onClick={() => {
+						setCurrentView("settings")
+						setDisplayExplorer(false)
+					}}
+				>
 					⚙️
 				</button>
 			</div>

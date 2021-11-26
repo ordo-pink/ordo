@@ -44,7 +44,8 @@ export const Kanban: React.FC<{
 	}
 
 	const deleteCard = (cardPath: string) => {
-		window.fileSystemAPI.delete(cardPath).then(updateFileTree)
+		window.fileSystemAPI.delete(cardPath)
+		updateFileTree()
 	}
 
 	const onDragEnd = (result: DropResult) => {

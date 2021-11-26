@@ -1,5 +1,5 @@
 import type { Hashed } from "../../../main/apis/hash-response"
-import type { ArbitraryFolder, ArbitraryFile } from "../../../global-context/types"
+import type { ArbitraryFolder } from "../../../global-context/types"
 
 import React from "react"
 import {

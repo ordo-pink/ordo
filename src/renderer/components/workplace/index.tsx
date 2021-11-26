@@ -1,5 +1,3 @@
-import type { MDFile } from "../../../global-context/types"
-
 import React from "react"
 
 import { Conditional } from "../conditional"

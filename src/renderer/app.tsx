@@ -36,7 +36,6 @@ export const App: React.FC = () => {
 		"workspace",
 	)
 	const [displayExplorer, setDisplayExplorer] = React.useState<boolean>(false)
-
 	const [creatorRef, creatorIsOpen, openCreator, closeCreator] = useDropdown<HTMLDivElement>()
 	const [searcherRef, searcherIsOpen, openSearcher, closeSearcher] = useDropdown<HTMLDivElement>()
 	const [creationName, setCreationName] = React.useState("")
@@ -63,6 +62,10 @@ export const App: React.FC = () => {
 					],
 				}),
 			)
+		}
+
+		return () => {
+			setFuse(null)
 		}
 	}, [searchTerms, setFuse])
 

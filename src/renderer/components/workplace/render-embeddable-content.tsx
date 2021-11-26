@@ -21,13 +21,23 @@ export const EmbeddableContent: React.FC<{ line: string; currentContent: string 
 
 	React.useEffect(() => {
 		window.fileSystemAPI.findFileBySubPath(strippedContent.concat(".md")).then((n) => {
-			if (n.body === currentContent) {
-				n.body =
-					"<div class='text-red-600 text-center uppercase font-bold'>Recursion is generally a bad idea</div>"
-			}
+			if (!n) {
+				const n = {
+					body: "<div class='text-red-600 text-center uppercase font-bold'>You are trying to embed a page that doesn't exist</div>",
+					path: strippedContent.concat(".md"),
+				}
 
-			setNode(n)
-			setHash(n.path)
+				setNode(n as any)
+				setHash("booo")
+			} else {
+				if (n.body === currentContent) {
+					n.body =
+						"<div class='text-red-600 text-center uppercase font-bold'>Recursion is generally a bad idea</div>"
+				}
+
+				setNode(n)
+				setHash(n.path)
+			}
 		})
 	}, [hash])
 

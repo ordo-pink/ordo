@@ -6,9 +6,10 @@ import { File } from "./file"
 import { Folder } from "./folder"
 import { Conditional } from "../conditional"
 import { hasCurrentlyOpenedFile } from "../../../utils/tree"
+import { useAppSelector } from "../../../renderer/app/hooks"
 
 export const FileExplorer: React.FC<{
-	tree: ArbitraryFolder
+	nestedTree?: ArbitraryFolder
 	root: string
 	currentFile: string
 	setCurrentFile: (page: string) => void
@@ -19,7 +20,7 @@ export const FileExplorer: React.FC<{
 	deleteItem: (path: string) => Promise<void>
 	rename: (oldPath: string, newPath: string) => Promise<void>
 }> = ({
-	tree,
+	nestedTree,
 	root,
 	setCurrentFile,
 	currentFile,
@@ -30,22 +31,23 @@ export const FileExplorer: React.FC<{
 	rename,
 	depth = 1,
 }) => {
+	const currentTree = nestedTree ? nestedTree : useAppSelector((state) => state.fileTree.tree)
 	const [collapsed, setCollapsed] = React.useState(true)
 
 	useEffect(() => {
-		if (currentFile && hasCurrentlyOpenedFile(tree, currentFile)) {
+		if (currentFile && hasCurrentlyOpenedFile(currentTree, currentFile)) {
 			setCollapsed(false)
 		}
-	}, [currentFile])
+	}, [currentFile, currentTree])
 
 	return (
-		tree && (
+		currentTree && (
 			<div className="w-full">
 				<Folder
 					depth={depth}
 					collapsed={collapsed}
 					setCollapsed={setCollapsed}
-					folder={tree}
+					folder={currentTree}
 					createFile={createFile}
 					createFolder={createFolder}
 					rename={rename}
@@ -53,9 +55,9 @@ export const FileExplorer: React.FC<{
 				/>
 
 				<div className={`${collapsed ? "hidden" : "block"} w-full`}>
-					{tree &&
-						tree.children &&
-						tree.children.map((fileOrFileTree) => (
+					{currentTree &&
+						currentTree.children &&
+						currentTree.children.map((fileOrFileTree) => (
 							<Conditional
 								key={fileOrFileTree.path}
 								when={!(fileOrFileTree as ArbitraryFolder).children}
@@ -74,7 +76,7 @@ export const FileExplorer: React.FC<{
 									createFolder={createFolder}
 									rename={rename}
 									deleteItem={deleteItem}
-									tree={fileOrFileTree as ArbitraryFolder}
+									nestedTree={fileOrFileTree as ArbitraryFolder}
 									unsavedFiles={unsavedFiles}
 									root={root}
 									setCurrentFile={setCurrentFile}

@@ -3,6 +3,8 @@ import type { ArbitraryFile, ArbitraryFolder, MDFile } from "../global-context/t
 import React from "react"
 import Fuse from "fuse.js"
 
+import { useAppDispatch, useAppSelector } from "./app/hooks"
+
 import { findFileByName } from "../utils/tree"
 import { FileExplorer } from "./components/file-explorer"
 import { Workspace } from "./components/workplace"
@@ -10,6 +12,7 @@ import { isFolder } from "../global-context/init"
 import { Conditional } from "./components/conditional"
 import { FileTreeGraph } from "./components/charts/file-tree"
 import { useDropdown } from "./hooks/use-dropdown"
+import { fetchFileTree } from "./features/file-tree/file-tree-slice"
 
 const createSearchTerms = (data: ArbitraryFolder | ArbitraryFile, terms: any[] = []) => {
 	if (!isFolder(data)) {
@@ -27,9 +30,11 @@ const createSearchTerms = (data: ArbitraryFolder | ArbitraryFile, terms: any[] =
 }
 
 export const App: React.FC = () => {
+	const dispatch = useAppDispatch()
+
+	const status = useAppSelector((state) => state.fileTree.status)
+
 	const [rootPath, setRootPath] = React.useState("")
-	const [fileTree, setFileTree] = React.useState(null as ArbitraryFolder)
-	const [hash, setHash] = React.useState("")
 	const [currentFilePath, setCurrentFilePath] = React.useState("")
 	const [unsavedFiles, setUnsavedFiles] = React.useState<string[]>([])
 	const [currentView, setCurrentView] = React.useState<"workspace" | "graph" | "settings">(
@@ -44,6 +49,10 @@ export const App: React.FC = () => {
 	const [fuse, setFuse] = React.useState(null)
 	const [found, setFound] = React.useState(null)
 	const [preselectedSearchItem, setPreselectedSearchItem] = React.useState(0)
+
+	React.useEffect(() => {
+		dispatch(fetchFileTree(rootPath))
+	}, [rootPath])
 
 	React.useEffect(() => {
 		if (currentFilePath) {
@@ -71,8 +80,6 @@ export const App: React.FC = () => {
 
 	const updateFileTreeListener = () => {
 		window.fileSystemAPI.listFolder(rootPath).then((data) => {
-			setFileTree(data)
-			setHash(data.hash)
 			setSearchTerms(createSearchTerms(data))
 
 			window.settingsAPI.get("application.last-open-file").then(setCurrentFilePath)
@@ -101,29 +108,26 @@ export const App: React.FC = () => {
 		if (detail.path.startsWith("https://") || detail.path.startsWith("http://")) {
 			window.shellAPI.openExternal(detail.path)
 		} else if (!detail.path.startsWith("/")) {
-			let node: ArbitraryFolder | MDFile = { ...fileTree }
-
-			if (~detail.path.indexOf("/")) {
-				const chunks = detail.path.split("/")
-
-				for (const chunk of chunks) {
-					node = isFolder(node)
-						? (node.children.find((child) => child.readableName === chunk) as MDFile)
-						: node
-
-					if (node.isFile && chunks.indexOf(chunk) === chunks.length - 1) {
-						setCurrentFilePath(node.path)
-						setCurrentView("workspace")
-					}
-				}
-			} else {
-				node = findFileByName(fileTree, detail.path)
-
-				if (node.isFile) {
-					setCurrentFilePath(node.path)
-					setCurrentView("workspace")
-				}
-			}
+			// TODO
+			// let node: ArbitraryFolder | MDFile = { ...fileTree }
+			// if (~detail.path.indexOf("/")) {
+			// 	const chunks = detail.path.split("/")
+			// 	for (const chunk of chunks) {
+			// 		node = isFolder(node)
+			// 			? (node.children.find((child) => child.readableName === chunk) as MDFile)
+			// 			: node
+			// 		if (node.isFile && chunks.indexOf(chunk) === chunks.length - 1) {
+			// 			setCurrentFilePath(node.path)
+			// 			setCurrentView("workspace")
+			// 		}
+			// 	}
+			// } else {
+			// 	node = findFileByName(fileTree, detail.path)
+			// 	if (node.isFile) {
+			// 		setCurrentFilePath(node.path)
+			// 		setCurrentView("workspace")
+			// 	}
+			// }
 		} else {
 			setCurrentFilePath(detail.path)
 			setCurrentView("workspace")
@@ -135,10 +139,11 @@ export const App: React.FC = () => {
 			return
 		}
 
-		window.fileSystemAPI.createFile(fileTree, detail.path).then(() => {
-			setCurrentFilePath(detail.path)
-			setCurrentView("workspace")
-		})
+		// TODO
+		// window.fileSystemAPI.createFile(fileTree, detail.path).then(() => {
+		// 	setCurrentFilePath(detail.path)
+		// 	setCurrentView("workspace")
+		// })
 	}
 
 	React.useEffect(() => {
@@ -153,7 +158,7 @@ export const App: React.FC = () => {
 			window.removeEventListener("update-tree", updateFileTreeListener)
 			window.removeEventListener("keydown", createFileOrFolderListener)
 		}
-	}, [hash, currentFilePath, currentView])
+	}, [currentFilePath])
 
 	const toggleUnsavedFileStatus = (path: string, saved: boolean) => {
 		const unsavedFilesCopy = [...unsavedFiles]
@@ -225,9 +230,9 @@ export const App: React.FC = () => {
 	return (
 		<div className="flex">
 			<div className="flex flex-grow w-full overflow-y-hidden overflow-x-hidden">
-				<Conditional when={currentView === "graph" && Boolean(fileTree)}>
+				<Conditional when={currentView === "graph" && status === "fulfilled"}>
 					<div className="flex flex-col w-full flex-grow">
-						<FileTreeGraph data={{ ...fileTree, hash }} />
+						<FileTreeGraph />
 					</div>
 					<div
 						className={`${
@@ -253,7 +258,6 @@ export const App: React.FC = () => {
 							deleteItem={deleteItem}
 							createFolder={createFolder}
 							rename={rename}
-							tree={fileTree}
 							root={rootPath}
 						/>
 					</div>
@@ -316,7 +320,7 @@ export const App: React.FC = () => {
 						className="fixed rounded-lg shadow-xl p-4 bg-gray-50"
 					>
 						<label className="p-1 flex flex-col space-y-2">
-							<span>{fileTree.path}/</span>
+							<span>{rootPath}/</span>
 							<input
 								placeholder="Type here..."
 								autoFocus={creatorIsOpen}
@@ -329,9 +333,9 @@ export const App: React.FC = () => {
 										e.preventDefault()
 
 										if (!creationName.endsWith("/")) {
-											createFile(fileTree, creationName)
+											// TODO createFile(fileTree, creationName)
 										} else if (creationName.endsWith("/")) {
-											createFolder(fileTree, creationName)
+											// TODO createFolder(fileTree, creationName)
 										}
 
 										setCreationName("")

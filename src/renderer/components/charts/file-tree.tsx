@@ -1,6 +1,3 @@
-import type { Hashed } from "../../../main/apis/hash-response"
-import type { ArbitraryFolder } from "../../../global-context/types"
-
 import React from "react"
 import {
 	hierarchy as createHierarchy,
@@ -14,6 +11,8 @@ import {
 	zoom,
 	select,
 } from "d3"
+
+import { useAppSelector } from "../../app/hooks"
 
 const drag = (simulation: Simulation<any, any>) =>
 	d3Drag()
@@ -38,8 +37,10 @@ const drag = (simulation: Simulation<any, any>) =>
 			d.fy = null
 		})
 
-export const FileTreeGraph: React.FC<{ data: Hashed<ArbitraryFolder> }> = ({ data = {} }) => {
+export const FileTreeGraph: React.FC = () => {
 	const svgRef = React.useRef(null)
+
+	const data = useAppSelector((state) => state.fileTree.tree)
 
 	React.useEffect(() => {
 		if (!svgRef) {
@@ -233,7 +234,7 @@ export const FileTreeGraph: React.FC<{ data: Hashed<ArbitraryFolder> }> = ({ dat
 
 			node.attr("transform", (d: any) => `translate(${d.x},${d.y})`)
 		})
-	}, [svgRef.current, data.hash])
+	}, [svgRef.current, data])
 
 	return <svg ref={svgRef} width={window.innerWidth} height={window.innerHeight} />
 }

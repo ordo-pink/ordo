@@ -12,7 +12,5 @@ export async function createFolder(
 	const folderPath = await promises.mkdir(path, { recursive: true })
 	const stats = await promises.stat(path)
 
-	console.log(folder)
-
 	return createArbitraryFolder(folderPath, stats, folder)
 }

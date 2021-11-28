@@ -3,19 +3,19 @@ import type { MDFile } from "../../../../global-context/types"
 import React from "react"
 import { Draggable } from "react-beautiful-dnd"
 
-import { useAppDispatch } from "../../../../renderer/app/hooks"
-import { setCurrentPath } from "../../../../renderer/features/file-tree/file-tree-slice"
+import { useAppDispatch } from "../../../app/hooks"
+import { deleteFileOrFolder, setCurrentPath } from "../../../features/file-tree/file-tree-slice"
 
 export const Card: React.FC<{
 	item: MDFile
 	index: number
 	updateCardName: (oldPath: string, newPath: string) => void
-	deleteCard: (cardName: string) => void
-}> = ({ item, index, updateCardName, deleteCard }) => {
+}> = ({ item, index, updateCardName }) => {
 	const [editable, setEditable] = React.useState(false)
 	const ref = React.useRef(null)
 
 	const dispatch = useAppDispatch()
+
 	const handleOpenButtonClick = () => dispatch(setCurrentPath(item.path))
 
 	const onBlur = () => {
@@ -62,8 +62,10 @@ export const Card: React.FC<{
 
 						<button
 							className="text-sxl"
-							onClick={() => {
-								deleteCard(item.path)
+							onClick={(e) => {
+								e.preventDefault()
+
+								dispatch(deleteFileOrFolder(item))
 							}}
 						>
 							⤫

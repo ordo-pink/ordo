@@ -6,15 +6,21 @@ import {
 } from "@reduxjs/toolkit"
 import { Hashed } from "../../../main/apis/hash-response"
 import { ArbitraryFile, ArbitraryFolder } from "../../../global-context/types"
-import { findNode, sortTree } from "../../../utils/tree"
+import { findNode, getParentNode, sortTree } from "../../../utils/tree"
 
 export const fetchFileTree = createAsyncThunk("fileTree/init", (rootPath: string) =>
 	window.fileSystemAPI.listFolder(rootPath),
 )
 
 export const getCurrentPathFromSettings = createAsyncThunk(
-	"fileTree/get-current-path-from-settings",
+	"fileTree/getCurrentPathFromSettings",
 	() => window.settingsAPI.get("application.last-open-file"),
+)
+
+export const deleteFileOrFolder = createAsyncThunk(
+	"filTree/delete",
+	(node: ArbitraryFolder | ArbitraryFile): Promise<ArbitraryFolder | ArbitraryFile> =>
+		window.fileSystemAPI.delete(node.path).then(() => node),
 )
 
 export const createFileOrFolder = createAsyncThunk(
@@ -90,6 +96,22 @@ const fileTreeSlice = createSlice({
 			getCurrentPathFromSettings.fulfilled,
 			(state, action: PayloadAction<string>) => {
 				state.currentPath = action.payload
+			},
+		)
+
+		builder.addCase(
+			deleteFileOrFolder.fulfilled,
+			(state, action: PayloadAction<ArbitraryFolder | ArbitraryFile>) => {
+				const removedNode: ArbitraryFolder = findNode(state.tree, "path", action.payload.path)
+				const parent = getParentNode(state.tree, removedNode)
+
+				parent.children = parent.children.filter((child) => child.path !== removedNode.path)
+
+				if (state.currentPath === removedNode.path) {
+					state.currentPath = ""
+				}
+
+				state.tree = sortTree(state.tree)
 			},
 		)
 	},

@@ -18,7 +18,9 @@ export interface IFileSystemAPI {
 	move: (oldPath: string, newPath: string) => Promise<void>
 	createFile: (folder: ArbitraryFolder, name: string) => Promise<ArbitraryFile>
 	createFolder: (folder: ArbitraryFolder, name: string) => Promise<ArbitraryFolder>
-	delete: (path: string) => Promise<void>
+	delete: (
+		path: string,
+	) => Promise<{ parentNode: ArbitraryFolder; node: ArbitraryFolder | ArbitraryFile }>
 	findFileBySubPath: (subPath: string) => Promise<WithBody<MDFile>>
 	selectRootFolder: () => Promise<string>
 }

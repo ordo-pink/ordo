@@ -5,16 +5,18 @@ import React from "react"
 import { useDropdown } from "../../hooks/use-dropdown"
 import { Conditional } from "../conditional"
 import { Emoji } from "../emoji"
-import { useAppSelector } from "../../../renderer/app/hooks"
+import { useAppDispatch, useAppSelector } from "../../../renderer/app/hooks"
+import { deleteFileOrFolder } from "../../features/file-tree/file-tree-slice"
 
 export const File: React.FC<{
 	file: MDFile
 	depth: number
 	unsavedFiles: string[]
 	setCurrentFile: (page: string) => void
-	deleteItem: (path: string) => Promise<void>
 	rename: (oldPath: string, newPath: string) => Promise<void>
-}> = ({ file, setCurrentFile, unsavedFiles, depth, deleteItem, rename }) => {
+}> = ({ file, setCurrentFile, unsavedFiles, depth, rename }) => {
+	const dispatch = useAppDispatch()
+
 	const [newName, setNewName] = React.useState(file ? file.readableName : "")
 	const [ref, isOpen, open] = useDropdown<HTMLDivElement>()
 
@@ -59,11 +61,9 @@ export const File: React.FC<{
 					)}
 
 					{isOpen && (
-						<div>
-							<button className="p-1" onClick={() => deleteItem(file.path)}>
-								❌
-							</button>
-						</div>
+						<button className="p-1" onClick={() => dispatch(deleteFileOrFolder(file))}>
+							❌
+						</button>
 					)}
 				</div>
 			</div>

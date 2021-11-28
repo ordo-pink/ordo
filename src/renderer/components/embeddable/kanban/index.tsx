@@ -37,10 +37,6 @@ export const Kanban: React.FC<{
 		window.fileSystemAPI.move(oldPath, newPath)
 	}
 
-	const deleteCard = (cardPath: string) => {
-		window.fileSystemAPI.delete(cardPath)
-	}
-
 	const onDragEnd = (result: DropResult) => {
 		if (result.source.droppableId !== result.destination.droppableId) {
 			window.fileSystemAPI.move(
@@ -75,7 +71,6 @@ export const Kanban: React.FC<{
 														tree={column}
 														index={index}
 														updateColumnName={updateColumnName}
-														deleteCard={deleteCard}
 													/>
 												),
 										)}

@@ -5,14 +5,13 @@ import { Draggable, Droppable } from "react-beautiful-dnd"
 import { Card } from "./card"
 import { Conditional } from "../../conditional"
 import { useAppDispatch } from "../../../app/hooks"
-import { createFileOrFolder } from "../../../features/file-tree/file-tree-slice"
+import { createFileOrFolder, deleteFileOrFolder } from "../../../features/file-tree/file-tree-slice"
 
 export const Column: React.FC<{
 	tree: ArbitraryFolder
 	index: number
 	updateColumnName: (oldPath: string, newPath: string) => void
-	deleteCard: (cardName: string) => void
-}> = ({ tree, index, updateColumnName, deleteCard }) => {
+}> = ({ tree, index, updateColumnName }) => {
 	const dispatch = useAppDispatch()
 
 	const [isAddingCardAtTheTop, setIsAddingCardAtTheTop] = React.useState(false)
@@ -63,7 +62,7 @@ export const Column: React.FC<{
 							<button
 								className="text-sxl"
 								onClick={() => {
-									deleteCard(tree.path)
+									dispatch(deleteFileOrFolder(tree))
 								}}
 							>
 								⤫
@@ -112,7 +111,6 @@ export const Column: React.FC<{
 													item={item as MDFile}
 													index={index}
 													updateCardName={updateColumnName}
-													deleteCard={deleteCard}
 												/>
 											) : (
 												<></>

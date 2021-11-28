@@ -1,11 +1,11 @@
 import { isFolder } from "../global-context/init"
-import type { ArbitraryFolder, MDFile } from "../global-context/types"
+import type { ArbitraryFile, ArbitraryFolder, MDFile } from "../global-context/types"
 
 export interface FSTree<TLeaf = any> extends Record<string, unknown> {
 	children: Array<FSTree<TLeaf> | TLeaf>
 }
 
-function isFSTreeBranch(x: any): x is FSTree {
+function isFSTreeBranch(x: { children?: unknown }): x is FSTree {
 	return x && x.children && Array.isArray(x.children)
 }
 
@@ -28,6 +28,29 @@ export function findNode<
 		} else {
 			if ((child as T)[key] === value) {
 				return child
+			}
+		}
+	}
+
+	return null
+}
+
+export function getParentNode(
+	tree: ArbitraryFolder,
+	node: ArbitraryFolder | ArbitraryFile,
+): ArbitraryFolder | ArbitraryFile {
+	if (isFolder(tree)) {
+		for (const child of tree.children) {
+			if (child.path === node.path) {
+				return tree
+			}
+
+			if (isFolder(child)) {
+				const found = getParentNode(child, node)
+
+				if (found) {
+					return found
+				}
 			}
 		}
 	}

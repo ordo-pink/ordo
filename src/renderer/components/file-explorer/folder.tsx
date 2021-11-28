@@ -7,15 +7,15 @@ import { Conditional } from "../conditional"
 import { Emoji } from "../emoji"
 import { useAppDispatch } from "../../app/hooks"
 import { toggleCreator } from "../../features/ui/ui-slice"
+import { deleteFileOrFolder } from "../../features/file-tree/file-tree-slice"
 
 export const Folder: React.FC<{
 	setCollapsed: React.Dispatch<React.SetStateAction<boolean>>
 	collapsed: boolean
 	folder: ArbitraryFolder
 	depth: number
-	deleteItem: (path: string) => Promise<void>
 	rename: (oldPath: string, newPath: string) => Promise<void>
-}> = ({ setCollapsed, collapsed, folder, depth, deleteItem, rename }) => {
+}> = ({ setCollapsed, collapsed, folder, depth, rename }) => {
 	const dispatch = useAppDispatch()
 
 	const [name, setName] = React.useState(folder.readableName)
@@ -68,7 +68,7 @@ export const Folder: React.FC<{
 					)}
 
 					{isOpen && (
-						<button className="p-1" onClick={() => deleteItem(folder.path)}>
+						<button className="p-1" onClick={() => dispatch(deleteFileOrFolder(folder))}>
 							❌
 						</button>
 					)}

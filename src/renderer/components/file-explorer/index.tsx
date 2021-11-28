@@ -14,9 +14,8 @@ export const FileExplorer: React.FC<{
 	setCurrentFile: (page: string) => void
 	unsavedFiles: string[]
 	depth?: number
-	deleteItem: (path: string) => Promise<void>
 	rename: (oldPath: string, newPath: string) => Promise<void>
-}> = ({ nestedTree, root, setCurrentFile, unsavedFiles, deleteItem, rename, depth = 1 }) => {
+}> = ({ nestedTree, root, setCurrentFile, unsavedFiles, rename, depth = 1 }) => {
 	const currentPath = useAppSelector((state) => state.fileTree.currentPath)
 	const currentTree = nestedTree ? nestedTree : useAppSelector((state) => state.fileTree.tree)
 	const [collapsed, setCollapsed] = React.useState(true)
@@ -36,7 +35,6 @@ export const FileExplorer: React.FC<{
 					setCollapsed={setCollapsed}
 					folder={currentTree}
 					rename={rename}
-					deleteItem={deleteItem}
 				/>
 
 				<div className={`${collapsed ? "hidden" : "block"} w-full`}>
@@ -48,14 +46,12 @@ export const FileExplorer: React.FC<{
 									unsavedFiles={unsavedFiles}
 									file={fileOrFileTree as MDFile}
 									depth={depth}
-									deleteItem={deleteItem}
 									rename={rename}
 									setCurrentFile={setCurrentFile}
 								/>
 
 								<FileExplorer
 									rename={rename}
-									deleteItem={deleteItem}
 									nestedTree={fileOrFileTree as ArbitraryFolder}
 									unsavedFiles={unsavedFiles}
 									root={root}

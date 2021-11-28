@@ -58,7 +58,7 @@ export const App: React.FC = () => {
 		return () => {
 			window.removeEventListener("keydown", createFileOrFolderListener)
 		}
-	}, [currentPath])
+	})
 
 	const createFileOrFolderListener = (e: KeyboardEvent) => {
 		if (e.metaKey && e.key === "n") {
@@ -90,13 +90,6 @@ export const App: React.FC = () => {
 	}
 
 	const rename = (oldPath: string, newPath: string) => window.fileSystemAPI.move(oldPath, newPath)
-
-	const deleteItem = (path: string) =>
-		window.fileSystemAPI.delete(path).then(() => {
-			if (currentPath === path) {
-				assignCurrentPath("")
-			}
-		})
 
 	const assignCurrentPath = (path: string) => {
 		window.settingsAPI.set("application.last-open-file", path)
@@ -138,7 +131,6 @@ export const App: React.FC = () => {
 						<FileExplorer
 							unsavedFiles={unsavedFiles}
 							setCurrentFile={assignCurrentPath} // TODO
-							deleteItem={deleteItem}
 							rename={rename}
 							root={rootPath}
 						/>

@@ -6,6 +6,7 @@ import { getCaretPosition, setCaretPosition } from "./caret"
 import { MemoLine } from "./memo-line"
 import { Metadata } from "./metadata"
 import { useAppSelector } from "../../../renderer/app/hooks"
+import { MDFile } from "../../../global-context/types"
 
 const getDivElement = (index: number): HTMLDivElement =>
 	document.querySelector(`[data-id="${index}"]`)
@@ -19,7 +20,7 @@ export const Workspace: React.FC<{
 	const [hash, setHash] = React.useState("")
 	const [savedCaretPosition, setSavedCaretPosition] = React.useState(0)
 	const [currentLine, setCurrentLine] = React.useState(0)
-	const [metadata, setMetadata] = React.useState<any>(null)
+	const [metadata, setMetadata] = React.useState<MDFile>(null)
 
 	React.useEffect(() => {
 		const line = getDivElement(currentLine)

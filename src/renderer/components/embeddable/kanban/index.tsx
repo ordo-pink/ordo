@@ -14,14 +14,21 @@ export const Kanban: React.FC<{
 	folder: string
 }> = ({ folder }) => {
 	const dispatch = useDispatch()
+	const rootTree = useAppSelector((state) => state.fileTree.tree) as ArbitraryFolder
 
-	const tree = useAppSelector((state) =>
-		findNode<ArbitraryFolder>(
-			state.fileTree.tree,
-			"path",
-			state.fileTree.tree.path.concat("/").concat(folder), // TODO: Add path resolution
-		),
-	) as ArbitraryFolder
+	const [tree, setTree] = React.useState<ArbitraryFolder>(null)
+
+	React.useEffect(() => {
+		if (rootTree) {
+			setTree(
+				findNode(
+					rootTree,
+					"path",
+					rootTree.path.concat("/").concat(folder), // TODO: Add path resolution
+				) as ArbitraryFolder,
+			)
+		}
+	}, [rootTree, folder])
 
 	const [isAddingColumn, setIsAddingColumn] = React.useState(false)
 	const [newColumnName, setNewColumnName] = React.useState("")
@@ -44,68 +51,70 @@ export const Kanban: React.FC<{
 	}
 
 	return (
-		<div className="overflow-x-auto font-sans bg-gray-50 dark:bg-gray-500 rounded-lg p-4 border border-gray-300 mx-auto">
-			<div className="text-xs mb-2 text-gray-700 dark:text-gray-300 outline-none">
-				{tree.readableName}
-			</div>
-
-			<DragDropContext onDragEnd={onDragEnd}>
-				<div>
-					{tree.children && (
-						<Droppable droppableId={tree.path as string} direction="horizontal" type="column">
-							{(provided) => (
-								<div
-									className="flex space-x-2"
-									ref={provided.innerRef}
-									{...provided.droppableProps}
-								>
-									{tree.children.map(
-										(column: ArbitraryFolder, index) =>
-											!column.isFile && (
-												<Column
-													key={column.path}
-													tree={column}
-													index={index}
-													updateColumnName={updateColumnName}
-													deleteCard={deleteCard}
-												/>
-											),
-									)}
-									{provided.placeholder}
-								</div>
-							)}
-						</Droppable>
-					)}
+		tree && (
+			<div className="overflow-x-auto font-sans bg-gray-50 dark:bg-gray-500 rounded-lg p-4 border border-gray-300 mx-auto">
+				<div className="text-xs mb-2 text-gray-700 dark:text-gray-300 outline-none">
+					{tree.readableName}
 				</div>
-			</DragDropContext>
 
-			<Conditional when={isAddingColumn}>
-				<input
-					autoFocus={isAddingColumn}
-					className="mt-2 w-72 outline-none text-left rounded-lg p-2 text-xs text-gray-500 border border-dashed border-gray-500"
-					value={newColumnName}
-					onChange={(e) => setNewColumnName(e.target.value)}
-					onKeyDown={(e) => {
-						if (e.key === "Enter") {
-							e.preventDefault()
-							dispatch(createFileOrFolder({ name: newColumnName, node: tree }))
-							setNewColumnName("")
-						}
-					}}
-					onBlur={() => setIsAddingColumn(false)}
-				/>
-				<button
-					onClick={() => setIsAddingColumn(true)}
-					className={`mt-2 w-72 text-left rounded-lg p-2 text-xs text-gray-500 border border-dashed border-gray-500 ${
-						!isAddingColumn && Boolean(newColumnName) && "border-yellow-700 text-yellow-700"
-					}`}
-				>
-					+ Add column
-					<Conditional when={!isAddingColumn && Boolean(newColumnName)}>
-						<span className="ml-4">🟡</span>
-					</Conditional>
-				</button>
-			</Conditional>
-		</div>
+				<DragDropContext onDragEnd={onDragEnd}>
+					<div>
+						{tree.children && (
+							<Droppable droppableId={tree.path as string} direction="horizontal" type="column">
+								{(provided) => (
+									<div
+										className="flex space-x-2"
+										ref={provided.innerRef}
+										{...provided.droppableProps}
+									>
+										{tree.children.map(
+											(column: ArbitraryFolder, index) =>
+												!column.isFile && (
+													<Column
+														key={column.path}
+														tree={column}
+														index={index}
+														updateColumnName={updateColumnName}
+														deleteCard={deleteCard}
+													/>
+												),
+										)}
+										{provided.placeholder}
+									</div>
+								)}
+							</Droppable>
+						)}
+					</div>
+				</DragDropContext>
+
+				<Conditional when={isAddingColumn}>
+					<input
+						autoFocus={isAddingColumn}
+						className="mt-2 w-72 outline-none text-left rounded-lg p-2 text-xs text-gray-500 border border-dashed border-gray-500"
+						value={newColumnName}
+						onChange={(e) => setNewColumnName(e.target.value)}
+						onKeyDown={(e) => {
+							if (e.key === "Enter") {
+								e.preventDefault()
+								dispatch(createFileOrFolder({ name: newColumnName, node: tree }))
+								setNewColumnName("")
+							}
+						}}
+						onBlur={() => setIsAddingColumn(false)}
+					/>
+					<button
+						onClick={() => setIsAddingColumn(true)}
+						className={`mt-2 w-72 text-left rounded-lg p-2 text-xs text-gray-500 border border-dashed border-gray-500 ${
+							!isAddingColumn && Boolean(newColumnName) && "border-yellow-700 text-yellow-700"
+						}`}
+					>
+						+ Add column
+						<Conditional when={!isAddingColumn && Boolean(newColumnName)}>
+							<span className="ml-4">🟡</span>
+						</Conditional>
+					</button>
+				</Conditional>
+			</div>
+		)
 	)
 }

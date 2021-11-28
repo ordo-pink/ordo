@@ -4,13 +4,16 @@ import React from "react"
 import { Draggable } from "react-beautiful-dnd"
 
 import { useAppDispatch } from "../../../app/hooks"
-import { deleteFileOrFolder, setCurrentPath } from "../../../features/file-tree/file-tree-slice"
+import {
+	deleteFileOrFolder,
+	moveFileOrFolder,
+	setCurrentPath,
+} from "../../../features/file-tree/file-tree-slice"
 
 export const Card: React.FC<{
 	item: MDFile
 	index: number
-	updateCardName: (oldPath: string, newPath: string) => void
-}> = ({ item, index, updateCardName }) => {
+}> = ({ item, index }) => {
 	const [editable, setEditable] = React.useState(false)
 	const ref = React.useRef(null)
 
@@ -19,7 +22,12 @@ export const Card: React.FC<{
 	const handleOpenButtonClick = () => dispatch(setCurrentPath(item.path))
 
 	const onBlur = () => {
-		updateCardName(item.path, item.path.replace(item.readableName, ref.current.textContent))
+		dispatch(
+			moveFileOrFolder({
+				node: item,
+				newPath: item.path.replace(item.readableName, ref.current.textContent),
+			}),
+		)
 	}
 
 	const onClick = () => setEditable(true)
@@ -28,7 +36,12 @@ export const Card: React.FC<{
 		if (e.key === "Enter") {
 			e.preventDefault()
 
-			updateCardName(item.path, item.path.replace(item.readableName, ref.current.textContent))
+			dispatch(
+				moveFileOrFolder({
+					node: item,
+					newPath: item.path.replace(item.readableName, ref.current.textContent),
+				}),
+			)
 
 			setEditable(false)
 		}

@@ -7,6 +7,7 @@ import {
 import { Hashed } from "../../../main/apis/hash-response"
 import { ArbitraryFile, ArbitraryFolder } from "../../../global-context/types"
 import { findNode, getParentNode, sortTree } from "../../../utils/tree"
+import { createArbitraryFolder, isFolder } from "../../../global-context/init"
 
 export const fetchFileTree = createAsyncThunk("fileTree/init", (rootPath: string) =>
 	window.fileSystemAPI.listFolder(rootPath),
@@ -32,6 +33,17 @@ export const createFileOrFolder = createAsyncThunk(
 			return window.fileSystemAPI.createFile(payload.node, payload.name)
 		}
 	},
+)
+
+export const moveFileOrFolder = createAsyncThunk(
+	"fileTree/move",
+	(payload: {
+		node: ArbitraryFolder | ArbitraryFile
+		newPath: string
+	}): Promise<{ node: ArbitraryFolder | ArbitraryFile; newPath: string }> =>
+		window.fileSystemAPI.move(payload.node.path, payload.newPath).then(() => {
+			return payload
+		}),
 )
 
 export type FileTreeState = {
@@ -114,6 +126,63 @@ const fileTreeSlice = createSlice({
 				state.tree = sortTree(state.tree)
 			},
 		)
+
+		builder.addCase(moveFileOrFolder.fulfilled, (state, action) => {
+			const parent = getParentNode(state.tree, action.payload.node)
+			const node: ArbitraryFolder | ArbitraryFile = findNode(
+				state.tree,
+				"path",
+				action.payload.node.path,
+			)
+			parent.children = parent.children.filter((child) => child.path !== action.payload.node.path)
+
+			const fullPath = action.payload.newPath.endsWith("/")
+				? action.payload.newPath.slice(0, -1)
+				: action.payload.newPath
+
+			const relativePath = fullPath.replace(state.tree.path, "")
+
+			const pathChunks = relativePath.split("/").slice(1, -1)
+
+			let currentNode: ArbitraryFolder | ArbitraryFile = state.tree
+
+			if (pathChunks.length > 0) {
+				let i = 0
+
+				while (i < pathChunks.length) {
+					const newPath: string = currentNode.path.endsWith("/")
+						? currentNode.path.concat(pathChunks[i])
+						: currentNode.path.concat("/").concat(pathChunks[i])
+
+					if (isFolder(currentNode)) {
+						let found: ArbitraryFile | ArbitraryFolder = currentNode.children.find(
+							(child) => child.path === newPath,
+						)
+
+						if (!found) {
+							found = createArbitraryFolder(
+								newPath,
+								{ isDirectory: () => true } as any,
+								currentNode,
+							)
+							currentNode.children.push(found)
+						}
+
+						currentNode = found
+					}
+
+					i++
+				}
+			}
+
+			node.path = action.payload.newPath
+
+			node.readableName = node.path.split("/").reverse()[0]
+
+			currentNode.children.push(node)
+
+			state.tree = sortTree(state.tree)
+		})
 	},
 })
 

@@ -69,6 +69,7 @@ export function createArbitraryFile(
 	const extension = fileName.substring(fileName.lastIndexOf("."))
 
 	return {
+		id: path,
 		path,
 		readableName,
 		extension,

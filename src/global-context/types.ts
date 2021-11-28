@@ -34,6 +34,7 @@ export type Tag = {
 }
 
 export interface ArbitraryFile extends FSTree {
+	id: Path
 	path: Path
 	readableName: ReadableName
 	extension: FileExtension

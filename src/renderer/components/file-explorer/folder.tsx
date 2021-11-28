@@ -2,24 +2,22 @@ import type { ArbitraryFolder } from "../../../global-context/types"
 
 import React from "react"
 
-import { useDropdown } from "../../hooks/use-dropdown"
 import { Conditional } from "../conditional"
 import { Emoji } from "../emoji"
 import { useAppDispatch } from "../../app/hooks"
 import { toggleCreator } from "../../features/ui/ui-slice"
-import { deleteFileOrFolder } from "../../features/file-tree/file-tree-slice"
+import { deleteFileOrFolder, moveFileOrFolder } from "../../features/file-tree/file-tree-slice"
 
 export const Folder: React.FC<{
 	setCollapsed: React.Dispatch<React.SetStateAction<boolean>>
 	collapsed: boolean
 	folder: ArbitraryFolder
 	depth: number
-	rename: (oldPath: string, newPath: string) => Promise<void>
-}> = ({ setCollapsed, collapsed, folder, depth, rename }) => {
+}> = ({ setCollapsed, collapsed, folder, depth }) => {
 	const dispatch = useAppDispatch()
 
 	const [name, setName] = React.useState(folder.readableName)
-	const [ref, isOpen, open] = useDropdown<HTMLDivElement>()
+	const [isOpen, setIsOpen] = React.useState(false)
 
 	const icon = collapsed ? "▶" : "▼"
 
@@ -43,13 +41,20 @@ export const Folder: React.FC<{
 							if (e.key === "Enter") {
 								e.preventDefault()
 
-								rename(folder.path, folder.path.replace(folder.readableName, name))
+								dispatch(
+									moveFileOrFolder({
+										node: folder,
+										newPath: folder.path.replace(folder.readableName, name),
+									}),
+								)
+
+								setIsOpen(false)
 							}
 						}}
 					/>
 				</Conditional>
 
-				<div ref={ref} className="flex space-x-2 text-xs pr-2">
+				<div className="flex space-x-2 text-xs pr-2">
 					{!isOpen && (
 						<div>
 							<button
@@ -61,7 +66,7 @@ export const Folder: React.FC<{
 								➕
 							</button>
 
-							<button className="p-1" onClick={open}>
+							<button className="p-1" onClick={() => setIsOpen(true)}>
 								⚙️
 							</button>
 						</div>

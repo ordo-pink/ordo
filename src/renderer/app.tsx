@@ -1,7 +1,6 @@
 import React from "react"
 
 import { useAppDispatch, useAppSelector } from "./app/hooks"
-
 import { FileExplorer } from "./components/file-explorer"
 import { Workspace } from "./components/workplace"
 import { Conditional } from "./components/conditional"
@@ -89,8 +88,6 @@ export const App: React.FC = () => {
 		setUnsavedFiles(unsavedFilesCopy)
 	}
 
-	const rename = (oldPath: string, newPath: string) => window.fileSystemAPI.move(oldPath, newPath)
-
 	const assignCurrentPath = (path: string) => {
 		window.settingsAPI.set("application.last-open-file", path)
 		dispatch(setCurrentPath(path))
@@ -128,12 +125,7 @@ export const App: React.FC = () => {
 						<h2 className="uppercase text-sm text-center text-gray-600 dark:text-gray-500">
 							Explorer
 						</h2>
-						<FileExplorer
-							unsavedFiles={unsavedFiles}
-							setCurrentFile={assignCurrentPath} // TODO
-							rename={rename}
-							root={rootPath}
-						/>
+						<FileExplorer unsavedFiles={unsavedFiles} root={rootPath} />
 					</div>
 
 					<div className="px-2">

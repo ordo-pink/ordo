@@ -8,7 +8,7 @@ import { Conditional } from "../../conditional"
 import { findNode } from "../../../../utils/tree"
 import { useAppSelector } from "../../../app/hooks"
 import { useDispatch } from "react-redux"
-import { createFileOrFolder } from "../../../features/file-tree/file-tree-slice"
+import { createFileOrFolder, moveFileOrFolder } from "../../../features/file-tree/file-tree-slice"
 
 export const Kanban: React.FC<{
 	folder: string
@@ -33,21 +33,26 @@ export const Kanban: React.FC<{
 	const [isAddingColumn, setIsAddingColumn] = React.useState(false)
 	const [newColumnName, setNewColumnName] = React.useState("")
 
-	const updateColumnName = (oldPath: string, newPath: string) => {
-		window.fileSystemAPI.move(oldPath, newPath)
-	}
-
 	const onDragEnd = (result: DropResult) => {
 		if (result.source.droppableId !== result.destination.droppableId) {
-			window.fileSystemAPI.move(
+			const node: ArbitraryFolder = findNode(
+				tree,
+				"path",
 				`${result.source.droppableId}/${result.draggableId}.md`,
-				`${result.destination.droppableId}/${result.draggableId}.md`,
+			)
+
+			dispatch(
+				moveFileOrFolder({
+					node,
+					newPath: `${result.destination.droppableId}/${result.draggableId}.md`,
+				}),
 			)
 		}
 	}
 
 	return (
-		tree && (
+		tree &&
+		tree.children && (
 			<div className="overflow-x-auto font-sans bg-gray-50 dark:bg-gray-500 rounded-lg p-4 border border-gray-300 mx-auto">
 				<div className="text-xs mb-2 text-gray-700 dark:text-gray-300 outline-none">
 					{tree.readableName}
@@ -66,12 +71,7 @@ export const Kanban: React.FC<{
 										{tree.children.map(
 											(column: ArbitraryFolder, index) =>
 												!column.isFile && (
-													<Column
-														key={column.path}
-														tree={column}
-														index={index}
-														updateColumnName={updateColumnName}
-													/>
+													<Column key={column.path} treePath={column.path} index={index} />
 												),
 										)}
 										{provided.placeholder}

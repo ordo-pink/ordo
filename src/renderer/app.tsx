@@ -1,5 +1,3 @@
-import type { ArbitraryFolder } from "../global-context/types"
-
 import React from "react"
 
 import { useAppDispatch, useAppSelector } from "./app/hooks"
@@ -8,14 +6,13 @@ import { FileExplorer } from "./components/file-explorer"
 import { Workspace } from "./components/workplace"
 import { Conditional } from "./components/conditional"
 import { FileTreeGraph } from "./components/charts/file-tree"
-import { useDropdown } from "./hooks/use-dropdown"
 import {
-	createFileOrFolder,
 	fetchFileTree,
+	getCurrentPathFromSettings,
 	setCurrentPath,
 	setRootPath,
 } from "./features/file-tree/file-tree-slice"
-import { hideExplorer, toggleExplorer, toggleSearcher } from "./features/ui/ui-slice"
+import { hideExplorer, toggleCreator, toggleExplorer, toggleSearcher } from "./features/ui/ui-slice"
 
 export const App: React.FC = () => {
 	const dispatch = useAppDispatch()
@@ -24,14 +21,15 @@ export const App: React.FC = () => {
 	const rootPath = useAppSelector((state) => state.fileTree.rootPath)
 	const currentPath = useAppSelector((state) => state.fileTree.currentPath)
 	const showExplorer = useAppSelector((state) => state.ui.showExplorer) // TODO Move explorer to Workspace
-	const tree = useAppSelector((state) => state.fileTree.tree)
 
 	const [unsavedFiles, setUnsavedFiles] = React.useState<string[]>([])
 	const [currentView, setCurrentView] = React.useState<"workspace" | "graph" | "settings">(
 		"workspace",
 	)
-	const [creatorRef, creatorIsOpen, openCreator, closeCreator] = useDropdown<HTMLDivElement>()
-	const [creationName, setCreationName] = React.useState("")
+
+	React.useEffect(() => {
+		dispatch(getCurrentPathFromSettings())
+	}, [])
 
 	React.useEffect(() => {
 		window.settingsAPI.get("application.root-folder-path").then((path) => {
@@ -55,31 +53,17 @@ export const App: React.FC = () => {
 			window.settingsAPI.set("application.last-open-file", currentPath)
 		}
 
-		window.addEventListener("create-file", createFileListener)
-		// window.addEventListener("update-tree", updateFileTreeListener)
 		window.addEventListener("keydown", createFileOrFolderListener)
 
 		return () => {
-			window.removeEventListener("create-file", createFileListener)
-			// window.removeEventListener("update-tree", updateFileTreeListener)
 			window.removeEventListener("keydown", createFileOrFolderListener)
 		}
 	}, [currentPath])
 
-	// const updateFileTreeListener = () => {
-	// 	window.fileSystemAPI.listFolder(rootPath).then((data) => {
-	//
-
-	// 		window.settingsAPI.get("application.last-open-file").then((path) => {
-	// 			dispatch(setCurrentPath(path))
-	// 		})
-	// 	})
-	// }
-
 	const createFileOrFolderListener = (e: KeyboardEvent) => {
 		if (e.metaKey && e.key === "n") {
 			e.preventDefault()
-			openCreator() // TODO: dispatch(toggleCreator(rootPath))
+			dispatch(toggleCreator())
 		}
 
 		if (e.metaKey && e.key === "p") {
@@ -91,18 +75,6 @@ export const App: React.FC = () => {
 			e.preventDefault()
 			dispatch(toggleExplorer())
 		}
-	}
-
-	const createFileListener = ({ detail }: CustomEvent) => {
-		if (!detail.path || detail.path.endsWith("/.md")) {
-			return
-		}
-
-		// TODO
-		// window.fileSystemAPI.createFile(fileTree, detail.path).then(() => {
-		// 	setCurrentFilePath(detail.path)
-		// 	setCurrentView("workspace")
-		// })
 	}
 
 	const toggleUnsavedFileStatus = (path: string, saved: boolean) => {
@@ -117,25 +89,7 @@ export const App: React.FC = () => {
 		setUnsavedFiles(unsavedFilesCopy)
 	}
 
-	const createFile = (folder: ArbitraryFolder, name: string) => {
-		if (!name || name.endsWith("/.md")) {
-			return
-		}
-
-		return (
-			window.fileSystemAPI
-				.createFile(folder, `${name}.md`)
-				// .then(updateFileTreeListener)
-				.then(() => assignCurrentPath(`${folder.path}/${name}.md`))
-		)
-	}
-
-	const createFolder = (folder: ArbitraryFolder, name: string) =>
-		window.fileSystemAPI.createFolder(folder, name)
-	// .then(updateFileTreeListener)
-
 	const rename = (oldPath: string, newPath: string) => window.fileSystemAPI.move(oldPath, newPath)
-	// .then(updateFileTreeListener)
 
 	const deleteItem = (path: string) =>
 		window.fileSystemAPI.delete(path).then(() => {
@@ -143,7 +97,6 @@ export const App: React.FC = () => {
 				assignCurrentPath("")
 			}
 		})
-	// .then(updateFileTreeListener)
 
 	const assignCurrentPath = (path: string) => {
 		window.settingsAPI.set("application.last-open-file", path)
@@ -184,10 +137,8 @@ export const App: React.FC = () => {
 						</h2>
 						<FileExplorer
 							unsavedFiles={unsavedFiles}
-							setCurrentFile={assignCurrentPath}
-							createFile={createFile}
+							setCurrentFile={assignCurrentPath} // TODO
 							deleteItem={deleteItem}
-							createFolder={createFolder as any}
 							rename={rename}
 							root={rootPath}
 						/>
@@ -236,55 +187,6 @@ export const App: React.FC = () => {
 					⚙️
 				</button>
 			</div>
-
-			{creatorIsOpen && (
-				<div className="fixed top-0 bottom-0 left-0 right-0 bg-gray-900 bg-opacity-40">
-					<div
-						ref={creatorRef}
-						style={{
-							top: "20%",
-							left: "50%",
-							transform: "translate(-50%, 0)",
-							width: "70%",
-							minWidth: "400px",
-						}}
-						className="fixed rounded-lg shadow-xl p-4 bg-gray-50"
-					>
-						<label className="p-1 flex flex-col space-y-2">
-							<span>{rootPath}/</span>
-							<input
-								placeholder="Type here..."
-								autoFocus={creatorIsOpen}
-								className="w-full outline-none bg-gray-50"
-								type="text"
-								onChange={(e) => setCreationName(e.target.value)}
-								value={creationName}
-								onKeyDown={(e) => {
-									if (e.key === "Enter") {
-										e.preventDefault()
-
-										dispatch(createFileOrFolder({ node: tree, name: creationName }))
-
-										setCreationName("")
-										closeCreator()
-									}
-								}}
-							/>
-						</label>
-
-						<div className="text-xs text-gray-600 text-center mt-2">
-							Press <kbd className="bg-pink-300 p-1 rounded-md">Enter</kbd> to apply changes or{" "}
-							<kbd className="bg-pink-300 p-1 rounded-md">Esc</kbd> to drop.
-						</div>
-
-						<div className="text-xs text-gray-600 text-center mt-2">
-							Ending with a <kbd className="bg-pink-300 p-1 rounded-md">/</kbd> will create a
-							folder. Any other case will create an{" "}
-							<kbd className="bg-pink-300 p-1 rounded-md">.md</kbd> file.
-						</div>
-					</div>
-				</div>
-			)}
 		</div>
 	)
 }

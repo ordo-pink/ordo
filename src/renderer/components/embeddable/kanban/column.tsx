@@ -4,14 +4,17 @@ import React from "react"
 import { Draggable, Droppable } from "react-beautiful-dnd"
 import { Card } from "./card"
 import { Conditional } from "../../conditional"
+import { useAppDispatch } from "../../../app/hooks"
+import { createFileOrFolder } from "../../../features/file-tree/file-tree-slice"
 
 export const Column: React.FC<{
 	tree: ArbitraryFolder
 	index: number
 	updateColumnName: (oldPath: string, newPath: string) => void
-	createCard: (column: ArbitraryFolder, cardName: string) => void
 	deleteCard: (cardName: string) => void
-}> = ({ tree, index, updateColumnName, createCard, deleteCard }) => {
+}> = ({ tree, index, updateColumnName, deleteCard }) => {
+	const dispatch = useAppDispatch()
+
 	const [isAddingCardAtTheTop, setIsAddingCardAtTheTop] = React.useState(false)
 	const [isAddingCardAtTheBottom, setIsAddingCardAtTheBottom] = React.useState(false)
 	const [newCardName, setNewCardName] = React.useState("")
@@ -21,7 +24,7 @@ export const Column: React.FC<{
 			e.preventDefault()
 
 			if (isAddingCardAtTheBottom || isAddingCardAtTheTop) {
-				createCard(tree, `${newCardName}.md`)
+				dispatch(createFileOrFolder({ node: tree, name: `${newCardName}.md` }))
 				setNewCardName("")
 			} else {
 				updateColumnName(
@@ -131,7 +134,7 @@ export const Column: React.FC<{
 								onKeyDown={(e) => {
 									if (e.key === "Enter") {
 										e.preventDefault()
-										createCard(tree, newCardName)
+										dispatch(createFileOrFolder({ node: tree, name: `${newCardName}.md` }))
 										setNewCardName("")
 									}
 								}}

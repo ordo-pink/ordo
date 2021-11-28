@@ -12,6 +12,11 @@ export const fetchFileTree = createAsyncThunk("fileTree/init", (rootPath: string
 	window.fileSystemAPI.listFolder(rootPath),
 )
 
+export const getCurrentPathFromSettings = createAsyncThunk(
+	"fileTree/get-current-path-from-settings",
+	() => window.settingsAPI.get("application.last-open-file"),
+)
+
 export const createFileOrFolder = createAsyncThunk(
 	"fileTree/create",
 	(payload: { node: ArbitraryFolder; name: string }): Promise<ArbitraryFolder | ArbitraryFile> => {
@@ -48,6 +53,7 @@ const fileTreeSlice = createSlice({
 		},
 		setCurrentPath: (state, action: PayloadAction<string>) => {
 			state.currentPath = action.payload
+			window.settingsAPI.set("application.last-open-file", action.payload)
 		},
 	},
 	extraReducers: (builder: ActionReducerMapBuilder<FileTreeState>) => {
@@ -73,9 +79,17 @@ const fileTreeSlice = createSlice({
 			createFileOrFolder.fulfilled,
 			(state, action: PayloadAction<ArbitraryFolder | ArbitraryFile>) => {
 				const folderNode: ArbitraryFolder = findNode(state.tree, "path", action.payload.parent.path)
+
 				folderNode.children.push(action.payload)
-				console.log(action.payload)
+
 				state.tree = sortTree(state.tree)
+			},
+		)
+
+		builder.addCase(
+			getCurrentPathFromSettings.fulfilled,
+			(state, action: PayloadAction<string>) => {
+				state.currentPath = action.payload
 			},
 		)
 	},

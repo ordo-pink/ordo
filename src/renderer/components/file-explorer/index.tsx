@@ -14,21 +14,9 @@ export const FileExplorer: React.FC<{
 	setCurrentFile: (page: string) => void
 	unsavedFiles: string[]
 	depth?: number
-	createFile: (folder: ArbitraryFolder, name: string) => Promise<void>
-	createFolder: (folder: ArbitraryFolder, name: string) => Promise<void>
 	deleteItem: (path: string) => Promise<void>
 	rename: (oldPath: string, newPath: string) => Promise<void>
-}> = ({
-	nestedTree,
-	root,
-	setCurrentFile,
-	unsavedFiles,
-	createFile,
-	deleteItem,
-	createFolder,
-	rename,
-	depth = 1,
-}) => {
+}> = ({ nestedTree, root, setCurrentFile, unsavedFiles, deleteItem, rename, depth = 1 }) => {
 	const currentPath = useAppSelector((state) => state.fileTree.currentPath)
 	const currentTree = nestedTree ? nestedTree : useAppSelector((state) => state.fileTree.tree)
 	const [collapsed, setCollapsed] = React.useState(true)
@@ -47,8 +35,6 @@ export const FileExplorer: React.FC<{
 					collapsed={collapsed}
 					setCollapsed={setCollapsed}
 					folder={currentTree}
-					createFile={createFile}
-					createFolder={createFolder}
 					rename={rename}
 					deleteItem={deleteItem}
 				/>
@@ -68,8 +54,6 @@ export const FileExplorer: React.FC<{
 								/>
 
 								<FileExplorer
-									createFile={createFile}
-									createFolder={createFolder}
 									rename={rename}
 									deleteItem={deleteItem}
 									nestedTree={fileOrFileTree as ArbitraryFolder}

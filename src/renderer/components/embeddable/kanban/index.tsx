@@ -6,60 +6,40 @@ import { DragDropContext, Droppable, DropResult } from "react-beautiful-dnd"
 import { Column } from "./column"
 import { Conditional } from "../../conditional"
 import { findNode } from "../../../../utils/tree"
-import { useAppSelector } from "../../../../renderer/app/hooks"
+import { useAppSelector } from "../../../app/hooks"
+import { useDispatch } from "react-redux"
+import { createFileOrFolder } from "../../../features/file-tree/file-tree-slice"
 
 export const Kanban: React.FC<{
 	folder: string
 }> = ({ folder }) => {
+	const dispatch = useDispatch()
+
 	const tree = useAppSelector((state) =>
 		findNode<ArbitraryFolder>(
 			state.fileTree.tree,
 			"path",
 			state.fileTree.tree.path.concat("/").concat(folder), // TODO: Add path resolution
 		),
-	)
+	) as ArbitraryFolder
+
 	const [isAddingColumn, setIsAddingColumn] = React.useState(false)
 	const [newColumnName, setNewColumnName] = React.useState("")
 
-	const updateFileTree = () => {
-		window.fileSystemAPI.listFolder(folder).then(() => {
-			window.dispatchEvent(new CustomEvent("update-tree"))
-		})
-	}
-
 	const updateColumnName = (oldPath: string, newPath: string) => {
-		window.fileSystemAPI.move(oldPath, newPath).then(updateFileTree)
+		window.fileSystemAPI.move(oldPath, newPath)
 	}
-
-	const createCard = (column: ArbitraryFolder, name: string) => {
-		if (name === ".md") {
-			return
-		}
-
-		window.fileSystemAPI.createFile(column, name).then(updateFileTree)
-	}
-
-	// const createColumn = (column: ArbitraryFolder, name: string) => {
-	// 	// if (findFileByPath(tree, name)) {
-	// 	// 	return
-	// 	// }
-
-	// 	window.fileSystemAPI.createFolder(column, name).then(updateFileTree)
-	// }
 
 	const deleteCard = (cardPath: string) => {
 		window.fileSystemAPI.delete(cardPath)
-		updateFileTree()
 	}
 
 	const onDragEnd = (result: DropResult) => {
 		if (result.source.droppableId !== result.destination.droppableId) {
-			window.fileSystemAPI
-				.move(
-					`${result.source.droppableId}/${result.draggableId}.md`,
-					`${result.destination.droppableId}/${result.draggableId}.md`,
-				)
-				.then(updateFileTree)
+			window.fileSystemAPI.move(
+				`${result.source.droppableId}/${result.draggableId}.md`,
+				`${result.destination.droppableId}/${result.draggableId}.md`,
+			)
 		}
 	}
 
@@ -87,7 +67,6 @@ export const Kanban: React.FC<{
 													tree={column}
 													index={index}
 													updateColumnName={updateColumnName}
-													createCard={createCard}
 													deleteCard={deleteCard}
 												/>
 											),
@@ -109,7 +88,7 @@ export const Kanban: React.FC<{
 					onKeyDown={(e) => {
 						if (e.key === "Enter") {
 							e.preventDefault()
-							// createColumn(tree, newColumnName)
+							dispatch(createFileOrFolder({ name: newColumnName, node: tree }))
 							setNewColumnName("")
 						}
 					}}

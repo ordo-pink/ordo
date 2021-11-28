@@ -8,6 +8,7 @@ import { FileTreeGraph } from "./components/charts/file-tree"
 import {
 	fetchFileTree,
 	getCurrentPathFromSettings,
+	getRootPathFromSettings,
 	setCurrentPath,
 	setRootPath,
 } from "./features/file-tree/file-tree-slice"
@@ -28,23 +29,11 @@ export const App: React.FC = () => {
 
 	React.useEffect(() => {
 		dispatch(getCurrentPathFromSettings())
+		dispatch(getRootPathFromSettings())
 	}, [])
 
 	React.useEffect(() => {
-		window.settingsAPI.get("application.root-folder-path").then((path) => {
-			if (!path) {
-				window.fileSystemAPI.selectRootFolder().then((path) => {
-					dispatch(setCurrentPath(path))
-					dispatch(setRootPath(path))
-				})
-			} else {
-				dispatch(setRootPath(path))
-			}
-		})
-
-		if (rootPath) {
-			dispatch(fetchFileTree(rootPath))
-		}
+		dispatch(fetchFileTree(rootPath))
 	}, [rootPath])
 
 	React.useEffect(() => {
@@ -88,11 +77,6 @@ export const App: React.FC = () => {
 		setUnsavedFiles(unsavedFilesCopy)
 	}
 
-	const assignCurrentPath = (path: string) => {
-		window.settingsAPI.set("application.last-open-file", path)
-		dispatch(setCurrentPath(path))
-	}
-
 	const selectRootDir = (e: React.MouseEvent<HTMLInputElement, MouseEvent>) => {
 		e.preventDefault()
 
@@ -125,7 +109,7 @@ export const App: React.FC = () => {
 						<h2 className="uppercase text-sm text-center text-gray-600 dark:text-gray-500">
 							Explorer
 						</h2>
-						<FileExplorer unsavedFiles={unsavedFiles} root={rootPath} />
+						<FileExplorer unsavedFiles={unsavedFiles} />
 					</div>
 
 					<div className="px-2">

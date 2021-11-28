@@ -9,12 +9,13 @@ import { hasCurrentlyOpenedFile } from "../../../utils/tree"
 import { useAppSelector } from "../../../renderer/app/hooks"
 
 export const FileExplorer: React.FC<{
-	root: string
 	unsavedFiles: string[]
 	nestedTree?: ArbitraryFolder
 	depth?: number
-}> = ({ nestedTree, root, unsavedFiles, depth = 1 }) => {
+}> = ({ nestedTree, unsavedFiles, depth = 1 }) => {
 	const currentPath = useAppSelector((state) => state.fileTree.currentPath)
+	const root = useAppSelector((state) => state.fileTree.rootPath)
+
 	const currentTree = nestedTree ? nestedTree : useAppSelector((state) => state.fileTree.tree)
 	const [collapsed, setCollapsed] = React.useState(true)
 
@@ -44,7 +45,6 @@ export const FileExplorer: React.FC<{
 								<FileExplorer
 									nestedTree={fileOrFileTree as ArbitraryFolder}
 									unsavedFiles={unsavedFiles}
-									root={root}
 									depth={depth + 1}
 								/>
 							</Conditional>

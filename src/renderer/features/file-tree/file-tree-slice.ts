@@ -18,6 +18,10 @@ export const getCurrentPathFromSettings = createAsyncThunk(
 	() => window.settingsAPI.get("application.last-open-file"),
 )
 
+export const getRootPathFromSettings = createAsyncThunk("fileTree/getRootPathFromSettings", () =>
+	window.settingsAPI.get("application.root-folder-path"),
+)
+
 export const deleteFileOrFolder = createAsyncThunk(
 	"filTree/delete",
 	(node: ArbitraryFolder | ArbitraryFile): Promise<ArbitraryFolder | ArbitraryFile> =>
@@ -110,6 +114,10 @@ const fileTreeSlice = createSlice({
 				state.currentPath = action.payload
 			},
 		)
+
+		builder.addCase(getRootPathFromSettings.fulfilled, (state, action: PayloadAction<string>) => {
+			state.rootPath = action.payload
+		})
 
 		builder.addCase(
 			deleteFileOrFolder.fulfilled,

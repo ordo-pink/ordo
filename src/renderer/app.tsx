@@ -1,7 +1,6 @@
 import React from "react"
 
 import { useAppDispatch, useAppSelector } from "./app/hooks"
-import { FileExplorer } from "./components/file-explorer"
 import { Workspace } from "./components/workplace"
 import { Conditional } from "./components/conditional"
 import { FileTreeGraph } from "./components/charts/file-tree"
@@ -13,11 +12,12 @@ import {
 	setRootPath,
 } from "./features/file-tree/file-tree-slice"
 import { hideExplorer, toggleCreator, toggleExplorer, toggleSearcher } from "./features/ui/ui-slice"
+import { Folder } from "./components/file-explorer/folder"
 
 export const App: React.FC = () => {
 	const dispatch = useAppDispatch()
 
-	const status = useAppSelector((state) => state.fileTree.status)
+	const folder = useAppSelector((state) => state.fileTree.tree)
 	const rootPath = useAppSelector((state) => state.fileTree.rootPath)
 	const currentPath = useAppSelector((state) => state.fileTree.currentPath)
 	const showExplorer = useAppSelector((state) => state.ui.showExplorer) // TODO Move explorer to Workspace
@@ -105,11 +105,11 @@ export const App: React.FC = () => {
 
 			<Conditional when={showExplorer}>
 				<div className="fixed right-14 top-0 h-screen overflow-y-auto flex flex-col justify-between w-72 border-l border-gray-300 dark:border-gray-900 py-4 bg-gray-100 dark:bg-gray-700">
-					<div>
+					<div className="pl-2">
 						<h2 className="uppercase text-sm text-center text-gray-600 dark:text-gray-500">
 							Explorer
 						</h2>
-						<FileExplorer unsavedFiles={unsavedFiles} />
+						<Folder unsavedFiles={unsavedFiles} folder={folder} />
 					</div>
 
 					<div className="px-2">

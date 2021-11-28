@@ -1,84 +1,126 @@
-import type { ArbitraryFolder } from "../../../global-context/types"
+import type { ArbitraryFolder, MDFile } from "../../../global-context/types"
 
 import React from "react"
+import { ifElse, tap, pipe } from "ramda"
 
-import { Conditional } from "../conditional"
-import { Emoji } from "../emoji"
-import { useAppDispatch } from "../../app/hooks"
+import { useAppDispatch, useAppSelector } from "../../app/hooks"
 import { toggleCreator } from "../../features/ui/ui-slice"
 import { deleteFileOrFolder, moveFileOrFolder } from "../../features/file-tree/file-tree-slice"
 
-export const Folder: React.FC<{
-	setCollapsed: React.Dispatch<React.SetStateAction<boolean>>
-	collapsed: boolean
-	folder: ArbitraryFolder
-	depth: number
-}> = ({ setCollapsed, collapsed, folder, depth }) => {
+import { Conditional } from "../conditional"
+import { Emoji } from "../emoji"
+import { File } from "./file"
+
+import { hasCurrentlyOpenedFile } from "../../../utils/tree"
+import { isFolder } from "../../../global-context/init"
+
+// TODO Move editing to an onHover three dot menu
+
+type FolderProps = {
+	folder?: ArbitraryFolder
+	depth?: number // TODO Move depth to store
+	unsavedFiles: string[] // TODO No unsaved files
+}
+
+export const Folder: React.FC<FolderProps> = ({ folder, depth = 0, unsavedFiles }) => {
 	const dispatch = useAppDispatch()
+	const rootFolder = useAppSelector((state) => state.fileTree.tree)
+	const currentPath = useAppSelector((state) => state.fileTree.currentPath)
 
-	const [name, setName] = React.useState(folder.readableName)
-	const [isOpen, setIsOpen] = React.useState(false)
+	const [name, setName] = React.useState("")
+	const [isEditing, setIsEditing] = React.useState(false)
+	const [collapsed, setCollapsed] = React.useState(true)
 
+	const tree = folder ? folder : rootFolder
 	const icon = collapsed ? "▶" : "▼"
+	const paddingLeft = `${depth * 20}px`
+	const canEdit = tree && rootFolder && tree.path !== rootFolder.path && !isEditing
+	const subTreeVisibilityClass = collapsed ? "hidden" : "block"
 
-	const toggleFolder = () => {
-		setCollapsed(!collapsed)
-	}
+	React.useEffect(() => {
+		tree && setName(tree.readableName)
+	}, [tree])
+
+	React.useEffect(() => {
+		if (tree && currentPath && hasCurrentlyOpenedFile(tree, currentPath)) {
+			setCollapsed(false)
+		}
+	}, [currentPath, tree])
+
+	const toggleFolder = () => setCollapsed(!collapsed) // TODO Move to store
+
+	const addClickHandler = () => dispatch(toggleCreator(tree))
+	const removeClickHandler = () => dispatch(deleteFileOrFolder(tree))
+	const editClickHandler = () => setIsEditing(true)
+	const nameChangeHandler = (e: React.ChangeEvent<HTMLInputElement>) => setName(e.target.value)
+
+	const isEnter = (e: KeyboardEvent) => e.key === "Enter"
+	const preventDefault = tap((e: Event) => e.preventDefault())
+	const move = tap(() =>
+		dispatch(
+			moveFileOrFolder({
+				node: tree,
+				newPath: tree.path.replace(tree.readableName, name),
+			}),
+		),
+	)
+	const stopEditing = tap(() => setIsEditing(false))
+	const noOp = (): null => null
+
+	const nameKeyDownHandler = ifElse(isEnter, pipe(preventDefault, move, stopEditing), noOp)
 
 	return (
-		<div className="w-full cursor-pointer py-1">
-			<div style={{ paddingLeft: `${depth * 20}px` }} className="flex justify-between select-none">
-				<Conditional when={!isOpen}>
-					<span className="flex-nowrap truncate" onClick={toggleFolder}>
-						<Emoji icon={icon}>{folder.readableName}</Emoji>
-					</span>
-					<input
-						autoFocus={isOpen}
-						className="rounded-lg outline-none p-1 text-left text-xs text-gray-500"
-						value={name}
-						onChange={(e) => setName(e.target.value)}
-						onKeyDown={(e) => {
-							if (e.key === "Enter") {
-								e.preventDefault()
+		tree && (
+			<div className="cursor-pointer py-1">
+				<div className="flex justify-between select-none" style={{ paddingLeft }}>
+					<Conditional when={!isEditing}>
+						<span className="flex-nowrap truncate" onClick={toggleFolder}>
+							<Emoji icon={icon}>{tree.readableName}</Emoji>
+						</span>
+						<input
+							className="rounded-lg outline-none p-1 text-left text-xs text-gray-500"
+							autoFocus={isEditing}
+							value={name} // TODO: Move to Renamer
+							onChange={nameChangeHandler}
+							onKeyDown={nameKeyDownHandler}
+						/>
+					</Conditional>
 
-								dispatch(
-									moveFileOrFolder({
-										node: folder,
-										newPath: folder.path.replace(folder.readableName, name),
-									}),
-								)
+					<div className="flex space-x-2 text-xs pr-2">
+						{canEdit && (
+							<div>
+								<button className="p-1" onClick={addClickHandler}>
+									➕
+								</button>
 
-								setIsOpen(false)
-							}
-						}}
-					/>
-				</Conditional>
+								<button className="p-1" onClick={editClickHandler}>
+									⚙️
+								</button>
+							</div>
+						)}
 
-				<div className="flex space-x-2 text-xs pr-2">
-					{!isOpen && (
-						<div>
-							<button
-								onClick={() => {
-									dispatch(toggleCreator(folder))
-								}}
-								className="p-1"
-							>
-								➕
+						{isEditing && (
+							<button className="p-1" onClick={removeClickHandler}>
+								❌
 							</button>
+						)}
+					</div>
+				</div>
 
-							<button className="p-1" onClick={() => setIsOpen(true)}>
-								⚙️
-							</button>
-						</div>
-					)}
-
-					{isOpen && (
-						<button className="p-1" onClick={() => dispatch(deleteFileOrFolder(folder))}>
-							❌
-						</button>
-					)}
+				<div className={subTreeVisibilityClass}>
+					{tree.children &&
+						tree.children.map((fileOrFolder) => (
+							<Conditional key={fileOrFolder.path} when={isFolder(fileOrFolder)}>
+								<Folder
+									folder={fileOrFolder as ArbitraryFolder}
+									unsavedFiles={unsavedFiles}
+									depth={depth + 1}
+								/>
+								<File unsavedFiles={unsavedFiles} file={fileOrFolder as MDFile} depth={depth} />
+							</Conditional>
+						))}
 				</div>
 			</div>
-		</div>
+		)
 	)
 }

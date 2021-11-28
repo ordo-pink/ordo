@@ -55,7 +55,11 @@ export function createMDFolderFrontmatter(frontmatter: Frontmatter = {}): MDFold
 	}
 }
 
-export function createArbitraryFile(path: Path, stats: Stats): Nullable<ArbitraryFile> {
+export function createArbitraryFile(
+	path: Path,
+	stats: Stats,
+	parent?: ArbitraryFolder,
+): Nullable<ArbitraryFile> {
 	if (!stats.isFile()) {
 		return null
 	}
@@ -73,6 +77,8 @@ export function createArbitraryFile(path: Path, stats: Stats): Nullable<Arbitrar
 		updatedAt: stats.mtime,
 		accessedAt: stats.atime,
 		size: stats.size,
+		parent,
+		children: [],
 	}
 }
 
@@ -88,9 +94,17 @@ export function createMDFile(
 	}
 }
 
-export function createArbitraryFolder(path: Path, stats: Stats): Nullable<ArbitraryFolder> {
+export function createArbitraryFolder(
+	path: Path,
+	stats: Stats,
+	parent?: ArbitraryFolder,
+): Nullable<ArbitraryFolder> {
 	if (!stats.isDirectory()) {
 		return null
+	}
+
+	if (path.endsWith("/")) {
+		path = path.slice(0, -1)
 	}
 
 	const readableName = path.substring(path.lastIndexOf("/") + 1)
@@ -101,6 +115,7 @@ export function createArbitraryFolder(path: Path, stats: Stats): Nullable<Arbitr
 		isFile: false,
 		children: [],
 		id: path,
+		parent,
 	}
 }
 

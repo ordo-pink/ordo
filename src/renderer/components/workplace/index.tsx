@@ -5,14 +5,16 @@ import { WelcomePage } from "./welcome-page"
 import { getCaretPosition, setCaretPosition } from "./caret"
 import { MemoLine } from "./memo-line"
 import { Metadata } from "./metadata"
+import { useAppSelector } from "../../../renderer/app/hooks"
 
 const getDivElement = (index: number): HTMLDivElement =>
 	document.querySelector(`[data-id="${index}"]`)
 
 export const Workspace: React.FC<{
-	currentFilePath: string
 	toggleSaved: (path: string, saved: boolean) => void
-}> = ({ currentFilePath, toggleSaved }) => {
+}> = ({ toggleSaved }) => {
+	const currentPath = useAppSelector((state) => state.fileTree.currentPath)
+
 	const [content, setContent] = React.useState<string[]>([])
 	const [hash, setHash] = React.useState("")
 	const [savedCaretPosition, setSavedCaretPosition] = React.useState(0)
@@ -28,8 +30,8 @@ export const Workspace: React.FC<{
 	}, [savedCaretPosition, currentLine])
 
 	React.useEffect(() => {
-		currentFilePath &&
-			window.fileSystemAPI.getFile(currentFilePath).then((data) => {
+		currentPath &&
+			window.fileSystemAPI.getFile(currentPath).then((data) => {
 				setContent(data.body.split("\n"))
 				setHash(data.hash)
 				setMetadata({
@@ -38,7 +40,7 @@ export const Workspace: React.FC<{
 					hash: undefined,
 				})
 			})
-	}, [hash, currentFilePath])
+	}, [hash, currentPath])
 
 	const onClickEditableDiv = (index: number) => {
 		const element = getDivElement(index)
@@ -49,7 +51,7 @@ export const Workspace: React.FC<{
 	}
 
 	const onChangeEditableDiv = (index: number) => {
-		toggleSaved(currentFilePath, false)
+		toggleSaved(currentPath, false)
 
 		const element = getDivElement(index)
 		const position = getCaretPosition(element)
@@ -74,8 +76,8 @@ export const Workspace: React.FC<{
 		const isLineEnd = savedCaretPosition === content[currentLineIndex].length
 
 		if (event.metaKey && event.key === "s") {
-			window.fileSystemAPI.saveFile(currentFilePath, content.join("\n")).then(() => {
-				toggleSaved(currentFilePath, true)
+			window.fileSystemAPI.saveFile(currentPath, content.join("\n")).then(() => {
+				toggleSaved(currentPath, true)
 			})
 		}
 
@@ -141,7 +143,7 @@ export const Workspace: React.FC<{
 
 				setContent(contentCopy)
 				setCurrentLine(previousLineIndex)
-				toggleSaved(currentFilePath, false)
+				toggleSaved(currentPath, false)
 				setSavedCaretPosition(indexBeforeMergingLines)
 			}
 		}
@@ -160,7 +162,7 @@ export const Workspace: React.FC<{
 
 			setContent(contentCopy)
 			setCurrentLine(nextLineIndex)
-			toggleSaved(currentFilePath, false)
+			toggleSaved(currentPath, false)
 			setSavedCaretPosition(0)
 		}
 
@@ -181,17 +183,17 @@ export const Workspace: React.FC<{
 				setSavedCaretPosition(savedCaretPosition - 1)
 			}
 
-			toggleSaved(currentFilePath, false)
+			toggleSaved(currentPath, false)
 			setContent(contentCopy)
 		}
 	}
 
 	return (
 		<>
-			{Boolean(currentFilePath) && metadata && metadata.readableName && (
+			{Boolean(currentPath) && metadata && metadata.readableName && (
 				<Metadata metadata={metadata} />
 			)}
-			<Conditional when={Boolean(currentFilePath)}>
+			<Conditional when={Boolean(currentPath)}>
 				<form className="pb-80 mb-80 overflow-x-hidden">
 					<div id="editor" className="pb-80 mb-80 font-mono">
 						{content &&

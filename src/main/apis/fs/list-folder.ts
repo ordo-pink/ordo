@@ -1,37 +1,14 @@
 import { promises } from "fs"
 import { join } from "path"
+
+import { sortTree } from "../../../utils/tree"
 import {
 	createArbitraryFolder,
 	createMDFolder,
 	createMDFolderFrontmatter,
-	isFolder,
 } from "../../../global-context/init"
 import { ArbitraryFolder } from "../../../global-context/types"
 import { getMarkdownFile } from "./get-markdown-file"
-
-const sortTree = (tree: ArbitraryFolder) => {
-	tree.children = tree.children.sort((a, b) => {
-		if (isFolder(a)) {
-			sortTree(a)
-		}
-
-		if (isFolder(b)) {
-			sortTree(b)
-		}
-
-		if (!isFolder(a) && isFolder(b)) {
-			return 1
-		}
-
-		if (isFolder(a) && !isFolder(b)) {
-			return -1
-		}
-
-		return a.readableName.localeCompare(b.readableName)
-	})
-
-	return tree
-}
 
 export async function listFolder(path: string): Promise<ArbitraryFolder> {
 	const folder = await promises.readdir(path, { withFileTypes: true, encoding: "utf-8" })

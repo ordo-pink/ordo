@@ -11,7 +11,6 @@ import { useAppSelector } from "../../../renderer/app/hooks"
 export const FileExplorer: React.FC<{
 	nestedTree?: ArbitraryFolder
 	root: string
-	currentFile: string
 	setCurrentFile: (page: string) => void
 	unsavedFiles: string[]
 	depth?: number
@@ -23,7 +22,6 @@ export const FileExplorer: React.FC<{
 	nestedTree,
 	root,
 	setCurrentFile,
-	currentFile,
 	unsavedFiles,
 	createFile,
 	deleteItem,
@@ -31,14 +29,15 @@ export const FileExplorer: React.FC<{
 	rename,
 	depth = 1,
 }) => {
+	const currentPath = useAppSelector((state) => state.fileTree.currentPath)
 	const currentTree = nestedTree ? nestedTree : useAppSelector((state) => state.fileTree.tree)
 	const [collapsed, setCollapsed] = React.useState(true)
 
 	useEffect(() => {
-		if (currentFile && hasCurrentlyOpenedFile(currentTree, currentFile)) {
+		if (currentPath && hasCurrentlyOpenedFile(currentTree, currentPath)) {
 			setCollapsed(false)
 		}
-	}, [currentFile, currentTree])
+	}, [currentPath, currentTree])
 
 	return (
 		currentTree && (
@@ -58,19 +57,16 @@ export const FileExplorer: React.FC<{
 					{currentTree &&
 						currentTree.children &&
 						currentTree.children.map((fileOrFileTree) => (
-							<Conditional
-								key={fileOrFileTree.path}
-								when={!(fileOrFileTree as ArbitraryFolder).children}
-							>
+							<Conditional key={fileOrFileTree.path} when={fileOrFileTree.isFile}>
 								<File
 									unsavedFiles={unsavedFiles}
 									file={fileOrFileTree as MDFile}
-									currentFile={currentFile}
 									depth={depth}
 									deleteItem={deleteItem}
 									rename={rename}
 									setCurrentFile={setCurrentFile}
 								/>
+
 								<FileExplorer
 									createFile={createFile}
 									createFolder={createFolder}
@@ -80,7 +76,6 @@ export const FileExplorer: React.FC<{
 									unsavedFiles={unsavedFiles}
 									root={root}
 									setCurrentFile={setCurrentFile}
-									currentFile={currentFile}
 									depth={depth + 1}
 								/>
 							</Conditional>

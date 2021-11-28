@@ -1,136 +1,95 @@
-import type { ArbitraryFile, ArbitraryFolder, MDFile } from "../global-context/types"
+import type { ArbitraryFolder } from "../global-context/types"
 
 import React from "react"
-import Fuse from "fuse.js"
 
 import { useAppDispatch, useAppSelector } from "./app/hooks"
 
-import { findFileByName } from "../utils/tree"
 import { FileExplorer } from "./components/file-explorer"
 import { Workspace } from "./components/workplace"
-import { isFolder } from "../global-context/init"
 import { Conditional } from "./components/conditional"
 import { FileTreeGraph } from "./components/charts/file-tree"
 import { useDropdown } from "./hooks/use-dropdown"
-import { fetchFileTree } from "./features/file-tree/file-tree-slice"
-
-const createSearchTerms = (data: ArbitraryFolder | ArbitraryFile, terms: any[] = []) => {
-	if (!isFolder(data)) {
-		terms.push({
-			readableName: data.readableName,
-			path: data.path,
-		})
-	} else {
-		for (const child of data.children) {
-			createSearchTerms(child, terms)
-		}
-	}
-
-	return terms
-}
+import {
+	createFileOrFolder,
+	fetchFileTree,
+	setCurrentPath,
+	setRootPath,
+} from "./features/file-tree/file-tree-slice"
+import { hideExplorer, toggleExplorer, toggleSearcher } from "./features/ui/ui-slice"
 
 export const App: React.FC = () => {
 	const dispatch = useAppDispatch()
 
 	const status = useAppSelector((state) => state.fileTree.status)
+	const rootPath = useAppSelector((state) => state.fileTree.rootPath)
+	const currentPath = useAppSelector((state) => state.fileTree.currentPath)
+	const showExplorer = useAppSelector((state) => state.ui.showExplorer) // TODO Move explorer to Workspace
+	const tree = useAppSelector((state) => state.fileTree.tree)
 
-	const [rootPath, setRootPath] = React.useState("")
-	const [currentFilePath, setCurrentFilePath] = React.useState("")
 	const [unsavedFiles, setUnsavedFiles] = React.useState<string[]>([])
 	const [currentView, setCurrentView] = React.useState<"workspace" | "graph" | "settings">(
 		"workspace",
 	)
-	const [displayExplorer, setDisplayExplorer] = React.useState<boolean>(false)
 	const [creatorRef, creatorIsOpen, openCreator, closeCreator] = useDropdown<HTMLDivElement>()
-	const [searcherRef, searcherIsOpen, openSearcher, closeSearcher] = useDropdown<HTMLDivElement>()
 	const [creationName, setCreationName] = React.useState("")
-	const [search, setSearch] = React.useState("")
-	const [searchTerms, setSearchTerms] = React.useState(null)
-	const [fuse, setFuse] = React.useState(null)
-	const [found, setFound] = React.useState(null)
-	const [preselectedSearchItem, setPreselectedSearchItem] = React.useState(0)
 
 	React.useEffect(() => {
-		dispatch(fetchFileTree(rootPath))
+		window.settingsAPI.get("application.root-folder-path").then((path) => {
+			if (!path) {
+				window.fileSystemAPI.selectRootFolder().then((path) => {
+					dispatch(setCurrentPath(path))
+					dispatch(setRootPath(path))
+				})
+			} else {
+				dispatch(setRootPath(path))
+			}
+		})
+
+		if (rootPath) {
+			dispatch(fetchFileTree(rootPath))
+		}
 	}, [rootPath])
 
 	React.useEffect(() => {
-		if (currentFilePath) {
-			window.settingsAPI.set("application.last-open-file", currentFilePath)
+		if (currentPath) {
+			window.settingsAPI.set("application.last-open-file", currentPath)
 		}
-	}, [currentFilePath])
 
-	React.useEffect(() => {
-		if (searchTerms) {
-			setFuse(
-				new Fuse(searchTerms, {
-					includeScore: true,
-					keys: [
-						{ name: "readableName", weight: 0.7 },
-						{ name: "path", weight: 0.3 },
-					],
-				}),
-			)
-		}
+		window.addEventListener("create-file", createFileListener)
+		// window.addEventListener("update-tree", updateFileTreeListener)
+		window.addEventListener("keydown", createFileOrFolderListener)
 
 		return () => {
-			setFuse(null)
+			window.removeEventListener("create-file", createFileListener)
+			// window.removeEventListener("update-tree", updateFileTreeListener)
+			window.removeEventListener("keydown", createFileOrFolderListener)
 		}
-	}, [searchTerms, setFuse])
+	}, [currentPath])
 
-	const updateFileTreeListener = () => {
-		window.fileSystemAPI.listFolder(rootPath).then((data) => {
-			setSearchTerms(createSearchTerms(data))
+	// const updateFileTreeListener = () => {
+	// 	window.fileSystemAPI.listFolder(rootPath).then((data) => {
+	//
 
-			window.settingsAPI.get("application.last-open-file").then(setCurrentFilePath)
-		})
-	}
+	// 		window.settingsAPI.get("application.last-open-file").then((path) => {
+	// 			dispatch(setCurrentPath(path))
+	// 		})
+	// 	})
+	// }
 
 	const createFileOrFolderListener = (e: KeyboardEvent) => {
 		if (e.metaKey && e.key === "n") {
 			e.preventDefault()
-			openCreator()
+			openCreator() // TODO: dispatch(toggleCreator(rootPath))
 		}
 
 		if (e.metaKey && e.key === "p") {
 			e.preventDefault()
-			openSearcher()
+			dispatch(toggleSearcher())
 		}
 
 		if (e.metaKey && e.key === "b" && currentView === "workspace") {
 			e.preventDefault()
-
-			setDisplayExplorer((v) => !v)
-		}
-	}
-
-	const setCurrentFileListener = ({ detail }: CustomEvent) => {
-		if (detail.path.startsWith("https://") || detail.path.startsWith("http://")) {
-			window.shellAPI.openExternal(detail.path)
-		} else if (!detail.path.startsWith("/")) {
-			// TODO
-			// let node: ArbitraryFolder | MDFile = { ...fileTree }
-			// if (~detail.path.indexOf("/")) {
-			// 	const chunks = detail.path.split("/")
-			// 	for (const chunk of chunks) {
-			// 		node = isFolder(node)
-			// 			? (node.children.find((child) => child.readableName === chunk) as MDFile)
-			// 			: node
-			// 		if (node.isFile && chunks.indexOf(chunk) === chunks.length - 1) {
-			// 			setCurrentFilePath(node.path)
-			// 			setCurrentView("workspace")
-			// 		}
-			// 	}
-			// } else {
-			// 	node = findFileByName(fileTree, detail.path)
-			// 	if (node.isFile) {
-			// 		setCurrentFilePath(node.path)
-			// 		setCurrentView("workspace")
-			// 	}
-			// }
-		} else {
-			setCurrentFilePath(detail.path)
-			setCurrentView("workspace")
+			dispatch(toggleExplorer())
 		}
 	}
 
@@ -145,20 +104,6 @@ export const App: React.FC = () => {
 		// 	setCurrentView("workspace")
 		// })
 	}
-
-	React.useEffect(() => {
-		window.addEventListener("set-current-file", setCurrentFileListener)
-		window.addEventListener("create-file", createFileListener)
-		window.addEventListener("update-tree", updateFileTreeListener)
-		window.addEventListener("keydown", createFileOrFolderListener)
-
-		return () => {
-			window.removeEventListener("set-current-file", setCurrentFileListener)
-			window.removeEventListener("create-file", createFileListener)
-			window.removeEventListener("update-tree", updateFileTreeListener)
-			window.removeEventListener("keydown", createFileOrFolderListener)
-		}
-	}, [currentFilePath])
 
 	const toggleUnsavedFileStatus = (path: string, saved: boolean) => {
 		const unsavedFilesCopy = [...unsavedFiles]
@@ -177,53 +122,40 @@ export const App: React.FC = () => {
 			return
 		}
 
-		return window.fileSystemAPI
-			.createFile(folder, `${name}.md`)
-			.then(updateFileTreeListener)
-			.then(() => assignCurrentPath(`${folder.path}/${name}.md`))
+		return (
+			window.fileSystemAPI
+				.createFile(folder, `${name}.md`)
+				// .then(updateFileTreeListener)
+				.then(() => assignCurrentPath(`${folder.path}/${name}.md`))
+		)
 	}
 
 	const createFolder = (folder: ArbitraryFolder, name: string) =>
-		window.fileSystemAPI.createFolder(folder, name).then(updateFileTreeListener)
+		window.fileSystemAPI.createFolder(folder, name)
+	// .then(updateFileTreeListener)
 
-	const rename = (oldPath: string, newPath: string) =>
-		window.fileSystemAPI.move(oldPath, newPath).then(updateFileTreeListener)
+	const rename = (oldPath: string, newPath: string) => window.fileSystemAPI.move(oldPath, newPath)
+	// .then(updateFileTreeListener)
 
 	const deleteItem = (path: string) =>
-		window.fileSystemAPI
-			.delete(path)
-			.then(() => {
-				if (currentFilePath === path) {
-					assignCurrentPath("")
-				}
-			})
-			.then(updateFileTreeListener)
+		window.fileSystemAPI.delete(path).then(() => {
+			if (currentPath === path) {
+				assignCurrentPath("")
+			}
+		})
+	// .then(updateFileTreeListener)
 
 	const assignCurrentPath = (path: string) => {
 		window.settingsAPI.set("application.last-open-file", path)
-		setCurrentFilePath(path)
+		dispatch(setCurrentPath(path))
 	}
-
-	React.useEffect(() => {
-		window.settingsAPI.get("application.root-folder-path").then((path) => {
-			if (!path) {
-				window.fileSystemAPI.selectRootFolder().then((path) => {
-					setCurrentFilePath("")
-					setRootPath(path)
-				})
-			} else {
-				setRootPath(path)
-				updateFileTreeListener()
-			}
-		})
-	}, [rootPath])
 
 	const selectRootDir = (e: React.MouseEvent<HTMLInputElement, MouseEvent>) => {
 		e.preventDefault()
 
 		window.fileSystemAPI.selectRootFolder().then((path) => {
-			setCurrentFilePath("")
-			setRootPath(path)
+			dispatch(setCurrentPath(path))
+			dispatch(setRootPath(path))
 		})
 	}
 
@@ -236,15 +168,15 @@ export const App: React.FC = () => {
 					</div>
 					<div
 						className={`${
-							displayExplorer ? "mr-96" : "mr-14"
+							showExplorer ? "mr-96" : "mr-14"
 						} flex flex-col w-full flex-grow overflow-y-auto overflow-x-auto`}
 					>
-						<Workspace currentFilePath={currentFilePath} toggleSaved={toggleUnsavedFileStatus} />
+						<Workspace toggleSaved={toggleUnsavedFileStatus} />
 					</div>
 				</Conditional>
 			</div>
 
-			<Conditional when={displayExplorer}>
+			<Conditional when={showExplorer}>
 				<div className="fixed right-14 top-0 h-screen overflow-y-auto flex flex-col justify-between w-72 border-l border-gray-300 dark:border-gray-900 py-4 bg-gray-100 dark:bg-gray-700">
 					<div>
 						<h2 className="uppercase text-sm text-center text-gray-600 dark:text-gray-500">
@@ -252,11 +184,10 @@ export const App: React.FC = () => {
 						</h2>
 						<FileExplorer
 							unsavedFiles={unsavedFiles}
-							currentFile={currentFilePath}
 							setCurrentFile={assignCurrentPath}
 							createFile={createFile}
 							deleteItem={deleteItem}
-							createFolder={createFolder}
+							createFolder={createFolder as any}
 							rename={rename}
 							root={rootPath}
 						/>
@@ -280,7 +211,7 @@ export const App: React.FC = () => {
 						setCurrentView("workspace")
 
 						if (currentView === "workspace") {
-							setDisplayExplorer((v) => !v)
+							dispatch(toggleExplorer())
 						}
 					}}
 				>
@@ -290,7 +221,7 @@ export const App: React.FC = () => {
 					className="text-4xl"
 					onClick={() => {
 						setCurrentView("graph")
-						setDisplayExplorer(false)
+						dispatch(hideExplorer())
 					}}
 				>
 					🌲
@@ -299,7 +230,7 @@ export const App: React.FC = () => {
 					className="text-4xl"
 					onClick={() => {
 						setCurrentView("settings")
-						setDisplayExplorer(false)
+						dispatch(hideExplorer())
 					}}
 				>
 					⚙️
@@ -332,11 +263,7 @@ export const App: React.FC = () => {
 									if (e.key === "Enter") {
 										e.preventDefault()
 
-										if (!creationName.endsWith("/")) {
-											// TODO createFile(fileTree, creationName)
-										} else if (creationName.endsWith("/")) {
-											// TODO createFolder(fileTree, creationName)
-										}
+										dispatch(createFileOrFolder({ node: tree, name: creationName }))
 
 										setCreationName("")
 										closeCreator()
@@ -354,94 +281,6 @@ export const App: React.FC = () => {
 							Ending with a <kbd className="bg-pink-300 p-1 rounded-md">/</kbd> will create a
 							folder. Any other case will create an{" "}
 							<kbd className="bg-pink-300 p-1 rounded-md">.md</kbd> file.
-						</div>
-					</div>
-				</div>
-			)}
-
-			{searcherIsOpen && (
-				<div className="fixed top-0 bottom-0 left-0 right-0 bg-gray-900 bg-opacity-40">
-					<div
-						ref={searcherRef}
-						style={{
-							top: "20%",
-							left: "50%",
-							transform: "translate(-50%, 0)",
-							width: "70%",
-							minWidth: "400px",
-						}}
-						className="fixed rounded-lg shadow-xl p-4 bg-gray-50"
-					>
-						<label className="flex-col space-y-2">
-							<span className="text-xl">Looking for something?</span>
-							<input
-								placeholder="Drama queen..."
-								autoFocus={searcherIsOpen}
-								className="w-full outline-none bg-gray-50"
-								type="text"
-								onChange={(e) => {
-									setSearch(e.target.value)
-									setFound(fuse.search(e.target.value))
-
-									if (found && found.length) {
-										setPreselectedSearchItem(0)
-									}
-								}}
-								value={search}
-								onKeyDown={(e) => {
-									if (e.key === "ArrowUp") {
-										e.preventDefault()
-
-										if (preselectedSearchItem === 0) {
-											setPreselectedSearchItem(found.length ? found.length - 1 : 0)
-										} else {
-											setPreselectedSearchItem((item) => item - 1)
-										}
-									}
-
-									if (e.key === "ArrowDown") {
-										e.preventDefault()
-
-										if (preselectedSearchItem === found.length - 1) {
-											setPreselectedSearchItem(0)
-										} else {
-											setPreselectedSearchItem((item) => item + 1)
-										}
-									}
-
-									if (e.key === "Enter") {
-										e.preventDefault()
-
-										setCurrentFilePath(found[preselectedSearchItem].item.path)
-
-										setPreselectedSearchItem(0)
-										setFound(null)
-										setSearch("")
-										closeSearcher()
-									}
-								}}
-							/>
-						</label>
-
-						<div className="rounded-xl shadow-xl mt-4 overflow-y-auto">
-							{found &&
-								found.slice(0, 6).map((page: any, i: number) => (
-									<div
-										onClick={() => {
-											setCurrentFilePath(page.item.path)
-											setFound(null)
-											setPreselectedSearchItem(0)
-											setSearch("")
-										}}
-										key={page.item.path}
-										className={`p-2 w-full flex flex-col space-y-2 cursor-pointer ${
-											preselectedSearchItem === i && " bg-purple-300"
-										}`}
-									>
-										<div className="text-sm text-gray-700">{page.item.readableName}</div>
-										<div className="text-xs text-mono text-gray-500">{page.item.path}</div>
-									</div>
-								))}
 						</div>
 					</div>
 				</div>

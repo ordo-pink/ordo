@@ -1,3 +1,4 @@
+import { FSTree } from "../utils/tree"
 import { AstNode } from "../md-tools/types"
 
 export type Nullable<T> = T | null
@@ -32,10 +33,11 @@ export type Tag = {
 	references: Path[]
 }
 
-export type ArbitraryFile = {
+export interface ArbitraryFile extends FSTree {
 	path: Path
 	readableName: ReadableName
 	extension: FileExtension
+	parent?: ArbitraryFolder
 	isFile: true
 	createdAt: Date
 	updatedAt: Date
@@ -44,11 +46,12 @@ export type ArbitraryFile = {
 	ast?: AstNode
 }
 
-export type ArbitraryFolder = {
+export interface ArbitraryFolder extends FSTree {
 	id: Path
 	path: Path
 	readableName: ReadableName
 	children: Array<ArbitraryFolder | ArbitraryFile>
+	parent?: ArbitraryFolder
 	isFile: false
 	tags?: any
 	links?: any

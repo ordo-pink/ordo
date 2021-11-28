@@ -16,8 +16,8 @@ export interface IFileSystemAPI {
 	getFile: (path: string) => Promise<Hashed<WithBody<MDFile>>>
 	saveFile: (path: string, data: string) => Promise<void>
 	move: (oldPath: string, newPath: string) => Promise<void>
-	createFile: (folder: ArbitraryFolder, name: string) => Promise<void>
-	createFolder: (folder: ArbitraryFolder, name: string) => Promise<string>
+	createFile: (folder: ArbitraryFolder, name: string) => Promise<ArbitraryFile>
+	createFolder: (folder: ArbitraryFolder, name: string) => Promise<ArbitraryFolder>
 	delete: (path: string) => Promise<void>
 	findFileBySubPath: (subPath: string) => Promise<WithBody<MDFile>>
 	selectRootFolder: () => Promise<string>

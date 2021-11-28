@@ -5,20 +5,24 @@ import { DragDropContext, Droppable, DropResult } from "react-beautiful-dnd"
 
 import { Column } from "./column"
 import { Conditional } from "../../conditional"
-import { findFileByPath } from "../../../../utils/tree"
+import { findNode } from "../../../../utils/tree"
+import { useAppSelector } from "../../../../renderer/app/hooks"
 
 export const Kanban: React.FC<{
 	folder: string
 }> = ({ folder }) => {
-	const [tree, setTree] = React.useState({} as ArbitraryFolder)
-	const [hash, setHash] = React.useState("")
+	const tree = useAppSelector((state) =>
+		findNode<ArbitraryFolder>(
+			state.fileTree.tree,
+			"path",
+			state.fileTree.tree.path.concat("/").concat(folder), // TODO: Add path resolution
+		),
+	)
 	const [isAddingColumn, setIsAddingColumn] = React.useState(false)
 	const [newColumnName, setNewColumnName] = React.useState("")
 
 	const updateFileTree = () => {
-		window.fileSystemAPI.listFolder(folder).then((data) => {
-			setTree(data)
-			setHash(data.hash)
+		window.fileSystemAPI.listFolder(folder).then(() => {
 			window.dispatchEvent(new CustomEvent("update-tree"))
 		})
 	}
@@ -35,13 +39,13 @@ export const Kanban: React.FC<{
 		window.fileSystemAPI.createFile(column, name).then(updateFileTree)
 	}
 
-	const createColumn = (column: ArbitraryFolder, name: string) => {
-		if (findFileByPath(tree, name)) {
-			return
-		}
+	// const createColumn = (column: ArbitraryFolder, name: string) => {
+	// 	// if (findFileByPath(tree, name)) {
+	// 	// 	return
+	// 	// }
 
-		window.fileSystemAPI.createFolder(column, name).then(updateFileTree)
-	}
+	// 	window.fileSystemAPI.createFolder(column, name).then(updateFileTree)
+	// }
 
 	const deleteCard = (cardPath: string) => {
 		window.fileSystemAPI.delete(cardPath)
@@ -59,13 +63,6 @@ export const Kanban: React.FC<{
 		}
 	}
 
-	React.useEffect(() => {
-		window.fileSystemAPI.listFolder(folder).then((data) => {
-			setTree(data)
-			setHash(data.hash)
-		})
-	}, [folder, hash])
-
 	return (
 		<div className="overflow-x-auto font-sans bg-gray-50 dark:bg-gray-500 rounded-lg p-4 border border-gray-300 mx-auto">
 			<div className="text-xs mb-2 text-gray-700 dark:text-gray-300 outline-none">
@@ -75,7 +72,7 @@ export const Kanban: React.FC<{
 			<DragDropContext onDragEnd={onDragEnd}>
 				<div>
 					{tree.children && (
-						<Droppable droppableId={tree.path} direction="horizontal" type="column">
+						<Droppable droppableId={tree.path as string} direction="horizontal" type="column">
 							{(provided) => (
 								<div
 									className="flex space-x-2"
@@ -112,7 +109,7 @@ export const Kanban: React.FC<{
 					onKeyDown={(e) => {
 						if (e.key === "Enter") {
 							e.preventDefault()
-							createColumn(tree, newColumnName)
+							// createColumn(tree, newColumnName)
 							setNewColumnName("")
 						}
 					}}

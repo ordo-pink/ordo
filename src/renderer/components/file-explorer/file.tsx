@@ -5,18 +5,20 @@ import React from "react"
 import { useDropdown } from "../../hooks/use-dropdown"
 import { Conditional } from "../conditional"
 import { Emoji } from "../emoji"
+import { useAppSelector } from "../../../renderer/app/hooks"
 
 export const File: React.FC<{
 	file: MDFile
-	currentFile: string
 	depth: number
 	unsavedFiles: string[]
 	setCurrentFile: (page: string) => void
 	deleteItem: (path: string) => Promise<void>
 	rename: (oldPath: string, newPath: string) => Promise<void>
-}> = ({ file, setCurrentFile, currentFile, unsavedFiles, depth, deleteItem, rename }) => {
+}> = ({ file, setCurrentFile, unsavedFiles, depth, deleteItem, rename }) => {
 	const [newName, setNewName] = React.useState(file ? file.readableName : "")
 	const [ref, isOpen, open] = useDropdown<HTMLDivElement>()
+
+	const currentPath = useAppSelector((state) => state.fileTree.currentPath)
 
 	return (
 		file && (
@@ -24,7 +26,7 @@ export const File: React.FC<{
 				style={{ paddingLeft: `${(depth + 1) * 20}px` }}
 				onClick={() => setCurrentFile(file.path)}
 				className={`w-full flex justify-between cursor-pointer py-1 pl-4 select-none truncate ${
-					file.path === currentFile ? "bg-gray-300 dark:bg-gray-600" : ""
+					file.path === currentPath ? "bg-gray-300 dark:bg-gray-600" : ""
 				}`}
 			>
 				<Conditional when={!isOpen}>

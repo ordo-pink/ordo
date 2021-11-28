@@ -1,18 +1,40 @@
-import { createSlice, PayloadAction, createAsyncThunk } from "@reduxjs/toolkit"
-import { ArbitraryFolder } from "../../../global-context/types"
+import {
+	createSlice,
+	PayloadAction,
+	createAsyncThunk,
+	ActionReducerMapBuilder,
+} from "@reduxjs/toolkit"
+import { Hashed } from "../../../main/apis/hash-response"
+import { ArbitraryFile, ArbitraryFolder } from "../../../global-context/types"
+import { findNode, sortTree } from "../../../utils/tree"
 
 export const fetchFileTree = createAsyncThunk("fileTree/init", (rootPath: string) =>
 	window.fileSystemAPI.listFolder(rootPath),
 )
 
+export const createFileOrFolder = createAsyncThunk(
+	"fileTree/create",
+	(payload: { node: ArbitraryFolder; name: string }): Promise<ArbitraryFolder | ArbitraryFile> => {
+		if (payload.name.endsWith("/")) {
+			return window.fileSystemAPI.createFolder(payload.node, payload.name)
+		} else {
+			return window.fileSystemAPI.createFile(payload.node, payload.name)
+		}
+	},
+)
+
 export type FileTreeState = {
 	status: "pending" | "fulfilled" | "rejected"
-	tree: ArbitraryFolder | null
+	rootPath: string
+	currentPath: string
+	tree: ArbitraryFolder
 	errorMessage: string
 }
 
 const initialState: FileTreeState = {
 	status: "pending",
+	rootPath: null,
+	currentPath: null,
 	tree: null,
 	errorMessage: "",
 }
@@ -21,19 +43,22 @@ const fileTreeSlice = createSlice({
 	name: "fileTree",
 	initialState,
 	reducers: {
-		// incremented(state) {
-		// 	state.
-		// },
-		// amountAdded(state, action: PayloadAction<number>) {
-		// 	state.value += action.payload
-		// },
+		setRootPath: (state, action: PayloadAction<string>) => {
+			state.rootPath = action.payload
+		},
+		setCurrentPath: (state, action: PayloadAction<string>) => {
+			state.currentPath = action.payload
+		},
 	},
-	extraReducers: (builder) => {
-		builder.addCase(fetchFileTree.fulfilled, (state, action) => {
-			state.status = "fulfilled"
-			state.tree = action.payload
-			state.errorMessage = ""
-		})
+	extraReducers: (builder: ActionReducerMapBuilder<FileTreeState>) => {
+		builder.addCase(
+			fetchFileTree.fulfilled,
+			(state, action: PayloadAction<Hashed<ArbitraryFolder>>) => {
+				state.status = "fulfilled"
+				state.tree = action.payload
+				state.errorMessage = ""
+			},
+		)
 
 		builder.addCase(fetchFileTree.rejected, (state) => {
 			state.status = "rejected"
@@ -43,9 +68,19 @@ const fileTreeSlice = createSlice({
 		builder.addCase(fetchFileTree.pending, (state) => {
 			state.status = "pending"
 		})
+
+		builder.addCase(
+			createFileOrFolder.fulfilled,
+			(state, action: PayloadAction<ArbitraryFolder | ArbitraryFile>) => {
+				const folderNode: ArbitraryFolder = findNode(state.tree, "path", action.payload.parent.path)
+				folderNode.children.push(action.payload)
+				console.log(action.payload)
+				state.tree = sortTree(state.tree)
+			},
+		)
 	},
 })
 
-// export const { incremented, amountAdded } = fileTreeSlice.actions
+export const { setRootPath, setCurrentPath } = fileTreeSlice.actions
 
 export default fileTreeSlice.reducer

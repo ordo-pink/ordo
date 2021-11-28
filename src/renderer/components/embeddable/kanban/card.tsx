@@ -1,8 +1,10 @@
 import type { MDFile } from "../../../../global-context/types"
 
 import React from "react"
-
 import { Draggable } from "react-beautiful-dnd"
+
+import { useAppDispatch } from "../../../../renderer/app/hooks"
+import { setCurrentPath } from "../../../../renderer/features/file-tree/file-tree-slice"
 
 export const Card: React.FC<{
 	item: MDFile
@@ -12,6 +14,9 @@ export const Card: React.FC<{
 }> = ({ item, index, updateCardName, deleteCard }) => {
 	const [editable, setEditable] = React.useState(false)
 	const ref = React.useRef(null)
+
+	const dispatch = useAppDispatch()
+	const handleOpenButtonClick = () => dispatch(setCurrentPath(item.path))
 
 	const onBlur = () => {
 		updateCardName(item.path, item.path.replace(item.readableName, ref.current.textContent))
@@ -51,17 +56,7 @@ export const Card: React.FC<{
 					</div>
 
 					<div className="flex space-x-2">
-						<button
-							className="text-xl"
-							onClick={(e) => {
-								e.preventDefault()
-								window.dispatchEvent(
-									new CustomEvent("set-current-file", {
-										detail: { path: item.path },
-									}),
-								)
-							}}
-						>
+						<button className="text-xl" onClick={handleOpenButtonClick}>
 							⇱
 						</button>
 

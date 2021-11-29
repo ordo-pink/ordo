@@ -6,7 +6,6 @@ import { Settings } from "./apis/settings"
 import { getMarkdownFile } from "./apis/fs/get-markdown-file"
 import { listFolder } from "./apis/fs/list-folder"
 import { saveFile } from "./apis/fs/save-file"
-import { hashResponse } from "./apis/hash-response"
 import { setTheme } from "./apis/appearance"
 import { move } from "./apis/fs/move"
 import { createFile } from "./apis/fs/create-file"
@@ -126,11 +125,9 @@ ipcMain.handle("fs:list-folder", async (_, path) => {
 	tree.tags = tags
 	tree.links = links
 
-	return hashResponse(tree)
+	return tree
 })
-ipcMain.handle("fs:get-file", async (_, path) =>
-	getMarkdownFile(getAbsolute(path)).then(hashResponse),
-)
+ipcMain.handle("fs:get-file", async (_, path) => getMarkdownFile(getAbsolute(path)))
 ipcMain.handle("fs:save-file", (_, path, data) => saveFile(getAbsolute(path), data))
 ipcMain.handle("fs:move", (_, oldPath, newPath) => move(getAbsolute(oldPath), getAbsolute(newPath)))
 ipcMain.handle("fs:create-file", (_, folder, name) => createFile(folder, name))

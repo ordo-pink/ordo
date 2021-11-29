@@ -4,13 +4,13 @@ import { join } from "path"
 import { promises } from "fs"
 import { createArbitraryFolder, createArbitraryFile } from "../../../global-context/init"
 
-export async function createFile(folder: ArbitraryFolder, name: string): Promise<ArbitraryFile> {
+export async function createFile(parent: ArbitraryFolder, name: string): Promise<ArbitraryFile> {
 	let path: string
 
 	if (name.startsWith("/")) {
 		path = name
 	} else {
-		path = join(folder.path, name)
+		path = join(parent.path, name)
 	}
 
 	const parentNodePath = path.slice(0, path.lastIndexOf("/"))
@@ -23,20 +23,20 @@ export async function createFile(folder: ArbitraryFolder, name: string): Promise
 
 		await promises.writeFile(path, "\n")
 
-		const fileStats = await promises.stat(path)
-		file = createArbitraryFile(path, fileStats, folder)
+		const { mtime, atime, birthtime, size } = await promises.stat(path)
+		file = createArbitraryFile({ path, mtime, atime, birthtime, size, parent })
 	} catch (e) {
 		await promises.mkdir(parentNodePath, { recursive: true })
 		parentNodeStat = await promises.stat(parentNodePath)
 
-		const parentNode = createArbitraryFolder(parentNodePath, parentNodeStat, folder)
+		const parentNode = createArbitraryFolder(parentNodePath, parentNodeStat, parent)
 
 		await promises.writeFile(path, "\n")
 
-		const fileStats = await promises.stat(path)
-		file = createArbitraryFile(path, fileStats, parentNode)
+		const { mtime, atime, birthtime, size } = await promises.stat(path)
+		file = createArbitraryFile({ path, mtime, atime, birthtime, size, parent: parentNode })
 
-		folder.children.push(parentNode)
+		parent.children.push(parentNode)
 	}
 
 	return file

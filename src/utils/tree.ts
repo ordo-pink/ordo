@@ -5,28 +5,28 @@ export interface FSTree<TLeaf = any> extends Record<string, unknown> {
 	children: Array<FSTree<TLeaf> | TLeaf>
 }
 
-function isFSTreeBranch(x: { children?: unknown }): x is FSTree {
-	return x && x.children && Array.isArray(x.children)
-}
-
-export function findNode<
-	N extends Record<string, unknown>,
-	T extends FSTree<N> = FSTree<N>,
-	K extends keyof T = keyof T,
->(tree: T, key: K, value: T[K]): T | N {
+export function findNode<K extends keyof (ArbitraryFolder | ArbitraryFile)>(
+	tree: ArbitraryFolder | ArbitraryFile,
+	key: K,
+	value: K extends keyof ArbitraryFolder ? ArbitraryFolder[K] : ArbitraryFile[K],
+): ArbitraryFolder | ArbitraryFile {
 	if (tree[key] === value) {
 		return tree
 	}
 
+	if (!isFolder(tree)) {
+		return null
+	}
+
 	for (const child of tree.children) {
-		if (isFSTreeBranch(child)) {
-			const found = findNode(child, key as keyof typeof child, value)
+		if (isFolder(child)) {
+			const found = findNode(child, key, value)
 
 			if (found) {
-				return found as T
+				return found
 			}
 		} else {
-			if ((child as T)[key] === value) {
+			if (child[key] === value) {
 				return child
 			}
 		}
@@ -38,7 +38,7 @@ export function findNode<
 export function getParentNode(
 	tree: ArbitraryFolder,
 	node: ArbitraryFolder | ArbitraryFile,
-): ArbitraryFolder | ArbitraryFile {
+): ArbitraryFolder {
 	if (isFolder(tree)) {
 		for (const child of tree.children) {
 			if (child.path === node.path) {

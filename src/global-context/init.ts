@@ -55,31 +55,40 @@ export function createMDFolderFrontmatter(frontmatter: Frontmatter = {}): MDFold
 	}
 }
 
-export function createArbitraryFile(
-	path: Path,
-	stats: Stats,
-	parent?: ArbitraryFolder,
-): Nullable<ArbitraryFile> {
-	if (!stats.isFile()) {
-		return null
-	}
+type CreateArbitraryFileArg = {
+	path: Path
+	birthtime?: Date
+	mtime?: Date
+	atime?: Date
+	size?: number
+	parent?: ArbitraryFolder
+}
 
-	const fileName = path.substring(path.lastIndexOf("/") + 1)
-	const readableName = fileName.substring(0, fileName.lastIndexOf("."))
-	const extension = fileName.substring(fileName.lastIndexOf("."))
+export function createArbitraryFile({
+	path,
+	birthtime,
+	atime,
+	mtime,
+	parent,
+	size = 0,
+}: CreateArbitraryFileArg): ArbitraryFile {
+	const readableName = path.substring(path.lastIndexOf("/") + 1)
+	const extension = readableName.substring(readableName.lastIndexOf("."))
+
+	const createdAt = birthtime ?? new Date()
+	const updatedAt = mtime ?? new Date()
+	const accessedAt = atime ?? new Date()
 
 	return {
-		id: path,
+		isFile: true,
 		path,
 		readableName,
 		extension,
-		isFile: true,
-		createdAt: stats.birthtime,
-		updatedAt: stats.mtime,
-		accessedAt: stats.atime,
-		size: stats.size,
+		createdAt,
+		updatedAt,
+		accessedAt,
+		size,
 		parent,
-		children: [],
 	}
 }
 
@@ -131,10 +140,10 @@ export function createMDFolder(
 	}
 }
 
-export function isFile(x: Record<string, unknown>): x is ArbitraryFile {
+export function isFile(x: any): x is ArbitraryFile {
 	return x && Boolean(x.isFile)
 }
 
-export function isFolder(x: Record<string, unknown>): x is ArbitraryFolder {
+export function isFolder(x: any): x is ArbitraryFolder {
 	return x && !x.isFile
 }

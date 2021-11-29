@@ -4,7 +4,6 @@ import {
 	createAsyncThunk,
 	ActionReducerMapBuilder,
 } from "@reduxjs/toolkit"
-import { Hashed } from "../../../main/apis/hash-response"
 import { ArbitraryFile, ArbitraryFolder } from "../../../global-context/types"
 import { findNode, getParentNode, sortTree } from "../../../utils/tree"
 import { createArbitraryFolder, isFolder } from "../../../global-context/init"
@@ -84,14 +83,11 @@ const fileTreeSlice = createSlice({
 		},
 	},
 	extraReducers: (builder: ActionReducerMapBuilder<FileTreeState>) => {
-		builder.addCase(
-			fetchFileTree.fulfilled,
-			(state, action: PayloadAction<Hashed<ArbitraryFolder>>) => {
-				state.status = "fulfilled"
-				state.tree = action.payload
-				state.errorMessage = ""
-			},
-		)
+		builder.addCase(fetchFileTree.fulfilled, (state, action: PayloadAction<ArbitraryFolder>) => {
+			state.status = "fulfilled"
+			state.tree = action.payload
+			state.errorMessage = ""
+		})
 
 		builder.addCase(fetchFileTree.rejected, (state) => {
 			state.status = "rejected"
@@ -105,7 +101,11 @@ const fileTreeSlice = createSlice({
 		builder.addCase(
 			createFileOrFolder.fulfilled,
 			(state, action: PayloadAction<ArbitraryFolder | ArbitraryFile>) => {
-				const folderNode: ArbitraryFolder = findNode(state.tree, "path", action.payload.parent.path)
+				const folderNode = findNode(
+					state.tree,
+					"path",
+					action.payload.parent.path,
+				) as ArbitraryFolder
 
 				folderNode.children.push(action.payload)
 
@@ -134,7 +134,12 @@ const fileTreeSlice = createSlice({
 					return
 				}
 
-				const removedNode: ArbitraryFolder = findNode(state.tree, "path", action.payload.node.path)
+				const removedNode = findNode(
+					state.tree,
+					"path",
+					action.payload.node.path,
+				) as ArbitraryFolder
+
 				const parent = getParentNode(state.tree, removedNode)
 
 				parent.children = parent.children.filter((child) => child.path !== removedNode.path)
@@ -199,7 +204,9 @@ const fileTreeSlice = createSlice({
 
 			node.readableName = node.path.split("/").reverse()[0].split(".")[0]
 
-			currentNode.children.push(node)
+			if (isFolder(currentNode)) {
+				currentNode.children.push(node)
+			}
 
 			state.tree = sortTree(state.tree)
 		})

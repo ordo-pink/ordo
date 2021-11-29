@@ -31,11 +31,11 @@ export const Kanban: React.FC<{
 
 	const onDragEnd = (result: DropResult) => {
 		if (result.source.droppableId !== result.destination.droppableId) {
-			const node: ArbitraryFolder = findNode(
+			const node = findNode(
 				tree,
 				"path",
 				`${result.source.droppableId}/${result.draggableId}.md`,
-			)
+			) as ArbitraryFolder
 
 			dispatch(
 				moveFileOrFolder({

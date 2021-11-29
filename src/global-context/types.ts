@@ -28,13 +28,12 @@ export type WithFrontmatter<
 	frontmatter: K & Frontmatter
 }
 
-export interface ArbitraryFile extends FSTree {
-	id: Path
+export interface ArbitraryFile {
 	path: Path
+	isFile: true
 	readableName: ReadableName
 	extension: FileExtension
 	parent?: ArbitraryFolder
-	isFile: true
 	createdAt: Date
 	updatedAt: Date
 	accessedAt: Date
@@ -56,10 +55,10 @@ export interface Link {
 export interface ArbitraryFolder extends FSTree {
 	id: Path
 	path: Path
-	readableName: ReadableName
-	children: Array<ArbitraryFolder | ArbitraryFile>
-	parent?: ArbitraryFolder
 	isFile: false
+	readableName: ReadableName
+	parent?: ArbitraryFolder
+	children: Array<ArbitraryFolder | ArbitraryFile>
 	tags: Tag[]
 	links?: Link[]
 }

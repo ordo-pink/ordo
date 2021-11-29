@@ -24,8 +24,13 @@ export const getRootPathFromSettings = createAsyncThunk("fileTree/getRootPathFro
 
 export const deleteFileOrFolder = createAsyncThunk(
 	"filTree/delete",
-	(node: ArbitraryFolder | ArbitraryFile): Promise<ArbitraryFolder | ArbitraryFile> =>
-		window.fileSystemAPI.delete(node.path).then(() => node),
+	(
+		node: ArbitraryFolder | ArbitraryFile,
+	): Promise<{ deleted: boolean; node: ArbitraryFolder | ArbitraryFile }> =>
+		window.fileSystemAPI.delete(node.path).then((deleted) => ({
+			deleted,
+			node,
+		})),
 )
 
 export const createFileOrFolder = createAsyncThunk(
@@ -121,8 +126,15 @@ const fileTreeSlice = createSlice({
 
 		builder.addCase(
 			deleteFileOrFolder.fulfilled,
-			(state, action: PayloadAction<ArbitraryFolder | ArbitraryFile>) => {
-				const removedNode: ArbitraryFolder = findNode(state.tree, "path", action.payload.path)
+			(
+				state,
+				action: PayloadAction<{ deleted: boolean; node: ArbitraryFolder | ArbitraryFile }>,
+			) => {
+				if (!action.payload.deleted) {
+					return
+				}
+
+				const removedNode: ArbitraryFolder = findNode(state.tree, "path", action.payload.node.path)
 				const parent = getParentNode(state.tree, removedNode)
 
 				parent.children = parent.children.filter((child) => child.path !== removedNode.path)

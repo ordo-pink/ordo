@@ -175,7 +175,7 @@ const createWindow = (): void => {
 		}, 300),
 	)
 
-	ipcMain.handle("fs:delete", (_, path: string): Promise<void> => {
+	ipcMain.handle("fs:delete", async (_, path: string): Promise<boolean> => {
 		const response = dialog.showMessageBoxSync(mainWindow, {
 			type: "question",
 			buttons: ["Yes", "No"],
@@ -184,8 +184,10 @@ const createWindow = (): void => {
 		})
 
 		if (response === 0) {
-			return shell.trashItem(path)
+			return shell.trashItem(path).then(() => response === 0)
 		}
+
+		return response === 0
 	})
 
 	ipcMain.handle("fs:select-root-folder", () =>

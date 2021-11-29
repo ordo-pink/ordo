@@ -1,4 +1,4 @@
-import type { ArbitraryFile, ArbitraryFolder } from "../global-context/types"
+import type { OrdoFile, OrdoFolder } from "../global-context/types"
 
 import React from "react"
 import Fuse from "fuse.js"
@@ -13,7 +13,7 @@ interface SearchTerm {
 	path: string
 }
 
-const createSearchTerms = (data: ArbitraryFolder | ArbitraryFile, terms: SearchTerm[] = []) => {
+const createSearchTerms = (data: OrdoFolder | OrdoFile, terms: SearchTerm[] = []) => {
 	if (!isFolder(data)) {
 		terms.push({
 			readableName: data.readableName,
@@ -37,8 +37,8 @@ export const Searcher: React.FC = () => {
 
 	const [search, setSearch] = React.useState("")
 	const [searchTerms, setSearchTerms] = React.useState(null)
-	const [fuse, setFuse] = React.useState<Fuse<ArbitraryFile>>(null)
-	const [found, setFound] = React.useState<Fuse.FuseResult<ArbitraryFile>[]>(null)
+	const [fuse, setFuse] = React.useState<Fuse<OrdoFile>>(null)
+	const [found, setFound] = React.useState<Fuse.FuseResult<OrdoFile>[]>(null)
 	const [preselectedSearchItem, setPreselectedSearchItem] = React.useState(0)
 
 	React.useEffect(() => {

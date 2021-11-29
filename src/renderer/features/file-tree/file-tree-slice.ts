@@ -4,12 +4,12 @@ import {
 	createAsyncThunk,
 	ActionReducerMapBuilder,
 } from "@reduxjs/toolkit"
-import { ArbitraryFile, ArbitraryFolder } from "../../../global-context/types"
+import { OrdoFile, OrdoFolder } from "../../../global-context/types"
 import { findNode, getParentNode, sortTree } from "../../../utils/tree"
-import { createArbitraryFolder, isFolder } from "../../../global-context/init"
+import { createOrdoFolder, isFolder } from "../../../global-context/init"
 
-export const fetchFileTree = createAsyncThunk("fileTree/init", (rootPath: string) =>
-	window.fileSystemAPI.listFolder(rootPath),
+export const fetchFileTree = createAsyncThunk("fileTree/init", (path: string) =>
+	window.fileSystemAPI.listFolder(path),
 )
 
 export const getCurrentPathFromSettings = createAsyncThunk(
@@ -23,9 +23,7 @@ export const getRootPathFromSettings = createAsyncThunk("fileTree/getRootPathFro
 
 export const deleteFileOrFolder = createAsyncThunk(
 	"filTree/delete",
-	(
-		node: ArbitraryFolder | ArbitraryFile,
-	): Promise<{ deleted: boolean; node: ArbitraryFolder | ArbitraryFile }> =>
+	(node: OrdoFolder | OrdoFile): Promise<{ deleted: boolean; node: OrdoFolder | OrdoFile }> =>
 		window.fileSystemAPI.delete(node.path).then((deleted) => ({
 			deleted,
 			node,
@@ -34,7 +32,7 @@ export const deleteFileOrFolder = createAsyncThunk(
 
 export const createFileOrFolder = createAsyncThunk(
 	"fileTree/create",
-	(payload: { node: ArbitraryFolder; name: string }): Promise<ArbitraryFolder | ArbitraryFile> => {
+	(payload: { node: OrdoFolder; name: string }): Promise<OrdoFolder | OrdoFile> => {
 		if (payload.name.endsWith("/")) {
 			return window.fileSystemAPI.createFolder(payload.node, payload.name)
 		} else {
@@ -46,9 +44,9 @@ export const createFileOrFolder = createAsyncThunk(
 export const moveFileOrFolder = createAsyncThunk(
 	"fileTree/move",
 	(payload: {
-		node: ArbitraryFolder | ArbitraryFile
+		node: OrdoFolder | OrdoFile
 		newPath: string
-	}): Promise<{ node: ArbitraryFolder | ArbitraryFile; newPath: string }> =>
+	}): Promise<{ node: OrdoFolder | OrdoFile; newPath: string }> =>
 		window.fileSystemAPI.move(payload.node.path, payload.newPath).then(() => {
 			return payload
 		}),
@@ -58,7 +56,7 @@ export type FileTreeState = {
 	status: "pending" | "fulfilled" | "rejected"
 	rootPath: string
 	currentPath: string
-	tree: ArbitraryFolder
+	tree: OrdoFolder
 	errorMessage: string
 }
 
@@ -83,7 +81,8 @@ const fileTreeSlice = createSlice({
 		},
 	},
 	extraReducers: (builder: ActionReducerMapBuilder<FileTreeState>) => {
-		builder.addCase(fetchFileTree.fulfilled, (state, action: PayloadAction<ArbitraryFolder>) => {
+		builder.addCase(fetchFileTree.fulfilled, (state, action: PayloadAction<OrdoFolder>) => {
+			console.log(action.payload)
 			state.status = "fulfilled"
 			state.tree = action.payload
 			state.errorMessage = ""
@@ -100,12 +99,8 @@ const fileTreeSlice = createSlice({
 
 		builder.addCase(
 			createFileOrFolder.fulfilled,
-			(state, action: PayloadAction<ArbitraryFolder | ArbitraryFile>) => {
-				const folderNode = findNode(
-					state.tree,
-					"path",
-					action.payload.parent.path,
-				) as ArbitraryFolder
+			(state, action: PayloadAction<OrdoFolder | OrdoFile>) => {
+				const folderNode = findNode(state.tree, "path", action.payload.parent) as OrdoFolder
 
 				folderNode.children.push(action.payload)
 
@@ -126,19 +121,12 @@ const fileTreeSlice = createSlice({
 
 		builder.addCase(
 			deleteFileOrFolder.fulfilled,
-			(
-				state,
-				action: PayloadAction<{ deleted: boolean; node: ArbitraryFolder | ArbitraryFile }>,
-			) => {
+			(state, action: PayloadAction<{ deleted: boolean; node: OrdoFolder | OrdoFile }>) => {
 				if (!action.payload.deleted) {
 					return
 				}
 
-				const removedNode = findNode(
-					state.tree,
-					"path",
-					action.payload.node.path,
-				) as ArbitraryFolder
+				const removedNode = findNode(state.tree, "path", action.payload.node.path) as OrdoFolder
 
 				const parent = getParentNode(state.tree, removedNode)
 
@@ -154,11 +142,7 @@ const fileTreeSlice = createSlice({
 
 		builder.addCase(moveFileOrFolder.fulfilled, (state, action) => {
 			const parent = getParentNode(state.tree, action.payload.node)
-			const node: ArbitraryFolder | ArbitraryFile = findNode(
-				state.tree,
-				"path",
-				action.payload.node.path,
-			)
+			const node: OrdoFolder | OrdoFile = findNode(state.tree, "path", action.payload.node.path)
 			parent.children = parent.children.filter((child) => child.path !== action.payload.node.path)
 
 			const fullPath = action.payload.newPath.endsWith("/")
@@ -169,7 +153,7 @@ const fileTreeSlice = createSlice({
 
 			const pathChunks = relativePath.split("/").slice(1, -1)
 
-			let currentNode: ArbitraryFolder | ArbitraryFile = state.tree
+			let currentNode: OrdoFolder | OrdoFile = state.tree
 
 			if (pathChunks.length > 0) {
 				let i = 0
@@ -180,16 +164,17 @@ const fileTreeSlice = createSlice({
 						: currentNode.path.concat("/").concat(pathChunks[i])
 
 					if (isFolder(currentNode)) {
-						let found: ArbitraryFile | ArbitraryFolder = currentNode.children.find(
+						let found: OrdoFile | OrdoFolder = currentNode.children.find(
 							(child) => child.path === newPath,
 						)
 
 						if (!found) {
-							found = createArbitraryFolder(
-								newPath,
-								{ isDirectory: () => true } as any,
-								currentNode,
-							)
+							found = createOrdoFolder({
+								path: newPath,
+								parent: currentNode.path,
+								exists: false,
+							})
+
 							currentNode.children.push(found)
 						}
 

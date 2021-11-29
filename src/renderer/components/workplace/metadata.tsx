@@ -2,15 +2,6 @@ import type { MDFile } from "../../../global-context/types"
 
 import React from "react"
 
-const readableSize = (a: number, b = 2, k = 1024): string => {
-	const d = Math.floor(Math.log(a) / Math.log(k))
-	return 0 == a
-		? "0 Bytes"
-		: `${parseFloat((a / Math.pow(k, d)).toFixed(Math.max(0, b)))} ${
-				["B", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"][d]
-		  }`
-}
-
 const Prop: React.FC<{ name: string; value: string }> = ({ name, value }) => (
 	<div className="flex justify-between text-sm text-gray-500 leading-7">
 		<div className="w-4/12">{name}</div>
@@ -25,7 +16,7 @@ type MetadataProps = {
 export const Metadata: React.FC<MetadataProps> = ({ metadata }) => {
 	const createdAt = metadata.createdAt.toLocaleString()
 	const updatedAt = metadata.updatedAt.toLocaleString()
-	const size = readableSize(metadata.size)
+	const size = metadata.size
 
 	return (
 		metadata &&
@@ -37,7 +28,7 @@ export const Metadata: React.FC<MetadataProps> = ({ metadata }) => {
 					<div className="pt-4">
 						<Prop name="Created" value={createdAt} />
 						<Prop name="Last Updated" value={updatedAt} />
-						<Prop name="Size" value={size} />
+						<Prop name="Size" value={String(size)} />
 					</div>
 				</details>
 			</div>

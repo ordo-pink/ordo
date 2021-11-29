@@ -1,4 +1,4 @@
-import type { ArbitraryFolder } from "../../../global-context/types"
+import type { OrdoFolder } from "../../../global-context/types"
 
 import { createSlice, PayloadAction } from "@reduxjs/toolkit"
 
@@ -6,7 +6,7 @@ export type UiState = {
 	showExplorer: boolean
 	showSearcher: boolean
 	showCreator: boolean
-	createIn: ArbitraryFolder
+	createIn: OrdoFolder
 }
 
 const initialState: UiState = {
@@ -20,7 +20,7 @@ const uiSlice = createSlice({
 	name: "ui",
 	initialState,
 	reducers: {
-		toggleCreator: (state, action?: PayloadAction<ArbitraryFolder>) => {
+		toggleCreator: (state, action?: PayloadAction<OrdoFolder>) => {
 			state.showCreator = !state.showCreator
 			state.createIn = action.payload
 		},
@@ -33,7 +33,7 @@ const uiSlice = createSlice({
 		toggleSearcher: (state) => {
 			state.showSearcher = !state.showSearcher
 		},
-		setCreateIn: (state, action: PayloadAction<ArbitraryFolder>) => {
+		setCreateIn: (state, action: PayloadAction<OrdoFolder>) => {
 			state.createIn = action.payload
 		},
 	},

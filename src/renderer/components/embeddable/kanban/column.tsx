@@ -1,4 +1,4 @@
-import type { ArbitraryFolder, MDFile } from "../../../../global-context/types"
+import type { OrdoFolder, MDFile } from "../../../../global-context/types"
 
 import React from "react"
 import { Draggable, Droppable } from "react-beautiful-dnd"
@@ -18,13 +18,13 @@ export const Column: React.FC<{
 }> = ({ treePath, index }) => {
 	const dispatch = useAppDispatch()
 
-	const rootTree = useAppSelector((state) => state.fileTree.tree) as ArbitraryFolder
+	const rootTree = useAppSelector((state) => state.fileTree.tree) as OrdoFolder
 
-	const [tree, setTree] = React.useState<ArbitraryFolder>(null)
+	const [tree, setTree] = React.useState<OrdoFolder>(null)
 
 	React.useEffect(() => {
 		if (rootTree) {
-			setTree(findNode(rootTree, "path", treePath) as ArbitraryFolder)
+			setTree(findNode(rootTree, "path", treePath) as OrdoFolder)
 		}
 	}, [rootTree, treePath])
 

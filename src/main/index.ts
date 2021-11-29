@@ -11,12 +11,7 @@ import { move } from "./apis/fs/move"
 import { createFile } from "./apis/fs/create-file"
 import { createFolder } from "./apis/fs/create-folder"
 import { findFileBySubPath } from "./apis/fs/find-file-by-subpath"
-import { ArbitraryFolder, ArbitraryFile, MDFile } from "../global-context/types"
-import { parseMarkdown } from "../md-tools/parse"
-import { tokenizeMarkdown } from "../md-tools/tokenise"
-import { visit } from "../md-tools/visit-node"
-import { AstNodeType } from "../md-tools/types"
-import { findFileByPath } from "../utils/tree"
+import { OrdoFolder, OrdoFile } from "../global-context/types"
 
 declare const MAIN_WINDOW_WEBPACK_ENTRY: string
 declare const MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY: string
@@ -27,12 +22,12 @@ const getAbsolute = (path: string) => {
 		: join(Settings.get("application.root-folder-path"), path)
 }
 
-const visitFile = (tree: ArbitraryFolder, cb: (x: ArbitraryFile) => void) => {
+const visitFile = (tree: OrdoFolder, cb: (x: OrdoFile) => void) => {
 	tree.children.forEach((child) => {
 		if (child.isFile) {
 			cb(child)
 		} else {
-			visitFile(child as ArbitraryFolder, cb)
+			visitFile(child as OrdoFolder, cb)
 		}
 	})
 }
@@ -50,80 +45,67 @@ ipcMain.handle("dark-mode:set", (_, theme): ColorTheme => setTheme(theme))
 ipcMain.handle("fs:list-folder", async (_, path) => {
 	const tree = await listFolder(getAbsolute(path))
 
-	const tags: any[] = []
-	const links: any[] = []
+	// const tags: any[] = []
+	// const links: any[] = []
 
 	visitFile(tree, (file) => {
 		if (file.extension === ".md") {
-			const ast = parseMarkdown(tokenizeMarkdown((file as MDFile).body))
-
-			visit(ast)(AstNodeType.TAG, (node) => {
-				let tag: any = tags.find((tag) => tag.name === (node.raw as any))
-
-				if (!tag) {
-					tag = { name: node.raw, children: [], id: node.raw }
-					tags.push(tag)
-				}
-
-				tag.children.push(file)
-			})
-
-			visit(ast)(AstNodeType.WIKI_LINK, (node) => {
-				const link = node.raw.slice(2, -2)
-
-				if (link.startsWith("http:") || link.startsWith("https:")) {
-					return
-				}
-
-				if (link.startsWith("/")) {
-					links.push({
-						source: file.path,
-						target: link,
-						exists: Boolean(findFileByPath(tree, link)),
-						type: "wiki-link",
-					})
-				}
-
-				const linkPath = resolve(tree.path, `${link}.md`)
-
-				links.push({
-					source: file.path,
-					target: linkPath,
-					exists: Boolean(findFileByPath(tree, linkPath)),
-					type: "wiki-link",
-				})
-			})
-
-			visit(ast)(AstNodeType.EMBEDDED_WIKI_LINK, (node) => {
-				const link = node.raw.trim().slice(3, -2)
-
-				if (link.startsWith("http:") || link.startsWith("https:")) {
-					return
-				}
-
-				if (link.startsWith("/")) {
-					links.push({
-						source: file.path,
-						target: link,
-						exists: Boolean(findFileByPath(tree, link)),
-						type: "wiki-link",
-					})
-				}
-
-				const linkPath = resolve(tree.path, `${link}.md`)
-
-				links.push({
-					source: file.path,
-					target: linkPath,
-					exists: Boolean(findFileByPath(tree, linkPath)),
-					type: "embedded-wiki-link",
-				})
-			})
+			// const ast = parseMarkdown(tokenizeMarkdown((file as MDFile).body))
+			// visit(ast)(AstNodeType.TAG, (node) => {
+			// 	let tag: any = tags.find((tag) => tag.name === (node.raw as any))
+			// 	if (!tag) {
+			// 		tag = { name: node.raw, children: [], id: node.raw }
+			// 		tags.push(tag)
+			// 	}
+			// 	tag.children.push(file)
+			// })
+			// visit(ast)(AstNodeType.WIKI_LINK, (node) => {
+			// 	const link = node.raw.slice(2, -2)
+			// 	if (link.startsWith("http:") || link.startsWith("https:")) {
+			// 		return
+			// 	}
+			// 	if (link.startsWith("/")) {
+			// 		links.push({
+			// 			source: file.path,
+			// 			target: link,
+			// 			exists: Boolean(findFileByPath(tree, link)),
+			// 			type: "wiki-link",
+			// 		})
+			// 	}
+			// 	const linkPath = resolve(tree.path, `${link}.md`)
+			// 	links.push({
+			// 		source: file.path,
+			// 		target: linkPath,
+			// 		exists: Boolean(findFileByPath(tree, linkPath)),
+			// 		type: "wiki-link",
+			// 	})
+			// })
+			// visit(ast)(AstNodeType.EMBEDDED_WIKI_LINK, (node) => {
+			// 	const link = node.raw.trim().slice(3, -2)
+			// 	if (link.startsWith("http:") || link.startsWith("https:")) {
+			// 		return
+			// 	}
+			// 	if (link.startsWith("/")) {
+			// 		links.push({
+			// 			source: file.path,
+			// 			target: link,
+			// 			exists: Boolean(findFileByPath(tree, link)),
+			// 			type: "wiki-link",
+			// 		})
+			// 	}
+			// 	const linkPath = resolve(tree.path, `${link}.md`)
+			// 	links.push({
+			// 		source: file.path,
+			// 		target: linkPath,
+			// 		exists: Boolean(findFileByPath(tree, linkPath)),
+			// 		type: "embedded-wiki-link",
+			// 	})
+			// })
 		}
 	})
 
-	tree.tags = tags
-	tree.links = links
+	// tree.tags = tags
+	// tree.links = links
 
 	return tree
 })

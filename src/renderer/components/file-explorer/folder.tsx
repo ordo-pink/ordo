@@ -1,4 +1,4 @@
-import type { ArbitraryFolder, MDFile } from "../../../global-context/types"
+import type { OrdoFolder, MDFile } from "../../../global-context/types"
 
 import React from "react"
 import { ifElse, tap, pipe } from "ramda"
@@ -15,7 +15,7 @@ import { hasCurrentlyOpenedFile } from "../../../utils/tree"
 import { isFolder } from "../../../global-context/init"
 
 type FolderProps = {
-	folder?: ArbitraryFolder
+	folder?: OrdoFolder
 	depth?: number
 	unsavedFiles: string[]
 }
@@ -110,7 +110,7 @@ export const Folder: React.FC<FolderProps> = ({ folder, depth = 0, unsavedFiles 
 						tree.children.map((fileOrFolder) => (
 							<Conditional key={fileOrFolder.path} when={isFolder(fileOrFolder)}>
 								<Folder
-									folder={fileOrFolder as ArbitraryFolder}
+									folder={fileOrFolder as OrdoFolder}
 									unsavedFiles={unsavedFiles}
 									depth={depth + 1}
 								/>

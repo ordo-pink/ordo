@@ -1,5 +1,4 @@
-import { ArbitraryFile, ArbitraryFolder, MDFile, WithBody } from "./global-context/types"
-import type { Hashed } from "./main/apis/hash-response"
+import { OrdoFile, OrdoFolder, MDFile, WithBody } from "./global-context/types"
 import type { Configuration } from "./main/apis/settings/types"
 
 declare global {
@@ -12,12 +11,12 @@ declare global {
 }
 
 export interface IFileSystemAPI {
-	listFolder: (path: string) => Promise<Hashed<ArbitraryFolder>>
-	getFile: (path: string) => Promise<Hashed<WithBody<MDFile>>>
+	listFolder: (path: string) => Promise<OrdoFolder>
+	getFile: (path: string) => Promise<WithBody<MDFile>>
 	saveFile: (path: string, data: string) => Promise<void>
 	move: (oldPath: string, newPath: string) => Promise<void>
-	createFile: (folder: ArbitraryFolder, name: string) => Promise<ArbitraryFile>
-	createFolder: (folder: ArbitraryFolder, name: string) => Promise<ArbitraryFolder>
+	createFile: (folder: OrdoFolder, name: string) => Promise<OrdoFile>
+	createFolder: (folder: OrdoFolder, name: string) => Promise<OrdoFolder>
 	delete: (path: string) => Promise<boolean>
 	findFileBySubPath: (subPath: string) => Promise<WithBody<MDFile>>
 	selectRootFolder: () => Promise<string>

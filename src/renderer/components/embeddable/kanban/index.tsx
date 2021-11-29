@@ -1,4 +1,4 @@
-import type { ArbitraryFolder } from "../../../../global-context/types"
+import type { OrdoFolder } from "../../../../global-context/types"
 
 import React from "react"
 import { DragDropContext, Droppable, DropResult } from "react-beautiful-dnd"
@@ -14,15 +14,13 @@ export const Kanban: React.FC<{
 	folder: string
 }> = ({ folder }) => {
 	const dispatch = useDispatch()
-	const rootTree = useAppSelector((state) => state.fileTree.tree) as ArbitraryFolder
+	const rootTree = useAppSelector((state) => state.fileTree.tree) as OrdoFolder
 
-	const [tree, setTree] = React.useState<ArbitraryFolder>(null)
+	const [tree, setTree] = React.useState<OrdoFolder>(null)
 
 	React.useEffect(() => {
 		if (rootTree) {
-			setTree(
-				findNode(rootTree, "path", rootTree.path.concat("/").concat(folder)) as ArbitraryFolder,
-			)
+			setTree(findNode(rootTree, "path", rootTree.path.concat("/").concat(folder)) as OrdoFolder)
 		}
 	}, [rootTree, folder])
 
@@ -35,7 +33,7 @@ export const Kanban: React.FC<{
 				tree,
 				"path",
 				`${result.source.droppableId}/${result.draggableId}.md`,
-			) as ArbitraryFolder
+			) as OrdoFolder
 
 			dispatch(
 				moveFileOrFolder({
@@ -65,7 +63,7 @@ export const Kanban: React.FC<{
 										{...provided.droppableProps}
 									>
 										{tree.children.map(
-											(column: ArbitraryFolder, index) =>
+											(column: OrdoFolder, index) =>
 												!column.isFile && (
 													<Column key={column.path} treePath={column.path} index={index} />
 												),

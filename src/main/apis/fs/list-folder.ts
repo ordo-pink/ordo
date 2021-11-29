@@ -2,36 +2,45 @@ import { promises } from "fs"
 import { join } from "path"
 
 import { sortTree } from "../../../utils/tree"
-import {
-	createArbitraryFolder,
-	createMDFolder,
-	createMDFolderFrontmatter,
-} from "../../../global-context/init"
-import { ArbitraryFolder } from "../../../global-context/types"
-import { getMarkdownFile } from "./get-markdown-file"
+import { createOrdoFile, createOrdoFolder } from "../../../global-context/init"
+import { OrdoFolder } from "../../../global-context/types"
 
-export async function listFolder(path: string): Promise<ArbitraryFolder> {
+export async function listFolder(
+	path: string,
+	depth = 0,
+	parent: string = null,
+): Promise<OrdoFolder> {
 	const folder = await promises.readdir(path, { withFileTypes: true, encoding: "utf-8" })
-	const stats = await promises.stat(path)
+	const { mtime, atime, birthtime } = await promises.stat(path)
 
-	let tree = createArbitraryFolder(path, stats)
+	const tree = createOrdoFolder({ path, mtime, atime, birthtime, parent, depth, exists: true })
 
 	for (const item of folder) {
 		const newPath = join(path, item.name)
+
 		if (item.isDirectory()) {
-			if (item.name.slice(item.name.lastIndexOf("/") + 1).startsWith(".")) {
+			const isHiddenDirectory = item.name.slice(item.name.lastIndexOf("/") + 1).startsWith(".")
+
+			if (isHiddenDirectory) {
 				continue
 			}
 
-			tree.children.push(await listFolder(newPath))
-		} else if (item.isFile() && item.name.endsWith(".md")) {
-			const mdFile = await getMarkdownFile(newPath)
+			tree.children.push(await listFolder(newPath, depth + 1, tree.path))
+		} else if (item.isFile()) {
+			const { birthtime, mtime, atime, size } = await promises.stat(newPath)
 
-			if (item.name === ".folder-metadata.md") {
-				tree = createMDFolder(tree, createMDFolderFrontmatter(mdFile.frontmatter))
-			} else {
-				tree.children.push(mdFile)
-			}
+			const file = createOrdoFile({
+				path: newPath,
+				birthtime,
+				mtime,
+				atime,
+				size,
+				depth: depth + 1,
+				parent: tree.path,
+				exists: true,
+			})
+
+			tree.children.push(file)
 		}
 	}
 

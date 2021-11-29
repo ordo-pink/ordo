@@ -16,7 +16,7 @@ import {
 
 import { useAppDispatch, useAppSelector } from "../../app/hooks"
 import { setCurrentPath, createFileOrFolder } from "../../features/file-tree/file-tree-slice"
-import { ArbitraryFolder, Tag } from "../../../global-context/types"
+import { OrdoFolder, Tag } from "../../../global-context/types"
 
 type TagNode = {
 	readableName: string
@@ -68,82 +68,81 @@ export const FileTreeGraph: React.FC = () => {
 		const hierarchy = createHierarchy(data)
 
 		const links: Array<
-			HierarchyLink<ArbitraryFolder | TagNode> & {
+			HierarchyLink<OrdoFolder | TagNode> & {
 				pageRelation?: boolean
 				index?: number
 				type?: string
 			}
 		> = hierarchy.links()
-		const nodes: Array<HierarchyNode<ArbitraryFolder> | HierarchyNode<TagNode>> =
-			hierarchy.descendants()
+		const nodes: Array<HierarchyNode<OrdoFolder> | HierarchyNode<TagNode>> = hierarchy.descendants()
 
-		data.links.forEach((link) => {
-			let target
+		// data.links.forEach((link) => {
+		// 	let target
 
-			const source = nodes.find((node) => node.data.path === link.source)
-			const parentNode = nodes.find(
-				(node) => node.data.path === link.target.slice(0, link.target.lastIndexOf("/")),
-			)
+		// 	const source = nodes.find((node) => node.data.path === link.source)
+		// 	const parentNode = nodes.find(
+		// 		(node) => node.data.path === link.target.slice(0, link.target.lastIndexOf("/")),
+		// 	)
 
-			if (!link.exists) {
-				const readableName = link.target.slice(
-					link.target.lastIndexOf("/") + 1,
-					link.target.lastIndexOf("."),
-				)
+		// 	if (!link.exists) {
+		// 		const readableName = link.target.slice(
+		// 			link.target.lastIndexOf("/") + 1,
+		// 			link.target.lastIndexOf("."),
+		// 		)
 
-				target = {
-					path: link.target,
-					data: {
-						readableName,
-						path: link.target,
-						type: "absent",
-						parentNode,
-					},
-				} as unknown as HierarchyNode<ArbitraryFolder>
+		// 		target = {
+		// 			path: link.target,
+		// 			data: {
+		// 				readableName,
+		// 				path: link.target,
+		// 				type: "absent",
+		// 				parentNode,
+		// 			},
+		// 		} as unknown as HierarchyNode<OrdoFolder>
 
-				nodes.push(target)
-			} else {
-				target = nodes.find((node) => node.data.path === link.target)
-			}
+		// 		nodes.push(target)
+		// 	} else {
+		// 		target = nodes.find((node) => node.data.path === link.target)
+		// 	}
 
-			links.push({
-				source,
-				target,
-				pageRelation: true,
-				index: links.length,
-			})
+		// 	links.push({
+		// 		source,
+		// 		target,
+		// 		pageRelation: true,
+		// 		index: links.length,
+		// 	})
 
-			if (parentNode) {
-				links.push({
-					source: parentNode,
-					target,
-					index: links.length,
-				})
-			}
-		})
+		// 	if (parentNode) {
+		// 		links.push({
+		// 			source: parentNode,
+		// 			target,
+		// 			index: links.length,
+		// 		})
+		// 	}
+		// })
 
-		data.tags.forEach((tag: Tag) => {
-			const node = {
-				readableName: tag.name,
-				path: tag.name,
-				type: "tag",
-				data: {
-					readableName: tag.name,
-					path: tag.name,
-					type: "tag",
-				},
-			} as unknown as HierarchyNode<TagNode>
+		// data.tags.forEach((tag: Tag) => {
+		// 	const node = {
+		// 		readableName: tag.name,
+		// 		path: tag.name,
+		// 		type: "tag",
+		// 		data: {
+		// 			readableName: tag.name,
+		// 			path: tag.name,
+		// 			type: "tag",
+		// 		},
+		// 	} as unknown as HierarchyNode<TagNode>
 
-			nodes.push(node)
+		// 	nodes.push(node)
 
-			tag.children.forEach((child) => {
-				links.push({
-					source: node,
-					target: nodes.find((n) => n.data.path === child.path),
-					index: links.length,
-				})
-			})
-		})
+		// 	tag.children.forEach((child) => {
+		// 		links.push({
+		// 			source: node,
+		// 			target: nodes.find((n) => n.data.path === child.path),
+		// 			index: links.length,
+		// 		})
+		// 	})
+		// })
 
 		const simulation: Simulation<SimulationNodeDatum, undefined> = forceSimulation(
 			nodes as unknown as SimulationNodeDatum[],
@@ -180,9 +179,9 @@ export const FileTreeGraph: React.FC = () => {
 			.data(links)
 			.join("line")
 			.attr("stroke", (d) => {
-				if (d.source.data.type === "tag") {
-					return "#EAB464"
-				}
+				// if (d.source.data.type === "tag") {
+				// 	return "#EAB464"
+				// }
 
 				if (d.pageRelation) {
 					return "#DCCCBB"
@@ -190,7 +189,7 @@ export const FileTreeGraph: React.FC = () => {
 
 				return "#646E78"
 			})
-			.attr("stroke-width", (d) => (d.source.data.type === "tag" || d.pageRelation ? 0.8 : null))
+		// .attr("stroke-width", (d) => (d.source.data.type === "tag" || d.pageRelation ? 0.8 : null))
 
 		const node = container
 			.append("g")
@@ -221,13 +220,13 @@ export const FileTreeGraph: React.FC = () => {
 					return "#8D98A7"
 				}
 
-				if (d.data.type === "tag") {
-					return "#EAB464"
-				}
+				// if (d.data.type === "tag") {
+				// 	return "#EAB464"
+				// }
 
-				if (d.data.type === "absent") {
-					return "#DA4167"
-				}
+				// if (d.data.type === "absent") {
+				// 	return "#DA4167"
+				// }
 
 				return "#646E78"
 			})

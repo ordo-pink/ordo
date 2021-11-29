@@ -1,16 +1,13 @@
-import type { ArbitraryFolder } from "../../../global-context/types"
+import type { OrdoFolder } from "../../../global-context/types"
 
 import { promises } from "fs"
 import { join } from "path"
-import { createArbitraryFolder } from "../../../global-context/init"
+import { createOrdoFolder } from "../../../global-context/init"
 
-export async function createFolder(
-	folder: ArbitraryFolder,
-	name: string,
-): Promise<ArbitraryFolder> {
+export async function createFolder(folder: OrdoFolder, name: string): Promise<OrdoFolder> {
 	const path = join(folder.path, name)
-	const folderPath = await promises.mkdir(path, { recursive: true })
-	const stats = await promises.stat(path)
+	await promises.mkdir(path, { recursive: true })
+	const { birthtime, atime, mtime } = await promises.stat(path)
 
-	return createArbitraryFolder(folderPath, stats, folder)
+	return createOrdoFolder({ path, birthtime, atime, mtime, parent: folder.path, exists: true })
 }

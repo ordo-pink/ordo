@@ -1,15 +1,11 @@
 import { isFolder } from "../global-context/init"
-import type { ArbitraryFile, ArbitraryFolder, MDFile } from "../global-context/types"
+import type { OrdoFile, OrdoFolder, MDFile } from "../global-context/types"
 
-export interface FSTree<TLeaf = any> extends Record<string, unknown> {
-	children: Array<FSTree<TLeaf> | TLeaf>
-}
-
-export function findNode<K extends keyof (ArbitraryFolder | ArbitraryFile)>(
-	tree: ArbitraryFolder | ArbitraryFile,
+export function findNode<K extends keyof (OrdoFolder | OrdoFile)>(
+	tree: OrdoFolder | OrdoFile,
 	key: K,
-	value: K extends keyof ArbitraryFolder ? ArbitraryFolder[K] : ArbitraryFile[K],
-): ArbitraryFolder | ArbitraryFile {
+	value: K extends keyof OrdoFolder ? OrdoFolder[K] : OrdoFile[K],
+): OrdoFolder | OrdoFile {
 	if (tree[key] === value) {
 		return tree
 	}
@@ -35,10 +31,7 @@ export function findNode<K extends keyof (ArbitraryFolder | ArbitraryFile)>(
 	return null
 }
 
-export function getParentNode(
-	tree: ArbitraryFolder,
-	node: ArbitraryFolder | ArbitraryFile,
-): ArbitraryFolder {
+export function getParentNode(tree: OrdoFolder, node: OrdoFolder | OrdoFile): OrdoFolder {
 	if (isFolder(tree)) {
 		for (const child of tree.children) {
 			if (child.path === node.path) {
@@ -58,7 +51,7 @@ export function getParentNode(
 	return null
 }
 
-export const sortTree = (tree: ArbitraryFolder): ArbitraryFolder => {
+export const sortTree = (tree: OrdoFolder): OrdoFolder => {
 	tree.children = tree.children.sort((a, b) => {
 		if (isFolder(a)) {
 			sortTree(a)
@@ -82,31 +75,27 @@ export const sortTree = (tree: ArbitraryFolder): ArbitraryFolder => {
 	return tree
 }
 
-export const reduce = <T>(
-	reducer: (acc: T, v: MDFile) => T,
-	accumulator: T,
-	tree: ArbitraryFolder,
-): T =>
+export const reduce = <T>(reducer: (acc: T, v: MDFile) => T, accumulator: T, tree: OrdoFolder): T =>
 	tree.children.reduce(
 		(acc, item) => (isFolder(item) ? reduce(reducer, acc, item) : reducer(acc, item as MDFile)),
 		accumulator,
 	)
 
-export const hasUnsavedFiles = (tree: ArbitraryFolder, unsavedFiles: string[]): boolean =>
+export const hasUnsavedFiles = (tree: OrdoFolder, unsavedFiles: string[]): boolean =>
 	isFolder(tree) && tree.children
 		? tree.children.some((item) =>
 				isFolder(item) ? hasUnsavedFiles(item, unsavedFiles) : unsavedFiles.includes(item.path),
 		  )
 		: false
 
-export const hasCurrentlyOpenedFile = (tree: ArbitraryFolder, path: string): boolean =>
+export const hasCurrentlyOpenedFile = (tree: OrdoFolder, path: string): boolean =>
 	isFolder(tree) && tree.children
 		? tree.children.some((item) =>
 				isFolder(item) ? hasCurrentlyOpenedFile(item, path) : item.path === path,
 		  )
 		: false
 
-export const findFileByPath = (tree: ArbitraryFolder, path: string): MDFile | null => {
+export const findFileByPath = (tree: OrdoFolder, path: string): MDFile | null => {
 	if (tree.isFile) {
 		return tree.path === path ? (tree as any) : null
 	}
@@ -128,7 +117,7 @@ export const findFileByPath = (tree: ArbitraryFolder, path: string): MDFile | nu
 	return null
 }
 
-export const findFileByName = (tree: ArbitraryFolder, name: string): MDFile | null => {
+export const findFileByName = (tree: OrdoFolder, name: string): MDFile | null => {
 	if (tree.isFile) {
 		return tree.readableName === name ? (tree as any) : null
 	}

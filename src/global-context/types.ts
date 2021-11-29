@@ -1,6 +1,3 @@
-import { FSTree } from "../utils/tree"
-import { AstNode } from "../md-tools/types"
-
 export type Nullable<T> = T | null
 
 export type TagName = string
@@ -19,31 +16,33 @@ export type FrontmatterValue =
 
 export type Frontmatter = Record<FrontmatterKey, FrontmatterValue>
 
-export type WithBody<T extends ArbitraryFile> = T & { body: string }
+export type WithBody<T extends OrdoFile> = T & { body: string }
 
 export type WithFrontmatter<
-	T extends ArbitraryFile | ArbitraryFolder,
+	T extends OrdoFile | OrdoFolder,
 	K extends Record<string, unknown>,
 > = T & {
 	frontmatter: K & Frontmatter
 }
 
-export interface ArbitraryFile {
+export interface OrdoFile {
 	path: Path
 	isFile: true
+	exists: boolean
+	depth: number
 	readableName: ReadableName
 	extension: FileExtension
-	parent?: ArbitraryFolder
+	parent?: Path
 	createdAt: Date
 	updatedAt: Date
 	accessedAt: Date
 	size: number
-	ast?: AstNode
+	readableSize: string
 }
 
 export interface Tag {
 	name: TagName
-	children: ArbitraryFile[]
+	children: OrdoFile[]
 }
 
 export interface Link {
@@ -52,15 +51,18 @@ export interface Link {
 	exists: boolean
 }
 
-export interface ArbitraryFolder extends FSTree {
-	id: Path
+export interface OrdoFolder {
 	path: Path
 	isFile: false
+	exists: boolean
+	depth: number
+	collapsed: boolean
 	readableName: ReadableName
-	parent?: ArbitraryFolder
-	children: Array<ArbitraryFolder | ArbitraryFile>
-	tags: Tag[]
-	links?: Link[]
+	createdAt: Date
+	updatedAt: Date
+	accessedAt: Date
+	parent?: Path
+	children: Array<OrdoFolder | OrdoFile>
 }
 
 export type MDFileFrontmatter = {
@@ -79,15 +81,15 @@ export type MDFolderFrontmatter = {
 	locked: boolean
 }
 
-export type MDFolder = WithFrontmatter<ArbitraryFolder, MDFolderFrontmatter>
-export type MDFile = WithBody<WithFrontmatter<ArbitraryFile, MDFileFrontmatter>>
+export type MDFolder = WithFrontmatter<OrdoFolder, MDFolderFrontmatter>
+export type MDFile = WithBody<WithFrontmatter<OrdoFile, MDFileFrontmatter>>
 
 export type MDTree = MDFolder | MDFile
 
 export type Editor = {
 	tabs: Path[]
 	pinnedTabs: Path[]
-	currentTab: WithBody<ArbitraryFile>
+	currentTab: WithBody<OrdoFile>
 }
 
 export type GlobalContext = {

@@ -17,7 +17,6 @@ export const Workspace: React.FC<{
 	const currentPath = useAppSelector((state) => state.fileTree.currentPath)
 
 	const [content, setContent] = React.useState<string[]>([])
-	const [hash, setHash] = React.useState("")
 	const [savedCaretPosition, setSavedCaretPosition] = React.useState(0)
 	const [currentLine, setCurrentLine] = React.useState(0)
 	const [metadata, setMetadata] = React.useState<MDFile>(null)
@@ -34,14 +33,12 @@ export const Workspace: React.FC<{
 		currentPath &&
 			window.fileSystemAPI.getFile(currentPath).then((data) => {
 				setContent(data.body.split("\n"))
-				setHash(data.hash)
 				setMetadata({
 					...data,
 					body: undefined,
-					hash: undefined,
 				})
 			})
-	}, [hash, currentPath])
+	}, [currentPath])
 
 	const onClickEditableDiv = (index: number) => {
 		const element = getDivElement(index)

@@ -1,4 +1,4 @@
-import type { MDFile } from "../../../global-context/types"
+import type { OrdoFile } from "../../../global-context/types"
 
 import React from "react"
 import { tap, pipe, ifElse } from "ramda"
@@ -14,7 +14,7 @@ import { Conditional } from "../conditional"
 import { Emoji } from "../emoji"
 
 export const File: React.FC<{
-	file: MDFile
+	file: OrdoFile
 	depth: number
 	unsavedFiles: string[]
 }> = ({ file, unsavedFiles, depth }) => {

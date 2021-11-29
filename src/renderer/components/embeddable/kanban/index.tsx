@@ -21,11 +21,7 @@ export const Kanban: React.FC<{
 	React.useEffect(() => {
 		if (rootTree) {
 			setTree(
-				findNode(
-					rootTree,
-					"path",
-					rootTree.path.concat("/").concat(folder), // TODO: Add path resolution
-				) as ArbitraryFolder,
+				findNode(rootTree, "path", rootTree.path.concat("/").concat(folder)) as ArbitraryFolder,
 			)
 		}
 	}, [rootTree, folder])

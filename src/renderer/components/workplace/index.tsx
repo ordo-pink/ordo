@@ -169,7 +169,6 @@ export const Workspace: React.FC<{
 
 		if (event.metaKey && event.key === "a") {
 			event.preventDefault()
-			// TODO
 		}
 
 		if (event.key === "Tab") {

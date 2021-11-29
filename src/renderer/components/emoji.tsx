@@ -1,6 +1,10 @@
 import React from "react"
 
-export const Emoji: React.FC<{ icon: string }> = ({ icon, children }) => (
+type EmojiProps = {
+	icon: string
+}
+
+export const Emoji: React.FC<EmojiProps> = ({ icon, children }) => (
 	<span>
 		{icon}&nbsp;&nbsp;{children}
 	</span>

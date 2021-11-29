@@ -1,6 +1,6 @@
 import React from "react"
 import { useAppDispatch, useAppSelector } from "./app/hooks"
-import { createFileOrFolder } from "./features/file-tree/file-tree-slice"
+import { createFileOrFolder, setCurrentPath } from "./features/file-tree/file-tree-slice"
 import { setCreateIn, toggleCreator } from "./features/ui/ui-slice"
 
 export const Creator: React.FC = () => {
@@ -60,6 +60,10 @@ export const Creator: React.FC = () => {
 									e.preventDefault()
 
 									dispatch(createFileOrFolder({ node: createIn, name: creationName }))
+
+									if (!creationName.endsWith("/")) {
+										dispatch(setCurrentPath(`${createIn.path}/${creationName}`))
+									}
 
 									resetState()
 								}

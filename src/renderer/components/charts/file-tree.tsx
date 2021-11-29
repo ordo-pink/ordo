@@ -1,3 +1,5 @@
+import type { SimulationNodeDatum, SimulationLinkDatum, HierarchyLink, HierarchyNode } from "d3"
+
 import React from "react"
 import {
 	hierarchy as createHierarchy,
@@ -12,11 +14,26 @@ import {
 	select,
 } from "d3"
 
-import { useAppSelector } from "../../app/hooks"
+import { useAppDispatch, useAppSelector } from "../../app/hooks"
+import { setCurrentPath, createFileOrFolder } from "../../features/file-tree/file-tree-slice"
+import { ArbitraryFolder, Tag } from "../../../global-context/types"
 
-const drag = (simulation: Simulation<any, any>) =>
+type TagNode = {
+	readableName: string
+	isFile: boolean
+	path: string
+	type: "tag"
+	data: {
+		isFile: boolean
+		readableName: string
+		path: string
+		type: "tag"
+	}
+}
+
+const drag = (simulation: Simulation<SimulationNodeDatum, undefined>) =>
 	d3Drag()
-		.on("start", (event, d: any) => {
+		.on("start", (event, d: SimulationNodeDatum) => {
 			if (!event.active) {
 				simulation.alphaTarget(0.3).restart()
 			}
@@ -24,11 +41,11 @@ const drag = (simulation: Simulation<any, any>) =>
 			d.fx = d.x
 			d.fy = d.y
 		})
-		.on("drag", (event, d: any) => {
+		.on("drag", (event, d: SimulationNodeDatum) => {
 			d.fx = event.x
 			d.fy = event.y
 		})
-		.on("end", (event, d: any) => {
+		.on("end", (event, d: SimulationNodeDatum) => {
 			if (!event.active) {
 				simulation.alphaTarget(0)
 			}
@@ -38,26 +55,34 @@ const drag = (simulation: Simulation<any, any>) =>
 		})
 
 export const FileTreeGraph: React.FC = () => {
-	const svgRef = React.useRef(null)
-
+	const dispatch = useAppDispatch()
 	const data = useAppSelector((state) => state.fileTree.tree)
 
+	const svgRef = React.useRef(null)
+
 	React.useEffect(() => {
-		if (!svgRef) {
+		if (!svgRef || !data) {
 			return
 		}
 
 		const hierarchy = createHierarchy(data)
 
-		const links: any = hierarchy.links()
-		const nodes: any = hierarchy.descendants()
+		const links: Array<
+			HierarchyLink<ArbitraryFolder | TagNode> & {
+				pageRelation?: boolean
+				index?: number
+				type?: string
+			}
+		> = hierarchy.links()
+		const nodes: Array<HierarchyNode<ArbitraryFolder> | HierarchyNode<TagNode>> =
+			hierarchy.descendants()
 
-		data.links.forEach((link: any) => {
+		data.links.forEach((link) => {
 			let target
 
-			const source = nodes.find((node: any) => node.data.path === link.source)
+			const source = nodes.find((node) => node.data.path === link.source)
 			const parentNode = nodes.find(
-				(node: any) => node.data.path === link.target.slice(0, link.target.lastIndexOf("/")),
+				(node) => node.data.path === link.target.slice(0, link.target.lastIndexOf("/")),
 			)
 
 			if (!link.exists) {
@@ -67,19 +92,18 @@ export const FileTreeGraph: React.FC = () => {
 				)
 
 				target = {
-					readableName,
 					path: link.target,
-					type: "absent",
 					data: {
 						readableName,
 						path: link.target,
 						type: "absent",
+						parentNode,
 					},
-				}
+				} as unknown as HierarchyNode<ArbitraryFolder>
 
 				nodes.push(target)
 			} else {
-				target = nodes.find((node: any) => node.data.path === link.target)
+				target = nodes.find((node) => node.data.path === link.target)
 			}
 
 			links.push({
@@ -98,7 +122,7 @@ export const FileTreeGraph: React.FC = () => {
 			}
 		})
 
-		data.tags.forEach((tag: any) => {
+		data.tags.forEach((tag: Tag) => {
 			const node = {
 				readableName: tag.name,
 				path: tag.name,
@@ -108,23 +132,25 @@ export const FileTreeGraph: React.FC = () => {
 					path: tag.name,
 					type: "tag",
 				},
-			}
+			} as unknown as HierarchyNode<TagNode>
 
 			nodes.push(node)
 
-			tag.children.forEach((child: any) => {
+			tag.children.forEach((child) => {
 				links.push({
 					source: node,
-					target: nodes.find((n: any) => n.data.path === child.path),
+					target: nodes.find((n) => n.data.path === child.path),
 					index: links.length,
 				})
 			})
 		})
 
-		const simulation = forceSimulation(nodes)
+		const simulation: Simulation<SimulationNodeDatum, undefined> = forceSimulation(
+			nodes as unknown as SimulationNodeDatum[],
+		)
 			.force(
 				"link",
-				forceLink(links)
+				forceLink(links as unknown as SimulationLinkDatum<SimulationNodeDatum>[])
 					.id((d: any) => d.data.path)
 					.distance(50)
 					.strength(2),
@@ -153,8 +179,8 @@ export const FileTreeGraph: React.FC = () => {
 			.selectAll("line")
 			.data(links)
 			.join("line")
-			.attr("stroke", (d: any) => {
-				if (d.source.type === "tag") {
+			.attr("stroke", (d) => {
+				if (d.source.data.type === "tag") {
 					return "#EAB464"
 				}
 
@@ -164,7 +190,7 @@ export const FileTreeGraph: React.FC = () => {
 
 				return "#646E78"
 			})
-			.attr("stroke-width", (d: any) => (d.source.type === "tag" || d.pageRelation ? 0.8 : null))
+			.attr("stroke-width", (d) => (d.source.data.type === "tag" || d.pageRelation ? 0.8 : null))
 
 		const node = container
 			.append("g")
@@ -178,26 +204,19 @@ export const FileTreeGraph: React.FC = () => {
 			)
 			.attr("stroke-width", 0.5)
 
-			.call(drag(simulation))
+			.call(drag(simulation) as any)
 			.on("click", (_, n: any) => {
 				if (n.data.isFile) {
-					window.dispatchEvent(
-						new CustomEvent("set-current-file", {
-							detail: { path: n.data.path },
-						}),
-					)
-				} else if (n.data.type === "absent") {
-					window.dispatchEvent(
-						new CustomEvent("create-file", {
-							detail: { path: n.data.path },
-						}),
-					)
+					dispatch(setCurrentPath(n.data.path))
+				} else if (n.data.type === "absent" && n.data.parentNode) {
+					dispatch(createFileOrFolder({ name: n.data.readableName, node: n.data.parentNode.data }))
+					dispatch(setCurrentPath(n.data.path))
 				}
 			})
 
 		node
 			.append("circle")
-			.attr("fill", (d: any) => {
+			.attr("fill", (d) => {
 				if (d.data.isFile) {
 					return "#8D98A7"
 				}
@@ -212,7 +231,7 @@ export const FileTreeGraph: React.FC = () => {
 
 				return "#646E78"
 			})
-			.attr("stroke", (d: any) => (d.data.isFile ? null : "#fff"))
+			.attr("stroke", (d) => (d.data.isFile ? null : "#fff"))
 			.attr("r", 3.5)
 
 		node
@@ -223,7 +242,7 @@ export const FileTreeGraph: React.FC = () => {
 			.attr("stroke-width", 0)
 			.attr("fill", "#333")
 			.attr("style", "font-size: 2px")
-			.text((d: any) => d.data.readableName)
+			.text((d) => d.data.readableName)
 
 		simulation.on("tick", () => {
 			link

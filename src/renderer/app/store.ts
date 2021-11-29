@@ -8,7 +8,6 @@ import uiReducer from "../features/ui/ui-slice"
 // const mw: ThunkMiddleware<{ fileTree: FileTreeState; ui: UiState }> =
 // 	(api) => (next) => (action) => {
 // 		{
-// TODO: Save state in one go to avoid indexing
 // 			return next(action)
 // 		}
 // 	}

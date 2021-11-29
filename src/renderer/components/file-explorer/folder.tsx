@@ -14,12 +14,10 @@ import { File } from "./file"
 import { hasCurrentlyOpenedFile } from "../../../utils/tree"
 import { isFolder } from "../../../global-context/init"
 
-// TODO Move editing to an onHover three dot menu
-
 type FolderProps = {
 	folder?: ArbitraryFolder
-	depth?: number // TODO Move depth to store
-	unsavedFiles: string[] // TODO No unsaved files
+	depth?: number
+	unsavedFiles: string[]
 }
 
 export const Folder: React.FC<FolderProps> = ({ folder, depth = 0, unsavedFiles }) => {
@@ -47,7 +45,7 @@ export const Folder: React.FC<FolderProps> = ({ folder, depth = 0, unsavedFiles 
 		}
 	}, [currentPath, tree])
 
-	const toggleFolder = () => setCollapsed(!collapsed) // TODO Move to store
+	const toggleFolder = () => setCollapsed(!collapsed)
 
 	const addClickHandler = () => dispatch(toggleCreator(tree))
 	const removeClickHandler = () => dispatch(deleteFileOrFolder(tree))
@@ -80,7 +78,7 @@ export const Folder: React.FC<FolderProps> = ({ folder, depth = 0, unsavedFiles 
 						<input
 							className="rounded-lg outline-none p-1 text-left text-xs text-gray-500"
 							autoFocus={isEditing}
-							value={name} // TODO: Move to Renamer
+							value={name}
 							onChange={nameChangeHandler}
 							onKeyDown={nameKeyDownHandler}
 						/>

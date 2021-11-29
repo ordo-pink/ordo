@@ -20,7 +20,7 @@ export const App: React.FC = () => {
 	const folder = useAppSelector((state) => state.fileTree.tree)
 	const rootPath = useAppSelector((state) => state.fileTree.rootPath)
 	const currentPath = useAppSelector((state) => state.fileTree.currentPath)
-	const showExplorer = useAppSelector((state) => state.ui.showExplorer) // TODO Move explorer to Workspace
+	const showExplorer = useAppSelector((state) => state.ui.showExplorer)
 
 	const [unsavedFiles, setUnsavedFiles] = React.useState<string[]>([])
 	const [currentView, setCurrentView] = React.useState<"workspace" | "graph" | "settings">(
@@ -33,7 +33,7 @@ export const App: React.FC = () => {
 	}, [])
 
 	React.useEffect(() => {
-		dispatch(fetchFileTree(rootPath))
+		rootPath && dispatch(fetchFileTree(rootPath))
 	}, [rootPath])
 
 	React.useEffect(() => {
@@ -89,7 +89,7 @@ export const App: React.FC = () => {
 	return (
 		<div className="flex">
 			<div className="flex flex-grow w-full overflow-y-hidden overflow-x-hidden">
-				<Conditional when={currentView === "graph" && status === "fulfilled"}>
+				<Conditional when={currentView === "graph"}>
 					<div className="flex flex-col w-full flex-grow">
 						<FileTreeGraph />
 					</div>

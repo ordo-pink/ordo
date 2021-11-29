@@ -185,7 +185,7 @@ const fileTreeSlice = createSlice({
 
 			node.path = action.payload.newPath
 
-			node.readableName = node.path.split("/").reverse()[0].split(".")[0] // TODO FIX THIS!
+			node.readableName = node.path.split("/").reverse()[0].split(".")[0]
 
 			currentNode.children.push(node)
 

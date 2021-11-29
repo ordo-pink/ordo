@@ -24,13 +24,7 @@ export const Column: React.FC<{
 
 	React.useEffect(() => {
 		if (rootTree) {
-			setTree(
-				findNode(
-					rootTree,
-					"path",
-					treePath, // TODO: Add path resolution
-				) as ArbitraryFolder,
-			)
+			setTree(findNode(rootTree, "path", treePath) as ArbitraryFolder)
 		}
 	}, [rootTree, treePath])
 

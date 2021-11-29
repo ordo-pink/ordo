@@ -289,8 +289,6 @@ export function parseMarkdown(
 				tokenSet = next()
 			}
 
-			// TODO: Extracting language and removing \n when passed inside inline parse
-
 			preservedTokens.push(tokenSet.token)
 			tokenSet = next()
 			preservedTokens.push(tokenSet.token)

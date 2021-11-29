@@ -28,11 +28,6 @@ export type WithFrontmatter<
 	frontmatter: K & Frontmatter
 }
 
-export type Tag = {
-	name: TagName
-	references: Path[]
-}
-
 export interface ArbitraryFile extends FSTree {
 	id: Path
 	path: Path
@@ -47,6 +42,17 @@ export interface ArbitraryFile extends FSTree {
 	ast?: AstNode
 }
 
+export interface Tag {
+	name: TagName
+	children: ArbitraryFile[]
+}
+
+export interface Link {
+	source: Path
+	target: Path
+	exists: boolean
+}
+
 export interface ArbitraryFolder extends FSTree {
 	id: Path
 	path: Path
@@ -54,8 +60,8 @@ export interface ArbitraryFolder extends FSTree {
 	children: Array<ArbitraryFolder | ArbitraryFile>
 	parent?: ArbitraryFolder
 	isFile: false
-	tags?: any
-	links?: any
+	tags: Tag[]
+	links?: Link[]
 }
 
 export type MDFileFrontmatter = {

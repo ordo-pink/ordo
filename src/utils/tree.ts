@@ -82,8 +82,6 @@ export const sortTree = (tree: ArbitraryFolder): ArbitraryFolder => {
 	return tree
 }
 
-// TODO: Deprecate
-
 export const reduce = <T>(
 	reducer: (acc: T, v: MDFile) => T,
 	accumulator: T,

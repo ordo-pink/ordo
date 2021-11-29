@@ -115,6 +115,7 @@ export function createArbitraryFolder(
 		readableName,
 		isFile: false,
 		children: [],
+		tags: [],
 		id: path,
 		parent,
 	}

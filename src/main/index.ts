@@ -149,12 +149,6 @@ ipcMain.handle("settings:get", (_, key) => Settings.get(key))
 ipcMain.handle("shell:open-external", (_, url) => shell.openExternal(url))
 
 const createWindow = (): void => {
-	// TODO: mainWindow.setProgressBar
-	// TODO: mainWindow.setRepresentedFileName - shows path to the given file in the title bar
-	// TODO: mainWindow.setDocumentEdited - shows the icon as gray if set to true
-	// TODO: Getting files served with a custom protocol (ordo-fork://)
-	// TODO: app.addRecentDocument
-	// TODO: app.dock - for MacOS Dock
 	const mainWindow = new BrowserWindow({
 		width: Settings.get("window.main-window.width"),
 		height: Settings.get("window.main-window.height"),

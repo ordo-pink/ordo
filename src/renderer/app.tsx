@@ -67,6 +67,15 @@ export const App: React.FC = () => {
 			e.preventDefault()
 			dispatch(toggleExplorer())
 		}
+
+		if (e.metaKey && e.shiftKey && e.key === "e") {
+			e.preventDefault()
+			dispatch(setCurrentView("workspace"))
+
+			if (!showExplorer) {
+				dispatch(toggleExplorer())
+			}
+		}
 	}
 
 	const toggleUnsavedFileStatus = (path: string, saved: boolean) => {

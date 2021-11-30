@@ -145,7 +145,7 @@ export function createOrdoFolder({
 	children = [],
 }: CreateOrdoFolderArg): OrdoFolder {
 	const splittablePath = path.endsWith("/") ? path.slice(0, -1) : path
-	const readableName = splittablePath.substring(path.lastIndexOf("/") + 1)
+	const readableName = splittablePath.slice(splittablePath.lastIndexOf("/") + 1)
 	const createdAt = birthtime ?? new Date()
 	const updatedAt = mtime ?? new Date()
 	const accessedAt = atime ?? new Date()

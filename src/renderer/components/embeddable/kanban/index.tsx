@@ -3,31 +3,60 @@ import type { OrdoFolder } from "../../../../global-context/types"
 import React from "react"
 import { DragDropContext, Droppable, DropResult } from "react-beautiful-dnd"
 
+import { useAppDispatch, useAppSelector } from "../../../app/hooks"
+import { createFileOrFolder, moveFileOrFolder } from "../../../features/file-tree/file-tree-slice"
+
 import { Column } from "./column"
 import { Conditional } from "../../conditional"
+
 import { findNode } from "../../../../utils/tree"
-import { useAppSelector } from "../../../app/hooks"
-import { useDispatch } from "react-redux"
-import { createFileOrFolder, moveFileOrFolder } from "../../../features/file-tree/file-tree-slice"
+import { escapeSlashes } from "../../../../utils/string"
 
 export const Kanban: React.FC<{
 	folder: string
 }> = ({ folder }) => {
-	const dispatch = useDispatch()
+	const dispatch = useAppDispatch()
 	const rootTree = useAppSelector((state) => state.fileTree.tree) as OrdoFolder
 
 	const [tree, setTree] = React.useState<OrdoFolder>(null)
+	const [isAddingColumn, setIsAddingColumn] = React.useState(false)
+	const [newColumnName, setNewColumnName] = React.useState("")
 
 	React.useEffect(() => {
 		if (rootTree) {
 			setTree(findNode(rootTree, "path", rootTree.path.concat("/").concat(folder)) as OrdoFolder)
 		}
-	}, [rootTree, folder])
+	}, [rootTree, folder, tree])
 
-	const [isAddingColumn, setIsAddingColumn] = React.useState(false)
-	const [newColumnName, setNewColumnName] = React.useState("")
+	const unsavedNewCardChangesClass =
+		!isAddingColumn && Boolean(newColumnName) && "border-yellow-700 text-yellow-700"
+	const hasUnsavedNewCardChanges = !isAddingColumn && Boolean(newColumnName)
 
-	const onDragEnd = (result: DropResult) => {
+	const addNewCardButtonClickHandler = () => setIsAddingColumn(true)
+	const newColumnNameChangeHandler = (e: React.ChangeEvent<HTMLInputElement>) =>
+		setNewColumnName(e.target.value)
+	const newColumnNameBlurHandler = () => setIsAddingColumn(false)
+	const newColumnNameKeyDownHandler = (e: React.KeyboardEvent<HTMLInputElement>) => {
+		if (e.key === "Enter") {
+			e.preventDefault()
+			dispatch(
+				createFileOrFolder({
+					name: newColumnName.endsWith("/")
+						? escapeSlashes(newColumnName)
+						: `${escapeSlashes(newColumnName)}/`,
+					node: tree,
+				}),
+			)
+			setNewColumnName("")
+		}
+
+		if (e.key === "Escape") {
+			e.preventDefault()
+			setNewColumnName("")
+			setIsAddingColumn(false)
+		}
+	}
+	const dragEndHandler = (result: DropResult) => {
 		const name = result.draggableId.endsWith(".md")
 			? result.draggableId
 			: `${result.draggableId}.md`
@@ -38,7 +67,7 @@ export const Kanban: React.FC<{
 		if (result.source.droppableId !== result.destination.droppableId) {
 			const node = findNode(tree, "path", oldPath) as OrdoFolder
 
-			dispatch(moveFileOrFolder({ node, newPath }))
+			dispatch(moveFileOrFolder({ node, newPath: escapeSlashes(newPath) }))
 		}
 	}
 
@@ -50,10 +79,10 @@ export const Kanban: React.FC<{
 					{tree.readableName}
 				</div>
 
-				<DragDropContext onDragEnd={onDragEnd}>
+				<DragDropContext onDragEnd={dragEndHandler}>
 					<div>
 						{tree.children && (
-							<Droppable droppableId={tree.path as string} direction="horizontal" type="column">
+							<Droppable droppableId={tree.path} direction="horizontal" type="column">
 								{(provided) => (
 									<div
 										className="flex space-x-2"
@@ -76,41 +105,22 @@ export const Kanban: React.FC<{
 
 				<Conditional when={isAddingColumn}>
 					<input
-						autoFocus={isAddingColumn}
 						className="mt-2 w-72 outline-none text-left rounded-lg p-2 text-xs text-gray-500 border border-dashed border-gray-500"
+						autoFocus={isAddingColumn}
 						value={newColumnName}
-						onChange={(e) => setNewColumnName(e.target.value)}
-						onKeyDown={(e) => {
-							if (e.key === "Enter") {
-								e.preventDefault()
-								dispatch(
-									createFileOrFolder({
-										name: newColumnName.endsWith("/") ? newColumnName : `${newColumnName}/`,
-										node: tree,
-									}),
-								)
-								setNewColumnName("")
-							}
-
-							if (e.key === "Escape") {
-								e.preventDefault()
-								setNewColumnName("")
-								setIsAddingColumn(false)
-							}
-						}}
-						onBlur={() => setIsAddingColumn(false)}
+						onChange={newColumnNameChangeHandler}
+						onKeyDown={newColumnNameKeyDownHandler}
+						onBlur={newColumnNameBlurHandler}
 					/>
-					<button
-						onClick={() => setIsAddingColumn(true)}
-						className={`mt-2 w-72 text-left rounded-lg p-2 text-xs text-gray-500 border border-dashed border-gray-500 ${
-							!isAddingColumn && Boolean(newColumnName) && "border-yellow-700 text-yellow-700"
-						}`}
+					<div
+						onClick={addNewCardButtonClickHandler}
+						className={`mt-2 w-72 text-left rounded-lg p-2 text-xs text-gray-500 border border-dashed border-gray-500 ${unsavedNewCardChangesClass}`}
 					>
 						+ Add column
-						<Conditional when={!isAddingColumn && Boolean(newColumnName)}>
+						<Conditional when={hasUnsavedNewCardChanges}>
 							<span className="ml-4">🟡</span>
 						</Conditional>
-					</button>
+					</div>
 				</Conditional>
 			</div>
 		)

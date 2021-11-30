@@ -2,27 +2,33 @@ import type { OrdoFolder, MDFile } from "../../../../global-context/types"
 
 import React from "react"
 import { Draggable, Droppable } from "react-beautiful-dnd"
-import { Card } from "./card"
-import { Conditional } from "../../conditional"
+
 import { useAppDispatch, useAppSelector } from "../../../app/hooks"
 import {
 	createFileOrFolder,
 	deleteFileOrFolder,
 	moveFileOrFolder,
 } from "../../../features/file-tree/file-tree-slice"
+
+import { Card } from "./card"
+import { Conditional } from "../../conditional"
+
 import { findNode } from "../../../../utils/tree"
+import { escapeSlashes } from "../../../../utils/string"
 
 export const Column: React.FC<{
 	treePath: string
 	index: number
 }> = ({ treePath, index }) => {
 	const dispatch = useAppDispatch()
+	const rootTree = useAppSelector((state) => state.fileTree.tree) as OrdoFolder
 
 	const ref = React.useRef<HTMLDivElement>(null)
 
-	const rootTree = useAppSelector((state) => state.fileTree.tree) as OrdoFolder
-
 	const [tree, setTree] = React.useState<OrdoFolder>(null)
+	const [isAddingCardAtTheTop, setIsAddingCardAtTheTop] = React.useState(false)
+	const [isAddingCardAtTheBottom, setIsAddingCardAtTheBottom] = React.useState(false)
+	const [newCardName, setNewCardName] = React.useState("")
 
 	React.useEffect(() => {
 		if (rootTree) {
@@ -30,22 +36,33 @@ export const Column: React.FC<{
 		}
 	}, [rootTree, treePath])
 
-	const [isAddingCardAtTheTop, setIsAddingCardAtTheTop] = React.useState(false)
-	const [isAddingCardAtTheBottom, setIsAddingCardAtTheBottom] = React.useState(false)
-	const [newCardName, setNewCardName] = React.useState("")
+	const newCardInputHasUnsavedChangesClass =
+		!isAddingCardAtTheTop && Boolean(newCardName) && "border-yellow-700 text-yellow-700"
+	const showNewCardInputHasUnsavedChanges = !isAddingCardAtTheTop && Boolean(newCardName)
 
+	const newCardNameChangeHandler = (e: React.ChangeEvent<HTMLInputElement>) =>
+		setNewCardName(e.target.value)
+	const bottomCardInputClickHandler = () => setIsAddingCardAtTheBottom(true)
+	const topCardInputClickHandler = () => setIsAddingCardAtTheTop(true)
+	const clickRemoveColumnHandler = () => dispatch(deleteFileOrFolder(tree))
+	const onBlur = () => {
+		ref.current.textContent = tree.readableName
+		ref.current.blur()
+		setIsAddingCardAtTheBottom(false)
+		setIsAddingCardAtTheTop(false)
+	}
 	const onKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
 		if (e.key === "Enter") {
 			e.preventDefault()
 
 			if (isAddingCardAtTheBottom || isAddingCardAtTheTop) {
-				dispatch(createFileOrFolder({ node: tree, name: `${newCardName}.md` }))
+				dispatch(createFileOrFolder({ node: tree, name: `${escapeSlashes(newCardName)}.md` }))
 				setNewCardName("")
 			} else {
 				dispatch(
 					moveFileOrFolder({
 						node: tree,
-						newPath: tree.path.replace(tree.readableName, ref.current.textContent),
+						newPath: tree.path.replace(tree.readableName, escapeSlashes(ref.current.textContent)),
 					}),
 				)
 			}
@@ -64,11 +81,6 @@ export const Column: React.FC<{
 		}
 	}
 
-	const onBlur = () => {
-		ref.current.textContent = tree.readableName
-		ref.current.blur()
-	}
-
 	return (
 		tree && (
 			<Draggable draggableId={tree.path} index={index}>
@@ -76,32 +88,35 @@ export const Column: React.FC<{
 					<div
 						ref={provided.innerRef}
 						{...provided.draggableProps}
-						style={{ minWidth: "18rem", maxWidth: "18rem" }}
 						className="bg-gray-200 dark:bg-gray-600 rounded-lg shadow-md flex flex-col pb-2 space-y-2"
+						style={{ minWidth: "16rem", maxWidth: "16rem" }}
 					>
 						<div className="flex justify-between items-center p-2">
 							<div
+								className="text-center outline-none text-xs"
 								ref={ref}
 								contentEditable={true}
 								suppressContentEditableWarning={true}
-								className="text-center outline-none text-xs"
 								onBlur={onBlur}
 								onKeyDown={onKeyDown}
 							>
 								{tree.readableName}
 							</div>
 
-							<div className="flex space-x-2 items-center">
-								<button
-									className="text-sxl"
-									onClick={() => {
-										dispatch(deleteFileOrFolder(tree))
-									}}
+							<div className="flex space-x-2 items-center text-gray-500">
+								<div
+									className="text-xl hover:text-black cursor-pointer"
+									title="Remove this column"
+									onClick={clickRemoveColumnHandler}
 								>
 									⤫
-								</button>
+								</div>
 
-								<div className="text-2xl" {...provided.dragHandleProps}>
+								<div
+									className="text-xl hover:text-black"
+									title="Hold to drag the column"
+									{...provided.dragHandleProps}
+								>
 									𐄞
 								</div>
 							</div>
@@ -109,23 +124,19 @@ export const Column: React.FC<{
 
 						<Conditional when={isAddingCardAtTheTop}>
 							<input
-								autoFocus={isAddingCardAtTheTop}
 								className="rounded-lg outline-none mx-2 p-2 text-left text-xs text-gray-500 border border-dashed border-gray-500"
+								autoFocus={isAddingCardAtTheTop}
 								value={newCardName}
-								onChange={(e) => setNewCardName(e.target.value)}
+								onChange={newCardNameChangeHandler}
 								onKeyDown={onKeyDown}
-								onBlur={() => setIsAddingCardAtTheTop(false)}
+								onBlur={onBlur}
 							/>
 							<button
-								onClick={() => setIsAddingCardAtTheTop(true)}
-								className={`rounded-lg mx-2 p-2 text-left text-xs text-gray-500 border border-dashed border-gray-500 ${
-									!isAddingCardAtTheTop &&
-									Boolean(newCardName) &&
-									"border-yellow-700 text-yellow-700"
-								}`}
+								className={`rounded-lg mx-2 p-2 text-left text-xs text-gray-500 border border-dashed border-gray-500 ${newCardInputHasUnsavedChangesClass}`}
+								onClick={topCardInputClickHandler}
 							>
 								+ Add card
-								<Conditional when={!isAddingCardAtTheTop && Boolean(newCardName)}>
+								<Conditional when={showNewCardInputHasUnsavedChanges}>
 									<span className="ml-4">🟡</span>
 								</Conditional>
 							</button>
@@ -134,14 +145,14 @@ export const Column: React.FC<{
 						<Droppable direction="vertical" droppableId={tree.path} type="card">
 							{(provided) => (
 								<div
-									className={`px-2 flex flex-col space-y-2 h-full`}
+									className="px-2 flex flex-col space-y-2 h-full"
 									ref={provided.innerRef}
 									{...provided.droppableProps}
 								>
 									{tree.children &&
-										tree.children.map((item, index) => (
-											<div key={item.path}>
-												{item.isFile ? <Card item={item as MDFile} index={index} /> : <></>}
+										tree.children.map((file, index) => (
+											<div key={file.path}>
+												{file.isFile && <Card file={file as MDFile} index={index} />}
 											</div>
 										))}
 									{provided.placeholder}
@@ -152,23 +163,19 @@ export const Column: React.FC<{
 						<Conditional when={tree.children && tree.children.length > 0}>
 							<Conditional when={isAddingCardAtTheBottom}>
 								<input
-									autoFocus={isAddingCardAtTheBottom}
 									className="rounded-lg outline-none mx-2 p-2 text-left text-xs text-gray-500 border border-dashed border-gray-500"
+									autoFocus={isAddingCardAtTheBottom}
 									value={newCardName}
-									onChange={(e) => setNewCardName(e.target.value)}
+									onChange={newCardNameChangeHandler}
 									onKeyDown={onKeyDown}
-									onBlur={() => setIsAddingCardAtTheBottom(false)}
+									onBlur={onBlur}
 								/>
 								<button
-									onClick={() => setIsAddingCardAtTheBottom(true)}
-									className={`rounded-lg mx-2 p-2 text-left text-xs text-gray-500 border border-dashed border-gray-500 ${
-										!isAddingCardAtTheBottom &&
-										Boolean(newCardName) &&
-										"border-yellow-700 text-yellow-700"
-									}`}
+									className={`rounded-lg mx-2 p-2 text-left text-xs text-gray-500 border border-dashed border-gray-500 ${newCardInputHasUnsavedChangesClass}`}
+									onClick={bottomCardInputClickHandler}
 								>
 									+ Add card
-									<Conditional when={!isAddingCardAtTheBottom && Boolean(newCardName)}>
+									<Conditional when={showNewCardInputHasUnsavedChanges}>
 										<span className="ml-4">🟡</span>
 									</Conditional>
 								</button>

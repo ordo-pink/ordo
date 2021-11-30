@@ -10,6 +10,8 @@ import {
 	setCurrentPath,
 } from "../../../features/file-tree/file-tree-slice"
 
+import { escapeSlashes } from "../../../../utils/string"
+
 const getDisplayName = (readableName: string) => readableName.replace(".md", "")
 
 const getBadge = (readableName: string) => {
@@ -22,30 +24,29 @@ const getBadge = (readableName: string) => {
 }
 
 export const Card: React.FC<{
-	item: MDFile
+	file: MDFile
 	index: number
-}> = ({ item, index }) => {
-	const [editable, setEditable] = React.useState(false)
+}> = ({ file: item, index }) => {
+	const dispatch = useAppDispatch()
+
 	const ref = React.useRef(null)
 
-	const dispatch = useAppDispatch()
+	const [editable, setEditable] = React.useState(false)
 
 	const displayName = getDisplayName(item.readableName)
 	const badge = getBadge(item.readableName)
 
-	const handleOpenButtonClick = () => dispatch(setCurrentPath(item.path))
-
-	const onBlur = () => {
+	const openButtonClickHandler = () => dispatch(setCurrentPath(item.path))
+	const deleteButtonClickHandler = () => dispatch(deleteFileOrFolder(item))
+	const clickCardNameInputHandler = () => setEditable(true)
+	const blurCardNameInputHandler = () => {
 		ref.current.textContent = displayName
 		setEditable(false)
 	}
-
-	const onClick = () => setEditable(true)
-
-	const onKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
+	const keyDownCardNameInputHandler = (e: React.KeyboardEvent<HTMLDivElement>) => {
 		if (e.key === "Escape") {
 			e.preventDefault()
-			onBlur()
+			blurCardNameInputHandler()
 		}
 
 		if (e.key === "Enter") {
@@ -54,7 +55,10 @@ export const Card: React.FC<{
 			dispatch(
 				moveFileOrFolder({
 					node: item,
-					newPath: item.path.replace(item.readableName, `${ref.current.textContent}.md`),
+					newPath: item.path.replace(
+						item.readableName,
+						`${escapeSlashes(ref.current.textContent)}.md`,
+					),
 				}),
 			)
 
@@ -76,9 +80,9 @@ export const Card: React.FC<{
 						className="outline-none cursor-text"
 						contentEditable={editable}
 						suppressContentEditableWarning={true}
-						onKeyDown={onKeyDown}
-						onClick={onClick}
-						onBlur={onBlur}
+						onKeyDown={keyDownCardNameInputHandler}
+						onClick={clickCardNameInputHandler}
+						onBlur={blurCardNameInputHandler}
 					>
 						{displayName}
 					</div>
@@ -88,7 +92,7 @@ export const Card: React.FC<{
 							<div
 								className="text-xl hover:text-black cursor-pointer"
 								title="Open in the workspace"
-								onClick={handleOpenButtonClick}
+								onClick={openButtonClickHandler}
 							>
 								⇱
 							</div>
@@ -96,7 +100,7 @@ export const Card: React.FC<{
 							<div
 								className="text-xl hover:text-black cursor-pointer"
 								title="Delete card"
-								onClick={() => dispatch(deleteFileOrFolder(item))}
+								onClick={deleteButtonClickHandler}
 							>
 								⤫
 							</div>

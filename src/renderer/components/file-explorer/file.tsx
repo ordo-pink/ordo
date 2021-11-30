@@ -26,7 +26,7 @@ export const File: React.FC<FileProps> = ({ file, unsavedFiles }) => {
 	const [newName, setNewName] = React.useState(file ? file.readableName : "")
 	const [isEditing, setIsEditing] = React.useState(false)
 
-	const paddingLeft = `${file.depth * 20}px`
+	const paddingLeft = `${file.depth * 15}px`
 	const hasUnsavedContent = unsavedFiles.includes(file.path)
 	const highlightCurrentFileClass = file.path === currentPath ? "bg-gray-300 dark:bg-gray-600" : ""
 

@@ -12,7 +12,6 @@ import {
 } from "../../features/file-tree/file-tree-slice"
 
 import { Conditional } from "../conditional"
-import { Emoji } from "../emoji"
 import { File } from "./file"
 
 import { hasCurrentlyOpenedFile } from "../../../utils/tree"
@@ -33,13 +32,13 @@ export const Folder: React.FC<FolderProps> = ({ folder, unsavedFiles }) => {
 
 	const tree = folder ?? rootFolder
 
-	const icon = tree && tree.collapsed ? "▶" : "▼"
+	const icon = tree && tree.collapsed ? "→" : "↓"
 	const subTreeVisibilityClass = tree && tree.collapsed ? "hidden" : "block"
 	const hasCurrentlyOpenFileClass =
 		tree && tree.collapsed && hasCurrentlyOpenedFile(tree, currentPath)
 			? "bg-gray-300 dark:bg-gray-600"
 			: ""
-	const paddingLeft = tree && `${tree.depth * 20}px`
+	const paddingLeft = tree && `${tree.depth * 10}px`
 	const canEdit = tree && rootFolder && tree.path !== rootFolder.path && !isEditing
 
 	React.useEffect(() => {
@@ -78,7 +77,11 @@ export const Folder: React.FC<FolderProps> = ({ folder, unsavedFiles }) => {
 				>
 					<Conditional when={!isEditing}>
 						<span className="flex-nowrap truncate" onClick={toggleFolder}>
-							<Emoji icon={icon}>{tree.readableName}</Emoji>
+							<span className="text-sm align-baseline text-gray-500">
+								{icon}
+								{"  "}
+							</span>
+							<span>{tree.readableName}</span>
 						</span>
 						<input
 							className="rounded-lg outline-none p-1 text-left text-xs text-gray-500"

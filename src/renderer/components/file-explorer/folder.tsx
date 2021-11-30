@@ -35,18 +35,16 @@ export const Folder: React.FC<FolderProps> = ({ folder, unsavedFiles }) => {
 
 	const icon = tree && tree.collapsed ? "▶" : "▼"
 	const subTreeVisibilityClass = tree && tree.collapsed ? "hidden" : "block"
+	const hasCurrentlyOpenFileClass =
+		tree && tree.collapsed && hasCurrentlyOpenedFile(tree, currentPath)
+			? "bg-gray-300 dark:bg-gray-600"
+			: ""
 	const paddingLeft = tree && `${tree.depth * 20}px`
 	const canEdit = tree && rootFolder && tree.path !== rootFolder.path && !isEditing
 
 	React.useEffect(() => {
 		tree && setName(tree.readableName)
 	}, [tree])
-
-	React.useEffect(() => {
-		if (tree && currentPath && hasCurrentlyOpenedFile(tree, currentPath)) {
-			dispatch(editNode({ node: tree, increment: { collapsed: false } }))
-		}
-	}, [currentPath, tree])
 
 	const toggleFolder = () =>
 		dispatch(editNode({ node: tree, increment: { collapsed: !tree.collapsed } }))
@@ -73,8 +71,11 @@ export const Folder: React.FC<FolderProps> = ({ folder, unsavedFiles }) => {
 
 	return (
 		tree && (
-			<div className="cursor-pointer py-1">
-				<div className="flex justify-between select-none" style={{ paddingLeft }}>
+			<div className="cursor-pointer">
+				<div
+					className={`flex justify-between py-1 select-none ${hasCurrentlyOpenFileClass}`}
+					style={{ paddingLeft }}
+				>
 					<Conditional when={!isEditing}>
 						<span className="flex-nowrap truncate" onClick={toggleFolder}>
 							<Emoji icon={icon}>{tree.readableName}</Emoji>

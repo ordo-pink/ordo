@@ -105,14 +105,14 @@ export const App: React.FC = () => {
 
 			<Conditional when={showExplorer}>
 				<div className="fixed right-14 top-0 h-screen overflow-y-auto flex flex-col justify-between w-72 border-l border-gray-300 dark:border-gray-900 py-4 bg-gray-100 dark:bg-gray-700">
-					<div className="pl-2">
+					<div>
 						<h2 className="uppercase text-sm text-center text-gray-600 dark:text-gray-500">
 							Explorer
 						</h2>
 						<Folder unsavedFiles={unsavedFiles} folder={folder} />
 					</div>
 
-					<div className="px-2">
+					<div className="px-2 mt-4">
 						<button
 							onClick={selectRootDir}
 							className="w-full text-left rounded-lg p-2 text-xs text-gray-500 border border-dashed border-gray-500"

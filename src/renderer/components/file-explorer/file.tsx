@@ -53,7 +53,7 @@ export const File: React.FC<FileProps> = ({ file, unsavedFiles }) => {
 	return (
 		file && (
 			<div
-				className={`w-full flex justify-between cursor-pointer py-1 pl-4 select-none truncate ${highlightCurrentFileClass}`}
+				className={`w-full flex py-1 justify-between cursor-pointer pl-4 select-none truncate ${highlightCurrentFileClass}`}
 				style={{ paddingLeft }}
 				onClick={fileClickHandler}
 			>

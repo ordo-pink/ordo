@@ -30,7 +30,7 @@ export const Card: React.FC<{
 		dispatch(
 			moveFileOrFolder({
 				node: item,
-				newPath: item.path.replace(item.readableName, ref.current.textContent),
+				newPath: item.path.replace(item.readableName, `${ref.current.textContent}.md`),
 			}),
 		)
 	}
@@ -44,7 +44,7 @@ export const Card: React.FC<{
 			dispatch(
 				moveFileOrFolder({
 					node: item,
-					newPath: item.path.replace(item.readableName, ref.current.textContent),
+					newPath: item.path.replace(item.readableName, `${ref.current.textContent}.md`),
 				}),
 			)
 

@@ -6,7 +6,7 @@ import {
 } from "@reduxjs/toolkit"
 import { OrdoFile, OrdoFolder } from "../../../global-context/types"
 import { findNode, getParentNode, sortTree } from "../../../utils/tree"
-import { createOrdoFolder, isFolder } from "../../../global-context/init"
+import { createOrdoFolder, ICON, isFolder } from "../../../global-context/init"
 
 export const fetchFileTree = createAsyncThunk("fileTree/init", (path: string) =>
 	window.fileSystemAPI.listFolder(path),
@@ -195,9 +195,18 @@ const fileTreeSlice = createSlice({
 				}
 			}
 
+			if (state.currentPath === node.path) {
+				state.currentPath = action.payload.newPath
+			}
+
 			node.path = action.payload.newPath
 
-			node.readableName = node.path.split("/").reverse()[0].split(".")[0]
+			node.readableName = node.path.split("/").reverse()[0]
+
+			if (!isFolder(node)) {
+				node.extension = node.path.slice(node.path.lastIndexOf("."))
+				node.icon = ICON[node.extension] ?? "🛠"
+			}
 
 			if (isFolder(currentNode)) {
 				currentNode.children.push(node)

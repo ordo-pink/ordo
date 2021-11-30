@@ -1,4 +1,5 @@
 import type { SimulationNodeDatum, SimulationLinkDatum, HierarchyLink, HierarchyNode } from "d3"
+import type { OrdoFolder, Tag } from "../../../global-context/types"
 
 import React from "react"
 import {
@@ -15,8 +16,8 @@ import {
 } from "d3"
 
 import { useAppDispatch, useAppSelector } from "../../app/hooks"
+import { setCurrentView } from "../../features/ui/ui-slice"
 import { setCurrentPath, createFileOrFolder } from "../../features/file-tree/file-tree-slice"
-import { OrdoFolder, Tag } from "../../../global-context/types"
 
 type TagNode = {
 	readableName: string
@@ -211,6 +212,8 @@ export const FileTreeGraph: React.FC = () => {
 					dispatch(createFileOrFolder({ name: n.data.readableName, node: n.data.parentNode.data }))
 					dispatch(setCurrentPath(n.data.path))
 				}
+
+				dispatch(setCurrentView("workspace"))
 			})
 
 		node

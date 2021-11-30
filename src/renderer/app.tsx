@@ -11,7 +11,13 @@ import {
 	setCurrentPath,
 	setRootPath,
 } from "./features/file-tree/file-tree-slice"
-import { hideExplorer, toggleCreator, toggleExplorer, toggleSearcher } from "./features/ui/ui-slice"
+import {
+	hideExplorer,
+	setCurrentView,
+	toggleCreator,
+	toggleExplorer,
+	toggleSearcher,
+} from "./features/ui/ui-slice"
 import { Folder } from "./components/file-explorer/folder"
 
 export const App: React.FC = () => {
@@ -21,11 +27,9 @@ export const App: React.FC = () => {
 	const rootPath = useAppSelector((state) => state.fileTree.rootPath)
 	const currentPath = useAppSelector((state) => state.fileTree.currentPath)
 	const showExplorer = useAppSelector((state) => state.ui.showExplorer)
+	const currentView = useAppSelector((state) => state.ui.currentView)
 
 	const [unsavedFiles, setUnsavedFiles] = React.useState<string[]>([])
-	const [currentView, setCurrentView] = React.useState<"workspace" | "graph" | "settings">(
-		"workspace",
-	)
 
 	React.useEffect(() => {
 		dispatch(getCurrentPathFromSettings())
@@ -127,7 +131,7 @@ export const App: React.FC = () => {
 				<button
 					className="text-4xl"
 					onClick={() => {
-						setCurrentView("workspace")
+						dispatch(setCurrentView("workspace"))
 
 						if (currentView === "workspace") {
 							dispatch(toggleExplorer())
@@ -139,7 +143,7 @@ export const App: React.FC = () => {
 				<button
 					className="text-4xl"
 					onClick={() => {
-						setCurrentView("graph")
+						dispatch(setCurrentView("graph"))
 						dispatch(hideExplorer())
 					}}
 				>
@@ -148,7 +152,7 @@ export const App: React.FC = () => {
 				<button
 					className="text-4xl"
 					onClick={() => {
-						setCurrentView("settings")
+						dispatch(setCurrentView("settings"))
 						dispatch(hideExplorer())
 					}}
 				>

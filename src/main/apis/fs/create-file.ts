@@ -16,5 +16,14 @@ export async function createFile(parent: OrdoFolder, name: string): Promise<Ordo
 	await promises.writeFile(path, "\n")
 
 	const { mtime, atime, birthtime, size } = await promises.stat(path)
-	return createOrdoFile({ path, mtime, atime, birthtime, size, parent: parent.path, exists: true })
+	return createOrdoFile({
+		path,
+		mtime,
+		atime,
+		birthtime,
+		size,
+		parent: parent.path,
+		depth: parent.depth + 1,
+		exists: true,
+	})
 }

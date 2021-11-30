@@ -41,7 +41,6 @@ if (!Settings.get("application.global-settings-path")) {
 }
 
 ipcMain.handle("dark-mode:set", (_, theme): ColorTheme => setTheme(theme))
-
 ipcMain.handle("fs:list-folder", async (_, path) => {
 	const tree = await listFolder(getAbsolute(path))
 
@@ -109,6 +108,7 @@ ipcMain.handle("fs:list-folder", async (_, path) => {
 
 	return tree
 })
+
 ipcMain.handle("fs:get-file", async (_, path) => getMarkdownFile(getAbsolute(path)))
 ipcMain.handle("fs:save-file", (_, path, data) => saveFile(getAbsolute(path), data))
 ipcMain.handle("fs:move", (_, oldPath, newPath) => move(getAbsolute(oldPath), getAbsolute(newPath)))
@@ -124,7 +124,6 @@ ipcMain.handle("settings:set", (_, key, value) => {
 	Settings.set(key, value).persist(Settings.get("application.global-settings-path"))
 })
 ipcMain.handle("settings:get", (_, key) => Settings.get(key))
-
 ipcMain.handle("shell:open-external", (_, url) => shell.openExternal(url))
 
 const createWindow = (): void => {
@@ -184,6 +183,12 @@ const createWindow = (): void => {
 	)
 
 	mainWindow.loadURL(MAIN_WINDOW_WEBPACK_ENTRY)
+
+	mainWindow.on("closed", () => {
+		ipcMain.removeHandler("fs:select-root-folder")
+		ipcMain.removeHandler("fs:delete")
+		ipcMain.removeHandler("shell:open-external")
+	})
 }
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.

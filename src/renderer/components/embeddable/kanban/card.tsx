@@ -65,7 +65,7 @@ export const Card: React.FC<{
 						onClick={onClick}
 						onBlur={onBlur}
 					>
-						{item.readableName}{" "}
+						{item.readableName.replace(".md", "")}{" "}
 					</div>
 
 					<div className="flex space-x-2">

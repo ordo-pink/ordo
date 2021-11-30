@@ -105,7 +105,7 @@ export const App: React.FC = () => {
 
 			<Conditional when={showExplorer}>
 				<div className="fixed right-14 top-0 h-screen overflow-y-auto flex flex-col justify-between w-72 border-l border-gray-300 dark:border-gray-900 py-4 bg-gray-100 dark:bg-gray-700">
-					<div>
+					<div className="pr-2">
 						<h2 className="uppercase text-sm text-center text-gray-600 dark:text-gray-500">
 							Explorer
 						</h2>

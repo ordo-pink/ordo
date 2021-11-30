@@ -16,6 +16,7 @@ import { File } from "./file"
 
 import { hasCurrentlyOpenedFile } from "../../../utils/tree"
 import { isFolder } from "../../../global-context/init"
+import { Emoji } from "../emoji"
 
 type FolderProps = {
 	folder?: OrdoFolder
@@ -33,12 +34,13 @@ export const Folder: React.FC<FolderProps> = ({ folder, unsavedFiles }) => {
 	const tree = folder ?? rootFolder
 
 	const icon = tree && tree.collapsed ? "→" : "↓"
+	const folderIcon = tree && tree.collapsed ? "📁" : "📂"
 	const subTreeVisibilityClass = tree && tree.collapsed ? "hidden" : "block"
 	const hasCurrentlyOpenFileClass =
 		tree && tree.collapsed && hasCurrentlyOpenedFile(tree, currentPath)
 			? "bg-gray-300 dark:bg-gray-600"
 			: ""
-	const paddingLeft = tree && `${tree.depth * 10}px`
+	const paddingLeft = tree && `${(tree.depth + 1) * 10}px`
 	const canEdit = tree && rootFolder && tree.path !== rootFolder.path && !isEditing
 
 	React.useEffect(() => {
@@ -81,7 +83,7 @@ export const Folder: React.FC<FolderProps> = ({ folder, unsavedFiles }) => {
 								{icon}
 								{"  "}
 							</span>
-							<span>{tree.readableName}</span>
+							<Emoji icon={folderIcon}>{tree.readableName}</Emoji>
 						</span>
 						<input
 							className="rounded-lg outline-none p-1 text-left text-xs text-gray-500"
@@ -92,7 +94,7 @@ export const Folder: React.FC<FolderProps> = ({ folder, unsavedFiles }) => {
 						/>
 					</Conditional>
 
-					<div className="flex space-x-2 text-xs pr-2">
+					<div className="flex space-x-2 text-xs">
 						{canEdit && (
 							<div>
 								<button className="p-1" onClick={addClickHandler}>

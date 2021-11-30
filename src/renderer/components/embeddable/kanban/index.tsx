@@ -32,13 +32,15 @@ export const Kanban: React.FC<{
 			const node = findNode(
 				tree,
 				"path",
-				`${result.source.droppableId}/${result.draggableId}.md`,
+				`${result.source.droppableId}/${result.draggableId}`,
 			) as OrdoFolder
+
+			console.log(result.source.droppableId)
 
 			dispatch(
 				moveFileOrFolder({
 					node,
-					newPath: `${result.destination.droppableId}/${result.draggableId}.md`,
+					newPath: `${result.destination.droppableId}/${result.draggableId}`,
 				}),
 			)
 		}

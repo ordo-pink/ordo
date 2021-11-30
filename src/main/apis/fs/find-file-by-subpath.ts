@@ -17,7 +17,7 @@ export async function findFileBySubPath(
 	let found: OrdoFile
 
 	for (const child of tree.children) {
-		if (found) {
+		if (found && isFile(child)) {
 			break
 		}
 

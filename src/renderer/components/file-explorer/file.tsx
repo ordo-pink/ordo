@@ -13,11 +13,12 @@ import {
 import { Conditional } from "../conditional"
 import { Emoji } from "../emoji"
 
-export const File: React.FC<{
+type FileProps = {
 	file: OrdoFile
-	depth: number
 	unsavedFiles: string[]
-}> = ({ file, unsavedFiles, depth }) => {
+}
+
+export const File: React.FC<FileProps> = ({ file, unsavedFiles }) => {
 	const dispatch = useAppDispatch()
 
 	const currentPath = useAppSelector((state) => state.fileTree.currentPath)
@@ -25,7 +26,7 @@ export const File: React.FC<{
 	const [newName, setNewName] = React.useState(file ? file.readableName : "")
 	const [isEditing, setIsEditing] = React.useState(false)
 
-	const paddingLeft = `${(depth + 1) * 20}px`
+	const paddingLeft = `${file.depth * 20}px`
 	const hasUnsavedContent = unsavedFiles.includes(file.path)
 	const highlightCurrentFileClass = file.path === currentPath ? "bg-gray-300 dark:bg-gray-600" : ""
 
@@ -54,9 +55,10 @@ export const File: React.FC<{
 			<div
 				className={`w-full flex justify-between cursor-pointer py-1 pl-4 select-none truncate ${highlightCurrentFileClass}`}
 				style={{ paddingLeft }}
+				onClick={fileClickHandler}
 			>
 				<Conditional when={!isEditing}>
-					<span className="flex-nowrap truncate" onClick={fileClickHandler}>
+					<span className="flex-nowrap truncate">
 						<Emoji icon="📄">{file.readableName}</Emoji>
 					</span>
 					<input

@@ -2,12 +2,7 @@ import type { MDFile } from "../../../global-context/types"
 
 import React from "react"
 
-const Prop: React.FC<{ name: string; value: string }> = ({ name, value }) => (
-	<div className="flex justify-between text-sm text-gray-500 leading-7">
-		<div className="w-4/12">{name}</div>
-		<div className="w-8/12">{value}</div>
-	</div>
-)
+import { MetadataProperty } from "./metadata-property"
 
 type MetadataProps = {
 	metadata: MDFile
@@ -16,7 +11,6 @@ type MetadataProps = {
 export const Metadata: React.FC<MetadataProps> = ({ metadata }) => {
 	const createdAt = metadata.createdAt.toLocaleString()
 	const updatedAt = metadata.updatedAt.toLocaleString()
-	const size = metadata.size
 
 	return (
 		metadata &&
@@ -26,9 +20,9 @@ export const Metadata: React.FC<MetadataProps> = ({ metadata }) => {
 				<details>
 					<summary className="text-xs text-gray-500">File Stats</summary>
 					<div className="pt-4">
-						<Prop name="Created" value={createdAt} />
-						<Prop name="Last Updated" value={updatedAt} />
-						<Prop name="Size" value={String(size)} />
+						<MetadataProperty name="Created" value={createdAt} />
+						<MetadataProperty name="Last Updated" value={updatedAt} />
+						<MetadataProperty name="Size" value={metadata.readableSize} />
 					</div>
 				</details>
 			</div>

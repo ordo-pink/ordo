@@ -28,7 +28,7 @@ export const App: React.FC = () => {
 	)
 
 	React.useEffect(() => {
-		// dispatch(getCurrentPathFromSettings())
+		dispatch(getCurrentPathFromSettings())
 		dispatch(getRootPathFromSettings())
 	}, [])
 

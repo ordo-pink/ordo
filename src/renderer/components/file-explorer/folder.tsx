@@ -5,7 +5,11 @@ import { ifElse, tap, pipe } from "ramda"
 
 import { useAppDispatch, useAppSelector } from "../../app/hooks"
 import { toggleCreator } from "../../features/ui/ui-slice"
-import { deleteFileOrFolder, moveFileOrFolder } from "../../features/file-tree/file-tree-slice"
+import {
+	deleteFileOrFolder,
+	editNode,
+	moveFileOrFolder,
+} from "../../features/file-tree/file-tree-slice"
 
 import { Conditional } from "../conditional"
 import { Emoji } from "../emoji"
@@ -16,24 +20,23 @@ import { isFolder } from "../../../global-context/init"
 
 type FolderProps = {
 	folder?: OrdoFolder
-	depth?: number
 	unsavedFiles: string[]
 }
 
-export const Folder: React.FC<FolderProps> = ({ folder, depth = 0, unsavedFiles }) => {
+export const Folder: React.FC<FolderProps> = ({ folder, unsavedFiles }) => {
 	const dispatch = useAppDispatch()
 	const rootFolder = useAppSelector((state) => state.fileTree.tree)
 	const currentPath = useAppSelector((state) => state.fileTree.currentPath)
 
 	const [name, setName] = React.useState("")
 	const [isEditing, setIsEditing] = React.useState(false)
-	const [collapsed, setCollapsed] = React.useState(true)
 
-	const tree = folder ? folder : rootFolder
-	const icon = collapsed ? "▶" : "▼"
-	const paddingLeft = `${depth * 20}px`
+	const tree = folder ?? rootFolder
+
+	const icon = tree && tree.collapsed ? "▶" : "▼"
+	const subTreeVisibilityClass = tree && tree.collapsed ? "hidden" : "block"
+	const paddingLeft = tree && `${tree.depth * 20}px`
 	const canEdit = tree && rootFolder && tree.path !== rootFolder.path && !isEditing
-	const subTreeVisibilityClass = collapsed ? "hidden" : "block"
 
 	React.useEffect(() => {
 		tree && setName(tree.readableName)
@@ -41,11 +44,12 @@ export const Folder: React.FC<FolderProps> = ({ folder, depth = 0, unsavedFiles 
 
 	React.useEffect(() => {
 		if (tree && currentPath && hasCurrentlyOpenedFile(tree, currentPath)) {
-			setCollapsed(false)
+			dispatch(editNode({ node: tree, increment: { collapsed: false } }))
 		}
 	}, [currentPath, tree])
 
-	const toggleFolder = () => setCollapsed(!collapsed)
+	const toggleFolder = () =>
+		dispatch(editNode({ node: tree, increment: { collapsed: !tree.collapsed } }))
 
 	const addClickHandler = () => dispatch(toggleCreator(tree))
 	const removeClickHandler = () => dispatch(deleteFileOrFolder(tree))
@@ -109,12 +113,8 @@ export const Folder: React.FC<FolderProps> = ({ folder, depth = 0, unsavedFiles 
 					{tree.children &&
 						tree.children.map((fileOrFolder) => (
 							<Conditional key={fileOrFolder.path} when={isFolder(fileOrFolder)}>
-								<Folder
-									folder={fileOrFolder as OrdoFolder}
-									unsavedFiles={unsavedFiles}
-									depth={depth + 1}
-								/>
-								<File unsavedFiles={unsavedFiles} file={fileOrFolder as MDFile} depth={depth} />
+								<Folder folder={fileOrFolder as OrdoFolder} unsavedFiles={unsavedFiles} />
+								<File unsavedFiles={unsavedFiles} file={fileOrFolder as MDFile} />
 							</Conditional>
 						))}
 				</div>

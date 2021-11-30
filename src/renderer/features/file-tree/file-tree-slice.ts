@@ -72,17 +72,29 @@ const fileTreeSlice = createSlice({
 	name: "fileTree",
 	initialState,
 	reducers: {
-		setRootPath: (state, action: PayloadAction<string>) => {
+		setRootPath(state, action: PayloadAction<string>) {
 			state.rootPath = action.payload
 		},
-		setCurrentPath: (state, action: PayloadAction<string>) => {
+		setCurrentPath(state, action: PayloadAction<string>) {
 			state.currentPath = action.payload
 			window.settingsAPI.set("application.last-open-file", action.payload)
+		},
+		editNode(
+			state,
+			action: PayloadAction<{
+				node: OrdoFile | OrdoFolder
+				increment: Partial<OrdoFile | OrdoFolder>
+			}>,
+		) {
+			const stateNode: any = findNode(state.tree, "path", action.payload.node.path)
+
+			Object.keys(action.payload.increment).forEach((key) => {
+				stateNode[key] = (action.payload.increment as any)[key]
+			})
 		},
 	},
 	extraReducers: (builder: ActionReducerMapBuilder<FileTreeState>) => {
 		builder.addCase(fetchFileTree.fulfilled, (state, action: PayloadAction<OrdoFolder>) => {
-			console.log(action.payload)
 			state.status = "fulfilled"
 			state.tree = action.payload
 			state.errorMessage = ""
@@ -198,6 +210,6 @@ const fileTreeSlice = createSlice({
 	},
 })
 
-export const { setRootPath, setCurrentPath } = fileTreeSlice.actions
+export const { setRootPath, setCurrentPath, editNode } = fileTreeSlice.actions
 
 export default fileTreeSlice.reducer

@@ -18,6 +18,8 @@ export const Column: React.FC<{
 }> = ({ treePath, index }) => {
 	const dispatch = useAppDispatch()
 
+	const ref = React.useRef<HTMLDivElement>(null)
+
 	const rootTree = useAppSelector((state) => state.fileTree.tree) as OrdoFolder
 
 	const [tree, setTree] = React.useState<OrdoFolder>(null)
@@ -43,20 +45,28 @@ export const Column: React.FC<{
 				dispatch(
 					moveFileOrFolder({
 						node: tree,
-						newPath: tree.path.replace(tree.readableName, e.currentTarget.textContent),
+						newPath: tree.path.replace(tree.readableName, ref.current.textContent),
 					}),
 				)
 			}
 		}
+
+		if (e.key === "Escape") {
+			e.preventDefault()
+
+			if (isAddingCardAtTheBottom || isAddingCardAtTheTop) {
+				setNewCardName("")
+				setIsAddingCardAtTheBottom(false)
+				setIsAddingCardAtTheTop(false)
+			} else {
+				onBlur()
+			}
+		}
 	}
 
-	const onBlur = (e: React.FocusEvent<HTMLDivElement, Element>) => {
-		dispatch(
-			moveFileOrFolder({
-				node: tree,
-				newPath: tree.path.replace(tree.readableName, e.currentTarget.textContent),
-			}),
-		)
+	const onBlur = () => {
+		ref.current.textContent = tree.readableName
+		ref.current.blur()
 	}
 
 	return (
@@ -67,13 +77,14 @@ export const Column: React.FC<{
 						ref={provided.innerRef}
 						{...provided.draggableProps}
 						style={{ minWidth: "18rem", maxWidth: "18rem" }}
-						className={`bg-gray-200 dark:bg-gray-600 rounded-lg shadow-md flex flex-col pb-2 space-y-2`}
+						className="bg-gray-200 dark:bg-gray-600 rounded-lg shadow-md flex flex-col pb-2 space-y-2"
 					>
 						<div className="flex justify-between items-center p-2">
 							<div
+								ref={ref}
 								contentEditable={true}
 								suppressContentEditableWarning={true}
-								className={`text-center outline-none text-xs`}
+								className="text-center outline-none text-xs"
 								onBlur={onBlur}
 								onKeyDown={onKeyDown}
 							>

@@ -10,6 +10,17 @@ import {
 	setCurrentPath,
 } from "../../../features/file-tree/file-tree-slice"
 
+const getDisplayName = (readableName: string) => readableName.replace(".md", "")
+
+const getBadge = (readableName: string) => {
+	const badge = readableName.match(/^\[.*\]\s/)
+
+	if (badge) {
+		return String(badge).slice(1, -2)
+	}
+	return badge
+}
+
 export const Card: React.FC<{
 	item: MDFile
 	index: number
@@ -19,25 +30,24 @@ export const Card: React.FC<{
 
 	const dispatch = useAppDispatch()
 
-	let badge: any = item.readableName.match(/^\[.*\]\s/)
-	if (badge) {
-		badge = String(badge).slice(1, -2)
-	}
+	const displayName = getDisplayName(item.readableName)
+	const badge = getBadge(item.readableName)
 
 	const handleOpenButtonClick = () => dispatch(setCurrentPath(item.path))
 
 	const onBlur = () => {
-		dispatch(
-			moveFileOrFolder({
-				node: item,
-				newPath: item.path.replace(item.readableName, `${ref.current.textContent}.md`),
-			}),
-		)
+		ref.current.textContent = displayName
+		setEditable(false)
 	}
 
 	const onClick = () => setEditable(true)
 
 	const onKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
+		if (e.key === "Escape") {
+			e.preventDefault()
+			onBlur()
+		}
+
 		if (e.key === "Enter") {
 			e.preventDefault()
 
@@ -70,7 +80,7 @@ export const Card: React.FC<{
 						onClick={onClick}
 						onBlur={onBlur}
 					>
-						{item.readableName.replace(".md", "")}{" "}
+						{displayName}
 					</div>
 
 					<div className="flex justify-between items-center text-gray-500">

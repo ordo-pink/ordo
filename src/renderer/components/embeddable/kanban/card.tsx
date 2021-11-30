@@ -19,6 +19,11 @@ export const Card: React.FC<{
 
 	const dispatch = useAppDispatch()
 
+	let badge: any = item.readableName.match(/^\[.*\]\s/)
+	if (badge) {
+		badge = String(badge).slice(1, -2)
+	}
+
 	const handleOpenButtonClick = () => dispatch(setCurrentPath(item.path))
 
 	const onBlur = () => {
@@ -68,14 +73,26 @@ export const Card: React.FC<{
 						{item.readableName.replace(".md", "")}{" "}
 					</div>
 
-					<div className="flex space-x-2">
-						<button className="text-xl" onClick={handleOpenButtonClick}>
-							⇱
-						</button>
+					<div className="flex justify-between items-center text-gray-500">
+						<div className="flex space-x-2">
+							<div
+								className="text-xl hover:text-black cursor-pointer"
+								title="Open in the workspace"
+								onClick={handleOpenButtonClick}
+							>
+								⇱
+							</div>
 
-						<button className="text-sxl" onClick={() => dispatch(deleteFileOrFolder(item))}>
-							⤫
-						</button>
+							<div
+								className="text-xl hover:text-black cursor-pointer"
+								title="Delete card"
+								onClick={() => dispatch(deleteFileOrFolder(item))}
+							>
+								⤫
+							</div>
+						</div>
+
+						<div className="text-sm">{badge}</div>
 					</div>
 				</div>
 			)}

@@ -156,13 +156,7 @@ export const Column: React.FC<{
 									className="rounded-lg outline-none mx-2 p-2 text-left text-xs text-gray-500 border border-dashed border-gray-500"
 									value={newCardName}
 									onChange={(e) => setNewCardName(e.target.value)}
-									onKeyDown={(e) => {
-										if (e.key === "Enter") {
-											e.preventDefault()
-											dispatch(createFileOrFolder({ node: tree, name: `${newCardName}.md` }))
-											setNewCardName("")
-										}
-									}}
+									onKeyDown={onKeyDown}
 									onBlur={() => setIsAddingCardAtTheBottom(false)}
 								/>
 								<button

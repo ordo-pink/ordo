@@ -91,6 +91,12 @@ export const Kanban: React.FC<{
 								)
 								setNewColumnName("")
 							}
+
+							if (e.key === "Escape") {
+								e.preventDefault()
+								setNewColumnName("")
+								setIsAddingColumn(false)
+							}
 						}}
 						onBlur={() => setIsAddingColumn(false)}
 					/>

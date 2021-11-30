@@ -73,6 +73,13 @@ const toReadableSize = (a: number, b = 2, k = 1024): string => {
 		  }`
 }
 
+export const ICON: Record<string, string> = {
+	".md": "📄",
+	".png": "🌄",
+	".jpg": "🏞",
+	".jpeg": "🏞",
+}
+
 export function createOrdoFile({
 	path,
 	birthtime = new Date(),
@@ -94,6 +101,7 @@ export function createOrdoFile({
 		isFile: true,
 		path,
 		exists,
+		icon: ICON[extension] ?? "🛠",
 		readableName,
 		extension,
 		depth,

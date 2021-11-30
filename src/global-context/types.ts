@@ -4,6 +4,7 @@ export type TagName = string
 export type Path = string
 export type ReadableName = string
 export type FileExtension = string
+export type Icon = string
 
 export type FrontmatterKey = string
 export type FrontmatterValue =
@@ -29,6 +30,7 @@ export interface OrdoFile {
 	path: Path
 	isFile: true
 	exists: boolean
+	icon: Icon
 	depth: number
 	readableName: ReadableName
 	extension: FileExtension

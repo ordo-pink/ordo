@@ -59,7 +59,7 @@ export const File: React.FC<FileProps> = ({ file, unsavedFiles }) => {
 			>
 				<Conditional when={!isEditing}>
 					<span className="flex-nowrap truncate">
-						<Emoji icon="📄">{file.readableName}</Emoji>
+						<Emoji icon={file.icon}>{file.readableName}</Emoji>
 					</span>
 					<input
 						className="rounded-lg outline-none p-1 text-left text-xs text-gray-500"

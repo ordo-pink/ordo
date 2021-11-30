@@ -30,6 +30,7 @@ export const Folder: React.FC<FolderProps> = ({ folder, unsavedFiles }) => {
 
 	const [name, setName] = React.useState("")
 	const [isEditing, setIsEditing] = React.useState(false)
+	const [optionsVisible, setOptionsVisible] = React.useState(false)
 
 	const tree = folder ?? rootFolder
 
@@ -54,6 +55,8 @@ export const Folder: React.FC<FolderProps> = ({ folder, unsavedFiles }) => {
 	const removeClickHandler = () => dispatch(deleteFileOrFolder(tree))
 	const editClickHandler = () => setIsEditing(true)
 	const nameChangeHandler = (e: React.ChangeEvent<HTMLInputElement>) => setName(e.target.value)
+	const folderMouseEnterHandler = () => setOptionsVisible(true)
+	const folderMouseLeaveHandler = () => setOptionsVisible(false)
 
 	const isEnter = (e: KeyboardEvent) => e.key === "Enter"
 	const preventDefault = tap((e: Event) => e.preventDefault())
@@ -76,6 +79,8 @@ export const Folder: React.FC<FolderProps> = ({ folder, unsavedFiles }) => {
 				<div
 					className={`flex justify-between py-1 select-none ${hasCurrentlyOpenFileClass}`}
 					style={{ paddingLeft }}
+					onMouseEnter={folderMouseEnterHandler}
+					onMouseLeave={folderMouseLeaveHandler}
 				>
 					<Conditional when={!isEditing}>
 						<span className="flex-nowrap truncate" onClick={toggleFolder}>
@@ -94,25 +99,27 @@ export const Folder: React.FC<FolderProps> = ({ folder, unsavedFiles }) => {
 						/>
 					</Conditional>
 
-					<div className="flex space-x-2 text-xs">
-						{canEdit && (
-							<div>
-								<button className="p-1" onClick={addClickHandler}>
-									➕
-								</button>
+					{optionsVisible && (
+						<div className="flex space-x-2 text-xs">
+							{canEdit && (
+								<div>
+									<button className="p-1" onClick={addClickHandler}>
+										➕
+									</button>
 
-								<button className="p-1" onClick={editClickHandler}>
-									⚙️
-								</button>
-							</div>
-						)}
+									<button className="p-1" onClick={editClickHandler}>
+										⚙️
+									</button>
+								</div>
+							)}
 
-						{isEditing && (
-							<button className="p-1" onClick={removeClickHandler}>
-								❌
-							</button>
-						)}
-					</div>
+							{isEditing && (
+								<button className="p-1" onClick={removeClickHandler}>
+									❌
+								</button>
+							)}
+						</div>
+					)}
 				</div>
 
 				<div className={subTreeVisibilityClass}>

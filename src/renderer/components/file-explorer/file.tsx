@@ -25,6 +25,7 @@ export const File: React.FC<FileProps> = ({ file, unsavedFiles }) => {
 
 	const [newName, setNewName] = React.useState(file ? file.readableName : "")
 	const [isEditing, setIsEditing] = React.useState(false)
+	const [optionsVisible, setOptionsVisible] = React.useState(false)
 
 	const paddingLeft = `${(file.depth + 1) * 15}px`
 	const hasUnsavedContent = unsavedFiles.includes(file.path)
@@ -34,6 +35,8 @@ export const File: React.FC<FileProps> = ({ file, unsavedFiles }) => {
 	const nameChangeHandler = (e: React.ChangeEvent<HTMLInputElement>) => setNewName(e.target.value)
 	const removeClickHandler = () => dispatch(deleteFileOrFolder(file))
 	const editClickHandler = () => setIsEditing(true)
+	const fileMouseEnterHandler = () => setOptionsVisible(true)
+	const fileMouseLeaveHandler = () => setOptionsVisible(false)
 
 	const isEnter = (e: KeyboardEvent) => e.key === "Enter"
 	const preventDefault = tap((e: Event) => e.preventDefault())
@@ -56,6 +59,8 @@ export const File: React.FC<FileProps> = ({ file, unsavedFiles }) => {
 				className={`w-full flex py-1 justify-between cursor-pointer pl-4 select-none truncate ${highlightCurrentFileClass}`}
 				style={{ paddingLeft }}
 				onClick={fileClickHandler}
+				onMouseEnter={fileMouseEnterHandler}
+				onMouseLeave={fileMouseLeaveHandler}
 			>
 				<Conditional when={!isEditing}>
 					<span className="flex-nowrap truncate">
@@ -74,12 +79,14 @@ export const File: React.FC<FileProps> = ({ file, unsavedFiles }) => {
 					<Emoji icon="🔴" />
 				</Conditional>
 
-				<div className="flex space-x-2 pr-1 text-xs">
-					<Conditional when={isEditing}>
-						<button onClick={removeClickHandler}>❌</button>
-						<button onClick={editClickHandler}>⚙️</button>
-					</Conditional>
-				</div>
+				{optionsVisible && (
+					<div className="flex space-x-2 pr-1 text-xs">
+						<Conditional when={isEditing}>
+							<button onClick={removeClickHandler}>❌</button>
+							<button onClick={editClickHandler}>⚙️</button>
+						</Conditional>
+					</div>
+				)}
 			</div>
 		)
 	)

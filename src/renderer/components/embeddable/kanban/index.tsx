@@ -87,7 +87,12 @@ export const Kanban: React.FC<{
 						onKeyDown={(e) => {
 							if (e.key === "Enter") {
 								e.preventDefault()
-								dispatch(createFileOrFolder({ name: newColumnName, node: tree }))
+								dispatch(
+									createFileOrFolder({
+										name: newColumnName.endsWith("/") ? newColumnName : `${newColumnName}/`,
+										node: tree,
+									}),
+								)
 								setNewColumnName("")
 							}
 						}}

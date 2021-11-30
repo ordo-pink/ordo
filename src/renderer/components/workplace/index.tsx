@@ -191,7 +191,7 @@ export const Workspace: React.FC<{
 				<Metadata metadata={metadata} />
 			)}
 			<Conditional when={Boolean(currentPath)}>
-				<form className="pb-80 mb-80 overflow-x-hidden">
+				<div className="pb-80 mb-80 overflow-x-hidden">
 					<div id="editor" className="pb-80 mb-80 font-mono">
 						{content &&
 							content.map((line, index) => (
@@ -207,7 +207,7 @@ export const Workspace: React.FC<{
 								/>
 							))}
 					</div>
-				</form>
+				</div>
 
 				<WelcomePage />
 			</Conditional>

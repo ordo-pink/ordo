@@ -73,14 +73,7 @@ export const Card: React.FC<{
 							⇱
 						</button>
 
-						<button
-							className="text-sxl"
-							onClick={(e) => {
-								e.preventDefault()
-
-								dispatch(deleteFileOrFolder(item))
-							}}
-						>
+						<button className="text-sxl" onClick={() => dispatch(deleteFileOrFolder(item))}>
 							⤫
 						</button>
 					</div>

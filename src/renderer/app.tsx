@@ -76,6 +76,15 @@ export const App: React.FC = () => {
 				dispatch(toggleExplorer())
 			}
 		}
+
+		if (e.metaKey && e.shiftKey && e.key === "g") {
+			e.preventDefault()
+			dispatch(setCurrentView("graph"))
+
+			if (showExplorer) {
+				dispatch(toggleExplorer())
+			}
+		}
 	}
 
 	const toggleUnsavedFileStatus = (path: string, saved: boolean) => {

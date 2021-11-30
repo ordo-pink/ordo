@@ -28,21 +28,17 @@ export const Kanban: React.FC<{
 	const [newColumnName, setNewColumnName] = React.useState("")
 
 	const onDragEnd = (result: DropResult) => {
+		const name = result.draggableId.endsWith(".md")
+			? result.draggableId
+			: `${result.draggableId}.md`
+
+		const oldPath = `${result.source.droppableId}/${name}`
+		const newPath = `${result.destination.droppableId}/${name}`
+
 		if (result.source.droppableId !== result.destination.droppableId) {
-			const node = findNode(
-				tree,
-				"path",
-				`${result.source.droppableId}/${result.draggableId}`,
-			) as OrdoFolder
+			const node = findNode(tree, "path", oldPath) as OrdoFolder
 
-			console.log(result.source.droppableId)
-
-			dispatch(
-				moveFileOrFolder({
-					node,
-					newPath: `${result.destination.droppableId}/${result.draggableId}`,
-				}),
-			)
+			dispatch(moveFileOrFolder({ node, newPath }))
 		}
 	}
 

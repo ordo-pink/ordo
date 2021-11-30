@@ -11,5 +11,5 @@ export async function move(initialPath: string, newPath: string): Promise<void> 
 		await promises.mkdir(parentPath, { recursive: true })
 	}
 
-	return promises.rename(initialPath, newPath).catch(console.log)
+	return promises.rename(initialPath, newPath)
 }

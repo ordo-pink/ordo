@@ -46,10 +46,8 @@ export const moveFileOrFolder = createAsyncThunk(
 	(payload: {
 		node: OrdoFolder | OrdoFile
 		newPath: string
-	}): Promise<{ node: OrdoFolder | OrdoFile; newPath: string }> => {
-		console.log(payload)
-		return window.fileSystemAPI.move(payload.node.path, payload.newPath).then(() => payload)
-	},
+	}): Promise<{ node: OrdoFolder | OrdoFile; newPath: string }> =>
+		window.fileSystemAPI.move(payload.node.path, payload.newPath).then(() => payload),
 )
 
 export type FileTreeState = {
@@ -207,8 +205,6 @@ const fileTreeSlice = createSlice({
 
 			state.tree = sortTree(state.tree)
 		})
-
-		builder.addCase(moveFileOrFolder.rejected, (...args) => console.log(args))
 	},
 })
 

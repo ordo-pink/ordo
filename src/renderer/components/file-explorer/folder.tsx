@@ -2,6 +2,7 @@ import type { OrdoFolder, MDFile } from "../../../global-context/types"
 
 import React from "react"
 import { ifElse, tap, pipe } from "ramda"
+import { HiChevronDown, HiChevronRight, HiFolder, HiFolderOpen } from "react-icons/hi"
 
 import { useAppDispatch, useAppSelector } from "../../app/hooks"
 import { toggleCreator } from "../../features/ui/ui-slice"
@@ -16,7 +17,6 @@ import { File } from "./file"
 
 import { hasCurrentlyOpenedFile } from "../../../utils/tree"
 import { isFolder } from "../../../global-context/init"
-import { Emoji } from "../emoji"
 
 type FolderProps = {
 	folder?: OrdoFolder
@@ -34,8 +34,8 @@ export const Folder: React.FC<FolderProps> = ({ folder, unsavedFiles }) => {
 
 	const tree = folder ?? rootFolder
 
-	const icon = tree && tree.collapsed ? "→" : "↓"
-	const folderIcon = tree && tree.collapsed ? "📁" : "📂"
+	const Icon = tree && tree.collapsed ? HiChevronRight : HiChevronDown
+	const FolderIcon = tree && tree.collapsed ? HiFolder : HiFolderOpen
 	const subTreeVisibilityClass = tree && tree.collapsed ? "hidden" : "block"
 	const hasCurrentlyOpenFileClass =
 		tree && tree.collapsed && hasCurrentlyOpenedFile(tree, currentPath)
@@ -83,12 +83,13 @@ export const Folder: React.FC<FolderProps> = ({ folder, unsavedFiles }) => {
 					onMouseLeave={folderMouseLeaveHandler}
 				>
 					<Conditional when={!isEditing}>
-						<span className="flex-nowrap truncate" onClick={toggleFolder}>
-							<span className="text-sm align-baseline text-gray-500">
-								{icon}
-								{"  "}
-							</span>
-							<Emoji icon={folderIcon}>{tree.readableName}</Emoji>
+						<span
+							className="flex items-center flex-nowrap space-x-1 truncate"
+							onClick={toggleFolder}
+						>
+							<Icon className="text-gray-500" />
+							<FolderIcon className="text-gray-500" />
+							<span>{tree.readableName}</span>
 						</span>
 						<input
 							className="rounded-lg outline-none p-1 text-left text-xs text-gray-500"

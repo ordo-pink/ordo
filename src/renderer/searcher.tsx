@@ -6,7 +6,7 @@ import Fuse from "fuse.js"
 import { useAppDispatch, useAppSelector } from "./app/hooks"
 import { setCurrentPath } from "./features/file-tree/file-tree-slice"
 import { isFolder } from "../global-context/init"
-import { toggleSearcher } from "./features/ui/ui-slice"
+import { setCurrentView, toggleSearcher } from "./features/ui/ui-slice"
 
 interface SearchTerm {
 	readableName: string
@@ -129,6 +129,7 @@ export const Searcher: React.FC = () => {
 									e.preventDefault()
 
 									dispatch(setCurrentPath(found[preselectedSearchItem].item.path))
+									dispatch(setCurrentView("workspace"))
 									dispatch(toggleSearcher())
 
 									setPreselectedSearchItem(0)
@@ -145,6 +146,7 @@ export const Searcher: React.FC = () => {
 								<div
 									onClick={() => {
 										dispatch(setCurrentPath(page.item.path))
+										dispatch(setCurrentView("workspace"))
 										dispatch(toggleSearcher())
 
 										setFound(null)

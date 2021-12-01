@@ -1,7 +1,7 @@
 import React from "react"
 import { useAppDispatch, useAppSelector } from "./app/hooks"
 import { createFileOrFolder, setCurrentPath } from "./features/file-tree/file-tree-slice"
-import { setCreateIn, toggleCreator } from "./features/ui/ui-slice"
+import { setCreateIn, setCurrentView, toggleCreator } from "./features/ui/ui-slice"
 
 export const Creator: React.FC = () => {
 	const dispatch = useAppDispatch()
@@ -18,6 +18,7 @@ export const Creator: React.FC = () => {
 
 	const resetState = () => {
 		setCreationName("")
+		dispatch(setCurrentView("workspace"))
 		dispatch(toggleCreator())
 	}
 

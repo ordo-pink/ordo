@@ -2,6 +2,27 @@ import type { OrdoFile } from "../../../global-context/types"
 
 import React from "react"
 import { tap, pipe, ifElse } from "ramda"
+import {
+	HiDocument,
+	HiDocumentText,
+	HiDocumentSearch,
+	HiDocumentRemove,
+	HiCog,
+	HiPhotograph,
+	HiExclamationCircle,
+} from "react-icons/hi"
+
+const getIcon = (extension: string, size: number) => {
+	if (extension === ".md") {
+		return size > 0 ? HiDocumentText : HiDocument
+	}
+
+	if (extension === ".png" || extension === ".jpg") {
+		return HiPhotograph
+	}
+
+	return HiDocumentSearch
+}
 
 import { useAppDispatch, useAppSelector } from "../../../renderer/app/hooks"
 import {
@@ -11,7 +32,6 @@ import {
 } from "../../features/file-tree/file-tree-slice"
 
 import { Conditional } from "../conditional"
-import { Emoji } from "../emoji"
 
 type FileProps = {
 	file: OrdoFile
@@ -27,19 +47,26 @@ export const File: React.FC<FileProps> = ({ file, unsavedFiles }) => {
 	const [isEditing, setIsEditing] = React.useState(false)
 	const [optionsVisible, setOptionsVisible] = React.useState(false)
 
+	const Icon = getIcon(file.extension, file.size)
 	const paddingLeft = `${(file.depth + 1) * 15}px`
 	const hasUnsavedContent = unsavedFiles.includes(file.path)
 	const highlightCurrentFileClass = file.path === currentPath ? "bg-gray-300 dark:bg-gray-600" : ""
 
 	const fileClickHandler = () => dispatch(setCurrentPath(file.path))
 	const nameChangeHandler = (e: React.ChangeEvent<HTMLInputElement>) => setNewName(e.target.value)
+	const nameBlurHandler = () => {
+		setIsEditing(false)
+		setNewName(file.readableName)
+	}
 	const removeClickHandler = () => dispatch(deleteFileOrFolder(file))
 	const editClickHandler = () => setIsEditing(true)
-	const fileMouseEnterHandler = () => setOptionsVisible(true)
+	const fileMouseOverHandler = () => setOptionsVisible(true)
 	const fileMouseLeaveHandler = () => setOptionsVisible(false)
 
 	const isEnter = (e: KeyboardEvent) => e.key === "Enter"
+	const isEsc = (e: KeyboardEvent) => e.key === "Escape"
 	const preventDefault = tap((e: Event) => e.preventDefault())
+	const resetName = tap(() => setNewName(file.readableName))
 	const move = tap(() =>
 		dispatch(
 			moveFileOrFolder({
@@ -49,44 +76,51 @@ export const File: React.FC<FileProps> = ({ file, unsavedFiles }) => {
 		),
 	)
 	const stopEditing = tap(() => setIsEditing(false))
-	const noOp = (): null => null
+	const noOp = tap((): null => null)
 
-	const nameKeyDownHandler = ifElse(isEnter, pipe(preventDefault, move, stopEditing), noOp)
+	const saveOnEnter = ifElse(isEnter, pipe(preventDefault, move, stopEditing), noOp)
+	const dropOnEsc = ifElse(isEsc, pipe(preventDefault, resetName, stopEditing), noOp)
+	const nameKeyDownHandler = pipe(saveOnEnter, dropOnEsc)
 
 	return (
 		file && (
 			<div
-				className={`w-full flex py-1 justify-between cursor-pointer pl-4 select-none truncate ${highlightCurrentFileClass}`}
+				className={`w-full flex p-0.5 justify-between cursor-pointer pl-4 select-none truncate ${highlightCurrentFileClass}`}
 				style={{ paddingLeft }}
 				onClick={fileClickHandler}
-				onMouseEnter={fileMouseEnterHandler}
+				onMouseOver={fileMouseOverHandler}
 				onMouseLeave={fileMouseLeaveHandler}
 			>
-				<Conditional when={!isEditing}>
-					<span className="flex-nowrap truncate">
-						<Emoji icon={file.icon}>{file.readableName}</Emoji>
-					</span>
-					<input
-						className="rounded-lg outline-none p-1 text-left text-xs text-gray-500"
-						autoFocus={isEditing}
-						value={newName}
-						onChange={nameChangeHandler}
-						onKeyDown={nameKeyDownHandler}
-					/>
-				</Conditional>
-
-				<Conditional when={hasUnsavedContent}>
-					<Emoji icon="🔴" />
-				</Conditional>
-
-				{optionsVisible && (
-					<div className="flex space-x-2 pr-1 text-xs">
-						<Conditional when={isEditing}>
-							<button onClick={removeClickHandler}>❌</button>
-							<button onClick={editClickHandler}>⚙️</button>
-						</Conditional>
+				<div className="flex space-x-1">
+					<div className="flex items-center flex-nowrap truncate">
+						<Icon className={hasUnsavedContent ? "text-yellow-500" : "text-gray-500"} />
 					</div>
-				)}
+
+					<Conditional when={!isEditing}>
+						<div className="truncate">{file.readableName}</div>
+						<input
+							className="bg-transparent flex-grow p-0.5 outline-none leading-5"
+							autoFocus={isEditing}
+							value={newName}
+							onChange={nameChangeHandler}
+							onKeyDown={nameKeyDownHandler}
+							onBlur={nameBlurHandler}
+						/>
+					</Conditional>
+				</div>
+
+				<div className="flex items-center space-x-2 pr-1 text-xs">
+					<Conditional when={hasUnsavedContent}>
+						<HiExclamationCircle className="text-yellow-500" />
+					</Conditional>
+
+					{optionsVisible && (
+						<Conditional when={isEditing}>
+							<HiDocumentRemove className="text-red-500" onClick={removeClickHandler} />
+							<HiCog className="text-gray-500" onClick={editClickHandler} />
+						</Conditional>
+					)}
+				</div>
 			</div>
 		)
 	)

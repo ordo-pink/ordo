@@ -154,28 +154,30 @@ export const App: React.FC = () => {
 				</div>
 			</Conditional>
 
-			<div className="fixed right-0 w-14 top-0 h-screen overflow-y-visible overflow-x-hidden items-center flex flex-col p-4 space-y-4 border-l border-gray-300 dark:border-gray-900 py-4 bg-gray-100 dark:bg-gray-700">
-				<button
-					className="text-4xl"
-					onClick={() => {
-						dispatch(setCurrentView("workspace"))
+			<div className="fixed right-0 w-14 top-0 h-screen justify-between overflow-y-visible overflow-x-hidden items-center flex flex-col p-4 space-y-4 border-l border-gray-300 dark:border-gray-900 py-4 bg-gray-100 dark:bg-gray-700">
+				<div>
+					<button
+						className="text-4xl"
+						onClick={() => {
+							dispatch(setCurrentView("workspace"))
 
-						if (currentView === "workspace") {
-							dispatch(toggleExplorer())
-						}
-					}}
-				>
-					🗄
-				</button>
-				<button
-					className="text-4xl"
-					onClick={() => {
-						dispatch(setCurrentView("graph"))
-						dispatch(hideExplorer())
-					}}
-				>
-					🌲
-				</button>
+							if (currentView === "workspace") {
+								dispatch(toggleExplorer())
+							}
+						}}
+					>
+						🗄
+					</button>
+					<button
+						className="text-4xl"
+						onClick={() => {
+							dispatch(setCurrentView("graph"))
+							dispatch(hideExplorer())
+						}}
+					>
+						🌲
+					</button>
+				</div>
 				<button
 					className="text-4xl"
 					onClick={() => {

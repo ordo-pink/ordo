@@ -110,7 +110,6 @@ ipcMain.handle("fs:list-folder", async (_, path) => {
 	return tree
 })
 
-ipcMain.handle("fs:get-file", async (_, path) => getMarkdownFile(getAbsolute(path)))
 ipcMain.handle("fs:save-file", (_, path, data) => saveFile(getAbsolute(path), data))
 ipcMain.handle("fs:move", (_, oldPath, newPath) => move(getAbsolute(oldPath), getAbsolute(newPath)))
 ipcMain.handle("fs:create-file", (_, folder, name) => createFile(folder, name))
@@ -157,6 +156,17 @@ const createWindow = (): void => {
 		}, 300),
 	)
 
+	ipcMain.handle("fs:get-file", async (_, path) => {
+		const file = await getMarkdownFile(getAbsolute(path))
+
+		mainWindow.setRepresentedFilename(path)
+		mainWindow.setTitle(`${file.readableName} — ORDO`)
+
+		app.addRecentDocument(path)
+
+		return file
+	})
+
 	ipcMain.handle("fs:delete", async (_, path: string): Promise<boolean> => {
 		const response = dialog.showMessageBoxSync(mainWindow, {
 			type: "question",
@@ -192,6 +202,7 @@ const createWindow = (): void => {
 		ipcMain.removeHandler("fs:select-root-folder")
 		ipcMain.removeHandler("fs:delete")
 		ipcMain.removeHandler("shell:open-external")
+		ipcMain.removeHandler("fs:get-file")
 	})
 }
 

@@ -2,7 +2,15 @@ import type { OrdoFolder, MDFile } from "../../../global-context/types"
 
 import React from "react"
 import { ifElse, tap, pipe } from "ramda"
-import { HiChevronDown, HiChevronRight, HiFolder, HiFolderOpen } from "react-icons/hi"
+import {
+	HiChevronDown,
+	HiChevronRight,
+	HiCog,
+	HiDocumentRemove,
+	HiFolder,
+	HiFolderOpen,
+	HiPlus,
+} from "react-icons/hi"
 
 import { useAppDispatch, useAppSelector } from "../../app/hooks"
 import { toggleCreator } from "../../features/ui/ui-slice"
@@ -55,11 +63,17 @@ export const Folder: React.FC<FolderProps> = ({ folder, unsavedFiles }) => {
 	const removeClickHandler = () => dispatch(deleteFileOrFolder(tree))
 	const editClickHandler = () => setIsEditing(true)
 	const nameChangeHandler = (e: React.ChangeEvent<HTMLInputElement>) => setName(e.target.value)
-	const folderMouseEnterHandler = () => setOptionsVisible(true)
+	const nameBlurHandler = () => {
+		setIsEditing(false)
+		setName(folder.readableName)
+	}
+	const folderMouseOverHandler = () => setOptionsVisible(true)
 	const folderMouseLeaveHandler = () => setOptionsVisible(false)
 
 	const isEnter = (e: KeyboardEvent) => e.key === "Enter"
+	const isEsc = (e: KeyboardEvent) => e.key === "Escape"
 	const preventDefault = tap((e: Event) => e.preventDefault())
+	const resetName = tap(() => setName(folder.readableName))
 	const move = tap(() =>
 		dispatch(
 			moveFileOrFolder({
@@ -69,9 +83,11 @@ export const Folder: React.FC<FolderProps> = ({ folder, unsavedFiles }) => {
 		),
 	)
 	const stopEditing = tap(() => setIsEditing(false))
-	const noOp = (): null => null
+	const noOp = tap((): null => null)
 
-	const nameKeyDownHandler = ifElse(isEnter, pipe(preventDefault, move, stopEditing), noOp)
+	const saveOnEnter = ifElse(isEnter, pipe(preventDefault, move, stopEditing), noOp)
+	const dropOnEsc = ifElse(isEsc, pipe(preventDefault, resetName, stopEditing), noOp)
+	const nameKeyDownHandler = pipe(saveOnEnter, dropOnEsc)
 
 	return (
 		tree && (
@@ -79,46 +95,39 @@ export const Folder: React.FC<FolderProps> = ({ folder, unsavedFiles }) => {
 				<div
 					className={`flex justify-between py-1 select-none ${hasCurrentlyOpenFileClass}`}
 					style={{ paddingLeft }}
-					onMouseEnter={folderMouseEnterHandler}
+					onMouseOver={folderMouseOverHandler}
 					onMouseLeave={folderMouseLeaveHandler}
 				>
-					<Conditional when={!isEditing}>
-						<span
+					<div className="flex space-x-1">
+						<div
 							className="flex items-center flex-nowrap space-x-1 truncate"
 							onClick={toggleFolder}
 						>
 							<Icon className="text-gray-500" />
 							<FolderIcon className="text-gray-500" />
-							<span>{tree.readableName}</span>
-						</span>
-						<input
-							className="rounded-lg outline-none p-1 text-left text-xs text-gray-500"
-							autoFocus={isEditing}
-							value={name}
-							onChange={nameChangeHandler}
-							onKeyDown={nameKeyDownHandler}
-						/>
-					</Conditional>
+						</div>
+						<Conditional when={!isEditing}>
+							<div>{tree.readableName}</div>
+							<input
+								className="bg-transparent flex-grow p-0.5 outline-none leading-5"
+								autoFocus={isEditing}
+								value={name}
+								onChange={nameChangeHandler}
+								onKeyDown={nameKeyDownHandler}
+								onBlur={nameBlurHandler}
+							/>
+						</Conditional>
+					</div>
 
 					{optionsVisible && (
-						<div className="flex space-x-2 text-xs">
-							{canEdit && (
-								<div>
-									<button className="p-1" onClick={addClickHandler}>
-										➕
-									</button>
-
-									<button className="p-1" onClick={editClickHandler}>
-										⚙️
-									</button>
-								</div>
-							)}
-
-							{isEditing && (
-								<button className="p-1" onClick={removeClickHandler}>
-									❌
-								</button>
-							)}
+						<div className="flex space-x-2 items-center text-xs">
+							<Conditional when={isEditing}>
+								<HiDocumentRemove className="text-red-500" onClick={removeClickHandler} />
+								<>
+									<HiPlus className="text-gray-500" onClick={addClickHandler} />
+									{canEdit && <HiCog className="text-gray-500" onClick={editClickHandler} />}
+								</>
+							</Conditional>
 						</div>
 					)}
 				</div>

@@ -26,7 +26,7 @@ export type WithFrontmatter<
 	frontmatter: K & Frontmatter
 }
 
-export interface OrdoFile {
+export interface OrdoFile extends Record<string, unknown> {
 	path: Path
 	isFile: true
 	exists: boolean
@@ -53,7 +53,7 @@ export interface Link {
 	exists: boolean
 }
 
-export interface OrdoFolder {
+export interface OrdoFolder extends Record<string, unknown> {
 	path: Path
 	isFile: false
 	exists: boolean

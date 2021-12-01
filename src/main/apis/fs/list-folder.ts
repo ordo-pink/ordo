@@ -1,6 +1,8 @@
 import { promises } from "fs"
 import { join } from "path"
 
+import YAML from "yaml"
+
 import { sortTree } from "../../../utils/tree"
 import { createOrdoFile, createOrdoFolder } from "../../../global-context/init"
 import { OrdoFolder } from "../../../global-context/types"
@@ -14,6 +16,20 @@ export async function listFolder(
 	const { mtime, atime, birthtime } = await promises.stat(path)
 
 	const tree = createOrdoFolder({ path, mtime, atime, birthtime, parent, depth, exists: true })
+	const metadataPath = tree.path.endsWith("/")
+		? tree.path.concat(".ordo")
+		: tree.path.concat("/.ordo")
+
+	try {
+		const metadataString = await promises.readFile(metadataPath, "utf-8")
+		const metadata = YAML.parse(metadataString) as Partial<OrdoFolder>
+
+		Object.keys(metadata).forEach((key) => {
+			tree[key] = metadata[key]
+		})
+	} catch (_) {
+		//
+	}
 
 	for (const item of folder) {
 		const newPath = join(path, item.name)
@@ -27,6 +43,10 @@ export async function listFolder(
 
 			tree.children.push(await listFolder(newPath, depth + 1, tree.path))
 		} else if (item.isFile()) {
+			if (item.name === ".ordo") {
+				continue
+			}
+
 			const { birthtime, mtime, atime, size } = await promises.stat(newPath)
 
 			const file = createOrdoFile({

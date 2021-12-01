@@ -20,6 +20,8 @@ contextBridge.exposeInMainWorld("fileSystemAPI", {
 		ipcRenderer.invoke("fs:create-folder", folder, name),
 	delete: (path: string) => ipcRenderer.invoke("fs:delete", path),
 	findFileBySubPath: (subPath: string) => ipcRenderer.invoke("fs:find-file-by-subpath", subPath),
+	handleOrdoFolderChange: (folder: OrdoFolder, changes: Partial<OrdoFolder>) =>
+		ipcRenderer.invoke("fs:handle-ordo-folder-change", folder, changes),
 })
 
 contextBridge.exposeInMainWorld("settingsAPI", {

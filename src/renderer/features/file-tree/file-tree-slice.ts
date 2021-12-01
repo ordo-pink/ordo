@@ -89,6 +89,13 @@ const fileTreeSlice = createSlice({
 			Object.keys(action.payload.increment).forEach((key) => {
 				stateNode[key] = (action.payload.increment as any)[key]
 			})
+
+			if (isFolder(action.payload.node)) {
+				window.fileSystemAPI.handleOrdoFolderChange(
+					action.payload.node,
+					action.payload.increment as Partial<OrdoFolder>,
+				)
+			}
 		},
 	},
 	extraReducers: (builder: ActionReducerMapBuilder<FileTreeState>) => {

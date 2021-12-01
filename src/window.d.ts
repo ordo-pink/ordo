@@ -20,6 +20,7 @@ export interface IFileSystemAPI {
 	delete: (path: string) => Promise<boolean>
 	findFileBySubPath: (subPath: string) => Promise<WithBody<MDFile>>
 	selectRootFolder: () => Promise<string>
+	handleOrdoFolderChange: (folder: OrdoFolder, changes: Partial<OrdoFolder>) => Promise<void>
 }
 
 export interface IShellAPI {

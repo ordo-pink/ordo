@@ -11,6 +11,24 @@ import { MDFile } from "../../../global-context/types"
 const getDivElement = (index: number): HTMLDivElement =>
 	document.querySelector(`[data-id="${index}"]`)
 
+const IMAGE_FILE_EXTENSIONS = [
+	".apng",
+	".avif",
+	".gif",
+	".jpg",
+	".jpeg",
+	".pjpeg",
+	".pjp",
+	".png",
+	".svg",
+	".webp",
+	".bmp",
+	".ico",
+	".cur",
+	".tif",
+	".tiff",
+]
+
 export const Workspace: React.FC<{
 	toggleSaved: (path: string, saved: boolean) => void
 }> = ({ toggleSaved }) => {
@@ -20,6 +38,9 @@ export const Workspace: React.FC<{
 	const [savedCaretPosition, setSavedCaretPosition] = React.useState(0)
 	const [currentLine, setCurrentLine] = React.useState(0)
 	const [metadata, setMetadata] = React.useState<MDFile>(null)
+	const [isImage, setIsImage] = React.useState(false)
+	const [extension, setExtension] = React.useState("")
+	const [imageContent, setImageContent] = React.useState("")
 
 	React.useEffect(() => {
 		const line = getDivElement(currentLine)
@@ -32,11 +53,18 @@ export const Workspace: React.FC<{
 	React.useEffect(() => {
 		currentPath &&
 			window.fileSystemAPI.getFile(currentPath).then((data) => {
-				setContent(data.body.split("\n"))
-				setMetadata({
-					...data,
-					body: undefined,
-				})
+				if (data.extension === ".md") {
+					setIsImage(false)
+					setContent(data.body.split("\n"))
+					setMetadata({
+						...data,
+						body: undefined,
+					})
+				} else if (IMAGE_FILE_EXTENSIONS.includes(data.extension)) {
+					setIsImage(true)
+					setExtension(data.extension)
+					setImageContent(data.body)
+				}
 			})
 	}, [currentPath])
 
@@ -187,29 +215,41 @@ export const Workspace: React.FC<{
 
 	return (
 		<>
-			{Boolean(currentPath) && metadata && metadata.readableName && (
-				<Metadata metadata={metadata} />
-			)}
-			<Conditional when={Boolean(currentPath)}>
-				<div className="pb-80 mb-80 overflow-x-hidden">
-					<div id="editor" className="pb-80 mb-80 font-mono">
-						{content &&
-							content.map((line, index) => (
-								<MemoLine
-									key={`${line}-${index}`}
-									onClick={onClickEditableDiv}
-									onChange={onChangeEditableDiv}
-									onKeyDown={onKeyDown}
-									line={line}
-									index={index}
-									currentLine={currentLine}
-									content={content}
-								/>
-							))}
-					</div>
+			<Conditional when={isImage}>
+				<div className="h-screen w-full flex justify-between items-center">
+					{imageContent && (
+						<img
+							className="mx-auto w-9/12 shadow-2xl"
+							src={`data:image/${extension.slice(1)};base64,${imageContent}`}
+						/>
+					)}
 				</div>
+				<div>
+					{Boolean(currentPath) && metadata && metadata.readableName && (
+						<Metadata metadata={metadata} />
+					)}
+					<Conditional when={Boolean(currentPath)}>
+						<div className="pb-80 mb-80 overflow-x-hidden">
+							<div id="editor" className="pb-80 mb-80 font-mono">
+								{content &&
+									content.map((line, index) => (
+										<MemoLine
+											key={`${line}-${index}`}
+											onClick={onClickEditableDiv}
+											onChange={onChangeEditableDiv}
+											onKeyDown={onKeyDown}
+											line={line}
+											index={index}
+											currentLine={currentLine}
+											content={content}
+										/>
+									))}
+							</div>
+						</div>
 
-				<WelcomePage />
+						<WelcomePage />
+					</Conditional>
+				</div>
 			</Conditional>
 		</>
 	)

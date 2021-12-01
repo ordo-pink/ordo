@@ -7,6 +7,7 @@ import { MemoLine } from "./memo-line"
 import { Metadata } from "./metadata"
 import { useAppSelector } from "../../../renderer/app/hooks"
 import { MDFile } from "../../../global-context/types"
+import { HiChevronRight } from "react-icons/hi"
 
 const getDivElement = (index: number): HTMLDivElement =>
 	document.querySelector(`[data-id="${index}"]`)
@@ -41,6 +42,7 @@ export const Workspace: React.FC<{
 	const [isImage, setIsImage] = React.useState(false)
 	const [extension, setExtension] = React.useState("")
 	const [imageContent, setImageContent] = React.useState("")
+	const [breadcrumbs, setBreadcrumbs] = React.useState(null)
 
 	React.useEffect(() => {
 		const line = getDivElement(currentLine)
@@ -53,6 +55,8 @@ export const Workspace: React.FC<{
 	React.useEffect(() => {
 		currentPath &&
 			window.fileSystemAPI.getFile(currentPath).then((data) => {
+				setBreadcrumbs(data.path.split("/"))
+
 				if (data.extension === ".md") {
 					setIsImage(false)
 					setContent(data.body.split("\n"))
@@ -215,6 +219,15 @@ export const Workspace: React.FC<{
 
 	return (
 		<>
+			<div className="py-2 text-gray-600 text-xs cursor-default flex">
+				{breadcrumbs &&
+					breadcrumbs.map((breadcrumb: string, index: number) => (
+						<span className="flex items-center">
+							<span className="px-1 hover:text-blue-600 cursor-pointer">{breadcrumb}</span>
+							{index !== breadcrumbs.length - 1 && index !== 0 && <HiChevronRight />}
+						</span>
+					))}
+			</div>
 			<Conditional when={isImage}>
 				<div className="h-screen w-full flex justify-between items-center">
 					{imageContent && (

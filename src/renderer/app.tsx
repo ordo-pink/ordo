@@ -19,13 +19,7 @@ import {
 	toggleSearcher,
 } from "./features/ui/ui-slice"
 import { Folder } from "./components/file-explorer/folder"
-import {
-	HiCog,
-	HiOutlineCog,
-	HiOutlineCollection,
-	HiOutlineSearch,
-	HiOutlineShare,
-} from "react-icons/hi"
+import { HiOutlineCog, HiOutlineCollection, HiOutlineLink, HiOutlineSearch } from "react-icons/hi"
 
 export const App: React.FC = () => {
 	const dispatch = useAppDispatch()
@@ -174,7 +168,7 @@ export const App: React.FC = () => {
 							}
 						}}
 					/>
-					<HiOutlineShare
+					<HiOutlineLink
 						className="text-4xl hover:text-blue-600 cursor-pointer"
 						title="Graph View"
 						onClick={() => {

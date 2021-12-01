@@ -47,6 +47,10 @@ export async function listFolder(
 				continue
 			}
 
+			if (item.name.startsWith(".")) {
+				continue
+			}
+
 			const { birthtime, mtime, atime, size } = await promises.stat(newPath)
 
 			const file = createOrdoFile({

@@ -19,6 +19,13 @@ import {
 	toggleSearcher,
 } from "./features/ui/ui-slice"
 import { Folder } from "./components/file-explorer/folder"
+import {
+	HiCog,
+	HiOutlineCog,
+	HiOutlineCollection,
+	HiOutlineSearch,
+	HiOutlineShare,
+} from "react-icons/hi"
 
 export const App: React.FC = () => {
 	const dispatch = useAppDispatch()
@@ -154,10 +161,11 @@ export const App: React.FC = () => {
 				</div>
 			</Conditional>
 
-			<div className="fixed right-0 w-14 top-0 h-screen justify-between overflow-y-visible overflow-x-hidden items-center flex flex-col p-4 space-y-4 border-l border-gray-300 dark:border-gray-900 py-4 bg-gray-100 dark:bg-gray-700">
-				<div>
-					<button
-						className="text-4xl"
+			<div className="fixed right-0 w-14 top-0 h-screen justify-between overflow-y-visible overflow-x-hidden items-center flex flex-col p-4 space-y-4 border-l border-gray-300 dark:border-gray-900 py-4 bg-gray-100 dark:bg-gray-700 text-gray-500">
+				<div className="flex flex-col items-center space-y-4">
+					<HiOutlineCollection
+						className="text-4xl hover:text-blue-600 cursor-pointer"
+						title="Open files"
 						onClick={() => {
 							dispatch(setCurrentView("workspace"))
 
@@ -165,28 +173,31 @@ export const App: React.FC = () => {
 								dispatch(toggleExplorer())
 							}
 						}}
-					>
-						🗄
-					</button>
-					<button
-						className="text-4xl"
+					/>
+					<HiOutlineShare
+						className="text-4xl hover:text-blue-600 cursor-pointer"
+						title="Graph View"
 						onClick={() => {
 							dispatch(setCurrentView("graph"))
 							dispatch(hideExplorer())
 						}}
-					>
-						🌲
-					</button>
+					/>
+					<HiOutlineSearch
+						className="text-4xl hover:text-blue-600 cursor-pointer"
+						title="Search..."
+						onClick={() => {
+							dispatch(toggleSearcher())
+						}}
+					/>
 				</div>
-				<button
-					className="text-4xl"
+				<HiOutlineCog
+					className="text-4xl hover:text-blue-600 cursor-pointer"
+					title="Settings"
 					onClick={() => {
 						dispatch(setCurrentView("settings"))
 						dispatch(hideExplorer())
 					}}
-				>
-					⚙️
-				</button>
+				/>
 			</div>
 		</div>
 	)

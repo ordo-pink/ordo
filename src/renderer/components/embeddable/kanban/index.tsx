@@ -62,12 +62,12 @@ export const Kanban: React.FC<{
 			: `${result.draggableId}.md`
 
 		const oldPath = `${result.source.droppableId}/${name}`
-		const newPath = `${result.destination.droppableId}/${name}`
+		const newPath = `${result.destination.droppableId}/${escapeSlashes(name)}`
 
 		if (result.source.droppableId !== result.destination.droppableId) {
 			const node = findNode(tree, "path", oldPath) as OrdoFolder
 
-			dispatch(moveFileOrFolder({ node, newPath: escapeSlashes(newPath) }))
+			dispatch(moveFileOrFolder({ node, newPath: newPath }))
 		}
 	}
 

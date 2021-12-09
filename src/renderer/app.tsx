@@ -1,122 +1,108 @@
-import React from "react"
+import React from "react";
 
-import { useAppDispatch, useAppSelector } from "./app/hooks"
-import { Workspace } from "./components/workplace"
-import { Conditional } from "./components/conditional"
-import { FileTreeGraph } from "./components/charts/file-tree"
-import {
-	fetchFileTree,
-	getCurrentPathFromSettings,
-	getRootPathFromSettings,
-	setCurrentPath,
-	setRootPath,
-} from "./features/file-tree/file-tree-slice"
+import { useAppDispatch, useAppSelector } from "../common/state/hooks";
+import { Workspace } from "./components/workplace";
+import { Conditional } from "../common/components/conditional";
+import { FileTreeGraph } from "./components/charts/file-tree";
+import { getCurrentPath, getRootPath } from "../file-tree/state/file-tree-slice";
 import {
 	hideExplorer,
 	setCurrentView,
 	toggleCreator,
 	toggleExplorer,
 	toggleSearcher,
-} from "./features/ui/ui-slice"
-import { Folder } from "./components/file-explorer/folder"
-import { HiOutlineCog, HiOutlineCollection, HiOutlineLink, HiOutlineSearch } from "react-icons/hi"
+} from "./features/ui/ui-slice";
+import { Folder } from "../file-tree/components/folder";
+import { HiOutlineCog, HiOutlineCollection, HiOutlineLink, HiOutlineSearch } from "react-icons/hi";
 
 export const App: React.FC = () => {
-	const dispatch = useAppDispatch()
+	const dispatch = useAppDispatch();
 
-	const folder = useAppSelector((state) => state.fileTree.tree)
-	const rootPath = useAppSelector((state) => state.fileTree.rootPath)
-	const currentPath = useAppSelector((state) => state.fileTree.currentPath)
-	const showExplorer = useAppSelector((state) => state.ui.showExplorer)
-	const currentView = useAppSelector((state) => state.ui.currentView)
+	const folder = useAppSelector((state) => state.fileTree.tree);
+	const currentPath = useAppSelector((state) => state.fileTree.currentPath);
+	const showExplorer = useAppSelector((state) => state.ui.showExplorer);
+	const currentView = useAppSelector((state) => state.ui.currentView);
 
-	const [unsavedFiles, setUnsavedFiles] = React.useState<string[]>([])
-
-	React.useEffect(() => {
-		dispatch(getCurrentPathFromSettings())
-		dispatch(getRootPathFromSettings())
-	}, [])
+	const [unsavedFiles, setUnsavedFiles] = React.useState<string[]>([]);
 
 	React.useEffect(() => {
-		rootPath && dispatch(fetchFileTree(rootPath))
-	}, [rootPath])
+		dispatch(getCurrentPath());
+		dispatch(getRootPath());
+	}, []);
 
 	React.useEffect(() => {
 		if (currentPath) {
-			window.settingsAPI.set("application.last-open-file", currentPath)
+			window.settingsAPI.set("application.last-open-file", currentPath);
 		}
 
-		window.addEventListener("keydown", createFileOrFolderListener)
+		window.addEventListener("keydown", createFileOrFolderListener);
 
 		return () => {
-			window.removeEventListener("keydown", createFileOrFolderListener)
-		}
-	})
+			window.removeEventListener("keydown", createFileOrFolderListener);
+		};
+	}, []);
 
 	const createFileOrFolderListener = (e: KeyboardEvent) => {
 		if (e.metaKey && e.key === "n") {
-			e.preventDefault()
-			dispatch(toggleCreator())
+			e.preventDefault();
+			dispatch(toggleCreator());
 		}
 
 		if (e.metaKey && e.key === "p") {
-			e.preventDefault()
-			dispatch(toggleSearcher())
+			e.preventDefault();
+			dispatch(toggleSearcher());
 		}
 
 		if (e.metaKey && e.key === "b" && currentView === "workspace") {
-			e.preventDefault()
-			dispatch(toggleExplorer())
+			e.preventDefault();
+			dispatch(toggleExplorer());
 		}
 
 		if (e.metaKey && e.shiftKey && e.key === "e") {
-			e.preventDefault()
-			dispatch(setCurrentView("workspace"))
+			e.preventDefault();
+			dispatch(setCurrentView("workspace"));
 
 			if (!showExplorer) {
-				dispatch(toggleExplorer())
+				dispatch(toggleExplorer());
 			}
 		}
 
 		if (e.metaKey && e.shiftKey && e.key === "g") {
-			e.preventDefault()
-			dispatch(setCurrentView("graph"))
+			e.preventDefault();
+			dispatch(setCurrentView("graph"));
 
 			if (showExplorer) {
-				dispatch(toggleExplorer())
+				dispatch(toggleExplorer());
 			}
 		}
 
 		if (e.metaKey && e.key === ",") {
-			e.preventDefault()
-			dispatch(setCurrentView("settings"))
+			e.preventDefault();
+			dispatch(setCurrentView("settings"));
 
 			if (showExplorer) {
-				dispatch(toggleExplorer())
+				dispatch(toggleExplorer());
 			}
 		}
-	}
+	};
 
 	const toggleUnsavedFileStatus = (path: string, saved: boolean) => {
-		const unsavedFilesCopy = [...unsavedFiles]
+		const unsavedFilesCopy = [...unsavedFiles];
 
 		if (saved) {
-			unsavedFilesCopy.splice(unsavedFilesCopy.indexOf(path), 1)
+			unsavedFilesCopy.splice(unsavedFilesCopy.indexOf(path), 1);
 		} else if (!unsavedFilesCopy.includes(path)) {
-			unsavedFilesCopy.push(path)
+			unsavedFilesCopy.push(path);
 		}
 
-		setUnsavedFiles(unsavedFilesCopy)
-	}
+		setUnsavedFiles(unsavedFilesCopy);
+	};
 
 	const selectRootDir = (e: React.MouseEvent<HTMLInputElement, MouseEvent>) => {
-		e.preventDefault()
+		e.preventDefault();
 
-		window.fileSystemAPI.selectRootFolder().then((path) => {
-			dispatch(setCurrentPath(path))
-			dispatch(setRootPath(path))
-		})
-	}
+		window.FileTree.selectRootFolder();
+	};
 
 	return (
 		<div className="flex">
@@ -137,7 +123,7 @@ export const App: React.FC = () => {
 
 			<Conditional when={showExplorer}>
 				<div className="fixed right-14 top-0 h-screen overflow-y-auto flex flex-col justify-between w-72 border-l border-gray-300 dark:border-gray-900 py-4 bg-gray-100 dark:bg-gray-700">
-					<div className="pr-2">
+					<div>
 						<h2 className="uppercase text-sm text-center text-gray-600 dark:text-gray-500">
 							Explorer
 						</h2>
@@ -161,10 +147,10 @@ export const App: React.FC = () => {
 						className="text-4xl hover:text-blue-600 cursor-pointer"
 						title="Open files"
 						onClick={() => {
-							dispatch(setCurrentView("workspace"))
+							dispatch(setCurrentView("workspace"));
 
 							if (currentView === "workspace") {
-								dispatch(toggleExplorer())
+								dispatch(toggleExplorer());
 							}
 						}}
 					/>
@@ -172,15 +158,15 @@ export const App: React.FC = () => {
 						className="text-4xl hover:text-blue-600 cursor-pointer"
 						title="Graph View"
 						onClick={() => {
-							dispatch(setCurrentView("graph"))
-							dispatch(hideExplorer())
+							dispatch(setCurrentView("graph"));
+							dispatch(hideExplorer());
 						}}
 					/>
 					<HiOutlineSearch
 						className="text-4xl hover:text-blue-600 cursor-pointer"
 						title="Search..."
 						onClick={() => {
-							dispatch(toggleSearcher())
+							dispatch(toggleSearcher());
 						}}
 					/>
 				</div>
@@ -188,11 +174,11 @@ export const App: React.FC = () => {
 					className="text-4xl hover:text-blue-600 cursor-pointer"
 					title="Settings"
 					onClick={() => {
-						dispatch(setCurrentView("settings"))
-						dispatch(hideExplorer())
+						dispatch(setCurrentView("settings"));
+						dispatch(hideExplorer());
 					}}
 				/>
 			</div>
 		</div>
-	)
-}
+	);
+};

@@ -1,26 +1,27 @@
-import React from "react"
-import { useAppDispatch, useAppSelector } from "./app/hooks"
-import { createFileOrFolder, setCurrentPath } from "./features/file-tree/file-tree-slice"
-import { setCreateIn, setCurrentView, toggleCreator } from "./features/ui/ui-slice"
+import React from "react";
+
+import { useAppDispatch, useAppSelector } from "../../common/state/hooks";
+import { createFile, createFolder, setCurrentPath } from "../state/file-tree-slice";
+import { setCreateIn, setCurrentView, toggleCreator } from "../../renderer/features/ui/ui-slice";
 
 export const Creator: React.FC = () => {
-	const dispatch = useAppDispatch()
+	const dispatch = useAppDispatch();
 
-	const tree = useAppSelector((state) => state.fileTree.tree)
-	const { createIn, showCreator } = useAppSelector((state) => state.ui)
+	const tree = useAppSelector((state) => state.fileTree.tree);
+	const { createIn, showCreator } = useAppSelector((state) => state.ui);
 
 	if (!createIn && tree) {
-		dispatch(setCreateIn(tree))
+		dispatch(setCreateIn(tree));
 	}
 
-	const ref = React.useRef()
-	const [creationName, setCreationName] = React.useState("")
+	const ref = React.useRef();
+	const [creationName, setCreationName] = React.useState("");
 
 	const resetState = () => {
-		setCreationName("")
-		dispatch(setCurrentView("workspace"))
-		dispatch(toggleCreator())
-	}
+		setCreationName("");
+		dispatch(setCurrentView("workspace"));
+		dispatch(toggleCreator());
+	};
 
 	return (
 		showCreator &&
@@ -52,21 +53,22 @@ export const Creator: React.FC = () => {
 							value={creationName}
 							onKeyDown={(e) => {
 								if (e.key === "Escape") {
-									e.preventDefault()
+									e.preventDefault();
 
-									resetState()
+									resetState();
 								}
 
 								if (e.key === "Enter") {
-									e.preventDefault()
-
-									dispatch(createFileOrFolder({ node: createIn, name: creationName }))
+									e.preventDefault();
 
 									if (!creationName.endsWith("/")) {
-										dispatch(setCurrentPath(`${createIn.path}/${creationName}`))
+										dispatch(createFile(`${createIn.path}/${creationName}`));
+										dispatch(setCurrentPath(`${createIn.path}/${creationName}`));
+									} else {
+										dispatch(createFolder(`${createIn.path}/${creationName}`));
 									}
 
-									resetState()
+									resetState();
 								}
 							}}
 						/>
@@ -85,5 +87,5 @@ export const Creator: React.FC = () => {
 				</div>
 			</div>
 		)
-	)
-}
+	);
+};

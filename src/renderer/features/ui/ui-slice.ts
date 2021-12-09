@@ -1,16 +1,16 @@
-import type { OrdoFolder } from "../../../global-context/types"
+import type { OrdoFolder } from "../../../file-tree/types";
 
-import { createSlice, PayloadAction } from "@reduxjs/toolkit"
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
-export type CurrentView = "workspace" | "graph" | "settings"
+export type CurrentView = "workspace" | "graph" | "settings";
 
 export type UiState = {
-	showExplorer: boolean
-	showSearcher: boolean
-	showCreator: boolean
-	currentView: CurrentView
-	createIn: OrdoFolder
-}
+	showExplorer: boolean;
+	showSearcher: boolean;
+	showCreator: boolean;
+	currentView: CurrentView;
+	createIn: OrdoFolder;
+};
 
 const initialState: UiState = {
 	showExplorer: true,
@@ -18,33 +18,33 @@ const initialState: UiState = {
 	showCreator: false,
 	currentView: "workspace",
 	createIn: null,
-}
+};
 
 const uiSlice = createSlice({
 	name: "ui",
 	initialState,
 	reducers: {
 		toggleCreator(state, action?: PayloadAction<OrdoFolder>) {
-			state.showCreator = !state.showCreator
-			state.createIn = action.payload
+			state.showCreator = !state.showCreator;
+			state.createIn = action.payload;
 		},
 		toggleExplorer(state) {
-			state.showExplorer = !state.showExplorer
+			state.showExplorer = !state.showExplorer;
 		},
 		hideExplorer(state) {
-			state.showExplorer = false
+			state.showExplorer = false;
 		},
 		toggleSearcher(state) {
-			state.showSearcher = !state.showSearcher
+			state.showSearcher = !state.showSearcher;
 		},
 		setCreateIn(state, action: PayloadAction<OrdoFolder>) {
-			state.createIn = action.payload
+			state.createIn = action.payload;
 		},
 		setCurrentView(state, action: PayloadAction<CurrentView>) {
-			state.currentView = action.payload
+			state.currentView = action.payload;
 		},
 	},
-})
+});
 
 export const {
 	hideExplorer,
@@ -53,6 +53,6 @@ export const {
 	toggleSearcher,
 	setCreateIn,
 	setCurrentView,
-} = uiSlice.actions
+} = uiSlice.actions;
 
-export default uiSlice.reducer
+export default uiSlice.reducer;

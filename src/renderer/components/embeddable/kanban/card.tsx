@@ -1,70 +1,66 @@
-import type { MDFile } from "../../../../global-context/types"
+import type { OrdoFile } from "../../../../file-tree/types";
 
-import React from "react"
-import { Draggable } from "react-beautiful-dnd"
+import React from "react";
+import { Draggable } from "react-beautiful-dnd";
 
-import { useAppDispatch } from "../../../app/hooks"
-import {
-	deleteFileOrFolder,
-	moveFileOrFolder,
-	setCurrentPath,
-} from "../../../features/file-tree/file-tree-slice"
+import { useAppDispatch } from "../../../../common/state/hooks";
+import { deleteFile, moveFile, setCurrentPath } from "../../../../file-tree/state/file-tree-slice";
 
-import { escapeSlashes } from "../../../../utils/string"
+import { escapeSlashes } from "../../../../utils/string";
 
-const getDisplayName = (readableName: string) => readableName.replace(".md", "")
+const getDisplayName = (readableName: string) => readableName.replace(".md", "");
 
 const getBadge = (readableName: string) => {
-	const badge = readableName.match(/^\[.*\]\s/)
+	const badge = readableName.match(/^\[.*\]\s/);
 
 	if (badge) {
-		return String(badge).slice(1, -2)
+		return String(badge).slice(1, -2);
 	}
-	return badge
-}
+	return badge;
+};
 
 export const Card: React.FC<{
-	file: MDFile
-	index: number
+	file: OrdoFile;
+	index: number;
 }> = ({ file: item, index }) => {
-	const dispatch = useAppDispatch()
+	const dispatch = useAppDispatch();
 
-	const ref = React.useRef(null)
+	const ref = React.useRef(null);
 
-	const [editable, setEditable] = React.useState(false)
+	const [editable, setEditable] = React.useState(false);
 
-	const displayName = getDisplayName(item.readableName)
-	const badge = getBadge(item.readableName)
+	const displayName = getDisplayName(item.readableName);
+	const badge = getBadge(item.readableName);
 
-	const openButtonClickHandler = () => dispatch(setCurrentPath(item.path))
-	const deleteButtonClickHandler = () => dispatch(deleteFileOrFolder(item))
-	const clickCardNameInputHandler = () => setEditable(true)
+	const openButtonClickHandler = () => dispatch(setCurrentPath(item.path));
+	const deleteButtonClickHandler = () => dispatch(deleteFile(item.path));
+	const clickCardNameInputHandler = () => setEditable(true);
 	const blurCardNameInputHandler = () => {
-		ref.current.textContent = displayName
-		setEditable(false)
-	}
+		ref.current.textContent = displayName;
+		setEditable(false);
+	};
 	const keyDownCardNameInputHandler = (e: React.KeyboardEvent<HTMLDivElement>) => {
 		if (e.key === "Escape") {
-			e.preventDefault()
-			blurCardNameInputHandler()
+			e.preventDefault();
+			blurCardNameInputHandler();
 		}
 
 		if (e.key === "Enter") {
-			e.preventDefault()
+			e.preventDefault();
 
 			dispatch(
-				moveFileOrFolder({
-					node: item,
+				moveFile({
+					oldPath: item.path,
 					newPath: item.path.replace(
 						item.readableName,
 						`${escapeSlashes(ref.current.textContent)}.md`,
 					),
 				}),
-			)
+			);
 
-			setEditable(false)
+			setEditable(false);
 		}
-	}
+	};
 
 	return (
 		<Draggable draggableId={item.readableName} index={index}>
@@ -111,5 +107,5 @@ export const Card: React.FC<{
 				</div>
 			)}
 		</Draggable>
-	)
-}
+	);
+};

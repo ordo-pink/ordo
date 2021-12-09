@@ -1,85 +1,88 @@
-import type { OrdoFolder, MDFile } from "../../../../global-context/types"
+import type { OrdoFolder, OrdoFile } from "../../../../file-tree/types";
 
-import React from "react"
-import { Draggable, Droppable } from "react-beautiful-dnd"
+import React from "react";
+import { Draggable, Droppable } from "react-beautiful-dnd";
 
-import { useAppDispatch, useAppSelector } from "../../../app/hooks"
+import { useAppDispatch, useAppSelector } from "../../../../common/state/hooks";
 import {
-	createFileOrFolder,
-	deleteFileOrFolder,
-	moveFileOrFolder,
-} from "../../../features/file-tree/file-tree-slice"
+	createFile,
+	createFolder,
+	deleteFile,
+	deleteFolder,
+	moveFile,
+	moveFolder,
+} from "../../../../file-tree/state/file-tree-slice";
 
-import { Card } from "./card"
-import { Conditional } from "../../conditional"
+import { Card } from "./card";
+import { Conditional } from "../../../../common/components/conditional";
 
-import { findNode } from "../../../../utils/tree"
-import { escapeSlashes } from "../../../../utils/string"
+import { findNode } from "../../../../utils/tree";
+import { escapeSlashes } from "../../../../utils/string";
 
 export const Column: React.FC<{
-	treePath: string
-	index: number
+	treePath: string;
+	index: number;
 }> = ({ treePath, index }) => {
-	const dispatch = useAppDispatch()
-	const rootTree = useAppSelector((state) => state.fileTree.tree) as OrdoFolder
+	const dispatch = useAppDispatch();
+	const rootTree = useAppSelector((state) => state.fileTree.tree) as OrdoFolder;
 
-	const ref = React.useRef<HTMLDivElement>(null)
+	const ref = React.useRef<HTMLDivElement>(null);
 
-	const [tree, setTree] = React.useState<OrdoFolder>(null)
-	const [isAddingCardAtTheTop, setIsAddingCardAtTheTop] = React.useState(false)
-	const [isAddingCardAtTheBottom, setIsAddingCardAtTheBottom] = React.useState(false)
-	const [newCardName, setNewCardName] = React.useState("")
+	const [tree, setTree] = React.useState<OrdoFolder>(null);
+	const [isAddingCardAtTheTop, setIsAddingCardAtTheTop] = React.useState(false);
+	const [isAddingCardAtTheBottom, setIsAddingCardAtTheBottom] = React.useState(false);
+	const [newCardName, setNewCardName] = React.useState("");
 
 	React.useEffect(() => {
 		if (rootTree) {
-			setTree(findNode(rootTree, "path", treePath) as OrdoFolder)
+			// setTree(findNode(rootTree, "path", treePath) as OrdoFolder);
 		}
-	}, [rootTree, treePath])
+	}, [rootTree, treePath]);
 
 	const newCardInputHasUnsavedChangesClass =
-		!isAddingCardAtTheTop && Boolean(newCardName) && "border-yellow-700 text-yellow-700"
-	const showNewCardInputHasUnsavedChanges = !isAddingCardAtTheTop && Boolean(newCardName)
+		!isAddingCardAtTheTop && Boolean(newCardName) && "border-yellow-700 text-yellow-700";
+	const showNewCardInputHasUnsavedChanges = !isAddingCardAtTheTop && Boolean(newCardName);
 
 	const newCardNameChangeHandler = (e: React.ChangeEvent<HTMLInputElement>) =>
-		setNewCardName(e.target.value)
-	const bottomCardInputClickHandler = () => setIsAddingCardAtTheBottom(true)
-	const topCardInputClickHandler = () => setIsAddingCardAtTheTop(true)
-	const clickRemoveColumnHandler = () => dispatch(deleteFileOrFolder(tree))
+		setNewCardName(e.target.value);
+	const bottomCardInputClickHandler = () => setIsAddingCardAtTheBottom(true);
+	const topCardInputClickHandler = () => setIsAddingCardAtTheTop(true);
+	const clickRemoveColumnHandler = () => dispatch(deleteFolder(tree.path));
 	const onBlur = () => {
-		ref.current.textContent = tree.readableName
-		ref.current.blur()
-		setIsAddingCardAtTheBottom(false)
-		setIsAddingCardAtTheTop(false)
-	}
+		ref.current.textContent = tree.readableName;
+		ref.current.blur();
+		setIsAddingCardAtTheBottom(false);
+		setIsAddingCardAtTheTop(false);
+	};
 	const onKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
 		if (e.key === "Enter") {
-			e.preventDefault()
+			e.preventDefault();
 
 			if (isAddingCardAtTheBottom || isAddingCardAtTheTop) {
-				dispatch(createFileOrFolder({ node: tree, name: `${escapeSlashes(newCardName)}.md` }))
-				setNewCardName("")
+				dispatch(createFile(`${tree.path}/${escapeSlashes(newCardName)}.md`));
+				setNewCardName("");
 			} else {
 				dispatch(
-					moveFileOrFolder({
-						node: tree,
+					moveFolder({
+						oldPath: tree.path,
 						newPath: tree.path.replace(tree.readableName, escapeSlashes(ref.current.textContent)),
 					}),
-				)
+				);
 			}
 		}
 
 		if (e.key === "Escape") {
-			e.preventDefault()
+			e.preventDefault();
 
 			if (isAddingCardAtTheBottom || isAddingCardAtTheTop) {
-				setNewCardName("")
-				setIsAddingCardAtTheBottom(false)
-				setIsAddingCardAtTheTop(false)
+				setNewCardName("");
+				setIsAddingCardAtTheBottom(false);
+				setIsAddingCardAtTheTop(false);
 			} else {
-				onBlur()
+				onBlur();
 			}
 		}
-	}
+	};
 
 	return (
 		tree && (
@@ -152,7 +155,7 @@ export const Column: React.FC<{
 									{tree.children &&
 										tree.children.map((file, index) => (
 											<div key={file.path}>
-												{file.isFile && <Card file={file as MDFile} index={index} />}
+												{file.type !== "folder" && <Card file={file as OrdoFile} index={index} />}
 											</div>
 										))}
 									{provided.placeholder}
@@ -185,5 +188,5 @@ export const Column: React.FC<{
 				)}
 			</Draggable>
 		)
-	)
-}
+	);
+};

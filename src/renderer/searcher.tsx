@@ -1,51 +1,50 @@
-import type { OrdoFile, OrdoFolder } from "../global-context/types"
+import type { OrdoFile, OrdoFolder } from "../file-tree/types";
 
-import React from "react"
-import Fuse from "fuse.js"
+import React from "react";
+import Fuse from "fuse.js";
 
-import { useAppDispatch, useAppSelector } from "./app/hooks"
-import { setCurrentPath } from "./features/file-tree/file-tree-slice"
-import { isFolder } from "../global-context/init"
-import { setCurrentView, toggleSearcher } from "./features/ui/ui-slice"
+import { useAppDispatch, useAppSelector } from "../common/state/hooks";
+import { setCurrentPath } from "../file-tree/state/file-tree-slice";
+import { setCurrentView, toggleSearcher } from "./features/ui/ui-slice";
 
 interface SearchTerm {
-	readableName: string
-	path: string
+	readableName: string;
+	path: string;
 }
 
 const createSearchTerms = (data: OrdoFolder | OrdoFile, terms: SearchTerm[] = []) => {
-	if (!isFolder(data)) {
-		terms.push({
-			readableName: data.readableName,
-			path: data.path,
-		})
-	} else {
-		for (const child of data.children) {
-			createSearchTerms(child, terms)
-		}
-	}
+	// if (!isFolder(data)) {
+	// 	terms.push({
+	// 		readableName: data.readableName,
+	// 		path: data.path,
+	// 	})
+	// } else {
+	// 	for (const child of data.children) {
+	// 		createSearchTerms(child, terms)
+	// 	}
+	// }
 
-	return terms
-}
+	return terms;
+};
 
 export const Searcher: React.FC = () => {
-	const dispatch = useAppDispatch()
-	const tree = useAppSelector((state) => state.fileTree.tree)
-	const searcherIsOpen = useAppSelector((state) => state.ui.showSearcher)
+	const dispatch = useAppDispatch();
+	const tree = useAppSelector((state) => state.fileTree.tree);
+	const searcherIsOpen = useAppSelector((state) => state.ui.showSearcher);
 
-	const ref = React.useRef()
+	const ref = React.useRef();
 
-	const [search, setSearch] = React.useState("")
-	const [searchTerms, setSearchTerms] = React.useState(null)
-	const [fuse, setFuse] = React.useState<Fuse<OrdoFile>>(null)
-	const [found, setFound] = React.useState<Fuse.FuseResult<OrdoFile>[]>(null)
-	const [preselectedSearchItem, setPreselectedSearchItem] = React.useState(0)
+	const [search, setSearch] = React.useState("");
+	const [searchTerms, setSearchTerms] = React.useState(null);
+	const [fuse, setFuse] = React.useState<Fuse<OrdoFile>>(null);
+	const [found, setFound] = React.useState<Fuse.FuseResult<OrdoFile>[]>(null);
+	const [preselectedSearchItem, setPreselectedSearchItem] = React.useState(0);
 
 	React.useEffect(() => {
 		if (tree) {
-			setSearchTerms(createSearchTerms(tree))
+			setSearchTerms(createSearchTerms(tree));
 		}
-	}, [tree])
+	}, [tree]);
 
 	React.useEffect(() => {
 		if (searchTerms) {
@@ -57,13 +56,13 @@ export const Searcher: React.FC = () => {
 						{ name: "path", weight: 0.4 },
 					],
 				}),
-			)
+			);
 		}
 
 		return () => {
-			setFuse(null)
-		}
-	}, [searchTerms, setFuse])
+			setFuse(null);
+		};
+	}, [searchTerms, setFuse]);
 
 	return (
 		searcherIsOpen && (
@@ -87,54 +86,54 @@ export const Searcher: React.FC = () => {
 							className="w-full outline-none bg-gray-50"
 							type="text"
 							onChange={(e) => {
-								setSearch(e.target.value)
-								setFound(fuse.search(e.target.value))
+								setSearch(e.target.value);
+								setFound(fuse.search(e.target.value));
 
 								if (found && found.length) {
-									setPreselectedSearchItem(0)
+									setPreselectedSearchItem(0);
 								}
 							}}
 							value={search}
 							onKeyDown={(e) => {
 								if (e.key === "Escape") {
-									e.preventDefault()
+									e.preventDefault();
 
-									setPreselectedSearchItem(0)
-									setFound(null)
-									setSearch("")
-									dispatch(toggleSearcher())
+									setPreselectedSearchItem(0);
+									setFound(null);
+									setSearch("");
+									dispatch(toggleSearcher());
 								}
 
 								if (e.key === "ArrowUp") {
-									e.preventDefault()
+									e.preventDefault();
 
 									if (preselectedSearchItem === 0) {
-										setPreselectedSearchItem(found.length ? found.length - 1 : 0)
+										setPreselectedSearchItem(found.length ? found.length - 1 : 0);
 									} else {
-										setPreselectedSearchItem((item) => item - 1)
+										setPreselectedSearchItem((item) => item - 1);
 									}
 								}
 
 								if (e.key === "ArrowDown") {
-									e.preventDefault()
+									e.preventDefault();
 
 									if (preselectedSearchItem === found.length - 1) {
-										setPreselectedSearchItem(0)
+										setPreselectedSearchItem(0);
 									} else {
-										setPreselectedSearchItem((item) => item + 1)
+										setPreselectedSearchItem((item) => item + 1);
 									}
 								}
 
 								if (e.key === "Enter") {
-									e.preventDefault()
+									e.preventDefault();
 
-									dispatch(setCurrentPath(found[preselectedSearchItem].item.path))
-									dispatch(setCurrentView("workspace"))
-									dispatch(toggleSearcher())
+									dispatch(setCurrentPath(found[preselectedSearchItem].item.path));
+									dispatch(setCurrentView("workspace"));
+									dispatch(toggleSearcher());
 
-									setPreselectedSearchItem(0)
-									setFound(null)
-									setSearch("")
+									setPreselectedSearchItem(0);
+									setFound(null);
+									setSearch("");
 								}
 							}}
 						/>
@@ -145,14 +144,14 @@ export const Searcher: React.FC = () => {
 							found.slice(0, 6).map((page, index) => (
 								<div
 									onClick={() => {
-										dispatch(setCurrentPath(page.item.path))
-										dispatch(setCurrentView("workspace"))
-										dispatch(toggleSearcher())
+										dispatch(setCurrentPath(page.item.path));
+										dispatch(setCurrentView("workspace"));
+										dispatch(toggleSearcher());
 
-										setFound(null)
-										setPreselectedSearchItem(0)
-										setSearch("")
-										dispatch(toggleSearcher())
+										setFound(null);
+										setPreselectedSearchItem(0);
+										setSearch("");
+										dispatch(toggleSearcher());
 									}}
 									key={page.item.path}
 									className={`p-2 w-full flex flex-col space-y-2 cursor-pointer ${
@@ -167,5 +166,5 @@ export const Searcher: React.FC = () => {
 				</div>
 			</div>
 		)
-	)
-}
+	);
+};

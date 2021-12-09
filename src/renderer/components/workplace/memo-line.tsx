@@ -1,22 +1,22 @@
-import React from "react"
+import React from "react";
 
-import { isEmbeddableComponent, renderEmbeddable } from "./render-embeddable"
-import { isEmbeddableContent, EmbeddableContent } from "./render-embeddable-content"
-import { applyLineStyling } from "./apply-line-styling"
-import { Conditional } from "../conditional"
+import { isEmbeddableComponent, renderEmbeddable } from "./render-embeddable";
+import { isEmbeddableContent, EmbeddableContent } from "./render-embeddable-content";
+import { applyLineStyling } from "./apply-line-styling";
+import { Conditional } from "../../../common/components/conditional";
 
 export const MemoLine = React.memo<{
-	line: string
-	index: number
-	content: string[]
-	currentLine: number
-	onClick: (index: number) => void
-	onChange: (index: number) => void
-	onKeyDown: (event: React.KeyboardEvent<HTMLDivElement>) => void
+	line: string;
+	index: number;
+	content: string[];
+	currentLine: number;
+	onClick: (index: number) => void;
+	onChange: (index: number) => void;
+	onKeyDown: (event: React.KeyboardEvent<HTMLDivElement>) => void;
 }>(
 	({ line, index, content, currentLine, onClick, onChange, onKeyDown }) => {
-		const [collapsed, setCollapsed] = React.useState(line.includes(":collapsed"))
-		const icon = collapsed ? "▶" : "▼"
+		const [collapsed, setCollapsed] = React.useState(line.includes(":collapsed"));
+		const icon = collapsed ? "▶" : "▼";
 
 		return (
 			<div key={line ? line : index}>
@@ -61,7 +61,7 @@ export const MemoLine = React.memo<{
 					</div>
 				</Conditional>
 			</div>
-		)
+		);
 	},
 	(a, b) => a.line === b.line && a.currentLine === b.currentLine,
-)
+);

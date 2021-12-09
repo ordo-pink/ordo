@@ -1,7 +1,7 @@
-import type { SimulationNodeDatum, SimulationLinkDatum, HierarchyLink, HierarchyNode } from "d3"
-import type { OrdoFolder, Tag } from "../../../global-context/types"
+import type { SimulationNodeDatum, SimulationLinkDatum, HierarchyLink, HierarchyNode } from "d3";
+import type { OrdoFolder } from "../../../file-tree/types";
 
-import React from "react"
+import React from "react";
 import {
 	hierarchy as createHierarchy,
 	forceSimulation,
@@ -13,69 +13,70 @@ import {
 	drag as d3Drag,
 	zoom,
 	select,
-} from "d3"
+} from "d3";
 
-import { useAppDispatch, useAppSelector } from "../../app/hooks"
-import { setCurrentView } from "../../features/ui/ui-slice"
-import { setCurrentPath, createFileOrFolder } from "../../features/file-tree/file-tree-slice"
+import { useAppDispatch, useAppSelector } from "../../../common/state/hooks";
+import { setCurrentView } from "../../features/ui/ui-slice";
+import { setCurrentPath, createFile } from "../../../file-tree/state/file-tree-slice";
 
 type TagNode = {
-	readableName: string
-	isFile: boolean
-	path: string
-	type: "tag"
+	readableName: string;
+	isFile: boolean;
+	path: string;
+	type: "tag";
 	data: {
-		isFile: boolean
-		readableName: string
-		path: string
-		type: "tag"
-	}
-}
+		isFile: boolean;
+		readableName: string;
+		path: string;
+		type: "tag";
+	};
+};
 
 const drag = (simulation: Simulation<SimulationNodeDatum, undefined>) =>
 	d3Drag()
 		.on("start", (event, d: SimulationNodeDatum) => {
 			if (!event.active) {
-				simulation.alphaTarget(0.3).restart()
+				simulation.alphaTarget(0.3).restart();
 			}
 
-			d.fx = d.x
-			d.fy = d.y
+			d.fx = d.x;
+			d.fy = d.y;
 		})
 		.on("drag", (event, d: SimulationNodeDatum) => {
-			d.fx = event.x
-			d.fy = event.y
+			d.fx = event.x;
+			d.fy = event.y;
 		})
 		.on("end", (event, d: SimulationNodeDatum) => {
 			if (!event.active) {
-				simulation.alphaTarget(0)
+				simulation.alphaTarget(0);
 			}
 
-			d.fx = null
-			d.fy = null
-		})
+			d.fx = null;
+			d.fy = null;
+		});
 
 export const FileTreeGraph: React.FC = () => {
-	const dispatch = useAppDispatch()
-	const data = useAppSelector((state) => state.fileTree.tree)
+	const dispatch = useAppDispatch();
+	const data = useAppSelector((state) => state.fileTree.tree);
 
-	const svgRef = React.useRef(null)
+	const svgRef = React.useRef(null);
 
 	React.useEffect(() => {
 		if (!svgRef || !data) {
-			return
+			return;
 		}
 
-		const hierarchy = createHierarchy(data)
+		const hierarchy = createHierarchy(data);
 
 		const links: Array<
 			HierarchyLink<OrdoFolder | TagNode> & {
-				pageRelation?: boolean
-				index?: number
-				type?: string
+				pageRelation?: boolean;
+				index?: number;
+				type?: string;
 			}
-		> = hierarchy.links()
-		const nodes: Array<HierarchyNode<OrdoFolder> | HierarchyNode<TagNode>> = hierarchy.descendants()
+		> = hierarchy.links();
+		const nodes: Array<HierarchyNode<OrdoFolder> | HierarchyNode<TagNode>> =
+			hierarchy.descendants();
 
 		// data.links.forEach((link) => {
 		// 	let target
@@ -157,9 +158,9 @@ export const FileTreeGraph: React.FC = () => {
 			)
 			.force("change", forceManyBody().strength(-100))
 			.force("x", forceX())
-			.force("y", forceY())
+			.force("y", forceY());
 
-		const container = select(svgRef.current)
+		const container = select(svgRef.current);
 
 		container
 			.attr(
@@ -169,7 +170,7 @@ export const FileTreeGraph: React.FC = () => {
 				}`,
 			)
 			.attr("class", "font-light text-xs")
-			.call(zoom().on("zoom", (e) => container.attr("transform", e.transform)))
+			.call(zoom().on("zoom", (e) => container.attr("transform", e.transform)));
 
 		const link = container
 			.append("g")
@@ -185,11 +186,11 @@ export const FileTreeGraph: React.FC = () => {
 				// }
 
 				if (d.pageRelation) {
-					return "#DCCCBB"
+					return "#DCCCBB";
 				}
 
-				return "#646E78"
-			})
+				return "#646E78";
+			});
 		// .attr("stroke-width", (d) => (d.source.data.type === "tag" || d.pageRelation ? 0.8 : null))
 
 		const node = container
@@ -199,42 +200,37 @@ export const FileTreeGraph: React.FC = () => {
 			.selectAll("g")
 			.data(nodes)
 			.join("g")
-			.attr("class", (d: any) =>
-				d.data.isFile || d.data.type === "absent" ? "cursor-pointer" : null,
-			)
+			.attr("class", (d: any) => (d.data.type !== "folder" ? "cursor-pointer" : null))
 			.attr("stroke-width", 0.5)
 
 			.call(drag(simulation) as any)
 			.on("click", (_, n: any) => {
-				if (n.data.isFile) {
-					dispatch(setCurrentPath(n.data.path))
+				if (n.data.type !== "folder") {
+					dispatch(setCurrentPath(n.data.path));
+					dispatch(setCurrentView("workspace"));
 				} else if (n.data.type === "absent" && n.data.parentNode) {
-					dispatch(createFileOrFolder({ name: n.data.readableName, node: n.data.parentNode.data }))
-					dispatch(setCurrentPath(n.data.path))
+					// dispatch(createFile({ name: n.data.readableName, node: n.data.parentNode.data }));
+					dispatch(setCurrentPath(n.data.path));
+					dispatch(setCurrentView("workspace"));
 				}
-
-				dispatch(setCurrentView("workspace"))
-			})
+			});
 
 		node
 			.append("circle")
-			.attr("fill", (d) => {
-				if (d.data.isFile) {
-					return "#8D98A7"
+			.attr("stroke", (d) => (d.data.type === "folder" ? "#777" : "#fff"))
+			.attr("class", (d: any) => {
+				if (d.data.type === "folder") {
+					return `text-${d.data.color}-300 fill-current`;
+				} else if (d.data.type === "image") {
+					return "text-blue-200 fill-current";
+				} else if (d.data.size === 0) {
+					return "text-pink-200 fill-current";
 				}
 
-				// if (d.data.type === "tag") {
-				// 	return "#EAB464"
-				// }
-
-				// if (d.data.type === "absent") {
-				// 	return "#DA4167"
-				// }
-
-				return "#646E78"
+				return "text-pink-400 fill-current";
 			})
-			.attr("stroke", (d) => (d.data.isFile ? null : "#fff"))
 			.attr("r", 3.5)
+			.attr("title", (d: any) => d.data.readableName);
 
 		node
 			.append("text")
@@ -244,18 +240,18 @@ export const FileTreeGraph: React.FC = () => {
 			.attr("stroke-width", 0)
 			.attr("fill", "#333")
 			.attr("style", "font-size: 2px")
-			.text((d) => d.data.readableName)
+			.text((d) => d.data.readableName);
 
 		simulation.on("tick", () => {
 			link
 				.attr("x1", (d: any) => d.source.x)
 				.attr("y1", (d: any) => d.source.y)
 				.attr("x2", (d: any) => d.target.x)
-				.attr("y2", (d: any) => d.target.y)
+				.attr("y2", (d: any) => d.target.y);
 
-			node.attr("transform", (d: any) => `translate(${d.x},${d.y})`)
-		})
-	}, [svgRef.current, data])
+			node.attr("transform", (d: any) => `translate(${d.x},${d.y})`);
+		});
+	}, [svgRef.current, data]);
 
-	return <svg ref={svgRef} width={window.innerWidth} height={window.innerHeight} />
-}
+	return <svg ref={svgRef} width={window.innerWidth} height={window.innerHeight} />;
+};

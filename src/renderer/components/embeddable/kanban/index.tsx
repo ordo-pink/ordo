@@ -1,75 +1,73 @@
-import type { OrdoFolder } from "../../../../global-context/types"
+import type { OrdoFolder } from "../../../../file-tree/types";
 
-import React from "react"
-import { DragDropContext, Droppable, DropResult } from "react-beautiful-dnd"
+import React from "react";
+import { DragDropContext, Droppable, DropResult } from "react-beautiful-dnd";
 
-import { useAppDispatch, useAppSelector } from "../../../app/hooks"
-import { createFileOrFolder, moveFileOrFolder } from "../../../features/file-tree/file-tree-slice"
+import { useAppDispatch, useAppSelector } from "../../../../common/state/hooks";
+import { createFolder } from "../../../../file-tree/state/file-tree-slice";
 
-import { Column } from "./column"
-import { Conditional } from "../../conditional"
+import { Column } from "./column";
+import { Conditional } from "../../../../common/components/conditional";
 
-import { findNode } from "../../../../utils/tree"
-import { escapeSlashes } from "../../../../utils/string"
+import { findNode } from "../../../../utils/tree";
+import { escapeSlashes } from "../../../../utils/string";
 
 export const Kanban: React.FC<{
-	folder: string
+	folder: string;
 }> = ({ folder }) => {
-	const dispatch = useAppDispatch()
-	const rootTree = useAppSelector((state) => state.fileTree.tree) as OrdoFolder
+	const dispatch = useAppDispatch();
+	const rootTree = useAppSelector((state) => state.fileTree.tree) as OrdoFolder;
 
-	const [tree, setTree] = React.useState<OrdoFolder>(null)
-	const [isAddingColumn, setIsAddingColumn] = React.useState(false)
-	const [newColumnName, setNewColumnName] = React.useState("")
+	const [tree, setTree] = React.useState<OrdoFolder>(null);
+	const [isAddingColumn, setIsAddingColumn] = React.useState(false);
+	const [newColumnName, setNewColumnName] = React.useState("");
 
 	React.useEffect(() => {
-		if (rootTree) {
-			setTree(findNode(rootTree, "path", rootTree.path.concat("/").concat(folder)) as OrdoFolder)
-		}
-	}, [rootTree, folder, tree])
+		// if (rootTree) {
+		// 	setTree(findNode(rootTree, "path", rootTree.path.concat("/").concat(folder)) as OrdoFolder);
+		// }
+	}, [rootTree, folder, tree]);
 
 	const unsavedNewCardChangesClass =
-		!isAddingColumn && Boolean(newColumnName) && "border-yellow-700 text-yellow-700"
-	const hasUnsavedNewCardChanges = !isAddingColumn && Boolean(newColumnName)
+		!isAddingColumn && Boolean(newColumnName) && "border-yellow-700 text-yellow-700";
+	const hasUnsavedNewCardChanges = !isAddingColumn && Boolean(newColumnName);
 
-	const addNewCardButtonClickHandler = () => setIsAddingColumn(true)
+	const addNewCardButtonClickHandler = () => setIsAddingColumn(true);
 	const newColumnNameChangeHandler = (e: React.ChangeEvent<HTMLInputElement>) =>
-		setNewColumnName(e.target.value)
-	const newColumnNameBlurHandler = () => setIsAddingColumn(false)
+		setNewColumnName(e.target.value);
+	const newColumnNameBlurHandler = () => setIsAddingColumn(false);
 	const newColumnNameKeyDownHandler = (e: React.KeyboardEvent<HTMLInputElement>) => {
 		if (e.key === "Enter") {
-			e.preventDefault()
+			e.preventDefault();
 			dispatch(
-				createFileOrFolder({
-					name: newColumnName.endsWith("/")
+				createFolder(
+					newColumnName.endsWith("/")
 						? escapeSlashes(newColumnName)
 						: `${escapeSlashes(newColumnName)}/`,
-					node: tree,
-				}),
-			)
-			setNewColumnName("")
+				),
+			);
+			setNewColumnName("");
 		}
 
 		if (e.key === "Escape") {
-			e.preventDefault()
-			setNewColumnName("")
-			setIsAddingColumn(false)
+			e.preventDefault();
+			setNewColumnName("");
+			setIsAddingColumn(false);
 		}
-	}
+	};
 	const dragEndHandler = (result: DropResult) => {
 		const name = result.draggableId.endsWith(".md")
 			? result.draggableId
-			: `${result.draggableId}.md`
+			: `${result.draggableId}.md`;
 
-		const oldPath = `${result.source.droppableId}/${name}`
-		const newPath = `${result.destination.droppableId}/${escapeSlashes(name)}`
+		const oldPath = `${result.source.droppableId}/${name}`;
+		const newPath = `${result.destination.droppableId}/${escapeSlashes(name)}`;
 
 		if (result.source.droppableId !== result.destination.droppableId) {
-			const node = findNode(tree, "path", oldPath) as OrdoFolder
-
-			dispatch(moveFileOrFolder({ node, newPath: newPath }))
+			// const node = findNode(tree, "path", oldPath) as OrdoFolder;
+			// dispatch(moveFileOrFolder({ node, newPath: newPath }));
 		}
-	}
+	};
 
 	return (
 		tree &&
@@ -91,7 +89,7 @@ export const Kanban: React.FC<{
 									>
 										{tree.children.map(
 											(column: OrdoFolder, index) =>
-												!column.isFile && (
+												column.type === "folder" && (
 													<Column key={column.path} treePath={column.path} index={index} />
 												),
 										)}
@@ -124,5 +122,5 @@ export const Kanban: React.FC<{
 				</Conditional>
 			</div>
 		)
-	)
-}
+	);
+};

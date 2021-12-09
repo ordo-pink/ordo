@@ -1,45 +1,43 @@
-import type { MDFile, WithBody } from "../../../global-context/types"
+import type { OrdoFileWithBody } from "../../../file-tree/types";
 
-import React from "react"
+import React from "react";
 
-import { Conditional } from "../conditional"
-import { isEmbeddableComponent, renderEmbeddable } from "./render-embeddable"
-import { applyLineStyling } from "./apply-line-styling"
+import { Conditional } from "../../../common/components/conditional";
+import { isEmbeddableComponent, renderEmbeddable } from "./render-embeddable";
+import { applyLineStyling } from "./apply-line-styling";
 
-export const isEmbeddableContent = (line: string): boolean => /^!\[\[(.*)\]\]/.test(line)
+export const isEmbeddableContent = (line: string): boolean => /^!\[\[(.*)\]\]/.test(line);
 
 export const EmbeddableContent: React.FC<{ line: string; currentContent: string }> = ({
 	line,
 	currentContent,
 }) => {
-	const strippedContent = line.replace(/^!\[\[/, "").replace(/\]\]$/, "")
+	const strippedContent = line.replace(/^!\[\[/, "").replace(/\]\]$/, "");
 
-	const [node, setNode] = React.useState<WithBody<MDFile>>(null)
-	const [hash, setHash] = React.useState("")
+	const [node, setNode] = React.useState<OrdoFileWithBody>(null);
+	const [hash, setHash] = React.useState("");
 
-	const isUrl = strippedContent.startsWith("http://") || strippedContent.startsWith("https://")
+	const isUrl = strippedContent.startsWith("http://") || strippedContent.startsWith("https://");
 
 	React.useEffect(() => {
-		window.fileSystemAPI.findFileBySubPath(strippedContent.concat(".md")).then((n) => {
-			if (!n) {
-				const n = {
-					body: "<div class='text-red-600 text-center uppercase font-bold'>You are trying to embed a page that doesn't exist</div>",
-					path: strippedContent.concat(".md"),
-				}
-
-				setNode(n as any)
-				setHash("booo")
-			} else {
-				if (n.body === currentContent) {
-					n.body =
-						"<div class='text-red-600 text-center uppercase font-bold'>Recursion is generally a bad idea</div>"
-				}
-
-				setNode(n)
-				setHash(n.path)
-			}
-		})
-	}, [hash])
+		// window.fileSystemAPI.findFileBySubPath(strippedContent.concat(".md")).then((n) => {
+		// 	if (!n) {
+		// 		const n = {
+		// 			body: "<div class='text-red-600 text-center uppercase font-bold'>You are trying to embed a page that doesn't exist</div>",
+		// 			path: strippedContent.concat(".md"),
+		// 		};
+		// 		setNode(n as any);
+		// 		setHash("booo");
+		// 	} else {
+		// 		if (n.body === currentContent) {
+		// 			n.body =
+		// 				"<div class='text-red-600 text-center uppercase font-bold'>Recursion is generally a bad idea</div>";
+		// 		}
+		// 		setNode(n);
+		// 		setHash(n.path);
+		// 	}
+		// });
+	}, [hash]);
 
 	return (
 		<Conditional when={node && !isUrl}>
@@ -67,5 +65,5 @@ export const EmbeddableContent: React.FC<{ line: string; currentContent: string 
 				</div>
 			</Conditional>
 		</Conditional>
-	)
-}
+	);
+};

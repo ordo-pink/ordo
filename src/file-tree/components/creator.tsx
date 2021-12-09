@@ -38,12 +38,13 @@ export const Creator: React.FC = () => {
 						transform: "translate(-50%, 0)",
 						width: "70%",
 						minWidth: "400px",
+						maxWidth: "1000px",
 					}}
 					className="fixed rounded-lg shadow-xl p-4 bg-gray-50"
 					onClick={(e) => e.stopPropagation()}
 				>
-					<label className="p-1 flex flex-col space-y-2">
-						<span>{createIn.path}/</span>
+					<label className="p-1 flex">
+						<span>{createIn.readablePath}/</span>
 						<input
 							placeholder="Type here..."
 							autoFocus={showCreator}

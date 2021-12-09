@@ -21,19 +21,15 @@ export type OrdoFileType = "image" | "document" | "other";
 export type ConnectionType = "fs" | "link" | "tag" | "relation";
 
 export interface Connection {
-	source: OrdoEntity;
-	target: OrdoEntity;
+	source: OrdoFile | OrdoFolder;
+	target: OrdoFile | OrdoFolder;
 	exists: boolean;
 	type: ConnectionType;
 }
 
-export interface Exists {
-	exists: true;
-}
+export type OrdoEntity = OrdoFile | OrdoFolder;
 
-export interface OrdoEntity {
-	exists: boolean;
-	type: OrdoFileType | "folder";
+export interface OrdoFile {
 	path: string;
 	readableName: string;
 	readablePath: string;
@@ -41,28 +37,8 @@ export interface OrdoEntity {
 	createdAt?: Date;
 	updatedAt?: Date;
 	accessedAt?: Date;
-}
-
-export interface AbstractOrdoFile extends OrdoEntity {
 	type: OrdoFileType;
 	extension: string;
-}
-
-export interface AbstractOrdoFolder extends OrdoEntity {
-	type: "folder";
-	children: Array<AbstractOrdoFolder | AbstractOrdoFile>;
-}
-
-export interface VirtualOrdoFile extends AbstractOrdoFile {
-	exists: false;
-}
-
-export interface VirtualOrdoFolder extends AbstractOrdoFolder {
-	exists: false;
-}
-
-export interface OrdoFile extends AbstractOrdoFile {
-	exists: true;
 	size: number;
 	readableSize: string;
 }
@@ -71,8 +47,16 @@ export interface OrdoFileWithBody extends OrdoFile {
 	body: string;
 }
 
-export interface OrdoFolder extends AbstractOrdoFolder {
-	exists: true;
+export interface OrdoFolder {
+	path: string;
+	readableName: string;
+	readablePath: string;
+	depth: number;
+	createdAt?: Date;
+	updatedAt?: Date;
+	accessedAt?: Date;
+	type: "folder";
+	children: OrdoEntity[];
 	collapsed: boolean;
 	color: Color;
 }

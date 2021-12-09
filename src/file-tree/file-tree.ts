@@ -1,10 +1,4 @@
-import type {
-	AbstractOrdoFile,
-	AbstractOrdoFolder,
-	OrdoFile,
-	OrdoFileWithBody,
-	OrdoFolder,
-} from "./types";
+import type { OrdoFile, OrdoFileWithBody, OrdoFolder } from "./types";
 
 import { produce } from "immer";
 import { Either, IEither } from "or-else";
@@ -19,13 +13,10 @@ import { deleteFolder } from "./folder/delete-folder";
 import { deleteFile } from "./file/delete-file";
 import { getParent } from "./common/get-parent";
 import { getAncestors } from "./common/get-ancestors";
-import { tap } from "ramda";
 
-export const isAbstractOrdoFolder = (x: any): x is AbstractOrdoFolder =>
+export const isOrdoFolder = (x: any): x is OrdoFolder =>
 	x.type && x.type === "folder" && x.children && Array.isArray(x.children);
-export const isOrdoFolder = (x: any): x is OrdoFolder => isAbstractOrdoFolder(x) && x.exists;
-export const isAbstractOrdoFile = (x: any): x is AbstractOrdoFile => x.type && x.type !== "folder";
-export const isOrdoFile = (x: any): x is OrdoFile => isAbstractOrdoFile(x) && x.exists;
+export const isOrdoFile = (x: any): x is OrdoFile => x.type && x.type !== "folder";
 export const isOrdoFileWithBody = (x: any): x is OrdoFileWithBody =>
 	x.body && typeof x.body === "string" && isOrdoFile(x);
 
@@ -35,34 +26,24 @@ const fromError = <T>(x: T | Error): IEither<T, Error> =>
 export interface IFileTree {
 	concat: (otherTree: IFileTree) => IEither<IFileTree, null>;
 	getRoot: () => IEither<OrdoFolder, null>;
-	getParent: <T extends AbstractOrdoFolder | AbstractOrdoFile>(
+	getParent: <T extends OrdoFolder | OrdoFile>(
 		node: T,
-	) => IEither<T extends OrdoFolder | OrdoFile ? OrdoFolder : AbstractOrdoFolder, null>;
-	getSiblings: (
-		node: AbstractOrdoFile | AbstractOrdoFolder,
-	) => IEither<Array<AbstractOrdoFile | AbstractOrdoFolder>, null>;
-	getAncestors: (
-		node: AbstractOrdoFile | AbstractOrdoFolder,
-	) => IEither<AbstractOrdoFolder[], null>;
+	) => IEither<T extends OrdoFolder | OrdoFile ? OrdoFolder : OrdoFolder, null>;
+	getSiblings: (node: OrdoFile | OrdoFolder) => IEither<Array<OrdoFile | OrdoFolder>, null>;
+	getAncestors: (node: OrdoFile | OrdoFolder) => IEither<OrdoFolder[], null>;
 	// getLinks
 	// getNodes
 	createPhysicalFile: (path: string) => Promise<IEither<IFileTree, Error>>;
-	getFile: <K extends keyof AbstractOrdoFile>(
-		key: K,
-		value: AbstractOrdoFile[K],
-	) => IEither<AbstractOrdoFile, null>;
-	updateFile: (path: string, update: (file: AbstractOrdoFile) => void) => IEither<IFileTree, null>;
+	getFile: <K extends keyof OrdoFile>(key: K, value: OrdoFile[K]) => IEither<OrdoFile, null>;
+	updateFile: (path: string, update: (file: OrdoFile) => void) => IEither<IFileTree, null>;
 	// moveFile
 	deleteFile: (file: OrdoFile) => IEither<IFileTree, null>;
 	createPhysicalFolder: (path: string) => Promise<IEither<IFileTree, Error>>;
-	getFolder: <K extends keyof AbstractOrdoFolder>(
+	getFolder: <K extends keyof OrdoFolder>(
 		key: K,
-		value: AbstractOrdoFolder[K],
-	) => IEither<AbstractOrdoFolder, null>;
-	updateFolder: (
-		path: string,
-		update: (folder: AbstractOrdoFolder) => void,
-	) => IEither<IFileTree, null>;
+		value: OrdoFolder[K],
+	) => IEither<OrdoFolder, null>;
+	updateFolder: (path: string, update: (folder: OrdoFolder) => void) => IEither<IFileTree, null>;
 	// moveFolder
 	deleteFolder: (folder: OrdoFolder) => IEither<IFileTree, null>;
 	// createBranch
@@ -127,7 +108,7 @@ const fileTree = (tree: OrdoFolder): IFileTree => ({
 	deleteFolder: (node) => Either.fromNullable(deleteFolder(tree, node.path)).map(FileTree.of),
 });
 
-const mergeTrees = (tree: AbstractOrdoFolder, other: AbstractOrdoFolder) =>
+const mergeTrees = (tree: OrdoFolder, other: OrdoFolder) =>
 	produce(tree, (state) => {
 		const treeNode = getFolder(state, "path", other.path);
 

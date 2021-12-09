@@ -1,4 +1,4 @@
-import type { AbstractOrdoFolder, OrdoFile } from "../types";
+import type { OrdoFolder, OrdoFile } from "../types";
 
 import { produce } from "immer";
 import { promises } from "fs";
@@ -7,10 +7,10 @@ import { getFile } from "./get-file";
 import { isOrdoFile, isOrdoFileWithBody } from "../file-tree";
 
 export const updateFile = (
-	tree: AbstractOrdoFolder,
+	tree: OrdoFolder,
 	path: string,
 	update: (file: OrdoFile) => void,
-): AbstractOrdoFolder =>
+): OrdoFolder =>
 	produce(tree, (state) => {
 		const file = getFile(state, "path", path);
 

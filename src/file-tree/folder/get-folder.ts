@@ -1,14 +1,11 @@
-import type { AbstractOrdoFolder } from "../types";
+import type { OrdoFolder } from "../types";
 import type { Nullable } from "../../common/types";
 
-export const getFolder = <
-	T extends AbstractOrdoFolder = AbstractOrdoFolder,
-	K extends keyof AbstractOrdoFolder = keyof AbstractOrdoFolder,
->(
-	tree: AbstractOrdoFolder,
+export const getFolder = <K extends keyof OrdoFolder = keyof OrdoFolder>(
+	tree: OrdoFolder,
 	key: K,
-	value: T[K],
-): Nullable<AbstractOrdoFolder> => {
+	value: OrdoFolder[K],
+): Nullable<OrdoFolder> => {
 	if (tree[key] === value) {
 		return tree;
 	}

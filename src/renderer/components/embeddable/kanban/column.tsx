@@ -63,7 +63,7 @@ export const Column: React.FC<{
 				setNewCardName("");
 			} else {
 				dispatch(
-					moveFolder({
+					moveFile({
 						oldPath: tree.path,
 						newPath: tree.path.replace(tree.readableName, escapeSlashes(ref.current.textContent)),
 					}),

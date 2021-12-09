@@ -2,7 +2,6 @@ import type { OrdoFolder } from "../types";
 import type { Nullable } from "../../common/types";
 
 import { produce } from "immer";
-import { promises } from "fs";
 
 import { getParent } from "../common/get-parent";
 import { getFolder } from "./get-folder";

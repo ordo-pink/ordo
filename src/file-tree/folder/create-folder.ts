@@ -1,4 +1,4 @@
-import type { VirtualOrdoFolder, OrdoFolder } from "../types";
+import type { OrdoFolder } from "../types";
 
 import { promises } from "fs";
 import { Color } from "../../common/color";
@@ -36,22 +36,11 @@ export const createOrdoFolder = ({
 		collapsed,
 		type: "folder",
 		children: [],
-		exists: true,
 		color: Color.GRAY,
 	};
 };
 
-export async function createFolder(
-	virtualFolder: VirtualOrdoFolder,
-	rootPath: string,
-): Promise<OrdoFolder>;
-export async function createFolder(path: string, rootPath: string): Promise<OrdoFolder>;
-export async function createFolder(
-	pathOrNode: VirtualOrdoFolder | string,
-	rootPath: string,
-): Promise<OrdoFolder> {
-	const dirtyPath = typeof pathOrNode === "string" ? pathOrNode : pathOrNode.path;
-	const path = dirtyPath.endsWith("/") ? dirtyPath.slice(0, -1) : dirtyPath;
+export async function createFolder(path: string, rootPath: string): Promise<OrdoFolder> {
 	const readablePath = path.replace(rootPath, "");
 
 	try {

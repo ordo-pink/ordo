@@ -1,18 +1,16 @@
-import { IpcMain, BrowserWindow, IpcMainInvokeEvent, app } from "electron";
 import type { IFileTreeAPI, OrdoFile, OrdoFolder } from "./types";
-import { IFileTree } from "./file-tree";
+import type { IFileTree } from "./file-tree";
 
-import { dialog, shell } from "electron";
+import { IpcMain, BrowserWindow, IpcMainInvokeEvent, dialog, shell } from "electron";
 import { identity } from "ramda";
 import { join } from "path";
 import YAML from "yaml";
+import { promises } from "fs";
 
 import { FileTreeAPI } from "./api";
-
 import { listFolder } from "./folder/list-folder";
 import { Settings } from "../main/apis/settings";
 import { getFileWithBody } from "./file/get-file-content";
-import { promises } from "fs";
 
 let fileTree: IFileTree;
 

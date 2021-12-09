@@ -1,4 +1,4 @@
-import type { AbstractOrdoFolder, OrdoFile, OrdoFileWithBody, OrdoFolder } from "../types";
+import type { OrdoFile, OrdoFolder } from "../types";
 
 import {
 	createSlice,
@@ -7,24 +7,24 @@ import {
 	ActionReducerMapBuilder,
 } from "@reduxjs/toolkit";
 
-export const isAbstractOrdoFolder = (x: any): x is AbstractOrdoFolder =>
+export const isFolder = (x: any): x is OrdoFolder =>
 	x.type && x.type === "folder" && x.children && Array.isArray(x.children);
 
-const sortTree = (tree: AbstractOrdoFolder | OrdoFolder): OrdoFolder => {
+const sortTree = (tree: OrdoFolder): OrdoFolder => {
 	tree.children = tree.children.sort((a, b) => {
-		if (isAbstractOrdoFolder(a)) {
+		if (isFolder(a)) {
 			sortTree(a);
 		}
 
-		if (isAbstractOrdoFolder(b)) {
+		if (isFolder(b)) {
 			sortTree(b);
 		}
 
-		if (!isAbstractOrdoFolder(a) && isAbstractOrdoFolder(b)) {
+		if (!isFolder(a) && isFolder(b)) {
 			return 1;
 		}
 
-		if (isAbstractOrdoFolder(a) && !isAbstractOrdoFolder(b)) {
+		if (isFolder(a) && !isFolder(b)) {
 			return -1;
 		}
 
@@ -62,10 +62,9 @@ export const moveFolder = createAsyncThunk(
 	(payload: { oldPath: string; newPath: string }) =>
 		window.FileTree.moveFolder(payload.oldPath, payload.newPath),
 );
-export const deleteFolder = createAsyncThunk("file-tree/folder/delete", (path: string) => {
-	console.log(path);
-	return window.FileTree.deleteFolder(path);
-});
+export const deleteFolder = createAsyncThunk("file-tree/folder/delete", (path: string) =>
+	window.FileTree.deleteFolder(path),
+);
 
 export const createFile = createAsyncThunk("file-tree/file/create", (path: string) =>
 	window.FileTree.createFile(path),

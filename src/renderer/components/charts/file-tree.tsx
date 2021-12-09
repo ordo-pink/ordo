@@ -1,5 +1,5 @@
 import type { SimulationNodeDatum, SimulationLinkDatum, HierarchyLink, HierarchyNode } from "d3";
-import type { OrdoFolder } from "../../../file-tree/types";
+import type { OrdoFile, OrdoFolder } from "../../../file-tree/types";
 
 import React from "react";
 import {
@@ -17,7 +17,7 @@ import {
 
 import { useAppDispatch, useAppSelector } from "../../../common/state/hooks";
 import { setCurrentView } from "../../features/ui/ui-slice";
-import { setCurrentPath, createFile } from "../../../file-tree/state/file-tree-slice";
+import { setCurrentPath } from "../../../file-tree/state/file-tree-slice";
 
 type TagNode = {
 	readableName: string;
@@ -75,8 +75,9 @@ export const FileTreeGraph: React.FC = () => {
 				type?: string;
 			}
 		> = hierarchy.links();
-		const nodes: Array<HierarchyNode<OrdoFolder> | HierarchyNode<TagNode>> =
-			hierarchy.descendants();
+		const nodes: Array<
+			HierarchyNode<OrdoFolder> | HierarchyNode<TagNode> | HierarchyNode<OrdoFile>
+		> = hierarchy.descendants();
 
 		// data.links.forEach((link) => {
 		// 	let target

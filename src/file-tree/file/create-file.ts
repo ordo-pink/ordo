@@ -1,4 +1,4 @@
-import { OrdoFile, VirtualOrdoFile } from "../types";
+import { OrdoFile } from "../types";
 
 import { promises } from "fs";
 
@@ -70,18 +70,10 @@ export const createOrdoFile = ({
 		extension,
 		readableSize,
 		type,
-		exists: true,
 	};
 };
 
-export async function createFile(virtualNode: VirtualOrdoFile, rootPath: string): Promise<OrdoFile>;
-export async function createFile(path: string, rootPath: string): Promise<OrdoFile>;
-export async function createFile(
-	pathOrNode: VirtualOrdoFile | string,
-	rootPath: string,
-): Promise<OrdoFile> {
-	const path = typeof pathOrNode === "string" ? pathOrNode : pathOrNode.path;
-
+export async function createFile(path: string, rootPath: string): Promise<OrdoFile> {
 	const readablePath = path.replace(rootPath, "");
 
 	try {

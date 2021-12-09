@@ -1,14 +1,14 @@
-import type { AbstractOrdoFolder } from "../types";
+import type { OrdoFolder } from "../types";
 
 import { produce } from "immer";
 
 import { getFolder } from "./get-folder";
 
 export const updateFolder = (
-	tree: AbstractOrdoFolder,
+	tree: OrdoFolder,
 	path: string,
-	update: (folder: AbstractOrdoFolder) => void,
-): AbstractOrdoFolder =>
+	update: (folder: OrdoFolder) => void,
+): OrdoFolder =>
 	produce(tree, (state) => {
 		const folder = getFolder(state, "path", path);
 

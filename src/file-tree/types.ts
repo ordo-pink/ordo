@@ -18,15 +18,6 @@ export interface IFileTreeAPI {
 
 export type OrdoFileType = "image" | "document" | "other";
 
-export type ConnectionType = "fs" | "link" | "tag" | "relation";
-
-export interface Connection {
-	source: OrdoFile | OrdoFolder;
-	target: OrdoFile | OrdoFolder;
-	exists: boolean;
-	type: ConnectionType;
-}
-
 export type OrdoEntity = OrdoFile | OrdoFolder;
 
 export interface OrdoFile {

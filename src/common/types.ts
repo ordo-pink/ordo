@@ -1,8 +1,18 @@
-import { OrdoFileWithBody } from "../file-tree/types";
+import type { IpcMainInvokeEvent } from "electron";
+import type { OrdoEntity } from "../file-tree/types";
 
 export type Nullable<T> = T | null;
 
-export interface OrdoEditor {
-	tabs: OrdoFileWithBody[];
-	currentTab: OrdoFileWithBody;
+export type ConnectionType = "fs" | "link" | "tag" | "relation";
+
+export interface Connection {
+	source: OrdoEntity;
+	target: OrdoEntity;
+	exists: boolean;
+	type: ConnectionType;
 }
+
+export type IpcMainInvokeEventHandler<T extends (...args: any) => any> = (
+	e: IpcMainInvokeEvent,
+	...args: Parameters<T>
+) => ReturnType<T>;

@@ -1,7 +1,8 @@
 import type { IFileTreeAPI, OrdoFile, OrdoFolder } from "./types";
 import type { IFileTree } from "./file-tree";
+import type { IpcMainInvokeEventHandler } from "../common/types";
 
-import { IpcMain, BrowserWindow, IpcMainInvokeEvent, dialog, shell } from "electron";
+import { IpcMain, BrowserWindow, dialog, shell } from "electron";
 import { identity } from "ramda";
 import { join } from "path";
 import YAML from "yaml";
@@ -13,11 +14,6 @@ import { Settings } from "../main/apis/settings";
 import { getFileWithBody } from "./file/get-file-content";
 
 let fileTree: IFileTree;
-
-type IpcMainInvokeEventHandler<T extends (...args: any) => any> = (
-	e: IpcMainInvokeEvent,
-	...args: Parameters<T>
-) => ReturnType<T>;
 
 const mainHandle =
 	(ipcMain: IpcMain) =>

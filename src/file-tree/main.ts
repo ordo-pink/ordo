@@ -29,7 +29,7 @@ const confirmRemoval = (window: BrowserWindow, path: string) => {
 		type: "question",
 		buttons: ["Yes", "No"],
 		title: "Confirm removal",
-		message: `Are you sure you want to remove "${path}"`,
+		message: `Are you sure you want to remove\n"${path}"?`,
 	});
 
 	return response === 0;

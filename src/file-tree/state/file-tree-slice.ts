@@ -6,8 +6,11 @@ import {
 	createAsyncThunk,
 	ActionReducerMapBuilder,
 } from "@reduxjs/toolkit";
+import { FileTreeAPI } from "../api";
 
-export const isFolder = (x: any): x is OrdoFolder =>
+const ft = window.FileTree;
+
+export const isFolder = (x: OrdoFile | OrdoFolder): x is OrdoFolder =>
 	x.type && x.type === "folder" && x.children && Array.isArray(x.children);
 
 const sortTree = (tree: OrdoFolder): OrdoFolder => {
@@ -34,60 +37,55 @@ const sortTree = (tree: OrdoFolder): OrdoFolder => {
 	return tree as OrdoFolder;
 };
 
-export const selectRootFolder = createAsyncThunk("file-tree/select-root-folder", () =>
-	window.FileTree.selectRootFolder(),
+export const selectRootFolder = createAsyncThunk(FileTreeAPI.SELECT_ROOT_FOLDER, () =>
+	ft.selectRootFolder(),
 );
 export const getCurrentPath = createAsyncThunk("file-tree/get-current-path", () =>
 	window.settingsAPI.get("application.last-open-file"),
 );
 export const getRootPath = createAsyncThunk("file-tree/get-root-path", () =>
-	window.settingsAPI
-		.get("application.root-folder-path")
-		.then((path) => window.FileTree.getFolder(path)),
+	window.settingsAPI.get("application.root-folder-path").then((path) => ft.getFolder(path)),
 );
 
-export const createFolder = createAsyncThunk("file-tree/folder/create", (path: string) =>
-	window.FileTree.createFolder(path),
+export const createFolder = createAsyncThunk(FileTreeAPI.CREATE_FOLDER, (path: string) =>
+	ft.createFolder(path),
 );
-export const getFolder = createAsyncThunk("file-tree/folder/get", (path: string) =>
-	window.FileTree.getFolder(path),
+export const getFolder = createAsyncThunk(FileTreeAPI.GET_FOLDER, (path: string) =>
+	ft.getFolder(path),
 );
 export const updateFolder = createAsyncThunk(
-	"file-tree/folder/update",
+	FileTreeAPI.UPDATE_FOLDER,
 	(payload: { folder: OrdoFolder; increment: Partial<OrdoFolder> }) =>
-		window.FileTree.updateFolder(payload.folder.path, payload.increment),
+		ft.updateFolder(payload.folder.path, payload.increment),
 );
 export const moveFolder = createAsyncThunk(
-	"file-tree/folder/move",
+	FileTreeAPI.MOVE_FOLDER,
 	(payload: { oldPath: string; newPath: string }) =>
-		window.FileTree.moveFolder(payload.oldPath, payload.newPath),
+		ft.moveFolder(payload.oldPath, payload.newPath),
 );
-export const deleteFolder = createAsyncThunk("file-tree/folder/delete", (path: string) =>
-	window.FileTree.deleteFolder(path),
+export const deleteFolder = createAsyncThunk(FileTreeAPI.DELETE_FOLDER, (path: string) =>
+	ft.deleteFolder(path),
 );
 
-export const createFile = createAsyncThunk("file-tree/file/create", (path: string) =>
-	window.FileTree.createFile(path),
+export const createFile = createAsyncThunk(FileTreeAPI.CREATE_FILE, (path: string) =>
+	ft.createFile(path),
 );
-export const getFile = createAsyncThunk("file-tree/file/get", (path: string) =>
-	window.FileTree.getFile(path),
-);
+export const getFile = createAsyncThunk(FileTreeAPI.GET_FILE, (path: string) => ft.getFile(path));
 export const updateFile = createAsyncThunk(
-	"file-tree/file/update",
+	FileTreeAPI.UPDATE_FILE,
 	(payload: { file: OrdoFile; increment: Partial<OrdoFile> }) =>
-		window.FileTree.updateFile(payload.file.path, payload.increment),
+		ft.updateFile(payload.file.path, payload.increment),
 );
 export const saveFile = createAsyncThunk(
-	"file-tree/file/save",
-	(payload: { path: string; data: string }) => window.FileTree.saveFile(payload.path, payload.data),
+	FileTreeAPI.SAVE_FILE,
+	(payload: { path: string; data: string }) => ft.saveFile(payload.path, payload.data),
 );
 export const moveFile = createAsyncThunk(
-	"file-tree/file/move",
-	(payload: { oldPath: string; newPath: string }) =>
-		window.FileTree.moveFile(payload.oldPath, payload.newPath),
+	FileTreeAPI.MOVE_FILE,
+	(payload: { oldPath: string; newPath: string }) => ft.moveFile(payload.oldPath, payload.newPath),
 );
-export const deleteFile = createAsyncThunk("file-tree/file/delete", (path: string) =>
-	window.FileTree.deleteFile(path),
+export const deleteFile = createAsyncThunk(FileTreeAPI.DELETE_FILE, (path: string) =>
+	ft.deleteFile(path),
 );
 
 const updateTree = (state: FileTreeState, action: PayloadAction<OrdoFolder>) => {
@@ -119,9 +117,9 @@ const fileTreeSlice = createSlice({
 		},
 	},
 	extraReducers: (builder: ActionReducerMapBuilder<FileTreeState>) => {
-		builder.addCase(getRootPath.fulfilled, (state, action: any) => {
-			state.rootPath = action.payload.path;
-			state.tree = sortTree(action.payload);
+		builder.addCase(getRootPath.fulfilled, (state, action) => {
+			state.rootPath = (action.payload as OrdoFolder).path;
+			state.tree = sortTree(action.payload as OrdoFolder);
 		});
 
 		builder.addCase(createFile.fulfilled, updateTree);

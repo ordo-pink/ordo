@@ -13,10 +13,7 @@ const getDisplayName = (readableName: string) => readableName.replace(".md", "")
 const getBadge = (readableName: string) => {
 	const badge = readableName.match(/^\[.*\]\s/);
 
-	if (badge) {
-		return String(badge).slice(1, -2);
-	}
-	return badge;
+	return badge ? String(badge).slice(1, -2) : badge;
 };
 
 export const Card: React.FC<{

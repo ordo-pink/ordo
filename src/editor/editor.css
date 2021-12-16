@@ -1,0 +1,32 @@
+@keyframes blinky {
+	0% {
+		background: transparent;
+	}
+	100% {
+		background: #7e1946;
+	}
+}
+
+@-webkit-keyframes blinky {
+	0% {
+		background: transparent;
+	}
+	100% {
+		background: #7e1946;
+	}
+}
+
+.caret {
+	position: relative;
+}
+
+.caret::before {
+	position: absolute;
+	content: "";
+	width: 2px;
+	height: 1.5rem;
+	vertical-align: middle;
+	background: #7e1946;
+	animation: blinky 0.5s ease-in-out infinite alternative;
+	-webkit-animation: blinky 0.5s ease-in-out infinite alternate;
+}

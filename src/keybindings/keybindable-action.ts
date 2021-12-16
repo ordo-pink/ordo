@@ -1,0 +1,30 @@
+export enum KeybindableAction {
+	NEW_FILE,
+	NEW_WINDOW,
+	OPEN,
+	// REOPEN_CLOSED_EDITOR, // cmd shift t
+	SAVE_FILE,
+	SAVE_AS,
+	// SAVE_ALL, // cmd option s
+	// TOGGLE_AUTOSAVE, // cmd shift option s
+	CLOSE_TAB,
+	CLOSE_WINDOW,
+
+	CUT,
+	COPY,
+	PASTE,
+	FIND,
+	FIND_IN_FILES,
+	UNDO,
+	REDO,
+
+	SELECT_ALL,
+
+	FINDER,
+	EXPLORER,
+	GRAPH,
+	SETTINGS,
+
+	TOGGLE_DEV_TOOLS,
+	RESTART_WINDOW,
+}

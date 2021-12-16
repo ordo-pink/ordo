@@ -1,12 +1,12 @@
 // eslint-disable-next-line
-const rules = require("./webpack.rules")
+const rules = require("./webpack.rules");
 // eslint-disable-next-line
-const plugins = require("./webpack.plugins")
+const plugins = require("./webpack.plugins");
 
 rules.push({
 	test: /\.css$/,
 	use: [{ loader: "style-loader" }, { loader: "css-loader" }, { loader: "postcss-loader" }],
-})
+});
 
 module.exports = {
 	module: {
@@ -16,4 +16,4 @@ module.exports = {
 	resolve: {
 		extensions: [".js", ".ts", ".jsx", ".tsx", ".css"],
 	},
-}
+};

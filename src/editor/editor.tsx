@@ -1,8 +1,14 @@
-import type { ChangeResponse } from "./types";
+import type { CaretPosition, ChangeResponse, ChangeSelection } from "./types";
 
 import React from "react";
 
 import "./editor.css";
+
+const statusLine = (selection: ChangeSelection) => {
+	const line = `Ln ${selection.start.line}, Col ${selection.start.index}`;
+
+	return line;
+};
 
 const Char: React.FC<{
 	value: string;
@@ -16,7 +22,7 @@ const Char: React.FC<{
 		e.stopPropagation();
 		e.preventDefault();
 
-		ref.current.classList.add("caret");
+		ref.current && ref.current.classList.add("caret");
 
 		charClickHandler(charIndex, lineIndex);
 	};
@@ -36,15 +42,18 @@ const Char: React.FC<{
 
 const ignoredKeyPresses = ["Meta", "Control", "Alt", "Shift", "CapsLock"];
 
-export const Editor: React.FC = () => {
+export const Editor: React.FC<any> = ({ addStatus, updateStatus, removeStatus }) => {
 	const ref = React.useRef<HTMLDivElement>(null);
 	const [content, setContent] = React.useState<string[]>(null);
-	const [caretStart, setCaretStart] = React.useState<number>(0);
-	const [currentLine, setCurrentLine] = React.useState<number>(0);
+	const [selection, setSelection] = React.useState<ChangeSelection>({
+		start: {
+			line: 0,
+			index: 0,
+		},
+	});
 
-	const charClickHandler = (charIndex: number, lineIndex: number) => {
-		setCaretStart(charIndex);
-		setCurrentLine(lineIndex);
+	const charClickHandler = (index: number, line: number) => {
+		setSelection({ start: { line, index } });
 	};
 
 	const onKeyDown = (e: KeyboardEvent) => {
@@ -57,41 +66,43 @@ export const Editor: React.FC = () => {
 		e.preventDefault();
 
 		window.Editor.onKeyDown({
-			selection: { start: caretStart, line: currentLine, length: 0 },
+			selection,
 			keys: { key, metaKey, altKey, ctrlKey, shiftKey },
 		}).then(({ selection, content }: ChangeResponse) => {
 			setContent(content);
-			setCaretStart(selection.start);
-			setCurrentLine(selection.line);
+			setSelection(selection);
 		});
 	};
 
 	React.useEffect(() => {
-		if (!content || !ref.current) {
+		if (!content || !ref.current || !selection) {
 			return;
 		}
 
-		const node = document.getElementById(`line-${currentLine}-${caretStart}`);
+		const node = document.getElementById(`line-${selection.start.line}-${selection.start.index}`);
 
 		node && node.classList.add("caret");
+		updateStatus({ id: "EDITOR_CARET_POSITION", value: statusLine(selection) });
 
 		return () => {
 			node && node.classList.remove("caret");
 		};
-	}, [caretStart, currentLine]);
+	}, [selection.start.index, selection.start.line]);
 
 	React.useEffect(() => {
 		window.Editor.getContent().then(setContent);
+		addStatus({ id: "EDITOR_CARET_POSITION", value: statusLine(selection) });
 
 		return () => {
 			setContent(null);
+			removeStatus("EDITOR_CARET_POSITION");
 		};
 	}, []);
 
 	React.useEffect(() => {
 		window.addEventListener("keydown", onKeyDown);
 		return () => window.removeEventListener("keydown", onKeyDown);
-	}, [caretStart, currentLine]);
+	}, [selection.start.index, selection.start.line]);
 
 	return (
 		<div>
@@ -109,8 +120,12 @@ export const Editor: React.FC = () => {
 				onMouseUp={(e) => {
 					e.preventDefault();
 
-					setCurrentLine(content.length - 1);
-					setCaretStart(content[content.length - 1].length - 1);
+					setSelection({
+						start: {
+							line: content.length - 1,
+							index: content[content.length - 1].length - 1,
+						},
+					});
 				}}
 			>
 				{content &&
@@ -120,7 +135,7 @@ export const Editor: React.FC = () => {
 							style={{
 								display: "flex",
 								alignItems: "center",
-								background: lineIndex === currentLine ? "#ddd" : "transparent",
+								background: lineIndex === selection.start.line ? "#ddd" : "transparent",
 								lineHeight: "1.5",
 							}}
 						>
@@ -131,7 +146,7 @@ export const Editor: React.FC = () => {
 									textAlign: "right",
 									paddingRight: "0.5em",
 									fontWeight: 900,
-									color: lineIndex === currentLine ? "#000" : "#555",
+									color: lineIndex === selection.start.line ? "#000" : "#555",
 									userSelect: "none",
 									fontSize: "0.8em",
 									cursor: "default",
@@ -150,8 +165,12 @@ export const Editor: React.FC = () => {
 									e.preventDefault();
 									e.stopPropagation();
 
-									setCurrentLine(lineIndex);
-									setCaretStart(line.length - 1);
+									setSelection({
+										start: {
+											line: lineIndex,
+											index: line.length - 1,
+										},
+									});
 								}}
 							>
 								{line.split("").map((char, charIndex) => (

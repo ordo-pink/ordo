@@ -18,8 +18,8 @@ export const handleBackspace = (change: ChangeResponse): ChangeResponse => {
 		change = moveCaretToPreviousLine(change);
 		change = moveCaretToLineEnd(change);
 
-		change.content[change.selection.line] += change.content[change.selection.line + 1];
-		change.content.splice(change.selection.line + 1, 1);
+		change.content[change.selection.start.line] += change.content[change.selection.start.line + 1];
+		change.content.splice(change.selection.start.line + 1, 1);
 
 		return change;
 	}
@@ -28,20 +28,22 @@ export const handleBackspace = (change: ChangeResponse): ChangeResponse => {
 		const prevSpace = getPreviousSpace(change);
 
 		if (~prevSpace) {
-			change.content[change.selection.line] =
-				change.content[change.selection.line].substring(0, prevSpace) +
-				change.content[change.selection.line].substring(change.selection.start);
+			change.content[change.selection.start.line] =
+				change.content[change.selection.start.line].substring(0, prevSpace) +
+				change.content[change.selection.start.line].substring(change.selection.start.index);
 
-			change.selection.start = prevSpace;
+			change.selection.start.index = prevSpace;
 		} else {
-			change.content[change.selection.line] = change.content[change.selection.line].slice(change.selection.start);
+			change.content[change.selection.start.line] = change.content[change.selection.start.line].slice(
+				change.selection.start.index,
+			);
 
 			change = moveCaretToLineStart(change);
 		}
 	} else {
-		change.content[change.selection.line] =
-			change.content[change.selection.line].substring(0, change.selection.start - 1) +
-			change.content[change.selection.line].substring(change.selection.start);
+		change.content[change.selection.start.line] =
+			change.content[change.selection.start.line].substring(0, change.selection.start.index - 1) +
+			change.content[change.selection.start.line].substring(change.selection.start.index);
 
 		change = moveCaretLeft(change);
 	}

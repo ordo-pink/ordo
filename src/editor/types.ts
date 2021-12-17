@@ -1,7 +1,10 @@
-export interface ChangeSelection {
-	start: number;
-	length: number;
+export interface CaretPosition {
 	line: number;
+	index: number;
+}
+
+export interface ChangeSelection {
+	start: CaretPosition;
 }
 
 export interface ChangeKeys {

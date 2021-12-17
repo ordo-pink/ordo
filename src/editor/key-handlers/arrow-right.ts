@@ -24,7 +24,7 @@ export const handleArrowRight = (change: ChangeResponse): ChangeResponse => {
 		const nextSpace = getNextSpace(change);
 
 		if (~nextSpace) {
-			change.selection.start = nextSpace + change.selection.start + 1;
+			change.selection.start.index = nextSpace + change.selection.start.index + 1;
 		} else {
 			change = moveCaretToLineEnd(change);
 		}

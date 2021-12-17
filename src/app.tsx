@@ -3,7 +3,31 @@ import Scrollbars from "react-custom-scrollbars";
 
 import { Editor } from "./editor/editor";
 
+interface StatusBarItem {
+	id: string;
+	value: string;
+	onClick: () => void;
+}
+
 export const App: React.FC = () => {
+	// TODO: Move to redux
+	const [status, setStatus] = React.useState<StatusBarItem[]>([]);
+
+	const addStatus = (item: StatusBarItem) => setStatus([...status, item]);
+	const removeStatus = (id: string) =>
+		setStatus(
+			[...status].splice(
+				status.findIndex((i) => i.id === id),
+				1,
+			),
+		);
+	const updateStatus = (item: StatusBarItem) => {
+		const oldItem = status.findIndex((i) => i.id === item.id);
+		const copy = [...status];
+		copy.splice(oldItem, 1, item);
+		setStatus(copy);
+	};
+
 	return (
 		<div>
 			<div style={{ display: "flex", flexDirection: "row", height: "calc(100vh - 1.3em)" }}>
@@ -35,7 +59,7 @@ export const App: React.FC = () => {
 						}}
 					>
 						<Scrollbars>
-							<Editor />
+							<Editor addStatus={addStatus} updateStatus={updateStatus} removeStatus={removeStatus} />
 						</Scrollbars>
 					</div>
 				</div>
@@ -50,7 +74,6 @@ export const App: React.FC = () => {
 						width: "2.5em",
 						borderLeft: "1px solid #ccc",
 						background: "#ddd",
-						paddingBottom: "1.5em",
 					}}
 				>
 					<div style={{ display: "flex", flexDirection: "column", height: "100vh" }}>
@@ -76,8 +99,13 @@ export const App: React.FC = () => {
 					borderTop: "1px solid #ccc",
 				}}
 			>
-				<div></div>
-				<div>test</div>
+				<div>
+					{status.map((item) => (
+						<span key={item.id} style={{ marginRight: "1em" }} onClick={item.onClick || (() => null)}>
+							{item.value}
+						</span>
+					))}
+				</div>
 			</div>
 		</div>
 	);

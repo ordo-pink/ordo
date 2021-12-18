@@ -104,6 +104,11 @@ const Char: React.FC<{
 			id={`line-${lineIndex}-${charIndex}`}
 			onMouseUp={onMouseUp}
 			onMouseDown={onMouseDown}
+			onMouseOver={(e) => {
+				if (e.buttons === 1) {
+					onMouseUp(e);
+				}
+			}}
 		>
 			{value}
 		</span>
@@ -130,7 +135,8 @@ export const Editor: React.FC<any> = ({ addStatus, updateStatus, removeStatus })
 
 	const mouseUpHandler = (index: number, line: number) => {
 		if (mouseDownPosition && (mouseDownPosition.index !== index || mouseDownPosition.line !== line)) {
-			const isMouseDownBefore = mouseDownPosition.line < line || mouseDownPosition.index < index;
+			const isMouseDownBefore =
+				mouseDownPosition.line < line || (mouseDownPosition.line === line && mouseDownPosition.index < index);
 			const direction = isMouseDownBefore ? "ltr" : "rtl";
 
 			return setSelection(
@@ -216,9 +222,18 @@ export const Editor: React.FC<any> = ({ addStatus, updateStatus, removeStatus })
 					mouseDownHandler(content[content.length - 1].length - 1, content.length - 1);
 				}}
 				onMouseUp={(e) => {
-					e.preventDefault();
+					if (e.buttons === 1) {
+						e.preventDefault();
 
-					mouseUpHandler(content[content.length - 1].length - 1, content.length - 1);
+						mouseUpHandler(content[content.length - 1].length - 1, content.length - 1);
+					}
+				}}
+				onMouseOver={(e) => {
+					if (e.buttons === 1) {
+						e.preventDefault();
+
+						mouseUpHandler(content[content.length - 1].length - 1, content.length - 1);
+					}
 				}}
 			>
 				{content &&
@@ -252,6 +267,10 @@ export const Editor: React.FC<any> = ({ addStatus, updateStatus, removeStatus })
 									e.preventDefault();
 									e.stopPropagation();
 								}}
+								onMouseOver={(e) => {
+									e.preventDefault();
+									e.stopPropagation();
+								}}
 							>
 								{lineIndex + 1}
 							</div>
@@ -265,10 +284,20 @@ export const Editor: React.FC<any> = ({ addStatus, updateStatus, removeStatus })
 									mouseDownHandler(line.length - 1, lineIndex);
 								}}
 								onMouseUp={(e) => {
-									e.preventDefault();
-									e.stopPropagation();
+									if (e.buttons === 1) {
+										e.preventDefault();
+										e.stopPropagation();
 
-									mouseUpHandler(line.length - 1, lineIndex);
+										mouseUpHandler(line.length - 1, lineIndex);
+									}
+								}}
+								onMouseOver={(e) => {
+									if (e.buttons === 1) {
+										e.preventDefault();
+										e.stopPropagation();
+
+										mouseUpHandler(line.length - 1, lineIndex);
+									}
 								}}
 							>
 								{line.split("").map((char, charIndex) => (

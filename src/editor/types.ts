@@ -5,6 +5,8 @@ export interface CaretPosition {
 
 export interface ChangeSelection {
 	start: CaretPosition;
+	end: CaretPosition;
+	direction: "ltr" | "rtl";
 }
 
 export interface ChangeKeys {

@@ -5,6 +5,7 @@ import {
 	isLastLine,
 	moveCaretRight,
 	moveCaretToLineEnd,
+	moveCaretToLineStart,
 	moveCaretToNextLine,
 } from "./common";
 
@@ -15,7 +16,7 @@ export const handleArrowRight = (change: ChangeResponse): ChangeResponse => {
 
 	if (isCaretAtLineEnd(change)) {
 		change = moveCaretToNextLine(change);
-		change = moveCaretToLineEnd(change);
+		change = moveCaretToLineStart(change);
 
 		return change;
 	}
@@ -24,7 +25,11 @@ export const handleArrowRight = (change: ChangeResponse): ChangeResponse => {
 		const nextSpace = getNextSpace(change);
 
 		if (~nextSpace) {
-			change.selection.start.index = nextSpace + change.selection.start.index + 1;
+			const newPosition =
+				change.selection.direction === "rtl"
+					? nextSpace + change.selection.start.index + 1
+					: nextSpace + change.selection.end.index + 1;
+			change = moveCaretRight(change, newPosition);
 		} else {
 			change = moveCaretToLineEnd(change);
 		}

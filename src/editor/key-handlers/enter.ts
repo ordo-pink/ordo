@@ -11,8 +11,8 @@ export const handleEnter = (change: ChangeResponse): ChangeResponse => {
 	}
 
 	change.content.splice(change.selection.start.line + 1, 0, nextLineContent);
-	change = moveCaretToNextLine(change);
-	change = moveCaretToLineStart(change);
+	change = moveCaretToNextLine(change, true);
+	change = moveCaretToLineStart(change, true);
 
 	return change;
 };

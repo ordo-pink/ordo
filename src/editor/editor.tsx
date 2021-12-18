@@ -1,13 +1,14 @@
-import type { CaretPosition, ChangeResponse, ChangeSelection } from "./types";
+import type { ChangeResponse, ChangeSelection } from "./types";
 
 import React from "react";
 
 import "./editor.css";
 
 const statusLine = (selection: ChangeSelection) => {
-	const line = `Ln ${selection.start.line}, Col ${selection.start.index}`;
+	const line = selection.direction === "rtl" ? selection.start.line : selection.end.line;
+	const index = selection.direction === "rtl" ? selection.start.index : selection.end.index;
 
-	return line;
+	return `Ln ${line}, Col ${index}`;
 };
 
 const Char: React.FC<{
@@ -15,7 +16,8 @@ const Char: React.FC<{
 	lineIndex: number;
 	charIndex: number;
 	charClickHandler: (charIndex: number, lineIndex: number) => void;
-}> = ({ value, charIndex, lineIndex, charClickHandler }) => {
+	selection: ChangeSelection;
+}> = ({ value, charIndex, lineIndex, charClickHandler, selection }) => {
 	const ref = React.useRef<HTMLSpanElement>(null);
 
 	const onClick = (e: React.MouseEvent<HTMLSpanElement>) => {
@@ -27,10 +29,61 @@ const Char: React.FC<{
 		charClickHandler(charIndex, lineIndex);
 	};
 
+	const selectionExists = selection.start.index !== selection.end.index || selection.start.line !== selection.end.line;
+	const betweenSelectedLines = selectionExists && lineIndex > selection.start.line && lineIndex < selection.end.line;
+	const onLastSelectedLine =
+		selectionExists &&
+		selection.start.line !== selection.end.line &&
+		lineIndex === selection.end.line &&
+		charIndex < selection.end.index;
+	const onFirstSelectedLine =
+		selectionExists &&
+		selection.start.line !== selection.end.line &&
+		lineIndex === selection.start.line &&
+		charIndex >= selection.start.index;
+	const onlyOneLineSelected =
+		selection.start.index !== selection.end.index &&
+		selection.start.line === selection.end.line &&
+		lineIndex === selection.start.line &&
+		charIndex >= selection.start.index &&
+		charIndex < selection.end.index;
+
+	const isInSelection = betweenSelectedLines || onLastSelectedLine || onFirstSelectedLine || onlyOneLineSelected;
+
+	let className = "";
+
+	if (selectionExists && isInSelection) {
+		className += "editor-selection ";
+	}
+
+	if (charIndex === selection.start.index && lineIndex === selection.start.line) {
+		className += "selection-start ";
+	}
+
+	if (charIndex === selection.end.index - 1 && lineIndex === selection.end.line) {
+		className += "selection-end ";
+	}
+
+	if (value === "\t") {
+		className += "tab ";
+	}
+
+	if (value === " ") {
+		className += "space ";
+	}
+
+	if (value === "\n") {
+		className += "new-line ";
+	}
+
 	return (
 		<span
-			style={{ display: "inline-block", whiteSpace: "pre" }}
 			ref={ref}
+			className={className}
+			style={{
+				display: "inline-block",
+				whiteSpace: "pre",
+			}}
 			data-index={`line-${lineIndex}-${charIndex}`}
 			id={`line-${lineIndex}-${charIndex}`}
 			onMouseUp={onClick}
@@ -50,10 +103,15 @@ export const Editor: React.FC<any> = ({ addStatus, updateStatus, removeStatus })
 			line: 0,
 			index: 0,
 		},
+		end: {
+			line: 0,
+			index: 0,
+		},
+		direction: "ltr",
 	});
 
 	const charClickHandler = (index: number, line: number) => {
-		setSelection({ start: { line, index } });
+		setSelection({ start: { line, index }, end: { line, index }, direction: "ltr" });
 	};
 
 	const onKeyDown = (e: KeyboardEvent) => {
@@ -79,7 +137,10 @@ export const Editor: React.FC<any> = ({ addStatus, updateStatus, removeStatus })
 			return;
 		}
 
-		const node = document.getElementById(`line-${selection.start.line}-${selection.start.index}`);
+		const node =
+			selection.direction === "rtl"
+				? document.getElementById(`line-${selection.start.line}-${selection.start.index}`)
+				: document.getElementById(`line-${selection.end.line}-${selection.end.index}`);
 
 		node && node.classList.add("caret");
 		updateStatus({ id: "EDITOR_CARET_POSITION", value: statusLine(selection) });
@@ -87,7 +148,7 @@ export const Editor: React.FC<any> = ({ addStatus, updateStatus, removeStatus })
 		return () => {
 			node && node.classList.remove("caret");
 		};
-	}, [selection.start.index, selection.start.line]);
+	}, [selection.start.index, selection.start.line, selection.end.index, selection.end.line]);
 
 	React.useEffect(() => {
 		window.Editor.getContent().then(setContent);
@@ -102,7 +163,7 @@ export const Editor: React.FC<any> = ({ addStatus, updateStatus, removeStatus })
 	React.useEffect(() => {
 		window.addEventListener("keydown", onKeyDown);
 		return () => window.removeEventListener("keydown", onKeyDown);
-	}, [selection.start.index, selection.start.line]);
+	}, [selection.start.index, selection.start.line, selection.end.index, selection.end.line]);
 
 	return (
 		<div>
@@ -125,6 +186,11 @@ export const Editor: React.FC<any> = ({ addStatus, updateStatus, removeStatus })
 							line: content.length - 1,
 							index: content[content.length - 1].length - 1,
 						},
+						end: {
+							line: content.length - 1,
+							index: content[content.length - 1].length - 1,
+						},
+						direction: "ltr",
 					});
 				}}
 			>
@@ -170,6 +236,11 @@ export const Editor: React.FC<any> = ({ addStatus, updateStatus, removeStatus })
 											line: lineIndex,
 											index: line.length - 1,
 										},
+										end: {
+											line: lineIndex,
+											index: line.length - 1,
+										},
+										direction: "ltr",
 									});
 								}}
 							>
@@ -179,6 +250,7 @@ export const Editor: React.FC<any> = ({ addStatus, updateStatus, removeStatus })
 										lineIndex={lineIndex}
 										charIndex={charIndex}
 										value={char}
+										selection={selection}
 										charClickHandler={charClickHandler}
 									/>
 								))}

@@ -9,7 +9,7 @@ export const handleTyping = (change: ChangeResponse): ChangeResponse => {
 		(change.keys.shiftKey ? change.keys.key.toLocaleUpperCase() : change.keys.key.toLocaleLowerCase()) +
 		currentLine.slice(change.selection.start.index);
 
-	change = moveCaretRight(change);
+	change = moveCaretRight(change, null, true);
 
 	return change;
 };

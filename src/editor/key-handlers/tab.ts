@@ -6,13 +6,13 @@ export const handleTab = (change: ChangeResponse): ChangeResponse => {
 	if (change.keys.shiftKey) {
 		if (change.content[change.selection.start.line].startsWith(" ")) {
 			change.content[change.selection.start.line] = change.content[change.selection.start.line].slice(1);
-			change = moveCaretLeft(change);
+			change = moveCaretLeft(change, null, true);
 		}
 
 		return change;
 	}
 
-	change.keys.key = " ";
+	change.keys.key = "\t";
 
 	return handleTyping(change);
 };

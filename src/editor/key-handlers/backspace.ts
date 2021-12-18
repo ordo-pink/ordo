@@ -15,8 +15,8 @@ export const handleBackspace = (change: ChangeResponse): ChangeResponse => {
 	}
 
 	if (isCaretAtLineStart(change)) {
-		change = moveCaretToPreviousLine(change);
-		change = moveCaretToLineEnd(change);
+		change = moveCaretToPreviousLine(change, true);
+		change = moveCaretToLineEnd(change, true);
 
 		change.content[change.selection.start.line] += change.content[change.selection.start.line + 1];
 		change.content.splice(change.selection.start.line + 1, 1);
@@ -38,14 +38,14 @@ export const handleBackspace = (change: ChangeResponse): ChangeResponse => {
 				change.selection.start.index,
 			);
 
-			change = moveCaretToLineStart(change);
+			change = moveCaretToLineStart(change, true);
 		}
 	} else {
 		change.content[change.selection.start.line] =
 			change.content[change.selection.start.line].substring(0, change.selection.start.index - 1) +
 			change.content[change.selection.start.line].substring(change.selection.start.index);
 
-		change = moveCaretLeft(change);
+		change = moveCaretLeft(change, null, true);
 	}
 
 	return change;

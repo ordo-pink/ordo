@@ -1,43 +1,30 @@
-import type { ChangeResponse, ChangeSelection } from "./types";
+import { CaretPosition, ChangeResponse, ChangeSelection } from "./types";
 
 import React from "react";
 
 import "./editor.css";
 
-const statusLine = (selection: ChangeSelection) => {
+const getStatusLine = (selection: ChangeSelection) => {
 	const line = selection.direction === "rtl" ? selection.start.line : selection.end.line;
 	const index = selection.direction === "rtl" ? selection.start.index : selection.end.index;
 
-	return `Ln ${line}, Col ${index}`;
+	return JSON.stringify(selection);
+	// return `Ln ${line}, Col ${index}`;
 };
 
-const Char: React.FC<{
-	value: string;
-	lineIndex: number;
-	charIndex: number;
-	charClickHandler: (charIndex: number, lineIndex: number) => void;
-	selection: ChangeSelection;
-}> = ({ value, charIndex, lineIndex, charClickHandler, selection }) => {
-	const ref = React.useRef<HTMLSpanElement>(null);
+const selectionExists = (selection: ChangeSelection) =>
+	selection.start.index !== selection.end.index || selection.start.line !== selection.end.line;
 
-	const onClick = (e: React.MouseEvent<HTMLSpanElement>) => {
-		e.stopPropagation();
-		e.preventDefault();
-
-		ref.current && ref.current.classList.add("caret");
-
-		charClickHandler(charIndex, lineIndex);
-	};
-
-	const selectionExists = selection.start.index !== selection.end.index || selection.start.line !== selection.end.line;
-	const betweenSelectedLines = selectionExists && lineIndex > selection.start.line && lineIndex < selection.end.line;
+const checkIsInSelection = (selection: ChangeSelection, charIndex: number, lineIndex: number) => {
+	const exists = selectionExists(selection);
+	const betweenSelectedLines = exists && lineIndex > selection.start.line && lineIndex < selection.end.line;
 	const onLastSelectedLine =
-		selectionExists &&
+		exists &&
 		selection.start.line !== selection.end.line &&
 		lineIndex === selection.end.line &&
 		charIndex < selection.end.index;
 	const onFirstSelectedLine =
-		selectionExists &&
+		exists &&
 		selection.start.line !== selection.end.line &&
 		lineIndex === selection.start.line &&
 		charIndex >= selection.start.index;
@@ -48,7 +35,36 @@ const Char: React.FC<{
 		charIndex >= selection.start.index &&
 		charIndex < selection.end.index;
 
-	const isInSelection = betweenSelectedLines || onLastSelectedLine || onFirstSelectedLine || onlyOneLineSelected;
+	return betweenSelectedLines || onLastSelectedLine || onFirstSelectedLine || onlyOneLineSelected;
+};
+
+const Char: React.FC<{
+	value: string;
+	lineIndex: number;
+	charIndex: number;
+	mouseUpHandler: (charIndex: number, lineIndex: number) => void;
+	mouseDownHandler: (charIndex: number, lineIndex: number) => void;
+	selection: ChangeSelection;
+}> = ({ value, charIndex, lineIndex, mouseUpHandler, mouseDownHandler, selection }) => {
+	const ref = React.useRef<HTMLSpanElement>(null);
+
+	const onMouseUp = (e: React.MouseEvent<HTMLSpanElement>) => {
+		e.stopPropagation();
+		e.preventDefault();
+
+		ref.current && ref.current.classList.add("caret");
+
+		mouseUpHandler(charIndex, lineIndex);
+	};
+
+	const onMouseDown = (e: React.MouseEvent<HTMLSpanElement>) => {
+		e.stopPropagation();
+		e.preventDefault();
+
+		mouseDownHandler(charIndex, lineIndex);
+	};
+
+	const isInSelection = checkIsInSelection(selection, charIndex, lineIndex);
 
 	let className = "";
 
@@ -86,7 +102,8 @@ const Char: React.FC<{
 			}}
 			data-index={`line-${lineIndex}-${charIndex}`}
 			id={`line-${lineIndex}-${charIndex}`}
-			onMouseUp={onClick}
+			onMouseUp={onMouseUp}
+			onMouseDown={onMouseDown}
 		>
 			{value}
 		</span>
@@ -98,6 +115,7 @@ const ignoredKeyPresses = ["Meta", "Control", "Alt", "Shift", "CapsLock"];
 export const Editor: React.FC<any> = ({ addStatus, updateStatus, removeStatus }) => {
 	const ref = React.useRef<HTMLDivElement>(null);
 	const [content, setContent] = React.useState<string[]>(null);
+	const [mouseDownPosition, setMouseDownPosition] = React.useState<CaretPosition>(null);
 	const [selection, setSelection] = React.useState<ChangeSelection>({
 		start: {
 			line: 0,
@@ -110,8 +128,22 @@ export const Editor: React.FC<any> = ({ addStatus, updateStatus, removeStatus })
 		direction: "ltr",
 	});
 
-	const charClickHandler = (index: number, line: number) => {
+	const mouseUpHandler = (index: number, line: number) => {
+		if (mouseDownPosition && (mouseDownPosition.index !== index || mouseDownPosition.line !== line)) {
+			const isMouseDownBefore = mouseDownPosition.line < line || mouseDownPosition.index < index;
+			const direction = isMouseDownBefore ? "ltr" : "rtl";
+
+			return setSelection(
+				isMouseDownBefore
+					? { start: mouseDownPosition, end: { line, index }, direction }
+					: { start: { line, index }, end: mouseDownPosition, direction },
+			);
+		}
 		setSelection({ start: { line, index }, end: { line, index }, direction: "ltr" });
+	};
+
+	const mouseDownHandler = (index: number, line: number) => {
+		setMouseDownPosition({ line, index });
 	};
 
 	const onKeyDown = (e: KeyboardEvent) => {
@@ -143,7 +175,7 @@ export const Editor: React.FC<any> = ({ addStatus, updateStatus, removeStatus })
 				: document.getElementById(`line-${selection.end.line}-${selection.end.index}`);
 
 		node && node.classList.add("caret");
-		updateStatus({ id: "EDITOR_CARET_POSITION", value: statusLine(selection) });
+		updateStatus({ id: "EDITOR_CARET_POSITION", value: getStatusLine(selection) });
 
 		return () => {
 			node && node.classList.remove("caret");
@@ -152,7 +184,7 @@ export const Editor: React.FC<any> = ({ addStatus, updateStatus, removeStatus })
 
 	React.useEffect(() => {
 		window.Editor.getContent().then(setContent);
-		addStatus({ id: "EDITOR_CARET_POSITION", value: statusLine(selection) });
+		addStatus({ id: "EDITOR_CARET_POSITION", value: getStatusLine(selection) });
 
 		return () => {
 			setContent(null);
@@ -178,20 +210,15 @@ export const Editor: React.FC<any> = ({ addStatus, updateStatus, removeStatus })
 					paddingBottom: "calc(100vh - 6em)",
 					cursor: "text",
 				}}
+				onMouseDown={(e) => {
+					e.preventDefault();
+
+					mouseDownHandler(content[content.length - 1].length - 1, content.length - 1);
+				}}
 				onMouseUp={(e) => {
 					e.preventDefault();
 
-					setSelection({
-						start: {
-							line: content.length - 1,
-							index: content[content.length - 1].length - 1,
-						},
-						end: {
-							line: content.length - 1,
-							index: content[content.length - 1].length - 1,
-						},
-						direction: "ltr",
-					});
+					mouseUpHandler(content[content.length - 1].length - 1, content.length - 1);
 				}}
 			>
 				{content &&
@@ -221,27 +248,27 @@ export const Editor: React.FC<any> = ({ addStatus, updateStatus, removeStatus })
 									e.preventDefault();
 									e.stopPropagation();
 								}}
+								onMouseDown={(e) => {
+									e.preventDefault();
+									e.stopPropagation();
+								}}
 							>
 								{lineIndex + 1}
 							</div>
 							<div
 								data-index={`line-${lineIndex}`}
 								style={{ width: "100%", tabSize: "1em", cursor: "text", padding: "0 0.5em", fontFamily: "monospace" }}
+								onMouseDown={(e) => {
+									e.preventDefault();
+									e.stopPropagation();
+
+									mouseDownHandler(line.length - 1, lineIndex);
+								}}
 								onMouseUp={(e) => {
 									e.preventDefault();
 									e.stopPropagation();
 
-									setSelection({
-										start: {
-											line: lineIndex,
-											index: line.length - 1,
-										},
-										end: {
-											line: lineIndex,
-											index: line.length - 1,
-										},
-										direction: "ltr",
-									});
+									mouseUpHandler(line.length - 1, lineIndex);
 								}}
 							>
 								{line.split("").map((char, charIndex) => (
@@ -251,7 +278,8 @@ export const Editor: React.FC<any> = ({ addStatus, updateStatus, removeStatus })
 										charIndex={charIndex}
 										value={char}
 										selection={selection}
-										charClickHandler={charClickHandler}
+										mouseUpHandler={mouseUpHandler}
+										mouseDownHandler={mouseDownHandler}
 									/>
 								))}
 							</div>

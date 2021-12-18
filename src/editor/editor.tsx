@@ -8,7 +8,8 @@ const statusLine = (selection: ChangeSelection) => {
 	const line = selection.direction === "rtl" ? selection.start.line : selection.end.line;
 	const index = selection.direction === "rtl" ? selection.start.index : selection.end.index;
 
-	return `Ln ${line}, Col ${index}`;
+	// return `Ln ${line}, Col ${index}`;
+	return JSON.stringify(selection);
 };
 
 const Char: React.FC<{

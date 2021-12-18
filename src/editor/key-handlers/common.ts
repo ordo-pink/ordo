@@ -4,9 +4,9 @@ export const getPreviousSpace = (change: ChangeResponse): number =>
 	change.content[change.selection.start.line]
 		.slice(
 			0,
-			change.selection.start.index < change.selection.end.index && change.selection.direction === "ltr"
-				? change.selection.end.index
-				: change.selection.start.index,
+			change.selection.start.index < change.selection.end.index && change.selection.direction === "rtl"
+				? change.selection.start.index
+				: change.selection.end.index,
 		)
 		.lastIndexOf(" ");
 
@@ -15,9 +15,12 @@ export const getNextSpace = (change: ChangeResponse): number =>
 		? change.content[change.selection.start.line].slice(change.selection.start.index).indexOf(" ")
 		: change.content[change.selection.end.line].slice(change.selection.end.index).indexOf(" ");
 
-export const isFirstLine = (change: ChangeResponse): boolean => change.selection.start.line === 0;
+export const isFirstLine = (change: ChangeResponse): boolean =>
+	change.selection.direction === "rtl" ? change.selection.start.line === 0 : change.selection.end.line === 0;
 export const isLastLine = (change: ChangeResponse): boolean =>
-	change.selection.start.line === change.content.length - 1;
+	change.selection.direction === "rtl"
+		? change.selection.start.line === change.content.length - 1
+		: change.selection.end.line === change.content.length - 1;
 
 export const isCaretAtLineStart = (change: ChangeResponse): boolean =>
 	change.selection.direction === "rtl" ? change.selection.start.index === 0 : change.selection.end.index === 0;
@@ -79,7 +82,13 @@ export const moveCaretToLineStart = (change: ChangeResponse, ignoreShift = false
 	return moveCaretLeft(change, 0, ignoreShift);
 };
 export const moveCaretToLineEnd = (change: ChangeResponse, ignoreShift = false): ChangeResponse => {
-	return moveCaretRight(change, change.content[change.selection.start.line].length - 1, ignoreShift);
+	return moveCaretRight(
+		change,
+		change.selection.direction === "rtl"
+			? change.content[change.selection.start.line].length - 1
+			: change.content[change.selection.end.line].length - 1,
+		ignoreShift,
+	);
 };
 
 export const moveCaretToPreviousLine = (change: ChangeResponse, ignoreShift = false): ChangeResponse => {

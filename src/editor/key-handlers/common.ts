@@ -37,26 +37,19 @@ export const isCaretBeyondLineLength = (change: ChangeResponse): boolean =>
 		? change.content[change.selection.start.line].length < change.selection.start.index
 		: change.content[change.selection.end.line].length < change.selection.end.index;
 
-export const moveCaretRight = (change: ChangeResponse, position?: number, ignoreShift = false): ChangeResponse => {
-	if (isWithinSelection(change) && change.selection.direction === "rtl") {
-		change.selection.start.index = position != null ? position : change.selection.start.index + 1;
-
-		if (!change.keys.shiftKey) {
-			change.selection.end.index = change.selection.start.index;
-			change.selection.end.line = change.selection.start.line;
-		}
-	} else {
-		change.selection.direction = "ltr";
-		change.selection.end.index = position != null ? position : change.selection.end.index + 1;
-
-		if (!change.keys.shiftKey || ignoreShift) {
-			change.selection.start.index = change.selection.end.index;
-			change.selection.start.line = change.selection.end.line;
-		}
-	}
-
-	return change;
+export const moveCaretToLineStart = (change: ChangeResponse, ignoreShift = false): ChangeResponse => {
+	return moveCaretLeft(change, 0, ignoreShift);
 };
+export const moveCaretToLineEnd = (change: ChangeResponse, ignoreShift = false): ChangeResponse => {
+	return moveCaretRight(
+		change,
+		change.selection.direction === "rtl"
+			? change.content[change.selection.start.line].length - 1
+			: change.content[change.selection.end.line].length - 1,
+		ignoreShift,
+	);
+};
+
 export const moveCaretLeft = (change: ChangeResponse, position?: number, ignoreShift = false): ChangeResponse => {
 	if (isWithinSelection(change) && change.selection.direction === "ltr") {
 		change.selection.end.index = position != null ? position : change.selection.end.index - 1;
@@ -78,22 +71,30 @@ export const moveCaretLeft = (change: ChangeResponse, position?: number, ignoreS
 	return change;
 };
 
-export const moveCaretToLineStart = (change: ChangeResponse, ignoreShift = false): ChangeResponse => {
-	return moveCaretLeft(change, 0, ignoreShift);
-};
-export const moveCaretToLineEnd = (change: ChangeResponse, ignoreShift = false): ChangeResponse => {
-	return moveCaretRight(
-		change,
-		change.selection.direction === "rtl"
-			? change.content[change.selection.start.line].length - 1
-			: change.content[change.selection.end.line].length - 1,
-		ignoreShift,
-	);
+export const moveCaretToPreviousLine = (change: ChangeResponse, ignoreShift = false): ChangeResponse => {
+	if (isWithinSelection(change) && change.selection.direction === "ltr") {
+		change.selection.end.line -= 1;
+
+		if (!change.keys.shiftKey) {
+			change.selection.start.index = change.selection.end.index;
+			change.selection.start.line = change.selection.end.line;
+		}
+	} else {
+		change.selection.direction = "rtl";
+		change.selection.start.line -= 1;
+
+		if (!change.keys.shiftKey || ignoreShift) {
+			change.selection.end.index = change.selection.start.index;
+			change.selection.end.line = change.selection.start.line;
+		}
+	}
+
+	return change;
 };
 
-export const moveCaretToPreviousLine = (change: ChangeResponse, ignoreShift = false): ChangeResponse => {
+export const moveCaretRight = (change: ChangeResponse, position?: number, ignoreShift = false): ChangeResponse => {
 	if (isWithinSelection(change) && change.selection.direction === "rtl") {
-		change.selection.start.line -= 1;
+		change.selection.start.index = position != null ? position : change.selection.start.index + 1;
 
 		if (!change.keys.shiftKey) {
 			change.selection.end.index = change.selection.start.index;
@@ -101,7 +102,7 @@ export const moveCaretToPreviousLine = (change: ChangeResponse, ignoreShift = fa
 		}
 	} else {
 		change.selection.direction = "ltr";
-		change.selection.end.line -= 1;
+		change.selection.end.index = position != null ? position : change.selection.end.index + 1;
 
 		if (!change.keys.shiftKey || ignoreShift) {
 			change.selection.start.index = change.selection.end.index;
@@ -111,21 +112,22 @@ export const moveCaretToPreviousLine = (change: ChangeResponse, ignoreShift = fa
 
 	return change;
 };
-export const moveCaretToNextLine = (change: ChangeResponse, ignoreShift = false): ChangeResponse => {
-	if (isWithinSelection(change) && change.selection.direction === "ltr") {
-		change.selection.end.line += 1;
 
-		if (!change.keys.shiftKey) {
-			change.selection.start.index = change.selection.end.index;
-			change.selection.start.line = change.selection.end.line;
-		}
-	} else {
-		change.selection.direction = "rtl";
+export const moveCaretToNextLine = (change: ChangeResponse, ignoreShift = false): ChangeResponse => {
+	if (isWithinSelection(change) && change.selection.direction === "rtl") {
 		change.selection.start.line += 1;
 
-		if (!change.keys.shiftKey || ignoreShift) {
+		if (!change.keys.shiftKey) {
 			change.selection.end.index = change.selection.start.index;
 			change.selection.end.line = change.selection.start.line;
+		}
+	} else {
+		change.selection.direction = "ltr";
+		change.selection.end.line += 1;
+
+		if (!change.keys.shiftKey || ignoreShift) {
+			change.selection.start.index = change.selection.end.index;
+			change.selection.start.line = change.selection.end.line;
 		}
 	}
 

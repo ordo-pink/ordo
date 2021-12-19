@@ -62,11 +62,11 @@ export const Char: React.FC<{
 	}
 
 	if (value === "\t") {
-		className += "tab text-pink-500 ";
+		className += "tab text-pink-400 ";
 	}
 
 	if (value === " ") {
-		className += "space text-pink-500 ";
+		className += "space text-pink-400 ";
 	}
 
 	if (value === "\n") {

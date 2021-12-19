@@ -162,7 +162,7 @@ export const Editor: React.FC = () => {
 							</div>
 							<div
 								data-index={`line-${lineIndex}`}
-								className="w-full cursor-text px-2"
+								className="w-full cursor-text px-2 text-gray-800"
 								style={{ tabSize: "2rem" }}
 								onMouseDown={(e) => {
 									e.preventDefault();

@@ -3,10 +3,10 @@ import { identity, ifElse, pipe, tap } from "ramda";
 import { join } from "path";
 import { KeyboardShortcuts } from "./keybindings/keyboard-shortcuts";
 import { getApplicationMenu } from "./application-menu";
-import { registerEditorMainAPIs } from "./editor/editor-main-api";
+import { registerEditorMainAPIs, unregisterEditorMainAPIs } from "./editor/editor-main-api";
 import { KeybindableAction } from "./keybindings/keybindable-action";
 import { getSettings } from "./configuration/settings";
-import { registerSettingsMainAPIs } from "./configuration/settings-main-api";
+import { registerSettingsMainAPIs, unregisterSettingsMainAPIs } from "./configuration/settings-main-api";
 
 declare const MAIN_WINDOW_WEBPACK_ENTRY: string;
 declare const MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY: string;
@@ -55,6 +55,15 @@ const registerWindowActions = pipe(
 	),
 	tap(() => pipe(getApplicationMenu(KeyboardShortcuts), Menu.buildFromTemplate, Menu.setApplicationMenu)(IS_MAC)),
 );
+const unregisterHandlersOnClose = tap((window: BrowserWindow) =>
+	window.on(
+		"closed",
+		pipe(
+			tap(() => unregisterEditorMainAPIs(ipcMain)),
+			tap(() => unregisterSettingsMainAPIs(ipcMain)),
+		),
+	),
+);
 
 const createWindow = pipe(
 	() => new BrowserWindow(config),
@@ -65,6 +74,7 @@ const createWindow = pipe(
 	registerMoveListener,
 	loadURL,
 	showWindow,
+	unregisterHandlersOnClose,
 );
 const handleDesktopShortcuts = ifElse(isShortcut, quit, identity);
 

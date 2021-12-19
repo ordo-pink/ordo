@@ -87,3 +87,8 @@ export const registerEditorMainAPIs = pipe(
 		}),
 	),
 );
+
+export const unregisterEditorMainAPIs = pipe(
+	tap((ipcMain: IpcMain) => ipcMain.removeHandler(EditorAction.GET_CONTENT)),
+	tap((ipcMain: IpcMain) => ipcMain.removeHandler(EditorAction.ON_KEY_DOWN)),
+);

@@ -10,8 +10,7 @@ import { addStatusBarItem, updateStatusBarItem, removeStatusBarItem } from "../s
 import { Char } from "./char";
 import { getStatusBarWidget } from "./status-bar-widget";
 
-const ignoredKeyPresses = ["Meta", "Control", "Alt", "Shift", "CapsLock"];
-
+const IGNORED_KEY_PRESSES = ["Meta", "Control", "Alt", "Shift", "CapsLock"];
 const STATUS_BAR_WIDGET_ID = "EDITOR_CARET_POSITION";
 
 export const Editor: React.FC = () => {
@@ -59,7 +58,7 @@ export const Editor: React.FC = () => {
 	const onKeyDown = (e: KeyboardEvent) => {
 		const { key, metaKey, altKey, ctrlKey, shiftKey } = e;
 
-		if (ignoredKeyPresses.includes(key)) {
+		if (IGNORED_KEY_PRESSES.includes(key)) {
 			return;
 		}
 

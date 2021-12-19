@@ -17,6 +17,7 @@ export const Editor: React.FC = () => {
 	const dispatch = useAppDispatch();
 
 	const ref = React.useRef<HTMLDivElement>(null);
+
 	const [content, setContent] = React.useState<string[]>(null);
 	const [mouseDownPosition, setMouseDownPosition] = React.useState<CaretPosition>(null);
 	const [selection, setSelection] = React.useState<ChangeSelection>({
@@ -30,6 +31,71 @@ export const Editor: React.FC = () => {
 		},
 		direction: "ltr",
 	});
+
+	const isCurrentLine = (index: number) =>
+		selection.direction === "rtl" ? selection.start.line === index : selection.end.line === index;
+
+	React.useEffect(() => {
+		window.Editor.getContent().then(setContent);
+		dispatch(
+			addStatusBarItem({
+				id: STATUS_BAR_WIDGET_ID,
+				position: "right",
+				value: getStatusBarWidget({ selection, content }),
+			}),
+		);
+
+		return () => {
+			setContent(null);
+			dispatch(removeStatusBarItem({ id: STATUS_BAR_WIDGET_ID, position: "right" }));
+		};
+	}, []);
+
+	React.useEffect(() => {
+		if (!content || !ref.current || !selection) {
+			return;
+		}
+
+		window.addEventListener("keydown", onKeyDown);
+
+		const node =
+			selection.direction === "rtl"
+				? document.getElementById(`line-${selection.start.line}-${selection.start.index}`)
+				: document.getElementById(`line-${selection.end.line}-${selection.end.index}`);
+
+		node && node.classList.add("caret");
+
+		dispatch(
+			updateStatusBarItem({
+				id: STATUS_BAR_WIDGET_ID,
+				position: "right",
+				value: getStatusBarWidget({ selection, content }),
+			}),
+		);
+
+		return () => {
+			window.removeEventListener("keydown", onKeyDown);
+			node && node.classList.remove("caret");
+		};
+	}, [selection.start.index, selection.start.line, selection.end.index, selection.end.line, selection.direction]);
+
+	const onKeyDown = (e: KeyboardEvent) => {
+		const { key, metaKey, altKey, ctrlKey, shiftKey } = e;
+
+		if (IGNORED_KEY_PRESSES.includes(key)) {
+			return;
+		}
+
+		e.preventDefault();
+
+		window.Editor.onKeyDown({
+			selection,
+			keys: { key, metaKey, altKey, ctrlKey, shiftKey },
+		}).then(({ selection, content }: ChangeResponse) => {
+			setContent(content);
+			setSelection(selection);
+		});
+	};
 
 	const mouseUpHandler = (index: number, line: number) => {
 		if (mouseDownPosition && (mouseDownPosition.index !== index || mouseDownPosition.line !== line)) {
@@ -54,72 +120,6 @@ export const Editor: React.FC = () => {
 	const mouseDownHandler = (index: number, line: number) => {
 		setMouseDownPosition({ line, index });
 	};
-
-	const onKeyDown = (e: KeyboardEvent) => {
-		const { key, metaKey, altKey, ctrlKey, shiftKey } = e;
-
-		if (IGNORED_KEY_PRESSES.includes(key)) {
-			return;
-		}
-
-		e.preventDefault();
-
-		window.Editor.onKeyDown({
-			selection,
-			keys: { key, metaKey, altKey, ctrlKey, shiftKey },
-		}).then(({ selection, content }: ChangeResponse) => {
-			setContent(content);
-			setSelection(selection);
-		});
-	};
-
-	React.useEffect(() => {
-		if (!content || !ref.current || !selection) {
-			return;
-		}
-
-		const node =
-			selection.direction === "rtl"
-				? document.getElementById(`line-${selection.start.line}-${selection.start.index}`)
-				: document.getElementById(`line-${selection.end.line}-${selection.end.index}`);
-
-		node && node.classList.add("caret");
-		dispatch(
-			updateStatusBarItem({
-				id: STATUS_BAR_WIDGET_ID,
-				position: "right",
-				value: getStatusBarWidget({ selection, content }),
-			}),
-		);
-
-		return () => {
-			node && node.classList.remove("caret");
-		};
-	}, [selection.start.index, selection.start.line, selection.end.index, selection.end.line]);
-
-	React.useEffect(() => {
-		window.Editor.getContent().then(setContent);
-		dispatch(
-			addStatusBarItem({
-				id: STATUS_BAR_WIDGET_ID,
-				position: "right",
-				value: getStatusBarWidget({ selection, content }),
-			}),
-		);
-
-		return () => {
-			setContent(null);
-			dispatch(removeStatusBarItem({ id: STATUS_BAR_WIDGET_ID, position: "right" }));
-		};
-	}, []);
-
-	React.useEffect(() => {
-		window.addEventListener("keydown", onKeyDown);
-		return () => window.removeEventListener("keydown", onKeyDown);
-	}, [selection.start.index, selection.start.line, selection.end.index, selection.end.line]);
-
-	const isCurrentLine = (index: number) =>
-		selection.direction === "rtl" ? selection.start.line === index : selection.end.line === index;
 
 	return (
 		<div>

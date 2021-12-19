@@ -30,78 +30,30 @@ export const App: React.FC = () => {
 
 	return (
 		<div>
-			<div style={{ display: "flex", flexDirection: "row", height: "calc(100vh - 1.3em)" }}>
-				<div style={{ display: "flex", flexDirection: "column", flexGrow: 1 }}>
-					<div
-						style={{
-							background: "#ccc",
-							display: "flex",
-							fontSize: "0.9em",
-							alignItems: "center",
-						}}
-					>
-						<div
-							style={{
-								background: "#eee",
-								borderRight: "1px solid #ddd",
-								padding: "0.5em 2em",
-								cursor: "pointer",
-							}}
-						>
-							Test.md
-						</div>
+			<div className="flex h-full">
+				<div className="flex flex-col grow">
+					<div className="flex items-center bg-gray-300">
+						<div className="bg-gray-200 border-r border-gray-200 cursor-pointer px-3 py-1">Test.md</div>
 					</div>
-					<div
-						style={{
-							background: "#eee",
-							flexGrow: 1,
-							paddingTop: "1em",
-						}}
-					>
+					<div className="bg-gray-50 grow pt-5">
 						<Scrollbars>
 							<Editor addStatus={addStatus} updateStatus={updateStatus} removeStatus={removeStatus} />
 						</Scrollbars>
 					</div>
 				</div>
 
-				<div
-					style={{
-						display: "flex",
-						flexDirection: "column",
-						alignItems: "center",
-						justifyContent: "space-between",
-						padding: "0.5em",
-						width: "2.5em",
-						borderLeft: "1px solid #ccc",
-						background: "#ddd",
-					}}
-				>
-					<div style={{ display: "flex", flexDirection: "column", height: "100vh" }}>
-						<div style={{ fontSize: "2em", cursor: "pointer", marginBottom: "0.2em" }}>📄</div>
-						<div style={{ fontSize: "2em", cursor: "pointer", marginBottom: "0.2em" }}>🌲</div>
+				<div className="flex flex-col items-center justify-between p-2 w-12 border-l border-gray-300 bg-gray-200">
+					<div className="flex flex-col h-screen space-y-3">
+						<div className="text-4xl cursor-pointer">📄</div>
+						<div className="text-4xl cursor-pointer">🌲</div>
+						<div className="text-4xl cursor-pointer">⚙️</div>
 					</div>
-					<div style={{ fontSize: "2em", cursor: "pointer", marginBottom: "0.2em" }}>⚙️</div>
 				</div>
 			</div>
-			<div
-				style={{
-					position: "fixed",
-					left: 0,
-					right: 0,
-					bottom: 0,
-					height: "1.3em",
-					display: "flex",
-					justifyContent: "space-between",
-					alignItems: "center",
-					fontSize: "0.75em",
-					padding: "0.2em 1em",
-					background: "#ddd",
-					borderTop: "1px solid #ccc",
-				}}
-			>
+			<div className="fixed left-0 right-0 bottom-0 flex justify-between items-center text-sm px-4 py-1 bg-gray-200 border-t border-gray-300">
 				<div>
 					{status.map((item) => (
-						<span key={item.id} style={{ marginRight: "1em" }} onClick={item.onClick || (() => null)}>
+						<span key={item.id} className="mr-4 cursor-pointer" onClick={item.onClick || (() => null)}>
 							{item.value}
 						</span>
 					))}

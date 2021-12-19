@@ -8,8 +8,8 @@ const getStatusLine = (selection: ChangeSelection) => {
 	const line = selection.direction === "rtl" ? selection.start.line : selection.end.line;
 	const index = selection.direction === "rtl" ? selection.start.index : selection.end.index;
 
-	return JSON.stringify(selection);
-	// return `Ln ${line}, Col ${index}`;
+	// return JSON.stringify(selection);
+	return `Ln ${line}, Col ${index}`;
 };
 
 const selectionExists = (selection: ChangeSelection) =>
@@ -69,23 +69,15 @@ const Char: React.FC<{
 	let className = "";
 
 	if (selectionExists && isInSelection) {
-		className += "editor-selection ";
-	}
-
-	if (charIndex === selection.start.index && lineIndex === selection.start.line) {
-		className += "selection-start ";
-	}
-
-	if (charIndex === selection.end.index - 1 && lineIndex === selection.end.line) {
-		className += "selection-end ";
+		className += "editor-selection bg-pink-200 ";
 	}
 
 	if (value === "\t") {
-		className += "tab ";
+		className += "tab text-gray-400 ";
 	}
 
 	if (value === " ") {
-		className += "space ";
+		className += "space text-gray-400 ";
 	}
 
 	if (value === "\n") {
@@ -95,11 +87,11 @@ const Char: React.FC<{
 	return (
 		<span
 			ref={ref}
-			className={className}
 			style={{
 				display: "inline-block",
 				whiteSpace: "pre",
 			}}
+			className={className}
 			data-index={`line-${lineIndex}-${charIndex}`}
 			id={`line-${lineIndex}-${charIndex}`}
 			onMouseUp={onMouseUp}
@@ -203,30 +195,23 @@ export const Editor: React.FC<any> = ({ addStatus, updateStatus, removeStatus })
 		return () => window.removeEventListener("keydown", onKeyDown);
 	}, [selection.start.index, selection.start.line, selection.end.index, selection.end.line]);
 
+	const isCurrentLine = (index: number) =>
+		selection.direction === "rtl" ? selection.start.line === index : selection.end.line === index;
+
 	return (
 		<div>
 			<div
 				ref={ref}
-				style={{
-					fontSize: "16px",
-					outline: "none",
-					wordWrap: "break-word",
-					width: "100%",
-					lineBreak: "anywhere",
-					paddingBottom: "calc(100vh - 6em)",
-					cursor: "text",
-				}}
+				className="outline-none text-lg break-words w-full pb-96 cursor-text font-mono tracking-wide"
 				onMouseDown={(e) => {
 					e.preventDefault();
 
 					mouseDownHandler(content[content.length - 1].length - 1, content.length - 1);
 				}}
 				onMouseUp={(e) => {
-					if (e.buttons === 1) {
-						e.preventDefault();
+					e.preventDefault();
 
-						mouseUpHandler(content[content.length - 1].length - 1, content.length - 1);
-					}
+					mouseUpHandler(content[content.length - 1].length - 1, content.length - 1);
 				}}
 				onMouseOver={(e) => {
 					if (e.buttons === 1) {
@@ -240,25 +225,12 @@ export const Editor: React.FC<any> = ({ addStatus, updateStatus, removeStatus })
 					content.map((line, lineIndex) => (
 						<div
 							key={`line-${lineIndex}`}
-							style={{
-								display: "flex",
-								alignItems: "center",
-								background: lineIndex === selection.start.line ? "#ddd" : "transparent",
-								lineHeight: "1.5",
-							}}
+							className={`flex items-center ${isCurrentLine(lineIndex) ? "bg-gray-200" : ""}`}
 						>
 							<div
-								style={{
-									width: "3em",
-									flexShrink: 0,
-									textAlign: "right",
-									paddingRight: "0.5em",
-									fontWeight: 900,
-									color: lineIndex === selection.start.line ? "#000" : "#555",
-									userSelect: "none",
-									fontSize: "0.8em",
-									cursor: "default",
-								}}
+								className={` w-16 shrink-0 text-sm text-right pr-2 font-sans select-none cursor-default ${
+									isCurrentLine(lineIndex) ? "texg-gray-500" : "text-gray-400"
+								}`}
 								onMouseUp={(e) => {
 									e.preventDefault();
 									e.stopPropagation();
@@ -276,7 +248,8 @@ export const Editor: React.FC<any> = ({ addStatus, updateStatus, removeStatus })
 							</div>
 							<div
 								data-index={`line-${lineIndex}`}
-								style={{ width: "100%", tabSize: "1em", cursor: "text", padding: "0 0.5em", fontFamily: "monospace" }}
+								className="w-full cursor-text px-2"
+								style={{ tabSize: "2rem" }}
 								onMouseDown={(e) => {
 									e.preventDefault();
 									e.stopPropagation();
@@ -284,12 +257,10 @@ export const Editor: React.FC<any> = ({ addStatus, updateStatus, removeStatus })
 									mouseDownHandler(line.length - 1, lineIndex);
 								}}
 								onMouseUp={(e) => {
-									if (e.buttons === 1) {
-										e.preventDefault();
-										e.stopPropagation();
+									e.preventDefault();
+									e.stopPropagation();
 
-										mouseUpHandler(line.length - 1, lineIndex);
-									}
+									mouseUpHandler(line.length - 1, lineIndex);
 								}}
 								onMouseOver={(e) => {
 									if (e.buttons === 1) {

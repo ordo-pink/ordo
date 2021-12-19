@@ -17,7 +17,7 @@ import { handleArrowRight } from "./key-handlers/arrow-right";
 import { handleArrowDown } from "./key-handlers/arrow-down";
 import { handleBackspace } from "./key-handlers/backspace";
 
-const content = ["Hello World\n", "\n", "It's the next line\n"];
+const content = ["# Test\n", "\n", "Hello there\n"];
 
 const createKeybinding = (keys: ChangeKeys): string => {
 	let combo = "";
@@ -53,6 +53,14 @@ export const registerEditorMainAPIs = pipe(
 	tap((ipcMain: IpcMain) => ipcMain.handle(EditorAction.GET_CONTENT, () => content)),
 	tap((ipcMain: IpcMain) =>
 		ipcMain.handle(EditorAction.ON_KEY_DOWN, (_, change: Change): ChangeResponse => {
+			KeyboardShortcuts[KeybindableAction.SELECT_ALL].action = () => {
+				change.selection.start.index = 0;
+				change.selection.start.line = 0;
+				change.selection.end.index = content[content.length - 1].length;
+				change.selection.end.line = content.length - 1;
+				change.selection.direction = "ltr";
+			};
+
 			const runKeyBinding = getKeybinding(change.keys);
 
 			if (runKeyBinding) {

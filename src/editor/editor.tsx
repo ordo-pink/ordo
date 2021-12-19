@@ -8,15 +8,11 @@ import { useAppDispatch } from "../redux/hooks";
 import { addStatusBarItem, updateStatusBarItem, removeStatusBarItem } from "../status-bar/state";
 
 import { Char } from "./char";
-
-const getStatusLine = (selection: ChangeSelection) => {
-	const line = selection.direction === "rtl" ? selection.start.line : selection.end.line;
-	const index = selection.direction === "rtl" ? selection.start.index : selection.end.index;
-
-	return `Ln ${line}, Col ${index}`;
-};
+import { getStatusBarWidget } from "./status-bar-widget";
 
 const ignoredKeyPresses = ["Meta", "Control", "Alt", "Shift", "CapsLock"];
+
+const STATUS_BAR_WIDGET_ID = "EDITOR_CARET_POSITION";
 
 export const Editor: React.FC = () => {
 	const dispatch = useAppDispatch();
@@ -49,6 +45,11 @@ export const Editor: React.FC = () => {
 			);
 		}
 		setSelection({ start: { line, index }, end: { line, index }, direction: "ltr" });
+	};
+
+	const mouseIgnoreHandler = (e: React.MouseEvent) => {
+		e.preventDefault();
+		e.stopPropagation();
 	};
 
 	const mouseDownHandler = (index: number, line: number) => {
@@ -84,7 +85,13 @@ export const Editor: React.FC = () => {
 				: document.getElementById(`line-${selection.end.line}-${selection.end.index}`);
 
 		node && node.classList.add("caret");
-		dispatch(updateStatusBarItem({ id: "EDITOR_CARET_POSITION", position: "right", value: getStatusLine(selection) }));
+		dispatch(
+			updateStatusBarItem({
+				id: STATUS_BAR_WIDGET_ID,
+				position: "right",
+				value: getStatusBarWidget({ selection, content }),
+			}),
+		);
 
 		return () => {
 			node && node.classList.remove("caret");
@@ -93,11 +100,17 @@ export const Editor: React.FC = () => {
 
 	React.useEffect(() => {
 		window.Editor.getContent().then(setContent);
-		dispatch(addStatusBarItem({ id: "EDITOR_CARET_POSITION", position: "right", value: getStatusLine(selection) }));
+		dispatch(
+			addStatusBarItem({
+				id: STATUS_BAR_WIDGET_ID,
+				position: "right",
+				value: getStatusBarWidget({ selection, content }),
+			}),
+		);
 
 		return () => {
 			setContent(null);
-			dispatch(removeStatusBarItem({ id: "EDITOR_CARET_POSITION", position: "right" }));
+			dispatch(removeStatusBarItem({ id: STATUS_BAR_WIDGET_ID, position: "right" }));
 		};
 	}, []);
 
@@ -142,18 +155,9 @@ export const Editor: React.FC = () => {
 								className={` w-16 shrink-0 text-sm text-right pr-2 font-sans select-none cursor-default ${
 									isCurrentLine(lineIndex) ? "texg-gray-500" : "text-gray-400"
 								}`}
-								onMouseUp={(e) => {
-									e.preventDefault();
-									e.stopPropagation();
-								}}
-								onMouseDown={(e) => {
-									e.preventDefault();
-									e.stopPropagation();
-								}}
-								onMouseOver={(e) => {
-									e.preventDefault();
-									e.stopPropagation();
-								}}
+								onMouseUp={mouseIgnoreHandler}
+								onMouseDown={mouseIgnoreHandler}
+								onMouseOver={mouseIgnoreHandler}
 							>
 								{lineIndex + 1}
 							</div>

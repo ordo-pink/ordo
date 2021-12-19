@@ -4,33 +4,9 @@ import { HiOutlineCog, HiOutlineShare, HiOutlineCollection } from "react-icons/h
 
 import { Editor } from "./editor/editor";
 
-interface StatusBarItem {
-	id: string;
-	value: string;
-	onClick: () => void;
-}
-
 export const App: React.FC = () => {
-	// TODO: Move to redux
-	const [status, setStatus] = React.useState<StatusBarItem[]>([]);
-
-	const addStatus = (item: StatusBarItem) => setStatus([...status, item]);
-	const removeStatus = (id: string) =>
-		setStatus(
-			[...status].splice(
-				status.findIndex((i) => i.id === id),
-				1,
-			),
-		);
-	const updateStatus = (item: StatusBarItem) => {
-		const oldItem = status.findIndex((i) => i.id === item.id);
-		const copy = [...status];
-		copy.splice(oldItem, 1, item);
-		setStatus(copy);
-	};
-
 	return (
-		<div>
+		<>
 			<div className="flex h-full">
 				<div className="flex flex-col grow">
 					<div className="flex items-center bg-gray-300">
@@ -38,7 +14,7 @@ export const App: React.FC = () => {
 					</div>
 					<div className="bg-gray-50 grow pt-5">
 						<Scrollbars>
-							<Editor addStatus={addStatus} updateStatus={updateStatus} removeStatus={removeStatus} />
+							<Editor />
 						</Scrollbars>
 					</div>
 				</div>
@@ -57,15 +33,6 @@ export const App: React.FC = () => {
 					</div>
 				</div>
 			</div>
-			<div className="fixed left-0 right-0 bottom-0 flex justify-between items-center text-sm px-4 py-1 bg-gray-200 border-t border-gray-300">
-				<div>
-					{status.map((item) => (
-						<span key={item.id} className="mr-4 cursor-pointer" onClick={item.onClick || (() => null)}>
-							{item.value}
-						</span>
-					))}
-				</div>
-			</div>
-		</div>
+		</>
 	);
 };

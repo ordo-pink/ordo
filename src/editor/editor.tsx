@@ -3,6 +3,8 @@ import { CaretPosition, ChangeResponse, ChangeSelection } from "./types";
 import React from "react";
 
 import "./editor.css";
+import { useAppDispatch } from "../redux/hooks";
+import { addStatusBarItem, updateStatusBarItem, removeStatusBarItem } from "../status-bar/state";
 
 const getStatusLine = (selection: ChangeSelection) => {
 	const line = selection.direction === "rtl" ? selection.start.line : selection.end.line;
@@ -73,11 +75,11 @@ const Char: React.FC<{
 	}
 
 	if (value === "\t") {
-		className += "tab text-gray-400 ";
+		className += "tab text-pink-500 ";
 	}
 
 	if (value === " ") {
-		className += "space text-gray-400 ";
+		className += "space text-pink-500 ";
 	}
 
 	if (value === "\n") {
@@ -109,7 +111,9 @@ const Char: React.FC<{
 
 const ignoredKeyPresses = ["Meta", "Control", "Alt", "Shift", "CapsLock"];
 
-export const Editor: React.FC<any> = ({ addStatus, updateStatus, removeStatus }) => {
+export const Editor: React.FC = () => {
+	const dispatch = useAppDispatch();
+
 	const ref = React.useRef<HTMLDivElement>(null);
 	const [content, setContent] = React.useState<string[]>(null);
 	const [mouseDownPosition, setMouseDownPosition] = React.useState<CaretPosition>(null);
@@ -173,7 +177,7 @@ export const Editor: React.FC<any> = ({ addStatus, updateStatus, removeStatus })
 				: document.getElementById(`line-${selection.end.line}-${selection.end.index}`);
 
 		node && node.classList.add("caret");
-		updateStatus({ id: "EDITOR_CARET_POSITION", value: getStatusLine(selection) });
+		dispatch(updateStatusBarItem({ id: "EDITOR_CARET_POSITION", position: "right", value: getStatusLine(selection) }));
 
 		return () => {
 			node && node.classList.remove("caret");
@@ -182,11 +186,11 @@ export const Editor: React.FC<any> = ({ addStatus, updateStatus, removeStatus })
 
 	React.useEffect(() => {
 		window.Editor.getContent().then(setContent);
-		addStatus({ id: "EDITOR_CARET_POSITION", value: getStatusLine(selection) });
+		dispatch(addStatusBarItem({ id: "EDITOR_CARET_POSITION", position: "right", value: getStatusLine(selection) }));
 
 		return () => {
 			setContent(null);
-			removeStatus("EDITOR_CARET_POSITION");
+			dispatch(removeStatusBarItem({ id: "EDITOR_CARET_POSITION", position: "right" }));
 		};
 	}, []);
 

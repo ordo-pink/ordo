@@ -3,7 +3,7 @@
 		background: transparent;
 	}
 	100% {
-		background: #7e1946;
+		background: #db2777;
 	}
 }
 
@@ -12,7 +12,7 @@
 		background: transparent;
 	}
 	100% {
-		background: #7e1946;
+		background: #db2777;
 	}
 }
 
@@ -26,7 +26,7 @@
 	width: 2px;
 	height: 1.5em;
 	vertical-align: middle;
-	background: #7e1946;
+	background: #db2777;
 	animation: blinky 0.5s ease-in-out infinite alternative;
 	-webkit-animation: blinky 0.5s ease-in-out infinite alternate;
 }

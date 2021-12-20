@@ -1,37 +1,12 @@
 import { promises } from "fs";
 import { join } from "path";
 import { getSettings } from "../../configuration/settings";
-import { OrdoFile, OrdoFolder } from "../types";
+import { OrdoFolder } from "../types";
 import { createOrdoFolder } from "./create-ordo-folder";
 import { Minimatch } from "minimatch";
 import YAML from "yaml";
 import { createOrdoFile } from "./create-ordo-file";
-
-const isFolder = (x: OrdoFile | OrdoFolder): x is OrdoFolder => x.type === "folder";
-
-const sortTree = (tree: OrdoFolder): OrdoFolder => {
-	tree.children = tree.children.sort((a, b) => {
-		if (isFolder(a)) {
-			sortTree(a);
-		}
-
-		if (isFolder(b)) {
-			sortTree(b);
-		}
-
-		if (!isFolder(a) && isFolder(b)) {
-			return 1;
-		}
-
-		if (isFolder(a) && !isFolder(b)) {
-			return -1;
-		}
-
-		return a.readableName.localeCompare(b.readableName);
-	});
-
-	return tree as OrdoFolder;
-};
+import { sortTree } from "../../common/sort-tree";
 
 export const listFolder = async (path: string, depth = 0, rootPath = path): Promise<OrdoFolder> => {
 	const folder = await promises.readdir(path, { withFileTypes: true, encoding: "utf-8" });

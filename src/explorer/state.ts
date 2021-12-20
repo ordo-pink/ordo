@@ -5,6 +5,12 @@ export const getFolder = createAsyncThunk("GetFolder", () => window.Explorer.get
 export const updateFolder = createAsyncThunk("UpdateFolder", (change: { path: string; update: Partial<OrdoFolder> }) =>
 	window.Explorer.updateFolder(change.path, change.update),
 );
+export const createFile = createAsyncThunk("CreateFile", (pointer: { selectedPath: string; path: string }) =>
+	window.Explorer.createFile(pointer.selectedPath, pointer.path),
+);
+export const createFolder = createAsyncThunk("CreateFolder", (pointer: { selectedPath: string; path: string }) =>
+	window.Explorer.createFolder(pointer.selectedPath, pointer.path),
+);
 
 export type ExplorerState = {
 	selected: string;
@@ -33,6 +39,14 @@ const explorerSlice = createSlice({
 		});
 		builder.addCase(getFolder.fulfilled, (state, action) => {
 			state.tree = action.payload;
+		});
+		builder.addCase(createFile.fulfilled, (state, action) => {
+			state.tree = action.payload;
+			state.selected = action.payload.path;
+		});
+		builder.addCase(createFolder.fulfilled, (state, action) => {
+			state.tree = action.payload;
+			state.selected = action.payload.path;
 		});
 	},
 });

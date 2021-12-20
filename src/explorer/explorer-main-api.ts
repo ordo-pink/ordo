@@ -2,6 +2,9 @@ import { BrowserWindow, IpcMain } from "electron";
 import { pipe, tap } from "ramda";
 import { getSettings } from "../configuration/settings";
 import { ExplorerAction } from "./explorer-renderer-api";
+import { createFile } from "./folder/create-file";
+import { createFolder } from "./folder/create-folder";
+import { getFolderOrParent } from "./folder/get-folder-or-parent";
 import { listFolder } from "./folder/list-folder";
 import { openFolder } from "./folder/open-folder";
 import { updateFolder } from "./folder/update-folder";
@@ -9,7 +12,7 @@ import { OrdoFolder } from "./types";
 
 let tree: OrdoFolder;
 
-export const registerExplorerMainAPIs = (window: BrowserWindow) =>
+export const registerExplorerMainAPIs = (window: BrowserWindow): ((ipcMain: IpcMain) => IpcMain) =>
 	pipe(
 		tap((ipcMain: IpcMain) => ipcMain.handle(ExplorerAction.OPEN_FOLDER, () => openFolder(window))),
 		tap((ipcMain: IpcMain) =>
@@ -27,7 +30,40 @@ export const registerExplorerMainAPIs = (window: BrowserWindow) =>
 		),
 		tap((ipcMain: IpcMain) =>
 			ipcMain.handle(ExplorerAction.UPDATE_FOLDER, (_, path: string, update: Partial<OrdoFolder>) => {
+				if (!tree) {
+					return null;
+				}
+
 				tree = updateFolder(tree, path, update);
+				return tree;
+			}),
+		),
+		tap((ipcMain: IpcMain) =>
+			ipcMain.handle(ExplorerAction.GET_FOLDER_OR_PARENT, (_, path: string) => {
+				if (!tree) {
+					return null;
+				}
+
+				return getFolderOrParent(tree, path);
+			}),
+		),
+		tap((ipcMain: IpcMain) =>
+			ipcMain.handle(ExplorerAction.CREATE_FILE, async (_, parentPath: string, path: string) => {
+				if (!tree) {
+					return null;
+				}
+
+				tree = await createFile(tree, parentPath, path);
+				return tree;
+			}),
+		),
+		tap((ipcMain: IpcMain) =>
+			ipcMain.handle(ExplorerAction.CREATE_FOLDER, async (_, parentPath: string, path: string) => {
+				if (!tree) {
+					return null;
+				}
+
+				tree = await createFolder(tree, parentPath, path);
 				return tree;
 			}),
 		),

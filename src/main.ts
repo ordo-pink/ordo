@@ -1,4 +1,4 @@
-import { App, app, BrowserWindow, BrowserWindowConstructorOptions, ipcMain, Menu } from "electron";
+import { App, app, BrowserWindow, BrowserWindowConstructorOptions, dialog, ipcMain, Menu } from "electron";
 import { identity, ifElse, pipe, tap } from "ramda";
 import { join } from "path";
 import { KeyboardShortcuts } from "./keybindings/keyboard-shortcuts";
@@ -8,6 +8,7 @@ import { KeybindableAction } from "./keybindings/keybindable-action";
 import { getSettings } from "./configuration/settings";
 import { registerSettingsMainAPIs, unregisterSettingsMainAPIs } from "./configuration/settings-main-api";
 import { debounce } from "./common/debounce";
+import { getState, setState } from "./common/application-state";
 
 declare const MAIN_WINDOW_WEBPACK_ENTRY: string;
 declare const MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY: string;
@@ -49,6 +50,18 @@ const showWindow = tap((window: BrowserWindow) => window.once("ready-to-show", w
 const registerResizeListener = tap((window: BrowserWindow) => window.on("resize", () => setWinPosition(window)));
 const registerMoveListener = tap((window: BrowserWindow) => window.on("move", () => setWinPosition(window)));
 const registerWindowActions = pipe(
+	tap(
+		(window: BrowserWindow) =>
+			(KeyboardShortcuts[KeybindableAction.OPEN].action = () => {
+				const filepaths = dialog.showOpenDialogSync(window, {
+					properties: ["openDirectory", "createDirectory", "promptToCreate"],
+				});
+
+				setState((state) => {
+					state.workingDirectory = filepaths[0];
+				});
+			}),
+	),
 	tap(
 		(window: BrowserWindow) =>
 			(KeyboardShortcuts[KeybindableAction.TOGGLE_DEV_TOOLS].action = () => window.webContents.toggleDevTools()),

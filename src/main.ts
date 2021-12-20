@@ -8,7 +8,7 @@ import { KeybindableAction } from "./keybindings/keybindable-action";
 import { getSettings } from "./configuration/settings";
 import { registerSettingsMainAPIs, unregisterSettingsMainAPIs } from "./configuration/settings-main-api";
 import { debounce } from "./common/debounce";
-import { getState, setState } from "./common/application-state";
+import { setState } from "./common/application-state";
 
 declare const MAIN_WINDOW_WEBPACK_ENTRY: string;
 declare const MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY: string;

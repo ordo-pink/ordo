@@ -7,6 +7,7 @@ const initialConfig: OrdoSettings = {
 	"last-window.height": 600,
 	"last-window.x": 0,
 	"last-window.y": 0,
+	"last-window.folder": null,
 	"editor.font": 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;',
 	"editor.tab-size": "2rem",
 	"editor.font-size": "15px",
@@ -29,7 +30,23 @@ const initialConfig: OrdoSettings = {
 		"**/Thumbs.db",
 	],
 	"file-explorer.file-associations": [
-		// TODO
+		{ extension: ".apng", association: "image" },
+		{ extension: ".avif", association: "image" },
+		{ extension: ".gif", association: "image" },
+		{ extension: ".jpg", association: "image" },
+		{ extension: ".jpeg", association: "image" },
+		{ extension: ".pjpeg", association: "image" },
+		{ extension: ".pjp", association: "image" },
+		{ extension: ".png", association: "image" },
+		{ extension: ".svg", association: "image" },
+		{ extension: ".webp", association: "image" },
+		{ extension: ".bmp", association: "image" },
+		{ extension: ".ico", association: "image" },
+		{ extension: ".cur", association: "image" },
+		{ extension: ".tif", association: "image" },
+		{ extension: ".tiff", association: "image" },
+		{ extension: ".md", association: "text" },
+		{ extension: ".txt", association: "text" },
 	],
 	"file-explorer.confirm-delete": true,
 	"file-explorer.enable-drag-and-drop": true,
@@ -39,19 +56,32 @@ const initialConfig: OrdoSettings = {
 };
 
 let config: OrdoSettings;
+let savedPath: string;
 
-export const getSettings = (path: string): SettingsAPI => {
-	if (!existsSync(path)) {
+export const getSettings = (path?: string): SettingsAPI => {
+	if (!savedPath && path) {
+		savedPath = path;
+	}
+
+	if (!path && savedPath) {
+		path = savedPath;
+	}
+
+	if (!existsSync(path) && path) {
 		writeFileSync(path, YAML.stringify(initialConfig), "utf-8");
 	}
 
-	if (!config) {
+	if (!config && path) {
 		try {
 			config = YAML.parse(readFileSync(path, "utf-8"));
 		} catch (e) {
 			writeFileSync(path, YAML.stringify(initialConfig), "utf-8");
 			config = YAML.parse(readFileSync(path, "utf-8"));
 		}
+	}
+
+	if (!config && !path) {
+		config = { ...initialConfig };
 	}
 
 	const api = {

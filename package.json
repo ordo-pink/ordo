@@ -112,6 +112,7 @@
 		"electron-util": "^0.17.2",
 		"fuse.js": "^6.4.6",
 		"immer": "^9.0.7",
+		"minimatch": "^3.0.4",
 		"or-else": "^0.1.0",
 		"or-pipets": "^1.0.1",
 		"ramda": "^0.27.1",

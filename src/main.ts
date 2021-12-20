@@ -8,7 +8,7 @@ import { KeybindableAction } from "./keybindings/keybindable-action";
 import { getSettings } from "./configuration/settings";
 import { registerSettingsMainAPIs, unregisterSettingsMainAPIs } from "./configuration/settings-main-api";
 import { debounce } from "./common/debounce";
-import { setState } from "./common/application-state";
+import { registerExplorerMainAPIs, unregisterExplorerMainAPIs } from "./explorer/explorer-main-api";
 
 declare const MAIN_WINDOW_WEBPACK_ENTRY: string;
 declare const MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY: string;
@@ -52,18 +52,6 @@ const registerMoveListener = tap((window: BrowserWindow) => window.on("move", ()
 const registerWindowActions = pipe(
 	tap(
 		(window: BrowserWindow) =>
-			(KeyboardShortcuts[KeybindableAction.OPEN].action = () => {
-				const filepaths = dialog.showOpenDialogSync(window, {
-					properties: ["openDirectory", "createDirectory", "promptToCreate"],
-				});
-
-				setState((state) => {
-					state.workingDirectory = filepaths[0];
-				});
-			}),
-	),
-	tap(
-		(window: BrowserWindow) =>
 			(KeyboardShortcuts[KeybindableAction.TOGGLE_DEV_TOOLS].action = () => window.webContents.toggleDevTools()),
 	),
 	tap(
@@ -77,6 +65,7 @@ const unregisterHandlersOnClose = tap((window: BrowserWindow) =>
 		"closed",
 		pipe(
 			tap(() => unregisterEditorMainAPIs(ipcMain)),
+			tap(() => unregisterExplorerMainAPIs(ipcMain)),
 			tap(() => unregisterSettingsMainAPIs(ipcMain)),
 		),
 	),
@@ -85,6 +74,7 @@ const unregisterHandlersOnClose = tap((window: BrowserWindow) =>
 const createWindow = pipe(
 	() => new BrowserWindow(config),
 	tap(() => registerEditorMainAPIs(ipcMain)),
+	tap((window) => registerExplorerMainAPIs(window)(ipcMain)),
 	tap(() => registerSettingsAPI(ipcMain)),
 	registerWindowActions,
 	registerResizeListener,

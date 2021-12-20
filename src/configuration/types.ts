@@ -1,12 +1,13 @@
 import colors from "tailwindcss/colors";
 
-export type FileAssociation<T> = "text" | "image" | T;
+export type FileAssociation<T = string> = "text" | "image" | T;
 
 export interface OrdoSettings {
 	"last-window.width": number;
 	"last-window.height": number;
 	"last-window.x": number;
 	"last-window.y": number;
+	"last-window.folder": string;
 	"editor.font": string;
 	"editor.tab-size": string;
 	"editor.font-size": string;

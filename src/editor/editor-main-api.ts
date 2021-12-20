@@ -4,6 +4,7 @@ import { IpcMain } from "electron";
 import { tap } from "or-pipets";
 import { identity, pipe } from "ramda";
 import { Switch } from "or-else";
+import { promises } from "fs";
 
 import { EditorAction } from "./editor-renderer-api";
 import { KeyboardShortcuts } from "../keybindings/keyboard-shortcuts";
@@ -16,8 +17,9 @@ import { handleArrowLeft } from "./key-handlers/arrow-left";
 import { handleArrowRight } from "./key-handlers/arrow-right";
 import { handleArrowDown } from "./key-handlers/arrow-down";
 import { handleBackspace } from "./key-handlers/backspace";
+import { OrdoFile } from "../explorer/types";
 
-const content = ["# Test\n", "\n", "Hello there\n"];
+let content = ["# Bring your thoughts to ORDO!", "\n", "BTW, you can type right here if you want to."];
 
 const createKeybinding = (keys: ChangeKeys): string => {
 	let combo = "";
@@ -50,7 +52,17 @@ const getKeybindableAction = (keybinding: string): (() => void) => {
 const getKeybinding = pipe(createKeybinding, getKeybindableAction);
 
 export const registerEditorMainAPIs = pipe(
-	tap((ipcMain: IpcMain) => ipcMain.handle(EditorAction.GET_CONTENT, () => content)),
+	tap((ipcMain: IpcMain) =>
+		ipcMain.handle(EditorAction.GET_CONTENT, (_, file: OrdoFile) =>
+			promises.readFile(file.path, "utf-8").then((body) => {
+				content = body.split("\n").map((t) => t.concat("\n"));
+				return {
+					...file,
+					body,
+				};
+			}),
+		),
+	),
 	tap((ipcMain: IpcMain) =>
 		ipcMain.handle(EditorAction.ON_KEY_DOWN, (_, change: Change): ChangeResponse => {
 			KeyboardShortcuts[KeybindableAction.SELECT_ALL].action = () => {

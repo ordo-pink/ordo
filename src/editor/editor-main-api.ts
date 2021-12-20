@@ -58,7 +58,7 @@ export const registerEditorMainAPIs = pipe(
 				content = body.split("\n").map((t) => t.concat("\n"));
 				return {
 					...file,
-					body,
+					body: content,
 				};
 			}),
 		),

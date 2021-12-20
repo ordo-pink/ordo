@@ -7,6 +7,7 @@ import { registerEditorMainAPIs, unregisterEditorMainAPIs } from "./editor/edito
 import { KeybindableAction } from "./keybindings/keybindable-action";
 import { getSettings } from "./configuration/settings";
 import { registerSettingsMainAPIs, unregisterSettingsMainAPIs } from "./configuration/settings-main-api";
+import { debounce } from "./common/debounce";
 
 declare const MAIN_WINDOW_WEBPACK_ENTRY: string;
 declare const MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY: string;
@@ -30,20 +31,23 @@ const config: BrowserWindowConstructorOptions = {
 	},
 };
 
-const setWinPosition = (window: BrowserWindow) =>
-	settings
-		.set("last-window.height", window.getBounds().height)
-		.set("last-window.width", window.getBounds().width)
-		.set("last-window.x", window.getBounds().x)
-		.set("last-window.y", window.getBounds().y);
+const setWinPosition = debounce(
+	(window: BrowserWindow) =>
+		settings
+			.set("last-window.height", window.getBounds().height)
+			.set("last-window.width", window.getBounds().width)
+			.set("last-window.x", window.getBounds().x)
+			.set("last-window.y", window.getBounds().y),
+	300,
+);
 const quit = () => process.platform !== "darwin" && app.quit();
 const activate = () => BrowserWindow.getAllWindows().length === 0 && createWindow();
-const isShortcut = (_: App) => require("electron-squirrel-startup");
+const isShortcut: (app: App) => boolean = () => require("electron-squirrel-startup");
 
 const loadURL = tap((window: BrowserWindow) => window.loadURL(MAIN_WINDOW_WEBPACK_ENTRY));
 const showWindow = tap((window: BrowserWindow) => window.once("ready-to-show", window.show));
-const registerResizeListener = tap((window: BrowserWindow) => window.on("resized", () => setWinPosition(window)));
-const registerMoveListener = tap((window: BrowserWindow) => window.on("moved", () => setWinPosition(window)));
+const registerResizeListener = tap((window: BrowserWindow) => window.on("resize", () => setWinPosition(window)));
+const registerMoveListener = tap((window: BrowserWindow) => window.on("move", () => setWinPosition(window)));
 const registerWindowActions = pipe(
 	tap(
 		(window: BrowserWindow) =>

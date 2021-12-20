@@ -118,7 +118,7 @@ export const Editor: React.FC = () => {
 			}),
 		);
 
-		setContent(tabs[currentTab].body.split("\n").map((t) => t.concat("\n")));
+		setContent(tabs[currentTab].body);
 
 		return () => {
 			setContent(null);

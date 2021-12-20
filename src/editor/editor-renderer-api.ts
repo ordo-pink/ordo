@@ -13,6 +13,6 @@ export enum EditorAction {
 export const EditorAPI = {
 	[EditorAction.ON_KEY_DOWN]: (change: Change): Promise<ChangeResponse> =>
 		ipcRenderer.invoke(EditorAction.ON_KEY_DOWN, change),
-	[EditorAction.GET_CONTENT]: (file: OrdoFile): Promise<OrdoFile & { body: string }> =>
+	[EditorAction.GET_CONTENT]: (file: OrdoFile): Promise<OrdoFile & { body: string[] }> =>
 		ipcRenderer.invoke(EditorAction.GET_CONTENT, file),
 };

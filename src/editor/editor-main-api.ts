@@ -55,6 +55,10 @@ export const registerEditorMainAPIs = pipe(
 	tap((ipcMain: IpcMain) =>
 		ipcMain.handle(EditorAction.GET_CONTENT, (_, file: OrdoFile) =>
 			promises.readFile(file.path, "utf-8").then((body) => {
+				if (!body) {
+					body = "\n";
+				}
+
 				content = body.split("\n").map((t) => t.concat("\n"));
 				return {
 					...file,

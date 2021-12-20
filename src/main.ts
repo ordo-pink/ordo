@@ -1,4 +1,4 @@
-import { App, app, BrowserWindow, BrowserWindowConstructorOptions, dialog, ipcMain, Menu } from "electron";
+import { App, app, BrowserWindow, BrowserWindowConstructorOptions, ipcMain, Menu } from "electron";
 import { identity, ifElse, pipe, tap } from "ramda";
 import { join } from "path";
 import { KeyboardShortcuts } from "./keybindings/keyboard-shortcuts";

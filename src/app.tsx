@@ -1,5 +1,4 @@
 import React from "react";
-import Scrollbars from "react-custom-scrollbars";
 
 import { Editor } from "./editor/editor";
 import { Explorer } from "./explorer/explorer";

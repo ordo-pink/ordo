@@ -4,7 +4,7 @@ import { OrdoFile } from "../explorer/types";
 export const createTab = createAsyncThunk("CreateTab", (file: OrdoFile) => window.Editor.getContent(file));
 
 export type EditorState = {
-	tabs: Array<OrdoFile & { body: string }>;
+	tabs: Array<OrdoFile & { body: string[] }>;
 	currentTab: number;
 };
 

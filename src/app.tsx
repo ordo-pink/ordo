@@ -11,7 +11,7 @@ export const App: React.FC = () => {
 			<div className="flex h-full select-none">
 				<div className="bg-gray-50 grow flex">
 					<Editor />
-					<div className="w-3/12 break-words bg-gray-100 border-l border-gray-300 pb-11">
+					<div className="break-words bg-gray-100 border-l border-gray-300 pb-11">
 						<Explorer />
 					</div>
 				</div>

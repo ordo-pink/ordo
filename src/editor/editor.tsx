@@ -49,8 +49,8 @@ const Tab: React.FC<{ tab: OrdoFile; index: number }> = ({ tab, index }) => {
 	return (
 		<div
 			key={tab.path}
-			className={`flex flex-shrink items-center space-x-2 bg-gray-200 border-r border-gray-200 cursor-pointer px-3 py-1 truncate ${
-				currentTab === index && "bg-pink-100"
+			className={`flex flex-shrink items-center space-x-2 cursor-pointer px-3 py-1 truncate ${
+				currentTab === index && "bg-gray-50"
 			}`}
 			onClick={() => dispatch(openTab(index))}
 		>

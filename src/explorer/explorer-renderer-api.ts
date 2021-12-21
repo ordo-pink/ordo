@@ -1,5 +1,5 @@
 import { ipcRenderer } from "electron";
-import { OrdoEntity, OrdoFile, OrdoFolder } from "./types";
+import { OrdoEntity, OrdoFolder } from "./types";
 
 export const EXPLORER_API = "Explorer";
 

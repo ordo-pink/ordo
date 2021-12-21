@@ -7,13 +7,13 @@ import "./editor.css";
 import { useAppDispatch, useAppSelector } from "../redux/hooks";
 import { addStatusBarItem, updateStatusBarItem, removeStatusBarItem } from "../status-bar/state";
 
-import { Char } from "./char";
 import { getStatusBarWidget } from "./status-bar-widget";
 import Scrollbars from "react-custom-scrollbars";
 import { closeTab, openTab } from "./state";
 import { HiChevronRight, HiFolder, HiX } from "react-icons/hi";
 import { OrdoFile } from "../explorer/types";
 import { getFileIcon } from "../common/get-file-icon";
+import { Line } from "./line";
 
 const IGNORED_KEY_PRESSES = ["Meta", "Control", "Alt", "Shift", "CapsLock"];
 const STATUS_BAR_WIDGET_ID = "EDITOR_CARET_POSITION";
@@ -60,7 +60,7 @@ const Tab: React.FC<{ tab: OrdoFile; index: number }> = ({ tab, index }) => {
 	return (
 		<div
 			key={tab.path}
-			className={`flex items-center space-x-2 bg-gray-200 border-r border-gray-200 cursor-pointer px-3 py-1 truncate ${
+			className={`flex flex-shrink items-center space-x-2 bg-gray-200 border-r border-gray-200 cursor-pointer px-3 py-1 truncate ${
 				currentTab === index && "bg-pink-100"
 			}`}
 			onClick={() => dispatch(openTab(index))}
@@ -210,7 +210,7 @@ export const Editor: React.FC = () => {
 				<div>
 					<div
 						ref={ref}
-						className="outline-none break-words w-full pb-96 cursor-text font-mono tracking-wide"
+						className="outline-none w-full pb-96 cursor-text font-mono tracking-wide"
 						onMouseDown={(e) => {
 							e.preventDefault();
 
@@ -231,58 +231,16 @@ export const Editor: React.FC = () => {
 					>
 						{content &&
 							content.map((line, lineIndex) => (
-								<div
+								<Line
 									key={`line-${lineIndex}`}
-									className={`flex items-center ${isCurrentLine(lineIndex) ? "bg-gray-200" : ""}`}
-								>
-									<div
-										className={` w-16 shrink-0 text-sm text-right pr-2 font-sans select-none cursor-default ${
-											isCurrentLine(lineIndex) ? "texg-gray-500" : "text-gray-400"
-										}`}
-										onMouseUp={mouseIgnoreHandler}
-										onMouseDown={mouseIgnoreHandler}
-										onMouseOver={mouseIgnoreHandler}
-									>
-										{lineIndex + 1}
-									</div>
-									<div
-										data-index={`line-${lineIndex}`}
-										className="w-full cursor-text px-2 text-gray-800"
-										style={{ tabSize: "2rem" }}
-										onMouseDown={(e) => {
-											e.preventDefault();
-											e.stopPropagation();
-
-											mouseDownHandler(line.length - 1, lineIndex);
-										}}
-										onMouseUp={(e) => {
-											e.preventDefault();
-											e.stopPropagation();
-
-											mouseUpHandler(line.length - 1, lineIndex);
-										}}
-										onMouseOver={(e) => {
-											if (e.buttons === 1) {
-												e.preventDefault();
-												e.stopPropagation();
-
-												mouseUpHandler(line.length - 1, lineIndex);
-											}
-										}}
-									>
-										{line.split("").map((char, charIndex) => (
-											<Char
-												key={`line-${lineIndex}-${charIndex}`}
-												lineIndex={lineIndex}
-												charIndex={charIndex}
-												value={char}
-												selection={selection}
-												mouseUpHandler={mouseUpHandler}
-												mouseDownHandler={mouseDownHandler}
-											/>
-										))}
-									</div>
-								</div>
+									isCurrentLine={isCurrentLine(lineIndex)}
+									mouseUpHandler={mouseUpHandler}
+									mouseDownHandler={mouseDownHandler}
+									mouseIgnoreHandler={mouseIgnoreHandler}
+									selection={selection}
+									line={line}
+									lineIndex={lineIndex}
+								/>
 							))}
 					</div>
 				</div>

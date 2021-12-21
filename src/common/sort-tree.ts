@@ -1,4 +1,4 @@
-import { OrdoEntity, OrdoFile, OrdoFolder } from "../explorer/types";
+import { OrdoEntity, OrdoFolder } from "../explorer/types";
 
 const isFolder = (x: OrdoEntity): x is OrdoFolder => x.type === "folder";
 

@@ -27,14 +27,14 @@ const checkIsInSelection = (selection: ChangeSelection, charIndex: number, lineI
 	return betweenSelectedLines || onLastSelectedLine || onFirstSelectedLine || onlyOneLineSelected;
 };
 
-export const Char: React.FC<{
+export const Char = React.memo<{
 	value: string;
 	lineIndex: number;
 	charIndex: number;
 	mouseUpHandler: (charIndex: number, lineIndex: number) => void;
 	mouseDownHandler: (charIndex: number, lineIndex: number) => void;
 	selection: ChangeSelection;
-}> = ({ value, charIndex, lineIndex, mouseUpHandler, mouseDownHandler, selection }) => {
+}>(({ value, charIndex, lineIndex, mouseUpHandler, mouseDownHandler, selection }) => {
 	const ref = React.useRef<HTMLSpanElement>(null);
 
 	const onMouseUp = (e: React.MouseEvent<HTMLSpanElement>) => {
@@ -94,4 +94,4 @@ export const Char: React.FC<{
 			{value}
 		</span>
 	);
-};
+});

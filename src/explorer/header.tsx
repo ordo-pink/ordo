@@ -3,7 +3,6 @@ import { HiOutlineDocumentAdd, HiOutlineFolderAdd } from "react-icons/hi";
 import { getCollapseIcon } from "../common/get-folder-icon";
 import { useAppDispatch, useAppSelector } from "../redux/hooks";
 import { createFile, createFolder, updateFolder } from "./state";
-import { OrdoEntity } from "./types";
 
 export const Header: React.FC = () => {
 	const dispatch = useAppDispatch();

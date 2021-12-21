@@ -54,7 +54,16 @@ const getKeybinding = pipe(createKeybinding, getKeybindableAction);
 export const registerEditorMainAPIs = pipe(
 	tap((ipcMain: IpcMain) =>
 		ipcMain.handle(EditorAction.GET_CONTENT, (_, file: OrdoFile) =>
-			promises.readFile(file.path, "utf-8").then((body) => {
+			promises.readFile(file.path).then((f) => {
+				if (file.type === "image") {
+					return {
+						...file,
+						body: [`data:image/${file.extension.slice(1)};base64,${f.toString("base64")}`],
+					};
+				}
+
+				let body = f.toString("utf-8");
+
 				if (!body) {
 					body = "\n";
 				}

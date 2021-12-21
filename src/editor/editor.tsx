@@ -10,6 +10,7 @@ import { OrdoFile } from "../explorer/types";
 import { getFileIcon } from "../common/get-file-icon";
 import { ImageViewer } from "./image-viewer";
 import { TextEditor } from "./text-editor";
+import { select } from "../explorer/state";
 
 const Breadcrumbs: React.FC = () => {
 	const currentTab = useAppSelector((state) => state.editor.currentTab);
@@ -43,7 +44,9 @@ const Breadcrumbs: React.FC = () => {
 
 const Tab: React.FC<{ tab: OrdoFile; index: number }> = ({ tab, index }) => {
 	const dispatch = useAppDispatch();
+
 	const currentTab = useAppSelector((state) => state.editor.currentTab);
+	const tabs = useAppSelector((state) => state.editor.tabs);
 	const Icon = getFileIcon(tab);
 
 	return (
@@ -52,7 +55,10 @@ const Tab: React.FC<{ tab: OrdoFile; index: number }> = ({ tab, index }) => {
 			className={`flex flex-shrink items-center space-x-2 cursor-pointer px-3 py-1 truncate ${
 				currentTab === index && "bg-gray-50"
 			}`}
-			onClick={() => dispatch(openTab(index))}
+			onClick={() => {
+				dispatch(openTab(index));
+				dispatch(select(tabs[index].path));
+			}}
 		>
 			<Icon className="text-gray-500" />
 			<div>{tab.readableName}</div>
@@ -63,6 +69,10 @@ const Tab: React.FC<{ tab: OrdoFile; index: number }> = ({ tab, index }) => {
 					e.stopPropagation();
 
 					dispatch(closeTab(index));
+
+					if (index === currentTab) {
+						dispatch(select(index > 0 ? tabs[index - 1].path : tabs.length > 1 ? tabs[index + 1].path : null));
+					}
 				}}
 			/>
 		</div>

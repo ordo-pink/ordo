@@ -5,7 +5,7 @@ export const ImageViewer: React.FC = () => {
 	const currentTab = useAppSelector((state) => state.editor.currentTab);
 	const tabs = useAppSelector((state) => state.editor.tabs);
 
-	if (!tabs || !currentTab || !tabs[currentTab] || tabs[currentTab].type !== "image") {
+	if (!tabs || currentTab == null || !tabs[currentTab] || tabs[currentTab].type !== "image") {
 		return null;
 	}
 

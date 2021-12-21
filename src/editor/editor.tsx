@@ -11,6 +11,8 @@ import { getFileIcon } from "../common/get-file-icon";
 import { ImageViewer } from "./image-viewer";
 import { TextEditor } from "./text-editor";
 import { select } from "../explorer/state";
+import { updateStatusBarItem } from "../status-bar/state";
+import { getLanguageModeWidget } from "./status-bar-widget";
 
 const Breadcrumbs: React.FC = () => {
 	const currentTab = useAppSelector((state) => state.editor.currentTab);
@@ -90,8 +92,14 @@ const Tabs: React.FC = () => {
 };
 
 export const Editor: React.FC = () => {
+	const dispatch = useAppDispatch();
+
 	const tabs = useAppSelector((state) => state.editor.tabs);
 	const currentTab = useAppSelector((state) => state.editor.currentTab);
+
+	if (tabs.length) {
+		dispatch(updateStatusBarItem(getLanguageModeWidget(tabs[currentTab])));
+	}
 
 	return (
 		<div className="flex flex-col grow">

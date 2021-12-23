@@ -1,5 +1,7 @@
 import { BrowserWindow, IpcMain } from "electron";
 import { pipe, tap } from "ramda";
+import { KeybindableAction } from "../keybindings/keybindable-action";
+import { KeyboardShortcuts } from "../keybindings/keyboard-shortcuts";
 import { getSettings } from "../configuration/settings";
 import { ExplorerAction } from "./explorer-renderer-api";
 import { createFile } from "./folder/create-file";
@@ -14,7 +16,19 @@ let tree: OrdoFolder;
 
 export const registerExplorerMainAPIs = (window: BrowserWindow): ((ipcMain: IpcMain) => IpcMain) =>
 	pipe(
-		tap((ipcMain: IpcMain) => ipcMain.handle(ExplorerAction.OPEN_FOLDER, () => openFolder(window))),
+		tap(() => {
+			KeyboardShortcuts[KeybindableAction.OPEN].action = async () => {
+				tree = await listFolder(openFolder(window));
+				window.reload();
+			};
+		}),
+		tap((ipcMain: IpcMain) =>
+			ipcMain.handle(ExplorerAction.OPEN_FOLDER, async () => {
+				tree = await listFolder(openFolder(window));
+
+				return tree;
+			}),
+		),
 		tap((ipcMain: IpcMain) =>
 			ipcMain.handle(ExplorerAction.GET_FOLDER, async () => {
 				const oldPath = getSettings().get("last-window.folder");

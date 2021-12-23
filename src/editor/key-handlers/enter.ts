@@ -1,18 +1,19 @@
-import { ChangeResponse } from "../types";
+import { EditorOrdoFile } from "../../common/types";
+import { ChangeKeys } from "../types";
 import { moveCaretToLineStart, moveCaretToNextLine } from "./common";
 
-export const handleEnter = (change: ChangeResponse): ChangeResponse => {
+export const handleEnter = (edited: EditorOrdoFile, keys: ChangeKeys): EditorOrdoFile => {
 	let nextLineContent = "\n";
 
-	if (change.content[change.selection.start.line].length >= change.selection.start.index) {
-		nextLineContent = change.content[change.selection.start.line].slice(change.selection.start.index);
-		change.content[change.selection.start.line] =
-			change.content[change.selection.start.line].slice(0, change.selection.start.index) + "\n";
+	if (edited.body[edited.selection.start.line].length >= edited.selection.start.index) {
+		nextLineContent = edited.body[edited.selection.start.line].slice(edited.selection.start.index);
+		edited.body[edited.selection.start.line] =
+			edited.body[edited.selection.start.line].slice(0, edited.selection.start.index) + "\n";
 	}
 
-	change.content.splice(change.selection.start.line + 1, 0, nextLineContent);
-	change = moveCaretToNextLine(change, true);
-	change = moveCaretToLineStart(change, true);
+	edited.body.splice(edited.selection.start.line + 1, 0, nextLineContent);
+	edited = moveCaretToNextLine(edited, keys, true);
+	edited = moveCaretToLineStart(edited, keys, true);
 
-	return change;
+	return edited;
 };

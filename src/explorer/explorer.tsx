@@ -1,19 +1,13 @@
 import React from "react";
 import Scrollbars from "react-custom-scrollbars";
-import { useAppDispatch, useAppSelector } from "../redux/hooks";
-import { getFolder } from "./state";
+import { useAppSelector } from "../redux/hooks";
 import { OrdoFile, OrdoFolder } from "./types";
 import { File } from "./file";
 import { Folder } from "./folder";
 import { Header } from "./header";
 
 export const Explorer: React.FC = () => {
-	const dispatch = useAppDispatch();
-	const tree = useAppSelector((state) => state.explorer.tree);
-
-	React.useEffect(() => {
-		dispatch(getFolder());
-	}, []);
+	const tree = useAppSelector((state) => state.explorerTree);
 
 	return (
 		tree && (

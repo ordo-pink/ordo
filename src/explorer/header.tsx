@@ -1,13 +1,13 @@
 import React from "react";
 import { HiOutlineDocumentAdd, HiOutlineFolderAdd } from "react-icons/hi";
+import { createFile, createFolder, updateFolder } from "../redux/store";
 import { getCollapseIcon } from "../common/get-folder-icon";
 import { useAppDispatch, useAppSelector } from "../redux/hooks";
-import { createFile, createFolder, updateFolder } from "./state";
 
 export const Header: React.FC = () => {
 	const dispatch = useAppDispatch();
-	const tree = useAppSelector((state) => state.explorer.tree);
-	const selected = useAppSelector((state) => state.explorer.selected);
+	const tree = useAppSelector((state) => state.explorerTree);
+	const selected = useAppSelector((state) => state.explorerSelection);
 
 	const Icon = tree && getCollapseIcon(tree);
 
@@ -25,11 +25,11 @@ export const Header: React.FC = () => {
 			<div className="flex items-center space-x-2 text-gray-600">
 				<HiOutlineDocumentAdd
 					className="hover:text-pink-600 cursor-pointer"
-					onClick={() => dispatch(createFile({ selectedPath: selected, path: "123.md" }))}
+					onClick={() => dispatch(createFile({ currentlySelectedPath: selected, name: "123.md" }))}
 				/>
 				<HiOutlineFolderAdd
 					className="hover:text-pink-600 cursor-pointer"
-					onClick={() => dispatch(createFolder({ selectedPath: selected, path: "123" }))}
+					onClick={() => dispatch(createFolder({ currentlySelectedPath: selected, name: "123" }))}
 				/>
 			</div>
 		</>

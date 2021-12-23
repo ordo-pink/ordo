@@ -1,4 +1,5 @@
-import { ChangeResponse } from "../types";
+import { EditorOrdoFile } from "../../common/types";
+import { ChangeKeys } from "../types";
 import {
 	getPreviousSpace,
 	isCaretAtLineStart,
@@ -9,29 +10,29 @@ import {
 	moveCaretToPreviousLine,
 } from "./common";
 
-export const handleArrowLeft = (change: ChangeResponse): ChangeResponse => {
-	if (isFirstLine(change) && isCaretAtLineStart(change)) {
-		return change;
+export const handleArrowLeft = (edited: EditorOrdoFile, keys: ChangeKeys): EditorOrdoFile => {
+	if (isFirstLine(edited) && isCaretAtLineStart(edited)) {
+		return edited;
 	}
 
-	if (isCaretAtLineStart(change)) {
-		change = moveCaretToPreviousLine(change);
-		change = moveCaretToLineEnd(change);
+	if (isCaretAtLineStart(edited)) {
+		edited = moveCaretToPreviousLine(edited, keys);
+		edited = moveCaretToLineEnd(edited, keys);
 
-		return change;
+		return edited;
 	}
 
-	if (change.keys.altKey) {
-		const prevSpace = getPreviousSpace(change);
+	if (keys.altKey) {
+		const prevSpace = getPreviousSpace(edited);
 
 		if (~prevSpace) {
-			change = moveCaretLeft(change, prevSpace);
+			edited = moveCaretLeft(edited, keys, prevSpace);
 		} else {
-			change = moveCaretToLineStart(change);
+			edited = moveCaretToLineStart(edited, keys);
 		}
 	} else {
-		change = moveCaretLeft(change);
+		edited = moveCaretLeft(edited, keys);
 	}
 
-	return change;
+	return edited;
 };

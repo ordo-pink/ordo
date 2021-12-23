@@ -1,15 +1,16 @@
-import { ChangeResponse } from "../types";
+import { EditorOrdoFile } from "../../common/types";
+import { ChangeKeys } from "../types";
 import { moveCaretRight } from "./common";
 
-export const handleTyping = (change: ChangeResponse): ChangeResponse => {
-	const currentLine = change.content[change.selection.start.line];
+export const handleTyping = (change: EditorOrdoFile, keys: ChangeKeys): EditorOrdoFile => {
+	const currentLine = change.body[change.selection.start.line];
 
-	change.content[change.selection.start.line] =
+	change.body[change.selection.start.line] =
 		currentLine.slice(0, change.selection.start.index) +
-		(change.keys.shiftKey ? change.keys.key.toLocaleUpperCase() : change.keys.key.toLocaleLowerCase()) +
+		(keys.shiftKey ? keys.key.toLocaleUpperCase() : keys.key.toLocaleLowerCase()) +
 		currentLine.slice(change.selection.start.index);
 
-	change = moveCaretRight(change, null, true);
+	change = moveCaretRight(change, keys, null, true);
 
 	return change;
 };

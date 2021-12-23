@@ -1,14 +1,14 @@
 import React from "react";
-import { select } from "./state";
 import { useAppSelector, useAppDispatch } from "../redux/hooks";
 import { getFileIcon } from "../common/get-file-icon";
-import { createTab } from "../editor/state";
+import { addTab } from "../editor/state";
 import { OrdoFile } from "./types";
+import { select } from "../redux/store";
 
 export const File: React.FC<{ file: OrdoFile }> = ({ file }) => {
 	const Icon = getFileIcon(file);
 
-	const selected = useAppSelector((state) => state.explorer.selected);
+	const selected = useAppSelector((state) => state.explorerSelection);
 	const dispatch = useAppDispatch();
 
 	return (
@@ -17,7 +17,7 @@ export const File: React.FC<{ file: OrdoFile }> = ({ file }) => {
 			className={`flex space-x-2 items-center ${selected === file.path && "bg-gray-300"}`}
 			onClick={() => {
 				dispatch(select(file.path));
-				dispatch(createTab(file));
+				dispatch(addTab(file.path));
 			}}
 		>
 			<Icon className="shrink-0 text-gray-500" />

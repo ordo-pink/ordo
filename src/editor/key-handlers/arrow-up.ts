@@ -1,4 +1,5 @@
-import { ChangeResponse } from "../types";
+import { EditorOrdoFile } from "../../common/types";
+import { ChangeKeys } from "../types";
 import {
 	isCaretAtLineStart,
 	isCaretBeyondLineLength,
@@ -7,18 +8,18 @@ import {
 	moveCaretToPreviousLine,
 } from "./common";
 
-export const handleArrowUp = (change: ChangeResponse): ChangeResponse => {
-	if (isFirstLine(change) && isCaretAtLineStart(change)) {
-		return change;
+export const handleArrowUp = (edited: EditorOrdoFile, keys: ChangeKeys): EditorOrdoFile => {
+	if (isFirstLine(edited) && isCaretAtLineStart(edited)) {
+		return edited;
 	}
 
-	if (!isFirstLine(change)) {
-		change = moveCaretToPreviousLine(change);
+	if (!isFirstLine(edited)) {
+		edited = moveCaretToPreviousLine(edited, keys);
 
-		if (isCaretBeyondLineLength(change)) {
-			change = moveCaretToLineEnd(change);
+		if (isCaretBeyondLineLength(edited)) {
+			edited = moveCaretToLineEnd(edited, keys);
 		}
 	}
 
-	return change;
+	return edited;
 };

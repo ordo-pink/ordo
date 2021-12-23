@@ -1,4 +1,5 @@
-import { ChangeResponse } from "../types";
+import { EditorOrdoFile } from "../../common/types";
+import { ChangeKeys } from "../types";
 import {
 	getNextSpace,
 	isCaretAtLineEnd,
@@ -9,33 +10,33 @@ import {
 	moveCaretToNextLine,
 } from "./common";
 
-export const handleArrowRight = (change: ChangeResponse): ChangeResponse => {
-	if (isLastLine(change) && isCaretAtLineEnd(change)) {
-		return change;
+export const handleArrowRight = (edited: EditorOrdoFile, keys: ChangeKeys): EditorOrdoFile => {
+	if (isLastLine(edited) && isCaretAtLineEnd(edited)) {
+		return edited;
 	}
 
-	if (isCaretAtLineEnd(change)) {
-		change = moveCaretToNextLine(change);
-		change = moveCaretToLineStart(change);
+	if (isCaretAtLineEnd(edited)) {
+		edited = moveCaretToNextLine(edited, keys);
+		edited = moveCaretToLineStart(edited, keys);
 
-		return change;
+		return edited;
 	}
 
-	if (change.keys.altKey) {
-		const nextSpace = getNextSpace(change);
+	if (keys.altKey) {
+		const nextSpace = getNextSpace(edited);
 
 		if (~nextSpace) {
 			const newPosition =
-				change.selection.direction === "rtl"
-					? nextSpace + change.selection.start.index + 1
-					: nextSpace + change.selection.end.index + 1;
-			change = moveCaretRight(change, newPosition);
+				edited.selection.direction === "rtl"
+					? nextSpace + edited.selection.start.index + 1
+					: nextSpace + edited.selection.end.index + 1;
+			edited = moveCaretRight(edited, keys, newPosition);
 		} else {
-			change = moveCaretToLineEnd(change);
+			edited = moveCaretToLineEnd(edited, keys);
 		}
 	} else {
-		change = moveCaretRight(change);
+		edited = moveCaretRight(edited, keys);
 	}
 
-	return change;
+	return edited;
 };

@@ -10,13 +10,11 @@ import { OrdoFile } from "../explorer/types";
 import { getFileIcon } from "../common/get-file-icon";
 import { ImageViewer } from "./image-viewer";
 import { TextEditor } from "./text-editor";
-import { select } from "../explorer/state";
-import { updateStatusBarItem } from "../status-bar/state";
-import { getLanguageModeWidget } from "./status-bar-widget";
+import { select } from "../redux/store";
 
 const Breadcrumbs: React.FC = () => {
-	const currentTab = useAppSelector((state) => state.editor.currentTab);
-	const tabs = useAppSelector((state) => state.editor.tabs);
+	const currentTab = useAppSelector((state) => state.currentTab);
+	const tabs = useAppSelector((state) => state.tabs);
 
 	const Icon = getFileIcon(tabs[currentTab]);
 
@@ -47,8 +45,8 @@ const Breadcrumbs: React.FC = () => {
 const Tab: React.FC<{ tab: OrdoFile; index: number }> = ({ tab, index }) => {
 	const dispatch = useAppDispatch();
 
-	const currentTab = useAppSelector((state) => state.editor.currentTab);
-	const tabs = useAppSelector((state) => state.editor.tabs);
+	const currentTab = useAppSelector((state) => state.currentTab);
+	const tabs = useAppSelector((state) => state.tabs);
 	const Icon = getFileIcon(tab);
 
 	return (
@@ -82,7 +80,7 @@ const Tab: React.FC<{ tab: OrdoFile; index: number }> = ({ tab, index }) => {
 };
 
 const Tabs: React.FC = () => {
-	const tabs = useAppSelector((state) => state.editor.tabs);
+	const tabs = useAppSelector((state) => state.tabs);
 
 	return (
 		<div className="flex items-center bg-gray-300">
@@ -92,14 +90,8 @@ const Tabs: React.FC = () => {
 };
 
 export const Editor: React.FC = () => {
-	const dispatch = useAppDispatch();
-
-	const tabs = useAppSelector((state) => state.editor.tabs);
-	const currentTab = useAppSelector((state) => state.editor.currentTab);
-
-	if (tabs.length) {
-		dispatch(updateStatusBarItem(getLanguageModeWidget(tabs[currentTab])));
-	}
+	const tabs = useAppSelector((state) => state.tabs);
+	const currentTab = useAppSelector((state) => state.currentTab);
 
 	return (
 		<div className="flex flex-col grow">

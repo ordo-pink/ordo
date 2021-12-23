@@ -1,18 +1,16 @@
 import React from "react";
 import { useAppDispatch, useAppSelector } from "../redux/hooks";
-import { addStatusBarItem, removeStatusBarItem } from "../status-bar/state";
 import { Line } from "./line";
-import { getStatusBarWidget } from "./status-bar-widget";
-import { CaretPosition, ChangeSelection, ChangeResponse } from "./types";
+import { CaretPosition, ChangeSelection } from "./types";
+import { onKeyDown as editorOnKeyDown } from "./state";
 
 const IGNORED_KEY_PRESSES = ["Meta", "Control", "Alt", "Shift", "CapsLock"];
-const STATUS_BAR_WIDGET_ID = "EDITOR_CARET_POSITION";
 
 export const TextEditor: React.FC = () => {
 	const dispatch = useAppDispatch();
 
-	const tabs = useAppSelector((state) => state.editor.tabs);
-	const currentTab = useAppSelector((state) => state.editor.currentTab);
+	const tabs = useAppSelector((state) => state.tabs);
+	const currentTab = useAppSelector((state) => state.currentTab);
 
 	const ref = React.useRef<HTMLDivElement>(null);
 
@@ -36,19 +34,10 @@ export const TextEditor: React.FC = () => {
 			return;
 		}
 
-		dispatch(
-			addStatusBarItem({
-				id: STATUS_BAR_WIDGET_ID,
-				position: "right",
-				value: getStatusBarWidget({ selection, content }),
-			}),
-		);
-
 		setContent(tabs[currentTab].body);
 
 		return () => {
 			setContent(null);
-			dispatch(removeStatusBarItem({ id: STATUS_BAR_WIDGET_ID, position: "right" }));
 		};
 	}, [tabs, currentTab]);
 
@@ -81,13 +70,7 @@ export const TextEditor: React.FC = () => {
 
 		e.preventDefault();
 
-		window.Editor.onKeyDown({
-			selection,
-			keys: { key, metaKey, altKey, ctrlKey, shiftKey },
-		}).then(({ selection, content }: ChangeResponse) => {
-			setContent(content);
-			setSelection(selection);
-		});
+		dispatch(editorOnKeyDown({ selection, keys: { key, metaKey, altKey, ctrlKey, shiftKey } }));
 	};
 
 	const mouseUpHandler = (index: number, line: number) => {

@@ -1,90 +1,77 @@
-import { BrowserWindow, IpcMain } from "electron";
-import { pipe, tap } from "ramda";
-import { KeybindableAction } from "../keybindings/keybindable-action";
-import { KeyboardShortcuts } from "../keybindings/keyboard-shortcuts";
-import { getSettings } from "../configuration/settings";
-import { ExplorerAction } from "./explorer-renderer-api";
+import { ExplorerAction, ExplorerAPI } from "./explorer-renderer-api";
 import { createFile } from "./folder/create-file";
 import { createFolder } from "./folder/create-folder";
-import { getFolderOrParent } from "./folder/get-folder-or-parent";
 import { listFolder } from "./folder/list-folder";
 import { openFolder } from "./folder/open-folder";
 import { updateFolder } from "./folder/update-folder";
 import { OrdoFolder } from "./types";
+import { WindowState } from "../common/types";
+import { join } from "path";
+import { EditorMainAPI } from "../editor/editor-main-api";
+import { EditorAction } from "../editor/editor-renderer-api";
+import { getFolder } from "./folder/get-folder";
+import { getFile } from "./folder/get-file";
+import { getFolderOrParent } from "./folder/get-folder-or-parent";
 
 let tree: OrdoFolder;
 
-export const registerExplorerMainAPIs = (window: BrowserWindow): ((ipcMain: IpcMain) => IpcMain) =>
-	pipe(
-		tap(() => {
-			KeyboardShortcuts[KeybindableAction.OPEN].action = async () => {
-				tree = await listFolder(openFolder(window));
-				window.reload();
-			};
-		}),
-		tap((ipcMain: IpcMain) =>
-			ipcMain.handle(ExplorerAction.OPEN_FOLDER, async () => {
-				tree = await listFolder(openFolder(window));
+export const ExplorerMainAPI = (state: WindowState): typeof ExplorerAPI => ({
+	[ExplorerAction.OPEN_FOLDER]: async () => {
+		state.explorer.tree = await listFolder(openFolder(state.window));
 
-				return tree;
-			}),
-		),
-		tap((ipcMain: IpcMain) =>
-			ipcMain.handle(ExplorerAction.GET_FOLDER, async () => {
-				const oldPath = getSettings().get("last-window.folder");
+		return state;
+	},
+	[ExplorerAction.SELECT]: async (path) => {
+		state.explorer.selection = path;
 
-				if (oldPath) {
-					tree = await listFolder(oldPath);
-				} else {
-					tree = await listFolder(openFolder(window));
-				}
+		const tabIndex = state.editor.tabs.findIndex((tab) => tab.path === path);
 
-				return tree;
-			}),
-		),
-		tap((ipcMain: IpcMain) =>
-			ipcMain.handle(ExplorerAction.UPDATE_FOLDER, (_, path: string, update: Partial<OrdoFolder>) => {
-				if (!tree) {
-					return null;
-				}
+		if (~tabIndex) {
+			state.editor.currentTab = tabIndex;
+		}
 
-				tree = updateFolder(tree, path, update);
-				return tree;
-			}),
-		),
-		tap((ipcMain: IpcMain) =>
-			ipcMain.handle(ExplorerAction.GET_FOLDER_OR_PARENT, (_, path: string) => {
-				if (!tree) {
-					return null;
-				}
+		return state;
+	},
+	[ExplorerAction.CREATE_FOLDER]: async ({ name, currentlySelectedPath }) => {
+		state.explorer.tree = await createFolder(tree, currentlySelectedPath, name);
+		return state;
+	},
+	[ExplorerAction.GET_FOLDER]: async (path) => {
+		return getFolder(tree, path);
+	},
+	[ExplorerAction.UPDATE_FOLDER]: async ({ path, update }) => {
+		state.explorer.tree = await updateFolder(tree, path, update);
+		return state;
+	},
+	[ExplorerAction.DELETE_FOLDER]: async (path) => {
+		// TODO: Ask for removal and remove file
+		return state;
+	},
+	[ExplorerAction.MOVE_FOLDER]: async ({ oldPath, newPath }) => {
+		// TODO: Implement moving
+		return state;
+	},
 
-				return getFolderOrParent(tree, path);
-			}),
-		),
-		tap((ipcMain: IpcMain) =>
-			ipcMain.handle(ExplorerAction.CREATE_FILE, async (_, parentPath: string, path: string) => {
-				if (!tree) {
-					return null;
-				}
+	[ExplorerAction.CREATE_FILE]: async ({ name, currentlySelectedPath }) => {
+		state.explorer.tree = await createFile(tree, currentlySelectedPath, name);
+		const parent = getFolderOrParent(tree, currentlySelectedPath);
+		const filePath = join(parent.path, name);
 
-				tree = await createFile(tree, parentPath, path);
-				return tree;
-			}),
-		),
-		tap((ipcMain: IpcMain) =>
-			ipcMain.handle(ExplorerAction.CREATE_FOLDER, async (_, parentPath: string, path: string) => {
-				if (!tree) {
-					return null;
-				}
-
-				tree = await createFolder(tree, parentPath, path);
-				return tree;
-			}),
-		),
-	);
-
-export const unregisterExplorerMainAPIs = pipe(
-	tap((ipcMain: IpcMain) => ipcMain.removeHandler(ExplorerAction.OPEN_FOLDER)),
-	tap((ipcMain: IpcMain) => ipcMain.removeHandler(ExplorerAction.GET_FOLDER)),
-	tap((ipcMain: IpcMain) => ipcMain.removeHandler(ExplorerAction.UPDATE_FOLDER)),
-);
+		return EditorMainAPI(state)[EditorAction.ADD_TAB](filePath);
+	},
+	[ExplorerAction.GET_FILE]: async (path) => {
+		return getFile(tree, path);
+	},
+	[ExplorerAction.UPDATE_FILE]: async ({ path, update }) => {
+		// TODO: Is there a file update?
+		return state;
+	},
+	[ExplorerAction.DELETE_FILE]: async (path) => {
+		// TODO: Ask for removal and remove file
+		return state;
+	},
+	[ExplorerAction.MOVE_FILE]: async ({ oldPath, newPath }) => {
+		// TODO: Implement moving
+		return state;
+	},
+});

@@ -2,8 +2,8 @@ import React from "react";
 import { useAppSelector } from "../redux/hooks";
 
 export const ImageViewer: React.FC = () => {
-	const currentTab = useAppSelector((state) => state.editor.currentTab);
-	const tabs = useAppSelector((state) => state.editor.tabs);
+	const currentTab = useAppSelector((state) => state.currentTab);
+	const tabs = useAppSelector((state) => state.tabs);
 
 	if (!tabs || currentTab == null || !tabs[currentTab] || tabs[currentTab].type !== "image") {
 		return null;

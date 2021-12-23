@@ -1,18 +1,19 @@
-import { ChangeResponse } from "../types";
+import { EditorOrdoFile } from "../../common/types";
+import { ChangeKeys } from "../types";
 import { moveCaretLeft } from "./common";
 import { handleTyping } from "./letters";
 
-export const handleTab = (change: ChangeResponse): ChangeResponse => {
-	if (change.keys.shiftKey) {
-		if (change.content[change.selection.start.line].startsWith(" ")) {
-			change.content[change.selection.start.line] = change.content[change.selection.start.line].slice(1);
-			change = moveCaretLeft(change, null, true);
+export const handleTab = (change: EditorOrdoFile, keys: ChangeKeys): EditorOrdoFile => {
+	if (keys.shiftKey) {
+		if (change.body[change.selection.start.line].startsWith(" ")) {
+			change.body[change.selection.start.line] = change.body[change.selection.start.line].slice(1);
+			change = moveCaretLeft(change, keys, null, true);
 		}
 
 		return change;
 	}
 
-	change.keys.key = "\t";
+	keys.key = "\t";
 
-	return handleTyping(change);
+	return handleTyping(change, keys);
 };

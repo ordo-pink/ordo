@@ -1,18 +1,22 @@
-import type { Change, ChangeResponse } from "./types";
+import type { Change } from "./types";
+import type { WindowState } from "../common/types";
 
 import { ipcRenderer } from "electron";
-import { OrdoFile } from "../explorer/types";
 
 export const EDITOR_API = "Editor";
 
 export enum EditorAction {
-	ON_KEY_DOWN = "onKeyDown",
-	GET_CONTENT = "getContent",
+	ADD_TAB = "addTab",
+	CLOSE_TAB = "closeTab",
+	OPEN_TAB = "openTab",
+	ON_KEYDOWN = "onKeyDown",
 }
 
+type R = Promise<WindowState>;
+
 export const EditorAPI = {
-	[EditorAction.ON_KEY_DOWN]: (change: Change): Promise<ChangeResponse> =>
-		ipcRenderer.invoke(EditorAction.ON_KEY_DOWN, change),
-	[EditorAction.GET_CONTENT]: (file: OrdoFile): Promise<OrdoFile & { body: string[] }> =>
-		ipcRenderer.invoke(EditorAction.GET_CONTENT, file),
+	[EditorAction.ON_KEYDOWN]: (change: Change): R => ipcRenderer.invoke(EditorAction.ON_KEYDOWN, change),
+	[EditorAction.ADD_TAB]: (path: string): R => ipcRenderer.invoke(EditorAction.ADD_TAB, path),
+	[EditorAction.OPEN_TAB]: (index: number): R => ipcRenderer.invoke(EditorAction.OPEN_TAB, index),
+	[EditorAction.CLOSE_TAB]: (index: number): R => ipcRenderer.invoke(EditorAction.CLOSE_TAB, index),
 };

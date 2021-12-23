@@ -1,12 +1,13 @@
 import type { KeyboardShortcut } from "./types";
 
 import { KeybindableAction } from "./keybindable-action";
+import { BrowserWindow } from "electron";
 
 export const KeyboardShortcuts: Record<KeybindableAction, KeyboardShortcut> = {
 	[KeybindableAction.OPEN]: {
 		label: "Open",
 		accelerator: "CommandOrControl+O",
-		action: () => console.log("File Create"),
+		action: () => console.log("Open Folder"),
 	},
 	[KeybindableAction.NEW_FILE]: {
 		label: "New File",
@@ -36,7 +37,7 @@ export const KeyboardShortcuts: Record<KeybindableAction, KeyboardShortcut> = {
 	[KeybindableAction.CLOSE_WINDOW]: {
 		label: "Close Window",
 		accelerator: "CommandOrControl+Shift+W",
-		action: () => console.log("Close Window"),
+		action: (window: BrowserWindow) => console.log(`Close window ${window.id}`),
 	},
 	[KeybindableAction.FINDER]: {
 		label: "Search",

@@ -1,15 +1,15 @@
 import React from "react";
 import { getCollapseIcon, getFolderIcon } from "../common/get-folder-icon";
 import { useAppSelector, useAppDispatch } from "../redux/hooks";
-import { select, updateFolder } from "./state";
 import { OrdoFolder, OrdoFile } from "./types";
 import { File } from "./file";
+import { select, updateFolder } from "../redux/store";
 
 export const Folder: React.FC<{ folder: OrdoFolder }> = ({ folder }) => {
 	const Icon = folder && getCollapseIcon(folder);
 	const FolderIcon = folder && getFolderIcon(folder);
 
-	const selected = useAppSelector((state) => state.explorer.selected);
+	const selected = useAppSelector((state) => state.explorerSelection);
 	const dispatch = useAppDispatch();
 
 	return (

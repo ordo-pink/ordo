@@ -1,4 +1,5 @@
-import { ChangeResponse } from "../types";
+import { EditorOrdoFile } from "../../common/types";
+import { ChangeKeys } from "../types";
 import {
 	getPreviousSpace,
 	isCaretAtLineStart,
@@ -9,43 +10,43 @@ import {
 	moveCaretToPreviousLine,
 } from "./common";
 
-export const handleBackspace = (change: ChangeResponse): ChangeResponse => {
+export const handleBackspace = (change: EditorOrdoFile, keys: ChangeKeys): EditorOrdoFile => {
 	if (isFirstLine(change) && isCaretAtLineStart(change)) {
 		return change;
 	}
 
 	if (isCaretAtLineStart(change)) {
-		change = moveCaretToPreviousLine(change, true);
-		change = moveCaretToLineEnd(change, true);
+		change = moveCaretToPreviousLine(change, keys, true);
+		change = moveCaretToLineEnd(change, keys, true);
 
-		change.content[change.selection.start.line] += change.content[change.selection.start.line + 1];
-		change.content.splice(change.selection.start.line + 1, 1);
+		change.body[change.selection.start.line] += change.body[change.selection.start.line + 1];
+		change.body.splice(change.selection.start.line + 1, 1);
 
 		return change;
 	}
 
-	if (change.keys.altKey) {
+	if (keys.altKey) {
 		const prevSpace = getPreviousSpace(change);
 
 		if (~prevSpace) {
-			change.content[change.selection.start.line] =
-				change.content[change.selection.start.line].substring(0, prevSpace) +
-				change.content[change.selection.start.line].substring(change.selection.start.index);
+			change.body[change.selection.start.line] =
+				change.body[change.selection.start.line].substring(0, prevSpace) +
+				change.body[change.selection.start.line].substring(change.selection.start.index);
 
 			change.selection.start.index = prevSpace;
 		} else {
-			change.content[change.selection.start.line] = change.content[change.selection.start.line].slice(
+			change.body[change.selection.start.line] = change.body[change.selection.start.line].slice(
 				change.selection.start.index,
 			);
 
-			change = moveCaretToLineStart(change, true);
+			change = moveCaretToLineStart(change, keys, true);
 		}
 	} else {
-		change.content[change.selection.start.line] =
-			change.content[change.selection.start.line].substring(0, change.selection.start.index - 1) +
-			change.content[change.selection.start.line].substring(change.selection.start.index);
+		change.body[change.selection.start.line] =
+			change.body[change.selection.start.line].substring(0, change.selection.start.index - 1) +
+			change.body[change.selection.start.line].substring(change.selection.start.index);
 
-		change = moveCaretLeft(change, null, true);
+		change = moveCaretLeft(change, keys, null, true);
 	}
 
 	return change;

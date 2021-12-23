@@ -1,10 +1,14 @@
-import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { OrdoFile } from "../explorer/types";
+import type { EditorOrdoFile } from "../common/types";
 
-export const createTab = createAsyncThunk("CreateTab", (file: OrdoFile) => window.Editor.getContent(file));
+import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+
+export const addTab = createAsyncThunk("AddTab", window.Editor.addTab);
+export const openTab = createAsyncThunk("OpenTab", window.Editor.openTab);
+export const closeTab = createAsyncThunk("CloseTab", window.Editor.closeTab);
+export const onKeyDown = createAsyncThunk("OnKeyDown", window.Editor.onKeyDown);
 
 export type EditorState = {
-	tabs: Array<OrdoFile & { body: string[] }>;
+	tabs: EditorOrdoFile[];
 	currentTab: number;
 };
 
@@ -16,31 +20,24 @@ const initialState: EditorState = {
 const editorSlice = createSlice({
 	name: "file-tree",
 	initialState,
-	reducers: {
-		openTab: (state, action: PayloadAction<number>) => {
-			state.currentTab = action.payload;
-		},
-		closeTab: (state, action: PayloadAction<number>) => {
-			state.tabs.splice(action.payload, 1);
-
-			if (state.currentTab >= state.tabs.length) {
-				state.currentTab -= 1;
-			}
-		},
-	},
+	reducers: {},
 	extraReducers: (builder) => {
-		builder.addCase(createTab.fulfilled, (state, action) => {
-			const tabIndex = state.tabs.findIndex((tab) => tab.path === action.payload.path);
-
-			if (tabIndex !== -1) {
-				state.currentTab = tabIndex;
-			} else {
-				state.tabs.push(action.payload);
-				state.currentTab = state.tabs.length - 1;
-			}
+		builder.addCase(addTab.fulfilled, (state, action) => {
+			state.tabs = action.payload.editor.tabs;
+			state.currentTab = action.payload.editor.currentTab;
+		});
+		builder.addCase(addTab.fulfilled, (state, action) => {
+			state.tabs = action.payload.editor.tabs;
+			state.currentTab = action.payload.editor.currentTab;
+		});
+		builder.addCase(addTab.fulfilled, (state, action) => {
+			state.tabs = action.payload.editor.tabs;
+			state.currentTab = action.payload.editor.currentTab;
+		});
+		builder.addCase(onKeyDown.fulfilled, (state, action) => {
+			state.tabs[state.currentTab] = action.payload.editor.tabs[state.currentTab];
 		});
 	},
 });
 
-export const { openTab, closeTab } = editorSlice.actions;
 export default editorSlice.reducer;

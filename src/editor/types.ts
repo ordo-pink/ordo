@@ -19,7 +19,7 @@ export interface ChangeKeys {
 
 export interface Change {
 	selection: ChangeSelection;
-	keys: ChangeKeys;
+	keys?: ChangeKeys;
 }
 
 export interface ChangeResponse extends Change {

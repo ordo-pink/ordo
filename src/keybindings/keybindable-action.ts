@@ -1,14 +1,14 @@
 export enum KeybindableAction {
 	NEW_FILE,
-	NEW_WINDOW,
-	OPEN,
-	// REOPEN_CLOSED_EDITOR, // cmd shift t
+	// NEW_WINDOW,
+	OPEN_FOLDER,
+	// REOPEN_CLOSED_EDITOR,
 	SAVE_FILE,
 	SAVE_AS,
-	// SAVE_ALL, // cmd option s
-	// TOGGLE_AUTOSAVE, // cmd shift option s
+	// SAVE_ALL,
+	// TOGGLE_AUTOSAVE,
 	CLOSE_TAB,
-	CLOSE_WINDOW,
+	// CLOSE_WINDOW,
 
 	CUT,
 	COPY,
@@ -20,7 +20,6 @@ export enum KeybindableAction {
 
 	SELECT_ALL,
 
-	FINDER,
 	EXPLORER,
 	GRAPH,
 	SETTINGS,

@@ -1,20 +1,19 @@
-import type { KeyboardShortcut } from "./keybindings/types";
-
 import { MenuItemConstructorOptions } from "electron";
 import { Pipe } from "or-pipets";
 
 import { KeybindableAction } from "./keybindings/keybindable-action";
+import { WindowState } from "./common/types";
 
-const toMenuItem = ({ label, accelerator, action }: KeyboardShortcut) => ({
-	label,
-	accelerator,
-	click: () => action(),
+const toMenuItem = (action: KeybindableAction, state: WindowState) => ({
+	label: state.keybindings[action].label,
+	accelerator: state.keybindings[action].accelerator,
+	click: () => state.keybindings[action].action(state),
 });
 
 const separator = { type: "separator" };
 
-const macMenu = (isMac: boolean) =>
-	isMac
+const macMenu = (state: WindowState) =>
+	state.constants.isMac
 		? ([
 				{
 					label: "ORDO",
@@ -23,56 +22,56 @@ const macMenu = (isMac: boolean) =>
 		  ] as MenuItemConstructorOptions[])
 		: ([] as MenuItemConstructorOptions[]);
 
-const getFileMenu = (keybindings: any) =>
+const getFileMenu = (state: WindowState) =>
 	({
 		label: "&File",
 		submenu: [
-			toMenuItem(keybindings[KeybindableAction.OPEN]),
+			toMenuItem(KeybindableAction.OPEN_FOLDER, state),
 			separator,
-			toMenuItem(keybindings[KeybindableAction.NEW_FILE]),
-			toMenuItem(keybindings[KeybindableAction.NEW_WINDOW]),
+			toMenuItem(KeybindableAction.NEW_FILE, state),
+			// toMenuItem(KeybindableAction.NEW_WINDOW, state),
 			separator,
-			toMenuItem(keybindings[KeybindableAction.CLOSE_TAB]),
-			toMenuItem(keybindings[KeybindableAction.CLOSE_WINDOW]),
+			toMenuItem(KeybindableAction.CLOSE_TAB, state),
+			// toMenuItem(KeybindableAction.CLOSE_WINDOW, state),
 		],
 	} as MenuItemConstructorOptions);
 
-const getEditMenu = (keybindings: any) =>
+const getEditMenu = (state: WindowState) =>
 	({
 		label: "&Edit",
 		submenu: [
-			toMenuItem(keybindings[KeybindableAction.UNDO]),
-			toMenuItem(keybindings[KeybindableAction.REDO]),
+			toMenuItem(KeybindableAction.UNDO, state),
+			toMenuItem(KeybindableAction.REDO, state),
 			separator,
-			toMenuItem(keybindings[KeybindableAction.CUT]),
-			toMenuItem(keybindings[KeybindableAction.COPY]),
-			toMenuItem(keybindings[KeybindableAction.PASTE]),
+			toMenuItem(KeybindableAction.CUT, state),
+			toMenuItem(KeybindableAction.COPY, state),
+			toMenuItem(KeybindableAction.PASTE, state),
 			separator,
-			toMenuItem(keybindings[KeybindableAction.FIND]),
+			toMenuItem(KeybindableAction.FIND, state),
 			separator,
-			toMenuItem(keybindings[KeybindableAction.FIND_IN_FILES]),
+			toMenuItem(KeybindableAction.FIND_IN_FILES, state),
 		],
 	} as MenuItemConstructorOptions);
 
-const getViewMenu = (keybindings: any) =>
+const getViewMenu = (state: WindowState) =>
 	({
 		label: "&View",
 		submenu: [
-			toMenuItem(keybindings[KeybindableAction.RESTART_WINDOW]),
-			toMenuItem(keybindings[KeybindableAction.TOGGLE_DEV_TOOLS]),
+			toMenuItem(KeybindableAction.RESTART_WINDOW, state),
+			toMenuItem(KeybindableAction.TOGGLE_DEV_TOOLS, state),
 			separator,
-			toMenuItem(keybindings[KeybindableAction.EXPLORER]),
-			toMenuItem(keybindings[KeybindableAction.GRAPH]),
-			toMenuItem(keybindings[KeybindableAction.FINDER]),
+			toMenuItem(KeybindableAction.EXPLORER, state),
+			toMenuItem(KeybindableAction.GRAPH, state),
+			toMenuItem(KeybindableAction.FIND_IN_FILES, state),
 			separator,
-			toMenuItem(keybindings[KeybindableAction.SETTINGS]),
+			toMenuItem(KeybindableAction.SETTINGS, state),
 		],
 	} as MenuItemConstructorOptions);
 
-const getSelectionMenu = (keybindings: any) =>
+const getSelectionMenu = (state: WindowState) =>
 	({
 		label: "&Selection",
-		submenu: [toMenuItem(keybindings[KeybindableAction.SELECT_ALL])],
+		submenu: [toMenuItem(KeybindableAction.SELECT_ALL, state)],
 	} as MenuItemConstructorOptions);
 
 const extendArray =
@@ -80,9 +79,10 @@ const extendArray =
 	(arr: T[]): T[] =>
 		[...arr, content];
 
-export const getApplicationMenu = (keybindings: any) =>
+export const getApplicationMenu = (state: WindowState) =>
 	Pipe.of(macMenu)
-		.pipe(extendArray(getFileMenu(keybindings)))
-		.pipe(extendArray(getEditMenu(keybindings)))
-		.pipe(extendArray(getSelectionMenu(keybindings)))
-		.pipe(extendArray(getViewMenu(keybindings))).process;
+		.pipe(extendArray(getFileMenu(state)))
+		.pipe(extendArray(getEditMenu(state)))
+		.pipe(extendArray(getSelectionMenu(state)))
+		.pipe(extendArray(getViewMenu(state)))
+		.process(state);

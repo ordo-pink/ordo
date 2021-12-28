@@ -1,8 +1,8 @@
 import React from "react";
 import { useAppDispatch, useAppSelector } from "../redux/hooks";
 import { Line } from "./line";
-import { CaretPosition, ChangeSelection } from "./types";
-import { onKeyDown as editorOnKeyDown } from "./state";
+import { CaretPosition } from "./types";
+import { onKeyDown as editorOnKeyDown } from "../redux/store";
 
 const IGNORED_KEY_PRESSES = ["Meta", "Control", "Alt", "Shift", "CapsLock"];
 
@@ -14,44 +14,23 @@ export const TextEditor: React.FC = () => {
 
 	const ref = React.useRef<HTMLDivElement>(null);
 
-	const [content, setContent] = React.useState<string[]>(null);
-
 	const [mouseDownPosition, setMouseDownPosition] = React.useState<CaretPosition>(null);
-	const [selection, setSelection] = React.useState<ChangeSelection>({
-		start: {
-			line: 0,
-			index: 0,
-		},
-		end: {
-			line: 0,
-			index: 0,
-		},
-		direction: "ltr",
-	});
 
 	React.useEffect(() => {
-		if (!tabs.length) {
-			return;
-		}
-
-		setContent(tabs[currentTab].body);
-
-		return () => {
-			setContent(null);
-		};
-	}, [tabs, currentTab]);
-
-	React.useEffect(() => {
-		if (!content || !ref.current || !selection) {
+		if (!tabs.length || currentTab == null || !tabs[currentTab] || !ref.current) {
 			return;
 		}
 
 		window.addEventListener("keydown", onKeyDown);
 
 		const node =
-			selection.direction === "rtl"
-				? document.getElementById(`line-${selection.start.line}-${selection.start.index}`)
-				: document.getElementById(`line-${selection.end.line}-${selection.end.index}`);
+			tabs[currentTab].selection.direction === "rtl"
+				? document.getElementById(
+						`line-${tabs[currentTab].selection.start.line}-${tabs[currentTab].selection.start.index}`,
+				  )
+				: document.getElementById(
+						`line-${tabs[currentTab].selection.end.line}-${tabs[currentTab].selection.end.index}`,
+				  );
 
 		node && node.classList.add("caret");
 
@@ -59,7 +38,13 @@ export const TextEditor: React.FC = () => {
 			window.removeEventListener("keydown", onKeyDown);
 			node && node.classList.remove("caret");
 		};
-	}, [selection.start.index, selection.start.line, selection.end.index, selection.end.line, selection.direction]);
+	}, [
+		tabs[currentTab].selection.start.index,
+		tabs[currentTab].selection.start.line,
+		tabs[currentTab].selection.end.index,
+		tabs[currentTab].selection.end.line,
+		tabs[currentTab].selection.direction,
+	]);
 
 	const onKeyDown = (e: KeyboardEvent) => {
 		const { key, metaKey, altKey, ctrlKey, shiftKey } = e;
@@ -70,7 +55,9 @@ export const TextEditor: React.FC = () => {
 
 		e.preventDefault();
 
-		dispatch(editorOnKeyDown({ selection, keys: { key, metaKey, altKey, ctrlKey, shiftKey } }));
+		dispatch(
+			editorOnKeyDown({ selection: tabs[currentTab].selection, keys: { key, metaKey, altKey, ctrlKey, shiftKey } }),
+		);
 	};
 
 	const mouseUpHandler = (index: number, line: number) => {
@@ -79,13 +66,18 @@ export const TextEditor: React.FC = () => {
 				mouseDownPosition.line < line || (mouseDownPosition.line === line && mouseDownPosition.index < index);
 			const direction = isMouseDownBefore ? "ltr" : "rtl";
 
-			return setSelection(
-				isMouseDownBefore
-					? { start: mouseDownPosition, end: { line, index }, direction }
-					: { start: { line, index }, end: mouseDownPosition, direction },
+			dispatch(
+				editorOnKeyDown({
+					selection: isMouseDownBefore
+						? { start: mouseDownPosition, end: { line, index }, direction }
+						: { start: { line, index }, end: mouseDownPosition, direction },
+				}),
 			);
+
+			return;
 		}
-		setSelection({ start: { line, index }, end: { line, index }, direction: "ltr" });
+
+		dispatch(editorOnKeyDown({ selection: { start: { line, index }, end: { line, index }, direction: "ltr" } }));
 	};
 
 	const mouseIgnoreHandler = (e: React.MouseEvent) => {
@@ -98,7 +90,9 @@ export const TextEditor: React.FC = () => {
 	};
 
 	const isCurrentLine = (index: number) =>
-		selection.direction === "rtl" ? selection.start.line === index : selection.end.line === index;
+		tabs[currentTab].selection.direction === "rtl"
+			? tabs[currentTab].selection.start.line === index
+			: tabs[currentTab].selection.end.line === index;
 
 	return (
 		<div>
@@ -108,30 +102,39 @@ export const TextEditor: React.FC = () => {
 				onMouseDown={(e) => {
 					e.preventDefault();
 
-					mouseDownHandler(content[content.length - 1].length - 1, content.length - 1);
+					mouseDownHandler(
+						tabs[currentTab].body[tabs[currentTab].body.length - 1].length - 1,
+						tabs[currentTab].body.length - 1,
+					);
 				}}
 				onMouseUp={(e) => {
 					e.preventDefault();
 
-					mouseUpHandler(content[content.length - 1].length - 1, content.length - 1);
+					mouseUpHandler(
+						tabs[currentTab].body[tabs[currentTab].body.length - 1].length - 1,
+						tabs[currentTab].body.length - 1,
+					);
 				}}
 				onMouseOver={(e) => {
 					if (e.buttons === 1) {
 						e.preventDefault();
 
-						mouseUpHandler(content[content.length - 1].length - 1, content.length - 1);
+						mouseUpHandler(
+							tabs[currentTab].body[tabs[currentTab].body.length - 1].length - 1,
+							tabs[currentTab].body.length - 1,
+						);
 					}
 				}}
 			>
-				{content &&
-					content.map((line, lineIndex) => (
+				{tabs[currentTab].body &&
+					tabs[currentTab].body.map((line, lineIndex) => (
 						<Line
 							key={`line-${lineIndex}`}
 							isCurrentLine={isCurrentLine(lineIndex)}
 							mouseUpHandler={mouseUpHandler}
 							mouseDownHandler={mouseDownHandler}
 							mouseIgnoreHandler={mouseIgnoreHandler}
-							selection={selection}
+							selection={tabs[currentTab].selection}
 							line={line}
 							lineIndex={lineIndex}
 						/>

@@ -1,5 +1,4 @@
 import type { Change } from "./types";
-import type { WindowState } from "../common/types";
 
 import { ipcRenderer } from "electron";
 
@@ -12,7 +11,7 @@ export enum EditorAction {
 	ON_KEYDOWN = "onKeyDown",
 }
 
-type R = Promise<WindowState>;
+type R = Promise<void>;
 
 export const EditorAPI = {
 	[EditorAction.ON_KEYDOWN]: (change: Change): R => ipcRenderer.invoke(EditorAction.ON_KEYDOWN, change),

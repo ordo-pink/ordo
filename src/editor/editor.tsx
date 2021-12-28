@@ -4,41 +4,43 @@ import "./editor.css";
 
 import { useAppDispatch, useAppSelector } from "../redux/hooks";
 import Scrollbars from "react-custom-scrollbars";
-import { closeTab, openTab } from "./state";
 import { HiChevronRight, HiFolder, HiX } from "react-icons/hi";
 import { OrdoFile } from "../explorer/types";
 import { getFileIcon } from "../common/get-file-icon";
 import { ImageViewer } from "./image-viewer";
 import { TextEditor } from "./text-editor";
-import { select } from "../redux/store";
+import { closeTab, openTab, select } from "../redux/store";
+import { Either, Switch } from "or-else";
 
 const Breadcrumbs: React.FC = () => {
 	const currentTab = useAppSelector((state) => state.currentTab);
 	const tabs = useAppSelector((state) => state.tabs);
 
-	const Icon = getFileIcon(tabs[currentTab]);
+	const Icon = tabs && currentTab && getFileIcon(tabs[currentTab]);
 
 	return (
-		<div className="flex space-x-2 items-center px-4 py-2">
-			{tabs.length > 0 &&
-				tabs[currentTab].relativePath.split("/").map((item) => (
-					<div key={item} className="flex space-x-2 items-center">
-						{item === "." ? (
-							<HiFolder className="text-gray-500" />
-						) : (
-							<div className="flex items-center space-x-2">
-								{item === tabs[currentTab].readableName ? (
-									<Icon className="text-gray-500" />
-								) : (
-									<HiFolder className="text-gray-500" />
-								)}
-								<div>{item}</div>
-							</div>
-						)}
-						{item !== tabs[currentTab].readableName && <HiChevronRight className="text-gray-500" />}
-					</div>
-				))}
-		</div>
+		tabs && (
+			<div className="flex space-x-2 items-center px-4 py-2">
+				{tabs.length > 0 &&
+					tabs[currentTab].relativePath.split("/").map((item) => (
+						<div key={item} className="flex space-x-2 items-center">
+							{item === "." ? (
+								<HiFolder className="text-gray-500" />
+							) : (
+								<div className="flex items-center space-x-2">
+									{item === tabs[currentTab].readableName ? (
+										<Icon className="text-gray-500" />
+									) : (
+										<HiFolder className="text-gray-500" />
+									)}
+									<div>{item}</div>
+								</div>
+							)}
+							{item !== tabs[currentTab].readableName && <HiChevronRight className="text-gray-500" />}
+						</div>
+					))}
+			</div>
+		)
 	);
 };
 
@@ -89,21 +91,26 @@ const Tabs: React.FC = () => {
 	);
 };
 
+const Welcome: React.FC = () => <h1>Bring your thoughts to ORDO</h1>;
+
 export const Editor: React.FC = () => {
 	const tabs = useAppSelector((state) => state.tabs);
 	const currentTab = useAppSelector((state) => state.currentTab);
 
+	const ViewComponent = Either.fromNullable(tabs)
+		.chain((t) => Either.fromNullable(t[currentTab]))
+		.fold(
+			() => Welcome,
+			(f) => Switch.of(f.type).case("image", ImageViewer).default(TextEditor),
+		);
+
 	return (
 		<div className="flex flex-col grow">
 			<Tabs />
-
-			{tabs && currentTab != null && tabs[currentTab] && (
-				<Scrollbars>
-					<Breadcrumbs />
-
-					{tabs[currentTab].type === "image" ? <ImageViewer /> : <TextEditor />}
-				</Scrollbars>
-			)}
+			<Scrollbars>
+				{/* <Breadcrumbs /> */}
+				<ViewComponent />
+			</Scrollbars>
 		</div>
 	);
 };

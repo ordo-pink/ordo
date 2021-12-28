@@ -1,13 +1,17 @@
-import { app, BrowserWindow, BrowserWindowConstructorOptions, ipcMain } from "electron";
+import { app, BrowserWindow, BrowserWindowConstructorOptions, ipcMain, Menu } from "electron";
 import { join } from "path";
 
-import { KeyboardShortcuts } from "./keybindings/keyboard-shortcuts";
 import { EditorMainAPI } from "./editor/editor-main-api";
 import { KeybindableAction } from "./keybindings/keybindable-action";
 import { getSettings } from "./configuration/settings";
 import { debounce } from "./common/debounce";
 import { WindowState } from "./common/types";
 import { EditorAction } from "./editor/editor-renderer-api";
+import { ExplorerMainAPI } from "./explorer/explorer-main-api";
+import { ExplorerAction } from "./explorer/explorer-renderer-api";
+import { getApplicationMenu } from "./application-menu";
+import { KeyboardShortcut } from "./keybindings/types";
+import { activeWindow } from "electron-util";
 
 declare const MAIN_WINDOW_WEBPACK_ENTRY: string;
 declare const MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY: string;
@@ -39,67 +43,230 @@ const addHandler = <T extends Record<string, (...args: any[]) => any>, K extends
 	state: WindowState,
 	api: (state: WindowState) => Record<K, T[K]>,
 	key: K,
-) =>
-	ipcMain.handle(
-		`${state.window.id}-${key}`,
-		(_, ...args: Parameters<T[K]>): ReturnType<T[K]> => api(state)[key](...args),
-	);
+) => ipcMain.handle(key as string, (_, ...args: Parameters<T[K]>): ReturnType<T[K]> => api(state)[key](...args));
 
-const removeHandler = (state: WindowState, key: string) => ipcMain.removeHandler(`${state.window.id}-${key}`);
-
-KeyboardShortcuts[KeybindableAction.NEW_WINDOW].action = () => {
-	const newWindow = createWindow();
-	windows.add(newWindow);
-};
+const removeHandler = (key: string) => ipcMain.removeHandler(key);
 
 const createWindow = () => {
-	if (!windows.size) {
-		config.x = settings.get("last-window.x");
-		config.y = settings.get("last-window.y");
-		config.width = settings.get("last-window.width");
-		config.height = settings.get("last-window.height");
-	}
+	config.x = settings.get("last-window.x");
+	config.y = settings.get("last-window.y");
+	config.width = settings.get("last-window.width");
+	config.height = settings.get("last-window.height");
 
-	const window = new BrowserWindow(config);
+	let window = new BrowserWindow(config);
 
 	window.on(
 		"resize",
 		debounce(() => saveWindowSize(window), 300),
 	);
 
-	const windowState: WindowState = {
+	const state: WindowState = {
 		window,
 		settings,
 		editor: {
 			tabs: [],
 			currentTab: 0,
 		},
-		explorer: null,
-		keyBindings: [],
+		explorer: {
+			tree: null,
+			selection: null,
+		},
+		keybindings: {} as Record<KeybindableAction, KeyboardShortcut>,
+		constants: {
+			isMac: IS_MAC,
+		},
 	};
 
-	window.once("ready-to-show", window.show);
-	window.on("close", () => {
-		windows.delete(window);
+	const keybindings: Record<KeybindableAction, KeyboardShortcut> = {
+		[KeybindableAction.OPEN_FOLDER]: {
+			label: "Open Folder",
+			accelerator: "CommandOrControl+O",
+			action: async (state) => {
+				await ExplorerMainAPI(state)[ExplorerAction.OPEN_FOLDER]();
+				window.setTitle(`${state.explorer.tree.readableName}`);
+			},
+		},
+		// [KeybindableAction.CLOSE_WINDOW]: {
+		// 	label: "Close Window",
+		// 	accelerator: "CommandOrControl+Shift+W",
+		// 	action: async () => {
+		// 		activeWindow().close();
+		// 	},
+		// },
+		[KeybindableAction.CLOSE_TAB]: {
+			label: "Close Tab",
+			accelerator: "CommandOrControl+W",
+			action: async (state) => {
+				EditorMainAPI(state)[EditorAction.CLOSE_TAB](state.editor.currentTab);
+				state.window.webContents.send("SetState", { explorer: state.explorer, editor: state.editor });
+			},
+		},
+		[KeybindableAction.COPY]: {
+			label: "Copy",
+			accelerator: "CommandOrControl+C",
+			action: () => null,
+		},
+		[KeybindableAction.CUT]: {
+			label: "Cut",
+			accelerator: "CommandOrControl+X",
+			action: () => null,
+		},
+		[KeybindableAction.EXPLORER]: {
+			label: "Explorer",
+			accelerator: "CommandOrControl+Shift+E",
+			action: () => null,
+		},
+		[KeybindableAction.FIND]: {
+			label: "Find",
+			accelerator: "CommandOrControl+F",
+			action: () => null,
+		},
+		[KeybindableAction.FIND_IN_FILES]: {
+			label: "Find in Files",
+			accelerator: "CommandOrControl+Shift+F",
+			action: () => null,
+		},
+		[KeybindableAction.GRAPH]: {
+			label: "Graph",
+			accelerator: "CommandOrControl+Shift+G",
+			action: () => null,
+		},
+		[KeybindableAction.NEW_FILE]: {
+			label: "New File",
+			accelerator: "CommandOrControl+N",
+			action: () => null,
+		},
+		// [KeybindableAction.NEW_WINDOW]: {
+		// 	label: "New Window",
+		// 	accelerator: "CommandOrControl+Shift+N",
+		// 	action: () => createWindow(),
+		// },
+		[KeybindableAction.PASTE]: {
+			label: "Paste",
+			accelerator: "CommandOrControl+V",
+			action: () => null,
+		},
+		[KeybindableAction.REDO]: {
+			label: "Redo",
+			accelerator: "CommandOrControl+Shift+Z",
+			action: () => null,
+		},
+		[KeybindableAction.RESTART_WINDOW]: {
+			label: "Restart Window",
+			accelerator: "CommandOrControl+Shift+R",
+			action: () => {
+				activeWindow().reload();
+			},
+		},
+		[KeybindableAction.SAVE_AS]: {
+			label: "Save As",
+			accelerator: "CommandOrControl+Shift+S",
+			action: () => null,
+		},
+		[KeybindableAction.SAVE_FILE]: {
+			label: "Save File",
+			accelerator: "CommandOrControl+S",
+			action: (state) => {
+				window.setDocumentEdited(false);
+				ExplorerMainAPI(state)[ExplorerAction.SAVE_FILE]();
+			},
+		},
+		[KeybindableAction.SELECT_ALL]: {
+			label: "Select All",
+			accelerator: "CommandOrControl+A",
+			action: (state) => {
+				if (state.editor.currentTab == null || !state.editor.tabs || !state.editor.tabs.length) {
+					return;
+				}
 
-		removeHandler(windowState, EditorAction.ADD_TAB);
-		removeHandler(windowState, EditorAction.OPEN_TAB);
-		removeHandler(windowState, EditorAction.CLOSE_TAB);
-		removeHandler(windowState, EditorAction.ON_KEYDOWN);
+				const currentTab = state.editor.tabs[state.editor.currentTab];
+
+				currentTab.selection.start.index = 0;
+				currentTab.selection.start.line = 0;
+				currentTab.selection.end.index = currentTab.body[currentTab.body.length - 1].length;
+				currentTab.selection.end.line = currentTab.body.length - 1;
+				currentTab.selection.direction = "ltr";
+
+				state.window.webContents.send("SetState", { explorer: state.explorer, editor: state.editor });
+			},
+		},
+		[KeybindableAction.SETTINGS]: {
+			label: "Settings",
+			accelerator: "CommandOrControl+,",
+			action: () => null,
+		},
+		[KeybindableAction.TOGGLE_DEV_TOOLS]: {
+			label: "Toggle Dev Tools",
+			accelerator: "CommandOrControl+Shift+I",
+			action: () => activeWindow().webContents.toggleDevTools(),
+		},
+		[KeybindableAction.UNDO]: {
+			label: "Undo",
+			accelerator: "CommandOrControl+Z",
+			action: () => null,
+		},
+	};
+
+	state.keybindings = keybindings;
+
+	window.once("ready-to-show", () => {
+		Menu.setApplicationMenu(Menu.buildFromTemplate(getApplicationMenu(state)));
+
+		const path = state.settings.get("last-window.folder");
+
+		if (path) {
+			ExplorerMainAPI(state)[ExplorerAction.OPEN_FOLDER](path);
+		}
+
+		window.show();
+	});
+
+	window.on("close", () => {
+		removeHandler(EditorAction.ADD_TAB);
+		removeHandler(EditorAction.OPEN_TAB);
+		removeHandler(EditorAction.CLOSE_TAB);
+		removeHandler(EditorAction.ON_KEYDOWN);
+
+		removeHandler(ExplorerAction.CREATE_FILE);
+		removeHandler(ExplorerAction.GET_FILE);
+		removeHandler(ExplorerAction.UPDATE_FILE);
+		removeHandler(ExplorerAction.MOVE_FILE);
+		removeHandler(ExplorerAction.DELETE_FILE);
+		removeHandler(ExplorerAction.CREATE_FOLDER);
+		removeHandler(ExplorerAction.GET_FOLDER);
+		removeHandler(ExplorerAction.UPDATE_FOLDER);
+		removeHandler(ExplorerAction.MOVE_FOLDER);
+		removeHandler(ExplorerAction.DELETE_FOLDER);
+		removeHandler(ExplorerAction.OPEN_FOLDER);
+		removeHandler(ExplorerAction.SELECT);
+
+		windows.delete(window);
+		window = null;
 	});
 
 	windows.add(window);
 
-	addHandler(windowState, EditorMainAPI, EditorAction.ADD_TAB);
-	addHandler(windowState, EditorMainAPI, EditorAction.OPEN_TAB);
-	addHandler(windowState, EditorMainAPI, EditorAction.CLOSE_TAB);
-	addHandler(windowState, EditorMainAPI, EditorAction.ON_KEYDOWN);
+	addHandler(state, EditorMainAPI, EditorAction.ADD_TAB);
+	addHandler(state, EditorMainAPI, EditorAction.OPEN_TAB);
+	addHandler(state, EditorMainAPI, EditorAction.CLOSE_TAB);
+	addHandler(state, EditorMainAPI, EditorAction.ON_KEYDOWN);
+
+	addHandler(state, ExplorerMainAPI, ExplorerAction.CREATE_FILE);
+	addHandler(state, ExplorerMainAPI, ExplorerAction.GET_FILE);
+	addHandler(state, ExplorerMainAPI, ExplorerAction.UPDATE_FILE);
+	addHandler(state, ExplorerMainAPI, ExplorerAction.MOVE_FILE);
+	addHandler(state, ExplorerMainAPI, ExplorerAction.DELETE_FILE);
+	addHandler(state, ExplorerMainAPI, ExplorerAction.CREATE_FOLDER);
+	addHandler(state, ExplorerMainAPI, ExplorerAction.GET_FOLDER);
+	addHandler(state, ExplorerMainAPI, ExplorerAction.UPDATE_FOLDER);
+	addHandler(state, ExplorerMainAPI, ExplorerAction.MOVE_FOLDER);
+	addHandler(state, ExplorerMainAPI, ExplorerAction.DELETE_FOLDER);
+	addHandler(state, ExplorerMainAPI, ExplorerAction.OPEN_FOLDER);
+	addHandler(state, ExplorerMainAPI, ExplorerAction.SELECT);
 
 	window.loadURL(MAIN_WINDOW_WEBPACK_ENTRY);
-
-	return window;
 };
 
-app.on("ready", createWindow);
+app.on("ready", () => createWindow());
 app.on("activate", () => BrowserWindow.getAllWindows().length === 0 && createWindow());
 app.on("window-all-closed", () => !IS_MAC && app.quit());

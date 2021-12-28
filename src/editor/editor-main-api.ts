@@ -1,12 +1,9 @@
 import type { Change, ChangeKeys } from "./types";
 
-import { pipe } from "ramda";
 import { Switch } from "or-else";
 import { promises } from "fs";
 
 import { EditorAction, EditorAPI } from "./editor-renderer-api";
-import { KeyboardShortcuts } from "../keybindings/keyboard-shortcuts";
-import { KeybindableAction } from "../keybindings/keybindable-action";
 import { handleEnter } from "./key-handlers/enter";
 import { handleTab } from "./key-handlers/tab";
 import { handleTyping } from "./key-handlers/letters";
@@ -17,8 +14,12 @@ import { handleArrowDown } from "./key-handlers/arrow-down";
 import { handleBackspace } from "./key-handlers/backspace";
 import { EditorOrdoFile, WindowState } from "../common/types";
 import { getFile } from "../explorer/folder/get-file";
+import { KeybindableAction } from "../keybindings/keybindable-action";
+import { dialog } from "electron";
+import { ExplorerMainAPI } from "../explorer/explorer-main-api";
+import { ExplorerAction } from "../explorer/explorer-renderer-api";
 
-const createKeybinding = (keys: ChangeKeys): string => {
+const createAccelerator = (keys: ChangeKeys): string => {
 	let combo = "";
 
 	if (keys.ctrlKey || keys.metaKey) {
@@ -38,21 +39,21 @@ const createKeybinding = (keys: ChangeKeys): string => {
 	return combo;
 };
 
-const getKeybindableAction = (keybinding: string): (() => void) => {
-	const keyBindable = Object.keys(KeyboardShortcuts).find(
-		(key) => KeyboardShortcuts[key as unknown as KeybindableAction].accelerator === keybinding,
+const getKeybindableAction = (keys: ChangeKeys, state: WindowState) => {
+	const accelerator = createAccelerator(keys);
+
+	const keyBindable = Object.keys(state.keybindings).find(
+		(key) => state.keybindings[key as unknown as KeybindableAction].accelerator === accelerator,
 	);
 
-	return keyBindable ? KeyboardShortcuts[keyBindable as unknown as KeybindableAction].action : null;
+	return keyBindable ? state.keybindings[keyBindable as unknown as KeybindableAction].action : null;
 };
-
-const getKeybinding = pipe(createKeybinding, getKeybindableAction);
 
 export const EditorMainAPI = (state: WindowState): typeof EditorAPI => ({
 	[EditorAction.ADD_TAB]: async (path: string) => {
 		const file = getFile(state.explorer.tree, path);
 
-		return promises.readFile(file.path).then((f) => {
+		promises.readFile(file.path).then((f) => {
 			if (file.type === "image") {
 				state.editor.tabs.push({
 					...file,
@@ -79,27 +80,30 @@ export const EditorMainAPI = (state: WindowState): typeof EditorAPI => ({
 				});
 			}
 
-			return state;
+			state.editor.currentTab = state.editor.tabs.length - 1;
+
+			state.window.setRepresentedFilename(state.editor.tabs[state.editor.currentTab].path);
+			state.window.setTitle(
+				`${state.editor.tabs[state.editor.currentTab].relativePath} - ${state.explorer.tree.readableName}`,
+			);
+			state.window.webContents.send("SetState", { explorer: state.explorer, editor: state.editor });
 		});
 	},
 	[EditorAction.ON_KEYDOWN]: async (change: Change) => {
 		const tab = state.editor.tabs[state.editor.currentTab];
-		// const body = tab.body;
 
-		// KeyboardShortcuts[KeybindableAction.SELECT_ALL].action = () => {
-		// 	change.selection.start.index = 0;
-		// 	change.selection.start.line = 0;
-		// 	change.selection.end.index = body[body.length - 1].length;
-		// 	change.selection.end.line = body.length - 1;
-		// 	change.selection.direction = "ltr";
-		// };
+		tab.selection = change.selection;
 
-		const runKeyBinding = getKeybinding(change.keys);
+		if (!change.keys) {
+			state.window.webContents.send("SetState", { explorer: state.explorer, editor: state.editor });
+			return;
+		}
 
-		if (runKeyBinding) {
-			runKeyBinding();
+		const shortcut = getKeybindableAction(change.keys, state);
 
-			return state;
+		if (shortcut) {
+			shortcut(state);
+			return;
 		}
 
 		const handle = Switch.of(change.keys.key)
@@ -115,23 +119,41 @@ export const EditorMainAPI = (state: WindowState): typeof EditorAPI => ({
 
 		state.editor.tabs[state.editor.currentTab] = handle(tab, change.keys);
 
-		return state;
+		state.window.setDocumentEdited(true);
+		state.window.webContents.send("SetState", { explorer: state.explorer, editor: state.editor });
 	},
 	[EditorAction.OPEN_TAB]: async (index: number) => {
 		if (index >= state.editor.tabs.length) {
 			// TODO: Add error warning
-			return state;
+			return;
 		}
 
 		state.editor.currentTab = index;
 		state.explorer.selection = state.editor.tabs[index].path;
 
-		return state;
+		state.window.setRepresentedFilename(state.editor.tabs[state.editor.currentTab].path);
+		state.window.setTitle(
+			`${state.editor.tabs[state.editor.currentTab].relativePath} - ${state.explorer.tree.readableName}`,
+		);
+
+		state.window.webContents.send("SetState", { explorer: state.explorer, editor: state.editor });
 	},
 	[EditorAction.CLOSE_TAB]: async (index: number) => {
 		if (index >= state.editor.tabs.length) {
 			// TODO: Add error warning
-			return state;
+			return;
+		}
+
+		if (state.window.documentEdited) {
+			const result = dialog.showMessageBoxSync(state.window, {
+				type: "question",
+				buttons: ["Yes", "No"],
+				message: "Do you want to save the file before closing?",
+			});
+
+			if (result === 0) {
+				await ExplorerMainAPI(state)[ExplorerAction.SAVE_FILE]();
+			}
 		}
 
 		state.editor.tabs.splice(index, 1);
@@ -139,15 +161,30 @@ export const EditorMainAPI = (state: WindowState): typeof EditorAPI => ({
 		if (state.editor.currentTab === index) {
 			if (state.editor.currentTab > 0) {
 				state.editor.currentTab--;
-			} else if (state.editor.tabs.length > 0) {
-				state.editor.currentTab++;
 			} else {
 				state.editor.currentTab = 0;
 			}
+		} else if (state.editor.currentTab > index) {
+			state.editor.currentTab--;
 		}
 
-		state.explorer.selection = state.editor.tabs[state.editor.currentTab].path;
+		state.window.setDocumentEdited(false);
+		EditorMainAPI(state)[EditorAction.OPEN_TAB](state.editor.currentTab);
 
-		return state;
+		const newSelection = state.editor.tabs[state.editor.currentTab];
+
+		if (newSelection) {
+			state.explorer.selection = newSelection.path;
+			state.window.setRepresentedFilename(newSelection.path);
+			state.window.setTitle(
+				`${state.editor.tabs[state.editor.currentTab].relativePath} - ${state.explorer.tree.readableName}`,
+			);
+		} else {
+			state.explorer.selection = state.explorer.tree.path;
+			state.window.setRepresentedFilename(state.explorer.tree.path);
+			state.window.setTitle(`${state.explorer.tree.readableName}`);
+		}
+
+		state.window.webContents.send("SetState", { explorer: state.explorer, editor: state.editor });
 	},
 });

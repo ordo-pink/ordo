@@ -2,9 +2,25 @@ import React from "react";
 
 import { Editor } from "./editor/editor";
 import { Explorer } from "./explorer/explorer";
+import { useAppDispatch } from "./redux/hooks";
+import { setState, State } from "./redux/store";
 import { SideBar } from "./side-bar/side-bar";
 
 export const App: React.FC = () => {
+	const dispatch = useAppDispatch();
+
+	const onStateUpdate = ({ detail }: { detail: Partial<State> }) => {
+		dispatch(setState(detail));
+	};
+
+	React.useEffect(() => {
+		window.addEventListener("SetState", onStateUpdate as any);
+
+		return () => {
+			window.removeEventListener("SetState", onStateUpdate as any);
+		};
+	});
+
 	return (
 		<>
 			<div className="flex h-full select-none">

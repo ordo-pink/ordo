@@ -1,5 +1,7 @@
+import { WindowState } from "../common/types";
+
 export interface KeyboardShortcut {
 	label: string;
 	accelerator: string;
-	action: (...args: any) => any;
+	action: (state: WindowState) => unknown;
 }

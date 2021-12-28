@@ -11,6 +11,7 @@ import { ImageViewer } from "./image-viewer";
 import { TextEditor } from "./text-editor";
 import { closeTab, openTab, select } from "../redux/store";
 import { Either, Switch } from "or-else";
+import { Welcome } from "./welcome-viewer";
 
 const Breadcrumbs: React.FC = () => {
 	const currentTab = useAppSelector((state) => state.currentTab);
@@ -90,8 +91,6 @@ const Tabs: React.FC = () => {
 		</div>
 	);
 };
-
-const Welcome: React.FC = () => <h1>Bring your thoughts to ORDO</h1>;
 
 export const Editor: React.FC = () => {
 	const tabs = useAppSelector((state) => state.tabs);

@@ -12,7 +12,7 @@ import { ExplorerAction } from "./explorer/explorer-renderer-api";
 import { getApplicationMenu } from "./application-menu";
 import { KeyboardShortcut } from "./keybindings/types";
 import { activeWindow } from "electron-util";
-import { getSelectionText } from "./common/get-selection-text";
+import { getSelectionText, removeSelectionText } from "./common/get-selection-text";
 
 declare const MAIN_WINDOW_WEBPACK_ENTRY: string;
 declare const MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY: string;
@@ -124,7 +124,16 @@ const createWindow = () => {
 		[KeybindableAction.CUT]: {
 			label: "Cut",
 			accelerator: "CommandOrControl+X",
-			action: () => null,
+			action: (state) => {
+				const currentTab = state.editor.tabs[state.editor.currentTab];
+
+				const selection = getSelectionText(currentTab);
+				clipboard.writeText(selection);
+				removeSelectionText(currentTab);
+
+				currentTab.selection.end = currentTab.selection.start;
+				currentTab.selection.direction = "ltr";
+			},
 		},
 		[KeybindableAction.EXPLORER]: {
 			label: "Explorer",

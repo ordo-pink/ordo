@@ -114,6 +114,7 @@ export const EditorMainAPI = (state: WindowState): typeof EditorAPI => ({
 
 		if (shortcut) {
 			shortcut(state);
+			state.window.webContents.send("SetState", { explorer: state.explorer, editor: state.editor });
 			return;
 		}
 

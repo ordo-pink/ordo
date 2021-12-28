@@ -17,7 +17,17 @@ const macMenu = (state: WindowState) =>
 		? ([
 				{
 					label: "ORDO",
-					submenu: [{ role: "about" }],
+					submenu: [
+						{ role: "about" },
+						separator,
+						{ role: "services" },
+						separator,
+						{ role: "hide" },
+						{ role: "hideOthers" },
+						{ role: "unhide" },
+						separator,
+						{ role: "quit" },
+					],
 				},
 		  ] as MenuItemConstructorOptions[])
 		: ([] as MenuItemConstructorOptions[]);
@@ -27,6 +37,16 @@ const getFileMenu = (state: WindowState) =>
 		label: "&File",
 		submenu: [
 			toMenuItem(KeybindableAction.OPEN_FOLDER, state),
+			{
+				label: "Open Recent",
+				role: "recentDocuments",
+				submenu: [
+					{
+						label: "Clear Recent",
+						role: "clearRecentDocuments",
+					},
+				],
+			},
 			separator,
 			toMenuItem(KeybindableAction.NEW_FILE, state),
 			// toMenuItem(KeybindableAction.NEW_WINDOW, state),

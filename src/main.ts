@@ -94,6 +94,7 @@ const createWindow = () => {
 			action: async (state) => {
 				await ExplorerMainAPI(state)[ExplorerAction.OPEN_FOLDER]();
 				window.setTitle(`${state.explorer.tree.readableName}`);
+				app.addRecentDocument(state.explorer.tree.path);
 			},
 		},
 		// [KeybindableAction.CLOSE_WINDOW]: {
@@ -218,6 +219,11 @@ const createWindow = () => {
 	};
 
 	state.keybindings = keybindings;
+
+	app.on("open-file", (_, path) => {
+		ExplorerMainAPI(state)[ExplorerAction.OPEN_FOLDER](path);
+		state.window.webContents.send("SetState", { explorer: state.explorer, editor: state.editor });
+	});
 
 	window.once("ready-to-show", () => {
 		Menu.setApplicationMenu(Menu.buildFromTemplate(getApplicationMenu(state)));

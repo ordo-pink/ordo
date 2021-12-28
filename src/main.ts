@@ -1,4 +1,4 @@
-import { app, BrowserWindow, BrowserWindowConstructorOptions, ipcMain, Menu } from "electron";
+import { app, BrowserWindow, BrowserWindowConstructorOptions, clipboard, ipcMain, Menu } from "electron";
 import { join } from "path";
 
 import { EditorMainAPI } from "./editor/editor-main-api";
@@ -12,6 +12,7 @@ import { ExplorerAction } from "./explorer/explorer-renderer-api";
 import { getApplicationMenu } from "./application-menu";
 import { KeyboardShortcut } from "./keybindings/types";
 import { activeWindow } from "electron-util";
+import { getSelectionText } from "./common/get-selection-text";
 
 declare const MAIN_WINDOW_WEBPACK_ENTRY: string;
 declare const MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY: string;
@@ -115,7 +116,10 @@ const createWindow = () => {
 		[KeybindableAction.COPY]: {
 			label: "Copy",
 			accelerator: "CommandOrControl+C",
-			action: () => null,
+			action: (state) => {
+				const selection = getSelectionText(state.editor.tabs[state.editor.currentTab]);
+				clipboard.writeText(selection);
+			},
 		},
 		[KeybindableAction.CUT]: {
 			label: "Cut",

@@ -52,6 +52,7 @@ const getFileMenu = (state: WindowState) =>
 			// toMenuItem(KeybindableAction.NEW_WINDOW, state),
 			separator,
 			toMenuItem(KeybindableAction.CLOSE_TAB, state),
+			{ role: "close" },
 			// toMenuItem(KeybindableAction.CLOSE_WINDOW, state),
 		],
 	} as MenuItemConstructorOptions);

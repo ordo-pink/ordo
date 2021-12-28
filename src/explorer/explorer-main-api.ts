@@ -40,7 +40,6 @@ export const ExplorerMainAPI = (state: WindowState): typeof ExplorerAPI => ({
 
 	[ExplorerAction.SAVE_FILE]: async () => {
 		const file = state.editor.tabs[state.editor.currentTab];
-		console.log(file.body);
 		await saveFile(file.path, file.body.join(""));
 		state.window.setDocumentEdited(false);
 	},

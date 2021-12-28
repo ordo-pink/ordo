@@ -44,6 +44,10 @@ export const ExplorerMainAPI = (state: WindowState): typeof ExplorerAPI => ({
 	},
 
 	[ExplorerAction.CREATE_FOLDER]: async ({ name, currentlySelectedPath }) => {
+		if (!currentlySelectedPath) {
+			currentlySelectedPath = state.explorer.tree.path;
+		}
+
 		state.explorer.tree = await createFolder(state.explorer.tree, currentlySelectedPath, name);
 		state.window.webContents.send("SetState", { explorer: state.explorer, editor: state.editor });
 	},
@@ -62,6 +66,10 @@ export const ExplorerMainAPI = (state: WindowState): typeof ExplorerAPI => ({
 	},
 
 	[ExplorerAction.CREATE_FILE]: async ({ name, currentlySelectedPath }) => {
+		if (!currentlySelectedPath) {
+			currentlySelectedPath = state.explorer.tree.path;
+		}
+
 		state.explorer.tree = await createFile(state.explorer.tree, currentlySelectedPath, name);
 		const parent = getFolderOrParent(state.explorer.tree, currentlySelectedPath);
 		const filePath = join(parent.path, name);

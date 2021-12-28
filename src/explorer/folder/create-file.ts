@@ -5,9 +5,13 @@ import { createOrdoFile } from "./create-ordo-file";
 import { getFolderOrParent } from "./get-folder-or-parent";
 import { join } from "path";
 
-export const createFile = (tree: OrdoFolder, parentPath: string, name: string): Promise<OrdoFolder> => {
+export const createFile = async (tree: OrdoFolder, parentPath: string, name: string): Promise<OrdoFolder> => {
 	const parent = getFolderOrParent(tree, parentPath);
 	const path = join(parent.path, name);
+
+	if (parent.children.find((child) => child.path === path)) {
+		return tree;
+	}
 
 	return promises
 		.writeFile(path, "", "utf-8")

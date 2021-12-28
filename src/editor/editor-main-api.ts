@@ -51,6 +51,16 @@ const getKeybindableAction = (keys: ChangeKeys, state: WindowState) => {
 
 export const EditorMainAPI = (state: WindowState): typeof EditorAPI => ({
 	[EditorAction.ADD_TAB]: async (path: string) => {
+		const tabIndex = state.editor.tabs.findIndex((tab) => tab.path === path);
+
+		if (~tabIndex) {
+			state.editor.currentTab = tabIndex;
+
+			EditorMainAPI(state)[EditorAction.OPEN_TAB](tabIndex);
+
+			return;
+		}
+
 		const file = getFile(state.explorer.tree, path);
 
 		promises.readFile(file.path).then((f) => {
@@ -81,6 +91,7 @@ export const EditorMainAPI = (state: WindowState): typeof EditorAPI => ({
 			}
 
 			state.editor.currentTab = state.editor.tabs.length - 1;
+			state.explorer.selection = state.editor.tabs[state.editor.currentTab].path;
 
 			state.window.setRepresentedFilename(state.editor.tabs[state.editor.currentTab].path);
 			state.window.setTitle(

@@ -17,6 +17,8 @@ export const ExplorerMainAPI = (state: WindowState): typeof ExplorerAPI => ({
 	[ExplorerAction.OPEN_FOLDER]: async (path?: string) => {
 		state.explorer.tree = await listFolder(path ? path : openFolder(state.window));
 
+		state.settings.set("last-window.folder", state.explorer.tree.path);
+
 		state.window.setRepresentedFilename(state.explorer.tree.path);
 		state.window.setTitle(`${state.explorer.tree.readableName}`);
 

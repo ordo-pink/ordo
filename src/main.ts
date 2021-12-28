@@ -22,12 +22,13 @@ const windows = new Set<BrowserWindow>();
 
 const settings = getSettings(join(app.getPath("userData"), "settings.yml"));
 
-const saveWindowSize = (window: BrowserWindow) =>
+const saveWindowSize = (window: BrowserWindow) => {
 	settings
 		.set("last-window.height", window.getBounds().height)
 		.set("last-window.width", window.getBounds().width)
 		.set("last-window.x", window.getBounds().x)
 		.set("last-window.y", window.getBounds().y);
+};
 
 const config: BrowserWindowConstructorOptions = {
 	show: false,
@@ -39,11 +40,15 @@ const config: BrowserWindowConstructorOptions = {
 	},
 };
 
-const addHandler = <T extends Record<string, (...args: any[]) => any>, K extends keyof T>(
+const addHandler = <T extends Record<string, (...args: unknown[]) => unknown>, K extends keyof T>(
 	state: WindowState,
 	api: (state: WindowState) => Record<K, T[K]>,
 	key: K,
-) => ipcMain.handle(key as string, (_, ...args: Parameters<T[K]>): ReturnType<T[K]> => api(state)[key](...args));
+) =>
+	ipcMain.handle(
+		key as string,
+		(_, ...args: Parameters<T[K]>): ReturnType<T[K]> => api(state)[key](...args) as ReturnType<T[K]>,
+	);
 
 const removeHandler = (key: string) => ipcMain.removeHandler(key);
 
@@ -57,6 +62,11 @@ const createWindow = () => {
 
 	window.on(
 		"resize",
+		debounce(() => saveWindowSize(window), 300),
+	);
+
+	window.on(
+		"move",
 		debounce(() => saveWindowSize(window), 300),
 	);
 

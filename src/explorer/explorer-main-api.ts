@@ -12,6 +12,7 @@ import { getFolder } from "./folder/get-folder";
 import { getFile } from "./folder/get-file";
 import { getFolderOrParent } from "./folder/get-folder-or-parent";
 import { saveFile } from "./folder/save-file";
+import { toReduxState } from "../common/to-redux-state";
 
 export const ExplorerMainAPI = (state: WindowState): typeof ExplorerAPI => ({
 	[ExplorerAction.OPEN_FOLDER]: async (path?: string) => {
@@ -25,7 +26,7 @@ export const ExplorerMainAPI = (state: WindowState): typeof ExplorerAPI => ({
 		state.window.setRepresentedFilename(state.explorer.tree.path);
 		state.window.setTitle(`${state.explorer.tree.readableName}`);
 
-		state.window.webContents.send("SetState", { explorer: state.explorer, editor: state.editor });
+		state.window.webContents.send("SetState", toReduxState(state));
 	},
 	[ExplorerAction.SELECT]: async (path) => {
 		state.explorer.selection = path;
@@ -38,7 +39,7 @@ export const ExplorerMainAPI = (state: WindowState): typeof ExplorerAPI => ({
 			EditorMainAPI(state)[EditorAction.ADD_TAB](path);
 		}
 
-		state.window.webContents.send("SetState", { explorer: state.explorer, editor: state.editor });
+		state.window.webContents.send("SetState", toReduxState(state));
 	},
 
 	[ExplorerAction.SAVE_FILE]: async () => {
@@ -53,14 +54,14 @@ export const ExplorerMainAPI = (state: WindowState): typeof ExplorerAPI => ({
 		}
 
 		state.explorer.tree = await createFolder(state.explorer.tree, currentlySelectedPath, name);
-		state.window.webContents.send("SetState", { explorer: state.explorer, editor: state.editor });
+		state.window.webContents.send("SetState", toReduxState(state));
 	},
 	[ExplorerAction.GET_FOLDER]: async (path) => {
 		return getFolder(state.explorer.tree, path);
 	},
 	[ExplorerAction.UPDATE_FOLDER]: async ({ path, update }) => {
 		state.explorer.tree = await updateFolder(state.explorer.tree, path, update);
-		state.window.webContents.send("SetState", { explorer: state.explorer, editor: state.editor });
+		state.window.webContents.send("SetState", toReduxState(state));
 	},
 	[ExplorerAction.DELETE_FOLDER]: async (path) => {
 		// TODO: Ask for removal and remove file
@@ -79,7 +80,7 @@ export const ExplorerMainAPI = (state: WindowState): typeof ExplorerAPI => ({
 		const filePath = join(parent.path, name);
 
 		EditorMainAPI(state)[EditorAction.ADD_TAB](filePath);
-		state.window.webContents.send("SetState", { explorer: state.explorer, editor: state.editor });
+		state.window.webContents.send("SetState", toReduxState(state));
 	},
 	[ExplorerAction.GET_FILE]: async (path) => {
 		return getFile(state.explorer.tree, path);

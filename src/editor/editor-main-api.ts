@@ -18,6 +18,7 @@ import { KeybindableAction } from "../keybindings/keybindable-action";
 import { dialog } from "electron";
 import { ExplorerMainAPI } from "../explorer/explorer-main-api";
 import { ExplorerAction } from "../explorer/explorer-renderer-api";
+import { toReduxState } from "../common/to-redux-state";
 
 const createAccelerator = (keys: ChangeKeys): string => {
 	let combo = "";
@@ -63,6 +64,10 @@ export const EditorMainAPI = (state: WindowState): typeof EditorAPI => ({
 
 		const file = getFile(state.explorer.tree, path);
 
+		if (!file) {
+			return;
+		}
+
 		promises.readFile(file.path).then((f) => {
 			if (file.type === "image") {
 				state.editor.tabs.push({
@@ -97,7 +102,7 @@ export const EditorMainAPI = (state: WindowState): typeof EditorAPI => ({
 			state.window.setTitle(
 				`${state.editor.tabs[state.editor.currentTab].relativePath} - ${state.explorer.tree.readableName}`,
 			);
-			state.window.webContents.send("SetState", { explorer: state.explorer, editor: state.editor });
+			state.window.webContents.send("SetState", toReduxState(state));
 		});
 	},
 	[EditorAction.ON_KEYDOWN]: async (change: Change) => {
@@ -106,7 +111,7 @@ export const EditorMainAPI = (state: WindowState): typeof EditorAPI => ({
 		tab.selection = change.selection;
 
 		if (!change.keys) {
-			state.window.webContents.send("SetState", { explorer: state.explorer, editor: state.editor });
+			state.window.webContents.send("SetState", toReduxState(state));
 			return;
 		}
 
@@ -114,7 +119,7 @@ export const EditorMainAPI = (state: WindowState): typeof EditorAPI => ({
 
 		if (shortcut) {
 			shortcut(state);
-			state.window.webContents.send("SetState", { explorer: state.explorer, editor: state.editor });
+			state.window.webContents.send("SetState", toReduxState(state));
 			return;
 		}
 
@@ -132,7 +137,7 @@ export const EditorMainAPI = (state: WindowState): typeof EditorAPI => ({
 		state.editor.tabs[state.editor.currentTab] = handle(tab, change.keys);
 
 		state.window.setDocumentEdited(true);
-		state.window.webContents.send("SetState", { explorer: state.explorer, editor: state.editor });
+		state.window.webContents.send("SetState", toReduxState(state));
 	},
 	[EditorAction.OPEN_TAB]: async (index: number) => {
 		if (index >= state.editor.tabs.length) {
@@ -148,7 +153,7 @@ export const EditorMainAPI = (state: WindowState): typeof EditorAPI => ({
 			`${state.editor.tabs[state.editor.currentTab].relativePath} - ${state.explorer.tree.readableName}`,
 		);
 
-		state.window.webContents.send("SetState", { explorer: state.explorer, editor: state.editor });
+		state.window.webContents.send("SetState", toReduxState(state));
 	},
 	[EditorAction.CLOSE_TAB]: async (index: number) => {
 		if (index >= state.editor.tabs.length) {
@@ -197,6 +202,6 @@ export const EditorMainAPI = (state: WindowState): typeof EditorAPI => ({
 			state.window.setTitle(`${state.explorer.tree.readableName}`);
 		}
 
-		state.window.webContents.send("SetState", { explorer: state.explorer, editor: state.editor });
+		state.window.webContents.send("SetState", toReduxState(state));
 	},
 });

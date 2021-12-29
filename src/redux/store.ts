@@ -29,6 +29,10 @@ export type State = {
 
 	explorerSelection: string;
 	explorerTree: OrdoFolder;
+	showCreateFile: boolean;
+	showCreateFolder: boolean;
+
+	editorSelected: boolean;
 };
 
 const initialState: State = {
@@ -37,6 +41,10 @@ const initialState: State = {
 
 	explorerTree: null,
 	explorerSelection: null,
+	showCreateFile: false,
+	showCreateFolder: false,
+
+	editorSelected: true,
 };
 
 const state = createSlice({
@@ -54,10 +62,19 @@ const state = createSlice({
 				state.currentTab = action.payload.editor.currentTab;
 			}
 		},
+		setShowCreateFile: (state, action: PayloadAction<boolean>) => {
+			state.showCreateFile = action.payload;
+		},
+		setShowCreateFolder: (state, action: PayloadAction<boolean>) => {
+			state.showCreateFolder = action.payload;
+		},
+		setEditorSelection: (state, action: PayloadAction<boolean>) => {
+			state.editorSelected = action.payload;
+		},
 	},
 });
 
-export const { setState } = state.actions;
+export const { setState, setShowCreateFile, setShowCreateFolder, setEditorSelection } = state.actions;
 
 export const store = configureStore({
 	reducer: state.reducer,

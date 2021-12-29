@@ -11,6 +11,7 @@ export const TextEditor: React.FC = () => {
 
 	const tabs = useAppSelector((state) => state.tabs);
 	const currentTab = useAppSelector((state) => state.currentTab);
+	const editorSelected = useAppSelector((state) => state.editorSelected);
 
 	const ref = React.useRef<HTMLDivElement>(null);
 
@@ -47,6 +48,10 @@ export const TextEditor: React.FC = () => {
 	]);
 
 	const onKeyDown = (e: KeyboardEvent) => {
+		if (!editorSelected) {
+			return;
+		}
+
 		const { key, metaKey, altKey, ctrlKey, shiftKey } = e;
 
 		if (IGNORED_KEY_PRESSES.includes(key)) {

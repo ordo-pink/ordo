@@ -24,6 +24,7 @@ export type WindowState = {
 		readonly isMac: boolean;
 	};
 	appearance: {
+		currentView: "editor" | "graph" | "settings";
 		showExplorer: boolean;
 		fontFamily: string;
 		tabSize: number;

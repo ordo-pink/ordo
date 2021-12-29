@@ -13,6 +13,7 @@ import { getApplicationMenu } from "./application-menu";
 import { KeyboardShortcut } from "./keybindings/types";
 import { activeWindow } from "electron-util";
 import { getSelectionText, removeSelectionText } from "./common/get-selection-text";
+import { toReduxState } from "./common/to-redux-state";
 
 declare const MAIN_WINDOW_WEBPACK_ENTRY: string;
 declare const MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY: string;
@@ -87,6 +88,7 @@ const createWindow = () => {
 			isMac: IS_MAC,
 		},
 		appearance: {
+			currentView: "editor",
 			fontFamily: settings.get("editor.font"),
 			fontSize: settings.get("editor.font-size"),
 			accentColor: settings.get("colors.accent"),
@@ -117,7 +119,7 @@ const createWindow = () => {
 			accelerator: "CommandOrControl+W",
 			action: async (state) => {
 				EditorMainAPI(state)[EditorAction.CLOSE_TAB](state.editor.currentTab);
-				state.window.webContents.send("SetState", { explorer: state.explorer, editor: state.editor });
+				state.window.webContents.send("SetState", toReduxState(state));
 			},
 		},
 		[KeybindableAction.COPY]: {
@@ -145,7 +147,10 @@ const createWindow = () => {
 		[KeybindableAction.EXPLORER]: {
 			label: "Explorer",
 			accelerator: "CommandOrControl+Shift+E",
-			action: () => null,
+			action: (state) => {
+				state.appearance.currentView = "editor";
+				state.window.webContents.send("SetState", toReduxState(state));
+			},
 		},
 		[KeybindableAction.TOGGLE_EXPLORER]: {
 			label: "Toggle Explorer",
@@ -153,11 +158,7 @@ const createWindow = () => {
 			action: (state) => {
 				state.settings.set("editor.explorer-visible", !state.appearance.showExplorer);
 				state.appearance.showExplorer = !state.appearance.showExplorer;
-				state.window.webContents.send("SetState", {
-					explorer: state.explorer,
-					editor: state.editor,
-					appearance: state.appearance,
-				});
+				state.window.webContents.send("SetState", toReduxState(state));
 			},
 		},
 		[KeybindableAction.FIND]: {
@@ -173,7 +174,10 @@ const createWindow = () => {
 		[KeybindableAction.GRAPH]: {
 			label: "Graph",
 			accelerator: "CommandOrControl+Shift+G",
-			action: () => null,
+			action: (state) => {
+				state.appearance.currentView = "graph";
+				state.window.webContents.send("SetState", toReduxState(state));
+			},
 		},
 		[KeybindableAction.NEW_FILE]: {
 			label: "New File",
@@ -231,7 +235,7 @@ const createWindow = () => {
 				currentTab.selection.end.line = currentTab.body.length - 1;
 				currentTab.selection.direction = "ltr";
 
-				state.window.webContents.send("SetState", { explorer: state.explorer, editor: state.editor });
+				state.window.webContents.send("SetState", toReduxState(state));
 			},
 		},
 		[KeybindableAction.SETTINGS]: {
@@ -261,13 +265,18 @@ const createWindow = () => {
 	window.once("ready-to-show", () => {
 		Menu.setApplicationMenu(Menu.buildFromTemplate(getApplicationMenu(state)));
 
+		window.show();
+	});
+
+	window.on("show", () => {
 		const path = state.settings.get("last-window.folder");
 
 		if (path) {
 			ExplorerMainAPI(state)[ExplorerAction.OPEN_FOLDER](path);
+			state.window.webContents.send("SetState", toReduxState(state));
 		}
 
-		window.show();
+		state.window.webContents.send("SetState", toReduxState(state));
 	});
 
 	window.on("close", () => {

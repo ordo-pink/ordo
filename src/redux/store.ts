@@ -2,6 +2,7 @@ import type { EditorOrdoFile, WindowState } from "../common/types";
 
 import { createAsyncThunk, createSlice, configureStore, PayloadAction } from "@reduxjs/toolkit";
 import { OrdoFolder } from "../explorer/types";
+import colors from "tailwindcss/colors";
 
 export const addTab = createAsyncThunk("CreateTab", window.Editor.addTab);
 export const openTab = createAsyncThunk("OpenTab", window.Editor.openTab);
@@ -32,7 +33,13 @@ export type State = {
 	showCreateFile: boolean;
 	showCreateFolder: boolean;
 
+	showExplorer: boolean;
+
 	editorSelected: boolean;
+	accentColor: keyof typeof colors;
+	fontFamily: string;
+	fontSize: number;
+	tabSize: number;
 };
 
 const initialState: State = {
@@ -44,7 +51,13 @@ const initialState: State = {
 	showCreateFile: false,
 	showCreateFolder: false,
 
+	showExplorer: false,
+
 	editorSelected: true,
+	accentColor: "pink",
+	fontFamily: "",
+	fontSize: 16,
+	tabSize: 2,
 };
 
 const state = createSlice({
@@ -60,6 +73,14 @@ const state = createSlice({
 			if (action.payload.editor) {
 				state.tabs = action.payload.editor.tabs;
 				state.currentTab = action.payload.editor.currentTab;
+			}
+
+			if (action.payload.appearance) {
+				state.showExplorer = action.payload.appearance.showExplorer;
+				state.accentColor = action.payload.appearance.accentColor;
+				state.fontFamily = action.payload.appearance.fontFamily;
+				state.fontSize = action.payload.appearance.fontSize;
+				state.tabSize = action.payload.appearance.tabSize;
 			}
 		},
 		setShowCreateFile: (state, action: PayloadAction<boolean>) => {

@@ -9,8 +9,8 @@ export interface OrdoSettings {
 	"last-window.y": number;
 	"last-window.folder": string;
 	"editor.font": string;
-	"editor.tab-size": string;
-	"editor.font-size": string;
+	"editor.tab-size": number;
+	"editor.font-size": number;
 	"editor.explorer-visible": boolean;
 	"editor.auto-closing-brackets": boolean;
 	"editor.auto-closing-delete": boolean;

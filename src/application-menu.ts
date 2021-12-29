@@ -82,6 +82,8 @@ const getViewMenu = (state: WindowState) =>
 			toMenuItem(KeybindableAction.TOGGLE_DEV_TOOLS, state),
 			separator,
 			toMenuItem(KeybindableAction.EXPLORER, state),
+			toMenuItem(KeybindableAction.TOGGLE_EXPLORER, state),
+			separator,
 			toMenuItem(KeybindableAction.GRAPH, state),
 			toMenuItem(KeybindableAction.FIND_IN_FILES, state),
 			separator,

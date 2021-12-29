@@ -24,6 +24,8 @@ export enum KeybindableAction {
 	GRAPH,
 	SETTINGS,
 
+	TOGGLE_EXPLORER,
+
 	TOGGLE_DEV_TOOLS,
 	RESTART_WINDOW,
 }

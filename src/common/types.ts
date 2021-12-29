@@ -3,7 +3,8 @@ import { SettingsAPI } from "../configuration/types";
 import { ChangeSelection } from "../editor/types";
 import { OrdoFile, OrdoFolder } from "../explorer/types";
 import { KeyboardShortcut } from "../keybindings/types";
-import { App, BrowserWindow } from "electron";
+import { BrowserWindow } from "electron";
+import colors from "tailwindcss/colors";
 
 export type EditorOrdoFile = OrdoFile & { body: string[]; selection: ChangeSelection };
 
@@ -21,5 +22,12 @@ export type WindowState = {
 	};
 	constants: {
 		readonly isMac: boolean;
+	};
+	appearance: {
+		showExplorer: boolean;
+		fontFamily: string;
+		tabSize: number;
+		fontSize: number;
+		accentColor: keyof typeof colors;
 	};
 };

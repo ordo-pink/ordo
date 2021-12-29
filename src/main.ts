@@ -86,6 +86,13 @@ const createWindow = () => {
 		constants: {
 			isMac: IS_MAC,
 		},
+		appearance: {
+			fontFamily: settings.get("editor.font"),
+			fontSize: settings.get("editor.font-size"),
+			accentColor: settings.get("colors.accent"),
+			tabSize: settings.get("editor.tab-size"),
+			showExplorer: settings.get("editor.explorer-visible"),
+		},
 	};
 
 	const keybindings: Record<KeybindableAction, KeyboardShortcut> = {
@@ -139,6 +146,19 @@ const createWindow = () => {
 			label: "Explorer",
 			accelerator: "CommandOrControl+Shift+E",
 			action: () => null,
+		},
+		[KeybindableAction.TOGGLE_EXPLORER]: {
+			label: "Toggle Explorer",
+			accelerator: "CommandOrControl+B",
+			action: (state) => {
+				state.settings.set("editor.explorer-visible", !state.appearance.showExplorer);
+				state.appearance.showExplorer = !state.appearance.showExplorer;
+				state.window.webContents.send("SetState", {
+					explorer: state.explorer,
+					editor: state.editor,
+					appearance: state.appearance,
+				});
+			},
 		},
 		[KeybindableAction.FIND]: {
 			label: "Find",

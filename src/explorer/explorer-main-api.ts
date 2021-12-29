@@ -16,6 +16,9 @@ import { saveFile } from "./folder/save-file";
 export const ExplorerMainAPI = (state: WindowState): typeof ExplorerAPI => ({
 	[ExplorerAction.OPEN_FOLDER]: async (path?: string) => {
 		state.explorer.tree = await listFolder(path ? path : openFolder(state.window));
+		state.explorer.selection = null;
+		state.editor.tabs = [];
+		state.editor.currentTab = null;
 
 		state.settings.set("last-window.folder", state.explorer.tree.path);
 

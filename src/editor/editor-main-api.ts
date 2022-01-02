@@ -12,7 +12,7 @@ import { handleArrowLeft } from "./key-handlers/arrow-left";
 import { handleArrowRight } from "./key-handlers/arrow-right";
 import { handleArrowDown } from "./key-handlers/arrow-down";
 import { handleBackspace } from "./key-handlers/backspace";
-import { EditorOrdoFile, TextBody, WindowState } from "../common/types";
+import { EditorOrdoFile, WindowState } from "../common/types";
 import { getFile } from "../explorer/folder/get-file";
 import { KeybindableAction } from "../keybindings/keybindable-action";
 import { dialog } from "electron";
@@ -72,7 +72,7 @@ export const EditorMainAPI = (state: WindowState): typeof EditorAPI => ({
 			if (file.type === "image") {
 				state.editor.tabs.push({
 					...file,
-					body: `data:image/${file.extension.slice(1)};base64,${f.toString("base64")}` as any,
+					body: `data:image/${file.extension.slice(1)};base64,${f.toString("base64")}` as unknown as string[][],
 					selection: null,
 				});
 			} else {

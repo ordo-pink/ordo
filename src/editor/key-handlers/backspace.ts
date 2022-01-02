@@ -19,7 +19,9 @@ export const handleBackspace = (change: EditorOrdoFile, keys: ChangeKeys): Edito
 		change = moveCaretToPreviousLine(change, keys, true);
 		change = moveCaretToLineEnd(change, keys, true);
 
-		change.body[change.selection.start.line] += change.body[change.selection.start.line + 1];
+		change.body[change.selection.start.line] = change.body[change.selection.start.line].concat(
+			change.body[change.selection.start.line + 1],
+		);
 		change.body.splice(change.selection.start.line + 1, 1);
 
 		return change;
@@ -29,9 +31,9 @@ export const handleBackspace = (change: EditorOrdoFile, keys: ChangeKeys): Edito
 		const prevSpace = getPreviousSpace(change);
 
 		if (~prevSpace) {
-			change.body[change.selection.start.line] =
-				change.body[change.selection.start.line].substring(0, prevSpace) +
-				change.body[change.selection.start.line].substring(change.selection.start.index);
+			change.body[change.selection.start.line] = change.body[change.selection.start.line]
+				.slice(0, prevSpace)
+				.concat(change.body[change.selection.start.line].slice(change.selection.start.index));
 
 			change.selection.start.index = prevSpace;
 		} else {
@@ -42,9 +44,9 @@ export const handleBackspace = (change: EditorOrdoFile, keys: ChangeKeys): Edito
 			change = moveCaretToLineStart(change, keys, true);
 		}
 	} else {
-		change.body[change.selection.start.line] =
-			change.body[change.selection.start.line].substring(0, change.selection.start.index - 1) +
-			change.body[change.selection.start.line].substring(change.selection.start.index);
+		change.body[change.selection.start.line] = change.body[change.selection.start.line]
+			.slice(0, change.selection.start.index - 1)
+			.concat(change.body[change.selection.start.line].slice(change.selection.start.index));
 
 		change = moveCaretLeft(change, keys, null, true);
 	}

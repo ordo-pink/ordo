@@ -5,7 +5,7 @@ import { handleTyping } from "./letters";
 
 export const handleTab = (change: EditorOrdoFile, keys: ChangeKeys): EditorOrdoFile => {
 	if (keys.shiftKey) {
-		if (change.body[change.selection.start.line].startsWith(" ")) {
+		if (change.body[change.selection.start.line][0] === " ") {
 			change.body[change.selection.start.line] = change.body[change.selection.start.line].slice(1);
 			change = moveCaretLeft(change, keys, null, true);
 		}

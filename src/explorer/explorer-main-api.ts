@@ -44,7 +44,11 @@ export const ExplorerMainAPI = (state: WindowState): typeof ExplorerAPI => ({
 
 	[ExplorerAction.SAVE_FILE]: async () => {
 		const file = state.editor.tabs[state.editor.currentTab];
-		await saveFile(file.path, file.body.join(""));
+
+		if (file.type === "image") {
+			return;
+		}
+		await saveFile(file.path, (file.body as string[][]).map((line) => line.join("")).join("\n"));
 		state.window.setDocumentEdited(false);
 	},
 

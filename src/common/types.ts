@@ -6,7 +6,9 @@ import { KeyboardShortcut } from "../keybindings/types";
 import { BrowserWindow } from "electron";
 import colors from "tailwindcss/colors";
 
-export type EditorOrdoFile = OrdoFile & { body: string[]; selection: ChangeSelection };
+export type TextBody = string[][];
+
+export type EditorOrdoFile = OrdoFile & { body: TextBody; selection: ChangeSelection };
 
 export type WindowState = {
 	window: BrowserWindow;

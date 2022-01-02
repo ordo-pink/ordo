@@ -127,7 +127,7 @@ const createWindow = () => {
 			accelerator: "CommandOrControl+C",
 			action: (state) => {
 				const selection = getSelectionText(state.editor.tabs[state.editor.currentTab]);
-				clipboard.writeText(selection);
+				clipboard.writeText(selection.join("\n"));
 			},
 		},
 		[KeybindableAction.CUT]: {
@@ -137,7 +137,7 @@ const createWindow = () => {
 				const currentTab = state.editor.tabs[state.editor.currentTab];
 
 				const selection = getSelectionText(currentTab);
-				clipboard.writeText(selection);
+				clipboard.writeText(selection.join("\n"));
 				removeSelectionText(currentTab);
 
 				currentTab.selection.end = currentTab.selection.start;
@@ -229,9 +229,13 @@ const createWindow = () => {
 
 				const currentTab = state.editor.tabs[state.editor.currentTab];
 
+				if (currentTab.type === "image") {
+					return;
+				}
+
 				currentTab.selection.start.index = 0;
 				currentTab.selection.start.line = 0;
-				currentTab.selection.end.index = currentTab.body[currentTab.body.length - 1].length;
+				currentTab.selection.end.index = currentTab.body.length;
 				currentTab.selection.end.line = currentTab.body.length - 1;
 				currentTab.selection.direction = "ltr";
 

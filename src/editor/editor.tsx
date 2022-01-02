@@ -4,7 +4,7 @@ import "./editor.css";
 
 import { useAppDispatch, useAppSelector } from "../redux/hooks";
 import Scrollbars from "react-custom-scrollbars";
-import { HiChevronRight, HiFolder, HiX } from "react-icons/hi";
+import { HiChevronRight, HiFolder, HiOutlineFolder, HiX } from "react-icons/hi";
 import { OrdoFile } from "../explorer/types";
 import { getFileIcon } from "../common/get-file-icon";
 import { ImageViewer } from "./image-viewer";
@@ -17,7 +17,11 @@ const Breadcrumbs: React.FC = () => {
 	const currentTab = useAppSelector((state) => state.currentTab);
 	const tabs = useAppSelector((state) => state.tabs);
 
-	const Icon = tabs && currentTab && getFileIcon(tabs[currentTab]);
+	if (!tabs || currentTab == null) {
+		return null;
+	}
+
+	const Icon = getFileIcon(tabs[currentTab]);
 
 	return (
 		tabs && (
@@ -26,7 +30,7 @@ const Breadcrumbs: React.FC = () => {
 					tabs[currentTab].relativePath.split("/").map((item) => (
 						<div key={item} className="flex space-x-2 items-center">
 							{item === "." ? (
-								<HiFolder className="text-gray-500" />
+								<HiOutlineFolder className="text-gray-500" />
 							) : (
 								<div className="flex items-center space-x-2">
 									{item === tabs[currentTab].readableName ? (
@@ -107,7 +111,7 @@ export const Editor: React.FC = () => {
 		<div className="flex flex-col grow">
 			<Tabs />
 			<Scrollbars>
-				{/* <Breadcrumbs /> */}
+				<Breadcrumbs />
 				<ViewComponent />
 			</Scrollbars>
 		</div>

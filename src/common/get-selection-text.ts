@@ -1,6 +1,6 @@
 import { EditorOrdoFile } from "./types";
 
-export const getSelectionText = (file: EditorOrdoFile): string => {
+export const getSelectionText = (file: EditorOrdoFile): string[] => {
 	if (
 		file.selection.start.line === file.selection.end.line &&
 		file.selection.start.index === file.selection.end.index
@@ -12,15 +12,15 @@ export const getSelectionText = (file: EditorOrdoFile): string => {
 		return file.body[file.selection.start.line].slice(file.selection.start.index, file.selection.end.index);
 	}
 
-	let text = "";
+	let text = [];
 
-	text += file.body[file.selection.start.line].slice(file.selection.start.index);
+	text = file.body[file.selection.start.line].slice(file.selection.start.index);
 
 	for (const line of file.body.slice(file.selection.start.line + 1, file.selection.end.line - 1)) {
-		text += line;
+		text = text.concat(line);
 	}
 
-	text += file.body[file.selection.end.line].slice(0, file.selection.end.index);
+	text = text.concat(file.body[file.selection.end.line].slice(0, file.selection.end.index));
 
 	return text;
 };
@@ -39,9 +39,9 @@ export const removeSelectionText = (file: EditorOrdoFile): void => {
 	}
 
 	if (file.selection.start.line === file.selection.end.line) {
-		file.body[file.selection.start.line] =
-			file.body[file.selection.start.line].slice(0, file.selection.start.index) +
-			file.body[file.selection.start.line].slice(file.selection.end.index);
+		file.body[file.selection.start.line] = file.body[file.selection.start.line]
+			.slice(0, file.selection.start.index)
+			.concat(file.body[file.selection.start.line].slice(file.selection.end.index));
 
 		file.selection.end = file.selection.start;
 		file.selection.direction = "ltr";
@@ -49,8 +49,9 @@ export const removeSelectionText = (file: EditorOrdoFile): void => {
 		return;
 	}
 
-	file.body[file.selection.start.line] = file.body[file.selection.start.line].slice(0, file.selection.start.index);
-	file.body[file.selection.start.line] += file.body[file.selection.end.line].slice(file.selection.end.index);
+	file.body[file.selection.start.line] = file.body[file.selection.start.line]
+		.slice(0, file.selection.start.index)
+		.concat(file.body[file.selection.end.line].slice(file.selection.end.index));
 
 	for (let i = file.selection.start.line + 1; i <= file.selection.end.line; i++) {
 		file.body.splice(i, 1);

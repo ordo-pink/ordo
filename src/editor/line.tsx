@@ -3,7 +3,7 @@ import { Char } from "./char";
 import { ChangeSelection } from "./types";
 
 export const Line = React.memo<{
-	line: string;
+	line: string[];
 	lineIndex: number;
 	mouseIgnoreHandler: (e: React.MouseEvent<HTMLDivElement>) => void;
 	mouseDownHandler: (line: number, index: number) => void;
@@ -48,7 +48,7 @@ export const Line = React.memo<{
 					}
 				}}
 			>
-				{line.split("").map((char, charIndex) => (
+				{line.map((char, charIndex) => (
 					<Char
 						key={`line-${lineIndex}-${charIndex}`}
 						lineIndex={lineIndex}

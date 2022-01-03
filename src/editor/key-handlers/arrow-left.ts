@@ -15,7 +15,7 @@ export const handleArrowLeft = (edited: EditorOrdoFile, keys: ChangeKeys): Edito
 		return edited;
 	}
 
-	if (isCaretAtLineStart(edited)) {
+	if (isCaretAtLineStart(edited) || edited.selection.start.index < 0 || edited.selection.end.index < 0) {
 		edited = moveCaretToPreviousLine(edited, keys);
 		edited = moveCaretToLineEnd(edited, keys);
 
@@ -23,10 +23,12 @@ export const handleArrowLeft = (edited: EditorOrdoFile, keys: ChangeKeys): Edito
 	}
 
 	if (keys.altKey) {
+		edited = moveCaretLeft(edited, keys);
+
 		const prevSpace = getPreviousSpace(edited);
 
 		if (~prevSpace) {
-			edited = moveCaretLeft(edited, keys, prevSpace);
+			edited = moveCaretLeft(edited, keys, prevSpace + 1);
 		} else {
 			edited = moveCaretToLineStart(edited, keys);
 		}

@@ -17,7 +17,7 @@ const Breadcrumbs: React.FC = () => {
 	const currentTab = useAppSelector((state) => state.currentTab);
 	const tabs = useAppSelector((state) => state.tabs);
 
-	if (!tabs || currentTab == null) {
+	if (!tabs || currentTab == null || !tabs[currentTab]) {
 		return null;
 	}
 
@@ -100,8 +100,10 @@ export const Editor: React.FC = () => {
 	const tabs = useAppSelector((state) => state.tabs);
 	const currentTab = useAppSelector((state) => state.currentTab);
 
+	console.log(tabs);
+
 	const ViewComponent = Either.fromNullable(tabs)
-		.chain((t) => Either.fromNullable(t[currentTab]))
+		.chain((t) => Either.fromNullable(t[currentTab] ? t[currentTab] : null))
 		.fold(
 			() => Welcome,
 			(f) => Switch.of(f.type).case("image", ImageViewer).default(TextEditor),

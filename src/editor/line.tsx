@@ -11,6 +11,10 @@ export const Line = React.memo<{
 	isCurrentLine: boolean;
 	selection: ChangeSelection;
 }>(({ line, lineIndex, mouseIgnoreHandler, mouseDownHandler, mouseUpHandler, isCurrentLine, selection }) => {
+	if (!line.length) {
+		line = [" "];
+	}
+
 	return (
 		<div className={`flex items-center ${isCurrentLine ? "bg-gray-200" : ""}`}>
 			<div

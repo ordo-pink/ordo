@@ -1,17 +1,17 @@
 @keyframes blinky {
-	0% {
+	100% {
 		background: transparent;
 	}
-	100% {
+	0% {
 		background: #db2777;
 	}
 }
 
 @-webkit-keyframes blinky {
-	0% {
+	100% {
 		background: transparent;
 	}
-	100% {
+	0% {
 		background: #db2777;
 	}
 }

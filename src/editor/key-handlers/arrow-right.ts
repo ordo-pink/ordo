@@ -23,13 +23,15 @@ export const handleArrowRight = (edited: EditorOrdoFile, keys: ChangeKeys): Edit
 	}
 
 	if (keys.altKey) {
+		edited = moveCaretRight(edited, keys);
+
 		const nextSpace = getNextSpace(edited);
 
 		if (~nextSpace) {
 			const newPosition =
 				edited.selection.direction === "rtl"
-					? nextSpace + edited.selection.start.index + 1
-					: nextSpace + edited.selection.end.index + 1;
+					? nextSpace + edited.selection.start.index
+					: nextSpace + edited.selection.end.index;
 			edited = moveCaretRight(edited, keys, newPosition);
 		} else {
 			edited = moveCaretToLineEnd(edited, keys);

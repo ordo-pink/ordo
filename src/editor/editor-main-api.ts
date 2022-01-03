@@ -78,11 +78,7 @@ export const EditorMainAPI = (state: WindowState): typeof EditorAPI => ({
 			} else {
 				let body: string | string[][] = f.toString("utf-8");
 
-				if (!body) {
-					body = "\n";
-				}
-
-				body = body.split("\n").map((line) => line.split(""));
+				body = body.split("\n").map((line) => line.split("").concat([" "]));
 
 				state.editor.tabs.push({
 					...file,

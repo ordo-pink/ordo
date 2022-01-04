@@ -15,7 +15,11 @@ export const handleArrowRight = (edited: EditorOrdoFile, keys: ChangeKeys): Edit
 		return edited;
 	}
 
-	if (isCaretAtLineEnd(edited)) {
+	if (
+		isCaretAtLineEnd(edited) ||
+		edited.selection.start.index >= edited.body[edited.selection.start.line].length ||
+		edited.selection.end.index >= edited.body[edited.selection.end.line].length
+	) {
 		edited = moveCaretToNextLine(edited, keys);
 		edited = moveCaretToLineStart(edited, keys);
 

@@ -48,7 +48,21 @@ export const ExplorerMainAPI = (state: WindowState): typeof ExplorerAPI => ({
 		if (file.type === "image") {
 			return;
 		}
-		await saveFile(file.path, (file.body as string[][]).map((line) => line.slice(0, -1).join("")).join("\n"));
+
+		await saveFile(
+			file.path,
+			(file.body as string[][])
+				.map((line) => {
+					let str = line.slice(0, -1).join("");
+
+					while (str.endsWith(" ")) {
+						str = str.slice(0, -1);
+					}
+
+					return str;
+				})
+				.join("\n"),
+		);
 		state.window.setDocumentEdited(false);
 	},
 

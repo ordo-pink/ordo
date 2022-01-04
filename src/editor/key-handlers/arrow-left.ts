@@ -11,7 +11,10 @@ import {
 } from "./common";
 
 export const handleArrowLeft = (edited: EditorOrdoFile, keys: ChangeKeys): EditorOrdoFile => {
-	if (isFirstLine(edited) && isCaretAtLineStart(edited)) {
+	if (
+		isFirstLine(edited) &&
+		(isCaretAtLineStart(edited) || edited.selection.start.index < 0 || edited.selection.end.index < 0)
+	) {
 		return edited;
 	}
 

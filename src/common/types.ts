@@ -6,6 +6,8 @@ import { KeyboardShortcut } from "../keybindings/types";
 import { BrowserWindow } from "electron";
 import colors from "tailwindcss/colors";
 
+export type CurrentView = "editor" | "graph" | "settings";
+
 export type TextBody = string[][];
 
 export type EditorOrdoFile = OrdoFile & { body: TextBody; selection: ChangeSelection };
@@ -26,7 +28,7 @@ export type WindowState = {
 		readonly isMac: boolean;
 	};
 	appearance: {
-		currentView: "editor" | "graph" | "settings";
+		currentView: CurrentView;
 		showExplorer: boolean;
 		fontFamily: string;
 		tabSize: number;

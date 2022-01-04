@@ -145,7 +145,7 @@ const createWindow = () => {
 			},
 		},
 		[KeybindableAction.EXPLORER]: {
-			label: "Explorer",
+			label: "Editor",
 			accelerator: "CommandOrControl+Shift+E",
 			action: (state) => {
 				state.appearance.currentView = "editor";
@@ -194,6 +194,11 @@ const createWindow = () => {
 			accelerator: "CommandOrControl+V",
 			action: () => null,
 		},
+		[KeybindableAction.UNDO]: {
+			label: "Undo",
+			accelerator: "CommandOrControl+Z",
+			action: () => null,
+		},
 		[KeybindableAction.REDO]: {
 			label: "Redo",
 			accelerator: "CommandOrControl+Shift+Z",
@@ -235,7 +240,7 @@ const createWindow = () => {
 
 				currentTab.selection.start.index = 0;
 				currentTab.selection.start.line = 0;
-				currentTab.selection.end.index = currentTab.body.length;
+				currentTab.selection.end.index = currentTab.body[currentTab.body.length - 1].length - 1;
 				currentTab.selection.end.line = currentTab.body.length - 1;
 				currentTab.selection.direction = "ltr";
 
@@ -251,11 +256,6 @@ const createWindow = () => {
 			label: "Toggle Dev Tools",
 			accelerator: "CommandOrControl+Shift+I",
 			action: () => activeWindow().webContents.toggleDevTools(),
-		},
-		[KeybindableAction.UNDO]: {
-			label: "Undo",
-			accelerator: "CommandOrControl+Z",
-			action: () => null,
 		},
 	};
 

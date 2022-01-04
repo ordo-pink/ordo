@@ -1,4 +1,4 @@
-import type { EditorOrdoFile, WindowState } from "../common/types";
+import type { CurrentView, EditorOrdoFile, WindowState } from "../common/types";
 
 import { createAsyncThunk, createSlice, configureStore, PayloadAction } from "@reduxjs/toolkit";
 import { OrdoFolder } from "../explorer/types";
@@ -35,6 +35,7 @@ export type State = {
 
 	showExplorer: boolean;
 
+	currentView: CurrentView;
 	editorSelected: boolean;
 	accentColor: keyof typeof colors;
 	fontFamily: string;
@@ -58,6 +59,8 @@ const initialState: State = {
 	fontFamily: "",
 	fontSize: 16,
 	tabSize: 2,
+
+	currentView: "editor",
 };
 
 const state = createSlice({
@@ -76,6 +79,7 @@ const state = createSlice({
 			}
 
 			if (action.payload.appearance) {
+				state.currentView = action.payload.appearance.currentView;
 				state.showExplorer = action.payload.appearance.showExplorer;
 				state.accentColor = action.payload.appearance.accentColor;
 				state.fontFamily = action.payload.appearance.fontFamily;
@@ -91,6 +95,9 @@ const state = createSlice({
 		},
 		setEditorSelection: (state, action: PayloadAction<boolean>) => {
 			state.editorSelected = action.payload;
+		},
+		setCurrentView: (state, action: PayloadAction<CurrentView>) => {
+			state.currentView = action.payload;
 		},
 	},
 });

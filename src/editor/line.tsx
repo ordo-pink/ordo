@@ -16,10 +16,10 @@ export const Line = React.memo<{
 	}
 
 	return (
-		<div className={`flex items-center ${isCurrentLine ? "bg-gray-200" : ""}`}>
+		<div className={`flex items-center ${isCurrentLine ? "bg-gray-200 dark:bg-gray-800 dark:bg-opacity-40" : ""}`}>
 			<div
 				className={` w-16 shrink-0 text-sm text-right pr-2 font-sans select-none cursor-default ${
-					isCurrentLine ? "texg-gray-500" : "text-gray-400"
+					isCurrentLine ? "text-gray-500 dark:text-gray-100" : "text-gray-400"
 				}`}
 				onMouseUp={mouseIgnoreHandler}
 				onMouseDown={mouseIgnoreHandler}
@@ -29,7 +29,7 @@ export const Line = React.memo<{
 			</div>
 			<div
 				data-index={`line-${lineIndex}`}
-				className="w-full cursor-text px-2 text-gray-800"
+				className="w-full cursor-text px-2 text-gray-800 dark:text-gray-200"
 				style={{ tabSize: "2rem" }}
 				onMouseDown={(e) => {
 					e.preventDefault();

@@ -59,8 +59,8 @@ const Tab: React.FC<{ tab: OrdoFile; index: number }> = ({ tab, index }) => {
 	return (
 		<div
 			key={tab.path}
-			className={`flex flex-shrink items-center space-x-2 cursor-pointer px-3 py-1 truncate ${
-				currentTab === index && "bg-gray-50"
+			className={`flex flex-shrink text-gray-800 dark:text-gray-300 items-center space-x-2 cursor-pointer px-3 py-1 rounded-lg truncate ${
+				currentTab === index && "bg-gray-100 dark:text-gray-800 shadow-md"
 			}`}
 			onClick={() => {
 				dispatch(openTab(index));
@@ -90,7 +90,7 @@ const Tabs: React.FC = () => {
 	const tabs = useAppSelector((state) => state.tabs);
 
 	return (
-		<div className="flex items-center bg-gray-300">
+		<div className="flex items-center p-2">
 			{tabs && tabs.map((tab, index) => <Tab key={tab.path} tab={tab} index={index} />)}
 		</div>
 	);
@@ -110,7 +110,7 @@ export const Editor: React.FC = () => {
 		);
 
 	return (
-		<div className="flex flex-col grow">
+		<div className="flex flex-col grow bg-gray-50 dark:bg-gray-700">
 			<Tabs />
 			<Scrollbars>
 				<Breadcrumbs />

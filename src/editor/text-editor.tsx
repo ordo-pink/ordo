@@ -103,7 +103,7 @@ export const TextEditor: React.FC = () => {
 		<div>
 			<div
 				ref={ref}
-				className="outline-none w-full pb-96 cursor-text font-mono tracking-wide"
+				className="outline-none w-full pb-96 cursor-text tracking-wide"
 				onMouseDown={(e) => {
 					e.preventDefault();
 

@@ -24,17 +24,16 @@ export const App: React.FC = () => {
 	});
 
 	return (
-		<div className="flex h-full select-none">
-			<div className="bg-gray-50 grow flex">
+		<div className="flex h-screen select-none bg-gray-50 dark:bg-gray-700">
+			<SideBar />
+			<div className="grow flex">
 				<Editor />
 
 				{showExplorer && (
-					<div className="break-normal bg-gray-100 border-l border-gray-300 pb-11">
+					<div className="break-normal pb-11 m-4 shadow-lg rounded-lg">
 						<Explorer />
 					</div>
 				)}
-
-				<SideBar />
 			</div>
 		</div>
 	);

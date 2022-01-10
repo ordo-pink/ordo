@@ -14,7 +14,7 @@ export const Explorer: React.FC = () => {
 			<>
 				<div
 					style={{ width: "300px" }}
-					className="flex items-center justify-between  fixed z-10 bg-gray-200 py-1 px-3 "
+					className="flex items-center justify-between  fixed z-10 bg-gray-200 py-1 px-3 rounded-t-lg"
 				>
 					<Header />
 				</div>

@@ -102,7 +102,7 @@ const state = createSlice({
 	},
 });
 
-export const { setState, setShowCreateFile, setShowCreateFolder, setEditorSelection } = state.actions;
+export const { setState, setShowCreateFile, setShowCreateFolder, setEditorSelection, setCurrentView } = state.actions;
 
 export const store = configureStore({
 	reducer: state.reducer,

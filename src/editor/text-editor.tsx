@@ -65,34 +65,37 @@ export const TextEditor: React.FC = () => {
 		);
 	};
 
-	const mouseUpHandler = (index: number, line: number) => {
-		if (mouseDownPosition && (mouseDownPosition.index !== index || mouseDownPosition.line !== line)) {
-			const isMouseDownBefore =
-				mouseDownPosition.line < line || (mouseDownPosition.line === line && mouseDownPosition.index < index);
-			const direction = isMouseDownBefore ? "ltr" : "rtl";
+	const mouseUpHandler = React.useCallback(
+		(index: number, line: number) => {
+			if (mouseDownPosition && (mouseDownPosition.index !== index || mouseDownPosition.line !== line)) {
+				const isMouseDownBefore =
+					mouseDownPosition.line < line || (mouseDownPosition.line === line && mouseDownPosition.index < index);
+				const direction = isMouseDownBefore ? "ltr" : "rtl";
 
-			dispatch(
-				editorOnKeyDown({
-					selection: isMouseDownBefore
-						? { start: mouseDownPosition, end: { line, index }, direction }
-						: { start: { line, index }, end: mouseDownPosition, direction },
-				}),
-			);
+				dispatch(
+					editorOnKeyDown({
+						selection: isMouseDownBefore
+							? { start: mouseDownPosition, end: { line, index }, direction }
+							: { start: { line, index }, end: mouseDownPosition, direction },
+					}),
+				);
 
-			return;
-		}
+				return;
+			}
 
-		dispatch(editorOnKeyDown({ selection: { start: { line, index }, end: { line, index }, direction: "ltr" } }));
-	};
+			dispatch(editorOnKeyDown({ selection: { start: { line, index }, end: { line, index }, direction: "ltr" } }));
+		},
+		[mouseDownPosition],
+	);
 
-	const mouseIgnoreHandler = (e: React.MouseEvent) => {
+	const mouseIgnoreHandler = React.useCallback((e: React.MouseEvent) => {
 		e.preventDefault();
 		e.stopPropagation();
-	};
+	}, []);
 
-	const mouseDownHandler = (index: number, line: number) => {
+	const mouseDownHandler = React.useCallback((index: number, line: number) => {
 		setMouseDownPosition({ line, index });
-	};
+	}, []);
 
 	const isCurrentLine = (index: number) =>
 		tabs[currentTab].selection.direction === "rtl"

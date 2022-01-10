@@ -100,8 +100,6 @@ export const Editor: React.FC = () => {
 	const tabs = useAppSelector((state) => state.tabs);
 	const currentTab = useAppSelector((state) => state.currentTab);
 
-	console.log(tabs);
-
 	const ViewComponent = Either.fromNullable(tabs)
 		.chain((t) => Either.fromNullable(t[currentTab] ? t[currentTab] : null))
 		.fold(

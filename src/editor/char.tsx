@@ -53,6 +53,12 @@ export const Char = React.memo<{
 		mouseDownHandler(charIndex, lineIndex);
 	};
 
+	const onMouseOver = (e: React.MouseEvent<HTMLSpanElement>) => {
+		if (e.buttons === 1) {
+			onMouseUp(e);
+		}
+	};
+
 	const isInSelection = checkIsInSelection(selection, charIndex, lineIndex);
 
 	let className = "";
@@ -85,11 +91,7 @@ export const Char = React.memo<{
 			id={`line-${lineIndex}-${charIndex}`}
 			onMouseUp={onMouseUp}
 			onMouseDown={onMouseDown}
-			onMouseOver={(e) => {
-				if (e.buttons === 1) {
-					onMouseUp(e);
-				}
-			}}
+			onMouseOver={onMouseOver}
 		>
 			{value}
 		</span>

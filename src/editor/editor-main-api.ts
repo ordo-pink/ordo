@@ -13,7 +13,7 @@ import { handleArrowRight } from "./key-handlers/arrow-right";
 import { handleArrowDown } from "./key-handlers/arrow-down";
 import { handleBackspace } from "./key-handlers/backspace";
 import { EditorOrdoFile, WindowState } from "../common/types";
-import { getFile } from "../explorer/folder/get-file";
+import { getFile } from "../explorer/fs/get-file";
 import { KeybindableAction } from "../keybindings/keybindable-action";
 import { dialog } from "electron";
 import { ExplorerMainAPI } from "../explorer/explorer-main-api";

@@ -1,17 +1,17 @@
 import { ExplorerAction, ExplorerAPI } from "./explorer-renderer-api";
-import { createFile } from "./folder/create-file";
-import { createFolder } from "./folder/create-folder";
-import { listFolder } from "./folder/list-folder";
-import { openFolder } from "./folder/open-folder";
-import { updateFolder } from "./folder/update-folder";
+import { createFile } from "./fs/create-file";
+import { createFolder } from "./fs/create-folder";
+import { listFolder } from "./fs/list-folder";
+import { openFolder } from "./fs/open-folder";
+import { updateFolder } from "./fs/update-folder";
 import { WindowState } from "../common/types";
 import { join } from "path";
 import { EditorMainAPI } from "../editor/editor-main-api";
 import { EditorAction } from "../editor/editor-renderer-api";
-import { getFolder } from "./folder/get-folder";
-import { getFile } from "./folder/get-file";
-import { getFolderOrParent } from "./folder/get-folder-or-parent";
-import { saveFile } from "./folder/save-file";
+import { getFolder } from "./fs/get-folder";
+import { getFile } from "./fs/get-file";
+import { getFolderOrParent } from "./fs/get-folder-or-parent";
+import { saveFile } from "./fs/save-file";
 import { toReduxState } from "../common/to-redux-state";
 
 export const ExplorerMainAPI = (state: WindowState): typeof ExplorerAPI => ({

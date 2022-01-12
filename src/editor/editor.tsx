@@ -90,7 +90,7 @@ const Tabs: React.FC = () => {
 	const tabs = useAppSelector((state) => state.tabs);
 
 	return (
-		<div className="flex items-center p-2">
+		<div className="flex items-center p-2 flex-wrap">
 			{tabs && tabs.map((tab, index) => <Tab key={tab.path} tab={tab} index={index} />)}
 		</div>
 	);

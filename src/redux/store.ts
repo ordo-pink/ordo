@@ -41,6 +41,8 @@ export type State = {
 	fontFamily: string;
 	fontSize: number;
 	tabSize: number;
+
+	statusBar: string[];
 };
 
 const initialState: State = {
@@ -61,6 +63,8 @@ const initialState: State = {
 	tabSize: 2,
 
 	currentView: "editor",
+
+	statusBar: [],
 };
 
 const state = createSlice({
@@ -71,11 +75,13 @@ const state = createSlice({
 			if (action.payload.explorer) {
 				state.explorerSelection = action.payload.explorer.selection;
 				state.explorerTree = action.payload.explorer.tree;
+				state.statusBar = action.payload.statusBar;
 			}
 
 			if (action.payload.editor) {
 				state.tabs = action.payload.editor.tabs;
 				state.currentTab = action.payload.editor.currentTab;
+				state.statusBar = action.payload.statusBar;
 			}
 
 			if (action.payload.appearance) {
@@ -85,6 +91,7 @@ const state = createSlice({
 				state.fontFamily = action.payload.appearance.fontFamily;
 				state.fontSize = action.payload.appearance.fontSize;
 				state.tabSize = action.payload.appearance.tabSize;
+				state.statusBar = action.payload.statusBar;
 			}
 		},
 		setShowCreateFile: (state, action: PayloadAction<boolean>) => {

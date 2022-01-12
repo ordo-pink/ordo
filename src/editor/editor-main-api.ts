@@ -40,6 +40,18 @@ const createAccelerator = (keys: ChangeKeys): string => {
 	return combo;
 };
 
+const setStatusBarSelectionText = (state: WindowState) => {
+	const currentTab = state.editor.tabs[state.editor.currentTab];
+
+	if (!currentTab || currentTab.type === "image") {
+		return state;
+	}
+
+	state.statusBar = [`Ln ${currentTab.selection.start.line}, Col ${currentTab.selection.start.index}`];
+
+	return state;
+};
+
 const getKeybindableAction = (keys: ChangeKeys, state: WindowState) => {
 	const accelerator = createAccelerator(keys);
 
@@ -58,6 +70,8 @@ export const EditorMainAPI = (state: WindowState): typeof EditorAPI => ({
 			state.editor.currentTab = tabIndex;
 
 			EditorMainAPI(state)[EditorAction.OPEN_TAB](tabIndex);
+
+			setStatusBarSelectionText(state);
 
 			return;
 		}
@@ -98,6 +112,10 @@ export const EditorMainAPI = (state: WindowState): typeof EditorAPI => ({
 			state.window.setTitle(
 				`${state.editor.tabs[state.editor.currentTab].relativePath} - ${state.explorer.tree.readableName}`,
 			);
+
+			setStatusBarSelectionText(state);
+			console.log(state.statusBar);
+
 			state.window.webContents.send("SetState", toReduxState(state));
 		});
 	},
@@ -132,6 +150,8 @@ export const EditorMainAPI = (state: WindowState): typeof EditorAPI => ({
 
 		state.editor.tabs[state.editor.currentTab] = handle(tab, change.keys);
 
+		setStatusBarSelectionText(state);
+
 		state.window.setDocumentEdited(true);
 		state.window.webContents.send("SetState", toReduxState(state));
 	},
@@ -148,6 +168,8 @@ export const EditorMainAPI = (state: WindowState): typeof EditorAPI => ({
 		state.window.setTitle(
 			`${state.editor.tabs[state.editor.currentTab].relativePath} - ${state.explorer.tree.readableName}`,
 		);
+
+		setStatusBarSelectionText(state);
 
 		state.window.webContents.send("SetState", toReduxState(state));
 	},
@@ -197,6 +219,8 @@ export const EditorMainAPI = (state: WindowState): typeof EditorAPI => ({
 			state.window.setRepresentedFilename(state.explorer.tree.path);
 			state.window.setTitle(`${state.explorer.tree.readableName}`);
 		}
+
+		setStatusBarSelectionText(state);
 
 		state.window.webContents.send("SetState", toReduxState(state));
 	},

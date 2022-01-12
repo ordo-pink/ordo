@@ -17,7 +17,7 @@ const EditorView: React.FC = () => {
 			<Editor />
 
 			{showExplorer && (
-				<div className="break-normal pb-11 m-4 shadow-lg rounded-lg">
+				<div className="break-normal pb-8 m-4 mb-10 shadow-lg rounded-lg">
 					<Explorer />
 				</div>
 			)}
@@ -32,6 +32,7 @@ const SettingsView: React.FC = () => <h1>Here will be settings soon!</h1>;
 export const App: React.FC = () => {
 	const dispatch = useAppDispatch();
 
+	const statusBar = useAppSelector((state) => state.statusBar) || [];
 	const currentView = useAppSelector((state) => state.currentView);
 
 	const onStateUpdate = ({ detail }: { detail: Partial<State> }) => {
@@ -55,6 +56,11 @@ export const App: React.FC = () => {
 			<SideBar />
 			<div className="flex grow">
 				<Component />
+			</div>
+			<div className="fixed right-2 bottom-2 text-sm text-gray-500">
+				{statusBar.map((status) => (
+					<div>{status}</div>
+				))}
 			</div>
 		</div>
 	);

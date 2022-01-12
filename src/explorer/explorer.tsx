@@ -19,7 +19,7 @@ export const Explorer: React.FC = () => {
 					<Header />
 				</div>
 				<Scrollbars style={{ width: "300px" }} className="relative mt-8">
-					<div className="mb-16">
+					<div className="mb-4">
 						{!tree.collapsed &&
 							tree.children.map((child) => (
 								<div className="cursor-pointer" key={child.path}>

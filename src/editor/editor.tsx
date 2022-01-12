@@ -110,10 +110,15 @@ export const Editor: React.FC = () => {
 	return (
 		<div className="flex flex-col grow bg-gray-50 dark:bg-gray-700">
 			<Tabs />
-			<Scrollbars>
+			<div className="mb-10 h-full">
+				<Scrollbars>
+					<ViewComponent />
+				</Scrollbars>
+			</div>
+
+			<div className="fixed bottom-0 left-0 right-96 w-full text-sm text-gray-500">
 				<Breadcrumbs />
-				<ViewComponent />
-			</Scrollbars>
+			</div>
 		</div>
 	);
 };

@@ -27,6 +27,7 @@ export type WindowState = {
 	constants: {
 		readonly isMac: boolean;
 	};
+	statusBar: string[];
 	appearance: {
 		currentView: CurrentView;
 		showExplorer: boolean;

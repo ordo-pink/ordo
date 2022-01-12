@@ -87,6 +87,7 @@ const createWindow = () => {
 		constants: {
 			isMac: IS_MAC,
 		},
+		statusBar: [],
 		appearance: {
 			currentView: "editor",
 			fontFamily: settings.get("editor.font"),

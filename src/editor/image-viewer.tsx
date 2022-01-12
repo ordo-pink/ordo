@@ -11,7 +11,7 @@ export const ImageViewer: React.FC = () => {
 
 	return (
 		<div className="flex items-center justify-center p-24">
-			<img className="shadow-2xl" src={tabs[currentTab].body.join("")} />
+			<img className="shadow-2xl" src={tabs[currentTab].body as unknown as string} />
 		</div>
 	);
 };

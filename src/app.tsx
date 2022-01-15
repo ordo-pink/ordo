@@ -9,25 +9,19 @@ import { Workspace } from "./containers/workspace/component"
 
 export const App: React.FC = () => {
 	return (
-		<div className="flex flex-col h-screen">
+		<div className="flex flex-col h-screen bg-gray-50">
 			<main className="flex flex-grow">
-				<div className="bg-gray-100">
+				<div>
 					<ActivityBar />
 				</div>
-				<Split
-					sizes={[75, 25]}
-					minSize={0}
-					snapOffset={50}
-					gutterAlign="start"
-					className="flex bg-gray-50 select-none w-full"
-				>
+				<Split sizes={[75, 25]} minSize={0} snapOffset={50} gutterAlign="start" className="flex select-none w-full">
 					<div className="w-full">
 						<Workspace />
 					</div>
 
 					<div>
 						<div className="p-2 h-full">
-							<div className="shadow-lg rounded-lg h-full p-2">
+							<div className="shadow-lg rounded-lg h-full p-2 bg-gray-100">
 								<Sidebar />
 							</div>
 						</div>

@@ -1,17 +1,13 @@
 import React from "react"
-import { NotificationCenter } from "../../components/notification-center/component"
-import { ShareMenu } from "../../components/share/component"
+import { HiOutlineBell, HiOutlineShare } from "react-icons/hi"
+import { StatusBarItem } from "./status-bar-item"
 
 export const StatusBar: React.FC = () => (
-	<div className="flex items-center justify-between px-4">
+	<div className="flex items-center justify-between">
 		<div></div>
 		<div className="flex">
-			<div className="px-4 py-1 hover:bg-gray-200 cursor-pointer">
-				<ShareMenu />
-			</div>
-			<div className="px-4 py-1 hover:bg-gray-200 cursor-pointer">
-				<NotificationCenter />
-			</div>
+			<StatusBarItem icon={HiOutlineShare} text="Notification" show={true} description="Leave Feedback" />
+			<StatusBarItem icon={HiOutlineBell} show={true} description="Notifications" />
 		</div>
 	</div>
 )

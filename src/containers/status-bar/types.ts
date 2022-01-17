@@ -10,5 +10,5 @@ export type StatusBarItemProps = {
 	icon?: React.FC | string
 	text?: string
 	description?: string
-	onClick?: (x: unknown) => void | Promise<void>
+	onClick?: (e: React.MouseEvent<HTMLDivElement>) => void | Promise<void>
 }

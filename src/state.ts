@@ -15,7 +15,6 @@ import {
 } from "electron"
 import { ActivityBarState } from "./containers/activity-bar/types"
 import { CommanderState } from "./containers/commander/types"
-import { NotificationCenterState } from "./containers/notification-center/types"
 import { PanelState } from "./containers/panel/types"
 import { SidebarState } from "./containers/sidebar/types"
 import { StatusBarState } from "./containers/status-bar/types"
@@ -46,6 +45,5 @@ export type WindowState = {
 		statusBar: StatusBarState
 		suggestions: SuggestionsState
 		workspace: WorkspaceState
-		notificationCenter: NotificationCenterState
 	}
 }

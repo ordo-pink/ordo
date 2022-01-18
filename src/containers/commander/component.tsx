@@ -6,7 +6,7 @@ const Command: React.FC<Command> = ({ icon, name, description }) => {
 	const Icon = icon ? getSupportedIcon(icon) : () => null
 
 	return (
-		<div className="text-sm hover:bg-gray-200 p-2 last-of-type:rounded-b-lg cursor-pointer">
+		<div className="text-sm hover:bg-gray-200 p-2 last-of-type:rounded-b-lg cursor-pointer select-none">
 			<div className="flex items-center space-x-2">
 				<Icon className="text-gray-500" />
 				<div className="text-gray-700">{name}</div>

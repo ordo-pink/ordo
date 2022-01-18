@@ -51,6 +51,7 @@ export const App: React.FC = () => {
 					minSize={0}
 					snapOffset={100}
 					className="flex select-none w-full"
+					onDragEnd={(sizes) => window.ordo.emit("@sidebar/set-width", sizes[1])}
 				>
 					<div className="w-full">
 						<Workspace />

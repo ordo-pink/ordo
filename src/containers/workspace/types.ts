@@ -1,4 +1,11 @@
+import { OrdoEvent } from "../../common/types"
+
+export type WORKSPACE_SCOPE = "workspace"
+
+export type WorkspaceEvent =
+	| OrdoEvent<WORKSPACE_SCOPE, "get-state">
+	| OrdoEvent<WORKSPACE_SCOPE, "set-component", string>
+
 export type WorkspaceState = {
-	show: boolean
 	component: string
 }

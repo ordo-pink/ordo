@@ -12,6 +12,7 @@ import commander from "./containers/commander/initial-state"
 import activities from "./containers/activity-bar/initial-state"
 import sidebar from "./containers/sidebar/initial-state"
 import suggestions from "./containers/suggestions/initial-state"
+import workspace from "./containers/workspace/initial-state"
 
 export const App: React.FC = () => {
 	const [state, setState] = useImmer({
@@ -19,6 +20,7 @@ export const App: React.FC = () => {
 		commander,
 		sidebar,
 		suggestions,
+		workspace,
 	})
 
 	const handlePatchState = ({ detail }: CustomEvent<Patch[]>) => {

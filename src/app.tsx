@@ -39,18 +39,14 @@ export const App: React.FC = () => {
 				</div>
 			) : null}
 			<main className="flex flex-grow">
-				<div className="p-2">
-					<ActivityBar
-						show={state.activities.show}
-						topItems={state.activities.topItems}
-						bottomItems={state.activities.bottomItems}
-					/>
-				</div>
+				<ActivityBar
+					show={state.activities.show}
+					topItems={state.activities.topItems}
+					bottomItems={state.activities.bottomItems}
+				/>
 				<Split sizes={[75, 25]} minSize={0} snapOffset={100} className="flex select-none w-full">
-					<div className="p-2 w-full">
-						<div>
-							<Workspace />
-						</div>
+					<div className="w-full">
+						<Workspace />
 					</div>
 
 					<div>

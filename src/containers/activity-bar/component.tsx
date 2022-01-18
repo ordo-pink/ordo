@@ -22,7 +22,7 @@ export const ActivityBar: React.FC<ActivityBarState> = ({ show, topItems, bottom
 	Either.fromBoolean(show).fold(
 		() => null,
 		() => (
-			<div className="text-3xl text-gray-600 flex flex-col justify-between h-full">
+			<div className="text-3xl text-gray-600 flex flex-col justify-between h-full p-2">
 				<div className="flex flex-col space-y-2">
 					{topItems.map((item) => (
 						<Activity key={item.name} name={item.name} show={item.show} icon={item.icon} />

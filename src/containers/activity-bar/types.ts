@@ -1,5 +1,3 @@
-import React from "react"
-
 export type ActivityBarState = {
 	show: boolean
 	items: ActivityBarItem[]
@@ -7,12 +5,7 @@ export type ActivityBarState = {
 
 export type ActivityBarItem = {
 	show: boolean
-	icon?: React.FC
+	icon?: string
 	text?: string
 	description?: string
-	commands?: null
-	panels?: null
-	workspaces?: null
-	sidebars?: null
-	suggestions?: null
 }

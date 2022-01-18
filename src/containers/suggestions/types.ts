@@ -6,5 +6,5 @@ export type Suggestion = {
 export type SuggestionsState = {
 	enable: boolean
 	show: boolean
-	suggestions: Suggestion[]
+	items: Suggestion[]
 }

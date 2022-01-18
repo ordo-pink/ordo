@@ -1,13 +1,10 @@
-import React from "react"
-import { WindowState } from "../../state"
-
 export type Command = {
-	icon?: React.FC
+	icon?: string
 	text: string
-	action: (state: WindowState) => void
+	id: string
 }
 
 export type CommanderState = {
 	show: boolean
-	commands: Command[]
+	items: Command[]
 }

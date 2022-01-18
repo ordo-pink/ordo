@@ -5,9 +5,9 @@ export type COMMANDER_SCOPE = "commander"
 
 export type CommanderEvent =
 	| OrdoEvent<COMMANDER_SCOPE, "get-state">
-	| OrdoEvent<COMMANDER_SCOPE, "get-show">
-	| OrdoEvent<COMMANDER_SCOPE, "get-hide">
-	| OrdoEvent<COMMANDER_SCOPE, "get-toggle">
+	| OrdoEvent<COMMANDER_SCOPE, "toggle">
+	| OrdoEvent<COMMANDER_SCOPE, "show">
+	| OrdoEvent<COMMANDER_SCOPE, "hide">
 	| OrdoEvent<COMMANDER_SCOPE, "get-items", string | void>
 	| OrdoEvent<COMMANDER_SCOPE, "run", string>
 

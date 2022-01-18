@@ -1,10 +1,17 @@
+import { OrdoEvent } from "../../common/types"
+
+export type SIDEBAR_SCOPE = "sidebar"
+
+export type CommanderEvent =
+	| OrdoEvent<SIDEBAR_SCOPE, "get-state">
+	| OrdoEvent<SIDEBAR_SCOPE, "set-width", number>
+	| OrdoEvent<SIDEBAR_SCOPE, "get-component", string>
+	| OrdoEvent<SIDEBAR_SCOPE, "toggle">
+	| OrdoEvent<SIDEBAR_SCOPE, "show">
+	| OrdoEvent<SIDEBAR_SCOPE, "hide">
+
 export type SidebarState = {
 	show: boolean
 	width: number
 	component: string
-}
-
-export type SidebarWindow = {
-	get: () => Promise<SidebarState>
-	toggle: () => Promise<void>
 }

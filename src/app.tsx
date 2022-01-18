@@ -10,11 +10,13 @@ import { Workspace } from "./containers/workspace/component"
 
 import commander from "./containers/commander/initial-state"
 import activities from "./containers/activity-bar/initial-state"
+import sidebar from "./containers/sidebar/initial-state"
 
 export const App: React.FC = () => {
 	const [state, setState] = useImmer({
 		activities,
 		commander,
+		sidebar,
 	})
 
 	const handlePatchState = ({ detail }: CustomEvent<Patch[]>) => {
@@ -44,7 +46,12 @@ export const App: React.FC = () => {
 					topItems={state.activities.topItems}
 					bottomItems={state.activities.bottomItems}
 				/>
-				<Split sizes={[75, 25]} minSize={0} snapOffset={100} className="flex select-none w-full">
+				<Split
+					sizes={[100 - state.sidebar.width, state.sidebar.width]}
+					minSize={0}
+					snapOffset={100}
+					className="flex select-none w-full"
+				>
 					<div className="w-full">
 						<Workspace />
 					</div>
@@ -52,7 +59,7 @@ export const App: React.FC = () => {
 					<div>
 						<div className="p-2 h-full">
 							<div className="shadow-lg rounded-lg h-full p-2 bg-gray-100">
-								<Sidebar />
+								<Sidebar show={state.sidebar.show} width={state.sidebar.width} component={state.sidebar.component} />
 							</div>
 						</div>
 					</div>

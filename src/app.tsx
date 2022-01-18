@@ -1,36 +1,56 @@
 import React from "react"
 import Split from "react-split"
+import { useImmer } from "use-immer"
+import { applyPatches, Patch } from "immer"
 
 import { ActivityBar } from "./containers/activity-bar/component"
 import { Commander } from "./containers/commander/component"
 import { Sidebar } from "./containers/sidebar/component"
 import { Workspace } from "./containers/workspace/component"
 
+import commander from "./containers/commander/initial-state"
+import activities from "./containers/activity-bar/initial-state"
+
 export const App: React.FC = () => {
+	const [state, setState] = useImmer({
+		activities,
+		commander,
+	})
+
+	const handlePatchState = ({ detail }: CustomEvent<Patch[]>) => {
+		setState(applyPatches(state, detail))
+	}
+
+	React.useEffect(() => {
+		window.addEventListener("patch-state", handlePatchState as (e: Event) => void)
+
+		return () => {
+			window.removeEventListener("patch-state", handlePatchState as (e: Event) => void)
+		}
+	})
+
 	return (
 		<div className="flex flex-col h-screen bg-gray-50">
-			<div className="fixed w-full flex justify-center">
-				<div className="mt-10 w-[50%] px-4 py-1 bg-white shadow-sm rounded-lg">
-					<Commander />
+			{state.commander.show ? (
+				<div className="fixed w-full flex justify-center">
+					<div className="mt-10 w-[50%] bg-white rounded-lg shadow-xl">
+						<Commander show={state.commander.show} items={state.commander.items} />
+					</div>
 				</div>
-			</div>
+			) : null}
 			<main className="flex flex-grow">
 				<div className="p-2">
-					<ActivityBar />
+					<ActivityBar
+						show={state.activities.show}
+						topItems={state.activities.topItems}
+						bottomItems={state.activities.bottomItems}
+					/>
 				</div>
 				<Split sizes={[75, 25]} minSize={0} snapOffset={100} className="flex select-none w-full">
 					<div className="p-2 w-full">
-						<Split
-							sizes={[70, 30]}
-							minSize={0}
-							snapOffset={100}
-							className="flex flex-col select-none h-full"
-							direction="vertical"
-						>
-							<div>
-								<Workspace />
-							</div>
-						</Split>
+						<div>
+							<Workspace />
+						</div>
 					</div>
 
 					<div>

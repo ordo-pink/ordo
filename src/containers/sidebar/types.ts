@@ -3,3 +3,8 @@ export type SidebarState = {
 	width: number
 	component: string
 }
+
+export type SidebarWindow = {
+	get: () => Promise<SidebarState>
+	toggle: () => Promise<void>
+}

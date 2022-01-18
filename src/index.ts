@@ -25,8 +25,6 @@ const createWindow = (): void => {
 
 	// Open the DevTools.
 	mainWindow.webContents.openDevTools()
-
-	mainWindow.webContents.on("before-input-event", (e, i) => console.log(i))
 }
 
 app.on("ready", async () => {

@@ -4,7 +4,6 @@ import Split from "react-split"
 import { ActivityBar } from "./containers/activity-bar/component"
 import { Commander } from "./containers/commander/component"
 import { Sidebar } from "./containers/sidebar/component"
-import { StatusBar } from "./containers/status-bar/component"
 import { Workspace } from "./containers/workspace/component"
 
 export const App: React.FC = () => {
@@ -19,9 +18,19 @@ export const App: React.FC = () => {
 				<div className="p-2">
 					<ActivityBar />
 				</div>
-				<Split sizes={[75, 25]} minSize={0} snapOffset={100} gutterAlign="start" className="flex select-none w-full">
+				<Split sizes={[75, 25]} minSize={0} snapOffset={100} className="flex select-none w-full">
 					<div className="p-2 w-full">
-						<Workspace />
+						<Split
+							sizes={[70, 30]}
+							minSize={0}
+							snapOffset={100}
+							className="flex flex-col select-none h-full"
+							direction="vertical"
+						>
+							<div>
+								<Workspace />
+							</div>
+						</Split>
 					</div>
 
 					<div>
@@ -33,11 +42,6 @@ export const App: React.FC = () => {
 					</div>
 				</Split>
 			</main>
-			<footer className="flex text-sm items-center text-gray-600">
-				<div className="flex-grow">
-					<StatusBar />
-				</div>
-			</footer>
 		</div>
 	)
 }

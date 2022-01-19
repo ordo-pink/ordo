@@ -14,7 +14,7 @@ interface IEitherStatic extends IES {
 
 export const Either: IEitherStatic = {
 	...E,
-	fromNullable: toEither(<T>(x: T) => x != null, null) as any,
+	fromNullable: toEither(<T>(x: T) => x != null, null) as <T>(x: T) => IEither<NonNullable<T>, null>,
 	fromEmptyArray: toEither(<T extends unknown[]>(x: T) => x.length > 0, [] as never[]),
-	fromBoolean: toEither((x: boolean) => x === true, false) as any,
+	fromBoolean: toEither((x: boolean) => x === true, false) as (x: boolean) => IEither<true, false>,
 }

@@ -1,6 +1,6 @@
 import { app, BrowserWindow, ipcMain } from "electron"
-import installExtension, { REACT_DEVELOPER_TOOLS, REDUX_DEVTOOLS } from "electron-devtools-installer"
-import { produce, enablePatches, applyPatches, Patch } from "immer"
+import installExtension, { REACT_DEVELOPER_TOOLS } from "electron-devtools-installer"
+import { enablePatches } from "immer"
 import { WindowContext, WindowState } from "./common/types"
 
 import activityBarIpcMainHandlers from "./containers/activity-bar/main-handlers"
@@ -22,7 +22,6 @@ if (require("electron-squirrel-startup")) {
 enablePatches()
 
 const createWindow = (): void => {
-	// Create the browser window.
 	const window = new BrowserWindow({
 		webPreferences: {
 			sandbox: true,
@@ -49,7 +48,6 @@ const createWindow = (): void => {
 
 	activityBarHandlers.register(state, context)
 
-	// and load the index.html of the app.
 	window.loadURL(MAIN_WINDOW_WEBPACK_ENTRY)
 
 	window.on("close", () => {
@@ -60,7 +58,7 @@ const createWindow = (): void => {
 app.on("ready", async () => {
 	if (process.argv.includes("--debug")) {
 		console.log("Debug mode on 🙌")
-		await installExtension([REACT_DEVELOPER_TOOLS, REDUX_DEVTOOLS])
+		await installExtension([REACT_DEVELOPER_TOOLS])
 	}
 
 	createWindow()

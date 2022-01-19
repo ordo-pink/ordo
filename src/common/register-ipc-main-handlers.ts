@@ -17,7 +17,7 @@ export const registerIpcMainHandlers =
 				ipcMain.handle(event, async (_, arg) => {
 					state = await produce(
 						state,
-						async (draft) => (handlers as unknown as Record<string, any>)[event](draft, arg),
+						async (draft) => (handlers as unknown as Record<string, EventHandler<T>>)[event](draft, arg),
 						(patches) => {
 							context.window.webContents.send("apply-state-patches", patches)
 						},

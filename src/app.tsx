@@ -70,7 +70,7 @@ export const App: React.FC = () => {
 					<div>
 						<div className="p-2 h-full">
 							<div className="shadow-lg rounded-lg h-full p-2 bg-gray-100">
-								<Sidebar show={state.sidebar.show} width={state.sidebar.width} component={state.sidebar.component} />
+								<Sidebar width={state.sidebar.width} component={state.sidebar.component} />
 							</div>
 						</div>
 					</div>

@@ -16,7 +16,6 @@ export type SidebarEvent =
 	| SetComponentSidebarEvent
 
 export type SidebarState = {
-	show: boolean
 	width: number
 	component: string
 }

@@ -62,7 +62,7 @@ export const App: React.FC = () => {
 					onDragEnd={(sizes) => window.ordo.emit("@sidebar/set-width", sizes[1])}
 				>
 					<div className="w-full">
-						<Workspace />
+						<Workspace component={state.workspace.component} />
 					</div>
 
 					<div>

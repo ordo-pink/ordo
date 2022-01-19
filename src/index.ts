@@ -14,10 +14,11 @@ import applicationIpcMainHandlers from "./application/main-handlers"
 import activityBarIpcMainHandlers from "./containers/activity-bar/main-handlers"
 import commanderIpcMainHandlers from "./containers/commander/main-handlers"
 import sidebarIpcMainHandlers from "./containers/sidebar/main-handlers"
+import workspaceIpcMainHandlers from "./containers/workspace/main-handlers"
 
 import registerApplicationCommands from "./application/commands"
 import registerActivityBarCommands from "./containers/activity-bar/commands"
-import registerSidbarCommands from "./containers/sidebar/commands"
+import registerSidebarCommands from "./containers/sidebar/commands"
 
 declare const MAIN_WINDOW_WEBPACK_ENTRY: string
 declare const MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY: string
@@ -55,17 +56,19 @@ const createWindow = (): void => {
 
 	state = registerActivityBarCommands(state)
 	state = registerApplicationCommands(state)
-	state = registerSidbarCommands(state)
+	state = registerSidebarCommands(state)
 
 	const applicationHandlers = applicationIpcMainHandlers(ipcMain)
 	const activityBarHandlers = activityBarIpcMainHandlers(ipcMain)
 	const commanderHandlers = commanderIpcMainHandlers(ipcMain)
 	const sidebarHandlers = sidebarIpcMainHandlers(ipcMain)
+	const workspaceHandlers = workspaceIpcMainHandlers(ipcMain)
 
 	activityBarHandlers.register(state, context)
 	applicationHandlers.register(state, context)
 	commanderHandlers.register(state, context)
 	sidebarHandlers.register(state, context)
+	workspaceHandlers.register(state, context)
 
 	window.loadURL(MAIN_WINDOW_WEBPACK_ENTRY)
 
@@ -74,6 +77,7 @@ const createWindow = (): void => {
 		applicationHandlers.unregister()
 		commanderHandlers.unregister()
 		sidebarHandlers.unregister()
+		workspaceHandlers.unregister()
 	})
 }
 

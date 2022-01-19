@@ -28,9 +28,9 @@ export const Commander: React.FC<CommanderState> = (state) => {
 	const [filter, setFilter] = React.useState("")
 
 	return (
-		<div className="space-y-2">
+		<div>
 			<input
-				className="w-full outline-none p-2"
+				className="w-full outline-none p-2 rounded-lg"
 				placeholder="What is that you truely desire?"
 				autoFocus={state.show}
 				type="text"
@@ -40,8 +40,7 @@ export const Commander: React.FC<CommanderState> = (state) => {
 					window.ordo.emit("@commander/get-items", e.target.value)
 				}}
 			/>
-			<hr />
-			<div>
+			<div className="rounded-b-lg">
 				{state.items.map((item) => (
 					<Command
 						key={item.name}

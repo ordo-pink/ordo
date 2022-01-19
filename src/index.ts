@@ -7,7 +7,6 @@ import application from "./application/initial-state"
 import activities from "./containers/activity-bar/initial-state"
 import commander from "./containers/commander/initial-state"
 import sidebar from "./containers/sidebar/initial-state"
-import suggestions from "./containers/suggestions/initial-state"
 import workspace from "./containers/workspace/initial-state"
 
 import applicationIpcMainHandlers from "./application/main-handlers"
@@ -49,7 +48,6 @@ const createWindow = (): void => {
 		activities,
 		commander,
 		sidebar,
-		suggestions,
 		workspace,
 		components: {},
 	}

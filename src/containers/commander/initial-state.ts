@@ -1,7 +1,7 @@
 import { CommanderState } from "./types"
 
 const initialState: CommanderState = {
-	show: false,
+	show: true,
 	items: [],
 }
 

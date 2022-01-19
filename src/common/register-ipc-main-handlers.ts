@@ -7,7 +7,11 @@ export type IpcMainHandlerInterface = {
 	unregister: () => void
 }
 
-export type EventHandler<T extends OrdoEvents> = (state: Draft<WindowState>, arg: T[1]) => void | Promise<void>
+export type EventHandler<T extends OrdoEvents> = (
+	state: Draft<WindowState>,
+	arg: T[1],
+	context: WindowContext,
+) => void | Promise<void>
 
 export const registerIpcMainHandlers =
 	<T extends OrdoEvents>(handlers: Record<T[0], EventHandler<T>>) =>
@@ -17,7 +21,7 @@ export const registerIpcMainHandlers =
 				ipcMain.handle(event, async (_, arg) => {
 					state = await produce(
 						state,
-						async (draft) => (handlers as unknown as Record<string, EventHandler<T>>)[event](draft, arg),
+						async (draft) => (handlers as unknown as Record<string, EventHandler<T>>)[event](draft, arg, context),
 						(patches) => {
 							context.window.webContents.send("apply-state-patches", patches)
 						},

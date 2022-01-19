@@ -23,8 +23,11 @@ export const App: React.FC = () => {
 		workspace,
 	})
 
+	React.useEffect(() => {
+		window.ordo.emit("@application/get-state")
+	}, [])
+
 	const handlePatchState = ({ detail }: CustomEvent<Patch[]>) => {
-		console.log(detail)
 		setState(applyPatches(state, detail))
 	}
 

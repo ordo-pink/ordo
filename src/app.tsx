@@ -28,6 +28,7 @@ export const App: React.FC = () => {
 	}, [])
 
 	const handlePatchState = ({ detail }: CustomEvent<Patch[]>) => {
+		console.log(detail)
 		setState(applyPatches(state, detail))
 	}
 

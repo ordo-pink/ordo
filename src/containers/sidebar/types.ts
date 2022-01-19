@@ -2,12 +2,18 @@ import { OrdoEvent } from "../../common/types"
 
 export type SIDEBAR_SCOPE = "sidebar"
 
+export type ShowSidebarEvent = OrdoEvent<SIDEBAR_SCOPE, "show">
+export type HideSidebarEvent = OrdoEvent<SIDEBAR_SCOPE, "hide">
+export type ToggleSidebarEvent = OrdoEvent<SIDEBAR_SCOPE, "toggle">
+export type SetWidthSidebarEvent = OrdoEvent<SIDEBAR_SCOPE, "set-width", number>
+export type SetComponentSidebarEvent = OrdoEvent<SIDEBAR_SCOPE, "set-component", string>
+
 export type SidebarEvent =
-	| OrdoEvent<SIDEBAR_SCOPE, "set-width", number>
-	| OrdoEvent<SIDEBAR_SCOPE, "set-component", string>
-	| OrdoEvent<SIDEBAR_SCOPE, "toggle">
-	| OrdoEvent<SIDEBAR_SCOPE, "show">
-	| OrdoEvent<SIDEBAR_SCOPE, "hide">
+	| ShowSidebarEvent
+	| HideSidebarEvent
+	| ToggleSidebarEvent
+	| SetWidthSidebarEvent
+	| SetComponentSidebarEvent
 
 export type SidebarState = {
 	show: boolean

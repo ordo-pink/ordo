@@ -7,5 +7,4 @@ export default registerIpcMainHandlers<CommanderEvent>({
 	"@commander/show": (draft) => void (draft.commander.show = true),
 	"@commander/hide": (draft) => void (draft.activities.show = false),
 	"@commander/toggle": (draft) => void (draft.commander.show = !draft.commander.show),
-	"@commander/run": (draft, name) => void (draft.activities.current = name),
 })

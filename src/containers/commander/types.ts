@@ -3,16 +3,15 @@ import { OrdoEvent, OrdoEvents } from "../../common/types"
 
 export type COMMANDER_SCOPE = "commander"
 
-export type CommanderEvent =
-	| OrdoEvent<COMMANDER_SCOPE, "toggle">
-	| OrdoEvent<COMMANDER_SCOPE, "show">
-	| OrdoEvent<COMMANDER_SCOPE, "hide">
-	| OrdoEvent<COMMANDER_SCOPE, "get-items", string | void>
-	| OrdoEvent<COMMANDER_SCOPE, "run", string>
+export type ShowCommanderEvent = OrdoEvent<COMMANDER_SCOPE, "show">
+export type HideCommanderEvent = OrdoEvent<COMMANDER_SCOPE, "hide">
+export type ToggleCommanderEvent = OrdoEvent<COMMANDER_SCOPE, "toggle">
+export type SelectCommanderEvent = OrdoEvent<COMMANDER_SCOPE, "get-items", string>
+
+export type CommanderEvent = ShowCommanderEvent | HideCommanderEvent | ToggleCommanderEvent | SelectCommanderEvent
 
 export type Command<T extends OrdoEvents = OrdoEvents> = {
 	icon?: SupportedIcon
-	show?: boolean
 	name: string
 	description: string
 	event: T

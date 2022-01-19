@@ -28,10 +28,10 @@ export const App: React.FC = () => {
 	}
 
 	React.useEffect(() => {
-		window.addEventListener("patch-state", handlePatchState as (e: Event) => void)
+		window.addEventListener("apply-state-patches", handlePatchState as (e: Event) => void)
 
 		return () => {
-			window.removeEventListener("patch-state", handlePatchState as (e: Event) => void)
+			window.removeEventListener("apply-state-patches", handlePatchState as (e: Event) => void)
 		}
 	})
 

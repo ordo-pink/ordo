@@ -1,4 +1,4 @@
-import type { OrdoEvents } from "./types"
+import type { OrdoEvents } from "./common/types"
 
 declare global {
 	interface Window {

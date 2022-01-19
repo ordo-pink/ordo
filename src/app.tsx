@@ -24,6 +24,7 @@ export const App: React.FC = () => {
 	})
 
 	const handlePatchState = ({ detail }: CustomEvent<Patch[]>) => {
+		console.log(detail)
 		setState(applyPatches(state, detail))
 	}
 
@@ -47,6 +48,7 @@ export const App: React.FC = () => {
 			<main className="flex flex-grow">
 				<ActivityBar
 					show={state.activities.show}
+					current={state.activities.current}
 					topItems={state.activities.topItems}
 					bottomItems={state.activities.bottomItems}
 				/>

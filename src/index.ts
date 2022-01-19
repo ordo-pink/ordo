@@ -1,5 +1,15 @@
-import { app, BrowserWindow } from "electron"
+import { app, BrowserWindow, ipcMain } from "electron"
 import installExtension, { REACT_DEVELOPER_TOOLS, REDUX_DEVTOOLS } from "electron-devtools-installer"
+import { produce, enablePatches, applyPatches, Patch } from "immer"
+import { WindowContext, WindowState } from "./common/types"
+
+import activityBarIpcMainHandlers from "./containers/activity-bar/main-handlers"
+
+import activities from "./containers/activity-bar/initial-state"
+import commander from "./containers/commander/initial-state"
+import sidebar from "./containers/sidebar/initial-state"
+import suggestions from "./containers/suggestions/initial-state"
+import workspace from "./containers/workspace/initial-state"
 
 declare const MAIN_WINDOW_WEBPACK_ENTRY: string
 declare const MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY: string
@@ -9,9 +19,11 @@ if (require("electron-squirrel-startup")) {
 	app.quit()
 }
 
+enablePatches()
+
 const createWindow = (): void => {
 	// Create the browser window.
-	const mainWindow = new BrowserWindow({
+	const window = new BrowserWindow({
 		webPreferences: {
 			sandbox: true,
 			contextIsolation: true,
@@ -20,11 +32,29 @@ const createWindow = (): void => {
 		},
 	})
 
-	// and load the index.html of the app.
-	mainWindow.loadURL(MAIN_WINDOW_WEBPACK_ENTRY)
+	const context: WindowContext = {
+		window,
+	}
 
-	// Open the DevTools.
-	mainWindow.webContents.openDevTools()
+	const state: WindowState = {
+		activities,
+		commander,
+		sidebar,
+		suggestions,
+		workspace,
+		components: {},
+	}
+
+	const activityBarHandlers = activityBarIpcMainHandlers(ipcMain)
+
+	activityBarHandlers.register(state, context)
+
+	// and load the index.html of the app.
+	window.loadURL(MAIN_WINDOW_WEBPACK_ENTRY)
+
+	window.on("close", () => {
+		activityBarHandlers.unregister()
+	})
 }
 
 app.on("ready", async () => {

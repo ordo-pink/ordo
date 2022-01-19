@@ -3,7 +3,6 @@ import { OrdoEvent } from "../../common/types"
 export type SUGGESTIONS_SCOPE = "suggestions"
 
 export type SuggestionsEvent =
-	| OrdoEvent<SUGGESTIONS_SCOPE, "get-state">
 	| OrdoEvent<SUGGESTIONS_SCOPE, "get-items", string | void>
 	| OrdoEvent<SUGGESTIONS_SCOPE, "enable">
 	| OrdoEvent<SUGGESTIONS_SCOPE, "disable">

@@ -3,9 +3,7 @@ import { OrdoEvent } from "../../common/types"
 
 export type ACTIVITY_BAR_SCOPE = "activity-bar"
 
-export type ActivityBarEvent =
-	| OrdoEvent<ACTIVITY_BAR_SCOPE, "get-state">
-	| OrdoEvent<ACTIVITY_BAR_SCOPE, "select", string>
+export type ActivityBarEvent = OrdoEvent<ACTIVITY_BAR_SCOPE, "select", string>
 
 export type ActivityBarState = {
 	show: boolean

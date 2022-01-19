@@ -4,7 +4,6 @@ import { OrdoEvent } from "../../common/types"
 export type COMMANDER_SCOPE = "commander"
 
 export type CommanderEvent =
-	| OrdoEvent<COMMANDER_SCOPE, "get-state">
 	| OrdoEvent<COMMANDER_SCOPE, "toggle">
 	| OrdoEvent<COMMANDER_SCOPE, "show">
 	| OrdoEvent<COMMANDER_SCOPE, "hide">

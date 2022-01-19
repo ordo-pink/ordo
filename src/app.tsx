@@ -8,25 +8,32 @@ import { Commander } from "./containers/commander/component"
 import { Sidebar } from "./containers/sidebar/component"
 import { Workspace } from "./containers/workspace/component"
 
+import application from "./application/initial-state"
 import commander from "./containers/commander/initial-state"
 import activities from "./containers/activity-bar/initial-state"
 import sidebar from "./containers/sidebar/initial-state"
 import workspace from "./containers/workspace/initial-state"
+import { WindowState } from "./common/types"
 
 export const App: React.FC = () => {
-	const [state, setState] = useImmer({
+	const [state, setState] = useImmer<WindowState>({
+		application,
 		activities,
 		commander,
 		sidebar,
 		workspace,
+		components: {},
 	})
 
 	React.useEffect(() => {
 		window.ordo.emit("@application/get-state")
+
+		return () => {
+			setState({} as WindowState)
+		}
 	}, [])
 
 	const handlePatchState = ({ detail }: CustomEvent<Patch[]>) => {
-		console.log(detail)
 		setState(applyPatches(state, detail))
 	}
 
@@ -40,10 +47,10 @@ export const App: React.FC = () => {
 
 	return (
 		<div className="flex flex-col h-screen bg-gray-50">
-			{state.commander.show ? (
+			{!state.commander.show ? (
 				<div className="fixed w-full flex justify-center">
 					<div className="mt-10 w-[50%] bg-white rounded-lg shadow-xl">
-						<Commander show={state.commander.show} items={state.commander.items} />
+						<Commander show={!state.commander.show} items={state.commander.items} />
 					</div>
 				</div>
 			) : null}
@@ -62,7 +69,7 @@ export const App: React.FC = () => {
 					onDragEnd={(sizes) => window.ordo.emit("@sidebar/set-width", sizes[1])}
 				>
 					<div className="w-full">
-						<Workspace component={state.workspace.component} />
+						<Workspace state={state} />
 					</div>
 
 					<div>

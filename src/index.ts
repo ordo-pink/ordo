@@ -1,4 +1,4 @@
-import { app, BrowserWindow, ipcMain } from "electron"
+import { app, BrowserWindow, ipcMain, dialog } from "electron"
 import installExtension, { REACT_DEVELOPER_TOOLS } from "electron-devtools-installer"
 import { enablePatches } from "immer"
 import { WindowContext, WindowState } from "./common/types"
@@ -23,7 +23,6 @@ declare const MAIN_WINDOW_WEBPACK_ENTRY: string
 declare const MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY: string
 
 if (require("electron-squirrel-startup")) {
-	// eslint-disable-line global-require
 	app.quit()
 }
 
@@ -41,6 +40,7 @@ const createWindow = (): void => {
 
 	const context: WindowContext = {
 		window,
+		dialog,
 	}
 
 	let state: WindowState = {

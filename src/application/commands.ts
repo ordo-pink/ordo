@@ -9,4 +9,11 @@ export default registerCommands<ApplicationEvent>([
 		event: ["@application/get-state"],
 		shortcut: "CommandOrControl+Shift+R",
 	},
+	{
+		icon: "HiOutlineFolderOpen",
+		name: "Open Folder",
+		description: "Open a different folder in current window.",
+		event: ["@application/open-folder"],
+		shortcut: "CommandOrControl+O",
+	},
 ])

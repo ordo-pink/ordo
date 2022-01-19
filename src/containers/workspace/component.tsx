@@ -1,9 +1,9 @@
 import React from "react"
+import { WindowState } from "../../common/types"
 import { components } from "../../components/components"
-import { WorkspaceState } from "./types"
 
-export const Workspace: React.FC<WorkspaceState> = ({ component }) => {
-	const Component = (components as any)[component]
+export const Workspace: React.FC<{ state: WindowState }> = ({ state }) => {
+	const Component = (components as any)[state.workspace.component]
 
-	return <Component />
+	return <Component {...state} />
 }

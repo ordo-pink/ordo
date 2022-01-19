@@ -1,4 +1,4 @@
-import { BrowserWindow } from "electron"
+import { BrowserWindow, Dialog } from "electron"
 import { ApplicationEvent, ApplicationState } from "../application/types"
 import { ActivityBarEvent, ActivityBarState } from "../containers/activity-bar/types"
 import { CommanderEvent, CommanderState } from "../containers/commander/types"
@@ -17,6 +17,7 @@ export type OrdoEvent<T extends string, K extends string, Args = void> = Args ex
 
 export type WindowContext = {
 	window: BrowserWindow
+	dialog: Dialog
 }
 
 export type WindowState<T extends Record<string, unknown> = Record<string, unknown>> = {

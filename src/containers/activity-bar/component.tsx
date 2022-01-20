@@ -1,5 +1,5 @@
 import React from "react"
-import { getSupportedIcon } from "../../appearance/icons/supported-icons"
+import { getSupportedIcon } from "../../application/appearance/icons/supported-icons"
 import { ActivityBarItem, ActivityBarState } from "./types"
 
 export const Activity: React.FC<ActivityBarItem & { current?: string }> = ({ show, icon, name, current }) => {

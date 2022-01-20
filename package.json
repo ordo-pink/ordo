@@ -149,6 +149,7 @@
 		"@electron-forge/maker-squirrel": "^6.0.0-beta.61",
 		"@electron-forge/maker-zip": "^6.0.0-beta.61",
 		"@electron-forge/plugin-webpack": "6.0.0-beta.61",
+		"@types/d3": "^7.1.0",
 		"@types/react": "^17.0.38",
 		"@types/react-beautiful-dnd": "^13.1.2",
 		"@types/react-custom-scrollbars": "^4.0.10",
@@ -178,6 +179,7 @@
 	},
 	"dependencies": {
 		"@reduxjs/toolkit": "^1.7.1",
+		"d3": "^7.3.0",
 		"electron-devtools-installer": "^3.2.0",
 		"electron-squirrel-startup": "^1.0.0",
 		"fuse.js": "^6.5.3",
@@ -191,6 +193,7 @@
 		"react-redux": "^7.2.6",
 		"react-split": "^2.0.14",
 		"trim-newlines": "^3.0.1",
-		"use-immer": "^0.6.0"
+		"use-immer": "^0.6.0",
+		"yaml": "^1.10.2"
 	}
 }

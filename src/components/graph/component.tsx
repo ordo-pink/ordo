@@ -40,7 +40,7 @@ const drag = (simulation: Simulation<SimulationNodeDatum, undefined>) =>
 			d.fy = null
 		})
 
-export const Graph: React.FC<WindowState> = ({ application }) => {
+export const Graph = React.memo<WindowState>(({ application }) => {
 	const ref = React.useRef(null)
 
 	React.useEffect(() => {
@@ -146,7 +146,7 @@ export const Graph: React.FC<WindowState> = ({ application }) => {
 
 			node.attr("transform", (d: any) => `translate(${d.x},${d.y})`)
 		})
-	}, [ref.current, application.tree])
+	}, [application.tree])
 
 	return <svg ref={ref} width={window.innerWidth} height={window.innerHeight} />
-}
+})

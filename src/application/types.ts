@@ -1,5 +1,6 @@
 import { Command } from "../containers/commander/types"
 import { OrdoEvent } from "../common/types"
+import { Color } from "./appearance/colors/types"
 
 export type APPLICATION_SCOPE = "application"
 
@@ -19,5 +20,36 @@ export type ApplicationEvent =
 export type ApplicationState = {
 	commands: Command[]
 	cwd: string
+	tree?: OrdoFolder
 	showDevTools: boolean
+}
+
+export type OrdoEntity = OrdoFile | OrdoFolder
+
+export type OrdoFile = {
+	path: string
+	readableName: string
+	relativePath: string
+	depth: number
+	createdAt?: Date
+	updatedAt?: Date
+	accessedAt?: Date
+	extension: string
+	size: number
+	type: "file"
+	readableSize: string
+}
+
+export type OrdoFolder = {
+	collapsed: boolean
+	path: string
+	readableName: string
+	relativePath: string
+	depth: number
+	createdAt?: Date
+	updatedAt?: Date
+	accessedAt?: Date
+	type: "folder"
+	children: OrdoEntity[]
+	color: keyof Color
 }

@@ -1,6 +1,7 @@
 import React from "react"
+import { useAppSelector } from "../../common/store-hooks"
 import { getSupportedIcon } from "../../application/appearance/icons/supported-icons"
-import { Command, CommanderState } from "./types"
+import { Command } from "./types"
 
 const Command: React.FC<Command> = ({ icon, name, description, shortcut, event }) => {
 	const Icon = icon ? getSupportedIcon(icon) : () => null
@@ -20,19 +21,22 @@ const Command: React.FC<Command> = ({ icon, name, description, shortcut, event }
 	)
 }
 
-export const Commander: React.FC<CommanderState> = (state) => {
-	if (!state.show) {
-		return null
-	}
+export const Commander: React.FC = () => {
+	const show = useAppSelector((state) => state.commander.show)
+	const items = useAppSelector((state) => state.commander.items)
 
 	const [filter, setFilter] = React.useState("")
+
+	if (!show) {
+		return null
+	}
 
 	return (
 		<div>
 			<input
 				className="w-full outline-none p-2 rounded-lg"
 				placeholder="What is that you truely desire?"
-				autoFocus={state.show}
+				autoFocus={show}
 				type="text"
 				value={filter}
 				onChange={(e) => {
@@ -41,7 +45,7 @@ export const Commander: React.FC<CommanderState> = (state) => {
 				}}
 			/>
 			<div className="rounded-b-lg">
-				{state.items.map((item) => (
+				{items.map((item) => (
 					<Command
 						key={item.name}
 						name={item.name}

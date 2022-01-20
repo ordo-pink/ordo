@@ -1,6 +1,7 @@
 import React from "react"
+import { useAppSelector } from "../../common/store-hooks"
 import { getSupportedIcon } from "../../application/appearance/icons/supported-icons"
-import { ActivityBarItem, ActivityBarState } from "./types"
+import { ActivityBarItem } from "./types"
 
 export const Activity: React.FC<ActivityBarItem & { current?: string }> = ({ show, icon, name, current }) => {
 	if (!show || !icon) {
@@ -20,7 +21,12 @@ export const Activity: React.FC<ActivityBarItem & { current?: string }> = ({ sho
 	)
 }
 
-export const ActivityBar: React.FC<ActivityBarState> = ({ show, topItems, bottomItems, current }) => {
+export const ActivityBar: React.FC = () => {
+	const show = useAppSelector((state) => state.activities.show)
+	const topItems = useAppSelector((state) => state.activities.topItems)
+	const bottomItems = useAppSelector((state) => state.activities.bottomItems)
+	const current = useAppSelector((state) => state.activities.current)
+
 	if (!show) {
 		return null
 	}

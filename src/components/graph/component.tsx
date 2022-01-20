@@ -16,6 +16,7 @@ import {
 	select,
 } from "d3"
 import { OrdoFile } from "../../application/types"
+import { useAppSelector } from "../../common/store-hooks"
 
 const drag = (simulation: Simulation<SimulationNodeDatum, undefined>) =>
 	d3Drag()
@@ -40,15 +41,17 @@ const drag = (simulation: Simulation<SimulationNodeDatum, undefined>) =>
 			d.fy = null
 		})
 
-export const Graph = React.memo<WindowState>(({ application }) => {
+export const Graph = React.memo(() => {
 	const ref = React.useRef(null)
 
+	const tree = useAppSelector((state) => state.application.tree)
+
 	React.useEffect(() => {
-		if (!ref || !application.tree) {
+		if (!ref || !tree) {
 			return
 		}
 
-		const hierarchy = createHierarchy(application.tree)
+		const hierarchy = createHierarchy(tree)
 
 		const links = hierarchy.links()
 		const nodes = hierarchy.descendants()
@@ -146,7 +149,7 @@ export const Graph = React.memo<WindowState>(({ application }) => {
 
 			node.attr("transform", (d: any) => `translate(${d.x},${d.y})`)
 		})
-	}, [application.tree])
+	}, [tree])
 
 	return <svg ref={ref} width={window.innerWidth} height={window.innerHeight} />
 })

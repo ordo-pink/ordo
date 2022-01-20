@@ -1,5 +1,5 @@
 import { app, BrowserWindow, ipcMain, dialog, Menu } from "electron"
-import installExtension, { REACT_DEVELOPER_TOOLS } from "electron-devtools-installer"
+import installExtension, { REACT_DEVELOPER_TOOLS, REDUX_DEVTOOLS } from "electron-devtools-installer"
 import { applyPatches, enablePatches, Patch } from "immer"
 import { WindowContext, WindowState } from "./common/types"
 
@@ -93,7 +93,7 @@ const createWindow = (): void => {
 app.on("ready", async () => {
 	if (process.argv.includes("--debug")) {
 		console.log("Debug mode on 🙌")
-		await installExtension([REACT_DEVELOPER_TOOLS])
+		await installExtension([REACT_DEVELOPER_TOOLS, REDUX_DEVTOOLS])
 	}
 
 	createWindow()

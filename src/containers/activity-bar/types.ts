@@ -3,16 +3,17 @@ import { OrdoEvent } from "../../common/types"
 
 export type ACTIVITY_BAR_SCOPE = "activity-bar"
 
-export type ShowActivityBarEvent = OrdoEvent<ACTIVITY_BAR_SCOPE, "show">
-export type HideActivityBarEvent = OrdoEvent<ACTIVITY_BAR_SCOPE, "hide">
-export type ToggleActivityBarEvent = OrdoEvent<ACTIVITY_BAR_SCOPE, "toggle">
-export type SelectActivityBarEvent = OrdoEvent<ACTIVITY_BAR_SCOPE, "select", string>
+export type ShowEvent = OrdoEvent<ACTIVITY_BAR_SCOPE, "show">
+export type HideEvent = OrdoEvent<ACTIVITY_BAR_SCOPE, "hide">
+export type ToggleEvent = OrdoEvent<ACTIVITY_BAR_SCOPE, "toggle">
+export type OpenEditorEvent = OrdoEvent<ACTIVITY_BAR_SCOPE, "open-editor">
+export type OpenGraphEvent = OrdoEvent<ACTIVITY_BAR_SCOPE, "open-graph">
+export type OpenFindInFilesEvent = OrdoEvent<ACTIVITY_BAR_SCOPE, "open-find-in-files">
+export type OpenSettingsEvent = OrdoEvent<ACTIVITY_BAR_SCOPE, "open-settings">
 
-export type ActivityBarEvent =
-	| ShowActivityBarEvent
-	| HideActivityBarEvent
-	| ToggleActivityBarEvent
-	| SelectActivityBarEvent
+export type OpenActivityEvent = OpenEditorEvent | OpenGraphEvent | OpenFindInFilesEvent | OpenSettingsEvent
+
+export type ActivityBarEvent = ShowEvent | HideEvent | ToggleEvent | OpenActivityEvent
 
 export type ActivityBarState = {
 	show: boolean
@@ -25,4 +26,5 @@ export type ActivityBarItem = {
 	show: boolean
 	name: string
 	icon?: SupportedIcon
+	openEvent: OpenActivityEvent[0]
 }

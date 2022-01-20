@@ -21,4 +21,32 @@ export default registerCommands<ActivityBarEvent>([
 		description: "Hides the activity bar located on the left of the application window.",
 		event: ["@activity-bar/hide"],
 	},
+	{
+		icon: "HiOutlineDocument",
+		name: "Open Editor",
+		description: "Switch to Editor view.",
+		event: ["@activity-bar/open-editor"],
+		shortcut: "CommandOrControl+Shift+E",
+	},
+	{
+		icon: "HiOutlineShare",
+		name: "Open Graph",
+		description: "Switch to Graph view.",
+		event: ["@activity-bar/open-graph"],
+		shortcut: "CommandOrControl+Shift+G",
+	},
+	{
+		icon: "HiOutlineSearch",
+		name: "Open Find in Files",
+		description: "Switch to Find in Files view.",
+		event: ["@activity-bar/open-find-in-files"],
+		shortcut: "CommandOrControl+Shift+F",
+	},
+	{
+		icon: "HiOutlineCog",
+		name: "Open Settings",
+		description: "Open Settings.",
+		event: ["@activity-bar/open-settings"],
+		shortcut: "CommandOrControl+,",
+	},
 ])

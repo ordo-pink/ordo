@@ -3,7 +3,13 @@ import { useAppSelector } from "../../common/store-hooks"
 import { getSupportedIcon } from "../../application/appearance/icons/supported-icons"
 import { ActivityBarItem } from "./types"
 
-export const Activity: React.FC<ActivityBarItem & { current?: string }> = ({ show, icon, name, current }) => {
+export const Activity: React.FC<ActivityBarItem & { current?: string }> = ({
+	show,
+	icon,
+	name,
+	current,
+	openEvent,
+}) => {
 	if (!show || !icon) {
 		return null
 	}
@@ -16,7 +22,7 @@ export const Activity: React.FC<ActivityBarItem & { current?: string }> = ({ sho
 		<Icon
 			title={name}
 			className={`cursor-pointer transition-all duration-300 ${color}`}
-			onClick={() => window.ordo.emit("@activity-bar/select", name)}
+			onClick={() => window.ordo.emit(openEvent)}
 		/>
 	)
 }
@@ -35,12 +41,26 @@ export const ActivityBar: React.FC = () => {
 		<div className="text-3xl flex flex-col justify-between h-full p-2">
 			<div className="flex flex-col space-y-2">
 				{topItems.map((item) => (
-					<Activity key={item.name} name={item.name} show={item.show} icon={item.icon} current={current} />
+					<Activity
+						key={item.name}
+						name={item.name}
+						show={item.show}
+						icon={item.icon}
+						current={current}
+						openEvent={item.openEvent}
+					/>
 				))}
 			</div>
 			<div className="flex flex-col space-y-2">
 				{bottomItems.map((item) => (
-					<Activity key={item.name} name={item.name} show={item.show} icon={item.icon} current={current} />
+					<Activity
+						key={item.name}
+						name={item.name}
+						show={item.show}
+						icon={item.icon}
+						current={current}
+						openEvent={item.openEvent}
+					/>
 				))}
 			</div>
 		</div>

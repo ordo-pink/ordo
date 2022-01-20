@@ -1,5 +1,4 @@
 import React from "react"
-import { WindowState } from "../../common/types"
 
 import {
 	hierarchy as createHierarchy,

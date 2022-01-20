@@ -1,5 +1,5 @@
 import React from "react"
-import { getSupportedIcon } from "../../icons/supported-icons"
+import { getSupportedIcon } from "../../appearance/icons/supported-icons"
 import { Command, CommanderState } from "./types"
 
 const Command: React.FC<Command> = ({ icon, name, description, shortcut, event }) => {

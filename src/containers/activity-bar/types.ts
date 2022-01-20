@@ -1,4 +1,4 @@
-import { SupportedIcon } from "../../icons/supported-icons"
+import { SupportedIcon } from "../../appearance/icons/supported-icons"
 import { OrdoEvent } from "../../common/types"
 
 export type ACTIVITY_BAR_SCOPE = "activity-bar"

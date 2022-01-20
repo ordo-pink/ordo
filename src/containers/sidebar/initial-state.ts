@@ -1,8 +1,8 @@
 import { SidebarState } from "./types"
 
 const initialState: SidebarState = {
-	width: 25,
-	component: "",
+	width: 0,
+	component: "FileExplorer",
 }
 
 export default initialState

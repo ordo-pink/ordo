@@ -32,19 +32,23 @@ export default registerIpcMainHandlers<ActivityBarEvent>({
 	"@activity-bar/toggle": (draft) => void (draft.activities.show = !draft.activities.show),
 	"@activity-bar/open-editor": openActivity({
 		activityName: "Editor",
-		workspaceComponent: "WelcomePage",
+		workspaceComponent: "Editor",
+		sidebarComponent: "FileExplorer",
 		sidebar: "show",
 	}),
 	"@activity-bar/open-graph": openActivity({
 		activityName: "Graph",
 		workspaceComponent: "Graph",
+		sidebar: "hide",
 	}),
 	"@activity-bar/open-find-in-files": openActivity({
 		activityName: "Find in Files",
-		workspaceComponent: "WelcomePage",
+		sidebarComponent: "FileFinder",
+		sidebar: "show",
 	}),
 	"@activity-bar/open-settings": openActivity({
 		activityName: "Settings",
-		workspaceComponent: "WelcomePage",
+		workspaceComponent: "Editor",
+		sidebar: "hide",
 	}),
 })

@@ -16,4 +16,25 @@ export default registerCommands<ApplicationEvent>([
 		event: ["@application/open-folder"],
 		shortcut: "CommandOrControl+O",
 	},
+	{
+		icon: "HiOutlineStop",
+		name: "Close Window",
+		description: "Close current window. This might not work though.",
+		event: ["@application/close-window"],
+		shortcut: "CommandOrControl+Shift+W",
+	},
+	{
+		icon: "HiOutlineCode",
+		name: "Toggle Dev Tools",
+		description: "Show or hide browser developer tools.",
+		event: ["@application/toggle-dev-tools"],
+		shortcut: "CommandOrControl+Shift+I",
+	},
+	{
+		icon: "HiOutlineDesktopComputer",
+		name: "Reload Window",
+		description: "Reload current Ordo window.",
+		event: ["@application/reload-window"],
+		shortcut: "CommandOrControl+Shift+R",
+	},
 ])

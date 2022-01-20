@@ -18,12 +18,12 @@ export const registerIpcMainHandlers =
 	(ipcMain: IpcMain): IpcMainHandlerInterface => ({
 		register: (state: WindowState, context: WindowContext) =>
 			Object.keys(handlers).forEach((event) => {
-				ipcMain.handle(event, async (_, arg) => {
+				ipcMain.on(event, async (_, arg) => {
 					state = await produce(
 						state,
 						async (draft) => (handlers as unknown as Record<string, EventHandler<T>>)[event](draft, arg, context),
 						(patches) => {
-							context.window.webContents.send("apply-state-patches", patches)
+							ipcMain.emit("apply-main-state-patches", patches)
 						},
 					)
 				})

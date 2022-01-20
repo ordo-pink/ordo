@@ -1,6 +1,6 @@
-import { app, BrowserWindow, ipcMain, dialog } from "electron"
+import { app, BrowserWindow, ipcMain, dialog, Menu } from "electron"
 import installExtension, { REACT_DEVELOPER_TOOLS } from "electron-devtools-installer"
-import { enablePatches } from "immer"
+import { applyPatches, enablePatches, Patch } from "immer"
 import { WindowContext, WindowState } from "./common/types"
 
 import application from "./application/initial-state"
@@ -18,6 +18,9 @@ import workspaceIpcMainHandlers from "./containers/workspace/main-handlers"
 import registerApplicationCommands from "./application/commands"
 import registerActivityBarCommands from "./containers/activity-bar/commands"
 import registerSidebarCommands from "./containers/sidebar/commands"
+import registerCommanderCommands from "./containers/commander/commands"
+
+import { applicationMenuTemlate } from "./application/appearance/menus/application-menu"
 
 declare const MAIN_WINDOW_WEBPACK_ENTRY: string
 declare const MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY: string
@@ -52,9 +55,15 @@ const createWindow = (): void => {
 		components: {},
 	}
 
-	state = registerActivityBarCommands(state)
-	state = registerApplicationCommands(state)
-	state = registerSidebarCommands(state)
+	ipcMain.on("apply-main-state-patches", (patches: any) => {
+		state = applyPatches(state, patches)
+		window.webContents.send("apply-state-patches", patches)
+	})
+
+	registerActivityBarCommands(state)
+	registerApplicationCommands(state)
+	registerSidebarCommands(state)
+	registerCommanderCommands(state)
 
 	const applicationHandlers = applicationIpcMainHandlers(ipcMain)
 	const activityBarHandlers = activityBarIpcMainHandlers(ipcMain)
@@ -69,6 +78,8 @@ const createWindow = (): void => {
 	workspaceHandlers.register(state, context)
 
 	window.loadURL(MAIN_WINDOW_WEBPACK_ENTRY)
+
+	Menu.setApplicationMenu(Menu.buildFromTemplate(applicationMenuTemlate(state)))
 
 	window.on("close", () => {
 		activityBarHandlers.unregister()

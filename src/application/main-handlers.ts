@@ -4,7 +4,7 @@ import { ApplicationEvent } from "./types"
 
 export default registerIpcMainHandlers<ApplicationEvent>({
 	"@application/get-state": (state, _, context) => {
-		context.window.webContents.send("apply-state-patches", original(state))
+		context.window.webContents.send("set-state", original(state))
 	},
 	"@application/open-folder": (state, _, context) => {
 		const filePaths = context.dialog.showOpenDialogSync(context.window, {
@@ -20,5 +20,16 @@ export default registerIpcMainHandlers<ApplicationEvent>({
 		state.commander.show = false
 		state.sidebar.width = 0
 		state.application.cwd = filePaths[0]
+	},
+	"@application/close-window": (_, __, context) => {
+		context.window.close()
+	},
+	"@application/toggle-dev-tools": (state, __, context) => {
+		state.application.showDevTools = !state.application.showDevTools
+		context.window.webContents.toggleDevTools()
+	},
+	"@application/reload-window": (state, __, context) => {
+		state.commander.show = false
+		context.window.webContents.reload()
 	},
 })

@@ -33,24 +33,30 @@ export const App: React.FC = () => {
 		}
 	}, [])
 
+	const handleSetState = ({ detail }: CustomEvent<WindowState>) => {
+		setState(detail)
+	}
+
 	const handlePatchState = ({ detail }: CustomEvent<Patch[]>) => {
 		setState(applyPatches(state, detail))
 	}
 
 	React.useEffect(() => {
 		window.addEventListener("apply-state-patches", handlePatchState as (e: Event) => void)
+		window.addEventListener("set-state", handleSetState as (e: Event) => void)
 
 		return () => {
 			window.removeEventListener("apply-state-patches", handlePatchState as (e: Event) => void)
+			window.removeEventListener("set-state", handleSetState as (e: Event) => void)
 		}
 	})
 
 	return (
 		<div className="flex flex-col h-screen bg-gray-50">
-			{!state.commander.show ? (
+			{state.commander.show ? (
 				<div className="fixed w-full flex justify-center">
 					<div className="mt-10 w-[50%] bg-white rounded-lg shadow-xl">
-						<Commander show={!state.commander.show} items={state.commander.items} />
+						<Commander show={state.commander.show} items={state.commander.items} />
 					</div>
 				</div>
 			) : null}

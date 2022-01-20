@@ -1,6 +1,6 @@
 import { app, BrowserWindow, ipcMain, dialog, Menu } from "electron"
 import installExtension, { REACT_DEVELOPER_TOOLS, REDUX_DEVTOOLS } from "electron-devtools-installer"
-import { applyPatches, enablePatches, Patch } from "immer"
+import { applyPatches, enablePatches } from "immer"
 import { WindowContext, WindowState } from "./common/types"
 
 import application from "./application/initial-state"

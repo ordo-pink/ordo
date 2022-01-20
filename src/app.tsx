@@ -41,7 +41,7 @@ export const App: React.FC = () => {
 
 	return (
 		<div className="flex flex-col h-screen bg-gray-50">
-			<div className="fixed w-full flex justify-center">
+			<div className="fixed w-full flex justify-center mx-24">
 				<div className="mt-10 w-[50%] bg-white rounded-lg shadow-xl">
 					<Commander />
 				</div>

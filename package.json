@@ -193,7 +193,6 @@
 		"react-redux": "^7.2.6",
 		"react-split": "^2.0.14",
 		"trim-newlines": "^3.0.1",
-		"use-immer": "^0.6.0",
 		"yaml": "^1.10.2"
 	}
 }

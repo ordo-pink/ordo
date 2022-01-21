@@ -31,9 +31,10 @@ export const createOrdoFile = ({
 	relativePath,
 	size = 0,
 }: CreateOrdoFileArg): OrdoFile => {
-	const type = "file"
 	const readableName = path.substring(path.lastIndexOf("/") + 1)
 	const extension = readableName.substring(readableName.lastIndexOf(".")) ?? ".md"
+
+	const type = extension === ".md" ? "text" : "image"
 
 	const readableSize = toReadableSize(size)
 

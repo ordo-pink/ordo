@@ -36,7 +36,7 @@ export type OrdoFile = {
 	accessedAt?: Date
 	extension: string
 	size: number
-	type: "file"
+	type: "text" | "image" | string
 	readableSize: string
 }
 

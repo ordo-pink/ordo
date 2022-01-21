@@ -150,5 +150,5 @@ export const Graph = React.memo(() => {
 		})
 	}, [tree])
 
-	return <svg ref={ref} width={window.innerWidth} height={window.innerHeight} />
+	return <svg className="-z-10" ref={ref} width={window.innerWidth} height={window.innerHeight} />
 })

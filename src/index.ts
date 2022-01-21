@@ -1,6 +1,6 @@
 import { app, BrowserWindow, ipcMain, dialog, Menu } from "electron"
 import installExtension, { REACT_DEVELOPER_TOOLS, REDUX_DEVTOOLS } from "electron-devtools-installer"
-import { applyPatches, enablePatches } from "immer"
+import { applyPatches, current, enablePatches, isDraft } from "immer"
 import { WindowContext, WindowState } from "./common/types"
 
 import application from "./application/initial-state"
@@ -55,16 +55,6 @@ const createWindow = (): void => {
 		components: {},
 	}
 
-	ipcMain.on("apply-main-state-patches", (patches: any) => {
-		state = applyPatches(state, patches)
-		window.webContents.send("apply-state-patches", patches)
-	})
-
-	registerActivityBarCommands(state)
-	registerApplicationCommands(state)
-	registerSidebarCommands(state)
-	registerCommanderCommands(state)
-
 	const applicationHandlers = applicationIpcMainHandlers(ipcMain)
 	const activityBarHandlers = activityBarIpcMainHandlers(ipcMain)
 	const commanderHandlers = commanderIpcMainHandlers(ipcMain)
@@ -76,6 +66,21 @@ const createWindow = (): void => {
 	commanderHandlers.register(state, context)
 	sidebarHandlers.register(state, context)
 	workspaceHandlers.register(state, context)
+
+	ipcMain.on("send-state", () => {
+		const currentState = isDraft(state) ? current(state) : state
+		context.window.webContents.send("set-state", currentState)
+	})
+
+	ipcMain.on("apply-main-state-patches", (patches: any) => {
+		state = applyPatches(state, patches)
+		window.webContents.send("apply-state-patches", patches)
+	})
+
+	registerActivityBarCommands(state)
+	registerApplicationCommands(state)
+	registerSidebarCommands(state)
+	registerCommanderCommands(state)
 
 	window.loadURL(MAIN_WINDOW_WEBPACK_ENTRY)
 

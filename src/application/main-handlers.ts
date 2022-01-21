@@ -17,10 +17,10 @@ export default registerIpcMainHandlers<ApplicationEvent>({
 			return
 		}
 
+		ipcMain.emit("@activity-bar/open-editor")
+
 		state.application.cwd = filePaths[0]
 		state.application.tree = await listFolder(state.application.cwd)
-
-		ipcMain.emit("@activity-bar/open-editor")
 	},
 	"@application/close-window": (_, __, context) => {
 		context.window.close()
@@ -29,7 +29,7 @@ export default registerIpcMainHandlers<ApplicationEvent>({
 		state.application.showDevTools = !state.application.showDevTools
 		context.window.webContents.toggleDevTools()
 	},
-	"@application/reload-window": (state, __, context) => {
+	"@application/reload-window": (_, __, context) => {
 		context.window.webContents.reload()
 	},
 })

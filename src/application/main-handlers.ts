@@ -1,3 +1,4 @@
+import { ipcMain } from "electron"
 import { original } from "immer"
 import { registerIpcMainHandlers } from "../common/register-ipc-main-handlers"
 import { listFolder } from "./fs/list-folder"
@@ -16,12 +17,10 @@ export default registerIpcMainHandlers<ApplicationEvent>({
 			return
 		}
 
-		state.activities.current = "Graph"
-		state.workspace.component = "Graph"
-		state.commander.show = false
-		state.sidebar.width = 0
 		state.application.cwd = filePaths[0]
 		state.application.tree = await listFolder(state.application.cwd)
+
+		ipcMain.emit("@activity-bar/open-editor")
 	},
 	"@application/close-window": (_, __, context) => {
 		context.window.close()
@@ -31,7 +30,6 @@ export default registerIpcMainHandlers<ApplicationEvent>({
 		context.window.webContents.toggleDevTools()
 	},
 	"@application/reload-window": (state, __, context) => {
-		state.commander.show = false
 		context.window.webContents.reload()
 	},
 })

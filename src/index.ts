@@ -1,6 +1,6 @@
-import { app, BrowserWindow, ipcMain, dialog, Menu } from "electron"
+import { app, BrowserWindow, ipcMain, dialog, Menu, IpcMainEvent } from "electron"
 import installExtension, { REACT_DEVELOPER_TOOLS, REDUX_DEVTOOLS } from "electron-devtools-installer"
-import { applyPatches, current, enablePatches, isDraft } from "immer"
+import { applyPatches, current, enablePatches, isDraft, Patch } from "immer"
 import { WindowContext, WindowState } from "./common/types"
 
 import application from "./application/initial-state"
@@ -72,8 +72,8 @@ const createWindow = (): void => {
 		context.window.webContents.send("set-state", currentState)
 	})
 
-	ipcMain.on("apply-main-state-patches", (patches: any) => {
-		state = applyPatches(state, patches)
+	ipcMain.on("apply-main-state-patches", (patches: IpcMainEvent) => {
+		state = applyPatches(state, patches as unknown as Patch[])
 		window.webContents.send("apply-state-patches", patches)
 	})
 

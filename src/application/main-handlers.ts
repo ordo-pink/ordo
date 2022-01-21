@@ -1,5 +1,4 @@
 import { ipcMain } from "electron"
-import { isDraft, current } from "immer"
 import { registerIpcMainHandlers } from "../common/register-ipc-main-handlers"
 import { listFolder } from "./fs/list-folder"
 import { ApplicationEvent } from "./types"

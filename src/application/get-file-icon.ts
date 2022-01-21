@@ -1,12 +1,12 @@
-import { HiDocument, HiDocumentSearch, HiDocumentText, HiPhotograph } from "react-icons/hi"
+import { HiOutlineDocument, HiOutlineDocumentSearch, HiOutlineDocumentText, HiOutlinePhotograph } from "react-icons/hi"
 import { IconType } from "react-icons/lib"
 import { OrdoFile } from "./types"
 
 export const getFileIcon = (file: OrdoFile): IconType =>
 	file.type === "image"
-		? HiPhotograph
+		? HiOutlinePhotograph
 		: file.type === "text"
 		? file.size
-			? HiDocumentText
-			: HiDocument
-		: HiDocumentSearch
+			? HiOutlineDocumentText
+			: HiOutlineDocument
+		: HiOutlineDocumentSearch

@@ -15,10 +15,10 @@ export const App: React.FC = () => {
 	const dispatch = useAppDispatch()
 
 	const sidebarWidth = useAppSelector((state) => state.sidebar.width)
+	const showCommander = useAppSelector((state) => state.commander.show)
 
 	React.useEffect(() => {
 		window.ordo.emit("@application/get-state")
-		window.ordo.emit("@commander/get-items", "")
 	}, [])
 
 	const handleSetState = ({ detail }: CustomEvent<WindowState>) => {
@@ -41,11 +41,13 @@ export const App: React.FC = () => {
 
 	return (
 		<div className="flex flex-col h-screen bg-gray-50">
-			<div className="fixed w-full flex justify-center mx-24">
-				<div className="mt-10 w-[50%] bg-white rounded-lg shadow-xl">
-					<Commander />
+			{showCommander ? (
+				<div className="fixed w-full flex justify-center z-50">
+					<div className="mt-10 w-[50%] bg-white rounded-lg shadow-xl">
+						<Commander />
+					</div>
 				</div>
-			</div>
+			) : null}
 			<main className="flex flex-grow">
 				<ActivityBar />
 				<Split
@@ -59,7 +61,7 @@ export const App: React.FC = () => {
 						<Workspace />
 					</div>
 
-					<div>
+					<div className="z-40">
 						<div className="p-2 h-full">
 							<div className="shadow-lg rounded-lg h-full p-2 bg-gray-100">
 								<Sidebar />

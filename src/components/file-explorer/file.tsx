@@ -10,7 +10,7 @@ export const File: React.FC<{ file: OrdoFile }> = ({ file }) => {
 			style={{ paddingLeft: (file.depth + 0.25) * 12 + "px" }}
 			className={`flex space-x-2 items-center`}
 			onClick={() => {
-				// TODO
+				window.ordo.emit("@application/open-file", file.path)
 			}}
 		>
 			<Icon className="shrink-0 text-gray-500" />

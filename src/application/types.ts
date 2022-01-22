@@ -5,22 +5,44 @@ import { Color } from "./appearance/colors/types"
 export type APPLICATION_SCOPE = "application"
 
 export type GetStateEvent = OrdoEvent<APPLICATION_SCOPE, "get-state">
-export type OpenFolderEvent = OrdoEvent<APPLICATION_SCOPE, "open-folder">
 export type CloseWindowEvent = OrdoEvent<APPLICATION_SCOPE, "close-window">
 export type ToggleDevToolsEvent = OrdoEvent<APPLICATION_SCOPE, "toggle-dev-tools">
 export type ReloadWindowEvent = OrdoEvent<APPLICATION_SCOPE, "reload-window">
 
+export type OpenFolderEvent = OrdoEvent<APPLICATION_SCOPE, "open-folder">
+export type OpenFileEvent = OrdoEvent<APPLICATION_SCOPE, "open-file", string>
+export type SetCurrentFileEvent = OrdoEvent<APPLICATION_SCOPE, "set-current-file", number>
+
 export type ApplicationEvent =
 	| GetStateEvent
-	| OpenFolderEvent
 	| CloseWindowEvent
 	| ToggleDevToolsEvent
 	| ReloadWindowEvent
+	| OpenFolderEvent
+	| OpenFileEvent
+	| SetCurrentFileEvent
+
+export type SelectionBoundary = {
+	line: number
+	index: number
+}
+
+export type Selection = {
+	start: SelectionBoundary
+	end: SelectionBoundary
+	direction: "ltr" | "rtl"
+}
+
+export type OpenOrdoFile = OrdoFile & { body: string; selection: Selection }
+
+export type OpenOrdoFiles = OpenOrdoFile[]
 
 export type ApplicationState = {
 	commands: Command[]
 	cwd: string
 	tree?: OrdoFolder
+	currentFile: number
+	openFiles: OpenOrdoFiles
 	showDevTools: boolean
 }
 

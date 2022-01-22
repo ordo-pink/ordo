@@ -4,12 +4,13 @@ import { HiOutlineX } from "react-icons/hi"
 import { getFileIcon } from "../../application/get-file-icon"
 import { OrdoFile, OpenOrdoFile } from "../../application/types"
 import { useAppSelector } from "../../common/store-hooks"
+import { TextEditor } from "./text-editor"
 
 const ImageViewer: React.FC = () => {
 	const currentTab = useAppSelector((state) => state.application.currentFile)
 	const tabs = useAppSelector((state) => state.application.openFiles)
 
-	if (!tabs || currentTab == null || !tabs[currentTab] || tabs[currentTab].type !== "image") {
+	if (!tabs || !tabs[currentTab] || tabs[currentTab].type !== "image") {
 		return null
 	}
 
@@ -25,7 +26,13 @@ const Viewer: React.FC<{ file: OrdoFile }> = ({ file }) => {
 		case "image":
 			return <ImageViewer />
 		default:
-			return <ImageViewer />
+			return (
+				<div className="h-full">
+					<Scrollbars>
+						<TextEditor />
+					</Scrollbars>
+				</div>
+			)
 	}
 }
 
@@ -82,7 +89,7 @@ export const Editor: React.FC = () => {
 	}
 
 	return (
-		<div className="flex flex-col grow bg-gray-50 dark:bg-gray-700">
+		<div className="flex flex-col grow bg-gray-50 dark:bg-gray-700 h-full">
 			<Tabs />
 			<div className="mb-10 h-full">
 				<Viewer file={tabs[currentTab]} />

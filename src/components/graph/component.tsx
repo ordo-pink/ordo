@@ -109,7 +109,9 @@ export const Graph = React.memo(() => {
 
 			.call(drag(simulation) as any)
 			.on("click", (_, n: any) => {
-				// TODO
+				if (n.data.type !== "folder") {
+					window.ordo.emit("@application/open-file", n.data.path)
+				}
 			})
 
 		node

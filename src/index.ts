@@ -61,12 +61,6 @@ const createWindow = (): void => {
 	const sidebarHandlers = sidebarIpcMainHandlers(ipcMain)
 	const workspaceHandlers = workspaceIpcMainHandlers(ipcMain)
 
-	activityBarHandlers.register(state, context)
-	applicationHandlers.register(state, context)
-	commanderHandlers.register(state, context)
-	sidebarHandlers.register(state, context)
-	workspaceHandlers.register(state, context)
-
 	ipcMain.on("send-state", () => {
 		const currentState = isDraft(state) ? current(state) : state
 		context.window.webContents.send("set-state", currentState)
@@ -81,6 +75,14 @@ const createWindow = (): void => {
 	registerApplicationCommands(state)
 	registerSidebarCommands(state)
 	registerCommanderCommands(state)
+
+	activityBarHandlers.register(state, context)
+	applicationHandlers.register(state, context)
+	commanderHandlers.register(state, context)
+	sidebarHandlers.register(state, context)
+	workspaceHandlers.register(state, context)
+
+	console.log(state.application.commands)
 
 	window.loadURL(MAIN_WINDOW_WEBPACK_ENTRY)
 

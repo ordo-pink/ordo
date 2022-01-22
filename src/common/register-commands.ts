@@ -8,7 +8,7 @@ export const registerCommands =
 	(state: WindowState): WindowState =>
 		produce(
 			state,
-			(draft) => commands?.forEach((command) => void draft.application.commands.push(command)),
+			(draft) => commands.forEach((command) => draft.application.commands.push(command)),
 			(patches) => {
 				ipcMain.emit("apply-main-state-patches", patches)
 			},

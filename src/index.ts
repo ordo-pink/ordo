@@ -82,8 +82,6 @@ const createWindow = (): void => {
 	sidebarHandlers.register(state, context)
 	workspaceHandlers.register(state, context)
 
-	console.log(state.application.commands)
-
 	window.loadURL(MAIN_WINDOW_WEBPACK_ENTRY)
 
 	Menu.setApplicationMenu(Menu.buildFromTemplate(applicationMenuTemlate(state)))

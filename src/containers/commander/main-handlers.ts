@@ -12,6 +12,10 @@ export default registerIpcMainHandlers<CommanderEvent>({
 	"@commander/hide": (draft) => {
 		draft.commander.show = false
 	},
+	"@commander/run": (draft, command) => {
+		draft.commander.show = false
+		ipcMain.emit(command as string)
+	},
 	"@commander/toggle": (draft) => {
 		draft.commander.show = !draft.commander.show
 

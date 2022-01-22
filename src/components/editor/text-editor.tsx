@@ -1,7 +1,6 @@
 import React from "react"
-import { useAppDispatch, useAppSelector } from "../../common/store-hooks"
+import { useAppSelector } from "../../common/store-hooks"
 import { Selection, SelectionBoundary } from "../../application/types"
-// import { onKeyDown as editorOnKeyDown } from "../../common/store"
 
 export interface CaretPosition {
 	line: number
@@ -197,8 +196,6 @@ export const Line = React.memo<{
 const IGNORED_KEY_PRESSES = ["Meta", "Control", "Alt", "Shift", "CapsLock"]
 
 export const TextEditor: React.FC = () => {
-	const dispatch = useAppDispatch()
-
 	const tabs = useAppSelector((state) => state.application.openFiles)
 	const currentTab = useAppSelector((state) => state.application.currentFile)
 	// const editorSelected = useAppSelector((state) => state.editorSelected)
@@ -207,36 +204,37 @@ export const TextEditor: React.FC = () => {
 
 	const [mouseDownPosition, setMouseDownPosition] = React.useState<SelectionBoundary | null>(null)
 
-	// React.useEffect(() => {
-	// 	if (!tabs.length || currentTab == null || !tabs[currentTab] || !ref.current) {
-	// 		return
-	// 	}
+	React.useEffect(() => {
+		if (!tabs.length || !tabs[currentTab] || !ref.current) {
+			return
+		}
 
-	// 	window.addEventListener("keydown", onKeyDown)
+		window.addEventListener("keydown", onKeyDown)
 
-	// 	const node =
-	// 		tabs[currentTab].selection.direction === "rtl"
-	// 			? document.getElementById(`line-${tabs[currentTab].selection.start.line}-${tabs[currentTab].selection.start.index}`)
-	// 			: document.getElementById(`line-${tabs[currentTab].selection.end.line}-${tabs[currentTab].selection.end.index}`)
+		const node =
+			tabs[currentTab].selection.direction === "rtl"
+				? document.getElementById(`line-${tabs[currentTab].selection.start.line}-${tabs[currentTab].selection.start.index}`)
+				: document.getElementById(`line-${tabs[currentTab].selection.end.line}-${tabs[currentTab].selection.end.index}`)
 
-	// 	node && node.classList.add("caret")
+		node && node.classList.add("caret")
 
-	// 	return () => {
-	// 		window.removeEventListener("keydown", onKeyDown)
-	// 		node && node.classList.remove("caret")
-	// 	}
-	// }, [
-	// 	tabs[currentTab].selection.start.index,
-	// 	tabs[currentTab].selection.start.line,
-	// 	tabs[currentTab].selection.end.index,
-	// 	tabs[currentTab].selection.end.line,
-	// 	tabs[currentTab].selection.direction,
-	// ])
+		return () => {
+			window.removeEventListener("keydown", onKeyDown)
+			node && node.classList.remove("caret")
+		}
+	}, [
+		tabs[currentTab].selection.start.index,
+		tabs[currentTab].selection.start.line,
+		tabs[currentTab].selection.end.index,
+		tabs[currentTab].selection.end.line,
+		tabs[currentTab].selection.direction,
+	])
 
 	const onKeyDown = (e: KeyboardEvent) => {
 		// if (!editorSelected) {
 		// 	return
 		// }
+		e.preventDefault()
 
 		const { key, metaKey, altKey, ctrlKey, shiftKey } = e
 
@@ -244,11 +242,7 @@ export const TextEditor: React.FC = () => {
 			return
 		}
 
-		e.preventDefault()
-
-		// dispatch(
-		// 	editorOnKeyDown({ selection: tabs[currentTab].selection, keys: { key, metaKey, altKey, ctrlKey, shiftKey } }),
-		// )
+		window.ordo.emit("@editor/on-key-down", { key, metaKey, altKey, ctrlKey, shiftKey })
 	}
 
 	const mouseUpHandler = React.useCallback(
@@ -257,19 +251,15 @@ export const TextEditor: React.FC = () => {
 				const isMouseDownBefore =
 					mouseDownPosition.line < line || (mouseDownPosition.line === line && mouseDownPosition.index < index)
 				const direction = isMouseDownBefore ? "ltr" : "rtl"
-
-				// dispatch(
-				// 	editorOnKeyDown({
-				// 		selection: isMouseDownBefore
-				// 			? { start: mouseDownPosition, end: { line, index }, direction }
-				// 			: { start: { line, index }, end: mouseDownPosition, direction },
-				// 	}),
-				// )
-
+				window.ordo.emit(
+					"@editor/on-mouse-up",
+					isMouseDownBefore
+						? { start: mouseDownPosition, end: { line, index }, direction }
+						: { start: { line, index }, end: mouseDownPosition, direction },
+				)
 				return
 			}
-
-			// dispatch(editorOnKeyDown({ selection: { start: { line, index }, end: { line, index }, direction: "ltr" } }))
+			window.ordo.emit("@editor/on-mouse-up", { start: { line, index }, end: { line, index }, direction: "ltr" })
 		},
 		[mouseDownPosition],
 	)
@@ -292,7 +282,7 @@ export const TextEditor: React.FC = () => {
 		<div>
 			<div
 				ref={ref}
-				className="outline-none w-full pb-96 cursor-text tracking-wide"
+				className="outline-none min-h-screen w-full cursor-text tracking-wide"
 				onMouseDown={(e) => {
 					e.preventDefault()
 
@@ -321,20 +311,18 @@ export const TextEditor: React.FC = () => {
 				}}
 			>
 				{tabs[currentTab].body &&
-					tabs[currentTab].body
-						.split("\n")
-						.map((line, lineIndex) => (
-							<Line
-								key={`line-${lineIndex}`}
-								isCurrentLine={isCurrentLine(lineIndex)}
-								mouseUpHandler={mouseUpHandler}
-								mouseDownHandler={mouseDownHandler}
-								mouseIgnoreHandler={mouseIgnoreHandler}
-								selection={tabs[currentTab].selection}
-								line={line.split("")}
-								lineIndex={lineIndex}
-							/>
-						))}
+					tabs[currentTab].body.map((line, lineIndex) => (
+						<Line
+							key={`line-${lineIndex}`}
+							isCurrentLine={isCurrentLine(lineIndex)}
+							mouseUpHandler={mouseUpHandler}
+							mouseDownHandler={mouseDownHandler}
+							mouseIgnoreHandler={mouseIgnoreHandler}
+							selection={tabs[currentTab].selection}
+							line={line}
+							lineIndex={lineIndex}
+						/>
+					))}
 			</div>
 		</div>
 	)

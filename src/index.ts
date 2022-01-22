@@ -82,8 +82,6 @@ const createWindow = (): void => {
 	sidebarHandlers.register(state, context)
 	workspaceHandlers.register(state, context)
 
-	window.loadURL(MAIN_WINDOW_WEBPACK_ENTRY)
-
 	Menu.setApplicationMenu(Menu.buildFromTemplate(applicationMenuTemlate(state)))
 
 	window.on("close", () => {
@@ -93,6 +91,8 @@ const createWindow = (): void => {
 		sidebarHandlers.unregister()
 		workspaceHandlers.unregister()
 	})
+
+	window.loadURL(MAIN_WINDOW_WEBPACK_ENTRY)
 }
 
 app.on("ready", async () => {

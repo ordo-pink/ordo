@@ -91,7 +91,7 @@ export const Editor: React.FC = () => {
 	return (
 		<div className="flex flex-col grow bg-gray-50 dark:bg-gray-700 h-full">
 			<Tabs />
-			<div className="mb-10 h-full">
+			<div className="h-full">
 				<Viewer file={tabs[currentTab]} />
 			</div>
 		</div>

@@ -2,6 +2,21 @@ import { Command } from "../containers/commander/types"
 import { OrdoEvent } from "../common/types"
 import { Color } from "./appearance/colors/types"
 
+export type EDITOR_SCOPE = "editor"
+
+export type OnKeyDownEvent = OrdoEvent<EDITOR_SCOPE, "on-key-down", KeysDown>
+export type OnMouseUpEvent = OrdoEvent<EDITOR_SCOPE, "on-mouse-up", Selection>
+
+export type EditorEvent = OnKeyDownEvent | OnMouseUpEvent
+
+export type KeysDown = {
+	key: string
+	metaKey: boolean
+	altKey: boolean
+	ctrlKey: boolean
+	shiftKey: boolean
+}
+
 export type APPLICATION_SCOPE = "application"
 
 export type GetStateEvent = OrdoEvent<APPLICATION_SCOPE, "get-state">
@@ -23,6 +38,7 @@ export type ApplicationEvent =
 	| OpenFileEvent
 	| SetCurrentFileEvent
 	| CloseFileEvent
+	| EditorEvent
 
 export type SelectionBoundary = {
 	line: number
@@ -35,7 +51,7 @@ export type Selection = {
 	direction: "ltr" | "rtl"
 }
 
-export type OpenOrdoFile = OrdoFile & { body: string; selection: Selection }
+export type OpenOrdoFile = OrdoFile & { body: string[][]; selection: Selection }
 
 export type OpenOrdoFiles = OpenOrdoFile[]
 

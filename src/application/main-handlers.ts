@@ -2,8 +2,43 @@ import { ipcMain } from "electron"
 import { registerIpcMainHandlers } from "../common/register-ipc-main-handlers"
 import { listFolder } from "./fs/list-folder"
 import { readFile } from "./fs/read-file"
-import { ApplicationEvent, OpenOrdoFile } from "./types"
+import { ApplicationEvent, OpenOrdoFile, KeysDown } from "./types"
 import { getFile } from "./utils/get-file"
+
+import { WindowState } from "../common/types"
+import { Switch } from "or-else"
+import { handleEnter } from "./key-handlers/enter"
+import { handleTab } from "./key-handlers/tab"
+import { handleTyping } from "./key-handlers/letters"
+import { handleArrowUp } from "./key-handlers/arrow-up"
+import { handleArrowLeft } from "./key-handlers/arrow-left"
+import { handleArrowRight } from "./key-handlers/arrow-right"
+import { handleArrowDown } from "./key-handlers/arrow-down"
+import { handleBackspace } from "./key-handlers/backspace"
+
+const createAccelerator = (keys: KeysDown): string => {
+	let combo = ""
+
+	if (keys.ctrlKey || keys.metaKey) {
+		combo += "CommandOrControl+"
+	}
+
+	if (keys.altKey) {
+		combo += "Alt+"
+	}
+
+	if (keys.shiftKey) {
+		combo += "Shift+"
+	}
+
+	combo += keys.key.toUpperCase()
+
+	return combo
+}
+
+const getRegisterredShortcut = (keys: KeysDown, state: WindowState) => {
+	return state.application.commands.find(({ shortcut }) => shortcut === createAccelerator(keys))
+}
 
 export default registerIpcMainHandlers<ApplicationEvent>({
 	"@application/get-state": () => {
@@ -55,7 +90,7 @@ export default registerIpcMainHandlers<ApplicationEvent>({
 			return
 		}
 
-		file.body = await readFile(file)
+		file.body = (await readFile(file)).split("\n").map((line) => line.split("").concat([" "]))
 		file.selection = {
 			start: { line: 0, index: 0 },
 			end: { line: 0, index: 0 },
@@ -84,5 +119,33 @@ export default registerIpcMainHandlers<ApplicationEvent>({
 		} else if (state.application.currentFile > index) {
 			state.application.currentFile--
 		}
+	},
+	"@editor/on-key-down": (draft, keys) => {
+		const shortcut = getRegisterredShortcut(keys as KeysDown, draft)
+		if (shortcut) {
+			ipcMain.emit(shortcut.event[0])
+			return
+		}
+
+		const handle = Switch.of((keys as KeysDown).key)
+			.case("Dead", (tab: OpenOrdoFile) => tab)
+			.case("ArrowUp", handleArrowUp)
+			.case("ArrowDown", handleArrowDown)
+			.case("ArrowLeft", handleArrowLeft)
+			.case("ArrowRight", handleArrowRight)
+			.case("Enter", handleEnter)
+			.case("Backspace", handleBackspace)
+			.case("Tab", handleTab)
+			.default(handleTyping)
+
+		handle(draft.application.openFiles[draft.application.currentFile], keys as any)
+
+		// draft.application.openFiles[draft.application.currentFile] = handle(
+		// 	draft.application.openFiles[draft.application.currentFile],
+		// 	keys as KeysDown,
+		// )
+	},
+	"@editor/on-mouse-up": (draft, selection) => {
+		console.log(selection)
 	},
 })

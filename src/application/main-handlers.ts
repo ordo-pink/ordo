@@ -42,7 +42,9 @@ export default registerIpcMainHandlers<ApplicationEvent>({
 		const alreadyOpen = state.application.openFiles.findIndex((file) => file.path === path)
 
 		if (~alreadyOpen) {
-			ipcMain.emit("@application/set-current-file", alreadyOpen)
+			if (state.application.currentFile !== alreadyOpen) {
+				ipcMain.emit("@application/set-current-file", alreadyOpen)
+			}
 
 			return
 		}

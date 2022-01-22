@@ -6,10 +6,24 @@ import { createOrdoFolder } from "../create-ordo-folder"
 import YAML from "yaml"
 import { createOrdoFile } from "../create-ordo-file"
 import { sortTree } from "../../common/sort-tree"
+import { Minimatch } from "minimatch"
+
+const excludePatterns = [
+	"**/node_modules",
+	"**/.git",
+	"**/.svn",
+	"**/.hg",
+	"**/CVS",
+	"**/.DS_Store",
+	"**/Thumbs.db",
+	"**/.obsidian",
+]
 
 export const listFolder = async (path: string, depth = 0, rootPath = path): Promise<OrdoFolder> => {
 	const folder = await promises.readdir(path, { withFileTypes: true, encoding: "utf-8" })
 	const { mtime, atime, birthtime } = await promises.stat(path)
+
+	const excluded = excludePatterns.map((pattern) => new Minimatch(pattern))
 
 	const relativePath = path.replace(rootPath, ".")
 	const tree = createOrdoFolder({
@@ -23,6 +37,10 @@ export const listFolder = async (path: string, depth = 0, rootPath = path): Prom
 
 	for (const item of folder) {
 		const itemPath = join(path, item.name)
+
+		if (excluded.some((mm) => mm.match(itemPath))) {
+			continue
+		}
 
 		if (item.isDirectory()) {
 			tree.children.push(await listFolder(itemPath, depth + 1, rootPath))

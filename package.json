@@ -184,6 +184,7 @@
 		"electron-squirrel-startup": "^1.0.0",
 		"fuse.js": "^6.5.3",
 		"immer": "^9.0.12",
+		"minimatch": "^3.0.4",
 		"or-else": "^0.1.0",
 		"react": "^17.0.2",
 		"react-beautiful-dnd": "^13.1.0",

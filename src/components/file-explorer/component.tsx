@@ -15,12 +15,11 @@ export const FileExplorer: React.FC = () => {
 	return (
 		<Scrollbars className="relative">
 			<div>
-				{!tree.collapsed &&
-					tree.children.map((child) => (
-						<div className="cursor-pointer" key={child.path}>
-							{child.type === "folder" ? <Folder folder={child as OrdoFolder} /> : <File file={child as OrdoFile} />}
-						</div>
-					))}
+				{tree.children.map((child) => (
+					<div className="cursor-pointer" key={child.path}>
+						{child.type === "folder" ? <Folder folder={child as OrdoFolder} /> : <File file={child as OrdoFile} />}
+					</div>
+				))}
 			</div>
 		</Scrollbars>
 	)

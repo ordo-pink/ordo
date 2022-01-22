@@ -66,4 +66,21 @@ export default registerIpcMainHandlers<ApplicationEvent>({
 	"@application/set-current-file": (state, index) => {
 		state.application.currentFile = index as number
 	},
+	"@application/close-file": (state, index) => {
+		if (index == null) {
+			index = state.application.currentFile
+		}
+
+		state.application.openFiles.splice(index as number, 1)
+
+		if (state.application.currentFile === index) {
+			if (state.application.currentFile > 0) {
+				state.application.currentFile--
+			} else {
+				state.application.currentFile = 0
+			}
+		} else if (state.application.currentFile > index) {
+			state.application.currentFile--
+		}
+	},
 })

@@ -37,4 +37,11 @@ export default registerCommands<ApplicationEvent>([
 		event: ["@application/reload-window"],
 		shortcut: "CommandOrControl+Shift+R",
 	},
+	{
+		icon: "HiOutlineX",
+		name: "Close File",
+		description: "Closes currently open file",
+		event: ["@application/close-file"],
+		shortcut: "CommandOrControl+W",
+	},
 ])

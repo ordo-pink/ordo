@@ -31,7 +31,6 @@ const Viewer: React.FC<{ file: OrdoFile }> = ({ file }) => {
 
 const Tab: React.FC<{ tab: OpenOrdoFile; index: number }> = ({ tab, index }) => {
 	const currentTab = useAppSelector((state) => state.application.currentFile)
-	const tabs = useAppSelector((state) => state.application.openFiles)
 	const Icon = getFileIcon(tab)
 
 	return (
@@ -40,10 +39,9 @@ const Tab: React.FC<{ tab: OpenOrdoFile; index: number }> = ({ tab, index }) => 
 			className={`flex flex-shrink text-gray-800 dark:text-gray-300 items-center space-x-2 cursor-pointer px-3 py-1 rounded-lg truncate ${
 				currentTab === index && "bg-gray-100 dark:text-gray-800 shadow-md"
 			}`}
-			onClick={() => {
+			onClick={(e) => {
+				e.preventDefault()
 				window.ordo.emit("@application/set-current-file", index)
-				// dispatch(openTab(index))
-				// dispatch(select(tabs[index].path))
 			}}
 		>
 			<Icon className="text-gray-500" />
@@ -51,12 +49,8 @@ const Tab: React.FC<{ tab: OpenOrdoFile; index: number }> = ({ tab, index }) => 
 			<HiOutlineX
 				className="text-gray-500 hover:text-red-500"
 				onClick={(e) => {
-					// e.preventDefault()
-					// e.stopPropagation()
-					// dispatch(closeTab(index))
-					// if (index === currentTab) {
-					// 	dispatch(select(index > 0 ? tabs[index - 1].path : tabs.length > 1 ? tabs[index + 1].path : null))
-					// }
+					e.preventDefault()
+					window.ordo.emit("@application/close-file", index)
 				}}
 			/>
 		</div>

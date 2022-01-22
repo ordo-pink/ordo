@@ -41,6 +41,7 @@ export const applicationMenuTemlate = (state: WindowState): any[] =>
 					],
 				},
 				separator,
+				toMenuItem(getCommandByName("Close File", state)),
 				toMenuItem(getCommandByName("Close Window", state)),
 			],
 		},

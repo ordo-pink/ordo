@@ -7,17 +7,16 @@ export default registerIpcMainHandlers<CommanderEvent>({
 		void (draft.commander.items = draft.application.commands.filter((command) => command.name.startsWith(filter || ""))),
 	"@commander/show": (draft) => {
 		draft.commander.show = true
-		draft.application.commands.forEach((command) => draft.commander.items.push(command))
+		ipcMain.emit("@commander/get-items", "")
 	},
 	"@commander/hide": (draft) => {
 		draft.commander.show = false
 	},
 	"@commander/toggle": (draft) => {
+		draft.commander.show = !draft.commander.show
+
 		if (draft.commander.show) {
-			draft.commander.show = false
-		} else {
-			draft.commander.show = true
-			ipcMain.emit("@commander/get-items")
+			ipcMain.emit("@commander/get-items", "")
 		}
 	},
 })

@@ -38,8 +38,8 @@ const createAccelerator = (keys: KeysDown): string => {
 	return combo
 }
 
-const getRegisterredShortcut = (keys: KeysDown, state: WindowState) => {
-	return state.application.commands.find(({ shortcut }) => shortcut === createAccelerator(keys))
+const getRegisterredShortcut = (keys: KeysDown, draft: WindowState) => {
+	return draft.application.commands.find(({ shortcut }) => shortcut === createAccelerator(keys))
 }
 
 export default registerIpcMainHandlers<ApplicationEvent>({
@@ -49,15 +49,15 @@ export default registerIpcMainHandlers<ApplicationEvent>({
 	"@application/close-window": (_, __, context) => {
 		context.window.close()
 	},
-	"@application/toggle-dev-tools": (state, __, context) => {
-		state.application.showDevTools = !state.application.showDevTools
+	"@application/toggle-dev-tools": (draft, __, context) => {
+		draft.application.showDevTools = !draft.application.showDevTools
 		context.window.webContents.toggleDevTools()
 	},
 	"@application/reload-window": (_, __, context) => {
 		context.window.webContents.reload()
 	},
 
-	"@application/open-folder": async (state, _, context) => {
+	"@application/open-folder": async (draft, _, context) => {
 		const filePaths = context.dialog.showOpenDialogSync(context.window, {
 			properties: ["openDirectory", "createDirectory", "promptToCreate"],
 		})
@@ -68,59 +68,58 @@ export default registerIpcMainHandlers<ApplicationEvent>({
 
 		ipcMain.emit("@activity-bar/open-editor")
 
-		state.application.cwd = filePaths[0]
-		state.application.tree = await listFolder(state.application.cwd)
+		draft.application.cwd = filePaths[0]
+		draft.application.tree = await listFolder(draft.application.cwd)
 	},
-	"@application/open-file": async (state, path) => {
-		if (!path || !state.application.tree) {
+	"@application/open-file": async (draft, path) => {
+		if (!path || !draft.application.tree) {
 			return
 		}
 
-		const alreadyOpen = state.application.openFiles.findIndex((file) => file.path === path)
+		const alreadyOpen = draft.application.openFiles.findIndex((file) => file.path === path)
 
 		if (~alreadyOpen) {
-			if (state.application.currentFile !== alreadyOpen) {
+			if (draft.application.currentFile !== alreadyOpen) {
 				ipcMain.emit("@application/set-current-file", alreadyOpen)
 			}
 
 			return
 		}
 
-		const file = getFile(state.application.tree, path as string) as OpenOrdoFile
+		const file = getFile(draft.application.tree, path as string) as OpenOrdoFile
 
 		if (!file) {
 			return
 		}
 
-		file.body = (await readFile(file)).split("\n").map((line) => line.split("").concat([" "]))
+		file.body = (await readFile(file)) as any
+
+		if (file.type === "image") {
+			draft.application.openFiles.push(file)
+			draft.application.currentFile = draft.application.openFiles.length - 1
+			return
+		}
+
+		file.body = (file.body as unknown as string).split("\n").map((line) => line.split("").concat([" "]))
 		file.selection = {
 			start: { line: 0, index: 0 },
 			end: { line: 0, index: 0 },
 			direction: "ltr",
 		}
 
-		state.application.openFiles.push(file)
-		state.application.currentFile = state.application.openFiles.length - 1
+		draft.application.openFiles.push(file)
+		draft.application.currentFile = draft.application.openFiles.length - 1
 	},
-	"@application/set-current-file": (state, index) => {
-		state.application.currentFile = index as number
+	"@application/set-current-file": (draft, index) => {
+		draft.application.currentFile = index as number
 	},
-	"@application/close-file": (state, index) => {
+	"@application/close-file": (draft, index) => {
 		if (index == null) {
-			index = state.application.currentFile
+			index = draft.application.currentFile
 		}
 
-		state.application.openFiles.splice(index as number, 1)
-
-		if (state.application.currentFile === index) {
-			if (state.application.currentFile > 0) {
-				state.application.currentFile--
-			} else {
-				state.application.currentFile = 0
-			}
-		} else if (state.application.currentFile > index) {
-			state.application.currentFile--
-		}
+		draft.application.openFiles.splice(index as number, 1)
+		draft.application.currentFile = draft.application.openFiles.length - 1
 	},
 	"@application/save-file": async (draft) => {
 		const file = draft.application.openFiles[draft.application.currentFile]

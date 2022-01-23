@@ -57,6 +57,7 @@ const Tab: React.FC<{ tab: OpenOrdoFile; index: number }> = ({ tab, index }) => 
 				className="text-gray-500 hover:text-red-500"
 				onClick={(e) => {
 					e.preventDefault()
+					e.stopPropagation()
 					window.ordo.emit("@application/close-file", index)
 				}}
 			/>

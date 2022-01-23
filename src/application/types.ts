@@ -28,6 +28,7 @@ export type OpenFolderEvent = OrdoEvent<APPLICATION_SCOPE, "open-folder">
 export type OpenFileEvent = OrdoEvent<APPLICATION_SCOPE, "open-file", string>
 export type SetCurrentFileEvent = OrdoEvent<APPLICATION_SCOPE, "set-current-file", number>
 export type CloseFileEvent = OrdoEvent<APPLICATION_SCOPE, "close-file", number | void>
+export type SaveFileEvent = OrdoEvent<APPLICATION_SCOPE, "save-file">
 
 export type ApplicationEvent =
 	| GetStateEvent
@@ -39,6 +40,7 @@ export type ApplicationEvent =
 	| SetCurrentFileEvent
 	| CloseFileEvent
 	| EditorEvent
+	| SaveFileEvent
 
 export type SelectionBoundary = {
 	line: number

@@ -4,6 +4,7 @@ import { listFolder } from "./fs/list-folder"
 import { readFile } from "./fs/read-file"
 import { ApplicationEvent, OpenOrdoFile, KeysDown } from "./types"
 import { getFile } from "./utils/get-file"
+import { promises } from "fs"
 
 import { WindowState } from "../common/types"
 import { Switch } from "or-else"
@@ -15,6 +16,7 @@ import { handleArrowLeft } from "./key-handlers/arrow-left"
 import { handleArrowRight } from "./key-handlers/arrow-right"
 import { handleArrowDown } from "./key-handlers/arrow-down"
 import { handleBackspace } from "./key-handlers/backspace"
+import { saveFile } from "./fs/save-file"
 
 const createAccelerator = (keys: KeysDown): string => {
 	let combo = ""
@@ -119,6 +121,34 @@ export default registerIpcMainHandlers<ApplicationEvent>({
 		} else if (state.application.currentFile > index) {
 			state.application.currentFile--
 		}
+	},
+	"@application/save-file": async (draft) => {
+		const file = draft.application.openFiles[draft.application.currentFile]
+
+		if (!file) {
+			return
+		}
+
+		await saveFile(
+			file.path,
+			file.body
+				.map((line) => {
+					let str = line.slice(0, -1).join("")
+
+					while (str.endsWith(" ")) {
+						str = str.slice(0, -1)
+					}
+
+					return str
+				})
+				.join("\n"),
+		)
+
+		const { size, mtime, atime } = await promises.stat(file.path)
+
+		file.size = size
+		file.updatedAt = mtime
+		file.accessedAt = atime
 	},
 	"@editor/on-key-down": (draft, keys) => {
 		const shortcut = getRegisterredShortcut(keys as KeysDown, draft)

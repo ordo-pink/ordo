@@ -40,8 +40,15 @@ export default registerCommands<ApplicationEvent>([
 	{
 		icon: "HiOutlineX",
 		name: "Close File",
-		description: "Closes currently open file",
+		description: "Closes currently open file.",
 		event: ["@application/close-file"],
 		shortcut: "CommandOrControl+W",
+	},
+	{
+		icon: "HiOutlineSave",
+		name: "Save File",
+		description: "Save currently open file.",
+		event: ["@application/save-file"],
+		shortcut: "CommandOrControl+S",
 	},
 ])

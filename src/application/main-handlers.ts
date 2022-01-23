@@ -80,7 +80,7 @@ export default registerIpcMainHandlers<ApplicationEvent>({
 
 		if (~alreadyOpen) {
 			if (draft.application.currentFile !== alreadyOpen) {
-				ipcMain.emit("@application/set-current-file", alreadyOpen)
+				draft.application.currentFile = alreadyOpen
 			}
 
 			return

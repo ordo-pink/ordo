@@ -25,6 +25,7 @@ export type ToggleDevToolsEvent = OrdoEvent<APPLICATION_SCOPE, "toggle-dev-tools
 export type ReloadWindowEvent = OrdoEvent<APPLICATION_SCOPE, "reload-window">
 
 export type OpenFolderEvent = OrdoEvent<APPLICATION_SCOPE, "open-folder">
+export type UpdateFolderEvent = OrdoEvent<APPLICATION_SCOPE, "update-folder", [string, Partial<OrdoFolder>]>
 export type OpenFileEvent = OrdoEvent<APPLICATION_SCOPE, "open-file", string>
 export type SetCurrentFileEvent = OrdoEvent<APPLICATION_SCOPE, "set-current-file", number>
 export type CloseFileEvent = OrdoEvent<APPLICATION_SCOPE, "close-file", number | void>
@@ -36,6 +37,7 @@ export type ApplicationEvent =
 	| ToggleDevToolsEvent
 	| ReloadWindowEvent
 	| OpenFolderEvent
+	| UpdateFolderEvent
 	| OpenFileEvent
 	| SetCurrentFileEvent
 	| CloseFileEvent

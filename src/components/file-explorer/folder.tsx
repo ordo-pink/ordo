@@ -38,8 +38,7 @@ export const Folder: React.FC<{ folder: OrdoFolder }> = ({ folder }) => {
 					style={{ paddingLeft: folder.depth * 12 + "px" }}
 					className={`flex space-x-2 items-center`}
 					onClick={() => {
-						// dispatch(select(folder.path))
-						// dispatch(updateFolder({ path: folder.path, update: { collapsed: !folder.collapsed } }))
+						window.ordo.emit("@application/update-folder", [folder.path, { collapsed: !folder.collapsed }])
 					}}
 				>
 					<Icon />

@@ -2,7 +2,7 @@ import { ipcMain } from "electron"
 import { registerIpcMainHandlers } from "../common/register-ipc-main-handlers"
 import { listFolder } from "./fs/list-folder"
 import { readFile } from "./fs/read-file"
-import { ApplicationEvent, OpenOrdoFile, KeysDown, Selection } from "./types"
+import { ApplicationEvent, OpenOrdoFile, KeysDown, Selection, OrdoFolder } from "./types"
 import { getFile } from "./utils/get-file"
 import { promises } from "fs"
 
@@ -17,6 +17,7 @@ import { handleArrowRight } from "./key-handlers/arrow-right"
 import { handleArrowDown } from "./key-handlers/arrow-down"
 import { handleBackspace } from "./key-handlers/backspace"
 import { saveFile } from "./fs/save-file"
+import { updateFolder } from "./fs/update-folder"
 
 const createAccelerator = (keys: KeysDown): string => {
 	let combo = ""
@@ -110,6 +111,10 @@ export default registerIpcMainHandlers<ApplicationEvent>({
 		draft.application.openFiles.push(file)
 		draft.application.currentFile = draft.application.openFiles.length - 1
 		draft.application.currentFilePath = draft.application.openFiles[draft.application.currentFile].path
+	},
+	"@application/update-folder": (draft, update) => {
+		const [path, increment] = update as [string, Partial<OrdoFolder>]
+		updateFolder(draft.application.tree as any, path, increment)
 	},
 	"@application/set-current-file": (draft, index) => {
 		draft.application.currentFile = index as number

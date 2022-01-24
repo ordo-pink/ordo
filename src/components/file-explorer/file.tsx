@@ -1,14 +1,17 @@
 import React from "react"
+import { useAppSelector } from "../../common/store-hooks"
 import { getFileIcon } from "../../application/get-file-icon"
 import { OrdoFile } from "../../application/types"
 
 export const File: React.FC<{ file: OrdoFile }> = ({ file }) => {
 	const Icon = file && getFileIcon(file)
 
+	const selected = useAppSelector((state) => state.application.currentFilePath)
+
 	return (
 		<div
 			style={{ paddingLeft: (file.depth + 0.25) * 12 + "px" }}
-			className={`flex space-x-2 items-center`}
+			className={`flex space-x-2 items-center ${selected === file.path && "bg-gray-300"}`}
 			onClick={() => {
 				window.ordo.emit("@application/open-file", file.path)
 			}}

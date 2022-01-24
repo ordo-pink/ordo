@@ -27,7 +27,6 @@ export const Folder: React.FC<{ folder: OrdoFolder }> = ({ folder }) => {
 
 	const [createdName, setCreatedName] = React.useState("")
 
-	// const selected = useAppSelector((state) => state.explorerSelection)
 	// const showCreateFile = useAppSelector((state) => state.showCreateFile)
 	// const showCreateFolder = useAppSelector((state) => state.showCreateFolder)
 	// const showInput = (showCreateFolder || showCreateFile) && selected === folder.path

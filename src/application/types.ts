@@ -62,6 +62,7 @@ export type ApplicationState = {
 	cwd: string
 	tree?: OrdoFolder
 	currentFile: number
+	currentFilePath: string
 	openFiles: OpenOrdoFiles
 	showDevTools: boolean
 }

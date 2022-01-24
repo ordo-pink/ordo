@@ -2,7 +2,7 @@ import { ipcMain } from "electron"
 import { registerIpcMainHandlers } from "../common/register-ipc-main-handlers"
 import { listFolder } from "./fs/list-folder"
 import { readFile } from "./fs/read-file"
-import { ApplicationEvent, OpenOrdoFile, KeysDown } from "./types"
+import { ApplicationEvent, OpenOrdoFile, KeysDown, Selection } from "./types"
 import { getFile } from "./utils/get-file"
 import { promises } from "fs"
 
@@ -109,9 +109,11 @@ export default registerIpcMainHandlers<ApplicationEvent>({
 
 		draft.application.openFiles.push(file)
 		draft.application.currentFile = draft.application.openFiles.length - 1
+		draft.application.currentFilePath = draft.application.openFiles[draft.application.currentFile].path
 	},
 	"@application/set-current-file": (draft, index) => {
 		draft.application.currentFile = index as number
+		draft.application.currentFilePath = draft.application.openFiles[draft.application.currentFile].path
 	},
 	"@application/close-file": (draft, index) => {
 		if (index == null) {
@@ -120,6 +122,7 @@ export default registerIpcMainHandlers<ApplicationEvent>({
 
 		draft.application.openFiles.splice(index as number, 1)
 		draft.application.currentFile = draft.application.openFiles.length - 1
+		draft.application.currentFilePath = draft.application.openFiles[draft.application.currentFile].path
 	},
 	"@application/save-file": async (draft) => {
 		const file = draft.application.openFiles[draft.application.currentFile]
@@ -168,13 +171,8 @@ export default registerIpcMainHandlers<ApplicationEvent>({
 			.default(handleTyping)
 
 		handle(draft.application.openFiles[draft.application.currentFile], keys as any)
-
-		// draft.application.openFiles[draft.application.currentFile] = handle(
-		// 	draft.application.openFiles[draft.application.currentFile],
-		// 	keys as KeysDown,
-		// )
 	},
 	"@editor/on-mouse-up": (draft, selection) => {
-		console.log(selection)
+		draft.application.openFiles[draft.application.currentFile].selection = selection as Selection
 	},
 })

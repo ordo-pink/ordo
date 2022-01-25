@@ -116,6 +116,8 @@ export default registerIpcMainHandlers<ApplicationEvent>({
 		draft.application.openFiles.push(file)
 		draft.application.currentFile = draft.application.openFiles.length - 1
 		draft.application.currentFilePath = draft.application.openFiles[draft.application.currentFile].path
+
+		ipcMain.emit("@activity-bar/open-editor")
 	},
 	"@application/update-folder": (draft, update) => {
 		const [path, increment] = update as [string, Partial<OrdoFolder>]

@@ -6,10 +6,13 @@ import {
 	HiOutlineFolder,
 	HiOutlineFolderOpen,
 } from "react-icons/hi"
+import { IconType } from "react-icons/lib"
 import { OrdoFolder } from "./types"
 
-export const getCollapseIcon = (folder: OrdoFolder) => (folder.collapsed ? HiOutlineChevronRight : HiOutlineChevronDown)
-export const getFolderIcon = (folder: OrdoFolder) =>
+export const getCollapseIcon = (folder: OrdoFolder): IconType =>
+	folder.collapsed ? HiOutlineChevronRight : HiOutlineChevronDown
+
+export const getFolderIcon = (folder: OrdoFolder): IconType =>
 	folder.collapsed
 		? folder.children.length
 			? HiFolder

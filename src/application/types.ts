@@ -27,6 +27,8 @@ export type ReloadWindowEvent = OrdoEvent<APPLICATION_SCOPE, "reload-window">
 export type OpenFolderEvent = OrdoEvent<APPLICATION_SCOPE, "open-folder">
 export type UpdateFolderEvent = OrdoEvent<APPLICATION_SCOPE, "update-folder", [string, Partial<OrdoFolder>]>
 export type OpenFileEvent = OrdoEvent<APPLICATION_SCOPE, "open-file", string>
+export type OpenFileCreatorEvent = OrdoEvent<APPLICATION_SCOPE, "open-file-creator">
+export type OpenFolderCreatorEvent = OrdoEvent<APPLICATION_SCOPE, "open-folder-creator">
 export type SetCurrentFileEvent = OrdoEvent<APPLICATION_SCOPE, "set-current-file", number>
 export type CloseFileEvent = OrdoEvent<APPLICATION_SCOPE, "close-file", number | void>
 export type SaveFileEvent = OrdoEvent<APPLICATION_SCOPE, "save-file">
@@ -43,6 +45,8 @@ export type ApplicationEvent =
 	| CloseFileEvent
 	| EditorEvent
 	| SaveFileEvent
+	| OpenFileCreatorEvent
+	| OpenFolderCreatorEvent
 
 export type SelectionBoundary = {
 	line: number

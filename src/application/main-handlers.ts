@@ -57,7 +57,12 @@ export default registerIpcMainHandlers<ApplicationEvent>({
 	"@application/reload-window": (_, __, context) => {
 		context.window.webContents.reload()
 	},
-
+	"@application/open-file-creator": (draft) => {
+		// TODO
+	},
+	"@application/open-folder-creator": (draft) => {
+		// TODO
+	},
 	"@application/open-folder": async (draft, _, context) => {
 		const filePaths = context.dialog.showOpenDialogSync(context.window, {
 			properties: ["openDirectory", "createDirectory", "promptToCreate"],

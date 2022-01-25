@@ -17,7 +17,6 @@ export const Header: React.FC = () => {
 			<div
 				className="cursor-pointer flex space-x-2 items-center"
 				onClick={() => {
-					// dispatch(updateFolder({ path: tree.path, update: { collapsed: !tree.collapsed } }))
 					window.ordo.emit("@application/update-folder", [tree.path, { collapsed: !tree.collapsed }])
 				}}
 			>
@@ -27,11 +26,11 @@ export const Header: React.FC = () => {
 			<div className="flex items-center space-x-2 text-gray-600">
 				<HiOutlineDocumentAdd
 					className="hover:text-pink-600 cursor-pointer"
-					// onClick={() => dispatch(setShowCreateFile(true))}
+					onClick={() => window.ordo.emit("@application/open-file-creator")}
 				/>
 				<HiOutlineFolderAdd
 					className="hover:text-pink-600 cursor-pointer"
-					// onClick={() => dispatch(setShowCreateFolder(true))}
+					onClick={() => window.ordo.emit("@application/open-folder-creator")}
 				/>
 			</div>
 		</>

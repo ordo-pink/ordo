@@ -126,8 +126,9 @@ export default registerIpcMainHandlers<ApplicationEvent>({
 		}
 
 		draft.application.openFiles.splice(index as number, 1)
+
 		draft.application.currentFile = draft.application.openFiles.length - 1
-		draft.application.currentFilePath = draft.application.openFiles[draft.application.currentFile].path
+		draft.application.currentFilePath = draft.application.openFiles[draft.application.currentFile]?.path || ""
 	},
 	"@application/save-file": async (draft) => {
 		const file = draft.application.openFiles[draft.application.currentFile]

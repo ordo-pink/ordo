@@ -63,7 +63,7 @@ export const App: React.FC = () => {
 
 					<div className="z-40">
 						<div className="p-2 h-full">
-							<div className="shadow-lg rounded-lg h-full py-2 bg-gray-100">
+							<div className="shadow-lg rounded-lg h-full bg-gray-100">
 								<Sidebar />
 							</div>
 						</div>

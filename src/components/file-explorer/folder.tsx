@@ -2,24 +2,7 @@ import React from "react"
 import { useAppSelector, useAppDispatch } from "../../common/store-hooks"
 import { OrdoFolder, OrdoFile } from "../../application/types"
 import { File } from "./file"
-import {
-	HiFolder,
-	HiFolderOpen,
-	HiOutlineChevronDown,
-	HiOutlineChevronRight,
-	HiOutlineFolder,
-	HiOutlineFolderOpen,
-} from "react-icons/hi"
-
-const getCollapseIcon = (folder: OrdoFolder) => (folder.collapsed ? HiOutlineChevronRight : HiOutlineChevronDown)
-const getFolderIcon = (folder: OrdoFolder) =>
-	folder.collapsed
-		? folder.children.length
-			? HiFolder
-			: HiOutlineFolder
-		: folder.children.length
-		? HiFolderOpen
-		: HiOutlineFolderOpen
+import { getCollapseIcon, getFolderIcon } from "../../application/get-folder-icon"
 
 export const Folder: React.FC<{ folder: OrdoFolder }> = ({ folder }) => {
 	const Icon = folder && getCollapseIcon(folder)

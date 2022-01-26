@@ -42,8 +42,11 @@ export const App: React.FC = () => {
 	return (
 		<div className="flex flex-col h-screen bg-gray-50">
 			{showCommander ? (
-				<div className="fixed w-full flex justify-center z-50">
-					<div className="mt-10 w-[50%] bg-white rounded-lg shadow-xl">
+				<div
+					className="fixed w-full flex justify-center z-50 top-0 left-0 right-0 bottom-0"
+					onClick={() => window.ordo.emit("@commander/hide")}
+				>
+					<div className="mt-10 w-[50%] h-fit bg-white rounded-lg shadow-xl">
 						<Commander />
 					</div>
 				</div>

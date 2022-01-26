@@ -5,6 +5,7 @@ const initialState: ApplicationState = {
 	cwd: "",
 	currentFilePath: "",
 	showDevTools: false,
+	focusedComponent: "",
 	openFiles: [],
 	currentFile: 0,
 };

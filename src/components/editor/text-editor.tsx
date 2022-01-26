@@ -198,6 +198,7 @@ const IGNORED_KEY_PRESSES = ["Meta", "Control", "Alt", "Shift", "CapsLock"];
 export const TextEditor: React.FC = () => {
 	const tabs = useAppSelector((state) => state.application.openFiles);
 	const currentTab = useAppSelector((state) => state.application.currentFile);
+	const focused = useAppSelector((state) => state.application.focusedComponent);
 	// const editorSelected = useAppSelector((state) => state.editorSelected)
 
 	const ref = React.useRef<HTMLDivElement>(null);
@@ -231,9 +232,10 @@ export const TextEditor: React.FC = () => {
 	]);
 
 	const onKeyDown = (e: KeyboardEvent) => {
-		// if (!editorSelected) {
-		// 	return
-		// }
+		if (focused !== "editor") {
+			return;
+		}
+
 		e.preventDefault();
 
 		const { key, metaKey, altKey, ctrlKey, shiftKey } = e;

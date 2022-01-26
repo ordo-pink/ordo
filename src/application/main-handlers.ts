@@ -48,6 +48,9 @@ export default registerEventHandlers<ApplicationEvent>({
 	"@application/get-state": () => {
 		ipcMain.emit("send-state");
 	},
+	"@application/set-focused-component": ({ draft, payload }) => {
+		draft.application.focusedComponent = payload;
+	},
 	"@application/register-command": ({ draft, payload }) => {
 		draft.application.commands.push(payload);
 	},

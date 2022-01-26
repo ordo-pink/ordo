@@ -62,7 +62,7 @@ export const Commander: React.FC = () => {
 
 	const [filter, setFilter] = React.useState("");
 	const [selected, setSelected] = React.useState(0);
-	const [fused, setFused] = React.useState(fuse.search(""));
+	const [fused, setFused] = React.useState(items.map((item) => ({ item })));
 
 	if (!show) {
 		return null;
@@ -91,12 +91,11 @@ export const Commander: React.FC = () => {
 				onChange={(e) => {
 					setFilter(e.target.value);
 					setSelected(0);
-					setFused(fuse.search(e.target.value));
-					window.ordo.emit("@commander/get-items", e.target.value);
+					setFused(e.target.value ? fuse.search(e.target.value) : items.map((item) => ({ item })));
 				}}
 			/>
 			<div className="rounded-b-lg">
-				{fused.slice(0, 10).map(({ item }, index) => (
+				{fused.map(({ item }, index) => (
 					<Command
 						index={index}
 						selected={selected}

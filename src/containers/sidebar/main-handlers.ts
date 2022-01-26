@@ -1,10 +1,9 @@
-import { registerIpcMainHandlers } from "../../common/register-ipc-main-handlers"
-import { SidebarEvent } from "./types"
+import { registerEventHandlers } from "../../common/register-ipc-main-handlers"
 
-export default registerIpcMainHandlers<SidebarEvent>({
-	"@sidebar/set-component": (draft, value) => void (draft.sidebar.component = value as any),
-	"@sidebar/set-width": (draft, value) => void (draft.sidebar.width = value as any),
-	"@sidebar/show": (draft) => void (draft.sidebar.width = 25),
-	"@sidebar/hide": (draft) => void (draft.sidebar.width = 0),
-	"@sidebar/toggle": (draft) => void (draft.sidebar.width = draft.sidebar.width > 0 ? 0 : 25),
+export default registerEventHandlers({
+	"@sidebar/set-component": ({ draft, passed }) => void (draft.sidebar.component = passed as any),
+	"@sidebar/set-width": ({ draft, passed }) => void (draft.sidebar.width = passed as any),
+	"@sidebar/show": ({ draft }) => void (draft.sidebar.width = 25),
+	"@sidebar/hide": ({ draft }) => void (draft.sidebar.width = 0),
+	"@sidebar/toggle": ({ draft }) => void (draft.sidebar.width = draft.sidebar.width > 0 ? 0 : 25),
 })

@@ -71,7 +71,7 @@
 	"prettier": {
 		"printWidth": 120,
 		"trailingComma": "all",
-		"semi": false,
+		"semi": true,
 		"useTabs": true,
 		"tabWidth": 1,
 		"bracketSpacing": true

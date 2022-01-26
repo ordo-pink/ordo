@@ -1,5 +1,5 @@
 import { ipcMain } from "electron"
-import { registerIpcMainHandlers } from "../common/register-ipc-main-handlers"
+import { registerEventHandlers } from "../common/register-ipc-main-handlers"
 import { listFolder } from "./fs/list-folder"
 import { readFile } from "./fs/read-file"
 import { ApplicationEvent, OpenOrdoFile, KeysDown, Selection, OrdoFolder } from "./types"
@@ -43,18 +43,21 @@ const getRegisterredShortcut = (keys: KeysDown, draft: WindowState) => {
 	return draft.application.commands.find(({ shortcut }) => shortcut === createAccelerator(keys))
 }
 
-export default registerIpcMainHandlers<ApplicationEvent>({
+export default registerEventHandlers({
 	"@application/get-state": () => {
 		ipcMain.emit("send-state")
 	},
-	"@application/close-window": (_, __, context) => {
+	"@application/register-command": ({ draft, passed }) => {
+		draft.application.commands.push(passed as any)
+	},
+	"@application/close-window": ({ context }) => {
 		context.window.close()
 	},
-	"@application/toggle-dev-tools": (draft, __, context) => {
+	"@application/toggle-dev-tools": ({ draft, context }) => {
 		draft.application.showDevTools = !draft.application.showDevTools
 		context.window.webContents.toggleDevTools()
 	},
-	"@application/reload-window": (_, __, context) => {
+	"@application/reload-window": ({ context }) => {
 		context.window.webContents.reload()
 	},
 	"@application/open-file-creator": (draft) => {
@@ -63,7 +66,7 @@ export default registerIpcMainHandlers<ApplicationEvent>({
 	"@application/open-folder-creator": (draft) => {
 		// TODO
 	},
-	"@application/open-folder": async (draft, _, context) => {
+	"@application/open-folder": async ({ draft, context, state }) => {
 		const filePaths = context.dialog.showOpenDialogSync(context.window, {
 			properties: ["openDirectory", "createDirectory", "promptToCreate"],
 		})
@@ -72,12 +75,12 @@ export default registerIpcMainHandlers<ApplicationEvent>({
 			return
 		}
 
-		ipcMain.emit("@activity-bar/open-editor")
+		state.emit("@activity-bar/open-editor")
 
 		draft.application.cwd = filePaths[0]
 		draft.application.tree = await listFolder(draft.application.cwd)
 	},
-	"@application/open-file": async (draft, path) => {
+	"@application/open-file": async ({ draft, passed: path, state }) => {
 		if (!path || !draft.application.tree) {
 			return
 		}
@@ -117,17 +120,17 @@ export default registerIpcMainHandlers<ApplicationEvent>({
 		draft.application.currentFile = draft.application.openFiles.length - 1
 		draft.application.currentFilePath = draft.application.openFiles[draft.application.currentFile].path
 
-		ipcMain.emit("@activity-bar/open-editor")
+		state.emit("@activity-bar/open-editor")
 	},
-	"@application/update-folder": (draft, update) => {
+	"@application/update-folder": ({ draft, passed: update }) => {
 		const [path, increment] = update as [string, Partial<OrdoFolder>]
 		updateFolder(draft.application.tree as any, path, increment)
 	},
-	"@application/set-current-file": (draft, index) => {
+	"@application/set-current-file": ({ draft, passed: index }) => {
 		draft.application.currentFile = index as number
 		draft.application.currentFilePath = draft.application.openFiles[draft.application.currentFile].path
 	},
-	"@application/close-file": (draft, index) => {
+	"@application/close-file": ({ draft, passed: index }) => {
 		if (index == null) {
 			index = draft.application.currentFile
 		}
@@ -137,7 +140,7 @@ export default registerIpcMainHandlers<ApplicationEvent>({
 		draft.application.currentFile = draft.application.openFiles.length - 1
 		draft.application.currentFilePath = draft.application.openFiles[draft.application.currentFile]?.path || ""
 	},
-	"@application/save-file": async (draft) => {
+	"@application/save-file": async ({ draft }) => {
 		const file = draft.application.openFiles[draft.application.currentFile]
 
 		if (!file) {
@@ -165,10 +168,10 @@ export default registerIpcMainHandlers<ApplicationEvent>({
 		file.updatedAt = mtime
 		file.accessedAt = atime
 	},
-	"@editor/on-key-down": (draft, keys) => {
+	"@editor/on-key-down": ({ draft, passed: keys, state }) => {
 		const shortcut = getRegisterredShortcut(keys as KeysDown, draft)
 		if (shortcut) {
-			ipcMain.emit(shortcut.event[0])
+			state.emit(shortcut.event)
 			return
 		}
 
@@ -185,7 +188,7 @@ export default registerIpcMainHandlers<ApplicationEvent>({
 
 		handle(draft.application.openFiles[draft.application.currentFile], keys as any)
 	},
-	"@editor/on-mouse-up": (draft, selection) => {
+	"@editor/on-mouse-up": ({ draft, passed: selection }) => {
 		draft.application.openFiles[draft.application.currentFile].selection = selection as Selection
 	},
 })

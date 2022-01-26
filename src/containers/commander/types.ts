@@ -1,5 +1,5 @@
 import { SupportedIcon } from "../../application/appearance/icons/supported-icons"
-import { OrdoEvent, OrdoEvents } from "../../common/types"
+import { OrdoEvent } from "../../common/types"
 
 export type COMMANDER_SCOPE = "commander"
 
@@ -9,13 +9,13 @@ export type ToggleEvent = OrdoEvent<COMMANDER_SCOPE, "toggle">
 export type SelectEvent = OrdoEvent<COMMANDER_SCOPE, "get-items", string>
 export type RunEvent = OrdoEvent<COMMANDER_SCOPE, "run", string>
 
-export type CommanderEvent = ShowEvent | HideEvent | ToggleEvent | SelectEvent | RunEvent
+export type CommanderEvent = ShowEvent & HideEvent & ToggleEvent & SelectEvent & RunEvent
 
-export type Command<T extends OrdoEvents = OrdoEvents> = {
+export type Command = {
 	icon?: SupportedIcon
 	name: string
 	description: string
-	event: T
+	event: string
 	shortcut?: string
 }
 

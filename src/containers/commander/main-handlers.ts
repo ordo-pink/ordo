@@ -1,26 +1,22 @@
-import { ipcMain } from "electron"
-import { registerIpcMainHandlers } from "../../common/register-ipc-main-handlers"
-import { CommanderEvent } from "./types"
+import { registerEventHandlers } from "../../common/register-ipc-main-handlers"
 
-export default registerIpcMainHandlers<CommanderEvent>({
-	"@commander/get-items": (draft, filter) =>
-		void (draft.commander.items = draft.application.commands.filter((command) => command.name.startsWith(filter || ""))),
-	"@commander/show": (draft) => {
+export default registerEventHandlers({
+	"@commander/get-items": ({ draft, passed, state }) => {
+		const appCommands = state.get((s) => s.application.commands)
+		draft.commander.items = appCommands.filter((c) => c.name.startsWith(passed || ""))
+	},
+	"@commander/show": ({ draft, state }) => {
 		draft.commander.show = true
-		ipcMain.emit("@commander/get-items", "")
+		state.emit("@commander/get-items", "")
 	},
-	"@commander/hide": (draft) => {
+	"@commander/hide": ({ draft }) => {
 		draft.commander.show = false
 	},
-	"@commander/run": (draft, command) => {
+	"@commander/run": ({ draft, passed, state }) => {
 		draft.commander.show = false
-		ipcMain.emit(command as string)
+		state.emit(passed as string)
 	},
-	"@commander/toggle": (draft) => {
-		draft.commander.show = !draft.commander.show
-
-		if (draft.commander.show) {
-			ipcMain.emit("@commander/get-items", "")
-		}
+	"@commander/toggle": ({ state }) => {
+		state.emit(state.get((s) => s.commander.show) ? "@commander/hide" : "@commander/show")
 	},
 })

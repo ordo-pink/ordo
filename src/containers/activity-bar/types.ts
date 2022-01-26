@@ -11,9 +11,9 @@ export type OpenGraphEvent = OrdoEvent<ACTIVITY_BAR_SCOPE, "open-graph">
 export type OpenFindInFilesEvent = OrdoEvent<ACTIVITY_BAR_SCOPE, "open-find-in-files">
 export type OpenSettingsEvent = OrdoEvent<ACTIVITY_BAR_SCOPE, "open-settings">
 
-export type OpenActivityEvent = OpenEditorEvent | OpenGraphEvent | OpenFindInFilesEvent | OpenSettingsEvent
+export type OpenActivityEvent = OpenEditorEvent & OpenGraphEvent & OpenFindInFilesEvent & OpenSettingsEvent
 
-export type ActivityBarEvent = ShowEvent | HideEvent | ToggleEvent | OpenActivityEvent
+export type ActivityBarEvent = ShowEvent & HideEvent & ToggleEvent & OpenActivityEvent
 
 export type ActivityBarState = {
 	show: boolean
@@ -26,5 +26,5 @@ export type ActivityBarItem = {
 	show: boolean
 	name: string
 	icon?: SupportedIcon
-	openEvent: OpenActivityEvent[0]
+	openEvent: keyof OpenActivityEvent
 }

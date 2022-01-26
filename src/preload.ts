@@ -1,9 +1,8 @@
 import { contextBridge, ipcRenderer } from "electron"
-import { OrdoEvents } from "./common/types"
 
 contextBridge.exposeInMainWorld("ordo", {
-	emit: (...args: OrdoEvents) => {
-		ipcRenderer.send(args[0], ...args.slice(1))
+	emit: (...args: any) => {
+		ipcRenderer.send("something-happened", args)
 	},
 })
 

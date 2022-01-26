@@ -8,7 +8,7 @@ const Command: React.FC<Command> = ({ icon, name, description, shortcut, event }
 
 	return (
 		<div className="flex space-x-2 text-sm hover:bg-gray-200 text-gray-500 p-2 last-of-type:rounded-b-lg cursor-pointer select-none">
-			<div className="flex-grow" onClick={() => window.ordo.emit("@commander/run", event[0])}>
+			<div className="flex-grow" onClick={() => window.ordo.emit("@commander/run", event)}>
 				<div className="flex items-center space-x-2">
 					<Icon />
 					<div className="text-gray-700">{name}</div>

@@ -1,6 +1,5 @@
-import { registerIpcMainHandlers } from "../../common/register-ipc-main-handlers"
-import { WorkspaceEvent } from "./types"
+import { registerEventHandlers } from "../../common/register-ipc-main-handlers"
 
-export default registerIpcMainHandlers<WorkspaceEvent>({
-	"@workspace/set-component": (draft, value) => void (draft.workspace.component = value as any),
+export default registerEventHandlers({
+	"@workspace/set-component": ({ draft, passed }) => void (draft.workspace.component = passed as any),
 })

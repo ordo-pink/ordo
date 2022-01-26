@@ -1,5 +1,4 @@
-import { ipcMain } from "electron"
-import { WindowState } from "../../../common/types"
+import { State } from "../../../state"
 import { Command } from "../../../containers/commander/types"
 
 const separator = { type: "separator" }
@@ -21,15 +20,15 @@ const MAC_MENU = [
 	},
 ]
 
-const getCommandByName = (name: string, state: WindowState): Command =>
-	state.application.commands.find((c) => c.name === name) as Command
+const getCommandByName = (name: string, state: State): Command =>
+	state.get((s) => s.application.commands).find((c) => c.name === name) as Command
 
-export const applicationMenuTemlate = (state: WindowState): any[] =>
+export const applicationMenuTemlate = (state: State): any[] =>
 	(process.platform === "darwin" ? MAC_MENU : []).concat([
 		{
 			label: "&File",
 			submenu: [
-				toMenuItem(getCommandByName("Open Folder", state)),
+				toMenuItem(getCommandByName("Open Folder", state), state),
 				{
 					label: "Open Recent",
 					role: "recentDocuments",
@@ -41,32 +40,32 @@ export const applicationMenuTemlate = (state: WindowState): any[] =>
 					],
 				},
 				separator,
-				toMenuItem(getCommandByName("Close File", state)),
-				toMenuItem(getCommandByName("Close Window", state)),
+				toMenuItem(getCommandByName("Close File", state), state),
+				toMenuItem(getCommandByName("Close Window", state), state),
 			],
 		},
 		{
 			label: "&View",
 			submenu: [
-				toMenuItem(getCommandByName("Restart Window", state)),
-				toMenuItem(getCommandByName("Refresh State", state)),
-				toMenuItem(getCommandByName("Toggle Dev Tools", state)),
-				toMenuItem(getCommandByName("Reload Window", state)),
+				toMenuItem(getCommandByName("Restart Window", state), state),
+				toMenuItem(getCommandByName("Refresh State", state), state),
+				toMenuItem(getCommandByName("Toggle Dev Tools", state), state),
+				toMenuItem(getCommandByName("Reload Window", state), state),
 				separator,
-				toMenuItem(getCommandByName("Toggle Sidebar", state)),
-				toMenuItem(getCommandByName("Toggle Activity Bar", state)),
-				toMenuItem(getCommandByName("Toggle Commander", state)),
+				toMenuItem(getCommandByName("Toggle Sidebar", state), state),
+				toMenuItem(getCommandByName("Toggle Activity Bar", state), state),
+				toMenuItem(getCommandByName("Toggle Commander", state), state),
 				separator,
-				toMenuItem(getCommandByName("Open Editor", state)),
-				toMenuItem(getCommandByName("Open Graph", state)),
-				toMenuItem(getCommandByName("Open Find in Files", state)),
+				toMenuItem(getCommandByName("Open Editor", state), state),
+				toMenuItem(getCommandByName("Open Graph", state), state),
+				toMenuItem(getCommandByName("Open Find in Files", state), state),
 				separator,
-				toMenuItem(getCommandByName("Open Settings", state)),
+				toMenuItem(getCommandByName("Open Settings", state), state),
 			],
 		},
 	] as any)
 
-export const toMenuItem = (command?: Command): any => {
+export const toMenuItem = (command: Command, state: State): any => {
 	if (!command) {
 		return separator
 	}
@@ -74,6 +73,6 @@ export const toMenuItem = (command?: Command): any => {
 	return {
 		label: command.name,
 		accelerator: command.shortcut,
-		click: () => ipcMain.emit(command.event[0]),
+		click: () => state.emit(command.event),
 	}
 }

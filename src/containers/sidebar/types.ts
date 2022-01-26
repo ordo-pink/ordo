@@ -8,12 +8,11 @@ export type ToggleSidebarEvent = OrdoEvent<SIDEBAR_SCOPE, "toggle">
 export type SetWidthSidebarEvent = OrdoEvent<SIDEBAR_SCOPE, "set-width", number>
 export type SetComponentSidebarEvent = OrdoEvent<SIDEBAR_SCOPE, "set-component", string>
 
-export type SidebarEvent =
-	| ShowSidebarEvent
-	| HideSidebarEvent
-	| ToggleSidebarEvent
-	| SetWidthSidebarEvent
-	| SetComponentSidebarEvent
+export type SidebarEvent = ShowSidebarEvent &
+	HideSidebarEvent &
+	ToggleSidebarEvent &
+	SetWidthSidebarEvent &
+	SetComponentSidebarEvent
 
 export type SidebarState = {
 	width: number

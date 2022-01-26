@@ -1,32 +1,12 @@
-import { IpcMain } from "electron"
-import { produce, Draft } from "immer"
-import { OrdoEvents, WindowContext, WindowState } from "../common/types"
+import { EventHandler, OrdoEvents } from "../common/types"
+import { State } from "../state"
 
-export type IpcMainHandlerInterface = {
-	register: (state: WindowState, context: WindowContext) => void
-	unregister: () => void
-}
-
-export type EventHandler<T extends OrdoEvents> = (
-	state: Draft<WindowState>,
-	arg: T[1],
-	context: WindowContext,
-) => void | Promise<void>
-
-export const registerIpcMainHandlers =
-	<T extends OrdoEvents>(handlers: Record<T[0], EventHandler<T>>) =>
-	(ipcMain: IpcMain): IpcMainHandlerInterface => ({
-		register: (state: WindowState, context: WindowContext) =>
-			Object.keys(handlers).forEach((event) => {
-				ipcMain.on(event, async (_, arg) => {
-					state = await produce(
-						state,
-						async (draft) => (handlers as unknown as Record<string, EventHandler<T>>)[event](draft, arg, context),
-						(patches) => {
-							ipcMain.emit("apply-main-state-patches", patches)
-						},
-					)
-				})
-			}),
-		unregister: () => Object.keys(handlers).forEach((event) => ipcMain.removeHandler(event)),
-	})
+export const registerEventHandlers =
+	<T extends Partial<OrdoEvents>, U extends Extract<OrdoEvents, T>, K extends keyof U = keyof U>(
+		handlers: Record<K, EventHandler<U[K]>>,
+	) =>
+	(state: State): void => {
+		for (const key in handlers) {
+			state.on(key, handlers[key])
+		}
+	}

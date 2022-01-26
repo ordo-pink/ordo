@@ -101,5 +101,5 @@ export type OrdoFolder = {
 	accessedAt?: Date;
 	type: "folder";
 	children: OrdoEntity[];
-	color: keyof Color;
+	color: Color;
 };

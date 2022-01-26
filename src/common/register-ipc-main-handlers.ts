@@ -1,12 +1,10 @@
 import { EventHandler, OrdoEvents } from "../common/types";
-import { State } from "../state";
+import { EventTransmission } from "../event-transmission";
 
 export const registerEventHandlers =
-	<T extends Partial<OrdoEvents>, U extends Extract<OrdoEvents, T>, K extends keyof U = keyof U>(
-		handlers: Record<K, EventHandler<U[K]>>,
-	) =>
-	(state: State): void => {
+	<T extends Partial<OrdoEvents>>(handlers: { [K in keyof T]: EventHandler<T[K]> }) =>
+	(transmission: EventTransmission): void => {
 		for (const key in handlers) {
-			state.on(key, handlers[key]);
+			transmission.on(key as keyof OrdoEvents, (handlers as unknown as Record<string, EventHandler<unknown>>)[key]);
 		}
 	};

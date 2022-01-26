@@ -2,7 +2,7 @@ import { ipcMain } from "electron";
 import { registerEventHandlers } from "../common/register-ipc-main-handlers";
 import { listFolder } from "./fs/list-folder";
 import { readFile } from "./fs/read-file";
-import { OpenOrdoFile, KeysDown, Selection, OrdoFolder } from "./types";
+import { OpenOrdoFile, KeysDown, Selection, OrdoFolder, ApplicationEvent } from "./types";
 import { getFile } from "./utils/get-file";
 import { promises } from "fs";
 
@@ -44,12 +44,12 @@ const getRegisterredShortcut = (keys: KeysDown, draft: WindowState) => {
 	return draft.application.commands.find(({ shortcut }) => shortcut === createAccelerator(keys));
 };
 
-export default registerEventHandlers({
+export default registerEventHandlers<ApplicationEvent>({
 	"@application/get-state": () => {
 		ipcMain.emit("send-state");
 	},
-	"@application/register-command": ({ draft, passed }) => {
-		draft.application.commands.push(passed as Command);
+	"@application/register-command": ({ draft, payload }) => {
+		draft.application.commands.push(payload);
 	},
 	"@application/close-window": ({ context }) => {
 		context.window.close();
@@ -61,7 +61,7 @@ export default registerEventHandlers({
 	"@application/reload-window": ({ context }) => {
 		context.window.webContents.reload();
 	},
-	"@application/open-folder": async ({ draft, context, state }) => {
+	"@application/open-folder": async ({ draft, context, transmission }) => {
 		const filePaths = context.dialog.showOpenDialogSync(context.window, {
 			properties: ["openDirectory", "createDirectory", "promptToCreate"],
 		});
@@ -70,17 +70,17 @@ export default registerEventHandlers({
 			return;
 		}
 
-		state.emit("@activity-bar/open-editor");
+		transmission.emit("@activity-bar/open-editor");
 
 		draft.application.cwd = filePaths[0];
 		draft.application.tree = await listFolder(draft.application.cwd);
 	},
-	"@application/open-file": async ({ draft, passed: path, state }) => {
-		if (!path || !draft.application.tree) {
+	"@application/open-file": async ({ draft, payload, transmission }) => {
+		if (!payload || !draft.application.tree) {
 			return;
 		}
 
-		const alreadyOpen = draft.application.openFiles.findIndex((file) => file.path === path);
+		const alreadyOpen = draft.application.openFiles.findIndex((file) => file.path === payload);
 
 		if (~alreadyOpen) {
 			if (draft.application.currentFile !== alreadyOpen) {
@@ -90,7 +90,7 @@ export default registerEventHandlers({
 			return;
 		}
 
-		const file = getFile(draft.application.tree, path as string) as OpenOrdoFile;
+		const file = getFile(draft.application.tree, payload as string) as OpenOrdoFile;
 
 		if (!file) {
 			return;
@@ -115,22 +115,22 @@ export default registerEventHandlers({
 		draft.application.currentFile = draft.application.openFiles.length - 1;
 		draft.application.currentFilePath = draft.application.openFiles[draft.application.currentFile].path;
 
-		state.emit("@activity-bar/open-editor");
+		transmission.emit("@activity-bar/open-editor");
 	},
-	"@application/update-folder": ({ draft, passed: update }) => {
-		const [path, increment] = update as [string, Partial<OrdoFolder>];
+	"@application/update-folder": ({ draft, payload }) => {
+		const [path, increment] = payload;
 		updateFolder(draft.application.tree as OrdoFolder, path, increment);
 	},
-	"@application/set-current-file": ({ draft, passed: index }) => {
-		draft.application.currentFile = index as number;
+	"@application/set-current-file": ({ draft, payload }) => {
+		draft.application.currentFile = payload;
 		draft.application.currentFilePath = draft.application.openFiles[draft.application.currentFile].path;
 	},
-	"@application/close-file": ({ draft, passed: index }) => {
-		if (index == null) {
-			index = draft.application.currentFile;
+	"@application/close-file": ({ draft, payload }) => {
+		if (payload == null) {
+			payload = draft.application.currentFile;
 		}
 
-		draft.application.openFiles.splice(index as number, 1);
+		draft.application.openFiles.splice(payload, 1);
 
 		draft.application.currentFile = draft.application.openFiles.length - 1;
 		draft.application.currentFilePath = draft.application.openFiles[draft.application.currentFile]?.path || "";
@@ -163,14 +163,14 @@ export default registerEventHandlers({
 		file.updatedAt = mtime;
 		file.accessedAt = atime;
 	},
-	"@editor/on-key-down": ({ draft, passed: keys, state }) => {
-		const shortcut = getRegisterredShortcut(keys as KeysDown, draft);
+	"@editor/on-key-down": ({ draft, payload, transmission }) => {
+		const shortcut = getRegisterredShortcut(payload, draft);
 		if (shortcut) {
-			state.emit(shortcut.event);
+			transmission.emit(shortcut.event);
 			return;
 		}
 
-		const handle = Switch.of((keys as KeysDown).key)
+		const handle = Switch.of(payload.key)
 			.case("Dead", (tab: OpenOrdoFile) => tab)
 			.case("ArrowUp", handleArrowUp)
 			.case("ArrowDown", handleArrowDown)
@@ -181,9 +181,9 @@ export default registerEventHandlers({
 			.case("Tab", handleTab)
 			.default(handleTyping);
 
-		handle(draft.application.openFiles[draft.application.currentFile], keys as KeysDown);
+		handle(draft.application.openFiles[draft.application.currentFile], payload);
 	},
-	"@editor/on-mouse-up": ({ draft, passed: selection }) => {
-		draft.application.openFiles[draft.application.currentFile].selection = selection as Selection;
+	"@editor/on-mouse-up": ({ draft, payload }) => {
+		draft.application.openFiles[draft.application.currentFile].selection = payload;
 	},
 });

@@ -1,4 +1,4 @@
-import { State } from "../../../state";
+import { EventTransmission } from "../../../event-transmission";
 import { Command } from "../../../containers/commander/types";
 
 const separator = { type: "separator" };
@@ -20,10 +20,10 @@ const MAC_MENU = [
 	},
 ];
 
-const getCommandByName = (name: string, state: State): Command =>
+const getCommandByName = (name: string, state: EventTransmission): Command =>
 	state.get((s) => s.application.commands).find((c) => c.name === name) as Command;
 
-export const applicationMenuTemlate = (state: State): any[] =>
+export const applicationMenuTemlate = (state: EventTransmission): any[] =>
 	(process.platform === "darwin" ? MAC_MENU : []).concat([
 		{
 			label: "&File",
@@ -65,7 +65,7 @@ export const applicationMenuTemlate = (state: State): any[] =>
 		},
 	] as any);
 
-export const toMenuItem = (command: Command, state: State): any => {
+export const toMenuItem = (command: Command, state: EventTransmission): any => {
 	if (!command) {
 		return separator;
 	}

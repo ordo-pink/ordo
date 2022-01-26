@@ -1,22 +1,24 @@
+import { OrdoEvents } from "../../common/types";
 import { registerEventHandlers } from "../../common/register-ipc-main-handlers";
+import { CommanderEvent } from "./types";
 
-export default registerEventHandlers({
-	"@commander/get-items": ({ draft, passed, state }) => {
+export default registerEventHandlers<CommanderEvent>({
+	"@commander/get-items": ({ draft, payload, transmission: state }) => {
 		const appCommands = state.get((s) => s.application.commands);
-		draft.commander.items = appCommands.filter((c) => c.name.startsWith(passed || ""));
+		draft.commander.items = appCommands.filter((c) => c.name.startsWith(payload || ""));
 	},
-	"@commander/show": ({ draft, state }) => {
+	"@commander/show": ({ draft, transmission }) => {
 		draft.commander.show = true;
-		state.emit("@commander/get-items", "");
+		transmission.emit("@commander/get-items", "");
 	},
 	"@commander/hide": ({ draft }) => {
 		draft.commander.show = false;
 	},
-	"@commander/run": ({ draft, passed, state }) => {
+	"@commander/run": ({ draft, payload, transmission }) => {
 		draft.commander.show = false;
-		state.emit(passed as string);
+		transmission.emit(payload as keyof OrdoEvents);
 	},
-	"@commander/toggle": ({ state }) => {
-		state.emit(state.get((s) => s.commander.show) ? "@commander/hide" : "@commander/show");
+	"@commander/toggle": ({ transmission }) => {
+		transmission.emit(transmission.get((s) => s.commander.show) ? "@commander/hide" : "@commander/show");
 	},
 });

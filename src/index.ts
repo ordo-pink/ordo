@@ -15,7 +15,7 @@ import registerSidebarCommands from "./containers/sidebar/commands";
 import registerCommanderCommands from "./containers/commander/commands";
 
 import { applicationMenuTemlate } from "./application/appearance/menus/application-menu";
-import { State } from "./state";
+import { EventTransmission } from "./event-transmission";
 
 declare const MAIN_WINDOW_WEBPACK_ENTRY: string;
 declare const MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY: string;
@@ -41,31 +41,31 @@ const createWindow = (): void => {
 		dialog,
 	};
 
-	const state = new State(context);
+	const transmission = new EventTransmission(context);
 
 	ipcMain.on("something-happened", (_, args) => {
-		state.emit(args[0], args[1]);
+		transmission.emit(args[0], args[1]);
 	});
 
 	ipcMain.on("send-state", () => {
 		context.window.webContents.send(
 			"set-state",
-			state.get((s) => s),
+			transmission.get((s) => s),
 		);
 	});
 
-	registerApplicationEventHandlers(state);
-	registerActivityBarEventHandlers(state);
-	registerCommanderEventHandlers(state);
-	registerSidebarEventHandlers(state);
-	registerWorkspaceEventHandlers(state);
+	registerApplicationEventHandlers(transmission);
+	registerActivityBarEventHandlers(transmission);
+	registerCommanderEventHandlers(transmission);
+	registerSidebarEventHandlers(transmission);
+	registerWorkspaceEventHandlers(transmission);
 
-	registerActivityBarCommands(state);
-	registerApplicationCommands(state);
-	registerSidebarCommands(state);
-	registerCommanderCommands(state);
+	registerActivityBarCommands(transmission);
+	registerApplicationCommands(transmission);
+	registerSidebarCommands(transmission);
+	registerCommanderCommands(transmission);
 
-	Menu.setApplicationMenu(Menu.buildFromTemplate(applicationMenuTemlate(state)));
+	Menu.setApplicationMenu(Menu.buildFromTemplate(applicationMenuTemlate(transmission)));
 
 	window.on("close", () => {
 		ipcMain.removeAllListeners("something-happened");

@@ -1,6 +1,6 @@
 import { BrowserWindow, Dialog } from "electron";
 import { Draft } from "immer";
-import { State } from "../state";
+import { EventTransmission } from "../event-transmission";
 import { ApplicationEvent, ApplicationState } from "../application/types";
 import { ActivityBarEvent, ActivityBarState } from "../containers/activity-bar/types";
 import { CommanderEvent, CommanderState } from "../containers/commander/types";
@@ -17,9 +17,9 @@ export type OrdoEvent<T extends string, K extends string, Args = undefined> = Re
 
 export type EventHandler<T> = (event: {
 	draft: Draft<WindowState>;
-	passed: T;
+	payload: T;
 	context: WindowContext;
-	state: State;
+	transmission: EventTransmission;
 }) => void | Promise<void>;
 
 export type WindowContext = {

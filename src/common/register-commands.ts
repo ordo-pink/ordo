@@ -1,8 +1,10 @@
 import { Command } from "../containers/commander/types";
-import { State } from "../state";
+import { EventTransmission } from "../event-transmission";
 import { WindowState } from "./types";
 
 export const registerCommands =
 	(commands: Command[]) =>
-	(state: State): void =>
-		commands.forEach((command) => (state as unknown as { state: WindowState }).state.application.commands.push(command));
+	(transmission: EventTransmission): void =>
+		commands.forEach((command) =>
+			(transmission as unknown as { state: WindowState }).state.application.commands.push(command),
+		);

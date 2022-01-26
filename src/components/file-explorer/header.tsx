@@ -24,14 +24,8 @@ export const Header: React.FC = () => {
 				<div className="font-bold text-gray-600 uppercase">{tree.readableName}</div>
 			</div>
 			<div className="flex items-center space-x-2 text-gray-600">
-				<HiOutlineDocumentAdd
-					className="hover:text-pink-600 cursor-pointer"
-					onClick={() => window.ordo.emit("@application/open-file-creator")}
-				/>
-				<HiOutlineFolderAdd
-					className="hover:text-pink-600 cursor-pointer"
-					onClick={() => window.ordo.emit("@application/open-folder-creator")}
-				/>
+				<HiOutlineDocumentAdd className="hover:text-pink-600 cursor-pointer" />
+				<HiOutlineFolderAdd className="hover:text-pink-600 cursor-pointer" />
 			</div>
 		</>
 	);

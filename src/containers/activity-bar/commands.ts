@@ -9,18 +9,6 @@ export default registerCommands([
 		shortcut: "CommandOrControl+Shift+B",
 	},
 	{
-		icon: "HiOutlineStatusOnline",
-		name: "Show Activity Bar",
-		description: "Shows the activity bar located on the left of the application window.",
-		event: "@activity-bar/show",
-	},
-	{
-		icon: "HiOutlineStatusOffline",
-		name: "Hide Activity Bar",
-		description: "Hides the activity bar located on the left of the application window.",
-		event: "@activity-bar/hide",
-	},
-	{
 		icon: "HiOutlineDocument",
 		name: "Open Editor",
 		description: "Switch to Editor view.",

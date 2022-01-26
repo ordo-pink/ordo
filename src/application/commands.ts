@@ -2,13 +2,6 @@ import { registerCommands } from "../common/register-commands";
 
 export default registerCommands([
 	{
-		icon: "HiOutlineRefresh",
-		name: "Refresh Application State",
-		description: "Triggers forceful application state update.",
-		event: "@application/get-state",
-		shortcut: "CommandOrControl+Shift+R",
-	},
-	{
 		icon: "HiOutlineFolderOpen",
 		name: "Open Folder",
 		description: "Open a different folder in current window.",
@@ -30,7 +23,7 @@ export default registerCommands([
 		shortcut: "CommandOrControl+Shift+I",
 	},
 	{
-		icon: "HiOutlineDesktopComputer",
+		icon: "HiOutlineRefresh",
 		name: "Reload Window",
 		description: "Reload current Ordo window.",
 		event: "@application/reload-window",

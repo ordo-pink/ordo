@@ -8,16 +8,4 @@ export default registerCommands([
 		event: "@sidebar/toggle",
 		shortcut: "CommandOrControl+B",
 	},
-	{
-		icon: "HiOutlineStatusOnline",
-		name: "Show Sidebar",
-		description: "Shows the sidebar located on the left of the application window.",
-		event: "@sidebar/show",
-	},
-	{
-		icon: "HiOutlineStatusOffline",
-		name: "Hide Sidebar",
-		description: "Hides the sidebar located on the left of the application window.",
-		event: "@sidebar/hide",
-	},
 ]);

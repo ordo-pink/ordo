@@ -1,12 +1,12 @@
-import { OrdoFolder } from "../types"
+import { OrdoFolder } from "../types";
 
-import { promises } from "fs"
-import { join } from "path"
-import { createOrdoFolder } from "../create-ordo-folder"
-import YAML from "yaml"
-import { createOrdoFile } from "../create-ordo-file"
-import { sortTree } from "../../common/sort-tree"
-import { Minimatch } from "minimatch"
+import { promises } from "fs";
+import { join } from "path";
+import { createOrdoFolder } from "../create-ordo-folder";
+import YAML from "yaml";
+import { createOrdoFile } from "../create-ordo-file";
+import { sortTree } from "../../common/sort-tree";
+import { Minimatch } from "minimatch";
 
 const excludePatterns = [
 	"**/node_modules",
@@ -17,15 +17,15 @@ const excludePatterns = [
 	"**/.DS_Store",
 	"**/Thumbs.db",
 	"**/.obsidian",
-]
+];
 
 export const listFolder = async (path: string, depth = 0, rootPath = path): Promise<OrdoFolder> => {
-	const folder = await promises.readdir(path, { withFileTypes: true, encoding: "utf-8" })
-	const { mtime, atime, birthtime } = await promises.stat(path)
+	const folder = await promises.readdir(path, { withFileTypes: true, encoding: "utf-8" });
+	const { mtime, atime, birthtime } = await promises.stat(path);
 
-	const excluded = excludePatterns.map((pattern) => new Minimatch(pattern))
+	const excluded = excludePatterns.map((pattern) => new Minimatch(pattern));
 
-	const relativePath = path.replace(rootPath, ".")
+	const relativePath = path.replace(rootPath, ".");
 	const tree = createOrdoFolder({
 		depth,
 		path,
@@ -33,40 +33,40 @@ export const listFolder = async (path: string, depth = 0, rootPath = path): Prom
 		createdAt: birthtime,
 		updatedAt: mtime,
 		accessedAt: atime,
-	})
+	});
 
 	for (const item of folder) {
-		const itemPath = join(path, item.name)
+		const itemPath = join(path, item.name);
 
 		if (excluded.some((mm) => mm.match(itemPath))) {
-			continue
+			continue;
 		}
 
 		if (item.isDirectory()) {
-			tree.children.push(await listFolder(itemPath, depth + 1, rootPath))
+			tree.children.push(await listFolder(itemPath, depth + 1, rootPath));
 		} else if (item.isFile()) {
 			if (item.name === ".ordo") {
-				const content = await promises.readFile(itemPath, "utf-8")
-				const dotOrdo = YAML.parse(content)
+				const content = await promises.readFile(itemPath, "utf-8");
+				const dotOrdo = YAML.parse(content);
 
 				Object.keys(dotOrdo).forEach((key) => {
 					switch (key) {
 						case "color":
-							tree.color = dotOrdo.color
-							break
+							tree.color = dotOrdo.color;
+							break;
 						case "collapsed":
-							tree.collapsed = dotOrdo.collapsed
-							break
+							tree.collapsed = dotOrdo.collapsed;
+							break;
 						default:
-							break
+							break;
 					}
-				})
+				});
 
-				continue
+				continue;
 			}
 
-			const { birthtime, mtime, atime, size } = await promises.stat(itemPath)
-			const relativePath = itemPath.replace(rootPath, ".")
+			const { birthtime, mtime, atime, size } = await promises.stat(itemPath);
+			const relativePath = itemPath.replace(rootPath, ".");
 
 			const file = createOrdoFile({
 				path: itemPath,
@@ -76,11 +76,11 @@ export const listFolder = async (path: string, depth = 0, rootPath = path): Prom
 				updatedAt: mtime,
 				accessedAt: atime,
 				size,
-			})
+			});
 
-			tree.children.push(file)
+			tree.children.push(file);
 		}
 	}
 
-	return sortTree(tree)
-}
+	return sortTree(tree);
+};

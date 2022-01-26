@@ -1,20 +1,20 @@
-import React from "react"
-import { components } from "../../components/components"
-import { useAppSelector } from "../../common/store-hooks"
+import React from "react";
+import { components } from "../../components/components";
+import { useAppSelector } from "../../common/store-hooks";
 
 export const Sidebar: React.FC = () => {
-	const component = useAppSelector((state) => state.sidebar.component)
+	const component = useAppSelector((state) => state.sidebar.component);
 
 	if (!component) {
-		return null
+		return null;
 	}
 
-	const Component = (components as any)[component]
+	const Component = (components as unknown as Record<string, React.FC>)[component];
 
 	if (!Component) {
-		window.ordo.emit("@sidebar/hide")
-		return null
+		window.ordo.emit("@sidebar/hide");
+		return null;
 	}
 
-	return <Component />
-}
+	return <Component />;
+};

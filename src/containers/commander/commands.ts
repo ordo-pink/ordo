@@ -1,4 +1,4 @@
-import { registerCommands } from "../../common/register-commands"
+import { registerCommands } from "../../common/register-commands";
 
 export default registerCommands([
 	{
@@ -8,4 +8,4 @@ export default registerCommands([
 		event: "@commander/toggle",
 		shortcut: "CommandOrControl+Shift+P",
 	},
-])
+]);

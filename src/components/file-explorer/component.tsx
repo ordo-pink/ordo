@@ -1,16 +1,16 @@
-import React from "react"
-import Scrollbars from "react-custom-scrollbars"
-import { useAppSelector } from "../../common/store-hooks"
-import { OrdoFile, OrdoFolder } from "../../application/types"
-import { File } from "./file"
-import { Folder } from "./folder"
-import { Header } from "./header"
+import React from "react";
+import Scrollbars from "react-custom-scrollbars";
+import { useAppSelector } from "../../common/store-hooks";
+import { OrdoFile, OrdoFolder } from "../../application/types";
+import { File } from "./file";
+import { Folder } from "./folder";
+import { Header } from "./header";
 
 export const FileExplorer: React.FC = () => {
-	const tree = useAppSelector((state) => state.application.tree)
+	const tree = useAppSelector((state) => state.application.tree);
 
 	if (!tree) {
-		return null
+		return null;
 	}
 
 	return (
@@ -32,5 +32,5 @@ export const FileExplorer: React.FC = () => {
 				)}
 			</div>
 		</>
-	)
-}
+	);
+};

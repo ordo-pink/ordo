@@ -1,4 +1,4 @@
-import { registerCommands } from "../../common/register-commands"
+import { registerCommands } from "../../common/register-commands";
 
 export default registerCommands([
 	{
@@ -20,4 +20,4 @@ export default registerCommands([
 		description: "Hides the sidebar located on the left of the application window.",
 		event: "@sidebar/hide",
 	},
-])
+]);

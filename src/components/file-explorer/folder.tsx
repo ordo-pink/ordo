@@ -1,11 +1,11 @@
-import React from "react"
-import { OrdoFolder, OrdoFile } from "../../application/types"
-import { File } from "./file"
-import { getCollapseIcon, getFolderIcon } from "../../application/get-folder-icon"
+import React from "react";
+import { OrdoFolder, OrdoFile } from "../../application/types";
+import { File } from "./file";
+import { getCollapseIcon, getFolderIcon } from "../../application/get-folder-icon";
 
 export const Folder: React.FC<{ folder: OrdoFolder }> = ({ folder }) => {
-	const Icon = folder && getCollapseIcon(folder)
-	const FolderIcon = folder && getFolderIcon(folder)
+	const Icon = folder && getCollapseIcon(folder);
+	const FolderIcon = folder && getFolderIcon(folder);
 
 	return (
 		folder && (
@@ -14,7 +14,7 @@ export const Folder: React.FC<{ folder: OrdoFolder }> = ({ folder }) => {
 					style={{ paddingLeft: folder.depth * 12 + "px" }}
 					className={`flex space-x-2 items-center`}
 					onClick={() => {
-						window.ordo.emit("@application/update-folder", [folder.path, { collapsed: !folder.collapsed }])
+						window.ordo.emit("@application/update-folder", [folder.path, { collapsed: !folder.collapsed }]);
 					}}
 				>
 					<Icon />
@@ -29,5 +29,5 @@ export const Folder: React.FC<{ folder: OrdoFolder }> = ({ folder }) => {
 					))}
 			</>
 		)
-	)
-}
+	);
+};

@@ -1,7 +1,8 @@
-import { Command } from "../containers/commander/types"
-import { State } from "../state"
+import { Command } from "../containers/commander/types";
+import { State } from "../state";
+import { WindowState } from "./types";
 
 export const registerCommands =
 	(commands: Command[]) =>
 	(state: State): void =>
-		commands.forEach((command) => (state as any).state.application.commands.push(command))
+		commands.forEach((command) => (state as unknown as { state: WindowState }).state.application.commands.push(command));

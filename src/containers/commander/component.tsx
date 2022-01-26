@@ -1,10 +1,10 @@
-import React from "react"
-import { useAppSelector } from "../../common/store-hooks"
-import { getSupportedIcon } from "../../application/appearance/icons/supported-icons"
-import { Command } from "./types"
+import React from "react";
+import { useAppSelector } from "../../common/store-hooks";
+import { getSupportedIcon } from "../../application/appearance/icons/supported-icons";
+import { Command } from "./types";
 
 const Command: React.FC<Command> = ({ icon, name, description, shortcut, event }) => {
-	const Icon = icon ? getSupportedIcon(icon) : () => null
+	const Icon = icon ? getSupportedIcon(icon) : () => null;
 
 	return (
 		<div className="flex space-x-2 text-sm hover:bg-gray-200 text-gray-500 p-2 last-of-type:rounded-b-lg cursor-pointer select-none">
@@ -18,17 +18,17 @@ const Command: React.FC<Command> = ({ icon, name, description, shortcut, event }
 			</div>
 			<div className="text-xs">{shortcut}</div>
 		</div>
-	)
-}
+	);
+};
 
 export const Commander: React.FC = () => {
-	const show = useAppSelector((state) => state.commander.show)
-	const items = useAppSelector((state) => state.commander.items)
+	const show = useAppSelector((state) => state.commander.show);
+	const items = useAppSelector((state) => state.commander.items);
 
-	const [filter, setFilter] = React.useState("")
+	const [filter, setFilter] = React.useState("");
 
 	if (!show) {
-		return null
+		return null;
 	}
 
 	return (
@@ -40,8 +40,8 @@ export const Commander: React.FC = () => {
 				type="text"
 				value={filter}
 				onChange={(e) => {
-					setFilter(e.target.value)
-					window.ordo.emit("@commander/get-items", e.target.value)
+					setFilter(e.target.value);
+					window.ordo.emit("@commander/get-items", e.target.value);
 				}}
 			/>
 			<div className="rounded-b-lg">
@@ -57,5 +57,5 @@ export const Commander: React.FC = () => {
 				))}
 			</div>
 		</div>
-	)
-}
+	);
+};

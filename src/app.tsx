@@ -1,43 +1,43 @@
-import React from "react"
-import Split from "react-split"
-import { Patch } from "immer"
+import React from "react";
+import Split from "react-split";
+import { Patch } from "immer";
 
-import { ActivityBar } from "./containers/activity-bar/component"
-import { Commander } from "./containers/commander/component"
-import { Sidebar } from "./containers/sidebar/component"
-import { Workspace } from "./containers/workspace/component"
+import { ActivityBar } from "./containers/activity-bar/component";
+import { Commander } from "./containers/commander/component";
+import { Sidebar } from "./containers/sidebar/component";
+import { Workspace } from "./containers/workspace/component";
 
-import { WindowState } from "./common/types"
-import { useAppDispatch, useAppSelector } from "./common/store-hooks"
-import { applyPatches, setState } from "./common/store"
+import { WindowState } from "./common/types";
+import { useAppDispatch, useAppSelector } from "./common/store-hooks";
+import { applyPatches, setState } from "./common/store";
 
 export const App: React.FC = () => {
-	const dispatch = useAppDispatch()
+	const dispatch = useAppDispatch();
 
-	const sidebarWidth = useAppSelector((state) => state.sidebar.width)
-	const showCommander = useAppSelector((state) => state.commander.show)
+	const sidebarWidth = useAppSelector((state) => state.sidebar.width);
+	const showCommander = useAppSelector((state) => state.commander.show);
 
 	React.useEffect(() => {
-		window.ordo.emit("@application/get-state")
-	}, [])
+		window.ordo.emit("@application/get-state");
+	}, []);
 
 	const handleSetState = ({ detail }: CustomEvent<WindowState>) => {
-		dispatch(setState(detail))
-	}
+		dispatch(setState(detail));
+	};
 
 	const handlePatchState = ({ detail }: CustomEvent<Patch[]>) => {
-		dispatch(applyPatches(detail))
-	}
+		dispatch(applyPatches(detail));
+	};
 
 	React.useEffect(() => {
-		window.addEventListener("apply-state-patches", handlePatchState as (e: Event) => void)
-		window.addEventListener("set-state", handleSetState as (e: Event) => void)
+		window.addEventListener("apply-state-patches", handlePatchState as (e: Event) => void);
+		window.addEventListener("set-state", handleSetState as (e: Event) => void);
 
 		return () => {
-			window.removeEventListener("apply-state-patches", handlePatchState as (e: Event) => void)
-			window.removeEventListener("set-state", handleSetState as (e: Event) => void)
-		}
-	})
+			window.removeEventListener("apply-state-patches", handlePatchState as (e: Event) => void);
+			window.removeEventListener("set-state", handleSetState as (e: Event) => void);
+		};
+	});
 
 	return (
 		<div className="flex flex-col h-screen bg-gray-50">
@@ -71,5 +71,5 @@ export const App: React.FC = () => {
 				</Split>
 			</main>
 		</div>
-	)
-}
+	);
+};

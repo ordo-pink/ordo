@@ -1,8 +1,8 @@
-import { CommanderState } from "./types"
+import { CommanderState } from "./types";
 
 const initialState: CommanderState = {
 	show: false,
 	items: [],
-}
+};
 
-export default initialState
+export default initialState;

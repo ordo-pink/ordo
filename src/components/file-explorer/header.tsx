@@ -1,15 +1,15 @@
-import React from "react"
-import { HiOutlineDocumentAdd, HiOutlineFolderAdd } from "react-icons/hi"
-import { getCollapseIcon } from "../../application/get-folder-icon"
-import { useAppSelector } from "../../common/store-hooks"
+import React from "react";
+import { HiOutlineDocumentAdd, HiOutlineFolderAdd } from "react-icons/hi";
+import { getCollapseIcon } from "../../application/get-folder-icon";
+import { useAppSelector } from "../../common/store-hooks";
 
 export const Header: React.FC = () => {
-	const tree = useAppSelector((state) => state.application.tree)
+	const tree = useAppSelector((state) => state.application.tree);
 
-	const Icon = tree ? getCollapseIcon(tree) : () => null
+	const Icon = tree ? getCollapseIcon(tree) : () => null;
 
 	if (!tree) {
-		return null
+		return null;
 	}
 
 	return (
@@ -17,7 +17,7 @@ export const Header: React.FC = () => {
 			<div
 				className="cursor-pointer flex space-x-2 items-center"
 				onClick={() => {
-					window.ordo.emit("@application/update-folder", [tree.path, { collapsed: !tree.collapsed }])
+					window.ordo.emit("@application/update-folder", [tree.path, { collapsed: !tree.collapsed }]);
 				}}
 			>
 				<Icon />
@@ -34,5 +34,5 @@ export const Header: React.FC = () => {
 				/>
 			</div>
 		</>
-	)
-}
+	);
+};

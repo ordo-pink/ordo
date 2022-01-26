@@ -1,4 +1,4 @@
-import React from "react"
+import React from "react";
 
 import {
 	hierarchy as createHierarchy,
@@ -13,47 +13,47 @@ import {
 	drag as d3Drag,
 	zoom,
 	select,
-} from "d3"
-import { OrdoFile } from "../../application/types"
-import { useAppSelector } from "../../common/store-hooks"
+} from "d3";
+import { OrdoFile } from "../../application/types";
+import { useAppSelector } from "../../common/store-hooks";
 
 const drag = (simulation: Simulation<SimulationNodeDatum, undefined>) =>
 	d3Drag()
 		.on("start", (event, d: any) => {
 			if (!event.active) {
-				simulation.alphaTarget(0.3).restart()
+				simulation.alphaTarget(0.3).restart();
 			}
 
-			d.fx = d.x
-			d.fy = d.y
+			d.fx = d.x;
+			d.fy = d.y;
 		})
 		.on("drag", (event, d: any) => {
-			d.fx = event.x
-			d.fy = event.y
+			d.fx = event.x;
+			d.fy = event.y;
 		})
 		.on("end", (event, d: any) => {
 			if (!event.active) {
-				simulation.alphaTarget(0)
+				simulation.alphaTarget(0);
 			}
 
-			d.fx = null
-			d.fy = null
-		})
+			d.fx = null;
+			d.fy = null;
+		});
 
 export const Graph = React.memo(() => {
-	const ref = React.useRef(null)
+	const ref = React.useRef(null);
 
-	const tree = useAppSelector((state) => state.application.tree)
+	const tree = useAppSelector((state) => state.application.tree);
 
 	React.useEffect(() => {
 		if (!ref || !tree) {
-			return
+			return;
 		}
 
-		const hierarchy = createHierarchy(tree)
+		const hierarchy = createHierarchy(tree);
 
-		const links = hierarchy.links()
-		const nodes = hierarchy.descendants()
+		const links = hierarchy.links();
+		const nodes = hierarchy.descendants();
 
 		const simulation: Simulation<SimulationNodeDatum, undefined> = forceSimulation(nodes as any)
 			.force(
@@ -65,9 +65,9 @@ export const Graph = React.memo(() => {
 			)
 			.force("change", forceManyBody().strength(-100))
 			.force("x", forceX())
-			.force("y", forceY())
+			.force("y", forceY());
 
-		const container = select(ref.current)
+		const container = select(ref.current);
 
 		container
 			.attr(
@@ -75,7 +75,7 @@ export const Graph = React.memo(() => {
 				`${-window.innerWidth / 2}, ${-window.innerHeight / 2}, ${window.innerWidth}, ${window.innerHeight}`,
 			)
 			.attr("class", "font-light text-xs")
-			.call(zoom().on("zoom", (e) => container.attr("transform", e.transform)) as any)
+			.call(zoom().on("zoom", (e) => container.attr("transform", e.transform)) as any);
 
 		const link = container
 			.append("g")
@@ -94,8 +94,8 @@ export const Graph = React.memo(() => {
 				// 	return "#DCCCBB"
 				// }
 
-				return "#646E78"
-			})
+				return "#646E78";
+			});
 
 		const node = container
 			.append("g")
@@ -110,26 +110,26 @@ export const Graph = React.memo(() => {
 			.call(drag(simulation) as any)
 			.on("click", (_, n: any) => {
 				if (n.data.type !== "folder") {
-					window.ordo.emit("@application/open-file", n.data.path)
+					window.ordo.emit("@application/open-file", n.data.path);
 				}
-			})
+			});
 
 		node
 			.append("circle")
 			.attr("stroke", (d) => (d.data.type === "folder" ? "#333" : "#fff"))
 			.attr("class", (d) => {
 				if (d.data.type === "folder") {
-					return `text-${d.data.color}-600 fill-current`
+					return `text-${d.data.color}-600 fill-current`;
 				} else if (d.data.type === "image") {
-					return "text-blue-200 fill-current"
+					return "text-blue-200 fill-current";
 				} else if ((d.data as unknown as OrdoFile).size === 0) {
-					return "text-rose-100 fill-current"
+					return "text-rose-100 fill-current";
 				}
 
-				return "text-rose-400 fill-current"
+				return "text-rose-400 fill-current";
 			})
 			.attr("r", 3.5)
-			.attr("title", (d: any) => d.data.readableName)
+			.attr("title", (d: any) => d.data.readableName);
 
 		node
 			.append("text")
@@ -139,18 +139,18 @@ export const Graph = React.memo(() => {
 			.attr("stroke-width", 0)
 			.attr("fill", "#333")
 			.attr("style", "font-size: 2px")
-			.text((d) => d.data.readableName)
+			.text((d) => d.data.readableName);
 
 		simulation.on("tick", () => {
 			link
 				.attr("x1", (d: any) => d.source.x)
 				.attr("y1", (d: any) => d.source.y)
 				.attr("x2", (d: any) => d.target.x)
-				.attr("y2", (d: any) => d.target.y)
+				.attr("y2", (d: any) => d.target.y);
 
-			node.attr("transform", (d: any) => `translate(${d.x},${d.y})`)
-		})
-	}, [tree])
+			node.attr("transform", (d: any) => `translate(${d.x},${d.y})`);
+		});
+	}, [tree]);
 
-	return <svg className="-z-10" ref={ref} width={window.innerWidth} height={window.innerHeight} />
-})
+	return <svg className="-z-10" ref={ref} width={window.innerWidth} height={window.innerHeight} />;
+});

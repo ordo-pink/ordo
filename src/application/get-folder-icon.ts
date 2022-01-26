@@ -5,12 +5,12 @@ import {
 	HiOutlineChevronRight,
 	HiOutlineFolder,
 	HiOutlineFolderOpen,
-} from "react-icons/hi"
-import { IconType } from "react-icons/lib"
-import { OrdoFolder } from "./types"
+} from "react-icons/hi";
+import { IconType } from "react-icons/lib";
+import { OrdoFolder } from "./types";
 
 export const getCollapseIcon = (folder: OrdoFolder): IconType =>
-	folder.collapsed ? HiOutlineChevronRight : HiOutlineChevronDown
+	folder.collapsed ? HiOutlineChevronRight : HiOutlineChevronDown;
 
 export const getFolderIcon = (folder: OrdoFolder): IconType =>
 	folder.collapsed
@@ -19,4 +19,4 @@ export const getFolderIcon = (folder: OrdoFolder): IconType =>
 			: HiOutlineFolder
 		: folder.children.length
 		? HiFolderOpen
-		: HiOutlineFolderOpen
+		: HiOutlineFolderOpen;

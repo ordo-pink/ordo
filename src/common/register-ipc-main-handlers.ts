@@ -1,5 +1,5 @@
-import { EventHandler, OrdoEvents } from "../common/types"
-import { State } from "../state"
+import { EventHandler, OrdoEvents } from "../common/types";
+import { State } from "../state";
 
 export const registerEventHandlers =
 	<T extends Partial<OrdoEvents>, U extends Extract<OrdoEvents, T>, K extends keyof U = keyof U>(
@@ -7,6 +7,6 @@ export const registerEventHandlers =
 	) =>
 	(state: State): void => {
 		for (const key in handlers) {
-			state.on(key, handlers[key])
+			state.on(key, handlers[key]);
 		}
-	}
+	};

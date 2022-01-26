@@ -1,16 +1,16 @@
-import { OrdoFile } from "./types"
+import { OrdoFile } from "./types";
 
 const toReadableSize = (a = 0, b = 2, k = 1024): string => {
 	if (a === 0) {
-		return "0 Bytes"
+		return "0 Bytes";
 	}
 
-	const d = Math.floor(Math.log(a) / Math.log(k))
+	const d = Math.floor(Math.log(a) / Math.log(k));
 
 	return `${parseFloat((a / Math.pow(k, d)).toFixed(Math.max(0, b)))}${
 		["B", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"][d]
-	}`
-}
+	}`;
+};
 
 const fileAssociations = [
 	{ extension: ".apng", association: "image" },
@@ -30,16 +30,16 @@ const fileAssociations = [
 	{ extension: ".tiff", association: "image" },
 	{ extension: ".md", association: "text" },
 	{ extension: ".txt", association: "text" },
-]
+];
 
 interface CreateOrdoFileArg {
-	path: string
-	size?: number
-	depth?: number
-	createdAt?: Date
-	updatedAt?: Date
-	accessedAt?: Date
-	relativePath: string
+	path: string;
+	size?: number;
+	depth?: number;
+	createdAt?: Date;
+	updatedAt?: Date;
+	accessedAt?: Date;
+	relativePath: string;
 }
 
 export const createOrdoFile = ({
@@ -51,12 +51,12 @@ export const createOrdoFile = ({
 	relativePath,
 	size = 0,
 }: CreateOrdoFileArg): OrdoFile => {
-	const readableName = path.substring(path.lastIndexOf("/") + 1)
-	const extension = readableName.substring(readableName.lastIndexOf(".")) ?? ".md"
+	const readableName = path.substring(path.lastIndexOf("/") + 1);
+	const extension = readableName.substring(readableName.lastIndexOf(".")) ?? ".md";
 
-	const type = fileAssociations.find((assoc) => assoc.extension === extension)?.association || "other"
+	const type = fileAssociations.find((assoc) => assoc.extension === extension)?.association || "other";
 
-	const readableSize = toReadableSize(size)
+	const readableSize = toReadableSize(size);
 
 	return {
 		depth,
@@ -70,5 +70,5 @@ export const createOrdoFile = ({
 		extension,
 		readableSize,
 		type,
-	}
-}
+	};
+};

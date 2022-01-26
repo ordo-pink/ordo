@@ -1,5 +1,5 @@
 // eslint-disable-next-line @typescript-eslint/no-var-requires
-const tailwindColors = require("tailwindcss/colors")
+const tailwindColors = require("tailwindcss/colors");
 
 const colors = {
 	inherit: tailwindColors.inherit,
@@ -29,7 +29,7 @@ const colors = {
 	fuchsia: tailwindColors.fuchsia,
 	pink: tailwindColors.pink,
 	rose: tailwindColors.rose,
-}
+};
 
 module.exports = {
 	darkMode: "media",
@@ -40,4 +40,4 @@ module.exports = {
 		},
 	},
 	plugins: [],
-}
+};

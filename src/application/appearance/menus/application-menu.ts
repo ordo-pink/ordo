@@ -1,7 +1,7 @@
-import { State } from "../../../state"
-import { Command } from "../../../containers/commander/types"
+import { State } from "../../../state";
+import { Command } from "../../../containers/commander/types";
 
-const separator = { type: "separator" }
+const separator = { type: "separator" };
 
 const MAC_MENU = [
 	{
@@ -18,10 +18,10 @@ const MAC_MENU = [
 			{ role: "quit" },
 		],
 	},
-]
+];
 
 const getCommandByName = (name: string, state: State): Command =>
-	state.get((s) => s.application.commands).find((c) => c.name === name) as Command
+	state.get((s) => s.application.commands).find((c) => c.name === name) as Command;
 
 export const applicationMenuTemlate = (state: State): any[] =>
 	(process.platform === "darwin" ? MAC_MENU : []).concat([
@@ -63,16 +63,16 @@ export const applicationMenuTemlate = (state: State): any[] =>
 				toMenuItem(getCommandByName("Open Settings", state), state),
 			],
 		},
-	] as any)
+	] as any);
 
 export const toMenuItem = (command: Command, state: State): any => {
 	if (!command) {
-		return separator
+		return separator;
 	}
 
 	return {
 		label: command.name,
 		accelerator: command.shortcut,
 		click: () => state.emit(command.event),
-	}
-}
+	};
+};

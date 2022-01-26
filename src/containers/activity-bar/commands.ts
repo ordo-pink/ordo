@@ -1,4 +1,4 @@
-import { registerCommands } from "../../common/register-commands"
+import { registerCommands } from "../../common/register-commands";
 
 export default registerCommands([
 	{
@@ -48,4 +48,4 @@ export default registerCommands([
 		event: "@activity-bar/open-settings",
 		shortcut: "CommandOrControl+,",
 	},
-])
+]);

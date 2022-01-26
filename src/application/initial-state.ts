@@ -1,4 +1,4 @@
-import { ApplicationState } from "./types"
+import { ApplicationState } from "./types";
 
 const initialState: ApplicationState = {
 	commands: [],
@@ -7,6 +7,6 @@ const initialState: ApplicationState = {
 	showDevTools: false,
 	openFiles: [],
 	currentFile: 0,
-}
+};
 
-export default initialState
+export default initialState;

@@ -1,4 +1,4 @@
-import { ActivityBarState } from "./types"
+import { ActivityBarState } from "./types";
 
 const initialState: ActivityBarState = {
 	show: true,
@@ -9,6 +9,6 @@ const initialState: ActivityBarState = {
 		{ show: true, name: "Find in Files", icon: "HiOutlineSearch", openEvent: "@activity-bar/open-find-in-files" },
 	],
 	bottomItems: [{ show: true, name: "Settings", icon: "HiOutlineCog", openEvent: "@activity-bar/open-settings" }],
-}
+};
 
-export default initialState
+export default initialState;

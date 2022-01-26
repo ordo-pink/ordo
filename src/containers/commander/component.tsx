@@ -62,7 +62,7 @@ export const Commander: React.FC = () => {
 
 	const [filter, setFilter] = React.useState("");
 	const [selected, setSelected] = React.useState(0);
-	const [fused, setFused] = React.useState(fuse.search("*"));
+	const [fused, setFused] = React.useState(fuse.search(""));
 
 	if (!show) {
 		return null;

@@ -34,6 +34,7 @@ const colors = {
 module.exports = {
 	darkMode: "media",
 	content: ["./src/**/*.{ts,tsx,js,jsx,html}"],
+	safelist: [{ pattern: /.*/ }],
 	theme: {
 		extend: {
 			colors,

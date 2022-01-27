@@ -12,13 +12,13 @@ export default registerEventHandlers<CommanderEvent>({
 		transmission.emit("@commander/get-items", "");
 		transmission.emit("@application/set-focused-component", "commander");
 	},
-	"@commander/hide": ({ draft }) => {
+	"@commander/hide": ({ draft, transmission }) => {
 		draft.commander.show = false;
+		transmission.emit("@application/set-focused-component", "editor");
 	},
 	"@commander/run": ({ draft, payload, transmission }) => {
 		draft.commander.show = false;
 		transmission.emit(payload as keyof OrdoEvents);
-		transmission.emit("@application/set-focused-component", "editor");
 	},
 	"@commander/toggle": ({ transmission }) => {
 		transmission.emit(transmission.get((s) => s.commander.show) ? "@commander/hide" : "@commander/show");

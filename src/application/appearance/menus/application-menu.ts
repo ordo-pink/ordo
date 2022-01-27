@@ -40,6 +40,8 @@ export const applicationMenuTemlate = (state: EventTransmission): any[] =>
 					],
 				},
 				separator,
+				toMenuItem(getCommandByName("Save File", state), state),
+				separator,
 				toMenuItem(getCommandByName("Close File", state), state),
 				toMenuItem(getCommandByName("Close Window", state), state),
 			],

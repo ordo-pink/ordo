@@ -199,7 +199,6 @@ export const TextEditor: React.FC = () => {
 	const tabs = useAppSelector((state) => state.application.openFiles);
 	const currentTab = useAppSelector((state) => state.application.currentFile);
 	const focused = useAppSelector((state) => state.application.focusedComponent);
-	// const editorSelected = useAppSelector((state) => state.editorSelected)
 
 	const ref = React.useRef<HTMLDivElement>(null);
 
@@ -249,9 +248,9 @@ export const TextEditor: React.FC = () => {
 
 	const mouseUpHandler = React.useCallback(
 		(index: number, line: number) => {
-			if (mouseDownPosition && (mouseDownPosition.index !== index || mouseDownPosition.line !== line)) {
-				window.ordo.emit("@application/set-focused-component", "editor");
+			window.ordo.emit("@application/set-focused-component", "editor");
 
+			if (mouseDownPosition && (mouseDownPosition.index !== index || mouseDownPosition.line !== line)) {
 				const isMouseDownBefore =
 					mouseDownPosition.line < line || (mouseDownPosition.line === line && mouseDownPosition.index < index);
 				const direction = isMouseDownBefore ? "ltr" : "rtl";

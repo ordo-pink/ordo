@@ -2,11 +2,10 @@ import { ipcMain } from "electron";
 import { registerEventHandlers } from "../common/register-ipc-main-handlers";
 import { listFolder } from "./fs/list-folder";
 import { readFile } from "./fs/read-file";
-import { OpenOrdoFile, KeysDown, OrdoFolder, ApplicationEvent } from "./types";
+import { OpenOrdoFile, OrdoFolder, ApplicationEvent } from "./types";
 import { getFile } from "./utils/get-file";
 import { promises } from "fs";
 
-import { WindowState } from "../common/types";
 import { Switch } from "or-else";
 import { handleEnter } from "./key-handlers/enter";
 import { handleTab } from "./key-handlers/tab";
@@ -18,30 +17,6 @@ import { handleArrowDown } from "./key-handlers/arrow-down";
 import { handleBackspace } from "./key-handlers/backspace";
 import { saveFile } from "./fs/save-file";
 import { updateFolder } from "./fs/update-folder";
-
-const createAccelerator = (keys: KeysDown): string => {
-	let combo = "";
-
-	if (keys.ctrlKey || keys.metaKey) {
-		combo += "CommandOrControl+";
-	}
-
-	if (keys.altKey) {
-		combo += "Alt+";
-	}
-
-	if (keys.shiftKey) {
-		combo += "Shift+";
-	}
-
-	combo += keys.key.toUpperCase();
-
-	return combo;
-};
-
-const getRegisterredShortcut = (keys: KeysDown, draft: WindowState) => {
-	return draft.application.commands.find(({ shortcut }) => shortcut === createAccelerator(keys));
-};
 
 export default registerEventHandlers<ApplicationEvent>({
 	"@application/get-state": () => {

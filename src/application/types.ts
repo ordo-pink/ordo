@@ -31,7 +31,7 @@ export type ShowContextMenuEvent = OrdoEvent<
 	{ x: number; y: number; item: string; params: Record<string, any> }
 >;
 
-export type OpenFolderEvent = OrdoEvent<APPLICATION_SCOPE, "open-folder">;
+export type OpenFolderEvent = OrdoEvent<APPLICATION_SCOPE, "open-folder", string | void>;
 export type UpdateFolderEvent = OrdoEvent<APPLICATION_SCOPE, "update-folder", [string, Partial<OrdoFolder>]>;
 export type OpenFileEvent = OrdoEvent<APPLICATION_SCOPE, "open-file", string>;
 export type SetCurrentFileEvent = OrdoEvent<APPLICATION_SCOPE, "set-current-file", number>;

@@ -28,6 +28,7 @@ enablePatches();
 
 const createWindow = (): void => {
 	const window = new BrowserWindow({
+		show: false,
 		webPreferences: {
 			sandbox: true,
 			contextIsolation: true,
@@ -39,9 +40,16 @@ const createWindow = (): void => {
 	const context: WindowContext = {
 		window,
 		dialog,
+		addRecentDocument: (path) => {
+			app.addRecentDocument(path);
+		},
 	};
 
 	const transmission = new EventTransmission(context);
+
+	app.on("open-file", (_, path) => {
+		transmission.emit("@application/open-folder", path);
+	});
 
 	ipcMain.on("something-happened", (_, args) => {
 		transmission.emit(args[0], args[1]);
@@ -64,6 +72,10 @@ const createWindow = (): void => {
 	registerApplicationCommands(transmission);
 	registerSidebarCommands(transmission);
 	registerCommanderCommands(transmission);
+
+	window.on("ready-to-show", () => {
+		window.show();
+	});
 
 	window.on("focus", () => {
 		transmission

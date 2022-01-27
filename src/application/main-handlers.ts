@@ -44,8 +44,6 @@ export default registerEventHandlers<ApplicationEvent>({
 
 		const entity = payload.item === "folder" ? getFolder(tree, payload.params.path) : getFile(tree, payload.params.path);
 
-		console.log(entity);
-
 		if (!entity) {
 			return;
 		}
@@ -184,19 +182,27 @@ export default registerEventHandlers<ApplicationEvent>({
 	"@application/reload-window": ({ context }) => {
 		context.window.webContents.reload();
 	},
-	"@application/open-folder": async ({ draft, context, transmission }) => {
-		const filePaths = context.dialog.showOpenDialogSync(context.window, {
-			properties: ["openDirectory", "createDirectory", "promptToCreate"],
-		});
+	"@application/open-folder": async ({ draft, context, transmission, payload }) => {
+		let filePath: string;
 
-		if (!filePaths) {
-			return;
+		if (payload) {
+			filePath = payload;
+		} else {
+			const filePaths = context.dialog.showOpenDialogSync(context.window, {
+				properties: ["openDirectory", "createDirectory", "promptToCreate"],
+			});
+
+			if (!filePaths) {
+				return;
+			}
+
+			filePath = filePaths[0];
 		}
 
 		transmission.emit("@activity-bar/open-editor");
 
-		draft.application.cwd = filePaths[0];
-		draft.application.tree = await listFolder(draft.application.cwd);
+		draft.application.cwd = filePath;
+		draft.application.tree = await listFolder(filePath);
 	},
 	"@application/open-file": async ({ draft, payload, transmission }) => {
 		if (!payload || !draft.application.tree) {

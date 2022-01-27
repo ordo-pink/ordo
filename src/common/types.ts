@@ -25,6 +25,7 @@ export type EventHandler<T> = (event: {
 export type WindowContext = {
 	window: BrowserWindow;
 	dialog: Dialog;
+	addRecentDocument: (path: string) => void;
 };
 
 export type WindowState<T extends Record<string, unknown> = Record<string, unknown>> = {

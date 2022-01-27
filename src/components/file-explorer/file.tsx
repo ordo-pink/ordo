@@ -10,6 +10,14 @@ export const File: React.FC<{ file: OrdoFile }> = ({ file }) => {
 
 	return (
 		<div
+			onContextMenu={(e) => {
+				window.ordo.emit("@application/show-context-menu", {
+					x: e.pageX,
+					y: e.pageY,
+					item: "file",
+					params: { path: file.path },
+				});
+			}}
 			style={{ paddingLeft: (file.depth + 0.25) * 12 + "px" }}
 			className={`flex space-x-2 items-center ${selected === file.path && "bg-gray-300"}`}
 			onClick={() => {

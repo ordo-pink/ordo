@@ -25,6 +25,11 @@ export type ToggleDevToolsEvent = OrdoEvent<APPLICATION_SCOPE, "toggle-dev-tools
 export type ReloadWindowEvent = OrdoEvent<APPLICATION_SCOPE, "reload-window">;
 export type RegisterCommandEvent = OrdoEvent<APPLICATION_SCOPE, "register-command", Command>;
 export type SetFocusedComponent = OrdoEvent<APPLICATION_SCOPE, "set-focused-component", string>;
+export type ShowContextMenuEvent = OrdoEvent<
+	APPLICATION_SCOPE,
+	"show-context-menu",
+	{ x: number; y: number; item: string; params: Record<string, any> }
+>;
 
 export type OpenFolderEvent = OrdoEvent<APPLICATION_SCOPE, "open-folder">;
 export type UpdateFolderEvent = OrdoEvent<APPLICATION_SCOPE, "update-folder", [string, Partial<OrdoFolder>]>;
@@ -45,6 +50,7 @@ export type ApplicationEvent = GetStateEvent &
 	CloseFileEvent &
 	EditorEvent &
 	SetFocusedComponent &
+	ShowContextMenuEvent &
 	SaveFileEvent;
 
 export type SelectionBoundary = {

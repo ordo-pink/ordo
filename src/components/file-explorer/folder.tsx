@@ -11,6 +11,14 @@ export const Folder: React.FC<{ folder: OrdoFolder }> = ({ folder }) => {
 		folder && (
 			<>
 				<div
+					onContextMenu={(e) =>
+						window.ordo.emit("@application/show-context-menu", {
+							x: e.pageX,
+							y: e.pageY,
+							item: "folder",
+							params: { path: folder.path },
+						})
+					}
 					style={{ paddingLeft: folder.depth * 12 + "px" }}
 					className={`flex space-x-2 items-center`}
 					onClick={() => {
@@ -18,7 +26,7 @@ export const Folder: React.FC<{ folder: OrdoFolder }> = ({ folder }) => {
 					}}
 				>
 					<Icon />
-					<FolderIcon className={`text-gray-500 text-${folder.color}-500`} />
+					<FolderIcon className={`text-${folder.color}-500`} />
 					<div className="pr-2 truncate text-gray-700 py-0.5">{folder.readableName}</div>
 				</div>
 				{!folder.collapsed &&

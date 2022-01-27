@@ -250,6 +250,8 @@ export const TextEditor: React.FC = () => {
 	const mouseUpHandler = React.useCallback(
 		(index: number, line: number) => {
 			if (mouseDownPosition && (mouseDownPosition.index !== index || mouseDownPosition.line !== line)) {
+				window.ordo.emit("@application/set-focused-component", "editor");
+
 				const isMouseDownBefore =
 					mouseDownPosition.line < line || (mouseDownPosition.line === line && mouseDownPosition.index < index);
 				const direction = isMouseDownBefore ? "ltr" : "rtl";

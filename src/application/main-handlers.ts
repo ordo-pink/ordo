@@ -2,7 +2,7 @@ import { ipcMain } from "electron";
 import { registerEventHandlers } from "../common/register-ipc-main-handlers";
 import { listFolder } from "./fs/list-folder";
 import { readFile } from "./fs/read-file";
-import { OpenOrdoFile, KeysDown, Selection, OrdoFolder, ApplicationEvent } from "./types";
+import { OpenOrdoFile, KeysDown, OrdoFolder, ApplicationEvent } from "./types";
 import { getFile } from "./utils/get-file";
 import { promises } from "fs";
 
@@ -18,7 +18,6 @@ import { handleArrowDown } from "./key-handlers/arrow-down";
 import { handleBackspace } from "./key-handlers/backspace";
 import { saveFile } from "./fs/save-file";
 import { updateFolder } from "./fs/update-folder";
-import { Command } from "../containers/commander/types";
 
 const createAccelerator = (keys: KeysDown): string => {
 	let combo = "";
@@ -83,6 +82,8 @@ export default registerEventHandlers<ApplicationEvent>({
 			return;
 		}
 
+		transmission.emit("@application/set-focused-component", "editor");
+
 		const alreadyOpen = draft.application.openFiles.findIndex((file) => file.path === payload);
 
 		if (~alreadyOpen) {
@@ -124,9 +125,10 @@ export default registerEventHandlers<ApplicationEvent>({
 		const [path, increment] = payload;
 		updateFolder(draft.application.tree as OrdoFolder, path, increment);
 	},
-	"@application/set-current-file": ({ draft, payload }) => {
+	"@application/set-current-file": ({ draft, payload, transmission }) => {
 		draft.application.currentFile = payload;
 		draft.application.currentFilePath = draft.application.openFiles[draft.application.currentFile].path;
+		transmission.emit("@application/set-focused-component", "editor");
 	},
 	"@application/close-file": ({ draft, payload }) => {
 		if (payload == null) {
@@ -166,13 +168,7 @@ export default registerEventHandlers<ApplicationEvent>({
 		file.updatedAt = mtime;
 		file.accessedAt = atime;
 	},
-	"@editor/on-key-down": ({ draft, payload, transmission }) => {
-		const shortcut = getRegisterredShortcut(payload, draft);
-		if (shortcut) {
-			transmission.emit(shortcut.event);
-			return;
-		}
-
+	"@editor/on-key-down": ({ draft, payload }) => {
 		const handle = Switch.of(payload.key)
 			.case("Dead", (tab: OpenOrdoFile) => tab)
 			.case("ArrowUp", handleArrowUp)

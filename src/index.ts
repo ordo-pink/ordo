@@ -1,4 +1,4 @@
-import { app, BrowserWindow, ipcMain, dialog, Menu } from "electron";
+import { app, BrowserWindow, ipcMain, dialog, Menu, globalShortcut } from "electron";
 import installExtension, { REACT_DEVELOPER_TOOLS, REDUX_DEVTOOLS } from "electron-devtools-installer";
 import { enablePatches } from "immer";
 import { WindowContext } from "./common/types";
@@ -64,6 +64,20 @@ const createWindow = (): void => {
 	registerApplicationCommands(transmission);
 	registerSidebarCommands(transmission);
 	registerCommanderCommands(transmission);
+
+	window.on("focus", () => {
+		transmission
+			.get((s) => s.application.commands)
+			.forEach((command) => {
+				if (command.shortcut) {
+					globalShortcut.register(command.shortcut, () => transmission.emit(command.event));
+				}
+			});
+	});
+
+	window.on("blur", () => {
+		globalShortcut.unregisterAll();
+	});
 
 	Menu.setApplicationMenu(Menu.buildFromTemplate(applicationMenuTemlate(transmission)));
 

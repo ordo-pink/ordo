@@ -257,9 +257,21 @@ export default registerEventHandlers<ApplicationEvent>({
 		draft.application.currentFilePath = draft.application.openFiles[payload].path;
 		transmission.emit("@application/set-focused-component", "editor");
 	},
-	"@application/close-file": ({ draft, payload }) => {
+	"@application/close-file": ({ draft, payload, context, transmission }) => {
 		if (payload == null) {
 			payload = draft.application.currentFile;
+		}
+
+		if (draft.application.unsavedFiles.includes(draft.application.openFiles[payload].path)) {
+			const response = context.dialog.showMessageBoxSync({
+				type: "question",
+				message: `The file "${draft.application.openFiles[payload].relativePath}" has unsaved changes. Save before closing?`,
+				buttons: ["Yes", "No"],
+			});
+
+			if (response === 0) {
+				transmission.emit("@application/save-file", draft.application.openFiles[payload].path);
+			}
 		}
 
 		draft.application.openFiles.splice(payload, 1);
@@ -267,8 +279,10 @@ export default registerEventHandlers<ApplicationEvent>({
 		draft.application.currentFile = draft.application.openFiles.length - 1;
 		draft.application.currentFilePath = draft.application.openFiles[draft.application.currentFile]?.path || "";
 	},
-	"@application/save-file": async ({ draft, context }) => {
-		const file = draft.application.openFiles[draft.application.currentFile];
+	"@application/save-file": async ({ draft, context, payload }) => {
+		const file = payload
+			? draft.application.openFiles.find((file) => file.path === payload)
+			: draft.application.openFiles[draft.application.currentFile];
 
 		if (!file) {
 			return;

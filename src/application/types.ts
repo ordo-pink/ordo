@@ -36,7 +36,7 @@ export type UpdateFolderEvent = OrdoEvent<APPLICATION_SCOPE, "update-folder", [s
 export type OpenFileEvent = OrdoEvent<APPLICATION_SCOPE, "open-file", string>;
 export type SetCurrentFileEvent = OrdoEvent<APPLICATION_SCOPE, "set-current-file", number>;
 export type CloseFileEvent = OrdoEvent<APPLICATION_SCOPE, "close-file", number | void>;
-export type SaveFileEvent = OrdoEvent<APPLICATION_SCOPE, "save-file">;
+export type SaveFileEvent = OrdoEvent<APPLICATION_SCOPE, "save-file", string | void>;
 
 export type ApplicationEvent = GetStateEvent &
 	CloseWindowEvent &

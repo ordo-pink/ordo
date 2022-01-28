@@ -9,6 +9,20 @@ export default registerCommands([
 		shortcut: "CommandOrControl+O",
 	},
 	{
+		icon: "HiOutlineDocumentRemove",
+		name: "Delete File",
+		description: "Move current file to trash.",
+		event: "@application/delete",
+		shortcut: "CommandOrControl+Backspace",
+	},
+	{
+		icon: "HiOutlineFolderOpen",
+		name: "Reveal in Finder",
+		description: "Reveal current file folder in the OS native file explorer.",
+		event: "@application/reveal-in-finder",
+		shortcut: "CommandOrControl+Alt+R",
+	},
+	{
 		icon: "HiOutlineStop",
 		name: "Close Window",
 		description: "Close current window. This might not work though.",

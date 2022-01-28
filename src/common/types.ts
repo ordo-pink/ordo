@@ -32,6 +32,8 @@ export type WindowContext = {
 	window: BrowserWindow;
 	dialog: Dialog;
 	addRecentDocument: (path: string) => void;
+	trashItem: (path: string) => Promise<void>;
+	showInFolder: (path: string) => void;
 };
 
 export type WindowState<T extends Record<string, unknown> = Record<string, unknown>> = {

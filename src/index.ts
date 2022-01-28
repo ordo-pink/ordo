@@ -1,4 +1,4 @@
-import { app, BrowserWindow, ipcMain, dialog, Menu, globalShortcut } from "electron";
+import { app, BrowserWindow, ipcMain, dialog, Menu, globalShortcut, shell } from "electron";
 import installExtension, { REACT_DEVELOPER_TOOLS, REDUX_DEVTOOLS } from "electron-devtools-installer";
 import { enablePatches } from "immer";
 import { WindowContext } from "./common/types";
@@ -45,6 +45,8 @@ const createWindow = (): void => {
 		addRecentDocument: (path) => {
 			app.addRecentDocument(path);
 		},
+		showInFolder: shell.showItemInFolder,
+		trashItem: shell.trashItem,
 	};
 
 	const transmission = new EventTransmission(context);

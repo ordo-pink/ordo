@@ -34,6 +34,8 @@ export type WindowContext = {
 	addRecentDocument: (path: string) => void;
 	trashItem: (path: string) => Promise<void>;
 	showInFolder: (path: string) => void;
+	toClipboard: (content: string) => void;
+	fromClipboard: () => string;
 };
 
 export type WindowState<T extends Record<string, unknown> = Record<string, unknown>> = {

@@ -9,6 +9,20 @@ export default registerCommands([
 		shortcut: "CommandOrControl+O",
 	},
 	{
+		icon: "HiOutlineMap",
+		name: "Copy Path",
+		description: "Put current file path to clipboard.",
+		event: "@application/copy-path",
+		shortcut: "CommandOrControl+Alt+C",
+	},
+	{
+		icon: "HiMap",
+		name: "Copy Relative Path",
+		description: "Put current file relative path to clipboard.",
+		event: "@application/copy-relative-path",
+		shortcut: "CommandOrControl+Shift+Alt+C",
+	},
+	{
 		icon: "HiOutlineDocumentRemove",
 		name: "Delete File",
 		description: "Move current file to trash.",

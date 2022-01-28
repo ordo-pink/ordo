@@ -18,6 +18,8 @@ export type ShowContextMenuEvent = OrdoEvent<
 >;
 
 export type OpenFolderEvent = OrdoEvent<APPLICATION_SCOPE, "open-folder", string | void>;
+export type CopyPathEvent = OrdoEvent<APPLICATION_SCOPE, "copy-path", string | void>;
+export type CopyRelativePathEvent = OrdoEvent<APPLICATION_SCOPE, "copy-relative-path", string | void>;
 export type UpdateFolderEvent = OrdoEvent<APPLICATION_SCOPE, "update-folder", [string, Partial<OrdoFolder>]>;
 export type OpenFileEvent = OrdoEvent<APPLICATION_SCOPE, "open-file", string>;
 export type SetCurrentFileEvent = OrdoEvent<APPLICATION_SCOPE, "set-current-file", number>;
@@ -39,6 +41,8 @@ export type ApplicationEvent = GetStateEvent &
 	ShowContextMenuEvent &
 	RevealInFinderEvent &
 	DeleteEvent &
+	CopyPathEvent &
+	CopyRelativePathEvent &
 	SaveFileEvent;
 
 export type SelectionBoundary = {

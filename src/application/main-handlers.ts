@@ -304,6 +304,38 @@ export default registerEventHandlers<ApplicationEvent>({
 		draft.application.currentFilePath = draft.application.openFiles[payload].path;
 		transmission.emit("@application/set-focused-component", "editor");
 	},
+	"@application/copy-path": ({ transmission, payload, context }) => {
+		const tree = transmission.get((state) => state.application.tree);
+		const currentFilePath = transmission.get((state) => state.application.currentFilePath);
+
+		if (!tree) {
+			return;
+		}
+
+		const file = getFile(tree, payload ? payload : currentFilePath);
+
+		if (!file) {
+			return;
+		}
+
+		context.toClipboard(file.path);
+	},
+	"@application/copy-relative-path": ({ transmission, payload, context }) => {
+		const tree = transmission.get((state) => state.application.tree);
+		const currentFilePath = transmission.get((state) => state.application.currentFilePath);
+
+		if (!tree) {
+			return;
+		}
+
+		const file = getFile(tree, payload ? payload : currentFilePath);
+
+		if (!file) {
+			return;
+		}
+
+		context.toClipboard(file.relativePath);
+	},
 	"@application/close-file": ({ draft, payload, context, transmission }) => {
 		if (payload == null) {
 			payload = draft.application.currentFile;

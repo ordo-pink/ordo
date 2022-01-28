@@ -1,4 +1,4 @@
-import { app, BrowserWindow, ipcMain, dialog, Menu, globalShortcut, shell } from "electron";
+import { app, BrowserWindow, ipcMain, dialog, Menu, globalShortcut, shell, clipboard } from "electron";
 import installExtension, { REACT_DEVELOPER_TOOLS, REDUX_DEVTOOLS } from "electron-devtools-installer";
 import { enablePatches } from "immer";
 import { WindowContext } from "./common/types";
@@ -45,6 +45,10 @@ const createWindow = (): void => {
 		addRecentDocument: (path) => {
 			app.addRecentDocument(path);
 		},
+		toClipboard: (content) => {
+			clipboard.writeText(content);
+		},
+		fromClipboard: clipboard.readText,
 		showInFolder: shell.showItemInFolder,
 		trashItem: shell.trashItem,
 	};

@@ -25,8 +25,8 @@ export default registerEventHandlers<ApplicationEvent>({
 	"@application/close-window": ({ context }) => {
 		context.window.close();
 	},
-	"@application/reveal-in-finder": ({ context, transmission }) => {
-		const currentFilePath = transmission.get((state) => state.application.currentFilePath);
+	"@application/reveal-in-finder": ({ context, transmission, payload }) => {
+		const currentFilePath = payload ? payload : transmission.get((state) => state.application.currentFilePath);
 		context.showInFolder(currentFilePath);
 	},
 	"@application/delete": ({ draft, transmission, context, payload }) => {

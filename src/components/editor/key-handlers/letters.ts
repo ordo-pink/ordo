@@ -1,4 +1,5 @@
-import { OpenOrdoFile, KeysDown } from "../types";
+import { OpenOrdoFile } from "../../../application/types";
+import { KeysDown } from "../types";
 import { moveCaretRight } from "./common";
 
 export const handleTyping = (change: OpenOrdoFile, keys: KeysDown): OpenOrdoFile => {

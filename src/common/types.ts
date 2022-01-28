@@ -6,8 +6,14 @@ import { ActivityBarEvent, ActivityBarState } from "../containers/activity-bar/t
 import { CommanderEvent, CommanderState } from "../containers/commander/types";
 import { SidebarEvent, SidebarState } from "../containers/sidebar/types";
 import { WorkspaceEvent, WorkspaceState } from "../containers/workspace/types";
+import { EditorEvent } from "../components/editor/types";
 
-export type OrdoEvents = ApplicationEvent & ActivityBarEvent & CommanderEvent & SidebarEvent & WorkspaceEvent;
+export type OrdoEvents = ApplicationEvent &
+	ActivityBarEvent &
+	CommanderEvent &
+	SidebarEvent &
+	WorkspaceEvent &
+	EditorEvent;
 
 export type Optional<T> = T | undefined;
 

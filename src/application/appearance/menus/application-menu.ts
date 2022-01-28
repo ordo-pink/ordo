@@ -65,6 +65,10 @@ export const applicationMenuTemlate = (state: EventTransmission): any[] =>
 				toMenuItem(getCommandByName("Open Settings", state), state),
 			],
 		},
+		{
+			label: "&Selection",
+			submenu: [toMenuItem(getCommandByName("Select All", state), state)],
+		},
 	] as any);
 
 export const toMenuItem = (command: Command, state: EventTransmission): any => {

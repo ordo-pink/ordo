@@ -1,4 +1,5 @@
-import { OpenOrdoFile, KeysDown } from "../types";
+import { OpenOrdoFile } from "../../../application/types";
+import { KeysDown } from "../types";
 
 export const getPreviousSpace = (edited: OpenOrdoFile): number =>
 	edited.body[edited.selection.start.line]

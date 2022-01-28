@@ -6,15 +6,6 @@ import { OpenOrdoFile, OrdoFolder, ApplicationEvent } from "./types";
 import { getFile } from "./utils/get-file";
 import { promises } from "fs";
 
-import { Switch } from "or-else";
-import { handleEnter } from "./key-handlers/enter";
-import { handleTab } from "./key-handlers/tab";
-import { handleTyping } from "./key-handlers/letters";
-import { handleArrowUp } from "./key-handlers/arrow-up";
-import { handleArrowLeft } from "./key-handlers/arrow-left";
-import { handleArrowRight } from "./key-handlers/arrow-right";
-import { handleArrowDown } from "./key-handlers/arrow-down";
-import { handleBackspace } from "./key-handlers/backspace";
 import { saveFile } from "./fs/save-file";
 import { updateFolder } from "./fs/update-folder";
 import { getFolder } from "./utils/get-folder";
@@ -199,10 +190,15 @@ export default registerEventHandlers<ApplicationEvent>({
 			filePath = filePaths[0];
 		}
 
+		context.addRecentDocument(filePath);
+
 		transmission.emit("@activity-bar/open-editor");
 
 		draft.application.cwd = filePath;
 		draft.application.tree = await listFolder(filePath);
+		draft.application.openFiles = [];
+		draft.application.currentFile = 0;
+		draft.application.currentFilePath = "";
 	},
 	"@application/open-file": async ({ draft, payload, transmission }) => {
 		if (!payload || !draft.application.tree) {
@@ -314,27 +310,5 @@ export default registerEventHandlers<ApplicationEvent>({
 		if (!draft.application.unsavedFiles.length) {
 			context.window.setDocumentEdited(false);
 		}
-	},
-	"@editor/on-key-down": ({ draft, payload, context }) => {
-		const handle = Switch.of(payload.key)
-			.case("Dead", (tab: OpenOrdoFile) => tab)
-			.case("ArrowUp", handleArrowUp)
-			.case("ArrowDown", handleArrowDown)
-			.case("ArrowLeft", handleArrowLeft)
-			.case("ArrowRight", handleArrowRight)
-			.case("Enter", handleEnter)
-			.case("Backspace", handleBackspace)
-			.case("Tab", handleTab)
-			.default(handleTyping);
-
-		handle(draft.application.openFiles[draft.application.currentFile], payload);
-
-		context.window.setDocumentEdited(true);
-		if (!draft.application.unsavedFiles.includes(draft.application.currentFilePath)) {
-			draft.application.unsavedFiles.push(draft.application.currentFilePath);
-		}
-	},
-	"@editor/on-mouse-up": ({ draft, payload }) => {
-		draft.application.openFiles[draft.application.currentFile].selection = payload;
 	},
 });

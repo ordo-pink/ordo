@@ -8,11 +8,13 @@ import registerActivityBarEventHandlers from "./containers/activity-bar/main-han
 import registerCommanderEventHandlers from "./containers/commander/main-handlers";
 import registerSidebarEventHandlers from "./containers/sidebar/main-handlers";
 import registerWorkspaceEventHandlers from "./containers/workspace/main-handlers";
+import registerEditorEventHandlers from "./components/editor/main-handlers";
 
 import registerApplicationCommands from "./application/commands";
 import registerActivityBarCommands from "./containers/activity-bar/commands";
 import registerSidebarCommands from "./containers/sidebar/commands";
 import registerCommanderCommands from "./containers/commander/commands";
+import registerEditorCommands from "./components/editor/commands";
 
 import { applicationMenuTemlate } from "./application/appearance/menus/application-menu";
 import { EventTransmission } from "./event-transmission";
@@ -67,11 +69,13 @@ const createWindow = (): void => {
 	registerCommanderEventHandlers(transmission);
 	registerSidebarEventHandlers(transmission);
 	registerWorkspaceEventHandlers(transmission);
+	registerEditorEventHandlers(transmission);
 
 	registerActivityBarCommands(transmission);
 	registerApplicationCommands(transmission);
 	registerSidebarCommands(transmission);
 	registerCommanderCommands(transmission);
+	registerEditorCommands(transmission);
 
 	window.on("ready-to-show", () => {
 		window.show();

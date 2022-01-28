@@ -1,4 +1,5 @@
-import { OpenOrdoFile, KeysDown } from "../types";
+import { OpenOrdoFile } from "../../../application/types";
+import { KeysDown } from "../types";
 import {
 	isCaretAtLineStart,
 	isCaretBeyondLineLength,

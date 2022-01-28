@@ -215,7 +215,7 @@ export default registerEventHandlers<ApplicationEvent>({
 
 		if (~alreadyOpen) {
 			if (draft.application.currentFile !== alreadyOpen) {
-				draft.application.currentFile = alreadyOpen;
+				transmission.emit("@application/set-current-file", alreadyOpen);
 			}
 
 			return;

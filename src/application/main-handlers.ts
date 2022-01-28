@@ -114,7 +114,7 @@ export default registerEventHandlers<ApplicationEvent>({
 			new MenuItem({
 				label: "Reveal in Finder",
 				accelerator: "CommandOrControl+Alt+R",
-				click: () => console.log("Booo"),
+				click: () => transmission.emit("@application/reveal-in-finder", entity.path),
 			}),
 		);
 
@@ -130,35 +130,11 @@ export default registerEventHandlers<ApplicationEvent>({
 
 		menu.append(new MenuItem({ type: "separator" }));
 
-		menu.append(
-			new MenuItem({
-				label: "Cut",
-				accelerator: "CommandOrControl+X",
-				click: () => console.log("Booo"),
-			}),
-		);
-
-		menu.append(
-			new MenuItem({
-				label: "Copy",
-				accelerator: "CommandOrControl+C",
-				click: () => console.log("Booo"),
-			}),
-		);
-
-		menu.append(
-			new MenuItem({
-				label: "Paste",
-				accelerator: "CommandOrControl+V",
-				click: () => console.log("Booo"),
-			}),
-		);
-
 		if (payload.item === "folder") {
 			const colorOptions = Colors.slice(5).map(
 				(color) =>
 					new MenuItem({
-						label: color,
+						label: color[0].toUpperCase() + color.slice(1),
 						type: "radio",
 						checked: (entity as any)?.color === color,
 						click: () => transmission.emit("@application/update-folder", [entity?.path, { color }]),
@@ -181,7 +157,7 @@ export default registerEventHandlers<ApplicationEvent>({
 			new MenuItem({
 				label: "Copy Path",
 				accelerator: "CommandOrControl+Option+C",
-				click: () => console.log("Booo"),
+				click: () => transmission.emit("@application/copy-path", entity.path),
 			}),
 		);
 
@@ -189,7 +165,7 @@ export default registerEventHandlers<ApplicationEvent>({
 			new MenuItem({
 				label: "Copy Relative Path",
 				accelerator: "CommandOrControl+Shift+Alt+C",
-				click: () => console.log("Booo"),
+				click: () => transmission.emit("@application/copy-relative-path", entity.path),
 			}),
 		);
 

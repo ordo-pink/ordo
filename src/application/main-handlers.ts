@@ -254,7 +254,7 @@ export default registerEventHandlers<ApplicationEvent>({
 	},
 	"@application/set-current-file": ({ draft, payload, transmission }) => {
 		draft.application.currentFile = payload;
-		draft.application.currentFilePath = draft.application.openFiles[draft.application.currentFile].path;
+		draft.application.currentFilePath = draft.application.openFiles[payload].path;
 		transmission.emit("@application/set-focused-component", "editor");
 	},
 	"@application/close-file": ({ draft, payload }) => {
@@ -267,7 +267,7 @@ export default registerEventHandlers<ApplicationEvent>({
 		draft.application.currentFile = draft.application.openFiles.length - 1;
 		draft.application.currentFilePath = draft.application.openFiles[draft.application.currentFile]?.path || "";
 	},
-	"@application/save-file": async ({ draft }) => {
+	"@application/save-file": async ({ draft, context }) => {
 		const file = draft.application.openFiles[draft.application.currentFile];
 
 		if (!file) {
@@ -294,8 +294,14 @@ export default registerEventHandlers<ApplicationEvent>({
 		file.size = size;
 		file.updatedAt = mtime;
 		file.accessedAt = atime;
+
+		draft.application.unsavedFiles = draft.application.unsavedFiles.filter((f) => f !== file.path);
+
+		if (!draft.application.unsavedFiles.length) {
+			context.window.setDocumentEdited(false);
+		}
 	},
-	"@editor/on-key-down": ({ draft, payload }) => {
+	"@editor/on-key-down": ({ draft, payload, context }) => {
 		const handle = Switch.of(payload.key)
 			.case("Dead", (tab: OpenOrdoFile) => tab)
 			.case("ArrowUp", handleArrowUp)
@@ -308,6 +314,11 @@ export default registerEventHandlers<ApplicationEvent>({
 			.default(handleTyping);
 
 		handle(draft.application.openFiles[draft.application.currentFile], payload);
+
+		context.window.setDocumentEdited(true);
+		if (!draft.application.unsavedFiles.includes(draft.application.currentFilePath)) {
+			draft.application.unsavedFiles.push(draft.application.currentFilePath);
+		}
 	},
 	"@editor/on-mouse-up": ({ draft, payload }) => {
 		draft.application.openFiles[draft.application.currentFile].selection = payload;

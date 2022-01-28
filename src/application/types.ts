@@ -72,6 +72,7 @@ export type ApplicationState = {
 	commands: Command[];
 	cwd: string;
 	tree?: OrdoFolder;
+	unsavedFiles: string[];
 	focusedComponent: string;
 	currentFile: number;
 	currentFilePath: string;

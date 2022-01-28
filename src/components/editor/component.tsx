@@ -1,6 +1,6 @@
 import React from "react";
 import Scrollbars from "react-custom-scrollbars";
-import { HiOutlineX } from "react-icons/hi";
+import { HiOutlineExclamation, HiOutlineX } from "react-icons/hi";
 import { getFileIcon } from "../../application/get-file-icon";
 import { OrdoFile, OpenOrdoFile } from "../../application/types";
 import { useAppSelector } from "../../common/store-hooks";
@@ -38,6 +38,8 @@ const Viewer: React.FC<{ file: OrdoFile }> = ({ file }) => {
 
 const Tab: React.FC<{ tab: OpenOrdoFile; index: number }> = ({ tab, index }) => {
 	const currentTab = useAppSelector((state) => state.application.currentFile);
+	const unsavedTabs = useAppSelector((state) => state.application.unsavedFiles);
+
 	const Icon = getFileIcon(tab);
 
 	return (
@@ -51,8 +53,11 @@ const Tab: React.FC<{ tab: OpenOrdoFile; index: number }> = ({ tab, index }) => 
 				window.ordo.emit("@application/set-current-file", index);
 			}}
 		>
-			<Icon className="text-gray-500" />
+			<Icon className="text-gray-500" title="This file contains unsaved changes." />
 			<div>{tab.readableName}</div>
+			<div>
+				<HiOutlineExclamation className={unsavedTabs.includes(tab.path) ? "text-amber-500" : "text-gray-100"} />
+			</div>
 			<HiOutlineX
 				className="text-gray-500 hover:text-red-500"
 				onClick={(e) => {

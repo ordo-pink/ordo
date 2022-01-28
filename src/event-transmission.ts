@@ -47,7 +47,7 @@ export class EventTransmission<
 					draft,
 					context: this.context,
 					transmission: this,
-					payload: payload ? payload : (undefined as unknown as T[K]),
+					payload: payload as unknown as T[K],
 				});
 			},
 			(patches) => {

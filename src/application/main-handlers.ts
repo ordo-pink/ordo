@@ -73,6 +73,7 @@ export default registerEventHandlers<ApplicationEvent>({
 			}
 
 			parent.children = parent?.children.filter((child) => child.path !== (entity as any).path);
+			draft.application.unsavedFiles = draft.application.unsavedFiles.filter((file) => file !== (entity as any).path);
 		}
 	},
 	"@application/show-context-menu": ({ payload, transmission, context }) => {

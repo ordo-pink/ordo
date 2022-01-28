@@ -2,7 +2,7 @@ import { ipcMain, Menu, MenuItem } from "electron";
 import { registerEventHandlers } from "../common/register-ipc-main-handlers";
 import { listFolder } from "./fs/list-folder";
 import { readFile } from "./fs/read-file";
-import { OpenOrdoFile, OrdoFolder, ApplicationEvent } from "./types";
+import { OpenOrdoFile, OrdoFolder, ApplicationEvent, OrdoFile } from "./types";
 import { getFile } from "./utils/get-file";
 import { promises } from "fs";
 
@@ -10,6 +10,7 @@ import { saveFile } from "./fs/save-file";
 import { updateFolder } from "./fs/update-folder";
 import { getFolder } from "./utils/get-folder";
 import { Colors } from "./appearance/colors/types";
+import { getParent } from "./utils/get-parent";
 
 export default registerEventHandlers<ApplicationEvent>({
 	"@application/get-state": () => {
@@ -28,8 +29,51 @@ export default registerEventHandlers<ApplicationEvent>({
 		const currentFilePath = transmission.get((state) => state.application.currentFilePath);
 		context.showInFolder(currentFilePath);
 	},
-	"@application/delete": () => {
-		//
+	"@application/delete": ({ draft, transmission, context, payload }) => {
+		const path = payload
+			? payload
+			: transmission.get((state) => state.application.openFiles[state.application.currentFile].path);
+		const tree = draft.application.tree;
+
+		if (!tree || !path) {
+			return;
+		}
+
+		let entity = getFile(tree, path);
+
+		if (!entity) {
+			entity = getFolder(tree, path) as unknown as OrdoFile;
+		}
+
+		if (!entity) {
+			return;
+		}
+
+		const response = context.dialog.showMessageBoxSync({
+			type: "question",
+			buttons: ["Yes", "No"],
+			message: `Are you sure you want to delete "${entity.relativePath}"?`,
+		});
+
+		if (response === 0) {
+			const isOpen = transmission
+				.get((state) => state.application.openFiles)
+				.findIndex((f) => f.path === (entity as any).path);
+
+			if (isOpen) {
+				transmission.emit("@application/close-file", isOpen);
+			}
+
+			context.trashItem(entity.path);
+
+			const parent = getParent(tree, entity.path);
+
+			if (!parent) {
+				return;
+			}
+
+			parent.children = parent?.children.filter((child) => child.path !== (entity as any).path);
+		}
 	},
 	"@application/show-context-menu": ({ payload, transmission, context }) => {
 		const tree = transmission.get((s) => s.application.tree);
@@ -163,7 +207,7 @@ export default registerEventHandlers<ApplicationEvent>({
 			new MenuItem({
 				label: "Delete",
 				accelerator: "CommandOrControl+Backspace",
-				click: () => console.log("Booo"),
+				click: () => transmission.emit("@application/delete", entity.path),
 			}),
 		);
 
@@ -265,7 +309,9 @@ export default registerEventHandlers<ApplicationEvent>({
 			payload = draft.application.currentFile;
 		}
 
-		if (draft.application.unsavedFiles.includes(draft.application.openFiles[payload].path)) {
+		const currentPath = draft.application.openFiles[payload]?.path;
+
+		if (draft.application.unsavedFiles.includes(currentPath)) {
 			const response = context.dialog.showMessageBoxSync({
 				type: "question",
 				message: `The file "${draft.application.openFiles[payload].relativePath}" has unsaved changes. Save before closing?`,

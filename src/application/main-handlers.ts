@@ -228,7 +228,7 @@ export default registerEventHandlers<ApplicationEvent>({
 		draft.application.currentFile = 0;
 		draft.application.currentFilePath = "";
 	},
-	"@application/open-file": async ({ draft, payload, transmission }) => {
+	"@application/open-file": async ({ draft, payload, transmission, context }) => {
 		if (!payload || !draft.application.tree) {
 			return;
 		}
@@ -270,15 +270,42 @@ export default registerEventHandlers<ApplicationEvent>({
 		draft.application.currentFile = draft.application.openFiles.length - 1;
 		draft.application.currentFilePath = draft.application.openFiles[draft.application.currentFile].path;
 
+		const tree = draft.application.tree;
+
+		if (!tree) {
+			return;
+		}
+
+		transmission.emit("@application/set-focused-component", "editor");
 		transmission.emit("@activity-bar/open-editor");
+
+		context.window.setRepresentedFilename(file.path);
+		context.window.setTitle(`${file.relativePath} - ${draft.application.tree.readableName} - ORDO`);
 	},
 	"@application/update-folder": ({ draft, payload }) => {
 		const [path, increment] = payload;
 		updateFolder(draft.application.tree as OrdoFolder, path, increment);
 	},
-	"@application/set-current-file": ({ draft, payload, transmission }) => {
+	"@application/set-current-file": ({ draft, payload, transmission, context }) => {
 		draft.application.currentFile = payload;
 		draft.application.currentFilePath = draft.application.openFiles[payload].path;
+
+		const tree = draft.application.tree;
+
+		if (!tree) {
+			return;
+		}
+
+		const file = getFile(tree, draft.application.openFiles[payload].path);
+
+		console.log("here", file?.readableName);
+
+		if (!file) {
+			return;
+		}
+
+		context.window.setRepresentedFilename(file.path);
+		context.window.setTitle(`${file.relativePath} - ${tree.readableName} - ORDO`);
 		transmission.emit("@application/set-focused-component", "editor");
 	},
 	"@application/copy-path": ({ transmission, payload, context }) => {
@@ -329,13 +356,14 @@ export default registerEventHandlers<ApplicationEvent>({
 
 			if (response === 0) {
 				transmission.emit("@application/save-file", draft.application.openFiles[payload].path);
+			} else {
+				draft.application.unsavedFiles.splice(draft.application.unsavedFiles.indexOf(currentPath), 1);
 			}
 		}
 
 		draft.application.openFiles.splice(payload, 1);
-
-		draft.application.currentFile = draft.application.openFiles.length - 1;
-		draft.application.currentFilePath = draft.application.openFiles[draft.application.currentFile]?.path || "";
+		// TODO: Fix opening another tab when closing file
+		transmission.emit("@application/set-current-file", draft.application.openFiles.length - 1);
 	},
 	"@application/save-file": async ({ draft, context, payload }) => {
 		const file = payload

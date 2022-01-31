@@ -3,7 +3,7 @@ import { HiOutlineQuestionMarkCircle } from "react-icons/hi";
 import { useAppSelector } from "../../common/store-hooks";
 import { OpenOrdoFile } from "../../application/types";
 
-export const Frontmatter: React.FC<{ file: OpenOrdoFile }> = () => {
+export const Frontmatter: React.FC = () => {
 	const tabs = useAppSelector((state) => state.application.openFiles);
 	const currentTab = useAppSelector((state) => state.application.currentFile);
 

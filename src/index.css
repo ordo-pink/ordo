@@ -64,7 +64,8 @@
 	height: 1ch;
 	display: inline-block;
 	content: "•";
-	margin-left: -1ch;
+	margin-left: -7.5px;
+	margin-right: -2.5px;
 	text-align: center;
 }
 

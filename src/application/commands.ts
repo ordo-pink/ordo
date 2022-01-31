@@ -9,6 +9,21 @@ export default registerCommands([
 		shortcut: "CommandOrControl+O",
 	},
 	{
+		icon: "HiOutlineDocumentAdd",
+		name: "Create File",
+		description: "Create a file next to the currently open file. Creates a file in the root folder if no files are open.",
+		event: "@application/show-file-creation",
+		shortcut: "CommandOrControl+N",
+	},
+	{
+		icon: "HiOutlineFolderAdd",
+		name: "Create Folder",
+		description:
+			"Create a folder next to the currently open file. Creates a folder in the root folder if no files are open.",
+		event: "@application/show-folder-creation",
+		shortcut: "CommandOrControl+Shift+N",
+	},
+	{
 		icon: "HiOutlineMap",
 		name: "Copy Path",
 		description: "Put current file path to clipboard.",

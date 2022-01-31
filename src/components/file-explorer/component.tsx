@@ -9,9 +9,16 @@ import { Header } from "./header";
 export const FileExplorer: React.FC = () => {
 	const tree = useAppSelector((state) => state.application.tree);
 
+	const createFileIn = useAppSelector((state) => state.application.createFileIn);
+	const createFolderIn = useAppSelector((state) => state.application.createFolderIn);
+
+	const [name, setName] = React.useState("");
+
 	if (!tree) {
 		return null;
 	}
+
+	const createHere = createFileIn === tree.path || createFolderIn === tree.path;
 
 	return (
 		<>
@@ -19,6 +26,25 @@ export const FileExplorer: React.FC = () => {
 				<Header />
 			</div>
 			<div className=" h-[97.7%]">
+				{createHere ? (
+					<input
+						type="text"
+						className="w-full px-1 py-0.5 outline-none border border-gray-400"
+						autoFocus={createHere}
+						value={name}
+						onChange={(e) => setName(e.target.value)}
+						onKeyDown={(e) => {
+							if (e.key === "Enter") {
+								window.ordo.emit(createFileIn ? "@application/create-file" : "@application/create-folder", name);
+								setName("");
+							} else if (e.key === "Escape") {
+								window.ordo.emit("@application/hide-creation");
+								setName("");
+							}
+						}}
+						onSubmit={() => window.ordo.emit(createFileIn ? "@application/create-file" : "@application/create-folder", name)}
+					/>
+				) : null}
 				{tree.collapsed ? null : (
 					<Scrollbars>
 						<div>

@@ -11,6 +11,11 @@ export type ReloadWindowEvent = OrdoEvent<APPLICATION_SCOPE, "reload-window">;
 export type RegisterCommandEvent = OrdoEvent<APPLICATION_SCOPE, "register-command", Command>;
 export type SetFocusedComponent = OrdoEvent<APPLICATION_SCOPE, "set-focused-component", string>;
 export type RevealInFinderEvent = OrdoEvent<APPLICATION_SCOPE, "reveal-in-finder", string | void>;
+export type ShowFileCreationEvent = OrdoEvent<APPLICATION_SCOPE, "show-file-creation", string | void>;
+export type ShowFolderCreationEvent = OrdoEvent<APPLICATION_SCOPE, "show-folder-creation", string | void>;
+export type HideCreationEvent = OrdoEvent<APPLICATION_SCOPE, "hide-creation">;
+export type CreateFileEvent = OrdoEvent<APPLICATION_SCOPE, "create-file", string>;
+export type CreateFolderEvent = OrdoEvent<APPLICATION_SCOPE, "create-folder", string>;
 export type ShowContextMenuEvent = OrdoEvent<
 	APPLICATION_SCOPE,
 	"show-context-menu",
@@ -43,6 +48,11 @@ export type ApplicationEvent = GetStateEvent &
 	DeleteEvent &
 	CopyPathEvent &
 	CopyRelativePathEvent &
+	ShowFileCreationEvent &
+	ShowFolderCreationEvent &
+	HideCreationEvent &
+	CreateFileEvent &
+	CreateFolderEvent &
 	SaveFileEvent;
 
 export type SelectionBoundary = {
@@ -63,6 +73,8 @@ export type OpenOrdoFiles = OpenOrdoFile[];
 export type ApplicationState = {
 	commands: Command[];
 	cwd: string;
+	createFileIn?: string;
+	createFolderIn?: string;
 	tree?: OrdoFolder;
 	unsavedFiles: string[];
 	focusedComponent: string;

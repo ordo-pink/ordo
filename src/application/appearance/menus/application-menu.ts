@@ -28,6 +28,9 @@ export const applicationMenuTemlate = (state: EventTransmission): any[] =>
 		{
 			label: "&File",
 			submenu: [
+				toMenuItem(getCommandByName("Create File", state), state),
+				toMenuItem(getCommandByName("Create Folder", state), state),
+				separator,
 				toMenuItem(getCommandByName("Open Folder", state), state),
 				{
 					label: "Open Recent",

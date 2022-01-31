@@ -11,6 +11,8 @@ import { updateFolder } from "./fs/update-folder";
 import { getFolder } from "./utils/get-folder";
 import { Colors } from "./appearance/colors/types";
 import { getParent } from "./utils/get-parent";
+import { createFile } from "./fs/create-file";
+import { createFolder } from "./fs/create-folder";
 
 export default registerEventHandlers<ApplicationEvent>({
 	"@application/get-state": () => {
@@ -29,6 +31,75 @@ export default registerEventHandlers<ApplicationEvent>({
 		const currentFilePath = payload ? payload : transmission.get((state) => state.application.currentFilePath);
 		context.showInFolder(currentFilePath);
 	},
+	"@application/show-file-creation": ({ draft, payload, transmission }) => {
+		if (!draft.application.tree) {
+			return;
+		}
+
+		const path = payload
+			? payload
+			: draft.application.currentFilePath
+			? getParent(draft.application.tree, draft.application.currentFilePath)?.path
+			: draft.application.tree.path;
+
+		if (!path) {
+			return;
+		}
+
+		const folder = getFolder(draft.application.tree, path);
+
+		if (folder?.collapsed) {
+			transmission.emit("@application/update-folder", [path, { collapsed: false }]);
+		}
+
+		draft.application.focusedComponent = "Sidebar";
+		draft.application.createFileIn = path;
+	},
+	"@application/show-folder-creation": ({ draft, payload, transmission }) => {
+		if (!draft.application.tree) {
+			return;
+		}
+
+		const path = payload
+			? payload
+			: draft.application.currentFilePath
+			? getParent(draft.application.tree, draft.application.currentFilePath)?.path
+			: draft.application.tree.path;
+
+		if (!path) {
+			return;
+		}
+
+		const folder = getFolder(draft.application.tree, path);
+
+		if (folder?.collapsed) {
+			transmission.emit("@application/update-folder", [path, { collapsed: false }]);
+		}
+
+		draft.application.focusedComponent = "Sidebar";
+		draft.application.createFolderIn = path;
+	},
+	"@application/hide-creation": ({ draft }) => {
+		draft.application.createFileIn = undefined;
+		draft.application.createFolderIn = undefined;
+		draft.application.focusedComponent = "Editor";
+	},
+	"@application/create-file": async ({ draft, payload, transmission }) => {
+		if (!draft.application.tree || !draft.application.createFileIn) {
+			return;
+		}
+
+		await createFile(draft.application.tree, draft.application.createFileIn, payload);
+		transmission.emit("@application/hide-creation");
+	},
+	"@application/create-folder": async ({ draft, payload, transmission }) => {
+		if (!draft.application.tree || !draft.application.createFolderIn) {
+			return;
+		}
+
+		await createFolder(draft.application.tree, draft.application.createFolderIn, payload);
+		transmission.emit("@application/hide-creation");
+	},
 	"@application/delete": ({ draft, transmission, context, payload }) => {
 		const path = payload
 			? payload
@@ -37,6 +108,12 @@ export default registerEventHandlers<ApplicationEvent>({
 
 		if (!tree || !path) {
 			return;
+		}
+
+		const isOpen = draft.application.openFiles.findIndex((item) => item.path === path);
+
+		if (~isOpen) {
+			transmission.emit("@application/close-file", isOpen);
 		}
 
 		let entity = getFile(tree, path);
@@ -96,7 +173,7 @@ export default registerEventHandlers<ApplicationEvent>({
 				new MenuItem({
 					label: "New File",
 					accelerator: "CommandOrControl+N",
-					click: () => console.log("Booo"),
+					click: () => transmission.emit("@application/show-file-creation", payload.params.path),
 				}),
 			);
 
@@ -104,7 +181,7 @@ export default registerEventHandlers<ApplicationEvent>({
 				new MenuItem({
 					label: "New Folder",
 					accelerator: "CommandOrControl+Shift+N",
-					click: () => console.log("Booo"),
+					click: () => transmission.emit("@application/show-folder-creation", payload.params.path),
 				}),
 			);
 
@@ -233,8 +310,6 @@ export default registerEventHandlers<ApplicationEvent>({
 			return;
 		}
 
-		transmission.emit("@application/set-focused-component", "editor");
-
 		const alreadyOpen = draft.application.openFiles.findIndex((file) => file.path === payload);
 
 		if (~alreadyOpen) {
@@ -288,7 +363,7 @@ export default registerEventHandlers<ApplicationEvent>({
 	},
 	"@application/set-current-file": ({ draft, payload, transmission, context }) => {
 		draft.application.currentFile = payload;
-		draft.application.currentFilePath = draft.application.openFiles[payload].path;
+		draft.application.currentFilePath = draft.application.openFiles[payload]?.path;
 
 		const tree = draft.application.tree;
 
@@ -296,11 +371,12 @@ export default registerEventHandlers<ApplicationEvent>({
 			return;
 		}
 
-		const file = getFile(tree, draft.application.openFiles[payload].path);
-
-		console.log("here", file?.readableName);
+		const file = getFile(tree, draft.application.openFiles[payload]?.path);
 
 		if (!file) {
+			context.window.setRepresentedFilename("");
+			context.window.setTitle(`ORDO`);
+
 			return;
 		}
 

@@ -2,10 +2,17 @@ import React from "react";
 import { OrdoFolder, OrdoFile } from "../../application/types";
 import { File } from "./file";
 import { getCollapseIcon, getFolderIcon } from "../../application/get-folder-icon";
+import { useAppSelector } from "../../common/store-hooks";
 
 export const Folder: React.FC<{ folder: OrdoFolder }> = ({ folder }) => {
+	const createFileIn = useAppSelector((state) => state.application.createFileIn);
+	const createFolderIn = useAppSelector((state) => state.application.createFolderIn);
 	const Icon = folder && getCollapseIcon(folder);
 	const FolderIcon = folder && getFolderIcon(folder);
+
+	const [name, setName] = React.useState("");
+
+	const createHere = createFileIn === folder.path || createFolderIn === folder.path;
 
 	return (
 		folder && (
@@ -29,12 +36,36 @@ export const Folder: React.FC<{ folder: OrdoFolder }> = ({ folder }) => {
 					<FolderIcon className={`text-${folder.color}-500`} />
 					<div className="pr-2 truncate text-gray-700 py-0.5">{folder.readableName}</div>
 				</div>
-				{!folder.collapsed &&
-					folder.children.map((child) => (
-						<div key={child.path}>
-							{child.type === "folder" ? <Folder folder={child as OrdoFolder} /> : <File file={child as OrdoFile} />}
-						</div>
-					))}
+				{!folder.collapsed && (
+					<div>
+						{createHere ? (
+							<input
+								type="text"
+								className="w-full px-1 py-0.5 outline-none border border-gray-400"
+								autoFocus={createHere}
+								value={name}
+								onChange={(e) => setName(e.target.value)}
+								onKeyDown={(e) => {
+									if (e.key === "Enter") {
+										window.ordo.emit(createFileIn ? "@application/create-file" : "@application/create-folder", name);
+										setName("");
+									} else if (e.key === "Escape") {
+										window.ordo.emit("@application/hide-creation");
+										setName("");
+									}
+								}}
+								onSubmit={() =>
+									window.ordo.emit(createFileIn ? "@application/create-file" : "@application/create-folder", name)
+								}
+							/>
+						) : null}
+						{folder.children.map((child) => (
+							<div key={child.path}>
+								{child.type === "folder" ? <Folder folder={child as OrdoFolder} /> : <File file={child as OrdoFile} />}
+							</div>
+						))}
+					</div>
+				)}
 			</>
 		)
 	);

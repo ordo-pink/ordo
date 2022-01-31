@@ -67,27 +67,33 @@ export const Char = React.memo<{
 }>(({ value, charIndex, lineIndex, mouseUpHandler, mouseDownHandler, selection }) => {
 	const ref = React.useRef<HTMLSpanElement>(null);
 
-	const onMouseUp = (e: React.MouseEvent<HTMLSpanElement>) => {
-		e.stopPropagation();
-		e.preventDefault();
+	const onMouseUp = React.useCallback(
+		(e: React.MouseEvent<HTMLSpanElement>) => {
+			e.stopPropagation();
+			e.preventDefault();
 
-		ref.current && ref.current.classList.add("caret");
+			ref.current && ref.current.classList.add("caret");
 
-		mouseUpHandler(charIndex, lineIndex);
-	};
+			mouseUpHandler(charIndex, lineIndex);
+		},
+		[ref.current, charIndex, lineIndex],
+	);
 
-	const onMouseDown = (e: React.MouseEvent<HTMLSpanElement>) => {
-		e.stopPropagation();
-		e.preventDefault();
+	const onMouseDown = React.useCallback(
+		(e: React.MouseEvent<HTMLSpanElement>) => {
+			e.stopPropagation();
+			e.preventDefault();
 
-		mouseDownHandler(charIndex, lineIndex);
-	};
+			mouseDownHandler(charIndex, lineIndex);
+		},
+		[charIndex, lineIndex],
+	);
 
-	const onMouseOver = (e: React.MouseEvent<HTMLSpanElement>) => {
+	const onMouseOver = React.useCallback((e: React.MouseEvent<HTMLSpanElement>) => {
 		if (e.buttons === 1) {
 			onMouseUp(e);
 		}
-	};
+	}, []);
 
 	const isInSelection = checkIsInSelection(selection, charIndex, lineIndex);
 
@@ -231,21 +237,24 @@ export const TextEditor: React.FC = () => {
 		tabs[currentTab].selection.direction,
 	]);
 
-	const onKeyDown = (e: KeyboardEvent) => {
-		if (focused !== "editor") {
-			return;
-		}
+	const onKeyDown = React.useCallback(
+		(e: KeyboardEvent) => {
+			if (focused !== "editor") {
+				return;
+			}
 
-		e.preventDefault();
+			e.preventDefault();
 
-		const { key, metaKey, altKey, ctrlKey, shiftKey } = e;
+			const { key, metaKey, altKey, ctrlKey, shiftKey } = e;
 
-		if (IGNORED_KEY_PRESSES.includes(key)) {
-			return;
-		}
+			if (IGNORED_KEY_PRESSES.includes(key)) {
+				return;
+			}
 
-		window.ordo.emit("@editor/on-key-down", { key, metaKey, altKey, ctrlKey, shiftKey });
-	};
+			window.ordo.emit("@editor/on-key-down", { key, metaKey, altKey, ctrlKey, shiftKey });
+		},
+		[focused],
+	);
 
 	const mouseUpHandler = React.useCallback(
 		(index: number, line: number) => {

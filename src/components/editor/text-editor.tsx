@@ -1,6 +1,7 @@
 import React from "react";
 import { useAppSelector } from "../../common/store-hooks";
 import { Selection, SelectionBoundary } from "../../application/types";
+import { HiOutlineQuestionMarkCircle } from "react-icons/hi";
 
 export interface CaretPosition {
 	line: number;
@@ -283,6 +284,21 @@ export const TextEditor: React.FC = () => {
 
 	return (
 		<div>
+			<div className="mt-24 mb-6 mx-[10%]">
+				<div className="flex justify-between items-center">
+					<div className="text-3xl text-gray-800">{tabs[currentTab].readableName}</div>
+					<HiOutlineQuestionMarkCircle
+						className="text-gray-400 hover:text-pink-400 duration-1000 cursor-pointer transition-all"
+						title={`Size: ${tabs[currentTab].readableSize}
+Path: ${tabs[currentTab].relativePath}
+Created: ${tabs[currentTab].createdAt?.toLocaleString()}
+Last updated: ${tabs[currentTab].updatedAt?.toLocaleString()}`}
+					/>
+				</div>
+				<div className="flex flex-col">
+					<div></div>
+				</div>
+			</div>
 			<div
 				ref={ref}
 				className="outline-none min-h-screen w-full cursor-text tracking-wide"

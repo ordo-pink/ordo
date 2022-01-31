@@ -36,6 +36,7 @@ export const handleBackspace = (change: OpenOrdoFile, keys: KeysDown): OpenOrdoF
 				.concat(change.body[change.selection.start.line].slice(change.selection.start.index));
 
 			change.selection.start.index = prevSpace;
+			change.selection.end.index = change.selection.start.index;
 		} else {
 			change.body[change.selection.start.line] = change.body[change.selection.start.line].slice(
 				change.selection.start.index,

@@ -16,6 +16,7 @@ export type ShowFolderCreationEvent = OrdoEvent<APPLICATION_SCOPE, "show-folder-
 export type HideCreationEvent = OrdoEvent<APPLICATION_SCOPE, "hide-creation">;
 export type CreateFileEvent = OrdoEvent<APPLICATION_SCOPE, "create-file", string>;
 export type CreateFolderEvent = OrdoEvent<APPLICATION_SCOPE, "create-folder", string>;
+export type SavePropsEvent = OrdoEvent<APPLICATION_SCOPE, "save-props", any[]>;
 export type ShowContextMenuEvent = OrdoEvent<
 	APPLICATION_SCOPE,
 	"show-context-menu",
@@ -42,6 +43,7 @@ export type ApplicationEvent = GetStateEvent &
 	OpenFileEvent &
 	SetCurrentFileEvent &
 	CloseFileEvent &
+	SavePropsEvent &
 	SetFocusedComponent &
 	ShowContextMenuEvent &
 	RevealInFinderEvent &
@@ -94,6 +96,7 @@ export type OrdoFile = {
 	createdAt?: Date;
 	updatedAt?: Date;
 	accessedAt?: Date;
+	frontmatter?: Record<string, unknown>;
 	extension: string;
 	size: number;
 	type: "text" | "image" | string;

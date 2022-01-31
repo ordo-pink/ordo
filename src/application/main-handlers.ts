@@ -5,6 +5,7 @@ import { readFile } from "./fs/read-file";
 import { OpenOrdoFile, OrdoFolder, ApplicationEvent, OrdoFile } from "./types";
 import { getFile } from "./utils/get-file";
 import { promises } from "fs";
+import YAML from "yaml";
 
 import { saveFile } from "./fs/save-file";
 import { updateFolder } from "./fs/update-folder";
@@ -13,6 +14,7 @@ import { Colors } from "./appearance/colors/types";
 import { getParent } from "./utils/get-parent";
 import { createFile } from "./fs/create-file";
 import { createFolder } from "./fs/create-folder";
+import { current } from "immer";
 
 export default registerEventHandlers<ApplicationEvent>({
 	"@application/get-state": () => {
@@ -54,6 +56,25 @@ export default registerEventHandlers<ApplicationEvent>({
 
 		draft.application.focusedComponent = "Sidebar";
 		draft.application.createFileIn = path;
+	},
+	"@application/save-props": async ({ draft, payload }) => {
+		const frontmatter = payload.reduce(
+			(acc, prop) => ({
+				...acc,
+				[prop.key]: prop.value,
+			}),
+			{},
+		);
+
+		const currentFile = draft.application.openFiles[draft.application.currentFile];
+
+		if (!currentFile) {
+			return;
+		}
+
+		currentFile.frontmatter = frontmatter;
+
+		await saveFile(currentFile);
 	},
 	"@application/show-folder-creation": ({ draft, payload, transmission }) => {
 		if (!draft.application.tree) {
@@ -326,7 +347,8 @@ export default registerEventHandlers<ApplicationEvent>({
 			return;
 		}
 
-		file.body = (await readFile(file)) as unknown as string[][];
+		const contents = await readFile(file);
+		file.body = contents as unknown as string[][];
 
 		if (file.type === "image") {
 			draft.application.openFiles.push(file);
@@ -334,7 +356,22 @@ export default registerEventHandlers<ApplicationEvent>({
 			return;
 		}
 
-		file.body = (file.body as unknown as string).split("\n").map((line) => line.split("").concat([" "]));
+		file.body = (file.body as unknown as string).split("\n") as any;
+
+		if ((file.body[0] as any) === "---") {
+			file.body.splice(0, 1);
+
+			const frontmatterEndIndex = file.body.findIndex((line: any) => line === "---");
+			const frontmatter = file.body.splice(0, frontmatterEndIndex);
+
+			file.body.splice(0, 1);
+			file.frontmatter = YAML.parse(frontmatter.join("\n"));
+
+			file.body = (file.body as any).map((line: string) => line.split("").concat([" "]));
+		} else {
+			file.body = (file.body as any).map((line: string) => line.split("").concat([" "]));
+		}
+
 		file.selection = {
 			start: { line: 0, index: 0 },
 			end: { line: 0, index: 0 },
@@ -450,20 +487,7 @@ export default registerEventHandlers<ApplicationEvent>({
 			return;
 		}
 
-		await saveFile(
-			file.path,
-			file.body
-				.map((line) => {
-					let str = line.slice(0, -1).join("");
-
-					while (str.endsWith(" ")) {
-						str = str.slice(0, -1);
-					}
-
-					return str;
-				})
-				.join("\n"),
-		);
+		await saveFile(current(file));
 
 		const { size, mtime, atime } = await promises.stat(file.path);
 

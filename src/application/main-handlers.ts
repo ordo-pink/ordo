@@ -483,7 +483,15 @@ export default registerEventHandlers<ApplicationEvent>({
 			? draft.application.openFiles.find((file) => file.path === payload)
 			: draft.application.openFiles[draft.application.currentFile];
 
-		if (!file) {
+		const tree = draft.application.tree;
+
+		if (!file || !tree) {
+			return;
+		}
+
+		const treeFile = getFile(tree, file.path);
+
+		if (!treeFile) {
 			return;
 		}
 
@@ -491,9 +499,9 @@ export default registerEventHandlers<ApplicationEvent>({
 
 		const { size, mtime, atime } = await promises.stat(file.path);
 
-		file.size = size;
-		file.updatedAt = mtime;
-		file.accessedAt = atime;
+		treeFile.size = file.size = size;
+		treeFile.updatedAt = file.updatedAt = mtime;
+		treeFile.accessedAt = file.createdAt = atime;
 
 		draft.application.unsavedFiles = draft.application.unsavedFiles.filter((f) => f !== file.path);
 

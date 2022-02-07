@@ -52,7 +52,9 @@ export const App: React.FC = () => {
 				</div>
 			) : null}
 			<main className="flex flex-grow">
-				<ActivityBar />
+				<div className="z-40 bg-gray-50">
+					<ActivityBar />
+				</div>
 				<Split
 					sizes={[100 - sidebarWidth, sidebarWidth]}
 					minSize={0}

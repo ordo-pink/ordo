@@ -92,7 +92,7 @@ const createWindow = (): void => {
 			.get((s) => s.application.commands)
 			.forEach((command) => {
 				if (command.shortcut) {
-					globalShortcut.register(command.shortcut, () => transmission.emit(command.event));
+					globalShortcut.register(command.shortcut, () => transmission.emit(command.event as keyof OrdoEvent));
 				}
 			});
 	});

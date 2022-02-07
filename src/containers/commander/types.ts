@@ -1,5 +1,5 @@
 import { SupportedIcon } from "../../application/appearance/icons/supported-icons";
-import { OrdoEvent, OrdoEvents } from "../../common/types";
+import { OrdoEvent } from "../../common/types";
 
 export type COMMANDER_SCOPE = "commander";
 
@@ -15,7 +15,7 @@ export type Command = {
 	icon?: SupportedIcon;
 	name: string;
 	description: string;
-	event: keyof OrdoEvents;
+	event: keyof OrdoEvent;
 	shortcut?: string;
 };
 

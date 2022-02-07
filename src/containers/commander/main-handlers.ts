@@ -1,4 +1,3 @@
-import { OrdoEvents } from "../../common/types";
 import { registerEventHandlers } from "../../common/register-ipc-main-handlers";
 import { CommanderEvent } from "./types";
 
@@ -18,7 +17,7 @@ export default registerEventHandlers<CommanderEvent>({
 	},
 	"@commander/run": ({ draft, payload, transmission }) => {
 		draft.commander.show = false;
-		transmission.emit(payload as keyof OrdoEvents);
+		transmission.emit(payload as keyof OrdoEvent);
 	},
 	"@commander/toggle": ({ transmission }) => {
 		transmission.emit(transmission.get((s) => s.commander.show) ? "@commander/hide" : "@commander/show");

@@ -1,25 +1,20 @@
 import { BrowserWindow, Dialog } from "electron";
 import { Draft } from "immer";
 import { EventTransmission } from "../event-transmission";
-import { ApplicationEvent, ApplicationState } from "../application/types";
-import { ActivityBarEvent, ActivityBarState } from "../containers/activity-bar/types";
-import { CommanderEvent, CommanderState } from "../containers/commander/types";
-import { SidebarEvent, SidebarState } from "../containers/sidebar/types";
-import { WorkspaceEvent, WorkspaceState } from "../containers/workspace/types";
-import { EditorEvent } from "../components/editor/types";
-
-export type OrdoEvents = ApplicationEvent &
-	ActivityBarEvent &
-	CommanderEvent &
-	SidebarEvent &
-	WorkspaceEvent &
-	EditorEvent;
+import { ApplicationState } from "../application/types";
+import { ActivityBarState } from "../containers/activity-bar/types";
+import { CommanderState } from "../containers/commander/types";
+import { SidebarState } from "../containers/sidebar/types";
+import { WorkspaceState } from "../containers/workspace/types";
 
 export type Optional<T> = T | undefined;
 
 export type UnaryFn<T, R> = (x: T) => R;
 
-export type OrdoEvent<T extends string, K extends string, Args = undefined> = Record<`@${T}/${K}`, Args>;
+export type OrdoEvent<T extends string = string, K extends string = string, Args = undefined> = Record<
+	`@${T}/${K}`,
+	Args
+>;
 
 export type EventHandler<T> = (event: {
 	draft: Draft<WindowState>;

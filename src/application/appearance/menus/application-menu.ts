@@ -82,6 +82,6 @@ export const toMenuItem = (command: Command, state: EventTransmission): any => {
 	return {
 		label: command.name,
 		accelerator: command.shortcut,
-		click: () => state.emit(command.event),
+		click: () => state.emit(command.event as keyof OrdoEvent),
 	};
 };

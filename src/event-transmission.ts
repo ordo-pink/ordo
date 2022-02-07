@@ -5,13 +5,13 @@ import commander from "./containers/commander/initial-state";
 import sidebar from "./containers/sidebar/initial-state";
 import workspace from "./containers/workspace/initial-state";
 import activities from "./containers/activity-bar/initial-state";
-import { EventHandler, OrdoEvents, WindowContext, WindowState } from "./common/types";
+import { EventHandler, WindowContext, WindowState } from "./common/types";
 
 export class EventTransmission<
 	T extends Record<string, unknown> = Record<string, unknown>,
-	H extends Record<keyof OrdoEvents, EventHandler<OrdoEvents[keyof OrdoEvents]>> = Record<
-		keyof OrdoEvents,
-		EventHandler<OrdoEvents[keyof OrdoEvents]>
+	H extends Record<keyof OrdoEvent, EventHandler<OrdoEvent[keyof OrdoEvent]>> = Record<
+		keyof OrdoEvent,
+		EventHandler<OrdoEvent[keyof OrdoEvent]>
 	>,
 > {
 	private state: WindowState;
@@ -31,7 +31,7 @@ export class EventTransmission<
 		this.context = context;
 	}
 
-	public on<T extends OrdoEvents, K extends keyof T>(key: K, updateFn: EventHandler<T[K]>): void {
+	public on<T extends OrdoEvent, K extends keyof T>(key: K, updateFn: EventHandler<T[K]>): void {
 		(this.handlers as unknown as Record<K, EventHandler<T[K]>>)[key] = updateFn;
 	}
 
@@ -39,7 +39,9 @@ export class EventTransmission<
 		return selector(this.state);
 	}
 
-	public emit<T extends OrdoEvents, K extends keyof T>(key: K, payload?: T[K]): void {
+	public emit<T extends OrdoEvent, K extends keyof T>(key: K): void;
+	public emit<T extends OrdoEvent, K extends keyof T>(key: K, payload: T[K]): void;
+	public emit<T extends OrdoEvent, K extends keyof T>(key: K, payload?: T[K]): void {
 		produce(
 			this.state,
 			async (draft) => {

@@ -1,6 +1,5 @@
-// eslint-disable-next-line
+const { resolve } = require("path");
 const rules = require("./webpack.rules");
-// eslint-disable-next-line
 const plugins = require("./webpack.plugins");
 
 rules.push({
@@ -15,5 +14,10 @@ module.exports = {
 	plugins: plugins,
 	resolve: {
 		extensions: [".js", ".ts", ".jsx", ".tsx", ".css"],
+		alias: {
+			"@core": resolve("./src/core"),
+			"@containers": resolve("./src/containers"),
+			"@modules": resolve("./src/modules"),
+		},
 	},
 };

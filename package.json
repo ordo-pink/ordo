@@ -68,6 +68,12 @@
 			]
 		}
 	},
+	"postcss": {
+		"plugins": {
+			"tailwindcss": {},
+			"autoprefixer": {}
+		}
+	},
 	"prettier": {
 		"printWidth": 120,
 		"trailingComma": "all",
@@ -89,6 +95,12 @@
 					"ignore": [
 						"ava"
 					]
+				}
+			],
+			"@typescript-eslint/no-var-requires": [
+				2,
+				{
+					"ignore": "js"
 				}
 			]
 		},

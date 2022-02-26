@@ -1,6 +1,7 @@
 import React from "react";
-import { components } from "../../components/components";
-import { useAppSelector } from "../../common/store-hooks";
+
+import { components } from "@modules/components";
+import { useAppSelector } from "@core/store-hooks";
 
 export const Sidebar: React.FC = () => {
 	const component = useAppSelector((state) => state.sidebar.component);

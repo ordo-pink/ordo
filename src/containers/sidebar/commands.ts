@@ -1,4 +1,4 @@
-import { registerCommands } from "../../common/register-commands";
+import { registerCommands } from "@core/register-commands";
 
 export default registerCommands([
 	{

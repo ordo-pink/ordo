@@ -1,5 +1,5 @@
-import { registerEventHandlers } from "../../common/register-ipc-main-handlers";
-import { ActivityBarEvent } from "./types";
+import { registerEventHandlers } from "@core/register-ipc-main-handlers";
+import { ActivityBarEvent } from "@containers/activity-bar/types";
 
 export default registerEventHandlers<ActivityBarEvent>({
 	"@activity-bar/show": ({ draft }) => void (draft.activities.show = true),

@@ -1,4 +1,4 @@
-import { CommanderState } from "./types";
+import { CommanderState } from "@containers/commander/types";
 
 const initialState: CommanderState = {
 	show: false,

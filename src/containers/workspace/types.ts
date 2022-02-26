@@ -1,4 +1,4 @@
-import { OrdoEvent } from "../../common/types";
+import { OrdoEvent } from "@core/types";
 
 export type WORKSPACE_SCOPE = "workspace";
 

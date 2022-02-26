@@ -1,5 +1,5 @@
-import { SupportedIcon } from "../../application/appearance/icons/supported-icons";
-import { OrdoEvent } from "../../common/types";
+import { SupportedIcon } from "@core/appearance/icons/supported-icons";
+import { OrdoEvent } from "@core/types";
 
 export type COMMANDER_SCOPE = "commander";
 

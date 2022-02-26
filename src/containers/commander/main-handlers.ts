@@ -1,5 +1,5 @@
-import { registerEventHandlers } from "../../common/register-ipc-main-handlers";
-import { CommanderEvent } from "./types";
+import { registerEventHandlers } from "@core/register-ipc-main-handlers";
+import { CommanderEvent } from "@containers/commander/types";
 
 export default registerEventHandlers<CommanderEvent>({
 	"@commander/get-items": ({ draft, payload, transmission: state }) => {

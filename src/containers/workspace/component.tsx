@@ -1,6 +1,7 @@
 import React from "react";
-import { useAppSelector } from "../../common/store-hooks";
-import { components } from "../../components/components";
+
+import { useAppSelector } from "@core/store-hooks";
+import { components } from "@modules/components";
 
 export const Workspace: React.FC = () => {
 	const component = useAppSelector((state) => state.workspace.component);

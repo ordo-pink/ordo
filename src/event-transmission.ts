@@ -1,11 +1,11 @@
 import { produce, applyPatches } from "immer";
 
-import application from "./application/initial-state";
-import commander from "./containers/commander/initial-state";
-import sidebar from "./containers/sidebar/initial-state";
-import workspace from "./containers/workspace/initial-state";
-import activities from "./containers/activity-bar/initial-state";
-import { EventHandler, WindowContext, WindowState } from "./common/types";
+import application from "@modules/application/initial-state";
+import commander from "@containers/commander/initial-state";
+import sidebar from "@containers/sidebar/initial-state";
+import workspace from "@containers/workspace/initial-state";
+import activities from "@containers/activity-bar/initial-state";
+import { EventHandler, WindowContext, WindowState } from "@core/types";
 
 export class EventTransmission<
 	T extends Record<string, unknown> = Record<string, unknown>,

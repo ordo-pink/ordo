@@ -1,5 +1,5 @@
-import { registerEventHandlers } from "../../common/register-ipc-main-handlers";
-import { SidebarEvent } from "./types";
+import { registerEventHandlers } from "@core/register-ipc-main-handlers";
+import { SidebarEvent } from "@containers/sidebar/types";
 
 export default registerEventHandlers<SidebarEvent>({
 	"@sidebar/set-component": ({ draft, payload }) => void (draft.sidebar.component = payload),

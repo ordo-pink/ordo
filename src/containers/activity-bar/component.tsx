@@ -1,7 +1,8 @@
 import React from "react";
-import { useAppSelector } from "../../common/store-hooks";
-import { getSupportedIcon } from "../../application/appearance/icons/supported-icons";
-import { ActivityBarItem } from "./types";
+
+import { useAppSelector } from "@core/store-hooks";
+import { getSupportedIcon } from "@core/appearance/icons/supported-icons";
+import { ActivityBarItem } from "@containers/activity-bar/types";
 
 export const Activity: React.FC<ActivityBarItem & { current?: string }> = ({
 	show,

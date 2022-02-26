@@ -1,8 +1,9 @@
 import React from "react";
-import { useAppSelector } from "../../common/store-hooks";
-import { getSupportedIcon } from "../../application/appearance/icons/supported-icons";
-import { Command } from "./types";
 import Fuse from "fuse.js";
+
+import { useAppSelector } from "@core/store-hooks";
+import { getSupportedIcon } from "@core/appearance/icons/supported-icons";
+import { Command } from "@containers/commander/types";
 
 const Shortcut = React.memo<{ shortcut: string }>(({ shortcut }) => {
 	if (!shortcut) {

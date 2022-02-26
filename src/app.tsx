@@ -2,14 +2,13 @@ import React from "react";
 import Split from "react-split";
 import { Patch } from "immer";
 
-import { ActivityBar } from "./containers/activity-bar/component";
-import { Commander } from "./containers/commander/component";
-import { Sidebar } from "./containers/sidebar/component";
-import { Workspace } from "./containers/workspace/component";
-
-import { WindowState } from "./common/types";
-import { useAppDispatch, useAppSelector } from "./common/store-hooks";
-import { applyPatches, setState } from "./common/store";
+import { ActivityBar } from "@containers/activity-bar/component";
+import { Commander } from "@containers/commander/component";
+import { Sidebar } from "@containers/sidebar/component";
+import { Workspace } from "@containers/workspace/component";
+import { WindowState } from "@core/types";
+import { useAppDispatch, useAppSelector } from "@core/store-hooks";
+import { applyPatches, setState } from "@core/store";
 
 export const App: React.FC = () => {
 	const dispatch = useAppDispatch();

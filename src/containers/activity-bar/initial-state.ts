@@ -1,4 +1,4 @@
-import { ActivityBarState } from "./types";
+import { ActivityBarState } from "@containers/activity-bar/types";
 
 const initialState: ActivityBarState = {
 	show: true,

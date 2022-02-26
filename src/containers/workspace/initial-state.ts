@@ -1,4 +1,4 @@
-import { WorkspaceState } from "./types";
+import { WorkspaceState } from "@containers/workspace/types";
 
 const initialState: WorkspaceState = {
 	component: "WelcomePage",

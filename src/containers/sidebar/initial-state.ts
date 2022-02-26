@@ -1,4 +1,4 @@
-import { SidebarState } from "./types";
+import { SidebarState } from "@containers/sidebar/types";
 
 const initialState: SidebarState = {
 	width: 0,

@@ -1,22 +1,20 @@
 import { app, BrowserWindow, ipcMain, dialog, Menu, globalShortcut, shell, clipboard } from "electron";
 import installExtension, { REACT_DEVELOPER_TOOLS, REDUX_DEVTOOLS } from "electron-devtools-installer";
 import { enablePatches } from "immer";
-import { WindowContext } from "./common/types";
 
-import registerApplicationEventHandlers from "./application/main-handlers";
-import registerActivityBarEventHandlers from "./containers/activity-bar/main-handlers";
-import registerCommanderEventHandlers from "./containers/commander/main-handlers";
-import registerSidebarEventHandlers from "./containers/sidebar/main-handlers";
-import registerWorkspaceEventHandlers from "./containers/workspace/main-handlers";
-import registerEditorEventHandlers from "./components/editor/main-handlers";
-
-import registerApplicationCommands from "./application/commands";
-import registerActivityBarCommands from "./containers/activity-bar/commands";
-import registerSidebarCommands from "./containers/sidebar/commands";
-import registerCommanderCommands from "./containers/commander/commands";
-import registerEditorCommands from "./components/editor/commands";
-
-import { applicationMenuTemlate } from "./application/appearance/menus/application-menu";
+import { WindowContext } from "@core/types";
+import registerApplicationEventHandlers from "@modules/application/main-handlers";
+import registerActivityBarEventHandlers from "@containers/activity-bar/main-handlers";
+import registerCommanderEventHandlers from "@containers/commander/main-handlers";
+import registerSidebarEventHandlers from "@containers/sidebar/main-handlers";
+import registerWorkspaceEventHandlers from "@containers/workspace/main-handlers";
+import registerEditorEventHandlers from "@modules/editor/main-handlers";
+import registerApplicationCommands from "@modules/application/commands";
+import registerActivityBarCommands from "@containers/activity-bar/commands";
+import registerSidebarCommands from "@containers/sidebar/commands";
+import registerCommanderCommands from "@containers/commander/commands";
+import registerEditorCommands from "@modules/editor/commands";
+import { applicationMenuTemlate } from "@core/appearance/menus/application-menu";
 import { EventTransmission } from "./event-transmission";
 
 declare const MAIN_WINDOW_WEBPACK_ENTRY: string;

@@ -1,7 +1,6 @@
 import { app, BrowserWindow } from "electron";
 import { Color } from "@core/apprearance/colors";
 import install, { REACT_DEVELOPER_TOOLS, REDUX_DEVTOOLS } from "electron-devtools-installer";
-// import internalSettings from "@core/settings/store";
 
 declare const MAIN_WINDOW_WEBPACK_ENTRY: string;
 declare const MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY: string;
@@ -63,8 +62,6 @@ app.on("window-all-closed", () => {
 		app.quit();
 	}
 });
-
-console.log(Color);
 
 app.on("activate", () => {
 	if (BrowserWindow.getAllWindows().length === 0) {

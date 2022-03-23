@@ -16,7 +16,7 @@ export const sidebarSlice = createSlice({
 	reducers: {
 		setSidebarWidth: (state, action: PayloadAction<number>) => {
 			state.width = action.payload;
-			state.show = action.payload > 0;
+			state.show = action.payload > 1;
 		},
 		toggleSidebar: (state) => {
 			state.show = !state.show;

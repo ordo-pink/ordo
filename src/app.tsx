@@ -11,11 +11,14 @@ import { setSidebarWidth } from "@containers/sidebar/sidebar-slice";
 
 import { ActivityBar } from "@modules/activity-bar";
 import { TopBar } from "@modules/top-bar";
+import { setPanelHeight } from "@containers/panel/panel-slice";
 
 export const App: React.FC = () => {
 	const dispatch = useAppDispatch();
 	const showSidebar = useAppSelector((state) => state.sidebar.show);
 	const sidebarWidth = useAppSelector((state) => state.sidebar.width);
+	const showPanel = useAppSelector((state) => state.panel.show);
+	const panelHeight = useAppSelector((state) => state.panel.height);
 
 	return (
 		<>
@@ -32,9 +35,10 @@ export const App: React.FC = () => {
 					<Split
 						className="flex flex-col justify-between"
 						direction="vertical"
-						sizes={[80, 20]}
+						sizes={showPanel ? [100 - panelHeight, panelHeight] : [100, 0]}
 						minSize={0}
 						snapOffset={100}
+						onDragEnd={(sizes) => dispatch(setPanelHeight(sizes[1]))}
 					>
 						<div className="px-2">
 							<Workspace />

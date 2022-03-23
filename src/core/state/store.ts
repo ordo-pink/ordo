@@ -1,29 +1,19 @@
-import { activityBarReducer, activityBarSlice, ActivityBarState } from "@modules/activity-bar/activity-bar-slice";
-import { configureStore, createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { applyPatches as apply, enablePatches, Patch } from "immer";
+import { sidebarReducer, SidebarState } from "@containers/sidebar/sidebar-slice";
+import { activityBarReducer, ActivityBarState } from "@modules/activity-bar/activity-bar-slice";
+import { configureStore } from "@reduxjs/toolkit";
+import { applyPatches as apply, enablePatches } from "immer";
 
 enablePatches();
 
 export type State = {
 	activityBar: ActivityBarState;
+	sidebar: SidebarState;
 };
-
-// export const initialState: State = {
-// 	activityBar: acitivityBarInitialState,
-// };
-
-// const state = createSlice({
-// 	name: "state",
-// 	initialState,
-// 	reducers: {
-// 		setState: (_, action: PayloadAction<State>) => action.payload,
-// 		applyPatches: (state, action: PayloadAction<Patch[]>) => apply(state, action.payload),
-// 	},
-// });
 
 export const store = configureStore({
 	reducer: {
 		activityBar: activityBarReducer,
+		sidebar: sidebarReducer,
 	},
 	middleware: (d) => d({ serializableCheck: false }),
 });

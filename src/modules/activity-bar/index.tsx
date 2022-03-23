@@ -11,7 +11,13 @@ export const ActivityBar: React.FC = () => {
 		<div className="flex flex-col justify-between px-4 py-2 h-full text-4xl">
 			<div className="flex flex-col space-y-4">
 				{items.map((item) => (
-					<ActivityBarIcon current={item.name === current} name={item.name} icon={item.icon} show={item.show} />
+					<ActivityBarIcon
+						key={item.name}
+						current={item.name === current}
+						name={item.name}
+						icon={item.icon}
+						show={item.show}
+					/>
 				))}
 			</div>
 			<ActivityBarIcon current={current === "Settings"} name="Settings" icon="HiOutlineCog" show={true} />

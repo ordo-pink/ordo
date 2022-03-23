@@ -2,7 +2,7 @@ import React from "react";
 
 import { getSupportedIcon } from "@core/apprearance/icons";
 import { useAppDispatch } from "@core/state/hooks";
-import { ActivityBarItem, selectActivity } from "./activity-bar-reducer";
+import { ActivityBarItem, selectActivity } from "./activity-bar-slice";
 
 export const ActivityBarIcon: React.FC<ActivityBarItem & { current: boolean }> = ({ icon, show, name, current }) => {
 	if (!show || !icon) {

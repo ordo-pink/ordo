@@ -1,4 +1,4 @@
-import { activityBarReducer, activityBarSlice, ActivityBarState } from "@modules/activity-bar/activity-bar-reducer";
+import { activityBarReducer, activityBarSlice, ActivityBarState } from "@modules/activity-bar/activity-bar-slice";
 import { configureStore, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { applyPatches as apply, enablePatches, Patch } from "immer";
 

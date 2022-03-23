@@ -1,7 +1,7 @@
 import React from "react";
 
 export const TopBar: React.FC = () => (
-	<div style={{ appRegion: "drag", cursor: "move" } as any} className="flex items-center justify-center pt-2">
+	<div style={{ appRegion: "drag" } as any} className="flex items-center justify-center pt-2">
 		<div style={{ appRegion: "none" } as any} className="w-[60%]">
 			<input
 				type="text"

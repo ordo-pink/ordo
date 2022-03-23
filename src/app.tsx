@@ -1,16 +1,20 @@
 import React from "react";
-
 import Split from "react-split";
-import { ActivityBar } from "@containers/activity-bar";
+import { Provider } from "react-redux";
+
+import { store } from "@core/state/store";
+
 import { Panel } from "@containers/panel";
 import { Sidebar } from "@containers/sidebar";
 import { StatusBar } from "@containers/status-bar";
-import { TopBar } from "@containers/top-bar";
 import { Workspace } from "@containers/workspace";
 
-export const App: React.FC = () => {
-	return (
-		<React.StrictMode>
+import { ActivityBar } from "@modules/activity-bar";
+import { TopBar } from "@modules/top-bar";
+
+export const App: React.FC = () => (
+	<React.StrictMode>
+		<Provider store={store}>
 			<TopBar />
 			<div className="flex h-[calc(100%-3.75rem)]">
 				<ActivityBar />
@@ -37,6 +41,6 @@ export const App: React.FC = () => {
 			<div className="fixed bottom-0 left-0 right-0 bg-neutral-200  dark:bg-neutral-800">
 				<StatusBar />
 			</div>
-		</React.StrictMode>
-	);
-};
+		</Provider>
+	</React.StrictMode>
+);

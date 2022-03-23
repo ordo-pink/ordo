@@ -40,9 +40,7 @@ export const App: React.FC = () => {
 						snapOffset={100}
 						onDragEnd={(sizes) => dispatch(setPanelHeight(sizes[1]))}
 					>
-						<div className="px-2">
-							<Workspace />
-						</div>
+						<Workspace />
 						<div className="h-full shadow-xl rounded-t-xl bg-neutral-200  dark:bg-neutral-800">
 							<Panel />
 						</div>

@@ -15,6 +15,7 @@ export const ActivityBarIcon: React.FC<ActivityBarItem & { current: boolean }> =
 
 	return (
 		<Icon
+			tabIndex={2}
 			title={name}
 			className={`cursor-pointer transition-all duration-500 ${color} select-none`}
 			onClick={() => dispatch(selectActivity(name))}

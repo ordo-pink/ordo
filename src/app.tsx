@@ -13,6 +13,7 @@ import { setSidebarWidth, toggleSidebar } from "@containers/sidebar/sidebar-slic
 import { ActivityBar } from "@modules/activity-bar";
 import { TopBar } from "@modules/top-bar";
 import { setPanelHeight, togglePanel } from "@containers/panel/panel-slice";
+import { openCommandPalette, openGoToLine, openSearchInFile } from "@modules/top-bar/top-bar-slice";
 
 export const App: React.FC = () => {
 	const dispatch = useAppDispatch();
@@ -23,6 +24,9 @@ export const App: React.FC = () => {
 
 	useMousetrap(["command+shift+b", "ctrl+shift+b"], () => dispatch(toggleSidebar()));
 	useMousetrap(["command+t command+t", "ctrl+t ctrl+t"], () => dispatch(togglePanel()));
+	useMousetrap(["command+shift+p", "ctrl+shift+p"], () => dispatch(openCommandPalette()));
+	useMousetrap(["command+f", "ctrl+f"], () => dispatch(openSearchInFile()));
+	useMousetrap(["alt+g"], () => dispatch(openGoToLine()));
 
 	return (
 		<>

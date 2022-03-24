@@ -30,7 +30,7 @@ export const TopBar: React.FC = () => {
 							ref.current?.blur();
 						}
 					}}
-					placeholder="Quick search (start with : to go to line or > to open commands)"
+					placeholder="Quick search (start with : to go to line, @ to go to file, or > to open commands)"
 					className="w-full shadow-inner text-sm rounded-xl outline-none focus:outline-1 focus:outline-neutral-400 bg-neutral-200 dark:bg-neutral-600 px-2 py-1"
 				/>
 			</div>

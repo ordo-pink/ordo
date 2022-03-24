@@ -37,10 +37,21 @@ export const topBarSlice = createSlice({
 			state.focused = true;
 			state.value = ":";
 		},
+		openGoToFile: (state) => {
+			state.focused = true;
+			state.value = "@";
+		},
 	},
 });
 
-export const { openSearchInFile, openGoToLine, unfocusTopBar, toggleTopBarFocus, setTopBarValue, openCommandPalette } =
-	topBarSlice.actions;
+export const {
+	openSearchInFile,
+	openGoToFile,
+	openGoToLine,
+	unfocusTopBar,
+	toggleTopBarFocus,
+	setTopBarValue,
+	openCommandPalette,
+} = topBarSlice.actions;
 
 export const topBarReducer = topBarSlice.reducer;

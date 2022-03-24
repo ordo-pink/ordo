@@ -10,16 +10,7 @@ export type StatusBarState = {
 };
 
 export const initialState: StatusBarState = {
-	items: [
-		{
-			name: "Editor Position",
-			content: "Ln 12, Col 23",
-		},
-		{
-			name: "Document Connections",
-			content: "In 5, Out 1",
-		},
-	],
+	items: [],
 };
 
 export const statusBarSlice = createSlice({

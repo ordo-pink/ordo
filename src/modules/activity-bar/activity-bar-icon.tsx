@@ -11,14 +11,18 @@ export const ActivityBarIcon: React.FC<ActivityBarItem & { current: boolean }> =
 
 	const dispatch = useAppDispatch();
 	const Icon = getSupportedIcon(icon);
-	const color = current ? "text-pink-600 hover:text-pink-800" : "text-neutral-400 hover:text-neutral-600";
+
+	const color = current
+		? "text-pink-600 dark:text-pink-400 hover:text-pink-800 dark:hover:text-pink-600 focus:text-pink-800 dark:focus:text-pink-600"
+		: "text-neutral-400 dark:text-neutral-500 hover:text-neutral-600 dark:hover:text-neutral-50 focus:text-neutral-600 dark:focus:text-neutral-50";
 
 	return (
-		<Icon
+		<button
 			tabIndex={2}
-			title={name}
-			className={`cursor-pointer transition-all duration-500 ${color} select-none`}
+			className={`outline-none cursor-pointer transition-all duration-500 ${color} select-none`}
 			onClick={() => dispatch(selectActivity(name))}
-		/>
+		>
+			<Icon title={name} className="outline-none" />
+		</button>
 	);
 };

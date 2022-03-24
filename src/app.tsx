@@ -1,5 +1,6 @@
 import React from "react";
 import Split from "react-split";
+import useMousetrap from "react-hook-mousetrap";
 
 import { useAppDispatch, useAppSelector } from "@core/state/hooks";
 
@@ -7,11 +8,11 @@ import { Panel } from "@containers/panel";
 import { Sidebar } from "@containers/sidebar";
 import { StatusBar } from "@containers/status-bar";
 import { Workspace } from "@containers/workspace";
-import { setSidebarWidth } from "@containers/sidebar/sidebar-slice";
+import { setSidebarWidth, toggleSidebar } from "@containers/sidebar/sidebar-slice";
 
 import { ActivityBar } from "@modules/activity-bar";
 import { TopBar } from "@modules/top-bar";
-import { setPanelHeight } from "@containers/panel/panel-slice";
+import { setPanelHeight, togglePanel } from "@containers/panel/panel-slice";
 
 export const App: React.FC = () => {
 	const dispatch = useAppDispatch();
@@ -19,6 +20,9 @@ export const App: React.FC = () => {
 	const sidebarWidth = useAppSelector((state) => state.sidebar.width);
 	const showPanel = useAppSelector((state) => state.panel.show);
 	const panelHeight = useAppSelector((state) => state.panel.height);
+
+	useMousetrap(["command+shift+b", "ctrl+shift+b"], () => dispatch(toggleSidebar()));
+	useMousetrap(["command+t command+t", "ctrl+t ctrl+t"], () => dispatch(togglePanel()));
 
 	return (
 		<>

@@ -1,9 +1,41 @@
 import { app, BrowserWindow, Menu } from "electron";
 import install, { REACT_DEVELOPER_TOOLS, REDUX_DEVTOOLS } from "electron-devtools-installer";
 import { is, setContentSecurityPolicy } from "electron-util";
+import Store from "electron-store";
 
 declare const MAIN_WINDOW_WEBPACK_ENTRY: string;
 declare const MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY: string;
+
+const store = new Store({
+	schema: {
+		window: {
+			type: "object",
+			properties: {
+				width: {
+					type: "number",
+					default: 800,
+				},
+				height: {
+					type: "number",
+					default: 600,
+				},
+				position: {
+					type: "object",
+					properties: {
+						x: {
+							type: ["number", "null"],
+							default: null,
+						},
+						y: {
+							type: ["number", "null"],
+							default: null,
+						},
+					},
+				},
+			},
+		},
+	},
+});
 
 if (!is.development) {
 	setContentSecurityPolicy(`
@@ -40,6 +72,16 @@ if (require("electron-squirrel-startup")) {
 	app.quit();
 }
 
+const saveWindowPosition = (window: BrowserWindow) => () => {
+	const [x, y] = window.getPosition();
+	const [width, height] = window.getSize();
+
+	store.set("window.width", width);
+	store.set("window.height", height);
+	store.set("window.position.x", x);
+	store.set("window.position.y", y);
+};
+
 const createWindow = async (): Promise<void> => {
 	if (process.argv.includes("--debug") && is.development) {
 		await install([REACT_DEVELOPER_TOOLS, REDUX_DEVTOOLS]);
@@ -47,10 +89,13 @@ const createWindow = async (): Promise<void> => {
 
 	const mainWindow = new BrowserWindow({
 		show: false,
-		height: 600,
-		width: 800,
+		height: store.get("window.height"),
+		width: store.get("window.width"),
+		x: store.get("window.position.x"),
+		y: store.get("window.position.y"),
 		icon: "../assets/android-chrome-512x512.png",
 		titleBarStyle: "hiddenInset",
+		acceptFirstMouse: true,
 		webPreferences: {
 			sandbox: true,
 			contextIsolation: true,
@@ -61,23 +106,8 @@ const createWindow = async (): Promise<void> => {
 		},
 	});
 
-	mainWindow.on("resize", () => {
-		const [width, height] = mainWindow.getSize();
-
-		// internalSettings.emit("@internal-settings/update", {
-		// 	"window.last-window-height": height,
-		// 	"window.last-window-width": width,
-		// });
-	});
-
-	mainWindow.on("moved", () => {
-		const [x, y] = mainWindow.getPosition();
-
-		// internalSettings.emit("@internal-settings/update", {
-		// 	"window.last-window-x": x,
-		// 	"window.last-window-y": y,
-		// });
-	});
+	mainWindow.on("resized", saveWindowPosition(mainWindow));
+	mainWindow.on("move", saveWindowPosition(mainWindow));
 
 	Menu.setApplicationMenu(Menu.buildFromTemplate(MENU as any));
 

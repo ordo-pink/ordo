@@ -6,6 +6,8 @@ import Store from "electron-store";
 declare const MAIN_WINDOW_WEBPACK_ENTRY: string;
 declare const MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY: string;
 
+const windows = new Set<BrowserWindow>();
+
 const store = new Store({
 	schema: {
 		window: {
@@ -51,23 +53,6 @@ object-src 'none';
 `);
 }
 
-const MENU = [
-	{
-		label: "ORDO",
-		submenu: [
-			{ role: "about" },
-			{ type: "separator" },
-			{ role: "services" },
-			{ type: "separator" },
-			{ role: "hide" },
-			{ role: "hideOthers" },
-			{ role: "unhide" },
-			{ type: "separator" },
-			{ role: "quit" },
-		],
-	},
-];
-
 if (require("electron-squirrel-startup")) {
 	app.quit();
 }
@@ -87,12 +72,12 @@ const createWindow = async (): Promise<void> => {
 		await install([REACT_DEVELOPER_TOOLS, REDUX_DEVTOOLS]);
 	}
 
-	const mainWindow = new BrowserWindow({
+	let window: BrowserWindow = new BrowserWindow({
 		show: false,
-		height: store.get("window.height"),
-		width: store.get("window.width"),
-		x: store.get("window.position.x"),
-		y: store.get("window.position.y"),
+		height: windows.size > 0 ? (store.get("window.position.height") as number) - 100 : store.get("window.height"),
+		width: windows.size > 0 ? (store.get("window.width") as number) - 100 : store.get("window.width"),
+		x: windows.size > 0 ? (store.get("window.position.x") as number) + 100 : store.get("window.position.x"),
+		y: windows.size > 0 ? (store.get("window.position.y") as number) + 100 : store.get("window.position.y"),
 		icon: "../assets/android-chrome-512x512.png",
 		titleBarStyle: "hiddenInset",
 		acceptFirstMouse: true,
@@ -106,28 +91,64 @@ const createWindow = async (): Promise<void> => {
 		},
 	});
 
-	mainWindow.on("resized", saveWindowPosition(mainWindow));
-	mainWindow.on("move", saveWindowPosition(mainWindow));
+	window.on("resized", saveWindowPosition(window));
+	window.on("move", saveWindowPosition(window));
+	window.on("close", () => {
+		windows.delete(window);
+		window = null as any;
+	});
+
+	const MENU = [
+		{
+			label: "ORDO",
+			submenu: [
+				{ role: "about" },
+				{ type: "separator" },
+				{ role: "services" },
+				{ type: "separator" },
+				{ role: "hide" },
+				{ role: "hideOthers" },
+				{ role: "unhide" },
+				{ type: "separator" },
+				{ role: "quit" },
+			],
+		},
+		{
+			label: "&File",
+			submenu: [
+				{
+					label: "New Window",
+					accelerator: "CommandOrControl+Shift+N",
+					click: async () => {
+						await createWindow();
+					},
+				},
+				{ type: "separator" },
+			],
+		},
+	];
 
 	Menu.setApplicationMenu(Menu.buildFromTemplate(MENU as any));
 
-	mainWindow.on("ready-to-show", () => {
-		mainWindow.show();
+	window.on("ready-to-show", () => {
+		window.show();
 	});
 
-	mainWindow.loadURL(MAIN_WINDOW_WEBPACK_ENTRY);
+	windows.add(window);
+
+	window.loadURL(MAIN_WINDOW_WEBPACK_ENTRY);
 };
 
 app.on("ready", createWindow);
 
 app.on("window-all-closed", () => {
-	if (is.macos) {
+	if (!is.macos) {
 		app.quit();
 	}
 });
 
-app.on("activate", () => {
-	if (BrowserWindow.getAllWindows().length === 0) {
-		createWindow();
+app.on("activate", async () => {
+	if (windows.size === 0) {
+		await createWindow();
 	}
 });

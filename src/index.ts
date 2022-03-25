@@ -1,6 +1,6 @@
 import { app, BrowserWindow, Menu, shell } from "electron";
 import install, { REACT_DEVELOPER_TOOLS, REDUX_DEVTOOLS } from "electron-devtools-installer";
-import { is, setContentSecurityPolicy } from "electron-util";
+import { centerWindow, enforceMacOSAppLocation, is, setContentSecurityPolicy } from "electron-util";
 import Store from "electron-store";
 
 declare const MAIN_WINDOW_WEBPACK_ENTRY: string;
@@ -90,6 +90,10 @@ const createWindow = async (): Promise<void> => {
 			preload: MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY,
 		},
 	});
+
+	if (windows.size > 0) {
+		centerWindow({ window });
+	}
 
 	window.on("resized", saveWindowPosition(window));
 	window.on("move", saveWindowPosition(window));
@@ -181,7 +185,10 @@ const createWindow = async (): Promise<void> => {
 	window.loadURL(MAIN_WINDOW_WEBPACK_ENTRY);
 };
 
-app.on("ready", createWindow);
+app.on("ready", async () => {
+	enforceMacOSAppLocation();
+	await createWindow();
+});
 
 app.on("window-all-closed", () => {
 	if (!is.macos) {

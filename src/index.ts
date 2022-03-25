@@ -1,11 +1,23 @@
 import { app, BrowserWindow, Menu } from "electron";
-import { Color } from "@core/apprearance/colors";
 import install, { REACT_DEVELOPER_TOOLS, REDUX_DEVTOOLS } from "electron-devtools-installer";
-
-const Mousetrap = require("mousetrap");
+import { is, setContentSecurityPolicy } from "electron-util";
 
 declare const MAIN_WINDOW_WEBPACK_ENTRY: string;
 declare const MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY: string;
+
+if (!is.development) {
+	setContentSecurityPolicy(`
+script-src 'self' ordo-app;
+img-src ordo-app data: file:;
+style-src 'unsafe-inline', ordo-app data: file:;
+font-src 'self', ordo-app file:;
+connect-src 'self', ordo-app;
+base-uri 'none';
+form-action 'none';
+frame-ancestors 'none';
+object-src 'none';
+`);
+}
 
 const MENU = [
 	{
@@ -29,7 +41,7 @@ if (require("electron-squirrel-startup")) {
 }
 
 const createWindow = async (): Promise<void> => {
-	if (process.argv.includes("--debug")) {
+	if (process.argv.includes("--debug") && is.development) {
 		await install([REACT_DEVELOPER_TOOLS, REDUX_DEVTOOLS]);
 	}
 
@@ -70,7 +82,6 @@ const createWindow = async (): Promise<void> => {
 
 	mainWindow.on("ready-to-show", () => {
 		mainWindow.show();
-		// mainWindow.webContents.openDevTools();
 	});
 
 	mainWindow.loadURL(MAIN_WINDOW_WEBPACK_ENTRY);
@@ -79,7 +90,7 @@ const createWindow = async (): Promise<void> => {
 app.on("ready", createWindow);
 
 app.on("window-all-closed", () => {
-	if (process.platform !== "darwin") {
+	if (is.macos) {
 		app.quit();
 	}
 });

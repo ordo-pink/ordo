@@ -1,9 +1,28 @@
-import { app, BrowserWindow } from "electron";
+import { app, BrowserWindow, Menu } from "electron";
 import { Color } from "@core/apprearance/colors";
 import install, { REACT_DEVELOPER_TOOLS, REDUX_DEVTOOLS } from "electron-devtools-installer";
 
+const Mousetrap = require("mousetrap");
+
 declare const MAIN_WINDOW_WEBPACK_ENTRY: string;
 declare const MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY: string;
+
+const MENU = [
+	{
+		label: "ORDO",
+		submenu: [
+			{ role: "about" },
+			{ type: "separator" },
+			{ role: "services" },
+			{ type: "separator" },
+			{ role: "hide" },
+			{ role: "hideOthers" },
+			{ role: "unhide" },
+			{ type: "separator" },
+			{ role: "quit" },
+		],
+	},
+];
 
 if (require("electron-squirrel-startup")) {
 	app.quit();
@@ -46,6 +65,8 @@ const createWindow = async (): Promise<void> => {
 		// 	"window.last-window-y": y,
 		// });
 	});
+
+	Menu.setApplicationMenu(Menu.buildFromTemplate(MENU as any));
 
 	mainWindow.on("ready-to-show", () => {
 		mainWindow.show();

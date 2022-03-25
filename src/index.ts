@@ -3,41 +3,15 @@ import install, { REACT_DEVELOPER_TOOLS, REDUX_DEVTOOLS } from "electron-devtool
 import { centerWindow, enforceMacOSAppLocation, is, setContentSecurityPolicy } from "electron-util";
 import Store from "electron-store";
 
+import { schema } from "@utils/store-schema";
+import { getTemplateMenu } from "@utils/menu-template";
+
 declare const MAIN_WINDOW_WEBPACK_ENTRY: string;
 declare const MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY: string;
 
 const windows = new Set<BrowserWindow>();
 
-const store = new Store({
-	schema: {
-		window: {
-			type: "object",
-			properties: {
-				width: {
-					type: "number",
-					default: 800,
-				},
-				height: {
-					type: "number",
-					default: 600,
-				},
-				position: {
-					type: "object",
-					properties: {
-						x: {
-							type: ["number", "null"],
-							default: null,
-						},
-						y: {
-							type: ["number", "null"],
-							default: null,
-						},
-					},
-				},
-			},
-		},
-	},
-});
+const store = new Store({ schema });
 
 if (!is.development) {
 	setContentSecurityPolicy(`
@@ -102,79 +76,7 @@ const createWindow = async (): Promise<void> => {
 		window = null as any;
 	});
 
-	const MENU = [
-		{
-			label: "ORDO",
-			submenu: [
-				{ role: "about" },
-				{ type: "separator" },
-				{ role: "services" },
-				{ type: "separator" },
-				{ role: "hide" },
-				{ role: "hideOthers" },
-				{ role: "unhide" },
-				{ type: "separator" },
-				{ role: "quit" },
-			],
-		},
-		{
-			label: "&File",
-			submenu: [
-				{
-					label: "New Window",
-					accelerator: "CommandOrControl+Shift+N",
-					click: async () => {
-						await createWindow();
-					},
-				},
-				{ type: "separator" },
-
-				{
-					label: "Close Window",
-					accelerator: "CommandOrControl+Shift+W",
-					click: () => {
-						BrowserWindow.getFocusedWindow()?.close();
-					},
-				},
-			],
-		},
-		{
-			label: "&View",
-			submenu: [
-				...(is.development && process.argv.includes("--debug")
-					? [{ role: "reload" }, { role: "forceReload" }, { role: "toggleDevTools" }]
-					: []),
-				{ role: "resetZoom" },
-				{ role: "zoomIn" },
-				{ role: "zoomOut" },
-				{ type: "separator" },
-				{ role: "togglefullscreen" },
-			],
-		},
-		{
-			label: "&Window",
-			submenu: [
-				{ role: "minimize" },
-				{ role: "zoom" },
-				...(is.macos
-					? [{ type: "separator" }, { role: "front" }, { type: "separator" }, { role: "window" }]
-					: [{ role: "close" }]),
-			],
-		},
-		{
-			role: "help",
-			submenu: [
-				{
-					label: "Learn More",
-					click: async () => {
-						await shell.openExternal("https://ordo.pink");
-					},
-				},
-			],
-		},
-	];
-
-	Menu.setApplicationMenu(Menu.buildFromTemplate(MENU as any));
+	Menu.setApplicationMenu(Menu.buildFromTemplate(getTemplateMenu(createWindow)));
 
 	window.on("ready-to-show", () => {
 		window.show();

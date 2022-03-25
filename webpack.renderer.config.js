@@ -18,6 +18,8 @@ module.exports = {
 			"@core": resolve("./src/core"),
 			"@containers": resolve("./src/containers"),
 			"@modules": resolve("./src/modules"),
+			"@utils": resolve("./src/utils"),
+			"@components": resolve("./src/components"),
 		},
 	},
 };

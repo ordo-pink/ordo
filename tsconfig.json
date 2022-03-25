@@ -23,6 +23,8 @@
 			"@core/*": ["src/core/*"],
 			"@containers/*": ["src/containers/*"],
 			"@modules/*": ["src/modules/*"],
+			"@utils/*": ["src/utils/*"],
+			"@components/*": ["src/components/*"],
 			"*": ["node_modules/*"]
 		}
 	},

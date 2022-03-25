@@ -1,4 +1,4 @@
-import { app, BrowserWindow, Menu } from "electron";
+import { app, BrowserWindow, Menu, shell } from "electron";
 import install, { REACT_DEVELOPER_TOOLS, REDUX_DEVTOOLS } from "electron-devtools-installer";
 import { is, setContentSecurityPolicy } from "electron-util";
 import Store from "electron-store";
@@ -130,6 +130,37 @@ const createWindow = async (): Promise<void> => {
 					accelerator: "CommandOrControl+Shift+W",
 					click: () => {
 						BrowserWindow.getFocusedWindow()?.close();
+					},
+				},
+			],
+		},
+		{
+			label: "&View",
+			submenu: [
+				{ role: "resetZoom" },
+				{ role: "zoomIn" },
+				{ role: "zoomOut" },
+				{ type: "separator" },
+				{ role: "togglefullscreen" },
+			],
+		},
+		{
+			label: "&Window",
+			submenu: [
+				{ role: "minimize" },
+				{ role: "zoom" },
+				...(is.macos
+					? [{ type: "separator" }, { role: "front" }, { type: "separator" }, { role: "window" }]
+					: [{ role: "close" }]),
+			],
+		},
+		{
+			role: "help",
+			submenu: [
+				{
+					label: "Learn More",
+					click: async () => {
+						await shell.openExternal("https://ordo.pink");
 					},
 				},
 			],

@@ -137,6 +137,9 @@ const createWindow = async (): Promise<void> => {
 		{
 			label: "&View",
 			submenu: [
+				...(is.development && process.argv.includes("--debug")
+					? [{ role: "reload" }, { role: "forceReload" }, { role: "toggleDevTools" }]
+					: []),
 				{ role: "resetZoom" },
 				{ role: "zoomIn" },
 				{ role: "zoomOut" },

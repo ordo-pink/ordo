@@ -124,6 +124,14 @@ const createWindow = async (): Promise<void> => {
 					},
 				},
 				{ type: "separator" },
+
+				{
+					label: "Close Window",
+					accelerator: "CommandOrControl+Shift+W",
+					click: () => {
+						BrowserWindow.getFocusedWindow()?.close();
+					},
+				},
 			],
 		},
 	];

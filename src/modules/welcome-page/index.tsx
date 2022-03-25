@@ -1,18 +1,42 @@
 import React from "react";
+import { animated, config, useTransition } from "react-spring";
 
-export const WelcomePage: React.FC = () => {
-	const [logo, setLogo] = React.useState("ORDO");
+const Logo = () => {
+	const [toggle, set] = React.useState(false);
+	const transitions = useTransition(toggle, {
+		from: { position: "absolute", opacity: 0 },
+		enter: { opacity: 1 },
+		leave: { opacity: 0 },
+		delay: 200,
+		config: config.molasses,
+	});
 
-	return (
-		<div className="flex flex-col flex-grow w-full h-full justify-center items-center text-gray-600 dark:text-gray-300 mt-[-3rem]">
-			<h2 className="text-lg uppercase tracking-wider border-b border-gray-400">Bring your thoughts to</h2>
-			<h1
-				className="font-bold text-8xl bg-gradient-to-bl from-orange-600 to-pink-700 text-transparent bg-clip-text drop-shadow-xl"
-				onMouseEnter={() => setLogo("||☑️")}
-				onMouseLeave={() => setLogo("ORDO")}
+	return transitions(({ opacity }, item) =>
+		item ? (
+			<animated.h1
+				className="cursor-pointer font-bold text-8xl bg-gradient-to-bl from-orange-600 to-pink-700 text-transparent bg-clip-text drop-shadow-xl"
+				style={{ position: "absolute", opacity: opacity.to({ range: [0.0, 1.0], output: [0, 1] }) }}
+				onClick={() => set(!toggle)}
 			>
-				{logo}
-			</h1>
-		</div>
+				||☑️
+			</animated.h1>
+		) : (
+			<animated.h1
+				className="cursor-pointer font-bold text-8xl bg-gradient-to-bl from-orange-600 to-pink-700 text-transparent bg-clip-text drop-shadow-xl"
+				style={{ position: "absolute", opacity: opacity.to({ range: [1.0, 0.0], output: [1, 0] }) }}
+				onClick={() => set(!toggle)}
+			>
+				ORDO
+			</animated.h1>
+		),
 	);
 };
+
+export const WelcomePage: React.FC = () => (
+	<div className="flex flex-col flex-grow w-full h-full justify-center items-center text-gray-600 dark:text-gray-300 mt-[-3rem]">
+		<h2 className="text-lg uppercase tracking-wider border-b border-gray-400">Bring your thoughts to</h2>
+		<div className="w-full flex items-center justify-center mt-11">
+			<Logo />
+		</div>
+	</div>
+);

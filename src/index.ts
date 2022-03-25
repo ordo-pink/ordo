@@ -49,6 +49,7 @@ const createWindow = async (): Promise<void> => {
 		show: false,
 		height: 600,
 		width: 800,
+		icon: "../assets/android-chrome-512x512.png",
 		titleBarStyle: "hiddenInset",
 		webPreferences: {
 			sandbox: true,

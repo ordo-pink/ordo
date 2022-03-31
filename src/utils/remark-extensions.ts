@@ -1,7 +1,8 @@
-import { OrdoFolder } from "@modules/editor/editor-slice";
 import { visit, Node, Parent } from "unist-util-visit";
+
+import { OrdoFolder } from "@modules/editor/editor-slice";
+import { findOrdoFile } from "@modules/file-explorer/file-tree/find-ordo-file";
 import { isImageUrl } from "./is-image-url";
-import { findOrdoFile } from "./tree/find-ordo-file";
 
 export const wikiLinkEmbeds =
 	(options: { fileTree?: OrdoFolder } = {}) =>

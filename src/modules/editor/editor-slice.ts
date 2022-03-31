@@ -30,7 +30,7 @@ export type OrdoFile<T = any> = {
 		};
 		direction: "ltr" | "rtl";
 	}>;
-	type: "file";
+	type: "image" | "document" | "file";
 };
 
 export type OrdoFolder = {

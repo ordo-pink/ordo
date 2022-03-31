@@ -1,3 +1,4 @@
+import Store from "electron-store";
 import { Color, Colors } from "@core/apprearance/colors";
 import { Schema } from "electron-store";
 
@@ -137,19 +138,28 @@ export const schema: Schema<InternalSettings> = {
 		properties: {
 			exclude: {
 				type: "array",
-				items: { type: "string" },
 				default: ["**/node_modules", "**/.git", "**/.svn", "**/CVS", "**/.DS_Store", "**/Thumbs.db"],
 			},
 			associations: {
 				type: "array",
-				items: [
-					{
-						type: "object",
-						properties: {
-							extension: { type: "string" },
-							association: { type: "string" },
-						},
-					},
+				default: [
+					{ extension: ".apng", association: "image" },
+					{ extension: ".avif", association: "image" },
+					{ extension: ".gif", association: "image" },
+					{ extension: ".jpg", association: "image" },
+					{ extension: ".jpeg", association: "image" },
+					{ extension: ".pjpeg", association: "image" },
+					{ extension: ".pjp", association: "image" },
+					{ extension: ".png", association: "image" },
+					{ extension: ".svg", association: "image" },
+					{ extension: ".webp", association: "image" },
+					{ extension: ".bmp", association: "image" },
+					{ extension: ".ico", association: "image" },
+					{ extension: ".cur", association: "image" },
+					{ extension: ".tif", association: "image" },
+					{ extension: ".tiff", association: "image" },
+					{ extension: ".md", association: "text" },
+					{ extension: ".txt", association: "text" },
 				],
 			},
 			confirmDelete: {
@@ -163,3 +173,48 @@ export const schema: Schema<InternalSettings> = {
 		},
 	},
 };
+
+export const store = new Store({
+	schema,
+	migrations: {
+		"0.1.0": (s) => {
+			s.set("window", { width: 800, height: 600, recentProjects: [] });
+			s.set("appearance", { theme: "system", accentColor: "pink" });
+			s.set("editor", {
+				showLineNumbers: true,
+				alwaysShowMarkdownSymbols: true,
+				fontSize: 16,
+				tabSize: 2,
+				autoClosingBrackets: true,
+				autoClosingQuotes: true,
+				autoIndent: true,
+				autoSurround: true,
+				emptySelectionLineToClipboard: true,
+			});
+			s.set("explorer", {
+				exclude: ["**/node_modules", "**/.git", "**/.svn", "**/CVS", "**/.DS_Store", "**/Thumbs.db"],
+				associations: [
+					{ extension: ".apng", association: "image" },
+					{ extension: ".avif", association: "image" },
+					{ extension: ".gif", association: "image" },
+					{ extension: ".jpg", association: "image" },
+					{ extension: ".jpeg", association: "image" },
+					{ extension: ".pjpeg", association: "image" },
+					{ extension: ".pjp", association: "image" },
+					{ extension: ".png", association: "image" },
+					{ extension: ".svg", association: "image" },
+					{ extension: ".webp", association: "image" },
+					{ extension: ".bmp", association: "image" },
+					{ extension: ".ico", association: "image" },
+					{ extension: ".cur", association: "image" },
+					{ extension: ".tif", association: "image" },
+					{ extension: ".tiff", association: "image" },
+					{ extension: ".md", association: "document" },
+					{ extension: ".txt", association: "document" },
+				],
+				confirmDelete: true,
+				enableDragAndDrop: true,
+			});
+		},
+	},
+});

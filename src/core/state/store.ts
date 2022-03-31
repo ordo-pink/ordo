@@ -7,6 +7,7 @@ import { activityBarReducer, ActivityBarState } from "@modules/activity-bar/acti
 import { statusBarReducer, StatusBarState } from "@containers/status-bar/status-bar-slice";
 import { topBarReducer, TopBarState } from "@modules/top-bar/top-bar-slice";
 import { editorReducer, EditorState } from "@modules/editor/editor-slice";
+import { fileExplorerReducer, FileExplorerState } from "@modules/file-explorer/file-explorer-slice";
 
 enablePatches();
 
@@ -17,6 +18,7 @@ export type State = {
 	statusBar: StatusBarState;
 	topBar: TopBarState;
 	editor: EditorState;
+	fileExplorer: FileExplorerState;
 };
 
 export const store = configureStore({
@@ -27,6 +29,7 @@ export const store = configureStore({
 		statusBar: statusBarReducer,
 		topBar: topBarReducer,
 		editor: editorReducer,
+		fileExplorer: fileExplorerReducer,
 	},
 	middleware: (d) => d({ serializableCheck: false }),
 });

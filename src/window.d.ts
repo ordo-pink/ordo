@@ -6,8 +6,7 @@ import { app } from "electron";
 declare global {
 	declare interface Window {
 		ordo: {
-			emit: <E extends OrdoEvent, K extends keyof E, V extends E[K]>(event: K, request: V) => void;
-			emit: <E extends OrdoEvent, K extends keyof E>(event: K) => void;
+			emit: <T, K = any>(event: string, payload?: K) => Promise<T>;
 		};
 	}
 

@@ -1,17 +1,15 @@
-import { app, BrowserWindow, Menu, shell } from "electron";
+import { app, BrowserWindow, dialog, ipcMain, Menu, shell } from "electron";
 import install, { REACT_DEVELOPER_TOOLS, REDUX_DEVTOOLS } from "electron-devtools-installer";
 import { centerWindow, enforceMacOSAppLocation, is, setContentSecurityPolicy } from "electron-util";
-import Store from "electron-store";
 
-import { schema } from "@utils/store-schema";
+import { store } from "@core/config-store";
 import { getTemplateMenu } from "@utils/menu-template";
+import { listFolder } from "@modules/file-explorer/file-tree/list-folder";
 
 declare const MAIN_WINDOW_WEBPACK_ENTRY: string;
 declare const MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY: string;
 
 const windows = new Set<BrowserWindow>();
-
-const store = new Store({ schema });
 
 if (!is.development) {
 	setContentSecurityPolicy(`
@@ -32,6 +30,29 @@ object-src 'none';
 if (require("electron-squirrel-startup")) {
 	app.quit();
 }
+
+ipcMain.handle("ordo", (e, data) => {
+	if (data.event === "@application/get-setting") {
+		return store.get(data.payload);
+	}
+
+	if (data.event === "@application/set-setting") {
+		return store.set(data.payload.key, data.payload.value);
+	}
+
+	if (data.event === "@file-explorer/select-project-folder") {
+		const paths = dialog.showOpenDialogSync({
+			properties: ["openDirectory", "createDirectory", "promptToCreate"],
+		});
+
+		return paths ? paths[0] : null;
+	} else if (data.event === "@file-explorer/list-folder") {
+		const recentProjects: string[] = store.get("window.recentProjects");
+		store.set("window.recentProjects", Array.from(new Set(recentProjects.concat([data.payload]).slice(0, 5))));
+
+		return listFolder(data.payload);
+	}
+});
 
 const saveWindowPosition = (window: BrowserWindow) => () => {
 	const [x, y] = window.getPosition();

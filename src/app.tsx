@@ -9,12 +9,13 @@ import { Sidebar } from "@containers/sidebar";
 import { StatusBar } from "@containers/status-bar";
 import { Workspace } from "@containers/workspace";
 import { setSidebarWidth, toggleSidebar } from "@containers/sidebar/sidebar-slice";
-
+import { showSidebar as openSidebar } from "@containers/sidebar/sidebar-slice";
 import { ActivityBar } from "@modules/activity-bar";
 import { TopBar } from "@modules/top-bar";
 import { setPanelHeight, togglePanel } from "@containers/panel/panel-slice";
 import { openCommandPalette, openGoToFile, openGoToLine, openSearchInFile } from "@modules/top-bar/top-bar-slice";
 import { selectActivity } from "@modules/activity-bar/activity-bar-slice";
+import { selectProjectFolder } from "@modules/file-explorer/file-explorer-slice";
 
 export const App: React.FC = () => {
 	const dispatch = useAppDispatch();
@@ -32,6 +33,11 @@ export const App: React.FC = () => {
 	useMousetrap(["command+shift+e", "ctrl+shift+e"], () => dispatch(selectActivity("Editor")));
 	useMousetrap(["command+shift+g", "ctrl+shift+g"], () => dispatch(selectActivity("Graph")));
 	useMousetrap(["command+,", "ctrl+,"], () => dispatch(selectActivity("Settings")));
+	useMousetrap(["command+o", "ctrl+o"], () => {
+		dispatch(selectProjectFolder());
+		dispatch(selectActivity("Editor"));
+		dispatch(openSidebar());
+	});
 
 	return (
 		<>

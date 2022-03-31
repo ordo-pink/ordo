@@ -1,5 +1,28 @@
+import { showSidebar } from "@containers/sidebar/sidebar-slice";
+import { useAppDispatch } from "@core/state/hooks";
+import { selectActivity } from "@modules/activity-bar/activity-bar-slice";
+import { listFolder } from "@modules/file-explorer/file-explorer-slice";
 import React from "react";
 import { animated, config, useTransition } from "react-spring";
+
+const BringYourThoughts = () => {
+	const transitions = useTransition(true, {
+		from: { position: "absolute", opacity: 0 },
+		enter: { opacity: 1 },
+		leave: { opacity: 0 },
+		delay: 200,
+		config: config.molasses,
+	});
+
+	return transitions(({ opacity }) => (
+		<animated.h1
+			className="text-lg uppercase tracking-wider border-b border-gray-400"
+			style={{ opacity: opacity.to({ range: [1.0, 0.0], output: [1, 0] }) }}
+		>
+			Bring your thoughts to
+		</animated.h1>
+	));
+};
 
 const Logo = () => {
 	const [toggle, set] = React.useState(false);
@@ -32,11 +55,42 @@ const Logo = () => {
 	);
 };
 
-export const WelcomePage: React.FC = () => (
-	<div className="flex flex-col flex-grow w-full h-full justify-center items-center text-gray-600 dark:text-gray-300 mt-[-3rem]">
-		<h2 className="text-lg uppercase tracking-wider border-b border-gray-400">Bring your thoughts to</h2>
-		<div className="w-full flex items-center justify-center mt-11">
-			<Logo />
+export const WelcomePage: React.FC = () => {
+	const [recentProjects, setRecentProjects] = React.useState<string[]>([]);
+
+	const dispatch = useAppDispatch();
+
+	React.useEffect(() => {
+		window.ordo
+			.emit<string[]>("@application/get-setting", "window.recentProjects")
+			.then((projects) => setRecentProjects(projects));
+	});
+
+	return (
+		<div className="select-none flex flex-col flex-grow w-full h-full justify-center items-center text-gray-600 dark:text-gray-300 mt-[-3rem]">
+			<div className="mb-24">
+				<BringYourThoughts />
+				<div className="w-full flex items-center justify-center mt-11">
+					<Logo />
+				</div>
+			</div>
+			<div className="">
+				{recentProjects && <h2 className="text-xl mb-2">Recent Projects</h2>}
+				{recentProjects &&
+					recentProjects.map((project) => (
+						<div
+							key={project}
+							className="bg-neutral-200 dark:bg-neutral-600 mb-2 py-1 px-3 rounded-lg hover:underline cursor-pointer"
+							onClick={() => {
+								dispatch(listFolder(project));
+								dispatch(selectActivity("Editor"));
+								dispatch(showSidebar());
+							}}
+						>
+							.../{project.split("/").slice(-3).join("/")}
+						</div>
+					))}
+			</div>
 		</div>
-	</div>
-);
+	);
+};

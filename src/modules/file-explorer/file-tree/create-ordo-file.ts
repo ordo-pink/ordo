@@ -1,3 +1,4 @@
+import { store } from "@core/config-store";
 import { OrdoFile } from "@modules/editor/editor-slice";
 
 const toReadableSize = (a: number, b = 2, k = 1024): string => {
@@ -31,6 +32,10 @@ export const createOrdoFile = ({
 	const readableName = path.substring(path.lastIndexOf("/") + 1);
 	const extension = readableName.substring(readableName.lastIndexOf(".")) ?? ".md";
 
+	const associations = store.store.explorer.associations;
+	const association = associations.find((a) => a.extension === extension);
+
+	const type = association ? association.association : "file";
 	const readableSize = toReadableSize(size);
 
 	return {
@@ -44,6 +49,6 @@ export const createOrdoFile = ({
 		relativePath,
 		extension,
 		readableSize,
-		type: "file",
+		type: type as any,
 	};
 };

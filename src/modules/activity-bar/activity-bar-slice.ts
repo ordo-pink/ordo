@@ -13,7 +13,7 @@ export type ActivityBarState = {
 };
 
 export const initialState: ActivityBarState = {
-	current: "Welcome",
+	current: "Editor",
 	items: [
 		{ show: true, name: "Editor", icon: "HiOutlineDocumentText" },
 		{ show: true, name: "Graph", icon: "HiOutlineShare" },

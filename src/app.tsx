@@ -14,6 +14,7 @@ import { ActivityBar } from "@modules/activity-bar";
 import { TopBar } from "@modules/top-bar";
 import { setPanelHeight, togglePanel } from "@containers/panel/panel-slice";
 import { openCommandPalette, openGoToFile, openGoToLine, openSearchInFile } from "@modules/top-bar/top-bar-slice";
+import { selectActivity } from "@modules/activity-bar/activity-bar-slice";
 
 export const App: React.FC = () => {
 	const dispatch = useAppDispatch();
@@ -28,6 +29,9 @@ export const App: React.FC = () => {
 	useMousetrap(["command+f", "ctrl+f"], () => dispatch(openSearchInFile()));
 	useMousetrap(["command+p", "ctrl+p"], () => dispatch(openGoToFile()));
 	useMousetrap(["alt+g"], () => dispatch(openGoToLine()));
+	useMousetrap(["command+shift+e", "ctrl+shift+e"], () => dispatch(selectActivity("Editor")));
+	useMousetrap(["command+shift+g", "ctrl+shift+g"], () => dispatch(selectActivity("Graph")));
+	useMousetrap(["command+,", "ctrl+,"], () => dispatch(selectActivity("Settings")));
 
 	return (
 		<>
@@ -35,7 +39,7 @@ export const App: React.FC = () => {
 			<div className="flex h-[calc(100%-3.75rem)]">
 				<ActivityBar />
 				<Split
-					className="flex select-none w-full h-full"
+					className="flex w-full h-full"
 					sizes={showSidebar ? [100 - sidebarWidth, sidebarWidth] : [100, 0]}
 					minSize={0}
 					snapOffset={200}

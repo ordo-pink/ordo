@@ -16,7 +16,7 @@ const store = new Store({ schema });
 if (!is.development) {
 	setContentSecurityPolicy(`
 script-src 'self' ordo-app;
-img-src ordo-app data: file:;
+img-src * data: file:;
 style-src 'unsafe-inline', ordo-app data: file:;
 font-src 'self', ordo-app file:;
 connect-src 'self', ordo-app;
@@ -25,6 +25,8 @@ form-action 'none';
 frame-ancestors 'none';
 object-src 'none';
 `);
+} else {
+	setContentSecurityPolicy(`img-src * data: file:;`);
 }
 
 if (require("electron-squirrel-startup")) {

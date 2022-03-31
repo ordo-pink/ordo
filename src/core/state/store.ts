@@ -6,6 +6,7 @@ import { sidebarReducer, SidebarState } from "@containers/sidebar/sidebar-slice"
 import { activityBarReducer, ActivityBarState } from "@modules/activity-bar/activity-bar-slice";
 import { statusBarReducer, StatusBarState } from "@containers/status-bar/status-bar-slice";
 import { topBarReducer, TopBarState } from "@modules/top-bar/top-bar-slice";
+import { editorReducer, EditorState } from "@modules/editor/editor-slice";
 
 enablePatches();
 
@@ -15,6 +16,7 @@ export type State = {
 	panel: PanelState;
 	statusBar: StatusBarState;
 	topBar: TopBarState;
+	editor: EditorState;
 };
 
 export const store = configureStore({
@@ -24,6 +26,7 @@ export const store = configureStore({
 		panel: panelReducer,
 		statusBar: statusBarReducer,
 		topBar: topBarReducer,
+		editor: editorReducer,
 	},
 	middleware: (d) => d({ serializableCheck: false }),
 });

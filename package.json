@@ -211,7 +211,14 @@
 		"react-redux": "^7.2.6",
 		"react-split": "^2.0.14",
 		"react-spring": "^9.4.4",
+		"remark": "^14.0.2",
+		"remark-burger": "^1.0.1",
+		"remark-gfm": "^3.0.1",
+		"remark-parse": "^10.0.1",
+		"remark-wiki-link": "^1.0.4",
 		"trim-newlines": "^4.0.2",
+		"unified": "^10.1.2",
+		"unist-util-visit": "^4.1.0",
 		"yaml": "^1.10.2"
 	}
 }

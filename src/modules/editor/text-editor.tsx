@@ -8,6 +8,7 @@ import { unified } from "unified";
 import remarkWikiLink from "remark-wiki-link";
 import remarkGfm from "remark-gfm";
 import { wikiLinkEmbeds, attachIds, groupByLines } from "@utils/remark-extensions";
+import { Breadcrumbs } from "./breadcrumbs";
 
 const Wrapper = (line: MdLine) =>
 	Switch.of(line)
@@ -138,12 +139,17 @@ export const TextEditor: React.FC = () => {
 	}
 
 	return (
-		<Scrollbars>
-			<div>
-				{json.children.map((line: any) => (
-					<Line key={line.number} line={line} />
-				))}
+		<>
+			<div className="w-full text-sm text-gray-500">
+				<Breadcrumbs />
 			</div>
-		</Scrollbars>
+			<Scrollbars>
+				<div>
+					{json.children.map((line: any) => (
+						<Line key={line.number} line={line} />
+					))}
+				</div>
+			</Scrollbars>
+		</>
 	);
 };

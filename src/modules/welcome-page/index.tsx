@@ -1,8 +1,9 @@
 import { showSidebar } from "@containers/sidebar/sidebar-slice";
 import { useAppDispatch } from "@core/state/hooks";
 import { selectActivity } from "@modules/activity-bar/activity-bar-slice";
-import { listFolder } from "@modules/file-explorer/file-explorer-slice";
+import { listFolder, selectProjectFolder } from "@modules/file-explorer/file-explorer-slice";
 import React from "react";
+import { HiOutlineCog, HiOutlineFolderOpen } from "react-icons/hi";
 import { animated, config, useTransition } from "react-spring";
 
 const BringYourThoughts = () => {
@@ -74,22 +75,46 @@ export const WelcomePage: React.FC = () => {
 					<Logo />
 				</div>
 			</div>
-			<div className="">
-				{recentProjects && <h2 className="text-xl mb-2">Recent Projects</h2>}
-				{recentProjects &&
-					recentProjects.map((project) => (
-						<div
-							key={project}
-							className="bg-neutral-200 dark:bg-neutral-600 mb-2 py-1 px-3 rounded-lg hover:underline cursor-pointer"
-							onClick={() => {
-								dispatch(listFolder(project));
-								dispatch(selectActivity("Editor"));
-								dispatch(showSidebar());
-							}}
-						>
-							.../{project.split("/").slice(-3).join("/")}
-						</div>
-					))}
+			<div className="flex space-x-24 justify-center">
+				{recentProjects && recentProjects.length > 0 && (
+					<div>
+						<h2 className="text-xl mb-2">Recent Projects</h2>
+						{recentProjects.map((project) => (
+							<div
+								key={project}
+								className="bg-neutral-200 dark:bg-neutral-600 mb-2 py-1 px-3 rounded-lg hover:underline cursor-pointer"
+								onClick={() => {
+									dispatch(listFolder(project));
+									dispatch(selectActivity("Editor"));
+									dispatch(showSidebar());
+								}}
+							>
+								.../{project.split("/").slice(-3).join("/")}
+							</div>
+						))}
+					</div>
+				)}
+				<div>
+					<h2 className="text-xl mb-2">Quick Actions</h2>
+					<button
+						className="flex space-x-2 items-center hover:text-pink-500 transition-all duration-300"
+						onClick={() => {
+							dispatch(selectProjectFolder());
+							dispatch(selectActivity("Editor"));
+							dispatch(showSidebar());
+						}}
+					>
+						<HiOutlineFolderOpen />
+						<span>Open Folder</span>
+					</button>
+					<button
+						className="flex space-x-2 items-center hover:text-pink-500 transition-all duration-300"
+						onClick={() => dispatch(selectActivity("Settings"))}
+					>
+						<HiOutlineCog />
+						<span>Settings</span>
+					</button>
+				</div>
 			</div>
 		</div>
 	);

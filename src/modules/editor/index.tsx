@@ -1,4 +1,5 @@
 import { useAppSelector } from "@core/state/hooks";
+import { findOrdoFile } from "@modules/file-explorer/file-tree/find-ordo-file";
 import { Switch } from "or-else";
 import React from "react";
 import { ImageViewer } from "./image-viewer";
@@ -7,9 +8,15 @@ import { TextEditor } from "./text-editor";
 
 export const Editor: React.FC = () => {
 	const path = useAppSelector((state) => state.editor.currentTab);
-	const currentTab = useAppSelector((state) => state.editor.tabs.find((tab) => tab.path === path));
+	const tree = useAppSelector((state) => state.fileExplorer.tree);
 
-	const Component = Switch.of(currentTab?.extension).case(".png", ImageViewer).default(TextEditor);
+	if (!tree || !path) {
+		return null;
+	}
+
+	const tab = findOrdoFile(tree, path);
+
+	const Component = Switch.of(tab?.type).case("image", ImageViewer).default(TextEditor);
 
 	return (
 		<>

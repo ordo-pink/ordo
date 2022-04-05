@@ -1,7 +1,6 @@
 import { useAppDispatch, useAppSelector } from "@core/state/hooks";
 import { findOrdoFile } from "@modules/file-explorer/file-tree/find-ordo-file";
 import { getFileIcon } from "@utils/get-icon";
-import { select } from "d3";
 import React from "react";
 import { HiX } from "react-icons/hi";
 import { OrdoFile, openTab, closeTab } from "./editor-slice";

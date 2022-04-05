@@ -12,9 +12,9 @@ export const Editor: React.FC = () => {
 	const Component = Switch.of(currentTab?.extension).case(".png", ImageViewer).default(TextEditor);
 
 	return (
-		<div>
+		<>
 			<Tabs />
 			<Component />
-		</div>
+		</>
 	);
 };

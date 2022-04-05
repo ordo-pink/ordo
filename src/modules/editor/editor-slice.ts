@@ -55,7 +55,7 @@ export type EditorState = {
 };
 
 export const initialState: EditorState = {
-	currentTab: "/absolute/relative",
+	currentTab: "",
 	tabs: [],
 };
 

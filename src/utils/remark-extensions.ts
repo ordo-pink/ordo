@@ -82,6 +82,22 @@ export const groupByLines = () => (tree: Parent) => {
 
 		currentLine = child.position.start.line;
 
+		if (child.children && child.type !== "list") {
+			child.children.forEach((grandChild: any) => {
+				if (grandChild.position.start.line !== child.position.start.line) {
+					child.children.splice(child.children.indexOf(grandChild), 1);
+
+					acc.push({
+						number: grandChild.position.start.line,
+						width: grandChild.position.end.column - 1,
+						children: [grandChild],
+					});
+
+					currentLine++;
+				}
+			});
+		}
+
 		return acc;
 	}, [] as any[]);
 };

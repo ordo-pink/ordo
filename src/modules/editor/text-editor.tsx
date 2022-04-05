@@ -1,15 +1,12 @@
-import { useAppDispatch, useAppSelector } from "@core/state/hooks";
-import { MdLine, MdToken } from "@utils/md-parser";
-import { Switch } from "or-else";
 import React from "react";
+import { Switch } from "or-else";
 import Scrollbars from "react-custom-scrollbars";
-import remarkParse from "remark-parse/lib";
-import { unified } from "unified";
-import remarkWikiLink from "remark-wiki-link";
-import remarkGfm from "remark-gfm";
-import { wikiLinkEmbeds, attachIds, groupByLines } from "@utils/remark-extensions";
+
+import { useAppDispatch } from "@core/state/hooks";
+import { MdLine, MdToken } from "@utils/md-parser";
 import { Breadcrumbs } from "./breadcrumbs";
 import { parseMarkdown } from "./editor-slice";
+import { useCurrentTab } from "./hooks";
 
 const Wrapper = (line: MdLine) =>
 	Switch.of(line)
@@ -131,27 +128,27 @@ const Line: React.FC<{ line: MdLine }> = ({ line }) => {
 
 export const TextEditor: React.FC = () => {
 	const dispatch = useAppDispatch();
-	const path = useAppSelector((state) => state.editor.currentTab);
-	const currentTab = useAppSelector((state) => state.editor.tabs.find((tab) => tab.path === path));
 
-	if (!currentTab) {
-		return null;
-	}
+	const { tab } = useCurrentTab();
 
-	if (currentTab && !currentTab.data) {
-		dispatch(parseMarkdown(currentTab));
-	}
+	React.useEffect(() => {
+		if (tab && !tab.data) {
+			dispatch(parseMarkdown(tab));
+		}
+	}, [tab && tab.data, tab?.data]);
 
 	return (
-		<>
-			<div className="w-full text-sm text-gray-500">
-				<Breadcrumbs />
-			</div>
-			<Scrollbars>
-				<div className="cursor-text pb-[100%]">
-					{currentTab.data && currentTab.data.children.map((line: any) => <Line key={line.id} line={line} />)}
+		tab && (
+			<>
+				<div className="w-full text-sm text-gray-500">
+					<Breadcrumbs />
 				</div>
-			</Scrollbars>
-		</>
+				<Scrollbars>
+					<div className="cursor-text pb-[100%]">
+						{tab.data && tab.data.children.map((line: any) => <Line key={line.id} line={line} />)}
+					</div>
+				</Scrollbars>
+			</>
+		)
 	);
 };

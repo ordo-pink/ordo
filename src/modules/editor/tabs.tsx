@@ -1,8 +1,9 @@
+import React from "react";
+import { HiX } from "react-icons/hi";
+
 import { useAppDispatch, useAppSelector } from "@core/state/hooks";
 import { findOrdoFile } from "@modules/file-explorer/file-tree/find-ordo-file";
 import { getFileIcon } from "@utils/get-icon";
-import React from "react";
-import { HiX } from "react-icons/hi";
 import { OrdoFile, openTab, closeTab } from "./editor-slice";
 
 const Tab: React.FC<{ tab: OrdoFile }> = ({ tab }) => {
@@ -53,7 +54,7 @@ export const Tabs: React.FC = () => {
 
 	return (
 		<div className="flex items-center p-2 flex-wrap select-none">
-			{tabs && tabs.map((tab, index) => <Tab key={tab.path} tab={tab} />)}
+			{tabs && tabs.map((tab) => <Tab key={tab.path} tab={tab} />)}
 		</div>
 	);
 };

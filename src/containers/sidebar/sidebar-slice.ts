@@ -20,9 +20,17 @@ export const sidebarSlice = createSlice({
 		},
 		toggleSidebar: (state) => {
 			state.show = !state.show;
+
+			if (state.show && state.width <= 100) {
+				state.width = window.innerWidth * 0.02;
+			}
 		},
 		showSidebar: (state) => {
 			state.show = true;
+
+			if (state.width <= 100) {
+				state.width = window.innerWidth * 0.02;
+			}
 		},
 		hideSidebar: (state) => {
 			state.show = false;

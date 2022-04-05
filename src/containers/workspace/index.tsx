@@ -9,7 +9,7 @@ export const Workspace: React.FC = () => {
 
 	const Component = Switch.of(currentActivity).case("Editor", Editor).default(WelcomePage);
 	return (
-		<div className="py-2 h-[calc(100%-15.75rem)]">
+		<div className="py-2 h-[calc(100%-4.6rem)]">
 			<Component />
 		</div>
 	);

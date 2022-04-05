@@ -99,25 +99,23 @@ const Line: React.FC<{ line: MdLine }> = ({ line }) => {
 	const LineWrapper = Wrapper(line);
 
 	return (
-		<>
-			<div className={`flex items-center`}>
-				<div
-					contentEditable={false}
-					className="w-12 select-none self-stretch flex items-center flex-shrink-0 justify-end border-r border-neutral-200 dark:border-neutral-600 text-right pr-2 font-mono text-neutral-500 dark:text-neutral-400 text-sm"
-				>
-					{line.number ?? " "}
-				</div>
-				<div className={` px-2 w-full`}>
-					{line.children && (
-						<LineWrapper>
-							{line.children.map((token: any) => (
-								<Token key={token.id} token={token} />
-							))}
-						</LineWrapper>
-					)}
-				</div>
+		<div className={`flex items-center whitespace-nowrap h-7`}>
+			<div
+				contentEditable={false}
+				className="w-12 select-none self-stretch flex items-center flex-shrink-0 justify-end border-r border-neutral-200 dark:border-neutral-600 text-right pr-2 font-mono text-neutral-500 dark:text-neutral-400 text-sm"
+			>
+				{line.number ?? " "}
 			</div>
-		</>
+			<div className={` px-2 w-full`}>
+				{line.children && (
+					<LineWrapper>
+						{line.children.map((token: any) => (
+							<Token key={token.id} token={token} />
+						))}
+					</LineWrapper>
+				)}
+			</div>
+		</div>
 	);
 };
 

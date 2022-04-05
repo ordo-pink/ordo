@@ -103,7 +103,6 @@ export const editorSlice = createSlice({
 				if (!currentTab) {
 					state.tabs.push(action.payload as any);
 					currentTab = state.tabs[state.tabs.length - 1];
-					console.log(state.tabs);
 				}
 
 				if (!currentTab || currentTab.raw == null) {

@@ -24,6 +24,18 @@ export const App: React.FC = () => {
 	const showPanel = useAppSelector((state) => state.panel.show);
 	const panelHeight = useAppSelector((state) => state.panel.height);
 
+	const filesUpdateListener = (data: any) => {
+		// TODO: Watch for changes
+	};
+
+	React.useEffect(() => {
+		window.addEventListener("@file-explorer/file-structure-updated", filesUpdateListener);
+
+		return () => {
+			window.removeEventListener("@file-explorer/file-structure-updated", filesUpdateListener);
+		};
+	}, []);
+
 	useMousetrap(["command+shift+b", "ctrl+shift+b"], () => dispatch(toggleSidebar()));
 	useMousetrap(["command+t command+t", "ctrl+t ctrl+t"], () => dispatch(togglePanel()));
 	useMousetrap(["command+shift+p", "ctrl+shift+p"], () => dispatch(openCommandPalette()));

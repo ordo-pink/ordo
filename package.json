@@ -190,6 +190,7 @@
 	},
 	"dependencies": {
 		"@reduxjs/toolkit": "^1.7.2",
+		"chokidar": "^3.5.3",
 		"d3": "^7.3.0",
 		"electron-devtools-installer": "^3.2.0",
 		"electron-squirrel-startup": "^1.0.0",

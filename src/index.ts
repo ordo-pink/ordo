@@ -1,6 +1,7 @@
 import { app, BrowserWindow, dialog, ipcMain, Menu, shell } from "electron";
 import install, { REACT_DEVELOPER_TOOLS, REDUX_DEVTOOLS } from "electron-devtools-installer";
 import { centerWindow, enforceMacOSAppLocation, is, setContentSecurityPolicy } from "electron-util";
+import { FSWatcher } from "chokidar";
 
 import { store } from "@core/config-store";
 import { getTemplateMenu } from "@utils/menu-template";
@@ -12,6 +13,8 @@ declare const MAIN_WINDOW_WEBPACK_ENTRY: string;
 declare const MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY: string;
 
 const windows = new Set<BrowserWindow>();
+
+const watcher = new FSWatcher({ ignored: store.get("explorer.exclude") });
 
 if (!is.development) {
 	setContentSecurityPolicy(`
@@ -57,6 +60,16 @@ ipcMain.handle("ordo", (e, data) => {
 	if (data.event === "@file-explorer/list-folder") {
 		const recentProjects: string[] = store.get("window.recentProjects");
 		store.set("window.recentProjects", Array.from(new Set(recentProjects.concat([data.payload]).slice(0, 5))));
+
+		watcher.add(data.payload);
+
+		["change", "unlink", "addDir", "unlinkDir"].forEach((type) => {
+			watcher.on(type, (_, path) => {
+				if (!path) return;
+
+				e.sender.send("@file-explorer/file-structure-updated", { path, type });
+			});
+		});
 
 		return listFolder(data.payload);
 	}

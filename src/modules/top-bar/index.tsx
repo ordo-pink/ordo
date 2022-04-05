@@ -16,7 +16,10 @@ export const TopBar: React.FC = () => {
 	}, [isFocused]);
 
 	return (
-		<div style={{ appRegion: "drag" } as any} className="flex items-center justify-center pt-2 cursor-pointer">
+		<div
+			style={{ appRegion: "drag" } as any}
+			className="flex items-center justify-center pt-2 cursor-pointer select-none"
+		>
 			<div style={{ appRegion: "none" } as any} className="w-[60%]">
 				<input
 					ref={ref}

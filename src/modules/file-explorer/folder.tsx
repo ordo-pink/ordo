@@ -20,7 +20,7 @@ export const Folder: React.FC<{ folder: OrdoFolder }> = ({ folder }) => {
 			<>
 				<div
 					style={{ paddingLeft: folder.depth * 12 + "px" }}
-					className={`flex space-x-2 items-center`}
+					className={`flex space-x-2 items-center select-none`}
 					onClick={() => {
 						window.ordo.emit("@application/update-folder", [folder.path, { collapsed: !folder.collapsed }]);
 					}}

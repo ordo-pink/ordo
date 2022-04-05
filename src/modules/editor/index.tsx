@@ -2,6 +2,7 @@ import { useAppSelector } from "@core/state/hooks";
 import { Switch } from "or-else";
 import React from "react";
 import { ImageViewer } from "./image-viewer";
+import { Tabs } from "./tabs";
 import { TextEditor } from "./text-editor";
 
 export const Editor: React.FC = () => {
@@ -10,5 +11,10 @@ export const Editor: React.FC = () => {
 
 	const Component = Switch.of(currentTab?.extension).case(".png", ImageViewer).default(TextEditor);
 
-	return <Component />;
+	return (
+		<div>
+			<Tabs />
+			<Component />
+		</div>
+	);
 };

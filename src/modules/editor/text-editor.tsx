@@ -9,9 +9,14 @@ import remarkWikiLink from "remark-wiki-link";
 import remarkGfm from "remark-gfm";
 import { wikiLinkEmbeds, attachIds, groupByLines } from "@utils/remark-extensions";
 import { Breadcrumbs } from "./breadcrumbs";
+import { parseMarkdown } from "./editor-slice";
 
 const Wrapper = (line: MdLine) =>
 	Switch.of(line)
+		.case(
+			(x) => x.type === "thematicBreak",
+			() => <hr className="border-2 border-gray-400" />,
+		)
 		.case(
 			(x) => x.type === "heading" && x.depth === 1,
 			({ children }: any) => <h1 className="text-4xl"># {children}</h1>,
@@ -108,12 +113,16 @@ const Line: React.FC<{ line: MdLine }> = ({ line }) => {
 				{line.number ?? " "}
 			</div>
 			<div className={` px-2 w-full`}>
-				{line.children && (
-					<LineWrapper>
-						{line.children.map((token: any) => (
-							<Token key={token.id} token={token} />
-						))}
-					</LineWrapper>
+				{line.type === "thematicBreak" ? (
+					<hr />
+				) : (
+					line.children && (
+						<LineWrapper>
+							{line.children.map((token: any) => (
+								<Token key={token.id} token={token} />
+							))}
+						</LineWrapper>
+					)
 				)}
 			</div>
 		</div>
@@ -125,17 +134,12 @@ export const TextEditor: React.FC = () => {
 	const path = useAppSelector((state) => state.editor.currentTab);
 	const currentTab = useAppSelector((state) => state.editor.tabs.find((tab) => tab.path === path));
 
-	const [json, setJson] = React.useState({ children: [] });
-
-	React.useEffect(() => {
-		const processor = unified().use(remarkParse).use(remarkGfm).use(remarkWikiLink);
-		const ast = processor.parse(currentTab?.raw);
-		const transformed = unified().use(wikiLinkEmbeds).use(groupByLines).use(attachIds).run(ast);
-		transformed.then((data) => setJson(data as any));
-	}, [currentTab && currentTab.raw && currentTab.data]);
-
 	if (!currentTab) {
 		return null;
+	}
+
+	if (currentTab && !currentTab.data) {
+		dispatch(parseMarkdown(currentTab));
 	}
 
 	return (
@@ -145,9 +149,7 @@ export const TextEditor: React.FC = () => {
 			</div>
 			<Scrollbars>
 				<div className="cursor-text pb-[100%]">
-					{json.children.map((line: any) => (
-						<Line key={line.number} line={line} />
-					))}
+					{currentTab.data && currentTab.data.children.map((line: any) => <Line key={line.id} line={line} />)}
 				</div>
 			</Scrollbars>
 		</>

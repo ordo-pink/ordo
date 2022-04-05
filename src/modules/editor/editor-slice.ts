@@ -1,11 +1,12 @@
 import { Color } from "@core/apprearance/colors";
 import remarkWikiLink from "remark-wiki-link";
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { wikiLinkEmbeds } from "@utils/remark-extensions";
+import { attachIds, extractFrontmatter, groupByLines, wikiLinkEmbeds } from "@utils/remark-extensions";
 import remarkGfm from "remark-gfm";
 import remarkParse from "remark-parse";
 import { unified } from "unified";
 import { getFile } from "@modules/file-explorer/file-tree/get-file";
+import remarkFrontmatter from "remark-frontmatter";
 
 export type OrdoFile<T = any> = {
 	path: string;
@@ -62,6 +63,18 @@ export const openTab = createAsyncThunk("@editor/open-tab", (path: string) =>
 	window.ordo.emit<string>("@file-explorer/read-file", path).then((raw) => ({ raw, path })),
 );
 
+export const parseMarkdown = createAsyncThunk("@editor/parse-markdown", async ({ raw, path }: any) => {
+	const processor = unified().use(remarkParse).use(remarkWikiLink);
+	const ast = processor.parse(raw);
+	const data = await unified().use(wikiLinkEmbeds).use(groupByLines).use(attachIds).run(ast);
+
+	return {
+		data,
+		raw,
+		path,
+	};
+});
+
 export const editorSlice = createSlice({
 	name: "editor",
 	initialState,
@@ -81,29 +94,31 @@ export const editorSlice = createSlice({
 		},
 	},
 	extraReducers: (builder) => {
-		builder.addCase(openTab.fulfilled, (state, action) => {
-			state.currentTab = action.payload.path;
+		builder
+			.addCase(openTab.fulfilled, (state, action) => {
+				state.currentTab = action.payload.path;
 
-			let currentTab = state.tabs.find((tab) => tab.path === action.payload.path) as OrdoFile;
+				let currentTab = state.tabs.find((tab) => tab.path === action.payload.path) as OrdoFile;
 
-			if (!currentTab) {
-				state.tabs.push(action.payload as any);
-				currentTab = state.tabs[state.tabs.length - 1];
-				console.log(state.tabs);
-			}
+				if (!currentTab) {
+					state.tabs.push(action.payload as any);
+					currentTab = state.tabs[state.tabs.length - 1];
+					console.log(state.tabs);
+				}
 
-			if (!currentTab || currentTab.raw == null) {
-				currentTab.raw = action.payload.raw;
-			}
+				if (!currentTab || currentTab.raw == null) {
+					currentTab.raw = action.payload.raw;
+				}
+			})
+			.addCase(parseMarkdown.fulfilled, (state, action) => {
+				const tab = state.tabs.find((t) => t.path === action.payload.path);
 
-			if (!currentTab.data) {
-				const processor = unified().use(remarkParse).use(remarkGfm).use(remarkWikiLink);
-				const ast = processor.parse(currentTab?.raw);
-				const transformed = unified().use(wikiLinkEmbeds).run(ast);
+				if (!tab) {
+					return;
+				}
 
-				currentTab.data = transformed;
-			}
-		});
+				tab.data = action.payload.data;
+			});
 	},
 });
 

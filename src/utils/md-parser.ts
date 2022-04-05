@@ -1,6 +1,6 @@
 import { Color } from "@core/apprearance/colors";
 
-export type MdLineType = "list" | "listItem" | "paragraph" | "blockquote" | "heading" | "HorizontalLine" | "br";
+export type MdLineType = "list" | "listItem" | "paragraph" | "blockquote" | "heading" | "thematicBreak" | "br";
 
 export type MdTokenType = "text" | "strong" | "link" | "wikiLink" | "wikiLinkEmbed" | "emphasis" | "delete";
 

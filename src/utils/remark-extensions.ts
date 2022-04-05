@@ -48,6 +48,13 @@ export const attachIds = () => (tree: Node) => {
 	});
 };
 
+export const extractFrontmatter = () => (tree: Parent) => {
+	if (tree.children[0].type === "yaml") {
+		(tree as any).frontmatter = tree.children[0];
+		tree.children.splice(0, 1);
+	}
+};
+
 export const groupByLines = () => (tree: Parent) => {
 	let currentLine = 0;
 

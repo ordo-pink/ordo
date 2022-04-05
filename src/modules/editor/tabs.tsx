@@ -22,7 +22,7 @@ const Tab: React.FC<{ tab: OrdoFile }> = ({ tab }) => {
 		return null;
 	}
 
-	const Icon = getFileIcon(tab);
+	const Icon = getFileIcon(file);
 
 	return (
 		<div

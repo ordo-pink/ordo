@@ -144,7 +144,7 @@ export const TextEditor: React.FC = () => {
 				<Breadcrumbs />
 			</div>
 			<Scrollbars>
-				<div>
+				<div className="cursor-text pb-[100%]">
 					{json.children.map((line: any) => (
 						<Line key={line.number} line={line} />
 					))}

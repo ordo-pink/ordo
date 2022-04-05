@@ -138,7 +138,7 @@ export const schema: Schema<InternalSettings> = {
 		properties: {
 			exclude: {
 				type: "array",
-				default: [".obsidian", "**/node_modules", "**/.git", "**/.svn", "**/CVS", "**/.DS_Store", "**/Thumbs.db"],
+				default: ["**/.obsidian", "**/node_modules", "**/.git", "**/.svn", "**/CVS", "**/.DS_Store", "**/Thumbs.db"],
 			},
 			associations: {
 				type: "array",
@@ -192,7 +192,7 @@ export const store = new Store({
 				emptySelectionLineToClipboard: true,
 			});
 			s.set("explorer", {
-				exclude: ["**/node_modules", "**/.git", "**/.svn", "**/CVS", "**/.DS_Store", "**/Thumbs.db"],
+				exclude: ["**/.obsidian", "**/node_modules", "**/.git", "**/.svn", "**/CVS", "**/.DS_Store", "**/Thumbs.db"],
 				associations: [
 					{ extension: ".apng", association: "image" },
 					{ extension: ".avif", association: "image" },

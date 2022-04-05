@@ -1,6 +1,5 @@
 import { promises } from "fs";
 import { join } from "path";
-import YAML from "yaml";
 import { Minimatch } from "minimatch";
 import { OrdoFolder } from "@modules/editor/editor-slice";
 import { createOrdoFile } from "./create-ordo-file";
@@ -37,8 +36,9 @@ export const listFolder = async (path: string, depth = 0, rootPath = path): Prom
 			tree.children.push(await listFolder(itemPath, depth + 1, rootPath));
 		} else if (item.isFile()) {
 			if (item.name === ".ordo") {
+				console.log(itemPath);
 				const content = await promises.readFile(itemPath, "utf-8");
-				const dotOrdo = YAML.parse(content);
+				const dotOrdo = JSON.parse(content);
 
 				Object.keys(dotOrdo).forEach((key) => {
 					switch (key) {

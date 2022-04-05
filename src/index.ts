@@ -5,6 +5,7 @@ import { centerWindow, enforceMacOSAppLocation, is, setContentSecurityPolicy } f
 import { store } from "@core/config-store";
 import { getTemplateMenu } from "@utils/menu-template";
 import { listFolder } from "@modules/file-explorer/file-tree/list-folder";
+import { updateFolder } from "@modules/file-explorer/file-tree/update-folder";
 
 declare const MAIN_WINDOW_WEBPACK_ENTRY: string;
 declare const MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY: string;
@@ -38,6 +39,10 @@ ipcMain.handle("ordo", (e, data) => {
 
 	if (data.event === "@application/set-setting") {
 		return store.set(data.payload.key, data.payload.value);
+	}
+
+	if (data.event === "@file-explorer/update-folder") {
+		updateFolder(data.payload.path, data.payload);
 	}
 
 	if (data.event === "@file-explorer/select-project-folder") {

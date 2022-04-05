@@ -1,15 +1,9 @@
 import { join } from "path";
 import { promises } from "fs";
 import { OrdoFolder } from "@modules/editor/editor-slice";
-import { findOrdoFolder } from "./find-ordo-folder";
 
-export const updateFolder = (tree: OrdoFolder, path: string, update: Partial<OrdoFolder>): OrdoFolder => {
-	const folder = findOrdoFolder(tree, path);
-
-	if (!folder) {
-		return tree;
-	}
-
+export const updateFolder = (path: string, update: Partial<OrdoFolder>): void => {
+	const folder = {} as OrdoFolder;
 	const props = Object.keys(update);
 	const dotOrdo: Partial<OrdoFolder> = {};
 
@@ -26,7 +20,7 @@ export const updateFolder = (tree: OrdoFolder, path: string, update: Partial<Ord
 	});
 
 	if (Object.keys(dotOrdo).length) {
-		const dotOrdoPath = join(folder.path, ".ordo");
+		const dotOrdoPath = join(path, ".ordo");
 
 		promises
 			.readFile(dotOrdoPath, "utf-8")
@@ -34,6 +28,4 @@ export const updateFolder = (tree: OrdoFolder, path: string, update: Partial<Ord
 			.then((data) => promises.writeFile(dotOrdoPath, JSON.stringify({ ...data, ...dotOrdo }, null, 2)))
 			.catch(() => promises.writeFile(dotOrdoPath, JSON.stringify(dotOrdo, null, 2)));
 	}
-
-	return tree;
 };

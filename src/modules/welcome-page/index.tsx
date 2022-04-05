@@ -65,7 +65,7 @@ export const WelcomePage: React.FC = () => {
 		window.ordo
 			.emit<string[]>("@application/get-setting", "window.recentProjects")
 			.then((projects) => setRecentProjects(projects));
-	});
+	}, []);
 
 	return (
 		<div className="select-none flex flex-col flex-grow w-full h-full justify-center items-center text-gray-600 dark:text-gray-300 mt-[-3rem]">

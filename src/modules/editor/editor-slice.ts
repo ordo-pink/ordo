@@ -1,10 +1,11 @@
 import { Color } from "@core/apprearance/colors";
 import remarkWikiLink from "remark-wiki-link";
-import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { wikiLinkEmbeds } from "@utils/remark-extensions";
 import remarkGfm from "remark-gfm";
 import remarkParse from "remark-parse";
 import { unified } from "unified";
+import { getFile } from "@modules/file-explorer/file-tree/get-file";
 
 export type OrdoFile<T = any> = {
 	path: string;
@@ -54,88 +55,17 @@ export type EditorState = {
 
 export const initialState: EditorState = {
 	currentTab: "/absolute/relative",
-	tabs: [
-		{
-			path: "/absolute/relative",
-			readableName: "Test",
-			relativePath: "relative",
-			depth: 0,
-			createdAt: new Date(),
-			updatedAt: new Date(),
-			accessedAt: new Date(),
-			extension: ".md",
-			size: 0,
-			readableSize: "0 Bytes",
-			ranges: [
-				{
-					start: {
-						line: 1,
-						character: 3,
-					},
-					end: {
-						line: 1,
-						character: 3,
-					},
-					direction: "ltr",
-				},
-			],
-			type: "file",
-			raw: `# Test
-
-Lorem ipsum dolor sit amet, consectetur adipisicing elit. Modi necessitatibus, at est repellat iusto veritatis repudiandae ipsam fugit, velit dolores fuga! Magnam reiciendis impedit commodi in quos blanditiis illum autem!
-
-## Test 2
-
-Lorem ipsum dolor sit amet, consectetur adipisicing elit. Modi necessitatibus, at est repellat iusto veritatis repudiandae ipsam fugit, velit dolores fuga! Magnam reiciendis impedit commodi in quos blanditiis illum autem!
-
-### Test 3
-
-Lorem ipsum dolor sit amet, consectetur adipisicing elit. Modi necessitatibus, at est repellat iusto veritatis repudiandae ipsam fugit, velit dolores fuga! Magnam reiciendis impedit commodi in quos blanditiis illum autem!
-
-#### Test 4
-
-Lorem ipsum dolor sit amet, consectetur adipisicing elit. Modi necessitatibus, at est repellat iusto veritatis repudiandae ipsam fugit, velit dolores fuga! Magnam reiciendis impedit commodi in quos blanditiis illum autem!
-
-> A blockquote
-
-##### Test 5
-
-This is **bold**. This is *italic*. This is __bold__. This is _italic_. This is **_bold and italic_**. \`Code example\`.
-
-![[Embed]]
-
-[[https://i.picsum.photos/id/28/200/300.jpg?hmac=PtGtIbRuuZW5gEPGm0h1Y-koEaki3vffOYcq3TdSAlA]]
-
-* Test the list
-
-32. Ordered List
-1. Ordered List 2
-`,
-		},
-	],
+	tabs: [],
 };
+
+export const openTab = createAsyncThunk("@editor/open-tab", (path: string) =>
+	window.ordo.emit<string>("@file-explorer/read-file", path).then((raw) => ({ raw, path })),
+);
 
 export const editorSlice = createSlice({
 	name: "editor",
 	initialState,
 	reducers: {
-		openTab: (state, action: PayloadAction<string>) => {
-			state.currentTab = action.payload;
-
-			const currentTab = state.tabs.find((tab) => tab.path === action.payload) as OrdoFile;
-
-			if (!currentTab || currentTab.raw == null) {
-				// TODO: Read file, parse file, show file
-			}
-
-			if (!currentTab.data) {
-				const processor = unified().use(remarkParse).use(remarkGfm).use(remarkWikiLink);
-				const ast = processor.parse(currentTab?.raw);
-				const transformed = unified().use(wikiLinkEmbeds).run(ast);
-
-				currentTab.data = transformed;
-			}
-		},
 		closeTab: (state, action: PayloadAction<string>) => {
 			const currentTab = state.tabs.findIndex((tab) => tab.path === action.payload);
 
@@ -150,8 +80,33 @@ export const editorSlice = createSlice({
 			}
 		},
 	},
+	extraReducers: (builder) => {
+		builder.addCase(openTab.fulfilled, (state, action) => {
+			state.currentTab = action.payload.path;
+
+			let currentTab = state.tabs.find((tab) => tab.path === action.payload.path) as OrdoFile;
+
+			if (!currentTab) {
+				state.tabs.push(action.payload as any);
+				currentTab = state.tabs[state.tabs.length - 1];
+				console.log(state.tabs);
+			}
+
+			if (!currentTab || currentTab.raw == null) {
+				currentTab.raw = action.payload.raw;
+			}
+
+			if (!currentTab.data) {
+				const processor = unified().use(remarkParse).use(remarkGfm).use(remarkWikiLink);
+				const ast = processor.parse(currentTab?.raw);
+				const transformed = unified().use(wikiLinkEmbeds).run(ast);
+
+				currentTab.data = transformed;
+			}
+		});
+	},
 });
 
-export const { openTab, closeTab } = editorSlice.actions;
+export const { closeTab } = editorSlice.actions;
 
 export const editorReducer = editorSlice.reducer;

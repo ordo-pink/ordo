@@ -36,7 +36,6 @@ export const listFolder = async (path: string, depth = 0, rootPath = path): Prom
 			tree.children.push(await listFolder(itemPath, depth + 1, rootPath));
 		} else if (item.isFile()) {
 			if (item.name === ".ordo") {
-				console.log(itemPath);
 				const content = await promises.readFile(itemPath, "utf-8");
 				const dotOrdo = JSON.parse(content);
 

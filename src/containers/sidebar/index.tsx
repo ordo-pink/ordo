@@ -8,7 +8,7 @@ export const Sidebar: React.FC = () => {
 	const tree = useAppSelector((state) => state.fileExplorer.tree);
 	return (
 		<Scrollbars>
-			<div className="flex flex-col p-2">{tree && <Folder folder={tree} />}</div>
+			<div className="flex flex-col py-3">{tree && <Folder folder={tree} />}</div>
 		</Scrollbars>
 	);
 };

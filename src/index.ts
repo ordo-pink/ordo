@@ -6,6 +6,7 @@ import { store } from "@core/config-store";
 import { getTemplateMenu } from "@utils/menu-template";
 import { listFolder } from "@modules/file-explorer/file-tree/list-folder";
 import { updateFolder } from "@modules/file-explorer/file-tree/update-folder";
+import { readFile } from "@modules/file-explorer/file-tree/read-file";
 
 declare const MAIN_WINDOW_WEBPACK_ENTRY: string;
 declare const MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY: string;
@@ -51,11 +52,17 @@ ipcMain.handle("ordo", (e, data) => {
 		});
 
 		return paths ? paths[0] : null;
-	} else if (data.event === "@file-explorer/list-folder") {
+	}
+
+	if (data.event === "@file-explorer/list-folder") {
 		const recentProjects: string[] = store.get("window.recentProjects");
 		store.set("window.recentProjects", Array.from(new Set(recentProjects.concat([data.payload]).slice(0, 5))));
 
 		return listFolder(data.payload);
+	}
+
+	if (data.event === "@file-explorer/read-file") {
+		return readFile(data.payload);
 	}
 });
 

@@ -19,8 +19,8 @@ export const File: React.FC<{ file: OrdoFile }> = ({ file }) => {
 
 	return (
 		<div
-			style={{ paddingLeft: (file.depth + 0.25) * 16 + "px" }}
-			className={`flex space-x-2 cursor-pointer items-center select-none ${selectionClass}`}
+			style={{ paddingLeft: (file.depth + 0.25) * 16 + 10 + "px" }}
+			className={`flex space-x-2 cursor-pointer items-center select-none hover:bg-neutral-300 ${selectionClass}`}
 			onClick={() => dispatch(openTab(file.path))}
 		>
 			<Icon className="shrink-0 text-neutral-500" />

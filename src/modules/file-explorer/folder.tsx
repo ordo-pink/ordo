@@ -21,14 +21,14 @@ export const Folder: React.FC<{ folder: OrdoFolder }> = ({ folder }) => {
 		folder && (
 			<>
 				<div
-					style={{ paddingLeft: folder.depth * 12 + "px" }}
-					className={`flex space-x-2 items-center select-none`}
+					style={{ paddingLeft: folder.depth * 12 + 10 + "px" }}
+					className={`flex space-x-2 items-center select-none hover:bg-neutral-300 cursor-pointer`}
 					onClick={() => {
 						dispatch(toggleFolder(folder.path));
 					}}
 				>
-					<Icon className="cursor-pointer" />
-					<FolderIcon className={`cursor-pointer text-${folder.color}-500`} />
+					<Icon />
+					<FolderIcon className={`text-${folder.color}-500`} />
 					<div className="pr-2 truncate text-gray-700 py-0.5">{folder.readableName}</div>
 				</div>
 				{!folder.collapsed && (

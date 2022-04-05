@@ -8,7 +8,12 @@ export const File: React.FC<{ file: OrdoFile }> = ({ file }) => {
 	const selectedFile = useAppSelector((state) => state.editor.currentTab);
 	const openFiles = useAppSelector((state) => state.editor.tabs);
 
-	const selectionClass = selectedFile === file.path ? "bg-gray-300 dark:bg-neutral-700" : "";
+	const selectionClass =
+		selectedFile === file.path
+			? "bg-neutral-300 dark:bg-pink-700"
+			: // : openFiles.some((f) => f.path === file.path)
+			  // ? "bg-sky-50 dark:bg-zinc-700"
+			  "";
 
 	const Icon = getFileIcon(file);
 

@@ -138,7 +138,7 @@ export const schema: Schema<InternalSettings> = {
 		properties: {
 			exclude: {
 				type: "array",
-				default: ["**/node_modules", "**/.git", "**/.svn", "**/CVS", "**/.DS_Store", "**/Thumbs.db"],
+				default: [".obsidian", "**/node_modules", "**/.git", "**/.svn", "**/CVS", "**/.DS_Store", "**/Thumbs.db"],
 			},
 			associations: {
 				type: "array",

@@ -53,6 +53,20 @@ export const fileExplorerSlice = createSlice({
 
 			state.createFolderIn = action.payload;
 		},
+		toggleFolder: (state, action: PayloadAction<string>) => {
+			if (!state.tree) {
+				return;
+			}
+
+			const folder = findOrdoFolder(state.tree, action.payload);
+
+			if (!folder) {
+				return;
+			}
+
+			folder.collapsed = !folder.collapsed;
+			window.ordo.emit("@file-explorer/update-folder", { path: folder.path, collapsed: folder.collapsed });
+		},
 	},
 	extraReducers: (builder) => {
 		builder
@@ -71,6 +85,6 @@ export const fileExplorerSlice = createSlice({
 	},
 });
 
-export const { showFileCreation, showFolderCreation } = fileExplorerSlice.actions;
+export const { showFileCreation, showFolderCreation, toggleFolder } = fileExplorerSlice.actions;
 
 export const fileExplorerReducer = fileExplorerSlice.reducer;

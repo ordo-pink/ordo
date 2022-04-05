@@ -1,11 +1,13 @@
 import React from "react";
 
 import { File } from "@modules/file-explorer/file";
-import { useAppSelector } from "@core/state/hooks";
+import { useAppDispatch, useAppSelector } from "@core/state/hooks";
 import { OrdoFolder, OrdoFile } from "@modules/editor/editor-slice";
 import { getCollapseIcon, getFolderIcon } from "@utils/get-icon";
+import { toggleFolder } from "./file-explorer-slice";
 
 export const Folder: React.FC<{ folder: OrdoFolder }> = ({ folder }) => {
+	const dispatch = useAppDispatch();
 	const createFileIn = useAppSelector((state) => state.fileExplorer.createFileIn);
 	const createFolderIn = useAppSelector((state) => state.fileExplorer.createFolderIn);
 	const Icon = folder && getCollapseIcon(folder);
@@ -22,11 +24,11 @@ export const Folder: React.FC<{ folder: OrdoFolder }> = ({ folder }) => {
 					style={{ paddingLeft: folder.depth * 12 + "px" }}
 					className={`flex space-x-2 items-center select-none`}
 					onClick={() => {
-						window.ordo.emit("@application/update-folder", [folder.path, { collapsed: !folder.collapsed }]);
+						dispatch(toggleFolder(folder.path));
 					}}
 				>
-					<Icon />
-					<FolderIcon className={`text-${folder.color}-500`} />
+					<Icon className="cursor-pointer" />
+					<FolderIcon className={`cursor-pointer text-${folder.color}-500`} />
 					<div className="pr-2 truncate text-gray-700 py-0.5">{folder.readableName}</div>
 				</div>
 				{!folder.collapsed && (

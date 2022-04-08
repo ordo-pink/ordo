@@ -74,11 +74,15 @@ export const groupByLines = () => (tree: Parent) => {
 	let currentLine = 0;
 
 	(tree as any).children = (tree as any).children.reduce((acc: any, child: any) => {
+		if (child.type === "list") {
+			groupByLines()(child);
+		}
+
 		if (child.position.start.line === currentLine) {
 			return acc;
 		}
 
-		while (child.position.start.line - currentLine > 1) {
+		if (child.position.start.line - currentLine > 1 && currentLine > 0) {
 			const newLine = {
 				number: currentLine + 1,
 				children: [] as any[],

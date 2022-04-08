@@ -56,8 +56,6 @@ export const extractFrontmatter = () => (tree: Parent) => {
 };
 
 export const handleEmptyFile = () => (tree: Parent) => {
-	console.log(tree.children);
-
 	if (tree.children.length > 0) {
 		return;
 	}

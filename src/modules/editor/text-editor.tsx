@@ -63,11 +63,16 @@ const TokenWrapper = (tokenType: string) =>
 			const dispatch = useAppDispatch();
 			const tree = useAppSelector((state) => state.fileExplorer.tree);
 
+			const [node, setNode] = React.useState<any>();
+
 			if (!tree) {
 				return null;
 			}
 
-			let node = findOrdoFileBy(tree, "relativePath", `./${children.includes(".") ? children : `${children}.md`}`);
+			React.useEffect(() => {
+				setNode(findOrdoFileBy(tree, "relativePath", `./${children.includes(".") ? children : `${children}.md`}`));
+			});
+
 			const color = node ? "text-pink-600" : "text-gray-600";
 
 			return (
@@ -76,10 +81,20 @@ const TokenWrapper = (tokenType: string) =>
 					className={`underline ${color}`}
 					onClick={() => {
 						if (!node) {
-							dispatch(createFile({ tree, path: children })).then(() => {
-								node = findOrdoFileBy(tree, "relativePath", `./${children.includes(".") ? children : `${children}.md`}`);
-								dispatch(openTab((node as any).path));
-							});
+							dispatch(createFile({ tree, path: `${children.includes(".") ? children : `${children}.md`}` })).then(
+								(action) => {
+									setNode(
+										findOrdoFileBy(
+											action.payload as any,
+											"relativePath",
+											`./${children.includes(".") ? children : `${children}.md`}`,
+										),
+									);
+
+									console.log(action.payload);
+									dispatch(openTab((node as any).path));
+								},
+							);
 						} else {
 							dispatch(openTab((node as any).path));
 						}

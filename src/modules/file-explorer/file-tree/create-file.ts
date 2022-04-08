@@ -36,7 +36,7 @@ export const createFile = async (tree: OrdoFolder, path: string): Promise<OrdoFo
 				updatedAt: stat.mtime,
 				accessedAt: stat.atime,
 				path: fullPath,
-				relativePath: path.replace(tree.path, "."),
+				relativePath: fullPath.replace(tree.path, "."),
 				size: stat.size,
 			});
 

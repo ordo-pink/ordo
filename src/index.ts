@@ -8,6 +8,7 @@ import { getTemplateMenu } from "@utils/menu-template";
 import { listFolder } from "@modules/file-explorer/file-tree/list-folder";
 import { updateFolder } from "@modules/file-explorer/file-tree/update-folder";
 import { readFile } from "@modules/file-explorer/file-tree/read-file";
+import { createFile } from "@modules/file-explorer/file-tree/create-file";
 
 declare const MAIN_WINDOW_WEBPACK_ENTRY: string;
 declare const MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY: string;
@@ -76,6 +77,10 @@ ipcMain.handle("ordo", (e, data) => {
 
 	if (data.event === "@file-explorer/read-file") {
 		return readFile(data.payload);
+	}
+
+	if (data.event === "@file-explorer/create-file") {
+		return createFile(data.payload.tree, data.payload.path);
 	}
 });
 

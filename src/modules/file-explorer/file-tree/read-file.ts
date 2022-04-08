@@ -7,7 +7,7 @@ export const readFile = async (path: string) => {
 
 	const association = associations.find((a) => a.extension === extension);
 
-	if (association.association === "image") {
+	if (association && association.association === "image") {
 		const content = await promises.readFile(path, "base64");
 		return `data:image/${extension.slice(1)};base64,${content}`;
 	}

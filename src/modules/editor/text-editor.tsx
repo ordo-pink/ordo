@@ -2,11 +2,14 @@ import React from "react";
 import { Switch } from "or-else";
 import Scrollbars from "react-custom-scrollbars";
 
-import { useAppDispatch } from "@core/state/hooks";
+import { useAppDispatch, useAppSelector } from "@core/state/hooks";
 import { MdLine, MdToken } from "@utils/md-parser";
 import { Breadcrumbs } from "./breadcrumbs";
-import { parseMarkdown } from "./editor-slice";
+import { openTab, parseMarkdown } from "./editor-slice";
 import { useCurrentTab } from "./hooks";
+import { findOrdoFile } from "@modules/file-explorer/file-tree/find-ordo-file";
+import { findOrdoFileBy } from "@modules/file-explorer/file-tree/find-ordo-file-by";
+import { createFile } from "@modules/file-explorer/file-explorer-slice";
 
 const Wrapper = (line: MdLine) =>
 	Switch.of(line)
@@ -56,11 +59,36 @@ const TokenWrapper = (tokenType: string) =>
 	Switch.of(tokenType)
 		.case("delete", ({ children }: any) => <span className="line-through">~~{children}~~</span>)
 		.case("emphasis", ({ children }: any) => <em className="italic">_{children}_</em>)
-		.case("wikiLink", ({ children }: any) => (
-			<a href="#" className="underline text-pink-600">
-				[[{children}]]
-			</a>
-		))
+		.case("wikiLink", ({ children }: any) => {
+			const dispatch = useAppDispatch();
+			const tree = useAppSelector((state) => state.fileExplorer.tree);
+
+			if (!tree) {
+				return null;
+			}
+
+			let node = findOrdoFileBy(tree, "relativePath", `./${children.includes(".") ? children : `${children}.md`}`);
+			const color = node ? "text-pink-600" : "text-gray-600";
+
+			return (
+				<a
+					href="#"
+					className={`underline ${color}`}
+					onClick={() => {
+						if (!node) {
+							dispatch(createFile({ tree, path: children })).then(() => {
+								node = findOrdoFileBy(tree, "relativePath", `./${children.includes(".") ? children : `${children}.md`}`);
+								dispatch(openTab((node as any).path));
+							});
+						} else {
+							dispatch(openTab((node as any).path));
+						}
+					}}
+				>
+					[[{children}]]
+				</a>
+			);
+		})
 		.case("wikiLinkEmbed", ({ children }: any) => <span className="text-pink-500 text-xs">{children}</span>)
 		.case("inlineCode", ({ children }: any) => (
 			<code className="bg-rose-200 text-sm text-rose-700 rounded-lg px-2 py-0.5 font-mono">`{children}`</code>

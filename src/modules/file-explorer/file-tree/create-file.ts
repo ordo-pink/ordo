@@ -4,35 +4,45 @@ import { join } from "path";
 import { OrdoFolder } from "@modules/editor/editor-slice";
 import { sortTree } from "./sort-tree";
 import { getFolderOrParent } from "./get-folder-or-parent";
+import { createFolder } from "./create-folder";
 
-export const createFile = async (tree: OrdoFolder, parentPath: string, name: string): Promise<OrdoFolder> => {
-	const parent = getFolderOrParent(tree, parentPath);
+export const createFile = async (tree: OrdoFolder, path: string): Promise<OrdoFolder> => {
+	const parentPath = path.includes("/") ? join(tree.path, path.slice(0, path.lastIndexOf("/"))) : tree.path;
+	let parent = getFolderOrParent(tree, parentPath);
+
+	console.log(parentPath);
 
 	if (!parent) {
-		throw new Error("Could not find the folder or file parent folder");
+		parent = await createFolder(tree, tree.path, parentPath.replace(tree.path, ""));
 	}
 
-	const path = join(parent.path, name);
+	if (!parent) {
+		throw new Error(`Could not create ${parentPath} folder`);
+	}
+
+	const fullPath = join(tree.path, path);
 
 	if (parent.children.find((child) => child.path === path)) {
 		return tree;
 	}
 
 	return promises
-		.writeFile(path, "", "utf-8")
-		.then(() => promises.stat(path))
+		.writeFile(fullPath, "", "utf-8")
+		.then(() => promises.stat(fullPath))
 		.then((stat) => {
 			const node = createOrdoFile({
-				depth: parent.depth + 1,
+				depth: (parent as any).depth + 1,
 				createdAt: stat.birthtime,
 				updatedAt: stat.mtime,
 				accessedAt: stat.atime,
-				path,
+				path: fullPath,
 				relativePath: path.replace(tree.path, "."),
 				size: stat.size,
 			});
 
-			parent.children.push(node);
+			console.log(node);
+
+			(parent as any).children.push(node);
 
 			return sortTree(tree);
 		});

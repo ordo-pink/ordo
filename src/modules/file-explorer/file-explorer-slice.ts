@@ -12,14 +12,18 @@ export const initialState: FileExplorerState = {
 	tree: null,
 };
 
-export const selectProjectFolder = createAsyncThunk("select-project-folder", () =>
+export const selectProjectFolder = createAsyncThunk("@file-explorer/select-project-folder", () =>
 	window.ordo
 		.emit<string>("@file-explorer/select-project-folder")
 		.then((folder) => window.ordo.emit<OrdoFolder>("@file-explorer/list-folder", folder)),
 );
 
-export const listFolder = createAsyncThunk("list-folder", (path: string) =>
+export const listFolder = createAsyncThunk("@file-explorer/list-folder", (path: string) =>
 	window.ordo.emit<OrdoFolder>("@file-explorer/list-folder", path),
+);
+
+export const createFile = createAsyncThunk("@file-explorer/create-file", (payload: any) =>
+	window.ordo.emit<OrdoFolder>("@file-explorer/create-file", payload),
 );
 
 export const fileExplorerSlice = createSlice({
@@ -80,6 +84,12 @@ export const fileExplorerSlice = createSlice({
 				state.tree = action.payload;
 			})
 			.addCase(listFolder.rejected, (state, action) => {
+				// TODO: Send error notification
+			})
+			.addCase(createFile.fulfilled, (state, action) => {
+				state.tree = action.payload;
+			})
+			.addCase(createFile.rejected, (state, action) => {
 				// TODO: Send error notification
 			});
 	},

@@ -55,6 +55,23 @@ export const extractFrontmatter = () => (tree: Parent) => {
 	}
 };
 
+export const handleEmptyFile = () => (tree: Parent) => {
+	console.log(tree.children);
+
+	if (tree.children.length > 0) {
+		return;
+	}
+
+	const newLine = {
+		number: 1,
+		id: "0",
+		children: [] as any[],
+		width: 0,
+	};
+
+	tree.children = [newLine as any];
+};
+
 export const groupByLines = () => (tree: Parent) => {
 	let currentLine = 0;
 

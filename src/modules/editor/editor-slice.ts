@@ -1,12 +1,11 @@
-import { Color } from "@core/apprearance/colors";
-import remarkWikiLink from "remark-wiki-link";
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { attachIds, extractFrontmatter, groupByLines, wikiLinkEmbeds } from "@utils/remark-extensions";
+import { unified } from "unified";
+import remarkWikiLink from "remark-wiki-link";
 import remarkGfm from "remark-gfm";
 import remarkParse from "remark-parse";
-import { unified } from "unified";
-import { getFile } from "@modules/file-explorer/file-tree/get-file";
-import remarkFrontmatter from "remark-frontmatter";
+
+import { Color } from "@core/apprearance/colors";
+import { attachIds, groupByLines, handleEmptyFile, wikiLinkEmbeds } from "@utils/remark-extensions";
 
 export type OrdoFile<T = any> = {
 	path: string;
@@ -64,9 +63,9 @@ export const openTab = createAsyncThunk("@editor/open-tab", (path: string) =>
 );
 
 export const parseMarkdown = createAsyncThunk("@editor/parse-markdown", async ({ raw, path }: any) => {
-	const processor = unified().use(remarkParse).use(remarkWikiLink);
+	const processor = unified().use(remarkParse).use(remarkGfm).use(remarkWikiLink);
 	const ast = processor.parse(raw);
-	const data = await unified().use(wikiLinkEmbeds).use(groupByLines).use(attachIds).run(ast);
+	const data = await unified().use(wikiLinkEmbeds).use(groupByLines).use(attachIds).use(handleEmptyFile).run(ast);
 
 	return {
 		data,
@@ -106,7 +105,7 @@ export const editorSlice = createSlice({
 				}
 
 				if (!currentTab || currentTab.raw == null) {
-					currentTab.raw = action.payload.raw;
+					currentTab.raw = action.payload.raw || "\n";
 				}
 			})
 			.addCase(parseMarkdown.fulfilled, (state, action) => {

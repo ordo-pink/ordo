@@ -10,8 +10,6 @@ export const createFile = async (tree: OrdoFolder, path: string): Promise<OrdoFo
 	const parentPath = path.includes("/") ? join(tree.path, path.slice(0, path.lastIndexOf("/"))) : tree.path;
 	let parent = getFolderOrParent(tree, parentPath);
 
-	console.log(parentPath);
-
 	if (!parent) {
 		parent = await createFolder(tree, tree.path, parentPath.replace(tree.path, ""));
 	}
@@ -39,8 +37,6 @@ export const createFile = async (tree: OrdoFolder, path: string): Promise<OrdoFo
 				relativePath: fullPath.replace(tree.path, "."),
 				size: stat.size,
 			});
-
-			console.log(node);
 
 			(parent as any).children.push(node);
 

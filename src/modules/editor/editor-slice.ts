@@ -20,7 +20,7 @@ export type OrdoFile<T = any> = {
 	readableSize: string;
 	raw?: string;
 	data?: T;
-	ranges?: Array<{
+	ranges: Array<{
 		start: {
 			line: int;
 			character: int;
@@ -91,6 +91,15 @@ export const editorSlice = createSlice({
 				state.currentTab = state.tabs.length ? state.tabs[0].path : "";
 			}
 		},
+		setRange: (state, action: PayloadAction<any>) => {
+			const currentTab = state.tabs.find((tab) => tab.path === state.currentTab);
+
+			if (!currentTab) {
+				return;
+			}
+
+			currentTab.ranges = [action.payload];
+		},
 	},
 	extraReducers: (builder) => {
 		builder
@@ -107,6 +116,20 @@ export const editorSlice = createSlice({
 				if (!currentTab || currentTab.raw == null) {
 					currentTab.raw = action.payload.raw || "\n";
 				}
+
+				currentTab.ranges = [
+					{
+						start: {
+							line: 1,
+							character: 0,
+						},
+						end: {
+							line: 1,
+							character: 0,
+						},
+						direction: "ltr",
+					},
+				];
 			})
 			.addCase(parseMarkdown.fulfilled, (state, action) => {
 				const tab = state.tabs.find((t) => t.path === action.payload.path);
@@ -116,10 +139,24 @@ export const editorSlice = createSlice({
 				}
 
 				tab.data = action.payload.data;
+
+				tab.ranges = [
+					{
+						start: {
+							line: 1,
+							character: 0,
+						},
+						end: {
+							line: 1,
+							character: 0,
+						},
+						direction: "ltr",
+					},
+				];
 			});
 	},
 });
 
-export const { closeTab } = editorSlice.actions;
+export const { closeTab, setRange } = editorSlice.actions;
 
 export const editorReducer = editorSlice.reducer;

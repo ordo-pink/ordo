@@ -5,9 +5,8 @@ import Scrollbars from "react-custom-scrollbars";
 import { useAppDispatch, useAppSelector } from "@core/state/hooks";
 import { MdLine, MdToken } from "@utils/md-parser";
 import { Breadcrumbs } from "./breadcrumbs";
-import { openTab, parseMarkdown } from "./editor-slice";
+import { openTab, parseMarkdown, setRange } from "./editor-slice";
 import { useCurrentTab } from "./hooks";
-import { findOrdoFile } from "@modules/file-explorer/file-tree/find-ordo-file";
 import { findOrdoFileBy } from "@modules/file-explorer/file-tree/find-ordo-file-by";
 import { createFile } from "@modules/file-explorer/file-explorer-slice";
 
@@ -19,23 +18,23 @@ const Wrapper = (line: MdLine) =>
 		)
 		.case(
 			(x) => x.type === "heading" && x.depth === 1,
-			({ children }: any) => <h1 className="text-4xl"># {children}</h1>,
+			({ children }: any) => <h1 className="text-4xl">{children}</h1>,
 		)
 		.case(
 			(x) => x.type === "heading" && x.depth === 2,
-			({ children }: any) => <h2 className="text-3xl">## {children}</h2>,
+			({ children }: any) => <h2 className="text-3xl">{children}</h2>,
 		)
 		.case(
 			(x) => x.type === "heading" && x.depth === 3,
-			({ children }: any) => <h3 className="text-2xl">### {children}</h3>,
+			({ children }: any) => <h3 className="text-2xl">{children}</h3>,
 		)
 		.case(
 			(x) => x.type === "heading" && x.depth === 4,
-			({ children }: any) => <h4 className="text-xl">#### {children}</h4>,
+			({ children }: any) => <h4 className="text-xl">{children}</h4>,
 		)
 		.case(
 			(x) => x.type === "heading" && x.depth === 5,
-			({ children }: any) => <h5 className="text-lg">##### {children}</h5>,
+			({ children }: any) => <h5 className="text-lg">{children}</h5>,
 		)
 		.case(
 			(x) => x.type === "listItem",
@@ -43,11 +42,7 @@ const Wrapper = (line: MdLine) =>
 		)
 		.case(
 			(x) => x.type === "blockquote",
-			({ children }: any) => (
-				<blockquote className="pl-2 border-l-4 border-gray-500">
-					{">"} {children}
-				</blockquote>
-			),
+			({ children }: any) => <blockquote className="pl-2 border-l-4 border-gray-500">{children}</blockquote>,
 		)
 		.case(
 			(x) => x.type === "br",
@@ -55,22 +50,22 @@ const Wrapper = (line: MdLine) =>
 		)
 		.default(({ children }: any) => <div>{children}</div>);
 
-const TokenWrapper = (tokenType: string) =>
+const TokenWrapper = (tokenType: string, value?: string) =>
 	Switch.of(tokenType)
-		.case("delete", ({ children }: any) => <span className="line-through">~~{children}~~</span>)
-		.case("emphasis", ({ children }: any) => <em className="italic">_{children}_</em>)
+		.case("delete", ({ children }: any) => <span className="line-through">{children}</span>)
+		.case("emphasis", ({ children }: any) => <em className="italic">{children}</em>)
 		.case("wikiLink", ({ children }: any) => {
 			const dispatch = useAppDispatch();
 			const tree = useAppSelector((state) => state.fileExplorer.tree);
 
 			const [node, setNode] = React.useState<any>();
 
-			if (!tree) {
+			if (!tree || !value) {
 				return null;
 			}
 
 			React.useEffect(() => {
-				setNode(findOrdoFileBy(tree, "relativePath", `./${children.includes(".") ? children : `${children}.md`}`));
+				setNode(findOrdoFileBy(tree, "relativePath", `./${value.includes(".") ? value : `${value}.md`}`));
 			});
 
 			const color = node ? "text-pink-600" : "text-gray-600";
@@ -79,52 +74,96 @@ const TokenWrapper = (tokenType: string) =>
 				<a
 					href="#"
 					className={`underline ${color}`}
-					onClick={() => {
+					onClick={async () => {
 						if (!node) {
-							dispatch(createFile({ tree, path: `${children.includes(".") ? children : `${children}.md`}` })).then(
-								(action) => {
-									setNode(
-										findOrdoFileBy(
-											action.payload as any,
-											"relativePath",
-											`./${children.includes(".") ? children : `${children}.md`}`,
-										),
-									);
-
-									console.log(action.payload);
-									dispatch(openTab((node as any).path));
-								},
+							const action = await dispatch(createFile({ tree, path: `${value.includes(".") ? value : `${value}.md`}` }));
+							setNode(
+								findOrdoFileBy(action.payload as any, "relativePath", `./${value.includes(".") ? value : `${value}.md`}`),
 							);
-						} else {
-							dispatch(openTab((node as any).path));
 						}
+
+						dispatch(openTab((node as any).path));
 					}}
 				>
-					[[{children}]]
+					{children}
 				</a>
 			);
 		})
 		.case("wikiLinkEmbed", ({ children }: any) => <span className="text-pink-500 text-xs">{children}</span>)
 		.case("inlineCode", ({ children }: any) => (
-			<code className="bg-rose-200 text-sm text-rose-700 rounded-lg px-2 py-0.5 font-mono">`{children}`</code>
+			<code className="bg-rose-200 text-sm text-rose-700 rounded-lg px-2 py-0.5 font-mono">{children}</code>
 		))
-		.case("strong", ({ children }: any) => <strong className="font-bold">**{children}**</strong>)
+		.case("strong", ({ children }: any) => <strong className="font-bold">{children}</strong>)
 		.default(({ children }: any) => <span>{children}</span>);
 
+const Char: React.FC<{ index: number; tokenId: string }> = ({ children, tokenId, index }) => {
+	const dispatch = useAppDispatch();
+	const { tab } = useCurrentTab();
+	const [lineNumber, ...tokenNesting] = tokenId.split("-").map(Number);
+	const tokenNumber = tokenNesting.reduce((acc, v) => acc + v, 1);
+	const charNumber = tokenNumber + index;
+
+	const range = tab?.ranges?.find((r) =>
+		r.direction === "ltr"
+			? r.end.line === lineNumber + 1 && r.end.character === charNumber
+			: r.start.line === lineNumber + 1 && r.start.character === charNumber,
+	);
+
+	const className = range ? "caret" : "";
+
+	console.log(lineNumber, charNumber);
+
+	return (
+		<span
+			className={className}
+			onClick={() =>
+				dispatch(
+					setRange({
+						start: {
+							line: lineNumber + 1,
+							character: charNumber,
+						},
+						end: {
+							line: lineNumber + 1,
+							character: charNumber,
+						},
+						direction: "ltr",
+					}),
+				)
+			}
+		>
+			{children}
+		</span>
+	);
+};
+
 const Token: React.FC<{ token: MdToken }> = ({ token }) => {
-	const Component = TokenWrapper(token.type);
+	const Component = TokenWrapper(token.type, token.value);
 
 	return (
 		<Component>
-			{token.children ? token.children.map((child) => <Token key={child.id} token={child} />) : token.value}
+			{token.children
+				? token.children.map((child) => <Token key={child.id} token={child} />)
+				: token.value?.split("").map((char, index) => (
+						<Char key={`${token.id}-${index}`} index={index} tokenId={token.id}>
+							{char}
+						</Char>
+				  ))}
 		</Component>
 	);
 };
 
 const Line: React.FC<{ line: MdLine }> = ({ line }) => {
+	const { tab } = useCurrentTab();
+	const ranges = tab?.ranges;
+	const currentLine =
+		ranges &&
+		ranges.find((range) => (range.direction === "ltr" ? range.end.line === line.number : range.end.line === line.number));
+	const bgColor = currentLine ? "bg-gray-200" : "";
+
 	if (line.type === "list" && !line.ordered) {
 		return (
-			<ul className=" list-disc list-inside">
+			<ul className={`list-disc list-inside ${bgColor}`}>
 				{line.children?.map((child) => (
 					<Line key={child.id} line={child as any} />
 				))}
@@ -134,7 +173,7 @@ const Line: React.FC<{ line: MdLine }> = ({ line }) => {
 
 	if (line.type === "list" && line.ordered) {
 		return (
-			<ol className=" list-decimal list-inside">
+			<ol className="list-decimal list-inside">
 				{line.children?.map((child) => (
 					<Line key={child.id} line={child as any} />
 				))}
@@ -145,7 +184,7 @@ const Line: React.FC<{ line: MdLine }> = ({ line }) => {
 	const LineWrapper = Wrapper(line);
 
 	return (
-		<div className={`flex items-center whitespace-nowrap h-7`}>
+		<div className={`flex items-center whitespace-nowrap h-7 ${bgColor}`}>
 			<div
 				contentEditable={false}
 				className="w-12 select-none self-stretch flex items-center flex-shrink-0 justify-end border-r border-neutral-200 dark:border-neutral-600 text-right pr-2 font-mono text-neutral-500 dark:text-neutral-400 text-sm"

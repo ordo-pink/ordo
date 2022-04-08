@@ -50,5 +50,18 @@ export const createOrdoFile = ({
 		extension,
 		readableSize,
 		type: type as any,
+		ranges: [
+			{
+				start: {
+					line: 1,
+					character: 0,
+				},
+				end: {
+					line: 1,
+					character: 0,
+				},
+				direction: "ltr",
+			},
+		],
 	};
 };

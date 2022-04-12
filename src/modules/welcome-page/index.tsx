@@ -68,7 +68,7 @@ export const WelcomePage: React.FC = () => {
 	}, []);
 
 	return (
-		<div className="select-none flex flex-col flex-grow w-full h-full justify-center items-center text-gray-600 dark:text-gray-300 mt-[-3rem]">
+		<div className="select-none flex flex-col flex-grow w-full h-full justify-center items-center text-gray-600 dark:text-gray-300 mt-10">
 			<div className="mb-24">
 				<BringYourThoughts />
 				<div className="w-full flex items-center justify-center mt-11">

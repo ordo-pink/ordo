@@ -96,12 +96,13 @@ const TokenWrapper = (tokenType: string, value?: string) =>
 		.case("strong", ({ children }: any) => <strong className="font-bold">{children}</strong>)
 		.default(({ children }: any) => <span>{children}</span>);
 
-const Char: React.FC<{ index: number; tokenId: string }> = ({ children, tokenId, index }) => {
+const Char: React.FC<{ index: number; tokenId: string; offset: number }> = ({ children, tokenId, index, offset }) => {
 	const dispatch = useAppDispatch();
 	const { tab } = useCurrentTab();
 	const [lineNumber, ...tokenNesting] = tokenId.split("-").map(Number);
-	const tokenNumber = tokenNesting.reduce((acc, v) => acc + v, 1);
-	const charNumber = tokenNumber + index;
+	const tokenNumber = tokenNesting.reduce((acc, v) => acc + v, 0);
+	const charNumber = offset - tokenNumber + index;
+	console.log(offset, tokenId);
 
 	const range = tab?.ranges?.find((r) =>
 		r.direction === "ltr"
@@ -110,8 +111,6 @@ const Char: React.FC<{ index: number; tokenId: string }> = ({ children, tokenId,
 	);
 
 	const className = range ? "caret" : "";
-
-	console.log(lineNumber, charNumber);
 
 	return (
 		<span
@@ -145,7 +144,7 @@ const Token: React.FC<{ token: MdToken }> = ({ token }) => {
 			{token.children
 				? token.children.map((child) => <Token key={child.id} token={child} />)
 				: token.value?.split("").map((char, index) => (
-						<Char key={`${token.id}-${index}`} index={index} tokenId={token.id}>
+						<Char key={`${token.id}-${index}`} index={index} tokenId={token.id} offset={(token as any).position.start.offset}>
 							{char}
 						</Char>
 				  ))}
@@ -184,10 +183,10 @@ const Line: React.FC<{ line: MdLine }> = ({ line }) => {
 	const LineWrapper = Wrapper(line);
 
 	return (
-		<div className={`flex items-center whitespace-nowrap h-7 ${bgColor}`}>
+		<div className={`flex items-center whitespace-nowrap ${bgColor}`}>
 			<div
 				contentEditable={false}
-				className="w-12 select-none self-stretch flex items-center flex-shrink-0 justify-end border-r border-neutral-200 dark:border-neutral-600 text-right pr-2 font-mono text-neutral-500 dark:text-neutral-400 text-sm"
+				className="w-12 py-1 select-none self-stretch flex items-center flex-shrink-0 justify-end border-r border-neutral-200 dark:border-neutral-600 text-right pr-2 font-mono text-neutral-500 dark:text-neutral-400 text-sm"
 			>
 				{line.number ?? " "}
 			</div>
@@ -226,7 +225,7 @@ export const TextEditor: React.FC = () => {
 					<Breadcrumbs />
 				</div>
 				<Scrollbars>
-					<div className="cursor-text pb-[100%]">
+					<div className="cursor-text pb-[100%] leading-7 tracking-wide">
 						{tab.data && tab.data.children.map((line: any) => <Line key={line.id} line={line} />)}
 					</div>
 				</Scrollbars>

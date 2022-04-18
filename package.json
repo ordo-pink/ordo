@@ -1,4 +1,5 @@
 {
+<<<<<<< HEAD
 	"name": "ordo",
 	"productName": "ORDO",
 <<<<<<< HEAD
@@ -12,15 +13,27 @@
 =======
 	"version": "0.1.0",
 	"description": "A place to bring your thoughts to",
+=======
+	"name": "ordo-app",
+	"productName": "ORDO",
+	"version": "0.1.0",
+	"description": "Bring your thoughts to ORDO",
+>>>>>>> ordo-app/main
 	"main": ".webpack/main",
 	"scripts": {
 		"start": "electron-forge start -- --debug",
 		"test": "ava",
 		"test:cover": "nyc ava",
+<<<<<<< HEAD
 		"package": "electron-forge package",
 		"make": "electron-forge make",
 		"debug": "electron-forge start --inspect-electron",
 >>>>>>> ordo/main
+=======
+		"debug": "electron-forge start --inspect-electron",
+		"package": "electron-forge package",
+		"make": "electron-forge make",
+>>>>>>> ordo-app/main
 		"publish": "electron-forge publish",
 		"lint": "eslint --ext .ts,.tsx ."
 	},
@@ -32,16 +45,26 @@
 	"license": "MIT",
 	"config": {
 		"forge": {
+<<<<<<< HEAD
 			"packagerConfig": {},
+=======
+			"packagerConfig": {
+				"icon": "./assets/ordo-macos.icns"
+			},
+>>>>>>> ordo-app/main
 			"makers": [
 				{
 					"name": "@electron-forge/maker-squirrel",
 					"config": {
 <<<<<<< HEAD
+<<<<<<< HEAD
 						"name": "ordo_electron"
 =======
 						"name": "ordo"
 >>>>>>> ordo/main
+=======
+						"name": "ordo_app"
+>>>>>>> ordo-app/main
 					}
 				},
 				{
@@ -79,6 +102,7 @@
 						}
 					}
 <<<<<<< HEAD
+<<<<<<< HEAD
 				],
 				[
 					"@electron-forge/plugin-electronegativity",
@@ -87,13 +111,18 @@
 					}
 =======
 >>>>>>> ordo/main
+=======
+>>>>>>> ordo-app/main
 				]
 			]
 		}
 	},
 <<<<<<< HEAD
+<<<<<<< HEAD
 	"devDependencies": {
 =======
+=======
+>>>>>>> ordo-app/main
 	"postcss": {
 		"plugins": {
 			"tailwindcss": {},
@@ -114,6 +143,7 @@
 			"es6": true,
 			"node": true
 		},
+<<<<<<< HEAD
 		"rules": {
 			"import/no-unresolved": [
 				2,
@@ -130,6 +160,8 @@
 				}
 			]
 		},
+=======
+>>>>>>> ordo-app/main
 		"extends": [
 			"eslint:recommended",
 			"plugin:@typescript-eslint/eslint-recommended",
@@ -138,6 +170,18 @@
 			"plugin:import/electron",
 			"plugin:import/typescript"
 		],
+<<<<<<< HEAD
+=======
+		"rules": {
+			"import/no-unresolved": "off",
+			"@typescript-eslint/no-var-requires": [
+				2,
+				{
+					"ignore": "js"
+				}
+			]
+		},
+>>>>>>> ordo-app/main
 		"parser": "@typescript-eslint/parser"
 	},
 	"ava": {
@@ -181,12 +225,16 @@
 	},
 	"devDependencies": {
 		"@ava/typescript": "^3.0.1",
+<<<<<<< HEAD
 >>>>>>> ordo/main
+=======
+>>>>>>> ordo-app/main
 		"@electron-forge/cli": "^6.0.0-beta.61",
 		"@electron-forge/maker-deb": "^6.0.0-beta.61",
 		"@electron-forge/maker-rpm": "^6.0.0-beta.61",
 		"@electron-forge/maker-squirrel": "^6.0.0-beta.61",
 		"@electron-forge/maker-zip": "^6.0.0-beta.61",
+<<<<<<< HEAD
 <<<<<<< HEAD
 		"@electron-forge/plugin-electronegativity": "^6.0.0-beta.61",
 		"@electron-forge/plugin-webpack": "6.0.0-beta.61",
@@ -212,19 +260,38 @@
 		"@types/react-custom-scrollbars": "^4.0.10",
 		"@types/react-dom": "^17.0.11",
 		"@types/tailwindcss": "^3.0.2",
+=======
+		"@electron-forge/plugin-webpack": "6.0.0-beta.61",
+		"@types/d3": "^7.1.0",
+		"@types/history": "^5.0.0",
+		"@types/mousetrap": "^1.6.9",
+		"@types/querystringify": "^2.0.0",
+		"@types/react": "^17.0.39",
+		"@types/react-beautiful-dnd": "^13.1.2",
+		"@types/react-custom-scrollbars": "^4.0.10",
+		"@types/react-dom": "^17.0.11",
+		"@types/react-hook-mousetrap": "^2.0.0",
+		"@types/tailwindcss": "^3.0.8",
+>>>>>>> ordo-app/main
 		"@typescript-eslint/eslint-plugin": "^4.0.1",
 		"@typescript-eslint/parser": "^4.0.1",
 		"@vercel/webpack-asset-relocator-loader": "1.7.0",
 		"autoprefixer": "^10.4.2",
 		"ava": "^4.0.1",
+<<<<<<< HEAD
 		"css-loader": "^6.5.1",
 		"electron": "16.0.7",
 >>>>>>> ordo/main
+=======
+		"css-loader": "^6.0.0",
+		"electron": "17.0.1",
+>>>>>>> ordo-app/main
 		"eslint": "^7.6.0",
 		"eslint-config-prettier": "^8.3.0",
 		"eslint-plugin-import": "^2.20.0",
 		"fork-ts-checker-webpack-plugin": "^6.0.1",
 		"node-loader": "^2.0.0",
+<<<<<<< HEAD
 <<<<<<< HEAD
 		"postcss": "^8.4.5",
 		"postcss-loader": "^6.2.0",
@@ -264,10 +331,38 @@
 		"minimatch": "^3.0.4",
 		"or-else": "^0.1.0",
 >>>>>>> ordo/main
+=======
+		"nyc": "^15.1.0",
+		"postcss": "^8.4.6",
+		"postcss-loader": "^6.2.1",
+		"sinon": "^13.0.1",
+		"style-loader": "^3.0.0",
+		"tailwindcss": "^3.0.23",
+		"ts-loader": "^9.2.2",
+		"ts-node": "^10.5.0",
+		"typescript": "^4.0.2"
+	},
+	"dependencies": {
+		"@reduxjs/toolkit": "^1.7.2",
+		"chokidar": "^3.5.3",
+		"d3": "^7.3.0",
+		"electron-devtools-installer": "^3.2.0",
+		"electron-squirrel-startup": "^1.0.0",
+		"electron-store": "^8.0.1",
+		"electron-util": "^0.17.2",
+		"fuse.js": "^6.5.3",
+		"history": "^5.3.0",
+		"immer": "^9.0.12",
+		"minimatch": "^5.0.0",
+		"mousetrap": "^1.6.5",
+		"or-else": "^0.1.0",
+		"querystringify": "^2.2.0",
+>>>>>>> ordo-app/main
 		"react": "^17.0.2",
 		"react-beautiful-dnd": "^13.1.0",
 		"react-custom-scrollbars": "^4.2.1",
 		"react-dom": "^17.0.2",
+<<<<<<< HEAD
 		"react-icons": "^4.3.1",
 		"react-redux": "^7.2.6",
 <<<<<<< HEAD
@@ -277,5 +372,22 @@
 		"trim-newlines": "^3.0.1",
 		"yaml": "^1.10.2"
 >>>>>>> ordo/main
+=======
+		"react-hook-mousetrap": "^2.0.4",
+		"react-icons": "^4.3.1",
+		"react-redux": "^7.2.6",
+		"react-split": "^2.0.14",
+		"react-spring": "^9.4.4",
+		"remark": "^14.0.2",
+		"remark-burger": "^1.0.1",
+		"remark-frontmatter": "^4.0.1",
+		"remark-gfm": "^3.0.1",
+		"remark-parse": "^10.0.1",
+		"remark-wiki-link": "^1.0.4",
+		"trim-newlines": "^4.0.2",
+		"unified": "^10.1.2",
+		"unist-util-visit": "^4.1.0",
+		"yaml": "^1.10.2"
+>>>>>>> ordo-app/main
 	}
 }

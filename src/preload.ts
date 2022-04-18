@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import { contextBridge, ipcRenderer } from "electron";
 <<<<<<< HEAD
 import { SettingsAPI, SETTINGS_API } from "./configuration/settings-renderer-api";
@@ -23,3 +24,14 @@ ipcRenderer.on("apply-state-patches", (_, detail) =>
 
 ipcRenderer.on("set-state", (_, detail) => window.dispatchEvent(new CustomEvent("set-state", { detail })));
 >>>>>>> ordo/main
+=======
+import { contextBridge, ipcMain, ipcRenderer } from "electron";
+
+contextBridge.exposeInMainWorld("ordo", {
+	emit: (event: string, payload: any) => ipcRenderer.invoke("ordo", { event, payload }),
+});
+
+ipcRenderer.on("@file-explorer/file-structure-updated", (_, detail: string) => {
+	window.dispatchEvent(new CustomEvent("@file-explorer/file-structure-updated", { detail }));
+});
+>>>>>>> ordo-app/main

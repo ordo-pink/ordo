@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import React from "react";
 import { HiOutlineDocumentAdd, HiOutlineFolderAdd } from "react-icons/hi";
 
@@ -6,6 +7,15 @@ import { useAppSelector } from "@core/store-hooks";
 
 export const Header: React.FC = () => {
 	const tree = useAppSelector((state) => state.application.tree);
+=======
+import { useAppSelector } from "@core/state/hooks";
+import { getCollapseIcon } from "@utils/get-icon";
+import React from "react";
+import { HiOutlineDocumentAdd, HiOutlineFolderAdd } from "react-icons/hi";
+
+export const Header: React.FC = () => {
+	const tree = useAppSelector((state) => state.fileExplorer.tree);
+>>>>>>> ordo-app/main
 
 	const Icon = tree ? getCollapseIcon(tree) : () => null;
 

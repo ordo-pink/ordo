@@ -26,4 +26,8 @@ module.exports = [
 			},
 		},
 	},
+<<<<<<< HEAD
 ]
+=======
+];
+>>>>>>> ordo/main

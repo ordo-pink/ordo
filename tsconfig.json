@@ -5,15 +5,21 @@
 		"module": "commonjs",
 		"skipLibCheck": true,
 		"esModuleInterop": true,
-		"noImplicitAny": true,
-		"sourceMap": true,
-		"baseUrl": ".",
-		"outDir": "dist",
-		"moduleResolution": "node",
+		"strict": true,
+		"allowSyntheticDefaultImports": true,
+		"strictBindCallApply": true,
+		"strictFunctionTypes": true,
+		"strictNullChecks": true,
+		"strictPropertyInitialization": true,
+		"alwaysStrict": true,
 		"resolveJsonModule": true,
 		"paths": {
+			"@core/*": ["src/core/*"],
+			"@containers/*": ["src/containers/*"],
+			"@modules/*": ["src/modules/*"],
 			"*": ["node_modules/*"]
 		}
 	},
-	"include": ["src/**/*"]
+	"include": ["src/**/*"],
+	"exclude": ["**/*.test.ts"]
 }

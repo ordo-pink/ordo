@@ -1,6 +1,6 @@
 import { useAppSelector } from "@core/state/store";
 import React from "react";
-import Scrollbars from "react-custom-scrollbars";
+import Scrollbars from "react-custom-scrollbars-2";
 import { Command } from "./components/command";
 import Fuse from "fuse.js";
 

@@ -2,7 +2,7 @@ import { useAppSelector } from "@core/state/store";
 import React from "react";
 import { Folder } from "@modules/file-explorer/components/folder";
 import { Header } from "@modules/file-explorer/components/header";
-import Scrollbars from "react-custom-scrollbars";
+import Scrollbars from "react-custom-scrollbars-2";
 import { isFolder } from "./utils/is-folder";
 import { File } from "./components/file";
 import { Creator } from "./components/creator";

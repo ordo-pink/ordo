@@ -2,17 +2,11 @@
 	"compilerOptions": {
 		"allowJs": true,
 		"jsx": "react",
-<<<<<<< HEAD
-		"module": "commonjs",
-		"skipLibCheck": true,
-		"esModuleInterop": true,
-=======
 		"target": "es2020",
 		"module": "commonjs",
 		"skipLibCheck": true,
 		"esModuleInterop": true,
 		"noImplicitAny": true,
->>>>>>> ordo-app/main
 		"strict": true,
 		"allowSyntheticDefaultImports": true,
 		"strictBindCallApply": true,
@@ -20,23 +14,17 @@
 		"strictNullChecks": true,
 		"strictPropertyInitialization": true,
 		"alwaysStrict": true,
-<<<<<<< HEAD
-=======
 		"sourceMap": true,
 		"baseUrl": ".",
 		"outDir": "dist",
 		"moduleResolution": "node",
->>>>>>> ordo-app/main
 		"resolveJsonModule": true,
 		"paths": {
 			"@core/*": ["src/core/*"],
 			"@containers/*": ["src/containers/*"],
 			"@modules/*": ["src/modules/*"],
-<<<<<<< HEAD
-=======
 			"@utils/*": ["src/utils/*"],
 			"@components/*": ["src/components/*"],
->>>>>>> ordo-app/main
 			"*": ["node_modules/*"]
 		}
 	},

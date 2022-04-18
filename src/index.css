@@ -1,31 +1,18 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-=======
->>>>>>> ordo-app/main
 
 .gutter {
 	background-repeat: no-repeat;
 	background-position: 50%;
 }
 
-<<<<<<< HEAD
-.gutter.gutter-horizontal:hover {
-=======
 .gutter.gutter-horizontal {
->>>>>>> ordo-app/main
 	background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAeCAYAAADkftS9AAAAIklEQVQoU2M4c+bMfxAGAgYYmwGrIIiDjrELjpo5aiZeMwF+yNnOs5KSvgAAAABJRU5ErkJggg==");
 	cursor: col-resize;
 }
 
-<<<<<<< HEAD
-.gutter.gutter-vertical:hover {
-=======
 .gutter.gutter-vertical {
->>>>>>> ordo-app/main
 	background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAB4AAAAFAQMAAABo7865AAAABlBMVEVHcEzMzMzyAv2sAAAAAXRSTlMAQObYZgAAABBJREFUeF5jOAMEEAIEEFwAn3kMwcB6I2AAAAAASUVORK5CYII=");
 	cursor: row-resize;
 }
@@ -98,7 +85,3 @@
 	display: inline-block;
 	width: 1ch;
 }
-<<<<<<< HEAD
->>>>>>> ordo/main
-=======
->>>>>>> ordo-app/main

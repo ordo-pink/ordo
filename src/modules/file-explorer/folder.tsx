@@ -1,15 +1,5 @@
 import React from "react";
 
-<<<<<<< HEAD
-import { OrdoFolder, OrdoFile } from "@modules/application/types";
-import { File } from "@modules/file-explorer/file";
-import { getCollapseIcon, getFolderIcon } from "@modules/application/get-folder-icon";
-import { useAppSelector } from "@core/store-hooks";
-
-export const Folder: React.FC<{ folder: OrdoFolder }> = ({ folder }) => {
-	const createFileIn = useAppSelector((state) => state.application.createFileIn);
-	const createFolderIn = useAppSelector((state) => state.application.createFolderIn);
-=======
 import { File } from "@modules/file-explorer/file";
 import { useAppDispatch, useAppSelector } from "@core/state/hooks";
 import { OrdoFolder, OrdoFile } from "@modules/editor/editor-slice";
@@ -20,7 +10,6 @@ export const Folder: React.FC<{ folder: OrdoFolder }> = ({ folder }) => {
 	const dispatch = useAppDispatch();
 	const createFileIn = useAppSelector((state) => state.fileExplorer.createFileIn);
 	const createFolderIn = useAppSelector((state) => state.fileExplorer.createFolderIn);
->>>>>>> ordo-app/main
 	const Icon = folder && getCollapseIcon(folder);
 	const FolderIcon = folder && getFolderIcon(folder);
 
@@ -32,25 +21,10 @@ export const Folder: React.FC<{ folder: OrdoFolder }> = ({ folder }) => {
 		folder && (
 			<>
 				<div
-<<<<<<< HEAD
-					onContextMenu={(e) =>
-						window.ordo.emit("@application/show-context-menu", {
-							x: e.pageX,
-							y: e.pageY,
-							item: "folder",
-							params: { path: folder.path },
-						})
-					}
-					style={{ paddingLeft: folder.depth * 12 + "px" }}
-					className={`flex space-x-2 items-center`}
-					onClick={() => {
-						window.ordo.emit("@application/update-folder", [folder.path, { collapsed: !folder.collapsed }]);
-=======
 					style={{ paddingLeft: folder.depth * 12 + 10 + "px" }}
 					className={`flex space-x-2 items-center select-none hover:bg-neutral-300 cursor-pointer`}
 					onClick={() => {
 						dispatch(toggleFolder(folder.path));
->>>>>>> ordo-app/main
 					}}
 				>
 					<Icon />

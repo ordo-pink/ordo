@@ -1,7 +1,3 @@
-<<<<<<< HEAD
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-=======
->>>>>>> ordo-app/main
 const tailwindColors = require("tailwindcss/colors");
 
 const colors = {

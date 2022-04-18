@@ -1,13 +1,5 @@
-<<<<<<< HEAD
-<<<<<<< HEAD
-mock-data
-
-=======
->>>>>>> ordo/main
-=======
 coverage
 
->>>>>>> ordo-app/main
 # Logs
 logs
 *.log

@@ -1,7 +1,7 @@
+import { useAppSelector } from "@core/state/store";
 import React from "react";
 
-import { useAppSelector } from "@core/state/hooks";
-import { ActivityBarIcon } from "./activity-bar-icon";
+import { ActivityBarIcon } from "./components/activity-bar-icon";
 
 export const ActivityBar: React.FC = () => {
 	const items = useAppSelector((state) => state.activityBar.items);

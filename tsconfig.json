@@ -2,11 +2,9 @@
 	"compilerOptions": {
 		"allowJs": true,
 		"jsx": "react",
-		"target": "es2020",
 		"module": "commonjs",
 		"skipLibCheck": true,
 		"esModuleInterop": true,
-		"noImplicitAny": true,
 		"strict": true,
 		"allowSyntheticDefaultImports": true,
 		"strictBindCallApply": true,
@@ -23,8 +21,8 @@
 			"@core/*": ["src/core/*"],
 			"@containers/*": ["src/containers/*"],
 			"@modules/*": ["src/modules/*"],
-			"@utils/*": ["src/utils/*"],
 			"@components/*": ["src/components/*"],
+			"@init/*": ["src/init/*"],
 			"*": ["node_modules/*"]
 		}
 	},

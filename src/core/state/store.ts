@@ -1,38 +1,30 @@
-import { configureStore } from "@reduxjs/toolkit";
-import { applyPatches as apply, enablePatches } from "immer";
+import { applyPatches as apply, enablePatches, Patch } from "immer";
+import { configureStore, createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { TypedUseSelectorHook, useDispatch, useSelector } from "react-redux";
 
-import { panelReducer, PanelState } from "@containers/panel/panel-slice";
-import { sidebarReducer, SidebarState } from "@containers/sidebar/sidebar-slice";
-import { activityBarReducer, ActivityBarState } from "@modules/activity-bar/activity-bar-slice";
-import { statusBarReducer, StatusBarState } from "@containers/status-bar/status-bar-slice";
-import { topBarReducer, TopBarState } from "@modules/top-bar/top-bar-slice";
-import { editorReducer, EditorState } from "@modules/editor/editor-slice";
-import { fileExplorerReducer, FileExplorerState } from "@modules/file-explorer/file-explorer-slice";
+import { WindowState } from "@core/types";
+import { initialState } from "@init/state";
 
 enablePatches();
 
-export type State = {
-	activityBar: ActivityBarState;
-	sidebar: SidebarState;
-	panel: PanelState;
-	statusBar: StatusBarState;
-	topBar: TopBarState;
-	editor: EditorState;
-	fileExplorer: FileExplorerState;
-};
+const state = createSlice({
+	name: "state",
+	initialState,
+	reducers: {
+		setState: (_, action: PayloadAction<WindowState>) => action.payload,
+		applyStatePatches: (state, action: PayloadAction<Patch[]>) => apply(state, action.payload),
+	},
+});
 
 export const store = configureStore({
-	reducer: {
-		activityBar: activityBarReducer,
-		sidebar: sidebarReducer,
-		panel: panelReducer,
-		statusBar: statusBarReducer,
-		topBar: topBarReducer,
-		editor: editorReducer,
-		fileExplorer: fileExplorerReducer,
-	},
+	reducer: state.reducer,
 	middleware: (d) => d({ serializableCheck: false }),
 });
 
+export const { setState, applyStatePatches } = state.actions;
+
 export type RootState = ReturnType<typeof store.getState>;
 export type AppDispatch = typeof store.dispatch;
+
+export const useAppDispatch = () => useDispatch<AppDispatch>();
+export const useAppSelector: TypedUseSelectorHook<RootState> = useSelector;

@@ -1,16 +1,18 @@
-import { TStore } from "@core/utils/store";
-import { BrowserWindow, Dialog } from "electron";
-import { Draft } from "immer";
-import { app } from "electron";
+export {};
+
+import { OrdoEvents } from "./core/types/ordo-events";
 
 declare global {
-	declare interface Window {
+	interface Window {
 		ordo: {
-			emit: <T, K = any>(event: string, payload?: K) => Promise<T>;
+			emit: <
+				TReturn = void,
+				TCustomEvents extends Record<string, unknown> = {},
+				TKey extends keyof (TCustomEvents & OrdoEvents) = keyof (OrdoEvents & TCustomEvents),
+			>(
+				key: TKey,
+				payload: (OrdoEvents & TCustomEvents)[TKey],
+			) => Promise<TReturn>;
 		};
 	}
-
-	declare type int = number;
-	declare type uint = number;
-	declare type float = number;
 }

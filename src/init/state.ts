@@ -1,0 +1,18 @@
+import { WindowState } from "@core/types";
+
+import fileExplorer from "@modules/file-explorer/initial-state";
+import activityBar from "@modules/activity-bar/initial-state";
+import sideBar from "@containers/side-bar/initial-state";
+import topBar from "@modules/top-bar/initial-state";
+import app from "@containers/app/initial-state";
+
+export const initialState: WindowState = {
+	app,
+	fileExplorer,
+	activityBar,
+	sideBar,
+	topBar,
+	statusBar: {},
+	workspace: {},
+	editor: {},
+};

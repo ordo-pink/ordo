@@ -1,16 +1,16 @@
 {
-	"name": "ordo-app",
-	"productName": "ORDO",
-	"version": "0.1.0",
-	"description": "Bring your thoughts to ORDO",
+	"name": "ordo-2",
+	"productName": "ordo-2",
+	"version": "1.0.0",
+	"description": "My Electron application description",
 	"main": ".webpack/main",
 	"scripts": {
 		"start": "electron-forge start -- --debug",
 		"test": "ava",
 		"test:cover": "nyc ava",
-		"debug": "electron-forge start --inspect-electron",
 		"package": "electron-forge package",
 		"make": "electron-forge make",
+		"debug": "electron-forge start --inspect-electron",
 		"publish": "electron-forge publish",
 		"lint": "eslint --ext .ts,.tsx ."
 	},
@@ -22,14 +22,12 @@
 	"license": "MIT",
 	"config": {
 		"forge": {
-			"packagerConfig": {
-				"icon": "./assets/ordo-macos.icns"
-			},
+			"packagerConfig": {},
 			"makers": [
 				{
 					"name": "@electron-forge/maker-squirrel",
 					"config": {
-						"name": "ordo_app"
+						"name": "ordo"
 					}
 				},
 				{
@@ -90,6 +88,22 @@
 			"es6": true,
 			"node": true
 		},
+		"rules": {
+			"import/no-unresolved": [
+				2,
+				{
+					"ignore": [
+						"ava"
+					]
+				}
+			],
+			"@typescript-eslint/no-var-requires": [
+				2,
+				{
+					"ignore": "js"
+				}
+			]
+		},
 		"extends": [
 			"eslint:recommended",
 			"plugin:@typescript-eslint/eslint-recommended",
@@ -98,15 +112,6 @@
 			"plugin:import/electron",
 			"plugin:import/typescript"
 		],
-		"rules": {
-			"import/no-unresolved": "off",
-			"@typescript-eslint/no-var-requires": [
-				2,
-				{
-					"ignore": "js"
-				}
-			]
-		},
 		"parser": "@typescript-eslint/parser"
 	},
 	"ava": {
@@ -149,78 +154,50 @@
 		"all": true
 	},
 	"devDependencies": {
-		"@ava/typescript": "^3.0.1",
 		"@electron-forge/cli": "^6.0.0-beta.61",
 		"@electron-forge/maker-deb": "^6.0.0-beta.61",
 		"@electron-forge/maker-rpm": "^6.0.0-beta.61",
 		"@electron-forge/maker-squirrel": "^6.0.0-beta.61",
 		"@electron-forge/maker-zip": "^6.0.0-beta.61",
-		"@electron-forge/plugin-webpack": "6.0.0-beta.61",
-		"@types/d3": "^7.1.0",
-		"@types/history": "^5.0.0",
-		"@types/mousetrap": "^1.6.9",
-		"@types/querystringify": "^2.0.0",
-		"@types/react": "^17.0.39",
-		"@types/react-beautiful-dnd": "^13.1.2",
+		"@electron-forge/plugin-webpack": "^6.0.0-beta.63",
+		"@types/react": "^17.0.44",
 		"@types/react-custom-scrollbars": "^4.0.10",
-		"@types/react-dom": "^17.0.11",
-		"@types/react-hook-mousetrap": "^2.0.0",
-		"@types/tailwindcss": "^3.0.8",
+		"@types/react-dom": "^17.0.15",
 		"@typescript-eslint/eslint-plugin": "^4.0.1",
 		"@typescript-eslint/parser": "^4.0.1",
 		"@vercel/webpack-asset-relocator-loader": "1.7.0",
-		"autoprefixer": "^10.4.2",
-		"ava": "^4.0.1",
+		"autoprefixer": "^10.4.4",
+		"ava": "^4.2.0",
 		"css-loader": "^6.0.0",
-		"electron": "17.0.1",
+		"electron": "18.0.3",
 		"eslint": "^7.6.0",
-		"eslint-config-prettier": "^8.3.0",
 		"eslint-plugin-import": "^2.20.0",
 		"fork-ts-checker-webpack-plugin": "^6.0.1",
 		"node-loader": "^2.0.0",
 		"nyc": "^15.1.0",
-		"postcss": "^8.4.6",
 		"postcss-loader": "^6.2.1",
 		"sinon": "^13.0.1",
 		"style-loader": "^3.0.0",
-		"tailwindcss": "^3.0.23",
 		"ts-loader": "^9.2.2",
-		"ts-node": "^10.5.0",
+		"ts-node": "^10.7.0",
 		"typescript": "^4.0.2"
 	},
 	"dependencies": {
-		"@reduxjs/toolkit": "^1.7.2",
-		"chokidar": "^3.5.3",
-		"d3": "^7.3.0",
+		"@reduxjs/toolkit": "^1.8.1",
 		"electron-devtools-installer": "^3.2.0",
 		"electron-squirrel-startup": "^1.0.0",
 		"electron-store": "^8.0.1",
 		"electron-util": "^0.17.2",
 		"fuse.js": "^6.5.3",
-		"history": "^5.3.0",
 		"immer": "^9.0.12",
-		"minimatch": "^5.0.0",
-		"mousetrap": "^1.6.5",
 		"or-else": "^0.1.0",
-		"querystringify": "^2.2.0",
 		"react": "^17.0.2",
-		"react-beautiful-dnd": "^13.1.0",
 		"react-custom-scrollbars": "^4.2.1",
 		"react-dom": "^17.0.2",
-		"react-hook-mousetrap": "^2.0.4",
 		"react-icons": "^4.3.1",
-		"react-redux": "^7.2.6",
+		"react-redux": "^7.2.8",
 		"react-split": "^2.0.14",
 		"react-spring": "^9.4.4",
-		"remark": "^14.0.2",
-		"remark-burger": "^1.0.1",
-		"remark-frontmatter": "^4.0.1",
-		"remark-gfm": "^3.0.1",
-		"remark-parse": "^10.0.1",
-		"remark-wiki-link": "^1.0.4",
-		"trim-newlines": "^4.0.2",
-		"unified": "^10.1.2",
-		"unist-util-visit": "^4.1.0",
-		"yaml": "^1.10.2"
+		"tailwindcss": "^3.0.24"
 	}
 }

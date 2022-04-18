@@ -1,12 +1,9 @@
-import { showSidebar } from "@containers/sidebar/sidebar-slice";
-import { useAppDispatch } from "@core/state/hooks";
-import { selectActivity } from "@modules/activity-bar/activity-bar-slice";
-import { listFolder, selectProjectFolder } from "@modules/file-explorer/file-explorer-slice";
+import { useAppSelector } from "@core/state/store";
 import React from "react";
 import { HiOutlineCog, HiOutlineFolderOpen } from "react-icons/hi";
 import { animated, config, useTransition } from "react-spring";
 
-const BringYourThoughts = () => {
+const BringYourThoughts: React.FC = () => {
 	const transitions = useTransition(true, {
 		from: { position: "absolute", opacity: 0 },
 		enter: { opacity: 1 },
@@ -25,7 +22,7 @@ const BringYourThoughts = () => {
 	));
 };
 
-const Logo = () => {
+const Logo: React.FC = () => {
 	const [toggle, set] = React.useState(false);
 	const transitions = useTransition(toggle, {
 		from: { position: "absolute", opacity: 0 },
@@ -57,18 +54,10 @@ const Logo = () => {
 };
 
 export const WelcomePage: React.FC = () => {
-	const [recentProjects, setRecentProjects] = React.useState<string[]>([]);
-
-	const dispatch = useAppDispatch();
-
-	React.useEffect(() => {
-		window.ordo
-			.emit<string[]>("@application/get-setting", "window.recentProjects")
-			.then((projects) => setRecentProjects(projects));
-	}, []);
+	const recentProjects = useAppSelector((state) => state.app.internalSettings.window?.recentProjects);
 
 	return (
-		<div className="select-none flex flex-col flex-grow w-full h-full justify-center items-center text-gray-600 dark:text-gray-300 mt-10">
+		<div className="select-none -z-50 flex flex-col flex-grow w-full h-full justify-center items-center text-gray-600 dark:text-gray-300 mt-10">
 			<div className="mb-24">
 				<BringYourThoughts />
 				<div className="w-full flex items-center justify-center mt-11">
@@ -84,9 +73,9 @@ export const WelcomePage: React.FC = () => {
 								key={project}
 								className="bg-neutral-200 dark:bg-neutral-600 mb-2 py-1 px-3 rounded-lg hover:underline cursor-pointer"
 								onClick={() => {
-									dispatch(listFolder(project));
-									dispatch(selectActivity("Editor"));
-									dispatch(showSidebar());
+									window.ordo.emit("@file-explorer/list-folder", project);
+									window.ordo.emit("@side-bar/show", null);
+									window.ordo.emit("@activity-bar/open-editor", null);
 								}}
 							>
 								.../{project.split("/").slice(-3).join("/")}
@@ -99,9 +88,9 @@ export const WelcomePage: React.FC = () => {
 					<button
 						className="flex space-x-2 items-center hover:text-pink-500 transition-all duration-300"
 						onClick={() => {
-							dispatch(selectProjectFolder());
-							dispatch(selectActivity("Editor"));
-							dispatch(showSidebar());
+							window.ordo.emit("@app/select-project", null);
+							window.ordo.emit("@side-bar/show", null);
+							window.ordo.emit("@activity-bar/open-editor", null);
 						}}
 					>
 						<HiOutlineFolderOpen />
@@ -109,7 +98,7 @@ export const WelcomePage: React.FC = () => {
 					</button>
 					<button
 						className="flex space-x-2 items-center hover:text-pink-500 transition-all duration-300"
-						onClick={() => dispatch(selectActivity("Settings"))}
+						onClick={() => window.ordo.emit("@activity-bar/select", "Settings")}
 					>
 						<HiOutlineCog />
 						<span>Settings</span>

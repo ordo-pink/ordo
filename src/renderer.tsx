@@ -2,12 +2,9 @@ import React from "react";
 import ReactDOM from "react-dom";
 import { Provider } from "react-redux";
 
-import { App } from "./app";
 import { store } from "@core/state/store";
-
 import "./index.css";
-
-const appContainer = document.querySelector("#app");
+import { App } from "@core/app";
 
 ReactDOM.render(
 	<React.StrictMode>
@@ -15,5 +12,5 @@ ReactDOM.render(
 			<App />
 		</Provider>
 	</React.StrictMode>,
-	appContainer,
+	document.querySelector("#container"),
 );

@@ -14,6 +14,7 @@ import fileExplorer from "@modules/file-explorer/initial-state";
 
 import { initEvents } from "@init/events";
 import { initCommands } from "@init/commands";
+import { initialState } from "@init/state";
 
 declare const MAIN_WINDOW_WEBPACK_ENTRY: string;
 declare const MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY: string;
@@ -75,14 +76,6 @@ export const createWindow = async (): Promise<void> => {
 
 	windows.add(window);
 
-	const state: WindowState = {
-		app: appInitialState,
-		activityBar,
-		topBar,
-		sideBar,
-		fileExplorer,
-	} as WindowState;
-
 	const context: WindowContext = {
 		window,
 		dialog,
@@ -97,7 +90,7 @@ export const createWindow = async (): Promise<void> => {
 		trashItem: shell.trashItem,
 	};
 
-	const transmission = new Transmission(state, context);
+	const transmission = new Transmission(initialState, context);
 
 	initEvents(transmission);
 

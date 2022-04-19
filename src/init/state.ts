@@ -4,6 +4,7 @@ import fileExplorer from "@modules/file-explorer/initial-state";
 import activityBar from "@modules/activity-bar/initial-state";
 import sideBar from "@containers/side-bar/initial-state";
 import topBar from "@modules/top-bar/initial-state";
+import editor from "@modules/editor/initial-state";
 import app from "@containers/app/initial-state";
 
 export const initialState: WindowState = {
@@ -14,5 +15,5 @@ export const initialState: WindowState = {
 	topBar,
 	statusBar: {},
 	workspace: {},
-	editor: {},
+	editor,
 };

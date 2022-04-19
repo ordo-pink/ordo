@@ -2,6 +2,7 @@ import { AppState } from "@containers/app/types";
 import { SideBarState } from "@containers/side-bar/types";
 import { EventHandler } from "@core/transmission";
 import { ActivityBarState } from "@modules/activity-bar/types";
+import { EditorState } from "@modules/editor/types";
 import { FileExplorerState } from "@modules/file-explorer/types";
 import { TopBarState } from "@modules/top-bar/types";
 import { BrowserWindow, Dialog } from "electron";
@@ -22,7 +23,7 @@ export type WindowState = {
 	statusBar: {};
 	workspace: {};
 	activityBar: ActivityBarState;
-	editor: {};
+	editor: EditorState;
 	fileExplorer: FileExplorerState;
 	topBar: TopBarState;
 };

@@ -33,6 +33,6 @@ export const createOrdoFolder = ({
 		collapsed,
 		type: "folder",
 		children: [],
-		color: "gray",
+		color: "neutral",
 	};
 };

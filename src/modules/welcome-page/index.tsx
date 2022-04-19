@@ -14,7 +14,7 @@ const BringYourThoughts: React.FC = () => {
 
 	return transitions(({ opacity }) => (
 		<animated.h1
-			className="text-lg uppercase tracking-wider border-b border-gray-400"
+			className="text-lg uppercase tracking-wider border-b border-neutral-400"
 			style={{ opacity: opacity.to({ range: [1.0, 0.0], output: [1, 0] }) }}
 		>
 			Bring your thoughts to
@@ -57,7 +57,7 @@ export const WelcomePage: React.FC = () => {
 	const recentProjects = useAppSelector((state) => state.app.internalSettings.window?.recentProjects);
 
 	return (
-		<div className="select-none -z-50 flex flex-col flex-grow w-full h-full justify-center items-center text-gray-600 dark:text-gray-300 mt-10">
+		<div className="select-none -z-50 flex flex-col flex-grow w-full h-full justify-center items-center text-neutral-600 dark:text-neutral-300 mt-10">
 			<div className="mb-24">
 				<BringYourThoughts />
 				<div className="w-full flex items-center justify-center mt-11">

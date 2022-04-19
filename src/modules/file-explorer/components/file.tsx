@@ -16,7 +16,7 @@ export const File: React.FC<{ file: OrdoFile }> = ({ file }) => {
 			className={`flex space-x-2 cursor-pointer items-center select-none hover:bg-neutral-300 dark:hover:bg-neutral-700 ${selectionClass}`}
 			onClick={() => window.ordo.emit("@editor/open-tab", file.path)}
 		>
-			<Icon className="shrink-0" />
+			<Icon className="shrink-0 text-neutral-500" />
 			<div className="pr-2 truncate py-0.5">{file.readableName}</div>
 		</div>
 	);

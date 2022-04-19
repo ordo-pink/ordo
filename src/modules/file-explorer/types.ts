@@ -67,6 +67,17 @@ export type ShowFileCreationEvent = OrdoEvent<FILE_EXPLORER_SCOPE, "show-file-cr
 export type ShowFolderCreationEvent = OrdoEvent<FILE_EXPLORER_SCOPE, "show-folder-creation", string>;
 export type HideCreationEvent = OrdoEvent<FILE_EXPLORER_SCOPE, "hide-creation">;
 
+export type ShowFileContextMenu = OrdoEvent<
+	FILE_EXPLORER_SCOPE,
+	"show-file-context-menu",
+	{ path: string; x: number; y: number }
+>;
+export type ShowFolderContextMenu = OrdoEvent<
+	FILE_EXPLORER_SCOPE,
+	"show-folder-context-menu",
+	{ path: string; x: number; y: number }
+>;
+
 export type FileExplorerEvents = CreateFileEvent &
 	CreateFolderEvent &
 	FindOrdoFile &
@@ -81,4 +92,6 @@ export type FileExplorerEvents = CreateFileEvent &
 	HideCreationEvent &
 	ToggleFolderEvent &
 	FoldFolderEvent &
-	UnfoldFolderEvent;
+	UnfoldFolderEvent &
+	ShowFileContextMenu &
+	ShowFolderContextMenu;

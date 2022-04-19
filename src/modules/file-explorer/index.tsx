@@ -16,7 +16,7 @@ export const FileExplorer: React.FC = () => {
 				<div className="flex w-full items-center justify-between bg-neutral-300 dark:bg-neutral-800 py-1 px-2 rounded-tl-lg">
 					<Header />
 				</div>
-				<Creator path={tree.path} />
+				<Creator path={tree.path} depth={0} />
 				{tree.collapsed ? null : (
 					<div className="h-[calc(100vh-6.25rem)]">
 						<Scrollbars autoHide={true}>

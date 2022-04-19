@@ -2,7 +2,7 @@ import React from "react";
 
 import { useAppSelector } from "@core/state/store";
 
-export const Creator: React.FC<{ path: string }> = ({ path }) => {
+export const Creator: React.FC<{ path: string; depth: number }> = ({ path, depth }) => {
 	const { createFileIn, createFolderIn } = useAppSelector((state) => state.fileExplorer);
 	const [name, setName] = React.useState("");
 
@@ -13,7 +13,11 @@ export const Creator: React.FC<{ path: string }> = ({ path }) => {
 			{createHere ? (
 				<input
 					type="text"
-					className="w-full px-1 py-0.5 outline-none border border-neutral-400"
+					className="px-1 outline-none border border-neutral-400 dark:bg-neutral-700"
+					style={{
+						width: `calc(100% - ${depth ? depth * 16 + 16 + "px" : "0px"})`,
+						marginLeft: depth ? depth * 16 + 16 + "px" : "0px",
+					}}
 					autoFocus={createHere}
 					value={name}
 					onChange={(e) => setName(e.target.value)}

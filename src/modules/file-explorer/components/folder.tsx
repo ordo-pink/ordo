@@ -15,9 +15,10 @@ export const Folder: React.FC<{ folder: OrdoFolder }> = ({ folder }) => {
 				<div
 					style={{ paddingLeft: folder.depth * 12 + 10 + "px" }}
 					className={`flex space-x-2 items-center select-none hover:bg-neutral-300 dark:hover:bg-neutral-700 cursor-pointer`}
-					onClick={() => {
-						window.ordo.emit("@file-explorer/toggle-folder", folder.path);
-					}}
+					onClick={() => window.ordo.emit("@file-explorer/toggle-folder", folder.path)}
+					onContextMenu={(e) =>
+						window.ordo.emit("@file-explorer/show-folder-context-menu", { path: folder.path, x: e.clientX, y: e.clientY })
+					}
 				>
 					<Icon />
 					<FolderIcon className={`text-${folder.color}-500 dark:text-${folder.color}-300`} />
@@ -25,7 +26,7 @@ export const Folder: React.FC<{ folder: OrdoFolder }> = ({ folder }) => {
 				</div>
 				{!folder.collapsed && (
 					<div>
-						<Creator path={folder.path} />
+						<Creator path={folder.path} depth={folder.depth} />
 						{folder.children.map((child) => (
 							<div key={child.path}>
 								{child.type === "folder" ? <Folder folder={child as OrdoFolder} /> : <File file={child as OrdoFile} />}

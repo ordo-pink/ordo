@@ -19,7 +19,7 @@ export const Command: React.FC<
 		>
 			<div className="flex-grow">
 				<div className="flex items-center space-x-2">
-					<Icon />
+					<Icon className="text-neutral-500" />
 					<div>{name}</div>
 				</div>
 

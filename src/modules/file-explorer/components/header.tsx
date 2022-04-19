@@ -15,7 +15,7 @@ export const Header: React.FC = () => {
 	return (
 		<>
 			<div
-				className="cursor-pointer flex space-x-2 items-center"
+				className="cursor-pointer flex space-x-2 items-center select-none"
 				onClick={() => {
 					window.ordo.emit("@file-explorer/toggle-folder", tree.path);
 				}}

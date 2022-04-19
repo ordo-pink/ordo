@@ -21,7 +21,7 @@ export const Folder: React.FC<{ folder: OrdoFolder }> = ({ folder }) => {
 				>
 					<Icon />
 					<FolderIcon className={`text-${folder.color}-500 dark:text-${folder.color}-300`} />
-					<div className="pr-2 truncate py-0.5">{folder.readableName}</div>
+					<div className="pr-2 truncate">{folder.readableName}</div>
 				</div>
 				{!folder.collapsed && (
 					<div>

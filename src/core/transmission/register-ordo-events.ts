@@ -1,5 +1,5 @@
 import { Transmission, EventHandler } from "@core/transmission";
-import { OrdoEvents } from "@core/types/ordo-events";
+import { OrdoEvents } from "@init/types";
 
 export const registerEvents =
 	<TCustomEvents = null>(handlers: {

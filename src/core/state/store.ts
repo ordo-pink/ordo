@@ -2,8 +2,8 @@ import { applyPatches as apply, enablePatches, Patch } from "immer";
 import { configureStore, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { TypedUseSelectorHook, useDispatch, useSelector } from "react-redux";
 
-import { WindowState } from "@core/types";
 import { initialState } from "@init/state";
+import { WindowState } from "@init/types";
 
 enablePatches();
 

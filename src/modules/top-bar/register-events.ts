@@ -1,5 +1,5 @@
 import { registerEvents } from "@core/transmission/register-ordo-events";
-import { OrdoEvents } from "@core/types/ordo-events";
+import { OrdoEvents } from "@init/types";
 import { TopBarEvents } from "./types";
 
 export default registerEvents<TopBarEvents>({

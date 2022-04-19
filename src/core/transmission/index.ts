@@ -1,7 +1,6 @@
 import produce, { applyPatches, Draft, enablePatches } from "immer";
 
-import { OrdoEvents } from "@core/types/ordo-events";
-import { WindowContext, WindowState } from "@core/types";
+import { WindowState, WindowContext, OrdoEvents } from "@init/types";
 
 const stateSymbol = Symbol.for("@transmission/state");
 const contextSymbol = Symbol.for("@transmission/context");

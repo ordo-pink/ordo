@@ -1,5 +1,4 @@
-import { WindowState } from "@core/types";
-
+import { WindowState } from "@init/types";
 import fileExplorer from "@modules/file-explorer/initial-state";
 import activityBar from "@modules/activity-bar/initial-state";
 import sideBar from "@containers/side-bar/initial-state";

@@ -1,20 +1,14 @@
 import { internalSettingsStore } from "@core/settings/internal-settings";
 import { Transmission } from "@core/transmission";
-import { WindowState, WindowContext } from "@core/types";
 import { BrowserWindow, dialog, app, clipboard, shell, ipcMain, globalShortcut } from "electron";
 import install, { REACT_DEVELOPER_TOOLS, REDUX_DEVTOOLS } from "electron-devtools-installer";
 import { is, centerWindow } from "electron-util";
 import { saveWindowPosition } from "./save-window-position";
 
-import sideBar from "@containers/side-bar/initial-state";
-import activityBar from "@modules/activity-bar/initial-state";
-import topBar from "@modules/top-bar/initial-state";
-import appInitialState from "@containers/app/initial-state";
-import fileExplorer from "@modules/file-explorer/initial-state";
-
 import { initEvents } from "@init/events";
 import { initCommands } from "@init/commands";
 import { initialState } from "@init/state";
+import { WindowContext } from "@init/types";
 
 declare const MAIN_WINDOW_WEBPACK_ENTRY: string;
 declare const MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY: string;

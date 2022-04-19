@@ -1,6 +1,5 @@
 import { Color } from "@core/appearance/colors";
-import { int } from "@core/types";
-import { OrdoEvent } from "@core/types/ordo-events";
+import { int, OrdoEvent } from "@core/types";
 
 export type OrdoFile<T = any> = {
 	path: string;

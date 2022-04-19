@@ -1,4 +1,4 @@
-import { OrdoEvent } from "@core/types/ordo-events";
+import { OrdoEvent } from "@core/types";
 import { OrdoFile } from "@modules/file-explorer/types";
 
 export type EditorState = {

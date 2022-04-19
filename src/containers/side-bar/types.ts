@@ -1,4 +1,4 @@
-import { OrdoEvent } from "@core/types/ordo-events";
+import { OrdoEvent } from "@core/types";
 
 export type SideBarState = {
 	show: boolean;

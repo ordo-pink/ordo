@@ -1,6 +1,4 @@
-export {};
-
-import { OrdoEvents } from "./core/types/ordo-events";
+import { OrdoEvents } from "@init/types";
 
 declare global {
 	interface Window {

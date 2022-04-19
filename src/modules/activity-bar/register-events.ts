@@ -9,7 +9,7 @@ export default registerEvents<ActivityBarEvents>({
 		transmission.emit("@activity-bar/select", "Editor").then((t) => t.emit("@side-bar/show", null));
 	},
 	"@activity-bar/open-graph": ({ transmission }) => {
-		transmission.emit("@activity-bar/select", "GraphView").then((t) => t.emit("@side-bar/hide", null));
+		transmission.emit("@activity-bar/select", "Graph").then((t) => t.emit("@side-bar/hide", null));
 	},
 	"@activity-bar/open-settings": ({ transmission }) => {
 		transmission.emit("@activity-bar/select", "Settings").then((t) => t.emit("@side-bar/hide", null));

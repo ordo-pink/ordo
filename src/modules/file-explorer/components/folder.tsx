@@ -25,7 +25,7 @@ export const Folder: React.FC<{ folder: OrdoFolder }> = ({ folder }) => {
 				</div>
 				{!folder.collapsed && (
 					<div>
-						<Creator />
+						<Creator path={folder.path} />
 						{folder.children.map((child) => (
 							<div key={child.path}>
 								{child.type === "folder" ? <Folder folder={child as OrdoFolder} /> : <File file={child as OrdoFile} />}

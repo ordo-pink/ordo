@@ -78,7 +78,7 @@ export const TopBar: React.FC = () => {
 				/>
 				{isFocused && value.startsWith(">") && (
 					<div className="fixed h-[70%] cursor-default z-50 mt-1 rounded-lg flex flex-col shadow-lg w-[50%] max-w-[600px] bg-neutral-100 dark:bg-neutral-600">
-						<Scrollbars>
+						<Scrollbars autoHide={true}>
 							<div>
 								{fused &&
 									fused.map(({ item }, index) => (

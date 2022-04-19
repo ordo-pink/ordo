@@ -19,7 +19,7 @@ export const FileExplorer: React.FC = () => {
 				<Creator />
 				{tree.collapsed ? null : (
 					<div className="h-[calc(100vh-6.25rem)]">
-						<Scrollbars>
+						<Scrollbars autoHide={true}>
 							<div className="mb-6">
 								{tree.children.map((child) =>
 									isFolder(child) ? <Folder folder={child} key={child.path} /> : <File file={child} key={child.path} />,

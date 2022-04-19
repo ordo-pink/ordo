@@ -11,7 +11,7 @@ export const TextEditor: React.FC = () => {
 		tab && (
 			<>
 				<Breadcrumbs />
-				<Scrollbars>
+				<Scrollbars autoHide={true}>
 					<div className="outline-none" contentEditable={true} suppressContentEditableWarning={true}>
 						{tab.raw?.split("\n").map((line, index) => (
 							<div key={`${line}-${index}`} className="flex items-center whitespace-nowrap">

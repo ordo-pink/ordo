@@ -23,17 +23,21 @@ object-src 'none';
 	setContentSecurityPolicy(`img-src * data: file:;`);
 }
 
-const dockMenu = Menu.buildFromTemplate([
-	{ type: "separator" },
-	{
-		label: "New Window",
-		click: () => createWindow(),
-	},
-]);
-
 app.on("ready", async () => {
 	enforceMacOSAppLocation();
-	app.dock.setMenu(dockMenu);
+
+	if (is.macos) {
+		const dockMenu = Menu.buildFromTemplate([
+			{ type: "separator" },
+			{
+				label: "New Window",
+				click: () => createWindow(),
+			},
+		]);
+
+		app.dock.setMenu(dockMenu);
+	}
+
 	await createWindow();
 });
 

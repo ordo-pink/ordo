@@ -39,7 +39,7 @@ export const createWindow = async (): Promise<void> => {
 				? (internalSettingsStore.get("window.position.y") as number) + 100
 				: internalSettingsStore.get("window.position.y"),
 		icon: "../assets/android-chrome-512x512.png",
-		titleBarStyle: "hiddenInset",
+		// titleBarStyle: "hiddenInset",
 		acceptFirstMouse: true,
 		webPreferences: {
 			sandbox: true,

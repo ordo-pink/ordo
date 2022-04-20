@@ -41,17 +41,21 @@ export const App: React.FC = () => {
 
 	return (
 		<>
-			<TopBar />
-			<div className="flex h-[calc(100%-3.75rem)]">
-				<ActivityBar />
-				<Split
-					className="flex w-full h-full"
-					sizes={showSidebar ? [100 - targetSideBarWidth, targetSideBarWidth] : [100, 0]}
-					minSize={0}
-					snapOffset={200}
-					onDragEnd={(sizes) => window.ordo.emit("@side-bar/set-width", sizes[1])}
-				>
-					{/* <Split
+			<div className="flex w-full h-full">
+				<div className="mt-2 mb-6">
+					<ActivityBar />
+				</div>
+				<div className="flex flex-col w-full h-full">
+					<TopBar />
+					<div className="flex flex-grow h-[calc(100%-3.75rem)]">
+						<Split
+							className="flex w-full h-full"
+							sizes={showSidebar ? [100 - targetSideBarWidth, targetSideBarWidth] : [100, 0]}
+							minSize={0}
+							snapOffset={200}
+							onDragEnd={(sizes) => window.ordo.emit("@side-bar/set-width", sizes[1])}
+						>
+							{/* <Split
 						className="flex flex-col justify-between"
 						direction="vertical"
 						sizes={showPanel ? [100 - panelHeight, panelHeight] : [100, 0]}
@@ -59,17 +63,19 @@ export const App: React.FC = () => {
 						snapOffset={100}
 						onDragEnd={(sizes) => dispatch(setPanelHeight(sizes[1]))}
 					> */}
-					<div className="h-full">
-						<Workspace />
-					</div>
-					{/* <div className="h-full shadow-xl rounded-t-xl bg-neutral-200  dark:bg-neutral-800">
+							<div className="h-full">
+								<Workspace />
+							</div>
+							{/* <div className="h-full shadow-xl rounded-t-xl bg-neutral-200  dark:bg-neutral-800">
 							<Panel />
 						</div>
 					</Split> */}
-					<div className="shadow-xl rounded-tl-xl mt-2 bg-neutral-200  dark:bg-neutral-600">
-						<Sidebar />
+							<div className="shadow-xl rounded-tl-xl mt-2 bg-neutral-200  dark:bg-neutral-600">
+								<Sidebar />
+							</div>
+						</Split>
 					</div>
-				</Split>
+				</div>
 			</div>
 			<div className="fixed bottom-0 left-0 right-0 bg-neutral-200  dark:bg-neutral-800">
 				<StatusBar />

@@ -1,11 +1,13 @@
 import { registerEvents } from "@core/transmission/register-ordo-events";
 import { readFile } from "@modules/file-explorer/api/read-file";
 import { OrdoFile } from "@modules/file-explorer/types";
+import { findOrdoFile } from "@modules/file-explorer/utils/find-ordo-file";
 import { EditorEvents } from "./types";
 
 export default registerEvents<EditorEvents>({
-	"@editor/open-tab": async ({ draft, payload, transmission }) => {
+	"@editor/open-tab": async ({ draft, payload, transmission, context }) => {
 		const currentTab = transmission.select((state) => state.editor.currentTab);
+		const tree = transmission.select((state) => state.fileExplorer.tree);
 
 		if (currentTab === payload) {
 			return;
@@ -36,11 +38,17 @@ export default registerEvents<EditorEvents>({
 		}
 
 		draft.editor.currentTab = payload;
+
+		const file = findOrdoFile(tree, "path", draft.editor.currentTab);
+
+		context.window.setRepresentedFilename(file?.path!);
+		context.window.setTitle(file?.path ? `${file.relativePath} — ${tree.readableName}` : "Ordo");
 	},
-	"@editor/close-tab": ({ draft, payload, transmission }) => {
+	"@editor/close-tab": ({ draft, payload, transmission, context }) => {
 		const currentTab = transmission.select((state) => state.editor.currentTab);
 		const tabIndex = transmission.select((state) => state.editor.tabs.findIndex((tab) => tab.path === payload));
 		const currentTabIndex = transmission.select((state) => state.editor.tabs.findIndex((tab) => tab.path === currentTab));
+		const tree = transmission.select((state) => state.fileExplorer.tree);
 
 		if (currentTabIndex === -1 && tabIndex === -1) {
 			return;
@@ -48,5 +56,10 @@ export default registerEvents<EditorEvents>({
 
 		draft.editor.tabs.splice(tabIndex !== -1 ? tabIndex : currentTabIndex, 1);
 		draft.editor.currentTab = draft.editor.tabs.length > 0 ? draft.editor.tabs[0].path : "";
+
+		const file = findOrdoFile(tree, "path", draft.editor.currentTab);
+
+		context.window.setRepresentedFilename(file?.path!);
+		context.window.setTitle(file?.path ? `${file.relativePath} — ${tree.readableName}` : "Ordo");
 	},
 });

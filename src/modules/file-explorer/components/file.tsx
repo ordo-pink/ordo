@@ -21,6 +21,9 @@ export const File: React.FC<{ file: OrdoFile }> = ({ file }) => {
 			style={{ paddingLeft: (file.depth + 0.25) * 16 + 10 + "px" }}
 			className={`flex space-x-2 cursor-pointer border border-transparent items-center select-none hover:bg-neutral-300 dark:hover:bg-neutral-700 ${selectionClass}`}
 			onClick={() => window.ordo.emit("@editor/open-tab", file.path)}
+			onContextMenu={(e) =>
+				window.ordo.emit("@file-explorer/show-file-context-menu", { path: file.path, x: e.clientX, y: e.clientY })
+			}
 		>
 			<Icon className="shrink-0 text-neutral-500" />
 			<div className="pr-2 truncate">{file.readableName}</div>

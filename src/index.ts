@@ -1,4 +1,4 @@
-import { app, BrowserWindow } from "electron";
+import { app, BrowserWindow, Menu } from "electron";
 import { enforceMacOSAppLocation, is, setContentSecurityPolicy } from "electron-util";
 
 import { createWindow } from "@core/window/create-window";
@@ -23,8 +23,17 @@ object-src 'none';
 	setContentSecurityPolicy(`img-src * data: file:;`);
 }
 
+const dockMenu = Menu.buildFromTemplate([
+	{ type: "separator" },
+	{
+		label: "New Window",
+		click: () => createWindow(),
+	},
+]);
+
 app.on("ready", async () => {
 	enforceMacOSAppLocation();
+	app.dock.setMenu(dockMenu);
 	await createWindow();
 });
 

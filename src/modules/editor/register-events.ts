@@ -41,8 +41,8 @@ export default registerEvents<EditorEvents>({
 
 		const file = findOrdoFile(tree, "path", draft.editor.currentTab);
 
-		context.window.setRepresentedFilename(file?.path!);
-		context.window.setTitle(file?.path ? `${file.relativePath} — ${tree.readableName}` : "Ordo");
+		context.window.setRepresentedFilename(file ? file.path : "");
+		context.window.setTitle(file ? `${file.relativePath} — ${tree.readableName}` : "Ordo");
 	},
 	"@editor/close-tab": ({ draft, payload, transmission, context }) => {
 		const currentTab = transmission.select((state) => state.editor.currentTab);
@@ -59,7 +59,7 @@ export default registerEvents<EditorEvents>({
 
 		const file = findOrdoFile(tree, "path", draft.editor.currentTab);
 
-		context.window.setRepresentedFilename(file?.path!);
-		context.window.setTitle(file?.path ? `${file.relativePath} — ${tree.readableName}` : "Ordo");
+		context.window.setRepresentedFilename(file ? file.path : "");
+		context.window.setTitle(file ? `${file.relativePath} — ${tree.readableName}` : "Ordo");
 	},
 });

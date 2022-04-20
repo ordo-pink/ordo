@@ -3,40 +3,84 @@ import React from "react";
 import Scrollbars from "react-custom-scrollbars-2";
 import { Command } from "./components/command";
 import Fuse from "fuse.js";
+import { collectFiles } from "@modules/file-explorer/utils/collect-files";
+import { File } from "./components/file";
 
 export const TopBar: React.FC = () => {
 	const value = useAppSelector((state) => state.topBar.value);
 	const isFocused = useAppSelector((state) => state.topBar.focused);
 	const items = useAppSelector((state) => state.app.commands);
-
-	const updateCommandList = (search: string) => {
-		setFused(search === ">" ? items.map((item) => ({ item })) : search.startsWith(">") ? fuse.search(search) : []);
-	};
-
-	const ref = React.useRef<HTMLInputElement>(null);
+	const tree = useAppSelector((state) => state.fileExplorer.tree);
 
 	const [selected, setSelected] = React.useState(0);
-	const [fuse, setFuse] = React.useState<any>(null);
-	const [fused, setFused] = React.useState(items.map((item) => ({ item })));
+	const [files, setFiles] = React.useState<any[]>([]);
+	const [fusedCommands, setFusedCommands] = React.useState(items.map((item) => ({ item })));
+	const [fusedFiles, setFusedFiles] = React.useState(files.map((item) => ({ item })));
+
+	const ref = React.useRef<HTMLInputElement>(null);
+	const commandFuse = React.useRef(
+		new Fuse(items, {
+			keys: ["name"],
+		}),
+	);
+	const fileFuse = React.useRef(
+		new Fuse(files, {
+			keys: ["readableName", "relativePath", "path"],
+		}),
+	);
+
+	React.useEffect(() => {
+		fileFuse.current.setCollection(files);
+	}, [files]);
+
+	React.useEffect(() => {
+		commandFuse.current.setCollection(items);
+	}, [items]);
+
+	React.useEffect(() => {
+		if (value.startsWith(">")) {
+			updateCommandList(value);
+		} else {
+			updateFileList(value);
+		}
+	}, [value]);
+
+	const updateCommandList = (search: string) => {
+		setFusedCommands(
+			search === ">"
+				? items.map((item) => ({ item }))
+				: search.startsWith(">")
+				? commandFuse.current.search(search.slice(1))
+				: [],
+		);
+
+		console.log(commandFuse.current);
+	};
+
+	const updateFileList = (search: string) => {
+		setFusedFiles(
+			search === "@"
+				? files.map((item) => ({ item }))
+				: search.startsWith("@")
+				? fileFuse.current.search(search.slice(1))
+				: [],
+		);
+	};
+
+	React.useEffect(() => {
+		if (tree) {
+			setFiles(collectFiles(tree));
+		}
+	}, [tree]);
 
 	React.useEffect(() => {
 		if (ref.current && isFocused != null) {
 			if (isFocused) {
 				ref.current.focus();
-
-				setFuse(
-					new Fuse(items, {
-						keys: ["name"],
-					}),
-				);
 			} else {
 				ref.current.blur();
 			}
 		}
-
-		return () => {
-			setFuse(null);
-		};
 	}, [isFocused]);
 
 	return (
@@ -51,23 +95,31 @@ export const TopBar: React.FC = () => {
 					value={value}
 					onFocus={() => {
 						window.ordo.emit("@top-bar/focus", null);
-						updateCommandList(value);
 					}}
 					onChange={(e) => {
 						window.ordo.emit("@top-bar/set-value", e.target.value);
 						setSelected(0);
-						updateCommandList(e.target.value);
 					}}
 					onBlur={() => {
 						setTimeout(() => window.ordo.emit("@top-bar/unfocus", null), 100);
 					}}
 					onKeyDown={(e) => {
 						if (e.key === "ArrowDown") {
-							setSelected(selected === fused.length - 1 ? 0 : selected + 1);
+							setSelected(
+								value.startsWith(">")
+									? selected === fusedCommands.length - 1
+										? 0
+										: selected + 1
+									: selected === fusedFiles.length - 1
+									? 0
+									: selected + 1,
+							);
 						} else if (e.key === "ArrowUp") {
-							setSelected(selected === 0 ? fused.length - 1 : selected - 1);
+							setSelected(
+								selected === 0 ? (value.startsWith(">") ? fusedCommands.length - 1 : fusedFiles.length - 1) : selected - 1,
+							);
 						} else if (e.key === "Enter") {
-							window.ordo.emit("@top-bar/run-command", fused[selected].item.event);
+							window.ordo.emit("@top-bar/run-command", fusedCommands[selected].item.event);
 							window.ordo.emit("@top-bar/unfocus", null);
 						} else if (e.key === "Escape") {
 							ref.current?.blur();
@@ -80,8 +132,8 @@ export const TopBar: React.FC = () => {
 					<div className="fixed h-[70%] cursor-default z-50 mt-1 rounded-lg flex flex-col shadow-lg w-[50%] max-w-[600px] bg-neutral-100 dark:bg-neutral-600">
 						<Scrollbars autoHide={true}>
 							<div>
-								{fused &&
-									fused.map(({ item }, index) => (
+								{fusedCommands &&
+									fusedCommands.map(({ item }, index) => (
 										<Command
 											key={item.event}
 											index={index}
@@ -91,6 +143,28 @@ export const TopBar: React.FC = () => {
 											icon={item.icon}
 											event={item.event}
 											accelerator={item.accelerator}
+											setSelected={setSelected}
+										/>
+									))}
+							</div>
+						</Scrollbars>
+					</div>
+				)}
+				{isFocused && value.startsWith("@") && (
+					<div className="fixed h-[70%] cursor-default z-50 mt-1 rounded-lg flex flex-col shadow-lg w-[50%] max-w-[600px] bg-neutral-100 dark:bg-neutral-600">
+						<Scrollbars>
+							<div>
+								{fusedFiles &&
+									fusedFiles.map(({ item }, index) => (
+										<File
+											key={item.path}
+											index={index}
+											readableName={item.readableName}
+											relativePath={item.relativePath}
+											size={item.size}
+											path={item.path}
+											type={item.type}
+											selected={selected}
 											setSelected={setSelected}
 										/>
 									))}

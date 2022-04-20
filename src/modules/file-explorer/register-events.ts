@@ -38,6 +38,44 @@ export default registerEvents<FileExplorerEvents>({
 
 		transmission.emit("@file-explorer/hide-creation", null);
 	},
+	"@file-explorer/remove-file": async ({ draft, payload, context, transmission }) => {
+		const currentPath = transmission.select((state) => state.editor.currentTab);
+		const tree = transmission.select((state) => state.fileExplorer.tree);
+		const path = payload ? payload : currentPath;
+
+		const isOpen = !payload || payload === currentPath;
+
+		const response = context.dialog.showMessageBoxSync({
+			type: "question",
+			buttons: ["Yes", "No"],
+			message: `Are you sure you want to remove "${path}"?`,
+		});
+
+		if (response === 0) {
+			if (isOpen) {
+				await transmission.emit("@editor/close-tab", path);
+			}
+
+			await context.trashItem(path);
+
+			draft.fileExplorer.tree = await listFolder(tree.path);
+		}
+	},
+	"@file-explorer/remove-folder": async ({ draft, payload, context, transmission }) => {
+		const tree = transmission.select((state) => state.fileExplorer.tree);
+
+		const response = context.dialog.showMessageBoxSync({
+			type: "question",
+			buttons: ["Yes", "No"],
+			message: `Are you sure you want to remove folder "${payload}"?`,
+		});
+
+		if (response === 0) {
+			await context.trashItem(payload);
+
+			draft.fileExplorer.tree = await listFolder(tree.path);
+		}
+	},
 	"@file-explorer/hide-creation": ({ draft }) => {
 		draft.fileExplorer.createFileIn = "";
 		draft.fileExplorer.createFolderIn = "";
@@ -126,6 +164,14 @@ export default registerEvents<FileExplorerEvents>({
 			}),
 		);
 
+		menu.append(
+			new MenuItem({
+				label: "Remove Folder",
+				accelerator: "CommandOrControl+Backspace",
+				click: () => transmission.emit("@file-explorer/remove-folder", path),
+			}),
+		);
+
 		menu.popup({
 			window: context.window,
 			x,
@@ -157,6 +203,14 @@ export default registerEvents<FileExplorerEvents>({
 				label: "Copy Path",
 				accelerator: "CommandOrControl+Option+C",
 				click: () => transmission.emit("@file-explorer/copy-path", path),
+			}),
+		);
+
+		menu.append(
+			new MenuItem({
+				label: "Remove File",
+				accelerator: "CommandOrControl+Backspace",
+				click: () => transmission.emit("@file-explorer/remove-file", path),
 			}),
 		);
 

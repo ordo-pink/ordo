@@ -10,7 +10,7 @@ export const TopBar: React.FC = () => {
 	const items = useAppSelector((state) => state.app.commands);
 
 	const updateCommandList = (search: string) => {
-		setFused(search === ">" ? items.map((item) => ({ item })) : fuse.search(search));
+		setFused(search === ">" ? items.map((item) => ({ item })) : search.startsWith(">") ? fuse.search(search) : []);
 	};
 
 	const ref = React.useRef<HTMLInputElement>(null);

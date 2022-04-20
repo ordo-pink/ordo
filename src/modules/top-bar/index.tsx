@@ -53,8 +53,6 @@ export const TopBar: React.FC = () => {
 				? commandFuse.current.search(search.slice(1))
 				: [],
 		);
-
-		console.log(commandFuse.current);
 	};
 
 	const updateFileList = (search: string) => {

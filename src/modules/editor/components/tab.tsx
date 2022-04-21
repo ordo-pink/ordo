@@ -20,28 +20,28 @@ export const Tab: React.FC<{ tab: OrdoFile }> = ({ tab }) => {
 	}
 
 	const Icon = getFileIcon(file);
+	const closeTab = (e: React.MouseEvent) => {
+		e.preventDefault();
+		e.stopPropagation();
 
+		window.ordo.emit("@editor/close-tab", file.path);
+	};
 	return (
 		<div
 			key={file.path}
 			className={`flex flex-shrink text-sm text-neutral-800 dark:text-neutral-300 items-center space-x-2 cursor-pointer px-3 py-1 rounded-lg truncate ${
 				currentTab === file.path && "bg-neutral-200 dark:bg-neutral-600 shadow-md"
 			}`}
-			onClick={() => {
+			onClick={(e) => {
+				e.preventDefault();
+				e.stopPropagation()
 				window.ordo.emit("@editor/open-tab", file.path);
 			}}
+			onMouseDown={(e) => (e.button === 1 ? closeTab(e) : void 0)}
 		>
 			<Icon className="text-neutral-500" />
 			<div>{file.readableName}</div>
-			<HiX
-				className="text-neutral-500 hover:text-red-500"
-				onClick={(e) => {
-					e.preventDefault();
-					e.stopPropagation();
-
-					window.ordo.emit("@editor/close-tab", file.path);
-				}}
-			/>
+			<HiX className="text-neutral-500 hover:text-red-500" onClick={closeTab} />
 		</div>
 	);
 };

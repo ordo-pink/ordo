@@ -41,10 +41,12 @@ const selectProjectHandler: OrdoEventHandler<"@app/select-project"> = async ({ d
 
 	if (paths && paths[0]) {
 		draft.app.currentProject = paths[0];
+		await transmission.emit("@file-explorer/list-folder", paths[0]);
 		await transmission.emit("@app/set-internal-setting", [
 			"window.recentProjects",
 			Array.from(new Set([paths[0]].concat(internalSettingsStore.get("window.recentProjects")))).slice(0, 8),
 		]);
+
 		context.addRecentDocument(paths[0]);
 	}
 };

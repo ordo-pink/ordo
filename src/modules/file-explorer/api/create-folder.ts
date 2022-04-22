@@ -32,7 +32,7 @@ export const createFolder = async (tree: OrdoFolder, parentPath: string, name: s
 				updatedAt: stat.mtime,
 				accessedAt: stat.atime,
 				path,
-				relativePath: path.replace(tree.path, "."),
+				relativePath: path.replace(tree.path, ""),
 			});
 
 			parent.children.push(node);

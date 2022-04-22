@@ -14,7 +14,7 @@ export const File: React.FC<{
 }> = ({ path, readableName, relativePath, size, type, selected, index, setSelected }) => {
 	const Icon = getFileIcon({ size, type } as OrdoFile);
 	const isSelected = selected === index;
-	const folder = relativePath.replace(readableName, "").slice(2, -1);
+	const folder = relativePath.replace(readableName, "").slice(1, -1);
 
 	return (
 		<div

@@ -1,7 +1,12 @@
 import Store, { Schema } from "electron-store";
 import { InternalSettings } from "./types";
+import { sep } from "path";
 
 export const internalSettingsSchema: Schema<InternalSettings> = {
+	separator: {
+		type: "string",
+		default: sep,
+	},
 	window: {
 		type: "object",
 		properties: {
@@ -49,7 +54,7 @@ export const internalSettingsStore = new Store({
 	schema: internalSettingsSchema,
 	migrations: {
 		"0.1.0": (s) => {
-			s.set("window", { width: 800, height: 600, recentProjects: [], sideBarWidth: 20 });
+			s.set("window", { separator: sep, width: 800, height: 600, recentProjects: [], sideBarWidth: 20 });
 		},
 	},
 });

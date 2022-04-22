@@ -55,6 +55,7 @@ const Logo: React.FC = () => {
 
 export const WelcomePage: React.FC = () => {
 	const recentProjects = useAppSelector((state) => state.app.internalSettings.window?.recentProjects);
+	const separator = useAppSelector((state) => state.app.internalSettings.separator);
 
 	return (
 		<div className="select-none -z-50 flex flex-col flex-grow w-full h-full justify-center items-center text-neutral-600 dark:text-neutral-300 mt-10">
@@ -78,7 +79,8 @@ export const WelcomePage: React.FC = () => {
 									window.ordo.emit("@activity-bar/open-editor", null);
 								}}
 							>
-								.../{project.split("/").slice(-3).join("/")}
+								...{separator}
+								{project.split(separator).slice(-3).join(separator)}
 							</div>
 						))}
 					</div>

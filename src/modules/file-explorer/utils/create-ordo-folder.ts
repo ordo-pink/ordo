@@ -1,3 +1,4 @@
+import { sep } from "path";
 import { OrdoFolder } from "@modules/file-explorer/types";
 
 type CreateOrdoFolderArg = {
@@ -19,8 +20,8 @@ export const createOrdoFolder = ({
 	collapsed = true,
 	relativePath,
 }: CreateOrdoFolderArg): OrdoFolder => {
-	const splittablePath = path.endsWith("/") ? path.slice(0, -1) : path;
-	const readableName = splittablePath.slice(splittablePath.lastIndexOf("/") + 1);
+	const splittablePath = path.endsWith(sep) ? path.slice(0, -1) : path;
+	const readableName = splittablePath.slice(splittablePath.lastIndexOf(sep) + 1);
 
 	return {
 		path,

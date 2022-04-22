@@ -1,6 +1,7 @@
 import { Color } from "@core/appearance/colors";
 
 export type InternalSettings = {
+	separator: string;
 	window: {
 		width: number;
 		height: number;

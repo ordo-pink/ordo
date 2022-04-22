@@ -1,3 +1,4 @@
+import { sep } from "path";
 import { userSettingsStore } from "@core/settings/user-settings";
 import { OrdoFile } from "@modules/file-explorer/types";
 
@@ -29,7 +30,7 @@ export const createOrdoFile = ({
 	relativePath,
 	size = 0,
 }: CreateOrdoFileArg): OrdoFile => {
-	const readableName = path.substring(path.lastIndexOf("/") + 1);
+	const readableName = path.substring(path.lastIndexOf(sep) + 1);
 	const extension = readableName.substring(readableName.lastIndexOf(".")) ?? ".md";
 
 	const associations = userSettingsStore.store.explorer.associations;

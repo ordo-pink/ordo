@@ -16,7 +16,7 @@ export const listFolder = async (path: string, depth = 0, rootPath = path): Prom
 
 	const excluded = excludePatterns.map((pattern) => new Minimatch(pattern));
 
-	const relativePath = path.replace(rootPath, ".");
+	const relativePath = path.replace(rootPath, "");
 	const tree = createOrdoFolder({
 		depth,
 		path,
@@ -57,7 +57,7 @@ export const listFolder = async (path: string, depth = 0, rootPath = path): Prom
 			}
 
 			const { birthtime, mtime, atime, size } = await promises.stat(itemPath);
-			const relativePath = itemPath.replace(rootPath, ".");
+			const relativePath = itemPath.replace(rootPath, "");
 
 			const file = createOrdoFile({
 				path: itemPath,

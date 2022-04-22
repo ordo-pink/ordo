@@ -52,13 +52,22 @@ export type FILE_EXPLORER_SCOPE = "file-explorer";
 
 export type CreateFileEvent = OrdoEvent<FILE_EXPLORER_SCOPE, "create-file", string>;
 export type CreateFolderEvent = OrdoEvent<FILE_EXPLORER_SCOPE, "create-folder", string>;
-export type FindOrdoFile = OrdoEvent<FILE_EXPLORER_SCOPE, "find-file", { [K in keyof OrdoFile]: OrdoFile[K] }>;
-export type FindOrdoFolder = OrdoEvent<FILE_EXPLORER_SCOPE, "find-folder", { [K in keyof OrdoFolder]: OrdoFolder[K] }>;
-export type UpdateOrdoFile = OrdoEvent<FILE_EXPLORER_SCOPE, "update-file", { path: string } & Partial<OrdoFile>>;
-export type UpdateOrdoFolder = OrdoEvent<FILE_EXPLORER_SCOPE, "update-folder", { path: string } & Partial<OrdoFolder>>;
-export type RemoveOrdoFile = OrdoEvent<FILE_EXPLORER_SCOPE, "remove-file", string>;
-export type RemoveOrdoFolder = OrdoEvent<FILE_EXPLORER_SCOPE, "remove-folder", string>;
-export type ListOrdoFolder = OrdoEvent<FILE_EXPLORER_SCOPE, "list-folder", string>;
+export type FindOrdoFileEvent = OrdoEvent<FILE_EXPLORER_SCOPE, "find-file", { [K in keyof OrdoFile]: OrdoFile[K] }>;
+export type FindOrdoFolderEvent = OrdoEvent<
+	FILE_EXPLORER_SCOPE,
+	"find-folder",
+	{ [K in keyof OrdoFolder]: OrdoFolder[K] }
+>;
+export type UpdateOrdoFileEvent = OrdoEvent<FILE_EXPLORER_SCOPE, "update-file", { path: string } & Partial<OrdoFile>>;
+export type UpdateOrdoFolderEvent = OrdoEvent<
+	FILE_EXPLORER_SCOPE,
+	"update-folder",
+	{ path: string } & Partial<OrdoFolder>
+>;
+export type RemoveOrdoFileEvent = OrdoEvent<FILE_EXPLORER_SCOPE, "remove-file", string>;
+export type RemoveOrdoFolderEvent = OrdoEvent<FILE_EXPLORER_SCOPE, "remove-folder", string>;
+export type ListOrdoFolderEvent = OrdoEvent<FILE_EXPLORER_SCOPE, "list-folder", string>;
+export type MoveFileOrFolderEvent = OrdoEvent<FILE_EXPLORER_SCOPE, "move", { oldPath: string; newPath: string }>;
 
 export type ToggleFolderEvent = OrdoEvent<FILE_EXPLORER_SCOPE, "toggle-folder", string>;
 export type SetFolderColorEvent = OrdoEvent<FILE_EXPLORER_SCOPE, "set-folder-color", { path: string; color: Color }>;
@@ -83,13 +92,14 @@ export type ShowFolderContextMenu = OrdoEvent<
 
 export type FileExplorerEvents = CreateFileEvent &
 	CreateFolderEvent &
-	FindOrdoFile &
-	FindOrdoFolder &
-	UpdateOrdoFile &
-	UpdateOrdoFolder &
-	RemoveOrdoFile &
-	RemoveOrdoFolder &
-	ListOrdoFolder &
+	FindOrdoFileEvent &
+	FindOrdoFolderEvent &
+	UpdateOrdoFileEvent &
+	UpdateOrdoFolderEvent &
+	RemoveOrdoFileEvent &
+	RemoveOrdoFolderEvent &
+	ListOrdoFolderEvent &
+	MoveFileOrFolderEvent &
 	ShowFileCreationEvent &
 	ShowFolderCreationEvent &
 	HideCreationEvent &

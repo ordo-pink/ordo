@@ -5,6 +5,7 @@ import { is } from "electron-util";
 import { createFile } from "./api/create-file";
 import { createFolder } from "./api/create-folder";
 import { listFolder } from "./api/list-folder";
+import { move } from "./api/move";
 import { updateFolder } from "./api/update-folder";
 import { FileExplorerEvents } from "./types";
 import { findOrdoFile } from "./utils/find-ordo-file";
@@ -243,5 +244,13 @@ export default registerEvents<FileExplorerEvents>({
 		folder.color = payload.color;
 
 		updateFolder(payload.path, { color: payload.color });
+	},
+	"@file-explorer/move": async ({ draft, payload, transmission }) => {
+		const { oldPath, newPath } = payload;
+		const currentProject = transmission.select((state) => state.app.currentProject);
+
+		await move(oldPath, newPath);
+
+		draft.fileExplorer.tree = await listFolder(currentProject);
 	},
 });

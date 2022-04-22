@@ -24,6 +24,11 @@ export const File: React.FC<{ file: OrdoFile }> = ({ file }) => {
 			onContextMenu={(e) =>
 				window.ordo.emit("@file-explorer/show-file-context-menu", { path: file.path, x: e.clientX, y: e.clientY })
 			}
+			draggable={true}
+			onDragStart={(event: any) => {
+				event.dataTransfer.setData("oldPath", file.path);
+				event.dataTransfer.setData("fileName", file.readableName);
+			}}
 		>
 			<Icon className="shrink-0 text-neutral-500" />
 			<div className="pr-2 truncate">{file.readableName}</div>

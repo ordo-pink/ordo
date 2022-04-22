@@ -67,7 +67,11 @@ export type UpdateOrdoFolderEvent = OrdoEvent<
 export type RemoveOrdoFileEvent = OrdoEvent<FILE_EXPLORER_SCOPE, "remove-file", string>;
 export type RemoveOrdoFolderEvent = OrdoEvent<FILE_EXPLORER_SCOPE, "remove-folder", string>;
 export type ListOrdoFolderEvent = OrdoEvent<FILE_EXPLORER_SCOPE, "list-folder", string>;
-export type MoveFileOrFolderEvent = OrdoEvent<FILE_EXPLORER_SCOPE, "move", { oldPath: string; newPath: string }>;
+export type MoveFileOrFolderEvent = OrdoEvent<
+	FILE_EXPLORER_SCOPE,
+	"move",
+	{ oldPath: string; newFolder: string; name: string }
+>;
 
 export type ToggleFolderEvent = OrdoEvent<FILE_EXPLORER_SCOPE, "toggle-folder", string>;
 export type SetFolderColorEvent = OrdoEvent<FILE_EXPLORER_SCOPE, "set-folder-color", { path: string; color: Color }>;

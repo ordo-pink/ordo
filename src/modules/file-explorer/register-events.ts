@@ -10,6 +10,7 @@ import { updateFolder } from "./api/update-folder";
 import { FileExplorerEvents } from "./types";
 import { findOrdoFile } from "./utils/find-ordo-file";
 import { findOrdoFolder } from "./utils/find-ordo-folder";
+import { join } from "path";
 
 export default registerEvents<FileExplorerEvents>({
 	"@file-explorer/list-folder": async ({ draft, payload }) => {
@@ -245,12 +246,26 @@ export default registerEvents<FileExplorerEvents>({
 
 		updateFolder(payload.path, { color: payload.color });
 	},
-	"@file-explorer/move": async ({ draft, payload, transmission }) => {
-		const { oldPath, newPath } = payload;
-		const currentProject = transmission.select((state) => state.app.currentProject);
+	"@file-explorer/move": async ({ draft, payload, transmission, context }) => {
+		const { oldPath, name, newFolder } = payload;
+		const tree = transmission.select((state) => state.fileExplorer.tree);
 
-		await move(oldPath, newPath);
+		const newPath = join(newFolder, name);
 
-		draft.fileExplorer.tree = await listFolder(currentProject);
+		if (oldPath === newPath) {
+			return;
+		}
+
+		const result = context.dialog.showMessageBoxSync(context.window, {
+			type: "question",
+			buttons: ["Yes", "No"],
+			message: `Are you sure you want to move "${name}" to "${newFolder}"?`,
+		});
+
+		if (result === 0) {
+			await move(oldPath, newPath);
+
+			draft.fileExplorer.tree = await listFolder(tree.path);
+		}
 	},
 });

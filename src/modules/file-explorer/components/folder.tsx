@@ -11,7 +11,37 @@ export const Folder: React.FC<{ folder: OrdoFolder }> = ({ folder }) => {
 
 	return (
 		folder && (
-			<>
+			<div
+				draggable={true}
+				onDragStart={(event: any) => {
+					event.dataTransfer.setData("oldPath", folder.path);
+					event.dataTransfer.setData("fileName", folder.readableName);
+				}}
+				onDragLeave={(event) => {
+					event.preventDefault();
+					event.stopPropagation();
+
+					event.currentTarget.classList.remove("bg-gray-300");
+				}}
+				onDragOver={(event) => {
+					event.preventDefault();
+					event.stopPropagation();
+
+					event.currentTarget.classList.add("bg-gray-300");
+				}}
+				onDrop={(event) => {
+					event.preventDefault();
+					event.stopPropagation();
+
+					const fileName = event.dataTransfer.getData("fileName");
+					const oldPath = event.dataTransfer.getData("oldPath");
+					event.dataTransfer.clearData();
+
+					window.ordo.emit("@file-explorer/move", { oldPath, newFolder: folder.path, name: fileName });
+
+					event.currentTarget.classList.remove("bg-gray-300");
+				}}
+			>
 				<div
 					style={{ paddingLeft: folder.depth * 12 + 10 + "px" }}
 					className={`flex space-x-2 items-center select-none hover:bg-neutral-300 dark:hover:bg-neutral-700 cursor-pointer`}
@@ -34,7 +64,7 @@ export const Folder: React.FC<{ folder: OrdoFolder }> = ({ folder }) => {
 						))}
 					</div>
 				)}
-			</>
+			</div>
 		)
 	);
 };

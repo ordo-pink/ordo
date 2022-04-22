@@ -12,11 +12,6 @@ export const Folder: React.FC<{ folder: OrdoFolder }> = ({ folder }) => {
 	return (
 		folder && (
 			<div
-				draggable={true}
-				onDragStart={(event: any) => {
-					event.dataTransfer.setData("oldPath", folder.path);
-					event.dataTransfer.setData("fileName", folder.readableName);
-				}}
 				onDragLeave={(event) => {
 					event.preventDefault();
 					event.stopPropagation();
@@ -49,6 +44,11 @@ export const Folder: React.FC<{ folder: OrdoFolder }> = ({ folder }) => {
 					onContextMenu={(e) =>
 						window.ordo.emit("@file-explorer/show-folder-context-menu", { path: folder.path, x: e.clientX, y: e.clientY })
 					}
+					draggable={true}
+					onDragStart={(event: any) => {
+						event.dataTransfer.setData("oldPath", folder.path);
+						event.dataTransfer.setData("fileName", folder.readableName);
+					}}
 				>
 					<Icon />
 					<FolderIcon className={`text-${folder.color}-500 dark:text-${folder.color}-300`} />

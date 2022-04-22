@@ -127,7 +127,10 @@ export const TopBar: React.FC = () => {
 					className="w-full shadow-inner text-sm rounded-xl outline-none focus:outline-1 focus:outline-neutral-400 bg-neutral-200 dark:bg-neutral-600 px-2 py-1"
 				/>
 				{isFocused && value.startsWith(">") && (
-					<div className="fixed h-[70%] cursor-default z-50 mt-1 rounded-lg flex flex-col shadow-lg w-[50%] max-w-[600px] bg-neutral-100 dark:bg-neutral-600">
+					<div
+						style={{ height: `${fusedCommands.length * 3.5}rem` }}
+						className="fixed h-[70%] cursor-default z-50 mt-1 rounded-lg flex flex-col shadow-lg w-[50%] max-w-[600px] bg-neutral-100 dark:bg-neutral-600"
+					>
 						<Scrollbars autoHide={true}>
 							<div>
 								{fusedCommands &&
@@ -149,7 +152,10 @@ export const TopBar: React.FC = () => {
 					</div>
 				)}
 				{isFocused && value.startsWith("@") && (
-					<div className="fixed h-[70%] cursor-default z-50 mt-1 rounded-lg flex flex-col shadow-lg w-[50%] max-w-[600px] bg-neutral-100 dark:bg-neutral-600">
+					<div
+						style={{ height: `${fusedFiles.length * 1.75}rem` }}
+						className="fixed max-h-[70%] cursor-default z-50 mt-1 rounded-lg flex flex-col shadow-lg w-[50%] max-w-[600px] bg-neutral-100 dark:bg-neutral-600"
+					>
 						<Scrollbars>
 							<div>
 								{fusedFiles &&

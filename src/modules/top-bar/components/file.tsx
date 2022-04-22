@@ -18,7 +18,7 @@ export const File: React.FC<{
 
 	return (
 		<div
-			className={`flex space-x-2 text-sm px-2 py-1 last-of-type:rounded-b-lg cursor-pointer select-none ${
+			className={`flex space-x-2 text-sm px-2 py-1 first-of-type:rounded-t-lg last-of-type:rounded-b-lg cursor-pointer select-none ${
 				isSelected && "bg-neutral-200 dark:bg-neutral-700"
 			}`}
 			onMouseOver={() => setSelected(index)}

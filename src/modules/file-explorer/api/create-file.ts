@@ -17,7 +17,7 @@ export const createFile = async (tree: OrdoFolder, parentPath: string, path: str
 		throw new Error(`Could not create ${parentPath} folder`);
 	}
 
-	const fullPath = join(tree.path, path);
+	const fullPath = join(parentPath, path);
 
 	if (existsSync(fullPath)) {
 		return tree;

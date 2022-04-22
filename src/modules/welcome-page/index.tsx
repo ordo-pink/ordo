@@ -39,7 +39,7 @@ const Logo: React.FC = () => {
 				style={{ position: "absolute", opacity: opacity.to({ range: [0.0, 1.0], output: [0, 1] }) }}
 				onClick={() => set(!toggle)}
 			>
-				||☑️
+				||✔
 			</animated.h1>
 		) : (
 			<animated.h1

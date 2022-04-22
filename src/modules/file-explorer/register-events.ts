@@ -1,6 +1,7 @@
 import { Colors } from "@core/appearance/colors";
 import { registerEvents } from "@core/transmission/register-ordo-events";
 import { Menu, MenuItem } from "electron";
+import { is } from "electron-util";
 import { createFile } from "./api/create-file";
 import { createFolder } from "./api/create-folder";
 import { listFolder } from "./api/list-folder";
@@ -133,7 +134,9 @@ export default registerEvents<FileExplorerEvents>({
 			}),
 		);
 
-		menu.append(new MenuItem({ type: "separator" }));
+		if (!is.windows) {
+			menu.append(new MenuItem({ type: "separator" }));
+		}
 
 		const colorOptions = Colors.slice(17).map(
 			(color) =>

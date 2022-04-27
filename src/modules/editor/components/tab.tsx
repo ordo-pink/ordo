@@ -4,8 +4,9 @@ import { findOrdoFile } from "@modules/file-explorer/utils/find-ordo-file";
 import { getFileIcon } from "@modules/file-explorer/utils/get-icon";
 import React from "react";
 import { HiX } from "react-icons/hi";
+import { Tab as TTab } from "../types";
 
-export const Tab: React.FC<{ tab: OrdoFile }> = ({ tab }) => {
+export const Tab: React.FC<{ tab: TTab }> = ({ tab }) => {
 	const currentTab = useAppSelector((state) => state.editor.currentTab);
 	const tree = useAppSelector((state) => state.fileExplorer.tree);
 
@@ -34,7 +35,7 @@ export const Tab: React.FC<{ tab: OrdoFile }> = ({ tab }) => {
 			}`}
 			onClick={(e) => {
 				e.preventDefault();
-				e.stopPropagation()
+				e.stopPropagation();
 				window.ordo.emit("@editor/open-tab", file.path);
 			}}
 			onMouseDown={(e) => (e.button === 1 ? closeTab(e) : void 0)}

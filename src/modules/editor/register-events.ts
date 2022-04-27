@@ -21,20 +21,7 @@ export default registerEvents<EditorEvents>({
 			draft.editor.tabs.push({
 				raw,
 				path: payload,
-				ranges: [
-					{
-						start: {
-							line: 1,
-							character: 0,
-						},
-						end: {
-							line: 1,
-							character: 0,
-						},
-						direction: "ltr",
-					},
-				],
-			} as OrdoFile);
+			});
 		}
 
 		draft.editor.currentTab = payload;

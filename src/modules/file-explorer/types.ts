@@ -1,7 +1,7 @@
 import { Color } from "@core/appearance/colors";
 import { int, OrdoEvent } from "@core/types";
 
-export type OrdoFile<T = any> = {
+export type OrdoFile = {
 	path: string;
 	readableName: string;
 	relativePath: string;
@@ -13,18 +13,6 @@ export type OrdoFile<T = any> = {
 	size: number;
 	readableSize: string;
 	raw?: string;
-	data?: T;
-	ranges: Array<{
-		start: {
-			line: int;
-			character: int;
-		};
-		end: {
-			line: int;
-			character: int;
-		};
-		direction: "ltr" | "rtl";
-	}>;
 	type: "image" | "document" | "file";
 };
 

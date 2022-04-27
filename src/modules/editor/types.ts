@@ -1,8 +1,10 @@
 import { OrdoEvent } from "@core/types";
 import { OrdoFile } from "@modules/file-explorer/types";
 
+export type Tab = Required<Pick<OrdoFile, "path" | "raw">>;
+
 export type EditorState = {
-	tabs: OrdoFile[];
+	tabs: Tab[];
 	currentTab: string;
 };
 

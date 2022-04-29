@@ -1,4 +1,5 @@
 import { internalSettingsStore } from "@core/settings/internal-settings";
+import { resolve } from "path";
 import { Transmission } from "@core/transmission";
 import { BrowserWindow, dialog, app, clipboard, shell, ipcMain, globalShortcut } from "electron";
 import install, { REACT_DEVELOPER_TOOLS, REDUX_DEVTOOLS } from "electron-devtools-installer";
@@ -38,7 +39,7 @@ export const createWindow = async (): Promise<void> => {
 			windows.size > 0
 				? (internalSettingsStore.get("window.position.y") as number) + 100
 				: internalSettingsStore.get("window.position.y"),
-		icon: "../assets/android-chrome-512x512.png",
+		icon: "assets/favicon.ico",
 		// titleBarStyle: "hiddenInset",
 		acceptFirstMouse: true,
 		webPreferences: {

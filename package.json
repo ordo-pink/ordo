@@ -1,8 +1,8 @@
 {
-	"name": "ordo-2",
-	"productName": "ordo-2",
+	"name": "ordo",
+	"productName": "Ordo",
 	"version": "1.0.0",
-	"description": "My Electron application description",
+	"description": "Bring Your Thoughts to Ordo",
 	"main": ".webpack/main",
 	"scripts": {
 		"commit": "gitmoji --commit",
@@ -23,7 +23,9 @@
 	"license": "MIT",
 	"config": {
 		"forge": {
-			"packagerConfig": {},
+			"packagerConfig": {
+				"icon": "./assets/favicon.ico"
+			},
 			"makers": [
 				{
 					"name": "@electron-forge/maker-squirrel",

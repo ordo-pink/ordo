@@ -31,21 +31,17 @@
 		background: transparent;
 	}
 	0% {
-		background: #db2777;
+		@apply bg-pink-700;
 	}
 }
 
 .caret {
-	position: relative;
+	@apply relative w-0;
 }
 
 .caret::before {
-	position: absolute;
+	@apply absolute w-0.5 h-full bg-pink-700 align-middle;
 	content: "";
-	width: 2px;
-	height: 1.5em;
-	vertical-align: middle;
-	background: #db2777;
 	animation: blinky 0.5s ease-in-out infinite alternative;
 	-webkit-animation: blinky 0.5s ease-in-out infinite alternate;
 }

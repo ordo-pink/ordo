@@ -3,62 +3,37 @@ import Scrollbars from "react-custom-scrollbars-2";
 import { useCurrentTab } from "@modules/editor/hooks/use-current-tab";
 import { Breadcrumbs } from "@modules/editor/components/breadcrumbs";
 import { LineNumber } from "./line-number";
+import { handleTyping, openTab, updateCaretPositions, useEditorDispatch, useEditorSelector } from "../state";
 
-export const TextEditor = React.memo(
+export const TextEditor: React.FC = () => {
+	return (
+		<div className="h-full">
+			<Breadcrumbs />
+			<Scrollbars autoHide onUpdate={() => {}}>
+				<Lines />
+			</Scrollbars>
+		</div>
+	);
+};
+
+const Lines = React.memo(
 	() => {
+		const dispatch = useEditorDispatch();
 		const { tab } = useCurrentTab();
-		const [lines, setLines] = React.useState<string[]>([]);
-		const [caretPositions, setCaretPositions] = React.useState([
-			{
-				start: {
-					line: 0,
-					character: 0,
-				},
-				end: {
-					line: 0,
-					character: 0,
-				},
-				direction: "ltr",
-			},
-		]);
-
-		const updateCaretPosition = React.useCallback(
-			(index: number, position: any) => {
-				const caretPositionsCopy = [...caretPositions];
-				caretPositionsCopy[index] = position;
-				setCaretPositions(caretPositionsCopy);
-			},
-			[caretPositions],
-		);
+		const tabs = useEditorSelector((state) => state.editor.tabs);
 
 		React.useEffect(() => {
-			if (tab && tab.raw != null) {
-				setLines(tab.raw.split("\n").map((line) => line.concat(" ")));
+			if (tab) {
+				dispatch(openTab(tab));
 			}
-		}, [tab, tab?.path]);
+		}, [tab]);
 
-		const handleKeyDown = React.useCallback(
-			(e: React.KeyboardEvent) => {
-				const linesCopy = [...lines];
-				const currentLine = linesCopy[caretPositions[0].start.line];
-
-				const newLine =
-					currentLine.slice(0, caretPositions[0].start.character) +
-					e.key +
-					currentLine.slice(caretPositions[0].start.character);
-
-				linesCopy[caretPositions[0].start.line] = newLine;
-
-				updateCaretPosition(0, {
-					start: { line: caretPositions[0].start.line, character: caretPositions[0].start.character + 1 },
-					end: { line: caretPositions[0].start.line, character: caretPositions[0].start.character + 1 },
-					direction: "ltr",
-				});
-
-				setLines(linesCopy);
-			},
-			[lines, tab?.path, caretPositions],
-		);
+		const handleKeyDown = ({ key, altKey, shiftKey, ctrlKey, metaKey }: React.KeyboardEvent) => {
+			tab &&
+				dispatch(
+					handleTyping({ path: tab.path, event: { key, shiftKey, altKey, ctrlKey, metaKey } as React.KeyboardEvent }),
+				);
+		};
 
 		React.useEffect(() => {
 			window.addEventListener("keydown", handleKeyDown as any);
@@ -66,109 +41,130 @@ export const TextEditor = React.memo(
 			return () => {
 				window.removeEventListener("keydown", handleKeyDown as any);
 			};
-		}, [handleKeyDown]);
+		}, [tab]);
+
+		if (!tab) return null;
+
+		const currentTab = tabs.find((t) => t.path === tab.path);
+
+		if (!currentTab || !currentTab.lines) return null;
 
 		return (
-			tab && (
-				<div className="h-full">
-					<Breadcrumbs />
-					{/* <Scrollbars autoHide={true}> */}
-					<div
-						className="outline-none select-none cursor-text min-h-full pb-96"
-						onClick={(e) => {
-							e.preventDefault();
-							e.stopPropagation();
+			<div
+				className="outline-none select-none cursor-text pb-[calc(50vh-9.5rem)]"
+				onClick={(e) => {
+					e.preventDefault();
+					e.stopPropagation();
 
-							updateCaretPosition(0, {
-								start: { line: lines.length - 1, character: lines[lines.length - 1].length - 1 },
-								end: { line: lines.length - 1, character: lines[lines.length - 1].length - 1 },
-								direction: "ltr",
-							});
-						}}
-					>
-						{lines.map((line, index) => (
-							<Line
-								key={`${line}-${index}`}
-								index={index}
-								line={line}
-								caretPositions={caretPositions}
-								updateCaretPosition={updateCaretPosition}
-							/>
-						))}
-					</div>
-					{/* </Scrollbars> */}
-				</div>
-			)
-		);
-	},
-	() => true,
-);
-
-const Line = React.memo(
-	({ index, line, caretPositions, updateCaretPosition }: any) => {
-		const ref = React.useRef<HTMLDivElement>(null);
-
-		return (
-			<div className="flex items-center">
-				<LineNumber number={index + 1} />
-				<div
-					ref={ref}
-					className="px-2 w-full"
-					onClick={(e) => {
-						e.preventDefault();
-						e.stopPropagation();
-
-						updateCaretPosition(0, {
-							start: { line: index, character: line.length - 1 },
-							end: { line: index, character: line.length - 1 },
-							direction: "ltr",
-						});
-					}}
-				>
-					{line.split("").map((char: any, charIndex: number) =>
-						index === caretPositions[0].start.line && charIndex === caretPositions[0].start.character ? (
-							<span key={`${index}-${charIndex}`}>
-								<Caret />
-								<Char lineIndex={index} charIndex={charIndex} char={char} updateCaretPosition={updateCaretPosition} />
-							</span>
-						) : (
-							<Char
-								key={`${index}-${charIndex}`}
-								lineIndex={index}
-								charIndex={charIndex}
-								char={char}
-								updateCaretPosition={updateCaretPosition}
-							/>
-						),
-					)}
-				</div>
+					dispatch(
+						updateCaretPositions({
+							path: tab.path,
+							positions: [
+								{
+									start: {
+										line: currentTab.lines.length - 1,
+										character: currentTab.lines[currentTab.lines.length - 1].length - 1,
+									},
+									end: {
+										line: currentTab.lines.length - 1,
+										character: currentTab.lines[currentTab.lines.length - 1].length - 1,
+									},
+									direction: "ltr",
+								},
+							],
+						}),
+					);
+				}}
+			>
+				{currentTab.lines &&
+					currentTab.lines.map((line, index) => <Line key={`${line}-${index}`} index={index} line={line} />)}
 			</div>
 		);
 	},
 	() => true,
 );
 
-export const Char: React.FC<any> = React.memo(
-	({ char, lineIndex, charIndex, updateCaretPosition }: any): any => {
-		return (
+const Line = ({ index, line }: any) => {
+	const dispatch = useEditorDispatch();
+	const { tab } = useCurrentTab();
+	const tabs = useEditorSelector((state) => state.editor.tabs);
+	const ref = React.useRef<HTMLDivElement>(null);
+
+	if (!tab) return null;
+	const currentTab = tabs.find((t) => t.path === tab.path);
+	if (!currentTab) return null;
+
+	return (
+		<div className="flex items-center w-full">
+			<LineNumber number={index + 1} />
+			<div
+				ref={ref}
+				className="px-2 w-full leading-5 whitespace-pre tracking-wide"
+				onClick={(e) => {
+					e.preventDefault();
+					e.stopPropagation();
+
+					dispatch(
+						updateCaretPositions({
+							path: tab.path,
+							positions: [
+								{
+									start: { line: index, character: line.length - 1 },
+									end: { line: index, character: line.length - 1 },
+									direction: "ltr",
+								},
+							],
+						}),
+					);
+				}}
+			>
+				{line.split("").map((char: any, charIndex: number) => (
+					<Char key={`${index}-${charIndex}`} lineIndex={index} charIndex={charIndex} char={char} />
+				))}
+			</div>
+		</div>
+	);
+};
+
+export const Char: React.FC<any> = ({ char, lineIndex, charIndex }: any): any => {
+	const dispatch = useEditorDispatch();
+	const { tab } = useCurrentTab();
+	const tabs = useEditorSelector((state) => state.editor.tabs);
+
+	if (!tab) return null;
+	const currentTab = tabs.find((t) => t.path === tab.path);
+	if (!currentTab) return null;
+
+	return (
+		<>
+			{lineIndex === currentTab.caretPositions[0].start.line &&
+			charIndex === currentTab.caretPositions[0].start.character ? (
+				<Caret />
+			) : null}
 			<span
 				onClick={(e) => {
 					e.preventDefault();
 					e.stopPropagation();
 
-					updateCaretPosition(0, {
-						start: { line: lineIndex, character: charIndex },
-						end: { line: lineIndex, character: charIndex },
-						direction: "ltr",
-					});
+					dispatch(
+						updateCaretPositions({
+							path: tab.path,
+							positions: [
+								{
+									start: { line: lineIndex, character: charIndex },
+									end: { line: lineIndex, character: charIndex },
+									direction: "ltr",
+								},
+							],
+						}),
+					);
 				}}
 			>
 				{char}
 			</span>
-		);
-	},
-	() => true,
-);
+		</>
+	);
+};
 
 export const Caret = React.memo(
 	() => {

@@ -51,7 +51,7 @@ export const TextEditor: React.FC = () => {
 					);
 				}}
 			>
-				<Scrollbars autoHide onUpdate={() => {}}>
+				<Scrollbars autoHide>
 					<Lines />
 				</Scrollbars>
 			</div>

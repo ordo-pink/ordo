@@ -2,6 +2,7 @@ import { Color } from "@core/appearance/colors";
 
 export type InternalSettings = {
 	separator: string;
+	platform: "aix" | "darwin" | "freebsd" | "linux" | "openbsd" | "sunos" | "win32";
 	window: {
 		width: number;
 		height: number;

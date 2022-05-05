@@ -7,6 +7,10 @@ export const internalSettingsSchema: Schema<InternalSettings> = {
 		type: "string",
 		default: sep,
 	},
+	platform: {
+		type: "string",
+		default: process.platform,
+	},
 	window: {
 		type: "object",
 		properties: {

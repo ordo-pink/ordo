@@ -49,7 +49,7 @@ export const editorSlice = createSlice({
 			const tabIndex = state.tabs.findIndex((t) => t.path === action.payload);
 			tabIndex >= 0 && state.tabs.splice(tabIndex, 1);
 		},
-		handleTyping: (state, action: PayloadAction<{ path: string; event: React.KeyboardEvent }>) => {
+		handleTyping: (state, action: PayloadAction<{ path: string; event: KeyboardEvent }>) => {
 			const tab = state.tabs.find((t) => t.path === action.payload.path);
 
 			if (!tab) return;

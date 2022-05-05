@@ -117,6 +117,8 @@ export const editorSlice = createSlice({
 				tab.caretPositions[0].start.character++;
 				tab.caretPositions[0].end.character = tab.caretPositions[0].start.character;
 			}
+
+			window.ordo.emit("@file-explorer/save-file", { path: tab.path, content: [...tab.lines] });
 		},
 		updateCaretPositions: (state, action: PayloadAction<{ path: string; positions: CaretRange[] }>) => {
 			const tab = state.tabs.find((t) => t.path === action.payload.path);

@@ -18,6 +18,7 @@ module.exports = {
 			"@components": resolve("./src/components"),
 			"@init": resolve("./src/init"),
 			"@modules": resolve("./src/modules"),
+			"@utils": resolve("./src/utils"),
 		},
 	},
 };

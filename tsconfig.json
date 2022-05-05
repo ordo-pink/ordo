@@ -23,6 +23,7 @@
 			"@modules/*": ["src/modules/*"],
 			"@components/*": ["src/components/*"],
 			"@init/*": ["src/init/*"],
+			"@utils/*": ["src/utils/*"],
 			"*": ["node_modules/*"]
 		}
 	},

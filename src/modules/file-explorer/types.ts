@@ -76,11 +76,13 @@ export type ShowFileContextMenu = OrdoEvent<
 	"show-file-context-menu",
 	{ path: string; x: number; y: number }
 >;
-export type ShowFolderContextMenu = OrdoEvent<
+export type ShowFolderContextMenuEvent = OrdoEvent<
 	FILE_EXPLORER_SCOPE,
 	"show-folder-context-menu",
 	{ path: string; x: number; y: number }
 >;
+
+export type SaveFileEvent = OrdoEvent<FILE_EXPLORER_SCOPE, "save-file", { path: string; content: string[] }>;
 
 export type FileExplorerEvents = CreateFileEvent &
 	CreateFolderEvent &
@@ -102,4 +104,5 @@ export type FileExplorerEvents = CreateFileEvent &
 	SetFolderColorEvent &
 	RevealInFinderEvent &
 	CopyPathEvent &
-	ShowFolderContextMenu;
+	SaveFileEvent &
+	ShowFolderContextMenuEvent;

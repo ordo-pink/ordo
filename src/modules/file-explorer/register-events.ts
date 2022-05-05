@@ -11,6 +11,10 @@ import { FileExplorerEvents } from "./types";
 import { findOrdoFile } from "./utils/find-ordo-file";
 import { findOrdoFolder } from "./utils/find-ordo-folder";
 import { join } from "path";
+import { saveFile } from "./api/save-file";
+import { debounce } from "@utils/debounce";
+
+const debounceSave = debounce((path: string, content: string) => saveFile(path, content));
 
 export default registerEvents<FileExplorerEvents>({
 	"@file-explorer/list-folder": async ({ draft, payload }) => {
@@ -267,5 +271,11 @@ export default registerEvents<FileExplorerEvents>({
 
 			draft.fileExplorer.tree = await listFolder(tree.path);
 		}
+	},
+	"@file-explorer/save-file": async ({ draft, payload }) => {
+		const contentString = payload.content.map((line) => line.slice(0, -1)).join("\n");
+		await debounceSave(payload.path, contentString);
+
+		draft.fileExplorer.tree = await listFolder(draft.fileExplorer.tree.path);
 	},
 });

@@ -88,10 +88,22 @@ export const editorSlice = createSlice({
 					tab.lines[tab.caretPositions[0].start.line].slice(0, tab.caretPositions[0].start.character) +
 					tab.lines[tab.caretPositions[0].start.line].slice(tab.caretPositions[0].start.character + 1);
 			} else if (action.payload.event.key === "Backspace") {
-				tab.lines[tab.caretPositions[0].start.line] =
-					tab.lines[tab.caretPositions[0].start.line].slice(0, tab.caretPositions[0].start.character - 1) +
-					tab.lines[tab.caretPositions[0].start.line].slice(tab.caretPositions[0].start.character);
-				tab.caretPositions[0].start.character--;
+				if (tab.caretPositions[0].start.character === 0) {
+					if (tab.caretPositions[0].start.line === 0) {
+						return;
+					}
+
+					tab.caretPositions[0].start.character = tab.lines[tab.caretPositions[0].start.line - 1].length - 1;
+					tab.lines[tab.caretPositions[0].start.line - 1] =
+						tab.lines[tab.caretPositions[0].start.line - 1].slice(0, -1) + currentLine;
+					tab.lines.splice(tab.caretPositions[0].start.line, 1);
+					tab.caretPositions[0].start.line--;
+				} else {
+					tab.lines[tab.caretPositions[0].start.line] =
+						tab.lines[tab.caretPositions[0].start.line].slice(0, tab.caretPositions[0].start.character - 1) +
+						tab.lines[tab.caretPositions[0].start.line].slice(tab.caretPositions[0].start.character);
+					tab.caretPositions[0].start.character--;
+				}
 			} else if (action.payload.event.key === "Enter") {
 				let lineContent = " ";
 

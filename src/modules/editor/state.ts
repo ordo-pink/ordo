@@ -83,6 +83,48 @@ export const editorSlice = createSlice({
 				action.payload.event.key === "Pause"
 			) {
 				return;
+			} else if (action.payload.event.key === "ArrowRight") {
+				if (tab.caretPositions[0].start.character === currentLine.length - 1) {
+					if (tab.caretPositions[0].start.line === tab.lines.length - 1) {
+						return;
+					}
+
+					tab.caretPositions[0].start.line++;
+					tab.caretPositions[0].start.character = 0;
+				} else {
+					tab.caretPositions[0].start.character++;
+				}
+			} else if (action.payload.event.key === "ArrowLeft") {
+				if (tab.caretPositions[0].start.character === 0) {
+					if (tab.caretPositions[0].start.line === 0) {
+						return;
+					}
+
+					tab.caretPositions[0].start.line--;
+					tab.caretPositions[0].start.character = tab.lines[tab.caretPositions[0].start.line].length - 1;
+				} else {
+					tab.caretPositions[0].start.character--;
+				}
+			} else if (action.payload.event.key === "ArrowUp") {
+				if (tab.caretPositions[0].start.line === 0) {
+					return;
+				}
+
+				tab.caretPositions[0].start.line--;
+
+				if (tab.lines[tab.caretPositions[0].start.line].length <= tab.caretPositions[0].start.character) {
+					tab.caretPositions[0].start.character = tab.lines[tab.caretPositions[0].start.line].length - 1;
+				}
+			} else if (action.payload.event.key === "ArrowDown") {
+				if (tab.caretPositions[0].start.line === tab.lines.length - 1) {
+					return;
+				}
+
+				tab.caretPositions[0].start.line++;
+
+				if (tab.lines[tab.caretPositions[0].start.line].length <= tab.caretPositions[0].start.character) {
+					tab.caretPositions[0].start.character = tab.lines[tab.caretPositions[0].start.line].length - 1;
+				}
 			} else if (action.payload.event.key === "Delete") {
 				tab.lines[tab.caretPositions[0].start.line] =
 					tab.lines[tab.caretPositions[0].start.line].slice(0, tab.caretPositions[0].start.character) +

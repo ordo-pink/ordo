@@ -274,8 +274,6 @@ export default registerEvents<FileExplorerEvents>({
 	},
 	"@file-explorer/save-file": async ({ draft, payload }) => {
 		const contentString = payload.content.map((line) => line.slice(0, -1)).join("\n");
-		await debounceSave(payload.path, contentString);
-
-		draft.fileExplorer.tree = await listFolder(draft.fileExplorer.tree.path);
+		debounceSave(payload.path, contentString);
 	},
 });

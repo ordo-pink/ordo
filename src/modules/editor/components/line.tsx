@@ -3,22 +3,65 @@ import { useCurrentTab } from "@modules/editor/hooks/use-current-tab";
 import { useEditorDispatch, useEditorSelector, updateCaretPositions } from "@modules/editor/state";
 import { LineNumber } from "@modules/editor/components/line-number";
 import { Char } from "@modules/editor/components/char";
+import { Switch } from "or-else";
 
 export const Line = React.memo(
-	({ index, line }: any) => {
+	({ index, line }: { index: number; line: string }) => {
 		const dispatch = useEditorDispatch();
 		const { tab } = useCurrentTab();
 		const tabs = useEditorSelector((state) => state.editor.tabs);
+		const [markup, setMarkup] = React.useState<any>({ type: "paragraph", children: [] });
+
+		React.useEffect(() => {
+			setMarkup({
+				type: Switch.of(line)
+					.case(
+						(x) => x.startsWith("# ") && x.length > 2,
+						() => "heading1",
+					)
+					.case(
+						(x) => x.startsWith("## ") && x.length > 3,
+						() => "heading2",
+					)
+					.case(
+						(x) => x.startsWith("### ") && x.length > 4,
+						() => "heading3",
+					)
+					.case(
+						(x) => x.startsWith("#### ") && x.length > 5,
+						() => "heading4",
+					)
+					.case(
+						(x) => x.startsWith("##### ") && x.length > 6,
+						() => "heading5",
+					)
+					.case(
+						(x) => x.startsWith("> ") && x.length > 2,
+						() => "blockquote",
+					)
+					.default(() => "paragraph")(),
+				children: line.split(""),
+			});
+		}, []);
 
 		if (!tab) return null;
 		const currentTab = tabs.find((t) => t.path === tab.path);
 		if (!currentTab) return null;
 
+		const className = Switch.of(markup.type)
+			.case("heading1", "font-bold text-4xl")
+			.case("heading2", "font-bold text-3xl")
+			.case("heading3", "font-bold text-2xl")
+			.case("heading4", "font-bold text-xl")
+			.case("heading5", "font-bold text-lg")
+			.case("blockquote", "border-l-2 border-neutral-500 p-2 mx-2")
+			.default("");
+
 		return (
-			<div className="flex items-center w-full">
+			<div className={`flex items-center align-middle w-full`}>
 				<LineNumber number={index + 1} />
 				<div
-					className="px-2 w-full leading-5 whitespace-pre tracking-wide"
+					className={`px-2 w-full whitespace-pre tracking-wide  ${className}`}
 					onClick={(e) => {
 						e.preventDefault();
 						e.stopPropagation();
@@ -37,7 +80,7 @@ export const Line = React.memo(
 						);
 					}}
 				>
-					{line.split("").map((char: any, charIndex: number) => (
+					{markup.children.map((char: any, charIndex: number) => (
 						<Char key={`${index}-${charIndex}`} lineIndex={index} charIndex={charIndex} char={char} />
 					))}
 				</div>

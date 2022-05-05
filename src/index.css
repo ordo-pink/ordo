@@ -22,7 +22,7 @@
 		background: transparent;
 	}
 	0% {
-		background: #db2777;
+		@apply bg-pink-700;
 	}
 }
 
@@ -35,6 +35,24 @@
 	}
 }
 
+@keyframes unfocused {
+	100% {
+		background: transparent;
+	}
+	0% {
+		@apply bg-neutral-700;
+	}
+}
+
+@-webkit-keyframes unfocused {
+	100% {
+		background: transparent;
+	}
+	0% {
+		@apply bg-neutral-700;
+	}
+}
+
 .caret {
 	@apply relative w-0;
 }
@@ -44,6 +62,17 @@
 	content: "";
 	animation: blinky 0.5s ease-in-out infinite alternative;
 	-webkit-animation: blinky 0.5s ease-in-out infinite alternate;
+}
+
+.caret-unfocused {
+	@apply relative w-0;
+}
+
+.caret-unfocused::before {
+	@apply absolute w-0.5 h-full bg-neutral-700 align-middle;
+	content: "";
+	animation: unfocused 0.5s ease-in-out infinite alternative;
+	-webkit-animation: unfocused 0.5s ease-in-out infinite alternate;
 }
 
 .editor-selection {

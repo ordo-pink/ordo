@@ -20,10 +20,12 @@ type EditorTab = Tab & {
 };
 
 type EditorState = {
+	focused: boolean;
 	tabs: EditorTab[];
 };
 
 export const initialState: EditorState = {
+	focused: true,
 	tabs: [],
 };
 
@@ -31,6 +33,12 @@ export const editorSlice = createSlice({
 	name: "editor",
 	initialState,
 	reducers: {
+		focusEditor: (state) => {
+			state.focused = true;
+		},
+		unfocusEditor: (state) => {
+			state.focused = false;
+		},
 		openTab: (state, action: PayloadAction<Tab>) => {
 			state.tabs.push({
 				path: action.payload.path,
@@ -50,6 +58,10 @@ export const editorSlice = createSlice({
 			tabIndex >= 0 && state.tabs.splice(tabIndex, 1);
 		},
 		handleTyping: (state, action: PayloadAction<{ path: string; event: KeyboardEvent }>) => {
+			if (!state.focused) {
+				return;
+			}
+
 			const tab = state.tabs.find((t) => t.path === action.payload.path);
 
 			if (!tab) return;
@@ -194,7 +206,8 @@ export const editorStore = configureStore({
 export type EditorRootState = ReturnType<typeof editorStore.getState>;
 export type EditorDispatch = typeof editorStore.dispatch;
 
-export const { openTab, closeTab, handleTyping, updateCaretPositions } = editorSlice.actions;
+export const { openTab, closeTab, handleTyping, updateCaretPositions, focusEditor, unfocusEditor } =
+	editorSlice.actions;
 
 export const editorContext = React.createContext(initialState);
 export const useEditorDispatch = createDispatchHook<EditorDispatch>(editorContext as any);

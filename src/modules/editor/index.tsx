@@ -6,8 +6,6 @@ import { useCurrentTab } from "@modules/editor/hooks/use-current-tab";
 import { EmptyEditor } from "@modules/editor/components/empty-editor";
 import { TextEditor } from "@modules/editor/components/text-editor";
 import { Tabs } from "@modules/editor/components/tabs";
-import { Provider } from "react-redux";
-import { editorContext, editorStore } from "./state";
 
 export const Editor: React.FC = () => {
 	const { file } = useCurrentTab();
@@ -20,9 +18,9 @@ export const Editor: React.FC = () => {
 	}
 
 	return (
-		<Provider store={editorStore} context={editorContext as any}>
+		<>
 			<Tabs />
 			<Component />
-		</Provider>
+		</>
 	);
 };

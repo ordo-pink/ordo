@@ -1,16 +1,18 @@
 import { useAppSelector } from "@core/state/store";
 import React from "react";
 import Scrollbars from "react-custom-scrollbars-2";
-import { Command } from "./components/command";
+import { Command } from "@modules/top-bar/components/command";
 import Fuse from "fuse.js";
 import { collectFiles } from "@modules/file-explorer/utils/collect-files";
-import { File } from "./components/file";
+import { File } from "@modules/top-bar/components/file";
+import { focusEditor, unfocusEditor, useEditorDispatch } from "@modules/editor/state";
 
 export const TopBar: React.FC = () => {
 	const value = useAppSelector((state) => state.topBar.value);
 	const isFocused = useAppSelector((state) => state.topBar.focused);
 	const items = useAppSelector((state) => state.app.commands);
 	const tree = useAppSelector((state) => state.fileExplorer.tree);
+	const dispatch = useEditorDispatch();
 
 	const [selected, setSelected] = React.useState(0);
 	const [files, setFiles] = React.useState<any[]>([]);
@@ -92,6 +94,7 @@ export const TopBar: React.FC = () => {
 					type="text"
 					value={value}
 					onFocus={() => {
+						dispatch(unfocusEditor());
 						window.ordo.emit("@top-bar/focus", null);
 					}}
 					onChange={(e) => {
@@ -99,6 +102,7 @@ export const TopBar: React.FC = () => {
 						setSelected(0);
 					}}
 					onBlur={() => {
+						dispatch(focusEditor());
 						setTimeout(() => window.ordo.emit("@top-bar/unfocus", null), 100);
 					}}
 					onKeyDown={(e) => {

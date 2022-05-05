@@ -212,7 +212,9 @@ export const Char = React.memo(
 
 export const Caret = React.memo(
 	() => {
-		return <span className="caret"></span>;
+		const focused = useEditorSelector((state) => state.editor.focused);
+		const className = focused ? "caret" : "caret-unfocused";
+		return <span className={className}></span>;
 	},
 	() => true,
 );

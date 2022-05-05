@@ -5,14 +5,16 @@ import { Command } from "@modules/top-bar/components/command";
 import Fuse from "fuse.js";
 import { collectFiles } from "@modules/file-explorer/utils/collect-files";
 import { File } from "@modules/top-bar/components/file";
-import { focusEditor, unfocusEditor, useEditorDispatch } from "@modules/editor/state";
+import { focusEditor, unfocusEditor, updateCaretPositions, useEditorDispatch } from "@modules/editor/state";
 
 export const TopBar: React.FC = () => {
+	const dispatch = useEditorDispatch();
+
 	const value = useAppSelector((state) => state.topBar.value);
 	const isFocused = useAppSelector((state) => state.topBar.focused);
 	const items = useAppSelector((state) => state.app.commands);
 	const tree = useAppSelector((state) => state.fileExplorer.tree);
-	const dispatch = useEditorDispatch();
+	const currentTab = useAppSelector((state) => state.editor.currentTab);
 
 	const [selected, setSelected] = React.useState(0);
 	const [files, setFiles] = React.useState<any[]>([]);
@@ -100,6 +102,22 @@ export const TopBar: React.FC = () => {
 					onChange={(e) => {
 						window.ordo.emit("@top-bar/set-value", e.target.value);
 						setSelected(0);
+
+						if (e.target.value.startsWith(":") || Boolean(currentTab)) {
+							const split = e.target.value.slice(1).split(":");
+							dispatch(
+								updateCaretPositions({
+									path: currentTab,
+									positions: [
+										{
+											start: { line: Number(split[0]) - 1, character: split[1] ? Number(split[1]) : 0 },
+											end: { line: Number(split[0]) - 1, character: split[1] ? Number(split[1]) : 0 },
+											direction: "ltr",
+										},
+									],
+								}),
+							);
+						}
 					}}
 					onBlur={() => {
 						dispatch(focusEditor());

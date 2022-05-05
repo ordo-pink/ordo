@@ -1,6 +1,6 @@
 import { createSlice, configureStore, PayloadAction } from "@reduxjs/toolkit";
 import React from "react";
-import { createDispatchHook, createSelectorHook, TypedUseSelectorHook, useDispatch, useSelector } from "react-redux";
+import { createDispatchHook, createSelectorHook, TypedUseSelectorHook } from "react-redux";
 import { Tab } from "./types";
 
 type CaretPosition = {
@@ -120,6 +120,10 @@ export const editorSlice = createSlice({
 				tab.caretPositions[0].start.line++;
 				tab.caretPositions[0].start.character = 0;
 			} else {
+				if (action.payload.event.ctrlKey || action.payload.event.altKey || action.payload.event.metaKey) {
+					return;
+				}
+
 				const newLine =
 					currentLine.slice(0, tab.caretPositions[0].start.character) +
 					(action.payload.event.shiftKey ? action.payload.event.key.toUpperCase() : action.payload.event.key) +

@@ -1,18 +1,22 @@
 import React from "react";
+
 import { useCurrentTab } from "@modules/editor/hooks/use-current-tab";
-import { useEditorDispatch, useEditorSelector, handleTyping, updateCaretPositions } from "@modules/editor/state";
 import { Line } from "@modules/editor/components/line";
 
 export const Lines = React.memo(
 	() => {
-		const dispatch = useEditorDispatch();
 		const { tab } = useCurrentTab();
-		const tabs = useEditorSelector((state) => state.editor.tabs);
 
-		const handleKeyDown = ({ key, altKey, shiftKey, ctrlKey, metaKey }: KeyboardEvent) => {
-			tab &&
-				dispatch(handleTyping({ path: tab.path, event: { key, shiftKey, altKey, ctrlKey, metaKey } as KeyboardEvent }));
-		};
+		const handleKeyDown = React.useCallback(
+			({ key, altKey, shiftKey, ctrlKey, metaKey }: KeyboardEvent) => {
+				tab &&
+					window.ordo.emit("@editor/handle-typing", {
+						path: tab.path,
+						event: { key, shiftKey, altKey, ctrlKey, metaKey } as KeyboardEvent,
+					});
+			},
+			[tab],
+		);
 
 		React.useEffect(() => {
 			window.addEventListener("keydown", handleKeyDown);
@@ -22,11 +26,9 @@ export const Lines = React.memo(
 			};
 		}, [tab]);
 
-		if (!tab) return null;
-
-		const currentTab = tabs.find((t) => t.path === tab.path);
-
-		if (!currentTab || !currentTab.lines) return null;
+		if (!tab) {
+			return null;
+		}
 
 		return (
 			<div
@@ -35,28 +37,25 @@ export const Lines = React.memo(
 					e.preventDefault();
 					e.stopPropagation();
 
-					dispatch(
-						updateCaretPositions({
-							path: tab.path,
-							positions: [
-								{
-									start: {
-										line: currentTab.lines.length - 1,
-										character: currentTab.lines[currentTab.lines.length - 1].length - 1,
-									},
-									end: {
-										line: currentTab.lines.length - 1,
-										character: currentTab.lines[currentTab.lines.length - 1].length - 1,
-									},
-									direction: "ltr",
+					window.ordo.emit("@editor/update-caret-positions", {
+						path: tab.path,
+						positions: [
+							{
+								start: {
+									line: tab.lines.length - 1,
+									character: tab.lines[tab.lines.length - 1].length - 1,
 								},
-							],
-						}),
-					);
+								end: {
+									line: tab.lines.length - 1,
+									character: tab.lines[tab.lines.length - 1].length - 1,
+								},
+								direction: "ltr",
+							},
+						],
+					});
 				}}
 			>
-				{currentTab.lines &&
-					currentTab.lines.map((line, index) => <Line key={`${line}-${index}`} index={index} line={line} />)}
+				{tab.lines && tab.lines.map((line, index) => <Line key={`${line}-${index}`} index={index} line={line} />)}
 			</div>
 		);
 	},

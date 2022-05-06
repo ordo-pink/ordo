@@ -1,22 +1,19 @@
 import React from "react";
+
 import { useCurrentTab } from "@modules/editor/hooks/use-current-tab";
-import { useEditorDispatch, useEditorSelector, updateCaretPositions } from "@modules/editor/state";
 import { Caret } from "@modules/editor/components/caret";
 
 export const Char = React.memo(
 	({ char, lineIndex, charIndex }: any): any => {
-		const dispatch = useEditorDispatch();
 		const { tab } = useCurrentTab();
-		const tabs = useEditorSelector((state) => state.editor.tabs);
 
-		if (!tab) return null;
-		const currentTab = tabs.find((t) => t.path === tab.path);
-		if (!currentTab) return null;
+		if (!tab) {
+			return;
+		}
 
 		return (
 			<>
-				{lineIndex === currentTab.caretPositions[0].start.line &&
-				charIndex === currentTab.caretPositions[0].start.character ? (
+				{lineIndex === tab.caretPositions[0].start.line && charIndex === tab.caretPositions[0].start.character ? (
 					<Caret />
 				) : null}
 				<span
@@ -24,18 +21,16 @@ export const Char = React.memo(
 						e.preventDefault();
 						e.stopPropagation();
 
-						dispatch(
-							updateCaretPositions({
-								path: tab.path,
-								positions: [
-									{
-										start: { line: lineIndex, character: charIndex },
-										end: { line: lineIndex, character: charIndex },
-										direction: "ltr",
-									},
-								],
-							}),
-						);
+						window.ordo.emit("@editor/update-caret-positions", {
+							path: tab.path,
+							positions: [
+								{
+									start: { line: lineIndex, character: charIndex },
+									end: { line: lineIndex, character: charIndex },
+									direction: "ltr",
+								},
+							],
+						});
 					}}
 				>
 					{char}

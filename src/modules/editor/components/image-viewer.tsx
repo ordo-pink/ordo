@@ -1,4 +1,5 @@
 import React from "react";
+
 import { useCurrentTab } from "@modules/editor/hooks/use-current-tab";
 
 export const ImageViewer: React.FC = () => {

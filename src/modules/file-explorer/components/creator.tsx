@@ -1,10 +1,8 @@
 import React from "react";
 
 import { useAppSelector } from "@core/state/store";
-import { focusEditor, unfocusEditor, useEditorDispatch } from "@modules/editor/state";
 
 export const Creator: React.FC<{ path: string; depth: number }> = ({ path, depth }) => {
-	const dispatch = useEditorDispatch();
 	const { createFileIn, createFolderIn } = useAppSelector((state) => state.fileExplorer);
 	const [name, setName] = React.useState("");
 
@@ -24,10 +22,10 @@ export const Creator: React.FC<{ path: string; depth: number }> = ({ path, depth
 					value={name}
 					onChange={(e) => setName(e.target.value)}
 					onFocus={() => {
-						dispatch(unfocusEditor());
+						window.ordo.emit("@editor/unfocus", null);
 					}}
 					onBlur={() => {
-						dispatch(focusEditor());
+						window.ordo.emit("@editor/focus", null);
 						window.ordo.emit("@file-explorer/hide-creation", null);
 						setName("");
 					}}
@@ -36,7 +34,7 @@ export const Creator: React.FC<{ path: string; depth: number }> = ({ path, depth
 							window.ordo.emit(createFileIn ? "@file-explorer/create-file" : "@file-explorer/create-folder", name);
 							setName("");
 						} else if (e.key === "Escape") {
-							dispatch(focusEditor());
+							window.ordo.emit("@editor/focus", null);
 							window.ordo.emit("@file-explorer/hide-creation", null);
 							setName("");
 						}

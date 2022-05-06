@@ -1,10 +1,25 @@
 import { OrdoEvent } from "@core/types";
 import { OrdoFile } from "@modules/file-explorer/types";
 
-export type Tab = Required<Pick<OrdoFile, "path" | "raw">>;
+export type CaretPosition = {
+	line: number;
+	character: number;
+};
+
+export type CaretRange = {
+	start: CaretPosition;
+	end: CaretPosition;
+	direction: "ltr" | "rtl";
+};
+
+export type EditorTab = Required<Pick<OrdoFile, "path" | "raw">> & {
+	lines: string[];
+	caretPositions: CaretRange[];
+};
 
 export type EditorState = {
-	tabs: Tab[];
+	focused: boolean;
+	tabs: EditorTab[];
 	currentTab: string;
 };
 
@@ -12,5 +27,18 @@ export type EDITOR_SCOPE = "editor";
 
 export type OpenTabEvent = OrdoEvent<EDITOR_SCOPE, "open-tab", string>;
 export type CloseTabEvent = OrdoEvent<EDITOR_SCOPE, "close-tab", string>;
+export type FocusEvent = OrdoEvent<EDITOR_SCOPE, "focus">;
+export type UnfocusEvent = OrdoEvent<EDITOR_SCOPE, "unfocus">;
+export type HandleTypingEvent = OrdoEvent<EDITOR_SCOPE, "handle-typing", { path: string; event: KeyboardEvent }>;
+export type UpdateCaretPositionsEvent = OrdoEvent<
+	EDITOR_SCOPE,
+	"update-caret-positions",
+	{ path: string; positions: CaretRange[] }
+>;
 
-export type EditorEvents = OpenTabEvent & CloseTabEvent;
+export type EditorEvents = OpenTabEvent &
+	CloseTabEvent &
+	FocusEvent &
+	UnfocusEvent &
+	HandleTypingEvent &
+	UpdateCaretPositionsEvent;

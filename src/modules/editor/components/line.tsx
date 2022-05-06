@@ -1,15 +1,13 @@
 import React from "react";
+import { Switch } from "or-else";
+
 import { useCurrentTab } from "@modules/editor/hooks/use-current-tab";
-import { useEditorDispatch, useEditorSelector, updateCaretPositions } from "@modules/editor/state";
 import { LineNumber } from "@modules/editor/components/line-number";
 import { Char } from "@modules/editor/components/char";
-import { Switch } from "or-else";
 
 export const Line = React.memo(
 	({ index, line }: { index: number; line: string }) => {
-		const dispatch = useEditorDispatch();
 		const { tab } = useCurrentTab();
-		const tabs = useEditorSelector((state) => state.editor.tabs);
 		const [markup, setMarkup] = React.useState<any>({ type: "paragraph", children: [] });
 
 		React.useEffect(() => {
@@ -44,9 +42,9 @@ export const Line = React.memo(
 			});
 		}, []);
 
-		if (!tab) return null;
-		const currentTab = tabs.find((t) => t.path === tab.path);
-		if (!currentTab) return null;
+		if (!tab) {
+			return null;
+		}
 
 		const className = Switch.of(markup.type)
 			.case("heading1", "font-bold text-4xl")
@@ -66,18 +64,16 @@ export const Line = React.memo(
 						e.preventDefault();
 						e.stopPropagation();
 
-						dispatch(
-							updateCaretPositions({
-								path: tab.path,
-								positions: [
-									{
-										start: { line: index, character: line.length - 1 },
-										end: { line: index, character: line.length - 1 },
-										direction: "ltr",
-									},
-								],
-							}),
-						);
+						window.ordo.emit("@editor/update-caret-positions", {
+							path: tab.path,
+							positions: [
+								{
+									start: { line: index, character: line.length - 1 },
+									end: { line: index, character: line.length - 1 },
+									direction: "ltr",
+								},
+							],
+						});
 					}}
 				>
 					{markup.children.map((char: any, charIndex: number) => (

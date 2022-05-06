@@ -1,12 +1,12 @@
-import { useAppSelector } from "@core/state/store";
-import { OrdoFile } from "@modules/file-explorer/types";
-import { findOrdoFile } from "@modules/file-explorer/utils/find-ordo-file";
-import { getFileIcon } from "@modules/file-explorer/utils/get-icon";
 import React from "react";
 import { HiX } from "react-icons/hi";
-import { Tab as TTab } from "../types";
 
-export const Tab: React.FC<{ tab: TTab }> = ({ tab }) => {
+import { useAppSelector } from "@core/state/store";
+import { findOrdoFile } from "@modules/file-explorer/utils/find-ordo-file";
+import { getFileIcon } from "@modules/file-explorer/utils/get-icon";
+import { EditorTab } from "@modules/editor/types";
+
+export const Tab: React.FC<{ tab: EditorTab }> = ({ tab }) => {
 	const currentTab = useAppSelector((state) => state.editor.currentTab);
 	const tree = useAppSelector((state) => state.fileExplorer.tree);
 

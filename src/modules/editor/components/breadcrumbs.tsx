@@ -1,6 +1,7 @@
-import { getFileIcon } from "@modules/file-explorer/utils/get-icon";
 import React from "react";
 import { HiOutlineFolder, HiFolder, HiChevronRight } from "react-icons/hi";
+
+import { getFileIcon } from "@modules/file-explorer/utils/get-icon";
 import { useCurrentTab } from "@modules/editor/hooks/use-current-tab";
 import { useAppSelector } from "@core/state/store";
 

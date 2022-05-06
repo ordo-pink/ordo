@@ -1,15 +1,13 @@
-import { useAppSelector } from "@core/state/store";
 import React from "react";
-import Scrollbars from "react-custom-scrollbars-2";
-import { Command } from "@modules/top-bar/components/command";
 import Fuse from "fuse.js";
+import Scrollbars from "react-custom-scrollbars-2";
+
+import { useAppSelector } from "@core/state/store";
+import { Command } from "@modules/top-bar/components/command";
 import { collectFiles } from "@modules/file-explorer/utils/collect-files";
 import { File } from "@modules/top-bar/components/file";
-import { focusEditor, unfocusEditor, updateCaretPositions, useEditorDispatch } from "@modules/editor/state";
 
 export const TopBar: React.FC = () => {
-	const dispatch = useEditorDispatch();
-
 	const value = useAppSelector((state) => state.topBar.value);
 	const isFocused = useAppSelector((state) => state.topBar.focused);
 	const items = useAppSelector((state) => state.app.commands);
@@ -96,7 +94,7 @@ export const TopBar: React.FC = () => {
 					type="text"
 					value={value}
 					onFocus={() => {
-						dispatch(unfocusEditor());
+						window.ordo.emit("@editor/unfocus", null);
 						window.ordo.emit("@top-bar/focus", null);
 					}}
 					onChange={(e) => {
@@ -105,22 +103,20 @@ export const TopBar: React.FC = () => {
 
 						if (e.target.value.startsWith(":") || Boolean(currentTab)) {
 							const split = e.target.value.slice(1).split(":");
-							dispatch(
-								updateCaretPositions({
-									path: currentTab,
-									positions: [
-										{
-											start: { line: Number(split[0]) - 1, character: split[1] ? Number(split[1]) : 0 },
-											end: { line: Number(split[0]) - 1, character: split[1] ? Number(split[1]) : 0 },
-											direction: "ltr",
-										},
-									],
-								}),
-							);
+							window.ordo.emit("@editor/update-caret-positions", {
+								path: currentTab,
+								positions: [
+									{
+										start: { line: Number(split[0]) - 1, character: split[1] ? Number(split[1]) : 0 },
+										end: { line: Number(split[0]) - 1, character: split[1] ? Number(split[1]) : 0 },
+										direction: "ltr",
+									},
+								],
+							});
 						}
 					}}
 					onBlur={() => {
-						dispatch(focusEditor());
+						window.ordo.emit("@editor/focus", null);
 						setTimeout(() => window.ordo.emit("@top-bar/unfocus", null), 100);
 					}}
 					onKeyDown={(e) => {

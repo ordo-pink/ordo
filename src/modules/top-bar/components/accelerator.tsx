@@ -1,11 +1,11 @@
 import React from "react";
 
-export const Accelerator = React.memo<{ accelerator: string }>(({ accelerator }) => {
-	if (!accelerator) {
-		return null;
-	}
+export const Accelerator: React.FC<{ accelerator: string }> = ({ accelerator = "" }) => {
+	const [split, setSplit] = React.useState<string[]>([]);
 
-	const split = accelerator.split("+");
+	React.useEffect(() => {
+		setSplit(accelerator.split("+"));
+	}, [accelerator]);
 
 	return (
 		<div className="flex align-baseline items-center space-x-1">
@@ -23,4 +23,4 @@ export const Accelerator = React.memo<{ accelerator: string }>(({ accelerator })
 			</kbd>
 		</div>
 	);
-});
+};

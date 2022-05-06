@@ -11,26 +11,22 @@ export const Tab: React.FC<{ tab: EditorTab }> = ({ tab }) => {
 
 	const currentTab = useAppSelector((state) => state.editor.currentTab);
 	const tree = useAppSelector((state) => state.fileExplorer.tree);
-	const HiX = useIcon("HiX");
-
-	if (!tree) {
-		return null;
-	}
-
 	const file = findOrdoFile(tree, "path", tab.path);
 
-	if (!file) {
-		return null;
-	}
-
+	const HiX = useIcon("HiX");
 	const Icon = useFileIcon(file);
-	const closeTab = (e: React.MouseEvent) => {
-		e.preventDefault();
-		e.stopPropagation();
 
-		dispatch({ type: "@editor/close-tab", payload: file.path });
-	};
-	return (
+	const closeTab = React.useCallback(
+		(e: React.MouseEvent) => {
+			e.preventDefault();
+			e.stopPropagation();
+
+			dispatch({ type: "@editor/close-tab", payload: file?.path || "" });
+		},
+		[file],
+	);
+
+	return file ? (
 		<div
 			key={file.path}
 			className={`flex flex-shrink text-sm text-neutral-800 dark:text-neutral-300 items-center space-x-2 cursor-pointer px-3 py-1 rounded-lg truncate ${
@@ -39,6 +35,7 @@ export const Tab: React.FC<{ tab: EditorTab }> = ({ tab }) => {
 			onClick={(e) => {
 				e.preventDefault();
 				e.stopPropagation();
+
 				dispatch({ type: "@editor/open-tab", payload: file.path });
 			}}
 			onMouseDown={(e) => (e.button === 1 ? closeTab(e) : void 0)}
@@ -47,5 +44,5 @@ export const Tab: React.FC<{ tab: EditorTab }> = ({ tab }) => {
 			<div>{file.readableName}</div>
 			<HiX className="text-neutral-500 hover:text-red-500" onClick={closeTab} />
 		</div>
-	);
+	) : null;
 };

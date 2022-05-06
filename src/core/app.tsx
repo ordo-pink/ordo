@@ -16,16 +16,19 @@ export const App: React.FC = () => {
 	const sideBarWidth = useAppSelector((state) => state.sideBar.width);
 	const settingsSideBarWidth = useAppSelector((state) => state.app.internalSettings.window?.sideBarWidth);
 
-	const targetSideBarWidth =
-		settingsSideBarWidth != null && sideBarWidth === settingsSideBarWidth ? sideBarWidth : settingsSideBarWidth;
+	const [targetSideBarWidth, setTargetSideBarWidth] = React.useState<number>(sideBarWidth);
+	const [sizes, setSizes] = React.useState<[number, number]>([100, 0]);
 
-	const handleApplyPatches = ({ detail }: any) => {
-		internalDispatch(applyStatePatches(detail));
-	};
+	const handleApplyPatches = React.useCallback(({ detail }: any) => internalDispatch(applyStatePatches(detail)), []);
+	const handleSetState = React.useCallback(({ detail }: any) => internalDispatch(setState(detail)), []);
 
-	const handleSetState = ({ detail }: any) => {
-		internalDispatch(setState(detail));
-	};
+	React.useEffect(() => {
+		setTargetSideBarWidth(settingsSideBarWidth != null ? sideBarWidth : settingsSideBarWidth);
+	}, [sideBarWidth, settingsSideBarWidth]);
+
+	React.useEffect(() => {
+		setSizes(showSidebar ? [100 - targetSideBarWidth, targetSideBarWidth] : [100, 0]);
+	}, [showSidebar, targetSideBarWidth]);
 
 	React.useEffect(() => {
 		dispatch({ type: "@app/get-state" });
@@ -53,7 +56,7 @@ export const App: React.FC = () => {
 					<div className="flex flex-grow h-[calc(100%-3.75rem)]">
 						<Split
 							className="flex w-full h-full"
-							sizes={showSidebar ? [100 - targetSideBarWidth, targetSideBarWidth] : [100, 0]}
+							sizes={sizes}
 							minSize={0}
 							snapOffset={200}
 							onDragEnd={(sizes) => dispatch({ type: "@side-bar/set-width", payload: sizes[1] })}

@@ -10,11 +10,7 @@ export const Char = React.memo(
 
 		const { tab } = useCurrentTab();
 
-		if (!tab) {
-			return;
-		}
-
-		return (
+		return tab ? (
 			<>
 				{lineIndex === tab.caretPositions[0].start.line && charIndex === tab.caretPositions[0].start.character ? (
 					<Caret />
@@ -43,7 +39,7 @@ export const Char = React.memo(
 					{char}
 				</span>
 			</>
-		);
+		) : null;
 	},
 	() => true,
 );

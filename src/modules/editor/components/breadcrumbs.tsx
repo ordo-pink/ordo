@@ -8,9 +8,9 @@ import { useIcon } from "@core/hooks/use-icon";
 export const Breadcrumbs = React.memo(
 	() => {
 		const { file } = useCurrentTab();
-		const separator = useAppSelector((state) => state.app.internalSettings.separator);
-		const Icon = useFileIcon(file);
+		const { separator } = useAppSelector((state) => state.app.internalSettings);
 
+		const Icon = useFileIcon(file);
 		const HiOutlineFolder = useIcon("HiOutlineFolder");
 		const HiFolder = useIcon("HiFolder");
 		const HiChevronRight = useIcon("HiChevronRight");

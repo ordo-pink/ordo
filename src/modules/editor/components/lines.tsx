@@ -34,11 +34,7 @@ export const Lines = React.memo(
 			};
 		}, [tab, focused]);
 
-		if (!tab) {
-			return null;
-		}
-
-		return (
+		return tab ? (
 			<div
 				className="outline-none select-none cursor-text pb-[calc(50vh-9.5rem)]"
 				onClick={(e) => {
@@ -69,7 +65,7 @@ export const Lines = React.memo(
 			>
 				{tab.lines && tab.lines.map((line, index) => <Line key={`${line}-${index}`} index={index} line={line} />)}
 			</div>
-		);
+		) : null;
 	},
 	() => true,
 );

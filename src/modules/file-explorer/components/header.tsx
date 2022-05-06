@@ -8,6 +8,7 @@ export const Header: React.FC = () => {
 	const dispatch = useAppDispatch();
 
 	const tree = useAppSelector((state) => state.fileExplorer.tree);
+
 	const { CollapseIcon } = useFolderIcons(tree);
 	const HiOutlineDocumentAdd = useIcon("HiOutlineDocumentAdd");
 	const HiOutlineFolderAdd = useIcon("HiOutlineFolderAdd");

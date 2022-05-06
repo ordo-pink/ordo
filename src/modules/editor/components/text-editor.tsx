@@ -12,9 +12,7 @@ export const TextEditor = React.memo(
 
 		const { tab } = useCurrentTab();
 
-		if (!tab) return null;
-
-		return (
+		return tab ? (
 			<div className="h-full">
 				<Breadcrumbs />
 				<div
@@ -50,7 +48,7 @@ export const TextEditor = React.memo(
 					</Scrollbars>
 				</div>
 			</div>
-		);
+		) : null;
 	},
 	() => true,
 );

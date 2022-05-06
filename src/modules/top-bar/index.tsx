@@ -22,6 +22,7 @@ export const TopBar: React.FC = () => {
 	const [fusedFiles, setFusedFiles] = React.useState(files.map((item) => ({ item })));
 
 	const ref = React.useRef<HTMLInputElement>(null);
+
 	const commandFuse = React.useRef(
 		new Fuse(items, {
 			keys: ["name"],

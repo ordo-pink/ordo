@@ -17,12 +17,7 @@ export const StatusBar: React.FC = () => {
 
 	return (
 		<div className="flex items-center justify-between">
-			<div className="flex items-center text-sm">
-				Hi
-				{/* {items.map((item) => (
-					<StatusBarElement key={item.name} name={item.name} content={item.content} />
-				))} */}
-			</div>
+			<div className="flex items-center text-sm"></div>
 			<div className="py-1 px-4 cursor-pointer">
 				<Bell />
 			</div>

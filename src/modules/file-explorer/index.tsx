@@ -18,7 +18,7 @@ export const FileExplorer: React.FC = () => {
 					<Header />
 				</div>
 				<Creator path={tree.path} depth={0} />
-				{tree.collapsed ? null : (
+				{!tree.collapsed ? (
 					<div className="h-[calc(100vh-6.25rem)]">
 						<Scrollbars autoHide={true}>
 							<div className="mb-6">
@@ -28,7 +28,7 @@ export const FileExplorer: React.FC = () => {
 							</div>
 						</Scrollbars>
 					</div>
-				)}
+				) : null}
 			</>
 		)
 	);

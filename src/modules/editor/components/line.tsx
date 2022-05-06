@@ -11,7 +11,14 @@ export const Line = React.memo(
 		const dispatch = useAppDispatch();
 
 		const { tab } = useCurrentTab();
+
 		const [markup, setMarkup] = React.useState<any>({ type: "paragraph", children: [] });
+		const [className, setClassName] = React.useState<string>("");
+		const [isCurrentLine, setIsCurrentLine] = React.useState<boolean>(true);
+
+		React.useEffect(() => {
+			setIsCurrentLine(tab?.caretPositions[0].start.line === index);
+		}, [index, tab]);
 
 		React.useEffect(() => {
 			setMarkup({
@@ -45,24 +52,24 @@ export const Line = React.memo(
 			});
 		}, []);
 
-		if (!tab) {
-			return null;
-		}
+		React.useEffect(() => {
+			setClassName(
+				Switch.of(markup.type)
+					.case("heading1", "font-bold text-4xl")
+					.case("heading2", "font-bold text-3xl")
+					.case("heading3", "font-bold text-2xl")
+					.case("heading4", "font-bold text-xl")
+					.case("heading5", "font-bold text-lg")
+					.case("blockquote", "border-l-2 border-neutral-500 p-2 mx-2")
+					.default(""),
+			);
+		}, [markup.type]);
 
-		const className = Switch.of(markup.type)
-			.case("heading1", "font-bold text-4xl")
-			.case("heading2", "font-bold text-3xl")
-			.case("heading3", "font-bold text-2xl")
-			.case("heading4", "font-bold text-xl")
-			.case("heading5", "font-bold text-lg")
-			.case("blockquote", "border-l-2 border-neutral-500 p-2 mx-2")
-			.default("");
-
-		return (
+		return tab ? (
 			<div className={`flex items-center align-middle w-full`}>
 				<LineNumber number={index + 1} />
 				<div
-					className={`px-2 w-full whitespace-pre tracking-wide  ${className}`}
+					className={`px-2 w-full whitespace-pre tracking-wide ${className}`}
 					onClick={(e) => {
 						e.preventDefault();
 						e.stopPropagation();
@@ -88,7 +95,7 @@ export const Line = React.memo(
 					))}
 				</div>
 			</div>
-		);
+		) : null;
 	},
 	() => true,
 );

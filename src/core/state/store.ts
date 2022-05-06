@@ -41,5 +41,5 @@ export const useAppDispatch =
 	<TReturn = void, TKey extends keyof OrdoEvents = keyof OrdoEvents>(
 		action: OrdoEvents[TKey] extends null ? Action<TKey> : ActionWithPayload<TKey>,
 	): TReturn =>
-		window.ordo.emit(action.type, (action as any).payload || null) as unknown as TReturn;
+		window.ordo.emit(action.type, (action as any).payload != null ? (action as any).payload : null) as unknown as TReturn;
 export const useAppSelector: TypedUseSelectorHook<RootState> = useSelector;

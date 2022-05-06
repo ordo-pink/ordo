@@ -1,9 +1,11 @@
 import { Transmission } from "./";
 import test from "ava";
 
+const globalContext: any = { window: { webContents: { send: () => {} } } };
+
 test("Transmission.select should provide valid selection", (t) => {
 	const state = { sideBar: { show: false } } as any;
-	const tr = new Transmission(state, {} as any);
+	const tr = new Transmission(state, globalContext);
 
 	t.false(tr.select((state) => state.sideBar.show));
 });
@@ -11,7 +13,7 @@ test("Transmission.select should provide valid selection", (t) => {
 test("Transmission should properly work with provided context", async (t) => {
 	const state = { sideBar: { show: false } } as any;
 	const context = { value: true } as any;
-	const tr = new Transmission(state, context);
+	const tr = new Transmission(state, { ...globalContext, ...context });
 	tr.on<{ test: null }>("test", ({ context, draft }) => {
 		draft.sideBar.show = (context as any).value;
 	});
@@ -23,7 +25,7 @@ test("Transmission should properly work with provided context", async (t) => {
 
 test("Transmission should properly apply event changes", async (t) => {
 	const state = { sideBar: { show: false } } as any;
-	const tr = new Transmission(state, {} as any);
+	const tr = new Transmission(state, globalContext);
 	tr.on<{ test: null }>("test", ({ draft }) => {
 		draft.sideBar.show = true;
 	});
@@ -35,7 +37,7 @@ test("Transmission should properly apply event changes", async (t) => {
 
 test("Transmission should properly handle errors in emit", async (t) => {
 	const state = { sideBar: { show: false } } as any;
-	const tr = new Transmission(state, {} as any, {});
+	const tr = new Transmission(state, globalContext, {});
 	tr.on<{ test: null }>("test", () => {
 		throw new Error("Test Error");
 	});
@@ -45,7 +47,7 @@ test("Transmission should properly handle errors in emit", async (t) => {
 
 test("Transmission should properly apply multiple sequential event changes", async (t) => {
 	const state = { sideBar: { width: 1 } } as any;
-	const tr = new Transmission(state, {} as any);
+	const tr = new Transmission(state, globalContext);
 	tr.on<{ test: null }>("test", ({ draft }) => {
 		draft.sideBar.width++;
 	});
@@ -61,7 +63,7 @@ test("Transmission should properly apply multiple sequential event changes", asy
 
 test("Transmission should allow emitting events from within event handlers without breaking sequence", async (t) => {
 	const state = { sideBar: { width: 1 }, activityBar: { current: "" } } as any;
-	const tr = new Transmission(state, {} as any);
+	const tr = new Transmission(state, globalContext);
 	tr
 		.on<{ test: null; test2: null }>("test", ({ draft }) => {
 			draft.sideBar.width = draft.sideBar.width === 1 ? draft.sideBar.width + 3 : draft.sideBar.width + 1;

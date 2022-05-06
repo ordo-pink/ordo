@@ -2,15 +2,14 @@ import React from "react";
 
 import { OrdoFolder, OrdoFile } from "@modules/file-explorer/types";
 import { File } from "@modules/file-explorer/components/file";
-import { getCollapseIcon, getFolderIcon } from "@modules/file-explorer/utils/get-icon";
 import { Creator } from "@modules/file-explorer/components/creator";
 import { useAppDispatch } from "@core/state/store";
+import { useFolderIcons } from "@modules/file-explorer/hooks/use-folder-icons";
 
 export const Folder: React.FC<{ folder: OrdoFolder }> = ({ folder }) => {
 	const dispatch = useAppDispatch();
 
-	const Icon = folder && getCollapseIcon(folder);
-	const FolderIcon = folder && getFolderIcon(folder);
+	const { FolderIcon, CollapseIcon } = useFolderIcons(folder);
 
 	return (
 		folder && (
@@ -56,7 +55,7 @@ export const Folder: React.FC<{ folder: OrdoFolder }> = ({ folder }) => {
 						event.dataTransfer.setData("fileName", folder.readableName);
 					}}
 				>
-					<Icon />
+					<CollapseIcon />
 					<FolderIcon className={`text-${folder.color}-500 dark:text-${folder.color}-300`} />
 					<div className="pr-2 truncate">{folder.readableName}</div>
 				</div>

@@ -1,3 +1,5 @@
+import * as HiIcons from "react-icons/hi";
+
 import { EventHandler } from "@core/transmission";
 import { OrdoEvents } from "@init/types";
 
@@ -14,3 +16,5 @@ export type OrdoEvent<TScope extends string = string, TEvent extends string = st
 	`@${TScope}/${TEvent}`,
 	TPayload
 >;
+
+export type SupportedIcon = keyof typeof HiIcons;

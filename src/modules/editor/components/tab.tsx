@@ -1,16 +1,17 @@
 import React from "react";
-import { HiX } from "react-icons/hi";
 
 import { useAppDispatch, useAppSelector } from "@core/state/store";
 import { findOrdoFile } from "@modules/file-explorer/utils/find-ordo-file";
-import { getFileIcon } from "@modules/file-explorer/utils/get-icon";
 import { EditorTab } from "@modules/editor/types";
+import { useFileIcon } from "@modules/file-explorer/hooks/use-file-icon";
+import { useIcon } from "@core/hooks/use-icon";
 
 export const Tab: React.FC<{ tab: EditorTab }> = ({ tab }) => {
 	const dispatch = useAppDispatch();
 
 	const currentTab = useAppSelector((state) => state.editor.currentTab);
 	const tree = useAppSelector((state) => state.fileExplorer.tree);
+	const HiX = useIcon("HiX");
 
 	if (!tree) {
 		return null;
@@ -22,7 +23,7 @@ export const Tab: React.FC<{ tab: EditorTab }> = ({ tab }) => {
 		return null;
 	}
 
-	const Icon = getFileIcon(file);
+	const Icon = useFileIcon(file);
 	const closeTab = (e: React.MouseEvent) => {
 		e.preventDefault();
 		e.stopPropagation();

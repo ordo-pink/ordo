@@ -2,7 +2,7 @@ import React from "react";
 
 import { useAppDispatch, useAppSelector } from "@core/state/store";
 import { OrdoFile } from "@modules/file-explorer/types";
-import { getFileIcon } from "@modules/file-explorer/utils/get-icon";
+import { useFileIcon } from "@modules/file-explorer/hooks/use-file-icon";
 
 export const File: React.FC<{ file: OrdoFile }> = ({ file }) => {
 	const dispatch = useAppDispatch();
@@ -17,7 +17,7 @@ export const File: React.FC<{ file: OrdoFile }> = ({ file }) => {
 			? "bg-neutral-300 dark:bg-neutral-700"
 			: "";
 
-	const Icon = getFileIcon(file);
+	const Icon = useFileIcon(file);
 
 	return (
 		<div

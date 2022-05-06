@@ -1,17 +1,21 @@
 import React from "react";
 
-import { getSupportedIcon } from "@core/appearance/icons";
 import { Command as TCommand } from "@containers/app/types";
 import { Accelerator } from "@modules/top-bar/components/accelerator";
 import { useAppDispatch } from "@core/state/store";
+import { useIcon } from "@core/hooks/use-icon";
 
 export const Command: React.FC<
 	TCommand & { selected: number; index: number; setSelected: React.Dispatch<React.SetStateAction<number>> }
 > = ({ icon, name, description, accelerator, event, selected, index, setSelected }) => {
 	const dispatch = useAppDispatch();
 
-	const Icon = icon ? getSupportedIcon(icon) : () => null;
-	const isSelected = selected === index;
+	const Icon = useIcon(icon);
+	const [isSelected, setIsSelected] = React.useState<boolean>(false);
+
+	React.useEffect(() => {
+		setIsSelected(selected === index);
+	}, [selected, index]);
 
 	return (
 		<div

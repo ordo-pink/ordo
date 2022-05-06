@@ -14,8 +14,12 @@ import { findOrdoFile } from "@modules/file-explorer/utils/find-ordo-file";
 import { findOrdoFolder } from "@modules/file-explorer/utils/find-ordo-folder";
 import { saveFile } from "@modules/file-explorer/api/save-file";
 import { debounce } from "@utils/debounce";
+import { Transmission } from "@core/transmission";
 
-const debounceSave = debounce((path: string, content: string) => saveFile(path, content));
+const debounceSave = debounce(async (path: string, content: string, callback: () => void) => {
+	await saveFile(path, content);
+	callback();
+});
 
 export default registerEvents<FileExplorerEvents>({
 	"@file-explorer/list-folder": async ({ draft, payload }) => {
@@ -273,8 +277,14 @@ export default registerEvents<FileExplorerEvents>({
 			draft.fileExplorer.tree = await listFolder(tree.path);
 		}
 	},
-	"@file-explorer/save-file": async ({ draft, payload }) => {
+	"@file-explorer/save-file": async ({ payload, transmission }) => {
 		const contentString = payload.content.map((line) => line.slice(0, -1)).join("\n");
-		debounceSave(payload.path, contentString);
+
+		debounceSave(payload.path, contentString, () =>
+			transmission.emit(
+				"@file-explorer/list-folder",
+				transmission.select((state) => state.fileExplorer.tree.path),
+			),
+		);
 	},
 });

@@ -1,6 +1,7 @@
 import React from "react";
 
-import { getSupportedIcon } from "@core/appearance/icons";
+import { useIcon } from "@core/hooks/use-icon";
+
 // import { useAppSelector } from "@core/state/store";
 
 // export const StatusBarElement: React.FC<StatusBarItem> = ({ name, content }) => (
@@ -12,7 +13,7 @@ import { getSupportedIcon } from "@core/appearance/icons";
 export const StatusBar: React.FC = () => {
 	// const items = useAppSelector((state) => state.statusBar.items);
 
-	const Bell = getSupportedIcon("HiOutlineBell");
+	const Bell = useIcon("HiOutlineBell");
 
 	return (
 		<div className="flex items-center justify-between">

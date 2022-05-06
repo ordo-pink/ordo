@@ -1,6 +1,5 @@
-import { SupportedIcon } from "@core/appearance/icons";
 import { InternalSettings, UserSettings } from "@core/settings/types";
-import { OrdoEvent } from "@core/types";
+import { OrdoEvent, SupportedIcon } from "@core/types";
 import { OrdoEvents } from "@init/types";
 
 export type Command<TCustomEvents extends Record<string, any> | null = null> = {

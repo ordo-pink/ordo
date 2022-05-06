@@ -1,8 +1,8 @@
 import React from "react";
 
-import { getSupportedIcon } from "@core/appearance/icons";
 import { useAppDispatch } from "@core/state/store";
 import { ActivityBarItem } from "@modules/activity-bar/types";
+import { useIcon } from "@core/hooks/use-icon";
 
 export const ActivityBarIcon: React.FC<ActivityBarItem & { current: boolean }> = ({ icon, show, name, current }) => {
 	const dispatch = useAppDispatch();
@@ -11,7 +11,7 @@ export const ActivityBarIcon: React.FC<ActivityBarItem & { current: boolean }> =
 		return null;
 	}
 
-	const Icon = getSupportedIcon(icon);
+	const Icon = useIcon(icon);
 
 	const color = current
 		? "text-pink-600 dark:text-pink-400 hover:text-pink-800 dark:hover:text-pink-600 focus:text-pink-800 dark:focus:text-pink-600"

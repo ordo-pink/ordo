@@ -1,5 +1,4 @@
-import { SupportedIcon } from "@core/appearance/icons";
-import { OrdoEvent } from "@core/types";
+import { OrdoEvent, SupportedIcon } from "@core/types";
 
 export type ActivityBarItem = {
 	show: boolean;

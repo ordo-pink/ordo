@@ -1,15 +1,16 @@
 import React from "react";
-import { HiOutlineDocumentAdd, HiOutlineFolderAdd } from "react-icons/hi";
 
 import { useAppDispatch, useAppSelector } from "@core/state/store";
-import { getCollapseIcon } from "@modules/file-explorer/utils/get-icon";
+import { useFolderIcons } from "@modules/file-explorer/hooks/use-folder-icons";
+import { useIcon } from "@core/hooks/use-icon";
 
 export const Header: React.FC = () => {
 	const dispatch = useAppDispatch();
 
 	const tree = useAppSelector((state) => state.fileExplorer.tree);
-
-	const Icon = tree ? getCollapseIcon(tree) : () => null;
+	const { CollapseIcon } = useFolderIcons(tree);
+	const HiOutlineDocumentAdd = useIcon("HiOutlineDocumentAdd");
+	const HiOutlineFolderAdd = useIcon("HiOutlineFolderAdd");
 
 	return (
 		tree && (
@@ -20,7 +21,7 @@ export const Header: React.FC = () => {
 						dispatch({ type: "@file-explorer/toggle-folder", payload: tree.path });
 					}}
 				>
-					<Icon />
+					<CollapseIcon />
 					<div className="font-bold uppercase">{tree.readableName}</div>
 				</div>
 				<div className="flex items-center space-x-2">

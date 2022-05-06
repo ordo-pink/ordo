@@ -21,7 +21,6 @@ export const App: React.FC = () => {
 
 	const handleApplyPatches = ({ detail }: any) => {
 		internalDispatch(applyStatePatches(detail));
-		console.log(applyStatePatches(detail));
 	};
 
 	const handleSetState = ({ detail }: any) => {

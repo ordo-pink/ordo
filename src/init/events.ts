@@ -1,5 +1,4 @@
 import { Transmission } from "@core/transmission";
-
 import registerSideBarEvents from "@containers/side-bar/register-events";
 import registerAppEvents from "@containers/app/register-events";
 import registerActivityBarEvents from "@modules/activity-bar/register-events";

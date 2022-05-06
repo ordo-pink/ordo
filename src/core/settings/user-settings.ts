@@ -1,6 +1,7 @@
-import { Colors } from "@core/appearance/colors";
 import Store, { Schema } from "electron-store";
-import { UserSettings } from "./types";
+
+import { Colors } from "@core/appearance/colors";
+import { UserSettings } from "@core/settings/types";
 
 export const userSettingsSchema: Schema<UserSettings> = {
 	appearance: {

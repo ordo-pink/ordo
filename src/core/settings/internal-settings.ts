@@ -1,6 +1,7 @@
-import Store, { Schema } from "electron-store";
-import { InternalSettings } from "./types";
 import { sep } from "path";
+
+import Store, { Schema } from "electron-store";
+import { InternalSettings } from "@core/settings/types";
 
 export const internalSettingsSchema: Schema<InternalSettings> = {
 	separator: {

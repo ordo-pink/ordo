@@ -1,11 +1,10 @@
-import { internalSettingsStore } from "@core/settings/internal-settings";
-import { resolve } from "path";
-import { Transmission } from "@core/transmission";
 import { BrowserWindow, dialog, app, clipboard, shell, ipcMain, globalShortcut } from "electron";
 import install, { REACT_DEVELOPER_TOOLS, REDUX_DEVTOOLS } from "electron-devtools-installer";
 import { is, centerWindow } from "electron-util";
-import { saveWindowPosition } from "./save-window-position";
 
+import { internalSettingsStore } from "@core/settings/internal-settings";
+import { Transmission } from "@core/transmission";
+import { saveWindowPosition } from "@core/window/save-window-position";
 import { initEvents } from "@init/events";
 import { initCommands } from "@init/commands";
 import { initialState } from "@init/state";

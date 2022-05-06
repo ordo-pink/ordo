@@ -1,5 +1,4 @@
 import { Transmission } from "@core/transmission";
-
 import registerAppCommands from "@containers/app/register-commands";
 import registerSideBarCommands from "@containers/side-bar/register-commands";
 import registerEditorCommands from "@modules/editor/register-commands";

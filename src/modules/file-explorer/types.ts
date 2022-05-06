@@ -1,5 +1,5 @@
 import { Color } from "@core/appearance/colors";
-import { int, OrdoEvent } from "@core/types";
+import { OrdoEvent } from "@core/types";
 
 export type OrdoFile = {
 	path: string;

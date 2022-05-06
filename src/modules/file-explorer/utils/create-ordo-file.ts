@@ -1,4 +1,5 @@
 import { sep } from "path";
+
 import { userSettingsStore } from "@core/settings/user-settings";
 import { OrdoFile } from "@modules/file-explorer/types";
 

@@ -1,11 +1,12 @@
-import { useAppSelector } from "@core/state/store";
 import React from "react";
+import Scrollbars from "react-custom-scrollbars-2";
+
+import { useAppSelector } from "@core/state/store";
 import { Folder } from "@modules/file-explorer/components/folder";
 import { Header } from "@modules/file-explorer/components/header";
-import Scrollbars from "react-custom-scrollbars-2";
-import { isFolder } from "./utils/is-folder";
-import { File } from "./components/file";
-import { Creator } from "./components/creator";
+import { isFolder } from "@modules/file-explorer/utils/is-folder";
+import { File } from "@modules/file-explorer/components/file";
+import { Creator } from "@modules/file-explorer/components/creator";
 
 export const FileExplorer: React.FC = () => {
 	const { tree } = useAppSelector((state) => state.fileExplorer);

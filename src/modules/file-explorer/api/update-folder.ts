@@ -1,5 +1,6 @@
 import { join } from "path";
 import { promises } from "fs";
+
 import { OrdoFolder } from "@modules/file-explorer/types";
 
 export const updateFolder = (path: string, update: Partial<OrdoFolder>): void => {

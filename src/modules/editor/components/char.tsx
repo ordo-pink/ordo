@@ -25,7 +25,8 @@ export const Char = React.memo(
 						e.stopPropagation();
 
 						dispatch({
-							"@editor/update-caret-positions": {
+							type: "@editor/update-caret-positions",
+							payload: {
 								path: tab.path,
 								positions: [
 									{

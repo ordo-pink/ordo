@@ -11,7 +11,8 @@ import {
 	HiOutlineFolder,
 	HiOutlineFolderOpen,
 } from "react-icons/hi";
-import { OrdoFile, OrdoFolder } from "../types";
+
+import { OrdoFile, OrdoFolder } from "@modules/file-explorer/types";
 
 export const getFileIcon = (file: OrdoFile): IconType =>
 	file.type === "image"

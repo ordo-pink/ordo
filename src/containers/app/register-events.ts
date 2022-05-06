@@ -1,11 +1,12 @@
+import { BrowserWindow } from "electron";
+import { is } from "electron-util";
+
 import { AppEvents } from "@containers/app/types";
 import { internalSettingsStore } from "@core/settings/internal-settings";
 import { userSettingsStore } from "@core/settings/user-settings";
 import { registerEvents } from "@core/transmission/register-ordo-events";
 import { OrdoEventHandler } from "@core/types";
 import { createWindow } from "@core/window/create-window";
-import { BrowserWindow } from "electron";
-import { is } from "electron-util";
 
 const getStateHandler: OrdoEventHandler<"@app/get-state"> = ({ context, transmission }) => {
 	context.window.webContents.send(

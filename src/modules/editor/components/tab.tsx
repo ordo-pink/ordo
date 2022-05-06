@@ -27,7 +27,7 @@ export const Tab: React.FC<{ tab: EditorTab }> = ({ tab }) => {
 		e.preventDefault();
 		e.stopPropagation();
 
-		dispatch({ "@editor/close-tab": file.path });
+		dispatch({ type: "@editor/close-tab", payload: file.path });
 	};
 	return (
 		<div
@@ -38,7 +38,7 @@ export const Tab: React.FC<{ tab: EditorTab }> = ({ tab }) => {
 			onClick={(e) => {
 				e.preventDefault();
 				e.stopPropagation();
-				dispatch({ "@editor/open-tab": file.path });
+				dispatch({ type: "@editor/open-tab", payload: file.path });
 			}}
 			onMouseDown={(e) => (e.button === 1 ? closeTab(e) : void 0)}
 		>

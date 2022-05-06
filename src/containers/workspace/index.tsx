@@ -1,8 +1,9 @@
+import React from "react";
+import { Switch } from "or-else";
+
 import { useAppSelector } from "@core/state/store";
 import { Editor } from "@modules/editor";
 import { WelcomePage } from "@modules/welcome-page";
-import { Switch } from "or-else";
-import React from "react";
 
 export const Workspace: React.FC = () => {
 	const currentActivity = useAppSelector((state) => state.activityBar.current);

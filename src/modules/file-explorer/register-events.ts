@@ -1,17 +1,18 @@
-import { Colors } from "@core/appearance/colors";
-import { registerEvents } from "@core/transmission/register-ordo-events";
 import { Menu, MenuItem } from "electron";
 import { is } from "electron-util";
-import { createFile } from "./api/create-file";
-import { createFolder } from "./api/create-folder";
-import { listFolder } from "./api/list-folder";
-import { move } from "./api/move";
-import { updateFolder } from "./api/update-folder";
-import { FileExplorerEvents } from "./types";
-import { findOrdoFile } from "./utils/find-ordo-file";
-import { findOrdoFolder } from "./utils/find-ordo-folder";
 import { join } from "path";
-import { saveFile } from "./api/save-file";
+
+import { Colors } from "@core/appearance/colors";
+import { registerEvents } from "@core/transmission/register-ordo-events";
+import { createFile } from "@modules/file-explorer/api/create-file";
+import { createFolder } from "@modules/file-explorer/api/create-folder";
+import { listFolder } from "@modules/file-explorer/api/list-folder";
+import { move } from "@modules/file-explorer/api/move";
+import { updateFolder } from "@modules/file-explorer/api/update-folder";
+import { FileExplorerEvents } from "@modules/file-explorer/types";
+import { findOrdoFile } from "@modules/file-explorer/utils/find-ordo-file";
+import { findOrdoFolder } from "@modules/file-explorer/utils/find-ordo-folder";
+import { saveFile } from "@modules/file-explorer/api/save-file";
 import { debounce } from "@utils/debounce";
 
 const debounceSave = debounce((path: string, content: string) => saveFile(path, content));

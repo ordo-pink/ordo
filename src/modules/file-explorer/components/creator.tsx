@@ -24,24 +24,26 @@ export const Creator: React.FC<{ path: string; depth: number }> = ({ path, depth
 					value={name}
 					onChange={(e) => setName(e.target.value)}
 					onFocus={() => {
-						dispatch({ "@editor/unfocus": null });
+						dispatch({ type: "@editor/unfocus" });
 					}}
 					onBlur={() => {
-						dispatch({ "@editor/focus": null });
-						dispatch({ "@file-explorer/hide-creation": null });
+						dispatch({ type: "@editor/focus" });
+						dispatch({ type: "@file-explorer/hide-creation" });
 						setName("");
 					}}
 					onKeyDown={(e) => {
 						if (e.key === "Enter") {
-							dispatch({ [createFileIn ? "@file-explorer/create-file" : "@file-explorer/create-folder"]: name });
+							dispatch({ type: createFileIn ? "@file-explorer/create-file" : "@file-explorer/create-folder", payload: name });
 							setName("");
 						} else if (e.key === "Escape") {
-							dispatch({ "@editor/focus": null });
-							dispatch({ "@file-explorer/hide-creation": null });
+							dispatch({ type: "@editor/focus" });
+							dispatch({ type: "@file-explorer/hide-creation" });
 							setName("");
 						}
 					}}
-					onSubmit={() => dispatch({ [createFileIn ? "@file-explorer/create-file" : "@file-explorer/create-folder"]: name })}
+					onSubmit={() =>
+						dispatch({ type: createFileIn ? "@file-explorer/create-file" : "@file-explorer/create-folder", payload: name })
+					}
 				/>
 			) : null}
 		</div>

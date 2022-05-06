@@ -1,7 +1,8 @@
+import React from "react";
+
 import { getSupportedIcon } from "@core/appearance/icons";
 import { Command as TCommand } from "@containers/app/types";
-import React from "react";
-import { Accelerator } from "./accelerator";
+import { Accelerator } from "@modules/top-bar/components/accelerator";
 import { useAppDispatch } from "@core/state/store";
 
 export const Command: React.FC<
@@ -18,7 +19,7 @@ export const Command: React.FC<
 				isSelected && "bg-neutral-200 dark:bg-neutral-700"
 			}`}
 			onMouseOver={() => setSelected(index)}
-			onClick={() => dispatch({ "@top-bar/run-command": event })}
+			onClick={() => dispatch({ type: "@top-bar/run-command", payload: event })}
 		>
 			<div className="flex-grow">
 				<div className="flex items-center space-x-2">

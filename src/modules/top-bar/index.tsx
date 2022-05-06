@@ -96,17 +96,18 @@ export const TopBar: React.FC = () => {
 					type="text"
 					value={value}
 					onFocus={() => {
-						dispatch({ "@editor/unfocus": null });
-						dispatch({ "@top-bar/focus": null });
+						dispatch({ type: "@editor/unfocus" });
+						dispatch({ type: "@top-bar/focus" });
 					}}
 					onChange={(e) => {
-						dispatch({ "@top-bar/set-value": e.target.value });
+						dispatch({ type: "@top-bar/set-value", payload: e.target.value });
 						setSelected(0);
 
 						if (e.target.value.startsWith(":") || Boolean(currentTab)) {
 							const split = e.target.value.slice(1).split(":");
 							dispatch({
-								"@editor/update-caret-positions": {
+								type: "@editor/update-caret-positions",
+								payload: {
 									path: currentTab,
 									positions: [
 										{
@@ -120,8 +121,8 @@ export const TopBar: React.FC = () => {
 						}
 					}}
 					onBlur={() => {
-						dispatch({ "@editor/focus": null });
-						setTimeout(() => dispatch({ "@top-bar/unfocus": null }), 100);
+						dispatch({ type: "@editor/focus" });
+						setTimeout(() => dispatch({ type: "@top-bar/unfocus" }), 100);
 					}}
 					onKeyDown={(e) => {
 						if (e.key === "ArrowDown") {
@@ -139,8 +140,8 @@ export const TopBar: React.FC = () => {
 								selected === 0 ? (value.startsWith(">") ? fusedCommands.length - 1 : fusedFiles.length - 1) : selected - 1,
 							);
 						} else if (e.key === "Enter") {
-							dispatch({ "@top-bar/run-command": fusedCommands[selected].item.event });
-							dispatch({ "@top-bar/unfocus": null });
+							dispatch({ type: "@top-bar/run-command", payload: fusedCommands[selected].item.event });
+							dispatch({ type: "@top-bar/unfocus" });
 						} else if (e.key === "Escape") {
 							ref.current?.blur();
 						}

@@ -1,4 +1,4 @@
-import { TopBarState } from "./types";
+import { TopBarState } from "@modules/top-bar/types";
 
 const initialState: TopBarState = {
 	focused: false,

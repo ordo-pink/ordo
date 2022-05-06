@@ -15,7 +15,8 @@ export const Lines = React.memo(
 			({ key, altKey, shiftKey, ctrlKey, metaKey }: KeyboardEvent) => {
 				if (tab && focused) {
 					dispatch({
-						"@editor/handle-typing": {
+						type: "@editor/handle-typing",
+						payload: {
 							path: tab.path,
 							event: { key, shiftKey, altKey, ctrlKey, metaKey } as KeyboardEvent,
 						},
@@ -45,7 +46,8 @@ export const Lines = React.memo(
 					e.stopPropagation();
 
 					dispatch({
-						"@editor/update-caret-positions": {
+						type: "@editor/update-caret-positions",
+						payload: {
 							path: tab.path,
 							positions: [
 								{

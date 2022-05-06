@@ -1,6 +1,7 @@
-import { useAppSelector } from "@core/state/store";
-import { Switch } from "or-else";
 import React from "react";
+import { Switch } from "or-else";
+
+import { useAppSelector } from "@core/state/store";
 import { ImageViewer } from "@modules/editor/components/image-viewer";
 import { useCurrentTab } from "@modules/editor/hooks/use-current-tab";
 import { EmptyEditor } from "@modules/editor/components/empty-editor";

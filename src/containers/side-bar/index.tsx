@@ -1,5 +1,6 @@
-import { FileExplorer } from "@modules/file-explorer";
 import React from "react";
+
+import { FileExplorer } from "@modules/file-explorer";
 
 export const Sidebar: React.FC = () => {
 	return (

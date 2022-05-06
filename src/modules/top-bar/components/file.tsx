@@ -1,4 +1,5 @@
 import React from "react";
+
 import { OrdoFile } from "@modules/file-explorer/types";
 import { getFileIcon } from "@modules/file-explorer/utils/get-icon";
 import { useAppDispatch } from "@core/state/store";
@@ -24,7 +25,7 @@ export const File: React.FC<{
 				isSelected && "bg-neutral-200 dark:bg-neutral-700"
 			}`}
 			onMouseOver={() => setSelected(index)}
-			onClick={() => dispatch({ "@editor/open-tab": path })}
+			onClick={() => dispatch({ type: "@editor/open-tab", payload: path })}
 		>
 			<div className="flex-grow">
 				<div className="flex items-center space-x-2">

@@ -1,5 +1,5 @@
-import { OrdoFile, OrdoFolder } from "../types";
-import { isFolder } from "./is-folder";
+import { OrdoFile, OrdoFolder } from "@modules/file-explorer/types";
+import { isFolder } from "@modules/file-explorer/utils/is-folder";
 
 export const collectFiles = (
 	tree: OrdoFolder,

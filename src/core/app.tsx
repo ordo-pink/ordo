@@ -21,6 +21,7 @@ export const App: React.FC = () => {
 
 	const handleApplyPatches = ({ detail }: any) => {
 		internalDispatch(applyStatePatches(detail));
+		console.log(applyStatePatches(detail));
 	};
 
 	const handleSetState = ({ detail }: any) => {
@@ -28,9 +29,9 @@ export const App: React.FC = () => {
 	};
 
 	React.useEffect(() => {
-		dispatch({ "@app/get-state": null });
-		dispatch({ "@app/get-internal-settings": null });
-		dispatch({ "@app/get-user-settings": null });
+		dispatch({ type: "@app/get-state" });
+		dispatch({ type: "@app/get-internal-settings" });
+		dispatch({ type: "@app/get-user-settings" });
 
 		window.addEventListener("@app/set-state", handleSetState);
 		window.addEventListener("@app/apply-patches", handleApplyPatches);
@@ -56,7 +57,7 @@ export const App: React.FC = () => {
 							sizes={showSidebar ? [100 - targetSideBarWidth, targetSideBarWidth] : [100, 0]}
 							minSize={0}
 							snapOffset={200}
-							onDragEnd={(sizes) => window.ordo.emit("@side-bar/set-width", sizes[1])}
+							onDragEnd={(sizes) => dispatch({ type: "@side-bar/set-width", payload: sizes[1] })}
 						>
 							{/* <Split
 						className="flex flex-col justify-between"

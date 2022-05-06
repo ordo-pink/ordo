@@ -1,7 +1,8 @@
-import { useAppDispatch, useAppSelector } from "@core/state/store";
 import React from "react";
 import { HiOutlineCog, HiOutlineFolderOpen } from "react-icons/hi";
 import { animated, config, useTransition } from "react-spring";
+
+import { useAppDispatch, useAppSelector } from "@core/state/store";
 
 const BringYourThoughts: React.FC = () => {
 	const transitions = useTransition(true, {
@@ -76,9 +77,9 @@ export const WelcomePage: React.FC = () => {
 								key={project}
 								className="bg-neutral-200 dark:bg-neutral-600 mb-2 py-1 px-3 rounded-lg hover:underline cursor-pointer"
 								onClick={() => {
-									dispatch({ "@file-explorer/list-folder": project });
-									dispatch({ "@side-bar/show": null });
-									dispatch({ "@activity-bar/open-editor": null });
+									dispatch({ type: "@file-explorer/list-folder", payload: project });
+									dispatch({ type: "@side-bar/show" });
+									dispatch({ type: "@activity-bar/open-editor" });
 								}}
 							>
 								...{separator}
@@ -92,9 +93,9 @@ export const WelcomePage: React.FC = () => {
 					<button
 						className="flex space-x-2 items-center hover:text-pink-500 transition-all duration-300"
 						onClick={() => {
-							dispatch({ "@app/select-project": null });
-							dispatch({ "@side-bar/show": null });
-							dispatch({ "@activity-bar/open-editor": null });
+							dispatch({ type: "@app/select-project" });
+							dispatch({ type: "@side-bar/show" });
+							dispatch({ type: "@activity-bar/open-editor" });
 						}}
 					>
 						<HiOutlineFolderOpen />
@@ -102,7 +103,7 @@ export const WelcomePage: React.FC = () => {
 					</button>
 					<button
 						className="flex space-x-2 items-center hover:text-pink-500 transition-all duration-300"
-						onClick={() => dispatch({ "@activity-bar/select": "Settings" })}
+						onClick={() => dispatch({ type: "@activity-bar/select", payload: "Settings" })}
 					>
 						<HiOutlineCog />
 						<span>Settings</span>

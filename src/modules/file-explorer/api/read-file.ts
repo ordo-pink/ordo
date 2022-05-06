@@ -1,5 +1,6 @@
-import { userSettingsStore } from "@core/settings/user-settings";
 import { promises } from "fs";
+
+import { userSettingsStore } from "@core/settings/user-settings";
 
 export const readFile = async (path: string) => {
 	const associations: any[] = userSettingsStore.get("explorer.associations");

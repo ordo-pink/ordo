@@ -1,6 +1,7 @@
 import React from "react";
 import { OrdoFile } from "@modules/file-explorer/types";
 import { getFileIcon } from "@modules/file-explorer/utils/get-icon";
+import { useAppDispatch } from "@core/state/store";
 
 export const File: React.FC<{
 	path: string;
@@ -12,6 +13,7 @@ export const File: React.FC<{
 	index: number;
 	setSelected: React.Dispatch<React.SetStateAction<number>>;
 }> = ({ path, readableName, relativePath, size, type, selected, index, setSelected }) => {
+	const dispatch = useAppDispatch();
 	const Icon = getFileIcon({ size, type } as OrdoFile);
 	const isSelected = selected === index;
 	const folder = relativePath.replace(readableName, "").slice(1, -1);
@@ -22,7 +24,7 @@ export const File: React.FC<{
 				isSelected && "bg-neutral-200 dark:bg-neutral-700"
 			}`}
 			onMouseOver={() => setSelected(index)}
-			onClick={() => window.ordo.emit("@editor/open-tab", path)}
+			onClick={() => dispatch({ "@editor/open-tab": path })}
 		>
 			<div className="flex-grow">
 				<div className="flex items-center space-x-2">

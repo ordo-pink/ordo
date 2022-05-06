@@ -1,8 +1,11 @@
 import { getSupportedIcon } from "@core/appearance/icons";
+import { useAppDispatch } from "@core/state/store";
 import React from "react";
 import { ActivityBarItem } from "../types";
 
 export const ActivityBarIcon: React.FC<ActivityBarItem & { current: boolean }> = ({ icon, show, name, current }) => {
+	const dispatch = useAppDispatch();
+
 	if (!show || !icon) {
 		return null;
 	}
@@ -17,7 +20,7 @@ export const ActivityBarIcon: React.FC<ActivityBarItem & { current: boolean }> =
 		<button
 			tabIndex={2}
 			className={`outline-none cursor-pointer transition-all duration-500 ${color} select-none`}
-			onClick={() => window.ordo.emit("@activity-bar/select", name)}
+			onClick={() => dispatch({ "@activity-bar/select": name })}
 		>
 			<Icon title={name} className="outline-none" />
 		</button>

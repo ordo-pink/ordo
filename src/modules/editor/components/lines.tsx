@@ -2,18 +2,25 @@ import React from "react";
 
 import { useCurrentTab } from "@modules/editor/hooks/use-current-tab";
 import { Line } from "@modules/editor/components/line";
+import { useAppDispatch, useAppSelector } from "@core/state/store";
 
 export const Lines = React.memo(
 	() => {
+		const dispatch = useAppDispatch();
+
 		const { tab } = useCurrentTab();
+		const { focused } = useAppSelector((state) => state.editor);
 
 		const handleKeyDown = React.useCallback(
 			({ key, altKey, shiftKey, ctrlKey, metaKey }: KeyboardEvent) => {
-				tab &&
-					window.ordo.emit("@editor/handle-typing", {
-						path: tab.path,
-						event: { key, shiftKey, altKey, ctrlKey, metaKey } as KeyboardEvent,
+				if (tab && focused) {
+					dispatch({
+						"@editor/handle-typing": {
+							path: tab.path,
+							event: { key, shiftKey, altKey, ctrlKey, metaKey } as KeyboardEvent,
+						},
 					});
+				}
 			},
 			[tab],
 		);
@@ -37,21 +44,23 @@ export const Lines = React.memo(
 					e.preventDefault();
 					e.stopPropagation();
 
-					window.ordo.emit("@editor/update-caret-positions", {
-						path: tab.path,
-						positions: [
-							{
-								start: {
-									line: tab.lines.length - 1,
-									character: tab.lines[tab.lines.length - 1].length - 1,
+					dispatch({
+						"@editor/update-caret-positions": {
+							path: tab.path,
+							positions: [
+								{
+									start: {
+										line: tab.lines.length - 1,
+										character: tab.lines[tab.lines.length - 1].length - 1,
+									},
+									end: {
+										line: tab.lines.length - 1,
+										character: tab.lines[tab.lines.length - 1].length - 1,
+									},
+									direction: "ltr",
 								},
-								end: {
-									line: tab.lines.length - 1,
-									character: tab.lines[tab.lines.length - 1].length - 1,
-								},
-								direction: "ltr",
-							},
-						],
+							],
+						},
 					});
 				}}
 			>

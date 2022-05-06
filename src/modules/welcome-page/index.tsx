@@ -1,4 +1,4 @@
-import { useAppSelector } from "@core/state/store";
+import { useAppDispatch, useAppSelector } from "@core/state/store";
 import React from "react";
 import { HiOutlineCog, HiOutlineFolderOpen } from "react-icons/hi";
 import { animated, config, useTransition } from "react-spring";
@@ -54,6 +54,8 @@ const Logo: React.FC = () => {
 };
 
 export const WelcomePage: React.FC = () => {
+	const dispatch = useAppDispatch();
+
 	const recentProjects = useAppSelector((state) => state.app.internalSettings.window?.recentProjects);
 	const separator = useAppSelector((state) => state.app.internalSettings.separator);
 
@@ -74,9 +76,9 @@ export const WelcomePage: React.FC = () => {
 								key={project}
 								className="bg-neutral-200 dark:bg-neutral-600 mb-2 py-1 px-3 rounded-lg hover:underline cursor-pointer"
 								onClick={() => {
-									window.ordo.emit("@file-explorer/list-folder", project);
-									window.ordo.emit("@side-bar/show", null);
-									window.ordo.emit("@activity-bar/open-editor", null);
+									dispatch({ "@file-explorer/list-folder": project });
+									dispatch({ "@side-bar/show": null });
+									dispatch({ "@activity-bar/open-editor": null });
 								}}
 							>
 								...{separator}
@@ -90,9 +92,9 @@ export const WelcomePage: React.FC = () => {
 					<button
 						className="flex space-x-2 items-center hover:text-pink-500 transition-all duration-300"
 						onClick={() => {
-							window.ordo.emit("@app/select-project", null);
-							window.ordo.emit("@side-bar/show", null);
-							window.ordo.emit("@activity-bar/open-editor", null);
+							dispatch({ "@app/select-project": null });
+							dispatch({ "@side-bar/show": null });
+							dispatch({ "@activity-bar/open-editor": null });
 						}}
 					>
 						<HiOutlineFolderOpen />
@@ -100,7 +102,7 @@ export const WelcomePage: React.FC = () => {
 					</button>
 					<button
 						className="flex space-x-2 items-center hover:text-pink-500 transition-all duration-300"
-						onClick={() => window.ordo.emit("@activity-bar/select", "Settings")}
+						onClick={() => dispatch({ "@activity-bar/select": "Settings" })}
 					>
 						<HiOutlineCog />
 						<span>Settings</span>

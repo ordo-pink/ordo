@@ -1,9 +1,11 @@
-import { useAppSelector } from "@core/state/store";
+import { useAppDispatch, useAppSelector } from "@core/state/store";
 import React from "react";
 import { OrdoFile } from "../types";
 import { getFileIcon } from "@modules/file-explorer/utils/get-icon";
 
 export const File: React.FC<{ file: OrdoFile }> = ({ file }) => {
+	const dispatch = useAppDispatch();
+
 	const selectedFile = useAppSelector((state) => state.editor.currentTab);
 	const openFiles = useAppSelector((state) => state.editor.tabs);
 
@@ -20,9 +22,9 @@ export const File: React.FC<{ file: OrdoFile }> = ({ file }) => {
 		<div
 			style={{ paddingLeft: (file.depth + 0.25) * 16 + 10 + "px" }}
 			className={`flex space-x-2 cursor-pointer border border-transparent items-center select-none hover:bg-neutral-300 dark:hover:bg-neutral-700 ${selectionClass}`}
-			onClick={() => window.ordo.emit("@editor/open-tab", file.path)}
+			onClick={() => dispatch({ "@editor/open-tab": file.path })}
 			onContextMenu={(e) =>
-				window.ordo.emit("@file-explorer/show-file-context-menu", { path: file.path, x: e.clientX, y: e.clientY })
+				dispatch({ "@file-explorer/show-file-context-menu": { path: file.path, x: e.clientX, y: e.clientY } })
 			}
 			draggable={true}
 			onDragStart={(event: any) => {

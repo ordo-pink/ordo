@@ -4,8 +4,11 @@ import { OrdoFolder, OrdoFile } from "@modules/file-explorer/types";
 import { File } from "@modules/file-explorer/components/file";
 import { getCollapseIcon, getFolderIcon } from "@modules/file-explorer/utils/get-icon";
 import { Creator } from "./creator";
+import { useAppDispatch } from "@core/state/store";
 
 export const Folder: React.FC<{ folder: OrdoFolder }> = ({ folder }) => {
+	const dispatch = useAppDispatch();
+
 	const Icon = folder && getCollapseIcon(folder);
 	const FolderIcon = folder && getFolderIcon(folder);
 
@@ -32,7 +35,7 @@ export const Folder: React.FC<{ folder: OrdoFolder }> = ({ folder }) => {
 					const oldPath = event.dataTransfer.getData("oldPath");
 					event.dataTransfer.clearData();
 
-					window.ordo.emit("@file-explorer/move", { oldPath, newFolder: folder.path, name: fileName });
+					dispatch({ "@file-explorer/move": { oldPath, newFolder: folder.path, name: fileName } });
 
 					event.currentTarget.classList.remove("bg-gray-300");
 				}}
@@ -40,9 +43,9 @@ export const Folder: React.FC<{ folder: OrdoFolder }> = ({ folder }) => {
 				<div
 					style={{ paddingLeft: folder.depth * 12 + 10 + "px" }}
 					className={`flex space-x-2 items-center select-none hover:bg-neutral-300 dark:hover:bg-neutral-700 cursor-pointer`}
-					onClick={() => window.ordo.emit("@file-explorer/toggle-folder", folder.path)}
+					onClick={() => dispatch({ "@file-explorer/toggle-folder": folder.path })}
 					onContextMenu={(e) =>
-						window.ordo.emit("@file-explorer/show-folder-context-menu", { path: folder.path, x: e.clientX, y: e.clientY })
+						dispatch({ "@file-explorer/show-folder-context-menu": { path: folder.path, x: e.clientX, y: e.clientY } })
 					}
 					draggable={true}
 					onDragStart={(event: any) => {

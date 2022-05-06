@@ -4,9 +4,12 @@ import { Switch } from "or-else";
 import { useCurrentTab } from "@modules/editor/hooks/use-current-tab";
 import { LineNumber } from "@modules/editor/components/line-number";
 import { Char } from "@modules/editor/components/char";
+import { useAppDispatch } from "@core/state/store";
 
 export const Line = React.memo(
 	({ index, line }: { index: number; line: string }) => {
+		const dispatch = useAppDispatch();
+
 		const { tab } = useCurrentTab();
 		const [markup, setMarkup] = React.useState<any>({ type: "paragraph", children: [] });
 
@@ -64,15 +67,17 @@ export const Line = React.memo(
 						e.preventDefault();
 						e.stopPropagation();
 
-						window.ordo.emit("@editor/update-caret-positions", {
-							path: tab.path,
-							positions: [
-								{
-									start: { line: index, character: line.length - 1 },
-									end: { line: index, character: line.length - 1 },
-									direction: "ltr",
-								},
-							],
+						dispatch({
+							"@editor/update-caret-positions": {
+								path: tab.path,
+								positions: [
+									{
+										start: { line: index, character: line.length - 1 },
+										end: { line: index, character: line.length - 1 },
+										direction: "ltr",
+									},
+								],
+							},
 						});
 					}}
 				>

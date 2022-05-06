@@ -1,12 +1,14 @@
 import React from "react";
 import { HiX } from "react-icons/hi";
 
-import { useAppSelector } from "@core/state/store";
+import { useAppDispatch, useAppSelector } from "@core/state/store";
 import { findOrdoFile } from "@modules/file-explorer/utils/find-ordo-file";
 import { getFileIcon } from "@modules/file-explorer/utils/get-icon";
 import { EditorTab } from "@modules/editor/types";
 
 export const Tab: React.FC<{ tab: EditorTab }> = ({ tab }) => {
+	const dispatch = useAppDispatch();
+
 	const currentTab = useAppSelector((state) => state.editor.currentTab);
 	const tree = useAppSelector((state) => state.fileExplorer.tree);
 
@@ -25,7 +27,7 @@ export const Tab: React.FC<{ tab: EditorTab }> = ({ tab }) => {
 		e.preventDefault();
 		e.stopPropagation();
 
-		window.ordo.emit("@editor/close-tab", file.path);
+		dispatch({ "@editor/close-tab": file.path });
 	};
 	return (
 		<div
@@ -36,7 +38,7 @@ export const Tab: React.FC<{ tab: EditorTab }> = ({ tab }) => {
 			onClick={(e) => {
 				e.preventDefault();
 				e.stopPropagation();
-				window.ordo.emit("@editor/open-tab", file.path);
+				dispatch({ "@editor/open-tab": file.path });
 			}}
 			onMouseDown={(e) => (e.button === 1 ? closeTab(e) : void 0)}
 		>

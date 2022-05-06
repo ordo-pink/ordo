@@ -1,13 +1,15 @@
 import React from "react";
 import Split from "react-split";
+
 import { StatusBar } from "@containers/status-bar";
 import { Workspace } from "@containers/workspace";
 import { Sidebar } from "@containers/side-bar";
-import { applyStatePatches, setState, useAppDispatch, useAppSelector } from "./state/store";
+import { applyStatePatches, setState, useInternalDispatch, useAppSelector, useAppDispatch } from "@core/state/store";
 import { TopBar } from "@modules/top-bar";
 import { ActivityBar } from "@modules/activity-bar";
 
 export const App: React.FC = () => {
+	const internalDispatch = useInternalDispatch();
 	const dispatch = useAppDispatch();
 
 	const showSidebar = useAppSelector((state) => state.sideBar.show);
@@ -18,17 +20,17 @@ export const App: React.FC = () => {
 		settingsSideBarWidth != null && sideBarWidth === settingsSideBarWidth ? sideBarWidth : settingsSideBarWidth;
 
 	const handleApplyPatches = ({ detail }: any) => {
-		dispatch(applyStatePatches(detail));
+		internalDispatch(applyStatePatches(detail));
 	};
 
 	const handleSetState = ({ detail }: any) => {
-		dispatch(setState(detail));
+		internalDispatch(setState(detail));
 	};
 
 	React.useEffect(() => {
-		window.ordo.emit("@app/get-state", null);
-		window.ordo.emit("@app/get-internal-settings", null);
-		window.ordo.emit("@app/get-user-settings", null);
+		dispatch({ "@app/get-state": null });
+		dispatch({ "@app/get-internal-settings": null });
+		dispatch({ "@app/get-user-settings": null });
 
 		window.addEventListener("@app/set-state", handleSetState);
 		window.addEventListener("@app/apply-patches", handleApplyPatches);

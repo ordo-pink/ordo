@@ -2,12 +2,14 @@ import React from "react";
 import Fuse from "fuse.js";
 import Scrollbars from "react-custom-scrollbars-2";
 
-import { useAppSelector } from "@core/state/store";
+import { useAppDispatch, useAppSelector } from "@core/state/store";
 import { Command } from "@modules/top-bar/components/command";
 import { collectFiles } from "@modules/file-explorer/utils/collect-files";
 import { File } from "@modules/top-bar/components/file";
 
 export const TopBar: React.FC = () => {
+	const dispatch = useAppDispatch();
+
 	const value = useAppSelector((state) => state.topBar.value);
 	const isFocused = useAppSelector((state) => state.topBar.focused);
 	const items = useAppSelector((state) => state.app.commands);
@@ -94,30 +96,32 @@ export const TopBar: React.FC = () => {
 					type="text"
 					value={value}
 					onFocus={() => {
-						window.ordo.emit("@editor/unfocus", null);
-						window.ordo.emit("@top-bar/focus", null);
+						dispatch({ "@editor/unfocus": null });
+						dispatch({ "@top-bar/focus": null });
 					}}
 					onChange={(e) => {
-						window.ordo.emit("@top-bar/set-value", e.target.value);
+						dispatch({ "@top-bar/set-value": e.target.value });
 						setSelected(0);
 
 						if (e.target.value.startsWith(":") || Boolean(currentTab)) {
 							const split = e.target.value.slice(1).split(":");
-							window.ordo.emit("@editor/update-caret-positions", {
-								path: currentTab,
-								positions: [
-									{
-										start: { line: Number(split[0]) - 1, character: split[1] ? Number(split[1]) : 0 },
-										end: { line: Number(split[0]) - 1, character: split[1] ? Number(split[1]) : 0 },
-										direction: "ltr",
-									},
-								],
+							dispatch({
+								"@editor/update-caret-positions": {
+									path: currentTab,
+									positions: [
+										{
+											start: { line: Number(split[0]) - 1, character: split[1] ? Number(split[1]) : 0 },
+											end: { line: Number(split[0]) - 1, character: split[1] ? Number(split[1]) : 0 },
+											direction: "ltr",
+										},
+									],
+								},
 							});
 						}
 					}}
 					onBlur={() => {
-						window.ordo.emit("@editor/focus", null);
-						setTimeout(() => window.ordo.emit("@top-bar/unfocus", null), 100);
+						dispatch({ "@editor/focus": null });
+						setTimeout(() => dispatch({ "@top-bar/unfocus": null }), 100);
 					}}
 					onKeyDown={(e) => {
 						if (e.key === "ArrowDown") {
@@ -135,8 +139,8 @@ export const TopBar: React.FC = () => {
 								selected === 0 ? (value.startsWith(">") ? fusedCommands.length - 1 : fusedFiles.length - 1) : selected - 1,
 							);
 						} else if (e.key === "Enter") {
-							window.ordo.emit("@top-bar/run-command", fusedCommands[selected].item.event);
-							window.ordo.emit("@top-bar/unfocus", null);
+							dispatch({ "@top-bar/run-command": fusedCommands[selected].item.event });
+							dispatch({ "@top-bar/unfocus": null });
 						} else if (e.key === "Escape") {
 							ref.current?.blur();
 						}

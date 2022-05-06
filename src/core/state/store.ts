@@ -3,7 +3,7 @@ import { configureStore, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { TypedUseSelectorHook, useDispatch, useSelector } from "react-redux";
 
 import { initialState } from "@init/state";
-import { WindowState } from "@init/types";
+import { OrdoEvents, WindowState } from "@init/types";
 
 enablePatches();
 
@@ -26,5 +26,13 @@ export const { setState, applyStatePatches } = state.actions;
 export type RootState = ReturnType<typeof store.getState>;
 export type AppDispatch = typeof store.dispatch;
 
-export const useAppDispatch = () => useDispatch<AppDispatch>();
+export const useInternalDispatch = () => useDispatch<AppDispatch>();
+export const useAppDispatch =
+	() =>
+	<TReturn = void>(action: {
+		[K in keyof Partial<OrdoEvents>]: OrdoEvents[K];
+	}): TReturn => {
+		const key = Object.keys(action)[0] as keyof OrdoEvents;
+		return window.ordo.emit(key, action[key]) as unknown as TReturn;
+	};
 export const useAppSelector: TypedUseSelectorHook<RootState> = useSelector;

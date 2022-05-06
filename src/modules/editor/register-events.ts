@@ -67,7 +67,12 @@ export default registerEvents<EditorEvents>({
 		}
 
 		tab.caretPositions = payload.positions;
+	},
+	"@editor/focus": ({ draft }) => {
 		draft.editor.focused = true;
+	},
+	"@editor/unfocus": ({ draft }) => {
+		draft.editor.focused = false;
 	},
 	"@editor/handle-typing": ({ draft, payload, transmission }) => {
 		if (!draft.editor.focused) {

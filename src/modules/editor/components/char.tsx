@@ -24,6 +24,7 @@ export const Char = React.memo(
 						e.preventDefault();
 						e.stopPropagation();
 
+						dispatch({ type: "@editor/focus" });
 						dispatch({
 							type: "@editor/update-caret-positions",
 							payload: {

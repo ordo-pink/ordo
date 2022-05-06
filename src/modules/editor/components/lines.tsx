@@ -13,7 +13,7 @@ export const Lines = React.memo(
 
 		const handleKeyDown = React.useCallback(
 			({ key, altKey, shiftKey, ctrlKey, metaKey }: KeyboardEvent) => {
-				if (tab && focused) {
+				if (tab) {
 					dispatch({
 						type: "@editor/handle-typing",
 						payload: {
@@ -32,7 +32,7 @@ export const Lines = React.memo(
 			return () => {
 				window.removeEventListener("keydown", handleKeyDown);
 			};
-		}, [tab]);
+		}, [tab, focused]);
 
 		if (!tab) {
 			return null;
@@ -45,6 +45,7 @@ export const Lines = React.memo(
 					e.preventDefault();
 					e.stopPropagation();
 
+					dispatch({ type: "@editor/focus" });
 					dispatch({
 						type: "@editor/update-caret-positions",
 						payload: {

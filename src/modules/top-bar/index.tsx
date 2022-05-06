@@ -27,6 +27,7 @@ export const TopBar: React.FC = () => {
 			keys: ["name"],
 		}),
 	);
+
 	const fileFuse = React.useRef(
 		new Fuse(files, {
 			keys: ["readableName", "relativePath", "path"],
@@ -42,7 +43,7 @@ export const TopBar: React.FC = () => {
 	}, [items]);
 
 	React.useEffect(() => {
-		if (value.startsWith(">")) {
+		if (value && value.startsWith(">")) {
 			updateCommandList(value);
 		} else {
 			updateFileList(value);
@@ -121,8 +122,9 @@ export const TopBar: React.FC = () => {
 						}
 					}}
 					onBlur={() => {
-						dispatch({ type: "@editor/focus" });
-						setTimeout(() => dispatch({ type: "@top-bar/unfocus" }), 100);
+						setTimeout(() => {
+							dispatch({ type: "@top-bar/unfocus" });
+						}, 100);
 					}}
 					onKeyDown={(e) => {
 						if (e.key === "ArrowDown") {
@@ -140,10 +142,12 @@ export const TopBar: React.FC = () => {
 								selected === 0 ? (value.startsWith(">") ? fusedCommands.length - 1 : fusedFiles.length - 1) : selected - 1,
 							);
 						} else if (e.key === "Enter") {
-							dispatch({ type: "@top-bar/run-command", payload: fusedCommands[selected].item.event });
 							dispatch({ type: "@top-bar/unfocus" });
+							dispatch({ type: "@editor/focus" });
+							dispatch({ type: "@top-bar/run-command", payload: fusedCommands[selected].item.event });
 						} else if (e.key === "Escape") {
 							ref.current?.blur();
+							dispatch({ type: "@editor/focus" });
 						}
 					}}
 					placeholder="Quick search (start with : to go to line, @ to go to file, or > to open commands)"

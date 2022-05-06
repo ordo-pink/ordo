@@ -67,6 +67,7 @@ export const Line = React.memo(
 						e.preventDefault();
 						e.stopPropagation();
 
+						dispatch({ type: "@editor/focus" });
 						dispatch({
 							type: "@editor/update-caret-positions",
 							payload: {

@@ -9,9 +9,12 @@ import { initEvents } from "@init/events";
 import { initCommands } from "@init/commands";
 import { initialState } from "@init/state";
 import { WindowContext } from "@init/types";
+import { debounce } from "@utils/debounce";
 
 declare const MAIN_WINDOW_WEBPACK_ENTRY: string;
 declare const MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY: string;
+
+const debounceSaveWindowPosition = debounce((window: BrowserWindow) => saveWindowPosition(window), 1000);
 
 const windows = new Set<BrowserWindow>();
 
@@ -55,8 +58,8 @@ export const createWindow = async (): Promise<void> => {
 		centerWindow({ window });
 	}
 
-	window.on("resized", saveWindowPosition(window));
-	window.on("move", saveWindowPosition(window));
+	window.on("resize", () => debounceSaveWindowPosition(window));
+	window.on("move", () => debounceSaveWindowPosition(window));
 	window.on("close", () => {
 		windows.delete(window);
 		window = null as any;
@@ -103,6 +106,7 @@ export const createWindow = async (): Promise<void> => {
 	});
 
 	window.on("blur", () => {
+		transmission.emit("@editor/unfocus", null);
 		globalShortcut.unregisterAll();
 	});
 

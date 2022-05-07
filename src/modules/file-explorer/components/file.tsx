@@ -27,6 +27,7 @@ export const File: React.FC<{ file: OrdoFile }> = ({ file }) => {
 	return (
 		<div
 			style={{ paddingLeft: (file.depth + 0.25) * 16 + 10 + "px" }}
+			title={file.path}
 			className={`flex space-x-2 cursor-pointer border border-transparent items-center select-none hover:bg-neutral-300 dark:hover:bg-neutral-700 ${className}`}
 			onClick={() => dispatch({ type: "@editor/open-tab", payload: file.path })}
 			onContextMenu={(e) =>

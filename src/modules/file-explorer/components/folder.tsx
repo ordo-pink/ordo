@@ -38,6 +38,7 @@ export const Folder: React.FC<{ folder: OrdoFolder }> = ({ folder }) => {
 
 					event.currentTarget.classList.remove("bg-gray-300");
 				}}
+				title={folder.path}
 			>
 				<div
 					style={{ paddingLeft: folder.depth * 12 + 10 + "px" }}

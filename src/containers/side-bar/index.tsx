@@ -2,9 +2,11 @@ import React from "react";
 
 import { FileExplorer } from "@modules/file-explorer";
 
+import "@containers/side-bar/index.css";
+
 export const Sidebar: React.FC = () => {
 	return (
-		<div className="flex flex-col shadow-xl rounded-tl-xl mt-2 bg-neutral-200  dark:bg-neutral-600">
+		<div className="sidebar">
 			<FileExplorer />
 		</div>
 	);

@@ -9,7 +9,7 @@ export const Workspace: React.FC = () => {
 	const Component = useWorkspaceComponent(currentActivity);
 
 	return (
-		<div className="py-2 h-[calc(100%-4.6rem)]">
+		<div>
 			<Component />
 		</div>
 	);

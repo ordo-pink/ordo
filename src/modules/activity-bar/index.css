@@ -1,0 +1,7 @@
+.activity-bar {
+	@apply flex flex-col justify-between p-2 pb-6 h-full text-4xl;
+}
+
+.activity-bar-side-container {
+	@apply flex flex-col space-y-4;
+}

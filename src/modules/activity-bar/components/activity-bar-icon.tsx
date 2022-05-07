@@ -4,28 +4,26 @@ import { useAppDispatch } from "@core/state/store";
 import { ActivityBarItem } from "@modules/activity-bar/types";
 import { useIcon } from "@core/hooks/use-icon";
 
-export const ActivityBarIcon: React.FC<ActivityBarItem & { current: boolean }> = ({ icon, show, name, current }) => {
+import "@modules/activity-bar/components/activity-bar-icon.css";
+
+type ActivityBarItemProps = ActivityBarItem & { current: string };
+
+export const ActivityBarIcon: React.FC<ActivityBarItemProps> = ({ icon, show, name, current }) => {
 	const dispatch = useAppDispatch();
 
 	const Icon = useIcon(icon);
 
 	const [className, setClassName] = React.useState<string>("");
 
+	const handleActivityClick = () => dispatch({ type: "@activity-bar/select", payload: name });
+
 	React.useEffect(() => {
-		setClassName(
-			current
-				? "text-pink-600 dark:text-pink-400 hover:text-pink-800 dark:hover:text-pink-600 focus:text-pink-800 dark:focus:text-pink-600"
-				: "text-neutral-400 dark:text-neutral-500 hover:text-neutral-600 dark:hover:text-neutral-50 focus:text-neutral-600 dark:focus:text-neutral-50",
-		);
-	}, [current]);
+		setClassName(current === name ? "current-activity" : "");
+	}, [current, name]);
 
 	return show ? (
-		<button
-			tabIndex={2}
-			className={`outline-none cursor-pointer transition-all duration-500 ${className} select-none`}
-			onClick={() => dispatch({ type: "@activity-bar/select", payload: name })}
-		>
-			<Icon title={name} className="outline-none" />
+		<button tabIndex={2} className={`activity ${className}`} onClick={handleActivityClick} title={name}>
+			<Icon />
 		</button>
 	) : null;
 };

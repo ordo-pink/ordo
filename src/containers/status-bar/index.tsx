@@ -4,13 +4,15 @@ import { useIcon } from "@core/hooks/use-icon";
 import { useCurrentTab } from "@modules/editor/hooks/use-current-tab";
 import { useAppDispatch } from "@core/state/store";
 
+import "@containers/status-bar/index.css";
+
 export const StatusBar: React.FC = () => {
 	const dispatch = useAppDispatch();
 
 	const { tab } = useCurrentTab();
 
 	const Bell = useIcon("HiOutlineBell");
-	const Line = useIcon("HiOutlineCode");
+	const Code = useIcon("HiOutlineCode");
 
 	const [line, setLine] = React.useState<number>(0);
 	const [character, setCharacter] = React.useState<number>(0);
@@ -22,22 +24,24 @@ export const StatusBar: React.FC = () => {
 	}, [tab]);
 
 	return (
-		<div className="flex items-center justify-between">
-			<div className="flex items-center text-xs">
+		<div className="status-bar">
+			<div className="status-bar-side-container">
 				<div
-					className="flex items-center space-x-1 hover:bg-gray-300 dark:hover:bg-gray-600 py-0.5 px-4 font-mono cursor-pointer"
+					className="status-bar-item"
 					onClick={() => dispatch({ type: "@top-bar/open-go-to-line" })}
 					title={`The caret is located on character ${character} of line ${line}`}
 				>
-					<Line />
+					<Code />
 					<span>
 						Ln {line}, Col {character}
 					</span>
 				</div>
 			</div>
 
-			<div className="py-1 px-4 cursor-pointer">
-				<Bell />
+			<div className="status-bar-side-container">
+				<div className="status-bar-item">
+					<Bell />
+				</div>
 			</div>
 		</div>
 	);

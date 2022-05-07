@@ -1,0 +1,11 @@
+.status-bar {
+	@apply flex items-center justify-between;
+}
+
+.status-bar-side-container {
+	@apply flex items-center text-sm font-mono;
+}
+
+.status-bar-item {
+	@apply hover:bg-gray-300 dark:hover:bg-gray-600 px-4 cursor-pointer py-0.5 flex items-center space-x-1;
+}

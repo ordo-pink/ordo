@@ -42,6 +42,7 @@ export default registerEvents<FileExplorerEvents>({
 		draft.fileExplorer.tree = await createFile(draft.fileExplorer.tree, createFileIn, payload);
 
 		transmission.emit("@file-explorer/hide-creation", null);
+		transmission.emit("@editor/open-tab", join(createFileIn, payload));
 	},
 	"@file-explorer/create-folder": async ({ draft, transmission, payload }) => {
 		const { createFolderIn } = transmission.select((state) => state.fileExplorer);

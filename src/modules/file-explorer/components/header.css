@@ -1,0 +1,15 @@
+.header {
+	@apply cursor-pointer flex space-x-2 items-center select-none;
+}
+
+.project-name {
+	@apply font-bold uppercase;
+}
+
+.header-actions {
+	@apply flex items-center space-x-2;
+}
+
+.header-action {
+	@apply hover:text-pink-600 cursor-pointer;
+}

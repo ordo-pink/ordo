@@ -1,0 +1,7 @@
+.file-explorer {
+	@apply flex w-full items-center justify-between bg-neutral-300 dark:bg-neutral-800 py-1 px-2 rounded-tl-lg;
+}
+
+.tree-wrapper {
+	@apply h-[calc(100vh-6.25rem)];
+}

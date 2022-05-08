@@ -3,47 +3,54 @@ import React from "react";
 import { useAppDispatch, useAppSelector } from "@core/state/store";
 import { OrdoFile } from "@modules/file-explorer/types";
 import { useFileIcon } from "@modules/file-explorer/hooks/use-file-icon";
+import { useTreePadding } from "@modules/file-explorer/hooks/use-tree-padding";
 
-export const File: React.FC<{ file: OrdoFile }> = ({ file }) => {
+import "@modules/file-explorer/components/file.css";
+
+type FileProps = {
+	file: OrdoFile;
+};
+
+export const File: React.FC<FileProps> = ({ file }) => {
 	const dispatch = useAppDispatch();
 
 	const selectedFile = useAppSelector((state) => state.editor.currentTab);
 	const openFiles = useAppSelector((state) => state.editor.tabs);
 
 	const Icon = useFileIcon(file);
+	const paddingLeft = useTreePadding(file.depth);
 
-	const [className, setClassName] = React.useState<string>("");
+	const [isOpenFile, setIsOpenFile] = React.useState<boolean>(false);
+	const [isCurrentFile, setIsCurrentFile] = React.useState<boolean>(false);
 
 	React.useEffect(() => {
-		setClassName(
-			selectedFile === file.path
-				? "bg-neutral-300 dark:bg-pink-700 border-neutral-500"
-				: openFiles.some((f) => f.path === file.path)
-				? "bg-neutral-300 dark:bg-neutral-700"
-				: "",
-		);
+		setIsCurrentFile(selectedFile === file.path);
+		setIsOpenFile(openFiles.some((f) => f.path === file.path));
 	}, [selectedFile, file, openFiles]);
+
+	const handleClick = () => dispatch({ type: "@editor/open-tab", payload: file.path });
+	const handleDragStart = (event: React.DragEvent) => {
+		event.dataTransfer.setData("oldPath", file.path);
+		event.dataTransfer.setData("fileName", file.readableName);
+	};
+	const handleContextMenu = (e: React.MouseEvent) =>
+		dispatch({
+			type: "@file-explorer/show-file-context-menu",
+			payload: { path: file.path, x: e.clientX, y: e.clientY },
+		});
 
 	return (
 		<div
-			style={{ paddingLeft: (file.depth + 0.25) * 16 + 10 + "px" }}
+			style={{ paddingLeft }}
 			title={file.path}
-			className={`flex space-x-2 cursor-pointer border border-transparent items-center select-none hover:bg-neutral-300 dark:hover:bg-neutral-700 ${className}`}
-			onClick={() => dispatch({ type: "@editor/open-tab", payload: file.path })}
-			onContextMenu={(e) =>
-				dispatch({
-					type: "@file-explorer/show-file-context-menu",
-					payload: { path: file.path, x: e.clientX, y: e.clientY },
-				})
-			}
 			draggable={true}
-			onDragStart={(event: any) => {
-				event.dataTransfer.setData("oldPath", file.path);
-				event.dataTransfer.setData("fileName", file.readableName);
-			}}
+			className={`file ${isOpenFile && "open-file"} ${isCurrentFile && "current-file"}`}
+			onClick={handleClick}
+			onContextMenu={handleContextMenu}
+			onDragStart={handleDragStart}
 		>
-			<Icon className="shrink-0 text-neutral-500" />
-			<div className="pr-2 truncate">{file.readableName}</div>
+			<Icon className="file-icon" />
+			<div className="file-name">{file.readableName}</div>
 		</div>
 	);
 };

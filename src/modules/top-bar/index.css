@@ -1,0 +1,15 @@
+.top-bar {
+	@apply flex items-center justify-center pt-2 cursor-pointer select-none;
+}
+
+.top-bar-wrapper {
+	@apply w-[50%] max-w-[600px] relative;
+}
+
+.top-bar-input {
+	@apply w-full shadow-inner text-sm rounded-xl outline-none focus:outline-1 focus:outline-neutral-400 bg-neutral-200 dark:bg-neutral-600 px-2 py-1;
+}
+
+.top-bar-list {
+	@apply fixed max-h-[70%] cursor-default z-50 mt-1 rounded-lg flex flex-col shadow-lg w-[50%] max-w-[600px] bg-neutral-100 dark:bg-neutral-600;
+}

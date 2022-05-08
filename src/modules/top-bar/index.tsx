@@ -7,6 +7,8 @@ import { Command } from "@modules/top-bar/components/command";
 import { collectFiles } from "@modules/file-explorer/utils/collect-files";
 import { File } from "@modules/top-bar/components/file";
 
+import "@modules/top-bar/index.css";
+
 export const TopBar: React.FC = () => {
 	const dispatch = useAppDispatch();
 
@@ -20,20 +22,13 @@ export const TopBar: React.FC = () => {
 	const [files, setFiles] = React.useState<any[]>([]);
 	const [fusedCommands, setFusedCommands] = React.useState(items.map((item) => ({ item })));
 	const [fusedFiles, setFusedFiles] = React.useState(files.map((item) => ({ item })));
+	const [height, setHeight] = React.useState<string>("0px");
+	const [filesHeight, setFilesHeight] = React.useState<string>("0px");
 
 	const ref = React.useRef<HTMLInputElement>(null);
 
-	const commandFuse = React.useRef(
-		new Fuse(items, {
-			keys: ["name"],
-		}),
-	);
-
-	const fileFuse = React.useRef(
-		new Fuse(files, {
-			keys: ["readableName", "relativePath", "path"],
-		}),
-	);
+	const commandFuse = React.useRef(new Fuse(items, { keys: ["name"] }));
+	const fileFuse = React.useRef(new Fuse(files, { keys: ["readableName", "relativePath", "path"] }));
 
 	React.useEffect(() => {
 		fileFuse.current.setCollection(files);
@@ -42,6 +37,16 @@ export const TopBar: React.FC = () => {
 	React.useEffect(() => {
 		commandFuse.current.setCollection(items);
 	}, [items]);
+
+	React.useEffect(() => {
+		if (value.startsWith(">")) {
+			setHeight(`${fusedCommands.length * 1.75}rem`);
+		}
+
+		if (value.startsWith("@")) {
+			setHeight(`${fusedFiles.length * 1.75}rem`);
+		}
+	}, [value, fusedCommands.length, fusedFiles.length]);
 
 	React.useEffect(() => {
 		if (value && value.startsWith(">")) {
@@ -87,79 +92,85 @@ export const TopBar: React.FC = () => {
 		}
 	}, [isFocused]);
 
-	return (
-		<div
-			style={{ appRegion: "drag" } as any}
-			className="flex items-center justify-center pt-2 cursor-pointer select-none"
-		>
-			<div style={{ appRegion: "none" } as any} className="w-[50%] max-w-[600px] relative">
-				<input
-					ref={ref}
-					type="text"
-					value={value}
-					onFocus={() => {
-						dispatch({ type: "@editor/unfocus" });
-						dispatch({ type: "@top-bar/focus" });
-					}}
-					onChange={(e) => {
-						dispatch({ type: "@top-bar/set-value", payload: e.target.value });
-						setSelected(0);
+	const handleFocus = () => {
+		dispatch({ type: "@editor/unfocus" });
+		dispatch({ type: "@top-bar/focus" });
+	};
 
-						if (e.target.value.startsWith(":") || Boolean(currentTab)) {
-							const split = e.target.value.slice(1).split(":");
-							dispatch({
-								type: "@editor/update-caret-positions",
-								payload: {
-									path: currentTab,
-									positions: [
-										{
-											start: { line: Number(split[0]) - 1, character: split[1] ? Number(split[1]) : 0 },
-											end: { line: Number(split[0]) - 1, character: split[1] ? Number(split[1]) : 0 },
-											direction: "ltr",
-										},
-									],
-								},
-							});
-						}
-					}}
-					onBlur={() => {
-						setTimeout(() => {
-							dispatch({ type: "@top-bar/unfocus" });
-						}, 100);
-					}}
-					onKeyDown={(e) => {
-						if (e.key === "ArrowDown") {
-							setSelected(
-								value.startsWith(">")
-									? selected === fusedCommands.length - 1
-										? 0
-										: selected + 1
-									: selected === fusedFiles.length - 1
-									? 0
-									: selected + 1,
-							);
-						} else if (e.key === "ArrowUp") {
-							setSelected(
-								selected === 0 ? (value.startsWith(">") ? fusedCommands.length - 1 : fusedFiles.length - 1) : selected - 1,
-							);
-						} else if (e.key === "Enter") {
-							dispatch({ type: "@top-bar/unfocus" });
-							dispatch({ type: "@editor/focus" });
-							dispatch({ type: "@top-bar/run-command", payload: fusedCommands[selected].item.event });
-						} else if (e.key === "Escape") {
-							ref.current?.blur();
-							dispatch({ type: "@editor/focus" });
-						}
-					}}
+	const handleBlur = () => {
+		setTimeout(() => {
+			dispatch({ type: "@top-bar/unfocus" });
+		}, 100);
+	};
+
+	const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+		dispatch({ type: "@top-bar/set-value", payload: e.target.value });
+		setSelected(0);
+
+		if (e.target.value.startsWith(":") || Boolean(currentTab)) {
+			const split = e.target.value.slice(1).split(":");
+			dispatch({
+				type: "@editor/update-caret-positions",
+				payload: {
+					path: currentTab,
+					positions: [
+						{
+							start: { line: Number(split[0]) - 1, character: split[1] ? Number(split[1]) : 0 },
+							end: { line: Number(split[0]) - 1, character: split[1] ? Number(split[1]) : 0 },
+							direction: "ltr",
+						},
+					],
+				},
+			});
+		}
+	};
+
+	const handleKeyDown = (e: React.KeyboardEvent) => {
+		if (e.key === "ArrowDown") {
+			setSelected(
+				value.startsWith(">")
+					? selected === fusedCommands.length - 1
+						? 0
+						: selected + 1
+					: selected === fusedFiles.length - 1
+					? 0
+					: selected + 1,
+			);
+		} else if (e.key === "ArrowUp") {
+			setSelected(
+				selected === 0 ? (value.startsWith(">") ? fusedCommands.length - 1 : fusedFiles.length - 1) : selected - 1,
+			);
+		} else if (e.key === "Enter") {
+			dispatch({ type: "@top-bar/unfocus" });
+			dispatch({ type: "@editor/focus" });
+			value.startsWith(">")
+				? dispatch({ type: "@top-bar/run-command", payload: fusedCommands[selected].item.event })
+				: value.startsWith("@")
+				? dispatch({ type: "@editor/open-tab", payload: fusedFiles[selected].item.path })
+				: null;
+		} else if (e.key === "Escape") {
+			ref.current?.blur();
+			dispatch({ type: "@editor/focus" });
+		}
+	};
+
+	return (
+		<div className="top-bar">
+			<div className="top-bar-wrapper">
+				<input
+					type="text"
+					className="top-bar-input"
 					placeholder="Quick search (start with : to go to line, @ to go to file, or > to open commands)"
-					className="w-full shadow-inner text-sm rounded-xl outline-none focus:outline-1 focus:outline-neutral-400 bg-neutral-200 dark:bg-neutral-600 px-2 py-1"
+					ref={ref}
+					value={value}
+					onFocus={handleFocus}
+					onChange={handleChange}
+					onBlur={handleBlur}
+					onKeyDown={handleKeyDown}
 				/>
-				{isFocused && value.startsWith(">") && (
-					<div
-						style={{ height: `${fusedCommands.length * 3.5}rem` }}
-						className="fixed h-[70%] cursor-default z-50 mt-1 rounded-lg flex flex-col shadow-lg w-[50%] max-w-[600px] bg-neutral-100 dark:bg-neutral-600"
-					>
-						<Scrollbars autoHide={true}>
+				{isFocused && value.startsWith(">") ? (
+					<div style={{ height }} className="top-bar-list">
+						<Scrollbars autoHide>
 							<div>
 								{fusedCommands &&
 									fusedCommands.map(({ item }, index) => (
@@ -178,13 +189,10 @@ export const TopBar: React.FC = () => {
 							</div>
 						</Scrollbars>
 					</div>
-				)}
-				{isFocused && value.startsWith("@") && (
-					<div
-						style={{ height: `${fusedFiles.length * 1.75}rem` }}
-						className="fixed max-h-[70%] cursor-default z-50 mt-1 rounded-lg flex flex-col shadow-lg w-[50%] max-w-[600px] bg-neutral-100 dark:bg-neutral-600"
-					>
-						<Scrollbars>
+				) : null}
+				{isFocused && value.startsWith("@") ? (
+					<div style={{ height }} className="top-bar-list">
+						<Scrollbars autoHide>
 							<div>
 								{fusedFiles &&
 									fusedFiles.map(({ item }, index) => (
@@ -203,7 +211,7 @@ export const TopBar: React.FC = () => {
 							</div>
 						</Scrollbars>
 					</div>
-				)}
+				) : null}
 			</div>
 		</div>
 	);

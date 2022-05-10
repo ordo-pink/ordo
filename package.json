@@ -73,6 +73,7 @@
 	},
 	"postcss": {
 		"plugins": {
+			"tailwindcss/nesting": {},
 			"tailwindcss": {},
 			"autoprefixer": {}
 		}

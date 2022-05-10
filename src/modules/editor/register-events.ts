@@ -32,6 +32,7 @@ export default registerEvents<EditorEvents>({
 		}
 
 		draft.editor.currentTab = payload;
+		transmission.emit("@activity-bar/open-editor", null);
 
 		const file = findOrdoFile(tree, "path", draft.editor.currentTab);
 

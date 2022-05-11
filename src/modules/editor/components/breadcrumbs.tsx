@@ -12,8 +12,8 @@ export const Breadcrumbs = React.memo(
 
 		return eitherFile.fold(NoOp, (f) => (
 			<div className="editor_breadcrumbs">
-				{f.relativePath.split(separator).map((item) => (
-					<Breadcrumb pathChunk={item} />
+				{f.relativePath.split(separator).map((item, index) => (
+					<Breadcrumb key={`${item}-${index}`} pathChunk={item} />
 				))}
 			</div>
 		));

@@ -10,6 +10,9 @@ import { FoldVoid, fromBoolean } from "@utils/either";
 
 import "@containers/main-area/index.css";
 
+/**
+ * MainArea component is a wrapper for TopBar, Workspace and SideBar.
+ */
 export const MainArea: React.FC = () => {
 	const dispatch = useAppDispatch();
 

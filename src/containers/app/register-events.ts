@@ -12,6 +12,9 @@ import { FoldVoid, fromBoolean } from "@utils/either";
 import { noOpFn } from "@utils/no-op";
 import { tap } from "@utils/tap";
 
+/**
+ * Sends a snapshot of the backend state to the frontend for synchronisation.
+ */
 const getStateHandler: OrdoEventHandler<"@app/get-state"> = ({ context, transmission }) => {
 	context.window.webContents.send(
 		"@app/set-state",
@@ -19,24 +22,40 @@ const getStateHandler: OrdoEventHandler<"@app/get-state"> = ({ context, transmis
 	);
 };
 
+/**
+ * Triggers closing currently focused window (if there is any).
+ */
 const closeWindowHandler: OrdoEventHandler<"@app/close-window"> = () => {
 	Either.fromNullable(BrowserWindow.getFocusedWindow()).fold(noOpFn, (window) => window.close());
 };
 
+/**
+ * Triggers creating a new window. This window exists completely separately from the other windows.
+ */
 const newWindowHandler: OrdoEventHandler<"@app/new-window"> = async () => {
 	await createWindow();
 };
 
+/**
+ * Triggers Electron browser window reload.
+ */
 const reloadWindowHandler: OrdoEventHandler<"@app/reload-window"> = ({ context }) => {
 	context.window.reload();
 };
 
+/**
+ * Triggers opening or closing dev tools. This action is only available if the application is in
+ * development mode, and the process is run with a `--debug` option.
+ */
 const toggleDevToolsHandler: OrdoEventHandler<"@app/toggle-dev-tools"> = ({ context }) => {
 	fromBoolean(is.development)
 		.chain(() => fromBoolean(!process.argv.includes("--debug")))
 		.fold(noOpFn, () => context.window.webContents.toggleDevTools());
 };
 
+/**
+ * Triggers an open folder dialog to open a new folder in the focused window.
+ */
 const selectProjectHandler: OrdoEventHandler<"@app/select-project"> = async ({ draft, context, transmission }) => {
 	Either.fromNullable(
 		context.dialog.showOpenDialogSync({
@@ -55,24 +74,39 @@ const selectProjectHandler: OrdoEventHandler<"@app/select-project"> = async ({ d
 		.fold(...FoldVoid);
 };
 
+/**
+ * Triggers syncrhonisation between state and internal settings store.
+ */
 const getInternalSettingsHandler: OrdoEventHandler<"@app/get-internal-settings"> = ({ draft }) => {
 	draft.app.internalSettings = internalSettingsStore.store;
 };
 
+/**
+ * Triggers an update to the internal settings store. The change is also applied to the state.
+ */
 const setInternalSettingHandler: OrdoEventHandler<"@app/set-internal-setting"> = ({ draft, payload }) => {
 	internalSettingsStore.set(...payload);
 	draft.app.internalSettings = internalSettingsStore.store;
 };
 
+/**
+ * Triggers syncrhonisation between state and user settings store.
+ */
 const getUserSettingsHandler: OrdoEventHandler<"@app/get-internal-settings"> = ({ draft }) => {
 	draft.app.userSettings = userSettingsStore.store;
 };
 
+/**
+ * Triggers an update to the user settings store. The change is also applied to the state.
+ */
 const setUserSettingHandler: OrdoEventHandler<"@app/set-user-setting"> = ({ draft, payload }) => {
 	userSettingsStore.set(...payload);
 	draft.app.userSettings = userSettingsStore.store;
 };
 
+/**
+ * Registers a provided command in the TopBar command palette.
+ */
 const registerCommandHandler: OrdoEventHandler<"@app/register-command"> = ({ draft, payload }) => {
 	draft.app.commands.push(payload);
 };

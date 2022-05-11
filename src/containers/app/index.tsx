@@ -7,6 +7,12 @@ import { ActivityBar } from "@modules/activity-bar";
 
 import "@containers/app/index.css";
 
+/**
+ * App is a wrapper for ActivityBar, MainArea and StatusBar. It is also the top level
+ * component in the frontend application, and it scaffolds the connection between the
+ * frontend and the backend. It requests initial data from the backend for state
+ * syncrchronisation, and registers listeners for backend state updates.
+ */
 export const App: React.FC = () => {
 	const internalDispatch = useInternalDispatch();
 	const dispatch = useAppDispatch();

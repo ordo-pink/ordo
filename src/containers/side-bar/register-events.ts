@@ -40,7 +40,7 @@ const toggleHandler: OrdoEventHandler<"@side-bar/toggle"> = ({ transmission }) =
 		.fold(...FoldVoid);
 
 /**
- * Set width of the SideBar. If the width set is under 1% of the screen, the SideBar is also marked hidden.
+ * Sets width of the SideBar. If the width set is under 1% of the screen, the SideBar is also marked hidden.
  */
 const setWidthHandler: OrdoEventHandler<"@side-bar/set-width"> = ({ draft, payload }) =>
 	Either.right(payload)

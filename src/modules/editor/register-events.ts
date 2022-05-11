@@ -81,8 +81,9 @@ export default registerEvents<EditorEvents>({
 		}
 
 		const tab = draft.editor.tabs.find((t) => t.path === payload.path);
+		const file = findOrdoFile(draft.fileExplorer.tree, "path", payload.path);
 
-		if (!tab) return;
+		if (!tab || !file) return;
 
 		const currentLine = tab.lines[tab.caretPositions[0].start.line];
 
@@ -205,6 +206,8 @@ export default registerEvents<EditorEvents>({
 			tab.caretPositions[0].start.character++;
 			tab.caretPositions[0].end.character = tab.caretPositions[0].start.character;
 		}
+
+		file.size = new TextEncoder().encode(tab.lines.map((line) => line.slice(0, -1)).join("\n")).length;
 
 		transmission.emit("@file-explorer/save-file", { path: tab.path, content: [...tab.lines] });
 	},

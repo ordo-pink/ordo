@@ -16,7 +16,7 @@ import { saveFile } from "@modules/file-explorer/api/save-file";
 import { debounce } from "@utils/debounce";
 import { Transmission } from "@core/transmission";
 
-const debounceSave = debounce(async (path: string, content: string, callback: () => void) => {
+const debounceSave = debounce(async (path: string, content: string, callback: () => void = () => void 0) => {
 	await saveFile(path, content);
 	callback();
 });
@@ -278,14 +278,9 @@ export default registerEvents<FileExplorerEvents>({
 			draft.fileExplorer.tree = await listFolder(tree.path);
 		}
 	},
-	"@file-explorer/save-file": async ({ payload, transmission }) => {
+	"@file-explorer/save-file": async ({ payload }) => {
 		const contentString = payload.content.map((line) => line.slice(0, -1)).join("\n");
 
-		debounceSave(payload.path, contentString, () =>
-			transmission.emit(
-				"@file-explorer/list-folder",
-				transmission.select((state) => state.fileExplorer.tree.path),
-			),
-		);
+		debounceSave(payload.path, contentString);
 	},
 });

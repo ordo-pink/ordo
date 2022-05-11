@@ -1,15 +1,15 @@
 import { BrowserWindow } from "electron";
 import { is } from "electron-util";
+import { Either } from "or-else";
 
-import { AppEvents } from "@containers/app/types";
+import { registerEvents } from "@core/transmission/register-ordo-events";
 import { internalSettingsStore } from "@core/settings/internal-settings";
 import { userSettingsStore } from "@core/settings/user-settings";
-import { registerEvents } from "@core/transmission/register-ordo-events";
-import { OrdoEventHandler } from "@core/types";
 import { createWindow } from "@core/window/create-window";
-import { Either } from "or-else";
-import { noOpFn } from "@utils/no-op";
+import { OrdoEventHandler } from "@core/types";
+import { AppEvents } from "@containers/app/types";
 import { FoldVoid, fromBoolean } from "@utils/either";
+import { noOpFn } from "@utils/no-op";
 import { tap } from "@utils/tap";
 
 const getStateHandler: OrdoEventHandler<"@app/get-state"> = ({ context, transmission }) => {

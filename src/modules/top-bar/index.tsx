@@ -107,7 +107,7 @@ export const TopBar: React.FC = () => {
 		dispatch({ type: "@top-bar/set-value", payload: e.target.value });
 		setSelected(0);
 
-		if (e.target.value.startsWith(":") || Boolean(currentTab)) {
+		if (e.target.value.startsWith(":") && Boolean(currentTab)) {
 			const split = e.target.value.slice(1).split(":");
 			dispatch({
 				type: "@editor/update-caret-positions",

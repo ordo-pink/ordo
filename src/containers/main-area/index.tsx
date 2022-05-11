@@ -1,10 +1,12 @@
 import React from "react";
+import { Either } from "or-else";
 
-import { Sidebar } from "@containers/side-bar";
+import { useAppDispatch, useAppSelector } from "@core/state/store";
 import { HorizontalSplit } from "@containers/split-view/horizontal-split";
 import { Workspace } from "@containers/workspace";
-import { useAppDispatch, useAppSelector } from "@core/state/store";
+import { Sidebar } from "@containers/side-bar";
 import { TopBar } from "@modules/top-bar";
+import { FoldVoid, fromBoolean } from "@utils/either";
 
 import "@containers/main-area/index.css";
 
@@ -18,20 +20,30 @@ export const MainArea: React.FC = () => {
 	const [targetSideBarWidth, setTargetSideBarWidth] = React.useState<number>(sideBarWidth);
 	const [sizes, setSizes] = React.useState<[number, number]>([100, 0]);
 
-	const onSideBarDragEnd = React.useCallback(([l, r]) => dispatch({ type: "@side-bar/set-width", payload: r }), []);
+	const handleDragEnd = (sizes: [number, number]) =>
+		Either.right(sizes)
+			.map((sizes) => sizes[1])
+			.map((payload) => dispatch({ type: "@side-bar/set-width", payload }))
+			.fold(...FoldVoid);
 
 	React.useEffect(() => {
-		setSizes(showSidebar ? [100 - targetSideBarWidth, targetSideBarWidth] : [100, 0]);
+		fromBoolean(showSidebar).fold(
+			() => setSizes([100, 0]),
+			() => setSizes([100 - targetSideBarWidth, targetSideBarWidth]),
+		);
 	}, [showSidebar, targetSideBarWidth]);
 
 	React.useEffect(() => {
-		setTargetSideBarWidth(settingsSideBarWidth != null ? sideBarWidth : settingsSideBarWidth);
+		Either.fromNullable(setTargetSideBarWidth).fold(
+			() => setTargetSideBarWidth(settingsSideBarWidth),
+			() => setTargetSideBarWidth(sideBarWidth),
+		);
 	}, [sideBarWidth, settingsSideBarWidth]);
 
 	return (
 		<div className="main-area">
 			<TopBar />
-			<HorizontalSplit sizes={sizes} snapOffset={200} onDragEnd={onSideBarDragEnd}>
+			<HorizontalSplit sizes={sizes} snapOffset={200} onDragEnd={handleDragEnd}>
 				<Workspace />
 				<Sidebar />
 			</HorizontalSplit>

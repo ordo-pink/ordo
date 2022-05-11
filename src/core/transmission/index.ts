@@ -59,8 +59,11 @@ export class Transmission {
 				},
 				(patches) => {
 					try {
-						this[stateSymbol] = applyPatches(this[stateSymbol], patches);
-						this[contextSymbol].window.webContents.send("@app/apply-patches", patches);
+						if (patches.length) {
+							this[stateSymbol] = applyPatches(this[stateSymbol], patches);
+							this[contextSymbol].window.webContents.send("@app/apply-patches", patches);
+						}
+
 						resolve(this);
 					} catch (e) {
 						reject(e);

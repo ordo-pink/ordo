@@ -1,24 +1,37 @@
 import React from "react";
-import { Switch } from "or-else";
+import { Either, Switch } from "or-else";
 
 import { useCurrentTab } from "@modules/editor/hooks/use-current-tab";
 import { LineNumber } from "@modules/editor/components/line-number";
 import { Char } from "@modules/editor/components/char";
 import { useAppDispatch } from "@core/state/store";
+import { FoldVoid } from "@utils/either";
+import { NoOp } from "@utils/no-op";
+import { tapPreventDefault, tapStopPropagation } from "@utils/events";
+import { lastIndex } from "@utils/array";
+
+export type LineProps = {
+	lineIndex: number;
+	line: string;
+};
 
 export const Line = React.memo(
-	({ index, line }: { index: number; line: string }) => {
+	({ lineIndex, line }: LineProps) => {
 		const dispatch = useAppDispatch();
 
-		const { tab } = useCurrentTab();
+		const { eitherTab } = useCurrentTab();
 
 		const [markup, setMarkup] = React.useState<any>({ type: "paragraph", children: [] });
 		const [className, setClassName] = React.useState<string>("");
 		const [isCurrentLine, setIsCurrentLine] = React.useState<boolean>(true);
+		const [path, setPath] = React.useState<string>("");
 
-		React.useEffect(() => {
-			setIsCurrentLine(tab?.caretPositions[0].start.line === index);
-		}, [index, tab]);
+		React.useEffect(() => eitherTab.map((t) => setPath(t.path)).fold(...FoldVoid), [eitherTab]);
+
+		React.useEffect(
+			() => eitherTab.map((t) => setIsCurrentLine(t.caretPositions[0].start.line === lineIndex)).fold(...FoldVoid),
+			[lineIndex, eitherTab],
+		);
 
 		React.useEffect(() => {
 			setMarkup({
@@ -65,37 +78,28 @@ export const Line = React.memo(
 			);
 		}, [markup.type]);
 
-		return tab ? (
-			<div className={`flex items-center align-middle w-full`}>
-				<LineNumber number={index + 1} />
-				<div
-					className={`px-2 w-full whitespace-pre tracking-wide ${className}`}
-					onClick={(e) => {
-						e.preventDefault();
-						e.stopPropagation();
+		const handleClick = (e: React.MouseEvent) =>
+			Either.right(e)
+				.map(tapPreventDefault)
+				.map(tapStopPropagation)
+				.chain(() => eitherTab)
+				.map(() => lastIndex(line))
+				.map((character) => ({ line: lineIndex, character }))
+				.map((position) => [{ start: position, end: position, direction: "ltr" as const }])
+				.map((positions) => ({ path, positions }))
+				.map((payload) => dispatch({ type: "@editor/update-caret-positions", payload }))
+				.fold(...FoldVoid);
 
-						dispatch({ type: "@editor/focus" });
-						dispatch({
-							type: "@editor/update-caret-positions",
-							payload: {
-								path: tab.path,
-								positions: [
-									{
-										start: { line: index, character: line.length - 1 },
-										end: { line: index, character: line.length - 1 },
-										direction: "ltr",
-									},
-								],
-							},
-						});
-					}}
-				>
-					{markup.children.map((char: any, charIndex: number) => (
-						<Char key={`${index}-${charIndex}`} lineIndex={index} charIndex={charIndex} char={char} />
+		return eitherTab.fold(NoOp, () => (
+			<div className="editor_line">
+				<LineNumber number={lineIndex + 1} />
+				<div className={`editor_line_content ${className}`} onClick={handleClick}>
+					{markup.children.map((char: string, charIndex: number) => (
+						<Char key={`${lineIndex}-${charIndex}`} lineIndex={lineIndex} charIndex={charIndex} char={char} />
 					))}
 				</div>
 			</div>
-		) : null;
+		));
 	},
 	() => true,
 );

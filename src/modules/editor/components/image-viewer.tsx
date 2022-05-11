@@ -1,15 +1,15 @@
 import React from "react";
+import { Either } from "or-else";
 
 import { useCurrentTab } from "@modules/editor/hooks/use-current-tab";
+import { NoOp } from "@utils/no-op";
 
 export const ImageViewer: React.FC = () => {
-	const { tab } = useCurrentTab();
+	const { eitherTab } = useCurrentTab();
 
-	return (
-		tab && (
-			<div className="flex items-center justify-center p-24">
-				<img className="shadow-2xl" src={tab.raw} />
-			</div>
-		)
-	);
+	return eitherTab.fold(NoOp, (t) => (
+		<div className="editor_image-viewer">
+			<img className="editor_image-viewer_image" src={t.raw} />
+		</div>
+	));
 };

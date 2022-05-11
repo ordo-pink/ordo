@@ -1,45 +1,63 @@
 import React from "react";
+import { Either } from "or-else";
 
 import { useCurrentTab } from "@modules/editor/hooks/use-current-tab";
 import { Caret } from "@modules/editor/components/caret";
 import { useAppDispatch } from "@core/state/store";
+import { NoOp } from "@utils/no-op";
+import { FoldVoid, fromBoolean } from "@utils/either";
+import { tapPreventDefault, tapStopPropagation } from "@utils/events";
+import { tap } from "@utils/tap";
+
+type CharProps = {
+	char: string;
+	lineIndex: number;
+	charIndex: number;
+};
 
 export const Char = React.memo(
-	({ char, lineIndex, charIndex }: any): any => {
+	({ char, lineIndex, charIndex }: CharProps) => {
 		const dispatch = useAppDispatch();
 
-		const { tab } = useCurrentTab();
+		const { eitherTab } = useCurrentTab();
 
-		return tab ? (
+		const [isCaretHere, setIsCaretHere] = React.useState<boolean>(false);
+		const [path, setPath] = React.useState<string>("");
+
+		React.useEffect(() => eitherTab.map((t) => setPath(t.path)).fold(...FoldVoid), [eitherTab]);
+
+		React.useEffect(
+			() =>
+				eitherTab
+					.chain(({ caretPositions: [caret] }) =>
+						fromBoolean(lineIndex === caret.start.line && charIndex === caret.start.character),
+					)
+					.fold(
+						() => setIsCaretHere(false),
+						() => setIsCaretHere(true),
+					),
+			[eitherTab, lineIndex, charIndex],
+		);
+
+		const handleClick = (e: React.MouseEvent) => {
+			Either.right(e)
+				.map(tapPreventDefault)
+				.map(tapStopPropagation)
+				.chain(() => eitherTab)
+				.map(tap(() => dispatch({ type: "@editor/focus" })))
+				.map(() => ({ line: lineIndex, character: charIndex }))
+				.map((position) => [{ start: position, end: position, direction: "ltr" as const }])
+				.map((positions) => ({ path, positions }))
+				.map((payload) => dispatch({ type: "@editor/update-caret-positions", payload }))
+				.fold(...FoldVoid);
+		};
+
+		return eitherTab.fold(NoOp, (t) => (
 			<>
-				{lineIndex === tab.caretPositions[0].start.line && charIndex === tab.caretPositions[0].start.character ? (
-					<Caret />
-				) : null}
-				<span
-					onClick={(e) => {
-						e.preventDefault();
-						e.stopPropagation();
-
-						dispatch({ type: "@editor/focus" });
-						dispatch({
-							type: "@editor/update-caret-positions",
-							payload: {
-								path: tab.path,
-								positions: [
-									{
-										start: { line: lineIndex, character: charIndex },
-										end: { line: lineIndex, character: charIndex },
-										direction: "ltr",
-									},
-								],
-							},
-						});
-					}}
-				>
-					{char}
-				</span>
+				{isCaretHere ? <Caret /> : null}
+				<span onClick={handleClick}>{char}</span>
 			</>
-		) : null;
+		));
 	},
 	() => true,
 );

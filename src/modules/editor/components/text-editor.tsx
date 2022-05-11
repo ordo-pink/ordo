@@ -1,54 +1,55 @@
 import React from "react";
 import Scrollbars from "react-custom-scrollbars-2";
+import { Either } from "or-else";
 
 import { useCurrentTab } from "@modules/editor/hooks/use-current-tab";
 import { Breadcrumbs } from "@modules/editor/components/breadcrumbs";
 import { Lines } from "@modules/editor/components/lines";
 import { useAppDispatch } from "@core/state/store";
+import { tapPreventDefault, tapStopPropagation } from "@utils/events";
+import { FoldVoid } from "@utils/either";
+import { NoOp } from "@utils/no-op";
+import { tap } from "@utils/tap";
+import { lastIndex } from "@utils/array";
 
-export const TextEditor = React.memo(
-	() => {
-		const dispatch = useAppDispatch();
+export const TextEditor: React.FC = () => {
+	const dispatch = useAppDispatch();
 
-		const { tab } = useCurrentTab();
+	const [line, setLine] = React.useState<number>(0);
+	const [character, setCharacter] = React.useState<number>(0);
+	const [path, setPath] = React.useState<string>("");
 
-		return tab ? (
-			<div className="h-full">
-				<Breadcrumbs />
-				<div
-					className="cursor-text h-full pb-6"
-					onClick={(e) => {
-						e.preventDefault();
-						e.stopPropagation();
+	const { eitherTab } = useCurrentTab();
 
-						dispatch({ type: "@editor/focus" });
-						dispatch({
-							type: "@editor/update-caret-positions",
-							payload: {
-								path: tab.path,
-								positions: [
-									{
-										start: {
-											line: tab.lines.length - 1,
-											character: tab.lines[tab.lines.length - 1].length - 1,
-										},
-										end: {
-											line: tab.lines.length - 1,
-											character: tab.lines[tab.lines.length - 1].length - 1,
-										},
-										direction: "ltr",
-									},
-								],
-							},
-						});
-					}}
-				>
-					<Scrollbars autoHide>
-						<Lines />
-					</Scrollbars>
-				</div>
+	React.useEffect(
+		() =>
+			eitherTab
+				.map(tap((t) => setLine(lastIndex(t.lines))))
+				.map(tap((t) => setCharacter(lastIndex(t.lines[lastIndex(t.lines)]))))
+				.map(tap((t) => setPath(t.path)))
+				.fold(...FoldVoid),
+		[eitherTab],
+	);
+
+	const handleClick = (e: React.MouseEvent) =>
+		Either.right(e)
+			.map(tapPreventDefault)
+			.map(tapStopPropagation)
+			.map(() => dispatch({ type: "@editor/focus" }))
+			.map(() => ({ line, character }))
+			.map((position) => [{ start: position, end: position, direction: "ltr" as const }])
+			.map((positions) => ({ path, positions }))
+			.map((payload) => dispatch({ type: "@editor/update-caret-positions", payload }))
+			.fold(...FoldVoid);
+
+	return eitherTab.fold(NoOp, () => (
+		<div className="h-full">
+			<Breadcrumbs />
+			<div className="editor_textarea" onClick={handleClick}>
+				<Scrollbars autoHide>
+					<Lines />
+				</Scrollbars>
 			</div>
-		) : null;
-	},
-	() => true,
-);
+		</div>
+	));
+};

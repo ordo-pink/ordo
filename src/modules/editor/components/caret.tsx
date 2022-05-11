@@ -1,17 +1,21 @@
 import React from "react";
 
 import { useAppSelector } from "@core/state/store";
+import { fromBoolean } from "@utils/either";
 
-export const Caret = React.memo(
-	() => {
-		const focused = useAppSelector((state) => state.editor.focused);
-		const [className, setClassName] = React.useState<string>("caret");
+export const Caret = () => {
+	const focused = useAppSelector((state) => state.editor.focused);
 
-		React.useEffect(() => {
-			setClassName(focused ? "caret" : "caret-unfocused");
-		}, [focused]);
+	const [unfocused, setUnfocused] = React.useState<string>("");
 
-		return <span className={className}></span>;
-	},
-	() => true,
-);
+	React.useEffect(
+		() =>
+			fromBoolean(focused).fold(
+				() => setUnfocused("editor_caret_unfocused"),
+				() => setUnfocused(""),
+			),
+		[focused],
+	);
+
+	return <span className={`editor_caret ${unfocused}`}></span>;
+};

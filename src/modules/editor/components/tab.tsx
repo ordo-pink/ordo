@@ -1,12 +1,20 @@
 import React from "react";
+import { Either } from "or-else";
 
 import { useAppDispatch, useAppSelector } from "@core/state/store";
 import { findOrdoFile } from "@modules/file-explorer/utils/find-ordo-file";
 import { EditorTab } from "@modules/editor/types";
 import { useFileIcon } from "@modules/file-explorer/hooks/use-file-icon";
 import { useIcon } from "@core/hooks/use-icon";
+import { FoldVoid, fromBoolean } from "@utils/either";
+import { tapPreventDefault, tapStopPropagation } from "@utils/events";
+import { NoOp } from "@utils/no-op";
 
-export const Tab: React.FC<{ tab: EditorTab }> = ({ tab }) => {
+type TabProps = {
+	tab: EditorTab;
+};
+
+export const Tab: React.FC<TabProps> = ({ tab }) => {
 	const dispatch = useAppDispatch();
 
 	const currentTab = useAppSelector((state) => state.editor.currentTab);
@@ -16,33 +24,56 @@ export const Tab: React.FC<{ tab: EditorTab }> = ({ tab }) => {
 	const HiX = useIcon("HiX");
 	const Icon = useFileIcon(file);
 
-	const closeTab = React.useCallback(
-		(e: React.MouseEvent) => {
-			e.preventDefault();
-			e.stopPropagation();
+	const [path, setPath] = React.useState<string>("");
+	const [isActive, setIsActive] = React.useState<boolean>(false);
 
-			dispatch({ type: "@editor/close-tab", payload: file?.path || "" });
-		},
+	React.useEffect(
+		() =>
+			Either.fromNullable(file)
+				.map((f) => setPath(f.path))
+				.fold(...FoldVoid),
 		[file],
 	);
 
-	return file ? (
-		<div
-			key={file.path}
-			className={`flex flex-shrink text-sm text-neutral-800 dark:text-neutral-300 items-center space-x-2 cursor-pointer px-3 py-1 rounded-lg truncate ${
-				currentTab === file.path && "bg-neutral-200 dark:bg-neutral-600 shadow-md"
-			}`}
-			onClick={(e) => {
-				e.preventDefault();
-				e.stopPropagation();
+	React.useEffect(
+		() =>
+			Either.fromNullable(file)
+				.map((f) => setIsActive(f.path === currentTab))
+				.fold(...FoldVoid),
+		[currentTab, file],
+	);
 
-				dispatch({ type: "@editor/open-tab", payload: file.path });
-			}}
-			onMouseDown={(e) => (e.button === 1 ? closeTab(e) : void 0)}
+	const handleClose = (e: React.MouseEvent) =>
+		Either.right(e)
+			.map(tapPreventDefault)
+			.map(tapStopPropagation)
+			.map(() => path)
+			.map((payload) => dispatch({ type: "@editor/close-tab", payload }))
+			.fold(...FoldVoid);
+
+	const handleClick = (e: React.MouseEvent) =>
+		Either.right(e)
+			.map(tapPreventDefault)
+			.map(tapStopPropagation)
+			.map(() => path)
+			.map((payload) => dispatch({ type: "@editor/open-tab", payload }))
+			.fold(...FoldVoid);
+
+	const handleMiddleButton = (e: React.MouseEvent) =>
+		fromBoolean(e.button === 1)
+			.map(() => handleClose(e))
+			.fold(...FoldVoid);
+
+	return Either.fromNullable(file).fold(NoOp, (f) => (
+		<div
+			key={path}
+			className={`editor_tab ${isActive ? "editor_tab_active" : ""}`}
+			onClick={handleClick}
+			onMouseDown={handleMiddleButton}
 		>
-			<Icon className="text-neutral-500" />
-			<div>{file.readableName}</div>
-			<HiX className="text-neutral-500 hover:text-red-500" onClick={closeTab} />
+			<Icon className="editor_tab_file-icon" />
+			<div>{f.readableName}</div>
+			<HiX className="editor_tab_close-icon" onClick={handleClose} />
 		</div>
-	) : null;
+	));
 };

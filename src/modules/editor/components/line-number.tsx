@@ -1,39 +1,40 @@
-import { useAppDispatch } from "@core/state/store";
 import React from "react";
-import { useCurrentTab } from "../hooks/use-current-tab";
+import { Either } from "or-else";
+
+import { useAppDispatch } from "@core/state/store";
+import { FoldVoid } from "@utils/either";
+import { tapPreventDefault, tapStopPropagation } from "@utils/events";
+import { NoOp } from "@utils/no-op";
+import { useCurrentTab } from "@modules/editor/hooks/use-current-tab";
+
+type LineNumberProps = {
+	number: number;
+};
 
 export const LineNumber = React.memo(
-	({ number }: any) => {
+	({ number }: LineNumberProps) => {
 		const dispatch = useAppDispatch();
-		const { tab } = useCurrentTab();
+		const { eitherTab } = useCurrentTab();
 
-		return tab ? (
-			<div
-				contentEditable={false}
-				className="w-12 py-1 select-none self-stretch flex flex-shrink-0 justify-end border-r border-neutral-200 dark:border-neutral-600 text-right pr-2 font-mono text-neutral-500 dark:text-neutral-400 text-sm"
-				onClick={(e) => {
-					e.preventDefault();
-					e.stopPropagation();
+		const [path, setPath] = React.useState<string>("");
 
-					dispatch({ type: "@editor/focus" });
-					dispatch({
-						type: "@editor/update-caret-positions",
-						payload: {
-							path: tab?.path,
-							positions: [
-								{
-									start: { line: number - 1, character: 0 },
-									end: { line: number - 1, character: 0 },
-									direction: "ltr",
-								},
-							],
-						},
-					});
-				}}
-			>
-				{number ?? " "}
+		React.useEffect(() => eitherTab.map((t) => setPath(t.path)).fold(...FoldVoid), [eitherTab]);
+
+		const handleClick = (e: React.MouseEvent) =>
+			Either.right(e)
+				.map(tapPreventDefault)
+				.map(tapStopPropagation)
+				.map(() => ({ line: number - 1, character: 0 }))
+				.map((position) => [{ start: position, end: position, direction: "ltr" as const }])
+				.map((positions) => ({ path, positions }))
+				.map((payload) => dispatch({ type: "@editor/update-caret-positions", payload }))
+				.fold(...FoldVoid);
+
+		return eitherTab.fold(NoOp, () => (
+			<div contentEditable={false} className="editor_line_number" onClick={handleClick}>
+				{number ?? "↑"}
 			</div>
-		) : null;
+		));
 	},
 	() => true,
 );

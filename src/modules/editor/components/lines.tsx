@@ -1,71 +1,67 @@
 import React from "react";
+import { Either } from "or-else";
 
 import { useCurrentTab } from "@modules/editor/hooks/use-current-tab";
 import { Line } from "@modules/editor/components/line";
 import { useAppDispatch, useAppSelector } from "@core/state/store";
+import { tap } from "@utils/tap";
+import { FoldVoid, fromBoolean } from "@utils/either";
+import { tapPreventDefault, tapStopPropagation } from "@utils/events";
+import { NoOp } from "@utils/no-op";
+import { lastIndex } from "@utils/array";
 
-export const Lines = React.memo(
-	() => {
-		const dispatch = useAppDispatch();
+export const Lines = () => {
+	const dispatch = useAppDispatch();
 
-		const { tab } = useCurrentTab();
-		const { focused } = useAppSelector((state) => state.editor);
+	const { eitherTab } = useCurrentTab();
+	const { focused } = useAppSelector((state) => state.editor);
 
-		const handleKeyDown = React.useCallback(
-			({ key, altKey, shiftKey, ctrlKey, metaKey }: KeyboardEvent) => {
-				if (tab) {
-					dispatch({
-						type: "@editor/handle-typing",
-						payload: {
-							path: tab.path,
-							event: { key, shiftKey, altKey, ctrlKey, metaKey } as KeyboardEvent,
-						},
-					});
-				}
-			},
-			[tab],
-		);
+	const [line, setLine] = React.useState<number>(0);
+	const [character, setCharacter] = React.useState<number>(0);
+	const [path, setPath] = React.useState<string>("");
 
-		React.useEffect(() => {
-			window.addEventListener("keydown", handleKeyDown);
+	React.useEffect(
+		() =>
+			eitherTab
+				.map(tap((t) => setPath(t.path)))
+				.map(tap((t) => setLine(lastIndex(t.lines))))
+				.map(tap((t) => setCharacter(lastIndex(t.lines[lastIndex(t.lines)]))))
+				.fold(...FoldVoid),
+		[eitherTab],
+	);
 
-			return () => {
-				window.removeEventListener("keydown", handleKeyDown);
-			};
-		}, [tab, focused]);
+	const handleKeyDown = ({ key, altKey, shiftKey, ctrlKey, metaKey }: KeyboardEvent) =>
+		eitherTab
+			.map(() => ({ key, shiftKey, altKey, ctrlKey, metaKey }))
+			.map((event) => ({ path, event }))
+			.map((payload) => dispatch({ type: "@editor/handle-typing", payload }))
+			.fold(...FoldVoid);
 
-		return tab ? (
-			<div
-				className="outline-none select-none cursor-text pb-[calc(50vh-9.5rem)]"
-				onClick={(e) => {
-					e.preventDefault();
-					e.stopPropagation();
+	const handleClick = (e: React.MouseEvent) =>
+		Either.right(e)
+			.map(tapPreventDefault)
+			.map(tapStopPropagation)
+			.chain(() => eitherTab)
+			.map(tap(() => dispatch({ type: "@editor/focus" })))
+			.map(() => ({ line, character }))
+			.map((position) => [{ start: position, end: position, direction: "ltr" as const }])
+			.map((positions) => ({ path, positions }))
+			.map((payload) => dispatch({ type: "@editor/update-caret-positions", payload }))
+			.fold(...FoldVoid);
 
-					dispatch({ type: "@editor/focus" });
-					dispatch({
-						type: "@editor/update-caret-positions",
-						payload: {
-							path: tab.path,
-							positions: [
-								{
-									start: {
-										line: tab.lines.length - 1,
-										character: tab.lines[tab.lines.length - 1].length - 1,
-									},
-									end: {
-										line: tab.lines.length - 1,
-										character: tab.lines[tab.lines.length - 1].length - 1,
-									},
-									direction: "ltr",
-								},
-							],
-						},
-					});
-				}}
-			>
-				{tab.lines && tab.lines.map((line, index) => <Line key={`${line}-${index}`} index={index} line={line} />)}
-			</div>
-		) : null;
-	},
-	() => true,
-);
+	const removeKeyDownListener = () => window.removeEventListener("keydown", handleKeyDown);
+
+	React.useEffect(() => {
+		window.addEventListener("keydown", handleKeyDown);
+
+		return () => removeKeyDownListener();
+	}, [eitherTab]);
+
+	return eitherTab.fold(NoOp, (t) => (
+		<div className="editor_lines" onClick={handleClick}>
+			{t.lines.map((line, lineIndex) => (
+				<Line key={`${line}-${lineIndex}`} lineIndex={lineIndex} line={line} />
+			))}
+		</div>
+	));
+};

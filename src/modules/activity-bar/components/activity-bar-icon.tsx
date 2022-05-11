@@ -3,6 +3,8 @@ import React from "react";
 import { useAppDispatch } from "@core/state/store";
 import { ActivityBarItem } from "@modules/activity-bar/types";
 import { useIcon } from "@core/hooks/use-icon";
+import { fromBoolean } from "@utils/either";
+import { NoOp, noOpFn } from "@utils/no-op";
 
 import "@modules/activity-bar/components/activity-bar-icon.css";
 
@@ -17,13 +19,18 @@ export const ActivityBarIcon: React.FC<ActivityBarItemProps> = ({ icon, show, na
 
 	const handleActivityClick = () => dispatch({ type: "@activity-bar/select", payload: name });
 
-	React.useEffect(() => {
-		setClassName(current === name ? "current-activity" : "");
-	}, [current, name]);
+	React.useEffect(
+		() =>
+			fromBoolean(current === name).fold(
+				() => setClassName(""),
+				() => setClassName("current-activity"),
+			),
+		[current, name],
+	);
 
-	return show ? (
+	return fromBoolean(show).fold(NoOp, () => (
 		<button tabIndex={2} className={`activity ${className}`} onClick={handleActivityClick} title={name}>
 			<Icon />
 		</button>
-	) : null;
+	));
 };

@@ -15,6 +15,11 @@ export type EventHandler<TPayload> = (event: {
 	transmission: Transmission;
 }) => void | Promise<void>;
 
+/**
+ * Transmission is the state management engine that allows mirroring state between
+ * frontend and backend. It tracks changes made with event handlers, collects patches,
+ * and sends them to be applied to the frontend.
+ */
 export class Transmission {
 	private [stateSymbol]: WindowState;
 	private [contextSymbol]: WindowContext;

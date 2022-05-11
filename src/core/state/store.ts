@@ -7,6 +7,9 @@ import { OrdoEvents, WindowState } from "@init/types";
 
 enablePatches();
 
+/**
+ * The frontend mirror of the application state stored in the backend. Uses ReduxJS Toolkit.
+ */
 const state = createSlice({
 	name: "state",
 	initialState,

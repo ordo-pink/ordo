@@ -1,13 +1,18 @@
 import React from "react";
 
 import { useIcon } from "@core/hooks/use-icon";
-import { useCurrentTab } from "@modules/editor/hooks/use-current-tab";
 import { useAppDispatch } from "@core/state/store";
+import { useCurrentTab } from "@modules/editor/hooks/use-current-tab";
+import { FoldVoid } from "@utils/either";
+import { NoOp } from "@utils/no-op";
+import { tap } from "@utils/tap";
 
 import "@containers/status-bar/index.css";
-import { tap } from "@utils/tap";
-import { FoldVoid } from "@utils/either";
 
+/**
+ * StatusBar is a wrapper component for custom informative views and Notifications.g
+ * TODO: Extract Caret Position component to Editor module.
+ */
 export const StatusBar: React.FC = () => {
 	const dispatch = useAppDispatch();
 

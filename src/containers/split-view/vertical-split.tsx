@@ -10,6 +10,10 @@ type VerticalSplitProps = {
 	onDragEnd: (sizes: [number, number]) => void;
 };
 
+/**
+ * Splits the parent element vertically, providing a draggable SVG to control the height
+ * of the items.
+ */
 export const VerticalSplit: React.FC<VerticalSplitProps> = ({
 	sizes,
 	minSize = 0,

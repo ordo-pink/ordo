@@ -18,6 +18,9 @@ const debounceSaveWindowPosition = debounce((window: BrowserWindow) => saveWindo
 
 const windows = new Set<BrowserWindow>();
 
+/**
+ * Creates a new BrowserWindow. Every window has its own separate state.
+ */
 export const createWindow = async (): Promise<void> => {
 	if (process.argv.includes("--debug") && is.development) {
 		await install([REACT_DEVELOPER_TOOLS, REDUX_DEVTOOLS]);

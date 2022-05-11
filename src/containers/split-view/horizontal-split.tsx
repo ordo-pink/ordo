@@ -10,6 +10,10 @@ type HorizontalSplitProps = {
 	onDragEnd: (sizes: [number, number]) => void;
 };
 
+/**
+ * Splits the parent element horizontally, providing a draggable SVG to control the width
+ * of the items.
+ */
 export const HorizontalSplit: React.FC<HorizontalSplitProps> = ({
 	sizes,
 	minSize = 0,

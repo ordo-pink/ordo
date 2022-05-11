@@ -52,9 +52,11 @@ export const Char = React.memo(
 				.fold(...FoldVoid);
 		};
 
-		return eitherTab.fold(NoOp, (t) => (
+		return eitherTab.fold(NoOp, () => (
 			<>
-				{isCaretHere ? <Caret /> : null}
+				{fromBoolean(isCaretHere).fold(NoOp, () => (
+					<Caret />
+				))}
 				<span onClick={handleClick}>{char}</span>
 			</>
 		));

@@ -1,5 +1,4 @@
 import React from "react";
-import { Either } from "or-else";
 
 import { useCurrentTab } from "@modules/editor/hooks/use-current-tab";
 import { NoOp } from "@utils/no-op";

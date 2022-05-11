@@ -99,6 +99,18 @@
 		}
 	}
 
+	&_breadcrumbs {
+		@apply flex space-x-2 text-sm text-neutral-500 items-center px-4 py-2 select-none;
+	}
+
+	&_breadcrumb {
+		@apply flex flex-shrink-0 truncate space-x-2 items-center;
+
+		&_title {
+			@apply flex items-center space-x-2;
+		}
+	}
+
 	&_caret {
 		@apply relative w-0;
 

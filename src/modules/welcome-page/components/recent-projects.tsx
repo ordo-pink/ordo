@@ -8,12 +8,14 @@ import { NoOp } from "@utils/no-op";
 export const RecentProjects: React.FC = () => {
 	const recentProjects = useAppSelector((state) => state.app.internalSettings.window?.recentProjects);
 
-	return fromBoolean(recentProjects.length > 0).fold(NoOp, () => (
-		<div>
-			<h2 className="welcome-page_actions-heading">Recent Projects</h2>
-			{recentProjects.map((path) => (
-				<RecentProject key={path} path={path} />
-			))}
-		</div>
-	));
+	return fromBoolean(!!recentProjects)
+		.chain(() => fromBoolean(recentProjects.length > 0))
+		.fold(NoOp, () => (
+			<div>
+				<h2 className="welcome-page_actions-heading">Recent Projects</h2>
+				{recentProjects.map((path) => (
+					<RecentProject key={path} path={path} />
+				))}
+			</div>
+		));
 };

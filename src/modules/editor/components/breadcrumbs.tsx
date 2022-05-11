@@ -1,9 +1,9 @@
 import React from "react";
 
-import { useCurrentTab } from "@modules/editor/hooks/use-current-tab";
 import { useAppSelector } from "@core/state/store";
+import { useCurrentTab } from "@modules/editor/hooks/use-current-tab";
+import { Breadcrumb } from "@modules/editor/components/breadcrumb";
 import { NoOp } from "@utils/no-op";
-import { Breadcrumb } from "./breadcrumb";
 
 export const Breadcrumbs = React.memo(
 	() => {

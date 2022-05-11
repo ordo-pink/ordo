@@ -1,14 +1,14 @@
 import React from "react";
 import { Either, Switch } from "or-else";
 
+import { useAppDispatch } from "@core/state/store";
 import { useCurrentTab } from "@modules/editor/hooks/use-current-tab";
 import { LineNumber } from "@modules/editor/components/line-number";
 import { Char } from "@modules/editor/components/char";
-import { useAppDispatch } from "@core/state/store";
-import { FoldVoid } from "@utils/either";
-import { NoOp } from "@utils/no-op";
 import { tapPreventDefault, tapStopPropagation } from "@utils/events";
+import { FoldVoid } from "@utils/either";
 import { lastIndex } from "@utils/array";
+import { NoOp } from "@utils/no-op";
 
 export type LineProps = {
 	lineIndex: number;

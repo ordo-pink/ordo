@@ -2,10 +2,10 @@ import React from "react";
 import Scrollbars from "react-custom-scrollbars-2";
 import { Either } from "or-else";
 
+import { useAppDispatch } from "@core/state/store";
 import { useCurrentTab } from "@modules/editor/hooks/use-current-tab";
 import { Breadcrumbs } from "@modules/editor/components/breadcrumbs";
 import { Lines } from "@modules/editor/components/lines";
-import { useAppDispatch } from "@core/state/store";
 import { tapPreventDefault, tapStopPropagation } from "@utils/events";
 import { FoldVoid } from "@utils/either";
 import { NoOp } from "@utils/no-op";

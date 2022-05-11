@@ -2,10 +2,10 @@ import React from "react";
 import { Either } from "or-else";
 
 import { useAppDispatch } from "@core/state/store";
-import { FoldVoid } from "@utils/either";
-import { tapPreventDefault, tapStopPropagation } from "@utils/events";
-import { NoOp } from "@utils/no-op";
 import { useCurrentTab } from "@modules/editor/hooks/use-current-tab";
+import { tapPreventDefault, tapStopPropagation } from "@utils/events";
+import { FoldVoid } from "@utils/either";
+import { NoOp } from "@utils/no-op";
 
 type LineNumberProps = {
 	number: number;

@@ -1,13 +1,13 @@
 import React from "react";
 import { Either } from "or-else";
 
+import { useIcon } from "@core/hooks/use-icon";
 import { useAppDispatch, useAppSelector } from "@core/state/store";
 import { findOrdoFile } from "@modules/file-explorer/utils/find-ordo-file";
-import { EditorTab } from "@modules/editor/types";
 import { useFileIcon } from "@modules/file-explorer/hooks/use-file-icon";
-import { useIcon } from "@core/hooks/use-icon";
-import { FoldVoid, fromBoolean } from "@utils/either";
+import { EditorTab } from "@modules/editor/types";
 import { tapPreventDefault, tapStopPropagation } from "@utils/events";
+import { FoldVoid, fromBoolean } from "@utils/either";
 import { NoOp } from "@utils/no-op";
 
 type TabProps = {

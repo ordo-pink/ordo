@@ -1,14 +1,14 @@
 import React from "react";
 import { Either } from "or-else";
 
+import { useAppDispatch, useAppSelector } from "@core/state/store";
 import { useCurrentTab } from "@modules/editor/hooks/use-current-tab";
 import { Line } from "@modules/editor/components/line";
-import { useAppDispatch, useAppSelector } from "@core/state/store";
-import { tap } from "@utils/tap";
-import { FoldVoid, fromBoolean } from "@utils/either";
 import { tapPreventDefault, tapStopPropagation } from "@utils/events";
-import { NoOp } from "@utils/no-op";
+import { FoldVoid } from "@utils/either";
 import { lastIndex } from "@utils/array";
+import { tap } from "@utils/tap";
+import { NoOp } from "@utils/no-op";
 
 export const Lines = () => {
 	const dispatch = useAppDispatch();

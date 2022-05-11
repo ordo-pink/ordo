@@ -1,9 +1,9 @@
 import React from "react";
 
-import { StatusBar } from "@containers/status-bar";
 import { applyStatePatches, setState, useInternalDispatch, useAppDispatch } from "@core/state/store";
-import { ActivityBar } from "@modules/activity-bar";
+import { StatusBar } from "@containers/status-bar";
 import { MainArea } from "@containers/main-area";
+import { ActivityBar } from "@modules/activity-bar";
 
 import "@containers/app/index.css";
 

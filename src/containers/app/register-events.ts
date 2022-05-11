@@ -7,6 +7,10 @@ import { userSettingsStore } from "@core/settings/user-settings";
 import { registerEvents } from "@core/transmission/register-ordo-events";
 import { OrdoEventHandler } from "@core/types";
 import { createWindow } from "@core/window/create-window";
+import { Either } from "or-else";
+import { noOpFn } from "@utils/no-op";
+import { FoldVoid, fromBoolean } from "@utils/either";
+import { tap } from "@utils/tap";
 
 const getStateHandler: OrdoEventHandler<"@app/get-state"> = ({ context, transmission }) => {
 	context.window.webContents.send(
@@ -16,7 +20,7 @@ const getStateHandler: OrdoEventHandler<"@app/get-state"> = ({ context, transmis
 };
 
 const closeWindowHandler: OrdoEventHandler<"@app/close-window"> = () => {
-	BrowserWindow.getFocusedWindow()?.close();
+	Either.fromNullable(BrowserWindow.getFocusedWindow()).fold(noOpFn, (window) => window.close());
 };
 
 const newWindowHandler: OrdoEventHandler<"@app/new-window"> = async () => {
@@ -28,28 +32,27 @@ const reloadWindowHandler: OrdoEventHandler<"@app/reload-window"> = ({ context }
 };
 
 const toggleDevToolsHandler: OrdoEventHandler<"@app/toggle-dev-tools"> = ({ context }) => {
-	if (!is.development || !process.argv.includes("--debug")) {
-		return;
-	}
-
-	context.window.webContents.toggleDevTools();
+	fromBoolean(is.development)
+		.chain(() => fromBoolean(!process.argv.includes("--debug")))
+		.fold(noOpFn, () => context.window.webContents.toggleDevTools());
 };
 
 const selectProjectHandler: OrdoEventHandler<"@app/select-project"> = async ({ draft, context, transmission }) => {
-	const paths = context.dialog.showOpenDialogSync({
-		properties: ["openDirectory", "createDirectory", "promptToCreate"],
-	});
-
-	if (paths && paths[0]) {
-		draft.app.currentProject = paths[0];
-		await transmission.emit("@file-explorer/list-folder", paths[0]);
-		await transmission.emit("@app/set-internal-setting", [
-			"window.recentProjects",
-			Array.from(new Set([paths[0]].concat(internalSettingsStore.get("window.recentProjects")))).slice(0, 8),
-		]);
-
-		context.addRecentDocument(paths[0]);
-	}
+	Either.fromNullable(
+		context.dialog.showOpenDialogSync({
+			properties: ["openDirectory", "createDirectory", "promptToCreate"],
+		}),
+	)
+		.map(([path]) => path)
+		.map(tap((path) => (draft.app.currentProject = path)))
+		.map(tap((path) => transmission.emit("@file-explorer/list-folder", path)))
+		.map(tap(context.addRecentDocument))
+		.map((path) => [path].concat(internalSettingsStore.get("window.recentProjects")))
+		.map((projects) => projects.slice(0, 5))
+		.map((projects) => new Set(projects))
+		.map(Array.from)
+		.map((projects) => transmission.emit("@app/set-internal-setting", ["window.recentProjects", projects]))
+		.fold(...FoldVoid);
 };
 
 const getInternalSettingsHandler: OrdoEventHandler<"@app/get-internal-settings"> = ({ draft }) => {

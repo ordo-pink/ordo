@@ -1,5 +1,4 @@
 import { OrdoEventHandler } from "@core/types";
-import { listFolder } from "@modules/file-explorer/api/list-folder";
 
 export const handleRemoveFile: OrdoEventHandler<"@file-explorer/remove-file"> = async ({
 	draft,
@@ -26,6 +25,6 @@ export const handleRemoveFile: OrdoEventHandler<"@file-explorer/remove-file"> = 
 
 		await context.trashItem(path);
 
-		draft.fileExplorer.tree = await listFolder(tree.path);
+		await transmission.emit("@file-explorer/list-folder", tree.path);
 	}
 };

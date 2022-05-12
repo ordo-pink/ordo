@@ -1,6 +1,6 @@
 import { OrdoEventHandler } from "@core/types";
-import { updateFolder } from "../api/update-folder";
-import { findOrdoFolder } from "../utils/find-ordo-folder";
+import { updateFolder } from "@modules/file-explorer/api/update-folder";
+import { findOrdoFolder } from "@modules/file-explorer/utils/find-ordo-folder";
 
 export const handleSetFolderColor: OrdoEventHandler<"@file-explorer/set-folder-color"> = ({ draft, payload }) => {
 	const folder = findOrdoFolder(draft.fileExplorer.tree, payload.path);

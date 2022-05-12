@@ -1,4 +1,5 @@
 import React from "react";
+import { Either } from "or-else";
 
 import { useAppSelector } from "@core/state/store";
 import { RecentProject } from "@modules/welcome-page/components/recent-project";
@@ -8,8 +9,8 @@ import { NoOp } from "@utils/no-op";
 export const RecentProjects: React.FC = () => {
 	const recentProjects = useAppSelector((state) => state.app.internalSettings.window?.recentProjects);
 
-	return fromBoolean(!!recentProjects)
-		.chain(() => fromBoolean(recentProjects.length > 0))
+	return Either.fromNullable(recentProjects)
+		.chain((projects) => fromBoolean(projects.length > 0))
 		.fold(NoOp, () => (
 			<div>
 				<h2 className="welcome-page_actions-heading">Recent Projects</h2>

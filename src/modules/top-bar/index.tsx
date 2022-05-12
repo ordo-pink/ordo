@@ -9,25 +9,31 @@ import { File } from "@modules/top-bar/components/file";
 
 import "@modules/top-bar/index.css";
 
+/**
+ * TopBar module provides easy access to finding things. It includes searching substring in
+ * current file, searching a file in the project, accessing commands, and switching between
+ * lines and chars in the document.
+ * TODO: Make a universal component for TopBar list items
+ * TODO: Fix switching between TopBar search modes (now it closes TopBar because of setTimeout)
+ */
 export const TopBar: React.FC = () => {
 	const dispatch = useAppDispatch();
 
 	const value = useAppSelector((state) => state.topBar.value);
 	const isFocused = useAppSelector((state) => state.topBar.focused);
-	const items = useAppSelector((state) => state.app.commands);
+	const commands = useAppSelector((state) => state.app.commands);
 	const tree = useAppSelector((state) => state.fileExplorer.tree);
 	const currentTab = useAppSelector((state) => state.editor.currentTab);
 
 	const [selected, setSelected] = React.useState(0);
 	const [files, setFiles] = React.useState<any[]>([]);
-	const [fusedCommands, setFusedCommands] = React.useState(items.map((item) => ({ item })));
+	const [fusedCommands, setFusedCommands] = React.useState(commands.map((item) => ({ item })));
 	const [fusedFiles, setFusedFiles] = React.useState(files.map((item) => ({ item })));
 	const [height, setHeight] = React.useState<string>("0px");
-	const [filesHeight, setFilesHeight] = React.useState<string>("0px");
 
 	const ref = React.useRef<HTMLInputElement>(null);
 
-	const commandFuse = React.useRef(new Fuse(items, { keys: ["name"] }));
+	const commandFuse = React.useRef(new Fuse(commands, { keys: ["name"] }));
 	const fileFuse = React.useRef(new Fuse(files, { keys: ["readableName", "relativePath", "path"] }));
 
 	React.useEffect(() => {
@@ -35,8 +41,8 @@ export const TopBar: React.FC = () => {
 	}, [files]);
 
 	React.useEffect(() => {
-		commandFuse.current.setCollection(items);
-	}, [items]);
+		commandFuse.current.setCollection(commands);
+	}, [commands]);
 
 	React.useEffect(() => {
 		if (value.startsWith(">")) {
@@ -59,7 +65,7 @@ export const TopBar: React.FC = () => {
 	const updateCommandList = (search: string) => {
 		setFusedCommands(
 			search === ">"
-				? items.map((item) => ({ item }))
+				? commands.map((item) => ({ item }))
 				: search.startsWith(">")
 				? commandFuse.current.search(search.slice(1))
 				: [],
@@ -98,6 +104,7 @@ export const TopBar: React.FC = () => {
 	};
 
 	const handleBlur = () => {
+		// TODO: Dragons here! Without setTimeout it goes to infinite rerendering when switching search views!
 		setTimeout(() => {
 			dispatch({ type: "@top-bar/unfocus" });
 		}, 100);
@@ -108,6 +115,8 @@ export const TopBar: React.FC = () => {
 		setSelected(0);
 
 		if (e.target.value.startsWith(":") && Boolean(currentTab)) {
+			e.stopPropagation();
+
 			const split = e.target.value.slice(1).split(":");
 			dispatch({
 				type: "@editor/update-caret-positions",
@@ -156,10 +165,10 @@ export const TopBar: React.FC = () => {
 
 	return (
 		<div className="top-bar">
-			<div className="top-bar-wrapper">
+			<div className="top-bar_wrapper">
 				<input
 					type="text"
-					className="top-bar-input"
+					className="top-bar_input"
 					placeholder="Quick search (start with : to go to line, @ to go to file, or > to open commands)"
 					ref={ref}
 					value={value}
@@ -169,7 +178,7 @@ export const TopBar: React.FC = () => {
 					onKeyDown={handleKeyDown}
 				/>
 				{isFocused && value.startsWith(">") ? (
-					<div style={{ height }} className="top-bar-list">
+					<div style={{ height }} className="top-bar_list">
 						<Scrollbars autoHide>
 							<div>
 								{fusedCommands &&
@@ -191,7 +200,7 @@ export const TopBar: React.FC = () => {
 					</div>
 				) : null}
 				{isFocused && value.startsWith("@") ? (
-					<div style={{ height }} className="top-bar-list">
+					<div style={{ height }} className="top-bar_list">
 						<Scrollbars autoHide>
 							<div>
 								{fusedFiles &&
@@ -200,7 +209,6 @@ export const TopBar: React.FC = () => {
 											key={item.path}
 											index={index}
 											readableName={item.readableName}
-											relativePath={item.relativePath}
 											size={item.size}
 											path={item.path}
 											type={item.type}

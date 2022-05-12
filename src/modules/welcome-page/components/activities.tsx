@@ -15,7 +15,7 @@ export const Activities: React.FC = () => {
 		dispatch({ type: "@activity-bar/open-editor" });
 	};
 
-	const handleSettingsClick = () => dispatch({ type: "@activity-bar/select", payload: "Settings" });
+	const handleSettingsClick = () => dispatch({ type: "@activity-bar/open-settings" });
 
 	return (
 		<div>

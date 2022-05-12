@@ -2,8 +2,6 @@ import React from "react";
 
 import { useAppSelector } from "@core/state/store";
 
-import "@modules/top-bar/components/accelerator.css";
-
 type AcceleratorProps = {
 	accelerator?: string;
 };
@@ -27,11 +25,11 @@ export const Accelerator: React.FC<AcceleratorProps> = ({ accelerator = "" }) =>
 	}, [platform]);
 
 	return (
-		<div className="top-bar-accelerator">
-			{split.includes("CommandOrControl") ? <kbd className="top-bar-accelerator-key">{ctrl}</kbd> : null}
-			{split.includes("Shift") ? <kbd className="top-bar-accelerator-key">⇧</kbd> : null}
-			{split.includes("Alt") ? <kbd className="top-bar-accelerator-key">{alt}</kbd> : null}
-			<kbd className="top-bar-accelerator-key">{split[split.length - 1]}</kbd>
+		<div className="top-bar_accelerator">
+			{split.includes("CommandOrControl") ? <kbd className="top-bar_accelerator_key">{ctrl}</kbd> : null}
+			{split.includes("Shift") ? <kbd className="top-bar_accelerator_key">⇧</kbd> : null}
+			{split.includes("Alt") ? <kbd className="top-bar_accelerator_key">{alt}</kbd> : null}
+			<kbd className="top-bar_accelerator_key">{split[split.length - 1]}</kbd>
 		</div>
 	);
 };

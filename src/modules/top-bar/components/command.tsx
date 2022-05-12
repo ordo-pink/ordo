@@ -5,8 +5,6 @@ import { Accelerator } from "@modules/top-bar/components/accelerator";
 import { useAppDispatch } from "@core/state/store";
 import { useIcon } from "@core/hooks/use-icon";
 
-import "@modules/top-bar/components/command.css";
-
 type CommandProps = TCommand & {
 	selected: number;
 	index: number;
@@ -28,12 +26,12 @@ export const Command: React.FC<CommandProps> = ({ icon, name, accelerator, event
 
 	return (
 		<div
-			className={`top-bar-command ${isSelected && "top-bar-selected-command"}`}
+			className={`top-bar_item ${isSelected && "top-bar_item_selected"}`}
 			onMouseOver={handleMouseOver}
 			onClick={handleClick}
 		>
-			<div className="top-bar-command-info">
-				<Icon className="top-bar-command-icon" />
+			<div className="top-bar_item_info">
+				<Icon className="top-bar_item_info_icon" />
 				<div>{name}</div>
 			</div>
 			<Accelerator accelerator={accelerator} />

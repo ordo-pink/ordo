@@ -1,7 +1,0 @@
-.top-bar-accelerator {
-	@apply flex align-baseline items-center space-x-1;
-}
-
-.top-bar-accelerator-key {
-	@apply bg-neutral-100 shadow-sm dark:bg-neutral-800 rounded-sm px-1 font-sans;
-}

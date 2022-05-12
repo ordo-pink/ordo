@@ -2,6 +2,7 @@ import { promises } from "fs";
 import { join } from "path";
 import { Minimatch } from "minimatch";
 
+import { OrdoEventHandler } from "@core/types";
 import { userSettingsStore } from "@core/settings/user-settings";
 import { OrdoFolder } from "@modules/file-explorer/types";
 import { createOrdoFile } from "@modules/file-explorer/utils/create-ordo-file";
@@ -74,4 +75,8 @@ export const listFolder = async (path: string, depth = 0, rootPath = path): Prom
 	}
 
 	return sortTree(tree);
+};
+
+export const handleListFolder: OrdoEventHandler<"@file-explorer/list-folder"> = async ({ draft, payload }) => {
+	draft.fileExplorer.tree = await listFolder(payload);
 };

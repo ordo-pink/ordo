@@ -6,3 +6,5 @@ export const tap =
 		f(arg);
 		return arg;
 	};
+
+export const id = <T>(x: T): T => x;

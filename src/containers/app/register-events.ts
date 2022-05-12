@@ -10,7 +10,7 @@ import { OrdoEventHandler } from "@core/types";
 import { AppEvents } from "@containers/app/types";
 import { FoldVoid, fromBoolean } from "@utils/either";
 import { noOpFn } from "@utils/no-op";
-import { tap } from "@utils/tap";
+import { tap } from "@utils/functions";
 
 /**
  * Sends a snapshot of the backend state to the frontend for synchronisation.
@@ -105,7 +105,7 @@ const setUserSettingHandler: OrdoEventHandler<"@app/set-user-setting"> = ({ draf
 };
 
 /**
- * Registers a provided command in the TopBar command palette.
+ * Registers a provided command in the TopBar command palette.w
  */
 const registerCommandHandler: OrdoEventHandler<"@app/register-command"> = ({ draft, payload }) => {
 	draft.app.commands.push(payload);

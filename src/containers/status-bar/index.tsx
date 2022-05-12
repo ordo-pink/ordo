@@ -5,7 +5,7 @@ import { useAppDispatch } from "@core/state/store";
 import { useCurrentTab } from "@modules/editor/hooks/use-current-tab";
 import { FoldVoid } from "@utils/either";
 import { NoOp } from "@utils/no-op";
-import { tap } from "@utils/tap";
+import { tap } from "@utils/functions";
 
 import "@containers/status-bar/index.css";
 

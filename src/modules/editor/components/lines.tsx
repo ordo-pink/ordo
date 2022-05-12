@@ -7,7 +7,7 @@ import { Line } from "@modules/editor/components/line";
 import { tapPreventDefault, tapStopPropagation } from "@utils/events";
 import { FoldVoid } from "@utils/either";
 import { lastIndex } from "@utils/array";
-import { tap } from "@utils/tap";
+import { tap } from "@utils/functions";
 import { NoOp } from "@utils/no-op";
 
 export const Lines = () => {

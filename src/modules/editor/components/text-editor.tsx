@@ -9,7 +9,7 @@ import { Lines } from "@modules/editor/components/lines";
 import { tapPreventDefault, tapStopPropagation } from "@utils/events";
 import { FoldVoid } from "@utils/either";
 import { NoOp } from "@utils/no-op";
-import { tap } from "@utils/tap";
+import { tap } from "@utils/functions";
 import { lastIndex } from "@utils/array";
 
 export const TextEditor: React.FC = () => {

@@ -7,6 +7,7 @@ import { Tabs } from "@modules/editor/components/tabs";
 import { useEditorComponent } from "@modules/editor/hooks/use-editor-component";
 import { fromBoolean } from "@utils/either";
 import { NoOp } from "@utils/no-op";
+import { id } from "@utils/functions";
 
 import "@modules/editor/index.css";
 
@@ -15,7 +16,7 @@ export const Editor: React.FC = () => {
 
 	const tabs = useAppSelector((state) => state.editor.tabs);
 
-	const Component = useEditorComponent(eitherFile.fold(NoOp, (x) => x));
+	const Component = useEditorComponent(eitherFile.fold(NoOp, id));
 
 	return fromBoolean(tabs.length > 0).fold(
 		() => <EmptyEditor />,

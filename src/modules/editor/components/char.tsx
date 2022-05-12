@@ -7,7 +7,7 @@ import { Caret } from "@modules/editor/components/caret";
 import { tapPreventDefault, tapStopPropagation } from "@utils/events";
 import { FoldVoid, fromBoolean } from "@utils/either";
 import { NoOp } from "@utils/no-op";
-import { tap } from "@utils/tap";
+import { tap } from "@utils/functions";
 
 type CharProps = {
 	char: string;

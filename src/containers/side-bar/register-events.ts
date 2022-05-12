@@ -5,7 +5,7 @@ import { registerEvents } from "@core/transmission/register-ordo-events";
 import { internalSettingsStore } from "@core/settings/internal-settings";
 import { SideBarEvents } from "@containers/side-bar/types";
 import { FoldVoid, fromBoolean } from "@utils/either";
-import { tap } from "@utils/tap";
+import { tap } from "@utils/functions";
 
 /**
  * Triggers hiding the SideBar. This method does not change width of the SideBar so that it can be

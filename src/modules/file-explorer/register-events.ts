@@ -4,8 +4,6 @@ import { join } from "path";
 
 import { Colors } from "@core/appearance/colors";
 import { registerEvents } from "@core/transmission/register-ordo-events";
-import { createFile } from "@modules/file-explorer/api/create-file";
-import { createFolder } from "@modules/file-explorer/api/create-folder";
 import { listFolder } from "@modules/file-explorer/api/list-folder";
 import { move } from "@modules/file-explorer/api/move";
 import { updateFolder } from "@modules/file-explorer/api/update-folder";
@@ -14,7 +12,8 @@ import { findOrdoFile } from "@modules/file-explorer/utils/find-ordo-file";
 import { findOrdoFolder } from "@modules/file-explorer/utils/find-ordo-folder";
 import { saveFile } from "@modules/file-explorer/api/save-file";
 import { debounce } from "@utils/debounce";
-import { Transmission } from "@core/transmission";
+import { handleCreateFile } from "@modules/file-explorer/events/create-file";
+import { handleCreateFolder } from "@modules/file-explorer/events/create-folder";
 
 const debounceSave = debounce(async (path: string, content: string, callback: () => void = () => void 0) => {
 	await saveFile(path, content);
@@ -36,21 +35,8 @@ export default registerEvents<FileExplorerEvents>({
 
 		updateFolder(payload, { collapsed: folder.collapsed });
 	},
-	"@file-explorer/create-file": async ({ draft, transmission, payload }) => {
-		const { createFileIn } = transmission.select((state) => state.fileExplorer);
-
-		draft.fileExplorer.tree = await createFile(draft.fileExplorer.tree, createFileIn, payload);
-
-		transmission.emit("@file-explorer/hide-creation", null);
-		transmission.emit("@editor/open-tab", join(createFileIn, payload));
-	},
-	"@file-explorer/create-folder": async ({ draft, transmission, payload }) => {
-		const { createFolderIn } = transmission.select((state) => state.fileExplorer);
-
-		draft.fileExplorer.tree = await createFolder(draft.fileExplorer.tree, createFolderIn, payload);
-
-		transmission.emit("@file-explorer/hide-creation", null);
-	},
+	"@file-explorer/create-file": handleCreateFile,
+	"@file-explorer/create-folder": handleCreateFolder,
 	"@file-explorer/remove-file": async ({ draft, payload, context, transmission }) => {
 		const currentPath = transmission.select((state) => state.editor.currentTab);
 		const tree = transmission.select((state) => state.fileExplorer.tree);

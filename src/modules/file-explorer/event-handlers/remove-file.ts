@@ -1,5 +1,9 @@
 import { OrdoEventHandler } from "@core/types";
 
+/**
+ * Moves file with a path provided via payload to trash bin.
+ * TODO: Add support for achiving files.
+ */
 export const handleRemoveFile: OrdoEventHandler<"@file-explorer/remove-file"> = async ({
 	payload,
 	context,

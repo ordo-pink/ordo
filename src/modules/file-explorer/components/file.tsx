@@ -5,12 +5,13 @@ import { OrdoFile } from "@modules/file-explorer/types";
 import { useFileIcon } from "@modules/file-explorer/hooks/use-file-icon";
 import { useTreePadding } from "@modules/file-explorer/hooks/use-tree-padding";
 
-import "@modules/file-explorer/components/file.css";
-
 type FileProps = {
 	file: OrdoFile;
 };
 
+/**
+ * Project file representation in FileExplorer.
+ */
 export const File: React.FC<FileProps> = ({ file }) => {
 	const dispatch = useAppDispatch();
 
@@ -44,13 +45,15 @@ export const File: React.FC<FileProps> = ({ file }) => {
 			style={{ paddingLeft }}
 			title={file.path}
 			draggable={true}
-			className={`file ${isOpenFile && "open-file"} ${isCurrentFile && "current-file"}`}
+			className={`file-explorer_item ${isOpenFile && "file-explorer_item_open"} ${
+				isCurrentFile && "file-explorer_item_current"
+			}`}
 			onClick={handleClick}
 			onContextMenu={handleContextMenu}
 			onDragStart={handleDragStart}
 		>
-			<Icon className="file-icon" />
-			<div className="file-name">{file.readableName}</div>
+			<Icon className="file-explorer_item_icon" />
+			<div className="file-explorer_item_name">{file.readableName}</div>
 		</div>
 	);
 };

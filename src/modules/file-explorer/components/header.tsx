@@ -1,11 +1,15 @@
 import React from "react";
+import { Either } from "or-else";
 
 import { useAppDispatch, useAppSelector } from "@core/state/store";
 import { useFolderIcons } from "@modules/file-explorer/hooks/use-folder-icons";
 import { useIcon } from "@core/hooks/use-icon";
+import { NoOp } from "@utils/no-op";
 
-import "@modules/file-explorer/components/header.css";
-
+/**
+ * Displays the project name and allows collapsing the whole project in one click.
+ * Action buttons allow creating a folder or a file at the root level of the project.
+ */
 export const Header: React.FC = () => {
 	const dispatch = useAppDispatch();
 
@@ -19,16 +23,16 @@ export const Header: React.FC = () => {
 	const handleFileClick = () => dispatch({ type: "@file-explorer/show-file-creation", payload: tree.path });
 	const handleFolderClick = () => dispatch({ type: "@file-explorer/show-folder-creation", payload: tree.path });
 
-	return tree ? (
-		<>
-			<div className="header" onClick={handleClick}>
+	return Either.fromNullable(tree).fold(NoOp, () => (
+		<div className="file-explorer_header">
+			<div className="file-explorer_header_title" onClick={handleClick}>
 				<CollapseIcon />
-				<div className="project-name">{tree.readableName}</div>
+				<div className="file-explorer_header_project-name">{tree.readableName}</div>
 			</div>
-			<div className="header-actions">
-				<HiOutlineDocumentAdd onClick={handleFileClick} className="header-action" />
-				<HiOutlineFolderAdd onClick={handleFolderClick} className="header-action" />
+			<div className="file-explorer_header_actions">
+				<HiOutlineDocumentAdd onClick={handleFileClick} className="file-explorer_header_action" />
+				<HiOutlineFolderAdd onClick={handleFolderClick} className="file-explorer_header_action" />
 			</div>
-		</>
-	) : null;
+		</div>
+	));
 };

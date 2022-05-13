@@ -3,6 +3,9 @@ import { existsSync, promises } from "fs";
 
 import { OrdoEventHandler } from "@core/types";
 
+/**
+ * Creates a folder with the path provided as payload.
+ */
 export const handleCreateFolder: OrdoEventHandler<"@file-explorer/create-folder"> = async ({
 	transmission,
 	payload,

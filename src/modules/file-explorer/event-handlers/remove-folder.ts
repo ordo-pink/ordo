@@ -5,6 +5,9 @@ import { fromBoolean } from "@utils/either";
 import { id } from "@utils/functions";
 import { noOpFn } from "@utils/no-op";
 
+/**
+ * Moves folder with a path provided via payload to trash bin.
+ */
 export const handleRemoveFolder: OrdoEventHandler<"@file-explorer/remove-folder"> = async ({
 	payload,
 	context,

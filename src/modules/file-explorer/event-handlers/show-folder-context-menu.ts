@@ -5,6 +5,9 @@ import { Colors } from "@core/appearance/colors";
 import { OrdoEventHandler } from "@core/types";
 import { findOrdoFolder } from "@modules/file-explorer/utils/find-ordo-folder";
 
+/**
+ * Shows folder context menu.
+ */
 export const handleShowFolderContextMenu: OrdoEventHandler<"@file-explorer/show-folder-context-menu"> = ({
 	payload: { x, y, path },
 	transmission,

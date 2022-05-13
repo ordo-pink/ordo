@@ -1,56 +1,57 @@
 import React from "react";
+import { Either } from "or-else";
 
-import { OrdoFolder, OrdoFile } from "@modules/file-explorer/types";
-import { File } from "@modules/file-explorer/components/file";
-import { Creator } from "@modules/file-explorer/components/creator";
 import { useAppDispatch } from "@core/state/store";
+import { OrdoFolder } from "@modules/file-explorer/types";
+import { Creator } from "@modules/file-explorer/components/creator";
 import { useFolderIcons } from "@modules/file-explorer/hooks/use-folder-icons";
 import { useTreePadding } from "@modules/file-explorer/hooks/use-tree-padding";
-
-import "@modules/file-explorer/components/folder.css";
+import { FolderContent } from "@modules/file-explorer/components/folder-content";
+import { tapPreventDefault, tapStopPropagation } from "@utils/events";
+import { FoldVoid } from "@utils/either";
+import { NoOp } from "@utils/no-op";
 
 type FolderProps = {
 	folder: OrdoFolder;
 };
 
+/**
+ * Collapsible and expandable representation of a folder inside the project.
+ */
 export const Folder: React.FC<FolderProps> = ({ folder }) => {
 	const dispatch = useAppDispatch();
 
 	const { FolderIcon, CollapseIcon } = useFolderIcons(folder);
 	const paddingLeft = useTreePadding(folder.depth);
 
-	const [color, setColor] = React.useState<string>("");
+	const [iconClassName, setIconClassName] = React.useState<string>("file-explorer_folder_green");
 
 	React.useEffect(() => {
-		setColor(`text-${folder.color}-600 dark:text-${folder.color}-300`);
+		setIconClassName(`file-explorer_folder_${folder.color}`);
 	}, [folder]);
 
-	const handleDragLeave = (event: React.MouseEvent) => {
-		event.preventDefault();
-		event.stopPropagation();
+	const handleDragLeave = (event: React.MouseEvent) =>
+		Either.right(event)
+			.map(tapPreventDefault)
+			.map(tapStopPropagation)
+			.map((e) => e.currentTarget.classList.remove("bg-gray-300"))
+			.fold(...FoldVoid);
 
-		event.currentTarget.classList.remove("bg-gray-300");
-	};
+	const handleDragOver = (event: React.MouseEvent) =>
+		Either.right(event)
+			.map(tapPreventDefault)
+			.map(tapStopPropagation)
+			.map((e) => e.currentTarget.classList.add("bg-gray-300"))
+			.fold(...FoldVoid);
 
-	const handleDragOver = (event: React.MouseEvent) => {
-		event.preventDefault();
-		event.stopPropagation();
-
-		event.currentTarget.classList.add("bg-gray-300");
-	};
-
-	const handleDrop = (event: React.DragEvent) => {
-		event.preventDefault();
-		event.stopPropagation();
-
-		const fileName = event.dataTransfer.getData("fileName");
-		const oldPath = event.dataTransfer.getData("oldPath");
-		event.dataTransfer.clearData();
-
-		dispatch({ type: "@file-explorer/move", payload: { oldPath, newFolder: folder.path, name: fileName } });
-
-		event.currentTarget.classList.remove("bg-gray-300");
-	};
+	const handleDrop = (event: React.DragEvent) =>
+		Either.right(event)
+			.map(tapPreventDefault)
+			.map(tapStopPropagation)
+			.map((e) => ({ name: e.dataTransfer.getData("fileName"), oldPath: e.dataTransfer.getData("oldPath") }))
+			.map(({ name, oldPath }) => ({ name, oldPath, newFolder: folder.path }))
+			.map((payload) => dispatch({ type: "@file-explorer/move", payload }))
+			.fold(...FoldVoid);
 
 	const handleDragStart = (event: React.DragEvent) => {
 		event.dataTransfer.setData("oldPath", folder.path);
@@ -65,32 +66,24 @@ export const Folder: React.FC<FolderProps> = ({ folder }) => {
 
 	const handleClick = () => dispatch({ type: "@file-explorer/toggle-folder", payload: folder.path });
 
-	return (
-		folder && (
-			<div onDragLeave={handleDragLeave} onDragOver={handleDragOver} onDrop={handleDrop} title={folder.path}>
-				<div
-					className="folder"
-					draggable={true}
-					style={{ paddingLeft }}
-					onClick={handleClick}
-					onContextMenu={handleContextMenu}
-					onDragStart={handleDragStart}
-				>
-					<CollapseIcon />
-					<FolderIcon className={`folder-icon ${color}`} />
-					<div className="folder-name">{folder.readableName}</div>
-				</div>
-				{!folder.collapsed ? (
-					<div>
-						<Creator path={folder.path} depth={folder.depth} />
-						{folder.children.map((child) => (
-							<div key={child.path}>
-								{child.type === "folder" ? <Folder folder={child as OrdoFolder} /> : <File file={child as OrdoFile} />}
-							</div>
-						))}
-					</div>
-				) : null}
+	return Either.fromNullable(folder).fold(NoOp, () => (
+		<div onDragLeave={handleDragLeave} onDragOver={handleDragOver} onDrop={handleDrop} title={folder.path}>
+			<div
+				className="file-explorer_item"
+				draggable={true}
+				style={{ paddingLeft }}
+				onClick={handleClick}
+				onContextMenu={handleContextMenu}
+				onDragStart={handleDragStart}
+			>
+				<CollapseIcon />
+				<FolderIcon className={iconClassName} />
+				<div className="file-explorer_item_name">{folder.readableName}</div>
 			</div>
-		)
-	);
+
+			<Creator path={folder.path} depth={folder.depth} />
+
+			<FolderContent folder={folder} />
+		</div>
+	));
 };

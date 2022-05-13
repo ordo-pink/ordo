@@ -3,6 +3,9 @@ import { Menu, MenuItem } from "electron";
 import { OrdoEventHandler } from "@core/types";
 import { findOrdoFile } from "@modules/file-explorer/utils/find-ordo-file";
 
+/**
+ * Shows file context menu.
+ */
 export const handleShowFileContextMenu: OrdoEventHandler<"@file-explorer/show-file-context-menu"> = ({
 	payload: { x, y, path },
 	transmission,

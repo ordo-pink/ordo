@@ -9,6 +9,9 @@ import { createOrdoFile } from "@modules/file-explorer/utils/create-ordo-file";
 import { createOrdoFolder } from "@modules/file-explorer/utils/create-ordo-folder";
 import { sortTree } from "@modules/file-explorer/utils/sort-tree";
 
+/**
+ * Collects the list of all files and folders within the path.
+ */
 export const listFolder = async (path: string, depth = 0, rootPath = path): Promise<OrdoFolder> => {
 	const folder = await promises.readdir(path, { withFileTypes: true, encoding: "utf-8" });
 	const { mtime, atime, birthtime } = await promises.stat(path);

@@ -3,6 +3,9 @@ import { join } from "path";
 
 import { OrdoEventHandler } from "@core/types";
 
+/**
+ * Moves file or folder from oldPath to newPath.
+ */
 export const handleMove: OrdoEventHandler<"@file-explorer/move"> = async ({ payload, transmission, context }) => {
 	const { oldPath, name, newFolder } = payload;
 	const tree = transmission.select((state) => state.fileExplorer.tree);

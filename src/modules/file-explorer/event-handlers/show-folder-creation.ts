@@ -1,6 +1,9 @@
 import { OrdoEventHandler } from "@core/types";
 import { findOrdoFolder } from "@modules/file-explorer/utils/find-ordo-folder";
 
+/**
+ * Shows input for creating a folder.
+ */
 export const handleShowFolderCreation: OrdoEventHandler<"@file-explorer/show-folder-creation"> = async ({
 	draft,
 	payload,

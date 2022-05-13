@@ -3,6 +3,9 @@ import { existsSync, promises } from "fs";
 
 import { OrdoEventHandler } from "@core/types";
 
+/**
+ * Creates a file with the path provided as payload.
+ */
 export const handleCreateFile: OrdoEventHandler<"@file-explorer/create-file"> = async ({ transmission, payload }) => {
 	const { createFileIn, tree } = transmission.select((state) => state.fileExplorer);
 

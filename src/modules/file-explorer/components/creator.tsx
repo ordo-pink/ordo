@@ -2,14 +2,18 @@ import React from "react";
 
 import { useAppDispatch, useAppSelector } from "@core/state/store";
 import { useTreePadding } from "@modules/file-explorer/hooks/use-tree-padding";
-
-import "@modules/file-explorer/components/creator.css";
+import { fromBoolean } from "@utils/either";
+import { NoOp } from "@utils/no-op";
 
 type CreatorProps = {
 	path: string;
 	depth: number;
 };
 
+/**
+ * Input field used for creating files or folders in any place within FileExplorer.
+ * TODO: Extract logic and avoid rendering if file or folder creation is not required.
+ */
 export const Creator: React.FC<CreatorProps> = ({ path, depth }) => {
 	const dispatch = useAppDispatch();
 
@@ -17,17 +21,20 @@ export const Creator: React.FC<CreatorProps> = ({ path, depth }) => {
 
 	const ref = React.useRef<HTMLInputElement>(null);
 
-	const padding = useTreePadding(depth);
+	const marginLeft = useTreePadding(depth);
 
-	const [name, setName] = React.useState("");
+	const [name, setName] = React.useState<string>("");
+	const [width, setWidth] = React.useState<string>();
 	const [createHere, setCreateHere] = React.useState<boolean>(false);
-	const [type, setType] = React.useState<"@file-explorer/create-file" | "@file-explorer/create-folder">(
-		"@file-explorer/create-file",
-	);
+	const [type, setType] = React.useState<"create-file" | "create-folder">("create-file");
+
+	React.useEffect(() => {
+		setWidth(`calc(100% - ${marginLeft})`);
+	}, [marginLeft]);
 
 	React.useEffect(() => {
 		setCreateHere(createFileIn === path || createFolderIn === path);
-		setType(createFileIn ? "@file-explorer/create-file" : "@file-explorer/create-folder");
+		setType(createFileIn ? "create-file" : "create-folder");
 	}, [createFileIn, createFolderIn, path]);
 
 	const handleBlur = () => {
@@ -39,7 +46,7 @@ export const Creator: React.FC<CreatorProps> = ({ path, depth }) => {
 	const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => setName(e.target.value);
 	const handleFocus = () => dispatch({ type: "@editor/unfocus" });
 	const handleSubmit = () => {
-		dispatch({ type, payload: name });
+		dispatch({ type: `@file-explorer/${type}`, payload: name });
 		setName("");
 	};
 	const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -50,12 +57,12 @@ export const Creator: React.FC<CreatorProps> = ({ path, depth }) => {
 		}
 	};
 
-	return createHere ? (
+	return fromBoolean(createHere).fold(NoOp, () => (
 		<input
 			type="text"
-			className="creator"
+			className="file-explorer_creator"
 			ref={ref}
-			style={{ width: `calc(100% - ${padding})`, marginLeft: padding }}
+			style={{ width, marginLeft }}
 			autoFocus={createHere}
 			value={name}
 			onChange={handleChange}
@@ -64,5 +71,5 @@ export const Creator: React.FC<CreatorProps> = ({ path, depth }) => {
 			onKeyDown={handleKeyDown}
 			onSubmit={handleSubmit}
 		/>
-	) : null;
+	));
 };

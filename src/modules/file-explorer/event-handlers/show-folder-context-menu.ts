@@ -48,7 +48,7 @@ export const handleShowFolderContextMenu: OrdoEventHandler<"@file-explorer/show-
 		menu.append(new MenuItem({ type: "separator" }));
 	}
 
-	const colorOptions = Colors.slice(17).map(
+	const colorOptions = Colors.map(
 		(color) =>
 			new MenuItem({
 				label: color[0].toUpperCase() + color.slice(1),

@@ -30,6 +30,7 @@ export const handleShowFolderContextMenu: OrdoEventHandler<"@file-explorer/show-
 	menu.append(
 		new MenuItem({
 			label: "New Folder",
+			accelerator: "CommandOrControl+Alt+N",
 			click: () => transmission.emit("@file-explorer/show-folder-creation", path),
 		}),
 	);
@@ -80,7 +81,6 @@ export const handleShowFolderContextMenu: OrdoEventHandler<"@file-explorer/show-
 	menu.append(
 		new MenuItem({
 			label: "Remove Folder",
-			accelerator: "CommandOrControl+Backspace",
 			click: () => transmission.emit("@file-explorer/remove-folder", path),
 		}),
 	);

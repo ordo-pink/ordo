@@ -1,7 +1,6 @@
 import { OrdoEventHandler } from "@core/types";
 
 export const handleRemoveFile: OrdoEventHandler<"@file-explorer/remove-file"> = async ({
-	draft,
 	payload,
 	context,
 	transmission,

@@ -38,7 +38,6 @@ export const handleShowFileContextMenu: OrdoEventHandler<"@file-explorer/show-fi
 	menu.append(
 		new MenuItem({
 			label: "Remove File",
-			accelerator: "CommandOrControl+Backspace",
 			click: () => transmission.emit("@file-explorer/remove-file", path),
 		}),
 	);

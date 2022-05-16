@@ -106,8 +106,13 @@ export const parseInline = (symbols: Symbol[], tree: TokenWithChildren) => {
 				symbol = reader.next();
 				symbols.push(symbol!);
 				symbol = reader.next();
+				ahead = reader.lookAhead();
+				back = reader.backTrack();
 
-				while (symbol && back && back.type !== SymbolType.STAR) {
+				while (symbol) {
+					if (!symbol || (symbol.type === SymbolType.STAR && back && back.type === SymbolType.STAR)) {
+						break;
+					}
 					symbols.push(symbol);
 					symbol = reader.next();
 					ahead = reader.lookAhead();
@@ -208,7 +213,10 @@ export const parseInline = (symbols: Symbol[], tree: TokenWithChildren) => {
 				symbols.push(symbol!);
 				symbol = reader.next();
 
-				while (symbol && back && back.type !== SymbolType.UNDERSCORE) {
+				while (symbol) {
+					if (!symbol || (symbol.type === SymbolType.UNDERSCORE && back && back.type === SymbolType.UNDERSCORE)) {
+						break;
+					}
 					symbols.push(symbol);
 					symbol = reader.next();
 					ahead = reader.lookAhead();
@@ -334,7 +342,7 @@ export const parseInline = (symbols: Symbol[], tree: TokenWithChildren) => {
 						start: symbols[0].position.start,
 						end: tail(symbols).position.end,
 					},
-					symbols,
+					symbols: symbols.slice(0, -2),
 					closingSymbols: symbols.slice(-2),
 				});
 			} else {

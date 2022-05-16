@@ -85,6 +85,9 @@ export default registerEvents<EditorEvents>({
 		}
 
 		tab.caretPositions = payload.positions;
+		if (!draft.editor.focused) {
+			draft.editor.focused = true;
+		}
 	},
 	"@editor/focus": ({ draft }) => {
 		draft.editor.focused = true;

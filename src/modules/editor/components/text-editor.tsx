@@ -28,7 +28,12 @@ export const TextEditor: React.FC = () => {
 				.map(tap((t) => setCharacter(lastIndex(t.lines[lastIndex(t.lines)]))))
 				.map(tap((t) => setPath(t.path)))
 				.fold(...FoldVoid),
-		[eitherTab],
+		[
+			eitherTab.fold(
+				() => null,
+				(t) => t.path,
+			),
+		],
 	);
 
 	const handleClick = (e: React.MouseEvent) =>

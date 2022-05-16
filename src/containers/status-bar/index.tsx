@@ -27,7 +27,7 @@ export const StatusBar: React.FC = () => {
 	React.useEffect(
 		() =>
 			eitherTab
-				.map(tap((t) => setLine(t.caretPositions[0].start.line + 1)))
+				.map(tap((t) => setLine(t.caretPositions[0].start.line)))
 				.map(tap((t) => setCharacter(t.caretPositions[0].start.character)))
 				.fold(...FoldVoid),
 		[eitherTab],

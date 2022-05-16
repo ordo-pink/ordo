@@ -1,13 +1,12 @@
 import React from "react";
-import { Either } from "or-else";
 
+import { Symbol } from "@modules/md-parser/types";
 import { useAppDispatch } from "@core/state/store";
 import { useCurrentTab } from "@modules/editor/hooks/use-current-tab";
 import { Caret } from "@modules/editor/components/caret";
-import { tapPreventDefault, tapStopPropagation } from "@utils/events";
-import { FoldVoid, fromBoolean } from "@utils/either";
+import { useCurrentPositions } from "@modules/editor/hooks/use-current-positions";
+import { fromBoolean } from "@utils/either";
 import { NoOp } from "@utils/no-op";
-import { tap } from "@utils/functions";
 
 type CharProps = {
 	char: string;
@@ -15,51 +14,81 @@ type CharProps = {
 	charIndex: number;
 };
 
-export const Char = React.memo(
-	({ char, lineIndex, charIndex }: CharProps) => {
-		const dispatch = useAppDispatch();
+export const Char = ({ char }: { char: Symbol }) => {
+	const dispatch = useAppDispatch();
+	const { eitherTab } = useCurrentTab();
+	const eitherPositions = useCurrentPositions();
 
-		const { eitherTab } = useCurrentTab();
+	const [path, setPath] = React.useState<string>("");
 
-		const [isCaretHere, setIsCaretHere] = React.useState<boolean>(false);
-		const [path, setPath] = React.useState<string>("");
+	const [isCaretHere, setIsCaretHere] = React.useState<boolean>(false);
 
-		React.useEffect(() => eitherTab.map((t) => setPath(t.path)).fold(...FoldVoid), [eitherTab]);
-
-		React.useEffect(
-			() =>
-				eitherTab
-					.chain(({ caretPositions: [caret] }) =>
-						fromBoolean(lineIndex === caret.start.line && charIndex === caret.start.character),
-					)
-					.fold(
-						() => setIsCaretHere(false),
-						() => setIsCaretHere(true),
+	React.useEffect(
+		() =>
+			eitherPositions
+				.chain((p) =>
+					fromBoolean(
+						char.position.start.line === p[0].start.line && char.position.start.character === p[0].start.character,
 					),
-			[eitherTab, lineIndex, charIndex],
+				)
+				.fold(
+					() => setIsCaretHere(false),
+					() => setIsCaretHere(true),
+				),
+		[
+			eitherPositions.fold(
+				() => null,
+				(p) => p,
+			),
+			char.position.start.line,
+			char.position.start.character,
+		],
+	);
+
+	React.useEffect(() => {
+		setPath(
+			eitherTab.fold(
+				() => "",
+				(t) => t.path,
+			),
 		);
+	}, [
+		eitherTab.fold(
+			() => null,
+			(t) => t.path,
+		),
+	]);
 
-		const handleClick = (e: React.MouseEvent) => {
-			Either.right(e)
-				.map(tapPreventDefault)
-				.map(tapStopPropagation)
-				.chain(() => eitherTab)
-				.map(tap(() => dispatch({ type: "@editor/focus" })))
-				.map(() => ({ line: lineIndex, character: charIndex }))
-				.map((position) => [{ start: position, end: position, direction: "ltr" as const }])
-				.map((positions) => ({ path, positions }))
-				.map((payload) => dispatch({ type: "@editor/update-caret-positions", payload }))
-				.fold(...FoldVoid);
-		};
+	const handleClick = (e: React.MouseEvent) => {
+		e.preventDefault();
+		e.stopPropagation();
+		dispatch({
+			type: "@editor/update-caret-positions",
+			payload: {
+				path,
+				positions: [
+					{
+						start: {
+							line: char.position.start.line,
+							character: char.position.start.character,
+						},
+						end: {
+							line: char.position.start.line,
+							character: char.position.start.character,
+						},
+						direction: "ltr",
+					},
+				],
+			},
+		});
+	};
 
-		return eitherTab.fold(NoOp, () => (
-			<>
-				{fromBoolean(isCaretHere).fold(NoOp, () => (
-					<Caret />
-				))}
-				<span onClick={handleClick}>{char}</span>
-			</>
-		));
-	},
-	() => true,
-);
+	return (
+		<>
+			<span onClick={handleClick}>{char.value}</span>
+			{fromBoolean(isCaretHere).fold(NoOp, () => (
+				<Caret />
+			))}
+		</>
+	);
+};

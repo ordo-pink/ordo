@@ -140,6 +140,7 @@ export const parse = (raw: string | Symbol[], tree?: TokenWithChildren): Documen
 			} else {
 				const subTree = createBlockToken(BlockTokenType.LIST_ITEM, depth + 1, { ordered: false }, reader, symbol);
 				tree.children.push(parseInline(subTree.symbols, subTree));
+				subTree.symbols = [];
 			}
 		} else if (
 			symbol &&

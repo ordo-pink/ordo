@@ -24,10 +24,16 @@ export const Lines = () => {
 		() =>
 			eitherTab
 				.map(tap((t) => setPath(t.path)))
+				.map(tap((t) => console.log(t.parsed)))
 				.map(tap((t) => setLine(lastIndex(t.lines))))
 				.map(tap((t) => setCharacter(lastIndex(t.lines[lastIndex(t.lines)]))))
 				.fold(...FoldVoid),
-		[eitherTab],
+		[
+			eitherTab.fold(
+				() => null,
+				(t) => t.path,
+			),
+		],
 	);
 
 	const handleKeyDown = ({ key, altKey, shiftKey, ctrlKey, metaKey }: KeyboardEvent) =>
@@ -59,8 +65,8 @@ export const Lines = () => {
 
 	return eitherTab.fold(NoOp, (t) => (
 		<div className="editor_lines" onClick={handleClick}>
-			{t.lines.map((line, lineIndex) => (
-				<Line key={`${line}-${lineIndex}`} lineIndex={lineIndex} line={line} />
+			{t.parsed.children.map((line, lineIndex) => (
+				<Line key={`${lineIndex}`} lineIndex={lineIndex} />
 			))}
 		</div>
 	));

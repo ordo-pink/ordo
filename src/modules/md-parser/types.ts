@@ -23,6 +23,7 @@ export type Token<TTokenType = BlockTokenType | InlineTokenType, TData = unknown
 	data: TData;
 	symbols: Symbol[];
 	depth: number;
+	closingSymbols: Symbol[];
 };
 
 export type TokenWithChildren<TTokenType = BlockTokenType | InlineTokenType, TData = unknown> = Token<

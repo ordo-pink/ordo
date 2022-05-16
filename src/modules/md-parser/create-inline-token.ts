@@ -18,6 +18,7 @@ export const createInlineToken = <TTokenType extends InlineTokenType>(
 		children: [],
 		data,
 		symbols: [],
+		closingSymbols: [],
 	};
 
 	const buildToken = swallow(token);

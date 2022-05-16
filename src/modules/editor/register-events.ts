@@ -5,6 +5,7 @@ import { readFile } from "@modules/file-explorer/api/read-file";
 import { findOrdoFile } from "@modules/file-explorer/utils/find-ordo-file";
 import { EditorEvents } from "@modules/editor/types";
 import { findOrdoFolder } from "@modules/file-explorer/utils/find-ordo-folder";
+import { parse } from "@modules/md-parser/parse";
 
 export default registerEvents<EditorEvents>({
 	"@editor/open-tab": async ({ draft, payload, transmission, context }) => {
@@ -31,6 +32,7 @@ export default registerEvents<EditorEvents>({
 						direction: "ltr",
 					},
 				],
+				parsed: parse(raw),
 			});
 		}
 

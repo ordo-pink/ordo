@@ -49,6 +49,7 @@ export const parseInline = (symbols: Symbol[], tree: TokenWithChildren) => {
 					end: tail(symbols).position.end,
 				},
 				symbols,
+				closingSymbols: [],
 			});
 		} else if (symbol && symbol.type === SymbolType.TILDE && ahead && ahead.type === SymbolType.TILDE) {
 			const symbols = [symbol];
@@ -78,8 +79,9 @@ export const parseInline = (symbols: Symbol[], tree: TokenWithChildren) => {
 							start: symbols[0].position.start,
 							end: tail(symbols).position.end,
 						},
-						symbols,
+						symbols: symbols.slice(0, 2),
 						children: [],
+						closingSymbols: symbols.slice(-2),
 					}),
 				);
 			} else {
@@ -92,8 +94,9 @@ export const parseInline = (symbols: Symbol[], tree: TokenWithChildren) => {
 							start: symbols[0].position.start,
 							end: tail(symbols).position.end,
 						},
-						symbols,
+						symbols: symbols.slice(0, 2),
 						children: [],
+						closingSymbols: [],
 					}),
 				);
 			}
@@ -127,7 +130,8 @@ export const parseInline = (symbols: Symbol[], tree: TokenWithChildren) => {
 								end: tail(symbols).position.end,
 							},
 							children: [],
-							symbols,
+							symbols: symbols.slice(0, 2),
+							closingSymbols: symbols.slice(-2),
 						}),
 					);
 				} else {
@@ -140,8 +144,9 @@ export const parseInline = (symbols: Symbol[], tree: TokenWithChildren) => {
 								start: symbols[0].position.start,
 								end: tail(symbols).position.end,
 							},
-							symbols,
+							symbols: symbols.slice(0, 2),
 							children: [],
+							closingSymbols: [],
 						}),
 					);
 				}
@@ -174,8 +179,9 @@ export const parseInline = (symbols: Symbol[], tree: TokenWithChildren) => {
 								start: symbols[0].position.start,
 								end: tail(symbols).position.end,
 							},
-							symbols,
+							symbols: symbols.slice(0, 1),
 							children: [],
+							closingSymbols: symbols.slice(-1),
 						}),
 					);
 				} else {
@@ -188,8 +194,9 @@ export const parseInline = (symbols: Symbol[], tree: TokenWithChildren) => {
 								start: symbols[0].position.start,
 								end: tail(symbols).position.end,
 							},
-							symbols,
+							symbols: symbols.slice(0, 1),
 							children: [],
+							closingSymbols: [],
 						}),
 					);
 				}
@@ -223,8 +230,9 @@ export const parseInline = (symbols: Symbol[], tree: TokenWithChildren) => {
 								start: symbols[0].position.start,
 								end: tail(symbols).position.end,
 							},
-							symbols,
+							symbols: symbols.slice(0, 2),
 							children: [],
+							closingSymbols: symbols.slice(-2),
 						}),
 					);
 				} else {
@@ -237,8 +245,9 @@ export const parseInline = (symbols: Symbol[], tree: TokenWithChildren) => {
 								start: symbols[0].position.start,
 								end: tail(symbols).position.end,
 							},
-							symbols,
+							symbols: symbols.slice(0, 2),
 							children: [],
+							closingSymbols: [],
 						}),
 					);
 				}
@@ -268,8 +277,9 @@ export const parseInline = (symbols: Symbol[], tree: TokenWithChildren) => {
 								start: symbols[0].position.start,
 								end: tail(symbols).position.end,
 							},
-							symbols,
+							symbols: symbols.slice(0, 1),
 							children: [],
+							closingSymbols: symbols.slice(-1),
 						}),
 					);
 				} else {
@@ -282,8 +292,9 @@ export const parseInline = (symbols: Symbol[], tree: TokenWithChildren) => {
 								start: symbols[0].position.start,
 								end: tail(symbols).position.end,
 							},
-							symbols,
+							symbols: symbols.slice(0, 1),
 							children: [],
+							closingSymbols: [],
 						}),
 					);
 				}
@@ -324,6 +335,7 @@ export const parseInline = (symbols: Symbol[], tree: TokenWithChildren) => {
 						end: tail(symbols).position.end,
 					},
 					symbols,
+					closingSymbols: symbols.slice(-2),
 				});
 			} else {
 				tree.children.push({
@@ -334,7 +346,8 @@ export const parseInline = (symbols: Symbol[], tree: TokenWithChildren) => {
 						start: symbols[0].position.start,
 						end: tail(symbols).position.end,
 					},
-					symbols,
+					symbols: symbols.slice(0, 2),
+					closingSymbols: [],
 				});
 			}
 		} else if (symbol && symbol.type === SymbolType.BACKTICK) {
@@ -363,8 +376,9 @@ export const parseInline = (symbols: Symbol[], tree: TokenWithChildren) => {
 							start: symbols[0].position.start,
 							end: tail(symbols).position.end,
 						},
-						symbols,
+						symbols: symbols.slice(0, 1),
 						children: [],
+						closingSymbols: symbols.slice(-1),
 					}),
 				);
 			} else {
@@ -377,8 +391,9 @@ export const parseInline = (symbols: Symbol[], tree: TokenWithChildren) => {
 							start: symbols[0].position.start,
 							end: tail(symbols).position.end,
 						},
-						symbols,
+						symbols: symbols.slice(0, 1),
 						children: [],
+						closingSymbols: [],
 					}),
 				);
 			}
@@ -404,11 +419,10 @@ export const parseInline = (symbols: Symbol[], tree: TokenWithChildren) => {
 					end: tail(symbols).position.end,
 				},
 				symbols,
+				closingSymbols: [],
 			});
 		}
 	}
-
-	tree.symbols = [];
 
 	return tree;
 };

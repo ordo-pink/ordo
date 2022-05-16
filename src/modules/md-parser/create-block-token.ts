@@ -18,6 +18,7 @@ export const createBlockToken = <TTokenType extends BlockTokenType>(
 		children: [],
 		data,
 		symbols: [],
+		closingSymbols: [],
 	};
 
 	const buildToken = swallow(token);

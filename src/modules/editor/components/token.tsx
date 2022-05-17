@@ -62,6 +62,7 @@ export const Token = React.memo(
 	},
 	(prev, next) =>
 		prev.token.type === next.token.type &&
+		prev.token.raw === next.token.raw &&
 		prev.token.position.start.character === next.token.position.start.character &&
 		prev.token.position.start.line === next.token.position.start.line &&
 		prev.token.position.end.character === next.token.position.end.character &&

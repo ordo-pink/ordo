@@ -191,10 +191,27 @@ export default registerEvents<EditorEvents>({
 				tab.caretPositions[0].start.character =
 					tab.content.children[tab.caretPositions[0].start.line - 1].position.end.character;
 			}
-			// } else if (payload.event.key === "Delete") {
-			// 	tab.lines[tab.caretPositions[0].start.line] =
-			// 		tab.lines[tab.caretPositions[0].start.line].slice(0, tab.caretPositions[0].start.character) +
-			// 		tab.lines[tab.caretPositions[0].start.line].slice(tab.caretPositions[0].start.character + 1);
+		} else if (payload.event.key === "Delete") {
+			const start = tab.content.children[tab.caretPositions[0].start.line - 1].position.start;
+			const end = tab.content.children[tab.caretPositions[0].start.line - 1].position.end;
+
+			tab.content.children[tab.caretPositions[0].start.line - 1].raw =
+				tab.content.children[tab.caretPositions[0].start.line - 1].raw!.slice(0, tab.caretPositions[0].start.character) +
+				tab.content.children[tab.caretPositions[0].start.line - 1].raw!.slice(tab.caretPositions[0].start.character + 1);
+
+			tab.content.children[tab.caretPositions[0].start.line - 1].children = [];
+			tab.content.children[tab.caretPositions[0].start.line - 1].symbols = [];
+			tab.content.children[tab.caretPositions[0].start.line - 1].closingSymbols = [];
+
+			parse(
+				tab.content.children[tab.caretPositions[0].start.line - 1].raw!,
+				tab.content.children[tab.caretPositions[0].start.line - 1],
+			);
+
+			tab.content.children[tab.caretPositions[0].start.line - 1].position = { start, end };
+			tab.content.children[tab.caretPositions[0].start.line - 1].position.end.character--;
+			tab.content.children[tab.caretPositions[0].start.line - 1].position.end.offset--;
+
 			// } else if (payload.event.key === "Backspace") {
 			// 	if (tab.caretPositions[0].start.character === 0) {
 			// 		if (tab.caretPositions[0].start.line === 0) {

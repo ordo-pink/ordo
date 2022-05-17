@@ -247,6 +247,7 @@ export const parse = (raw: string | MdSymbol[], tree?: MdNode): MdDocument => {
 					start: { line: child.position.start.line, character: 0, offset: child.position.start.offset },
 					end: { line: child.position.start.line, character: 0, offset: child.position.start.offset },
 				},
+				raw: "",
 				depth: child.depth + 1,
 				data: null,
 				children: [],

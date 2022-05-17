@@ -24,6 +24,7 @@ export type MdNode<TTokenType = BlockTokenType | InlineTokenType, TData = unknow
 	position: MdSymbolRange;
 	children: MdNode[];
 	data: TData;
+	raw?: string;
 	symbols: MdSymbol[];
 	depth: number;
 	closingSymbols: MdSymbol[];

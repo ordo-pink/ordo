@@ -17,6 +17,7 @@ export const createBlockToken = <TTokenType extends BlockTokenType>(
 		position: symbol.position,
 		children: [],
 		data,
+		raw: "",
 		symbols: [],
 		closingSymbols: [],
 	};

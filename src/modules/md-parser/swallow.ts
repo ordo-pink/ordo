@@ -9,6 +9,7 @@ export const swallow =
 
 		block.position.end.character = symbol.position.start.character;
 		block.position.end.offset = symbol.position.start.offset;
+		block.raw += symbol.value;
 		block.symbols.push(symbol as any);
 
 		return block;

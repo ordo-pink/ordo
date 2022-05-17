@@ -4,11 +4,11 @@ import { useCurrentTab } from "@modules/editor/hooks/use-current-tab";
 import { NoOp } from "@utils/no-op";
 
 export const ImageViewer: React.FC = () => {
-	const { eitherTab } = useCurrentTab();
+	const { tab } = useCurrentTab();
 
-	return eitherTab.fold(NoOp, (t) => (
+	return tab ? (
 		<div className="editor_image-viewer">
-			<img className="editor_image-viewer_image" src={t.raw} />
+			<img className="editor_image-viewer_image" src={tab.raw} />
 		</div>
-	));
+	) : null;
 };

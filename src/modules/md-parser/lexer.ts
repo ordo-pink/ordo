@@ -9,7 +9,7 @@ export const lex = (text: string): Symbol[] =>
 		() => [],
 		(t) => {
 			let line = 1;
-			let character = 0;
+			let character = 1;
 
 			return t.split("").map((value, offset) => {
 				const type = getSymbolType(value);
@@ -35,7 +35,7 @@ export const lex = (text: string): Symbol[] =>
 
 				if (type === SymbolType.EOL) {
 					line++;
-					character = 0;
+					character = 1;
 				}
 
 				return result;

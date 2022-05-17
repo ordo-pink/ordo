@@ -7,16 +7,16 @@ import { NoOp } from "@utils/no-op";
 
 export const Breadcrumbs = React.memo(
 	() => {
-		const { eitherFile } = useCurrentTab();
+		const { file } = useCurrentTab();
 		const { separator } = useAppSelector((state) => state.app.internalSettings);
 
-		return eitherFile.fold(NoOp, (f) => (
+		return file ? (
 			<div className="editor_breadcrumbs">
-				{f.relativePath.split(separator).map((item, index) => (
+				{file.relativePath.split(separator).map((item, index) => (
 					<Breadcrumb key={`${item}-${index}`} pathChunk={item} />
 				))}
 			</div>
-		));
+		) : null;
 	},
 	() => true,
 );

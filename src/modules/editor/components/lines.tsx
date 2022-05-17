@@ -10,64 +10,59 @@ import { lastIndex } from "@utils/array";
 import { tap } from "@utils/functions";
 import { NoOp } from "@utils/no-op";
 
-export const Lines = () => {
-	const dispatch = useAppDispatch();
+export const Lines = React.memo(
+	() => {
+		const dispatch = useAppDispatch();
 
-	const { eitherTab } = useCurrentTab();
-	const { focused } = useAppSelector((state) => state.editor);
+		const { tab } = useCurrentTab();
+		const { focused } = useAppSelector((state) => state.editor);
 
-	const [line, setLine] = React.useState<number>(0);
-	const [character, setCharacter] = React.useState<number>(0);
-	const [path, setPath] = React.useState<string>("");
+		const [line, setLine] = React.useState<number>(0);
+		const [character, setCharacter] = React.useState<number>(0);
+		const [path, setPath] = React.useState<string>("");
 
-	React.useEffect(
-		() =>
-			eitherTab
-				.map(tap((t) => setPath(t.path)))
-				.map(tap((t) => console.log(t.parsed)))
-				.map(tap((t) => setLine(lastIndex(t.lines))))
-				.map(tap((t) => setCharacter(lastIndex(t.lines[lastIndex(t.lines)]))))
-				.fold(...FoldVoid),
-		[
-			eitherTab.fold(
-				() => null,
-				(t) => t.path,
-			),
-		],
-	);
+		const handleKeyDown = (e: KeyboardEvent) => {
+			if (!tab) return;
 
-	const handleKeyDown = ({ key, altKey, shiftKey, ctrlKey, metaKey }: KeyboardEvent) =>
-		eitherTab
-			.map(() => ({ key, shiftKey, altKey, ctrlKey, metaKey }))
-			.map((event) => ({ path, event }))
-			.map((payload) => dispatch({ type: "@editor/handle-typing", payload }))
-			.fold(...FoldVoid);
+			const { key, shiftKey, altKey, ctrlKey, metaKey } = e;
+			e.preventDefault();
+			e.stopPropagation();
+			dispatch({
+				type: "@editor/handle-typing",
+				payload: {
+					path: tab?.path,
+					event: { key, shiftKey, altKey, ctrlKey, metaKey },
+				},
+			});
+		};
 
-	const handleClick = (e: React.MouseEvent) =>
-		Either.right(e)
-			.map(tapPreventDefault)
-			.map(tapStopPropagation)
-			.chain(() => eitherTab)
-			.map(tap(() => dispatch({ type: "@editor/focus" })))
-			.map(() => ({ line, character }))
-			.map((position) => [{ start: position, end: position, direction: "ltr" as const }])
-			.map((positions) => ({ path, positions }))
-			.map((payload) => dispatch({ type: "@editor/update-caret-positions", payload }))
-			.fold(...FoldVoid);
+		// const handleClick = (e: React.MouseEvent) =>
+		// 	Either.right(e)
+		// 		.map(tapPreventDefault)
+		// 		.map(tapStopPropagation)
+		// 		.chain(() => eitherTab)
+		// 		.map(tap(() => dispatch({ type: "@editor/focus" })))
+		// 		.map(() => ({ line, character }))
+		// 		.map((position) => [{ start: position, end: position, direction: "ltr" as const }])
+		// 		.map((positions) => ({ path, positions }))
+		// 		.map((payload) => dispatch({ type: "@editor/update-caret-positions", payload }))
+		// 		.fold(...FoldVoid);
 
-	const removeKeyDownListener = () => window.removeEventListener("keydown", handleKeyDown);
+		const removeKeyDownListener = () => window.removeEventListener("keydown", handleKeyDown);
 
-	React.useEffect(() => {
-		window.addEventListener("keydown", handleKeyDown);
+		React.useEffect(() => {
+			window.addEventListener("keydown", handleKeyDown);
 
-		return () => removeKeyDownListener();
-	}, [eitherTab]);
+			return () => removeKeyDownListener();
+		}, [tab]);
 
-	return eitherTab.fold(NoOp, (t) => (
-		<div className="editor_lines" onClick={handleClick}>
-			{t.parsed.children.map((line, lineIndex) => (
-				<Line key={`${lineIndex}`} lineIndex={lineIndex} />
-			))}
-		</div>
-	));
-};
+		return tab ? (
+			<div className="editor_lines">
+				{tab.parsed.children.map((_, lineIndex) => (
+					<Line key={`${lineIndex}`} lineIndex={lineIndex} />
+				))}
+			</div>
+		) : null;
+	},
+	() => true,
+);

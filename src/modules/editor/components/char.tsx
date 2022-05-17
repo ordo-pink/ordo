@@ -4,91 +4,65 @@ import { Symbol } from "@modules/md-parser/types";
 import { useAppDispatch } from "@core/state/store";
 import { useCurrentTab } from "@modules/editor/hooks/use-current-tab";
 import { Caret } from "@modules/editor/components/caret";
-import { useCurrentPositions } from "@modules/editor/hooks/use-current-positions";
-import { fromBoolean } from "@utils/either";
-import { NoOp } from "@utils/no-op";
 
 type CharProps = {
-	char: string;
-	lineIndex: number;
-	charIndex: number;
+	char: Symbol;
 };
 
-export const Char = ({ char }: { char: Symbol }) => {
-	const dispatch = useAppDispatch();
-	const { eitherTab } = useCurrentTab();
-	const eitherPositions = useCurrentPositions();
+export const Char = React.memo(
+	({ char }: CharProps) => {
+		const dispatch = useAppDispatch();
+		const { tab } = useCurrentTab();
 
-	const [path, setPath] = React.useState<string>("");
+		const [isCaretHere, setIsCaretHere] = React.useState<boolean>(false);
 
-	const [isCaretHere, setIsCaretHere] = React.useState<boolean>(false);
-
-	React.useEffect(
-		() =>
-			eitherPositions
-				.chain((p) =>
-					fromBoolean(
-						char.position.start.line === p[0].start.line && char.position.start.character === p[0].start.character,
-					),
-				)
-				.fold(
-					() => setIsCaretHere(false),
-					() => setIsCaretHere(true),
-				),
-		[
-			eitherPositions.fold(
-				() => null,
-				(p) => p,
-			),
+		React.useEffect(() => {
+			if (tab && tab.caretPositions) {
+				setIsCaretHere(
+					char.position.start.line === tab.caretPositions[0].start.line &&
+						char.position.start.character === tab.caretPositions[0].start.character,
+				);
+			}
+		}, [
 			char.position.start.line,
 			char.position.start.character,
-		],
-	);
+			tab && tab.caretPositions && tab.caretPositions[0].start.line,
+			tab && tab.caretPositions && tab.caretPositions[0].start.character,
+		]);
 
-	React.useEffect(() => {
-		setPath(
-			eitherTab.fold(
-				() => "",
-				(t) => t.path,
-			),
-		);
-	}, [
-		eitherTab.fold(
-			() => null,
-			(t) => t.path,
-		),
-	]);
-
-	const handleClick = (e: React.MouseEvent) => {
-		e.preventDefault();
-		e.stopPropagation();
-		dispatch({
-			type: "@editor/update-caret-positions",
-			payload: {
-				path,
-				positions: [
-					{
-						start: {
-							line: char.position.start.line,
-							character: char.position.start.character,
-						},
-						end: {
-							line: char.position.start.line,
-							character: char.position.start.character,
-						},
-						direction: "ltr",
+		const handleClick = React.useCallback(
+			(e: React.MouseEvent) => {
+				e.preventDefault();
+				e.stopPropagation();
+				dispatch({
+					type: "@editor/update-caret-positions",
+					payload: {
+						path: tab?.path || "",
+						positions: [
+							{
+								start: {
+									line: char.position.start.line,
+									character: char.position.start.character,
+								},
+								end: {
+									line: char.position.start.line,
+									character: char.position.start.character,
+								},
+								direction: "ltr",
+							},
+						],
 					},
-				],
+				});
 			},
-		});
-	};
+			[char.position.start.line, char.position.start.character, tab?.path],
+		);
 
-	return (
-		<>
-			<span onClick={handleClick}>{char.value}</span>
-			{fromBoolean(isCaretHere).fold(NoOp, () => (
-				<Caret />
-			))}
-		</>
-	);
-};
+		return (
+			<>
+				<span onClick={handleClick}>{char.value}</span>
+				<Caret visible={isCaretHere} />
+			</>
+		);
+	},
+	() => true,
+);

@@ -11,31 +11,36 @@ type BreadcrumbProps = {
 	pathChunk: string;
 };
 
-export const Breadcrumb: React.FC<BreadcrumbProps> = ({ pathChunk }) => {
-	const { eitherFile } = useCurrentTab();
+export const Breadcrumb: React.FC<BreadcrumbProps> = React.memo(
+	({ pathChunk }) => {
+		const { file } = useCurrentTab();
 
-	const Icon = useFileIcon(eitherFile.fold(NoOp, id));
-	const HiOutlineFolder = useIcon("HiOutlineFolder");
-	const HiFolder = useIcon("HiFolder");
-	const HiChevronRight = useIcon("HiChevronRight");
+		const Icon = useFileIcon(file);
+		const HiOutlineFolder = useIcon("HiOutlineFolder");
+		const HiFolder = useIcon("HiFolder");
+		const HiChevronRight = useIcon("HiChevronRight");
 
-	const Folder = () => <HiFolder />;
-	const File = () => <Icon />;
+		const Folder = () => <HiFolder />;
+		const File = () => <Icon />;
 
-	return eitherFile.fold(NoOp, (f) => (
-		<div className="editor_breadcrumb">
-			{fromBoolean(pathChunk === "").fold(
-				() => (
-					<div className="editor_breadcrumb_title">
-						{fromBoolean(pathChunk === f.readableName).fold(Folder, File)}
-						<div>{pathChunk}</div>
-					</div>
-				),
-				() => (
-					<HiOutlineFolder />
-				),
-			)}
-			{pathChunk !== f.readableName && <HiChevronRight />}
-		</div>
-	));
-};
+		return (
+			file && (
+				<div className="editor_breadcrumb">
+					{fromBoolean(pathChunk === "").fold(
+						() => (
+							<div className="editor_breadcrumb_title">
+								{fromBoolean(pathChunk === file.readableName).fold(Folder, File)}
+								<div>{pathChunk}</div>
+							</div>
+						),
+						() => (
+							<HiOutlineFolder />
+						),
+					)}
+					{pathChunk !== file.readableName && <HiChevronRight />}
+				</div>
+			)
+		);
+	},
+	(prev, next) => prev.pathChunk === next.pathChunk,
+);

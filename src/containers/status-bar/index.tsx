@@ -16,36 +16,24 @@ import "@containers/status-bar/index.css";
 export const StatusBar: React.FC = () => {
 	const dispatch = useAppDispatch();
 
-	const { eitherTab } = useCurrentTab();
+	const { tab } = useCurrentTab();
 
 	const Bell = useIcon("HiOutlineBell");
 	const Code = useIcon("HiOutlineCode");
 
-	const [line, setLine] = React.useState<number>(0);
-	const [character, setCharacter] = React.useState<number>(0);
-
-	React.useEffect(
-		() =>
-			eitherTab
-				.map(tap((t) => setLine(t.caretPositions[0].start.line)))
-				.map(tap((t) => setCharacter(t.caretPositions[0].start.character)))
-				.fold(...FoldVoid),
-		[eitherTab],
-	);
-
 	const handleClick = () => dispatch({ type: "@top-bar/open-go-to-line" });
 
-	return (
+	return tab ? (
 		<div className="status-bar">
 			<div className="status-bar-side-container">
 				<div
 					className="status-bar-item"
 					onClick={handleClick}
-					title={`The caret is located on character ${character} of line ${line}`}
+					title={`The caret is located on character ${tab.caretPositions[0].start.character} of line ${tab.caretPositions[0].start.line}`}
 				>
 					<Code />
 					<span>
-						Ln {line}, Col {character}
+						Ln {tab.caretPositions[0].start.line}, Col {tab.caretPositions[0].start.character}
 					</span>
 				</div>
 			</div>
@@ -56,5 +44,5 @@ export const StatusBar: React.FC = () => {
 				</div>
 			</div>
 		</div>
-	);
+	) : null;
 };

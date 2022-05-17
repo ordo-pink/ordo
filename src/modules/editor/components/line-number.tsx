@@ -14,27 +14,24 @@ type LineNumberProps = {
 export const LineNumber = React.memo(
 	({ number }: LineNumberProps) => {
 		const dispatch = useAppDispatch();
-		const { eitherTab } = useCurrentTab();
-
-		const [path, setPath] = React.useState<string>("");
-
-		React.useEffect(() => eitherTab.map((t) => setPath(t.path)).fold(...FoldVoid), [eitherTab]);
+		const { tab } = useCurrentTab();
 
 		const handleClick = (e: React.MouseEvent) =>
+			tab &&
 			Either.right(e)
 				.map(tapPreventDefault)
 				.map(tapStopPropagation)
 				.map(() => ({ line: number - 1, character: 0 }))
 				.map((position) => [{ start: position, end: position, direction: "ltr" as const }])
-				.map((positions) => ({ path, positions }))
+				.map((positions) => ({ path: tab.path, positions }))
 				.map((payload) => dispatch({ type: "@editor/update-caret-positions", payload }))
 				.fold(...FoldVoid);
 
-		return eitherTab.fold(NoOp, () => (
+		return tab ? (
 			<div contentEditable={false} className="editor_line_number" onClick={handleClick}>
 				{number ?? "↑"}
 			</div>
-		));
+		) : null;
 	},
 	() => true,
 );

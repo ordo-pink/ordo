@@ -14,7 +14,6 @@ export type CaretRange = {
 };
 
 export type EditorTab = Required<Pick<OrdoFile, "path" | "raw">> & {
-	lines: string[];
 	caretPositions: CaretRange[];
 	content: MdDocument;
 };

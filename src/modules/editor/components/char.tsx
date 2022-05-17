@@ -60,7 +60,7 @@ export const Char = React.memo(
 		return (
 			<>
 				<span onClick={handleClick}>{char.value}</span>
-				<Caret visible={isCaretHere} />
+				<Caret visible={isCaretHere && char.position.start.character !== 0} />
 			</>
 		);
 	},

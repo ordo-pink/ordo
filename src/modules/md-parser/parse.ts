@@ -1,5 +1,5 @@
 import { createBlockToken } from "@modules/md-parser/create-block-token";
-import { BlockTokenType, SymbolType } from "@modules/md-parser/enums";
+import { BlockTokenType, InlineTokenType, SymbolType } from "@modules/md-parser/enums";
 import { parseInline } from "@modules/md-parser/parse-inline";
 import { createReader } from "@modules/md-parser/reader";
 import { MdNode, MdDocument, MdCodeBlock, MdSymbol } from "@modules/md-parser/types";
@@ -66,89 +66,86 @@ export const parse = (raw: string | MdSymbol[], tree?: MdNode): MdDocument => {
 			const subTree = createBlockToken(BlockTokenType.DIVIDER, depth, null, reader, symbol);
 			tree.children.push(parseInline(subTree.symbols, subTree));
 			subTree.symbols = [];
-		} else if (
-			symbol &&
-			symbol.type === SymbolType.BACKTICK &&
-			isLineStart &&
-			ahead &&
-			ahead2 &&
-			ahead.type === SymbolType.BACKTICK &&
-			ahead2.type === SymbolType.BACKTICK
-		) {
-			if (tree.type !== BlockTokenType.CODE_BLOCK) {
-				const subTree = createBlockToken(
-					BlockTokenType.CODE_BLOCK,
-					depth,
+			// } else if (
+			// 	symbol &&
+			// 	symbol.type === SymbolType.BACKTICK &&
+			// 	isLineStart &&
+			// 	ahead &&
+			// 	ahead2 &&
+			// 	ahead.type === SymbolType.BACKTICK &&
+			// 	ahead2.type === SymbolType.BACKTICK
+			// ) {
+			// 	if (tree.type !== BlockTokenType.CODE_BLOCK) {
+			// 		const subTree = createBlockToken(
+			// 			BlockTokenType.CODE_BLOCK,
+			// 			depth,
 
-					{ language: null },
-					reader,
-					symbol,
-					(symbol, reader) => {
-						const back = reader.backTrack();
-						const back2 = reader.backTrack(2);
-						const back3 = reader.backTrack(3);
+			// 			{ language: null },
+			// 			reader,
+			// 			symbol,
+			// 			(symbol, reader) => {
+			// 				const back = reader.backTrack();
+			// 				const back2 = reader.backTrack(2);
+			// 				const back3 = reader.backTrack(3);
 
-						return Boolean(
-							(!symbol || symbol.type === SymbolType.EOL) &&
-								back &&
-								back2 &&
-								back3 &&
-								back.type === SymbolType.BACKTICK &&
-								back2.type === SymbolType.BACKTICK &&
-								back3.type === SymbolType.BACKTICK,
-						);
-					},
-				);
+			// 				return Boolean(
+			// 					(!symbol || symbol.type === SymbolType.EOL) &&
+			// 						back &&
+			// 						back2 &&
+			// 						back3 &&
+			// 						back.type === SymbolType.BACKTICK &&
+			// 						back2.type === SymbolType.BACKTICK &&
+			// 						back3.type === SymbolType.BACKTICK,
+			// 				);
+			// 			},
+			// 		);
 
-				tree.children.push(parse(subTree.symbols, subTree));
-			} else {
-				const subTree = createBlockToken(BlockTokenType.PARAGRAPH, depth + 1, null, reader, symbol);
-				tree.children.push(parseInline(subTree.symbols, subTree));
+			// 		tree.children.push(parse(subTree.symbols, subTree));
+			// 	} else {
+			// 		const subTree = createBlockToken(BlockTokenType.PARAGRAPH, depth + 1, null, reader, symbol);
+			// 		tree.children.push(parseInline(subTree.symbols, subTree));
 
-				(tree as MdCodeBlock).data.language = tree.symbols
-					.slice(
-						3,
-						tree.symbols.findIndex((s) => s.type === SymbolType.EOL),
-					)
-					.reduce((acc, v) => acc.concat(v.value), "");
-			}
-		} else if (
-			symbol &&
-			(symbol.type === SymbolType.HYPHEN || symbol.type === SymbolType.STAR) &&
-			isLineStart &&
-			ahead &&
-			ahead.type === SymbolType.WHITESPACE
-		) {
-			if (tree.type !== BlockTokenType.LIST) {
-				const subTree = createBlockToken(
-					BlockTokenType.LIST,
-					depth,
+			// 		(tree as MdCodeBlock).data.language = tree.symbols
+			// 			.slice(
+			// 				3,
+			// 				tree.symbols.findIndex((s) => s.type === SymbolType.EOL),
+			// 			)
+			// 			.reduce((acc, v) => acc.concat(v.value), "");
+			// 	}
+		}
 
-					{ ordered: false },
-					reader,
-					symbol,
-					(symbol, reader) => {
-						const ahead = reader.lookAhead();
-						return symbol.type === SymbolType.EOL && (!ahead || ahead.type === SymbolType.EOL);
-					},
-				);
+		// else if (
+		// 	symbol &&
+		// 	(symbol.type === SymbolType.HYPHEN || symbol.type === SymbolType.STAR) &&
+		// 	isLineStart &&
+		// 	ahead &&
+		// 	ahead.type === SymbolType.WHITESPACE
+		// ) {
+		// 	if (tree.type !== BlockTokenType.LIST) {
+		// 		const subTree = createBlockToken(
+		// 			BlockTokenType.LIST,
+		// 			depth,
 
-				const parsed = parse(subTree.symbols, subTree);
-				parsed.symbols = [];
+		// 			{ ordered: false },
+		// 			reader,
+		// 			symbol,
+		// 			(symbol, reader) => {
+		// 				const ahead = reader.lookAhead();
+		// 				return symbol.type === SymbolType.EOL && (!ahead || ahead.type === SymbolType.EOL);
+		// 			},
+		// 		);
 
-				tree.children.push(parsed);
-			} else {
-				const subTree = createBlockToken(BlockTokenType.LIST_ITEM, depth + 1, { ordered: false }, reader, symbol);
-				tree.children.push(parseInline(subTree.symbols, subTree));
-				subTree.symbols = [];
-			}
-		} else if (
-			symbol &&
-			symbol.type === SymbolType.HASH &&
-			isLineStart &&
-			ahead &&
-			ahead.type === SymbolType.WHITESPACE
-		) {
+		// 		const parsed = parse(subTree.symbols, subTree);
+		// 		parsed.symbols = [];
+
+		// 		tree.children.push(parsed);
+		// 	} else {
+		// 		const subTree = createBlockToken(BlockTokenType.LIST_ITEM, depth + 1, { ordered: false }, reader, symbol);
+		// 		tree.children.push(parseInline(subTree.symbols, subTree));
+		// 		subTree.symbols = [];
+		// 	}
+		// }
+		else if (symbol && symbol.type === SymbolType.HASH && isLineStart && ahead && ahead.type === SymbolType.WHITESPACE) {
 			depth = 1;
 			const subTree = createBlockToken(BlockTokenType.HEADING, depth, null, reader, symbol);
 			tree.children.push(parseInline(subTree.symbols.slice(2), subTree));
@@ -223,24 +220,55 @@ export const parse = (raw: string | MdSymbol[], tree?: MdNode): MdDocument => {
 			subTree.symbols = subTree.symbols.slice(0, 6);
 			depth += 1;
 		} else if (symbol) {
-			if (tree.type === BlockTokenType.CODE_BLOCK) {
-				const subTree = createBlockToken(BlockTokenType.PARAGRAPH, depth + 1, null, reader, symbol);
-				tree.children.push(subTree);
-			} else if (tree.type === BlockTokenType.LIST) {
-				const subTree = createBlockToken(BlockTokenType.LIST_ITEM, depth + 1, null, reader, symbol);
-				const parsedSubTree = parseInline(subTree.symbols, subTree);
-				parsedSubTree.symbols = [];
-				tree.children.push(parsedSubTree);
-			} else {
-				const subTree = createBlockToken(BlockTokenType.PARAGRAPH, depth, null, reader, symbol);
-				const parsedSubTree = parseInline(subTree.symbols, subTree);
-				parsedSubTree.symbols = [];
-				tree.children.push(parsedSubTree);
-			}
+			// if (tree.type === BlockTokenType.CODE_BLOCK) {
+			// 	const subTree = createBlockToken(BlockTokenType.PARAGRAPH, depth + 1, null, reader, symbol);
+			// 	tree.children.push(subTree);
+			// } else if (tree.type === BlockTokenType.LIST) {
+			// 	const subTree = createBlockToken(BlockTokenType.LIST_ITEM, depth + 1, null, reader, symbol);
+			// 	const parsedSubTree = parseInline(subTree.symbols, subTree);
+			// 	parsedSubTree.symbols = [];
+			// 	tree.children.push(parsedSubTree);
+			// } else {
+			const subTree = createBlockToken(BlockTokenType.PARAGRAPH, depth, null, reader, symbol);
+			const parsedSubTree = parseInline(subTree.symbols, subTree);
+			parsedSubTree.symbols = [];
+			tree.children.push(parsedSubTree);
+			// }
 		}
 
 		symbol = reader.next();
 	}
+
+	tree.children.forEach((child) => {
+		if (!child.children.length && !child.symbols.length) {
+			child.children.push({
+				type: InlineTokenType.TEXT,
+				position: {
+					start: { line: child.position.start.line, character: 0, offset: child.position.start.offset },
+					end: { line: child.position.start.line, character: 0, offset: child.position.start.offset },
+				},
+				depth: child.depth + 1,
+				data: null,
+				children: [],
+				closingSymbols: [],
+				symbols: [
+					{
+						position: {
+							start: { line: child.position.start.line, character: 0, offset: child.position.start.offset },
+							end: { line: child.position.start.line, character: 0, offset: child.position.start.offset },
+						},
+						type: SymbolType.WHITESPACE,
+						value: " ",
+					},
+				],
+			});
+
+			child.position = {
+				start: { line: child.position.start.line, character: 0, offset: child.position.start.offset },
+				end: { line: child.position.start.line, character: 0, offset: child.position.start.offset },
+			};
+		}
+	});
 
 	tree.symbols = [];
 

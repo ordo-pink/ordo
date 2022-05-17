@@ -7,8 +7,8 @@ export const swallow =
 			return block;
 		}
 
-		block.position.end.character++;
-		block.position.end.offset++;
+		block.position.end.character = symbol.position.start.character;
+		block.position.end.offset = symbol.position.start.offset;
 		block.symbols.push(symbol as any);
 
 		return block;

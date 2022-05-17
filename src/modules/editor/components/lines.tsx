@@ -6,7 +6,7 @@ import { useCurrentTab } from "@modules/editor/hooks/use-current-tab";
 import { Line } from "@modules/editor/components/line";
 import { tapPreventDefault, tapStopPropagation } from "@utils/events";
 import { FoldVoid } from "@utils/either";
-import { lastIndex } from "@utils/array";
+import { lastIndex, tail } from "@utils/array";
 import { tap } from "@utils/functions";
 import { NoOp } from "@utils/no-op";
 
@@ -38,8 +38,9 @@ export const Lines = React.memo(
 				.map(tapPreventDefault)
 				.map(tapStopPropagation)
 				.chain(() => Either.fromNullable(tab))
+				.map(tap((t) => console.log(t)))
 				.map((t) => t.content)
-				.map((t) => t.position.end)
+				.chain((c) => Either.fromNullable(tail(c.children).position.end))
 				.map((position) => [{ start: position, end: position, direction: "ltr" as const }])
 				.map((positions) => ({ path: tab.path, positions }))
 				.map((payload) => dispatch({ type: "@editor/update-caret-positions", payload }))

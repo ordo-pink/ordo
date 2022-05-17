@@ -19,7 +19,6 @@ export type MdSymbol = {
 
 // TODO: Add OpeningSymbols
 // TODO: Add id
-// TODO: Add raw
 export type MdNode<TTokenType = BlockTokenType | InlineTokenType, TData = unknown> = {
 	type: TTokenType;
 	position: MdSymbolRange;

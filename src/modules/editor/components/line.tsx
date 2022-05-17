@@ -9,6 +9,7 @@ import { tapPreventDefault, tapStopPropagation } from "@utils/events";
 import { FoldVoid } from "@utils/either";
 import { tail } from "@utils/array";
 import { Caret } from "./caret";
+import { tap } from "@utils/functions";
 
 export type LineProps = {
 	lineIndex: number;
@@ -26,6 +27,7 @@ export const Line = React.memo(
 				.map(tapPreventDefault)
 				.map(tapStopPropagation)
 				.chain(() => Either.fromNullable(tab))
+				.map(tap((t) => console.log(t)))
 				.map((t) => t.content)
 				.map((p) => p.children[lineIndex])
 				.map((l) => l.position.end)
@@ -38,10 +40,7 @@ export const Line = React.memo(
 			<div className="editor_line">
 				<LineNumber number={lineIndex + 1} />
 				<div className={`editor_line_content`} onClick={handleClick}>
-					<Caret
-						visible={tab.caretPositions[0].start.line === lineIndex + 1 && tab.caretPositions[0].start.character === 0}
-					/>
-					<Token token={tab.content.children[lineIndex]} />
+					<Token token={tab.content.children[lineIndex]} lineIndex={lineIndex} />
 				</div>
 			</div>
 		) : null;

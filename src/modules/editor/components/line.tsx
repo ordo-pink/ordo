@@ -26,7 +26,7 @@ export const Line = React.memo(
 				.map(tapPreventDefault)
 				.map(tapStopPropagation)
 				.chain(() => Either.fromNullable(tab))
-				.map((t) => t.parsed)
+				.map((t) => t.content)
 				.map((p) => p.children[lineIndex])
 				.map((l) => l.position.end)
 				.map((position) => [{ start: position, end: position, direction: "ltr" as const }])
@@ -41,7 +41,7 @@ export const Line = React.memo(
 					<Caret
 						visible={tab.caretPositions[0].start.line === lineIndex + 1 && tab.caretPositions[0].start.character === 0}
 					/>
-					<Token token={tab.parsed.children[lineIndex]} />
+					<Token token={tab.content.children[lineIndex]} />
 				</div>
 			</div>
 		) : null;

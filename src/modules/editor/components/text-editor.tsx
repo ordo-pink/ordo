@@ -22,8 +22,8 @@ export const TextEditor: React.FC = React.memo(
 				.map(tapStopPropagation)
 				.map(() => dispatch({ type: "@editor/focus" }))
 				.map(() => ({
-					line: tab.parsed.children[tab.parsed.children.length - 1].position.end.line,
-					character: tab.parsed.children[tab.parsed.children.length - 1].position.end.character,
+					line: tab.content.children[tab.content.children.length - 1].position.end.line,
+					character: tab.content.children[tab.content.children.length - 1].position.end.character,
 				}))
 				.map((position) => [{ start: position, end: position, direction: "ltr" as const }])
 				.map((positions) => ({ path: tab.path, positions }))

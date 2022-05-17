@@ -32,7 +32,7 @@ export default registerEvents<EditorEvents>({
 						direction: "ltr",
 					},
 				],
-				parsed: parse(raw),
+				content: parse(raw),
 			});
 		}
 

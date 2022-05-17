@@ -38,7 +38,7 @@ export const Lines = React.memo(
 				.map(tapPreventDefault)
 				.map(tapStopPropagation)
 				.chain(() => Either.fromNullable(tab))
-				.map((t) => t.parsed)
+				.map((t) => t.content)
 				.map((t) => t.position.end)
 				.map((position) => [{ start: position, end: position, direction: "ltr" as const }])
 				.map((positions) => ({ path: tab.path, positions }))
@@ -55,7 +55,7 @@ export const Lines = React.memo(
 
 		return tab ? (
 			<div className="editor_lines" onClick={handleClick}>
-				{tab.parsed.children.map((_, lineIndex) => (
+				{tab.content.children.map((_, lineIndex) => (
 					<Line key={`${lineIndex}`} lineIndex={lineIndex} />
 				))}
 			</div>

@@ -2,9 +2,9 @@ import { createBlockToken } from "@modules/md-parser/create-block-token";
 import { BlockTokenType, SymbolType } from "@modules/md-parser/enums";
 import { parseInline } from "@modules/md-parser/parse-inline";
 import { createReader } from "@modules/md-parser/reader";
-import { Token, DocumentRoot, CodeBlockToken, Symbol } from "@modules/md-parser/types";
+import { MdNode, MdDocument, MdCodeBlock, MdSymbol } from "@modules/md-parser/types";
 
-export const parse = (raw: string | Symbol[], tree?: Token): DocumentRoot => {
+export const parse = (raw: string | MdSymbol[], tree?: MdNode): MdDocument => {
 	const reader = createReader(raw);
 
 	if (!tree) {
@@ -13,7 +13,7 @@ export const parse = (raw: string | Symbol[], tree?: Token): DocumentRoot => {
 			depth: 0,
 			data: { length: raw.length, raw },
 			children: [],
-		} as unknown as DocumentRoot;
+		} as unknown as MdDocument;
 	}
 
 	let symbol = reader.next();
@@ -105,7 +105,7 @@ export const parse = (raw: string | Symbol[], tree?: Token): DocumentRoot => {
 				const subTree = createBlockToken(BlockTokenType.PARAGRAPH, depth + 1, null, reader, symbol);
 				tree.children.push(parseInline(subTree.symbols, subTree));
 
-				(tree as CodeBlockToken).data.language = tree.symbols
+				(tree as MdCodeBlock).data.language = tree.symbols
 					.slice(
 						3,
 						tree.symbols.findIndex((s) => s.type === SymbolType.EOL),
@@ -244,5 +244,5 @@ export const parse = (raw: string | Symbol[], tree?: Token): DocumentRoot => {
 
 	tree.symbols = [];
 
-	return tree as DocumentRoot;
+	return tree as MdDocument;
 };

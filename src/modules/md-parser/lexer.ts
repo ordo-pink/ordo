@@ -1,10 +1,10 @@
 import { Either } from "or-else";
 
-import { Symbol } from "@modules/md-parser/types";
+import { MdSymbol } from "@modules/md-parser/types";
 import { SymbolType } from "@modules/md-parser/enums";
 import { getSymbolType } from "@modules/md-parser/get-symbol-type";
 
-export const lex = (text: string): Symbol[] =>
+export const lex = (text: string): MdSymbol[] =>
 	Either.fromNullable(text).fold(
 		() => [],
 		(t) => {

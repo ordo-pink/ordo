@@ -1,45 +1,54 @@
 import { SymbolType, BlockTokenType, InlineTokenType } from "@modules/md-parser/enums";
 
-export type Location = {
+export type MdSymbolPosition = {
 	line: number;
 	character: number;
 	offset: number;
 };
 
-export type Position = {
-	start: Location;
-	end: Location;
+export type MdSymbolRange = {
+	start: MdSymbolPosition;
+	end: MdSymbolPosition;
 };
 
-export type Symbol = {
+export type MdSymbol = {
 	type: SymbolType;
 	value: string;
-	position: Position;
+	position: MdSymbolRange;
 };
 
-export type Token<TTokenType = BlockTokenType | InlineTokenType, TData = unknown> = {
+// TODO: Add OpeningSymbols
+// TODO: Add id
+// TODO: Add raw
+export type MdNode<TTokenType = BlockTokenType | InlineTokenType, TData = unknown> = {
 	type: TTokenType;
-	position: Position;
-	children: Token[];
+	position: MdSymbolRange;
+	children: MdNode[];
 	data: TData;
-	symbols: Symbol[];
+	symbols: MdSymbol[];
 	depth: number;
-	closingSymbols: Symbol[];
+	closingSymbols: MdSymbol[];
 };
 
-export type DocumentRoot = Token<BlockTokenType.ROOT, { length: number }>;
-export type HeadingToken = Token<BlockTokenType.HEADING>;
-export type BlockquoteToken = Token<BlockTokenType.BLOCKQUOTE>;
-export type ParagraphToken = Token<BlockTokenType.PARAGRAPH>;
-export type DividerToken = Token<BlockTokenType.DIVIDER>;
-export type ListToken = Token<BlockTokenType.LIST, { ordered: boolean }>;
-export type ListItemToken = Token<BlockTokenType.LIST_ITEM, { task: boolean; checked: boolean }>;
-export type ComponentToken = Token<BlockTokenType.COMPONENT, { name: string; attributes: Record<string, string> }>;
-export type EmbedToken = Token<BlockTokenType.EMBED, { content: string }>;
-export type CodeBlockToken = Token<BlockTokenType.CODE_BLOCK, { language: string }>;
+export type MdDocument = MdNode<BlockTokenType.ROOT, { length: number }>;
+export type MdHeading = MdNode<BlockTokenType.HEADING>;
+export type MdBlockquote = MdNode<BlockTokenType.BLOCKQUOTE>;
+export type MdParagraph = MdNode<BlockTokenType.PARAGRAPH>;
+export type MdDivider = MdNode<BlockTokenType.DIVIDER>;
+export type MdList = MdNode<BlockTokenType.LIST, { ordered: boolean }>;
+export type MdListItem = MdNode<BlockTokenType.LIST_ITEM, { task: boolean; checked: boolean }>;
+export type MdComponent = MdNode<BlockTokenType.COMPONENT, { name: string; attributes: Record<string, string> }>;
+export type MdEmbed = MdNode<BlockTokenType.EMBED, { content: string }>;
+export type MdCodeBlock = MdNode<BlockTokenType.CODE_BLOCK, { language: string }>;
 
-export type MarkdownTree = {
-	type: "root";
-	length: number;
-	children: Symbol[];
-};
+export type LineToken =
+	| MdDocument
+	| MdHeading
+	| MdBlockquote
+	| MdParagraph
+	| MdDivider
+	| MdList
+	| MdListItem
+	| MdComponent
+	| MdEmbed
+	| MdCodeBlock;

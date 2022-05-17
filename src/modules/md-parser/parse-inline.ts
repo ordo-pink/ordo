@@ -1,9 +1,9 @@
 import { SymbolType, InlineTokenType } from "@modules/md-parser/enums";
 import { createReader } from "@modules/md-parser/reader";
-import { Token, Symbol } from "@modules/md-parser/types";
+import { MdNode, MdSymbol } from "@modules/md-parser/types";
 import { tail } from "@utils/array";
 
-export const parseInline = (symbols: Symbol[], tree: Token) => {
+export const parseInline = (symbols: MdSymbol[], tree: MdNode) => {
 	const reader = createReader(symbols);
 
 	let symbol = reader.next();

@@ -1,17 +1,17 @@
 import { InlineTokenType } from "@modules/md-parser/enums";
 import { createReader } from "@modules/md-parser/reader";
 import { swallow } from "@modules/md-parser/swallow";
-import { Token, Symbol } from "@modules/md-parser/types";
+import { MdNode, MdSymbol } from "@modules/md-parser/types";
 
 export const createInlineToken = <TTokenType extends InlineTokenType>(
 	type: TTokenType,
 	depth: number,
-	data: Token<TTokenType>["data"] = {},
+	data: MdNode<TTokenType>["data"] = {},
 	reader: ReturnType<typeof createReader>,
-	symbol: Symbol,
-	end = (symbol: Symbol, reader: ReturnType<typeof createReader>): boolean => Boolean(symbol),
-): Token<TTokenType> => {
-	const token: Token<TTokenType> = {
+	symbol: MdSymbol,
+	end = (symbol: MdSymbol, reader: ReturnType<typeof createReader>): boolean => Boolean(symbol),
+): MdNode<TTokenType> => {
+	const token: MdNode<TTokenType> = {
 		type,
 		depth,
 		position: symbol.position,
@@ -29,5 +29,5 @@ export const createInlineToken = <TTokenType extends InlineTokenType>(
 	}
 
 	const result = buildToken();
-	return result as Token<TTokenType>;
+	return result as MdNode<TTokenType>;
 };

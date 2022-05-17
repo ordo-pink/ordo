@@ -2,11 +2,11 @@ import React from "react";
 import { Switch } from "or-else";
 
 import { BlockTokenType, InlineTokenType } from "@modules/md-parser/enums";
-import { Token, ListToken } from "@modules/md-parser/types";
+import { MdNode, MdList } from "@modules/md-parser/types";
 
 type ReactChildren = Parameters<React.FC>[0];
 
-export const useTokenWrapper = (token: Token) => {
+export const useTokenWrapper = (token: MdNode) => {
 	const Wrapper = React.useMemo(
 		() =>
 			Switch.of(token.type)
@@ -23,7 +23,7 @@ export const useTokenWrapper = (token: Token) => {
 					<blockquote className="border-l border-neutral-600 pl-2">{children}</blockquote>
 				))
 				.case(BlockTokenType.LIST, ({ children }: ReactChildren) =>
-					(token as ListToken).data.ordered ? <ol>{children}</ol> : <ul>{children}</ul>,
+					(token as MdList).data.ordered ? <ol>{children}</ol> : <ul>{children}</ul>,
 				)
 				.case(BlockTokenType.LIST_ITEM, ({ children }: ReactChildren) => <li>{children}</li>)
 				.case(InlineTokenType.BOLD, ({ children }: ReactChildren) => <strong>{children}</strong>)

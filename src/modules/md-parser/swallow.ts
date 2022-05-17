@@ -1,8 +1,8 @@
-import { Token, Symbol } from "@modules/md-parser/types";
+import { MdNode, MdSymbol } from "@modules/md-parser/types";
 
 export const swallow =
-	<TToken extends Token>(block: TToken) =>
-	(symbol?: Symbol): TToken => {
+	<TToken extends MdNode>(block: TToken) =>
+	(symbol?: MdSymbol): TToken => {
 		if (!symbol) {
 			return block;
 		}

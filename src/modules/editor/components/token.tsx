@@ -1,7 +1,7 @@
 import React from "react";
 
 import { InlineTokenType } from "@modules/md-parser/enums";
-import { Token as TToken } from "@modules/md-parser/types";
+import { MdNode as TToken } from "@modules/md-parser/types";
 import { useTokenWrapper } from "@modules/editor/hooks/use-token-wrapper";
 import { Char } from "@modules/editor/components/char";
 import { useCurrentTab } from "../hooks/use-current-tab";

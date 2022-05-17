@@ -1,7 +1,7 @@
-import { Symbol } from "@modules/md-parser/types";
+import { MdSymbol } from "@modules/md-parser/types";
 import { lex } from "@modules/md-parser/lexer";
 
-export const createReader = (data: string | Symbol[]) => {
+export const createReader = (data: string | MdSymbol[]) => {
 	let i = -1;
 	const symbols = typeof data === "string" ? lex(data) : data;
 

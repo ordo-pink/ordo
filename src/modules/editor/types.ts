@@ -1,6 +1,6 @@
 import { OrdoEvent } from "@core/types";
 import { OrdoFile } from "@modules/file-explorer/types";
-import { DocumentRoot } from "@modules/md-parser/types";
+import { MdDocument } from "@modules/md-parser/types";
 
 export type CaretPosition = {
 	line: number;
@@ -16,7 +16,7 @@ export type CaretRange = {
 export type EditorTab = Required<Pick<OrdoFile, "path" | "raw">> & {
 	lines: string[];
 	caretPositions: CaretRange[];
-	parsed: DocumentRoot;
+	parsed: MdDocument;
 };
 
 export type EditorState = {

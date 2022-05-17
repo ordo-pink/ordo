@@ -1,12 +1,12 @@
 import React from "react";
 
-import { Symbol } from "@modules/md-parser/types";
+import { MdSymbol } from "@modules/md-parser/types";
 import { useAppDispatch } from "@core/state/store";
 import { useCurrentTab } from "@modules/editor/hooks/use-current-tab";
 import { Caret } from "@modules/editor/components/caret";
 
 type CharProps = {
-	char: Symbol;
+	char: MdSymbol;
 };
 
 export const Char = React.memo(

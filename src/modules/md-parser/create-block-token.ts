@@ -1,7 +1,7 @@
 import { BlockTokenType, SymbolType } from "@modules/md-parser/enums";
 import { createReader } from "@modules/md-parser/reader";
 import { swallow } from "@modules/md-parser/swallow";
-import { Token, TokenWithChildren, Symbol } from "@modules/md-parser/types";
+import { Token, Symbol } from "@modules/md-parser/types";
 
 export const createBlockToken = <TTokenType extends BlockTokenType>(
 	type: TTokenType,
@@ -10,8 +10,8 @@ export const createBlockToken = <TTokenType extends BlockTokenType>(
 	reader: ReturnType<typeof createReader>,
 	symbol: Symbol,
 	end = (symbol: Symbol, reader: ReturnType<typeof createReader>) => symbol.type === SymbolType.EOL,
-): TokenWithChildren<TTokenType> => {
-	const token: TokenWithChildren<TTokenType> = {
+): Token<TTokenType> => {
+	const token: Token<TTokenType> = {
 		type,
 		depth,
 		position: symbol.position,

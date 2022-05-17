@@ -20,32 +20,23 @@ export type Symbol = {
 export type Token<TTokenType = BlockTokenType | InlineTokenType, TData = unknown> = {
 	type: TTokenType;
 	position: Position;
+	children: Token[];
 	data: TData;
 	symbols: Symbol[];
 	depth: number;
 	closingSymbols: Symbol[];
 };
 
-export type TokenWithChildren<TTokenType = BlockTokenType | InlineTokenType, TData = unknown> = Token<
-	TTokenType,
-	TData
-> & {
-	children: Token[];
-};
-
-export type DocumentRoot = TokenWithChildren<BlockTokenType.ROOT, { length: number }>;
-export type HeadingToken = TokenWithChildren<BlockTokenType.HEADING>;
-export type BlockquoteToken = TokenWithChildren<BlockTokenType.BLOCKQUOTE>;
-export type ParagraphToken = TokenWithChildren<BlockTokenType.PARAGRAPH>;
-export type DividerToken = TokenWithChildren<BlockTokenType.DIVIDER>;
-export type ListToken = TokenWithChildren<BlockTokenType.LIST, { ordered: boolean }>;
-export type ListItemToken = TokenWithChildren<BlockTokenType.LIST_ITEM, { task: boolean; checked: boolean }>;
-export type ComponentToken = TokenWithChildren<
-	BlockTokenType.COMPONENT,
-	{ name: string; attributes: Record<string, string> }
->;
-export type EmbedToken = TokenWithChildren<BlockTokenType.EMBED, { content: string }>;
-export type CodeBlockToken = TokenWithChildren<BlockTokenType.CODE_BLOCK, { language: string }>;
+export type DocumentRoot = Token<BlockTokenType.ROOT, { length: number }>;
+export type HeadingToken = Token<BlockTokenType.HEADING>;
+export type BlockquoteToken = Token<BlockTokenType.BLOCKQUOTE>;
+export type ParagraphToken = Token<BlockTokenType.PARAGRAPH>;
+export type DividerToken = Token<BlockTokenType.DIVIDER>;
+export type ListToken = Token<BlockTokenType.LIST, { ordered: boolean }>;
+export type ListItemToken = Token<BlockTokenType.LIST_ITEM, { task: boolean; checked: boolean }>;
+export type ComponentToken = Token<BlockTokenType.COMPONENT, { name: string; attributes: Record<string, string> }>;
+export type EmbedToken = Token<BlockTokenType.EMBED, { content: string }>;
+export type CodeBlockToken = Token<BlockTokenType.CODE_BLOCK, { language: string }>;
 
 export type MarkdownTree = {
 	type: "root";

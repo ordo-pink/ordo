@@ -1,9 +1,9 @@
 import { SymbolType, InlineTokenType } from "@modules/md-parser/enums";
 import { createReader } from "@modules/md-parser/reader";
-import { TokenWithChildren, Symbol } from "@modules/md-parser/types";
+import { Token, Symbol } from "@modules/md-parser/types";
 import { tail } from "@utils/array";
 
-export const parseInline = (symbols: Symbol[], tree: TokenWithChildren) => {
+export const parseInline = (symbols: Symbol[], tree: Token) => {
 	const reader = createReader(symbols);
 
 	let symbol = reader.next();
@@ -50,6 +50,7 @@ export const parseInline = (symbols: Symbol[], tree: TokenWithChildren) => {
 				},
 				symbols,
 				closingSymbols: [],
+				children: [],
 			});
 		} else if (symbol && symbol.type === SymbolType.TILDE && ahead && ahead.type === SymbolType.TILDE) {
 			const symbols = [symbol];
@@ -342,6 +343,7 @@ export const parseInline = (symbols: Symbol[], tree: TokenWithChildren) => {
 						start: symbols[0].position.start,
 						end: tail(symbols).position.end,
 					},
+					children: [],
 					symbols: symbols.slice(0, -2),
 					closingSymbols: symbols.slice(-2),
 				});
@@ -354,6 +356,7 @@ export const parseInline = (symbols: Symbol[], tree: TokenWithChildren) => {
 						start: symbols[0].position.start,
 						end: tail(symbols).position.end,
 					},
+					children: [],
 					symbols: symbols.slice(0, 2),
 					closingSymbols: [],
 				});
@@ -426,6 +429,7 @@ export const parseInline = (symbols: Symbol[], tree: TokenWithChildren) => {
 					start: symbols[0].position.start,
 					end: tail(symbols).position.end,
 				},
+				children: [],
 				symbols,
 				closingSymbols: [],
 			});

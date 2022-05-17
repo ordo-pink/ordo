@@ -1,7 +1,7 @@
 import { InlineTokenType } from "@modules/md-parser/enums";
 import { createReader } from "@modules/md-parser/reader";
 import { swallow } from "@modules/md-parser/swallow";
-import { Token, TokenWithChildren, Symbol } from "@modules/md-parser/types";
+import { Token, Symbol } from "@modules/md-parser/types";
 
 export const createInlineToken = <TTokenType extends InlineTokenType>(
 	type: TTokenType,
@@ -10,8 +10,8 @@ export const createInlineToken = <TTokenType extends InlineTokenType>(
 	reader: ReturnType<typeof createReader>,
 	symbol: Symbol,
 	end = (symbol: Symbol, reader: ReturnType<typeof createReader>): boolean => Boolean(symbol),
-): TokenWithChildren<TTokenType> => {
-	const token: TokenWithChildren<TTokenType> = {
+): Token<TTokenType> => {
+	const token: Token<TTokenType> = {
 		type,
 		depth,
 		position: symbol.position,
@@ -29,5 +29,5 @@ export const createInlineToken = <TTokenType extends InlineTokenType>(
 	}
 
 	const result = buildToken();
-	return result as TokenWithChildren<TTokenType>;
+	return result as Token<TTokenType>;
 };

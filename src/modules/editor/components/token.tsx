@@ -1,7 +1,7 @@
 import React from "react";
 
 import { InlineTokenType } from "@modules/md-parser/enums";
-import { TokenWithChildren, Token as TToken } from "@modules/md-parser/types";
+import { Token as TToken } from "@modules/md-parser/types";
 import { useTokenWrapper } from "@modules/editor/hooks/use-token-wrapper";
 import { Char } from "@modules/editor/components/char";
 import { useCurrentTab } from "../hooks/use-current-tab";
@@ -28,8 +28,8 @@ export const Token = React.memo(
 						))}
 					</span>
 				}
-				{(token as TokenWithChildren).children &&
-					(token as TokenWithChildren).children.map((child) => (
+				{token.children &&
+					token.children.map((child) => (
 						<Token key={`${child.position.start.line}-${child.position.start.character}`} token={child} />
 					))}
 

@@ -2,9 +2,9 @@ import { createBlockToken } from "@modules/md-parser/create-block-token";
 import { BlockTokenType, SymbolType } from "@modules/md-parser/enums";
 import { parseInline } from "@modules/md-parser/parse-inline";
 import { createReader } from "@modules/md-parser/reader";
-import { TokenWithChildren, DocumentRoot, CodeBlockToken, Symbol } from "@modules/md-parser/types";
+import { Token, DocumentRoot, CodeBlockToken, Symbol } from "@modules/md-parser/types";
 
-export const parse = (raw: string | Symbol[], tree?: TokenWithChildren): DocumentRoot => {
+export const parse = (raw: string | Symbol[], tree?: Token): DocumentRoot => {
 	const reader = createReader(raw);
 
 	if (!tree) {

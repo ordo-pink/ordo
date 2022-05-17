@@ -8,7 +8,6 @@ import { Token } from "@modules/editor/components/token";
 import { tapPreventDefault, tapStopPropagation } from "@utils/events";
 import { FoldVoid } from "@utils/either";
 import { tail } from "@utils/array";
-import { NoOp } from "@utils/no-op";
 import { Caret } from "./caret";
 
 export type LineProps = {
@@ -28,9 +27,8 @@ export const Line = React.memo(
 				.map(tapStopPropagation)
 				.chain(() => Either.fromNullable(tab))
 				.map((t) => t.parsed)
-				.map((p) => tail(p.children))
-				.map((l) => l.position)
-				.map((position) => ({ line: position.start.line, character: position.start.character }))
+				.map((p) => p.children[lineIndex])
+				.map((l) => l.position.end)
 				.map((position) => [{ start: position, end: position, direction: "ltr" as const }])
 				.map((positions) => ({ path: tab.path, positions }))
 				.map((payload) => dispatch({ type: "@editor/update-caret-positions", payload }))

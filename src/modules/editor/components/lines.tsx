@@ -17,10 +17,6 @@ export const Lines = React.memo(
 		const { tab } = useCurrentTab();
 		const { focused } = useAppSelector((state) => state.editor);
 
-		const [line, setLine] = React.useState<number>(0);
-		const [character, setCharacter] = React.useState<number>(0);
-		const [path, setPath] = React.useState<string>("");
-
 		const handleKeyDown = (e: KeyboardEvent) => {
 			if (!tab) return;
 
@@ -36,17 +32,18 @@ export const Lines = React.memo(
 			});
 		};
 
-		// const handleClick = (e: React.MouseEvent) =>
-		// 	Either.right(e)
-		// 		.map(tapPreventDefault)
-		// 		.map(tapStopPropagation)
-		// 		.chain(() => eitherTab)
-		// 		.map(tap(() => dispatch({ type: "@editor/focus" })))
-		// 		.map(() => ({ line, character }))
-		// 		.map((position) => [{ start: position, end: position, direction: "ltr" as const }])
-		// 		.map((positions) => ({ path, positions }))
-		// 		.map((payload) => dispatch({ type: "@editor/update-caret-positions", payload }))
-		// 		.fold(...FoldVoid);
+		const handleClick = (e: React.MouseEvent) =>
+			tab &&
+			Either.right(e)
+				.map(tapPreventDefault)
+				.map(tapStopPropagation)
+				.chain(() => Either.fromNullable(tab))
+				.map((t) => t.parsed)
+				.map((t) => t.position.end)
+				.map((position) => [{ start: position, end: position, direction: "ltr" as const }])
+				.map((positions) => ({ path: tab.path, positions }))
+				.map((payload) => dispatch({ type: "@editor/update-caret-positions", payload }))
+				.fold(...FoldVoid);
 
 		const removeKeyDownListener = () => window.removeEventListener("keydown", handleKeyDown);
 
@@ -57,7 +54,7 @@ export const Lines = React.memo(
 		}, [tab]);
 
 		return tab ? (
-			<div className="editor_lines">
+			<div className="editor_lines" onClick={handleClick}>
 				{tab.parsed.children.map((_, lineIndex) => (
 					<Line key={`${lineIndex}`} lineIndex={lineIndex} />
 				))}

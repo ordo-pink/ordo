@@ -1,7 +1,7 @@
 import React from "react";
 
 import { useAppDispatch, useAppSelector } from "@core/state/store";
-import { useTreePadding } from "@modules/file-explorer/hooks/use-tree-padding";
+import { useTreeNesting } from "@modules/file-explorer/hooks/use-tree-nesting";
 import { fromBoolean } from "@utils/either";
 import { NoOp } from "@utils/no-op";
 
@@ -21,7 +21,7 @@ export const Creator: React.FC<CreatorProps> = ({ path, depth }) => {
 
 	const ref = React.useRef<HTMLInputElement>(null);
 
-	const marginLeft = useTreePadding(depth);
+	const marginLeft = useTreeNesting(depth);
 
 	const [name, setName] = React.useState<string>("");
 	const [width, setWidth] = React.useState<string>();

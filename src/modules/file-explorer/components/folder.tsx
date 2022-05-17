@@ -5,7 +5,7 @@ import { useAppDispatch } from "@core/state/store";
 import { OrdoFolder } from "@modules/file-explorer/types";
 import { Creator } from "@modules/file-explorer/components/creator";
 import { useFolderIcons } from "@modules/file-explorer/hooks/use-folder-icons";
-import { useTreePadding } from "@modules/file-explorer/hooks/use-tree-padding";
+import { useTreeNesting } from "@modules/file-explorer/hooks/use-tree-nesting";
 import { FolderContent } from "@modules/file-explorer/components/folder-content";
 import { tapPreventDefault, tapStopPropagation } from "@utils/events";
 import { FoldVoid } from "@utils/either";
@@ -22,7 +22,7 @@ export const Folder: React.FC<FolderProps> = ({ folder }) => {
 	const dispatch = useAppDispatch();
 
 	const { FolderIcon, CollapseIcon } = useFolderIcons(folder);
-	const paddingLeft = useTreePadding(folder.depth);
+	const paddingLeft = useTreeNesting(folder.depth);
 
 	const [iconClassName, setIconClassName] = React.useState<string>("file-explorer_folder_green");
 

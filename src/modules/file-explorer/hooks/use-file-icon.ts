@@ -1,20 +1,17 @@
-import { Switch } from "or-else";
+import React from "react";
 
 import { useIcon } from "@core/hooks/use-icon";
 import { OrdoFile } from "@modules/file-explorer/types";
-import { SupportedIcon } from "@core/types";
 
 export const useFileIcon = (file?: OrdoFile | null) => {
-	if (!file) {
-		return () => null;
-	}
+	const iconName = React.useMemo(() => {
+		if (!file) return;
+		if (file.type === "image") return "HiOutlinePhotograph";
+		if (file.size > 0) return "HiOutlineDocumentText";
+		else return "HiOutlineDocument";
+	}, [file, file && file.path, file && file.type, file && file.size]);
 
-	const getIcon: () => SupportedIcon = Switch.of(file.type)
-		.case("image", () => "HiOutlinePhotograph" as const)
-		.case("document", () => (file.size > 0 ? ("HiOutlineDocumentText" as const) : ("HiOutlineDocument" as const)))
-		.default(() => "HiOutlineDocumentSearch");
-
-	const Icon = useIcon(getIcon());
+	const Icon = useIcon(iconName);
 
 	return Icon;
 };

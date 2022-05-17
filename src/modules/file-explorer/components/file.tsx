@@ -3,7 +3,7 @@ import React from "react";
 import { useAppDispatch, useAppSelector } from "@core/state/store";
 import { OrdoFile } from "@modules/file-explorer/types";
 import { useFileIcon } from "@modules/file-explorer/hooks/use-file-icon";
-import { useTreePadding } from "@modules/file-explorer/hooks/use-tree-padding";
+import { useTreeNesting } from "@modules/file-explorer/hooks/use-tree-nesting";
 
 type FileProps = {
 	file: OrdoFile;
@@ -19,7 +19,7 @@ export const File: React.FC<FileProps> = ({ file }) => {
 	const openFiles = useAppSelector((state) => state.editor.tabs);
 
 	const Icon = useFileIcon(file);
-	const paddingLeft = useTreePadding(file.depth);
+	const paddingLeft = useTreeNesting(file.depth);
 
 	const [isOpenFile, setIsOpenFile] = React.useState<boolean>(false);
 	const [isCurrentFile, setIsCurrentFile] = React.useState<boolean>(false);

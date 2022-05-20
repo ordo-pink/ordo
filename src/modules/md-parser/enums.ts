@@ -1,44 +1,4 @@
-export enum SymbolType {
-	STAR = "star",
-	TILDE = "tilde",
-	UNDERSCORE = "underscore",
-	HYPHEN = "hyphen",
-	CHEVRON_LEFT = "chevronLeft",
-	CHEVRON_RIGHT = "chevronRight",
-	AT = "at",
-	DOT = "dot",
-	COMMA = "comma",
-	EXCLAMATION_MARK = "exclamationMark",
-	QUESTION_MARK = "questionMark",
-	COLON = "colon",
-	SEMICOLON = "semicolon",
-	SINGLE_QUOTE = "singleQuote",
-	DOUBLE_QUOTE = "doubleQuote",
-	PLUS = "plus",
-	DOLLAR_SIGN = "dollar",
-	PERCENT = "percent",
-	AMPERSAND = "ampersand",
-	CARET = "caret",
-	BACKTICK = "backtick",
-	HASH = "hash",
-	WHITESPACE = "whitespace",
-	SLASH = "slash",
-	BACKSLASH = "backslash",
-	PIPE = "pipe",
-	BRACE_OPEN = "braceOpen",
-	BRACE_CLOSE = "braceClose",
-	CURLY_BRACE_OPEN = "curlyBraceOpen",
-	CURLY_BRACE_CLOSE = "curlyBraceClose",
-	BRACKET_OPEN = "bracketOpen",
-	BRACKET_CLOSE = "bracketClose",
-	OCTET = "digit",
-	CHAR = "character",
-	TAB = "tab",
-	EOL = "eol",
-}
-
-export enum BlockTokenType {
-	ROOT = "root",
+export enum BlockNodeType {
 	HEADING = "heading",
 	BLOCKQUOTE = "blockquote",
 	PARAGRAPH = "paragraph",
@@ -50,7 +10,7 @@ export enum BlockTokenType {
 	CODE_BLOCK = "codeBlock",
 }
 
-export enum InlineTokenType {
+export enum InlineNodeType {
 	TAG = "tag",
 	TEXT = "text",
 	BOLD = "bold",

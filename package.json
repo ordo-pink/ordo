@@ -7,8 +7,8 @@
 	"scripts": {
 		"commit": "gitmoji --commit",
 		"start": "electron-forge start -- --debug",
-		"test": "ava",
-		"test:cover": "nyc ava",
+		"test": "cross-env NODE_PATH=src ava",
+		"test:cover": "cross-env NODE_PATH=src nyc ava",
 		"package": "electron-forge package",
 		"make": "electron-forge make",
 		"debug": "electron-forge start --inspect-electron",
@@ -126,6 +126,7 @@
 			"ts"
 		],
 		"require": [
+			"tsconfig-paths/register",
 			"ts-node/register"
 		],
 		"concurrency": 5,
@@ -171,6 +172,7 @@
 		"@vercel/webpack-asset-relocator-loader": "1.7.0",
 		"autoprefixer": "^10.4.4",
 		"ava": "^4.2.0",
+		"cross-env": "^7.0.3",
 		"css-loader": "^6.0.0",
 		"electron": "18.0.3",
 		"eslint": "^7.6.0",
@@ -184,6 +186,7 @@
 		"style-loader": "^3.0.0",
 		"ts-loader": "^9.2.2",
 		"ts-node": "^10.7.0",
+		"tsconfig-paths": "^4.0.0",
 		"typescript": "^4.0.2"
 	},
 	"dependencies": {

@@ -1,7 +1,6 @@
 import React from "react";
 
 import { useAppSelector } from "@core/state/store";
-import { fromBoolean } from "@utils/either";
 
 type CaretProps = {
 	visible?: boolean;

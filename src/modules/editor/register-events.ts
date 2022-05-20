@@ -5,8 +5,10 @@ import { readFile } from "@modules/file-explorer/api/read-file";
 import { findOrdoFile } from "@modules/file-explorer/utils/find-ordo-file";
 import { EditorEvents } from "@modules/editor/types";
 import { findOrdoFolder } from "@modules/file-explorer/utils/find-ordo-folder";
-import { parse } from "@modules/md-parser/parse";
+import { parseLineContent, parseText } from "@modules/text-parser";
+import { createRoot } from "@core/parser/create-root";
 import { tail } from "@utils/array";
+import { NodeWithChildren } from "@core/parser/types";
 
 export default registerEvents<EditorEvents>({
 	"@editor/open-tab": async ({ draft, payload, transmission, context }) => {
@@ -22,6 +24,10 @@ export default registerEvents<EditorEvents>({
 		if (!tab) {
 			const raw = await readFile(payload);
 
+			const content = createRoot(payload);
+
+			parseText(raw, content);
+
 			draft.editor.tabs.push({
 				raw,
 				path: payload,
@@ -32,7 +38,7 @@ export default registerEvents<EditorEvents>({
 						direction: "ltr",
 					},
 				],
-				content: parse(raw),
+				content,
 			});
 		}
 
@@ -105,9 +111,7 @@ export default registerEvents<EditorEvents>({
 
 		if (!tab || !file) return;
 
-		const currentLine = tab.content.children.find(
-			(node) => node.position.start.line === tab.caretPositions[0].start.line,
-		);
+		const currentLine = tab.content.children.find((node) => node.range.start.line === tab.caretPositions[0].start.line);
 
 		if (!currentLine) return;
 
@@ -139,12 +143,11 @@ export default registerEvents<EditorEvents>({
 		) {
 			return;
 		} else if (payload.event.key === "ArrowRight") {
-			if (tab.caretPositions[0].start.character === currentLine.position.end.character) {
-				if (tab.caretPositions[0].start.line === tail(tab.content.children).position.start.line) {
-					tab.caretPositions[0].start.character = tail(tab.content.children).position.end.character;
+			if (tab.caretPositions[0].start.character === currentLine.range.end.character) {
+				if (tab.caretPositions[0].start.line === tail(tab.content.children).range.start.line) {
+					tab.caretPositions[0].start.character = tail(tab.content.children).range.end.character;
 					return;
 				}
-
 				tab.caretPositions[0].start.line++;
 				tab.caretPositions[0].start.character = 0;
 			} else {
@@ -155,10 +158,9 @@ export default registerEvents<EditorEvents>({
 				if (tab.caretPositions[0].start.line === 1) {
 					return;
 				}
-
 				tab.caretPositions[0].start.line--;
 				tab.caretPositions[0].start.character =
-					tab.content.children[tab.caretPositions[0].start.line - 1].position.end.character;
+					tab.content.children[tab.caretPositions[0].start.line - 1].range.end.character;
 			} else {
 				tab.caretPositions[0].start.character--;
 			}
@@ -167,50 +169,37 @@ export default registerEvents<EditorEvents>({
 				tab.caretPositions[0].start.character = 0;
 				return;
 			}
-
 			tab.caretPositions[0].start.line--;
-
 			if (
-				tab.content.children[tab.caretPositions[0].start.line - 1].position.end.character <=
+				tab.content.children[tab.caretPositions[0].start.line - 1].range.end.character <=
 				tab.caretPositions[0].start.character
 			) {
 				tab.caretPositions[0].start.character =
-					tab.content.children[tab.caretPositions[0].start.line - 1].position.end.character;
+					tab.content.children[tab.caretPositions[0].start.line - 1].range.end.character;
 			}
 		} else if (payload.event.key === "ArrowDown") {
-			if (tab.caretPositions[0].start.line === tail(tab.content.children).position.end.line) {
-				tab.caretPositions[0].start.character = tail(tab.content.children).position.end.character;
+			if (tab.caretPositions[0].start.line === tail(tab.content.children).range.end.line) {
+				tab.caretPositions[0].start.character = tail(tab.content.children).range.end.character;
 				return;
 			}
-
 			tab.caretPositions[0].start.line++;
 			if (
-				tab.content.children[tab.caretPositions[0].start.line - 1].position.end.character <=
+				tab.content.children[tab.caretPositions[0].start.line - 1].range.end.character <=
 				tab.caretPositions[0].start.character
 			) {
 				tab.caretPositions[0].start.character =
-					tab.content.children[tab.caretPositions[0].start.line - 1].position.end.character;
+					tab.content.children[tab.caretPositions[0].start.line - 1].range.end.character;
 			}
 		} else if (payload.event.key === "Delete") {
-			const start = tab.content.children[tab.caretPositions[0].start.line - 1].position.start;
-			const end = tab.content.children[tab.caretPositions[0].start.line - 1].position.end;
+			const line = tab.content.children[tab.caretPositions[0].start.line - 1] as NodeWithChildren;
 
-			tab.content.children[tab.caretPositions[0].start.line - 1].raw =
-				tab.content.children[tab.caretPositions[0].start.line - 1].raw!.slice(0, tab.caretPositions[0].start.character) +
-				tab.content.children[tab.caretPositions[0].start.line - 1].raw!.slice(tab.caretPositions[0].start.character + 1);
+			line.raw = line.raw
+				.slice(0, tab.caretPositions[0].start.character)
+				.concat(line.raw.slice(tab.caretPositions[0].start.character + 1));
 
-			tab.content.children[tab.caretPositions[0].start.line - 1].children = [];
-			tab.content.children[tab.caretPositions[0].start.line - 1].symbols = [];
-			tab.content.children[tab.caretPositions[0].start.line - 1].closingSymbols = [];
+			line.children = [];
 
-			parse(
-				tab.content.children[tab.caretPositions[0].start.line - 1].raw!,
-				tab.content.children[tab.caretPositions[0].start.line - 1],
-			);
-
-			tab.content.children[tab.caretPositions[0].start.line - 1].position = { start, end };
-			tab.content.children[tab.caretPositions[0].start.line - 1].position.end.character--;
-			tab.content.children[tab.caretPositions[0].start.line - 1].position.end.offset--;
+			parseLineContent(line.raw, line);
 
 			// } else if (payload.event.key === "Backspace") {
 			// 	if (tab.caretPositions[0].start.character === 0) {

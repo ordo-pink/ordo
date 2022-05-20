@@ -8,6 +8,7 @@ import { Breadcrumbs } from "@modules/editor/components/breadcrumbs";
 import { Lines } from "@modules/editor/components/lines";
 import { tapPreventDefault, tapStopPropagation } from "@utils/events";
 import { FoldVoid } from "@utils/either";
+import { tail } from "@utils/array";
 
 export const TextEditor: React.FC = React.memo(
 	() => {
@@ -22,8 +23,8 @@ export const TextEditor: React.FC = React.memo(
 				.map(tapStopPropagation)
 				.map(() => dispatch({ type: "@editor/focus" }))
 				.map(() => ({
-					line: tab.content.children[tab.content.children.length - 1].position.end.line,
-					character: tab.content.children[tab.content.children.length - 1].position.end.character,
+					line: tail(tab.content.children).range.end.line,
+					character: tail(tab.content.children).range.end.character,
 				}))
 				.map((position) => [{ start: position, end: position, direction: "ltr" as const }])
 				.map((positions) => ({ path: tab.path, positions }))

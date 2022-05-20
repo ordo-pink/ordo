@@ -1,15 +1,15 @@
 import React from "react";
 
-import { MdSymbol } from "@modules/md-parser/types";
 import { useAppDispatch } from "@core/state/store";
 import { useCurrentTab } from "@modules/editor/hooks/use-current-tab";
 import { Caret } from "@modules/editor/components/caret";
+import { Char } from "@core/parser/types";
 
 type CharProps = {
-	char: MdSymbol;
+	char: Char;
 };
 
-export const Char = React.memo(
+export const Character = React.memo(
 	({ char }: CharProps) => {
 		const dispatch = useAppDispatch();
 		const { tab } = useCurrentTab();
@@ -19,13 +19,13 @@ export const Char = React.memo(
 		React.useEffect(() => {
 			if (tab && tab.caretPositions) {
 				setIsCaretHere(
-					char.position.start.line === tab.caretPositions[0].start.line &&
-						char.position.start.character === tab.caretPositions[0].start.character,
+					char.position.line === tab.caretPositions[0].start.line &&
+						char.position.character === tab.caretPositions[0].start.character,
 				);
 			}
 		}, [
-			char.position.start.line,
-			char.position.start.character,
+			char.position.line,
+			char.position.character,
 			tab && tab.caretPositions && tab.caretPositions[0].start.line,
 			tab && tab.caretPositions && tab.caretPositions[0].start.character,
 		]);
@@ -41,12 +41,12 @@ export const Char = React.memo(
 						positions: [
 							{
 								start: {
-									line: char.position.start.line,
-									character: char.position.start.character,
+									line: char.position.line,
+									character: char.position.character,
 								},
 								end: {
-									line: char.position.start.line,
-									character: char.position.start.character,
+									line: char.position.line,
+									character: char.position.character,
 								},
 								direction: "ltr",
 							},
@@ -54,15 +54,15 @@ export const Char = React.memo(
 					},
 				});
 			},
-			[char.position.start.line, char.position.start.character, tab?.path],
+			[char.position.line, char.position.character, tab?.path],
 		);
 
 		return (
 			<>
-				<span onClick={handleClick}>{char.value}</span>
-				<Caret visible={isCaretHere && char.position.start.character !== 0} />
+				{char.value ? <span onClick={handleClick}>{char.value}</span> : null}
+				<Caret visible={isCaretHere && char.position.character !== 0} />
 			</>
 		);
 	},
-	() => true,
+	() => false,
 );

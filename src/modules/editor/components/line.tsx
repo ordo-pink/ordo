@@ -10,6 +10,7 @@ import { FoldVoid } from "@utils/either";
 import { tail } from "@utils/array";
 import { Caret } from "./caret";
 import { tap } from "@utils/functions";
+import { isNodeWithChildren } from "@core/parser/is";
 
 export type LineProps = {
 	lineIndex: number;
@@ -30,16 +31,23 @@ export const Line = React.memo(
 				.map(tap((t) => console.log(t)))
 				.map((t) => t.content)
 				.map((p) => p.children[lineIndex])
-				.map((l) => l.position.end)
+				.map((l) => l.range.end)
 				.map((position) => [{ start: position, end: position, direction: "ltr" as const }])
 				.map((positions) => ({ path: tab.path, positions }))
 				.map((payload) => dispatch({ type: "@editor/update-caret-positions", payload }))
 				.fold(...FoldVoid);
 
+		const line = tab && tab.content.children[lineIndex];
+		const hasNoChildren = line && isNodeWithChildren(line) && !line.children.length;
+
 		return tab ? (
 			<div className="editor_line">
 				<LineNumber number={lineIndex + 1} />
 				<div className={`editor_line_content`} onClick={handleClick}>
+					<Caret
+						visible={tab.caretPositions[0].start.line === lineIndex + 1 && tab.caretPositions[0].start.character === 0}
+					/>
+					{hasNoChildren && <span> </span>}
 					<Token token={tab.content.children[lineIndex]} lineIndex={lineIndex} />
 				</div>
 			</div>

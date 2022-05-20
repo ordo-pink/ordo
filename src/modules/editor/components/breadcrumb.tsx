@@ -3,9 +3,7 @@ import React from "react";
 import { useIcon } from "@core/hooks/use-icon";
 import { useFileIcon } from "@modules/file-explorer/hooks/use-file-icon";
 import { useCurrentTab } from "@modules/editor/hooks/use-current-tab";
-import { NoOp } from "@utils/no-op";
 import { fromBoolean } from "@utils/either";
-import { id } from "@utils/functions";
 
 type BreadcrumbProps = {
 	pathChunk: string;

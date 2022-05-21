@@ -22,20 +22,72 @@ export const Line = React.memo(
 
 		const { tab } = useCurrentTab();
 
-		const handleClick = (e: React.MouseEvent) =>
-			tab &&
-			Either.right(e)
-				.map(tapPreventDefault)
-				.map(tapStopPropagation)
-				.chain(() => Either.fromNullable(tab))
-				.map(tap((t) => console.log(t)))
-				.map((t) => t.content)
-				.map((p) => p.children[lineIndex])
-				.map((l) => l.range.end)
-				.map((position) => [{ start: position, end: position, direction: "ltr" as const }])
-				.map((positions) => ({ path: tab.path, positions }))
-				.map((payload) => dispatch({ type: "@editor/update-caret-positions", payload }))
-				.fold(...FoldVoid);
+		const handleClick = (e: React.MouseEvent) => {
+			e.preventDefault();
+			e.stopPropagation();
+
+			if (!tab) return;
+
+			if (e.altKey) {
+				const found = tab.caretPositions.findIndex(
+					(position) =>
+						position.start.character === tab.content.children[lineIndex].raw.length && position.start.line === lineIndex + 1,
+				);
+
+				if (found !== -1) {
+					const positions = tab.caretPositions.slice(0, found).concat(tab.caretPositions.slice(found + 1));
+
+					dispatch({
+						type: "@editor/update-caret-positions",
+						payload: {
+							path: tab.path,
+							positions,
+						},
+					});
+				} else {
+					dispatch({
+						type: "@editor/update-caret-positions",
+						payload: {
+							path: tab.path,
+							positions: [
+								...tab.caretPositions,
+								{
+									start: {
+										line: lineIndex + 1,
+										character: tab.content.children[lineIndex].raw.length,
+									},
+									end: {
+										line: lineIndex + 1,
+										character: tab.content.children[lineIndex].raw.length,
+									},
+									direction: "ltr",
+								},
+							],
+						},
+					});
+				}
+			} else {
+				dispatch({
+					type: "@editor/update-caret-positions",
+					payload: {
+						path: tab.path,
+						positions: [
+							{
+								start: {
+									line: lineIndex + 1,
+									character: tab.content.children[lineIndex].raw.length,
+								},
+								end: {
+									line: lineIndex + 1,
+									character: tab.content.children[lineIndex].raw.length,
+								},
+								direction: "ltr",
+							},
+						],
+					},
+				});
+			}
+		};
 
 		const line = tab && tab.content.children[lineIndex];
 		const hasNoChildren = line && isNodeWithChildren(line) && !line.children.length;
@@ -45,7 +97,9 @@ export const Line = React.memo(
 				<LineNumber number={lineIndex + 1} />
 				<div className={`editor_line_content`} onClick={handleClick}>
 					<Caret
-						visible={tab.caretPositions[0].start.line === lineIndex + 1 && tab.caretPositions[0].start.character === 0}
+						visible={tab.caretPositions.some(
+							(position) => position.start.line === lineIndex + 1 && position.start.character === 0,
+						)}
 					/>
 					{hasNoChildren && <span> </span>}
 					<Token token={tab.content.children[lineIndex]} lineIndex={lineIndex} />

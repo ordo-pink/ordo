@@ -5,10 +5,11 @@ import { readFile } from "@modules/file-explorer/api/read-file";
 import { findOrdoFile } from "@modules/file-explorer/utils/find-ordo-file";
 import { EditorEvents } from "@modules/editor/types";
 import { findOrdoFolder } from "@modules/file-explorer/utils/find-ordo-folder";
-import { parseLineContent, parseText } from "@modules/text-parser";
+import { createLineNode, parseLine, parseLineContent, parseText, reparseLine } from "@modules/text-parser";
 import { createRoot } from "@core/parser/create-root";
 import { tail } from "@utils/array";
-import { NodeWithChildren } from "@core/parser/types";
+import { Char, NodeWithChildren } from "@core/parser/types";
+import { BlockNodeType } from "@modules/text-parser/enums";
 
 export default registerEvents<EditorEvents>({
 	"@editor/open-tab": async ({ draft, payload, transmission, context }) => {
@@ -191,58 +192,116 @@ export default registerEvents<EditorEvents>({
 					tab.content.children[tab.caretPositions[0].start.line - 1].range.end.character;
 			}
 		} else if (payload.event.key === "Delete") {
-			const line = tab.content.children[tab.caretPositions[0].start.line - 1] as NodeWithChildren;
+			const lineIndex = tab.caretPositions[0].start.line - 1;
+			const charPosition = tab.caretPositions[0].start.character;
+			const line = tab.content.children[lineIndex] as NodeWithChildren;
 
-			line.raw = line.raw
-				.slice(0, tab.caretPositions[0].start.character)
-				.concat(line.raw.slice(tab.caretPositions[0].start.character + 1));
+			if (charPosition === tab.content.children[lineIndex].raw.length) {
+				if (lineIndex === tab.content.children.length - 1) {
+					return;
+				}
 
-			line.children = [];
+				tab.content.children[lineIndex].raw = tab.content.children[lineIndex].raw + tab.content.children[lineIndex + 1].raw;
 
-			parseLineContent(line.raw, line);
+				tab.content.children.splice(lineIndex + 1, 1);
 
-			// } else if (payload.event.key === "Backspace") {
-			// 	if (tab.caretPositions[0].start.character === 0) {
-			// 		if (tab.caretPositions[0].start.line === 0) {
-			// 			return;
-			// 		}
-			// 		tab.caretPositions[0].start.character = tab.lines[tab.caretPositions[0].start.line - 1].length - 1;
-			// 		tab.lines[tab.caretPositions[0].start.line - 1] =
-			// 			tab.lines[tab.caretPositions[0].start.line - 1].slice(0, -1) + currentLine;
-			// 		tab.lines.splice(tab.caretPositions[0].start.line, 1);
-			// 		tab.caretPositions[0].start.line--;
-			// 	} else {
-			// 		tab.lines[tab.caretPositions[0].start.line] =
-			// 			tab.lines[tab.caretPositions[0].start.line].slice(0, tab.caretPositions[0].start.character - 1) +
-			// 			tab.lines[tab.caretPositions[0].start.line].slice(tab.caretPositions[0].start.character);
-			// 		tab.caretPositions[0].start.character--;
-			// 	}
-			// } else if (payload.event.key === "Enter") {
-			// 	let lineContent = " ";
-			// 	lineContent = tab.lines[tab.caretPositions[0].start.line].slice(tab.caretPositions[0].start.character);
-			// 	tab.lines[tab.caretPositions[0].start.line] =
-			// 		tab.lines[tab.caretPositions[0].start.line].slice(
-			// 			0,
-			// 			tab.caretPositions[0].start.character ? tab.caretPositions[0].start.character : 0,
-			// 		) + " ";
-			// 	tab.lines.splice(tab.caretPositions[0].start.line + 1, 0, lineContent);
-			// 	tab.caretPositions[0].start.line++;
-			// 	tab.caretPositions[0].start.character = 0;
-			// } else {
-			// 	if (payload.event.ctrlKey || payload.event.altKey || payload.event.metaKey) {
-			// 		return;
-			// 	}
-			// 	const newLine =
-			// 		currentLine.slice(0, tab.caretPositions[0].start.character) +
-			// 		(payload.event.shiftKey ? payload.event.key.toUpperCase() : payload.event.key) +
-			// 		currentLine.slice(tab.caretPositions[0].start.character);
-			// 	tab.lines[tab.caretPositions[0].start.line] = newLine;
-			// 	tab.caretPositions[0].start.character++;
-			// 	tab.caretPositions[0].end.character = tab.caretPositions[0].start.character;
+				tab.content.children.forEach((line, index) => {
+					tab.content.children[index] = parseLine(line.raw, index, tab.content, {
+						depth: tab.content.depth,
+					});
+				});
+			} else {
+				tab.content.children[lineIndex].raw = line.raw.slice(0, charPosition).concat(line.raw.slice(charPosition + 1));
+
+				tab.content.children[lineIndex] = parseLine(tab.content.children[lineIndex].raw, lineIndex, tab.content, {
+					depth: tab.content.depth,
+				});
+			}
+		} else if (payload.event.key === "Backspace") {
+			const lineIndex = tab.caretPositions[0].start.line - 1;
+			const charPosition = tab.caretPositions[0].start.character;
+
+			if (charPosition === 0) {
+				if (lineIndex === 0) {
+					return;
+				}
+
+				tab.caretPositions[0].start.line--;
+				tab.caretPositions[0].start.character = tab.content.children[lineIndex - 1].raw.length;
+
+				tab.content.children[lineIndex - 1].raw =
+					tab.content.children[lineIndex - 1].raw + tab.content.children[lineIndex].raw;
+
+				tab.content.children.splice(lineIndex, 1);
+
+				tab.content.children.forEach((line, index) => {
+					tab.content.children[index] = parseLine(line.raw, index, tab.content, {
+						depth: tab.content.depth,
+					});
+				});
+			} else {
+				tab.content.children[lineIndex].raw =
+					tab.content.children[lineIndex].raw.slice(0, charPosition - 1) +
+					tab.content.children[lineIndex].raw.slice(charPosition);
+				tab.caretPositions[0].start.character--;
+
+				tab.content.children[lineIndex] = parseLine(tab.content.children[lineIndex].raw, lineIndex, tab.content, {
+					depth: tab.content.depth,
+				});
+			}
+		} else if (payload.event.key === "Enter") {
+			const lineIndex = tab.caretPositions[0].start.line - 1;
+
+			const raw = tab.content.children[lineIndex].raw.slice(tab.caretPositions[0].start.character);
+
+			tab.content.children[lineIndex].raw = tab.content.children[lineIndex].raw.slice(
+				0,
+				tab.caretPositions[0].start.character ? tab.caretPositions[0].start.character : 0,
+			);
+
+			tab.caretPositions[0].start.line++;
+			tab.caretPositions[0].start.character = 0;
+
+			const node = createLineNode(
+				BlockNodeType.LINE,
+				tab.content,
+				{ position: { character: 1, line: lineIndex + 1 } } as Char,
+				tab.content.depth + 1,
+			);
+			node.raw = raw;
+
+			tab.content.children.splice(lineIndex + 1, 0, node);
+
+			tab.content.children.forEach((line, index) => {
+				tab.content.children[index] = parseLine(line.raw, index, tab.content, {
+					depth: tab.content.depth,
+				});
+			});
+		} else {
+			if (payload.event.ctrlKey || payload.event.altKey || payload.event.metaKey) {
+				return;
+			}
+
+			const lineIndex = tab.caretPositions[0].start.line - 1;
+			const charPosition = tab.caretPositions[0].start.character;
+
+			const newLine =
+				tab.content.children[lineIndex].raw.slice(0, charPosition) +
+				(payload.event.shiftKey ? payload.event.key.toUpperCase() : payload.event.key) +
+				tab.content.children[lineIndex].raw.slice(charPosition);
+			tab.content.children[lineIndex].raw = newLine;
+
+			tab.content.children[lineIndex] = parseLine(tab.content.children[lineIndex].raw, lineIndex, tab.content, {
+				depth: tab.content.depth,
+			});
+
+			tab.caretPositions[0].start.character++;
+			tab.caretPositions[0].end.character = tab.caretPositions[0].start.character;
 		}
 
-		// file.size = new TextEncoder().encode(tab.lines.map((line) => line.slice(0, -1)).join("\n")).length;
+		tab.content.raw = tab.content.children.map((line) => line.raw).join("\n");
+		file.size = new TextEncoder().encode(tab.raw).length;
 
-		// transmission.emit("@file-explorer/save-file", { path: tab.path, content: [...tab.lines] });
+		transmission.emit("@file-explorer/save-file", { path: tab.path, content: tab.raw });
 	},
 });

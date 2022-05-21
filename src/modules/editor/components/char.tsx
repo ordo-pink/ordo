@@ -6,7 +6,7 @@ import { Caret } from "@modules/editor/components/caret";
 import { Char } from "@core/parser/types";
 
 type CharProps = {
-	char: Char;
+	char: Char<{ hidable: boolean } | null>;
 };
 
 export const Character = React.memo(
@@ -15,6 +15,20 @@ export const Character = React.memo(
 		const { tab } = useCurrentTab();
 
 		const [isCaretHere, setIsCaretHere] = React.useState<boolean>(false);
+		const [show, setShow] = React.useState<boolean>(true);
+
+		React.useEffect(() => {
+			if (tab && tab.caretPositions) {
+				setShow(
+					tab.caretPositions.some(
+						(position) =>
+							!char.data ||
+							char.data.hidable == null ||
+							(char.data.hidable && (position.start.line === char.position.line || position.end.line === char.position.line)),
+					),
+				);
+			}
+		});
 
 		React.useEffect(() => {
 			if (tab && tab.caretPositions) {
@@ -59,10 +73,10 @@ export const Character = React.memo(
 
 		return (
 			<>
-				{char.value ? <span onClick={handleClick}>{char.value}</span> : null}
+				{char.value && show ? <span onClick={handleClick}>{char.value}</span> : null}
 				<Caret visible={isCaretHere && char.position.character !== 0} />
 			</>
 		);
 	},
-	() => false,
+	(prev, next) => prev.char.value === next.char.value,
 );

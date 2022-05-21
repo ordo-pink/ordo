@@ -1,5 +1,18 @@
 import { CharType } from "@core/parser/char-type";
 
+export type ParseHook = (tree: NodeWithChildren | DocumentRoot, reader: Reader) => void;
+export type EvaluateFn = (char: Char | null, tree: NodeWithChildren | DocumentRoot, reader: Reader) => boolean;
+export type ParseFn = (char: Char | null, tree: NodeWithChildren | DocumentRoot, reader: Reader) => Char | null;
+export type Parser = {
+	evaluate: EvaluateFn;
+	parse: ParseFn;
+};
+export type ParseOptions = {
+	beforeParse?: ParseHook;
+	afterParse?: ParseHook;
+	parsers: Parser[];
+};
+
 export type Reader = {
 	next: () => Char | null;
 	current: () => Char | null;

@@ -1,18 +1,7 @@
 import { createReader } from "@core/parser/reader";
-import { Char, DocumentRoot, NodeWithChildren, Reader } from "@core/parser/types";
+import { Char, NodeWithChildren, ParseOptions } from "@core/parser/types";
 import { lex } from "@core/parser/lexer";
 import { noOpFn } from "@utils/no-op";
-
-type ParseHook = (tree: NodeWithChildren | DocumentRoot, reader: Reader) => void;
-type Parser = {
-	evaluate: (char: Char | null, tree: NodeWithChildren | DocumentRoot, reader: Reader) => boolean;
-	parse: (char: Char | null, tree: NodeWithChildren | DocumentRoot, reader: Reader) => Char | null;
-};
-type ParseOptions = {
-	beforeParse?: ParseHook;
-	afterParse?: ParseHook;
-	parsers: Parser[];
-};
 
 export const parse =
 	({ beforeParse = noOpFn, afterParse = noOpFn, parsers }: ParseOptions) =>

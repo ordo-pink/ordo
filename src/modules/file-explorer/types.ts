@@ -82,7 +82,7 @@ export type ShowFolderContextMenuEvent = OrdoEvent<
 	{ path: string; x: number; y: number }
 >;
 
-export type SaveFileEvent = OrdoEvent<FILE_EXPLORER_SCOPE, "save-file", { path: string; content: string[] }>;
+export type SaveFileEvent = OrdoEvent<FILE_EXPLORER_SCOPE, "save-file", { path: string; content: string } | null>;
 
 export type FileExplorerEvents = CreateFileEvent &
 	CreateFolderEvent &

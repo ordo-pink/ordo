@@ -1,4 +1,6 @@
 .file-explorer {
+	@apply text-sm;
+
 	&_header {
 		@apply flex w-full items-center justify-between bg-neutral-300 dark:bg-neutral-800 py-1 px-2 rounded-tl-lg;
 

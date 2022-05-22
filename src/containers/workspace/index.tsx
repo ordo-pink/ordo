@@ -13,7 +13,7 @@ export const Workspace: React.FC = () => {
 	const Component = useWorkspaceComponent(currentActivity);
 
 	return (
-		<div className=" my-6">
+		<div className="my-6">
 			<Component />
 		</div>
 	);

@@ -18,7 +18,7 @@ export const ActivityBar: React.FC = () => {
 			() => (
 				<div className="activity-bar">
 					<div className="activity-bar-side-container">
-						<ActivityBarIcon current={current} name="WelcomePage" icon="HiMap" show={true} />
+						<ActivityBarIcon current={current} name="WelcomePage" icon="HiOutlineInbox" show={true} />
 					</div>
 					<div className="activity-bar-side-section">
 						<ActivityBarIcon current={current} name="Settings" icon="HiOutlineCog" show={true} />

@@ -34,7 +34,7 @@ export const TextEditor: React.FC = React.memo(
 		return tab ? (
 			<div className="h-full">
 				<Breadcrumbs />
-				<div className="editor_textarea pb-24" onClick={handleClick}>
+				<div className="editor_textarea" onClick={handleClick}>
 					<Scrollbars autoHide>
 						<Lines />
 					</Scrollbars>

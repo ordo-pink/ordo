@@ -15,14 +15,18 @@ export const Lines = React.memo(
 		const dispatch = useAppDispatch();
 
 		const { tab } = useCurrentTab();
-		const { focused } = useAppSelector((state) => state.editor);
+		const focused = useAppSelector((state) => state.editor.focused);
 
 		const handleKeyDown = (e: KeyboardEvent) => {
-			if (!tab) return;
+			if (!tab || !focused) return;
+
+			console.log("Here");
 
 			const { key, shiftKey, altKey, ctrlKey, metaKey } = e;
+
 			e.preventDefault();
 			e.stopPropagation();
+
 			dispatch({
 				type: "@editor/handle-typing",
 				payload: {

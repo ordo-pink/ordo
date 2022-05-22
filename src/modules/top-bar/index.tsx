@@ -111,6 +111,7 @@ export const TopBar: React.FC = () => {
 	};
 
 	const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+		console.log("Hello");
 		dispatch({ type: "@top-bar/set-value", payload: e.target.value });
 		setSelected(0);
 
@@ -136,6 +137,9 @@ export const TopBar: React.FC = () => {
 
 	const handleKeyDown = (e: React.KeyboardEvent) => {
 		if (e.key === "ArrowDown") {
+			e.preventDefault();
+			e.stopPropagation();
+
 			setSelected(
 				value.startsWith(">")
 					? selected === fusedCommands.length - 1
@@ -146,10 +150,16 @@ export const TopBar: React.FC = () => {
 					: selected + 1,
 			);
 		} else if (e.key === "ArrowUp") {
+			e.preventDefault();
+			e.stopPropagation();
+
 			setSelected(
 				selected === 0 ? (value.startsWith(">") ? fusedCommands.length - 1 : fusedFiles.length - 1) : selected - 1,
 			);
 		} else if (e.key === "Enter") {
+			e.preventDefault();
+			e.stopPropagation();
+
 			dispatch({ type: "@top-bar/unfocus" });
 			dispatch({ type: "@editor/focus" });
 			value.startsWith(">")
@@ -158,6 +168,9 @@ export const TopBar: React.FC = () => {
 				? dispatch({ type: "@editor/open-tab", payload: fusedFiles[selected].item.path })
 				: null;
 		} else if (e.key === "Escape") {
+			e.preventDefault();
+			e.stopPropagation();
+
 			ref.current?.blur();
 			dispatch({ type: "@editor/focus" });
 		}

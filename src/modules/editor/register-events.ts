@@ -70,20 +70,23 @@ export default registerEvents<EditorEvents>({
 		const tabIndex = transmission.select((state) => state.editor.tabs.findIndex((tab) => tab.path === payload));
 		const currentTabIndex = transmission.select((state) => state.editor.tabs.findIndex((tab) => tab.path === currentTab));
 		const tree = transmission.select((state) => state.fileExplorer.tree);
+		const tab = draft.editor.tabs.find((t) => t.path === currentTab);
 		const file = findOrdoFile(tree, "path", currentTab);
 
-		if (!file || (currentTabIndex === -1 && tabIndex === -1)) {
+		if (!file || !tab || (currentTabIndex === -1 && tabIndex === -1)) {
 			return;
 		}
 
-		const result = context.dialog.showMessageBoxSync(context.window, {
-			type: "question",
-			buttons: ["Yes", "No"],
-			message: `The file "${file.readableName}" has unsaved changes. Quit without saving?`,
-		});
+		if (tab.unsaved) {
+			const result = context.dialog.showMessageBoxSync(context.window, {
+				type: "question",
+				buttons: ["Yes", "No"],
+				message: `The file "${file.readableName}" has unsaved changes. Quit without saving?`,
+			});
 
-		if (result !== 0) {
-			return;
+			if (result !== 0) {
+				return;
+			}
 		}
 
 		draft.editor.tabs.splice(tabIndex !== -1 ? tabIndex : currentTabIndex, 1);

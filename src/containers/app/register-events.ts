@@ -1,4 +1,4 @@
-import { BrowserWindow } from "electron";
+import { BrowserWindow, nativeTheme } from "electron";
 import { is } from "electron-util";
 import { Either } from "or-else";
 
@@ -99,8 +99,13 @@ const getUserSettingsHandler: OrdoEventHandler<"@app/get-internal-settings"> = (
 /**
  * Triggers an update to the user settings store. The change is also applied to the state.
  */
-const setUserSettingHandler: OrdoEventHandler<"@app/set-user-setting"> = ({ draft, payload }) => {
+const setUserSettingHandler: OrdoEventHandler<"@app/set-user-setting"> = ({ draft, payload, context }) => {
 	userSettingsStore.set(...payload);
+
+	if (payload[0] === "appearance.theme") {
+		nativeTheme.themeSource = payload[1];
+	}
+
 	draft.app.userSettings = userSettingsStore.store;
 };
 

@@ -1,4 +1,4 @@
-import { BrowserWindow, dialog, app, clipboard, shell, ipcMain, globalShortcut } from "electron";
+import { BrowserWindow, dialog, app, clipboard, shell, ipcMain, globalShortcut, nativeTheme } from "electron";
 import install, { REACT_DEVELOPER_TOOLS, REDUX_DEVTOOLS } from "electron-devtools-installer";
 import { is, centerWindow } from "electron-util";
 
@@ -10,6 +10,7 @@ import { initCommands } from "@init/commands";
 import { initialState } from "@init/state";
 import { WindowContext } from "@init/types";
 import { debounce } from "@utils/debounce";
+import { userSettingsStore } from "@core/settings/user-settings";
 
 declare const MAIN_WINDOW_WEBPACK_ENTRY: string;
 declare const MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY: string;
@@ -25,6 +26,8 @@ export const createWindow = async (): Promise<void> => {
 	if (process.argv.includes("--debug") && is.development) {
 		await install([REACT_DEVELOPER_TOOLS, REDUX_DEVTOOLS]);
 	}
+
+	nativeTheme.themeSource = userSettingsStore.get("appearance.theme") || "system";
 
 	let window: BrowserWindow = new BrowserWindow({
 		show: false,

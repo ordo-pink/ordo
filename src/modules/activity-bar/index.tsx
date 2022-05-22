@@ -14,16 +14,28 @@ export const ActivityBar: React.FC = () => {
 
 	return Either.fromNullable(tree)
 		.chain((t) => Either.fromNullable(t.path))
-		.fold(NoOp, () => (
-			<div className="activity-bar">
-				<div className="activity-bar-side-container">
-					{items.map((item) => (
-						<ActivityBarIcon key={item.name} current={current} name={item.name} icon={item.icon} show={item.show} />
-					))}
+		.fold(
+			() => (
+				<div className="activity-bar">
+					<div className="activity-bar-side-container">
+						<ActivityBarIcon current={current} name="WelcomePage" icon="HiMap" show={true} />
+					</div>
+					<div className="activity-bar-side-section">
+						<ActivityBarIcon current={current} name="Settings" icon="HiOutlineCog" show={true} />
+					</div>
 				</div>
-				<div className="activity-bar-side-section">
-					<ActivityBarIcon current={current} name="Settings" icon="HiOutlineCog" show={true} />
+			),
+			() => (
+				<div className="activity-bar">
+					<div className="activity-bar-side-container">
+						{items.map((item) => (
+							<ActivityBarIcon key={item.name} current={current} name={item.name} icon={item.icon} show={item.show} />
+						))}
+					</div>
+					<div className="activity-bar-side-section">
+						<ActivityBarIcon current={current} name="Settings" icon="HiOutlineCog" show={true} />
+					</div>
 				</div>
-			</div>
-		));
+			),
+		);
 };

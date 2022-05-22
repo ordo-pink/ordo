@@ -19,17 +19,17 @@ export type InternalSettings = {
 export type UserSettings = {
 	appearance: {
 		theme: "system" | "light" | "dark";
-		accentColor: Color;
+		// accentColor: Color;
 	};
 	editor: {
 		showLineNumbers: boolean;
 		alwaysShowMarkdownSymbols: boolean;
-		font: string;
-		fontSize: number;
-		tabSize: number;
+		// font: string;
+		// fontSize: number;
+		// tabSize: number;
 		autoClosingBrackets: boolean;
 		autoClosingQuotes: boolean;
-		autoIndent: boolean;
+		// autoIndent: boolean;
 		autoSurround: boolean;
 		emptySelectionLineToClipboard: boolean;
 	};
@@ -37,6 +37,6 @@ export type UserSettings = {
 		exclude: string[];
 		associations: Array<{ extension: string; association: string }>;
 		confirmDelete: boolean;
-		enableDragAndDrop: boolean;
+		// enableDragAndDrop: boolean;
 	};
 };

@@ -122,13 +122,6 @@ export const parseLine = (line: string, index: number, tree: NodeWithChildren, m
 		content.chars[3].data = { hidable: true };
 		content.chars[4].data = { hidable: true };
 		content.chars[5].data = { hidable: true };
-	} else if (line.startsWith("> ")) {
-		lineNode = createLineNode(BlockNodeType.BLOCKQUOTE, tree, chars[0], metadata.depth + 1);
-		parseLineContent(chars, lineNode);
-
-		const content = lineNode.children[0] as NodeWithChars<InlineNodeType, null, { hidable: boolean }>;
-		content.chars[0].data = { hidable: true };
-		content.chars[1].data = { hidable: true };
 	} else {
 		lineNode = createLineNode(BlockNodeType.LINE, tree, chars[0], metadata.depth + 1);
 		parseLineContent(chars, lineNode);
@@ -184,6 +177,9 @@ export const parseLineContent = parse({
 					inline.range.end.character = tail(chars).position.character;
 					inline.raw = chars.reduce((str, char) => str.concat(char.value), "");
 					inline.chars = chars;
+
+					inline.chars[0].data = { hidable: true } as any;
+					inline.chars[inline.chars.length - 1].data = { hidable: true } as any;
 
 					tree.children.push(inline);
 

@@ -13,12 +13,15 @@ export const handleRemoveFolder: OrdoEventHandler<"@file-explorer/remove-folder"
 	context,
 	transmission,
 }) =>
-	Either.fromNullable(
-		context.dialog.showMessageBoxSync({
-			type: "question",
-			buttons: ["Yes", "No"],
-			message: `Are you sure you want to remove folder "${payload}"?`,
-		}),
+	(transmission.select((state) => state.app.userSettings.explorer.confirmDelete)
+		? Either.fromNullable(
+				context.dialog.showMessageBoxSync({
+					type: "question",
+					buttons: ["Yes", "No"],
+					message: `Are you sure you want to remove folder "${payload}"?`,
+				}),
+		  )
+		: Either.of(0)
 	)
 		.chain((result) => fromBoolean(result === 0))
 		.map(() => transmission.select((state) => state.fileExplorer.tree))

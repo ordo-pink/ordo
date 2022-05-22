@@ -1,6 +1,6 @@
 import React from "react";
 
-import { useAppDispatch } from "@core/state/store";
+import { useAppDispatch, useAppSelector } from "@core/state/store";
 import { useCurrentTab } from "@modules/editor/hooks/use-current-tab";
 import { Caret } from "@modules/editor/components/caret";
 import { Char } from "@core/parser/types";
@@ -13,30 +13,40 @@ export const Character = React.memo(
 	({ char }: CharProps) => {
 		const dispatch = useAppDispatch();
 		const { tab } = useCurrentTab();
+		const alwaysShowMarkdownSymbols = useAppSelector((state) => state.app.userSettings.editor.alwaysShowMarkdownSymbols);
 
 		const [isCaretHere, setIsCaretHere] = React.useState<boolean>(false);
 		const [show, setShow] = React.useState<boolean>(
 			Boolean(tab) &&
-				tab!.caretPositions.some(
-					(position) =>
-						!char.data ||
-						char.data.hidable == null ||
-						(char.data.hidable && (position.start.line === char.position.line || position.end.line === char.position.line)),
-				),
+				(alwaysShowMarkdownSymbols ||
+					tab!.caretPositions.some(
+						(position) =>
+							!char.data ||
+							char.data.hidable == null ||
+							(char.data.hidable && (position.start.line === char.position.line || position.end.line === char.position.line)),
+					)),
 		);
 
 		React.useEffect(() => {
 			if (tab && tab.caretPositions) {
 				setShow(
-					tab.caretPositions.some(
-						(position) =>
-							!char.data ||
-							char.data.hidable == null ||
-							(char.data.hidable && (position.start.line === char.position.line || position.end.line === char.position.line)),
-					),
+					alwaysShowMarkdownSymbols ||
+						tab.caretPositions.some(
+							(position) =>
+								!char.data ||
+								char.data.hidable == null ||
+								(char.data.hidable && (position.start.line === char.position.line || position.end.line === char.position.line)),
+						),
 				);
 			}
-		});
+		}, [
+			char.position.line,
+			char.position.character,
+			tab,
+			tab && tab.caretPositions.length,
+			tab && tab.caretPositions[0].start.line,
+			tab && tab.caretPositions[0].start.character,
+		]);
 
 		React.useEffect(() => {
 			if (tab && tab.caretPositions) {
@@ -49,6 +59,7 @@ export const Character = React.memo(
 		}, [
 			char.position.line,
 			char.position.character,
+			tab,
 			tab && tab.caretPositions.length,
 			tab && tab.caretPositions[0].start.line,
 			tab && tab.caretPositions[0].start.character,

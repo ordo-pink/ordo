@@ -13,12 +13,6 @@ export const useTokenWrapper = (token?: Node) => {
 			return ({ children }) => <h5 className="inline text-lg">{children}</h5>;
 		}
 
-		if (token?.type === BlockNodeType.BLOCKQUOTE) {
-			return ({ children }) => (
-				<blockquote className="inline bg-neutral-200 rounded-lg px-2 py-0.5">{children}</blockquote>
-			);
-		}
-
 		if (token?.type === InlineNodeType.BOLD) {
 			return ({ children }) => <strong className="font-bold">{children}</strong>;
 		}
@@ -28,7 +22,11 @@ export const useTokenWrapper = (token?: Node) => {
 		}
 
 		if (token?.type === InlineNodeType.CODE) {
-			return ({ children }) => <code className="px-1 py-0.5 rounded-lg bg-rose-200 text-rose-700">{children}</code>;
+			return ({ children }) => (
+				<code className="px-2 py-0.5 rounded-lg bg-neutral-300 text-neutral-700 dark:bg-neutral-600 dark:text-neutral-200">
+					{children}
+				</code>
+			);
 		}
 
 		return ({ children }) => <span>{children}</span>;

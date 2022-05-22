@@ -3,7 +3,7 @@
 		background: transparent;
 	}
 	0% {
-		@apply bg-pink-700;
+		@apply bg-pink-500 dark:bg-pink-300;
 	}
 }
 
@@ -12,7 +12,7 @@
 		background: transparent;
 	}
 	0% {
-		@apply bg-pink-700;
+		@apply bg-pink-500 dark:bg-pink-300;
 	}
 }
 
@@ -21,7 +21,7 @@
 		background: transparent;
 	}
 	0% {
-		@apply bg-neutral-700;
+		@apply bg-neutral-500 dark:bg-neutral-300;
 	}
 }
 
@@ -30,7 +30,7 @@
 		background: transparent;
 	}
 	0% {
-		@apply bg-neutral-700;
+		@apply bg-neutral-500 dark:bg-neutral-300;
 	}
 }
 
@@ -43,7 +43,7 @@
 		@apply flex items-center justify-center w-full h-[calc(100vh-3rem)] select-none cursor-default;
 
 		&_logo {
-			@apply bg-gradient-to-bl from-neutral-500 to-pink-700 text-transparent bg-clip-text drop-shadow-xl;
+			@apply bg-gradient-to-t from-neutral-700 dark:from-neutral-700 to-pink-500 dark:to-pink-800 text-transparent bg-clip-text;
 
 			&_or {
 				@apply text-9xl font-black;
@@ -115,7 +115,7 @@
 		@apply relative w-0;
 
 		&::before {
-			@apply absolute w-0.5 h-full bg-pink-700 align-middle;
+			@apply absolute w-0.5 h-full bg-pink-500 dark:bg-pink-300 align-middle;
 			content: "";
 			animation: blinky 0.5s ease-in-out infinite alternative;
 			-webkit-animation: blinky 0.5s ease-in-out infinite alternate;
@@ -123,7 +123,7 @@
 
 		&_unfocused {
 			&::before {
-				@apply bg-neutral-700;
+				@apply bg-neutral-500 dark:bg-neutral-300;
 				animation: unfocused 0.5s ease-in-out infinite alternative;
 				-webkit-animation: unfocused 0.5s ease-in-out infinite alternate;
 			}

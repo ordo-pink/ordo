@@ -337,9 +337,11 @@ export default registerEvents<EditorEvents>({
 		}
 
 		tab.content.raw = tab.content.children.map((line) => line.raw).join("\n");
-		tab.raw = tab.content.raw;
-		file.size = new TextEncoder().encode(tab.raw === "\n" ? "" : tab.content.raw).length;
 
-		transmission.emit("@file-explorer/save-file", { path: tab.path, content: tab.content.raw });
+		if (tab.raw === tab.content.raw) {
+			tab.unsaved = false;
+		}
+
+		file.size = new TextEncoder().encode(tab.raw === "\n" ? "" : tab.content.raw).length;
 	},
 });

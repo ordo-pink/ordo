@@ -99,6 +99,8 @@ export const createWindow = async (): Promise<void> => {
 	await initCommands(transmission);
 
 	window.on("focus", () => {
+		transmission.emit("@editor/focus", null);
+
 		transmission
 			.select((s) => s.app.commands)
 			.forEach((command) => {

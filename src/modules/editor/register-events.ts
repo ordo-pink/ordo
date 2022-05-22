@@ -228,6 +228,8 @@ export default registerEvents<EditorEvents>({
 					});
 				});
 			}
+
+			tab.unsaved = true;
 		} else if (payload.event.key === "Backspace") {
 			let reparse = false;
 
@@ -268,6 +270,8 @@ export default registerEvents<EditorEvents>({
 					});
 				});
 			}
+
+			tab.unsaved = true;
 		} else if (payload.event.key === "Enter") {
 			// TODO: Fix backspace and enter with multiple carets
 			tab.caretPositions.forEach((position) => {
@@ -295,6 +299,8 @@ export default registerEvents<EditorEvents>({
 					depth: tab.content.depth,
 				});
 			});
+
+			tab.unsaved = true;
 		} else {
 			if (payload.event.ctrlKey || payload.event.altKey || payload.event.metaKey) {
 				return;
@@ -317,11 +323,14 @@ export default registerEvents<EditorEvents>({
 				position.start.character++;
 				position.end.character = position.start.character;
 			});
+
+			tab.unsaved = true;
 		}
 
 		tab.content.raw = tab.content.children.map((line) => line.raw).join("\n");
-		file.size = new TextEncoder().encode(tab.raw).length;
+		tab.raw = tab.content.raw;
+		file.size = new TextEncoder().encode(tab.raw === "\n" ? "" : tab.content.raw).length;
 
-		transmission.emit("@file-explorer/save-file", { path: tab.path, content: tab.raw });
+		transmission.emit("@file-explorer/save-file", { path: tab.path, content: tab.content.raw });
 	},
 });

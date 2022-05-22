@@ -70,15 +70,24 @@ export default registerEvents<EditorEvents>({
 		const tabIndex = transmission.select((state) => state.editor.tabs.findIndex((tab) => tab.path === payload));
 		const currentTabIndex = transmission.select((state) => state.editor.tabs.findIndex((tab) => tab.path === currentTab));
 		const tree = transmission.select((state) => state.fileExplorer.tree);
+		const file = findOrdoFile(tree, "path", currentTab);
 
-		if (currentTabIndex === -1 && tabIndex === -1) {
+		if (!file || (currentTabIndex === -1 && tabIndex === -1)) {
+			return;
+		}
+
+		const result = context.dialog.showMessageBoxSync(context.window, {
+			type: "question",
+			buttons: ["Yes", "No"],
+			message: `The file "${file.readableName}" has unsaved changes. Quit without saving?`,
+		});
+
+		if (result !== 0) {
 			return;
 		}
 
 		draft.editor.tabs.splice(tabIndex !== -1 ? tabIndex : currentTabIndex, 1);
 		draft.editor.currentTab = draft.editor.tabs.length > 0 ? draft.editor.tabs[0].path : "";
-
-		const file = findOrdoFile(tree, "path", draft.editor.currentTab);
 
 		context.window.setRepresentedFilename(file ? file.path : "");
 		context.window.setTitle(file ? `${file.relativePath} — ${tree.readableName}` : "Ordo");

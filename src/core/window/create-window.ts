@@ -28,22 +28,10 @@ export const createWindow = async (): Promise<void> => {
 
 	let window: BrowserWindow = new BrowserWindow({
 		show: false,
-		height:
-			windows.size > 0
-				? (internalSettingsStore.get("window.position.height") as number) - 100
-				: internalSettingsStore.get("window.height"),
-		width:
-			windows.size > 0
-				? (internalSettingsStore.get("window.width") as number) - 100
-				: internalSettingsStore.get("window.width"),
-		x:
-			windows.size > 0
-				? (internalSettingsStore.get("window.position.x") as number) + 100
-				: internalSettingsStore.get("window.position.x"),
-		y:
-			windows.size > 0
-				? (internalSettingsStore.get("window.position.y") as number) + 100
-				: internalSettingsStore.get("window.position.y"),
+		height: internalSettingsStore.get("window.height"),
+		width: internalSettingsStore.get("window.width"),
+		x: internalSettingsStore.get("window.position.x"),
+		y: internalSettingsStore.get("window.position.y"),
 		icon: "assets/favicon.ico",
 		// titleBarStyle: "hiddenInset",
 		acceptFirstMouse: true,

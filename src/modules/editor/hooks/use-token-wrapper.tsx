@@ -21,10 +21,10 @@ export const useTokenWrapper = (token?: Node, isCurrentLine = false) => {
 				isCurrentLine ? (
 					<span>{children}</span>
 				) : (
-					<>
+					<div className="flex space-x-2 items-center">
 						<input
 							type="checkbox"
-							className="w-5 h-5"
+							className="block w-5 h-5"
 							onClick={(e) => {
 								e.preventDefault();
 								e.stopPropagation();
@@ -32,8 +32,8 @@ export const useTokenWrapper = (token?: Node, isCurrentLine = false) => {
 							onChange={() => dispatch({ type: "@editor/toggle-todo", payload: token.range.start.line - 1 })}
 							checked={(token.data! as { checked: boolean }).checked}
 						/>
-						<span className="ml-2">{children}</span>
-					</>
+						<div>{children}</div>
+					</div>
 				);
 		}
 

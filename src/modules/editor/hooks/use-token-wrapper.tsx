@@ -3,6 +3,7 @@ import React from "react";
 import { Node } from "@core/parser/types";
 import { BlockNodeType, InlineNodeType } from "@modules/text-parser/enums";
 import { useAppDispatch } from "@core/state/store";
+import { Lines } from "../components/lines";
 
 export const useTokenWrapper = (token?: Node, isCurrentLine = false) => {
 	const dispatch = useAppDispatch();
@@ -33,6 +34,27 @@ export const useTokenWrapper = (token?: Node, isCurrentLine = false) => {
 							checked={(token.data! as { checked: boolean }).checked}
 						/>
 						<div className={(token.data! as { checked: boolean }).checked ? "line-through" : ""}>{children}</div>
+					</div>
+				);
+		}
+
+		if (token?.type === BlockNodeType.COMPONENT) {
+			// TODO: Render component
+			return ({ children }) => {
+				const rx = /(\w+)=["']?((?:.(?!["']?\s+(?:\S+)=|\s*\/?[>"']))+.)["']?/;
+
+				return <span className="text-xs text-neutral-500">{children}</span>;
+			};
+		}
+
+		if (token?.type === BlockNodeType.EMBED) {
+			// TODO: Render component
+			return ({ children }) =>
+				isCurrentLine ? (
+					<span className="text-xs text-neutral-500">{children}</span>
+				) : (
+					<div>
+						<span className="text-xs text-neutral-500">{children}</span>
 					</div>
 				);
 		}

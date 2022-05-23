@@ -72,6 +72,20 @@ export const parseLine = (line: string, index: number, tree: NodeWithChildren, m
 		);
 
 		parseLineContent([], lineNode);
+	} else if (/^<.*\/>$/.test(line)) {
+		lineNode = createLineNode(BlockNodeType.COMPONENT, tree, chars[0], metadata.depth + 1);
+		parseLineContent(chars, lineNode);
+
+		const content = lineNode.children[0] as NodeWithChars<InlineNodeType, null, { hidable: boolean }>;
+		content.chars.forEach((char) => (char.data = { hidable: true }));
+	} else if (/^!\[\[.*]]$/.test(line)) {
+		lineNode = createLineNode(BlockNodeType.EMBED, tree, chars[0], metadata.depth + 1) as unknown as NodeWithChildren<
+			BlockNodeType.EMBED,
+			{ relativePath: string }
+		>;
+		lineNode.data = {};
+		lineNode.data.relativePath = line.slice(3, -2);
+		parseLineContent(chars, lineNode);
 	} else if (line.startsWith("# ")) {
 		metadata.depth = 1;
 		lineNode = createLineNode(BlockNodeType.HEADING, tree, chars[0], metadata.depth);

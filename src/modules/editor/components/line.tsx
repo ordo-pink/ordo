@@ -5,12 +5,9 @@ import { useAppDispatch } from "@core/state/store";
 import { useCurrentTab } from "@modules/editor/hooks/use-current-tab";
 import { LineNumber } from "@modules/editor/components/line-number";
 import { Token } from "@modules/editor/components/token";
-import { tapPreventDefault, tapStopPropagation } from "@utils/events";
-import { FoldVoid } from "@utils/either";
-import { tail } from "@utils/array";
-import { Caret } from "./caret";
-import { tap } from "@utils/functions";
+import { Caret } from "@modules/editor/components/caret";
 import { isNodeWithChildren } from "@core/parser/is";
+import { NoOp } from "@utils/no-op";
 
 export type LineProps = {
 	lineIndex: number;
@@ -92,20 +89,20 @@ export const Line = React.memo(
 		const line = tab && tab.content.children[lineIndex];
 		const hasNoChildren = line && isNodeWithChildren(line) && !line.children.length;
 
-		return tab ? (
+		return Either.fromNullable(tab).fold(NoOp, (t) => (
 			<div className="editor_line">
 				<LineNumber number={lineIndex + 1} />
 				<div className={`editor_line_content`} onClick={handleClick}>
 					<Caret
-						visible={tab.caretPositions.some(
+						visible={t.caretPositions.some(
 							(position) => position.start.line === lineIndex + 1 && position.start.character === 0,
 						)}
 					/>
 					{hasNoChildren && <span> </span>}
-					<Token token={tab.content.children[lineIndex]} lineIndex={lineIndex} />
+					<Token token={t.content.children[lineIndex]} lineIndex={lineIndex} />
 				</div>
 			</div>
-		) : null;
+		));
 	},
 	() => true,
 );

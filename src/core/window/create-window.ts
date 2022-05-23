@@ -9,13 +9,10 @@ import { initEvents } from "@init/events";
 import { initCommands } from "@init/commands";
 import { initialState } from "@init/state";
 import { WindowContext } from "@init/types";
-import { debounce } from "@utils/debounce";
 import { userSettingsStore } from "@core/settings/user-settings";
 
 declare const MAIN_WINDOW_WEBPACK_ENTRY: string;
 declare const MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY: string;
-
-const debounceSaveWindowPosition = debounce((window: BrowserWindow) => saveWindowPosition(window), 1000);
 
 const windows = new Set<BrowserWindow>();
 
@@ -64,8 +61,8 @@ export const createWindow = async (): Promise<void> => {
 		centerWindow({ window });
 	}
 
-	window.on("resize", () => debounceSaveWindowPosition(window));
-	window.on("move", () => debounceSaveWindowPosition(window));
+	window.on("resized", () => saveWindowPosition(window));
+	window.on("moved", () => saveWindowPosition(window));
 	window.on("close", () => {
 		windows.delete(window);
 		window = null as any;
@@ -102,8 +99,6 @@ export const createWindow = async (): Promise<void> => {
 	await initCommands(transmission);
 
 	window.on("focus", () => {
-		transmission.emit("@editor/focus", null);
-
 		transmission
 			.select((s) => s.app.commands)
 			.forEach((command) => {

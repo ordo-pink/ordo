@@ -20,8 +20,6 @@ export const Lines = React.memo(
 		const handleKeyDown = (e: KeyboardEvent) => {
 			if (!tab || !focused) return;
 
-			console.log("Here");
-
 			const { key, shiftKey, altKey, ctrlKey, metaKey } = e;
 
 			e.preventDefault();
@@ -37,26 +35,28 @@ export const Lines = React.memo(
 		};
 
 		const handleClick = (e: React.MouseEvent) =>
-			tab &&
-			Either.right(e)
-				.map(tapPreventDefault)
-				.map(tapStopPropagation)
-				.chain(() => Either.fromNullable(tab))
-				.map(tap((t) => console.log(t)))
-				.map((t) => t.content)
-				.chain((c) => Either.fromNullable(tail(c.children).range.end))
-				.map((position) => [{ start: position, end: position, direction: "ltr" as const }])
-				.map((positions) => ({ path: tab.path, positions }))
-				.map((payload) => dispatch({ type: "@editor/update-caret-positions", payload }))
+			Either.fromNullable(tab)
+				.chain((t) =>
+					Either.right(e)
+						.map(tapPreventDefault)
+						.map(tapStopPropagation)
+						.map(() => t.content)
+						.chain((c) => Either.fromNullable(tail(c.children).range.end))
+						.map((position) => [{ start: position, end: position, direction: "ltr" as const }])
+						.map((positions) => ({ path: t.path, positions }))
+						.map((payload) => dispatch({ type: "@editor/update-caret-positions", payload })),
+				)
 				.fold(...FoldVoid);
 
 		const removeKeyDownListener = () => window.removeEventListener("keydown", handleKeyDown);
 
 		React.useEffect(() => {
-			window.addEventListener("keydown", handleKeyDown);
+			if (tab && focused) {
+				window.addEventListener("keydown", handleKeyDown);
+			}
 
 			return () => removeKeyDownListener();
-		}, [tab]);
+		}, [tab, focused]);
 
 		return tab ? (
 			<div className="editor_lines" onClick={handleClick}>

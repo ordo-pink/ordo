@@ -9,7 +9,10 @@ import { useTokenWrapper } from "../hooks/use-token-wrapper";
 export const Token = React.memo(
 	({ token, lineIndex }: { token: Node; lineIndex?: number }) => {
 		const { tab } = useCurrentTab();
-		const Wrapper = useTokenWrapper(token);
+		const Wrapper = useTokenWrapper(
+			token,
+			tab?.caretPositions.some((position) => position.start.line === token.range.start.line),
+		);
 
 		return tab ? (
 			<Wrapper>

@@ -4,6 +4,8 @@ export enum BlockNodeType {
 	BLOCKQUOTE = "blockquote",
 	HEADING = "heading",
 	COMPONENT = "component",
+	HR = "hr",
+	TODO = "todo",
 }
 
 export enum InlineNodeType {

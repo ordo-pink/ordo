@@ -61,7 +61,7 @@ export const reparseLine = (lineIndex: number, parent: NodeWithChildren) => {
 export const parseLine = (line: string, index: number, tree: NodeWithChildren, metadata: { depth: number }) => {
 	const chars = lex(line, index + 1);
 
-	let lineNode: NodeWithChildren;
+	let lineNode: NodeWithChildren<BlockNodeType, any>;
 
 	if (!chars.length) {
 		lineNode = createLineNode(
@@ -122,6 +122,30 @@ export const parseLine = (line: string, index: number, tree: NodeWithChildren, m
 		content.chars[3].data = { hidable: true };
 		content.chars[4].data = { hidable: true };
 		content.chars[5].data = { hidable: true };
+	} else if (line === "---") {
+		lineNode = createLineNode(BlockNodeType.HR, tree, chars[0], metadata.depth + 1);
+
+		parseLineContent(chars, lineNode);
+
+		const content = lineNode.children[0] as NodeWithChars<InlineNodeType, null, { hidable: boolean }>;
+		content.chars[0].data = { hidable: true };
+		content.chars[1].data = { hidable: true };
+		content.chars[2].data = { hidable: true };
+	} else if (line.startsWith("[ ] ") || line.startsWith("[x] ")) {
+		lineNode = createLineNode(BlockNodeType.TODO, tree, chars[0], metadata.depth + 1) as unknown as NodeWithChildren<
+			BlockNodeType.TODO,
+			{ checked: boolean }
+		>;
+
+		parseLineContent(chars, lineNode);
+
+		lineNode.data = { checked: line.charAt(1) === "x" };
+
+		const content = lineNode.children[0] as NodeWithChars<InlineNodeType, null, { hidable: boolean }>;
+		content.chars[0].data = { hidable: true };
+		content.chars[1].data = { hidable: true };
+		content.chars[2].data = { hidable: true };
+		content.chars[3].data = { hidable: true };
 	} else {
 		lineNode = createLineNode(BlockNodeType.LINE, tree, chars[0], metadata.depth + 1);
 		parseLineContent(chars, lineNode);

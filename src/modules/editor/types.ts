@@ -27,6 +27,7 @@ export type EditorState = {
 
 export type EDITOR_SCOPE = "editor";
 
+export type ToggleTodoEvent = OrdoEvent<EDITOR_SCOPE, "toggle-todo", number>;
 export type OpenTabEvent = OrdoEvent<EDITOR_SCOPE, "open-tab", string>;
 export type CloseTabEvent = OrdoEvent<EDITOR_SCOPE, "close-tab", string>;
 export type FocusEvent = OrdoEvent<EDITOR_SCOPE, "focus">;
@@ -43,6 +44,7 @@ export type UpdateCaretPositionsEvent = OrdoEvent<
 >;
 
 export type EditorEvents = OpenTabEvent &
+	ToggleTodoEvent &
 	CloseTabEvent &
 	FocusEvent &
 	UnfocusEvent &

@@ -5,13 +5,31 @@ import { readFile } from "@modules/file-explorer/api/read-file";
 import { findOrdoFile } from "@modules/file-explorer/utils/find-ordo-file";
 import { EditorEvents } from "@modules/editor/types";
 import { findOrdoFolder } from "@modules/file-explorer/utils/find-ordo-folder";
-import { createLineNode, parseLine, parseLineContent, parseText, reparseLine } from "@modules/text-parser";
+import { createLineNode, parseLine, parseText } from "@modules/text-parser";
 import { createRoot } from "@core/parser/create-root";
 import { tail } from "@utils/array";
 import { Char, NodeWithChildren } from "@core/parser/types";
 import { BlockNodeType } from "@modules/text-parser/enums";
 
 export default registerEvents<EditorEvents>({
+	"@editor/toggle-todo": ({ draft, payload }) => {
+		const { currentTab, tabs } = draft.editor;
+		const tab = tabs.find((t) => t.path === currentTab);
+
+		if (!tab) return;
+
+		const line = tab.content.children[payload] as NodeWithChildren;
+		const checked = line.raw.charAt(1) === "x";
+
+		const check = (str: string) => str.replace("[ ] ", "[x] ");
+		const uncheck = (str: string) => str.replace("[x] ", "[ ] ");
+
+		line.raw = checked ? uncheck(line.raw) : check(line.raw);
+
+		tab.content.children[payload] = parseLine(line.raw, payload, tab.content, {
+			depth: tab.content.depth,
+		});
+	},
 	"@editor/open-tab": async ({ draft, payload, transmission, context }) => {
 		const currentTab = transmission.select((state) => state.editor.currentTab);
 		const tree = transmission.select((state) => state.fileExplorer.tree);

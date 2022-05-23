@@ -26,6 +26,8 @@ export default registerEvents<EditorEvents>({
 
 		line.raw = checked ? uncheck(line.raw) : check(line.raw);
 
+		tab.unsaved = true;
+
 		tab.content.children[payload] = parseLine(line.raw, payload, tab.content, {
 			depth: tab.content.depth,
 		});

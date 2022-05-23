@@ -23,19 +23,21 @@ export const StatusBar: React.FC = () => {
 
 	const handleClick = () => dispatch({ type: "@top-bar/open-go-to-line" });
 
-	return tab ? (
+	return (
 		<div className="status-bar">
 			<div className="status-bar-side-container">
-				<div
-					className="status-bar-item"
-					onClick={handleClick}
-					title={`The caret is located on character ${tab.caretPositions[0].start.character} of line ${tab.caretPositions[0].start.line}`}
-				>
-					<Code />
-					<span>
-						Ln {tab.caretPositions[0].start.line}, Col {tab.caretPositions[0].start.character}
-					</span>
-				</div>
+				{tab && (
+					<div
+						className="status-bar-item"
+						onClick={handleClick}
+						title={`The caret is located on character ${tab.caretPositions[0].start.character} of line ${tab.caretPositions[0].start.line}`}
+					>
+						<Code />
+						<span>
+							Ln {tab.caretPositions[0].start.line}, Col {tab.caretPositions[0].start.character}
+						</span>
+					</div>
+				)}
 			</div>
 
 			<div className="status-bar-side-container">
@@ -44,5 +46,5 @@ export const StatusBar: React.FC = () => {
 				</div>
 			</div>
 		</div>
-	) : null;
+	);
 };

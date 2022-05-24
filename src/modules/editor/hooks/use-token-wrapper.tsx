@@ -2,11 +2,12 @@ import React from "react";
 
 import { Node } from "@core/parser/types";
 import { TextNodeWithChildrenType, TextNodeWithCharsType } from "@modules/text-parser/enums";
-import { useAppDispatch } from "@core/state/store";
-import { Lines } from "../components/lines";
+import { useAppDispatch, useAppSelector } from "@core/state/store";
+import { HiOutlineLink } from "react-icons/hi";
 
 export const useTokenWrapper = (token?: Node, isCurrentLine = false) => {
 	const dispatch = useAppDispatch();
+	const platform = useAppSelector((state) => state.app.internalSettings.platform);
 
 	const wrapper: React.FC = React.useMemo(() => {
 		if (token?.type === TextNodeWithChildrenType.HEADING) {
@@ -77,12 +78,68 @@ export const useTokenWrapper = (token?: Node, isCurrentLine = false) => {
 			return ({ children }) => <em className="italic">{children}</em>;
 		}
 
+		if (token?.type === TextNodeWithCharsType.LINK) {
+			return ({ children }) =>
+				isCurrentLine ? (
+					<span
+						onMouseMove={(e) => {
+							if (e.ctrlKey && !e.currentTarget.classList.contains("cursor-pointer")) {
+								e.currentTarget.classList.add("cursor-pointer");
+							}
+						}}
+						onMouseLeave={(e) => e.currentTarget.classList.remove("cursor-pointer")}
+						onClick={(e) => {
+							if (e.ctrlKey) {
+								e.preventDefault();
+								e.stopPropagation();
+							}
+						}}
+						title={`${platform === "darwin" ? "Cmd" : "Ctrl"}+Click to follow the link.`}
+						className="text-sky-800 dark:text-sky-400 hover:underline"
+					>
+						{children}
+					</span>
+				) : (
+					<div className="inline-flex space-x-1 items-center underline text-sky-800 dark:text-sky-400">
+						<div
+							onMouseMove={(e) => {
+								if (e.ctrlKey && !e.currentTarget.classList.contains("cursor-pointer")) {
+									e.currentTarget.classList.add("cursor-pointer");
+								}
+							}}
+							onMouseLeave={(e) => e.currentTarget.classList.remove("cursor-pointer")}
+							onClick={(e) => {
+								if (e.ctrlKey) {
+									e.preventDefault();
+									e.stopPropagation();
+								}
+							}}
+							title={`${platform === "darwin" ? "Cmd" : "Ctrl"}+Click to follow the link.`}
+						>
+							{token.data!.href as string}
+						</div>
+						<HiOutlineLink
+							title="Click here to follow the link."
+							className="cursor-pointer"
+							onClick={(e) => {
+								e.preventDefault();
+								e.stopPropagation();
+							}}
+						/>
+					</div>
+				);
+		}
+
 		if (token?.type === TextNodeWithChildrenType.CODE) {
 			return ({ children }) => (
 				<code className="px-2 py-0.5 rounded-lg bg-neutral-300 text-neutral-700 dark:bg-neutral-600 dark:text-neutral-200">
 					{children}
 				</code>
 			);
+		}
+
+		if (token?.type === TextNodeWithChildrenType.STRIKETHROUGH) {
+			return ({ children }) => <span className="line-through">{children}</span>;
 		}
 
 		return ({ children }) => <span>{children}</span>;

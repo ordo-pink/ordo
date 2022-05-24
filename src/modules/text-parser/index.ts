@@ -129,13 +129,101 @@ export const parseText = (raw: string, tree: NodeWithChildren | DocumentRoot) =>
 	});
 };
 
-const specialCharTypes = [CharType.BACKTICK, CharType.HASH];
+const specialCharTypes = [CharType.BACKTICK, CharType.HASH, CharType.TILDE, CharType.BRACKET_OPEN];
 
 export const parseLineContent = parse({
 	afterParse: (tree, reader) => {
 		tree.range.end.character = reader.getChars().length;
 	},
 	parsers: [
+		{
+			evaluate: (char, _, reader) =>
+				Boolean(char) &&
+				char!.type === CharType.TILDE &&
+				Boolean(reader.lookAhead()) &&
+				reader.lookAhead()!.type === CharType.TILDE,
+			parse: (char, tree, reader) => {
+				if (!char) return reader.next();
+
+				const chars: Char[] = [char];
+				let currentChar: Char | null = reader.next();
+				chars.push(currentChar!);
+				currentChar = reader.next();
+				chars.push(currentChar!);
+				currentChar = reader.next();
+
+				while (currentChar && reader.backTrack() && reader.backTrack()!.type !== CharType.TILDE) {
+					chars.push(currentChar);
+					currentChar = reader.next();
+				}
+
+				if (currentChar && currentChar.type === CharType.TILDE) {
+					chars.push(currentChar);
+					currentChar = reader.next();
+
+					const inline = createNodeWithChildren(TextNodeWithChildrenType.STRIKETHROUGH, tree, char);
+
+					inline.openingChars = chars.slice(0, 2);
+					inline.closingChars = chars.slice(-2);
+					inline.raw = chars.reduce((str, char) => str.concat(char.value), "");
+					inline.range = { start: chars[0].position, end: tail(chars).position };
+
+					parseLineContent(chars.slice(2, -2), inline);
+
+					tree.children.push(inline);
+				} else {
+					const inline = createNodeWithChars(TextNodeWithCharsType.TEXT, tree, char);
+					inline.raw = chars.reduce((str, char) => str.concat(char.value), "");
+					inline.chars = chars;
+					tree.children.push(inline);
+				}
+
+				return currentChar;
+			},
+		},
+		{
+			evaluate: (char, _, reader) =>
+				Boolean(char) &&
+				char!.type === CharType.BRACKET_OPEN &&
+				Boolean(reader.lookAhead()) &&
+				reader.lookAhead()!.type === CharType.BRACKET_OPEN,
+			parse: (char, tree, reader) => {
+				if (!char) return reader.next();
+
+				const chars: Char[] = [char];
+				let currentChar: Char | null = reader.next();
+				chars.push(currentChar!);
+				currentChar = reader.next();
+				chars.push(currentChar!);
+				currentChar = reader.next();
+
+				while (currentChar && reader.backTrack() && reader.backTrack()!.type !== CharType.BRACKET_CLOSE) {
+					chars.push(currentChar);
+					currentChar = reader.next();
+				}
+
+				if (currentChar && currentChar.type === CharType.BRACKET_CLOSE) {
+					chars.push(currentChar);
+					currentChar = reader.next();
+
+					const inline = createNodeWithChars(TextNodeWithCharsType.LINK, tree, char);
+
+					inline.raw = chars.reduce((str, char) => str.concat(char.value), "");
+					inline.range = { start: chars[0].position, end: tail(chars).position };
+					inline.data.href = chars.slice(2, -2).reduce((str, char) => str.concat(char.value), "");
+					inline.chars = chars;
+
+					tree.children.push(inline);
+				} else {
+					const inline = createNodeWithChars(TextNodeWithCharsType.TEXT, tree, char);
+					inline.raw = chars.reduce((str, char) => str.concat(char.value), "");
+					inline.chars = chars;
+					tree.children.push(inline);
+				}
+
+				return currentChar;
+			},
+		},
 		{
 			evaluate: (char) => Boolean(char) && char!.type === CharType.HASH,
 			parse: (char, tree, reader) => {

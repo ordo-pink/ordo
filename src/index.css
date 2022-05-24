@@ -1,3 +1,7 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+select {
+	@apply h-7 text-sm pl-2 pr-12 py-0;
+}

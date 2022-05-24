@@ -129,8 +129,6 @@ export const parseText = (raw: string, tree: NodeWithChildren | DocumentRoot) =>
 	});
 };
 
-const specialCharTypes = [CharType.BACKTICK, CharType.HASH, CharType.TILDE, CharType.BRACKET_OPEN];
-
 export const parseLineContent = parse({
 	afterParse: (tree, reader) => {
 		tree.range.end.character = reader.getChars().length;
@@ -146,11 +144,18 @@ export const parseLineContent = parse({
 				if (!char) return reader.next();
 
 				const chars: Char[] = [char];
+
 				let currentChar: Char | null = reader.next();
-				chars.push(currentChar!);
-				currentChar = reader.next();
-				chars.push(currentChar!);
-				currentChar = reader.next();
+
+				if (currentChar) {
+					chars.push(currentChar!);
+					currentChar = reader.next();
+				}
+
+				if (currentChar) {
+					chars.push(currentChar!);
+					currentChar = reader.next();
+				}
 
 				while (currentChar && reader.backTrack() && reader.backTrack()!.type !== CharType.TILDE) {
 					chars.push(currentChar);
@@ -192,10 +197,16 @@ export const parseLineContent = parse({
 
 				const chars: Char[] = [char];
 				let currentChar: Char | null = reader.next();
-				chars.push(currentChar!);
-				currentChar = reader.next();
-				chars.push(currentChar!);
-				currentChar = reader.next();
+
+				if (currentChar) {
+					chars.push(currentChar!);
+					currentChar = reader.next();
+				}
+
+				if (currentChar) {
+					chars.push(currentChar!);
+					currentChar = reader.next();
+				}
 
 				while (currentChar && reader.backTrack() && reader.backTrack()!.type !== CharType.BRACKET_CLOSE) {
 					chars.push(currentChar);
@@ -295,14 +306,14 @@ export const parseLineContent = parse({
 			},
 		},
 		{
-			evaluate: (char) => Boolean(char) && !specialCharTypes.includes(char!.type),
+			evaluate: (char, _, reader) => !shouldBreakDefaultParsing(char, reader),
 			parse: (char, tree, reader) => {
 				if (!char) return reader.next();
 
 				const inline = createNodeWithChars(TextNodeWithCharsType.TEXT, tree, char);
 				let currentChar: Char | null = char;
 
-				while (currentChar && !specialCharTypes.includes(currentChar.type)) {
+				while (currentChar && !shouldBreakDefaultParsing(char, reader)) {
 					currentChar.position.line = tree.range.start.line;
 
 					inline.range.end.character = currentChar.position.character;
@@ -319,3 +330,10 @@ export const parseLineContent = parse({
 		},
 	],
 });
+
+const shouldBreakDefaultParsing = (char: Char | null, reader: Reader) =>
+	!char ||
+	char.type === CharType.BACKTICK ||
+	char.type === CharType.HASH ||
+	(char.type === CharType.BRACKET_OPEN && reader.lookAhead() && reader.lookAhead()!.type === CharType.BRACKET_OPEN) ||
+	(char.type === CharType.TILDE && reader.lookAhead() && reader.lookAhead()!.type === CharType.TILDE);

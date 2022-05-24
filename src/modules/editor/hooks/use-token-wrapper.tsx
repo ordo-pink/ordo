@@ -107,12 +107,16 @@ export const useTokenWrapper = (token?: Node, isCurrentLine = false) => {
 							}
 						}}
 						title={`${platform === "darwin" ? "Cmd" : "Ctrl"}+Click to follow the link.`}
-						className="text-sky-800 dark:text-sky-400 hover:underline"
+						className={`hover:underline ${!file ? "text-sky-800 dark:text-sky-400" : "text-purple-800 dark:text-purple-400"}`}
 					>
 						{children}
 					</span>
 				) : (
-					<div className="inline-flex space-x-1 items-center underline text-sky-800 dark:text-sky-400">
+					<div
+						className={`inline-flex space-x-1 items-center underline ${
+							!file ? "text-sky-800 dark:text-sky-400" : "text-purple-800 dark:text-purple-400"
+						}`}
+					>
 						<div
 							onMouseMove={(e) => {
 								if (e.ctrlKey && !e.currentTarget.classList.contains("cursor-pointer")) {

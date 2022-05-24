@@ -1,7 +1,7 @@
 import test from "ava";
 import { createRoot } from "../../core/parser/create-root";
 import { NodeWithChars, NodeWithChildren } from "../../core/parser/types";
-import { BlockNodeType } from "./enums";
+import { TextNodeWithChildrenType } from "./enums";
 import { parseText } from "./index";
 import { CharType } from "../../core/parser/char-type";
 
@@ -11,10 +11,10 @@ test("define parent structure", (t) => {
 	parseText("Hello\n", tree);
 
 	t.is(tree.raw, "Hello\n");
-	t.is(tree.length, 6);
+	t.is(tree.data.length, 6);
 	t.is(tree.range.end.line, 2);
 	t.is(tree.range.end.character, 0);
-	t.is(tree.path, "path");
+	t.is(tree.data.path, "path");
 });
 
 test("create separate lines", (t) => {
@@ -110,7 +110,7 @@ test("parse heading 1", (t) => {
 	const firstLine = tree.children[0] as NodeWithChildren;
 
 	t.is(firstLine.depth, 1);
-	t.is(firstLine.type, BlockNodeType.HEADING);
+	t.is(firstLine.type, TextNodeWithChildrenType.HEADING);
 	t.is(firstLine.raw, "# Yo!");
 });
 
@@ -122,7 +122,7 @@ test("parse heading 2", (t) => {
 	const firstLine = tree.children[0] as NodeWithChildren;
 
 	t.is(firstLine.depth, 2);
-	t.is(firstLine.type, BlockNodeType.HEADING);
+	t.is(firstLine.type, TextNodeWithChildrenType.HEADING);
 	t.is(firstLine.raw, "## Yo!");
 });
 
@@ -134,7 +134,7 @@ test("parse heading 3", (t) => {
 	const firstLine = tree.children[0] as NodeWithChildren;
 
 	t.is(firstLine.depth, 3);
-	t.is(firstLine.type, BlockNodeType.HEADING);
+	t.is(firstLine.type, TextNodeWithChildrenType.HEADING);
 	t.is(firstLine.raw, "### Yo!");
 });
 
@@ -146,7 +146,7 @@ test("parse heading 4", (t) => {
 	const firstLine = tree.children[0] as NodeWithChildren;
 
 	t.is(firstLine.depth, 4);
-	t.is(firstLine.type, BlockNodeType.HEADING);
+	t.is(firstLine.type, TextNodeWithChildrenType.HEADING);
 	t.is(firstLine.raw, "#### Yo!");
 });
 
@@ -158,7 +158,7 @@ test("parse heading 5", (t) => {
 	const firstLine = tree.children[0] as NodeWithChildren;
 
 	t.is(firstLine.depth, 5);
-	t.is(firstLine.type, BlockNodeType.HEADING);
+	t.is(firstLine.type, TextNodeWithChildrenType.HEADING);
 	t.is(firstLine.raw, "##### Yo!");
 });
 
@@ -170,6 +170,6 @@ test("parse nested paragraph", (t) => {
 	const thirdLine = tree.children[2] as NodeWithChildren;
 
 	t.is(thirdLine.depth, 4);
-	t.is(thirdLine.type, BlockNodeType.LINE);
+	t.is(thirdLine.type, TextNodeWithChildrenType.PARAGRAPH);
 	t.is(thirdLine.raw, "Some text");
 });

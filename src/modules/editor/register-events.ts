@@ -5,11 +5,11 @@ import { readFile } from "@modules/file-explorer/api/read-file";
 import { findOrdoFile } from "@modules/file-explorer/utils/find-ordo-file";
 import { EditorEvents } from "@modules/editor/types";
 import { findOrdoFolder } from "@modules/file-explorer/utils/find-ordo-folder";
-import { createLineNode, parseLine, parseText } from "@modules/text-parser";
+import { createNodeWithChildren, parseLine, parseText } from "@modules/text-parser";
 import { createRoot } from "@core/parser/create-root";
 import { tail } from "@utils/array";
 import { Char, NodeWithChildren } from "@core/parser/types";
-import { BlockNodeType } from "@modules/text-parser/enums";
+import { TextNodeWithChildrenType } from "@modules/text-parser/enums";
 
 export default registerEvents<EditorEvents>({
 	"@editor/toggle-todo": ({ draft, payload }) => {
@@ -315,8 +315,8 @@ export default registerEvents<EditorEvents>({
 				position.start.line = position.start.line + 1;
 				position.start.character = 0;
 
-				const node = createLineNode(
-					BlockNodeType.LINE,
+				const node = createNodeWithChildren(
+					TextNodeWithChildrenType.PARAGRAPH,
 					tab.content,
 					{ position: { character: 1, line: lineIndex + 1 } } as Char,
 					tab.content.depth + 1,

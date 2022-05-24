@@ -11,16 +11,16 @@ export const lex = (text: string, initialLine = 1, initialChar = 1): Char[] =>
 			let line = initialLine;
 			let character = initialChar;
 
-			return t.split("").map((value) => {
+			return t.split("").map((value, offset) => {
 				const type = getSymbolType(value);
 
 				const result: Char = {
 					type,
 					value,
-					data: null,
 					position: {
 						line,
 						character,
+						offset,
 					},
 				};
 

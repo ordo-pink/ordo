@@ -26,6 +26,7 @@ export type Reader = {
 export type Position = {
 	line: number;
 	character: number;
+	offset: number;
 };
 
 export type NodeRange = {
@@ -33,14 +34,13 @@ export type NodeRange = {
 	end: Position;
 };
 
-export type Char<Data = null> = {
+export type Char = {
 	type: CharType;
 	value: string;
 	position: Position;
-	data: Data;
 };
 
-export type Node<TypeSource = string, Data = null> = {
+export type Node<TypeSource = string, Data = Record<string, unknown> | null> = {
 	id: string;
 	depth: number;
 	type: TypeSource;
@@ -50,21 +50,21 @@ export type Node<TypeSource = string, Data = null> = {
 };
 
 export type ChildrenAware = {
+	openingChars: Char[];
+	closingChars: Char[];
 	children: Node[];
 };
 
-export type CharsAware<CharData = null> = {
-	chars: Char<CharData>[];
+export type CharsAware = {
+	chars: Char[];
 };
 
-export type NodeWithChildren<TypeSource = string, Data = null> = Node<TypeSource, Data> & ChildrenAware;
+export type NodeWithChildren<TypeSource = string, Data = Record<string, unknown>> = Node<TypeSource, Data> &
+	ChildrenAware;
 
-export type NodeWithChars<TypeSource = string, Data = null, CharData = null> = Node<TypeSource, Data> &
-	CharsAware<CharData>;
+export type NodeWithChars<TypeSource = string, Data = Record<string, unknown>> = Node<TypeSource, Data> & CharsAware;
 
-export type DocumentRoot<Data = null> = NodeWithChildren & {
-	type: "root";
-	path: string;
-	length: number;
-	data: Data;
-};
+export type DocumentRoot<Data = Record<string, unknown>> = NodeWithChildren<
+	"root",
+	Data & { path: string; length: number }
+>;

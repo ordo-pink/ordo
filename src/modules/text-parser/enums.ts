@@ -1,19 +1,19 @@
-export enum BlockNodeType {
-	LINE = "line",
-	EMBED = "embed",
+export enum TextNodeWithChildrenType {
+	PARAGRAPH = "paragraph",
 	BLOCKQUOTE = "blockquote",
 	HEADING = "heading",
-	COMPONENT = "component",
-	HR = "hr",
 	TODO = "todo",
-}
-
-export enum InlineNodeType {
-	TAG = "tag",
-	TEXT = "text",
-	LINK = "link",
 	BOLD = "bold",
 	CODE = "code",
 	ITALIC = "italic",
 	STRIKETHROUGH = "strikethrough",
+}
+
+export enum TextNodeWithCharsType {
+	COMPONENT = "component",
+	EMBED = "embed",
+	TEXT = "text",
+	TAG = "tag",
+	LINK = "link",
+	HR = "hr",
 }

@@ -6,7 +6,7 @@ import { Caret } from "@modules/editor/components/caret";
 import { Char } from "@core/parser/types";
 
 type CharProps = {
-	char: Char<{ hidable: boolean } | null>;
+	char: Char;
 };
 
 export const Character = React.memo(
@@ -16,37 +16,6 @@ export const Character = React.memo(
 		const alwaysShowMarkdownSymbols = useAppSelector((state) => state.app.userSettings.editor.alwaysShowMarkdownSymbols);
 
 		const [isCaretHere, setIsCaretHere] = React.useState<boolean>(false);
-		const [show, setShow] = React.useState<boolean>(
-			Boolean(tab) &&
-				(alwaysShowMarkdownSymbols ||
-					tab!.caretPositions.some(
-						(position) =>
-							!char.data ||
-							char.data.hidable == null ||
-							(char.data.hidable && (position.start.line === char.position.line || position.end.line === char.position.line)),
-					)),
-		);
-
-		React.useEffect(() => {
-			if (tab && tab.caretPositions) {
-				setShow(
-					alwaysShowMarkdownSymbols ||
-						tab.caretPositions.some(
-							(position) =>
-								!char.data ||
-								char.data.hidable == null ||
-								(char.data.hidable && (position.start.line === char.position.line || position.end.line === char.position.line)),
-						),
-				);
-			}
-		}, [
-			char.position.line,
-			char.position.character,
-			tab,
-			tab && tab.caretPositions.length,
-			tab && tab.caretPositions[0].start.line,
-			tab && tab.caretPositions[0].start.character,
-		]);
 
 		React.useEffect(() => {
 			if (tab && tab.caretPositions) {
@@ -143,7 +112,7 @@ export const Character = React.memo(
 
 		return (
 			<>
-				{char.value && show ? <span onClick={handleClick}>{char.value}</span> : null}
+				{char.value ? <span onClick={handleClick}>{char.value}</span> : null}
 				<Caret visible={isCaretHere && char.position.character !== 0} />
 			</>
 		);

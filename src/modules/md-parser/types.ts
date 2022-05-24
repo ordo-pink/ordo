@@ -1,9 +1,7 @@
 import { Char, NodeWithChars, NodeWithChildren } from "@core/parser/types";
 import { BlockNodeType, InlineNodeType } from "@modules/md-parser/enums";
 
-export type MarkdownChar = Char<{
-	hidable: boolean;
-}>;
+export type MarkdownChar = Char;
 
 export type MarkdownHeading = NodeWithChildren<BlockNodeType.HEADING>;
 export type MarkdownBlockquote = NodeWithChildren<BlockNodeType.BLOCKQUOTE>;

@@ -5,3 +5,8 @@
 select {
 	@apply h-7 text-sm pl-2 pr-12 py-0;
 }
+
+input[type="text"],
+input[type="number"] {
+	@apply h-7 text-sm pl-2 pr-12 py-0;
+}

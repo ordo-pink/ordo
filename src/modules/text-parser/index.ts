@@ -135,6 +135,184 @@ export const parseLineContent = parse({
 	},
 	parsers: [
 		{
+			evaluate: (char) => Boolean(char) && char!.type === CharType.STAR,
+			parse: (char, tree, reader) => {
+				if (Boolean(reader.lookAhead()) && reader.lookAhead()!.type === CharType.STAR) {
+					if (!char) return reader.next();
+
+					const chars: Char[] = [char];
+
+					let currentChar: Char | null = reader.next();
+
+					if (currentChar) {
+						chars.push(currentChar!);
+						currentChar = reader.next();
+					}
+
+					if (currentChar) {
+						chars.push(currentChar!);
+						currentChar = reader.next();
+					}
+
+					while (currentChar && reader.backTrack() && reader.backTrack()!.type !== CharType.STAR) {
+						chars.push(currentChar);
+						currentChar = reader.next();
+					}
+
+					if (currentChar && currentChar.type === CharType.STAR) {
+						chars.push(currentChar);
+						currentChar = reader.next();
+
+						const inline = createNodeWithChildren(TextNodeWithChildrenType.BOLD, tree, char);
+
+						inline.openingChars = chars.slice(0, 2);
+						inline.closingChars = chars.slice(-2);
+						inline.raw = chars.reduce((str, char) => str.concat(char.value), "");
+						inline.range = { start: chars[0].position, end: tail(chars).position };
+
+						parseLineContent(chars.slice(2, -2), inline);
+
+						tree.children.push(inline);
+					} else {
+						const inline = createNodeWithChars(TextNodeWithCharsType.TEXT, tree, char);
+						inline.raw = chars.reduce((str, char) => str.concat(char.value), "");
+						inline.chars = chars;
+						tree.children.push(inline);
+					}
+
+					return currentChar;
+				} else {
+					if (!char) return reader.next();
+
+					const chars: Char[] = [char];
+
+					let currentChar: Char | null = reader.next();
+
+					if (currentChar) {
+						chars.push(currentChar!);
+						currentChar = reader.next();
+					}
+
+					while (currentChar && currentChar.type !== CharType.STAR) {
+						chars.push(currentChar);
+						currentChar = reader.next();
+					}
+
+					if (currentChar) {
+						chars.push(currentChar);
+						currentChar = reader.next();
+
+						const inline = createNodeWithChildren(TextNodeWithChildrenType.ITALIC, tree, char);
+
+						inline.openingChars = chars.slice(0, 1);
+						inline.closingChars = chars.slice(-1);
+						inline.raw = chars.reduce((str, char) => str.concat(char.value), "");
+						inline.range = { start: chars[0].position, end: tail(chars).position };
+
+						parseLineContent(chars.slice(1, -1), inline);
+
+						tree.children.push(inline);
+					} else {
+						const inline = createNodeWithChars(TextNodeWithCharsType.TEXT, tree, char);
+						inline.raw = chars.reduce((str, char) => str.concat(char.value), "");
+						inline.chars = chars;
+						tree.children.push(inline);
+					}
+
+					return currentChar;
+				}
+			},
+		},
+		{
+			evaluate: (char) => Boolean(char) && char!.type === CharType.UNDERSCORE,
+			parse: (char, tree, reader) => {
+				if (Boolean(reader.lookAhead()) && reader.lookAhead()!.type === CharType.UNDERSCORE) {
+					if (!char) return reader.next();
+
+					const chars: Char[] = [char];
+
+					let currentChar: Char | null = reader.next();
+
+					if (currentChar) {
+						chars.push(currentChar!);
+						currentChar = reader.next();
+					}
+
+					if (currentChar) {
+						chars.push(currentChar!);
+						currentChar = reader.next();
+					}
+
+					while (currentChar && reader.backTrack() && reader.backTrack()!.type !== CharType.UNDERSCORE) {
+						chars.push(currentChar);
+						currentChar = reader.next();
+					}
+
+					if (currentChar && currentChar.type === CharType.UNDERSCORE) {
+						chars.push(currentChar);
+						currentChar = reader.next();
+
+						const inline = createNodeWithChildren(TextNodeWithChildrenType.BOLD, tree, char);
+
+						inline.openingChars = chars.slice(0, 2);
+						inline.closingChars = chars.slice(-2);
+						inline.raw = chars.reduce((str, char) => str.concat(char.value), "");
+						inline.range = { start: chars[0].position, end: tail(chars).position };
+
+						parseLineContent(chars.slice(2, -2), inline);
+
+						tree.children.push(inline);
+					} else {
+						const inline = createNodeWithChars(TextNodeWithCharsType.TEXT, tree, char);
+						inline.raw = chars.reduce((str, char) => str.concat(char.value), "");
+						inline.chars = chars;
+						tree.children.push(inline);
+					}
+
+					return currentChar;
+				} else {
+					if (!char) return reader.next();
+
+					const chars: Char[] = [char];
+
+					let currentChar: Char | null = reader.next();
+
+					if (currentChar) {
+						chars.push(currentChar!);
+						currentChar = reader.next();
+					}
+
+					while (currentChar && currentChar.type !== CharType.UNDERSCORE) {
+						chars.push(currentChar);
+						currentChar = reader.next();
+					}
+
+					if (currentChar) {
+						chars.push(currentChar);
+						currentChar = reader.next();
+
+						const inline = createNodeWithChildren(TextNodeWithChildrenType.ITALIC, tree, char);
+
+						inline.openingChars = chars.slice(0, 1);
+						inline.closingChars = chars.slice(-1);
+						inline.raw = chars.reduce((str, char) => str.concat(char.value), "");
+						inline.range = { start: chars[0].position, end: tail(chars).position };
+
+						parseLineContent(chars.slice(1, -1), inline);
+
+						tree.children.push(inline);
+					} else {
+						const inline = createNodeWithChars(TextNodeWithCharsType.TEXT, tree, char);
+						inline.raw = chars.reduce((str, char) => str.concat(char.value), "");
+						inline.chars = chars;
+						tree.children.push(inline);
+					}
+
+					return currentChar;
+				}
+			},
+		},
+		{
 			evaluate: (char, _, reader) =>
 				Boolean(char) &&
 				char!.type === CharType.TILDE &&
@@ -335,5 +513,7 @@ const shouldBreakDefaultParsing = (char: Char | null, reader: Reader) =>
 	!char ||
 	char.type === CharType.BACKTICK ||
 	char.type === CharType.HASH ||
+	char.type === CharType.STAR ||
+	char.type === CharType.UNDERSCORE ||
 	(char.type === CharType.BRACKET_OPEN && reader.lookAhead() && reader.lookAhead()!.type === CharType.BRACKET_OPEN) ||
 	(char.type === CharType.TILDE && reader.lookAhead() && reader.lookAhead()!.type === CharType.TILDE);

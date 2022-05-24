@@ -36,6 +36,8 @@ export const Character = React.memo(
 
 		const handleClick = React.useCallback(
 			(e: React.MouseEvent) => {
+				if (e.ctrlKey) return;
+
 				e.preventDefault();
 				e.stopPropagation();
 

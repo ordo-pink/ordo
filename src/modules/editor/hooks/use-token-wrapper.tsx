@@ -4,10 +4,16 @@ import { Node } from "@core/parser/types";
 import { TextNodeWithChildrenType, TextNodeWithCharsType } from "@modules/text-parser/enums";
 import { useAppDispatch, useAppSelector } from "@core/state/store";
 import { HiOutlineLink } from "react-icons/hi";
+import { findOrdoFile } from "@modules/file-explorer/utils/find-ordo-file";
 
 export const useTokenWrapper = (token?: Node, isCurrentLine = false) => {
 	const dispatch = useAppDispatch();
 	const platform = useAppSelector((state) => state.app.internalSettings.platform);
+	const tree = useAppSelector((state) => state.fileExplorer.tree);
+	const file = React.useMemo(
+		() => (token?.data!.href ? findOrdoFile(tree, "readableName", token!.data!.href as string) : null),
+		[token?.data!.href, tree],
+	);
 
 	const wrapper: React.FC = React.useMemo(() => {
 		if (token?.type === TextNodeWithChildrenType.HEADING) {
@@ -92,6 +98,8 @@ export const useTokenWrapper = (token?: Node, isCurrentLine = false) => {
 							if (e.ctrlKey) {
 								e.preventDefault();
 								e.stopPropagation();
+
+								file && dispatch({ type: "@editor/open-tab", payload: file.path });
 							}
 						}}
 						title={`${platform === "darwin" ? "Cmd" : "Ctrl"}+Click to follow the link.`}
@@ -112,6 +120,8 @@ export const useTokenWrapper = (token?: Node, isCurrentLine = false) => {
 								if (e.ctrlKey) {
 									e.preventDefault();
 									e.stopPropagation();
+
+									file && dispatch({ type: "@editor/open-tab", payload: file.path });
 								}
 							}}
 							title={`${platform === "darwin" ? "Cmd" : "Ctrl"}+Click to follow the link.`}
@@ -124,6 +134,8 @@ export const useTokenWrapper = (token?: Node, isCurrentLine = false) => {
 							onClick={(e) => {
 								e.preventDefault();
 								e.stopPropagation();
+
+								file && dispatch({ type: "@editor/open-tab", payload: file.path });
 							}}
 						/>
 					</div>

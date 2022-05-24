@@ -61,6 +61,14 @@ export const useTokenWrapper = (token?: Node, isCurrentLine = false) => {
 			return ({ children }) => (isCurrentLine ? <span>{children}</span> : <hr />);
 		}
 
+		if (token?.type === TextNodeWithCharsType.TAG) {
+			return ({ children }) => (
+				<strong className="bg-gradient-to-tr from-orange-600 dark:from-purple-400 to-pink-700 dark:to-pink-400 text-transparent bg-clip-text drop-shadow-xl mt-2">
+					{children}
+				</strong>
+			);
+		}
+
 		if (token?.type === TextNodeWithChildrenType.BOLD) {
 			return ({ children }) => <strong className="font-bold">{children}</strong>;
 		}

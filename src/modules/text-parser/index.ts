@@ -129,13 +129,41 @@ export const parseText = (raw: string, tree: NodeWithChildren | DocumentRoot) =>
 	});
 };
 
-const specialCharTypes = [CharType.BACKTICK];
+const specialCharTypes = [CharType.BACKTICK, CharType.HASH];
 
 export const parseLineContent = parse({
 	afterParse: (tree, reader) => {
 		tree.range.end.character = reader.getChars().length;
 	},
 	parsers: [
+		{
+			evaluate: (char) => Boolean(char) && char!.type === CharType.HASH,
+			parse: (char, tree, reader) => {
+				if (!char) return reader.next();
+
+				const chars: Char[] = [char];
+				let currentChar: Char | null = reader.next();
+
+				while (currentChar && currentChar.type !== CharType.WHITESPACE && currentChar.type !== CharType.HASH) {
+					currentChar.position.line = tree.range.start.line;
+					chars.push(currentChar);
+
+					currentChar = reader.next();
+				}
+
+				const inline = createNodeWithChars(TextNodeWithCharsType.TAG, tree, char);
+
+				inline.range.end.character = tail(chars).position.character;
+				inline.raw = chars.reduce((str, char) => str.concat(char.value), "");
+				inline.chars = chars;
+				inline.range = { start: chars[0].position, end: tail(chars).position };
+				inline.data.tag = chars.slice(1).reduce((str, char) => str.concat(char.value), "");
+
+				tree.children.push(inline);
+
+				return currentChar;
+			},
+		},
 		{
 			evaluate: (char) => Boolean(char) && char!.type === CharType.BACKTICK,
 			parse: (char, tree, reader) => {

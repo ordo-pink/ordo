@@ -491,7 +491,7 @@ export const parseLineContent = parse({
 				const inline = createNodeWithChars(TextNodeWithCharsType.TEXT, tree, char);
 				let currentChar: Char | null = char;
 
-				while (currentChar && !shouldBreakDefaultParsing(char, reader)) {
+				while (currentChar && !shouldBreakDefaultParsing(currentChar, reader)) {
 					currentChar.position.line = tree.range.start.line;
 
 					inline.range.end.character = currentChar.position.character;

@@ -99,7 +99,11 @@ export const useTokenWrapper = (token?: Node, isCurrentLine = false) => {
 								e.preventDefault();
 								e.stopPropagation();
 
-								file && dispatch({ type: "@editor/open-tab", payload: file.path });
+								if (file) {
+									dispatch({ type: "@editor/open-tab", payload: file.path });
+								} else {
+									dispatch({ type: "@file-explorer/create-file", payload: token.data!.href as string });
+								}
 							}
 						}}
 						title={`${platform === "darwin" ? "Cmd" : "Ctrl"}+Click to follow the link.`}
@@ -121,7 +125,11 @@ export const useTokenWrapper = (token?: Node, isCurrentLine = false) => {
 									e.preventDefault();
 									e.stopPropagation();
 
-									file && dispatch({ type: "@editor/open-tab", payload: file.path });
+									if (file) {
+										dispatch({ type: "@editor/open-tab", payload: file.path });
+									} else {
+										dispatch({ type: "@file-explorer/create-file", payload: token.data!.href as string });
+									}
 								}
 							}}
 							title={`${platform === "darwin" ? "Cmd" : "Ctrl"}+Click to follow the link.`}
@@ -135,7 +143,11 @@ export const useTokenWrapper = (token?: Node, isCurrentLine = false) => {
 								e.preventDefault();
 								e.stopPropagation();
 
-								file && dispatch({ type: "@editor/open-tab", payload: file.path });
+								if (file) {
+									dispatch({ type: "@editor/open-tab", payload: file.path });
+								} else {
+									dispatch({ type: "@file-explorer/create-file", payload: token.data!.href as string });
+								}
 							}}
 						/>
 					</div>
@@ -155,7 +167,13 @@ export const useTokenWrapper = (token?: Node, isCurrentLine = false) => {
 		}
 
 		return ({ children }) => <span>{children}</span>;
-	}, [token && token.type, token && token.depth, isCurrentLine, token && token.data && (token.data as any).checked]);
+	}, [
+		token && token.type,
+		token && token.depth,
+		isCurrentLine,
+		token && token.data && (token.data as any).checked,
+		file,
+	]);
 
 	return wrapper;
 };

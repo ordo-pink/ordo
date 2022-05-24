@@ -1,4 +1,4 @@
-import { join, sep } from "path";
+import { join, resolve, sep } from "path";
 import { existsSync, promises } from "fs";
 
 import { OrdoEventHandler } from "@core/types";
@@ -9,7 +9,7 @@ import { OrdoEventHandler } from "@core/types";
 export const handleCreateFile: OrdoEventHandler<"@file-explorer/create-file"> = async ({ transmission, payload }) => {
 	const { createFileIn, tree } = transmission.select((state) => state.fileExplorer);
 
-	const path = join(createFileIn, payload);
+	const path = join(createFileIn ? createFileIn : tree.path, payload);
 
 	if (existsSync(path)) {
 		return;

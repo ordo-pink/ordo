@@ -6,9 +6,7 @@ import { useCurrentTab } from "@modules/editor/hooks/use-current-tab";
 import { Line } from "@modules/editor/components/line";
 import { tapPreventDefault, tapStopPropagation } from "@utils/events";
 import { FoldVoid } from "@utils/either";
-import { lastIndex, tail } from "@utils/array";
-import { tap } from "@utils/functions";
-import { NoOp } from "@utils/no-op";
+import { tail } from "@utils/array";
 
 export const Lines = React.memo(
 	() => {
@@ -18,7 +16,7 @@ export const Lines = React.memo(
 		const focused = useAppSelector((state) => state.editor.focused);
 
 		const handleKeyDown = (e: KeyboardEvent) => {
-			if (!tab || !focused) return;
+			if (!tab || !focused || e.key === "Tab") return;
 
 			const { key, shiftKey, altKey, ctrlKey, metaKey } = e;
 

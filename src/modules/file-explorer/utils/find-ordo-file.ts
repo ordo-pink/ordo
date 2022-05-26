@@ -6,7 +6,7 @@ export const findOrdoFile = <Key extends keyof OrdoFile = "path">(
 	value: OrdoFile[Key],
 ): OrdoFile | null => {
 	if (key === "path" && tree.path === value) {
-		throw new Error(`"${value}" is a folder, not a file`);
+		return null;
 	}
 
 	for (const child of tree.children) {

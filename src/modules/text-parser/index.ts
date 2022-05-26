@@ -111,18 +111,35 @@ export const parseLine = (line: string, index: number, tree: NodeWithChildren, m
 	return lineNode;
 };
 
-export const parseText = (raw: string, tree: NodeWithChildren | DocumentRoot) => {
+export const extractFrontmatter = (raw: string): { raw: string; frontmatter: Record<string, any> | null } => {
 	const lines = raw.split("\n");
+	let frontmatter: Record<string, any> | null = null;
+
+	if (lines[0] === "---" && lines[2] === "---") {
+		frontmatter = JSON.parse(lines[1]);
+		return { raw: lines.slice(3).join("\n"), frontmatter };
+	}
+
+	return { raw, frontmatter };
+};
+
+export const parseText = (raw: string, tree: NodeWithChildren | DocumentRoot) => {
 	tree.raw = raw;
+
+	if (isDocumentRoot(tree)) {
+		tree.data.length = raw.length;
+		const frontmatterParsed = extractFrontmatter(tree.raw);
+		tree.raw = frontmatterParsed.raw;
+		tree.data.frontmatter = frontmatterParsed.frontmatter;
+	}
+
+	const lines = tree.raw.split("\n");
+
 	const metadata = { depth: tree.depth };
 	tree.range = {
 		start: { line: 1, character: 1, offset: 1 },
 		end: { line: lines.length, character: tail(lines).length, offset: raw.length },
 	};
-
-	if (isDocumentRoot(tree)) {
-		tree.data.length = raw.length;
-	}
 
 	lines.forEach((line, index) => {
 		tree.children.push(parseLine(line, index, tree, metadata));

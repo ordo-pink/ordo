@@ -66,5 +66,5 @@ export type NodeWithChars<TypeSource = string, Data = Record<string, unknown>> =
 
 export type DocumentRoot<Data = Record<string, unknown>> = NodeWithChildren<
 	"root",
-	Data & { path: string; length: number }
+	Data & { path: string; length: number; frontmatter: Record<string, any> | null }
 >;

@@ -52,7 +52,13 @@ export const File: React.FC<FileProps> = ({ file }) => {
 			onContextMenu={handleContextMenu}
 			onDragStart={handleDragStart}
 		>
-			<Icon className="file-explorer_item_icon" />
+			<Icon
+				className={`file-explorer_item_icon ${
+					file.frontmatter && file.frontmatter.color
+						? `text-${file.frontmatter.color}-600 dark:text-${file.frontmatter.color}-300`
+						: "text-neutral-500 dark:text-neutral-300"
+				}`}
+			/>
 			<div className="file-explorer_item_name">{file.readableName}</div>
 		</div>
 	);

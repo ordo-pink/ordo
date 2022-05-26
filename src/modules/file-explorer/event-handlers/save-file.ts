@@ -28,7 +28,13 @@ export const handleSaveFile: OrdoEventHandler<"@file-explorer/save-file"> = asyn
 		tab.raw = tab.content.raw;
 		file.size = new TextEncoder().encode(tab.raw === "\n" ? "" : tab.raw).length;
 
-		await promises.writeFile(tab.path, tab.content.raw, "utf-8");
+		let fileContent = tab.content.raw;
+
+		if (file.frontmatter) {
+			fileContent = "---\n".concat(JSON.stringify(file.frontmatter)).concat("\n---\n").concat(fileContent);
+		}
+
+		await promises.writeFile(tab.path, fileContent, "utf-8");
 
 		tab.unsaved = false;
 	} else {

@@ -7,6 +7,7 @@ export const createRoot = (path: string): DocumentRoot => ({
 	closingChars: [],
 	data: {
 		path,
+		frontmatter: {},
 		length: 0,
 	},
 	raw: "",

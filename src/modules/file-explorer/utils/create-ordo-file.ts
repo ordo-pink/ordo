@@ -52,5 +52,6 @@ export const createOrdoFile = ({
 		extension,
 		readableSize,
 		type: type as any,
+		frontmatter: null,
 	};
 };

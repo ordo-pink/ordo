@@ -1,6 +1,7 @@
-import { promises } from "fs";
+import { promises, createReadStream } from "fs";
 import { join } from "path";
 import { Minimatch } from "minimatch";
+import { createInterface } from "readline";
 
 import { OrdoEventHandler } from "@core/types";
 import { userSettingsStore } from "@core/settings/user-settings";
@@ -8,6 +9,7 @@ import { OrdoFolder } from "@modules/file-explorer/types";
 import { createOrdoFile } from "@modules/file-explorer/utils/create-ordo-file";
 import { createOrdoFolder } from "@modules/file-explorer/utils/create-ordo-folder";
 import { sortTree } from "@modules/file-explorer/utils/sort-tree";
+import { extractFrontmatter } from "@modules/text-parser";
 
 /**
  * Collects the list of all files and folders within the path.
@@ -72,6 +74,18 @@ export const listFolder = async (path: string, depth = 0, rootPath = path): Prom
 				accessedAt: atime,
 				size,
 			});
+
+			if (file.extension === ".md" && file.size > 0) {
+				const input = createReadStream(file.path);
+				let maybeRawFrontmatter: string = await new Promise((resolve) => {
+					input.on("data", (chunk) => {
+						input.close();
+						resolve(chunk.toString("utf8"));
+					});
+				});
+
+				file.frontmatter = extractFrontmatter(maybeRawFrontmatter).frontmatter;
+			}
 
 			tree.children.push(file);
 		}

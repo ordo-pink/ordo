@@ -41,7 +41,7 @@
 		}
 
 		&_icon {
-			@apply shrink-0 text-neutral-500 dark:text-neutral-300;
+			@apply shrink-0;
 		}
 
 		&_name {

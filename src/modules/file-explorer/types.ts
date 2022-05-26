@@ -13,6 +13,7 @@ export type OrdoFile = {
 	size: number;
 	readableSize: string;
 	raw?: string;
+	frontmatter: Record<string, any> | null;
 	type: "image" | "document" | "file";
 };
 

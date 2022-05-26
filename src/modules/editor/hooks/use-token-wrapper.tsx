@@ -1,10 +1,11 @@
 import React from "react";
 
-import { Node } from "@core/parser/types";
+import { Node, NodeWithChars } from "@core/parser/types";
 import { TextNodeWithChildrenType, TextNodeWithCharsType } from "@modules/text-parser/enums";
 import { useAppDispatch, useAppSelector } from "@core/state/store";
 import { HiOutlineLink } from "react-icons/hi";
 import { findOrdoFile } from "@modules/file-explorer/utils/find-ordo-file";
+import { useComponent } from "./use-component";
 
 export const useTokenWrapper = (token?: Node, isCurrentLine = false) => {
 	const dispatch = useAppDispatch();
@@ -14,6 +15,7 @@ export const useTokenWrapper = (token?: Node, isCurrentLine = false) => {
 		() => (token?.data!.href ? findOrdoFile(tree, "readableName", token!.data!.href as string) : null),
 		[token?.data!.href, tree],
 	);
+	const Component = useComponent(token as any);
 
 	const wrapper: React.FC = React.useMemo(() => {
 		if (token?.type === TextNodeWithChildrenType.HEADING) {
@@ -48,7 +50,12 @@ export const useTokenWrapper = (token?: Node, isCurrentLine = false) => {
 		if (token?.type === TextNodeWithCharsType.COMPONENT) {
 			// TODO: Render component
 			return ({ children }) => {
-				return <span className="text-xs text-neutral-500">{children}</span>;
+				return (
+					<div>
+						<span className="text-xs text-neutral-500">{children}</span>
+						{isCurrentLine ? null : <Component token={token as NodeWithChars} />}
+					</div>
+				);
 			};
 		}
 
@@ -171,13 +178,7 @@ export const useTokenWrapper = (token?: Node, isCurrentLine = false) => {
 		}
 
 		return ({ children }) => <span>{children}</span>;
-	}, [
-		token && token.type,
-		token && token.depth,
-		isCurrentLine,
-		token && token.data && (token.data as any).checked,
-		file,
-	]);
+	}, [token, isCurrentLine, file, Component]);
 
 	return wrapper;
 };

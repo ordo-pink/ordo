@@ -1,5 +1,5 @@
 import { OrdoEventHandler } from "@core/types";
-import { findOrdoFolder } from "@modules/file-explorer/utils/find-ordo-folder";
+import { findOrdoFolderByPath } from "@modules/file-explorer/utils/find-ordo-folder";
 
 /**
  * Shows input for creating a file.
@@ -9,7 +9,7 @@ export const handleShowFileCreation: OrdoEventHandler<"@file-explorer/show-file-
 	payload,
 	transmission,
 }) => {
-	const folder = findOrdoFolder(draft.fileExplorer.tree, payload);
+	const folder = findOrdoFolderByPath(draft.fileExplorer.tree, payload);
 
 	if (folder?.collapsed) {
 		await transmission.emit("@file-explorer/toggle-folder", payload);

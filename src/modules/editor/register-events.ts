@@ -4,7 +4,7 @@ import { registerEvents } from "@core/transmission/register-ordo-events";
 import { readFile } from "@modules/file-explorer/api/read-file";
 import { findOrdoFile } from "@modules/file-explorer/utils/find-ordo-file";
 import { EditorEvents } from "@modules/editor/types";
-import { findOrdoFolder } from "@modules/file-explorer/utils/find-ordo-folder";
+import { findOrdoFolderByPath } from "@modules/file-explorer/utils/find-ordo-folder";
 import { createNodeWithChildren, parseLine, parseText } from "@modules/text-parser";
 import { createRoot } from "@core/parser/create-root";
 import { tail } from "@utils/array";
@@ -71,7 +71,7 @@ export default registerEvents<EditorEvents>({
 		let parentPath = file?.path.split(sep).slice(0, -1).join(sep);
 
 		while (parentPath && parentPath !== tree.path) {
-			const folder = findOrdoFolder(tree, parentPath);
+			const folder = findOrdoFolderByPath(tree, parentPath);
 
 			if (folder?.collapsed) {
 				await transmission.emit("@file-explorer/toggle-folder", parentPath);

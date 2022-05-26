@@ -6,13 +6,13 @@ import { EmptyEditor } from "@modules/editor/components/empty-editor";
 import { useCurrentTab } from "@modules/editor/hooks/use-current-tab";
 
 export const useEditorComponent = () => {
-	const { file } = useCurrentTab();
+	const currentTab = useCurrentTab();
 
 	const Component = React.useMemo(() => {
-		if (!file) return EmptyEditor;
-		if (file.type === "image") return ImageViewer;
+		if (!currentTab.file) return EmptyEditor;
+		if (currentTab.file.type === "image") return ImageViewer;
 		return TextEditor;
-	}, [file && file.path]);
+	}, [currentTab.file && currentTab.file.path]);
 
 	return Component;
 };

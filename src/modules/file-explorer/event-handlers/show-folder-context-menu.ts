@@ -3,7 +3,7 @@ import { is } from "electron-util";
 
 import { Colors } from "@core/appearance/colors";
 import { OrdoEventHandler } from "@core/types";
-import { findOrdoFolder } from "@modules/file-explorer/utils/find-ordo-folder";
+import { findOrdoFolderByPath } from "@modules/file-explorer/utils/find-ordo-folder";
 
 /**
  * Shows folder context menu.
@@ -14,7 +14,7 @@ export const handleShowFolderContextMenu: OrdoEventHandler<"@file-explorer/show-
 	context,
 }) => {
 	const tree = transmission.select((state) => state.fileExplorer.tree);
-	const folder = findOrdoFolder(tree, path);
+	const folder = findOrdoFolderByPath(tree, path);
 
 	if (!folder) {
 		return;

@@ -46,7 +46,7 @@ const collectNodes = (tree: OrdoFolder, nodes: any[] = [], edges: any[] = []) =>
 							color: "#cdb4db",
 							from: child.path,
 							to: tag,
-							length: 200,
+							length: 100,
 						});
 					});
 				}
@@ -71,7 +71,7 @@ const collectNodes = (tree: OrdoFolder, nodes: any[] = [], edges: any[] = []) =>
 							color: "#ffafcc",
 							from: child.path,
 							to: embed,
-							length: 200,
+							length: 500,
 						});
 					});
 				}
@@ -105,7 +105,7 @@ const createNetwork = (tree: OrdoFolder) => {
 						? {
 								label: edge.to,
 								id: edge.to,
-								color: "#b5838d",
+								color: "#ffcdb2",
 								size: 15,
 								height: 0,
 						  }

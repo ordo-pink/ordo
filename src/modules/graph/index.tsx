@@ -37,7 +37,7 @@ const createNetwork = (tree: OrdoFolder, nodes: any[] = [], edges: any[] = []) =
 				color: isFolder(child) ? "#aaa" : "#ccc",
 				from: tree.path,
 				to: child.path,
-				length: isFolder(child) ? 250 : 150,
+				length: isFolder(child) ? 310 : 150,
 			});
 		}
 	});
@@ -71,7 +71,7 @@ export const Graph: React.FC<GraphProps> = React.memo(
 						max: 30,
 					},
 					font: {
-						size: 10,
+						size: 12,
 						color: isDarkMode === "dark" ? "#ddd" : "#111",
 					},
 				},
@@ -88,7 +88,6 @@ export const Graph: React.FC<GraphProps> = React.memo(
 					hideEdgesOnDrag: false,
 					tooltipDelay: 200,
 				},
-
 				physics: true,
 			};
 

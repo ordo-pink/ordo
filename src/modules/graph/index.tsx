@@ -67,8 +67,8 @@ export const Graph: React.FC<GraphProps> = ({ tree }) => {
 					max: 30,
 				},
 				font: {
-					size: 12,
-					color: isDarkMode ? "#ddd" : "#222",
+					size: 10,
+					color: isDarkMode === "dark" ? "#ddd" : "#111",
 				},
 			},
 			edges: {

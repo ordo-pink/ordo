@@ -3,13 +3,52 @@ import { sep } from "path";
 import { registerEvents } from "@core/transmission/register-ordo-events";
 import { readFile } from "@modules/file-explorer/api/read-file";
 import { findOrdoFile } from "@modules/file-explorer/utils/find-ordo-file";
-import { EditorEvents } from "@modules/editor/types";
+import { EditorEvents, EditorTab } from "@modules/editor/types";
 import { findOrdoFolderByPath } from "@modules/file-explorer/utils/find-ordo-folder";
 import { createNodeWithChildren, parseLine, parseText } from "@modules/text-parser";
 import { createRoot } from "@core/parser/create-root";
 import { tail } from "@utils/array";
-import { Char, NodeWithChildren } from "@core/parser/types";
-import { TextNodeWithChildrenType } from "@modules/text-parser/enums";
+import { Char, NodeWithChars, NodeWithChildren } from "@core/parser/types";
+import { TextNodeWithCharsType, TextNodeWithChildrenType } from "@modules/text-parser/enums";
+import { isNodeWithChars } from "@core/parser/is";
+import { OrdoFile } from "@modules/file-explorer/types";
+
+const visit = (
+	node: NodeWithChildren | NodeWithChars,
+	saved: {
+		tags: string[];
+		embeds: string[];
+		links: string[];
+	} = { tags: [], embeds: [], links: [] },
+) => {
+	if (isNodeWithChars(node)) {
+		if (node.type === TextNodeWithCharsType.TAG) {
+			saved.tags.push(node.data.tag as string);
+		} else if (node.type === TextNodeWithCharsType.EMBED) {
+			saved.embeds.push(node.data.relativePath as string);
+		} else if (node.type === TextNodeWithCharsType.LINK) {
+			saved.links.push(node.data.href as string);
+		}
+	} else {
+		node.children.forEach((child) => visit(child as any, saved));
+	}
+
+	return saved;
+};
+
+const collectFrontmatterValues = (file: OrdoFile, tab: EditorTab) => {
+	const { tags, embeds, links } = visit(tab.content);
+
+	if (!file.frontmatter) {
+		file.frontmatter = {};
+	}
+
+	file.frontmatter.tags = tags;
+	file.frontmatter.embeds = embeds;
+	file.frontmatter.links = links;
+
+	tab.content.data.frontmatter = file.frontmatter;
+};
 
 export default registerEvents<EditorEvents>({
 	"@editor/toggle-todo": ({ draft, payload }) => {
@@ -34,9 +73,10 @@ export default registerEvents<EditorEvents>({
 	},
 	"@editor/open-tab": async ({ draft, payload, transmission, context }) => {
 		const currentTab = transmission.select((state) => state.editor.currentTab);
-		const tree = transmission.select((state) => state.fileExplorer.tree);
+		const tree = draft.fileExplorer.tree;
+		const file = findOrdoFile(tree, "path", payload);
 
-		if (currentTab === payload) {
+		if (currentTab === payload || !file) {
 			return;
 		}
 
@@ -49,7 +89,7 @@ export default registerEvents<EditorEvents>({
 
 			parseText(raw, content);
 
-			draft.editor.tabs.push({
+			const tab: EditorTab = {
 				raw,
 				path: payload,
 				caretPositions: [
@@ -60,13 +100,15 @@ export default registerEvents<EditorEvents>({
 					},
 				],
 				content,
-			});
+			};
+
+			collectFrontmatterValues(file, tab);
+
+			draft.editor.tabs.push(tab);
 		}
 
 		draft.editor.currentTab = payload;
 		transmission.emit("@activity-bar/open-editor", null);
-
-		const file = findOrdoFile(tree, "path", draft.editor.currentTab);
 
 		let parentPath = file?.path.split(sep).slice(0, -1).join(sep);
 
@@ -366,5 +408,7 @@ export default registerEvents<EditorEvents>({
 		}
 
 		file.size = new TextEncoder().encode(tab.raw === "\n" ? "" : tab.content.raw).length;
+
+		collectFrontmatterValues(file, tab);
 	},
 });

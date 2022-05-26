@@ -3,42 +3,123 @@ import { Network, Options } from "vis-network";
 
 import { OrdoFolder } from "@modules/file-explorer/types";
 import { isFolder } from "@modules/file-explorer/utils/is-folder";
-import { useAppDispatch, useAppSelector } from "@core/state/store";
+import { useAppDispatch } from "@core/state/store";
 import { findOrdoFile } from "@modules/file-explorer/utils/find-ordo-file";
 
-const createNetwork = (tree: OrdoFolder, nodes: any[] = [], edges: any[] = []) => {
+const collectNodes = (tree: OrdoFolder, nodes: any[] = [], edges: any[] = []) => {
 	nodes.push({
 		...tree,
 		label: tree.readableName,
 		id: tree.path,
 		height: tree.depth,
-		color: "#999",
+		color: "#bde0fe",
 		size: tree.children.length + 10,
 	});
 
 	tree.children.forEach((child) => {
 		if (isFolder(child)) {
-			createNetwork(child, nodes, edges);
+			collectNodes(child, nodes, edges);
 		} else {
 			nodes.push({
 				...child,
 				label: child.readableName,
 				id: child.path,
-				color: "#bbb",
+				color: "#ffc8dd",
 				size: 10,
 				height: tree.depth,
 			});
+
+			if (child.frontmatter) {
+				if (child.frontmatter.tags) {
+					child.frontmatter.tags.forEach((tag: string) => {
+						if (!nodes.some((node) => node.id === tag)) {
+							nodes.push({
+								label: `#${tag}`,
+								id: tag,
+								color: "#cdb4db",
+								size: 15,
+								height: 0,
+							});
+						}
+
+						edges.push({
+							color: "#cdb4db",
+							from: child.path,
+							to: tag,
+							length: 200,
+						});
+					});
+				}
+
+				if (child.frontmatter.embeds) {
+					child.frontmatter.embeds.forEach((embed: string) => {
+						edges.push({
+							arrow: "to",
+							color: "#ffafcc",
+							from: child.path,
+							to: embed,
+							length: 500,
+						});
+					});
+				}
+
+				if (child.frontmatter.links) {
+					child.frontmatter.links.forEach((embed: string) => {
+						edges.push({
+							dashes: true,
+							arrow: "to",
+							color: "#ffafcc",
+							from: child.path,
+							to: embed,
+							length: 200,
+						});
+					});
+				}
+			}
 		}
 
 		if (!edges.some((l) => l.source === tree.path && l.target === child.path)) {
 			edges.push({
 				arrows: "to",
-				physics: true,
-				color: isFolder(child) ? "#aaa" : "#ccc",
+				color: isFolder(child) ? "#a2d2ff" : "#ffafcc",
 				from: tree.path,
 				to: child.path,
 				length: isFolder(child) ? 310 : 150,
 			});
+		}
+	});
+
+	return { nodes, edges };
+};
+
+const createNetwork = (tree: OrdoFolder) => {
+	const { nodes, edges } = collectNodes(tree, [], []);
+
+	edges.forEach((edge) => {
+		if (!nodes.some((node) => node.id === edge.to)) {
+			const file = findOrdoFile(tree, "readableName", edge.to);
+
+			if (!file) {
+				nodes.push(
+					edge.color === "#ffafcc"
+						? {
+								label: edge.to,
+								id: edge.to,
+								color: "#b5838d",
+								size: 15,
+								height: 0,
+						  }
+						: {
+								label: edge.to,
+								id: edge.to,
+								color: "#bde0fe",
+								size: 15,
+								height: 0,
+						  },
+				);
+			} else {
+				edge.to = file.path;
+			}
 		}
 	});
 
@@ -52,7 +133,7 @@ type GraphProps = {
 
 export const Graph: React.FC<GraphProps> = React.memo(
 	({ tree, height = "98vh" }) => {
-		const data = createNetwork(tree, [], []);
+		const data = createNetwork(tree);
 		const ref = React.useRef<HTMLDivElement>(null);
 		const dispatch = useAppDispatch();
 

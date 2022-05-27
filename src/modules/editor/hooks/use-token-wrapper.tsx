@@ -53,7 +53,11 @@ export const useTokenWrapper = (token?: Node, isCurrentLine = false) => {
 				return (
 					<div>
 						<span className="text-xs text-neutral-500">{children}</span>
-						{isCurrentLine ? null : <Component token={token as NodeWithChars} />}
+						{isCurrentLine ? null : (
+							<div className="w-4/5">
+								<Component token={token as NodeWithChars} />
+							</div>
+						)}
 					</div>
 				);
 			};

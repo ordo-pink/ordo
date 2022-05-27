@@ -17,19 +17,48 @@ export const GraphComponent = React.memo(
 		const tree = useAppSelector((state) => state.fileExplorer.tree);
 		const [content, setContent] = React.useState<OrdoFolder | null>(null);
 
+		const parsed: string[] = token.data.parsed as string[];
+
+		const [showTags, setShowTags] = React.useState<boolean>(true);
+		const [showFolders, setShowFolders] = React.useState<boolean>(true);
+		const [showLinks, setShowLinks] = React.useState<boolean>(true);
+		const [height, setHeight] = React.useState<string>("40vh");
+
 		React.useEffect(() => {
 			Either.fromNullable(tree)
 				.chain((t) =>
-					Either.try(() => (token.data as any).parsed[2]).chain((folder) =>
-						Either.fromNullable(findOrdoFolder(t, "readableName", folder)),
-					),
+					Either.fromNullable(parsed.find((attr) => attr.startsWith("folder=")))
+						.map((attr) => attr.slice(8, -1))
+						.chain((folder) => Either.fromNullable(findOrdoFolder(t, "readableName", folder))),
 				)
 				.fold(id, (c) => setContent(c));
-		}, [tree.path, token.raw]);
+
+			Either.fromNullable(parsed.find((attr) => attr === "no-folders")).fold(
+				() => setShowFolders(true),
+				() => setShowFolders(false),
+			);
+
+			Either.fromNullable(parsed.find((attr) => attr === "no-tags")).fold(
+				() => setShowTags(true),
+				() => setShowTags(false),
+			);
+
+			Either.fromNullable(parsed.find((attr) => attr.startsWith("height=")))
+				.map((attr) => attr.slice(8, -1))
+				.fold(
+					() => setHeight("40vh"),
+					(v) => setHeight(v),
+				);
+
+			Either.fromNullable(parsed.find((attr) => attr === "no-links")).fold(
+				() => setShowLinks(true),
+				() => setShowLinks(false),
+			);
+		}, []);
 
 		return Either.fromNullable(content).fold(NoOp, (t) => (
 			<div className="rounded-xl bg-neutral-50 shadow-lg mb-4">
-				<Graph tree={t} height={"50vh"} />
+				<Graph tree={t} showFolders={showFolders} showLinks={showLinks} showTags={showTags} height={height} />
 			</div>
 		));
 	},

@@ -60,7 +60,7 @@ export const parseLine = (line: string, index: number, tree: NodeWithChildren, m
 		parseLineContent([], lineNode);
 	} else if (/^<.*\/>$/.test(line)) {
 		lineNode = createNodeWithChars(TextNodeWithCharsType.COMPONENT, tree, chars[0], metadata.depth + 1);
-		lineNode.data.parsed = line.match(/(\w+)=["']?((?:.(?!["']?\s+(?:\S+)=|\s*\/?[>"']))+.)["']?/);
+		lineNode.data.parsed = line.match(/([-\w]+)(=["']?((?:.(?!["']?\s+(?:\S+)=|\s*\/?[>"']))+.)["']?)?/g);
 		lineNode.range = { start: chars[0].position, end: tail(chars).position };
 		lineNode.chars = chars;
 	} else if (/^!\[\[.*]]$/.test(line)) {

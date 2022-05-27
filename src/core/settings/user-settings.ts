@@ -9,6 +9,11 @@ export const userSettingsStore = new Store({
 	migrations: {
 		"0.1.0": (s) => {
 			s.set("appearance", { theme: "system", accentColor: "pink" });
+			s.set("graph", {
+				showFolders: true,
+				showTags: true,
+				showLinks: true,
+			});
 			s.set("editor", {
 				showLineNumbers: true,
 				alwaysShowMarkdownSymbols: true,

@@ -6,19 +6,28 @@ import { isFolder } from "@modules/file-explorer/utils/is-folder";
 import { useAppDispatch } from "@core/state/store";
 import { findOrdoFile } from "@modules/file-explorer/utils/find-ordo-file";
 
-const collectNodes = (tree: OrdoFolder, nodes: any[] = [], edges: any[] = []) => {
-	nodes.push({
-		...tree,
-		label: tree.readableName,
-		id: tree.path,
-		height: tree.depth,
-		color: "#bde0fe",
-		size: tree.children.length + 10,
-	});
+const collectNodes = (
+	tree: OrdoFolder,
+	nodes: any[] = [],
+	edges: any[] = [],
+	showTags: boolean,
+	showLinks: boolean,
+	showFolders: boolean,
+) => {
+	if (showFolders) {
+		nodes.push({
+			...tree,
+			label: tree.readableName,
+			id: tree.path,
+			height: tree.depth,
+			color: "#bde0fe",
+			size: tree.children.length + 10,
+		});
+	}
 
 	tree.children.forEach((child) => {
 		if (isFolder(child)) {
-			collectNodes(child, nodes, edges);
+			collectNodes(child, nodes, edges, showTags, showLinks, showFolders);
 		} else {
 			nodes.push({
 				...child,
@@ -30,7 +39,7 @@ const collectNodes = (tree: OrdoFolder, nodes: any[] = [], edges: any[] = []) =>
 			});
 
 			if (child.frontmatter) {
-				if (child.frontmatter.tags) {
+				if (showTags && child.frontmatter.tags) {
 					child.frontmatter.tags.forEach((tag: string) => {
 						if (!nodes.some((node) => node.id === tag)) {
 							nodes.push({
@@ -43,48 +52,51 @@ const collectNodes = (tree: OrdoFolder, nodes: any[] = [], edges: any[] = []) =>
 						}
 
 						edges.push({
+							width: 1,
 							color: "#cdb4db",
 							from: child.path,
 							to: tag,
-							length: 100,
+							length: 150,
 						});
 					});
 				}
 
-				if (child.frontmatter.embeds) {
+				if (showLinks && child.frontmatter.embeds) {
 					child.frontmatter.embeds.forEach((embed: string) => {
 						edges.push({
+							width: 2,
 							arrow: "to",
 							color: "#ffafcc",
 							from: child.path,
 							to: embed,
-							length: 500,
+							length: 50,
 						});
 					});
 				}
 
-				if (child.frontmatter.links) {
+				if (showLinks && child.frontmatter.links) {
 					child.frontmatter.links.forEach((embed: string) => {
 						edges.push({
+							width: 2,
 							dashes: true,
 							arrow: "to",
 							color: "#ffafcc",
 							from: child.path,
 							to: embed,
-							length: 500,
+							length: 100,
 						});
 					});
 				}
 			}
 		}
 
-		if (!edges.some((l) => l.source === tree.path && l.target === child.path)) {
+		if (showFolders && !edges.some((l) => l.source === tree.path && l.target === child.path)) {
 			edges.push({
 				arrows: "to",
 				color: isFolder(child) ? "#a2d2ff" : "#ffafcc",
 				from: tree.path,
 				to: child.path,
-				length: isFolder(child) ? 310 : 150,
+				length: 300,
 			});
 		}
 	});
@@ -92,8 +104,8 @@ const collectNodes = (tree: OrdoFolder, nodes: any[] = [], edges: any[] = []) =>
 	return { nodes, edges };
 };
 
-const createNetwork = (tree: OrdoFolder) => {
-	const { nodes, edges } = collectNodes(tree, [], []);
+const createNetwork = (tree: OrdoFolder, showTags: boolean, showLinks: boolean, showFolders: boolean) => {
+	const { nodes, edges } = collectNodes(tree, [], [], showTags, showLinks, showFolders);
 
 	edges.forEach((edge) => {
 		if (!nodes.some((node) => node.id === edge.to)) {
@@ -129,11 +141,14 @@ const createNetwork = (tree: OrdoFolder) => {
 type GraphProps = {
 	tree: OrdoFolder;
 	height?: string;
+	showTags?: boolean;
+	showFolders?: boolean;
+	showLinks?: boolean;
 };
 
 export const Graph: React.FC<GraphProps> = React.memo(
-	({ tree, height = "98vh" }) => {
-		const data = createNetwork(tree);
+	({ tree, height = "98vh", showTags = true, showFolders = true, showLinks = true }) => {
+		const data = createNetwork(tree, showTags, showLinks, showFolders);
 		const ref = React.useRef<HTMLDivElement>(null);
 		const dispatch = useAppDispatch();
 

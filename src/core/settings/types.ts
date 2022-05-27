@@ -21,6 +21,11 @@ export type UserSettings = {
 		theme: "system" | "light" | "dark";
 		// accentColor: Color;
 	};
+	graph: {
+		showFolders: boolean;
+		showTags: boolean;
+		showLinks: boolean;
+	};
 	editor: {
 		showLineNumbers: boolean;
 		alwaysShowMarkdownSymbols: boolean;

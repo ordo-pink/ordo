@@ -15,6 +15,28 @@ export const userSettingsSchema: Schema<UserSettings> = {
 			},
 		},
 	},
+	graph: {
+		type: "object",
+		description: "Graph::Graph settings",
+		properties: {
+			showFolders: {
+				description: "Show folders::Turn this on to make graphs show the full filesystem hierarchy including folders",
+				type: "boolean",
+				default: true,
+			},
+			showTags: {
+				description: "Show tags::Turn this on to make graphs show tags used in files",
+				type: "boolean",
+				default: true,
+			},
+			showLinks: {
+				description:
+					"Show links::Turn this on to make graphs show links between files. Links will be shown as dashed lines, ebmeds will be shown as solid lines",
+				type: "boolean",
+				default: true,
+			},
+		},
+	},
 	editor: {
 		type: "object",
 		description: "Editor::Editor related settings",

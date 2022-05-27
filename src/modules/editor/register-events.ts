@@ -22,11 +22,19 @@ const visit = (
 	} = { tags: [], embeds: [], links: [] },
 ) => {
 	if (isNodeWithChars(node)) {
-		if (node.type === TextNodeWithCharsType.TAG && !saved.tags.includes(node.data.tag as string)) {
+		if (node.type === TextNodeWithCharsType.TAG && !saved.tags.includes(node.data.tag as string) && node.data.tag) {
 			saved.tags.push(node.data.tag as string);
-		} else if (node.type === TextNodeWithCharsType.EMBED && !saved.embeds.includes(node.data.relativePath as string)) {
+		} else if (
+			node.type === TextNodeWithCharsType.EMBED &&
+			!saved.embeds.includes(node.data.relativePath as string) &&
+			node.data.relativePath
+		) {
 			saved.embeds.push(node.data.relativePath as string);
-		} else if (node.type === TextNodeWithCharsType.LINK && !saved.links.includes(node.data.href as string)) {
+		} else if (
+			node.type === TextNodeWithCharsType.LINK &&
+			!saved.links.includes(node.data.href as string) &&
+			node.data.href
+		) {
 			saved.links.push(node.data.href as string);
 		}
 	} else {

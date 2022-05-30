@@ -17,14 +17,14 @@ export const GraphComponent = React.memo(
 		const tree = useAppSelector((state) => state.fileExplorer.tree);
 		const [content, setContent] = React.useState<OrdoFolder | null>(null);
 
-		const parsed: string[] = token.data.parsed as string[];
-
 		const [showTags, setShowTags] = React.useState<boolean>(true);
 		const [showFolders, setShowFolders] = React.useState<boolean>(true);
 		const [showLinks, setShowLinks] = React.useState<boolean>(true);
 		const [height, setHeight] = React.useState<string>("40vh");
 
 		React.useEffect(() => {
+			const parsed: string[] = token.data.parsed as string[];
+
 			Either.fromNullable(tree)
 				.chain((t) =>
 					Either.fromNullable(parsed.find((attr) => attr.startsWith("folder=")))
@@ -54,7 +54,7 @@ export const GraphComponent = React.memo(
 				() => setShowLinks(true),
 				() => setShowLinks(false),
 			);
-		}, []);
+		}, [tree.children.length]);
 
 		return Either.fromNullable(content).fold(NoOp, (t) => (
 			<div className="rounded-xl bg-neutral-50 shadow-lg mb-4">

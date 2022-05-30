@@ -22,4 +22,11 @@ export default registerCommands([
 		icon: "HiOutlineCog",
 		accelerator: "CommandOrControl+,",
 	},
+	{
+		name: "Open Welcome Page",
+		description: "Switch to Welcome Page.",
+		event: "@activity-bar/open-welcome-page",
+		icon: "HiOutlineInbox",
+		accelerator: "CommandOrControl+Alt+W",
+	},
 ]);

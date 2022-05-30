@@ -17,7 +17,12 @@ export type ActivityBarSelectEvent = OrdoEvent<ACTIVITY_BAR_SCOPE, "select", str
 export type OpenEditorEvent = OrdoEvent<ACTIVITY_BAR_SCOPE, "open-editor">;
 export type OpenGraphEvent = OrdoEvent<ACTIVITY_BAR_SCOPE, "open-graph">;
 export type OpenFindInFilesEvent = OrdoEvent<ACTIVITY_BAR_SCOPE, "open-find-in-files">;
+export type OpenWelcomePageEvent = OrdoEvent<ACTIVITY_BAR_SCOPE, "open-welcome-page">;
 export type OpenAchievementsEvent = OrdoEvent<ACTIVITY_BAR_SCOPE, "open-achievements">;
 export type OpenSettingsEvent = OrdoEvent<ACTIVITY_BAR_SCOPE, "open-settings">;
 
-export type ActivityBarEvents = ActivityBarSelectEvent & OpenEditorEvent & OpenGraphEvent & OpenSettingsEvent;
+export type ActivityBarEvents = ActivityBarSelectEvent &
+	OpenEditorEvent &
+	OpenGraphEvent &
+	OpenSettingsEvent &
+	OpenWelcomePageEvent;

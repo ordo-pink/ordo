@@ -3,7 +3,6 @@ import { Either } from "or-else";
 
 import { useAppSelector } from "@core/state/store";
 import { ActivityBarIcon } from "@modules/activity-bar/components/activity-bar-icon";
-import { NoOp } from "@utils/no-op";
 
 import "@modules/activity-bar/index.css";
 

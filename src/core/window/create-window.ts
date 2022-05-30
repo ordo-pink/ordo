@@ -1,4 +1,4 @@
-import { BrowserWindow, dialog, app, clipboard, shell, ipcMain, globalShortcut, nativeTheme } from "electron";
+import { BrowserWindow, dialog, app, clipboard, shell, ipcMain, globalShortcut, nativeTheme, Menu } from "electron";
 import install, { REACT_DEVELOPER_TOOLS, REDUX_DEVTOOLS } from "electron-devtools-installer";
 import { is, centerWindow } from "electron-util";
 
@@ -10,6 +10,7 @@ import { initCommands } from "@init/commands";
 import { initialState } from "@init/state";
 import { WindowContext } from "@init/types";
 import { userSettingsStore } from "@core/settings/user-settings";
+import { getApplicationMenu } from "@core/application-menu";
 
 declare const MAIN_WINDOW_WEBPACK_ENTRY: string;
 declare const MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY: string;
@@ -56,8 +57,6 @@ export const createWindow = async (): Promise<void> => {
 		window = null as any;
 	});
 
-	// Menu.setApplicationMenu(Menu.buildFromTemplate(getTemplateMenu(createWindow)));
-
 	window.on("ready-to-show", () => {
 		window.show();
 	});
@@ -86,19 +85,10 @@ export const createWindow = async (): Promise<void> => {
 
 	await initCommands(transmission);
 
-	window.on("focus", () => {
-		transmission
-			.select((s) => s.app.commands)
-			.forEach((command) => {
-				if (command.accelerator) {
-					globalShortcut.register(command.accelerator, () => transmission.emit(command.event, null));
-				}
-			});
-	});
+	Menu.setApplicationMenu(getApplicationMenu(transmission));
 
 	window.on("blur", () => {
 		transmission.emit("@editor/unfocus", null);
-		globalShortcut.unregisterAll();
 	});
 
 	window.loadURL(MAIN_WINDOW_WEBPACK_ENTRY);

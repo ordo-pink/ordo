@@ -16,7 +16,7 @@ export const Lines = React.memo(
 		const focused = useAppSelector((state) => state.editor.focused);
 
 		const handleKeyDown = (e: KeyboardEvent) => {
-			if (!tab || !focused || e.key === "Tab") return;
+			if (!tab || !focused || e.key === "Tab" || e.ctrlKey || e.altKey || e.metaKey) return;
 
 			const { key, shiftKey, altKey, ctrlKey, metaKey } = e;
 

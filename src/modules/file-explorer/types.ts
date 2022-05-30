@@ -64,8 +64,8 @@ export type MoveFileOrFolderEvent = OrdoEvent<
 
 export type ToggleFolderEvent = OrdoEvent<FILE_EXPLORER_SCOPE, "toggle-folder", string>;
 export type SetFolderColorEvent = OrdoEvent<FILE_EXPLORER_SCOPE, "set-folder-color", { path: string; color: Color }>;
-export type RevealInFinderEvent = OrdoEvent<FILE_EXPLORER_SCOPE, "reveal-in-finder", string | undefined>;
-export type CopyPathEvent = OrdoEvent<FILE_EXPLORER_SCOPE, "copy-path", string | undefined>;
+export type RevealInFinderEvent = OrdoEvent<FILE_EXPLORER_SCOPE, "reveal-in-finder", string | null>;
+export type CopyPathEvent = OrdoEvent<FILE_EXPLORER_SCOPE, "copy-path", string | null>;
 export type FoldFolderEvent = OrdoEvent<FILE_EXPLORER_SCOPE, "fold-folder", string>;
 export type UnfoldFolderEvent = OrdoEvent<FILE_EXPLORER_SCOPE, "unfold-folder", string>;
 export type ShowFileCreationEvent = OrdoEvent<FILE_EXPLORER_SCOPE, "show-file-creation", string>;

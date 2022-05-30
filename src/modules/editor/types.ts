@@ -29,7 +29,7 @@ export type EDITOR_SCOPE = "editor";
 
 export type ToggleTodoEvent = OrdoEvent<EDITOR_SCOPE, "toggle-todo", number>;
 export type OpenTabEvent = OrdoEvent<EDITOR_SCOPE, "open-tab", string>;
-export type CloseTabEvent = OrdoEvent<EDITOR_SCOPE, "close-tab", string>;
+export type CloseTabEvent = OrdoEvent<EDITOR_SCOPE, "close-tab", string | null>;
 export type FocusEvent = OrdoEvent<EDITOR_SCOPE, "focus">;
 export type UnfocusEvent = OrdoEvent<EDITOR_SCOPE, "unfocus">;
 export type HandleTypingEvent = OrdoEvent<

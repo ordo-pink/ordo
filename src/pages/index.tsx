@@ -10,7 +10,7 @@ export default function IndexPage() {
     <div className="flex flex-col min-h-screen bg-gradient-to-br from-neutral-50 to-neutral-100 dark:from-neutral-700 dark:to-neutral-800 text-neutral-800 dark:text-neutral-300">
       <Seo
         title="Ordo Home"
-        description="Ordo is a knowledge for you, your team, and the humanity."
+        description="Ordo is a knowledge manager for you, your team, and the humanity."
       />
       <Header />
       <div className="flex-grow flex flex-col items-center justify-center justify-self-center self-center">

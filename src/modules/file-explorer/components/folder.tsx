@@ -62,10 +62,16 @@ export const Folder: React.FC<FolderProps> = ({ folder }) => {
 	};
 
 	const handleContextMenu = (e: React.MouseEvent) =>
-		dispatch({
-			type: "@file-explorer/show-folder-context-menu",
-			payload: { path: folder.path, x: e.clientX, y: e.clientY },
-		});
+		Either.of(e)
+			.map(tapPreventDefault)
+			.map(tapStopPropagation)
+			.map(() =>
+				dispatch({
+					type: "@file-explorer/show-folder-context-menu",
+					payload: { path: folder.path, x: e.clientX, y: e.clientY },
+				}),
+			)
+			.fold(...FoldVoid);
 
 	const handleClick = () => dispatch({ type: "@file-explorer/toggle-folder", payload: folder.path });
 

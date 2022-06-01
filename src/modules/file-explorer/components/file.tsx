@@ -1,9 +1,12 @@
 import React from "react";
+import { Either } from "or-else";
 
 import { useAppDispatch, useAppSelector } from "@core/state/store";
 import { OrdoFile } from "@modules/file-explorer/types";
 import { useFileIcon } from "@modules/file-explorer/hooks/use-file-icon";
 import { useTreeNesting } from "@modules/file-explorer/hooks/use-tree-nesting";
+import { tapPreventDefault, tapStopPropagation } from "@utils/events";
+import { FoldVoid } from "@utils/either";
 
 type FileProps = {
 	file: OrdoFile;
@@ -35,10 +38,16 @@ export const File: React.FC<FileProps> = ({ file }) => {
 		event.dataTransfer.setData("fileName", file.readableName);
 	};
 	const handleContextMenu = (e: React.MouseEvent) =>
-		dispatch({
-			type: "@file-explorer/show-file-context-menu",
-			payload: { path: file.path, x: e.clientX, y: e.clientY },
-		});
+		Either.of(e)
+			.map(tapPreventDefault)
+			.map(tapStopPropagation)
+			.map(() =>
+				dispatch({
+					type: "@file-explorer/show-file-context-menu",
+					payload: { path: file.path, x: e.clientX, y: e.clientY },
+				}),
+			)
+			.fold(...FoldVoid);
 
 	return (
 		<div

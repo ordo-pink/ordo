@@ -440,7 +440,6 @@ export const parseLineContent = parse({
 
 				while (
 					currentChar &&
-					reader.lookAhead() &&
 					(currentChar.type === CharType.CHAR ||
 						currentChar.type === CharType.UNDERSCORE ||
 						currentChar.type === CharType.SLASH ||
@@ -537,7 +536,13 @@ export const parseLineContent = parse({
 const shouldBreakDefaultParsing = (char: Char | null, reader: Reader) =>
 	!char ||
 	char.type === CharType.BACKTICK ||
-	char.type === CharType.HASH ||
+	(char.type === CharType.HASH &&
+		reader.lookAhead() &&
+		(reader.lookAhead()!.type === CharType.CHAR ||
+			reader.lookAhead()!.type === CharType.UNDERSCORE ||
+			reader.lookAhead()!.type === CharType.SLASH ||
+			reader.lookAhead()!.type === CharType.HYPHEN ||
+			reader.lookAhead()!.type === CharType.OCTET)) ||
 	char.type === CharType.STAR ||
 	char.type === CharType.UNDERSCORE ||
 	(char.type === CharType.BRACKET_OPEN && reader.lookAhead() && reader.lookAhead()!.type === CharType.BRACKET_OPEN) ||

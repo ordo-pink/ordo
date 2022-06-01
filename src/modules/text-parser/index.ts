@@ -438,7 +438,14 @@ export const parseLineContent = parse({
 				const chars: Char[] = [char];
 				let currentChar: Char | null = reader.next();
 
-				while (currentChar && currentChar.type !== CharType.WHITESPACE && currentChar.type !== CharType.HASH) {
+				while (
+					currentChar &&
+					(currentChar.type === CharType.CHAR ||
+						currentChar.type === CharType.UNDERSCORE ||
+						currentChar.type === CharType.SLASH ||
+						currentChar.type === CharType.HYPHEN ||
+						currentChar.type === CharType.OCTET)
+				) {
 					currentChar.position.line = tree.range.start.line;
 					chars.push(currentChar);
 

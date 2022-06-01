@@ -440,6 +440,7 @@ export const parseLineContent = parse({
 
 				while (
 					currentChar &&
+					reader.lookAhead() &&
 					(currentChar.type === CharType.CHAR ||
 						currentChar.type === CharType.UNDERSCORE ||
 						currentChar.type === CharType.SLASH ||

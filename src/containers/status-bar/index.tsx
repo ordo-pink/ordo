@@ -27,15 +27,19 @@ export const StatusBar: React.FC = () => {
 		<div className="status-bar">
 			<div className="status-bar-side-container">
 				{tab && (
-					<div
-						className="status-bar-item"
-						onClick={handleClick}
-						title={`The caret is located on character ${tab.caretPositions[0].start.character} of line ${tab.caretPositions[0].start.line}`}
-					>
+					<div className="status-bar-item" onClick={handleClick}>
 						<Code />
-						<span>
-							Ln {tab.caretPositions[0].start.line}, Col {tab.caretPositions[0].start.character}
-						</span>
+						<div className="flex space-x-2">
+							{tab.caretPositions.map((position, index) => (
+								<div
+									title={`The caret is located on character ${position.start.character} of line ${position.start.line}`}
+									className=""
+								>
+									{position.start.line}:{position.start.character}
+									{index !== tab.caretPositions.length - 1 ? "," : ""}
+								</div>
+							))}
+						</div>
 					</div>
 				)}
 			</div>

@@ -111,7 +111,6 @@ export const TopBar: React.FC = () => {
 	};
 
 	const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-		console.log("Hello");
 		dispatch({ type: "@top-bar/set-value", payload: e.target.value });
 		setSelected(0);
 

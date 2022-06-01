@@ -78,6 +78,8 @@ export default registerEvents<EditorEvents>({
 		tab.content.children[payload] = parseLine(line.raw, payload, tab.content, {
 			depth: tab.content.depth,
 		});
+
+		tab.content.raw = tab.content.children.map((line) => line.raw).join("\n");
 	},
 	"@editor/open-tab": async ({ draft, payload, transmission, context }) => {
 		const currentTab = transmission.select((state) => state.editor.currentTab);

@@ -116,21 +116,7 @@ export const TopBar: React.FC = () => {
 
 		if (e.target.value.startsWith(":") && Boolean(currentTab)) {
 			e.stopPropagation();
-
-			const split = e.target.value.slice(1).split(":");
-			dispatch({
-				type: "@editor/update-caret-positions",
-				payload: {
-					path: currentTab,
-					positions: [
-						{
-							start: { line: Number(split[0]) - 1, character: split[1] ? Number(split[1]) : 0 },
-							end: { line: Number(split[0]) - 1, character: split[1] ? Number(split[1]) : 0 },
-							direction: "ltr",
-						},
-					],
-				},
-			});
+			e.preventDefault();
 		}
 	};
 
@@ -165,6 +151,27 @@ export const TopBar: React.FC = () => {
 				? dispatch({ type: "@top-bar/run-command", payload: fusedCommands[selected].item.event })
 				: value.startsWith("@")
 				? dispatch({ type: "@editor/open-tab", payload: fusedFiles[selected].item.path })
+				: value.startsWith(":")
+				? // TODO: Refactor this insanity
+				  dispatch({
+						type: "@editor/update-caret-positions",
+						payload: {
+							path: currentTab,
+							positions: [
+								{
+									start: {
+										line: Number(value.slice(1).split(":")[0]),
+										character: value.slice(1).split(":")[1] ? Number(value.slice(1).split(":")[1]) : 0,
+									},
+									end: {
+										line: Number(value.slice(1).split(":")[0]),
+										character: value.slice(1).split(":")[1] ? Number(value.slice(1).split(":")[1]) : 0,
+									},
+									direction: "ltr",
+								},
+							],
+						},
+				  })
 				: null;
 		} else if (e.key === "Escape") {
 			e.preventDefault();

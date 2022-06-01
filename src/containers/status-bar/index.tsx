@@ -32,6 +32,7 @@ export const StatusBar: React.FC = () => {
 						<div className="flex space-x-2">
 							{tab.caretPositions.map((position, index) => (
 								<div
+									key={`${position.start.line}-${position.start.character}`}
 									title={`The caret is located on character ${position.start.character} of line ${position.start.line}`}
 									className=""
 								>

@@ -32,7 +32,7 @@ export const Settings: React.FC = () => {
 								))}
 						</div>
 						{Object.keys(schema[key].properties).map((property) => (
-							<p key={`${key}-${property}`} className="">
+							<div key={`${key}-${property}`} className="">
 								{property !== "exclude" && property !== "associations" && (
 									<label className="flex justify-between items-center w-full py-3">
 										<div>
@@ -52,7 +52,9 @@ export const Settings: React.FC = () => {
 												}
 											>
 												{schema[key].properties[property].enum.map((value: string) => (
-													<option value={value}>{value}</option>
+													<option key={`${key}-${value}`} value={value}>
+														{value}
+													</option>
 												))}
 											</select>
 										) : null}
@@ -67,7 +69,7 @@ export const Settings: React.FC = () => {
 										) : null}
 									</label>
 								)}
-							</p>
+							</div>
 						))}
 					</fieldset>
 				))}

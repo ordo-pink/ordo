@@ -57,7 +57,7 @@ export const GraphComponent = React.memo(
 		}, [tree.children.length]);
 
 		return Either.fromNullable(content).fold(NoOp, (t) => (
-			<div className="rounded-xl bg-neutral-50 shadow-lg mb-4">
+			<div className="rounded-xl bg-neutral-50 dark:bg-neutral-800 shadow-lg mb-4">
 				<Graph tree={t} showFolders={showFolders} showLinks={showLinks} showTags={showTags} height={height} />
 			</div>
 		));

@@ -144,8 +144,9 @@ export default registerEvents<EditorEvents>({
 		const tree = transmission.select((state) => state.fileExplorer.tree);
 		const tab = draft.editor.tabs.find((t) => t.path === currentTab);
 		const file = findOrdoFile(tree, "path", currentTab);
+		const index = tabIndex !== -1 ? tabIndex : currentTabIndex;
 
-		if (!file || !tab || (currentTabIndex === -1 && tabIndex === -1)) {
+		if (!file || !tab || index === -1) {
 			return;
 		}
 
@@ -161,12 +162,25 @@ export default registerEvents<EditorEvents>({
 			}
 		}
 
-		draft.editor.tabs.splice(tabIndex !== -1 ? tabIndex : currentTabIndex, 1);
-		draft.editor.currentTab = draft.editor.tabs.length > 0 ? draft.editor.tabs[0].path : "";
+		draft.editor.tabs.splice(index, 1);
+		const nextFilePath = draft.editor.tabs[index === 0 ? draft.editor.tabs.length - 1 : 0]?.path || "";
 
-		context.window.setRepresentedFilename(file ? file.path : "");
-		context.window.setTitle(file ? `${file.relativePath} — ${tree.readableName}` : "Ordo");
-		draft.editor.focused = false;
+		if (draft.editor.tabs.length) {
+			draft.editor.currentTab = nextFilePath;
+		}
+
+		const nextFile = findOrdoFile(tree, "path", nextFilePath);
+
+		if (!nextFile) {
+			context.window.setRepresentedFilename("");
+			context.window.setTitle("Ordo");
+			draft.editor.focused = false;
+			return;
+		}
+
+		context.window.setRepresentedFilename(nextFile.path);
+		context.window.setTitle(`${nextFile.relativePath} — ${tree.readableName}`);
+		draft.editor.focused = true;
 	},
 	"@editor/update-caret-positions": ({ draft, payload }) => {
 		const tab = draft.editor.tabs.find((t) => t.path === payload.path);

@@ -13,6 +13,7 @@ const collectNodes = (
 	showTags: boolean,
 	showLinks: boolean,
 	showFolders: boolean,
+	isDarkMode = false,
 ) => {
 	if (showFolders) {
 		nodes.push({
@@ -20,20 +21,20 @@ const collectNodes = (
 			label: tree.readableName,
 			id: tree.path,
 			height: tree.depth,
-			color: "#bde0fe",
+			color: isDarkMode ? "#86C6FD" : "#bde0fe",
 			size: tree.children.length + 10,
 		});
 	}
 
 	tree.children.forEach((child) => {
 		if (isFolder(child)) {
-			collectNodes(child, nodes, edges, showTags, showLinks, showFolders);
+			collectNodes(child, nodes, edges, showTags, showLinks, showFolders, isDarkMode);
 		} else {
 			nodes.push({
 				...child,
 				label: child.readableName,
 				id: child.path,
-				color: "#ffc8dd",
+				color: isDarkMode ? "#FF99C0" : "#ffc8dd",
 				size: 10,
 				height: tree.depth,
 			});
@@ -45,7 +46,7 @@ const collectNodes = (
 							nodes.push({
 								label: `#${tag}`,
 								id: tag,
-								color: "#cdb4db",
+								color: isDarkMode ? "#B591CA" : "#cdb4db",
 								size: 15,
 								height: 0,
 							});
@@ -53,7 +54,7 @@ const collectNodes = (
 
 						edges.push({
 							width: 1,
-							color: "#cdb4db",
+							color: isDarkMode ? "#B591CA" : "#cdb4db",
 							from: child.path,
 							to: tag,
 							length: 150,
@@ -65,8 +66,7 @@ const collectNodes = (
 					child.frontmatter.embeds.forEach((embed: string) => {
 						edges.push({
 							width: 2,
-							arrow: "to",
-							color: "#ffafcc",
+							color: isDarkMode ? "#FF70A5" : "#ffafcc",
 							from: child.path,
 							to: embed,
 							length: 50,
@@ -79,8 +79,8 @@ const collectNodes = (
 						edges.push({
 							width: 2,
 							dashes: true,
-							arrow: "to",
-							color: "#ffafcc",
+							arrows: "to",
+							color: isDarkMode ? "#FF70A5" : "#ffafcc",
 							from: child.path,
 							to: embed,
 							length: 100,
@@ -93,7 +93,7 @@ const collectNodes = (
 		if (showFolders && !edges.some((l) => l.source === tree.path && l.target === child.path)) {
 			edges.push({
 				arrows: "to",
-				color: isFolder(child) ? "#a2d2ff" : "#ffafcc",
+				color: isFolder(child) ? (isDarkMode ? "#70BAFF" : "#a2d2ff") : isDarkMode ? "#FF70A5" : "#ffafcc",
 				from: tree.path,
 				to: child.path,
 				length: 300,
@@ -104,8 +104,14 @@ const collectNodes = (
 	return { nodes, edges };
 };
 
-const createNetwork = (tree: OrdoFolder, showTags: boolean, showLinks: boolean, showFolders: boolean) => {
-	const { nodes, edges } = collectNodes(tree, [], [], showTags, showLinks, showFolders);
+const createNetwork = (
+	tree: OrdoFolder,
+	showTags: boolean,
+	showLinks: boolean,
+	showFolders: boolean,
+	isDarkMode = false,
+) => {
+	const { nodes, edges } = collectNodes(tree, [], [], showTags, showLinks, showFolders, isDarkMode);
 
 	edges.forEach((edge) => {
 		if (!nodes.some((node) => node.id === edge.to)) {
@@ -113,18 +119,18 @@ const createNetwork = (tree: OrdoFolder, showTags: boolean, showLinks: boolean, 
 
 			if (!file) {
 				nodes.push(
-					edge.color === "#ffafcc"
+					edge.color === "#ffafcc" || edge.color === "#FF70A5"
 						? {
 								label: edge.to,
 								id: edge.to,
-								color: "#ffcdb2",
+								color: isDarkMode ? "#FF99C0" : "#ffc8dd",
 								size: 15,
 								height: 0,
 						  }
 						: {
 								label: edge.to,
 								id: edge.to,
-								color: "#bde0fe",
+								color: isDarkMode ? "#86C6FD" : "#bde0fe",
 								size: 15,
 								height: 0,
 						  },
@@ -148,11 +154,10 @@ type GraphProps = {
 
 export const Graph: React.FC<GraphProps> = React.memo(
 	({ tree, height = "98vh", showTags = true, showFolders = true, showLinks = true }) => {
-		const data = createNetwork(tree, showTags, showLinks, showFolders);
+		const mode = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+		const data = createNetwork(tree, showTags, showLinks, showFolders, mode === "dark");
 		const ref = React.useRef<HTMLDivElement>(null);
 		const dispatch = useAppDispatch();
-
-		const isDarkMode = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
 
 		React.useEffect(() => {
 			if (!ref.current) return;
@@ -168,7 +173,7 @@ export const Graph: React.FC<GraphProps> = React.memo(
 					},
 					font: {
 						size: 12,
-						color: isDarkMode === "dark" ? "#ddd" : "#111",
+						color: mode === "dark" ? "#ddd" : "#111",
 					},
 				},
 				edges: {

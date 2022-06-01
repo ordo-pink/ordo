@@ -1,12 +1,13 @@
 import React from "react";
-import { useAppSelector } from "@core/state/store";
 import { Either } from "or-else";
-import { Graph } from ".";
-import { NoOp } from "@utils/no-op";
+
+import { useAppSelector } from "@core/state/store";
 import { NodeWithChars } from "@core/parser/types";
 import { findOrdoFolder } from "@modules/file-explorer/utils/find-ordo-folder";
 import { OrdoFolder } from "@modules/file-explorer/types";
+import { Graph } from "@modules/graph";
 import { id } from "@utils/functions";
+import { NoOp } from "@utils/no-op";
 
 type GraphComponentProps = {
 	token: NodeWithChars;
@@ -22,6 +23,7 @@ export const GraphComponent = React.memo(
 		const [showLinks, setShowLinks] = React.useState<boolean>(true);
 		const [height, setHeight] = React.useState<string>("40vh");
 		const [width, setWidth] = React.useState<string>("50vw");
+		const [showBackground, setShowBackground] = React.useState<boolean>(true);
 
 		React.useEffect(() => {
 			const parsed: string[] = token.data.parsed as string[];
@@ -37,6 +39,11 @@ export const GraphComponent = React.memo(
 			Either.fromNullable(parsed.find((attr) => attr === "no-folders")).fold(
 				() => setShowFolders(true),
 				() => setShowFolders(false),
+			);
+
+			Either.fromNullable(parsed.find((attr) => attr === "no-background")).fold(
+				() => setShowBackground(true),
+				() => setShowBackground(false),
 			);
 
 			Either.fromNullable(parsed.find((attr) => attr === "no-tags")).fold(
@@ -65,7 +72,10 @@ export const GraphComponent = React.memo(
 		}, [tree.children.length]);
 
 		return Either.fromNullable(content).fold(NoOp, (t) => (
-			<div className="rounded-xl bg-neutral-50 dark:bg-neutral-800 shadow-lg mb-4" style={{ width }}>
+			<div
+				className={`mb-4 ${showBackground && "rounded-xl bg-neutral-50 dark:bg-neutral-800 shadow-lg"}`}
+				style={{ width }}
+			>
 				<Graph tree={t} showFolders={showFolders} showLinks={showLinks} showTags={showTags} height={height} />
 			</div>
 		));

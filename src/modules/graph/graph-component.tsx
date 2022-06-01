@@ -22,7 +22,7 @@ export const GraphComponent = React.memo(
 		const [showFolders, setShowFolders] = React.useState<boolean>(true);
 		const [showLinks, setShowLinks] = React.useState<boolean>(true);
 		const [height, setHeight] = React.useState<string>("40vh");
-		const [width, setWidth] = React.useState<string>("50vw");
+		const [width, setWidth] = React.useState<string>("100%");
 		const [showBackground, setShowBackground] = React.useState<boolean>(true);
 
 		React.useEffect(() => {
@@ -61,7 +61,7 @@ export const GraphComponent = React.memo(
 			Either.fromNullable(parsed.find((attr) => attr.startsWith("width=")))
 				.map((attr) => attr.slice(7, -1))
 				.fold(
-					() => setWidth("50vw"),
+					() => setWidth("100%"),
 					(v) => setWidth(v),
 				);
 

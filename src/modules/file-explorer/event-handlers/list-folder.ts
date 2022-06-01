@@ -1,7 +1,7 @@
 import { promises, createReadStream } from "fs";
 import { join } from "path";
 import { Minimatch } from "minimatch";
-import { createInterface } from "readline";
+import { randomUUID } from "crypto";
 
 import { OrdoEventHandler } from "@core/types";
 import { userSettingsStore } from "@core/settings/user-settings";
@@ -10,6 +10,7 @@ import { createOrdoFile } from "@modules/file-explorer/utils/create-ordo-file";
 import { createOrdoFolder } from "@modules/file-explorer/utils/create-ordo-folder";
 import { sortTree } from "@modules/file-explorer/utils/sort-tree";
 import { extractFrontmatter } from "@modules/text-parser";
+import { existsSync } from "original-fs";
 
 /**
  * Collects the list of all files and folders within the path.
@@ -23,6 +24,19 @@ export const listFolder = async (path: string, depth = 0, rootPath = path): Prom
 	const excluded = excludePatterns.map((pattern) => new Minimatch(pattern));
 
 	const relativePath = path.replace(rootPath, "");
+
+	const folderConfigPath = join(path, ".ordo");
+
+	if (!existsSync(folderConfigPath)) {
+		const defaultConfig = {
+			uuid: randomUUID(),
+			color: "neutral",
+			collapsed: false,
+		};
+
+		await promises.writeFile(folderConfigPath, JSON.stringify(defaultConfig), "utf8");
+	}
+
 	const tree = createOrdoFolder({
 		depth,
 		path,
@@ -54,6 +68,8 @@ export const listFolder = async (path: string, depth = 0, rootPath = path): Prom
 						case "collapsed":
 							tree.collapsed = dotOrdo.collapsed;
 							break;
+						case "uuid":
+							tree.uuid = dotOrdo.uuid;
 						default:
 							break;
 					}
@@ -85,6 +101,14 @@ export const listFolder = async (path: string, depth = 0, rootPath = path): Prom
 				});
 
 				file.frontmatter = extractFrontmatter(maybeRawFrontmatter).frontmatter;
+				if (!file.frontmatter?.uuid) {
+					if (!file.frontmatter) {
+						file.frontmatter = {};
+						file.frontmatter.uuid = randomUUID();
+					}
+
+					file.uuid = file.frontmatter.uuid;
+				}
 			}
 
 			tree.children.push(file);

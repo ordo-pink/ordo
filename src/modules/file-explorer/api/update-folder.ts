@@ -26,7 +26,7 @@ export const updateFolder = (path: string, update: Partial<OrdoFolder>): void =>
 		promises
 			.readFile(dotOrdoPath, "utf-8")
 			.then(JSON.parse)
-			.then((data) => promises.writeFile(dotOrdoPath, JSON.stringify({ ...data, ...dotOrdo }, null, 2)))
-			.catch(() => promises.writeFile(dotOrdoPath, JSON.stringify(dotOrdo, null, 2)));
+			.then((data) => promises.writeFile(dotOrdoPath, JSON.stringify({ ...data, ...dotOrdo })))
+			.catch(() => promises.writeFile(dotOrdoPath, JSON.stringify(dotOrdo)));
 	}
 };

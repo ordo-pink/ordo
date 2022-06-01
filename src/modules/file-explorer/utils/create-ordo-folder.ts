@@ -1,4 +1,5 @@
 import { sep } from "path";
+import { randomUUID } from "crypto";
 
 import { OrdoFolder } from "@modules/file-explorer/types";
 
@@ -8,6 +9,7 @@ type CreateOrdoFolderArg = {
 	createdAt?: Date;
 	updatedAt?: Date;
 	accessedAt?: Date;
+	uuid?: string;
 	collapsed?: boolean;
 	relativePath: string;
 };
@@ -18,6 +20,7 @@ export const createOrdoFolder = ({
 	updatedAt = new Date(),
 	accessedAt = new Date(),
 	path,
+	uuid,
 	collapsed = true,
 	relativePath,
 }: CreateOrdoFolderArg): OrdoFolder => {
@@ -25,6 +28,7 @@ export const createOrdoFolder = ({
 	const readableName = splittablePath.slice(splittablePath.lastIndexOf(sep) + 1);
 
 	return {
+		uuid: uuid ? uuid : randomUUID(),
 		path,
 		relativePath,
 		readableName,

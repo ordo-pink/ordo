@@ -1,4 +1,5 @@
 import { sep } from "path";
+import { randomUUID } from "crypto";
 
 import { userSettingsStore } from "@core/settings/user-settings";
 import { OrdoFile } from "@modules/file-explorer/types";
@@ -16,6 +17,7 @@ interface CreateOrdoFileArg {
 	path: string;
 	size?: number;
 	depth?: number;
+	uuid?: string;
 	createdAt?: Date;
 	updatedAt?: Date;
 	accessedAt?: Date;
@@ -28,6 +30,7 @@ export const createOrdoFile = ({
 	updatedAt = new Date(),
 	accessedAt = new Date(),
 	path,
+	uuid,
 	relativePath,
 	size = 0,
 }: CreateOrdoFileArg): OrdoFile => {
@@ -41,6 +44,7 @@ export const createOrdoFile = ({
 	const readableSize = toReadableSize(size);
 
 	return {
+		uuid: uuid ? uuid : randomUUID(),
 		depth,
 		createdAt,
 		updatedAt,

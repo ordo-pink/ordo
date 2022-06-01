@@ -1,4 +1,5 @@
 import { promises } from "fs";
+import { randomUUID } from "crypto";
 
 import { OrdoEventHandler } from "@core/types";
 import { debounce } from "@utils/debounce";
@@ -31,6 +32,11 @@ export const handleSaveFile: OrdoEventHandler<"@file-explorer/save-file"> = asyn
 		let fileContent = tab.content.raw;
 
 		if (file.frontmatter) {
+			if (!file.frontmatter.uuid) {
+				file.frontmatter.uuid = file.uuid ?? randomUUID();
+				console.log(file.uuid);
+			}
+
 			fileContent = "---\n".concat(JSON.stringify(file.frontmatter)).concat("\n---\n").concat(fileContent);
 		}
 

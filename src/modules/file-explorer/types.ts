@@ -2,6 +2,7 @@ import { Color } from "@core/appearance/colors";
 import { OrdoEvent } from "@core/types";
 
 export type OrdoFile = {
+	uuid: string;
 	path: string;
 	readableName: string;
 	relativePath: string;
@@ -18,6 +19,7 @@ export type OrdoFile = {
 };
 
 export type OrdoFolder = {
+	uuid: string;
 	collapsed: boolean;
 	path: string;
 	readableName: string;

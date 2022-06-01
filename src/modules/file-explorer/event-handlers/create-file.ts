@@ -1,4 +1,5 @@
-import { join, resolve, sep } from "path";
+import { join, sep } from "path";
+import { randomUUID } from "crypto";
 import { existsSync, promises } from "fs";
 
 import { OrdoEventHandler } from "@core/types";
@@ -21,7 +22,15 @@ export const handleCreateFile: OrdoEventHandler<"@file-explorer/create-file"> = 
 		await transmission.emit("@file-explorer/create-folder", parentPath);
 	}
 
-	await promises.writeFile(path, "", "utf-8");
+	const defaultConfig = {
+		uuid: randomUUID(),
+		color: "neutral",
+		tags: [],
+		embeds: [],
+		links: [],
+	};
+
+	await promises.writeFile(path, `---\n${JSON.stringify(defaultConfig)}\n---\n`, "utf-8");
 
 	await transmission.emit("@file-explorer/hide-creation", null);
 	await transmission.emit("@file-explorer/list-folder", tree.path);

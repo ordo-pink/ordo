@@ -5,7 +5,7 @@ import { useAppDispatch, useAppSelector } from "@core/state/store";
 import { useCurrentTab } from "@modules/editor/hooks/use-current-tab";
 import { tapPreventDefault, tapStopPropagation } from "@utils/events";
 import { FoldVoid, fromBoolean } from "@utils/either";
-import { NoOp } from "@utils/no-op";
+import { NoOp, noOpFn } from "@utils/no-op";
 
 type LineNumberProps = {
 	number: number;
@@ -24,11 +24,17 @@ export const LineNumber = React.memo(
 						.map(tapPreventDefault)
 						.map(tapStopPropagation)
 						.map(() => ({ line: number, character: 0 }))
-						.map((position) => [{ start: position, end: position, direction: "ltr" as const }])
-						.map((positions) => ({ path: t.path, positions }))
-						.map((payload) => dispatch({ type: "@editor/update-caret-positions", payload })),
+						.map((position) => [{ start: position, end: position, direction: "ltr" as const }]),
 				)
-				.fold(...FoldVoid);
+				.fold(noOpFn, (payload) =>
+					dispatch({
+						type: "@editor/update-caret-positions",
+						payload: {
+							path: tab!.path,
+							positions: tab!.caretPositions.concat(payload),
+						},
+					}),
+				);
 
 		return fromBoolean(showLineNumbers)
 			.chain(() => Either.fromNullable(tab))

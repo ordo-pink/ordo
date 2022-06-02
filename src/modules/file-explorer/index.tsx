@@ -17,6 +17,32 @@ export const FileExplorer: React.FC = () => {
 
 	const tree = useAppSelector((state) => state.fileExplorer.tree);
 
+	const [draggedOver, setDraggedOver] = React.useState<boolean>(false);
+
+	const handleDragLeave = (event: React.MouseEvent) =>
+		Either.right(event)
+			.map(tapPreventDefault)
+			.map(tapStopPropagation)
+			.map(() => (draggedOver ? setDraggedOver(false) : void 0))
+			.fold(...FoldVoid);
+
+	const handleDragOver = (event: React.MouseEvent) =>
+		Either.right(event)
+			.map(tapPreventDefault)
+			.map(tapStopPropagation)
+			.map(() => (draggedOver ? void 0 : setDraggedOver(true)))
+			.fold(...FoldVoid);
+
+	const handleDrop = (event: React.DragEvent) =>
+		Either.right(event)
+			.map(tapPreventDefault)
+			.map(tapStopPropagation)
+			.map((e) => ({ name: e.dataTransfer.getData("fileName"), oldPath: e.dataTransfer.getData("oldPath") }))
+			.map(({ name, oldPath }) => ({ name, oldPath, newFolder: tree.path }))
+			.map((payload) => dispatch({ type: "@file-explorer/move", payload }))
+			.map(() => (draggedOver ? setDraggedOver(false) : void 0))
+			.fold(...FoldVoid);
+
 	const handleContextMenu = (e: React.MouseEvent) =>
 		Either.of(e)
 			.map(tapPreventDefault)
@@ -30,7 +56,13 @@ export const FileExplorer: React.FC = () => {
 			.fold(...FoldVoid);
 
 	return Either.fromNullable(tree).fold(NoOp, (folder) => (
-		<div className="file-explorer" onContextMenu={handleContextMenu}>
+		<div
+			className={`file-explorer ${draggedOver ? "bg-neutral-400 dark:bg-neutral-800" : ""}`}
+			onContextMenu={handleContextMenu}
+			onDragLeave={handleDragLeave}
+			onDragOver={handleDragOver}
+			onDrop={handleDrop}
+		>
 			<Header />
 			<Creator path={folder.path} depth={0} />
 			<div className="file-explorer_tree-wrapper">

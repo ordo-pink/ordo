@@ -30,6 +30,7 @@ export const Kanban: React.FC<Props> = React.memo(
 		const [columns, setColumns] = React.useState<Columns>({});
 		const [tasks, setTasks] = React.useState<Tasks>({});
 		const [columnOrder, setColumnOrder] = React.useState<string[]>([]);
+		const [showBackground, setShowBackground] = React.useState<boolean>(true);
 
 		React.useEffect(() => {
 			const parsed: string[] = token.data.parsed as string[];
@@ -68,6 +69,11 @@ export const Kanban: React.FC<Props> = React.memo(
 					() => setDisplayProperties([]),
 					(ps) => setDisplayProperties(ps),
 				);
+
+			Either.fromNullable(parsed.find((attr) => attr === "no-background")).fold(
+				() => setShowBackground(true),
+				() => setShowBackground(false),
+			);
 
 			Either.fromNullable(parsed.find((attr) => attr.startsWith("height=")))
 				.map((attr) => attr.slice(8, -1))
@@ -149,7 +155,13 @@ export const Kanban: React.FC<Props> = React.memo(
 
 		return (
 			<DragDropContext onDragEnd={handleDragEnd}>
-				<div className="w-full flex space-x-2 rounded-lg cursor-auto" style={{ width, height }} onClick={handleClick}>
+				<div
+					className={`w-full flex space-x-2 rounded-lg cursor-auto ${
+						showBackground ? "rounded-xl bg-neutral-50 dark:bg-neutral-800 shadow-lg p-2" : ""
+					}`}
+					style={{ width, height }}
+					onClick={handleClick}
+				>
 					{columnOrder.map((columnId) =>
 						Either.fromNullable(columns)
 							.chain((cs) => Either.fromNullable(cs[columnId]))

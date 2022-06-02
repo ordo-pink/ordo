@@ -24,7 +24,7 @@ export const handleSaveFile: OrdoEventHandler<"@file-explorer/save-file"> = asyn
 		const tab = draft.editor.tabs.find((t) => t.path === currentTab);
 		const file = findOrdoFile(draft.fileExplorer.tree, "path", currentTab);
 
-		if (!tab || !file) return;
+		if (!tab || !file || file.type !== "document") return;
 
 		tab.raw = tab.content.raw;
 		file.size = new TextEncoder().encode(tab.raw === "\n" ? "" : tab.raw).length;

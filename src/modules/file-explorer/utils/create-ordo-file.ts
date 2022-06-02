@@ -35,7 +35,7 @@ export const createOrdoFile = ({
 	size = 0,
 }: CreateOrdoFileArg): OrdoFile => {
 	const readableName = path.substring(path.lastIndexOf(sep) + 1);
-	const extension = readableName.substring(readableName.lastIndexOf(".")) ?? ".md";
+	const extension = readableName.substring(readableName.lastIndexOf("."));
 
 	const associations = userSettingsStore.store.explorer.associations;
 	const association = associations.find((a) => a.extension === extension);
@@ -51,7 +51,7 @@ export const createOrdoFile = ({
 		accessedAt,
 		path,
 		size,
-		readableName,
+		readableName: readableName.slice(0, -extension.length),
 		relativePath,
 		extension,
 		readableSize,

@@ -84,18 +84,18 @@ export const Task: React.FC<Props> = ({ task, displayProperties, index }) => {
 						</div>
 
 						<div className="pt-1 flex items-center justify-between">
-							<LinkIcon
-								title={`Open "${task.readableName}" in a new tab`}
-								className="text-neutral-500 hover:text-rose-500 transition-colors duration-300 cursor-pointer"
-								onClick={handleLinkClick}
-								tabIndex={0}
-							/>
-							<XIcon
-								title="Remove card"
-								className="text-neutral-500 hover:text-rose-500 transition-colors duration-300 cursor-pointer"
-								onClick={handleRemoveClick}
-								tabIndex={0}
-							/>
+							<button className="outline-pink-400 dark:outline-purple-500" onClick={handleLinkClick}>
+								<LinkIcon
+									title={`Open "${task.readableName}" in a new tab`}
+									className="text-neutral-500 hover:text-rose-500 transition-colors duration-300 cursor-pointer"
+								/>
+							</button>
+							<button className="outline-pink-400 dark:outline-purple-500" onClick={handleRemoveClick}>
+								<XIcon
+									title="Remove card"
+									className="text-neutral-500 hover:text-rose-500 transition-colors duration-300 cursor-pointer"
+								/>
+							</button>
 						</div>
 					</div>
 				</div>

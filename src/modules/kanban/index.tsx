@@ -2,7 +2,7 @@ import React from "react";
 import { Either } from "or-else";
 import { DragDropContext, DropResult, ResponderProvided } from "react-beautiful-dnd";
 
-import { useAppSelector } from "@core/state/store";
+import { useAppDispatch, useAppSelector } from "@core/state/store";
 import { findOrdoFolder } from "@modules/file-explorer/utils/find-ordo-folder";
 import { id, tap } from "@utils/functions";
 import { Column } from "./components/column";
@@ -22,6 +22,8 @@ type Props = {
 
 export const Kanban: React.FC<Props> = React.memo(
 	({ token }) => {
+		const dispatch = useAppDispatch();
+
 		const tree = useAppSelector((state) => state.fileExplorer.tree);
 
 		const [height, setHeight] = React.useState<string>("40vh");
@@ -153,8 +155,10 @@ export const Kanban: React.FC<Props> = React.memo(
 			});
 		};
 
+		const handleBeforeDragStart = () => dispatch({ type: "@editor/unfocus" });
+
 		return (
-			<DragDropContext onDragEnd={handleDragEnd}>
+			<DragDropContext onDragEnd={handleDragEnd} onBeforeDragStart={handleBeforeDragStart}>
 				<div
 					className={`w-full flex space-x-2 rounded-lg cursor-auto ${
 						showBackground ? "rounded-xl bg-neutral-50 dark:bg-neutral-800 shadow-lg p-2" : ""

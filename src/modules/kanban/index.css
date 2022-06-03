@@ -1,16 +1,22 @@
 .column {
-	&::-webkit-scrollbar {
-		width: 5px;
+	@apply overflow-hidden flex flex-col h-full;
 
-		&-thumb {
-			@apply invisible rounded-sm bg-neutral-300 dark:bg-neutral-600;
-		}
-	}
+	&_task-list {
+		@apply flex-grow overflow-auto;
 
-	&:hover {
 		&::-webkit-scrollbar {
+			width: 5px;
+
 			&-thumb {
-				@apply visible;
+				@apply invisible rounded-sm bg-neutral-300 dark:bg-neutral-700;
+			}
+		}
+
+		&:hover {
+			&::-webkit-scrollbar {
+				&-thumb {
+					@apply visible;
+				}
 			}
 		}
 	}

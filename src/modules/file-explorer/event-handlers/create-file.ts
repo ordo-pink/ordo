@@ -10,7 +10,10 @@ import { OrdoEventHandler } from "@core/types";
 export const handleCreateFile: OrdoEventHandler<"@file-explorer/create-file"> = async ({ transmission, payload }) => {
 	const { createFileIn, tree } = transmission.select((state) => state.fileExplorer);
 
-	const path = join(createFileIn ? createFileIn : tree.path, payload);
+	const path =
+		typeof payload === "string"
+			? join(createFileIn ? createFileIn : tree.path, payload)
+			: join(payload.parentPath, payload.name);
 
 	if (existsSync(path)) {
 		return;
@@ -34,5 +37,8 @@ export const handleCreateFile: OrdoEventHandler<"@file-explorer/create-file"> = 
 
 	await transmission.emit("@file-explorer/hide-creation", null);
 	await transmission.emit("@file-explorer/list-folder", tree.path);
-	await transmission.emit("@editor/open-tab", path);
+
+	if (typeof payload === "string") {
+		await transmission.emit("@editor/open-tab", path);
+	}
 };

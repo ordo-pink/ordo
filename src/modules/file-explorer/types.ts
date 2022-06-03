@@ -41,8 +41,16 @@ export type FileExplorerState = {
 
 export type FILE_EXPLORER_SCOPE = "file-explorer";
 
-export type CreateFileEvent = OrdoEvent<FILE_EXPLORER_SCOPE, "create-file", string>;
-export type CreateFolderEvent = OrdoEvent<FILE_EXPLORER_SCOPE, "create-folder", string>;
+export type CreateFileEvent = OrdoEvent<
+	FILE_EXPLORER_SCOPE,
+	"create-file",
+	{ name: string; parentPath: string } | string
+>;
+export type CreateFolderEvent = OrdoEvent<
+	FILE_EXPLORER_SCOPE,
+	"create-folder",
+	{ name: string; parentPath: string } | string
+>;
 export type FindOrdoFileEvent = OrdoEvent<FILE_EXPLORER_SCOPE, "find-file", { [K in keyof OrdoFile]: OrdoFile[K] }>;
 export type FindOrdoFolderEvent = OrdoEvent<
 	FILE_EXPLORER_SCOPE,

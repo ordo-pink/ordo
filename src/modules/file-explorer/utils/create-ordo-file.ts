@@ -4,6 +4,7 @@ import { randomUUID } from "crypto";
 import { userSettingsStore } from "@core/settings/user-settings";
 import { OrdoFile } from "@modules/file-explorer/types";
 
+// TODO: Move to frontend
 const toReadableSize = (a: number, b = 2, k = 1024): string => {
 	const d = Math.floor(Math.log(a) / Math.log(k));
 	return 0 == a
@@ -51,7 +52,7 @@ export const createOrdoFile = ({
 		accessedAt,
 		path,
 		size,
-		readableName: readableName.slice(0, -extension.length),
+		readableName,
 		relativePath,
 		extension,
 		readableSize,

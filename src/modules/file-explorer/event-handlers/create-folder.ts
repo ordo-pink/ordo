@@ -11,7 +11,10 @@ export const handleCreateFolder: OrdoEventHandler<"@file-explorer/create-folder"
 	payload,
 }) => {
 	const { createFolderIn, tree } = transmission.select((state) => state.fileExplorer);
-	const path = join(createFolderIn, payload);
+	const path =
+		typeof payload === "string"
+			? join(createFolderIn ? createFolderIn : tree.path, payload)
+			: join(payload.parentPath, payload.name);
 
 	if (existsSync(path)) {
 		return;

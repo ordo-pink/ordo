@@ -1,3 +1,4 @@
+import { useIcon } from "@core/hooks/use-icon";
 import { useAppDispatch } from "@core/state/store";
 import React from "react";
 import { Droppable } from "react-beautiful-dnd";
@@ -13,6 +14,7 @@ type Props = {
 
 export const Column: React.FC<Props> = ({ column, tasks, displayProperties }) => {
 	const dispatch = useAppDispatch();
+	const XIcon = useIcon("HiX");
 
 	const ref = React.useRef<HTMLInputElement>(null);
 	const [inputValue, setInputValue] = React.useState<string>("");
@@ -42,9 +44,17 @@ export const Column: React.FC<Props> = ({ column, tasks, displayProperties }) =>
 	};
 
 	return (
-		<div className={`column w-1/3 max-w-xs min-w-[250px] column_${column.color} rounded-lg overflow-auto`}>
-			<div className={`uppercase font-bold text-center column_${column.color} py-2`}>
+		<div className={`column w-1/3 max-w-xs min-w-[250px] column_${column.color} rounded-lg`}>
+			<div className={`uppercase flex justify-between items-center px-2 font-bold column_${column.color} py-2`}>
 				<h3>{column.readableName}</h3>
+				<div>
+					<XIcon
+						title="Remove column"
+						className="outline-pink-400 dark:outline-purple-500 text-neutral-600 dark:text-neutral-300 hover:text-rose-500 dark:hover:text-rose-400 transition-colors duration-300 cursor-pointer"
+						onClick={() => dispatch({ type: "@file-explorer/remove-folder", payload: column.path })}
+						tabIndex={0}
+					/>
+				</div>
 			</div>
 
 			<div className="column_task-list">

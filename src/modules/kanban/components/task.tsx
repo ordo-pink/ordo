@@ -50,7 +50,7 @@ export const Task: React.FC<Props> = ({ task, displayProperties, index }) => {
 					ref={provided.innerRef}
 					{...provided.draggableProps}
 					{...provided.dragHandleProps}
-					className={`p-2 bg-gradient-to-br outline-pink-400 dark:outline-purple-500 rounded-lg whitespace-pre-wrap flex space-x-1 shadow-lg transition-colors duration-300 ${
+					className={`p-2 bg-gradient-to-br outline-pink-400 dark:outline-purple-500 rounded-lg whitespace-pre-wrap flex space-x-1 shadow-md transition-colors duration-300 ${
 						snapshot.isDragging
 							? "from-stone-100 dark:from-stone-700 to-stone-200 dark:to-stone-800"
 							: "from-neutral-50 dark:from-neutral-700 to-neutral-100 dark:to-neutral-800"
@@ -85,12 +85,16 @@ export const Task: React.FC<Props> = ({ task, displayProperties, index }) => {
 
 						<div className="pt-1 flex items-center justify-between">
 							<LinkIcon
+								title={`Open "${task.readableName}" in a new tab`}
 								className="text-neutral-500 hover:text-rose-500 transition-colors duration-300 cursor-pointer"
 								onClick={handleLinkClick}
+								tabIndex={0}
 							/>
 							<XIcon
+								title="Remove card"
 								className="text-neutral-500 hover:text-rose-500 transition-colors duration-300 cursor-pointer"
 								onClick={handleRemoveClick}
+								tabIndex={0}
 							/>
 						</div>
 					</div>

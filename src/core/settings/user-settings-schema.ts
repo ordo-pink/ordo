@@ -110,6 +110,12 @@ export const userSettingsSchema: Schema<UserSettings> = {
 				type: "boolean",
 				default: true,
 			},
+			confirmMove: {
+				description:
+					"Confirm moving and renaming::Show the annoying alert asking if you are sure you know what you are doing",
+				type: "boolean",
+				default: true,
+			},
 		},
 	},
 };

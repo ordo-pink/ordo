@@ -5,8 +5,10 @@ import { useIcon } from "@core/hooks/use-icon";
 import { OrdoFile } from "@modules/file-explorer/types";
 import { Either } from "or-else";
 import { tapPreventDefault, tapStopPropagation } from "@utils/events";
-import { useAppDispatch } from "@core/state/store";
+import { useAppDispatch, useAppSelector } from "@core/state/store";
 import { Task as TTask } from "../types";
+import { fromBoolean } from "@utils/either";
+import { getFolderOrParent } from "@modules/file-explorer/utils/get-folder-or-parent";
 
 type Props = {
 	task: TTask;
@@ -17,9 +19,22 @@ type Props = {
 export const Task: React.FC<Props> = ({ task, displayProperties, index }) => {
 	const dispatch = useAppDispatch();
 
+	const tree = useAppSelector((state) => state.fileExplorer.tree);
+
+	const titleInputRef = React.useRef<HTMLInputElement>(null);
+	const [isTitleEditable, setIsTitleEditable] = React.useState<boolean>(false);
+	const [cardTitleInputValue, setCardTitleInputValue] = React.useState<string>(task.readableName);
+
 	const LinkIcon = useIcon("HiOutlineLink");
+	const ShareIcon = useIcon("HiOutlineShare");
 	const XIcon = useIcon("HiX");
-	const TagIcon = useIcon("HiOutlineTag");
+	const PencilIcon = useIcon("HiOutlinePencilAlt");
+
+	React.useEffect(() => {
+		if (isTitleEditable && titleInputRef.current) {
+			titleInputRef.current.focus();
+		}
+	}, [isTitleEditable, titleInputRef.current]);
 
 	const handleLinkClick = (e: React.MouseEvent) =>
 		Either.of(e)
@@ -43,6 +58,40 @@ export const Task: React.FC<Props> = ({ task, displayProperties, index }) => {
 				}),
 			);
 
+	const handleTitleInputFocus = () => dispatch({ type: "@editor/unfocus" });
+
+	const handleTitleInputBlur = () => {
+		setIsTitleEditable(false);
+		setCardTitleInputValue(task.readableName);
+	};
+
+	const handleEditClick = () => {
+		setIsTitleEditable((editable) => !editable);
+	};
+	const handleTitleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => setCardTitleInputValue(e.target.value);
+
+	const handleTitleInputKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+		if (e.key === "Escape") {
+			e.preventDefault();
+			e.stopPropagation();
+			titleInputRef.current && titleInputRef.current.blur();
+		} else if (e.key === "Enter") {
+			setIsTitleEditable(false);
+			const parent = getFolderOrParent(tree, task.path);
+			const name = cardTitleInputValue.trim();
+
+			parent &&
+				dispatch({
+					type: "@file-explorer/move",
+					payload: {
+						oldPath: task.path,
+						newFolder: parent.path,
+						name: name.endsWith(".md") ? name : name.concat(".md"),
+					},
+				});
+		}
+	};
+
 	return (
 		<Draggable draggableId={task.path} index={index}>
 			{(provided, snapshot) => (
@@ -57,12 +106,28 @@ export const Task: React.FC<Props> = ({ task, displayProperties, index }) => {
 					}`}
 				>
 					<div className="flex flex-col space-y-2 flex-grow">
-						<div>{task.readableName}</div>
+						{fromBoolean(isTitleEditable).fold(
+							() => (
+								<div>{task.readableName}</div>
+							),
+							() => (
+								<input
+									ref={titleInputRef}
+									className="outline-pink-400 dark:outline-purple-500 rounded bg-transparent border-0 p-0"
+									type="text"
+									value={cardTitleInputValue}
+									onChange={handleTitleInputChange}
+									onFocus={handleTitleInputFocus}
+									onBlur={handleTitleInputBlur}
+									onKeyDown={handleTitleInputKeyDown}
+								/>
+							),
+						)}
 						<div className="flex space-x-2">
 							{displayProperties.includes("links") && task.frontmatter && task.frontmatter.links.length > 0 && (
 								<div className="text-sm">
 									<div className="flex space-x-1 items-center text-neutral-500 dark:text-neutral-400">
-										<LinkIcon />
+										<ShareIcon />
 										<div>{task.frontmatter!.links.length}</div>
 									</div>
 								</div>
@@ -84,12 +149,20 @@ export const Task: React.FC<Props> = ({ task, displayProperties, index }) => {
 						</div>
 
 						<div className="pt-1 flex items-center justify-between">
-							<button className="outline-pink-400 dark:outline-purple-500" onClick={handleLinkClick}>
-								<LinkIcon
-									title={`Open "${task.readableName}" in a new tab`}
-									className="text-neutral-500 hover:text-rose-500 transition-colors duration-300 cursor-pointer"
-								/>
-							</button>
+							<div className="flex items-center space-x-1">
+								<button className="outline-pink-400 dark:outline-purple-500" onClick={handleLinkClick}>
+									<LinkIcon
+										title={`Open "${task.readableName}" in a new tab`}
+										className="text-neutral-500 hover:text-rose-500 transition-colors duration-300 cursor-pointer"
+									/>
+								</button>
+								<button className="outline-pink-400 dark:outline-purple-500" onClick={handleEditClick}>
+									<PencilIcon
+										title="Edit card title"
+										className="text-neutral-500 hover:text-rose-500 transition-colors duration-300 cursor-pointer"
+									/>
+								</button>
+							</div>
 							<button className="outline-pink-400 dark:outline-purple-500" onClick={handleRemoveClick}>
 								<XIcon
 									title="Remove card"

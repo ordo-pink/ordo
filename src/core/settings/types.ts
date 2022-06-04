@@ -42,6 +42,7 @@ export type UserSettings = {
 		exclude: string[];
 		associations: Array<{ extension: string; association: string }>;
 		confirmDelete: boolean;
+		confirmMove: boolean;
 		// enableDragAndDrop: boolean;
 	};
 };

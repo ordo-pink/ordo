@@ -9,6 +9,7 @@ import { OrdoEventHandler } from "@core/types";
 export const handleMove: OrdoEventHandler<"@file-explorer/move"> = async ({ payload, transmission, context }) => {
 	const { oldPath, name, newFolder } = payload;
 	const tree = transmission.select((state) => state.fileExplorer.tree);
+	const confirmMove = transmission.select((state) => state.app.userSettings.explorer.confirmMove);
 
 	const newPath = join(newFolder, name);
 
@@ -16,11 +17,13 @@ export const handleMove: OrdoEventHandler<"@file-explorer/move"> = async ({ payl
 		return;
 	}
 
-	const result = context.dialog.showMessageBoxSync(context.window, {
-		type: "question",
-		buttons: ["Yes", "No"],
-		message: `Are you sure you want to move "${name}" to "${newFolder}"?`,
-	});
+	const result = confirmMove
+		? context.dialog.showMessageBoxSync(context.window, {
+				type: "question",
+				buttons: ["Yes", "No"],
+				message: `Are you sure you want to move "${name}" to "${newFolder}"?`,
+		  })
+		: 0;
 
 	if (result === 0) {
 		await promises.rename(oldPath, newPath);

@@ -29,6 +29,7 @@ export const Task: React.FC<Props> = ({ task, displayProperties, index }) => {
 	const ShareIcon = useIcon("HiOutlineShare");
 	const XIcon = useIcon("HiX");
 	const PencilIcon = useIcon("HiOutlinePencilAlt");
+	const CheckIcon = useIcon("HiOutlineCheckCircle");
 
 	React.useEffect(() => {
 		if (isTitleEditable && titleInputRef.current) {
@@ -129,6 +130,23 @@ export const Task: React.FC<Props> = ({ task, displayProperties, index }) => {
 									<div className="flex space-x-1 items-center text-neutral-500 dark:text-neutral-400">
 										<ShareIcon />
 										<div>{task.frontmatter!.links.length}</div>
+									</div>
+								</div>
+							)}
+							{displayProperties.includes("todos") && task.frontmatter && task.frontmatter.todos && (
+								<div className="text-sm">
+									<div
+										className={`flex space-x-1 items-center ${
+											task.frontmatter.todos.pending.length === 0
+												? "text-emerald-500 dark:text-emerald-500 font-bold"
+												: "text-neutral-500 dark:text-neutral-400"
+										}`}
+									>
+										<CheckIcon />
+										<div>
+											{task.frontmatter.todos.done.length}/
+											{task.frontmatter.todos.done.length + task.frontmatter.todos.pending.length}
+										</div>
 									</div>
 								</div>
 							)}

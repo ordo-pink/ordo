@@ -19,7 +19,11 @@ const visit = (
 		tags: string[];
 		embeds: string[];
 		links: string[];
-	} = { tags: [], embeds: [], links: [] },
+		todos: {
+			done: string[];
+			pending: string[];
+		};
+	} = { tags: [], embeds: [], links: [], todos: { done: [], pending: [] } },
 ) => {
 	if (isNodeWithChars(node)) {
 		if (node.type === TextNodeWithCharsType.TAG && !saved.tags.includes(node.data.tag as string) && node.data.tag) {
@@ -38,6 +42,10 @@ const visit = (
 			saved.links.push(node.data.href as string);
 		}
 	} else {
+		if (node.type === TextNodeWithChildrenType.TODO) {
+			node.raw.startsWith("[ ] ") ? saved.todos.pending.push(node.raw.slice(4)) : saved.todos.done.push(node.raw.slice(4));
+		}
+
 		node.children.forEach((child) => visit(child as any, saved));
 	}
 
@@ -45,7 +53,7 @@ const visit = (
 };
 
 const collectFrontmatterValues = (file: OrdoFile, tab: EditorTab) => {
-	const { tags, embeds, links } = visit(tab.content);
+	const { tags, embeds, links, todos } = visit(tab.content);
 
 	if (!file.frontmatter) {
 		file.frontmatter = {};
@@ -54,16 +62,21 @@ const collectFrontmatterValues = (file: OrdoFile, tab: EditorTab) => {
 	file.frontmatter.tags = tags;
 	file.frontmatter.embeds = embeds;
 	file.frontmatter.links = links;
+	file.frontmatter.todos = todos;
 
 	tab.content.data.frontmatter = file.frontmatter;
 };
 
 export default registerEvents<EditorEvents>({
-	"@editor/toggle-todo": ({ draft, payload }) => {
+	"@editor/toggle-todo": async ({ draft, payload, transmission }) => {
 		const { currentTab, tabs } = draft.editor;
 		const tab = tabs.find((t) => t.path === currentTab);
 
 		if (!tab) return;
+
+		const file = findOrdoFile(draft.fileExplorer.tree, "path", tab.path);
+
+		if (!file) return;
 
 		const line = tab.content.children[payload] as NodeWithChildren;
 		const checked = line.raw.charAt(1) === "x";
@@ -71,15 +84,23 @@ export default registerEvents<EditorEvents>({
 		const check = (str: string) => str.replace("[ ] ", "[x] ");
 		const uncheck = (str: string) => str.replace("[x] ", "[ ] ");
 
-		line.raw = checked ? uncheck(line.raw) : check(line.raw);
-
-		tab.unsaved = true;
+		if (checked) {
+			line.raw = uncheck(line.raw);
+			file.frontmatter!.todos.done.splice(file.frontmatter!.todos.done.indexOf(line.raw.slice(4)), 1);
+			file.frontmatter!.todos.pending.push(line.raw.slice(4));
+		} else {
+			line.raw = check(line.raw);
+			file.frontmatter!.todos.pending.splice(file.frontmatter!.todos.pending.indexOf(line.raw.slice(4)), 1);
+			file.frontmatter!.todos.done.push(line.raw.slice(4));
+		}
 
 		tab.content.children[payload] = parseLine(line.raw, payload, tab.content, {
 			depth: tab.content.depth,
 		});
 
 		tab.content.raw = tab.content.children.map((line) => line.raw).join("\n");
+
+		await transmission.emit("@file-explorer/save-file", { path: tab.path, content: tab.content.raw });
 	},
 	"@editor/open-tab": async ({ draft, payload, transmission, context }) => {
 		const currentTab = transmission.select((state) => state.editor.currentTab);

@@ -15,6 +15,8 @@ import { NoOp, noOpFn } from "@utils/no-op";
 import { tapPreventDefault, tapStopPropagation } from "@utils/events";
 
 import "@modules/kanban/index.css";
+import { OrdoFolder } from "@modules/file-explorer/types";
+import { useIcon } from "@core/hooks/use-icon";
 
 type Props = {
 	token: NodeWithChars;
@@ -26,13 +28,26 @@ export const Kanban: React.FC<Props> = React.memo(
 
 		const tree = useAppSelector((state) => state.fileExplorer.tree);
 
+		const createColumnInputRef = React.useRef<HTMLInputElement>(null);
+
 		const [height, setHeight] = React.useState<string>("40vh");
 		const [width, setWidth] = React.useState<string>("100%");
+		const [folder, setFolder] = React.useState<OrdoFolder | null>(null);
 		const [displayProperties, setDisplayProperties] = React.useState<string[]>([]);
 		const [columns, setColumns] = React.useState<Columns>({});
 		const [tasks, setTasks] = React.useState<Tasks>({});
 		const [columnOrder, setColumnOrder] = React.useState<string[]>([]);
 		const [showBackground, setShowBackground] = React.useState<boolean>(true);
+		const [showColumnCreationInput, setShowColumnCreationInput] = React.useState<boolean>(false);
+		const [createColumnInputValue, setCreateInputColumnValue] = React.useState<string>("");
+
+		const PlusIcon = useIcon("HiPlus");
+
+		React.useEffect(() => {
+			if (createColumnInputRef.current && showColumnCreationInput) {
+				createColumnInputRef.current.focus();
+			}
+		}, [createColumnInputRef.current, showColumnCreationInput]);
 
 		React.useEffect(() => {
 			const parsed: string[] = token.data.parsed as string[];
@@ -53,6 +68,7 @@ export const Kanban: React.FC<Props> = React.memo(
 							{},
 						);
 
+						setFolder(tree);
 						setColumns(columns);
 						setColumnOrder(Object.keys(columns));
 					}),
@@ -155,29 +171,95 @@ export const Kanban: React.FC<Props> = React.memo(
 			});
 		};
 
+		const handleColumnInputChange = (e: React.ChangeEvent<HTMLInputElement>) => setCreateInputColumnValue(e.target.value);
+		const handleColumnInputFocus = () => dispatch({ type: "@editor/unfocus" });
+		const handleColumnInputBlur = () => {
+			setCreateInputColumnValue("");
+			setShowColumnCreationInput(false);
+		};
+		const handleColumnInputKeyDown = (e: React.KeyboardEvent) => {
+			if (e.key === "Escape") {
+				e.preventDefault();
+				e.stopPropagation();
+				createColumnInputRef.current?.blur();
+			} else if (e.key === "Enter") {
+				e.preventDefault();
+				e.stopPropagation();
+				dispatch({
+					type: "@file-explorer/create-folder",
+					payload: {
+						parentPath: folder!.path,
+						name: createColumnInputValue,
+					},
+				});
+				createColumnInputRef.current?.blur();
+			}
+		};
+
 		const handleBeforeDragStart = () => dispatch({ type: "@editor/unfocus" });
+		const handleAddColumnClick = (e: React.MouseEvent) =>
+			Either.of(e)
+				.map(tapPreventDefault)
+				.map(tapStopPropagation)
+				.map(() => setShowColumnCreationInput((prev) => !prev))
+				.fold(...FoldVoid);
 
 		return (
-			<DragDropContext onDragEnd={handleDragEnd} onBeforeDragStart={handleBeforeDragStart}>
-				<div
-					className={`w-full flex space-x-2 rounded-lg cursor-auto ${
-						showBackground ? "rounded-xl bg-neutral-50 dark:bg-neutral-800 shadow-lg p-2" : ""
-					}`}
-					style={{ width, height }}
-					onClick={handleClick}
-				>
-					{columnOrder.map((columnId) =>
-						Either.fromNullable(columns)
-							.chain((cs) => Either.fromNullable(cs[columnId]))
-							.chain((c) =>
-								Either.fromNullable(c.tasks)
-									.map((ts) => ts.map((id) => tasks[id]))
-									.map((ts) => <Column key={c.path} column={c} tasks={ts} displayProperties={displayProperties} />),
-							)
-							.fold(NoOp, id),
-					)}
+			<div
+				onClick={(e) =>
+					Either.fromNullable(e)
+						.map(tapPreventDefault)
+						.map(tapStopPropagation)
+						.fold(...FoldVoid)
+				}
+				className={`flex flex-col space-y-2 rounded-lg cursor-auto ${
+					showBackground ? "rounded-xl bg-neutral-50 dark:bg-neutral-800 shadow-lg p-2" : ""
+				}`}
+			>
+				<div className="flex justify-between items-center">
+					<h1 className="font-bold tracking-wide">{folder?.readableName}</h1>
+					<div className="flex space-x-2 items-center">
+						<button
+							className={`transition-colors duration-200 ${
+								showColumnCreationInput ? "text-rose-500" : "text-neutral-500 dark:text-neutral-400"
+							}`}
+							title="Add column"
+							onClick={handleAddColumnClick}
+						>
+							<PlusIcon />
+						</button>
+					</div>
 				</div>
-			</DragDropContext>
+				<DragDropContext onDragEnd={handleDragEnd} onBeforeDragStart={handleBeforeDragStart}>
+					<div className={`flex space-x-2 w-full  `} style={{ width, height }} onClick={handleClick}>
+						{columnOrder.map((columnId) =>
+							Either.fromNullable(columns)
+								.chain((cs) => Either.fromNullable(cs[columnId]))
+								.chain((c) =>
+									Either.fromNullable(c.tasks)
+										.map((ts) => ts.map((id) => tasks[id]))
+										.map((ts) => <Column key={c.path} column={c} tasks={ts} displayProperties={displayProperties} />),
+								)
+								.fold(NoOp, id),
+						)}
+						{showColumnCreationInput && (
+							<div>
+								<input
+									ref={createColumnInputRef}
+									value={createColumnInputValue}
+									onChange={handleColumnInputChange}
+									onKeyDown={handleColumnInputKeyDown}
+									onFocus={handleColumnInputFocus}
+									onBlur={handleColumnInputBlur}
+									type="text"
+									placeholder="+ Add column..."
+									className="w-full bg-transparent border-0 outline-pink-400 dark:outline-purple-500"
+								/>
+							</div>
+						)}
+					</div>
+				</DragDropContext>
+			</div>
 		);
 	},
 	() => true,

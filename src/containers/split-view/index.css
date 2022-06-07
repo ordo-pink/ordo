@@ -1,5 +1,5 @@
 .split-view-horizontal {
-	@apply flex w-full h-full;
+	@apply flex w-full;
 }
 
 .split-view-vertical {

@@ -1,7 +1,6 @@
 import React from "react";
 
 import { userSettingsSchema } from "@core/settings/user-settings-schema";
-import Scrollbars from "react-custom-scrollbars-2";
 import { useAppDispatch, useAppSelector } from "@core/state/store";
 
 export const Settings: React.FC = () => {
@@ -10,13 +9,7 @@ export const Settings: React.FC = () => {
 	const dispatch = useAppDispatch();
 
 	return (
-		<Scrollbars autoHide>
-			<div className="mx-[10%] mt-12 flex items-center justify-center">
-				<span className="px-4 py-2 bg-pink-200 text-pink-700 dark:bg-pink-800 dark:text-pink-200 rounded-lg shadow-lg text-sm text-center">
-					Updates are saved automatically 👍
-				</span>
-			</div>
-
+		<div className="h-[calc(100vh-3.75rem)] overflow-y-auto">
 			<form className="m-[10%]">
 				{Object.keys(schema).map((key) => (
 					<fieldset key={key} className="my-5 p-5 bg-neutral-200 dark:bg-neutral-600 rounded-lg shadow-lg">
@@ -74,6 +67,6 @@ export const Settings: React.FC = () => {
 					</fieldset>
 				))}
 			</form>
-		</Scrollbars>
+		</div>
 	);
 };

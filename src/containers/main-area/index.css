@@ -1,3 +1,3 @@
 .main-area {
-	@apply flex flex-col w-full h-full;
+	@apply flex flex-col w-full;
 }

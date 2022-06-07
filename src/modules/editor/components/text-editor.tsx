@@ -1,5 +1,4 @@
 import React from "react";
-import Scrollbars from "react-custom-scrollbars-2";
 import { Either } from "or-else";
 
 import { useAppDispatch } from "@core/state/store";
@@ -32,12 +31,10 @@ export const TextEditor: React.FC = React.memo(
 				.fold(...FoldVoid);
 
 		return tab ? (
-			<div className="h-full">
+			<div>
 				<Breadcrumbs />
 				<div className="editor_textarea" onClick={handleClick}>
-					<Scrollbars autoHide>
-						<Lines />
-					</Scrollbars>
+					<Lines />
 				</div>
 			</div>
 		) : null;

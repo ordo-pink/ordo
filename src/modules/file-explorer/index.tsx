@@ -1,5 +1,4 @@
 import React from "react";
-import Scrollbars from "react-custom-scrollbars-2";
 import { Either } from "or-else";
 
 import { useAppDispatch, useAppSelector } from "@core/state/store";
@@ -66,9 +65,7 @@ export const FileExplorer: React.FC = () => {
 			<Header />
 			<Creator path={folder.path} depth={0} />
 			<div className="file-explorer_tree-wrapper">
-				<Scrollbars autoHide>
-					<FolderContent folder={folder} />
-				</Scrollbars>
+				<FolderContent folder={folder} />
 			</div>
 		</div>
 	));

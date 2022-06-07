@@ -22,7 +22,7 @@
 	}
 
 	&_tree-wrapper {
-		@apply h-[calc(100vh-6.25rem)];
+		@apply h-[calc(100vh-6.25rem)] overflow-y-auto;
 	}
 
 	&_creator {

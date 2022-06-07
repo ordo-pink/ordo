@@ -62,7 +62,7 @@ export const Lines = React.memo(
 		}, [tab, focused]);
 
 		return tab ? (
-			<div className="editor_lines" onClick={handleClick}>
+			<div className="h-[calc(100vh-9rem)] overflow-auto" onClick={handleClick}>
 				{tab.content.children.map((_, lineIndex) => (
 					<Line key={`${lineIndex}`} lineIndex={lineIndex} />
 				))}

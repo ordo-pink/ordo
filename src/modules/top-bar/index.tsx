@@ -1,6 +1,5 @@
 import React from "react";
 import Fuse from "fuse.js";
-import Scrollbars from "react-custom-scrollbars-2";
 
 import { useAppDispatch, useAppSelector } from "@core/state/store";
 import { Command } from "@modules/top-bar/components/command";
@@ -198,45 +197,41 @@ export const TopBar: React.FC = () => {
 				/>
 				{isFocused && value.startsWith(">") ? (
 					<div style={{ height }} className="top-bar_list">
-						<Scrollbars autoHide>
-							<div>
-								{fusedCommands &&
-									fusedCommands.map(({ item }, index) => (
-										<Command
-											key={item.event}
-											index={index}
-											selected={selected}
-											name={item.name}
-											description={item.description}
-											icon={item.icon}
-											event={item.event}
-											accelerator={item.accelerator}
-											setSelected={setSelected}
-										/>
-									))}
-							</div>
-						</Scrollbars>
+						<div>
+							{fusedCommands &&
+								fusedCommands.map(({ item }, index) => (
+									<Command
+										key={item.event}
+										index={index}
+										selected={selected}
+										name={item.name}
+										description={item.description}
+										icon={item.icon}
+										event={item.event}
+										accelerator={item.accelerator}
+										setSelected={setSelected}
+									/>
+								))}
+						</div>
 					</div>
 				) : null}
 				{isFocused && value.startsWith("@") ? (
 					<div style={{ height }} className="top-bar_list">
-						<Scrollbars autoHide>
-							<div>
-								{fusedFiles &&
-									fusedFiles.map(({ item }, index) => (
-										<File
-											key={item.path}
-											index={index}
-											readableName={item.readableName}
-											size={item.size}
-											path={item.path}
-											type={item.type}
-											selected={selected}
-											setSelected={setSelected}
-										/>
-									))}
-							</div>
-						</Scrollbars>
+						<div>
+							{fusedFiles &&
+								fusedFiles.map(({ item }, index) => (
+									<File
+										key={item.path}
+										index={index}
+										readableName={item.readableName}
+										size={item.size}
+										path={item.path}
+										type={item.type}
+										selected={selected}
+										setSelected={setSelected}
+									/>
+								))}
+						</div>
 					</div>
 				) : null}
 			</div>

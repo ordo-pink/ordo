@@ -3,22 +3,6 @@
 
 	&_task-list {
 		@apply flex-grow overflow-auto;
-
-		&::-webkit-scrollbar {
-			width: 5px;
-
-			&-thumb {
-				@apply invisible rounded-sm bg-neutral-300 dark:bg-neutral-700;
-			}
-		}
-
-		&:hover {
-			&::-webkit-scrollbar {
-				&-thumb {
-					@apply visible;
-				}
-			}
-		}
 	}
 
 	&_neutral {

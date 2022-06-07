@@ -13,7 +13,7 @@ export const Workspace: React.FC = () => {
 	const Component = useWorkspaceComponent(currentActivity);
 
 	return (
-		<div className="h-[calc(100vh-3.75rem)]">
+		<div>
 			<Component />
 		</div>
 	);

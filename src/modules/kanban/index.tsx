@@ -213,10 +213,10 @@ export const Kanban: React.FC<Props> = React.memo(
 						.fold(...FoldVoid)
 				}
 				className={`flex flex-col space-y-2 rounded-lg cursor-auto ${
-					showBackground ? "rounded-xl bg-neutral-50 dark:bg-neutral-800 shadow-lg p-2" : ""
+					showBackground ? "rounded-xl bg-neutral-50 dark:bg-neutral-800 shadow-lg p-2 overflow-auto" : ""
 				}`}
 			>
-				<div className="flex justify-between items-center">
+				<div className="flex space-x-2 items-center">
 					<h1 className="font-bold tracking-wide">{folder?.readableName}</h1>
 					<div className="flex space-x-2 items-center">
 						<button

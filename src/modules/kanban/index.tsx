@@ -17,6 +17,7 @@ import { tapPreventDefault, tapStopPropagation } from "@utils/events";
 import "@modules/kanban/index.css";
 import { OrdoFolder } from "@modules/file-explorer/types";
 import { useIcon } from "@core/hooks/use-icon";
+import { findOrdoFile } from "@modules/file-explorer/utils/find-ordo-file";
 
 type Props = {
 	token: NodeWithChars;
@@ -168,6 +169,19 @@ export const Kanban: React.FC<Props> = React.memo(
 				...columns,
 				[newStart.readableName]: newStart,
 				[newFinish.readableName]: newFinish,
+			});
+
+			const file = findOrdoFile(tree, "path", draggableId);
+
+			if (!file) return;
+
+			dispatch({
+				type: "@file-explorer/move",
+				payload: {
+					oldPath: file.path,
+					newFolder: finish.path,
+					name: file.readableName,
+				},
 			});
 		};
 

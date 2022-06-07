@@ -12,15 +12,15 @@ type CharProps = {
 export const Character = React.memo(
 	({ char }: CharProps) => {
 		const dispatch = useAppDispatch();
-		const { tab } = useCurrentTab();
+		const current = useCurrentTab();
 		const alwaysShowMarkdownSymbols = useAppSelector((state) => state.app.userSettings.editor.alwaysShowMarkdownSymbols);
 
 		const [isCaretHere, setIsCaretHere] = React.useState<boolean>(false);
 
 		React.useEffect(() => {
-			if (tab && tab.caretPositions) {
+			if (current.tab && current.tab.caretPositions) {
 				setIsCaretHere(
-					tab.caretPositions.some(
+					current.tab.caretPositions.some(
 						(position) => char.position.line === position.start.line && char.position.character === position.start.character,
 					),
 				);
@@ -28,10 +28,10 @@ export const Character = React.memo(
 		}, [
 			char.position.line,
 			char.position.character,
-			tab,
-			tab && tab.caretPositions.length,
-			tab && tab.caretPositions[0].start.line,
-			tab && tab.caretPositions[0].start.character,
+			current.tab,
+			current.tab && current.tab.caretPositions.length,
+			current.tab && current.tab.caretPositions[0].start.line,
+			current.tab && current.tab.caretPositions[0].start.character,
 		]);
 
 		const handleClick = React.useCallback(
@@ -41,20 +41,20 @@ export const Character = React.memo(
 				e.preventDefault();
 				e.stopPropagation();
 
-				if (!tab) return;
+				if (!current.tab) return;
 
 				if (e.altKey) {
-					const found = tab.caretPositions.findIndex(
+					const found = current.tab.caretPositions.findIndex(
 						(position) => position.start.character === char.position.character && position.start.line === char.position.line,
 					);
 
 					if (found !== -1) {
-						const positions = tab.caretPositions.slice(0, found).concat(tab.caretPositions.slice(found + 1));
+						const positions = current.tab.caretPositions.slice(0, found).concat(current.tab.caretPositions.slice(found + 1));
 
 						dispatch({
 							type: "@editor/update-caret-positions",
 							payload: {
-								path: tab.path,
+								path: current.tab.path,
 								positions,
 							},
 						});
@@ -62,9 +62,9 @@ export const Character = React.memo(
 						dispatch({
 							type: "@editor/update-caret-positions",
 							payload: {
-								path: tab.path,
+								path: current.tab.path,
 								positions: [
-									...tab.caretPositions,
+									...current.tab.caretPositions,
 									{
 										start: {
 											line: char.position.line,
@@ -84,7 +84,7 @@ export const Character = React.memo(
 					dispatch({
 						type: "@editor/update-caret-positions",
 						payload: {
-							path: tab?.path || "",
+							path: current.tab?.path || "",
 							positions: [
 								{
 									start: {
@@ -105,10 +105,10 @@ export const Character = React.memo(
 			[
 				char.position.line,
 				char.position.character,
-				tab,
-				tab && tab.caretPositions.length,
-				tab && tab.caretPositions[0].start.line,
-				tab && tab.caretPositions[0].start.character,
+				current.tab,
+				current.tab && current.tab.caretPositions.length,
+				current.tab && current.tab.caretPositions[0].start.line,
+				current.tab && current.tab.caretPositions[0].start.character,
 			],
 		);
 

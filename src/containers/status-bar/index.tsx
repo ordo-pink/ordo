@@ -16,7 +16,7 @@ import "@containers/status-bar/index.css";
 export const StatusBar: React.FC = () => {
 	const dispatch = useAppDispatch();
 
-	const { tab } = useCurrentTab();
+	const current = useCurrentTab();
 
 	const Bell = useIcon("HiOutlineBell");
 	const Code = useIcon("HiOutlineCode");
@@ -26,18 +26,18 @@ export const StatusBar: React.FC = () => {
 	return (
 		<div className="status-bar">
 			<div className="status-bar-side-container">
-				{tab && (
+				{current.tab && (
 					<div className="status-bar-item" onClick={handleClick}>
 						<Code />
 						<div className="flex space-x-2">
-							{tab.caretPositions.map((position, index) => (
+							{current.tab.caretPositions.map((position, index) => (
 								<div
 									key={`${position.start.line}-${position.start.character}`}
 									title={`The caret is located on character ${position.start.character} of line ${position.start.line}`}
 									className=""
 								>
 									{position.start.line}:{position.start.character}
-									{index !== tab.caretPositions.length - 1 ? "," : ""}
+									{index !== current.tab!.caretPositions.length - 1 ? "," : ""}
 								</div>
 							))}
 						</div>

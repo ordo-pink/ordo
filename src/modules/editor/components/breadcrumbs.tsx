@@ -6,12 +6,12 @@ import { Breadcrumb } from "@modules/editor/components/breadcrumb";
 
 export const Breadcrumbs = React.memo(
 	() => {
-		const { file } = useCurrentTab();
+		const current = useCurrentTab();
 		const { separator } = useAppSelector((state) => state.app.internalSettings);
 
-		return file ? (
+		return current.file ? (
 			<div className="editor_breadcrumbs">
-				{file.relativePath.split(separator).map((item, index) => (
+				{current.file.relativePath.split(separator).map((item, index) => (
 					<Breadcrumb key={`${item}-${index}`} pathChunk={item} />
 				))}
 			</div>

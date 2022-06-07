@@ -12,11 +12,11 @@ export const Lines = React.memo(
 	() => {
 		const dispatch = useAppDispatch();
 
-		const { tab } = useCurrentTab();
+		const current = useCurrentTab();
 		const focused = useAppSelector((state) => state.editor.focused);
 
 		const handleKeyDown = (e: KeyboardEvent) => {
-			if (!tab || !focused || e.ctrlKey || e.altKey || e.metaKey) return;
+			if (!current.tab || !focused || e.ctrlKey || e.altKey || e.metaKey) return;
 
 			const { key, shiftKey, altKey, ctrlKey, metaKey } = e;
 
@@ -31,14 +31,14 @@ export const Lines = React.memo(
 			dispatch({
 				type: "@editor/handle-typing",
 				payload: {
-					path: tab?.path,
+					path: current.tab?.path,
 					event: { key, shiftKey, altKey, ctrlKey, metaKey },
 				},
 			});
 		};
 
 		const handleClick = (e: React.MouseEvent) =>
-			Either.fromNullable(tab)
+			Either.fromNullable(current.tab)
 				.chain((t) =>
 					Either.right(e)
 						.map(tapPreventDefault)
@@ -54,16 +54,16 @@ export const Lines = React.memo(
 		const removeKeyDownListener = () => window.removeEventListener("keydown", handleKeyDown);
 
 		React.useEffect(() => {
-			if (tab && focused) {
+			if (current.tab && focused) {
 				window.addEventListener("keydown", handleKeyDown);
 			}
 
 			return () => removeKeyDownListener();
-		}, [tab, focused]);
+		}, [current.tab, focused]);
 
-		return tab ? (
+		return current.tab ? (
 			<div className="h-[calc(100vh-9rem)] overflow-auto" onClick={handleClick}>
-				{tab.content.children.map((_, lineIndex) => (
+				{current.tab.content.children.map((_, lineIndex) => (
 					<Line key={`${lineIndex}`} lineIndex={lineIndex} />
 				))}
 			</div>

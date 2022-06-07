@@ -9,18 +9,22 @@ import { useAppSelector } from "@core/state/store";
 
 export const Token = React.memo(
 	({ token, lineIndex }: { token: Node; lineIndex?: number }) => {
-		const { tab } = useCurrentTab();
+		const current = useCurrentTab();
 		const Wrapper = useTokenWrapper(
 			token,
-			tab?.caretPositions.some((position) => position.start.line === token.range.start.line),
+			current.tab?.caretPositions.some((position) => position.start.line === token.range.start.line),
 		);
 		const alwaysShowMarkdownSymbols = useAppSelector((state) => state.app.userSettings.editor.alwaysShowMarkdownSymbols);
 		const isCurrentLine = React.useMemo(
-			() => tab && tab.caretPositions.some((position) => position.start.line === token.range.start.line),
-			[tab && tab.caretPositions.length, tab && tab.caretPositions[0].start.line, token && token.range.start.line],
+			() => current.tab && current.tab.caretPositions.some((position) => position.start.line === token.range.start.line),
+			[
+				current.tab && current.tab.caretPositions.length,
+				current.tab && current.tab.caretPositions[0].start.line,
+				token && token.range.start.line,
+			],
 		);
 
-		return tab ? (
+		return current.tab ? (
 			<Wrapper>
 				{isNodeWithChars(token) &&
 					token.chars.map((char) => <Character key={`${token.id}-${char.position.character}`} char={char} />)}

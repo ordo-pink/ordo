@@ -17,27 +17,28 @@ export const Line = React.memo(
 	({ lineIndex }: LineProps) => {
 		const dispatch = useAppDispatch();
 
-		const { tab } = useCurrentTab();
+		const current = useCurrentTab();
 
 		const handleClick = (e: React.MouseEvent) => {
 			e.preventDefault();
 			e.stopPropagation();
 
-			if (!tab) return;
+			if (!current.tab) return;
 
 			if (e.altKey) {
-				const found = tab.caretPositions.findIndex(
+				const found = current.tab.caretPositions.findIndex(
 					(position) =>
-						position.start.character === tab.content.children[lineIndex].raw.length && position.start.line === lineIndex + 1,
+						position.start.character === current.tab!.content.children[lineIndex].raw.length &&
+						position.start.line === lineIndex + 1,
 				);
 
 				if (found !== -1) {
-					const positions = tab.caretPositions.slice(0, found).concat(tab.caretPositions.slice(found + 1));
+					const positions = current.tab!.caretPositions.slice(0, found).concat(current.tab.caretPositions.slice(found + 1));
 
 					dispatch({
 						type: "@editor/update-caret-positions",
 						payload: {
-							path: tab.path,
+							path: current.tab.path,
 							positions,
 						},
 					});
@@ -45,17 +46,17 @@ export const Line = React.memo(
 					dispatch({
 						type: "@editor/update-caret-positions",
 						payload: {
-							path: tab.path,
+							path: current.tab.path,
 							positions: [
-								...tab.caretPositions,
+								...current.tab.caretPositions,
 								{
 									start: {
 										line: lineIndex + 1,
-										character: tab.content.children[lineIndex].raw.length,
+										character: current.tab.content.children[lineIndex].raw.length,
 									},
 									end: {
 										line: lineIndex + 1,
-										character: tab.content.children[lineIndex].raw.length,
+										character: current.tab.content.children[lineIndex].raw.length,
 									},
 									direction: "ltr",
 								},
@@ -67,16 +68,16 @@ export const Line = React.memo(
 				dispatch({
 					type: "@editor/update-caret-positions",
 					payload: {
-						path: tab.path,
+						path: current.tab.path,
 						positions: [
 							{
 								start: {
 									line: lineIndex + 1,
-									character: tab.content.children[lineIndex].raw.length,
+									character: current.tab.content.children[lineIndex].raw.length,
 								},
 								end: {
 									line: lineIndex + 1,
-									character: tab.content.children[lineIndex].raw.length,
+									character: current.tab.content.children[lineIndex].raw.length,
 								},
 								direction: "ltr",
 							},
@@ -86,10 +87,10 @@ export const Line = React.memo(
 			}
 		};
 
-		const line = tab && tab.content.children[lineIndex];
+		const line = current.tab && current.tab.content.children[lineIndex];
 		const hasNoChildren = line && isNodeWithChildren(line) && !line.children.length;
 
-		return Either.fromNullable(tab).fold(NoOp, (t) => (
+		return Either.fromNullable(current.tab).fold(NoOp, (t) => (
 			<div className="editor_line">
 				<LineNumber number={lineIndex + 1} />
 				<div className={`editor_line_content`} onClick={handleClick}>

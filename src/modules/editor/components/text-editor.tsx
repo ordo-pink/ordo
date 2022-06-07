@@ -13,24 +13,24 @@ export const TextEditor: React.FC = React.memo(
 	() => {
 		const dispatch = useAppDispatch();
 
-		const { tab } = useCurrentTab();
+		const current = useCurrentTab();
 
 		const handleClick = (e: React.MouseEvent) =>
-			tab &&
+			current.tab &&
 			Either.right(e)
 				.map(tapPreventDefault)
 				.map(tapStopPropagation)
 				.map(() => dispatch({ type: "@editor/focus" }))
 				.map(() => ({
-					line: tail(tab.content.children).range.end.line,
-					character: tail(tab.content.children).range.end.character,
+					line: tail(current.tab!.content.children).range.end.line,
+					character: tail(current.tab!.content.children).range.end.character,
 				}))
 				.map((position) => [{ start: position, end: position, direction: "ltr" as const }])
-				.map((positions) => ({ path: tab.path, positions }))
+				.map((positions) => ({ path: current.tab!.path, positions }))
 				.map((payload) => dispatch({ type: "@editor/update-caret-positions", payload }))
 				.fold(...FoldVoid);
 
-		return tab ? (
+		return current.tab ? (
 			<div>
 				<Breadcrumbs />
 				<div className="editor_textarea" onClick={handleClick}>

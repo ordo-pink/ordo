@@ -111,7 +111,7 @@ export default registerEvents<EditorEvents>({
 			return;
 		}
 
-		const tab = transmission.select((state) => state.editor.tabs.find((tab) => tab.path === payload));
+		let tab = transmission.select((state) => state.editor.tabs.find((tab) => tab.path === payload));
 
 		if (!tab) {
 			const raw = await readFile(payload);
@@ -120,7 +120,7 @@ export default registerEvents<EditorEvents>({
 
 			parseText(raw, content);
 
-			const tab: EditorTab = {
+			tab = {
 				raw,
 				path: payload,
 				caretPositions: [
@@ -155,6 +155,8 @@ export default registerEvents<EditorEvents>({
 
 		context.window.setRepresentedFilename(file ? file.path : "");
 		context.window.setTitle(file ? `${file.relativePath} — ${tree.readableName}` : "Ordo");
+
+		await transmission.emit("@file-explorer/save-file", { path: tab!.path, content: tab!.raw });
 
 		draft.editor.focused = true;
 	},

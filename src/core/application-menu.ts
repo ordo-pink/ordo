@@ -165,6 +165,11 @@ export const getApplicationMenu = (transmission: Transmission) => {
 						click: () => transmission.emit("@activity-bar/open-graph", null),
 					},
 					{
+						label: "Checkboxes",
+						accelerator: "CommandOrControl+Shift+C",
+						click: () => transmission.emit("@activity-bar/open-checkboxes", null),
+					},
+					{
 						label: "Settings",
 						accelerator: "CommandOrControl+,",
 						click: () => transmission.emit("@activity-bar/open-settings", null),

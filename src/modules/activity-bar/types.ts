@@ -20,9 +20,11 @@ export type OpenFindInFilesEvent = OrdoEvent<ACTIVITY_BAR_SCOPE, "open-find-in-f
 export type OpenWelcomePageEvent = OrdoEvent<ACTIVITY_BAR_SCOPE, "open-welcome-page">;
 export type OpenAchievementsEvent = OrdoEvent<ACTIVITY_BAR_SCOPE, "open-achievements">;
 export type OpenSettingsEvent = OrdoEvent<ACTIVITY_BAR_SCOPE, "open-settings">;
+export type OpenCheckboxesEvent = OrdoEvent<ACTIVITY_BAR_SCOPE, "open-checkboxes">;
 
 export type ActivityBarEvents = ActivityBarSelectEvent &
 	OpenEditorEvent &
 	OpenGraphEvent &
 	OpenSettingsEvent &
+	OpenCheckboxesEvent &
 	OpenWelcomePageEvent;

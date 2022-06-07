@@ -132,23 +132,26 @@ export const Task: React.FC<Props> = ({ task, displayProperties, index }) => {
 									</div>
 								</div>
 							)}
-							{displayProperties.includes("todos") && task.frontmatter && task.frontmatter.todos && (
-								<div className="text-sm">
-									<div
-										className={`flex space-x-1 items-center ${
-											task.frontmatter.todos.pending.length === 0
-												? "text-emerald-500 dark:text-emerald-500 font-bold"
-												: "text-neutral-500 dark:text-neutral-400"
-										}`}
-									>
-										<CheckIcon />
-										<div>
-											{task.frontmatter.todos.done.length}/
-											{task.frontmatter.todos.done.length + task.frontmatter.todos.pending.length}
+							{displayProperties.includes("todos") &&
+								task.frontmatter &&
+								task.frontmatter.todos &&
+								(task.frontmatter.todos.pending.length > 0 || task.frontmatter.todos.done.length > 0) && (
+									<div className="text-sm">
+										<div
+											className={`flex space-x-1 items-center ${
+												task.frontmatter.todos.pending.length === 0
+													? "text-emerald-500 dark:text-emerald-500 font-bold"
+													: "text-neutral-500 dark:text-neutral-400"
+											}`}
+										>
+											<CheckIcon />
+											<div>
+												{task.frontmatter.todos.done.length}/
+												{task.frontmatter.todos.done.length + task.frontmatter.todos.pending.length}
+											</div>
 										</div>
 									</div>
-								</div>
-							)}
+								)}
 							{displayProperties.includes("tags") && task.frontmatter && (
 								<div className="text-sm">
 									<div className="flex flex-wrap space-x-1 text-neutral-500 dark:text-neutral-400">

@@ -16,6 +16,13 @@ export default registerCommands([
 		accelerator: "CommandOrControl+Shift+G",
 	},
 	{
+		name: "Open Checkboxes",
+		description: "Switch to Checkboxes view.",
+		event: "@activity-bar/open-checkboxes",
+		icon: "HiOutlineCheckCircle",
+		accelerator: "CommandOrControl+Shift+C",
+	},
+	{
 		name: "Open Settings",
 		description: "Switch to Settings view.",
 		event: "@activity-bar/open-settings",

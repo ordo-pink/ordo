@@ -17,6 +17,7 @@ const handleOpen =
 const handleOpenEditor = handleOpen<"@activity-bar/open-editor">("Editor", true);
 const handleOpenGraph = handleOpen<"@activity-bar/open-graph">("Graph");
 const handleOpenSettings = handleOpen<"@activity-bar/open-settings">("Settings");
+const handleOpenCheckboxes = handleOpen<"@activity-bar/open-checkboxes">("Checkboxes");
 const handleOpenWelcomePage = handleOpen<"@activity-bar/open-welcome-page">("WelcomePage");
 
 export default registerEvents<ActivityBarEvents>({
@@ -25,4 +26,5 @@ export default registerEvents<ActivityBarEvents>({
 	"@activity-bar/open-graph": handleOpenGraph,
 	"@activity-bar/open-welcome-page": handleOpenWelcomePage,
 	"@activity-bar/open-settings": handleOpenSettings,
+	"@activity-bar/open-checkboxes": handleOpenCheckboxes,
 });

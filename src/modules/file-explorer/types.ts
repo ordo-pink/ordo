@@ -94,6 +94,11 @@ export type ShowFolderContextMenuEvent = OrdoEvent<
 >;
 
 export type SaveFileEvent = OrdoEvent<FILE_EXPLORER_SCOPE, "save-file", { path: string; content: string } | null>;
+export type ReplaceLineEvent = OrdoEvent<
+	FILE_EXPLORER_SCOPE,
+	"replace-line",
+	{ oldContent: string; newContent: string; path: string }
+>;
 
 export type FileExplorerEvents = CreateFileEvent &
 	CreateFolderEvent &
@@ -116,4 +121,5 @@ export type FileExplorerEvents = CreateFileEvent &
 	RevealInFinderEvent &
 	CopyPathEvent &
 	SaveFileEvent &
+	ReplaceLineEvent &
 	ShowFolderContextMenuEvent;

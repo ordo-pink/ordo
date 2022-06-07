@@ -34,7 +34,6 @@ export const handleSaveFile: OrdoEventHandler<"@file-explorer/save-file"> = asyn
 		if (file.frontmatter) {
 			if (!file.frontmatter.uuid) {
 				file.frontmatter.uuid = file.uuid ?? randomUUID();
-				console.log(file.uuid);
 			}
 
 			fileContent = "---\n".concat(JSON.stringify(file.frontmatter)).concat("\n---\n").concat(fileContent);
@@ -42,6 +41,24 @@ export const handleSaveFile: OrdoEventHandler<"@file-explorer/save-file"> = asyn
 
 		await promises.writeFile(tab.path, fileContent, "utf-8");
 	} else {
-		debounceSave(payload.path, payload.content);
+		const tab = draft.editor.tabs.find((t) => t.path === payload.path);
+		const file = findOrdoFile(draft.fileExplorer.tree, "path", payload.path);
+
+		if (!tab || !file || file.type !== "document") return;
+
+		tab.raw = tab.content.raw;
+		file.size = new TextEncoder().encode(tab.raw === "\n" ? "" : tab.raw).length;
+
+		let fileContent = tab.content.raw;
+
+		if (file.frontmatter) {
+			if (!file.frontmatter.uuid) {
+				file.frontmatter.uuid = file.uuid ?? randomUUID();
+			}
+
+			fileContent = "---\n".concat(JSON.stringify(file.frontmatter)).concat("\n---\n").concat(fileContent);
+		}
+
+		await promises.writeFile(tab.path, fileContent, "utf-8");
 	}
 };

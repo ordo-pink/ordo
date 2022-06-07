@@ -17,7 +17,8 @@ type CreatorProps = {
 export const Creator: React.FC<CreatorProps> = ({ path, depth }) => {
 	const dispatch = useAppDispatch();
 
-	const { createFileIn, createFolderIn } = useAppSelector((state) => state.fileExplorer);
+	const createFileIn = useAppSelector((state) => state.fileExplorer.createFileIn);
+	const createFolderIn = useAppSelector((state) => state.fileExplorer.createFolderIn);
 
 	const ref = React.useRef<HTMLInputElement>(null);
 

@@ -7,7 +7,7 @@ import { Breadcrumb } from "@modules/editor/components/breadcrumb";
 export const Breadcrumbs = React.memo(
 	() => {
 		const current = useCurrentTab();
-		const { separator } = useAppSelector((state) => state.app.internalSettings);
+		const separator = useAppSelector((state) => state.app.internalSettings.separator);
 
 		return current.file ? (
 			<div className="editor_breadcrumbs">

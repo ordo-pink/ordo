@@ -27,11 +27,11 @@ export const Column: React.FC<Props> = ({ column, tasks, displayProperties }) =>
 			e.preventDefault();
 			e.stopPropagation();
 
-			const value = inputValue.trim();
+			const name = inputValue.trim();
 
 			dispatch({
 				type: "@file-explorer/create-file",
-				payload: { name: value.endsWith(".md") ? value : value.concat(".md"), parentPath: column.path },
+				payload: { name, parentPath: column.path },
 			});
 
 			ref.current!.blur();

@@ -15,6 +15,10 @@ export const handleCreateFile: OrdoEventHandler<"@file-explorer/create-file"> = 
 			? join(createFileIn ? createFileIn : tree.path, payload)
 			: join(payload.parentPath, payload.name);
 
+	if (path === createFileIn) {
+		return;
+	}
+
 	if (existsSync(path)) {
 		return;
 	}
@@ -33,7 +37,11 @@ export const handleCreateFile: OrdoEventHandler<"@file-explorer/create-file"> = 
 		links: [],
 	};
 
-	await promises.writeFile(path, `---\n${JSON.stringify(defaultConfig)}\n---\n`, "utf-8");
+	await promises.writeFile(
+		path.indexOf(".") === -1 ? `${path.trim()}.md` : path.trim(),
+		`---\n${JSON.stringify(defaultConfig)}\n---\n`,
+		"utf-8",
+	);
 
 	await transmission.emit("@file-explorer/hide-creation", null);
 	await transmission.emit("@file-explorer/list-folder", tree.path);

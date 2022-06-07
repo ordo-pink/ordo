@@ -79,7 +79,6 @@ export const Task: React.FC<Props> = ({ task, displayProperties, index }) => {
 		} else if (e.key === "Enter") {
 			setIsTitleEditable(false);
 			const parent = getFolderOrParent(tree, task.path);
-			const name = cardTitleInputValue.trim();
 
 			parent &&
 				dispatch({
@@ -87,7 +86,7 @@ export const Task: React.FC<Props> = ({ task, displayProperties, index }) => {
 					payload: {
 						oldPath: task.path,
 						newFolder: parent.path,
-						name: name.endsWith(".md") ? name : name.concat(".md"),
+						name: cardTitleInputValue,
 					},
 				});
 		}

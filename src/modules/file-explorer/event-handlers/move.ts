@@ -11,6 +11,8 @@ export const handleMove: OrdoEventHandler<"@file-explorer/move"> = async ({ payl
 	const tree = transmission.select((state) => state.fileExplorer.tree);
 	const confirmMove = transmission.select((state) => state.app.userSettings.explorer.confirmMove);
 
+	const normalisedName = name.indexOf(".") === -1 ? `${name}.md`.trim() : name.trim();
+
 	const newPath = join(newFolder, name);
 
 	if (oldPath === newPath) {

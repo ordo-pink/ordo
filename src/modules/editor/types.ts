@@ -16,7 +16,6 @@ export type CaretRange = {
 export type EditorTab = Required<Pick<OrdoFile, "path" | "raw">> & {
 	caretPositions: CaretRange[];
 	content: DocumentRoot;
-	unsaved?: boolean;
 };
 
 export type EditorState = {

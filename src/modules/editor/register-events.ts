@@ -171,18 +171,6 @@ export default registerEvents<EditorEvents>({
 			return;
 		}
 
-		if (tab.unsaved) {
-			const result = context.dialog.showMessageBoxSync(context.window, {
-				type: "question",
-				buttons: ["Yes", "No"],
-				message: `The file "${file.readableName}" has unsaved changes. Quit without saving?`,
-			});
-
-			if (result !== 0) {
-				return;
-			}
-		}
-
 		draft.editor.tabs.splice(index, 1);
 		const nextFilePath = draft.editor.tabs[index === 0 ? draft.editor.tabs.length - 1 : 0]?.path || "";
 
@@ -347,8 +335,6 @@ export default registerEvents<EditorEvents>({
 					});
 				});
 			}
-
-			tab.unsaved = true;
 		} else if (payload.event.key === "Backspace") {
 			let reparse = false;
 
@@ -389,8 +375,6 @@ export default registerEvents<EditorEvents>({
 					});
 				});
 			}
-
-			tab.unsaved = true;
 		} else if (payload.event.key === "Enter") {
 			// TODO: Fix backspace and enter with multiple carets
 			tab.caretPositions.forEach((position) => {
@@ -418,8 +402,6 @@ export default registerEvents<EditorEvents>({
 					depth: tab.content.depth,
 				});
 			});
-
-			tab.unsaved = true;
 		} else {
 			if (payload.event.ctrlKey || payload.event.altKey || payload.event.metaKey) {
 				return;
@@ -442,18 +424,14 @@ export default registerEvents<EditorEvents>({
 				position.start.character++;
 				position.end.character = position.start.character;
 			});
-
-			tab.unsaved = true;
 		}
 
 		tab.content.raw = tab.content.children.map((line) => line.raw).join("\n");
 
-		if (tab.raw === tab.content.raw) {
-			tab.unsaved = false;
-		}
-
 		file.size = new TextEncoder().encode(tab.raw === "\n" ? "" : tab.content.raw).length;
 
 		collectFrontmatterValues(file, tab);
+
+		transmission.emit("@file-explorer/save-file", { path: file.path, content: tab.content.raw });
 	},
 });

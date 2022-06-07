@@ -41,8 +41,6 @@ export const handleSaveFile: OrdoEventHandler<"@file-explorer/save-file"> = asyn
 		}
 
 		await promises.writeFile(tab.path, fileContent, "utf-8");
-
-		tab.unsaved = false;
 	} else {
 		debounceSave(payload.path, payload.content);
 	}

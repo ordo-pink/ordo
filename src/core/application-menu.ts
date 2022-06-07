@@ -68,12 +68,6 @@ export const getApplicationMenu = (transmission: Transmission) => {
 					},
 					separator,
 					{
-						label: "Save",
-						accelerator: "CommandOrControl+S",
-						click: () => transmission.emit("@file-explorer/save-file", null),
-					},
-					separator,
-					{
 						label: "Close Tab",
 						accelerator: "CommandOrControl+W",
 						click: () => transmission.emit("@editor/close-tab", null),

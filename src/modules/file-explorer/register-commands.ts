@@ -15,11 +15,4 @@ export default registerCommands([
 		icon: "HiOutlineClipboardCopy",
 		accelerator: "CommandOrControl+Alt+C",
 	},
-	{
-		name: "Save",
-		description: "Save current file.",
-		event: "@file-explorer/save-file",
-		icon: "HiSave",
-		accelerator: "CommandOrControl+S",
-	},
 ]);

@@ -1,5 +1,5 @@
 .welcome-page {
-	@apply select-none -z-50 flex flex-col flex-grow w-full h-full justify-center items-center text-neutral-600 dark:text-neutral-300;
+	@apply h-screen select-none -z-50 flex flex-col flex-grow w-full justify-center items-center text-neutral-600 dark:text-neutral-300;
 
 	&_title-container {
 		@apply relative w-full flex items-center justify-center mt-9 pb-24;

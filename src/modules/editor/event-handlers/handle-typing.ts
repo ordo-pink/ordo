@@ -1,10 +1,27 @@
-import { NodeWithChildren, Char } from "@core/parser/types";
+import { CharType } from "@core/parser/char-type";
+import { isNodeWithChars, isNodeWithChildren } from "@core/parser/is";
+import { NodeWithChildren, Char, Node } from "@core/parser/types";
 import { OrdoEventHandler } from "@core/types";
 import { findOrdoFile } from "@modules/file-explorer/utils/find-ordo-file";
 import { parseLine, createNodeWithChildren } from "@modules/text-parser";
 import { TextNodeWithChildrenType } from "@modules/text-parser/enums";
 import { tail } from "@utils/array";
 import { collectFrontmatterValues } from "../utils/collect-frontmatter-values";
+
+const findChar = (tree: Node, line: number, character: number): Char | null => {
+	if (isNodeWithChildren(tree)) {
+		for (const child of tree.children) {
+			const found = findChar(child, line, character);
+			if (found) {
+				return found;
+			}
+		}
+	} else if (isNodeWithChars(tree)) {
+		return tree.chars.find((char) => char.position.line === line && char.position.character === character) ?? null;
+	}
+
+	return null;
+};
 
 export const handleTyping: OrdoEventHandler<"@editor/handle-typing"> = ({ draft, payload, transmission }) => {
 	if (!draft.editor.focused) {
@@ -60,7 +77,32 @@ export const handleTyping: OrdoEventHandler<"@editor/handle-typing"> = ({ draft,
 				position.start.line++;
 				position.start.character = 0;
 			} else {
-				position.start.character++;
+				if (payload.event.ctrlKey) {
+					const char = findChar(
+						tab.content.children[position.start.line - 1],
+						position.start.line,
+						position.start.character + 1,
+					);
+
+					if (!char) {
+						position.start.character = tab.content.children[position.start.line - 1].range.end.character;
+					} else {
+						let nextNonChar: Char | null = char;
+
+						while (nextNonChar && (nextNonChar.type === CharType.CHAR || nextNonChar.type === CharType.OCTET)) {
+							nextNonChar = findChar(
+								tab.content.children[position.start.line - 1],
+								position.start.line,
+								nextNonChar.position.character + 1,
+							);
+						}
+
+						position.start.character =
+							nextNonChar?.position.character || tab.content.children[position.start.line - 1].range.end.character;
+					}
+				} else {
+					position.start.character++;
+				}
 			}
 		});
 	} else if (payload.event.key === "ArrowLeft") {
@@ -72,7 +114,31 @@ export const handleTyping: OrdoEventHandler<"@editor/handle-typing"> = ({ draft,
 				position.start.line--;
 				position.start.character = tab.content.children[position.start.line - 1].range.end.character;
 			} else {
-				position.start.character--;
+				if (payload.event.ctrlKey) {
+					const char = findChar(
+						tab.content.children[position.start.line - 1],
+						position.start.line,
+						position.start.character - 1,
+					);
+
+					if (!char) {
+						position.start.character = 0;
+					} else {
+						let previousNonChar: Char | null = char;
+
+						while (previousNonChar && (previousNonChar.type === CharType.CHAR || previousNonChar.type === CharType.OCTET)) {
+							previousNonChar = findChar(
+								tab.content.children[position.start.line - 1],
+								position.start.line,
+								previousNonChar.position.character - 1,
+							);
+						}
+
+						position.start.character = previousNonChar?.position.character || 0;
+					}
+				} else {
+					position.start.character--;
+				}
 			}
 		});
 	} else if (payload.event.key === "ArrowUp") {

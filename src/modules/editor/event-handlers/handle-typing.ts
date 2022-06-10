@@ -219,10 +219,33 @@ export const handleTyping: OrdoEventHandler<"@editor/handle-typing"> = ({ draft,
 
 				reparse = true;
 			} else {
-				tab.content.children[lineIndex].raw =
-					tab.content.children[lineIndex].raw.slice(0, charPosition - 1) +
-					tab.content.children[lineIndex].raw.slice(charPosition);
-				position.start.character--;
+				if (payload.event.ctrlKey) {
+					let previousNonChar = findChar(
+						tab.content.children[position.start.line - 1],
+						position.start.line,
+						position.start.character - 1,
+					);
+
+					while (previousNonChar && (previousNonChar.type === CharType.CHAR || previousNonChar.type === CharType.OCTET)) {
+						previousNonChar = findChar(
+							tab.content.children[position.start.line - 1],
+							position.start.line,
+							previousNonChar.position.character - 1,
+						);
+					}
+
+					const found = previousNonChar ? previousNonChar.position.character : 0;
+
+					tab.content.children[lineIndex].raw =
+						tab.content.children[lineIndex].raw.slice(0, found ? found - 1 : 0) +
+						tab.content.children[lineIndex].raw.slice(position.start.character);
+					position.start.character = found ? found - 1 : 0;
+				} else {
+					tab.content.children[lineIndex].raw =
+						tab.content.children[lineIndex].raw.slice(0, charPosition - 1) +
+						tab.content.children[lineIndex].raw.slice(charPosition);
+					position.start.character--;
+				}
 
 				tab.content.children[lineIndex] = parseLine(tab.content.children[lineIndex].raw, lineIndex, tab.content, {
 					depth: tab.content.depth,

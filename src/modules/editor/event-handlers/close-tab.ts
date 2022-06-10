@@ -15,11 +15,8 @@ export const handleCloseTab: OrdoEventHandler<"@editor/close-tab"> = ({ draft, p
 	}
 
 	draft.editor.tabs.splice(index, 1);
-	const nextFilePath = draft.editor.tabs[index === 0 ? draft.editor.tabs.length - 1 : 0]?.path || "";
-
-	if (draft.editor.tabs.length) {
-		draft.editor.currentTab = nextFilePath;
-	}
+	const nextFilePath = draft.editor.tabs[0]?.path || "";
+	draft.editor.currentTab = nextFilePath;
 
 	const nextFile = findOrdoFile(tree, "path", nextFilePath);
 

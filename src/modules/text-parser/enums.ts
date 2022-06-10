@@ -1,6 +1,6 @@
 export enum TextNodeWithChildrenType {
 	PARAGRAPH = "paragraph",
-	BLOCKQUOTE = "blockquote",
+	TOGGLE = "toggle",
 	HEADING = "heading",
 	TODO = "todo",
 	BOLD = "bold",

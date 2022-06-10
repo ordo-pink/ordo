@@ -12,6 +12,7 @@ import { Char, NodeWithChars, NodeWithChildren } from "@core/parser/types";
 import { TextNodeWithCharsType, TextNodeWithChildrenType } from "@modules/text-parser/enums";
 import { isNodeWithChars } from "@core/parser/is";
 import { OrdoFile } from "@modules/file-explorer/types";
+import { shell } from "electron";
 
 const visit = (
 	node: NodeWithChildren | NodeWithChars,
@@ -159,6 +160,9 @@ export default registerEvents<EditorEvents>({
 		await transmission.emit("@file-explorer/save-file", { path: tab!.path, content: tab!.raw });
 
 		draft.editor.focused = true;
+	},
+	"@editor/open-external-link": ({ payload }) => {
+		shell.openExternal(payload);
 	},
 	"@editor/close-tab": ({ draft, payload, transmission, context }) => {
 		const currentTab = transmission.select((state) => state.editor.currentTab);

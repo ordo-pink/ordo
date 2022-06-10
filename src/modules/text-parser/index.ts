@@ -5,7 +5,7 @@ import { parse } from "@core/parser/parse";
 import { Char, DocumentRoot, EvaluateFn, NodeWithChars, NodeWithChildren, Reader } from "@core/parser/types";
 import { userSettingsStore } from "@core/settings/user-settings";
 import { tail } from "@utils/array";
-import { Switch } from "or-else";
+import { Either, Switch } from "or-else";
 import { TextNodeWithCharsType, TextNodeWithChildrenType } from "./enums";
 
 export const createNodeWithChildren = <Type extends TextNodeWithChildrenType = TextNodeWithChildrenType.PARAGRAPH>(
@@ -74,7 +74,7 @@ export const parseLine = (line: string, index: number, tree: NodeWithChildren, m
 		const extension = `.${(lineNode.data.href as string).split(".").reverse()[0]}`;
 		const association = associations.find((a) => a.extension === extension);
 
-		const getEmbedContentType = Switch.of(lineNode.data.href as string)
+		const getLinkContentType = Switch.of(lineNode.data.href as string)
 			.case(
 				(x) => x.startsWith("http"),
 				() =>
@@ -92,7 +92,7 @@ export const parseLine = (line: string, index: number, tree: NodeWithChildren, m
 					.default("document");
 			});
 
-		lineNode.data.contentType = getEmbedContentType();
+		lineNode.data.contentType = getLinkContentType();
 		lineNode.range = { start: chars[0].position, end: tail(chars).position };
 		lineNode.chars = chars;
 	} else if (line.startsWith("# ")) {
@@ -444,6 +444,12 @@ export const parseLineContent = parse({
 					inline.raw = chars.reduce((str, char) => str.concat(char.value), "");
 					inline.range = { start: chars[0].position, end: tail(chars).position };
 					inline.data.href = chars.slice(2, -2).reduce((str, char) => str.concat(char.value), "");
+
+					inline.data.contentType = Either.try(() => new URL(inline.data.href as string)).fold(
+						() => "internal",
+						() => "external",
+					);
+
 					inline.chars = chars;
 
 					tree.children.push(inline);

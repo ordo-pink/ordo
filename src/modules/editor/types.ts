@@ -31,6 +31,7 @@ export type OpenTabEvent = OrdoEvent<EDITOR_SCOPE, "open-tab", string>;
 export type CloseTabEvent = OrdoEvent<EDITOR_SCOPE, "close-tab", string | null>;
 export type FocusEvent = OrdoEvent<EDITOR_SCOPE, "focus">;
 export type UnfocusEvent = OrdoEvent<EDITOR_SCOPE, "unfocus">;
+export type OpenExternalLinkEvent = OrdoEvent<EDITOR_SCOPE, "open-external-link", string>;
 export type HandleTypingEvent = OrdoEvent<
 	EDITOR_SCOPE,
 	"handle-typing",
@@ -48,4 +49,5 @@ export type EditorEvents = OpenTabEvent &
 	FocusEvent &
 	UnfocusEvent &
 	HandleTypingEvent &
+	OpenExternalLinkEvent &
 	UpdateCaretPositionsEvent;

@@ -7,15 +7,12 @@ import { OrdoEventHandler } from "@core/types";
  * Moves file or folder from oldPath to newPath.
  */
 export const handleMove: OrdoEventHandler<"@file-explorer/move"> = async ({ payload, transmission, context }) => {
-	const { oldPath, name, newFolder } = payload;
 	const tree = transmission.select((state) => state.fileExplorer.tree);
 	const confirmMove = transmission.select((state) => state.app.userSettings.explorer.confirmMove);
 
-	const normalisedName = name.indexOf(".") === -1 ? `${name}.md`.trim() : name.trim();
+	const newPath = payload.newPath ? payload.newPath : join(payload.newFolder!, payload.name!);
 
-	const newPath = join(newFolder, name);
-
-	if (oldPath === newPath) {
+	if (payload.oldPath === newPath) {
 		return;
 	}
 
@@ -23,12 +20,12 @@ export const handleMove: OrdoEventHandler<"@file-explorer/move"> = async ({ payl
 		? context.dialog.showMessageBoxSync(context.window, {
 				type: "question",
 				buttons: ["Yes", "No"],
-				message: `Are you sure you want to move "${name}" to "${newFolder}"?`,
+				message: `Are you sure you want to move "${payload.oldPath}" to "${newPath}"?`,
 		  })
 		: 0;
 
 	if (result === 0) {
-		await promises.rename(oldPath, newPath);
+		await promises.rename(payload.oldPath, newPath);
 		await transmission.emit("@file-explorer/list-folder", tree.path);
 	}
 };

@@ -131,6 +131,11 @@ export const getApplicationMenu = (transmission: Transmission) => {
 						accelerator: "CommandOrControl+Alt+R",
 						click: () => transmission.emit("@file-explorer/reveal-in-finder", null),
 					},
+					{
+						label: "Rename",
+						accelerator: "Shift+F2",
+						click: () => transmission.emit("@file-explorer/rename", null),
+					},
 					...(platform === "darwin"
 						? [
 								{

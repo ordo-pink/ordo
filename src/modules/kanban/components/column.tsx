@@ -48,10 +48,7 @@ export const Column: React.FC<Props> = ({ column, tasks, displayProperties }) =>
 			<div className={`uppercase flex justify-between items-center px-2 font-bold column_${column.color} py-2`}>
 				<h3>{column.readableName}</h3>
 				<div>
-					<button
-						className="outline-pink-400 dark:outline-purple-500"
-						onClick={() => dispatch({ type: "@file-explorer/remove-folder", payload: column.path })}
-					>
+					<button onClick={() => dispatch({ type: "@file-explorer/remove-folder", payload: column.path })}>
 						<XIcon
 							title="Remove column"
 							className="text-neutral-600 dark:text-neutral-300 hover:text-rose-500 dark:hover:text-rose-400 transition-colors duration-300 cursor-pointer"
@@ -81,7 +78,7 @@ export const Column: React.FC<Props> = ({ column, tasks, displayProperties }) =>
 
 			<input
 				type="text"
-				className="outline-pink-400 dark:outline-purple-500 w-full bg-transparent border-0 py-1 px-2 flex-shrink-0"
+				className="w-full bg-transparent border-0 py-1 px-2 flex-shrink-0"
 				placeholder="+ Add card"
 				ref={ref}
 				value={inputValue}

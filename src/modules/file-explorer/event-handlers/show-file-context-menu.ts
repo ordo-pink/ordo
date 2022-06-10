@@ -40,6 +40,16 @@ export const handleShowFileContextMenu: OrdoEventHandler<"@file-explorer/show-fi
 
 	menu.append(
 		new MenuItem({
+			label: "Rename",
+			accelerator: "Shift+F2",
+			click: () => transmission.emit("@file-explorer/rename", path),
+		}),
+	);
+
+	menu.append(new MenuItem({ type: "separator" }));
+
+	menu.append(
+		new MenuItem({
 			label: "Remove File",
 			click: () => transmission.emit("@file-explorer/remove-file", path),
 		}),

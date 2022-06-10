@@ -1,14 +1,14 @@
 import React from "react";
 import { Either } from "or-else";
 
-import { useAppDispatch } from "@core/state/store";
+import { useAppDispatch, useAppSelector } from "@core/state/store";
 import { OrdoFolder } from "@modules/file-explorer/types";
 import { Creator } from "@modules/file-explorer/components/creator";
 import { useFolderIcons } from "@modules/file-explorer/hooks/use-folder-icons";
 import { useTreeNesting } from "@modules/file-explorer/hooks/use-tree-nesting";
 import { FolderContent } from "@modules/file-explorer/components/folder-content";
 import { tapPreventDefault, tapStopPropagation } from "@utils/events";
-import { FoldVoid } from "@utils/either";
+import { FoldVoid, fromBoolean } from "@utils/either";
 import { NoOp } from "@utils/no-op";
 import { tap } from "@utils/functions";
 
@@ -22,15 +22,26 @@ type FolderProps = {
 export const Folder: React.FC<FolderProps> = ({ folder }) => {
 	const dispatch = useAppDispatch();
 
+	const toRename = useAppSelector((state) => state.fileExplorer.toRename);
+
+	const changeInputRef = React.useRef<HTMLInputElement>(null);
+
 	const { FolderIcon, CollapseIcon } = useFolderIcons(folder);
 	const paddingLeft = useTreeNesting(folder.depth);
 
 	const [iconClassName, setIconClassName] = React.useState<string>("file-explorer_folder_green");
 	const [draggedOver, setDraggedOver] = React.useState<boolean>(false);
+	const [renameInputValue, setRenameInputValue] = React.useState<string>(folder.readableName);
 
 	React.useEffect(() => {
 		setIconClassName(`file-explorer_folder_${folder.color}`);
 	}, [folder]);
+
+	React.useEffect(() => {
+		if (toRename === folder.path) {
+			changeInputRef.current && changeInputRef.current.focus();
+		}
+	}, [changeInputRef.current, folder.path, toRename]);
 
 	const handleDragLeave = (event: React.MouseEvent) =>
 		Either.right(event)
@@ -75,6 +86,37 @@ export const Folder: React.FC<FolderProps> = ({ folder }) => {
 
 	const handleClick = () => dispatch({ type: "@file-explorer/toggle-folder", payload: folder.path });
 
+	const handleRenameInputChange = (e: React.ChangeEvent<HTMLInputElement>) => setRenameInputValue(e.target.value);
+
+	const handleRenameInputFocus = () => dispatch({ type: "@editor/unfocus" });
+
+	const handleRenameInputBlur = () => {
+		setRenameInputValue(folder.readableName);
+		dispatch({ type: "@file-explorer/rename", payload: "" });
+	};
+
+	const handleRenameInputKeydown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+		if (e.key === "Enter") {
+			e.preventDefault();
+			e.stopPropagation();
+
+			const trimmed = renameInputValue.trim();
+			const newPath = folder.path.replace(folder.readableName, trimmed);
+
+			dispatch({
+				type: "@file-explorer/move",
+				payload: { oldPath: folder.path, newPath },
+			});
+
+			changeInputRef.current && changeInputRef.current.blur();
+		} else if (e.key === "Escape") {
+			e.preventDefault();
+			e.stopPropagation();
+
+			changeInputRef.current && changeInputRef.current.blur();
+		}
+	};
+
 	return Either.fromNullable(folder).fold(NoOp, () => (
 		<div
 			className={draggedOver ? "bg-neutral-400 dark:bg-neutral-800" : ""}
@@ -83,18 +125,36 @@ export const Folder: React.FC<FolderProps> = ({ folder }) => {
 			onDrop={handleDrop}
 			title={folder.path}
 		>
-			<div
-				className="file-explorer_item"
-				draggable={true}
-				style={{ paddingLeft }}
-				onClick={handleClick}
-				onContextMenu={handleContextMenu}
-				onDragStart={handleDragStart}
-			>
-				<CollapseIcon />
-				<FolderIcon className={iconClassName} />
-				<div className="file-explorer_item_name">{folder.readableName}</div>
-			</div>
+			{fromBoolean(!toRename || toRename !== folder.path).fold(
+				() => (
+					<div style={{ paddingLeft }}>
+						<input
+							type="text"
+							className="bg-neutral-100 dark:bg-neutral-600 border-0"
+							ref={changeInputRef}
+							onBlur={handleRenameInputBlur}
+							onKeyDown={handleRenameInputKeydown}
+							onChange={handleRenameInputChange}
+							onFocus={handleRenameInputFocus}
+							value={renameInputValue}
+						/>
+					</div>
+				),
+				() => (
+					<div
+						className="file-explorer_item"
+						draggable={true}
+						style={{ paddingLeft }}
+						onClick={handleClick}
+						onContextMenu={handleContextMenu}
+						onDragStart={handleDragStart}
+					>
+						<CollapseIcon />
+						<FolderIcon className={iconClassName} />
+						<div className="file-explorer_item_name">{folder.readableName}</div>
+					</div>
+				),
+			)}
 
 			<Creator path={folder.path} depth={folder.depth} />
 

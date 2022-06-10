@@ -83,6 +83,15 @@ export const handleShowFolderContextMenu: OrdoEventHandler<"@file-explorer/show-
 
 	menu.append(
 		new MenuItem({
+			label: "Rename",
+			click: () => transmission.emit("@file-explorer/rename", path),
+		}),
+	);
+
+	menu.append(new MenuItem({ type: "separator" }));
+
+	menu.append(
+		new MenuItem({
 			label: "Remove Folder",
 			click: () => transmission.emit("@file-explorer/remove-folder", path),
 		}),

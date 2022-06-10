@@ -17,6 +17,7 @@ import { handleMove } from "@modules/file-explorer/event-handlers/move";
 import { handleSetFolderColor } from "@modules/file-explorer/event-handlers/set-folder-color";
 import { handleSaveFile } from "@modules/file-explorer/event-handlers/save-file";
 import { handleReplaceLine } from "@modules/file-explorer/event-handlers/replace-line";
+import { handleRename } from "./event-handlers/rename";
 
 export default registerEvents<FileExplorerEvents>({
 	"@file-explorer/copy-path": handleCopyPath,
@@ -36,4 +37,5 @@ export default registerEvents<FileExplorerEvents>({
 	"@file-explorer/show-folder-creation": handleShowFolderCreation,
 	"@file-explorer/toggle-folder": handleToggleFolder,
 	"@file-explorer/replace-line": handleReplaceLine,
+	"@file-explorer/rename": handleRename,
 });

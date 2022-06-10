@@ -35,8 +35,9 @@ export type OrdoFolder = {
 
 export type FileExplorerState = {
 	tree: OrdoFolder;
-	createFileIn: string;
-	createFolderIn: string;
+	createFileIn: string; // TODO: Rewrite when migrating to JS context menus instead of Electron ones
+	createFolderIn: string; // TODO: Rewrite when migrating to JS context menus instead of Electron ones
+	toRename?: string; // TODO: Rewrite when migrating to JS context menus instead of Electron ones
 };
 
 export type FILE_EXPLORER_SCOPE = "file-explorer";
@@ -69,7 +70,7 @@ export type ListOrdoFolderEvent = OrdoEvent<FILE_EXPLORER_SCOPE, "list-folder", 
 export type MoveFileOrFolderEvent = OrdoEvent<
 	FILE_EXPLORER_SCOPE,
 	"move",
-	{ oldPath: string; newFolder: string; name: string }
+	{ oldPath: string; newFolder?: string; name?: string; newPath?: string }
 >;
 
 export type ToggleFolderEvent = OrdoEvent<FILE_EXPLORER_SCOPE, "toggle-folder", string>;
@@ -81,6 +82,7 @@ export type UnfoldFolderEvent = OrdoEvent<FILE_EXPLORER_SCOPE, "unfold-folder", 
 export type ShowFileCreationEvent = OrdoEvent<FILE_EXPLORER_SCOPE, "show-file-creation", string>;
 export type ShowFolderCreationEvent = OrdoEvent<FILE_EXPLORER_SCOPE, "show-folder-creation", string>;
 export type HideCreationEvent = OrdoEvent<FILE_EXPLORER_SCOPE, "hide-creation">;
+export type RenameEvent = OrdoEvent<FILE_EXPLORER_SCOPE, "rename", string | null>;
 
 export type ShowFileContextMenu = OrdoEvent<
 	FILE_EXPLORER_SCOPE,
@@ -122,4 +124,5 @@ export type FileExplorerEvents = CreateFileEvent &
 	CopyPathEvent &
 	SaveFileEvent &
 	ReplaceLineEvent &
+	RenameEvent &
 	ShowFolderContextMenuEvent;

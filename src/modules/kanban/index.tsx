@@ -268,7 +268,7 @@ export const Kanban: React.FC<Props> = React.memo(
 									onBlur={handleColumnInputBlur}
 									type="text"
 									placeholder="+ Add column..."
-									className="w-full bg-transparent border-0 outline-pink-400 dark:outline-purple-500"
+									className="w-full bg-transparent border-0"
 								/>
 							</div>
 						)}

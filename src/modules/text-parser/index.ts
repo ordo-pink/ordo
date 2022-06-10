@@ -12,6 +12,7 @@ export const createNodeWithChildren = <Type extends TextNodeWithChildrenType = T
 	type: Type,
 	parent: NodeWithChildren,
 	firstChar: Char,
+	raw: string,
 	depth?: number,
 ): NodeWithChildren<Type> => ({
 	children: [],
@@ -20,10 +21,10 @@ export const createNodeWithChildren = <Type extends TextNodeWithChildrenType = T
 	data: {},
 	depth: depth ? depth : parent.depth + 1,
 	id: `${parent.id}-${firstChar.position.line}`,
-	raw: "",
+	raw,
 	range: {
 		start: { ...firstChar.position },
-		end: { ...firstChar.position },
+		end: { line: firstChar.position.line, character: raw.length, offset: firstChar.position.offset + raw.length },
 	},
 	type,
 });
@@ -56,6 +57,7 @@ export const parseLine = (line: string, index: number, tree: NodeWithChildren, m
 			TextNodeWithChildrenType.PARAGRAPH,
 			tree,
 			{ position: { line: index + 1, character: 0 } } as Char,
+			line,
 			metadata.depth + 1,
 		);
 
@@ -97,27 +99,27 @@ export const parseLine = (line: string, index: number, tree: NodeWithChildren, m
 		lineNode.chars = chars;
 	} else if (line.startsWith("# ")) {
 		metadata.depth = 1;
-		lineNode = createNodeWithChildren(TextNodeWithChildrenType.HEADING, tree, chars[0], metadata.depth);
+		lineNode = createNodeWithChildren(TextNodeWithChildrenType.HEADING, tree, chars[0], line, metadata.depth);
 		lineNode.openingChars = chars.slice(0, 2);
 		parseLineContent(chars.slice(2), lineNode);
 	} else if (line.startsWith("## ")) {
 		metadata.depth = 2;
-		lineNode = createNodeWithChildren(TextNodeWithChildrenType.HEADING, tree, chars[0], metadata.depth);
+		lineNode = createNodeWithChildren(TextNodeWithChildrenType.HEADING, tree, chars[0], line, metadata.depth);
 		lineNode.openingChars = chars.slice(0, 3);
 		parseLineContent(chars.slice(3), lineNode);
 	} else if (line.startsWith("### ")) {
 		metadata.depth = 3;
-		lineNode = createNodeWithChildren(TextNodeWithChildrenType.HEADING, tree, chars[0], metadata.depth);
+		lineNode = createNodeWithChildren(TextNodeWithChildrenType.HEADING, tree, chars[0], line, metadata.depth);
 		lineNode.openingChars = chars.slice(0, 4);
 		parseLineContent(chars.slice(4), lineNode);
 	} else if (line.startsWith("#### ")) {
 		metadata.depth = 4;
-		lineNode = createNodeWithChildren(TextNodeWithChildrenType.HEADING, tree, chars[0], metadata.depth);
+		lineNode = createNodeWithChildren(TextNodeWithChildrenType.HEADING, tree, chars[0], line, metadata.depth);
 		lineNode.openingChars = chars.slice(0, 5);
 		parseLineContent(chars.slice(5), lineNode);
 	} else if (line.startsWith("##### ")) {
 		metadata.depth = 5;
-		lineNode = createNodeWithChildren(TextNodeWithChildrenType.HEADING, tree, chars[0], metadata.depth);
+		lineNode = createNodeWithChildren(TextNodeWithChildrenType.HEADING, tree, chars[0], line, metadata.depth);
 		lineNode.openingChars = chars.slice(0, 6);
 		parseLineContent(chars.slice(6), lineNode);
 	} else if (line === "---") {
@@ -125,12 +127,12 @@ export const parseLine = (line: string, index: number, tree: NodeWithChildren, m
 		lineNode.range = { start: chars[0].position, end: tail(chars).position };
 		lineNode.chars = chars;
 	} else if (line.startsWith("[ ] ") || line.startsWith("[x] ")) {
-		lineNode = createNodeWithChildren(TextNodeWithChildrenType.TODO, tree, chars[0], metadata.depth + 1);
+		lineNode = createNodeWithChildren(TextNodeWithChildrenType.TODO, tree, chars[0], line, metadata.depth + 1);
 		lineNode.data.checked = line.charAt(1) === "x";
 		lineNode.openingChars = chars.slice(0, 4);
 		parseLineContent(chars.slice(4), lineNode);
 	} else {
-		lineNode = createNodeWithChildren(TextNodeWithChildrenType.PARAGRAPH, tree, chars[0], metadata.depth + 1);
+		lineNode = createNodeWithChildren(TextNodeWithChildrenType.PARAGRAPH, tree, chars[0], line, metadata.depth + 1);
 		parseLineContent(chars, lineNode);
 	}
 
@@ -174,9 +176,6 @@ export const parseText = (raw: string, tree: NodeWithChildren | DocumentRoot) =>
 };
 
 export const parseLineContent = parse({
-	afterParse: (tree, reader) => {
-		tree.range.end.character = reader.getChars().length;
-	},
 	parsers: [
 		{
 			evaluate: (char) => Boolean(char) && char!.type === CharType.STAR,
@@ -207,7 +206,7 @@ export const parseLineContent = parse({
 						chars.push(currentChar);
 						currentChar = reader.next();
 
-						const inline = createNodeWithChildren(TextNodeWithChildrenType.BOLD, tree, char);
+						const inline = createNodeWithChildren(TextNodeWithChildrenType.BOLD, tree, char, "");
 
 						inline.openingChars = chars.slice(0, 2);
 						inline.closingChars = chars.slice(-2);
@@ -246,7 +245,7 @@ export const parseLineContent = parse({
 						chars.push(currentChar);
 						currentChar = reader.next();
 
-						const inline = createNodeWithChildren(TextNodeWithChildrenType.ITALIC, tree, char);
+						const inline = createNodeWithChildren(TextNodeWithChildrenType.ITALIC, tree, char, "");
 
 						inline.openingChars = chars.slice(0, 1);
 						inline.closingChars = chars.slice(-1);
@@ -296,7 +295,7 @@ export const parseLineContent = parse({
 						chars.push(currentChar);
 						currentChar = reader.next();
 
-						const inline = createNodeWithChildren(TextNodeWithChildrenType.BOLD, tree, char);
+						const inline = createNodeWithChildren(TextNodeWithChildrenType.BOLD, tree, char, "");
 
 						inline.openingChars = chars.slice(0, 2);
 						inline.closingChars = chars.slice(-2);
@@ -335,7 +334,7 @@ export const parseLineContent = parse({
 						chars.push(currentChar);
 						currentChar = reader.next();
 
-						const inline = createNodeWithChildren(TextNodeWithChildrenType.ITALIC, tree, char);
+						const inline = createNodeWithChildren(TextNodeWithChildrenType.ITALIC, tree, char, "");
 
 						inline.openingChars = chars.slice(0, 1);
 						inline.closingChars = chars.slice(-1);
@@ -388,7 +387,7 @@ export const parseLineContent = parse({
 					chars.push(currentChar);
 					currentChar = reader.next();
 
-					const inline = createNodeWithChildren(TextNodeWithChildrenType.STRIKETHROUGH, tree, char);
+					const inline = createNodeWithChildren(TextNodeWithChildrenType.STRIKETHROUGH, tree, char, "");
 
 					inline.openingChars = chars.slice(0, 2);
 					inline.closingChars = chars.slice(-2);
@@ -514,7 +513,7 @@ export const parseLineContent = parse({
 				}
 
 				if (currentChar && currentChar.type === CharType.BACKTICK) {
-					const inline = createNodeWithChildren(TextNodeWithChildrenType.CODE, tree, char);
+					const inline = createNodeWithChildren(TextNodeWithChildrenType.CODE, tree, char, "");
 
 					chars.push(currentChar);
 

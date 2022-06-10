@@ -252,6 +252,7 @@ export const handleTyping: OrdoEventHandler<"@editor/handle-typing"> = ({ draft,
 				TextNodeWithChildrenType.PARAGRAPH,
 				tab.content,
 				{ position: { character: 1, line: lineIndex + 1 } } as Char,
+				raw,
 				tab.content.depth + 1,
 			);
 			node.raw = raw;

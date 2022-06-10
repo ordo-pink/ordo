@@ -27,9 +27,6 @@ export const Lines = React.memo(
 				return;
 			}
 
-			e.preventDefault();
-			e.stopPropagation();
-
 			dispatch({
 				type: "@editor/handle-typing",
 				payload: {

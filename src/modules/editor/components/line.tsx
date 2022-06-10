@@ -33,43 +33,17 @@ export const Line = React.memo(
 				);
 
 				if (found !== -1) {
-					const positions = current.tab!.caretPositions.slice(0, found).concat(current.tab.caretPositions.slice(found + 1));
+					const payload = current.tab!.caretPositions.slice(0, found).concat(current.tab.caretPositions.slice(found + 1));
 
 					dispatch({
 						type: "@editor/update-caret-positions",
-						payload: {
-							path: current.tab.path,
-							positions,
-						},
+						payload,
 					});
 				} else {
 					dispatch({
 						type: "@editor/update-caret-positions",
-						payload: {
-							path: current.tab.path,
-							positions: [
-								...current.tab.caretPositions,
-								{
-									start: {
-										line: lineIndex + 1,
-										character: current.tab.content.children[lineIndex].raw.length,
-									},
-									end: {
-										line: lineIndex + 1,
-										character: current.tab.content.children[lineIndex].raw.length,
-									},
-									direction: "ltr",
-								},
-							],
-						},
-					});
-				}
-			} else {
-				dispatch({
-					type: "@editor/update-caret-positions",
-					payload: {
-						path: current.tab.path,
-						positions: [
+						payload: [
+							...current.tab.caretPositions,
 							{
 								start: {
 									line: lineIndex + 1,
@@ -82,7 +56,24 @@ export const Line = React.memo(
 								direction: "ltr",
 							},
 						],
-					},
+					});
+				}
+			} else {
+				dispatch({
+					type: "@editor/update-caret-positions",
+					payload: [
+						{
+							start: {
+								line: lineIndex + 1,
+								character: current.tab.content.children[lineIndex].raw.length,
+							},
+							end: {
+								line: lineIndex + 1,
+								character: current.tab.content.children[lineIndex].raw.length,
+							},
+							direction: "ltr",
+						},
+					],
 				});
 			}
 		};

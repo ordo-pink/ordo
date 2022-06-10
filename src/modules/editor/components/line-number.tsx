@@ -19,7 +19,7 @@ export const LineNumber = React.memo(
 
 		const handleClick = (e: React.MouseEvent) =>
 			Either.fromNullable(current.tab)
-				.chain((t) =>
+				.chain(() =>
 					Either.right(e)
 						.map(tapPreventDefault)
 						.map(tapStopPropagation)
@@ -29,10 +29,7 @@ export const LineNumber = React.memo(
 				.fold(noOpFn, (payload) =>
 					dispatch({
 						type: "@editor/update-caret-positions",
-						payload: {
-							path: current.tab!.path,
-							positions: current.tab!.caretPositions.concat(payload),
-						},
+						payload: e.ctrlKey ? current.tab!.caretPositions.concat(payload) : payload,
 					}),
 				);
 

@@ -26,7 +26,6 @@ export const TextEditor: React.FC = React.memo(
 					character: tail(current.tab!.content.children).range.end.character,
 				}))
 				.map((position) => [{ start: position, end: position, direction: "ltr" as const }])
-				.map((positions) => ({ path: current.tab!.path, positions }))
 				.map((payload) => dispatch({ type: "@editor/update-caret-positions", payload }))
 				.fold(...FoldVoid);
 

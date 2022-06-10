@@ -46,7 +46,6 @@ export const Lines = React.memo(
 						.map(() => t.content)
 						.chain((c) => Either.fromNullable(tail(c.children).range.end))
 						.map((position) => [{ start: position, end: position, direction: "ltr" as const }])
-						.map((positions) => ({ path: t.path, positions }))
 						.map((payload) => dispatch({ type: "@editor/update-caret-positions", payload })),
 				)
 				.fold(...FoldVoid);

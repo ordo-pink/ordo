@@ -1,6 +1,6 @@
 import React from "react";
 
-import { useAppDispatch, useAppSelector } from "@core/state/store";
+import { useAppDispatch } from "@core/state/store";
 import { useCurrentTab } from "@modules/editor/hooks/use-current-tab";
 import { Caret } from "@modules/editor/components/caret";
 import { Char } from "@core/parser/types";
@@ -13,7 +13,6 @@ export const Character = React.memo(
 	({ char }: CharProps) => {
 		const dispatch = useAppDispatch();
 		const current = useCurrentTab();
-		const alwaysShowMarkdownSymbols = useAppSelector((state) => state.app.userSettings.editor.alwaysShowMarkdownSymbols);
 
 		const [isCaretHere, setIsCaretHere] = React.useState<boolean>(false);
 
@@ -49,43 +48,17 @@ export const Character = React.memo(
 					);
 
 					if (found !== -1) {
-						const positions = current.tab.caretPositions.slice(0, found).concat(current.tab.caretPositions.slice(found + 1));
+						const payload = current.tab.caretPositions.slice(0, found).concat(current.tab.caretPositions.slice(found + 1));
 
 						dispatch({
 							type: "@editor/update-caret-positions",
-							payload: {
-								path: current.tab.path,
-								positions,
-							},
+							payload,
 						});
 					} else {
 						dispatch({
 							type: "@editor/update-caret-positions",
-							payload: {
-								path: current.tab.path,
-								positions: [
-									...current.tab.caretPositions,
-									{
-										start: {
-											line: char.position.line,
-											character: char.position.character,
-										},
-										end: {
-											line: char.position.line,
-											character: char.position.character,
-										},
-										direction: "ltr",
-									},
-								],
-							},
-						});
-					}
-				} else {
-					dispatch({
-						type: "@editor/update-caret-positions",
-						payload: {
-							path: current.tab?.path || "",
-							positions: [
+							payload: [
+								...current.tab.caretPositions,
 								{
 									start: {
 										line: char.position.line,
@@ -98,7 +71,24 @@ export const Character = React.memo(
 									direction: "ltr",
 								},
 							],
-						},
+						});
+					}
+				} else {
+					dispatch({
+						type: "@editor/update-caret-positions",
+						payload: [
+							{
+								start: {
+									line: char.position.line,
+									character: char.position.character,
+								},
+								end: {
+									line: char.position.line,
+									character: char.position.character,
+								},
+								direction: "ltr",
+							},
+						],
 					});
 				}
 			},

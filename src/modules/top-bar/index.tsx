@@ -154,22 +154,19 @@ export const TopBar: React.FC = () => {
 				? // TODO: Refactor this insanity
 				  dispatch({
 						type: "@editor/update-caret-positions",
-						payload: {
-							path: currentTab,
-							positions: [
-								{
-									start: {
-										line: Number(value.slice(1).split(":")[0]),
-										character: value.slice(1).split(":")[1] ? Number(value.slice(1).split(":")[1]) : 0,
-									},
-									end: {
-										line: Number(value.slice(1).split(":")[0]),
-										character: value.slice(1).split(":")[1] ? Number(value.slice(1).split(":")[1]) : 0,
-									},
-									direction: "ltr",
+						payload: [
+							{
+								start: {
+									line: Number(value.slice(1).split(":")[0]),
+									character: value.slice(1).split(":")[1] ? Number(value.slice(1).split(":")[1]) : 0,
 								},
-							],
-						},
+								end: {
+									line: Number(value.slice(1).split(":")[0]),
+									character: value.slice(1).split(":")[1] ? Number(value.slice(1).split(":")[1]) : 0,
+								},
+								direction: "ltr",
+							},
+						],
 				  })
 				: null;
 		} else if (e.key === "Escape") {

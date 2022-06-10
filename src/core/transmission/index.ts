@@ -59,7 +59,13 @@ export class Transmission {
 							payload,
 						});
 					} catch (e) {
-						reject(e);
+						const error = e as Error;
+
+						this.emit("@notifications/add", {
+							type: "error",
+							title: error.name,
+							content: error.message,
+						});
 					}
 				},
 				(patches) => {

@@ -1,17 +1,19 @@
 import { BrowserWindow, Dialog } from "electron";
 
-import { AppState, AppEvents } from "@containers/app/types";
-import { SideBarState, SideBarEvents } from "@containers/side-bar/types";
-import { ActivityBarState, ActivityBarEvents } from "@modules/activity-bar/types";
-import { EditorState, EditorEvents } from "@modules/editor/types";
+import { NotificationsEvents, NotificationsState } from "@modules/notifications/types";
 import { FileExplorerState, FileExplorerEvents } from "@modules/file-explorer/types";
+import { ActivityBarState, ActivityBarEvents } from "@modules/activity-bar/types";
+import { SideBarState, SideBarEvents } from "@containers/side-bar/types";
 import { TopBarState, TopBarEvents } from "@modules/top-bar/types";
+import { EditorState, EditorEvents } from "@modules/editor/types";
+import { AppState, AppEvents } from "@containers/app/types";
 
 export type OrdoEvents = FileExplorerEvents &
 	AppEvents &
 	SideBarEvents &
 	ActivityBarEvents &
 	TopBarEvents &
+	NotificationsEvents &
 	EditorEvents;
 
 export type WindowState = {
@@ -23,6 +25,7 @@ export type WindowState = {
 	editor: EditorState;
 	fileExplorer: FileExplorerState;
 	topBar: TopBarState;
+	notifications: NotificationsState;
 };
 
 export type WindowContext = {

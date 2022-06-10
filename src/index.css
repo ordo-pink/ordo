@@ -31,5 +31,5 @@ input[type="number"] {
 }
 
 * {
-	@apply outline-pink-400 dark:outline-purple-500;
+	@apply outline-pink-400 dark:outline-purple-500 select-none;
 }

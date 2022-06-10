@@ -1,4 +1,5 @@
 import { WindowState } from "@init/types";
+import notifications from "@modules/notifications/initial-state";
 import fileExplorer from "@modules/file-explorer/initial-state";
 import activityBar from "@modules/activity-bar/initial-state";
 import sideBar from "@containers/side-bar/initial-state";
@@ -15,4 +16,5 @@ export const initialState: WindowState = {
 	statusBar: {},
 	workspace: {},
 	editor,
+	notifications,
 };

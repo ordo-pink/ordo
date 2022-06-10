@@ -3,11 +3,9 @@ import React from "react";
 import { useIcon } from "@core/hooks/use-icon";
 import { useAppDispatch } from "@core/state/store";
 import { useCurrentTab } from "@modules/editor/hooks/use-current-tab";
-import { FoldVoid } from "@utils/either";
-import { NoOp } from "@utils/no-op";
-import { tap } from "@utils/functions";
 
 import "@containers/status-bar/index.css";
+import { Notifications } from "@modules/notifications";
 
 /**
  * StatusBar is a wrapper component for custom informative views and Notifications.g
@@ -18,7 +16,6 @@ export const StatusBar: React.FC = () => {
 
 	const current = useCurrentTab();
 
-	const Bell = useIcon("HiOutlineBell");
 	const Code = useIcon("HiOutlineCode");
 
 	const handleClick = () => dispatch({ type: "@top-bar/open-go-to-line" });
@@ -45,11 +42,7 @@ export const StatusBar: React.FC = () => {
 				)}
 			</div>
 
-			<div className="status-bar-side-container">
-				<div className="status-bar-item">
-					<Bell />
-				</div>
-			</div>
+			<Notifications />
 		</div>
 	);
 };

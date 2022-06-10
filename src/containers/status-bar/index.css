@@ -1,5 +1,5 @@
 .status-bar {
-	@apply flex items-center justify-between h-6;
+	@apply flex items-center justify-between h-6 select-none;
 }
 
 .status-bar-side-container {

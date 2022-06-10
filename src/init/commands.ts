@@ -5,6 +5,7 @@ import registerEditorCommands from "@modules/editor/register-commands";
 import registerTopBarCommands from "@modules/top-bar/register-commands";
 import registerFileExplorerCommands from "@modules/file-explorer/register-commands";
 import registerActivityBarCommands from "@modules/activity-bar/register-commands";
+import registerNotificationsCommands from "@modules/notifications/register-commands";
 
 export const initCommands = async (transmission: Transmission) => {
 	await registerAppCommands(transmission);
@@ -13,4 +14,5 @@ export const initCommands = async (transmission: Transmission) => {
 	await registerSideBarCommands(transmission);
 	await registerFileExplorerCommands(transmission);
 	await registerActivityBarCommands(transmission);
+	await registerNotificationsCommands(transmission);
 };

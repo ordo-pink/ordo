@@ -40,7 +40,7 @@ export type Char = {
 	position: Position;
 };
 
-export type Node<TypeSource = string, Data = Record<string, unknown> | null> = {
+export type Node<TypeSource = string, Data = Record<string, unknown> | undefined> = {
 	id: string;
 	depth: number;
 	type: TypeSource;

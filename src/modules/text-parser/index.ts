@@ -3,7 +3,9 @@ import { isDocumentRoot } from "@core/parser/is";
 import { lex } from "@core/parser/lexer";
 import { parse } from "@core/parser/parse";
 import { Char, DocumentRoot, EvaluateFn, NodeWithChars, NodeWithChildren, Reader } from "@core/parser/types";
+import { userSettingsStore } from "@core/settings/user-settings";
 import { tail } from "@utils/array";
+import { Switch } from "or-else";
 import { TextNodeWithCharsType, TextNodeWithChildrenType } from "./enums";
 
 export const createNodeWithChildren = <Type extends TextNodeWithChildrenType = TextNodeWithChildrenType.PARAGRAPH>(
@@ -65,7 +67,32 @@ export const parseLine = (line: string, index: number, tree: NodeWithChildren, m
 		lineNode.chars = chars;
 	} else if (/^!\[\[.*]]$/.test(line)) {
 		lineNode = createNodeWithChars(TextNodeWithCharsType.EMBED, tree, chars[0], metadata.depth + 1);
-		lineNode.data.relativePath = line.slice(3, -2);
+		lineNode.data.href = line.slice(3, -2);
+
+		// TODO: Extract to a function and reuse in opening image/video/audio files
+		const associations: any[] = userSettingsStore.get("explorer.associations");
+		const extension = `.${(lineNode.data.href as string).split(".").reverse()[0]}`;
+		const association = associations.find((a) => a.extension === extension);
+
+		const getEmbedContentType = Switch.of(lineNode.data.href as string)
+			.case(
+				(x) => x.startsWith("http"),
+				() =>
+					Switch.of(lineNode.data.href as string)
+						.case((x) => x.includes("youtube.com") || x.includes("youtu.be"), "youtube")
+						.case((x) => x.includes("twitter.com"), "twitter")
+						.case(() => Boolean(association) && association.association === "image", "remotemimage")
+						.default("link"),
+			)
+			.default(() => {
+				return Switch.of(association)
+					.case((x: any) => Boolean(x) && x.association === "image", "image")
+					.case((x: any) => Boolean(x) && x.association === "audio", "audio")
+					.case((x: any) => Boolean(x) && x.association === "video", "video")
+					.default("document");
+			});
+
+		lineNode.data.contentType = getEmbedContentType();
 		lineNode.range = { start: chars[0].position, end: tail(chars).position };
 		lineNode.chars = chars;
 	} else if (line.startsWith("# ")) {

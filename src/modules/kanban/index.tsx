@@ -18,13 +18,14 @@ import "@modules/kanban/index.css";
 import { OrdoFolder } from "@modules/file-explorer/types";
 import { useIcon } from "@core/hooks/use-icon";
 import { findOrdoFile } from "@modules/file-explorer/utils/find-ordo-file";
+import { ComponentNode } from "@modules/text-parser/types";
 
 type Props = {
-	token: NodeWithChars;
+	node: ComponentNode;
 };
 
 export const Kanban: React.FC<Props> = React.memo(
-	({ token }) => {
+	({ node }) => {
 		const dispatch = useAppDispatch();
 
 		const tree = useAppSelector((state) => state.fileExplorer.tree);
@@ -51,7 +52,7 @@ export const Kanban: React.FC<Props> = React.memo(
 		}, [createColumnInputRef.current, showColumnCreationInput]);
 
 		React.useEffect(() => {
-			const parsed: string[] = token.data.parsed as string[];
+			const parsed: string[] = node.data.parsed;
 
 			Either.fromNullable(tree)
 				.chain((t) =>

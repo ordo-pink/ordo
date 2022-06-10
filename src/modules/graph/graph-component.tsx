@@ -8,13 +8,14 @@ import { OrdoFolder } from "@modules/file-explorer/types";
 import { Graph } from "@modules/graph";
 import { id } from "@utils/functions";
 import { NoOp } from "@utils/no-op";
+import { ComponentNode } from "@modules/text-parser/types";
 
-type GraphComponentProps = {
-	token: NodeWithChars;
+type Props = {
+	node: ComponentNode;
 };
 
-export const GraphComponent = React.memo(
-	({ token }: GraphComponentProps) => {
+export const GraphComponent: React.FC<Props> = React.memo(
+	({ node }) => {
 		const tree = useAppSelector((state) => state.fileExplorer.tree);
 		const [content, setContent] = React.useState<OrdoFolder | null>(null);
 
@@ -26,7 +27,7 @@ export const GraphComponent = React.memo(
 		const [showBackground, setShowBackground] = React.useState<boolean>(true);
 
 		React.useEffect(() => {
-			const parsed: string[] = token.data.parsed as string[];
+			const parsed: string[] = node.data.parsed as string[];
 
 			Either.fromNullable(tree)
 				.chain((t) =>

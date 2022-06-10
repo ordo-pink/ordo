@@ -1,4 +1,4 @@
-import { app, BrowserWindow, Menu } from "electron";
+import { app, BrowserWindow, Menu, protocol } from "electron";
 import { enforceMacOSAppLocation, is, setContentSecurityPolicy } from "electron-util";
 
 import { createWindow } from "@core/window/create-window";
@@ -15,16 +15,27 @@ style-src 'unsafe-inline', ordo-app data: file:;
 font-src 'self', ordo-app file:;
 connect-src 'self', ordo-app;
 base-uri 'none';
+frame-src https://www.youtube.com;
 form-action 'none';
 frame-ancestors 'none';
 object-src 'none';
 `);
 } else {
-	setContentSecurityPolicy(`img-src * data: file:;`);
+	setContentSecurityPolicy(`img-src * data: file:; frame-src *;`);
 }
 
 app.on("ready", async () => {
 	enforceMacOSAppLocation();
+
+	protocol.registerFileProtocol("ordo-app", (req, cb) => {
+		const url = req.url.replace("ordo-app://open-file/", "");
+
+		try {
+			return cb(url);
+		} catch (e) {
+			console.error(e);
+		}
+	});
 
 	if (is.macos) {
 		const dockMenu = Menu.buildFromTemplate([

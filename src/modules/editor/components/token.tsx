@@ -4,13 +4,13 @@ import { Character } from "@modules/editor/components/char";
 import { useCurrentTab } from "../hooks/use-current-tab";
 import { Node } from "@core/parser/types";
 import { isNodeWithChars, isNodeWithChildren } from "@core/parser/is";
-import { useTokenWrapper } from "../hooks/use-token-wrapper";
+import { useTextNodeWrapper } from "../hooks/use-token-wrapper";
 import { useAppSelector } from "@core/state/store";
 
 export const Token = React.memo(
 	({ token, lineIndex }: { token: Node; lineIndex?: number }) => {
 		const current = useCurrentTab();
-		const Wrapper = useTokenWrapper(
+		const Wrapper = useTextNodeWrapper(
 			token,
 			current.tab?.caretPositions.some((position) => position.start.line === token.range.start.line),
 		);

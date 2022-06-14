@@ -13,6 +13,6 @@ export default registerCommands([
 		description: "Select everything in the file",
 		event: "@editor/select-all",
 		icon: "HiOutlineSelector",
-		accelerator: "CommandOrControl+A",
+		accelerator: "CommandOrControl+Shift+A",
 	},
 ]);

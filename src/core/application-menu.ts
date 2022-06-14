@@ -117,7 +117,7 @@ export const getApplicationMenu = (transmission: Transmission) => {
 					separator,
 					{
 						label: "Select All",
-						accelerator: "CommandOrControl+A",
+						accelerator: "CommandOrControl+Shift+A",
 						click: () => transmission.emit("@editor/select-all", null),
 					},
 					separator,

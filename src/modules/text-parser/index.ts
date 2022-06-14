@@ -20,7 +20,7 @@ export const createNodeWithChildren = <Type extends TextNodeWithChildrenType = T
 	closingChars: [],
 	data: {},
 	depth: depth ? depth : parent.depth + 1,
-	id: `${parent.id}-${firstChar.position.line}`,
+	id: `${parent.id}-${firstChar.position.line}-${firstChar.position.character}`,
 	raw,
 	range: {
 		start: { ...firstChar.position },
@@ -38,7 +38,7 @@ export const createNodeWithChars = <Type extends TextNodeWithCharsType>(
 	chars: [],
 	data: {},
 	depth: depth ? depth : parent.depth + 1,
-	id: `${parent.id}-${firstChar.position.character}`,
+	id: `${parent.id}-${firstChar.position.line}-${firstChar.position.character}`,
 	raw: "",
 	range: {
 		start: { ...firstChar.position },

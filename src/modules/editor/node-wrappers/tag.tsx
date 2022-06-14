@@ -9,8 +9,4 @@ type Config = {
 export const TagWrapper =
 	({ node }: Config): React.FC =>
 	({ children }) =>
-		(
-			<strong className="bg-gradient-to-tr from-orange-600 dark:from-purple-400 to-pink-700 dark:to-pink-400 text-transparent bg-clip-text drop-shadow-xl mt-2">
-				{children}
-			</strong>
-		);
+		<strong className="dark:text-purple-400 text-pink-700 drop-shadow-xl mt-2">{children}</strong>;

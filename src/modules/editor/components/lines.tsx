@@ -22,6 +22,10 @@ export const Lines = React.memo(
 
 			const { key, shiftKey, altKey, ctrlKey, metaKey } = e;
 
+			if (key === " ") {
+				e.preventDefault();
+			}
+
 			if (key === "Tab" && focused) {
 				dispatch({ type: "@editor/unfocus" });
 				return;

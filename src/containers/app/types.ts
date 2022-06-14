@@ -29,6 +29,8 @@ export type SetInternalSettingEvent = OrdoEvent<APP_SCOPE, "set-internal-setting
 export type GetUserSettingsEvent = OrdoEvent<APP_SCOPE, "get-user-settings">;
 export type SetUserSettingEvent = OrdoEvent<APP_SCOPE, "set-user-setting", [string, any]>;
 export type RegisterCommandEvent = OrdoEvent<APP_SCOPE, "register-command", Command>;
+export type UndoEvent = OrdoEvent<APP_SCOPE, "undo">;
+export type RedoEvent = OrdoEvent<APP_SCOPE, "redo">;
 
 export type AppEvents = GetStateEvent &
 	ReloadWindowEvent &
@@ -40,4 +42,6 @@ export type AppEvents = GetStateEvent &
 	GetUserSettingsEvent &
 	SetInternalSettingEvent &
 	SetUserSettingEvent &
+	UndoEvent &
+	RedoEvent &
 	RegisterCommandEvent;

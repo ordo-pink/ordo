@@ -116,6 +116,13 @@ const registerCommandHandler: OrdoEventHandler<"@app/register-command"> = ({ dra
 	draft.app.commands.push(payload);
 };
 
+const handleUndo: OrdoEventHandler<"@app/undo"> = ({ transmission }) => {
+	transmission.undo();
+};
+const handleRedo: OrdoEventHandler<"@app/redo"> = ({ transmission }) => {
+	transmission.undo();
+};
+
 export default registerEvents<AppEvents>({
 	"@app/get-state": getStateHandler,
 	"@app/close-window": closeWindowHandler,
@@ -128,4 +135,6 @@ export default registerEvents<AppEvents>({
 	"@app/get-user-settings": getUserSettingsHandler,
 	"@app/set-user-setting": setUserSettingHandler,
 	"@app/register-command": registerCommandHandler,
+	"@app/undo": handleUndo,
+	"@app/redo": handleRedo,
 });

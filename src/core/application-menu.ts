@@ -82,17 +82,17 @@ export const getApplicationMenu = (transmission: Transmission) => {
 			{
 				label: "&Edit",
 				submenu: [
-					// {
-					//   label: "Undo",
-					//   accelerator: "CommandOrControl+Z",
-					//   click: () => transmission.emit("@editor/undo", null);
-					// },
-					// {
-					//   label: "Redo",
-					//   accelerator: "CommandOrControl+Shift+Z",
-					//   click: () => transmission.emit("@editor/redo", null);
-					// },
-					// separator,
+					{
+						label: "Undo",
+						accelerator: "CommandOrControl+Z",
+						click: () => transmission.emit("@app/undo", null),
+					},
+					{
+						label: "Redo",
+						accelerator: "CommandOrControl+Shift+Z",
+						click: () => transmission.emit("@app/redo", null),
+					},
+					separator,
 					// {
 					//   label: "Cut",
 					//   accelerator: "CommandOrControl+X",

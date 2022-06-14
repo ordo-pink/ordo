@@ -29,7 +29,17 @@ export const LineNumber = React.memo(
 				.fold(noOpFn, (payload) =>
 					dispatch({
 						type: "@editor/update-caret-positions",
-						payload: e.ctrlKey ? current.tab!.caretPositions.concat(payload) : payload,
+						payload: e.ctrlKey
+							? current.tab!.caretPositions.concat(payload)
+							: e.shiftKey
+							? [
+									{
+										start: { line: number, character: 0 },
+										end: current.tab!.caretPositions[0].end,
+										direction: "rtl",
+									},
+							  ]
+							: payload,
 					}),
 				);
 

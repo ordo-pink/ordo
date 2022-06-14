@@ -58,6 +58,30 @@ export const Line = React.memo(
 						],
 					});
 				}
+			} else if (e.shiftKey) {
+				if (lineIndex + 1 < current.tab.caretPositions[0].start.line) {
+					dispatch({
+						type: "@editor/update-caret-positions",
+						payload: [
+							{
+								start: { line: lineIndex + 1, character: current.tab.content.children[lineIndex].raw.length },
+								end: current.tab.caretPositions[0].end,
+								direction: "rtl",
+							},
+						],
+					});
+				} else {
+					dispatch({
+						type: "@editor/update-caret-positions",
+						payload: [
+							{
+								start: current.tab.caretPositions[0].start,
+								end: { line: lineIndex + 1, character: current.tab.content.children[lineIndex].raw.length },
+								direction: "ltr",
+							},
+						],
+					});
+				}
 			} else {
 				dispatch({
 					type: "@editor/update-caret-positions",

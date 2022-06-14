@@ -94,6 +94,33 @@ export const Character = React.memo(
 							],
 						});
 					}
+				} else if (e.shiftKey) {
+					if (
+						char.position.character < current.tab.caretPositions[0].start.character ||
+						char.position.line < current.tab.caretPositions[0].start.line
+					) {
+						dispatch({
+							type: "@editor/update-caret-positions",
+							payload: [
+								{
+									start: char.position,
+									end: current.tab.caretPositions[0].end,
+									direction: "rtl",
+								},
+							],
+						});
+					} else {
+						dispatch({
+							type: "@editor/update-caret-positions",
+							payload: [
+								{
+									start: current.tab.caretPositions[0].start,
+									end: char.position,
+									direction: "ltr",
+								},
+							],
+						});
+					}
 				} else {
 					dispatch({
 						type: "@editor/update-caret-positions",

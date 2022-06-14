@@ -69,98 +69,146 @@ export const handleTyping: OrdoEventHandler<"@editor/handle-typing"> = ({ draft,
 		}
 	} else if (payload.event.key === "ArrowRight") {
 		tab.caretPositions.forEach((position) => {
-			if (position.start.character === currentLine.range.end.character) {
-				if (position.start.line === tail(tab.content.children).range.start.line) {
-					position.start.character = tail(tab.content.children).range.end.character;
+			if (position.start.line === position.end.line && position.start.character === position.end.character) {
+				position.direction = "ltr";
+			}
+
+			const direction = position.direction === "ltr" ? "end" : "start";
+
+			if (position[direction].character === tab.content.children[position[direction].line - 1].range.end.character) {
+				if (position[direction].line === tail(tab.content.children).range.start.line) {
+					position[direction].character = tail(tab.content.children).range.end.character;
 					return;
 				}
-				position.start.line++;
-				position.start.character = 0;
+				position[direction].line++;
+				position[direction].character = 0;
 			} else {
 				if (payload.event.ctrlKey) {
 					const char = findChar(
-						tab.content.children[position.start.line - 1],
-						position.start.line,
-						position.start.character + 1,
+						tab.content.children[position[direction].line - 1],
+						position[direction].line,
+						position[direction].character + 1,
 					);
 
 					if (!char) {
-						position.start.character = tab.content.children[position.start.line - 1].range.end.character;
+						position[direction].character = tab.content.children[position[direction].line - 1].range.end.character;
 					} else {
 						let nextNonChar: Char | null = char;
 
 						while (nextNonChar && (nextNonChar.type === CharType.CHAR || nextNonChar.type === CharType.OCTET)) {
 							nextNonChar = findChar(
-								tab.content.children[position.start.line - 1],
-								position.start.line,
+								tab.content.children[position[direction].line - 1],
+								position[direction].line,
 								nextNonChar.position.character + 1,
 							);
 						}
 
-						position.start.character =
-							nextNonChar?.position.character || tab.content.children[position.start.line - 1].range.end.character;
+						position[direction].character =
+							nextNonChar?.position.character || tab.content.children[position[direction].line - 1].range.end.character;
 					}
 				} else {
-					position.start.character++;
+					position[direction].character++;
 				}
+			}
+
+			if (!payload.event.shiftKey) {
+				position[direction === "start" ? "end" : "start"].line = position[direction].line;
+				position[direction === "start" ? "end" : "start"].character = position[direction].character;
 			}
 		});
 	} else if (payload.event.key === "ArrowLeft") {
 		tab.caretPositions.forEach((position) => {
-			if (position.start.character === 0) {
-				if (position.start.line === 1) {
+			if (position.start.line === position.end.line && position.start.character === position.end.character) {
+				position.direction = "rtl";
+			}
+
+			const direction = position.direction === "ltr" ? "end" : "start";
+
+			if (position[direction].character === 0) {
+				if (position[direction].line === 1) {
 					return;
 				}
-				position.start.line--;
-				position.start.character = tab.content.children[position.start.line - 1].range.end.character;
+				position[direction].line--;
+				position[direction].character = tab.content.children[position[direction].line - 1].range.end.character;
 			} else {
 				if (payload.event.ctrlKey) {
 					const char = findChar(
-						tab.content.children[position.start.line - 1],
-						position.start.line,
-						position.start.character - 1,
+						tab.content.children[position[direction].line - 1],
+						position[direction].line,
+						position[direction].character - 1,
 					);
 
 					if (!char) {
-						position.start.character = 0;
+						position[direction].character = 0;
 					} else {
 						let previousNonChar: Char | null = char;
 
 						while (previousNonChar && (previousNonChar.type === CharType.CHAR || previousNonChar.type === CharType.OCTET)) {
 							previousNonChar = findChar(
-								tab.content.children[position.start.line - 1],
-								position.start.line,
+								tab.content.children[position[direction].line - 1],
+								position[direction].line,
 								previousNonChar.position.character - 1,
 							);
 						}
 
-						position.start.character = previousNonChar?.position.character || 0;
+						position[direction].character = previousNonChar?.position.character || 0;
 					}
 				} else {
-					position.start.character--;
+					position[direction].character--;
 				}
+			}
+
+			if (!payload.event.shiftKey) {
+				position[direction === "start" ? "end" : "start"].line = position[direction].line;
+				position[direction === "start" ? "end" : "start"].character = position[direction].character;
 			}
 		});
 	} else if (payload.event.key === "ArrowUp") {
 		tab.caretPositions.forEach((position) => {
-			if (position.start.line === 1) {
-				position.start.character = 0;
+			if (position.start.line === position.end.line && position.start.character === position.end.character) {
+				position.direction = "rtl";
+			}
+
+			const direction = position.direction === "ltr" ? "end" : "start";
+
+			if (position[direction].line === 1) {
+				position[direction].character = 0;
 				return;
 			}
-			position.start.line--;
-			if (tab.content.children[position.start.line - 1].range.end.character <= position.start.character) {
-				position.start.character = tab.content.children[position.start.line - 1].range.end.character;
+
+			position[direction].line--;
+
+			if (tab.content.children[position[direction].line - 1].range.end.character <= position[direction].character) {
+				position[direction].character = tab.content.children[position[direction].line - 1].range.end.character;
+			}
+
+			if (!payload.event.shiftKey) {
+				position[direction === "start" ? "end" : "start"].line = position[direction].line;
+				position[direction === "start" ? "end" : "start"].character = position[direction].character;
 			}
 		});
 	} else if (payload.event.key === "ArrowDown") {
 		tab.caretPositions.forEach((position) => {
-			if (position.start.line === tail(tab.content.children).range.end.line) {
-				position.start.character = tail(tab.content.children).range.end.character;
+			if (position.start.line === position.end.line && position.start.character === position.end.character) {
+				position.direction = "ltr";
+			}
+
+			const direction = position.direction === "ltr" ? "end" : "start";
+
+			if (position[direction].line === tail(tab.content.children).range.end.line) {
+				position[direction].character = tail(tab.content.children).range.end.character;
 				return;
 			}
-			position.start.line++;
-			if (tab.content.children[position.start.line - 1].range.end.character <= position.start.character) {
-				position.start.character = tab.content.children[position.start.line - 1].range.end.character;
+
+			position[direction].line++;
+
+			if (tab.content.children[position[direction].line - 1].range.end.character <= position[direction].character) {
+				position[direction].character = tab.content.children[position[direction].line - 1].range.end.character;
+			}
+
+			if (!payload.event.shiftKey) {
+				position[direction === "start" ? "end" : "start"].line = position[direction].line;
+				position[direction === "start" ? "end" : "start"].character = position[direction].character;
 			}
 		});
 	} else if (payload.event.key === "Delete") {

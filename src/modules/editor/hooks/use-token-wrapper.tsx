@@ -64,7 +64,7 @@ export const useTextNodeWrapper = (node?: Node, isCurrentLine = false): React.FC
 		}
 
 		return TextWrapper();
-	}, [node.type, isCurrentLine]);
+	}, [node.type, node.raw, isCurrentLine]);
 
 	return wrapper;
 };

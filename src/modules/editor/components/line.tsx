@@ -86,8 +86,10 @@ export const Line = React.memo(
 				<LineNumber number={lineIndex + 1} />
 				<div className={`editor_line_content`} onClick={handleClick}>
 					<Caret
-						visible={t.caretPositions.some(
-							(position) => position.start.line === lineIndex + 1 && position.start.character === 0,
+						visible={t.caretPositions.some((position) =>
+							position.direction === "rtl"
+								? position.start.line === lineIndex + 1 && position.start.character === 0
+								: position.end.line === lineIndex + 1 && position.end.character === 0,
 						)}
 					/>
 					{hasNoChildren && <span> </span>}

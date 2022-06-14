@@ -15,12 +15,33 @@ export const Character = React.memo(
 		const current = useCurrentTab();
 
 		const [isCaretHere, setIsCaretHere] = React.useState<boolean>(false);
+		const [isWithinSelection, setIsWithinSelection] = React.useState<boolean>(false);
 
 		React.useEffect(() => {
 			if (current.tab && current.tab.caretPositions) {
 				setIsCaretHere(
 					current.tab.caretPositions.some(
-						(position) => char.position.line === position.start.line && char.position.character === position.start.character,
+						(position) =>
+							char.position.line === (position.direction === "rtl" ? position.start.line : position.end.line) &&
+							char.position.character === (position.direction === "rtl" ? position.start.character : position.end.character),
+					),
+				);
+
+				setIsWithinSelection(
+					current.tab.caretPositions.some(
+						(position) =>
+							(position.start.character !== position.end.character || position.start.line !== position.end.line) &&
+							((char.position.line === position.start.line &&
+								char.position.line === position.end.line &&
+								char.position.character > position.start.character &&
+								char.position.character <= position.end.character) ||
+								(char.position.line > position.start.line && char.position.line < position.end.line) ||
+								(char.position.line === position.start.line &&
+									char.position.line < position.end.line &&
+									char.position.character > position.start.character) ||
+								(char.position.line > position.start.line &&
+									char.position.line === position.end.line &&
+									char.position.character <= position.end.character)),
 					),
 				);
 			}
@@ -104,7 +125,11 @@ export const Character = React.memo(
 
 		return (
 			<>
-				{char.value ? <span onClick={handleClick}>{char.value}</span> : null}
+				{char.value ? (
+					<span className={isWithinSelection ? "bg-pink-200" : ""} onClick={handleClick}>
+						{char.value}
+					</span>
+				) : null}
 				<Caret visible={isCaretHere && char.position.character !== 0} />
 			</>
 		);

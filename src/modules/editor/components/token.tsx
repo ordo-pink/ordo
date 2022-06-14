@@ -12,15 +12,24 @@ export const Token = React.memo(
 		const current = useCurrentTab();
 		const Wrapper = useTextNodeWrapper(
 			token,
-			current.tab?.caretPositions.some((position) => position.start.line === token.range.start.line),
+			current.tab?.caretPositions.some(
+				(position) => position.end.line >= token.range.end.line && position.start.line <= token.range.start.line,
+			),
 		);
 		const alwaysShowMarkdownSymbols = useAppSelector((state) => state.app.userSettings.editor.alwaysShowMarkdownSymbols);
 		const isCurrentLine = React.useMemo(
-			() => current.tab && current.tab.caretPositions.some((position) => position.start.line === token.range.start.line),
+			() =>
+				current.tab &&
+				current.tab.caretPositions.some(
+					(position) => position.end.line >= token.range.end.line && position.start.line <= token.range.start.line,
+				),
 			[
+				token.raw,
 				current.tab && current.tab.caretPositions.length,
 				current.tab && current.tab.caretPositions[0].start.line,
+				current.tab && current.tab.caretPositions[0].end.line,
 				token && token.range.start.line,
+				token && token.range.end.line,
 			],
 		);
 

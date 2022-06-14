@@ -114,12 +114,12 @@ export const getApplicationMenu = (transmission: Transmission) => {
 						accelerator: "CommandOrControl+F",
 						click: () => transmission.emit("@top-bar/open-search-in-file", null),
 					},
-					// separator,
-					// {
-					//   label: "Select All",
-					//   accelerator: "CommandOrControl+A",
-					//   click: () => transmission.emit("@editor/select-all", null);
-					// },
+					separator,
+					{
+						label: "Select All",
+						accelerator: "CommandOrControl+A",
+						click: () => transmission.emit("@editor/select-all", null),
+					},
 					separator,
 					{
 						label: "Copy Path",

@@ -126,7 +126,7 @@ export const Character = React.memo(
 		return (
 			<>
 				{char.value ? (
-					<span className={isWithinSelection ? "bg-pink-200" : ""} onClick={handleClick}>
+					<span className={isWithinSelection ? "bg-pink-200 dark:bg-pink-700" : ""} onClick={handleClick}>
 						{char.value}
 					</span>
 				) : null}

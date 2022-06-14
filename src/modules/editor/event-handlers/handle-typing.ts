@@ -249,16 +249,18 @@ export const handleTyping: OrdoEventHandler<"@editor/handle-typing"> = ({ draft,
 		let reparse = false;
 
 		tab.caretPositions.forEach((position) => {
-			const lineIndex = position.start.line - 1;
-			const charPosition = position.start.character;
+			const direction = position.direction === "ltr" ? "end" : "start";
+
+			const lineIndex = position[direction].line - 1;
+			const charPosition = position[direction].character;
 
 			if (charPosition === 0) {
 				if (lineIndex === 0) {
 					return;
 				}
 
-				position.start.line--;
-				position.start.character = tab.content.children[lineIndex - 1].raw.length;
+				position[direction].line--;
+				position[direction].character = tab.content.children[lineIndex - 1].raw.length;
 
 				tab.content.children[lineIndex - 1].raw =
 					tab.content.children[lineIndex - 1].raw + tab.content.children[lineIndex].raw;
@@ -269,15 +271,15 @@ export const handleTyping: OrdoEventHandler<"@editor/handle-typing"> = ({ draft,
 			} else {
 				if (payload.event.ctrlKey) {
 					let previousNonChar = findChar(
-						tab.content.children[position.start.line - 1],
-						position.start.line,
-						position.start.character - 1,
+						tab.content.children[position[direction].line - 1],
+						position[direction].line,
+						position[direction].character - 1,
 					);
 
 					while (previousNonChar && (previousNonChar.type === CharType.CHAR || previousNonChar.type === CharType.OCTET)) {
 						previousNonChar = findChar(
-							tab.content.children[position.start.line - 1],
-							position.start.line,
+							tab.content.children[position[direction].line - 1],
+							position[direction].line,
 							previousNonChar.position.character - 1,
 						);
 					}
@@ -286,13 +288,13 @@ export const handleTyping: OrdoEventHandler<"@editor/handle-typing"> = ({ draft,
 
 					tab.content.children[lineIndex].raw =
 						tab.content.children[lineIndex].raw.slice(0, found ? found - 1 : 0) +
-						tab.content.children[lineIndex].raw.slice(position.start.character);
-					position.start.character = found ? found - 1 : 0;
+						tab.content.children[lineIndex].raw.slice(position[direction].character);
+					position[direction].character = found ? found - 1 : 0;
 				} else {
 					tab.content.children[lineIndex].raw =
 						tab.content.children[lineIndex].raw.slice(0, charPosition - 1) +
 						tab.content.children[lineIndex].raw.slice(charPosition);
-					position.start.character--;
+					position[direction].character--;
 				}
 
 				tab.content.children[lineIndex] = parseLine(tab.content.children[lineIndex].raw, lineIndex, tab.content, {

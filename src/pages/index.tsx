@@ -20,14 +20,14 @@ export default function IndexPage() {
         <GradientTitle text="Ordo" />
         <div className="mt-5 text-center">
           <p>
-            Private beta starts on <strong>June 15</strong>.
+            Private beta <strong>started</strong>!
           </p>
           <p>
             Subscribe on{" "}
             <a className="underline" href="https://twitter.com/ordo_pink">
               Twitter
             </a>{" "}
-            to participate.
+            to follow along!
           </p>
         </div>
       </div>

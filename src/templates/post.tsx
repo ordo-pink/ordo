@@ -22,7 +22,7 @@ export const pageQuery = graphql`
 
 export default function Post({ data }: any) {
   return (
-    <div className="flex flex-col min-h-screen bg-gradient-to-br p-2 from-neutral-50 to-neutral-100 dark:from-neutral-700 dark:to-neutral-800 text-neutral-800 dark:text-neutral-300">
+    <div className="flex flex-col min-h-screen bg-gradient-to-br p-2 from-neutral-50 to-neutral-100 dark:from-neutral-700 dark:to-neutral-800 text-neutral-800 dark:text-neutral-300 overflow-x-hidden">
       <Seo
         title={data.markdownRemark.frontmatter.title}
         description={data.markdownRemark.frontmatter.excerpt}

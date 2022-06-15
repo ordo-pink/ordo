@@ -9,15 +9,11 @@ export const handleCopy: OrdoEventHandler<"@editor/copy"> = ({ transmission, con
 
 	if (!tab) return;
 
-	const text = tab.raw.split("\n").slice(3).join("\n");
-
 	const markup = tab.caretPositions.map((position) => {
 		const firstChar = findChar(tab.content, position.start.line, position.start.character);
 		const lastChar = findChar(tab.content, position.end.line, position.end.character);
 
-		console.log(firstChar?.position, lastChar?.position);
-
-		return text.slice(firstChar?.position.offset ?? 0, lastChar?.position.offset ?? 0);
+		return tab.content.raw.slice(firstChar?.position.offset ?? 0, lastChar?.position.offset ?? 0);
 	});
 
 	context.toClipboard(markup.join("\n"));

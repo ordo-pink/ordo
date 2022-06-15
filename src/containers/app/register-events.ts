@@ -117,15 +117,7 @@ const registerCommandHandler: OrdoEventHandler<"@app/register-command"> = ({ dra
 };
 
 const handleUndo: OrdoEventHandler<"@app/undo"> = ({ transmission }) => {
-	const tabs = transmission.select((state) => state.editor.tabs);
-	const currentTab = transmission.select((state) => state.editor.currentTab);
-
-	const tab = tabs.find((t) => t.path === currentTab);
-
-	if (!tab) return;
-
 	transmission.undo();
-	transmission.emit("@file-explorer/save-file", { path: currentTab, content: tab.content.raw });
 };
 const handleRedo: OrdoEventHandler<"@app/redo"> = ({ transmission }) => {
 	transmission.undo();

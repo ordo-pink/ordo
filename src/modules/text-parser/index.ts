@@ -2,7 +2,6 @@ import { CharType } from "@core/parser/char-type";
 import { isDocumentRoot } from "@core/parser/is";
 import { lex } from "@core/parser/lexer";
 import { parse } from "@core/parser/parse";
-import { createReader } from "@core/parser/reader";
 import { Char, DocumentRoot, EvaluateFn, NodeWithChars, NodeWithChildren, Reader } from "@core/parser/types";
 import { userSettingsStore } from "@core/settings/user-settings";
 import { tail } from "@utils/array";
@@ -48,14 +47,8 @@ export const createNodeWithChars = <Type extends TextNodeWithCharsType>(
 	type,
 });
 
-export const parseLine = (
-	source: string | Char[],
-	index: number,
-	tree: NodeWithChildren,
-	metadata: { depth: number },
-) => {
-	const line = Array.isArray(source) ? source.map((char) => char.value).join("") : source;
-	const chars = Array.isArray(source) ? source : lex(source, index + 1);
+export const parseLine = (line: string, index: number, tree: NodeWithChildren, metadata: { depth: number }) => {
+	const chars = lex(line, index + 1);
 
 	let lineNode: NodeWithChildren | NodeWithChars;
 
@@ -169,28 +162,11 @@ export const parseText = (raw: string, tree: NodeWithChildren | DocumentRoot) =>
 		tree.data.frontmatter = frontmatterParsed.frontmatter;
 	}
 
-	const lines = [] as Char[][];
-	let currentLine = [] as Char[];
-
-	const chars = lex(tree.raw);
-	const reader = createReader(chars);
-
-	let currentChar = reader.next();
-
-	while (currentChar) {
-		if (currentChar.type === CharType.EOL) {
-			lines.push(currentLine);
-			currentLine = [];
-		} else {
-			currentLine.push(currentChar);
-		}
-
-		currentChar = reader.next();
-	}
+	const lines = tree.raw.split("\n");
 
 	const metadata = { depth: tree.depth };
 	tree.range = {
-		start: { line: 1, character: 0, offset: 0 },
+		start: { line: 1, character: 1, offset: 1 },
 		end: { line: lines.length, character: tail(lines).length, offset: raw.length },
 	};
 

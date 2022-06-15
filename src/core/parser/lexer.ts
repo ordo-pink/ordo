@@ -20,7 +20,7 @@ export const lex = (text: string, initialLine = 1, initialChar = 1): Char[] =>
 					position: {
 						line,
 						character,
-						offset: offset + 1,
+						offset,
 					},
 				};
 

@@ -1,12 +1,27 @@
 import { CharType } from "@core/parser/char-type";
-import { NodeWithChildren, Char } from "@core/parser/types";
+import { isNodeWithChars, isNodeWithChildren } from "@core/parser/is";
+import { NodeWithChildren, Char, Node } from "@core/parser/types";
 import { OrdoEventHandler } from "@core/types";
 import { findOrdoFile } from "@modules/file-explorer/utils/find-ordo-file";
 import { parseLine, createNodeWithChildren } from "@modules/text-parser";
 import { TextNodeWithChildrenType } from "@modules/text-parser/enums";
 import { tail } from "@utils/array";
 import { collectFrontmatterValues } from "../utils/collect-frontmatter-values";
-import { findChar } from "../utils/find-char";
+
+const findChar = (tree: Node, line: number, character: number): Char | null => {
+	if (isNodeWithChildren(tree)) {
+		for (const child of tree.children) {
+			const found = findChar(child, line, character);
+			if (found) {
+				return found;
+			}
+		}
+	} else if (isNodeWithChars(tree)) {
+		return tree.chars.find((char) => char.position.line === line && char.position.character === character) ?? null;
+	}
+
+	return null;
+};
 
 export const handleTyping: OrdoEventHandler<"@editor/handle-typing"> = ({ draft, payload, transmission }) => {
 	if (!draft.editor.focused) {

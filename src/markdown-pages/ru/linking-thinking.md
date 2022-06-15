@@ -10,6 +10,12 @@ slug: /ru/linking-thinking
 и недостатки и места применения, а главное - их можно миксовать. Да и вообще, попробуйте положить файл не в папку, это
 должно быть интересно)
 
+## Оглавление
+
+1. [Про маркдаун](/ru/markdown-basics)
+2. [Как связывать мысли](/ru/linking-thinking)
+3. [Про визуализацию заметок в Ordo](/ru/using-ordo-components)
+
 ![Linking Thinking](./linking-thinking.png)
 
 ## Как организовать

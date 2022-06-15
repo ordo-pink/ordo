@@ -34,7 +34,7 @@ export default function IndexPage() {
               className="flex space-x-2 justify-center items-center bg-gradient-to-tr from-purple-600 to-pink-700 text-neutral-200 font-bold px-2 py-1 rounded-lg shadow-lg"
             >
               <HiOutlineBookOpen />
-              <div>A small three-page tutorial to get started (RU only)</div>
+              <div>Getting Started Three-Pager</div>
             </Link>
           </p>
         </div>

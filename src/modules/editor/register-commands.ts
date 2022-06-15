@@ -13,6 +13,27 @@ export default registerCommands([
 		description: "Select everything in the file",
 		event: "@editor/select-all",
 		icon: "HiOutlineSelector",
-		accelerator: "CommandOrControl+Shift+A",
+		accelerator: "CommandOrControl+A",
+	},
+	{
+		name: "Copy",
+		description: "Copy selection",
+		event: "@editor/copy",
+		icon: "HiOutlineClipboardCopy",
+		accelerator: "CommandOrControl+C",
+	},
+	{
+		name: "Cut",
+		description: "Cut selection",
+		event: "@editor/cut",
+		icon: "HiOutlineScissors",
+		accelerator: "CommandOrControl+X",
+	},
+	{
+		name: "Paste",
+		description: "Paste text",
+		event: "@editor/paste",
+		icon: "HiOutlineClipboardList",
+		accelerator: "CommandOrControl+V",
 	},
 ]);

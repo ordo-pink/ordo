@@ -49,6 +49,8 @@ export class Transmission {
 			"@editor/toggle-todo",
 			"@editor/handle-typing",
 			"@editor/close-tab",
+			"@editor/cut",
+			"@editor/paste",
 			"@file-explorer/move",
 			"@file-explorer/replace-line",
 			"@file-explorer/set-folder-color",

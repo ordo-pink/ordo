@@ -52,26 +52,26 @@ export const userSettingsSchema: Schema<UserSettings> = {
 				type: "boolean",
 				default: false,
 			},
-			autoClosingBrackets: {
-				description: "Automatically close brackets::Let or let not the machine do the job for you",
-				type: "boolean",
-				default: true,
-			},
-			autoClosingQuotes: {
-				description: "Automatically close quotes::Let or let not the machine do the job for you",
-				type: "boolean",
-				default: true,
-			},
-			autoSurround: {
-				description: "Automatically surround text::Let or let not the machine do the job for you",
-				type: "boolean",
-				default: true,
-			},
-			emptySelectionLineToClipboard: {
-				description: "Copy without selection::If this is on, you can copy the whole line if it doesn't have selection",
-				type: "boolean",
-				default: true,
-			},
+			// autoClosingBrackets: {
+			// 	description: "Automatically close brackets::Let or let not the machine do the job for you",
+			// 	type: "boolean",
+			// 	default: true,
+			// },
+			// autoClosingQuotes: {
+			// 	description: "Automatically close quotes::Let or let not the machine do the job for you",
+			// 	type: "boolean",
+			// 	default: true,
+			// },
+			// autoSurround: {
+			// 	description: "Automatically surround text::Let or let not the machine do the job for you",
+			// 	type: "boolean",
+			// 	default: true,
+			// },
+			// emptySelectionLineToClipboard: {
+			// 	description: "Copy without selection::If this is on, you can copy the whole line if it doesn't have selection",
+			// 	type: "boolean",
+			// 	default: true,
+			// },
 		},
 	},
 	explorer: {

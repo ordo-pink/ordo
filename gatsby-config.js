@@ -11,7 +11,14 @@ module.exports = {
     "gatsby-plugin-postcss",
     "gatsby-plugin-robots-txt",
     "gatsby-plugin-sitemap",
-    // "gatsby-plugin-image",
+    {
+      resolve: "gatsby-source-filesystem",
+      options: {
+        name: "markdown-pages",
+        path: `${__dirname}/src/markdown-pages`,
+      },
+    },
+    "gatsby-plugin-image",
     // {
     //   resolve: "gatsby-source-filesystem",
     //   options: {
@@ -19,8 +26,24 @@ module.exports = {
     //     path: "${__dirname}/src/images",
     //   },
     // },
-    // "gatsby-transformer-sharp",
-    // "gatsby-plugin-sharp",
+    "gatsby-transformer-sharp",
+    "gatsby-plugin-sharp",
+    {
+      resolve: "gatsby-transformer-remark",
+      options: {
+        plugins: [
+          {
+            resolve: "gatsby-remark-images",
+            options: {
+              // It's important to specify the maxWidth (in pixels) of
+              // the content container as this plugin uses this as the
+              // base for generating different widths of each image.
+              maxWidth: 1152,
+            },
+          },
+        ],
+      },
+    },
     // {
     //   resolve: "gatsby-plugin-manifest",
     //   options: {

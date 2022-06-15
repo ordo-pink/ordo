@@ -5,7 +5,7 @@ export const Footer: React.FC = () => (
   <footer className="py-10 self-center">
     © {new Date().getFullYear()}{" "}
     <Link className="underline" to="/">
-      Ordo
+      Ordo ||l
     </Link>
   </footer>
 )

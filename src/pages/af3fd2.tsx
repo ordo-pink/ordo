@@ -1,10 +1,12 @@
+import { Link } from "gatsby"
 import React from "react"
 import { DiApple, DiWindows } from "react-icons/di"
+import { HiOutlineBookOpen } from "react-icons/hi"
 import { Footer } from "../components/footer"
 import { GradientTitle } from "../components/gradient-title"
 import { Header } from "../components/header"
 
-const PrivateBeta = () => {
+export default function PrivateBeta() {
   return (
     <div className="flex flex-col min-h-screen bg-gradient-to-br from-neutral-50 to-neutral-100 dark:from-neutral-700 dark:to-neutral-800 text-neutral-800 dark:text-neutral-300">
       <Header />
@@ -30,6 +32,15 @@ const PrivateBeta = () => {
             <DiWindows />
             <div>Download for Windows</div>
           </a>
+        </div>
+        <div className="mt-5 flex flex-col space-y-2 w-full">
+          <Link
+            to="/ru/markdown-basics"
+            className="flex space-x-2 justify-center items-center bg-gradient-to-tr from-neutral-600 to-neutral-700 text-neutral-200 font-bold px-2 py-1 rounded-lg shadow-lg"
+          >
+            <HiOutlineBookOpen />
+            <div>Getting Started Three-Pager</div>
+          </Link>
         </div>
         <div className="mt-12 bg-rose-200 dark:bg-rose-800 w-72 p-2 rounded-lg">
           <p>
@@ -75,5 +86,3 @@ const PrivateBeta = () => {
     </div>
   )
 }
-
-export default PrivateBeta

@@ -96,19 +96,19 @@ export const getApplicationMenu = (transmission: Transmission) => {
 					// {
 					//   label: "Cut",
 					//   accelerator: "CommandOrControl+X",
-					//   click: () => transmission.emit("@editor/cut", null);
+					//   click: () => transmission.emit("@editor/cut", null)
 					// },
-					// {
-					//   label: "Copy",
-					//   accelerator: "CommandOrControl+C",
-					//   click: () => transmission.emit("@editor/copy", null);
-					// },
+					{
+						label: "Copy",
+						accelerator: "CommandOrControl+C",
+						click: () => transmission.emit("@editor/copy", null),
+					},
 					// {
 					//   label: "Paste",
 					//   accelerator: "CommandOrControl+V",
-					//   click: () => transmission.emit("@editor/paste", null);
+					//   click: () => transmission.emit("@editor/paste", null)
 					// },
-					// separator,
+					separator,
 					{
 						label: "Find",
 						accelerator: "CommandOrControl+F",

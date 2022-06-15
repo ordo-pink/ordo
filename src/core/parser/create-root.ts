@@ -16,7 +16,7 @@ export const createRoot = (path: string): DocumentRoot => ({
 	range: {
 		start: {
 			line: 1,
-			character: 1,
+			character: 0,
 			offset: 1,
 		},
 		end: {

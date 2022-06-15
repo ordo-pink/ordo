@@ -8,7 +8,7 @@ import { Header } from "../components/header"
 
 export default function PrivateBeta() {
   return (
-    <div className="flex flex-col min-h-screen bg-gradient-to-br from-neutral-50 to-neutral-100 dark:from-neutral-700 dark:to-neutral-800 text-neutral-800 dark:text-neutral-300">
+    <div className="flex flex-col min-h-screen">
       <Header />
       <div className="flex-grow flex flex-col items-center justify-center justify-self-center self-center">
         <h2 className="text-xl font-bold uppercase border-b border-neutral-800 dark:border-neutral-300">

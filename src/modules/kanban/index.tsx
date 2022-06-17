@@ -6,19 +6,18 @@ import { useAppDispatch, useAppSelector } from "@core/state/store";
 import { findOrdoFolder } from "@modules/file-explorer/utils/find-ordo-folder";
 import { id, tap } from "@utils/functions";
 import { Column } from "./components/column";
-import { NodeWithChars } from "@core/parser/types";
-import { Columns, Tasks } from "./types";
+import { Columns, Task, Tasks } from "./types";
 import { collectFolders } from "@modules/file-explorer/utils/collect-folders";
 import { collectFiles } from "@modules/file-explorer/utils/collect-files";
 import { FoldVoid } from "@utils/either";
 import { NoOp, noOpFn } from "@utils/no-op";
 import { tapPreventDefault, tapStopPropagation } from "@utils/events";
-
-import "@modules/kanban/index.css";
 import { OrdoFolder } from "@modules/file-explorer/types";
 import { useIcon } from "@core/hooks/use-icon";
 import { findOrdoFile } from "@modules/file-explorer/utils/find-ordo-file";
 import { ComponentNode } from "@modules/text-parser/types";
+
+import "@modules/kanban/index.css";
 
 type Props = {
 	node: ComponentNode;
@@ -252,7 +251,7 @@ export const Kanban: React.FC<Props> = React.memo(
 								.chain((cs) => Either.fromNullable(cs[columnId]))
 								.chain((c) =>
 									Either.fromNullable(c.tasks)
-										.map((ts) => ts.map((id) => tasks[id]))
+										.map((ts) => ts.reduce((acc, id) => (tasks[id] ? acc.concat(tasks[id]) : acc), [] as Task[]))
 										.map((ts) => <Column key={c.path} column={c} tasks={ts} displayProperties={displayProperties} />),
 								)
 								.fold(NoOp, id),

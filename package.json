@@ -24,7 +24,7 @@
 	"config": {
 		"forge": {
 			"packagerConfig": {
-				"icon": "./assets/ordo-macos.icns"
+				"icon": "assets/icons/png/1024x1024.png"
 			},
 			"makers": [
 				{

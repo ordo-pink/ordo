@@ -33,7 +33,7 @@ export const createWindow = async (): Promise<void> => {
 		width: internalSettingsStore.get("window.width"),
 		x: internalSettingsStore.get("window.position.x"),
 		y: internalSettingsStore.get("window.position.y"),
-		icon: "assets/favicon.ico",
+		icon: "assets/icons/png/1024x1024.png",
 		// titleBarStyle: "hiddenInset",
 		acceptFirstMouse: true,
 		webPreferences: {
@@ -41,7 +41,7 @@ export const createWindow = async (): Promise<void> => {
 			contextIsolation: true,
 			nodeIntegration: false,
 			allowRunningInsecureContent: false,
-			accessibleTitle: "Order",
+			accessibleTitle: "Ordo",
 			preload: MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY,
 		},
 	});

@@ -3,7 +3,7 @@ import { promises } from "fs";
 import { userSettingsStore } from "@core/settings/user-settings";
 
 export const readFile = async (path: string) => {
-	const associations: any[] = userSettingsStore.get("explorer.associations");
+	const { associations } = userSettingsStore.get("explorer");
 	const extension = `.${path.split(".").reverse()[0]}`;
 
 	const association = associations.find((a) => a.extension === extension);
@@ -13,5 +13,5 @@ export const readFile = async (path: string) => {
 		return `data:image/${extension.slice(1)};base64,${content}`;
 	}
 
-	return promises.readFile(path, "utf-8");
+	if (association) return promises.readFile(path, "utf-8");
 };

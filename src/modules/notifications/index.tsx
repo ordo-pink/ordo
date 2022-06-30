@@ -8,7 +8,7 @@ export const Notifications: React.FC = () => {
 
 	const Bell = useIcon(messages.length ? "HiBell" : "HiOutlineBell");
 
-	const [showNotifications, setShowNotifications] = React.useState<boolean>(false);
+	const [showNotifications, setShowNotifications] = React.useState<boolean>(true);
 
 	const handleClick = () =>
 		setShowNotifications((prev) => {

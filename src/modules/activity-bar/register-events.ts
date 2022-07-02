@@ -3,18 +3,23 @@ import { OrdoEventHandler } from "@core/types";
 import { OrdoEvents } from "@init/types";
 import { ActivityBarEvents } from "@modules/activity-bar/types";
 
-const handleSelect: OrdoEventHandler<"@activity-bar/select"> = ({ draft, payload }) => {
+const handleSelect: OrdoEventHandler<"@activity-bar/select"> = ({ draft, payload, transmission }) => {
+	if (payload === "Editor") {
+		transmission.emit("@side-bar/show", null);
+	} else {
+		transmission.emit("@side-bar/hide", null);
+	}
+
 	draft.activityBar.current = payload;
 };
 
 const handleOpen =
-	<T extends keyof OrdoEvents>(activity: string, showSidebar = false): OrdoEventHandler<T> =>
+	<T extends keyof OrdoEvents>(activity: string): OrdoEventHandler<T> =>
 	({ transmission }) => {
-		transmission.emit(showSidebar ? "@side-bar/show" : "@side-bar/hide", null);
 		transmission.emit("@activity-bar/select", activity);
 	};
 
-const handleOpenEditor = handleOpen<"@activity-bar/open-editor">("Editor", true);
+const handleOpenEditor = handleOpen<"@activity-bar/open-editor">("Editor");
 const handleOpenGraph = handleOpen<"@activity-bar/open-graph">("Graph");
 const handleOpenSettings = handleOpen<"@activity-bar/open-settings">("Settings");
 const handleOpenCheckboxes = handleOpen<"@activity-bar/open-checkboxes">("Checkboxes");

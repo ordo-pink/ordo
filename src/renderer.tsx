@@ -5,12 +5,16 @@ import { Provider } from "react-redux";
 import { store } from "@core/state/store";
 import "./index.css";
 import { App } from "@containers/app";
+import ErrorBoundary from "@core/error-boundary";
 
-ReactDOM.render(
+const app = (
 	<React.StrictMode>
-		<Provider store={store}>
-			<App />
-		</Provider>
-	</React.StrictMode>,
-	document.querySelector("#container"),
+		<ErrorBoundary>
+			<Provider store={store}>
+				<App />
+			</Provider>
+		</ErrorBoundary>
+	</React.StrictMode>
 );
+
+ReactDOM.render(app, document.querySelector("#container"));

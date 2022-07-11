@@ -22,7 +22,7 @@ export const ActivityBar: React.FC = () => {
 			),
 			() => (
 				<div className="activity-bar">
-					<div>
+					<div className="flex flex-col space-y-2">
 						{items.map((item) => (
 							<ActivityBarIcon key={item.name} current={current} name={item.name} icon={item.icon} show={item.show} />
 						))}

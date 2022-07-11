@@ -18,7 +18,7 @@ export const handleOpenTab: OrdoEventHandler<"@editor/open-tab"> = async ({
 	const tree = draft.fileExplorer.tree;
 	const file = findOrdoFile(tree, "path", payload);
 
-	if (currentTab === payload || !file) {
+	if (!file) {
 		return;
 	}
 

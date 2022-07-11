@@ -18,11 +18,12 @@ export const ComponentWrapper =
 	({ isCurrentLine, component, node }: Config): React.FC =>
 	({ children }) => {
 		const Component = components[component];
+		const isExistComponent = typeof Component !== "undefined";
 
 		return (
 			<div>
 				<span className="text-xs text-neutral-500">{children}</span>
-				{isCurrentLine ? null : <Component node={node} />}
+				{!isCurrentLine && isExistComponent ? <Component node={node} /> : null}
 			</div>
 		);
 	};

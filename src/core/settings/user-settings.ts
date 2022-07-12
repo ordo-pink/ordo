@@ -44,7 +44,7 @@ export const userSettingsStore = new Store({
 					{ extension: ".txt", association: "document" },
 				],
 				confirmDelete: true,
-				confirmMove: true,
+				confirmMove: false,
 				enableDragAndDrop: true,
 			});
 		},

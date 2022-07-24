@@ -1,11 +1,11 @@
+import en from "@i18n/en.json";
+import ru from "@i18n/ru.json";
 import i18next from "i18next";
 import LanguageDetector from "i18next-browser-languagedetector";
 import React from "react";
 import ReactDOM from "react-dom";
 import { I18nextProvider, initReactI18next } from "react-i18next";
 import App from "./App";
-import en from "./i18n/en.json";
-import ru from "./i18n/ru.json";
 import "./index.css";
 import reportWebVitals from "./reportWebVitals";
 

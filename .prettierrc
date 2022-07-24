@@ -2,7 +2,6 @@
 	"printWidth": 120,
 	"trailingComma": "all",
 	"semi": true,
-	"useTabs": true,
-	"tabWidth": 1,
+	"tabWidth": 2,
 	"bracketSpacing": true
 }

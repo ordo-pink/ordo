@@ -1,9 +1,10 @@
-import path from 'path';
+/* eslint-disable @typescript-eslint/no-var-requires */
+const { resolve } = require("path");
 
 module.exports = {
 	webpack: {
 		alias: {
-			"@i18n": path.resolve(__dirname, "src", "i18n"),
+			"@i18n": resolve(__dirname, "src", "i18n"),
 		},
 	},
 };

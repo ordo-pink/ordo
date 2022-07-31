@@ -34,6 +34,9 @@ bower_components
 # node-waf configuration
 .lock-wscript
 
+# Mac OS DS Store File
+.DS_Store
+
 # Compiled binary addons (https://nodejs.org/api/addons.html)
 build/Release
 
@@ -102,3 +105,4 @@ dist
 
 # TernJS port file
 .tern-port
+

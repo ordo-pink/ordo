@@ -44,9 +44,12 @@ export const userSettingsStore = new Store({
 					{ extension: ".txt", association: "document" },
 				],
 				confirmDelete: true,
-				confirmMove: false,
+				confirmMove: true,
 				enableDragAndDrop: true,
 			});
+		},
+		"0.1.1": (s) => {
+			s.set("explorer.confirmMove", false);
 		},
 	},
 });

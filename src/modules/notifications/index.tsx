@@ -24,7 +24,7 @@ export const Notifications: React.FC = () => {
 			</div>
 
 			{showNotifications && (
-				<div style={{ bottom: 24, right: 10 }} className="fixed w-72 font-sans flex flex-col space-y-1">
+				<div style={{ bottom: 32, right: 10 }} className="fixed w-72 font-sans flex flex-col space-y-1">
 					{messages.map((message, index) => (
 						<Message key={index} message={message} index={index} />
 					))}

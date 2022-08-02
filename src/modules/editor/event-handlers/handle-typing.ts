@@ -173,6 +173,11 @@ export const handleTyping: OrdoEventHandler<"@editor/handle-typing"> = ({ draft,
 
 			if (position[direction].line === 1) {
 				position[direction].character = 0;
+
+				if (!payload.event.shiftKey) {
+					position[direction === "start" ? "end" : "start"].character = 0;
+				}
+
 				return;
 			}
 
@@ -197,6 +202,11 @@ export const handleTyping: OrdoEventHandler<"@editor/handle-typing"> = ({ draft,
 
 			if (position[direction].line === tail(tab.content.children).range.end.line) {
 				position[direction].character = tail(tab.content.children).range.end.character;
+
+				if (!payload.event.shiftKey) {
+					position[direction === "start" ? "end" : "start"].character = position[direction].character;
+				}
+
 				return;
 			}
 

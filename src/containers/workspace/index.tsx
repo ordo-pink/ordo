@@ -13,7 +13,7 @@ export const Workspace: React.FC = () => {
 	const Component = useWorkspaceComponent(currentActivity);
 
 	return (
-		<div>
+		<div className="w-full">
 			<Component />
 		</div>
 	);

@@ -22,9 +22,11 @@ export const ActivityBar: React.FC = () => {
 			),
 			() => (
 				<div className="activity-bar">
-					{items.map((item) => (
-						<ActivityBarIcon key={item.name} current={current} name={item.name} icon={item.icon} show={item.show} />
-					))}
+					<div className="flex flex-col space-y-2">
+						{items.map((item) => (
+							<ActivityBarIcon key={item.name} current={current} name={item.name} icon={item.icon} show={item.show} />
+						))}
+					</div>
 					<ActivityBarIcon current={current} name="Settings" icon="HiOutlineCog" show={true} />
 				</div>
 			),

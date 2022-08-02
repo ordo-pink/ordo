@@ -36,7 +36,7 @@
 
 .editor {
 	&_textarea {
-		@apply cursor-text h-[calc(100vh-8.7rem)];
+		@apply w-full cursor-text h-[calc(100vh-8.7rem)];
 	}
 
 	&_empty {

@@ -1,3 +1,3 @@
 .activity-bar {
-	@apply flex flex-col space-y-4 p-2 pb-6 text-4xl;
+	@apply h-screen flex flex-col space-y-4 p-2 pb-8 text-4xl justify-between;
 }

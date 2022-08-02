@@ -48,5 +48,8 @@ export const userSettingsStore = new Store({
 				enableDragAndDrop: true,
 			});
 		},
+		"0.1.1": (s) => {
+			s.set("explorer.confirmMove", false);
+		},
 	},
 });

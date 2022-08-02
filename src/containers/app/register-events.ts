@@ -120,7 +120,7 @@ const handleUndo: OrdoEventHandler<"@app/undo"> = ({ transmission }) => {
 	transmission.undo();
 };
 const handleRedo: OrdoEventHandler<"@app/redo"> = ({ transmission }) => {
-	transmission.undo();
+	transmission.redo();
 };
 
 export default registerEvents<AppEvents>({

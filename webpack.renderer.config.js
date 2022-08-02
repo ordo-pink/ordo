@@ -7,6 +7,24 @@ rules.push({
 	use: [{ loader: "style-loader" }, { loader: "css-loader" }, { loader: "postcss-loader" }],
 });
 
+rules.push({
+	test: /\.svg$/,
+	use: [
+		{
+			loader: "babel-loader",
+			options: {
+				presets: ["@babel/preset-react"],
+			},
+		},
+		{
+			loader: "react-svg-loader",
+			options: {
+				jsx: true, // true outputs JSX tags
+			},
+		},
+	],
+});
+
 module.exports = {
 	module: {
 		rules,

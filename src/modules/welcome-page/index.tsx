@@ -16,8 +16,8 @@ import "@modules/welcome-page/index.css";
 export const WelcomePage: React.FC = () => {
 	return (
 		<div className="welcome-page">
-			<Slogan />
 			<Logo />
+			<Slogan />
 			<div className="welcome-page_actions-container">
 				<RecentProjects />
 				<Activities />

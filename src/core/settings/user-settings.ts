@@ -50,6 +50,7 @@ export const userSettingsStore = new Store({
 		},
 		"0.1.1": (s) => {
 			s.set("explorer.confirmMove", false);
+			s.set("editor.alwaysShowMarkdownSymbols", false);
 		},
 	},
 });

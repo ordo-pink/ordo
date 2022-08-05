@@ -7,6 +7,7 @@ import { collectFiles } from "@modules/file-explorer/utils/collect-files";
 import { File } from "@modules/top-bar/components/file";
 
 import "@modules/top-bar/index.css";
+import { CaretRange } from "@modules/editor/types";
 
 /**
  * TopBar module provides easy access to finding things. It includes searching substring in
@@ -23,6 +24,7 @@ export const TopBar: React.FC = () => {
 	const commands = useAppSelector((state) => state.app.commands);
 	const tree = useAppSelector((state) => state.fileExplorer.tree);
 	const currentTab = useAppSelector((state) => state.editor.currentTab);
+	const tabs = useAppSelector((state) => state.editor.tabs);
 
 	const [selected, setSelected] = React.useState(0);
 	const [files, setFiles] = React.useState<any[]>([]);
@@ -54,7 +56,7 @@ export const TopBar: React.FC = () => {
 	}, [value, fusedCommands.length, fusedFiles.length]);
 
 	React.useEffect(() => {
-		if (value && value.startsWith(">")) {
+		if (value?.startsWith(">")) {
 			updateCommandList(value);
 		} else {
 			updateFileList(value);
@@ -146,29 +148,54 @@ export const TopBar: React.FC = () => {
 
 			dispatch({ type: "@top-bar/unfocus" });
 			dispatch({ type: "@editor/focus" });
-			value.startsWith(">")
-				? dispatch({ type: "@top-bar/run-command", payload: fusedCommands[selected].item.event })
-				: value.startsWith("@")
-				? dispatch({ type: "@editor/open-tab", payload: fusedFiles[selected].item.path })
-				: value.startsWith(":")
-				? // TODO: Refactor this insanity
-				  dispatch({
-						type: "@editor/update-caret-positions",
-						payload: [
-							{
-								start: {
-									line: Number(value.slice(1).split(":")[0]),
-									character: value.slice(1).split(":")[1] ? Number(value.slice(1).split(":")[1]) : 0,
-								},
-								end: {
-									line: Number(value.slice(1).split(":")[0]),
-									character: value.slice(1).split(":")[1] ? Number(value.slice(1).split(":")[1]) : 0,
-								},
-								direction: "ltr",
+
+			if (value.startsWith(">")) {
+				dispatch({ type: "@top-bar/run-command", payload: fusedCommands[selected].item.event });
+			} else if (value.startsWith("@")) {
+				dispatch({ type: "@editor/open-tab", payload: fusedFiles[selected].item.path });
+			} else if (value.startsWith(":")) {
+				const line = Number(value.slice(1).split(":")[0]);
+				const character = value.slice(1).split(":")[1] ? Number(value.slice(1).split(":")[1]) : 0;
+
+				const rangeEnd = tabs[0].content.range.end;
+
+				const condition =
+					Number.isNaN(line) ||
+					line > rangeEnd.line ||
+					line < 1 ||
+					Number.isNaN(character) ||
+					character > rangeEnd.character;
+
+				if (condition) {
+					dispatch({
+						type: "@notifications/add",
+						payload: {
+							type: "info",
+							title: "Range error",
+							content: "Incorrect line",
+						},
+					});
+				} else {
+					const payload: CaretRange[] = [
+						{
+							start: {
+								line,
+								character,
 							},
-						],
-				  })
-				: null;
+							end: {
+								line,
+								character,
+							},
+							direction: "ltr",
+						},
+					];
+
+					dispatch({
+						type: "@editor/update-caret-positions",
+						payload,
+					});
+				}
+			} else null;
 		} else if (e.key === "Escape") {
 			e.preventDefault();
 			e.stopPropagation();
@@ -195,39 +222,37 @@ export const TopBar: React.FC = () => {
 				{isFocused && value.startsWith(">") ? (
 					<div style={{ height }} className="top-bar_list">
 						<div>
-							{fusedCommands &&
-								fusedCommands.map(({ item }, index) => (
-									<Command
-										key={item.event}
-										index={index}
-										selected={selected}
-										name={item.name}
-										description={item.description}
-										icon={item.icon}
-										event={item.event}
-										accelerator={item.accelerator}
-										setSelected={setSelected}
-									/>
-								))}
+							{fusedCommands?.map(({ item }, index) => (
+								<Command
+									key={item.event}
+									index={index}
+									selected={selected}
+									name={item.name}
+									description={item.description}
+									icon={item.icon}
+									event={item.event}
+									accelerator={item.accelerator}
+									setSelected={setSelected}
+								/>
+							))}
 						</div>
 					</div>
 				) : null}
 				{isFocused && value.startsWith("@") ? (
 					<div style={{ height }} className="top-bar_list">
 						<div>
-							{fusedFiles &&
-								fusedFiles.map(({ item }, index) => (
-									<File
-										key={item.path}
-										index={index}
-										readableName={item.readableName}
-										size={item.size}
-										path={item.path}
-										type={item.type}
-										selected={selected}
-										setSelected={setSelected}
-									/>
-								))}
+							{fusedFiles?.map(({ item }, index) => (
+								<File
+									key={item.path}
+									index={index}
+									readableName={item.readableName}
+									size={item.size}
+									path={item.path}
+									type={item.type}
+									selected={selected}
+									setSelected={setSelected}
+								/>
+							))}
 						</div>
 					</div>
 				) : null}

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useRef, useEffect, useState } from "react";
 import { Either } from "or-else";
 
 import { useAppDispatch, useAppSelector } from "@core/state/store";
@@ -11,6 +11,8 @@ import { tail } from "@utils/array";
 export const Lines = React.memo(
 	() => {
 		const dispatch = useAppDispatch();
+		const refLines = useRef(null);
+		const [prevScrollHeight, setPrevScrollHeight] = useState(0);
 
 		const current = useCurrentTab();
 		const focused = useAppSelector((state) => state.editor.focused);
@@ -63,8 +65,21 @@ export const Lines = React.memo(
 			return () => removeKeyDownListener();
 		}, [current.tab, focused]);
 
+		useEffect(() => {
+			if (!refLines.current) return;
+			const linesComponent = refLines.current as HTMLDivElement;
+			const scrollHeight = linesComponent.scrollHeight;
+			const clientHeight = linesComponent.clientHeight;
+			const currentScrollHeight = scrollHeight - prevScrollHeight;
+
+			if (scrollHeight > clientHeight) {
+				linesComponent.scrollBy({ top: currentScrollHeight });
+				setPrevScrollHeight(scrollHeight);
+			}
+		}, [current.tab]);
+
 		return current.tab ? (
-			<div className="h-[calc(100vh-9rem)] overflow-auto" onClick={handleClick}>
+			<div className="h-[calc(100vh-9rem)] overflow-auto" ref={refLines} onClick={handleClick}>
 				{current.tab.content.children.map((_, lineIndex) => (
 					<Line key={`${lineIndex}`} lineIndex={lineIndex} />
 				))}

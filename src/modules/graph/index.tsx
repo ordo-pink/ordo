@@ -161,8 +161,6 @@ export const Graph: React.FC<GraphProps> = React.memo(
 		const dispatch = useAppDispatch();
 		const [loader, setLoader] = useState(true);
 
-		let network: Network;
-
 		useEffect(() => {
 			if (!ref.current) return;
 			var options: Options = {
@@ -199,16 +197,10 @@ export const Graph: React.FC<GraphProps> = React.memo(
 				physics: true,
 			};
 
-			network = new Network(ref.current, data, options);
+			const network = new Network(ref.current, data, options);
 
 			network.disableEditMode();
 
-			network.on("beforeDrawing", () => {
-				setLoader(false);
-			});
-		}, [ref]);
-
-		useEffect(() => {
 			network.on("click", (properties) => {
 				if (properties.nodes.length) {
 					const clickedNode = properties.nodes[0];
@@ -218,6 +210,10 @@ export const Graph: React.FC<GraphProps> = React.memo(
 						dispatch({ type: "@editor/open-tab", payload: file.path });
 					}
 				}
+			});
+
+			network.on("beforeDrawing", () => {
+				setLoader(false);
 			});
 		}, [ref, tree]);
 

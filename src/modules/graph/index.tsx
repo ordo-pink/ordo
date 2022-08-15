@@ -191,9 +191,6 @@ export const Graph: React.FC<GraphProps> = React.memo(
 					hideEdgesOnDrag: false,
 					tooltipDelay: 200,
 				},
-				layout: {
-					improvedLayout: false,
-				},
 				physics: true,
 			};
 

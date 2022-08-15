@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Network, Options } from "vis-network";
 
 import { OrdoFolder } from "@modules/file-explorer/types";
@@ -161,7 +161,9 @@ export const Graph: React.FC<GraphProps> = React.memo(
 		const dispatch = useAppDispatch();
 		const [loader, setLoader] = useState(true);
 
-		React.useEffect(() => {
+		let network: Network;
+
+		useEffect(() => {
 			if (!ref.current) return;
 			var options: Options = {
 				manipulation: {
@@ -197,10 +199,16 @@ export const Graph: React.FC<GraphProps> = React.memo(
 				physics: true,
 			};
 
-			const network = new Network(ref.current, data, options);
+			network = new Network(ref.current, data, options);
 
 			network.disableEditMode();
 
+			network.on("beforeDrawing", () => {
+				setLoader(false);
+			});
+		}, [ref]);
+
+		useEffect(() => {
 			network.on("click", (properties) => {
 				if (properties.nodes.length) {
 					const clickedNode = properties.nodes[0];
@@ -211,11 +219,7 @@ export const Graph: React.FC<GraphProps> = React.memo(
 					}
 				}
 			});
-
-			network.on("beforeDrawing", () => {
-				setLoader(false);
-			});
-		}, [ref.current, tree, data]);
+		}, [ref, tree]);
 
 		return (
 			<>

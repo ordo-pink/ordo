@@ -1,10 +1,11 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Network, Options } from "vis-network";
 
 import { OrdoFolder } from "@modules/file-explorer/types";
 import { isFolder } from "@modules/file-explorer/utils/is-folder";
 import { useAppDispatch } from "@core/state/store";
 import { findOrdoFile } from "@modules/file-explorer/utils/find-ordo-file";
+import { Loader } from "@modules/graph/components/loader";
 
 const collectNodes = (
 	tree: OrdoFolder,
@@ -158,8 +159,9 @@ export const Graph: React.FC<GraphProps> = React.memo(
 		const data = createNetwork(tree, showTags, showLinks, showFolders, mode === "dark");
 		const ref = React.useRef<HTMLDivElement>(null);
 		const dispatch = useAppDispatch();
+		const [loader, setLoader] = useState(true);
 
-		React.useEffect(() => {
+		useEffect(() => {
 			if (!ref.current) return;
 			var options: Options = {
 				manipulation: {
@@ -206,9 +208,22 @@ export const Graph: React.FC<GraphProps> = React.memo(
 					}
 				}
 			});
-		}, [ref.current, tree, data]);
 
-		return <div onClick={(e) => e.stopPropagation()} className="cursor-auto" style={{ height }} ref={ref}></div>;
+			network.on("beforeDrawing", () => {
+				setLoader(false);
+			});
+		}, [ref, tree]);
+
+		return (
+			<>
+				{loader && (
+					<div className="absolute top-1/2 left-1/2">
+						<Loader />
+					</div>
+				)}
+				<div onClick={(e) => e.stopPropagation()} className="cursor-auto" style={{ height }} ref={ref}></div>
+			</>
+		);
 	},
 	() => true,
 );

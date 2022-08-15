@@ -1,93 +1,93 @@
 .file-explorer {
-	@apply text-sm rounded-tl-lg;
+  @apply text-sm rounded-tl-lg;
 
-	&_header {
-		@apply flex w-full items-center justify-between bg-neutral-300 dark:bg-neutral-800 py-1 px-2 rounded-tl-lg;
+  &_header {
+    @apply flex w-full items-center justify-between bg-neutral-300 dark:bg-neutral-800 py-1 px-2 rounded-tl-lg;
 
-		&_title {
-			@apply cursor-pointer flex space-x-2 items-center select-none;
-		}
+    &_title {
+      @apply cursor-pointer flex space-x-2 items-center select-none;
+    }
 
-		&_project-name {
-			@apply font-bold uppercase;
-		}
+    &_project-name {
+      @apply font-bold uppercase;
+    }
 
-		&_actions {
-			@apply flex items-center space-x-2;
-		}
+    &_actions {
+      @apply flex items-center space-x-2;
+    }
 
-		&_action {
-			@apply hover:text-pink-600 cursor-pointer;
-		}
-	}
+    &_action {
+      @apply hover:text-pink-600 cursor-pointer;
+    }
+  }
 
-	&_tree-wrapper {
-		@apply h-[calc(100vh-6.25rem)] overflow-y-auto;
-	}
+  &_tree-wrapper {
+    @apply h-[calc(100vh-6.25rem)] overflow-y-auto;
+  }
 
-	&_creator {
-		@apply px-1 outline-none border border-neutral-400 dark:bg-neutral-700;
-	}
+  &_creator {
+    @apply px-1 outline-none border border-neutral-400 dark:bg-neutral-700;
+  }
 
-	&_item {
-		@apply flex space-x-2 cursor-pointer border border-transparent items-center select-none hover:bg-neutral-300 dark:hover:bg-neutral-700;
+  &_item {
+    @apply flex space-x-2 cursor-pointer border border-transparent items-center select-none hover:bg-neutral-300 dark:hover:bg-neutral-700;
 
-		&_current {
-			@apply bg-neutral-300 dark:bg-pink-700 border-neutral-500;
-		}
+    &_current {
+      @apply bg-neutral-300 dark:bg-pink-700 border-neutral-500;
+    }
 
-		&_open {
-			@apply bg-neutral-300 dark:bg-neutral-700;
-		}
+    &_open {
+      @apply bg-neutral-300 dark:bg-neutral-700;
+    }
 
-		&_icon {
-			@apply shrink-0;
-		}
+    &_icon {
+      @apply shrink-0;
+    }
 
-		&_name {
-			@apply pr-2 truncate;
-		}
-	}
+    &_name {
+      @apply pr-2 truncate;
+    }
+  }
 
-	&_folder {
-		&_neutral {
-			@apply shrink-0 text-neutral-600 dark:text-neutral-300;
-		}
+  &_folder {
+    &_neutral {
+      @apply shrink-0 text-neutral-600 dark:text-neutral-300;
+    }
 
-		&_red {
-			@apply shrink-0 text-red-600 dark:text-red-300;
-		}
+    &_red {
+      @apply shrink-0 text-red-600 dark:text-red-300;
+    }
 
-		&_pink {
-			@apply shrink-0 text-pink-600 dark:text-pink-300;
-		}
+    &_pink {
+      @apply shrink-0 text-pink-600 dark:text-pink-300;
+    }
 
-		&_orange {
-			@apply shrink-0 text-orange-600 dark:text-orange-300;
-		}
+    &_orange {
+      @apply shrink-0 text-orange-600 dark:text-orange-300;
+    }
 
-		&_yellow {
-			@apply shrink-0 text-yellow-600 dark:text-yellow-300;
-		}
+    &_yellow {
+      @apply shrink-0 text-yellow-600 dark:text-yellow-300;
+    }
 
-		&_lime {
-			@apply shrink-0 text-lime-600 dark:text-lime-300;
-		}
+    &_lime {
+      @apply shrink-0 text-lime-600 dark:text-lime-300;
+    }
 
-		&_green {
-			@apply shrink-0 text-green-600 dark:text-green-300;
-		}
+    &_green {
+      @apply shrink-0 text-green-600 dark:text-green-300;
+    }
 
-		&_sky {
-			@apply shrink-0 text-sky-600 dark:text-sky-300;
-		}
+    &_sky {
+      @apply shrink-0 text-sky-600 dark:text-sky-300;
+    }
 
-		&_blue {
-			@apply shrink-0 text-blue-600 dark:text-blue-300;
-		}
+    &_blue {
+      @apply shrink-0 text-blue-600 dark:text-blue-300;
+    }
 
-		&_purple {
-			@apply shrink-0 text-purple-600 dark:text-purple-300;
-		}
-	}
+    &_purple {
+      @apply shrink-0 text-purple-600 dark:text-purple-300;
+    }
+  }
 }

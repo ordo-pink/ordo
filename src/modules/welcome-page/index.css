@@ -1,31 +1,31 @@
 .welcome-page {
-	@apply h-screen select-none -z-50 flex flex-col flex-grow w-full justify-center items-center text-neutral-600 dark:text-neutral-300;
+  @apply h-screen select-none -z-50 flex flex-col flex-grow w-full justify-center items-center text-neutral-600 dark:text-neutral-300;
 
-	&_title-container {
-		@apply relative w-full flex items-center justify-center pb-20;
-	}
+  &_title-container {
+    @apply relative w-full flex items-center justify-center pb-20;
+  }
 
-	&_title {
-		@apply cursor-pointer font-bold text-8xl bg-gradient-to-bl from-orange-600 to-pink-700 text-transparent bg-clip-text drop-shadow-xl;
-	}
+  &_title {
+    @apply cursor-pointer font-bold text-8xl bg-gradient-to-bl from-orange-600 to-pink-700 text-transparent bg-clip-text drop-shadow-xl;
+  }
 
-	&_bring-your-thoughts-to {
-		@apply text-lg uppercase tracking-wider border-neutral-400;
-	}
+  &_bring-your-thoughts-to {
+    @apply text-lg uppercase tracking-wider border-neutral-400;
+  }
 
-	&_actions-container {
-		@apply flex space-x-24 justify-center mt-12;
-	}
+  &_actions-container {
+    @apply flex space-x-24 justify-center mt-12;
+  }
 
-	&_actions-heading {
-		@apply text-xl mb-2;
-	}
+  &_actions-heading {
+    @apply text-xl mb-2;
+  }
 
-	&_action {
-		@apply flex space-x-2 items-center hover:text-pink-500 transition-all duration-300;
-	}
+  &_action {
+    @apply flex space-x-2 items-center hover:text-pink-500 transition-all duration-300;
+  }
 
-	&_recent-project {
-		@apply bg-neutral-200 dark:bg-neutral-600 mb-2 py-1 px-3 rounded-lg hover:underline cursor-pointer;
-	}
+  &_recent-project {
+    @apply bg-neutral-200 dark:bg-neutral-600 mb-2 py-1 px-3 rounded-lg hover:underline cursor-pointer;
+  }
 }

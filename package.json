@@ -1,220 +1,221 @@
 {
-	"name": "ordo",
-	"productName": "Ordo",
-	"version": "0.1.0",
-	"description": "Bring Your Thoughts to Ordo",
-	"main": ".webpack/main",
-	"scripts": {
-		"commit": "gitmoji --commit",
-		"start": "electron-forge start -- --debug",
-		"test": "cross-env NODE_PATH=src ava",
-		"test:cover": "cross-env NODE_PATH=src nyc ava",
-		"package": "electron-forge package",
-		"make": "electron-forge make",
-		"debug": "electron-forge start --inspect-electron",
-		"publish": "electron-forge publish",
-		"lint": "eslint --ext .ts,.tsx ."
-	},
-	"keywords": [],
-	"author": {
-		"name": "Sergei Orlov",
-		"email": "hello@orlow.dev"
-	},
-	"license": "MIT",
-	"config": {
-		"forge": {
-			"packagerConfig": {
-				"icon": "assets/android-chrome-512x512.png"
-			},
-			"makers": [
-				{
-					"name": "@electron-forge/maker-squirrel",
-					"config": {
-						"name": "ordo"
-					}
-				},
-				{
-					"name": "@electron-forge/maker-zip",
-					"platforms": [
-						"darwin"
-					]
-				},
-				{
-					"name": "@electron-forge/maker-deb",
-					"config": {}
-				},
-				{
-					"name": "@electron-forge/maker-rpm",
-					"config": {}
-				}
-			],
-			"plugins": [
-				[
-					"@electron-forge/plugin-webpack",
-					{
-						"mainConfig": "./webpack.main.config.js",
-						"renderer": {
-							"config": "./webpack.renderer.config.js",
-							"entryPoints": [
-								{
-									"html": "./src/index.html",
-									"js": "./src/renderer.tsx",
-									"name": "main_window",
-									"preload": {
-										"js": "./src/preload.ts"
-									}
-								}
-							]
-						}
-					}
-				]
-			]
-		}
-	},
-	"postcss": {
-		"plugins": {
-			"tailwindcss/nesting": {},
-			"tailwindcss": {},
-			"autoprefixer": {}
-		}
-	},
-	"prettier": {
-		"printWidth": 120,
-		"trailingComma": "all",
-		"semi": true,
-		"useTabs": true,
-		"tabWidth": 1,
-		"bracketSpacing": true
-	},
-	"eslintConfig": {
-		"env": {
-			"browser": true,
-			"es6": true,
-			"node": true
-		},
-		"rules": {
-			"import/no-unresolved": [
-				2,
-				{
-					"ignore": [
-						"ava"
-					]
-				}
-			],
-			"@typescript-eslint/no-var-requires": [
-				2,
-				{
-					"ignore": "js"
-				}
-			]
-		},
-		"extends": [
-			"eslint:recommended",
-			"plugin:@typescript-eslint/eslint-recommended",
-			"plugin:@typescript-eslint/recommended",
-			"plugin:import/recommended",
-			"plugin:import/electron",
-			"plugin:import/typescript"
-		],
-		"parser": "@typescript-eslint/parser"
-	},
-	"ava": {
-		"files": [
-			"src/**/*.test.*"
-		],
-		"extensions": [
-			"ts"
-		],
-		"require": [
-			"tsconfig-paths/register",
-			"ts-node/register"
-		],
-		"concurrency": 5,
-		"failFast": true,
-		"failWithoutAssertions": false,
-		"verbose": true,
-		"nodeArguments": [
-			"--trace-deprecation",
-			"--napi-modules"
-		]
-	},
-	"nyc": {
-		"reporter": [
-			"text",
-			"lcov",
-			"html"
-		],
-		"exclude": [
-			"coverage/*",
-			"src/renderer.ts",
-			"src/preload.ts",
-			"src/main.ts",
-			"*webpack*"
-		],
-		"branches": 80,
-		"lines": 80,
-		"functions": 80,
-		"statements": 80,
-		"check-coverage": true,
-		"all": true
-	},
-	"devDependencies": {
-		"@electron-forge/cli": "^6.0.0-beta.61",
-		"@electron-forge/maker-deb": "^6.0.0-beta.61",
-		"@electron-forge/maker-rpm": "^6.0.0-beta.61",
-		"@electron-forge/maker-squirrel": "^6.0.0-beta.61",
-		"@electron-forge/maker-zip": "^6.0.0-beta.61",
-		"@electron-forge/plugin-webpack": "^6.0.0-beta.63",
-		"@types/react": "17.0.2",
-		"@types/react-beautiful-dnd": "^13.1.2",
-		"@types/react-dom": "17.0.2",
-		"@typescript-eslint/eslint-plugin": "^4.0.1",
-		"@typescript-eslint/parser": "^4.0.1",
-		"@vercel/webpack-asset-relocator-loader": "1.7.0",
-		"autoprefixer": "^10.4.4",
-		"ava": "^4.2.0",
-		"babel-loader": "^8.2.5",
-		"cross-env": "^7.0.3",
-		"css-loader": "^6.0.0",
-		"electron": "18.0.3",
-		"eslint": "^7.6.0",
-		"eslint-plugin-import": "^2.20.0",
-		"fork-ts-checker-webpack-plugin": "^6.0.1",
-		"gitmoji-cli": "^4.13.1",
-		"node-loader": "^2.0.0",
-		"nyc": "^15.1.0",
-		"postcss-loader": "^6.2.1",
-		"react-svg-loader": "^3.0.3",
-		"sinon": "^13.0.1",
-		"style-loader": "^3.0.0",
-		"ts-loader": "^9.2.2",
-		"ts-node": "^10.7.0",
-		"tsconfig-paths": "^4.0.0",
-		"typescript": "^4.0.2"
-	},
-	"dependencies": {
-		"@reduxjs/toolkit": "^1.8.1",
-		"@tailwindcss/forms": "^0.5.2",
-		"electron-devtools-installer": "^3.2.0",
-		"electron-squirrel-startup": "^1.0.0",
-		"electron-store": "^8.0.1",
-		"electron-util": "^0.17.2",
-		"fuse.js": "^6.5.3",
-		"immer": "^9.0.12",
-		"or-else": "^0.1.0",
-		"react": "^17.0.2",
-		"react-beautiful-dnd": "^13.1.0",
-		"react-dom": "^17.0.2",
-		"react-icons": "^4.3.1",
-		"react-redux": "^8.0.0",
-		"react-split": "^2.0.14",
-		"react-spring": "^9.4.4",
-		"tailwindcss": "^3.0.24",
-		"vis-data": "^7.1.4",
-		"vis-network": "^9.1.2"
-	},
-	"resolutions": {
-		"@types/react": "17.0.2",
-		"@types/react-dom": "17.0.2"
-	}
+  "name": "ordo",
+  "productName": "Ordo",
+  "version": "0.1.0",
+  "description": "Bring Your Thoughts to Ordo",
+  "main": ".webpack/main",
+  "scripts": {
+    "commit": "gitmoji --commit",
+    "start": "electron-forge start -- --debug",
+    "test": "cross-env NODE_PATH=src ava",
+    "test:cover": "cross-env NODE_PATH=src nyc ava",
+    "package": "electron-forge package",
+    "make": "electron-forge make",
+    "debug": "electron-forge start --inspect-electron",
+    "publish": "electron-forge publish",
+    "lint": "eslint --ext .ts,.tsx .",
+    "format": "prettier --write ."
+  },
+  "keywords": [],
+  "author": {
+    "name": "Sergei Orlov",
+    "email": "hello@orlow.dev"
+  },
+  "license": "MIT",
+  "config": {
+    "forge": {
+      "packagerConfig": {
+        "icon": "assets/android-chrome-512x512.png"
+      },
+      "makers": [
+        {
+          "name": "@electron-forge/maker-squirrel",
+          "config": {
+            "name": "ordo"
+          }
+        },
+        {
+          "name": "@electron-forge/maker-zip",
+          "platforms": [
+            "darwin"
+          ]
+        },
+        {
+          "name": "@electron-forge/maker-deb",
+          "config": {}
+        },
+        {
+          "name": "@electron-forge/maker-rpm",
+          "config": {}
+        }
+      ],
+      "plugins": [
+        [
+          "@electron-forge/plugin-webpack",
+          {
+            "mainConfig": "./webpack.main.config.js",
+            "renderer": {
+              "config": "./webpack.renderer.config.js",
+              "entryPoints": [
+                {
+                  "html": "./src/index.html",
+                  "js": "./src/renderer.tsx",
+                  "name": "main_window",
+                  "preload": {
+                    "js": "./src/preload.ts"
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      ]
+    }
+  },
+  "postcss": {
+    "plugins": {
+      "tailwindcss/nesting": {},
+      "tailwindcss": {},
+      "autoprefixer": {}
+    }
+  },
+  "prettier": {
+    "printWidth": 120,
+    "trailingComma": "all",
+    "semi": true,
+    "tabWidth": 2,
+    "bracketSpacing": true
+  },
+  "eslintConfig": {
+    "env": {
+      "browser": true,
+      "es6": true,
+      "node": true
+    },
+    "rules": {
+      "import/no-unresolved": [
+        2,
+        {
+          "ignore": [
+            "ava"
+          ]
+        }
+      ],
+      "@typescript-eslint/no-var-requires": [
+        2,
+        {
+          "ignore": "js"
+        }
+      ]
+    },
+    "extends": [
+      "eslint:recommended",
+      "plugin:@typescript-eslint/eslint-recommended",
+      "plugin:@typescript-eslint/recommended",
+      "plugin:import/recommended",
+      "plugin:import/electron",
+      "plugin:import/typescript"
+    ],
+    "parser": "@typescript-eslint/parser"
+  },
+  "ava": {
+    "files": [
+      "src/**/*.test.*"
+    ],
+    "extensions": [
+      "ts"
+    ],
+    "require": [
+      "tsconfig-paths/register",
+      "ts-node/register"
+    ],
+    "concurrency": 5,
+    "failFast": true,
+    "failWithoutAssertions": false,
+    "verbose": true,
+    "nodeArguments": [
+      "--trace-deprecation",
+      "--napi-modules"
+    ]
+  },
+  "nyc": {
+    "reporter": [
+      "text",
+      "lcov",
+      "html"
+    ],
+    "exclude": [
+      "coverage/*",
+      "src/renderer.ts",
+      "src/preload.ts",
+      "src/main.ts",
+      "*webpack*"
+    ],
+    "branches": 80,
+    "lines": 80,
+    "functions": 80,
+    "statements": 80,
+    "check-coverage": true,
+    "all": true
+  },
+  "devDependencies": {
+    "@electron-forge/cli": "^6.0.0-beta.61",
+    "@electron-forge/maker-deb": "^6.0.0-beta.61",
+    "@electron-forge/maker-rpm": "^6.0.0-beta.61",
+    "@electron-forge/maker-squirrel": "^6.0.0-beta.61",
+    "@electron-forge/maker-zip": "^6.0.0-beta.61",
+    "@electron-forge/plugin-webpack": "^6.0.0-beta.63",
+    "@types/react": "17.0.2",
+    "@types/react-beautiful-dnd": "^13.1.2",
+    "@types/react-dom": "17.0.2",
+    "@typescript-eslint/eslint-plugin": "^4.0.1",
+    "@typescript-eslint/parser": "^4.0.1",
+    "@vercel/webpack-asset-relocator-loader": "1.7.0",
+    "autoprefixer": "^10.4.4",
+    "ava": "^4.2.0",
+    "babel-loader": "^8.2.5",
+    "cross-env": "^7.0.3",
+    "css-loader": "^6.0.0",
+    "electron": "18.0.3",
+    "eslint": "^7.6.0",
+    "eslint-plugin-import": "^2.20.0",
+    "fork-ts-checker-webpack-plugin": "^6.0.1",
+    "gitmoji-cli": "^4.13.1",
+    "node-loader": "^2.0.0",
+    "nyc": "^15.1.0",
+    "postcss-loader": "^6.2.1",
+    "prettier": "2.7.1",
+    "react-svg-loader": "^3.0.3",
+    "sinon": "^13.0.1",
+    "style-loader": "^3.0.0",
+    "ts-loader": "^9.2.2",
+    "ts-node": "^10.7.0",
+    "tsconfig-paths": "^4.0.0",
+    "typescript": "^4.0.2"
+  },
+  "dependencies": {
+    "@reduxjs/toolkit": "^1.8.1",
+    "@tailwindcss/forms": "^0.5.2",
+    "electron-devtools-installer": "^3.2.0",
+    "electron-squirrel-startup": "^1.0.0",
+    "electron-store": "^8.0.1",
+    "electron-util": "^0.17.2",
+    "fuse.js": "^6.5.3",
+    "immer": "^9.0.12",
+    "or-else": "^0.1.0",
+    "react": "^17.0.2",
+    "react-beautiful-dnd": "^13.1.0",
+    "react-dom": "^17.0.2",
+    "react-icons": "^4.3.1",
+    "react-redux": "^8.0.0",
+    "react-split": "^2.0.14",
+    "react-spring": "^9.4.4",
+    "tailwindcss": "^3.0.24",
+    "vis-data": "^7.1.4",
+    "vis-network": "^9.1.2"
+  },
+  "resolutions": {
+    "@types/react": "17.0.2",
+    "@types/react-dom": "17.0.2"
+  }
 }

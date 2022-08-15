@@ -11,76 +11,76 @@ import { FoldVoid, fromBoolean } from "@utils/either";
 import { NoOp } from "@utils/no-op";
 
 type TabProps = {
-	tab: EditorTab;
+  tab: EditorTab;
 };
 
 export const Tab: React.FC<TabProps> = React.memo(
-	({ tab }) => {
-		const dispatch = useAppDispatch();
+  ({ tab }) => {
+    const dispatch = useAppDispatch();
 
-		const currentTab = useAppSelector((state) => state.editor.currentTab);
-		const tree = useAppSelector((state) => state.fileExplorer.tree);
-		const file = findOrdoFile(tree, "path", tab.path);
+    const currentTab = useAppSelector((state) => state.editor.currentTab);
+    const tree = useAppSelector((state) => state.fileExplorer.tree);
+    const file = findOrdoFile(tree, "path", tab.path);
 
-		const HiX = useIcon("HiX");
-		const Icon = useFileIcon(file);
+    const HiX = useIcon("HiX");
+    const Icon = useFileIcon(file);
 
-		const [path, setPath] = React.useState<string>("");
-		const [isActive, setIsActive] = React.useState<boolean>(false);
+    const [path, setPath] = React.useState<string>("");
+    const [isActive, setIsActive] = React.useState<boolean>(false);
 
-		React.useEffect(
-			() =>
-				Either.fromNullable(file)
-					.map((f) => setPath(f.path))
-					.fold(...FoldVoid),
-			[file],
-		);
+    React.useEffect(
+      () =>
+        Either.fromNullable(file)
+          .map((f) => setPath(f.path))
+          .fold(...FoldVoid),
+      [file],
+    );
 
-		React.useEffect(
-			() =>
-				Either.fromNullable(file)
-					.map((f) => setIsActive(f.path === currentTab))
-					.fold(...FoldVoid),
-			[currentTab, file],
-		);
+    React.useEffect(
+      () =>
+        Either.fromNullable(file)
+          .map((f) => setIsActive(f.path === currentTab))
+          .fold(...FoldVoid),
+      [currentTab, file],
+    );
 
-		const handleClose = (e: React.MouseEvent) =>
-			Either.right(e)
-				.map(tapPreventDefault)
-				.map(tapStopPropagation)
-				.map(() => path)
-				.map((payload) => dispatch({ type: "@editor/close-tab", payload }))
-				.fold(...FoldVoid);
+    const handleClose = (e: React.MouseEvent) =>
+      Either.right(e)
+        .map(tapPreventDefault)
+        .map(tapStopPropagation)
+        .map(() => path)
+        .map((payload) => dispatch({ type: "@editor/close-tab", payload }))
+        .fold(...FoldVoid);
 
-		const handleClick = (e: React.MouseEvent) =>
-			Either.right(e)
-				.map(tapPreventDefault)
-				.map(tapStopPropagation)
-				.map(() => path)
-				.map((payload) => dispatch({ type: "@editor/open-tab", payload }))
-				.fold(...FoldVoid);
+    const handleClick = (e: React.MouseEvent) =>
+      Either.right(e)
+        .map(tapPreventDefault)
+        .map(tapStopPropagation)
+        .map(() => path)
+        .map((payload) => dispatch({ type: "@editor/open-tab", payload }))
+        .fold(...FoldVoid);
 
-		const handleMiddleButton = (e: React.MouseEvent) =>
-			fromBoolean(e.button === 1)
-				.map(() => handleClose(e))
-				.fold(...FoldVoid);
+    const handleMiddleButton = (e: React.MouseEvent) =>
+      fromBoolean(e.button === 1)
+        .map(() => handleClose(e))
+        .fold(...FoldVoid);
 
-		return Either.fromNullable(file)
-			.chain((f) => Either.fromNullable(tab).map((t) => ({ f, t })))
-			.fold(NoOp, ({ f, t }) => (
-				<div
-					title={t.path}
-					tabIndex={1}
-					key={t.path}
-					className={`editor_tab ${isActive ? "editor_tab_active" : ""}`}
-					onClick={handleClick}
-					onMouseDown={handleMiddleButton}
-				>
-					<Icon className="editor_tab_file-icon" />
-					<div>{f.readableName}</div>
-					<HiX className="editor_tab_close-icon" onClick={handleClose} />
-				</div>
-			));
-	},
-	(prev, next) => prev.tab.path === next.tab.path,
+    return Either.fromNullable(file)
+      .chain((f) => Either.fromNullable(tab).map((t) => ({ f, t })))
+      .fold(NoOp, ({ f, t }) => (
+        <div
+          title={t.path}
+          tabIndex={1}
+          key={t.path}
+          className={`editor_tab ${isActive ? "editor_tab_active" : ""}`}
+          onClick={handleClick}
+          onMouseDown={handleMiddleButton}
+        >
+          <Icon className="editor_tab_file-icon" />
+          <div>{f.readableName}</div>
+          <HiX className="editor_tab_close-icon" onClick={handleClose} />
+        </div>
+      ));
+  },
+  (prev, next) => prev.tab.path === next.tab.path,
 );

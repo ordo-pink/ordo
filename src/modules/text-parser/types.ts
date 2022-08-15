@@ -4,14 +4,14 @@ import { TextNodeWithCharsType, TextNodeWithChildrenType } from "@modules/text-p
 export type LinkContentType = "internal" | "external";
 
 export type EmbedContentType =
-	| "youtube"
-	| "twitter"
-	| "remotemimage"
-	| "link"
-	| "video"
-	| "audio"
-	| "image"
-	| "document";
+  | "youtube"
+  | "twitter"
+  | "remotemimage"
+  | "link"
+  | "video"
+  | "audio"
+  | "image"
+  | "document";
 
 export type TodoNode = NodeWithChildren<TextNodeWithChildrenType.TODO, { checked: boolean }>;
 export type HeadingNode = NodeWithChildren<TextNodeWithChildrenType.HEADING>;

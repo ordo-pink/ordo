@@ -13,8 +13,8 @@ export type Thunk<TResult> = UnaryFunction<never, TResult>;
 export type OrdoEventHandler<TKey extends keyof OrdoEvents> = EventHandler<OrdoEvents[TKey]>;
 
 export type OrdoEvent<TScope extends string = string, TEvent extends string = string, TPayload = null> = Record<
-	`@${TScope}/${TEvent}`,
-	TPayload
+  `@${TScope}/${TEvent}`,
+  TPayload
 >;
 
 export type SupportedIcon = keyof typeof HiIcons;

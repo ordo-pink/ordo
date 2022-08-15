@@ -21,75 +21,75 @@ const windows = new Set<BrowserWindow>();
  * Creates a new BrowserWindow. Every window has its own separate state.
  */
 export const createWindow = async (): Promise<void> => {
-	if (process.argv.includes("--debug") && is.development) {
-		await install([REACT_DEVELOPER_TOOLS, REDUX_DEVTOOLS]);
-	}
+  if (process.argv.includes("--debug") && is.development) {
+    await install([REACT_DEVELOPER_TOOLS, REDUX_DEVTOOLS]);
+  }
 
-	nativeTheme.themeSource = userSettingsStore.get("appearance.theme") || "system";
+  nativeTheme.themeSource = userSettingsStore.get("appearance.theme") || "system";
 
-	let window: BrowserWindow = new BrowserWindow({
-		show: false,
-		height: internalSettingsStore.get("window.height"),
-		width: internalSettingsStore.get("window.width"),
-		x: internalSettingsStore.get("window.position.x"),
-		y: internalSettingsStore.get("window.position.y"),
-		icon: "assets/android-chrome-512x512.png",
-		// titleBarStyle: "hiddenInset",
-		acceptFirstMouse: true,
-		webPreferences: {
-			sandbox: true,
-			contextIsolation: true,
-			nodeIntegration: false,
-			allowRunningInsecureContent: false,
-			accessibleTitle: "Ordo",
-			preload: MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY,
-		},
-	});
+  let window: BrowserWindow = new BrowserWindow({
+    show: false,
+    height: internalSettingsStore.get("window.height"),
+    width: internalSettingsStore.get("window.width"),
+    x: internalSettingsStore.get("window.position.x"),
+    y: internalSettingsStore.get("window.position.y"),
+    icon: "assets/android-chrome-512x512.png",
+    // titleBarStyle: "hiddenInset",
+    acceptFirstMouse: true,
+    webPreferences: {
+      sandbox: true,
+      contextIsolation: true,
+      nodeIntegration: false,
+      allowRunningInsecureContent: false,
+      accessibleTitle: "Ordo",
+      preload: MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY,
+    },
+  });
 
-	if (windows.size > 0) {
-		centerWindow({ window });
-	}
+  if (windows.size > 0) {
+    centerWindow({ window });
+  }
 
-	window.on("resized", () => saveWindowPosition(window));
-	window.on("moved", () => saveWindowPosition(window));
-	window.on("close", () => {
-		windows.delete(window);
-		window = null as any;
-	});
+  window.on("resized", () => saveWindowPosition(window));
+  window.on("moved", () => saveWindowPosition(window));
+  window.on("close", () => {
+    windows.delete(window);
+    window = null as any;
+  });
 
-	window.on("ready-to-show", () => {
-		window.show();
-	});
+  window.on("ready-to-show", () => {
+    window.show();
+  });
 
-	windows.add(window);
+  windows.add(window);
 
-	const context: WindowContext = {
-		window,
-		dialog,
-		addRecentDocument: (path) => {
-			app.addRecentDocument(path);
-		},
-		toClipboard: (content) => {
-			clipboard.writeText(content);
-		},
-		fromClipboard: clipboard.readText,
-		showInFolder: shell.showItemInFolder,
-		trashItem: shell.trashItem,
-	};
+  const context: WindowContext = {
+    window,
+    dialog,
+    addRecentDocument: (path) => {
+      app.addRecentDocument(path);
+    },
+    toClipboard: (content) => {
+      clipboard.writeText(content);
+    },
+    fromClipboard: clipboard.readText,
+    showInFolder: shell.showItemInFolder,
+    trashItem: shell.trashItem,
+  };
 
-	const transmission = new Transmission(initialState, context);
+  const transmission = new Transmission(initialState, context);
 
-	initEvents(transmission);
+  initEvents(transmission);
 
-	ipcMain.on("ordo", (_, { event, payload }) => transmission.emit(event, payload));
+  ipcMain.on("ordo", (_, { event, payload }) => transmission.emit(event, payload));
 
-	await initCommands(transmission);
+  await initCommands(transmission);
 
-	Menu.setApplicationMenu(getApplicationMenu(transmission));
+  Menu.setApplicationMenu(getApplicationMenu(transmission));
 
-	window.on("blur", () => {
-		transmission.emit("@editor/unfocus", null);
-	});
+  window.on("blur", () => {
+    transmission.emit("@editor/unfocus", null);
+  });
 
-	window.loadURL(MAIN_WINDOW_WEBPACK_ENTRY);
+  window.loadURL(MAIN_WINDOW_WEBPACK_ENTRY);
 };

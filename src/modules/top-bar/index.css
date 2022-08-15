@@ -1,43 +1,43 @@
 .top-bar {
-	@apply flex items-center justify-center pt-2 cursor-pointer select-none;
+  @apply flex items-center justify-center pt-2 cursor-pointer select-none;
 
-	&_accelerator {
-		@apply flex align-baseline items-center space-x-1;
+  &_accelerator {
+    @apply flex align-baseline items-center space-x-1;
 
-		&_key {
-			@apply bg-neutral-300 shadow-sm dark:bg-neutral-800 rounded-sm px-2 font-sans;
-		}
-	}
+    &_key {
+      @apply bg-neutral-300 shadow-sm dark:bg-neutral-800 rounded-sm px-2 font-sans;
+    }
+  }
 
-	&_item {
-		@apply flex space-x-2 text-sm px-2 py-1 first-of-type:rounded-t-lg last-of-type:rounded-b-lg cursor-pointer select-none;
+  &_item {
+    @apply flex space-x-2 text-sm px-2 py-1 first-of-type:rounded-t-lg last-of-type:rounded-b-lg cursor-pointer select-none;
 
-		&_selected {
-			@apply bg-neutral-200 dark:bg-neutral-700;
-		}
+    &_selected {
+      @apply bg-neutral-200 dark:bg-neutral-700;
+    }
 
-		&_info {
-			@apply flex w-full items-center space-x-2;
+    &_info {
+      @apply flex w-full items-center space-x-2;
 
-			&_icon {
-				@apply flex-shrink-0 text-neutral-500;
-			}
+      &_icon {
+        @apply flex-shrink-0 text-neutral-500;
+      }
 
-			&_name {
-				@apply truncate;
-			}
-		}
-	}
+      &_name {
+        @apply truncate;
+      }
+    }
+  }
 
-	&_wrapper {
-		@apply w-[50%] max-w-[600px] relative;
-	}
+  &_wrapper {
+    @apply w-[50%] max-w-[600px] relative;
+  }
 
-	&_input {
-		@apply w-full shadow-inner text-sm rounded-xl outline-none focus:outline-1 focus:outline-neutral-400 bg-neutral-200 dark:bg-neutral-600 px-2 py-1;
-	}
+  &_input {
+    @apply w-full shadow-inner text-sm rounded-xl outline-none focus:outline-1 focus:outline-neutral-400 bg-neutral-200 dark:bg-neutral-600 px-2 py-1;
+  }
 
-	&_list {
-		@apply fixed max-h-[70%] overflow-y-auto cursor-default z-50 mt-1 rounded-lg flex flex-col shadow-lg w-[50%] max-w-[600px] bg-neutral-100 dark:bg-neutral-600;
-	}
+  &_list {
+    @apply fixed max-h-[70%] overflow-y-auto cursor-default z-50 mt-1 rounded-lg flex flex-col shadow-lg w-[50%] max-w-[600px] bg-neutral-100 dark:bg-neutral-600;
+  }
 }

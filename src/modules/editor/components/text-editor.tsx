@@ -10,33 +10,33 @@ import { FoldVoid } from "@utils/either";
 import { tail } from "@utils/array";
 
 export const TextEditor: React.FC = React.memo(
-	() => {
-		const dispatch = useAppDispatch();
+  () => {
+    const dispatch = useAppDispatch();
 
-		const current = useCurrentTab();
+    const current = useCurrentTab();
 
-		const handleClick = (e: React.MouseEvent) =>
-			current.tab &&
-			Either.right(e)
-				.map(tapPreventDefault)
-				.map(tapStopPropagation)
-				.map(() => dispatch({ type: "@editor/focus" }))
-				.map(() => ({
-					line: tail(current.tab!.content.children).range.end.line,
-					character: tail(current.tab!.content.children).range.end.character,
-				}))
-				.map((position) => [{ start: position, end: position, direction: "ltr" as const }])
-				.map((payload) => dispatch({ type: "@editor/update-caret-positions", payload }))
-				.fold(...FoldVoid);
+    const handleClick = (e: React.MouseEvent) =>
+      current.tab &&
+      Either.right(e)
+        .map(tapPreventDefault)
+        .map(tapStopPropagation)
+        .map(() => dispatch({ type: "@editor/focus" }))
+        .map(() => ({
+          line: tail(current.tab!.content.children).range.end.line,
+          character: tail(current.tab!.content.children).range.end.character,
+        }))
+        .map((position) => [{ start: position, end: position, direction: "ltr" as const }])
+        .map((payload) => dispatch({ type: "@editor/update-caret-positions", payload }))
+        .fold(...FoldVoid);
 
-		return current.tab ? (
-			<div>
-				<Breadcrumbs />
-				<div className="editor_textarea" onClick={handleClick}>
-					<Lines />
-				</div>
-			</div>
-		) : null;
-	},
-	() => true,
+    return current.tab ? (
+      <div>
+        <Breadcrumbs />
+        <div className="editor_textarea" onClick={handleClick}>
+          <Lines />
+        </div>
+      </div>
+    ) : null;
+  },
+  () => true,
 );

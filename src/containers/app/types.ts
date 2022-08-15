@@ -3,18 +3,18 @@ import { OrdoEvent, SupportedIcon } from "@core/types";
 import { OrdoEvents } from "@init/types";
 
 export type Command<TCustomEvents extends Record<string, any> | null = null> = {
-	icon?: SupportedIcon;
-	name: string;
-	description: string;
-	event: TCustomEvents extends null ? keyof OrdoEvents : TCustomEvents;
-	accelerator: string;
+  icon?: SupportedIcon;
+  name: string;
+  description: string;
+  event: TCustomEvents extends null ? keyof OrdoEvents : TCustomEvents;
+  accelerator: string;
 };
 
 export type AppState = {
-	internalSettings: InternalSettings;
-	userSettings: UserSettings;
-	currentProject: string;
-	commands: Command[];
+  internalSettings: InternalSettings;
+  userSettings: UserSettings;
+  currentProject: string;
+  commands: Command[];
 };
 export type APP_SCOPE = "app";
 
@@ -33,15 +33,15 @@ export type UndoEvent = OrdoEvent<APP_SCOPE, "undo">;
 export type RedoEvent = OrdoEvent<APP_SCOPE, "redo">;
 
 export type AppEvents = GetStateEvent &
-	ReloadWindowEvent &
-	SelectProjectEvent &
-	NewWindowEvent &
-	CloseWindowEvent &
-	ToggleDevToolsEvent &
-	GetInternalSettingsEvent &
-	GetUserSettingsEvent &
-	SetInternalSettingEvent &
-	SetUserSettingEvent &
-	UndoEvent &
-	RedoEvent &
-	RegisterCommandEvent;
+  ReloadWindowEvent &
+  SelectProjectEvent &
+  NewWindowEvent &
+  CloseWindowEvent &
+  ToggleDevToolsEvent &
+  GetInternalSettingsEvent &
+  GetUserSettingsEvent &
+  SetInternalSettingEvent &
+  SetUserSettingEvent &
+  UndoEvent &
+  RedoEvent &
+  RegisterCommandEvent;

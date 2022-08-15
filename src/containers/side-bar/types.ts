@@ -1,8 +1,8 @@
 import { OrdoEvent } from "@core/types";
 
 export type SideBarState = {
-	show: boolean;
-	width: number;
+  show: boolean;
+  width: number;
 };
 
 export type SideBarSetWidthEvent = OrdoEvent<"side-bar", "set-width", number>;

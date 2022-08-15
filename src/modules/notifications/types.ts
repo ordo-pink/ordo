@@ -1,13 +1,13 @@
 import { OrdoEvent } from "@core/types";
 
 export type NotificationMessage = {
-	type: "error" | "warning" | "info" | "success";
-	title: string;
-	content: string;
+  type: "error" | "warning" | "info" | "success";
+  title: string;
+  content: string;
 };
 
 export type NotificationsState = {
-	messages: NotificationMessage[];
+  messages: NotificationMessage[];
 };
 
 export type NOTIFICATIONS_SCOPE = "notifications";

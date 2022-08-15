@@ -1,8 +1,8 @@
 import { OrdoEvent } from "@core/types";
 
 export type TopBarState = {
-	focused: boolean;
-	value: string;
+  focused: boolean;
+  value: string;
 };
 
 export type TOP_BAR_SCOPE = "top-bar";
@@ -18,11 +18,11 @@ export type TopBarOpenGoToFile = OrdoEvent<TOP_BAR_SCOPE, "open-go-to-file">;
 export type TopBarRunCommand = OrdoEvent<TOP_BAR_SCOPE, "run-command", string>;
 
 export type TopBarEvents = TopBarFocus &
-	TopBarUnfocus &
-	TopBarToggleFocus &
-	TopBarSetValue &
-	TopBarOpenCommandPalette &
-	TopBarOpenSearchInFile &
-	TopBarOpenGoToLine &
-	TopBarOpenGoToFile &
-	TopBarRunCommand;
+  TopBarUnfocus &
+  TopBarToggleFocus &
+  TopBarSetValue &
+  TopBarOpenCommandPalette &
+  TopBarOpenSearchInFile &
+  TopBarOpenGoToLine &
+  TopBarOpenGoToFile &
+  TopBarRunCommand;

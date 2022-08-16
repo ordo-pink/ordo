@@ -1,6 +1,6 @@
 {
   "name": "ordo",
-  "productName": "Ordo",
+  "productName": "ordo",
   "version": "0.1.0",
   "description": "Bring Your Thoughts to Ordo",
   "main": ".webpack/main",

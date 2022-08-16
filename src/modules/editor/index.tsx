@@ -9,17 +9,17 @@ import { fromBoolean } from "@utils/either";
 import "@modules/editor/index.css";
 
 export const Editor: React.FC = () => {
-	const tabs = useAppSelector((state) => state.editor.tabs);
+  const tabs = useAppSelector((state) => state.editor.tabs);
 
-	const Component = useEditorComponent();
+  const Component = useEditorComponent();
 
-	return fromBoolean(tabs.length > 0).fold(
-		() => <EmptyEditor />,
-		() => (
-			<>
-				<Tabs />
-				<Component />
-			</>
-		),
-	);
+  return fromBoolean(tabs.length > 0).fold(
+    () => <EmptyEditor />,
+    () => (
+      <>
+        <Tabs />
+        <Component />
+      </>
+    ),
+  );
 };

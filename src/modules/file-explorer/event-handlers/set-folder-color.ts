@@ -9,7 +9,7 @@ import { Either } from "or-else";
  * Sets given color to a given folder.
  */
 export const handleSetFolderColor: OrdoEventHandler<"@file-explorer/set-folder-color"> = ({ draft, payload }) =>
-	Either.fromNullable(findOrdoFolderByPath(draft.fileExplorer.tree, payload.path))
-		.map(tap((folder) => void (folder.color = payload.color)))
-		.map((folder) => updateFolder(payload.path, { color: folder.color }))
-		.fold(...FoldVoid);
+  Either.fromNullable(findOrdoFolderByPath(draft.fileExplorer.tree, payload.path))
+    .map(tap((folder) => void (folder.color = payload.color)))
+    .map((folder) => updateFolder(payload.path, { color: folder.color }))
+    .fold(...FoldVoid);

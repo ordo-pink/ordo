@@ -8,13 +8,13 @@ import { useWorkspaceComponent } from "@containers/workspace/hooks/use-workspace
  * components like Editor, Graph, Settings, etc.
  */
 export const Workspace: React.FC = () => {
-	const currentActivity = useAppSelector((state) => state.activityBar.current);
+  const currentActivity = useAppSelector((state) => state.activityBar.current);
 
-	const Component = useWorkspaceComponent(currentActivity);
+  const Component = useWorkspaceComponent(currentActivity);
 
-	return (
-		<div className="w-full">
-			<Component />
-		</div>
-	);
+  return (
+    <div className="w-full">
+      <Component />
+    </div>
+  );
 };

@@ -6,8 +6,8 @@ import { debounce } from "@utils/debounce";
 import { findOrdoFile } from "../utils/find-ordo-file";
 
 const debounceSave = debounce(async (path: string, content: string, callback: () => void = () => void 0) => {
-	await promises.writeFile(path, content, "utf-8");
-	callback();
+  await promises.writeFile(path, content, "utf-8");
+  callback();
 });
 
 /**
@@ -15,50 +15,50 @@ const debounceSave = debounce(async (path: string, content: string, callback: ()
  * saves while typing.
  */
 export const handleSaveFile: OrdoEventHandler<"@file-explorer/save-file"> = async ({
-	payload,
-	draft,
-	transmission,
+  payload,
+  draft,
+  transmission,
 }) => {
-	if (!payload) {
-		const { currentTab } = transmission.select((state) => state.editor);
-		const tab = draft.editor.tabs.find((t) => t.path === currentTab);
-		const file = findOrdoFile(draft.fileExplorer.tree, "path", currentTab);
+  if (!payload) {
+    const { currentTab } = transmission.select((state) => state.editor);
+    const tab = draft.editor.tabs.find((t) => t.path === currentTab);
+    const file = findOrdoFile(draft.fileExplorer.tree, "path", currentTab);
 
-		if (!tab || !file || file.type !== "document") return;
+    if (!tab || !file || file.type !== "document") return;
 
-		tab.raw = tab.content.raw;
-		file.size = new TextEncoder().encode(tab.raw === "\n" ? "" : tab.raw).length;
+    tab.raw = tab.content.raw;
+    file.size = new TextEncoder().encode(tab.raw === "\n" ? "" : tab.raw).length;
 
-		let fileContent = tab.content.raw;
+    let fileContent = tab.content.raw;
 
-		if (file.frontmatter) {
-			if (!file.frontmatter.uuid) {
-				file.frontmatter.uuid = file.uuid ?? randomUUID();
-			}
+    if (file.frontmatter) {
+      if (!file.frontmatter.uuid) {
+        file.frontmatter.uuid = file.uuid ?? randomUUID();
+      }
 
-			fileContent = "---\n".concat(JSON.stringify(file.frontmatter)).concat("\n---\n").concat(fileContent);
-		}
+      fileContent = "---\n".concat(JSON.stringify(file.frontmatter)).concat("\n---\n").concat(fileContent);
+    }
 
-		await promises.writeFile(tab.path, fileContent, "utf-8");
-	} else {
-		const tab = draft.editor.tabs.find((t) => t.path === payload.path);
-		const file = findOrdoFile(draft.fileExplorer.tree, "path", payload.path);
+    await promises.writeFile(tab.path, fileContent, "utf-8");
+  } else {
+    const tab = draft.editor.tabs.find((t) => t.path === payload.path);
+    const file = findOrdoFile(draft.fileExplorer.tree, "path", payload.path);
 
-		if (!tab || !file || file.type !== "document") return;
+    if (!tab || !file || file.type !== "document") return;
 
-		tab.raw = tab.content.raw;
-		file.size = new TextEncoder().encode(tab.raw === "\n" ? "" : tab.raw).length;
+    tab.raw = tab.content.raw;
+    file.size = new TextEncoder().encode(tab.raw === "\n" ? "" : tab.raw).length;
 
-		let fileContent = tab.content.raw;
+    let fileContent = tab.content.raw;
 
-		if (file.frontmatter) {
-			if (!file.frontmatter.uuid) {
-				file.frontmatter.uuid = file.uuid ?? randomUUID();
-			}
+    if (file.frontmatter) {
+      if (!file.frontmatter.uuid) {
+        file.frontmatter.uuid = file.uuid ?? randomUUID();
+      }
 
-			fileContent = "---\n".concat(JSON.stringify(file.frontmatter)).concat("\n---\n").concat(fileContent);
-		}
+      fileContent = "---\n".concat(JSON.stringify(file.frontmatter)).concat("\n---\n").concat(fileContent);
+    }
 
-		await promises.writeFile(tab.path, fileContent, "utf-8");
-	}
+    await promises.writeFile(tab.path, fileContent, "utf-8");
+  }
 };

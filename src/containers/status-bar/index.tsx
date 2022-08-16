@@ -12,41 +12,41 @@ import { Notifications } from "@modules/notifications";
  * TODO: Extract Caret Position component to Editor module.
  */
 export const StatusBar: React.FC = () => {
-	const dispatch = useAppDispatch();
+  const dispatch = useAppDispatch();
 
-	const current = useCurrentTab();
+  const current = useCurrentTab();
 
-	const Code = useIcon("HiOutlineCode");
+  const Code = useIcon("HiOutlineCode");
 
-	const handleClick = () => dispatch({ type: "@top-bar/open-go-to-line" });
+  const handleClick = () => dispatch({ type: "@top-bar/open-go-to-line" });
 
-	return (
-		<div className="status-bar">
-			<div className="status-bar-side-container">
-				{current.tab && (
-					<div className="status-bar-item" onClick={handleClick}>
-						<Code />
-						<div className="flex space-x-2">
-							{current.tab.caretPositions.map((position, index) => {
-								const direction = position.direction === "ltr" ? "end" : "start";
+  return (
+    <div className="status-bar">
+      <div className="status-bar-side-container">
+        {current.tab && (
+          <div className="status-bar-item" onClick={handleClick}>
+            <Code />
+            <div className="flex space-x-2">
+              {current.tab.caretPositions.map((position, index) => {
+                const direction = position.direction === "ltr" ? "end" : "start";
 
-								return (
-									<div
-										key={`${position[direction].line}-${position[direction].character}`}
-										title={`The caret is located on character ${position[direction].character} of line ${position[direction].line}`}
-										className=""
-									>
-										{position[direction].line}:{position[direction].character}
-										{index !== current.tab!.caretPositions.length - 1 ? "," : ""}
-									</div>
-								);
-							})}
-						</div>
-					</div>
-				)}
-			</div>
+                return (
+                  <div
+                    key={`${position[direction].line}-${position[direction].character}`}
+                    title={`The caret is located on character ${position[direction].character} of line ${position[direction].line}`}
+                    className=""
+                  >
+                    {position[direction].line}:{position[direction].character}
+                    {index !== current.tab!.caretPositions.length - 1 ? "," : ""}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
+      </div>
 
-			<Notifications />
-		</div>
-	);
+      <Notifications />
+    </div>
+  );
 };

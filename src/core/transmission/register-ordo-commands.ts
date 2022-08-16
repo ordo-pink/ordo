@@ -6,9 +6,9 @@ import { Command } from "@containers/app/types";
  * commands will be available via TopBar command palette.
  */
 export const registerCommands =
-	(commands: Command[]) =>
-	async (transmission: Transmission): Promise<void> => {
-		for (const command of commands) {
-			await transmission.emit("@app/register-command", command);
-		}
-	};
+  (commands: Command[]) =>
+  async (transmission: Transmission): Promise<void> => {
+    for (const command of commands) {
+      await transmission.emit("@app/register-command", command);
+    }
+  };

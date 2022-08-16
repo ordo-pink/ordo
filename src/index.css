@@ -3,33 +3,33 @@
 @tailwind utilities;
 
 select {
-	@apply h-7 text-sm pl-2 pr-12 py-0;
+  @apply h-7 text-sm pl-2 pr-12 py-0;
 }
 
 input[type="text"],
 input[type="number"] {
-	@apply h-7 text-sm pl-2 pr-12 py-0;
+  @apply h-7 text-sm pl-2 pr-12 py-0;
 }
 
 * {
-	&::-webkit-scrollbar {
-		width: 5px;
-		height: 5px;
+  &::-webkit-scrollbar {
+    width: 5px;
+    height: 5px;
 
-		&-thumb {
-			@apply invisible rounded-lg bg-neutral-300 dark:bg-neutral-800;
-		}
-	}
+    &-thumb {
+      @apply invisible rounded-lg bg-neutral-300 dark:bg-neutral-800;
+    }
+  }
 
-	&:hover {
-		&::-webkit-scrollbar {
-			&-thumb {
-				@apply visible;
-			}
-		}
-	}
+  &:hover {
+    &::-webkit-scrollbar {
+      &-thumb {
+        @apply visible;
+      }
+    }
+  }
 }
 
 * {
-	@apply outline-pink-400 dark:outline-purple-500 select-none;
+  @apply outline-pink-400 dark:outline-purple-500 select-none;
 }

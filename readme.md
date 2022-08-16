@@ -11,4 +11,4 @@ npm start
 npm run commit
 ```
 
-Or, use [gitmoji.dev](https://gimoji.dev) as a reference  and  use `git commit` with apprpriately assigned commit message.
+Or, use [gitmoji.dev](https://gimoji.dev) as a reference and use `git commit` with apprpriately assigned commit message.

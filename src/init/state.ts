@@ -8,13 +8,13 @@ import editor from "@modules/editor/initial-state";
 import app from "@containers/app/initial-state";
 
 export const initialState: WindowState = {
-	app,
-	fileExplorer,
-	activityBar,
-	sideBar,
-	topBar,
-	statusBar: {},
-	workspace: {},
-	editor,
-	notifications,
+  app,
+  fileExplorer,
+  activityBar,
+  sideBar,
+  topBar,
+  statusBar: {},
+  workspace: {},
+  editor,
+  notifications,
 };

@@ -6,35 +6,35 @@ import { useAppDispatch } from "@core/state/store";
 import { useIcon } from "@core/hooks/use-icon";
 
 type CommandProps = TCommand & {
-	selected: number;
-	index: number;
-	setSelected: React.Dispatch<React.SetStateAction<number>>;
+  selected: number;
+  index: number;
+  setSelected: React.Dispatch<React.SetStateAction<number>>;
 };
 
 export const Command: React.FC<CommandProps> = ({ icon, name, accelerator, event, selected, index, setSelected }) => {
-	const dispatch = useAppDispatch();
+  const dispatch = useAppDispatch();
 
-	const Icon = useIcon(icon);
-	const [isSelected, setIsSelected] = React.useState<boolean>(false);
+  const Icon = useIcon(icon);
+  const [isSelected, setIsSelected] = React.useState<boolean>(false);
 
-	React.useEffect(() => {
-		setIsSelected(selected === index);
-	}, [selected, index]);
+  React.useEffect(() => {
+    setIsSelected(selected === index);
+  }, [selected, index]);
 
-	const handleMouseOver = () => setSelected(index);
-	const handleClick = () => dispatch({ type: "@top-bar/run-command", payload: event });
+  const handleMouseOver = () => setSelected(index);
+  const handleClick = () => dispatch({ type: "@top-bar/run-command", payload: event });
 
-	return (
-		<div
-			className={`top-bar_item ${isSelected && "top-bar_item_selected"}`}
-			onMouseOver={handleMouseOver}
-			onClick={handleClick}
-		>
-			<div className="top-bar_item_info">
-				<Icon className="top-bar_item_info_icon" />
-				<div>{name}</div>
-			</div>
-			<Accelerator accelerator={accelerator} />
-		</div>
-	);
+  return (
+    <div
+      className={`top-bar_item ${isSelected && "top-bar_item_selected"}`}
+      onMouseOver={handleMouseOver}
+      onClick={handleClick}
+    >
+      <div className="top-bar_item_info">
+        <Icon className="top-bar_item_info_icon" />
+        <div>{name}</div>
+      </div>
+      <Accelerator accelerator={accelerator} />
+    </div>
+  );
 };

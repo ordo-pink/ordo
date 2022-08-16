@@ -7,10 +7,10 @@ import { IconType } from "react-icons/lib";
  * Hero Icons package from `react-icons` (distributed via MIT license).
  */
 export const useIcon = (name?: keyof typeof HiIcons): IconType => {
-	const Icon = React.useMemo(
-		() => (name ? (HiIcons as Record<keyof typeof HiIcons, IconType>)[name] : ((() => null) as unknown as IconType)),
-		[name],
-	);
+  const Icon = React.useMemo(
+    () => (name ? (HiIcons as Record<keyof typeof HiIcons, IconType>)[name] : ((() => null) as unknown as IconType)),
+    [name],
+  );
 
-	return Icon;
+  return Icon;
 };

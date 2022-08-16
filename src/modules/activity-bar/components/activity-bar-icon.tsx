@@ -11,26 +11,26 @@ import "@modules/activity-bar/components/activity-bar-icon.css";
 type ActivityBarItemProps = ActivityBarItem & { current: string };
 
 export const ActivityBarIcon: React.FC<ActivityBarItemProps> = ({ icon, show, name, current }) => {
-	const dispatch = useAppDispatch();
+  const dispatch = useAppDispatch();
 
-	const Icon = useIcon(icon);
+  const Icon = useIcon(icon);
 
-	const [className, setClassName] = React.useState<string>("");
+  const [className, setClassName] = React.useState<string>("");
 
-	const handleActivityClick = () => dispatch({ type: "@activity-bar/select", payload: name });
+  const handleActivityClick = () => dispatch({ type: "@activity-bar/select", payload: name });
 
-	React.useEffect(
-		() =>
-			fromBoolean(current === name).fold(
-				() => setClassName(""),
-				() => setClassName("current-activity"),
-			),
-		[current, name],
-	);
+  React.useEffect(
+    () =>
+      fromBoolean(current === name).fold(
+        () => setClassName(""),
+        () => setClassName("current-activity"),
+      ),
+    [current, name],
+  );
 
-	return fromBoolean(show).fold(NoOp, () => (
-		<button tabIndex={2} className={`activity ${className}`} onClick={handleActivityClick} title={name}>
-			<Icon />
-		</button>
-	));
+  return fromBoolean(show).fold(NoOp, () => (
+    <button tabIndex={2} className={`activity ${className}`} onClick={handleActivityClick} title={name}>
+      <Icon />
+    </button>
+  ));
 };

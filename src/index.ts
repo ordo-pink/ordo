@@ -4,11 +4,11 @@ import { enforceMacOSAppLocation, is, setContentSecurityPolicy } from "electron-
 import { createWindow } from "@core/window/create-window";
 
 if (require("electron-squirrel-startup")) {
-	app.quit();
+  app.quit();
 }
 
 if (!is.development) {
-	setContentSecurityPolicy(`
+  setContentSecurityPolicy(`
 script-src 'self' ordo-app;
 img-src * data: file:;
 style-src 'unsafe-inline', ordo-app data: file:;
@@ -21,45 +21,45 @@ frame-ancestors 'none';
 object-src 'none';
 `);
 } else {
-	setContentSecurityPolicy(`img-src * data: file:; frame-src *;`);
+  setContentSecurityPolicy(`img-src * data: file:; frame-src *;`);
 }
 
 app.on("ready", async () => {
-	enforceMacOSAppLocation();
+  enforceMacOSAppLocation();
 
-	protocol.registerFileProtocol("ordo-app", (req, cb) => {
-		const url = req.url.replace("ordo-app://open-file/", "");
+  protocol.registerFileProtocol("ordo-app", (req, cb) => {
+    const url = req.url.replace("ordo-app://open-file/", "");
 
-		try {
-			return cb(url);
-		} catch (e) {
-			console.error(e);
-		}
-	});
+    try {
+      return cb(url);
+    } catch (e) {
+      console.error(e);
+    }
+  });
 
-	if (is.macos) {
-		const dockMenu = Menu.buildFromTemplate([
-			{ type: "separator" },
-			{
-				label: "New Window",
-				click: () => createWindow(),
-			},
-		]);
+  if (is.macos) {
+    const dockMenu = Menu.buildFromTemplate([
+      { type: "separator" },
+      {
+        label: "New Window",
+        click: () => createWindow(),
+      },
+    ]);
 
-		app.dock.setMenu(dockMenu);
-	}
+    app.dock.setMenu(dockMenu);
+  }
 
-	await createWindow();
+  await createWindow();
 });
 
 app.on("window-all-closed", () => {
-	if (!is.macos) {
-		app.quit();
-	}
+  if (!is.macos) {
+    app.quit();
+  }
 });
 
 app.on("activate", async () => {
-	if (BrowserWindow.getAllWindows().length === 0) {
-		await createWindow();
-	}
+  if (BrowserWindow.getAllWindows().length === 0) {
+    await createWindow();
+  }
 });

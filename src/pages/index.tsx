@@ -15,7 +15,7 @@ export default function IndexPage() {
         <section className="flex flex-col items-center text-center space-y-4 p-4 md:flex-row flex-nowrap md:space-y-0 md:justify-between md:pt-32">
           <div>
             <h1 className="text-5xl font-black max-w-xl">
-              Помогаем беречь и преумножать знания
+              Помогаем беречь и приумножать знания
             </h1>
             <h2 className="text-2xl py-16 md:py-8 max-w-xl">
               Ordo помогает упорядочить знания и работать с ними в том виде,

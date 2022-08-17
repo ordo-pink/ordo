@@ -1,6 +1,6 @@
 import { Link } from "gatsby"
 import React from "react"
-import { DiWindows, DiLinux } from "react-icons/di"
+import { DiWindows, DiLinux, DiApple } from "react-icons/di"
 import { HiOutlineBookOpen } from "react-icons/hi"
 import { Footer } from "../components/footer"
 import { Header } from "../components/header"
@@ -27,6 +27,15 @@ export default function PrivateBeta() {
             >
               <DiWindows />
               <div>Windows</div>
+            </a>
+          </div>
+          <div className="flex flex-col space-y-2">
+            <a
+              href="https://tinyurl.com/ordo-011-darwin"
+              className="flex space-x-2 justify-center items-center px-8 py-2 bg-gradient-to-tr from-pink-500 to-cyan-500 rounded-xl font-bold text-xl text-white whitespace-nowrap"
+            >
+              <DiApple />
+              <div>MacOS</div>
             </a>
           </div>
           <div className="flex flex-col space-y-4 md:flex-row md:space-y-0 md:space-x-4">

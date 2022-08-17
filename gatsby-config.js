@@ -1,8 +1,9 @@
 module.exports = {
   siteMetadata: {
     title: "Ordo.pink",
-    description: "What would you expect from an Ordo website?",
-    author: "@ordo.pink",
+    description:
+      "Ordo - это система управления знаниями для тебя, твоей команды и всего человечества.",
+    author: "Ordo.pink",
     siteUrl: "https://ordo.pink",
   },
 
@@ -19,13 +20,13 @@ module.exports = {
       },
     },
     "gatsby-plugin-image",
-    // {
-    //   resolve: "gatsby-source-filesystem",
-    //   options: {
-    //     name: "images",
-    //     path: "${__dirname}/src/images",
-    //   },
-    // },
+    {
+      resolve: "gatsby-source-filesystem",
+      options: {
+        name: "assets",
+        path: `${__dirname}/assets`,
+      },
+    },
     "gatsby-transformer-sharp",
     "gatsby-plugin-sharp",
     {

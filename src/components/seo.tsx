@@ -3,7 +3,7 @@ import { Helmet } from "react-helmet"
 import { useStaticQuery, graphql } from "gatsby"
 
 type Props = {
-  description: string
+  description?: string
   lang?: string
   meta?: Array<{ name: string; content: string }>
   title: string

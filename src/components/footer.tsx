@@ -46,11 +46,10 @@ const siteMapLinks: TFooterSectionProps = {
       text: "Скачать",
       href: "/download",
     },
-    // {
-    //   text: "Блог",
-    //   href: "/blog",
-    //   nofollow: true,
-    // },
+    {
+      text: "Блодж",
+      href: "/blog",
+    },
     // {
     //   text: "Цены",
     //   href: "/pricing",

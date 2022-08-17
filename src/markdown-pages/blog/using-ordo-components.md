@@ -1,6 +1,6 @@
 ---
 title: Использование компонентов в Ordo
-date: 2022-06-15
+date: 2022-06-15 12:30
 slug: /blog/using-ordo-components
 ---
 

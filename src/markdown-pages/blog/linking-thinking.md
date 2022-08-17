@@ -1,6 +1,6 @@
 ---
 title: Соединение заметок
-date: 2022-06-15
+date: 2022-06-15 12:10
 slug: /blog/linking-thinking
 ---
 

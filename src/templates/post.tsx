@@ -29,7 +29,7 @@ export default function Post({ data }: any) {
       <Header />
       <div className="flex flex-col min-h-screen p-6">
         <div className="flex-grow flex flex-col max-w-6xl mx-auto">
-          <div className="prose prose-purple dark:prose-yellow lg:prose-lg prose-img:rounded-lg dark:prose-invert">
+          <div className="prose prose-amber lg:prose-lg prose-img:rounded-lg dark:prose-invert">
             <h1>{data.markdownRemark.frontmatter.title}</h1>
             <div
               dangerouslySetInnerHTML={{ __html: data.markdownRemark.html }}

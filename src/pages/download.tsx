@@ -4,10 +4,15 @@ import { DiWindows, DiLinux } from "react-icons/di"
 import { HiOutlineBookOpen } from "react-icons/hi"
 import { Footer } from "../components/footer"
 import { Header } from "../components/header"
+import { Seo } from "../components/seo"
 
 export default function PrivateBeta() {
   return (
     <div className="flex flex-col min-h-screen">
+      <Seo
+        title="Скачать"
+        description="Скачать Ordo для Windows, Linux и MacOS"
+      />
       <Header />
       <div className="flex-grow flex flex-col items-center justify-center justify-self-center self-center my-8">
         <div className="py-8 text-center">
@@ -46,7 +51,7 @@ export default function PrivateBeta() {
           </div>
           <div className="flex flex-col space-y-2">
             <Link
-              to="/ru/markdown-basics"
+              to="/blog/markdown-basics"
               className="flex space-x-2 justify-center items-center  font-bold px-2 py-1"
             >
               <HiOutlineBookOpen />

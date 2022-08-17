@@ -1,6 +1,6 @@
 ---
 slug: "/blog/markdown-basics"
-date: 2022-06-15
+date: 2022-06-15 12:00
 title: "Азы Markdown"
 ---
 

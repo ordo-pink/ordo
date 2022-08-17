@@ -15,7 +15,7 @@
     "gatsby-plugin-robots-txt": "^1.7.1",
     "gatsby-plugin-sharp": "^4.16.1",
     "gatsby-plugin-sitemap": "^5.15.0",
-    "gatsby-plugin-yandex-metrica": "^0.1.3-check",
+    "gatsby-plugin-yandex-metrika": "^2.5.0",
     "gatsby-remark-images": "^6.16.0",
     "gatsby-source-filesystem": "^4.16.0",
     "gatsby-transformer-remark": "^5.16.0",
@@ -37,7 +37,7 @@
   "keywords": [
     "gatsby"
   ],
-  "license": "0BSD",
+  "license": "MIT",
   "scripts": {
     "build": "gatsby build",
     "develop": "gatsby develop",

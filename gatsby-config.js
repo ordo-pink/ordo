@@ -46,14 +46,13 @@ module.exports = {
       },
     },
     {
-      resolve: `gatsby-plugin-yandex-metrica`,
+      resolve: `gatsby-plugin-yandex-metrika`,
       options: {
-        trackingId: "89994639",
-        clickmap: true,
-        trackLinks: true,
-        accurateTrackBounce: true,
-        trackHash: true,
+        trackingId: 89994639,
         webvisor: true,
+        trackHash: true,
+        afterBody: true,
+        defer: false,
       },
     },
     // {

@@ -11,7 +11,7 @@ export default function BlogListPage() {
     query BlogPostsQuery {
       allMarkdownRemark(
         filter: { frontmatter: { slug: { glob: "/blog/*" } } }
-        sort: { order: ASC, fields: frontmatter___date }
+        sort: { order: DESC, fields: frontmatter___date }
       ) {
         edges {
           node {

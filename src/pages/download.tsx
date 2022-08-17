@@ -1,6 +1,6 @@
 import { Link } from "gatsby"
 import React from "react"
-import { DiApple, DiWindows } from "react-icons/di"
+import { DiApple, DiWindows, DiLinux } from "react-icons/di"
 import { HiOutlineBookOpen } from "react-icons/hi"
 import { Footer } from "../components/footer"
 import { GradientTitle } from "../components/gradient-title"
@@ -15,22 +15,31 @@ export default function PrivateBeta() {
           Bring Your Thoughts to
         </h2>
         <GradientTitle text="Beta" />
-        <div className="mt-12 flex flex-col space-y-2 w-full">
+        <div className="mt-5 flex flex-col space-y-2 w-full">
           <a
-            href="https://tinyurl.com/ordo-0-1-0-mac"
-            className="flex space-x-2 justify-center items-center bg-gradient-to-tr from-purple-600 to-pink-700 text-neutral-200 font-bold px-2 py-1 rounded-lg shadow-lg"
+            href="https://tinyurl.com/ordo-011-win"
+            className="flex space-x-2 justify-center items-center bg-gradient-to-tr from-purple-600 to-sky-700 text-neutral-200 font-bold px-2 py-1 rounded-lg shadow-lg"
           >
-            <DiApple />
-            <div>Download for Mac</div>
+            <DiWindows />
+            <div>Download for Windows</div>
           </a>
         </div>
         <div className="mt-5 flex flex-col space-y-2 w-full">
           <a
-            href="https://tinyurl.com/ordo-0-1-0-win"
-            className="flex space-x-2 justify-center items-center bg-gradient-to-bl from-purple-600 to-sky-700 text-neutral-200 font-bold px-2 py-1 rounded-lg shadow-lg"
+            href="https://tinyurl.com/ordo-011-rpm"
+            className="flex space-x-2 justify-center items-center bg-gradient-to-bl from-purple-600 to-pink-700 text-neutral-200 font-bold px-2 py-1 rounded-lg shadow-lg"
           >
-            <DiWindows />
-            <div>Download for Windows</div>
+            <DiLinux />
+            <div>Download for Linux (RPM)</div>
+          </a>
+        </div>
+        <div className="mt-5 flex flex-col space-y-2 w-full">
+          <a
+            href="https://tinyurl.com/ordo-011-deb"
+            className="flex space-x-2 justify-center items-center bg-gradient-to-tr from-purple-600 to-pink-700 text-neutral-200 font-bold px-2 py-1 rounded-lg shadow-lg"
+          >
+            <DiLinux />
+            <div>Download for Linux (DEB)</div>
           </a>
         </div>
         <div className="mt-5 flex flex-col space-y-2 w-full">

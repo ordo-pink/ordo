@@ -1,93 +1,67 @@
 import { Link } from "gatsby"
 import React from "react"
-import { DiApple, DiWindows, DiLinux } from "react-icons/di"
+import { DiWindows, DiLinux } from "react-icons/di"
 import { HiOutlineBookOpen } from "react-icons/hi"
 import { Footer } from "../components/footer"
-import { GradientTitle } from "../components/gradient-title"
 import { Header } from "../components/header"
 
 export default function PrivateBeta() {
   return (
     <div className="flex flex-col min-h-screen">
       <Header />
-      <div className="flex-grow flex flex-col items-center justify-center justify-self-center self-center">
-        <h2 className="text-xl font-bold uppercase border-b border-neutral-800 dark:border-neutral-300">
-          Bring Your Thoughts to
-        </h2>
-        <GradientTitle text="Beta" />
-        <div className="mt-5 flex flex-col space-y-2 w-full">
-          <a
-            href="https://tinyurl.com/ordo-011-win"
-            className="flex space-x-2 justify-center items-center bg-gradient-to-tr from-purple-600 to-sky-700 text-neutral-200 font-bold px-2 py-1 rounded-lg shadow-lg"
-          >
-            <DiWindows />
-            <div>Download for Windows</div>
-          </a>
+      <div className="flex-grow flex flex-col items-center justify-center justify-self-center self-center my-8">
+        <div className="py-8 text-center">
+          <h1 className="text-4xl font-black max-w-xl">Скачать ORDO</h1>
+          <h2 className="text-2xl max-w-xl">v0.1.1-ALPHA</h2>
         </div>
-        <div className="mt-5 flex flex-col space-y-2 w-full">
-          <a
-            href="https://tinyurl.com/ordo-011-rpm"
-            className="flex space-x-2 justify-center items-center bg-gradient-to-bl from-purple-600 to-pink-700 text-neutral-200 font-bold px-2 py-1 rounded-lg shadow-lg"
-          >
-            <DiLinux />
-            <div>Download for Linux (RPM)</div>
-          </a>
+        <div className="flex flex-col space-y-4">
+          <div className="flex flex-col space-y-2">
+            <a
+              href="https://tinyurl.com/ordo-011-win"
+              className="flex space-x-2 justify-center items-center px-8 py-2 bg-gradient-to-tr from-pink-500 to-cyan-500 rounded-xl font-bold text-xl text-white whitespace-nowrap"
+            >
+              <DiWindows />
+              <div>Windows</div>
+            </a>
+          </div>
+          <div className="flex flex-col space-y-4 md:flex-row md:space-y-0 md:space-x-4">
+            <div className="flex flex-col space-y-2">
+              <a
+                href="https://tinyurl.com/ordo-011-rpm"
+                className="flex space-x-2 justify-center items-center px-8 py-2 bg-gradient-to-tr from-pink-500 to-cyan-500 rounded-xl font-bold text-xl text-white whitespace-nowrap"
+              >
+                <DiLinux />
+                <div>Linux (RPM)</div>
+              </a>
+            </div>
+            <div className="flex flex-col space-y-2">
+              <a
+                href="https://tinyurl.com/ordo-011-deb"
+                className="flex space-x-2 justify-center items-center px-8 py-2 bg-gradient-to-tr from-pink-500 to-cyan-500 rounded-xl font-bold text-xl text-white whitespace-nowrap"
+              >
+                <DiLinux />
+                <div>Linux (DEB)</div>
+              </a>
+            </div>
+          </div>
+          <div className="flex flex-col space-y-2">
+            <Link
+              to="/ru/markdown-basics"
+              className="flex space-x-2 justify-center items-center  font-bold px-2 py-1"
+            >
+              <HiOutlineBookOpen />
+              <div>А как этим пользоваться?</div>
+            </Link>
+          </div>
         </div>
-        <div className="mt-5 flex flex-col space-y-2 w-full">
-          <a
-            href="https://tinyurl.com/ordo-011-deb"
-            className="flex space-x-2 justify-center items-center bg-gradient-to-tr from-purple-600 to-pink-700 text-neutral-200 font-bold px-2 py-1 rounded-lg shadow-lg"
-          >
-            <DiLinux />
-            <div>Download for Linux (DEB)</div>
-          </a>
-        </div>
-        <div className="mt-5 flex flex-col space-y-2 w-full">
-          <Link
-            to="/ru/markdown-basics"
-            className="flex space-x-2 justify-center items-center bg-gradient-to-tr from-neutral-600 to-neutral-700 text-neutral-200 font-bold px-2 py-1 rounded-lg shadow-lg"
-          >
-            <HiOutlineBookOpen />
-            <div>Getting Started Three-Pager</div>
-          </Link>
-        </div>
-        <div className="mt-12 bg-rose-200 dark:bg-rose-800 w-72 p-2 rounded-lg">
-          <p>
-            <strong>Beware, 🐲 dragons here!</strong>
+
+        <div className="mt-12 bg-red-800 w-72 p-4 rounded-lg">
+          <p className="uppercase mb-2 whitespace-nowrap">
+            <strong>Здесь живут драконы! 🐲</strong>
           </p>
-          <p>Make a copy of the files you work with. Just in case.</p>
-        </div>
-        <div className="mt-5 bg-rose-200 dark:bg-rose-800 w-72 p-2 rounded-lg">
-          <p>
-            Also, there might be bugs. Chances are, chances are high. It's{" "}
-            <strong>v0.1.0</strong>, afterall. If you find any, drop them on
-            Twitter{" "}
-            <a
-              rel="nofollow"
-              target="_blank"
-              className="underline"
-              href="https://twitter.com/ordo_pink"
-            >
-              @ordo_pink
-            </a>
-            , reach out via email at{" "}
-            <a
-              rel="nofollow"
-              className="underline"
-              href="mailto:hello@ordo.pink"
-            >
-              hello@ordo.pink
-            </a>{" "}
-            or create an issue on{" "}
-            <a
-              rel="nofollow"
-              target="_blank"
-              className="underline"
-              href="https://github.com/ordo-pink/releases/issues"
-            >
-              Github
-            </a>
-            .
+          <p className="text-sm">
+            Это релиз цикла <strong>ALPHA</strong>. Сделайте копию файлов, перед
+            использованием их с Ordo. Ну так, на всякий случай.
           </p>
         </div>
       </div>

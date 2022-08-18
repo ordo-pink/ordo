@@ -66,8 +66,12 @@ export const Footer: React.FC = () => (
     </div>
 
     <div className="mt-4 flex flex-col items-center text-sm text-neutral-500">
-      <Link to="/cookie-policy">Использование cookie (English)</Link>
-      <Link to="/privacy-policy">Политика конфиденциальности (English)</Link>
+      <Link to="/cookie-policy" className="py-2">
+        Использование cookie (English)
+      </Link>
+      <Link to="/privacy-policy" className="py-2">
+        Политика конфиденциальности (English)
+      </Link>
     </div>
 
     <div className="text-center mt-8">
@@ -85,7 +89,7 @@ const FooterSection: React.FC<TFooterSectionProps> = ({ title, items }) => (
     <div>
       {items &&
         items.map(item => (
-          <p key={item.text + item.href}>
+          <p key={item.text + item.href} className="py-2">
             {item.href.startsWith("/") ? (
               <Link to={item.href} rel={item.nofollow ? "nofollow" : ""}>
                 {item.text}

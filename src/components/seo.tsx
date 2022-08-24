@@ -38,7 +38,7 @@ export const Seo: React.FC<Props> = ({
         lang,
       }}
       title={title}
-      titleTemplate={defaultTitle ? `%s / ${defaultTitle}` : void 0}
+      titleTemplate={defaultTitle ? `%s | ${defaultTitle}` : void 0}
       meta={[
         {
           name: "description",

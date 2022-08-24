@@ -16,11 +16,13 @@ export default function IndexPage() {
       <Header />
 
       <div className="grow max-w-7xl mx-auto">
-        <StaticImage
-          src="../../assets/shelf.png"
-          alt="Bookshelf"
-          class="absolute top-0 left-0 right-0 -z-20 blur-sm md:blur-lg w-full h-screen md:h-2/5"
-        />
+        <div className="absolute top-0 left-0 right-0 -z-20 blur-sm md:blur-lg w-full h-screen md:h-2/5">
+          <StaticImage
+            src="../../assets/shelf.png"
+            alt="Bookshelf"
+            className="h-full"
+          />
+        </div>
 
         <section className="flex flex-col items-center text-center space-y-4 p-4 md:flex-row flex-nowrap md:space-y-0 md:space-x-24 md:justify-between md:pt-32">
           <div>

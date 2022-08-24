@@ -41,35 +41,51 @@ export const Seo: React.FC<Props> = ({
       titleTemplate={defaultTitle ? `%s / ${defaultTitle}` : void 0}
       meta={[
         {
-          name: `description`,
+          name: "description",
           content: metaDescription,
         },
         {
-          property: `og:title`,
+          property: "og:title",
           content: title,
         },
         {
-          property: `og:description`,
+          property: "og:site_name",
+          content: "Ordo.pink",
+        },
+        {
+          property: "og:description",
           content: metaDescription,
         },
         {
-          property: `og:type`,
-          content: `website`,
+          property: "og:type",
+          content: "website",
         },
         {
-          name: `twitter:card`,
-          content: `summary`,
+          property: "og:locale",
+          content: "ru_RU",
         },
         {
-          name: `twitter:creator`,
-          content: site.siteMetadata?.author || ``,
+          property: "og:image",
+          content: "https://ordo.pink/og.jpg",
         },
         {
-          name: `twitter:title`,
+          name: "twitter:card",
+          content: "summary_large_image",
+        },
+        {
+          name: "twitter:creator",
+          content: "@ordo_pink",
+        },
+        {
+          name: "twitter:title",
           content: title,
         },
         {
-          name: `twitter:description`,
+          property: "twitter:image",
+          content: "https://ordo.pink/og.jpg",
+        },
+        {
+          name: "twitter:description",
           content: metaDescription,
         },
       ].concat(meta)}

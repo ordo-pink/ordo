@@ -8,7 +8,10 @@ import { Seo } from "../components/seo"
 export default function NotFoundPage() {
   return (
     <div className="flex flex-col h-screen">
-      <Seo title="404: Not found" description="Whoa, you broke the site!" />
+      <Seo
+        title="404: Not found"
+        description="Ничего не найдено. Опечатка в адресе, не иначе..."
+      />
       <Header />
       <div className="flex-grow flex items-center justify-center justify-self-center self-center">
         <GradientTitle text="404" />

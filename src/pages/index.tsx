@@ -9,7 +9,10 @@ import { StaticImage } from "gatsby-plugin-image"
 export default function IndexPage() {
   return (
     <div className="flex flex-col min-h-screen">
-      <Seo title="Добро пожаловать в Ordo" />
+      <Seo
+        title="Добро пожаловать в Ordo"
+        description="Ordo - это система управления знаниями для вас, вашей команды, и всего человечества."
+      />
       <Header />
 
       <div className="grow max-w-7xl mx-auto">

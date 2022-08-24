@@ -29,7 +29,7 @@ export default function BlogListPage() {
 
   return (
     <div className="flex flex-col min-h-screen">
-      <Seo title="Блог | В разработке" />
+      <Seo title="Блодж" description="Блог Ordo" />
       <Header />
 
       <div className="flex-grow p-4 max-w-4xl mx-auto">

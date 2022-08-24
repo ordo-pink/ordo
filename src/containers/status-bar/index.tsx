@@ -1,4 +1,5 @@
 import React from "react";
+import { useTranslation } from "react-i18next";
 
 import { useIcon } from "@core/hooks/use-icon";
 import { useAppDispatch } from "@core/state/store";
@@ -18,6 +19,8 @@ export const StatusBar: React.FC = () => {
 
   const Code = useIcon("HiOutlineCode");
 
+  const { t } = useTranslation();
+
   const handleClick = () => dispatch({ type: "@top-bar/open-go-to-line" });
 
   return (
@@ -33,7 +36,10 @@ export const StatusBar: React.FC = () => {
                 return (
                   <div
                     key={`${position[direction].line}-${position[direction].character}`}
-                    title={`The caret is located on character ${position[direction].character} of line ${position[direction].line}`}
+                    title={t("status-bar.caret-position.title", {
+                      charNumber: position[direction].character,
+                      lineNumber: position[direction].line,
+                    })}
                     className=""
                   >
                     {position[direction].line}:{position[direction].character}

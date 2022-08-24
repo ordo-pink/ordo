@@ -1,4 +1,5 @@
 import React from "react";
+import { useTranslation } from "react-i18next";
 import { animated, config, useTransition } from "react-spring";
 
 export const Slogan: React.FC = () => {
@@ -10,12 +11,14 @@ export const Slogan: React.FC = () => {
     config: config.molasses,
   });
 
+  const { t } = useTranslation();
+
   return transitions(({ opacity }) => (
     <animated.h1
       className="welcome-page_bring-your-thoughts-to"
       style={{ opacity: opacity.to({ range: [1.0, 0.0], output: [1, 0] }) }}
     >
-      Bring your thoughts to
+      {t("ordo.slogan")}
     </animated.h1>
   ));
 };

@@ -1,5 +1,6 @@
 import React from "react";
 import Fuse from "fuse.js";
+import { useTranslation } from "react-i18next";
 
 import { useAppDispatch, useAppSelector } from "@core/state/store";
 import { Command } from "@modules/top-bar/components/command";
@@ -25,6 +26,8 @@ export const TopBar: React.FC = () => {
   const tree = useAppSelector((state) => state.fileExplorer.tree);
   const currentTab = useAppSelector((state) => state.editor.currentTab);
   const tabs = useAppSelector((state) => state.editor.tabs);
+
+  const { t } = useTranslation();
 
   const [selected, setSelected] = React.useState(0);
   const [files, setFiles] = React.useState<any[]>([]);
@@ -164,15 +167,18 @@ export const TopBar: React.FC = () => {
           line > rangeEnd.line ||
           line < 1 ||
           Number.isNaN(character) ||
-          character > rangeEnd.character;
+          character < 0 ||
+          character > tabs[0].content.children[line - 1].range.end.character;
 
         if (condition) {
+          const str = t("core.errors.range-error.content", { lineNumber: line, charNumber: character });
+          console.log(str);
           dispatch({
             type: "@notifications/add",
             payload: {
               type: "info",
-              title: "Range error",
-              content: "Incorrect line",
+              title: t("core.errors.range-error"),
+              content: str,
             },
           });
         } else {
@@ -228,7 +234,6 @@ export const TopBar: React.FC = () => {
                   index={index}
                   selected={selected}
                   name={item.name}
-                  description={item.description}
                   icon={item.icon}
                   event={item.event}
                   accelerator={item.accelerator}

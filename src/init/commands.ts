@@ -8,11 +8,11 @@ import registerActivityBarCommands from "@modules/activity-bar/register-commands
 import registerNotificationsCommands from "@modules/notifications/register-commands";
 
 export const initCommands = async (transmission: Transmission) => {
-	await registerAppCommands(transmission);
-	await registerTopBarCommands(transmission);
-	await registerEditorCommands(transmission);
-	await registerSideBarCommands(transmission);
-	await registerFileExplorerCommands(transmission);
-	await registerActivityBarCommands(transmission);
-	await registerNotificationsCommands(transmission);
+  await registerAppCommands(transmission);
+  await registerTopBarCommands(transmission);
+  await registerEditorCommands(transmission);
+  await registerSideBarCommands(transmission);
+  await registerFileExplorerCommands(transmission);
+  await registerActivityBarCommands(transmission);
+  await registerNotificationsCommands(transmission);
 };

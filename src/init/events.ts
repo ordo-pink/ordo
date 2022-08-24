@@ -8,11 +8,11 @@ import registerEditorEvents from "@modules/editor/register-events";
 import registerNotificationsEvents from "@modules/notifications/register-events";
 
 export const initEvents = (transmission: Transmission) => {
-	registerAppEvents(transmission);
-	registerTopBarEvents(transmission);
-	registerEditorEvents(transmission);
-	registerSideBarEvents(transmission);
-	registerActivityBarEvents(transmission);
-	registerFileExplorerEvents(transmission);
-	registerNotificationsEvents(transmission);
+  registerAppEvents(transmission);
+  registerTopBarEvents(transmission);
+  registerEditorEvents(transmission);
+  registerSideBarEvents(transmission);
+  registerActivityBarEvents(transmission);
+  registerFileExplorerEvents(transmission);
+  registerNotificationsEvents(transmission);
 };

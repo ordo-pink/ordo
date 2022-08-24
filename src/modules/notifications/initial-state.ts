@@ -1,7 +1,7 @@
 import { NotificationsState } from "@modules/notifications/types";
 
 const initialState: NotificationsState = {
-	messages: [],
+  messages: [],
 };
 
 export default initialState;

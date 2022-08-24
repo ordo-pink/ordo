@@ -8,13 +8,13 @@ import { FoldVoid } from "@utils/either";
  * Current file path is used otherwise.
  */
 export const handleRevealInFinder: OrdoEventHandler<"@file-explorer/reveal-in-finder"> = ({
-	payload,
-	context,
-	transmission,
+  payload,
+  context,
+  transmission,
 }) =>
-	Either.fromNullable(payload)
-		.map((path) => context.showInFolder(path))
-		.swap()
-		.chain(() => Either.fromNullable(transmission.select((state) => state.editor.currentTab)))
-		.map((path) => context.showInFolder(path))
-		.fold(...FoldVoid);
+  Either.fromNullable(payload)
+    .map((path) => context.showInFolder(path))
+    .swap()
+    .chain(() => Either.fromNullable(transmission.select((state) => state.editor.currentTab)))
+    .map((path) => context.showInFolder(path))
+    .fold(...FoldVoid);

@@ -1,32 +1,32 @@
 {
-	"compilerOptions": {
-		"allowJs": true,
-		"jsx": "react",
-		"module": "commonjs",
-		"skipLibCheck": true,
-		"esModuleInterop": true,
-		"strict": true,
-		"allowSyntheticDefaultImports": true,
-		"strictBindCallApply": true,
-		"strictFunctionTypes": true,
-		"strictNullChecks": true,
-		"strictPropertyInitialization": true,
-		"alwaysStrict": true,
-		"sourceMap": true,
-		"baseUrl": ".",
-		"outDir": "dist",
-		"moduleResolution": "node",
-		"resolveJsonModule": true,
-		"paths": {
-			"@core/*": ["src/core/*"],
-			"@containers/*": ["src/containers/*"],
-			"@modules/*": ["src/modules/*"],
-			"@components/*": ["src/components/*"],
-			"@init/*": ["src/init/*"],
-			"@utils/*": ["src/utils/*"],
-			"*": ["node_modules/*"]
-		}
-	},
-	"include": ["src/**/*"],
-	"exclude": ["**/*.test.ts"]
+  "compilerOptions": {
+    "allowJs": true,
+    "jsx": "react",
+    "module": "commonjs",
+    "skipLibCheck": true,
+    "esModuleInterop": true,
+    "strict": true,
+    "allowSyntheticDefaultImports": true,
+    "strictBindCallApply": true,
+    "strictFunctionTypes": true,
+    "strictNullChecks": true,
+    "strictPropertyInitialization": true,
+    "alwaysStrict": true,
+    "sourceMap": true,
+    "baseUrl": ".",
+    "outDir": "dist",
+    "moduleResolution": "node",
+    "resolveJsonModule": true,
+    "paths": {
+      "@core/*": ["src/core/*"],
+      "@containers/*": ["src/containers/*"],
+      "@modules/*": ["src/modules/*"],
+      "@components/*": ["src/components/*"],
+      "@init/*": ["src/init/*"],
+      "@utils/*": ["src/utils/*"],
+      "*": ["node_modules/*"]
+    }
+  },
+  "include": ["src/**/*"],
+  "exclude": ["**/*.test.ts"]
 }

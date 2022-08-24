@@ -1,14 +1,14 @@
 import { OrdoEvent, SupportedIcon } from "@core/types";
 
 export type ActivityBarItem = {
-	show: boolean;
-	name: string;
-	icon: SupportedIcon;
+  show: boolean;
+  name: string;
+  icon: SupportedIcon;
 };
 
 export type ActivityBarState = {
-	current: string;
-	items: ActivityBarItem[];
+  current: string;
+  items: ActivityBarItem[];
 };
 
 export type ACTIVITY_BAR_SCOPE = "activity-bar";
@@ -23,8 +23,8 @@ export type OpenSettingsEvent = OrdoEvent<ACTIVITY_BAR_SCOPE, "open-settings">;
 export type OpenCheckboxesEvent = OrdoEvent<ACTIVITY_BAR_SCOPE, "open-checkboxes">;
 
 export type ActivityBarEvents = ActivityBarSelectEvent &
-	OpenEditorEvent &
-	OpenGraphEvent &
-	OpenSettingsEvent &
-	OpenCheckboxesEvent &
-	OpenWelcomePageEvent;
+  OpenEditorEvent &
+  OpenGraphEvent &
+  OpenSettingsEvent &
+  OpenCheckboxesEvent &
+  OpenWelcomePageEvent;

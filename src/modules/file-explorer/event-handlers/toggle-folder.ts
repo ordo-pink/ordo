@@ -10,8 +10,8 @@ import { tap } from "@utils/functions";
  * Collapses or expands the folder.
  */
 export const handleToggleFolder: OrdoEventHandler<"@file-explorer/toggle-folder"> = ({ draft, payload }) =>
-	Either.fromNullable(payload)
-		.chain((p) => Either.fromNullable(findOrdoFolderByPath(draft.fileExplorer.tree, p)))
-		.map(tap((f) => void (f.collapsed = !f.collapsed)))
-		.map(({ path, collapsed }) => updateFolder(path, { collapsed }))
-		.fold(...FoldVoid);
+  Either.fromNullable(payload)
+    .chain((p) => Either.fromNullable(findOrdoFolderByPath(draft.fileExplorer.tree, p)))
+    .map(tap((f) => void (f.collapsed = !f.collapsed)))
+    .map(({ path, collapsed }) => updateFolder(path, { collapsed }))
+    .fold(...FoldVoid);

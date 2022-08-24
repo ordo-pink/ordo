@@ -208,6 +208,7 @@
 		"react-icons": "^4.3.1",
 		"react-redux": "^8.0.0",
 		"react-split": "^2.0.14",
+		"react-spring": "^9.4.4",
 		"tailwindcss": "^3.0.24",
 		"vis-data": "^7.1.4",
 		"vis-network": "^9.1.2"

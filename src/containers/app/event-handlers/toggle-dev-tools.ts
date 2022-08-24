@@ -9,7 +9,7 @@ import { noOpFn } from "@utils/no-op";
  * development mode, and the process is run with a `--debug` option.
  */
 export const handleToggleDevTools: OrdoEventHandler<"@app/toggle-dev-tools"> = ({ context }) => {
-	fromBoolean(is.development)
-		.chain(() => fromBoolean(!process.argv.includes("--debug")))
-		.fold(noOpFn, () => context.window.webContents.toggleDevTools());
+  fromBoolean(is.development)
+    .chain(() => fromBoolean(!process.argv.includes("--debug")))
+    .fold(noOpFn, () => context.window.webContents.toggleDevTools());
 };

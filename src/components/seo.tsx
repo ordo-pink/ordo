@@ -11,7 +11,7 @@ type Props = {
 
 export const Seo: React.FC<Props> = ({
   description = "",
-  lang = "en",
+  lang = "ru",
   meta = [],
   title,
 }) => {

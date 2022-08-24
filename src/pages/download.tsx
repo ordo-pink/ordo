@@ -23,7 +23,7 @@ export default function PrivateBeta() {
           <div className="flex flex-col space-y-2">
             <a
               href="https://tinyurl.com/ordo-011-win"
-              className="flex space-x-2 justify-center items-center px-8 py-2 bg-gradient-to-tr from-pink-500 to-cyan-500 rounded-xl font-bold text-xl text-white whitespace-nowrap"
+              className="flex space-x-2 justify-center items-center px-8 py-2 bg-gradient-to-tr from-pink-500 to-cyan-500 rounded-xl font-semibold text-xl text-white whitespace-nowrap"
             >
               <DiWindows />
               <div>Windows</div>
@@ -32,7 +32,7 @@ export default function PrivateBeta() {
           <div className="flex flex-col space-y-2">
             <a
               href="https://tinyurl.com/ordo-011-darwin"
-              className="flex space-x-2 justify-center items-center px-8 py-2 bg-gradient-to-tr from-pink-500 to-cyan-500 rounded-xl font-bold text-xl text-white whitespace-nowrap"
+              className="flex space-x-2 justify-center items-center px-8 py-2 bg-gradient-to-tr from-pink-500 to-cyan-500 rounded-xl font-semibold text-xl text-white whitespace-nowrap"
             >
               <DiApple />
               <div>MacOS</div>
@@ -42,7 +42,7 @@ export default function PrivateBeta() {
             <div className="flex flex-col space-y-2">
               <a
                 href="https://tinyurl.com/ordo-011-rpm"
-                className="flex space-x-2 justify-center items-center px-8 py-2 bg-gradient-to-tr from-pink-500 to-cyan-500 rounded-xl font-bold text-xl text-white whitespace-nowrap"
+                className="flex space-x-2 justify-center items-center px-8 py-2 bg-gradient-to-tr from-pink-500 to-cyan-500 rounded-xl font-semibold text-xl text-white whitespace-nowrap"
               >
                 <DiLinux />
                 <div>Linux (RPM)</div>
@@ -51,7 +51,7 @@ export default function PrivateBeta() {
             <div className="flex flex-col space-y-2">
               <a
                 href="https://tinyurl.com/ordo-011-deb"
-                className="flex space-x-2 justify-center items-center px-8 py-2 bg-gradient-to-tr from-pink-500 to-cyan-500 rounded-xl font-bold text-xl text-white whitespace-nowrap"
+                className="flex space-x-2 justify-center items-center px-8 py-2 bg-gradient-to-tr from-pink-500 to-cyan-500 rounded-xl font-semibold text-xl text-white whitespace-nowrap"
               >
                 <DiLinux />
                 <div>Linux (DEB)</div>
@@ -61,7 +61,7 @@ export default function PrivateBeta() {
           <div className="flex flex-col space-y-2">
             <Link
               to="/blog/markdown-basics"
-              className="flex space-x-2 justify-center items-center  font-bold px-2 py-1"
+              className="flex space-x-2 justify-center items-center font-semibold px-2 py-1"
             >
               <HiOutlineBookOpen />
               <div>А как этим пользоваться?</div>
@@ -79,6 +79,9 @@ export default function PrivateBeta() {
           </p>
         </div>
       </div>
+
+      <div className="fixed top-0 left-0 right-0 bottom-0 bg-neutral-800 bg-opacity-90 bg-blend-exclusion -z-10"></div>
+
       <Footer />
     </div>
   )

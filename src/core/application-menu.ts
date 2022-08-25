@@ -231,7 +231,7 @@ export const getApplicationMenu = (transmission: Transmission) => {
           },
           {
             label: "Tutorial",
-            click: () => shell.openExternal("https://ordo.pink/tutorial"),
+            click: () => shell.openExternal("https://ordo.pink/blog/markdown-basics"),
           },
         ],
       },

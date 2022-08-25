@@ -1,4 +1,5 @@
 import React from "react";
+import { useTranslation } from "react-i18next";
 
 import { useAppDispatch } from "@core/state/store";
 import { ActivityBarItem } from "@modules/activity-bar/types";
@@ -17,6 +18,8 @@ export const ActivityBarIcon: React.FC<ActivityBarItemProps> = ({ icon, show, na
 
   const [className, setClassName] = React.useState<string>("");
 
+  const { t } = useTranslation();
+
   const handleActivityClick = () => dispatch({ type: "@activity-bar/select", payload: name });
 
   React.useEffect(
@@ -29,7 +32,12 @@ export const ActivityBarIcon: React.FC<ActivityBarItemProps> = ({ icon, show, na
   );
 
   return fromBoolean(show).fold(NoOp, () => (
-    <button tabIndex={2} className={`activity ${className}`} onClick={handleActivityClick} title={name}>
+    <button
+      tabIndex={2}
+      className={`activity ${className}`}
+      onClick={handleActivityClick}
+      title={t(`activities.activity.${name}.name`.toLowerCase())}
+    >
       <Icon />
     </button>
   ));

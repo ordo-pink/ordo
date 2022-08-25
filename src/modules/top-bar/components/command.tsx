@@ -1,4 +1,5 @@
 import React from "react";
+import { useTranslation } from "react-i18next";
 
 import { Command as TCommand } from "@containers/app/types";
 import { Accelerator } from "@modules/top-bar/components/accelerator";
@@ -17,6 +18,8 @@ export const Command: React.FC<CommandProps> = ({ icon, name, accelerator, event
   const Icon = useIcon(icon);
   const [isSelected, setIsSelected] = React.useState<boolean>(false);
 
+  const { t } = useTranslation();
+
   React.useEffect(() => {
     setIsSelected(selected === index);
   }, [selected, index]);
@@ -32,7 +35,7 @@ export const Command: React.FC<CommandProps> = ({ icon, name, accelerator, event
     >
       <div className="top-bar_item_info">
         <Icon className="top-bar_item_info_icon" />
-        <div>{name}</div>
+        <div>{t(name)}</div>
       </div>
       <Accelerator accelerator={accelerator} />
     </div>

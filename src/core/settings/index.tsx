@@ -1,4 +1,5 @@
 import React from "react";
+import { useTranslation } from "react-i18next";
 
 import { userSettingsSchema } from "@core/settings/user-settings-schema";
 import { useAppDispatch, useAppSelector } from "@core/state/store";
@@ -7,6 +8,7 @@ export const Settings: React.FC = () => {
   const schema: any = userSettingsSchema;
   const settings: any = useAppSelector((state) => state.app.userSettings);
   const dispatch = useAppDispatch();
+  const { t } = useTranslation();
 
   return (
     <div className="h-[calc(100vh-3.75rem)] overflow-y-auto">
@@ -15,14 +17,16 @@ export const Settings: React.FC = () => {
           <fieldset key={key} className="my-5 p-5 bg-neutral-200 dark:bg-neutral-600 rounded-lg shadow-lg">
             <div className="text-center">
               {schema[key].description &&
-                schema[key].description.split("::").map((line: string, index: number) => (
-                  <div
-                    key={line}
-                    className={index === 0 ? "font-bold uppercase" : "text-sm text-neutral-600 dark:text-neutral-400"}
-                  >
-                    {line}
-                  </div>
-                ))}
+                t(schema[key].description)
+                  .split("::")
+                  .map((line: string, index: number) => (
+                    <div
+                      key={line}
+                      className={index === 0 ? "font-bold uppercase" : "text-sm text-neutral-600 dark:text-neutral-400"}
+                    >
+                      {line}
+                    </div>
+                  ))}
             </div>
             {Object.keys(schema[key].properties).map((property) => (
               <div key={`${key}-${property}`} className="">
@@ -30,11 +34,16 @@ export const Settings: React.FC = () => {
                   <label className="flex justify-between items-center w-full py-3">
                     <div>
                       {schema[key].properties[property].description &&
-                        schema[key].properties[property].description.split("::").map((line: string, index: number) => (
-                          <p key={line} className={index === 0 ? "" : "text-sm text-neutral-600 dark:text-neutral-400"}>
-                            {line}
-                          </p>
-                        ))}
+                        t(schema[key].properties[property].description)
+                          .split("::")
+                          .map((line: string, index: number) => (
+                            <p
+                              key={line}
+                              className={index === 0 ? "" : "text-sm text-neutral-600 dark:text-neutral-400"}
+                            >
+                              {line}
+                            </p>
+                          ))}
                     </div>
                     {schema[key].properties[property].enum ? (
                       <select
@@ -46,7 +55,7 @@ export const Settings: React.FC = () => {
                       >
                         {schema[key].properties[property].enum.map((value: string) => (
                           <option key={`${key}-${value}`} value={value}>
-                            {value}
+                            {t(`${schema[key].properties[property].description}.${value}`)}
                           </option>
                         ))}
                       </select>

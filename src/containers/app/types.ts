@@ -5,7 +5,6 @@ import { OrdoEvents } from "@init/types";
 export type Command<TCustomEvents extends Record<string, any> | null = null> = {
   icon?: SupportedIcon;
   name: string;
-  description: string;
   event: TCustomEvents extends null ? keyof OrdoEvents : TCustomEvents;
   accelerator: string;
 };

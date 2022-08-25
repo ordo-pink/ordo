@@ -19,6 +19,7 @@ export type InternalSettings = {
 export type UserSettings = {
   appearance: {
     theme: "system" | "light" | "dark";
+    language: "ru-RU" | "en-US";
     // accentColor: Color;
   };
   graph: {

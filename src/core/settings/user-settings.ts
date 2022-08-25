@@ -8,7 +8,7 @@ export const userSettingsStore = new Store({
   schema: userSettingsSchema,
   migrations: {
     "0.1.0": (s) => {
-      s.set("appearance", { theme: "system", accentColor: "pink" });
+      s.set("appearance", { theme: "system" });
       s.set("graph", {
         showFolders: true,
         showTags: true,
@@ -51,6 +51,18 @@ export const userSettingsStore = new Store({
     "0.1.1": (s) => {
       s.set("explorer.confirmMove", false);
       s.set("editor.alwaysShowMarkdownSymbols", false);
+
+      const supportedLocales = ["ru-RU", "en-US"];
+
+      const currentLocale = Intl.DateTimeFormat().resolvedOptions().locale;
+
+      const language = supportedLocales.includes(currentLocale)
+        ? currentLocale
+        : currentLocale === "ru"
+        ? "ru-RU"
+        : "en-US";
+
+      s.set("appearance.language", language);
     },
   },
 });

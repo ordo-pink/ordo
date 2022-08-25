@@ -1,11 +1,14 @@
 import React from "react";
 
-import { applyStatePatches, setState, useInternalDispatch, useAppDispatch } from "@core/state/store";
+import { applyStatePatches, setState, useInternalDispatch, useAppDispatch, useAppSelector } from "@core/state/store";
 import { StatusBar } from "@containers/status-bar";
 import { MainArea } from "@containers/main-area";
 import { ActivityBar } from "@modules/activity-bar";
+import i18n from "../../i18n";
 
 import "@containers/app/index.css";
+import { Either } from "or-else";
+import { FoldVoid } from "@utils/either";
 
 /**
  * App is a wrapper for ActivityBar, MainArea and StatusBar. It is also the top level
@@ -16,6 +19,8 @@ import "@containers/app/index.css";
 export const App: React.FC = () => {
   const internalDispatch = useInternalDispatch();
   const dispatch = useAppDispatch();
+
+  const locale = useAppSelector((state) => state.app.userSettings?.appearance?.language);
 
   const handleApplyPatches = React.useCallback(({ detail }: any) => internalDispatch(applyStatePatches(detail)), []);
   const handleSetState = React.useCallback(({ detail }: any) => internalDispatch(setState(detail)), []);
@@ -33,6 +38,8 @@ export const App: React.FC = () => {
       window.removeEventListener("@app/apply-patches", handleApplyPatches);
     };
   }, []);
+
+  React.useEffect(() => void Either.fromNullable(locale).fold(FoldVoid[0], i18n.changeLanguage), [locale]);
 
   return (
     <>

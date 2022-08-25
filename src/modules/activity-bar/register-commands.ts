@@ -2,36 +2,31 @@ import { registerCommands } from "@core/transmission/register-ordo-commands";
 
 export default registerCommands([
   {
-    name: "Open Editor",
-    description: "Switch to Editor view.",
+    name: "activity-bar.commands.open-editor",
     event: "@activity-bar/open-editor",
     icon: "HiOutlineDocumentText",
     accelerator: "CommandOrControl+Shift+E",
   },
   {
-    name: "Open Graph",
-    description: "Switch to Graph view.",
+    name: "activity-bar.commands.open-graph",
     event: "@activity-bar/open-graph",
     icon: "HiOutlineShare",
     accelerator: "CommandOrControl+Shift+G",
   },
   {
-    name: "Open Checkboxes",
-    description: "Switch to Checkboxes view.",
+    name: "activity-bar.commands.open-checkboxes",
     event: "@activity-bar/open-checkboxes",
     icon: "HiOutlineCheckCircle",
     accelerator: "CommandOrControl+Shift+C",
   },
   {
-    name: "Open Settings",
-    description: "Switch to Settings view.",
+    name: "activity-bar.commands.open-settings",
     event: "@activity-bar/open-settings",
     icon: "HiOutlineCog",
     accelerator: "CommandOrControl+,",
   },
   {
-    name: "Open Welcome Page",
-    description: "Switch to Welcome Page.",
+    name: "activity-bar.commands.open-welcome-page",
     event: "@activity-bar/open-welcome-page",
     icon: "HiOutlineInbox",
     accelerator: "CommandOrControl+Alt+W",

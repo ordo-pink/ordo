@@ -7,6 +7,7 @@ import "./index.css";
 import { store } from "@core/state/store";
 import { App } from "@containers/app";
 import ErrorBoundary from "@core/error-boundary";
+import "./i18n";
 
 const app = (
   <React.StrictMode>

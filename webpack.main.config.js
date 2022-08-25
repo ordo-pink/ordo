@@ -19,6 +19,7 @@ module.exports = {
       "@init": resolve("./src/init"),
       "@modules": resolve("./src/modules"),
       "@utils": resolve("./src/utils"),
+      "@i18n": resolve("./i18n"),
     },
   },
 };

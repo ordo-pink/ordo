@@ -5,33 +5,37 @@ import { UserSettings } from "@core/settings/types";
 export const userSettingsSchema: Schema<UserSettings> = {
   appearance: {
     type: "object",
-    description: "Appearance::Application appearance settings",
+    description: "core.settings.appearance",
     properties: {
       theme: {
-        description: "Theme::Let the darkness (or the lightness?) be with you",
+        description: "core.settings.appearance.theme",
         type: "string",
         enum: ["system", "light", "dark"],
         default: "system",
+      },
+      language: {
+        description: "core.settings.appearance.language",
+        type: "string",
+        enum: ["ru-RU", "en-US"],
       },
     },
   },
   graph: {
     type: "object",
-    description: "Graph::Graph settings",
+    description: "core.settings.graph",
     properties: {
       showFolders: {
-        description: "Show folders::Turn this on to make graphs show the full filesystem hierarchy including folders",
+        description: "core.settings.graph.show-folders",
         type: "boolean",
         default: true,
       },
       showTags: {
-        description: "Show tags::Turn this on to make graphs show tags used in files",
+        description: "core.settings.graph.show-tags",
         type: "boolean",
         default: true,
       },
       showLinks: {
-        description:
-          "Show links::Turn this on to make graphs show links between files. Links will be shown as dashed lines, ebmeds will be shown as solid lines",
+        description: "core.settings.graph.show-links",
         type: "boolean",
         default: true,
       },
@@ -39,16 +43,15 @@ export const userSettingsSchema: Schema<UserSettings> = {
   },
   editor: {
     type: "object",
-    description: "Editor::Editor related settings",
+    description: "core.settings.editor",
     properties: {
       showLineNumbers: {
-        description: "Show line numbers::You would probably need line numbers - they are so convenient!",
+        description: "core.settings.editor.show-line-numbers",
         type: "boolean",
         default: true,
       },
       alwaysShowMarkdownSymbols: {
-        description:
-          "Always show Markdown symbols::Those hashes and stars may be annoying, but seeing them is near and dear to many hearts",
+        description: "core.settings.editor.always-show-markdown-symbols",
         type: "boolean",
         default: false,
       },
@@ -75,15 +78,15 @@ export const userSettingsSchema: Schema<UserSettings> = {
     },
   },
   explorer: {
-    description: "File Explorer::Stuff related to working with files",
+    description: "core.settings.file-explorer",
     properties: {
       exclude: {
-        description: "Ignore files and folders::Beware of the dragons! 🐉",
+        description: "core.settings.file-explorer.exclude",
         type: "array",
         default: ["**/.obsidian", "**/node_modules", "**/.git", "**/.svn", "**/CVS", "**/.DS_Store", "**/Thumbs.db"],
       },
       associations: {
-        description: "Associate file type with extension::Beware of the dragons! 🐉",
+        description: "core.settings.file-explorer.associations",
         type: "array",
         default: [
           { extension: ".apng", association: "image" },
@@ -106,13 +109,12 @@ export const userSettingsSchema: Schema<UserSettings> = {
         ],
       },
       confirmDelete: {
-        description: "Confirm removal::Show the annoying alert asking if you are sure you know what you are doing",
+        description: "core.settings.file-explorer.confirm-delete",
         type: "boolean",
         default: true,
       },
       confirmMove: {
-        description:
-          "Confirm moving and renaming::Show the annoying alert asking if you are sure you know what you are doing",
+        description: "core.settings.file-explorer.confirm-move",
         type: "boolean",
         default: false,
       },

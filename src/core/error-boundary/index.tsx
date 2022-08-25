@@ -21,6 +21,7 @@ class ErrorBoundary extends React.Component<Props, State> {
   }
 
   public componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
+    // TODO: Replace "Uncaught error:" with translation with the key "core.errors.uncaught-error"
     console.error("Uncaught error:", error, errorInfo);
 
     this.props.dispatch({

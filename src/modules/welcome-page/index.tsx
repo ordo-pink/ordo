@@ -14,14 +14,14 @@ import "@modules/welcome-page/index.css";
  * user preferences.
  */
 export const WelcomePage: React.FC = () => {
-  return (
-    <div className="welcome-page">
-      <Logo />
-      <Slogan />
-      <div className="welcome-page_actions-container">
-        <RecentProjects />
-        <Activities />
-      </div>
-    </div>
-  );
+	return (
+		<div className="welcome-page">
+			<Slogan />
+			<Logo />
+			<div className="welcome-page_actions-container">
+				<RecentProjects />
+				<Activities />
+			</div>
+		</div>
+	);
 };

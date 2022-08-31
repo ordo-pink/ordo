@@ -146,7 +146,7 @@ export const Autocomplete: React.FC<{ char: string }> = ({ char }) => {
             shiftKey: false,
             ctrlKey: false,
             metaKey: false,
-            key: fusedLinks.length ? `${e.currentTarget.value}]] ` : `${e.currentTarget.value} `,
+            key: fusedLinks.length ? `${e.currentTarget.value}]] ` : `${e.currentTarget.value.replace(/\s+/g, "-")} `,
           },
         },
       });

@@ -366,14 +366,15 @@ export const handleTyping: OrdoEventHandler<"@editor/handle-typing"> = ({ draft,
         tab.content.children[lineIndex].raw.slice(0, charPosition) +
         (payload.event.shiftKey ? payload.event.key.toUpperCase() : payload.event.key) +
         tab.content.children[lineIndex].raw.slice(charPosition);
+
       tab.content.children[lineIndex].raw = newLine;
 
       tab.content.children[lineIndex] = parseLine(tab.content.children[lineIndex].raw, lineIndex, tab.content, {
         depth: tab.content.depth,
       });
 
-      position.start.character++;
-      position.end.character = position.start.character;
+      position.start.character += payload.event.key.length;
+      position.end.character += payload.event.key.length;
     });
   }
 

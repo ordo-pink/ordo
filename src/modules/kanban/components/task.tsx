@@ -9,6 +9,7 @@ import { useAppDispatch, useAppSelector } from "@core/state/store";
 import { Task as TTask } from "../types";
 import { fromBoolean } from "@utils/either";
 import { getFolderOrParent } from "@modules/file-explorer/utils/get-folder-or-parent";
+import { getDocumentName } from "@utils/get-document-name";
 
 type Props = {
   task: TTask;
@@ -30,6 +31,8 @@ export const Task: React.FC<Props> = ({ task, displayProperties, index }) => {
   const XIcon = useIcon("HiX");
   const PencilIcon = useIcon("HiOutlinePencilAlt");
   const CheckIcon = useIcon("HiOutlineCheckCircle");
+
+  const readableName = getDocumentName(task.readableName);
 
   React.useEffect(() => {
     if (isTitleEditable && titleInputRef.current) {
@@ -108,7 +111,7 @@ export const Task: React.FC<Props> = ({ task, displayProperties, index }) => {
           <div className="flex flex-col space-y-2 flex-grow">
             {fromBoolean(isTitleEditable).fold(
               () => (
-                <div>{task.readableName}</div>
+                <div>{readableName}</div>
               ),
               () => (
                 <input

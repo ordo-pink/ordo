@@ -9,6 +9,7 @@ import { EditorTab } from "@modules/editor/types";
 import { tapPreventDefault, tapStopPropagation } from "@utils/events";
 import { FoldVoid, fromBoolean } from "@utils/either";
 import { NoOp } from "@utils/no-op";
+import { getDocumentName } from "@utils/get-document-name";
 
 type TabProps = {
   tab: EditorTab;
@@ -24,6 +25,8 @@ export const Tab: React.FC<TabProps> = React.memo(
 
     const HiX = useIcon("HiX");
     const Icon = useFileIcon(file);
+
+    const readableName = getDocumentName(file?.readableName);
 
     const [path, setPath] = React.useState<string>("");
     const [isActive, setIsActive] = React.useState<boolean>(false);
@@ -67,7 +70,7 @@ export const Tab: React.FC<TabProps> = React.memo(
 
     return Either.fromNullable(file)
       .chain((f) => Either.fromNullable(tab).map((t) => ({ f, t })))
-      .fold(NoOp, ({ f, t }) => (
+      .fold(NoOp, ({ t }) => (
         <div
           title={t.path}
           tabIndex={1}
@@ -77,7 +80,7 @@ export const Tab: React.FC<TabProps> = React.memo(
           onMouseDown={handleMiddleButton}
         >
           <Icon className="editor_tab_file-icon" />
-          <div>{f.readableName}</div>
+          <div>{readableName}</div>
           <HiX className="editor_tab_close-icon" onClick={handleClose} />
         </div>
       ));

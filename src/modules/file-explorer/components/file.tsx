@@ -7,6 +7,7 @@ import { useFileIcon } from "@modules/file-explorer/hooks/use-file-icon";
 import { useTreeNesting } from "@modules/file-explorer/hooks/use-tree-nesting";
 import { tapPreventDefault, tapStopPropagation } from "@utils/events";
 import { FoldVoid, fromBoolean } from "@utils/either";
+import { getDocumentName } from "@utils/get-document-name";
 
 type FileProps = {
   file: OrdoFile;
@@ -30,6 +31,8 @@ export const File: React.FC<FileProps> = ({ file }) => {
   const [isOpenFile, setIsOpenFile] = React.useState<boolean>(false);
   const [isCurrentFile, setIsCurrentFile] = React.useState<boolean>(false);
   const [renameInputValue, setRenameInputValue] = React.useState<string>(file.readableName);
+
+  const readableName = getDocumentName(file.readableName);
 
   React.useEffect(() => {
     setIsCurrentFile(selectedFile === file.path);
@@ -131,7 +134,7 @@ export const File: React.FC<FileProps> = ({ file }) => {
               : "text-neutral-500 dark:text-neutral-300"
           }`}
         />
-        <div className="file-explorer_item_name">{file.readableName}</div>
+        <div className="file-explorer_item_name">{readableName}</div>
       </div>
     ),
   );

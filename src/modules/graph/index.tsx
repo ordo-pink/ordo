@@ -3,9 +3,12 @@ import { Network, Options } from "vis-network";
 
 import { OrdoFolder } from "@modules/file-explorer/types";
 import { isFolder } from "@modules/file-explorer/utils/is-folder";
-import { useAppDispatch } from "@core/state/store";
+import { useAppDispatch, useAppSelector } from "@core/state/store";
 import { findOrdoFile } from "@modules/file-explorer/utils/find-ordo-file";
 import { Loader } from "@modules/graph/components/loader";
+import { getDocumentName } from "@utils/get-document-name";
+
+const getLevel = (node: any, sep: string) => node.path.split(sep).length;
 
 const collectNodes = (
   tree: OrdoFolder,
@@ -15,12 +18,14 @@ const collectNodes = (
   showLinks: boolean,
   showFolders: boolean,
   isDarkMode = false,
+  sep: string,
 ) => {
   if (showFolders) {
     nodes.push({
       ...tree,
       label: tree.readableName,
       id: tree.path,
+      level: getLevel(tree, sep),
       height: tree.depth,
       color: isDarkMode ? "#86C6FD" : "#bde0fe",
       size: tree.children.length + 10,
@@ -29,7 +34,7 @@ const collectNodes = (
 
   tree.children.forEach((child) => {
     if (isFolder(child)) {
-      collectNodes(child, nodes, edges, showTags, showLinks, showFolders, isDarkMode);
+      collectNodes(child, nodes, edges, showTags, showLinks, showFolders, isDarkMode, sep);
     } else {
       nodes.push({
         ...child,
@@ -37,6 +42,7 @@ const collectNodes = (
         id: child.path,
         color: isDarkMode ? "#FF99C0" : "#ffc8dd",
         size: 10,
+        level: getLevel(child, sep),
         height: tree.depth,
       });
 
@@ -111,8 +117,9 @@ const createNetwork = (
   showLinks: boolean,
   showFolders: boolean,
   isDarkMode = false,
+  sep: string,
 ) => {
-  const { nodes, edges } = collectNodes(tree, [], [], showTags, showLinks, showFolders, isDarkMode);
+  const { nodes, edges } = collectNodes(tree, [], [], showTags, showLinks, showFolders, isDarkMode, sep);
 
   edges.forEach((edge) => {
     if (!nodes.some((node) => node.id === edge.to)) {
@@ -120,16 +127,16 @@ const createNetwork = (
 
       if (!file) {
         nodes.push(
-          edge.color === "#ffafcc" || edge.color === "#FF70A5"
+          edge.color === "#FF70A5" || edge.color === "#FF70A5"
             ? {
-                label: edge.to,
+                label: getDocumentName(edge.to),
                 id: edge.to,
                 color: isDarkMode ? "#FF99C0" : "#ffc8dd",
                 size: 15,
                 height: 0,
               }
             : {
-                label: edge.to,
+                label: getDocumentName(edge.to),
                 id: edge.to,
                 color: isDarkMode ? "#86C6FD" : "#bde0fe",
                 size: 15,
@@ -138,6 +145,7 @@ const createNetwork = (
         );
       } else {
         edge.to = file.path;
+        edge.label = getDocumentName(file.readableName);
       }
     }
   });
@@ -156,7 +164,8 @@ type GraphProps = {
 export const Graph: React.FC<GraphProps> = React.memo(
   ({ tree, height = "98vh", showTags = true, showFolders = true, showLinks = true }) => {
     const mode = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
-    const data = createNetwork(tree, showTags, showLinks, showFolders, mode === "dark");
+    const sep = useAppSelector((state) => state.app.internalSettings.separator);
+    const data = createNetwork(tree, showTags, showLinks, showFolders, mode === "dark", sep);
     const ref = React.useRef<HTMLDivElement>(null);
     const dispatch = useAppDispatch();
     const [loader, setLoader] = useState(true);
@@ -170,11 +179,11 @@ export const Graph: React.FC<GraphProps> = React.memo(
         nodes: {
           shape: "dot",
           scaling: {
-            min: 10,
-            max: 30,
+            min: 20,
+            max: 50,
           },
           font: {
-            size: 12,
+            size: 16,
             color: mode === "dark" ? "#ddd" : "#111",
           },
         },
@@ -188,6 +197,7 @@ export const Graph: React.FC<GraphProps> = React.memo(
           },
         },
         interaction: {
+          hover: true,
           hideEdgesOnDrag: false,
           tooltipDelay: 200,
         },

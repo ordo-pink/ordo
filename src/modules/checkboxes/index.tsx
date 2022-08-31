@@ -1,6 +1,7 @@
 import { useIcon } from "@core/hooks/use-icon";
 import { useAppDispatch, useAppSelector } from "@core/state/store";
 import { collectFiles } from "@modules/file-explorer/utils/collect-files";
+import { getDocumentName } from "@utils/get-document-name";
 import { NoOp } from "@utils/no-op";
 import { Either } from "or-else";
 import React from "react";
@@ -24,7 +25,7 @@ export const Checkboxes = () => {
                 (todos.pending.length > 0 || todos.done.length > 0) && (
                   <div key={f.path}>
                     <div className="flex space-x-1 items-center">
-                      <h2 className="font-bold text-xl my-2">{f.readableName}</h2>
+                      <h2 className="font-bold text-xl my-2">{getDocumentName(f.readableName)}</h2>
                       <button onClick={() => dispatch({ type: "@editor/open-tab", payload: f.path })}>
                         <LinkIcon className={`cursor-pointer ${"text-sky-800 dark:text-sky-400"}`} />
                       </button>

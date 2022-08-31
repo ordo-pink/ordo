@@ -124,17 +124,21 @@ export const Task: React.FC<Props> = ({ task, displayProperties, index }) => {
               ),
             )}
             <div className="flex space-x-2">
-              {displayProperties.includes("links") && task.frontmatter && task.frontmatter.links.length > 0 && (
-                <div className="text-sm">
-                  <div className="flex space-x-1 items-center text-neutral-500 dark:text-neutral-400">
-                    <ShareIcon />
-                    <div>{task.frontmatter!.links.length}</div>
+              {displayProperties.includes("links") &&
+                task.frontmatter &&
+                task.frontmatter.links &&
+                task.frontmatter.links.length > 0 && (
+                  <div className="text-sm">
+                    <div className="flex space-x-1 items-center text-neutral-500 dark:text-neutral-400">
+                      <ShareIcon />
+                      <div>{task.frontmatter!.links.length}</div>
+                    </div>
                   </div>
-                </div>
-              )}
+                )}
               {displayProperties.includes("todos") &&
                 task.frontmatter &&
                 task.frontmatter.todos &&
+                (task.frontmatter.todos.pending || task.frontmatter.todos.done) &&
                 (task.frontmatter.todos.pending.length > 0 || task.frontmatter.todos.done.length > 0) && (
                   <div className="text-sm">
                     <div
@@ -155,14 +159,15 @@ export const Task: React.FC<Props> = ({ task, displayProperties, index }) => {
               {displayProperties.includes("tags") && task.frontmatter && (
                 <div className="text-sm">
                   <div className="flex flex-wrap space-x-1 text-neutral-500 dark:text-neutral-400">
-                    {task.frontmatter.tags.map((tag: string) => (
-                      <div
-                        className="font-bold bg-gradient-to-tr from-orange-600 dark:from-purple-400 to-pink-700 dark:to-pink-400 text-transparent bg-clip-text drop-shadow-xl"
-                        key={tag}
-                      >
-                        #{tag}
-                      </div>
-                    ))}
+                    {task.frontmatter.tags &&
+                      task.frontmatter.tags.map((tag: string) => (
+                        <div
+                          className="font-bold bg-gradient-to-tr from-orange-600 dark:from-purple-400 to-pink-700 dark:to-pink-400 text-transparent bg-clip-text drop-shadow-xl"
+                          key={tag}
+                        >
+                          #{tag}
+                        </div>
+                      ))}
                   </div>
                 </div>
               )}

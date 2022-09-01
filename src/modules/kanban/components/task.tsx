@@ -9,6 +9,7 @@ import { useAppDispatch, useAppSelector } from "@core/state/store";
 import { Task as TTask } from "../types";
 import { fromBoolean } from "@utils/either";
 import { getFolderOrParent } from "@modules/file-explorer/utils/get-folder-or-parent";
+import { getDocumentName } from "@utils/get-document-name";
 
 type Props = {
   task: TTask;
@@ -30,6 +31,8 @@ export const Task: React.FC<Props> = ({ task, displayProperties, index }) => {
   const XIcon = useIcon("HiX");
   const PencilIcon = useIcon("HiOutlinePencilAlt");
   const CheckIcon = useIcon("HiOutlineCheckCircle");
+
+  const readableName = getDocumentName(task.readableName);
 
   React.useEffect(() => {
     if (isTitleEditable && titleInputRef.current) {
@@ -108,7 +111,7 @@ export const Task: React.FC<Props> = ({ task, displayProperties, index }) => {
           <div className="flex flex-col space-y-2 flex-grow">
             {fromBoolean(isTitleEditable).fold(
               () => (
-                <div>{task.readableName}</div>
+                <div>{readableName}</div>
               ),
               () => (
                 <input
@@ -124,17 +127,21 @@ export const Task: React.FC<Props> = ({ task, displayProperties, index }) => {
               ),
             )}
             <div className="flex space-x-2">
-              {displayProperties.includes("links") && task.frontmatter && task.frontmatter.links.length > 0 && (
-                <div className="text-sm">
-                  <div className="flex space-x-1 items-center text-neutral-500 dark:text-neutral-400">
-                    <ShareIcon />
-                    <div>{task.frontmatter!.links.length}</div>
+              {displayProperties.includes("links") &&
+                task.frontmatter &&
+                task.frontmatter.links &&
+                task.frontmatter.links.length > 0 && (
+                  <div className="text-sm">
+                    <div className="flex space-x-1 items-center text-neutral-500 dark:text-neutral-400">
+                      <ShareIcon />
+                      <div>{task.frontmatter!.links.length}</div>
+                    </div>
                   </div>
-                </div>
-              )}
+                )}
               {displayProperties.includes("todos") &&
                 task.frontmatter &&
                 task.frontmatter.todos &&
+                (task.frontmatter.todos.pending || task.frontmatter.todos.done) &&
                 (task.frontmatter.todos.pending.length > 0 || task.frontmatter.todos.done.length > 0) && (
                   <div className="text-sm">
                     <div
@@ -155,14 +162,15 @@ export const Task: React.FC<Props> = ({ task, displayProperties, index }) => {
               {displayProperties.includes("tags") && task.frontmatter && (
                 <div className="text-sm">
                   <div className="flex flex-wrap space-x-1 text-neutral-500 dark:text-neutral-400">
-                    {task.frontmatter.tags.map((tag: string) => (
-                      <div
-                        className="font-bold bg-gradient-to-tr from-orange-600 dark:from-purple-400 to-pink-700 dark:to-pink-400 text-transparent bg-clip-text drop-shadow-xl"
-                        key={tag}
-                      >
-                        #{tag}
-                      </div>
-                    ))}
+                    {task.frontmatter.tags &&
+                      task.frontmatter.tags.map((tag: string) => (
+                        <div
+                          className="font-bold bg-gradient-to-tr from-orange-600 dark:from-purple-400 to-pink-700 dark:to-pink-400 text-transparent bg-clip-text drop-shadow-xl"
+                          key={tag}
+                        >
+                          #{tag}
+                        </div>
+                      ))}
                   </div>
                 </div>
               )}

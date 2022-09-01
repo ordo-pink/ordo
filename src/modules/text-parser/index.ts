@@ -141,13 +141,7 @@ export const parseLine = (line: string, index: number, tree: NodeWithChildren, m
 };
 
 export const extractFrontmatter = (raw: string): { raw: string; frontmatter: Record<string, any> | null } => {
-  const lines = raw.split("\n");
   let frontmatter: Record<string, any> | null = null;
-
-  if (lines[0] === "---" && lines[2] === "---") {
-    frontmatter = JSON.parse(lines[1]);
-    return { raw: lines.slice(3).join("\n"), frontmatter };
-  }
 
   return { raw, frontmatter };
 };

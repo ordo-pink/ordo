@@ -64,7 +64,7 @@
   }
 
   &_line {
-    @apply flex items-center align-middle w-full;
+    @apply flex items-center align-middle w-full relative;
 
     &_number {
       @apply w-12 select-none self-stretch flex flex-shrink-0 justify-end border-r border-neutral-200 dark:border-neutral-600 text-right pr-2 font-mono text-neutral-500 dark:text-neutral-400 text-sm;

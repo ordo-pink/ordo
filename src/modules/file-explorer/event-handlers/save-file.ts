@@ -36,7 +36,7 @@ export const handleSaveFile: OrdoEventHandler<"@file-explorer/save-file"> = asyn
         file.frontmatter.uuid = file.uuid ?? randomUUID();
       }
 
-      fileContent = "---\n".concat(JSON.stringify(file.frontmatter)).concat("\n---\n").concat(fileContent);
+      await promises.writeFile(`${tab.path}.meta`, JSON.stringify(file.frontmatter), "utf-8");
     }
 
     await promises.writeFile(tab.path, fileContent, "utf-8");
@@ -56,7 +56,7 @@ export const handleSaveFile: OrdoEventHandler<"@file-explorer/save-file"> = asyn
         file.frontmatter.uuid = file.uuid ?? randomUUID();
       }
 
-      fileContent = "---\n".concat(JSON.stringify(file.frontmatter)).concat("\n---\n").concat(fileContent);
+      await promises.writeFile(`${tab.path}.meta`, JSON.stringify(file.frontmatter), "utf-8");
     }
 
     await promises.writeFile(tab.path, fileContent, "utf-8");

@@ -9,7 +9,6 @@ import { OrdoFolder } from "@modules/file-explorer/types";
 import { createOrdoFile } from "@modules/file-explorer/utils/create-ordo-file";
 import { createOrdoFolder } from "@modules/file-explorer/utils/create-ordo-folder";
 import { sortTree } from "@modules/file-explorer/utils/sort-tree";
-import { extractFrontmatter } from "@modules/text-parser";
 import { existsSync } from "original-fs";
 
 /**
@@ -78,6 +77,10 @@ export const listFolder = async (path: string, depth = 0, rootPath = path): Prom
         continue;
       }
 
+      if (item.name.endsWith(".meta")) {
+        continue;
+      }
+
       const { birthtime, mtime, atime, size } = await promises.stat(itemPath);
       const relativePath = itemPath.replace(rootPath, "");
 
@@ -100,7 +103,15 @@ export const listFolder = async (path: string, depth = 0, rootPath = path): Prom
           });
         });
 
-        file.frontmatter = extractFrontmatter(maybeRawFrontmatter).frontmatter;
+        if (existsSync(`${file.path}.meta`)) {
+          try {
+            const metadata = await promises.readFile(`${file.path}.meta`, "utf-8");
+            file.frontmatter = JSON.parse(metadata);
+          } catch (e) {
+            file.frontmatter = {};
+          }
+        }
+
         if (!file.frontmatter?.uuid) {
           if (!file.frontmatter) {
             file.frontmatter = {};

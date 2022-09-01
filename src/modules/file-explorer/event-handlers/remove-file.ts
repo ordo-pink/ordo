@@ -1,4 +1,5 @@
 import { OrdoEventHandler } from "@core/types";
+import { existsSync, promises } from "original-fs";
 
 /**
  * Moves file with a path provided via payload to trash bin.
@@ -29,6 +30,10 @@ export const handleRemoveFile: OrdoEventHandler<"@file-explorer/remove-file"> = 
   if (response === 0) {
     if (isOpen) {
       await transmission.emit("@editor/close-tab", path);
+    }
+
+    if (existsSync(`${path}.meta`)) {
+      await promises.unlink(`${path}.meta`);
     }
 
     await context.trashItem(path);

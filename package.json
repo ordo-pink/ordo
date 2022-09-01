@@ -27,7 +27,7 @@
   "config": {
     "forge": {
       "packagerConfig": {
-        "icon": "assets/android-chrome-512x512.png"
+        "icon": "assets/icon"
       },
       "makers": [
         {

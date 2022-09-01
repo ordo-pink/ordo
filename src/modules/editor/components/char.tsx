@@ -4,7 +4,6 @@ import { useAppDispatch } from "@core/state/store";
 import { useCurrentTab } from "@modules/editor/hooks/use-current-tab";
 import { Caret } from "@modules/editor/components/caret";
 import { Char } from "@core/parser/types";
-import { Autocomplete } from "./autocomplete";
 
 type CharProps = {
   char: Char;
@@ -162,9 +161,7 @@ export const Character = React.memo(
             {char.value}
           </span>
         ) : null}
-        <Caret visible={isCaretHere && char.position.character !== 0}>
-          <Autocomplete char={char.value} />
-        </Caret>
+        <Caret visible={isCaretHere && char.position.character !== 0} />
       </>
     );
   },

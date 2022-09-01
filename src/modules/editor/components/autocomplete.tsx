@@ -6,17 +6,19 @@ import Fuse from "fuse.js";
 import React from "react";
 import { useCurrentTab } from "../hooks/use-current-tab";
 import { EditorTab } from "../types";
+import { AutocompleteItem } from "./autocomplete-item";
 
 const getCurrentLineChar = (tab: EditorTab, offset = 0) =>
   tab?.content.children[tab?.caretPositions[0].start.line - 1].raw[tab?.caretPositions[0].start.character + offset];
 
 const charEquals = (what: string) => (which: string) => what === which;
 
-export const Autocomplete: React.FC<{ char: string }> = ({ char }) => {
+export const Autocomplete: React.FC = () => {
   const dispatch = useAppDispatch();
 
   const tree = useAppSelector((state) => state.fileExplorer.tree);
 
+  const [focusedIndex, setFocusedIndex] = React.useState<number>(0);
   const [show, setShow] = React.useState<boolean>(false);
   const [links, setLinks] = React.useState<OrdoFile[]>([]);
   const [tags, setTags] = React.useState<CollectedTag[]>([]);
@@ -113,6 +115,8 @@ export const Autocomplete: React.FC<{ char: string }> = ({ char }) => {
     });
   };
 
+  const handleItemHover = (index: number) => void setFocusedIndex(index);
+
   const handleInputClick = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
@@ -146,29 +150,48 @@ export const Autocomplete: React.FC<{ char: string }> = ({ char }) => {
             shiftKey: false,
             ctrlKey: false,
             metaKey: false,
-            key: fusedLinks.length ? `${e.currentTarget.value}]] ` : `${e.currentTarget.value.replace(/\s+/g, "-")} `,
+            key: fusedLinks.length
+              ? `${fusedLinks[focusedIndex].item.readableName}]] `
+              : `${fusedTags[focusedIndex].item.name} `,
           },
         },
       });
+    } else if (e.key === "ArrowDown") {
+      e.preventDefault();
+      e.stopPropagation();
+
+      const lastIndex = fusedLinks.length ? fusedLinks.length - 1 : fusedTags.length - 1;
+
+      setFocusedIndex(focusedIndex < lastIndex ? focusedIndex + 1 : 0);
+    } else if (e.key === "ArrowUp") {
+      e.preventDefault();
+      e.stopPropagation();
+
+      const lastIndex = fusedLinks.length ? fusedLinks.length - 1 : fusedTags.length - 1;
+
+      setFocusedIndex(focusedIndex > 0 ? focusedIndex - 1 : lastIndex);
     }
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     fusedLinks.length ? updateLinkList(e.target.value) : updateTagList(e.target.value);
+    setFocusedIndex(0);
   };
 
   return show ? (
-    <div className="absolute bottom-[-1px] left-0 bg-neutral-200 dark:bg-neutral-800 text-neutral-800 dark:text-neutral-200 font-normal">
-      {(fusedLinks.length ? fusedLinks : fusedTags).slice(0, 5).map(({ item }: any) => (
-        <p
-          title={item.readableName ? item.readablОрeName : item.name}
-          key={item.path ? item.path : item.name}
-          className="hover:bg-neutral-300 dark:bg-neutral-900 px-2 cursor-pointer max-w-full w-80 truncate"
-          onClick={(e) => handleItemClick(e, item.readableName ? item.readableName : item.name)}
-        >
-          {item.readableName ? item.readableName : item.name}
-        </p>
-      ))}
+    <div className="flex flex-col absolute z-50 bottom-[-1px] left-0 bg-neutral-200 dark:bg-neutral-800 text-neutral-800 dark:text-neutral-200 font-normal">
+      <div className="max-h-96 overflow-y-auto w-80">
+        {(fusedLinks.length ? fusedLinks : fusedTags).reverse().map(({ item }: any, index: number) => (
+          <AutocompleteItem
+            key={item.path ? item.path : item.name}
+            index={index}
+            focusedIndex={focusedIndex}
+            title={item.readableName ? item.readableName : item.name}
+            onClick={handleItemClick}
+            onMouseOver={handleItemHover}
+          />
+        ))}
+      </div>
       <input
         ref={inputRef}
         type="text"

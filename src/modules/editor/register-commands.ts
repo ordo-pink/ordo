@@ -21,8 +21,14 @@ export default registerCommands([
   },
   {
     name: "editor.commands.copy",
-    event: "@editor/paste",
+    event: "@editor/copy",
     icon: "HiOutlineClipboard",
     accelerator: "CommandOrControl+C",
+  },
+  {
+    name: "editor.commands.cut",
+    event: "@editor/cut",
+    icon: "HiOutlineScissors",
+    accelerator: "CommandOrControl+V",
   },
 ]);

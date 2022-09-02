@@ -93,11 +93,11 @@ export const getApplicationMenu = (transmission: Transmission) => {
             click: () => transmission.emit("@app/redo", null),
           },
           separator,
-          // {
-          //   label: "Cut",
-          //   accelerator: "CommandOrControl+X",
-          //   click: () => transmission.emit("@editor/cut", null);
-          // },
+          {
+            label: "Cut",
+            accelerator: "CommandOrControl+X",
+            click: () => transmission.emit("@editor/cut", null),
+          },
           {
             label: "Copy",
             accelerator: "CommandOrControl+C",

@@ -11,6 +11,7 @@ import { handleTyping } from "@modules/editor/event-handlers/handle-typing";
 import { handleSelectAll } from "@modules/editor/event-handlers/select-all";
 import { handlePaste } from "@modules/editor/event-handlers/paste";
 import { handleCopy } from "@modules/editor/event-handlers/copy";
+import { handleCut } from "@modules/editor/event-handlers/cut";
 
 export default registerEvents<EditorEvents>({
   "@editor/toggle-todo": handleToggleToDo,
@@ -24,4 +25,5 @@ export default registerEvents<EditorEvents>({
   "@editor/select-all": handleSelectAll,
   "@editor/paste": handlePaste,
   "@editor/copy": handleCopy,
+  "@editor/cut": handleCut,
 });

@@ -46,7 +46,7 @@ export const handleSaveFile: OrdoEventHandler<"@file-explorer/save-file"> = asyn
 
     if (!tab || !file || file.type !== "document") return;
 
-    tab.raw = tab.content.raw;
+    tab.raw = tab.content.raw = payload.content ? payload.content : tab.content.raw;
     file.size = new TextEncoder().encode(tab.raw === "\n" ? "" : tab.raw).length;
 
     let fileContent = tab.content.raw;

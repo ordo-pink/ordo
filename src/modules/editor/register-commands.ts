@@ -13,4 +13,10 @@ export default registerCommands([
     icon: "HiOutlineSelector",
     accelerator: "CommandOrControl+Shift+A",
   },
+  {
+    name: "editor.commands.paste",
+    event: "@editor/paste",
+    icon: "HiOutlineClipboardCopy",
+    accelerator: "CommandOrControl+V",
+  },
 ]);

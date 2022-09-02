@@ -103,12 +103,12 @@ export const getApplicationMenu = (transmission: Transmission) => {
           //   accelerator: "CommandOrControl+C",
           //   click: () => transmission.emit("@editor/copy", null);
           // },
-          // {
-          //   label: "Paste",
-          //   accelerator: "CommandOrControl+V",
-          //   click: () => transmission.emit("@editor/paste", null);
-          // },
-          // separator,
+          {
+            label: "Paste",
+            accelerator: "CommandOrControl+V",
+            click: () => transmission.emit("@editor/paste", null),
+          },
+          separator,
           {
             label: "Find",
             accelerator: "CommandOrControl+F",

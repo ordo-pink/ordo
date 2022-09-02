@@ -38,6 +38,7 @@ export type HandleTypingEvent = OrdoEvent<
   { path: string; event: { key: string; ctrlKey: boolean; altKey: boolean; metaKey: boolean; shiftKey: boolean } }
 >;
 export type UpdateCaretPositionsEvent = OrdoEvent<EDITOR_SCOPE, "update-caret-positions", CaretRange[]>;
+export type PasteEvent = OrdoEvent<EDITOR_SCOPE, "paste">;
 
 export type SelectAllEvent = OrdoEvent<EDITOR_SCOPE, "select-all">;
 
@@ -49,4 +50,5 @@ export type EditorEvents = OpenTabEvent &
   HandleTypingEvent &
   OpenExternalLinkEvent &
   SelectAllEvent &
+  PasteEvent &
   UpdateCaretPositionsEvent;

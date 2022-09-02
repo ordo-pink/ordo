@@ -98,11 +98,11 @@ export const getApplicationMenu = (transmission: Transmission) => {
           //   accelerator: "CommandOrControl+X",
           //   click: () => transmission.emit("@editor/cut", null);
           // },
-          // {
-          //   label: "Copy",
-          //   accelerator: "CommandOrControl+C",
-          //   click: () => transmission.emit("@editor/copy", null);
-          // },
+          {
+            label: "Copy",
+            accelerator: "CommandOrControl+C",
+            click: () => transmission.emit("@editor/copy", null),
+          },
           {
             label: "Paste",
             accelerator: "CommandOrControl+V",

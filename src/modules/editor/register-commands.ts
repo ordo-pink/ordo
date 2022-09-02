@@ -19,4 +19,10 @@ export default registerCommands([
     icon: "HiOutlineClipboardCopy",
     accelerator: "CommandOrControl+V",
   },
+  {
+    name: "editor.commands.copy",
+    event: "@editor/paste",
+    icon: "HiOutlineClipboard",
+    accelerator: "CommandOrControl+C",
+  },
 ]);

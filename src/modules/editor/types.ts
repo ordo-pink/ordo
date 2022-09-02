@@ -39,6 +39,7 @@ export type HandleTypingEvent = OrdoEvent<
 >;
 export type UpdateCaretPositionsEvent = OrdoEvent<EDITOR_SCOPE, "update-caret-positions", CaretRange[]>;
 export type PasteEvent = OrdoEvent<EDITOR_SCOPE, "paste">;
+export type CopyEvent = OrdoEvent<EDITOR_SCOPE, "copy">;
 
 export type SelectAllEvent = OrdoEvent<EDITOR_SCOPE, "select-all">;
 
@@ -51,4 +52,5 @@ export type EditorEvents = OpenTabEvent &
   OpenExternalLinkEvent &
   SelectAllEvent &
   PasteEvent &
+  CopyEvent &
   UpdateCaretPositionsEvent;

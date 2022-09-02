@@ -23,8 +23,16 @@ export const handleCopy: OrdoEventHandler<"@editor/copy"> = ({ context, transmis
 
   if (!hasRange) return;
 
-  const selectionOffset1 = findCharOffset(tab, caretRangeStart.line, caretRangeStart.character);
-  const selectionOffset2 = findCharOffset(tab, caretRangeEnd.line, caretRangeEnd.character);
+  const selectionOffset1 = findCharOffset({
+    tab,
+    lineNumber: caretRangeStart.line,
+    charNumber: caretRangeStart.character,
+  });
+  const selectionOffset2 = findCharOffset({
+    tab,
+    lineNumber: caretRangeEnd.line,
+    charNumber: caretRangeEnd.character,
+  });
 
   const selectionOffsetStart = selectionOffset1 <= selectionOffset2 ? selectionOffset1 : selectionOffset2;
   const selectionOffsetEnd = selectionOffset1 <= selectionOffset2 ? selectionOffset2 : selectionOffset1;

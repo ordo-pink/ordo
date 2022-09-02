@@ -1,12 +1,16 @@
 import { EditorTab } from "@modules/editor/types";
 
-export const findCharOffset = (tab: EditorTab, lineNumber: number, charNumber: number) => {
-  let i = 0;
+type Params = {
+  tab: EditorTab;
+  lineNumber: number;
+  charNumber: number;
+};
+
+export const findCharOffset = ({ tab, lineNumber, charNumber }: Params) => {
   let offset = charNumber;
 
-  while (i < lineNumber - 1) {
+  for (let i = 0; i < lineNumber - 1; i++) {
     offset += tab.content.children[i].raw.length + 1;
-    i++;
   }
 
   return offset;

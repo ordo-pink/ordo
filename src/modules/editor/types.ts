@@ -1,6 +1,7 @@
 import { DocumentRoot } from "@core/parser/types";
 import { OrdoEvent } from "@core/types";
 import { OrdoFile } from "@modules/file-explorer/types";
+import { RangeDirection } from "@modules/editor/constants";
 
 export type CaretPosition = {
   line: number;
@@ -10,7 +11,7 @@ export type CaretPosition = {
 export type CaretRange = {
   start: CaretPosition;
   end: CaretPosition;
-  direction: "ltr" | "rtl";
+  direction: RangeDirection;
 };
 
 export type EditorTab = Required<Pick<OrdoFile, "path" | "raw">> & {

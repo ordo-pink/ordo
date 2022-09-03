@@ -1,6 +1,7 @@
 import { DocumentRoot } from "@core/parser/types";
 import { OrdoEvent } from "@core/types";
 import { OrdoFile } from "@modules/file-explorer/types";
+import { RangeDirection } from "@modules/editor/constants";
 
 export type CaretPosition = {
   line: number;
@@ -10,7 +11,7 @@ export type CaretPosition = {
 export type CaretRange = {
   start: CaretPosition;
   end: CaretPosition;
-  direction: "ltr" | "rtl";
+  direction: RangeDirection;
 };
 
 export type EditorTab = Required<Pick<OrdoFile, "path" | "raw">> & {
@@ -38,6 +39,9 @@ export type HandleTypingEvent = OrdoEvent<
   { path: string; event: { key: string; ctrlKey: boolean; altKey: boolean; metaKey: boolean; shiftKey: boolean } }
 >;
 export type UpdateCaretPositionsEvent = OrdoEvent<EDITOR_SCOPE, "update-caret-positions", CaretRange[]>;
+export type PasteEvent = OrdoEvent<EDITOR_SCOPE, "paste">;
+export type CopyEvent = OrdoEvent<EDITOR_SCOPE, "copy">;
+export type CutEvent = OrdoEvent<EDITOR_SCOPE, "cut">;
 
 export type SelectAllEvent = OrdoEvent<EDITOR_SCOPE, "select-all">;
 
@@ -49,4 +53,7 @@ export type EditorEvents = OpenTabEvent &
   HandleTypingEvent &
   OpenExternalLinkEvent &
   SelectAllEvent &
+  PasteEvent &
+  CopyEvent &
+  CutEvent &
   UpdateCaretPositionsEvent;

@@ -1,6 +1,7 @@
 import { BrowserWindow, dialog, app, clipboard, shell, ipcMain, globalShortcut, nativeTheme, Menu } from "electron";
 import install, { REACT_DEVELOPER_TOOLS, REDUX_DEVTOOLS } from "electron-devtools-installer";
 import { is, centerWindow } from "electron-util";
+import path from "path";
 
 import { internalSettingsStore } from "@core/settings/internal-settings";
 import { Transmission } from "@core/transmission";
@@ -33,7 +34,8 @@ export const createWindow = async (): Promise<void> => {
     width: internalSettingsStore.get("window.width"),
     x: internalSettingsStore.get("window.position.x"),
     y: internalSettingsStore.get("window.position.y"),
-    icon: "assets/icon.png",
+    // icon: "assets/icon.png",
+    icon: path.join(__dirname, "assets/icon.png"),
     // titleBarStyle: "hiddenInset",
     acceptFirstMouse: true,
     webPreferences: {

@@ -1,7 +1,7 @@
 import { SideBarState } from "@containers/side-bar/types";
 
 const initialState: SideBarState = {
-  show: false,
+  isShown: false,
   width: 0,
 };
 

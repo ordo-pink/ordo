@@ -1,7 +1,7 @@
 import { OrdoEvent } from "@core/types";
 
 export type SideBarState = {
-  show: boolean;
+  isShown: boolean;
   width: number;
 };
 

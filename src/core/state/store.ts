@@ -21,7 +21,7 @@ const state = createSlice({
 
 export const store = configureStore({
   reducer: state.reducer,
-  middleware: (d) => d({ serializableCheck: false }),
+  middleware: (getDefault) => getDefault({ serializableCheck: false }),
 });
 
 export const { setState, applyStatePatches } = state.actions;
@@ -39,6 +39,7 @@ export type ActionWithPayload<TKey extends keyof OrdoEvents = keyof OrdoEvents> 
 };
 
 export const useInternalDispatch = () => useDispatch<AppDispatch>();
+
 export const useAppDispatch =
   () =>
   <TReturn = void, TKey extends keyof OrdoEvents = keyof OrdoEvents>(
@@ -48,4 +49,5 @@ export const useAppDispatch =
       action.type,
       (action as any).payload != null ? (action as any).payload : null,
     ) as unknown as TReturn;
+
 export const useAppSelector: TypedUseSelectorHook<RootState> = useSelector;

@@ -16,7 +16,7 @@ type Props = PropsWithChildren<{
  * Splits the parent element horizontally, providing a draggable SVG to control the width
  * of the items.
  */
-export const Split = ({ sizes, direction, onDragEnd, minSize = 0, snapOffset = 0, children }: Props) => (
+const Split = ({ sizes, direction, onDragEnd, minSize = 0, snapOffset = 0, children }: Props) => (
   <SplitView
     className={`split-view ${direction}`}
     sizes={sizes}
@@ -27,3 +27,5 @@ export const Split = ({ sizes, direction, onDragEnd, minSize = 0, snapOffset = 0
     {children}
   </SplitView>
 );
+
+export default Split;

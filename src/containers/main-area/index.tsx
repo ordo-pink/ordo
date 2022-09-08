@@ -1,19 +1,20 @@
 import React, { useState, useEffect } from "react";
 
 import { useAppDispatch, useAppSelector } from "@core/state/store";
-import { Split } from "@containers/split-view/split";
-import { Workspace } from "@containers/workspace";
-import { Sidebar } from "@containers/side-bar";
 import { TopBar } from "@modules/top-bar";
 import { WindowState } from "@init/types";
 import { SplitDirection } from "@containers/split-view/split-direction";
+
+import Split from "@containers/split-view/split";
+import Workspace from "@containers/workspace";
+import Sidebar from "@containers/side-bar";
 
 import "@containers/main-area/index.css";
 
 /**
  * MainArea component is a wrapper for TopBar, Workspace and SideBar.
  */
-export const MainArea = () => {
+const MainArea = () => {
   const dispatch = useAppDispatch();
 
   const isSideBarShown = useAppSelector((state) => state.sideBar.isShown);
@@ -51,3 +52,5 @@ export const MainArea = () => {
 };
 
 const getSideBarWidth = ({ app, sideBar }: WindowState) => sideBar.width || app.internalSettings.window?.sideBarWidth;
+
+export default MainArea;

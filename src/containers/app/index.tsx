@@ -1,10 +1,11 @@
 import React from "react";
 
-import { StatusBar } from "@containers/status-bar";
-import { MainArea } from "@containers/main-area";
-import { ActivityBar } from "@modules/activity-bar";
 import { useInternationalisation } from "@containers/app/hooks/use-i18n";
 import { useMainState } from "./hooks/use-main-state";
+
+import { ActivityBar } from "@modules/activity-bar";
+import StatusBar from "@containers/status-bar";
+import MainArea from "@containers/main-area";
 
 import "@containers/app/index.css";
 
@@ -14,7 +15,7 @@ import "@containers/app/index.css";
  * frontend and the backend. It requests initial data from the backend for state
  * syncrchronisation, and registers listeners for backend state updates.
  */
-export const App = () => {
+const App = () => {
   useInternationalisation();
   useMainState();
 
@@ -30,3 +31,5 @@ export const App = () => {
     </>
   );
 };
+
+export default App;

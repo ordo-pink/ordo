@@ -4,8 +4,10 @@ import { FileExplorer } from "@modules/file-explorer";
 
 import "@containers/side-bar/index.css";
 
-export const Sidebar = () => (
+const Sidebar = () => (
   <div className="sidebar">
     <FileExplorer />
   </div>
 );
+
+export default Sidebar;

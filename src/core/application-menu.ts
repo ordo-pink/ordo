@@ -1,6 +1,4 @@
-import { app, Menu, shell } from "electron";
-import { join } from "path";
-import { existsSync, promises } from "fs";
+import { Menu, shell } from "electron";
 
 import { Transmission } from "@core/transmission";
 

@@ -8,7 +8,7 @@ import "@containers/status-bar/index.css";
 /**
  * StatusBar is a wrapper component for custom informative views and Notifications.g
  */
-export const StatusBar = () => {
+const StatusBar = () => {
   return (
     <div className="status-bar">
       <div className="status-bar_side-container">
@@ -19,3 +19,5 @@ export const StatusBar = () => {
     </div>
   );
 };
+
+export default StatusBar;

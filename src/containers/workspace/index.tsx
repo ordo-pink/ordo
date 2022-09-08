@@ -8,7 +8,7 @@ import "@containers/workspace/index.css";
  * Workspace is a wrapper component for user interaction. It provides space for
  * components like Editor, Graph, Settings, etc.
  */
-export const Workspace = () => {
+const Workspace = () => {
   const WorkspaceComponent = useWorkspaceComponent();
 
   return (
@@ -17,3 +17,5 @@ export const Workspace = () => {
     </div>
   );
 };
+
+export default Workspace;

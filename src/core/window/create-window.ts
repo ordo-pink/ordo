@@ -1,7 +1,7 @@
 import { BrowserWindow, dialog, app, clipboard, shell, ipcMain, globalShortcut, nativeTheme, Menu } from "electron";
 import install, { REACT_DEVELOPER_TOOLS, REDUX_DEVTOOLS } from "electron-devtools-installer";
 import { is, centerWindow } from "electron-util";
-import path from "path";
+import { join } from "path";
 
 import { internalSettingsStore } from "@core/settings/internal-settings";
 import { Transmission } from "@core/transmission";
@@ -28,14 +28,20 @@ export const createWindow = async (): Promise<void> => {
 
   nativeTheme.themeSource = userSettingsStore.get("appearance.theme") || "system";
 
+  const {
+    height,
+    width,
+    position: { x, y },
+  } = internalSettingsStore.get("window");
+  const iconPath = join(__dirname, "assets", "icon.png");
+
   let window: BrowserWindow = new BrowserWindow({
     show: false,
-    height: internalSettingsStore.get("window.height"),
-    width: internalSettingsStore.get("window.width"),
-    x: internalSettingsStore.get("window.position.x"),
-    y: internalSettingsStore.get("window.position.y"),
-    // icon: "assets/icon.png",
-    icon: path.join(__dirname, "assets/icon.png"),
+    height,
+    width,
+    x,
+    y,
+    icon: iconPath,
     // titleBarStyle: "hiddenInset",
     acceptFirstMouse: true,
     webPreferences: {
@@ -52,10 +58,12 @@ export const createWindow = async (): Promise<void> => {
     centerWindow({ window });
   }
 
+  // TODO: Fix issues with having multiple app windows
   window.on("resized", () => saveWindowPosition(window));
   window.on("moved", () => saveWindowPosition(window));
   window.on("close", () => {
     windows.delete(window);
+
     window = null as any;
   });
 
@@ -88,6 +96,7 @@ export const createWindow = async (): Promise<void> => {
   await initCommands(transmission);
 
   Menu.setApplicationMenu(getApplicationMenu(transmission));
+  // TODO: Menu.setApplicationMenu(Menu.buildFromTemplate([]));
 
   window.on("blur", () => {
     transmission.emit("@editor/unfocus", null);

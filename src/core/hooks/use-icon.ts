@@ -4,6 +4,8 @@ import { IconType } from "react-icons/lib";
 
 import { NoOp } from "@utils/functions";
 
+export type SupportedIcon = keyof typeof HiIcons;
+
 /**
  * An easy to use hook for importing an SVG icon into a component. Internally it uses
  * Hero Icons package from `react-icons` (distributed via MIT license).

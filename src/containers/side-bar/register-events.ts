@@ -1,5 +1,3 @@
-import { Either } from "or-else";
-
 import { registerEvents } from "@core/transmission/register-ordo-events";
 import { SideBarEvents } from "@containers/side-bar/types";
 import { handleHide } from "@containers/side-bar/event-handlers/hide";

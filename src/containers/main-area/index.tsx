@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from "react";
 
 import { useAppDispatch, useAppSelector } from "@core/state/store";
-import { HorizontalSplit } from "@containers/split-view/horizontal-split";
+import { Split } from "@containers/split-view/split";
 import { Workspace } from "@containers/workspace";
 import { Sidebar } from "@containers/side-bar";
 import { TopBar } from "@modules/top-bar";
 import { WindowState } from "@init/types";
+import { SplitDirection } from "@containers/split-view/split-direction";
 
 import "@containers/main-area/index.css";
 
@@ -27,23 +28,24 @@ export const MainArea = () => {
   };
 
   useEffect(() => {
-    const sizes: [number, number] = [100, 0];
+    let leftSectionWidth = 100;
+    let rightSectionWidth = 0;
 
     if (isSideBarShown) {
-      sizes[0] -= sideBarWidth; // The left one gets smaller
-      sizes[1] += sideBarWidth; // The right one gets bigger
+      leftSectionWidth -= sideBarWidth;
+      rightSectionWidth += sideBarWidth;
     }
 
-    setSectionSizes(sizes);
+    setSectionSizes([leftSectionWidth, rightSectionWidth]);
   }, [isSideBarShown, sideBarWidth]);
 
   return (
     <div className="main-area">
       <TopBar />
-      <HorizontalSplit sizes={sectionSizes} snapOffset={200} onDragEnd={handleDragEnd}>
+      <Split sizes={sectionSizes} snapOffset={200} onDragEnd={handleDragEnd} direction={SplitDirection.HORIZONTAL}>
         <Workspace />
         <Sidebar />
-      </HorizontalSplit>
+      </Split>
     </div>
   );
 };

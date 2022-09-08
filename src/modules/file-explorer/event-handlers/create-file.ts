@@ -37,9 +37,10 @@ export const handleCreateFile: OrdoEventHandler<"@file-explorer/create-file"> = 
     links: [],
   };
 
+  await promises.writeFile(path.indexOf(".") === -1 ? `${path.trim()}.md` : path.trim(), ``, "utf-8");
   await promises.writeFile(
-    path.indexOf(".") === -1 ? `${path.trim()}.md` : path.trim(),
-    `---\n${JSON.stringify(defaultConfig)}\n---\n`,
+    path.indexOf(".") === -1 ? `${path.trim()}.md.meta` : `${path.trim()}.meta`,
+    JSON.stringify(defaultConfig),
     "utf-8",
   );
 

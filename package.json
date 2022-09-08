@@ -27,7 +27,7 @@
   "config": {
     "forge": {
       "packagerConfig": {
-        "icon": "assets/android-chrome-512x512.png"
+        "icon": "assets/icon"
       },
       "makers": [
         {
@@ -44,11 +44,15 @@
         },
         {
           "name": "@electron-forge/maker-deb",
-          "config": {}
+          "config": {
+            "icon": "./assets/icon.png"
+          }
         },
         {
           "name": "@electron-forge/maker-rpm",
-          "config": {}
+          "config": {
+            "icon": "./assets/icon.png"
+          }
         }
       ],
       "plugins": [
@@ -186,6 +190,7 @@
     "autoprefixer": "^10.4.4",
     "ava": "^4.2.0",
     "babel-loader": "^8.2.5",
+    "copy-webpack-plugin": "^11.0.0",
     "cross-env": "^7.0.3",
     "css-loader": "^6.0.0",
     "electron": "18.0.3",

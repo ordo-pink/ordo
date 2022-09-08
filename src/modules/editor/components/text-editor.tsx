@@ -6,7 +6,7 @@ import { useCurrentTab } from "@modules/editor/hooks/use-current-tab";
 import { Breadcrumbs } from "@modules/editor/components/breadcrumbs";
 import { Lines } from "@modules/editor/components/lines";
 import { tapPreventDefault, tapStopPropagation } from "@utils/events";
-import { FoldVoid } from "@utils/either";
+import { FoldVoid } from "@utils/functions";
 import { tail } from "@utils/array";
 import { RangeDirection } from "../constants";
 

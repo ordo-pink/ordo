@@ -16,8 +16,14 @@ export const handleGetUserSettings: OrdoEventHandler<"@app/get-internal-settings
 export const handleSetUserSetting: OrdoEventHandler<"@app/set-user-setting"> = ({ draft, payload, context }) => {
   userSettingsStore.set(...payload);
 
-  if (payload[0] === "appearance.theme") {
-    nativeTheme.themeSource = payload[1];
+  const settingKey = payload[0];
+  const settingValue = payload[1];
+
+  const isChangingAppTheme = settingKey === "appearance.theme";
+
+  if (isChangingAppTheme) {
+    // Also inform all browser windows that they should change native theme.
+    nativeTheme.themeSource = settingValue;
   }
 
   draft.app.userSettings = userSettingsStore.store;

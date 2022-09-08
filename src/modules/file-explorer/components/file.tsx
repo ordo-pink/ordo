@@ -6,7 +6,8 @@ import { OrdoFile } from "@modules/file-explorer/types";
 import { useFileIcon } from "@modules/file-explorer/hooks/use-file-icon";
 import { useTreeNesting } from "@modules/file-explorer/hooks/use-tree-nesting";
 import { tapPreventDefault, tapStopPropagation } from "@utils/events";
-import { FoldVoid, fromBoolean } from "@utils/either";
+import { fromBoolean } from "@utils/either";
+import { FoldVoid } from "@utils/functions";
 import { getDocumentName } from "@utils/get-document-name";
 
 type FileProps = {

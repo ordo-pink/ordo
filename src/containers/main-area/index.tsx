@@ -6,7 +6,8 @@ import { HorizontalSplit } from "@containers/split-view/horizontal-split";
 import { Workspace } from "@containers/workspace";
 import { Sidebar } from "@containers/side-bar";
 import { TopBar } from "@modules/top-bar";
-import { FoldVoid, fromBoolean } from "@utils/either";
+import { fromBoolean } from "@utils/either";
+import { FoldVoid } from "@utils/functions";
 
 import "@containers/main-area/index.css";
 

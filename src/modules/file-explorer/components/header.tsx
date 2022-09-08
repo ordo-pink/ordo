@@ -4,7 +4,7 @@ import { Either } from "or-else";
 import { useAppDispatch, useAppSelector } from "@core/state/store";
 import { useFolderIcons } from "@modules/file-explorer/hooks/use-folder-icons";
 import { useIcon } from "@core/hooks/use-icon";
-import { NoOp } from "@utils/no-op";
+import { NoOp } from "@utils/functions";
 
 /**
  * Displays the project name and allows collapsing the whole project in one click.

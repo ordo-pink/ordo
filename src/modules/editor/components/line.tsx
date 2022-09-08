@@ -2,13 +2,13 @@ import React from "react";
 import { Either } from "or-else";
 
 import { useAppDispatch } from "@core/state/store";
+import { isNodeWithChildren } from "@core/parser/is";
 import { useCurrentTab } from "@modules/editor/hooks/use-current-tab";
 import { LineNumber } from "@modules/editor/components/line-number";
+import { RangeDirection } from "@modules/editor/constants";
 import { Token } from "@modules/editor/components/token";
 import { Caret } from "@modules/editor/components/caret";
-import { isNodeWithChildren } from "@core/parser/is";
-import { NoOp } from "@utils/no-op";
-import { RangeDirection } from "../constants";
+import { NoOp } from "@utils/functions";
 
 export type LineProps = {
   lineIndex: number;

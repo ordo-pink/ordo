@@ -3,7 +3,7 @@ import React from "react";
 import { useAppDispatch, useAppSelector } from "@core/state/store";
 import { useTreeNesting } from "@modules/file-explorer/hooks/use-tree-nesting";
 import { fromBoolean } from "@utils/either";
-import { NoOp } from "@utils/no-op";
+import { NoOp } from "@utils/functions";
 
 type CreatorProps = {
   path: string;

@@ -2,7 +2,7 @@ import { internalSettingsStore } from "@core/settings/internal-settings";
 import { OrdoEventHandler } from "@core/types";
 
 /**
- * Triggers syncrhonisation between state and internal settings store.
+ * Triggers sync between state and internal settings store.
  */
 export const hangleGetInternalSettings: OrdoEventHandler<"@app/get-internal-settings"> = ({ draft }) => {
   draft.app.internalSettings = internalSettingsStore.store;
@@ -13,5 +13,6 @@ export const hangleGetInternalSettings: OrdoEventHandler<"@app/get-internal-sett
  */
 export const handleSetInternalSetting: OrdoEventHandler<"@app/set-internal-setting"> = ({ draft, payload }) => {
   internalSettingsStore.set(...payload);
+
   draft.app.internalSettings = internalSettingsStore.store;
 };

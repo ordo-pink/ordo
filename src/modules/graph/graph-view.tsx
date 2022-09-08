@@ -2,7 +2,7 @@ import React from "react";
 import { useAppSelector } from "@core/state/store";
 import { Either } from "or-else";
 import { Graph } from ".";
-import { NoOp } from "@utils/no-op";
+import { NoOp } from "@utils/functions";
 
 export const GraphView: React.FC = () => {
   const tree = useAppSelector((state) => state.fileExplorer.tree);

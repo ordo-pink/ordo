@@ -1,10 +1,11 @@
+import React from "react";
+import { Either } from "or-else";
+
 import { useIcon } from "@core/hooks/use-icon";
 import { useAppDispatch, useAppSelector } from "@core/state/store";
 import { collectFiles } from "@modules/file-explorer/utils/collect-files";
 import { getDocumentName } from "@utils/get-document-name";
-import { NoOp } from "@utils/no-op";
-import { Either } from "or-else";
-import React from "react";
+import { NoOp } from "@utils/functions";
 
 export const Checkboxes = () => {
   const dispatch = useAppDispatch();

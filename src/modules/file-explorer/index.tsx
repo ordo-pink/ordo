@@ -6,8 +6,7 @@ import { Header } from "@modules/file-explorer/components/header";
 import { Creator } from "@modules/file-explorer/components/creator";
 import { FolderContent } from "@modules/file-explorer/components/folder-content";
 import { tapPreventDefault, tapStopPropagation } from "@utils/events";
-import { FoldVoid } from "@utils/either";
-import { NoOp } from "@utils/no-op";
+import { NoOp, FoldVoid } from "@utils/functions";
 
 import "@modules/file-explorer/index.css";
 

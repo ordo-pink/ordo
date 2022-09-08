@@ -5,7 +5,7 @@ import { useAppDispatch } from "@core/state/store";
 import { ActivityBarItem } from "@modules/activity-bar/types";
 import { useIcon } from "@core/hooks/use-icon";
 import { fromBoolean } from "@utils/either";
-import { NoOp, noOpFn } from "@utils/no-op";
+import { NoOp, noOpFn } from "@utils/functions";
 
 import "@modules/activity-bar/components/activity-bar-icon.css";
 

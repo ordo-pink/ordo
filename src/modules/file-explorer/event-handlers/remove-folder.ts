@@ -3,7 +3,7 @@ import { Either } from "or-else";
 import { OrdoEventHandler } from "@core/types";
 import { fromBoolean } from "@utils/either";
 import { id } from "@utils/functions";
-import { noOpFn } from "@utils/no-op";
+import { noOpFn } from "@utils/functions";
 
 /**
  * Moves folder with a path provided via payload to trash bin.

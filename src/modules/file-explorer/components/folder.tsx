@@ -8,8 +8,8 @@ import { useFolderIcons } from "@modules/file-explorer/hooks/use-folder-icons";
 import { useTreeNesting } from "@modules/file-explorer/hooks/use-tree-nesting";
 import { FolderContent } from "@modules/file-explorer/components/folder-content";
 import { tapPreventDefault, tapStopPropagation } from "@utils/events";
-import { FoldVoid, fromBoolean } from "@utils/either";
-import { NoOp } from "@utils/no-op";
+import { fromBoolean } from "@utils/either";
+import { NoOp, FoldVoid } from "@utils/functions";
 import { tap } from "@utils/functions";
 
 type FolderProps = {

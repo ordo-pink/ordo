@@ -35,16 +35,6 @@ test("Transmission should properly apply event changes", async (t) => {
   t.true(tr.select((state) => state.sideBar.show));
 });
 
-test("Transmission should properly handle errors in emit", async (t) => {
-  const state = { sideBar: { show: false } } as any;
-  const tr = new Transmission(state, globalContext, {});
-  tr.on<{ test: null }>("test", () => {
-    throw new Error("Test Error");
-  });
-
-  await t.throwsAsync(async () => await tr.emit<{ test: null }>("test", null));
-});
-
 test("Transmission should properly apply multiple sequential event changes", async (t) => {
   const state = { sideBar: { width: 1 } } as any;
   const tr = new Transmission(state, globalContext);

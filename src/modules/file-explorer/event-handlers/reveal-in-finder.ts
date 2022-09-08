@@ -1,7 +1,7 @@
 import { Either } from "or-else";
 
 import { OrdoEventHandler } from "@core/types";
-import { FoldVoid } from "@utils/either";
+import { FoldVoid } from "@utils/functions";
 
 /**
  * Show path in OS file manager. If payload is provided, payload path is used.

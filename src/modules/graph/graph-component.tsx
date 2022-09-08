@@ -7,7 +7,7 @@ import { findOrdoFolder } from "@modules/file-explorer/utils/find-ordo-folder";
 import { OrdoFolder } from "@modules/file-explorer/types";
 import { Graph } from "@modules/graph";
 import { id } from "@utils/functions";
-import { NoOp } from "@utils/no-op";
+import { NoOp } from "@utils/functions";
 import { ComponentNode } from "@modules/text-parser/types";
 
 type Props = {

@@ -15,6 +15,7 @@ export type AppState = {
   currentProject: string;
   commands: Command[];
 };
+
 export type APP_SCOPE = "app";
 
 export type GetStateEvent = OrdoEvent<APP_SCOPE, "get-state">;

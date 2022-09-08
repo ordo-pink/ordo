@@ -7,8 +7,8 @@ import { findOrdoFile } from "@modules/file-explorer/utils/find-ordo-file";
 import { useFileIcon } from "@modules/file-explorer/hooks/use-file-icon";
 import { EditorTab } from "@modules/editor/types";
 import { tapPreventDefault, tapStopPropagation } from "@utils/events";
-import { FoldVoid, fromBoolean } from "@utils/either";
-import { NoOp } from "@utils/no-op";
+import { fromBoolean } from "@utils/either";
+import { NoOp, FoldVoid } from "@utils/functions";
 import { getDocumentName } from "@utils/get-document-name";
 
 type TabProps = {

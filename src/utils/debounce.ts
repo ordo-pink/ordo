@@ -1,3 +1,6 @@
+/**
+ * Debounce function call if it happens too often.
+ */
 export const debounce = <TArgs extends any[]>(func: (...args: TArgs) => any, timeout = 500) => {
   let timer: ReturnType<typeof setTimeout> | undefined;
   return (...args: TArgs) => {

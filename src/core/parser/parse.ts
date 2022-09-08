@@ -1,7 +1,7 @@
 import { createReader } from "@core/parser/reader";
 import { Char, NodeWithChildren, ParseOptions } from "@core/parser/types";
 import { lex } from "@core/parser/lexer";
-import { noOpFn } from "@utils/no-op";
+import { noOpFn } from "@utils/functions";
 
 export const parse =
   ({ beforeParse = noOpFn, afterParse = noOpFn, parsers }: ParseOptions) =>

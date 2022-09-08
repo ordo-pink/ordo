@@ -1,7 +1,7 @@
 import { contextBridge, ipcRenderer } from "electron";
 
 contextBridge.exposeInMainWorld("ordo", {
-  emit: (event: string, payload: any) => ipcRenderer.send("ordo", { event, payload }),
+  emit: (event: string, payload: unknown) => ipcRenderer.send("ordo", { event, payload }),
 });
 
 ipcRenderer

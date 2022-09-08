@@ -2,7 +2,8 @@ import { registerEvents } from "@core/transmission/register-ordo-events";
 import { OrdoEventHandler } from "@core/types";
 import { OrdoEvents } from "@init/types";
 import { TopBarEvents } from "@modules/top-bar/types";
-import { FoldVoid, fromBoolean } from "@utils/either";
+import { fromBoolean } from "@utils/either";
+import { FoldVoid } from "@utils/functions";
 
 /**
  * Triggers focusing the TopBar.

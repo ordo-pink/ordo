@@ -2,11 +2,11 @@ import React from "react";
 import ReactDOM from "react-dom";
 import { Provider } from "react-redux";
 
-import "./index.css";
-
+import ErrorBoundary from "@core/error-boundary";
 import { store } from "@core/state/store";
 import { App } from "@containers/app";
-import ErrorBoundary from "@core/error-boundary";
+
+import "./index.css";
 import "./i18n";
 
 const app = (

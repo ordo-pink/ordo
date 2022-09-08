@@ -1,7 +1,7 @@
 import { Either } from "or-else";
 
 import { OrdoEventHandler } from "@core/types";
-import { FoldVoid } from "@utils/either";
+import { FoldVoid } from "@utils/functions";
 
 /**
  * Put path to clipboard. If payload is provided, payload path is used. Current file path is used otherwise.

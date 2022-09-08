@@ -1,5 +1,6 @@
 import { OrdoEventHandler } from "@core/types";
-import { FoldVoid, fromBoolean } from "@utils/either";
+import { fromBoolean } from "@utils/either";
+import { FoldVoid } from "@utils/functions";
 import { Either } from "or-else";
 
 export const handleUpdateCaretPositions: OrdoEventHandler<"@editor/update-caret-positions"> = ({ draft, payload }) =>

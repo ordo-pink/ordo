@@ -40,10 +40,7 @@ app.on("ready", async () => {
   if (is.macos) {
     const dockMenu = Menu.buildFromTemplate([
       { type: "separator" },
-      {
-        label: "New Window",
-        click: () => createWindow(),
-      },
+      { label: "New Window", click: () => createWindow() },
     ]);
 
     app.dock.setMenu(dockMenu);

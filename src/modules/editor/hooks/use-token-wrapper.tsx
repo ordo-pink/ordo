@@ -28,7 +28,7 @@ import { CodeWrapper } from "@modules/editor/node-wrappers/code";
 import { StrikethroughWrapper } from "@modules/editor/node-wrappers/strikethrough";
 import { TextWrapper } from "@modules/editor/node-wrappers/text";
 import { LinkWrapper } from "@modules/editor/node-wrappers/link";
-import { NoOp } from "@utils/no-op";
+import { NoOp } from "@utils/functions";
 
 export const useTextNodeWrapper = (node?: Node, isCurrentLine = false): React.FC => {
   const dispatch = useAppDispatch();

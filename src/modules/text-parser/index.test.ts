@@ -3,7 +3,6 @@ import { createRoot } from "../../core/parser/create-root";
 import { NodeWithChars, NodeWithChildren } from "../../core/parser/types";
 import { TextNodeWithChildrenType } from "./enums";
 import { parseText } from "./index";
-import { CharType } from "../../core/parser/char-type";
 
 test("define parent structure", (t) => {
   const tree = createRoot("path");
@@ -34,9 +33,9 @@ test("assign ids", (t) => {
   const secondLine = tree.children[1] as NodeWithChildren;
   const firstLineContent = firstLine.children[0] as NodeWithChars;
 
-  t.is(firstLine.id, "1-1");
-  t.is(secondLine.id, "1-2");
-  t.is(firstLineContent.id, "1-1-1");
+  t.is(firstLine.id, "1-1-1");
+  t.is(secondLine.id, "1-2-0");
+  t.is(firstLineContent.id, "1-1-1-1-1");
 });
 
 test("assign depth", (t) => {

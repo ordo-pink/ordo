@@ -6,6 +6,9 @@ type Params = {
   charNumber: number;
 };
 
+/**
+ * Find the offset of a given char from the beginning of the document.
+ */
 export const findCharOffset = ({ tab, lineNumber, charNumber }: Params) => {
   let offset = charNumber;
 

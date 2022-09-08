@@ -4,7 +4,7 @@ import { OrdoFile, OrdoFolder } from "@modules/file-explorer/types";
 import { Folder } from "@modules/file-explorer/components/folder";
 import { File } from "@modules/file-explorer/components/file";
 import { fromBoolean } from "@utils/either";
-import { NoOp } from "@utils/no-op";
+import { NoOp } from "@utils/functions";
 
 type FolderContentProps = {
   folder: OrdoFolder;

@@ -3,8 +3,7 @@ import { Either } from "or-else";
 import { OrdoEventHandler } from "@core/types";
 import { updateFolder } from "@modules/file-explorer/api/update-folder";
 import { findOrdoFolderByPath } from "@modules/file-explorer/utils/find-ordo-folder";
-import { FoldVoid } from "@utils/either";
-import { tap } from "@utils/functions";
+import { tap, FoldVoid } from "@utils/functions";
 
 /**
  * Collapses or expands the folder.

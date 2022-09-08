@@ -3,10 +3,10 @@ import { Either } from "or-else";
 
 import { useAppDispatch, useAppSelector } from "@core/state/store";
 import { useCurrentTab } from "@modules/editor/hooks/use-current-tab";
+import { RangeDirection } from "@modules/editor/constants";
 import { tapPreventDefault, tapStopPropagation } from "@utils/events";
 import { fromBoolean } from "@utils/either";
-import { NoOp, noOpFn } from "@utils/no-op";
-import { RangeDirection } from "../constants";
+import { NoOp, noOpFn } from "@utils/functions";
 
 type LineNumberProps = {
   number: number;

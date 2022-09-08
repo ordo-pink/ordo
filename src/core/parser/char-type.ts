@@ -1,3 +1,6 @@
+/**
+ * An enum of character types.
+ */
 export enum CharType {
   STAR = "star",
   TILDE = "tilde",

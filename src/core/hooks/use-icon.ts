@@ -1,16 +1,23 @@
-import React from "react";
+import { useMemo } from "react";
 import * as HiIcons from "react-icons/hi";
 import { IconType } from "react-icons/lib";
+
+import { NoOp } from "@utils/functions";
 
 /**
  * An easy to use hook for importing an SVG icon into a component. Internally it uses
  * Hero Icons package from `react-icons` (distributed via MIT license).
+ *
+ * TODO: Add other packages with MIT license
  */
 export const useIcon = (name?: keyof typeof HiIcons): IconType => {
-  const Icon = React.useMemo(
-    () => (name ? (HiIcons as Record<keyof typeof HiIcons, IconType>)[name] : ((() => null) as unknown as IconType)),
-    [name],
-  );
+  const Icon = useMemo(() => {
+    if (!name) return NoOp;
 
-  return Icon;
+    const Icon = HiIcons[name];
+
+    return Icon ?? NoOp;
+  }, [name]);
+
+  return Icon as IconType;
 };

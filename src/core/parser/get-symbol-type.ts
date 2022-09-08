@@ -2,6 +2,9 @@ import { Switch } from "or-else";
 
 import { CharType } from "@core/parser/char-type";
 
+/**
+ * Get the type of the character.
+ */
 export const getSymbolType = (char: string) =>
   Switch.of(char)
     .case("*", CharType.STAR)

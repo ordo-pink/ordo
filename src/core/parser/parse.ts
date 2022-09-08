@@ -1,5 +1,5 @@
-import { createReader } from "@core/parser/reader";
 import { Char, NodeWithChildren, ParseOptions } from "@core/parser/types";
+import { createReader } from "@core/parser/reader";
 import { lex } from "@core/parser/lexer";
 import { noOpFn } from "@utils/functions";
 

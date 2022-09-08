@@ -1,37 +1,29 @@
-import { Either } from "or-else";
-
 import { getSymbolType } from "@core/parser/get-symbol-type";
 import { CharType } from "@core/parser/char-type";
 import { Char } from "@core/parser/types";
 
-export const lex = (text: string, initialLine = 1, initialChar = 1): Char[] =>
-  Either.fromNullable(text).fold(
-    () => [] as Char[],
-    (t) => {
-      let line = initialLine;
-      let character = initialChar;
+export const lex = (text: string, initialLine = 1, initialChar = 1): Char[] => {
+  if (!text) return [];
 
-      return t.split("").map((value, offset) => {
-        const type = getSymbolType(value);
+  let line = initialLine;
+  let character = initialChar;
 
-        const result: Char = {
-          type,
-          value,
-          position: {
-            line,
-            character,
-            offset,
-          },
-        };
+  const characters = text.split("");
 
-        character++;
+  const result = characters.map((value, offset) => {
+    const type = getSymbolType(value);
+    const position = { line, character, offset };
+    const char: Char = { type, value, position };
 
-        if (type === CharType.EOL) {
-          line++;
-          character = 1;
-        }
+    if (type === CharType.EOL) {
+      line++;
+      character = 1;
+    } else {
+      character++;
+    }
 
-        return result;
-      });
-    },
-  );
+    return char;
+  });
+
+  return result;
+};

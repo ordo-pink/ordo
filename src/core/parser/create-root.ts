@@ -1,5 +1,8 @@
-import { DocumentRoot } from "./types";
+import { DocumentRoot } from "@core/parser/types";
 
+/**
+ * Create document root for a file under the given path.
+ */
 export const createRoot = (path: string): DocumentRoot => ({
   type: "root",
   children: [],

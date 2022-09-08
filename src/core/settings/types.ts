@@ -1,5 +1,3 @@
-import { Color } from "@core/appearance/colors";
-
 export type InternalSettings = {
   separator: string;
   platform: "aix" | "darwin" | "freebsd" | "linux" | "openbsd" | "sunos" | "win32";
@@ -33,11 +31,11 @@ export type UserSettings = {
     // font: string;
     // fontSize: number;
     // tabSize: number;
-    autoClosingBrackets: boolean;
-    autoClosingQuotes: boolean;
+    // autoClosingBrackets: boolean;
+    // autoClosingQuotes: boolean;
     // autoIndent: boolean;
-    autoSurround: boolean;
-    emptySelectionLineToClipboard: boolean;
+    // autoSurround: boolean;
+    // emptySelectionLineToClipboard: boolean;
   };
   explorer: {
     exclude: string[];

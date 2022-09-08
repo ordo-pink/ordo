@@ -1,43 +1,29 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useTranslation } from "react-i18next";
 
 import { useAppDispatch } from "@core/state/store";
 import { ActivityBarItem } from "@modules/activity-bar/types";
 import { useIcon } from "@core/hooks/use-icon";
 import { fromBoolean } from "@utils/either";
-import { NoOp, noOpFn } from "@utils/functions";
+import { NoOp } from "@utils/functions";
 
-import "@modules/activity-bar/components/activity-bar-icon.css";
+type Props = ActivityBarItem & { currentActivity: string };
 
-type ActivityBarItemProps = ActivityBarItem & { current: string };
-
-export const ActivityBarIcon: React.FC<ActivityBarItemProps> = ({ icon, show, name, current }) => {
+export const ActivityBarIcon = ({ icon, isShown, name, currentActivity }: Props) => {
   const dispatch = useAppDispatch();
 
+  const { t } = useTranslation();
   const Icon = useIcon(icon);
 
-  const [className, setClassName] = React.useState<string>("");
+  const isCurrentActivity = currentActivity === name;
+  const className = isCurrentActivity ? "activity_current" : "";
 
-  const { t } = useTranslation();
+  const activityTranslationKey = `activities.activity.${name}.name`.toLowerCase();
 
-  const handleActivityClick = () => dispatch({ type: "@activity-bar/select", payload: name });
+  const handleClick = () => dispatch({ type: "@activity-bar/select", payload: name });
 
-  React.useEffect(
-    () =>
-      fromBoolean(current === name).fold(
-        () => setClassName(""),
-        () => setClassName("current-activity"),
-      ),
-    [current, name],
-  );
-
-  return fromBoolean(show).fold(NoOp, () => (
-    <button
-      tabIndex={2}
-      className={`activity ${className}`}
-      onClick={handleActivityClick}
-      title={t(`activities.activity.${name}.name`.toLowerCase())}
-    >
+  return fromBoolean(isShown).fold(NoOp, () => (
+    <button tabIndex={2} className={`activity ${className}`} onClick={handleClick} title={t(activityTranslationKey)}>
       <Icon />
     </button>
   ));

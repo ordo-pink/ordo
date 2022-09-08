@@ -2,7 +2,7 @@ import { SupportedIcon } from "@core/hooks/use-icon";
 import { OrdoEvent } from "@core/types";
 
 export type ActivityBarItem = {
-  show: boolean;
+  isShown: boolean;
   name: string;
   icon: SupportedIcon;
 };

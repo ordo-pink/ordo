@@ -3,13 +3,13 @@ import { ActivityBarState } from "@modules/activity-bar/types";
 const initialState: ActivityBarState = {
   current: "WelcomePage",
   items: [
-    { show: true, name: "Editor", icon: "HiOutlineDocumentText" },
-    { show: true, name: "Graph", icon: "HiOutlineShare" },
-    { show: true, name: "Checkboxes", icon: "HiOutlineCheckCircle" },
-    { show: false, name: "Find in Files", icon: "HiOutlineSearch" },
-    { show: false, name: "WelcomePage", icon: "HiOutlineInbox" },
-    { show: false, name: "Achievements", icon: "HiOutlineSparkles" },
-    { show: false, name: "Settings", icon: "HiOutlineCog" },
+    { isShown: true, name: "Editor", icon: "HiOutlineDocumentText" },
+    { isShown: true, name: "Graph", icon: "HiOutlineShare" },
+    { isShown: true, name: "Checkboxes", icon: "HiOutlineCheckCircle" },
+    { isShown: false, name: "Find in Files", icon: "HiOutlineSearch" },
+    { isShown: false, name: "WelcomePage", icon: "HiOutlineInbox" },
+    { isShown: false, name: "Achievements", icon: "HiOutlineSparkles" },
+    { isShown: false, name: "Settings", icon: "HiOutlineCog" },
   ],
 };
 

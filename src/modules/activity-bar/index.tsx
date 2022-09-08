@@ -1,34 +1,47 @@
-import React from "react";
-import { Either } from "or-else";
+import React, { useEffect, useState } from "react";
 
 import { useAppSelector } from "@core/state/store";
 import { ActivityBarIcon } from "@modules/activity-bar/components/activity-bar-icon";
+import { ActivityBarItem } from "@modules/activity-bar/types";
 
 import "@modules/activity-bar/index.css";
 
-export const ActivityBar: React.FC = () => {
-  const items = useAppSelector((state) => state.activityBar.items);
-  const current = useAppSelector((state) => state.activityBar.current);
-  const tree = useAppSelector((state) => state.fileExplorer.tree);
+const defaultActivities: ActivityBarItem[] = [
+  {
+    name: "WelcomePage",
+    icon: "HiOutlineInbox",
+    isShown: true,
+  },
+];
 
-  return Either.fromNullable(tree)
-    .chain((t) => Either.fromNullable(t.path))
-    .fold(
-      () => (
-        <div className="activity-bar">
-          <ActivityBarIcon current={current} name="WelcomePage" icon="HiOutlineInbox" show={true} />
-          <ActivityBarIcon current={current} name="Settings" icon="HiOutlineCog" show={true} />
-        </div>
-      ),
-      () => (
-        <div className="activity-bar">
-          <div className="flex flex-col space-y-2">
-            {items.map((item) => (
-              <ActivityBarIcon key={item.name} current={current} name={item.name} icon={item.icon} show={item.show} />
-            ))}
-          </div>
-          <ActivityBarIcon current={current} name="Settings" icon="HiOutlineCog" show={true} />
-        </div>
-      ),
-    );
+const ActivityBar = () => {
+  const activityBarItems = useAppSelector((state) => state.activityBar.items);
+  const currentActivity = useAppSelector((state) => state.activityBar.current);
+  const currentProjectPath = useAppSelector((state) => state.fileExplorer.tree?.path);
+
+  const [availableActivities, setAvailableActivities] = useState<ActivityBarItem[]>(defaultActivities);
+
+  useEffect(() => {
+    const activities = currentProjectPath ? activityBarItems : defaultActivities;
+    setAvailableActivities(activities);
+  }, [currentProjectPath]);
+
+  return (
+    <div className="activity-bar">
+      <div className="activity-bar_section">
+        {availableActivities.map((item) => (
+          <ActivityBarIcon
+            key={item.name}
+            currentActivity={currentActivity}
+            name={item.name}
+            icon={item.icon}
+            isShown={item.isShown}
+          />
+        ))}
+      </div>
+      <ActivityBarIcon currentActivity={currentActivity} name="Settings" icon="HiOutlineCog" isShown={true} />
+    </div>
+  );
 };
+
+export default ActivityBar;

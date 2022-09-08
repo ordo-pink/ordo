@@ -3,7 +3,7 @@ import React from "react";
 import { useInternationalisation } from "@containers/app/hooks/use-i18n";
 import { useMainState } from "./hooks/use-main-state";
 
-import { ActivityBar } from "@modules/activity-bar";
+import ActivityBar from "@modules/activity-bar";
 import StatusBar from "@containers/status-bar";
 import MainArea from "@containers/main-area";
 

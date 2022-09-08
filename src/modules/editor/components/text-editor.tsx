@@ -8,6 +8,7 @@ import { Lines } from "@modules/editor/components/lines";
 import { tapPreventDefault, tapStopPropagation } from "@utils/events";
 import { FoldVoid } from "@utils/either";
 import { tail } from "@utils/array";
+import { RangeDirection } from "../constants";
 
 export const TextEditor: React.FC = React.memo(
   () => {
@@ -25,7 +26,7 @@ export const TextEditor: React.FC = React.memo(
           line: tail(current.tab!.content.children).range.end.line,
           character: tail(current.tab!.content.children).range.end.character,
         }))
-        .map((position) => [{ start: position, end: position, direction: "ltr" as const }])
+        .map((position) => [{ start: position, end: position, direction: RangeDirection.LEFT_TO_RIGHT }])
         .map((payload) => dispatch({ type: "@editor/update-caret-positions", payload }))
         .fold(...FoldVoid);
 

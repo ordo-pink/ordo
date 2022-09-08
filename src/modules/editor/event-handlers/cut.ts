@@ -1,6 +1,7 @@
 import { OrdoEventHandler } from "@core/types";
 import { parseText } from "@modules/text-parser";
 import { findCharOffset } from "@utils/find-char-offset";
+import { RangeDirection } from "../constants";
 
 export const handleCut: OrdoEventHandler<"@editor/cut"> = async ({ context, transmission, draft }) => {
   const editorTabs = draft.editor.tabs;
@@ -15,7 +16,7 @@ export const handleCut: OrdoEventHandler<"@editor/cut"> = async ({ context, tran
   if (hasNoneOrMultipleSelections) return;
 
   const currentCaretPosition = tab.caretPositions[0];
-  const isLeftToRight = currentCaretPosition.direction === "ltr";
+  const isLeftToRight = currentCaretPosition.direction === RangeDirection.LEFT_TO_RIGHT;
   const caretRangeStart = isLeftToRight ? currentCaretPosition.start : currentCaretPosition.end;
   const caretRangeEnd = isLeftToRight ? currentCaretPosition.end : currentCaretPosition.start;
 
@@ -52,7 +53,7 @@ export const handleCut: OrdoEventHandler<"@editor/cut"> = async ({ context, tran
     {
       start: { character: caretRangeStart.character, line: caretRangeStart.line },
       end: { character: caretRangeStart.character, line: caretRangeStart.line },
-      direction: "ltr",
+      direction: RangeDirection.LEFT_TO_RIGHT,
     },
   ]);
 

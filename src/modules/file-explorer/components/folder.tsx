@@ -59,6 +59,7 @@ export const Folder: React.FC<FolderProps> = ({ folder }) => {
 
   const handleDrop = (event: React.DragEvent) =>
     Either.right(event)
+      .map(tap(console.log))
       .map(tapPreventDefault)
       .map(tapStopPropagation)
       .map((e) => ({ name: e.dataTransfer.getData("fileName"), oldPath: e.dataTransfer.getData("oldPath") }))

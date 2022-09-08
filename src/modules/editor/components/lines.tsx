@@ -7,6 +7,7 @@ import { Line } from "@modules/editor/components/line";
 import { tapPreventDefault, tapStopPropagation } from "@utils/events";
 import { FoldVoid } from "@utils/either";
 import { tail } from "@utils/array";
+import { RangeDirection } from "../constants";
 
 export const Lines = React.memo(
   () => {
@@ -50,7 +51,7 @@ export const Lines = React.memo(
             .map(tapStopPropagation)
             .map(() => t.content)
             .chain((c) => Either.fromNullable(tail(c.children).range.end))
-            .map((position) => [{ start: position, end: position, direction: "ltr" as const }])
+            .map((position) => [{ start: position, end: position, direction: RangeDirection.LEFT_TO_RIGHT }])
             .map((payload) => dispatch({ type: "@editor/update-caret-positions", payload })),
         )
         .fold(...FoldVoid);

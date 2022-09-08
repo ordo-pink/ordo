@@ -4,6 +4,7 @@ import { useAppDispatch } from "@core/state/store";
 import { useCurrentTab } from "@modules/editor/hooks/use-current-tab";
 import { Caret } from "@modules/editor/components/caret";
 import { Char } from "@core/parser/types";
+import { RangeDirection } from "../constants";
 
 type CharProps = {
   char: Char;
@@ -22,9 +23,12 @@ export const Character = React.memo(
         setIsCaretHere(
           current.tab.caretPositions.some(
             (position) =>
-              char.position.line === (position.direction === "rtl" ? position.start.line : position.end.line) &&
+              char.position.line ===
+                (position.direction === RangeDirection.RIGHT_TO_LEFT ? position.start.line : position.end.line) &&
               char.position.character ===
-                (position.direction === "rtl" ? position.start.character : position.end.character),
+                (position.direction === RangeDirection.RIGHT_TO_LEFT
+                  ? position.start.character
+                  : position.end.character),
           ),
         );
 
@@ -93,7 +97,7 @@ export const Character = React.memo(
                     line: char.position.line,
                     character: char.position.character,
                   },
-                  direction: "ltr",
+                  direction: RangeDirection.LEFT_TO_RIGHT,
                 },
               ],
             });
@@ -109,7 +113,7 @@ export const Character = React.memo(
                 {
                   start: char.position,
                   end: current.tab.caretPositions[0].end,
-                  direction: "rtl",
+                  direction: RangeDirection.RIGHT_TO_LEFT,
                 },
               ],
             });
@@ -120,7 +124,7 @@ export const Character = React.memo(
                 {
                   start: current.tab.caretPositions[0].start,
                   end: char.position,
-                  direction: "ltr",
+                  direction: RangeDirection.LEFT_TO_RIGHT,
                 },
               ],
             });
@@ -138,7 +142,7 @@ export const Character = React.memo(
                   line: char.position.line,
                   character: char.position.character,
                 },
-                direction: "ltr",
+                direction: RangeDirection.LEFT_TO_RIGHT,
               },
             ],
           });

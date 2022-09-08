@@ -7,6 +7,7 @@ import { useCurrentTab } from "@modules/editor/hooks/use-current-tab";
 
 import "@containers/status-bar/index.css";
 import { Notifications } from "@modules/notifications";
+import { RangeDirection } from "@modules/editor/constants";
 
 /**
  * StatusBar is a wrapper component for custom informative views and Notifications.g
@@ -31,7 +32,7 @@ export const StatusBar: React.FC = () => {
             <Code />
             <div className="flex space-x-2">
               {current.tab.caretPositions.map((position, index) => {
-                const direction = position.direction === "ltr" ? "end" : "start";
+                const direction = position.direction === RangeDirection.LEFT_TO_RIGHT ? "end" : "start";
 
                 return (
                   <div

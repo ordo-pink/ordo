@@ -1,4 +1,5 @@
 import { OrdoEventHandler } from "@core/types";
+import { RangeDirection } from "../constants";
 
 export const handleSelectAll: OrdoEventHandler<"@editor/select-all"> = ({ transmission }) => {
   const currentTab = transmission.select((state) => state.editor.currentTab);
@@ -11,6 +12,6 @@ export const handleSelectAll: OrdoEventHandler<"@editor/select-all"> = ({ transm
   const selection = tab.content.range;
 
   transmission.emit("@editor/update-caret-positions", [
-    { start: { line: 1, character: 0 }, end: selection.end, direction: "ltr" },
+    { start: { line: 1, character: 0 }, end: selection.end, direction: RangeDirection.LEFT_TO_RIGHT },
   ]);
 };

@@ -6,6 +6,7 @@ import { findOrdoFile } from "@modules/file-explorer/utils/find-ordo-file";
 import { parseLine, createNodeWithChildren } from "@modules/text-parser";
 import { TextNodeWithChildrenType } from "@modules/text-parser/enums";
 import { tail } from "@utils/array";
+import { RangeDirection } from "../constants";
 import { collectFrontmatterValues } from "../utils/collect-frontmatter-values";
 
 const findChar = (tree: Node, line: number, character: number): Char | null => {
@@ -70,10 +71,10 @@ export const handleTyping: OrdoEventHandler<"@editor/handle-typing"> = ({ draft,
   } else if (payload.event.key === "ArrowRight") {
     tab.caretPositions.forEach((position) => {
       if (position.start.line === position.end.line && position.start.character === position.end.character) {
-        position.direction = "ltr";
+        position.direction = RangeDirection.LEFT_TO_RIGHT;
       }
 
-      const direction = position.direction === "ltr" ? "end" : "start";
+      const direction = position.direction === RangeDirection.LEFT_TO_RIGHT ? "end" : "start";
 
       if (position[direction].character === tab.content.children[position[direction].line - 1].range.end.character) {
         if (position[direction].line === tail(tab.content.children).range.start.line) {
@@ -119,10 +120,10 @@ export const handleTyping: OrdoEventHandler<"@editor/handle-typing"> = ({ draft,
   } else if (payload.event.key === "ArrowLeft") {
     tab.caretPositions.forEach((position) => {
       if (position.start.line === position.end.line && position.start.character === position.end.character) {
-        position.direction = "rtl";
+        position.direction = RangeDirection.RIGHT_TO_LEFT;
       }
 
-      const direction = position.direction === "ltr" ? "end" : "start";
+      const direction = position.direction === RangeDirection.LEFT_TO_RIGHT ? "end" : "start";
 
       if (position[direction].character === 0) {
         if (position[direction].line === 1) {
@@ -169,10 +170,10 @@ export const handleTyping: OrdoEventHandler<"@editor/handle-typing"> = ({ draft,
   } else if (payload.event.key === "ArrowUp") {
     tab.caretPositions.forEach((position) => {
       if (position.start.line === position.end.line && position.start.character === position.end.character) {
-        position.direction = "rtl";
+        position.direction = RangeDirection.RIGHT_TO_LEFT;
       }
 
-      const direction = position.direction === "ltr" ? "end" : "start";
+      const direction = position.direction === RangeDirection.LEFT_TO_RIGHT ? "end" : "start";
 
       if (position[direction].line === 1) {
         position[direction].character = 0;
@@ -198,10 +199,10 @@ export const handleTyping: OrdoEventHandler<"@editor/handle-typing"> = ({ draft,
   } else if (payload.event.key === "ArrowDown") {
     tab.caretPositions.forEach((position) => {
       if (position.start.line === position.end.line && position.start.character === position.end.character) {
-        position.direction = "ltr";
+        position.direction = RangeDirection.LEFT_TO_RIGHT;
       }
 
-      const direction = position.direction === "ltr" ? "end" : "start";
+      const direction = position.direction === RangeDirection.LEFT_TO_RIGHT ? "end" : "start";
 
       if (position[direction].line === tail(tab.content.children).range.end.line) {
         position[direction].character = tail(tab.content.children).range.end.character;

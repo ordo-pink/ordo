@@ -8,6 +8,7 @@ import { Token } from "@modules/editor/components/token";
 import { Caret } from "@modules/editor/components/caret";
 import { isNodeWithChildren } from "@core/parser/is";
 import { NoOp } from "@utils/no-op";
+import { RangeDirection } from "../constants";
 
 export type LineProps = {
   lineIndex: number;
@@ -55,7 +56,7 @@ export const Line = React.memo(
                   line: lineIndex + 1,
                   character: current.tab.content.children[lineIndex].raw.length,
                 },
-                direction: "ltr",
+                direction: RangeDirection.LEFT_TO_RIGHT,
               },
             ],
           });
@@ -68,7 +69,7 @@ export const Line = React.memo(
               {
                 start: { line: lineIndex + 1, character: current.tab.content.children[lineIndex].raw.length },
                 end: current.tab.caretPositions[0].end,
-                direction: "rtl",
+                direction: RangeDirection.RIGHT_TO_LEFT,
               },
             ],
           });
@@ -79,7 +80,7 @@ export const Line = React.memo(
               {
                 start: current.tab.caretPositions[0].start,
                 end: { line: lineIndex + 1, character: current.tab.content.children[lineIndex].raw.length },
-                direction: "ltr",
+                direction: RangeDirection.LEFT_TO_RIGHT,
               },
             ],
           });
@@ -97,7 +98,7 @@ export const Line = React.memo(
                 line: lineIndex + 1,
                 character: current.tab.content.children[lineIndex].raw.length,
               },
-              direction: "ltr",
+              direction: RangeDirection.LEFT_TO_RIGHT,
             },
           ],
         });
@@ -113,7 +114,7 @@ export const Line = React.memo(
         <div className={`editor_line_content`} onClick={handleClick}>
           <Caret
             visible={t.caretPositions.some((position) =>
-              position.direction === "rtl"
+              position.direction === RangeDirection.RIGHT_TO_LEFT
                 ? position.start.line === lineIndex + 1 && position.start.character === 0
                 : position.end.line === lineIndex + 1 && position.end.character === 0,
             )}

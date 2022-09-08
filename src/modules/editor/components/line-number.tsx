@@ -6,6 +6,7 @@ import { useCurrentTab } from "@modules/editor/hooks/use-current-tab";
 import { tapPreventDefault, tapStopPropagation } from "@utils/events";
 import { fromBoolean } from "@utils/either";
 import { NoOp, noOpFn } from "@utils/no-op";
+import { RangeDirection } from "../constants";
 
 type LineNumberProps = {
   number: number;
@@ -24,7 +25,7 @@ export const LineNumber = React.memo(
             .map(tapPreventDefault)
             .map(tapStopPropagation)
             .map(() => ({ line: number, character: 0 }))
-            .map((position) => [{ start: position, end: position, direction: "ltr" as const }]),
+            .map((position) => [{ start: position, end: position, direction: RangeDirection.LEFT_TO_RIGHT }]),
         )
         .fold(noOpFn, (payload) =>
           dispatch({
@@ -36,7 +37,7 @@ export const LineNumber = React.memo(
                   {
                     start: { line: number, character: 0 },
                     end: current.tab!.caretPositions[0].end,
-                    direction: "rtl",
+                    direction: RangeDirection.RIGHT_TO_LEFT,
                   },
                 ]
               : payload,

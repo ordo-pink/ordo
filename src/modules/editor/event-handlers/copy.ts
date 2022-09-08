@@ -1,5 +1,6 @@
 import { OrdoEventHandler } from "@core/types";
 import { findCharOffset } from "@utils/find-char-offset";
+import { RangeDirection } from "../constants";
 
 export const handleCopy: OrdoEventHandler<"@editor/copy"> = ({ context, transmission, draft }) => {
   const editorTabs = draft.editor.tabs;
@@ -14,7 +15,7 @@ export const handleCopy: OrdoEventHandler<"@editor/copy"> = ({ context, transmis
   if (hasNoneOrMultipleSelections) return;
 
   const currentCaretPosition = tab.caretPositions[0];
-  const isLeftToRight = currentCaretPosition.direction === "ltr";
+  const isLeftToRight = currentCaretPosition.direction === RangeDirection.LEFT_TO_RIGHT;
   const caretRangeStart = isLeftToRight ? currentCaretPosition.start : currentCaretPosition.end;
   const caretRangeEnd = isLeftToRight ? currentCaretPosition.end : currentCaretPosition.start;
 

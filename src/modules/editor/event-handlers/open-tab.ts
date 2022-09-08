@@ -7,6 +7,7 @@ import { findOrdoFile } from "@modules/file-explorer/utils/find-ordo-file";
 import { findOrdoFolderByPath } from "@modules/file-explorer/utils/find-ordo-folder";
 import { parseText } from "@modules/text-parser";
 import { collectFrontmatterValues } from "../utils/collect-frontmatter-values";
+import { RangeDirection } from "../constants";
 
 export const handleOpenTab: OrdoEventHandler<"@editor/open-tab"> = async ({
   draft,
@@ -39,7 +40,7 @@ export const handleOpenTab: OrdoEventHandler<"@editor/open-tab"> = async ({
           {
             start: { line: 1, character: 0 },
             end: { line: 1, character: 0 },
-            direction: "ltr",
+            direction: RangeDirection.LEFT_TO_RIGHT,
           },
         ],
         content,

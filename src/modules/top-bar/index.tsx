@@ -9,6 +9,7 @@ import { File } from "@modules/top-bar/components/file";
 
 import "@modules/top-bar/index.css";
 import { CaretRange } from "@modules/editor/types";
+import { RangeDirection } from "@modules/editor/constants";
 
 /**
  * TopBar module provides easy access to finding things. It includes searching substring in
@@ -192,7 +193,7 @@ export const TopBar: React.FC = () => {
                 line,
                 character,
               },
-              direction: "ltr",
+              direction: RangeDirection.LEFT_TO_RIGHT,
             },
           ];
 

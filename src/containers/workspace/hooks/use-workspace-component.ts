@@ -1,23 +1,27 @@
-import React from "react";
+import { useMemo } from "react";
 import { Switch } from "or-else";
 
-import { Editor } from "@modules/editor";
-import { WelcomePage } from "@modules/welcome-page";
+import { useAppSelector } from "@core/state/store";
 import { Settings } from "@core/settings";
-import { GraphView } from "@modules/graph/graph-view";
+import { Editor } from "@modules/editor";
 import { Checkboxes } from "@modules/checkboxes";
+import { WelcomePage } from "@modules/welcome-page";
+import { GraphView } from "@modules/graph/graph-view";
 
-export const useWorkspaceComponent = (currentActivity: string) => {
-  const component = React.useMemo(
-    () =>
-      Switch.of(currentActivity)
-        .case("Editor", Editor)
-        .case("Graph", GraphView)
-        .case("Settings", Settings)
-        .case("Checkboxes", Checkboxes)
-        .default(WelcomePage),
-    [currentActivity],
-  );
+const activitySwitch = (activity: string) =>
+  Switch.of(activity)
+    .case("Editor", Editor)
+    .case("Graph", GraphView)
+    .case("Settings", Settings)
+    .case("Checkboxes", Checkboxes);
 
-  return component;
+/**
+ * The useWorkspaceComponent hook is used for picking the right Workspace component based on currently selected activity.
+ * TODO: Dynamically add activities
+ */
+export const useWorkspaceComponent = () => {
+  const currentActivity = useAppSelector((state) => state.activityBar.current);
+  const WorkspaceComponent = useMemo(() => activitySwitch(currentActivity).default(WelcomePage), [currentActivity]);
+
+  return WorkspaceComponent;
 };

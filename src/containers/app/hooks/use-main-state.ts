@@ -1,4 +1,4 @@
-import React from "react";
+import { useEffect } from "react";
 
 import { useInternalDispatch, useAppDispatch, applyStatePatches, setState } from "@core/state/store";
 
@@ -9,7 +9,7 @@ export const useMainState = () => {
   const handleApplyPatches = ({ detail }: any) => internalDispatch(applyStatePatches(detail));
   const handleSetState = ({ detail }: any) => internalDispatch(setState(detail));
 
-  React.useEffect(() => {
+  useEffect(() => {
     dispatch({ type: "@app/get-state" });
     dispatch({ type: "@app/get-internal-settings" });
     dispatch({ type: "@app/get-user-settings" });

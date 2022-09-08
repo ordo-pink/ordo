@@ -14,7 +14,7 @@ import "@containers/app/index.css";
  * frontend and the backend. It requests initial data from the backend for state
  * syncrchronisation, and registers listeners for backend state updates.
  */
-export const App: React.FC = () => {
+export const App = () => {
   useInternationalisation();
   useMainState();
 

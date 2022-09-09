@@ -1,11 +1,13 @@
 import { promises, existsSync } from "fs";
 
 import { OrdoEventHandler } from "@core/types";
-import { extractFrontmatter, parseText } from "@modules/text-parser";
-import { findOrdoFile } from "../utils/find-ordo-file";
+import { parseText } from "@modules/text-parser";
+import { findOrdoFile } from "@modules/file-explorer/utils/find-ordo-file";
 import { createRoot } from "@core/parser/create-root";
 
 // TODO: Rewrite with "@editor/toggle-todo"
+// TODO: Clean up here
+// TODO: Try reading files. If meta file does not exist, trigger creating one
 export const handleReplaceLine: OrdoEventHandler<"@file-explorer/replace-line"> = async ({
   payload,
   transmission,
@@ -23,7 +25,9 @@ export const handleReplaceLine: OrdoEventHandler<"@file-explorer/replace-line"> 
 
   fileLines[index] = payload.newContent;
 
-  const frontmatter = extractFrontmatter(fileContent).frontmatter;
+  const metaPath = `${payload.path}.meta`;
+
+  const frontmatter = JSON.parse(await promises.readFile(metaPath, "utf-8"));
 
   if (payload.oldContent.startsWith("[ ] ")) {
     frontmatter!.todos.pending.splice(frontmatter!.todos.pending.indexOf(payload.oldContent.slice(4)), 1);
@@ -36,9 +40,8 @@ export const handleReplaceLine: OrdoEventHandler<"@file-explorer/replace-line"> 
   frontmatter!.todos.pending = Array.from(new Set(frontmatter!.todos.pending));
   frontmatter!.todos.done = Array.from(new Set(frontmatter!.todos.done));
 
-  fileLines[1] = JSON.stringify(frontmatter);
-
   await promises.writeFile(payload.path, fileLines.join("\n"));
+  await promises.writeFile(metaPath, JSON.stringify(frontmatter));
 
   const tab = tabs.find((tab) => tab.path === payload.path);
 

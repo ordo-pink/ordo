@@ -2,11 +2,12 @@ import { useMemo } from "react";
 import { Switch } from "or-else";
 
 import { useAppSelector } from "@core/state/store";
-import Settings from "@core/settings";
 import { Editor } from "@modules/editor";
-import { Checkboxes } from "@modules/checkboxes";
 import { WelcomePage } from "@modules/welcome-page";
 import { GraphView } from "@modules/graph/graph-view";
+
+import Checkboxes from "@modules/checkboxes";
+import Settings from "@core/settings";
 
 const activitySwitch = (activity: string) =>
   Switch.of(activity)

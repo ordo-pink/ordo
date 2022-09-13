@@ -27,7 +27,7 @@ export default function Post({ data }: any) {
         description={data.markdownRemark.frontmatter.excerpt}
       />
       <Header />
-      <div className="flex flex-col min-h-screen p-6">
+      <div className="flex flex-col min-h-screen p-6 mt-32">
         <div className="flex-grow flex flex-col max-w-6xl mx-auto">
           <div className="prose prose-amber lg:prose-lg prose-img:rounded-lg prose-invert">
             <h1>{data.markdownRemark.frontmatter.title}</h1>

@@ -107,7 +107,7 @@ export const Seo: React.FC<Props> = ({
         },
         {
           property: "og:image",
-          content: "https://ordo.pink/og.jpg",
+          content: "https://ordo.pink/og.png",
         },
         {
           name: "twitter:card",
@@ -123,7 +123,7 @@ export const Seo: React.FC<Props> = ({
         },
         {
           property: "twitter:image",
-          content: "https://ordo.pink/og.jpg",
+          content: "https://ordo.pink/og.png",
         },
         {
           name: "twitter:description",

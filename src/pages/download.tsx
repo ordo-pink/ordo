@@ -8,7 +8,7 @@ import { Seo } from "../components/seo"
 
 export default function PrivateBeta() {
   return (
-    <div className="flex flex-col min-h-screen">
+    <div className="flex flex-col min-h-screen text-white mt-12">
       <Seo
         title="Скачать"
         description="Скачать Ordo для Windows, Linux и MacOS"
@@ -22,7 +22,7 @@ export default function PrivateBeta() {
         <div className="flex flex-col space-y-4">
           <div className="flex flex-col space-y-2">
             <a
-              href="https://tinyurl.com/ordo-011-win"
+              href="https://github.com/ordo-pink/ordo-electron/releases/download/0.2.0/ordo-0.2.0-windows-x64.zip"
               className="flex space-x-2 justify-center items-center px-8 py-2 bg-gradient-to-tr from-pink-500 to-cyan-500 rounded-xl font-semibold text-xl text-white whitespace-nowrap"
             >
               <DiWindows />
@@ -31,7 +31,7 @@ export default function PrivateBeta() {
           </div>
           <div className="flex flex-col space-y-2">
             <a
-              href="https://tinyurl.com/ordo-011-darwin"
+              href="https://github.com/ordo-pink/ordo-electron/releases/download/0.2.0/ordo-0.2.0-darwin-x64.zip"
               className="flex space-x-2 justify-center items-center px-8 py-2 bg-gradient-to-tr from-pink-500 to-cyan-500 rounded-xl font-semibold text-xl text-white whitespace-nowrap"
             >
               <DiApple />
@@ -41,7 +41,7 @@ export default function PrivateBeta() {
           <div className="flex flex-col space-y-4 md:flex-row md:space-y-0 md:space-x-4">
             <div className="flex flex-col space-y-2">
               <a
-                href="https://tinyurl.com/ordo-011-rpm"
+                href="https://github.com/ordo-pink/ordo-electron/releases/download/0.2.0/ordo-0.2.0-linux-amd64.deb"
                 className="flex space-x-2 justify-center items-center px-8 py-2 bg-gradient-to-tr from-pink-500 to-cyan-500 rounded-xl font-semibold text-xl text-white whitespace-nowrap"
               >
                 <DiLinux />
@@ -50,7 +50,7 @@ export default function PrivateBeta() {
             </div>
             <div className="flex flex-col space-y-2">
               <a
-                href="https://tinyurl.com/ordo-011-deb"
+                href="https://github.com/ordo-pink/ordo-electron/releases/download/0.2.0/ordo-0.2.0-linux-amd64.deb"
                 className="flex space-x-2 justify-center items-center px-8 py-2 bg-gradient-to-tr from-pink-500 to-cyan-500 rounded-xl font-semibold text-xl text-white whitespace-nowrap"
               >
                 <DiLinux />

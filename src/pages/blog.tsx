@@ -28,7 +28,7 @@ export default function BlogListPage() {
   `)
 
   return (
-    <div className="flex flex-col min-h-screen">
+    <div className="flex flex-col min-h-screen text-white mt-32">
       <Seo title="Блодж" description="Блог Ordo" />
       <Header />
 

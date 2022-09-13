@@ -1,4 +1,4 @@
-import { promises } from "fs";
+import { promises, existsSync } from "fs";
 import { join } from "path";
 
 import { OrdoEventHandler } from "@core/types";
@@ -25,6 +25,17 @@ export const handleMove: OrdoEventHandler<"@file-explorer/move"> = async ({ payl
     : 0;
 
   if (result === 0) {
+    const stats = await promises.stat(payload.oldPath);
+
+    if (stats.isFile()) {
+      const oldMetaPath = `${payload.oldPath}.meta`;
+      const newMetaPath = `${newPath}.meta`;
+
+      if (existsSync(oldMetaPath)) {
+        await promises.rename(oldMetaPath, newMetaPath);
+      }
+    }
+
     await promises.rename(payload.oldPath, newPath);
     await transmission.emit("@file-explorer/list-folder", tree.path);
   }

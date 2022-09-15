@@ -1,10 +1,10 @@
 import React from "react";
 
 import { OrdoFolder } from "@modules/file-explorer/types";
-import { SupportedIcon, useIcon } from "@core/hooks/use-icon";
+import { IconName, useIcon } from "@core/hooks/use-icon";
 
 export const useFolderIcons = (folder: OrdoFolder) => {
-  const collapseIcon: SupportedIcon = React.useMemo(
+  const collapseIcon: IconName = React.useMemo(
     () => (folder.collapsed ? "HiOutlineChevronRight" : "HiOutlineChevronDown"),
     [folder.path, folder.collapsed],
   );

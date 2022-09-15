@@ -1,10 +1,10 @@
-import { SupportedIcon } from "@core/hooks/use-icon";
+import { IconName } from "@core/hooks/use-icon";
 import { InternalSettings, UserSettings } from "@core/settings/types";
 import { OrdoEvent } from "@core/types";
 import { OrdoEvents } from "@init/types";
 
 export type Command<TCustomEvents extends Record<string, any> | null = null> = {
-  icon?: SupportedIcon;
+  icon?: IconName;
   name: string;
   event: TCustomEvents extends null ? keyof OrdoEvents : TCustomEvents;
   accelerator: string;

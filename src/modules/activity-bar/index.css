@@ -1,13 +1,13 @@
 .activity-bar {
-  @apply h-screen flex flex-col space-y-4 p-2 pb-8 text-4xl justify-between;
+  @apply h-screen flex flex-col pb-6 text-3xl justify-between;
 
   &_section {
-    @apply flex flex-col space-y-2;
+    @apply flex flex-col;
   }
 }
 
 .activity {
-  @apply outline-none cursor-pointer transition-all duration-500 select-none text-neutral-400 dark:text-neutral-500 hover:text-neutral-600 dark:hover:text-neutral-50 focus:text-neutral-600 dark:focus:text-neutral-50;
+  @apply p-2 outline-none cursor-pointer transition-all duration-500 select-none text-neutral-400 dark:text-neutral-500 hover:text-neutral-600 dark:hover:text-neutral-50 focus:text-neutral-600 dark:focus:text-neutral-50;
 
   &_current {
     @apply text-pink-600 dark:text-pink-400 hover:text-pink-800 dark:hover:text-pink-600 focus:text-pink-800 dark:focus:text-pink-600;

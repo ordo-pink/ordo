@@ -15,7 +15,7 @@ type CommandProps = TCommand & {
 export const Command: React.FC<CommandProps> = ({ icon, name, accelerator, event, selected, index, setSelected }) => {
   const dispatch = useAppDispatch();
 
-  const Icon = useIcon(icon);
+  const Icon = useIcon(icon as any);
   const [isSelected, setIsSelected] = React.useState<boolean>(false);
 
   const { t } = useTranslation();

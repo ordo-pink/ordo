@@ -39,7 +39,7 @@ const ActivityBar = () => {
           />
         ))}
       </div>
-      <ActivityBarIcon currentActivity={currentActivity} name="Settings" icon="HiOutlineCog" isShown={true} />
+      <ActivityBarIcon currentActivity={currentActivity} name="Settings" icon="FaCogs" isShown={true} />
     </div>
   );
 };

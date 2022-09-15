@@ -13,7 +13,7 @@ export const ActivityBarIcon = ({ icon, isShown, name, currentActivity }: Props)
   const dispatch = useAppDispatch();
 
   const { t } = useTranslation();
-  const Icon = useIcon(icon);
+  const Icon = useIcon(icon as any);
 
   const isCurrentActivity = currentActivity === name;
   const className = isCurrentActivity ? "activity_current" : "";

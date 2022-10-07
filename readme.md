@@ -1,14 +1,21 @@
-# How to start
+# ordo
 
-```shell
+[![Lint](https://github.com/ordo-pink/super-duper-computing-machine/actions/workflows/lint.yml/badge.svg?branch=main)](https://github.com/ordo-pink/super-duper-computing-machine/actions/workflows/lint.yml)
+
+## Start
+
+```sh
 npm i
+```
+
+```sh
 npm start
 ```
 
-# How to commit
+## Commit
 
-```shell
+Use [Gitmoji](https://gitmoji.dev)! CLI for your convenience:
+
+```sh
 npm run commit
 ```
-
-Or, use [gitmoji.dev](https://gimoji.dev) as a reference and use `git commit` with apprpriately assigned commit message.

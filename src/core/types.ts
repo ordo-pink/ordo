@@ -1,16 +1,19 @@
-import { EventHandler } from "@core/transmission";
-import { OrdoEvents } from "@init/types";
+export type Nullable<T> = T | null
 
-export type int = number;
-export type uint = number;
-export type float = number;
+export type Optional<T> = T | undefined
 
-export type UnaryFunction<TArgument, TResult> = (arg: TArgument) => TResult;
-export type Thunk<TResult> = UnaryFunction<never, TResult>;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type Fn<Arguments = any, Result = void> = Arguments extends void
+  ? () => Result
+  : (arg: Arguments) => Result
 
-export type OrdoEventHandler<TKey extends keyof OrdoEvents> = EventHandler<OrdoEvents[TKey]>;
+export type UnaryFn<Arg, Result> = Fn<Arg, Result>
 
-export type OrdoEvent<TScope extends string = string, TEvent extends string = string, TPayload = null> = Record<
-  `@${TScope}/${TEvent}`,
-  TPayload
->;
+export type Unpack<T> = T extends Array<infer U> ? U : T
+
+export type Thunk<T> = () => T
+
+export type OrdoEvent<
+  Scope extends string = string,
+  Identifier extends string = string
+> = `@${Scope}/${Identifier}`

@@ -1,16 +1,13 @@
-import { OrdoEvents } from "@init/types";
+import type { PayloadAction, Action } from "@reduxjs/toolkit"
 
 declare global {
   interface Window {
     ordo: {
-      emit: <
-        TReturn = void,
-        TCustomEvents extends Record<string, unknown> = {},
-        TKey extends keyof (TCustomEvents & OrdoEvents) = keyof (OrdoEvents & TCustomEvents),
-      >(
-        key: TKey,
-        payload: (OrdoEvents & TCustomEvents)[TKey],
-      ) => Promise<TReturn>;
-    };
+      emit: <Result = void, Payload = unknown>(
+        action: Action | PayloadAction<Payload>
+      ) => Promise<Result>
+    }
   }
 }
+
+export {}

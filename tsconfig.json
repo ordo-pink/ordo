@@ -1,8 +1,9 @@
 {
   "compilerOptions": {
-    "allowJs": true,
+    "lib": ["DOM", "DOM.Iterable", "ESNext"],
+    "module": "ESNext",
     "jsx": "react",
-    "module": "commonjs",
+    "allowJs": true,
     "skipLibCheck": true,
     "esModuleInterop": true,
     "strict": true,
@@ -18,16 +19,13 @@
     "moduleResolution": "node",
     "resolveJsonModule": true,
     "paths": {
+      "@assets/*": ["src/assets/*"],
+      "@client/*": ["src/client/*"],
+      "@main/*": ["src/main/*"],
       "@core/*": ["src/core/*"],
-      "@containers/*": ["src/containers/*"],
-      "@modules/*": ["src/modules/*"],
-      "@components/*": ["src/components/*"],
-      "@init/*": ["src/init/*"],
-      "@utils/*": ["src/utils/*"],
-      "@i18n/*": ["i18n/*"],
       "*": ["node_modules/*"]
     }
   },
-  "include": ["src/**/*"],
+  "include": ["src/**/*", "window.d.ts"],
   "exclude": ["**/*.test.ts"]
 }

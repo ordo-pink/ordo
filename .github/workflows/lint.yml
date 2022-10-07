@@ -12,20 +12,6 @@ on:
   workflow_dispatch:
 
 jobs:
-  commitlint:
-    runs-on: ubuntu-latest
-
-    steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
-        with:
-          node-version: 16
-
-      - name: NPM Install
-        run: npm ci
-
-      - name: Commitlint check
-        run: npx commitlint -e $1
   eslint:
     runs-on: ubuntu-latest
 
@@ -35,10 +21,10 @@ jobs:
         with:
           node-version: 16
 
-      - name: NPM Install
+      - name: Install dependencies
         run: npm ci
 
-      - name: ESLint check
+      - name: Check with ESLint
         run: npm run eslint:lint
   prettier:
     runs-on: ubuntu-latest
@@ -49,8 +35,8 @@ jobs:
         with:
           node-version: 16
 
-      - name: NPM Install
+      - name: Install dependencies
         run: npm ci
 
-      - name: Prettier check
+      - name: Check with Prettier
         run: npm run prettier:check

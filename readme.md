@@ -1,6 +1,6 @@
 # ordo
 
-[![Lint](https://github.com/ordo-pink/super-duper-computing-machine/actions/workflows/lint.yml/badge.svg?branch=main)](https://github.com/ordo-pink/super-duper-computing-machine/actions/workflows/lint.yml)
+[![Lint](https://github.com/ordo-pink/ordo-electron/actions/workflows/lint.yml/badge.svg?branch=main)](https://github.com/ordo-pink/ordo-electron/actions/workflows/lint.yml)
 
 ## Start
 

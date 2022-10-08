@@ -1,7 +1,7 @@
 name: Feature Request
 description: Asking for a friend
 title: "✨ "
-labels: ["✨ Enhancement"]
+labels: [":sparkles: enhancement"]
 assignees:
   - orlowdev
 body:

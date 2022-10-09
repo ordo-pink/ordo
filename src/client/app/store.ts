@@ -45,7 +45,6 @@ export const selectPersonalProjectDirectory = createAsyncThunk(
   () => window.ordo.emit<string>({ type: "@app/selectPersonalProjectDirectory" })
 )
 
-// TODO: 53
 export const listFolder = createAsyncThunk("@app/listFolder", (payload: string) =>
   window.ordo.emit<OrdoFolder, string>({ type: "@app/listFolder", payload })
 )
@@ -174,7 +173,6 @@ export const appSlice = createSlice({
         state.isLoading = true
       })
       .addCase(saveFile.fulfilled, (state, action) => {
-        // TODO: 54
         if (action.payload) state.personalDirectory = action.payload
       })
   },

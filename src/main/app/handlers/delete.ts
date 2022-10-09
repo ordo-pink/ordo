@@ -5,9 +5,6 @@ import { handleListFolder } from "./list-folder"
 import { promises } from "fs"
 
 export const handleDelete = async (path: string) => {
-  // TODO: 92
-  // TODO: 93
-  // TODO: 94
   await shell.trashItem(path)
 
   const isOrdoFile = path.endsWith(ORDO_FILE_EXTENSION)

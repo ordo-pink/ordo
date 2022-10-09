@@ -1,8 +1,6 @@
 import i18next, { use } from "i18next"
 import { initReactI18next } from "react-i18next"
 
-// TODO: 70
-// TODO: 71
 import ruEditor from "@core/editor/translations/ru.json"
 import enEditor from "@core/editor/translations/en.json"
 

@@ -4,10 +4,6 @@
 
 /* This file is only for global things like registering fonts */
 
-/* TODO: 47 */
-/* TODO: 48 */
-/* TODO: 49 */
-
 @font-face {
   font-family: "Jost";
   src: url("@assets/fonts/jost/jost-thin.ttf") format("ttf");

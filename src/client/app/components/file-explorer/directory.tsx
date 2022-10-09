@@ -50,7 +50,7 @@ export default function Directory({ item }: Props) {
       {
         title: "app.file.duplicate",
         icon: "BsFiles",
-        action: () => console.log("TODO: 59"),
+        action: () => console.log("TODO"),
       },
       SEPARATOR,
       {
@@ -75,19 +75,19 @@ export default function Directory({ item }: Props) {
       {
         title: "app.file.copy-path",
         icon: "BsSignpost2",
-        action: () => console.log("TODO: 60"),
+        action: () => console.log("TODO"),
         accelerator: "CommandOrControl+Alt+C",
       },
       {
         title: "app.file.copy-relative-path",
         icon: "BsSignpost",
-        action: () => console.log("TODO: 61"),
+        action: () => console.log("TODO"),
         accelerator: "CommandOrControl+Shift+Alt+C",
       },
       {
         title: "app.file.reveal-in-files",
         icon: "BsFolderCheck",
-        action: () => console.log("TODO: 62"),
+        action: () => console.log("TODO"),
       },
     ],
   })

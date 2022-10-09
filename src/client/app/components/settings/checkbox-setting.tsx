@@ -5,7 +5,6 @@ import React from "react"
 import { setUserSetting } from "@client/app/store"
 import { useAppDispatch } from "@client/state"
 
-// TODO: 67
 /**
  * Input for settings with boolean values.
  */

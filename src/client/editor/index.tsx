@@ -186,14 +186,6 @@ export default function Editor() {
         )
       })
 
-  // TODO: 100
-  // TODO: 101
-  // TODO: 102
-  // TODO: 103
-  // TODO: 104
-  // TODO: 105
-  // TODO: 106
-  // BUG: 107
   useHotkeys(
     "*",
     (event) => {
@@ -253,7 +245,6 @@ export default function Editor() {
               }`}
             >
               <CheckboxIcon />
-              {/* TODO: Extract all these */}
               <div>
                 {currentFile?.metadata.checkboxes.filter((checkbox) => checkbox.checked).length}/
                 {currentFile.metadata.checkboxes.length}

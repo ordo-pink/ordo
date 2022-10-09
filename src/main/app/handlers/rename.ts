@@ -10,10 +10,6 @@ type Params = {
 
 export const handleRename = async ({ oldPath, newPath }: Params) => {
   const rootPath = userSettingsStore.get("project.personal.directory")
-
-  // TODO: 98
-  // TODO: 99
-
   const oldPathIsOrdoFile = oldPath.endsWith(ORDO_FILE_EXTENSION)
   const newPathIsOrdoFile = newPath.endsWith(ORDO_FILE_EXTENSION)
 

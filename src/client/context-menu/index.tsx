@@ -6,8 +6,6 @@ import Menu from "@client/context-menu/components/menu"
 
 export const useContextMenu = (structure: TMenu) => {
   const [isShown, setIsShown] = useState(false)
-  // TODO: 68
-  // TODO: 69
   const [x, setX] = useState(0)
   const [y, setY] = useState(0)
 

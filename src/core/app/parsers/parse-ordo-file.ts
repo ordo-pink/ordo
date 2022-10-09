@@ -22,8 +22,6 @@ const createExtractor = () => (tree: RootNode) => {
   const linkRx = /\(\(([\p{L}\d/-]+)\)\)/giu
   const dateRx = /!?!\(\d{4}-\d{2}-\d{2}\)/g
   const dateWithPatternRx = /(!?!\(\d{4}-\d{2}-\d{2}\+[0-9*]{5}\))/g
-  // TODO: 75
-  // TODO: 76
 
   for (let i = 0; i < tree.children.length; i++) {
     for (let ci = 0; ci < tree.children[i].children.length; ci++) {
@@ -109,19 +107,9 @@ const createExtractor = () => (tree: RootNode) => {
   }
 }
 
-// TODO 77
 // @example ((folder/another-file.mdo)), ((photos/2022/img.png))
-// TODO 78
 // @example !((folder/another-file.mdo))
-
-// TODO 79
 // @example !2022-09-25, !2022-09-25T09:03:47.133Z
 // @example !2022-09-25--00***--2022-10-25 - Appear daily at midnight since Sep 25, 2022 till Oct 25, 2022
 // @example !(2022-09-25T09:00:00.133Z--****7--2022-12-31) - Remind every Sunday at 9am since Sep 25, 2022 till Dec 31, 2022
-// TODO 80
-// TODO 81
-// TODO 82
 // @example !!2022-09-25--00***--2022-10-25 - Appear daily at midnight since Sep 25, 2022 till Oct 25, 2022
-
-// TODO: 83
-// TODO: 84

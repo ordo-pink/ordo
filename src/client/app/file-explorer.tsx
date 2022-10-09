@@ -17,7 +17,6 @@ export default function FileExplorer() {
   useHotkeys("ctrl+n", () => showCreateFileModal())
   useHotkeys("ctrl+shift+n", () => showCreateFolderModal())
 
-  // TODO: 51
   const { showContextMenu, ContextMenu } = useContextMenu({
     children: [
       {
@@ -36,19 +35,19 @@ export default function FileExplorer() {
       {
         title: "app.file.copy-path",
         icon: "BsSignpost2",
-        action: () => console.log("TODO: 55"),
+        action: () => console.log("TODO"),
         accelerator: "CommandOrControl+Alt+C",
       },
       {
         title: "app.file.copy-relative-path",
         icon: "BsSignpost",
-        action: () => console.log("TODO: 56"),
+        action: () => console.log("TODO"),
         accelerator: "CommandOrControl+Shift+Alt+C",
       },
       {
         title: "app.file.reveal-in-files",
         icon: "BsFolderCheck",
-        action: () => console.log("TODO: 57"),
+        action: () => console.log("TODO"),
       },
     ],
   })

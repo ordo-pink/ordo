@@ -30,7 +30,6 @@ const isIconAvailable = (name?: IconName) => Boolean(name && ALL_ICONS[name])
 /**
  * React hook that provides quick access to a desired icon. If the icon is not available,
  * or the name is not provided, returns a NoOp. Results are cached per icon name.
- * // TODO: 50
  */
 export const useIcon = (name?: IconName): IconType => {
   const Icon = useMemo(() => {

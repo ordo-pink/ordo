@@ -22,15 +22,11 @@
   "app.modal.create.folder.title": "Создать папку",
   "app.modal.create.folder.hint": "Жми Enter, чтобы применить изменения, или Escape, чтобы отменить.",
   "app.modal.create.folder.placeholder": "папка/подпапка/.../",
-  "app.file.delete": "Удалить",
-  "app.file.duplicate": "Создать копию",
-  "app.file.copy-path": "Скопировать путь",
-  "app.file.copy-relative-path": "Скопировать относительный путь",
-  "app.file.reveal-in-files": "Показать в файловой системе",
-  "app.file.rename": "Переименовать",
-  "app.folder.create-file": "Создать файл",
-  "app.folder.create-folder": "Создать папку",
   "app.system": "Системная",
   "app.light": "Светлая",
-  "app.dark": "Тёмная"
+  "app.dark": "Тёмная",
+  "@app/delete": "Удалить",
+  "@app/rename": "Переименовать",
+  "@app/create-file": "Создать файл",
+  "@app/create-folder": "Создать папку"
 }

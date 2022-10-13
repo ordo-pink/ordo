@@ -12,12 +12,15 @@ import {
   setSideBarWidth,
   toggleSideBar,
 } from "@client/app/store"
-import i18n from "@client/i18n"
+import { ExtensionContextMenuLocation } from "@core/constants"
+import { FileContextMenu, FolderContextMenu } from "@client/app/context-menu"
+import { Extensions } from "@extensions/index"
+import Switch from "@core/utils/switch"
+import i18next from "@client/i18n"
 
 import ActivityBar from "@client/activity-bar"
 import SideBar from "@client/side-bar"
 import Workspace from "@client/workspace"
-import Switch from "@core/utils/switch"
 
 export default function App() {
   const dispatch = useAppDispatch()
@@ -31,6 +34,25 @@ export default function App() {
   const [isLeftCollapsed, setIsLeftCollapsed] = useState(false)
   const [isRightCollapsed, setIsRightCollapsed] = useState(false)
   const [sizes, setSizes] = useState<[number, number]>([sideBarWidth, 100 - sideBarWidth])
+
+  // TODO: Move to store
+  useEffect(() => {
+    Extensions.map(({ commands, translations }) => {
+      Object.keys(translations).forEach((lng) => {
+        i18next.addResourceBundle(lng, "translation", (translations as any)[lng])
+      })
+      commands.forEach((command) => {
+        if (command.showInContextMenu === ExtensionContextMenuLocation.FILE) {
+          FileContextMenu.push(command)
+        } else if (command.showInContextMenu === ExtensionContextMenuLocation.FOLDER) {
+          FolderContextMenu.push(command)
+        } else if (command.showInContextMenu === ExtensionContextMenuLocation.FILE_OR_FOLDER) {
+          FileContextMenu.push(command)
+          FolderContextMenu.push(command)
+        }
+      })
+    })
+  }, [])
 
   useHotkeys("ctrl+b", () => void dispatch(toggleSideBar()))
   useHotkeys("ctrl+e", () => void dispatch(selectActivity("editor")))
@@ -47,6 +69,7 @@ export default function App() {
     body.style.fontSize = `${size}px`
   }, [fontSize])
 
+  // TODO: use local settings value
   useEffect(() => {
     setSizes([sideBarWidth, 100 - sideBarWidth])
     if (sideBarWidth < 2) {
@@ -62,7 +85,7 @@ export default function App() {
   }, [sideBarWidth])
 
   useEffect(() => void (project && dispatch(listFolder(project))), [project])
-  useEffect(() => void i18n.changeLanguage(language), [language])
+  useEffect(() => void i18next.changeLanguage(language), [language])
   useEffect(() => {
     if (!isSideBarAvailable) {
       setIsLeftCollapsed(true)

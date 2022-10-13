@@ -22,17 +22,13 @@
   "app.modal.create.file.placeholder": "folder/file",
   "app.modal.create.folder.hint": "Press Enter to apply changes, Escape to cancel.",
   "app.modal.create.folder.placeholder": "folder/subfolder/.../",
-  "app.file.delete": "Delete",
-  "app.file.duplicate": "Duplicate",
-  "app.file.copy-path": "Copy path",
-  "app.file.copy-relative-path": "Copy relative path",
-  "app.file.reveal-in-files": "Reveal in files",
-  "app.file.rename": "Rename",
-  "app.folder.create-file": "Create file",
-  "app.folder.create-folder": "Create folder",
   "app.system": "System",
   "app.light": "Light",
   "app.dark": "Dark",
   "app.en": "English",
-  "app.ru": "Русский"
+  "app.ru": "Русский",
+  "@app/delete": "Delete",
+  "@app/rename": "Rename",
+  "@app/create-file": "Create file",
+  "@app/create-folder": "Create folder"
 }

@@ -7,11 +7,11 @@ import { handleListFolder } from "@main/app/handlers/list-folder"
 import userSettingsStore from "@main/app/user-settings-store"
 import { parseMetadata, parseOrdoFile } from "@core/app/parsers/parse-ordo-file"
 
-type TParams = RootNode["data"] & {
+type Params = RootNode["data"] & {
   path: string
 }
 
-export const handleSaveFile = async ({ path, raw }: TParams) => {
+export const handleSaveFile = async ({ path, raw }: Params) => {
   const rootPath = userSettingsStore.get("project.personal.directory")
   const isOrdoFile = path.endsWith(ORDO_FILE_EXTENSION)
 

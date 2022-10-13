@@ -1,22 +1,25 @@
-import type { TMenu } from "@client/context-menu/types"
+import type { Menu } from "@client/context-menu/types"
+import type { OrdoFile, OrdoFolder } from "@core/app/types"
+import type { Nullable, OrdoCommand } from "@core/types"
 
 import React, { MouseEvent } from "react"
 import { useHotkeys } from "react-hotkeys-hook"
 
 import Either from "@core/utils/either"
 
-import Null from "@client/null"
 import MenuItem from "@client/context-menu/components/menu-item"
+import Null from "@client/null"
 
-type TProps = {
-  structure: TMenu
+type Props = {
+  structure: Menu
   isShown: boolean
+  target: Nullable<OrdoFile | OrdoFolder>
   hideContextMenu: (event: MouseEvent) => void
   x: number
   y: number
 }
 
-export default function Menu({ structure, isShown, hideContextMenu, x, y }: TProps) {
+export default function Menu({ structure, isShown, hideContextMenu, target, x, y }: Props) {
   useHotkeys("escape", (event) => hideContextMenu(event as unknown as MouseEvent))
 
   return Either.fromBoolean(isShown).fold(Null, () => (
@@ -30,7 +33,12 @@ export default function Menu({ structure, isShown, hideContextMenu, x, y }: TPro
         className="inline-block bg-neutral-50 dark:bg-neutral-600 w-auto shadow-lg"
       >
         {structure.children.map((child, index) => (
-          <MenuItem item={child} key={index} hideContextMenu={hideContextMenu} />
+          <MenuItem
+            item={child as OrdoCommand<string>}
+            key={index}
+            hideContextMenu={hideContextMenu}
+            target={target}
+          />
         ))}
       </div>
     </div>

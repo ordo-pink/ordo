@@ -4,11 +4,11 @@ import Either from "@core/utils/either"
 
 import Null from "@client/null"
 
-type TProps = {
+type Props = {
   accelerator?: string
 }
 
-export default function Accelerator({ accelerator }: TProps) {
+export default function Accelerator({ accelerator }: Props) {
   const isDarwin = navigator.appVersion.indexOf("Mac") != -1
 
   const [split, setSplit] = useState<string[]>([])
@@ -28,10 +28,10 @@ export default function Accelerator({ accelerator }: TProps) {
 
   return Either.fromNullable(accelerator).fold(Null, () => (
     <div className="flex items-center text-xs space-x-1 ml-6 text-neutral-500">
-      {split.includes("CommandOrControl") ? <div className="">{ctrl} +</div> : null}
-      {split.includes("Shift") ? <div className="">⇧ +</div> : null}
-      {split.includes("Alt") ? <div className="">{alt} +</div> : null}
-      <div className="">{split[split.length - 1]}</div>
+      {split.includes("ctrl") ? <div className="">{ctrl} +</div> : null}
+      {split.includes("shift") ? <div className="">⇧ +</div> : null}
+      {split.includes("alt") ? <div className="">{alt} +</div> : null}
+      <div className="">{split[split.length - 1]?.toUpperCase()}</div>
     </div>
   ))
 }

@@ -44,13 +44,13 @@ export const useCreateFolderModal = ({ parent }: Params) => {
   }
 }
 
-type TProps = {
+type Props = {
   type: "file" | "folder"
   hideModal: (event?: MouseEvent) => void
   parent: Nullable<OrdoFolder>
 }
 
-const CreateModal = ({ hideModal, type, parent }: TProps) => {
+const CreateModal = ({ hideModal, type, parent }: Props) => {
   const dispatch = useAppDispatch()
   const { t } = useTranslation()
   const separator = useAppSelector((state) => state.app.localSettings["app.separator"])

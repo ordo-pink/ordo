@@ -6,7 +6,11 @@ export const useModalWindow = () => {
   const [isShown, setIsShown] = useState(false)
 
   const showModal = (event?: MouseEvent) => {
-    if (event) event.stopPropagation()
+    if (event) {
+      event.preventDefault()
+      event.stopPropagation()
+    }
+
     setIsShown(true)
   }
 

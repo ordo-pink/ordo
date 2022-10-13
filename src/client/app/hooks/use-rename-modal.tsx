@@ -32,12 +32,12 @@ export const useRenameModal = (item: Nullable<OrdoFile | OrdoFolder>) => {
   }
 }
 
-type TProps = {
+type Props = {
   item: OrdoFile | OrdoFolder
   hideModal: (event?: MouseEvent) => void
 }
 
-const RenameModal = ({ item, hideModal }: TProps) => {
+const RenameModal = ({ item, hideModal }: Props) => {
   const dispatch = useAppDispatch()
   const { t } = useTranslation()
 

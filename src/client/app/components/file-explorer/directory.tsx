@@ -9,6 +9,7 @@ import { useAppDispatch } from "@client/state"
 import { useIcon } from "@client/use-icon"
 import { deleteFileOrFolder } from "@client/app/store"
 import { SEPARATOR } from "@client/context-menu/constants"
+import { FolderContextMenu } from "@client/app/context-menu"
 
 import FileOrFolder from "@client/app/components/file-explorer/file-or-folder"
 
@@ -40,64 +41,42 @@ export default function Directory({ item }: Props) {
   const { showCreateFileModal, CreateFileModal } = useCreateFileModal({ parent: item })
   const { showCreateFolderModal, CreateFolderModal } = useCreateFolderModal({ parent: item })
 
+  // TODO: Move CreateModal and RenameModal handling to store
   const { showContextMenu, ContextMenu } = useContextMenu({
     children: [
       {
-        title: "app.file.rename",
+        title: "@app/rename",
         icon: "BsPencilSquare",
-        action: showRenameModal,
+        action: () => showRenameModal(),
       },
       {
-        title: "app.file.duplicate",
-        icon: "BsFiles",
-        action: () => console.log("TODO"),
-      },
-      SEPARATOR,
-      {
-        title: "app.folder.create-file",
+        title: "@app/create-file",
         icon: "BsFilePlus",
-        action: showCreateFileModal,
-        accelerator: "CommandOrControl+N",
+        action: () => showCreateFileModal(),
+        accelerator: "ctrl+n",
       },
       {
-        title: "app.folder.create-folder",
+        title: "@app/create-folder",
         icon: "BsFolderPlus",
-        action: showCreateFolderModal,
-        accelerator: "CommandOrControl+Shift+N",
+        action: () => showCreateFolderModal(),
+        accelerator: "ctrl+shift+n",
       },
-      SEPARATOR,
       {
-        title: "app.file.delete",
+        title: "@app/delete",
         icon: "BsTrash",
-        action: () => dispatch(deleteFileOrFolder(item.path)),
+        action: () => {
+          dispatch(deleteFileOrFolder(item.path))
+        },
       },
-      SEPARATOR,
-      {
-        title: "app.file.copy-path",
-        icon: "BsSignpost2",
-        action: () => console.log("TODO"),
-        accelerator: "CommandOrControl+Alt+C",
-      },
-      {
-        title: "app.file.copy-relative-path",
-        icon: "BsSignpost",
-        action: () => console.log("TODO"),
-        accelerator: "CommandOrControl+Shift+Alt+C",
-      },
-      {
-        title: "app.file.reveal-in-files",
-        icon: "BsFolderCheck",
-        action: () => console.log("TODO"),
-      },
-    ],
+    ].concat(FolderContextMenu as any[]) as any[],
   })
 
   return (
-    <div onContextMenu={showContextMenu}>
+    <div onContextMenu={(e) => showContextMenu(e, item)}>
       <div
         className="flex items-center space-x-2 py-1 px-2 cursor-pointer rounded-md hover-passive"
         onClick={handleChevronClick}
-        onContextMenu={showContextMenu}
+        onContextMenu={(e) => showContextMenu(e, item)}
       >
         <ChevronIcon className="shrink-0" />
         <FolderIcon className="shrink-0" />

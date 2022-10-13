@@ -1,8 +1,8 @@
 import type { Nullable } from "@core/types"
 import type { LocalSettings, OrdoFile, OrdoFolder, UserSettings } from "@core/app/types"
 import type { RootNode } from "@core/editor/types"
-import debounce from "lodash/debounce"
 
+import debounce from "lodash/debounce"
 import {
   createSlice,
   PayloadAction,
@@ -87,7 +87,7 @@ const saveFileHandler: AsyncThunkPayloadCreator<void | undefined, TSaveFileParam
   dispatch(setIsLoading(false))
 }
 
-const debounceSaveFileHandler = debounce(saveFileHandler, 2000, { trailing: true, leading: false })
+const debounceSaveFileHandler = debounce(saveFileHandler, 200, { trailing: true, leading: false })
 
 export const saveFile = createAsyncThunk("@app/saveFile", debounceSaveFileHandler)
 

@@ -1,19 +1,25 @@
-import type { TMenuItem } from "@client/context-menu/types"
+import type { OrdoFile, OrdoFolder } from "@core/app/types"
+import type { Nullable, OrdoCommand } from "@core/types"
 
 import React, { MouseEvent } from "react"
 import { useTranslation } from "react-i18next"
+import { identity } from "ramda"
 
 import { useIcon } from "@client/use-icon"
+import { useAppDispatch, useAppSelector } from "@client/state"
 
 import Accelerator from "@client/context-menu/components/accelerator"
 
-type TProps = {
-  item: TMenuItem
+type Props = {
+  item: OrdoCommand<string>
+  target: Nullable<OrdoFile | OrdoFolder>
   hideContextMenu: (event: MouseEvent) => void
 }
 
-export default function MenuItem({ item, hideContextMenu }: TProps) {
+export default function MenuItem({ item, hideContextMenu, target }: Props) {
+  const state = useAppSelector(identity)
   const Icon = useIcon(item.icon)
+  const dispatch = useAppDispatch()
   const { t } = useTranslation()
 
   const title = t(item.title)
@@ -21,12 +27,10 @@ export default function MenuItem({ item, hideContextMenu }: TProps) {
   const onClick = (event: MouseEvent) => {
     hideContextMenu(event)
 
-    if (item.action) item.action()
+    if (item.action) item.action(state, { dispatch, target })
   }
 
-  return item.title === "separator" ? (
-    <hr className="border-t border-neutral-300 dark:border-neutral-500" />
-  ) : (
+  return (
     <div
       className="hover-passive px-4 py-1 text-sm flex items-center justify-between"
       onClick={onClick}

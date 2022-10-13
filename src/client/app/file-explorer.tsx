@@ -1,12 +1,13 @@
 import React from "react"
+import { useHotkeys } from "react-hotkeys-hook"
 
 import { useAppSelector } from "@client/state"
-import Either from "@core/utils/either"
-import Null from "@client/null"
-import FileOrFolder from "./components/file-explorer/file-or-folder"
 import { useContextMenu } from "@client/context-menu"
-import { useCreateFileModal, useCreateFolderModal } from "./hooks/use-create-modal"
-import { useHotkeys } from "react-hotkeys-hook"
+import { useCreateFileModal, useCreateFolderModal } from "@client/app/hooks/use-create-modal"
+import Either from "@core/utils/either"
+
+import FileOrFolder from "@client/app/components/file-explorer/file-or-folder"
+import Null from "@client/null"
 
 export default function FileExplorer() {
   const root = useAppSelector((state) => state.app.personalDirectory)
@@ -14,40 +15,24 @@ export default function FileExplorer() {
   const { showCreateFileModal, CreateFileModal } = useCreateFileModal({ parent: root })
   const { showCreateFolderModal, CreateFolderModal } = useCreateFolderModal({ parent: root })
 
+  // TODO: Register hotkeys from commands
   useHotkeys("ctrl+n", () => showCreateFileModal())
   useHotkeys("ctrl+shift+n", () => showCreateFolderModal())
 
+  // TODO: Extract to CreateCommandExtension
   const { showContextMenu, ContextMenu } = useContextMenu({
     children: [
       {
-        title: "app.folder.create-file",
+        title: "@app/create-file",
         icon: "BsFilePlus",
-        action: showCreateFileModal,
-        accelerator: "CommandOrControl+N",
+        action: () => showCreateFileModal(),
+        accelerator: "ctrl+n",
       },
       {
-        title: "app.folder.create-folder",
+        title: "@app/create-folder",
         icon: "BsFolderPlus",
-        action: showCreateFolderModal,
-        accelerator: "CommandOrControl+Shift+N",
-      },
-      { title: "separator" },
-      {
-        title: "app.file.copy-path",
-        icon: "BsSignpost2",
-        action: () => console.log("TODO"),
-        accelerator: "CommandOrControl+Alt+C",
-      },
-      {
-        title: "app.file.copy-relative-path",
-        icon: "BsSignpost",
-        action: () => console.log("TODO"),
-        accelerator: "CommandOrControl+Shift+Alt+C",
-      },
-      {
-        title: "app.file.reveal-in-files",
-        icon: "BsFolderCheck",
-        action: () => console.log("TODO"),
+        action: () => showCreateFolderModal(),
+        accelerator: "ctrl+shift+n",
       },
     ],
   })
@@ -55,7 +40,7 @@ export default function FileExplorer() {
   return Either.fromNullable(root)
     .chain((folder) => Either.fromNullable(folder.children))
     .fold(Null, (items) => (
-      <div className="h-full" onContextMenu={showContextMenu}>
+      <div className="h-full" onContextMenu={(e) => showContextMenu(e, root!)}>
         {items.map((item) => (
           <FileOrFolder key={item.path} item={item} />
         ))}

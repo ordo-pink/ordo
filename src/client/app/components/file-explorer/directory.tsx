@@ -21,7 +21,7 @@ type Props = {
 export default function Directory({ item }: Props) {
   const dispatch = useAppDispatch()
 
-  const commands = useAppSelector((state) => state.app.commands)
+  const commands = useAppSelector((state) => state.commandPalette.commands)
 
   const hasChildren = item.children.length > 0
 

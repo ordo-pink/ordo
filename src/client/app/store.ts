@@ -11,7 +11,6 @@ import {
 } from "@reduxjs/toolkit"
 
 export type AppState = {
-  commands: OrdoCommand<string>[]
   userSettings: UserSettings
   localSettings: LocalSettings
   personalDirectory: Nullable<OrdoDirectory>
@@ -23,7 +22,6 @@ export type AppState = {
 }
 
 const initialState: AppState = {
-  commands: [],
   userSettings: {} as UserSettings,
   localSettings: {} as LocalSettings,
   personalDirectory: null,
@@ -140,9 +138,6 @@ export const appSlice = createSlice({
     setIsLoading: (state: AppState, action: PayloadAction<boolean>) => {
       state.isLoading = action.payload
     },
-    addCommand: (state: AppState, action: PayloadAction<OrdoCommand<string>>) => {
-      state.commands.push(action.payload)
-    },
   },
   extraReducers: (builder) => {
     builder
@@ -191,7 +186,6 @@ export const {
   enableSideBar,
   disableSideBar,
   setIsLoading,
-  addCommand,
 } = appSlice.actions
 
 export default appSlice.reducer

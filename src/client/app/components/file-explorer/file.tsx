@@ -19,7 +19,7 @@ type Props = {
 
 export default function File({ item }: Props) {
   const dispatch = useAppDispatch()
-  const commands = useAppSelector((state) => state.app.commands)
+  const commands = useAppSelector((state) => state.commandPalette.commands)
 
   const currentFile = useAppSelector((state) => state.app.currentFile)
   const { showRenameModal, RenameModal } = useRenameModal(item)

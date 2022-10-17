@@ -6,7 +6,6 @@ import { SPLIT_SNAP_OFFSET, SPLIT_MIN_SIZE } from "@client/app/constants"
 import { useAppDispatch, useAppSelector } from "@client/state"
 import { selectActivity } from "@client/activity-bar/store"
 import {
-  addCommand,
   getLocalSettings,
   getUserSettings,
   listDirectory,
@@ -20,7 +19,8 @@ import i18next from "@client/i18n"
 import ActivityBar from "@client/activity-bar"
 import SideBar from "@client/side-bar"
 import Workspace from "@client/workspace"
-import { useCommandPaletteModal } from "@client/command-palette"
+import CommandPalette from "@client/command-palette"
+import { showCommandPalette, addCommand } from "@client/command-palette/store"
 
 export default function App() {
   const dispatch = useAppDispatch()
@@ -30,8 +30,6 @@ export default function App() {
   const project = useAppSelector((state) => state.app.userSettings?.["project.personal.directory"])
   const sideBarWidth = useAppSelector((state) => state.app.sideBarWidth)
   const isSideBarAvailable = useAppSelector((state) => state.app.isSideBarAvailable)
-
-  const { showCommandPalette, CommandPalette } = useCommandPaletteModal()
 
   const [isLeftCollapsed, setIsLeftCollapsed] = useState(false)
   const [isRightCollapsed, setIsRightCollapsed] = useState(false)
@@ -53,7 +51,7 @@ export default function App() {
   useHotkeys("ctrl+e", () => void dispatch(selectActivity("editor")))
   useHotkeys("ctrl+,", () => void dispatch(selectActivity("settings")))
   useHotkeys("alt+n", () => void dispatch(selectActivity("notifications")))
-  useHotkeys("ctrl+shift+p", () => void showCommandPalette())
+  useHotkeys("ctrl+shift+p", () => void dispatch(showCommandPalette()))
 
   useLayoutEffect(() => {
     const body = document.querySelector(":root") as HTMLElement

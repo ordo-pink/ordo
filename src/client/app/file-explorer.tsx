@@ -13,7 +13,7 @@ import { OrdoCommand } from "@core/types"
 
 export default function FileExplorer() {
   const parent = useAppSelector((state) => state.app.personalDirectory)
-  const commands = useAppSelector((state) => state.app.commands)
+  const commands = useAppSelector((state) => state.commandPalette.commands)
 
   const { showCreateFileModal, CreateFileModal } = useCreateFileModal({ parent })
   const { showCreateDirectoryModal, CreateDirectoryModal } = useCreateDirectoryModal({

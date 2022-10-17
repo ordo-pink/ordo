@@ -1,6 +1,7 @@
 {
   "settings.activity.title": "Настройки",
   "notifications.activity.title": "Уведомления",
+  "app.command-palette.placeholder": "Поиск команд по названию",
   "app.appearance.theme.title": "Тема оформления",
   "app.appearance.theme.description": "Темнота - друг молодёжи.",
   "app.appearance.language.title": "Язык",
@@ -19,14 +20,14 @@
   "app.modal.create.file.title": "Создать файл",
   "app.modal.create.file.hint": "Жми Enter, чтобы применить изменения, или Escape, чтобы отменить.",
   "app.modal.create.file.placeholder": "папка/файл",
-  "app.modal.create.folder.title": "Создать папку",
-  "app.modal.create.folder.hint": "Жми Enter, чтобы применить изменения, или Escape, чтобы отменить.",
-  "app.modal.create.folder.placeholder": "папка/подпапка/.../",
+  "app.modal.create.directory.title": "Создать папку",
+  "app.modal.create.directory.hint": "Жми Enter, чтобы применить изменения, или Escape, чтобы отменить.",
+  "app.modal.create.directory.placeholder": "папка/подпапка/.../",
   "app.system": "Системная",
   "app.light": "Светлая",
   "app.dark": "Тёмная",
   "@app/delete": "Удалить",
   "@app/rename": "Переименовать",
   "@app/create-file": "Создать файл",
-  "@app/create-folder": "Создать папку"
+  "@app/create-directory": "Создать папку"
 }

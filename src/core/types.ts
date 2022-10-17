@@ -3,7 +3,7 @@ import { store } from "@client/store"
 import { IconName } from "@client/use-icon"
 import { Slice } from "@reduxjs/toolkit"
 import { FC } from "react"
-import { OrdoFile, OrdoFolder } from "./app/types"
+import { OrdoFile, OrdoDirectory } from "./app/types"
 import { ExtensionContextMenuLocation } from "./constants"
 import { RootNode } from "./editor/types"
 import { Language } from "./locales"
@@ -68,7 +68,7 @@ export type OrdoParserExtension<Name extends string> = OrdoExtension<Name, "pars
 }
 
 export type ActionArgs = {
-  target: Nullable<OrdoFile | OrdoFolder>
+  target: Nullable<OrdoFile | OrdoDirectory>
   dispatch: ReturnType<typeof useAppDispatch>
 }
 

@@ -6,14 +6,13 @@ import { SPLIT_SNAP_OFFSET, SPLIT_MIN_SIZE } from "@client/app/constants"
 import { useAppDispatch, useAppSelector } from "@client/state"
 import { selectActivity } from "@client/activity-bar/store"
 import {
+  addCommand,
   getLocalSettings,
   getUserSettings,
-  listFolder,
+  listDirectory,
   setSideBarWidth,
   toggleSideBar,
 } from "@client/app/store"
-import { ExtensionContextMenuLocation } from "@core/constants"
-import { FileContextMenu, FolderContextMenu } from "@client/app/context-menu"
 import { Extensions } from "@extensions/index"
 import Switch from "@core/utils/switch"
 import i18next from "@client/i18n"
@@ -21,6 +20,7 @@ import i18next from "@client/i18n"
 import ActivityBar from "@client/activity-bar"
 import SideBar from "@client/side-bar"
 import Workspace from "@client/workspace"
+import { useCommandPaletteModal } from "@client/command-palette"
 
 export default function App() {
   const dispatch = useAppDispatch()
@@ -31,25 +31,20 @@ export default function App() {
   const sideBarWidth = useAppSelector((state) => state.app.sideBarWidth)
   const isSideBarAvailable = useAppSelector((state) => state.app.isSideBarAvailable)
 
+  const { showCommandPalette, CommandPalette } = useCommandPaletteModal()
+
   const [isLeftCollapsed, setIsLeftCollapsed] = useState(false)
   const [isRightCollapsed, setIsRightCollapsed] = useState(false)
   const [sizes, setSizes] = useState<[number, number]>([sideBarWidth, 100 - sideBarWidth])
 
-  // TODO: Move to store
   useEffect(() => {
     Extensions.map(({ commands, translations }) => {
       Object.keys(translations).forEach((lng) => {
-        i18next.addResourceBundle(lng, "translation", (translations as any)[lng])
+        i18next.addResourceBundle(lng, "translation", (translations as Record<string, string>)[lng])
       })
+
       commands.forEach((command) => {
-        if (command.showInContextMenu === ExtensionContextMenuLocation.FILE) {
-          FileContextMenu.push(command)
-        } else if (command.showInContextMenu === ExtensionContextMenuLocation.FOLDER) {
-          FolderContextMenu.push(command)
-        } else if (command.showInContextMenu === ExtensionContextMenuLocation.FILE_OR_FOLDER) {
-          FileContextMenu.push(command)
-          FolderContextMenu.push(command)
-        }
+        if (command.showInCommandPalette) dispatch(addCommand(command))
       })
     })
   }, [])
@@ -58,6 +53,7 @@ export default function App() {
   useHotkeys("ctrl+e", () => void dispatch(selectActivity("editor")))
   useHotkeys("ctrl+,", () => void dispatch(selectActivity("settings")))
   useHotkeys("alt+n", () => void dispatch(selectActivity("notifications")))
+  useHotkeys("ctrl+shift+p", () => void showCommandPalette())
 
   useLayoutEffect(() => {
     const body = document.querySelector(":root") as HTMLElement
@@ -84,7 +80,7 @@ export default function App() {
     }
   }, [sideBarWidth])
 
-  useEffect(() => void (project && dispatch(listFolder(project))), [project])
+  useEffect(() => void (project && dispatch(listDirectory(project))), [project])
   useEffect(() => void i18next.changeLanguage(language), [language])
   useEffect(() => {
     if (!isSideBarAvailable) {
@@ -146,13 +142,14 @@ export default function App() {
           </SplitView>
         ) : (
           <div className="fixed top-0 left-10 right-0 bottom-0 flex grow">
-            <div className="h-full w-[10.5px] bg-neutral-200 dark:bg-neutral-900"></div>
-            <div className={`overflow-y-scroll h-full ${isRightCollapsed && "hidden"}`}>
+            <div className="h-full w-4 bg-neutral-200 dark:bg-neutral-900"></div>
+            <div className="overflow-y-scroll h-full">
               <Workspace />
             </div>
           </div>
         )}
       </div>
+      <CommandPalette />
     </div>
   )
 }

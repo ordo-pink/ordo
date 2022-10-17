@@ -1,41 +1,41 @@
-import type { OrdoFolder } from "@core/app/types"
+import type { OrdoDirectory } from "@core/app/types"
 
 import { promises, existsSync } from "fs"
 import { join } from "path"
 
 import { Color } from "@core/colors"
-import { createOrdoFolder } from "@main/app/create-ordo-folder"
+import { createOrdoDirectory } from "@main/app/create-ordo-directory"
 import { createOrdoFile } from "@main/app/create-ordo-file"
-import { sortOrdoFolder } from "@main/app/sort-ordo-folder"
+import { sortOrdoDirectory } from "@main/app/sort-ordo-directory"
 import { ORDO_METADATA_EXTENSION, ORDO_FILE_EXTENSION } from "@core/app/constants"
 
-export const handleListFolder = async (
+export const handleListDirectory = async (
   path: string,
   depth = 0,
   rootPath = path
-): Promise<OrdoFolder> => {
+): Promise<OrdoDirectory> => {
   // Check if provided path exists
   if (!existsSync(path)) {
-    throw new Error("app.error.list-folder.path-does-not-exist")
+    throw new Error("app.error.list-directory.path-does-not-exist")
   }
 
   const stat = await promises.stat(path)
 
-  // Check if provided path is a folder
+  // Check if provided path is a directory
   if (!stat.isDirectory()) {
-    throw new Error("app.error.list-folder.not-a-folder")
+    throw new Error("app.error.list-directory.not-a-directory")
   }
 
-  // Get the list of files inside the folder
-  const folder = await promises.readdir(path, {
+  // Get the list of files inside the directory
+  const directory = await promises.readdir(path, {
     withFileTypes: true,
     encoding: "utf8",
   })
 
   const relativePath = path.replace(rootPath, "")
 
-  // Create a tree structure for the folder
-  const ordoFolder = createOrdoFolder({
+  // Create a tree structure for the directory
+  const ordoDirectory = createOrdoDirectory({
     depth,
     path,
     relativePath,
@@ -44,11 +44,11 @@ export const handleListFolder = async (
     accessedAt: stat.atime,
   })
 
-  for (const item of folder) {
+  for (const item of directory) {
     const itemPath = join(path, item.name)
 
     if (item.isDirectory()) {
-      ordoFolder.children.push(await handleListFolder(itemPath, depth + 1, rootPath))
+      ordoDirectory.children.push(await handleListDirectory(itemPath, depth + 1, rootPath))
     } else if (item.isFile()) {
       const isMetadataFile = item.name.endsWith(ORDO_METADATA_EXTENSION)
 
@@ -88,9 +88,9 @@ export const handleListFolder = async (
         }
       }
 
-      ordoFolder.children.push(ordoFile)
+      ordoDirectory.children.push(ordoFile)
     }
   }
 
-  return sortOrdoFolder(ordoFolder)
+  return sortOrdoDirectory(ordoDirectory)
 }

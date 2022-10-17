@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit"
-import { OrdoFolder } from "@core/app/types"
+import { OrdoDirectory } from "@core/app/types"
 import { collectTags } from "./collect-tags"
 import { TagObject } from "./types"
 
@@ -19,7 +19,7 @@ export const tagsSlice = createSlice({
   name: "@activity-bar",
   initialState,
   reducers: {
-    getTags: (state: TagsState, action: PayloadAction<OrdoFolder>) => {
+    getTags: (state: TagsState, action: PayloadAction<OrdoDirectory>) => {
       state.tags = collectTags(action.payload)
     },
     setHoveredTag: (state: TagsState, action: PayloadAction<string>) => {

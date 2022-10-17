@@ -1,100 +1,112 @@
-import type { OrdoFolder } from "@core/app/types"
+import type { OrdoDirectory } from "@core/app/types"
 
-import React, { useState } from "react"
+import React, { MouseEvent, useState } from "react"
 
-import { useCreateFileModal, useCreateFolderModal } from "@client/app/hooks/use-create-modal"
+import { useCreateFileModal, useCreateDirectoryModal } from "@client/app/hooks/use-create-modal"
+import { useAppDispatch, useAppSelector } from "@client/state"
 import { useRenameModal } from "@client/app/hooks/use-rename-modal"
 import { useContextMenu } from "@client/context-menu"
-import { useAppDispatch } from "@client/state"
 import { useIcon } from "@client/use-icon"
-import { deleteFileOrFolder } from "@client/app/store"
-import { SEPARATOR } from "@client/context-menu/constants"
-import { FolderContextMenu } from "@client/app/context-menu"
+import { deleteFileOrDirectory } from "@client/app/store"
 
-import FileOrFolder from "@client/app/components/file-explorer/file-or-folder"
+import FileOrDirectory from "@client/app/components/file-explorer/file-or-directory"
+import ActionListItem from "@client/common/action-list-item"
+import { OrdoCommand } from "@core/types"
+import { ExtensionContextMenuLocation } from "@core/constants"
 
 type Props = {
-  item: OrdoFolder
+  item: OrdoDirectory
 }
 
 export default function Directory({ item }: Props) {
   const dispatch = useAppDispatch()
 
+  const commands = useAppSelector((state) => state.app.commands)
+
   const hasChildren = item.children.length > 0
 
-  const ChevronDown = useIcon("BsChevronDown")
-  const ChevronRight = useIcon("BsChevronRight")
-  const OpenFolder = useIcon(hasChildren ? "AiFillFolderOpen" : "AiOutlineFolderOpen")
-  const ClosedFolder = useIcon(hasChildren ? "AiFillFolder" : "AiOutlineFolder")
+  const ChevronDown = useIcon("HiOutlineChevronDown")
+  const ChevronUp = useIcon("HiOutlineChevronUp")
+  const openIcon = hasChildren ? "AiFillFolderOpen" : "AiOutlineFolderOpen"
+  const closedIcon = hasChildren ? "AiFillFolder" : "AiOutlineFolder"
 
   const [isExpanded, setIsExpanded] = useState(false)
 
-  const ChevronIcon = isExpanded ? ChevronDown : ChevronRight
-  const FolderIcon = isExpanded ? OpenFolder : ClosedFolder
+  const ChevronIcon = isExpanded ? ChevronDown : ChevronUp
+  const icon = isExpanded ? openIcon : closedIcon
 
-  // This increases padding. The deeper the folder, the righter it goes
-  const paddingLeft = `${(item.depth + 5) * 2}px`
+  // This increases padding. The deeper the directory, the righter it goes
+  const paddingLeft = `${item.depth * 10}px`
 
-  const handleChevronClick = () => setIsExpanded((value) => !value)
+  const handleClick = () => setIsExpanded((value) => !value)
 
   const { showRenameModal, RenameModal } = useRenameModal(item)
   const { showCreateFileModal, CreateFileModal } = useCreateFileModal({ parent: item })
-  const { showCreateFolderModal, CreateFolderModal } = useCreateFolderModal({ parent: item })
-
-  // TODO: Move CreateModal and RenameModal handling to store
-  const { showContextMenu, ContextMenu } = useContextMenu({
-    children: [
-      {
-        title: "@app/rename",
-        icon: "BsPencilSquare",
-        action: () => showRenameModal(),
-      },
-      {
-        title: "@app/create-file",
-        icon: "BsFilePlus",
-        action: () => showCreateFileModal(),
-        accelerator: "ctrl+n",
-      },
-      {
-        title: "@app/create-folder",
-        icon: "BsFolderPlus",
-        action: () => showCreateFolderModal(),
-        accelerator: "ctrl+shift+n",
-      },
-      {
-        title: "@app/delete",
-        icon: "BsTrash",
-        action: () => {
-          dispatch(deleteFileOrFolder(item.path))
-        },
-      },
-    ].concat(FolderContextMenu as any[]) as any[],
+  const { showCreateDirectoryModal, CreateDirectoryModal } = useCreateDirectoryModal({
+    parent: item,
   })
 
+  const children: OrdoCommand<string>[] = [
+    {
+      title: "@app/rename",
+      icon: "BsPencilSquare",
+      action: () => showRenameModal(),
+    },
+    {
+      title: "@app/create-file",
+      icon: "BsFilePlus",
+      action: () => showCreateFileModal(),
+      accelerator: "ctrl+n",
+    },
+    {
+      title: "@app/create-directory",
+      icon: "BsFolderPlus",
+      action: () => showCreateDirectoryModal(),
+      accelerator: "ctrl+shift+n",
+    },
+    {
+      title: "@app/delete",
+      icon: "BsTrash",
+      action: () => {
+        dispatch(deleteFileOrDirectory(item.path))
+      },
+    },
+    ...commands.filter(
+      (command) =>
+        command.showInContextMenu === ExtensionContextMenuLocation.DIRECTORY ||
+        command.showInContextMenu === ExtensionContextMenuLocation.FILE_OR_DIRECTORY
+    ),
+  ]
+
+  // TODO: Move CreateModal and RenameModal handling to store
+  const { showContextMenu, ContextMenu } = useContextMenu({ children })
+
+  const handleContextMenu = (event: MouseEvent) => showContextMenu(event, item)
+
   return (
-    <div onContextMenu={(e) => showContextMenu(e, item)}>
-      <div
-        className="flex items-center space-x-2 py-1 px-2 cursor-pointer rounded-md hover-passive"
-        onClick={handleChevronClick}
-        onContextMenu={(e) => showContextMenu(e, item)}
+    <>
+      <ActionListItem
+        style={{ paddingLeft }}
+        text={item.readableName}
+        icon={icon}
+        onClick={handleClick}
+        onContextMenu={handleContextMenu}
+        isCurrent={false}
       >
         <ChevronIcon className="shrink-0" />
-        <FolderIcon className="shrink-0" />
-        <div className="truncate text-sm">{item.readableName}</div>
-      </div>
-      <div style={{ paddingLeft }}>
         {isExpanded && (
           <div>
             {item.children.map((item) => (
-              <FileOrFolder key={item.path} item={item} />
+              <FileOrDirectory key={item.path} item={item} />
             ))}
           </div>
         )}
-      </div>
+      </ActionListItem>
+
       <ContextMenu />
       <RenameModal />
       <CreateFileModal />
-      <CreateFolderModal />
-    </div>
+      <CreateDirectoryModal />
+    </>
   )
 }

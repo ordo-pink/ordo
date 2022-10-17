@@ -3,50 +3,58 @@ import { useHotkeys } from "react-hotkeys-hook"
 
 import { useAppSelector } from "@client/state"
 import { useContextMenu } from "@client/context-menu"
-import { useCreateFileModal, useCreateFolderModal } from "@client/app/hooks/use-create-modal"
+import { useCreateFileModal, useCreateDirectoryModal } from "@client/app/hooks/use-create-modal"
 import Either from "@core/utils/either"
 
-import FileOrFolder from "@client/app/components/file-explorer/file-or-folder"
+import FileOrDirectory from "@client/app/components/file-explorer/file-or-directory"
 import Null from "@client/null"
+import { ExtensionContextMenuLocation } from "@core/constants"
+import { OrdoCommand } from "@core/types"
 
 export default function FileExplorer() {
-  const root = useAppSelector((state) => state.app.personalDirectory)
+  const parent = useAppSelector((state) => state.app.personalDirectory)
+  const commands = useAppSelector((state) => state.app.commands)
 
-  const { showCreateFileModal, CreateFileModal } = useCreateFileModal({ parent: root })
-  const { showCreateFolderModal, CreateFolderModal } = useCreateFolderModal({ parent: root })
+  const { showCreateFileModal, CreateFileModal } = useCreateFileModal({ parent })
+  const { showCreateDirectoryModal, CreateDirectoryModal } = useCreateDirectoryModal({
+    parent,
+  })
 
   // TODO: Register hotkeys from commands
   useHotkeys("ctrl+n", () => showCreateFileModal())
-  useHotkeys("ctrl+shift+n", () => showCreateFolderModal())
+  useHotkeys("ctrl+shift+n", () => showCreateDirectoryModal())
+
+  const children: OrdoCommand<string>[] = [
+    {
+      title: "@app/create-file",
+      icon: "BsFilePlus",
+      action: () => showCreateFileModal(),
+      accelerator: "ctrl+n",
+    },
+    {
+      title: "@app/create-directory",
+      icon: "BsFolderPlus",
+      action: () => showCreateDirectoryModal(),
+      accelerator: "ctrl+shift+n",
+    },
+    ...commands.filter(
+      (command) =>
+        command.showInContextMenu === ExtensionContextMenuLocation.DIRECTORY ||
+        command.showInContextMenu === ExtensionContextMenuLocation.FILE_OR_DIRECTORY
+    ),
+  ]
 
   // TODO: Extract to CreateCommandExtension
-  const { showContextMenu, ContextMenu } = useContextMenu({
-    children: [
-      {
-        title: "@app/create-file",
-        icon: "BsFilePlus",
-        action: () => showCreateFileModal(),
-        accelerator: "ctrl+n",
-      },
-      {
-        title: "@app/create-folder",
-        icon: "BsFolderPlus",
-        action: () => showCreateFolderModal(),
-        accelerator: "ctrl+shift+n",
-      },
-    ],
-  })
+  const { showContextMenu, ContextMenu } = useContextMenu({ children })
 
-  return Either.fromNullable(root)
-    .chain((folder) => Either.fromNullable(folder.children))
-    .fold(Null, (items) => (
-      <div className="h-full" onContextMenu={(e) => showContextMenu(e, root!)}>
-        {items.map((item) => (
-          <FileOrFolder key={item.path} item={item} />
-        ))}
-        <ContextMenu />
-        <CreateFileModal />
-        <CreateFolderModal />
-      </div>
-    ))
+  return Either.fromNullable(parent).fold(Null, (directory) => (
+    <div className="h-full" onContextMenu={(e) => showContextMenu(e, directory)}>
+      {directory.children.map((item) => (
+        <FileOrDirectory key={item.path} item={item} />
+      ))}
+      <ContextMenu />
+      <CreateFileModal />
+      <CreateDirectoryModal />
+    </div>
+  ))
 }

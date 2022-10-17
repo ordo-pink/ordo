@@ -1,10 +1,10 @@
-import type { OrdoFile, OrdoFolder } from "@core/app/types"
+import type { OrdoFile, OrdoDirectory } from "@core/app/types"
 
-import { isFolder } from "@core/app/is-folder"
+import { isDirectory } from "@core/app/is-directory"
 
 import Directory from "@client/app/components/file-explorer/directory"
 import File from "@client/app/components/file-explorer/file"
 
-export const useFileExplorerComponent = (item: OrdoFile | OrdoFolder) => {
-  return isFolder(item) ? Directory : File
+export const useFileExplorerComponent = (item: OrdoFile | OrdoDirectory) => {
+  return isDirectory(item) ? Directory : File
 }

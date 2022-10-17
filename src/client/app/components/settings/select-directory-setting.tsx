@@ -10,14 +10,14 @@ import { selectPersonalProjectDirectory } from "@client/app/store"
 /**
  * Input for string settings.
  */
-export default function SelectFolderSetting({
+export default function SelectDirectorySetting({
   value,
 }: SettingsItemProps<"project.personal.directory">) {
   const dispatch = useAppDispatch()
 
   const { t } = useTranslation()
 
-  const FolderIcon = useIcon("BsFolder2Open")
+  const Icon = useIcon("BsFolder2Open")
 
   const handleClick = (event: MouseEvent<HTMLButtonElement>) => {
     event.preventDefault()
@@ -34,7 +34,7 @@ export default function SelectFolderSetting({
         onClick={handleClick}
         className="bg-neutral-200 ring-neutral-500 dark:bg-neutral-700 p-4 border border-neutral-300 dark:border-neutral-900"
       >
-        <FolderIcon />
+        <Icon />
       </button>
     </div>
   )

@@ -1,16 +1,16 @@
-import type { OrdoFile, OrdoFolder } from "@core/app/types"
+import type { OrdoFile, OrdoDirectory } from "@core/app/types"
 import type { Nullable } from "@core/types"
 
 import React, { useState, MouseEvent } from "react"
 import { useTranslation } from "react-i18next"
 
-import { renameFileOrFolder } from "@client/app/store"
+import { renameFileOrDirectory } from "@client/app/store"
 import { useAppDispatch } from "@client/state"
 import { useModalWindow } from "@client/modal"
 
 import Null from "@client/null"
 
-export const useRenameModal = (item: Nullable<OrdoFile | OrdoFolder>) => {
+export const useRenameModal = (item: Nullable<OrdoFile | OrdoDirectory>) => {
   const { showModal, hideModal, Modal } = useModalWindow()
 
   if (!item) {
@@ -33,7 +33,7 @@ export const useRenameModal = (item: Nullable<OrdoFile | OrdoFolder>) => {
 }
 
 type Props = {
-  item: OrdoFile | OrdoFolder
+  item: OrdoFile | OrdoDirectory
   hideModal: (event?: MouseEvent) => void
 }
 
@@ -61,7 +61,7 @@ const RenameModal = ({ item, hideModal }: Props) => {
             if (e.key === "Enter") {
               const oldPath = item.path
               const newPath = item.path.replace(item.readableName, newName)
-              dispatch(renameFileOrFolder({ oldPath, newPath }))
+              dispatch(renameFileOrDirectory({ oldPath, newPath }))
               hideModal()
             }
           }}

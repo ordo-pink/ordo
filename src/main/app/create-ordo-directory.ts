@@ -1,4 +1,4 @@
-import type { OrdoFile, OrdoFolder, OrdoPath, OrdoRelativePath } from "@core/app/types"
+import type { OrdoFile, OrdoDirectory, OrdoPath, OrdoRelativePath } from "@core/app/types"
 
 import { sep } from "path"
 import { slice, lastIndexOf, pipe, add } from "ramda"
@@ -17,7 +17,7 @@ type Props = {
 const removeLastSeparator = slice(0, -1)
 const getLastSeparatorPosition = pipe(lastIndexOf(sep), add(1))
 
-export const createOrdoFolder = (props: Props): OrdoFolder => {
+export const createOrdoDirectory = (props: Props): OrdoDirectory => {
   const hasSeparatorAtTheEnd = props.path.endsWith(sep)
   const splittablePath = hasSeparatorAtTheEnd ? removeLastSeparator(props.path) : props.path
   const lastSeparatorPosition = getLastSeparatorPosition(splittablePath)
@@ -26,7 +26,7 @@ export const createOrdoFolder = (props: Props): OrdoFolder => {
   return {
     ...props,
     readableName,
-    children: [] as Array<OrdoFile | OrdoFolder>,
+    children: [] as Array<OrdoFile | OrdoDirectory>,
     metadata: {
       color: Color.NEUTRAL,
     },

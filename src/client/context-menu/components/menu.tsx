@@ -1,5 +1,5 @@
 import type { Menu } from "@client/context-menu/types"
-import type { OrdoFile, OrdoFolder } from "@core/app/types"
+import type { OrdoFile, OrdoDirectory } from "@core/app/types"
 import type { Nullable, OrdoCommand } from "@core/types"
 
 import React, { MouseEvent } from "react"
@@ -13,7 +13,7 @@ import Null from "@client/null"
 type Props = {
   structure: Menu
   isShown: boolean
-  target: Nullable<OrdoFile | OrdoFolder>
+  target: Nullable<OrdoFile | OrdoDirectory>
   hideContextMenu: (event: MouseEvent) => void
   x: number
   y: number

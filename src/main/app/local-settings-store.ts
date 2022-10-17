@@ -18,7 +18,7 @@ export default new Store<LocalSettings>({
     "0.1.0": (store) => {
       store.set("app.side-bar.width", 800)
       store.set("app.window.height", 600)
-      store.set("app.file-explorer.expanded-folders", [])
+      store.set("app.file-explorer.expanded-directories", [])
       store.set("app.side-bar.width", 0)
       store.set("app.separator", sep)
     },

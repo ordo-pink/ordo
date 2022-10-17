@@ -1,13 +1,13 @@
-import { isFolder } from "@core/app/is-folder"
-import { OrdoFolder } from "@core/app/types"
+import { isDirectory } from "@core/app/is-directory"
+import { OrdoDirectory } from "@core/app/types"
 import { Nullable } from "@core/types"
 import { TagObject } from "./types"
 
-export const collectTags = (tree: Nullable<OrdoFolder>, tags: TagObject[] = []) => {
+export const collectTags = (tree: Nullable<OrdoDirectory>, tags: TagObject[] = []) => {
   if (!tree) return tags
 
   for (const child of tree.children) {
-    if (isFolder(child)) {
+    if (isDirectory(child)) {
       tags = collectTags(child, tags)
       continue
     }

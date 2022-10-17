@@ -93,9 +93,12 @@ export default function Tags() {
   }, [ref, tags, data])
 
   useEffect(() => {
-    if (!network || !data.nodes.some((node) => node.id === hoveredTag)) return
+    const invalidTagHovered =
+      hoveredTag !== "" && !data.nodes.some((node) => node.id === hoveredTag)
 
-    hoveredTag ? network.selectNodes([hoveredTag]) : network.selectNodes([])
+    if (!network || invalidTagHovered) return
+
+    hoveredTag ? network.selectNodes([hoveredTag]) : network.unselectAll()
   }, [network, hoveredTag])
 
   useEffect(() => {

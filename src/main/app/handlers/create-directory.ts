@@ -2,9 +2,10 @@ import { promises } from "fs"
 
 import localSettingsStore from "../local-settings-store"
 import userSettingsStore from "../user-settings-store"
-import { handleListFolder } from "./list-folder"
+import { handleListDirectory } from "./list-directory"
 
-export const handleCreateFolder = async (path: string) => {
+export const handleCreateDirectory = async (path: string) => {
+  // TODO:BUG: Fix creating nested directories having the same name
   const separator = localSettingsStore.get("app.separator")
   const rootPath = userSettingsStore.get("project.personal.directory")
 
@@ -17,5 +18,5 @@ export const handleCreateFolder = async (path: string) => {
 
   await promises.mkdir(path, { recursive: true })
 
-  return handleListFolder(rootPath)
+  return handleListDirectory(rootPath)
 }

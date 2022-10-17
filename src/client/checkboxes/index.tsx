@@ -1,15 +1,15 @@
 import { disableSideBar } from "@client/app/store"
 import Null from "@client/null"
 import { useAppDispatch, useAppSelector } from "@client/state"
-import { isFolder } from "@core/app/is-folder"
-import { OrdoFolder } from "@core/app/types"
+import { isDirectory } from "@core/app/is-directory"
+import { OrdoDirectory } from "@core/app/types"
 import { Checkbox } from "@core/editor/types"
 import Either from "@core/utils/either"
 import React, { useEffect, useState } from "react"
 
-const collectCheckboxes = (tree: OrdoFolder, checkboxes: Record<string, Checkbox[]> = {}) => {
+const collectCheckboxes = (tree: OrdoDirectory, checkboxes: Record<string, Checkbox[]> = {}) => {
   for (const child of tree.children) {
-    if (isFolder(child)) {
+    if (isDirectory(child)) {
       checkboxes = collectCheckboxes(child, checkboxes)
       continue
     }

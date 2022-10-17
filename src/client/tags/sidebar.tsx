@@ -2,14 +2,10 @@ import React, { useEffect, useState } from "react"
 import { useTranslation } from "react-i18next"
 
 import { useAppDispatch, useAppSelector } from "@client/state"
-import {
-  addSelectedTag,
-  getTags,
-  removeSelectedTag,
-  resetHoveredTag,
-  resetSelectedTags,
-  setHoveredTag,
-} from "@client/tags/store"
+import { getTags, resetHoveredTag, resetSelectedTags } from "@client/tags/store"
+
+import ActionListItem from "@client/common/action-list-item"
+import Tag from "@client/tags/components/tag"
 
 export default function TagsSidebar() {
   const dispatch = useAppDispatch()
@@ -29,46 +25,24 @@ export default function TagsSidebar() {
     if (tree) dispatch(getTags(tree))
   }, [tree])
 
-  const activeClass =
-    "hover:bg-gradient-to-r hover:from-rose-300 hover:dark:from-violet-700 hover:to-purple-300 hover:dark:to-purple-700 bg-gradient-to-r from-rose-300 dark:from-violet-700 to-purple-300 dark:to-purple-700"
   const hasNoSelectedTag = selectedTags.length === 0
 
   return (
     <div>
-      <div
+      <ActionListItem
+        icon="BsTags"
+        text={t("tags.all-tags")}
+        isCurrent={hasNoSelectedTag}
         onMouseEnter={() => dispatch(resetHoveredTag())}
         onClick={() => dispatch(resetSelectedTags())}
-        className={`flex items-center justify-between text-sm px-4 py-1 hover-passive rounded-md cursor-pointer ${
-          hasNoSelectedTag && activeClass
-        }`}
       >
-        <div className="truncate shrink-0">{t("tags.all-tags")}</div>
         <div className="shrink-0 text-xs font-bold font-mono text-neutral-600 dark:text-neutral-400">
           {tagCount}
         </div>
-      </div>
-      {tags.map((tag) => (
-        <div
-          key={tag.name}
-          onMouseEnter={() => dispatch(setHoveredTag(tag.name))}
-          onMouseLeave={() => dispatch(resetHoveredTag())}
-          onClick={() =>
-            dispatch(
-              selectedTags.some((st) => st === tag.name)
-                ? removeSelectedTag(tag.name)
-                : addSelectedTag(tag.name)
-            )
-          }
-          className={`flex items-center justify-between text-sm px-4 py-1 hover-passive rounded-md cursor-pointer ${
-            selectedTags.some((st) => st === tag.name) && activeClass
-          }`}
-        >
-          <div className="truncate shrink-0">{tag.name}</div>
+      </ActionListItem>
 
-          <div className="shrink-0 text-xs font-bold font-mono text-neutral-500 dark:text-neutral-400">
-            {tag.files.length}
-          </div>
-        </div>
+      {tags.map((tag) => (
+        <Tag tag={tag} key={tag.name} />
       ))}
     </div>
   )

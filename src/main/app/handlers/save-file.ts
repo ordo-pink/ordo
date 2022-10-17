@@ -3,7 +3,7 @@ import type { RootNode } from "@core/editor/types"
 import { promises } from "fs"
 
 import { ORDO_FILE_EXTENSION, ORDO_METADATA_EXTENSION } from "@core/app/constants"
-import { handleListFolder } from "@main/app/handlers/list-folder"
+import { handleListDirectory } from "@main/app/handlers/list-directory"
 import userSettingsStore from "@main/app/user-settings-store"
 import { parseMetadata, parseOrdoFile } from "@core/app/parsers/parse-ordo-file"
 
@@ -27,5 +27,5 @@ export const handleSaveFile = async ({ path, raw }: Params) => {
     "utf8"
   )
 
-  return handleListFolder(rootPath)
+  return handleListDirectory(rootPath)
 }

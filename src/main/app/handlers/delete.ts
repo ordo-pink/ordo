@@ -1,7 +1,7 @@
 import { ORDO_FILE_EXTENSION, ORDO_METADATA_EXTENSION } from "@core/app/constants"
 import { shell } from "electron"
 import userSettingsStore from "../user-settings-store"
-import { handleListFolder } from "./list-folder"
+import { handleListDirectory } from "./list-directory"
 import { promises } from "fs"
 
 export const handleDelete = async (path: string) => {
@@ -16,5 +16,5 @@ export const handleDelete = async (path: string) => {
 
   const rootPath = userSettingsStore.get("project.personal.directory")
 
-  return handleListFolder(rootPath)
+  return handleListDirectory(rootPath)
 }

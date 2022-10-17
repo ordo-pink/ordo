@@ -1,11 +1,11 @@
-import type { OrdoFolder } from "@core/app/types"
+import type { OrdoDirectory } from "@core/app/types"
 import type { Nullable } from "@core/types"
 
 import React, { useState, MouseEvent } from "react"
 import { useTranslation } from "react-i18next"
 
 import Either from "@core/utils/either"
-import { createFile, createFolder } from "@client/app/store"
+import { createFile, createDirectory as createDirectory } from "@client/app/store"
 import { useAppDispatch, useAppSelector } from "@client/state"
 import { useModalWindow } from "@client/modal"
 import { useIcon } from "@client/use-icon"
@@ -13,7 +13,7 @@ import { useIcon } from "@client/use-icon"
 import Null from "@client/null"
 
 type Params = {
-  parent: Nullable<OrdoFolder>
+  parent: Nullable<OrdoDirectory>
 }
 
 export const useCreateFileModal = ({ parent }: Params) => {
@@ -30,36 +30,36 @@ export const useCreateFileModal = ({ parent }: Params) => {
   }
 }
 
-export const useCreateFolderModal = ({ parent }: Params) => {
+export const useCreateDirectoryModal = ({ parent }: Params) => {
   const { showModal, hideModal, Modal } = useModalWindow()
 
   return {
-    showCreateFolderModal: showModal,
-    hideCreateFolderModal: hideModal,
-    CreateFolderModal: () => (
+    showCreateDirectoryModal: showModal,
+    hideCreateDirectoryModal: hideModal,
+    CreateDirectoryModal: () => (
       <Modal>
-        <CreateModal parent={parent} hideModal={hideModal} type="folder" />
+        <CreateModal parent={parent} hideModal={hideModal} type="directory" />
       </Modal>
     ),
   }
 }
 
 type Props = {
-  type: "file" | "folder"
+  type: "file" | "directory"
   hideModal: (event?: MouseEvent) => void
-  parent: Nullable<OrdoFolder>
+  parent: Nullable<OrdoDirectory>
 }
 
 const CreateModal = ({ hideModal, type, parent }: Props) => {
   const dispatch = useAppDispatch()
   const { t } = useTranslation()
   const separator = useAppSelector((state) => state.app.localSettings["app.separator"])
-  const create = type === "file" ? createFile : createFolder
+  const create = type === "file" ? createFile : createDirectory
 
   const [newName, setNewName] = useState("")
   const Icon = useIcon(type === "file" ? "BsFilePlus" : "BsFolderPlus")
 
-  return Either.fromNullable(parent).fold(Null, (folder) => (
+  return Either.fromNullable(parent).fold(Null, (directory) => (
     <div className="h-full flex items-center justify-center">
       <div
         onClick={(event) => event.stopPropagation()}
@@ -79,7 +79,7 @@ const CreateModal = ({ hideModal, type, parent }: Props) => {
           onKeyDown={(e) => {
             if (e.key === "Escape") return hideModal()
             if (e.key === "Enter") {
-              dispatch(create(folder.path + separator + newName))
+              dispatch(create(directory.path + separator + newName))
               hideModal()
             }
           }}

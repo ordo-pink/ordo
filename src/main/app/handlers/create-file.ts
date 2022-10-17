@@ -2,7 +2,7 @@ import { ORDO_FILE_EXTENSION, ORDO_METADATA_EXTENSION } from "@core/app/constant
 
 import { promises } from "fs"
 import localSettingsStore from "../local-settings-store"
-import { handleListFolder } from "./list-folder"
+import { handleListDirectory } from "./list-directory"
 import userSettingsStore from "../user-settings-store"
 
 export const handleCreateFile = async (path: string) => {
@@ -24,7 +24,7 @@ export const handleCreateFile = async (path: string) => {
   }
 
   if (path.endsWith(windowsSeparator)) {
-    return handleListFolder(rootPath)
+    return handleListDirectory(rootPath)
   }
 
   const lastDot = path.lastIndexOf(".")
@@ -42,5 +42,5 @@ export const handleCreateFile = async (path: string) => {
     await writeFile()
   }
 
-  return handleListFolder(rootPath)
+  return handleListDirectory(rootPath)
 }

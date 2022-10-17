@@ -1,10 +1,10 @@
 import { OrdoCommandExtension } from "@core/types"
 
-import CopyPathCommandExtension from "@extensions/copy-path"
-import RevealInFilesCommandExtension from "@extensions/reveal-in-files"
-import DuplicateCommandExtension from "@extensions/duplicate"
+import CopyPathCommandExtension from "@extensions/commands/copy-path"
+import RevealInFilesCommandExtension from "@extensions/commands/reveal-in-files"
+import DuplicateCommandExtension from "@extensions/commands/duplicate"
 
-// TODO: Replace this with extension installation
+// TODO: Replace this with actual extension installation (when ready)
 export const Extensions: OrdoCommandExtension<string>[] = [
   CopyPathCommandExtension,
   DuplicateCommandExtension,

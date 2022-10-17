@@ -1,4 +1,4 @@
-import type { Nullable, OrdoCommand } from "@core/types"
+import type { Nullable } from "@core/types"
 import type { LocalSettings, OrdoFile, OrdoDirectory, UserSettings } from "@core/app/types"
 import type { RootNode } from "@core/editor/types"
 

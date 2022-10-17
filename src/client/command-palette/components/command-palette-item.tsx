@@ -1,6 +1,6 @@
 import type { OrdoCommand, UnaryFn } from "@core/types"
 
-import React, { MouseEvent, MouseEventHandler } from "react"
+import React, { MouseEvent } from "react"
 import { useTranslation } from "react-i18next"
 
 import { noOp } from "@core/utils/no-op"

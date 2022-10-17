@@ -1,12 +1,14 @@
+import type { OrdoCommand } from "@core/types"
+
 import React, { useState, MouseEvent, KeyboardEvent, ChangeEvent, useEffect } from "react"
 import { useTranslation } from "react-i18next"
+import { identity } from "ramda"
 import Fuse from "fuse.js"
 
 import { useModalWindow } from "@client/modal"
 import { useAppDispatch, useAppSelector } from "@client/state"
-import { identity } from "ramda"
-import CommandPaletteItem from "./components/command-palette-item"
-import { OrdoCommand } from "@core/types"
+
+import CommandPaletteItem from "@client/command-palette/components/command-palette-item"
 
 /**
  * This is required to let fuse search through translations, not original command keys.
@@ -36,7 +38,6 @@ type Props = {
 const CommandPalette = ({ hideModal }: Props) => {
   const dispatch = useAppDispatch()
 
-  // TODO: Add fuse
   const commands = useAppSelector((state) => state.app.commands)
   const state = useAppSelector(identity)
   const [visibleCommands, setVisibleCommands] = useState(commands)

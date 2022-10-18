@@ -1,3 +1,4 @@
 {
-  "editor.activity.title": "Editor"
+  "editor.activity.title": "Editor",
+  "@editor/open-activity": "Open Editor"
 }

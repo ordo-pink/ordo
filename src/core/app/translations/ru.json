@@ -29,5 +29,10 @@
   "@app/delete": "Удалить",
   "@app/rename": "Переименовать",
   "@app/create-file": "Создать файл",
-  "@app/create-directory": "Создать папку"
+  "@app/create-directory": "Создать папку",
+  "@settings/open-activity": "Открыть Настройки",
+  "@extensions/open-activity": "Открыть Расширения",
+  "@notifications/open-activity": "Открыть Уведомления",
+  "@achievements/open-activity": "Открыть Достижения",
+  "@account/open-activity": "Открыть Аккаунт"
 }

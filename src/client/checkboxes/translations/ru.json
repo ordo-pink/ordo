@@ -1,3 +1,4 @@
 {
-  "checkboxes.activity.title": "Дела"
+  "checkboxes.activity.title": "Дела",
+  "@checkboxes/open-activity": "Открыть Дела"
 }

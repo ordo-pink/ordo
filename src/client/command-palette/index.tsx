@@ -54,7 +54,7 @@ export default function CommandPalette() {
     }))
 
     fuse.setCollection(searchableCommands)
-  }, [commands])
+  }, [commands, t])
 
   useEffect(() => {
     if (inputValue === "") {
@@ -69,7 +69,7 @@ export default function CommandPalette() {
     const fusedCommands = fuse.search(inputValue)
 
     setVisibleCommands(fusedCommands.map(({ item }) => item))
-  }, [inputValue, commands])
+  }, [inputValue, commands, t])
 
   const hide = () => {
     hideModal()

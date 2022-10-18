@@ -2,7 +2,6 @@ import type { OrdoDirectory } from "@core/app/types"
 
 import React, { MouseEvent, useState } from "react"
 
-import { useCreateFileModal, useCreateDirectoryModal } from "@client/app/hooks/use-create-modal"
 import { useAppDispatch, useAppSelector } from "@client/state"
 import { useRenameModal } from "@client/app/hooks/use-rename-modal"
 import { useContextMenu } from "@client/context-menu"
@@ -13,6 +12,7 @@ import FileOrDirectory from "@client/app/components/file-explorer/file-or-direct
 import ActionListItem from "@client/common/action-list-item"
 import { OrdoCommand } from "@core/types"
 import { ExtensionContextMenuLocation } from "@core/constants"
+import { showCreateFileModal, showCreateDirectoryModal } from "@client/create-modal/store"
 
 type Props = {
   item: OrdoDirectory
@@ -41,10 +41,6 @@ export default function Directory({ item }: Props) {
   const handleClick = () => setIsExpanded((value) => !value)
 
   const { showRenameModal, RenameModal } = useRenameModal(item)
-  const { showCreateFileModal, CreateFileModal } = useCreateFileModal({ parent: item })
-  const { showCreateDirectoryModal, CreateDirectoryModal } = useCreateDirectoryModal({
-    parent: item,
-  })
 
   const children: OrdoCommand<string>[] = [
     {
@@ -55,13 +51,14 @@ export default function Directory({ item }: Props) {
     {
       title: "@app/create-file",
       icon: "BsFilePlus",
-      action: () => showCreateFileModal(),
+      action: (_, { target, dispatch }) => dispatch(showCreateFileModal(target as OrdoDirectory)),
       accelerator: "ctrl+n",
     },
     {
       title: "@app/create-directory",
       icon: "BsFolderPlus",
-      action: () => showCreateDirectoryModal(),
+      action: (_, { target, dispatch }) =>
+        dispatch(showCreateDirectoryModal(target as OrdoDirectory)),
       accelerator: "ctrl+shift+n",
     },
     {
@@ -105,8 +102,6 @@ export default function Directory({ item }: Props) {
 
       <ContextMenu />
       <RenameModal />
-      <CreateFileModal />
-      <CreateDirectoryModal />
     </>
   )
 }

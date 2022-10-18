@@ -29,8 +29,8 @@ export interface IEither<TRight, TLeft = unknown> {
   leftMap: <TNewLeft>(
     onLeft: UnaryFn<TLeft, TNewLeft> | Thunk<TNewLeft>
   ) => IEither<TRight, TNewLeft>
-  chain: <TNewRight>(
-    onRight: UnaryFn<TRight, IEither<TNewRight, TLeft>> | Thunk<IEither<TNewRight, TLeft>>
+  chain: <TNewRight, TNewLeft>(
+    onRight: UnaryFn<TRight, IEither<TNewRight, TNewLeft>> | Thunk<IEither<TNewRight, TLeft>>
   ) => IEither<TNewRight, TLeft>
   ap: <TNewRight, TNewLeft = TLeft>(
     other: IEither<UnaryFn<TRight, TNewRight>, UnaryFn<TRight, TNewLeft>>
@@ -66,7 +66,8 @@ export const right = <TRight, TLeft = TRight>(x: TRight): IEither<TRight, TLeft>
   map: (onRight) => right(onRight(x)),
   leftMap: () => right(x),
   bimap: (_, onRight) => right(onRight(x)),
-  chain: (onRight) => onRight(x),
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  chain: (onRight) => onRight(x) as any,
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   ap: (other) => (other.isRight ? (right(other[unsafeGet]()(x)) as any) : right(x)),
   getOrElse: () => x,

@@ -29,9 +29,13 @@ export const commandPaletteSlice = createSlice({
 
       if (!commandRegisterred) state.commands.push(action.payload)
     },
+    clearCommands: (state) => {
+      state.commands = []
+    },
   },
 })
 
-export const { showCommandPalette, hideCommandPalette, addCommand } = commandPaletteSlice.actions
+export const { showCommandPalette, hideCommandPalette, addCommand, clearCommands } =
+  commandPaletteSlice.actions
 
 export default commandPaletteSlice.reducer

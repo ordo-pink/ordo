@@ -1,3 +1,4 @@
 {
-  "checkboxes.activity.title": "Tasks"
+  "checkboxes.activity.title": "Tasks",
+  "@checkboxes/open-activity": "Open Tasks"
 }

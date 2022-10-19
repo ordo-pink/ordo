@@ -1,7 +1,6 @@
 import React from "react"
-import { useHotkeys } from "react-hotkeys-hook"
 
-import { useAppDispatch, useAppSelector } from "@client/state"
+import { useAppSelector } from "@client/state"
 import { useContextMenu } from "@client/context-menu"
 import Either from "@core/utils/either"
 

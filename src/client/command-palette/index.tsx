@@ -78,7 +78,10 @@ export default function CommandPalette() {
     dispatch(hideCommandPalette())
   }
 
-  const handleChange = (e: ChangeEvent<HTMLInputElement>) => setInputValue(e.target.value)
+  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
+    setInputValue(e.target.value)
+    setCurrentIndex(0)
+  }
 
   const handleClick = (command: OrdoCommand<string>) => {
     dispatch(() => command.action(state, { dispatch, target: null }))

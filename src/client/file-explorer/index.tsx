@@ -7,7 +7,7 @@ import { useContextMenu } from "@client/context-menu"
 import { ExtensionContextMenuLocation } from "@core/constants"
 import Either from "@core/utils/either"
 
-import FileOrDirectory from "@client/app/components/file-explorer/file-or-directory"
+import FileOrDirectory from "@client/file-explorer/components/file-or-directory"
 import Null from "@client/null"
 
 export default function FileExplorer() {

@@ -3,7 +3,7 @@ import type { SettingsItemProps } from "@client/app/types"
 import React from "react"
 import { useTranslation } from "react-i18next"
 
-import { useSettingInput } from "@client/app/hooks/use-setting-input"
+import { useSettingInput } from "@client/settings/hooks/use-setting-input"
 
 /**
  * A configurable application option.

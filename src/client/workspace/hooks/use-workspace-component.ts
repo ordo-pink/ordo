@@ -1,7 +1,7 @@
 import { useAppSelector } from "@client/state"
 import Switch from "@core/utils/switch"
 
-import Settings from "@client/app/settings"
+import Settings from "@client/settings"
 import Editor from "@client/editor"
 import Null from "@client/null"
 import Checkboxes from "@client/checkboxes"

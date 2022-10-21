@@ -1,7 +1,7 @@
 import React, { FC } from "react"
 
 import type { OrdoFile, OrdoDirectory } from "@core/app/types"
-import { useFileExplorerComponent } from "@client/app/hooks/use-file-explorer-component"
+import { useFileExplorerComponent } from "@client/file-explorer/hooks/use-file-explorer-component"
 
 type Props = {
   item: OrdoFile | OrdoDirectory

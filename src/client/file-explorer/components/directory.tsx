@@ -7,7 +7,7 @@ import { useContextMenu } from "@client/context-menu"
 import { useIcon } from "@client/use-icon"
 import { deleteFileOrDirectory } from "@client/app/store"
 
-import FileOrDirectory from "@client/app/components/file-explorer/file-or-directory"
+import FileOrDirectory from "@client/file-explorer/components/file-or-directory"
 import ActionListItem from "@client/common/action-list-item"
 import { OrdoCommand } from "@core/types"
 import { ExtensionContextMenuLocation } from "@core/constants"

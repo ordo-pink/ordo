@@ -12,7 +12,6 @@ import FileOrDirectory from "@client/app/components/file-explorer/file-or-direct
 import ActionListItem from "@client/common/action-list-item"
 import { OrdoCommand } from "@core/types"
 import { ExtensionContextMenuLocation } from "@core/constants"
-import { showCreateFileModal, showCreateDirectoryModal } from "@client/create-modal/store"
 
 type Props = {
   item: OrdoDirectory

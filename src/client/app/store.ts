@@ -1,6 +1,6 @@
 import type { Nullable } from "@core/types"
 import type { LocalSettings, OrdoFile, OrdoDirectory, UserSettings } from "@core/app/types"
-import type { RootNode } from "@core/editor/types"
+import type { RootNode } from "@client/editor/types"
 
 import debounce from "lodash/debounce"
 import {

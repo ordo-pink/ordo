@@ -1,7 +1,8 @@
-import { ORDO_FILE_EXTENSION, ORDO_METADATA_EXTENSION } from "@core/app/constants"
 import { promises } from "fs"
-import userSettingsStore from "../user-settings-store"
-import { handleListDirectory } from "./list-directory"
+
+import { ORDO_FILE_EXTENSION, ORDO_METADATA_EXTENSION } from "@core/app/constants"
+import { handleListDirectory } from "@main/app/handlers/list-directory"
+import userSettingsStore from "@main/app/user-settings-store"
 
 type Params = {
   oldPath: string

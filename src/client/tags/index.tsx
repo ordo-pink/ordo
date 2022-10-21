@@ -1,5 +1,5 @@
 import { enableSideBar } from "@client/app/store"
-import { useAppDispatch, useAppSelector } from "@client/state"
+import { useAppDispatch, useAppSelector } from "@client/common/hooks/state-hooks"
 import { Nullable } from "@core/types"
 import React, { useEffect, useMemo, useRef, useState } from "react"
 import { Network, Options, Edge, Node } from "vis-network"

@@ -1,13 +1,13 @@
-import type { SettingsItemProps } from "@client/app/types"
+import type { SettingsItemProps } from "@client/settings/types"
 
 import React, { ChangeEvent } from "react"
 
-import Either from "@core/utils/either"
-import { useAppDispatch } from "@client/state"
+import Either from "@client/common/utils/either"
+import { useAppDispatch } from "@client/common/hooks/state-hooks"
 import { setUserSetting } from "@client/app/store"
 
-import Null from "@client/null"
-import SelectSettingOption from "./select-setting-option"
+import Null from "@client/common/null"
+import SelectSettingOption from "@client/settings/components/select-setting-option"
 
 /**
  * Input for enum settings.

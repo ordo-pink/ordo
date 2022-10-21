@@ -3,6 +3,7 @@ import type { Activity } from "@client/activity-bar/types"
 /**
  * A list of activities natively supported by Ordo.
  * 3rd party activities also go here.
+ * TODO: Move this when extracting activities
  */
 export const topActivities: Activity[] = [
   {
@@ -33,6 +34,7 @@ export const topActivities: Activity[] = [
 
 /**
  * A list of static activities that cannot be extended externally.
+ * TODO: Move to initial state
  */
 export const bottomActivities: Activity[] = [
   {

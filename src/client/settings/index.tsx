@@ -1,12 +1,12 @@
 import React, { useEffect } from "react"
 
-import { useAppDispatch, useAppSelector } from "@client/state"
-import { USER_SETTINGS_SCHEMA } from "@core/app/user-settings-schema"
+import { useAppDispatch, useAppSelector } from "@client/common/hooks/state-hooks"
+import { USER_SETTINGS_SCHEMA } from "@client/settings/user-settings-schema"
 import { disableSideBar } from "@client/app/store"
-import Either from "@core/utils/either"
+import Either from "@client/common/utils/either"
 
 import SettingsItem from "@client/settings/components/settings-item"
-import Null from "@client/null"
+import Null from "@client/common/null"
 
 /**
  * Application settings page.

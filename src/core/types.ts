@@ -1,13 +1,16 @@
-import { useAppDispatch } from "@client/state"
-import { store } from "@client/store"
-import { IconName } from "@client/use-icon"
-import { Slice } from "@reduxjs/toolkit"
-import { FC } from "react"
-import { OrdoFile, OrdoDirectory } from "./app/types"
-import { ExtensionContextMenuLocation } from "./constants"
-import { RootNode } from "./editor/types"
-import { Language } from "./locales"
+import type { FC } from "react"
+import type { IconName } from "@client/common/hooks/use-icon"
+import type { RootNode } from "@client/editor/types"
+import type { OrdoFile, OrdoDirectory } from "@core/app/types"
 
+import { Slice } from "@reduxjs/toolkit"
+
+import { store } from "@client/store"
+import { useAppDispatch } from "@client/common/hooks/state-hooks"
+import { ExtensionContextMenuLocation } from "@core/constants"
+import { Language } from "@core/locales"
+
+// TODO: Put types together
 export type Nullable<T> = T | null
 
 export type Optional<T> = T | undefined

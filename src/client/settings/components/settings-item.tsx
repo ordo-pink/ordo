@@ -1,4 +1,4 @@
-import type { SettingsItemProps } from "@client/app/types"
+import type { SettingsItemProps } from "@client/settings/types"
 
 import React from "react"
 import { useTranslation } from "react-i18next"

@@ -1,6 +1,7 @@
-import { IconName, useIcon } from "@client/use-icon"
-import { noOp } from "@core/utils/no-op"
 import React, { CSSProperties, MouseEventHandler, PropsWithChildren } from "react"
+
+import { IconName, useIcon } from "@client/common/hooks/use-icon"
+import { noOp } from "@client/common/utils/no-op"
 
 type Props = {
   text: string

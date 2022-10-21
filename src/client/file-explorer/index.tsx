@@ -2,13 +2,13 @@ import type { OrdoCommand } from "@core/types"
 
 import React from "react"
 
-import { useAppSelector } from "@client/state"
-import { useContextMenu } from "@client/context-menu"
+import { useAppSelector } from "@client/common/hooks/state-hooks"
 import { ExtensionContextMenuLocation } from "@core/constants"
-import Either from "@core/utils/either"
+import { useContextMenu } from "@client/context-menu"
+import Either from "@client/common/utils/either"
 
 import FileOrDirectory from "@client/file-explorer/components/file-or-directory"
-import Null from "@client/null"
+import Null from "@client/common/null"
 
 export default function FileExplorer() {
   const parent = useAppSelector((state) => state.app.personalDirectory)

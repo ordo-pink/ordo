@@ -1,10 +1,10 @@
 import { disableSideBar } from "@client/app/store"
-import Null from "@client/null"
-import { useAppDispatch, useAppSelector } from "@client/state"
-import { isDirectory } from "@core/app/is-directory"
+import Null from "@client/common/null"
+import { useAppDispatch, useAppSelector } from "@client/common/hooks/state-hooks"
+import { isDirectory } from "@client/common/is-directory"
 import { OrdoDirectory } from "@core/app/types"
-import { Checkbox } from "@core/editor/types"
-import Either from "@core/utils/either"
+import { Checkbox } from "@client/editor/types"
+import Either from "@client/common/utils/either"
 import React, { useEffect, useState } from "react"
 
 const collectCheckboxes = (tree: OrdoDirectory, checkboxes: Record<string, Checkbox[]> = {}) => {

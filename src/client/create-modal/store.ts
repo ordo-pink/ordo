@@ -1,8 +1,9 @@
+import type { Nullable } from "@core/types"
+import type { OrdoDirectory } from "@core/app/types"
+
 import { createSlice, PayloadAction } from "@reduxjs/toolkit"
 
 import { CreationType } from "@client/create-modal/creation-type"
-import { OrdoDirectory } from "@core/app/types"
-import { Nullable } from "@core/types"
 
 export type CreateModalState = {
   isShown: boolean

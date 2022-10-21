@@ -1,6 +1,6 @@
 import type { CaretRange, RootNode } from "../types"
 
-import { getCharIndex } from "@core/editor/get-char-index"
+import { getCharIndex } from "@client/editor/get-char-index"
 
 export const handleDelete =
   (caretRanges: CaretRange[]) =>

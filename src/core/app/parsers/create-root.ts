@@ -1,5 +1,5 @@
-import { TextNodeType } from "@core/editor/constants"
-import { LineNode, RootNode } from "@core/editor/types"
+import { TextNodeType } from "@client/editor/constants"
+import { LineNode, RootNode } from "@client/editor/types"
 
 export const createRoot = (raw: string): RootNode => {
   const root: RootNode = {

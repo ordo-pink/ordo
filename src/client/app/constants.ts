@@ -30,3 +30,8 @@ export const MIN_FONT_SIZE = 8
  * The largest possible font size in Ordo.
  */
 export const MAX_FONT_SIZE = 25
+
+export const enum SectionPosition {
+  LEFT = "left",
+  RIGHT = "right",
+}

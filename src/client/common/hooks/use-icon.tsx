@@ -6,9 +6,9 @@ import * as FaIcons from "react-icons/fa"
 import * as AiIcons from "react-icons/ai"
 import * as BsIcons from "react-icons/bs"
 
-import Switch from "@core/utils/switch"
+import Switch from "@client/common/utils/switch"
 
-import Null from "@client/null"
+import Null from "@client/common/null"
 
 const ALL_ICONS: Record<string, IconType> = {
   ...HiIcons,

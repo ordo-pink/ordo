@@ -5,8 +5,8 @@ import { useTranslation } from "react-i18next"
 
 import { useActivityBarItemClass } from "@client/activity-bar/hooks/use-activity-bar-item-class"
 import { selectActivity } from "@client/activity-bar/store"
-import { useAppDispatch } from "@client/state"
-import { useIcon } from "@client/use-icon"
+import { useAppDispatch } from "@client/common/hooks/state-hooks"
+import { useIcon } from "@client/common/hooks/use-icon"
 
 type Props = Activity & { currentActivityName: string }
 

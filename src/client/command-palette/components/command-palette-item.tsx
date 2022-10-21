@@ -3,7 +3,7 @@ import type { OrdoCommand, UnaryFn } from "@core/types"
 import React, { MouseEvent } from "react"
 import { useTranslation } from "react-i18next"
 
-import { noOp } from "@core/utils/no-op"
+import { noOp } from "@client/common/utils/no-op"
 
 import Accelerator from "@client/context-menu/components/accelerator"
 import ActionListItem from "@client/common/action-list-item"

@@ -1,14 +1,15 @@
+import type { OrdoDirectory, OrdoFile } from "@core/app/types"
+
 import React, { useState, useEffect } from "react"
 import { useTranslation } from "react-i18next"
 
 import { renameFileOrDirectory } from "@client/app/store"
-import { useAppDispatch, useAppSelector } from "@client/state"
-import { useModalWindow } from "@client/modal"
-import Either from "@core/utils/either"
+import { useAppDispatch, useAppSelector } from "@client/common/hooks/state-hooks"
+import { hideRenameModal, showRenameModal } from "@client/rename-modal/store"
+import { useModalWindow } from "@client/common/hooks/use-modal"
+import Either from "@client/common/utils/either"
 
-import Null from "@client/null"
-import { hideRenameModal, showRenameModal } from "./store"
-import { OrdoDirectory, OrdoFile } from "@core/app/types"
+import Null from "@client/common/null"
 
 export default function CreateModal() {
   const dispatch = useAppDispatch()

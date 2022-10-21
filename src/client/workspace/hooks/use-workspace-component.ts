@@ -1,10 +1,10 @@
-import { useAppSelector } from "@client/state"
-import Switch from "@core/utils/switch"
+import { useAppSelector } from "@client/common/hooks/state-hooks"
+import Switch from "@client/common/utils/switch"
 
-import Settings from "@client/settings"
-import Editor from "@client/editor"
-import Null from "@client/null"
 import Checkboxes from "@client/checkboxes"
+import Settings from "@client/settings"
+import Null from "@client/common/null"
+import Editor from "@client/editor"
 import Tags from "@client/tags"
 
 export const useWorkspaceComponent = () => {

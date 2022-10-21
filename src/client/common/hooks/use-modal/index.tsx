@@ -1,7 +1,8 @@
+import type { Thunk } from "@core/types"
+
 import React, { useState, useCallback, MouseEvent, PropsWithChildren } from "react"
 
-import Modal from "@client/modal/components/modal"
-import { Thunk } from "@core/types"
+import Modal from "@client/common/hooks/use-modal/components/modal"
 
 type Props = {
   onHide?: Thunk<void>

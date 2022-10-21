@@ -30,7 +30,7 @@ export interface IEither<TRight, TLeft = unknown> {
     onLeft: UnaryFn<TLeft, TNewLeft> | Thunk<TNewLeft>
   ) => IEither<TRight, TNewLeft>
   chain: <TNewRight, TNewLeft>(
-    onRight: UnaryFn<TRight, IEither<TNewRight, TNewLeft>> | Thunk<IEither<TNewRight, TLeft>>
+    onRight: UnaryFn<TRight, IEither<TNewRight, TNewLeft>> | Thunk<IEither<TNewRight, TNewLeft>>
   ) => IEither<TNewRight, TLeft>
   ap: <TNewRight, TNewLeft = TLeft>(
     other: IEither<UnaryFn<TRight, TNewRight>, UnaryFn<TRight, TNewLeft>>

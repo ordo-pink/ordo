@@ -1,16 +1,17 @@
 import type { OrdoFile } from "@core/app/types"
+import type { OrdoCommand } from "@core/types"
+import type { IconName } from "@client/common/hooks/use-icon"
 
 import React, { MouseEvent } from "react"
 
-import { deleteFileOrDirectory, openFile } from "@client/app/store"
+import { openFile } from "@client/app/store"
 import { selectActivity } from "@client/activity-bar/store"
-import { useAppDispatch, useAppSelector } from "@client/state"
+import { useAppDispatch, useAppSelector } from "@client/common/hooks/state-hooks"
 import { useContextMenu } from "@client/context-menu"
-import { IconName } from "@client/use-icon"
 import { ORDO_FILE_EXTENSION } from "@core/app/constants"
-import ActionListItem from "@client/common/action-list-item"
-import { OrdoCommand } from "@core/types"
 import { ExtensionContextMenuLocation } from "@core/constants"
+
+import ActionListItem from "@client/common/action-list-item"
 
 type Props = {
   item: OrdoFile
@@ -23,22 +24,12 @@ export default function File({ item }: Props) {
   const currentFile = useAppSelector((state) => state.app.currentFile)
   const icon: IconName = item.extension === ORDO_FILE_EXTENSION ? "BsFileEarmarkText" : "BsMarkdown"
 
-  // TODO: Move RenameModal, CreateFileModal and CreateDirectoryModal management to store
-  const children: OrdoCommand<string>[] = [
-    {
-      title: "@app/delete",
-      icon: "BsTrash",
-      action: () => {
-        dispatch(deleteFileOrDirectory(item.path))
-      },
-    },
-    ...commands.filter(
-      (command) =>
-        command.showInContextMenu === ExtensionContextMenuLocation.FILE ||
-        command.showInContextMenu === ExtensionContextMenuLocation.FILE_OR_DIRECTORY ||
-        command.showInContextMenu === ExtensionContextMenuLocation.FILE_OR_DIRECTORY_OR_ROOT
-    ),
-  ]
+  const children: OrdoCommand<string>[] = commands.filter(
+    (command) =>
+      command.showInContextMenu === ExtensionContextMenuLocation.FILE ||
+      command.showInContextMenu === ExtensionContextMenuLocation.FILE_OR_DIRECTORY ||
+      command.showInContextMenu === ExtensionContextMenuLocation.FILE_OR_DIRECTORY_OR_ROOT
+  )
 
   // TODO: Move ContextMenu management to store
   const { showContextMenu, ContextMenu } = useContextMenu({ children })

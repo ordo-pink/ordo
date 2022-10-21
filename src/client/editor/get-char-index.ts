@@ -1,4 +1,4 @@
-import { RootNode } from "@core/editor/types"
+import { RootNode } from "@client/editor/types"
 
 type Params = {
   root: RootNode

@@ -1,9 +1,9 @@
-import type { SettingsItemProps } from "@client/app/types"
+import type { SettingsItemProps } from "@client/settings/types"
 
 import React from "react"
 
 import { setUserSetting } from "@client/app/store"
-import { useAppDispatch } from "@client/state"
+import { useAppDispatch } from "@client/common/hooks/state-hooks"
 
 /**
  * Input for settings with boolean values.

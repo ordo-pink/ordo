@@ -1,4 +1,4 @@
-import type { OrdoDate, RootNode } from "@core/editor/types"
+import type { OrdoDate, RootNode } from "@client/editor/types"
 
 import { createRoot } from "@core/app/parsers/create-root"
 

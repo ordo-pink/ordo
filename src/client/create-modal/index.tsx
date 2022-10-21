@@ -1,15 +1,15 @@
 import React, { useState, useEffect } from "react"
 import { useTranslation } from "react-i18next"
 
-import { createFile, createDirectory as createDirectory } from "@client/app/store"
+import { createFile, createDirectory } from "@client/app/store"
 import { CreationType } from "@client/create-modal/creation-type"
-import { useAppDispatch, useAppSelector } from "@client/state"
+import { useAppDispatch, useAppSelector } from "@client/common/hooks/state-hooks"
 import { hideCreateModal } from "@client/create-modal/store"
-import { useModalWindow } from "@client/modal"
-import { useIcon } from "@client/use-icon"
-import Either from "@core/utils/either"
+import { useModalWindow } from "@client/common/hooks/use-modal"
+import { useIcon } from "@client/common/hooks/use-icon"
+import Either from "@client/common/utils/either"
 
-import Null from "@client/null"
+import Null from "@client/common/null"
 
 export default function CreateModal() {
   const dispatch = useAppDispatch()

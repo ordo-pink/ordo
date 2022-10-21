@@ -1,6 +1,6 @@
 import type { OrdoDirectory } from "@core/app/types"
 
-import { isDirectory } from "@core/app/is-directory"
+import { isDirectory } from "@client/common/is-directory"
 
 export const sortOrdoDirectory = (directory: OrdoDirectory): OrdoDirectory => {
   directory.children = directory.children.sort((a, b) => {

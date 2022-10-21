@@ -1,5 +1,6 @@
 import React, { useLayoutEffect, useState, useEffect } from "react"
 import { useHotkeys } from "react-hotkeys-hook"
+import { identity } from "ramda"
 import SplitView from "react-split"
 
 import {
@@ -10,39 +11,58 @@ import {
   MIN_FONT_SIZE,
   MAX_FONT_SIZE,
 } from "@client/app/constants"
-import { useAppDispatch, useAppSelector } from "@client/state"
-import { selectActivity } from "@client/activity-bar/store"
+import { useAppDispatch, useAppSelector } from "@client/common/hooks/state-hooks"
 import {
   getLocalSettings,
   getUserSettings,
   listDirectory,
   setSideBarWidth,
-  toggleSideBar,
 } from "@client/app/store"
-import { showCommandPalette, addCommand } from "@client/command-palette/store"
+import { addCommand, showCommandPalette } from "@client/command-palette/store"
 import { Extensions } from "@extensions/index"
-import Switch from "@core/utils/switch"
+import Switch from "@client/common/utils/switch"
 import i18next from "@client/i18n"
+import { useCommands } from "@client/common/hooks/use-commands"
+import { renameFileCommand } from "@client/app/commands/rename-file"
+import { renameDirectoryCommand } from "@client/app/commands/rename-directory"
+import { createFileCommand } from "@client/app/commands/create-file"
+import { createDirectoryCommand } from "@client/app/commands/create-directory"
+import { deleteDirectoryCommand } from "@client/app/commands/delete-directory"
+import { deleteFileCommand } from "@client/app/commands/delete-file"
 
 import ActivityBar from "@client/activity-bar"
 import SideBar from "@client/side-bar"
 import Workspace from "@client/workspace"
 import CommandPalette from "@client/command-palette"
-import Either from "@core/utils/either"
+import Either from "@client/common/utils/either"
 import CreateModal from "@client/create-modal"
 import RenameModal from "@client/rename-modal"
 
 export default function App() {
   const dispatch = useAppDispatch()
+
+  const state = useAppSelector(identity)
+
   const fontSize = useAppSelector((state) => state.app.userSettings["editor.font-size"])
   const language = useAppSelector((state) => state.app.userSettings["appearance.language"])
   const project = useAppSelector((state) => state.app.userSettings["project.personal.directory"])
   const isSideBarAvailable = useAppSelector((state) => state.app.isSideBarAvailable)
+  const hotkeys = useAppSelector((state) => state.commandPalette.hotkeys)
   const sideBarWidth = useAppSelector((state) => state.app.sideBarWidth)
+  const currentFile = useAppSelector((state) => state.app.currentFile)
 
   const [isLeftCollapsed, setIsLeftCollapsed] = useState(false)
   const [isRightCollapsed, setIsRightCollapsed] = useState(false)
   const [sizes, setSizes] = useState<[number, number]>([sideBarWidth, 100 - sideBarWidth])
+
+  useCommands([
+    createFileCommand,
+    createDirectoryCommand,
+    renameFileCommand,
+    renameDirectoryCommand,
+    deleteFileCommand,
+    deleteDirectoryCommand,
+  ])
 
   useEffect(() => {
     Extensions.map(({ commands, translations }) => {
@@ -51,18 +71,24 @@ export default function App() {
       })
 
       commands.forEach((command) => {
-        if (command.showInCommandPalette) dispatch(addCommand(command))
+        dispatch(addCommand(command))
       })
-
-      // TODO: Register accelerators
     })
   }, [])
 
-  useHotkeys("ctrl+b", () => void dispatch(toggleSideBar()))
-  useHotkeys("ctrl+e", () => void dispatch(selectActivity("editor")))
-  useHotkeys("ctrl+,", () => void dispatch(selectActivity("settings")))
-  useHotkeys("alt+n", () => void dispatch(selectActivity("notifications")))
-  useHotkeys("ctrl+shift+p", () => void dispatch(showCommandPalette()))
+  useHotkeys(
+    Object.keys(hotkeys).join(", "),
+    (_, handler) => {
+      const action = hotkeys[handler.key]
+
+      if (action) {
+        action(state, { dispatch, contextMenuTarget: null, currentFile })
+      }
+    },
+    [hotkeys, state, currentFile, dispatch]
+  )
+
+  useHotkeys("ctrl+shift+p, cmd+shift+p", () => void dispatch(showCommandPalette()))
 
   useLayoutEffect(() => {
     const body = document.querySelector(":root") as HTMLElement
@@ -165,6 +191,7 @@ export default function App() {
           </div>
         )}
       </div>
+
       <CommandPalette />
       <CreateModal />
       <RenameModal />

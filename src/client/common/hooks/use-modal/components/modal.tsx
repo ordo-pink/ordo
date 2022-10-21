@@ -1,11 +1,11 @@
 import React, { PropsWithChildren, MouseEvent, useEffect } from "react"
 import { useHotkeys } from "react-hotkeys-hook"
 
-import Either from "@core/utils/either"
+import Either from "@client/common/utils/either"
 
-import Null from "@client/null"
+import Null from "@client/common/null"
 import { Thunk } from "@core/types"
-import { noOp } from "@core/utils/no-op"
+import { noOp } from "@client/common/utils/no-op"
 
 type Props = {
   isShown: boolean

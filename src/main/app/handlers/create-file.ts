@@ -1,9 +1,9 @@
-import { ORDO_FILE_EXTENSION, ORDO_METADATA_EXTENSION } from "@core/app/constants"
-
 import { promises } from "fs"
-import localSettingsStore from "../local-settings-store"
-import { handleListDirectory } from "./list-directory"
-import userSettingsStore from "../user-settings-store"
+
+import { ORDO_FILE_EXTENSION, ORDO_METADATA_EXTENSION } from "@core/app/constants"
+import { handleListDirectory } from "@main/app/handlers/list-directory"
+import localSettingsStore from "@main/app/local-settings-store"
+import userSettingsStore from "@main/app/user-settings-store"
 
 export const handleCreateFile = async (path: string) => {
   const separator = localSettingsStore.get("app.separator")

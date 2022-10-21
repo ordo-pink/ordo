@@ -1,7 +1,7 @@
 import type { CaretRange, RootNode } from "../types"
 
-import { getCharIndex } from "@core/editor/get-char-index"
-import { CaretRangeDirection } from "../../../core/editor/constants"
+import { getCharIndex } from "@client/editor/get-char-index"
+import { CaretRangeDirection } from "../constants"
 
 export const handleEnter =
   (caretRanges: CaretRange[]) =>

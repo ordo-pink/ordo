@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react"
 import { useTranslation } from "react-i18next"
 
-import { useAppDispatch, useAppSelector } from "@client/state"
+import { useAppDispatch, useAppSelector } from "@client/common/hooks/state-hooks"
 import { getTags, resetHoveredTag, resetSelectedTags } from "@client/tags/store"
 
 import ActionListItem from "@client/common/action-list-item"

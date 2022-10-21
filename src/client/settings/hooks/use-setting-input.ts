@@ -1,17 +1,17 @@
-import { FC } from "react"
+import type { FC } from "react"
+import type { Schema } from "electron-store"
+import type { UserSettings } from "@core/app/types"
 
-import Switch from "@core/utils/switch"
+import Switch from "@client/common/utils/switch"
 
-import { USER_SETTINGS_SCHEMA } from "@core/app/user-settings-schema"
+import { USER_SETTINGS_SCHEMA } from "@client/settings/user-settings-schema"
 
 import CheckboxSetting from "@client/settings/components/checkbox-setting"
 import SelectSetting from "@client/settings/components/select-setting"
 import StringSetting from "@client/settings/components/string-setting"
 import NumberSetting from "@client/settings/components/number-setting"
 import SelectDirectorySetting from "@client/settings/components/select-directory-setting"
-import Null from "@client/null"
-import { UserSettings } from "@core/app/types"
-import type { Schema } from "electron-store"
+import Null from "@client/common/null"
 
 export const useSettingInput = <Key extends keyof typeof USER_SETTINGS_SCHEMA>(
   key: Key,

@@ -1,4 +1,4 @@
-import { CaretRangeDirection } from "@core/editor/constants"
+import { CaretRangeDirection } from "@client/editor/constants"
 
 export const initialCaretRanges = [
   {

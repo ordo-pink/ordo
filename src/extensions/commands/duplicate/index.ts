@@ -1,10 +1,10 @@
 import type { OrdoCommandExtension } from "@core/types"
 import type { OrdoFile } from "@core/app/types"
-import type { RootNode } from "@core/editor/types"
+import type { RootNode } from "@client/editor/types"
 
 import { ExtensionContextMenuLocation } from "@core/constants"
 import { listDirectory } from "@client/app/store"
-import { isDirectory } from "@core/app/is-directory"
+import { isDirectory } from "@client/common/is-directory"
 import { createRoot } from "@core/app/parsers/create-root"
 import { parseMetadata } from "@core/app/parsers/parse-ordo-file"
 
@@ -23,17 +23,22 @@ const DuplicateCommandExtension: OrdoCommandExtension<"duplicate"> = {
       accelerator: "shift+alt+d",
       showInContextMenu: ExtensionContextMenuLocation.FILE,
       showInCommandPalette: false,
-      action: async (state, { contextMenuTarget, dispatch }) => {
-        if (!contextMenuTarget || isDirectory(contextMenuTarget)) return
+      action: async (state, { contextMenuTarget, dispatch, currentFile }) => {
+        if (!contextMenuTarget && !currentFile) return
+        if (contextMenuTarget && isDirectory(contextMenuTarget)) return
+
+        const source = contextMenuTarget ? contextMenuTarget : currentFile
+
+        if (!source) return
 
         const { raw } = await window.ordo.emit<{ file: OrdoFile; raw: string }, OrdoFile>({
           type: "@app/openFile",
-          payload: contextMenuTarget,
+          payload: source,
         })
 
-        const separator = contextMenuTarget.path.lastIndexOf(".")
-        const nameBeforeExtension = contextMenuTarget.path.slice(0, separator)
-        const extension = contextMenuTarget.path.slice(separator)
+        const separator = source.path.lastIndexOf(".")
+        const nameBeforeExtension = source.path.slice(0, separator)
+        const extension = source.path.slice(separator)
         const path = nameBeforeExtension.concat(" copy").concat(extension)
         const rootNode = createRoot(raw)
         const node = parseMetadata(rootNode)

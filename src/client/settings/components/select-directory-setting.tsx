@@ -1,10 +1,10 @@
-import type { SettingsItemProps } from "@client/app/types"
+import type { SettingsItemProps } from "@client/settings/types"
 
 import React, { MouseEvent } from "react"
 import { useTranslation } from "react-i18next"
 
-import { useIcon } from "@client/use-icon"
-import { useAppDispatch } from "@client/state"
+import { useIcon } from "@client/common/hooks/use-icon"
+import { useAppDispatch } from "@client/common/hooks/state-hooks"
 import { selectPersonalProjectDirectory } from "@client/app/store"
 
 /**

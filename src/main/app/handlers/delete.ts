@@ -1,8 +1,9 @@
-import { ORDO_FILE_EXTENSION, ORDO_METADATA_EXTENSION } from "@core/app/constants"
 import { shell } from "electron"
-import userSettingsStore from "../user-settings-store"
-import { handleListDirectory } from "./list-directory"
 import { promises } from "fs"
+
+import { ORDO_FILE_EXTENSION, ORDO_METADATA_EXTENSION } from "@core/app/constants"
+import { handleListDirectory } from "@main/app/handlers/list-directory"
+import userSettingsStore from "@main/app/user-settings-store"
 
 export const handleDelete = async (path: string) => {
   await shell.trashItem(path)

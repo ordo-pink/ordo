@@ -5,16 +5,16 @@ import { useTranslation } from "react-i18next"
 import { identity } from "ramda"
 import Fuse from "fuse.js"
 
-import { useModalWindow } from "@client/modal"
-import { useAppDispatch, useAppSelector } from "@client/state"
+import { useModalWindow } from "@client/common/hooks/use-modal"
+import { useAppDispatch, useAppSelector } from "@client/common/hooks/state-hooks"
 
-import { hideCommandPalette } from "./store"
-import { noOp } from "@core/utils/no-op"
-import Either from "@core/utils/either"
+import { hideCommandPalette } from "@client/command-palette/store"
+import { noOp } from "@client/common/utils/no-op"
+import Either from "@client/common/utils/either"
+import Switch from "@client/common/utils/switch"
 
 import CommandPaletteItem from "@client/command-palette/components/command-palette-item"
-import Null from "@client/null"
-import Switch from "@core/utils/switch"
+import Null from "@client/common/null"
 
 // This is required to let fuse search through translations, not original command keys.
 type SearchableCommand = OrdoCommand<string> & { title: `@${string}/${string}` }
@@ -36,7 +36,9 @@ export default function CommandPalette() {
   const { Modal, showModal, hideModal } = useModalWindow()
   const { t } = useTranslation()
 
-  const [visibleCommands, setVisibleCommands] = useState(commands)
+  const [visibleCommands, setVisibleCommands] = useState(
+    commands.filter((command) => command.showInCommandPalette)
+  )
   const [currentIndex, setCurrentIndex] = useState(0)
   const [inputValue, setInputValue] = useState("")
 
@@ -49,20 +51,24 @@ export default function CommandPalette() {
   const handleWrapperClick = (event: MouseEvent) => event.stopPropagation()
 
   useEffect(() => {
-    const searchableCommands: SearchableCommand[] = commands.map((command) => ({
-      ...command,
-      title: t(command.title),
-    }))
+    const searchableCommands: SearchableCommand[] = commands
+      .filter((command) => command.showInCommandPalette)
+      .map((command) => ({
+        ...command,
+        title: t(command.title),
+      }))
 
     fuse.setCollection(searchableCommands)
   }, [commands, t])
 
   useEffect(() => {
     if (inputValue === "") {
-      const searchableCommands: SearchableCommand[] = commands.map((command) => ({
-        ...command,
-        title: t(command.title),
-      }))
+      const searchableCommands: SearchableCommand[] = commands
+        .filter((command) => command.showInCommandPalette)
+        .map((command) => ({
+          ...command,
+          title: t(command.title),
+        }))
 
       return setVisibleCommands(searchableCommands)
     }

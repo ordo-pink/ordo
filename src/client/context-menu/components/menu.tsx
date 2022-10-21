@@ -5,10 +5,10 @@ import type { Nullable, OrdoCommand } from "@core/types"
 import React, { MouseEvent } from "react"
 import { useHotkeys } from "react-hotkeys-hook"
 
-import Either from "@core/utils/either"
+import Either from "@client/common/utils/either"
 
 import MenuItem from "@client/context-menu/components/menu-item"
-import Null from "@client/null"
+import Null from "@client/common/null"
 
 type Props = {
   structure: Menu

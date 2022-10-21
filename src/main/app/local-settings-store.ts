@@ -3,7 +3,7 @@ import type { LocalSettings } from "@core/app/types"
 import Store from "electron-store"
 import { sep } from "path"
 
-import { LOCAL_SETTINGS_SCHEMA } from "@core/app/local-settings-schema"
+import { LOCAL_SETTINGS_SCHEMA } from "@client/settings/local-settings-schema"
 
 /**
  * This store is used to store internal settings for the current device the

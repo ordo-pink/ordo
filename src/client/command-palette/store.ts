@@ -5,11 +5,13 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit"
 export type CommandPaletteState = {
   isShown: boolean
   commands: OrdoCommand<string>[]
+  hotkeys: Record<string, OrdoCommand<string>["action"]>
 }
 
 const initialState: CommandPaletteState = {
   isShown: false,
   commands: [],
+  hotkeys: {},
 }
 
 export const commandPaletteSlice = createSlice({
@@ -27,15 +29,17 @@ export const commandPaletteSlice = createSlice({
         (command) => command.title === action.payload.title
       )
 
-      if (!commandRegisterred) state.commands.push(action.payload)
-    },
-    clearCommands: (state) => {
-      state.commands = []
+      if (commandRegisterred) return
+
+      state.commands.push(action.payload)
+
+      if (action.payload.accelerator) {
+        state.hotkeys[action.payload.accelerator] = action.payload.action
+      }
     },
   },
 })
 
-export const { showCommandPalette, hideCommandPalette, addCommand, clearCommands } =
-  commandPaletteSlice.actions
+export const { showCommandPalette, hideCommandPalette, addCommand } = commandPaletteSlice.actions
 
 export default commandPaletteSlice.reducer

@@ -1,7 +1,7 @@
 import React, { Dispatch, SetStateAction } from "react"
 
 import InlineNode from "@client/editor/components/inline-node"
-import { LineNode, CaretRange } from "@core/editor/types"
+import { LineNode, CaretRange } from "@client/editor/types"
 
 type Props = {
   node: LineNode

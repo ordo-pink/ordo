@@ -5,8 +5,8 @@ import React, { MouseEvent } from "react"
 import { useTranslation } from "react-i18next"
 import { identity } from "ramda"
 
-import { useIcon } from "@client/use-icon"
-import { useAppDispatch, useAppSelector } from "@client/state"
+import { useIcon } from "@client/common/hooks/use-icon"
+import { useAppDispatch, useAppSelector } from "@client/common/hooks/state-hooks"
 
 import Accelerator from "@client/context-menu/components/accelerator"
 

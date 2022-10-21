@@ -1,24 +1,21 @@
 import type { OrdoDirectory } from "@core/app/types"
+import type { OrdoCommand } from "@core/types"
 
 import React, { MouseEvent, useState } from "react"
 
-import { useAppDispatch, useAppSelector } from "@client/state"
+import { useAppSelector } from "@client/common/hooks/state-hooks"
 import { useContextMenu } from "@client/context-menu"
-import { useIcon } from "@client/use-icon"
-import { deleteFileOrDirectory } from "@client/app/store"
+import { useIcon } from "@client/common/hooks/use-icon"
+import { ExtensionContextMenuLocation } from "@core/constants"
 
 import FileOrDirectory from "@client/file-explorer/components/file-or-directory"
 import ActionListItem from "@client/common/action-list-item"
-import { OrdoCommand } from "@core/types"
-import { ExtensionContextMenuLocation } from "@core/constants"
 
 type Props = {
   item: OrdoDirectory
 }
 
 export default function Directory({ item }: Props) {
-  const dispatch = useAppDispatch()
-
   const commands = useAppSelector((state) => state.commandPalette.commands)
 
   const hasChildren = item.children.length > 0
@@ -38,23 +35,13 @@ export default function Directory({ item }: Props) {
 
   const handleClick = () => setIsExpanded((value) => !value)
 
-  const children: OrdoCommand<string>[] = [
-    {
-      title: "@app/delete",
-      icon: "BsTrash",
-      action: () => {
-        dispatch(deleteFileOrDirectory(item.path))
-      },
-    },
-    ...commands.filter(
-      (command) =>
-        command.showInContextMenu === ExtensionContextMenuLocation.DIRECTORY ||
-        command.showInContextMenu === ExtensionContextMenuLocation.FILE_OR_DIRECTORY ||
-        command.showInContextMenu === ExtensionContextMenuLocation.DIRECTORY_OR_ROOT
-    ),
-  ]
+  const children: OrdoCommand<string>[] = commands.filter(
+    (command) =>
+      command.showInContextMenu === ExtensionContextMenuLocation.DIRECTORY ||
+      command.showInContextMenu === ExtensionContextMenuLocation.FILE_OR_DIRECTORY ||
+      command.showInContextMenu === ExtensionContextMenuLocation.DIRECTORY_OR_ROOT
+  )
 
-  // TODO: Move CreateModal and RenameModal handling to store
   const { showContextMenu, ContextMenu } = useContextMenu({ children })
 
   const handleContextMenu = (event: MouseEvent) => showContextMenu(event, item)

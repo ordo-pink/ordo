@@ -8,7 +8,7 @@ import {
   setHoveredTag,
   resetHoveredTag,
 } from "@client/tags/store"
-import { useAppDispatch, useAppSelector } from "@client/state"
+import { useAppDispatch, useAppSelector } from "@client/common/hooks/state-hooks"
 
 import ActionListItem from "@client/common/action-list-item"
 

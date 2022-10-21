@@ -1,4 +1,4 @@
-import { isDirectory } from "@core/app/is-directory"
+import { isDirectory } from "@client/common/is-directory"
 import { OrdoDirectory } from "@core/app/types"
 import { Nullable } from "@core/types"
 import { TagObject } from "./types"

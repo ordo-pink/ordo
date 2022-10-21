@@ -1,9 +1,9 @@
-import { Color } from "@core/colors"
-import { Nullable } from "@core/types"
+import type { RootNode } from "@client/editor/types"
+import type { Nullable } from "@core/types"
 
+import { Color } from "@core/colors"
 import { Language } from "@core/locales"
 import { Theme } from "@core/theme"
-import { RootNode } from "@core/editor/types"
 
 export type OrdoPathLike = string
 export type OrdoPath = OrdoPathLike

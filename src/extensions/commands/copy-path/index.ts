@@ -18,8 +18,9 @@ const CopyPathCommandExtension: OrdoCommandExtension<"copy-path"> = {
     {
       title: "@copy-path/copy-relative-path",
       icon: "BsSignpost",
-      showInContextMenu: ExtensionContextMenuLocation.FILE_OR_DIRECTORY_OR_ROOT,
+      accelerator: "ctrl+alt+c",
       showInCommandPalette: true,
+      showInContextMenu: ExtensionContextMenuLocation.FILE_OR_DIRECTORY_OR_ROOT,
       action: (_, { contextMenuTarget, currentFile }) => {
         if (!contextMenuTarget && !currentFile) return
 
@@ -35,8 +36,9 @@ const CopyPathCommandExtension: OrdoCommandExtension<"copy-path"> = {
     {
       title: "@copy-path/copy-path",
       icon: "BsSignpost2",
-      showInContextMenu: ExtensionContextMenuLocation.FILE_OR_DIRECTORY_OR_ROOT,
+      accelerator: "ctrl+alt+shift+c",
       showInCommandPalette: true,
+      showInContextMenu: ExtensionContextMenuLocation.FILE_OR_DIRECTORY_OR_ROOT,
       action: (state, { contextMenuTarget, currentFile }) => {
         const path = contextMenuTarget
           ? contextMenuTarget.path

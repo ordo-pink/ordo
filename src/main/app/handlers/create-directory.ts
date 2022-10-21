@@ -1,11 +1,11 @@
 import { promises } from "fs"
 
-import localSettingsStore from "../local-settings-store"
-import userSettingsStore from "../user-settings-store"
-import { handleListDirectory } from "./list-directory"
+import { handleListDirectory } from "@main/app/handlers/list-directory"
+import localSettingsStore from "@main/app/local-settings-store"
+import userSettingsStore from "@main/app/user-settings-store"
 
 export const handleCreateDirectory = async (path: string) => {
-  // TODO:BUG: Fix creating nested directories having the same name
+  // TODO:BUG: Fix creating nested directories that have the same name
   const separator = localSettingsStore.get("app.separator")
   const rootPath = userSettingsStore.get("project.personal.directory")
 

@@ -1,7 +1,7 @@
-import { useAppSelector } from "@client/state"
-import Switch from "@core/utils/switch"
+import { useAppSelector } from "@client/common/hooks/state-hooks"
+import Switch from "@client/common/utils/switch"
 
-import Null from "@client/null"
+import Null from "@client/common/null"
 import FileExplorer from "@client/file-explorer"
 import TagsSidebar from "@client/tags/sidebar"
 

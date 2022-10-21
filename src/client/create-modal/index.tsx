@@ -27,15 +27,20 @@ export default function CreateModal() {
   const [newName, setNewName] = useState("")
 
   useEffect(() => {
-    isShown ? showModal() : hideModal()
+    if (!isShown) showModal()
   }, [isShown])
 
   const create = type === CreationType.FILE ? createFile : createDirectory
 
+  const hide = () => {
+    setNewName("")
+    dispatch(hideCreateModal())
+  }
+
   return Either.fromBoolean(isShown)
     .chain(() => Either.fromNullable(parent))
     .fold(Null, (directory) => (
-      <Modal>
+      <Modal onHide={hide}>
         <div className="h-full flex items-center justify-center">
           <div
             onClick={(event) => event.stopPropagation()}
@@ -54,12 +59,10 @@ export default function CreateModal() {
               onChange={(e) => setNewName(e.target.value)}
               onKeyDown={(e) => {
                 if (e.key === "Escape") {
-                  setNewName("")
-                  dispatch(hideCreateModal())
+                  hideModal()
                 } else if (e.key === "Enter") {
-                  setNewName("")
                   dispatch(create(directory.path + separator + newName))
-                  dispatch(hideCreateModal())
+                  hideModal()
                 }
               }}
             />

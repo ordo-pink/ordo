@@ -4,7 +4,6 @@ import React, { MouseEvent } from "react"
 
 import { deleteFileOrDirectory, openFile } from "@client/app/store"
 import { selectActivity } from "@client/activity-bar/store"
-import { useRenameModal } from "@client/app/hooks/use-rename-modal"
 import { useAppDispatch, useAppSelector } from "@client/state"
 import { useContextMenu } from "@client/context-menu"
 import { IconName } from "@client/use-icon"
@@ -22,17 +21,10 @@ export default function File({ item }: Props) {
   const commands = useAppSelector((state) => state.commandPalette.commands)
 
   const currentFile = useAppSelector((state) => state.app.currentFile)
-  const { showRenameModal, RenameModal } = useRenameModal(item)
   const icon: IconName = item.extension === ORDO_FILE_EXTENSION ? "BsFileEarmarkText" : "BsMarkdown"
 
   // TODO: Move RenameModal, CreateFileModal and CreateDirectoryModal management to store
   const children: OrdoCommand<string>[] = [
-    {
-      title: "@app/rename",
-      icon: "BsPencilSquare",
-      accelerator: "f2",
-      action: () => showRenameModal(),
-    },
     {
       title: "@app/delete",
       icon: "BsTrash",
@@ -43,7 +35,8 @@ export default function File({ item }: Props) {
     ...commands.filter(
       (command) =>
         command.showInContextMenu === ExtensionContextMenuLocation.FILE ||
-        command.showInContextMenu === ExtensionContextMenuLocation.FILE_OR_DIRECTORY
+        command.showInContextMenu === ExtensionContextMenuLocation.FILE_OR_DIRECTORY ||
+        command.showInContextMenu === ExtensionContextMenuLocation.FILE_OR_DIRECTORY_OR_ROOT
     ),
   ]
 
@@ -72,7 +65,6 @@ export default function File({ item }: Props) {
       />
 
       <ContextMenu />
-      <RenameModal />
     </>
   )
 }

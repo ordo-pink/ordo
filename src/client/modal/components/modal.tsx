@@ -1,17 +1,31 @@
-import React, { PropsWithChildren, MouseEvent } from "react"
+import React, { PropsWithChildren, MouseEvent, useEffect } from "react"
 import { useHotkeys } from "react-hotkeys-hook"
 
 import Either from "@core/utils/either"
 
 import Null from "@client/null"
+import { Thunk } from "@core/types"
+import { noOp } from "@core/utils/no-op"
 
 type Props = {
   isShown: boolean
   hideModal: (event: MouseEvent) => void
+  onShow?: Thunk<void>
+  onHide?: Thunk<void>
 }
 
-export default function Modal({ isShown, hideModal, children }: PropsWithChildren<Props>) {
+export default function Modal({
+  isShown,
+  hideModal,
+  children,
+  onHide = noOp,
+  onShow = noOp,
+}: PropsWithChildren<Props>) {
   useHotkeys("escape", (event) => hideModal(event as unknown as MouseEvent))
+
+  useEffect(() => {
+    isShown ? onShow() : onHide()
+  }, [isShown])
 
   return Either.fromBoolean(isShown).fold(Null, () => (
     <div

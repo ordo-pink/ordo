@@ -3,7 +3,6 @@ import type { OrdoDirectory } from "@core/app/types"
 import React, { MouseEvent, useState } from "react"
 
 import { useAppDispatch, useAppSelector } from "@client/state"
-import { useRenameModal } from "@client/app/hooks/use-rename-modal"
 import { useContextMenu } from "@client/context-menu"
 import { useIcon } from "@client/use-icon"
 import { deleteFileOrDirectory } from "@client/app/store"
@@ -39,14 +38,7 @@ export default function Directory({ item }: Props) {
 
   const handleClick = () => setIsExpanded((value) => !value)
 
-  const { showRenameModal, RenameModal } = useRenameModal(item)
-
   const children: OrdoCommand<string>[] = [
-    {
-      title: "@app/rename",
-      icon: "BsPencilSquare",
-      action: () => showRenameModal(),
-    },
     {
       title: "@app/delete",
       icon: "BsTrash",
@@ -57,7 +49,8 @@ export default function Directory({ item }: Props) {
     ...commands.filter(
       (command) =>
         command.showInContextMenu === ExtensionContextMenuLocation.DIRECTORY ||
-        command.showInContextMenu === ExtensionContextMenuLocation.FILE_OR_DIRECTORY
+        command.showInContextMenu === ExtensionContextMenuLocation.FILE_OR_DIRECTORY ||
+        command.showInContextMenu === ExtensionContextMenuLocation.DIRECTORY_OR_ROOT
     ),
   ]
 
@@ -87,7 +80,6 @@ export default function Directory({ item }: Props) {
       </ActionListItem>
 
       <ContextMenu />
-      <RenameModal />
     </>
   )
 }

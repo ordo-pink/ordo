@@ -10,8 +10,7 @@ import { parseMetadata } from "@core/app/parsers/parse-ordo-file"
 
 type TSaveFileParams = RootNode["data"] & { path: string }
 
-// TODO: Add command palette
-const RevealInFilesCommandExtension: OrdoCommandExtension<"duplicate"> = {
+const DuplicateCommandExtension: OrdoCommandExtension<"duplicate"> = {
   name: "ordo-command-duplicate",
   translations: {
     en: { "@duplicate/duplicate-file-or-directory": "Duplicate" },
@@ -24,17 +23,17 @@ const RevealInFilesCommandExtension: OrdoCommandExtension<"duplicate"> = {
       accelerator: "shift+alt+d",
       showInContextMenu: ExtensionContextMenuLocation.FILE,
       showInCommandPalette: false,
-      action: async (state, { target, dispatch }) => {
-        if (!target || isDirectory(target)) return
+      action: async (state, { contextMenuTarget, dispatch }) => {
+        if (!contextMenuTarget || isDirectory(contextMenuTarget)) return
 
         const { raw } = await window.ordo.emit<{ file: OrdoFile; raw: string }, OrdoFile>({
           type: "@app/openFile",
-          payload: target,
+          payload: contextMenuTarget,
         })
 
-        const separator = target.path.lastIndexOf(".")
-        const nameBeforeExtension = target.path.slice(0, separator)
-        const extension = target.path.slice(separator)
+        const separator = contextMenuTarget.path.lastIndexOf(".")
+        const nameBeforeExtension = contextMenuTarget.path.slice(0, separator)
+        const extension = contextMenuTarget.path.slice(separator)
         const path = nameBeforeExtension.concat(" copy").concat(extension)
         const rootNode = createRoot(raw)
         const node = parseMetadata(rootNode)
@@ -49,4 +48,4 @@ const RevealInFilesCommandExtension: OrdoCommandExtension<"duplicate"> = {
   ],
 }
 
-export default RevealInFilesCommandExtension
+export default DuplicateCommandExtension

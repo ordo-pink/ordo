@@ -22,8 +22,8 @@ const CreateCommandExtension: OrdoCommandExtension<"create"> = {
       icon: "BsFilePlus",
       accelerator: "ctrl+n",
       showInCommandPalette: true,
-      showInContextMenu: ExtensionContextMenuLocation.DIRECTORY,
-      action: (state, { dispatch, target }) =>
+      showInContextMenu: ExtensionContextMenuLocation.DIRECTORY_OR_ROOT,
+      action: (state, { dispatch, contextMenuTarget: target }) =>
         dispatch(
           showCreateFileModal(target ? (target as OrdoDirectory) : state.app.personalDirectory)
         ),
@@ -33,8 +33,8 @@ const CreateCommandExtension: OrdoCommandExtension<"create"> = {
       icon: "BsFolderPlus",
       accelerator: "ctrl+shift+n",
       showInCommandPalette: true,
-      showInContextMenu: ExtensionContextMenuLocation.DIRECTORY,
-      action: (state, { dispatch, target }) =>
+      showInContextMenu: ExtensionContextMenuLocation.DIRECTORY_OR_ROOT,
+      action: (state, { dispatch, contextMenuTarget: target }) =>
         dispatch(
           showCreateDirectoryModal(target ? (target as OrdoDirectory) : state.app.personalDirectory)
         ),

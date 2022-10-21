@@ -17,6 +17,7 @@ type Props = {
 }
 
 export default function MenuItem({ item, hideContextMenu, target }: Props) {
+  const currentFile = useAppSelector((state) => state.app.currentFile)
   const state = useAppSelector(identity)
   const Icon = useIcon(item.icon)
   const dispatch = useAppDispatch()
@@ -27,7 +28,9 @@ export default function MenuItem({ item, hideContextMenu, target }: Props) {
   const onClick = (event: MouseEvent) => {
     hideContextMenu(event)
 
-    if (item.action) item.action(state, { dispatch, target })
+    if (item.action) {
+      item.action(state, { dispatch, contextMenuTarget: target, currentFile })
+    }
   }
 
   return (

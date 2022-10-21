@@ -18,12 +18,14 @@ const CopyPathCommandExtension: OrdoCommandExtension<"copy-path"> = {
     {
       title: "@copy-path/copy-relative-path",
       icon: "BsSignpost",
-      showInContextMenu: ExtensionContextMenuLocation.FILE_OR_DIRECTORY,
+      showInContextMenu: ExtensionContextMenuLocation.FILE_OR_DIRECTORY_OR_ROOT,
       showInCommandPalette: true,
-      action: (state, { target }) => {
-        if (!target && !state.app.currentFile) return
+      action: (_, { contextMenuTarget, currentFile }) => {
+        if (!contextMenuTarget && !currentFile) return
 
-        const relativePath = target ? target.relativePath : state.app.currentFile?.relativePath
+        const relativePath = contextMenuTarget
+          ? contextMenuTarget.relativePath
+          : currentFile?.relativePath
 
         if (!relativePath) return
 
@@ -33,13 +35,13 @@ const CopyPathCommandExtension: OrdoCommandExtension<"copy-path"> = {
     {
       title: "@copy-path/copy-path",
       icon: "BsSignpost2",
-      showInContextMenu: ExtensionContextMenuLocation.FILE_OR_DIRECTORY,
+      showInContextMenu: ExtensionContextMenuLocation.FILE_OR_DIRECTORY_OR_ROOT,
       showInCommandPalette: true,
-      action: (state, { target }) => {
-        const path = target
-          ? target.path
-          : state.app.currentFile
-          ? state.app.currentFile.path
+      action: (state, { contextMenuTarget, currentFile }) => {
+        const path = contextMenuTarget
+          ? contextMenuTarget.path
+          : currentFile
+          ? currentFile.path
           : state.app.userSettings["project.personal.directory"]
 
         if (!path) return

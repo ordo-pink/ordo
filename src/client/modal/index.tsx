@@ -1,6 +1,12 @@
 import React, { useState, useCallback, MouseEvent, PropsWithChildren } from "react"
 
 import Modal from "@client/modal/components/modal"
+import { Thunk } from "@core/types"
+
+type Props = {
+  onHide?: Thunk<void>
+  onShow?: Thunk<void>
+}
 
 export const useModalWindow = () => {
   const [isShown, setIsShown] = useState(false)
@@ -24,8 +30,8 @@ export const useModalWindow = () => {
   }
 
   const Component = useCallback(
-    ({ children }: PropsWithChildren) => (
-      <Modal isShown={isShown} hideModal={hideModal}>
+    ({ children, onShow, onHide }: PropsWithChildren<Props>) => (
+      <Modal isShown={isShown} hideModal={hideModal} onShow={onShow} onHide={onHide}>
         {children}
       </Modal>
     ),

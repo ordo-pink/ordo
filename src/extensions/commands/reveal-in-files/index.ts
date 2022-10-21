@@ -12,9 +12,10 @@ const RevealInFilesCommandExtension: OrdoCommandExtension<"reveal-in-files"> = {
     {
       title: "@reveal-in-files/open-in-file-explorer",
       icon: "BsFolderCheck",
-      showInContextMenu: ExtensionContextMenuLocation.FILE_OR_DIRECTORY,
+      hasElectronHanlders: true,
       showInCommandPalette: true,
-      action: (state, { target }) => {
+      showInContextMenu: ExtensionContextMenuLocation.FILE_OR_DIRECTORY_OR_ROOT,
+      action: (state, { contextMenuTarget: target }) => {
         const type = "@reveal-in-files/open-in-file-explorer"
         const payload = target
           ? target.path

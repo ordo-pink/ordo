@@ -4,6 +4,7 @@ import app from "@client/app/store"
 import tags from "@client/tags/store"
 import activityBar from "@client/activity-bar/store"
 import createModal from "@client/create-modal/store"
+import renameModal from "@client/rename-modal/store"
 import commandPalette from "@client/command-palette/store"
 
 export const store = configureStore({
@@ -13,6 +14,7 @@ export const store = configureStore({
     tags,
     activityBar,
     createModal,
+    renameModal,
     commandPalette,
   },
 })

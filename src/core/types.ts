@@ -68,16 +68,17 @@ export type OrdoParserExtension<Name extends string> = OrdoExtension<Name, "pars
 }
 
 export type ActionArgs = {
-  target: Nullable<OrdoFile | OrdoDirectory>
+  currentFile: Nullable<OrdoFile>
+  contextMenuTarget: Nullable<OrdoFile | OrdoDirectory>
   dispatch: ReturnType<typeof useAppDispatch>
 }
 
 export type OrdoCommand<ExtensionName extends string> = {
   accelerator?: string
   title: `@${ExtensionName}/${string}`
-  // eslint-disable-next-line @typescript-eslint/ban-types
   action: (state: ReturnType<typeof store.getState>, args: ActionArgs) => void
   icon?: IconName
   showInContextMenu?: ExtensionContextMenuLocation
   showInCommandPalette?: boolean
+  hasElectronHanlders?: boolean
 }

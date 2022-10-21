@@ -16,8 +16,9 @@ export default function FileExplorer() {
 
   const children: OrdoCommand<string>[] = commands.filter(
     (command) =>
-      command.showInContextMenu === ExtensionContextMenuLocation.DIRECTORY ||
-      command.showInContextMenu === ExtensionContextMenuLocation.FILE_OR_DIRECTORY
+      command.showInContextMenu === ExtensionContextMenuLocation.ROOT ||
+      command.showInContextMenu === ExtensionContextMenuLocation.DIRECTORY_OR_ROOT ||
+      command.showInContextMenu === ExtensionContextMenuLocation.FILE_OR_DIRECTORY_OR_ROOT
   )
 
   const { showContextMenu, ContextMenu } = useContextMenu({ children })

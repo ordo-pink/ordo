@@ -30,6 +30,7 @@ export default function CommandPalette() {
 
   const commands = useAppSelector((state) => state.commandPalette.commands)
   const isShown = useAppSelector((state) => state.commandPalette.isShown)
+  const currentFile = useAppSelector((state) => state.app.currentFile)
   const state = useAppSelector(identity)
 
   const { Modal, showModal, hideModal } = useModalWindow()
@@ -42,7 +43,7 @@ export default function CommandPalette() {
   const placeholder = t(`app.command-palette.placeholder`)
 
   useEffect(() => {
-    if (isShown) showModal()
+    if (!isShown) showModal()
   }, [isShown])
 
   const handleWrapperClick = (event: MouseEvent) => event.stopPropagation()
@@ -72,7 +73,6 @@ export default function CommandPalette() {
   }, [inputValue, commands, t])
 
   const hide = () => {
-    hideModal()
     setCurrentIndex(0)
     setInputValue("")
     dispatch(hideCommandPalette())
@@ -84,8 +84,8 @@ export default function CommandPalette() {
   }
 
   const handleClick = (command: OrdoCommand<string>) => {
-    dispatch(() => command.action(state, { dispatch, target: null }))
-    hide()
+    dispatch(() => command.action(state, { dispatch, contextMenuTarget: null, currentFile }))
+    hideModal()
   }
 
   const handleKeyDown = ({ key }: KeyboardEvent) => {
@@ -93,8 +93,10 @@ export default function CommandPalette() {
       .case("Escape", hide)
       .case("Enter", () => {
         const currentCommand = visibleCommands[currentIndex]
-        dispatch(() => currentCommand.action(state, { dispatch, target: null }))
-        hide()
+        dispatch(() =>
+          currentCommand.action(state, { dispatch, contextMenuTarget: null, currentFile })
+        )
+        hideModal()
       })
       .case("ArrowUp", () => {
         // If it is the first item, skip to the last item.
@@ -112,7 +114,7 @@ export default function CommandPalette() {
   }
 
   return Either.fromBoolean(isShown).fold(Null, () => (
-    <Modal>
+    <Modal onHide={hide}>
       <div className="h-full flex items-start justify-center">
         <div
           onClick={handleWrapperClick}

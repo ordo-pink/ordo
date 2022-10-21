@@ -30,6 +30,7 @@ import Workspace from "@client/workspace"
 import CommandPalette from "@client/command-palette"
 import Either from "@core/utils/either"
 import CreateModal from "@client/create-modal"
+import RenameModal from "@client/rename-modal"
 
 export default function App() {
   const dispatch = useAppDispatch()
@@ -166,6 +167,7 @@ export default function App() {
       </div>
       <CommandPalette />
       <CreateModal />
+      <RenameModal />
     </div>
   )
 }

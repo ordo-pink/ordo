@@ -2,6 +2,7 @@ import type { OrdoCommandExtension } from "@core/types"
 
 import { ExtensionContextMenuLocation } from "@core/constants"
 import { showCreateFileModal, showCreateDirectoryModal } from "@client/create-modal/store"
+import { OrdoDirectory } from "@core/app/types"
 
 const CreateCommandExtension: OrdoCommandExtension<"create"> = {
   name: "ordo-command-create",
@@ -21,15 +22,22 @@ const CreateCommandExtension: OrdoCommandExtension<"create"> = {
       icon: "BsFilePlus",
       accelerator: "ctrl+n",
       showInCommandPalette: true,
-      action: (state, { dispatch }) => dispatch(showCreateFileModal(state.app.personalDirectory)),
+      showInContextMenu: ExtensionContextMenuLocation.DIRECTORY,
+      action: (state, { dispatch, target }) =>
+        dispatch(
+          showCreateFileModal(target ? (target as OrdoDirectory) : state.app.personalDirectory)
+        ),
     },
     {
       title: "@create/directory",
       icon: "BsFolderPlus",
       accelerator: "ctrl+shift+n",
       showInCommandPalette: true,
-      action: (state, { dispatch }) =>
-        dispatch(showCreateDirectoryModal(state.app.personalDirectory)),
+      showInContextMenu: ExtensionContextMenuLocation.DIRECTORY,
+      action: (state, { dispatch, target }) =>
+        dispatch(
+          showCreateDirectoryModal(target ? (target as OrdoDirectory) : state.app.personalDirectory)
+        ),
     },
   ],
 }

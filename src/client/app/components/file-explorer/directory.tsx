@@ -49,19 +49,6 @@ export default function Directory({ item }: Props) {
       action: () => showRenameModal(),
     },
     {
-      title: "@app/create-file",
-      icon: "BsFilePlus",
-      action: (_, { target, dispatch }) => dispatch(showCreateFileModal(target as OrdoDirectory)),
-      accelerator: "ctrl+n",
-    },
-    {
-      title: "@app/create-directory",
-      icon: "BsFolderPlus",
-      action: (_, { target, dispatch }) =>
-        dispatch(showCreateDirectoryModal(target as OrdoDirectory)),
-      accelerator: "ctrl+shift+n",
-    },
-    {
       title: "@app/delete",
       icon: "BsTrash",
       action: () => {

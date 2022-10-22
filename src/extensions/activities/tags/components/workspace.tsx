@@ -4,16 +4,18 @@ import React, { useEffect, useMemo, useRef, useState } from "react"
 import { Network, Options, Edge, Node } from "vis-network"
 
 import { enableSideBar } from "@client/app/store"
-import { useAppDispatch, useAppSelector } from "@client/common/hooks/state-hooks"
+import { useAppDispatch, useExtensionSelector } from "@client/common/hooks/state-hooks"
 import { usePreferredColorTheme } from "@client/common/hooks/use-preferred-color-scheme"
-import { getTags } from "@extensions/activities/tags/store"
+import { getTags, TagsState } from "@extensions/activities/tags/store"
 
 export default function Tags() {
   const dispatch = useAppDispatch()
-  const tree = useAppSelector((state) => state.app.personalDirectory)
-  const hoveredTag = useAppSelector((state) => state.tags.hoveredTag)
-  const selectedTags = useAppSelector((state) => state.tags.selectedTags)
-  const tags = useAppSelector((state) => state.tags.tags)
+  const select = useExtensionSelector<{ tags: TagsState }>()
+
+  const tree = select((state) => state.app.personalDirectory)
+  const hoveredTag = select((state) => state.tags.hoveredTag)
+  const selectedTags = select((state) => state.tags.selectedTags)
+  const tags = select((state) => state.tags.tags)
   const ref = useRef<HTMLDivElement>(null)
   const [network, setNetwork] = useState<Nullable<Network>>(null)
   const [data, setData] = useState<{ nodes: Node[]; edges: Edge[] }>({ nodes: [], edges: [] })

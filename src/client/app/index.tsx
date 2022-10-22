@@ -1,4 +1,5 @@
 import React, { useLayoutEffect, useState, useEffect } from "react"
+import { combineReducers } from "@reduxjs/toolkit"
 import { useHotkeys } from "react-hotkeys-hook"
 import { identity } from "ramda"
 import SplitView from "react-split"
@@ -29,6 +30,7 @@ import { createFileCommand } from "@client/app/commands/create-file"
 import { createDirectoryCommand } from "@client/app/commands/create-directory"
 import { deleteDirectoryCommand } from "@client/app/commands/delete-directory"
 import { deleteFileCommand } from "@client/app/commands/delete-file"
+import { reducer, store } from "@client/store"
 
 import ActivityBar from "@client/activity-bar"
 import SideBar from "@client/side-bar"
@@ -65,7 +67,7 @@ export default function App() {
   ])
 
   useEffect(() => {
-    Extensions.map(({ commands, translations }) => {
+    Extensions.map(({ commands, translations, storeSlice, name }) => {
       Object.keys(translations).forEach((lng) => {
         i18next.addResourceBundle(lng, "translation", (translations as Record<string, string>)[lng])
       })
@@ -73,6 +75,17 @@ export default function App() {
       commands.forEach((command) => {
         dispatch(addCommand(command))
       })
+
+      if (storeSlice) {
+        const newReducer = storeSlice.reducer
+
+        const combined = combineReducers({
+          ...reducer,
+          [name.replace("ordo-activity-", "")]: newReducer,
+        })
+
+        store.replaceReducer(combined)
+      }
     })
   }, [])
 

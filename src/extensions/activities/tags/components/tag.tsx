@@ -7,8 +7,13 @@ import {
   addSelectedTag,
   setHoveredTag,
   resetHoveredTag,
+  TagsState,
 } from "@extensions/activities/tags/store"
-import { useAppDispatch, useAppSelector } from "@client/common/hooks/state-hooks"
+import {
+  useAppDispatch,
+  useAppSelector,
+  useExtensionSelector,
+} from "@client/common/hooks/state-hooks"
 
 import ActionListItem from "@client/common/action-list-item"
 
@@ -18,7 +23,8 @@ type Props = {
 
 export default function Tag({ tag }: Props) {
   const dispatch = useAppDispatch()
-  const selectedTags = useAppSelector((state) => state.tags.selectedTags)
+  const select = useExtensionSelector<{ tags: TagsState }>()
+  const selectedTags = select((state) => state.tags.selectedTags)
 
   const isCurrent = selectedTags.some((st) => st === tag.name)
 

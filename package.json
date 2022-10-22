@@ -13,6 +13,7 @@
     "eslint:lint": "eslint --ext .ts,.tsx .",
     "prettier:check": "prettier --check src/**/*.{ts,tsx}",
     "prettier:format": "prettier --write src/**/*.{ts,tsx}",
+    "lint": "npm run eslint:lint && npm run prettier:check",
     "prepare": "husky install",
     "postinstall": "husky install"
   },

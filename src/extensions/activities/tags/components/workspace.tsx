@@ -1,9 +1,12 @@
-import { enableSideBar } from "@client/app/store"
-import { useAppDispatch, useAppSelector } from "@client/common/hooks/state-hooks"
-import { Nullable } from "@core/types"
+import type { Nullable } from "@core/types"
+
 import React, { useEffect, useMemo, useRef, useState } from "react"
 import { Network, Options, Edge, Node } from "vis-network"
-import { getTags } from "./store"
+
+import { enableSideBar } from "@client/app/store"
+import { useAppDispatch, useAppSelector } from "@client/common/hooks/state-hooks"
+import { usePreferredColorTheme } from "@client/common/hooks/use-preferred-color-scheme"
+import { getTags } from "@extensions/activities/tags/store"
 
 export default function Tags() {
   const dispatch = useAppDispatch()
@@ -21,10 +24,7 @@ export default function Tags() {
     if (tree) dispatch(getTags(tree))
   }, [tree])
 
-  const mode =
-    window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches
-      ? "dark"
-      : "light"
+  const theme = usePreferredColorTheme()
 
   const allData = useMemo(
     () =>
@@ -38,7 +38,7 @@ export default function Tags() {
               label: tag.name,
               size: 10 + 2 * tag.files.length,
               borderWidth: 0,
-              color: mode === "dark" ? "#ec4899" : "#f472b6",
+              color: theme === "dark" ? "#ec4899" : "#f472b6",
             })
           }
 
@@ -51,7 +51,7 @@ export default function Tags() {
                 size: 10,
                 shape: "hexagon",
                 label: file.slice(0, -4),
-                color: mode === "dark" ? "#fafaf9" : "#44403c",
+                color: theme === "dark" ? "#fafaf9" : "#44403c",
                 borderWidth: 0,
               })
             }
@@ -75,7 +75,7 @@ export default function Tags() {
 
     const options: Options = {
       manipulation: { enabled: false },
-      nodes: { shape: "dot", font: { color: mode === "dark" ? "#ddd" : "#111" } },
+      nodes: { shape: "dot", font: { color: theme === "dark" ? "#ddd" : "#111" } },
       edges: { smooth: { enabled: true, type: "continuous", roundness: 0 } },
       interaction: { hover: true, hideEdgesOnDrag: true, tooltipDelay: 200 },
       physics: {
@@ -88,17 +88,25 @@ export default function Tags() {
     }
 
     const network = new Network(ref.current, data, options)
+
     network.disableEditMode()
+
     setNetwork(network)
   }, [ref, tags, data])
 
   useEffect(() => {
+    if (!network) return
+
     const invalidTagHovered =
       hoveredTag !== "" && !data.nodes.some((node) => node.id === hoveredTag)
 
-    if (!network || invalidTagHovered) return
+    if (invalidTagHovered) return
 
-    hoveredTag ? network.selectNodes([hoveredTag]) : network.unselectAll()
+    try {
+      hoveredTag ? network.selectNodes([hoveredTag]) : network.unselectAll()
+    } catch (e) {
+      network.unselectAll()
+    }
   }, [network, hoveredTag])
 
   useEffect(() => {

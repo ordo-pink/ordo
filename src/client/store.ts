@@ -1,7 +1,7 @@
 import { configureStore } from "@reduxjs/toolkit"
 
 import app from "@client/app/store"
-import tags from "@client/tags/store"
+import tags from "@extensions/activities/tags/store"
 import activityBar from "@client/activity-bar/store"
 import createModal from "@client/create-modal/store"
 import renameModal from "@client/rename-modal/store"

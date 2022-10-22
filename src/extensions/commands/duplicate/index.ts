@@ -13,12 +13,12 @@ type TSaveFileParams = RootNode["data"] & { path: string }
 const DuplicateCommandExtension: OrdoCommandExtension<"duplicate"> = {
   name: "ordo-command-duplicate",
   translations: {
-    en: { "@duplicate/duplicate-file-or-directory": "Duplicate" },
-    ru: { "@duplicate/duplicate-file-or-directory": "Создать копию" },
+    en: { duplicate: "Duplicate" },
+    ru: { duplicate: "Создать копию" },
   },
   commands: [
     {
-      title: "@duplicate/duplicate-file-or-directory",
+      title: "duplicate",
       icon: "BsFiles",
       accelerator: "shift+alt+d",
       showInContextMenu: ExtensionContextMenuLocation.FILE,

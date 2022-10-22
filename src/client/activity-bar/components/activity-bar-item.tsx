@@ -19,7 +19,7 @@ export default function ActivityBarItem({ icon, name, currentActivityName }: Pro
   const className = useActivityBarItemClass({ name, currentActivityName })
   const { t } = useTranslation()
 
-  const translatedTitle = t(`${name}.activity.title`)
+  const translatedTitle = t(name.replace("ordo-activity-", ""))
 
   const handleClick = () => dispatch(selectActivity(name))
 

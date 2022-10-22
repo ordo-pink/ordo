@@ -1,4 +1,4 @@
-import type { TagObject } from "@client/tags/types"
+import type { TagObject } from "@extensions/activities/tags/types"
 
 import React from "react"
 
@@ -7,7 +7,7 @@ import {
   addSelectedTag,
   setHoveredTag,
   resetHoveredTag,
-} from "@client/tags/store"
+} from "@extensions/activities/tags/store"
 import { useAppDispatch, useAppSelector } from "@client/common/hooks/state-hooks"
 
 import ActionListItem from "@client/common/action-list-item"

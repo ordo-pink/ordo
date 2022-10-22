@@ -32,16 +32,15 @@ export type OrdoEvent<
 > = `@${Scope}/${Identifier}`
 
 type TranslationRecord<Name extends string> = {
-  [Key in Language]?: Record<`@${Name}/${string}`, string>
+  [Key in Language]?: Record<`@${Name}/${string}` | Name, string>
 }
 
-export type OrdoExtension<
-  Name extends string,
-  Type extends "command" | "parser" | "association" | "activity"
-> = {
-  name: `ordo-${Type}-${Name}`
+type ExtensionType = "command" | "association" | "parser" | "activity"
+
+export type OrdoExtension<Name extends string> = {
   translations: TranslationRecord<Name>
-  store?: Slice
+  name: `ordo-${ExtensionType}-${Name}`
+  storeSlice?: Slice
 }
 
 export type ParserRule = {
@@ -49,24 +48,25 @@ export type ParserRule = {
   extract: (line: string, root: RootNode) => void
 }
 
-export type OrdoCommandExtension<Name extends string> = OrdoExtension<Name, "command"> & {
+export type OrdoCommandExtension<Name extends string> = OrdoExtension<Name> & {
   commands: OrdoCommand<Name>[]
 }
 
 export type OrdoActivityExtension<Name extends string> = OrdoCommandExtension<Name> &
-  OrdoExtension<Name, "activity"> & {
+  OrdoExtension<Name> & {
     sidebarComponent: Nullable<FC>
     workspaceComponent: FC
     icon: IconName
   }
 
 export type OrdoAssociationExtension<Name extends string> = OrdoCommandExtension<Name> &
-  OrdoExtension<Name, "association"> &
+  OrdoExtension<Name> &
   OrdoParserExtension<Name> & {
     fileExtensions: `.${string}`[]
   }
 
-export type OrdoParserExtension<Name extends string> = OrdoExtension<Name, "parser"> & {
+export type OrdoParserExtension<Name extends string> = OrdoExtension<Name> & {
+  name: `ordo-parser-${Name}`
   rules: ParserRule[]
 }
 
@@ -76,9 +76,9 @@ export type ActionArgs = {
   dispatch: ReturnType<typeof useAppDispatch>
 }
 
-export type OrdoCommand<ExtensionName extends string> = {
+export type OrdoCommand<Name extends string> = {
   accelerator?: string
-  title: `@${ExtensionName}/${string}`
+  title: `@${Name}/${string}` | Name
   action: (state: ReturnType<typeof store.getState>, args: ActionArgs) => void
   icon?: IconName
   showInContextMenu?: ExtensionContextMenuLocation

@@ -2,10 +2,10 @@ import React, { useEffect, useState } from "react"
 import { useTranslation } from "react-i18next"
 
 import { useAppDispatch, useAppSelector } from "@client/common/hooks/state-hooks"
-import { getTags, resetHoveredTag, resetSelectedTags } from "@client/tags/store"
+import { getTags, resetHoveredTag, resetSelectedTags } from "@extensions/activities/tags/store"
 
 import ActionListItem from "@client/common/action-list-item"
-import Tag from "@client/tags/components/tag"
+import Tag from "@extensions/activities/tags/components/tag"
 
 export default function TagsSidebar() {
   const dispatch = useAppDispatch()
@@ -18,6 +18,7 @@ export default function TagsSidebar() {
 
   useEffect(() => {
     const count = tags.reduce((acc, tag) => acc + tag.files.length, 0)
+
     setTagCount(count)
   }, [tags])
 
@@ -31,7 +32,7 @@ export default function TagsSidebar() {
     <div>
       <ActionListItem
         icon="BsTags"
-        text={t("tags.all-tags")}
+        text={t("@tags/all-tags")}
         isCurrent={hasNoSelectedTag}
         onMouseEnter={() => dispatch(resetHoveredTag())}
         onClick={() => dispatch(resetSelectedTags())}
@@ -42,7 +43,7 @@ export default function TagsSidebar() {
       </ActionListItem>
 
       {tags.map((tag) => (
-        <Tag tag={tag} key={tag.name} />
+        <Tag key={tag.name} tag={tag} />
       ))}
     </div>
   )

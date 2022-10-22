@@ -6,12 +6,12 @@ const CopyPathCommandExtension: OrdoCommandExtension<"copy-path"> = {
   name: "ordo-command-copy-path",
   translations: {
     en: {
+      "copy-path": "Copy path",
       "@copy-path/copy-relative-path": "Copy relative path",
-      "@copy-path/copy-path": "Copy path",
     },
     ru: {
+      "copy-path": "Скопировать путь",
       "@copy-path/copy-relative-path": "Скопировать относительный путь",
-      "@copy-path/copy-path": "Скопировать путь",
     },
   },
   commands: [
@@ -34,7 +34,7 @@ const CopyPathCommandExtension: OrdoCommandExtension<"copy-path"> = {
       },
     },
     {
-      title: "@copy-path/copy-path",
+      title: "copy-path",
       icon: "BsSignpost2",
       accelerator: "ctrl+alt+shift+c",
       showInCommandPalette: true,

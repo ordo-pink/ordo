@@ -5,12 +5,12 @@ import { ExtensionContextMenuLocation } from "@core/constants"
 const RevealInFilesCommandExtension: OrdoCommandExtension<"reveal-in-files"> = {
   name: "ordo-command-reveal-in-files",
   translations: {
-    en: { "@reveal-in-files/open-in-file-explorer": "Reveal in Files" },
-    ru: { "@reveal-in-files/open-in-file-explorer": "Показать в проводнике" },
+    en: { "reveal-in-files": "Reveal in Files" },
+    ru: { "reveal-in-files": "Показать в проводнике" },
   },
   commands: [
     {
-      title: "@reveal-in-files/open-in-file-explorer",
+      title: "reveal-in-files",
       icon: "BsFolderCheck",
       accelerator: "ctrl+alt+r",
       hasElectronHanlders: true,

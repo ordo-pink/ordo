@@ -3,13 +3,25 @@ import Switch from "@client/common/utils/switch"
 
 import Null from "@client/common/null"
 import FileExplorer from "@client/file-explorer"
-import TagsSidebar from "@client/tags/sidebar"
+import { Extensions } from "@extensions/index"
+import { OrdoActivityExtension } from "@core/types"
 
 export const useSidebarComponent = () => {
   const currentActivity = useAppSelector((state) => state.activityBar.currentActivity)
 
-  return Switch.of(currentActivity)
-    .case("editor", FileExplorer)
-    .case("tags", TagsSidebar)
-    .default(Null)
+  let componentSwitch = Switch.of(currentActivity).case("editor", FileExplorer)
+
+  Extensions.forEach((extension) => {
+    const isActivityExtension = extension.name.startsWith("ordo-activity-")
+
+    if (!isActivityExtension) return
+
+    const { name, sidebarComponent } = extension as OrdoActivityExtension<string>
+
+    if (!sidebarComponent) return
+
+    componentSwitch = componentSwitch.case(name, sidebarComponent)
+  })
+
+  return componentSwitch.default(Null)
 }

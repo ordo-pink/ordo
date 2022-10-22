@@ -6,11 +6,12 @@ import Switch from "@client/common/utils/switch"
 
 import Null from "@client/common/null"
 import Editor from "@client/editor"
+import Settings from "@client/settings"
 
 export const useWorkspaceComponent = () => {
   const currentActivity = useAppSelector((state) => state.activityBar.currentActivity)
 
-  let componentSwitch = Switch.of(currentActivity).case("editor", Editor)
+  let componentSwitch = Switch.of(currentActivity).case("editor", Editor).case("settings", Settings)
 
   Extensions.forEach((extension) => {
     const isActivityExtension = extension.name.startsWith("ordo-activity-")

@@ -1,4 +1,4 @@
 {
-  "editor.activity.title": "Редактор",
+  "editor": "Редактор",
   "@editor/open-activity": "Открыть Редактор"
 }

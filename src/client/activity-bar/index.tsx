@@ -79,7 +79,9 @@ export default function ActivityBar() {
 
   return (
     <div className="fixed top-0 left-0 bottom-0 flex flex-col items-center justify-between py-4 pl-4 pr-2 bg-neutral-200 dark:bg-neutral-900 activity-bar">
-      <ActivityGroup activities={activities} currentActivity={currentActivity} />
+      <ActivityGroup activities={[activities[0]]} currentActivity={currentActivity} />
+
+      <ActivityGroup activities={activities.slice(1)} currentActivity={currentActivity} />
 
       <ActivityGroup activities={requiredActivities} currentActivity={currentActivity} />
     </div>

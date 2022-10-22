@@ -1,6 +1,9 @@
 {
-  "settings.activity.title": "Settings",
-  "notifications.activity.title": "Notifications",
+  "settings": "Settings",
+  "notifications": "Notifications",
+  "achievements": "Achievements",
+  "account": "Account",
+  "extensions": "Extensions",
   "app.command-palette.placeholder": "Search commands by name",
   "app.appearance.theme.title": "Theme",
   "app.appearance.theme.description": "Let the darkness (or the lightness?) be with you.",

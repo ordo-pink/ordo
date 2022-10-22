@@ -1,6 +1,9 @@
 {
-  "settings.activity.title": "Настройки",
-  "notifications.activity.title": "Уведомления",
+  "settings": "Настройки",
+  "notifications": "Уведомления",
+  "achievements": "Достижения",
+  "account": "Личный кабинет",
+  "extensions": "Расширения",
   "app.command-palette.placeholder": "Поиск команд по названию",
   "app.appearance.theme.title": "Тема оформления",
   "app.appearance.theme.description": "Темнота - друг молодёжи.",

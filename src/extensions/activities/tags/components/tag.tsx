@@ -9,11 +9,7 @@ import {
   resetHoveredTag,
   TagsState,
 } from "@extensions/activities/tags/store"
-import {
-  useAppDispatch,
-  useAppSelector,
-  useExtensionSelector,
-} from "@client/common/hooks/state-hooks"
+import { useAppDispatch, useExtensionSelector } from "@client/common/hooks/state-hooks"
 
 import ActionListItem from "@client/common/action-list-item"
 

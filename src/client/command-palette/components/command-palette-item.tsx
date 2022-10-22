@@ -6,7 +6,7 @@ import { useTranslation } from "react-i18next"
 import { noOp } from "@client/common/utils/no-op"
 
 import Accelerator from "@client/context-menu/components/accelerator"
-import ActionListItem from "@client/common/action-list-item"
+import ActionListItem from "@client/common/components/action-list-item"
 
 type Props = {
   isCurrent: boolean

@@ -11,7 +11,7 @@ import {
 } from "@extensions/activities/tags/store"
 import { useAppDispatch, useExtensionSelector } from "@client/common/hooks/state-hooks"
 
-import ActionListItem from "@client/common/action-list-item"
+import ActionListItem from "@client/common/components/action-list-item"
 
 type Props = {
   tag: TagObject

@@ -6,7 +6,7 @@ import Either from "@client/common/utils/either"
 import { useAppDispatch } from "@client/common/hooks/state-hooks"
 import { setUserSetting } from "@client/app/store"
 
-import Null from "@client/common/null"
+import Null from "@client/common/components/null"
 import SelectSettingOption from "@client/settings/components/select-setting-option"
 
 /**

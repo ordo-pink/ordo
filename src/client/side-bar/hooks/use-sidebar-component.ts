@@ -1,10 +1,10 @@
 import { useAppSelector } from "@client/common/hooks/state-hooks"
-import Switch from "@client/common/utils/switch"
-
-import Null from "@client/common/null"
-import FileExplorer from "@client/file-explorer"
 import { Extensions } from "@extensions/index"
 import { OrdoActivityExtension } from "@core/types"
+import Switch from "@client/common/utils/switch"
+
+import Null from "@client/common/components/null"
+import FileExplorer from "@client/file-explorer"
 
 export const useSidebarComponent = () => {
   const currentActivity = useAppSelector((state) => state.activityBar.currentActivity)

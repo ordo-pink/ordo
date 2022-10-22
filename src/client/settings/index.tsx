@@ -6,7 +6,7 @@ import { disableSideBar } from "@client/app/store"
 import Either from "@client/common/utils/either"
 
 import SettingsItem from "@client/settings/components/settings-item"
-import Null from "@client/common/null"
+import Null from "@client/common/components/null"
 
 /**
  * Application settings page.

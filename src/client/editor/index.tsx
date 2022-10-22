@@ -1,3 +1,4 @@
+import type { RootNode } from "@client/editor/types"
 import type { Nullable } from "@core/types"
 
 import React, { useEffect, useState, MouseEvent } from "react"
@@ -6,15 +7,10 @@ import { useAppDispatch, useAppSelector } from "@client/common/hooks/state-hooks
 import { getFileParser } from "@core/get-file-parser"
 import Either from "@client/common/utils/either"
 
-import Null from "@client/common/null"
-
-import "@client/editor/index.css"
-import { CaretRangeDirection } from "./constants"
+import { CaretRangeDirection } from "@client/editor/constants"
 import { useHotkeys } from "react-hotkeys-hook"
 import { noOp } from "@client/common/utils/no-op"
 import { preventDefault } from "@client/common/utils/event"
-import Line from "./components/line"
-import Switch from "@client/common/utils/switch"
 import { initialCaretRanges } from "@client/editor/initial-caret-ranges"
 import {
   handleArrowDown,
@@ -26,10 +22,15 @@ import { handleBackspace } from "@client/editor/key-handlers/backspace"
 import { handleChar } from "@client/editor/key-handlers/char"
 import { handleDelete } from "@client/editor/key-handlers/delete"
 import { handleEnter } from "@client/editor/key-handlers/enter"
-import { RootNode } from "@client/editor/types"
 import { IsKey } from "@client/editor/is-key"
 import { enableSideBar, saveFile } from "@client/app/store"
 import { useIcon } from "@client/common/hooks/use-icon"
+import Switch from "@client/common/utils/switch"
+
+import Line from "@client/editor/components/line"
+import Null from "@client/common/components/null"
+
+import "@client/editor/index.css"
 
 export default function Editor() {
   const dispatch = useAppDispatch()

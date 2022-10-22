@@ -1,7 +1,8 @@
 import type { OrdoActivityExtension } from "@core/types"
-import { openCheckboxesCommand } from "./commands/open-checkboxes"
 
-import Checkboxes from "./workspace"
+import { openCheckboxesCommand } from "@extensions/activities/checkboxes/commands/open-checkboxes"
+
+import Checkboxes from "@extensions/activities/checkboxes/workspace"
 
 const TagsActivityExtension: OrdoActivityExtension<"checkboxes"> = {
   icon: "BsCheck2Square",

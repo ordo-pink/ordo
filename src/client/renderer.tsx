@@ -6,7 +6,7 @@ import { store } from "@client/store"
 
 import App from "@client/app"
 
-import "@client/i18n/index"
+import "@client/i18n"
 import "@assets/index.css"
 
 const container = document.getElementById("app") as HTMLDivElement

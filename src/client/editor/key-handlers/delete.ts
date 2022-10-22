@@ -1,4 +1,4 @@
-import type { CaretRange, RootNode } from "../types"
+import type { CaretRange, RootNode } from "@client/editor/types"
 
 import { getCharIndex } from "@client/editor/get-char-index"
 

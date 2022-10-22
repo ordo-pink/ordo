@@ -13,7 +13,7 @@ import {
   TagsState,
 } from "@extensions/activities/tags/store"
 
-import ActionListItem from "@client/common/action-list-item"
+import ActionListItem from "@client/common/components/action-list-item"
 import Tag from "@extensions/activities/tags/components/tag"
 
 export default function TagsSidebar() {

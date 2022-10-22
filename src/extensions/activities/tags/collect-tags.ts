@@ -1,7 +1,8 @@
+import type { OrdoDirectory } from "@core/app/types"
+import type { Nullable } from "@core/types"
+import type { TagObject } from "@extensions/activities/tags/types"
+
 import { isDirectory } from "@client/common/is-directory"
-import { OrdoDirectory } from "@core/app/types"
-import { Nullable } from "@core/types"
-import { TagObject } from "./types"
 
 export const collectTags = (tree: Nullable<OrdoDirectory>, tags: TagObject[] = []) => {
   if (!tree) return tags

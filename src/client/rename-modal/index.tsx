@@ -9,7 +9,7 @@ import { hideRenameModal, showRenameModal } from "@client/rename-modal/store"
 import { useModalWindow } from "@client/common/hooks/use-modal"
 import Either from "@client/common/utils/either"
 
-import Null from "@client/common/null"
+import Null from "@client/common/components/null"
 
 export default function CreateModal() {
   const dispatch = useAppDispatch()

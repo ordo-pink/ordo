@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react"
 import Either from "@client/common/utils/either"
 import Switch from "@client/common/utils/switch"
 
-import Null from "@client/common/null"
+import Null from "@client/common/components/null"
 
 type Props = {
   accelerator?: string

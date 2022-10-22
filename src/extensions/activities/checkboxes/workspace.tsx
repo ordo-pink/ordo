@@ -1,11 +1,14 @@
+import type { OrdoDirectory } from "@core/app/types"
+import type { Checkbox } from "@client/editor/types"
+
+import React, { useEffect, useState } from "react"
+
 import { disableSideBar } from "@client/app/store"
-import Null from "@client/common/null"
 import { useAppDispatch, useAppSelector } from "@client/common/hooks/state-hooks"
 import { isDirectory } from "@client/common/is-directory"
-import { OrdoDirectory } from "@core/app/types"
-import { Checkbox } from "@client/editor/types"
 import Either from "@client/common/utils/either"
-import React, { useEffect, useState } from "react"
+
+import Null from "@client/common/components/null"
 
 const collectCheckboxes = (tree: OrdoDirectory, checkboxes: Record<string, Checkbox[]> = {}) => {
   for (const child of tree.children) {

@@ -11,7 +11,7 @@ import { useContextMenu } from "@client/context-menu"
 import { ORDO_FILE_EXTENSION } from "@core/app/constants"
 import { ExtensionContextMenuLocation } from "@core/constants"
 
-import ActionListItem from "@client/common/action-list-item"
+import ActionListItem from "@client/common/components/action-list-item"
 
 type Props = {
   item: OrdoFile

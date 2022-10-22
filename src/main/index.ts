@@ -3,16 +3,15 @@ import { app, BrowserWindow, ipcMain, nativeTheme } from "electron"
 import install, { REACT_DEVELOPER_TOOLS, REDUX_DEVTOOLS } from "electron-devtools-installer"
 import { join } from "path"
 
-import Either from "@client/common/utils/either"
 import { noOp } from "@client/common/utils/no-op"
+import Either from "@client/common/utils/either"
 
 import LocalSettingsStore from "@main/app/local-settings-store"
+import UserSettingsStore from "@main/app/user-settings-store"
 
 // TODO: Provide safe Electron.js APIs to avoid registerring main handlers from extensions
 import createAppApi from "@main/app"
 import createRevealInFilesApi from "@extensions/commands/reveal-in-files/main"
-
-import userSettingsStore from "@main/app/user-settings-store"
 
 const unregisterAppApi = createAppApi(ipcMain)
 const unregisterRevealInFilesApi = createRevealInFilesApi(ipcMain)
@@ -78,7 +77,7 @@ const createWindow = async () => {
     },
   })
 
-  nativeTheme.themeSource = userSettingsStore.get("appearance.theme")
+  nativeTheme.themeSource = UserSettingsStore.get("appearance.theme")
 
   // const documentsPath = app.getPath("documents")
   // TODO: (join(documentsPath, "Ordo Docs"))

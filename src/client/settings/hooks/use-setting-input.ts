@@ -11,7 +11,7 @@ import SelectSetting from "@client/settings/components/select-setting"
 import StringSetting from "@client/settings/components/string-setting"
 import NumberSetting from "@client/settings/components/number-setting"
 import SelectDirectorySetting from "@client/settings/components/select-directory-setting"
-import Null from "@client/common/null"
+import Null from "@client/common/components/null"
 
 export const useSettingInput = <Key extends keyof typeof USER_SETTINGS_SCHEMA>(
   key: Key,

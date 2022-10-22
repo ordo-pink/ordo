@@ -4,7 +4,7 @@ import { useAppSelector } from "@client/common/hooks/state-hooks"
 import { Extensions } from "@extensions/index"
 import Switch from "@client/common/utils/switch"
 
-import Null from "@client/common/null"
+import Null from "@client/common/components/null"
 import Editor from "@client/editor"
 import Settings from "@client/settings"
 

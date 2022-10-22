@@ -14,7 +14,7 @@ import Either from "@client/common/utils/either"
 import Switch from "@client/common/utils/switch"
 
 import CommandPaletteItem from "@client/command-palette/components/command-palette-item"
-import Null from "@client/common/null"
+import Null from "@client/common/components/null"
 
 // This is required to let fuse search through translations, not original command keys.
 type SearchableCommand = OrdoCommand<string> & { title: `@${string}/${string}` }

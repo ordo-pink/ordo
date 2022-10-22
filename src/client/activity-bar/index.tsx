@@ -27,8 +27,6 @@ export default function ActivityBar() {
         dispatch(addActivity({ icon, name }))
       }
     })
-
-    // TODO: Replace store reducer if extension extends store
   }, [Extensions])
 
   // TODO: Move this when extracting activities to extensions

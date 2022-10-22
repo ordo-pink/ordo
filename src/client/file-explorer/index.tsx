@@ -8,7 +8,7 @@ import { useContextMenu } from "@client/context-menu"
 import Either from "@client/common/utils/either"
 
 import FileOrDirectory from "@client/file-explorer/components/file-or-directory"
-import Null from "@client/common/null"
+import Null from "@client/common/components/null"
 
 export default function FileExplorer() {
   const parent = useAppSelector((state) => state.app.personalDirectory)

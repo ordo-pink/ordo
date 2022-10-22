@@ -9,7 +9,7 @@ import { useIcon } from "@client/common/hooks/use-icon"
 import { ExtensionContextMenuLocation } from "@core/constants"
 
 import FileOrDirectory from "@client/file-explorer/components/file-or-directory"
-import ActionListItem from "@client/common/action-list-item"
+import ActionListItem from "@client/common/components/action-list-item"
 
 type Props = {
   item: OrdoDirectory

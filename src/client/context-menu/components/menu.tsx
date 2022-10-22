@@ -8,7 +8,7 @@ import { useHotkeys } from "react-hotkeys-hook"
 import Either from "@client/common/utils/either"
 
 import MenuItem from "@client/context-menu/components/menu-item"
-import Null from "@client/common/null"
+import Null from "@client/common/components/null"
 
 type Props = {
   structure: Menu

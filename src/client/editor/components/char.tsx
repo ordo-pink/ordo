@@ -1,7 +1,10 @@
+import type { CaretRange, TextNode } from "@client/editor/types"
+
 import React, { useState, useEffect, Dispatch, SetStateAction, MouseEvent } from "react"
-import { CaretRangeDirection } from "../constants"
-import { CaretRange, TextNode } from "@client/editor/types"
-import Caret from "./caret"
+
+import { CaretRangeDirection } from "@client/editor/constants"
+
+import Caret from "@client/editor/components/caret"
 
 type Props = {
   node: TextNode

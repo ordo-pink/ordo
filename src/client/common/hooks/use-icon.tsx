@@ -8,7 +8,7 @@ import * as BsIcons from "react-icons/bs"
 
 import Switch from "@client/common/utils/switch"
 
-import Null from "@client/common/null"
+import Null from "@client/common/components/null"
 
 const ALL_ICONS: Record<string, IconType> = {
   ...HiIcons,

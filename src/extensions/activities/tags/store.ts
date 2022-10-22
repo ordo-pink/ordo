@@ -1,7 +1,9 @@
+import type { OrdoDirectory } from "@core/app/types"
+import type { TagObject } from "@extensions/activities/tags/types"
+
 import { createSlice, PayloadAction } from "@reduxjs/toolkit"
-import { OrdoDirectory } from "@core/app/types"
-import { collectTags } from "./collect-tags"
-import { TagObject } from "./types"
+
+import { collectTags } from "@extensions/activities/tags/collect-tags"
 
 export type TagsState = {
   tags: TagObject[]

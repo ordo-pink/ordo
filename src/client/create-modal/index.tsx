@@ -9,7 +9,7 @@ import { useModalWindow } from "@client/common/hooks/use-modal"
 import { useIcon } from "@client/common/hooks/use-icon"
 import Either from "@client/common/utils/either"
 
-import Null from "@client/common/null"
+import Null from "@client/common/components/null"
 
 export default function CreateModal() {
   const dispatch = useAppDispatch()

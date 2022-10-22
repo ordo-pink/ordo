@@ -1,4 +1,4 @@
-import { CaretRangeDirection, TextNodeType } from "./constants"
+import { CaretRangeDirection, TextNodeType } from "@client/editor/constants"
 
 export type CaretPosition = {
   line: number

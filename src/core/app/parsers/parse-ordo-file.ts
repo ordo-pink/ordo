@@ -1,4 +1,4 @@
-import type { OrdoDate, RootNode } from "@core/editor/types"
+import type { OrdoDate, RootNode } from "@client/editor/types"
 
 import { createRoot } from "@core/app/parsers/create-root"
 
@@ -107,8 +107,8 @@ const createExtractor = () => (tree: RootNode) => {
   }
 }
 
-// @example ((folder/another-file.mdo)), ((photos/2022/img.png))
-// @example !((folder/another-file.mdo))
+// @example ((directory/another-file.mdo)), ((photos/2022/img.png))
+// @example !((directory/another-file.mdo))
 // @example !2022-09-25, !2022-09-25T09:03:47.133Z
 // @example !2022-09-25--00***--2022-10-25 - Appear daily at midnight since Sep 25, 2022 till Oct 25, 2022
 // @example !(2022-09-25T09:00:00.133Z--****7--2022-12-31) - Remind every Sunday at 9am since Sep 25, 2022 till Dec 31, 2022

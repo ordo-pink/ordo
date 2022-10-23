@@ -1,8 +1,8 @@
 import type { Nullable } from "@core/types"
-import type { LocalSettings, OrdoFile, OrdoFolder, UserSettings } from "@core/app/types"
-import type { RootNode } from "@core/editor/types"
-import debounce from "lodash/debounce"
+import type { LocalSettings, OrdoFile, OrdoDirectory, UserSettings } from "@core/app/types"
+import type { RootNode } from "@client/editor/types"
 
+import debounce from "lodash/debounce"
 import {
   createSlice,
   PayloadAction,
@@ -13,7 +13,7 @@ import {
 export type AppState = {
   userSettings: UserSettings
   localSettings: LocalSettings
-  personalDirectory: Nullable<OrdoFolder>
+  personalDirectory: Nullable<OrdoDirectory>
   currentFileRaw: string
   currentFile: Nullable<OrdoFile>
   sideBarWidth: number
@@ -45,8 +45,8 @@ export const selectPersonalProjectDirectory = createAsyncThunk(
   () => window.ordo.emit<string>({ type: "@app/selectPersonalProjectDirectory" })
 )
 
-export const listFolder = createAsyncThunk("@app/listFolder", (payload: string) =>
-  window.ordo.emit<OrdoFolder, string>({ type: "@app/listFolder", payload })
+export const listDirectory = createAsyncThunk("@app/listDirectory", (payload: string) =>
+  window.ordo.emit<OrdoDirectory, string>({ type: "@app/listDirectory", payload })
 )
 
 export const openFile = createAsyncThunk("@app/openFile", (payload: OrdoFile) =>
@@ -54,21 +54,21 @@ export const openFile = createAsyncThunk("@app/openFile", (payload: OrdoFile) =>
 )
 
 export const createFile = createAsyncThunk("@app/createFile", (payload: string) =>
-  window.ordo.emit<OrdoFolder, string>({ type: "@app/createFile", payload })
+  window.ordo.emit<OrdoDirectory, string>({ type: "@app/createFile", payload })
 )
 
-export const createFolder = createAsyncThunk("@app/createFolder", (payload: string) =>
-  window.ordo.emit<OrdoFolder, string>({ type: "@app/createFolder", payload })
+export const createDirectory = createAsyncThunk("@app/createDirectory", (payload: string) =>
+  window.ordo.emit<OrdoDirectory, string>({ type: "@app/createDirectory", payload })
 )
 
-export const deleteFileOrFolder = createAsyncThunk("@app/delete", (payload: string) =>
-  window.ordo.emit<OrdoFolder, string>({ type: "@app/delete", payload })
+export const deleteFileOrDirectory = createAsyncThunk("@app/delete", (payload: string) =>
+  window.ordo.emit<OrdoDirectory, string>({ type: "@app/delete", payload })
 )
 
 type TRenameParams = { oldPath: string; newPath: string }
 
-export const renameFileOrFolder = createAsyncThunk("@app/rename", (payload: TRenameParams) =>
-  window.ordo.emit<OrdoFolder, TRenameParams>({ type: "@app/rename", payload })
+export const renameFileOrDirectory = createAsyncThunk("@app/rename", (payload: TRenameParams) =>
+  window.ordo.emit<OrdoDirectory, TRenameParams>({ type: "@app/rename", payload })
 )
 
 type TSaveFileParams = RootNode["data"] & { path: string }
@@ -79,7 +79,7 @@ const saveFileHandler: AsyncThunkPayloadCreator<void | undefined, TSaveFileParam
 ) => {
   dispatch(setIsLoading(true))
 
-  await window.ordo.emit<OrdoFolder, TSaveFileParams>({
+  await window.ordo.emit<OrdoDirectory, TSaveFileParams>({
     type: "@app/saveFile",
     payload,
   })
@@ -87,7 +87,7 @@ const saveFileHandler: AsyncThunkPayloadCreator<void | undefined, TSaveFileParam
   dispatch(setIsLoading(false))
 }
 
-const debounceSaveFileHandler = debounce(saveFileHandler, 2000, { trailing: true, leading: false })
+const debounceSaveFileHandler = debounce(saveFileHandler, 200, { trailing: true, leading: false })
 
 export const saveFile = createAsyncThunk("@app/saveFile", debounceSaveFileHandler)
 
@@ -150,20 +150,20 @@ export const appSlice = createSlice({
       .addCase(selectPersonalProjectDirectory.fulfilled, (state, action) => {
         state.userSettings["project.personal.directory"] = action.payload
       })
-      .addCase(listFolder.fulfilled, (state, action) => {
+      .addCase(listDirectory.fulfilled, (state, action) => {
         state.personalDirectory = action.payload
       })
       .addCase(openFile.fulfilled, (state, action) => {
         state.currentFileRaw = action.payload.raw
         state.currentFile = action.payload.file
       })
-      .addCase(deleteFileOrFolder.fulfilled, (state, action) => {
+      .addCase(deleteFileOrDirectory.fulfilled, (state, action) => {
         state.personalDirectory = action.payload
       })
-      .addCase(renameFileOrFolder.fulfilled, (state, action) => {
+      .addCase(renameFileOrDirectory.fulfilled, (state, action) => {
         state.personalDirectory = action.payload
       })
-      .addCase(createFolder.fulfilled, (state, action) => {
+      .addCase(createDirectory.fulfilled, (state, action) => {
         state.personalDirectory = action.payload
       })
       .addCase(createFile.fulfilled, (state, action) => {

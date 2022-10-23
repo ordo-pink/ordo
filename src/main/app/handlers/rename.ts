@@ -1,7 +1,8 @@
-import { ORDO_FILE_EXTENSION, ORDO_METADATA_EXTENSION } from "@core/app/constants"
 import { promises } from "fs"
-import userSettingsStore from "../user-settings-store"
-import { handleListFolder } from "./list-folder"
+
+import { ORDO_FILE_EXTENSION, ORDO_METADATA_EXTENSION } from "@core/app/constants"
+import { handleListDirectory } from "@main/app/handlers/list-directory"
+import userSettingsStore from "@main/app/user-settings-store"
 
 type Params = {
   oldPath: string
@@ -41,5 +42,5 @@ export const handleRename = async ({ oldPath, newPath }: Params) => {
     await promises.rename(oldPath, newPath)
   }
 
-  return handleListFolder(rootPath)
+  return handleListDirectory(rootPath)
 }

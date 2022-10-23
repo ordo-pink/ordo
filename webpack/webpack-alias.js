@@ -6,4 +6,5 @@ module.exports = {
   "@core": resolve("./src/core"),
   "@client": resolve("./src/client"),
   "@main": resolve("./src/main"),
+  "@extensions": resolve("./src/extensions"),
 }

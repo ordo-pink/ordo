@@ -1,36 +1,36 @@
+import type { RootNode } from "@client/editor/types"
 import type { Nullable } from "@core/types"
 
 import React, { useEffect, useState, MouseEvent } from "react"
 
-import { useAppDispatch, useAppSelector } from "@client/state"
+import { useAppDispatch, useAppSelector } from "@client/common/hooks/state-hooks"
 import { getFileParser } from "@core/get-file-parser"
-import Either from "@core/utils/either"
+import Either from "@client/common/utils/either"
 
-import Null from "@client/null"
-
-import "@client/editor/index.css"
-import { CaretRangeDirection } from "../../core/editor/constants"
+import { CaretRangeDirection } from "@client/editor/constants"
 import { useHotkeys } from "react-hotkeys-hook"
-import { noOp } from "@core/utils/no-op"
-import { preventDefault } from "@core/utils/event"
-import Line from "./components/line"
-import Switch from "@core/utils/switch"
-import { initialCaretRanges } from "@core/editor/initial-caret-ranges"
+import { noOp } from "@client/common/utils/no-op"
+import { preventDefault } from "@client/common/utils/event"
+import { initialCaretRanges } from "@client/editor/initial-caret-ranges"
 import {
   handleArrowDown,
   handleArrowUp,
   handleArrowLeft,
   handleArrowRight,
-} from "@core/editor/key-handlers/arrows"
-import { handleBackspace } from "@core/editor/key-handlers/backspace"
-import { handleChar } from "@core/editor/key-handlers/char"
-import { handleDelete } from "@core/editor/key-handlers/delete"
-import { handleEnter } from "@core/editor/key-handlers/enter"
-import { RootNode } from "@core/editor/types"
-import { IsKey } from "@core/editor/is-key"
+} from "@client/editor/key-handlers/arrows"
+import { handleBackspace } from "@client/editor/key-handlers/backspace"
+import { handleChar } from "@client/editor/key-handlers/char"
+import { handleDelete } from "@client/editor/key-handlers/delete"
+import { handleEnter } from "@client/editor/key-handlers/enter"
+import { IsKey } from "@client/editor/is-key"
 import { enableSideBar, saveFile } from "@client/app/store"
-import { useIcon } from "@client/use-icon"
-import { useRenameModal } from "@client/app/hooks/use-rename-modal"
+import { useIcon } from "@client/common/hooks/use-icon"
+import Switch from "@client/common/utils/switch"
+
+import Line from "@client/editor/components/line"
+import Null from "@client/common/components/null"
+
+import "@client/editor/index.css"
 
 export default function Editor() {
   const dispatch = useAppDispatch()
@@ -60,10 +60,6 @@ export default function Editor() {
     if (currentFileRaw != null) setRaw(currentFileRaw)
     setCaretRanges(initialCaretRanges)
   }, [currentFileRaw, currentFile?.path])
-
-  const { showRenameModal, RenameModal } = useRenameModal(currentFile)
-
-  useHotkeys("f2", () => showRenameModal(), [currentFile])
 
   const onArrowDown = (event: Event) =>
     Either.of(event)
@@ -303,7 +299,6 @@ export default function Editor() {
           </div>
         )}
       </div>
-      <RenameModal />
     </div>
   ))
 }

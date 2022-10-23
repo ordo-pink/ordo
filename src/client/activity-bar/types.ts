@@ -1,4 +1,4 @@
-import type { IconName } from "@client/use-icon"
+import type { IconName } from "@client/common/hooks/use-icon"
 
 type ActivityID = string
 

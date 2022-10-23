@@ -1,19 +1,29 @@
-import { useAppSelector } from "@client/state"
-import Switch from "@core/utils/switch"
+import type { OrdoActivityExtension } from "@core/types"
 
-import Settings from "@client/app/settings"
+import { useAppSelector } from "@client/common/hooks/state-hooks"
+import { Extensions } from "@extensions/index"
+import Switch from "@client/common/utils/switch"
+
+import Null from "@client/common/components/null"
 import Editor from "@client/editor"
-import Null from "@client/null"
-import Checkboxes from "@client/checkboxes"
-import Tags from "@client/tags"
+import Settings from "@client/settings"
 
 export const useWorkspaceComponent = () => {
   const currentActivity = useAppSelector((state) => state.activityBar.currentActivity)
 
-  return Switch.of(currentActivity)
-    .case("editor", Editor)
-    .case("checkboxes", Checkboxes)
-    .case("settings", Settings)
-    .case("tags", Tags)
-    .default(Null)
+  let componentSwitch = Switch.of(currentActivity).case("editor", Editor).case("settings", Settings)
+
+  Extensions.forEach((extension) => {
+    const isActivityExtension = extension.name.startsWith("ordo-activity-")
+
+    if (!isActivityExtension) return
+
+    const { name, workspaceComponent } = extension as OrdoActivityExtension<string>
+
+    if (!workspaceComponent) return
+
+    componentSwitch = componentSwitch.case(name, workspaceComponent)
+  })
+
+  return componentSwitch.default(Null)
 }

@@ -1,17 +1,17 @@
-import type { RootNode } from "@core/editor/types"
+import type { RootNode } from "@client/editor/types"
 
 import { promises } from "fs"
 
 import { ORDO_FILE_EXTENSION, ORDO_METADATA_EXTENSION } from "@core/app/constants"
-import { handleListFolder } from "@main/app/handlers/list-folder"
-import userSettingsStore from "@main/app/user-settings-store"
 import { parseMetadata, parseOrdoFile } from "@core/app/parsers/parse-ordo-file"
+import { handleListDirectory } from "@main/app/handlers/list-directory"
+import userSettingsStore from "@main/app/user-settings-store"
 
-type TParams = RootNode["data"] & {
+type Params = RootNode["data"] & {
   path: string
 }
 
-export const handleSaveFile = async ({ path, raw }: TParams) => {
+export const handleSaveFile = async ({ path, raw }: Params) => {
   const rootPath = userSettingsStore.get("project.personal.directory")
   const isOrdoFile = path.endsWith(ORDO_FILE_EXTENSION)
 
@@ -27,5 +27,5 @@ export const handleSaveFile = async ({ path, raw }: TParams) => {
     "utf8"
   )
 
-  return handleListFolder(rootPath)
+  return handleListDirectory(rootPath)
 }

@@ -13,6 +13,7 @@
     "eslint:lint": "eslint --ext .ts,.tsx .",
     "prettier:check": "prettier --check src/**/*.{ts,tsx}",
     "prettier:format": "prettier --write src/**/*.{ts,tsx}",
+    "lint": "npm run eslint:lint && npm run prettier:check",
     "prepare": "husky install",
     "postinstall": "husky install"
   },
@@ -119,6 +120,7 @@
     "electron-squirrel-startup": "^1.0.0",
     "electron-store": "^8.1.0",
     "electron-util": "^0.17.2",
+    "fuse.js": "^6.6.2",
     "i18next": "^21.9.2",
     "immer": "^9.0.15",
     "lodash": "^4.17.21",

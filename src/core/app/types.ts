@@ -1,9 +1,9 @@
-import { Color } from "@core/colors"
-import { Nullable } from "@core/types"
+import type { RootNode } from "@client/editor/types"
+import type { Nullable } from "@core/types"
 
+import { Color } from "@core/colors"
 import { Language } from "@core/locales"
 import { Theme } from "@core/theme"
-import { RootNode } from "@core/editor/types"
 
 export type OrdoPathLike = string
 export type OrdoPath = OrdoPathLike
@@ -32,9 +32,9 @@ export interface OrdoFile<TMetadata extends Record<string, unknown> = Record<str
   size: number
 }
 
-export interface OrdoFolder<TMetadata extends Record<string, unknown> = Record<string, unknown>>
+export interface OrdoDirectory<TMetadata extends Record<string, unknown> = Record<string, unknown>>
   extends OrdoFSElement {
-  children: (OrdoFile | OrdoFolder)[]
+  children: (OrdoFile | OrdoDirectory)[]
   metadata: TMetadata & { color: Color }
 }
 
@@ -45,7 +45,7 @@ export type UserSettings = {
   "appearance.theme": Theme
   "appearance.language": Language
   "project.personal.directory": string
-  // "graph.show-folders": boolean
+  // "graph.show-directories": boolean
   // "graph.show-links": boolean
   // "graph.show-tags": boolean
   // "graph.show-dates": boolean
@@ -71,7 +71,7 @@ export type LocalSettings = {
   "window.width": number
   "window.height": number
   "side-bar.width": number
-  "file-explorer.expanded-folders": string[]
+  "file-explorer.expanded-directories": string[]
   "app.separator": string
   // "project.external.directories": string[]
 }

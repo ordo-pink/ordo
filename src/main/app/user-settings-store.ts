@@ -4,7 +4,7 @@ import Store from "electron-store"
 
 import { Theme } from "@core/theme"
 import { Language } from "@core/locales"
-import { USER_SETTINGS_SCHEMA } from "@core/app/user-settings-schema"
+import { USER_SETTINGS_SCHEMA } from "@client/settings/user-settings-schema"
 
 /**
  * This store is used to store app level user preferences.

@@ -1,0 +1,12 @@
+export enum ExtensionContextMenuLocation {
+  FILE,
+  DIRECTORY,
+  ROOT,
+  DIRECTORY_OR_ROOT,
+  FILE_OR_DIRECTORY,
+  FILE_OR_DIRECTORY_OR_ROOT,
+  TEXT_SELECTION,
+  CHAR,
+  LINE,
+  EDITOR,
+}

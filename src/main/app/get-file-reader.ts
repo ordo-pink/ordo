@@ -2,8 +2,8 @@ import type { OrdoFile } from "@core/app/types"
 
 import { defaultFileReader } from "@main/app/file-readers/default"
 import { imageFileReader } from "@main/app/file-readers/image"
-import Switch from "@core/utils/switch"
 import { getFileType } from "@core/get-file-type"
+import Switch from "@client/common/utils/switch"
 
 export const getFileReader = (file: OrdoFile) => {
   const type = getFileType(file)

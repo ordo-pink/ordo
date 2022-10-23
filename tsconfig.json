@@ -23,6 +23,7 @@
       "@client/*": ["src/client/*"],
       "@main/*": ["src/main/*"],
       "@core/*": ["src/core/*"],
+      "@extensions/*": ["src/extensions/*"],
       "*": ["node_modules/*"]
     }
   },

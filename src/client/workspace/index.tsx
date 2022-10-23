@@ -1,6 +1,6 @@
 import React from "react"
 
-import { useWorkspaceComponent } from "./hooks/use-workspace-component"
+import { useWorkspaceComponent } from "@client/workspace/hooks/use-workspace-component"
 
 export default function Workspace() {
   const Component = useWorkspaceComponent()

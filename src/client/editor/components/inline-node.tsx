@@ -1,8 +1,11 @@
-import { TextNode, CaretRange } from "@core/editor/types"
-import Switch from "@core/utils/switch"
+import type { TextNode, CaretRange } from "@client/editor/types"
+
 import React, { useState, useEffect, Dispatch, SetStateAction } from "react"
-import Caret from "./caret"
-import Char from "./char"
+
+import Switch from "@client/common/utils/switch"
+
+import Caret from "@client/editor/components/caret"
+import Char from "@client/editor/components/char"
 
 type Props = {
   node: TextNode

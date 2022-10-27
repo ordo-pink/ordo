@@ -18,7 +18,6 @@ const RevealInFilesCommandExtension: OrdoCommandExtension<"reveal-in-files"> = {
       showInContextMenu: ExtensionContextMenuLocation.FILE_OR_DIRECTORY_OR_ROOT,
       action: (state, { contextMenuTarget }) => {
         const type = "@reveal-in-files/open-in-file-explorer"
-        console.log(type)
         const payload = contextMenuTarget
           ? contextMenuTarget.path
           : state.app.currentFile

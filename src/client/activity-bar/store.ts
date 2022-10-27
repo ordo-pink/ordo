@@ -11,10 +11,10 @@ export type ActivityBarState = {
 const initialState: ActivityBarState = {
   activities: [{ name: "editor", icon: "BsLayoutTextWindow" }],
   requiredActivities: [
-    { icon: "BsBell", name: "notifications" },
-    { icon: "BsPerson", name: "account" },
-    { icon: "BsAward", name: "achievements" },
-    { icon: "BsPuzzle", name: "extensions" },
+    // { icon: "BsBell", name: "notifications" },
+    // { icon: "BsPerson", name: "account" },
+    // { icon: "BsAward", name: "achievements" },
+    // { icon: "BsPuzzle", name: "extensions" },
     { icon: "FaCogs", name: "settings" },
   ],
   currentActivity: "editor",

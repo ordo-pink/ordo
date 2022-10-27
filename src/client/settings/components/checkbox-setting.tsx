@@ -18,7 +18,7 @@ export default function CheckboxSetting({
 
   return (
     <input
-      className="w-10 h-10 md:w-5 md:h-5 accent-green-700"
+      className="w-10 h-10 md:w-5 md:h-5 accent-violet-500 dark:accent-violet-600"
       type="checkbox"
       checked={value}
       onChange={handleChange}

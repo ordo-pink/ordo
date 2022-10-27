@@ -4,7 +4,7 @@ import { handleListDirectory } from "@main/app/handlers/list-directory"
 import localSettingsStore from "@main/app/local-settings-store"
 import userSettingsStore from "@main/app/user-settings-store"
 
-export const handleCreateDirectory = async (path: string) => {
+export const handleCreateDirectory = async ({ path }: { path: string }) => {
   // TODO:BUG: Fix creating nested directories that have the same name
   const separator = localSettingsStore.get("app.separator")
   const rootPath = userSettingsStore.get("project.personal.directory")

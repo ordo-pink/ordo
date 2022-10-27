@@ -88,7 +88,7 @@ const createWindow = async () => {
   // and load the index.html of the app.
   mainWindow.loadURL(MAIN_WINDOW_WEBPACK_ENTRY)
 
-  mainWindow.webContents.toggleDevTools()
+  // mainWindow.webContents.toggleDevTools()
 
   mainWindow.on("resized", () => saveWindowPosition(mainWindow))
   mainWindow.on("moved", () => saveWindowPosition(mainWindow))

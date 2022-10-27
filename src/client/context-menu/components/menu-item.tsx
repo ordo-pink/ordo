@@ -35,7 +35,7 @@ export default function MenuItem({ item, hideContextMenu, target }: Props) {
 
   return (
     <div
-      className="hover-passive px-4 py-1 text-sm flex items-center justify-between"
+      className="hover-passive px-4 py-1 text-sm flex items-center justify-between space-x-4"
       onClick={onClick}
     >
       <div className="flex items-center space-x-2">

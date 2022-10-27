@@ -54,8 +54,11 @@ export const listDirectory = createAsyncThunk("@app/listDirectory", (payload: st
   window.ordo.emit<OrdoDirectory, string>({ type: "@app/listDirectory", payload })
 )
 
-export const openFile = createAsyncThunk("@app/openFile", (payload: OrdoFile) =>
-  window.ordo.emit<{ file: OrdoFile; raw: string }, OrdoFile>({ type: "@app/openFile", payload })
+export const openFile = createAsyncThunk("@app/openFile", (payload: OrdoFile | string) =>
+  window.ordo.emit<{ file: OrdoFile; raw: string }, OrdoFile | string>({
+    type: "@app/openFile",
+    payload,
+  })
 )
 
 export const createFile = createAsyncThunk(

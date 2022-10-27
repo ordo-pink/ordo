@@ -37,7 +37,11 @@ export default function CommandPalette() {
   const { t } = useTranslation()
 
   const [visibleCommands, setVisibleCommands] = useState(
-    commands.filter((command) => command.showInCommandPalette)
+    commands.filter((command) =>
+      command.showInCommandPalette && typeof command.showInCommandPalette === "function"
+        ? command.showInCommandPalette(currentFile)
+        : command.showInCommandPalette
+    )
   )
   const [currentIndex, setCurrentIndex] = useState(0)
   const [inputValue, setInputValue] = useState("")
@@ -52,19 +56,27 @@ export default function CommandPalette() {
 
   useEffect(() => {
     const searchableCommands: SearchableCommand[] = commands
-      .filter((command) => command.showInCommandPalette)
+      .filter((command) =>
+        command.showInCommandPalette && typeof command.showInCommandPalette === "function"
+          ? command.showInCommandPalette(currentFile)
+          : command.showInCommandPalette
+      )
       .map((command) => ({
         ...command,
         title: t(command.title),
       }))
 
     fuse.setCollection(searchableCommands)
-  }, [commands, t])
+  }, [commands, t, currentFile])
 
   useEffect(() => {
     if (inputValue === "") {
       const searchableCommands: SearchableCommand[] = commands
-        .filter((command) => command.showInCommandPalette)
+        .filter((command) =>
+          command.showInCommandPalette && typeof command.showInCommandPalette === "function"
+            ? command.showInCommandPalette(currentFile)
+            : command.showInCommandPalette
+        )
         .map((command) => ({
           ...command,
           title: t(command.title),
@@ -76,7 +88,7 @@ export default function CommandPalette() {
     const fusedCommands = fuse.search(inputValue)
 
     setVisibleCommands(fusedCommands.map(({ item }) => item))
-  }, [inputValue, commands, t])
+  }, [inputValue, commands, t, currentFile])
 
   const hide = () => {
     setCurrentIndex(0)

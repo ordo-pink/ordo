@@ -19,7 +19,7 @@ export const parseMetadata = (tree: RootNode) => {
 const createExtractor = () => (tree: RootNode) => {
   const tagRx = /--([\p{L}\d./-]+)/giu
   const checkboxRx = /^\([*\s]\)\s.*/
-  const linkRx = /\(\(([\p{L}\d/-]+)\)\)/giu
+  const linkRx = /!?\(\(([\p{L}\d.\s/\-,_]+)\)\)/giu
   const dateRx = /!?!\(\d{4}-\d{2}-\d{2}\)/g
   const dateWithPatternRx = /(!?!\(\d{4}-\d{2}-\d{2}\+[0-9*]{5}\))/g
 

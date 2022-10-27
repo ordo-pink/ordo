@@ -58,14 +58,14 @@ export const OrdoButtonPrimary = ({
   hotkey,
   disabled,
 }: Props) => {
-  const buttonAppearanceClass = Either.fromBoolean(!!disabled).fold(
+  const buttonClassNames = Either.fromBoolean(!!disabled).fold(
     () =>
       "bg-gradient-to-r from-sky-200 dark:from-cyan-600 via-violet-200 dark:via-violet-600 to-purple-200 dark:to-purple-600 active-ring",
     () =>
       "bg-gradient-to-r from-slate-300 via-zinc-300 to-stone-300 dark:from-slate-900 dark:via-zinc-900 dark:to-stone-900"
   )
 
-  const buttonClass = `${buttonAppearanceClass} ${className}`
+  const classNames = `${buttonClassNames} ${className}`
 
   return (
     <OrdoButton
@@ -73,7 +73,7 @@ export const OrdoButtonPrimary = ({
       onMouseOver={onMouseOver}
       disabled={disabled}
       hotkey={hotkey}
-      className={buttonClass}
+      className={classNames}
     >
       {children}
     </OrdoButton>

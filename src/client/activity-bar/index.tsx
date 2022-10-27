@@ -29,7 +29,6 @@ export default function ActivityBar() {
     })
   }, [Extensions])
 
-  // TODO: Move this when extracting activities to extensions
   useCommands([
     {
       title: "@editor/open-activity",
@@ -38,6 +37,7 @@ export default function ActivityBar() {
       showInCommandPalette: true,
       action: (_, { dispatch }) => dispatch(selectActivity("editor")),
     },
+    // TODO: Move this when extracting activities to extensions
     // {
     //   title: "@notifications/open-activity",
     //   icon: "BsBell",

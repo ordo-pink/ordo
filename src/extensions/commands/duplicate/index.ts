@@ -2,7 +2,6 @@ import type { OrdoCommandExtension } from "@core/types"
 import type { OrdoFile } from "@core/app/types"
 import type { RootNode } from "@client/editor/types"
 
-import { ExtensionContextMenuLocation } from "@core/constants"
 import { listDirectory, openFile } from "@client/app/store"
 import { isDirectory } from "@client/common/is-directory"
 import { createRoot } from "@core/app/parsers/create-root"

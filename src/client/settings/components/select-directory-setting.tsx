@@ -1,7 +1,6 @@
 import type { SettingsItemProps } from "@client/settings/types"
 
-import React, { MouseEvent } from "react"
-import { useTranslation } from "react-i18next"
+import React from "react"
 
 import { useIcon } from "@client/common/hooks/use-icon"
 import { useAppDispatch } from "@client/common/hooks/state-hooks"
@@ -15,8 +14,6 @@ export default function SelectDirectorySetting({
   value,
 }: SettingsItemProps<"project.personal.directory">) {
   const dispatch = useAppDispatch()
-
-  const { t } = useTranslation()
 
   const Icon = useIcon("BsFolder2Open")
 

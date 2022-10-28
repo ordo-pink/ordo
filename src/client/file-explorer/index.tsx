@@ -1,7 +1,6 @@
 import type { OrdoCommand } from "@core/types"
 
 import React from "react"
-import { useTranslation } from "react-i18next"
 
 import { showCreateDirectoryModal, showCreateFileModal } from "@client/create-modal/store"
 import { useAppDispatch, useAppSelector } from "@client/common/hooks/state-hooks"
@@ -20,8 +19,6 @@ export default function FileExplorer() {
 
   const parent = useAppSelector((state) => state.app.personalDirectory)
   const commands = useAppSelector((state) => state.commandPalette.commands)
-
-  const { t } = useTranslation()
 
   const children: OrdoCommand<string>[] = commands.filter(
     (command) =>

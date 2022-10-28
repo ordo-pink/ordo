@@ -81,7 +81,9 @@ export type OrdoCommand<Name extends string> = {
   title: `@${Name}/${string}` | Name
   action: (state: ReturnType<typeof store.getState>, args: ActionArgs) => void
   icon?: IconName
-  showInContextMenu?: ExtensionContextMenuLocation
-  showInCommandPalette?: boolean
+  showInContextMenu?:
+    | ExtensionContextMenuLocation
+    | ((current: OrdoFile | OrdoDirectory) => boolean)
+  showInCommandPalette?: boolean | ((current: Nullable<OrdoFile>) => boolean)
   hasElectronHanlders?: boolean
 }

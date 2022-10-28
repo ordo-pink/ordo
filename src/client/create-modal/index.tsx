@@ -61,7 +61,7 @@ export default function CreateModal() {
                 if (e.key === "Escape") {
                   hideModal()
                 } else if (e.key === "Enter") {
-                  dispatch(create(directory.path + separator + newName))
+                  dispatch(create({ path: `${directory.path}${separator}${newName}` }))
                   hideModal()
                 }
               }}

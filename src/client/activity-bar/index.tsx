@@ -29,7 +29,6 @@ export default function ActivityBar() {
     })
   }, [Extensions])
 
-  // TODO: Move this when extracting activities to extensions
   useCommands([
     {
       title: "@editor/open-activity",
@@ -38,34 +37,35 @@ export default function ActivityBar() {
       showInCommandPalette: true,
       action: (_, { dispatch }) => dispatch(selectActivity("editor")),
     },
-    {
-      title: "@notifications/open-activity",
-      icon: "BsBell",
-      accelerator: "ctrl+alt+n",
-      showInCommandPalette: true,
-      action: (_, { dispatch }) => dispatch(selectActivity("notifications")),
-    },
-    {
-      title: "@account/open-activity",
-      icon: "BsPerson",
-      accelerator: "ctrl+alt+a",
-      showInCommandPalette: true,
-      action: (_, { dispatch }) => dispatch(selectActivity("account")),
-    },
-    {
-      title: "@achievements/open-activity",
-      icon: "BsAward",
-      accelerator: "ctrl+shift+y",
-      showInCommandPalette: true,
-      action: (_, { dispatch }) => dispatch(selectActivity("achievements")),
-    },
-    {
-      title: "@extensions/open-activity",
-      icon: "BsPuzzle",
-      accelerator: "ctrl+alt+e",
-      showInCommandPalette: true,
-      action: (_, { dispatch }) => dispatch(selectActivity("extensions")),
-    },
+    // TODO: Move this when extracting activities to extensions
+    // {
+    //   title: "@notifications/open-activity",
+    //   icon: "BsBell",
+    //   accelerator: "ctrl+alt+n",
+    //   showInCommandPalette: true,
+    //   action: (_, { dispatch }) => dispatch(selectActivity("notifications")),
+    // },
+    // {
+    //   title: "@account/open-activity",
+    //   icon: "BsPerson",
+    //   accelerator: "ctrl+alt+a",
+    //   showInCommandPalette: true,
+    //   action: (_, { dispatch }) => dispatch(selectActivity("account")),
+    // },
+    // {
+    //   title: "@achievements/open-activity",
+    //   icon: "BsAward",
+    //   accelerator: "ctrl+shift+y",
+    //   showInCommandPalette: true,
+    //   action: (_, { dispatch }) => dispatch(selectActivity("achievements")),
+    // },
+    // {
+    //   title: "@extensions/open-activity",
+    //   icon: "BsPuzzle",
+    //   accelerator: "ctrl+alt+e",
+    //   showInCommandPalette: true,
+    //   action: (_, { dispatch }) => dispatch(selectActivity("extensions")),
+    // },
     {
       title: "@settings/open-activity",
       icon: "FaCogs",

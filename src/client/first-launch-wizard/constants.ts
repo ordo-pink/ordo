@@ -1,0 +1,9 @@
+export enum FirstLaunchWizardStep {
+  WELCOME,
+  LANGUAGE,
+  THEME,
+  PERSONAL_PROJECT_DIRECTORY,
+  DUMMY_CONTENT,
+  IS_LOADING,
+  ALL_DONE,
+}

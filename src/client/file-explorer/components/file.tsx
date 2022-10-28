@@ -26,6 +26,7 @@ export default function File({ item }: Props) {
 
   const children: OrdoCommand<string>[] = commands.filter(
     (command) =>
+      (typeof command.showInContextMenu === "function" && command.showInContextMenu(item)) ||
       command.showInContextMenu === ExtensionContextMenuLocation.FILE ||
       command.showInContextMenu === ExtensionContextMenuLocation.FILE_OR_DIRECTORY ||
       command.showInContextMenu === ExtensionContextMenuLocation.FILE_OR_DIRECTORY_OR_ROOT

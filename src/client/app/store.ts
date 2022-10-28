@@ -45,20 +45,35 @@ export const selectPersonalProjectDirectory = createAsyncThunk(
   () => window.ordo.emit<string>({ type: "@app/selectPersonalProjectDirectory" })
 )
 
+export const selectDefaultPersonalProjectDirectory = createAsyncThunk(
+  "@app/selectDefaultPersonalProjectDirectory",
+  () => window.ordo.emit<string>({ type: "@app/selectDefaultPersonalProjectDirectory" })
+)
+
 export const listDirectory = createAsyncThunk("@app/listDirectory", (payload: string) =>
   window.ordo.emit<OrdoDirectory, string>({ type: "@app/listDirectory", payload })
 )
 
-export const openFile = createAsyncThunk("@app/openFile", (payload: OrdoFile) =>
-  window.ordo.emit<{ file: OrdoFile; raw: string }, OrdoFile>({ type: "@app/openFile", payload })
+export const openFile = createAsyncThunk("@app/openFile", (payload: OrdoFile | string) =>
+  window.ordo.emit<{ file: OrdoFile; raw: string }, OrdoFile | string>({
+    type: "@app/openFile",
+    payload,
+  })
 )
 
-export const createFile = createAsyncThunk("@app/createFile", (payload: string) =>
-  window.ordo.emit<OrdoDirectory, string>({ type: "@app/createFile", payload })
+export const createFile = createAsyncThunk(
+  "@app/createFile",
+  (payload: { path: string; content?: string }) =>
+    window.ordo.emit<OrdoDirectory, { path: string; content?: string }>({
+      type: "@app/createFile",
+      payload,
+    })
 )
 
-export const createDirectory = createAsyncThunk("@app/createDirectory", (payload: string) =>
-  window.ordo.emit<OrdoDirectory, string>({ type: "@app/createDirectory", payload })
+export const createDirectory = createAsyncThunk(
+  "@app/createDirectory",
+  (payload: { path: string }) =>
+    window.ordo.emit<OrdoDirectory, { path: string }>({ type: "@app/createDirectory", payload })
 )
 
 export const deleteFileOrDirectory = createAsyncThunk("@app/delete", (payload: string) =>
@@ -71,7 +86,7 @@ export const renameFileOrDirectory = createAsyncThunk("@app/rename", (payload: T
   window.ordo.emit<OrdoDirectory, TRenameParams>({ type: "@app/rename", payload })
 )
 
-type TSaveFileParams = RootNode["data"] & { path: string }
+type TSaveFileParams = Partial<RootNode["data"]> & { path: string }
 
 const saveFileHandler: AsyncThunkPayloadCreator<void | undefined, TSaveFileParams> = async (
   payload: TSaveFileParams,
@@ -148,6 +163,9 @@ export const appSlice = createSlice({
         state.localSettings = action.payload
       })
       .addCase(selectPersonalProjectDirectory.fulfilled, (state, action) => {
+        state.userSettings["project.personal.directory"] = action.payload
+      })
+      .addCase(selectDefaultPersonalProjectDirectory.fulfilled, (state, action) => {
         state.userSettings["project.personal.directory"] = action.payload
       })
       .addCase(listDirectory.fulfilled, (state, action) => {

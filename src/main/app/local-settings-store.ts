@@ -16,10 +16,10 @@ export default new Store<LocalSettings>({
   schema: LOCAL_SETTINGS_SCHEMA,
   migrations: {
     "0.1.0": (store) => {
-      store.set("app.side-bar.width", 800)
-      store.set("app.window.height", 600)
+      store.set("window.width", 800)
+      store.set("window.height", 600)
       store.set("app.file-explorer.expanded-directories", [])
-      store.set("app.side-bar.width", 0)
+      store.set("side-bar.width", 0)
       store.set("app.separator", sep)
     },
   },

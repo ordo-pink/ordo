@@ -29,7 +29,7 @@ export default function NumberSetting({ schemaKey, value }: SettingsItemProps<"e
   return (
     <input
       type="number"
-      className="w-full bg-neutral-100 dark:bg-neutral-700 border border-neutral-300 dark:border-neutral-900 px-2 py-1"
+      className="w-full bg-neutral-50 dark:bg-neutral-500 border border-neutral-300 dark:border-neutral-700 rounded-md px-2 py-1"
       value={internalValue}
       onChange={handleChange}
       onBlur={handleBlur}

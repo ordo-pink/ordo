@@ -2,8 +2,7 @@ import type { OrdoCommandExtension } from "@core/types"
 import type { OrdoFile } from "@core/app/types"
 import type { RootNode } from "@client/editor/types"
 
-import { ExtensionContextMenuLocation } from "@core/constants"
-import { listDirectory } from "@client/app/store"
+import { listDirectory, openFile } from "@client/app/store"
 import { isDirectory } from "@client/common/is-directory"
 import { createRoot } from "@core/app/parsers/create-root"
 import { parseMetadata } from "@core/app/parsers/parse-ordo-file"
@@ -21,8 +20,9 @@ const DuplicateCommandExtension: OrdoCommandExtension<"duplicate"> = {
       title: "duplicate",
       icon: "BsFiles",
       accelerator: "shift+alt+d",
-      showInContextMenu: ExtensionContextMenuLocation.FILE,
-      showInCommandPalette: false,
+      showInContextMenu: (item) => Boolean(item) && !isDirectory(item) && item.extension === ".ism",
+      showInCommandPalette: (currentFile) =>
+        Boolean(currentFile) && currentFile?.extension === ".ism",
       action: async (state, { contextMenuTarget, dispatch, currentFile }) => {
         if (!contextMenuTarget && !currentFile) return
         if (contextMenuTarget && isDirectory(contextMenuTarget)) return
@@ -47,7 +47,8 @@ const DuplicateCommandExtension: OrdoCommandExtension<"duplicate"> = {
 
         await window.ordo.emit<void, TSaveFileParams>({ type: "@app/saveFile", payload })
 
-        dispatch(listDirectory(state.app.userSettings["project.personal.directory"]))
+        await dispatch(listDirectory(state.app.userSettings["project.personal.directory"]))
+        await dispatch(openFile(path))
       },
     },
   ],

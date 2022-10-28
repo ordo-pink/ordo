@@ -21,11 +21,11 @@ export default new Store<UserSettings>({
   },
   migrations: {
     "0.1.0": (store) => {
-      store.set("app.language", Language.ENGLISH)
-      store.set("app.theme", Theme.SYSTEM)
-      store.set("app.project.directory", "")
-      store.set("app.files.confirm-delete", true)
-      store.set("app.files.confirm-move", true)
+      store.set("appearance.language", Language.ENGLISH)
+      store.set("appearance.theme", Theme.SYSTEM)
+      store.set("project.personal.directory", "")
+      store.set("files.confirm-delete", true)
+      store.set("files.confirm-move", true)
       store.set("editor.font-size", 16)
     },
   },

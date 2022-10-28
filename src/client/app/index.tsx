@@ -39,6 +39,7 @@ import Workspace from "@client/workspace"
 import CommandPalette from "@client/command-palette"
 import CreateModal from "@client/create-modal"
 import RenameModal from "@client/rename-modal"
+import FirstLaunchWizard from "@client/first-launch-wizard"
 
 export default function App() {
   const dispatch = useAppDispatch()
@@ -208,6 +209,7 @@ export default function App() {
       <CommandPalette />
       <CreateModal />
       <RenameModal />
+      <FirstLaunchWizard />
     </div>
   )
 }

@@ -138,8 +138,32 @@ export const OrdoButtonSuccess = ({
   )
 }
 
-export const OrdoButtonWarning = ({ children, onClick, className, onMouseOver }: Props) => (
-  <OrdoButton onClick={onClick} onMouseOver={onMouseOver} className={` ${className}`}>
-    {children}
-  </OrdoButton>
-)
+export const OrdoButtonNeutral = ({
+  children,
+  onClick,
+  className,
+  onMouseOver,
+  hotkey,
+  disabled,
+}: Props) => {
+  const buttonAppearanceClass = Either.fromBoolean(!!disabled).fold(
+    () =>
+      "bg-gradient-to-r from-neutral-300 via-stone-300 to-neutral-300 dark:from-neutral-800 dark:via-stone-800 dark:to-neutral-800 active-ring",
+    () =>
+      "bg-gradient-to-r from-slate-300 via-zinc-300 to-stone-300 dark:from-slate-900 dark:via-zinc-900 dark:to-stone-900"
+  )
+
+  const buttonClass = `${buttonAppearanceClass} ${className}`
+
+  return (
+    <OrdoButton
+      onClick={onClick}
+      onMouseOver={onMouseOver}
+      disabled={disabled}
+      hotkey={hotkey}
+      className={buttonClass}
+    >
+      {children}
+    </OrdoButton>
+  )
+}

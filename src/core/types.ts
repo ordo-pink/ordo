@@ -1,0 +1,129 @@
+import type { LoadableComponent } from "@loadable/component"
+import type { Slice } from "@reduxjs/toolkit"
+import type { Schema } from "jsonschema"
+import type { FC } from "react"
+
+import type { Language } from "$core/constants/language"
+import type { OrdoExtensionType } from "$core/constants/ordo-extension-type"
+
+export type Nullable<T> = T | null
+
+export type Optional<T> = T | undefined
+
+export type ThunkFn<Result> = () => Result
+export type UnaryFn<Arg, Result> = (arg: Arg) => Result
+export type BinaryFn<Arg1, Arg2, Result> = (arg1: Arg1, arg2: Arg2) => Result
+export type TernaryFn<Arg1, Arg2, Arg3, Result> = (arg1: Arg1, arg2: Arg2, arg3: Arg3) => Result
+
+export type Icon = FC // TODO Make this more specific
+
+export type FileExtension = `.${string}`
+
+export type FileAssociation = Record<OrdoExtensionName, FileExtension[]>
+
+export type OrdoElectronEnv = {
+  type: "electron"
+}
+
+export type OrdoBrowserEnv = {
+  type: "browser"
+}
+
+export type AccessLevel = {
+  read: boolean
+  write: boolean
+  erase: boolean
+}
+
+export type ActionContext = {
+  state: object // TODO Provide state type
+  currentFile: Nullable<OrdoFile>
+  contextMenuTarget: Nullable<OrdoFile | OrdoDirectory>
+  dispatch: ThunkFn<void> // TODO Provide dispatch type
+  env: OrdoElectronEnv | OrdoBrowserEnv
+}
+
+export type IsmParserRule = {
+  validate: UnaryFn<string, boolean>
+  extract: TernaryFn<string, object, object, void> // TODO Replace objects with Node and RootNode
+}
+
+export type OrdoCommand<ExtensionName extends string> = {
+  icon?: Icon
+  hotkey?: string
+  title: `@${ExtensionName}/${string}`
+  action: UnaryFn<ActionContext, void | PromiseLike<void>>
+  showInContextMenu?: boolean | UnaryFn<OrdoFile | OrdoDirectory, boolean>
+  showInCommandPalette?: boolean | UnaryFn<Nullable<OrdoFile>, boolean>
+}
+
+export type OrdoExtensionName<
+  Name extends string = "",
+  ExtensionType extends OrdoExtensionType = OrdoExtensionType,
+> = `ordo-${ExtensionType}-${Name}`
+
+export type TranslationsRecord<Name extends string> = {
+  [Key in Language]?: Record<`@${Name}/${string}`, string>
+}
+
+export interface OrdoExtension<Name extends string, ExtensionType extends OrdoExtensionType> {
+  translations: TranslationsRecord<OrdoExtensionName<Name, ExtensionType>>
+  name: OrdoExtensionName<Name, ExtensionType>
+  readableName?: string
+  description?: string
+  storeSlice?: Slice
+  dependencies?: OrdoExtensionName[]
+}
+
+export interface OrdoCommandExtension<Name extends string>
+  extends OrdoExtension<Name, OrdoExtensionType.COMMAND> {
+  commands: OrdoCommand<`ordo-command-${Name}`>[]
+}
+
+export interface OrdoIsmParserExtension<Name extends string>
+  extends OrdoExtension<Name, OrdoExtensionType.ISM_PARSER> {
+  rules: IsmParserRule[]
+}
+
+export interface OrdoFileAssociationExtension<Name extends string>
+  extends OrdoExtension<Name, OrdoExtensionType.FILE_ASSOCIATION> {
+  fileExtensions: FileExtension[]
+  Component: FC | LoadableComponent<Record<string, never>>
+}
+
+export interface OrdoLocalSettingExtension<Name extends string>
+  extends OrdoExtension<Name, OrdoExtensionType.LOCAL_SETTING> {
+  schema: Schema
+  peerAccess?: AccessLevel | boolean
+  dependantAccess?: AccessLevel | boolean
+}
+
+export interface OrdoActivityExtension<Name extends string>
+  extends OrdoExtension<Name, OrdoExtensionType.ACTIVITY> {
+  Icon: Icon
+  Component: FC | LoadableComponent<Record<string, never>>
+}
+
+export type OrdoFile<Metadata extends Record<string, unknown> = Record<string, unknown>> = {
+  path: string
+  readableName: string
+  extension: FileExtension
+  createdAt: Date
+  updatedAt: Date
+  accessedAt: Date
+  depth: number
+  size: number
+  metadata: Metadata
+}
+
+export type OrdoDirectory<Metadata extends Record<string, unknown> = Record<string, unknown>> = {
+  path: string
+  readableName: string
+  extension: FileExtension
+  createdAt: Date
+  updatedAt: Date
+  accessedAt: Date
+  depth: number
+  children: Array<OrdoFile | OrdoDirectory>
+  metadata: Metadata
+}

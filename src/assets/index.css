@@ -1,0 +1,185 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* This file is only for global things like registering fonts */
+
+@font-face {
+  font-family: "Jost";
+  src: url("$assets/fonts/jost/jost-thin.ttf") format("ttf");
+  font-weight: 100;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Jost";
+  src: url("$assets/fonts/jost/jost-thin-italic.ttf") format("ttf");
+  font-weight: 100;
+  font-style: italic;
+}
+
+@font-face {
+  font-family: "Jost";
+  src: url("$assets/fonts/jost/jost-extra-light.ttf") format("ttf");
+  font-weight: 200;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Jost";
+  src: url("$assets/fonts/jost/jost-extra-light-italic.ttf") format("ttf");
+  font-weight: 200;
+  font-style: italic;
+}
+
+@font-face {
+  font-family: "Jost";
+  src: url("$assets/fonts/jost/jost-light.ttf") format("ttf");
+  font-weight: 300;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Jost";
+  src: url("$assets/fonts/jost/jost-light-italic.ttf") format("ttf");
+  font-weight: 300;
+  font-style: italic;
+}
+
+@font-face {
+  font-family: "Jost";
+  src: url("$assets/fonts/jost/jost.ttf") format("ttf");
+  font-weight: 400;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Jost";
+  src: url("$assets/fonts/jost/jost-italic.ttf") format("ttf");
+  font-weight: 400;
+  font-style: italic;
+}
+
+@font-face {
+  font-family: "Jost";
+  src: url("$assets/fonts/jost/jost-medium.ttf") format("ttf");
+  font-weight: 500;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Jost";
+  src: url("$assets/fonts/jost/jost-medium-italic.ttf") format("ttf");
+  font-weight: 500;
+  font-style: italic;
+}
+
+@font-face {
+  font-family: "Jost";
+  src: url("$assets/fonts/jost/jost-semibold.ttf") format("ttf");
+  font-weight: 600;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Jost";
+  src: url("$assets/fonts/jost/jost-semibold-italic.ttf") format("ttf");
+  font-weight: 600;
+  font-style: italic;
+}
+
+@font-face {
+  font-family: "Jost";
+  src: url("$assets/fonts/jost/jost-bold.ttf") format("ttf");
+  font-weight: 700;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Jost";
+  src: url("$assets/fonts/jost/jost-bold-italic.ttf") format("ttf");
+  font-weight: 700;
+  font-style: italic;
+}
+
+@font-face {
+  font-family: "Jost";
+  src: url("$assets/fonts/jost/jost-extra-bold.ttf") format("ttf");
+  font-weight: 800;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Jost";
+  src: url("$assets/fonts/jost/jost-extra-bold-italic.ttf") format("ttf");
+  font-weight: 800;
+  font-style: italic;
+}
+
+@font-face {
+  font-family: "Jost";
+  src: url("$assets/fonts/jost/jost-black.ttf") format("ttf");
+  font-weight: 900;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Jost";
+  src: url("$assets/fonts/jost/jost-black-italic.ttf") format("ttf");
+  font-weight: 900;
+  font-style: italic;
+}
+
+* {
+  font-family: Jost, sans-serif;
+  @apply select-none;
+}
+
+.gutter {
+  background-repeat: no-repeat;
+  background-position: 50%;
+  @apply bg-neutral-200 dark:bg-neutral-900;
+}
+
+.gutter.gutter-horizontal {
+  background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAeCAYAAADkftS9AAAAIklEQVQoU2M4c+bMfxAGAgYYmwGrIIiDjrELjpo5aiZeMwF+yNnOs5KSvgAAAABJRU5ErkJggg==");
+  @apply cursor-col-resize;
+}
+
+.gutter.gutter-vertical {
+  background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAB4AAAAFAQMAAABo7865AAAABlBMVEVHcEzMzMzyAv2sAAAAAXRSTlMAQObYZgAAABBJREFUeF5jOAMEEAIEEFwAn3kMwcB6I2AAAAAASUVORK5CYII=");
+  @apply cursor-row-resize;
+}
+
+*:focus {
+  @apply outline-none ring-0;
+}
+
+.active-ring {
+  @apply hover:ring-2 hover:ring-pink-300 dark:hover:ring-pink-500 focus:ring-2 focus:ring-pink-300 dark:focus:ring-pink-500 transition-all duration-300;
+}
+
+.passive-ring {
+  @apply hover:ring-2 hover:ring-neutral-500 dark:hover:ring-neutral-500 focus:ring-2 focus:ring-neutral-500 dark:focus:ring-neutral-500 transition-all duration-300;
+}
+
+*::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+
+*::-webkit-scrollbar-thumb {
+  @apply invisible rounded-lg bg-neutral-300 dark:bg-neutral-600 my-2;
+}
+
+*:hover::-webkit-scrollbar-thumb {
+  @apply visible;
+}
+
+.hover-active {
+  @apply hover:bg-gradient-to-r hover:from-rose-300 hover:dark:from-violet-700 hover:to-purple-300 hover:dark:to-purple-700;
+}
+
+.hover-passive {
+  @apply hover:bg-gradient-to-r hover:from-neutral-300 hover:dark:from-stone-700 hover:to-slate-300 hover:dark:to-slate-700;
+}

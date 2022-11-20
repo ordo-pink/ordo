@@ -7,6 +7,7 @@ const AllActivitiesExtension: OrdoActivityExtension<"all-activities"> = {
   Component: loadable(() => import("$activities/all-activities/components")),
   Icon: BsCollection,
   name: "ordo-activity-all-activities",
+  readableName: "@ordo-activity-all-activities/title",
   translations: {
     ru: {
       "@ordo-activity-all-activities/title": "Установленные расширения",

@@ -87,6 +87,7 @@ export interface OrdoIsmParserExtension<Name extends string>
 
 export interface OrdoFileAssociationExtension<Name extends string>
   extends OrdoExtension<Name, OrdoExtensionType.FILE_ASSOCIATION> {
+  Icon?: Icon
   fileExtensions: FileExtension[]
   Component: FC | LoadableComponent<Record<string, never>>
 }
@@ -100,6 +101,7 @@ export interface OrdoLocalSettingExtension<Name extends string>
 
 export interface OrdoActivityExtension<Name extends string>
   extends OrdoExtension<Name, OrdoExtensionType.ACTIVITY> {
+  paths?: string[]
   Icon: Icon
   Component: FC | LoadableComponent<Record<string, never>>
 }

@@ -47,6 +47,8 @@ module.exports = {
     ],
     "@typescript-eslint/no-var-requires": "off",
     "i18next/no-literal-string": "warn",
+    "jsx-a11y/click-events-have-key-events": "warn",
+    "jsx-a11y/no-static-element-interactions": "warn",
   },
   overrides: [],
   parser: "@typescript-eslint/parser",

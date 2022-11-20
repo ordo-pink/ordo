@@ -24,7 +24,7 @@
       "$containers/*": ["src/containers/*"],
       "$activities/*": ["src/activities/*"],
       "$commands/*": ["src/commands/*"],
-      "$associations/*": ["src/associations/*"],
+      "$file-associations/*": ["src/file-associations/*"],
       "$core/*": ["src/core/*"],
       "*": ["node_modules/*"]
     }

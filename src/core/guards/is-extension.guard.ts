@@ -12,9 +12,7 @@ const isExtensionType = (
   extensionType: OrdoExtensionType,
   extension: OrdoExtension<string, OrdoExtensionType>,
 ) => {
-  const type = extension.name.split("-")[1]
-
-  return Boolean(type) && type === extensionType
+  return extension.name.startsWith(`ordo-${extensionType}`)
 }
 
 export const isActivityExtension = (

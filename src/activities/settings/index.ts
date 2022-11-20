@@ -7,6 +7,7 @@ const SettingsExtension: OrdoActivityExtension<"settings"> = {
   Component: loadable(() => import("$activities/settings/components")),
   Icon: BsGearWideConnected,
   name: "ordo-activity-settings",
+  readableName: "@ordo-activity-settings/title",
   translations: {
     ru: {
       "@ordo-activity-settings/title": "Настройки",

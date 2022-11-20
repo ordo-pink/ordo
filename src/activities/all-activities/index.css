@@ -1,0 +1,17 @@
+.all-activities {
+  @apply flex justify-around sm:justify-start flex-wrap;
+}
+
+.all-activities_activity {
+  @apply flex flex-col items-center justify-center space-y-2;
+  @apply w-36 m-2;
+  @apply shadow-md p-4 bg-neutral-200 dark:bg-neutral-600 rounded-xl hover:shadow-xl cursor-pointer hover:scale-105 transition-all duration-300;
+}
+
+.all-activities_activity_icon {
+  @apply text-6xl hover:text-purple-600 dark:hover:text-purple-300 transition-colors duration-300;
+}
+
+.all-activities_activity_name {
+  @apply uppercase antialiased text-sm;
+}

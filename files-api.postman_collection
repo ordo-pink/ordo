@@ -1,0 +1,108 @@
+{
+	"info": {
+		"_postman_id": "019b07d8-79f1-4b54-83c0-d0ccc08dafbe",
+		"name": "Ordo API",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Create File",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"path\": \"/ism/test2/ordo3.txt\",\r\n    \"raw\": \"+++++ Hello from ISM\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:5000/api/files",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"files"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create Directory",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"path\": \"/md/te111st/1111121111121113/231241/345\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:5000/api/directories",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"directories"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get File",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:5000/api/files/ordo.ism",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"files",
+						"ordo.ism"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Directory",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:5000/api/directories/%2Fism1",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"directories",
+						"%2Fism1"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

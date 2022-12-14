@@ -7,7 +7,5 @@ export default function Settings() {
 
   const Workspace = useWorkspaceWithSidebar()
 
-  return (
-    <Workspace sidebarChildren={<h1>Hello!</h1>}>{t("@ordo-activity-settings/title")}</Workspace>
-  )
+  return <Workspace sidebarChildren={<h1>TODO</h1>}>{t("@ordo-activity-settings/title")}</Workspace>
 }

@@ -10,6 +10,7 @@ export default function WorkspaceWithSidebar({
   children,
   sidebarChildren,
 }: PropsWithChildren<Props>) {
+  // TODO: Add support for dragging
   return (
     <>
       <Sidebar>{sidebarChildren}</Sidebar>

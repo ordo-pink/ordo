@@ -13,14 +13,14 @@ const EditorExtension: OrdoActivityExtension<"editor"> = {
     ru: {
       "@ordo-activity-editor/title": "Редактор",
       "@ordo-activity-editor/no-file": "Выберите файл",
-      "@ordo-activity-editor/unsupported-file":
-        "Ordo не знает, как открыть этот файл. Поищем в расширениях?",
+      "@ordo-activity-editor/unsupported-file": "Ordo не знает, как открыть этот файл.",
+      "@ordo-activity-editor/search-for-extensions": "Поищем в расширениях?",
     },
     en: {
       "@ordo-activity-editor/title": "Editor",
       "@ordo-activity-editor/no-file": "Choose file",
-      "@ordo-activity-editor/unsupported-file":
-        "Ordo doesn't know how to open this file. Feel like finding an extension that can fix the problem?",
+      "@ordo-activity-editor/unsupported-file": "Ordo doesn't know how to open this file.",
+      "@ordo-activity-editor/search-for-extensions": "There might be an extension to fix that.",
     },
   },
 }

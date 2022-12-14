@@ -1,6 +1,6 @@
 import { useTranslation } from "react-i18next"
 
-export default function EmptyEditor() {
+export default function FileNotSelected() {
   const { t } = useTranslation()
 
   return (

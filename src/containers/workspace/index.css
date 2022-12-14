@@ -3,5 +3,5 @@
 }
 
 .workspace-sidebar {
-  @apply p-2 w-full h-full bg-neutral-200 dark:bg-neutral-600;
+  @apply p-2 h-full bg-neutral-200 dark:bg-neutral-600 w-1/4;
 }

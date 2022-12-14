@@ -1,4 +1,4 @@
-import { WorkerMessageData } from "$file-associations/ism/types"
+import { WorkerMessageData } from "$core/types"
 
 onmessage = (message: MessageEvent<WorkerMessageData>) => {
   const { event } = message.data

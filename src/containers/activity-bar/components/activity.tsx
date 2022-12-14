@@ -1,12 +1,12 @@
 import { useTranslation } from "react-i18next"
-import { Link } from "react-router-dom"
+import { NavLink } from "react-router-dom"
 
 import { OrdoActivityExtension } from "$core/types"
 import { getActivityRoute, getExtensionReadableName } from "$core/utils/extensions.util"
 
 type Props = { activity: OrdoActivityExtension<string> }
 
-export default function AllActivitiesActivity({ activity }: Props) {
+export default function ActivityBarActivity({ activity }: Props) {
   const { t } = useTranslation()
 
   const activityName = getExtensionReadableName(activity)
@@ -14,17 +14,12 @@ export default function AllActivitiesActivity({ activity }: Props) {
   const Icon = activity.Icon
 
   return (
-    <Link
-      className="block"
+    <NavLink
+      title={t(activityName) as string}
+      className="activity-bar__activity"
       to={activityRoute}
     >
-      <div className="all-activities_activity">
-        <div className="all-activities_activity_icon">
-          <Icon />
-        </div>
-
-        <div className="all-activities_activity_name">{t(activityName)}</div>
-      </div>
-    </Link>
+      <Icon />
+    </NavLink>
   )
 }

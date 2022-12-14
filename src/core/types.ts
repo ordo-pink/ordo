@@ -15,6 +15,8 @@ export type UnaryFn<Arg, Result> = (arg: Arg) => Result
 export type BinaryFn<Arg1, Arg2, Result> = (arg1: Arg1, arg2: Arg2) => Result
 export type TernaryFn<Arg1, Arg2, Arg3, Result> = (arg1: Arg1, arg2: Arg2, arg3: Arg3) => Result
 
+export type Unpack<T> = T extends Array<infer U> ? U : T
+
 export type Icon = FC // TODO Make this more specific
 
 export type FileExtension = `.${string}`
@@ -66,6 +68,19 @@ export type TranslationsRecord<Name extends string> = {
   [Key in Language]?: Record<`@${Name}/${string}`, string>
 }
 
+// TODO: Restrict things, provide them via env
+// @see https://developer.mozilla.org/en-US/docs/Web/HTTP/Feature_Policy
+// @see https://w3c.github.io/webappsec-permissions-policy/#permissions-policy-http-header-field
+export type OrdoExtensionPermissions = Partial<{
+  http: string[]
+  clipboard: AccessLevel
+  localStorage: Record<string, AccessLevel>
+  cookies: Record<string, AccessLevel>
+  filesystem: Record<string, AccessLevel>
+  readSession: boolean
+  indexDB: Record<string, AccessLevel>
+}>
+
 export interface OrdoExtension<Name extends string, ExtensionType extends OrdoExtensionType> {
   translations: TranslationsRecord<OrdoExtensionName<Name, ExtensionType>>
   name: OrdoExtensionName<Name, ExtensionType>
@@ -73,6 +88,7 @@ export interface OrdoExtension<Name extends string, ExtensionType extends OrdoEx
   description?: string
   storeSlice?: Slice
   dependencies?: OrdoExtensionName[]
+  permissions?: OrdoExtensionPermissions
 }
 
 export interface OrdoCommandExtension<Name extends string>
@@ -121,11 +137,15 @@ export type OrdoFile<Metadata extends Record<string, unknown> = Record<string, u
 export type OrdoDirectory<Metadata extends Record<string, unknown> = Record<string, unknown>> = {
   path: string
   readableName: string
-  extension: FileExtension
   createdAt: Date
   updatedAt: Date
   accessedAt: Date
   depth: number
   children: Array<OrdoFile | OrdoDirectory>
   metadata: Metadata
+}
+
+export type WorkerMessageData<T = unknown> = {
+  event: string
+  payload: T
 }

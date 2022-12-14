@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react"
 import { useParams } from "react-router-dom"
 
-import { WorkerMessageData } from "$file-associations/ism/types"
+import { WorkerMessageData } from "$core/types"
 
 export default function IsmEditor() {
   const [worker] = useState(new Worker(new URL("$file-associations/ism/worker", import.meta.url)))

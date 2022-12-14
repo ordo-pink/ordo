@@ -3,6 +3,7 @@ import { Outlet, RouteObject, useLocation, useNavigate } from "react-router-dom"
 
 import AllActivitiesExtension from "$activities/all-activities"
 import EditorExtension from "$activities/editor"
+import ExtensionStoreExtension from "$activities/extension-store"
 import SettingsExtension from "$activities/settings"
 import UserExtension from "$activities/user"
 import ActivityBar from "$containers/activity-bar"
@@ -14,6 +15,7 @@ import { router } from "$core/router"
 import { useAppDispatch } from "$core/state/hooks/use-app-dispatch.hook"
 import { useAppSelector } from "$core/state/hooks/use-app-selector.hook"
 import IsmFileAssociation from "$file-associations/ism"
+import MdViewerFileAssociation from "$file-associations/md-viewer"
 
 import "$containers/app/index.css"
 
@@ -33,15 +35,18 @@ export default function App() {
     const extensions = [
       AllActivitiesExtension,
       EditorExtension,
+      ExtensionStoreExtension,
       UserExtension,
       SettingsExtension,
       IsmFileAssociation,
+      MdViewerFileAssociation,
     ]
 
     extensions.forEach((extension) => {
       if (isActivityExtension(extension)) {
         const activityExists = activities.some((activity) => activity.name === extension.name)
 
+        // TODO: Disallow overriding routes
         if (activityExists) return
 
         const paths = extension.paths

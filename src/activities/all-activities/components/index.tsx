@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react"
 
 import AllActivitiesActivity from "$activities/all-activities/components/activity"
+import { useWorkspace } from "$containers/workspace/hooks/use-workspace.hook"
 import { useAppSelector } from "$core/state/hooks/use-app-selector.hook"
 import { OrdoActivityExtension } from "$core/types"
 
@@ -11,6 +12,8 @@ export default function AllActivities() {
 
   const [visibleActivities, setVisibleActivities] = useState<OrdoActivityExtension<string>[]>([])
 
+  const Workspace = useWorkspace()
+
   useEffect(() => {
     activities &&
       setVisibleActivities(
@@ -19,13 +22,15 @@ export default function AllActivities() {
   }, [activities])
 
   return (
-    <div className="all-activities">
-      {visibleActivities.map((activity) => (
-        <AllActivitiesActivity
-          key={activity.name}
-          activity={activity}
-        />
-      ))}
-    </div>
+    <Workspace>
+      <div className="all-activities">
+        {visibleActivities.map((activity) => (
+          <AllActivitiesActivity
+            key={activity.name}
+            activity={activity}
+          />
+        ))}
+      </div>
+    </Workspace>
   )
 }

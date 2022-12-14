@@ -11,10 +11,10 @@ const IsmFileAssociation: OrdoFileAssociationExtension<"ism"> = {
   readableName: "@ordo-file-association-ism/title",
   translations: {
     ru: {
-      "@ordo-file-association-ism/title": "Установленные расширения",
+      "@ordo-file-association-ism/title": "Поддержка файлов ISM",
     },
     en: {
-      "@ordo-file-association-ism/title": "All installed extensions",
+      "@ordo-file-association-ism/title": "ISM Files Support",
     },
   },
 }

@@ -1,7 +1,11 @@
 import { useTranslation } from "react-i18next"
 
+import { useWorkspace } from "$containers/workspace/hooks/use-workspace.hook"
+
 export default function Settings() {
   const { t } = useTranslation()
 
-  return <div>{t("@ordo-activity-user/name")}</div>
+  const Workspace = useWorkspace()
+
+  return <Workspace>{t("@ordo-activity-user/name")}</Workspace>
 }

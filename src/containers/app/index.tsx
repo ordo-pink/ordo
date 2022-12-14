@@ -9,7 +9,6 @@ import UserExtension from "$activities/user"
 import ActivityBar from "$containers/activity-bar"
 import { useI18nInit } from "$containers/app/hooks/use-i18n-init"
 import { registerExtensions } from "$containers/app/store"
-import Workspace from "$containers/workspace"
 import { isActivityExtension } from "$core/guards/is-extension.guard"
 import { router } from "$core/router"
 import { useAppDispatch } from "$core/state/hooks/use-app-dispatch.hook"
@@ -81,7 +80,7 @@ export default function App() {
   return (
     <div className="app">
       <ActivityBar />
-      <Workspace element={<Outlet />} />
+      <Outlet />
     </div>
   )
 }

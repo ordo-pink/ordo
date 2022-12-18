@@ -1,11 +1,24 @@
 import { useContext } from '@marblejs/core';
 import { HttpError, HttpStatus, r } from '@marblejs/http';
-import { defer, Observable, throwError, from as from$ } from 'rxjs';
-import { catchError, map, mergeMap, reduce, switchMap } from 'rxjs/operators';
+import {
+  defer,
+  Observable,
+  throwError,
+  from as from$,
+  of,
+} from 'rxjs';
+import {
+  catchError,
+  map,
+  mergeMap,
+  reduce,
+  retryWhen,
+} from 'rxjs/operators';
 import { ListDirectoryRequest } from '../types';
 import { isPathParamsInHeaderExists$ } from '../middlewares';
 import { sortByCreatedAt, sortByUpdatedAt, toSort } from '@ordo-fs/utils';
 import { FileSystemToken, PathExchangeToken } from '@ordo-fs/contexts';
+import { OrdoHeaderPath } from '@ordo-fs/domain';
 
 export const listDirectory$ = r.pipe(
   r.matchPath('/'),
@@ -29,10 +42,11 @@ export const listDirectory$ = r.pipe(
               () => new HttpError(err.message, HttpStatus.NOT_ACCEPTABLE)
             )
           ),
-          switchMap((path: string) =>
-            fs.exists(path).pipe(
-              mergeMap((exists) =>
-                defer(() =>
+          mergeMap((path: string) =>
+            of(path).pipe(
+              mergeMap((path) => fs.exists(path)),
+              mergeMap((exists) => {
+                return defer(() =>
                   exists
                     ? fs.list(path, {
                         depth,
@@ -44,6 +58,20 @@ export const listDirectory$ = r.pipe(
                     : throwError(
                         () => new HttpError('NotFound', HttpStatus.NOT_FOUND)
                       )
+                );
+              }),
+              retryWhen((subj) =>
+                subj.pipe(
+                  mergeMap((error: HttpError, retryAttempt) => {
+                    if (
+                      error.status === HttpStatus.NOT_FOUND &&
+                      req.headers[OrdoHeaderPath.DIRECTORY] === '/' &&
+                      !retryAttempt
+                    ) {
+                      return fs.make(path, true);
+                    }
+                    return throwError(() => error);
+                  })
                 )
               ),
               mergeMap((list) => from$(list)),

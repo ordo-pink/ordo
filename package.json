@@ -43,6 +43,7 @@
   "dependencies": {
     "@marblejs/core": "^4.0.3",
     "@marblejs/http": "^4.0.3",
+    "@marblejs/middleware-cors": "^4.0.3",
     "@marblejs/middleware-logger": "^4.0.3",
     "fp-ts": "^2.13.1",
     "jsonwebtoken": "^8.5.1",

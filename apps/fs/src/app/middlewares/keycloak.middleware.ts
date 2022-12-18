@@ -1,8 +1,8 @@
-import { HttpMiddlewareEffect, HttpError, HttpStatus } from '@marblejs/http';
-import { isAuthorized$ } from '@ordo-fs/utils';
-import { Observable, mergeMap, of, throwError, catchError, iif } from 'rxjs';
-import { FileRequest } from '../containers/files/types';
-import { DirectoryRequest } from '../containers/directories/types';
+import {HttpMiddlewareEffect, HttpError, HttpStatus} from '@marblejs/http';
+import {isAuthorized$} from '@ordo-fs/utils';
+import {Observable, mergeMap, of, throwError, catchError, iif} from 'rxjs';
+import {FileRequest} from '../containers/files/types';
+import {DirectoryRequest} from '../containers/directories/types';
 
 export const keycloakMiddlware$: HttpMiddlewareEffect = (
   req$: Observable<DirectoryRequest | FileRequest>

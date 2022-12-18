@@ -1,7 +1,7 @@
-import { HttpMiddlewareEffect, HttpError, HttpStatus } from '@marblejs/http';
-import { OrdoHeaderPath } from '../../../../domain';
-import { Observable, mergeMap, of, throwError } from 'rxjs';
-import { FileRequest } from '../types';
+import {HttpMiddlewareEffect, HttpError, HttpStatus} from '@marblejs/http';
+import {OrdoHeaderPath} from '@ordo-fs/domain';
+import {Observable, mergeMap, of, throwError} from 'rxjs';
+import {FileRequest} from '../types';
 
 export const isPathParamsInHeaderExists$: HttpMiddlewareEffect = (
   req$: Observable<FileRequest>

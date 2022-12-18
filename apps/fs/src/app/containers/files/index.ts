@@ -1,4 +1,4 @@
-import { combineRoutes } from '@marblejs/http';
+import {combineRoutes} from '@marblejs/http';
 import {
   getFile$,
   createFile$,

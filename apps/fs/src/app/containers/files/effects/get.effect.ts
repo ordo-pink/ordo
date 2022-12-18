@@ -1,11 +1,11 @@
-import { useContext } from '@marblejs/core';
-import { HttpError, HttpStatus, r } from '@marblejs/http';
-import { defer, Observable, throwError } from 'rxjs';
-import { catchError, map, mergeMap, switchMap } from 'rxjs/operators';
-import { GetFileRequest } from '../types';
-import { lookup } from 'mime-types';
-import { isPathParamsInHeaderExists$ } from '../middlewares';
-import { FileSystemToken, PathExchangeToken } from '@ordo-fs/contexts';
+import {useContext} from '@marblejs/core';
+import {HttpError, HttpStatus, r} from '@marblejs/http';
+import {defer, Observable, throwError} from 'rxjs';
+import {catchError, map, mergeMap, switchMap} from 'rxjs/operators';
+import {GetFileRequest} from '../types';
+import {lookup} from 'mime-types';
+import {isPathParamsInHeaderExists$} from '../middlewares';
+import {FileSystemToken, PathExchangeToken} from '@ordo-fs/contexts';
 
 export const getFile$ = r.pipe(
   r.matchPath('/'),
@@ -27,8 +27,8 @@ export const getFile$ = r.pipe(
               exists
                 ? fs.read(path)
                 : throwError(
-                    () => new HttpError('NotFound', HttpStatus.NOT_FOUND)
-                  )
+                  () => new HttpError('NotFound', HttpStatus.NOT_FOUND)
+                )
             )
           ),
           map((body) => ({
@@ -37,8 +37,8 @@ export const getFile$ = r.pipe(
           }))
         )
       ),
-      map(({ mimeType, body }) => ({
-        headers: { 'Content-Type': mimeType },
+      map(({mimeType, body}) => ({
+        headers: {'Content-Type': mimeType},
         body,
       }))
     );

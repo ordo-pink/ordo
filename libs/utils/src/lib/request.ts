@@ -1,6 +1,6 @@
 import * as http from 'http';
 import * as https from 'https';
-import { HttpStatus } from '@marblejs/http';
+import {HttpStatus} from '@marblejs/http';
 
 export const request = <T>(
   url: string,

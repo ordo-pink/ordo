@@ -1,5 +1,5 @@
-import { useContext } from '@marblejs/core';
-import { HttpError, HttpStatus, r } from '@marblejs/http';
+import {useContext} from '@marblejs/core';
+import {HttpError, HttpStatus, r} from '@marblejs/http';
 import {
   defer,
   Observable,
@@ -14,11 +14,11 @@ import {
   reduce,
   retryWhen,
 } from 'rxjs/operators';
-import { ListDirectoryRequest } from '../types';
-import { isPathParamsInHeaderExists$ } from '../middlewares';
-import { sortByCreatedAt, sortByUpdatedAt, toSort } from '@ordo-fs/utils';
-import { FileSystemToken, PathExchangeToken } from '@ordo-fs/contexts';
-import { OrdoHeaderPath } from '@ordo-fs/domain';
+import {ListDirectoryRequest} from '../types';
+import {isPathParamsInHeaderExists$} from '../middlewares';
+import {sortByCreatedAt, sortByUpdatedAt, toSort} from '@ordo-fs/utils';
+import {FileSystemToken, PathExchangeToken} from '@ordo-fs/contexts';
+import {OrdoHeaderPath} from '@ordo-fs/domain';
 
 export const listDirectory$ = r.pipe(
   r.matchPath('/'),
@@ -49,15 +49,15 @@ export const listDirectory$ = r.pipe(
                 return defer(() =>
                   exists
                     ? fs.list(path, {
-                        depth,
-                        skip,
-                        length,
-                        createdAt,
-                        updatedAt,
-                      })
+                      depth,
+                      skip,
+                      length,
+                      createdAt,
+                      updatedAt,
+                    })
                     : throwError(
-                        () => new HttpError('NotFound', HttpStatus.NOT_FOUND)
-                      )
+                      () => new HttpError('NotFound', HttpStatus.NOT_FOUND)
+                    )
                 );
               }),
               retryWhen((subj) =>
@@ -86,7 +86,7 @@ export const listDirectory$ = r.pipe(
         );
       }),
       map((body) => ({
-        headers: { 'content-type': 'appliction/json' },
+        headers: {'content-type': 'appliction/json'},
         body,
       }))
     );

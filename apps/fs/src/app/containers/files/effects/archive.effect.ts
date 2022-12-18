@@ -1,10 +1,10 @@
-import { useContext } from '@marblejs/core';
-import { HttpError, HttpStatus, r } from '@marblejs/http';
-import { defer, Observable, of, throwError } from 'rxjs';
-import { catchError, map, mergeMap, switchMap } from 'rxjs/operators';
-import { ArchiveFileRequest } from '../types';
-import { isPathParamsInHeaderExists$ } from '../middlewares';
-import { FileSystemToken, PathExchangeToken } from '@ordo-fs/contexts';
+import {useContext} from '@marblejs/core';
+import {HttpError, HttpStatus, r} from '@marblejs/http';
+import {defer, Observable, of, throwError} from 'rxjs';
+import {catchError, map, mergeMap, switchMap} from 'rxjs/operators';
+import {ArchiveFileRequest} from '../types';
+import {isPathParamsInHeaderExists$} from '../middlewares';
+import {FileSystemToken, PathExchangeToken} from '@ordo-fs/contexts';
 
 export const archiveFile$ = r.pipe(
   r.matchPath('/archive'),
@@ -32,8 +32,8 @@ export const archiveFile$ = r.pipe(
                     exists
                       ? fs.archive(path)
                       : throwError(
-                          () => new HttpError('NOT_FOUND', HttpStatus.NOT_FOUND)
-                        )
+                        () => new HttpError('NOT_FOUND', HttpStatus.NOT_FOUND)
+                      )
                   )
                 )
               )

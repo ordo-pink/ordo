@@ -1,10 +1,10 @@
-import { useContext } from '@marblejs/core';
-import { HttpError, HttpStatus, r } from '@marblejs/http';
-import { defer, Observable, of, throwError } from 'rxjs';
-import { catchError, map, mergeMap, switchMap } from 'rxjs/operators';
-import { RemoveFileRequest } from '../types';
-import { isPathParamsInHeaderExists$ } from '../middlewares';
-import { FileSystemToken, PathExchangeToken } from '@ordo-fs/contexts';
+import {useContext} from '@marblejs/core';
+import {HttpError, HttpStatus, r} from '@marblejs/http';
+import {defer, Observable, of, throwError} from 'rxjs';
+import {catchError, map, mergeMap, switchMap} from 'rxjs/operators';
+import {RemoveFileRequest} from '../types';
+import {isPathParamsInHeaderExists$} from '../middlewares';
+import {FileSystemToken, PathExchangeToken} from '@ordo-fs/contexts';
 
 export const removeFile$ = r.pipe(
   r.matchPath('/'),
@@ -31,22 +31,22 @@ export const removeFile$ = r.pipe(
                   defer(() =>
                     exists
                       ? fs
-                          .remove(path, false)
-                          .pipe(
-                            catchError((e: Error) =>
-                              throwError(
-                                () =>
-                                  new HttpError(
-                                    'NOT_ACCEPTABLE',
-                                    HttpStatus.NOT_ACCEPTABLE,
-                                    [e.message]
-                                  )
-                              )
+                        .remove(path, false)
+                        .pipe(
+                          catchError((e: Error) =>
+                            throwError(
+                              () =>
+                                new HttpError(
+                                  'NOT_ACCEPTABLE',
+                                  HttpStatus.NOT_ACCEPTABLE,
+                                  [e.message]
+                                )
                             )
                           )
-                      : throwError(
-                          () => new HttpError('NOT_FOUND', HttpStatus.NOT_FOUND)
                         )
+                      : throwError(
+                        () => new HttpError('NOT_FOUND', HttpStatus.NOT_FOUND)
+                      )
                   )
                 )
               )

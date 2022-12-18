@@ -1,10 +1,10 @@
-import { useContext } from '@marblejs/core';
-import { HttpError, HttpStatus, r } from '@marblejs/http';
-import { FileSystemToken, PathExchangeToken } from '@ordo-fs/contexts';
-import { defer, forkJoin, Observable, of, throwError } from 'rxjs';
-import { catchError, map, mergeMap, switchMap } from 'rxjs/operators';
-import { isPathFromToParamsInHeaderExists$ } from '../middlewares';
-import { MoveFileRequest } from '../types';
+import {useContext} from '@marblejs/core';
+import {HttpError, HttpStatus, r} from '@marblejs/http';
+import {FileSystemToken, PathExchangeToken} from '@ordo-fs/contexts';
+import {defer, forkJoin, Observable, of, throwError} from 'rxjs';
+import {catchError, map, mergeMap, switchMap} from 'rxjs/operators';
+import {isPathFromToParamsInHeaderExists$} from '../middlewares';
+import {MoveFileRequest} from '../types';
 
 export const moveFile$ = r.pipe(
   r.matchPath('/'),
@@ -42,26 +42,26 @@ export const moveFile$ = r.pipe(
                 defer(() =>
                   isFile
                     ? fs
-                        .move(from, to)
-                        .pipe(
-                          catchError((e: Error) =>
-                            throwError(
-                              () =>
-                                new HttpError(
-                                  'NOT_ACCEPTABLE',
-                                  HttpStatus.NOT_ACCEPTABLE,
-                                  [e.message]
-                                )
-                            )
+                      .move(from, to)
+                      .pipe(
+                        catchError((e: Error) =>
+                          throwError(
+                            () =>
+                              new HttpError(
+                                'NOT_ACCEPTABLE',
+                                HttpStatus.NOT_ACCEPTABLE,
+                                [e.message]
+                              )
                           )
                         )
-                    : throwError(
-                        () =>
-                          new HttpError(
-                            'NOT_ACCEPTABLE',
-                            HttpStatus.NOT_ACCEPTABLE
-                          )
                       )
+                    : throwError(
+                      () =>
+                        new HttpError(
+                          'NOT_ACCEPTABLE',
+                          HttpStatus.NOT_ACCEPTABLE
+                        )
+                    )
                 )
               )
             )

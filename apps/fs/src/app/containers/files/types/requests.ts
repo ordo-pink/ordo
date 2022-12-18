@@ -1,5 +1,5 @@
-import { HttpRequest } from '@marblejs/http';
-import { OrdoIncomingMessage } from '../../../../domain';
+import {HttpRequest} from '@marblejs/http';
+import {OrdoIncomingMessage} from '@ordo-fs/domain';
 
 export type GetFileRequest = HttpRequest<never, never, never> &
   OrdoIncomingMessage;

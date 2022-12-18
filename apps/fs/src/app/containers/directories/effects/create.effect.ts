@@ -1,10 +1,10 @@
-import { useContext } from '@marblejs/core';
-import { HttpError, HttpStatus, r } from '@marblejs/http';
-import { defer, Observable, of, throwError } from 'rxjs';
-import { catchError, map, mergeMap, switchMap } from 'rxjs/operators';
-import { CreateDirectoryRequest } from '../types';
-import { isPathParamsInHeaderExists$ } from '../middlewares';
-import { FileSystemToken, PathExchangeToken } from '@ordo-fs/contexts';
+import {useContext} from '@marblejs/core';
+import {HttpError, HttpStatus, r} from '@marblejs/http';
+import {defer, Observable, of, throwError} from 'rxjs';
+import {catchError, map, mergeMap, switchMap} from 'rxjs/operators';
+import {CreateDirectoryRequest} from '../types';
+import {isPathParamsInHeaderExists$} from '../middlewares';
+import {FileSystemToken, PathExchangeToken} from '@ordo-fs/contexts';
 
 export const createDirectory$ = r.pipe(
   r.matchPath('/'),
@@ -31,8 +31,8 @@ export const createDirectory$ = r.pipe(
                   defer(() =>
                     exists
                       ? throwError(
-                          () => new HttpError('CONFLICT', HttpStatus.CONFLICT)
-                        )
+                        () => new HttpError('CONFLICT', HttpStatus.CONFLICT)
+                      )
                       : fs.make(path, true)
                   )
                 )

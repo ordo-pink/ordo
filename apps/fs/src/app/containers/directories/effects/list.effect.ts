@@ -65,7 +65,7 @@ export const listDirectory$ = r.pipe(
                   mergeMap((error: HttpError, retryAttempt) => {
                     if (
                       error.status === HttpStatus.NOT_FOUND &&
-                      req.headers[OrdoHeaderPath.DIRECTORY] === '/' &&
+                      req.headers[OrdoHeaderPath.PATH] === '/' &&
                       !retryAttempt
                     ) {
                       return fs.make(path, true);

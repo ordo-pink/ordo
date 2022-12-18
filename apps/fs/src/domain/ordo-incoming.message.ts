@@ -1,12 +1,9 @@
 import { IncomingHttpHeaders, IncomingMessage } from 'http';
 
 export enum OrdoHeaderPath {
-  DIRECTORY = 'ordo-directory-path',
-  DIRECTORY_FROM = 'ordo-directory-path-from',
-  DIRECTORY_TO = 'ordo-directory-path-to',
-  FILE = 'ordo-file-path',
-  FILE_FROM = 'ordo-file-path-from',
-  FILE_TO = 'ordo-file-path-to',
+  PATH = 'ordo-path',
+  PATH_FROM = 'ordo-path-from',
+  PATH_TO = 'ordo-path-to',
 }
 
 type OrdoIncomingHttpHeaders = {

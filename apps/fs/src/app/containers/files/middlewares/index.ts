@@ -8,8 +8,8 @@ export const isPathParamsInHeaderExists$: HttpMiddlewareEffect = (
 ) =>
   req$.pipe(
     mergeMap((req) =>
-      req.headers[OrdoHeaderPath.FILE] &&
-      req.headers[OrdoHeaderPath.FILE].toString() !== 'undefined'
+      req.headers[OrdoHeaderPath.PATH] &&
+      req.headers[OrdoHeaderPath.PATH].toString() !== 'undefined'
         ? of(req)
         : throwError(() => new HttpError('BadRequest', HttpStatus.BAD_REQUEST))
     )
@@ -20,10 +20,10 @@ export const isPathFromToParamsInHeaderExists$: HttpMiddlewareEffect = (
 ) =>
   req$.pipe(
     mergeMap((req) =>
-      req.headers[OrdoHeaderPath.FILE_FROM] &&
-      req.headers[OrdoHeaderPath.FILE_TO].toString() !== 'undefined' &&
-      req.headers[OrdoHeaderPath.FILE_TO] &&
-      req.headers[OrdoHeaderPath.FILE_TO].toString() !== 'undefined'
+      req.headers[OrdoHeaderPath.PATH_FROM] &&
+      req.headers[OrdoHeaderPath.PATH_TO].toString() !== 'undefined' &&
+      req.headers[OrdoHeaderPath.PATH_TO] &&
+      req.headers[OrdoHeaderPath.PATH_TO].toString() !== 'undefined'
         ? of(req)
         : throwError(() => new HttpError('BadRequest', HttpStatus.BAD_REQUEST))
     )

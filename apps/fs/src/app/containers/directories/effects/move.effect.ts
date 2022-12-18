@@ -17,7 +17,7 @@ export const moveDirectory$ = r.pipe(
     return req$.pipe(
       switchMap((req) =>
         of(req).pipe(
-          mergeMap(exchange.directoryFromTo),
+          mergeMap(exchange.pathFromTo),
           catchError((err: Error) =>
             throwError(
               () => new HttpError(err.message, HttpStatus.NOT_ACCEPTABLE)

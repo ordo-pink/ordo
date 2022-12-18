@@ -1,3 +1,4 @@
+import { FC } from "react"
 import { useParams } from "react-router-dom"
 
 import FileExplorer from "$activities/editor/components/file-explorer"
@@ -14,7 +15,7 @@ export default function Editor() {
   const association = useFileAssociation()
 
   // TODO: EmptyEditor vs UnsupportedFile
-  const Component = association ? association.Component : FileNotSupported
+  const Component = (association ? association.Component : FileNotSupported) as FC
 
   const Workspace = useWorkspaceWithSidebar()
 

@@ -1,22 +1,16 @@
-import loadable from "@loadable/component"
-import { BsFileEarmark } from "react-icons/bs"
+import { createFileAssociationExtension } from "$core/extensions/create-file-association-extension"
 
-import { OrdoFileAssociationExtension } from "$core/types"
-
-const IsmFileAssociation: OrdoFileAssociationExtension<"ism"> = {
-  Component: loadable(() => import("$file-associations/ism/components")),
-  Icon: BsFileEarmark,
+export default createFileAssociationExtension("ism", {
+  Component: () => import("$file-associations/ism/components"),
+  Icon: () => import("$file-associations/ism/components/icon"),
   fileExtensions: [".ism"],
-  name: "ordo-file-association-ism",
   readableName: "@ordo-file-association-ism/title",
   translations: {
     ru: {
-      "@ordo-file-association-ism/title": "Поддержка файлов ISM",
+      "@ordo-file-association-ism/title": "Поддержка файлов .ism",
     },
     en: {
-      "@ordo-file-association-ism/title": "ISM Files Support",
+      "@ordo-file-association-ism/title": "'.ism' file support",
     },
   },
-}
-
-export default IsmFileAssociation
+})

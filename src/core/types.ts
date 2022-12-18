@@ -1,7 +1,6 @@
-import type { LoadableComponent } from "@loadable/component"
 import type { Slice } from "@reduxjs/toolkit"
 import type { Schema } from "jsonschema"
-import type { FC } from "react"
+import type Loadable from "react-loadable"
 
 import type { Language } from "$core/constants/language"
 import type { OrdoExtensionType } from "$core/constants/ordo-extension-type"
@@ -17,7 +16,7 @@ export type TernaryFn<Arg1, Arg2, Arg3, Result> = (arg1: Arg1, arg2: Arg2, arg3:
 
 export type Unpack<T> = T extends Array<infer U> ? U : T
 
-export type Icon = FC // TODO Make this more specific
+export type Icon = ReturnType<typeof Loadable>
 
 export type FileExtension = `.${string}`
 
@@ -105,7 +104,7 @@ export interface OrdoFileAssociationExtension<Name extends string>
   extends OrdoExtension<Name, OrdoExtensionType.FILE_ASSOCIATION> {
   Icon?: Icon
   fileExtensions: FileExtension[]
-  Component: FC | LoadableComponent<Record<string, never>>
+  Component: ReturnType<typeof Loadable>
 }
 
 export interface OrdoLocalSettingExtension<Name extends string>
@@ -119,7 +118,7 @@ export interface OrdoActivityExtension<Name extends string>
   extends OrdoExtension<Name, OrdoExtensionType.ACTIVITY> {
   paths?: string[]
   Icon: Icon
-  Component: FC | LoadableComponent<Record<string, never>>
+  Component: ReturnType<typeof Loadable>
 }
 
 export type OrdoFile<Metadata extends Record<string, unknown> = Record<string, unknown>> = {

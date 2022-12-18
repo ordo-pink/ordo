@@ -1,12 +1,8 @@
-import loadable from "@loadable/component"
-import { BsLayoutSidebarInset } from "react-icons/bs"
+import { createActivityExtension } from "$core/extensions/create-activity-extension"
 
-import { OrdoActivityExtension } from "$core/types"
-
-const EditorExtension: OrdoActivityExtension<"editor"> = {
-  name: "ordo-activity-editor",
-  Icon: BsLayoutSidebarInset,
-  Component: loadable(() => import("$activities/editor/components")),
+export default createActivityExtension("editor", {
+  Component: () => import("$activities/editor/components"),
+  Icon: () => import("$activities/editor/components/icon"),
   paths: ["editor", "editor/:extension/:path"],
   readableName: "@ordo-activity-editor/title",
   translations: {
@@ -23,6 +19,4 @@ const EditorExtension: OrdoActivityExtension<"editor"> = {
       "@ordo-activity-editor/search-for-extensions": "There might be an extension to fix that.",
     },
   },
-}
-
-export default EditorExtension
+})

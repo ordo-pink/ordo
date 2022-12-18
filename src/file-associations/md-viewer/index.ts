@@ -1,22 +1,16 @@
-import loadable from "@loadable/component"
-import { BsFileEarmark } from "react-icons/bs"
+import { createFileAssociationExtension } from "$core/extensions/create-file-association-extension"
 
-import { OrdoFileAssociationExtension } from "$core/types"
-
-const MdFileAssociation: OrdoFileAssociationExtension<"md-viewer"> = {
-  Component: loadable(() => import("$file-associations/md-viewer/components")),
-  Icon: BsFileEarmark,
+export default createFileAssociationExtension("md-viewer", {
+  Component: () => import("$file-associations/md-viewer/components"),
+  Icon: () => import("$file-associations/md-viewer/components/icon"),
   fileExtensions: [".md"],
-  name: "ordo-file-association-md-viewer",
   readableName: "@ordo-file-association-md-viewer/title",
   translations: {
     ru: {
-      "@ordo-file-association-md-viewer/title": "Установленные расширения",
+      "@ordo-file-association-md-viewer/title": "Просмотр Markdown-файлов",
     },
     en: {
-      "@ordo-file-association-md-viewer/title": "All installed extensions",
+      "@ordo-file-association-md-viewer/title": "Markdown Viewer",
     },
   },
-}
-
-export default MdFileAssociation
+})

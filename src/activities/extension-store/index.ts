@@ -1,12 +1,8 @@
-import loadable from "@loadable/component"
-import { BsShop } from "react-icons/bs"
+import { createActivityExtension } from "$core/extensions/create-activity-extension"
 
-import { OrdoActivityExtension } from "$core/types"
-
-const ExtensionStoreExtension: OrdoActivityExtension<"extension-store"> = {
-  Component: loadable(() => import("$activities/extension-store/components")),
-  Icon: BsShop,
-  name: "ordo-activity-extension-store",
+export default createActivityExtension("extension-store", {
+  Component: () => import("$activities/extension-store/components"),
+  Icon: () => import("$activities/extension-store/components/icon"),
   readableName: "@ordo-activity-extension-store/title",
   paths: ["extension-store", "extension-store/:type/:name"],
   translations: {
@@ -17,6 +13,4 @@ const ExtensionStoreExtension: OrdoActivityExtension<"extension-store"> = {
       "@ordo-activity-extension-store/title": "Extensions",
     },
   },
-}
-
-export default ExtensionStoreExtension
+})

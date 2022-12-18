@@ -1,12 +1,8 @@
-import loadable from "@loadable/component"
-import { BsPersonBadge } from "react-icons/bs"
+import { createActivityExtension } from "$core/extensions/create-activity-extension"
 
-import { OrdoActivityExtension } from "$core/types"
-
-const UserExtension: OrdoActivityExtension<"user"> = {
-  Component: loadable(() => import("$activities/user/components")),
-  Icon: BsPersonBadge,
-  name: "ordo-activity-user",
+export default createActivityExtension("user", {
+  Component: () => import("$activities/user/components"),
+  Icon: () => import("$activities/user/components/icon"),
   readableName: "@ordo-activity-user/title",
   translations: {
     ru: {
@@ -18,6 +14,4 @@ const UserExtension: OrdoActivityExtension<"user"> = {
       "@ordo-activity-user/name": "Name",
     },
   },
-}
-
-export default UserExtension
+})

@@ -80,6 +80,7 @@ export default function App() {
   return (
     <div className="app">
       <ActivityBar />
+
       <Outlet />
     </div>
   )

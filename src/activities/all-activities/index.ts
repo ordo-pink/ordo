@@ -1,12 +1,8 @@
-import loadable from "@loadable/component"
-import { BsCollection } from "react-icons/bs"
+import { createActivityExtension } from "$core/extensions/create-activity-extension"
 
-import { OrdoActivityExtension } from "$core/types"
-
-const AllActivitiesExtension: OrdoActivityExtension<"all-activities"> = {
-  Component: loadable(() => import("$activities/all-activities/components")),
-  Icon: BsCollection,
-  name: "ordo-activity-all-activities",
+export default createActivityExtension("all-activities", {
+  Component: () => import("$activities/all-activities/components"),
+  Icon: () => import("$activities/all-activities/components/icon"),
   readableName: "@ordo-activity-all-activities/title",
   translations: {
     ru: {
@@ -16,6 +12,4 @@ const AllActivitiesExtension: OrdoActivityExtension<"all-activities"> = {
       "@ordo-activity-all-activities/title": "All installed extensions",
     },
   },
-}
-
-export default AllActivitiesExtension
+})

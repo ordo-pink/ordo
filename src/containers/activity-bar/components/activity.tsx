@@ -12,10 +12,16 @@ export default function ActivityBarActivity({ activity }: Props) {
   const activityName = getExtensionReadableName(activity)
   const activityRoute = getActivityRoute(activity)
   const Icon = activity.Icon
+  const Component = activity.Component
+
+  const handleMouseOver = () => {
+    Component.preload()
+  }
 
   return (
     <NavLink
       title={t(activityName) as string}
+      onMouseOver={handleMouseOver}
       className="activity-bar__activity"
       to={activityRoute}
     >

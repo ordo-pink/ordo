@@ -1,6 +1,7 @@
 import { createBrowserRouter } from "react-router-dom"
-import Welcome from "$activities/welcome"
+
 import App from "$containers/app"
+import Welcome from "$core/components/welcome"
 
 export const router = createBrowserRouter([
   {

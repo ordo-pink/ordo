@@ -9,7 +9,7 @@
 }
 
 .all-activities_activity_icon {
-  @apply text-6xl hover:text-purple-600 dark:hover:text-purple-300 transition-colors duration-300;
+  @apply text-6xl hover:text-purple-600 dark:hover:text-purple-400 transition-colors duration-300;
 }
 
 .all-activities_activity_name {

@@ -1,12 +1,8 @@
-import loadable from "@loadable/component"
-import { BsGearWideConnected } from "react-icons/bs"
+import { createActivityExtension } from "$core/extensions/create-activity-extension"
 
-import { OrdoActivityExtension } from "$core/types"
-
-const SettingsExtension: OrdoActivityExtension<"settings"> = {
-  Component: loadable(() => import("$activities/settings/components")),
-  Icon: BsGearWideConnected,
-  name: "ordo-activity-settings",
+export default createActivityExtension("settings", {
+  Component: () => import("$activities/settings/components"),
+  Icon: () => import("$activities/settings/components/icon"),
   readableName: "@ordo-activity-settings/title",
   translations: {
     ru: {
@@ -16,6 +12,4 @@ const SettingsExtension: OrdoActivityExtension<"settings"> = {
       "@ordo-activity-settings/title": "Settings",
     },
   },
-}
-
-export default SettingsExtension
+})

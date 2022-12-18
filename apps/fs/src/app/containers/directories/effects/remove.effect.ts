@@ -2,22 +2,22 @@ import { useContext } from '@marblejs/core';
 import { HttpError, HttpStatus, r } from '@marblejs/http';
 import { defer, Observable, of, throwError } from 'rxjs';
 import { catchError, map, mergeMap, switchMap } from 'rxjs/operators';
-import { RemoveFolderRequest } from '../types';
+import { RemoveDirectoryRequest } from '../types';
 import { isPathParamsInHeaderExists$ } from '../middlewares';
 import { FileSystemToken, PathExchangeToken } from '@ordo-fs/contexts';
 
-export const removeForlder$ = r.pipe(
+export const removeDirectory$ = r.pipe(
   r.matchPath('/'),
   r.matchType('DELETE'),
   r.use(isPathParamsInHeaderExists$),
-  r.useEffect((req$: Observable<RemoveFolderRequest>, ctx) => {
+  r.useEffect((req$: Observable<RemoveDirectoryRequest>, ctx) => {
     const fs = useContext(FileSystemToken)(ctx.ask);
     const exchange = useContext(PathExchangeToken)(ctx.ask);
 
     return req$.pipe(
       switchMap((req) =>
         of(req).pipe(
-          mergeMap(exchange.folder),
+          mergeMap(exchange.directory),
           catchError((err: Error) =>
             throwError(
               () => new HttpError(err.message, HttpStatus.NOT_ACCEPTABLE)

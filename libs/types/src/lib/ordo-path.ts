@@ -24,7 +24,7 @@ export interface OrdoDirectory extends OrdoFSElement {
   children: (OrdoFile | OrdoDirectory)[];
 }
 
-export const makeOrdoFolder =
+export const makeOrdoDirectory =
   (initialPath: PathLike) =>
   (path: OrdoPath, stat: Stats, depth: number): OrdoDirectory => {
     return {

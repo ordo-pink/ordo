@@ -2,16 +2,16 @@ import { useContext } from '@marblejs/core';
 import { HttpError, HttpStatus, r } from '@marblejs/http';
 import { defer, Observable, throwError, from as from$ } from 'rxjs';
 import { catchError, map, mergeMap, reduce, switchMap } from 'rxjs/operators';
-import { ListFolderRequest } from '../types';
+import { ListDirectoryRequest } from '../types';
 import { isPathParamsInHeaderExists$ } from '../middlewares';
 import { sortByCreatedAt, sortByUpdatedAt, toSort } from '@ordo-fs/utils';
 import { FileSystemToken, PathExchangeToken } from '@ordo-fs/contexts';
 
-export const listFolder$ = r.pipe(
+export const listDirectory$ = r.pipe(
   r.matchPath('/'),
   r.matchType('GET'),
   r.use(isPathParamsInHeaderExists$),
-  r.useEffect((req$: Observable<ListFolderRequest>, ctx) => {
+  r.useEffect((req$: Observable<ListDirectoryRequest>, ctx) => {
     const fs = useContext(FileSystemToken)(ctx.ask);
     const exchange = useContext(PathExchangeToken)(ctx.ask);
 
@@ -23,7 +23,7 @@ export const listFolder$ = r.pipe(
         const createdAt = req.query.createdAt && toSort(req.query.createdAt);
         const updatedAt = req.query.updatedAt && toSort(req.query.updatedAt);
 
-        return exchange.folder(req).pipe(
+        return exchange.directory(req).pipe(
           catchError((err: Error) =>
             throwError(
               () => new HttpError(err.message, HttpStatus.NOT_ACCEPTABLE)

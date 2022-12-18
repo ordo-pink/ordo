@@ -2,10 +2,10 @@ import { HttpMiddlewareEffect, HttpError, HttpStatus } from '@marblejs/http';
 import { isAuthorized$ } from '@ordo-fs/utils';
 import { Observable, mergeMap, of, throwError, catchError, iif } from 'rxjs';
 import { FileRequest } from '../containers/files/types';
-import { FolderRequest } from '../containers/folders/types';
+import { DirectoryRequest } from '../containers/directories/types';
 
 export const keycloakMiddlware$: HttpMiddlewareEffect = (
-  req$: Observable<FolderRequest | FileRequest>
+  req$: Observable<DirectoryRequest | FileRequest>
 ) =>
   req$.pipe(
     mergeMap((req) =>

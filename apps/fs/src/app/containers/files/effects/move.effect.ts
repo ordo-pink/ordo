@@ -17,7 +17,7 @@ export const moveFile$ = r.pipe(
     return req$.pipe(
       switchMap((req) =>
         of(req).pipe(
-          mergeMap(exchange.folderFromTo),
+          mergeMap(exchange.fileFromTo),
           catchError((err: Error) =>
             throwError(
               () => new HttpError(err.message, HttpStatus.NOT_ACCEPTABLE)

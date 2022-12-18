@@ -2,22 +2,22 @@ import { useContext } from '@marblejs/core';
 import { HttpError, HttpStatus, r } from '@marblejs/http';
 import { defer, forkJoin, Observable, of, throwError } from 'rxjs';
 import { catchError, map, mergeMap, switchMap } from 'rxjs/operators';
-import { MoveFolderRequest } from '../types';
+import { MoveDirectoryRequest } from '../types';
 import { isPathFromToParamsInHeaderExists$ } from '../middlewares';
 import { FileSystemToken, PathExchangeToken } from '@ordo-fs/contexts';
 
-export const moveFolder$ = r.pipe(
+export const moveDirectory$ = r.pipe(
   r.matchPath('/'),
   r.matchType('PATCH'),
   r.use(isPathFromToParamsInHeaderExists$),
-  r.useEffect((req$: Observable<MoveFolderRequest>, ctx) => {
+  r.useEffect((req$: Observable<MoveDirectoryRequest>, ctx) => {
     const fs = useContext(FileSystemToken)(ctx.ask);
     const exchange = useContext(PathExchangeToken)(ctx.ask);
 
     return req$.pipe(
       switchMap((req) =>
         of(req).pipe(
-          mergeMap(exchange.folderFromTo),
+          mergeMap(exchange.directoryFromTo),
           catchError((err: Error) =>
             throwError(
               () => new HttpError(err.message, HttpStatus.NOT_ACCEPTABLE)
@@ -37,10 +37,10 @@ export const moveFolder$ = r.pipe(
                   );
                 }
               }),
-              mergeMap(() => fs.isFolder(from)),
-              mergeMap((isFolder) =>
+              mergeMap(() => fs.isDirectory(from)),
+              mergeMap((isdirectory) =>
                 defer(() =>
-                  isFolder
+                  isdirectory
                     ? fs
                         .move(from, to)
                         .pipe(

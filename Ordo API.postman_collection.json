@@ -170,125 +170,125 @@
 			"response": []
 		},
 		{
-			"name": "FOLDER [CREATE]",
+			"name": "DIRECTORY [CREATE]",
 			"request": {
 				"method": "POST",
 				"header": [
 					{
-						"key": "ordo-folder-path",
+						"key": "ordo-directory-path",
 						"value": "/md/te111st/1111121111121113/231241/345",
 						"type": "text"
 					}
 				],
 				"url": {
-					"raw": "{{host}}/api/folders",
+					"raw": "{{host}}/api/directories",
 					"host": [
 						"{{host}}"
 					],
 					"path": [
 						"api",
-						"folders"
+						"directories"
 					]
 				}
 			},
 			"response": []
 		},
 		{
-			"name": "FOLDER [GET]",
+			"name": "DIRECTORY [GET]",
 			"request": {
 				"method": "GET",
 				"header": [
 					{
-						"key": "ordo-folder-path",
+						"key": "ordo-directory-path",
 						"value": "/",
 						"type": "text"
 					}
 				],
 				"url": {
-					"raw": "{{host}}/api/folders",
+					"raw": "{{host}}/api/directories",
 					"host": [
 						"{{host}}"
 					],
 					"path": [
 						"api",
-						"folders"
+						"directories"
 					]
 				}
 			},
 			"response": []
 		},
 		{
-			"name": "FOLDER [MOVE]",
+			"name": "DIRECTORY [MOVE]",
 			"request": {
 				"method": "PATCH",
 				"header": [
 					{
-						"key": "ordo-folder-path-from",
+						"key": "ordo-directory-path-from",
 						"value": "/ordo",
 						"type": "text"
 					},
 					{
-						"key": "ordo-folder-path-to",
+						"key": "ordo-directory-path-to",
 						"value": "/huerdo",
 						"type": "text"
 					}
 				],
 				"url": {
-					"raw": "{{host}}/api/folders",
+					"raw": "{{host}}/api/directories",
 					"host": [
 						"{{host}}"
 					],
 					"path": [
 						"api",
-						"folders"
+						"directories"
 					]
 				}
 			},
 			"response": []
 		},
 		{
-			"name": "FOLDER [REMOVE]",
+			"name": "DIRECTORY [REMOVE]",
 			"request": {
 				"method": "DELETE",
 				"header": [
 					{
-						"key": "ordo-folder-path",
+						"key": "ordo-directory-path",
 						"value": "/md/te111st/1111121111121113/231241/345",
 						"type": "text"
 					}
 				],
 				"url": {
-					"raw": "{{host}}/api/folders",
+					"raw": "{{host}}/api/directories",
 					"host": [
 						"{{host}}"
 					],
 					"path": [
 						"api",
-						"folders"
+						"directories"
 					]
 				}
 			},
 			"response": []
 		},
 		{
-			"name": "FOLDER [ARCHIVE]",
+			"name": "DIRECTORY [ARCHIVE]",
 			"request": {
 				"method": "DELETE",
 				"header": [
 					{
-						"key": "ordo-folder-path",
+						"key": "ordo-directory-path",
 						"value": "/md/te111st/1111121111121113/231241/345",
 						"type": "text"
 					}
 				],
 				"url": {
-					"raw": "{{host}}/api/folders/archive",
+					"raw": "{{host}}/api/directories/archive",
 					"host": [
 						"{{host}}"
 					],
 					"path": [
 						"api",
-						"folders",
+						"directories",
 						"archive"
 					]
 				}

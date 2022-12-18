@@ -5,7 +5,7 @@ import {
   OrdoPath,
   OrdoDirectory,
   OrdoFile,
-  makeOrdoFolder,
+  makeOrdoDirectory,
   makeOrdoFile,
 } from '@ordo/types';
 import {
@@ -36,8 +36,8 @@ import { FilesSystemListOptions, FileSystemDriver } from '../domain';
 
 const asyncPipeline = promisify(pipeline);
 
-const make = (path: PathLike, isFolder: boolean): Observable<Stats> => {
-  if (isFolder) {
+const make = (path: PathLike, isDirectory: boolean): Observable<Stats> => {
+  if (isDirectory) {
     return from(promises.mkdir(path, { recursive: true })).pipe(
       mergeMap(() => from(promises.stat(path)))
     );
@@ -69,11 +69,11 @@ const exists = (path: PathLike): Observable<boolean> =>
 const read = (path: PathLike): Observable<NodeJS.ReadableStream> =>
   of(path).pipe(mergeMap((path) => of(createReadStream(path))));
 
-const remove = (path: PathLike, isFolder: boolean): Observable<void> =>
+const remove = (path: PathLike, isDirectory: boolean): Observable<void> =>
   from(promises.lstat(path)).pipe(
     mergeMap((stat) =>
       defer(() =>
-        stat.isDirectory() === isFolder
+        stat.isDirectory() === isDirectory
           ? from(promises.rm(path, { recursive: true, force: true }))
           : throwError(() => new Error("Cant't remove that"))
       )
@@ -100,7 +100,7 @@ const archive = (path: PathLike): Observable<void> => {
 
 const readDir$ =
   (
-    folderMap: (path: OrdoPath, stat: Stats, depth: number) => OrdoDirectory,
+    directoryMap: (path: OrdoPath, stat: Stats, depth: number) => OrdoDirectory,
     fileMap: (path: OrdoPath, stat: Stats, depth: number) => OrdoFile
   ) =>
   (
@@ -118,14 +118,14 @@ const readDir$ =
           map((stat) =>
             stat.isFile()
               ? fileMap(path, stat, depth)
-              : folderMap(path, stat, depth)
+              : directoryMap(path, stat, depth)
           )
         )
       ),
       mergeMap((dto: OrdoFile | OrdoDirectory) =>
         // @ts-ignore TODO: !FIX TYPES!
         Array.isArray(dto.children)
-          ? readDir$(folderMap, fileMap)(dto.path, options, depth + 1).pipe(
+          ? readDir$(directoryMap, fileMap)(dto.path, options, depth + 1).pipe(
               map((childrens: [OrdoFile | OrdoDirectory]) => {
                 //@ts-ignore
                 dto.children = childrens
@@ -144,7 +144,7 @@ const list = (
   options: Partial<FilesSystemListOptions>
 ): Observable<[OrdoDirectory | OrdoFile]> => {
   const readDir = readDir$(
-    makeOrdoFolder(initialPath),
+    makeOrdoDirectory(initialPath),
     makeOrdoFile(initialPath)
   );
   return readDir(initialPath, options);
@@ -156,7 +156,7 @@ const move = (path: PathLike, to: PathLike): Observable<Partial<Stats>> =>
 const isFile = (path: PathLike): Observable<boolean> =>
   from(promises.lstat(path)).pipe(map((lstat) => lstat.isFile()));
 
-const isFolder = (path: PathLike): Observable<boolean> =>
+const isDirectory = (path: PathLike): Observable<boolean> =>
   from(promises.lstat(path)).pipe(map((lstat) => lstat.isDirectory()));
 
 export const FileSystemContext = createReader(
@@ -170,7 +170,7 @@ export const FileSystemContext = createReader(
     list,
     move,
     isFile,
-    isFolder,
+    isDirectory,
   })
 );
 

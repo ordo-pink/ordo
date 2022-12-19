@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "f0953650-2346-40e2-9ddf-cf32b5cd7f48",
+		"_postman_id": "37c8dd24-4d5b-46bc-bf71-4025e127ac9a",
 		"name": "Ordo API",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
 		"_exporter_id": "2080759"
@@ -300,18 +300,43 @@
 		"type": "oauth2",
 		"oauth2": [
 			{
+				"key": "tokenType",
+				"value": "Bearer",
+				"type": "string"
+			},
+			{
+				"key": "accessToken",
+				"value": "eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJyaHdxYzh1N2NiYnFjOVB3UXFWQWs2NnJEZ0dQaXZ5YVBPNUtfYll6aDJFIn0.eyJleHAiOjE2NzE0NjkzOTEsImlhdCI6MTY3MTQ2ODQ5MSwiYXV0aF90aW1lIjoxNjcxNDY4NDkxLCJqdGkiOiJjNzg1MmZiZS00Nzc5LTQzZmEtYTgwZi00ODkyM2YzZjc5Y2EiLCJpc3MiOiJodHRwczovL3Nzby5vcmRvLnBpbmsvcmVhbG1zL3Rlc3QiLCJhdWQiOiJhY2NvdW50Iiwic3ViIjoiMmRiYWRhMDMtMDRhMS00ZjYzLWFkN2ItN2NlNDYxZmQ4MzgzIiwidHlwIjoiQmVhcmVyIiwiYXpwIjoib3Jkby13ZWItYXBwIiwic2Vzc2lvbl9zdGF0ZSI6Ijc3MDM0ZjNhLWIwZTItNDI4Mi1hZjEyLWRjZWU0YmZkNmRlZiIsImFjciI6IjEiLCJhbGxvd2VkLW9yaWdpbnMiOlsiKiJdLCJyZWFsbV9hY2Nlc3MiOnsicm9sZXMiOlsiZGVmYXVsdC1yb2xlcy10ZXN0Iiwib2ZmbGluZV9hY2Nlc3MiLCJ1bWFfYXV0aG9yaXphdGlvbiJdfSwicmVzb3VyY2VfYWNjZXNzIjp7ImFjY291bnQiOnsicm9sZXMiOlsibWFuYWdlLWFjY291bnQiLCJtYW5hZ2UtYWNjb3VudC1saW5rcyIsInZpZXctcHJvZmlsZSJdfX0sInNjb3BlIjoib3BlbmlkIHByb2ZpbGUgZW1haWwiLCJzaWQiOiI3NzAzNGYzYS1iMGUyLTQyODItYWYxMi1kY2VlNGJmZDZkZWYiLCJlbWFpbF92ZXJpZmllZCI6dHJ1ZSwibmFtZSI6ImEgYiIsInByZWZlcnJlZF91c2VybmFtZSI6ImFAYSIsImdpdmVuX25hbWUiOiJhIiwiZmFtaWx5X25hbWUiOiJiIiwiZW1haWwiOiJhQGEifQ.Oip1eXiGC-o9mTVVs7IBGO_yHwvWktPhrZLGVK1x86hr8fbFH1b4sOOpOVDbxJmKgwz_jN2iYXZhsex1kwqUY0-hI6Lzp9KfBDYDetDBpGRFFTL-Ax677jbAEUOmx4Dtw0hpk71ptbjrOGh8mxxhkT_99I-eqAWlttLByYw0Snm-MY5rSiMa-o6nt2ig9Vg5q3Wc1fUB-r8LliaeVBXwj1DzEYufeQAH6j5_9k0mftk9dycIC4ZgwslWuEnddrL-_rdLIQzWL3-_8PRt--ODZCDX7PShmnPKDw5k199jZafCJ7HeQUFMDJfMkzQzrm9CQcFun8buz6GFfiqmTIICkj5KQ24JGfDhMVe7BfNckDTHqj1PRC21tAS5rSkCH5t588NzxYca9nLxuTwhO-1OsXR2npPTX7BfzHjx6YtCk0qgikX-siQCmCgin1R7oR672l2EZQF95geDMhZhQ1zVUOogxHf3tJ-1YzLuCvKtx7TMKJ7_Q8iT1uux0eovHNHKwBsHjFPWEiuJb7BFzkTkt7wITx28_xHk8b3phf9ffx7q2-4D4d4NSFjX21qeeOxZkFc_FGFQ6xIdf4fA0CEkSzyPwxVXmSFzLdts_V0Zjh8pz5aPU8RF7RQe68LwOMAxA_U7v_ifSsScMqtZxlA-lX2xyjUGw6r4I2kD6jgjXsI",
+				"type": "string"
+			},
+			{
+				"key": "client_authentication",
+				"value": "body",
+				"type": "string"
+			},
+			{
+				"key": "scope",
+				"value": "openid",
+				"type": "string"
+			},
+			{
 				"key": "grant_type",
-				"value": "client_credentials",
+				"value": "implicit",
+				"type": "string"
+			},
+			{
+				"key": "useBrowser",
+				"value": true,
+				"type": "boolean"
+			},
+			{
+				"key": "redirect_uri",
+				"value": "http://localhost:3000",
 				"type": "string"
 			},
 			{
 				"key": "clientSecret",
 				"value": "Vw2Vz7y1N1Js6ojW8ECitYyzeA78yGRa",
-				"type": "string"
-			},
-			{
-				"key": "scope",
-				"value": "openid email",
 				"type": "string"
 			},
 			{
@@ -327,11 +352,6 @@
 			{
 				"key": "accessTokenUrl",
 				"value": "https://sso.ordo.pink/realms/test/protocol/openid-connect/token",
-				"type": "string"
-			},
-			{
-				"key": "redirect_uri",
-				"value": "http://localhost:5000",
 				"type": "string"
 			},
 			{

@@ -71,8 +71,14 @@
 				"header": [
 					{
 						"key": "ordo-path",
-						"value": "/ordo.ism",
+						"value": "/ism/test2/ordo3.txt",
 						"type": "text"
+					},
+					{
+						"key": "ordo-path",
+						"value": "/ordo.ism",
+						"type": "text",
+						"disabled": true
 					}
 				],
 				"url": {
@@ -143,13 +149,13 @@
 				"header": [
 					{
 						"key": "ordo-path",
-						"value": "/ism/test2/ordo3.txt",
+						"value": "/ordo.ism",
 						"type": "text"
 					}
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "+++++ Hello from ISM",
+					"raw": "+++++ Hello from ISM!!!",
 					"options": {
 						"raw": {
 							"language": "text"
@@ -176,7 +182,7 @@
 				"header": [
 					{
 						"key": "ordo-path",
-						"value": "/md/te111st/1111121111121113/231241/345",
+						"value": "/ordo",
 						"type": "text"
 					}
 				],

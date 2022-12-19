@@ -7,8 +7,7 @@ export type OrdoRelativePath = OrdoPathLike;
 export type OrdoFileExtension = `.${string}`;
 
 export interface OrdoFSElement {
-  path: OrdoPath;
-  relativePath: OrdoRelativePath;
+  path: OrdoRelativePath;
   readableName: string;
   depth: number;
   createdAt: Date;
@@ -30,8 +29,7 @@ export const makeOrdoDirectory =
     (path: OrdoPath, stat: Stats, depth: number): OrdoDirectory => {
       return {
         children: [],
-        path,
-        relativePath: relative(initialPath.toString(), path),
+        path: relative(initialPath.toString(), path) || '/',
         readableName: basename(path),
         depth,
         createdAt: stat.birthtime,
@@ -46,8 +44,7 @@ export const makeOrdoFile =
       return {
         extension: extname(path),
         size: stat.size,
-        path,
-        relativePath: relative(initialPath.toString(), path),
+        path: relative(initialPath.toString(), path),
         readableName: basename(path),
         depth,
         createdAt: stat.birthtime,

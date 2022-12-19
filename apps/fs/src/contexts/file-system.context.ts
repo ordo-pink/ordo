@@ -125,7 +125,11 @@ const readDir$ =
       mergeMap((dto: OrdoFile | OrdoDirectory) =>
         // @ts-ignore TODO: !FIX TYPES!
         Array.isArray(dto.children)
-          ? readDir$(directoryMap, fileMap)(dto.path, options, depth + 1).pipe(
+          ? readDir$(directoryMap, fileMap)(
+              join(initialPath.toString(), basename(dto.path)),
+              options,
+              depth + 1
+            ).pipe(
               map((childrens: [OrdoFile | OrdoDirectory]) => {
                 //@ts-ignore
                 dto.children = childrens

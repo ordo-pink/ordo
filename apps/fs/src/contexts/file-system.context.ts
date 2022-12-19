@@ -143,11 +143,11 @@ const readDir$ =
 
 const list = (
   initialPath: PathLike,
-  options: Partial<FilesSystemListOptions>
+  options: Partial<FilesSystemListOptions> = {}
 ): Observable<[OrdoDirectory | OrdoFile]> => {
   const readDir = readDir$(
-    makeOrdoDirectory(initialPath),
-    makeOrdoFile(initialPath)
+    makeOrdoDirectory(options.rootPath || initialPath),
+    makeOrdoFile(options.rootPath || initialPath)
   );
   return readDir(initialPath, options);
 };

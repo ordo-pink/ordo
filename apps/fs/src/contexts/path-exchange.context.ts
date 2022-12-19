@@ -16,15 +16,20 @@ export type PathExchangeInterface = {
   pathFromTo: <T extends HttpRequest & OrdoIncomingMessage>(
     req: T
   ) => Observable<string[]>;
+  getRootPath: <T extends HttpRequest & OrdoIncomingMessage>(
+    req: T
+  ) => string;
 };
 
 export const PathExchange = createReader((): PathExchangeInterface => {
-  const getRootPath = (authorization: string) =>
-    join(environment.cwd, getUserId(authorization));
+
   return {
+    getRootPath(req) {
+      return join(environment.cwd, getUserId(req.headers.authorization))
+    },
     directory(req) {
       const path = req.headers[OrdoHeaderPath.PATH];
-      const base = getRootPath(req.headers.authorization);
+      const base = this.getRootPath(req);
       const current = join(base, path);
 
       if (!~current.indexOf(base)) {
@@ -34,7 +39,7 @@ export const PathExchange = createReader((): PathExchangeInterface => {
     },
     file(req) {
       const path = req.headers[OrdoHeaderPath.PATH];
-      const base = getRootPath(req.headers.authorization);
+      const base = this.getRootPath(req);
       const current = join(base, path);
 
       if (!~current.indexOf(base) || dirname(current) == dirname(base)) {
@@ -46,7 +51,7 @@ export const PathExchange = createReader((): PathExchangeInterface => {
       const left = req.headers[OrdoHeaderPath.PATH_FROM];
       const right = req.headers[OrdoHeaderPath.PATH_TO];
 
-      const base = getRootPath(req.headers.authorization);
+      const base = this.getRootPath(req);
       const from = join(base, left);
 
       if (!~from.indexOf(base)) {

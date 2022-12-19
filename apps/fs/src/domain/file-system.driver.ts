@@ -13,6 +13,7 @@ export type FilesSystemListOptions = {
   skip: number;
   updatedAt: SORT;
   createdAt: SORT;
+  rootPath: string;
 };
 
 export type FileSystemDriver = {

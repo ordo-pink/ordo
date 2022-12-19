@@ -43,6 +43,7 @@ export const listDirectory$ = r.pipe(
                         length,
                         createdAt,
                         updatedAt,
+                        rootPath: exchange.getRootPath(req)
                       })
                     : throwError(
                         () => new HttpError('NotFound', HttpStatus.NOT_FOUND)

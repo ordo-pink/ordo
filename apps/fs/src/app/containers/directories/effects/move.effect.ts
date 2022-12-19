@@ -36,6 +36,7 @@ export const moveDirectory$ = r.pipe(
                     () => new HttpError('CONFLICT', HttpStatus.CONFLICT)
                   );
                 }
+                return of([exFrom, exTo]);
               }),
               mergeMap(() => fs.isDirectory(from)),
               mergeMap((isdirectory) =>

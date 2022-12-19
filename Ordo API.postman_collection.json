@@ -12,7 +12,7 @@
 				"method": "DELETE",
 				"header": [
 					{
-						"key": "ordo-file-path",
+						"key": "ordo-path",
 						"value": "/ordo.ism",
 						"type": "text"
 					}
@@ -37,7 +37,7 @@
 				"method": "POST",
 				"header": [
 					{
-						"key": "ordo-file-path",
+						"key": "ordo-path",
 						"value": "/ism/test2/ordo3.txt",
 						"type": "text"
 					}
@@ -70,7 +70,7 @@
 				"method": "GET",
 				"header": [
 					{
-						"key": "ordo-file-path",
+						"key": "ordo-path",
 						"value": "/ordo.ism",
 						"type": "text"
 					}
@@ -94,7 +94,7 @@
 				"method": "PATCH",
 				"header": [
 					{
-						"key": "ordo-file-path",
+						"key": "ordo-path",
 						"value": "/ordo.ism",
 						"type": "text"
 					}
@@ -118,7 +118,7 @@
 				"method": "DELETE",
 				"header": [
 					{
-						"key": "ordo-file-path",
+						"key": "ordo-path",
 						"value": "/ordo.ism",
 						"type": "text"
 					}
@@ -142,7 +142,7 @@
 				"method": "PUT",
 				"header": [
 					{
-						"key": "ordo-file-path",
+						"key": "ordo-path",
 						"value": "/ism/test2/ordo3.txt",
 						"type": "text"
 					}
@@ -175,7 +175,7 @@
 				"method": "POST",
 				"header": [
 					{
-						"key": "ordo-directory-path",
+						"key": "ordo-path",
 						"value": "/md/te111st/1111121111121113/231241/345",
 						"type": "text"
 					}
@@ -199,7 +199,7 @@
 				"method": "GET",
 				"header": [
 					{
-						"key": "ordo-directory-path",
+						"key": "ordo-path",
 						"value": "/",
 						"type": "text"
 					}
@@ -223,12 +223,12 @@
 				"method": "PATCH",
 				"header": [
 					{
-						"key": "ordo-directory-path-from",
+						"key": "ordo-path-from",
 						"value": "/ordo",
 						"type": "text"
 					},
 					{
-						"key": "ordo-directory-path-to",
+						"key": "ordo-path-to",
 						"value": "/huerdo",
 						"type": "text"
 					}
@@ -252,8 +252,8 @@
 				"method": "DELETE",
 				"header": [
 					{
-						"key": "ordo-directory-path",
-						"value": "/md/te111st/1111121111121113/231241/345",
+						"key": "ordo-path",
+						"value": "/",
 						"type": "text"
 					}
 				],
@@ -276,8 +276,8 @@
 				"method": "DELETE",
 				"header": [
 					{
-						"key": "ordo-directory-path",
-						"value": "/md/te111st/1111121111121113/231241/345",
+						"key": "ordo-path",
+						"value": "/",
 						"type": "text"
 					}
 				],

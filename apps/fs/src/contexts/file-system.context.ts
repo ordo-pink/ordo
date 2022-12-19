@@ -153,6 +153,8 @@ const list = (
 const move = (path: PathLike, to: PathLike): Observable<Partial<Stats>> =>
   from(promises.rename(path, to)).pipe(mergeMap(() => from(promises.stat(to))));
 
+const stat = (path: PathLike): Observable<Stats> => from(promises.stat(path));
+
 const isFile = (path: PathLike): Observable<boolean> =>
   from(promises.lstat(path)).pipe(map((lstat) => lstat.isFile()));
 
@@ -171,6 +173,7 @@ export const FileSystemContext = createReader(
     move,
     isFile,
     isDirectory,
+    stat,
   })
 );
 

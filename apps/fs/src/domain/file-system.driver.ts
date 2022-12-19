@@ -33,4 +33,5 @@ export type FileSystemDriver = {
   ) => Observable<[OrdoFile | OrdoDirectory]>;
   isDirectory: (path: PathLike) => Observable<boolean>;
   isFile: (path: PathLike) => Observable<boolean>;
+  stat: (path: PathLike) => Observable<Stats>;
 };

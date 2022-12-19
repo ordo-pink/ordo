@@ -1,24 +1,13 @@
-import {useContext} from '@marblejs/core';
-import {HttpError, HttpStatus, r} from '@marblejs/http';
-import {
-  defer,
-  Observable,
-  throwError,
-  from as from$,
-  of,
-} from 'rxjs';
-import {
-  catchError,
-  map,
-  mergeMap,
-  reduce,
-  retryWhen,
-} from 'rxjs/operators';
-import {ListDirectoryRequest} from '../types';
-import {isPathParamsInHeaderExists$} from '../middlewares';
-import {sortByCreatedAt, sortByUpdatedAt, toSort} from '@ordo-fs/utils';
-import {FileSystemToken, PathExchangeToken} from '@ordo-fs/contexts';
-import {OrdoHeaderPath} from '@ordo-fs/domain';
+import { useContext } from '@marblejs/core';
+import { HttpError, HttpStatus, r } from '@marblejs/http';
+import { defer, Observable, throwError, from as from$, of, from } from 'rxjs';
+import { catchError, map, mergeMap, reduce, retryWhen } from 'rxjs/operators';
+import { ListDirectoryRequest } from '../types';
+import { isPathParamsInHeaderExists$ } from '../middlewares';
+import { sortByCreatedAt, sortByUpdatedAt, toSort } from '@ordo-fs/utils';
+import { FileSystemToken, PathExchangeToken } from '@ordo-fs/contexts';
+import { OrdoHeaderPath } from '@ordo-fs/domain';
+import { makeOrdoDirectory } from '@ordo/types';
 
 export const listDirectory$ = r.pipe(
   r.matchPath('/'),
@@ -49,15 +38,15 @@ export const listDirectory$ = r.pipe(
                 return defer(() =>
                   exists
                     ? fs.list(path, {
-                      depth,
-                      skip,
-                      length,
-                      createdAt,
-                      updatedAt,
-                    })
+                        depth,
+                        skip,
+                        length,
+                        createdAt,
+                        updatedAt,
+                      })
                     : throwError(
-                      () => new HttpError('NotFound', HttpStatus.NOT_FOUND)
-                    )
+                        () => new HttpError('NotFound', HttpStatus.NOT_FOUND)
+                      )
                 );
               }),
               retryWhen((subj) =>
@@ -80,13 +69,22 @@ export const listDirectory$ = r.pipe(
                 list
                   .sort(sortByCreatedAt(createdAt))
                   .sort(sortByUpdatedAt(updatedAt))
+              ),
+              mergeMap((children) =>
+                from(fs.stat(path)).pipe(
+                  map((stat) => {
+                    const directory = makeOrdoDirectory(path)(path, stat, 0);
+                    directory.children = children;
+                    return directory;
+                  })
+                )
               )
             )
           )
         );
       }),
       map((body) => ({
-        headers: {'content-type': 'appliction/json'},
+        headers: { 'content-type': 'appliction/json' },
         body,
       }))
     );

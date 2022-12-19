@@ -21,15 +21,17 @@ export type PathExchangeInterface = {
   ) => string;
 };
 
+const getRootPath = (req) => {
+  return join(environment.cwd, getUserId(req.headers.authorization))
+}
+
 export const PathExchange = createReader((): PathExchangeInterface => {
 
   return {
-    getRootPath(req) {
-      return join(environment.cwd, getUserId(req.headers.authorization))
-    },
+    getRootPath,
     directory(req) {
       const path = req.headers[OrdoHeaderPath.PATH];
-      const base = this.getRootPath(req);
+      const base = getRootPath(req);
       const current = join(base, path);
 
       if (!~current.indexOf(base)) {
@@ -39,7 +41,7 @@ export const PathExchange = createReader((): PathExchangeInterface => {
     },
     file(req) {
       const path = req.headers[OrdoHeaderPath.PATH];
-      const base = this.getRootPath(req);
+      const base = getRootPath(req);
       const current = join(base, path);
 
       if (!~current.indexOf(base) || dirname(current) == dirname(base)) {
@@ -51,7 +53,7 @@ export const PathExchange = createReader((): PathExchangeInterface => {
       const left = req.headers[OrdoHeaderPath.PATH_FROM];
       const right = req.headers[OrdoHeaderPath.PATH_TO];
 
-      const base = this.getRootPath(req);
+      const base = getRootPath(req);
       const from = join(base, left);
 
       if (!~from.indexOf(base)) {

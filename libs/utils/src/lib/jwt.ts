@@ -40,7 +40,7 @@ export const decode$ = (token: string): Observable<JwtPayload> =>
   );
 
 export const getUserId = (authorization: string): string => {
-  const {preferred_username, email} = decode(authorization.split('Bearer ')[1])
+  const {sub, preferred_username, email} = decode(authorization.split('Bearer ')[1])
     ?.payload as JwtPayload;
-  return email || preferred_username;
+  return sub || email || preferred_username;
 };

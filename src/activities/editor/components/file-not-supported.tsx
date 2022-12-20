@@ -15,7 +15,7 @@ export default function FileNotSupported() {
       <div>{t("@ordo-activity-editor/unsupported-file")}</div>
       <div>
         <Link
-          className="hover:underline hover:text-purple-600 hover:dark:text-purple-400 transition-colors duration-300"
+          className="underline hover:text-purple-600 hover:dark:text-purple-400 transition-colors duration-300"
           to={extensionStorePath}
         >
           {t("@ordo-activity-editor/search-for-extensions")}

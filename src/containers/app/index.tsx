@@ -7,8 +7,10 @@ import ExtensionStoreExtension from "$activities/extension-store"
 import SettingsExtension from "$activities/settings"
 import UserExtension from "$activities/user"
 import ActivityBar from "$containers/activity-bar"
+import CreateModal from "$containers/app/components/create-modal"
 import { useI18nInit } from "$containers/app/hooks/use-i18n-init"
-import { registerExtensions } from "$containers/app/store"
+import { gotDirectory, registerExtensions } from "$containers/app/store"
+import { useFSAPI } from "$core/api/fs.adapter"
 import { isActivityExtension } from "$core/guards/is-extension.guard"
 import { router } from "$core/router"
 import { useAppDispatch } from "$core/state/hooks/use-app-dispatch.hook"
@@ -19,14 +21,18 @@ import MdViewerFileAssociation from "$file-associations/md-viewer"
 import "$containers/app/index.css"
 
 export default function App() {
-  useI18nInit()
-
   const dispatch = useAppDispatch()
   const i18n = useI18nInit()
+
+  const fsApi = useFSAPI()
 
   const activities = useAppSelector((state) => state.app.activityExtensions)
   const currentRoute = useLocation()
   const navigate = useNavigate()
+
+  useEffect(() => {
+    fsApi.directories.get("/").then((root) => dispatch(gotDirectory(root)))
+  }, [])
 
   useEffect(() => {
     if (!i18n || !dispatch || !activities) return
@@ -82,6 +88,8 @@ export default function App() {
       <ActivityBar />
 
       <Outlet />
+
+      <CreateModal />
     </div>
   )
 }

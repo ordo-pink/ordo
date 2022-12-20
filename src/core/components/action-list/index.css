@@ -1,0 +1,26 @@
+.action-list_item {
+  @apply hover:bg-gradient-to-r hover:from-neutral-300 hover:dark:from-stone-700 hover:to-slate-300 hover:dark:to-slate-700 rounded-md px-2 py-0.5 flex justify-between items-center;
+}
+
+.action-list_item.active {
+  @apply hover:bg-gradient-to-r hover:from-rose-300 hover:dark:from-violet-700 hover:to-purple-300 hover:dark:to-purple-700;
+}
+
+.action-list_item_left {
+  @apply flex items-center space-x-2 w-full;
+}
+
+.action-list_item_left_icon {
+  @apply shrink-0;
+}
+
+.action-list_item_left_text {
+  @apply text-sm truncate;
+}
+
+.action-list_item_right {
+  @apply shrink-0;
+}
+
+.action-list_item_bottom {
+}

@@ -1,0 +1,3 @@
+.modal-overlay {
+  @apply fixed m-0 p-10 top-0 left-0 right-0 bottom-0 cursor-default z-50 bg-neutral-500 dark:bg-neutral-900 bg-opacity-50 dark:bg-opacity-80;
+}

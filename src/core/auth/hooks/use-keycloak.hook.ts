@@ -14,6 +14,7 @@ export function useKeycloak() {
   }
 
   const { authClient, initialized } = ctx
+
   return {
     initialized,
     keycloak: authClient,

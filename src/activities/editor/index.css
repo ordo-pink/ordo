@@ -1,3 +1,19 @@
 .editor {
   @apply w-full h-full flex;
 }
+
+.file-explorer {
+  @apply h-full flex flex-col justify-between;
+}
+
+.file-explorer_files-container {
+  @apply h-full grow overflow-y-scroll;
+}
+
+.file-explorer_action-group {
+  @apply flex items-center justify-between p-1 rounded-md text-sm;
+}
+
+.file-explorer_action-group_action {
+  @apply flex items-center md:space-x-2;
+}

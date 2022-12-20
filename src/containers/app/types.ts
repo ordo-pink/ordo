@@ -1,6 +1,8 @@
 import {
+  Nullable,
   OrdoActivityExtension,
   OrdoCommandExtension,
+  OrdoDirectory,
   OrdoFileAssociationExtension,
   OrdoIsmParserExtension,
   OrdoLocalSettingExtension,
@@ -11,6 +13,7 @@ export type AppState = {
   localSettings: object
   projectSettings: object
   userSettings: object
+  personalProject: Nullable<OrdoDirectory>
   activityExtensions: OrdoActivityExtension<string>[]
   commandExtensions: OrdoCommandExtension<string>[]
   fileAssociationExtensions: OrdoFileAssociationExtension<string>[]

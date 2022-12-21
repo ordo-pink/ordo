@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react"
-import { useParams } from "react-router-dom"
 import rehypeStringify from "rehype-stringify"
 import remarkParse from "remark-parse"
 import remarkRehype from "remark-rehype"

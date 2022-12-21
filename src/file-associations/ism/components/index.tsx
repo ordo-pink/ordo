@@ -31,6 +31,7 @@ export default function IsmEditor() {
     return () => {
       worker.onmessage = () => void 0
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [worker, path])
 
   return (

@@ -1,7 +1,7 @@
 import { useSearchParams } from "react-router-dom"
 
 import { useAppSelector } from "$core/state/hooks/use-app-selector.hook"
-import { Nullable, OrdoFile } from "$core/types"
+import { OrdoFile } from "$core/types"
 import { findOrdoFile } from "$core/utils/fs-helpers"
 
 export const useCurrentFileAssociation = () => {

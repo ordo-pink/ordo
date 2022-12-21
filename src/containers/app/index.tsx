@@ -1,3 +1,4 @@
+import { combineReducers } from "@reduxjs/toolkit"
 import { useEffect } from "react"
 import { Outlet, RouteObject, useLocation, useNavigate } from "react-router-dom"
 
@@ -11,30 +12,30 @@ import CreateModal from "$containers/app/components/create-modal"
 import { useI18nInit } from "$containers/app/hooks/use-i18n-init"
 import { gotDirectory, registerExtensions } from "$containers/app/store"
 import { useFSAPI } from "$core/api/fs.adapter"
+import { getExtensionName } from "$core/extensions/utils"
 import { isActivityExtension } from "$core/guards/is-extension.guard"
 import { router } from "$core/router"
+import { reducer, store } from "$core/state"
 import { useAppDispatch } from "$core/state/hooks/use-app-dispatch.hook"
 import { useAppSelector } from "$core/state/hooks/use-app-selector.hook"
 import IsmFileAssociation from "$file-associations/ism"
 import MdViewerFileAssociation from "$file-associations/md-viewer"
 
 import "$containers/app/index.css"
-import { combineReducers } from "@reduxjs/toolkit"
-import { reducer, store } from "$core/state"
-import { getExtensionName } from "$core/extensions/utils"
 
 export default function App() {
   const dispatch = useAppDispatch()
   const i18n = useI18nInit()
 
-  const fsApi = useFSAPI()
+  const { directories } = useFSAPI()
 
   const activities = useAppSelector((state) => state.app.activityExtensions)
   const currentRoute = useLocation()
   const navigate = useNavigate()
 
   useEffect(() => {
-    fsApi.directories.get("/").then((root) => dispatch(gotDirectory(root)))
+    directories.get("/").then((root) => dispatch(gotDirectory(root)))
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   useEffect(() => {

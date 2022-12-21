@@ -1,6 +1,12 @@
 import { Color } from "$core/constants/color"
-import { OrdoFile } from "$core/types"
+import { Nullable, OrdoFile } from "$core/types"
 
+export type EditorState = {
+  currentFile: Nullable<OrdoFile>
+  currentFileRaw?: string
+}
+
+// TODO Extract all this stuff to ism file association
 export type OrdoIsmFileDate = {
   remind: boolean
   start: Date

@@ -1,12 +1,13 @@
 import { WorkerMessageData } from "$core/types"
 
-onmessage = (message: MessageEvent<WorkerMessageData>) => {
-  const { event } = message.data
+onmessage = (message: MessageEvent<WorkerMessageData<string>>) => {
+  const { event, payload } = message.data
 
+  // TODO: Move events to enum
   if (event === "open-file") {
     postMessage({
       event: "open-file",
-      payload: "WOOOOHOOOOO".split("\n").map((line) => line.split("")),
+      payload: payload.split("\n").map((line) => line.split("")),
     })
   }
 }

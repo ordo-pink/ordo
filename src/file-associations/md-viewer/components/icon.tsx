@@ -1,5 +1,5 @@
-import { BsFileEarmark } from "react-icons/bs"
+import { BsFileEarmarkArrowDown } from "react-icons/bs"
 
 export default function Icon() {
-  return <BsFileEarmark />
+  return <BsFileEarmarkArrowDown />
 }

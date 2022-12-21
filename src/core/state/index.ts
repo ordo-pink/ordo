@@ -1,7 +1,7 @@
 import { configureStore } from "@reduxjs/toolkit"
 
-import app from "$containers/app/store"
 import createModal from "$containers/app/components/create-modal/store"
+import app from "$containers/app/store"
 
 export const reducer = {
   app,

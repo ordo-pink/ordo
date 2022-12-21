@@ -19,6 +19,9 @@ import IsmFileAssociation from "$file-associations/ism"
 import MdViewerFileAssociation from "$file-associations/md-viewer"
 
 import "$containers/app/index.css"
+import { combineReducers } from "@reduxjs/toolkit"
+import { reducer, store } from "$core/state"
+import { getExtensionName } from "$core/extensions/utils"
 
 export default function App() {
   const dispatch = useAppDispatch()
@@ -54,9 +57,7 @@ export default function App() {
         // TODO: Disallow overriding routes
         if (activityExists) return
 
-        const paths = extension.paths
-          ? extension.paths
-          : [extension.name.replace("ordo-activity-", "")]
+        const paths = extension.paths ? extension.paths : [getExtensionName(extension)]
         const Element = extension.Component
 
         for (const path of paths) {
@@ -78,6 +79,17 @@ export default function App() {
           (extension.translations as Record<string, string>)[language],
         )
       })
+
+      if (extension.storeSlice != null) {
+        const newReducer = extension.storeSlice.reducer
+
+        const combinedReducer = combineReducers({
+          ...reducer,
+          [extension.name]: newReducer,
+        })
+
+        store.replaceReducer(combinedReducer)
+      }
     })
 
     dispatch(registerExtensions(extensions))

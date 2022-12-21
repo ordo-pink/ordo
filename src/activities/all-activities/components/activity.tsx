@@ -2,7 +2,7 @@ import { useTranslation } from "react-i18next"
 import { Link } from "react-router-dom"
 
 import { OrdoActivityExtension } from "$core/types"
-import { getActivityRoute, getExtensionReadableName } from "$core/utils/extensions.util"
+import { getActivityRoute, getExtensionReadableName } from "$core/extensions/utils"
 
 type Props = { activity: OrdoActivityExtension<string> }
 

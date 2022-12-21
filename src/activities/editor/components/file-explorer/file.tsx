@@ -1,20 +1,19 @@
+import { BsFileText } from "react-icons/bs"
+import { createSearchParams, useNavigate, useSearchParams } from "react-router-dom"
+
 import ActionListItem from "$core/components/action-list/item"
-import { useAppDispatch } from "$core/state/hooks/use-app-dispatch.hook"
 import { useAppSelector } from "$core/state/hooks/use-app-selector.hook"
 import { OrdoFile } from "$core/types"
-import { Switch } from "$core/utils/switch"
-import { BsFileText } from "react-icons/bs"
 
 type Props = {
   item: OrdoFile
 }
 
 export default function File({ item }: Props) {
-  const dispatch = useAppDispatch()
+  const navigate = useNavigate()
+  const [query] = useSearchParams()
 
-  // TODO: Add editor state
-  const currentFile = ""
-  const isCurrent = item.path === currentFile
+  const isCurrent = query.has("path") && query.get("path") === item.path
 
   const fileAssociations = useAppSelector((state) => state.app.fileAssociationExtensions)
   const association = fileAssociations.find((assoc) =>
@@ -25,7 +24,13 @@ export default function File({ item }: Props) {
   const paddingLeft = `${item.depth * 10}px`
 
   const handleClick = () => {
-    // TODO: Open file
+    navigate({
+      pathname: "/editor",
+      search: createSearchParams({
+        association: association ? association.name : "unsupported",
+        path: item.path,
+      }).toString(),
+    })
   }
 
   return (

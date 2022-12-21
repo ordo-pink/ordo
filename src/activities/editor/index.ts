@@ -1,10 +1,11 @@
+import { editorSlice } from "$activities/editor/store"
 import { createActivityExtension } from "$core/extensions/create-activity-extension"
 
 export default createActivityExtension("editor", {
   Component: () => import("$activities/editor/components"),
   Icon: () => import("$activities/editor/components/icon"),
-  paths: ["editor", "editor/:extension/:path"],
   readableName: "@ordo-activity-editor/title",
+  storeSlice: editorSlice,
   translations: {
     ru: {
       "@ordo-activity-editor/title": "Редактор",

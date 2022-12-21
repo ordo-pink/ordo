@@ -22,16 +22,16 @@ export const useFSAPI = () => {
         fetch(`${host}/${FILE_API}`, {
           method: "POST",
           headers: { [PATH_HEADER_KEY]: path },
-        }),
-      get: (path: string): Promise<OrdoFile> =>
+        }).then((res) => res.json()),
+      get: (path: string): Promise<string> =>
         fetch(`${host}/${FILE_API}`, {
           headers: { [PATH_HEADER_KEY]: path },
-        }),
+        }).then((res) => res.text()),
       archive: (path: string) =>
         fetch(`${host}/${FILE_API}`, {
           method: "DELETE",
           headers: { [PATH_HEADER_KEY]: path },
-        }),
+        }).then((res) => res.json()),
       move: (from: string, to: string): Promise<OrdoFile> =>
         fetch(`${host}/${FILE_API}`, {
           method: "PATCH",
@@ -39,29 +39,29 @@ export const useFSAPI = () => {
             [PATH_FROM_HEADER_KEY]: from,
             [PATH_TO_HEADER_KEY]: to,
           },
-        }),
+        }).then((res) => res.json()),
       save: (path: string, body: string): Promise<OrdoFile> =>
         fetch(`${host}/${FILE_API}`, {
           method: "PUT",
           headers: { [PATH_HEADER_KEY]: path },
           body,
-        }),
+        }).then((res) => res.json()),
     },
     directories: {
       create: (path: string): Promise<OrdoDirectory> =>
         fetch(`${host}/${DIRECTORY_API}`, {
           method: "POST",
           headers: { [PATH_HEADER_KEY]: path },
-        }),
+        }).then((res) => res.json()),
       get: (path: string): Promise<OrdoDirectory> =>
         fetch(`${host}/${DIRECTORY_API}`, {
           headers: { [PATH_HEADER_KEY]: path },
-        }),
+        }).then((res) => res.json()),
       archive: (path: string) =>
         fetch(`${host}/${DIRECTORY_API}`, {
           method: "DELETE",
           headers: { [PATH_HEADER_KEY]: path },
-        }),
+        }).then((res) => res.json()),
       move: (from: string, to: string): Promise<OrdoDirectory> =>
         fetch(`${host}/${DIRECTORY_API}`, {
           method: "PATCH",
@@ -69,7 +69,7 @@ export const useFSAPI = () => {
             [PATH_FROM_HEADER_KEY]: from,
             [PATH_TO_HEADER_KEY]: to,
           },
-        }),
+        }).then((res) => res.json()),
     },
   }
 }

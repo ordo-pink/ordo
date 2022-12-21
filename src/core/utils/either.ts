@@ -24,18 +24,22 @@ export interface IEither<TRight, TLeft = unknown> {
   map: <TNewRight>(
     onRight: UnaryFn<TRight, TNewRight> | ThunkFn<TNewRight>,
   ) => IEither<TNewRight, TLeft>
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   tap: (onRight: UnaryFn<TRight, any> | ThunkFn<any>) => IEither<TRight, TLeft>
   bimap: <TNewRight, TNewLeft = TNewRight>(
     onLeft: UnaryFn<TLeft, TNewLeft> | ThunkFn<TNewLeft>,
     onRight: UnaryFn<TRight, TNewRight> | ThunkFn<TNewRight>,
   ) => IEither<TNewRight, TNewLeft>
   bitap: (
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onLeft: UnaryFn<TLeft, any> | ThunkFn<any>,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onRight: UnaryFn<TRight, any> | ThunkFn<any>,
   ) => IEither<TRight, TLeft>
   leftMap: <TNewLeft>(
     onLeft: UnaryFn<TLeft, TNewLeft> | ThunkFn<TNewLeft>,
   ) => IEither<TRight, TNewLeft>
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   leftTap: (onLeft: UnaryFn<TLeft, any> | ThunkFn<any>) => IEither<TRight, TLeft>
   chain: <TNewRight, TNewLeft>(
     onRight: UnaryFn<TRight, IEither<TNewRight, TNewLeft>> | ThunkFn<IEither<TNewRight, TNewLeft>>,

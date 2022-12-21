@@ -86,7 +86,7 @@ export interface OrdoExtension<Name extends string, ExtensionType extends OrdoEx
   name: OrdoExtensionName<Name, ExtensionType>
   readableName?: string
   description?: string
-  storeSlice?: Slice
+  storeSlice: Slice
   dependencies?: OrdoExtensionName[]
   permissions?: OrdoExtensionPermissions
 }

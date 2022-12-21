@@ -18,3 +18,15 @@ export const findParent = (child: OrdoFile | OrdoDirectory, root: Nullable<OrdoD
 
   return parent
 }
+
+export const findOrdoFile = (path: string, root: Nullable<OrdoDirectory>) => {
+  if (!root) return null
+
+  const parent = findParent({ path } as OrdoFile, root)
+
+  const found = parent?.children.find((child) => child.path === path)
+
+  if (!found || isDirectory(found)) return null
+
+  return found
+}

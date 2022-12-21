@@ -27,8 +27,6 @@ export default function Directory({ item }: Props) {
   const Icon = isExpanded ? OpenIcon : ClosedIcon
   const Chevron = isExpanded ? BsChevronDown : BsChevronUp
 
-  console.log(item)
-
   const handleClick = () => setIsExpanded((value) => !value)
 
   return Either.fromNullable(item).fold(Null, (directory) => (

@@ -31,7 +31,7 @@ export default function Modal({
 
   useEffect(() => {
     isShown ? onShow() : onHide()
-  }, [isShown])
+  }, [isShown, onShow, onHide])
 
   const handleEscapeKeyDown = (event: KeyboardEvent) => {
     if (event.key === "Escape") hideModal()

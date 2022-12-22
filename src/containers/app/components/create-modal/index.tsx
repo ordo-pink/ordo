@@ -10,6 +10,7 @@ import { useModal } from "$core/hooks/use-modal"
 import { useAppDispatch } from "$core/state/hooks/use-app-dispatch.hook"
 import { useAppSelector } from "$core/state/hooks/use-app-selector.hook"
 import { Either } from "$core/utils/either"
+// eslint-disable-next-line
 import { createdDirectory, createdFile } from "$containers/app/store"
 
 export default function CreateModal() {
@@ -29,6 +30,7 @@ export default function CreateModal() {
 
   useEffect(() => {
     if (!isShown) showModal()
+    // eslint-disable-next-line
   }, [isShown])
 
   const Icon = type === "file" ? BsFilePlus : BsFolderPlus
@@ -51,11 +53,13 @@ export default function CreateModal() {
           >
             <div className="flex items-center space-x-4">
               <Icon className="shrink-0" />
-              <div className="text-xl">{t(`app.modal.create.${type}.title`)}</div>
+              <div className="text-xl">{t(`@ordo-activity-editor/create-${type}`)}</div>
             </div>
             <input
               type="text"
-              placeholder={t(`app.modal.create.${type}.placeholder`) as string}
+              placeholder={
+                t(`@ordo-activity-editor/create-modal.create-${type}.placeholder`) as string
+              }
               className="w-full outline-none bg-white dark:bg-neutral-600 px-4 py-2"
               value={newName}
               onChange={(e) => setNewName(e.target.value)}
@@ -64,18 +68,22 @@ export default function CreateModal() {
                   hideModal()
                 } else if (e.key === "Enter") {
                   type === FSEntity.FILE
-                    ? fsApi.files.create(`${parentDirectory.path}/${newName}`).then(console.log) // TODO .then((file) => dispatch(createdFile(file)))
+                    ? // eslint-disable-next-line
+                      fsApi.files.create(`${parentDirectory.path}/${newName}`).then(console.log) // TODO .then((file) => dispatch(createdFile(file)))
                     : fsApi.directories
                         .create(`${parentDirectory.path}/${newName}`)
+                        // eslint-disable-next-line
                         .then(console.log) // TODO .then((directory) => dispatch(createdDirectory(directory)))
 
                   hideModal()
                 }
               }}
             />
-            <div className="text-sm text-neutral-500">{t(`app.modal.create.${type}.hint`)}</div>
+            <div className="text-sm text-neutral-500">
+              {t(`@ordo-activity-editor/create-modal.hint`)}
+            </div>
           </div>
-          {/* TODO: Add cancel and ok buttons */}
+          {/* TODO: Add cancel and ok buttons, remove hints then */}
         </div>
       </Modal>
     ))

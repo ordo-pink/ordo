@@ -10,5 +10,24 @@ export const useFetch = () => {
         ...params[1]?.headers,
         Authorization: `Bearer ${keycloak.idToken}`,
       },
-    }).then(async (res) => (res.ok ? res : Promise.reject(await res.json())))
+    }).then(async (res) => {
+      if (res.ok) return res
+
+      if (res.status === 401) {
+        return keycloak
+          .updateToken(200)
+          .then(() =>
+            fetch(params[0], {
+              ...params[1],
+              headers: {
+                ...params[1]?.headers,
+                Authorization: `Bearer ${keycloak.idToken}`,
+              },
+            }),
+          )
+          .then((res) => (res.ok ? res : Promise.reject(res)))
+      }
+
+      return Promise.reject(res)
+    })
 }

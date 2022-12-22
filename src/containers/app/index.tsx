@@ -1,5 +1,5 @@
 import { combineReducers } from "@reduxjs/toolkit"
-import { useEffect } from "react"
+import { MouseEvent, useEffect } from "react"
 import { Outlet, RouteObject, useLocation, useNavigate } from "react-router-dom"
 
 import AllActivitiesExtension from "$activities/all-activities"
@@ -22,12 +22,18 @@ import IsmFileAssociation from "$file-associations/ism"
 import MdViewerFileAssociation from "$file-associations/md-viewer"
 
 import "$containers/app/index.css"
+import ContextMenu from "$core/hooks/use-context-menu/components/context-menu"
 
 export default function App() {
   const dispatch = useAppDispatch()
   const i18n = useI18nInit()
 
   const { directories } = useFSAPI()
+
+  const handleContextMenu = (event: MouseEvent) => {
+    event.preventDefault()
+    event.stopPropagation()
+  }
 
   const activities = useAppSelector((state) => state.app.activityExtensions)
   const currentRoute = useLocation()
@@ -97,12 +103,16 @@ export default function App() {
   }, [i18n, dispatch, navigate, currentRoute, activities])
 
   return (
-    <div className="app">
+    <div
+      className="app"
+      onContextMenu={handleContextMenu}
+    >
       <ActivityBar />
 
       <Outlet />
 
       <CreateModal />
+      <ContextMenu />
     </div>
   )
 }

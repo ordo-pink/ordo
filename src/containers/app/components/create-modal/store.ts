@@ -16,7 +16,7 @@ const initialState: CreateModalState = {
 }
 
 export const createModalSlice = createSlice({
-  name: "@activity-bar",
+  name: "@create-modal",
   initialState,
   reducers: {
     showCreateModal: (state) => {

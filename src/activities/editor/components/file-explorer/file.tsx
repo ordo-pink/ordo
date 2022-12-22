@@ -1,9 +1,13 @@
-import { BsFileText } from "react-icons/bs"
+import { BsFileEarmarkBinary, BsFileX } from "react-icons/bs"
 import { createSearchParams, useNavigate, useSearchParams } from "react-router-dom"
 
 import ActionListItem from "$core/components/action-list/item"
 import { useAppSelector } from "$core/state/hooks/use-app-selector.hook"
 import { OrdoFile } from "$core/types"
+import { useContextMenu } from "$core/hooks/use-context-menu"
+import { useAppDispatch } from "$core/state/hooks/use-app-dispatch.hook"
+import { MouseEvent } from "react"
+import { Either } from "$core/utils/either"
 
 type Props = {
   item: OrdoFile
@@ -12,6 +16,9 @@ type Props = {
 export default function File({ item }: Props) {
   const navigate = useNavigate()
   const [query] = useSearchParams()
+  const dispatch = useAppDispatch()
+
+  const { showContextMenu } = useContextMenu()
 
   const isCurrent = query.has("path") && query.get("path") === item.path
 
@@ -19,9 +26,20 @@ export default function File({ item }: Props) {
   const association = fileAssociations.find((assoc) =>
     assoc.fileExtensions.includes(item.extension),
   )
-  const Icon = association && association.Icon ? association.Icon : BsFileText
+  const Icon = association && association.Icon ? association.Icon : BsFileEarmarkBinary
 
   const paddingLeft = `${item.depth * 10}px`
+
+  const structure = {
+    children: [
+      {
+        action: () => console.log("TODO"),
+        Icon: BsFileX,
+        title: "@ordo-activity-editor/remove",
+        accelerator: "ctrl+backspace",
+      },
+    ],
+  }
 
   const handleClick = () => {
     navigate({
@@ -33,13 +51,28 @@ export default function File({ item }: Props) {
     })
   }
 
+  const handleContextMenu = (event: MouseEvent) =>
+    Either.of(event)
+      .tap((e) => e.preventDefault())
+      .tap((e) => e.stopPropagation())
+      .map(() =>
+        dispatch(
+          showContextMenu({
+            event,
+            target: item,
+            structure,
+          }),
+        ),
+      )
+
   return (
     <ActionListItem
       style={{ paddingLeft }}
       text={item.readableName}
       Icon={Icon}
-      onClick={handleClick}
       isCurrent={isCurrent}
+      onClick={handleClick}
+      onContextMenu={handleContextMenu}
     />
   )
 }

@@ -11,7 +11,7 @@
 }
 
 .file-explorer_action-group {
-  @apply flex items-center justify-between p-1 rounded-md text-sm;
+  @apply flex items-center justify-around p-1 rounded-md text-sm;
 }
 
 .file-explorer_action-group_action {

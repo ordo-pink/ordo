@@ -1,12 +1,12 @@
+import { MouseEvent } from "react"
 import { BsFileEarmarkBinary, BsFileX } from "react-icons/bs"
 import { createSearchParams, useNavigate, useSearchParams } from "react-router-dom"
 
+import { useContextMenu } from "$containers/app/hooks/use-context-menu"
 import ActionListItem from "$core/components/action-list/item"
+import { useAppDispatch } from "$core/state/hooks/use-app-dispatch.hook"
 import { useAppSelector } from "$core/state/hooks/use-app-selector.hook"
 import { OrdoFile } from "$core/types"
-import { useContextMenu } from "$containers/app/hooks/use-context-menu"
-import { useAppDispatch } from "$core/state/hooks/use-app-dispatch.hook"
-import { MouseEvent } from "react"
 import { Either } from "$core/utils/either"
 
 type Props = {
@@ -33,6 +33,7 @@ export default function File({ item }: Props) {
   const structure = {
     children: [
       {
+        // TODO: Add support for removing files
         action: () => console.log("TODO"),
         Icon: BsFileX,
         title: "@ordo-activity-editor/remove",

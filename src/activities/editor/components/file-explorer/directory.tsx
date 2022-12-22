@@ -7,16 +7,18 @@ import {
 } from "react-icons/ai"
 import { BsChevronDown, BsChevronUp, BsFilePlus, BsFolderPlus, BsFolderX } from "react-icons/bs"
 import FileOrDirectory from "$activities/editor/components/file-explorer/file-or-directory"
-import ActionListItem from "$core/components/action-list/item"
-import Null from "$core/components/null"
-import { OrdoDirectory } from "$core/types"
-import { Either } from "$core/utils/either"
-import { useAppDispatch } from "$core/state/hooks/use-app-dispatch.hook"
-import { showContextMenu } from "$containers/app/hooks/use-context-menu/store"
+// TODO: Move to a hook
 import {
   showCreateDirectoryModal,
   showCreateFileModal,
 } from "$containers/app/components/create-modal/store"
+// TODO: Use hook
+import { showContextMenu } from "$containers/app/hooks/use-context-menu/store"
+import ActionListItem from "$core/components/action-list/item"
+import Null from "$core/components/null"
+import { useAppDispatch } from "$core/state/hooks/use-app-dispatch.hook"
+import { OrdoDirectory } from "$core/types"
+import { Either } from "$core/utils/either"
 
 type Props = {
   item: OrdoDirectory
@@ -51,6 +53,7 @@ export default function Directory({ item }: Props) {
         accelerator: "ctrl+shift+n",
       },
       {
+        // TODO: Add support for removing or archiving
         action: () => console.log("TODO"),
         Icon: BsFolderX,
         title: "@ordo-activity-editor/remove",

@@ -2,13 +2,14 @@ import { combineReducers } from "@reduxjs/toolkit"
 import { MouseEvent, useEffect } from "react"
 import { Outlet, RouteObject, useLocation, useNavigate } from "react-router-dom"
 
-import AllActivitiesExtension from "$activities/all-activities"
+// import AllActivitiesExtension from "$activities/all-activities"
 import EditorExtension from "$activities/editor"
 import ExtensionStoreExtension from "$activities/extension-store"
 import SettingsExtension from "$activities/settings"
 import UserExtension from "$activities/user"
 import ActivityBar from "$containers/activity-bar"
 import CreateModal from "$containers/app/components/create-modal"
+import ContextMenu from "$containers/app/hooks/use-context-menu/components/context-menu"
 import { useI18nInit } from "$containers/app/hooks/use-i18n-init"
 import { gotDirectory, registerExtensions } from "$containers/app/store"
 import { useFSAPI } from "$core/api/fs.adapter"
@@ -22,7 +23,6 @@ import IsmFileAssociation from "$file-associations/ism"
 import MdViewerFileAssociation from "$file-associations/md-viewer"
 
 import "$containers/app/index.css"
-import ContextMenu from "$core/hooks/use-context-menu/components/context-menu"
 
 export default function App() {
   const dispatch = useAppDispatch()
@@ -48,7 +48,7 @@ export default function App() {
     if (!i18n || !dispatch || !activities) return
 
     const extensions = [
-      AllActivitiesExtension,
+      // AllActivitiesExtension,
       EditorExtension,
       ExtensionStoreExtension,
       UserExtension,

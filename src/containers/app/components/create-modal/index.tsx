@@ -1,12 +1,14 @@
 import { useEffect, useState } from "react"
 import { useTranslation } from "react-i18next"
-import { BsFilePlus, BsFolderPlus } from "react-icons/bs"
+import { AiFillFolder } from "react-icons/ai"
+import { BsChevronRight, BsFilePlus, BsFolderPlus } from "react-icons/bs"
 
 import { hideCreateModal } from "$containers/app/components/create-modal/store"
 import { FSEntity } from "$containers/app/constants"
+import { useModal } from "$containers/app/hooks/use-modal"
 import { useFSAPI } from "$core/api/fs.adapter"
+import { OrdoButtonPrimary, OrdoButtonSecondary } from "$core/components/buttons"
 import Null from "$core/components/null"
-import { useModal } from "$core/hooks/use-modal"
 import { useAppDispatch } from "$core/state/hooks/use-app-dispatch.hook"
 import { useAppSelector } from "$core/state/hooks/use-app-selector.hook"
 import { Either } from "$core/utils/either"
@@ -19,6 +21,8 @@ export default function CreateModal() {
   const isShown = useAppSelector((state) => state.createModal.isShown)
   const parent = useAppSelector((state) => state.createModal.parent)
   const type = useAppSelector((state) => state.createModal.entityType)
+
+  console.log(parent)
 
   const fsApi = useFSAPI()
 
@@ -55,12 +59,30 @@ export default function CreateModal() {
               <Icon className="shrink-0" />
               <div className="text-xl">{t(`@ordo-activity-editor/create-${type}`)}</div>
             </div>
+            <div className="self-start flex flex-wrap text-neutral-500 text-xs space-x-4">
+              {/* TODO: Extract to Breadcrumbs */}
+              {parent &&
+                parent.path
+                  .slice(1)
+                  .split("/")
+                  .map((chunk, index) => (
+                    <div
+                      key={`${chunk}-${index}`}
+                      className="flex items-center shrink-0 space-x-2"
+                    >
+                      <AiFillFolder />
+                      <div>{chunk ? chunk : "/"}</div>
+                      <BsChevronRight />
+                    </div>
+                  ))}
+            </div>
             <input
+              autoFocus
               type="text"
               placeholder={
                 t(`@ordo-activity-editor/create-modal.create-${type}.placeholder`) as string
               }
-              className="w-full outline-none bg-white dark:bg-neutral-600 px-4 py-2"
+              className="w-full outline-none border dark:border-0 border-neutral-400 rounded-lg bg-white dark:bg-neutral-600 px-4 py-2"
               value={newName}
               onChange={(e) => setNewName(e.target.value)}
               onKeyDown={(e) => {
@@ -79,11 +101,18 @@ export default function CreateModal() {
                 }
               }}
             />
-            <div className="text-sm text-neutral-500">
-              {t(`@ordo-activity-editor/create-modal.hint`)}
+            <div className="w-full flex items-center justify-around">
+              <OrdoButtonSecondary
+                hotkey="escape"
+                onClick={() => dispatch(hideCreateModal())}
+              ></OrdoButtonSecondary>
+
+              <OrdoButtonPrimary
+                onClick={() => console.log("TODO")}
+                hotkey="enter"
+              ></OrdoButtonPrimary>
             </div>
           </div>
-          {/* TODO: Add cancel and ok buttons, remove hints then */}
         </div>
       </Modal>
     ))

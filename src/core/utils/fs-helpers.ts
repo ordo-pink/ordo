@@ -1,6 +1,7 @@
 import { isDirectory } from "$core/guards/is-directory.guard"
 import { Nullable, OrdoDirectory, OrdoFile } from "$core/types"
 
+// TODO: Move elsewhere
 export const findParent = (child: OrdoFile | OrdoDirectory, root: Nullable<OrdoDirectory>) => {
   if (!root) return null
 

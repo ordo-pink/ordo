@@ -4,7 +4,7 @@ import { createSearchParams, useNavigate, useSearchParams } from "react-router-d
 import ActionListItem from "$core/components/action-list/item"
 import { useAppSelector } from "$core/state/hooks/use-app-selector.hook"
 import { OrdoFile } from "$core/types"
-import { useContextMenu } from "$core/hooks/use-context-menu"
+import { useContextMenu } from "$containers/app/hooks/use-context-menu"
 import { useAppDispatch } from "$core/state/hooks/use-app-dispatch.hook"
 import { MouseEvent } from "react"
 import { Either } from "$core/utils/either"

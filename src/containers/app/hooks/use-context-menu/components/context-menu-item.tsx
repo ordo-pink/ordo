@@ -1,14 +1,14 @@
+import { MouseEvent } from "react"
+import { useTranslation } from "react-i18next"
+
+import { hideContextMenu } from "$containers/app/hooks/use-context-menu/store"
+import { ContextMenuTemplateItem } from "$containers/app/hooks/use-context-menu/types"
 import Accelerator from "$core/components/accelerator"
 import { useAppDispatch } from "$core/state/hooks/use-app-dispatch.hook"
 import { useAppSelector } from "$core/state/hooks/use-app-selector.hook"
-import { Nullable } from "$core/types"
-import { MouseEvent } from "react"
-import { useTranslation } from "react-i18next"
-import { hideContextMenu } from "../store"
-import { ContextMenuTemplateItem as TContextMenuItem, ContextMenuTarget } from "../types"
 
 type Props = {
-  item: TContextMenuItem
+  item: ContextMenuTemplateItem
 }
 
 export default function ContextMenuItem({ item }: Props) {

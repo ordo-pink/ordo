@@ -59,9 +59,9 @@ export const OrdoButtonPrimary = ({
 }: Props) => {
   const buttonClassNames = Either.fromBoolean(!!disabled).fold(
     () =>
-      "bg-gradient-to-r from-sky-200 dark:from-cyan-600 via-violet-200 dark:via-violet-600 to-purple-200 dark:to-purple-600 active-ring",
+      "bg-gradient-to-br from-sky-200 dark:from-purple-600 via-violet-200 dark:via-violet-600 to-purple-200 dark:to-purple-600 active-ring",
     () =>
-      "bg-gradient-to-r from-slate-300 via-zinc-300 to-stone-300 dark:from-slate-900 dark:via-zinc-900 dark:to-stone-900",
+      "bg-gradient-to-br from-slate-300 via-zinc-300 to-stone-300 dark:from-slate-900 dark:via-zinc-900 dark:to-stone-900",
   )
 
   const classNames = `${buttonClassNames} ${className}`

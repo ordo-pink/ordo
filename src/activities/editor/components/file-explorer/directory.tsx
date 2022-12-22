@@ -12,7 +12,11 @@ import Null from "$core/components/null"
 import { OrdoDirectory } from "$core/types"
 import { Either } from "$core/utils/either"
 import { useAppDispatch } from "$core/state/hooks/use-app-dispatch.hook"
-import { showContextMenu } from "$core/hooks/use-context-menu/store"
+import { showContextMenu } from "$containers/app/hooks/use-context-menu/store"
+import {
+  showCreateDirectoryModal,
+  showCreateFileModal,
+} from "$containers/app/components/create-modal/store"
 
 type Props = {
   item: OrdoDirectory
@@ -34,22 +38,22 @@ export default function Directory({ item }: Props) {
   const structure = {
     children: [
       {
-        action: () => console.log("TODO"),
+        action: () => dispatch(showCreateFileModal(item)),
         Icon: BsFilePlus,
-        title: "@ordo-activity-editor/remove",
+        title: "@ordo-activity-editor/create-file",
         accelerator: "ctrl+n",
       },
       {
         // TODO: Support for providing path prefix to create modal
-        action: () => console.log("TODO"),
+        action: () => dispatch(showCreateDirectoryModal(item)),
         Icon: BsFolderPlus,
-        title: "@ordo-activity-editor/create-file",
+        title: "@ordo-activity-editor/create-directory",
         accelerator: "ctrl+shift+n",
       },
       {
         action: () => console.log("TODO"),
         Icon: BsFolderX,
-        title: "@ordo-activity-editor/create-directory",
+        title: "@ordo-activity-editor/remove",
         accelerator: "ctrl+backspace",
       },
     ],

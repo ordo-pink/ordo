@@ -47,6 +47,7 @@ module.exports = {
     ],
     "@typescript-eslint/no-var-requires": "off",
     "i18next/no-literal-string": "warn",
+    "jsx-a11y/no-autofocus": "warn",
   },
   overrides: [],
   parser: "@typescript-eslint/parser",

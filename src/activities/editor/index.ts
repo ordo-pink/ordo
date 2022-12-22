@@ -17,8 +17,6 @@ export default createActivityExtension("editor", {
       "@ordo-activity-editor/create-directory": "Создать папку",
       "@ordo-activity-editor/create-modal.create-file.placeholder": "Название файла",
       "@ordo-activity-editor/create-modal.create-directory.placeholder": "Название папки",
-      "@ordo-activity-editor/create-modal.hint":
-        "Жми Enter, чтобы применить изменения, или Escape, чтобы отменить.",
     },
     en: {
       "@ordo-activity-editor/title": "Editor",
@@ -30,7 +28,6 @@ export default createActivityExtension("editor", {
       "@ordo-activity-editor/create-directory": "Create directory",
       "@ordo-activity-editor/create-modal.create-file.placeholder": "File name",
       "@ordo-activity-editor/create-modal.create-directory.placeholder": "Directory name",
-      "@ordo-activity-editor/create-modal.hint": "Press Enter to create, or Escape to cancel.",
     },
   },
 })

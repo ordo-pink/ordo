@@ -6,7 +6,7 @@ import { ThunkFn } from "$core/types"
 import { Either } from "$core/utils/either"
 import { noOp } from "$core/utils/no-op"
 
-import "$core/hooks/use-modal/index.css"
+import "$containers/app/hooks/use-modal/index.css"
 
 type Props = {
   isShown: boolean

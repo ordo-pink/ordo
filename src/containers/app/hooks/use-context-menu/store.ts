@@ -1,7 +1,10 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit"
 import { MouseEvent } from "react"
 
-import { ContextMenuTemplate, ContextMenuTarget } from "$core/hooks/use-context-menu/types"
+import {
+  ContextMenuTemplate,
+  ContextMenuTarget,
+} from "$containers/app/hooks/use-context-menu/types"
 
 export type ContextMenuState = {
   isShown: boolean

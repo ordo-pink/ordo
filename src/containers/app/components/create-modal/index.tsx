@@ -6,9 +6,9 @@ import { BsChevronRight, BsFilePlus, BsFolderPlus } from "react-icons/bs"
 import { hideCreateModal } from "$containers/app/components/create-modal/store"
 import { FSEntity } from "$containers/app/constants"
 import { useModal } from "$containers/app/hooks/use-modal"
-import { useFSAPI } from "$core/api/fs.adapter"
 import { OrdoButtonPrimary, OrdoButtonSecondary } from "$core/components/buttons"
 import Null from "$core/components/null"
+import { useFSAPI } from "$core/hooks/use-fs-api.hooks"
 import { useAppDispatch } from "$core/state/hooks/use-app-dispatch.hook"
 import { useAppSelector } from "$core/state/hooks/use-app-selector.hook"
 import { Either } from "$core/utils/either"
@@ -21,8 +21,6 @@ export default function CreateModal() {
   const isShown = useAppSelector((state) => state.createModal.isShown)
   const parent = useAppSelector((state) => state.createModal.parent)
   const type = useAppSelector((state) => state.createModal.entityType)
-
-  console.log(parent)
 
   const fsApi = useFSAPI()
 

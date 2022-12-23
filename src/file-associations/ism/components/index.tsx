@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react"
 import { useSearchParams } from "react-router-dom"
 
-import { useFSAPI } from "$core/api/fs.adapter"
+import { useFSAPI } from "$core/hooks/use-fs-api.hooks"
 import { WorkerMessageData } from "$core/types"
 
 export default function IsmEditor() {

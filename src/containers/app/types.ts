@@ -9,7 +9,6 @@ import {
 } from "$core/types"
 
 export type AppState = {
-  isLoading: boolean
   localSettings: object
   projectSettings: object
   userSettings: object
@@ -19,4 +18,9 @@ export type AppState = {
   fileAssociationExtensions: OrdoFileAssociationExtension<string>[]
   ismParserExtensions: OrdoIsmParserExtension<string>[]
   localSettingExtensions: OrdoLocalSettingExtension<string>[]
+}
+
+export type UpdatedFilePayload = {
+  path: string
+  content: string
 }

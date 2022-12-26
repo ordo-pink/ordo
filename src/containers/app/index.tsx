@@ -11,10 +11,9 @@ import ActivityBar from "$containers/activity-bar"
 import CreateModal from "$containers/app/components/create-modal"
 import ContextMenu from "$containers/app/hooks/use-context-menu/components/context-menu"
 import { useI18nInit } from "$containers/app/hooks/use-i18n-init"
-import { gotDirectory, registerExtensions } from "$containers/app/store"
+import { gotDirectory, registeredExtensions } from "$containers/app/store"
 import { getExtensionName } from "$core/extensions/utils"
 import { isActivityExtension } from "$core/guards/is-extension.guard"
-import { useFSAPI } from "$core/hooks/use-fs-api.hooks"
 import { router } from "$core/router"
 import { reducer, store } from "$core/state"
 import { useAppDispatch } from "$core/state/hooks/use-app-dispatch.hook"
@@ -28,8 +27,6 @@ export default function App() {
   const dispatch = useAppDispatch()
   const i18n = useI18nInit()
 
-  const { directories } = useFSAPI()
-
   const handleContextMenu = (event: MouseEvent) => {
     event.preventDefault()
     event.stopPropagation()
@@ -40,7 +37,7 @@ export default function App() {
   const navigate = useNavigate()
 
   useEffect(() => {
-    directories.get("/").then((root) => dispatch(gotDirectory(root)))
+    dispatch(gotDirectory("/"))
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
@@ -99,7 +96,7 @@ export default function App() {
       }
     })
 
-    dispatch(registerExtensions(extensions))
+    dispatch(registeredExtensions(extensions))
   }, [i18n, dispatch, navigate, currentRoute, activities])
 
   return (

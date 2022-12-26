@@ -19,21 +19,21 @@ const host = HOST.endsWith("/") ? HOST.slice(0, -1) : HOST
 // TODO: Provide access to fetch. Check request URL and request user to accept outgoing messages
 window.ordo = {
   api: {
-    fs: (auth: typeof Keycloak) => ({
+    fs: {
       files: {
         create: (path) =>
           fetch(`${host}/${FILE_API}`, {
             method: "POST",
             headers: {
               [PATH_HEADER_KEY]: path,
-              [AUTHORIZATION_HEADER_KEY]: `Bearer ${auth.token}`,
+              [AUTHORIZATION_HEADER_KEY]: `Bearer ${Keycloak.token}`,
             },
           }).then((res) => res.json()),
         get: (path) =>
           fetch(`${host}/${FILE_API}`, {
             headers: {
               [PATH_HEADER_KEY]: path,
-              [AUTHORIZATION_HEADER_KEY]: `Bearer ${auth.token}`,
+              [AUTHORIZATION_HEADER_KEY]: `Bearer ${Keycloak.token}`,
             },
           }).then((res) => res.text()),
         remove: (path) =>
@@ -41,7 +41,7 @@ window.ordo = {
             method: "DELETE",
             headers: {
               [PATH_HEADER_KEY]: path,
-              [AUTHORIZATION_HEADER_KEY]: `Bearer ${auth.token}`,
+              [AUTHORIZATION_HEADER_KEY]: `Bearer ${Keycloak.token}`,
             },
           }).then((res) => res.json()),
         move: (from, to) =>
@@ -50,7 +50,7 @@ window.ordo = {
             headers: {
               [PATH_FROM_HEADER_KEY]: from,
               [PATH_TO_HEADER_KEY]: to,
-              [AUTHORIZATION_HEADER_KEY]: `Bearer ${auth.token}`,
+              [AUTHORIZATION_HEADER_KEY]: `Bearer ${Keycloak.token}`,
             },
           }).then((res) => res.json()),
         update: (path, body) =>
@@ -58,7 +58,7 @@ window.ordo = {
             method: "PUT",
             headers: {
               [PATH_HEADER_KEY]: path,
-              [AUTHORIZATION_HEADER_KEY]: `Bearer ${auth.token}`,
+              [AUTHORIZATION_HEADER_KEY]: `Bearer ${Keycloak.token}`,
             },
             body,
           }).then((res) => res.json()),
@@ -69,14 +69,14 @@ window.ordo = {
             method: "POST",
             headers: {
               [PATH_HEADER_KEY]: path,
-              [AUTHORIZATION_HEADER_KEY]: `Bearer ${auth.token}`,
+              [AUTHORIZATION_HEADER_KEY]: `Bearer ${Keycloak.token}`,
             },
           }).then((res) => res.json()),
         get: (path) =>
           fetch(`${host}/${DIRECTORY_API}`, {
             headers: {
               [PATH_HEADER_KEY]: path,
-              [AUTHORIZATION_HEADER_KEY]: `Bearer ${auth.token}`,
+              [AUTHORIZATION_HEADER_KEY]: `Bearer ${Keycloak.token}`,
             },
           }).then((res) => res.json()),
         remove: (path) =>
@@ -84,7 +84,7 @@ window.ordo = {
             method: "DELETE",
             headers: {
               [PATH_HEADER_KEY]: path,
-              [AUTHORIZATION_HEADER_KEY]: `Bearer ${auth.token}`,
+              [AUTHORIZATION_HEADER_KEY]: `Bearer ${Keycloak.token}`,
             },
           }).then((res) => res.json()),
         move: (from, to) =>
@@ -93,11 +93,11 @@ window.ordo = {
             headers: {
               [PATH_FROM_HEADER_KEY]: from,
               [PATH_TO_HEADER_KEY]: to,
-              [AUTHORIZATION_HEADER_KEY]: `Bearer ${auth.token}`,
+              [AUTHORIZATION_HEADER_KEY]: `Bearer ${Keycloak.token}`,
             },
           }).then((res) => res.json()),
       },
-    }),
+    },
   },
 }
 

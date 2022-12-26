@@ -3,11 +3,13 @@ import { BsFileEarmarkBinary, BsFileX } from "react-icons/bs"
 import { createSearchParams, useNavigate, useSearchParams } from "react-router-dom"
 
 import { useContextMenu } from "$containers/app/hooks/use-context-menu"
+import { removedFile } from "$containers/app/store"
 import ActionListItem from "$core/components/action-list/item"
 import { useAppDispatch } from "$core/state/hooks/use-app-dispatch.hook"
 import { useAppSelector } from "$core/state/hooks/use-app-selector.hook"
 import { OrdoFile } from "$core/types"
 import { Either } from "$core/utils/either"
+import { noOp } from "$core/utils/no-op"
 
 type Props = {
   item: OrdoFile
@@ -33,8 +35,7 @@ export default function File({ item }: Props) {
   const structure = {
     children: [
       {
-        // TODO: Add support for removing files
-        action: () => console.log("TODO"),
+        action: () => void dispatch(removedFile(item.path)),
         Icon: BsFileX,
         title: "@ordo-activity-editor/remove",
         accelerator: "ctrl+backspace",
@@ -54,17 +55,9 @@ export default function File({ item }: Props) {
 
   const handleContextMenu = (event: MouseEvent) =>
     Either.of(event)
-      .tap((e) => e.preventDefault())
-      .tap((e) => e.stopPropagation())
-      .map(() =>
-        dispatch(
-          showContextMenu({
-            event,
-            target: item,
-            structure,
-          }),
-        ),
-      )
+      .tap((event) => event.preventDefault())
+      .tap((event) => event.stopPropagation())
+      .fold(noOp, () => dispatch(showContextMenu({ event, target: item, structure })))
 
   return (
     <ActionListItem

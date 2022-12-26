@@ -312,7 +312,7 @@ Status code: 201
 
 ### Delete
 
-Archives directory or removes it completely. If the directory was archived, returns the directory object with the path to the path, updated properties, and an empty children array. If the directory was completely removed, returns empty response.
+Archives directory or removes it completely. Returns the directory object, updated properties, and an empty children array.
 
 | Method | URL                        |
 | ------ | -------------------------- |
@@ -342,16 +342,16 @@ NONE
 
 #### Examples
 
-##### Request (archive)
+##### Request
 
 
-| Headers                               | Query Parameters |
-| ------------------------------------- | ---------------- |
-| `ordo-path`: /dir 1/dir 2/remove this | ?unlink=0        |
-| `authorization`: $token               |                  |
+| Headers                               | Query Parameters     |
+| ------------------------------------- | -------------------- |
+| `ordo-path`: /dir 1/dir 2/remove this | ?unlink=0, ?unlink=1 |
+| `authorization`: $token               |                      |
 
 
-##### Response (archive)
+##### Response
 
 Status code: 200
 
@@ -360,23 +360,9 @@ Status code: 200
   "accessedAt": "2022-12-20T14:25:56.096Z",
   "createdAt": "2022-12-20T14:25:56.096Z",
   "updatedAt": "2022-12-20T14:25:56.096Z",
-  "depth": 4,
-  "path": "/dir 1/dir 2/dir 3/remove this",
+  "depth": 3,
+  "path": "/dir 1/dir 2/remove this",
   "readableName": "remove this",
   "children": []
 }
-```
-
-##### Request (unlink)
-
-| Headers                               | Query Parameters |
-| ------------------------------------- | ---------------- |
-| `ordo-path`: /dir 1/dir 2/remove this | ?unlink=1        |
-| `authorization`: $token               |                  |
-
-##### Response (unlink)
-
-Status code: 204
-
-```json
 ```

@@ -1,4 +1,4 @@
-import { useWorkspace } from "$containers/workspace/hooks/use-workspace.hook"
+import { useWorkspace } from "$containers/workspace/hooks/use-workspace"
 import Loader from "$core/components/loader"
 
 export default function Loading() {

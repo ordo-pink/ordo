@@ -33,14 +33,14 @@ export default function OrdoButton({
       onClick={onClick}
       onMouseOver={onMouseOver}
       onFocus={onMouseOver}
-      className={`px-6 py-2 rounded-md shrink-0 ${className}`}
+      className={`text-sm px-6 py-2 rounded-md shrink-0 ${className}`}
       disabled={disabled}
     >
       <div className="flex items-center space-x-2">
-        <div>{children}</div>
+        <div className="shrink-0">{children}</div>
 
         {hotkey && !disabled ? (
-          <div className="hidden md:block text-xs border border-neutral-400 dark:border-neutral-300 rounded-md px-1 py-0.5">
+          <div className="shrink-0 hidden md:block text-xs border border-neutral-400 dark:border-neutral-300 rounded-md px-1 py-0.5">
             <Accelerator accelerator={hotkey} />
           </div>
         ) : null}

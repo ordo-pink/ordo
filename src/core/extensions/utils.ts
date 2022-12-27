@@ -5,7 +5,7 @@ import {
   isFileAssociationExtension,
   isIsmParserExtension,
   isLocalSettingExtension,
-} from "$core/guards/is-extension.guard"
+} from "$core/guards/is-extension"
 import { OrdoActivityExtension, OrdoExtension } from "$core/types"
 import { Switch } from "$core/utils/switch"
 

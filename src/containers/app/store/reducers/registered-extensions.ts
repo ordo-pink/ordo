@@ -8,7 +8,7 @@ import {
   isFileAssociationExtension,
   isIsmParserExtension,
   isLocalSettingExtension,
-} from "$core/guards/is-extension.guard"
+} from "$core/guards/is-extension"
 import { OrdoExtension } from "$core/types"
 
 export const registeredExtensionsReducer: CaseReducer<

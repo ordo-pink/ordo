@@ -11,11 +11,11 @@ export default function FileNotSupported() {
     : "/extension-store"
 
   return (
-    <div className="h-full w-full flex flex-col items-center justify-center">
+    <div className="editor_not-supported">
       <div>{t("@ordo-activity-editor/unsupported-file")}</div>
       <div>
         <Link
-          className="underline hover:text-purple-600 hover:dark:text-purple-400 transition-colors duration-300"
+          className="editor_not-supported_link"
           to={extensionStorePath}
         >
           {t("@ordo-activity-editor/search-for-extensions")}

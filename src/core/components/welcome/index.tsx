@@ -1,5 +1,5 @@
 import Logo from "$assets/img/logo.png"
-import { useWorkspace } from "$containers/workspace/hooks/use-workspace.hook"
+import { useWorkspace } from "$containers/workspace/hooks/use-workspace"
 
 export default function Welcome() {
   const Workspace = useWorkspace()

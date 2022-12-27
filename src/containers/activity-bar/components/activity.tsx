@@ -22,7 +22,7 @@ export default function ActivityBarActivity({ activity }: Props) {
     <NavLink
       title={t(activityName) as string}
       onMouseOver={handleMouseOver}
-      className="activity-bar__activity"
+      className="activity-bar_activity"
       to={activityRoute}
     >
       <Icon />

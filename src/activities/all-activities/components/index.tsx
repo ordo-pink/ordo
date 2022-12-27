@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react"
 
 import AllActivitiesActivity from "$activities/all-activities/components/activity"
-import { useWorkspace } from "$containers/workspace/hooks/use-workspace.hook"
-import { useAppSelector } from "$core/state/hooks/use-app-selector.hook"
+import { useWorkspace } from "$containers/workspace/hooks/use-workspace"
+import { useAppSelector } from "$core/state/hooks/use-app-selector"
 import { OrdoActivityExtension } from "$core/types"
 
 import "$activities/all-activities/index.css"

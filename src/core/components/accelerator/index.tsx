@@ -49,7 +49,7 @@ export default function Accelerator({ accelerator }: Props) {
   }, [isDarwin])
 
   return Either.fromNullable(accelerator).fold(Null, () => (
-    <div className="flex items-center space-x-1 text-neutral-400 dark:text-neutral-300">
+    <div className="shrink-0 flex items-center space-x-1 text-neutral-400 dark:text-neutral-300">
       {split.includes("ctrl") ? (
         <div className="">{ctrl} +</div> /* eslint-disable-line i18next/no-literal-string */
       ) : null}

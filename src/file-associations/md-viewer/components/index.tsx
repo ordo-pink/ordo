@@ -5,7 +5,7 @@ import remarkParse from "remark-parse"
 import remarkRehype from "remark-rehype"
 import { unified } from "unified"
 
-import { useFSAPI } from "$core/hooks/use-fs-api.hooks"
+import { useFSAPI } from "$core/hooks/use-fs-api"
 
 export default function MdViewer() {
   const [content, setContent] = useState<string>("")

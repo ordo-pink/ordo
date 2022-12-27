@@ -3,8 +3,8 @@ import { useHotkeys } from "react-hotkeys-hook"
 import ContextMenuItem from "$containers/app/hooks/use-context-menu/components/context-menu-item"
 import { hideContextMenu } from "$containers/app/hooks/use-context-menu/store"
 import Null from "$core/components/null"
-import { useAppDispatch } from "$core/state/hooks/use-app-dispatch.hook"
-import { useAppSelector } from "$core/state/hooks/use-app-selector.hook"
+import { useAppDispatch } from "$core/state/hooks/use-app-dispatch"
+import { useAppSelector } from "$core/state/hooks/use-app-selector"
 import { Either } from "$core/utils/either"
 
 export default function ContextMenu() {

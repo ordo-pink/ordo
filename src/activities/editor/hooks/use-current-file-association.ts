@@ -1,6 +1,6 @@
 import { useSearchParams } from "react-router-dom"
 
-import { useAppSelector } from "$core/state/hooks/use-app-selector.hook"
+import { useAppSelector } from "$core/state/hooks/use-app-selector"
 import { OrdoFile } from "$core/types"
 import { findOrdoFile } from "$core/utils/fs-helpers"
 

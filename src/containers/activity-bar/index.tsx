@@ -1,5 +1,5 @@
 import ActivityBarActivity from "$containers/activity-bar/components/activity"
-import { useAppSelector } from "$core/state/hooks/use-app-selector.hook"
+import { useAppSelector } from "$core/state/hooks/use-app-selector"
 
 import "$containers/activity-bar/index.css"
 

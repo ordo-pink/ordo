@@ -4,8 +4,8 @@ import { useTranslation } from "react-i18next"
 import { hideContextMenu } from "$containers/app/hooks/use-context-menu/store"
 import { ContextMenuTemplateItem } from "$containers/app/hooks/use-context-menu/types"
 import Accelerator from "$core/components/accelerator"
-import { useAppDispatch } from "$core/state/hooks/use-app-dispatch.hook"
-import { useAppSelector } from "$core/state/hooks/use-app-selector.hook"
+import { useAppDispatch } from "$core/state/hooks/use-app-dispatch"
+import { useAppSelector } from "$core/state/hooks/use-app-selector"
 
 type Props = {
   item: ContextMenuTemplateItem

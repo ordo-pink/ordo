@@ -1,4 +1,4 @@
-import { isDirectory } from "$core/guards/is-directory.guard"
+import { isDirectory } from "$core/guards/is-directory"
 import { Nullable, OrdoDirectory, OrdoFile } from "$core/types"
 
 // TODO: Move elsewhere

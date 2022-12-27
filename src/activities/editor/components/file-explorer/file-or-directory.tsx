@@ -1,7 +1,8 @@
 import Directory from "$activities/editor/components/file-explorer/directory"
 import File from "$activities/editor/components/file-explorer/file"
+
 import Null from "$core/components/null"
-import { isDirectory } from "$core/guards/is-directory.guard"
+import { isDirectory } from "$core/guards/is-directory"
 import { Nullable, OrdoDirectory, OrdoFile } from "$core/types"
 import { Either } from "$core/utils/either"
 
@@ -12,9 +13,9 @@ type Props = {
 export default function FileOrDirectory({ item }: Props) {
   return Either.fromNullable(item).fold(Null, (fileOrDirectory) =>
     isDirectory(fileOrDirectory) ? (
-      <Directory item={fileOrDirectory} />
+      <Directory directory={fileOrDirectory} />
     ) : (
-      <File item={fileOrDirectory} />
+      <File file={fileOrDirectory} />
     ),
   )
 }

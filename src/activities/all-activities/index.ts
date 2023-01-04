@@ -1,5 +1,9 @@
 import { createActivityExtension } from "$core/extensions/create-activity-extension"
 
+/**
+ * All Activities is an activity extension that adds a place for all
+ * activity extensions installed in user's Ordo space.
+ */
 export default createActivityExtension("all-activities", {
   Component: () => import("$activities/all-activities/components"),
   Icon: () => import("$activities/all-activities/components/icon"),

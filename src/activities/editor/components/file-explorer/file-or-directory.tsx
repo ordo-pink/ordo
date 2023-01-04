@@ -12,10 +12,9 @@ type Props = {
 
 export default function FileOrDirectory({ item }: Props) {
   return Either.fromNullable(item).fold(Null, (fileOrDirectory) =>
-    isDirectory(fileOrDirectory) ? (
-      <Directory directory={fileOrDirectory} />
-    ) : (
-      <File file={fileOrDirectory} />
+    Either.fromBoolean(isDirectory(fileOrDirectory)).fold(
+      () => <File file={fileOrDirectory as OrdoFile} />,
+      () => <Directory directory={fileOrDirectory as OrdoDirectory} />,
     ),
   )
 }

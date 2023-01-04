@@ -99,6 +99,7 @@ export interface OrdoCommandExtension<Name extends string>
 export interface OrdoIsmParserExtension<Name extends string>
   extends OrdoExtension<Name, OrdoExtensionType.ISM_PARSER> {
   rules: IsmParserRule[]
+  Component: Component
 }
 
 export interface OrdoFileAssociationExtension<Name extends string>

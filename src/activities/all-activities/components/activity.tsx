@@ -4,7 +4,9 @@ import { Link } from "react-router-dom"
 import { getActivityRoute, getExtensionReadableName } from "$core/extensions/utils"
 import { OrdoActivityExtension } from "$core/types"
 
-type Props = { activity: OrdoActivityExtension<string> }
+type Props = {
+  activity: OrdoActivityExtension<string>
+}
 
 export default function AllActivitiesActivity({ activity }: Props) {
   const { t } = useTranslation()

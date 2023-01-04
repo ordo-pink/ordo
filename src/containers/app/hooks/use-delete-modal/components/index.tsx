@@ -2,16 +2,16 @@ import { useEffect } from "react"
 import { useTranslation } from "react-i18next"
 import { BsFileMinus, BsFolderMinus } from "react-icons/bs"
 
-import { hideCreateModal } from "$containers/app/hooks/use-create-modal/store"
+import { hideDeleteModal } from "$containers/app/hooks/use-delete-modal/store"
 import { useModal } from "$containers/app/hooks/use-modal"
+import { removedDirectory, removedFile } from "$containers/app/store"
+
 import { OrdoButtonPrimary, OrdoButtonSecondary } from "$core/components/buttons"
 import Null from "$core/components/null"
+import { isDirectory } from "$core/guards/is-directory"
 import { useAppDispatch } from "$core/state/hooks/use-app-dispatch"
 import { useAppSelector } from "$core/state/hooks/use-app-selector"
 import { Either } from "$core/utils/either"
-import { removedDirectory, removedFile } from "$containers/app/store"
-import { isDirectory } from "$core/guards/is-directory"
-import { hideDeleteModal } from "../store"
 
 export default function DeleteModal() {
   const dispatch = useAppDispatch()
@@ -21,7 +21,7 @@ export default function DeleteModal() {
 
   const { t } = useTranslation()
 
-  const { showModal, hideModal, Modal } = useModal()
+  const { showModal, Modal } = useModal()
 
   const type = isDirectory(target) ? "directory" : "file"
 
@@ -46,7 +46,6 @@ export default function DeleteModal() {
     dispatch(hideDeleteModal())
   }
 
-  // TODO: Extract styles
   return Either.fromBoolean(isShown)
     .chain(() => Either.fromNullable(target))
     .fold(Null, (item) => (
@@ -59,7 +58,7 @@ export default function DeleteModal() {
           >
             <div className="flex items-center space-x-4">
               <Icon className="shrink-0" />
-              <div className="text-xl">{t(`@ordo-activity-editor/delete-${type}`)}</div>
+              <div className="">{t(`@ordo-activity-editor/delete-${type}`)}</div>
             </div>
 
             <div className="w-full flex items-center justify-around">

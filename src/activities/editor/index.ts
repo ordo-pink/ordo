@@ -5,6 +5,7 @@ export default createActivityExtension("editor", {
   Component: () => import("$activities/editor/components"),
   Icon: () => import("$activities/editor/components/icon"),
   readableName: "@ordo-activity-editor/title",
+  // TODO: Remove / at the beginning if it is present
   storeSlice: editorSlice,
   translations: {
     ru: {

@@ -16,7 +16,6 @@ window.fetch = null as any
 
 const host = HOST.endsWith("/") ? HOST.slice(0, -1) : HOST
 
-// TODO: Provide access to fetch. Check request URL and request user to accept outgoing messages
 window.ordo = {
   api: {
     fs: {

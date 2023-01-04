@@ -3,12 +3,11 @@ import { useTranslation } from "react-i18next"
 import { AiFillFolder } from "react-icons/ai"
 import { BsChevronRight, BsFilePlus, BsFolderPlus } from "react-icons/bs"
 
-import { hideCreateModal } from "$containers/app/hooks/use-create-modal/store"
 import { FSEntity } from "$containers/app/constants"
+import { hideCreateModal } from "$containers/app/hooks/use-create-modal/store"
 import { useModal } from "$containers/app/hooks/use-modal"
 import { OrdoButtonPrimary, OrdoButtonSecondary } from "$core/components/buttons"
 import Null from "$core/components/null"
-import { useFSAPI } from "$core/hooks/use-fs-api"
 import { useAppDispatch } from "$core/state/hooks/use-app-dispatch"
 import { useAppSelector } from "$core/state/hooks/use-app-selector"
 import { Either } from "$core/utils/either"
@@ -22,11 +21,9 @@ export default function CreateModal() {
   const parent = useAppSelector((state) => state.createModal.parent)
   const type = useAppSelector((state) => state.createModal.entityType)
 
-  const fsApi = useFSAPI()
-
   const { t } = useTranslation()
 
-  const { showModal, hideModal, Modal } = useModal()
+  const { showModal, Modal } = useModal()
 
   const [newName, setNewName] = useState("")
 
@@ -42,7 +39,6 @@ export default function CreateModal() {
     dispatch(hideCreateModal())
   }
 
-  // TODO: Extract styles
   return Either.fromBoolean(isShown)
     .chain(() => Either.fromNullable(parent))
     .fold(Null, (parentDirectory) => (
@@ -75,7 +71,6 @@ export default function CreateModal() {
                   ))}
             </div>
             <input
-              autoFocus
               type="text"
               placeholder={
                 t(`@ordo-activity-editor/create-modal.create-${type}.placeholder`) as string
@@ -83,32 +78,27 @@ export default function CreateModal() {
               className="w-full outline-none border dark:border-0 border-neutral-400 rounded-lg bg-white dark:bg-neutral-600 px-4 py-2"
               value={newName}
               onChange={(e) => setNewName(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === "Escape") {
-                  hideModal()
-                } else if (e.key === "Enter") {
-                  type === FSEntity.FILE
-                    ? // eslint-disable-next-line
-                      fsApi.files.create(`${parentDirectory.path}/${newName}`).then(console.log) // TODO .then((file) => dispatch(createdFile(file)))
-                    : fsApi.directories
-                        .create(`${parentDirectory.path}/${newName}`)
-                        // eslint-disable-next-line
-                        .then(console.log) // TODO .then((directory) => dispatch(createdDirectory(directory)))
-
-                  hideModal()
-                }
-              }}
             />
             <div className="w-full flex items-center justify-around">
               <OrdoButtonSecondary
                 hotkey="escape"
                 onClick={() => dispatch(hideCreateModal())}
-              ></OrdoButtonSecondary>
+              >
+                {t("@app/button-cancel")}
+              </OrdoButtonSecondary>
 
               <OrdoButtonPrimary
-                onClick={() => console.log("TODO")}
+                onClick={() => {
+                  type === FSEntity.DIRECTORY
+                    ? dispatch(createdDirectory(`${parentDirectory.path}/${newName}`))
+                    : dispatch(createdFile(`${parentDirectory.path}/${newName}`))
+
+                  dispatch(hideCreateModal())
+                }}
                 hotkey="enter"
-              ></OrdoButtonPrimary>
+              >
+                {t("@app/button-ok")}
+              </OrdoButtonPrimary>
             </div>
           </div>
         </div>

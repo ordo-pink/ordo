@@ -7,8 +7,9 @@ import { useCurrentFileAssociation } from "$activities/editor/hooks/use-current-
 
 import { useWorkspaceWithSidebar } from "$containers/workspace/hooks/use-workspace"
 
-import "$activities/editor/index.css"
 import { Either } from "$core/utils/either"
+
+import "$activities/editor/index.css"
 
 export default function Editor() {
   const [query] = useSearchParams()

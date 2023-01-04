@@ -27,7 +27,6 @@ import MdViewerFileAssociation from "$file-associations/md-viewer"
 
 import "$containers/app/index.css"
 
-// TODO: Move app translations (e.g. for modals) to separate translation bundle
 export default function App() {
   const dispatch = useAppDispatch()
   const i18n = useI18nInit()
@@ -63,7 +62,6 @@ export default function App() {
       if (isActivityExtension(extension)) {
         const activityExists = activities.some((activity) => activity.name === extension.name)
 
-        // TODO: Disallow overriding routes
         if (activityExists) return
 
         const paths = extension.paths ? extension.paths : [getExtensionName(extension)]

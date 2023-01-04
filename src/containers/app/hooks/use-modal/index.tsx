@@ -1,6 +1,6 @@
 import { PropsWithChildren, useCallback, useState } from "react"
 
-import Modal from "$containers/app/hooks/use-modal/modal"
+import Modal from "$containers/app/hooks/use-modal/components/modal"
 import { ThunkFn } from "$core/types"
 
 type Props = {

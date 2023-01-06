@@ -1,5 +1,5 @@
 import { combineReducers } from "@reduxjs/toolkit"
-import { MouseEvent, useEffect } from "react"
+import { FC, MouseEvent, useEffect, useState } from "react"
 import { Outlet, RouteObject, useLocation, useNavigate } from "react-router-dom"
 
 // import AllActivitiesExtension from "$activities/all-activities"
@@ -21,6 +21,9 @@ import { router } from "$core/router"
 import { reducer, store } from "$core/state"
 import { useAppDispatch } from "$core/state/hooks/use-app-dispatch"
 import { useAppSelector } from "$core/state/hooks/use-app-selector"
+import { Component } from "$core/types"
+import { Either } from "$core/utils/either"
+import { noOp } from "$core/utils/no-op"
 
 import IsmFileAssociation from "$file-associations/ism"
 import MdViewerFileAssociation from "$file-associations/md-viewer"
@@ -40,6 +43,8 @@ export default function App() {
   const currentRoute = useLocation()
   const navigate = useNavigate()
 
+  const [overlayComponents, setOverlayComponents] = useState<(Component | FC)[]>([])
+
   useEffect(() => {
     dispatch(gotDirectory("/"))
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -58,7 +63,16 @@ export default function App() {
       MdViewerFileAssociation,
     ]
 
+    setOverlayComponents([CreateModal, DeleteModal])
+
     extensions.forEach((extension) => {
+      Either.fromNullable(extension.overlayComponents).fold(noOp, (components) =>
+        setOverlayComponents((existingComponents) => [
+          ...existingComponents,
+          ...(components as Component[]),
+        ]),
+      )
+
       if (isActivityExtension(extension)) {
         const activityExists = activities.some((activity) => activity.name === extension.name)
 
@@ -111,9 +125,11 @@ export default function App() {
 
       <Outlet />
 
-      <CreateModal />
-      <DeleteModal />
       <ContextMenu />
+
+      {overlayComponents.map((Component, index) => (
+        <Component key={index} />
+      ))}
     </div>
   )
 }

@@ -2,8 +2,11 @@ import type { Slice } from "@reduxjs/toolkit"
 import type { Schema } from "jsonschema"
 import type Loadable from "react-loadable"
 
+import { AppState } from "$containers/app/types"
+
 import type { Language } from "$core/constants/language"
 import type { OrdoExtensionType } from "$core/constants/ordo-extension-type"
+import { useAppDispatch } from "$core/state/hooks/use-app-dispatch"
 
 export type Nullable<T> = T | null
 
@@ -38,10 +41,10 @@ export type AccessLevel = {
 }
 
 export type ActionContext = {
-  state: object // TODO Provide state type
+  state: AppState
   currentFile: Nullable<OrdoFile>
   contextMenuTarget: Nullable<OrdoFile | OrdoDirectory>
-  dispatch: ThunkFn<void> // TODO Provide dispatch type
+  dispatch: ReturnType<typeof useAppDispatch>
   env: OrdoElectronEnv | OrdoBrowserEnv
 }
 
@@ -85,6 +88,7 @@ export interface OrdoExtension<Name extends string, ExtensionType extends OrdoEx
   translations: TranslationsRecord<OrdoExtensionName<Name, ExtensionType>>
   name: OrdoExtensionName<Name, ExtensionType>
   readableName?: string
+  overlayComponents?: Component[]
   description?: string
   storeSlice: Slice
   dependencies?: OrdoExtensionName[]

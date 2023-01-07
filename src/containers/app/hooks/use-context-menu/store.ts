@@ -1,5 +1,4 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit"
-import { MouseEvent } from "react"
 
 import {
   ContextMenuTemplate,
@@ -31,15 +30,16 @@ export const createModalSlice = createSlice({
     showContextMenu: (
       state,
       action: PayloadAction<{
-        event: MouseEvent
+        x: number
+        y: number
         target: ContextMenuTarget
-        structure: ContextMenuTemplate
+        structure?: { children: [] }
       }>,
     ) => {
       state.isShown = true
-      state.x = action.payload.event.pageX
-      state.y = action.payload.event.pageY
-      state.structure = action.payload.structure
+      state.x = action.payload.x
+      state.y = action.payload.y
+      state.structure = action.payload.structure ?? { children: [] }
       state.target = action.payload.target
     },
     hideContextMenu: (state) => {

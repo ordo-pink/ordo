@@ -4,9 +4,7 @@ import { BsFilePlus, BsFolderPlus } from "react-icons/bs"
 import FileOrDirectory from "$activities/editor/components/file-explorer/file-or-directory"
 
 import { useContextMenu } from "$containers/app/hooks/use-context-menu"
-import { useCreateModal } from "$containers/app/hooks/use-create-modal"
 
-import item from "$core/components/action-list/item"
 import { OrdoButtonNeutral } from "$core/components/buttons"
 import Null from "$core/components/null"
 import { useAppDispatch } from "$core/state/hooks/use-app-dispatch"
@@ -18,32 +16,26 @@ export default function FileExplorer() {
   const dispatch = useAppDispatch()
 
   const directory = useAppSelector((state) => state.app.personalProject)
+  const commands = useAppSelector((state) => state.app.commands)
+  const state = useAppSelector((state) => state)
+
+  const createFileCommand = commands.find(
+    (command) => command.title === "@ordo-command-create-file-or-directory/create-file",
+  )
+
+  const createDirectoryCommand = commands.find(
+    (command) => command.title === "@ordo-command-create-file-or-directory/create-directory",
+  )
 
   const { showContextMenu } = useContextMenu()
-  const { showCreateFileModal, showCreateDirectoryModal } = useCreateModal()
-
-  const structure = {
-    children: [
-      {
-        action: () => void dispatch(showCreateFileModal(directory)),
-        Icon: BsFilePlus,
-        title: "@ordo-activity-editor/create-file",
-        accelerator: "ctrl+n",
-      },
-      {
-        action: () => void dispatch(showCreateDirectoryModal(directory)),
-        Icon: BsFolderPlus,
-        title: "@ordo-activity-editor/create-directory",
-        accelerator: "ctrl+shift+n",
-      },
-    ],
-  }
 
   const handleContextMenu = (event: MouseEvent) =>
     Either.of(event)
       .tap((event) => event.preventDefault())
       .tap((event) => event.stopPropagation())
-      .fold(noOp, () => dispatch(showContextMenu({ event, target: item, structure })))
+      .fold(noOp, ({ pageX, pageY }) =>
+        dispatch(showContextMenu({ target: directory, x: pageX, y: pageY })),
+      )
 
   return Either.fromNullable(directory).fold(Null, (rootDirectory) => (
     <div
@@ -60,12 +52,39 @@ export default function FileExplorer() {
       </div>
 
       <div className="file-explorer_action-group">
-        <OrdoButtonNeutral onClick={() => dispatch(showCreateFileModal(directory))}>
+        <OrdoButtonNeutral
+          onClick={() =>
+            createFileCommand &&
+            createFileCommand.action({
+              contextMenuTarget: directory,
+              currentFile: null,
+              dispatch,
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              env: {} as any,
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              state: state as any,
+            })
+          }
+        >
           <div className="flex items-center md:space-x-2">
             <BsFilePlus />
           </div>
         </OrdoButtonNeutral>
-        <OrdoButtonNeutral onClick={() => dispatch(showCreateDirectoryModal(directory))}>
+        <OrdoButtonNeutral
+          onClick={() =>
+            // TODO: Extract action call preparation to a hook
+            createDirectoryCommand &&
+            createDirectoryCommand.action({
+              contextMenuTarget: directory,
+              currentFile: null,
+              dispatch,
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              env: {} as any,
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              state: state as any,
+            })
+          }
+        >
           <div className="flex items-center md:space-x-2">
             <BsFolderPlus />
           </div>

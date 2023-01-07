@@ -44,5 +44,5 @@
   position: absolute;
   @apply top-2 right-2 bottom-2 left-2;
   @apply border border-transparent rounded-full;
-  @apply bg-neutral-100 dark:bg-neutral-900;
+  @apply bg-neutral-100 dark:bg-neutral-700;
 }

@@ -12,6 +12,7 @@ const PATH_FROM_HEADER_KEY = "ordo-path-from"
 const PATH_TO_HEADER_KEY = "ordo-path-to"
 const AUTHORIZATION_HEADER_KEY = "authorization"
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 window.fetch = null as any
 
 const host = HOST.endsWith("/") ? HOST.slice(0, -1) : HOST

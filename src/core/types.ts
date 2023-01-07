@@ -19,8 +19,7 @@ export type TernaryFn<Arg1, Arg2, Arg3, Result> = (arg1: Arg1, arg2: Arg2, arg3:
 
 export type Unpack<T> = T extends Array<infer U> ? U : T
 
-export type Icon = ReturnType<typeof Loadable>
-export type Component = ReturnType<typeof Loadable>
+export type OrdoLoadableComponent = ReturnType<typeof Loadable>
 
 export type FileExtension = `.${string}`
 
@@ -43,6 +42,7 @@ export type AccessLevel = {
 export type ActionContext = {
   state: AppState
   currentFile: Nullable<OrdoFile>
+  // TODO: Replace with `target` and add a boolean for whether it is `isContextMenuCall`
   contextMenuTarget: Nullable<OrdoFile | OrdoDirectory>
   dispatch: ReturnType<typeof useAppDispatch>
   env: OrdoElectronEnv | OrdoBrowserEnv
@@ -54,8 +54,8 @@ export type IsmParserRule = {
 }
 
 export type OrdoCommand<ExtensionName extends string> = {
-  icon?: Icon
-  hotkey?: string
+  Icon?: OrdoLoadableComponent
+  accelerator?: string
   title: `@${ExtensionName}/${string}`
   action: UnaryFn<ActionContext, void | PromiseLike<void>>
   showInContextMenu?: boolean | UnaryFn<OrdoFile | OrdoDirectory, boolean>
@@ -72,6 +72,7 @@ export type TranslationsRecord<Name extends string> = {
 }
 
 // TODO: Restrict things, provide them via env
+// TODO: Put patched fetch here
 // @see https://developer.mozilla.org/en-US/docs/Web/HTTP/Feature_Policy
 // @see https://w3c.github.io/webappsec-permissions-policy/#permissions-policy-http-header-field
 export type OrdoExtensionPermissions = Partial<{
@@ -85,14 +86,13 @@ export type OrdoExtensionPermissions = Partial<{
 }>
 
 export interface OrdoExtension<Name extends string, ExtensionType extends OrdoExtensionType> {
-  translations: TranslationsRecord<OrdoExtensionName<Name, ExtensionType>>
+  translations?: TranslationsRecord<OrdoExtensionName<Name, ExtensionType>>
   name: OrdoExtensionName<Name, ExtensionType>
   readableName?: string
-  overlayComponents?: Component[]
+  overlayComponents?: OrdoLoadableComponent[]
   description?: string
   storeSlice: Slice
-  dependencies?: OrdoExtensionName[]
-  permissions?: OrdoExtensionPermissions
+  commands?: OrdoCommand<`ordo-command-${Name}`>[]
 }
 
 export interface OrdoCommandExtension<Name extends string>
@@ -103,14 +103,14 @@ export interface OrdoCommandExtension<Name extends string>
 export interface OrdoIsmParserExtension<Name extends string>
   extends OrdoExtension<Name, OrdoExtensionType.ISM_PARSER> {
   rules: IsmParserRule[]
-  Component: Component
+  Component: OrdoLoadableComponent
 }
 
 export interface OrdoFileAssociationExtension<Name extends string>
   extends OrdoExtension<Name, OrdoExtensionType.FILE_ASSOCIATION> {
   fileExtensions: FileExtension[]
-  Icon?: Icon
-  Component: Component
+  Icon?: OrdoLoadableComponent
+  Component: OrdoLoadableComponent
 }
 
 export interface OrdoLocalSettingExtension<Name extends string>
@@ -123,8 +123,9 @@ export interface OrdoLocalSettingExtension<Name extends string>
 export interface OrdoActivityExtension<Name extends string>
   extends OrdoExtension<Name, OrdoExtensionType.ACTIVITY> {
   paths?: string[]
-  Icon: Icon
-  Component: Component
+  accelerator?: string
+  Icon: OrdoLoadableComponent
+  Component: OrdoLoadableComponent
 }
 
 export type OrdoFile<Metadata extends Record<string, unknown> = Record<string, unknown>> = {

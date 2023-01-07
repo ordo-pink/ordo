@@ -1,9 +1,8 @@
 import { MouseEvent } from "react"
-import { BsFileEarmarkBinary, BsFileX } from "react-icons/bs"
+import { BsFileEarmarkBinary } from "react-icons/bs"
 import { createSearchParams, useNavigate, useSearchParams } from "react-router-dom"
 
 import { useContextMenu } from "$containers/app/hooks/use-context-menu"
-import { useDeleteModal } from "$containers/app/hooks/use-delete-modal"
 
 import ActionListItem from "$core/components/action-list/item"
 import { useAppDispatch } from "$core/state/hooks/use-app-dispatch"
@@ -22,7 +21,6 @@ export default function File({ file }: Props) {
   const dispatch = useAppDispatch()
 
   const { showContextMenu } = useContextMenu()
-  const { showDeleteFileModal } = useDeleteModal()
 
   const isCurrent = query.has("path") && query.get("path") === file.path
 
@@ -33,17 +31,6 @@ export default function File({ file }: Props) {
   const Icon = association && association.Icon ? association.Icon : BsFileEarmarkBinary
 
   const paddingLeft = `${file.depth * 10}px`
-
-  const structure = {
-    children: [
-      {
-        action: () => void dispatch(showDeleteFileModal(file)),
-        Icon: BsFileX,
-        title: "@ordo-activity-editor/remove",
-        accelerator: "ctrl+backspace",
-      },
-    ],
-  }
 
   const handleClick = (event: MouseEvent) =>
     Either.of(event)
@@ -63,7 +50,9 @@ export default function File({ file }: Props) {
     Either.of(event)
       .tap((e) => e.preventDefault())
       .tap((e) => e.stopPropagation())
-      .fold(noOp, () => dispatch(showContextMenu({ event, target: file, structure })))
+      .fold(noOp, ({ pageX, pageY }) =>
+        dispatch(showContextMenu({ x: pageX, y: pageY, target: file })),
+      )
 
   return (
     <ActionListItem

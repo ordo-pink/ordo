@@ -8,15 +8,12 @@ import { removedReducer } from "$containers/app/store/reducers/removed"
 import { AppState, UpdatedFilePayload } from "$containers/app/types"
 
 const initialState: AppState = {
-  localSettings: {},
-  projectSettings: {},
-  userSettings: {},
   personalProject: null,
   activityExtensions: [],
   commandExtensions: [],
   fileAssociationExtensions: [],
   ismParserExtensions: [],
-  localSettingExtensions: [],
+  commands: [],
 }
 
 export const createdFile = createAsyncThunk("@ordo-app/create-file", (path: string) =>

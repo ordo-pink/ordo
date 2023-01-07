@@ -8,9 +8,10 @@ import ExtensionStoreExtension from "$activities/extension-store"
 import SettingsExtension from "$activities/settings"
 import UserExtension from "$activities/user"
 
+import CreateFileOrDirectory from "$commands/create-file-or-directory"
+
 import ActivityBar from "$containers/activity-bar"
 import ContextMenu from "$containers/app/hooks/use-context-menu/components/context-menu"
-import CreateModal from "$containers/app/hooks/use-create-modal/components"
 import DeleteModal from "$containers/app/hooks/use-delete-modal/components"
 import { useI18nInit } from "$containers/app/hooks/use-i18n-init"
 import { gotDirectory, registeredExtensions } from "$containers/app/store"
@@ -21,7 +22,7 @@ import { router } from "$core/router"
 import { reducer, store } from "$core/state"
 import { useAppDispatch } from "$core/state/hooks/use-app-dispatch"
 import { useAppSelector } from "$core/state/hooks/use-app-selector"
-import { Component } from "$core/types"
+import { OrdoLoadableComponent } from "$core/types"
 import { Either } from "$core/utils/either"
 import { noOp } from "$core/utils/no-op"
 
@@ -43,7 +44,7 @@ export default function App() {
   const currentRoute = useLocation()
   const navigate = useNavigate()
 
-  const [overlayComponents, setOverlayComponents] = useState<(Component | FC)[]>([])
+  const [overlayComponents, setOverlayComponents] = useState<(OrdoLoadableComponent | FC)[]>([])
 
   useEffect(() => {
     dispatch(gotDirectory("/"))
@@ -61,15 +62,18 @@ export default function App() {
       SettingsExtension,
       IsmFileAssociation,
       MdViewerFileAssociation,
+      CreateFileOrDirectory,
     ]
 
-    setOverlayComponents([CreateModal, DeleteModal])
+    // TODO: Extract to commands
+    setOverlayComponents([DeleteModal])
 
     extensions.forEach((extension) => {
+      // Register overlay components to be rendered at the top level of the application
       Either.fromNullable(extension.overlayComponents).fold(noOp, (components) =>
         setOverlayComponents((existingComponents) => [
           ...existingComponents,
-          ...(components as Component[]),
+          ...(components as OrdoLoadableComponent[]),
         ]),
       )
 
@@ -78,6 +82,7 @@ export default function App() {
 
         if (activityExists) return
 
+        // Register paths in the router to make activities available
         const paths = extension.paths ? extension.paths : [getExtensionName(extension)]
         const Element = extension.Component
 
@@ -91,17 +96,23 @@ export default function App() {
 
           if (currentRoute.pathname.startsWith(`/${path}`)) navigate(currentRoute)
         }
+
+        // TODO: Register accelerators for quick activity access
       }
 
-      Object.keys(extension.translations).forEach((language) => {
-        i18n.addResourceBundle(
-          language,
-          "translation",
-          (extension.translations as Record<string, string>)[language],
-        )
-      })
+      if (extension.translations) {
+        // Register translations for i18n
+        Object.keys(extension.translations).forEach((language) => {
+          i18n.addResourceBundle(
+            language,
+            "translation",
+            (extension.translations as Record<string, string>)[language],
+          )
+        })
+      }
 
       if (extension.storeSlice != null) {
+        // Register extension store slice
         const newReducer = extension.storeSlice.reducer
 
         const combinedReducer = combineReducers({
@@ -113,6 +124,7 @@ export default function App() {
       }
     })
 
+    // Register installed extensions in the store
     dispatch(registeredExtensions(extensions))
   }, [i18n, dispatch, navigate, currentRoute, activities])
 

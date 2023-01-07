@@ -1,4 +1,4 @@
-export enum FSEntity {
+export enum OrdoFSEntity {
   FILE = "file",
   DIRECTORY = "directory",
 }

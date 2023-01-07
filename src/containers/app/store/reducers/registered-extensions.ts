@@ -7,7 +7,6 @@ import {
   isCommandExtension,
   isFileAssociationExtension,
   isIsmParserExtension,
-  isLocalSettingExtension,
 } from "$core/guards/is-extension"
 import { OrdoExtension } from "$core/types"
 
@@ -36,10 +35,10 @@ export const registeredExtensionsReducer: CaseReducer<
       !state.ismParserExtensions.some((ext) => ext.name === extension.name)
     )
       state.ismParserExtensions.push(extension)
-    else if (
-      isLocalSettingExtension(extension) &&
-      !state.localSettingExtensions.some((ext) => ext.name === extension.name)
-    )
-      state.localSettingExtensions.push(extension)
+    else return
+
+    if (extension.commands) {
+      state.commands = state.commands.concat(extension.commands)
+    }
   })
 }

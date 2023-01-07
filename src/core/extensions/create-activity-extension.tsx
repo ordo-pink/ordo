@@ -21,7 +21,8 @@ export const createActivityExtension = <Name extends string, State extends Recor
 ): OrdoActivityExtension<Name> => ({
   ...props,
   name: `ordo-activity-${name}`,
-  Component: createLoadable(props.Component),
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  Component: createLoadable(props.Component, () => null as any),
   Icon: createLoadable(props.Icon, () => <BsLock />, 200),
   storeSlice: props.storeSlice ?? (null as unknown as OrdoActivityExtension<Name>["storeSlice"]),
 })

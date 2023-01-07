@@ -16,6 +16,7 @@ export default function ContextMenuItem({ item }: Props) {
   const dispatch = useAppDispatch()
 
   const target = useAppSelector((state) => state.contextMenu.target)
+  const state = useAppSelector((state) => state)
 
   const Icon = item.Icon
   const title = t(item.title)
@@ -27,7 +28,15 @@ export default function ContextMenuItem({ item }: Props) {
     dispatch(hideContextMenu())
 
     if (item.action) {
-      item.action({ contextMenuTarget: target })
+      item.action({
+        contextMenuTarget: target,
+        dispatch,
+        currentFile: null,
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        env: {} as any,
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        state: state as any,
+      })
     }
   }
 
@@ -41,9 +50,7 @@ export default function ContextMenuItem({ item }: Props) {
       tabIndex={-2}
     >
       <div className="flex items-center space-x-2">
-        <div className="shrink-0">
-          <Icon />
-        </div>
+        <div className="shrink-0">{Icon && <Icon />}</div>
         <div
           title={title}
           className="truncate"

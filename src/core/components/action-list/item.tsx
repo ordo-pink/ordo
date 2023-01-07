@@ -6,14 +6,14 @@ import {
   PropsWithChildren,
 } from "react"
 
-import { Icon } from "$core/types"
+import { OrdoLoadableComponent } from "$core/types"
 import { noOp } from "$core/utils/no-op"
 
 import "$core/components/action-list/index.css"
 
 type Props = {
   text: string
-  Icon: Icon | FC
+  Icon: OrdoLoadableComponent | FC
   isCurrent: boolean
   style?: CSSProperties
   onClick?: MouseEventHandler

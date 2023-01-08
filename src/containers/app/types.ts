@@ -6,6 +6,7 @@ import {
   OrdoDirectory,
   OrdoFileAssociationExtension,
   OrdoIsmParserExtension,
+  OrdoLoadableComponent,
 } from "$core/types"
 
 export type AppState = {
@@ -15,6 +16,7 @@ export type AppState = {
   fileAssociationExtensions: OrdoFileAssociationExtension<string>[]
   ismParserExtensions: OrdoIsmParserExtension<string>[]
   commands: OrdoCommand<string>[]
+  overlays: OrdoLoadableComponent[]
 }
 
 export type UpdatedFilePayload = {

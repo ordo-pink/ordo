@@ -5,10 +5,21 @@ import { OrdoDirectory } from "$core/types"
 import { Either } from "$core/utils/either"
 
 type Props = {
+  /**
+   * Directory the content refers to.
+   */
   directory: OrdoDirectory
+
+  /**
+   * Whether the directory is expanded or collapsed.
+   */
   isExpanded: boolean
 }
 
+/**
+ * DirectoryContent conditionally renders directories and files inside, depending on whether
+ * it is marked `isExpanded` or not.
+ */
 export default function DirectoryContent({ directory, isExpanded }: Props) {
   return Either.fromBoolean(isExpanded).fold(Null, () => (
     <>

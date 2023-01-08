@@ -31,7 +31,6 @@ export default function ContextMenuItem({ item }: Props) {
       item.action({
         contextMenuTarget: target,
         dispatch,
-        currentFile: null,
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         env: {} as any,
         // eslint-disable-next-line @typescript-eslint/no-explicit-any

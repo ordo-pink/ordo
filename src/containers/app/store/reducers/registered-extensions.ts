@@ -40,5 +40,9 @@ export const registeredExtensionsReducer: CaseReducer<
     if (extension.commands) {
       state.commands = state.commands.concat(extension.commands)
     }
+
+    if (extension.overlayComponents) {
+      state.overlays.push(...extension.overlayComponents)
+    }
   })
 }

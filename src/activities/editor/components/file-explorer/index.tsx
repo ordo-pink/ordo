@@ -57,7 +57,6 @@ export default function FileExplorer() {
             createFileCommand &&
             createFileCommand.action({
               contextMenuTarget: directory,
-              currentFile: null,
               dispatch,
               // eslint-disable-next-line @typescript-eslint/no-explicit-any
               env: {} as any,
@@ -76,7 +75,6 @@ export default function FileExplorer() {
             createDirectoryCommand &&
             createDirectoryCommand.action({
               contextMenuTarget: directory,
-              currentFile: null,
               dispatch,
               // eslint-disable-next-line @typescript-eslint/no-explicit-any
               env: {} as any,

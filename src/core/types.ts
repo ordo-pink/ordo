@@ -41,7 +41,6 @@ export type AccessLevel = {
 
 export type ActionContext = {
   state: AppState
-  currentFile: Nullable<OrdoFile>
   // TODO: Replace with `target` and add a boolean for whether it is `isContextMenuCall`
   contextMenuTarget: Nullable<OrdoFile | OrdoDirectory>
   dispatch: ReturnType<typeof useAppDispatch>
@@ -54,12 +53,12 @@ export type IsmParserRule = {
 }
 
 export type OrdoCommand<ExtensionName extends string> = {
-  Icon?: OrdoLoadableComponent
+  Icon: OrdoLoadableComponent
   accelerator?: string
   title: `@${ExtensionName}/${string}`
   action: UnaryFn<ActionContext, void | PromiseLike<void>>
   showInContextMenu?: boolean | UnaryFn<OrdoFile | OrdoDirectory, boolean>
-  showInCommandPalette?: boolean | UnaryFn<Nullable<OrdoFile>, boolean>
+  showInCommandPalette?: boolean
 }
 
 export type OrdoExtensionName<

@@ -14,6 +14,7 @@ const initialState: AppState = {
   fileAssociationExtensions: [],
   ismParserExtensions: [],
   commands: [],
+  overlays: [],
 }
 
 export const createdFile = createAsyncThunk("@ordo-app/create-file", (path: string) =>

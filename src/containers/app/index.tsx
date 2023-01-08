@@ -1,5 +1,5 @@
-import { combineReducers } from "@reduxjs/toolkit"
-import { FC, MouseEvent, useEffect, useState } from "react"
+import { combineReducers, Reducer } from "@reduxjs/toolkit"
+import { MouseEvent, useEffect } from "react"
 import { Outlet, RouteObject, useLocation, useNavigate } from "react-router-dom"
 
 // import AllActivitiesExtension from "$activities/all-activities"
@@ -8,11 +8,11 @@ import ExtensionStoreExtension from "$activities/extension-store"
 import SettingsExtension from "$activities/settings"
 import UserExtension from "$activities/user"
 
+import CommandPalette from "$commands/command-palette"
 import CreateFileOrDirectory from "$commands/create-file-or-directory"
 
 import ActivityBar from "$containers/activity-bar"
 import ContextMenu from "$containers/app/hooks/use-context-menu/components/context-menu"
-import DeleteModal from "$containers/app/hooks/use-delete-modal/components"
 import { useI18nInit } from "$containers/app/hooks/use-i18n-init"
 import { gotDirectory, registeredExtensions } from "$containers/app/store"
 
@@ -22,9 +22,6 @@ import { router } from "$core/router"
 import { reducer, store } from "$core/state"
 import { useAppDispatch } from "$core/state/hooks/use-app-dispatch"
 import { useAppSelector } from "$core/state/hooks/use-app-selector"
-import { OrdoLoadableComponent } from "$core/types"
-import { Either } from "$core/utils/either"
-import { noOp } from "$core/utils/no-op"
 
 import IsmFileAssociation from "$file-associations/ism"
 import MdViewerFileAssociation from "$file-associations/md-viewer"
@@ -41,10 +38,9 @@ export default function App() {
   }
 
   const activities = useAppSelector((state) => state.app.activityExtensions)
+  const overlays = useAppSelector((state) => state.app.overlays)
   const currentRoute = useLocation()
   const navigate = useNavigate()
-
-  const [overlayComponents, setOverlayComponents] = useState<(OrdoLoadableComponent | FC)[]>([])
 
   useEffect(() => {
     dispatch(gotDirectory("/"))
@@ -63,20 +59,12 @@ export default function App() {
       IsmFileAssociation,
       MdViewerFileAssociation,
       CreateFileOrDirectory,
+      CommandPalette,
     ]
 
-    // TODO: Extract to commands
-    setOverlayComponents([DeleteModal])
+    const reducers: Record<string, Reducer> = {}
 
     extensions.forEach((extension) => {
-      // Register overlay components to be rendered at the top level of the application
-      Either.fromNullable(extension.overlayComponents).fold(noOp, (components) =>
-        setOverlayComponents((existingComponents) => [
-          ...existingComponents,
-          ...(components as OrdoLoadableComponent[]),
-        ]),
-      )
-
       if (isActivityExtension(extension)) {
         const activityExists = activities.some((activity) => activity.name === extension.name)
 
@@ -113,16 +101,16 @@ export default function App() {
 
       if (extension.storeSlice != null) {
         // Register extension store slice
-        const newReducer = extension.storeSlice.reducer
-
-        const combinedReducer = combineReducers({
-          ...reducer,
-          [extension.name]: newReducer,
-        })
-
-        store.replaceReducer(combinedReducer)
+        reducers[extension.name] = extension.storeSlice.reducer
       }
     })
+
+    const combinedReducer = combineReducers({
+      ...reducer,
+      ...reducers,
+    })
+
+    store.replaceReducer(combinedReducer)
 
     // Register installed extensions in the store
     dispatch(registeredExtensions(extensions))
@@ -139,7 +127,7 @@ export default function App() {
 
       <ContextMenu />
 
-      {overlayComponents.map((Component, index) => (
+      {overlays.map((Component, index) => (
         <Component key={index} />
       ))}
     </div>

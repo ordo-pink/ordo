@@ -12,7 +12,7 @@ export default createCommandExtension("create-file-or-directory", {
     {
       Icon: () => import("$commands/create-file-or-directory/components/create-file-icon"),
       title: "@ordo-command-create-file-or-directory/create-file",
-      accelerator: "ctrl+n",
+      accelerator: "alt+n",
       showInCommandPalette: true,
       showInContextMenu: isDirectory,
       action: ({ dispatch, contextMenuTarget, state }) => {
@@ -28,7 +28,7 @@ export default createCommandExtension("create-file-or-directory", {
     {
       Icon: () => import("$commands/create-file-or-directory/components/create-directory-icon"),
       title: "@ordo-command-create-file-or-directory/create-directory",
-      accelerator: "ctrl+shift+n",
+      accelerator: "alt+shift+n",
       showInCommandPalette: true,
       showInContextMenu: isDirectory,
       action: ({ dispatch, contextMenuTarget, state }) => {

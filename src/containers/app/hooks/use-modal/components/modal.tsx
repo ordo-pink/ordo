@@ -22,12 +22,12 @@ export default function Modal({
   onShow = noOp,
   onHide = noOp,
 }: PropsWithChildren<Props>) {
-  useHotkeys("escape", (event) =>
+  useHotkeys("escape", (event) => {
     Either.of(event)
       .tap((e) => e.preventDefault())
       .tap((e) => e.stopPropagation())
-      .map(hideModal),
-  )
+      .map(hideModal)
+  })
 
   useEffect(() => {
     isShown ? onShow() : onHide()

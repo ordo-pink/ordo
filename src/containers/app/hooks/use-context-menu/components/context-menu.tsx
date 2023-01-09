@@ -21,12 +21,12 @@ export default function ContextMenu() {
 
   const [commandList, setCommandList] = useState(structure.children)
 
-  useHotkeys("escape", (e) =>
+  useHotkeys("escape", (e) => {
     Either.of(e)
       .tap((e) => e.preventDefault())
       .tap((e) => e.stopPropagation())
-      .tap(() => dispatch(hideContextMenu())),
-  )
+      .tap(() => dispatch(hideContextMenu()))
+  })
 
   useEffect(() => {
     commands.forEach((command) => {

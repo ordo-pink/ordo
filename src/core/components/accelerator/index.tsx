@@ -50,14 +50,17 @@ export default function Accelerator({ accelerator }: Props) {
 
   return Either.fromNullable(accelerator).fold(Null, () => (
     <div className="shrink-0 flex items-center space-x-1 text-neutral-400 dark:text-neutral-300">
+      {split.includes("alt") ? (
+        <div className="">{alt} +</div> /* eslint-disable-line i18next/no-literal-string */
+      ) : null}
+      {split.includes("option") ? (
+        <div className="">⌥ +</div> /* eslint-disable-line i18next/no-literal-string */
+      ) : null}
       {split.includes("ctrl") ? (
         <div className="">{ctrl} +</div> /* eslint-disable-line i18next/no-literal-string */
       ) : null}
       {split.includes("shift") ? (
         <div className="">⇧ +</div> /* eslint-disable-line i18next/no-literal-string */
-      ) : null}
-      {split.includes("alt") ? (
-        <div className="">{alt} +</div> /* eslint-disable-line i18next/no-literal-string */
       ) : null}
       <Key className="shrink-0" />
     </div>

@@ -25,7 +25,12 @@ export default function OrdoButton({
 }: Props) {
   const ref = useRef<HTMLButtonElement>(null)
 
-  useHotkeys(hotkey, () => void (ref.current && ref.current.click()), [ref.current])
+  useHotkeys(
+    hotkey,
+    () => void (ref.current && ref.current.click()),
+    { enableOnTags: ["INPUT", "TEXTAREA"] },
+    [ref.current, hotkey],
+  )
 
   return (
     <button

@@ -1,8 +1,8 @@
 import { combineReducers, Reducer } from "@reduxjs/toolkit"
-import { MouseEvent, useEffect } from "react"
+import { MouseEvent, useEffect, useState } from "react"
 import { Outlet, RouteObject, useLocation, useNavigate } from "react-router-dom"
 
-// import AllActivitiesExtension from "$activities/all-activities"
+import AllActivitiesExtension from "$activities/all-activities"
 import EditorExtension from "$activities/editor"
 import ExtensionStoreExtension from "$activities/extension-store"
 import SettingsExtension from "$activities/settings"
@@ -22,15 +22,19 @@ import { router } from "$core/router"
 import { reducer, store } from "$core/state"
 import { useAppDispatch } from "$core/state/hooks/use-app-dispatch"
 import { useAppSelector } from "$core/state/hooks/use-app-selector"
+import { ActionContext, UnaryFn } from "$core/types"
 
 import IsmFileAssociation from "$file-associations/ism"
 import MdViewerFileAssociation from "$file-associations/md-viewer"
 
 import "$containers/app/index.css"
+import { useHotkeys } from "react-hotkeys-hook"
 
 export default function App() {
   const dispatch = useAppDispatch()
   const i18n = useI18nInit()
+
+  const [accelerators, setAccelerators] = useState<Record<string, UnaryFn<ActionContext, void>>>({})
 
   const handleContextMenu = (event: MouseEvent) => {
     event.preventDefault()
@@ -39,6 +43,9 @@ export default function App() {
 
   const activities = useAppSelector((state) => state.app.activityExtensions)
   const overlays = useAppSelector((state) => state.app.overlays)
+  const commands = useAppSelector((state) => state.app.commands)
+  const state = useAppSelector((state) => state as any)
+
   const currentRoute = useLocation()
   const navigate = useNavigate()
 
@@ -48,10 +55,44 @@ export default function App() {
   }, [])
 
   useEffect(() => {
+    const keybindings: Record<string, UnaryFn<ActionContext, void>> = {}
+
+    commands.forEach((command) => {
+      if (command.accelerator) {
+        keybindings[command.accelerator] = command.action
+      }
+    })
+
+    setAccelerators(() => keybindings)
+  }, [commands])
+
+  console.log(accelerators)
+
+  useHotkeys(
+    Object.keys(accelerators).join(", "),
+    (event, handler) => {
+      event.preventDefault()
+      event.stopPropagation()
+
+      const action = accelerators[handler.key]
+
+      if (action) {
+        action({
+          state,
+          contextMenuTarget: null,
+          dispatch,
+          env: {} as any,
+        })
+      }
+    },
+    [accelerators],
+  )
+
+  useEffect(() => {
     if (!i18n || !dispatch || !activities) return
 
     const extensions = [
-      // AllActivitiesExtension,
+      AllActivitiesExtension,
       EditorExtension,
       ExtensionStoreExtension,
       UserExtension,
@@ -114,7 +155,9 @@ export default function App() {
 
     // Register installed extensions in the store
     dispatch(registeredExtensions(extensions))
-  }, [i18n, dispatch, navigate, currentRoute, activities])
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   return (
     <div

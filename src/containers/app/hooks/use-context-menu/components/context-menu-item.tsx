@@ -4,6 +4,7 @@ import { useTranslation } from "react-i18next"
 import { hideContextMenu } from "$containers/app/hooks/use-context-menu/store"
 import { ContextMenuTemplateItem } from "$containers/app/hooks/use-context-menu/types"
 import Accelerator from "$core/components/accelerator"
+import { useActionContext } from "$core/hooks/use-action-context"
 import { useAppDispatch } from "$core/state/hooks/use-app-dispatch"
 import { useAppSelector } from "$core/state/hooks/use-app-selector"
 
@@ -16,10 +17,11 @@ export default function ContextMenuItem({ item }: Props) {
   const dispatch = useAppDispatch()
 
   const target = useAppSelector((state) => state.contextMenu.target)
-  const state = useAppSelector((state) => state)
 
   const Icon = item.Icon
   const title = t(item.title)
+
+  const actionContext = useActionContext(target)
 
   const handleClick = (event: MouseEvent) => {
     event.preventDefault()
@@ -27,16 +29,7 @@ export default function ContextMenuItem({ item }: Props) {
 
     dispatch(hideContextMenu())
 
-    if (item.action) {
-      item.action({
-        contextMenuTarget: target,
-        dispatch,
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        env: {} as any,
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        state: state as any,
-      })
-    }
+    item.action && item.action(actionContext)
   }
 
   // TODO: Add key handling

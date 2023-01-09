@@ -19,6 +19,7 @@ import { gotDirectory, registeredExtensions } from "$containers/app/store"
 
 import { getExtensionName } from "$core/extensions/utils"
 import { isActivityExtension } from "$core/guards/is-extension"
+import { useActionContext } from "$core/hooks/use-action-context"
 import { router } from "$core/router"
 import { reducer, store } from "$core/state"
 import { useAppDispatch } from "$core/state/hooks/use-app-dispatch"
@@ -44,8 +45,8 @@ export default function App() {
   const activities = useAppSelector((state) => state.app.activityExtensions)
   const overlays = useAppSelector((state) => state.app.overlays)
   const commands = useAppSelector((state) => state.app.commands)
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const state = useAppSelector((state) => state as any)
+
+  const actionContext = useActionContext()
 
   const currentRoute = useLocation()
   const navigate = useNavigate()
@@ -75,15 +76,7 @@ export default function App() {
 
       const action = accelerators[handler.key]
 
-      if (action) {
-        action({
-          state,
-          contextMenuTarget: null,
-          dispatch,
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          env: {} as any,
-        })
-      }
+      action && action(actionContext)
     },
     [accelerators],
   )

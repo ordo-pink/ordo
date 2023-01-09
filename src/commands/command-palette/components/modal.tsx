@@ -9,6 +9,7 @@ import { AppSelectorExtension, SearchableCommand } from "$commands/command-palet
 import { useModal } from "$containers/app/hooks/use-modal"
 import Null from "$core/components/null"
 
+import { useActionContext } from "$core/hooks/use-action-context"
 import { useAppDispatch } from "$core/state/hooks/use-app-dispatch"
 import { useAppSelector } from "$core/state/hooks/use-app-selector"
 import { OrdoCommand } from "$core/types"
@@ -21,14 +22,13 @@ const fuse = new Fuse([] as SearchableCommand[], { keys: ["title"] })
 export default function CommandPalette() {
   const dispatch = useAppDispatch()
 
+  const root = useAppSelector((state) => state.app.personalProject)
   const commands = useAppSelector((state) => state.app.commands)
   const isShown = useAppSelector<AppSelectorExtension>(
     (state) => state["ordo-command-command-palette"].isShown,
   ) as boolean
 
-  // TODO: Simplify state provision
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const state: any = useAppSelector((state) => state)
+  const actionContext = useActionContext(root)
 
   const { showModal, hideModal, Modal } = useModal()
 
@@ -91,19 +91,21 @@ export default function CommandPalette() {
   }
 
   const handleClick = (command: OrdoCommand<string>) => {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    command.action({ state, dispatch, contextMenuTarget: null, env: {} as any })
+    command.action(actionContext)
+
     hideModal()
   }
 
-  const handleKeyDown = ({ key }: KeyboardEvent) => {
-    const handle = Switch.of(key)
+  const handleKeyDown = (event: KeyboardEvent) => {
+    const handle = Switch.of(event.key)
       .case("Escape", hide)
       .case("Enter", () => {
+        event.preventDefault()
+        event.stopPropagation()
+
         const currentCommand = visibleCommands[currentIndex]
-        // TODO: Simplify env provision
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        currentCommand.action({ state, dispatch, contextMenuTarget: null, env: {} as any })
+        currentCommand && currentCommand.action(actionContext)
+
         hideModal()
       })
       .case("ArrowUp", () => {

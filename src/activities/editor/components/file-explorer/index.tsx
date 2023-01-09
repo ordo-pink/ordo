@@ -7,6 +7,7 @@ import { useContextMenu } from "$containers/app/hooks/use-context-menu"
 
 import { OrdoButtonNeutral } from "$core/components/buttons"
 import Null from "$core/components/null"
+import { useActionContext } from "$core/hooks/use-action-context"
 import { useAppDispatch } from "$core/state/hooks/use-app-dispatch"
 import { useAppSelector } from "$core/state/hooks/use-app-selector"
 import { Either } from "$core/utils/either"
@@ -17,7 +18,8 @@ export default function FileExplorer() {
 
   const directory = useAppSelector((state) => state.app.personalProject)
   const commands = useAppSelector((state) => state.app.commands)
-  const state = useAppSelector((state) => state)
+
+  const actionContext = useActionContext(directory)
 
   const createFileCommand = commands.find(
     (command) => command.title === "@ordo-command-create-file-or-directory/create-file",
@@ -53,35 +55,14 @@ export default function FileExplorer() {
 
       <div className="file-explorer_action-group">
         <OrdoButtonNeutral
-          onClick={() =>
-            createFileCommand &&
-            createFileCommand.action({
-              contextMenuTarget: directory,
-              dispatch,
-              // eslint-disable-next-line @typescript-eslint/no-explicit-any
-              env: {} as any,
-              // eslint-disable-next-line @typescript-eslint/no-explicit-any
-              state: state as any,
-            })
-          }
+          onClick={() => createFileCommand && createFileCommand.action(actionContext)}
         >
           <div className="flex items-center md:space-x-2">
             <BsFilePlus />
           </div>
         </OrdoButtonNeutral>
         <OrdoButtonNeutral
-          onClick={() =>
-            // TODO: Extract action call preparation to a hook
-            createDirectoryCommand &&
-            createDirectoryCommand.action({
-              contextMenuTarget: directory,
-              dispatch,
-              // eslint-disable-next-line @typescript-eslint/no-explicit-any
-              env: {} as any,
-              // eslint-disable-next-line @typescript-eslint/no-explicit-any
-              state: state as any,
-            })
-          }
+          onClick={() => createDirectoryCommand && createDirectoryCommand.action(actionContext)}
         >
           <div className="flex items-center md:space-x-2">
             <BsFolderPlus />

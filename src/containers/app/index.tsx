@@ -1,5 +1,6 @@
 import { combineReducers, Reducer } from "@reduxjs/toolkit"
 import { MouseEvent, useEffect, useState } from "react"
+import { useHotkeys } from "react-hotkeys-hook"
 import { Outlet, RouteObject, useLocation, useNavigate } from "react-router-dom"
 
 import AllActivitiesExtension from "$activities/all-activities"
@@ -28,7 +29,6 @@ import IsmFileAssociation from "$file-associations/ism"
 import MdViewerFileAssociation from "$file-associations/md-viewer"
 
 import "$containers/app/index.css"
-import { useHotkeys } from "react-hotkeys-hook"
 
 export default function App() {
   const dispatch = useAppDispatch()
@@ -44,6 +44,7 @@ export default function App() {
   const activities = useAppSelector((state) => state.app.activityExtensions)
   const overlays = useAppSelector((state) => state.app.overlays)
   const commands = useAppSelector((state) => state.app.commands)
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const state = useAppSelector((state) => state as any)
 
   const currentRoute = useLocation()
@@ -66,8 +67,6 @@ export default function App() {
     setAccelerators(() => keybindings)
   }, [commands])
 
-  console.log(accelerators)
-
   useHotkeys(
     Object.keys(accelerators).join(", "),
     (event, handler) => {
@@ -81,6 +80,7 @@ export default function App() {
           state,
           contextMenuTarget: null,
           dispatch,
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           env: {} as any,
         })
       }

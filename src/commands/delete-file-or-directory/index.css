@@ -1,0 +1,19 @@
+.delete-file-or-directory-overlay {
+  @apply h-full flex items-center justify-center;
+}
+
+.delete-file-or-directory-modal {
+  @apply bg-neutral-100 dark:bg-neutral-700 shadow-xl rounded-md w-full max-w-lg p-8 flex flex-col space-y-4 items-center;
+}
+
+.delete-file-or-directory-modal_title {
+  @apply flex items-center space-x-4 text-xl;
+}
+
+.delete-file-or-directory-modal_input {
+  @apply w-full outline-none border dark:border-0 border-neutral-400 rounded-lg bg-white dark:bg-neutral-600 px-4 py-2;
+}
+
+.delete-file-or-directory-modal_button-group {
+  @apply w-full flex items-center justify-around;
+}

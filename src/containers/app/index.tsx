@@ -11,6 +11,7 @@ import UserExtension from "$activities/user"
 
 import CommandPalette from "$commands/command-palette"
 import CreateFileOrDirectory from "$commands/create-file-or-directory"
+import DeleteFileOrDirectory from "$commands/delete-file-or-directory"
 
 import ActivityBar from "$containers/activity-bar"
 import ContextMenu from "$containers/app/hooks/use-context-menu/components/context-menu"
@@ -93,6 +94,7 @@ export default function App() {
       IsmFileAssociation,
       MdViewerFileAssociation,
       CreateFileOrDirectory,
+      DeleteFileOrDirectory,
       CommandPalette,
     ]
 

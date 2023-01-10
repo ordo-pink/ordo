@@ -47,8 +47,7 @@ export default function ActionListItem({
         onMouseEnter={onMouseEnter}
         onMouseLeave={onMouseLeave}
         onContextMenu={onContextMenu}
-        tabIndex={-1}
-        role="link"
+        role="none"
         onKeyDown={onEnterKeyDown}
       >
         <div className="action-list_item_left">

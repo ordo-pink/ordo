@@ -5,11 +5,11 @@ import { createCommandExtension } from "$core/extensions/create-command-extensio
 export default createCommandExtension("command-palette", {
   commands: [
     {
-      Icon: () => import("$commands/command-palette/components/show-command-palette-icon"),
+      Icon: () => import("$commands/command-palette/components/command-palette-icon"),
       title: "@ordo-command-command-palette/show-command-palette",
       accelerator: "ctrl+shift+p",
       showInCommandPalette: false,
-      showInContextMenu: true,
+      showInContextMenu: false,
       action: ({ dispatch }) => void dispatch(showCommandPalette()),
     },
   ],

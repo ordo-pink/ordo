@@ -16,16 +16,17 @@ import Null from "$core/components/null"
 import { useAppDispatch } from "$core/state/hooks/use-app-dispatch"
 import { OrdoDirectory } from "$core/types"
 import { Either } from "$core/utils/either"
-import { noOp } from "$core/utils/no-op"
+import { preventDefault, stopPropagation } from "$core/utils/event"
+import { lazyBox } from "$core/utils/lazy-box"
 
 type Props = {
   directory: OrdoDirectory
 }
 
 export default function Directory({ directory }: Props) {
-  const [isExpanded, setIsExpanded] = useState(false)
-
   const dispatch = useAppDispatch()
+
+  const [isExpanded, setIsExpanded] = useState(false)
 
   const { showContextMenu } = useContextMenu()
 
@@ -38,19 +39,20 @@ export default function Directory({ directory }: Props) {
 
   const Chevron = isExpanded ? BsChevronDown : BsChevronUp
 
-  const handleClick = (event: MouseEvent) =>
-    Either.of(event)
-      .tap((e) => e.preventDefault())
-      .tap((e) => e.stopPropagation())
-      .fold(noOp, () => setIsExpanded((value) => !value))
+  const handleClick = lazyBox<MouseEvent>((box) =>
+    box
+      .tap(preventDefault)
+      .tap(stopPropagation)
+      .fold(() => setIsExpanded((value) => !value)),
+  )
 
-  const handleContextMenu = (event: MouseEvent) =>
-    Either.of(event)
-      .tap((e) => e.preventDefault())
-      .tap((e) => e.stopPropagation())
-      .fold(noOp, ({ pageX, pageY }) =>
-        dispatch(showContextMenu({ x: pageX, y: pageY, target: directory })),
-      )
+  const handleContextMenu = lazyBox<MouseEvent>((box) =>
+    box
+      .tap(preventDefault)
+      .tap(stopPropagation)
+      .map(({ pageX, pageY }) => ({ x: pageX, y: pageY }))
+      .fold(({ x, y }) => dispatch(showContextMenu({ target: directory, x, y }))),
+  )
 
   return Either.fromNullable(directory).fold(Null, (directory) => (
     <ActionListItem

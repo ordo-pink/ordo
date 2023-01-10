@@ -9,16 +9,16 @@ type Props = {
 }
 
 export default function AllActivitiesActivity({ activity }: Props) {
-  const { t } = useTranslation()
-
   const activityName = getExtensionReadableName(activity)
   const activityRoute = getActivityRoute(activity)
   const Icon = activity.Icon
   const Component = activity.Component
 
-  const handleMouseOver = () => {
-    Component.preload()
-  }
+  const handleMouseOver = () => Component.preload()
+
+  const { t } = useTranslation()
+
+  const translatedActivityName = t(activityName)
 
   return (
     <Link
@@ -31,7 +31,7 @@ export default function AllActivitiesActivity({ activity }: Props) {
           <Icon />
         </div>
 
-        <div className="all-activities_activity_name">{t(activityName)}</div>
+        <div className="all-activities_activity_name">{translatedActivityName}</div>
       </div>
     </Link>
   )

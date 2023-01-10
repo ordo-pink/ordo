@@ -14,8 +14,12 @@ import { useAppDispatch } from "$core/state/hooks/use-app-dispatch"
 import { useAppSelector } from "$core/state/hooks/use-app-selector"
 import { OrdoCommand } from "$core/types"
 import { Either } from "$core/utils/either"
+import { preventDefault, stopPropagation } from "$core/utils/event"
+import { lazyBox } from "$core/utils/lazy-box"
 import { noOp } from "$core/utils/no-op"
 import { Switch } from "$core/utils/switch"
+
+import "$commands/command-palette/index.css"
 
 const fuse = new Fuse([] as SearchableCommand[], { keys: ["title"] })
 
@@ -34,20 +38,11 @@ export default function CommandPalette() {
 
   const { t } = useTranslation()
 
+  const [currentIndex, setCurrentIndex] = useState(0)
+  const [inputValue, setInputValue] = useState("")
   const [visibleCommands, setVisibleCommands] = useState(
     commands.filter((command) => command.showInCommandPalette),
   )
-  const [currentIndex, setCurrentIndex] = useState(0)
-  const [inputValue, setInputValue] = useState("")
-
-  const placeholder = t(`@ordo-command-command-palette/placeholder`)
-
-  useEffect(() => {
-    if (!isShown) showModal()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isShown])
-
-  const handleWrapperClick = (event: MouseEvent) => event.stopPropagation()
 
   useEffect(() => {
     const searchableCommands: SearchableCommand[] = commands
@@ -70,7 +65,7 @@ export default function CommandPalette() {
           title: t(command.title),
         }))
 
-      return setVisibleCommands(searchableCommands)
+      return void setVisibleCommands(searchableCommands)
     }
 
     const fusedCommands = fuse.search(inputValue)
@@ -79,71 +74,108 @@ export default function CommandPalette() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [inputValue, commands])
 
-  const hide = () => {
+  useEffect(() => {
+    if (!isShown) showModal()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isShown])
+
+  const handleEnter = lazyBox<KeyboardEvent<HTMLInputElement>>((box) =>
+    box
+      .tap(preventDefault)
+      .tap(stopPropagation)
+      .map(() => visibleCommands[currentIndex])
+      .map((maybeCommand) =>
+        Either.fromNullable(maybeCommand)
+          .map((command) => command.action)
+          .fold(noOp, (action) => action(actionContext)),
+      )
+      .fold(hideModal),
+  )
+
+  const handleArrowUp = lazyBox((box) =>
+    box
+      .map(() => currentIndex === 0)
+      // If it is the first item in the list, skip to the last item.
+      .map((isFirstItem) =>
+        Either.fromBoolean(isFirstItem).fold(
+          () => currentIndex - 1,
+          () => visibleCommands.length - 1,
+        ),
+      )
+      .fold(setCurrentIndex),
+  )
+
+  const handleArrowDown = lazyBox((box) =>
+    box
+      .map(() => currentIndex === visibleCommands.length - 1)
+      // If it is the last item in the list, skip to the first item.
+      .map((isLastItem) =>
+        Either.fromBoolean(isLastItem).fold(
+          () => currentIndex + 1,
+          () => 0,
+        ),
+      )
+      .fold(setCurrentIndex),
+  )
+
+  const handleClick = lazyBox<OrdoCommand<string>>((box) =>
+    box
+      .map((command) => command.action)
+      .map((action) => action(actionContext))
+      .fold(hideModal),
+  )
+
+  const handleHideModal = () => {
     setCurrentIndex(0)
     setInputValue("")
+
     dispatch(hideCommandPalette())
   }
 
-  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
-    setInputValue(e.target.value)
-    setCurrentIndex(0)
-  }
+  const handleModalClick = lazyBox<MouseEvent>((box) => box.tap(preventDefault))
 
-  const handleClick = (command: OrdoCommand<string>) => {
-    command.action(actionContext)
+  const handleChange = lazyBox<ChangeEvent<HTMLInputElement>>((box) =>
+    box
+      .map((e) => e.target)
+      .map((t) => t.value)
+      .map(setInputValue)
 
-    hideModal()
-  }
+      .map(() => 0)
+      .fold(setCurrentIndex),
+  )
 
-  const handleKeyDown = (event: KeyboardEvent) => {
+  const handleKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
     const handle = Switch.of(event.key)
-      .case("Escape", hide)
-      .case("Enter", () => {
-        event.preventDefault()
-        event.stopPropagation()
-
-        const currentCommand = visibleCommands[currentIndex]
-        currentCommand && currentCommand.action(actionContext)
-
-        hideModal()
-      })
-      .case("ArrowUp", () => {
-        // If it is the first item, skip to the last item.
-        const previousIndex = currentIndex === 0 ? visibleCommands.length - 1 : currentIndex - 1
-        setCurrentIndex(previousIndex)
-      })
-      .case("ArrowDown", () => {
-        // If it is the last item, skip to the first item.
-        const nextIndex = currentIndex === visibleCommands.length - 1 ? 0 : currentIndex + 1
-        setCurrentIndex(nextIndex)
-      })
+      .case("Escape", handleHideModal)
+      .case("Enter", () => handleEnter(event))
+      .case("ArrowUp", () => handleArrowUp(event))
+      .case("ArrowDown", () => handleArrowDown(event))
       .default(noOp)
 
     handle()
   }
 
+  const translatedPlaceholder = t(`@ordo-command-command-palette/placeholder`)
+
   return Either.fromBoolean(isShown).fold(Null, () => (
-    <Modal onHide={hide}>
-      <div className="h-full flex items-start justify-center">
+    <Modal onHide={handleHideModal}>
+      <div className="command-palette_overlay">
         <div
-          onClick={handleWrapperClick}
-          onKeyDown={() => void 0}
-          role="button"
-          tabIndex={-2}
-          className="bg-neutral-100 dark:bg-neutral-700 shadow-xl rounded-md w-full max-w-2xl p-8 flex flex-col space-y-4 items-center"
+          role="none"
+          className="command-palette_modal"
+          onClick={handleModalClick}
         >
           <input
-            className="w-full outline-none bg-white dark:bg-neutral-600 px-4 py-2"
+            className="command-palette_modal_input"
             autoFocus
             type="text"
-            placeholder={placeholder}
+            placeholder={translatedPlaceholder}
             value={inputValue}
             onChange={handleChange}
             onKeyDown={handleKeyDown}
           />
 
-          <div className="w-full">
+          <div className="command-palette_modal_command-container">
             {visibleCommands.map((command, index) => (
               <CommandPaletteItem
                 key={command.title}

@@ -2,10 +2,14 @@ import { useTranslation } from "react-i18next"
 
 import { useWorkspace } from "$containers/workspace/hooks/use-workspace"
 
-export default function ExtensionStore() {
-  const { t } = useTranslation()
+import "$activities/extension-store/index.css"
 
+export default function ExtensionStore() {
   const Workspace = useWorkspace()
 
-  return <Workspace>{t("@ordo-activity-extension-store/title")}</Workspace>
+  const { t } = useTranslation()
+
+  const translatedTitle = t("@ordo-activity-extension-store/title")
+
+  return <Workspace>{translatedTitle}</Workspace>
 }

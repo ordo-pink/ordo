@@ -1,0 +1,7 @@
+.path-breadcrumbs {
+  @apply self-start flex flex-wrap text-neutral-500 text-xs space-x-4;
+}
+
+.path-breadcrumbs-item {
+  @apply flex items-center shrink-0 space-x-2;
+}

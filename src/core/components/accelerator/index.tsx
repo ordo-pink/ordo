@@ -6,12 +6,14 @@ import Null from "$core/components/null"
 import { Either } from "$core/utils/either"
 import { Switch } from "$core/utils/switch"
 
+import "$core/components/accelerator/index.css"
+
 type Props = {
   accelerator?: string
 }
 
 export default function Accelerator({ accelerator }: Props) {
-  const isDarwin = navigator.appVersion.indexOf("Mac") != -1
+  const isDarwin = navigator.appVersion.indexOf("Mac") !== -1
 
   const [split, setSplit] = useState<string[]>([])
   const [alt, setAlt] = useState<string>("Alt")
@@ -49,7 +51,7 @@ export default function Accelerator({ accelerator }: Props) {
   }, [isDarwin])
 
   return Either.fromNullable(accelerator).fold(Null, () => (
-    <div className="shrink-0 flex items-center space-x-1 text-neutral-400 dark:text-neutral-300">
+    <div className="accelerator">
       {split.includes("alt") ? (
         <div className="">{alt} +</div> /* eslint-disable-line i18next/no-literal-string */
       ) : null}

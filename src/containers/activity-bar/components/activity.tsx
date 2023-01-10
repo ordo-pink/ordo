@@ -4,11 +4,11 @@ import { NavLink } from "react-router-dom"
 import { getActivityRoute, getExtensionReadableName } from "$core/extensions/utils"
 import { OrdoActivityExtension } from "$core/types"
 
-type Props = { activity: OrdoActivityExtension<string> }
+type Props = {
+  activity: OrdoActivityExtension<string>
+}
 
 export default function ActivityBarActivity({ activity }: Props) {
-  const { t } = useTranslation()
-
   const activityName = getExtensionReadableName(activity)
   const activityRoute = getActivityRoute(activity)
   const Icon = activity.Icon
@@ -18,9 +18,13 @@ export default function ActivityBarActivity({ activity }: Props) {
     Component.preload()
   }
 
+  const { t } = useTranslation()
+
+  const translatedTitle = t(activityName) ?? activityName
+
   return (
     <NavLink
-      title={t(activityName) as string}
+      title={translatedTitle}
       onMouseOver={handleMouseOver}
       className="activity-bar_activity"
       to={activityRoute}

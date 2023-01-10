@@ -7,11 +7,9 @@ export default createActivityExtension("user", {
   translations: {
     ru: {
       "@ordo-activity-user/title": "Личный кабинет",
-      "@ordo-activity-user/name": "Имя",
     },
     en: {
       "@ordo-activity-user/title": "Account",
-      "@ordo-activity-user/name": "Name",
     },
   },
 })

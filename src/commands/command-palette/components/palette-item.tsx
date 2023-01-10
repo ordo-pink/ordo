@@ -4,6 +4,8 @@ import { useTranslation } from "react-i18next"
 import Accelerator from "$core/components/accelerator"
 import ActionListItem from "$core/components/action-list/item"
 import { OrdoCommand, UnaryFn } from "$core/types"
+import { preventDefault, stopPropagation } from "$core/utils/event"
+import { lazyBox } from "$core/utils/lazy-box"
 import { noOp } from "$core/utils/no-op"
 
 type Props = {
@@ -15,19 +17,22 @@ type Props = {
 export default function CommandPaletteItem({ command, isCurrent, onClick = noOp }: Props) {
   const { t } = useTranslation()
 
-  const handleClick = (event: MouseEvent) => {
-    event.preventDefault()
-    event.stopPropagation()
+  const translatedCommandTitle = t(command.title)
 
-    onClick(command)
-  }
+  const handleClick = lazyBox<MouseEvent>((box) =>
+    box
+      .tap(preventDefault)
+      .tap(stopPropagation)
+      .map(() => command)
+      .fold(onClick),
+  )
 
   return (
     <ActionListItem
       onClick={handleClick}
       Icon={command.Icon}
       isCurrent={isCurrent}
-      text={t(command.title)}
+      text={translatedCommandTitle}
     >
       <Accelerator accelerator={command.accelerator} />
     </ActionListItem>

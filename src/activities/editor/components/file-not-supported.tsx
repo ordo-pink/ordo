@@ -4,21 +4,24 @@ import { Link } from "react-router-dom"
 import ExtensionStoreExtension from "$activities/extension-store"
 
 export default function FileNotSupported() {
-  const { t } = useTranslation()
-
   const extensionStorePath = ExtensionStoreExtension.paths
     ? `/${ExtensionStoreExtension.paths[0]}`
     : "/extension-store"
 
+  const { t } = useTranslation()
+
+  const translatedText = t("@ordo-activity-editor/unsupported-file")
+  const translatedLink = t("@ordo-activity-editor/search-for-extensions")
+
   return (
     <div className="editor_not-supported">
-      <div>{t("@ordo-activity-editor/unsupported-file")}</div>
+      <div>{translatedText}</div>
       <div>
         <Link
           className="editor_not-supported_link"
           to={extensionStorePath}
         >
-          {t("@ordo-activity-editor/search-for-extensions")}
+          {translatedLink}
         </Link>
       </div>
     </div>

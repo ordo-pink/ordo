@@ -1,30 +1,29 @@
-import { useEffect, useState } from "react"
+import { ChangeEvent, MouseEvent, useEffect, useState } from "react"
 import { useTranslation } from "react-i18next"
-import { AiFillFolder } from "react-icons/ai"
-import { BsChevronRight, BsFilePlus, BsFolderPlus } from "react-icons/bs"
+import { BsFileEarmarkPlus, BsFolderPlus } from "react-icons/bs"
 
+import CreateModalButtonGroup from "$commands/create-file-or-directory/components/create-modal-button-group"
 import { hideCreateModal } from "$commands/create-file-or-directory/store"
-import { CreateFileOrDirectoryState } from "$commands/create-file-or-directory/types"
+import { AppSelectorExtension } from "$commands/create-file-or-directory/types"
 
 import { useModal } from "$containers/app/hooks/use-modal"
-import { createdDirectory, createdFile } from "$containers/app/store"
 
-import { OrdoButtonPrimary, OrdoButtonSecondary } from "$core/components/buttons"
 import Null from "$core/components/null"
+import PathBreadcrumbs from "$core/components/path-breadcrumbs"
 import { OrdoFSEntity } from "$core/constants/ordo-fs-entity"
 import { useAppDispatch } from "$core/state/hooks/use-app-dispatch"
 import { useAppSelector } from "$core/state/hooks/use-app-selector"
 import { Nullable, OrdoDirectory } from "$core/types"
 import { Either } from "$core/utils/either"
+import { preventDefault, stopPropagation } from "$core/utils/event"
+import { lazyBox } from "$core/utils/lazy-box"
 
-type AppSelectorExtension = {
-  "ordo-command-create-file-or-directory": CreateFileOrDirectoryState
-}
+import "$commands/create-file-or-directory/index.css"
 
 export default function CreateModal() {
   const dispatch = useAppDispatch()
 
-  const root = useAppSelector((state) => state.app.personalProject)
+  const { showModal, Modal } = useModal()
 
   const isShown = useAppSelector<AppSelectorExtension, boolean>(
     (state) => state["ordo-command-create-file-or-directory"].isShown,
@@ -38,10 +37,6 @@ export default function CreateModal() {
     (state) => state["ordo-command-create-file-or-directory"].entityType,
   )
 
-  const { t } = useTranslation()
-
-  const { showModal, Modal } = useModal()
-
   const [newName, setNewName] = useState("")
 
   useEffect(() => {
@@ -49,80 +44,56 @@ export default function CreateModal() {
     // eslint-disable-next-line
   }, [isShown])
 
-  const Icon = type === "file" ? BsFilePlus : BsFolderPlus
+  const Icon = type === "file" ? BsFileEarmarkPlus : BsFolderPlus
 
-  const hide = () => {
-    setNewName("")
-    dispatch(hideCreateModal())
-  }
+  const handleHide = lazyBox((box) =>
+    box
+      .map(() => "")
+      .map(setNewName)
+      .fold(() => dispatch(hideCreateModal())),
+  )
+
+  const handleInputChange = lazyBox<ChangeEvent<HTMLInputElement>>((box) =>
+    box
+      .map((event) => event.target)
+      .map((target) => target.value)
+      .fold(setNewName),
+  )
+
+  const handleModalClick = lazyBox<MouseEvent>((box) =>
+    box.tap(stopPropagation).fold(preventDefault),
+  )
+
+  const { t } = useTranslation()
+
+  const translatedTitle = t(`@ordo-command-create-file-or-directory/create-${type}`)
+  const translatedPlaceholder = t(`@ordo-command-create-file-or-directory/placeholder`) ?? ""
 
   return Either.fromBoolean(isShown).fold(Null, () => (
-    <Modal onHide={hide}>
-      <div className="h-full flex items-center justify-center">
+    <Modal onHide={handleHide}>
+      <div className="create-file-or-directory-overlay">
         <div
-          onClick={(event) => event.stopPropagation()}
-          className="bg-neutral-100 dark:bg-neutral-700 shadow-xl rounded-md w-full max-w-lg p-8 flex flex-col space-y-4 items-center"
+          onClick={handleModalClick}
+          className="create-file-or-directory-modal"
           role="none"
         >
-          <div className="flex items-center space-x-4">
+          <div className="create-file-or-directory-modal_title">
             <Icon className="shrink-0" />
-            <div className="text-xl">
-              {t(`@ordo-command-create-file-or-directory/create-${type}`)}
-            </div>
+            <div>{translatedTitle}</div>
           </div>
-          <div className="self-start flex flex-wrap text-neutral-500 text-xs space-x-4">
-            {/* TODO: Extract to Breadcrumbs */}
-            {parent &&
-              parent.path &&
-              parent.path
-                .slice(1)
-                .split("/")
-                .map((chunk, index) => (
-                  <div
-                    key={`${chunk}-${index}`}
-                    className="flex items-center shrink-0 space-x-2"
-                  >
-                    <AiFillFolder />
-                    <div>{chunk ? chunk : "/"}</div>
-                    <BsChevronRight />
-                  </div>
-                ))}
-          </div>
+
+          {parent && <PathBreadcrumbs path={parent.path} />}
+
           <input
             type="text"
+            className="create-file-or-directory-modal_input"
             autoFocus
-            placeholder={t(`@ordo-command-create-file-or-directory/placeholder`) as string}
-            className="w-full outline-none border dark:border-0 border-neutral-400 rounded-lg bg-white dark:bg-neutral-600 px-4 py-2"
+            placeholder={translatedPlaceholder}
             value={newName}
-            onChange={(e) => setNewName(e.target.value)}
+            onChange={handleInputChange}
           />
-          <div className="w-full flex items-center justify-around">
-            <OrdoButtonSecondary
-              hotkey="escape"
-              onClick={() => dispatch(hideCreateModal())}
-            >
-              {t("@ordo-command-create-file-or-directory/button-cancel")}
-            </OrdoButtonSecondary>
 
-            <OrdoButtonPrimary
-              onClick={() => {
-                type === OrdoFSEntity.DIRECTORY
-                  ? dispatch(
-                      createdDirectory(
-                        `${parent ? parent.path : root ? root.path : ""}/${newName}`,
-                      ),
-                    )
-                  : dispatch(
-                      createdFile(`${parent ? parent.path : root ? root.path : ""}/${newName}`),
-                    )
-
-                dispatch(hideCreateModal())
-              }}
-              hotkey="enter"
-            >
-              {t("@ordo-command-create-file-or-directory/button-ok")}
-            </OrdoButtonPrimary>
-          </div>
+          <CreateModalButtonGroup newName={newName} />
         </div>
       </div>
     </Modal>

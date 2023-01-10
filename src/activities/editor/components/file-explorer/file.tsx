@@ -8,51 +8,56 @@ import ActionListItem from "$core/components/action-list/item"
 import { useAppDispatch } from "$core/state/hooks/use-app-dispatch"
 import { useAppSelector } from "$core/state/hooks/use-app-selector"
 import { OrdoFile } from "$core/types"
-import { Either } from "$core/utils/either"
-import { noOp } from "$core/utils/no-op"
+import { preventDefault, stopPropagation } from "$core/utils/event"
+import { lazyBox } from "$core/utils/lazy-box"
 
 type Props = {
   file: OrdoFile
 }
 
 export default function File({ file }: Props) {
+  const dispatch = useAppDispatch()
+
+  const fileAssociations = useAppSelector((state) => state.app.fileAssociationExtensions)
+
   const navigate = useNavigate()
   const [query] = useSearchParams()
-  const dispatch = useAppDispatch()
 
   const { showContextMenu } = useContextMenu()
 
+  const paddingLeft = `${file.depth * 10}px`
   const isCurrent = query.has("path") && query.get("path") === file.path
 
-  const fileAssociations = useAppSelector((state) => state.app.fileAssociationExtensions)
   const association = fileAssociations.find((assoc) =>
     assoc.fileExtensions.includes(file.extension),
   )
   const Icon = association && association.Icon ? association.Icon : BsFileEarmarkBinary
 
-  const paddingLeft = `${file.depth * 10}px`
-
-  const handleClick = (event: MouseEvent) =>
-    Either.of(event)
-      .tap((e) => e.preventDefault())
-      .tap((e) => e.stopPropagation())
-      .fold(noOp, () =>
-        navigate({
-          pathname: "/editor",
-          search: createSearchParams({
-            association: association ? association.name : "unsupported",
-            path: file.path,
-          }).toString(),
+  const handleClick = lazyBox<MouseEvent>((box) =>
+    box
+      .tap(preventDefault)
+      .tap(stopPropagation)
+      .map(() =>
+        createSearchParams({
+          association: association ? association.name : "unsupported",
+          path: file.path,
         }),
       )
+      .fold((searchParams) =>
+        navigate({
+          pathname: "/editor",
+          search: searchParams.toString(),
+        }),
+      ),
+  )
 
-  const handleContextMenu = (event: MouseEvent) =>
-    Either.of(event)
-      .tap((e) => e.preventDefault())
-      .tap((e) => e.stopPropagation())
-      .fold(noOp, ({ pageX, pageY }) =>
-        dispatch(showContextMenu({ x: pageX, y: pageY, target: file })),
-      )
+  const handleContextMenu = lazyBox<MouseEvent>((box) =>
+    box
+      .tap(preventDefault)
+      .tap(stopPropagation)
+      .map(({ pageX, pageY }) => ({ x: pageX, y: pageY }))
+      .fold(({ x, y }) => dispatch(showContextMenu({ target: file, x, y }))),
+  )
 
   return (
     <ActionListItem

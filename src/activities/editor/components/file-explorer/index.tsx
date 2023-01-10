@@ -1,5 +1,4 @@
 import { MouseEvent } from "react"
-import { BsFilePlus, BsFolderPlus } from "react-icons/bs"
 
 import FileOrDirectory from "$activities/editor/components/file-explorer/file-or-directory"
 
@@ -11,7 +10,8 @@ import { useActionContext } from "$core/hooks/use-action-context"
 import { useAppDispatch } from "$core/state/hooks/use-app-dispatch"
 import { useAppSelector } from "$core/state/hooks/use-app-selector"
 import { Either } from "$core/utils/either"
-import { noOp } from "$core/utils/no-op"
+import { preventDefault, stopPropagation } from "$core/utils/event"
+import { lazyBox } from "$core/utils/lazy-box"
 
 export default function FileExplorer() {
   const dispatch = useAppDispatch()
@@ -19,25 +19,37 @@ export default function FileExplorer() {
   const directory = useAppSelector((state) => state.app.personalProject)
   const commands = useAppSelector((state) => state.app.commands)
 
+  const { showContextMenu } = useContextMenu()
+
   const actionContext = useActionContext(directory)
 
   const createFileCommand = commands.find(
     (command) => command.title === "@ordo-command-create-file-or-directory/create-file",
   )
-
   const createDirectoryCommand = commands.find(
     (command) => command.title === "@ordo-command-create-file-or-directory/create-directory",
   )
 
-  const { showContextMenu } = useContextMenu()
+  const CreateFileIcon = createFileCommand ? createFileCommand.Icon : () => null
+  const CreateDirectoryIcon = createDirectoryCommand ? createDirectoryCommand.Icon : () => null
 
-  const handleContextMenu = (event: MouseEvent) =>
-    Either.of(event)
-      .tap((event) => event.preventDefault())
-      .tap((event) => event.stopPropagation())
-      .fold(noOp, ({ pageX, pageY }) =>
-        dispatch(showContextMenu({ target: directory, x: pageX, y: pageY })),
-      )
+  const handleContextMenu = lazyBox<MouseEvent>((box) =>
+    box
+      .tap(preventDefault)
+      .tap(stopPropagation)
+      .map(({ pageX, pageY }) => ({ x: pageX, y: pageY }))
+      .fold(({ x, y }) => dispatch(showContextMenu({ target: directory, x, y }))),
+  )
+
+  const handleCreateFileClick = lazyBox((box) =>
+    box.map(() => actionContext).fold((ctx) => createFileCommand && createFileCommand.action(ctx)),
+  )
+
+  const handleCreateDirectoryClick = lazyBox((box) =>
+    box
+      .map(() => actionContext)
+      .fold((ctx) => createDirectoryCommand && createDirectoryCommand.action(ctx)),
+  )
 
   return Either.fromNullable(directory).fold(Null, (rootDirectory) => (
     <div
@@ -54,18 +66,14 @@ export default function FileExplorer() {
       </div>
 
       <div className="file-explorer_action-group">
-        <OrdoButtonNeutral
-          onClick={() => createFileCommand && createFileCommand.action(actionContext)}
-        >
-          <div className="flex items-center md:space-x-2">
-            <BsFilePlus />
+        <OrdoButtonNeutral onClick={handleCreateFileClick}>
+          <div>
+            <CreateFileIcon />
           </div>
         </OrdoButtonNeutral>
-        <OrdoButtonNeutral
-          onClick={() => createDirectoryCommand && createDirectoryCommand.action(actionContext)}
-        >
-          <div className="flex items-center md:space-x-2">
-            <BsFolderPlus />
+        <OrdoButtonNeutral onClick={handleCreateDirectoryClick}>
+          <div>
+            <CreateDirectoryIcon />
           </div>
         </OrdoButtonNeutral>
       </div>

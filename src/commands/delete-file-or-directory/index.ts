@@ -25,7 +25,7 @@ export default createCommandExtension("delete-file-or-directory", {
       Icon: () => import("$commands/delete-file-or-directory/components/delete-directory-icon"),
       title: "@ordo-command-delete-file-or-directory/delete-directory",
       showInCommandPalette: false,
-      showInContextMenu: isDirectory,
+      showInContextMenu: (target) => isDirectory(target) && target.path !== "/",
       action: ({ dispatch, contextMenuTarget }) => {
         if (!contextMenuTarget || !isDirectory(contextMenuTarget)) return
 
@@ -37,18 +37,20 @@ export default createCommandExtension("delete-file-or-directory", {
   translations: {
     ru: {
       "@ordo-command-delete-file-or-directory/readable-name": "Удаление файлов и папок",
-      "@ordo-command-delete-file-or-directory/delete-file": "Удалить файл?",
-      "@ordo-command-delete-file-or-directory/delete-directory": "Удалить папку?",
-      "@ordo-command-delete-file-or-directory/placeholder": "Название",
+      "@ordo-command-delete-file-or-directory/delete-file": "Удалить файл",
+      "@ordo-command-delete-file-or-directory/delete-directory": "Удалить папку",
+      "@ordo-command-delete-file-or-directory/delete-confirmation":
+        "Вы уверены, что хотите удалить {{path}}?",
       "@ordo-command-delete-file-or-directory/button-ok": "Удалить",
       "@ordo-command-delete-file-or-directory/button-cancel": "Отмена",
       "@ordo-command-delete-file-or-directory/description": "TODO",
     },
     en: {
       "@ordo-command-delete-file-or-directory/readable-name": "Delete file or directory",
-      "@ordo-command-delete-file-or-directory/delete-file": "Delete file?",
-      "@ordo-command-delete-file-or-directory/delete-directory": "Delete directory?",
-      "@ordo-command-delete-file-or-directory/placeholder": "Name",
+      "@ordo-command-delete-file-or-directory/delete-file": "Delete file",
+      "@ordo-command-delete-file-or-directory/delete-directory": "Delete directory",
+      "@ordo-command-delete-file-or-directory/delete-confirmation":
+        "Are you sure you want to remove {{path}}?",
       "@ordo-command-delete-file-or-directory/button-ok": "Delete",
       "@ordo-command-delete-file-or-directory/button-cancel": "Cancel",
       "@ordo-command-delete-file-or-directory/description": "TODO",

@@ -7,11 +7,7 @@
 }
 
 .delete-file-or-directory-modal_title {
-  @apply flex items-center space-x-4 text-xl;
-}
-
-.delete-file-or-directory-modal_input {
-  @apply w-full outline-none border dark:border-0 border-neutral-400 rounded-lg bg-white dark:bg-neutral-600 px-4 py-2;
+  @apply flex flex-col items-center space-y-4;
 }
 
 .delete-file-or-directory-modal_button-group {

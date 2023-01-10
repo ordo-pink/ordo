@@ -6,13 +6,12 @@ import { AppSelectorExtension } from "$commands/delete-file-or-directory/types"
 import { removedFile, removedDirectory } from "$containers/app/store"
 
 import { OrdoButtonSecondary, OrdoButtonPrimary } from "$core/components/buttons"
-import { OrdoFSEntity } from "$core/constants/ordo-fs-entity"
+import { isDirectory } from "$core/guards/is-directory"
 import { useAppDispatch } from "$core/state/hooks/use-app-dispatch"
 import { useAppSelector } from "$core/state/hooks/use-app-selector"
 import { Nullable, OrdoDirectory, OrdoFile } from "$core/types"
 import { Either } from "$core/utils/either"
 import { lazyBox } from "$core/utils/lazy-box"
-import { isDirectory } from "$core/guards/is-directory"
 
 type Props = {
   path: string

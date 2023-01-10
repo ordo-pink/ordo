@@ -50,7 +50,9 @@ export default function CreateModal() {
 
   const { t } = useTranslation()
 
-  const translatedTitle = t(`@ordo-command-delete-file-or-directory/delete-${type}`)
+  const translatedTitle = t(`@ordo-command-delete-file-or-directory/delete-confirmation`, {
+    path: target?.path,
+  })
 
   return Either.fromBoolean(isShown)
     .chain(() => Either.fromNullable(target))
@@ -63,7 +65,7 @@ export default function CreateModal() {
             role="none"
           >
             <div className="delete-file-or-directory-modal_title">
-              <Icon className="shrink-0" />
+              <Icon className="text-5xl shrink-0" />
               <div>{translatedTitle}</div>
             </div>
 

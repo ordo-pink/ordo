@@ -1,4 +1,4 @@
-import { isDirectory } from "$core/guards/is-directory"
+import { isOrdoDirectory } from "$core/guards/is-fs-entity"
 import { Nullable, OrdoDirectory, OrdoFile } from "$core/types"
 
 // TODO: Move elsewhere
@@ -17,7 +17,7 @@ export const findParent = (
   for (const chunk of parentPathChunks) {
     const found = parent.children.find((child) => child.path === `${parent.path}/${chunk}`)
 
-    if (!found || !isDirectory(found)) return null
+    if (!found || !isOrdoDirectory(found)) return null
 
     parent = found
   }
@@ -37,7 +37,7 @@ export const findOrdoFile = (
 
   const found = parent?.children.find((child) => child.path === path)
 
-  if (!found || isDirectory(found)) return null
+  if (!found || isOrdoDirectory(found)) return null
 
   return found
 }

@@ -5,7 +5,7 @@ import {
 } from "$commands/delete-file-or-directory/store"
 
 import { createCommandExtension } from "$core/extensions/create-command-extension"
-import { isDirectory } from "$core/guards/is-directory"
+import { isOrdoDirectory, isOrdoFile } from "$core/guards/is-fs-entity"
 
 export default createCommandExtension("delete-file-or-directory", {
   commands: [
@@ -14,9 +14,9 @@ export default createCommandExtension("delete-file-or-directory", {
       title: "@ordo-command-delete-file-or-directory/delete-file",
       accelerator: "alt+backspace",
       showInCommandPalette: false,
-      showInContextMenu: (target) => !isDirectory(target),
+      showInContextMenu: isOrdoFile,
       action: ({ dispatch, contextMenuTarget }) => {
-        if (!contextMenuTarget || isDirectory(contextMenuTarget)) return
+        if (!contextMenuTarget || isOrdoDirectory(contextMenuTarget)) return
 
         dispatch(showDeleteFileModal(contextMenuTarget))
       },
@@ -25,9 +25,9 @@ export default createCommandExtension("delete-file-or-directory", {
       Icon: () => import("$commands/delete-file-or-directory/components/delete-directory-icon"),
       title: "@ordo-command-delete-file-or-directory/delete-directory",
       showInCommandPalette: false,
-      showInContextMenu: (target) => isDirectory(target) && target.path !== "/",
+      showInContextMenu: (target) => isOrdoDirectory(target) && target.path !== "/",
       action: ({ dispatch, contextMenuTarget }) => {
-        if (!contextMenuTarget || !isDirectory(contextMenuTarget)) return
+        if (!contextMenuTarget || !isOrdoDirectory(contextMenuTarget)) return
 
         dispatch(showDeleteDirectoryModal(contextMenuTarget))
       },

@@ -6,7 +6,7 @@ import { AppSelectorExtension } from "$commands/delete-file-or-directory/types"
 import { removedFile, removedDirectory } from "$containers/app/store"
 
 import { OrdoButtonSecondary, OrdoButtonPrimary } from "$core/components/buttons"
-import { isDirectory } from "$core/guards/is-directory"
+import { isOrdoDirectory } from "$core/guards/is-fs-entity"
 import { useAppDispatch } from "$core/state/hooks/use-app-dispatch"
 import { useAppSelector } from "$core/state/hooks/use-app-selector"
 import { Nullable, OrdoDirectory, OrdoFile } from "$core/types"
@@ -28,7 +28,7 @@ export default function DeleteModalButtonGroup({ path }: Props) {
 
   const handleOkButtonClick = lazyBox((box) =>
     box
-      .map(() => isDirectory(target))
+      .map(() => isOrdoDirectory(target))
       .map((isDire) =>
         Either.fromBoolean(isDire).fold(
           () => removedFile,

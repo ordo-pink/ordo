@@ -5,7 +5,7 @@ import {
 } from "$commands/create-file-or-directory/store"
 
 import { createCommandExtension } from "$core/extensions/create-command-extension"
-import { isDirectory } from "$core/guards/is-directory"
+import { isOrdoDirectory } from "$core/guards/is-fs-entity"
 
 export default createCommandExtension("create-file-or-directory", {
   commands: [
@@ -14,11 +14,11 @@ export default createCommandExtension("create-file-or-directory", {
       title: "@ordo-command-create-file-or-directory/create-file",
       accelerator: "alt+n",
       showInCommandPalette: true,
-      showInContextMenu: isDirectory,
+      showInContextMenu: isOrdoDirectory,
       action: ({ dispatch, contextMenuTarget, state }) => {
         dispatch(
           showCreateFileModal(
-            contextMenuTarget && isDirectory(contextMenuTarget)
+            contextMenuTarget && isOrdoDirectory(contextMenuTarget)
               ? contextMenuTarget
               : state.personalProject,
           ),
@@ -30,11 +30,11 @@ export default createCommandExtension("create-file-or-directory", {
       title: "@ordo-command-create-file-or-directory/create-directory",
       accelerator: "alt+shift+n",
       showInCommandPalette: true,
-      showInContextMenu: isDirectory,
+      showInContextMenu: isOrdoDirectory,
       action: ({ dispatch, contextMenuTarget, state }) => {
         dispatch(
           showCreateDirectoryModal(
-            contextMenuTarget && isDirectory(contextMenuTarget)
+            contextMenuTarget && isOrdoDirectory(contextMenuTarget)
               ? contextMenuTarget
               : state.personalProject,
           ),

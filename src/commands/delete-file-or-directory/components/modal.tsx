@@ -10,7 +10,7 @@ import { useModal } from "$containers/app/hooks/use-modal"
 
 import Null from "$core/components/null"
 import { OrdoFSEntity } from "$core/constants/ordo-fs-entity"
-import { isDirectory } from "$core/guards/is-directory"
+import { isOrdoDirectory } from "$core/guards/is-fs-entity"
 import { useAppDispatch } from "$core/state/hooks/use-app-dispatch"
 import { useAppSelector } from "$core/state/hooks/use-app-selector"
 import { Nullable, OrdoDirectory, OrdoFile } from "$core/types"
@@ -38,7 +38,7 @@ export default function CreateModal() {
     // eslint-disable-next-line
   }, [isShown])
 
-  const type = isDirectory(target) ? OrdoFSEntity.DIRECTORY : OrdoFSEntity.FILE
+  const type = isOrdoDirectory(target) ? OrdoFSEntity.DIRECTORY : OrdoFSEntity.FILE
 
   const Icon = type === "file" ? BsFileEarmarkX : BsFolderX
 

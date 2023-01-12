@@ -1,7 +1,9 @@
-import { FSDriver } from "$core/types"
+import { DirectoryPath, FSDriver } from "$core/types"
 
-export const fsDriver: FSDriver = {
-  createDirectory: () => void 0 as any,
+import { createDirectory } from "$fs/driver/methods/create-directory"
+
+export const createFsServer = (directory: DirectoryPath): FSDriver => ({
+  createDirectory: createDirectory(directory),
   createFile: () => void 0 as any,
   getDirectory: () => void 0 as any,
   getFile: () => void 0 as any,
@@ -10,4 +12,4 @@ export const fsDriver: FSDriver = {
   removeDirectory: () => void 0 as any,
   removeFile: () => void 0 as any,
   updateFile: () => void 0 as any,
-}
+})

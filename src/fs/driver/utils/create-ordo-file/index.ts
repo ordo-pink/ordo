@@ -1,11 +1,11 @@
-import type { FilePath, OrdoFile } from "$core/types"
+import type { OrdoFilePath, OrdoFile } from "$core/types"
 
 import { getDepth } from "$fs/driver/utils/get-depth"
 import { getFileExtension } from "$fs/driver/utils/get-file-extension"
 import { getReadableFileName } from "$fs/driver/utils/get-readable-name"
 
 type Props<Metadata extends Record<string, unknown> = Record<string, unknown>> = {
-  path: FilePath
+  path: OrdoFilePath
   createdAt?: Date
   updatedAt?: Date
   accessedAt?: Date

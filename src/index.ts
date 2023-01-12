@@ -1,21 +1,17 @@
 import "module-alias/register"
 
-import { resolve } from "path"
+import { join } from "path"
 
 import { createOrdoBackendServer } from "./app"
-import { DirectoryPath } from "$core/types"
+import { OrdoDirectoryPath } from "$core/types"
 import { createFsServer } from "$fs/driver"
 
 const PORT = process.env.ORDO_BACKEND_UNIVERSAL_PORT ?? 1337
-const DIRECTORY = process.env.ORDO_BACKEND_UNIVERSAL_DIRECTORY ?? resolve("./files")
-
-if (!DIRECTORY.startsWith("/")) {
-  throw new Error("ORDO_BACKEND_UNIVERSAL_DIRECTORY must have absolute path.")
-}
+const DIRECTORY = process.env.ORDO_BACKEND_UNIVERSAL_DIRECTORY ?? join(__dirname, "files")
 
 const dir = DIRECTORY.endsWith("/") ? DIRECTORY : `${DIRECTORY}/`
 
-const fsDriver = createFsServer(dir as DirectoryPath)
+const fsDriver = createFsServer(dir as OrdoDirectoryPath)
 
 const server = createOrdoBackendServer({ fsDriver })
 

@@ -2,14 +2,14 @@ import { promises } from "fs"
 import { join } from "path"
 
 import { Either } from "$core/either"
-import { DirectoryPath, FSDriver, OrdoDirectory } from "$core/types"
+import { OrdoDirectoryPath, FSDriver, OrdoDirectory } from "$core/types"
 
 import { Exception } from "$fs/constants"
 import { getParentPath } from "$fs/driver/utils/get-parent-path"
 import { listDirectory } from "$fs/driver/utils/list-directory"
 
 export const createDirectory =
-  (directory: DirectoryPath): FSDriver["createDirectory"] =>
+  (directory: OrdoDirectoryPath): FSDriver["createDirectory"] =>
   async (path) => {
     const absolutePath = join(directory, path)
 
@@ -28,7 +28,7 @@ export const createDirectory =
         relativeRecursiveCreationStartPath = `${relativeRecursiveCreationStartPath}/`
       }
 
-      const parentPath = getParentPath(relativeRecursiveCreationStartPath as DirectoryPath)
+      const parentPath = getParentPath(relativeRecursiveCreationStartPath as OrdoDirectoryPath)
 
       const listedDirectory = (await listDirectory(parentPath, directory)) as OrdoDirectory
 

@@ -1,6 +1,6 @@
-import { FileExtension, FilePath } from "$core/types"
+import { OrdoFileExtension, OrdoFilePath } from "$core/types"
 
-export const getFileExtension = (path: FilePath): FileExtension => {
+export const getFileExtension = (path: OrdoFilePath): OrdoFileExtension => {
   const fileName = path.split("/").reverse()[0] as string
 
   const lastDotPosition = fileName.lastIndexOf(".")
@@ -9,5 +9,5 @@ export const getFileExtension = (path: FilePath): FileExtension => {
     return ""
   }
 
-  return fileName.substring(lastDotPosition) as FileExtension
+  return fileName.substring(lastDotPosition) as OrdoFileExtension
 }

@@ -1,36 +1,35 @@
-import type { Request, Response } from "express"
-
+import type { Readable } from "stream"
 import type { RequestHandler } from "express"
 
 import type { IEither } from "$core/either"
 
 import type { Exception } from "$fs/constants"
 
-export type FileExtension = `.${string}` | ""
-export type FilePath = `/${string}`
-export type DirectoryPath = `/${string}/`
+export type OrdoFileExtension = `.${string}` | ""
+export type OrdoFilePath = `/${string}`
+export type OrdoDirectoryPath = `/${string}/`
 
 export type FSDriver = {
-  createDirectory: UnaryFn<DirectoryPath, Promise<IEither<OrdoDirectory, Exception.CONFLICT>>>
-  getDirectory: UnaryFn<DirectoryPath, Promise<IEither<OrdoDirectory, Exception.NOT_FOUND>>>
+  createDirectory: UnaryFn<OrdoDirectoryPath, Promise<IEither<OrdoDirectory, Exception.CONFLICT>>>
+  getDirectory: UnaryFn<OrdoDirectoryPath, Promise<IEither<OrdoDirectory, Exception.NOT_FOUND>>>
   moveDirectory: BinaryFn<
-    DirectoryPath,
-    DirectoryPath,
+    OrdoDirectoryPath,
+    OrdoDirectoryPath,
     Promise<IEither<OrdoDirectory, Exception.NOT_FOUND | Exception.CONFLICT>>
   >
-  removeDirectory: UnaryFn<DirectoryPath, Promise<IEither<OrdoDirectory, Exception.NOT_FOUND>>>
+  removeDirectory: UnaryFn<OrdoDirectoryPath, Promise<IEither<OrdoDirectory, Exception.NOT_FOUND>>>
 
   createFile:
-    | UnaryFn<FilePath, Promise<IEither<OrdoFile, Exception.CONFLICT>>>
-    | BinaryFn<FilePath, string, Promise<IEither<OrdoFile, Exception.CONFLICT>>>
-  getFile: UnaryFn<FilePath, Promise<IEither<OrdoFile, Exception.NOT_FOUND>>>
-  updateFile: BinaryFn<FilePath, string, Promise<IEither<OrdoFile, Exception.NOT_FOUND>>>
+    | UnaryFn<OrdoFilePath, Promise<IEither<OrdoFile, Exception.CONFLICT>>>
+    | BinaryFn<OrdoFilePath, Readable, Promise<IEither<OrdoFile, Exception.CONFLICT>>>
+  getFile: UnaryFn<OrdoFilePath, Promise<IEither<Readable, Exception.NOT_FOUND>>>
+  updateFile: BinaryFn<OrdoFilePath, Readable, Promise<IEither<OrdoFile, Exception.NOT_FOUND>>>
   moveFile: BinaryFn<
-    FilePath,
-    FilePath,
+    OrdoFilePath,
+    OrdoFilePath,
     Promise<IEither<OrdoFile, Exception.NOT_FOUND | Exception.CONFLICT>>
   >
-  removeFile: UnaryFn<FilePath, Promise<IEither<OrdoFile, Exception.NOT_FOUND>>>
+  removeFile: UnaryFn<OrdoFilePath, Promise<IEither<OrdoFile, Exception.NOT_FOUND>>>
 }
 
 export type FsRequestHandler<T = Record<string, unknown>> = UnaryFn<FSDriver, RequestHandler<T>>
@@ -47,9 +46,9 @@ export type TernaryFn<Arg1, Arg2, Arg3, Result> = (arg1: Arg1, arg2: Arg2, arg3:
 export type Unpack<T> = T extends Array<infer U> ? U : T
 
 export type OrdoFile<Metadata extends Record<string, unknown> = Record<string, unknown>> = {
-  path: FilePath
+  path: OrdoFilePath
   readableName: string
-  extension: FileExtension
+  extension: OrdoFileExtension
   createdAt: Date
   updatedAt: Date
   accessedAt: Date
@@ -59,7 +58,7 @@ export type OrdoFile<Metadata extends Record<string, unknown> = Record<string, u
 }
 
 export type OrdoDirectory<Metadata extends Record<string, unknown> = Record<string, unknown>> = {
-  path: DirectoryPath
+  path: OrdoDirectoryPath
   readableName: string
   createdAt: Date
   updatedAt: Date
@@ -68,8 +67,6 @@ export type OrdoDirectory<Metadata extends Record<string, unknown> = Record<stri
   children: Array<OrdoFile | OrdoDirectory>
   metadata: Metadata
 }
-
-export type OrdoMiddleware = BinaryFn<Request, Response, void | PromiseLike<void>>
 
 export type Drivers = {
   fsDriver: FSDriver

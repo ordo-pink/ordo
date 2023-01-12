@@ -1,7 +1,7 @@
-import { FilePath } from "$core/types"
+import { OrdoFilePath } from "$core/types"
 import { getFileExtension } from "$fs/driver/utils/get-file-extension"
 
-export const getReadableFileName = (path: FilePath): string => {
+export const getReadableFileName = (path: OrdoFilePath): string => {
   const lastSeparatorPosition = path.lastIndexOf("/") + 1
   const readableName = path.slice(lastSeparatorPosition)
   const extension = getFileExtension(path)

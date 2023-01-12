@@ -1,10 +1,20 @@
-import type { FilePath, FsRequestHandler } from "$core/types"
+import type { OrdoFilePath, FsRequestHandler } from "$core/types"
 
-export const removeFile: FsRequestHandler<{ path: FilePath }> =
+import { PATH_PARAM } from "$fs/constants"
+
+type Params = {
+  [PATH_PARAM]: OrdoFilePath
+}
+
+export const removeFileHandler: FsRequestHandler<Params> =
   ({ removeFile }) =>
   async (req, res) => {
-    // TODO
-    await removeFile(req.params.path)
+    const path = req.params[PATH_PARAM]
 
-    res.status(501).send()
+    const eitherFile = await removeFile(path)
+
+    eitherFile.fold(
+      () => res.status(404).send(),
+      (file) => res.status(200).json(file),
+    )
   }

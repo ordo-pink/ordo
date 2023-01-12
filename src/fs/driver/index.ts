@@ -1,8 +1,8 @@
-import { DirectoryPath, FSDriver } from "$core/types"
+import { OrdoDirectoryPath, FSDriver } from "$core/types"
 
 import { createDirectory } from "$fs/driver/methods/create-directory"
 
-export const createFsServer = (directory: DirectoryPath): FSDriver => ({
+export const createFsServer = (directory: OrdoDirectoryPath): FSDriver => ({
   createDirectory: createDirectory(directory),
   createFile: () => void 0 as any,
   getDirectory: () => void 0 as any,

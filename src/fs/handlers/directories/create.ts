@@ -1,13 +1,20 @@
-import { DirectoryPath, FsRequestHandler } from "$core/types"
+import { OrdoDirectoryPath, FsRequestHandler } from "$core/types"
 
-export const createDirectory: FsRequestHandler<{ path: DirectoryPath }> =
-  ({ createFile }) =>
+import { PATH_PARAM } from "$fs/constants"
+
+type Params = {
+  [PATH_PARAM]: OrdoDirectoryPath
+}
+
+export const createDirectoryHandler: FsRequestHandler<Params> =
+  ({ createDirectory }) =>
   async (req, res) => {
-    const path = req.params.path
-    const body = req.body ?? ""
+    const path = req.params[PATH_PARAM]
 
-    await createFile(path as DirectoryPath, body)
+    const eitherDirectory = await createDirectory(path as OrdoDirectoryPath)
 
-    // TODO
-    res.status(501).send()
+    eitherDirectory.fold(
+      () => res.status(409).send(),
+      (directory) => res.status(201).json(directory),
+    )
   }

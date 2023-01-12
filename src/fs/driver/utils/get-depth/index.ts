@@ -1,4 +1,4 @@
-import { DirectoryPath, FilePath } from "$core/types"
+import { OrdoDirectoryPath, OrdoFilePath } from "$core/types"
 
-export const getDepth = (path: FilePath | DirectoryPath): number =>
+export const getDepth = (path: OrdoFilePath | OrdoDirectoryPath): number =>
   path.split("/").filter(Boolean).length

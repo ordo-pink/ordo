@@ -1,4 +1,5 @@
 import type { FSDriver } from "$core/types"
+
 import {
   OLD_PATH_PARAM,
   NEW_PATH_PARAM,
@@ -10,15 +11,14 @@ import {
 
 import { Router } from "express"
 
-import { createDirectory } from "$fs/handlers/directories/create"
-import { getDirectory } from "$fs/handlers/directories/get"
-import { moveDirectory } from "$fs/handlers/directories/move"
-import { removeDirectory } from "$fs/handlers/directories/remove"
-import { createFile } from "$fs/handlers/files/create"
-import { getFile } from "$fs/handlers/files/get"
-import { removeFile } from "$fs/handlers/files/remove"
-import { updateFile } from "$fs/handlers/files/update"
-
+import { createDirectoryHandler } from "$fs/handlers/directories/create"
+import { getDirectoryHandler } from "$fs/handlers/directories/get"
+import { moveDirectoryHandler } from "$fs/handlers/directories/move"
+import { removeDirectoryHandler } from "$fs/handlers/directories/remove"
+import { createFileHandler } from "$fs/handlers/files/create"
+import { getFileHandler } from "$fs/handlers/files/get"
+import { removeFileHandler } from "$fs/handlers/files/remove"
+import { updateFileHandler } from "$fs/handlers/files/update"
 import { extractDynamicParam } from "$fs/middleware/extract-dynamic-param"
 import { validateDirectoryPath, validateFilePath } from "$fs/middleware/validate-path"
 
@@ -26,55 +26,69 @@ const filesRouter = (driver: FSDriver) =>
   Router()
     .post(
       `/:${PATH_PARAM}*`,
+
       extractDynamicParam([PATH_PARAM]),
       validateFilePath,
-      createFile(driver),
+      createFileHandler(driver),
     )
-    .get(`/:${PATH_PARAM}*`, extractDynamicParam([PATH_PARAM]), validateFilePath, getFile(driver))
+    .get(
+      `/:${PATH_PARAM}*`,
+
+      extractDynamicParam([PATH_PARAM]),
+      validateFilePath,
+      getFileHandler(driver),
+    )
     .put(
       `/:${PATH_PARAM}*`,
+
       extractDynamicParam([PATH_PARAM]),
       validateFilePath,
-      updateFile(driver),
+      updateFileHandler(driver),
     )
     .patch(
       `/:${OLD_PATH_PARAM}*${PATH_SEPARATOR}/:${NEW_PATH_PARAM}*`,
+
       extractDynamicParam([OLD_PATH_PARAM, NEW_PATH_PARAM]),
       validateFilePath,
-      moveDirectory(driver),
+      moveDirectoryHandler(driver),
     )
     .delete(
       `/:${PATH_PARAM}*`,
+
       extractDynamicParam([PATH_PARAM]),
       validateFilePath,
-      removeFile(driver),
+      removeFileHandler(driver),
     )
 
 const directoriesRouter = (driver: FSDriver) =>
   Router()
     .post(
       `/:${PATH_PARAM}*`,
+
       extractDynamicParam([PATH_PARAM]),
       validateDirectoryPath,
-      createDirectory(driver),
+      createDirectoryHandler(driver),
     )
     .get(
       `/:${PATH_PARAM}*`,
+
       extractDynamicParam([PATH_PARAM]),
       validateDirectoryPath,
-      getDirectory(driver),
+      getDirectoryHandler(driver),
     )
     .patch(
       `/:${OLD_PATH_PARAM}*${PATH_SEPARATOR}/:${NEW_PATH_PARAM}*`,
+
       extractDynamicParam([OLD_PATH_PARAM, NEW_PATH_PARAM]),
       validateDirectoryPath,
-      moveDirectory(driver),
+      moveDirectoryHandler(driver),
     )
     .delete(
       `/:${PATH_PARAM}*`,
+
       extractDynamicParam([PATH_PARAM]),
       validateDirectoryPath,
-      removeDirectory(driver),
+      removeDirectoryHandler(driver),
     )
 
 export default (driver: FSDriver) =>

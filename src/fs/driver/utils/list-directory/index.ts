@@ -1,7 +1,7 @@
 import { promises } from "fs"
 import { join } from "path"
 
-import type { DirectoryPath, FilePath, Nullable, OrdoDirectory } from "$core/types"
+import type { OrdoDirectoryPath, OrdoFilePath, Nullable, OrdoDirectory } from "$core/types"
 import { createOrdoDirectory } from "$fs/driver/utils/create-ordo-directory"
 import { createOrdoFile } from "$fs/driver/utils/create-ordo-file"
 import { sortOrdoDirectory } from "$fs/driver/utils/sort-ordo-directory"
@@ -12,8 +12,8 @@ import { sortOrdoDirectory } from "$fs/driver/utils/sort-ordo-directory"
  * @param {string?} rootPath
  */
 export const listDirectory = async (
-  path: DirectoryPath,
-  dir: DirectoryPath,
+  path: OrdoDirectoryPath,
+  dir: OrdoDirectoryPath,
   depth = 0,
   rootPath = path,
 ): Promise<Nullable<OrdoDirectory>> => {
@@ -48,7 +48,7 @@ export const listDirectory = async (
       }
 
       const listedDirectory = await listDirectory(
-        itemPath as DirectoryPath,
+        itemPath as OrdoDirectoryPath,
         dir,
         depth + 1,
         rootPath,
@@ -65,7 +65,7 @@ export const listDirectory = async (
       }
 
       const ordoFile = createOrdoFile({
-        path: itemPath as FilePath,
+        path: itemPath as OrdoFilePath,
         depth: depth + 1,
         createdAt: stat.birthtime,
         updatedAt: stat.mtime,

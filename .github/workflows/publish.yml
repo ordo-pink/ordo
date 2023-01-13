@@ -1,4 +1,4 @@
-name: Publish Package
+name: publish
 on:
   release:
     types: [released]
@@ -10,8 +10,6 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: 16
-      - name: Set env
-        run: echo "RELEASE_VERSION=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
       - name: Configure npm
         run: |
           echo '//registry.npmjs.org/:_authToken=${NPM_TOKEN}' > .npmrc
@@ -23,37 +21,8 @@ jobs:
         run: npm run build:prod
       - name: Put version to package.json
         run: |
-          sed -i s/"\"version\":.*/\"version\": \"$RELEASE_VERSION\","/ package.json
+          sed -i s/"\"version\":.*/\"version\": \"$GITHUB_REF_NAME\","/ package.json
       - name: Update Publish Config
         run: sed -i 's^registry-url^registry.npmjs.org^' package.json
       - name: Publish to NPM
         run: npm publish ./dist
-        env:
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-  ghp:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
-        with:
-          node-version: 16
-          registry-url: https://npm.pkg.github.com
-          scope: '@ordo-pink'
-      - name: Set env
-        run: echo "RELEASE_VERSION=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
-      - name: Install dependencies
-        run: npm ci
-      - name: Build package
-        run: npm run build:prod
-      - name: Go to dist
-        run: cd dist
-      - name: Put version to package.json
-        run: |
-          sed -i s/"\"version\":.*/\"version\": \"$RELEASE_VERSION\","/ package.json
-      - name: Configure npm
-        run: |
-          echo '//registry.npmjs.org/:_authToken=${GHP_TOKEN}' > .npmrc
-        env:
-          GHP_TOKEN: ${{ secrets.GHP_TOKEN }}
-      - name: Publish to GHP
-        run: npm publish ./dist --access=public

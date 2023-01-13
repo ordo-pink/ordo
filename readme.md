@@ -2,10 +2,10 @@
 
 [![lint](https://github.com/ordo-pink/switch/actions/workflows/lint.yml/badge.svg)](https://github.com/ordo-pink/switch/actions/workflows/lint.yml)
 [![test](https://github.com/ordo-pink/switch/actions/workflows/test.yml/badge.svg)](https://github.com/ordo-pink/switch/actions/workflows/test.yml)
-![bundlephobia](https://img.shields.io/bundlephobia/min/@ordo-pink/switch?style=flat)
-![downloads](https://img.shields.io/npm/dt/@ordo-pink/switch?style=flat)
+[![bundlephobia](https://img.shields.io/bundlephobia/min/@ordo-pink/switch?style=flat)](https://bundlephobia.com/package/@ordo-pink/switch)
+[![downloads](https://img.shields.io/npm/dt/@ordo-pink/switch?style=flat)](https://www.npmjs.com/package/@ordo-pink/switch)
 
-A health-checked, light-weight, well-typed, and dependency-free alternative to JavaScript _switch_
+A light-weight, well-typed, health-checked, and dependency-free alternative to JavaScript _switch_
 statement.
 
 ## Usage
@@ -13,6 +13,15 @@ statement.
 To use it, you can simply lift a value into **Switch** with `Switch.of`, chain `.case` for as many
 cases as you wish, and then get whatever matched by calling `.default` that accepts instructions on
 what to do if nothing actually matched!
+
+```typescript
+import { Switch } from "@ordo-pink/switch"
+
+Switch.of(true && false)
+  .case(false, () => "You won!")
+  .case(true, () => "Whoa, you broke JavaScript!")
+  .default(() => "This is not gonna happen")
+```
 
 See examples below!
 
@@ -23,16 +32,18 @@ See examples below!
   through to the next case.
 - ⚖ **Validator functions**. Unlike _switch_ statement, where you can only use values to compare
   with the _switch_ statement argument, **Switch** allows you to use functions to validate the
-  **Switch** argument value. Those functions accept the argument and let you decide whether the
-  **Switch** should consider it a match or not. Just return a boolean.
-- 🦥 **Lazy computation**. **Switch** allows you to delay computation based on the _switch_ case you
-  fall into, until you fold the **Switch** by calling `.default`.
-- ⛓ **Chaining**. You can also dynamically extend your _switch_ which might be helpful in situations
+  **Switch** argument value. Those functions accept the argument itself and let you decide whether
+  the **Switch** should consider it a match or not. Just return a boolean.
+- 🦥 **Lazy computation**. **Switch** allows you to delay computation based on the **Switch** case
+  you fall into, until you fold the **Switch** by calling `.default`.
+- ⛓ **Chaining**. You can dynamically extend your **Switch** which might be helpful in situations
   where the cases depend on something outside the scope of the **Switch** itself.
 
 ## API
 
 The **Switch** is fairly straightforward.
+
+### `Switch` Static Methods
 
 The `Switch.of` accepts one argument:
 
@@ -40,6 +51,8 @@ The `Switch.of` accepts one argument:
   TypeScript, `ISwitch` has two paramaters: the **TContext** which is inferred from the type of
   **x** and the **TResult** which holds all possible `ISwitch` return value types. The **TResult**
   is transformed into a Union when you fold the **Switch** with a `.default`.
+
+### `Switch` Instance Methods
 
 The `.case` accepts two arguments:
 
@@ -50,9 +63,10 @@ The `.case` accepts two arguments:
   function or a value) at the moment it was defined. But the **onTrue** thunk will only be called
   when you unfold **Switch** by calling `.default`.
 - **onTrue** - a thunk with the value that should be returned if the case matched. Keep in mind that
-  **Switch** will ignore the rest of the cases defined later in the chain, if the case matched. Even
-  if they could also, potentially, match. Another thing to be aware of is that **Switch** is a lazy
-  little. It does not call the **onTrue** thunk until you end the chain with the `.default` method.
+  **Switch** will ignore the rest of the cases defined later in the chain, if the case has already
+  matched. Even if they could also potentially match. Another thing to be aware of is that
+  **Switch** is a lazy little one. It does not call the **onTrue** thunk until you end the chain
+  with the `.default` method.
 
 The `.default` accepts one argument:
 
@@ -61,12 +75,12 @@ The `.default` accepts one argument:
   you call `.default`, the **Switch** will be folded into one of the **onTrue** return values (the
   one that was matched first in the chain), or the **onAllFalse** return value.
 
-## lazySwitch
+### `lazySwitch`
 
-`lazySwitch` is an even lazier version of **Switch**. It allows you to define the **Switch**
-behaviour even before the context is lifted into **Switch**. You can pack up `lazySwitch` into a
-variable and then call it with the value expected by the **Switch**. Keep in mind that if you don't
-call `.default`, `lazySwitch` will return you an `ISwitch`.
+`lazySwitch` is a helper function that makes **Switch** even lazier. It allows you to define the
+**Switch** behaviour before the context is lifted into the **Switch**. You can pack up `lazySwitch`
+into a variable and then call it with the value expected by the **Switch**. Keep in mind that if you
+don't call `.default`, `lazySwitch` will return you an `ISwitch`.
 
 ## Installation
 

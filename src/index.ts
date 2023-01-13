@@ -1,4 +1,4 @@
-import { ISwitchStatic, UnaryFn, ISwitch, ThunkFn, Unpack } from "--types"
+import { ISwitchStatic, UnaryFn, ISwitch, ThunkFn, Unpack, LazySwitch } from "--types"
 
 const isFunction = <T = unknown, K = T>(x: unknown): x is UnaryFn<T, K> => typeof x == "function"
 
@@ -24,3 +24,5 @@ const swich = <TContext, TResult extends unknown[] = []>(
   },
   default: (defaultValue) => defaultValue(),
 })
+
+export const lazySwitch: LazySwitch = (callback) => (x) => callback(Switch.of(x))

@@ -1,4 +1,4 @@
-import { Switch } from "--index"
+import { lazySwitch, Switch } from "--index"
 
 describe("Switch", () => {
   it("should apply fall into case if the value matches", () => {
@@ -36,5 +36,24 @@ describe("Switch", () => {
         .case(1, () => false)
         .default(() => false),
     ).toEqual(true)
+  })
+})
+
+describe("lazySwitch", () => {
+  it("should allow assigning switch behaviour before the context argument is provided", () => {
+    const run = lazySwitch<number>((s) =>
+      s
+        .case(
+          (n) => n > 1,
+          () => true,
+        )
+        .case(
+          (n) => n < 2,
+          () => false,
+        )
+        .default(() => null),
+    )
+
+    expect(run(1.5)).toEqual(true)
   })
 })

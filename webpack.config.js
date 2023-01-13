@@ -36,7 +36,11 @@ module.exports = {
       removeComments: false,
     }),
     new CopyWebpackPlugin({
-      patterns: [{ from: "./package.json", to: "./package.json" }],
+      patterns: [
+        { from: "./package.json", to: "./package.json" },
+        { from: "./readme.md", to: "./readme.md" },
+        { from: "./license", to: "./license" },
+      ],
     }),
   ],
 }

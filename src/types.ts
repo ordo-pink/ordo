@@ -86,3 +86,7 @@ export type ISwitch<TContext, TResult extends unknown[]> = {
    */
   default: <TDefaultResult>(onAllFalse: ThunkFn<TDefaultResult>) => Unpack<TResult> | TDefaultResult
 }
+
+export type LazySwitch = <TContext, TResult extends unknown[] = unknown[]>(
+  callback: (s: ISwitch<TContext, TResult>) => Unpack<TResult>,
+) => (x: TContext) => Unpack<TResult>

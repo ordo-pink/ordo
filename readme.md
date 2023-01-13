@@ -61,6 +61,13 @@ The `.default` accepts one argument:
   you call `.default`, the **Switch** will be folded into one of the **onTrue** return values (the
   one that was matched first in the chain), or the **onAllFalse** return value.
 
+## lazySwitch
+
+`lazySwitch` is an even lazier version of **Switch**. It allows you to define the **Switch**
+behaviour even before the context is lifted into **Switch**. You can pack up `lazySwitch` into a
+variable and then call it with the value expected by the **Switch**. Keep in mind that if you don't
+call `.default`, `lazySwitch` will return you an `ISwitch`.
+
 ## Installation
 
 ```sh
@@ -95,6 +102,36 @@ const lotteryResult = Switch.of(somethingUnexpected)
     () => "Here's your nickel back",
   )
   .default(() => "Loser! Loser! Na na, na-na na!")
+
+console.log(lotteryResult)
+```
+
+Here is the same example with `lazySwitch`.
+
+```typescript
+import { lazySwitch } from "@ordo-pink/switch"
+
+const somethingUnexpected = Math.random()
+
+const lottery = lazySwitch<number>((s) =>
+  s
+    .case(1, () => "JACKPOT!")
+    .case(
+      (num) => num >= 0.5,
+      () => "Much win!",
+    )
+    .case(
+      (num) => num >= 0.2,
+      () => "Some win",
+    )
+    .case(
+      (num) => num > 0.125,
+      () => "Here's your nickel back",
+    )
+    .default(() => "Loser! Loser! Na na, na-na na!"),
+)
+
+const lotteryResult = lottery(somethingUnexpected)
 
 console.log(lotteryResult)
 ```

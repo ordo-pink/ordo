@@ -1,4 +1,4 @@
-name: coverage
+name: test
 
 on:
   push:
@@ -10,7 +10,7 @@ on:
 
 jobs:
 
-  jest:
+  test:
     runs-on: ubuntu-latest
 
     steps:
@@ -30,4 +30,5 @@ jobs:
 
       - name: Publish to Codecov
         uses: codecov/codecov-action@v3
+          
       

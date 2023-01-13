@@ -4,6 +4,7 @@
 [![test](https://github.com/ordo-pink/switch/actions/workflows/test.yml/badge.svg)](https://github.com/ordo-pink/switch/actions/workflows/test.yml)
 [![bundlephobia](https://img.shields.io/bundlephobia/min/@ordo-pink/switch?style=flat)](https://bundlephobia.com/package/@ordo-pink/switch)
 [![downloads](https://img.shields.io/npm/dt/@ordo-pink/switch?style=flat)](https://www.npmjs.com/package/@ordo-pink/switch)
+[![codecov](https://img.shields.io/codecov/c/gh/ordo-pink/switch)](https://app.codecov.io/gh/ordo-pink/switch)
 
 A light-weight, well-typed, health-checked, and dependency-free alternative to JavaScript _switch_
 statement.

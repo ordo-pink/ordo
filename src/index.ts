@@ -19,6 +19,7 @@ const swich = <TContext, TResult extends unknown[] = []>(
   case: (predicate, onTrue) => {
     const isTrue = isFunction(predicate) ? predicate(x) : predicate === x
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     return isTrue ? swichMatched(onTrue) : (swich(x) as any)
   },
   default: (defaultValue) => defaultValue(),

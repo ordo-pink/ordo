@@ -87,6 +87,14 @@ export type ISwitch<TContext, TResult extends unknown[]> = {
   default: <TDefaultResult>(onAllFalse: ThunkFn<TDefaultResult>) => Unpack<TResult> | TDefaultResult
 }
 
+/**
+ * Makes Switch even lazier. LazySwitch allows you to define the behaviour of
+ * Switch before the context of the Switch is available. Simply call lazySwitch
+ * with the definition of Switch cases in the callback, and then call it with
+ * the value expected as the Switch context.
+ *
+ * @example `lazySwitch((s) => s.case(1, () => "yay!").default(() => "Nah..."))(1)`
+ */
 export type LazySwitch = <TContext, TResult extends unknown[] = unknown[]>(
   callback: (s: ISwitch<TContext, TResult>) => Unpack<TResult>,
 ) => (x: TContext) => Unpack<TResult>

@@ -1,5 +1,9 @@
 # Ordo.pink Switch
 
+[![lint](https://github.com/ordo-pink/switch/actions/workflows/lint.yml/badge.svg)](https://github.com/ordo-pink/switch/actions/workflows/lint.yml)
+◯
+[![test](https://github.com/ordo-pink/switch/actions/workflows/test.yml/badge.svg)](https://github.com/ordo-pink/switch/actions/workflows/test.yml)
+
 A health-checked, light-weight, well-typed, and dependency-free alternative to JavaScript **switch**
 statement.
 

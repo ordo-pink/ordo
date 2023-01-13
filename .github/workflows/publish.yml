@@ -27,7 +27,7 @@ jobs:
       - name: Update Publish Config
         run: sed -i 's^registry-url^registry.npmjs.org^' package.json
       - name: Publish to NPM
-        run: npm publish dist
+        run: npm publish ./dist
         env:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
   ghp:
@@ -56,4 +56,4 @@ jobs:
         env:
           GHP_TOKEN: ${{ secrets.GHP_TOKEN }}
       - name: Publish to GHP
-        run: npm publish dist --access=public
+        run: npm publish ./dist --access=public

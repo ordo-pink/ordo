@@ -28,6 +28,17 @@ See examples below!
 - ⛓ **Chaining**. You can also dynamically extend your _switch_ which might be helpful in situations
   where the cases depend on something outside the scope of the **Switch** itself.
 
+## API
+
+The **Switch** is fairly straightforward.
+
+The `Switch.of` accepts one argument:
+
+- **x** - anything to match cases against. Returns an object that implements `ISwitch`. In
+  TypeScript, `ISwitch` has two paramaters: the **TContext** which is inferred from the type of
+  **x** and the **TResult** which holds all possible `ISwitch` return value types. The **TResult**
+  is transformed into a Union when you fold the **Switch** with a `.default`.
+
 The `.case` accepts two arguments:
 
 - **predicate** - something to validate with. It may be a value of the same type as the one lifted

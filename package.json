@@ -1,5 +1,8 @@
 {
-  "name": "ordo-backend-universal",
+  "name": "@ordo-pink/backend-universal",
+  "publishConfig": {
+    "access": "public"
+  },
   "version": "0.1.0",
   "description": "",
   "main": "index.js",
@@ -10,11 +13,11 @@
     "$user": "dist/user"
   },
   "scripts": {
-    "build": "npx tsc",
+    "build": "webpack",
     "serve": "node dist/index.js",
-    "start": "cross-env ORDO_BACKEND_UNIVERSAL_PORT=1337 concurrently \"npx tsc --watch\" \"nodemon -q ./dist\"",
+    "start": "cross-env ORDO_BACKEND_UNIVERSAL_PORT=1337 concurrently \"npx webpack --watch\" \"nodemon -q ./dist\"",
     "test": "jest",
-    "test:cover": "jest --cover",
+    "test:cover": "jest --coverage",
     "test:watch": "jest --watch"
   },
   "repository": {
@@ -22,8 +25,12 @@
     "url": "git+https://github.com/ordo-pink/ordo-backend-universal.git"
   },
   "keywords": [],
-  "author": "ordo.pink",
-  "license": "MIT",
+  "author": {
+    "email": "hello@ordo.pink",
+    "name": "Ordo.pink",
+    "url": "https://ordo.pink"
+  },
+  "license": "Unlicense",
   "bugs": {
     "url": "https://github.com/ordo-pink/ordo-backend-universal/issues"
   },
@@ -32,9 +39,11 @@
     "@types/express": "^4.17.15",
     "@types/jest": "^29.2.5",
     "@types/node": "^18.11.18",
+    "@types/webpack": "^5.28.0",
     "@typescript-eslint/eslint-plugin": "^5.48.1",
     "@typescript-eslint/parser": "^5.48.1",
     "concurrently": "^7.6.0",
+    "copy-webpack-plugin": "^11.0.0",
     "cross-env": "^7.0.3",
     "eslint": "^8.31.0",
     "eslint-config-prettier": "^8.6.0",
@@ -43,12 +52,19 @@
     "eslint-plugin-prettier": "^4.2.1",
     "eslint-plugin-promise": "^6.1.1",
     "jest": "^29.3.1",
+    "json-loader": "^0.5.7",
     "nodemon": "^2.0.20",
     "prettier": "^2.8.2",
     "ts-jest": "^29.0.4",
-    "typescript": "^4.9.4"
+    "ts-loader": "^9.4.2",
+    "typescript": "^4.9.4",
+    "typescript-declaration-webpack-plugin": "^0.2.2",
+    "webpack": "^5.75.0",
+    "webpack-cli": "^5.0.1",
+    "webpack-node-externals": "^3.0.0"
   },
   "dependencies": {
+    "@ordo-pink/switch": "^1.1.1",
     "body-parser": "^1.20.1",
     "express": "^4.18.2",
     "module-alias": "^2.2.2"

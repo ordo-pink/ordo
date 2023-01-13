@@ -1,4 +1,5 @@
-import { Switch } from "$core/switch"
+import { lazySwitch } from "@ordo-pink/switch"
+
 import { OrdoFilePath, FsRequestHandler } from "$core/types"
 
 import { Exception, NEW_PATH_PARAM, OLD_PATH_PARAM } from "$fs/constants"
@@ -17,16 +18,11 @@ export const moveFileHandler: FsRequestHandler<Params> =
     const eitherFile = await moveFile(oldPath, newPath)
 
     eitherFile.fold(
-      (e) => {
-        const handle = Switch.of(e)
+      lazySwitch((s) =>
+        s
           .case(Exception.NOT_FOUND, () => res.status(404).send())
-          .default(() => res.status(409).send())
-
-        handle()
-      },
+          .default(() => res.status(409).send()),
+      ),
       (file) => res.status(201).json(file),
     )
-    // TODO
-
-    res.status(501).send()
   }

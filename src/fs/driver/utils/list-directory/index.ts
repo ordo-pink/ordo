@@ -6,11 +6,6 @@ import { createOrdoDirectory } from "$fs/driver/utils/create-ordo-directory"
 import { createOrdoFile } from "$fs/driver/utils/create-ordo-file"
 import { sortOrdoDirectory } from "$fs/driver/utils/sort-ordo-directory"
 
-/**
- * @param {string} path
- * @param {number?} depth
- * @param {string?} rootPath
- */
 export const listDirectory = async (
   path: OrdoDirectoryPath,
   dir: OrdoDirectoryPath,

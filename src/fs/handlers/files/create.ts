@@ -17,6 +17,4 @@ export const createFileHandler: FsRequestHandler<Params> =
       () => res.status(409).send(),
       (file) => res.status(201).json(file),
     )
-
-    res.status(501).send()
   }

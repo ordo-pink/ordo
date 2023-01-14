@@ -25,6 +25,4 @@ export const moveDirectoryHandler: FsRequestHandler<Params> =
       ),
       (directory) => res.status(201).json(directory),
     )
-
-    res.status(501).send()
   }

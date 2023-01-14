@@ -1,6 +1,6 @@
 import type { RequestHandler } from "express"
 
-const disallowedCharacters = ["<", ">", ":", '"', "\\", "|", "?", "*"]
+const disallowedCharacters = ["<", ">", ":", '"', "\\", "|", "?", "*", "..", "./"]
 
 const hasForbiddenChars = (path: string) =>
   path.split("").some((char) => disallowedCharacters.includes(char))

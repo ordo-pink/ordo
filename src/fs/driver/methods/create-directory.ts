@@ -8,7 +8,7 @@ import { Exception } from "$fs/constants"
 import { listDirectory } from "$fs/driver/utils/list-directory"
 
 export const createDirectory =
-  (directory: OrdoDirectoryPath): FSDriver["createDirectory"] =>
+  (directory: string): FSDriver["createDirectory"] =>
   async (path) => {
     const absolutePath = join(directory, path)
 

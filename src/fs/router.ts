@@ -9,19 +9,20 @@ import {
   PATH_SEPARATOR,
 } from "$fs/constants"
 
-import { Router } from "express"
-
 import { createDirectoryHandler } from "$fs/handlers/directories/create"
 import { getDirectoryHandler } from "$fs/handlers/directories/get"
+import { Router } from "express"
 import { moveDirectoryHandler } from "$fs/handlers/directories/move"
 import { removeDirectoryHandler } from "$fs/handlers/directories/remove"
 import { createFileHandler } from "$fs/handlers/files/create"
 import { getFileHandler } from "$fs/handlers/files/get"
 import { removeFileHandler } from "$fs/handlers/files/remove"
 import { updateFileHandler } from "$fs/handlers/files/update"
+
+import { appendTrailingDirectoryPath } from "$fs/middleware/add-trailing-directory-slash"
 import { extractDynamicParam } from "$fs/middleware/extract-dynamic-param"
+import { setRootPathParam } from "$fs/middleware/set-root-path-param"
 import { validateDirectoryPath, validateFilePath } from "$fs/middleware/validate-path"
-import { appendTrailingDirectoryPath } from "./middleware/append-trailing-directory-slash"
 
 const filesRouter = (driver: FSDriver) =>
   Router()
@@ -70,6 +71,12 @@ const directoriesRouter = (driver: FSDriver) =>
       appendTrailingDirectoryPath,
       validateDirectoryPath,
       createDirectoryHandler(driver),
+    )
+    .get(
+      `/`,
+
+      setRootPathParam,
+      getDirectoryHandler(driver),
     )
     .get(
       `/:${PATH_PARAM}*`,

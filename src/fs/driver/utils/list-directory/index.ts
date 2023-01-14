@@ -7,7 +7,7 @@ import { createOrdoFile } from "$fs/driver/utils/create-ordo-file"
 import { sortOrdoDirectory } from "$fs/driver/utils/sort-ordo-directory"
 
 export const listDirectory = async (
-  path: OrdoDirectoryPath,
+  path: string,
   dir: string,
   depth = 0,
   rootPath = path,
@@ -61,9 +61,9 @@ export const listDirectory = async (
       const ordoFile = createOrdoFile({
         depth: depth + 1,
         path: `/${itemPath.replace(normalizedDir, "")}` as OrdoFilePath,
-        createdAt: new Date(stat.birthtime),
-        updatedAt: new Date(stat.mtime),
-        accessedAt: new Date(stat.atime),
+        createdAt: stat.birthtime,
+        updatedAt: stat.mtime,
+        accessedAt: stat.atime,
         size: stat.size,
       })
 

@@ -3,7 +3,7 @@ import { join } from "path"
 import { pipeline, Readable, Writable } from "stream"
 
 import { Either } from "$core/either"
-import { FSDriver, OrdoDirectory, OrdoDirectoryPath, OrdoFile } from "$core/types"
+import { FSDriver, OrdoDirectory, OrdoFile } from "$core/types"
 
 import { Exception } from "$fs/constants"
 import { createDirectory } from "$fs/driver/methods/create-directory"
@@ -12,7 +12,7 @@ import { getDepth } from "$fs/driver/utils/get-depth"
 import { getParentPath } from "$fs/driver/utils/get-parent-path"
 
 export const createFile =
-  (directory: OrdoDirectoryPath): FSDriver["createFile"] =>
+  (directory: string): FSDriver["createFile"] =>
   async (path, contentStream) => {
     const absolutePath = join(directory, path)
 

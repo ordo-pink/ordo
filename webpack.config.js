@@ -7,7 +7,8 @@ const nodeExternals = require("webpack-node-externals")
 module.exports = {
   target: "node",
   entry: "./src/index.ts",
-  mode: process.env.NODE_ENV ?? "production",
+  mode: process.env.NODE_ENV ?? "development",
+  devtool: process.env.NODE_ENV !== "production" && "inline-source-map",
   externals: [nodeExternals()],
   module: {
     rules: [

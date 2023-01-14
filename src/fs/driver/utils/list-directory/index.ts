@@ -8,34 +8,33 @@ import { sortOrdoDirectory } from "$fs/driver/utils/sort-ordo-directory"
 
 export const listDirectory = async (
   path: OrdoDirectoryPath,
-  dir: OrdoDirectoryPath,
+  dir: string,
   depth = 0,
   rootPath = path,
 ): Promise<Nullable<OrdoDirectory>> => {
-  const absolutePath = join(dir, path)
-  const stat = await promises.stat(absolutePath)
+  const stat = await promises.stat(path)
+
+  const normalizedDir = dir.replaceAll("\\", "/")
 
   if (!stat.isDirectory()) {
     return null
   }
 
-  const directory = await promises.readdir(absolutePath, {
+  const directory = await promises.readdir(path, {
     withFileTypes: true,
     encoding: "utf-8",
   })
 
   const ordoDirectory = createOrdoDirectory({
     depth,
-    path,
-    createdAt: stat.birthtime,
-    updatedAt: stat.mtime,
-    accessedAt: stat.atime,
+    path: `/${path.replace(normalizedDir, "")}` as OrdoDirectoryPath,
+    createdAt: new Date(stat.birthtime),
+    updatedAt: new Date(stat.mtime),
+    accessedAt: new Date(stat.atime),
   })
 
   for (const item of directory) {
     let itemPath = join(path, item.name).replaceAll("\\", "/")
-
-    const itemAbsolutePath = join(absolutePath, item.name)
 
     if (item.isDirectory()) {
       if (!itemPath.endsWith("/")) {
@@ -53,18 +52,18 @@ export const listDirectory = async (
 
       ordoDirectory.children.push(listedDirectory)
     } else if (item.isFile()) {
-      const stat = await promises.stat(itemAbsolutePath)
+      const stat = await promises.stat(itemPath)
 
       if (itemPath.endsWith("/")) {
         itemPath = itemPath.slice(0, -1)
       }
 
       const ordoFile = createOrdoFile({
-        path: itemPath as OrdoFilePath,
         depth: depth + 1,
-        createdAt: stat.birthtime,
-        updatedAt: stat.mtime,
-        accessedAt: stat.atime,
+        path: `/${itemPath.replace(normalizedDir, "")}` as OrdoFilePath,
+        createdAt: new Date(stat.birthtime),
+        updatedAt: new Date(stat.mtime),
+        accessedAt: new Date(stat.atime),
         size: stat.size,
       })
 

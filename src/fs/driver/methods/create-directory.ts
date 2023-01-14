@@ -5,7 +5,6 @@ import { Either } from "$core/either"
 import { OrdoDirectoryPath, FSDriver, OrdoDirectory } from "$core/types"
 
 import { Exception } from "$fs/constants"
-import { getParentPath } from "$fs/driver/utils/get-parent-path"
 import { listDirectory } from "$fs/driver/utils/list-directory"
 
 export const createDirectory =
@@ -28,13 +27,14 @@ export const createDirectory =
         relativeRecursiveCreationStartPath = `${relativeRecursiveCreationStartPath}/`
       }
 
-      const parentPath = getParentPath(relativeRecursiveCreationStartPath as OrdoDirectoryPath)
-
-      const listedDirectory = (await listDirectory(parentPath, directory)) as OrdoDirectory
+      const listedDirectory = (await listDirectory(
+        relativeRecursiveCreationStartPath as OrdoDirectoryPath,
+        directory,
+      )) as OrdoDirectory
 
       return Either.right(listedDirectory)
-    } catch (_) {
-      // TODO: Add logging. Replace with Exception.UNKNOWN
+    } catch (e) {
+      // TODO: Log error
       return Either.left(Exception.CONFLICT)
     }
   }

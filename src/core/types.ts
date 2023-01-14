@@ -19,15 +19,17 @@ export type FSDriver = {
   >
   removeDirectory: UnaryFn<OrdoDirectoryPath, Promise<IEither<OrdoDirectory, Exception.NOT_FOUND>>>
 
-  createFile:
-    | UnaryFn<OrdoFilePath, Promise<IEither<OrdoFile, Exception.CONFLICT>>>
-    | BinaryFn<OrdoFilePath, Readable, Promise<IEither<OrdoFile, Exception.CONFLICT>>>
+  createFile: BinaryFn<
+    OrdoFilePath,
+    Readable,
+    Promise<IEither<OrdoFile | OrdoDirectory, Exception.CONFLICT>>
+  >
   getFile: UnaryFn<OrdoFilePath, Promise<IEither<Readable, Exception.NOT_FOUND>>>
   updateFile: BinaryFn<OrdoFilePath, Readable, Promise<IEither<OrdoFile, Exception.NOT_FOUND>>>
   moveFile: BinaryFn<
     OrdoFilePath,
     OrdoFilePath,
-    Promise<IEither<OrdoFile, Exception.NOT_FOUND | Exception.CONFLICT>>
+    Promise<IEither<OrdoFile | OrdoDirectory, Exception.NOT_FOUND | Exception.CONFLICT>>
   >
   removeFile: UnaryFn<OrdoFilePath, Promise<IEither<OrdoFile, Exception.NOT_FOUND>>>
 }

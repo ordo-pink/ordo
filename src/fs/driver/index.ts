@@ -1,10 +1,11 @@
 import { OrdoDirectoryPath, FSDriver } from "$core/types"
 
 import { createDirectory } from "$fs/driver/methods/create-directory"
+import { createFile } from "$fs/driver/methods/create-file"
 
 export const createDefaultFSDriver = (directory: OrdoDirectoryPath): FSDriver => ({
   createDirectory: createDirectory(directory),
-  createFile: () => void 0 as any,
+  createFile: createFile(directory),
   getDirectory: () => void 0 as any,
   getFile: () => void 0 as any,
   moveDirectory: () => void 0 as any,

@@ -8,4 +8,7 @@ import fsRouter from "$fs/router"
 const app = express()
 
 export const createOrdoBackendServer = (drivers: Drivers) =>
-  app.use(urlencoded({ extended: false })).use("/fs", fsRouter(drivers.fsDriver))
+  app
+    .use(urlencoded({ extended: false }))
+    .use("/fs", fsRouter(drivers.fsDriver))
+    .disable("x-powered-by")

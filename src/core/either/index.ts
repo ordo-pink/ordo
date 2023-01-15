@@ -33,7 +33,7 @@ export interface IEither<TRight, TLeft = unknown> {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   chain: <TNewRight, TNewLeft>(
     onRight: UnaryFn<TRight, IEither<TNewRight, TNewLeft>> | ThunkFn<IEither<TNewRight, TNewLeft>>,
-  ) => IEither<TNewRight, TLeft>
+  ) => IEither<TNewRight, TNewLeft>
   ap: <TNewRight, TNewLeft = TLeft>(
     other: IEither<UnaryFn<TRight, TNewRight>, UnaryFn<TRight, TNewLeft>>,
   ) => IEither<TNewRight, TLeft>
@@ -53,7 +53,8 @@ export const left = <TLeft, TRight = TLeft>(x: TLeft): IEither<TRight, TLeft> =>
   map: () => left(x),
   leftMap: (onLeft) => left(onLeft(x)),
   bimap: (onLeft) => left(onLeft(x)),
-  chain: () => left(x),
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  chain: () => left(x) as any,
   ap: () => left(x),
   getOrElse: (onLeft) => onLeft(x),
   fold: (onLeft) => onLeft(x),

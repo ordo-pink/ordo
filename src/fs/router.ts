@@ -23,6 +23,7 @@ import { appendTrailingDirectoryPath } from "$fs/middleware/add-trailing-directo
 import { extractDynamicParam } from "$fs/middleware/extract-dynamic-param"
 import { setRootPathParam } from "$fs/middleware/set-root-path-param"
 import { validateDirectoryPath, validateFilePath } from "$fs/middleware/validate-path"
+import { setContentTypeHeader } from "./middleware/set-content-type-header"
 
 const filesRouter = (driver: FSDriver) =>
   Router()
@@ -38,6 +39,7 @@ const filesRouter = (driver: FSDriver) =>
 
       extractDynamicParam([PATH_PARAM]),
       validateFilePath,
+      setContentTypeHeader,
       getFileHandler(driver),
     )
     .put(

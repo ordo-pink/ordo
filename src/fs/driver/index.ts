@@ -4,6 +4,8 @@ import { createDirectory } from "$fs/driver/methods/create-directory"
 import { createFile } from "$fs/driver/methods/create-file"
 import { getDirectory } from "$fs/driver/methods/get-directory"
 import { getFile } from "$fs/driver/methods/get-file"
+import { moveDirectory } from "$fs/driver/methods/move-directory"
+import { moveFile } from "$fs/driver/methods/move-file"
 
 export const createDefaultFSDriver = (rootDirectory: string): FSDriver => {
   const normalizedDirectory = rootDirectory.replaceAll("\\", "/")
@@ -13,8 +15,8 @@ export const createDefaultFSDriver = (rootDirectory: string): FSDriver => {
     createFile: createFile(normalizedDirectory),
     getDirectory: getDirectory(normalizedDirectory),
     getFile: getFile(normalizedDirectory),
-    moveDirectory: () => void 0 as any,
-    moveFile: () => void 0 as any,
+    moveDirectory: moveDirectory(normalizedDirectory),
+    moveFile: moveFile(normalizedDirectory),
     removeDirectory: () => void 0 as any,
     removeFile: () => void 0 as any,
     updateFile: () => void 0 as any,

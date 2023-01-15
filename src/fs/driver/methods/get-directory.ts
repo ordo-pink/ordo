@@ -1,4 +1,4 @@
-import { existsSync } from "fs"
+import { promises } from "fs"
 import { join } from "path"
 
 import { Either } from "$core/either"
@@ -13,7 +13,9 @@ export const getDirectory =
     // TODO: Extract path normalization to a util function
     const absolutePath = join(directory, path).replaceAll("\\", "/")
 
-    if (!existsSync(absolutePath)) return Either.left(Exception.NOT_FOUND)
+    const stat = await promises.stat(absolutePath).catch(() => null)
+
+    if (!stat) return Either.left(Exception.NOT_FOUND)
 
     const dir = await listDirectory(absolutePath, directory)
 

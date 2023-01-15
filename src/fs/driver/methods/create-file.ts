@@ -1,4 +1,4 @@
-import { createWriteStream, existsSync, promises } from "fs"
+import { createWriteStream, promises } from "fs"
 import { join } from "path"
 import { pipeline, Readable, Writable } from "stream"
 import { charset } from "mime-types"
@@ -18,7 +18,9 @@ export const createFile =
   async (path, contentStream) => {
     const absolutePath = join(directory, path)
 
-    if (existsSync(absolutePath)) {
+    const stat = await promises.stat(absolutePath).catch(() => null)
+
+    if (stat) {
       return Either.left(Exception.CONFLICT)
     }
 

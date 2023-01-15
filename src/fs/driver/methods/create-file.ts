@@ -1,6 +1,7 @@
 import { createWriteStream, existsSync, promises } from "fs"
 import { join } from "path"
 import { pipeline, Readable, Writable } from "stream"
+import { charset } from "mime-types"
 
 import { Either } from "$core/either"
 import { FSDriver, OrdoDirectory, OrdoFile } from "$core/types"
@@ -9,6 +10,7 @@ import { Exception } from "$fs/constants"
 import { createDirectory } from "$fs/driver/methods/create-directory"
 import { createOrdoFile } from "$fs/driver/utils/create-ordo-file"
 import { getDepth } from "$fs/driver/utils/get-depth"
+import { getFileExtension } from "$fs/driver/utils/get-file-extension"
 import { getParentPath } from "$fs/driver/utils/get-parent-path"
 
 export const createFile =
@@ -24,10 +26,14 @@ export const createFile =
 
     const eitherParent = await createDirectory(directory)(parentPath)
 
+    const extension = getFileExtension(path)
+
+    const encoding = (charset(extension) || "utf-8").toLowerCase() as BufferEncoding
+
     if (!contentStream) {
-      await promises.writeFile(absolutePath, "", "utf8")
+      await promises.writeFile(absolutePath, "", { encoding })
     } else {
-      const writableStream = createWriteStream(absolutePath, "utf8")
+      const writableStream = createWriteStream(absolutePath, { encoding })
 
       await promiseWriteStream(contentStream, writableStream)
     }

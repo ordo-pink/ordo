@@ -32,6 +32,7 @@ const filesRouter = (driver: FSDriver) =>
       `/:${PATH_PARAM}*`,
 
       extractDynamicParam([PATH_PARAM]),
+      prependFilePathSlash,
       validateFilePath,
       createFileHandler(driver),
     )

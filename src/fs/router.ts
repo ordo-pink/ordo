@@ -12,8 +12,8 @@ import {
 import { createDirectoryHandler } from "$fs/handlers/directories/create"
 import { getDirectoryHandler } from "$fs/handlers/directories/get"
 import { moveDirectoryHandler } from "$fs/handlers/directories/move"
-import { Router } from "express"
 import { removeDirectoryHandler } from "$fs/handlers/directories/remove"
+import { Router } from "express"
 import { createFileHandler } from "$fs/handlers/files/create"
 import { getFileHandler } from "$fs/handlers/files/get"
 import { removeFileHandler } from "$fs/handlers/files/remove"
@@ -21,6 +21,7 @@ import { updateFileHandler } from "$fs/handlers/files/update"
 
 import { appendTrailingDirectoryPath } from "$fs/middleware/add-trailing-directory-slash"
 import { extractDynamicParam } from "$fs/middleware/extract-dynamic-param"
+import { prependFilePathSlash } from "$fs/middleware/prepend-file-path-slash"
 import { setContentTypeHeader } from "$fs/middleware/set-content-type-header"
 import { setRootPathParam } from "$fs/middleware/set-root-path-param"
 import { validateDirectoryPath, validateFilePath } from "$fs/middleware/validate-path"
@@ -38,6 +39,7 @@ const filesRouter = (driver: FSDriver) =>
       `/:${PATH_PARAM}*`,
 
       extractDynamicParam([PATH_PARAM]),
+      prependFilePathSlash,
       validateFilePath,
       setContentTypeHeader,
       getFileHandler(driver),

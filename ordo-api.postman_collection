@@ -23,12 +23,12 @@
 							}
 						},
 						"url": {
-							"raw": "http://localhost:1337/fs/files/test.md",
+							"raw": "http://localhost:{{PORT}}/fs/files/test.md",
 							"protocol": "http",
 							"host": [
 								"localhost"
 							],
-							"port": "1337",
+							"port": "{{PORT}}",
 							"path": [
 								"fs",
 								"files",
@@ -44,12 +44,12 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:1337/fs/files/test.md",
+							"raw": "http://localhost:{{PORT}}/fs/files/test.md",
 							"protocol": "http",
 							"host": [
 								"localhost"
 							],
-							"port": "1337",
+							"port": "{{PORT}}",
 							"path": [
 								"fs",
 								"files",
@@ -65,12 +65,12 @@
 						"method": "PUT",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:1337/fs/files/test.md",
+							"raw": "http://localhost:{{PORT}}/fs/files/test.md",
 							"protocol": "http",
 							"host": [
 								"localhost"
 							],
-							"port": "1337",
+							"port": "{{PORT}}",
 							"path": [
 								"fs",
 								"files",
@@ -86,12 +86,12 @@
 						"method": "PATCH",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:1337/fs/files/test->/5245/2134523/412/341231/231/2312/3123/test.md",
+							"raw": "http://localhost:{{PORT}}/fs/files/test->/5245/2134523/412/341231/231/2312/3123/test.md",
 							"protocol": "http",
 							"host": [
 								"localhost"
 							],
-							"port": "1337",
+							"port": "{{PORT}}",
 							"path": [
 								"fs",
 								"files",
@@ -115,12 +115,12 @@
 						"method": "DELETE",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:1337/fs/files/1/2/3/->/1/2/5/",
+							"raw": "http://localhost:{{PORT}}/fs/files/1/2/3/->/1/2/5/",
 							"protocol": "http",
 							"host": [
 								"localhost"
 							],
-							"port": "1337",
+							"port": "{{PORT}}",
 							"path": [
 								"fs",
 								"files",
@@ -137,6 +137,29 @@
 					},
 					"response": []
 				}
+			],
+			"auth": {
+				"type": "noauth"
+			},
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				}
 			]
 		},
 		{
@@ -148,12 +171,12 @@
 						"method": "POST",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:1337/fs/directories/test1/",
+							"raw": "http://localhost:{{PORT}}/fs/directories/test1/",
 							"protocol": "http",
 							"host": [
 								"localhost"
 							],
-							"port": "1337",
+							"port": "{{PORT}}",
 							"path": [
 								"fs",
 								"directories",
@@ -170,12 +193,12 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:1337/fs/directories/test1/",
+							"raw": "http://localhost:{{PORT}}/fs/directories/test1/",
 							"protocol": "http",
 							"host": [
 								"localhost"
 							],
-							"port": "1337",
+							"port": "{{PORT}}",
 							"path": [
 								"fs",
 								"directories",
@@ -192,12 +215,12 @@
 						"method": "PATCH",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:1337/fs/directories/1/2/3/->/1/2/5/",
+							"raw": "http://localhost:{{PORT}}/fs/directories/1/2/3/->/1/2/5/",
 							"protocol": "http",
 							"host": [
 								"localhost"
 							],
-							"port": "1337",
+							"port": "{{PORT}}",
 							"path": [
 								"fs",
 								"directories",
@@ -220,12 +243,12 @@
 						"method": "DELETE",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:1337/fs/directories/1/2/3/",
+							"raw": "http://localhost:{{PORT}}/fs/directories/1/2/3/",
 							"protocol": "http",
 							"host": [
 								"localhost"
 							],
-							"port": "1337",
+							"port": "{{PORT}}",
 							"path": [
 								"fs",
 								"directories",
@@ -238,7 +261,71 @@
 					},
 					"response": []
 				}
+			],
+			"auth": {
+				"type": "noauth"
+			},
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				}
 			]
+		}
+	],
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "{{AUTH_TOKEN}}",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "PORT",
+			"value": "5000"
+		},
+		{
+			"key": "AUTH_TOKEN",
+			"value": "WHOA_SO_SAFE!",
+			"type": "default"
 		}
 	]
 }

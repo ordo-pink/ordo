@@ -1,4 +1,4 @@
-import type { FSDriver } from "$core/types"
+import type { Drivers } from "$core/types"
 
 import {
   OLD_PATH_PARAM,
@@ -27,97 +27,127 @@ import { setContentTypeHeader } from "$fs/middleware/set-content-type-header"
 import { setRootPathParam } from "$fs/middleware/set-root-path-param"
 import { validateDirectoryPath, validateFilePath } from "$fs/middleware/validate-path"
 
-const filesRouter = (driver: FSDriver) =>
+const filesRouter = ({ fsDriver, userDriver: { protect, authorize } }: Drivers) =>
   Router()
     .post(
       `/:${PATH_PARAM}*`,
 
+      protect(["owner", "admin", "write"]),
+      authorize,
+
       extractDynamicParam([PATH_PARAM]),
       prependSlash,
       validateFilePath,
-      createFileHandler(driver),
+      createFileHandler(fsDriver),
     )
     .get(
       `/:${PATH_PARAM}*`,
+
+      protect(["owner", "admin", "write", "read"]),
+      authorize,
 
       extractDynamicParam([PATH_PARAM]),
       prependSlash,
       validateFilePath,
       setContentTypeHeader,
-      getFileHandler(driver),
+      getFileHandler(fsDriver),
     )
     .put(
       `/:${PATH_PARAM}*`,
 
+      protect(["owner", "admin", "write"]),
+      authorize,
+
       extractDynamicParam([PATH_PARAM]),
       prependSlash,
       validateFilePath,
-      updateFileHandler(driver),
+      updateFileHandler(fsDriver),
     )
     .patch(
       `/:${OLD_PATH_PARAM}*${PATH_SEPARATOR}/:${NEW_PATH_PARAM}*`,
 
+      protect(["owner", "admin", "write"]),
+      authorize,
+
       extractDynamicParam([OLD_PATH_PARAM, NEW_PATH_PARAM]),
       prependSlash,
       validateFilePath,
-      moveFileHandler(driver),
+      moveFileHandler(fsDriver),
     )
     .delete(
       `/:${PATH_PARAM}*`,
 
+      protect(["owner", "admin", "write"]),
+      authorize,
+
       extractDynamicParam([PATH_PARAM]),
       prependSlash,
       validateFilePath,
-      removeFileHandler(driver),
+      removeFileHandler(fsDriver),
     )
 
-const directoriesRouter = (driver: FSDriver) =>
+const directoriesRouter = ({ fsDriver, userDriver: { protect, authorize } }: Drivers) =>
   Router()
     .post(
       `/:${PATH_PARAM}*`,
 
+      protect(["owner", "admin", "write"]),
+      authorize,
+
       extractDynamicParam([PATH_PARAM]),
       prependSlash,
       appendTrailingDirectoryPath,
       validateDirectoryPath,
-      createDirectoryHandler(driver),
+      createDirectoryHandler(fsDriver),
     )
     .get(
       `/`,
 
+      protect(["owner", "admin", "write", "read"]),
+      authorize,
+
       setRootPathParam,
       prependSlash,
-      getDirectoryHandler(driver),
+      getDirectoryHandler(fsDriver),
     )
     .get(
       `/:${PATH_PARAM}*`,
+
+      protect(["owner", "admin", "write", "read"]),
+      authorize,
 
       extractDynamicParam([PATH_PARAM]),
       prependSlash,
       appendTrailingDirectoryPath,
       validateDirectoryPath,
-      getDirectoryHandler(driver),
+      getDirectoryHandler(fsDriver),
     )
     .patch(
       `/:${OLD_PATH_PARAM}*${PATH_SEPARATOR}/:${NEW_PATH_PARAM}*`,
+
+      protect(["owner", "admin", "write"]),
+      authorize,
 
       extractDynamicParam([OLD_PATH_PARAM, NEW_PATH_PARAM]),
       prependSlash,
       appendTrailingDirectoryPath,
       validateDirectoryPath,
-      moveDirectoryHandler(driver),
+      moveDirectoryHandler(fsDriver),
     )
     .delete(
       `/:${PATH_PARAM}*`,
+
+      protect(["owner", "admin", "write"]),
+      authorize,
 
       extractDynamicParam([PATH_PARAM]),
       prependSlash,
       appendTrailingDirectoryPath,
       validateDirectoryPath,
-      removeDirectoryHandler(driver),
+      removeDirectoryHandler(fsDriver),
     )
 
-export default (driver: FSDriver) =>
+export default (drivers: Drivers) =>
   Router()
-    .use(`/${FILES_PARAM}`, filesRouter(driver))
-    .use(`/${DIRECTORIES_PARAM}`, directoriesRouter(driver))
+    .use(`/${FILES_PARAM}`, filesRouter(drivers))
+    .use(`/${DIRECTORIES_PARAM}`, directoriesRouter(drivers))

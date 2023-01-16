@@ -14,5 +14,5 @@ export const createOrdoBackendServer = (drivers: Drivers) =>
   app
     .use(urlencoded({ extended: false }))
     .use(compression({ filter: filterCompression }))
-    .use("/fs", fsRouter(drivers.fsDriver))
+    .use("/fs", fsRouter(drivers))
     .disable("x-powered-by")

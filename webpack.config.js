@@ -28,6 +28,7 @@ module.exports = {
     extensions: [".ts", ".js"],
     alias: {
       $fs: resolve("./src/fs"),
+      $user: resolve("./src/user"),
       $core: resolve("./src/core"),
     },
   },

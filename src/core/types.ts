@@ -9,6 +9,11 @@ export type OrdoFileExtension = `.${string}` | ""
 export type OrdoFilePath = `/${string}`
 export type OrdoDirectoryPath = `/${string}/`
 
+export type UserDriver = {
+  protect: UnaryFn<string[], RequestHandler>
+  authorize: RequestHandler
+}
+
 export type FSDriver = {
   createDirectory: UnaryFn<OrdoDirectoryPath, Promise<IEither<OrdoDirectory, Exception.CONFLICT>>>
   getDirectory: UnaryFn<OrdoDirectoryPath, Promise<IEither<OrdoDirectory, Exception.NOT_FOUND>>>
@@ -72,4 +77,5 @@ export type OrdoDirectory<Metadata extends Record<string, unknown> = Record<stri
 
 export type Drivers = {
   fsDriver: FSDriver
+  userDriver: UserDriver
 }

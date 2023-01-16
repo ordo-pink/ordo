@@ -26,3 +26,8 @@ The port the server should listen to. Defaults to `5000`.
 ### ORDO_BACKEND_UNIVERSAL_DIRECTORY
 
 The directory the application will save files to. Defaults to `<projectRoot>/dist/files`.
+
+## API
+
+There is a Postman collection in the root directory of the project that you can use as a place to
+start.

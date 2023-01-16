@@ -25,4 +25,4 @@ The port the server should listen to. Defaults to `5000`.
 
 ### ORDO_BACKEND_UNIVERSAL_DIRECTORY
 
-The directory the application will save files to. Defaults to `<projectRoot>/dist/files`
+The directory the application will save files to. Defaults to `<projectRoot>/dist/files`.

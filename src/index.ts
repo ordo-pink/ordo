@@ -6,7 +6,7 @@ import { createOrdoBackendServer } from "./app"
 import { OrdoDirectoryPath } from "$core/types"
 import { createDefaultFSDriver } from "$fs/driver"
 
-const PORT = process.env.ORDO_BACKEND_UNIVERSAL_PORT ?? 1337
+const PORT = process.env.ORDO_BACKEND_UNIVERSAL_PORT ?? 5000
 const DIRECTORY = process.env.ORDO_BACKEND_UNIVERSAL_DIRECTORY ?? join(__dirname, "files")
 
 const dir = DIRECTORY.endsWith("/") ? DIRECTORY : `${DIRECTORY}/`

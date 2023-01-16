@@ -8,7 +8,9 @@ import { Exception } from "$fs/constants"
 import { createDirectory } from "$fs/driver/methods/create-directory"
 import { createOrdoDirectory } from "$fs/driver/utils/create-ordo-directory"
 import { getDepth } from "$fs/driver/utils/get-depth"
+import { getNormalizedAbsolutePath } from "$fs/driver/utils/get-normalized-absolute-path"
 import { getParentPath } from "$fs/driver/utils/get-parent-path"
+import { listDirectory } from "$fs/driver/utils/list-directory"
 
 export const moveDirectory =
   (directory: string): FSDriver["moveDirectory"] =>
@@ -23,7 +25,7 @@ export const moveDirectory =
       return Either.left(Exception.NOT_FOUND)
     }
 
-    if (newStat) {
+    if (newStat && newStat.isDirectory()) {
       return Either.left(Exception.CONFLICT)
     }
 
@@ -45,12 +47,13 @@ export const moveDirectory =
       updatedAt,
     })
 
-    return eitherParent.fold(
-      () => Either.right<OrdoDirectory, Exception.CONFLICT | Exception.NOT_FOUND>(ordoDirectory),
-      (parent) => {
-        parent.children.push(ordoDirectory)
+    const parent = eitherParent.getOrElse(() => null)
 
-        return Either.right<OrdoDirectory, Exception.CONFLICT | Exception.NOT_FOUND>(parent)
-      },
-    )
+    if (!parent) return Either.right(ordoDirectory)
+
+    const absoluteParentPath = getNormalizedAbsolutePath(parent.path, directory)
+
+    const createdDirectory = (await listDirectory(absoluteParentPath, directory)) as OrdoDirectory
+
+    return Either.right(createdDirectory)
   }

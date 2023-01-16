@@ -18,7 +18,7 @@ export const updateFile =
 
     const stat = await promises.stat(absolutePath).catch(() => null)
 
-    if (!stat) {
+    if (!stat || !stat.isFile()) {
       return Either.left(Exception.NOT_FOUND)
     }
 

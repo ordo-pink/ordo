@@ -9,9 +9,10 @@ import { moveFile } from "$fs/driver/methods/move-file"
 import { removeDirectory } from "$fs/driver/methods/remove-directory"
 import { removeFile } from "$fs/driver/methods/remove-file"
 import { updateFile } from "$fs/driver/methods/update-file"
+import { getNormalizedAbsolutePath } from "$fs/driver/utils/get-normalized-absolute-path"
 
 export const createDefaultFSDriver = (rootDirectory: string): FSDriver => {
-  const normalizedDirectory = rootDirectory.replaceAll("\\", "/")
+  const normalizedDirectory = getNormalizedAbsolutePath("/", rootDirectory)
 
   return {
     createDirectory: createDirectory(normalizedDirectory),

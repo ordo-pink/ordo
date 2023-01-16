@@ -2,13 +2,15 @@ import { promises } from "fs"
 import { join } from "path"
 
 import { Either } from "$core/either"
-import { FSDriver, OrdoDirectory, OrdoFile } from "$core/types"
+import { FSDriver, OrdoDirectory } from "$core/types"
 
 import { Exception } from "$fs/constants"
 import { createDirectory } from "$fs/driver/methods/create-directory"
 import { createOrdoFile } from "$fs/driver/utils/create-ordo-file"
 import { getDepth } from "$fs/driver/utils/get-depth"
+import { getNormalizedAbsolutePath } from "$fs/driver/utils/get-normalized-absolute-path"
 import { getParentPath } from "$fs/driver/utils/get-parent-path"
+import { listDirectory } from "$fs/driver/utils/list-directory"
 
 export const moveFile =
   (directory: string): FSDriver["moveFile"] =>
@@ -23,7 +25,7 @@ export const moveFile =
       return Either.left(Exception.NOT_FOUND)
     }
 
-    if (newStat) {
+    if (newStat && newStat.isFile()) {
       return Either.left(Exception.CONFLICT)
     }
 
@@ -46,12 +48,13 @@ export const moveFile =
       updatedAt,
     })
 
-    return eitherParent.fold(
-      () => Either.right<OrdoFile, Exception.CONFLICT | Exception.NOT_FOUND>(ordoFile),
-      (parent) => {
-        parent.children.push(ordoFile)
+    const parent = eitherParent.getOrElse(() => null)
 
-        return Either.right<OrdoDirectory, Exception.CONFLICT | Exception.NOT_FOUND>(parent)
-      },
-    )
+    if (!parent) return Either.right(ordoFile)
+
+    const absoluteParentPath = getNormalizedAbsolutePath(parent.path, directory)
+
+    const createdDirectory = (await listDirectory(absoluteParentPath, directory)) as OrdoDirectory
+
+    return Either.right(createdDirectory)
   }

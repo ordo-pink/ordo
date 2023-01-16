@@ -1,104 +1,244 @@
 {
 	"info": {
-		"_postman_id": "019b07d8-79f1-4b54-83c0-d0ccc08dafbe",
+		"_postman_id": "af21c032-a4bb-4afe-b321-6403d65110b0",
 		"name": "Ordo API",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
 	"item": [
 		{
-			"name": "Create File",
-			"request": {
-				"method": "POST",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": "# This is an MD file!\r\n",
-					"options": {
-						"raw": {
-							"language": "text"
+			"name": "Files",
+			"item": [
+				{
+					"name": "Create / Upload",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "# This is an MD file!\r\n",
+							"options": {
+								"raw": {
+									"language": "text"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:1337/fs/files/test.md",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "1337",
+							"path": [
+								"fs",
+								"files",
+								"test.md"
+							]
 						}
-					}
+					},
+					"response": []
 				},
-				"url": {
-					"raw": "http://localhost:1337/fs/files/test.md",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "1337",
-					"path": [
-						"fs",
-						"files",
-						"test.md"
-					]
+				{
+					"name": "Get",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:1337/fs/files/test.md",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "1337",
+							"path": [
+								"fs",
+								"files",
+								"test.md"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:1337/fs/files/test.md",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "1337",
+							"path": [
+								"fs",
+								"files",
+								"test.md"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Move / Rename",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:1337/fs/files/test->/5245/2134523/412/341231/231/2312/3123/test.md",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "1337",
+							"path": [
+								"fs",
+								"files",
+								"test->",
+								"5245",
+								"2134523",
+								"412",
+								"341231",
+								"231",
+								"2312",
+								"3123",
+								"test.md"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Remove Permanently",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:1337/fs/files/1/2/3/->/1/2/5/",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "1337",
+							"path": [
+								"fs",
+								"files",
+								"1",
+								"2",
+								"3",
+								"->",
+								"1",
+								"2",
+								"5",
+								""
+							]
+						}
+					},
+					"response": []
 				}
-			},
-			"response": []
+			]
 		},
 		{
-			"name": "Create Directory",
-			"request": {
-				"method": "POST",
-				"header": [],
-				"url": {
-					"raw": "http://localhost:1337/fs/directories/test1/",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "1337",
-					"path": [
-						"fs",
-						"directories",
-						"test1",
-						""
-					]
+			"name": "Directories",
+			"item": [
+				{
+					"name": "Create",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:1337/fs/directories/test1/",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "1337",
+							"path": [
+								"fs",
+								"directories",
+								"test1",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:1337/fs/directories/test1/",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "1337",
+							"path": [
+								"fs",
+								"directories",
+								"test1",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Move / Rename",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:1337/fs/directories/1/2/3/->/1/2/5/",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "1337",
+							"path": [
+								"fs",
+								"directories",
+								"1",
+								"2",
+								"3",
+								"->",
+								"1",
+								"2",
+								"5",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Remove Permanently",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:1337/fs/directories/1/2/3/",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "1337",
+							"path": [
+								"fs",
+								"directories",
+								"1",
+								"2",
+								"3",
+								""
+							]
+						}
+					},
+					"response": []
 				}
-			},
-			"response": []
-		},
-		{
-			"name": "Get File",
-			"request": {
-				"method": "GET",
-				"header": [],
-				"url": {
-					"raw": "http://localhost:1337/fs/files/test.md",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "1337",
-					"path": [
-						"fs",
-						"files",
-						"test.md"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Get Directory",
-			"request": {
-				"method": "GET",
-				"header": [],
-				"url": {
-					"raw": "http://localhost:1337/fs/directories/test1/",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "1337",
-					"path": [
-						"fs",
-						"directories",
-						"test1",
-						""
-					]
-				}
-			},
-			"response": []
+			]
 		}
 	]
 }

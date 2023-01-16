@@ -5,8 +5,8 @@ import { Either } from "$core/either"
 import { FSDriver } from "$core/types"
 
 import { Exception } from "$fs/constants"
-import { getDepth } from "$fs/driver/utils/get-depth"
 import { createOrdoDirectory } from "$fs/driver/utils/create-ordo-directory"
+import { getDepth } from "$fs/driver/utils/get-depth"
 
 export const removeDirectory =
   (directory: string): FSDriver["removeDirectory"] =>

@@ -1,16 +1,18 @@
 import { createWriteStream, promises } from "fs"
 import { join } from "path"
+import { Either } from "$core/either"
 import { charset } from "mime-types"
 
-import { Either } from "$core/either"
-import { FSDriver, OrdoDirectory, OrdoFile } from "$core/types"
+import { FSDriver, OrdoDirectory } from "$core/types"
 
 import { Exception } from "$fs/constants"
 import { createDirectory } from "$fs/driver/methods/create-directory"
 import { createOrdoFile } from "$fs/driver/utils/create-ordo-file"
 import { getDepth } from "$fs/driver/utils/get-depth"
 import { getFileExtension } from "$fs/driver/utils/get-file-extension"
+import { getNormalizedAbsolutePath } from "$fs/driver/utils/get-normalized-absolute-path"
 import { getParentPath } from "$fs/driver/utils/get-parent-path"
+import { listDirectory } from "$fs/driver/utils/list-directory"
 import { promiseWriteStream } from "$fs/driver/utils/promise-write-stream"
 
 export const createFile =
@@ -20,7 +22,7 @@ export const createFile =
 
     const stat = await promises.stat(absolutePath).catch(() => null)
 
-    if (stat) {
+    if (stat && stat.isFile()) {
       return Either.left(Exception.CONFLICT)
     }
 
@@ -46,12 +48,13 @@ export const createFile =
 
     const ordoFile = createOrdoFile({ path, accessedAt, createdAt, depth, size, updatedAt })
 
-    return eitherParent.fold(
-      () => Either.right<OrdoFile, Exception.CONFLICT>(ordoFile),
-      (parent) => {
-        parent.children.push(ordoFile)
+    const parent = eitherParent.getOrElse(() => null)
 
-        return Either.right<OrdoDirectory, Exception.CONFLICT>(parent)
-      },
-    )
+    if (!parent) return Either.right(ordoFile)
+
+    const absoluteParentPath = getNormalizedAbsolutePath(parent.path, directory)
+
+    const createdDirectory = (await listDirectory(absoluteParentPath, directory)) as OrdoDirectory
+
+    return Either.right(createdDirectory)
   }

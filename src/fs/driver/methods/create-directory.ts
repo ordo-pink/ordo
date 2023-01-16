@@ -12,6 +12,10 @@ export const createDirectory =
   async (path) => {
     const absolutePath = join(directory, path)
 
+    const stat = await promises.stat(absolutePath).catch(() => null)
+
+    if (stat && stat.isDirectory()) return Either.left(Exception.CONFLICT)
+
     try {
       const recursiveCreationStartPath = await promises.mkdir(absolutePath, { recursive: true })
 

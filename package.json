@@ -37,7 +37,11 @@
     "test": "craco test",
     "test:cover": "npm run test -- --coverage .",
     "eject": "craco eject",
-    "lint": "eslint -c .eslintrc.js --ext .js,.jsx,.ts,.tsx .",
+    "tsc:check": "tsc --noEmit",
+    "eslint:check": "eslint --ext .ts,.tsx .",
+    "prettier:check": "prettier --check src/**/*.{ts,tsx}",
+    "prettier:format": "prettier --write src/**/*.{ts,tsx}",
+    "lint": "npm run eslint:check && npm run prettier:check && npm run tsc:check",
     "lint:fix": "npm run lint -- --fix"
   },
   "browserslist": {

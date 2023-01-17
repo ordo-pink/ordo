@@ -10,7 +10,7 @@ uses the hard disk to store the data.
 You can use it as a server for personal deployment of Ordo.pink, though it is not recommended right
 now.
 
-## Installation
+## Installation and startup
 
 1. Clone this repository (make sure you have Node.js installed)
 2. Run `npm i` to install dependencies

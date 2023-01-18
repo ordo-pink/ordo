@@ -5,9 +5,9 @@ import { FSDriver, OrdoDirectory } from "$core/types"
 import { OrdoDirectoryPath } from "$core/types"
 
 import { Exception } from "$fs/constants"
+import { createDirectory } from "$fs/driver/methods/create-directory"
 import { getNormalizedAbsolutePath } from "$fs/driver/utils/get-normalized-absolute-path"
 import { listDirectory } from "$fs/driver/utils/list-directory"
-import { createDirectory } from "./create-directory"
 
 export const getDirectory =
   (directory: string): FSDriver["getDirectory"] =>

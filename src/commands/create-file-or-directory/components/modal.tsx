@@ -93,7 +93,10 @@ export default function CreateModal() {
             onChange={handleInputChange}
           />
 
-          <CreateModalButtonGroup newName={newName} />
+          <CreateModalButtonGroup
+            newName={newName}
+            onAction={handleHide}
+          />
         </div>
       </div>
     </Modal>

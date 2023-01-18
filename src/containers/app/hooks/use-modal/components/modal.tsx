@@ -37,16 +37,11 @@ export default function Modal({
     isShown ? onShow() : onHide()
   }, [isShown, onShow, onHide])
 
-  const handleEscapeKeyDown = (event: KeyboardEvent) => {
-    if (event.key === "Escape") hide()
-  }
-
   return Either.fromBoolean(isShown).fold(Null, () => (
     <div
       className="modal-overlay"
       onClick={hide}
       onContextMenu={hide}
-      onKeyDown={handleEscapeKeyDown}
       role="none"
     >
       {children}

@@ -9,15 +9,16 @@ import { OrdoButtonSecondary, OrdoButtonPrimary } from "$core/components/buttons
 import { OrdoFSEntity } from "$core/constants/ordo-fs-entity"
 import { useAppDispatch } from "$core/state/hooks/use-app-dispatch"
 import { useAppSelector } from "$core/state/hooks/use-app-selector"
-import { Nullable, OrdoDirectory } from "$core/types"
+import { Nullable, OrdoDirectory, ThunkFn } from "$core/types"
 import { Either } from "$core/utils/either"
 import { lazyBox } from "$core/utils/lazy-box"
 
 type Props = {
   newName: string
+  onAction: ThunkFn<void>
 }
 
-export default function CreateModalButtonGroup({ newName }: Props) {
+export default function CreateModalButtonGroup({ newName, onAction }: Props) {
   const dispatch = useAppDispatch()
 
   const root = useAppSelector((state) => state.app.personalProject)
@@ -35,7 +36,9 @@ export default function CreateModalButtonGroup({ newName }: Props) {
 
   const newPath = `${parentPath}/${newName}`
 
-  const handleCancelButtonClick = lazyBox((box) => box.fold(() => dispatch(hideCreateModal())))
+  const handleCancelButtonClick = lazyBox((box) =>
+    box.tap(onAction).fold(() => dispatch(hideCreateModal())),
+  )
 
   const handleOkButtonClick = lazyBox((box) =>
     box
@@ -46,6 +49,7 @@ export default function CreateModalButtonGroup({ newName }: Props) {
           () => createdDirectory,
         ),
       )
+      .tap(onAction)
       .map((f) => dispatch(f(newPath) as ReturnType<typeof createdDirectory>))
       .fold(() => dispatch(hideCreateModal())),
   )

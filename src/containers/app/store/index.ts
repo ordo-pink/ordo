@@ -9,6 +9,7 @@ import { AppState, UpdatedFilePayload } from "$containers/app/types"
 
 const initialState: AppState = {
   personalProject: null,
+  isSidebarVisible: false,
   activityExtensions: [],
   commandExtensions: [],
   fileAssociationExtensions: [],
@@ -47,6 +48,9 @@ export const appSlice = createSlice({
   initialState,
   reducers: {
     registeredExtensions: registeredExtensionsReducer,
+    toggleSidebarVisibility: (state) => {
+      state.isSidebarVisible = !state.isSidebarVisible
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -67,6 +71,6 @@ export const appSlice = createSlice({
   },
 })
 
-export const { registeredExtensions } = appSlice.actions
+export const { registeredExtensions, toggleSidebarVisibility } = appSlice.actions
 
 export default appSlice.reducer

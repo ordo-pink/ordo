@@ -1,7 +1,7 @@
 .workspace {
-  @apply p-2 w-full h-full;
+  @apply p-2 w-full h-full overflow-auto;
 }
 
 .workspace-sidebar {
-  @apply p-2 h-full bg-neutral-200 dark:bg-neutral-800 w-1/4;
+  @apply p-2 h-full bg-neutral-200 dark:bg-neutral-800 w-full md:w-1/4 lg:w-1/6;
 }

@@ -10,6 +10,7 @@ import {
 } from "$core/types"
 
 export type AppState = {
+  isSidebarVisible: boolean
   personalProject: Nullable<OrdoDirectory>
   activityExtensions: OrdoActivityExtension<string>[]
   commandExtensions: OrdoCommandExtension<string>[]

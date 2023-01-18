@@ -126,8 +126,6 @@ export default function App() {
 
           if (currentRoute.pathname.startsWith(`/${path}`)) navigate(currentRoute)
         }
-
-        // TODO: Register accelerators for quick activity access
       }
 
       if (extension.translations) {

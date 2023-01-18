@@ -10,14 +10,18 @@ export const findParent = (
 
   const path = typeof child === "string" ? child : child.path
 
-  const parentPathChunks = path.split("/").slice(0, -1)
+  const parentPathChunks = path.split("/").slice(0, -1).filter(Boolean)
+
+  if (!parentPathChunks.length) {
+    return root
+  }
 
   let parent: OrdoDirectory = root
 
   for (const chunk of parentPathChunks) {
-    const found = parent.children.find((child) => child.path === `${parent.path}/${chunk}`)
+    const found = parent.children.find((child) => child.path === `${parent.path}${chunk}/`)
 
-    if (!found || !isOrdoDirectory(found)) return null
+    if (!found || !isOrdoDirectory(found)) return parent
 
     parent = found
   }

@@ -7,7 +7,7 @@ type Props = {
 }
 
 export default function PathBreadcrumbs({ path }: Props) {
-  const chunks = path.slice(1).split("/")
+  const chunks = path.slice(0, -1).split("/")
 
   return (
     <div className="path-breadcrumbs">

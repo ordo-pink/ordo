@@ -9,6 +9,7 @@
     "@testing-library/jest-dom": "^5.16.5",
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",
+    "draft-js": "^0.11.7",
     "fuse.js": "^6.6.2",
     "i18next": "^22.0.5",
     "jsonschema": "^1.4.1",
@@ -32,7 +33,7 @@
     "web-vitals": "^2.1.4"
   },
   "scripts": {
-    "start": "craco start",
+    "start": "cross-env REACT_APP_FAKE_TOKEN=\"WHOA_SO_SAFE!\" craco start",
     "build": "craco build",
     "test": "craco test",
     "test:cover": "npm run test -- --coverage .",
@@ -58,12 +59,14 @@
   },
   "devDependencies": {
     "@tailwindcss/typography": "^0.5.8",
+    "@types/draft-js": "^0.11.10",
     "@types/loadable__component": "^5.13.4",
     "@types/ramda": "^0.28.20",
     "@types/react-loadable": "^5.5.6",
     "@typescript-eslint/eslint-plugin": "^5.42.1",
     "@typescript-eslint/parser": "^5.42.1",
     "autoprefixer": "^10.4.13",
+    "cross-env": "^7.0.3",
     "eslint": "^8.27.0",
     "eslint-config-prettier": "^8.5.0",
     "eslint-plugin-css": "^0.6.0",

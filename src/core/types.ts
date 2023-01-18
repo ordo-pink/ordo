@@ -7,6 +7,7 @@ import { AppState } from "$containers/app/types"
 import type { Language } from "$core/constants/language"
 import type { OrdoExtensionType } from "$core/constants/ordo-extension-type"
 import { useAppDispatch } from "$core/state/hooks/use-app-dispatch"
+import { ContentBlock } from "draft-js"
 
 export type Nullable<T> = T | null
 
@@ -48,8 +49,7 @@ export type ActionContext = {
 }
 
 export type IsmParserRule = {
-  validate: UnaryFn<string, boolean>
-  extract: TernaryFn<string, object, object, void> // TODO Replace objects with Node and RootNode
+  validate: UnaryFn<ContentBlock, boolean>
 }
 
 export type OrdoCommand<ExtensionName extends string> = {

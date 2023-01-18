@@ -1,5 +1,5 @@
-import { BsPalette2 } from "react-icons/bs"
+import { AiOutlineMenu } from "react-icons/ai"
 
 export default function CreateFileIcon() {
-  return <BsPalette2 />
+  return <AiOutlineMenu />
 }

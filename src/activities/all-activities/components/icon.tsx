@@ -1,5 +1,5 @@
-import { BsCollection } from "react-icons/bs"
+import { BsFillGrid3X3GapFill } from "react-icons/bs"
 
 export default function Icon() {
-  return <BsCollection />
+  return <BsFillGrid3X3GapFill />
 }

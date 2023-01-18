@@ -21,6 +21,7 @@ import { gotDirectory, registeredExtensions } from "$containers/app/store"
 import { getExtensionName } from "$core/extensions/utils"
 import { isActivityExtension } from "$core/guards/is-extension"
 import { useActionContext } from "$core/hooks/use-action-context"
+import { useCommandIconButton } from "$core/hooks/use-command-icon-button"
 import { router } from "$core/router"
 import { reducer, store } from "$core/state"
 import { useAppDispatch } from "$core/state/hooks/use-app-dispatch"
@@ -31,6 +32,19 @@ import IsmFileAssociation from "$file-associations/ism"
 import MdViewerFileAssociation from "$file-associations/md-viewer"
 
 import "$containers/app/index.css"
+
+const extensions = [
+  AllActivitiesExtension,
+  EditorExtension,
+  ExtensionStoreExtension,
+  UserExtension,
+  SettingsExtension,
+  IsmFileAssociation,
+  MdViewerFileAssociation,
+  CreateFileOrDirectory,
+  DeleteFileOrDirectory,
+  CommandPalette,
+]
 
 export default function App() {
   const dispatch = useAppDispatch()
@@ -82,21 +96,13 @@ export default function App() {
     [accelerators],
   )
 
+  const CommandPaletteIcon = useCommandIconButton(
+    CommandPalette,
+    "@ordo-command-command-palette/show-command-palette",
+  )
+
   useEffect(() => {
     if (!i18n || !dispatch || !activities) return
-
-    const extensions = [
-      AllActivitiesExtension,
-      EditorExtension,
-      ExtensionStoreExtension,
-      UserExtension,
-      SettingsExtension,
-      IsmFileAssociation,
-      MdViewerFileAssociation,
-      CreateFileOrDirectory,
-      DeleteFileOrDirectory,
-      CommandPalette,
-    ]
 
     const reducers: Record<string, Reducer> = {}
 
@@ -168,6 +174,16 @@ export default function App() {
       {overlays.map((Component, index) => (
         <Component key={index} />
       ))}
+
+      <div
+        className="fixed top-5 right-5 cursor-pointer hover:text-pink-600 transition-colors duration-200"
+        onClick={() => {
+          CommandPalette.commands[0].action(actionContext)
+        }}
+        role="none"
+      >
+        <CommandPaletteIcon />
+      </div>
     </div>
   )
 }

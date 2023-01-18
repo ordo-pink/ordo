@@ -1,5 +1,5 @@
-import { BsWindowDock } from "react-icons/bs"
+import { BsPuzzle } from "react-icons/bs"
 
 export default function Icon() {
-  return <BsWindowDock />
+  return <BsPuzzle />
 }

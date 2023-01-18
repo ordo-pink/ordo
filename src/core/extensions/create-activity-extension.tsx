@@ -36,5 +36,6 @@ export const createActivityExtension = <Name extends string, State extends Recor
       }
 
       return command
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     }) as any),
 })

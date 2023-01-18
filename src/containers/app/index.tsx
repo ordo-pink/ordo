@@ -3,10 +3,10 @@ import { MouseEvent, useEffect, useState } from "react"
 import { useHotkeys } from "react-hotkeys-hook"
 import { Outlet, RouteObject, useLocation, useNavigate } from "react-router-dom"
 
-import AllActivitiesExtension from "$activities/all-activities"
+// import AllActivitiesExtension from "$activities/all-activities"
 import EditorExtension from "$activities/editor"
-import ExtensionStoreExtension from "$activities/extension-store"
-import SettingsExtension from "$activities/settings"
+// import ExtensionStoreExtension from "$activities/extension-store"
+// import SettingsExtension from "$activities/settings"
 import UserExtension from "$activities/user"
 
 import CommandPalette from "$commands/command-palette"
@@ -34,11 +34,11 @@ import MdViewerFileAssociation from "$file-associations/md-viewer"
 import "$containers/app/index.css"
 
 const extensions = [
-  AllActivitiesExtension,
+  // AllActivitiesExtension,
   EditorExtension,
-  ExtensionStoreExtension,
+  // ExtensionStoreExtension,
   UserExtension,
-  SettingsExtension,
+  // SettingsExtension,
   IsmFileAssociation,
   MdViewerFileAssociation,
   CreateFileOrDirectory,

@@ -1,19 +1,12 @@
-import { ContentBlock, Editor, EditorState } from "draft-js"
-import {
-  useState,
-  useCallback,
-  //  useEffect
-} from "react"
+import { ContentBlock, convertFromRaw, convertToRaw, Editor, EditorState } from "draft-js"
+import { markdownToDraft, draftToMarkdown } from "markdown-draft-js"
+import { useState, useCallback, useEffect } from "react"
+import { useSearchParams } from "react-router-dom"
 
+import { useFSAPI } from "$core/hooks/use-fs-api"
 import { useAppSelector } from "$core/state/hooks/use-app-selector"
-// import { useSearchParams } from "react-router-dom"
-
-// import { useFSAPI } from "$core/hooks/use-fs-api"
-// import { WorkerMessageData } from "$core/types"
 
 export default function IsmEditor() {
-  // const [worker] = useState(new Worker(new URL("$file-associations/ism/worker", import.meta.url)))
-  // const [lines, setLines] = useState<string[][]>([])
   const [editorState, setEditorState] = useState(() => EditorState.createEmpty())
 
   const ismParsers = useAppSelector((state) => state.app.ismParserExtensions)
@@ -34,34 +27,34 @@ export default function IsmEditor() {
     [ismParsers],
   )
 
-  // const [query] = useSearchParams()
-  // const { files } = useFSAPI()
+  const [query] = useSearchParams()
+  const { files } = useFSAPI()
 
-  // const path = query.get("path")
+  const path = query.get("path")
 
-  // useEffect(() => {
-  //   if (!path || !worker) return
+  useEffect(() => {
+    if (!path || !files) return
 
-  //   files.get(path).then((payload) =>
-  //     worker.postMessage({
-  //       // TODO: Move events to enum
-  //       event: "open-file",
-  //       payload,
-  //     }),
-  //   )
+    files.get(path).then((payload) => {
+      const raw = markdownToDraft(payload)
+      const contentState = convertFromRaw(raw)
+      setEditorState(EditorState.createWithContent(contentState))
+    })
+  }, [path, files])
 
-  //   // worker.onmessage = ({ data }: MessageEvent<WorkerMessageData<string[][]>>) => {
-  //   //   setLines(data.payload)
-  //   // }
+  useEffect(() => {
+    if (!path || !files) return
 
-  //   return () => {
-  //     worker.onmessage = () => void 0
-  //   }
-  //   // eslint-disable-next-line react-hooks/exhaustive-deps
-  // }, [worker, path])
+    // TODO: Send to webworker
+    const content = editorState.getCurrentContent()
+    const raw = convertToRaw(content)
+    const markdownString = draftToMarkdown(raw)
+
+    files.update(path, markdownString)
+  }, [path, files, editorState])
 
   return (
-    <div className="w-full h-full max-h-screen">
+    <div className="prose prose-pink w-full h-full max-h-screen caret-purple-800 dark:caret-purple-200">
       <Editor
         blockRendererFn={blockRendererFn}
         editorState={editorState}
@@ -70,22 +63,5 @@ export default function IsmEditor() {
         }}
       />
     </div>
-    // <div className="flex flex-col">
-    //   {lines.map((line, lineIndex) => (
-    //     <div
-    //       className="flex whitespace-nowrap"
-    //       key={lineIndex + 1}
-    //     >
-    //       {line.map((char, charIndex) => (
-    //         <span
-    //           key={`${lineIndex + 1}-${charIndex + 1}`}
-    //           className="whitespace-pre"
-    //         >
-    //           {char}
-    //         </span>
-    //       ))}
-    //     </div>
-    //   ))}
-    // </div>
   )
 }

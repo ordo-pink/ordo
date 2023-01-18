@@ -1,4 +1,4 @@
-import { KeyboardEvent, PropsWithChildren, useEffect } from "react"
+import { PropsWithChildren, useEffect } from "react"
 import { useHotkeys } from "react-hotkeys-hook"
 
 import Null from "$core/components/null"

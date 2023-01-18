@@ -1,4 +1,5 @@
 import type { Slice } from "@reduxjs/toolkit"
+import { ContentBlock } from "draft-js"
 import type { Schema } from "jsonschema"
 import type Loadable from "react-loadable"
 
@@ -7,7 +8,6 @@ import { AppState } from "$containers/app/types"
 import type { Language } from "$core/constants/language"
 import type { OrdoExtensionType } from "$core/constants/ordo-extension-type"
 import { useAppDispatch } from "$core/state/hooks/use-app-dispatch"
-import { ContentBlock } from "draft-js"
 
 export type Nullable<T> = T | null
 

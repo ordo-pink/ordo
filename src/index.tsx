@@ -3,8 +3,6 @@ import Keycloak from "$core/auth"
 const HOST = process.env.REACT_APP_FS_API_HOST ?? "http://localhost:5000"
 const FAKE_TOKEN = process.env.REACT_APP_FAKE_TOKEN
 
-console.log(FAKE_TOKEN)
-
 const DIRECTORY_API = "fs/directories"
 const FILE_API = "fs/files"
 

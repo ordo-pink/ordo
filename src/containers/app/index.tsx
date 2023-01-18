@@ -175,9 +175,6 @@ export default function App() {
 
       <div
         className="fixed top-5 right-5 cursor-pointer hover:text-pink-600 transition-colors duration-200"
-        onClick={() => {
-          CommandPalette.commands[0].action(actionContext)
-        }}
         role="none"
       >
         <CommandPaletteIcon />

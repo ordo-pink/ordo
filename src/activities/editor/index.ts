@@ -1,15 +1,28 @@
 import { editorSlice } from "$activities/editor/store"
+
 import { createActivityExtension } from "$core/extensions/create-activity-extension"
+import { router } from "$core/router"
 
 export default createActivityExtension("editor", {
   Component: () => import("$activities/editor/components"),
   Icon: () => import("$activities/editor/components/icon"),
   readableName: "@ordo-activity-editor/title",
   // TODO: Remove / at the beginning if it is present
+  commands: [
+    {
+      Icon: () => import("$activities/editor/components/icon"),
+      title: "@ordo-activity-editor/open-editor",
+      accelerator: "ctrl+shift+e",
+      showInCommandPalette: true,
+      showInContextMenu: false,
+      action: () => router.navigate("/editor"),
+    },
+  ],
   storeSlice: editorSlice,
   translations: {
     ru: {
       "@ordo-activity-editor/title": "Редактор",
+      "@ordo-activity-editor/open-editor": "Открыть редактор",
       "@ordo-activity-editor/no-file": "Выберите файл",
       "@ordo-activity-editor/unsupported-file": "Ordo не знает, как открыть этот файл.",
       "@ordo-activity-editor/search-for-extensions": "Поищем в расширениях?",
@@ -21,6 +34,7 @@ export default createActivityExtension("editor", {
     },
     en: {
       "@ordo-activity-editor/title": "Editor",
+      "@ordo-activity-editor/open-editor": "Open Editor",
       "@ordo-activity-editor/no-file": "Choose file",
       "@ordo-activity-editor/unsupported-file": "Ordo doesn't know how to open this file.",
       "@ordo-activity-editor/search-for-extensions": "There might be an extension to fix that.",

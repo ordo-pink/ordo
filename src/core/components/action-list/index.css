@@ -1,5 +1,6 @@
 .action-list_item {
-  @apply hover:bg-gradient-to-r hover:from-neutral-300 hover:dark:from-stone-700 hover:to-slate-300 hover:dark:to-slate-700 rounded-md px-2 py-0.5 flex justify-between items-center cursor-pointer;
+  @apply py-2 md:py-0.5;
+  @apply hover:bg-gradient-to-r hover:from-neutral-300 hover:dark:from-stone-700 hover:to-slate-300 hover:dark:to-slate-700 rounded-md px-2 flex justify-between items-center cursor-pointer;
 }
 
 .action-list_item.active {

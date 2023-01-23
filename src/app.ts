@@ -6,6 +6,7 @@ import express, { Request } from "express"
 import { Drivers } from "$core/types"
 
 import fsRouter from "$fs/router"
+import userRouter from "$user/router"
 
 const app = express()
 
@@ -17,4 +18,5 @@ export const createOrdoBackendServer = (drivers: Drivers) =>
     .use(urlencoded({ extended: false }))
     .use(compression({ filter: filterCompression }))
     .use("/fs", fsRouter(drivers))
+    .use("/user", userRouter(drivers))
     .disable("x-powered-by")

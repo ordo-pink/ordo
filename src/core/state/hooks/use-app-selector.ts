@@ -2,8 +2,8 @@ import { EqualityFn, useSelector } from "react-redux"
 import { RootState } from "$core/state/types"
 
 export const useAppSelector = <
-  // TODO: Improve type here to accept typeof extension
-  WithT extends Record<string, unknown> = Record<string, unknown>,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  WithT extends Record<string, any> = Record<string, any>,
   Selected = unknown,
 >(
   selector: (state: RootState<WithT>) => Selected,

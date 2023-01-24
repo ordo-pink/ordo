@@ -2,16 +2,20 @@ import Fuse from "fuse.js"
 import { useState, useEffect, ChangeEvent, KeyboardEvent, MouseEvent } from "react"
 import { useTranslation } from "react-i18next"
 
+import { EditorExtensionStore } from "$activities/editor/types"
+
 import CommandPaletteItem from "$commands/command-palette/components/palette-item"
 import { hideCommandPalette } from "$commands/command-palette/store"
+import { CommandPaletteExtensionStore, SearchableCommand } from "$commands/command-palette/types"
 
-import { AppSelectorExtension, SearchableCommand } from "$commands/command-palette/types"
 import { useModal } from "$containers/app/hooks/use-modal"
+
 import Null from "$core/components/null"
 
 import { useActionContext } from "$core/hooks/use-action-context"
 import { useAppDispatch } from "$core/state/hooks/use-app-dispatch"
 import { useAppSelector } from "$core/state/hooks/use-app-selector"
+import { useExtensionSelector } from "$core/state/hooks/use-extension-selector"
 import { OrdoCommand } from "$core/types"
 import { Either } from "$core/utils/either"
 import { preventDefault, stopPropagation } from "$core/utils/event"
@@ -26,11 +30,14 @@ const fuse = new Fuse([] as SearchableCommand[], { keys: ["title"] })
 export default function CommandPalette() {
   const dispatch = useAppDispatch()
 
+  const editorSelector = useExtensionSelector<EditorExtensionStore>()
+  const commandPaletteSelector = useExtensionSelector<CommandPaletteExtensionStore>()
+
   const root = useAppSelector((state) => state.app.personalProject)
   const commands = useAppSelector((state) => state.app.commands)
-  const isShown = useAppSelector<AppSelectorExtension>(
-    (state) => state["ordo-command-command-palette"].isShown,
-  ) as boolean
+
+  const isShown = commandPaletteSelector((state) => state["ordo-command-command-palette"].isShown)
+  const currentFile = editorSelector((state) => state["ordo-activity-editor"].currentFile)
 
   const actionContext = useActionContext(root)
 
@@ -41,12 +48,20 @@ export default function CommandPalette() {
   const [currentIndex, setCurrentIndex] = useState(0)
   const [inputValue, setInputValue] = useState("")
   const [visibleCommands, setVisibleCommands] = useState(
-    commands.filter((command) => command.showInCommandPalette),
+    commands.filter((command) =>
+      typeof command.showInCommandPalette === "function"
+        ? command.showInCommandPalette(actionContext)
+        : command.showInCommandPalette,
+    ),
   )
 
   useEffect(() => {
     const searchableCommands: SearchableCommand[] = commands
-      .filter((command) => command.showInCommandPalette)
+      .filter((command) =>
+        typeof command.showInCommandPalette === "function"
+          ? command.showInCommandPalette(actionContext)
+          : command.showInCommandPalette,
+      )
       .map((command) => ({
         ...command,
         title: t(command.title),
@@ -54,12 +69,16 @@ export default function CommandPalette() {
 
     fuse.setCollection(searchableCommands)
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [commands])
+  }, [commands, currentFile])
 
   useEffect(() => {
     if (inputValue === "") {
       const searchableCommands: SearchableCommand[] = commands
-        .filter((command) => command.showInCommandPalette)
+        .filter((command) =>
+          typeof command.showInCommandPalette === "function"
+            ? command.showInCommandPalette(actionContext)
+            : command.showInCommandPalette,
+        )
         .map((command) => ({
           ...command,
           title: t(command.title),
@@ -72,7 +91,7 @@ export default function CommandPalette() {
 
     setVisibleCommands(fusedCommands.map(({ item }) => item))
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [inputValue, commands])
+  }, [inputValue, commands, currentFile])
 
   useEffect(() => {
     if (!isShown) showModal()

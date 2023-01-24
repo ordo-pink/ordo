@@ -1,18 +1,10 @@
-import { showCommandPalette, slice } from "$commands/command-palette/store"
+import OpenCommandPalette from "$commands/command-palette/commands/open-command-palette"
+import { slice } from "$commands/command-palette/store"
 
 import { createCommandExtension } from "$core/extensions/create-command-extension"
 
 export default createCommandExtension("command-palette", {
-  commands: [
-    {
-      Icon: () => import("$commands/command-palette/components/command-palette-icon"),
-      title: "@ordo-command-command-palette/show-command-palette",
-      accelerator: "ctrl+shift+p",
-      showInCommandPalette: false,
-      showInContextMenu: false,
-      action: ({ dispatch }) => void dispatch(showCommandPalette()),
-    },
-  ],
+  commands: [OpenCommandPalette],
   overlayComponents: [() => import("$commands/command-palette/components/modal")],
   translations: {
     ru: {

@@ -1,6 +1,7 @@
-import { MouseEvent } from "react"
+import { MouseEvent, useEffect } from "react"
 
 import FileOrDirectory from "$activities/editor/components/file-explorer/file-or-directory"
+import { closeFile } from "$activities/editor/store"
 
 import { useContextMenu } from "$containers/app/hooks/use-context-menu"
 
@@ -19,15 +20,22 @@ export default function FileExplorer() {
   const directory = useAppSelector((state) => state.app.personalProject)
   const commands = useAppSelector((state) => state.app.commands)
 
+  useEffect(
+    () => () => {
+      dispatch(closeFile())
+    },
+    [dispatch],
+  )
+
   const { showContextMenu } = useContextMenu()
 
   const actionContext = useActionContext(directory)
 
   const createFileCommand = commands.find(
-    (command) => command.title === "@ordo-command-create-file-or-directory/create-file",
+    (command) => command.title === "@ordo-command-file-system/create-file",
   )
   const createDirectoryCommand = commands.find(
-    (command) => command.title === "@ordo-command-create-file-or-directory/create-directory",
+    (command) => command.title === "@ordo-command-file-system/create-directory",
   )
 
   const CreateFileIcon = createFileCommand ? createFileCommand.Icon : () => null

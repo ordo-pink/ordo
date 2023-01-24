@@ -4,7 +4,7 @@ export type CommandPaletteState = {
   isShown: boolean
 }
 
-export type AppSelectorExtension = {
+export type CommandPaletteExtensionStore = {
   "ordo-command-command-palette": CommandPaletteState
 }
 

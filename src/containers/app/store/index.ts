@@ -9,7 +9,7 @@ import { AppState, UpdatedFilePayload } from "$containers/app/types"
 
 const initialState: AppState = {
   personalProject: null,
-  isSidebarVisible: false,
+  isSidebarVisible: Boolean(window) && window.innerWidth > 448,
   activityExtensions: [],
   commandExtensions: [],
   fileAssociationExtensions: [],

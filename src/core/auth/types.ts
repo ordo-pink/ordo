@@ -4,6 +4,7 @@ export interface AuthClientError {
 }
 
 export interface AuthClientInitOptions {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   [paramName: string]: any
 }
 

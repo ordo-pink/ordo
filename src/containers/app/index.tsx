@@ -7,18 +7,17 @@ import { Outlet, RouteObject, useLocation, useNavigate } from "react-router-dom"
 import EditorExtension from "$activities/editor"
 // import ExtensionStoreExtension from "$activities/extension-store"
 // import SettingsExtension from "$activities/settings"
+import { EditorExtensionStore } from "$activities/editor/types"
 import UserExtension from "$activities/user"
 
 import CommandPalette from "$commands/command-palette"
-import CreateFileOrDirectory from "$commands/create-file-or-directory"
-import DeleteFileOrDirectory from "$commands/delete-file-or-directory"
+import FileSystemCommands from "$commands/file-system"
 
 import ActivityBar from "$containers/activity-bar"
 import ContextMenu from "$containers/app/hooks/use-context-menu/components/context-menu"
 import { useI18nInit } from "$containers/app/hooks/use-i18n-init"
 import { gotDirectory, registeredExtensions } from "$containers/app/store"
 
-import { getExtensionName } from "$core/extensions/utils"
 import { isActivityExtension } from "$core/guards/is-extension"
 import { useActionContext } from "$core/hooks/use-action-context"
 import { useCommandIconButton } from "$core/hooks/use-command-icon-button"
@@ -26,10 +25,10 @@ import { router } from "$core/router"
 import { reducer, store } from "$core/state"
 import { useAppDispatch } from "$core/state/hooks/use-app-dispatch"
 import { useAppSelector } from "$core/state/hooks/use-app-selector"
+import { useExtensionSelector } from "$core/state/hooks/use-extension-selector"
 import { ActionContext, UnaryFn } from "$core/types"
 
-import IsmFileAssociation from "$file-associations/ism"
-import MdViewerFileAssociation from "$file-associations/md-viewer"
+import MdFileExtension from "$file-associations/md"
 
 import "$containers/app/index.css"
 
@@ -39,10 +38,8 @@ const extensions = [
   // ExtensionStoreExtension,
   UserExtension,
   // SettingsExtension,
-  IsmFileAssociation,
-  MdViewerFileAssociation,
-  CreateFileOrDirectory,
-  DeleteFileOrDirectory,
+  MdFileExtension,
+  FileSystemCommands,
   CommandPalette,
 ]
 
@@ -50,7 +47,10 @@ export default function App() {
   const dispatch = useAppDispatch()
   const i18n = useI18nInit()
 
+  const editorSelector = useExtensionSelector<EditorExtensionStore>()
+
   const [accelerators, setAccelerators] = useState<Record<string, UnaryFn<ActionContext, void>>>({})
+  const currentFile = editorSelector((state) => state?.["ordo-activity-editor"]?.currentFile)
 
   const handleContextMenu = (event: MouseEvent) => {
     event.preventDefault()
@@ -81,7 +81,7 @@ export default function App() {
     })
 
     setAccelerators(() => keybindings)
-  }, [commands])
+  }, [commands, currentFile])
 
   useHotkeys(
     Object.keys(accelerators).join(", "),
@@ -113,10 +113,9 @@ export default function App() {
         if (activityExists) return
 
         // Register paths in the router to make activities available
-        const paths = extension.paths ? extension.paths : [getExtensionName(extension)]
         const Element = extension.Component
 
-        for (const path of paths) {
+        for (const path of extension.routes) {
           router.routes[0].children?.unshift({
             path,
             element: <Element />,

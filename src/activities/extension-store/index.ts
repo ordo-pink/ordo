@@ -4,7 +4,7 @@ export default createActivityExtension("extension-store", {
   Component: () => import("$activities/extension-store/components"),
   Icon: () => import("$activities/extension-store/components/icon"),
   readableName: "@ordo-activity-extension-store/title",
-  paths: ["extension-store", "extension-store/:type/:name"],
+  routes: ["/extension-store", "/extension-store/:type/:name"],
   translations: {
     ru: {
       "@ordo-activity-extension-store/title": "Расширения",

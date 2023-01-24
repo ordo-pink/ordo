@@ -6,7 +6,11 @@ import { OrdoCommand, OrdoCommandExtension } from "$core/types"
 
 import "$core/hooks/use-command-icon-button/index.css"
 
-export const useCommandIconButton = <T extends OrdoCommandExtension<string>>(
+export const useCommandIconButton = <
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  State extends Record<string, any>,
+  T extends OrdoCommandExtension<string, State>,
+>(
   extension: T,
   commandName: string,
 ) => {

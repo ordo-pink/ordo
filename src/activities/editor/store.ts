@@ -11,19 +11,15 @@ export const editorSlice = createSlice({
   name: "@ordo-editor",
   initialState,
   reducers: {
-    selectedFile: (state, action: PayloadAction<OrdoFile>) => {
+    selectFile: (state, action: PayloadAction<OrdoFile>) => {
       state.currentFile = action.payload
     },
-    gotFileContent: (state, action: PayloadAction<string>) => {
-      state.currentFileRaw = action.payload
-    },
-    closedFile: (state) => {
+    closeFile: (state) => {
       state.currentFile = null
-      state.currentFileRaw = undefined
     },
   },
 })
 
-export const { gotFileContent, closedFile, selectedFile } = editorSlice.actions
+export const { selectFile, closeFile } = editorSlice.actions
 
 export default editorSlice.reducer

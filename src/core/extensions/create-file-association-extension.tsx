@@ -20,12 +20,14 @@ export const createFileAssociationExtension = <
   State extends Record<string, unknown>,
 >(
   name: Name,
-  props: Props<Name, State>,
-): OrdoFileAssociationExtension<Name> => ({
+  props: Props<Name, Record<`ordo-file-association-${Name}`, State>>,
+): OrdoFileAssociationExtension<Name, State> => ({
   ...props,
   name: `ordo-file-association-${name}`,
   Component: createLoadable(props.Component),
   Icon: createLoadable(props.Icon, () => <BsLock />, 200),
   storeSlice:
-    props.storeSlice ?? (null as unknown as OrdoFileAssociationExtension<Name>["storeSlice"]),
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (props.storeSlice as any) ??
+    (null as unknown as OrdoFileAssociationExtension<Name>["storeSlice"]),
 })

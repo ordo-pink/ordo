@@ -1,0 +1,12 @@
+{
+  "@ordo-activity-editor/title": "Editor",
+  "@ordo-activity-editor/open-editor": "Open Editor",
+  "@ordo-activity-editor/no-file": "Choose file",
+  "@ordo-activity-editor/unsupported-file": "Can't open \"{{extension}}\"",
+  "@ordo-activity-editor/search-for-extensions": "There might be an extension to fix that.",
+  "@ordo-activity-editor/remove": "Remove",
+  "@ordo-activity-editor/create-file": "Create file",
+  "@ordo-activity-editor/create-directory": "Create directory",
+  "@ordo-activity-editor/create-modal.create-file.placeholder": "File name",
+  "@ordo-activity-editor/create-modal.create-directory.placeholder": "Directory name"
+}

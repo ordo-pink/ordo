@@ -1,5 +1,5 @@
 .editor {
-  @apply w-full h-full flex;
+  @apply w-full h-full flex justify-center;
 }
 
 .editor_not-selected {

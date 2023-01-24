@@ -7,6 +7,7 @@ import { createActivityExtension } from "$core/extensions/create-activity-extens
 export default createActivityExtension("all-activities", {
   Component: () => import("$activities/all-activities/components"),
   Icon: () => import("$activities/all-activities/components/icon"),
+  routes: ["all-activities"],
   readableName: "@ordo-activity-all-activities/title",
   translations: {
     ru: {

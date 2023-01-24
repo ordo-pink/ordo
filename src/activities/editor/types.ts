@@ -3,7 +3,10 @@ import { Nullable, OrdoFile } from "$core/types"
 
 export type EditorState = {
   currentFile: Nullable<OrdoFile>
-  currentFileRaw?: string
+}
+
+export type EditorExtensionStore = {
+  "ordo-activity-editor": EditorState
 }
 
 export type OrdoIsmFileDate = {

@@ -10,7 +10,7 @@ import { OrdoActivityExtension, OrdoExtension } from "$core/types"
 import { Switch } from "$core/utils/switch"
 
 export const getActivityRoute = (activity: OrdoActivityExtension<string>) =>
-  activity.paths?.[0] ? `/${activity.paths?.[0]}` : `/${getExtensionName(activity)}`
+  activity.routes?.[0] ? `/${activity.routes?.[0]}` : `/${getExtensionName(activity)}`
 
 export const getExtensionReadableName = (extension: OrdoExtension<string, OrdoExtensionType>) => {
   const checkHasReadableName = (currentExtension: OrdoExtension<string, OrdoExtensionType>) =>

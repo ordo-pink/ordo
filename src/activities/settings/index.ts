@@ -3,6 +3,7 @@ import { createActivityExtension } from "$core/extensions/create-activity-extens
 export default createActivityExtension("settings", {
   Component: () => import("$activities/settings/components"),
   Icon: () => import("$activities/settings/components/icon"),
+  routes: ["/settings", "/settings/:extension"],
   readableName: "@ordo-activity-settings/title",
   translations: {
     ru: {

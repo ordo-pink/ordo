@@ -1,5 +1,10 @@
-import { ContentBlock, convertFromRaw, convertToRaw, Editor, EditorState } from "draft-js"
+import { ContentBlock, convertFromRaw, convertToRaw, EditorState } from "draft-js"
+import createMarkdownShortcutsPlugin from "draft-js-markdown-shortcuts-plugin"
+import Editor from "draft-js-plugins-editor"
+import createPrismPlugin from "draft-js-prism-plugin"
+import { clearEmptyBlocks, clearPastedStyle, replaceTextRegex } from "draft-regex"
 import { markdownToDraft, draftToMarkdown } from "markdown-draft-js"
+import Prism from "prismjs"
 import { useState, useCallback, useEffect, useRef } from "react"
 import { useSearchParams } from "react-router-dom"
 
@@ -10,6 +15,16 @@ import { useAppDispatch } from "$core/state/hooks/use-app-dispatch"
 import { useAppSelector } from "$core/state/hooks/use-app-selector"
 import { findOrdoFile } from "$core/utils/fs-helpers"
 
+import "prismjs/components/prism-python"
+import "prismjs/components/prism-javascript"
+import "prismjs/components/prism-typescript"
+import "prismjs/components/prism-bash"
+
+const markdownShortcutsPlugin = createMarkdownShortcutsPlugin()
+const prismPlugin = createPrismPlugin({
+  prism: Prism,
+})
+
 export default function IsmEditor() {
   const dispatch = useAppDispatch()
 
@@ -17,7 +32,7 @@ export default function IsmEditor() {
 
   const [editorState, setEditorState] = useState(() => EditorState.createEmpty())
 
-  const editorRef = useRef<Draft.DraftComponent.Base.DraftEditor>(null)
+  const editorRef = useRef<Editor>(null)
 
   const ismParsers = useAppSelector((state) => state.app.ismParserExtensions)
 
@@ -80,8 +95,14 @@ export default function IsmEditor() {
         ref={editorRef}
         blockRendererFn={blockRendererFn}
         editorState={editorState}
+        plugins={[prismPlugin, markdownShortcutsPlugin]}
         onChange={(state) => {
-          setEditorState(state)
+          setEditorState(clearEmptyBlocks(state))
+        }}
+        handlePastedText={(_, __, state) => {
+          setEditorState(clearPastedStyle(state))
+
+          return "not-handled"
         }}
       />
     </div>

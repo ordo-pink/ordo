@@ -1,7 +1,7 @@
 {
   "@ordo-activity-editor/title": "Editor",
   "@ordo-activity-editor/open-editor": "Open Editor",
-  "@ordo-activity-editor/no-file": "Choose file",
+  "@ordo-activity-editor/no-file": "Choose file. Or create one. \"ALT+N\" is a good place to start.",
   "@ordo-activity-editor/unsupported-file": "Sorry, \"{{extension}}\" files are not supported yet. We will soon provide you with access to Ordo Store where you can extend Ordo, including the support for custom files. Stay tuned!",
   "@ordo-activity-editor/search-for-extensions": "There might be an extension to fix that.",
   "@ordo-activity-editor/remove": "Remove",

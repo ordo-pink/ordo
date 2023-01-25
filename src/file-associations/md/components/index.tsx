@@ -2,7 +2,6 @@ import { ContentBlock, convertFromRaw, convertToRaw, EditorState } from "draft-j
 import createMarkdownShortcutsPlugin from "draft-js-markdown-shortcuts-plugin"
 import Editor from "draft-js-plugins-editor"
 import createPrismPlugin from "draft-js-prism-plugin"
-import { clearEmptyBlocks, clearPastedStyle } from "draft-regex"
 import { markdownToDraft, draftToMarkdown } from "markdown-draft-js"
 import Prism from "prismjs"
 import { useState, useCallback, useEffect, useRef } from "react"
@@ -102,10 +101,10 @@ export default function IsmEditor() {
         editorState={editorState}
         plugins={[prismPlugin, markdownShortcutsPlugin]}
         onChange={(state) => {
-          setEditorState(clearEmptyBlocks(state))
+          setEditorState(state)
         }}
         handlePastedText={(_, __, state) => {
-          setEditorState(clearPastedStyle(state))
+          setEditorState(state)
 
           return "not-handled"
         }}

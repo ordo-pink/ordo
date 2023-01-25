@@ -8,7 +8,7 @@ import Prism from "prismjs"
 import { useState, useCallback, useEffect, useRef } from "react"
 import { useSearchParams } from "react-router-dom"
 
-import { useCurrentFileAssociation } from "$activities/editor/hooks/use-current-file-association"
+import EditorPage from "$activities/editor/components/editor-page"
 import { selectFile } from "$activities/editor/store"
 import { EditorExtensionStore } from "$activities/editor/types"
 
@@ -17,6 +17,7 @@ import { useFSAPI } from "$core/hooks/use-fs-api"
 import { useAppDispatch } from "$core/state/hooks/use-app-dispatch"
 import { useAppSelector } from "$core/state/hooks/use-app-selector"
 import { useExtensionSelector } from "$core/state/hooks/use-extension-selector"
+import { Either } from "$core/utils/either"
 import { findOrdoFile } from "$core/utils/fs-helpers"
 
 import "prismjs/components/prism-python"
@@ -37,8 +38,6 @@ export default function IsmEditor() {
   const editorSelector = useExtensionSelector<EditorExtensionStore>()
 
   const currentFile = editorSelector((state) => state["ordo-activity-editor"].currentFile)
-  const currentFileAssociation = useCurrentFileAssociation()
-  const Icon = currentFileAssociation?.Icon ?? Null
 
   const [editorState, setEditorState] = useState(() => EditorState.createEmpty())
 
@@ -95,34 +94,22 @@ export default function IsmEditor() {
     files.update(path, markdownString)
   }, [path, files, editorState])
 
-  return (
-    <div className="flex flex-col w-full">
-      <div className="py-8 px-4">
-        <div className="text-5xl flex space-x-4 font-black">
-          <Icon />
-          <div>{currentFile?.readableName}</div>
-        </div>
-      </div>
-      <div
-        className="self-center prose prose-pink w-full h-full max-h-screen caret-purple-800 dark:prose-invert dark:caret-purple-200 cursor-text"
-        onClick={() => editorRef.current && editorRef.current.focus()}
-        role="none"
-      >
-        <Editor
-          ref={editorRef}
-          blockRendererFn={blockRendererFn}
-          editorState={editorState}
-          plugins={[prismPlugin, markdownShortcutsPlugin]}
-          onChange={(state) => {
-            setEditorState(clearEmptyBlocks(state))
-          }}
-          handlePastedText={(_, __, state) => {
-            setEditorState(clearPastedStyle(state))
+  return Either.fromNullable(currentFile).fold(Null, (file) => (
+    <EditorPage currentFile={file}>
+      <Editor
+        ref={editorRef}
+        blockRendererFn={blockRendererFn}
+        editorState={editorState}
+        plugins={[prismPlugin, markdownShortcutsPlugin]}
+        onChange={(state) => {
+          setEditorState(clearEmptyBlocks(state))
+        }}
+        handlePastedText={(_, __, state) => {
+          setEditorState(clearPastedStyle(state))
 
-            return "not-handled"
-          }}
-        />
-      </div>
-    </div>
-  )
+          return "not-handled"
+        }}
+      />
+    </EditorPage>
+  ))
 }

@@ -1,10 +1,13 @@
 import { useTranslation } from "react-i18next"
 
+import EditorPage from "$activities/editor/components/editor-page"
 import { EditorExtensionStore } from "$activities/editor/types"
 
 import Unsupported from "$assets/img/not-supported-2.png"
 
+import Null from "$core/components/null"
 import { useExtensionSelector } from "$core/state/hooks/use-extension-selector"
+import { Either } from "$core/utils/either"
 
 export default function FileNotSupported() {
   const editorSelector = useExtensionSelector<EditorExtensionStore>()
@@ -17,19 +20,13 @@ export default function FileNotSupported() {
     extension: currentFile?.extension,
   })
 
-  return (
-    <div className="editor_not-supported">
-      <div className="relative w-full h-screen flex items-center justify-center">
-        <img
-          src={Unsupported}
-          className="w-5/6 max-w-lg shadow-xl absolute rounded-md"
-          alt=""
-        />
-
-        <div className="absolute w-1/2 break-words text-right text-9xl mix-blend-difference uppercase font-black">
-          {translatedText}
-        </div>
-      </div>
-    </div>
-  )
+  return Either.fromNullable(currentFile).fold(Null, (file) => (
+    <EditorPage
+      currentFile={file}
+      image={Unsupported}
+      imageAlt=""
+    >
+      {translatedText}
+    </EditorPage>
+  ))
 }

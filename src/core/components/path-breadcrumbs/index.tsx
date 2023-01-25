@@ -7,10 +7,14 @@ type Props = {
 }
 
 export default function PathBreadcrumbs({ path }: Props) {
-  const chunks = path.slice(0, -1).split("/")
+  const pathWithoutLastSlash = path.endsWith("/") && path.length > 1 ? path.slice(0, -1) : path
+
+  const chunks = pathWithoutLastSlash.split("/").filter(Boolean)
 
   return (
     <div className="path-breadcrumbs">
+      <PathBreadcrumbsItem chunk="/" />
+
       {chunks.map((chunk, index) => (
         <PathBreadcrumbsItem
           key={`${chunk}-${index}`}

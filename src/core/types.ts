@@ -28,10 +28,14 @@ export type FileAssociation = Record<OrdoExtensionName, FileExtension[]>
 
 export type OrdoElectronEnv = {
   type: "electron"
+  fetch: typeof fetch
+  isAuthenticated?: boolean
 }
 
 export type OrdoBrowserEnv = {
   type: "browser"
+  fetch: typeof fetch
+  isAuthenticated?: boolean
 }
 
 export type AccessLevel = {

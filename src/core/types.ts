@@ -27,10 +27,12 @@ export type FileExtension = `.${string}`
 export type FileAssociation = Record<OrdoExtensionName, FileExtension[]>
 
 export type OrdoElectronEnv = {
+  openExternal: UnaryFn<string, void>
   type: "electron"
 }
 
 export type OrdoBrowserEnv = {
+  openExternal: UnaryFn<string, void>
   type: "browser"
 }
 

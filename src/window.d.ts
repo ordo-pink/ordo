@@ -1,4 +1,4 @@
-import type { OrdoDirectory, OrdoFile } from "$core/types"
+import type { OrdoDirectory, OrdoFile, UnaryFn } from "$core/types"
 
 declare global {
   interface Window {
@@ -6,6 +6,7 @@ declare global {
       env: {
         type: "electron" | "browser"
         fetch: typeof fetch
+        openExternal: UnaryFn<string, void>
       }
       api: {
         fs: {

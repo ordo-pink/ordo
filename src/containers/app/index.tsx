@@ -12,6 +12,7 @@ import UserExtension from "$activities/user"
 
 import CommandPalette from "$commands/command-palette"
 import FileSystemCommands from "$commands/file-system"
+import UserSupportCommands from "$commands/user-support"
 
 import ActivityBar from "$containers/activity-bar"
 import ContextMenu from "$containers/app/hooks/use-context-menu/components/context-menu"
@@ -41,6 +42,7 @@ const extensions = [
   MdFileExtension,
   FileSystemCommands,
   CommandPalette,
+  UserSupportCommands,
 ]
 
 export default function App() {

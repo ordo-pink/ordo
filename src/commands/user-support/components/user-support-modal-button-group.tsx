@@ -1,12 +1,12 @@
 import { useTranslation } from "react-i18next"
+import { AiTwotoneMail } from "react-icons/ai"
+import { BsTelegram } from "react-icons/bs"
 
 import { hideSupportModal } from "../store"
 import { OrdoButtonSecondary, OrdoButtonNeutral } from "$core/components/buttons"
 import { useEnv } from "$core/hooks/use-env"
 import { useAppDispatch } from "$core/state/hooks/use-app-dispatch"
 import { lazyBox } from "$core/utils/lazy-box"
-import { BsTelegram } from "react-icons/bs"
-import { AiTwotoneMail } from "react-icons/ai"
 
 export default function DeleteModalButtonGroup() {
   const dispatch = useAppDispatch()

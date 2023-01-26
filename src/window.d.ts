@@ -6,6 +6,7 @@ declare global {
       env: {
         type: "electron" | "browser"
         fetch: typeof fetch
+        isAuthenticated?: boolean
       }
       api: {
         fs: {

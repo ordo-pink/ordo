@@ -13,15 +13,11 @@ export default function DeleteModalButtonGroup() {
   const handleCancelButtonClick = lazyBox((box) => box.fold(() => dispatch(hideSupportModal())))
 
   const handleEmailButtonClick = lazyBox((box) =>
-    box.fold(() => {
-      env.openExternal("mailto:support@ordo.pink")
-    }),
+    box.map(() => env.openExternal("mailto:support@ordo.pink")).fold(handleCancelButtonClick),
   )
 
   const handleTelegramButtonClick = lazyBox((box) =>
-    box.fold(() => {
-      env.openExternal("https://t.me/ordo_pink")
-    }),
+    box.map(() => env.openExternal("https://t.me/ordo_pink")).fold(handleCancelButtonClick),
   )
 
   const { t } = useTranslation()

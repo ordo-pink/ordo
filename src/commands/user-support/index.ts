@@ -16,7 +16,7 @@ export default createCommandExtension("user-support", {
     en: {
       "@ordo-command-user-support/readable-name": "Support",
       "@ordo-command-user-support/open-user-support": "Request support",
-      "@ordo-command-user-support/call-to-support": "Which communication method do you prefer?",
+      "@ordo-command-user-support/call-to-support": "Which communication method would you prefer?",
       "@ordo-command-user-support/button-telegram": "Telegram",
       "@ordo-command-user-support/button-email": "Email",
       "@ordo-command-user-support/button-cancel": "Cancel",

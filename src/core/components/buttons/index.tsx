@@ -152,7 +152,7 @@ export const OrdoButtonNeutral = ({
 }: Props) => {
   const buttonAppearanceClass = Either.fromBoolean(!!disabled).fold(
     () =>
-      "bg-gradient-to-r from-neutral-300 via-stone-300 to-neutral-300 dark:from-neutral-700 dark:via-stone-700 dark:to-neutral-700 active-ring",
+      "bg-gradient-to-r from-neutral-300 via-stone-300 to-neutral-300 dark:from-neutral-600 dark:via-stone-600 dark:to-neutral-600 active-ring",
     () =>
       "bg-gradient-to-r from-slate-300 via-zinc-300 to-stone-300 dark:from-slate-900 dark:via-zinc-900 dark:to-stone-900",
   )

@@ -8,6 +8,14 @@ declare global {
         fetch: typeof fetch
         openExternal: UnaryFn<string, void>
         isAuthenticated?: boolean
+        userData?: {
+          firstName: string
+          lastName: string
+          fullName: string
+          username: string
+          email: string
+          emailVerified: boolean
+        }
       }
       api: {
         fs: {

@@ -22,14 +22,13 @@ window.XMLHttpRequest = class extends XMLHttpRequest {
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   open(method: any, url: any, async?: any, username?: any, password?: any): void {
-    // if (
-    //   method !== "POST" ||
-    //   !url.startsWith("https://sso.ordo.pink") ||
-    //   !url.endsWith("/protocol/openid-connect/token")
-    // ) {
-    //   // throw new Error("Invalid request")
-    //   console.log(method, url, async, username, password)
-    // }
+    if (
+      method !== "POST" ||
+      !url.startsWith("https://sso.ordo.pink") ||
+      !url.endsWith("/protocol/openid-connect/token")
+    ) {
+      throw new Error("Invalid request")
+    }
 
     super.open(method, url, async, username, password)
   }
@@ -45,19 +44,19 @@ window.ordo = {
     type: "browser",
     // TODO: Extend this to support permissions provided by the user
     fetch: (...[url, params]: Parameters<typeof fetch>) => {
-      // if (typeof url === "string") {
-      //   if (!url.startsWith(HOST)) {
-      //     throw new Error("Invalid request")
-      //   }
-      // } else if (url instanceof URL) {
-      //   if (url.host !== HOST) {
-      //     throw new Error("Invalid request")
-      //   }
-      // } else {
-      //   if (!url.url.startsWith(HOST)) {
-      //     throw new Error("Invalid request")
-      //   }
-      // }
+      if (typeof url === "string") {
+        if (!url.startsWith(HOST)) {
+          throw new Error("Invalid request")
+        }
+      } else if (url instanceof URL) {
+        if (url.host !== HOST) {
+          throw new Error("Invalid request")
+        }
+      } else {
+        if (!url.url.startsWith(HOST)) {
+          throw new Error("Invalid request")
+        }
+      }
 
       return fetch(url, params)
     },

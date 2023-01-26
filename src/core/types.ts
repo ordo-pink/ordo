@@ -1,5 +1,6 @@
 import type { Slice } from "@reduxjs/toolkit"
-import { ContentBlock } from "draft-js"
+import type { ContentBlock } from "draft-js"
+import type { TFunction } from "i18next"
 import type { Schema } from "jsonschema"
 import type Loadable from "react-loadable"
 
@@ -43,6 +44,7 @@ export type ActionContext<
   dispatch: ReturnType<typeof useAppDispatch>
   env: typeof window["ordo"]["env"]
   navigate: typeof router.navigate
+  translate: TFunction<"translation", undefined>
 }
 
 export type IsmParserRule = {

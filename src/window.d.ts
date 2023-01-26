@@ -7,6 +7,7 @@ declare global {
         type: "electron" | "browser"
         fetch: typeof fetch
         openExternal: UnaryFn<string, void>
+        isAuthenticated?: boolean
       }
       api: {
         fs: {

@@ -29,11 +29,15 @@ export type FileAssociation = Record<OrdoExtensionName, FileExtension[]>
 export type OrdoElectronEnv = {
   openExternal: UnaryFn<string, void>
   type: "electron"
+  fetch: typeof fetch
+  isAuthenticated?: boolean
 }
 
 export type OrdoBrowserEnv = {
   openExternal: UnaryFn<string, void>
   type: "browser"
+  fetch: typeof fetch
+  isAuthenticated?: boolean
 }
 
 export type AccessLevel = {

@@ -10,6 +10,7 @@ import EditorExtension from "$activities/editor"
 import { EditorExtensionStore } from "$activities/editor/types"
 import UserExtension from "$activities/user"
 
+import AuthCommands from "$commands/auth"
 import CommandPalette from "$commands/command-palette"
 import FileSystemCommands from "$commands/file-system"
 import UserSupportCommands from "$commands/user-support"
@@ -43,6 +44,7 @@ const extensions = [
   FileSystemCommands,
   CommandPalette,
   UserSupportCommands,
+  AuthCommands,
 ]
 
 export default function App() {

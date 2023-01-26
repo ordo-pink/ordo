@@ -7,7 +7,7 @@ import { OrdoButtonSecondary, OrdoButtonPrimary } from "$core/components/buttons
 import { useAppDispatch } from "$core/state/hooks/use-app-dispatch"
 import { lazyBox } from "$core/utils/lazy-box"
 
-export default function DeleteModalButtonGroup() {
+export default function LogoutModalButtonGroup() {
   const dispatch = useAppDispatch()
 
   const { keycloak } = useKeycloak()

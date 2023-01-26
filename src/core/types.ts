@@ -26,20 +26,6 @@ export type FileExtension = `.${string}`
 
 export type FileAssociation = Record<OrdoExtensionName, FileExtension[]>
 
-export type OrdoElectronEnv = {
-  openExternal: UnaryFn<string, void>
-  type: "electron"
-  fetch: typeof fetch
-  isAuthenticated?: boolean
-}
-
-export type OrdoBrowserEnv = {
-  openExternal: UnaryFn<string, void>
-  type: "browser"
-  fetch: typeof fetch
-  isAuthenticated?: boolean
-}
-
 export type AccessLevel = {
   read: boolean
   write: boolean
@@ -55,7 +41,7 @@ export type ActionContext<
   // TODO: Replace with `target` and add a boolean for whether it is `isContextMenuCall`
   contextMenuTarget: Nullable<OrdoFile | OrdoDirectory>
   dispatch: ReturnType<typeof useAppDispatch>
-  env: OrdoElectronEnv | OrdoBrowserEnv
+  env: typeof window["ordo"]["env"]
   navigate: typeof router.navigate
 }
 

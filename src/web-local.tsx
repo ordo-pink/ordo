@@ -12,8 +12,9 @@ import "$assets/index.css"
 
 Keycloak.init({
   onLoad: "login-required",
-}).then(() => {
-  window.ordo.env.isAuthenticated = true
+}).then((isAuthenticated) => {
+  window.ordo.env.isAuthenticated = isAuthenticated
+
   const root = ReactDOM.createRoot(document.getElementById("root") as HTMLDivElement)
 
   root.render(

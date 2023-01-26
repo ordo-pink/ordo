@@ -5,6 +5,8 @@ import { OrdoButtonSecondary, OrdoButtonNeutral } from "$core/components/buttons
 import { useEnv } from "$core/hooks/use-env"
 import { useAppDispatch } from "$core/state/hooks/use-app-dispatch"
 import { lazyBox } from "$core/utils/lazy-box"
+import { BsTelegram } from "react-icons/bs"
+import { AiTwotoneMail } from "react-icons/ai"
 
 export default function DeleteModalButtonGroup() {
   const dispatch = useAppDispatch()
@@ -39,14 +41,20 @@ export default function DeleteModalButtonGroup() {
         hotkey="e"
         onClick={handleEmailButtonClick}
       >
-        {translatedEmail}
+        <div className="flex space-x-2 items-center">
+          <AiTwotoneMail className="text-neutral-700 dark:text-neutral-300 shrink-0" />
+          <div>{translatedEmail}</div>
+        </div>
       </OrdoButtonNeutral>
 
       <OrdoButtonNeutral
         hotkey="t"
         onClick={handleTelegramButtonClick}
       >
-        {translatedTelegram}
+        <div className="flex space-x-2 items-center">
+          <BsTelegram className="text-neutral-700 dark:text-neutral-300 shrink-0" />
+          <div>{translatedTelegram}</div>
+        </div>
       </OrdoButtonNeutral>
     </div>
   )

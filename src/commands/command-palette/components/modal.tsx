@@ -151,7 +151,9 @@ export default function CommandPalette() {
     dispatch(hideCommandPalette())
   }
 
-  const handleModalClick = lazyBox<MouseEvent>((box) => box.tap(preventDefault))
+  const handleModalClick = lazyBox<MouseEvent>((box) =>
+    box.tap(preventDefault).tap(stopPropagation),
+  )
 
   const handleChange = lazyBox<ChangeEvent<HTMLInputElement>>((box) =>
     box

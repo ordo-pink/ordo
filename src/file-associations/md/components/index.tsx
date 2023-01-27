@@ -19,11 +19,13 @@ import { useExtensionSelector } from "$core/state/hooks/use-extension-selector"
 import { Either } from "$core/utils/either"
 import { getParentPath } from "$core/utils/fs-helpers"
 import { findOrdoFile } from "$core/utils/fs-helpers"
+import { lazyBox } from "$core/utils/lazy-box"
 
 import "prismjs/components/prism-python"
 import "prismjs/components/prism-javascript"
 import "prismjs/components/prism-typescript"
 import "prismjs/components/prism-bash"
+import "draft-js/dist/Draft.css"
 
 const markdownShortcutsPlugin = createMarkdownShortcutsPlugin()
 const prismPlugin = createPrismPlugin({
@@ -95,12 +97,16 @@ export default function IsmEditor() {
     files.update(path, markdownString)
   }, [path, files, editorState])
 
+  const handleEditorClick = lazyBox((box) => box.fold(() => editorRef.current?.focus()))
+
   return Either.fromNullable(currentFile).fold(Null, (file) => (
     <EditorPage
       title={file.readableName}
       breadcrumbsPath={breadcrumbsPath}
+      onClick={handleEditorClick}
     >
       <Editor
+        placeholder="Type something..."
         ref={editorRef}
         blockRendererFn={blockRendererFn}
         editorState={editorState}

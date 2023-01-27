@@ -1,15 +1,17 @@
-import { PropsWithChildren } from "react"
+import { MouseEvent, PropsWithChildren } from "react"
 
 import { useCurrentFileAssociation } from "$activities/editor/hooks/use-current-file-association"
 
 import Null from "$core/components/null"
 import PathBreadcrumbs from "$core/components/path-breadcrumbs"
+import { UnaryFn } from "$core/types"
 
 type Props = PropsWithChildren<{
   image?: string
   imageAlt?: string
   title?: string
   breadcrumbsPath?: string
+  onClick?: UnaryFn<MouseEvent, void>
 }>
 
 export default function EditorPage({
@@ -18,6 +20,7 @@ export default function EditorPage({
   title,
   breadcrumbsPath,
   children,
+  onClick = () => void 0,
 }: Props) {
   const currentFileAssociation = useCurrentFileAssociation()
   const Icon = currentFileAssociation?.Icon ?? Null
@@ -39,7 +42,11 @@ export default function EditorPage({
         <Icon />
       </div>
 
-      <div className="mt-48 p-4 self-center prose prose-pink prose-headings:text-neutral-700 dark:prose-headings:text-neutral-300 w-full h-full max-h-screen caret-purple-800 dark:prose-invert dark:caret-purple-200 cursor-text">
+      <div
+        className="mt-48 p-4 self-center prose prose-pink prose-headings:text-neutral-700 dark:prose-headings:text-neutral-300 w-full h-full max-h-screen caret-purple-800 dark:prose-invert dark:caret-purple-200 cursor-text"
+        onClick={onClick}
+        role="none"
+      >
         <PathBreadcrumbs path={breadcrumbsPath ?? ""} />
 
         <div className="text-5xl flex space-x-4 font-black text-neutral-700 dark:text-neutral-300">

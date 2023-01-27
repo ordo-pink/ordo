@@ -9,7 +9,7 @@ export interface IEitherStatic {
   readonly isRight: false
   try: <TRight, TLeft extends Error>(thunk: ThunkFn<TRight>) => IEither<TRight, TLeft>
   fromNullable: <TRight>(x: Nullable<TRight>) => IEither<TRight, null>
-  fromBoolean: (x: boolean) => IEither<true, false>
+  fromBoolean: (x: unknown) => IEither<true, false>
   right: <TRight, TLeft = unknown>(x: TRight) => IEither<TRight, TLeft>
   left: <TLeft, TRight = unknown>(x: TLeft) => IEither<TRight, TLeft>
   of: <TRight, TLeft = unknown>(x: TRight) => IEither<TRight, TLeft>
@@ -103,7 +103,7 @@ export const Either: IEitherStatic = {
     }
   },
   fromNullable: (x) => (x != null ? right(x) : left(null)),
-  fromBoolean: (x) => (x === true ? right(x) : left(x)),
+  fromBoolean: (x) => (x ? right(true) : left(false)),
   right: <TRight, TLeft = unknown>(x: TRight) => right(x) as IEither<TRight, TLeft>,
   left: (x) => left(x),
   of: (x) => right(x),

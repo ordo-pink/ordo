@@ -9,7 +9,7 @@ export default function FileNotSelected() {
 
   return (
     <EditorPage
-      currentFile={null}
+      title=""
       image={NotSelected}
       imageAlt=""
     >

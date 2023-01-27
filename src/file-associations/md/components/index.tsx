@@ -17,6 +17,7 @@ import { useAppDispatch } from "$core/state/hooks/use-app-dispatch"
 import { useAppSelector } from "$core/state/hooks/use-app-selector"
 import { useExtensionSelector } from "$core/state/hooks/use-extension-selector"
 import { Either } from "$core/utils/either"
+import { getParentPath } from "$core/utils/fs-helpers"
 import { findOrdoFile } from "$core/utils/fs-helpers"
 
 import "prismjs/components/prism-python"
@@ -64,6 +65,7 @@ export default function IsmEditor() {
   const { files } = useFSAPI()
 
   const path = query.get("path")
+  const breadcrumbsPath = getParentPath(path ?? "/")
 
   useEffect(() => {
     if (!path || !files) return
@@ -94,7 +96,10 @@ export default function IsmEditor() {
   }, [path, files, editorState])
 
   return Either.fromNullable(currentFile).fold(Null, (file) => (
-    <EditorPage currentFile={file}>
+    <EditorPage
+      title={file.readableName}
+      breadcrumbsPath={breadcrumbsPath}
+    >
       <Editor
         ref={editorRef}
         blockRendererFn={blockRendererFn}

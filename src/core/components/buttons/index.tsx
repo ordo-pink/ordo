@@ -13,6 +13,7 @@ type Props = PropsWithChildren<{
   className?: string
   outline?: boolean
   hotkey?: string
+  center?: boolean
 }>
 
 export default function OrdoButton({
@@ -22,6 +23,8 @@ export default function OrdoButton({
   className = "",
   hotkey = "",
   onMouseOver = noOp,
+  outline = false,
+  center = false,
 }: Props) {
   const ref = useRef<HTMLButtonElement>(null)
 
@@ -38,10 +41,10 @@ export default function OrdoButton({
       onClick={onClick}
       onMouseOver={onMouseOver}
       onFocus={onMouseOver}
-      className={`text-sm px-6 py-2 rounded-md shrink-0 ${className}`}
+      className={`text-sm px-6 py-2 rounded-md shrink-0 ${outline ? "border-2" : ""} ${className}`}
       disabled={disabled}
     >
-      <div className="flex items-center space-x-2">
+      <div className={`flex items-center space-x-2 ${center ? "justify-center" : ""}`}>
         <div className="shrink-0">{children}</div>
 
         {hotkey && !disabled ? (
@@ -61,6 +64,8 @@ export const OrdoButtonPrimary = ({
   onMouseOver,
   hotkey,
   disabled,
+  outline,
+  center,
 }: Props) => {
   const buttonClassNames = Either.fromBoolean(!!disabled).fold(
     () =>
@@ -78,6 +83,8 @@ export const OrdoButtonPrimary = ({
       disabled={disabled}
       hotkey={hotkey}
       className={classNames}
+      outline={outline}
+      center={center}
     >
       {children}
     </OrdoButton>
@@ -91,6 +98,8 @@ export const OrdoButtonSecondary = ({
   onMouseOver,
   hotkey,
   disabled,
+  outline,
+  center,
 }: Props) => {
   const buttonAppearanceClass = Either.fromBoolean(!!disabled).fold(
     () => "text-neutral-600 dark:text-neutral-300 passive-ring",
@@ -106,6 +115,8 @@ export const OrdoButtonSecondary = ({
       disabled={disabled}
       hotkey={hotkey}
       className={buttonClass}
+      outline={outline}
+      center={center}
     >
       {children}
     </OrdoButton>
@@ -119,6 +130,8 @@ export const OrdoButtonSuccess = ({
   onMouseOver,
   hotkey,
   disabled,
+  outline,
+  center,
 }: Props) => {
   const buttonAppearanceClass = Either.fromBoolean(!!disabled).fold(
     () =>
@@ -136,6 +149,8 @@ export const OrdoButtonSuccess = ({
       disabled={disabled}
       hotkey={hotkey}
       className={buttonClass}
+      outline={outline}
+      center={center}
     >
       {children}
     </OrdoButton>
@@ -149,6 +164,8 @@ export const OrdoButtonNeutral = ({
   onMouseOver,
   hotkey,
   disabled,
+  outline,
+  center,
 }: Props) => {
   const buttonAppearanceClass = Either.fromBoolean(!!disabled).fold(
     () =>
@@ -166,6 +183,8 @@ export const OrdoButtonNeutral = ({
       disabled={disabled}
       hotkey={hotkey}
       className={buttonClass}
+      outline={outline}
+      center={center}
     >
       {children}
     </OrdoButton>

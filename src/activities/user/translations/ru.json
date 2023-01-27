@@ -1,4 +1,11 @@
 {
   "@ordo-activity-user/title": "Личный кабинет",
-  "@ordo-activity-user/open-account": "Открыть личный кабинет"
+  "@ordo-activity-user/open-account": "Открыть личный кабинет",
+  "@ordo-activity-user/email": "Email",
+  "@ordo-activity-user/change-email": "Изменить Email",
+  "@ordo-activity-user/email-not-verified": "Ваш Email не подтверждён.",
+  "@ordo-activity-user/resend-verification": "Подтвердить Email",
+  "@ordo-activity-user/password": "Пароль",
+  "@ordo-activity-user/change-password": "Изменить пароль",
+  "@ordo-activity-user/email-verified": "Email подтверждён"
 }

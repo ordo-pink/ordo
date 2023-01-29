@@ -34,7 +34,7 @@ export default function CommandPaletteItem({ command, isCurrent, onClick = noOp 
       isCurrent={isCurrent}
       text={translatedCommandTitle}
     >
-      <Accelerator accelerator={command.accelerator} />
+      { command.accelerator && <Accelerator accelerator={command.accelerator} /> }
     </ActionListItem>
   )
 }

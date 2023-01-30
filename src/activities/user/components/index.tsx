@@ -2,7 +2,7 @@ import { useTranslation } from "react-i18next"
 
 import EditorPage from "$activities/editor/components/editor-page"
 import EmailField from "$activities/user/components/email-field"
-import EmailVerifiedField from "$activities/user/components/email-verified-field"
+// import EmailVerifiedField from "$activities/user/components/email-verified-field"
 import LogoutField from "$activities/user/components/logout-field"
 import PasswordField from "$activities/user/components/password-field"
 import { useWorkspace } from "$containers/workspace/hooks/use-workspace"
@@ -26,7 +26,7 @@ export default function Settings() {
       >
         <form className="flex flex-col space-y-4">
           <EmailField />
-          <EmailVerifiedField />
+          {/* <EmailVerifiedField /> */}
           <PasswordField />
           <LogoutField />
         </form>

@@ -1,7 +1,7 @@
 import { MouseEvent } from "react"
 import { useTranslation } from "react-i18next"
+import { AiOutlineLogout } from "react-icons/ai"
 
-import SupportBadge from "$core/components/badge/support"
 import { OrdoButtonSecondary } from "$core/components/buttons"
 import Fieldset from "$core/components/fieldset"
 import { useActionContext } from "$core/hooks/use-action-context"
@@ -27,17 +27,18 @@ export default function LogoutField() {
   )
 
   return (
-    <Fieldset className="relative">
-      <div className="text-lg">{translatedChangePassword}</div>
-      <OrdoButtonSecondary
-        onClick={handleButtonClick}
-        hotkey="shift+p"
-        center
-      >
-        {translatedChangePassword}
-      </OrdoButtonSecondary>
-
-      <SupportBadge className="absolute bottom-0 right-0 md:top-0 md:bottom-auto" />
+    <Fieldset>
+      <div className="flex flex-row-reverse w-full">
+        <OrdoButtonSecondary
+          onClick={handleButtonClick}
+          center
+        >
+          <div className="flex items-center space-x-2">
+            <AiOutlineLogout />
+            <div>{translatedChangePassword}</div>
+          </div>
+        </OrdoButtonSecondary>
+      </div>
     </Fieldset>
   )
 }

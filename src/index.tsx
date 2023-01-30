@@ -60,6 +60,9 @@ window.ordo = {
 
       return fetch(url, params)
     },
+    openExternal: (url) => {
+      window.open(url, "_blank")
+    },
   },
   api: {
     fs: {

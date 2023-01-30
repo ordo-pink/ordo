@@ -22,7 +22,7 @@ export default function FileNotSupported() {
 
   return Either.fromNullable(currentFile).fold(Null, (file) => (
     <EditorPage
-      currentFile={file}
+      title=""
       image={Unsupported}
       imageAlt=""
     >

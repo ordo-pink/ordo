@@ -20,7 +20,7 @@ export default function FileNotSupported() {
     extension: currentFile?.extension,
   })
 
-  return Either.fromNullable(currentFile).fold(Null, (file) => (
+  return Either.fromNullable(currentFile).fold(Null, () => (
     <EditorPage
       title=""
       image={Unsupported}

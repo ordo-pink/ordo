@@ -53,7 +53,7 @@ export default function ContextMenuItem({ item }: Props) {
           {translatedTitle}
         </div>
       </div>
-      { item.accelerator && <Accelerator accelerator={item.accelerator} /> }
+      {item.accelerator && <Accelerator accelerator={item.accelerator} />}
     </div>
   )
 }

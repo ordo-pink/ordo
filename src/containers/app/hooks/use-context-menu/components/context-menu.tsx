@@ -14,7 +14,6 @@ import { lazyBox } from "$core/utils/lazy-box"
 
 import "$containers/app/hooks/use-context-menu/index.css"
 
-
 export default function ContextMenu() {
   const dispatch = useAppDispatch()
 
@@ -28,15 +27,18 @@ export default function ContextMenu() {
   const contextMenuContainer = useRef<HTMLDivElement>(null)
 
   const [commandList, setCommandList] = useState(structure.children)
-  const [containerSize, setContainerSize] = useState<{ width: number, height: number} | undefined>(undefined)
+  const [containerSize, setContainerSize] = useState<{ width: number; height: number } | undefined>(
+    undefined,
+  )
 
-  const x = containerSize && window.innerWidth - (mouseX + containerSize.width) < 0 
-    ? mouseX - containerSize.width
-    : mouseX
-  const y = containerSize && window.innerHeight - (mouseY + containerSize.height) < 0 
-    ? mouseY - containerSize.height 
-    : mouseY
-  
+  const x =
+    containerSize && window.innerWidth - (mouseX + containerSize.width) < 0
+      ? mouseX - containerSize.width
+      : mouseX
+  const y =
+    containerSize && window.innerHeight - (mouseY + containerSize.height) < 0
+      ? mouseY - containerSize.height
+      : mouseY
 
   useEffect(() => {
     commands.forEach((command) => {
@@ -57,12 +59,12 @@ export default function ContextMenu() {
   }, [commands, target])
 
   useLayoutEffect(() => {
-    if(contextMenuContainer.current) {
+    if (contextMenuContainer.current) {
       setContainerSize(contextMenuContainer?.current?.getBoundingClientRect())
     }
-  // don't trust eslint. it works because this component renders 2 times due to useEffect on 50th line
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  },[contextMenuContainer.current])
+    // don't trust eslint. it works because this component renders 2 times due to useEffect on 50th line
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [contextMenuContainer.current])
 
   const hide = lazyBox<{ preventDefault: ThunkFn<void>; stopPropagation: ThunkFn<void> }>((box) =>
     box

@@ -7,5 +7,6 @@
   "@ordo-activity-user/resend-verification": "Verify Email",
   "@ordo-activity-user/password": "Password",
   "@ordo-activity-user/change-password": "Change password",
-  "@ordo-activity-user/email-verified": "Email verified"
+  "@ordo-activity-user/email-verified": "Email verified",
+  "@ordo-activity-user/logout": "Log Out"
 }

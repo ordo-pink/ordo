@@ -9,6 +9,7 @@ module.exports = {
       $containers: resolve("./src/containers"),
       $core: resolve("./src/core"),
       "$file-associations": resolve("./src/file-associations"),
+      "$editor-plugins": resolve("./src/editor-plugins"),
     },
   },
 }

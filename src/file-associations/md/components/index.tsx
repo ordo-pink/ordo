@@ -1,6 +1,5 @@
+import Editor from "@draft-js-plugins/editor"
 import { ContentBlock, convertFromRaw, convertToRaw, EditorState } from "draft-js"
-import createMarkdownShortcutsPlugin from "draft-js-markdown-shortcuts-plugin"
-import Editor from "draft-js-plugins-editor"
 import createPrismPlugin from "draft-js-prism-plugin"
 import { markdownToDraft, draftToMarkdown } from "markdown-draft-js"
 import Prism from "prismjs"
@@ -21,6 +20,8 @@ import { getParentPath } from "$core/utils/fs-helpers"
 import { findOrdoFile } from "$core/utils/fs-helpers"
 import { lazyBox } from "$core/utils/lazy-box"
 
+import createMarkdownShortcutsPlugin from "$editor-plugins/markdown-shortcuts"
+
 import "prismjs/components/prism-python"
 import "prismjs/components/prism-javascript"
 import "prismjs/components/prism-typescript"
@@ -32,7 +33,7 @@ const prismPlugin = createPrismPlugin({
   prism: Prism,
 })
 
-export default function IsmEditor() {
+export default function MdEditor() {
   const dispatch = useAppDispatch()
 
   const tree = useAppSelector((state) => state.app.personalProject)

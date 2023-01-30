@@ -7,5 +7,6 @@
   "@ordo-activity-user/resend-verification": "Подтвердить Email",
   "@ordo-activity-user/password": "Пароль",
   "@ordo-activity-user/change-password": "Изменить пароль",
-  "@ordo-activity-user/email-verified": "Email подтверждён"
+  "@ordo-activity-user/email-verified": "Email подтверждён",
+  "@ordo-activity-user/logout": "Выйти из аккаунта"
 }

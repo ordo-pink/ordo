@@ -1,5 +1,6 @@
 const { resolve } = require("path")
 
+/** @type {import('@craco/types').CracoConfig} */
 module.exports = {
   webpack: {
     alias: {

@@ -1,7 +1,7 @@
+import { EditorPlugin } from "@draft-js-plugins/editor"
 import type { Slice } from "@reduxjs/toolkit"
 import type { ContentBlock } from "draft-js"
 import type { TFunction } from "i18next"
-import type { Schema } from "jsonschema"
 import type Loadable from "react-loadable"
 
 import type { Language } from "$core/constants/language"
@@ -9,7 +9,6 @@ import type { OrdoExtensionType } from "$core/constants/ordo-extension-type"
 import type { router } from "$core/router"
 import type { useAppDispatch } from "$core/state/hooks/use-app-dispatch"
 import type { RootState } from "$core/state/types"
-import { EditorPlugin } from "@draft-js-plugins/editor"
 
 export type Nullable<T> = T | null
 

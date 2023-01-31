@@ -1,7 +1,6 @@
 export enum OrdoExtensionType {
   COMMAND = "command",
   FILE_ASSOCIATION = "file-association",
-  ISM_PARSER = "ism-parser",
+  EDITOR_PLUGIN = "editor-plugin",
   ACTIVITY = "activity",
-  LOCAL_SETTING = "setting",
 }

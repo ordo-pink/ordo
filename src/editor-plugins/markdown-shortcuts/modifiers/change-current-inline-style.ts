@@ -1,7 +1,7 @@
 import { EditorState, SelectionState, Modifier } from "draft-js"
 import { OrderedSet } from "immutable"
 
-const changeCurrentInlineStyle = (
+export const changeCurrentInlineStyle = (
   editorState: EditorState,
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   matchArr: any,
@@ -35,5 +35,3 @@ const changeCurrentInlineStyle = (
   const newEditorState = EditorState.push(editorState, newContentState, "change-inline-style")
   return EditorState.forceSelection(newEditorState, newContentState.getSelectionAfter())
 }
-
-export default changeCurrentInlineStyle

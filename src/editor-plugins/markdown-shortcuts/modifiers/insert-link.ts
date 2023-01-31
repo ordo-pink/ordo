@@ -1,7 +1,6 @@
 import { EditorState, RichUtils, SelectionState, Modifier } from "draft-js"
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const insertLink = (editorState: EditorState, matchArr: any) => {
+export const insertLink = (editorState: EditorState, matchArr: RegExpExecArray) => {
   const currentContent = editorState.getCurrentContent()
   const selection = editorState.getSelection()
   const key = selection.getStartKey()
@@ -26,5 +25,3 @@ const insertLink = (editorState: EditorState, matchArr: any) => {
 
   return EditorState.forceSelection(newEditorState, newContentState.getSelectionAfter())
 }
-
-export default insertLink

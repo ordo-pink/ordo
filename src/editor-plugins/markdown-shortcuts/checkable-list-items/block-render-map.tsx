@@ -3,7 +3,7 @@ import { Map } from "immutable"
 import {
   CHECKABLE_LIST_ITEM,
   UNORDERED_LIST_ITEM,
-} from "$editor-plugins/checkable-list-items/constants"
+} from "$editor-plugins/markdown-shortcuts/checkable-list-items/constants"
 
 // https://github.com/facebook/draft-js/blob/0.10-stable/src/model/immutable/DefaultDraftBlockRenderMap.js#L22
 // <ul className={cx('public/DraftStyleDefault/ul')} />

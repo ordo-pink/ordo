@@ -3,8 +3,7 @@ import {
   isActivityExtension,
   isCommandExtension,
   isFileAssociationExtension,
-  isIsmParserExtension,
-  isLocalSettingExtension,
+  isEditorPluginExtension,
 } from "$core/guards/is-extension"
 import { OrdoActivityExtension, OrdoExtension } from "$core/types"
 import { Switch } from "$core/utils/switch"
@@ -28,8 +27,7 @@ export const getExtensionName = (extension: OrdoExtension<string, OrdoExtensionT
     .case(isActivityExtension, () => extension.name.replace("ordo-activity-", ""))
     .case(isFileAssociationExtension, () => extension.name.replace("ordo-file-association-", ""))
     .case(isCommandExtension, () => extension.name.replace("ordo-command-", ""))
-    .case(isIsmParserExtension, () => extension.name.replace("ordo-ism-parser-", ""))
-    .case(isLocalSettingExtension, () => extension.name.replace("ordo-local-setting-", ""))
+    .case(isEditorPluginExtension, () => extension.name.replace("ordo-editor-plugin-", ""))
     .default(() => "")
 
   return extensionNameThunk()

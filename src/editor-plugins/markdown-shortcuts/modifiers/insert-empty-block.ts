@@ -1,12 +1,18 @@
 import { genKey, ContentBlock, EditorState } from "draft-js"
-import { List, Map } from "immutable"
+import Immutable, { List, Map } from "immutable"
 
-const insertEmptyBlock = (editorState: EditorState, blockType = "unstyled", data = {}) => {
+export const insertEmptyBlock = (
+  editorState: EditorState,
+  blockType = "unstyled",
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  data: Immutable.Map<any, any> = Immutable.Map({}),
+) => {
   const contentState = editorState.getCurrentContent()
   const selection = editorState.getSelection()
   const key = selection.getStartKey()
   const currentBlock = contentState.getBlockForKey(key)
   const emptyBlockKey = genKey()
+
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const emptyBlock = new (ContentBlock as any)({
     characterList: List(),
@@ -44,5 +50,3 @@ const insertEmptyBlock = (editorState: EditorState, blockType = "unstyled", data
   })
   return EditorState.push(editorState, newContentState, "split-block")
 }
-
-export default insertEmptyBlock

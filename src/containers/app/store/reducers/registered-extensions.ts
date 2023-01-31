@@ -6,7 +6,7 @@ import {
   isActivityExtension,
   isCommandExtension,
   isFileAssociationExtension,
-  isIsmParserExtension,
+  isEditorPluginExtension,
 } from "$core/guards/is-extension"
 import { OrdoExtension } from "$core/types"
 
@@ -31,10 +31,12 @@ export const registeredExtensionsReducer: CaseReducer<
     )
       state.fileAssociationExtensions.push(extension)
     else if (
-      isIsmParserExtension(extension) &&
-      !state.ismParserExtensions.some((ext) => ext.name === extension.name)
+      isEditorPluginExtension(extension) &&
+      !state.editorPluginExtensions.some((ext) => ext.name === extension.name)
     )
-      state.ismParserExtensions.push(extension)
+      state.editorPluginExtensions.push(
+        extension as any, // eslint-disable-line @typescript-eslint/no-explicit-any
+      )
     else return
 
     if (extension.commands) {

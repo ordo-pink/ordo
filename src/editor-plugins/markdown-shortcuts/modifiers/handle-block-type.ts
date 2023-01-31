@@ -1,6 +1,6 @@
 import { EditorState, RichUtils } from "draft-js"
 
-import { CHECKABLE_LIST_ITEM } from "$editor-plugins/checkable-list-items"
+import { CHECKABLE_LIST_ITEM } from "$editor-plugins/markdown-shortcuts/checkable-list-items/constants"
 import { changeCurrentBlockType } from "$editor-plugins/markdown-shortcuts/modifiers/change-current-block-type"
 
 const sharps = (len: number) => {
@@ -21,7 +21,7 @@ const blockTypes = [
   "header-six",
 ]
 
-const handleBlockType = (editorState: EditorState, character: string) => {
+export const handleBlockType = (editorState: EditorState, character: string) => {
   const currentSelection = editorState.getSelection()
   const key = currentSelection.getStartKey()
   const text = editorState.getCurrentContent().getBlockForKey(key).getText()
@@ -51,7 +51,6 @@ const handleBlockType = (editorState: EditorState, character: string) => {
       checked: matchArr[1] !== " ",
     })
   }
+
   return editorState
 }
-
-export default handleBlockType

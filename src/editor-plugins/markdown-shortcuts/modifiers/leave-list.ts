@@ -1,6 +1,6 @@
 import { EditorState, RichUtils } from "draft-js"
 
-const leaveList = (editorState: EditorState) => {
+export const leaveList = (editorState: EditorState) => {
   const contentState = editorState.getCurrentContent()
   const selection = editorState.getSelection()
   const key = selection.getStartKey()
@@ -8,5 +8,3 @@ const leaveList = (editorState: EditorState) => {
   const type = currentBlock.getType()
   return RichUtils.toggleBlockType(editorState, type)
 }
-
-export default leaveList

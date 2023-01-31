@@ -4,8 +4,7 @@ import {
   OrdoCommandExtension,
   OrdoExtension,
   OrdoFileAssociationExtension,
-  OrdoIsmParserExtension,
-  OrdoLocalSettingExtension,
+  OrdoEditorPluginExtension,
 } from "$core/types"
 
 const isExtensionType = (
@@ -30,12 +29,7 @@ export const isFileAssociationExtension = (
 ): extension is OrdoFileAssociationExtension<string> =>
   isExtensionType(OrdoExtensionType.FILE_ASSOCIATION, extension)
 
-export const isIsmParserExtension = (
+export const isEditorPluginExtension = (
   extension: OrdoExtension<string, OrdoExtensionType>,
-): extension is OrdoIsmParserExtension<string> =>
-  isExtensionType(OrdoExtensionType.ISM_PARSER, extension)
-
-export const isLocalSettingExtension = (
-  extension: OrdoExtension<string, OrdoExtensionType>,
-): extension is OrdoLocalSettingExtension<string> =>
-  isExtensionType(OrdoExtensionType.LOCAL_SETTING, extension)
+): extension is OrdoEditorPluginExtension<string> =>
+  isExtensionType(OrdoExtensionType.EDITOR_PLUGIN, extension)

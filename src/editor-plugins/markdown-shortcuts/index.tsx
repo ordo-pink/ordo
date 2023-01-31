@@ -1,26 +1,27 @@
+import { EditorPlugin, PluginFunctions } from "@draft-js-plugins/editor"
 import { ContentBlock, EditorState } from "draft-js"
 import { Map } from "immutable"
 import { KeyboardEvent } from "react"
 
-import createImageDecorator from "./decorators/image"
-import createLinkDecorator from "./decorators/link"
-import adjustBlockDepth from "./modifiers/adjust-block-depth"
-import { changeCurrentBlockType } from "./modifiers/change-current-block-type"
-import handleBlockType from "./modifiers/handle-block-type"
-import handleImage from "./modifiers/handle-image"
-import handleInlineStyle from "./modifiers/handle-inline-style"
-import handleLink from "./modifiers/handle-link"
-import handleNewCodeBlock from "./modifiers/handle-new-code-block"
-import insertEmptyBlock from "./modifiers/insert-empty-block"
-import insertText from "./modifiers/insert-text"
-import leaveList from "./modifiers/leave-list"
-import { replaceText } from "./utils"
-import {
-  blockRenderMap as checkboxBlockRenderMap,
-  CheckableListItem,
-  CheckableListItemUtils,
-  CHECKABLE_LIST_ITEM,
-} from "$editor-plugins/checkable-list-items"
+import { createEditorPluginExtension } from "$core/extensions/create-editor-plugin"
+
+import { blockRenderMap as checkboxBlockRenderMap } from "$editor-plugins/markdown-shortcuts/checkable-list-items/block-render-map"
+import CheckableListItemUtils from "$editor-plugins/markdown-shortcuts/checkable-list-items/chackable-list-item-utils"
+import CheckableListItem from "$editor-plugins/markdown-shortcuts/checkable-list-items/checkable-list-item"
+import { CHECKABLE_LIST_ITEM } from "$editor-plugins/markdown-shortcuts/checkable-list-items/constants"
+import { createImageDecorator } from "$editor-plugins/markdown-shortcuts/decorators/image"
+import { createLinkDecorator } from "$editor-plugins/markdown-shortcuts/decorators/link"
+import { adjustBlockDepth } from "$editor-plugins/markdown-shortcuts/modifiers/adjust-block-depth"
+import { changeCurrentBlockType } from "$editor-plugins/markdown-shortcuts/modifiers/change-current-block-type"
+import { handleBlockType } from "$editor-plugins/markdown-shortcuts/modifiers/handle-block-type"
+import { handleImage } from "$editor-plugins/markdown-shortcuts/modifiers/handle-image"
+import { handleInlineStyle } from "$editor-plugins/markdown-shortcuts/modifiers/handle-inline-style"
+import { handleLink } from "$editor-plugins/markdown-shortcuts/modifiers/handle-link"
+import { handleNewCodeBlock } from "$editor-plugins/markdown-shortcuts/modifiers/handle-new-code-block"
+import { insertEmptyBlock } from "$editor-plugins/markdown-shortcuts/modifiers/insert-empty-block"
+import { insertText } from "$editor-plugins/markdown-shortcuts/modifiers/insert-text"
+import { leaveList } from "$editor-plugins/markdown-shortcuts/modifiers/leave-list"
+import { replaceText } from "$editor-plugins/markdown-shortcuts/utils"
 
 function checkCharacterForState(editorState: EditorState, character: string) {
   let newEditorState = handleBlockType(editorState, character)
@@ -87,13 +88,13 @@ function checkReturnForState(
   return newEditorState
 }
 
-const createMarkdownShortcutsPlugin = (
+export const createMarkdownShortcutsPlugin = (
   config = { insertEmptyBlockOnReturnWithModifierKey: true },
-) => {
+): EditorPlugin => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const store: any = {}
+
   return {
-    store,
     blockRenderMap: Map({
       "code-block": {
         element: "code",
@@ -102,10 +103,11 @@ const createMarkdownShortcutsPlugin = (
     }).merge(checkboxBlockRenderMap),
     decorators: [createLinkDecorator(), createImageDecorator()],
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    initialize({ setEditorState, getEditorState }: any) {
+    initialize({ setEditorState, getEditorState }: PluginFunctions) {
       store.setEditorState = setEditorState
       store.getEditorState = getEditorState
     },
+
     blockStyleFn(block: ContentBlock) {
       switch (block.getType()) {
         case CHECKABLE_LIST_ITEM:
@@ -139,9 +141,8 @@ const createMarkdownShortcutsPlugin = (
       const newEditorState = adjustBlockDepth(editorState, ev)
       if (newEditorState !== editorState) {
         store.setEditorState(newEditorState)
-        return "handled"
+        return true
       }
-      return "not-handled"
     },
     handleReturn(ev: KeyboardEvent, editorState: EditorState) {
       const newEditorState = checkReturnForState(editorState, ev, config)
@@ -174,20 +175,22 @@ const createMarkdownShortcutsPlugin = (
       let newEditorState = editorState
       let buffer = []
       for (let i = 0; i < text.length; i += 1) {
-        // eslint-disable-line no-plusplus
         if (text[i].match(/[^A-z0-9_*~`]/)) {
           newEditorState = replaceText(newEditorState, buffer.join("") + text[i])
           newEditorState = checkCharacterForState(newEditorState, text[i])
           buffer = []
         } else if (text[i].charCodeAt(0) === 10) {
           newEditorState = replaceText(newEditorState, buffer.join(""))
+
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           const tmpEditorState = checkReturnForState(newEditorState, {} as any, config)
+
           if (newEditorState === tmpEditorState) {
             newEditorState = insertEmptyBlock(tmpEditorState)
           } else {
             newEditorState = tmpEditorState
           }
+
           buffer = []
         } else if (i === text.length - 1) {
           newEditorState = replaceText(newEditorState, buffer.join("") + text[i])
@@ -206,4 +209,12 @@ const createMarkdownShortcutsPlugin = (
   }
 }
 
-export default createMarkdownShortcutsPlugin
+export default createEditorPluginExtension("checkable-list-items", {
+  readableName: "@ordo-editor-plugin-checkable-list-items/title",
+  translations: {
+    ru: {},
+    en: {},
+  },
+  description: "@ordo-editor-plugin-checkable-list-items/description",
+  plugins: [createMarkdownShortcutsPlugin()],
+})

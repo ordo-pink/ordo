@@ -1,6 +1,6 @@
 import { EditorState, Modifier } from "draft-js"
 
-const insertText = (editorState: EditorState, text: string) => {
+export const insertText = (editorState: EditorState, text: string) => {
   const selection = editorState.getSelection()
   const content = editorState.getCurrentContent()
   const newContentState = Modifier.insertText(
@@ -11,5 +11,3 @@ const insertText = (editorState: EditorState, text: string) => {
   )
   return EditorState.push(editorState, newContentState, "insert-fragment")
 }
-
-export default insertText

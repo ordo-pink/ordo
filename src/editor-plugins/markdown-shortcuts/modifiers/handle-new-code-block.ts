@@ -1,8 +1,9 @@
 import { EditorState } from "draft-js"
-import { changeCurrentBlockType } from "./change-current-block-type"
-import insertEmptyBlock from "./insert-empty-block"
 
-const handleNewCodeBlock = (editorState: EditorState) => {
+import { changeCurrentBlockType } from "$editor-plugins/markdown-shortcuts/modifiers/change-current-block-type"
+import { insertEmptyBlock } from "$editor-plugins/markdown-shortcuts/modifiers/insert-empty-block"
+
+export const handleNewCodeBlock = (editorState: EditorState) => {
   const contentState = editorState.getCurrentContent()
   const selection = editorState.getSelection()
   const key = selection.getStartKey()
@@ -24,5 +25,3 @@ const handleNewCodeBlock = (editorState: EditorState) => {
   }
   return editorState
 }
-
-export default handleNewCodeBlock

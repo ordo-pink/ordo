@@ -1,9 +1,7 @@
-import Editor from "@draft-js-plugins/editor"
-import { ContentBlock, convertFromRaw, convertToRaw, EditorState } from "draft-js"
-import createPrismPlugin from "draft-js-prism-plugin"
+import Editor, { EditorPlugin } from "@draft-js-plugins/editor"
+import { convertFromRaw, convertToRaw, EditorState } from "draft-js"
 import { markdownToDraft, draftToMarkdown } from "markdown-draft-js"
-import Prism from "prismjs"
-import { useState, useCallback, useEffect, useRef } from "react"
+import { useState, useEffect, useRef } from "react"
 import { useSearchParams } from "react-router-dom"
 
 import EditorPage from "$activities/editor/components/editor-page"
@@ -20,49 +18,58 @@ import { getParentPath } from "$core/utils/fs-helpers"
 import { findOrdoFile } from "$core/utils/fs-helpers"
 import { lazyBox } from "$core/utils/lazy-box"
 
-import createMarkdownShortcutsPlugin from "$editor-plugins/markdown-shortcuts"
-
-import "prismjs/components/prism-python"
-import "prismjs/components/prism-javascript"
-import "prismjs/components/prism-typescript"
-import "prismjs/components/prism-bash"
-import "draft-js/dist/Draft.css"
-
-const markdownShortcutsPlugin = createMarkdownShortcutsPlugin()
-const prismPlugin = createPrismPlugin({
-  prism: Prism,
-})
-
 export default function MdEditor() {
   const dispatch = useAppDispatch()
 
   const tree = useAppSelector((state) => state.app.personalProject)
 
   const editorSelector = useExtensionSelector<EditorExtensionStore>()
+  const pluginExtensions = useAppSelector((state) => state.app.editorPluginExtensions)
 
   const currentFile = editorSelector((state) => state["ordo-activity-editor"].currentFile)
 
   const [editorState, setEditorState] = useState(() => EditorState.createEmpty())
+  const [plugins, setPlugins] = useState<EditorPlugin[]>([])
 
   const editorRef = useRef<Editor>(null)
 
-  const ismParsers = useAppSelector((state) => state.app.ismParserExtensions)
+  useEffect(() => {
+    if (pluginExtensions) {
+      let plugins = [] as EditorPlugin[]
 
-  const blockRendererFn = useCallback(
-    (block: ContentBlock) => {
-      ismParsers.forEach((parser) => {
-        if (parser.rules.some((rule) => rule.validate(block))) {
-          return {
-            component: parser.Component,
-            props: {
-              block,
-            },
-          }
-        }
+      pluginExtensions.forEach((extension) => {
+        plugins = plugins.concat(
+          extension.plugins.map((plugin) => {
+            if (!plugin) return plugin
+
+            plugin.initialize &&
+              plugin.initialize({
+                getEditorState: () => editorState,
+                setEditorState: (editorState) => setEditorState(editorState),
+                setReadOnly: () => void 0,
+                getReadOnly: () => false,
+                getEditorRef: () => ({
+                  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                  editor: editorRef.current as any,
+                  refs: {
+                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                    editor: editorRef.current as any,
+                  },
+                }),
+                getPlugins: () => plugins,
+                getProps: () => void 0,
+              })
+
+            return plugin
+          }),
+        )
       })
-    },
-    [ismParsers],
-  )
+
+      setPlugins(plugins)
+    }
+
+    return () => setPlugins([])
+  }, [pluginExtensions, editorState])
 
   const [query] = useSearchParams()
   const { files } = useFSAPI()
@@ -71,7 +78,7 @@ export default function MdEditor() {
   const breadcrumbsPath = getParentPath(path ?? "/")
 
   useEffect(() => {
-    if (!path || !files) return
+    if (!path || !files || !tree) return
 
     files.get(path).then((payload) => {
       const file = findOrdoFile(path, tree)
@@ -82,6 +89,7 @@ export default function MdEditor() {
 
       const raw = markdownToDraft(payload)
       const contentState = convertFromRaw(raw)
+
       setEditorState(EditorState.createWithContent(contentState))
     })
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -109,9 +117,8 @@ export default function MdEditor() {
       <Editor
         placeholder="Type something..."
         ref={editorRef}
-        blockRendererFn={blockRendererFn}
         editorState={editorState}
-        plugins={[prismPlugin, markdownShortcutsPlugin]}
+        plugins={plugins}
         onChange={(state) => {
           setEditorState(state)
         }}

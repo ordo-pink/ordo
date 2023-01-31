@@ -5,7 +5,7 @@ import {
   OrdoCommandExtension,
   OrdoDirectory,
   OrdoFileAssociationExtension,
-  OrdoIsmParserExtension,
+  OrdoEditorPluginExtension,
   OrdoLoadableComponent,
 } from "$core/types"
 
@@ -15,7 +15,7 @@ export type AppState = {
   activityExtensions: OrdoActivityExtension<string>[]
   commandExtensions: OrdoCommandExtension<string>[]
   fileAssociationExtensions: OrdoFileAssociationExtension<string>[]
-  ismParserExtensions: OrdoIsmParserExtension<string>[]
+  editorPluginExtensions: OrdoEditorPluginExtension<string>[]
   commands: OrdoCommand<string>[]
   overlays: OrdoLoadableComponent[]
 }

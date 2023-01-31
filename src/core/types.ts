@@ -9,6 +9,7 @@ import type { OrdoExtensionType } from "$core/constants/ordo-extension-type"
 import type { router } from "$core/router"
 import type { useAppDispatch } from "$core/state/hooks/use-app-dispatch"
 import type { RootState } from "$core/state/types"
+import { EditorPlugin } from "@draft-js-plugins/editor"
 
 export type Nullable<T> = T | null
 
@@ -111,13 +112,12 @@ export interface OrdoCommandExtension<
   commands: OrdoCommand<Name>[]
 }
 
-export interface OrdoIsmParserExtension<
+export interface OrdoEditorPluginExtension<
   Name extends string,
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   TState extends Record<string, any> = Record<string, any>,
-> extends OrdoExtension<Name, OrdoExtensionType.ISM_PARSER, TState> {
-  rules: IsmParserRule[]
-  Component: OrdoLoadableComponent
+> extends OrdoExtension<Name, OrdoExtensionType.EDITOR_PLUGIN, TState> {
+  plugins: EditorPlugin[]
 }
 
 export interface OrdoFileAssociationExtension<
@@ -128,16 +128,6 @@ export interface OrdoFileAssociationExtension<
   fileExtensions: FileExtension[]
   Icon?: OrdoLoadableComponent
   Component: OrdoLoadableComponent
-}
-
-export interface OrdoLocalSettingExtension<
-  Name extends string,
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  TState extends Record<string, any> = Record<string, any>,
-> extends OrdoExtension<Name, OrdoExtensionType.LOCAL_SETTING, TState> {
-  schema: Schema
-  peerAccess?: AccessLevel | boolean
-  dependantAccess?: AccessLevel | boolean
 }
 
 export interface OrdoActivityExtension<

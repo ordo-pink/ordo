@@ -2,12 +2,12 @@ import { ContentBlock, EditorState } from "draft-js"
 import { adjustBlockDepth, mergeBlockDataByKey } from "draft-js-modifiers"
 import { KeyboardEvent } from "react"
 
-import CheckableListItem from "$editor-plugins/checkable-list-items/checkable-list-item"
+import CheckableListItem from "$editor-plugins/markdown-shortcuts/checkable-list-items/checkable-list-item"
 import {
   CHECKABLE_LIST_ITEM,
   UNORDERED_LIST_ITEM,
   ORDERED_LIST_ITEM,
-} from "$editor-plugins/checkable-list-items/constants"
+} from "$editor-plugins/markdown-shortcuts/checkable-list-items/constants"
 
 export type CheckableListItemBlock = {
   component: typeof CheckableListItem

@@ -30,6 +30,8 @@ import { useAppSelector } from "$core/state/hooks/use-app-selector"
 import { useExtensionSelector } from "$core/state/hooks/use-extension-selector"
 import { ActionContext, UnaryFn } from "$core/types"
 
+import MarkdownShortcuts from "$editor-plugins/markdown-shortcuts"
+
 import MdFileExtension from "$file-associations/md"
 
 import "$containers/app/index.css"
@@ -45,6 +47,7 @@ const extensions = [
   CommandPalette,
   UserSupportCommands,
   AuthCommands,
+  MarkdownShortcuts,
 ]
 
 export default function App() {

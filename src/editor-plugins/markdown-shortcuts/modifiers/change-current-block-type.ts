@@ -29,7 +29,8 @@ export const changeCurrentBlockType = (
     focusOffset: 0,
   })
 
-  const newContentStateMap = merge(currentContent, {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const newContentStateMap = (currentContent as any).merge({
     blockMap: blockMap.set(key, newBlock),
     selectionAfter: newSelection,
   })

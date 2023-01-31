@@ -13,7 +13,7 @@ const initialState: AppState = {
   activityExtensions: [],
   commandExtensions: [],
   fileAssociationExtensions: [],
-  ismParserExtensions: [],
+  editorPluginExtensions: [],
   commands: [],
   overlays: [],
 }

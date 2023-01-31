@@ -1,5 +1,6 @@
 import { EditorState } from "draft-js"
-import changeCurrentInlineStyle from "./change-current-inline-style"
+
+import { changeCurrentInlineStyle } from "$editor-plugins/markdown-shortcuts/modifiers/change-current-inline-style"
 
 const inlineMatchers: Record<string, RegExp> = {
   BOLD: /(?:^|\s|\n|[^A-z0-9_*~`])(\*{2}|_{2})((?!\1).*?)(\1)($|\s|\n|[^A-z0-9_*~`])/g,
@@ -8,7 +9,7 @@ const inlineMatchers: Record<string, RegExp> = {
   STRIKETHROUGH: /(?:^|\s|\n|[^A-z0-9_*~`])(~{2})((?!\1).*?)(\1)($|\s|\n|[^A-z0-9_*~`])/g,
 }
 
-const handleInlineStyle = (editorState: EditorState, character: string) => {
+export const handleInlineStyle = (editorState: EditorState, character: string) => {
   const key = editorState.getSelection().getStartKey()
   const text = editorState.getCurrentContent().getBlockForKey(key).getText()
   const line = `${text}${character}`
@@ -27,5 +28,3 @@ const handleInlineStyle = (editorState: EditorState, character: string) => {
   })
   return newEditorState
 }
-
-export default handleInlineStyle

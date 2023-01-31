@@ -1,3 +1,4 @@
+import { Helmet } from "react-helmet"
 import { useTranslation } from "react-i18next"
 
 import EditorPage from "$activities/editor/components/editor-page"
@@ -8,7 +9,6 @@ import PasswordField from "$activities/user/components/password-field"
 import { useWorkspace } from "$containers/workspace/hooks/use-workspace"
 
 import { useEnv } from "$core/hooks/use-env"
-import { Helmet } from "react-helmet"
 
 export default function Settings() {
   const Workspace = useWorkspace()

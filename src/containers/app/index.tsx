@@ -172,7 +172,7 @@ export default function App() {
       onContextMenu={handleContextMenu}
     >
       <Helmet>
-        <title>Ordo.pink</title>
+        <title>{"Ordo.pink"}</title>
       </Helmet>
 
       <ActivityBar />

@@ -1,4 +1,6 @@
 import { useEffect } from "react"
+import { Helmet } from "react-helmet"
+import { useTranslation } from "react-i18next"
 import { useSearchParams } from "react-router-dom"
 
 import FileExplorer from "$activities/editor/components/file-explorer"
@@ -6,10 +8,12 @@ import FileNotSelected from "$activities/editor/components/file-not-selected"
 import FileNotSupported from "$activities/editor/components/file-not-supported"
 import { useCurrentFileAssociation } from "$activities/editor/hooks/use-current-file-association"
 import { selectFile } from "$activities/editor/store"
+import { EditorExtensionStore } from "$activities/editor/types"
 
 import { useWorkspaceWithSidebar } from "$containers/workspace/hooks/use-workspace"
 import { useAppDispatch } from "$core/state/hooks/use-app-dispatch"
 import { useAppSelector } from "$core/state/hooks/use-app-selector"
+import { useExtensionSelector } from "$core/state/hooks/use-extension-selector"
 import { Either } from "$core/utils/either"
 import { findOrdoFile } from "$core/utils/fs-helpers"
 
@@ -20,7 +24,10 @@ export default function Editor() {
 
   const [query] = useSearchParams()
 
+  const editorSelector = useExtensionSelector<EditorExtensionStore>()
+
   const tree = useAppSelector((state) => state.app.personalProject)
+  const currentFile = editorSelector((state) => state["ordo-activity-editor"].currentFile)
 
   const association = useCurrentFileAssociation()
   const Workspace = useWorkspaceWithSidebar()
@@ -42,8 +49,19 @@ export default function Editor() {
     ({ Component }) => Component,
   )
 
+  const { t } = useTranslation()
+
+  const translatedTitle = t("@ordo-activity-editor/title")
+
   return (
     <Workspace sidebarChildren={<FileExplorer />}>
+      <Helmet>
+        <title>
+          {"Ordo.pink | "}
+          {currentFile ? currentFile.readableName : translatedTitle}
+        </title>
+      </Helmet>
+
       <div className="editor">
         {Either.fromBoolean(Boolean(path)).fold(
           () => (

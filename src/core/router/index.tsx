@@ -1,7 +1,7 @@
 import { createBrowserRouter } from "react-router-dom"
 
 import App from "$containers/app"
-import Welcome from "$core/components/welcome"
+import Loading from "$core/components/loading"
 
 export const router = createBrowserRouter([
   {
@@ -10,7 +10,7 @@ export const router = createBrowserRouter([
     children: [
       {
         path: "*",
-        element: <Welcome />,
+        element: <Loading />,
       },
     ],
   },

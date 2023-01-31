@@ -1,4 +1,5 @@
 import ReactDOM from "react-dom/client"
+import { Helmet } from "react-helmet"
 import { Provider } from "react-redux"
 import { RouterProvider } from "react-router-dom"
 
@@ -53,6 +54,10 @@ Keycloak.init({
           fallbackElement={<Loading />}
         />
       </Provider>
+
+      <Helmet>
+        <title>{"Ordo.pink"}</title>
+      </Helmet>
     </ReactKeycloakProvider>,
   )
 })

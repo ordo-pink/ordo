@@ -8,6 +8,7 @@ import PasswordField from "$activities/user/components/password-field"
 import { useWorkspace } from "$containers/workspace/hooks/use-workspace"
 
 import { useEnv } from "$core/hooks/use-env"
+import { Helmet } from "react-helmet"
 
 export default function Settings() {
   const Workspace = useWorkspace()
@@ -20,6 +21,13 @@ export default function Settings() {
 
   return (
     <Workspace>
+      <Helmet>
+        <title>
+          {"Ordo.pink | "}
+          {translatedTitle}
+        </title>
+      </Helmet>
+
       <EditorPage
         title={env.userData?.username}
         breadcrumbsPath={`/${translatedTitle}/`}

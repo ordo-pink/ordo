@@ -1,5 +1,6 @@
 import { combineReducers, Reducer } from "@reduxjs/toolkit"
 import { MouseEvent, useEffect, useState } from "react"
+import { Helmet } from "react-helmet"
 import { useHotkeys } from "react-hotkeys-hook"
 import { Outlet, RouteObject, useLocation, useNavigate } from "react-router-dom"
 
@@ -130,6 +131,7 @@ export default function App() {
             id: extension.name,
           } as RouteObject)
 
+          if (currentRoute.pathname === "/" && path === "editor") navigate("/editor")
           if (currentRoute.pathname.startsWith(`/${path}`)) navigate(currentRoute)
         }
       }
@@ -169,6 +171,10 @@ export default function App() {
       className="app"
       onContextMenu={handleContextMenu}
     >
+      <Helmet>
+        <title>Ordo.pink</title>
+      </Helmet>
+
       <ActivityBar />
 
       <Outlet />

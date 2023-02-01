@@ -109,11 +109,7 @@
 }
 
 *::-webkit-scrollbar-thumb {
-  @apply invisible rounded-lg bg-neutral-300 dark:bg-neutral-600 my-2;
-}
-
-*:hover::-webkit-scrollbar-thumb {
-  @apply visible;
+  @apply rounded-lg bg-neutral-300 dark:bg-neutral-800 my-2;
 }
 
 .hover-active {

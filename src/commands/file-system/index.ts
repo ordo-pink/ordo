@@ -11,7 +11,7 @@ import { createCommandExtension } from "$core/extensions/create-command-extensio
 export default createCommandExtension("file-system", {
   readableName: "@ordo-command-file-system/readable-name",
   description: "@ordo-command-file-system/description",
-  translations: { ru, en },
+  translations: { en, ru },
   storeSlice: slice,
   commands: [CreateFileCommand, CreateDirectoryCommand, DeleteFileCommand, DeleteDirectoryCommand],
   overlayComponents: [

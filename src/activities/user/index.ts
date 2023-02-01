@@ -10,5 +10,5 @@ export default createActivityExtension("user", {
   readableName: "@ordo-activity-user/title",
   routes: ["/user"],
   commands: [openAccountCommand],
-  translations: { ru, en },
+  translations: { en, ru },
 })

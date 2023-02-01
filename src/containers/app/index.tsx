@@ -132,7 +132,10 @@ export default function App() {
           } as RouteObject)
 
           if (currentRoute.pathname === "/" && path === "editor") navigate("/editor")
-          if (currentRoute.pathname.startsWith(`/${path}`)) navigate(currentRoute)
+          if (currentRoute.pathname.startsWith(`/${path}`)) {
+            currentRoute.hash = ""
+            navigate(currentRoute)
+          }
         }
       }
 

@@ -1,3 +1,6 @@
+import en from "$activities/extension-store/translations/en.json"
+import ru from "$activities/extension-store/translations/ru.json"
+
 import { createActivityExtension } from "$core/extensions/create-activity-extension"
 
 export default createActivityExtension("extension-store", {
@@ -5,12 +8,5 @@ export default createActivityExtension("extension-store", {
   Icon: () => import("$activities/extension-store/components/icon"),
   readableName: "@ordo-activity-extension-store/title",
   routes: ["/extension-store", "/extension-store/:type/:name"],
-  translations: {
-    ru: {
-      "@ordo-activity-extension-store/title": "Расширения",
-    },
-    en: {
-      "@ordo-activity-extension-store/title": "Extensions",
-    },
-  },
+  translations: { en, ru },
 })

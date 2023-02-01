@@ -1,3 +1,6 @@
+import en from "$activities/settings/translations/en.json"
+import ru from "$activities/settings/translations/ru.json"
+
 import { createActivityExtension } from "$core/extensions/create-activity-extension"
 
 export default createActivityExtension("settings", {
@@ -5,12 +8,5 @@ export default createActivityExtension("settings", {
   Icon: () => import("$activities/settings/components/icon"),
   routes: ["/settings", "/settings/:extension"],
   readableName: "@ordo-activity-settings/title",
-  translations: {
-    ru: {
-      "@ordo-activity-settings/title": "Настройки",
-    },
-    en: {
-      "@ordo-activity-settings/title": "Settings",
-    },
-  },
+  translations: { en, ru },
 })

@@ -1,0 +1,6 @@
+{
+    "@ordo-command-command-palette/readable-name": "Панель команд",
+    "@ordo-command-command-palette/show-command-palette": "Показать панель команд",
+    "@ordo-command-command-palette/placeholder": "Быстрый поиск",
+    "@ordo-command-command-palette/description": "TODO"
+  }

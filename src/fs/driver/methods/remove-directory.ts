@@ -25,7 +25,7 @@ export const removeDirectory =
 
     const ordoDirectory = createOrdoDirectory({ path, accessedAt, createdAt, depth, updatedAt })
 
-    await promises.unlink(absolutePath)
+    await promises.rm(absolutePath, { recursive: true, force: true })
 
     return Either.right(ordoDirectory)
   }

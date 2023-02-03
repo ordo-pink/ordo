@@ -24,7 +24,7 @@ export default function WorkspaceWithSidebar({
       sizes={sizes}
       snapOffset={isMobile ? windowWidth / 2 : 200}
       minSize={0}
-      className="w-full flex max-w"
+      className="flex w-[calc(100vw-2.75rem)]"
       direction="horizontal"
       onDrag={() => {
         setSnapLeft(true)

@@ -22,8 +22,8 @@ export const useActionContext = (
     env,
     state,
     contextMenuTarget,
-    createLoginUrl: () => keycloak.createLoginUrl(),
-    createRegisterUrl: () => keycloak.createRegisterUrl(),
+    createLoginUrl: () => keycloak.createLoginUrl({ redirectUri: "/editor" }),
+    createRegisterUrl: () => keycloak.createRegisterUrl({ redirectUri: "/editor" }),
     navigate,
     translate: t,
   }

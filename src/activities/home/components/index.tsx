@@ -66,7 +66,6 @@ export default function ExtensionStore() {
   useEffect(() => {
     const raw = markdownToDraft(translatedText)
 
-    console.log(raw)
     const contentState = convertFromRaw(raw)
 
     setEditorState(EditorState.createWithContent(contentState))

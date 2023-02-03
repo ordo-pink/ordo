@@ -47,7 +47,15 @@ export const appSlice = createSlice({
   name: "@ordo-app",
   initialState,
   reducers: {
-    registeredExtensions: registeredExtensionsReducer,
+    registerExtensions: registeredExtensionsReducer,
+    unregisterExtensions: (state) => {
+      state.activityExtensions = []
+      state.commandExtensions = []
+      state.editorPluginExtensions = []
+      state.fileAssociationExtensions = []
+      state.commands = []
+      state.overlays = []
+    },
     toggleSidebarVisibility: (state) => {
       state.isSidebarVisible = !state.isSidebarVisible
     },
@@ -71,6 +79,7 @@ export const appSlice = createSlice({
   },
 })
 
-export const { registeredExtensions, toggleSidebarVisibility } = appSlice.actions
+export const { registerExtensions, toggleSidebarVisibility, unregisterExtensions } =
+  appSlice.actions
 
 export default appSlice.reducer

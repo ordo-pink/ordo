@@ -19,6 +19,8 @@ Keycloak.init({
   const token = Keycloak.tokenParsed
 
   if (token) {
+    window.ordo.env.isAuthenticated = true
+
     window.ordo.env.userData = {
       email: token.email,
       emailVerified: token.email_verified,
@@ -42,6 +44,7 @@ Keycloak.init({
       authClient={Keycloak}
       LoadingComponent={<Loading />}
       onEvent={(_, error) => {
+        // eslint-disable-next-line no-console
         if (error) console.error(error)
       }}
       // onTokens={(tokens) => console.log(tokens)}

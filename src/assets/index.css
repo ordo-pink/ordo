@@ -119,3 +119,7 @@
 .hover-passive {
   @apply hover:bg-gradient-to-r hover:from-neutral-300 hover:dark:from-stone-700 hover:to-slate-300 hover:dark:to-slate-700;
 }
+
+a {
+  @apply underline text-sky-700 dark:text-sky-300 visited:text-violet-700 visited:dark:text-violet-300;
+}

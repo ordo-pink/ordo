@@ -1,13 +1,12 @@
 import Helmet from "react-helmet"
 import { useTranslation } from "react-i18next"
 
+import PricingPlan from "$activities/pricing/components/pricing-plan"
+
 import { useWorkspace } from "$containers/workspace/hooks/use-workspace"
-import ComingSoonBadge from "$core/components/badge/coming-soon"
-import { OrdoButtonPrimary } from "$core/components/buttons"
-import { BsArrowRight, BsCheck2 } from "react-icons/bs"
-import PricingPlan from "./pricing-plan"
-import { useAppSelector } from "$core/state/hooks/use-app-selector"
+
 import { useActionContext } from "$core/hooks/use-action-context"
+import { useAppSelector } from "$core/state/hooks/use-app-selector"
 
 export default function ExtensionStore() {
   const Workspace = useWorkspace()
@@ -33,7 +32,7 @@ export default function ExtensionStore() {
 
       <h1 className="text-center text-4xl font-black my-20">{translatedTitle}</h1>
 
-      <div className="my-12 w-full flex flex-col flex-wrap md:flex-row space-y-8 md:space-y-0 md:space-x-8 items-center justify-center">
+      <div className="my-12 w-full flex flex-col flex-wrap space-y-8 md:flex-row md:space-y-0 md:space-x-8 items-center justify-center">
         <PricingPlan
           isAvailable
           isHighlighted

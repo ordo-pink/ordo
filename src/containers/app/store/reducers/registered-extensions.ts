@@ -14,6 +14,13 @@ export const registeredExtensionsReducer: CaseReducer<
   AppState,
   PayloadAction<OrdoExtension<string, OrdoExtensionType>[]>
 > = (state, action) => {
+  state.activityExtensions = []
+  state.commandExtensions = []
+  state.editorPluginExtensions = []
+  state.fileAssociationExtensions = []
+  state.commands = []
+  state.overlays = []
+
   action.payload.forEach((extension) => {
     if (
       isActivityExtension(extension) &&

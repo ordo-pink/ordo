@@ -36,7 +36,7 @@ export default function PricingPlan({
 
   return (
     <div
-      className={`flex flex-col space-y-2 w-72 md:w-96 p-4 rounded-lg bg-gradient-to-tr ${
+      className={`flex flex-col space-y-2 w-72 lg:w-96 p-4 rounded-lg bg-gradient-to-tr ${
         isHighlighted
           ? "from-pink-300 via-rose-300 to-purple-300 dark:from-stone-900 dark:via-neutral-900 dark:to-sky-900 dark:shadow-lg"
           : "from-slate-200 via-neutral-200 to-stone-200 dark:from-stone-800 dark:via-neutral-800 dark:to-slate-800 dark:shadow-lg"

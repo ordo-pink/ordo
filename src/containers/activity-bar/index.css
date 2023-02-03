@@ -3,10 +3,10 @@
 }
 
 .activity-bar_activity {
-  @apply text-neutral-700 dark:text-neutral-300 hover:text-purple-600 dark:hover:text-purple-400 transition-all duration-300;
+  @apply !text-neutral-700 dark:!text-neutral-300 hover:!text-purple-600 dark:hover:!text-purple-400 transition-all duration-300;
   @apply p-2 text-xl rounded-lg;
 }
 
 .activity-bar_activity.active {
-  @apply text-pink-700 dark:text-pink-500 hover:text-purple-600 dark:hover:text-purple-400;
+  @apply !text-pink-700 dark:!text-pink-500 hover:!text-purple-600 dark:hover:!text-purple-400;
 }

@@ -22,7 +22,7 @@ import UserSupportCommands from "$commands/user-support"
 import ActivityBar from "$containers/activity-bar"
 import ContextMenu from "$containers/app/hooks/use-context-menu/components/context-menu"
 import { useI18nInit } from "$containers/app/hooks/use-i18n-init"
-import { gotDirectory, registeredExtensions } from "$containers/app/store"
+import { gotDirectory, registerExtensions } from "$containers/app/store"
 
 import { OrdoExtensionType } from "$core/constants/ordo-extension-type"
 import { isActivityExtension } from "$core/guards/is-extension"
@@ -86,11 +86,13 @@ export default function App() {
 
   const actionContext = useActionContext()
 
+  const isAuthenticated = actionContext.env.isAuthenticated
+
   const currentRoute = useLocation()
   const navigate = useNavigate()
 
   useEffect(() => {
-    if (actionContext.env.isAuthenticated) {
+    if (isAuthenticated) {
       dispatch(gotDirectory("/"))
 
       setExtensions(loggedInExtensions)
@@ -98,7 +100,7 @@ export default function App() {
       setExtensions(loggedOutExtensions)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, [isAuthenticated])
 
   useEffect(() => {
     if (!extensions) return
@@ -155,8 +157,6 @@ export default function App() {
             id: extension.name,
           } as RouteObject)
 
-          if (currentRoute.pathname === "/" && path === "editor") navigate("/editor")
-          if (currentRoute.pathname === "/" && path === "home") navigate("/home")
           if (currentRoute.pathname.startsWith(`/${path}`)) {
             currentRoute.hash = ""
             navigate(currentRoute)
@@ -189,10 +189,10 @@ export default function App() {
     store.replaceReducer(combinedReducer)
 
     // Register installed extensions in the store
-    dispatch(registeredExtensions(extensions))
+    dispatch(registerExtensions(extensions))
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [extensions])
+  }, [extensions, isAuthenticated])
 
   return (
     <div

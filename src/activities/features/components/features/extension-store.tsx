@@ -2,11 +2,11 @@ import { useTranslation } from "react-i18next"
 
 import ComingSoonBadge from "$core/components/badge/coming-soon"
 
-export default function TeamFoldersFeature() {
+export default function ExtensionStoreFeature() {
   const { t } = useTranslation()
 
-  const translatedTitle = t("@ordo-activity-features/team-folders-title")
-  const translatedText = t("@ordo-activity-features/team-folders-text")
+  const translatedTitle = t("@ordo-activity-features/extension-store-title")
+  const translatedText = t("@ordo-activity-features/extension-store-text")
   const translatedComingSoon = t("@ordo-activity-features/coming-soon")
 
   return (

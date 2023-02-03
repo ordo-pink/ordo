@@ -37,7 +37,7 @@ export default function CommandPalette() {
   const commands = useAppSelector((state) => state.app.commands)
 
   const isShown = commandPaletteSelector((state) => state["ordo-command-command-palette"].isShown)
-  const currentFile = editorSelector((state) => state["ordo-activity-editor"].currentFile)
+  const currentFile = editorSelector((state) => state["ordo-activity-editor"]?.currentFile)
 
   const actionContext = useActionContext(root)
 

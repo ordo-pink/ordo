@@ -1,6 +1,7 @@
 import { useTranslation } from "react-i18next"
 import { useNavigate } from "react-router-dom"
 
+import { useKeycloak } from "$core/auth/hooks/use-keycloak"
 import { useEnv } from "$core/hooks/use-env"
 import { useAppDispatch } from "$core/state/hooks/use-app-dispatch"
 import { useState } from "$core/state/hooks/use-state"
@@ -11,6 +12,7 @@ export const useActionContext = (
 ): ActionContext => {
   const dispatch = useAppDispatch()
   const state = useState()
+  const { keycloak } = useKeycloak()
   const env = useEnv()
   const navigate = useNavigate()
   const { t } = useTranslation()
@@ -20,6 +22,8 @@ export const useActionContext = (
     env,
     state,
     contextMenuTarget,
+    createLoginUrl: () => keycloak.createLoginUrl(),
+    createRegisterUrl: () => keycloak.createRegisterUrl(),
     navigate,
     translate: t,
   }

@@ -1,0 +1,7 @@
+{
+  "@ordo-activity-home/title": "Homepage",
+  "@ordo-activity-home/hi": "Hi",
+  "@ordo-activity-home/go-home": "Go Home",
+  "@ordo-activity-home/useful-links": "Useful Links",
+  "@ordo-activity-home/text": "# Hi,\nI'm **Ordo**, a free, open source note-taking app that uses Markdown to store your thoughts.\n### This page is editable with Markdown by the way.\nFeel free to\n- erase this text\n- write something of your own\n- take a screenshot\n- share it on the web showing what those devs did here\n\nWe don't mind, really. In fact, we're not even sure if it actually works. 🎉\n## What's Next?\n1. There's an *Activity Bar* on the left (the thing with icons). Check it out\n\n2. The icon in the top left (**`ctrl+shift+p`**) brings you to the command palette. That's a cool one\n\n"
+}

@@ -12,30 +12,26 @@ import { store } from "$core/state"
 import "$assets/index.css"
 
 Keycloak.init({
-  onLoad: "login-required",
+  onLoad: "check-sso",
 }).then((isAuthenticated) => {
   window.ordo.env.isAuthenticated = isAuthenticated
 
-  if (!isAuthenticated) {
-    window.location.replace("https://ordo.pink")
-  }
-
   const token = Keycloak.tokenParsed
 
-  if (!token) throw new Error("Authorization error: Token not found")
+  if (token) {
+    window.ordo.env.userData = {
+      email: token.email,
+      emailVerified: token.email_verified,
+      firstName: token.given_name,
+      lastName: token.family_name,
+      fullName: token.name,
+      username: token.preferred_username,
+    }
 
-  window.ordo.env.userData = {
-    email: token.email,
-    emailVerified: token.email_verified,
-    firstName: token.given_name,
-    lastName: token.family_name,
-    fullName: token.name,
-    username: token.preferred_username,
-  }
-
-  Keycloak.onTokenExpired = () => {
-    if (Keycloak.refreshToken) {
-      Keycloak.updateToken(60 * 30)
+    Keycloak.onTokenExpired = () => {
+      if (Keycloak.refreshToken) {
+        Keycloak.updateToken(60 * 30)
+      }
     }
   }
 
@@ -45,7 +41,9 @@ Keycloak.init({
     <ReactKeycloakProvider
       authClient={Keycloak}
       LoadingComponent={<Loading />}
-      // onEvent={(type, error) => console.log(type, error)}
+      onEvent={(_, error) => {
+        if (error) console.error(error)
+      }}
       // onTokens={(tokens) => console.log(tokens)}
     >
       <Provider store={store}>

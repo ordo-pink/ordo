@@ -14,6 +14,7 @@ type Props = PropsWithChildren<{
   outline?: boolean
   hotkey?: string
   center?: boolean
+  inverted?: boolean
 }>
 
 export default function OrdoButton({
@@ -64,15 +65,22 @@ export const OrdoButtonPrimary = ({
   onMouseOver,
   hotkey,
   disabled,
+  inverted,
   outline,
   center,
 }: Props) => {
-  const buttonClassNames = Either.fromBoolean(!!disabled).fold(
-    () =>
-      "bg-gradient-to-br from-sky-200 dark:from-purple-600 via-violet-200 dark:via-violet-600 to-purple-200 dark:to-purple-600 active-ring",
-    () =>
-      "bg-gradient-to-br from-slate-300 via-zinc-300 to-stone-300 dark:from-slate-900 dark:via-zinc-900 dark:to-stone-900",
-  )
+  let buttonClassNames: string
+
+  if (disabled) {
+    buttonClassNames =
+      "bg-gradient-to-br from-slate-300 via-zinc-300 to-stone-300 dark:from-slate-900 dark:via-zinc-900 dark:to-stone-900"
+  } else if (inverted) {
+    buttonClassNames =
+      "bg-gradient-to-br from-purple-600 via-violet-600 to-purple-600 active-ring text-neutral-200"
+  } else {
+    buttonClassNames =
+      "bg-gradient-to-br from-sky-200 dark:from-purple-600 via-violet-200 dark:via-violet-600 to-purple-200 dark:to-purple-600 active-ring"
+  }
 
   const classNames = `${buttonClassNames} ${className}`
 

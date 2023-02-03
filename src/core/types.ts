@@ -2,6 +2,7 @@ import { EditorPlugin } from "@draft-js-plugins/editor"
 import type { Slice } from "@reduxjs/toolkit"
 import type { ContentBlock } from "draft-js"
 import type { TFunction } from "i18next"
+import { KeycloakLoginOptions } from "keycloak-js"
 import type Loadable from "react-loadable"
 
 import type { Language } from "$core/constants/language"
@@ -45,6 +46,8 @@ export type ActionContext<
   env: typeof window["ordo"]["env"]
   navigate: typeof router.navigate
   translate: TFunction<"translation", undefined>
+  createLoginUrl: ThunkFn<string>
+  createRegisterUrl: ThunkFn<string>
 }
 
 export type IsmParserRule = {

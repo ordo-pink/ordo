@@ -9,6 +9,9 @@ import EditorExtension from "$activities/editor"
 // import ExtensionStoreExtension from "$activities/extension-store"
 // import SettingsExtension from "$activities/settings"
 import { EditorExtensionStore } from "$activities/editor/types"
+import Features from "$activities/features"
+import Home from "$activities/home"
+import Pricing from "$activities/pricing"
 import UserExtension from "$activities/user"
 
 import AuthCommands from "$commands/auth"
@@ -21,6 +24,7 @@ import ContextMenu from "$containers/app/hooks/use-context-menu/components/conte
 import { useI18nInit } from "$containers/app/hooks/use-i18n-init"
 import { gotDirectory, registeredExtensions } from "$containers/app/store"
 
+import { OrdoExtensionType } from "$core/constants/ordo-extension-type"
 import { isActivityExtension } from "$core/guards/is-extension"
 import { useActionContext } from "$core/hooks/use-action-context"
 import { useCommandIconButton } from "$core/hooks/use-command-icon-button"
@@ -29,7 +33,7 @@ import { reducer, store } from "$core/state"
 import { useAppDispatch } from "$core/state/hooks/use-app-dispatch"
 import { useAppSelector } from "$core/state/hooks/use-app-selector"
 import { useExtensionSelector } from "$core/state/hooks/use-extension-selector"
-import { ActionContext, UnaryFn } from "$core/types"
+import { ActionContext, OrdoExtension, UnaryFn } from "$core/types"
 
 import MarkdownShortcuts from "$editor-plugins/markdown-shortcuts"
 
@@ -37,7 +41,7 @@ import MdFileExtension from "$file-associations/md"
 
 import "$containers/app/index.css"
 
-const extensions = [
+const loggedInExtensions = [
   // AllActivitiesExtension,
   EditorExtension,
   // ExtensionStoreExtension,
@@ -51,6 +55,16 @@ const extensions = [
   MarkdownShortcuts,
 ]
 
+const loggedOutExtensions = [
+  AuthCommands,
+  CommandPalette,
+  Home,
+  Features,
+  Pricing,
+  MarkdownShortcuts,
+  UserSupportCommands,
+]
+
 export default function App() {
   const dispatch = useAppDispatch()
   const i18n = useI18nInit()
@@ -58,6 +72,7 @@ export default function App() {
   const editorSelector = useExtensionSelector<EditorExtensionStore>()
 
   const [accelerators, setAccelerators] = useState<Record<string, UnaryFn<ActionContext, void>>>({})
+  const [extensions, setExtensions] = useState<OrdoExtension<string, OrdoExtensionType>[]>([])
   const currentFile = editorSelector((state) => state?.["ordo-activity-editor"]?.currentFile)
 
   const handleContextMenu = (event: MouseEvent) => {
@@ -75,11 +90,19 @@ export default function App() {
   const navigate = useNavigate()
 
   useEffect(() => {
-    dispatch(gotDirectory("/"))
+    if (actionContext.env.isAuthenticated) {
+      dispatch(gotDirectory("/"))
+
+      setExtensions(loggedInExtensions)
+    } else {
+      setExtensions(loggedOutExtensions)
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   useEffect(() => {
+    if (!extensions) return
+
     const keybindings: Record<string, UnaryFn<ActionContext, void>> = {}
 
     commands.forEach((command) => {
@@ -89,6 +112,7 @@ export default function App() {
     })
 
     setAccelerators(() => keybindings)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [commands, currentFile])
 
   useHotkeys(
@@ -132,6 +156,7 @@ export default function App() {
           } as RouteObject)
 
           if (currentRoute.pathname === "/" && path === "editor") navigate("/editor")
+          if (currentRoute.pathname === "/" && path === "home") navigate("/home")
           if (currentRoute.pathname.startsWith(`/${path}`)) {
             currentRoute.hash = ""
             navigate(currentRoute)
@@ -167,7 +192,7 @@ export default function App() {
     dispatch(registeredExtensions(extensions))
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, [extensions])
 
   return (
     <div

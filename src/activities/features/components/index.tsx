@@ -1,6 +1,7 @@
 import { Switch } from "@ordo-pink/switch"
 import Helmet from "react-helmet"
 import { useTranslation } from "react-i18next"
+import { Navigate, useParams } from "react-router-dom"
 
 import CalendarFeature from "$activities/features/components/features/calendar"
 import CommandPaletteFeature from "$activities/features/components/features/command-palette"
@@ -19,7 +20,6 @@ import TeamFoldersFeature from "$activities/features/components/features/team-fo
 import FeaturesSidebar from "$activities/features/components/sidebar"
 
 import { useWorkspaceWithSidebar } from "$containers/workspace/hooks/use-workspace"
-import { Navigate, useParams } from "react-router-dom"
 
 const GoToRichTextEditorFeature = () => <Navigate to="/features/rich-text-editor" />
 

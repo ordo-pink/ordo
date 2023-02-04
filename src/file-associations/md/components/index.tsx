@@ -8,6 +8,7 @@ import EditorPage from "$activities/editor/components/editor-page"
 import { selectFile } from "$activities/editor/store"
 import { EditorExtensionStore } from "$activities/editor/types"
 
+import { updatedFile } from "$containers/app/store";
 import Null from "$core/components/null"
 import { useFSAPI } from "$core/hooks/use-fs-api"
 import { useAppDispatch } from "$core/state/hooks/use-app-dispatch"
@@ -103,8 +104,8 @@ export default function MdEditor() {
     const raw = convertToRaw(content)
     const markdownString = draftToMarkdown(raw)
 
-    files.update(path, markdownString)
-  }, [path, files, editorState])
+    dispatch(updatedFile({ path, content: markdownString }))
+  }, [path, files, editorState, dispatch])
 
   const handleEditorClick = lazyBox((box) => box.fold(() => editorRef.current?.focus()))
 

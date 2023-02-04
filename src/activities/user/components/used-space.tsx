@@ -8,8 +8,6 @@ import { OrdoDirectory, OrdoFile, Nullable } from "$core/types";
 import { Either } from "$core/utils/either";
 import { convertBytesToMb } from "$core/utils/size-format-helper";
 
-import '../index.css'
-
 const spaceLimitMB = Number(process.env.REACT_USER_SPACE_LIMIT || 50);
 
 const sizeReducer = (totalSize: number) => (acc: number, item: OrdoFile | OrdoDirectory) =>

@@ -181,6 +181,10 @@ export default function App() {
       }
     })
 
+    if (currentRoute.pathname === "/") {
+      navigate(isAuthenticated ? "/editor" : "/home")
+    }
+
     const combinedReducer = combineReducers({
       ...reducer,
       ...reducers,

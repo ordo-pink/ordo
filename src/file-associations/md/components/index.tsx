@@ -8,7 +8,7 @@ import EditorPage from "$activities/editor/components/editor-page"
 import { selectFile } from "$activities/editor/store"
 import { EditorExtensionStore } from "$activities/editor/types"
 
-import { updatedFile } from "$containers/app/store";
+import { updatedFile } from "$containers/app/store"
 import Null from "$core/components/null"
 import { useFSAPI } from "$core/hooks/use-fs-api"
 import { useAppDispatch } from "$core/state/hooks/use-app-dispatch"

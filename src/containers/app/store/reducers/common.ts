@@ -12,10 +12,8 @@ export const getItemParent =
       .chain((root) => Either.fromNullable(findParent(item, root)))
   }
 
-export const getFile =
-  (personalProject: Draft<Nullable<OrdoDirectory>>) =>
-    (item: OrdoFile) => {
-      return Either.fromNullable(personalProject?.path)
-        .map(() => personalProject as NonNullable<typeof personalProject>)
-        .chain((root) => Either.fromNullable(findOrdoFile(item.path, root)))
-    }
+export const getFile = (personalProject: Draft<Nullable<OrdoDirectory>>) => (item: OrdoFile) => {
+  return Either.fromNullable(personalProject?.path)
+    .map(() => personalProject as NonNullable<typeof personalProject>)
+    .chain((root) => Either.fromNullable(findOrdoFile(item.path, root)))
+}

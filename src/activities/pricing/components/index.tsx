@@ -43,11 +43,11 @@ export default function ExtensionStore() {
           features={[
             { text: "@ordo-activity-pricing/free-cloud-storage" },
             { text: "@ordo-activity-pricing/free-file-size" },
+            { text: "@ordo-activity-pricing/free-invites", comingSoon: true },
+            { text: "@ordo-activity-pricing/free-extensions", comingSoon: true },
             { text: "@ordo-activity-pricing/free-local-storage", comingSoon: true },
             { text: "@ordo-activity-pricing/free-self-hosting", comingSoon: true },
-            { text: "@ordo-activity-pricing/free-invites", comingSoon: true },
             { text: "@ordo-activity-pricing/free-cross-device-access", comingSoon: true },
-            { text: "@ordo-activity-pricing/free-extensions", comingSoon: true },
           ]}
         />
 
@@ -60,11 +60,11 @@ export default function ExtensionStore() {
           features={[
             { text: "@ordo-activity-pricing/pro-everything-from-free" },
             { text: "@ordo-activity-pricing/pro-cloud-storage" },
-            { text: "@ordo-activity-pricing/pro-invites" },
-            { text: "@ordo-activity-pricing/pro-file-history" },
-            { text: "@ordo-activity-pricing/pro-extensions" },
-            { text: "@ordo-activity-pricing/pro-public-sharing" },
             { text: "@ordo-activity-pricing/pro-file-size" },
+            { text: "@ordo-activity-pricing/pro-invites" },
+            { text: "@ordo-activity-pricing/pro-extensions" },
+            { text: "@ordo-activity-pricing/pro-file-history" },
+            { text: "@ordo-activity-pricing/pro-public-sharing" },
           ]}
         />
       </div>

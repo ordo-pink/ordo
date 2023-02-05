@@ -1,6 +1,6 @@
 {
   "@ordo-activity-pricing/title": "Цены",
-  "@ordo-activity-pricing/go-to-pricing": "Перейти к ценам",
+  "@ordo-activity-pricing/go-to-pricing": "Посмотреть цены",
   "@ordo-activity-pricing/coming-soon": "Скоро",
   "@ordo-activity-pricing/choose-plan": "Выбрать",
   "@ordo-activity-pricing/pro-title": "Pro",
@@ -18,8 +18,8 @@
   "@ordo-activity-pricing/free-description": "Для организации мыслей, работы и жизни",
   "@ordo-activity-pricing/free-cloud-storage": "50 MB облачного хранения",
   "@ordo-activity-pricing/free-file-size": "Загрузка файлов до 50 MB",
-  "@ordo-activity-pricing/free-local-storage": "Неограниченное хранение на личном устройстве",
-  "@ordo-activity-pricing/free-self-hosting": "Возможность самостоятельного размещения",
+  "@ordo-activity-pricing/free-local-storage": "Неограниченное локальное хранение",
+  "@ordo-activity-pricing/free-self-hosting": "Размещение на личном сервере",
   "@ordo-activity-pricing/free-invites": "Приглашайте до 4 участников",
   "@ordo-activity-pricing/free-cross-device-access": "Доступ с разных устройств",
   "@ordo-activity-pricing/free-extensions": "До 5 расширений"

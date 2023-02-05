@@ -17,7 +17,7 @@ export const useActionContext = (
   const navigate = useNavigate()
   const { t } = useTranslation()
 
-  return {
+  return <ActionContext>{
     dispatch,
     env,
     state,

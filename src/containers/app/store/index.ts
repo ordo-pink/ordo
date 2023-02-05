@@ -5,6 +5,7 @@ import { gotDirectoryReducer } from "$containers/app/store/reducers/got-director
 import { registeredExtensionsReducer } from "$containers/app/store/reducers/registered-extensions"
 import { rejectedReducer } from "$containers/app/store/reducers/rejected"
 import { removedReducer } from "$containers/app/store/reducers/removed"
+import { updatedFileReducer } from "$containers/app/store/reducers/updated-file"
 import { AppState, UpdatedFilePayload } from "$containers/app/types"
 
 const initialState: AppState = {
@@ -76,6 +77,9 @@ export const appSlice = createSlice({
 
       .addCase(removedDirectory.fulfilled, removedReducer)
       .addCase(removedDirectory.rejected, rejectedReducer)
+
+      .addCase(updatedFile.fulfilled, updatedFileReducer)
+      .addCase(updatedFile.rejected, rejectedReducer)
   },
 })
 

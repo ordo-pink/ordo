@@ -29,10 +29,8 @@ const UsedSpace = () => {
 
   const usedSpaceText = t("@ordo-activity-user/used-space")
 
-  const allFilesSizeMB = useMemo(
-    () => convertBytesToMb(calculateTreeSize(directory, 0)),
-    [directory],
-  )
+  const allFilesSizeMB = convertBytesToMb(calculateTreeSize(directory, 0))
+
   const usedSpacePercent = (allFilesSizeMB / spaceLimitMB) * 100
 
   return (
@@ -44,9 +42,9 @@ const UsedSpace = () => {
           {allFilesSizeMB}/{spaceLimitMB}MB
         </div>
       </div>
-      <div className="w-full bg-gray-200 rounded-full h-2.5 dark:bg-gray-700 mb-3">
+      <div className="w-full bg-neutral-200 rounded-full h-2.5 dark:bg-neutral-700 mb-3">
         <div
-          className="bg-gradient-to-r from-pink-700 dark:from-pink-500 to-purple-600 dark:to-purple-400 h-2.5 rounded-full"
+          className="bg-gradient-to-tr from-pink-300 dark:from-pink-700 via-rose-300 dark:via-rose-700 to-purple-300 dark:to-purple-700 h-2.5 rounded-full"
           style={{ width: `${usedSpacePercent.toFixed(0)}%` }}
         />
       </div>

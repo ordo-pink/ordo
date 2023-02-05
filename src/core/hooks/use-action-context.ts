@@ -17,7 +17,7 @@ export const useActionContext = (
   const navigate = useNavigate()
   const { t } = useTranslation()
 
-  return <ActionContext>{
+  return {
     dispatch,
     env,
     state,
@@ -26,5 +26,5 @@ export const useActionContext = (
     createRegisterUrl: () => keycloak.createRegisterUrl({ redirectUri: "/editor" }),
     navigate,
     translate: t,
-  }
+  } as ActionContext
 }

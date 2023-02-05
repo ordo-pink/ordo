@@ -42,7 +42,7 @@ export type ActionContext<
   // TODO: Replace with `target` and add a boolean for whether it is `isContextMenuCall`
   contextMenuTarget: Nullable<OrdoFile | OrdoDirectory>
   dispatch: ReturnType<typeof useAppDispatch>
-  env: (typeof window)["ordo"]["env"]
+  env: typeof window["ordo"]["env"]
   navigate: typeof router.navigate
   translate: TFunction<"translation", undefined>
   createLoginUrl: ThunkFn<string>

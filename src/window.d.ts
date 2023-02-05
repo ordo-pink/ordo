@@ -21,6 +21,7 @@ declare global {
         fs: {
           files: {
             get: (path: string) => Promise<string>
+            getRaw: (path: string) => ReturnType<typeof fetch>
             create: (path: string) => Promise<OrdoFile>
             move: (oldPath: string, newPath: string) => Promise<OrdoFile | OrdoDirectory>
             update: (path: string, content: string) => Promise<OrdoFile>

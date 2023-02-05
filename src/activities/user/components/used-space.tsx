@@ -1,5 +1,4 @@
 import { reduce } from "ramda"
-import { useMemo } from "react"
 import { useTranslation } from "react-i18next"
 
 import { isOrdoDirectory } from "$core/guards/is-fs-entity"

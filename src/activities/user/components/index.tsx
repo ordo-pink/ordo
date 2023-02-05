@@ -6,8 +6,10 @@ import EmailField from "$activities/user/components/email-field"
 // import EmailVerifiedField from "$activities/user/components/email-verified-field"
 import LogoutField from "$activities/user/components/logout-field"
 import PasswordField from "$activities/user/components/password-field"
+import { UsedSpace } from "$activities/user/components/used-space"
 import { useWorkspace } from "$containers/workspace/hooks/use-workspace"
 
+import Fieldset from "$core/components/fieldset"
 import { useEnv } from "$core/hooks/use-env"
 
 export default function Settings() {
@@ -33,6 +35,12 @@ export default function Settings() {
         breadcrumbsPath={`/${translatedTitle}/`}
       >
         <form className="flex flex-col space-y-4">
+          <Fieldset>
+            <div className="w-full">
+              <UsedSpace />
+            </div>
+          </Fieldset>
+
           <EmailField />
           {/* <EmailVerifiedField /> */}
           <PasswordField />

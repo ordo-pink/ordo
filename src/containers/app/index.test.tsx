@@ -1,8 +1,18 @@
 import { render, screen } from "@testing-library/react"
-import App from "./"
+import OrdoButton from "$core/components/buttons"
 
-test("renders learn react link", () => {
-  render(<App />)
-  const linkElement = screen.getByText(/Hello/i)
+test("it should render button", () => {
+  render(
+    <OrdoButton
+      onClick={() => {
+        throw new Error("Function not implemented.")
+      }}
+    >
+      {/* eslint-disable-next-line i18next/no-literal-string */}
+      {/* eslint-disable-next-line i18next/no-literal-string */}
+      Test Button
+    </OrdoButton>,
+  )
+  const linkElement = screen.getByText(/Test Button/i)
   expect(linkElement).toBeInTheDocument()
 })

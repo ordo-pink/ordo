@@ -17,6 +17,7 @@ import UserExtension from "$activities/user"
 import AuthCommands from "$commands/auth"
 import CommandPalette from "$commands/command-palette"
 import FileSystemCommands from "$commands/file-system"
+import OpenFile from "$commands/open-file"
 import UserSupportCommands from "$commands/user-support"
 
 import ActivityBar from "$containers/activity-bar"
@@ -52,6 +53,7 @@ const loggedInExtensions = [
   MdFileExtension,
   FileSystemCommands,
   CommandPalette,
+  OpenFile,
   UserSupportCommands,
   AuthCommands,
   MarkdownShortcuts,

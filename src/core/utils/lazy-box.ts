@@ -1,8 +1,8 @@
-import { EventBox, IBox } from "./box"
+import { Box, IBox } from "./box"
 
 export const lazyBox =
   <T>(callback: (either: IBox<T>) => void) =>
   (x?: T) => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    callback(EventBox.of(x ?? (null as any)))
+    callback(Box.of(x ?? (null as any)))
   }

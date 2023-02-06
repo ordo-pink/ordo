@@ -15,6 +15,7 @@ import { useFSAPI } from "$core/hooks/use-fs-api"
 import { useAppDispatch } from "$core/state/hooks/use-app-dispatch"
 import { useAppSelector } from "$core/state/hooks/use-app-selector"
 import { useExtensionSelector } from "$core/state/hooks/use-extension-selector"
+import { Box } from "$core/utils/box"
 import { Either } from "$core/utils/either"
 import { getParentPath } from "$core/utils/fs-helpers"
 import { findOrdoFile } from "$core/utils/fs-helpers"
@@ -29,10 +30,16 @@ export default function MdEditor() {
 
   const currentFile = editorSelector((state) => state["ordo-activity-editor"].currentFile)
 
-  const [editorState, setEditorState] = useState(() => EditorState.createEmpty())
+  const [editorState, setEditorState] = useState(EditorState.createEmpty())
   const [plugins, setPlugins] = useState<EditorPlugin[]>([])
 
   const editorRef = useRef<Editor>(null)
+
+  const [query] = useSearchParams()
+  const { files } = useFSAPI()
+
+  const path = query.get("path")
+  const breadcrumbsPath = getParentPath(path ?? "/")
 
   useEffect(() => {
     if (pluginExtensions) {
@@ -67,14 +74,10 @@ export default function MdEditor() {
       })
 
       setPlugins(plugins)
+
+      return () => setPlugins([])
     }
   }, [pluginExtensions, editorState])
-
-  const [query] = useSearchParams()
-  const { files } = useFSAPI()
-
-  const path = query.get("path")
-  const breadcrumbsPath = getParentPath(path ?? "/")
 
   useEffect(() => {
     if (!path || !files || !tree) return
@@ -86,10 +89,11 @@ export default function MdEditor() {
         dispatch(selectFile(file))
       }
 
-      const raw = markdownToDraft(payload)
-      const contentState = convertFromRaw(raw)
-
-      setEditorState(EditorState.createWithContent(contentState))
+      Box.of(payload)
+        .map(markdownToDraft)
+        .map(convertFromRaw)
+        .map(EditorState.createWithContent)
+        .fold(setEditorState)
     })
   }, [path, files, tree, dispatch])
 
@@ -107,13 +111,15 @@ export default function MdEditor() {
         editorState={editorState}
         plugins={plugins}
         onChange={(state) => {
-          const content = editorState.getCurrentContent()
-          const raw = convertToRaw(content)
-          const markdownString = draftToMarkdown(raw)
+          if (state.getLastChangeType() != null) {
+            const content = state.getCurrentContent()
+            const raw = convertToRaw(content)
+            const markdownString = draftToMarkdown(raw)
 
-          if (!markdownString) return
+            if (!markdownString) return
 
-          dispatch(updatedFile({ path: file.path, content: markdownString }))
+            dispatch(updatedFile({ path: file.path, content: markdownString }))
+          }
 
           setEditorState(state)
         }}

@@ -2,6 +2,7 @@ import { Switch } from "@ordo-pink/switch"
 import { createContext, useEffect } from "react"
 import { Helmet } from "react-helmet"
 import { useTranslation } from "react-i18next"
+import { AiOutlineLoading } from "react-icons/ai"
 import { createSearchParams, useNavigate, useSearchParams } from "react-router-dom"
 
 import FileExplorer from "$activities/editor/components/file-explorer"
@@ -44,6 +45,7 @@ export default function Editor({ metadata }: OrdoExtensionProps<EditorMetadata>)
   const editorSelector = useExtensionSelector<EditorActivityState>()
 
   const tree = useAppSelector((state) => state.app.personalProject)
+  const isSaving = useAppSelector((state) => state.app.isSaving)
   const currentFile = editorSelector((state) => state["ordo-activity-editor"].currentFile)
 
   const association = useCurrentFileAssociation()
@@ -114,6 +116,7 @@ export default function Editor({ metadata }: OrdoExtensionProps<EditorMetadata>)
   const { t } = useTranslation()
 
   const translatedTitle = t("@ordo-activity-editor/title")
+  const translatedSaving = t("@ordo-activity-editor/saving")
 
   return (
     <EditorMetadataContext.Provider value={metadata}>
@@ -134,6 +137,15 @@ export default function Editor({ metadata }: OrdoExtensionProps<EditorMetadata>)
               <Component />
             ),
           )}
+        </div>
+
+        <div
+          className={`${
+            isSaving ? "block" : "hidden"
+          } fixed bottom-2 right-2 opacity-50 flex items-center text-xs space-x-2 text-right`}
+        >
+          <AiOutlineLoading className="animate-spin" />
+          <div>{translatedSaving}</div>
         </div>
       </Workspace>
     </EditorMetadataContext.Provider>

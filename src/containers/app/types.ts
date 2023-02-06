@@ -18,6 +18,7 @@ export type AppState = {
   editorPluginExtensions: OrdoEditorPluginExtension<string>[]
   commands: OrdoCommand<string>[]
   overlays: OrdoLoadableComponent[]
+  isSaving: boolean
 }
 
 export type UpdatedFilePayload = {

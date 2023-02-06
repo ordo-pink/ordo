@@ -5,7 +5,7 @@
   "@ordo-command-auth/register": "Зарегистрироваться",
   "@ordo-command-auth/change-password": "Сменить пароль",
   "@ordo-command-auth/change-email": "Сменить электронную почту",
-  "@ordo-command-auth/delete-account": "Удалить аккаунт",
+  "@ordo-command-auth/delete-account": "Удалить аккаунт (необратимо)",
   "@ordo-command-auth/confirm-logout": "Вы уверены, что хотите выйти?",
   "@ordo-command-auth/button-ok": "Да",
   "@ordo-command-auth/button-cancel": "Нет",

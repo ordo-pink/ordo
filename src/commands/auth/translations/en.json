@@ -5,7 +5,7 @@
   "@ordo-command-auth/register": "Register",
   "@ordo-command-auth/change-password": "Change password",
   "@ordo-command-auth/change-email": "Change email",
-  "@ordo-command-auth/delete-account": "Delete account",
+  "@ordo-command-auth/delete-account": "Permanently delete account",
   "@ordo-command-auth/confirm-logout": "Are you sure you want to log out?",
   "@ordo-command-auth/button-ok": "Yes",
   "@ordo-command-auth/button-cancel": "No",

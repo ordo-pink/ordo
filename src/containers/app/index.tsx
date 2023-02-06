@@ -41,6 +41,7 @@ import ImgFileExtension from "$file-associations/img"
 import MdFileExtension from "$file-associations/md"
 
 import "$containers/app/index.css"
+import { useKeycloak } from "$core/auth/hooks/use-keycloak"
 
 const loggedInExtensions = [
   // AllActivitiesExtension,
@@ -85,10 +86,11 @@ export default function App() {
   const activities = useAppSelector((state) => state.app.activityExtensions)
   const overlays = useAppSelector((state) => state.app.overlays)
   const commands = useAppSelector((state) => state.app.commands)
+  const { keycloak } = useKeycloak()
 
   const actionContext = useActionContext()
 
-  const isAuthenticated = actionContext.env.isAuthenticated
+  const isAuthenticated = keycloak.authenticated
 
   const currentRoute = useLocation()
   const navigate = useNavigate()

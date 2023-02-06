@@ -1,4 +1,4 @@
-import type { KeycloakInstance } from "keycloak-js"
+import type Keycloak from "keycloak-js"
 import { createContext } from "react"
 
 import type { AuthClient } from "$core/auth/types"
@@ -34,7 +34,7 @@ export function createAuthContext<T extends AuthClient>(
   })
 }
 
-export const reactKeycloakWebContext = createAuthContext<KeycloakInstance>()
+export const reactKeycloakWebContext = createAuthContext<Keycloak>()
 
 export const ReactKeycloakWebContextConsumer = reactKeycloakWebContext.Consumer
 

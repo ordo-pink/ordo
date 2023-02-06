@@ -11,6 +11,15 @@ import type { RootState } from "$core/state/types"
 
 export type Nullable<T> = T | null
 
+export type OrdoExtensionMetadata<T extends Record<string, unknown>> = {
+  get<K extends keyof T>(key: K): Promise<T[K]>
+  set<K extends keyof T>(key: K, value: T[K]): Promise<void>
+  clear: ThunkFn<Promise<void>>
+  resetDefaults: ThunkFn<Promise<void>>
+  getState: ThunkFn<Promise<T>>
+  getDefaults: ThunkFn<Promise<T>>
+}
+
 export type Optional<T> = T | undefined
 
 export type ThunkFn<Result> = () => Result
@@ -37,8 +46,14 @@ export type ActionContext<
   env: typeof window.ordo.env
   navigate: typeof router.navigate
   translate: TFunction<"translation", undefined>
+  isAuthenticated: boolean
   createLoginUrl: ThunkFn<string>
   createRegisterUrl: ThunkFn<string>
+  userData?: {
+    email: string
+    username: string
+    emailVerified: boolean
+  }
 }
 
 export type ExtensionState<T extends OrdoExtension<string, OrdoExtensionType>> =
@@ -67,6 +82,8 @@ export interface OrdoExtension<
   ExtensionType extends OrdoExtensionType,
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   TState extends Record<string, any> = Record<string, any>,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  TMetadata extends Record<string, any> = Record<string, any>,
 > {
   name: OrdoExtensionName<Name, ExtensionType>
   translations?: TranslationsRecord
@@ -75,6 +92,7 @@ export interface OrdoExtension<
   description?: string
   storeSlice?: Slice<TState>
   commands?: OrdoCommand<Name>[]
+  metadata?: OrdoExtensionMetadata<TMetadata>
 }
 
 export interface OrdoCommandExtension<

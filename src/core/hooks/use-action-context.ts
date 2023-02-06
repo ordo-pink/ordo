@@ -17,14 +17,28 @@ export const useActionContext = (
   const navigate = useNavigate()
   const { t } = useTranslation()
 
+  let userData
+
+  const tokenParsed = keycloak.tokenParsed
+
+  if (tokenParsed) {
+    userData = {
+      email: tokenParsed.email,
+      emailVerified: tokenParsed.email_verified,
+      username: tokenParsed.preferred_username,
+    }
+  }
+
   return {
     dispatch,
     env,
     state,
     contextMenuTarget,
+    isAuthenticated: keycloak.authenticated,
     createLoginUrl: () => keycloak.createLoginUrl({ redirectUri: "/editor" }),
     createRegisterUrl: () => keycloak.createRegisterUrl({ redirectUri: "/editor" }),
     navigate,
     translate: t,
+    userData,
   } as ActionContext
 }

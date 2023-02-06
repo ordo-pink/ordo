@@ -7,3 +7,8 @@ export type EditorState = {
 }
 
 export type EditorActivityState = ExtensionState<typeof editor>
+
+export type EditorMetadata = {
+  recentFiles: string[]
+  expandedDirectories: string[]
+}

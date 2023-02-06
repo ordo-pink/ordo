@@ -6,6 +6,6 @@ export const RegisterCommand = createOrdoCommand({
     window.open(createRegisterUrl(), "_self")
   },
   accelerator: "alt+r",
-  showInCommandPalette: ({ env }) => !env.isAuthenticated,
+  showInCommandPalette: ({ isAuthenticated }) => !isAuthenticated,
   Icon: () => import("$commands/auth/components/register-icon"),
 })

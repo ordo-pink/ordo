@@ -37,6 +37,7 @@ import { ActionContext, OrdoExtension, UnaryFn } from "$core/types"
 
 import MarkdownShortcuts from "$editor-plugins/markdown-shortcuts"
 
+import ImgFileExtension from "$file-associations/img"
 import MdFileExtension from "$file-associations/md"
 
 import "$containers/app/index.css"
@@ -53,6 +54,7 @@ const loggedInExtensions = [
   UserSupportCommands,
   AuthCommands,
   MarkdownShortcuts,
+  ImgFileExtension,
 ]
 
 const loggedOutExtensions = [

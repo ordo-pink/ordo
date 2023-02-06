@@ -82,6 +82,12 @@ window.ordo = {
               },
             })
             .then((res) => res.text()),
+        getRaw: (path) =>
+          window.ordo.env.fetch(`${host}/${FILE_API}${path}`, {
+            headers: {
+              [AUTHORIZATION_HEADER_KEY]: `Bearer ${TEST_AUTH_TOKEN ?? Keycloak.token}`,
+            },
+          }),
         remove: (path) =>
           window.ordo.env
             .fetch(`${host}/${FILE_API}${path}`, {

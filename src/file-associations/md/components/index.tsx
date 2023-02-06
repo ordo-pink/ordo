@@ -18,7 +18,6 @@ import { useExtensionSelector } from "$core/state/hooks/use-extension-selector"
 import { Either } from "$core/utils/either"
 import { getParentPath } from "$core/utils/fs-helpers"
 import { findOrdoFile } from "$core/utils/fs-helpers"
-import { lazyBox } from "$core/utils/lazy-box"
 
 export default function MdEditor() {
   const dispatch = useAppDispatch()
@@ -69,8 +68,6 @@ export default function MdEditor() {
 
       setPlugins(plugins)
     }
-
-    return () => setPlugins([])
   }, [pluginExtensions, editorState])
 
   const [query] = useSearchParams()
@@ -94,21 +91,9 @@ export default function MdEditor() {
 
       setEditorState(EditorState.createWithContent(contentState))
     })
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [path, files])
+  }, [path, files, tree, dispatch])
 
-  useEffect(() => {
-    if (!path || !files) return
-
-    // TODO: Send to webworker
-    const content = editorState.getCurrentContent()
-    const raw = convertToRaw(content)
-    const markdownString = draftToMarkdown(raw)
-
-    dispatch(updatedFile({ path, content: markdownString }))
-  }, [path, files, editorState, dispatch])
-
-  const handleEditorClick = lazyBox((box) => box.fold(() => editorRef.current?.focus()))
+  const handleEditorClick = () => editorRef.current?.focus()
 
   return Either.fromNullable(currentFile).fold(Null, (file) => (
     <EditorPage
@@ -117,17 +102,20 @@ export default function MdEditor() {
       onClick={handleEditorClick}
     >
       <Editor
-        placeholder="Type something..."
+        // placeholder="Type something..."
         ref={editorRef}
         editorState={editorState}
         plugins={plugins}
         onChange={(state) => {
-          setEditorState(state)
-        }}
-        handlePastedText={(_, __, state) => {
-          setEditorState(state)
+          const content = editorState.getCurrentContent()
+          const raw = convertToRaw(content)
+          const markdownString = draftToMarkdown(raw)
 
-          return "not-handled"
+          if (!markdownString) return
+
+          dispatch(updatedFile({ path: file.path, content: markdownString }))
+
+          setEditorState(state)
         }}
       />
     </EditorPage>

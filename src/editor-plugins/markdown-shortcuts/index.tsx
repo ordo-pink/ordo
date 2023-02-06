@@ -11,7 +11,6 @@ import CheckableListItem from "$editor-plugins/markdown-shortcuts/checkable-list
 import { CHECKABLE_LIST_ITEM } from "$editor-plugins/markdown-shortcuts/checkable-list-items/constants"
 import { createImageDecorator } from "$editor-plugins/markdown-shortcuts/decorators/image"
 import { createLinkDecorator } from "$editor-plugins/markdown-shortcuts/decorators/link"
-import { adjustBlockDepth } from "$editor-plugins/markdown-shortcuts/modifiers/adjust-block-depth"
 import { changeCurrentBlockType } from "$editor-plugins/markdown-shortcuts/modifiers/change-current-block-type"
 import { handleBlockType } from "$editor-plugins/markdown-shortcuts/modifiers/handle-block-type"
 import { handleImage } from "$editor-plugins/markdown-shortcuts/modifiers/handle-image"
@@ -136,14 +135,7 @@ export const createMarkdownShortcutsPlugin = (
           return null
       }
     },
-    onTab(ev: KeyboardEvent) {
-      const editorState = store.getEditorState()
-      const newEditorState = adjustBlockDepth(editorState, ev)
-      if (newEditorState !== editorState) {
-        store.setEditorState(newEditorState)
-        return true
-      }
-    },
+
     handleReturn(ev: KeyboardEvent, editorState: EditorState) {
       const newEditorState = checkReturnForState(editorState, ev, config)
       if (editorState !== newEditorState) {

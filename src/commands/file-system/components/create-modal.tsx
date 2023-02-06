@@ -16,8 +16,6 @@ import { Either } from "$core/utils/either"
 import { preventDefault, stopPropagation } from "$core/utils/event"
 import { lazyBox } from "$core/utils/lazy-box"
 
-import "$commands/file-system/index.css"
-
 export default function CreateModal() {
   const dispatch = useAppDispatch()
 
@@ -63,13 +61,13 @@ export default function CreateModal() {
 
   return Either.fromBoolean(isShown).fold(Null, () => (
     <Modal onHide={handleHide}>
-      <div className="file-system_create-overlay">
+      <div className="h-full flex items-center justify-center">
         <div
           onClick={handleModalClick}
-          className="file-system_create-modal"
+          className="bg-neutral-100 dark:bg-neutral-700 shadow-xl rounded-md w-full max-w-lg p-8 flex flex-col space-y-4 items-center"
           role="none"
         >
-          <div className="file-system_create-modal_title">
+          <div className="flex items-center space-x-4 text-xl">
             <Icon className="shrink-0" />
             <div>{translatedTitle}</div>
           </div>
@@ -78,7 +76,7 @@ export default function CreateModal() {
 
           <input
             type="text"
-            className="file-system_create-modal_input"
+            className="w-full outline-none border dark:border-0 border-neutral-400 rounded-lg bg-white dark:bg-neutral-600 px-4 py-2"
             autoFocus
             placeholder={translatedPlaceholder}
             value={newName}

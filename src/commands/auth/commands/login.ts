@@ -6,6 +6,6 @@ export const LoginCommand = createOrdoCommand({
     window.open(createLoginUrl(), "_self")
   },
   accelerator: "alt+l",
-  showInCommandPalette: ({ env }) => !env.isAuthenticated,
+  showInCommandPalette: ({ isAuthenticated }) => !isAuthenticated,
   Icon: () => import("$commands/auth/components/login-icon"),
 })

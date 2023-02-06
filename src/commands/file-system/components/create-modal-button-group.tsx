@@ -60,7 +60,7 @@ export default function CreateModalButtonGroup({ newName, onAction }: Props) {
   const translatedOk = t("@ordo-command-file-system/button-ok")
 
   return (
-    <div className="file-system-modal_button-group">
+    <div className="w-full flex items-center justify-around">
       <OrdoButtonSecondary
         hotkey="escape"
         onClick={handleCancelButtonClick}

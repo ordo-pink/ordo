@@ -29,7 +29,7 @@ export default function EmailVerifiedField() {
       .fold(() => verifyEmailCommand?.action(actionContext)),
   )
 
-  return Either.fromBoolean(actionContext.env.userData?.emailVerified).fold(
+  return Either.fromBoolean(actionContext.userData?.emailVerified).fold(
     () => (
       <Fieldset>
         <div className="text-lg text-rose-600 dark:text-rose-400 flex space-x-2 items-center">

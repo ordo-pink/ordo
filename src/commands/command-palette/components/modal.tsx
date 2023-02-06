@@ -2,7 +2,7 @@ import Fuse from "fuse.js"
 import { useState, useEffect, ChangeEvent, KeyboardEvent, MouseEvent } from "react"
 import { useTranslation } from "react-i18next"
 
-import { EditorExtensionStore } from "$activities/editor/types"
+import { EditorActivityState } from "$activities/editor/types"
 
 import CommandPaletteItem from "$commands/command-palette/components/palette-item"
 import { hideCommandPalette } from "$commands/command-palette/store"
@@ -30,7 +30,7 @@ const fuse = new Fuse([] as SearchableCommand[], { keys: ["title"] })
 export default function CommandPalette() {
   const dispatch = useAppDispatch()
 
-  const editorSelector = useExtensionSelector<EditorExtensionStore>()
+  const editorSelector = useExtensionSelector<EditorActivityState>()
   const commandPaletteSelector = useExtensionSelector<CommandPaletteExtensionStore>()
 
   const root = useAppSelector((state) => state.app.personalProject)

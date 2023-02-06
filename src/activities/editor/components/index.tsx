@@ -8,7 +8,7 @@ import FileNotSelected from "$activities/editor/components/file-not-selected"
 import FileNotSupported from "$activities/editor/components/file-not-supported"
 import { useCurrentFileAssociation } from "$activities/editor/hooks/use-current-file-association"
 import { selectFile } from "$activities/editor/store"
-import { EditorExtensionStore } from "$activities/editor/types"
+import { EditorActivityState } from "$activities/editor/types"
 
 import { useWorkspaceWithSidebar } from "$containers/workspace/hooks/use-workspace"
 import { useAppDispatch } from "$core/state/hooks/use-app-dispatch"
@@ -24,7 +24,7 @@ export default function Editor() {
 
   const [query] = useSearchParams()
 
-  const editorSelector = useExtensionSelector<EditorExtensionStore>()
+  const editorSelector = useExtensionSelector<EditorActivityState>()
 
   const tree = useAppSelector((state) => state.app.personalProject)
   const currentFile = editorSelector((state) => state["ordo-activity-editor"].currentFile)

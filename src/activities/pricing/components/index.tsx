@@ -67,6 +67,23 @@ export default function ExtensionStore() {
             { text: "@ordo-activity-pricing/pro-public-sharing" },
           ]}
         />
+
+        <PricingPlan
+          isAvailable={false}
+          isHighlighted={false}
+          title="@ordo-activity-pricing/pro-title"
+          price="@ordo-activity-pricing/pro-price"
+          description="@ordo-activity-pricing/pro-description"
+          features={[
+            { text: "@ordo-activity-pricing/pro-everything-from-free" },
+            { text: "@ordo-activity-pricing/pro-cloud-storage" },
+            { text: "@ordo-activity-pricing/pro-file-size" },
+            { text: "@ordo-activity-pricing/pro-invites" },
+            { text: "@ordo-activity-pricing/pro-extensions" },
+            { text: "@ordo-activity-pricing/pro-file-history" },
+            { text: "@ordo-activity-pricing/pro-public-sharing" },
+          ]}
+        />
       </div>
     </Workspace>
   )

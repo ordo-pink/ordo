@@ -11,14 +11,14 @@ import { UsedSpace } from "$activities/user/components/used-space"
 import { useWorkspace } from "$containers/workspace/hooks/use-workspace"
 
 import Fieldset from "$core/components/fieldset"
-import { useEnv } from "$core/hooks/use-env"
+import { useActionContext } from "$core/hooks/use-action-context"
 
 export default function Settings() {
   const Workspace = useWorkspace()
 
   const { t } = useTranslation()
 
-  const env = useEnv()
+  const { userData } = useActionContext()
 
   const translatedTitle = t("@ordo-activity-user/title")
 
@@ -32,7 +32,7 @@ export default function Settings() {
       </Helmet>
 
       <EditorPage
-        title={env.userData?.username}
+        title={userData?.username}
         breadcrumbsPath={`/${translatedTitle}/`}
       >
         <form className="flex flex-col space-y-4">

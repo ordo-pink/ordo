@@ -18,9 +18,8 @@ root.render(
     authClient={Keycloak}
     autoRefreshToken
     LoadingComponent={<Loading />}
-    onEvent={(event, error) => {
+    onEvent={(_, error) => {
       // eslint-disable-next-line no-console
-      console.log(event)
       if (error) console.error(error)
     }}
   >

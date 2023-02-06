@@ -24,6 +24,7 @@ import ContextMenu from "$containers/app/hooks/use-context-menu/components/conte
 import { useI18nInit } from "$containers/app/hooks/use-i18n-init"
 import { gotDirectory, registerExtensions } from "$containers/app/store"
 
+import { useKeycloak } from "$core/auth/hooks/use-keycloak"
 import { OrdoExtensionType } from "$core/constants/ordo-extension-type"
 import { isActivityExtension } from "$core/guards/is-extension"
 import { useActionContext } from "$core/hooks/use-action-context"
@@ -41,7 +42,6 @@ import ImgFileExtension from "$file-associations/img"
 import MdFileExtension from "$file-associations/md"
 
 import "$containers/app/index.css"
-import { useKeycloak } from "$core/auth/hooks/use-keycloak"
 
 const loggedInExtensions = [
   // AllActivitiesExtension,

@@ -5,11 +5,14 @@
   "@ordo-command-auth/register": "Register",
   "@ordo-command-auth/change-password": "Change password",
   "@ordo-command-auth/change-email": "Change email",
+  "@ordo-command-auth/delete-account": "Delete account",
   "@ordo-command-auth/confirm-logout": "Are you sure you want to log out?",
   "@ordo-command-auth/button-ok": "Yes",
   "@ordo-command-auth/button-cancel": "No",
   "@ordo-command-auth/change-password-email-subject": "Password change for {{email}}",
   "@ordo-command-auth/change-password-email-body": "Hi,%0A%0AI'd like to reset my password for the Ordo account.%0A%0A{{username}}",
   "@ordo-command-auth/change-email-subject": "Email change for {{email}}",
-  "@ordo-command-auth/change-email-body": "Hi,%0A%0AI'd like to change my email for the Ordo account.%0A%0A{{username}}"
+  "@ordo-command-auth/change-email-body": "Hi,%0A%0AI'd like to change my email for the Ordo account.%0A%0A{{username}}",
+  "@ordo-command-auth/delete-account-subject": "Delete account for {{email}}",
+  "@ordo-command-auth/delete-account-body": "Hi,%0A%0AI'd like to permanently delete my account for the Ordo account.%0A%0A{{username}}"
 }

@@ -1,5 +1,6 @@
 import { ChangeEmailCommand } from "$commands/auth/commands/change-email"
 import { ChangePasswordCommand } from "$commands/auth/commands/change-password"
+import { DeleteAccount } from "$commands/auth/commands/delete-account"
 import { LoginCommand } from "$commands/auth/commands/login"
 import { LogoutCommand } from "$commands/auth/commands/logout"
 import { RegisterCommand } from "$commands/auth/commands/register"
@@ -17,6 +18,7 @@ export default createCommandExtension("auth", {
     LogoutCommand,
     ChangePasswordCommand,
     ChangeEmailCommand,
+    DeleteAccount,
   ],
   overlayComponents: [() => import("$commands/auth/components/logout-modal")],
   storeSlice: slice,

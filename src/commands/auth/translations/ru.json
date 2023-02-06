@@ -5,11 +5,13 @@
   "@ordo-command-auth/register": "Зарегистрироваться",
   "@ordo-command-auth/change-password": "Сменить пароль",
   "@ordo-command-auth/change-email": "Сменить электронную почту",
+  "@ordo-command-auth/delete-account": "Удалить аккаунт",
   "@ordo-command-auth/confirm-logout": "Вы уверены, что хотите выйти?",
   "@ordo-command-auth/button-ok": "Да",
   "@ordo-command-auth/button-cancel": "Нет",
   "@ordo-command-auth/change-password-email-subject": "Запрос на смену пароля для {{email}}",
   "@ordo-command-auth/change-password-email-body": "Привет,%0A%0AЯ бы хотел запросить смену пароля для моего аккаунта в Ordo.%0A%0A{{username}}",
   "@ordo-command-auth/change-email-subject": "Запрос на смену электронной почты для {{email}}",
-  "@ordo-command-auth/change-email-body": "Привет,%0A%0AЯ бы хотел запросить смену электронной почты для моего аккаунта в Ordo.%0A%0A{{username}}"
-}
+  "@ordo-command-auth/change-email-body": "Привет,%0A%0AЯ бы хотел запросить смену электронной почты для моего аккаунта в Ordo.%0A%0A{{username}}",
+  "@ordo-command-auth/delete-account-subject": "Запрос на удаление аккаунта для {{email}}",
+  "@ordo-command-auth/delete-account-body": "Привет,%0A%0AЯ бы хотел навсегда удалить мой аккаунт в Ordo.%0A%0A{{username}}"}

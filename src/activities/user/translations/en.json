@@ -9,5 +9,6 @@
   "@ordo-activity-user/change-password": "Change password",
   "@ordo-activity-user/email-verified": "Email verified",
   "@ordo-activity-user/logout": "Log Out",
+  "@ordo-activity-user/delete-account": "Delete account",
   "@ordo-activity-user/used-space": "Used Space"
 }

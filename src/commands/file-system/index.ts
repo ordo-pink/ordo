@@ -2,6 +2,7 @@ import { CreateDirectoryCommand } from "$commands/file-system/commands/create-di
 import { CreateFileCommand } from "$commands/file-system/commands/create-file"
 import { DeleteDirectoryCommand } from "$commands/file-system/commands/delete-directory"
 import { DeleteFileCommand } from "$commands/file-system/commands/delete-file"
+import { DownloadFileCommand } from "$commands/file-system/commands/download-file"
 import { slice } from "$commands/file-system/store"
 import en from "$commands/file-system/translations/en.json"
 import ru from "$commands/file-system/translations/ru.json"
@@ -13,7 +14,13 @@ export default createCommandExtension("file-system", {
   description: "@ordo-command-file-system/description",
   translations: { en, ru },
   storeSlice: slice,
-  commands: [CreateFileCommand, CreateDirectoryCommand, DeleteFileCommand, DeleteDirectoryCommand],
+  commands: [
+    CreateFileCommand,
+    CreateDirectoryCommand,
+    DeleteFileCommand,
+    DeleteDirectoryCommand,
+    DownloadFileCommand,
+  ],
   overlayComponents: [
     () => import("$commands/file-system/components/delete-modal"),
     () => import("$commands/file-system/components/create-modal"),

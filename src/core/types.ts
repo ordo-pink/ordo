@@ -1,7 +1,8 @@
-import { EditorPlugin } from "@draft-js-plugins/editor"
+import type { EditorPlugin } from "@draft-js-plugins/editor"
 import type { Slice } from "@reduxjs/toolkit"
 import type { TFunction } from "i18next"
-import type Loadable from "react-loadable"
+import type { ComponentType } from "react"
+import type { LoadableComponent } from "react-loadable"
 
 import type { Language } from "$core/constants/language"
 import type { OrdoExtensionType } from "$core/constants/ordo-extension-type"
@@ -12,6 +13,7 @@ import type { RootState } from "$core/state/types"
 export type Nullable<T> = T | null
 
 export type OrdoExtensionMetadata<T extends Record<string, unknown>> = {
+  init: ThunkFn<Promise<void>>
   get<K extends keyof T>(key: K): Promise<T[K]>
   set<K extends keyof T>(key: K, value: T[K]): Promise<void>
   clear: ThunkFn<Promise<void>>
@@ -29,11 +31,18 @@ export type TernaryFn<Arg1, Arg2, Arg3, Result> = (arg1: Arg1, arg2: Arg2, arg3:
 
 export type Unpack<T> = T extends Array<infer U> ? U : T
 
-export type OrdoLoadableComponent = ReturnType<typeof Loadable>
+export type OrdoLoadableComponent<T = Record<string, unknown>> = ComponentType<T> &
+  LoadableComponent
 
-export type FileExtension = `.${string}`
+export type FileExtension = string
 
 export type FileAssociation = Record<OrdoExtensionName, FileExtension[]>
+
+export type OrdoExtensionProps<
+  TMetadata extends Record<string, unknown> = Record<string, unknown>,
+> = {
+  metadata: OrdoExtensionMetadata<TMetadata>
+}
 
 export type ActionContext<
   T extends OrdoExtension<string, OrdoExtensionType> = OrdoExtension<string, OrdoExtensionType>,
@@ -92,7 +101,7 @@ export interface OrdoExtension<
   description?: string
   storeSlice?: Slice<TState>
   commands?: OrdoCommand<Name>[]
-  metadata?: OrdoExtensionMetadata<TMetadata>
+  metadata?: TMetadata
 }
 
 export interface OrdoCommandExtension<
@@ -125,11 +134,13 @@ export interface OrdoActivityExtension<
   Name extends string,
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   TState extends Record<string, any> = Record<string, any>,
+  TMetadata extends Record<string, unknown> = Record<string, unknown>,
 > extends OrdoExtension<Name, OrdoExtensionType.ACTIVITY, TState> {
   routes: string[]
   accelerator?: string
   Icon: OrdoLoadableComponent
-  Component: OrdoLoadableComponent
+  Component: OrdoLoadableComponent<{ metadata?: OrdoExtensionMetadata<TMetadata> }>
+  metadata?: TMetadata
 }
 
 export type OrdoFile<Metadata extends Record<string, unknown> = Record<string, unknown>> = {

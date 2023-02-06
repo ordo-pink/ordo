@@ -31,6 +31,7 @@ export default function File({ file }: Props) {
   const association = fileAssociations.find((assoc) =>
     assoc.fileExtensions.includes(file.extension),
   )
+
   const Icon = association && association.Icon ? association.Icon : BsFileEarmarkBinary
 
   const handleClick = lazyBox<MouseEvent>((box) =>

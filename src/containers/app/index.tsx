@@ -26,6 +26,7 @@ import { gotDirectory, registerExtensions } from "$containers/app/store"
 
 import { useKeycloak } from "$core/auth/hooks/use-keycloak"
 import { OrdoExtensionType } from "$core/constants/ordo-extension-type"
+import { createExtensionMetadata } from "$core/extensions/create-extension-metadata"
 import { isActivityExtension } from "$core/guards/is-extension"
 import { useActionContext } from "$core/hooks/use-action-context"
 import { useCommandIconButton } from "$core/hooks/use-command-icon-button"
@@ -154,16 +155,34 @@ export default function App() {
         const Element = extension.Component
 
         for (const path of extension.routes) {
-          router.routes[0].children?.unshift({
-            path,
-            element: <Element />,
-            hasErrorBoundary: false,
-            id: extension.name,
-          } as RouteObject)
+          const metadata = createExtensionMetadata(extension.name, extension.metadata)
 
-          if (currentRoute.pathname.startsWith(`/${path}`)) {
-            currentRoute.hash = ""
-            navigate(currentRoute)
+          if (metadata) {
+            metadata.init().then(() => {
+              router.routes[0].children?.unshift({
+                path,
+                element: <Element metadata={metadata} />,
+                hasErrorBoundary: false,
+                id: extension.name,
+              } as RouteObject)
+
+              if (currentRoute.pathname.startsWith(`/${path}`)) {
+                currentRoute.hash = ""
+                navigate(currentRoute)
+              }
+            })
+          } else {
+            router.routes[0].children?.unshift({
+              path,
+              element: <Element />,
+              hasErrorBoundary: false,
+              id: extension.name,
+            } as RouteObject)
+
+            if (currentRoute.pathname.startsWith(`/${path}`)) {
+              currentRoute.hash = ""
+              navigate(currentRoute)
+            }
           }
         }
       }

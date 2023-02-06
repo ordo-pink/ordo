@@ -1,6 +1,7 @@
 import { Helmet } from "react-helmet"
 import { useTranslation } from "react-i18next"
 
+import DeleteAccountField from "$activities/user/components/delete-account-field"
 import EmailField from "$activities/user/components/email-field"
 // import EmailVerifiedField from "$activities/user/components/email-verified-field"
 import LogoutField from "$activities/user/components/logout-field"
@@ -45,6 +46,7 @@ export default function Settings() {
           {/* <EmailVerifiedField /> */}
           <PasswordField />
           <LogoutField />
+          <DeleteAccountField />
         </form>
       </EditorPage>
     </Workspace>

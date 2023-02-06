@@ -65,10 +65,11 @@ window.ordo = {
   api: {
     fs: {
       files: {
-        create: (path) =>
+        create: (path, content = "") =>
           window.ordo.env
             .fetch(`${host}/${FILE_API}${path}`, {
               method: "POST",
+              body: content,
               headers: {
                 [AUTHORIZATION_HEADER_KEY]: `Bearer ${TEST_AUTH_TOKEN ?? Keycloak.token}`,
               },

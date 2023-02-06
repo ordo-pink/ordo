@@ -7,6 +7,6 @@ export const LogoutCommand = createOrdoCommand({
   action: ({ dispatch }) => {
     dispatch(showLogoutModal())
   },
-  showInCommandPalette: ({ env }) => Boolean(env.isAuthenticated),
+  showInCommandPalette: ({ isAuthenticated }) => isAuthenticated,
   Icon: () => import("$commands/auth/components/logout-icon"),
 })

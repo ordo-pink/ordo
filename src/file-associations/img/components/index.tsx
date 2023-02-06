@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react"
 import { useSearchParams } from "react-router-dom"
 
-import EditorPage from "$activities/editor/components/editor-page"
 import { selectFile } from "$activities/editor/store"
 import { EditorActivityState } from "$activities/editor/types"
 
+import EditorPage from "$core/components/editor-page/editor-page"
 import Loading from "$core/components/loading"
 import { useFSAPI } from "$core/hooks/use-fs-api"
 import { useAppDispatch } from "$core/state/hooks/use-app-dispatch"

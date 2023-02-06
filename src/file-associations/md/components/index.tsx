@@ -4,12 +4,12 @@ import { markdownToDraft, draftToMarkdown } from "markdown-draft-js"
 import { useState, useEffect, useRef } from "react"
 import { useSearchParams } from "react-router-dom"
 
-import EditorPage from "$activities/editor/components/editor-page"
 import { selectFile } from "$activities/editor/store"
 import { EditorActivityState } from "$activities/editor/types"
 
 import { updatedFile } from "$containers/app/store"
 
+import EditorPage from "$core/components/editor-page/editor-page"
 import Null from "$core/components/null"
 import { useFSAPI } from "$core/hooks/use-fs-api"
 import { useAppDispatch } from "$core/state/hooks/use-app-dispatch"

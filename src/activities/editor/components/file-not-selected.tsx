@@ -1,5 +1,5 @@
 import { useTranslation } from "react-i18next"
-import EditorPage from "./editor-page"
+import EditorPage from "../../../core/components/editor-page/editor-page"
 import NotSelected from "$assets/img/not-selected-3.png"
 
 export default function FileNotSelected() {

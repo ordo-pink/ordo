@@ -17,7 +17,7 @@ export default function SupportBadge({ children, className = "" }: Props) {
       ) : (
         <div className="flex items-center space-x-1">
           <BsHeadphones className="shrink-0" />
-          <div>{"Via support"}</div>
+          <div>{"support"}</div>
         </div>
       )}
     </Badge>

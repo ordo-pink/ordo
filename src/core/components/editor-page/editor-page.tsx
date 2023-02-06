@@ -1,9 +1,8 @@
 import { MouseEvent, PropsWithChildren } from "react"
 
-import { useCurrentFileAssociation } from "$activities/editor/hooks/use-current-file-association"
-
 import Null from "$core/components/null"
 import PathBreadcrumbs from "$core/components/path-breadcrumbs"
+import { useCurrentFileAssociation } from "$core/hooks/use-current-file-association"
 import { UnaryFn } from "$core/types"
 
 type Props = PropsWithChildren<{

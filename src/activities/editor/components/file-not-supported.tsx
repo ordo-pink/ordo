@@ -1,10 +1,10 @@
 import { useTranslation } from "react-i18next"
 
-import EditorPage from "$activities/editor/components/editor-page"
 import { EditorActivityState } from "$activities/editor/types"
 
 import Unsupported from "$assets/img/not-supported-2.png"
 
+import EditorPage from "$core/components/editor-page/editor-page"
 import Null from "$core/components/null"
 import { useExtensionSelector } from "$core/state/hooks/use-extension-selector"
 import { Either } from "$core/utils/either"

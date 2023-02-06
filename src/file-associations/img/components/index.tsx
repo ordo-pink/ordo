@@ -42,6 +42,9 @@ export default function ImgEditor() {
         const url = URL.createObjectURL(payload)
         setContent(url)
       })
+    return () => {
+      URL.revokeObjectURL(content)
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [path, files])
 

@@ -3,7 +3,7 @@ import { useSearchParams } from "react-router-dom"
 
 import EditorPage from "$activities/editor/components/editor-page"
 import { selectFile } from "$activities/editor/store"
-import { EditorExtensionStore } from "$activities/editor/types"
+import { EditorActivityState } from "$activities/editor/types"
 
 import Loading from "$core/components/loading"
 import { useFSAPI } from "$core/hooks/use-fs-api"
@@ -15,7 +15,7 @@ import { findOrdoFile, getParentPath } from "$core/utils/fs-helpers"
 
 export default function ImgEditor() {
   const dispatch = useAppDispatch()
-  const editorSelector = useExtensionSelector<EditorExtensionStore>()
+  const editorSelector = useExtensionSelector<EditorActivityState>()
 
   const tree = useAppSelector((state) => state.app.personalProject)
   const currentFile = editorSelector((state) => state["ordo-activity-editor"].currentFile)

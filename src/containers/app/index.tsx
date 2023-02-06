@@ -8,7 +8,7 @@ import { Outlet, RouteObject, useLocation, useNavigate } from "react-router-dom"
 import EditorExtension from "$activities/editor"
 // import ExtensionStoreExtension from "$activities/extension-store"
 // import SettingsExtension from "$activities/settings"
-import { EditorExtensionStore } from "$activities/editor/types"
+import { EditorActivityState } from "$activities/editor/types"
 import Features from "$activities/features"
 import Home from "$activities/home"
 import Pricing from "$activities/pricing"
@@ -71,7 +71,7 @@ export default function App() {
   const dispatch = useAppDispatch()
   const i18n = useI18nInit()
 
-  const editorSelector = useExtensionSelector<EditorExtensionStore>()
+  const editorSelector = useExtensionSelector<EditorActivityState>()
 
   const [accelerators, setAccelerators] = useState<Record<string, UnaryFn<ActionContext, void>>>({})
   const [extensions, setExtensions] = useState<OrdoExtension<string, OrdoExtensionType>[]>([])

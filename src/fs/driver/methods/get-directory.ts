@@ -1,4 +1,5 @@
 import { promises } from "fs"
+import { Readable } from "stream"
 
 import { Either } from "$core/either"
 import { FSDriver, OrdoDirectory } from "$core/types"
@@ -6,6 +7,7 @@ import { OrdoDirectoryPath } from "$core/types"
 
 import { Exception } from "$fs/constants"
 import { createDirectory } from "$fs/driver/methods/create-directory"
+import { createFile } from "$fs/driver/methods/create-file"
 import { getNormalizedAbsolutePath } from "$fs/driver/utils/get-normalized-absolute-path"
 import { listDirectory } from "$fs/driver/utils/list-directory"
 
@@ -17,7 +19,14 @@ export const getDirectory =
       const stat = await promises.stat(absolutePath).catch(() => null)
 
       if (!stat || !stat.isDirectory()) {
-        await createDirectory(directory)("" as OrdoDirectoryPath)
+        await createDirectory(absolutePath)("" as OrdoDirectoryPath)
+
+        const readStream = new Readable()
+
+        readStream.push("Type Something...")
+        readStream.push(null)
+
+        await createFile(absolutePath)("/Welcome.md", readStream)
       }
     }
 

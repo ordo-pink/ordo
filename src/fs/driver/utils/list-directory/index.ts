@@ -20,6 +20,10 @@ export const listDirectory = async (
     return null
   }
 
+  if (path.endsWith("/.extensions/")) {
+    return null
+  }
+
   const directory = await promises.readdir(path, {
     withFileTypes: true,
     encoding: "utf-8",

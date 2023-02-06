@@ -17,7 +17,7 @@ import { promiseWriteStream } from "$fs/driver/utils/promise-write-stream"
 
 export const createFile =
   (directory: string): FSDriver["createFile"] =>
-  async (path, contentStream) => {
+  async (path, contentStream?) => {
     const absolutePath = join(directory, path)
 
     const stat = await promises.stat(absolutePath).catch(() => null)

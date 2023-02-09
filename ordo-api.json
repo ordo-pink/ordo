@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "af21c032-a4bb-4afe-b321-6403d65110b0",
+		"_postman_id": "807b4149-ba43-41b3-be9d-4f203bb9a193",
 		"name": "Ordo API",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -23,7 +23,7 @@
 							}
 						},
 						"url": {
-							"raw": "http://localhost:{{PORT}}/fs/files/test.md",
+							"raw": "http://localhost:{{PORT}}/fs/files/{{USER_ID}}/test.md",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -32,6 +32,7 @@
 							"path": [
 								"fs",
 								"files",
+								"{{USER_ID}}",
 								"test.md"
 							]
 						}
@@ -44,7 +45,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:{{PORT}}/fs/files/test.md",
+							"raw": "http://localhost:{{PORT}}/fs/files/{{USER_ID}}/test.md",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -53,6 +54,7 @@
 							"path": [
 								"fs",
 								"files",
+								"{{USER_ID}}",
 								"test.md"
 							]
 						}
@@ -65,7 +67,7 @@
 						"method": "PUT",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:{{PORT}}/fs/files/test.md",
+							"raw": "http://localhost:{{PORT}}/fs/files/{{USER_ID}}/test.md",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -74,6 +76,7 @@
 							"path": [
 								"fs",
 								"files",
+								"{{USER_ID}}",
 								"test.md"
 							]
 						}
@@ -86,7 +89,7 @@
 						"method": "PATCH",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:{{PORT}}/fs/files/test->/5245/2134523/412/341231/231/2312/3123/test.md",
+							"raw": "http://localhost:{{PORT}}/fs/files/{{USER_ID}}/test.md->/5245/2134523/412/341231/231/2312/3123/test.md",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -95,7 +98,8 @@
 							"path": [
 								"fs",
 								"files",
-								"test->",
+								"{{USER_ID}}",
+								"test.md->",
 								"5245",
 								"2134523",
 								"412",
@@ -115,7 +119,7 @@
 						"method": "DELETE",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:{{PORT}}/fs/files/1/2/3/->/1/2/5/",
+							"raw": "http://localhost:{{PORT}}/fs/files/{{USER_ID}}/test.md",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -124,14 +128,8 @@
 							"path": [
 								"fs",
 								"files",
-								"1",
-								"2",
-								"3",
-								"->",
-								"1",
-								"2",
-								"5",
-								""
+								"{{USER_ID}}",
+								"test.md"
 							]
 						}
 					},
@@ -171,7 +169,7 @@
 						"method": "POST",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:{{PORT}}/fs/directories/test1/",
+							"raw": "http://localhost:{{PORT}}/fs/directories/{{USER_ID}}/1/2/3/4/5/6/7",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -180,8 +178,14 @@
 							"path": [
 								"fs",
 								"directories",
-								"test1",
-								""
+								"{{USER_ID}}",
+								"1",
+								"2",
+								"3",
+								"4",
+								"5",
+								"6",
+								"7"
 							]
 						}
 					},
@@ -193,7 +197,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:{{PORT}}/fs/directories/test1/",
+							"raw": "http://localhost:{{PORT}}/fs/directories/{{USER_ID}}/test1/",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -202,6 +206,7 @@
 							"path": [
 								"fs",
 								"directories",
+								"{{USER_ID}}",
 								"test1",
 								""
 							]
@@ -215,7 +220,7 @@
 						"method": "PATCH",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:{{PORT}}/fs/directories/1/2/3/->/1/2/5/",
+							"raw": "http://localhost:{{PORT}}/fs/directories/{{USER_ID}}/1/2/5/->/1/2/3/",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -224,13 +229,14 @@
 							"path": [
 								"fs",
 								"directories",
-								"1",
-								"2",
-								"3",
-								"->",
+								"{{USER_ID}}",
 								"1",
 								"2",
 								"5",
+								"->",
+								"1",
+								"2",
+								"3",
 								""
 							]
 						}
@@ -243,7 +249,7 @@
 						"method": "DELETE",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:{{PORT}}/fs/directories/1/2/3/",
+							"raw": "http://localhost:{{PORT}}/fs/directories/{{USER_ID}}/5245",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -252,10 +258,8 @@
 							"path": [
 								"fs",
 								"directories",
-								"1",
-								"2",
-								"3",
-								""
+								"{{USER_ID}}",
+								"5245"
 							]
 						}
 					},
@@ -325,6 +329,11 @@
 		{
 			"key": "AUTH_TOKEN",
 			"value": "WHOA_SO_SAFE!",
+			"type": "default"
+		},
+		{
+			"key": "USER_ID",
+			"value": "123123",
 			"type": "default"
 		}
 	]

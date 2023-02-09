@@ -1,11 +1,9 @@
 export enum Exception {
-  NOT_FOUND = "not-found",
   CONFLICT = "conflict",
-  UNAUTHORIZED = "unauthorized",
-  FORBIDDEN = "forbidden",
-  BAD_REQUEST = "bad-request",
+  NOT_FOUND = "not-found",
 }
 
+export const USER_ID_PARAM = "userId"
 export const DIRECTORIES_PARAM = "directories"
 export const FILES_PARAM = "files"
 export const PATH_PARAM = "path"

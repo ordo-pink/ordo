@@ -1,5 +1,5 @@
 import { Request, Response } from "express"
-import { extractDynamicParam } from "./index"
+import { extractDynamicParam } from "."
 
 describe("extract-dynamic-param", () => {
   it("should properly provide the dynamic param in the params object", () => {
@@ -31,5 +31,22 @@ describe("extract-dynamic-param", () => {
 
     expect(req.params.oldPath).toEqual("/1/2/test")
     expect(req.params.newPath).toEqual("/4/test")
+  })
+
+  it("should not break other params", () => {
+    const keys = ["oldPath", "newPath"]
+
+    const req = {
+      params: { oldPath: "1", 0: "/2/test", userId: "123" },
+    } as unknown as Request
+
+    const extractPath = extractDynamicParam(keys)
+
+    const res = {} as Response
+    const next = () => void 0
+    extractPath(req, res, next)
+
+    expect(req.params.oldPath).toEqual("/1/2/test")
+    expect(req.params.userId).toEqual("123")
   })
 })

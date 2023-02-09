@@ -1,6 +1,6 @@
 import { RequestHandler } from "express"
 
-export const appendTrailingDirectoryPath: RequestHandler = (req, _, next) => {
+export const appendTrailingDirectoryPathSlash: RequestHandler = (req, _, next) => {
   if (req.params.path && !req.params.path.endsWith("/")) {
     req.params.path = `${req.params.path}/`
   }

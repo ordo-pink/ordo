@@ -1,153 +1,170 @@
-import type { Drivers } from "$core/types"
-
+import { Router } from "express"
 import {
-  OLD_PATH_PARAM,
-  NEW_PATH_PARAM,
   PATH_PARAM,
+  OLD_PATH_PARAM,
+  PATH_SEPARATOR,
+  NEW_PATH_PARAM,
   FILES_PARAM,
   DIRECTORIES_PARAM,
-  PATH_SEPARATOR,
-} from "$fs/constants"
+} from "./constants"
+import { OrdoDirectoryModel } from "./entities/directory/ordo-directory-model"
+import { OrdoFileModel } from "./entities/file/ordo-file-model"
+import { createDirectoryHandler } from "./handlers/directories/create"
+import { getDirectoryHandler } from "./handlers/directories/get"
+import { moveDirectoryHandler } from "./handlers/directories/move"
+import { removeDirectoryHandler } from "./handlers/directories/remove"
+import { createFileHandler } from "./handlers/files/create"
+import { getFileHandler } from "./handlers/files/get"
+import { moveFileHandler } from "./handlers/files/move"
+import { removeFileHandler } from "./handlers/files/remove"
+import { updateFileHandler } from "./handlers/files/update"
+import { addUserIdToPath } from "./middleware/add-user-id-to-path"
+import { appendTrailingDirectoryPathSlash } from "./middleware/append-trailing-directory-slash"
+import { extractDynamicParam } from "./middleware/extract-dynamic-param"
+import { prependSlash } from "./middleware/prepend-slash"
+import { setContentTypeHeader } from "./middleware/set-content-type-header"
+import { setRootPathParam } from "./middleware/set-root-path-param"
+import { validateFilePath, validateDirectoryPath } from "./middleware/validate-path"
+import { AppContext } from "../types"
+import { logRequest } from "./middleware/log-request"
 
-import { createDirectoryHandler } from "$fs/handlers/directories/create"
-import { getDirectoryHandler } from "$fs/handlers/directories/get"
-import { moveDirectoryHandler } from "$fs/handlers/directories/move"
-import { removeDirectoryHandler } from "$fs/handlers/directories/remove"
-import { createFileHandler } from "$fs/handlers/files/create"
-import { Router } from "express"
-import { getFileHandler } from "$fs/handlers/files/get"
-import { moveFileHandler } from "$fs/handlers/files/move"
-import { removeFileHandler } from "$fs/handlers/files/remove"
-import { updateFileHandler } from "$fs/handlers/files/update"
+const filesRouter = ({ fsDriver, authorize, logger }: AppContext) => {
+  const file = OrdoFileModel(fsDriver)
+  const directory = OrdoDirectoryModel(fsDriver)
 
-import { appendTrailingDirectoryPath } from "$fs/middleware/append-trailing-directory-slash"
-import { extractDynamicParam } from "$fs/middleware/extract-dynamic-param"
-import { prependSlash } from "$fs/middleware/prepend-slash"
-import { setContentTypeHeader } from "$fs/middleware/set-content-type-header"
-import { setRootPathParam } from "$fs/middleware/set-root-path-param"
-import { validateDirectoryPath, validateFilePath } from "$fs/middleware/validate-path"
+  const env = { file, directory, logger }
 
-const filesRouter = ({ fsDriver, userDriver: { protect, authorize } }: Drivers) =>
-  Router()
+  const log = logRequest(logger)
+
+  return Router()
     .post(
-      `/:${PATH_PARAM}*`,
+      `/:userId/:${PATH_PARAM}*`,
 
-      protect(["owner", "admin", "write"]),
       authorize,
-
       extractDynamicParam([PATH_PARAM]),
       prependSlash,
       validateFilePath,
-      createFileHandler(fsDriver),
+      addUserIdToPath,
+      log,
+      createFileHandler(env),
     )
     .get(
-      `/:${PATH_PARAM}*`,
+      `/:userId/:${PATH_PARAM}*`,
 
-      protect(["owner", "admin", "write", "read"]),
       authorize,
-
       extractDynamicParam([PATH_PARAM]),
       prependSlash,
       validateFilePath,
+      addUserIdToPath,
       setContentTypeHeader,
-      getFileHandler(fsDriver),
+      log,
+      getFileHandler(env),
     )
     .put(
-      `/:${PATH_PARAM}*`,
+      `/:userId/:${PATH_PARAM}*`,
 
-      protect(["owner", "admin", "write"]),
       authorize,
-
       extractDynamicParam([PATH_PARAM]),
       prependSlash,
       validateFilePath,
-      updateFileHandler(fsDriver),
+      addUserIdToPath,
+      log,
+      updateFileHandler(env),
     )
     .patch(
-      `/:${OLD_PATH_PARAM}*${PATH_SEPARATOR}/:${NEW_PATH_PARAM}*`,
+      `/:userId/:${OLD_PATH_PARAM}*${PATH_SEPARATOR}/:${NEW_PATH_PARAM}*`,
 
-      protect(["owner", "admin", "write"]),
       authorize,
-
       extractDynamicParam([OLD_PATH_PARAM, NEW_PATH_PARAM]),
       prependSlash,
       validateFilePath,
-      moveFileHandler(fsDriver),
+      addUserIdToPath,
+      log,
+      moveFileHandler(env),
     )
     .delete(
-      `/:${PATH_PARAM}*`,
+      `/:userId/:${PATH_PARAM}*`,
 
-      protect(["owner", "admin", "write"]),
       authorize,
-
       extractDynamicParam([PATH_PARAM]),
       prependSlash,
       validateFilePath,
-      removeFileHandler(fsDriver),
+      addUserIdToPath,
+      log,
+      removeFileHandler(env),
     )
+}
 
-const directoriesRouter = ({ fsDriver, userDriver: { protect, authorize } }: Drivers) =>
-  Router()
+const directoriesRouter = ({ fsDriver, authorize, logger }: AppContext) => {
+  const file = OrdoFileModel(fsDriver)
+  const directory = OrdoDirectoryModel(fsDriver)
+
+  const env = { file, directory, logger }
+
+  const log = logRequest(logger)
+
+  return Router()
     .post(
-      `/:${PATH_PARAM}*`,
+      `/:userId/:${PATH_PARAM}*`,
 
-      protect(["owner", "admin", "write"]),
       authorize,
-
       extractDynamicParam([PATH_PARAM]),
       prependSlash,
-      appendTrailingDirectoryPath,
+      appendTrailingDirectoryPathSlash,
       validateDirectoryPath,
-      createDirectoryHandler(fsDriver),
+      addUserIdToPath,
+      log,
+      createDirectoryHandler(env),
     )
     .get(
       `/`,
 
-      protect(["owner", "admin", "write", "read"]),
       authorize,
-
       setRootPathParam,
       prependSlash,
-      getDirectoryHandler(fsDriver),
+      addUserIdToPath,
+      log,
+      getDirectoryHandler(env),
     )
     .get(
-      `/:${PATH_PARAM}*`,
+      `/:userId/:${PATH_PARAM}*`,
 
-      protect(["owner", "admin", "write", "read"]),
       authorize,
-
       extractDynamicParam([PATH_PARAM]),
       prependSlash,
-      appendTrailingDirectoryPath,
+      appendTrailingDirectoryPathSlash,
       validateDirectoryPath,
-      getDirectoryHandler(fsDriver),
+      addUserIdToPath,
+      log,
+      getDirectoryHandler(env),
     )
     .patch(
-      `/:${OLD_PATH_PARAM}*${PATH_SEPARATOR}/:${NEW_PATH_PARAM}*`,
+      `/:userId/:${OLD_PATH_PARAM}*${PATH_SEPARATOR}/:${NEW_PATH_PARAM}*`,
 
-      protect(["owner", "admin", "write"]),
       authorize,
-
       extractDynamicParam([OLD_PATH_PARAM, NEW_PATH_PARAM]),
       prependSlash,
-      appendTrailingDirectoryPath,
+      appendTrailingDirectoryPathSlash,
       validateDirectoryPath,
-      moveDirectoryHandler(fsDriver),
+      addUserIdToPath,
+      log,
+      moveDirectoryHandler(env),
     )
     .delete(
-      `/:${PATH_PARAM}*`,
+      `/:userId/:${PATH_PARAM}*`,
 
-      protect(["owner", "admin", "write"]),
       authorize,
-
       extractDynamicParam([PATH_PARAM]),
       prependSlash,
-      appendTrailingDirectoryPath,
+      appendTrailingDirectoryPathSlash,
       validateDirectoryPath,
-      removeDirectoryHandler(fsDriver),
+      addUserIdToPath,
+      log,
+      removeDirectoryHandler(env),
     )
+}
 
-export default (drivers: Drivers) =>
+export const FSRouter = (drivers: AppContext) =>
   Router()
     .use(`/${FILES_PARAM}`, filesRouter(drivers))
     .use(`/${DIRECTORIES_PARAM}`, directoriesRouter(drivers))

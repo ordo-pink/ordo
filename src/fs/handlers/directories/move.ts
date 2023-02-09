@@ -1,8 +1,6 @@
-import { lazySwitch } from "@ordo-pink/switch"
-
-import { OrdoDirectoryPath, FsRequestHandler } from "$core/types"
-
-import { Exception, NEW_PATH_PARAM, OLD_PATH_PARAM } from "$fs/constants"
+import { Switch } from "@ordo-pink/switch"
+import { OLD_PATH_PARAM, NEW_PATH_PARAM, Exception } from "../../constants"
+import { FsRequestHandler, OrdoDirectoryPath } from "../../types"
 
 type Params = {
   [OLD_PATH_PARAM]: OrdoDirectoryPath
@@ -10,19 +8,20 @@ type Params = {
 }
 
 export const moveDirectoryHandler: FsRequestHandler<Params> =
-  ({ moveDirectory }) =>
-  async (req, res) => {
+  ({ directory: { moveDirectory }, logger }) =>
+  (req, res) => {
     const oldPath = req.params[OLD_PATH_PARAM]
     const newPath = req.params[NEW_PATH_PARAM]
 
-    const eitherDirectory = await moveDirectory(oldPath, newPath)
-
-    eitherDirectory.fold(
-      lazySwitch((s) =>
-        s
+    moveDirectory({ oldPath, newPath })
+      .then((directory) => res.status(201).json(directory))
+      .catch((error: Exception.NOT_FOUND | Exception.CONFLICT | Error) =>
+        Switch.of(error)
           .case(Exception.NOT_FOUND, () => res.status(404).send())
-          .default(() => res.status(409).send()),
-      ),
-      (directory) => res.status(201).json(directory),
-    )
+          .case(Exception.CONFLICT, () => res.status(409).send())
+          .default(() => {
+            logger.error(error)
+            res.status(500).send()
+          }),
+      )
   }

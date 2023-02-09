@@ -1,10 +1,8 @@
 import type { RequestHandler } from "express"
 import { contentType } from "mime-types"
-
-import { OrdoFilePath } from "$core/types"
-
-import { PATH_PARAM } from "$fs/constants"
-import { getFileExtension } from "$fs/driver/utils/get-file-extension"
+import { PATH_PARAM } from "../../constants"
+import { OrdoFile } from "../../entities/file"
+import { OrdoFilePath } from "../../types"
 
 type Params = {
   [PATH_PARAM]: OrdoFilePath
@@ -13,7 +11,7 @@ type Params = {
 export const setContentTypeHeader: RequestHandler<Params> = (req, res, next) => {
   const path = req.params[PATH_PARAM]
 
-  const extension = getFileExtension(path)
+  const extension = OrdoFile.getFileExtension(path)
 
   const type = contentType(extension) || "application/octet-stream"
 

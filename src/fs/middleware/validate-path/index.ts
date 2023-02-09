@@ -1,28 +1,19 @@
 import type { RequestHandler } from "express"
-
-const disallowedCharacters = ["<", ">", ":", '"', "\\", "|", "?", "*", "..", "./"]
-
-const hasForbiddenChars = (path: string) =>
-  path.split("").some((char) => disallowedCharacters.includes(char))
-const startsWithSlash = (path: string) => path.startsWith("/")
-const endsWithSlash = (path: string) => path.endsWith("/")
-
-const isValidPath = (path: string) => !hasForbiddenChars(path) && startsWithSlash(path)
-const isValidFilePath = (path: string) => isValidPath(path) && !endsWithSlash(path)
-const isValidDirectoryPath = (path: string) => isValidPath(path) && endsWithSlash(path)
+import { OrdoDirectory } from "../../entities/directory/ordo-directory"
+import { OrdoFile } from "../../entities/file/ordo-file"
 
 export const validateFilePath: RequestHandler = (req, res, next) => {
-  if (req.params.path && !isValidFilePath(req.params.path)) {
+  if (req.params.path && !OrdoFile.isValidPath(req.params.path)) {
     res.status(400).send("Invalid path")
     return
   }
 
-  if (req.params.oldPath && !isValidFilePath(req.params.oldPath)) {
+  if (req.params.oldPath && !OrdoFile.isValidPath(req.params.oldPath)) {
     res.status(400).send("Invalid oldPath")
     return
   }
 
-  if (req.params.newPath && !isValidFilePath(req.params.newPath)) {
+  if (req.params.newPath && !OrdoFile.isValidPath(req.params.newPath)) {
     res.status(400).send("Invalid newPath")
     return
   }
@@ -31,17 +22,17 @@ export const validateFilePath: RequestHandler = (req, res, next) => {
 }
 
 export const validateDirectoryPath: RequestHandler = (req, res, next) => {
-  if (req.params.path && !isValidDirectoryPath(req.params.path)) {
+  if (req.params.path && !OrdoDirectory.isValidPath(req.params.path)) {
     res.status(400).send("Invalid path")
     return
   }
 
-  if (req.params.oldPath && !isValidDirectoryPath(req.params.oldPath)) {
+  if (req.params.oldPath && !OrdoDirectory.isValidPath(req.params.oldPath)) {
     res.status(400).send("Invalid oldPath")
     return
   }
 
-  if (req.params.newPath && !isValidDirectoryPath(req.params.newPath)) {
+  if (req.params.newPath && !OrdoDirectory.isValidPath(req.params.newPath)) {
     res.status(400).send("Invalid newPath")
     return
   }

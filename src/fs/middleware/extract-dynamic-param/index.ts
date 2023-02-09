@@ -4,9 +4,7 @@ export const extractDynamicParam =
   (keys: string[]): RequestHandler =>
   (req, _, next) => {
     for (let i = 0; i < keys.length; i++) {
-      const key = keys[i]
-
-      if (!key) continue
+      const key = keys[i] as string
 
       if (req.params[key] && req.params[i]) {
         req.params[key] = `/${req.params[key]}${req.params[i]}`

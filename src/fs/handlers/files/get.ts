@@ -1,20 +1,24 @@
-import { OrdoFilePath, FsRequestHandler } from "$core/types"
-
-import { PATH_PARAM } from "$fs/constants"
+import { Switch } from "@ordo-pink/switch"
+import { Exception, PATH_PARAM } from "../../constants"
+import { FsRequestHandler, OrdoFilePath } from "../../types"
 
 type Params = {
   [PATH_PARAM]: OrdoFilePath
 }
 
 export const getFileHandler: FsRequestHandler<Params> =
-  ({ getFile }) =>
-  async (req, res) => {
+  ({ file: { getFileContent }, logger }) =>
+  (req, res) => {
     const path = req.params[PATH_PARAM]
 
-    const eitherFile = await getFile(path)
-
-    eitherFile.fold(
-      () => res.status(404).send(),
-      (fileStream) => fileStream.pipe(res),
-    )
+    getFileContent(path)
+      .then((content) => content.pipe(res))
+      .catch((error: Exception.NOT_FOUND | Error) =>
+        Switch.of(error)
+          .case(Exception.NOT_FOUND, () => res.status(404).send())
+          .default(() => {
+            logger.error(error)
+            res.status(500).send()
+          }),
+      )
   }

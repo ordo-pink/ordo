@@ -1,4 +1,5 @@
 const { resolve } = require("path")
+
 const CopyWebpackPlugin = require("copy-webpack-plugin")
 const TypeScriptDeclarationPlugin = require("typescript-declaration-webpack-plugin")
 const nodeExternals = require("webpack-node-externals")
@@ -8,7 +9,6 @@ module.exports = {
   target: "node",
   entry: "./src/index.ts",
   mode: process.env.NODE_ENV ?? "development",
-  devtool: process.env.NODE_ENV !== "production" && "inline-source-map",
   externals: [nodeExternals()],
   module: {
     rules: [
@@ -17,20 +17,10 @@ module.exports = {
         use: "ts-loader",
         exclude: /node_modules/,
       },
-      {
-        test: /\.json$/,
-        use: "json-loader",
-        exclude: /node_modules/,
-      },
     ],
   },
   resolve: {
-    extensions: [".ts", ".js"],
-    alias: {
-      $fs: resolve("./src/fs"),
-      $user: resolve("./src/user"),
-      $core: resolve("./src/core"),
-    },
+    extensions: [".ts"],
   },
   output: {
     path: resolve(__dirname, "dist"),
@@ -43,7 +33,11 @@ module.exports = {
       removeComments: false,
     }),
     new CopyWebpackPlugin({
-      patterns: [{ from: "./package.json", to: "./package.json" }],
+      patterns: [
+        { from: "./package.json", to: "./package.json" },
+        { from: "./readme.md", to: "./readme.md" },
+        { from: "./license.md", to: "./license.md" },
+      ],
     }),
   ],
 }

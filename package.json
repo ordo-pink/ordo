@@ -4,7 +4,7 @@
     "access": "public"
   },
   "version": "0.1.0",
-  "description": "Ordo.pink backend server for personal use.",
+  "description": "Customisable Ordo.pink backend server.",
   "main": "index.js",
   "scripts": {
     "build": "webpack",

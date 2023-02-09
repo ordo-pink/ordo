@@ -21,12 +21,12 @@ import { updateFileHandler } from "./handlers/files/update"
 import { addUserIdToPath } from "./middleware/add-user-id-to-path"
 import { appendTrailingDirectoryPathSlash } from "./middleware/append-trailing-directory-slash"
 import { extractDynamicParam } from "./middleware/extract-dynamic-param"
+import { logRequest } from "./middleware/log-request"
 import { prependSlash } from "./middleware/prepend-slash"
 import { setContentTypeHeader } from "./middleware/set-content-type-header"
 import { setRootPathParam } from "./middleware/set-root-path-param"
 import { validateFilePath, validateDirectoryPath } from "./middleware/validate-path"
 import { AppContext } from "../types"
-import { logRequest } from "./middleware/log-request"
 
 const filesRouter = ({ fsDriver, authorize, logger }: AppContext) => {
   const file = OrdoFileModel(fsDriver)

@@ -1,3 +1,11 @@
 {
-  "@ordo-activity-settings/title": "Settings"
+  "@ordo-activity-settings/title": "Settings",
+  "@ordo-activity-settings/change-theme": "Change theme",
+  "@ordo-activity-settings/theme": "Theme",
+  "@ordo-activity-settings/dark-theme": "Dark theme",
+  "@ordo-activity-settings/light-theme": "Light theme",
+  "@ordo-activity-settings/change-language": "Change language",
+  "@ordo-activity-settings/rus-language": "Русский",
+  "@ordo-activity-settings/eng-language": "English",
+  "@ordo-activity-settings/language": "Language"
 }

@@ -1,10 +1,10 @@
 {
-  "name": "@ordo-pink/types",
+  "name": "@ordo-pink/core",
   "version": "1.0.0",
   "publishConfig": {
     "access": "public"
   },
-  "description": "Ordo.pink types and type-related utils.",
+  "description": "Ordo.pink core stuff.",
   "main": "index.js",
   "scripts": {
     "build": "webpack",
@@ -20,7 +20,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/ordo-pink/types.git"
+    "url": "git+https://github.com/ordo-pink/core.git"
   },
   "keywords": [],
   "author": {
@@ -30,9 +30,9 @@
   },
   "license": "Unlicense",
   "bugs": {
-    "url": "https://github.com/ordo-pink/types/issues"
+    "url": "https://github.com/ordo-pink/core/issues"
   },
-  "homepage": "https://github.com/ordo-pink/types#readme",
+  "homepage": "https://github.com/ordo-pink/core#readme",
   "devDependencies": {
     "@types/jest": "^29.2.5",
     "@types/webpack": "^5.28.0",

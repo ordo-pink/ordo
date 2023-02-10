@@ -1,5 +1,5 @@
-import { AiOutlineFileImage } from "react-icons/ai"
+import { BsFileEarmarkImage } from "react-icons/bs"
 
 export default function Icon() {
-  return <AiOutlineFileImage />
+  return <BsFileEarmarkImage />
 }

@@ -7,11 +7,11 @@ import { Outlet, RouteObject, useLocation, useNavigate } from "react-router-dom"
 // import AllActivitiesExtension from "$activities/all-activities"
 import EditorExtension from "$activities/editor"
 // import ExtensionStoreExtension from "$activities/extension-store"
-// import SettingsExtension from "$activities/settings"
 import { EditorActivityState } from "$activities/editor/types"
 import Features from "$activities/features"
 import Home from "$activities/home"
 import Pricing from "$activities/pricing"
+import SettingsExtension from "$activities/settings"
 import UserExtension from "$activities/user"
 
 import AuthCommands from "$commands/auth"
@@ -50,7 +50,7 @@ const loggedInExtensions = [
   EditorExtension,
   // ExtensionStoreExtension,
   UserExtension,
-  // SettingsExtension,
+  SettingsExtension,
   MdFileExtension,
   FileSystemCommands,
   CommandPalette,

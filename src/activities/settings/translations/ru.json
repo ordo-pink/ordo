@@ -1,9 +1,9 @@
 {
   "@ordo-activity-settings/title": "Настройки",
-  "@ordo-activity-settings/change-theme": "Сменить тему",
+  "@ordo-activity-settings/system-theme": "Системная",
   "@ordo-activity-settings/theme": "Тема",
-  "@ordo-activity-settings/dark-theme": "Темная тема",
-  "@ordo-activity-settings/light-theme": "Светлая тема",
+  "@ordo-activity-settings/dark-theme": "Темная",
+  "@ordo-activity-settings/light-theme": "Светлая",
   "@ordo-activity-settings/change-language": "Сменить язык",
   "@ordo-activity-settings/rus-language": "Русский",
   "@ordo-activity-settings/eng-language": "English",

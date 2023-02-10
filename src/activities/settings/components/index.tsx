@@ -1,7 +1,6 @@
 import { Helmet } from "react-helmet"
 import { useTranslation } from "react-i18next"
 
-import "$activities/settings/index.css"
 import LanguageField from "$activities/settings/components/language-field"
 import ThemeField from "$activities/settings/components/theme-field"
 

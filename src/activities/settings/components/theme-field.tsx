@@ -1,53 +1,45 @@
-import { MouseEvent } from "react"
+import { ChangeEvent } from "react"
 import { useTranslation } from "react-i18next"
 
-import { OrdoButtonSecondary } from "$core/components/buttons"
 import Fieldset from "$core/components/fieldset"
-import { useActionContext } from "$core/hooks/use-action-context"
-import { useAppSelector } from "$core/state/hooks/use-app-selector"
-import { preventDefault, stopPropagation } from "$core/utils/event"
-import { lazyBox } from "$core/utils/lazy-box"
+import { Theme } from "$core/constants/theme"
 
 export default function ThemeField() {
-  const actionContext = useActionContext()
-
-  const commands = useAppSelector((state) => state.app.commands)
-  const changeTheme = commands.find(
-    (command) => command.title === "@ordo-activity-settings/change-theme",
-  )
-
   const { t } = useTranslation()
 
   const translatedTheme = t("@ordo-activity-settings/theme")
-  const translatedChangeTheme = t("@ordo-activity-settings/change-theme")
+  const translatedSystemTheme = t("@ordo-activity-settings/system-theme")
   const translatedDarkTheme = t("@ordo-activity-settings/dark-theme")
   const translatedLightTheme = t("@ordo-activity-settings/light-theme")
 
-  const handleButtonClick = lazyBox<MouseEvent>((box) =>
-    box
-      .tap(preventDefault)
-      .tap(stopPropagation)
-      .fold(() => changeTheme?.action(actionContext)),
-  )
+  const handleChange = (event: ChangeEvent<HTMLSelectElement>) => {
+    const body = document.getElementsByTagName("body")[0]
+
+    if (event.target.value === Theme.DARK) {
+      body.classList.add("dark")
+    } else {
+      body.classList.remove("dark")
+    }
+  }
 
   return (
-    <Fieldset className="relative">
+    <Fieldset>
       <div className="text-lg">{translatedTheme}</div>
-      <OrdoButtonSecondary
-        onClick={handleButtonClick}
-        center
+
+      <select
+        className="px-4 py-1 rounded-lg border-0 bg-neutral-200 dark:bg-neutral-500"
+        name="select"
+        onChange={handleChange}
       >
-        <select name="select">
-          <option
-            value="value1"
-            selected
-          >
-            {translatedChangeTheme}
-          </option>
-          <option value="value2">{translatedDarkTheme}</option>
-          <option value="value3">{translatedLightTheme}</option>
-        </select>
-      </OrdoButtonSecondary>
+        <option
+          value="system"
+          selected
+        >
+          {translatedSystemTheme}
+        </option>
+        <option value="dark">{translatedDarkTheme}</option>
+        <option value="light">{translatedLightTheme}</option>
+      </select>
     </Fieldset>
   )
 }

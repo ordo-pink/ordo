@@ -42,6 +42,7 @@ import MarkdownShortcuts from "$editor-plugins/markdown-shortcuts"
 
 import ImgFileExtension from "$file-associations/img"
 import MdFileExtension from "$file-associations/md"
+import PDFFileExtension from "$file-associations/pdf"
 import MediaEditor from "$file-associations/media"
 
 import "$containers/app/index.css"
@@ -60,6 +61,7 @@ const loggedInExtensions = [
   AuthCommands,
   MarkdownShortcuts,
   ImgFileExtension,
+  PDFFileExtension,
   MediaEditor,
 ]
 

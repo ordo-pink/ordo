@@ -10,10 +10,11 @@ import { useFSAPI } from "$core/hooks/use-fs-api"
 import { useAppDispatch } from "$core/state/hooks/use-app-dispatch"
 import { useAppSelector } from "$core/state/hooks/use-app-selector"
 import { useExtensionSelector } from "$core/state/hooks/use-extension-selector"
+import { Nullable } from "$core/types"
 import { Either } from "$core/utils/either"
 import { findOrdoFile, getParentPath } from "$core/utils/fs-helpers"
 
-export default function ImgViewer() {
+export default function MediaViewer() {
   const dispatch = useAppDispatch()
   const editorSelector = useExtensionSelector<EditorActivityState>()
 
@@ -21,6 +22,7 @@ export default function ImgViewer() {
   const currentFile = editorSelector((state) => state["ordo-activity-editor"].currentFile)
 
   const [content, setContent] = useState("")
+  const [isVideo, setIsVideo] = useState(false)
 
   const { files } = useFSAPI()
 
@@ -50,6 +52,22 @@ export default function ImgViewer() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [path, files])
 
+  useEffect(() => {
+    let video: Nullable<HTMLVideoElement> = document.createElement("video")
+    video.preload = "metadata"
+
+    video.onloadedmetadata = () => {
+      setIsVideo(Boolean(video && video.videoHeight && video.videoWidth))
+
+      if (video) {
+        video.src = null as unknown as string
+        video = null
+      }
+    }
+
+    video.src = content
+  }, [content])
+
   return Either.fromNullable(content)
     .chain(() => Either.fromNullable(currentFile))
     .fold(Loading, (file) => (
@@ -57,12 +75,29 @@ export default function ImgViewer() {
         title={file.readableName}
         breadcrumbsPath={breadcrumbsPath}
       >
-        <img
-          className="shadow-lg"
-          title={file.path}
-          src={content}
-          alt={file.readableName}
-        />
+        {isVideo ? (
+          <video
+            controls
+            className="w-full"
+          >
+            <source src={content} />
+            <track
+              kind="captions"
+              src={file.path}
+            />
+          </video>
+        ) : (
+          <audio
+            controls
+            className="w-full"
+            src={content}
+          >
+            <track
+              kind="captions"
+              src={file.path}
+            />
+          </audio>
+        )}
       </EditorPage>
     ))
 }

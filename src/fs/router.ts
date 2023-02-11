@@ -110,20 +110,20 @@ const directoriesRouter = ({ fsDriver, authorize, logger }: AppContext) => {
 
       authorize,
       extractDynamicParam([PATH_PARAM]),
-      prependSlash,
+      addUserIdToPath,
       appendTrailingDirectoryPathSlash,
       validateDirectoryPath,
-      addUserIdToPath,
       log,
       createDirectoryHandler(env),
     )
     .get(
-      `/:${USER_ID_PARAM}`,
+      `/:${USER_ID_PARAM}/`,
 
       authorize,
       setRootPathParam,
-      prependSlash,
       addUserIdToPath,
+      appendTrailingDirectoryPathSlash,
+      validateDirectoryPath,
       log,
       getDirectoryHandler(env),
     )
@@ -132,10 +132,9 @@ const directoriesRouter = ({ fsDriver, authorize, logger }: AppContext) => {
 
       authorize,
       extractDynamicParam([PATH_PARAM]),
-      prependSlash,
+      addUserIdToPath,
       appendTrailingDirectoryPathSlash,
       validateDirectoryPath,
-      addUserIdToPath,
       log,
       getDirectoryHandler(env),
     )
@@ -144,10 +143,9 @@ const directoriesRouter = ({ fsDriver, authorize, logger }: AppContext) => {
 
       authorize,
       extractDynamicParam([OLD_PATH_PARAM, NEW_PATH_PARAM]),
-      prependSlash,
+      addUserIdToPath,
       appendTrailingDirectoryPathSlash,
       validateDirectoryPath,
-      addUserIdToPath,
       log,
       moveDirectoryHandler(env),
     )
@@ -156,10 +154,9 @@ const directoriesRouter = ({ fsDriver, authorize, logger }: AppContext) => {
 
       authorize,
       extractDynamicParam([PATH_PARAM]),
-      prependSlash,
+      addUserIdToPath,
       appendTrailingDirectoryPathSlash,
       validateDirectoryPath,
-      addUserIdToPath,
       log,
       removeDirectoryHandler(env),
     )

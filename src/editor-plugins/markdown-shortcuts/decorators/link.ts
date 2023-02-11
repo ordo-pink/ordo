@@ -1,6 +1,5 @@
+import { ThunkFn } from "@ordo-pink/core"
 import { DraftDecorator } from "draft-js"
-
-import { ThunkFn } from "$core/types"
 
 import Link from "$editor-plugins/markdown-shortcuts/components/link"
 

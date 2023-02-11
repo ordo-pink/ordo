@@ -1,14 +1,14 @@
+import { IOrdoDirectory } from "@ordo-pink/core"
 import FileOrDirectory from "$activities/editor/components/file-explorer/file-or-directory"
 
 import Null from "$core/components/null"
-import { OrdoDirectory } from "$core/types"
 import { Either } from "$core/utils/either"
 
 type Props = {
   /**
    * Directory the content refers to.
    */
-  directory: OrdoDirectory
+  directory: IOrdoDirectory
 
   /**
    * Whether the directory is expanded or collapsed.
@@ -25,7 +25,7 @@ export default function DirectoryContent({ directory, isExpanded }: Props) {
     <>
       {directory.children.map((child) => (
         <FileOrDirectory
-          key={child.path}
+          key={child.raw.path}
           item={child}
         />
       ))}

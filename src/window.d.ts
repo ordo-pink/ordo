@@ -1,4 +1,10 @@
-import type { OrdoDirectory, OrdoFile, UnaryFn } from "$core/types"
+import type {
+  IOrdoDirectoryRaw,
+  IOrdoFileRaw,
+  OrdoFilePath,
+  OrdoDirectoryPath,
+  UnaryFn,
+} from "@ordo-pink/core"
 
 declare global {
   interface Window {
@@ -11,18 +17,28 @@ declare global {
       api: {
         fs: {
           files: {
-            get: (path: string) => Promise<string>
-            getRaw: (path: string) => ReturnType<typeof fetch>
-            create: (path: string, content?: string) => Promise<OrdoFile>
-            move: (oldPath: string, newPath: string) => Promise<OrdoFile | OrdoDirectory>
-            update: (path: string, content: string) => Promise<OrdoFile>
-            remove: (path: string) => Promise<OrdoFile>
+            get: UnaryFn<OrdoFilePath, Promise<string>>
+            getRaw: UnaryFn<OrdoFilePath, ReturnType<typeof fetch>>
+            getBlob: UnaryFn<OrdoFilePath, Promise<Blob>>
+            create: UnaryFn<
+              { path: OrdoFilePath; content?: string },
+              Promise<IOrdoFileRaw | IOrdoDirectoryRaw>
+            >
+            move: UnaryFn<
+              { oldPath: OrdoFilePath; newPath: OrdoFIlePath },
+              Promise<IOrdoFileRaw | IOrdoDirectoryRaw>
+            >
+            update: UnaryFn<{ path: OrdoFilePath; content: string }, Promise<IOrdoFileRaw>>
+            remove: UnaryFn<OrdoFilePath, Promise<IOrdoFileRaw>>
           }
           directories: {
-            get: (path: string) => Promise<OrdoDirectory>
-            create: (path: string) => Promise<OrdoDirectory>
-            move: (oldPath: string, newPath: string) => Promise<OrdoDirectory>
-            remove: (path: string) => Promise<void | OrdoDirectory>
+            get: UnaryFn<OrdoDirectoryPath, Promise<IOrdoDirectoryRaw>>
+            create: UnaryFn<OrdoDirectoryPath, Promise<IOrdoDirectoryRaw>>
+            move: UnaryFn<
+              { oldPath: OrdoDirectoryPath; newPath: OrdoDirectoryPath },
+              Promise<IOrdoDirectoryRaw>
+            >
+            remove: UnaryFn<OrdoDirectoryPath, Promise<IOrdoDirectoryRaw>>
           }
         }
       }

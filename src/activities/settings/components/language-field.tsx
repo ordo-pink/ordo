@@ -1,17 +1,13 @@
+import { Language } from "@ordo-pink/core"
 import { ChangeEvent, useEffect, useState } from "react"
 import { useTranslation } from "react-i18next"
 
-import { useI18nInit } from "$containers/app/hooks/use-i18n-init"
+import { useI18n } from "$containers/app/hooks/use-i18n"
 import Fieldset from "$core/components/fieldset"
-import { Language } from "$core/constants/language"
 
 export default function LanguageField() {
-  const { t } = useTranslation()
-  const i18n = useI18nInit()
+  const i18n = useI18n()
 
-  const translatedLanguage = t("@ordo-activity-settings/language")
-  const translatedRussianLanguage = t("@ordo-activity-settings/rus-language")
-  const translatedEnglishLanguage = t("@ordo-activity-settings/eng-language")
   const [language, setLanguage] = useState(Language.ENGLISH)
 
   useEffect(() => {
@@ -21,6 +17,12 @@ export default function LanguageField() {
   const handleChange = (event: ChangeEvent<HTMLSelectElement>) => {
     i18n.changeLanguage(event.target.value)
   }
+
+  const { t } = useTranslation()
+
+  const translatedLanguage = t("@ordo-activity-settings/language")
+  const translatedRussianLanguage = t("@ordo-activity-settings/rus-language")
+  const translatedEnglishLanguage = t("@ordo-activity-settings/eng-language")
 
   return (
     <Fieldset>

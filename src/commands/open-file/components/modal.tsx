@@ -1,3 +1,5 @@
+import { Nullable, IOrdoDirectory, IOrdoFile, OrdoDirectory } from "@ordo-pink/core"
+import { Switch } from "@ordo-pink/switch"
 import Fuse from "fuse.js"
 import { useState, useEffect, ChangeEvent, KeyboardEvent, MouseEvent } from "react"
 import { useTranslation } from "react-i18next"
@@ -11,24 +13,21 @@ import { useModal } from "$containers/app/hooks/use-modal"
 
 import Null from "$core/components/null"
 
-import { isOrdoDirectory } from "$core/guards/is-fs-entity"
 import { useAppDispatch } from "$core/state/hooks/use-app-dispatch"
 import { useAppSelector } from "$core/state/hooks/use-app-selector"
 import { useExtensionSelector } from "$core/state/hooks/use-extension-selector"
-import { Nullable, OrdoDirectory, OrdoFile } from "$core/types"
 import { Either } from "$core/utils/either"
 import { preventDefault, stopPropagation } from "$core/utils/event"
 import { lazyBox } from "$core/utils/lazy-box"
 import { noOp } from "$core/utils/no-op"
-import { Switch } from "$core/utils/switch"
 
 import "$commands/open-file/index.css"
 
-const getFiles = (directory: Nullable<OrdoDirectory>, files: OrdoFile[] = []) => {
+const getFiles = (directory: Nullable<IOrdoDirectory>, files: IOrdoFile[] = []) => {
   if (!directory) return files
 
   for (const item of directory.children) {
-    if (isOrdoDirectory(item)) {
+    if (OrdoDirectory.isOrdoDirectory(item)) {
       getFiles(item, files)
     } else {
       files.push(item)
@@ -38,7 +37,7 @@ const getFiles = (directory: Nullable<OrdoDirectory>, files: OrdoFile[] = []) =>
   return files
 }
 
-const fuse = new Fuse([] as OrdoFile[], { keys: ["readableName"] })
+const fuse = new Fuse([] as IOrdoFile[], { keys: ["readableName"] })
 
 export default function OpenFile() {
   const dispatch = useAppDispatch()
@@ -93,7 +92,7 @@ export default function OpenFile() {
 
         return createSearchParams({
           association: association ? association.name : "unsupported",
-          path: file.path,
+          path: file.raw.path,
         })
       })
       .fold((searchParams) => {
@@ -132,7 +131,7 @@ export default function OpenFile() {
       .fold(setCurrentIndex),
   )
 
-  const handleClick = lazyBox<OrdoFile>((box) =>
+  const handleClick = lazyBox<IOrdoFile>((box) =>
     box
       .map((file) => {
         const association = fileAssociations.find((assoc) =>
@@ -141,7 +140,7 @@ export default function OpenFile() {
 
         return createSearchParams({
           association: association ? association.name : "unsupported",
-          path: file.path,
+          path: file.raw.path,
         })
       })
       .fold((searchParams) => {
@@ -174,16 +173,13 @@ export default function OpenFile() {
       .fold(setCurrentIndex),
   )
 
-  const handleKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
-    const handle = Switch.of(event.key)
+  const handleKeyDown = (event: KeyboardEvent<HTMLInputElement>) =>
+    Switch.of(event.key)
       .case("Escape", handleHideModal)
       .case("Enter", () => handleEnter(event))
       .case("ArrowUp", () => handleArrowUp(event))
       .case("ArrowDown", () => handleArrowDown(event))
       .default(noOp)
-
-    handle()
-  }
 
   const translatedPlaceholder = t(`@ordo-command-open-file/placeholder`)
 
@@ -208,7 +204,7 @@ export default function OpenFile() {
           <div className="open-file_modal_command-container">
             {visibleFiles.map((file, index) => (
               <OpenFileItem
-                key={file.path}
+                key={file.raw.path}
                 file={file}
                 onClick={handleClick}
                 isCurrent={currentIndex === index}

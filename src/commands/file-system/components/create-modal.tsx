@@ -72,7 +72,7 @@ export default function CreateModal() {
             <div>{translatedTitle}</div>
           </div>
 
-          {parent && <PathBreadcrumbs path={parent.path} />}
+          {parent && <PathBreadcrumbs path={parent.raw.path} />}
 
           <input
             type="text"

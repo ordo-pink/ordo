@@ -1,16 +1,16 @@
+import { OrdoDirectoryPath, OrdoFilePath, ThunkFn } from "@ordo-pink/core"
 import { useTranslation } from "react-i18next"
 
 import { hideCreateModal } from "$commands/file-system/store"
 import { FileSystemExtensionStore } from "$commands/file-system/types"
 
-import { createdDirectory, createdFile } from "$containers/app/store"
+import { createdDirectory, createFile } from "$containers/app/store"
 
 import { OrdoButtonSecondary, OrdoButtonPrimary } from "$core/components/buttons"
 import { OrdoFSEntity } from "$core/constants/ordo-fs-entity"
 import { useAppDispatch } from "$core/state/hooks/use-app-dispatch"
 import { useAppSelector } from "$core/state/hooks/use-app-selector"
 import { useExtensionSelector } from "$core/state/hooks/use-extension-selector"
-import { ThunkFn } from "$core/types"
 import { Either } from "$core/utils/either"
 import { lazyBox } from "$core/utils/lazy-box"
 
@@ -30,8 +30,8 @@ export default function CreateModalButtonGroup({ newName, onAction }: Props) {
   const parent = fileSystemCommandsSelector((state) => state["ordo-command-file-system"].parent)
 
   const parentPath = Either.fromNullable(parent).fold(
-    () => root?.path ?? "",
-    (p) => p.path,
+    () => root?.raw.path ?? "",
+    (p) => p.raw.path,
   )
 
   const newPath = `${parentPath}/${newName}`
@@ -43,14 +43,13 @@ export default function CreateModalButtonGroup({ newName, onAction }: Props) {
   const handleOkButtonClick = lazyBox((box) =>
     box
       .map(() => type === OrdoFSEntity.DIRECTORY)
+      .tap(onAction)
       .map((isDirectory) =>
         Either.fromBoolean(isDirectory).fold(
-          () => createdFile,
-          () => createdDirectory,
+          () => dispatch(createFile({ path: newPath as OrdoFilePath })),
+          () => dispatch(createdDirectory(newPath as OrdoDirectoryPath)),
         ),
       )
-      .tap(onAction)
-      .map((f) => dispatch(f(newPath) as ReturnType<typeof createdDirectory>))
       .fold(() => dispatch(hideCreateModal())),
   )
 

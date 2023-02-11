@@ -1,20 +1,22 @@
+import { IOrdoFile, OrdoDirectory, OrdoFile } from "@ordo-pink/core"
 import type EditorExtension from "$activities/editor"
 
 import { createOrdoCommand } from "$core/extensions/create-ordo-command"
-import { isOrdoFile, isOrdoDirectory } from "$core/guards/is-fs-entity"
-import { ActionContext, OrdoFile } from "$core/types"
+import { ActionContext } from "$core/types"
 
-const download = (file: OrdoFile) => {
+const download = (file: IOrdoFile) => {
   window.ordo.api.fs.files
-    .getRaw(file.path)
-    .then((res) => res.blob())
+    .getBlob(file.raw.path)
     .then((blob) => URL.createObjectURL(blob))
     .then((url) => {
       const a = document.createElement("a")
+
       a.href = url
       a.download = `${file.readableName}${file.extension}`
       document.body.appendChild(a)
+
       a.click()
+
       setTimeout(() => {
         document.body.removeChild(a)
         URL.revokeObjectURL(url)
@@ -29,9 +31,9 @@ export const DownloadFileCommand = createOrdoCommand<"ordo-command-file-system">
   showInCommandPalette: ({ state }: ActionContext<typeof EditorExtension>) => {
     return Boolean(state["ordo-activity-editor"].currentFile)
   },
-  showInContextMenu: isOrdoFile,
+  showInContextMenu: OrdoFile.isOrdoFile,
   action: ({ contextMenuTarget, state }: ActionContext<typeof EditorExtension>) => {
-    if (contextMenuTarget && !isOrdoDirectory(contextMenuTarget)) {
+    if (contextMenuTarget && !OrdoDirectory.isOrdoDirectory(contextMenuTarget)) {
       return void download(contextMenuTarget)
     }
 

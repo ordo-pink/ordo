@@ -1,20 +1,19 @@
+import { IOrdoDirectory, IOrdoFile, Nullable, OrdoDirectory } from "@ordo-pink/core"
 import Directory from "$activities/editor/components/file-explorer/directory"
 import File from "$activities/editor/components/file-explorer/file"
 
 import Null from "$core/components/null"
-import { isOrdoDirectory } from "$core/guards/is-fs-entity"
-import { Nullable, OrdoDirectory, OrdoFile } from "$core/types"
 import { Either } from "$core/utils/either"
 
 type Props = {
-  item: Nullable<OrdoFile | OrdoDirectory>
+  item: Nullable<IOrdoFile | IOrdoDirectory>
 }
 
 export default function FileOrDirectory({ item }: Props) {
   return Either.fromNullable(item).fold(Null, (fileOrDirectory) =>
-    Either.fromBoolean(isOrdoDirectory(fileOrDirectory)).fold(
-      () => <File file={fileOrDirectory as OrdoFile} />,
-      () => <Directory directory={fileOrDirectory as OrdoDirectory} />,
+    Either.fromBoolean(OrdoDirectory.isOrdoDirectory(fileOrDirectory)).fold(
+      () => <File file={fileOrDirectory as IOrdoFile} />,
+      () => <Directory directory={fileOrDirectory as IOrdoDirectory} />,
     ),
   )
 }

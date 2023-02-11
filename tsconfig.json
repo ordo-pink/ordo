@@ -3,6 +3,7 @@
     "lib": ["DOM", "DOM.Iterable", "ESNext"],
     "module": "ESNext",
     "jsx": "react-jsx",
+    "target": "ESNext",
     "jsxImportSource": "react",
     "allowJs": true,
     "skipLibCheck": true,

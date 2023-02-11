@@ -1,3 +1,4 @@
+import { Switch } from "@ordo-pink/switch"
 import Fuse from "fuse.js"
 import { useState, useEffect, ChangeEvent, KeyboardEvent, MouseEvent } from "react"
 import { useTranslation } from "react-i18next"
@@ -21,7 +22,6 @@ import { Either } from "$core/utils/either"
 import { preventDefault, stopPropagation } from "$core/utils/event"
 import { lazyBox } from "$core/utils/lazy-box"
 import { noOp } from "$core/utils/no-op"
-import { Switch } from "$core/utils/switch"
 
 import "$commands/command-palette/index.css"
 
@@ -165,16 +165,13 @@ export default function CommandPalette() {
       .fold(setCurrentIndex),
   )
 
-  const handleKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
-    const handle = Switch.of(event.key)
+  const handleKeyDown = (event: KeyboardEvent<HTMLInputElement>) =>
+    Switch.of(event.key)
       .case("Escape", handleHideModal)
       .case("Enter", () => handleEnter(event))
       .case("ArrowUp", () => handleArrowUp(event))
       .case("ArrowDown", () => handleArrowDown(event))
       .default(noOp)
-
-    handle()
-  }
 
   const translatedPlaceholder = t(`@ordo-command-command-palette/placeholder`)
 

@@ -1,6 +1,5 @@
+import type { ThunkFn, Nullable, UnaryFn } from "@ordo-pink/core"
 import { tap } from "ramda"
-
-import type { ThunkFn, Nullable, UnaryFn } from "$core/types"
 
 const unsafeGet = Symbol("EitherUnsafeGet")
 

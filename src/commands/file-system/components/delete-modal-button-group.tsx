@@ -1,3 +1,4 @@
+import { OrdoDirectory, OrdoDirectoryPath, OrdoFilePath } from "@ordo-pink/core"
 import { useTranslation } from "react-i18next"
 
 import { hideDeleteModal } from "$commands/file-system/store"
@@ -6,14 +7,13 @@ import { FileSystemExtensionStore } from "$commands/file-system/types"
 import { removedFile, removedDirectory } from "$containers/app/store"
 
 import { OrdoButtonSecondary, OrdoButtonPrimary } from "$core/components/buttons"
-import { isOrdoDirectory } from "$core/guards/is-fs-entity"
 import { useAppDispatch } from "$core/state/hooks/use-app-dispatch"
 import { useExtensionSelector } from "$core/state/hooks/use-extension-selector"
 import { Either } from "$core/utils/either"
 import { lazyBox } from "$core/utils/lazy-box"
 
 type Props = {
-  path: string
+  path: OrdoDirectoryPath | OrdoFilePath
 }
 
 export default function DeleteModalButtonGroup({ path }: Props) {
@@ -27,14 +27,13 @@ export default function DeleteModalButtonGroup({ path }: Props) {
 
   const handleOkButtonClick = lazyBox((box) =>
     box
-      .map(() => isOrdoDirectory(target))
-      .map((isDire) =>
-        Either.fromBoolean(isDire).fold(
-          () => removedFile,
-          () => removedDirectory,
+      .map(() => OrdoDirectory.isOrdoDirectory(target))
+      .map((isDirectory) =>
+        Either.fromBoolean(isDirectory).fold(
+          () => dispatch(removedFile(path)),
+          () => dispatch(removedDirectory(path as OrdoDirectoryPath)),
         ),
       )
-      .map((f) => dispatch(f(path) as ReturnType<typeof removedDirectory>))
       .fold(() => dispatch(hideDeleteModal())),
   )
 

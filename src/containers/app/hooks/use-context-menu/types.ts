@@ -1,7 +1,9 @@
-import { Nullable, OrdoCommand, OrdoDirectory, OrdoFile } from "$core/types"
+import { IOrdoDirectory, IOrdoFile, Nullable } from "@ordo-pink/core"
+
+import { OrdoCommand } from "$core/types"
 
 export type ContextMenuActionParams<T = unknown> = {
-  contextMenuTarget: Nullable<OrdoFile | OrdoDirectory | T>
+  contextMenuTarget: Nullable<IOrdoFile | IOrdoDirectory | T>
 }
 
 export type ContextMenuTemplateItem<T extends string = string> = OrdoCommand<T>
@@ -11,5 +13,5 @@ export type ContextMenuTemplate = {
 }
 
 export type ContextMenuTarget<T = void> = T extends void
-  ? Nullable<OrdoFile | OrdoDirectory>
+  ? Nullable<IOrdoFile | IOrdoDirectory>
   : Nullable<T>

@@ -1,8 +1,8 @@
+import { ThunkFn } from "@ordo-pink/core"
 import { PropsWithChildren, useRef } from "react"
 import { useHotkeys } from "react-hotkeys-hook"
 
 import Accelerator from "$core/components/accelerator"
-import { ThunkFn } from "$core/types"
 import { Either } from "$core/utils/either"
 import { noOp } from "$core/utils/no-op"
 

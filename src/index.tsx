@@ -65,9 +65,9 @@ window.ordo = {
   api: {
     fs: {
       files: {
-        create: (path, content = "") =>
+        create: ({ path, content }) =>
           window.ordo.env
-            .fetch(`${host}/${FILE_API}${path}`, {
+            .fetch(`${host}/${FILE_API}/${Keycloak.tokenParsed?.sub}${path}`, {
               method: "POST",
               body: content,
               headers: {
@@ -77,51 +77,59 @@ window.ordo = {
             .then((res) => res.json()),
         get: (path) =>
           window.ordo.env
-            .fetch(`${host}/${FILE_API}${path}`, {
+            .fetch(`${host}/${FILE_API}/${Keycloak.tokenParsed?.sub}${path}`, {
               headers: {
                 [AUTHORIZATION_HEADER_KEY]: `Bearer ${TEST_AUTH_TOKEN ?? Keycloak.token}`,
               },
             })
             .then((res) => res.text()),
         getRaw: (path) =>
-          window.ordo.env.fetch(`${host}/${FILE_API}${path}`, {
+          window.ordo.env.fetch(`${host}/${FILE_API}/${Keycloak.tokenParsed?.sub}${path}`, {
             headers: {
               [AUTHORIZATION_HEADER_KEY]: `Bearer ${TEST_AUTH_TOKEN ?? Keycloak.token}`,
             },
           }),
+        getBlob: (path) =>
+          window.ordo.env
+            .fetch(`${host}/${FILE_API}/${Keycloak.tokenParsed?.sub}${path}`, {
+              headers: {
+                [AUTHORIZATION_HEADER_KEY]: `Bearer ${TEST_AUTH_TOKEN ?? Keycloak.token}`,
+              },
+            })
+            .then((res) => res.blob()),
         remove: (path) =>
           window.ordo.env
-            .fetch(`${host}/${FILE_API}${path}`, {
+            .fetch(`${host}/${FILE_API}/${Keycloak.tokenParsed?.sub}${path}`, {
               method: "DELETE",
               headers: {
                 [AUTHORIZATION_HEADER_KEY]: `Bearer ${TEST_AUTH_TOKEN ?? Keycloak.token}`,
               },
             })
             .then((res) => res.json()),
-        move: (from, to) =>
+        move: ({ oldPath, newPath }) =>
           window.ordo.env
-            .fetch(`${host}/${FILE_API}${from}->${to}`, {
+            .fetch(`${host}/${FILE_API}/${Keycloak.tokenParsed?.sub}${oldPath}->${newPath}`, {
               method: "PATCH",
               headers: {
                 [AUTHORIZATION_HEADER_KEY]: `Bearer ${TEST_AUTH_TOKEN ?? Keycloak.token}`,
               },
             })
             .then((res) => res.json()),
-        update: (path, body) =>
+        update: ({ path, content }) =>
           window.ordo.env
-            .fetch(`${host}/${FILE_API}${path}`, {
+            .fetch(`${host}/${FILE_API}/${Keycloak.tokenParsed?.sub}${path}`, {
               method: "PUT",
               headers: {
                 [AUTHORIZATION_HEADER_KEY]: `Bearer ${TEST_AUTH_TOKEN ?? Keycloak.token}`,
               },
-              body,
+              body: content,
             })
             .then((res) => res.json()),
       },
       directories: {
         create: (path) =>
           window.ordo.env
-            .fetch(`${host}/${DIRECTORY_API}${path}`, {
+            .fetch(`${host}/${DIRECTORY_API}/${Keycloak.tokenParsed?.sub}${path}`, {
               method: "POST",
               headers: {
                 [AUTHORIZATION_HEADER_KEY]: `Bearer ${TEST_AUTH_TOKEN ?? Keycloak.token}`,
@@ -130,7 +138,7 @@ window.ordo = {
             .then((res) => res.json()),
         get: (path) =>
           window.ordo.env
-            .fetch(`${host}/${DIRECTORY_API}${path}`, {
+            .fetch(`${host}/${DIRECTORY_API}/${Keycloak.tokenParsed?.sub}${path}`, {
               headers: {
                 [AUTHORIZATION_HEADER_KEY]: `Bearer ${TEST_AUTH_TOKEN ?? Keycloak.token}`,
               },
@@ -138,16 +146,16 @@ window.ordo = {
             .then((res) => res.json()),
         remove: (path) =>
           window.ordo.env
-            .fetch(`${host}/${DIRECTORY_API}${path}`, {
+            .fetch(`${host}/${DIRECTORY_API}/${Keycloak.tokenParsed?.sub}${path}`, {
               method: "DELETE",
               headers: {
                 [AUTHORIZATION_HEADER_KEY]: `Bearer ${TEST_AUTH_TOKEN ?? Keycloak.token}`,
               },
             })
             .then((res) => res.json()),
-        move: (from, to) =>
+        move: ({ oldPath, newPath }) =>
           window.ordo.env
-            .fetch(`${host}/${DIRECTORY_API}${from}->${to}`, {
+            .fetch(`${host}/${DIRECTORY_API}/${Keycloak.tokenParsed?.sub}${oldPath}->${newPath}`, {
               method: "PATCH",
               headers: {
                 [AUTHORIZATION_HEADER_KEY]: `Bearer ${TEST_AUTH_TOKEN ?? Keycloak.token}`,

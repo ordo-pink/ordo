@@ -1,4 +1,4 @@
-import { OrdoExtensionType } from "$core/constants/ordo-extension-type"
+import { OrdoExtensionType } from "@ordo-pink/core"
 import {
   OrdoActivityExtension,
   OrdoCommandExtension,

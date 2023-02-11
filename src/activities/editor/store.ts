@@ -1,7 +1,7 @@
+import { IOrdoFile } from "@ordo-pink/core"
 import { createSlice, PayloadAction } from "@reduxjs/toolkit"
 
 import { EditorState } from "$activities/editor/types"
-import { OrdoFile } from "$core/types"
 
 const initialState: EditorState = {
   currentFile: null,
@@ -11,7 +11,7 @@ export const editorSlice = createSlice({
   name: "@ordo-editor",
   initialState,
   reducers: {
-    selectFile: (state, action: PayloadAction<OrdoFile>) => {
+    selectFile: (state, action: PayloadAction<IOrdoFile>) => {
       state.currentFile = action.payload
     },
     closeFile: (state) => {

@@ -1,3 +1,4 @@
+import { OrdoFile, OrdoFilePath } from "@ordo-pink/core"
 import { Switch } from "@ordo-pink/switch"
 import { createContext, useEffect } from "react"
 import { Helmet } from "react-helmet"
@@ -15,23 +16,11 @@ import { useCurrentFileAssociation } from "$core/hooks/use-current-file-associat
 import { useAppDispatch } from "$core/state/hooks/use-app-dispatch"
 import { useAppSelector } from "$core/state/hooks/use-app-selector"
 import { useExtensionSelector } from "$core/state/hooks/use-extension-selector"
-import { FileExtension, OrdoExtensionMetadata, OrdoExtensionProps } from "$core/types"
+import { OrdoExtensionMetadata, OrdoExtensionProps } from "$core/types"
 import { Either } from "$core/utils/either"
 import { findOrdoFile } from "$core/utils/fs-helpers"
 
 import "$activities/editor/index.css"
-
-export const getFileExtension = (path: string): FileExtension => {
-  const fileName = path.split("/").reverse()[0] as string
-
-  const lastDotPosition = fileName.lastIndexOf(".")
-
-  if (!~lastDotPosition) {
-    return ""
-  }
-
-  return fileName.substring(lastDotPosition) as FileExtension
-}
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const EditorMetadataContext = createContext<OrdoExtensionMetadata<EditorMetadata>>({} as any)
@@ -52,16 +41,18 @@ export default function Editor({ metadata }: OrdoExtensionProps<EditorMetadata>)
 
   const Workspace = useWorkspaceWithSidebar()
 
-  const path = query.get("path")
+  const path = query.get("path") as OrdoFilePath
 
   const fileAssociations = useAppSelector((state) => state.app.fileAssociationExtensions)
 
   useEffect(() => {
     if (!path) {
       metadata.get("recentFiles").then((files) => {
+        if (!files[0]) return
+
         const path = files[0]
 
-        const fileExtension = getFileExtension(path)
+        const fileExtension = OrdoFile.from({ path, size: 0 }).extension
 
         const association = fileAssociations.find((assoc) =>
           assoc.fileExtensions.includes(fileExtension),
@@ -88,7 +79,7 @@ export default function Editor({ metadata }: OrdoExtensionProps<EditorMetadata>)
     if (!file) return
 
     metadata.get("recentFiles").then((recent) => {
-      Switch.of(file.path)
+      Switch.of(file.raw.path)
         .case(
           (path) => recent.indexOf(path) === 0,
           () => void 0,
@@ -98,12 +89,12 @@ export default function Editor({ metadata }: OrdoExtensionProps<EditorMetadata>)
           () => {
             const recentCopy = [...recent]
 
-            recentCopy.splice(recentCopy.indexOf(file.path), 1)
-            metadata.set("recentFiles", [file.path].concat(recentCopy))
+            recentCopy.splice(recentCopy.indexOf(file.raw.path), 1)
+            metadata.set("recentFiles", [file.raw.path].concat(recentCopy))
           },
         )
         .default(() => {
-          metadata.set("recentFiles", [file.path].concat(recent))
+          metadata.set("recentFiles", [file.raw.path].concat(recent))
         })
     })
   }, [path, tree, metadata, dispatch])

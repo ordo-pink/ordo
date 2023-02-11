@@ -1,3 +1,4 @@
+import { IOrdoDirectory } from "@ordo-pink/core"
 import { MouseEvent, useContext, useEffect, useState } from "react"
 import {
   AiFillFolder,
@@ -15,13 +16,12 @@ import { useContextMenu } from "$containers/app/hooks/use-context-menu"
 import ActionListItem from "$core/components/action-list/item"
 import Null from "$core/components/null"
 import { useAppDispatch } from "$core/state/hooks/use-app-dispatch"
-import { OrdoDirectory } from "$core/types"
 import { Either } from "$core/utils/either"
 import { preventDefault, stopPropagation } from "$core/utils/event"
 import { lazyBox } from "$core/utils/lazy-box"
 
 type Props = {
-  directory: OrdoDirectory
+  directory: IOrdoDirectory
 }
 
 export default function Directory({ directory }: Props) {
@@ -35,7 +35,9 @@ export default function Directory({ directory }: Props) {
 
   const { showContextMenu } = useContextMenu()
 
-  const paddingLeft = `${directory.depth * 10}px`
+  const depth = directory.raw.path.slice(1, -1).split("/").filter(Boolean).length
+
+  const paddingLeft = `${depth * 10}px`
   const hasChildren = directory && directory.children && directory.children.length > 0
 
   const OpenIcon = hasChildren ? AiFillFolderOpen : AiOutlineFolderOpen
@@ -49,7 +51,7 @@ export default function Directory({ directory }: Props) {
   }, [metadata])
 
   useEffect(() => {
-    setIsExpanded(expandedDirectories.includes(directory.path))
+    setIsExpanded(expandedDirectories.includes(directory.raw.path))
   }, [expandedDirectories, directory])
 
   const handleClick = lazyBox<MouseEvent>((box) =>
@@ -61,19 +63,19 @@ export default function Directory({ directory }: Props) {
 
         if (!isExpanded) {
           metadata.get("expandedDirectories").then((expanded) => {
-            if (expanded.includes(directory.path)) return
+            if (expanded.includes(directory.raw.path)) return
 
             metadata
-              .set("expandedDirectories", expanded.concat([directory.path]))
+              .set("expandedDirectories", expanded.concat([directory.raw.path]))
               .then(() => metadata.getState())
           })
         } else {
           metadata.get("expandedDirectories").then((expanded) => {
-            if (!expanded.includes(directory.path)) return
+            if (!expanded.includes(directory.raw.path)) return
 
             const expandedCopy = [...expanded]
 
-            expandedCopy.splice(expanded.indexOf(directory.path), 1)
+            expandedCopy.splice(expanded.indexOf(directory.raw.path), 1)
 
             metadata.set("expandedDirectories", expandedCopy).then(() => metadata.getState())
           })

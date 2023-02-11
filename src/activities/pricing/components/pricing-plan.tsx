@@ -1,3 +1,4 @@
+import { ThunkFn } from "@ordo-pink/core"
 import { useTranslation } from "react-i18next"
 import { BsArrowRight } from "react-icons/bs"
 
@@ -5,7 +6,6 @@ import PricingPlanFeature from "$activities/pricing/components/pricing-plan-feat
 import { PricingPlanFeatureItem } from "$activities/pricing/types"
 
 import { OrdoButtonPrimary } from "$core/components/buttons"
-import { ThunkFn } from "$core/types"
 
 type Props = {
   title: string

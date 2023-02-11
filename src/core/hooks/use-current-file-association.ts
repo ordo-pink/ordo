@@ -1,7 +1,7 @@
+import { OrdoFilePath } from "@ordo-pink/core"
 import { useSearchParams } from "react-router-dom"
 
 import { useAppSelector } from "$core/state/hooks/use-app-selector"
-import { OrdoFile } from "$core/types"
 import { findOrdoFile } from "$core/utils/fs-helpers"
 
 export const useCurrentFileAssociation = () => {
@@ -21,13 +21,12 @@ export const useCurrentFileAssociation = () => {
 
   const path = query.get("path")
 
-  const file = findOrdoFile(path as string, tree)
+  const file = findOrdoFile(path as OrdoFilePath, tree)
 
   if (!file) return null
 
   return (
-    fileAssociations.find((association) =>
-      association.fileExtensions.includes((file as OrdoFile).extension),
-    ) ?? null
+    fileAssociations.find((association) => association.fileExtensions.includes(file.extension)) ??
+    null
   )
 }

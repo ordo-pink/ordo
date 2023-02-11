@@ -1,3 +1,4 @@
+import { ThunkFn } from "@ordo-pink/core"
 import { useEffect, useState, useRef, useLayoutEffect } from "react"
 import { useHotkeys } from "react-hotkeys-hook"
 
@@ -7,7 +8,6 @@ import { hideContextMenu } from "$containers/app/hooks/use-context-menu/store"
 import Null from "$core/components/null"
 import { useAppDispatch } from "$core/state/hooks/use-app-dispatch"
 import { useAppSelector } from "$core/state/hooks/use-app-selector"
-import { ThunkFn } from "$core/types"
 import { Either } from "$core/utils/either"
 import { preventDefault, stopPropagation } from "$core/utils/event"
 import { lazyBox } from "$core/utils/lazy-box"

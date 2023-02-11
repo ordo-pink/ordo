@@ -16,4 +16,4 @@ i18next
     },
   })
 
-export const useI18nInit = () => i18next
+export const useI18n = () => i18next

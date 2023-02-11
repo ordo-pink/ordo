@@ -1,3 +1,4 @@
+import { OrdoExtensionType, UnaryFn } from "@ordo-pink/core"
 import { combineReducers, Reducer } from "@reduxjs/toolkit"
 import { MouseEvent, useEffect, useState } from "react"
 import { Helmet } from "react-helmet"
@@ -22,11 +23,10 @@ import UserSupportCommands from "$commands/user-support"
 
 import ActivityBar from "$containers/activity-bar"
 import ContextMenu from "$containers/app/hooks/use-context-menu/components/context-menu"
-import { useI18nInit } from "$containers/app/hooks/use-i18n-init"
+import { useI18n } from "$containers/app/hooks/use-i18n"
 import { gotDirectory, registerExtensions } from "$containers/app/store"
 
 import { useKeycloak } from "$core/auth/hooks/use-keycloak"
-import { OrdoExtensionType } from "$core/constants/ordo-extension-type"
 import { createExtensionMetadata } from "$core/extensions/create-extension-metadata"
 import { isActivityExtension } from "$core/guards/is-extension"
 import { useActionContext } from "$core/hooks/use-action-context"
@@ -36,14 +36,14 @@ import { reducer, store } from "$core/state"
 import { useAppDispatch } from "$core/state/hooks/use-app-dispatch"
 import { useAppSelector } from "$core/state/hooks/use-app-selector"
 import { useExtensionSelector } from "$core/state/hooks/use-extension-selector"
-import { ActionContext, OrdoExtension, UnaryFn } from "$core/types"
+import { ActionContext, OrdoExtension } from "$core/types"
 
 import MarkdownShortcuts from "$editor-plugins/markdown-shortcuts"
 
 import ImgFileExtension from "$file-associations/img"
 import MdFileExtension from "$file-associations/md"
-import PDFFileExtension from "$file-associations/pdf"
 import MediaEditor from "$file-associations/media"
+import PDFFileExtension from "$file-associations/pdf"
 
 import "$containers/app/index.css"
 
@@ -77,7 +77,7 @@ const loggedOutExtensions = [
 
 export default function App() {
   const dispatch = useAppDispatch()
-  const i18n = useI18nInit()
+  const i18n = useI18n()
 
   const editorSelector = useExtensionSelector<EditorActivityState>()
 

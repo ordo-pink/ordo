@@ -1,4 +1,5 @@
 import Editor, { EditorPlugin } from "@draft-js-plugins/editor"
+import { OrdoFile, OrdoFilePath } from "@ordo-pink/core"
 import { convertFromRaw, convertToRaw, EditorState } from "draft-js"
 import { markdownToDraft, draftToMarkdown } from "markdown-draft-js"
 import { useState, useEffect, useRef } from "react"
@@ -11,13 +12,13 @@ import { updatedFile } from "$containers/app/store"
 
 import EditorPage from "$core/components/editor-page/editor-page"
 import Null from "$core/components/null"
+import { useFileParentBreadcrumbs } from "$core/hooks/use-file-breadcrumbs"
 import { useFSAPI } from "$core/hooks/use-fs-api"
 import { useAppDispatch } from "$core/state/hooks/use-app-dispatch"
 import { useAppSelector } from "$core/state/hooks/use-app-selector"
 import { useExtensionSelector } from "$core/state/hooks/use-extension-selector"
 import { Box } from "$core/utils/box"
 import { Either } from "$core/utils/either"
-import { getParentPath } from "$core/utils/fs-helpers"
 import { findOrdoFile } from "$core/utils/fs-helpers"
 
 export default function MdEditor() {
@@ -38,8 +39,8 @@ export default function MdEditor() {
   const [query] = useSearchParams()
   const { files } = useFSAPI()
 
-  const path = query.get("path")
-  const breadcrumbsPath = getParentPath(path ?? "/")
+  const path = query.get("path") as OrdoFilePath
+  const breadcrumbsPath = useFileParentBreadcrumbs()
 
   useEffect(() => {
     if (pluginExtensions) {
@@ -80,7 +81,7 @@ export default function MdEditor() {
   }, [pluginExtensions, editorState])
 
   useEffect(() => {
-    if (!path || !files || !tree) return
+    if (!path || !files || !tree || !OrdoFile.isValidPath(path)) return
 
     files.get(path).then((payload) => {
       const file = findOrdoFile(path, tree)
@@ -118,7 +119,7 @@ export default function MdEditor() {
 
             if (!markdownString) return
 
-            dispatch(updatedFile({ path: file.path, content: markdownString }))
+            dispatch(updatedFile({ path: file.raw.path, content: markdownString }))
           }
 
           setEditorState(state)

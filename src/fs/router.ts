@@ -6,9 +6,8 @@ import {
   NEW_PATH_PARAM,
   FILES_PARAM,
   DIRECTORIES_PARAM,
+  USER_ID_PARAM,
 } from "./constants"
-import { OrdoDirectoryModel } from "./models/directory"
-import { OrdoFileModel } from "./models/file"
 import { createDirectoryHandler } from "./handlers/directories/create"
 import { getDirectoryHandler } from "./handlers/directories/get"
 import { moveDirectoryHandler } from "./handlers/directories/move"
@@ -26,6 +25,8 @@ import { prependSlash } from "./middleware/prepend-slash"
 import { setContentTypeHeader } from "./middleware/set-content-type-header"
 import { setRootPathParam } from "./middleware/set-root-path-param"
 import { validateFilePath, validateDirectoryPath } from "./middleware/validate-path"
+import { OrdoDirectoryModel } from "./models/directory"
+import { OrdoFileModel } from "./models/file"
 import { AppContext } from "../types"
 
 const filesRouter = ({ fsDriver, authorize, logger }: AppContext) => {
@@ -38,7 +39,7 @@ const filesRouter = ({ fsDriver, authorize, logger }: AppContext) => {
 
   return Router()
     .post(
-      `/:userId/:${PATH_PARAM}*`,
+      `/:${USER_ID_PARAM}/:${PATH_PARAM}*`,
 
       authorize,
       extractDynamicParam([PATH_PARAM]),
@@ -49,7 +50,7 @@ const filesRouter = ({ fsDriver, authorize, logger }: AppContext) => {
       createFileHandler(env),
     )
     .get(
-      `/:userId/:${PATH_PARAM}*`,
+      `/:${USER_ID_PARAM}/:${PATH_PARAM}*`,
 
       authorize,
       extractDynamicParam([PATH_PARAM]),
@@ -61,7 +62,7 @@ const filesRouter = ({ fsDriver, authorize, logger }: AppContext) => {
       getFileHandler(env),
     )
     .put(
-      `/:userId/:${PATH_PARAM}*`,
+      `/:${USER_ID_PARAM}/:${PATH_PARAM}*`,
 
       authorize,
       extractDynamicParam([PATH_PARAM]),
@@ -72,7 +73,7 @@ const filesRouter = ({ fsDriver, authorize, logger }: AppContext) => {
       updateFileHandler(env),
     )
     .patch(
-      `/:userId/:${OLD_PATH_PARAM}*${PATH_SEPARATOR}/:${NEW_PATH_PARAM}*`,
+      `/:${USER_ID_PARAM}/:${OLD_PATH_PARAM}*${PATH_SEPARATOR}/:${NEW_PATH_PARAM}*`,
 
       authorize,
       extractDynamicParam([OLD_PATH_PARAM, NEW_PATH_PARAM]),
@@ -83,7 +84,7 @@ const filesRouter = ({ fsDriver, authorize, logger }: AppContext) => {
       moveFileHandler(env),
     )
     .delete(
-      `/:userId/:${PATH_PARAM}*`,
+      `/:${USER_ID_PARAM}/:${PATH_PARAM}*`,
 
       authorize,
       extractDynamicParam([PATH_PARAM]),
@@ -105,7 +106,7 @@ const directoriesRouter = ({ fsDriver, authorize, logger }: AppContext) => {
 
   return Router()
     .post(
-      `/:userId/:${PATH_PARAM}*`,
+      `/:${USER_ID_PARAM}/:${PATH_PARAM}*`,
 
       authorize,
       extractDynamicParam([PATH_PARAM]),
@@ -117,7 +118,7 @@ const directoriesRouter = ({ fsDriver, authorize, logger }: AppContext) => {
       createDirectoryHandler(env),
     )
     .get(
-      `/`,
+      `/:${USER_ID_PARAM}`,
 
       authorize,
       setRootPathParam,
@@ -127,7 +128,7 @@ const directoriesRouter = ({ fsDriver, authorize, logger }: AppContext) => {
       getDirectoryHandler(env),
     )
     .get(
-      `/:userId/:${PATH_PARAM}*`,
+      `/:${USER_ID_PARAM}/:${PATH_PARAM}*`,
 
       authorize,
       extractDynamicParam([PATH_PARAM]),
@@ -139,7 +140,7 @@ const directoriesRouter = ({ fsDriver, authorize, logger }: AppContext) => {
       getDirectoryHandler(env),
     )
     .patch(
-      `/:userId/:${OLD_PATH_PARAM}*${PATH_SEPARATOR}/:${NEW_PATH_PARAM}*`,
+      `/:${USER_ID_PARAM}/:${OLD_PATH_PARAM}*${PATH_SEPARATOR}/:${NEW_PATH_PARAM}*`,
 
       authorize,
       extractDynamicParam([OLD_PATH_PARAM, NEW_PATH_PARAM]),
@@ -151,7 +152,7 @@ const directoriesRouter = ({ fsDriver, authorize, logger }: AppContext) => {
       moveDirectoryHandler(env),
     )
     .delete(
-      `/:userId/:${PATH_PARAM}*`,
+      `/:${USER_ID_PARAM}/:${PATH_PARAM}*`,
 
       authorize,
       extractDynamicParam([PATH_PARAM]),

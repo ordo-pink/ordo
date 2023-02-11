@@ -13,10 +13,6 @@ export const getDirectoryHandler: FsRequestHandler<Params> =
     const path = req.params[PATH_PARAM]
 
     getDirectory(path)
-      .then((dir) => {
-        dir.children.map((child) => console.log(child.path))
-        return dir
-      })
       .then((directory) => res.status(SuccessResponse.OK).json(directory))
       .catch((error: ExceptionResponse.NOT_FOUND | Error) =>
         Switch.of(error)

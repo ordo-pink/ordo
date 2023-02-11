@@ -1,8 +1,3 @@
-export enum Exception {
-  CONFLICT = "conflict",
-  NOT_FOUND = "not-found",
-}
-
 export const USER_ID_PARAM = "userId"
 export const DIRECTORIES_PARAM = "directories"
 export const FILES_PARAM = "files"

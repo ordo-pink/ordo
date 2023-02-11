@@ -1,6 +1,6 @@
+import { OrdoFilePath } from "@ordo-pink/core"
 import { Request, Response } from "express"
 import { setContentTypeHeader } from "."
-import { OrdoFilePath } from "../../types"
 
 describe("set-content-type-header", () => {
   it("should set content-type to response headers", () => {

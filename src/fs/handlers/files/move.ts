@@ -1,6 +1,7 @@
+import { ExceptionResponse, OrdoFilePath, SuccessResponse } from "@ordo-pink/core"
 import { Switch } from "@ordo-pink/switch"
-import { OLD_PATH_PARAM, NEW_PATH_PARAM, Exception } from "../../constants"
-import { FsRequestHandler, OrdoFilePath } from "../../types"
+import { OLD_PATH_PARAM, NEW_PATH_PARAM } from "../../constants"
+import { FsRequestHandler } from "../../types"
 
 type Params = {
   [OLD_PATH_PARAM]: OrdoFilePath
@@ -14,14 +15,14 @@ export const moveFileHandler: FsRequestHandler<Params> =
     const newPath = req.params[NEW_PATH_PARAM]
 
     moveFile({ oldPath, newPath })
-      .then((fileOrDirectory) => res.status(201).json(fileOrDirectory))
-      .catch((error: Exception.CONFLICT | Exception.NOT_FOUND | Error) =>
+      .then((fileOrDirectory) => res.status(SuccessResponse.CREATED).json(fileOrDirectory))
+      .catch((error: ExceptionResponse.CONFLICT | ExceptionResponse.NOT_FOUND | Error) =>
         Switch.of(error)
-          .case(Exception.NOT_FOUND, () => res.status(404).send())
-          .case(Exception.CONFLICT, () => res.status(409).send())
+          .case(ExceptionResponse.NOT_FOUND, () => res.status(ExceptionResponse.NOT_FOUND).send())
+          .case(ExceptionResponse.CONFLICT, () => res.status(ExceptionResponse.CONFLICT).send())
           .default(() => {
             logger.error(error)
-            res.status(500).send()
+            res.status(ExceptionResponse.UNKNOWN_ERROR).send(error.toString())
           }),
       )
   }

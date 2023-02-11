@@ -1,6 +1,5 @@
+import { OrdoFile, OrdoDirectory } from "@ordo-pink/core"
 import type { RequestHandler } from "express"
-import { OrdoDirectory } from "../../entities/directory/ordo-directory"
-import { OrdoFile } from "../../entities/file/ordo-file"
 
 export const validateFilePath: RequestHandler = (req, res, next) => {
   if (req.params.path && !OrdoFile.isValidPath(req.params.path)) {

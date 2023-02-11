@@ -4,15 +4,12 @@ import { FSDriver } from "./fs/types"
 
 export type Logger = {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  info: (...message: any[]) => void
+  info: (message: any) => void
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  warn: (...message: any[]) => void
+  warn: (message: any) => void
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  error: (...message: any[]) => void
+  error: (message: any) => void
 }
-
-export type ThunkFn<Result> = () => Result
-export type UnaryFn<Arg, Result> = (arg: Arg) => Result
 
 export type AppContext = {
   fsDriver: FSDriver

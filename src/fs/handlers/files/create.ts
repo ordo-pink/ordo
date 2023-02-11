@@ -1,6 +1,7 @@
+import { OrdoFilePath, ExceptionResponse, SuccessResponse } from "@ordo-pink/core"
 import { Switch } from "@ordo-pink/switch"
-import { Exception, PATH_PARAM } from "../../constants"
-import { FsRequestHandler, OrdoFilePath } from "../../types"
+import { PATH_PARAM } from "../../constants"
+import { FsRequestHandler } from "../../types"
 
 type Params = {
   [PATH_PARAM]: OrdoFilePath
@@ -12,13 +13,13 @@ export const createFileHandler: FsRequestHandler<Params> =
     const path = req.params[PATH_PARAM]
 
     createFile({ path, content: req })
-      .then((fileOrDirectory) => res.status(201).json(fileOrDirectory))
-      .catch((error: Exception.CONFLICT | Error) =>
+      .then((fileOrDirectory) => res.status(SuccessResponse.CREATED).json(fileOrDirectory))
+      .catch((error: ExceptionResponse.CONFLICT | Error) =>
         Switch.of(error)
-          .case(Exception.CONFLICT, () => res.status(409).send())
+          .case(ExceptionResponse.CONFLICT, () => res.status(ExceptionResponse.CONFLICT).send())
           .default(() => {
             logger.error(error)
-            res.status(500).send()
+            res.status(ExceptionResponse.UNKNOWN_ERROR).send(error.toString())
           }),
       )
   }

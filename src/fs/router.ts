@@ -7,8 +7,8 @@ import {
   FILES_PARAM,
   DIRECTORIES_PARAM,
 } from "./constants"
-import { OrdoDirectoryModel } from "./entities/directory/ordo-directory-model"
-import { OrdoFileModel } from "./entities/file/ordo-file-model"
+import { OrdoDirectoryModel } from "./models/directory"
+import { OrdoFileModel } from "./models/file"
 import { createDirectoryHandler } from "./handlers/directories/create"
 import { getDirectoryHandler } from "./handlers/directories/get"
 import { moveDirectoryHandler } from "./handlers/directories/move"

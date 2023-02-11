@@ -1,7 +1,6 @@
+import { OrdoFilePath, disallowedCharacters } from "@ordo-pink/core"
 import { Request, Response } from "express"
 import { validateDirectoryPath, validateFilePath } from "."
-import { disallowedCharacters } from "../../entities/common"
-import { OrdoFilePath } from "../../types"
 
 describe("validate-path", () => {
   describe("validate-directory-path", () => {

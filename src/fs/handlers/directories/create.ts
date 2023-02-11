@@ -1,6 +1,7 @@
+import { ExceptionResponse, OrdoDirectoryPath, SuccessResponse } from "@ordo-pink/core"
 import { Switch } from "@ordo-pink/switch"
-import { Exception, PATH_PARAM } from "../../constants"
-import { FsRequestHandler, OrdoDirectoryPath } from "../../types"
+import { PATH_PARAM } from "../../constants"
+import { FsRequestHandler } from "../../types"
 
 type Params = {
   [PATH_PARAM]: OrdoDirectoryPath
@@ -12,13 +13,13 @@ export const createDirectoryHandler: FsRequestHandler<Params> =
     const path = req.params[PATH_PARAM]
 
     createDirectory(path)
-      .then((directory) => res.status(201).json(directory))
-      .catch((error: Exception.CONFLICT | Error) =>
+      .then((directory) => res.status(SuccessResponse.CREATED).json(directory))
+      .catch((error: ExceptionResponse.CONFLICT | Error) =>
         Switch.of(error)
-          .case(Exception.CONFLICT, () => res.status(409).send())
+          .case(ExceptionResponse.CONFLICT, () => res.status(ExceptionResponse.CONFLICT).send())
           .default(() => {
             logger.error(error)
-            res.status(500).send()
+            res.status(ExceptionResponse.UNKNOWN_ERROR).send(error.toString())
           }),
       )
   }

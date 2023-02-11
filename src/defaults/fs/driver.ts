@@ -1,6 +1,7 @@
 import { createReadStream, createWriteStream, promises } from "fs"
 import { join } from "path"
-import { FSDriver, promiseWriteStream, OrdoDirectoryPath, OrdoFilePath } from "../../fs"
+import { OrdoDirectoryPath, OrdoFilePath } from "@ordo-pink/core"
+import { FSDriver, promiseWriteStream } from "../../fs"
 
 const getAbsolutePath = (absolute: string) => (path: string) => join(absolute, path)
 
@@ -33,8 +34,8 @@ export const createDefaultFSDriver = (rootDirectory: string): FSDriver => {
         .then((children) =>
           children.map((child) =>
             child.isDirectory()
-              ? (`${path}/${child.name}/` as OrdoDirectoryPath)
-              : (`${path}/${child.name}` as OrdoFilePath),
+              ? (`${path}${child.name}/` as OrdoDirectoryPath)
+              : (`${path}${child.name}` as OrdoFilePath),
           ),
         ),
     getFile: (path) => Promise.resolve(createReadStream(absolute(path))),

@@ -1,7 +1,6 @@
-import { OrdoFile } from "./ordo-file"
-import { Exception } from "../../constants"
-import { FSDriver, IOrdoFileModel } from "../../types"
-import { OrdoDirectoryModel } from "../directory"
+import { ExceptionResponse, OrdoFile } from "@ordo-pink/core"
+import { OrdoDirectoryModel } from "./directory"
+import { FSDriver, IOrdoFileModel } from "../types"
 
 export const OrdoFileModel = (driver: FSDriver): IOrdoFileModel => ({
   createFile: ({ path, content }) =>
@@ -10,7 +9,7 @@ export const OrdoFileModel = (driver: FSDriver): IOrdoFileModel => ({
       driver.checkDirectoryExists(OrdoFile.getParentPath(path)),
     ])
       .then(([fileExists, parentDirectoryExists]) =>
-        fileExists ? Promise.reject(Exception.CONFLICT) : { path, parentDirectoryExists },
+        fileExists ? Promise.reject(ExceptionResponse.CONFLICT) : { path, parentDirectoryExists },
       )
       .then(async ({ path, parentDirectoryExists }) => {
         const parentDirectory = !parentDirectoryExists
@@ -29,7 +28,7 @@ export const OrdoFileModel = (driver: FSDriver): IOrdoFileModel => ({
   deleteFile: (path) =>
     driver
       .checkFileExists(path)
-      .then((exists) => (exists ? path : Promise.reject(Exception.NOT_FOUND)))
+      .then((exists) => (exists ? path : Promise.reject(ExceptionResponse.NOT_FOUND)))
       .then(OrdoFileModel(driver).getFile)
       .then(async (file) => {
         await driver.deleteFile(file.path)
@@ -37,11 +36,11 @@ export const OrdoFileModel = (driver: FSDriver): IOrdoFileModel => ({
         return file
       }),
   exists: driver.checkFileExists,
-  getFile: (path) => driver.getFileDescriptor(path).then(OrdoFile.of),
+  getFile: (path) => driver.getFileDescriptor(path).then(OrdoFile.raw),
   getFileContent: (path) =>
     driver
       .checkFileExists(path)
-      .then((exists) => (exists ? path : Promise.reject(Exception.NOT_FOUND)))
+      .then((exists) => (exists ? path : Promise.reject(ExceptionResponse.NOT_FOUND)))
       .then(driver.getFile),
   moveFile: ({ oldPath, newPath }) =>
     Promise.all([
@@ -51,9 +50,9 @@ export const OrdoFileModel = (driver: FSDriver): IOrdoFileModel => ({
     ])
       .then(([oldFileExists, newFileExists, newFileParentExists]) =>
         newFileExists
-          ? Promise.reject(Exception.CONFLICT)
+          ? Promise.reject(ExceptionResponse.CONFLICT)
           : !oldFileExists
-          ? Promise.reject(Exception.NOT_FOUND)
+          ? Promise.reject(ExceptionResponse.NOT_FOUND)
           : { oldPath, newPath, newFileParentExists },
       )
       .then(async ({ oldPath, newPath, newFileParentExists }) => {
@@ -70,13 +69,13 @@ export const OrdoFileModel = (driver: FSDriver): IOrdoFileModel => ({
       .then(({ file, parentDirectory }) =>
         parentDirectory
           ? OrdoDirectoryModel(driver).getDirectory(parentDirectory.path)
-          : driver.getFileDescriptor(file).then(OrdoFile.of),
+          : driver.getFileDescriptor(file).then(OrdoFile.raw),
       ),
   updateFile: ({ path, content }) =>
     driver
       .checkFileExists(path)
-      .then((exists) => (exists ? { path, content } : Promise.reject(Exception.NOT_FOUND)))
+      .then((exists) => (exists ? { path, content } : Promise.reject(ExceptionResponse.NOT_FOUND)))
       .then(({ path, content }) => driver.updateFile({ path, content }))
       .then((path) => driver.getFileDescriptor(path))
-      .then(OrdoFile.of),
+      .then(OrdoFile.raw),
 })

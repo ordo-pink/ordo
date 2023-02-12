@@ -36,7 +36,7 @@ export const OrdoDirectoryModel = (driver: FSDriver): IOrdoDirectoryModel => ({
   },
   deleteDirectory: (path) =>
     driver
-      .checkFileExists(path)
+      .checkDirectoryExists(path)
       .then((exists) => (exists ? path : Promise.reject(ExceptionResponse.NOT_FOUND)))
       .then(() => OrdoDirectory.raw({ path, children: [] }))
       .then(async (directory) => {

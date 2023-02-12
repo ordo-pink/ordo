@@ -1,14 +1,10 @@
-import { ExceptionResponse, OrdoFilePath } from "@ordo-pink/core"
+import { ExceptionResponse } from "@ordo-pink/core"
 import { Switch } from "@ordo-pink/switch"
 import { PATH_PARAM } from "../../constants"
-import { FsRequestHandler } from "../../types"
+import { FsRequestHandler, OrdoFilePathParams } from "../../types"
 
-type Params = {
-  [PATH_PARAM]: OrdoFilePath
-}
-
-export const getFileHandler: FsRequestHandler<Params> =
-  ({ file: { getFileContent }, logger }) =>
+export const getFileHandler: FsRequestHandler<OrdoFilePathParams> =
+  ({ file: { getFileContent } }) =>
   (req, res) => {
     const path = req.params[PATH_PARAM]
 
@@ -18,7 +14,7 @@ export const getFileHandler: FsRequestHandler<Params> =
         Switch.of(error)
           .case(ExceptionResponse.NOT_FOUND, () => res.status(ExceptionResponse.NOT_FOUND).send())
           .default(() => {
-            logger.error(error)
+            req.params.logger.error(error)
             res.status(ExceptionResponse.UNKNOWN_ERROR).send(error.toString())
           }),
       )

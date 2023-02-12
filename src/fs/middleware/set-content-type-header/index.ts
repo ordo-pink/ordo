@@ -1,13 +1,14 @@
-import { OrdoFilePath, OrdoFile } from "@ordo-pink/core"
+import { OrdoFile } from "@ordo-pink/core"
 import type { RequestHandler } from "express"
 import { contentType } from "mime-types"
 import { PATH_PARAM } from "../../constants"
+import { OrdoDirectoryPathParams, OrdoFilePathParams } from "../../types"
 
-type Params = {
-  [PATH_PARAM]: OrdoFilePath
-}
-
-export const setContentTypeHeader: RequestHandler<Params> = (req, res, next) => {
+export const setContentTypeHeader: RequestHandler<OrdoFilePathParams | OrdoDirectoryPathParams> = (
+  req,
+  res,
+  next,
+) => {
   const path = req.params[PATH_PARAM]
 
   const extension = OrdoFile.getFileExtension(path)
@@ -15,6 +16,8 @@ export const setContentTypeHeader: RequestHandler<Params> = (req, res, next) => 
   const type = contentType(extension) || "application/octet-stream"
 
   res.setHeader("content-type", type)
+
+  req.params.logger.info(`Set content type: ${type}`)
 
   next()
 }

@@ -18,6 +18,7 @@ import { moveFileHandler } from "./handlers/files/move"
 import { removeFileHandler } from "./handlers/files/remove"
 import { updateFileHandler } from "./handlers/files/update"
 import { addUserIdToOldPathAndNewPath, addUserIdToPath } from "./middleware/add-user-id-to-path"
+import { appendLogger } from "./middleware/append-logger"
 import {
   appendTrailingDirectoryOldPathAndNewPathSlashes,
   appendTrailingDirectoryPathSlash,
@@ -47,6 +48,7 @@ const filesRouter = ({ drivers: { fs }, authorize, logger }: CreateOrdoBackendSe
       `/:${USER_ID_PARAM}/:${PATH_PARAM}*`,
 
       authorize,
+      appendLogger(logger),
       extractDynamicParam([PATH_PARAM]),
       prependPathSlash,
       validateFilePath,
@@ -57,6 +59,7 @@ const filesRouter = ({ drivers: { fs }, authorize, logger }: CreateOrdoBackendSe
       `/:${USER_ID_PARAM}/:${PATH_PARAM}*`,
 
       authorize,
+      appendLogger(logger),
       extractDynamicParam([PATH_PARAM]),
       prependPathSlash,
       validateFilePath,
@@ -68,6 +71,7 @@ const filesRouter = ({ drivers: { fs }, authorize, logger }: CreateOrdoBackendSe
       `/:${USER_ID_PARAM}/:${PATH_PARAM}*`,
 
       authorize,
+      appendLogger(logger),
       extractDynamicParam([PATH_PARAM]),
       prependPathSlash,
       validateFilePath,
@@ -78,6 +82,7 @@ const filesRouter = ({ drivers: { fs }, authorize, logger }: CreateOrdoBackendSe
       `/:${USER_ID_PARAM}/:${OLD_PATH_PARAM}*${PATH_SEPARATOR}/:${NEW_PATH_PARAM}*`,
 
       authorize,
+      appendLogger(logger),
       extractDynamicParam([OLD_PATH_PARAM, NEW_PATH_PARAM]),
       prependOldPathAndNewPathSlashes,
       validateFileOldPathAndNewPath,
@@ -88,6 +93,7 @@ const filesRouter = ({ drivers: { fs }, authorize, logger }: CreateOrdoBackendSe
       `/:${USER_ID_PARAM}/:${PATH_PARAM}*`,
 
       authorize,
+      appendLogger(logger),
       extractDynamicParam([PATH_PARAM]),
       prependPathSlash,
       validateFilePath,
@@ -111,6 +117,7 @@ const directoriesRouter = ({
       `/:${USER_ID_PARAM}/:${PATH_PARAM}*`,
 
       authorize,
+      appendLogger(logger),
       extractDynamicParam([PATH_PARAM]),
       addUserIdToPath,
       appendTrailingDirectoryPathSlash,
@@ -121,6 +128,7 @@ const directoriesRouter = ({
       `/:${USER_ID_PARAM}/`,
 
       authorize,
+      appendLogger(logger),
       setRootPathParam,
       addUserIdToPath,
       appendTrailingDirectoryPathSlash,
@@ -131,6 +139,7 @@ const directoriesRouter = ({
       `/:${USER_ID_PARAM}/:${PATH_PARAM}*`,
 
       authorize,
+      appendLogger(logger),
       extractDynamicParam([PATH_PARAM]),
       addUserIdToPath,
       appendTrailingDirectoryPathSlash,
@@ -141,6 +150,7 @@ const directoriesRouter = ({
       `/:${USER_ID_PARAM}/:${OLD_PATH_PARAM}*${PATH_SEPARATOR}/:${NEW_PATH_PARAM}*`,
 
       authorize,
+      appendLogger(logger),
       extractDynamicParam([OLD_PATH_PARAM, NEW_PATH_PARAM]),
       addUserIdToOldPathAndNewPath,
       appendTrailingDirectoryOldPathAndNewPathSlashes,
@@ -151,6 +161,7 @@ const directoriesRouter = ({
       `/:${USER_ID_PARAM}/:${PATH_PARAM}*`,
 
       authorize,
+      appendLogger(logger),
       extractDynamicParam([PATH_PARAM]),
       addUserIdToPath,
       appendTrailingDirectoryPathSlash,

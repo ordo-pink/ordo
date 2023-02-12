@@ -1,17 +1,11 @@
-import { ExceptionResponse, OrdoDirectoryPath, SuccessResponse } from "@ordo-pink/core"
+import { ExceptionResponse, SuccessResponse } from "@ordo-pink/core"
 import { Switch } from "@ordo-pink/switch"
 import { OLD_PATH_PARAM, NEW_PATH_PARAM, USER_ID_PARAM } from "../../constants"
-import { FsRequestHandler } from "../../types"
+import { FsRequestHandler, OrdoDirectoryTwoPathsParams } from "../../types"
 import { removeUserIdFromPath } from "../../utils/remove-user-id-from-path"
 
-type Params = {
-  [OLD_PATH_PARAM]: OrdoDirectoryPath
-  [NEW_PATH_PARAM]: OrdoDirectoryPath
-  [USER_ID_PARAM]: string
-}
-
-export const moveDirectoryHandler: FsRequestHandler<Params> =
-  ({ directory: { moveDirectory }, logger }) =>
+export const moveDirectoryHandler: FsRequestHandler<OrdoDirectoryTwoPathsParams> =
+  ({ directory: { moveDirectory } }) =>
   (req, res) => {
     const oldPath = req.params[OLD_PATH_PARAM]
     const newPath = req.params[NEW_PATH_PARAM]
@@ -25,7 +19,7 @@ export const moveDirectoryHandler: FsRequestHandler<Params> =
           .case(ExceptionResponse.NOT_FOUND, () => res.status(ExceptionResponse.NOT_FOUND).send())
           .case(ExceptionResponse.CONFLICT, () => res.status(ExceptionResponse.CONFLICT).send())
           .default(() => {
-            logger.error(error)
+            req.params.logger.error(error)
             res.status(ExceptionResponse.UNKNOWN_ERROR).send(error.toString())
           }),
       )

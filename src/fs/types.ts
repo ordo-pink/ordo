@@ -19,9 +19,10 @@ import {
 } from "./constants"
 import { Logger } from "../types"
 
-export type Params<T extends Record<string, unknown>> = T & {
+export type Params<T extends Record<string, unknown> = Record<string, unknown>> = T & {
   [USER_ID_PARAM]: string
   [TOKEN_PARSED_PARAM]: JwtPayload
+  logger: Logger
 }
 
 export type PathParams<T extends OrdoDirectoryPath | OrdoFilePath> = Params<{

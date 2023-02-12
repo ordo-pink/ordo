@@ -16,7 +16,9 @@ export const findParent = (
 
   const path = typeof child === "string" ? child : child.path
 
-  const parentPathChunks = path.split("/").slice(0, -1).filter(Boolean)
+  const parentPathChunks = path.endsWith("/")
+    ? path.slice(0, -1).split("/").slice(0, -1).filter(Boolean)
+    : path.split("/").slice(0, -1).filter(Boolean)
 
   if (!parentPathChunks.length) {
     return root

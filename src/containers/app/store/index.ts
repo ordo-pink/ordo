@@ -15,7 +15,6 @@ import { debounce } from "lodash"
 
 import { registeredExtensionsReducer } from "$containers/app/store/reducers/registered-extensions"
 import { rejectedReducer } from "$containers/app/store/reducers/rejected"
-import { removedReducer } from "$containers/app/store/reducers/removed"
 import { updatedFileReducer } from "$containers/app/store/reducers/updated-file"
 import { AppState, UpdateFilePayload } from "$containers/app/types"
 import { Either } from "$core/utils/either"
@@ -111,6 +110,7 @@ export const appSlice = createSlice({
           .chain((item) =>
             Either.fromNullable(findParent(item.path, state.personalProject)).map((parent) => {
               parent.children.push(item)
+              OrdoDirectory.sort(parent.children)
             }),
           )
           .fold(noOp, noOp),
@@ -122,6 +122,7 @@ export const appSlice = createSlice({
           .chain((item) => Either.fromNullable(findParent(item.path, state.personalProject)))
           .fold(noOp, (parent) => {
             parent.children.push(OrdoDirectory.from(payload))
+            OrdoDirectory.sort(parent.children)
           }),
       )
 
@@ -141,10 +142,32 @@ export const appSlice = createSlice({
       )
 
       .addCase(removedFile.rejected, rejectedReducer)
-      .addCase(removedFile.fulfilled, removedReducer)
+      .addCase(removedFile.fulfilled, (state, { payload }) => {
+        Either.fromNullable(payload)
+          .chain((item) => Either.fromNullable(findParent(item.path, state.personalProject)))
+          .chain((parent) =>
+            Either.of(parent.children.findIndex((child) => child.path === payload.path)).chain(
+              (index) => Either.fromBoolean(index !== -1).map(() => ({ parent, index })),
+            ),
+          )
+          .fold(noOp, ({ parent, index }) => {
+            parent.children.splice(index, 1)
+          })
+      })
 
       .addCase(removedDirectory.rejected, rejectedReducer)
-      .addCase(removedDirectory.fulfilled, removedReducer)
+      .addCase(removedDirectory.fulfilled, (state, { payload }) => {
+        Either.fromNullable(payload)
+          .chain((item) => Either.fromNullable(findParent(item.path, state.personalProject)))
+          .chain((parent) =>
+            Either.of(parent.children.findIndex((child) => child.path === payload.path)).chain(
+              (index) => Either.fromBoolean(index !== -1).map(() => ({ parent, index })),
+            ),
+          )
+          .fold(noOp, ({ parent, index }) => {
+            parent.children.splice(index, 1)
+          })
+      })
 
       .addCase(updatedFile.rejected, rejectedReducer)
       // eslint-disable-next-line @typescript-eslint/no-explicit-any

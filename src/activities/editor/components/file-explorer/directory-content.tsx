@@ -25,7 +25,7 @@ export default function DirectoryContent({ directory, isExpanded }: Props) {
     <>
       {directory.children.map((child) => (
         <FileOrDirectory
-          key={child.raw.path}
+          key={child.path}
           item={child}
         />
       ))}

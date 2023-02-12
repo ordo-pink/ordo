@@ -45,7 +45,7 @@ export default function CreateModal() {
   const { t } = useTranslation()
 
   const translatedTitle = t(`@ordo-command-file-system/delete-confirmation`, {
-    path: target?.raw.path,
+    path: target?.path,
   })
 
   return Either.fromBoolean(isShown)
@@ -63,7 +63,7 @@ export default function CreateModal() {
               <div className=" break-inside-auto text-center">{translatedTitle}</div>
             </div>
 
-            <CreateModalButtonGroup path={t.raw.path} />
+            <CreateModalButtonGroup path={t.path} />
           </div>
         </div>
       </Modal>

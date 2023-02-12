@@ -92,7 +92,7 @@ export default function OpenFile() {
 
         return createSearchParams({
           association: association ? association.name : "unsupported",
-          path: file.raw.path,
+          path: file.path,
         })
       })
       .fold((searchParams) => {
@@ -140,7 +140,7 @@ export default function OpenFile() {
 
         return createSearchParams({
           association: association ? association.name : "unsupported",
-          path: file.raw.path,
+          path: file.path,
         })
       })
       .fold((searchParams) => {
@@ -204,7 +204,7 @@ export default function OpenFile() {
           <div className="open-file_modal_command-container">
             {visibleFiles.map((file, index) => (
               <OpenFileItem
-                key={file.raw.path}
+                key={file.path}
                 file={file}
                 onClick={handleClick}
                 isCurrent={currentIndex === index}

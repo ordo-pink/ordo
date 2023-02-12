@@ -68,7 +68,7 @@ export default function FileExplorer() {
       <div className="file-explorer_files-container">
         {rootDirectory.children.map((child) => (
           <FileOrDirectory
-            key={child.raw.path}
+            key={child.path}
             item={child}
           />
         ))}

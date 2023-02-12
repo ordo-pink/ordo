@@ -35,7 +35,7 @@ export default function Directory({ directory }: Props) {
 
   const { showContextMenu } = useContextMenu()
 
-  const depth = directory.raw.path.slice(1, -1).split("/").filter(Boolean).length
+  const depth = directory.path.slice(1, -1).split("/").filter(Boolean).length
 
   const paddingLeft = `${depth * 10}px`
   const hasChildren = directory && directory.children && directory.children.length > 0
@@ -51,7 +51,7 @@ export default function Directory({ directory }: Props) {
   }, [metadata])
 
   useEffect(() => {
-    setIsExpanded(expandedDirectories.includes(directory.raw.path))
+    setIsExpanded(expandedDirectories.includes(directory.path))
   }, [expandedDirectories, directory])
 
   const handleClick = lazyBox<MouseEvent>((box) =>
@@ -63,19 +63,19 @@ export default function Directory({ directory }: Props) {
 
         if (!isExpanded) {
           metadata.get("expandedDirectories").then((expanded) => {
-            if (expanded.includes(directory.raw.path)) return
+            if (expanded.includes(directory.path)) return
 
             metadata
-              .set("expandedDirectories", expanded.concat([directory.raw.path]))
+              .set("expandedDirectories", expanded.concat([directory.path]))
               .then(() => metadata.getState())
           })
         } else {
           metadata.get("expandedDirectories").then((expanded) => {
-            if (!expanded.includes(directory.raw.path)) return
+            if (!expanded.includes(directory.path)) return
 
             const expandedCopy = [...expanded]
 
-            expandedCopy.splice(expanded.indexOf(directory.raw.path), 1)
+            expandedCopy.splice(expanded.indexOf(directory.path), 1)
 
             metadata.set("expandedDirectories", expandedCopy).then(() => metadata.getState())
           })

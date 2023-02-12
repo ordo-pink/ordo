@@ -43,7 +43,7 @@ export default function PDFViewer() {
       >
         <iframe
           className="w-full h-screen"
-          title={file.raw.path}
+          title={file.path}
           src={content}
         />
       </EditorPage>

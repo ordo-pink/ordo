@@ -6,7 +6,7 @@ import { ActionContext } from "$core/types"
 
 const download = (file: IOrdoFile) => {
   window.ordo.api.fs.files
-    .getBlob(file.raw.path)
+    .getBlob(file.path)
     .then((blob) => URL.createObjectURL(blob))
     .then((url) => {
       const a = document.createElement("a")

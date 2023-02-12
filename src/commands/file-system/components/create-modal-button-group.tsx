@@ -30,11 +30,11 @@ export default function CreateModalButtonGroup({ newName, onAction }: Props) {
   const parent = fileSystemCommandsSelector((state) => state["ordo-command-file-system"].parent)
 
   const parentPath = Either.fromNullable(parent).fold(
-    () => root?.raw.path ?? "",
-    (p) => p.raw.path,
+    () => root?.path ?? "",
+    (p) => p.path,
   )
 
-  const newPath = `${parentPath}/${newName}`
+  const newPath = `${parentPath}${newName}`
 
   const handleCancelButtonClick = lazyBox((box) =>
     box.tap(onAction).fold(() => dispatch(hideCreateModal())),

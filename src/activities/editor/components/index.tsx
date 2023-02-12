@@ -79,7 +79,7 @@ export default function Editor({ metadata }: OrdoExtensionProps<EditorMetadata>)
     if (!file) return
 
     metadata.get("recentFiles").then((recent) => {
-      Switch.of(file.raw.path)
+      Switch.of(file.path)
         .case(
           (path) => recent.indexOf(path) === 0,
           () => void 0,
@@ -89,12 +89,12 @@ export default function Editor({ metadata }: OrdoExtensionProps<EditorMetadata>)
           () => {
             const recentCopy = [...recent]
 
-            recentCopy.splice(recentCopy.indexOf(file.raw.path), 1)
-            metadata.set("recentFiles", [file.raw.path].concat(recentCopy))
+            recentCopy.splice(recentCopy.indexOf(file.path), 1)
+            metadata.set("recentFiles", [file.path].concat(recentCopy))
           },
         )
         .default(() => {
-          metadata.set("recentFiles", [file.raw.path].concat(recent))
+          metadata.set("recentFiles", [file.path].concat(recent))
         })
     })
   }, [path, tree, metadata, dispatch])

@@ -14,7 +14,7 @@ export const findParent = (
 ) => {
   if (!root) return null
 
-  const path = typeof child === "string" ? child : child.raw.path
+  const path = typeof child === "string" ? child : child.path
 
   const parentPathChunks = path.split("/").slice(0, -1).filter(Boolean)
 
@@ -25,7 +25,7 @@ export const findParent = (
   let parent: IOrdoDirectory = root
 
   for (const chunk of parentPathChunks) {
-    const found = parent.children.find((child) => child.raw.path === `${parent.raw.path}${chunk}/`)
+    const found = parent.children.find((child) => child.path === `${parent.path}${chunk}/`)
 
     if (!found || !OrdoDirectory.isOrdoDirectory(found)) return parent
 
@@ -41,11 +41,11 @@ export const findOrdoFile = (
 ) => {
   if (!root) return null
 
-  const path = typeof child === "string" ? child : child.raw.path
+  const path = typeof child === "string" ? child : child.path
 
   const parent = findParent(path, root)
 
-  const found = parent?.children.find((child) => child.raw.path === path)
+  const found = parent?.children.find((child) => child.path === path)
 
   if (!found || OrdoDirectory.isOrdoDirectory(found)) return null
 

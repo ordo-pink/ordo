@@ -43,7 +43,7 @@ export default function ImgViewer() {
       >
         <img
           className="shadow-lg"
-          title={file.raw.path}
+          title={file.path}
           src={content}
           alt={file.readableName}
         />

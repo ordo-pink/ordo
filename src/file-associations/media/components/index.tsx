@@ -66,7 +66,7 @@ export default function MediaViewer() {
             <source src={content} />
             <track
               kind="captions"
-              src={file.raw.path}
+              src={file.path}
             />
           </video>
         ) : (
@@ -77,7 +77,7 @@ export default function MediaViewer() {
           >
             <track
               kind="captions"
-              src={file.raw.path}
+              src={file.path}
             />
           </audio>
         )}

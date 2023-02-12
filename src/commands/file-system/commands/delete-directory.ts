@@ -7,7 +7,7 @@ export const DeleteDirectoryCommand = createOrdoCommand<"ordo-command-file-syste
   Icon: () => import("$commands/file-system/components/delete-directory-icon"),
   title: "@ordo-command-file-system/delete-directory",
   showInCommandPalette: false,
-  showInContextMenu: (target) => OrdoDirectory.isOrdoDirectory(target) && target.raw.path !== "/",
+  showInContextMenu: (target) => OrdoDirectory.isOrdoDirectory(target) && target.path !== "/",
   action: ({ dispatch, contextMenuTarget }) => {
     if (!contextMenuTarget || !OrdoDirectory.isOrdoDirectory(contextMenuTarget)) return
 

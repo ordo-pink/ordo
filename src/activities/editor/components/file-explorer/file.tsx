@@ -25,10 +25,10 @@ export default function File({ file }: Props) {
 
   const { showContextMenu } = useContextMenu()
 
-  const depth = file.raw.path.split("/").filter(Boolean).length
+  const depth = file.path.split("/").filter(Boolean).length
 
   const paddingLeft = `${depth * 10}px`
-  const isCurrent = query.has("path") && query.get("path") === file.raw.path
+  const isCurrent = query.has("path") && query.get("path") === file.path
 
   const association = fileAssociations.find((assoc) =>
     assoc.fileExtensions.includes(file.extension),
@@ -43,7 +43,7 @@ export default function File({ file }: Props) {
       .map(() =>
         createSearchParams({
           association: association ? association.name : "unsupported",
-          path: file.raw.path,
+          path: file.path,
         }),
       )
       .fold((searchParams) =>

@@ -109,7 +109,7 @@ export const appSlice = createSlice({
             OrdoDirectory.isOrdoDirectoryRaw(data) ? OrdoDirectory.from(data) : OrdoFile.from(data),
           )
           .chain((item) =>
-            Either.fromNullable(findParent(item.raw.path, state.personalProject)).map((parent) => {
+            Either.fromNullable(findParent(item.path, state.personalProject)).map((parent) => {
               parent.children.push(item)
             }),
           )

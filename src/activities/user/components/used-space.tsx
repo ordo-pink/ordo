@@ -9,9 +9,7 @@ import { convertBytesToMb } from "$core/utils/size-format-helper"
 const spaceLimitMB = Number(process.env.REACT_USER_SPACE_LIMIT || 50)
 
 const sizeReducer = (totalSize: number) => (acc: number, item: IOrdoFile | IOrdoDirectory) =>
-  OrdoDirectory.isOrdoDirectory(item)
-    ? acc + calculateTreeSize(item, totalSize)
-    : acc + item.raw.size
+  OrdoDirectory.isOrdoDirectory(item) ? acc + calculateTreeSize(item, totalSize) : acc + item.size
 
 export const calculateTreeSize = (directory: Nullable<IOrdoDirectory>, size = 0): number =>
   Either.fromNullable(directory)

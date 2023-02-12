@@ -9,8 +9,8 @@ export const removedReducer: CaseReducer<AppState> = (state, { payload }) => {
   Either.fromNullable(payload)
     .chain(getItemParent(state.personalProject))
     .chain((parent) =>
-      Either.of(parent.children.findIndex((child) => child.raw.path === payload.path)).chain(
-        (index) => Either.fromBoolean(!!~index).map(() => ({ parent, index })),
+      Either.of(parent.children.findIndex((child) => child.path === payload.path)).chain((index) =>
+        Either.fromBoolean(!!~index).map(() => ({ parent, index })),
       ),
     )
     .fold(noOp, ({ parent, index }) => {

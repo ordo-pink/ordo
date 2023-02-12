@@ -119,7 +119,7 @@ export default function MdEditor() {
 
             if (!markdownString) return
 
-            dispatch(updatedFile({ path: file.raw.path, content: markdownString }))
+            dispatch(updatedFile({ path: file.path, content: markdownString }))
           }
 
           setEditorState(state)

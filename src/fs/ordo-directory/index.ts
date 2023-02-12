@@ -20,7 +20,7 @@ export interface IOrdoDirectoryRaw {
 
 export type IOrdoDirectory = {
   get readableName(): string
-  get path(): string
+  get path(): OrdoDirectoryPath
   get children(): OrdoFsEntity[]
 }
 

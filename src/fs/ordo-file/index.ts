@@ -70,7 +70,7 @@ export interface IOrdoFileRawInitParams {
   /**
    * @see IOrdoFileRaw.path
    */
-  path: string
+  path: OrdoFilePath
 
   /**
    * @see IOrdoFileRaw.size

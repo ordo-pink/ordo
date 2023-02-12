@@ -8,10 +8,16 @@ import {
   validateFileOldPathAndNewPath,
 } from "."
 
+const logger = {
+  warn: console.log,
+  info: console.log,
+  error: console.log,
+}
+
 describe("validate-path", () => {
   describe("validate-directory-path", () => {
     it("should work on valid path", () => {
-      const req = { params: { path: "/test/" } } as unknown as Request<any>
+      const req = { params: { logger, path: "/test/" } } as unknown as Request<any>
 
       let status = 0
 
@@ -31,7 +37,7 @@ describe("validate-path", () => {
 
     describe("path", () => {
       it("should fail without trailing slash", () => {
-        const req = { params: { path: "/test.md" } } as unknown as Request<any>
+        const req = { params: { logger, path: "/test.md" } } as unknown as Request<any>
 
         let status = 0
 
@@ -50,7 +56,7 @@ describe("validate-path", () => {
       })
 
       it("should fail without leading slash", () => {
-        const req = { params: { path: "test.md/" } } as unknown as Request<any>
+        const req = { params: { logger, path: "test.md/" } } as unknown as Request<any>
 
         let status = 0
 
@@ -70,7 +76,7 @@ describe("validate-path", () => {
 
       disallowedCharacters.forEach((character) => {
         it(`should fail with "${character}" in path`, () => {
-          const req = { params: { path: `/${character}/test/` } } as unknown as Request<any>
+          const req = { params: { logger, path: `/${character}/test/` } } as unknown as Request<any>
 
           let status = 0
 
@@ -92,7 +98,7 @@ describe("validate-path", () => {
 
     describe("old-path", () => {
       it("should fail without trailing slash", () => {
-        const req = { params: { oldPath: "/test.md" } } as unknown as Request<any>
+        const req = { params: { logger, oldPath: "/test.md" } } as unknown as Request<any>
 
         let status = 0
 
@@ -111,7 +117,7 @@ describe("validate-path", () => {
       })
 
       it("should fail without leading slash", () => {
-        const req = { params: { oldPath: "test.md/" } } as unknown as Request<any>
+        const req = { params: { logger, oldPath: "test.md/" } } as unknown as Request<any>
 
         let status = 0
 
@@ -131,7 +137,9 @@ describe("validate-path", () => {
 
       disallowedCharacters.forEach((character) => {
         it(`should fail with "${character}" in oldPath`, () => {
-          const req = { params: { oldPath: `/${character}/test/` } } as unknown as Request<any>
+          const req = {
+            params: { logger, oldPath: `/${character}/test/` },
+          } as unknown as Request<any>
 
           let status = 0
 
@@ -154,7 +162,7 @@ describe("validate-path", () => {
     describe("new-path", () => {
       it("should fail on newPath slash", () => {
         const req = {
-          params: { newPath: "/", oldPath: "/test/" },
+          params: { logger, newPath: "/", oldPath: "/test/" },
         } as unknown as Request<any>
 
         let status = 0
@@ -174,7 +182,7 @@ describe("validate-path", () => {
 
       it("should fail on oldPath slash", () => {
         const req = {
-          params: { oldPath: "/", newPath: "/test/" },
+          params: { logger, oldPath: "/", newPath: "/test/" },
         } as unknown as Request<any>
 
         let status = 0
@@ -194,7 +202,7 @@ describe("validate-path", () => {
 
       it("should fail no path", () => {
         const req = {
-          params: { newPath: "", oldPath: "/test/" },
+          params: { logger, newPath: "", oldPath: "/test/" },
         } as unknown as Request<any>
 
         let status = 0
@@ -214,7 +222,7 @@ describe("validate-path", () => {
 
       it("should fail on the same path", () => {
         const req = {
-          params: { newPath: "/test/", oldPath: "/test/" },
+          params: { logger, newPath: "/test/", oldPath: "/test/" },
         } as unknown as Request<any>
 
         let status = 0
@@ -234,7 +242,7 @@ describe("validate-path", () => {
 
       it("should not fail if everything is fine", () => {
         const req = {
-          params: { newPath: "/test/", oldPath: "/1/test/" },
+          params: { logger, newPath: "/test/", oldPath: "/1/test/" },
         } as unknown as Request<any>
 
         let status = 0
@@ -253,7 +261,7 @@ describe("validate-path", () => {
       })
 
       it("should fail without trailing slash", () => {
-        const req = { params: { newPath: "/test.md" } } as unknown as Request<any>
+        const req = { params: { logger, newPath: "/test.md" } } as unknown as Request<any>
 
         let status = 0
 
@@ -272,7 +280,7 @@ describe("validate-path", () => {
       })
 
       it("should fail without leading slash", () => {
-        const req = { params: { newPath: "test.md/" } } as unknown as Request<any>
+        const req = { params: { logger, newPath: "test.md/" } } as unknown as Request<any>
 
         let status = 0
 
@@ -292,7 +300,9 @@ describe("validate-path", () => {
 
       disallowedCharacters.forEach((character) => {
         it(`should fail with "${character}" in newPath`, () => {
-          const req = { params: { newPath: `/${character}/test/` } } as unknown as Request<any>
+          const req = {
+            params: { logger, newPath: `/${character}/test/` },
+          } as unknown as Request<any>
 
           let status = 0
 
@@ -315,7 +325,7 @@ describe("validate-path", () => {
 
   describe("validate-file-path", () => {
     it("should work on valid path", () => {
-      const req = { params: { path: "/test.md" } } as unknown as Request<any>
+      const req = { params: { logger, path: "/test.md" } } as unknown as Request<any>
 
       let status = 0
 
@@ -335,7 +345,7 @@ describe("validate-path", () => {
 
     describe("path", () => {
       it("should fail with trailing slash", () => {
-        const req = { params: { path: "/test/" } } as unknown as Request<any>
+        const req = { params: { logger, path: "/test/" } } as unknown as Request<any>
 
         let status = 0
 
@@ -353,7 +363,7 @@ describe("validate-path", () => {
       })
 
       it("should fail without leading slash", () => {
-        const req = { params: { path: "test.md" } } as unknown as Request<any>
+        const req = { params: { logger, path: "test.md" } } as unknown as Request<any>
 
         let status = 0
 
@@ -373,7 +383,7 @@ describe("validate-path", () => {
 
       disallowedCharacters.forEach((character) => {
         it(`should fail with "${character}" in path`, () => {
-          const req = { params: { path: `/${character}/test/` } } as unknown as Request<any>
+          const req = { params: { logger, path: `/${character}/test/` } } as unknown as Request<any>
 
           let status = 0
 
@@ -395,7 +405,7 @@ describe("validate-path", () => {
 
     describe("old-path", () => {
       it("should fail with trailing slash", () => {
-        const req = { params: { oldPath: "/test/" } } as unknown as Request<any>
+        const req = { params: { logger, oldPath: "/test/" } } as unknown as Request<any>
 
         let status = 0
 
@@ -413,7 +423,7 @@ describe("validate-path", () => {
       })
 
       it("should fail without leading slash", () => {
-        const req = { params: { oldPath: "test.md" } } as unknown as Request<any>
+        const req = { params: { logger, oldPath: "test.md" } } as unknown as Request<any>
 
         let status = 0
 
@@ -433,7 +443,9 @@ describe("validate-path", () => {
 
       disallowedCharacters.forEach((character) => {
         it(`should fail with "${character}" in oldPath`, () => {
-          const req = { params: { oldPath: `/${character}/test/` } } as unknown as Request<any>
+          const req = {
+            params: { logger, oldPath: `/${character}/test/` },
+          } as unknown as Request<any>
 
           let status = 0
 
@@ -455,7 +467,7 @@ describe("validate-path", () => {
 
     describe("new-path", () => {
       it("should fail with trailing slash", () => {
-        const req = { params: { newPath: "/test/" } } as unknown as Request<any>
+        const req = { params: { logger, newPath: "/test/" } } as unknown as Request<any>
 
         let status = 0
 
@@ -473,7 +485,9 @@ describe("validate-path", () => {
       })
 
       it("should fail no path", () => {
-        const req = { params: { newPath: "", oldPath: "/test.md" } } as unknown as Request<any>
+        const req = {
+          params: { logger, newPath: "", oldPath: "/test.md" },
+        } as unknown as Request<any>
 
         let status = 0
 
@@ -492,7 +506,7 @@ describe("validate-path", () => {
 
       it("should fail on the same path", () => {
         const req = {
-          params: { newPath: "/test.md", oldPath: "/test.md" },
+          params: { logger, newPath: "/test.md", oldPath: "/test.md" },
         } as unknown as Request<any>
 
         let status = 0
@@ -512,7 +526,7 @@ describe("validate-path", () => {
 
       it("should not fail if everything is fine", () => {
         const req = {
-          params: { newPath: "/test.md", oldPath: "/1/test.md" },
+          params: { logger, newPath: "/test.md", oldPath: "/1/test.md" },
         } as unknown as Request<any>
 
         let status = 0
@@ -531,7 +545,7 @@ describe("validate-path", () => {
       })
 
       it("should fail without leading slash", () => {
-        const req = { params: { newPath: "test.md" } } as unknown as Request<any>
+        const req = { params: { logger, newPath: "test.md" } } as unknown as Request<any>
 
         let status = 0
 
@@ -551,7 +565,9 @@ describe("validate-path", () => {
 
       disallowedCharacters.forEach((character) => {
         it(`should fail with "${character}" in newPath`, () => {
-          const req = { params: { newPath: `/${character}/test/` } } as unknown as Request<any>
+          const req = {
+            params: { logger, newPath: `/${character}/test/` },
+          } as unknown as Request<any>
 
           let status = 0
 

@@ -5,9 +5,15 @@ import {
   appendTrailingDirectoryPathSlash,
 } from "."
 
+const logger = {
+  warn: console.log,
+  info: console.log,
+  error: console.log,
+}
+
 describe("append-trailing-directory-path-slash", () => {
   it("should append trailing slash in the params object", () => {
-    const req = { params: { path: "/1/2/test" } } as unknown as Request<any>
+    const req = { params: { path: "/1/2/test", logger } } as unknown as Request<any>
 
     const res = {} as Response
     const next = () => void 0
@@ -18,7 +24,7 @@ describe("append-trailing-directory-path-slash", () => {
 
   it("should work with multiple dynamic params inside the same route", () => {
     const req = {
-      params: { oldPath: "/1/2/test", newPath: "/4/test" },
+      params: { oldPath: "/1/2/test", newPath: "/4/test", logger },
     } as unknown as Request<any>
 
     const res = {} as Response

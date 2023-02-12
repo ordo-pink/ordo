@@ -2,9 +2,15 @@
 import { Request, Response } from "express"
 import { prependOldPathAndNewPathSlashes, prependPathSlash } from "."
 
+const logger = {
+  warn: console.log,
+  info: console.log,
+  error: console.log,
+}
+
 describe("prepend-slash", () => {
   it("should prepend slash in the params object", () => {
-    const req = { params: { path: "1/2/test" } } as unknown as Request<any>
+    const req = { params: { path: "1/2/test", logger } } as unknown as Request<any>
 
     const res = {} as Response
     const next = () => void 0
@@ -15,7 +21,7 @@ describe("prepend-slash", () => {
 
   it("should work with multiple params inside the same route", () => {
     const req = {
-      params: { oldPath: "1/2/test", newPath: "4/test" },
+      params: { oldPath: "1/2/test", newPath: "4/test", logger },
     } as unknown as Request<any>
 
     const res = {} as Response

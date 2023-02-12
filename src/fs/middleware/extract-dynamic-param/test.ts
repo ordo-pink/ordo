@@ -2,11 +2,17 @@
 import { Request, Response } from "express"
 import { extractDynamicParam } from "."
 
+const logger = {
+  warn: console.log,
+  info: console.log,
+  error: console.log,
+}
+
 describe("extract-dynamic-param", () => {
   it("should properly provide the dynamic param in the params object", () => {
     const keys = ["path"]
 
-    const req = { params: { path: "1", 0: "/2/test" } } as unknown as Request<any>
+    const req = { params: { path: "1", 0: "/2/test", logger } } as unknown as Request<any>
 
     const extractPath = extractDynamicParam(keys)
 
@@ -20,7 +26,7 @@ describe("extract-dynamic-param", () => {
   it("should extract params for 1 character long path", () => {
     const keys = ["path"]
 
-    const req = { params: { path: "1" } } as unknown as Request<any>
+    const req = { params: { path: "1", logger } } as unknown as Request<any>
 
     const extractPath = extractDynamicParam(keys)
 
@@ -35,7 +41,7 @@ describe("extract-dynamic-param", () => {
     const keys = ["oldPath", "newPath"]
 
     const req = {
-      params: { oldPath: "1", 0: "/2/test", newPath: "4", 1: "/test" },
+      params: { oldPath: "1", 0: "/2/test", newPath: "4", 1: "/test", logger },
     } as unknown as Request<any>
 
     const extractPath = extractDynamicParam(keys)
@@ -52,7 +58,7 @@ describe("extract-dynamic-param", () => {
     const keys = ["oldPath", "newPath"]
 
     const req = {
-      params: { oldPath: "1", 0: "/2/test", userId: "123" },
+      params: { oldPath: "1", 0: "/2/test", userId: "123", logger },
     } as unknown as Request<any>
 
     const extractPath = extractDynamicParam(keys)

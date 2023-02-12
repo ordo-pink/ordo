@@ -2,9 +2,15 @@
 import { Request, Response } from "express"
 import { setContentTypeHeader } from "."
 
+const logger = {
+  warn: console.log,
+  info: console.log,
+  error: console.log,
+}
+
 describe("set-content-type-header", () => {
   it("should set content-type to response headers", () => {
-    const req = { params: { path: "/test.md" } } as unknown as Request<any>
+    const req = { params: { path: "/test.md", logger } } as unknown as Request<any>
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const headers: any = {}
@@ -19,7 +25,7 @@ describe("set-content-type-header", () => {
   })
 
   it("should fall back to octet-stream if content-type is unknown", () => {
-    const req = { params: { path: "/test.asdfasdf" } } as unknown as Request<any>
+    const req = { params: { path: "/test.asdfasdf", logger } } as unknown as Request<any>
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const headers: any = {}

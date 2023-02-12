@@ -1,4 +1,4 @@
-import { OrdoFile } from "."
+import { OrdoFile, OrdoFilePath } from "."
 import { disallowedCharacters } from "../common"
 
 describe("ordo-file", () => {
@@ -36,7 +36,7 @@ describe("ordo-file", () => {
 
     it("should the path if leading slash is missing", () => {
       const updatedAt = new Date()
-      const file = OrdoFile.from({ path: "123.md", size: 0, updatedAt })
+      const file = OrdoFile.from({ path: "123.md" as unknown as OrdoFilePath, size: 0, updatedAt })
 
       expect(file.extension).toBe(".md")
       expect(file.readableName).toBe("123")

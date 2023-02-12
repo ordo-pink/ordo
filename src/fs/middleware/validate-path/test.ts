@@ -9,9 +9,9 @@ import {
 } from "."
 
 const logger = {
-  warn: console.log,
-  info: console.log,
-  error: console.log,
+  warn: jest.fn(),
+  info: jest.fn(),
+  error: jest.fn(),
 }
 
 describe("validate-path", () => {

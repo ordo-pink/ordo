@@ -20,6 +20,11 @@ export const OrdoDirectoryModel = (driver: FSDriver): IOrdoDirectoryModel => ({
           : { path, parentDirectoryExists },
       )
       .then(async ({ path, parentDirectoryExists }) => {
+        if (OrdoDirectory.getParentPath(path) === "/" && !parentDirectoryExists) {
+          await driver.createDirectory("/")
+          parentDirectoryExists = true
+        }
+
         const parentDirectory = !parentDirectoryExists
           ? await OrdoDirectoryModel(driver).createDirectory(OrdoDirectory.getParentPath(path))
           : null
@@ -37,6 +42,7 @@ export const OrdoDirectoryModel = (driver: FSDriver): IOrdoDirectoryModel => ({
   deleteDirectory: (path) =>
     driver
       .checkDirectoryExists(path)
+      .then((exists) => (path === "/" ? Promise.reject(ExceptionResponse.CONFLICT) : exists))
       .then((exists) => (exists ? path : Promise.reject(ExceptionResponse.NOT_FOUND)))
       .then(() => OrdoDirectory.raw({ path, children: [] }))
       .then(async (directory) => {
@@ -48,6 +54,14 @@ export const OrdoDirectoryModel = (driver: FSDriver): IOrdoDirectoryModel => ({
   getDirectory: (path) =>
     driver
       .checkDirectoryExists(path)
+      .then(async (exists) => {
+        if (path === "/" && !exists) {
+          await driver.createDirectory("/")
+          return true
+        }
+
+        return exists
+      })
       .then((exists) => (exists ? path : Promise.reject(ExceptionResponse.NOT_FOUND)))
       .then(driver.getDirectoryChildren)
       .then(async (children) => {
@@ -71,7 +85,7 @@ export const OrdoDirectoryModel = (driver: FSDriver): IOrdoDirectoryModel => ({
       driver.checkDirectoryExists(OrdoDirectory.getParentPath(newPath)),
     ])
       .then(([oldDirectoryExists, newDirectoryExists, newDirectoryParentExists]) =>
-        newDirectoryExists
+        newDirectoryExists || oldPath === newPath
           ? Promise.reject(ExceptionResponse.CONFLICT)
           : !oldDirectoryExists
           ? Promise.reject(ExceptionResponse.NOT_FOUND)
@@ -79,7 +93,7 @@ export const OrdoDirectoryModel = (driver: FSDriver): IOrdoDirectoryModel => ({
       )
       .then(async ({ oldPath, newPath, newDirectoryParentExists }) => {
         const parentDirectory = !newDirectoryParentExists
-          ? await driver.createDirectory(OrdoDirectory.getParentPath(newPath))
+          ? await OrdoDirectoryModel(driver).createDirectory(OrdoDirectory.getParentPath(newPath))
           : null
 
         return { oldPath, newPath, parentDirectory }
@@ -90,7 +104,7 @@ export const OrdoDirectoryModel = (driver: FSDriver): IOrdoDirectoryModel => ({
       }))
       .then(({ directory, parentDirectory }) =>
         parentDirectory
-          ? OrdoDirectoryModel(driver).getDirectory(parentDirectory)
+          ? OrdoDirectoryModel(driver).getDirectory(parentDirectory.path)
           : OrdoDirectoryModel(driver).getDirectory(directory),
       ),
 })

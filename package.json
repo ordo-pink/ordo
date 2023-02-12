@@ -68,7 +68,7 @@
     "webpack-node-externals": "^3.0.0"
   },
   "dependencies": {
-    "@ordo-pink/core": "^0.2.0",
+    "@ordo-pink/core": "^0.2.1",
     "@ordo-pink/switch": "^1.1.1",
     "body-parser": "^1.20.1",
     "cors": "^2.8.5",

@@ -3,9 +3,9 @@ import { Request, Response } from "express"
 import { setContentTypeHeader } from "."
 
 const logger = {
-  warn: console.log,
-  info: console.log,
-  error: console.log,
+  warn: jest.fn(),
+  info: jest.fn(),
+  error: jest.fn(),
 }
 
 describe("set-content-type-header", () => {

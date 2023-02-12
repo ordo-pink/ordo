@@ -25,8 +25,8 @@ describe("ordo-directory", () => {
     it("should return false if it is not an OrdoDirectory", () => {
       expect(
         OrdoDirectory.isOrdoDirectory({
-          path: "/test.md/",
-          extension: ".md",
+          path: "/test.md",
+          children: [],
           readableName: "test",
         } as unknown as IOrdoDirectory),
       ).toBe(false)
@@ -34,7 +34,6 @@ describe("ordo-directory", () => {
       expect(
         OrdoDirectory.isOrdoDirectory({
           path: "/test/",
-          children: [],
           readableName: "test",
         } as unknown as IOrdoDirectory),
       ).toBe(false)
@@ -85,7 +84,7 @@ describe("ordo-directory", () => {
     it(`should fail with "${character}" in path`, () => {
       const directory = OrdoDirectory.from({ path: `/${character}/test` })
 
-      expect(OrdoDirectory.isValidPath(directory.raw.path)).toBe(false)
+      expect(OrdoDirectory.isValidPath(directory.path)).toBe(false)
     })
   })
 })

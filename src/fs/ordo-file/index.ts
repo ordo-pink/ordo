@@ -39,6 +39,20 @@ export interface IOrdoFileRaw {
  */
 export type IOrdoFile = {
   /**
+   * @see IOrdoFileRaw.path
+   */
+  get path(): OrdoFilePath
+
+  /**
+   * @see IOrdoFileRaw.size
+   */
+  get size(): number
+
+  /**
+   * @see IOrdoFileRaw.updatedAt
+   */
+  get updatedAt(): Date
+  /**
    * Readable name of the file.
    */
   get readableName(): string
@@ -47,11 +61,6 @@ export type IOrdoFile = {
    * File extension. Must be a valid OrdoFileExtension.
    */
   get extension(): OrdoFileExtension
-
-  /**
-   * Access to the IOrdoFileRaw.
-   */
-  get raw(): IOrdoFileRaw
 }
 
 /**
@@ -139,7 +148,7 @@ export const OrdoFile: IOrdoFileStatic = {
     Boolean(x) &&
     typeof (x as IOrdoFile).readableName === "string" &&
     typeof (x as IOrdoFile).extension === "string" &&
-    OrdoFile.isOrdoFileRaw((x as IOrdoFile).raw),
+    OrdoFile.isOrdoFileRaw(x),
   isOrdoFileRaw: (x): x is IOrdoFileRaw =>
     Boolean(x) &&
     typeof (x as IOrdoFileRaw).size === "number" &&
@@ -183,8 +192,14 @@ export const ordoFile = (raw: IOrdoFileRaw): IOrdoFile => {
     get extension() {
       return extension
     },
-    get raw() {
-      return raw
+    get path() {
+      return raw.path
+    },
+    get updatedAt() {
+      return raw.updatedAt
+    },
+    get size() {
+      return raw.size
     },
   }
 }

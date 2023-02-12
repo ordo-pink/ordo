@@ -29,9 +29,9 @@ describe("ordo-file", () => {
 
       expect(file.extension).toBe(".md")
       expect(file.readableName).toBe("123")
-      expect(file.raw.path).toBe("/123.md")
-      expect(file.raw.size).toBe(0)
-      expect(file.raw.updatedAt).toBe(updatedAt)
+      expect(file.path).toBe("/123.md")
+      expect(file.size).toBe(0)
+      expect(file.updatedAt).toBe(updatedAt)
     })
 
     it("should the path if leading slash is missing", () => {
@@ -40,9 +40,9 @@ describe("ordo-file", () => {
 
       expect(file.extension).toBe(".md")
       expect(file.readableName).toBe("123")
-      expect(file.raw.path).toBe("/123.md")
-      expect(file.raw.size).toBe(0)
-      expect(file.raw.updatedAt).toBe(updatedAt)
+      expect(file.path).toBe("/123.md")
+      expect(file.size).toBe(0)
+      expect(file.updatedAt).toBe(updatedAt)
     })
   })
 
@@ -108,7 +108,7 @@ describe("ordo-file", () => {
     it(`should fail with "${character}" in path`, () => {
       const directory = OrdoFile.from({ path: `/${character}/test.md`, size: 0 })
 
-      expect(OrdoFile.isValidPath(directory.raw.path)).toBe(false)
+      expect(OrdoFile.isValidPath(directory.path)).toBe(false)
     })
   })
 })

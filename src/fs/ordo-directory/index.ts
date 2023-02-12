@@ -20,8 +20,8 @@ export interface IOrdoDirectoryRaw {
 
 export type IOrdoDirectory = {
   get readableName(): string
+  get path(): string
   get children(): OrdoFsEntity[]
-  get raw(): IOrdoDirectoryRaw
 }
 
 export interface IOrdoDirectoryStatic {
@@ -62,7 +62,7 @@ export const OrdoDirectory: IOrdoDirectoryStatic = {
     Boolean(x) &&
     typeof (x as IOrdoDirectory).readableName === "string" &&
     Array.isArray((x as IOrdoDirectory).children) &&
-    OrdoDirectory.isOrdoDirectoryRaw((x as IOrdoDirectory).raw),
+    OrdoDirectory.isOrdoDirectoryRaw(x),
   isValidPath: (path) => isValidPath(path) && endsWithSlash(path),
   sort: (children) => {
     children.sort((a, b) => {
@@ -130,8 +130,8 @@ export const ordoDirectory = (raw: IOrdoDirectoryRaw): IOrdoDirectory => {
     get children() {
       return children
     },
-    get raw() {
-      return raw
+    get path() {
+      return raw.path
     },
   }
 }

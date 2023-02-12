@@ -9,7 +9,35 @@ import {
 } from "@ordo-pink/core"
 import { RequestHandler } from "express"
 
+import { Jwt, JwtPayload } from "jsonwebtoken"
+import {
+  NEW_PATH_PARAM,
+  OLD_PATH_PARAM,
+  PATH_PARAM,
+  TOKEN_PARSED_PARAM,
+  USER_ID_PARAM,
+} from "./constants"
 import { Logger } from "../types"
+
+export type Params<T extends Record<string, unknown>> = T & {
+  [USER_ID_PARAM]: string
+  [TOKEN_PARSED_PARAM]: string | JwtPayload | Jwt
+}
+
+export type PathParams<T extends OrdoDirectoryPath | OrdoFilePath> = Params<{
+  [PATH_PARAM]: T
+}>
+
+export type TwoPathsParams<T extends OrdoDirectoryPath | OrdoFilePath> = Params<{
+  [OLD_PATH_PARAM]: T
+  [NEW_PATH_PARAM]: T
+}>
+
+export type OrdoFilePathParams = PathParams<OrdoFilePath>
+export type OrdoFileTwoPathsParams = TwoPathsParams<OrdoFilePath>
+
+export type OrdoDirectoryPathParams = PathParams<OrdoDirectoryPath>
+export type OrdoDirectoryTwoPathsParams = TwoPathsParams<OrdoDirectoryPath>
 
 export type IOrdoFileModel = {
   exists: UnaryFn<OrdoFilePath, Promise<boolean>>

@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { Request, Response } from "express"
 import { extractDynamicParam } from "."
 
@@ -5,7 +6,7 @@ describe("extract-dynamic-param", () => {
   it("should properly provide the dynamic param in the params object", () => {
     const keys = ["path"]
 
-    const req = { params: { path: "1", 0: "/2/test" } } as unknown as Request
+    const req = { params: { path: "1", 0: "/2/test" } } as unknown as Request<any>
 
     const extractPath = extractDynamicParam(keys)
 
@@ -16,12 +17,26 @@ describe("extract-dynamic-param", () => {
     expect(req.params.path).toEqual("/1/2/test")
   })
 
+  it("should extract params for 1 character long path", () => {
+    const keys = ["path"]
+
+    const req = { params: { path: "1" } } as unknown as Request<any>
+
+    const extractPath = extractDynamicParam(keys)
+
+    const res = {} as Response
+    const next = () => void 0
+    extractPath(req, res, next)
+
+    expect(req.params.path).toEqual("/1")
+  })
+
   it("should work with multiple dynamic params inside the same route", () => {
     const keys = ["oldPath", "newPath"]
 
     const req = {
       params: { oldPath: "1", 0: "/2/test", newPath: "4", 1: "/test" },
-    } as unknown as Request
+    } as unknown as Request<any>
 
     const extractPath = extractDynamicParam(keys)
 
@@ -38,7 +53,7 @@ describe("extract-dynamic-param", () => {
 
     const req = {
       params: { oldPath: "1", 0: "/2/test", userId: "123" },
-    } as unknown as Request
+    } as unknown as Request<any>
 
     const extractPath = extractDynamicParam(keys)
 

@@ -1,16 +1,33 @@
 import { RequestHandler } from "express"
+import { NEW_PATH_PARAM, OLD_PATH_PARAM, PATH_PARAM } from "../../constants"
+import {
+  OrdoDirectoryPathParams,
+  OrdoDirectoryTwoPathsParams,
+  OrdoFilePathParams,
+  OrdoFileTwoPathsParams,
+} from "../../types"
 
-export const prependSlash: RequestHandler = (req, _, next) => {
-  if (req.params.path && !req.params.path.startsWith("/")) {
-    req.params.path = `/${req.params.path}`
+export const prependPathSlash: RequestHandler<OrdoDirectoryPathParams | OrdoFilePathParams> = (
+  req,
+  _,
+  next,
+) => {
+  if (!req.params[PATH_PARAM].startsWith("/")) {
+    req.params[PATH_PARAM] = `/${req.params[PATH_PARAM]}`
   }
 
-  if (req.params.oldPath && !req.params.oldPath.startsWith("/")) {
-    req.params.oldPath = `/${req.params.oldPath}`
+  next()
+}
+
+export const prependOldPathAndNewPathSlashes: RequestHandler<
+  OrdoDirectoryTwoPathsParams | OrdoFileTwoPathsParams
+> = (req, _, next) => {
+  if (!req.params[OLD_PATH_PARAM].startsWith("/")) {
+    req.params[OLD_PATH_PARAM] = `/${req.params[OLD_PATH_PARAM]}`
   }
 
-  if (req.params.newPath && !req.params.newPath.startsWith("/")) {
-    req.params.newPath = `/${req.params.newPath}`
+  if (!req.params[NEW_PATH_PARAM].startsWith("/")) {
+    req.params[NEW_PATH_PARAM] = `/${req.params[NEW_PATH_PARAM]}`
   }
 
   next()

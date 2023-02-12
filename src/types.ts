@@ -1,6 +1,7 @@
-import type { RequestHandler } from "express"
-
-import { FSDriver } from "./fs/types"
+import { UnaryFn } from "@ordo-pink/core"
+import cors from "cors"
+import express, { RequestHandler } from "express"
+import { FSDriver, Params } from "./fs/types"
 
 export type Logger = {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -11,8 +12,14 @@ export type Logger = {
   error: (message: any) => void
 }
 
-export type AppContext = {
-  fsDriver: FSDriver
-  authorize: RequestHandler
+export type Drivers = {
+  fs: FSDriver
+}
+
+export type CreateOrdoBackendServerParams = {
+  drivers: Drivers
+  prependMiddleware?: UnaryFn<ReturnType<typeof express>, ReturnType<typeof express>>
+  corsOptions?: Parameters<typeof cors>[0]
+  authorize: RequestHandler<Params<Record<string, unknown>>>
   logger: Logger
 }

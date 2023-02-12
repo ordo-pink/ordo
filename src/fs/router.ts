@@ -17,25 +17,30 @@ import { getFileHandler } from "./handlers/files/get"
 import { moveFileHandler } from "./handlers/files/move"
 import { removeFileHandler } from "./handlers/files/remove"
 import { updateFileHandler } from "./handlers/files/update"
-import { addUserIdToPath } from "./middleware/add-user-id-to-path"
-import { appendTrailingDirectoryPathSlash } from "./middleware/append-trailing-directory-slash"
+import { addUserIdToOldPathAndNewPath, addUserIdToPath } from "./middleware/add-user-id-to-path"
+import {
+  appendTrailingDirectoryOldPathAndNewPathSlashes,
+  appendTrailingDirectoryPathSlash,
+} from "./middleware/append-trailing-directory-slash"
 import { extractDynamicParam } from "./middleware/extract-dynamic-param"
-import { logRequest } from "./middleware/log-request"
-import { prependSlash } from "./middleware/prepend-slash"
+import { prependPathSlash, prependOldPathAndNewPathSlashes } from "./middleware/prepend-slash"
 import { setContentTypeHeader } from "./middleware/set-content-type-header"
 import { setRootPathParam } from "./middleware/set-root-path-param"
-import { validateFilePath, validateDirectoryPath } from "./middleware/validate-path"
+import {
+  validateFilePath,
+  validateDirectoryPath,
+  validateFileOldPathAndNewPath,
+  validateDirectoryOldPathAndNewPath,
+} from "./middleware/validate-path"
 import { OrdoDirectoryModel } from "./models/directory"
 import { OrdoFileModel } from "./models/file"
-import { AppContext } from "../types"
+import { CreateOrdoBackendServerParams } from "../types"
 
-const filesRouter = ({ fsDriver, authorize, logger }: AppContext) => {
-  const file = OrdoFileModel(fsDriver)
-  const directory = OrdoDirectoryModel(fsDriver)
+const filesRouter = ({ drivers: { fs }, authorize, logger }: CreateOrdoBackendServerParams) => {
+  const file = OrdoFileModel(fs)
+  const directory = OrdoDirectoryModel(fs)
 
   const env = { file, directory, logger }
-
-  const log = logRequest(logger)
 
   return Router()
     .post(
@@ -43,10 +48,9 @@ const filesRouter = ({ fsDriver, authorize, logger }: AppContext) => {
 
       authorize,
       extractDynamicParam([PATH_PARAM]),
-      prependSlash,
+      prependPathSlash,
       validateFilePath,
       addUserIdToPath,
-      log,
       createFileHandler(env),
     )
     .get(
@@ -54,11 +58,10 @@ const filesRouter = ({ fsDriver, authorize, logger }: AppContext) => {
 
       authorize,
       extractDynamicParam([PATH_PARAM]),
-      prependSlash,
+      prependPathSlash,
       validateFilePath,
       addUserIdToPath,
       setContentTypeHeader,
-      log,
       getFileHandler(env),
     )
     .put(
@@ -66,10 +69,9 @@ const filesRouter = ({ fsDriver, authorize, logger }: AppContext) => {
 
       authorize,
       extractDynamicParam([PATH_PARAM]),
-      prependSlash,
+      prependPathSlash,
       validateFilePath,
       addUserIdToPath,
-      log,
       updateFileHandler(env),
     )
     .patch(
@@ -77,10 +79,9 @@ const filesRouter = ({ fsDriver, authorize, logger }: AppContext) => {
 
       authorize,
       extractDynamicParam([OLD_PATH_PARAM, NEW_PATH_PARAM]),
-      prependSlash,
-      validateFilePath,
-      addUserIdToPath,
-      log,
+      prependOldPathAndNewPathSlashes,
+      validateFileOldPathAndNewPath,
+      addUserIdToOldPathAndNewPath,
       moveFileHandler(env),
     )
     .delete(
@@ -88,21 +89,22 @@ const filesRouter = ({ fsDriver, authorize, logger }: AppContext) => {
 
       authorize,
       extractDynamicParam([PATH_PARAM]),
-      prependSlash,
+      prependPathSlash,
       validateFilePath,
       addUserIdToPath,
-      log,
       removeFileHandler(env),
     )
 }
 
-const directoriesRouter = ({ fsDriver, authorize, logger }: AppContext) => {
-  const file = OrdoFileModel(fsDriver)
-  const directory = OrdoDirectoryModel(fsDriver)
+const directoriesRouter = ({
+  drivers: { fs },
+  authorize,
+  logger,
+}: CreateOrdoBackendServerParams) => {
+  const file = OrdoFileModel(fs)
+  const directory = OrdoDirectoryModel(fs)
 
   const env = { file, directory, logger }
-
-  const log = logRequest(logger)
 
   return Router()
     .post(
@@ -113,7 +115,6 @@ const directoriesRouter = ({ fsDriver, authorize, logger }: AppContext) => {
       addUserIdToPath,
       appendTrailingDirectoryPathSlash,
       validateDirectoryPath,
-      log,
       createDirectoryHandler(env),
     )
     .get(
@@ -124,7 +125,6 @@ const directoriesRouter = ({ fsDriver, authorize, logger }: AppContext) => {
       addUserIdToPath,
       appendTrailingDirectoryPathSlash,
       validateDirectoryPath,
-      log,
       getDirectoryHandler(env),
     )
     .get(
@@ -135,7 +135,6 @@ const directoriesRouter = ({ fsDriver, authorize, logger }: AppContext) => {
       addUserIdToPath,
       appendTrailingDirectoryPathSlash,
       validateDirectoryPath,
-      log,
       getDirectoryHandler(env),
     )
     .patch(
@@ -143,10 +142,9 @@ const directoriesRouter = ({ fsDriver, authorize, logger }: AppContext) => {
 
       authorize,
       extractDynamicParam([OLD_PATH_PARAM, NEW_PATH_PARAM]),
-      addUserIdToPath,
-      appendTrailingDirectoryPathSlash,
-      validateDirectoryPath,
-      log,
+      addUserIdToOldPathAndNewPath,
+      appendTrailingDirectoryOldPathAndNewPathSlashes,
+      validateDirectoryOldPathAndNewPath,
       moveDirectoryHandler(env),
     )
     .delete(
@@ -157,12 +155,11 @@ const directoriesRouter = ({ fsDriver, authorize, logger }: AppContext) => {
       addUserIdToPath,
       appendTrailingDirectoryPathSlash,
       validateDirectoryPath,
-      log,
       removeDirectoryHandler(env),
     )
 }
 
-export const FSRouter = (drivers: AppContext) =>
+export const FSRouter = (context: CreateOrdoBackendServerParams) =>
   Router()
-    .use(`/${FILES_PARAM}`, filesRouter(drivers))
-    .use(`/${DIRECTORIES_PARAM}`, directoriesRouter(drivers))
+    .use(`/${FILES_PARAM}`, filesRouter(context))
+    .use(`/${DIRECTORIES_PARAM}`, directoriesRouter(context))

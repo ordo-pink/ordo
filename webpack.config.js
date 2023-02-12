@@ -1,7 +1,6 @@
 const { resolve } = require("path")
 
 const CopyWebpackPlugin = require("copy-webpack-plugin")
-const TypeScriptDeclarationPlugin = require("typescript-declaration-webpack-plugin")
 const nodeExternals = require("webpack-node-externals")
 
 /** @type {import('webpack').Configuration} */
@@ -29,9 +28,6 @@ module.exports = {
     globalObject: "this",
   },
   plugins: [
-    new TypeScriptDeclarationPlugin({
-      removeComments: false,
-    }),
     new CopyWebpackPlugin({
       patterns: [
         { from: "./package.json", to: "./package.json" },

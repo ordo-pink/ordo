@@ -1,18 +1,20 @@
 import { urlencoded } from "body-parser"
-import compression from "compression"
 import cors from "cors"
-import express, { Request } from "express"
+import express from "express"
 import { FSRouter } from "./fs/router"
-import { AppContext } from "./types"
+import { CreateOrdoBackendServerParams } from "./types"
 
 const app = express()
 
-const filterCompression = (req: Request) => !req.headers["x-no-compression"]
-
-export const createOrdoBackendServer = (drivers: AppContext) =>
-  app
-    .use(cors())
+export const createOrdoBackendServer = ({
+  drivers,
+  prependMiddleware = (app) => app,
+  corsOptions,
+  authorize,
+  logger,
+}: CreateOrdoBackendServerParams) =>
+  prependMiddleware(app)
+    .use(cors(corsOptions))
     .use(urlencoded({ extended: false }))
-    .use(compression({ filter: filterCompression }))
-    .use(`/fs`, FSRouter(drivers))
+    .use(`/fs`, FSRouter({ drivers, authorize, logger }))
     .disable("x-powered-by")

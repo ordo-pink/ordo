@@ -1,16 +1,28 @@
 import { RequestHandler } from "express"
+import { NEW_PATH_PARAM, OLD_PATH_PARAM, PATH_PARAM } from "../../constants"
+import { OrdoDirectoryPathParams, OrdoDirectoryTwoPathsParams } from "../../types"
 
-export const appendTrailingDirectoryPathSlash: RequestHandler = (req, _, next) => {
-  if (req.params.path && !req.params.path.endsWith("/")) {
-    req.params.path = `${req.params.path}/`
+export const appendTrailingDirectoryPathSlash: RequestHandler<OrdoDirectoryPathParams> = (
+  req,
+  _,
+  next,
+) => {
+  if (!req.params[PATH_PARAM].endsWith("/")) {
+    req.params[PATH_PARAM] = `${req.params[PATH_PARAM]}/`
   }
 
-  if (req.params.oldPath && !req.params.oldPath.endsWith("/")) {
-    req.params.oldPath = `${req.params.oldPath}/`
+  next()
+}
+
+export const appendTrailingDirectoryOldPathAndNewPathSlashes: RequestHandler<
+  OrdoDirectoryTwoPathsParams
+> = (req, _, next) => {
+  if (!req.params[OLD_PATH_PARAM].endsWith("/")) {
+    req.params[OLD_PATH_PARAM] = `${req.params[OLD_PATH_PARAM]}/`
   }
 
-  if (req.params.newPath && !req.params.newPath.endsWith("/")) {
-    req.params.newPath = `${req.params.newPath}/`
+  if (!req.params[NEW_PATH_PARAM].endsWith("/")) {
+    req.params[NEW_PATH_PARAM] = `${req.params[NEW_PATH_PARAM]}/`
   }
 
   next()

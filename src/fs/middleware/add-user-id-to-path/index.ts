@@ -1,18 +1,27 @@
 import { RequestHandler } from "express"
-import { USER_ID_PARAM } from "../../constants"
+import { NEW_PATH_PARAM, OLD_PATH_PARAM, PATH_PARAM, USER_ID_PARAM } from "../../constants"
+import {
+  OrdoDirectoryPathParams,
+  OrdoDirectoryTwoPathsParams,
+  OrdoFilePathParams,
+  OrdoFileTwoPathsParams,
+} from "../../types"
 
-export const addUserIdToPath: RequestHandler = (req, _, next) => {
-  if (req.params.path != null) {
-    req.params.path = `/${req.params[USER_ID_PARAM]}${req.params.path}`
-  }
+export const addUserIdToPath: RequestHandler<OrdoDirectoryPathParams | OrdoFilePathParams> = (
+  req,
+  _,
+  next,
+) => {
+  req.params[PATH_PARAM] = `/${req.params[USER_ID_PARAM]}${req.params[PATH_PARAM]}`
 
-  if (req.params.oldPath != null) {
-    req.params.oldPath = `/${req.params[USER_ID_PARAM]}${req.params.oldPath}`
-  }
+  next()
+}
 
-  if (req.params.newPath != null) {
-    req.params.newPath = `/${req.params[USER_ID_PARAM]}${req.params.newPath}`
-  }
+export const addUserIdToOldPathAndNewPath: RequestHandler<
+  OrdoDirectoryTwoPathsParams | OrdoFileTwoPathsParams
+> = (req, _, next) => {
+  req.params[OLD_PATH_PARAM] = `/${req.params[USER_ID_PARAM]}${req.params[OLD_PATH_PARAM]}`
+  req.params[NEW_PATH_PARAM] = `/${req.params[USER_ID_PARAM]}${req.params[NEW_PATH_PARAM]}`
 
   next()
 }

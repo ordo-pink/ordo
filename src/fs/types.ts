@@ -9,7 +9,7 @@ import {
 } from "@ordo-pink/core"
 import { RequestHandler } from "express"
 
-import { Jwt, JwtPayload } from "jsonwebtoken"
+import { JwtPayload } from "jsonwebtoken"
 import {
   NEW_PATH_PARAM,
   OLD_PATH_PARAM,
@@ -21,7 +21,7 @@ import { Logger } from "../types"
 
 export type Params<T extends Record<string, unknown>> = T & {
   [USER_ID_PARAM]: string
-  [TOKEN_PARSED_PARAM]: string | JwtPayload | Jwt
+  [TOKEN_PARSED_PARAM]: JwtPayload
 }
 
 export type PathParams<T extends OrdoDirectoryPath | OrdoFilePath> = Params<{

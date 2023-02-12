@@ -41,7 +41,6 @@ export type OrdoDirectoryPathParams = PathParams<OrdoDirectoryPath>
 export type OrdoDirectoryTwoPathsParams = TwoPathsParams<OrdoDirectoryPath>
 
 export type IOrdoFileModel = {
-  exists: UnaryFn<OrdoFilePath, Promise<boolean>>
   getFileContent: UnaryFn<OrdoFilePath, Promise<Readable>>
   getFile: UnaryFn<OrdoFilePath, Promise<IOrdoFileRaw>>
   updateFile: UnaryFn<{ path: OrdoFilePath; content: Readable }, Promise<IOrdoFileRaw>>
@@ -57,7 +56,6 @@ export type IOrdoFileModel = {
 }
 
 export type IOrdoDirectoryModel = {
-  exists: UnaryFn<OrdoDirectoryPath, Promise<boolean>>
   getDirectory: UnaryFn<OrdoDirectoryPath, Promise<IOrdoDirectoryRaw>>
   deleteDirectory: UnaryFn<OrdoDirectoryPath, Promise<IOrdoDirectoryRaw>>
   moveDirectory: UnaryFn<

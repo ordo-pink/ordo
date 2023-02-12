@@ -51,7 +51,6 @@ export const OrdoDirectoryModel = {
 
           return directory
         }),
-    exists: driver.checkFileExists,
     getDirectory: (path) =>
       driver
         .checkDirectoryExists(path)

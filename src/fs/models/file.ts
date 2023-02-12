@@ -36,8 +36,12 @@ export const OrdoFileModel = {
 
           return file
         }),
-    exists: driver.checkFileExists,
-    getFile: (path) => driver.getFileDescriptor(path).then(OrdoFile.raw),
+    getFile: (path) =>
+      driver
+        .checkFileExists(path)
+        .then((exists) => (exists ? path : Promise.reject(ExceptionResponse.NOT_FOUND)))
+        .then(() => driver.getFileDescriptor(path))
+        .then(OrdoFile.raw),
     getFileContent: (path) =>
       driver
         .checkFileExists(path)

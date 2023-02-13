@@ -31,19 +31,10 @@ export default function LanguageField() {
         onChange={handleChange}
         className="px-4 py-1 rounded-lg border-0 bg-neutral-200 dark:bg-neutral-500"
         name="select"
+        value={language}
       >
-        <option
-          value={Language.ENGLISH}
-          selected={language === Language.ENGLISH}
-        >
-          {translatedEnglishLanguage}
-        </option>
-        <option
-          value={Language.RUSSIAN}
-          selected={language === Language.RUSSIAN}
-        >
-          {translatedRussianLanguage}
-        </option>
+        <option value={Language.ENGLISH}>{translatedEnglishLanguage}</option>
+        <option value={Language.RUSSIAN}>{translatedRussianLanguage}</option>
       </select>
     </Fieldset>
   )

@@ -30,15 +30,11 @@ export default function ThemeField() {
         className="px-4 py-1 rounded-lg border-0 bg-neutral-200 dark:bg-neutral-500"
         name="select"
         onChange={handleChange}
+        value={ColourTheme.SYSTEM}
       >
-        <option
-          value="system"
-          selected
-        >
-          {translatedSystemTheme}
-        </option>
-        <option value="dark">{translatedDarkTheme}</option>
-        <option value="light">{translatedLightTheme}</option>
+        <option value={ColourTheme.SYSTEM}>{translatedSystemTheme}</option>
+        <option value={ColourTheme.DARK}>{translatedDarkTheme}</option>
+        <option value={ColourTheme.LIGHT}>{translatedLightTheme}</option>
       </select>
     </Fieldset>
   )

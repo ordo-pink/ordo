@@ -1,4 +1,10 @@
-import { IOrdoDirectoryRaw, IOrdoFileRaw, OrdoDirectory, OrdoFile } from "@ordo-pink/core"
+import {
+  IOrdoDirectoryRaw,
+  IOrdoFileRaw,
+  OrdoDirectory,
+  OrdoFile,
+  OrdoFilePath,
+} from "@ordo-pink/core"
 
 export const removeUserIdFromPath =
   (userId: string) =>
@@ -10,5 +16,5 @@ export const removeUserIdFromPath =
         })
       : OrdoFile.raw({
           ...item,
-          path: item.path.replace(`/${userId}`, ""),
+          path: item.path.replace(`/${userId}`, "") as OrdoFilePath,
         })

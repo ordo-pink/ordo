@@ -1,6 +1,6 @@
 import { OrdoFile, OrdoDirectory, ExceptionResponse, SystemDirectory } from "@ordo-pink/core"
 import type { RequestHandler } from "express"
-import { NEW_PATH_PARAM, OLD_PATH_PARAM, PATH_PARAM } from "../../constants"
+import { NEW_PATH_PARAM, OLD_PATH_PARAM, PATH_PARAM, USER_ID_PARAM } from "../../constants"
 import {
   OrdoDirectoryPathParams,
   OrdoDirectoryTwoPathsParams,
@@ -9,10 +9,10 @@ import {
 } from "../../types"
 
 const checkIsInternalPath = (userId: string) => (path: string) =>
-  path.startsWith(`/${userId}/${SystemDirectory.INTERNAL}`)
+  path.startsWith(`/${userId}${SystemDirectory.INTERNAL}`)
 
 export const validateFilePath: RequestHandler<OrdoFilePathParams> = (req, res, next) => {
-  const isInternalPath = checkIsInternalPath(req.params.userId)
+  const isInternalPath = checkIsInternalPath(req.params[USER_ID_PARAM])
 
   if (
     !req.params[PATH_PARAM] ||
@@ -42,7 +42,7 @@ export const validateFileOldPathAndNewPath: RequestHandler<OrdoFileTwoPathsParam
       .send("oldPath and newPath must be different")
   }
 
-  const isInternalPath = checkIsInternalPath(req.params.userId)
+  const isInternalPath = checkIsInternalPath(req.params[USER_ID_PARAM])
 
   if (
     !req.params[OLD_PATH_PARAM] ||
@@ -68,7 +68,7 @@ export const validateFileOldPathAndNewPath: RequestHandler<OrdoFileTwoPathsParam
 }
 
 export const validateDirectoryPath: RequestHandler<OrdoDirectoryPathParams> = (req, res, next) => {
-  const isInternalPath = checkIsInternalPath(req.params.userId)
+  const isInternalPath = checkIsInternalPath(req.params[USER_ID_PARAM])
 
   if (
     !req.params[PATH_PARAM] ||
@@ -106,7 +106,7 @@ export const validateDirectoryOldPathAndNewPath: RequestHandler<OrdoDirectoryTwo
       .send("oldPath and newPath must be different")
   }
 
-  const isInternalPath = checkIsInternalPath(req.params.userId)
+  const isInternalPath = checkIsInternalPath(req.params[USER_ID_PARAM])
 
   if (
     !req.params[OLD_PATH_PARAM] ||

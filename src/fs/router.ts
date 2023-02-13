@@ -23,6 +23,7 @@ import {
   appendTrailingDirectoryOldPathAndNewPathSlashes,
   appendTrailingDirectoryPathSlash,
 } from "./middleware/append-trailing-directory-slash"
+import { compareTokens } from "./middleware/compare-tokens"
 import { extractDynamicParam } from "./middleware/extract-dynamic-param"
 import { prependPathSlash, prependOldPathAndNewPathSlashes } from "./middleware/prepend-slash"
 import { setContentTypeHeader } from "./middleware/set-content-type-header"
@@ -48,22 +49,24 @@ const filesRouter = ({ drivers: { fs }, authorize, logger }: CreateOrdoBackendSe
       `/:${USER_ID_PARAM}/:${PATH_PARAM}*`,
 
       authorize,
+      compareTokens(env),
       appendLogger(logger),
       extractDynamicParam([PATH_PARAM]),
       prependPathSlash,
-      validateFilePath,
       addUserIdToPath,
+      validateFilePath,
       createFileHandler(env),
     )
     .get(
       `/:${USER_ID_PARAM}/:${PATH_PARAM}*`,
 
       authorize,
+      compareTokens(env),
       appendLogger(logger),
       extractDynamicParam([PATH_PARAM]),
       prependPathSlash,
-      validateFilePath,
       addUserIdToPath,
+      validateFilePath,
       setContentTypeHeader,
       getFileHandler(env),
     )
@@ -71,33 +74,36 @@ const filesRouter = ({ drivers: { fs }, authorize, logger }: CreateOrdoBackendSe
       `/:${USER_ID_PARAM}/:${PATH_PARAM}*`,
 
       authorize,
+      compareTokens(env),
       appendLogger(logger),
       extractDynamicParam([PATH_PARAM]),
       prependPathSlash,
-      validateFilePath,
       addUserIdToPath,
+      validateFilePath,
       updateFileHandler(env),
     )
     .patch(
       `/:${USER_ID_PARAM}/:${OLD_PATH_PARAM}*${PATH_SEPARATOR}/:${NEW_PATH_PARAM}*`,
 
       authorize,
+      compareTokens(env),
       appendLogger(logger),
       extractDynamicParam([OLD_PATH_PARAM, NEW_PATH_PARAM]),
       prependOldPathAndNewPathSlashes,
-      validateFileOldPathAndNewPath,
       addUserIdToOldPathAndNewPath,
+      validateFileOldPathAndNewPath,
       moveFileHandler(env),
     )
     .delete(
       `/:${USER_ID_PARAM}/:${PATH_PARAM}*`,
 
       authorize,
+      compareTokens(env),
       appendLogger(logger),
       extractDynamicParam([PATH_PARAM]),
       prependPathSlash,
-      validateFilePath,
       addUserIdToPath,
+      validateFilePath,
       removeFileHandler(env),
     )
 }
@@ -117,10 +123,11 @@ const directoriesRouter = ({
       `/:${USER_ID_PARAM}/:${PATH_PARAM}*`,
 
       authorize,
+      compareTokens(env),
       appendLogger(logger),
       extractDynamicParam([PATH_PARAM]),
-      addUserIdToPath,
       appendTrailingDirectoryPathSlash,
+      addUserIdToPath,
       validateDirectoryPath,
       createDirectoryHandler(env),
     )
@@ -128,10 +135,11 @@ const directoriesRouter = ({
       `/:${USER_ID_PARAM}/`,
 
       authorize,
+      compareTokens(env),
       appendLogger(logger),
       setRootPathParam,
-      addUserIdToPath,
       appendTrailingDirectoryPathSlash,
+      addUserIdToPath,
       validateDirectoryPath,
       getDirectoryHandler(env),
     )
@@ -139,10 +147,11 @@ const directoriesRouter = ({
       `/:${USER_ID_PARAM}/:${PATH_PARAM}*`,
 
       authorize,
+      compareTokens(env),
       appendLogger(logger),
       extractDynamicParam([PATH_PARAM]),
-      addUserIdToPath,
       appendTrailingDirectoryPathSlash,
+      addUserIdToPath,
       validateDirectoryPath,
       getDirectoryHandler(env),
     )
@@ -150,10 +159,11 @@ const directoriesRouter = ({
       `/:${USER_ID_PARAM}/:${OLD_PATH_PARAM}*${PATH_SEPARATOR}/:${NEW_PATH_PARAM}*`,
 
       authorize,
+      compareTokens(env),
       appendLogger(logger),
       extractDynamicParam([OLD_PATH_PARAM, NEW_PATH_PARAM]),
-      addUserIdToOldPathAndNewPath,
       appendTrailingDirectoryOldPathAndNewPathSlashes,
+      addUserIdToOldPathAndNewPath,
       validateDirectoryOldPathAndNewPath,
       moveDirectoryHandler(env),
     )
@@ -161,10 +171,11 @@ const directoriesRouter = ({
       `/:${USER_ID_PARAM}/:${PATH_PARAM}*`,
 
       authorize,
+      compareTokens(env),
       appendLogger(logger),
       extractDynamicParam([PATH_PARAM]),
-      addUserIdToPath,
       appendTrailingDirectoryPathSlash,
+      addUserIdToPath,
       validateDirectoryPath,
       removeDirectoryHandler(env),
     )

@@ -83,7 +83,7 @@ export type FSDriver = {
   updateFile: UnaryFn<{ path: OrdoFilePath; content: Readable }, Promise<OrdoFilePath>>
 }
 
-export type FsRequestHandler<T = Record<string, unknown>> = UnaryFn<
+export type FsRequestHandler<T = Params> = UnaryFn<
   {
     file: IOrdoFileModel
     directory: IOrdoDirectoryModel

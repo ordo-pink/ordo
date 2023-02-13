@@ -1,4 +1,4 @@
-import { OrdoExtensionType, UnaryFn } from "@ordo-pink/core"
+import { OrdoExtensionType } from "@ordo-pink/core"
 import { combineReducers, Reducer } from "@reduxjs/toolkit"
 import { MouseEvent, useEffect, useState } from "react"
 import { Helmet } from "react-helmet"
@@ -24,6 +24,7 @@ import UserSupportCommands from "$commands/user-support"
 import ActivityBar from "$containers/activity-bar"
 import ContextMenu from "$containers/app/hooks/use-context-menu/components/context-menu"
 import { useI18n } from "$containers/app/hooks/use-i18n"
+import { useSystemCommands } from "$containers/app/hooks/use-system-commands/use-system-commands"
 import { gotDirectory, registerExtensions } from "$containers/app/store"
 
 import { useKeycloak } from "$core/auth/hooks/use-keycloak"
@@ -36,7 +37,7 @@ import { reducer, store } from "$core/state"
 import { useAppDispatch } from "$core/state/hooks/use-app-dispatch"
 import { useAppSelector } from "$core/state/hooks/use-app-selector"
 import { useExtensionSelector } from "$core/state/hooks/use-extension-selector"
-import { ActionContext, OrdoExtension, OrdoExtensionName } from "$core/types"
+import { OrdoExtension, OrdoExtensionName } from "$core/types"
 
 import MarkdownShortcuts from "$editor-plugins/markdown-shortcuts"
 
@@ -81,7 +82,7 @@ export default function App() {
 
   const editorSelector = useExtensionSelector<EditorActivityState>()
 
-  const [accelerators, setAccelerators] = useState<Record<string, UnaryFn<ActionContext, void>>>({})
+  // const [accelerators, setAccelerators] = useState<Record<string, UnaryFn<ActionContext, void>>>({})
   const [extensions, setExtensions] = useState<OrdoExtension<string, OrdoExtensionType>[]>([])
   const currentFile = editorSelector((state) => state?.["ordo-activity-editor"]?.currentFile)
 
@@ -102,6 +103,8 @@ export default function App() {
   const currentRoute = useLocation()
   const navigate = useNavigate()
 
+  const accelerators = useSystemCommands(extensions, commands, currentFile)
+
   useEffect(() => {
     if (isAuthenticated) {
       dispatch(gotDirectory("/"))
@@ -112,21 +115,6 @@ export default function App() {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isAuthenticated])
-
-  useEffect(() => {
-    if (!extensions) return
-
-    const keybindings: Record<string, UnaryFn<ActionContext, void>> = {}
-
-    commands.forEach((command) => {
-      if (command.accelerator) {
-        keybindings[command.accelerator] = command.action
-      }
-    })
-
-    setAccelerators(() => keybindings)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [commands, currentFile])
 
   useHotkeys(
     Object.keys(accelerators).join(", "),

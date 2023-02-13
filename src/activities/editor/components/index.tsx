@@ -11,7 +11,6 @@ import FileExplorer from "$activities/editor/components/file-explorer"
 import FileNotSelected from "$activities/editor/components/file-not-selected"
 import FileNotSupported from "$activities/editor/components/file-not-supported"
 import { EditorActivityState, EditorMetadata } from "$activities/editor/types"
-
 import { useWorkspaceWithSidebar } from "$containers/workspace/hooks/use-workspace"
 import { useCurrentFileAssociation } from "$core/hooks/use-current-file-association"
 import { useAppDispatch } from "$core/state/hooks/use-app-dispatch"
@@ -63,7 +62,7 @@ export default function Editor({ metadata }: OrdoExtensionProps<EditorMetadata>)
   useEffect(() => {
     if (!path) {
       metadata.get("recentFiles").then((files) => {
-        if (!files[0]) return
+        if (!files || !files[0]) return
 
         const path = files[0]
 
@@ -96,20 +95,20 @@ export default function Editor({ metadata }: OrdoExtensionProps<EditorMetadata>)
     metadata.get("recentFiles").then((recent) => {
       Switch.of(file.path)
         .case(
-          (path) => recent.indexOf(path) === 0,
+          (path) => !recent || recent.indexOf(path) === 0,
           () => void 0,
         )
         .case(
-          (path) => recent.includes(path),
+          (path) => Boolean(recent) && (recent as string[]).includes(path),
           () => {
-            const recentCopy = [...recent]
+            const recentCopy = [...(recent as OrdoFilePath[])]
 
             recentCopy.splice(recentCopy.indexOf(file.path), 1)
             metadata.set("recentFiles", [file.path].concat(recentCopy))
           },
         )
         .default(() => {
-          metadata.set("recentFiles", [file.path].concat(recent))
+          metadata.set("recentFiles", [file.path].concat(recent as OrdoFilePath[]))
         })
     })
   }, [path, tree, metadata, dispatch])

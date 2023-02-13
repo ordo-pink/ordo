@@ -47,7 +47,7 @@ export default function Directory({ directory }: Props) {
   const Chevron = isExpanded ? BsChevronDown : BsChevronUp
 
   useEffect(() => {
-    metadata.get("expandedDirectories").then(setExpandedDirectories)
+    metadata.get("expandedDirectories").then((dirs) => setExpandedDirectories(dirs ?? []))
   }, [metadata])
 
   useEffect(() => {
@@ -63,7 +63,7 @@ export default function Directory({ directory }: Props) {
 
         if (!isExpanded) {
           metadata.get("expandedDirectories").then((expanded) => {
-            if (expanded.includes(directory.path)) return
+            if (!expanded || expanded.includes(directory.path)) return
 
             metadata
               .set("expandedDirectories", expanded.concat([directory.path]))
@@ -71,7 +71,7 @@ export default function Directory({ directory }: Props) {
           })
         } else {
           metadata.get("expandedDirectories").then((expanded) => {
-            if (!expanded.includes(directory.path)) return
+            if (!expanded || !expanded.includes(directory.path)) return
 
             const expandedCopy = [...expanded]
 

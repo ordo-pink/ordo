@@ -28,7 +28,7 @@ export default function LogoutField() {
 
   return (
     <Fieldset>
-      <div className="flex flex-row-reverse w-full">
+      <div className="md:flex md:flex-row-reverse md:w-full">
         <OrdoButtonSecondary
           onClick={handleButtonClick}
           center

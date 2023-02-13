@@ -14,7 +14,7 @@ export type Nullable<T> = T | null
 
 export type OrdoExtensionMetadata<T extends Record<string, unknown>> = {
   init: ThunkFn<Promise<void>>
-  get<K extends keyof T>(key: K): Promise<T[K]>
+  get<K extends keyof T>(key: K): Promise<Nullable<T[K]>>
   set<K extends keyof T>(key: K, value: T[K]): Promise<void>
   clear: ThunkFn<Promise<void>>
   resetDefaults: ThunkFn<Promise<void>>

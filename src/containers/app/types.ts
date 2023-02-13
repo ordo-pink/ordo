@@ -1,9 +1,8 @@
+import { OrdoFilePath, IOrdoDirectory, Nullable } from "@ordo-pink/core"
 import {
-  Nullable,
   OrdoActivityExtension,
   OrdoCommand,
   OrdoCommandExtension,
-  OrdoDirectory,
   OrdoFileAssociationExtension,
   OrdoEditorPluginExtension,
   OrdoLoadableComponent,
@@ -11,7 +10,7 @@ import {
 
 export type AppState = {
   isSidebarVisible: boolean
-  personalProject: Nullable<OrdoDirectory>
+  personalProject: Nullable<IOrdoDirectory>
   activityExtensions: OrdoActivityExtension<string>[]
   commandExtensions: OrdoCommandExtension<string>[]
   fileAssociationExtensions: OrdoFileAssociationExtension<string>[]
@@ -21,7 +20,12 @@ export type AppState = {
   isSaving: boolean
 }
 
-export type UpdatedFilePayload = {
-  path: string
+export type UpdateFilePayload = {
+  path: OrdoFilePath
   content: string
+}
+
+export type CreateFilePayload = {
+  path: OrdoFilePath
+  content?: string
 }

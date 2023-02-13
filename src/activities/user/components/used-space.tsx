@@ -1,18 +1,17 @@
+import { IOrdoDirectory, IOrdoFile, Nullable, OrdoDirectory } from "@ordo-pink/core"
 import { reduce } from "ramda"
 import { useTranslation } from "react-i18next"
 
-import { isOrdoDirectory } from "$core/guards/is-fs-entity"
 import { useAppSelector } from "$core/state/hooks/use-app-selector"
-import { OrdoDirectory, OrdoFile, Nullable } from "$core/types"
 import { Either } from "$core/utils/either"
 import { convertBytesToMb } from "$core/utils/size-format-helper"
 
 const spaceLimitMB = Number(process.env.REACT_USER_SPACE_LIMIT || 50)
 
-const sizeReducer = (totalSize: number) => (acc: number, item: OrdoFile | OrdoDirectory) =>
-  isOrdoDirectory(item) ? acc + calculateTreeSize(item, totalSize) : acc + item.size
+const sizeReducer = (totalSize: number) => (acc: number, item: IOrdoFile | IOrdoDirectory) =>
+  OrdoDirectory.isOrdoDirectory(item) ? acc + calculateTreeSize(item, totalSize) : acc + item.size
 
-export const calculateTreeSize = (directory: Nullable<OrdoDirectory>, size = 0): number =>
+export const calculateTreeSize = (directory: Nullable<IOrdoDirectory>, size = 0): number =>
   Either.fromNullable(directory)
     .chain((dir) => Either.fromNullable(dir.children))
     .map(reduce(sizeReducer(size), size))

@@ -1,8 +1,8 @@
+import { ColourTheme } from "@ordo-pink/core"
 import { ChangeEvent } from "react"
 import { useTranslation } from "react-i18next"
 
 import Fieldset from "$core/components/fieldset"
-import { Theme } from "$core/constants/theme"
 
 export default function ThemeField() {
   const { t } = useTranslation()
@@ -15,7 +15,7 @@ export default function ThemeField() {
   const handleChange = (event: ChangeEvent<HTMLSelectElement>) => {
     const body = document.getElementsByTagName("body")[0]
 
-    if (event.target.value === Theme.DARK) {
+    if (event.target.value === ColourTheme.DARK) {
       body.classList.add("dark")
     } else {
       body.classList.remove("dark")

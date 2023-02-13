@@ -1,13 +1,18 @@
+import { Switch } from "@ordo-pink/switch"
 import { AiOutlineEnter } from "react-icons/ai"
 import { BsBackspace } from "react-icons/bs"
-
-import { Switch } from "$core/utils/switch"
 
 import "$core/components/accelerator/index.css"
 
 type Props = {
   accelerator: string
 }
+
+// eslint-disable-next-line i18next/no-literal-string
+const Esc = () => <span>Esc</span>
+const Backspace = () => <BsBackspace />
+const Enter = () => <AiOutlineEnter />
+const Letter = ({ symbol }: { symbol: string }) => <span>{symbol.toLocaleUpperCase()}</span>
 
 export default function Accelerator({ accelerator }: Props) {
   const isDarwin = navigator.appVersion.indexOf("Mac") !== -1
@@ -19,10 +24,10 @@ export default function Accelerator({ accelerator }: Props) {
   const symbol = split[split.length - 1].toLowerCase()
 
   const Key = Switch.of(symbol)
-    .case("backspace", () => <BsBackspace />)
-    .case("enter", () => <AiOutlineEnter />)
-    .case("escape", () => <span>ESC</span>)
-    .default(() => <span>{symbol.toLocaleUpperCase()}</span>)
+    .case("backspace", () => Backspace)
+    .case("enter", () => Enter)
+    .case("escape", () => Esc)
+    .default(() => Letter)
 
   return (
     <div className="accelerator">
@@ -38,7 +43,8 @@ export default function Accelerator({ accelerator }: Props) {
       {split.includes("shift") && (
         <div className="">⇧ +</div> /* eslint-disable-line i18next/no-literal-string */
       )}
-      <Key />
+
+      <Key symbol={symbol} />
     </div>
   )
 }

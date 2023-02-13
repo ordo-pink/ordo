@@ -1,17 +1,17 @@
+import { IOrdoFile, UnaryFn } from "@ordo-pink/core"
 import { MouseEvent } from "react"
 import { BsFileEarmarkBinary } from "react-icons/bs"
 
 import ActionListItem from "$core/components/action-list/item"
 import { useAppSelector } from "$core/state/hooks/use-app-selector"
-import { OrdoFile, UnaryFn } from "$core/types"
 import { preventDefault, stopPropagation } from "$core/utils/event"
 import { lazyBox } from "$core/utils/lazy-box"
 import { noOp } from "$core/utils/no-op"
 
 type Props = {
   isCurrent: boolean
-  file: OrdoFile
-  onClick?: UnaryFn<OrdoFile, void>
+  file: IOrdoFile
+  onClick?: UnaryFn<IOrdoFile, void>
 }
 
 export default function OpenFileItem({ file, isCurrent, onClick = noOp }: Props) {

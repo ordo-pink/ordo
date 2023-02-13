@@ -1,7 +1,7 @@
-import { OrdoExtensionMetadata } from "$core/types"
+import { OrdoExtensionMetadata, OrdoExtensionName } from "$core/types"
 
 const extensionMetadata = <T extends Record<string, unknown>>(
-  name: string,
+  name: OrdoExtensionName,
   metadata: T,
 ): OrdoExtensionMetadata<T> => {
   let store = { ...metadata }
@@ -9,15 +9,16 @@ const extensionMetadata = <T extends Record<string, unknown>>(
   return {
     init: async () => {
       try {
-        const json = await window.ordo.api.fs.files
-          .getRaw(`/.extensions/${name}.json`)
-          .then((res) => res.json())
+        const json = await window.ordo.api.extensions.get(name)
+
         store = json
       } catch (e) {
-        await window.ordo.api.fs.files.create(`/.extensions/${name}.json`, JSON.stringify(metadata))
-        const json = await window.ordo.api.fs.files
-          .getRaw(`/.extensions/${name}.json`)
-          .then((res) => res.json())
+        await window.ordo.api.extensions.create({
+          name,
+          content: metadata,
+        })
+        const json = await window.ordo.api.extensions.get(name)
+
         store = json
       }
     },
@@ -25,12 +26,10 @@ const extensionMetadata = <T extends Record<string, unknown>>(
     set: (key, value) => {
       store[key] = value
 
-      return window.ordo.api.fs.files
-        .update(`/.extensions/${name}.json`, JSON.stringify(store))
-        .then(() => void 0)
+      return window.ordo.api.extensions.update({ name, content: store }).then(() => void 0)
     },
     clear: () => {
-      return window.ordo.api.fs.files.remove(`/.extensions/${name}.json`).then(() => {
+      return window.ordo.api.extensions.remove(name).then(() => {
         store = {} as T
       })
     },
@@ -39,12 +38,12 @@ const extensionMetadata = <T extends Record<string, unknown>>(
     resetDefaults: async () => {
       store = { ...metadata }
 
-      await window.ordo.api.fs.files.update(`/.extensions/${name}.json`, JSON.stringify(store))
+      await window.ordo.api.extensions.update({ name, content: store })
     },
   }
 }
 
 export const createExtensionMetadata = <T extends Record<string, unknown>>(
-  name: string,
+  name: OrdoExtensionName,
   defaultMetadata?: T,
 ) => (defaultMetadata ? extensionMetadata(name, defaultMetadata) : undefined)

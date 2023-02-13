@@ -1,3 +1,4 @@
+import { UnaryFn } from "@ordo-pink/core"
 import {
   EditorBlock,
   SelectionState,
@@ -6,8 +7,6 @@ import {
   DraftDecoratorType,
 } from "draft-js"
 import type { List } from "immutable"
-
-import { UnaryFn } from "$core/types"
 
 type Props = {
   contentState: ContentState

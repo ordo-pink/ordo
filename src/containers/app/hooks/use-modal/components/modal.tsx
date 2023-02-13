@@ -1,8 +1,8 @@
+import { ThunkFn } from "@ordo-pink/core"
 import { PropsWithChildren, useEffect } from "react"
 import { useHotkeys } from "react-hotkeys-hook"
 
 import Null from "$core/components/null"
-import { ThunkFn } from "$core/types"
 import { Either } from "$core/utils/either"
 import { preventDefault, stopPropagation } from "$core/utils/event"
 import { lazyBox } from "$core/utils/lazy-box"

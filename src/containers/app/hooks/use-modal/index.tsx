@@ -1,8 +1,7 @@
+import { ThunkFn } from "@ordo-pink/core"
 import { PropsWithChildren, useCallback, useState } from "react"
 
 import Modal from "$containers/app/hooks/use-modal/components/modal"
-
-import { ThunkFn } from "$core/types"
 
 type Props = {
   onShow?: ThunkFn<void>

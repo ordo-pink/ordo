@@ -1,6 +1,5 @@
+import { ThunkFn, UnaryFn } from "@ordo-pink/core"
 import { tap } from "ramda"
-
-import type { ThunkFn, UnaryFn } from "$core/types"
 
 const unsafeGet = Symbol("EventBoxUnsafeGet")
 

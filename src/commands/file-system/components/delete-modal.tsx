@@ -1,3 +1,4 @@
+import { OrdoDirectory } from "@ordo-pink/core"
 import { MouseEvent, useEffect } from "react"
 import { useTranslation } from "react-i18next"
 import { BsFileEarmarkX, BsFolderX } from "react-icons/bs"
@@ -10,7 +11,6 @@ import { useModal } from "$containers/app/hooks/use-modal"
 
 import Null from "$core/components/null"
 import { OrdoFSEntity } from "$core/constants/ordo-fs-entity"
-import { isOrdoDirectory } from "$core/guards/is-fs-entity"
 import { useAppDispatch } from "$core/state/hooks/use-app-dispatch"
 import { useExtensionSelector } from "$core/state/hooks/use-extension-selector"
 import { Either } from "$core/utils/either"
@@ -32,7 +32,7 @@ export default function CreateModal() {
     // eslint-disable-next-line
   }, [isShown])
 
-  const type = isOrdoDirectory(target) ? OrdoFSEntity.DIRECTORY : OrdoFSEntity.FILE
+  const type = OrdoDirectory.isOrdoDirectory(target) ? OrdoFSEntity.DIRECTORY : OrdoFSEntity.FILE
 
   const Icon = type === "file" ? BsFileEarmarkX : BsFolderX
 

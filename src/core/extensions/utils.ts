@@ -1,4 +1,6 @@
-import { OrdoExtensionType } from "$core/constants/ordo-extension-type"
+import { OrdoExtensionType } from "@ordo-pink/core"
+import { Switch } from "@ordo-pink/switch"
+
 import {
   isActivityExtension,
   isCommandExtension,
@@ -6,7 +8,6 @@ import {
   isEditorPluginExtension,
 } from "$core/guards/is-extension"
 import { OrdoActivityExtension, OrdoExtension } from "$core/types"
-import { Switch } from "$core/utils/switch"
 
 export const getActivityRoute = (activity: OrdoActivityExtension<string>) =>
   activity.routes?.[0] ? `/${activity.routes?.[0]}` : `/${getExtensionName(activity)}`
@@ -15,20 +16,15 @@ export const getExtensionReadableName = (extension: OrdoExtension<string, OrdoEx
   const checkHasReadableName = (currentExtension: OrdoExtension<string, OrdoExtensionType>) =>
     Boolean(currentExtension.readableName)
 
-  const readableNameFn = Switch.of(extension)
+  return Switch.of(extension)
     .case(checkHasReadableName, () => extension.readableName as string)
-    .default(getExtensionName)
-
-  return readableNameFn(extension)
+    .default(() => getExtensionName(extension))
 }
 
-export const getExtensionName = (extension: OrdoExtension<string, OrdoExtensionType>) => {
-  const extensionNameThunk = Switch.of(extension)
+export const getExtensionName = (extension: OrdoExtension<string, OrdoExtensionType>) =>
+  Switch.of(extension)
     .case(isActivityExtension, () => extension.name.replace("ordo-activity-", ""))
     .case(isFileAssociationExtension, () => extension.name.replace("ordo-file-association-", ""))
     .case(isCommandExtension, () => extension.name.replace("ordo-command-", ""))
     .case(isEditorPluginExtension, () => extension.name.replace("ordo-editor-plugin-", ""))
     .default(() => "")
-
-  return extensionNameThunk()
-}

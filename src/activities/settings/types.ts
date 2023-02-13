@@ -1,7 +1,6 @@
-import { Language } from "$core/constants/language"
-import { Theme } from "$core/constants/theme"
+import { Language, ColourTheme } from "@ordo-pink/core"
 
 export type SettingsMetadata = {
-  theme: Theme
+  theme: ColourTheme
   language: Language
 }

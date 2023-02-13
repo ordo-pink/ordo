@@ -17,7 +17,7 @@
   "@ordo-activity-pricing/free-price": "0 рублей в месяц",
   "@ordo-activity-pricing/free-description": "Для организации мыслей, работы и жизни",
   "@ordo-activity-pricing/free-cloud-storage": "50 MB облачного хранения",
-  "@ordo-activity-pricing/free-file-size": "Загрузка файлов до 50 MB",
+  "@ordo-activity-pricing/free-file-size": "Загрузка файлов до 5 MB",
   "@ordo-activity-pricing/free-local-storage": "Неограниченное локальное хранение",
   "@ordo-activity-pricing/free-self-hosting": "Размещение на личном сервере",
   "@ordo-activity-pricing/free-invites": "Приглашайте до 4 участников",

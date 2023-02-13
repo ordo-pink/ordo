@@ -1,42 +1,33 @@
+import { Nullable, OrdoFile, OrdoFilePath } from "@ordo-pink/core"
 import { Switch } from "@ordo-pink/switch"
-import { createContext, useEffect } from "react"
+import { createContext, useEffect, useState } from "react"
 import { Helmet } from "react-helmet"
 import { useTranslation } from "react-i18next"
 import { AiOutlineLoading } from "react-icons/ai"
 import { createSearchParams, useNavigate, useSearchParams } from "react-router-dom"
 
+import { selectFile } from "../store"
 import FileExplorer from "$activities/editor/components/file-explorer"
 import FileNotSelected from "$activities/editor/components/file-not-selected"
 import FileNotSupported from "$activities/editor/components/file-not-supported"
 import { EditorActivityState, EditorMetadata } from "$activities/editor/types"
-
 import { useWorkspaceWithSidebar } from "$containers/workspace/hooks/use-workspace"
 import { useCurrentFileAssociation } from "$core/hooks/use-current-file-association"
 import { useAppDispatch } from "$core/state/hooks/use-app-dispatch"
 import { useAppSelector } from "$core/state/hooks/use-app-selector"
 import { useExtensionSelector } from "$core/state/hooks/use-extension-selector"
-import { FileExtension, OrdoExtensionMetadata, OrdoExtensionProps } from "$core/types"
+import { OrdoExtensionMetadata, OrdoExtensionProps } from "$core/types"
 import { Either } from "$core/utils/either"
 import { findOrdoFile } from "$core/utils/fs-helpers"
 
 import "$activities/editor/index.css"
 
-export const getFileExtension = (path: string): FileExtension => {
-  const fileName = path.split("/").reverse()[0] as string
-
-  const lastDotPosition = fileName.lastIndexOf(".")
-
-  if (!~lastDotPosition) {
-    return ""
-  }
-
-  return fileName.substring(lastDotPosition) as FileExtension
-}
-
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const EditorMetadataContext = createContext<OrdoExtensionMetadata<EditorMetadata>>({} as any)
 
 export default function Editor({ metadata }: OrdoExtensionProps<EditorMetadata>) {
+  const [path, setPath] = useState<Nullable<OrdoFilePath>>(null)
+
   const dispatch = useAppDispatch()
 
   const [query] = useSearchParams()
@@ -52,21 +43,30 @@ export default function Editor({ metadata }: OrdoExtensionProps<EditorMetadata>)
 
   const Workspace = useWorkspaceWithSidebar()
 
-  const path = query.get("path")
-
   const fileAssociations = useAppSelector((state) => state.app.fileAssociationExtensions)
+
+  useEffect(() => {
+    setPath((query.get("path") as OrdoFilePath) ?? null)
+  }, [query])
+
+  useEffect(() => {
+    if (!path) return
+
+    const file = findOrdoFile(path, tree)
+
+    if (!file) return
+
+    dispatch(selectFile(file))
+  }, [path, tree, dispatch])
 
   useEffect(() => {
     if (!path) {
       metadata.get("recentFiles").then((files) => {
-<<<<<<< Updated upstream
-=======
         if (!files || !files[0]) return
 
->>>>>>> Stashed changes
         const path = files[0]
 
-        const fileExtension = getFileExtension(path)
+        const fileExtension = OrdoFile.from({ path, size: 0 }).extension
 
         const association = fileAssociations.find((assoc) =>
           assoc.fileExtensions.includes(fileExtension),

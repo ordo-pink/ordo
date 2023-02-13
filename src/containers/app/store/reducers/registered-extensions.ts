@@ -1,7 +1,7 @@
+import { OrdoExtensionType } from "@ordo-pink/core"
 import { CaseReducer, PayloadAction } from "@reduxjs/toolkit"
 
 import { AppState } from "$containers/app/types"
-import { OrdoExtensionType } from "$core/constants/ordo-extension-type"
 import {
   isActivityExtension,
   isCommandExtension,

@@ -1,56 +1,39 @@
+import { OrdoFilePath, Nullable } from "@ordo-pink/core"
 import { useEffect, useState } from "react"
 import { useSearchParams } from "react-router-dom"
 
-import { selectFile } from "$activities/editor/store"
 import { EditorActivityState } from "$activities/editor/types"
 
 import EditorPage from "$core/components/editor-page/editor-page"
 import Loading from "$core/components/loading"
+import { useFileParentBreadcrumbs } from "$core/hooks/use-file-breadcrumbs"
 import { useFSAPI } from "$core/hooks/use-fs-api"
-import { useAppDispatch } from "$core/state/hooks/use-app-dispatch"
-import { useAppSelector } from "$core/state/hooks/use-app-selector"
 import { useExtensionSelector } from "$core/state/hooks/use-extension-selector"
-import { Nullable } from "$core/types"
 import { Either } from "$core/utils/either"
-import { findOrdoFile, getParentPath } from "$core/utils/fs-helpers"
 
 export default function MediaViewer() {
-  const dispatch = useAppDispatch()
   const editorSelector = useExtensionSelector<EditorActivityState>()
 
-  const tree = useAppSelector((state) => state.app.personalProject)
   const currentFile = editorSelector((state) => state["ordo-activity-editor"].currentFile)
+
+  const { files } = useFSAPI()
+  const [query] = useSearchParams()
+  const breadcrumbsPath = useFileParentBreadcrumbs()
 
   const [content, setContent] = useState("")
   const [isVideo, setIsVideo] = useState(false)
 
-  const { files } = useFSAPI()
-
-  const [query] = useSearchParams()
-  const path = query.get("path")
-  const breadcrumbsPath = getParentPath(path ?? "/")
+  const path = query.get("path") as OrdoFilePath
 
   useEffect(() => {
-    if (!path || !files || !tree) return
+    if (!path) return
 
-    files
-      .getRaw(path)
-      .then((res) => res.blob())
-      .then((payload) => {
-        const file = findOrdoFile(path, tree)
+    files.getBlob(path).then(URL.createObjectURL).then(setContent)
 
-        if (file) {
-          dispatch(selectFile(file))
-        }
-
-        const url = URL.createObjectURL(payload)
-        setContent(url)
-      })
     return () => {
       URL.revokeObjectURL(content)
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [path, files])
+  }, [path, files, content])
 
   useEffect(() => {
     let video: Nullable<HTMLVideoElement> = document.createElement("video")

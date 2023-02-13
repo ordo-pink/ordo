@@ -1,9 +1,10 @@
+import { UnaryFn } from "@ordo-pink/core"
 import { MouseEvent } from "react"
 import { useTranslation } from "react-i18next"
 
 import Accelerator from "$core/components/accelerator"
 import ActionListItem from "$core/components/action-list/item"
-import { OrdoCommand, UnaryFn } from "$core/types"
+import { OrdoCommand } from "$core/types"
 import { preventDefault, stopPropagation } from "$core/utils/event"
 import { lazyBox } from "$core/utils/lazy-box"
 import { noOp } from "$core/utils/no-op"

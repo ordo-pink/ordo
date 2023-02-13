@@ -162,6 +162,45 @@ window.ordo = {
             .then((res) => res.json()),
       },
     },
+    extensions: {
+      create: ({ name, content }) =>
+        window.ordo.env
+          .fetch(`${host}/extensions/${Keycloak.tokenParsed?.sub}/${name}`, {
+            method: "POST",
+            body: JSON.stringify(content),
+            headers: {
+              [AUTHORIZATION_HEADER_KEY]: `Bearer ${Keycloak.token}`,
+            },
+          })
+          .then((res) => res.json()),
+      get: (name) =>
+        window.ordo.env
+          .fetch(`${host}/extensions/${Keycloak.tokenParsed?.sub}/${name}`, {
+            headers: {
+              [AUTHORIZATION_HEADER_KEY]: `Bearer ${Keycloak.token}`,
+            },
+          })
+          .then((res) => res.json()),
+      remove: (name) =>
+        window.ordo.env
+          .fetch(`${host}/extensions/${Keycloak.tokenParsed?.sub}/${name}`, {
+            method: "DELETE",
+            headers: {
+              [AUTHORIZATION_HEADER_KEY]: `Bearer ${Keycloak.token}`,
+            },
+          })
+          .then((res) => res.json()),
+      update: ({ name, content }) =>
+        window.ordo.env
+          .fetch(`${host}/extensions/${Keycloak.tokenParsed?.sub}/${name}`, {
+            method: "PUT",
+            headers: {
+              [AUTHORIZATION_HEADER_KEY]: `Bearer ${Keycloak.token}`,
+            },
+            body: JSON.stringify(content),
+          })
+          .then((res) => res.json()),
+    },
   },
 }
 

@@ -36,7 +36,7 @@ import { reducer, store } from "$core/state"
 import { useAppDispatch } from "$core/state/hooks/use-app-dispatch"
 import { useAppSelector } from "$core/state/hooks/use-app-selector"
 import { useExtensionSelector } from "$core/state/hooks/use-extension-selector"
-import { ActionContext, OrdoExtension } from "$core/types"
+import { ActionContext, OrdoExtension, OrdoExtensionName } from "$core/types"
 
 import MarkdownShortcuts from "$editor-plugins/markdown-shortcuts"
 
@@ -161,7 +161,10 @@ export default function App() {
         const Element = extension.Component
 
         for (const path of extension.routes) {
-          const metadata = createExtensionMetadata(extension.name, extension.metadata)
+          const metadata = createExtensionMetadata(
+            extension.name as OrdoExtensionName,
+            extension.metadata,
+          )
 
           if (metadata) {
             metadata.init().then(() => {

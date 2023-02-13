@@ -5,6 +5,7 @@ import type {
   OrdoDirectoryPath,
   UnaryFn,
 } from "@ordo-pink/core"
+import { OrdoExtensionName } from "$core/types"
 
 declare global {
   interface Window {
@@ -40,6 +41,15 @@ declare global {
             >
             remove: UnaryFn<OrdoDirectoryPath, Promise<IOrdoDirectoryRaw>>
           }
+        }
+        extensions: {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          get: UnaryFn<OrdoExtensionName, Promise<any>>
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          create: UnaryFn<{ name: OrdoExtensionName; content?: any }, Promise<IOrdoFileRaw>>
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          update: UnaryFn<{ name: OrdoExtensionName; content: any }, Promise<IOrdoFileRaw>>
+          remove: UnaryFn<OrdoExtensionName, Promise<IOrdoFileRaw>>
         }
       }
     }

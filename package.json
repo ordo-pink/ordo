@@ -45,7 +45,7 @@
     "web-vitals": "^2.1.4"
   },
   "scripts": {
-    "start": "cross-env REACT_APP_FAKE_TOKEN=\"WHOA_SO_SAFE!\" craco start",
+    "start": "cross-env REACT_APP_FS_API_HOST=\"https://api-test.ordo.pink\" craco start",
     "build": "craco build",
     "test": "craco test",
     "test:cover": "npm run test -- --coverage .",

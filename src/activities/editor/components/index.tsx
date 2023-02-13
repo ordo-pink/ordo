@@ -1,11 +1,12 @@
-import { OrdoFile, OrdoFilePath } from "@ordo-pink/core"
+import { Nullable, OrdoFile, OrdoFilePath } from "@ordo-pink/core"
 import { Switch } from "@ordo-pink/switch"
-import { createContext, useEffect } from "react"
+import { createContext, useEffect, useState } from "react"
 import { Helmet } from "react-helmet"
 import { useTranslation } from "react-i18next"
 import { AiOutlineLoading } from "react-icons/ai"
 import { createSearchParams, useNavigate, useSearchParams } from "react-router-dom"
 
+import { selectFile } from "../store"
 import FileExplorer from "$activities/editor/components/file-explorer"
 import FileNotSelected from "$activities/editor/components/file-not-selected"
 import FileNotSupported from "$activities/editor/components/file-not-supported"
@@ -26,6 +27,8 @@ import "$activities/editor/index.css"
 export const EditorMetadataContext = createContext<OrdoExtensionMetadata<EditorMetadata>>({} as any)
 
 export default function Editor({ metadata }: OrdoExtensionProps<EditorMetadata>) {
+  const [path, setPath] = useState<Nullable<OrdoFilePath>>(null)
+
   const dispatch = useAppDispatch()
 
   const [query] = useSearchParams()
@@ -41,9 +44,21 @@ export default function Editor({ metadata }: OrdoExtensionProps<EditorMetadata>)
 
   const Workspace = useWorkspaceWithSidebar()
 
-  const path = query.get("path") as OrdoFilePath
-
   const fileAssociations = useAppSelector((state) => state.app.fileAssociationExtensions)
+
+  useEffect(() => {
+    setPath((query.get("path") as OrdoFilePath) ?? null)
+  }, [query])
+
+  useEffect(() => {
+    if (!path) return
+
+    const file = findOrdoFile(path, tree)
+
+    if (!file) return
+
+    dispatch(selectFile(file))
+  }, [path, tree, dispatch])
 
   useEffect(() => {
     if (!path) {

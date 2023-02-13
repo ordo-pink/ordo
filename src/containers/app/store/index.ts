@@ -44,7 +44,7 @@ const updateFileHandler: AsyncThunkPayloadCreator<IOrdoFileRaw, UpdateFilePayloa
   return result
 }
 
-const debounceSave = debounce(updateFileHandler, 2000, { trailing: true, leading: false })
+const debounceSave = debounce(updateFileHandler, 500, { trailing: true, leading: false })
 
 export const createFile = createAsyncThunk(
   "@ordo-app/create-file",

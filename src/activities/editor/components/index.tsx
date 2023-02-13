@@ -57,7 +57,8 @@ export default function Editor({ metadata }: OrdoExtensionProps<EditorMetadata>)
     if (!file) return
 
     dispatch(selectFile(file))
-  }, [path, tree, dispatch])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [path, tree])
 
   useEffect(() => {
     if (!path) {

@@ -1,4 +1,4 @@
-import { IOrdoFile, IOrdoFileRaw } from "@ordo-pink/core"
+import { IOrdoFileRaw } from "@ordo-pink/core"
 import { CaseReducer, PayloadAction } from "@reduxjs/toolkit"
 
 import { getFile } from "$containers/app/store/reducers/common"
@@ -12,11 +12,8 @@ export const updatedFileReducer: CaseReducer<AppState, PayloadAction<IOrdoFileRa
 ) => {
   Either.fromNullable(payload)
     .chain(getFile(state.personalProject))
-    .fold(noOp, (item: IOrdoFile) => {
-      Object.keys(payload).forEach(
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore
-        (key) => (item[key as keyof IOrdoFileRaw] = payload[key as keyof IOrdoFileRaw]),
-      )
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    .fold(noOp, (item: any) => {
+      item.size = payload.size
     })
 }

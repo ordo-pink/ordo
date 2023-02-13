@@ -1,11 +1,10 @@
 import Editor, { EditorPlugin } from "@draft-js-plugins/editor"
-import { OrdoFile, OrdoFilePath } from "@ordo-pink/core"
+import { OrdoFilePath } from "@ordo-pink/core"
 import { convertFromRaw, convertToRaw, EditorState } from "draft-js"
 import { markdownToDraft, draftToMarkdown } from "markdown-draft-js"
 import { useState, useEffect, useRef } from "react"
 import { useSearchParams } from "react-router-dom"
 
-import { selectFile } from "$activities/editor/store"
 import { EditorActivityState } from "$activities/editor/types"
 
 import { updatedFile } from "$containers/app/store"
@@ -19,18 +18,17 @@ import { useAppSelector } from "$core/state/hooks/use-app-selector"
 import { useExtensionSelector } from "$core/state/hooks/use-extension-selector"
 import { Box } from "$core/utils/box"
 import { Either } from "$core/utils/either"
-import { findOrdoFile } from "$core/utils/fs-helpers"
 
 export default function MdEditor() {
   const dispatch = useAppDispatch()
 
-  const tree = useAppSelector((state) => state.app.personalProject)
-
   const editorSelector = useExtensionSelector<EditorActivityState>()
   const pluginExtensions = useAppSelector((state) => state.app.editorPluginExtensions)
-
   const currentFile = editorSelector((state) => state["ordo-activity-editor"].currentFile)
 
+  const breadcrumbsPath = useFileParentBreadcrumbs()
+
+  const [path, setPath] = useState<OrdoFilePath>("" as OrdoFilePath)
   const [editorState, setEditorState] = useState(EditorState.createEmpty())
   const [plugins, setPlugins] = useState<EditorPlugin[]>([])
 
@@ -39,8 +37,9 @@ export default function MdEditor() {
   const [query] = useSearchParams()
   const { files } = useFSAPI()
 
-  const path = query.get("path") as OrdoFilePath
-  const breadcrumbsPath = useFileParentBreadcrumbs()
+  useEffect(() => {
+    setPath(query.get("path") as OrdoFilePath)
+  }, [query])
 
   useEffect(() => {
     if (pluginExtensions) {
@@ -81,22 +80,16 @@ export default function MdEditor() {
   }, [pluginExtensions, editorState])
 
   useEffect(() => {
-    if (!path || !files || !tree || !OrdoFile.isValidPath(path)) return
+    if (!path) return
 
     files.get(path).then((payload) => {
-      const file = findOrdoFile(path, tree)
-
-      if (file) {
-        dispatch(selectFile(file))
-      }
-
       Box.of(payload)
         .map(markdownToDraft)
         .map(convertFromRaw)
         .map(EditorState.createWithContent)
         .fold(setEditorState)
     })
-  }, [path, files, tree, dispatch])
+  }, [path, files])
 
   const handleEditorClick = () => editorRef.current?.focus()
 

@@ -1,4 +1,4 @@
-import { IOrdoDirectory } from "@ordo-pink/core"
+import { IOrdoDirectory, SystemDirectory } from "@ordo-pink/core"
 import { MouseEvent, useContext, useEffect, useState } from "react"
 import {
   AiFillFolder,
@@ -91,20 +91,24 @@ export default function Directory({ directory }: Props) {
       .fold(({ x, y }) => dispatch(showContextMenu({ target: directory, x, y }))),
   )
 
-  return Either.fromNullable(directory).fold(Null, (directory) => (
-    <ActionListItem
-      style={{ paddingLeft }}
-      text={directory.readableName}
-      Icon={Icon}
-      onClick={handleClick}
-      isCurrent={false}
-      onContextMenu={handleContextMenu}
-    >
-      <Chevron className="shrink-0" />
-      <DirectoryContent
-        directory={directory}
-        isExpanded={isExpanded}
-      />
-    </ActionListItem>
-  ))
+  return Either.fromNullable(directory)
+    .chain(() =>
+      Either.fromBoolean(directory.path !== SystemDirectory.INTERNAL).map(() => directory),
+    )
+    .fold(Null, (directory) => (
+      <ActionListItem
+        style={{ paddingLeft }}
+        text={directory.readableName}
+        Icon={Icon}
+        onClick={handleClick}
+        isCurrent={false}
+        onContextMenu={handleContextMenu}
+      >
+        <Chevron className="shrink-0" />
+        <DirectoryContent
+          directory={directory}
+          isExpanded={isExpanded}
+        />
+      </ActionListItem>
+    ))
 }

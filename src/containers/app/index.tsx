@@ -39,8 +39,6 @@ import { useAppSelector } from "$core/state/hooks/use-app-selector"
 import { useExtensionSelector } from "$core/state/hooks/use-extension-selector"
 import { OrdoExtension, OrdoExtensionName } from "$core/types"
 
-import MarkdownShortcuts from "$editor-plugins/markdown-shortcuts"
-
 import ImgFileExtension from "$file-associations/img"
 import MdFileExtension from "$file-associations/md"
 import MediaEditor from "$file-associations/media"
@@ -60,7 +58,6 @@ const loggedInExtensions = [
   OpenFile,
   UserSupportCommands,
   AuthCommands,
-  MarkdownShortcuts,
   ImgFileExtension,
   PDFFileExtension,
   MediaEditor,
@@ -72,7 +69,6 @@ const loggedOutExtensions = [
   Home,
   Features,
   Pricing,
-  MarkdownShortcuts,
   UserSupportCommands,
 ]
 

@@ -1,10 +1,16 @@
-import Editor, { EditorPlugin } from "@draft-js-plugins/editor"
+import { $convertToMarkdownString } from "@lexical/markdown"
+import { LexicalComposer } from "@lexical/react/LexicalComposer"
+import { ContentEditable } from "@lexical/react/LexicalContentEditable"
+import LexicalErrorBoundary from "@lexical/react/LexicalErrorBoundary"
+import { HistoryPlugin } from "@lexical/react/LexicalHistoryPlugin"
+import { OnChangePlugin } from "@lexical/react/LexicalOnChangePlugin"
+import { PlainTextPlugin } from "@lexical/react/LexicalPlainTextPlugin"
 import { OrdoFilePath } from "@ordo-pink/core"
-import { convertFromRaw, convertToRaw, EditorState } from "draft-js"
-import { markdownToDraft, draftToMarkdown } from "markdown-draft-js"
-import { useState, useEffect, useRef } from "react"
+import { EditorState, EditorThemeClasses } from "lexical"
+import { useState, useEffect, ComponentType } from "react"
 import { useSearchParams } from "react-router-dom"
 
+import { EditorStatePlugin } from "../plugins/editor-state"
 import { EditorActivityState } from "$activities/editor/types"
 
 import { updatedFile } from "$containers/app/store"
@@ -12,12 +18,12 @@ import { updatedFile } from "$containers/app/store"
 import EditorPage from "$core/components/editor-page/editor-page"
 import Null from "$core/components/null"
 import { useFileParentBreadcrumbs } from "$core/hooks/use-file-breadcrumbs"
-import { useFSAPI } from "$core/hooks/use-fs-api"
 import { useAppDispatch } from "$core/state/hooks/use-app-dispatch"
 import { useAppSelector } from "$core/state/hooks/use-app-selector"
 import { useExtensionSelector } from "$core/state/hooks/use-extension-selector"
-import { Box } from "$core/utils/box"
 import { Either } from "$core/utils/either"
+
+const theme: EditorThemeClasses = {}
 
 export default function MdEditor() {
   const dispatch = useAppDispatch()
@@ -26,98 +32,74 @@ export default function MdEditor() {
   const pluginExtensions = useAppSelector((state) => state.app.editorPluginExtensions)
   const currentFile = editorSelector((state) => state["ordo-activity-editor"].currentFile)
 
+  const [query] = useSearchParams()
+
   const breadcrumbsPath = useFileParentBreadcrumbs()
 
   const [path, setPath] = useState<OrdoFilePath>("" as OrdoFilePath)
-  const [editorState, setEditorState] = useState(EditorState.createEmpty())
-  const [plugins, setPlugins] = useState<EditorPlugin[]>([])
-
-  const editorRef = useRef<Editor>(null)
-
-  const [query] = useSearchParams()
-  const { files } = useFSAPI()
+  const [plugins, setPlugins] = useState<ComponentType[]>([])
 
   useEffect(() => {
     setPath(query.get("path") as OrdoFilePath)
   }, [query])
 
   useEffect(() => {
-    if (pluginExtensions) {
-      let plugins = [] as EditorPlugin[]
+    if (!pluginExtensions || !pluginExtensions.length) return
 
-      pluginExtensions.forEach((extension) => {
-        plugins = plugins.concat(
-          extension.plugins.map((plugin) => {
-            if (!plugin) return plugin
+    setPlugins(
+      pluginExtensions.reduce(
+        (acc, extension) => acc.concat(extension.plugins),
+        [] as ComponentType[],
+      ),
+    )
 
-            plugin.initialize &&
-              plugin.initialize({
-                getEditorState: () => editorState,
-                setEditorState: (editorState) => setEditorState(editorState),
-                setReadOnly: () => void 0,
-                getReadOnly: () => false,
-                getEditorRef: () => ({
-                  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                  editor: editorRef.current as any,
-                  refs: {
-                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                    editor: editorRef.current as any,
-                  },
-                }),
-                getPlugins: () => plugins,
-                getProps: () => void 0,
-              })
+    return () => setPlugins([])
+  }, [pluginExtensions])
 
-            return plugin
-          }),
-        )
-      })
+  const handleChange = (state: EditorState) => {
+    state.read(() => {
+      const content = $convertToMarkdownString()
 
-      setPlugins(plugins)
-
-      return () => setPlugins([])
-    }
-  }, [pluginExtensions, editorState])
-
-  useEffect(() => {
-    if (!path) return
-
-    files.get(path).then((payload) => {
-      Box.of(payload)
-        .map(markdownToDraft)
-        .map(convertFromRaw)
-        .map(EditorState.createWithContent)
-        .fold(setEditorState)
+      dispatch(updatedFile({ path, content }))
     })
-  }, [path, files])
+  }
 
-  const handleEditorClick = () => editorRef.current?.focus()
+  // eslint-disable-next-line no-console
+  const onError = console.error
 
   return Either.fromNullable(currentFile).fold(Null, (file) => (
     <EditorPage
       title={file.readableName}
       breadcrumbsPath={breadcrumbsPath}
-      onClick={handleEditorClick}
     >
-      <Editor
-        // placeholder="Type something..."
-        ref={editorRef}
-        editorState={editorState}
-        plugins={plugins}
-        onChange={(state) => {
-          if (state.getLastChangeType() != null) {
-            const content = state.getCurrentContent()
-            const raw = convertToRaw(content)
-            const markdownString = draftToMarkdown(raw)
-
-            if (!markdownString) return
-
-            dispatch(updatedFile({ path: file.path, content: markdownString }))
-          }
-
-          setEditorState(state)
+      <LexicalComposer
+        initialConfig={{
+          namespace: "md-editor-root",
+          onError,
+          theme,
         }}
-      />
+      >
+        <PlainTextPlugin
+          contentEditable={<ContentEditable />}
+          placeholder={<div>...</div>}
+          ErrorBoundary={LexicalErrorBoundary}
+        />
+
+        <EditorStatePlugin />
+
+        <OnChangePlugin
+          ignoreSelectionChange
+          onChange={handleChange}
+        />
+
+        <HistoryPlugin />
+
+        <>
+          {plugins.map((Plugin, index) => (
+            <Plugin key={index} />
+          ))}
+        </>
+      </LexicalComposer>
     </EditorPage>
   ))
 }

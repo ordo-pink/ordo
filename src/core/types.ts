@@ -1,4 +1,3 @@
-import type { EditorPlugin } from "@draft-js-plugins/editor"
 import {
   IOrdoDirectory,
   IOrdoFile,
@@ -110,7 +109,7 @@ export interface OrdoEditorPluginExtension<
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   TState extends Record<string, any> = Record<string, any>,
 > extends OrdoExtension<Name, OrdoExtensionType.EDITOR_PLUGIN, TState> {
-  plugins: EditorPlugin[]
+  plugins: ComponentType[]
 }
 
 export interface OrdoFileAssociationExtension<

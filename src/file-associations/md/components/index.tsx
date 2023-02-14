@@ -1,4 +1,5 @@
 import { CodeHighlightNode, CodeNode } from "@lexical/code"
+import { HashtagNode } from "@lexical/hashtag"
 import { AutoLinkNode, LinkNode } from "@lexical/link"
 import { ListItemNode, ListNode } from "@lexical/list"
 import { $convertToMarkdownString, TRANSFORMERS } from "@lexical/markdown"
@@ -6,6 +7,7 @@ import { $convertToMarkdownString, TRANSFORMERS } from "@lexical/markdown"
 import { LexicalComposer } from "@lexical/react/LexicalComposer"
 import { ContentEditable } from "@lexical/react/LexicalContentEditable"
 import LexicalErrorBoundary from "@lexical/react/LexicalErrorBoundary"
+import { HashtagPlugin } from "@lexical/react/LexicalHashtagPlugin"
 import { HistoryPlugin } from "@lexical/react/LexicalHistoryPlugin"
 import { MarkdownShortcutPlugin } from "@lexical/react/LexicalMarkdownShortcutPlugin"
 import { OnChangePlugin } from "@lexical/react/LexicalOnChangePlugin"
@@ -17,20 +19,41 @@ import { EditorState, EditorThemeClasses } from "lexical"
 import { useState, useEffect, ComponentType } from "react"
 import { useSearchParams } from "react-router-dom"
 
-import { EditorStatePlugin } from "../plugins/editor-state"
+import { LoadEditorStatePlugin } from "../core-plugins/load-editor-state"
 import { EditorActivityState } from "$activities/editor/types"
 
 import { updatedFile } from "$containers/app/store"
 
-import EditorPage from "$core/components/editor-page/editor-page"
 import Null from "$core/components/null"
+import PathBreadcrumbs from "$core/components/path-breadcrumbs"
 import { useFileParentBreadcrumbs } from "$core/hooks/use-file-breadcrumbs"
 import { useAppDispatch } from "$core/state/hooks/use-app-dispatch"
 import { useAppSelector } from "$core/state/hooks/use-app-selector"
 import { useExtensionSelector } from "$core/state/hooks/use-extension-selector"
 import { Either } from "$core/utils/either"
 
-const theme: EditorThemeClasses = {}
+const theme: EditorThemeClasses = {
+  heading: {
+    h1: "text-5xl mb-8",
+    h2: "text-4xl mb-7",
+    h3: "text-3xl mb-6",
+    h4: "text-2xl mb-5",
+    h5: "text-xl mb-4",
+  },
+  list: {
+    ul: "list-inside list-disc mb-4",
+    ol: "list-inside list-decimal mb-4",
+  },
+  paragraph: "mb-4",
+  hashtag: "text-pink-600 dark:text-pink-300",
+  text: {
+    strikethrough: "line-through",
+    underline: "underline",
+    underlineStrikethrough: "underline line-through",
+    bold: "font-bold",
+    italic: "italic",
+  },
+}
 
 const nodes = [
   HeadingNode,
@@ -44,6 +67,7 @@ const nodes = [
   TableRowNode,
   AutoLinkNode,
   LinkNode,
+  HashtagNode,
 ]
 
 export default function MdEditor() {
@@ -98,10 +122,7 @@ export default function MdEditor() {
   const onError = console.error
 
   return Either.fromNullable(currentFile).fold(Null, (file) => (
-    <EditorPage
-      title={file.readableName}
-      breadcrumbsPath={breadcrumbsPath}
-    >
+    <div className="p-4 w-full">
       <LexicalComposer
         initialConfig={{
           namespace: "md-editor-root",
@@ -110,29 +131,40 @@ export default function MdEditor() {
           nodes,
         }}
       >
-        <MarkdownShortcutPlugin transformers={TRANSFORMERS} />
+        <div className="mb-8">
+          <PathBreadcrumbs path={breadcrumbsPath} />
 
-        <RichTextPlugin
-          contentEditable={<ContentEditable />}
-          placeholder={<div>...</div>}
-          ErrorBoundary={LexicalErrorBoundary}
-        />
+          <h1 className="text-3xl font-black">{file.readableName}</h1>
+        </div>
 
-        <EditorStatePlugin />
+        <div className="w-full h-screen flex flex-col items-center">
+          <div className="prose prose-pink dark:prose-invert w-full py-8 px-4">
+            <MarkdownShortcutPlugin transformers={TRANSFORMERS} />
 
-        <OnChangePlugin
-          ignoreSelectionChange
-          onChange={handleChange}
-        />
+            <HashtagPlugin />
+            <HistoryPlugin />
 
-        <HistoryPlugin />
+            <RichTextPlugin
+              contentEditable={<ContentEditable />}
+              placeholder={<div>...</div>}
+              ErrorBoundary={LexicalErrorBoundary}
+            />
 
-        <>
-          {plugins.map((Plugin, index) => (
-            <Plugin key={index} />
-          ))}
-        </>
+            <LoadEditorStatePlugin />
+
+            <OnChangePlugin
+              ignoreSelectionChange
+              onChange={handleChange}
+            />
+
+            <>
+              {plugins.map((Plugin, index) => (
+                <Plugin key={index} />
+              ))}
+            </>
+          </div>
+        </div>
       </LexicalComposer>
-    </EditorPage>
+    </div>
   ))
 }

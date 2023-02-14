@@ -6,7 +6,7 @@ import { useSearchParams } from "react-router-dom"
 
 import { useFSAPI } from "$core/hooks/use-fs-api"
 
-export const EditorStatePlugin = () => {
+export const LoadEditorStatePlugin = () => {
   const [editor] = useLexicalComposerContext()
   const [query] = useSearchParams()
   const { files } = useFSAPI()

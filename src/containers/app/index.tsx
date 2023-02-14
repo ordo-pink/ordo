@@ -39,6 +39,8 @@ import { useAppSelector } from "$core/state/hooks/use-app-selector"
 import { useExtensionSelector } from "$core/state/hooks/use-extension-selector"
 import { OrdoExtension, OrdoExtensionName } from "$core/types"
 
+import ToolbarPlugin from "$editor-plugins/toolbar"
+
 import ImgFileExtension from "$file-associations/img"
 import MdFileExtension from "$file-associations/md"
 import MediaEditor from "$file-associations/media"
@@ -61,6 +63,7 @@ const loggedInExtensions = [
   ImgFileExtension,
   PDFFileExtension,
   MediaEditor,
+  ToolbarPlugin,
 ]
 
 const loggedOutExtensions = [
@@ -70,6 +73,7 @@ const loggedOutExtensions = [
   Features,
   Pricing,
   UserSupportCommands,
+  ToolbarPlugin,
 ]
 
 export default function App() {

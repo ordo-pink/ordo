@@ -4,7 +4,7 @@ import { $getSelection, $isRangeSelection, LexicalEditor, SELECTION_CHANGE_COMMA
 import { useRef, useState, useCallback, useEffect } from "react"
 import { BsCheck2, BsPencilSquare } from "react-icons/bs"
 import { Link } from "react-router-dom"
-import { LowPriority } from "../constants"
+import { LOW_PRIORITY } from "../constants"
 import { getSelectedNode } from "../utils/get-selected-node"
 import { OrdoButtonSecondary } from "$core/components/buttons"
 
@@ -58,7 +58,7 @@ export function LinkEditor({ editor }: Props) {
           updateLinkEditor()
           return true
         },
-        LowPriority,
+        LOW_PRIORITY,
       ),
     )
   }, [editor, updateLinkEditor])

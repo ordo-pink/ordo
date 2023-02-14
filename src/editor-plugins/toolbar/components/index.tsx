@@ -32,7 +32,7 @@ import {
 } from "react-icons/ai"
 import { BlockOptions } from "./block-options"
 import { LinkEditor } from "./link-editor"
-import { LowPriority } from "../constants"
+import { LOW_PRIORITY } from "../constants"
 import { getSelectedNode } from "../utils/get-selected-node"
 import { positionEditorElement } from "../utils/position-editor-element"
 import Null from "$core/components/null"
@@ -166,12 +166,13 @@ export default function ToolbarPlugin() {
           updateToolbar()
           return false
         },
-        LowPriority,
+        LOW_PRIORITY,
       ),
     )
   }, [editor, updateToolbar])
 
   const codeLanguages = useMemo(() => getCodeLanguages(), [])
+
   const onCodeLanguageSelect = useCallback(
     (e: ChangeEvent<HTMLSelectElement>) => {
       editor.update(() => {
@@ -248,7 +249,7 @@ export default function ToolbarPlugin() {
           updateLinkEditor()
           return true
         },
-        LowPriority,
+        LOW_PRIORITY,
       ),
     )
   }, [editor, updateLinkEditor])
@@ -257,7 +258,7 @@ export default function ToolbarPlugin() {
     createPortal(
       <div
         ref={toolbarRef}
-        className="absolute flex flex-col space-y-2 items-center bg-white dark:bg-neutral-900 shadow-lg p-2 rounded-sm"
+        className="absolute z-[1000] flex flex-col space-y-2 items-center bg-white dark:bg-neutral-800 text-neutral-800 dark:text-neutral-200 shadow-lg p-2 rounded-sm"
       >
         <div>
           {supportedBlockTypes.has(blockType) && (

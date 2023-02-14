@@ -1,14 +1,20 @@
-import { CodeHighlightNode, CodeNode } from "@lexical/code"
+import { CodeHighlightNode, CodeNode, registerCodeHighlighting } from "@lexical/code"
 import { HashtagNode } from "@lexical/hashtag"
 import { AutoLinkNode, LinkNode } from "@lexical/link"
 import { ListItemNode, ListNode } from "@lexical/list"
 import { $convertToMarkdownString, TRANSFORMERS } from "@lexical/markdown"
 
+import { AutoLinkPlugin } from "@lexical/react/LexicalAutoLinkPlugin"
+import { CheckListPlugin } from "@lexical/react/LexicalCheckListPlugin"
 import { LexicalComposer } from "@lexical/react/LexicalComposer"
+import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext"
 import { ContentEditable } from "@lexical/react/LexicalContentEditable"
 import LexicalErrorBoundary from "@lexical/react/LexicalErrorBoundary"
 import { HashtagPlugin } from "@lexical/react/LexicalHashtagPlugin"
 import { HistoryPlugin } from "@lexical/react/LexicalHistoryPlugin"
+import { HorizontalRulePlugin } from "@lexical/react/LexicalHorizontalRulePlugin"
+import { LinkPlugin } from "@lexical/react/LexicalLinkPlugin"
+import { ListPlugin } from "@lexical/react/LexicalListPlugin"
 import { MarkdownShortcutPlugin } from "@lexical/react/LexicalMarkdownShortcutPlugin"
 import { OnChangePlugin } from "@lexical/react/LexicalOnChangePlugin"
 import { RichTextPlugin } from "@lexical/react/LexicalRichTextPlugin"
@@ -34,24 +40,60 @@ import { Either } from "$core/utils/either"
 
 const theme: EditorThemeClasses = {
   heading: {
-    h1: "text-5xl mb-8",
-    h2: "text-4xl mb-7",
-    h3: "text-3xl mb-6",
-    h4: "text-2xl mb-5",
-    h5: "text-xl mb-4",
+    h1: "font-extrabold text-5xl my-2",
+    h2: "font-extrabold text-4xl my-2",
+    h3: "font-extrabold text-3xl my-2",
+    h4: "font-extrabold text-2xl my-2",
+    h5: "font-extrabold text-xl my-2",
   },
   list: {
-    ul: "list-inside list-disc mb-4",
-    ol: "list-inside list-decimal mb-4",
+    ul: "list-inside list-disc my-2",
+    ol: "list-inside list-decimal my-2",
   },
-  paragraph: "mb-4",
-  hashtag: "text-pink-600 dark:text-pink-300",
+  link: "text-sky-700 visited:text-purple-700",
+  paragraph: "my-2",
+  hashtag: "text-pink-600 dark:text-pink-400",
   text: {
     strikethrough: "line-through",
     underline: "underline",
     underlineStrikethrough: "underline line-through",
     bold: "font-bold",
     italic: "italic",
+  },
+  quote:
+    "border-l border-b border-slate-400 dark:border-slate-600 p-4 max-w-xl my-2 text-sm rounded-bl-lg",
+  code: "block px-6 py-4 bg-stone-200 dark:bg-stone-800 max-w-xl my-8 shadow-lg rounded-lg",
+  codeHighlight: {
+    atrule: "text-neutral-500",
+    attr: "text-neutral-500",
+    boolean: "text-orange-700",
+    builtin: "text-emerald-600 font-bold",
+    cdata: "text-neutral-400",
+    char: "text-emerald-600",
+    class: "text-emerald-900",
+    "class-name": "text-emerald-900",
+    comment: "text-neutral-400",
+    constant: "text-orange-700",
+    deleted: "text-orange-700",
+    doctype: "text-neutral-400",
+    entity: "text-stone-600",
+    function: "text-emerald-900",
+    important: "text-neutral-600",
+    inserted: "text-emerald-600",
+    keyword: "text-neutral-500",
+    namespace: "text-neutral-600",
+    number: "text-orange-700",
+    operator: "text-stone-600",
+    prolog: "text-neutral-400",
+    property: "text-orange-700",
+    punctuation: "text-neutral-400",
+    regex: "text-neutral-600",
+    selector: "text-emerald-600",
+    string: "text-emerald-600",
+    symbol: "text-orange-700",
+    tag: "text-orange-700",
+    url: "text-stone-600",
+    variable: "text-neutral-600",
   },
 }
 
@@ -69,6 +111,18 @@ const nodes = [
   LinkNode,
   HashtagNode,
 ]
+
+const HighlightCodePlugin = () => {
+  const [editor] = useLexicalComposerContext()
+
+  useEffect(() => {
+    editor.update(() => {
+      registerCodeHighlighting(editor)
+    })
+  }, [editor])
+
+  return null
+}
 
 export default function MdEditor() {
   const dispatch = useAppDispatch()
@@ -122,7 +176,7 @@ export default function MdEditor() {
   const onError = console.error
 
   return Either.fromNullable(currentFile).fold(Null, (file) => (
-    <div className="p-4 w-full">
+    <div className="p-4 w-full max-w-2xl">
       <LexicalComposer
         initialConfig={{
           namespace: "md-editor-root",
@@ -138,11 +192,44 @@ export default function MdEditor() {
         </div>
 
         <div className="w-full h-screen flex flex-col items-center">
-          <div className="prose prose-pink dark:prose-invert w-full py-8 px-4">
+          <div className="w-full py-8 px-4">
             <MarkdownShortcutPlugin transformers={TRANSFORMERS} />
+
+            <LinkPlugin />
+            <ListPlugin />
+            <CheckListPlugin />
 
             <HashtagPlugin />
             <HistoryPlugin />
+            <HorizontalRulePlugin />
+            <HighlightCodePlugin />
+
+            <AutoLinkPlugin
+              matchers={[
+                (x) => {
+                  const rx =
+                    /(?:(?:(?:https?|ftp):)?\/\/)(?:\S+(?::\S*)?@)?(?:(?!(?:10|127)(?:\.\d{1,3}){3})(?!(?:169\.254|192\.168)(?:\.\d{1,3}){2})(?!172\.(?:1[6-9]|2\d|3[0-1])(?:\.\d{1,3}){2})(?:[1-9]\d?|1\d\d|2[01]\d|22[0-3])(?:\.(?:1?\d{1,2}|2[0-4]\d|25[0-5])){2}(?:\.(?:[1-9]\d?|1\d\d|2[0-4]\d|25[0-4]))|(?:(?:[a-z0-9\u00a1-\uffff][a-z0-9\u00a1-\uffff_-]{0,62})?[a-z0-9\u00a1-\uffff]\.)+(?:[a-z\u00a1-\uffff]{2,}\.?))(?::\d{2,5})?(?:[/?#]\S*)?/i
+
+                  const matched = x.match(rx)
+
+                  if (!matched || !matched[0]) return null
+
+                  const urlText = matched[0]
+
+                  return {
+                    index: x.indexOf(urlText),
+                    length: urlText.length,
+                    text: urlText,
+                    url: urlText,
+                    attributes: {
+                      target: "_blank",
+                      rel: "noreferrer noopener",
+                    },
+                  }
+                },
+              ]}
+            />
+            <CheckListPlugin />
 
             <RichTextPlugin
               contentEditable={<ContentEditable />}

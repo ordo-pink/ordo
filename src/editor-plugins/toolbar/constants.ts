@@ -1,1 +1,1 @@
-export const LowPriority = 1
+export const LOW_PRIORITY = 1

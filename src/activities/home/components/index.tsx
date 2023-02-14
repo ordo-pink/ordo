@@ -1,107 +1,109 @@
-// import { useState, useRef, useEffect } from "react"
-// import Helmet from "react-helmet"
-// import { useTranslation } from "react-i18next"
+import { CodeNode, CodeHighlightNode } from "@lexical/code"
+import { AutoLinkNode, LinkNode } from "@lexical/link"
+import { ListNode, ListItemNode } from "@lexical/list"
+import { $convertFromMarkdownString, TRANSFORMERS } from "@lexical/markdown"
 
+import { LexicalComposer } from "@lexical/react/LexicalComposer"
+import { ContentEditable } from "@lexical/react/LexicalContentEditable"
+import LexicalErrorBoundary from "@lexical/react/LexicalErrorBoundary"
+import { HistoryPlugin } from "@lexical/react/LexicalHistoryPlugin"
+import { MarkdownShortcutPlugin } from "@lexical/react/LexicalMarkdownShortcutPlugin"
+import { RichTextPlugin } from "@lexical/react/LexicalRichTextPlugin"
+import { HeadingNode, QuoteNode } from "@lexical/rich-text"
+import { TableNode, TableCellNode, TableRowNode } from "@lexical/table"
+import { EditorThemeClasses } from "lexical"
+import { useState, useEffect, ComponentType } from "react"
+import Helmet from "react-helmet"
+import { useTranslation } from "react-i18next"
 import { useWorkspace } from "$containers/workspace/hooks/use-workspace"
+import { useAppSelector } from "$core/state/hooks/use-app-selector"
 
-// import { useAppSelector } from "$core/state/hooks/use-app-selector"
-// import { lazyBox } from "$core/utils/lazy-box"
+const theme: EditorThemeClasses = {}
+
+const nodes = [
+  HeadingNode,
+  ListNode,
+  ListItemNode,
+  QuoteNode,
+  CodeNode,
+  CodeHighlightNode,
+  TableNode,
+  TableCellNode,
+  TableRowNode,
+  AutoLinkNode,
+  LinkNode,
+]
 
 export default function Home() {
   const Workspace = useWorkspace()
 
-  // const pluginExtensions = useAppSelector((state) => state.app.editorPluginExtensions)
+  const pluginExtensions = useAppSelector((state) => state.app.editorPluginExtensions)
 
-  // const [editorState, setEditorState] = useState(() => EditorState.createEmpty())
-  // const [plugins, setPlugins] = useState<EditorPlugin[]>([])
+  const [plugins, setPlugins] = useState<ComponentType[]>([])
 
-  // const editorRef = useRef<Editor>(null)
+  useEffect(() => {
+    if (!pluginExtensions || !pluginExtensions.length) return
 
-  // const { t } = useTranslation()
+    setPlugins(
+      pluginExtensions.reduce(
+        (acc, extension) => acc.concat(extension.plugins),
+        [] as ComponentType[],
+      ),
+    )
 
-  // const translatedTitle = t("@ordo-activity-home/title")
-  // const translatedText = t("@ordo-activity-home/text")
+    return () => setPlugins([])
+  }, [pluginExtensions])
 
-  // useEffect(() => {
-  //   if (pluginExtensions) {
-  //     let plugins = [] as EditorPlugin[]
+  const { t } = useTranslation()
 
-  //     pluginExtensions.forEach((extension) => {
-  //       plugins = plugins.concat(
-  //         extension.plugins.map((plugin) => {
-  //           if (!plugin) return plugin
+  const translatedTitle = t("@ordo-activity-home/title")
+  const translatedText = t("@ordo-activity-home/text")
 
-  //           plugin.initialize &&
-  //             plugin.initialize({
-  //               getEditorState: () => editorState,
-  //               setEditorState: (editorState) => setEditorState(editorState),
-  //               setReadOnly: () => void 0,
-  //               getReadOnly: () => false,
-  //               getEditorRef: () => ({
-  //                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  //                 editor: editorRef.current as any,
-  //                 refs: {
-  //                   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  //                   editor: editorRef.current as any,
-  //                 },
-  //               }),
-  //               getPlugins: () => plugins,
-  //               getProps: () => void 0,
-  //             })
+  // eslint-disable-next-line no-console
+  const onError = console.error
 
-  //           return plugin
-  //         }),
-  //       )
-  //     })
+  return (
+    <Workspace>
+      <Helmet>
+        <title>
+          {"Ordo.pink | "}
+          {translatedTitle}
+        </title>
+      </Helmet>
 
-  //     setPlugins(plugins)
-  //   }
+      <div className="w-full h-screen flex flex-col items-center">
+        <div className="prose prose-pink dark:prose-invert w-full py-8 px-4">
+          <LexicalComposer
+            initialConfig={{
+              namespace: "md-editor-root",
+              onError,
+              theme,
+              nodes,
+              editorState: (editor) => {
+                editor.update(() => {
+                  $convertFromMarkdownString(translatedText)
+                })
+              },
+            }}
+          >
+            <MarkdownShortcutPlugin transformers={TRANSFORMERS} />
 
-  //   return () => setPlugins([])
-  // }, [pluginExtensions, editorState])
+            <RichTextPlugin
+              contentEditable={<ContentEditable />}
+              placeholder={<div>...</div>}
+              ErrorBoundary={LexicalErrorBoundary}
+            />
 
-  // useEffect(() => {
-  //   const raw = markdownToDraft(translatedText)
+            <HistoryPlugin />
 
-  //   const contentState = convertFromRaw(raw)
-
-  //   setEditorState(EditorState.createWithContent(contentState))
-  // }, [translatedText])
-
-  // const handleEditorClick = lazyBox((box) => box.fold(() => editorRef.current?.focus()))
-
-  // return (
-  //   <Workspace>
-  //     <Helmet>
-  //       <title>
-  //         {"Ordo.pink | "}
-  //         {translatedTitle}
-  //       </title>
-  //     </Helmet>
-
-  //     <div
-  //       className="w-full h-screen flex flex-col items-center"
-  //       role="none"
-  //       onClick={handleEditorClick}
-  //     >
-  //       <div className="prose prose-pink dark:prose-invert w-full py-8 px-4">
-  //         <Editor
-  //           ref={editorRef}
-  //           editorState={editorState}
-  //           plugins={plugins}
-  //           onChange={(state) => {
-  //             setEditorState(state)
-  //           }}
-  //           handlePastedText={(_, __, state) => {
-  //             setEditorState(state)
-
-  //             return "not-handled"
-  //           }}
-  //         />
-  //       </div>
-  //     </div>
-  //   </Workspace>
-  // )
-
-  return <h1>TODO</h1>
+            <>
+              {plugins.map((Plugin, index) => (
+                <Plugin key={index} />
+              ))}
+            </>
+          </LexicalComposer>
+        </div>
+      </div>
+    </Workspace>
+  )
 }

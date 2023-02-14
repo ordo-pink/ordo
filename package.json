@@ -4,8 +4,13 @@
   "private": true,
   "dependencies": {
     "@craco/craco": "^7.0.0",
+    "@lexical/code": "^0.8.0",
+    "@lexical/link": "^0.8.0",
+    "@lexical/list": "^0.8.0",
     "@lexical/markdown": "^0.8.0",
     "@lexical/react": "^0.8.0",
+    "@lexical/rich-text": "^0.8.0",
+    "@lexical/table": "^0.8.0",
     "@loadable/component": "^5.15.2",
     "@ordo-pink/core": "^0.2.1",
     "@ordo-pink/switch": "^1.1.1",

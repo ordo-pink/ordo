@@ -1,10 +1,17 @@
-import { $convertToMarkdownString } from "@lexical/markdown"
+import { CodeHighlightNode, CodeNode } from "@lexical/code"
+import { AutoLinkNode, LinkNode } from "@lexical/link"
+import { ListItemNode, ListNode } from "@lexical/list"
+import { $convertToMarkdownString, TRANSFORMERS } from "@lexical/markdown"
+
 import { LexicalComposer } from "@lexical/react/LexicalComposer"
 import { ContentEditable } from "@lexical/react/LexicalContentEditable"
 import LexicalErrorBoundary from "@lexical/react/LexicalErrorBoundary"
 import { HistoryPlugin } from "@lexical/react/LexicalHistoryPlugin"
+import { MarkdownShortcutPlugin } from "@lexical/react/LexicalMarkdownShortcutPlugin"
 import { OnChangePlugin } from "@lexical/react/LexicalOnChangePlugin"
-import { PlainTextPlugin } from "@lexical/react/LexicalPlainTextPlugin"
+import { RichTextPlugin } from "@lexical/react/LexicalRichTextPlugin"
+import { HeadingNode, QuoteNode } from "@lexical/rich-text"
+import { TableCellNode, TableNode, TableRowNode } from "@lexical/table"
 import { OrdoFilePath } from "@ordo-pink/core"
 import { EditorState, EditorThemeClasses } from "lexical"
 import { useState, useEffect, ComponentType } from "react"
@@ -25,6 +32,20 @@ import { Either } from "$core/utils/either"
 
 const theme: EditorThemeClasses = {}
 
+const nodes = [
+  HeadingNode,
+  ListNode,
+  ListItemNode,
+  QuoteNode,
+  CodeNode,
+  CodeHighlightNode,
+  TableNode,
+  TableCellNode,
+  TableRowNode,
+  AutoLinkNode,
+  LinkNode,
+]
+
 export default function MdEditor() {
   const dispatch = useAppDispatch()
 
@@ -32,6 +53,7 @@ export default function MdEditor() {
   const pluginExtensions = useAppSelector((state) => state.app.editorPluginExtensions)
   const currentFile = editorSelector((state) => state["ordo-activity-editor"].currentFile)
 
+  const [isInitialLoad, setIsInitialLoad] = useState(true)
   const [query] = useSearchParams()
 
   const breadcrumbsPath = useFileParentBreadcrumbs()
@@ -41,6 +63,10 @@ export default function MdEditor() {
 
   useEffect(() => {
     setPath(query.get("path") as OrdoFilePath)
+
+    return () => {
+      setIsInitialLoad(true)
+    }
   }, [query])
 
   useEffect(() => {
@@ -60,7 +86,11 @@ export default function MdEditor() {
     state.read(() => {
       const content = $convertToMarkdownString()
 
-      dispatch(updatedFile({ path, content }))
+      if (!isInitialLoad) {
+        dispatch(updatedFile({ path, content }))
+      }
+
+      setIsInitialLoad(false)
     })
   }
 
@@ -77,9 +107,12 @@ export default function MdEditor() {
           namespace: "md-editor-root",
           onError,
           theme,
+          nodes,
         }}
       >
-        <PlainTextPlugin
+        <MarkdownShortcutPlugin transformers={TRANSFORMERS} />
+
+        <RichTextPlugin
           contentEditable={<ContentEditable />}
           placeholder={<div>...</div>}
           ErrorBoundary={LexicalErrorBoundary}

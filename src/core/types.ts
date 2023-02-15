@@ -17,7 +17,7 @@ import type { router } from "$core/router"
 import type { useAppDispatch } from "$core/state/hooks/use-app-dispatch"
 import type { RootState } from "$core/state/types"
 
-export type OrdoExtensionMetadata<T extends Record<string, unknown>> = {
+export type OrdoExtensionPersistedStore<T extends Record<string, unknown>> = {
   init: ThunkFn<Promise<void>>
   get<K extends keyof T>(key: K): Promise<Nullable<T[K]>>
   set<K extends keyof T>(key: K, value: T[K]): Promise<void>
@@ -30,10 +30,13 @@ export type OrdoExtensionMetadata<T extends Record<string, unknown>> = {
 export type OrdoLoadableComponent<T = Record<string, unknown>> = ComponentType<T> &
   LoadableComponent
 
-export type OrdoExtensionProps<
-  TMetadata extends Record<string, unknown> = Record<string, unknown>,
-> = {
-  metadata: OrdoExtensionMetadata<TMetadata>
+export type OrdoExtensionProps<T extends OrdoExtension<string, OrdoExtensionType>> = {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  persistedStore: T extends OrdoExtension<string, OrdoExtensionType, Record<string, any>, infer U>
+    ? OrdoExtensionPersistedStore<U>
+    : null
+  selector: () => null // TODO
+  translate: () => null // TODO
 }
 
 export type ActionContext<
@@ -79,21 +82,21 @@ export type TranslationsRecord = {
 }
 
 export interface OrdoExtension<
-  Name extends string,
-  ExtensionType extends OrdoExtensionType,
+  Name extends string = string,
+  ExtensionType extends OrdoExtensionType = OrdoExtensionType,
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  TState extends Record<string, any> = Record<string, any>,
+  MemoryState extends Record<string, any> = Record<string, any>,
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  TMetadata extends Record<string, any> = Record<string, any>,
+  PersistedState extends Record<string, any> = Record<string, any>,
 > {
   name: OrdoExtensionName<Name, ExtensionType>
   translations?: TranslationsRecord
   readableName?: string
   overlayComponents?: OrdoLoadableComponent[]
   description?: string
-  storeSlice?: Slice<TState>
+  storeSlice?: Slice<MemoryState>
   commands?: OrdoCommand<Name>[]
-  metadata?: TMetadata
+  persistedState?: PersistedState
 }
 
 export interface OrdoCommandExtension<
@@ -126,11 +129,12 @@ export interface OrdoActivityExtension<
   Name extends string,
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   TState extends Record<string, any> = Record<string, any>,
-  TMetadata extends Record<string, unknown> = Record<string, unknown>,
-> extends OrdoExtension<Name, OrdoExtensionType.ACTIVITY, TState> {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  PersistedState extends Record<string, any> = Record<string, any>,
+> extends OrdoExtension<Name, OrdoExtensionType.ACTIVITY, TState, PersistedState> {
   routes: string[]
   accelerator?: string
   Icon: OrdoLoadableComponent
-  Component: OrdoLoadableComponent<{ metadata?: OrdoExtensionMetadata<TMetadata> }>
-  metadata?: TMetadata
+  Component: OrdoLoadableComponent
+  persistedState?: PersistedState
 }

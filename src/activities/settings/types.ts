@@ -1,6 +1,6 @@
 import { Language, ColourTheme } from "@ordo-pink/core"
 
-export type SettingsMetadata = {
+export type SettingsPersistedState = {
   theme: ColourTheme
   language: Language
 }

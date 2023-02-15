@@ -6,26 +6,29 @@ import { useTranslation } from "react-i18next"
 import { AiOutlineLoading } from "react-icons/ai"
 import { createSearchParams, useNavigate, useSearchParams } from "react-router-dom"
 
+import { EditorProps } from ".."
 import { selectFile } from "../store"
 import FileExplorer from "$activities/editor/components/file-explorer"
 import FileNotSelected from "$activities/editor/components/file-not-selected"
 import FileNotSupported from "$activities/editor/components/file-not-supported"
-import { EditorActivityState, EditorMetadata } from "$activities/editor/types"
+import { EditorActivityState, EditorPersistedState } from "$activities/editor/types"
 import { useWorkspaceWithSidebar } from "$containers/workspace/hooks/use-workspace"
 import { useCurrentFileAssociation } from "$core/hooks/use-current-file-association"
 import { useAppDispatch } from "$core/state/hooks/use-app-dispatch"
 import { useAppSelector } from "$core/state/hooks/use-app-selector"
 import { useExtensionSelector } from "$core/state/hooks/use-extension-selector"
-import { OrdoExtensionMetadata, OrdoExtensionProps } from "$core/types"
+import { OrdoExtensionPersistedStore } from "$core/types"
 import { Either } from "$core/utils/either"
 import { findOrdoFile } from "$core/utils/fs-helpers"
 
 import "$activities/editor/index.css"
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const EditorMetadataContext = createContext<OrdoExtensionMetadata<EditorMetadata>>({} as any)
+export const EditorMetadataContext = createContext<
+  OrdoExtensionPersistedStore<EditorPersistedState>
+>({} as OrdoExtensionPersistedStore<EditorPersistedState>)
 
-export default function Editor({ metadata }: OrdoExtensionProps<EditorMetadata>) {
+export default function Editor({ persistedStore }: EditorProps) {
   const [path, setPath] = useState<Nullable<OrdoFilePath>>(null)
 
   const dispatch = useAppDispatch()
@@ -62,7 +65,7 @@ export default function Editor({ metadata }: OrdoExtensionProps<EditorMetadata>)
 
   useEffect(() => {
     if (!path) {
-      metadata.get("recentFiles").then((files) => {
+      persistedStore.get("recentFiles").then((files) => {
         if (!files || !files[0]) return
 
         const path = files[0]
@@ -84,7 +87,7 @@ export default function Editor({ metadata }: OrdoExtensionProps<EditorMetadata>)
         })
       })
     }
-  }, [metadata, association, navigate, path, fileAssociations])
+  }, [persistedStore, association, navigate, path, fileAssociations])
 
   useEffect(() => {
     if (!path || !tree || !dispatch) return
@@ -93,7 +96,7 @@ export default function Editor({ metadata }: OrdoExtensionProps<EditorMetadata>)
 
     if (!file) return
 
-    metadata.get("recentFiles").then((recent) => {
+    persistedStore.get("recentFiles").then((recent) => {
       Switch.of(file.path)
         .case(
           (path) => !recent || recent.indexOf(path) === 0,
@@ -105,14 +108,14 @@ export default function Editor({ metadata }: OrdoExtensionProps<EditorMetadata>)
             const recentCopy = [...(recent as OrdoFilePath[])]
 
             recentCopy.splice(recentCopy.indexOf(file.path), 1)
-            metadata.set("recentFiles", [file.path].concat(recentCopy))
+            persistedStore.set("recentFiles", [file.path].concat(recentCopy))
           },
         )
         .default(() => {
-          metadata.set("recentFiles", [file.path].concat(recent as OrdoFilePath[]))
+          persistedStore.set("recentFiles", [file.path].concat(recent as OrdoFilePath[]))
         })
     })
-  }, [path, tree, metadata, dispatch])
+  }, [path, tree, persistedStore, dispatch])
 
   const Component = Either.fromNullable(association).fold(
     () => FileNotSupported,
@@ -125,7 +128,7 @@ export default function Editor({ metadata }: OrdoExtensionProps<EditorMetadata>)
   const translatedSaving = t("@ordo-activity-editor/saving")
 
   return (
-    <EditorMetadataContext.Provider value={metadata}>
+    <EditorMetadataContext.Provider value={persistedStore}>
       <Workspace sidebarChildren={<FileExplorer />}>
         <Helmet>
           <title>

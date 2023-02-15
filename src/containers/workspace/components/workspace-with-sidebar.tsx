@@ -1,4 +1,4 @@
-import { PropsWithChildren, useEffect, useLayoutEffect, useState } from "react"
+import { PropsWithChildren, useEffect, useState } from "react"
 import ReactSplit from "react-split"
 
 import Workspace from "$containers/workspace"

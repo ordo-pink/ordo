@@ -39,7 +39,6 @@ export default function File({ file }: Props) {
   const handleClick = lazyBox<MouseEvent>((box) =>
     box
       .tap(preventDefault)
-      .tap(stopPropagation)
       .map(() =>
         createSearchParams({
           association: association ? association.name : "unsupported",

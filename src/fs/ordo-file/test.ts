@@ -1,7 +1,14 @@
-import { OrdoFile, OrdoFilePath } from "."
+import { IOrdoFile, OrdoFile, OrdoFilePath } from "."
 import { disallowedCharacters } from "../common"
 
 describe("ordo-file", () => {
+  describe("of", () => {
+    it("should throw on invalid path provided", () =>
+      expect(() => OrdoFile.of({ path: "", children: [] } as unknown as IOrdoFile)).toThrow(
+        "Invalid file path",
+      ))
+  })
+
   describe("is-ordo-file", () => {
     it("should return true if it is an OrdoFile", () => {
       const file = OrdoFile.from({ path: "/123.md", size: 0 })
@@ -31,18 +38,7 @@ describe("ordo-file", () => {
       expect(file.readableName).toBe("123")
       expect(file.path).toBe("/123.md")
       expect(file.size).toBe(0)
-      expect(file.updatedAt).toBe(updatedAt)
-    })
-
-    it("should the path if leading slash is missing", () => {
-      const updatedAt = new Date()
-      const file = OrdoFile.from({ path: "123.md" as unknown as OrdoFilePath, size: 0, updatedAt })
-
-      expect(file.extension).toBe(".md")
-      expect(file.readableName).toBe("123")
-      expect(file.path).toBe("/123.md")
-      expect(file.size).toBe(0)
-      expect(file.updatedAt).toBe(updatedAt)
+      expect(file.updatedAt.toISOString()).toBe(updatedAt.toISOString())
     })
   })
 
@@ -52,6 +48,11 @@ describe("ordo-file", () => {
 
       expect(OrdoFile.getFileExtension(path)).toEqual(".txt")
     })
+
+    it("should throw on invalid path", () =>
+      expect(() =>
+        OrdoFile.getFileExtension("/directory/dir1/" as unknown as OrdoFilePath),
+      ).toThrow("Invalid file path"))
 
     it("should properly extract file extension if file does not have a name", () => {
       const path = "/directory/.gitignore"
@@ -78,6 +79,11 @@ describe("ordo-file", () => {
       expect(OrdoFile.getParentPath(path)).toEqual("/dir1/dir2/")
     })
 
+    it("should throw on invalid path", () =>
+      expect(() => OrdoFile.getParentPath("/directory/dir1/" as unknown as OrdoFilePath)).toThrow(
+        "Invalid file path",
+      ))
+
     it("should properly extract directory parent path", () => {
       const path = "/dir1/dir2/dir3"
       expect(OrdoFile.getParentPath(path)).toEqual("/dir1/dir2/")
@@ -90,6 +96,11 @@ describe("ordo-file", () => {
 
       expect(OrdoFile.getReadableName(path)).toEqual("file")
     })
+
+    it("should throw on invalid path", () =>
+      expect(() => OrdoFile.getReadableName("/directory/dir1/" as unknown as OrdoFilePath)).toThrow(
+        "Invalid file path",
+      ))
 
     it("should extract readable name of files without file extension", () => {
       const path = "/directory/file"
@@ -106,9 +117,9 @@ describe("ordo-file", () => {
 
   disallowedCharacters.forEach((character) => {
     it(`should fail with "${character}" in path`, () => {
-      const directory = OrdoFile.from({ path: `/${character}/test.md`, size: 0 })
-
-      expect(OrdoFile.isValidPath(directory.path)).toBe(false)
+      expect(() => OrdoFile.from({ path: `/${character}/test.md`, size: 0 })).toThrow(
+        "Invalid file path",
+      )
     })
   })
 })

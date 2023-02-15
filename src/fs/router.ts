@@ -23,6 +23,7 @@ import {
   appendTrailingDirectoryOldPathAndNewPathSlashes,
   appendTrailingDirectoryPathSlash,
 } from "./middleware/append-trailing-directory-slash"
+import { checkSizeOfUploadingFile } from "./middleware/check-size-of-uploading-file"
 import { compareTokens } from "./middleware/compare-tokens"
 import { extractDynamicParam } from "./middleware/extract-dynamic-param"
 import { prependPathSlash, prependOldPathAndNewPathSlashes } from "./middleware/prepend-slash"
@@ -55,6 +56,7 @@ const filesRouter = ({ drivers: { fs }, authorize, logger }: CreateOrdoBackendSe
       prependPathSlash,
       addUserIdToPath,
       validateFilePath,
+      checkSizeOfUploadingFile,
       createFileHandler(env),
     )
     .get(
@@ -80,6 +82,7 @@ const filesRouter = ({ drivers: { fs }, authorize, logger }: CreateOrdoBackendSe
       prependPathSlash,
       addUserIdToPath,
       validateFilePath,
+      checkSizeOfUploadingFile,
       updateFileHandler(env),
     )
     .patch(

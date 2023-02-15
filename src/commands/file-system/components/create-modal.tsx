@@ -1,16 +1,20 @@
+import { OrdoDirectory, OrdoDirectoryPath, OrdoFile, OrdoFilePath } from "@ordo-pink/core"
 import { ChangeEvent, MouseEvent, useEffect, useState } from "react"
 import { useTranslation } from "react-i18next"
 import { BsFileEarmarkPlus, BsFolderPlus } from "react-icons/bs"
 
-import CreateModalButtonGroup from "$commands/file-system/components/create-modal-button-group"
 import { hideCreateModal } from "$commands/file-system/store"
 import { FileSystemExtensionStore } from "$commands/file-system/types"
 
 import { useModal } from "$containers/app/hooks/use-modal"
 
+import { createdDirectory, createFile } from "$containers/app/store"
+import { OrdoButtonPrimary, OrdoButtonSecondary } from "$core/components/buttons"
 import Null from "$core/components/null"
 import PathBreadcrumbs from "$core/components/path-breadcrumbs"
+import { OrdoFSEntity } from "$core/constants/ordo-fs-entity"
 import { useAppDispatch } from "$core/state/hooks/use-app-dispatch"
+import { useAppSelector } from "$core/state/hooks/use-app-selector"
 import { useExtensionSelector } from "$core/state/hooks/use-extension-selector"
 import { Either } from "$core/utils/either"
 import { preventDefault, stopPropagation } from "$core/utils/event"
@@ -23,11 +27,44 @@ export default function CreateModal() {
 
   const fsSelector = useExtensionSelector<FileSystemExtensionStore>()
 
+  const root = useAppSelector((state) => state.app.personalProject)
+
   const isShown = fsSelector((state) => state["ordo-command-file-system"].isCreateModalShown)
   const parent = fsSelector((state) => state["ordo-command-file-system"].parent)
   const type = fsSelector((state) => state["ordo-command-file-system"].entityType)
 
-  const [newName, setNewName] = useState("")
+  const { t } = useTranslation()
+
+  const translatedTitle = t(`@ordo-command-file-system/create-${type}`)
+  const translatedPlaceholder = t(`@ordo-command-file-system/placeholder`) ?? ""
+  const translatedError = t("@ordo-command-file-system/invalid-path")
+  const translatedCancel = t("@ordo-command-file-system/button-cancel")
+  const translatedOk = t("@ordo-command-file-system/button-ok")
+
+  const [hasError, setHasError] = useState(false)
+  const [newName, setNewName] = useState<OrdoFilePath | "">("")
+
+  const parentPath = Either.fromNullable(parent).fold(
+    () => root?.path ?? "/",
+    (p) => p.path,
+  )
+
+  const newPath = `${parentPath}${newName}` as OrdoFilePath
+  const isDirectory = type === OrdoFSEntity.DIRECTORY
+  const isValidPath = isDirectory
+    ? OrdoDirectory.isValidPath(`${newPath}/`)
+    : OrdoFile.isValidPath(`${newPath}`)
+
+  useEffect(() => {
+    const isDirectory = type === OrdoFSEntity.DIRECTORY
+
+    const isValidPath =
+      newName.length > 1 && isDirectory
+        ? OrdoDirectory.isValidPath(`/${newName}/`)
+        : OrdoFile.isValidPath(`/${newName}`)
+
+    setHasError(Boolean(newName) && !isValidPath)
+  }, [newName, translatedError, type])
 
   useEffect(() => {
     if (!isShown) showModal()
@@ -37,16 +74,13 @@ export default function CreateModal() {
   const Icon = type === "file" ? BsFileEarmarkPlus : BsFolderPlus
 
   const handleHide = lazyBox((box) =>
-    box
-      .map(() => "")
-      .map(setNewName)
-      .fold(() => dispatch(hideCreateModal())),
+    box.map(() => setNewName("")).fold(() => dispatch(hideCreateModal())),
   )
 
   const handleInputChange = lazyBox<ChangeEvent<HTMLInputElement>>((box) =>
     box
       .map((event) => event.target)
-      .map((target) => target.value)
+      .map((target) => target.value as OrdoFilePath)
       .fold(setNewName),
   )
 
@@ -54,10 +88,21 @@ export default function CreateModal() {
     box.tap(stopPropagation).fold(preventDefault),
   )
 
-  const { t } = useTranslation()
+  const handleCancelButtonClick = lazyBox((box) =>
+    box.tap(handleHide).fold(() => dispatch(hideCreateModal())),
+  )
 
-  const translatedTitle = t(`@ordo-command-file-system/create-${type}`)
-  const translatedPlaceholder = t(`@ordo-command-file-system/placeholder`) ?? ""
+  const handleOkButtonClick = lazyBox((box) =>
+    box
+      .tap(handleHide)
+      .map(() =>
+        Either.fromBoolean(isDirectory).fold(
+          () => dispatch(createFile({ path: newPath })),
+          () => dispatch(createdDirectory(newPath as unknown as OrdoDirectoryPath)),
+        ),
+      )
+      .fold(() => dispatch(hideCreateModal())),
+  )
 
   return Either.fromBoolean(isShown).fold(Null, () => (
     <Modal onHide={handleHide}>
@@ -72,7 +117,7 @@ export default function CreateModal() {
             <div>{translatedTitle}</div>
           </div>
 
-          {parent && <PathBreadcrumbs path={parent.path} />}
+          <PathBreadcrumbs path={parent ? parent.path : "/"} />
 
           <input
             type="text"
@@ -83,10 +128,30 @@ export default function CreateModal() {
             onChange={handleInputChange}
           />
 
-          <CreateModalButtonGroup
-            newName={newName}
-            onAction={handleHide}
-          />
+          <div
+            className={`text-red-500 text-sm transition-opacity duration-200 ${
+              hasError ? "opacity-100" : "opacity-0"
+            }`}
+          >
+            {translatedError}
+          </div>
+
+          <div className="w-full flex items-center justify-around">
+            <OrdoButtonSecondary
+              hotkey="escape"
+              onClick={handleCancelButtonClick}
+            >
+              {translatedCancel}
+            </OrdoButtonSecondary>
+
+            <OrdoButtonPrimary
+              hotkey="enter"
+              disabled={!newName || !isValidPath}
+              onClick={handleOkButtonClick}
+            >
+              {translatedOk}
+            </OrdoButtonPrimary>
+          </div>
         </div>
       </div>
     </Modal>

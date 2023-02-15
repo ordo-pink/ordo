@@ -41,29 +41,17 @@ export default function CreateModal() {
   const translatedCancel = t("@ordo-command-file-system/button-cancel")
   const translatedOk = t("@ordo-command-file-system/button-ok")
 
-  const [hasError, setHasError] = useState(false)
   const [newName, setNewName] = useState<OrdoFilePath | "">("")
-
-  const parentPath = Either.fromNullable(parent).fold(
-    () => root?.path ?? "/",
-    (p) => p.path,
-  )
-
-  const newPath = `${parentPath}${newName}` as OrdoFilePath
-  const isDirectory = type === OrdoFSEntity.DIRECTORY
-  const isValidPath = isDirectory
-    ? OrdoDirectory.isValidPath(`${newPath}/`)
-    : OrdoFile.isValidPath(`${newPath}`)
+  const [isValidPath, setIsValidPath] = useState(true)
 
   useEffect(() => {
     const isDirectory = type === OrdoFSEntity.DIRECTORY
 
-    const isValidPath =
+    setIsValidPath(
       newName.length > 1 && isDirectory
         ? OrdoDirectory.isValidPath(`/${newName}/`)
-        : OrdoFile.isValidPath(`/${newName}`)
-
-    setHasError(Boolean(newName) && !isValidPath)
+        : OrdoFile.isValidPath(`/${newName}`),
+    )
   }, [newName, translatedError, type])
 
   useEffect(() => {
@@ -96,10 +84,18 @@ export default function CreateModal() {
     box
       .tap(handleHide)
       .map(() =>
-        Either.fromBoolean(isDirectory).fold(
-          () => dispatch(createFile({ path: newPath })),
-          () => dispatch(createdDirectory(newPath as unknown as OrdoDirectoryPath)),
-        ),
+        Either.fromBoolean(type === OrdoFSEntity.DIRECTORY)
+          .bimap(
+            () => `${root?.path ?? "/"}${newName}` as OrdoFilePath,
+            () => `${root?.path ?? "/"}${newName}/` as OrdoDirectoryPath,
+          )
+          .leftMap((path) =>
+            OrdoFile.getFileExtension(path) ? path : (`${path}.md` as OrdoFilePath),
+          )
+          .fold(
+            (path) => dispatch(createFile({ path })),
+            (path) => dispatch(createdDirectory(path)),
+          ),
       )
       .fold(() => dispatch(hideCreateModal())),
   )
@@ -130,7 +126,7 @@ export default function CreateModal() {
 
           <div
             className={`text-red-500 text-sm transition-opacity duration-200 ${
-              hasError ? "opacity-100" : "opacity-0"
+              newName && !isValidPath ? "opacity-100" : "opacity-0"
             }`}
           >
             {translatedError}

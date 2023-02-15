@@ -96,18 +96,3 @@ export type CamelCasedKeys<T> = { [P in keyof T as CamelCase<P & string>]: T[P] 
 export type CamelCasedKeysDeep<T> = {
   [P in keyof T as CamelCase<P & string>]: T[P] extends object ? CamelCasedKeys<T[P]> : T[P]
 }
-
-export interface INode<T = unknown> {
-  get id(): string
-  get depth(): number
-  get value(): T
-}
-
-export interface IParentNode<T = unknown, TChildren = T, TParent = T> extends INode<T> {
-  get children(): INode<TChildren>[]
-  get parent(): Nullable<IParentNode<TParent>>
-}
-
-export interface ILeafNode<T = unknown, TParent = T> extends INode<T> {
-  get parent(): IParentNode<TParent>
-}

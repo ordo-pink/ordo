@@ -1,5 +1,5 @@
 import { UnaryFn } from "../../types"
-import { endsWithSlash, isValidPath } from "../common"
+import { endsWithSlash, isValidPath, NoDisallowedCharacters } from "../common"
 import { OrdoDirectoryPath } from "../ordo-directory"
 
 /**
@@ -12,7 +12,11 @@ import { OrdoDirectoryPath } from "../ordo-directory"
  */
 export type OrdoFileExtension = `.${string}` | ""
 
-export type OrdoFilePath = `/${string}`
+export type NonSlash<T> = T extends "/" ? never : T
+
+export type NonTrailingSlash<T> = T extends `${string}/` ? never : T
+
+export type OrdoFilePath = `/${string}${OrdoFileExtension}`
 
 /**
  * Raw OrdoFile content shared between the frontend and the backend.
@@ -21,17 +25,17 @@ export interface IOrdoFileRaw {
   /**
    * Path of the file. Must be a valid OrdoFilePath.
    */
-  get path(): OrdoFilePath
+  path: OrdoFilePath
 
   /**
    * Size of the file.
    */
-  get size(): number
+  size: number
 
   /**
    * Last modified date.
    */
-  get updatedAt(): Date
+  updatedAt: Date
 }
 
 /**
@@ -41,36 +45,36 @@ export type IOrdoFile = {
   /**
    * @see IOrdoFileRaw.path
    */
-  get path(): OrdoFilePath
+  path: OrdoFilePath
 
   /**
    * @see IOrdoFileRaw.size
    */
-  get size(): number
+  size: number
 
   /**
    * @see IOrdoFileRaw.updatedAt
    */
-  get updatedAt(): Date
+  updatedAt: Date
   /**
    * Readable name of the file.
    */
-  get readableName(): string
+  readableName: string
 
   /**
    * File extension. Must be a valid OrdoFileExtension.
    */
-  get extension(): OrdoFileExtension
+  extension: OrdoFileExtension
 }
 
 /**
  * Initialisation params for creating an IOrdoFileRaw.
  */
-export interface IOrdoFileRawInitParams {
+export interface IOrdoFileRawInitParams<Path extends OrdoFilePath> {
   /**
    * @see IOrdoFileRaw.path
    */
-  path: OrdoFilePath
+  path: NonSlash<NonTrailingSlash<NoDisallowedCharacters<Path>>>
 
   /**
    * @see IOrdoFileRaw.size
@@ -90,20 +94,29 @@ export interface IOrdoFileRawInitParams {
 export interface IOrdoFileStatic {
   /**
    * Creates an IOrdoFile from an IOrdoFileRaw.
+   *
+   * @throws TypeError if provided path is invalid.
    */
   of: (raw: IOrdoFileRaw) => IOrdoFile
 
   /**
    * Creates an IOrdoFile from IOrdoFileRawInitParams.
+   *
+   * @throws TypeError if provided path is invalid.
    */
-  from: (params: IOrdoFileRawInitParams) => IOrdoFile
+  from: <Path extends OrdoFilePath>(params: IOrdoFileRawInitParams<Path>) => IOrdoFile
 
-  raw: (params: IOrdoFileRawInitParams) => IOrdoFileRaw
+  /**
+   * Creates an IOrdoFileRaw from IOrdoFileRawInitParams.
+   *
+   * @throws TypeError if provided path is invalid.
+   */
+  raw: <Path extends OrdoFilePath>(params: IOrdoFileRawInitParams<Path>) => IOrdoFileRaw
 
   /**
    * Check if provided path is a valid IOrdoFile path.
    */
-  isValidPath: (path: string) => boolean
+  isValidPath: (path: unknown) => path is OrdoFilePath
 
   /**
    * Check if provided object is an IOrdoFile.
@@ -115,33 +128,40 @@ export interface IOrdoFileStatic {
    */
   isOrdoFileRaw: (x: unknown) => x is IOrdoFileRaw
 
+  /**
+   * Get path of the parent directory of a given file path.
+   *
+   * @throws TypeError if provided path is invalid.
+   */
   getParentPath: UnaryFn<OrdoFilePath, OrdoDirectoryPath>
 
+  /**
+   * Get readable name of a given file path.
+   *
+   * @throws TypeError if provided path is invalid.
+   */
   getReadableName: UnaryFn<OrdoFilePath, string>
 
+  /**
+   * Get file extension of a given file path.
+   *
+   * @throws TypeError if provided path is invalid.
+   */
   getFileExtension: UnaryFn<OrdoFilePath, OrdoFileExtension>
-
-  toFilePath: UnaryFn<string, OrdoFilePath>
 }
 
 export const OrdoFile: IOrdoFileStatic = {
   of: (raw) => ordoFile(raw),
   raw: (params) => {
-    const path = OrdoFile.toFilePath(params.path)
-    const size = params.size
-    const updatedAt = params.updatedAt ?? new Date()
-
-    return {
-      get path() {
-        return path
-      },
-      get size() {
-        return size
-      },
-      get updatedAt() {
-        return updatedAt
-      },
+    if (!OrdoFile.isValidPath(params.path)) {
+      throw new TypeError("Invalid path")
     }
+
+    const path = params.path
+    const size = params.size
+    const updatedAt = params.updatedAt ? new Date(params.updatedAt) : new Date()
+
+    return { path, size, updatedAt }
   },
   from: (params) => OrdoFile.of(OrdoFile.raw(params)),
   isOrdoFile: (x): x is IOrdoFile =>
@@ -154,13 +174,22 @@ export const OrdoFile: IOrdoFileStatic = {
     typeof (x as IOrdoFileRaw).size === "number" &&
     typeof (x as IOrdoFileRaw).path === "string" &&
     OrdoFile.isValidPath((x as IOrdoFileRaw).path),
-  isValidPath: (path) => isValidPath(path) && !endsWithSlash(path),
+  isValidPath: (path): path is OrdoFilePath =>
+    typeof path === "string" && isValidPath(path) && !endsWithSlash(path),
   getParentPath: (path) => {
+    if (!OrdoFile.isValidPath(path)) {
+      throw new TypeError("Invalid path")
+    }
+
     const lastSeparatorPosition = path.lastIndexOf("/") + 1
 
     return path.slice(0, lastSeparatorPosition) as OrdoDirectoryPath
   },
   getReadableName: (path) => {
+    if (!OrdoFile.isValidPath(path)) {
+      throw new TypeError("Invalid path")
+    }
+
     const lastSeparatorPosition = path.lastIndexOf("/") + 1
     const readableName = path.slice(lastSeparatorPosition)
     const extension = OrdoFile.getFileExtension(path)
@@ -168,6 +197,10 @@ export const OrdoFile: IOrdoFileStatic = {
     return readableName.replace(extension, "")
   },
   getFileExtension: (path) => {
+    if (!OrdoFile.isValidPath(path)) {
+      throw new TypeError("Invalid path")
+    }
+
     const fileName = path.split("/").reverse()[0] as string
 
     const lastDotPosition = fileName.lastIndexOf(".")
@@ -178,28 +211,17 @@ export const OrdoFile: IOrdoFileStatic = {
 
     return fileName.substring(lastDotPosition) as OrdoFileExtension
   },
-  toFilePath: (path) => (path.startsWith("/") ? (path as OrdoFilePath) : `/${path}`),
 }
 
 export const ordoFile = (raw: IOrdoFileRaw): IOrdoFile => {
+  if (!OrdoFile.isValidPath(raw.path)) {
+    throw new TypeError("Invalid path")
+  }
+
+  const { path, size, updatedAt } = raw
+
   const readableName = OrdoFile.getReadableName(raw.path)
   const extension = OrdoFile.getFileExtension(raw.path)
 
-  return {
-    get readableName() {
-      return readableName
-    },
-    get extension() {
-      return extension
-    },
-    get path() {
-      return raw.path
-    },
-    get updatedAt() {
-      return raw.updatedAt
-    },
-    get size() {
-      return raw.size
-    },
-  }
+  return { readableName, extension, path, updatedAt: new Date(updatedAt), size }
 }

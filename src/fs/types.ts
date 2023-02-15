@@ -6,6 +6,7 @@ import {
   OrdoDirectoryPath,
   IOrdoFileRawInitParams,
   UnaryFn,
+  ValidatedOrdoFilePath,
 } from "@ordo-pink/core"
 import { RequestHandler } from "express"
 
@@ -74,7 +75,9 @@ export type FSDriver = {
   deleteDirectory: UnaryFn<OrdoDirectoryPath, Promise<OrdoDirectoryPath>>
   getDirectoryChildren: UnaryFn<OrdoDirectoryPath, Promise<Array<OrdoDirectoryPath | OrdoFilePath>>>
   getFile: UnaryFn<OrdoFilePath, Promise<Readable>>
-  getFileDescriptor: UnaryFn<OrdoFilePath, Promise<IOrdoFileRawInitParams>>
+  getFileDescriptor: <Path extends OrdoFilePath>(
+    path: ValidatedOrdoFilePath<Path>,
+  ) => Promise<IOrdoFileRawInitParams<Path>>
   moveFile: UnaryFn<{ oldPath: OrdoFilePath; newPath: OrdoFilePath }, Promise<OrdoFilePath>>
   moveDirectory: UnaryFn<
     { oldPath: OrdoDirectoryPath; newPath: OrdoDirectoryPath },

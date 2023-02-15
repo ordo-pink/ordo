@@ -5,10 +5,18 @@ import { FSDriver, IOrdoFileModel } from "../types"
 export const OrdoFileModel = {
   of: (driver: FSDriver): IOrdoFileModel => ({
     createFile: ({ path, content }) =>
-      Promise.all([
-        driver.checkFileExists(path),
-        driver.checkDirectoryExists(OrdoFile.getParentPath(path)),
-      ])
+      Promise.resolve(path)
+        .then((path) =>
+          OrdoFile.isValidPath(path)
+            ? Promise.resolve(path)
+            : Promise.reject(ExceptionResponse.BAD_REQUEST),
+        )
+        .then((path) =>
+          Promise.all([
+            driver.checkFileExists(path),
+            driver.checkDirectoryExists(OrdoFile.getParentPath(path)),
+          ]),
+        )
         .then(([fileExists, parentDirectoryExists]) =>
           fileExists ? Promise.reject(ExceptionResponse.CONFLICT) : { path, parentDirectoryExists },
         )
@@ -27,8 +35,13 @@ export const OrdoFileModel = {
             : OrdoFileModel.of(driver).getFile(path)
         }),
     deleteFile: (path) =>
-      driver
-        .checkFileExists(path)
+      Promise.resolve(path)
+        .then((path) =>
+          OrdoFile.isValidPath(path)
+            ? Promise.resolve(path)
+            : Promise.reject(ExceptionResponse.BAD_REQUEST),
+        )
+        .then((path) => driver.checkFileExists(path))
         .then((exists) => (exists ? path : Promise.reject(ExceptionResponse.NOT_FOUND)))
         .then(OrdoFileModel.of(driver).getFile)
         .then(async (file) => {
@@ -37,22 +50,40 @@ export const OrdoFileModel = {
           return file
         }),
     getFile: (path) =>
-      driver
-        .checkFileExists(path)
+      Promise.resolve(path)
+        .then((path) =>
+          OrdoFile.isValidPath(path)
+            ? Promise.resolve(path)
+            : Promise.reject(ExceptionResponse.BAD_REQUEST),
+        )
+        .then((path) => driver.checkFileExists(path))
         .then((exists) => (exists ? path : Promise.reject(ExceptionResponse.NOT_FOUND)))
         .then(() => driver.getFileDescriptor(path))
         .then(OrdoFile.raw),
     getFileContent: (path) =>
-      driver
-        .checkFileExists(path)
+      Promise.resolve(path)
+        .then((path) =>
+          OrdoFile.isValidPath(path)
+            ? Promise.resolve(path)
+            : Promise.reject(ExceptionResponse.BAD_REQUEST),
+        )
+        .then((path) => driver.checkFileExists(path))
         .then((exists) => (exists ? path : Promise.reject(ExceptionResponse.NOT_FOUND)))
         .then(driver.getFile),
     moveFile: ({ oldPath, newPath }) =>
-      Promise.all([
-        driver.checkFileExists(oldPath),
-        driver.checkFileExists(newPath),
-        driver.checkDirectoryExists(OrdoFile.getParentPath(newPath)),
-      ])
+      Promise.resolve({ oldPath, newPath })
+        .then(({ oldPath, newPath }) =>
+          OrdoFile.isValidPath(oldPath) && OrdoFile.isValidPath(newPath)
+            ? Promise.resolve({ oldPath, newPath })
+            : Promise.reject(ExceptionResponse.BAD_REQUEST),
+        )
+        .then(({ oldPath, newPath }) =>
+          Promise.all([
+            driver.checkFileExists(oldPath),
+            driver.checkFileExists(newPath),
+            driver.checkDirectoryExists(OrdoFile.getParentPath(newPath)),
+          ]),
+        )
         .then(([oldFileExists, newFileExists, newFileParentExists]) =>
           newFileExists
             ? Promise.reject(ExceptionResponse.CONFLICT)
@@ -77,8 +108,13 @@ export const OrdoFileModel = {
             : driver.getFileDescriptor(file).then(OrdoFile.raw),
         ),
     updateFile: ({ path, content }) =>
-      driver
-        .checkFileExists(path)
+      Promise.resolve(path)
+        .then((path) =>
+          OrdoFile.isValidPath(path)
+            ? Promise.resolve(path)
+            : Promise.reject(ExceptionResponse.BAD_REQUEST),
+        )
+        .then((path) => driver.checkFileExists(path))
         .then((exists) =>
           exists ? { path, content } : Promise.reject(ExceptionResponse.NOT_FOUND),
         )

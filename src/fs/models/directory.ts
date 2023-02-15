@@ -10,11 +10,19 @@ import { FSDriver, IOrdoDirectoryModel } from "../types"
 
 export const OrdoDirectoryModel = {
   of: (driver: FSDriver): IOrdoDirectoryModel => ({
-    createDirectory: (path) => {
-      return Promise.all([
-        driver.checkDirectoryExists(path),
-        driver.checkDirectoryExists(OrdoDirectory.getParentPath(path)),
-      ])
+    createDirectory: (path) =>
+      Promise.resolve(path)
+        .then((path) =>
+          OrdoDirectory.isValidPath(path)
+            ? Promise.resolve(path)
+            : Promise.reject(ExceptionResponse.BAD_REQUEST),
+        )
+        .then((path) =>
+          Promise.all([
+            driver.checkDirectoryExists(path),
+            driver.checkDirectoryExists(OrdoDirectory.getParentPath(path)),
+          ]),
+        )
         .then(([directoryExists, parentDirectoryExists]) =>
           directoryExists
             ? Promise.reject(ExceptionResponse.CONFLICT)
@@ -38,11 +46,15 @@ export const OrdoDirectoryModel = {
           return parentDirectory
             ? OrdoDirectoryModel.of(driver).getDirectory(parentDirectory.path)
             : OrdoDirectoryModel.of(driver).getDirectory(path)
-        })
-    },
+        }),
     deleteDirectory: (path) =>
-      driver
-        .checkDirectoryExists(path)
+      Promise.resolve(path)
+        .then((path) =>
+          OrdoDirectory.isValidPath(path)
+            ? Promise.resolve(path)
+            : Promise.reject(ExceptionResponse.BAD_REQUEST),
+        )
+        .then(driver.checkDirectoryExists)
         .then((exists) => (path === "/" ? Promise.reject(ExceptionResponse.CONFLICT) : exists))
         .then((exists) => (exists ? path : Promise.reject(ExceptionResponse.NOT_FOUND)))
         .then(() => OrdoDirectory.raw({ path, children: [] }))
@@ -52,11 +64,17 @@ export const OrdoDirectoryModel = {
           return directory
         }),
     getDirectory: (path) =>
-      driver
-        .checkDirectoryExists(path)
+      Promise.resolve(path)
+        .then((path) =>
+          OrdoDirectory.isValidPath(path)
+            ? Promise.resolve(path)
+            : Promise.reject(ExceptionResponse.BAD_REQUEST),
+        )
+        .then((path) => driver.checkDirectoryExists(path))
         .then(async (exists) => {
           if (path === "/" && !exists) {
             await driver.createDirectory("/")
+
             return true
           }
 
@@ -81,11 +99,19 @@ export const OrdoDirectoryModel = {
         })
         .then((children) => OrdoDirectory.raw({ path, children })),
     moveDirectory: ({ oldPath, newPath }) =>
-      Promise.all([
-        driver.checkDirectoryExists(oldPath),
-        driver.checkDirectoryExists(newPath),
-        driver.checkDirectoryExists(OrdoDirectory.getParentPath(newPath)),
-      ])
+      Promise.resolve({ oldPath, newPath })
+        .then(({ oldPath, newPath }) =>
+          OrdoDirectory.isValidPath(oldPath) && OrdoDirectory.isValidPath(newPath)
+            ? Promise.resolve({ oldPath, newPath })
+            : Promise.reject(ExceptionResponse.BAD_REQUEST),
+        )
+        .then(({ oldPath, newPath }) =>
+          Promise.all([
+            driver.checkDirectoryExists(oldPath),
+            driver.checkDirectoryExists(newPath),
+            driver.checkDirectoryExists(OrdoDirectory.getParentPath(newPath)),
+          ]),
+        )
         .then(([oldDirectoryExists, newDirectoryExists, newDirectoryParentExists]) =>
           newDirectoryExists || oldPath === newPath
             ? Promise.reject(ExceptionResponse.CONFLICT)

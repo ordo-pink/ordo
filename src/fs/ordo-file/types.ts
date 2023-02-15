@@ -1,5 +1,6 @@
 import { UnaryFn } from "../../types"
 import { NoDisallowedCharacters } from "../common"
+import { OrdoDirectoryPath } from "../ordo-directory"
 
 /**
  * Files might or might not have a file extension. These are the two possible
@@ -155,7 +156,7 @@ export interface IOrdoFileStatic {
    *
    * @throws TypeError if provided path is invalid.
    */
-  getParentPath: <Path extends OrdoFilePath>(path: ValidatedOrdoFilePath<Path>) => OrdoFilePath
+  getParentPath: <Path extends OrdoFilePath>(path: ValidatedOrdoFilePath<Path>) => OrdoDirectoryPath
 
   /**
    * Get readable name of a given file path.

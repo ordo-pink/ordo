@@ -122,7 +122,7 @@ export interface OrdoFileAssociationExtension<
 > extends OrdoExtension<Name, OrdoExtensionType.FILE_ASSOCIATION, TState> {
   fileExtensions: OrdoFileExtension[]
   Icon?: OrdoLoadableComponent
-  Component: OrdoLoadableComponent
+  Component: OrdoLoadableComponent<{ file: IOrdoFile; content: ReturnType<typeof fetch> }>
 }
 
 export interface OrdoActivityExtension<

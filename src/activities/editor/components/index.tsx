@@ -1,4 +1,4 @@
-import { Nullable, OrdoFile, OrdoFilePath } from "@ordo-pink/core"
+import { IOrdoFile, Nullable, OrdoFile, OrdoFilePath } from "@ordo-pink/core"
 import { Switch } from "@ordo-pink/switch"
 import { createContext, useEffect, useState } from "react"
 import { Helmet } from "react-helmet"
@@ -11,24 +11,21 @@ import { selectFile } from "../store"
 import FileExplorer from "$activities/editor/components/file-explorer"
 import FileNotSelected from "$activities/editor/components/file-not-selected"
 import FileNotSupported from "$activities/editor/components/file-not-supported"
-import { EditorActivityState, EditorPersistedState } from "$activities/editor/types"
+import { EditorActivityState } from "$activities/editor/types"
 import { useWorkspaceWithSidebar } from "$containers/workspace/hooks/use-workspace"
+import { useActionContext } from "$core/hooks/use-action-context"
 import { useCurrentFileAssociation } from "$core/hooks/use-current-file-association"
 import { useAppDispatch } from "$core/state/hooks/use-app-dispatch"
 import { useAppSelector } from "$core/state/hooks/use-app-selector"
 import { useExtensionSelector } from "$core/state/hooks/use-extension-selector"
-import { OrdoExtensionPersistedStore } from "$core/types"
 import { Either } from "$core/utils/either"
 import { findOrdoFile } from "$core/utils/fs-helpers"
 
 import "$activities/editor/index.css"
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const EditorMetadataContext = createContext<
-  OrdoExtensionPersistedStore<EditorPersistedState>
->({} as OrdoExtensionPersistedStore<EditorPersistedState>)
+export const EditorContext = createContext({} as EditorProps)
 
-export default function Editor({ persistedStore }: EditorProps) {
+export default function Editor(props: EditorProps) {
   const [path, setPath] = useState<Nullable<OrdoFilePath>>(null)
 
   const dispatch = useAppDispatch()
@@ -45,6 +42,8 @@ export default function Editor({ persistedStore }: EditorProps) {
   const association = useCurrentFileAssociation()
 
   const Workspace = useWorkspaceWithSidebar()
+
+  const context = useActionContext()
 
   const fileAssociations = useAppSelector((state) => state.app.fileAssociationExtensions)
 
@@ -65,7 +64,7 @@ export default function Editor({ persistedStore }: EditorProps) {
 
   useEffect(() => {
     if (!path) {
-      persistedStore.get("recentFiles").then((files) => {
+      props.persistedStore.get("recentFiles").then((files) => {
         if (!files || !files[0]) return
 
         const path = files[0]
@@ -87,7 +86,7 @@ export default function Editor({ persistedStore }: EditorProps) {
         })
       })
     }
-  }, [persistedStore, association, navigate, path, fileAssociations])
+  }, [props.persistedStore, association, navigate, path, fileAssociations])
 
   useEffect(() => {
     if (!path || !tree || !dispatch) return
@@ -96,7 +95,7 @@ export default function Editor({ persistedStore }: EditorProps) {
 
     if (!file) return
 
-    persistedStore.get("recentFiles").then((recent) => {
+    props.persistedStore.get("recentFiles").then((recent) => {
       Switch.of(file.path)
         .case(
           (path) => !recent || recent.indexOf(path) === 0,
@@ -108,14 +107,14 @@ export default function Editor({ persistedStore }: EditorProps) {
             const recentCopy = [...(recent as OrdoFilePath[])]
 
             recentCopy.splice(recentCopy.indexOf(file.path), 1)
-            persistedStore.set("recentFiles", [file.path].concat(recentCopy))
+            props.persistedStore.set("recentFiles", [file.path].concat(recentCopy))
           },
         )
         .default(() => {
-          persistedStore.set("recentFiles", [file.path].concat(recent as OrdoFilePath[]))
+          props.persistedStore.set("recentFiles", [file.path].concat(recent as OrdoFilePath[]))
         })
     })
-  }, [path, tree, persistedStore, dispatch])
+  }, [path, tree, props.persistedStore, dispatch])
 
   const Component = Either.fromNullable(association).fold(
     () => FileNotSupported,
@@ -128,7 +127,7 @@ export default function Editor({ persistedStore }: EditorProps) {
   const translatedSaving = t("@ordo-activity-editor/saving")
 
   return (
-    <EditorMetadataContext.Provider value={persistedStore}>
+    <EditorContext.Provider value={props}>
       <Workspace sidebarChildren={<FileExplorer />}>
         <Helmet>
           <title>
@@ -138,12 +137,15 @@ export default function Editor({ persistedStore }: EditorProps) {
         </Helmet>
 
         <div className="editor">
-          {Either.fromBoolean(Boolean(path)).fold(
+          {Either.fromBoolean(Boolean(path) && currentFile).fold(
             () => (
               <FileNotSelected />
             ),
             () => (
-              <Component />
+              <Component
+                file={currentFile as IOrdoFile}
+                content={context.env.fetch(path as OrdoFilePath)}
+              />
             ),
           )}
         </div>
@@ -157,6 +159,6 @@ export default function Editor({ persistedStore }: EditorProps) {
           <div>{translatedSaving}</div>
         </div>
       </Workspace>
-    </EditorMetadataContext.Provider>
+    </EditorContext.Provider>
   )
 }

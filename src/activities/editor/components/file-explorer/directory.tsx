@@ -8,7 +8,7 @@ import {
 } from "react-icons/ai"
 import { BsChevronDown, BsChevronUp } from "react-icons/bs"
 
-import { EditorMetadataContext } from "$activities/editor/components"
+import { EditorContext } from "$activities/editor/components"
 import DirectoryContent from "$activities/editor/components/file-explorer/directory-content"
 
 import { useContextMenu } from "$containers/app/hooks/use-context-menu"
@@ -31,7 +31,7 @@ export default function Directory({ directory }: Props) {
 
   const [isExpanded, setIsExpanded] = useState(false)
 
-  const metadata = useContext(EditorMetadataContext)
+  const { persistedStore } = useContext(EditorContext)
 
   const { showContextMenu } = useContextMenu()
 
@@ -47,8 +47,8 @@ export default function Directory({ directory }: Props) {
   const Chevron = isExpanded ? BsChevronDown : BsChevronUp
 
   useEffect(() => {
-    metadata.get("expandedDirectories").then((dirs) => setExpandedDirectories(dirs ?? []))
-  }, [metadata])
+    persistedStore.get("expandedDirectories").then((dirs) => setExpandedDirectories(dirs ?? []))
+  }, [persistedStore])
 
   useEffect(() => {
     setIsExpanded(expandedDirectories.includes(directory.path))
@@ -62,22 +62,24 @@ export default function Directory({ directory }: Props) {
         setIsExpanded((value) => !value)
 
         if (!isExpanded) {
-          metadata.get("expandedDirectories").then((expanded) => {
+          persistedStore.get("expandedDirectories").then((expanded) => {
             if (!expanded || expanded.includes(directory.path)) return
 
-            metadata
+            persistedStore
               .set("expandedDirectories", expanded.concat([directory.path]))
-              .then(() => metadata.getState())
+              .then(() => persistedStore.getState())
           })
         } else {
-          metadata.get("expandedDirectories").then((expanded) => {
+          persistedStore.get("expandedDirectories").then((expanded) => {
             if (!expanded || !expanded.includes(directory.path)) return
 
             const expandedCopy = [...expanded]
 
             expandedCopy.splice(expanded.indexOf(directory.path), 1)
 
-            metadata.set("expandedDirectories", expandedCopy).then(() => metadata.getState())
+            persistedStore
+              .set("expandedDirectories", expandedCopy)
+              .then(() => persistedStore.getState())
           })
         }
       }),

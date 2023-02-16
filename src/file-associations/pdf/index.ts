@@ -1,6 +1,7 @@
 import { createFileAssociationExtension } from "$core/extensions/create-file-association-extension"
+import { OrdoFileAssociationProps } from "$core/types"
 
-export default createFileAssociationExtension("pdf", {
+const pdf = createFileAssociationExtension("pdf", {
   Component: () => import("$file-associations/pdf/components"),
   Icon: () => import("$file-associations/pdf/components/icon"),
   fileExtensions: [".pdf"],
@@ -14,3 +15,7 @@ export default createFileAssociationExtension("pdf", {
     },
   },
 })
+
+export type PdfProps = OrdoFileAssociationProps<typeof pdf>
+
+export default pdf

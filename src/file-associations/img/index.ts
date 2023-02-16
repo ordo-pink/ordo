@@ -1,6 +1,7 @@
 import { createFileAssociationExtension } from "$core/extensions/create-file-association-extension"
+import { OrdoFileAssociationProps } from "$core/types"
 
-export default createFileAssociationExtension("img", {
+const img = createFileAssociationExtension("img", {
   Component: () => import("$file-associations/img/components"),
   Icon: () => import("$file-associations/img/components/icon"),
   fileExtensions: [
@@ -30,3 +31,7 @@ export default createFileAssociationExtension("img", {
     },
   },
 })
+
+export type ImgProps = OrdoFileAssociationProps<typeof img>
+
+export default img

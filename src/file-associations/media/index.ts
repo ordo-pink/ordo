@@ -1,6 +1,7 @@
 import { createFileAssociationExtension } from "$core/extensions/create-file-association-extension"
+import { OrdoFileAssociationProps } from "$core/types"
 
-export default createFileAssociationExtension("media", {
+const media = createFileAssociationExtension("media", {
   Component: () => import("$file-associations/media/components"),
   Icon: () => import("$file-associations/media/components/icon"),
   fileExtensions: [".wav", ".mp3", ".ogg", ".mp4", ".adts", ".webm", ".caf", ".flac"],
@@ -14,3 +15,7 @@ export default createFileAssociationExtension("media", {
     },
   },
 })
+
+export type MediaProps = OrdoFileAssociationProps<typeof media>
+
+export default media

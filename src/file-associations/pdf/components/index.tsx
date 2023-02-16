@@ -1,51 +1,43 @@
-import { OrdoFilePath } from "@ordo-pink/core"
 import { useEffect, useState } from "react"
-import { useSearchParams } from "react-router-dom"
 
-import { EditorActivityState } from "$activities/editor/types"
-
-import EditorPage from "$core/components/editor-page/editor-page"
+import { PdfProps } from ".."
 import Loading from "$core/components/loading"
+import PathBreadcrumbs from "$core/components/path-breadcrumbs"
 import { useFileParentBreadcrumbs } from "$core/hooks/use-file-breadcrumbs"
 import { useFSAPI } from "$core/hooks/use-fs-api"
-import { useExtensionSelector } from "$core/state/hooks/use-extension-selector"
 import { Either } from "$core/utils/either"
 
-export default function PDFViewer() {
-  const editorSelector = useExtensionSelector<EditorActivityState>()
-
-  const currentFile = editorSelector((state) => state["ordo-activity-editor"].currentFile)
-
-  const { files } = useFSAPI()
-  const [query] = useSearchParams()
+export default function PDFViewer({ file }: PdfProps) {
   const breadcrumbsPath = useFileParentBreadcrumbs()
+  const { files } = useFSAPI()
 
   const [content, setContent] = useState("")
 
-  const path = query.get("path") as OrdoFilePath
-
   useEffect(() => {
-    if (!path) return
-
-    files.getBlob(path).then(URL.createObjectURL).then(setContent)
+    files.getBlob(file.path).then(URL.createObjectURL).then(setContent)
 
     return () => {
       URL.revokeObjectURL(content)
+      setContent("")
     }
-  }, [path, files, content])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [file.path, files])
 
-  return Either.fromNullable(content)
-    .chain(() => Either.fromNullable(currentFile))
-    .fold(Loading, (file) => (
-      <EditorPage
-        title={file.readableName}
-        breadcrumbsPath={breadcrumbsPath}
-      >
+  return Either.fromBoolean(content).fold(Loading, () => (
+    <div className="p-4 w-full max-w-6xl">
+      <div className="mb-8">
+        <PathBreadcrumbs path={breadcrumbsPath} />
+
+        <h1 className="text-3xl font-black">{file.readableName}</h1>
+      </div>
+
+      <div className="w-full h-screen flex flex-col items-center">
         <iframe
           className="w-full h-screen"
           title={file.path}
           src={content}
         />
-      </EditorPage>
-    ))
+      </div>
+    </div>
+  ))
 }

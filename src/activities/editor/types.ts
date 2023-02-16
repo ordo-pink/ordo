@@ -9,7 +9,7 @@ export type EditorState = {
 
 export type EditorActivityState = ExtensionState<typeof editor>
 
-export type EditorMetadata = {
+export type EditorPersistedState = {
   recentFiles: OrdoFilePath[]
   expandedDirectories: OrdoDirectoryPath[]
 }

@@ -1,5 +1,18 @@
-import { PropsWithChildren } from "react"
+import { UnaryFn } from "@ordo-pink/core"
+import { MouseEvent, PropsWithChildren } from "react"
 
-export default function Sidebar({ children }: PropsWithChildren) {
-  return <div className="workspace-sidebar">{children}</div>
+type Props = PropsWithChildren<{
+  onClick: UnaryFn<MouseEvent, void>
+}>
+
+export default function Sidebar({ children, onClick }: Props) {
+  return (
+    <div
+      onClick={onClick}
+      role="none"
+      className="workspace-sidebar"
+    >
+      {children}
+    </div>
+  )
 }

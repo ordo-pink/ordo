@@ -1,13 +1,11 @@
-import { CodeHighlightNode, CodeNode, registerCodeHighlighting } from "@lexical/code"
+import { CodeHighlightNode, CodeNode } from "@lexical/code"
 import { HashtagNode } from "@lexical/hashtag"
 import { AutoLinkNode, LinkNode } from "@lexical/link"
 import { ListItemNode, ListNode } from "@lexical/list"
 import { $convertToMarkdownString, TRANSFORMERS } from "@lexical/markdown"
 
-import { AutoLinkPlugin } from "@lexical/react/LexicalAutoLinkPlugin"
 import { CheckListPlugin } from "@lexical/react/LexicalCheckListPlugin"
 import { LexicalComposer } from "@lexical/react/LexicalComposer"
-import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext"
 import { ContentEditable } from "@lexical/react/LexicalContentEditable"
 import LexicalErrorBoundary from "@lexical/react/LexicalErrorBoundary"
 import { HashtagPlugin } from "@lexical/react/LexicalHashtagPlugin"
@@ -17,26 +15,21 @@ import { LinkPlugin } from "@lexical/react/LexicalLinkPlugin"
 import { ListPlugin } from "@lexical/react/LexicalListPlugin"
 import { MarkdownShortcutPlugin } from "@lexical/react/LexicalMarkdownShortcutPlugin"
 import { OnChangePlugin } from "@lexical/react/LexicalOnChangePlugin"
-import { RichTextPlugin } from "@lexical/react/LexicalRichTextPlugin"
+import { PlainTextPlugin } from "@lexical/react/LexicalPlainTextPlugin"
 import { HeadingNode, QuoteNode } from "@lexical/rich-text"
 import { TableCellNode, TableNode, TableRowNode } from "@lexical/table"
-import { OrdoFilePath } from "@ordo-pink/core"
 import { EditorState, EditorThemeClasses } from "lexical"
-import { useState, useEffect, ComponentType } from "react"
-import { useSearchParams } from "react-router-dom"
+import { useState, useEffect, ComponentType, memo } from "react"
 
+import { MdProps } from ".."
 import { LoadEditorStatePlugin } from "../core-plugins/load-editor-state"
-import { EditorActivityState } from "$activities/editor/types"
 
 import { updatedFile } from "$containers/app/store"
 
-import Null from "$core/components/null"
 import PathBreadcrumbs from "$core/components/path-breadcrumbs"
 import { useFileParentBreadcrumbs } from "$core/hooks/use-file-breadcrumbs"
 import { useAppDispatch } from "$core/state/hooks/use-app-dispatch"
 import { useAppSelector } from "$core/state/hooks/use-app-selector"
-import { useExtensionSelector } from "$core/state/hooks/use-extension-selector"
-import { Either } from "$core/utils/either"
 
 const theme: EditorThemeClasses = {
   heading: {
@@ -97,6 +90,7 @@ const theme: EditorThemeClasses = {
   },
 }
 
+// TODO: Adding nodes
 const nodes = [
   HeadingNode,
   ListNode,
@@ -112,146 +106,101 @@ const nodes = [
   HashtagNode,
 ]
 
-const HighlightCodePlugin = () => {
-  const [editor] = useLexicalComposerContext()
+export default memo(
+  function MdEditor({ file }: MdProps) {
+    const dispatch = useAppDispatch()
+    const breadcrumbsPath = useFileParentBreadcrumbs()
 
-  useEffect(() => {
-    editor.update(() => {
-      registerCodeHighlighting(editor)
-    })
-  }, [editor])
+    const pluginExtensions = useAppSelector((state) => state.app.editorPluginExtensions)
 
-  return null
-}
+    const [isInitialLoad, setIsInitialLoad] = useState(true)
+    const [plugins, setPlugins] = useState<ComponentType[]>([])
 
-export default function MdEditor() {
-  const dispatch = useAppDispatch()
+    // Prevent from updating the file at the moment it is opened
+    useEffect(() => {
+      setTimeout(() => setIsInitialLoad(false), 500)
 
-  const editorSelector = useExtensionSelector<EditorActivityState>()
-  const pluginExtensions = useAppSelector((state) => state.app.editorPluginExtensions)
-  const currentFile = editorSelector((state) => state["ordo-activity-editor"].currentFile)
-
-  const [isInitialLoad, setIsInitialLoad] = useState(true)
-  const [query] = useSearchParams()
-
-  const breadcrumbsPath = useFileParentBreadcrumbs()
-
-  const [path, setPath] = useState<OrdoFilePath>("" as OrdoFilePath)
-  const [plugins, setPlugins] = useState<ComponentType[]>([])
-
-  useEffect(() => {
-    setPath(query.get("path") as OrdoFilePath)
-
-    return () => {
-      setIsInitialLoad(true)
-    }
-  }, [query])
-
-  useEffect(() => {
-    if (!pluginExtensions || !pluginExtensions.length) return
-
-    setPlugins(
-      pluginExtensions.reduce(
-        (acc, extension) => acc.concat(extension.plugins),
-        [] as ComponentType[],
-      ),
-    )
-
-    return () => setPlugins([])
-  }, [pluginExtensions])
-
-  const handleChange = (state: EditorState) => {
-    state.read(() => {
-      const content = $convertToMarkdownString()
-
-      if (!isInitialLoad) {
-        dispatch(updatedFile({ path, content }))
+      return () => {
+        setIsInitialLoad(true)
       }
+    }, [file.path])
 
-      setIsInitialLoad(false)
-    })
-  }
+    useEffect(() => {
+      if (!pluginExtensions || !pluginExtensions.length) return
 
-  // eslint-disable-next-line no-console
-  const onError = console.error
+      setPlugins(
+        pluginExtensions.reduce(
+          (acc, extension) => acc.concat(extension.plugins),
+          [] as ComponentType[],
+        ),
+      )
 
-  return Either.fromNullable(currentFile).fold(Null, (file) => (
-    <div className="p-4 w-full max-w-2xl">
-      <LexicalComposer
-        initialConfig={{
-          namespace: "md-editor-root",
-          onError,
-          theme,
-          nodes,
-        }}
-      >
-        <div className="mb-8">
-          <PathBreadcrumbs path={breadcrumbsPath} />
+      return () => setPlugins([])
+    }, [pluginExtensions])
 
-          <h1 className="text-3xl font-black">{file.readableName}</h1>
-        </div>
+    const handleChange = (state: EditorState) => {
+      if (isInitialLoad) return
 
-        <div className="w-full h-screen flex flex-col items-center">
-          <div className="w-full py-8 px-4">
-            <MarkdownShortcutPlugin transformers={TRANSFORMERS} />
+      state.read(() => {
+        const content = $convertToMarkdownString()
 
-            <LinkPlugin />
-            <ListPlugin />
-            <CheckListPlugin />
+        dispatch(updatedFile({ path: file.path, content }))
+      })
+    }
 
-            <HashtagPlugin />
-            <HistoryPlugin />
-            <HorizontalRulePlugin />
-            <HighlightCodePlugin />
+    // eslint-disable-next-line no-console
+    const onError = console.error
 
-            <AutoLinkPlugin
-              matchers={[
-                (x) => {
-                  const rx =
-                    /(?:(?:(?:https?|ftp):)?\/\/)(?:\S+(?::\S*)?@)?(?:(?!(?:10|127)(?:\.\d{1,3}){3})(?!(?:169\.254|192\.168)(?:\.\d{1,3}){2})(?!172\.(?:1[6-9]|2\d|3[0-1])(?:\.\d{1,3}){2})(?:[1-9]\d?|1\d\d|2[01]\d|22[0-3])(?:\.(?:1?\d{1,2}|2[0-4]\d|25[0-5])){2}(?:\.(?:[1-9]\d?|1\d\d|2[0-4]\d|25[0-4]))|(?:(?:[a-z0-9\u00a1-\uffff][a-z0-9\u00a1-\uffff_-]{0,62})?[a-z0-9\u00a1-\uffff]\.)+(?:[a-z\u00a1-\uffff]{2,}\.?))(?::\d{2,5})?(?:[/?#]\S*)?/i
+    return (
+      <div className="p-4 w-full max-w-2xl">
+        <LexicalComposer
+          initialConfig={{
+            namespace: "md-editor-root",
+            onError,
+            theme,
+            nodes,
+          }}
+        >
+          <div className="mb-8">
+            <PathBreadcrumbs path={breadcrumbsPath} />
 
-                  const matched = x.match(rx)
+            <h1 className="text-3xl font-black">{file.readableName}</h1>
+          </div>
 
-                  if (!matched || !matched[0]) return null
+          <div className="w-full h-screen flex flex-col items-center">
+            <div className="w-full py-8 px-4">
+              <MarkdownShortcutPlugin transformers={TRANSFORMERS} />
 
-                  const urlText = matched[0]
+              <LinkPlugin />
+              <ListPlugin />
+              <CheckListPlugin />
 
-                  return {
-                    index: x.indexOf(urlText),
-                    length: urlText.length,
-                    text: urlText,
-                    url: urlText,
-                    attributes: {
-                      target: "_blank",
-                      rel: "noreferrer noopener",
-                    },
-                  }
-                },
-              ]}
-            />
-            <CheckListPlugin />
+              <HashtagPlugin />
+              <HistoryPlugin />
+              <HorizontalRulePlugin />
 
-            <RichTextPlugin
-              contentEditable={<ContentEditable />}
-              placeholder={<div>...</div>}
-              ErrorBoundary={LexicalErrorBoundary}
-            />
+              <CheckListPlugin />
 
-            <LoadEditorStatePlugin />
+              <PlainTextPlugin
+                contentEditable={<ContentEditable spellCheck={false} />}
+                placeholder={<div>...</div>}
+                ErrorBoundary={LexicalErrorBoundary}
+              />
 
-            <OnChangePlugin
-              ignoreSelectionChange
-              onChange={handleChange}
-            />
+              <LoadEditorStatePlugin file={file} />
+              <OnChangePlugin
+                ignoreSelectionChange
+                onChange={handleChange}
+              />
 
-            <>
               {plugins.map((Plugin, index) => (
                 <Plugin key={index} />
               ))}
-            </>
+            </div>
           </div>
-        </div>
-      </LexicalComposer>
-    </div>
-  ))
-}
+        </LexicalComposer>
+      </div>
+    )
+  },
+  (prev, next) => prev.file.path === next.file.path,
+)

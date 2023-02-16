@@ -39,6 +39,14 @@ export type OrdoExtensionProps<T extends OrdoExtension<string, OrdoExtensionType
   translate: () => null // TODO
 }
 
+export type OrdoActivityProps<T extends OrdoExtension<string, OrdoExtensionType>> =
+  OrdoExtensionProps<T>
+
+export type OrdoFileAssociationProps<T extends OrdoExtension<string, OrdoExtensionType>> =
+  OrdoExtensionProps<T> & {
+    file: IOrdoFile
+  }
+
 export type ActionContext<
   T extends OrdoExtension<string, OrdoExtensionType> = OrdoExtension<string, OrdoExtensionType>,
 > = {
@@ -122,7 +130,7 @@ export interface OrdoFileAssociationExtension<
 > extends OrdoExtension<Name, OrdoExtensionType.FILE_ASSOCIATION, TState> {
   fileExtensions: OrdoFileExtension[]
   Icon?: OrdoLoadableComponent
-  Component: OrdoLoadableComponent<{ file: IOrdoFile; content: ReturnType<typeof fetch> }>
+  Component: OrdoLoadableComponent
 }
 
 export interface OrdoActivityExtension<

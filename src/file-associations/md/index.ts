@@ -1,6 +1,7 @@
 import { createFileAssociationExtension } from "$core/extensions/create-file-association-extension"
+import { OrdoFileAssociationProps } from "$core/types"
 
-export default createFileAssociationExtension("md", {
+export const md = createFileAssociationExtension("md", {
   Component: () => import("$file-associations/md/components"),
   Icon: () => import("$file-associations/md/components/icon"),
   fileExtensions: [".md"],
@@ -18,3 +19,7 @@ export default createFileAssociationExtension("md", {
     },
   },
 })
+
+export type MdProps = OrdoFileAssociationProps<typeof md>
+
+export default md

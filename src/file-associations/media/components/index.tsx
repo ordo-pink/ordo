@@ -1,63 +1,40 @@
-import { OrdoFilePath, Nullable } from "@ordo-pink/core"
 import { useEffect, useState } from "react"
-import { useSearchParams } from "react-router-dom"
 
-import { EditorActivityState } from "$activities/editor/types"
-
-import EditorPage from "$core/components/editor-page/editor-page"
+import { useIsVideo } from "./use-is-video"
+import { MediaProps } from ".."
 import Loading from "$core/components/loading"
+import PathBreadcrumbs from "$core/components/path-breadcrumbs"
 import { useFileParentBreadcrumbs } from "$core/hooks/use-file-breadcrumbs"
 import { useFSAPI } from "$core/hooks/use-fs-api"
-import { useExtensionSelector } from "$core/state/hooks/use-extension-selector"
 import { Either } from "$core/utils/either"
 
-export default function MediaViewer() {
-  const editorSelector = useExtensionSelector<EditorActivityState>()
-
-  const currentFile = editorSelector((state) => state["ordo-activity-editor"].currentFile)
-
-  const { files } = useFSAPI()
-  const [query] = useSearchParams()
+export default function MediaViewer({ file }: MediaProps) {
   const breadcrumbsPath = useFileParentBreadcrumbs()
+  const { files } = useFSAPI()
 
   const [content, setContent] = useState("")
-  const [isVideo, setIsVideo] = useState(false)
 
-  const path = query.get("path") as OrdoFilePath
+  const isVideo = useIsVideo(content)
 
   useEffect(() => {
-    if (!path) return
-
-    files.getBlob(path).then(URL.createObjectURL).then(setContent)
+    files.getBlob(file.path).then(URL.createObjectURL).then(setContent)
 
     return () => {
       URL.revokeObjectURL(content)
+      setContent("")
     }
-  }, [path, files, content])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [file.path, files])
 
-  useEffect(() => {
-    let video: Nullable<HTMLVideoElement> = document.createElement("video")
-    video.preload = "metadata"
+  return Either.fromBoolean(Boolean(content)).fold(Loading, () => (
+    <div className="p-4 w-full max-w-6xl">
+      <div className="mb-8">
+        <PathBreadcrumbs path={breadcrumbsPath} />
 
-    video.onloadedmetadata = () => {
-      setIsVideo(Boolean(video && video.videoHeight && video.videoWidth))
+        <h1 className="text-3xl font-black">{file.readableName}</h1>
+      </div>
 
-      if (video) {
-        video.src = null as unknown as string
-        video = null
-      }
-    }
-
-    video.src = content
-  }, [content])
-
-  return Either.fromNullable(content)
-    .chain(() => Either.fromNullable(currentFile))
-    .fold(Loading, (file) => (
-      <EditorPage
-        title={file.readableName}
-        breadcrumbsPath={breadcrumbsPath}
-      >
+      <div className="w-full h-screen flex flex-col items-center">
         {isVideo ? (
           <video
             controls
@@ -81,6 +58,7 @@ export default function MediaViewer() {
             />
           </audio>
         )}
-      </EditorPage>
-    ))
+      </div>
+    </div>
+  ))
 }

@@ -1,0 +1,55 @@
+import { createReadStream, createWriteStream, promises } from "fs"
+import { resolve, join } from "path"
+import { FSDriver } from "@ordo-pink/backend-universal"
+import { promiseWriteStream } from "@ordo-pink/fs-utils"
+import { OrdoDirectoryPath, OrdoFilePath } from "@ordo-pink/fs-entity"
+
+const toAbsolutePath = (absolute: string) => (path: string) => resolve(absolute, path)
+
+export const createFSDriver = (rootDirectory: string): FSDriver => {
+  const getAbsolute = toAbsolutePath(join(rootDirectory, "/"))
+
+  return {
+    checkDirectoryExists: (path) =>
+      promises
+        .stat(getAbsolute(path))
+        .catch(() => null)
+        .then(Boolean),
+    checkFileExists: (path) =>
+      promises
+        .stat(getAbsolute(path))
+        .catch(() => null)
+        .then(Boolean),
+    createDirectory: (path) => promises.mkdir(getAbsolute(path)).then(() => path),
+    createFile: ({ path, content }) =>
+      content
+        ? promiseWriteStream(content, createWriteStream(getAbsolute(path))).then(() => path)
+        : promises.writeFile(getAbsolute(path), "", "utf8").then(() => path),
+    deleteDirectory: (path) =>
+      promises.rm(getAbsolute(path), { recursive: true, force: true }).then(() => path),
+    deleteFile: (path) => promises.unlink(getAbsolute(path)).then(() => path),
+    getDirectoryChildren: (path) =>
+      promises
+        .readdir(getAbsolute(path), { withFileTypes: true })
+        .then((children) =>
+          children.map((child) =>
+            child.isDirectory()
+              ? (`${path}${child.name}/` as OrdoDirectoryPath)
+              : (`${path}${child.name}` as OrdoFilePath)
+          )
+        ),
+    getFile: (path) => Promise.resolve(createReadStream(getAbsolute(path))),
+    getFileDescriptor: (path) =>
+      promises.stat(getAbsolute(path)).then(({ size, mtime }) => ({
+        path,
+        size,
+        updatedAt: mtime,
+      })),
+    moveDirectory: ({ oldPath, newPath }) =>
+      promises.rename(getAbsolute(oldPath), getAbsolute(newPath)).then(() => newPath),
+    moveFile: ({ oldPath, newPath }) =>
+      promises.rename(getAbsolute(oldPath), getAbsolute(newPath)).then(() => newPath),
+    updateFile: ({ path, content }) =>
+      promiseWriteStream(content, createWriteStream(getAbsolute(path))).then(() => path),
+  }
+}

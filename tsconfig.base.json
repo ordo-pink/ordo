@@ -14,7 +14,16 @@
     "skipLibCheck": true,
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
-    "paths": {}
+    "paths": {
+      "@ordo-pink/backend-universal": ["packages/backend-universal/src/index.ts"],
+      "@ordo-pink/common-types": ["packages/common-types/src/index.ts"],
+      "@ordo-pink/either": ["packages/either/src/index.ts"],
+      "@ordo-pink/fs-driver": ["packages/backend-fs-driver/src/index.ts"],
+      "@ordo-pink/fs-entity": ["packages/fs-entity/src/index.ts"],
+      "@ordo-pink/fs-utils": ["packages/fs-utils/src/index.ts"],
+      "@ordo-pink/locale": ["packages/locale/src/index.ts"],
+      "@ordo-pink/switch": ["packages/switch/src/index.ts"]
+    }
   },
   "exclude": ["node_modules", "tmp"]
 }

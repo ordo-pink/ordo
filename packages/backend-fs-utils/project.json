@@ -1,0 +1,41 @@
+{
+  "name": "backend-fs-utils",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "packages/backend-fs-utils/src",
+  "projectType": "library",
+  "targets": {
+    "lint": {
+      "executor": "@nrwl/linter:eslint",
+      "outputs": ["{options.outputFile}"],
+      "options": {
+        "lintFilePatterns": ["packages/backend-fs-utils/**/*.ts"]
+      }
+    },
+    "test": {
+      "executor": "@nrwl/jest:jest",
+      "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
+      "options": {
+        "jestConfig": "packages/backend-fs-utils/jest.config.ts",
+        "passWithNoTests": true
+      },
+      "configurations": {
+        "ci": {
+          "ci": true,
+          "codeCoverage": true
+        }
+      }
+    },
+    "build": {
+      "executor": "@nrwl/js:tsc",
+      "outputs": ["{options.outputPath}"],
+      "options": {
+        "outputPath": "dist/packages/backend-fs-utils",
+        "tsConfig": "packages/backend-fs-utils/tsconfig.lib.json",
+        "packageJson": "packages/backend-fs-utils/package.json",
+        "main": "packages/backend-fs-utils/src/index.ts",
+        "assets": ["packages/backend-fs-utils/*.md"]
+      }
+    }
+  },
+  "tags": []
+}

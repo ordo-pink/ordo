@@ -1,12 +1,9 @@
 /* eslint-disable */
 import { Request, Response } from "express"
 import { extractDynamicParam } from "."
+import { IgnoreLogger } from "@ordo-pink/logger"
 
-const logger = {
-  warn: vitest.fn(),
-  info: vitest.fn(),
-  error: vitest.fn(),
-}
+const logger = IgnoreLogger
 
 describe("extract-dynamic-param", () => {
   it("should properly provide the dynamic param in the params object", () => {

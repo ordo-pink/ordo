@@ -1,4 +1,4 @@
-import { Logger } from "@ordo-pink/common-types"
+import { Logger } from "@ordo-pink/logger"
 import { RequestHandler } from "express"
 import { Params } from "../../../types"
 

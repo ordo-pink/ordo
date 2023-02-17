@@ -1,8 +1,9 @@
 import { existsSync, mkdirSync } from "fs"
 import { join } from "path"
-import { createAuthorisationStub } from "@ordo-pink/authorisation-stub"
+import { createAuthorisationStub } from "@ordo-pink/backend-authorisation-stub"
+import { createFSDriver } from "@ordo-pink/backend-fs-driver"
 import { createOrdoBackendServer } from "@ordo-pink/backend-universal"
-import { createFSDriver } from "@ordo-pink/fs-driver"
+import { ConsoleLogger } from "@ordo-pink/logger"
 import morgan from "morgan"
 
 /**
@@ -11,8 +12,8 @@ import morgan from "morgan"
  */
 const root = join(__dirname, "..", "..", "..", "..", "ordo-backend-local-assets")
 
-const PORT = process.env.LOCAL_BACKEND_PORT ?? 5000
-const TOKEN = process.env.LOCAL_TOKEN ?? "BOOP"
+const PORT = process.env.BACKEND_LOCAL_PORT ?? 5000
+const TOKEN = process.env.BACKEND_LOCAL_TOKEN ?? "BOOP"
 
 const assetsPath = join(root, TOKEN)
 
@@ -20,18 +21,9 @@ if (!existsSync(assetsPath)) mkdirSync(assetsPath, { recursive: true })
 
 const server = createOrdoBackendServer({
   fsDriver: createFSDriver(root),
-  authorise: createAuthorisationStub("BOOP"),
+  authorise: createAuthorisationStub(TOKEN),
   prependMiddleware: (app) => app.use(morgan("dev")),
-  logger: {
-    alert: console.log,
-    critical: console.log,
-    debug: console.log,
-    error: console.log,
-    info: console.log,
-    notice: console.log,
-    panic: console.log,
-    warn: console.log,
-  },
+  logger: ConsoleLogger,
 })
 
 server.listen(PORT, () => console.log("Listening on port ", PORT))

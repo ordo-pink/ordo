@@ -1,0 +1,41 @@
+{
+  "name": "backend-s3-driver",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "packages/backend-s3-driver/src",
+  "projectType": "library",
+  "targets": {
+    "lint": {
+      "executor": "@nrwl/linter:eslint",
+      "outputs": ["{options.outputFile}"],
+      "options": {
+        "lintFilePatterns": ["packages/backend-s3-driver/**/*.ts"]
+      }
+    },
+    "test": {
+      "executor": "@nrwl/jest:jest",
+      "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
+      "options": {
+        "jestConfig": "packages/backend-s3-driver/jest.config.ts",
+        "passWithNoTests": true
+      },
+      "configurations": {
+        "ci": {
+          "ci": true,
+          "codeCoverage": true
+        }
+      }
+    },
+    "build": {
+      "executor": "@nrwl/js:tsc",
+      "outputs": ["{options.outputPath}"],
+      "options": {
+        "outputPath": "dist/packages/backend-s3-driver",
+        "tsConfig": "packages/backend-s3-driver/tsconfig.lib.json",
+        "packageJson": "packages/backend-s3-driver/package.json",
+        "main": "packages/backend-s3-driver/src/index.ts",
+        "assets": ["packages/backend-s3-driver/*.md"]
+      }
+    }
+  },
+  "tags": []
+}

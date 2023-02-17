@@ -7,12 +7,9 @@ import {
   validateDirectoryOldPathAndNewPath,
   validateFileOldPathAndNewPath,
 } from "."
+import { IgnoreLogger } from "@ordo-pink/logger"
 
-const logger = {
-  warn: vitest.fn(),
-  info: vitest.fn(),
-  error: vitest.fn(),
-}
+const logger = IgnoreLogger
 
 describe("validate-path", () => {
   describe("validate-directory-path", () => {

@@ -1,12 +1,9 @@
 /* eslint-disable */
 import { Request, Response } from "express"
 import { prependOldPathAndNewPathSlashes, prependPathSlash } from "."
+import { IgnoreLogger } from "@ordo-pink/logger"
 
-const logger = {
-  warn: vitest.fn(),
-  info: vitest.fn(),
-  error: vitest.fn(),
-}
+const logger = IgnoreLogger
 
 describe("prepend-slash", () => {
   it("should prepend slash in the params object", () => {

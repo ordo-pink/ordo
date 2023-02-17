@@ -22,6 +22,7 @@
       "inputs": ["default", "{workspaceRoot}/.eslintrc.json"]
     },
     "e2e": {
+      "dependsOn": ["^build"],
       "inputs": ["default", "^production"]
     }
   },

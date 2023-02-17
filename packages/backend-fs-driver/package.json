@@ -1,5 +1,4 @@
 {
-  "name": "@ordo-pink/fs-driver",
-  "version": "0.0.1",
-  "type": "commonjs"
+  "name": "@ordo-pink/backend-fs-driver",
+  "version": "0.0.1"
 }

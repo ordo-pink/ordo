@@ -2,19 +2,16 @@
 import { Request, Response } from "express"
 import { addUserIdToOldPathAndNewPath, addUserIdToPath } from "."
 import { NEW_PATH_PARAM, OLD_PATH_PARAM, PATH_PARAM, USER_ID_PARAM } from "../../constants"
+import { IgnoreLogger } from "@ordo-pink/logger"
 
-const logger = {
-  info: vitest.fn(),
-  warn: vitest.fn(),
-  error: vitest.fn(),
-}
+const logger = IgnoreLogger
 
 describe("add-user-id-to-path", () => {
   it("should prepend user ID from the URL to path", () => {
     const req = { params: { [USER_ID_PARAM]: "123", [PATH_PARAM]: "/123", logger } } as Request<any>
     const res = {} as Response
 
-    const next = vitest.fn()
+    const next = jest.fn()
 
     addUserIdToPath(req, res, next)
 
@@ -32,7 +29,7 @@ describe("add-user-id-to-path", () => {
       },
     } as Request<any>
     const res = {} as Response
-    const next = vitest.fn()
+    const next = jest.fn()
 
     addUserIdToOldPathAndNewPath(req, res, next)
 

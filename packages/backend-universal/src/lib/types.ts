@@ -1,5 +1,5 @@
 import { Readable } from "stream"
-import { Logger, UnaryFn } from "@ordo-pink/common-types"
+import { UnaryFn } from "@ordo-pink/common-types"
 import {
   OrdoDirectoryPath,
   OrdoFilePath,
@@ -8,6 +8,7 @@ import {
   IOrdoDirectoryRaw,
   IOrdoFileRaw,
 } from "@ordo-pink/fs-entity"
+import { Logger } from "@ordo-pink/logger"
 import cors from "cors"
 import express, { RequestHandler } from "express"
 import { JwtPayload } from "jsonwebtoken"

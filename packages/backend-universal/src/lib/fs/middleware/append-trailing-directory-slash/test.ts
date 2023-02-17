@@ -4,12 +4,9 @@ import {
   appendTrailingDirectoryOldPathAndNewPathSlashes,
   appendTrailingDirectoryPathSlash,
 } from "."
+import { IgnoreLogger } from "@ordo-pink/logger"
 
-const logger = {
-  warn: vitest.fn(),
-  info: vitest.fn(),
-  error: vitest.fn(),
-}
+const logger = IgnoreLogger
 
 describe("append-trailing-directory-path-slash", () => {
   it("should append trailing slash in the params object", () => {

@@ -1,12 +1,9 @@
 /* eslint-disable */
 import { Request, Response } from "express"
 import { setContentTypeHeader } from "."
+import { IgnoreLogger } from "@ordo-pink/logger"
 
-const logger = {
-  warn: vitest.fn(),
-  info: vitest.fn(),
-  error: vitest.fn(),
-}
+const logger = IgnoreLogger
 
 describe("set-content-type-header", () => {
   it("should set content-type to response headers", () => {

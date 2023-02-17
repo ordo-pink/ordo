@@ -57,7 +57,7 @@ export type CreateOrdoBackendServerParams = {
   fsDriver: FSDriver
   prependMiddleware?: UnaryFn<ReturnType<typeof express>, ReturnType<typeof express>>
   corsOptions?: Parameters<typeof cors>[0]
-  authorize: RequestHandler<Params<Record<string, unknown>>>
+  authorise: RequestHandler<Params<Record<string, unknown>>>
   logger: Logger
 }
 

@@ -1,6 +1,12 @@
+import { Params } from "@ordo-pink/backend-universal"
 import { UnaryFn } from "@ordo-pink/common-types"
 import { RequestHandler } from "express"
 
-export const authorisationStub: UnaryFn<string, RequestHandler> = (token) => (_, __, next) => {
-  return next()
-}
+export const createAuthorisationStub: UnaryFn<string, RequestHandler<Params>> =
+  (token) => (req, __, next) => {
+    req.params.tokenParsed = {
+      sub: token,
+    }
+
+    return next()
+  }

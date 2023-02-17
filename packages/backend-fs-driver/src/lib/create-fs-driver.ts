@@ -1,13 +1,13 @@
 import { createReadStream, createWriteStream, promises } from "fs"
-import { resolve, join } from "path"
+import { join } from "path"
 import { FSDriver } from "@ordo-pink/backend-universal"
-import { promiseWriteStream } from "@ordo-pink/fs-utils"
 import { OrdoDirectoryPath, OrdoFilePath } from "@ordo-pink/fs-entity"
+import { promiseWriteStream } from "@ordo-pink/fs-utils"
 
-const toAbsolutePath = (absolute: string) => (path: string) => resolve(absolute, path)
+const toAbsolutePath = (absolute: string) => (path: string) => join(absolute, path)
 
 export const createFSDriver = (rootDirectory: string): FSDriver => {
-  const getAbsolute = toAbsolutePath(join(rootDirectory, "/"))
+  const getAbsolute = toAbsolutePath(rootDirectory)
 
   return {
     checkDirectoryExists: (path) =>
@@ -35,8 +35,8 @@ export const createFSDriver = (rootDirectory: string): FSDriver => {
           children.map((child) =>
             child.isDirectory()
               ? (`${path}${child.name}/` as OrdoDirectoryPath)
-              : (`${path}${child.name}` as OrdoFilePath)
-          )
+              : (`${path}${child.name}` as OrdoFilePath),
+          ),
         ),
     getFile: (path) => Promise.resolve(createReadStream(getAbsolute(path))),
     getFileDescriptor: (path) =>

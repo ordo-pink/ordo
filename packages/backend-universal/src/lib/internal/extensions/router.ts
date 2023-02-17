@@ -12,7 +12,7 @@ import { CreateOrdoBackendServerParams } from "../../types"
 
 export const ExtensionsRouter = ({
   fsDriver,
-  authorize,
+  authorise: authorize,
   logger,
 }: CreateOrdoBackendServerParams) => {
   const file = OrdoFileModel.of(fsDriver)

@@ -39,7 +39,7 @@ import { OrdoDirectoryModel } from "./models/directory"
 import { OrdoFileModel } from "./models/file"
 import { CreateOrdoBackendServerParams } from "../types"
 
-const filesRouter = ({ fsDriver, authorize, logger }: CreateOrdoBackendServerParams) => {
+const filesRouter = ({ fsDriver, authorise: authorize, logger }: CreateOrdoBackendServerParams) => {
   const file = OrdoFileModel.of(fsDriver)
   const directory = OrdoDirectoryModel.of(fsDriver)
 
@@ -49,9 +49,9 @@ const filesRouter = ({ fsDriver, authorize, logger }: CreateOrdoBackendServerPar
     .post(
       `/:${USER_ID_PARAM}/:${PATH_PARAM}*`,
 
+      appendLogger(logger),
       authorize,
       compareTokens(env),
-      appendLogger(logger),
       extractDynamicParam([PATH_PARAM]),
       prependPathSlash,
       addUserIdToPath,
@@ -62,9 +62,9 @@ const filesRouter = ({ fsDriver, authorize, logger }: CreateOrdoBackendServerPar
     .get(
       `/:${USER_ID_PARAM}/:${PATH_PARAM}*`,
 
+      appendLogger(logger),
       authorize,
       compareTokens(env),
-      appendLogger(logger),
       extractDynamicParam([PATH_PARAM]),
       prependPathSlash,
       addUserIdToPath,
@@ -75,9 +75,9 @@ const filesRouter = ({ fsDriver, authorize, logger }: CreateOrdoBackendServerPar
     .put(
       `/:${USER_ID_PARAM}/:${PATH_PARAM}*`,
 
+      appendLogger(logger),
       authorize,
       compareTokens(env),
-      appendLogger(logger),
       extractDynamicParam([PATH_PARAM]),
       prependPathSlash,
       addUserIdToPath,
@@ -88,9 +88,9 @@ const filesRouter = ({ fsDriver, authorize, logger }: CreateOrdoBackendServerPar
     .patch(
       `/:${USER_ID_PARAM}/:${OLD_PATH_PARAM}*${PATH_SEPARATOR}/:${NEW_PATH_PARAM}*`,
 
+      appendLogger(logger),
       authorize,
       compareTokens(env),
-      appendLogger(logger),
       extractDynamicParam([OLD_PATH_PARAM, NEW_PATH_PARAM]),
       prependOldPathAndNewPathSlashes,
       addUserIdToOldPathAndNewPath,
@@ -100,9 +100,9 @@ const filesRouter = ({ fsDriver, authorize, logger }: CreateOrdoBackendServerPar
     .delete(
       `/:${USER_ID_PARAM}/:${PATH_PARAM}*`,
 
+      appendLogger(logger),
       authorize,
       compareTokens(env),
-      appendLogger(logger),
       extractDynamicParam([PATH_PARAM]),
       prependPathSlash,
       addUserIdToPath,
@@ -111,7 +111,11 @@ const filesRouter = ({ fsDriver, authorize, logger }: CreateOrdoBackendServerPar
     )
 }
 
-const directoriesRouter = ({ fsDriver, authorize, logger }: CreateOrdoBackendServerParams) => {
+const directoriesRouter = ({
+  fsDriver,
+  authorise: authorize,
+  logger,
+}: CreateOrdoBackendServerParams) => {
   const file = OrdoFileModel.of(fsDriver)
   const directory = OrdoDirectoryModel.of(fsDriver)
 
@@ -121,9 +125,9 @@ const directoriesRouter = ({ fsDriver, authorize, logger }: CreateOrdoBackendSer
     .post(
       `/:${USER_ID_PARAM}/:${PATH_PARAM}*`,
 
+      appendLogger(logger),
       authorize,
       compareTokens(env),
-      appendLogger(logger),
       extractDynamicParam([PATH_PARAM]),
       appendTrailingDirectoryPathSlash,
       addUserIdToPath,
@@ -133,9 +137,9 @@ const directoriesRouter = ({ fsDriver, authorize, logger }: CreateOrdoBackendSer
     .get(
       `/:${USER_ID_PARAM}/`,
 
+      appendLogger(logger),
       authorize,
       compareTokens(env),
-      appendLogger(logger),
       setRootPathParam,
       appendTrailingDirectoryPathSlash,
       addUserIdToPath,
@@ -145,9 +149,9 @@ const directoriesRouter = ({ fsDriver, authorize, logger }: CreateOrdoBackendSer
     .get(
       `/:${USER_ID_PARAM}/:${PATH_PARAM}*`,
 
+      appendLogger(logger),
       authorize,
       compareTokens(env),
-      appendLogger(logger),
       extractDynamicParam([PATH_PARAM]),
       appendTrailingDirectoryPathSlash,
       addUserIdToPath,
@@ -157,9 +161,9 @@ const directoriesRouter = ({ fsDriver, authorize, logger }: CreateOrdoBackendSer
     .patch(
       `/:${USER_ID_PARAM}/:${OLD_PATH_PARAM}*${PATH_SEPARATOR}/:${NEW_PATH_PARAM}*`,
 
+      appendLogger(logger),
       authorize,
       compareTokens(env),
-      appendLogger(logger),
       extractDynamicParam([OLD_PATH_PARAM, NEW_PATH_PARAM]),
       appendTrailingDirectoryOldPathAndNewPathSlashes,
       addUserIdToOldPathAndNewPath,
@@ -169,9 +173,9 @@ const directoriesRouter = ({ fsDriver, authorize, logger }: CreateOrdoBackendSer
     .delete(
       `/:${USER_ID_PARAM}/:${PATH_PARAM}*`,
 
+      appendLogger(logger),
       authorize,
       compareTokens(env),
-      appendLogger(logger),
       extractDynamicParam([PATH_PARAM]),
       appendTrailingDirectoryPathSlash,
       addUserIdToPath,

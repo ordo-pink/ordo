@@ -1,6 +1,7 @@
-import { ExceptionResponse, OrdoFile } from "@ordo-pink/core"
+import { ExceptionResponse } from "@ordo-pink/common-types"
+import { OrdoFile } from "@ordo-pink/fs-entity"
 import { OrdoDirectoryModel } from "./directory"
-import { FSDriver, IOrdoFileModel } from "../types"
+import { FSDriver, IOrdoFileModel } from "../../types"
 
 export const OrdoFileModel = {
   of: (driver: FSDriver): IOrdoFileModel => ({

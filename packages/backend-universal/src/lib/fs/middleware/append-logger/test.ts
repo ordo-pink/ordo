@@ -3,16 +3,16 @@ import { Request, Response } from "express"
 import { appendLogger } from "."
 
 const logger = {
-  info: jest.fn(),
-  warn: jest.fn(),
-  error: jest.fn(),
+  info: vitest.fn(),
+  warn: vitest.fn(),
+  error: vitest.fn(),
 }
 
 describe("append-logger", () => {
   it("should add logger to request params", () => {
     const req = { params: {} } as Request<any>
     const res = {} as Response
-    const next = jest.fn()
+    const next = vitest.fn()
 
     appendLogger(logger)(req, res, next)
 

@@ -1,6 +1,6 @@
-import { ExceptionResponse } from "@ordo-pink/core"
+import { ExceptionResponse } from "@ordo-pink/common-types"
 import type { RequestHandler } from "express"
-import { OrdoFilePathParams } from "../../types"
+import { OrdoFilePathParams } from "../../../types"
 
 export const checkSizeOfUploadingFile: RequestHandler<OrdoFilePathParams> = (req, res, next) => {
   const contentSize = Number(req.headers["content-length"])

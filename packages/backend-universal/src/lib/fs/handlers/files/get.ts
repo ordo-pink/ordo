@@ -1,7 +1,7 @@
-import { ExceptionResponse } from "@ordo-pink/core"
+import { ExceptionResponse } from "@ordo-pink/common-types"
 import { Switch } from "@ordo-pink/switch"
+import { FsRequestHandler, OrdoFilePathParams } from "../../../types"
 import { PATH_PARAM } from "../../constants"
-import { FsRequestHandler, OrdoFilePathParams } from "../../types"
 
 export const getFileHandler: FsRequestHandler<OrdoFilePathParams> =
   ({ file: { getFileContent } }) =>

@@ -1,6 +1,6 @@
 /* eslint-disable */
-import { disallowedCharacters } from "@ordo-pink/core"
 import { Request, Response } from "express"
+import { disallowedCharacters } from "@ordo-pink/fs-entity"
 import {
   validateDirectoryPath,
   validateFilePath,
@@ -9,9 +9,9 @@ import {
 } from "."
 
 const logger = {
-  warn: jest.fn(),
-  info: jest.fn(),
-  error: jest.fn(),
+  warn: vitest.fn(),
+  info: vitest.fn(),
+  error: vitest.fn(),
 }
 
 describe("validate-path", () => {

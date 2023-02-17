@@ -1,11 +1,11 @@
 import { RequestHandler } from "express"
-import { NEW_PATH_PARAM, OLD_PATH_PARAM, PATH_PARAM, USER_ID_PARAM } from "../../constants"
 import {
   OrdoDirectoryPathParams,
-  OrdoDirectoryTwoPathsParams,
   OrdoFilePathParams,
+  OrdoDirectoryTwoPathsParams,
   OrdoFileTwoPathsParams,
-} from "../../types"
+} from "../../../types"
+import { NEW_PATH_PARAM, OLD_PATH_PARAM, PATH_PARAM, USER_ID_PARAM } from "../../constants"
 
 export const addUserIdToPath: RequestHandler<OrdoDirectoryPathParams | OrdoFilePathParams> = (
   req,

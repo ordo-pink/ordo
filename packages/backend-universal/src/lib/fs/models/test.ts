@@ -1,9 +1,9 @@
 /* eslint-disable */
+import { OrdoFilePath, OrdoDirectoryPath } from "@ordo-pink/fs-entity"
 import { ReadStream } from "fs"
-import { OrdoDirectoryPath, OrdoFilePath } from "@ordo-pink/core"
+import { FSDriver } from "../../types"
 import { OrdoDirectoryModel } from "./directory"
 import { OrdoFileModel } from "./file"
-import { FSDriver } from "../types"
 
 const getDriver = (tree: (OrdoFilePath | OrdoDirectoryPath)[]): FSDriver => ({
   createDirectory: (path) => {

@@ -39,9 +39,9 @@ import { OrdoDirectoryModel } from "./models/directory"
 import { OrdoFileModel } from "./models/file"
 import { CreateOrdoBackendServerParams } from "../types"
 
-const filesRouter = ({ drivers: { fs }, authorize, logger }: CreateOrdoBackendServerParams) => {
-  const file = OrdoFileModel.of(fs)
-  const directory = OrdoDirectoryModel.of(fs)
+const filesRouter = ({ fsDriver, authorize, logger }: CreateOrdoBackendServerParams) => {
+  const file = OrdoFileModel.of(fsDriver)
+  const directory = OrdoDirectoryModel.of(fsDriver)
 
   const env = { file, directory, logger }
 
@@ -111,13 +111,9 @@ const filesRouter = ({ drivers: { fs }, authorize, logger }: CreateOrdoBackendSe
     )
 }
 
-const directoriesRouter = ({
-  drivers: { fs },
-  authorize,
-  logger,
-}: CreateOrdoBackendServerParams) => {
-  const file = OrdoFileModel.of(fs)
-  const directory = OrdoDirectoryModel.of(fs)
+const directoriesRouter = ({ fsDriver, authorize, logger }: CreateOrdoBackendServerParams) => {
+  const file = OrdoFileModel.of(fsDriver)
+  const directory = OrdoDirectoryModel.of(fsDriver)
 
   const env = { file, directory, logger }
 

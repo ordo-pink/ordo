@@ -1,8 +1,8 @@
-import { OrdoFile } from "@ordo-pink/core"
+import { OrdoFile } from "@ordo-pink/fs-entity"
 import type { RequestHandler } from "express"
 import { contentType } from "mime-types"
+import { OrdoDirectoryPathParams, OrdoFilePathParams } from "../../../types"
 import { PATH_PARAM } from "../../constants"
-import { OrdoDirectoryPathParams, OrdoFilePathParams } from "../../types"
 
 export const setContentTypeHeader: RequestHandler<OrdoFilePathParams | OrdoDirectoryPathParams> = (
   req,

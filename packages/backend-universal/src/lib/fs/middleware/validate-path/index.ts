@@ -1,12 +1,13 @@
-import { OrdoFile, OrdoDirectory, ExceptionResponse, SystemDirectory } from "@ordo-pink/core"
+import { SystemDirectory, ExceptionResponse } from "@ordo-pink/common-types"
+import { OrdoFile, OrdoDirectory } from "@ordo-pink/fs-entity"
 import type { RequestHandler } from "express"
-import { NEW_PATH_PARAM, OLD_PATH_PARAM, PATH_PARAM, USER_ID_PARAM } from "../../constants"
 import {
-  OrdoDirectoryPathParams,
-  OrdoDirectoryTwoPathsParams,
   OrdoFilePathParams,
   OrdoFileTwoPathsParams,
-} from "../../types"
+  OrdoDirectoryPathParams,
+  OrdoDirectoryTwoPathsParams,
+} from "../../../types"
+import { NEW_PATH_PARAM, OLD_PATH_PARAM, PATH_PARAM, USER_ID_PARAM } from "../../constants"
 
 const checkIsInternalPath = (userId: string) => (path: string) =>
   path.startsWith(`/${userId}${SystemDirectory.INTERNAL}`)

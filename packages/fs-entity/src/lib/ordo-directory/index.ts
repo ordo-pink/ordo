@@ -1,5 +1,3 @@
-import { isValidPath, endsWithSlash } from "../common"
-import { OrdoFile } from "../ordo-file"
 import {
   IOrdoDirectoryStatic,
   IOrdoDirectoryRaw,
@@ -7,6 +5,8 @@ import {
   OrdoDirectoryPath,
   OrdoFsEntity,
 } from "./types"
+import { isValidPath, endsWithSlash } from "../common"
+import { OrdoFile } from "../ordo-file"
 
 const ordoDirectory = (raw: IOrdoDirectoryRaw): IOrdoDirectory => {
   if (!OrdoDirectory.isValidPath(raw.path)) {

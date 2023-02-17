@@ -1,5 +1,5 @@
 import { UnaryFn } from "@ordo-pink/common-types"
-import { NoForbiddenCharacters } from "../common"
+import { NoForbiddenCharacters } from "../common/types"
 import { IOrdoFileRaw, IOrdoFile } from "../ordo-file/types"
 
 /**
@@ -96,7 +96,7 @@ export interface IOrdoDirectoryStatic {
    * @throws TypeError if provided path is invalid.
    */
   from: <Path extends OrdoDirectoryPath>(
-    params: IOrdoDirectoryRawInitParams<Path>
+    params: IOrdoDirectoryRawInitParams<Path>,
   ) => IOrdoDirectory
 
   /**
@@ -105,7 +105,7 @@ export interface IOrdoDirectoryStatic {
    * @throws TypeError if provided path is invalid.
    */
   raw: <Path extends OrdoDirectoryPath>(
-    params: IOrdoDirectoryRawInitParams<Path>
+    params: IOrdoDirectoryRawInitParams<Path>,
   ) => IOrdoDirectoryRaw
 
   /**
@@ -129,7 +129,7 @@ export interface IOrdoDirectoryStatic {
    * @throws TypeError if provided path is invalid.
    */
   getParentPath: <Path extends OrdoDirectoryPath>(
-    path: ValidatedOrdoDirectoryPath<Path>
+    path: ValidatedOrdoDirectoryPath<Path>,
   ) => OrdoDirectoryPath
 
   /**
@@ -138,7 +138,7 @@ export interface IOrdoDirectoryStatic {
    * @throws TypeError if provided path is invalid.
    */
   getReadableName: <Path extends OrdoDirectoryPath>(
-    path: ValidatedOrdoDirectoryPath<Path>
+    path: ValidatedOrdoDirectoryPath<Path>,
   ) => string
 
   /**

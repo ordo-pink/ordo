@@ -4,9 +4,9 @@ import { addUserIdToOldPathAndNewPath, addUserIdToPath } from "."
 import { NEW_PATH_PARAM, OLD_PATH_PARAM, PATH_PARAM, USER_ID_PARAM } from "../../constants"
 
 const logger = {
-  info: jest.fn(),
-  warn: jest.fn(),
-  error: jest.fn(),
+  info: vitest.fn(),
+  warn: vitest.fn(),
+  error: vitest.fn(),
 }
 
 describe("add-user-id-to-path", () => {
@@ -14,7 +14,7 @@ describe("add-user-id-to-path", () => {
     const req = { params: { [USER_ID_PARAM]: "123", [PATH_PARAM]: "/123", logger } } as Request<any>
     const res = {} as Response
 
-    const next = jest.fn()
+    const next = vitest.fn()
 
     addUserIdToPath(req, res, next)
 
@@ -32,7 +32,7 @@ describe("add-user-id-to-path", () => {
       },
     } as Request<any>
     const res = {} as Response
-    const next = jest.fn()
+    const next = vitest.fn()
 
     addUserIdToOldPathAndNewPath(req, res, next)
 

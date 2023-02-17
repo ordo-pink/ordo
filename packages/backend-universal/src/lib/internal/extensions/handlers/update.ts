@@ -1,16 +1,17 @@
-import { SuccessResponse, ExceptionResponse } from "@ordo-pink/common-types"
+import { SystemDirectory, SuccessResponse, ExceptionResponse } from "@ordo-pink/common-types"
 import { Switch } from "@ordo-pink/switch"
-import { FsRequestHandler, OrdoFilePathParams } from "../../../types"
-import { PATH_PARAM, USER_ID_PARAM } from "../../constants"
-import { removeUserIdFromPath } from "../../utils/remove-user-id-from-path"
+import { USER_ID_PARAM } from "../../../fs/constants"
+import { removeUserIdFromPath } from "../../../fs/utils/remove-user-id-from-path"
+import { FsRequestHandler } from "../../../types"
+import { ExtensionsParams } from "../../../types"
 
-export const removeFileHandler: FsRequestHandler<OrdoFilePathParams> =
-  ({ file: { deleteFile } }) =>
+export const updateExtensionFileHandler: FsRequestHandler<ExtensionsParams> =
+  ({ file: { updateFile } }) =>
   (req, res) => {
-    const path = req.params[PATH_PARAM]
     const userId = req.params[USER_ID_PARAM]
+    const path = `/${userId}${SystemDirectory.EXTENSIONS}${req.params.extension}.json` as const
 
-    deleteFile(path)
+    updateFile({ path, content: req })
       .then(removeUserIdFromPath(userId))
       .then((file) => res.status(SuccessResponse.OK).json(file))
       .catch((error: ExceptionResponse.NOT_FOUND | Error) =>

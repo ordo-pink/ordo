@@ -1,6 +1,6 @@
 import { RequestHandler } from "express"
+import { OrdoDirectoryPathParams, OrdoDirectoryTwoPathsParams } from "../../../types"
 import { NEW_PATH_PARAM, OLD_PATH_PARAM, PATH_PARAM } from "../../constants"
-import { OrdoDirectoryPathParams, OrdoDirectoryTwoPathsParams } from "../../types"
 
 export const appendTrailingDirectoryPathSlash: RequestHandler<OrdoDirectoryPathParams> = (
   req,

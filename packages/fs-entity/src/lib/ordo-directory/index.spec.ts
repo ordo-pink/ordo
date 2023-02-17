@@ -1,7 +1,8 @@
 /* eslint-disable */
-import { OrdoDirectory, IOrdoDirectory, OrdoDirectoryPath } from "."
+import { OrdoDirectory } from "."
 import { disallowedCharacters } from "../common"
 import { OrdoFile } from "../ordo-file"
+import { IOrdoDirectory, OrdoDirectoryPath } from "./types"
 
 describe("ordo-directory", () => {
   describe("of", () => {
@@ -10,14 +11,14 @@ describe("ordo-directory", () => {
         OrdoDirectory.of({
           path: "",
           children: [],
-        } as unknown as IOrdoDirectory)
+        } as unknown as IOrdoDirectory),
       ).toThrow("Invalid directory path"))
   })
 
   describe("is-ordo-directory", () => {
     it("should return true if it is an OrdoDirectory", () =>
       expect(
-        OrdoDirectory.isOrdoDirectory(OrdoDirectory.from({ path: "/123/", children: [] }))
+        OrdoDirectory.isOrdoDirectory(OrdoDirectory.from({ path: "/123/", children: [] })),
       ).toBe(true))
 
     it("should return false if it is not an OrdoDirectory", () => {
@@ -26,14 +27,14 @@ describe("ordo-directory", () => {
           path: "/test.md",
           children: [],
           readableName: "test",
-        })
+        }),
       ).toBe(false)
 
       expect(
         OrdoDirectory.isOrdoDirectory({
           path: "/test/",
           readableName: "test",
-        })
+        }),
       ).toBe(false)
     })
   })
@@ -44,7 +45,7 @@ describe("ordo-directory", () => {
 
     it("should throw on invalid path provided", () =>
       expect(() => OrdoDirectory.getReadableName("" as unknown as OrdoDirectoryPath)).toThrow(
-        "Invalid directory path"
+        "Invalid directory path",
       ))
   })
 
@@ -89,14 +90,14 @@ describe("ordo-directory", () => {
 
     it("should throw on invalid path provided", () =>
       expect(() => OrdoDirectory.getParentPath("" as unknown as OrdoDirectoryPath)).toThrow(
-        "Invalid directory path"
+        "Invalid directory path",
       ))
   })
 
   disallowedCharacters.forEach((character) => {
     it(`should fail with "${character}" in path`, () => {
       expect(() => OrdoDirectory.from({ path: `/${character}/test` } as any)).toThrow(
-        "Invalid directory path"
+        "Invalid directory path",
       )
     })
   })

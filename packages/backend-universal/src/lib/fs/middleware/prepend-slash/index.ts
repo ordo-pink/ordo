@@ -1,11 +1,11 @@
 import { RequestHandler } from "express"
-import { NEW_PATH_PARAM, OLD_PATH_PARAM, PATH_PARAM } from "../../constants"
 import {
   OrdoDirectoryPathParams,
   OrdoDirectoryTwoPathsParams,
   OrdoFilePathParams,
   OrdoFileTwoPathsParams,
-} from "../../types"
+} from "../../../types"
+import { NEW_PATH_PARAM, OLD_PATH_PARAM, PATH_PARAM } from "../../constants"
 
 export const prependPathSlash: RequestHandler<OrdoDirectoryPathParams | OrdoFilePathParams> = (
   req,

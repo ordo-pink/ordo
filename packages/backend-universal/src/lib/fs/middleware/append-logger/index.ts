@@ -1,6 +1,6 @@
+import { Logger } from "@ordo-pink/common-types"
 import { RequestHandler } from "express"
-import { Logger } from "../../../types"
-import { Params } from "../../types"
+import { Params } from "../../../types"
 
 export const appendLogger =
   (logger: Logger): RequestHandler<Params> =>

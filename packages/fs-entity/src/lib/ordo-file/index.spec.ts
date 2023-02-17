@@ -1,11 +1,12 @@
-import { IOrdoFile, OrdoFile, OrdoFilePath } from "."
+import { OrdoFile } from "."
+import { IOrdoFile, OrdoFilePath } from "./types"
 import { disallowedCharacters } from "../common"
 
 describe("ordo-file", () => {
   describe("of", () => {
     it("should throw on invalid path provided", () =>
       expect(() => OrdoFile.of({ path: "", children: [] } as unknown as IOrdoFile)).toThrow(
-        "Invalid file path"
+        "Invalid file path",
       ))
   })
 
@@ -24,7 +25,7 @@ describe("ordo-file", () => {
           extension: ".md",
           readableName: "test",
           updatedAt: new Date(),
-        })
+        }),
       ).toBe(false)
     })
   })
@@ -51,7 +52,7 @@ describe("ordo-file", () => {
 
     it("should throw on invalid path", () =>
       expect(() =>
-        OrdoFile.getFileExtension("/directory/dir1/" as unknown as OrdoFilePath)
+        OrdoFile.getFileExtension("/directory/dir1/" as unknown as OrdoFilePath),
       ).toThrow("Invalid file path"))
 
     it("should properly extract file extension if file does not have a name", () => {
@@ -81,7 +82,7 @@ describe("ordo-file", () => {
 
     it("should throw on invalid path", () =>
       expect(() => OrdoFile.getParentPath("/directory/dir1/" as unknown as OrdoFilePath)).toThrow(
-        "Invalid file path"
+        "Invalid file path",
       ))
 
     it("should properly extract directory parent path", () => {
@@ -99,7 +100,7 @@ describe("ordo-file", () => {
 
     it("should throw on invalid path", () =>
       expect(() => OrdoFile.getReadableName("/directory/dir1/" as unknown as OrdoFilePath)).toThrow(
-        "Invalid file path"
+        "Invalid file path",
       ))
 
     it("should extract readable name of files without file extension", () => {
@@ -118,7 +119,7 @@ describe("ordo-file", () => {
   disallowedCharacters.forEach((character) => {
     it(`should fail with "${character}" in path`, () => {
       expect(() => OrdoFile.from({ path: `/${character}/test.md`, size: 0 })).toThrow(
-        "Invalid file path"
+        "Invalid file path",
       )
     })
   })

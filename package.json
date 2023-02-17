@@ -13,6 +13,7 @@
     "test:cover:all": "nx run-many --target=test --coverage --verbose",
     "e2e": "nx affected --target=e2e --headless",
     "e2e:all": "nx run-many --target=e2e --headless",
+    "e2e:watch": "nx affected --target=e2e --headless --watch",
     "build": "nx affected --target=build",
     "build:all": "nx run-many --target=build"
   },
@@ -83,6 +84,7 @@
     "jsonwebtoken": "^9.0.0",
     "mime-types": "^2.1.35",
     "morgan": "^1.10.0",
+    "node-fetch": "^3.3.0",
     "ramda": "^0.28.0",
     "react": "18.2.0",
     "react-dom": "18.2.0",

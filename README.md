@@ -18,5 +18,5 @@ npx nx g @nrwl/node:lib NAME [--publishabe --importPath=[@ordo-pink/]NAME]
 ### Common
 
 ```sh
-nps nx g @nrwl/js:lib NAME --bundler=vite --unitTestRunner=vitest [--publishable --importPath=[@ordo-pink/]NAME]
+npx nx g @nrwl/js:lib NAME --bundler=vite --unitTestRunner=vitest [--publishable --importPath=[@ordo-pink/]NAME]
 ```

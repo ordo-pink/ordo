@@ -5,6 +5,7 @@
     "sourceMap": true,
     "declaration": false,
     "moduleResolution": "node",
+    "esModuleInterop": true,
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "importHelpers": true,
@@ -15,6 +16,7 @@
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
     "paths": {
+      "@ordo-pink/authorisation-stub": ["packages/authorisation-stub/src/index.ts"],
       "@ordo-pink/backend-universal": ["packages/backend-universal/src/index.ts"],
       "@ordo-pink/common-types": ["packages/common-types/src/index.ts"],
       "@ordo-pink/either": ["packages/either/src/index.ts"],
@@ -22,6 +24,7 @@
       "@ordo-pink/fs-entity": ["packages/fs-entity/src/index.ts"],
       "@ordo-pink/fs-utils": ["packages/fs-utils/src/index.ts"],
       "@ordo-pink/locale": ["packages/locale/src/index.ts"],
+      "@ordo-pink/s3-driver": ["packages/s3-driver/src/index.ts"],
       "@ordo-pink/switch": ["packages/switch/src/index.ts"]
     }
   },

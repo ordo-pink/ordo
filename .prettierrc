@@ -1,5 +1,9 @@
 {
-  "singleQuote": false,
+  "semi": false,
   "printWidth": 100,
-  "semi": false
+  "trailingComma": "all",
+  "endOfLine": "auto",
+  "singleAttributePerLine": true,
+  "htmlWhitespaceSensitivity": "strict",
+  "proseWrap": "always"
 }

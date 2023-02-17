@@ -1,1 +1,1 @@
-export * from "./lib/authorisation-stub"
+export * from "./lib"

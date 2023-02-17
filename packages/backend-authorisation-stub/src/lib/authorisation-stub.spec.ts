@@ -1,6 +1,6 @@
 import { Params } from "@ordo-pink/backend-universal"
 import { Request, Response } from "express"
-import { createAuthorisationStub } from "./authorisation-stub"
+import { createAuthorisationStub } from "."
 
 describe("createAuthorisationStub", () => {
   it("should work", () => {

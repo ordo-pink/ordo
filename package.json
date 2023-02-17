@@ -16,8 +16,7 @@
     "e2e:watch": "nx affected --target=e2e --headless --watch",
     "build": "nx affected --target=build",
     "build:all": "nx run-many --target=build",
-    "postinstall": "husky install & gitmoji --init && gitmoji --update",
-    "commit": "gitmoji --commit"
+    "postinstall": "husky install && gitmoji --update"
   },
   "private": true,
   "devDependencies": {
@@ -65,6 +64,7 @@
     "eslint-plugin-react": "7.31.11",
     "eslint-plugin-react-hooks": "4.6.0",
     "gitmoji-cli": "^7.1.0",
+    "husky": "^8.0.3",
     "jest": "^28.1.1",
     "jest-environment-jsdom": "^28.1.1",
     "jsdom": "~20.0.3",

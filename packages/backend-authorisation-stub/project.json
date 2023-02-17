@@ -1,36 +1,36 @@
 {
-  "name": "authorisation-stub",
+  "name": "backend-authorisation-stub",
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
-  "sourceRoot": "packages/authorisation-stub/src",
+  "sourceRoot": "packages/backend-authorisation-stub/src",
   "projectType": "library",
   "targets": {
     "build": {
       "executor": "@nrwl/vite:build",
       "outputs": ["{options.outputPath}"],
       "options": {
-        "outputPath": "dist/packages/authorisation-stub"
+        "outputPath": "dist/packages/backend-authorisation-stub"
       }
     },
     "publish": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "node tools/scripts/publish.mjs authorisation-stub {args.ver} {args.tag}"
+        "command": "node tools/scripts/publish.mjs backend-authorisation-stub {args.ver} {args.tag}"
       },
       "dependsOn": ["build"]
     },
     "test": {
       "executor": "@nrwl/vite:test",
-      "outputs": ["coverage/packages/authorisation-stub"],
+      "outputs": ["coverage/packages/backend-authorisation-stub"],
       "options": {
         "passWithNoTests": true,
-        "reportsDirectory": "../../coverage/packages/authorisation-stub"
+        "reportsDirectory": "../../coverage/packages/backend-authorisation-stub"
       }
     },
     "lint": {
       "executor": "@nrwl/linter:eslint",
       "outputs": ["{options.outputFile}"],
       "options": {
-        "lintFilePatterns": ["packages/authorisation-stub/**/*.ts"]
+        "lintFilePatterns": ["packages/backend-authorisation-stub/**/*.ts"]
       }
     }
   },

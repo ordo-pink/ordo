@@ -3,7 +3,8 @@
   "version": "0.0.0",
   "license": "Unlicense",
   "scripts": {
-    "start": "cross-env VITE_BACKEND_LOCAL_PORT=5000 VITE_BACKEND_LOCAL_TOKEN=boop VITE_FREE_SPACE_LIMIT=0 VITE_FREE_UPLOAD_SIZE=0 VITE_FRONTEND_PORT=3000 VITE_BACKEND_HOST=http://localhost:5000 VITE_AUTH_HOST=https://sso.ordo.pink VITE_AUTH_REALM=test VITE_AUTH_CLIENT_ID=ordo-web-app nx run-many --target=serve",
+    "start": "cross-env VITE_BACKEND_LOCAL_PORT=5000 VITE_BACKEND_LOCAL_TOKEN=boop VITE_FREE_SPACE_LIMIT=0 VITE_FREE_UPLOAD_SIZE=0 VITE_FRONTEND_PORT=3000 VITE_BACKEND_HOST=http://localhost:5000 VITE_AUTH_HOST=https://sso.ordo.pink VITE_AUTH_REALM=test VITE_AUTH_CLIENT_ID=ordo-web-app nx run-many:serve",
+    "start:remote": "cross-env VITE_FREE_SPACE_LIMIT=25 VITE_FREE_UPLOAD_SIZE=2 VITE_FRONTEND_PORT=3000 VITE_BACKEND_HOST=https://api-test.ordo.pink VITE_AUTH_HOST=https://sso.ordo.pink VITE_AUTH_REALM=test VITE_AUTH_CLIENT_ID=ordo-web-app nx run serve --project=web",
     "graph": "nx graph",
     "lint": "nx affected --target=lint",
     "lint:all": "nx run-many --target=lint",

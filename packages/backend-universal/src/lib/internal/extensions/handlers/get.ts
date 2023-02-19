@@ -1,5 +1,4 @@
-import { Readable } from "stream"
-import { SystemDirectory, ExceptionResponse, SuccessResponse } from "@ordo-pink/common-types"
+import { SystemDirectory, ExceptionResponse } from "@ordo-pink/common-types"
 import { Switch } from "@ordo-pink/switch"
 import { contentType } from "mime-types"
 import { USER_ID_PARAM } from "../../../fs/constants"
@@ -7,7 +6,7 @@ import { ExtensionsParams } from "../../../types"
 import { FsRequestHandler } from "../../../types"
 
 export const getExtensionFileHandler: FsRequestHandler<ExtensionsParams> =
-  ({ file: { getFileContent, createFile } }) =>
+  ({ file: { getFileContent } }) =>
   (req, res) => {
     const userId = req.params[USER_ID_PARAM]
     const path = `/${userId}${SystemDirectory.EXTENSIONS}${req.params.extension}.json` as const
@@ -19,13 +18,7 @@ export const getExtensionFileHandler: FsRequestHandler<ExtensionsParams> =
       .catch((error: ExceptionResponse.NOT_FOUND | Error) =>
         Switch.of(error)
           .case(ExceptionResponse.NOT_FOUND, async () => {
-            const content = new Readable()
-            content.push("{}")
-            content.push(null)
-
-            await createFile({ path, content })
-
-            res.status(SuccessResponse.OK).send("{}")
+            res.status(ExceptionResponse.NOT_FOUND).send()
           })
           .default(() => {
             req.params.logger.error(error)

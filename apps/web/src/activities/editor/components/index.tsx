@@ -20,7 +20,7 @@ import { findOrdoFile } from "../../../core/utils/fs-helpers"
 import { selectFile } from "../store"
 import { EditorActivityState } from "../types"
 
-import "./index.css"
+import "../index.css"
 
 export const EditorContext = createContext({} as EditorProps)
 

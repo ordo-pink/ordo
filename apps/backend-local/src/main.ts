@@ -12,8 +12,8 @@ import morgan from "morgan"
  */
 const root = join(__dirname, "..", "..", "..", "..", "ordo-backend-local-assets")
 
-const PORT = process.env.BACKEND_LOCAL_PORT ?? 5000
-const TOKEN = process.env.BACKEND_LOCAL_TOKEN ?? "BOOP"
+const PORT = process.env.VITE_BACKEND_LOCAL_PORT
+const TOKEN = process.env.VITE_BACKEND_LOCAL_TOKEN
 
 const assetsPath = join(root, TOKEN)
 

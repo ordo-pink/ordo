@@ -3,6 +3,7 @@ import { OrdoDirectory } from "@ordo-pink/fs-entity"
 import { MouseEvent, useEffect } from "react"
 import { useTranslation } from "react-i18next"
 import { BsFileEarmarkX, BsFolderX } from "react-icons/bs"
+import DeleteModalButtonGroup from "./delete-modal-button-group"
 import { useModal } from "../../../containers/app/hooks/use-modal"
 import Null from "../../../core/components/null"
 import { OrdoFSEntity } from "../../../core/constants/ordo-fs-entity"
@@ -59,7 +60,7 @@ export default function CreateModal() {
               <div className=" break-inside-auto text-center">{translatedTitle}</div>
             </div>
 
-            <CreateModalButtonGroup path={t.path} />
+            <DeleteModalButtonGroup path={t.path} />
           </div>
         </div>
       </Modal>

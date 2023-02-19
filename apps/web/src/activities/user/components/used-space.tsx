@@ -3,14 +3,16 @@ import { Either } from "@ordo-pink/either"
 import { IOrdoFile, IOrdoDirectory, OrdoDirectory } from "@ordo-pink/fs-entity"
 import { reduce } from "ramda"
 import { useTranslation } from "react-i18next"
+import Null from "../../../core/components/null"
 import { useAppSelector } from "../../../core/state/hooks/use-app-selector"
 import { convertBytesToMb } from "../../../core/utils/size-format-helper"
 
-const spaceLimitMB = Number(process.env.REACT_USER_SPACE_LIMIT || 50)
+const spaceLimitMB = import.meta.env.VITE_FREE_SPACE_LIMIT
 
 const sizeReducer = (totalSize: number) => (acc: number, item: IOrdoFile | IOrdoDirectory) =>
   OrdoDirectory.isOrdoDirectory(item) ? acc + calculateTreeSize(item, totalSize) : acc + item.size
 
+// TODO: Persist the data in the backend on create/update and retrieve from there
 export const calculateTreeSize = (directory: Nullable<IOrdoDirectory>, size = 0): number =>
   Either.fromNullable(directory)
     .chain((dir) => Either.fromNullable(dir.children))
@@ -20,6 +22,7 @@ export const calculateTreeSize = (directory: Nullable<IOrdoDirectory>, size = 0)
       (size) => size,
     )
 
+// TODO: Get available space of the user from the backend
 const UsedSpace = () => {
   const directory = useAppSelector((state) => state.app.personalProject)
 
@@ -29,9 +32,9 @@ const UsedSpace = () => {
 
   const allFilesSizeMB = convertBytesToMb(calculateTreeSize(directory, 0))
 
-  const usedSpacePercent = (allFilesSizeMB / spaceLimitMB) * 100
+  const usedSpacePercent = (allFilesSizeMB / Number(spaceLimitMB)) * 100
 
-  return (
+  return Either.fromBoolean(spaceLimitMB !== "0").fold(Null, () => (
     <>
       <div className="flex justify-between mb-1 items-center">
         <div className="text-base truncate">{usedSpaceText}</div>
@@ -49,7 +52,7 @@ const UsedSpace = () => {
         />
       </div>
     </>
-  )
+  ))
 }
 
 export { UsedSpace }

@@ -1,12 +1,12 @@
 import { ComponentType } from "react"
-import Loadable from "../loadable/index"
 import Loading from "../components/loading"
+import Loadable from "../loadable/index"
 
-export const createLoadable = <T>(
+export const createLoadable = (
   loader: () => Promise<ComponentType>,
   loading = Loading,
   delay = 300,
-): any => {
+) => {
   return Loadable({
     loader,
     loading,

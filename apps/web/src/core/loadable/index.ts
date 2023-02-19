@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Nullable, ThunkFn } from "@ordo-pink/common-types"
 import { Children, Component, ComponentType, createElement, PropsWithChildren } from "react"
 
@@ -25,10 +26,6 @@ type LoadableComponentState = {
 
 const ALL_INITIALIZERS: ThunkFn<Promise<ComponentType>>[] = []
 const READY_INITIALIZERS: ThunkFn<Promise<ComponentType>>[] = []
-
-function isWebpackReady() {
-  return true
-}
 
 function load(loader: ThunkFn<Promise<ComponentType>>) {
   const promise = loader()

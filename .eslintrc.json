@@ -21,6 +21,7 @@
         ],
         "array-callback-return": "off",
         "no-console": "warn",
+        "@typescript-eslint/triple-slash-reference": "off",
         "import/order": [
           "warn",
           {

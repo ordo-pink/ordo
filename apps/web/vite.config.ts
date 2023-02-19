@@ -3,7 +3,7 @@ import react from "@vitejs/plugin-react"
 import { defineConfig } from "vite"
 import viteTsConfigPaths from "vite-tsconfig-paths"
 
-const frontendPort = process.env.VITE_FRONTEND_PORT ?? 3000
+const frontendPort = process.env.VITE_FRONTEND_PORT
 
 export default defineConfig({
   cacheDir: "../../node_modules/.vite/web",
@@ -36,6 +36,7 @@ export default defineConfig({
 
   test: {
     globals: true,
+    setupFiles: "setup-tests.ts",
     cache: {
       dir: "../../node_modules/.vitest",
     },

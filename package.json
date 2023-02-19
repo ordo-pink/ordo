@@ -33,6 +33,7 @@
     "@nrwl/vite": "^15.7.1",
     "@nrwl/webpack": "^15.7.1",
     "@nrwl/workspace": "15.7.1",
+    "@testing-library/jest-dom": "^5.16.5",
     "@testing-library/react": "13.4.0",
     "@types/body-parser": "^1.19.2",
     "@types/cors": "^2.8.13",

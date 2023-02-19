@@ -9,7 +9,8 @@
       "outputs": ["{options.outputPath}"],
       "defaultConfiguration": "production",
       "options": {
-        "outputPath": "dist/apps/web"
+        "outputPath": "dist/apps/web",
+        "postcssConfig": "apps/web/postcss.config.cjs"
       },
       "configurations": {
         "development": {
@@ -24,7 +25,8 @@
       "executor": "@nrwl/vite:dev-server",
       "defaultConfiguration": "development",
       "options": {
-        "buildTarget": "web:build"
+        "buildTarget": "web:build",
+        "postcssConfig": "apps/web/postcss.config.cjs"
       },
       "configurations": {
         "development": {
@@ -41,7 +43,8 @@
       "executor": "@nrwl/vite:preview-server",
       "defaultConfiguration": "development",
       "options": {
-        "buildTarget": "web:build"
+        "buildTarget": "web:build",
+        "postcssConfig": "apps/web/postcss.config.cjs"
       },
       "configurations": {
         "development": {
@@ -57,6 +60,7 @@
       "outputs": ["coverage/apps/web"],
       "options": {
         "passWithNoTests": true,
+        "postcssConfig": "apps/web/postcss.config.cjs",
         "reportsDirectory": "../../coverage/apps/web"
       }
     },

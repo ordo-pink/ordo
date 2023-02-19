@@ -1,0 +1,11 @@
+.path-breadcrumbs {
+  @apply self-start flex flex-wrap text-neutral-500 text-xs;
+}
+
+.path-breadcrumbs-item {
+  @apply flex items-center shrink-0 space-x-2 ml-4 mb-2;
+}
+
+.path-breadcrumbs-item:first-of-type {
+  @apply ml-0;
+}

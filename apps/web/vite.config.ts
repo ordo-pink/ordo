@@ -1,18 +1,20 @@
 /// <reference types="vitest" />
-import { defineConfig } from "vite"
 import react from "@vitejs/plugin-react"
+import { defineConfig } from "vite"
 import viteTsConfigPaths from "vite-tsconfig-paths"
+
+const frontendPort = process.env.VITE_FRONTEND_PORT ?? 3000
 
 export default defineConfig({
   cacheDir: "../../node_modules/.vite/web",
 
-  server: {
-    port: 4200,
+  preview: {
+    port: Number(frontendPort),
     host: "localhost",
   },
 
-  preview: {
-    port: 4300,
+  server: {
+    port: Number(frontendPort),
     host: "localhost",
   },
 

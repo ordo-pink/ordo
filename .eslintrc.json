@@ -1,7 +1,7 @@
 {
   "root": true,
   "ignorePatterns": ["**/*"],
-  "plugins": ["@nrwl/nx", "@typescript-eslint", "import", "prettier"],
+  "plugins": ["@nrwl/nx", "@typescript-eslint", "import", "prettier", "jest"],
   "overrides": [
     {
       "files": ["*.ts", "*.tsx", "*.js", "*.jsx"],
@@ -19,6 +19,7 @@
             ]
           }
         ],
+        "array-callback-return": "off",
         "no-console": "warn",
         "import/order": [
           "warn",

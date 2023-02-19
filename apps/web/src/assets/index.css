@@ -123,7 +123,7 @@ a {
 }
 
 .gutter {
-  @apply bg-neutral-100 dark:bg-neutral-800 bg-no-repeat bg-center z-20;
+  @apply bg-neutral-100 dark:bg-neutral-800 bg-no-repeat bg-center z-40;
 }
 
 .gutter.gutter-horizontal {

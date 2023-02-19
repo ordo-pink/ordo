@@ -1,11 +1,11 @@
 # Ordo Monorepo
 
 [![CI](https://github.com/ordo-pink/ordo/actions/workflows/ci.yml/badge.svg)](https://github.com/ordo-pink/ordo/actions/workflows/ci.yml)
+[![Netlify Status](https://api.netlify.com/api/v1/badges/914ba3b0-282f-4bda-af89-96d63d9555a1/deploy-status)](https://app.netlify.com/sites/ordo-pink/deploys)
 
 [![gitmoji](https://img.shields.io/badge/gitmoji-%20😜%20😍-FFDD67.svg)](https://gitmoji.carloscuesta.me/)
 [![nx](https://img.shields.io/badge/generated%20with-nx-blue)](https://nx.dev)
 [![license](https://img.shields.io/github/license/ordo-pink/ordo)](https://github.com/ordo-pink/ordo)
-[![Netlify Status](https://api.netlify.com/api/v1/badges/914ba3b0-282f-4bda-af89-96d63d9555a1/deploy-status)](https://app.netlify.com/sites/ordo-pink/deploys)
 
 ## Understand this workspace
 

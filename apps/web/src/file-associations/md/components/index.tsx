@@ -15,7 +15,7 @@ import { LinkPlugin } from "@lexical/react/LexicalLinkPlugin"
 import { ListPlugin } from "@lexical/react/LexicalListPlugin"
 import { MarkdownShortcutPlugin } from "@lexical/react/LexicalMarkdownShortcutPlugin"
 import { OnChangePlugin } from "@lexical/react/LexicalOnChangePlugin"
-import { PlainTextPlugin } from "@lexical/react/LexicalPlainTextPlugin"
+import { RichTextPlugin } from "@lexical/react/LexicalRichTextPlugin"
 import { HeadingNode, QuoteNode } from "@lexical/rich-text"
 import { TableCellNode, TableNode, TableRowNode } from "@lexical/table"
 import { EditorState, EditorThemeClasses } from "lexical"
@@ -179,7 +179,7 @@ export default memo(
 
               <CheckListPlugin />
 
-              <PlainTextPlugin
+              <RichTextPlugin
                 contentEditable={<ContentEditable spellCheck={false} />}
                 placeholder={<div>...</div>}
                 ErrorBoundary={LexicalErrorBoundary}

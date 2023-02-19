@@ -121,12 +121,3 @@
 a {
   @apply underline text-sky-700 dark:text-sky-300 visited:text-violet-700 visited:dark:text-violet-300;
 }
-
-.gutter {
-  @apply bg-neutral-100 dark:bg-neutral-800 bg-no-repeat bg-center z-40;
-}
-
-.gutter.gutter-horizontal {
-  @apply cursor-col-resize;
-  background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAeCAYAAADkftS9AAAAIklEQVQoU2M4c+bMfxAGAgYYmwGrIIiDjrELjpo5aiZeMwF+yNnOs5KSvgAAAABJRU5ErkJggg==");
-}

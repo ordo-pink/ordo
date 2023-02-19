@@ -56,7 +56,7 @@ export default function Settings() {
         </title>
       </Helmet>
 
-      <div className="w-full h-screen px-4 py-12 flex flex-col space-y-8 items-center">
+      <div className="w-full px-4 py-12 flex flex-col space-y-8 items-center">
         <Component />
       </div>
     </Workspace>

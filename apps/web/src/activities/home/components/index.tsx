@@ -134,7 +134,7 @@ export default function Home() {
         </title>
       </Helmet>
 
-      <div className="w-full h-screen flex flex-col items-center">
+      <div className="w-full flex flex-col items-center">
         <div className="p-4 w-full max-w-2xl">
           <div className="w-full py-8 px-4">
             <LexicalComposer

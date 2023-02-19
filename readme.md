@@ -16,19 +16,22 @@ Run `nx graph` to see a diagram of the dependencies of the projects.
 npm i
 ```
 
+### Local client, local server
+
+Spins up a local backend server that stores data in FS as well as a frontend server, and instructs
+the frontend to send requests there.
+
 ```sh
-# Spins up a local backend server that stores data in FS as well as a frontend
-# server, and instructs the frontend to send requests there.
 npm start
 ```
 
-or
+### Local client, remote server
+
+Spins up a frontend server, and instructs it to send requests to the remote api-test server. You
+need to gain access to the remote api-test server before you can start using it. If you don't have
+the credentials, please reach out to the Ordo.pink support.
 
 ```sh
-# Spins up a frontend server, and instructs it to send requests to the remote
-# api-test server. You need to gain access to the remote api-test server before
-# you can start using it. If you don't have the credentials, please reach out
-# to the Ordo.pink support.
 npm run start:remote
 ```
 

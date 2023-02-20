@@ -1,9 +1,9 @@
 import { ThunkFn } from "@ordo-pink/common-types"
 import { Either } from "@ordo-pink/either"
 import { noOp } from "@ordo-pink/fns"
-import { Accelerator } from "@ordo-pink/react-components"
 import { PropsWithChildren, useRef } from "react"
 import { useHotkeys } from "react-hotkeys-hook"
+import { Accelerator } from "../accelerator/accelerator"
 
 type Props = PropsWithChildren<{
   onClick: ThunkFn<void>
@@ -16,7 +16,7 @@ type Props = PropsWithChildren<{
   inverted?: boolean
 }>
 
-export default function OrdoButton({
+export const OrdoButton = ({
   children,
   onClick,
   disabled,
@@ -25,7 +25,7 @@ export default function OrdoButton({
   onMouseOver = noOp,
   outline = false,
   center = false,
-}: Props) {
+}: Props) => {
   const ref = useRef<HTMLButtonElement>(null)
 
   useHotkeys(

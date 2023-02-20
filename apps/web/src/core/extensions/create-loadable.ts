@@ -1,6 +1,6 @@
 import { loadable } from "@ordo-pink/loadable"
+import { Loading } from "@ordo-pink/react-components"
 import { ComponentType } from "react"
-import Loading from "../components/loading"
 
 export const createLoadable = (
   loader: () => Promise<ComponentType>,

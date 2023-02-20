@@ -1,6 +1,6 @@
+import { ComingSoonBadge } from "@ordo-pink/react-components"
 import { useTranslation } from "react-i18next"
 import { BsCheck2 } from "react-icons/bs"
-import ComingSoonBadge from "../../../core/components/badge/coming-soon"
 import { PricingPlanFeatureItem } from "../types"
 
 type Props = {

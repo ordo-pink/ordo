@@ -1,7 +1,6 @@
 import { Switch } from "@ordo-pink/switch"
 import { AiOutlineEnter } from "react-icons/ai"
 import { BsBackspace } from "react-icons/bs"
-import classes from "./accelerator.module.css"
 
 type Props = {
   accelerator: string
@@ -28,7 +27,7 @@ export const Accelerator = ({ accelerator }: Props) => {
     .default(() => Letter)
 
   return (
-    <div className={classes.accelerator}>
+    <div className="hidden md:flex shrink-0 items-center space-x-1 text-neutral-500 dark:text-neutral-300 text-xs">
       {split.includes("alt") && <div className="">{alt} +</div>}
       {split.includes("option") && <div className="">⌥ +</div>}
       {split.includes("ctrl") && <div className="">{ctrl} +</div>}

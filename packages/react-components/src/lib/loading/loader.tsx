@@ -1,6 +1,6 @@
 import "./loader.css"
 
-export default function Loader() {
+export const Loader = () => {
   return (
     <div className="loader">
       <span></span>

@@ -1,7 +1,7 @@
 import { ColourTheme } from "@ordo-pink/common-types"
+import { Fieldset } from "@ordo-pink/react-components"
 import { ChangeEvent } from "react"
 import { useTranslation } from "react-i18next"
-import Fieldset from "../../../core/components/fieldset"
 
 export default function ThemeField() {
   const { t } = useTranslation()

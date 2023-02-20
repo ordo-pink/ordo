@@ -1,4 +1,4 @@
-import Loading from "../../../core/components/loading"
+import { Loading } from "@ordo-pink/react-components"
 
 export default function FileNotSelected() {
   return <Loading />

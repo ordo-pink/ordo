@@ -5,7 +5,6 @@ import LanguageField from "./language-field"
 import ThemeField from "./theme-field"
 import { SettingsProps } from ".."
 import { useWorkspace } from "../../../containers/workspace/hooks/use-workspace"
-import EditorPage from "../../../core/components/editor-page/editor-page"
 
 export const SettingsContext = createContext({} as SettingsProps)
 
@@ -25,15 +24,10 @@ export default function Settings(props: SettingsProps) {
             {translatedTitle}
           </title>
         </Helmet>
-        <EditorPage
-          title={translatedTitle}
-          breadcrumbsPath={`/${translatedTitle}/`}
-        >
-          <form className="flex flex-col space-y-4">
-            <ThemeField />
-            <LanguageField />
-          </form>
-        </EditorPage>
+        <form className="flex flex-col space-y-4">
+          <ThemeField />
+          <LanguageField />
+        </form>
       </Workspace>
     </SettingsContext.Provider>
   )

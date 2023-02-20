@@ -1,5 +1,5 @@
+import { ComingSoonBadge } from "@ordo-pink/react-components"
 import { useTranslation } from "react-i18next"
-import ComingSoonBadge from "../../../../core/components/badge/coming-soon"
 
 export default function TagsFeature() {
   const { t } = useTranslation()

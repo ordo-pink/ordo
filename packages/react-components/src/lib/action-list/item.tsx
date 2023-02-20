@@ -7,8 +7,6 @@ import {
   PropsWithChildren,
 } from "react"
 
-import "./item.css"
-
 type Props = {
   text: string
   Icon: ComponentType
@@ -39,7 +37,10 @@ export const ActionListItem = ({
   return (
     <div>
       <div
-        className={`action-list_item ${isCurrent && "active"}`}
+        className={`py-2 md:py-0.5 hover:bg-gradient-to-r hover:from-neutral-300 hover:dark:from-stone-700 hover:to-slate-300 hover:dark:to-slate-700 rounded-md px-2 flex justify-between items-center cursor-pointer ${
+          isCurrent &&
+          "bg-gradient-to-r from-rose-300 dark:from-violet-700 to-purple-300 dark:to-purple-700"
+        }`}
         style={style}
         onClick={onClick}
         onMouseEnter={onMouseEnter}
@@ -48,13 +49,13 @@ export const ActionListItem = ({
         role="none"
         onKeyDown={onEnterKeyDown}
       >
-        <div className="action-list_item_left">
-          <div className="action-list_item_left_icon">
+        <div className="flex items-center space-x-2 w-full truncate">
+          <div className="shrink-0">
             <Icon />
           </div>
-          <div className="action-list_item_left_text">{text}</div>
+          <div className="text-sm truncate">{text}</div>
         </div>
-        <div className="action-list_item_right">{right}</div>
+        <div className="shrink-0">{right}</div>
       </div>
       <div className="action-list_item_bottom">{bottom}</div>
     </div>

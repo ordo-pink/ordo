@@ -1,3 +1,4 @@
+import { ActionListItem, ComingSoonBadge } from "@ordo-pink/react-components"
 import { useTranslation } from "react-i18next"
 import { AiOutlineMenu, AiOutlineTeam } from "react-icons/ai"
 import {
@@ -13,8 +14,6 @@ import {
 } from "react-icons/bs"
 import { TbDevices2, TbFreeRights, TbBrandOpenSource } from "react-icons/tb"
 import { useNavigate, useParams } from "react-router-dom"
-import ActionListItem from "../../../core/components/action-list/item"
-import ComingSoonBadge from "../../../core/components/badge/coming-soon"
 
 export default function FeaturesSidebar() {
   const navigate = useNavigate()

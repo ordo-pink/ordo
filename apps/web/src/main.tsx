@@ -1,10 +1,10 @@
 import { ReactKeycloakProvider } from "@ordo-pink/keycloak"
+import { Loading } from "@ordo-pink/react-components"
 import Keycloak from "keycloak-js"
 import ReactDOM from "react-dom/client"
 import { Helmet } from "react-helmet"
 import { Provider } from "react-redux"
 import { RouterProvider } from "react-router-dom"
-import Loading from "./core/components/loading"
 import { router } from "./core/router"
 import { store } from "./core/state"
 

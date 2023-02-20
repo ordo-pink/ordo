@@ -5,9 +5,9 @@ type Props = {
   chunk: string
 }
 
-export default function PathBreadcrumbsItem({ chunk }: Props) {
+export const PathBreadcrumbsItem = ({ chunk }: Props) => {
   return (
-    <div className="path-breadcrumbs-item">
+    <div className="flex items-center shrink-0 space-x-2 ml-4 mb-2 first-of-type:ml-0">
       <AiFillFolder />
       <div>{chunk ? chunk : "/"}</div>
       <BsChevronRight />

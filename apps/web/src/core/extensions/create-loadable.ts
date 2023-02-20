@@ -1,13 +1,13 @@
+import { loadable } from "@ordo-pink/loadable"
 import { ComponentType } from "react"
 import Loading from "../components/loading"
-import Loadable from "../loadable/index"
 
 export const createLoadable = (
   loader: () => Promise<ComponentType>,
   loading = Loading,
   delay = 300,
 ) => {
-  return Loadable({
+  return loadable({
     loader,
     loading,
     delay,

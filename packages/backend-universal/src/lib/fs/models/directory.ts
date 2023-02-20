@@ -5,6 +5,7 @@ import { FSDriver, IOrdoDirectoryModel } from "../../types"
 
 export const OrdoDirectoryModel = {
   of: (driver: FSDriver): IOrdoDirectoryModel => ({
+    checkDirectoryExists: driver.checkDirectoryExists,
     createDirectory: (path) =>
       Promise.resolve(path)
         .then((path) =>

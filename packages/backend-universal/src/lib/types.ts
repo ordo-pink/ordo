@@ -7,6 +7,7 @@ import {
   IOrdoFileRawInitParams,
   IOrdoDirectoryRaw,
   IOrdoFileRaw,
+  IOrdoInternal,
 } from "@ordo-pink/fs-entity"
 import { Logger } from "@ordo-pink/logger"
 import cors from "cors"
@@ -43,6 +44,7 @@ export type FsRequestHandler<T = Params> = UnaryFn<
   {
     file: IOrdoFileModel
     directory: IOrdoDirectoryModel
+    internal: IOrdoInternalModel
     logger: Logger
   },
   RequestHandler<T>
@@ -83,6 +85,7 @@ export type FSDriver = {
 }
 
 export type IOrdoFileModel = {
+  checkFileExists: UnaryFn<OrdoFilePath, Promise<boolean>>
   getFileContent: UnaryFn<OrdoFilePath, Promise<Readable>>
   getFile: UnaryFn<OrdoFilePath, Promise<IOrdoFileRaw>>
   updateFile: UnaryFn<{ path: OrdoFilePath; content: Readable }, Promise<IOrdoFileRaw>>
@@ -97,7 +100,21 @@ export type IOrdoFileModel = {
   >
 }
 
+export type IOrdoInternalModel = {
+  getInternalValue: <K extends keyof IOrdoInternal>(
+    userId: string,
+    key: K,
+  ) => Promise<IOrdoInternal[K]>
+  setInternalValue: <K extends keyof IOrdoInternal>(
+    userId: string,
+    key: K,
+    value: IOrdoInternal[K],
+  ) => Promise<void>
+  getValues: (userId: string) => Promise<IOrdoInternal>
+}
+
 export type IOrdoDirectoryModel = {
+  checkDirectoryExists: UnaryFn<OrdoDirectoryPath, Promise<boolean>>
   getDirectory: UnaryFn<OrdoDirectoryPath, Promise<IOrdoDirectoryRaw>>
   deleteDirectory: UnaryFn<OrdoDirectoryPath, Promise<IOrdoDirectoryRaw>>
   moveDirectory: UnaryFn<

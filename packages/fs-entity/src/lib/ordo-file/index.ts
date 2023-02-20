@@ -2,6 +2,16 @@ import { IOrdoFileStatic, IOrdoFile, IOrdoFileRaw, OrdoFilePath, OrdoFileExtensi
 import { endsWithSlash, isValidPath } from "../common"
 import { OrdoDirectoryPath } from "../ordo-directory/types"
 
+const toReadableSize = (a: number, b = 2, k = 1024): string => {
+  const d = Math.floor(Math.log(a) / Math.log(k))
+
+  return a === 0
+    ? "0B"
+    : `${parseFloat((a / Math.pow(k, d)).toFixed(Math.max(0, b)))}${
+        ["B", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"][d]
+      }`
+}
+
 export const OrdoFile: IOrdoFileStatic = {
   of: (raw) => ordoFile(raw),
   raw: (params) => {
@@ -64,6 +74,13 @@ export const OrdoFile: IOrdoFileStatic = {
 
     return fileName.substring(lastDotPosition) as OrdoFileExtension
   },
+  getReadableSize: (size) => {
+    if (typeof size !== "number" || Number.isNaN(size) || !Number.isFinite(size) || size < 0) {
+      throw new TypeError("Invalid size")
+    }
+
+    return toReadableSize(size)
+  },
 }
 
 export const ordoFile = (raw: IOrdoFileRaw): IOrdoFile => {
@@ -75,6 +92,7 @@ export const ordoFile = (raw: IOrdoFileRaw): IOrdoFile => {
 
   const readableName = OrdoFile.getReadableName(raw.path)
   const extension = OrdoFile.getFileExtension(raw.path)
+  const readableSize = toReadableSize(size)
 
   return {
     readableName,
@@ -82,5 +100,6 @@ export const ordoFile = (raw: IOrdoFileRaw): IOrdoFile => {
     path,
     updatedAt: new Date(updatedAt),
     size,
+    readableSize,
   }
 }

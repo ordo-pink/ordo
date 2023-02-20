@@ -1,4 +1,5 @@
-import { SuccessResponse, ExceptionResponse } from "@ordo-pink/common-types"
+import { SuccessResponse, ExceptionResponse, SystemDirectory } from "@ordo-pink/common-types"
+import { IOrdoDirectoryRaw } from "@ordo-pink/fs-entity"
 import { Switch } from "@ordo-pink/switch"
 import { FsRequestHandler, OrdoDirectoryPathParams } from "../../../types"
 import { PATH_PARAM, USER_ID_PARAM } from "../../constants"
@@ -12,6 +13,19 @@ export const getDirectoryHandler: FsRequestHandler<OrdoDirectoryPathParams> =
 
     getDirectory(path)
       .then(removeUserIdFromPath(userId))
+      .then((directory: IOrdoDirectoryRaw) => {
+        if (directory.path !== "/") return directory
+
+        const internalDirectoryIndex = directory.children.findIndex(
+          (child) => child.path === SystemDirectory.INTERNAL,
+        )
+
+        if (internalDirectoryIndex === -1) return directory
+
+        directory.children.splice(internalDirectoryIndex, 1)
+
+        return directory
+      })
       .then((directory) => res.status(SuccessResponse.OK).json(directory))
       .catch((error: ExceptionResponse.NOT_FOUND | Error) =>
         Switch.of(error)

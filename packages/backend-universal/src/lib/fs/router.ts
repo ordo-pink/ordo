@@ -37,13 +37,15 @@ import {
 } from "./middleware/validate-path"
 import { OrdoDirectoryModel } from "./models/directory"
 import { OrdoFileModel } from "./models/file"
+import { OrdoInternalModel } from "../internal/models/internal-model"
 import { CreateOrdoBackendServerParams } from "../types"
 
 const filesRouter = ({ fsDriver, authorise: authorize, logger }: CreateOrdoBackendServerParams) => {
   const file = OrdoFileModel.of(fsDriver)
   const directory = OrdoDirectoryModel.of(fsDriver)
+  const internal = OrdoInternalModel.of(fsDriver)
 
-  const env = { file, directory, logger }
+  const env = { file, directory, logger, internal }
 
   return Router()
     .post(
@@ -56,7 +58,7 @@ const filesRouter = ({ fsDriver, authorise: authorize, logger }: CreateOrdoBacke
       prependPathSlash,
       addUserIdToPath,
       validateFilePath,
-      checkSizeOfUploadingFile,
+      checkSizeOfUploadingFile(env),
       createFileHandler(env),
     )
     .get(
@@ -82,7 +84,7 @@ const filesRouter = ({ fsDriver, authorise: authorize, logger }: CreateOrdoBacke
       prependPathSlash,
       addUserIdToPath,
       validateFilePath,
-      checkSizeOfUploadingFile,
+      checkSizeOfUploadingFile(env),
       updateFileHandler(env),
     )
     .patch(
@@ -118,8 +120,9 @@ const directoriesRouter = ({
 }: CreateOrdoBackendServerParams) => {
   const file = OrdoFileModel.of(fsDriver)
   const directory = OrdoDirectoryModel.of(fsDriver)
+  const internal = OrdoInternalModel.of(fsDriver)
 
-  const env = { file, directory, logger }
+  const env = { file, directory, logger, internal }
 
   return Router()
     .post(

@@ -12,6 +12,8 @@ describe("ordo-backend", () =>
     })))
 
 describe("directories", () => {
+  afterEach(() => axios.delete(`/fs/directories/${token}/e2e/`, { headers }))
+
   describe("create-directory", () => {
     it("should create a directory", () =>
       axios.post(`/fs/directories/${token}/e2e/`, { headers }).then((res) => {
@@ -22,7 +24,7 @@ describe("directories", () => {
         })
       }))
 
-    it("should create a nested directory when path exists", () =>
+    it("should create a nested directory when the path doesn't exist", () =>
       axios.post(`/fs/directories/${token}/e2e/dir1/`, { headers }).then(() =>
         axios.post(`/fs/directories/${token}/e2e/dir1/dir2/`, { headers }).then((res) => {
           expect(res.status).toEqual(201)
@@ -120,6 +122,4 @@ describe("directories", () => {
     it.todo("should return 404 if the old path does not exist")
     it.todo("should return 409 if the new path already exists")
   })
-
-  afterEach(() => axios.delete(`/fs/directories/${token}/e2e/`, { headers }))
 })

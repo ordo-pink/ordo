@@ -26,4 +26,4 @@ const server = createOrdoBackendServer({
   logger: ConsoleLogger,
 })
 
-server.listen(PORT, () => console.log("Listening on port ", PORT))
+server.listen(PORT, () => ConsoleLogger.info(`🚀 Listening on port ${PORT}`))

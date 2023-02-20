@@ -166,7 +166,7 @@ window.ordo = {
     extensions: {
       create: ({ name, content }) =>
         window.ordo.env
-          .fetch(`${host}/extensions/${Keycloak.tokenParsed?.sub}/${name}`, {
+          .fetch(`${host}/internal/extensions/${Keycloak.tokenParsed?.sub}/${name}`, {
             method: "POST",
             body: JSON.stringify(content),
             headers: {
@@ -176,7 +176,7 @@ window.ordo = {
           .then((res) => res.json()),
       get: (name) =>
         window.ordo.env
-          .fetch(`${host}/extensions/${Keycloak.tokenParsed?.sub}/${name}`, {
+          .fetch(`${host}/internal/extensions/${Keycloak.tokenParsed?.sub}/${name}`, {
             headers: {
               [AUTHORIZATION_HEADER_KEY]: `Bearer ${LOCAL_TOKEN ?? Keycloak.token}`,
             },
@@ -184,7 +184,7 @@ window.ordo = {
           .then((res) => res.json()),
       remove: (name) =>
         window.ordo.env
-          .fetch(`${host}/extensions/${Keycloak.tokenParsed?.sub}/${name}`, {
+          .fetch(`${host}/internal/extensions/${Keycloak.tokenParsed?.sub}/${name}`, {
             method: "DELETE",
             headers: {
               [AUTHORIZATION_HEADER_KEY]: `Bearer ${LOCAL_TOKEN ?? Keycloak.token}`,
@@ -193,7 +193,7 @@ window.ordo = {
           .then((res) => res.json()),
       update: ({ name, content }) =>
         window.ordo.env
-          .fetch(`${host}/extensions/${Keycloak.tokenParsed?.sub}/${name}`, {
+          .fetch(`${host}/internal/extensions/${Keycloak.tokenParsed?.sub}/${name}`, {
             method: "PUT",
             headers: {
               [AUTHORIZATION_HEADER_KEY]: `Bearer ${LOCAL_TOKEN ?? Keycloak.token}`,

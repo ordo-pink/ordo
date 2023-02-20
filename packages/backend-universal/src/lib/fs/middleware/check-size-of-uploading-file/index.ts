@@ -1,14 +1,37 @@
 import { ExceptionResponse } from "@ordo-pink/common-types"
-import type { RequestHandler } from "express"
-import { OrdoFilePathParams } from "../../../types"
+import { FsRequestHandler, OrdoFilePathParams } from "../../../types"
+import { USER_ID_PARAM } from "../../constants"
 
-export const checkSizeOfUploadingFile: RequestHandler<OrdoFilePathParams> = (req, res, next) => {
-  const contentSize = Number(req.headers["content-length"])
-  const fiveMB = 5 * 1024 * 1024
+export const checkSizeOfUploadingFile: FsRequestHandler<OrdoFilePathParams> =
+  ({ internal }) =>
+  async (req, res, next) => {
+    const userId = req.params[USER_ID_PARAM]
 
-  if (Number.isNaN(contentSize) || contentSize >= fiveMB) {
-    return void res.status(ExceptionResponse.BAD_REQUEST).send("File too large")
+    req.params.logger.info("HELLLOs")
+
+    const contentSize = Number(req.headers["content-length"])
+
+    const maxFileSizeMB = await internal.getInternalValue(userId, "maxUploadSize")
+    const maxFileSize = maxFileSizeMB * 1024 * 1024
+
+    const maxTotalSizeMB = await internal.getInternalValue(userId, "maxTotalSize")
+    const maxTotalSize = maxTotalSizeMB * 1024 * 1024
+
+    const totalSize = await internal.getInternalValue(userId, "totalSize")
+
+    req.params.logger.info(`Attempting to upload ${contentSize} file`)
+
+    if (Number.isNaN(contentSize)) {
+      return void res.status(ExceptionResponse.LENGTH_REQUIRED).send()
+    }
+
+    if (contentSize > maxFileSize) {
+      return void res.status(ExceptionResponse.PAYLOAD_TOO_LARGE).send()
+    }
+
+    if (totalSize + contentSize > maxTotalSize) {
+      return void res.status(ExceptionResponse.UNPROCESSABLE_ENTITY).send()
+    }
+
+    return next()
   }
-
-  return next()
-}

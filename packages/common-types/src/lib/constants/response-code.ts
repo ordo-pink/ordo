@@ -29,6 +29,21 @@ export enum ExceptionResponse {
   CONFLICT = 409,
 
   /**
+   * Content length not provided.
+   */
+  LENGTH_REQUIRED = 411,
+
+  /**
+   * Entity size is too large.
+   */
+  PAYLOAD_TOO_LARGE = 413,
+
+  /**
+   * Entity cannot be processed.
+   */
+  UNPROCESSABLE_ENTITY = 422,
+
+  /**
    * Unexpected server error occured. Response body contains a text string
    * describing the error.
    */

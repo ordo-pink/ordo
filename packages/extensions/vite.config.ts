@@ -1,12 +1,12 @@
 /// <reference types="vitest" />
 import { defineConfig } from "vite"
-import react from "@vitejs/plugin-react"
+
 import viteTsConfigPaths from "vite-tsconfig-paths"
 import dts from "vite-plugin-dts"
 import { join } from "path"
 
 export default defineConfig({
-  cacheDir: "../../node_modules/.vite/loading",
+  cacheDir: "../../node_modules/.vite/extensions",
 
   plugins: [
     dts({
@@ -14,7 +14,7 @@ export default defineConfig({
       tsConfigFilePath: join(__dirname, "tsconfig.lib.json"),
       skipDiagnostics: true,
     }),
-    react(),
+
     viteTsConfigPaths({
       root: "../../",
     }),
@@ -35,7 +35,7 @@ export default defineConfig({
     lib: {
       // Could also be a dictionary or array of multiple entry points.
       entry: "src/index.ts",
-      name: "loading",
+      name: "extensions",
       fileName: "index",
       // Change this to the formats you want to support.
       // Don't forgot to update your package.json as well.
@@ -43,7 +43,7 @@ export default defineConfig({
     },
     rollupOptions: {
       // External packages that should not be bundled into your library.
-      external: ["react", "react-dom", "react/jsx-runtime"],
+      external: [],
     },
   },
 

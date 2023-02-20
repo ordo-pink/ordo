@@ -1,5 +1,6 @@
 import { ThunkFn } from "@ordo-pink/common-types"
 import { Either } from "@ordo-pink/either"
+import { lazyBox, preventDefault, stopPropagation } from "@ordo-pink/fns"
 import { Null } from "@ordo-pink/react-components"
 import { useEffect, useState, useRef, useLayoutEffect } from "react"
 import { useHotkeys } from "react-hotkeys-hook"
@@ -7,8 +8,6 @@ import ContextMenuItem from "../../../../../containers/app/hooks/use-context-men
 import { hideContextMenu } from "../../../../../containers/app/hooks/use-context-menu/store"
 import { useAppDispatch } from "../../../../../core/state/hooks/use-app-dispatch"
 import { useAppSelector } from "../../../../../core/state/hooks/use-app-selector"
-import { preventDefault, stopPropagation } from "../../../../../core/utils/event"
-import { lazyBox } from "../../../../../core/utils/lazy-box"
 
 export default function ContextMenu() {
   const dispatch = useAppDispatch()

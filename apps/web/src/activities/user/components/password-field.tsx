@@ -1,3 +1,4 @@
+import { lazyBox, preventDefault, stopPropagation } from "@ordo-pink/fns"
 import { MouseEvent } from "react"
 import { useTranslation } from "react-i18next"
 import SupportBadge from "../../../core/components/badge/support"
@@ -5,8 +6,6 @@ import { OrdoButtonSecondary } from "../../../core/components/buttons"
 import Fieldset from "../../../core/components/fieldset"
 import { useActionContext } from "../../../core/hooks/use-action-context"
 import { useAppSelector } from "../../../core/state/hooks/use-app-selector"
-import { preventDefault, stopPropagation } from "../../../core/utils/event"
-import { lazyBox } from "../../../core/utils/lazy-box"
 
 export default function PasswordField() {
   const actionContext = useActionContext()

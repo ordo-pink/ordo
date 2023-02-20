@@ -1,18 +1,17 @@
+import { noOp } from "@ordo-pink/fns"
 import {
+  ComponentType,
   CSSProperties,
-  FC,
   KeyboardEventHandler,
   MouseEventHandler,
   PropsWithChildren,
 } from "react"
-import { OrdoLoadableComponent } from "../../types"
-import { noOp } from "../../utils/no-op"
 
-import "./index.css"
+import "./item.css"
 
 type Props = {
   text: string
-  Icon: OrdoLoadableComponent | FC
+  Icon: ComponentType
   isCurrent: boolean
   style?: CSSProperties
   onClick?: MouseEventHandler
@@ -22,7 +21,7 @@ type Props = {
   onEnterKeyDown?: KeyboardEventHandler
 }
 
-export default function ActionListItem({
+export const ActionListItem = ({
   Icon,
   text,
   style = {},
@@ -33,7 +32,7 @@ export default function ActionListItem({
   onMouseLeave = noOp,
   onContextMenu = noOp,
   onEnterKeyDown = noOp,
-}: PropsWithChildren<Props>) {
+}: PropsWithChildren<Props>) => {
   const right = Array.isArray(children) ? children[0] : children
   const bottom = Array.isArray(children) ? children[1] : null
 

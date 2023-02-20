@@ -7,7 +7,6 @@ import { RouterProvider } from "react-router-dom"
 import Loading from "./core/components/loading"
 import { router } from "./core/router"
 import { store } from "./core/state"
-import "./assets/index.css"
 
 const AUTH_HOST = import.meta.env.VITE_AUTH_HOST
 const FS_HOST = import.meta.env.VITE_BACKEND_HOST

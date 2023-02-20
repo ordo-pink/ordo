@@ -6,6 +6,7 @@ import { $isHeadingNode } from "@lexical/rich-text"
 import { $getNearestNodeOfType, mergeRegister } from "@lexical/utils"
 import { Nullable } from "@ordo-pink/common-types"
 import { Either } from "@ordo-pink/either"
+import { Null } from "@ordo-pink/react-components"
 import {
   $getSelection,
   $isRangeSelection,
@@ -36,7 +37,6 @@ import { LinkEditor } from "./link-editor"
 import { LOW_PRIORITY } from "../constants"
 import { getSelectedNode } from "../utils/get-selected-node"
 import { positionEditorElement } from "../utils/position-editor-element"
-import { Null } from "@ordo-pink/react-components"
 
 const supportedBlockTypes = new Set([
   "paragraph",

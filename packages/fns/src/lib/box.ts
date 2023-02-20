@@ -27,3 +27,10 @@ const box = <T>(x: T): IBox<T> => ({
 export const Box: IBoxStatic = {
   of: (x) => box(x),
 }
+
+export const lazyBox =
+  <T>(callback: (either: IBox<T>) => void) =>
+  (x?: T) => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    callback(Box.of(x ?? (null as any)))
+  }

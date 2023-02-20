@@ -1,11 +1,11 @@
 import { Either } from "@ordo-pink/either"
+import { lazyBox } from "@ordo-pink/fns"
 import { OrdoDirectoryPath, OrdoFilePath, OrdoDirectory } from "@ordo-pink/fs-entity"
 import { useTranslation } from "react-i18next"
 import { removedFile, removedDirectory } from "../../../containers/app/store"
 import { OrdoButtonSecondary, OrdoButtonPrimary } from "../../../core/components/buttons"
 import { useAppDispatch } from "../../../core/state/hooks/use-app-dispatch"
 import { useExtensionSelector } from "../../../core/state/hooks/use-extension-selector"
-import { lazyBox } from "../../../core/utils/lazy-box"
 import { hideDeleteModal } from "../store"
 import { FileSystemExtensionStore } from "../types"
 

@@ -1,7 +1,7 @@
+import { createActivityExtension } from "@ordo-pink/extensions"
 import { GoToPricingCommand } from "./commands/go-to-pricing"
 import en from "./translations/en.json"
 import ru from "./translations/ru.json"
-import { createActivityExtension } from "../../core/extensions/create-activity-extension"
 
 export default createActivityExtension("pricing", {
   Component: () => import("./components"),

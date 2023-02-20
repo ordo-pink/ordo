@@ -1,8 +1,8 @@
 import { ThunkFn } from "@ordo-pink/common-types"
+import { OrdoButtonPrimary } from "@ordo-pink/react-components"
 import { useTranslation } from "react-i18next"
 import { BsArrowRight } from "react-icons/bs"
 import PricingPlanFeature from "./pricing-plan-feature"
-import { OrdoButtonPrimary } from "../../../core/components/buttons"
 import { PricingPlanFeatureItem } from "../types"
 
 type Props = {

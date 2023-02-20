@@ -1,33 +1,35 @@
 import { Slice } from "@reduxjs/toolkit"
 import { BsLock } from "react-icons/bs"
 import { createLoadable } from "./create-loadable"
-import { OrdoActivityExtension } from "../types"
+import { OrdoActivityExtension, OrdoCommand } from "./types"
 
 type Props<
   Name extends string,
-  State extends Record<string, unknown>,
+  MemoryState extends Record<string, unknown>,
   PersistedState extends Record<string, unknown>,
 > = Omit<
-  OrdoActivityExtension<Name>,
-  "Component" | "Icon" | "name" | "storeSlice" | "persistedState"
+  OrdoActivityExtension<string, MemoryState, PersistedState>,
+  "Component" | "Icon" | "name" | "storeSlice" | "commands"
 > & {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   Icon: () => Promise<any>
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   Component: () => Promise<any>
-  storeSlice?: Slice<State>
-  persistedState?: PersistedState
+  storeSlice?: Slice<MemoryState>
+  commands?: OrdoCommand<`ordo-activity-${Name}`>[]
 }
 
 export const createActivityExtension = <
   Name extends string,
-  State extends Record<string, unknown>,
+  MemoryState extends Record<string, unknown>,
   PersistedState extends Record<string, unknown>,
 >(
   name: Name,
-  props: Props<Name, State, PersistedState>,
-): OrdoActivityExtension<Name, Record<`ordo-activity-${Name}`, State>, PersistedState> => ({
+  props: Props<Name, MemoryState, PersistedState>,
+): OrdoActivityExtension<Name, MemoryState, PersistedState> => ({
   ...props,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  commands: props.commands as any,
   name: `ordo-activity-${name}`,
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   Component: createLoadable(props.Component, () => null as any),
@@ -35,5 +37,6 @@ export const createActivityExtension = <
   routes: props.routes.map((route) => (route.startsWith("/") ? route.slice(1) : route)),
   storeSlice:
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    (props.storeSlice as any) ?? (null as unknown as OrdoActivityExtension<Name>["storeSlice"]),
+    (props.storeSlice as any) ??
+    (null as unknown as OrdoActivityExtension<Name, MemoryState, PersistedState>["storeSlice"]),
 })

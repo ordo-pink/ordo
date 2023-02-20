@@ -1,6 +1,5 @@
+import { ActionContext, createOrdoCommand } from "@ordo-pink/extensions"
 import { IOrdoFile, OrdoFile, OrdoDirectory } from "@ordo-pink/fs-entity"
-import { createOrdoCommand } from "../../../core/extensions/create-ordo-command"
-import { ActionContext } from "../../../core/types"
 
 const download = (file: IOrdoFile) => {
   window.ordo.api.fs.files
@@ -27,7 +26,8 @@ export const DownloadFileCommand = createOrdoCommand<"ordo-command-file-system">
   title: "@ordo-command-file-system/download-file",
   accelerator: "alt+d",
   showInCommandPalette: ({ state }: ActionContext) => {
-    return Boolean(state["ordo-activity-editor"].currentFile)
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    return Boolean((state as any)["ordo-activity-editor"].currentFile)
   },
   showInContextMenu: OrdoFile.isOrdoFile,
   action: ({ contextMenuTarget, state }: ActionContext) => {
@@ -35,8 +35,10 @@ export const DownloadFileCommand = createOrdoCommand<"ordo-command-file-system">
       return void download(contextMenuTarget)
     }
 
-    if (state["ordo-activity-editor"].currentFile) {
-      download(state["ordo-activity-editor"].currentFile)
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    if ((state as any)["ordo-activity-editor"].currentFile) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      download((state as any)["ordo-activity-editor"].currentFile)
     }
   },
 })

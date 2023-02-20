@@ -1,3 +1,4 @@
+import { createCommandExtension } from "@ordo-pink/extensions"
 import { ChangeEmailCommand } from "./commands/change-email"
 import { ChangePasswordCommand } from "./commands/change-password"
 import { DeleteAccount } from "./commands/delete-account"
@@ -7,8 +8,6 @@ import { RegisterCommand } from "./commands/register"
 import { slice } from "./store"
 import en from "./translations/en.json"
 import ru from "./translations/ru.json"
-
-import { createCommandExtension } from "../../core/extensions/create-command-extension"
 
 export default createCommandExtension("auth", {
   translations: { en, ru },

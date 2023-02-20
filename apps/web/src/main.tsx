@@ -1,4 +1,5 @@
 import { ReactKeycloakProvider } from "@ordo-pink/keycloak"
+import { ConsoleLogger } from "@ordo-pink/logger"
 import { Loading } from "@ordo-pink/react-components"
 import Keycloak from "keycloak-js"
 import ReactDOM from "react-dom/client"
@@ -226,8 +227,8 @@ root.render(
     autoRefreshToken
     LoadingComponent={<Loading />}
     onEvent={(_, error) => {
-      // eslint-disable-next-line no-console
-      if (error) console.error(error)
+      // TODO: Replace with valid logger
+      if (error) ConsoleLogger.alert(error)
     }}
   >
     <Helmet>
@@ -242,4 +243,3 @@ root.render(
     </Provider>
   </ReactKeycloakProvider>,
 )
-// })

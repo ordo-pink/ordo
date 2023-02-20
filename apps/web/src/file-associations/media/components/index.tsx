@@ -1,9 +1,8 @@
 import { Either } from "@ordo-pink/either"
+import { Loading, PathBreadcrumbs } from "@ordo-pink/react-components"
 import { useEffect, useState } from "react"
 import { useIsVideo } from "./use-is-video"
 import { MediaProps } from ".."
-import Loading from "../../../core/components/loading"
-import PathBreadcrumbs from "../../../core/components/path-breadcrumbs"
 import { useFileParentBreadcrumbs } from "../../../core/hooks/use-file-breadcrumbs"
 import { useFSAPI } from "../../../core/hooks/use-fs-api"
 

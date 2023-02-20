@@ -6,11 +6,10 @@ export const createLoadable = (
   loader: () => Promise<ComponentType>,
   loading = Loading,
   delay = 300,
-) => {
-  return loadable({
+) =>
+  loadable({
     loader,
     loading,
     delay,
     timeout: 10000,
   })
-}

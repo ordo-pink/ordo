@@ -128,7 +128,7 @@ export default memo(
 
       setPlugins(
         pluginExtensions.reduce(
-          (acc, extension) => acc.concat(extension.plugins),
+          (acc, extension) => acc.concat(extension.editorPlugins),
           [] as ComponentType[],
         ),
       )

@@ -45,7 +45,8 @@ export default function Editor(props: EditorProps) {
     const queryPath = query.get("path")
 
     if (!queryPath && !currentFile) {
-      props.persistedStore.get("recentFiles").then((recentFiles) => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      props.persistedStore.get("recentFiles").then((recentFiles: any) => {
         if (!recentFiles || !recentFiles[0]) return
 
         const path = recentFiles[0]
@@ -81,7 +82,8 @@ export default function Editor(props: EditorProps) {
           ({ Component }) =>
             () =>
               Component as FC,
-        ),
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        ) as any,
       )
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -90,14 +92,17 @@ export default function Editor(props: EditorProps) {
   useEffect(() => {
     if (!currentFile || !tree || !dispatch) return
 
-    props.persistedStore.get("recentFiles").then((recent) => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    props.persistedStore.get("recentFiles").then((recent: any) => {
       Switch.of(currentFile.path)
         .case(
-          (path) => !recent || recent.indexOf(path) === 0,
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          (path: any) => !recent || recent.indexOf(path) === 0,
           () => void 0,
         )
         .case(
-          (path) => Boolean(recent) && (recent as string[]).includes(path),
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          (path: any) => Boolean(recent) && (recent as string[]).includes(path),
           () => {
             const recentCopy = [...(recent as OrdoFilePath[])]
 

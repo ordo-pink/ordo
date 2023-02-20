@@ -1,5 +1,5 @@
+import { createOrdoCommand } from "@ordo-pink/extensions"
 import { OrdoDirectory } from "@ordo-pink/fs-entity"
-import { createOrdoCommand } from "../../../core/extensions/create-ordo-command"
 import { showCreateFileModal } from "../store"
 
 export const CreateFileCommand = createOrdoCommand<"ordo-command-file-system">({
@@ -14,6 +14,7 @@ export const CreateFileCommand = createOrdoCommand<"ordo-command-file-system">({
         ? contextMenuTarget
         : state.personalProject
 
-    dispatch(showCreateFileModal(target))
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    dispatch(showCreateFileModal(target as any))
   },
 })

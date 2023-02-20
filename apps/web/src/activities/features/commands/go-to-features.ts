@@ -1,4 +1,4 @@
-import { createOrdoCommand } from "../../../core/extensions/create-ordo-command"
+import { createOrdoCommand } from "@ordo-pink/extensions"
 
 export const GoToFeaturesCommand = createOrdoCommand<"ordo-activity-features">({
   Icon: () => import("../components/icon"),

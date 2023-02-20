@@ -1,6 +1,5 @@
+import { createOrdoCommand } from "@ordo-pink/extensions"
 import { showLogoutModal } from "../../../commands/auth/store"
-
-import { createOrdoCommand } from "../../../core/extensions/create-ordo-command"
 
 export const LogoutCommand = createOrdoCommand({
   title: "@ordo-command-auth/logout",

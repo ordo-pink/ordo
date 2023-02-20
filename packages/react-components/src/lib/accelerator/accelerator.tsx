@@ -1,20 +1,18 @@
 import { Switch } from "@ordo-pink/switch"
 import { AiOutlineEnter } from "react-icons/ai"
 import { BsBackspace } from "react-icons/bs"
-
-import "./index.css"
+import classes from "./accelerator.module.css"
 
 type Props = {
   accelerator: string
 }
 
-// eslint-disable-next-line i18next/no-literal-string
 const Esc = () => <span>Esc</span>
 const Backspace = () => <BsBackspace />
 const Enter = () => <AiOutlineEnter />
 const Letter = ({ symbol }: { symbol: string }) => <span>{symbol.toLocaleUpperCase()}</span>
 
-export default function Accelerator({ accelerator }: Props) {
+export const Accelerator = ({ accelerator }: Props) => {
   const isDarwin = navigator.appVersion.indexOf("Mac") !== -1
 
   const split = accelerator.split("+")
@@ -30,19 +28,11 @@ export default function Accelerator({ accelerator }: Props) {
     .default(() => Letter)
 
   return (
-    <div className="accelerator">
-      {split.includes("alt") && (
-        <div className="">{alt} +</div> /* eslint-disable-line i18next/no-literal-string */
-      )}
-      {split.includes("option") && (
-        <div className="">⌥ +</div> /* eslint-disable-line i18next/no-literal-string */
-      )}
-      {split.includes("ctrl") && (
-        <div className="">{ctrl} +</div> /* eslint-disable-line i18next/no-literal-string */
-      )}
-      {split.includes("shift") && (
-        <div className="">⇧ +</div> /* eslint-disable-line i18next/no-literal-string */
-      )}
+    <div className={classes.accelerator}>
+      {split.includes("alt") && <div className="">{alt} +</div>}
+      {split.includes("option") && <div className="">⌥ +</div>}
+      {split.includes("ctrl") && <div className="">{ctrl} +</div>}
+      {split.includes("shift") && <div className="">⇧ +</div>}
 
       <Key symbol={symbol} />
     </div>

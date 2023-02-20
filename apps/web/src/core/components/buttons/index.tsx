@@ -1,9 +1,9 @@
 import { ThunkFn } from "@ordo-pink/common-types"
 import { Either } from "@ordo-pink/either"
+import { Accelerator } from "@ordo-pink/react-components"
 import { PropsWithChildren, useRef } from "react"
 import { useHotkeys } from "react-hotkeys-hook"
 import { noOp } from "../../utils/no-op"
-import Accelerator from "../accelerator"
 
 type Props = PropsWithChildren<{
   onClick: ThunkFn<void>

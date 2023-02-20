@@ -1,7 +1,7 @@
 import { UnaryFn } from "@ordo-pink/common-types"
+import { Accelerator } from "@ordo-pink/react-components"
 import { MouseEvent } from "react"
 import { useTranslation } from "react-i18next"
-import Accelerator from "../../../core/components/accelerator"
 import ActionListItem from "../../../core/components/action-list/item"
 import { OrdoCommand } from "../../../core/types"
 import { preventDefault, stopPropagation } from "../../../core/utils/event"

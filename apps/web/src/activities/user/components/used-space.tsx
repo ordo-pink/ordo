@@ -1,9 +1,9 @@
 import { Nullable } from "@ordo-pink/common-types"
 import { Either } from "@ordo-pink/either"
 import { IOrdoFile, IOrdoDirectory, OrdoDirectory } from "@ordo-pink/fs-entity"
+import { Null } from "@ordo-pink/react-components"
 import { reduce } from "ramda"
 import { useTranslation } from "react-i18next"
-import Null from "../../../core/components/null"
 import { useAppSelector } from "../../../core/state/hooks/use-app-selector"
 import { convertBytesToMb } from "../../../core/utils/size-format-helper"
 

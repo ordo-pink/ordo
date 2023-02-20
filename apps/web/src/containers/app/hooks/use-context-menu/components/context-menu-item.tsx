@@ -1,10 +1,9 @@
+import { Accelerator, Null } from "@ordo-pink/react-components"
 import { MouseEvent } from "react"
 import { useTranslation } from "react-i18next"
 
 import { hideContextMenu } from "../../../../../containers/app/hooks/use-context-menu/store"
 import { ContextMenuTemplateItem } from "../../../../../containers/app/hooks/use-context-menu/types"
-import Accelerator from "../../../../../core/components/accelerator"
-import Null from "../../../../../core/components/null"
 import { useActionContext } from "../../../../../core/hooks/use-action-context"
 import { useAppDispatch } from "../../../../../core/state/hooks/use-app-dispatch"
 import { useAppSelector } from "../../../../../core/state/hooks/use-app-selector"

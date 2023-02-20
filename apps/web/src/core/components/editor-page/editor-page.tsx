@@ -1,7 +1,7 @@
 import { UnaryFn } from "@ordo-pink/common-types"
+import { Null } from "@ordo-pink/react-components"
 import { MouseEvent, PropsWithChildren } from "react"
 import { useCurrentFileAssociation } from "../../hooks/use-current-file-association"
-import Null from "../null"
 import PathBreadcrumbs from "../path-breadcrumbs"
 
 type Props = PropsWithChildren<{

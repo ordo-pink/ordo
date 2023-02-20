@@ -1,9 +1,9 @@
 import { Nullable } from "@ordo-pink/common-types"
 import { Either } from "@ordo-pink/either"
 import { IOrdoFile, IOrdoDirectory, OrdoDirectory } from "@ordo-pink/fs-entity"
+import { Null } from "@ordo-pink/react-components"
 import Directory from "./directory"
 import File from "./file"
-import Null from "../../../../core/components/null"
 
 type Props = {
   item: Nullable<IOrdoFile | IOrdoDirectory>

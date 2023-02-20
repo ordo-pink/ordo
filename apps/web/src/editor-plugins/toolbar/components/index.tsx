@@ -33,10 +33,10 @@ import {
 } from "react-icons/ai"
 import { BlockOptions } from "./block-options"
 import { LinkEditor } from "./link-editor"
-import Null from "../../../core/components/null"
 import { LOW_PRIORITY } from "../constants"
 import { getSelectedNode } from "../utils/get-selected-node"
 import { positionEditorElement } from "../utils/position-editor-element"
+import { Null } from "@ordo-pink/react-components"
 
 const supportedBlockTypes = new Set([
   "paragraph",

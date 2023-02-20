@@ -1,7 +1,7 @@
 import { ThunkFn } from "@ordo-pink/common-types"
+import { Null } from "@ordo-pink/react-components"
 import { Slice } from "@reduxjs/toolkit"
 import { createLoadable } from "./create-loadable"
-import Null from "../components/null"
 import { OrdoCommandExtension } from "../types"
 
 type Props<Name extends string, State extends Record<string, unknown>> = Omit<

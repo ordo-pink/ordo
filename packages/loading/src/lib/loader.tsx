@@ -1,4 +1,4 @@
-import "./index.css"
+import "./loader.css"
 
 export default function Loader() {
   return (

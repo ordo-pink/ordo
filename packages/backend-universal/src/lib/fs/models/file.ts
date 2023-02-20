@@ -5,6 +5,7 @@ import { FSDriver, IOrdoFileModel } from "../../types"
 
 export const OrdoFileModel = {
   of: (driver: FSDriver): IOrdoFileModel => ({
+    checkFileExists: driver.checkFileExists,
     createFile: ({ path, content }) =>
       Promise.resolve(path)
         .then((path) =>

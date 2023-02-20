@@ -9,23 +9,25 @@ import { compareTokensStrict } from "../../fs/middleware/compare-tokens"
 import { OrdoDirectoryModel } from "../../fs/models/directory"
 import { OrdoFileModel } from "../../fs/models/file"
 import { CreateOrdoBackendServerParams } from "../../types"
+import { OrdoInternalModel } from "../models/internal-model"
 
 export const ExtensionsRouter = ({
   fsDriver,
-  authorise: authorize,
+  authorise,
   logger,
 }: CreateOrdoBackendServerParams) => {
   const file = OrdoFileModel.of(fsDriver)
   const directory = OrdoDirectoryModel.of(fsDriver)
+  const internal = OrdoInternalModel.of(fsDriver)
 
-  const env = { file, directory, logger }
+  const env = { file, directory, logger, internal }
 
   return Router()
     .post(
       `/:${USER_ID_PARAM}/:extension`,
 
       appendLogger(logger),
-      authorize,
+      authorise,
       compareTokensStrict,
       createExtensionFileHandler(env),
     )
@@ -33,7 +35,7 @@ export const ExtensionsRouter = ({
       `/:${USER_ID_PARAM}/:extension`,
 
       appendLogger(logger),
-      authorize,
+      authorise,
       compareTokensStrict,
       getExtensionFileHandler(env),
     )
@@ -41,7 +43,7 @@ export const ExtensionsRouter = ({
       `/:${USER_ID_PARAM}/:extension`,
 
       appendLogger(logger),
-      authorize,
+      authorise,
       compareTokensStrict,
       updateExtensionFileHandler(env),
     )
@@ -49,7 +51,7 @@ export const ExtensionsRouter = ({
       `/:${USER_ID_PARAM}/:extension`,
 
       appendLogger(logger),
-      authorize,
+      authorise,
       compareTokensStrict,
       removeExtensionFileHandler(env),
     )

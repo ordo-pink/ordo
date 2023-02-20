@@ -2,7 +2,7 @@ import { urlencoded } from "body-parser"
 import cors from "cors"
 import express from "express"
 import { FSRouter } from "./fs/router"
-import { ExtensionsRouter } from "./internal/extensions/router"
+import { InternalRouter } from "./internal/router"
 import { CreateOrdoBackendServerParams } from "./types"
 
 const app = express()
@@ -18,5 +18,5 @@ export const createOrdoBackendServer = ({
     .use(cors(corsOptions))
     .use(urlencoded({ extended: false }))
     .use("/fs", FSRouter({ fsDriver, authorise: authorize, logger }))
-    .use("/extensions", ExtensionsRouter({ fsDriver, authorise: authorize, logger }))
+    .use("/internal", InternalRouter({ fsDriver, authorise: authorize, logger }))
     .disable("x-powered-by")

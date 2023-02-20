@@ -10,7 +10,7 @@ import {
 import { NEW_PATH_PARAM, OLD_PATH_PARAM, PATH_PARAM, USER_ID_PARAM } from "../../constants"
 
 const checkIsInternalPath = (userId: string) => (path: string) =>
-  path.startsWith(`/${userId}${SystemDirectory.INTERNAL}`)
+  path.includes(`/${userId}${SystemDirectory.INTERNAL}`)
 
 export const validateFilePath: RequestHandler<OrdoFilePathParams> = (req, res, next) => {
   const isInternalPath = checkIsInternalPath(req.params[USER_ID_PARAM])
@@ -20,7 +20,7 @@ export const validateFilePath: RequestHandler<OrdoFilePathParams> = (req, res, n
     !OrdoFile.isValidPath(req.params[PATH_PARAM]) ||
     isInternalPath(req.params[PATH_PARAM])
   ) {
-    req.params.logger.info(`Invalid file path: ${req.params[PATH_PARAM]}`)
+    req.params.logger.debug(`Invalid file path: ${req.params[PATH_PARAM]}`)
 
     return void res.status(ExceptionResponse.BAD_REQUEST).send("Invalid path")
   }

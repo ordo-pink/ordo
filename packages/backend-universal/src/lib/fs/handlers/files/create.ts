@@ -5,14 +5,23 @@ import { PATH_PARAM, USER_ID_PARAM } from "../../constants"
 import { removeUserIdFromPath } from "../../utils/remove-user-id-from-path"
 
 export const createFileHandler: FsRequestHandler<OrdoFilePathParams> =
-  ({ file: { createFile } }) =>
+  ({ file: { createFile }, internal: { getInternalValue, setInternalValue } }) =>
   (req, res) => {
     const path = req.params[PATH_PARAM]
     const userId = req.params[USER_ID_PARAM]
 
+    const contentLength = Number(req.headers["content-length"])
+
     createFile({ path, content: req })
       .then(removeUserIdFromPath(userId))
       .then((fileOrDirectory) => res.status(SuccessResponse.CREATED).json(fileOrDirectory))
+      .then(() => {
+        if (contentLength === 0) return
+
+        return getInternalValue(userId, "totalSize").then((total) =>
+          setInternalValue(userId, "totalSize", total + contentLength),
+        )
+      })
       .catch((error: ExceptionResponse.CONFLICT | Error) =>
         Switch.of(error)
           .case(ExceptionResponse.CONFLICT, () => res.status(ExceptionResponse.CONFLICT).send())

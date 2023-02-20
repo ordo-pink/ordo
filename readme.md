@@ -41,11 +41,17 @@ npm run start:remote
 ### Node.js
 
 ```sh
-npx nx g @nrwl/node:lib NAME [--publishabe --importPath=[@ordo-pink/]NAME]
+npx nx g @nrwl/node:lib NAME [--publishable --importPath=[@ordo-pink/]NAME]
 ```
 
 ### Common
 
 ```sh
 npx nx g @nrwl/js:lib NAME --bundler=vite --unitTestRunner=vitest [--publishable --importPath=[@ordo-pink/]NAME]
+```
+
+### Ordo Extension
+
+```sh
+npx nx g @nrwl/react:lib NAME --bundler=vite --unitTestRunner=vitest [--publishable --importPath=[@ordo-pink/]NAME]
 ```

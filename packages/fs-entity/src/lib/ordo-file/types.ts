@@ -81,6 +81,8 @@ export type IOrdoFile = {
    * File extension. Must be a valid OrdoFileExtension.
    */
   extension: OrdoFileExtension
+
+  readableSize: string
 }
 
 /**
@@ -173,4 +175,15 @@ export interface IOrdoFileStatic {
   getFileExtension: <Path extends OrdoFilePath>(
     path: ValidatedOrdoFilePath<Path>,
   ) => OrdoFileExtension
+
+  /**
+   * Get a metric-prefixed size of a given size.
+   *
+   * @throws TypeError if provided size is invalid.
+   *
+   * @example 1024 -> `1KB`
+   * @example 3145728 -> `3MB`
+   * @example 0 -> `0B`
+   */
+  getReadableSize: (size: number) => string
 }

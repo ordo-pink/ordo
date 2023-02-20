@@ -4,7 +4,8 @@
 
 ## About
 
-Authorisation stub is an authorisation middleware for `@ordo-pink/backend-universal`. It allows you to use the backend as if you were authenticated with the token you define for the stub.
+Authorisation stub is an authorisation middleware for `@ordo-pink/backend-universal`. It allows you
+to use the backend as if you were authenticated with the token you define for the stub.
 
 ## Usage
 
@@ -20,11 +21,13 @@ const authorise = authorisationStub(myAuthToken)
 // Pass to Backend Universal server factory
 ```
 
-Now you can sign your requests with `Authorization` header with the value `Bearer ${myAuthToken}` to make Backend Universal work.
+Now you can sign your requests with `Authorization` header with the value `Bearer ${myAuthToken}` to
+make Backend Universal work.
 
 ## ⚠ **WARNING** ⚠
 
-Don't use it in production. It should only be used for testing, debugging, or local development purposes.
+Don't use it in production. It should only be used for testing, debugging, or local development
+purposes.
 
 ## Installation
 

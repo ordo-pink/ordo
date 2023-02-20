@@ -16,12 +16,12 @@ import { MarkdownShortcutPlugin } from "@lexical/react/LexicalMarkdownShortcutPl
 import { RichTextPlugin } from "@lexical/react/LexicalRichTextPlugin"
 import { HeadingNode, QuoteNode } from "@lexical/rich-text"
 import { TableNode, TableCellNode, TableRowNode } from "@lexical/table"
+import { useWorkspace } from "@ordo-pink/react-components"
 import { EditorThemeClasses } from "lexical"
-import { useState, useEffect, ComponentType } from "react"
+// import { useState, useEffect, ComponentType } from "react"
 import Helmet from "react-helmet"
 import { useTranslation } from "react-i18next"
-import { useWorkspace } from "../../../containers/workspace/hooks/use-workspace"
-import { useAppSelector } from "../../../core/state/hooks/use-app-selector"
+// import { useAppSelector } from "../../../core/state/hooks/use-app-selector"
 
 const theme: EditorThemeClasses = {
   heading: {
@@ -100,22 +100,22 @@ const nodes = [
 export default function Home() {
   const Workspace = useWorkspace()
 
-  const pluginExtensions = useAppSelector((state) => state.app.editorPluginExtensions)
+  // const pluginExtensions = useAppSelector((state) => state.app.editorPluginExtensions)
 
-  const [plugins, setPlugins] = useState<ComponentType[]>([])
+  // const [plugins, setPlugins] = useState<ComponentType[]>([])
 
-  useEffect(() => {
-    if (!pluginExtensions || !pluginExtensions.length) return
+  // useEffect(() => {
+  //   if (!pluginExtensions || !pluginExtensions.length) return
 
-    setPlugins(
-      pluginExtensions.reduce(
-        (acc, extension) => acc.concat(extension.plugins),
-        [] as ComponentType[],
-      ),
-    )
+  //   setPlugins(
+  //     pluginExtensions.reduce(
+  //       (acc, extension) => acc.concat(extension.editorPlugins),
+  //       [] as ComponentType[],
+  //     ),
+  //   )
 
-    return () => setPlugins([])
-  }, [pluginExtensions])
+  //   return () => setPlugins([])
+  // }, [pluginExtensions])
 
   const { t } = useTranslation()
 
@@ -168,11 +168,11 @@ export default function Home() {
                 ErrorBoundary={LexicalErrorBoundary}
               />
 
-              <>
+              {/* <>
                 {plugins.map((Plugin, index) => (
                   <Plugin key={index} />
                 ))}
-              </>
+              </> */}
             </LexicalComposer>
           </div>
         </div>

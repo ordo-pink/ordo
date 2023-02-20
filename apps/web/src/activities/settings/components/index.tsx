@@ -1,10 +1,10 @@
+import { useWorkspace } from "@ordo-pink/react-components"
 import { createContext } from "react"
 import { Helmet } from "react-helmet"
 import { useTranslation } from "react-i18next"
 import LanguageField from "./language-field"
 import ThemeField from "./theme-field"
 import { SettingsProps } from ".."
-import { useWorkspace } from "../../../containers/workspace/hooks/use-workspace"
 
 export const SettingsContext = createContext({} as SettingsProps)
 

@@ -1,18 +1,16 @@
+import { useWorkspace } from "@ordo-pink/react-components"
 import Helmet from "react-helmet"
 import { useTranslation } from "react-i18next"
 import PricingPlan from "./pricing-plan"
-import { useWorkspace } from "../../../containers/workspace/hooks/use-workspace"
-import { useActionContext } from "../../../core/hooks/use-action-context"
-import { useAppSelector } from "../../../core/state/hooks/use-app-selector"
 
 export default function ExtensionStore() {
   const Workspace = useWorkspace()
-  const actionContext = useActionContext()
+  // const actionContext = useActionContext()
 
-  const commands = useAppSelector((state) => state.app.commands)
-  const registerCommand = commands.find(
-    (command) => command.title === "@ordo-command-auth/register",
-  )
+  // const commands = useAppSelector((state) => state.app.commands)
+  // const registerCommand = commands.find(
+  // (command) => command.title === "@ordo-command-auth/register",
+  // )
 
   const { t } = useTranslation()
 
@@ -36,7 +34,7 @@ export default function ExtensionStore() {
           title="@ordo-activity-pricing/free-title"
           price="@ordo-activity-pricing/free-price"
           description="@ordo-activity-pricing/free-description"
-          onClick={() => registerCommand && registerCommand.action(actionContext)}
+          // onClick={() => registerCommand && registerCommand.action(actionContext)}
           features={[
             { text: "@ordo-activity-pricing/free-cloud-storage" },
             { text: "@ordo-activity-pricing/free-file-size" },

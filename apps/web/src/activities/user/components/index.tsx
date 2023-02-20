@@ -1,4 +1,4 @@
-import { Fieldset } from "@ordo-pink/react-components"
+import { Fieldset, useWorkspace } from "@ordo-pink/react-components"
 import { Helmet } from "react-helmet"
 import { useTranslation } from "react-i18next"
 import DeleteAccountField from "./delete-account-field"
@@ -6,7 +6,6 @@ import EmailField from "./email-field"
 import LogoutField from "./logout-field"
 import PasswordField from "./password-field"
 import { UsedSpace } from "./used-space"
-import { useWorkspace } from "../../../containers/workspace/hooks/use-workspace"
 
 export default function Settings() {
   const Workspace = useWorkspace()

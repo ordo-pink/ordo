@@ -2,7 +2,7 @@ import { PropsWithChildren, useEffect, useState } from "react"
 import ReactSplit from "react-split"
 import Sidebar from "./sidebar"
 import Workspace from ".."
-import { useWindowSize } from "../../../core/hooks/use-window-size"
+import { useWindowSize } from "../../use-window-size"
 
 type Props = {
   sidebarChildren: PropsWithChildren["children"]

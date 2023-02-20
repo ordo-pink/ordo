@@ -1,3 +1,4 @@
+import { useWorkspaceWithSidebar } from "@ordo-pink/react-components"
 import { Switch } from "@ordo-pink/switch"
 import Helmet from "react-helmet"
 import { useTranslation } from "react-i18next"
@@ -17,7 +18,6 @@ import SelfHostingFeature from "./features/self-hosting"
 import TagsFeature from "./features/tags"
 import TeamFoldersFeature from "./features/team-folders"
 import FeaturesSidebar from "./sidebar"
-import { useWorkspaceWithSidebar } from "../../../containers/workspace/hooks/use-workspace"
 
 const GoToRichTextEditorFeature = () => <Navigate to="/features/rich-text-editor" />
 

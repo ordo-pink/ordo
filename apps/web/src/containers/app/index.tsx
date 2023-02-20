@@ -1,4 +1,5 @@
 import { OrdoExtensionType } from "@ordo-pink/common-types"
+import { useKeycloak } from "@ordo-pink/keycloak"
 import { combineReducers, Reducer } from "@reduxjs/toolkit"
 import { MouseEvent, useEffect, useState } from "react"
 import { Helmet } from "react-helmet"
@@ -27,7 +28,6 @@ import { useI18n } from "../../containers/app/hooks/use-i18n"
 import { useSystemCommands } from "../../containers/app/hooks/use-system-commands/use-system-commands"
 import { gotDirectory, registerExtensions } from "../../containers/app/store"
 
-import { useKeycloak } from "../../core/auth/hooks/use-keycloak"
 import { createExtensionPersistedState } from "../../core/extensions/create-extension-metadata"
 import { isActivityExtension } from "../../core/guards/is-extension"
 import { useActionContext } from "../../core/hooks/use-action-context"

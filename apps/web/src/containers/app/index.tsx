@@ -16,6 +16,7 @@ import { useHotkeys } from "react-hotkeys-hook"
 import { Outlet, RouteObject, useLocation, useNavigate } from "react-router-dom"
 
 // import AllActivitiesExtension from "$activities/all-activities"
+import CalendarExtension from "../../activities/calendar"
 import EditorExtension from "../../activities/editor"
 // import ExtensionStoreExtension from "../../activities/extension-store"
 import { EditorActivityState } from "../../activities/editor/types"
@@ -53,6 +54,7 @@ import PDFFileExtension from "../../file-associations/pdf"
 
 const loggedInExtensions = [
   // AllActivitiesExtension,
+  CalendarExtension,
   EditorExtension,
   UserExtension,
   SettingsExtension,
@@ -243,7 +245,7 @@ export default function App() {
 
   return (
     <div
-      className="bg-neutral-50 text-neutral-800 dark:bg-neutral-700 dark:text-neutral-200 flex flex-col"
+      className="bg-neutral-50 text-neutral-800 dark:bg-neutral-700 dark:text-neutral-200 flex flex-col min-h-screen"
       onContextMenu={handleContextMenu}
     >
       <Helmet>

@@ -42,7 +42,7 @@ export default defineConfig({
     },
     rollupOptions: {
       // External packages that should not be bundled into your library.
-      external: ["stream", "express", "body-parser", "cors"],
+      external: ["stream", "express", "body-parser", "cors", "mime-types"],
     },
   },
 

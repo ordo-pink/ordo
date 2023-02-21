@@ -11,13 +11,6 @@
         "outputPath": "dist/packages/fns"
       }
     },
-    "publish": {
-      "executor": "nx:run-commands",
-      "options": {
-        "command": "node tools/scripts/publish.mjs fns {args.ver} {args.tag}"
-      },
-      "dependsOn": ["build"]
-    },
     "test": {
       "executor": "@nrwl/vite:test",
       "outputs": ["coverage/packages/fns"],

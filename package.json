@@ -95,6 +95,7 @@
     "vitest": "^0.25.8"
   },
   "dependencies": {
+    "@daypilot/daypilot-lite-react": "^3.12.1",
     "@lexical/code": "^0.8.0",
     "@lexical/link": "^0.8.0",
     "@lexical/list": "^0.8.0",

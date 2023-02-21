@@ -59,10 +59,13 @@ export default function File({ file }: Props) {
       .fold(({ x, y }) => dispatch(showContextMenu({ target: file, x, y }))),
   )
 
+  const name =
+    file.extension === ".md" ? file.readableName : `${file.readableName}${file.extension}`
+
   return (
     <ActionListItem
       style={{ paddingLeft }}
-      text={file.readableName}
+      text={name}
       Icon={Icon}
       isCurrent={isCurrent}
       onClick={handleClick}

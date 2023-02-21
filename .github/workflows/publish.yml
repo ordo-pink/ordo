@@ -7,7 +7,6 @@ on:
   workflow_dispatch:
 
 jobs:
-
   npm:
     runs-on: ubuntu-latest
 
@@ -19,8 +18,8 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: 16
-          registry-url: 'https://registry.npmjs.org'
-          scope: '@ordo-pink'
+          registry-url: "https://registry.npmjs.org"
+          scope: "@ordo-pink"
 
       - name: Install dependencies
         run: npm ci
@@ -45,8 +44,8 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: 16
-          registry-url: 'https://npm.pkg.github.com'
-          scope: '@ordo-pink'
+          registry-url: "https://npm.pkg.github.com"
+          scope: "@ordo-pink"
 
       - name: Install dependencies
         run: npm ci

@@ -7,7 +7,6 @@ on:
   workflow_dispatch:
 
 jobs:
-
   npm:
     runs-on: ubuntu-latest
 
@@ -19,14 +18,15 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: 16
-          registry-url: 'https://registry.npmjs.org'
-          scope: '@ordo-pink'
+          registry-url: "https://registry.npmjs.org"
+          scope: "@ordo-pink"
 
       - name: Install dependencies
         run: npm ci
 
       - name: Publish to NPM
-        run: npm nx affected --target=publish --args="--ver=${GITHUB_REF_NAME} --tag=${GITHUB_SHA::6}"
+        run:
+          npm nx affected --target=publish --args="--ver=${GITHUB_REF_NAME} --tag=${GITHUB_SHA::6}"
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GHP_TOKEN }}
 
@@ -45,13 +45,14 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: 16
-          registry-url: 'https://npm.pkg.github.com'
-          scope: '@ordo-pink'
+          registry-url: "https://npm.pkg.github.com"
+          scope: "@ordo-pink"
 
       - name: Install dependencies
         run: npm ci
 
       - name: Publish to NPM
-        run: npm nx affected --target=publish --args="--ver=${GITHUB_REF_NAME} --tag=${GITHUB_SHA::6}"
+        run:
+          npm nx affected --target=publish --args="--ver=${GITHUB_REF_NAME} --tag=${GITHUB_SHA::6}"
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GHP_TOKEN }}

@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { DayPilot, DayPilotMonth } from "@daypilot/daypilot-lite-react"
 import React, { Component } from "react"
-import "./CalendarStyles.css"
+import "./calendar-styles.css"
 
 class MonthView extends Component {
   calendarRef: React.RefObject<any>

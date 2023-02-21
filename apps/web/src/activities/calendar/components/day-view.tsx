@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { DayPilot, DayPilotCalendar, DayPilotNavigator } from "@daypilot/daypilot-lite-react"
 import React, { Component } from "react"
-import "./CalendarStyles.css"
+import "./calendar-styles.css"
 
 const styles = {
   wrap: {

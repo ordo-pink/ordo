@@ -14,7 +14,7 @@
     "publish": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "node tools/scripts/publish.mjs backend-authorisation-stub {args.ver} {args.tag}"
+        "command": "node tools/scripts/publish.mjs backend-universal {args.ver} {args.tag}"
       },
       "dependsOn": ["build"]
     },
@@ -33,14 +33,10 @@
       }
     },
     "build": {
-      "executor": "@nrwl/js:tsc",
+      "executor": "@nrwl/vite:build",
       "outputs": ["{options.outputPath}"],
       "options": {
-        "outputPath": "dist/packages/backend-universal",
-        "tsConfig": "packages/backend-universal/tsconfig.lib.json",
-        "packageJson": "packages/backend-universal/package.json",
-        "main": "packages/backend-universal/src/index.ts",
-        "assets": ["packages/backend-universal/*.md"]
+        "outputPath": "dist/packages/backend-universal"
       }
     }
   },

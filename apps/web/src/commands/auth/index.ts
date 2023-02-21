@@ -1,9 +1,9 @@
 import { ChangeEmailCommand } from "./commands/change-email"
 import { ChangePasswordCommand } from "./commands/change-password"
 import { DeleteAccount } from "./commands/delete-account"
-// import { LoginCommand } from "./commands/login"
+import { LoginCommand } from "./commands/login"
 import { LogoutCommand } from "./commands/logout"
-// import { RegisterCommand } from "./commands/register"
+import { RegisterCommand } from "./commands/register"
 import { slice } from "./store"
 import en from "./translations/en.json"
 import ru from "./translations/ru.json"
@@ -13,8 +13,8 @@ import { createCommandExtension } from "../../core/extensions/create-command-ext
 export default createCommandExtension("auth", {
   translations: { en, ru },
   commands: [
-    // RegisterCommand,
-    // LoginCommand,
+    RegisterCommand,
+    LoginCommand,
     LogoutCommand,
     ChangePasswordCommand,
     ChangeEmailCommand,

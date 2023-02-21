@@ -14,4 +14,5 @@
   "@ordo-command-auth/change-email-subject": "Запрос на смену электронной почты для {{email}}",
   "@ordo-command-auth/change-email-body": "Привет,%0A%0AЯ бы хотел запросить смену электронной почты для моего аккаунта в Ordo.%0A%0A{{username}}",
   "@ordo-command-auth/delete-account-subject": "Запрос на удаление аккаунта для {{email}}",
-  "@ordo-command-auth/delete-account-body": "Привет,%0A%0AЯ бы хотел навсегда удалить мой аккаунт в Ordo.%0A%0A{{username}}"}
+  "@ordo-command-auth/delete-account-body": "Привет,%0A%0AЯ бы хотел навсегда удалить мой аккаунт в Ordo.%0A%0A{{username}}"
+}

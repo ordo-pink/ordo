@@ -1,12 +1,10 @@
+import { lazyBox, preventDefault, stopPropagation } from "@ordo-pink/fns"
+import { Fieldset, OrdoButtonSecondary } from "@ordo-pink/react-components"
 import { MouseEvent } from "react"
 import { useTranslation } from "react-i18next"
 import { AiOutlineLogout } from "react-icons/ai"
-import { OrdoButtonSecondary } from "../../../core/components/buttons"
-import Fieldset from "../../../core/components/fieldset"
 import { useActionContext } from "../../../core/hooks/use-action-context"
 import { useAppSelector } from "../../../core/state/hooks/use-app-selector"
-import { preventDefault, stopPropagation } from "../../../core/utils/event"
-import { lazyBox } from "../../../core/utils/lazy-box"
 
 export default function LogoutField() {
   const actionContext = useActionContext()

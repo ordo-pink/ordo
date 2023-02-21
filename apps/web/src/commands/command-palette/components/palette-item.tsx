@@ -1,12 +1,9 @@
 import { UnaryFn } from "@ordo-pink/common-types"
+import { noOp, lazyBox, preventDefault, stopPropagation } from "@ordo-pink/fns"
+import { Accelerator, ActionListItem } from "@ordo-pink/react-components"
 import { MouseEvent } from "react"
 import { useTranslation } from "react-i18next"
-import Accelerator from "../../../core/components/accelerator"
-import ActionListItem from "../../../core/components/action-list/item"
 import { OrdoCommand } from "../../../core/types"
-import { preventDefault, stopPropagation } from "../../../core/utils/event"
-import { lazyBox } from "../../../core/utils/lazy-box"
-import { noOp } from "../../../core/utils/no-op"
 
 type Props = {
   isCurrent: boolean

@@ -18,7 +18,7 @@ export type ISwitchStatic = {
    * @example `Switch.of(myVariableWithIDontKnowWhichThingInside)`
    */
   of: <TResult extends unknown[] = [], TContext = unknown>(
-    x: TContext
+    x: TContext,
   ) => ISwitch<TContext, TResult>
 }
 
@@ -55,7 +55,7 @@ export type ISwitch<TContext, TResult extends unknown[]> = {
      * thunk that is defined for the matched case. If none of the cases did
      * match, the `.default` argument thunk will be called.
      */
-    onTrue: ThunkFn<TNewResult>
+    onTrue: ThunkFn<TNewResult>,
   ) => ISwitch<TContext, [Unpack<TResult>, TNewResult]>
 
   /**
@@ -77,5 +77,5 @@ export type ISwitch<TContext, TResult extends unknown[]> = {
  * @example `lazySwitch((s) => s.case(1, () => "yay!").default(() => "Nah..."))(1)`
  */
 export type LazySwitch = <TContext, TResult extends unknown[] = unknown[]>(
-  callback: (s: ISwitch<TContext, TResult>) => Unpack<TResult>
+  callback: (s: ISwitch<TContext, TResult>) => Unpack<TResult>,
 ) => (x: TContext) => Unpack<TResult>

@@ -1,13 +1,12 @@
+import { lazyBox, preventDefault, stopPropagation } from "@ordo-pink/fns"
 import { IOrdoFile } from "@ordo-pink/fs-entity"
+import { ActionListItem } from "@ordo-pink/react-components"
 import { MouseEvent } from "react"
 import { BsFileEarmarkBinary } from "react-icons/bs"
 import { createSearchParams, useNavigate, useSearchParams } from "react-router-dom"
 import { useContextMenu } from "../../../../containers/app/hooks/use-context-menu"
-import ActionListItem from "../../../../core/components/action-list/item"
 import { useAppDispatch } from "../../../../core/state/hooks/use-app-dispatch"
 import { useAppSelector } from "../../../../core/state/hooks/use-app-selector"
-import { preventDefault, stopPropagation } from "../../../../core/utils/event"
-import { lazyBox } from "../../../../core/utils/lazy-box"
 
 type Props = {
   file: IOrdoFile

@@ -1,4 +1,14 @@
-import { OrdoExtensionType } from "@ordo-pink/common-types"
+import {
+  createExtensionPersistedState,
+  isActivityExtension,
+  OrdoExtension,
+  OrdoExtensionName,
+  OrdoExtensionType,
+} from "@ordo-pink/extensions"
+import { useKeycloak } from "@ordo-pink/keycloak"
+import Features from "@ordo-pink/ordo-activity-features"
+import Home from "@ordo-pink/ordo-activity-home"
+import Pricing from "@ordo-pink/ordo-activity-pricing"
 import { combineReducers, Reducer } from "@reduxjs/toolkit"
 import { MouseEvent, useEffect, useState } from "react"
 import { Helmet } from "react-helmet"
@@ -10,9 +20,6 @@ import CalendarExtension from "../../activities/calendar"
 import EditorExtension from "../../activities/editor"
 // import ExtensionStoreExtension from "../../activities/extension-store"
 import { EditorActivityState } from "../../activities/editor/types"
-import Features from "../../activities/features"
-import Home from "../../activities/home"
-import Pricing from "../../activities/pricing"
 import SettingsExtension from "../../activities/settings"
 import UserExtension from "../../activities/user"
 
@@ -28,9 +35,6 @@ import { useI18n } from "../../containers/app/hooks/use-i18n"
 import { useSystemCommands } from "../../containers/app/hooks/use-system-commands/use-system-commands"
 import { gotDirectory, registerExtensions } from "../../containers/app/store"
 
-import { useKeycloak } from "../../core/auth/hooks/use-keycloak"
-import { createExtensionPersistedState } from "../../core/extensions/create-extension-metadata"
-import { isActivityExtension } from "../../core/guards/is-extension"
 import { useActionContext } from "../../core/hooks/use-action-context"
 import { useCommandIconButton } from "../../core/hooks/use-command-icon-button"
 import { router } from "../../core/router"
@@ -38,7 +42,6 @@ import { reducer, store } from "../../core/state"
 import { useAppDispatch } from "../../core/state/hooks/use-app-dispatch"
 import { useAppSelector } from "../../core/state/hooks/use-app-selector"
 import { useExtensionSelector } from "../../core/state/hooks/use-extension-selector"
-import { OrdoExtension, OrdoExtensionName } from "../../core/types"
 
 import AutolinkPlugin from "../../editor-plugins/autolink"
 import HighlightCodePlugin from "../../editor-plugins/highlight-code"
@@ -88,7 +91,9 @@ export default function App() {
   const editorSelector = useExtensionSelector<EditorActivityState>()
 
   // const [accelerators, setAccelerators] = useState<Record<string, UnaryFn<ActionContext, void>>>({})
-  const [extensions, setExtensions] = useState<OrdoExtension<string, OrdoExtensionType>[]>([])
+  const [extensions, setExtensions] = useState<
+    OrdoExtension<string, OrdoExtensionType, Record<string, unknown>, Record<string, unknown>>[]
+  >([])
   const currentFile = editorSelector((state) => state?.["ordo-activity-editor"]?.currentFile)
 
   const handleContextMenu = (event: MouseEvent) => {
@@ -114,9 +119,11 @@ export default function App() {
     if (isAuthenticated) {
       dispatch(gotDirectory("/"))
 
-      setExtensions(loggedInExtensions)
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      setExtensions(loggedInExtensions as any[])
     } else {
-      setExtensions(loggedOutExtensions)
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      setExtensions(loggedOutExtensions as any[])
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isAuthenticated])
@@ -151,10 +158,11 @@ export default function App() {
         if (activityExists) return
 
         // Register paths in the router to make activities available
-        const Element = extension.Component
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const Element: any = extension.Component
 
         const persistedStore = createExtensionPersistedState(
-          extension.name as OrdoExtensionName,
+          extension.name as OrdoExtensionName<string, OrdoExtensionType>,
           extension.persistedState,
         )
 

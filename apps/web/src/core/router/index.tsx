@@ -1,6 +1,6 @@
+import { Loading } from "@ordo-pink/react-components"
 import { createBrowserRouter } from "react-router-dom"
 import App from "../../containers/app"
-import Loading from "../components/loading"
 
 export const router = createBrowserRouter([
   {

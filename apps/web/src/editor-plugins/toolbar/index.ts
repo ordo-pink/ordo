@@ -1,6 +1,6 @@
+import { createEditorPluginExtension } from "@ordo-pink/extensions"
 import ToolbarPlugin from "./components"
-import { createEditorPluginExtension } from "../../core/extensions/create-editor-plugin"
 
 export default createEditorPluginExtension("toolbar", {
-  plugins: [ToolbarPlugin],
+  editorPlugins: [ToolbarPlugin],
 })

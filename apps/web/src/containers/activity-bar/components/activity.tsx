@@ -1,19 +1,23 @@
+import {
+  OrdoActivityExtension,
+  getExtensionReadableName,
+  getActivityRoute,
+} from "@ordo-pink/extensions"
 import { useTranslation } from "react-i18next"
 import { NavLink } from "react-router-dom"
-import { getExtensionReadableName, getActivityRoute } from "../../../core/extensions/utils"
-import { OrdoActivityExtension } from "../../../core/types"
 
 import "./activity.css"
 
 type Props = {
-  activity: OrdoActivityExtension<string>
+  activity: OrdoActivityExtension<string, Record<string, unknown>, Record<string, unknown>>
 }
 
 export default function ActivityBarActivity({ activity }: Props) {
   const activityName = getExtensionReadableName(activity)
   const activityRoute = getActivityRoute(activity)
   const Icon = activity.Icon
-  const Component = activity.Component
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const Component = activity.Component as any
 
   const handleMouseOver = () => {
     Component.preload()

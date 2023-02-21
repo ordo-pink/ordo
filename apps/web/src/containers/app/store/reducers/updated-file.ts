@@ -1,8 +1,8 @@
 import { Either } from "@ordo-pink/either"
+import { noOp } from "@ordo-pink/fns"
 import { IOrdoFileRaw } from "@ordo-pink/fs-entity"
 import { CaseReducer, PayloadAction } from "@reduxjs/toolkit"
 import { getFile } from "./common"
-import { noOp } from "../../../../core/utils/no-op"
 import { AppState } from "../../types"
 
 export const updatedFileReducer: CaseReducer<AppState, PayloadAction<IOrdoFileRaw>> = (

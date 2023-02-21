@@ -1,4 +1,5 @@
 import { Either } from "@ordo-pink/either"
+import { noOp } from "@ordo-pink/fns"
 import {
   IOrdoFileRaw,
   OrdoFilePath,
@@ -17,7 +18,6 @@ import { registeredExtensionsReducer } from "./reducers/registered-extensions"
 import { rejectedReducer } from "./reducers/rejected"
 import { updatedFileReducer } from "./reducers/updated-file"
 import { findParent } from "../../../core/utils/fs-helpers"
-import { noOp } from "../../../core/utils/no-op"
 import { AppState, UpdateFilePayload } from "../types"
 
 const initialState: AppState = {

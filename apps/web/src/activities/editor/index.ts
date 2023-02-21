@@ -1,10 +1,9 @@
+import { createActivityExtension } from "@ordo-pink/extensions"
 import { OpenEditorCommand } from "./commands/open-editor"
 import { editorSlice } from "./store"
 import en from "./translations/en.json"
 import ru from "./translations/ru.json"
 import { EditorPersistedState } from "./types"
-import { createActivityExtension } from "../../core/extensions/create-activity-extension"
-import { OrdoExtensionProps } from "../../core/types"
 
 const editor = createActivityExtension("editor", {
   Component: () => import("./components"),
@@ -20,6 +19,7 @@ const editor = createActivityExtension("editor", {
   } as EditorPersistedState,
 })
 
-export type EditorProps = OrdoExtensionProps<typeof editor>
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type EditorProps = any
 
 export default editor

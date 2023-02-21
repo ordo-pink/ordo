@@ -1,5 +1,4 @@
-import { createFileAssociationExtension } from "../../core/extensions/create-file-association-extension"
-import { OrdoFileAssociationProps } from "../../core/types"
+import { createFileAssociationExtension, OrdoFileAssociationProps } from "@ordo-pink/extensions"
 
 const media = createFileAssociationExtension("media", {
   Component: () => import("./components"),

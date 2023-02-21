@@ -1,59 +1,59 @@
-import { lazySwitch, Switch } from './switch';
+import { lazySwitch, Switch } from "./switch"
 
-describe('Switch', () => {
-  it('should apply fall into case if the value matches', () => {
+describe("Switch", () => {
+  it("should apply fall into case if the value matches", () => {
     expect(
       Switch.of(1)
         .case(1, () => true)
-        .default(() => false)
-    ).toEqual(true);
-  });
+        .default(() => false),
+    ).toEqual(true)
+  })
 
-  it('should apply fall into case if the validation succeeded', () => {
+  it("should apply fall into case if the validation succeeded", () => {
     expect(
       Switch.of(1)
         .case(
           (x) => x === 1,
-          () => true
+          () => true,
         )
-        .default(() => false)
-    ).toEqual(true);
-  });
+        .default(() => false),
+    ).toEqual(true)
+  })
 
-  it('should apply fall into default none of the cases succeeded', () => {
+  it("should apply fall into default none of the cases succeeded", () => {
     expect(
       Switch.of(2)
         .case(1, () => false)
         .case(3, () => false)
-        .default(() => true)
-    ).toEqual(true);
-  });
+        .default(() => true),
+    ).toEqual(true)
+  })
 
-  it('should apply the first case where the value matched', () => {
+  it("should apply the first case where the value matched", () => {
     expect(
       Switch.of(1)
         .case(1, () => true)
         .case(1, () => false)
-        .default(() => false)
-    ).toEqual(true);
-  });
-});
+        .default(() => false),
+    ).toEqual(true)
+  })
+})
 
-describe('lazySwitch', () => {
-  it('should allow assigning switch behaviour before the context argument is provided', () => {
+describe("lazySwitch", () => {
+  it("should allow assigning switch behaviour before the context argument is provided", () => {
     const run = lazySwitch<number>((s) =>
       s
         .case(
           (n) => n > 1,
-          () => true
+          () => true,
         )
         .case(
           (n) => n < 2,
-          () => false
+          () => false,
         )
-        .default(() => null)
-    );
+        .default(() => null),
+    )
 
-    expect(run(1.5)).toEqual(true);
-  });
-});
+    expect(run(1.5)).toEqual(true)
+  })
+})

@@ -8,14 +8,14 @@ export const Switch: ISwitchStatic = {
 }
 
 const swichMatched = <TContext, TResult extends unknown[] = []>(
-  x: TContext
+  x: TContext,
 ): ISwitch<TContext, TResult> => ({
   case: () => swichMatched(x),
   default: () => (x as ThunkFn<Unpack<TResult>>)(),
 })
 
 const swich = <TContext, TResult extends unknown[] = []>(
-  x: TContext
+  x: TContext,
 ): ISwitch<TContext, TResult> => ({
   case: (predicate, onTrue) => {
     const isTrue = isFunction(predicate) ? predicate(x) : predicate === x

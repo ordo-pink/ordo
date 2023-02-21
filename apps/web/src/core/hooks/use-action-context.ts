@@ -1,7 +1,7 @@
+import { useKeycloak } from "@ordo-pink/keycloak"
 import { useTranslation } from "react-i18next"
 import { useNavigate } from "react-router-dom"
 import { useEnv } from "./use-env"
-import { useKeycloak } from "../auth/hooks/use-keycloak"
 import { useAppDispatch } from "../state/hooks/use-app-dispatch"
 import { useRootState } from "../state/hooks/use-root-state"
 import { ActionContext } from "../types"

@@ -1,5 +1,5 @@
+import { createOrdoCommand } from "@ordo-pink/extensions"
 import { OrdoDirectory } from "@ordo-pink/fs-entity"
-import { createOrdoCommand } from "../../../core/extensions/create-ordo-command"
 import { showDeleteDirectoryModal } from "../store"
 
 export const DeleteDirectoryCommand = createOrdoCommand<"ordo-command-file-system">({

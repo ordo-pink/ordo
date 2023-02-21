@@ -1,19 +1,21 @@
 import { Either } from "@ordo-pink/either"
+import { lazyBox, stopPropagation, preventDefault } from "@ordo-pink/fns"
 import { OrdoFilePath, OrdoDirectory, OrdoFile, OrdoDirectoryPath } from "@ordo-pink/fs-entity"
+import {
+  Null,
+  OrdoButtonPrimary,
+  OrdoButtonSecondary,
+  PathBreadcrumbs,
+} from "@ordo-pink/react-components"
 import { ChangeEvent, MouseEvent, useEffect, useState } from "react"
 import { useTranslation } from "react-i18next"
 import { BsFileEarmarkPlus, BsFolderPlus } from "react-icons/bs"
 import { useModal } from "../../../containers/app/hooks/use-modal"
 import { createFile, createdDirectory } from "../../../containers/app/store"
-import { OrdoButtonSecondary, OrdoButtonPrimary } from "../../../core/components/buttons"
-import Null from "../../../core/components/null"
-import PathBreadcrumbs from "../../../core/components/path-breadcrumbs"
 import { OrdoFSEntity } from "../../../core/constants/ordo-fs-entity"
 import { useAppDispatch } from "../../../core/state/hooks/use-app-dispatch"
 import { useAppSelector } from "../../../core/state/hooks/use-app-selector"
 import { useExtensionSelector } from "../../../core/state/hooks/use-extension-selector"
-import { stopPropagation, preventDefault } from "../../../core/utils/event"
-import { lazyBox } from "../../../core/utils/lazy-box"
 import { hideCreateModal } from "../store"
 import { FileSystemExtensionStore } from "../types"
 

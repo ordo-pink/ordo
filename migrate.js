@@ -20,7 +20,7 @@ execSync("rm -rf node_modules")
 execSync(`mkdir ${repo}`)
 execSync(`mv * ${repo}`)
 execSync("rm -rf node_modules")
+console.log(`npm i && git merge ${branch} --allow-unrelated-histories`)
+console.log(`rm -rf ${repo} && git add . && git commit`)
+console.log(`git branch -D ${branch} && git remote remove ${origin} && git push origin merge-repos`)
 execSync(`git commit -m ":truck: Move in ${repo}"`)
-// execSync(`git checkout merge-repos`);
-
-// console.log(`npm i && git merge ${branch}`);

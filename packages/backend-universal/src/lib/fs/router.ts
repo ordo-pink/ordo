@@ -40,10 +40,10 @@ import { OrdoFileModel } from "./models/file"
 import { OrdoInternalModel } from "../internal/models/internal-model"
 import { CreateOrdoBackendServerParams } from "../types"
 
-const filesRouter = ({ fsDriver, authorise: authorize, logger }: CreateOrdoBackendServerParams) => {
+const filesRouter = ({ fsDriver, authorise, logger, limits }: CreateOrdoBackendServerParams) => {
   const file = OrdoFileModel.of(fsDriver)
   const directory = OrdoDirectoryModel.of(fsDriver)
-  const internal = OrdoInternalModel.of(fsDriver)
+  const internal = OrdoInternalModel.of(fsDriver, limits)
 
   const env = { file, directory, logger, internal }
 
@@ -52,7 +52,7 @@ const filesRouter = ({ fsDriver, authorise: authorize, logger }: CreateOrdoBacke
       `/:${USER_ID_PARAM}/:${PATH_PARAM}*`,
 
       appendLogger(logger),
-      authorize,
+      authorise,
       compareTokens(env),
       extractDynamicParam([PATH_PARAM]),
       prependPathSlash,
@@ -65,7 +65,7 @@ const filesRouter = ({ fsDriver, authorise: authorize, logger }: CreateOrdoBacke
       `/:${USER_ID_PARAM}/:${PATH_PARAM}*`,
 
       appendLogger(logger),
-      authorize,
+      authorise,
       compareTokens(env),
       extractDynamicParam([PATH_PARAM]),
       prependPathSlash,
@@ -78,7 +78,7 @@ const filesRouter = ({ fsDriver, authorise: authorize, logger }: CreateOrdoBacke
       `/:${USER_ID_PARAM}/:${PATH_PARAM}*`,
 
       appendLogger(logger),
-      authorize,
+      authorise,
       compareTokens(env),
       extractDynamicParam([PATH_PARAM]),
       prependPathSlash,
@@ -91,7 +91,7 @@ const filesRouter = ({ fsDriver, authorise: authorize, logger }: CreateOrdoBacke
       `/:${USER_ID_PARAM}/:${OLD_PATH_PARAM}*${PATH_SEPARATOR}/:${NEW_PATH_PARAM}*`,
 
       appendLogger(logger),
-      authorize,
+      authorise,
       compareTokens(env),
       extractDynamicParam([OLD_PATH_PARAM, NEW_PATH_PARAM]),
       prependOldPathAndNewPathSlashes,
@@ -103,7 +103,7 @@ const filesRouter = ({ fsDriver, authorise: authorize, logger }: CreateOrdoBacke
       `/:${USER_ID_PARAM}/:${PATH_PARAM}*`,
 
       appendLogger(logger),
-      authorize,
+      authorise,
       compareTokens(env),
       extractDynamicParam([PATH_PARAM]),
       prependPathSlash,
@@ -115,12 +115,13 @@ const filesRouter = ({ fsDriver, authorise: authorize, logger }: CreateOrdoBacke
 
 const directoriesRouter = ({
   fsDriver,
-  authorise: authorize,
+  authorise,
   logger,
+  limits,
 }: CreateOrdoBackendServerParams) => {
   const file = OrdoFileModel.of(fsDriver)
   const directory = OrdoDirectoryModel.of(fsDriver)
-  const internal = OrdoInternalModel.of(fsDriver)
+  const internal = OrdoInternalModel.of(fsDriver, limits)
 
   const env = { file, directory, logger, internal }
 
@@ -129,7 +130,7 @@ const directoriesRouter = ({
       `/:${USER_ID_PARAM}/:${PATH_PARAM}*`,
 
       appendLogger(logger),
-      authorize,
+      authorise,
       compareTokens(env),
       extractDynamicParam([PATH_PARAM]),
       appendTrailingDirectoryPathSlash,
@@ -141,7 +142,7 @@ const directoriesRouter = ({
       `/:${USER_ID_PARAM}/`,
 
       appendLogger(logger),
-      authorize,
+      authorise,
       compareTokens(env),
       setRootPathParam,
       appendTrailingDirectoryPathSlash,
@@ -153,7 +154,7 @@ const directoriesRouter = ({
       `/:${USER_ID_PARAM}/:${PATH_PARAM}*`,
 
       appendLogger(logger),
-      authorize,
+      authorise,
       compareTokens(env),
       extractDynamicParam([PATH_PARAM]),
       appendTrailingDirectoryPathSlash,
@@ -165,7 +166,7 @@ const directoriesRouter = ({
       `/:${USER_ID_PARAM}/:${OLD_PATH_PARAM}*${PATH_SEPARATOR}/:${NEW_PATH_PARAM}*`,
 
       appendLogger(logger),
-      authorize,
+      authorise,
       compareTokens(env),
       extractDynamicParam([OLD_PATH_PARAM, NEW_PATH_PARAM]),
       appendTrailingDirectoryOldPathAndNewPathSlashes,
@@ -177,7 +178,7 @@ const directoriesRouter = ({
       `/:${USER_ID_PARAM}/:${PATH_PARAM}*`,
 
       appendLogger(logger),
-      authorize,
+      authorise,
       compareTokens(env),
       extractDynamicParam([PATH_PARAM]),
       appendTrailingDirectoryPathSlash,

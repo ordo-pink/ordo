@@ -15,10 +15,11 @@ export const ExtensionsRouter = ({
   fsDriver,
   authorise,
   logger,
+  limits,
 }: CreateOrdoBackendServerParams) => {
   const file = OrdoFileModel.of(fsDriver)
   const directory = OrdoDirectoryModel.of(fsDriver)
-  const internal = OrdoInternalModel.of(fsDriver)
+  const internal = OrdoInternalModel.of(fsDriver, limits)
 
   const env = { file, directory, logger, internal }
 

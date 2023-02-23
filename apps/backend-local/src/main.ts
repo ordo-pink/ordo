@@ -14,6 +14,11 @@ const root = join(__dirname, "..", "..", "..", "..", "ordo-backend-local-assets"
 
 const PORT = process.env.VITE_BACKEND_LOCAL_PORT
 const TOKEN = process.env.VITE_BACKEND_LOCAL_TOKEN
+const MAX_UPLOAD_SIZE = process.env.VITE_FREE_UPLOAD_SIZE
+const MAX_TOTAL_SIZE = process.env.VITE_FREE_SPACE_LIMIT
+
+const maxUploadSize = Number(MAX_UPLOAD_SIZE)
+const maxTotalSize = Number(MAX_TOTAL_SIZE)
 
 if (!existsSync(root)) mkdirSync(root, { recursive: true })
 
@@ -22,6 +27,7 @@ const server = createOrdoBackendServer({
   authorise: createAuthorisationStub(TOKEN),
   prependMiddleware: (app) => app.use(morgan("dev")),
   logger: ConsoleLogger,
+  limits: { maxTotalSize, maxUploadSize },
 })
 
 server.listen(PORT, () => ConsoleLogger.info(`🚀 Listening on port ${PORT}`))

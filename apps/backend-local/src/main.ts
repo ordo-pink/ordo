@@ -15,9 +15,7 @@ const root = join(__dirname, "..", "..", "..", "..", "ordo-backend-local-assets"
 const PORT = process.env.VITE_BACKEND_LOCAL_PORT
 const TOKEN = process.env.VITE_BACKEND_LOCAL_TOKEN
 
-const assetsPath = join(root, TOKEN)
-
-if (!existsSync(assetsPath)) mkdirSync(assetsPath, { recursive: true })
+if (!existsSync(root)) mkdirSync(root, { recursive: true })
 
 const server = createOrdoBackendServer({
   fsDriver: createFSDriver(root),

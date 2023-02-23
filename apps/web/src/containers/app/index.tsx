@@ -138,6 +138,9 @@ export default function App() {
 
       action && action(actionContext)
     },
+    {
+      enableOnContentEditable: true,
+    },
     [accelerators],
   )
 

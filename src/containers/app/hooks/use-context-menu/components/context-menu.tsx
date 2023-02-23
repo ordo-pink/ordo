@@ -14,6 +14,7 @@ import { lazyBox } from "$core/utils/lazy-box"
 
 import "$containers/app/hooks/use-context-menu/index.css"
 
+
 export default function ContextMenu() {
   const dispatch = useAppDispatch()
 
@@ -27,6 +28,7 @@ export default function ContextMenu() {
   const contextMenuContainer = useRef<HTMLDivElement>(null)
 
   const [commandList, setCommandList] = useState(structure.children)
+
   const [containerSize, setContainerSize] = useState<{ width: number; height: number } | undefined>(
     undefined,
   )

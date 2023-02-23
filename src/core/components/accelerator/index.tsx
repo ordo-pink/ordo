@@ -1,4 +1,7 @@
-import { Switch } from "@ordo-pink/switch"
+import { AiOutlineEnter } from "react-icons/ai"
+import { BsBackspace } from "react-icons/bs"
+
+import { Switch } from "$core/utils/switch"
 import { AiOutlineEnter } from "react-icons/ai"
 import { BsBackspace } from "react-icons/bs"
 

@@ -25,8 +25,7 @@ jobs:
         run: npm ci
 
       - name: Publish to GHP
-        run:
-          npx nx run-many --target=publish --args="--ver=${GITHUB_REF_NAME} --tag=latest"
+        run: npx nx run-many --target=publish --args="--ver=${GITHUB_REF_NAME} --tag=latest"
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GHP_TOKEN }}
 
@@ -52,7 +51,6 @@ jobs:
         run: npm ci
 
       - name: Publish to NPM
-        run:
-          npx nx run-many --target=publish --args="--ver=${GITHUB_REF_NAME} --tag=latest"
+        run: npx nx run-many --target=publish --args="--ver=${GITHUB_REF_NAME} --tag=latest"
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

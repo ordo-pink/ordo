@@ -43,7 +43,10 @@ export default function Directory({ directory }: Props) {
   const Chevron = isExpanded ? BsChevronDown : BsChevronUp
 
   useEffect(() => {
-    persistedStore.get("expandedDirectories").then((dirs) => setExpandedDirectories(dirs ?? []))
+    persistedStore
+      .get("expandedDirectories")
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      .then((dirs: any) => setExpandedDirectories(dirs ?? []))
   }, [persistedStore])
 
   useEffect(() => {
@@ -58,7 +61,8 @@ export default function Directory({ directory }: Props) {
         setIsExpanded((value) => !value)
 
         if (!isExpanded) {
-          persistedStore.get("expandedDirectories").then((expanded) => {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          persistedStore.get("expandedDirectories").then((expanded: any) => {
             if (!expanded || expanded.includes(directory.path)) return
 
             persistedStore
@@ -66,7 +70,8 @@ export default function Directory({ directory }: Props) {
               .then(() => persistedStore.getState())
           })
         } else {
-          persistedStore.get("expandedDirectories").then((expanded) => {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          persistedStore.get("expandedDirectories").then((expanded: any) => {
             if (!expanded || !expanded.includes(directory.path)) return
 
             const expandedCopy = [...expanded]

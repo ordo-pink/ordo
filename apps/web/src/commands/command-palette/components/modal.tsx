@@ -1,4 +1,5 @@
 import { Either } from "@ordo-pink/either"
+import { OrdoCommand } from "@ordo-pink/extensions"
 import { lazyBox, preventDefault, stopPropagation, noOp } from "@ordo-pink/fns"
 import { Null } from "@ordo-pink/react"
 import { Switch } from "@ordo-pink/switch"
@@ -17,7 +18,6 @@ import { useActionContext } from "../../../core/hooks/use-action-context"
 import { useAppDispatch } from "../../../core/state/hooks/use-app-dispatch"
 import { useAppSelector } from "../../../core/state/hooks/use-app-selector"
 import { useExtensionSelector } from "../../../core/state/hooks/use-extension-selector"
-import { OrdoCommand } from "../../../core/types"
 
 import "../index.css"
 

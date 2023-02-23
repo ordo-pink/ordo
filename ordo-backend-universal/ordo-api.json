@@ -1,0 +1,340 @@
+{
+	"info": {
+		"_postman_id": "807b4149-ba43-41b3-be9d-4f203bb9a193",
+		"name": "Ordo API",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Files",
+			"item": [
+				{
+					"name": "Create / Upload",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "# This is an MD file!\r\n",
+							"options": {
+								"raw": {
+									"language": "text"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:{{PORT}}/fs/files/{{USER_ID}}/test.md",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "{{PORT}}",
+							"path": [
+								"fs",
+								"files",
+								"{{USER_ID}}",
+								"test.md"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:{{PORT}}/fs/files/{{USER_ID}}/test.md",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "{{PORT}}",
+							"path": [
+								"fs",
+								"files",
+								"{{USER_ID}}",
+								"test.md"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:{{PORT}}/fs/files/{{USER_ID}}/test.md",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "{{PORT}}",
+							"path": [
+								"fs",
+								"files",
+								"{{USER_ID}}",
+								"test.md"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Move / Rename",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:{{PORT}}/fs/files/{{USER_ID}}/test.md->/5245/2134523/412/341231/231/2312/3123/test.md",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "{{PORT}}",
+							"path": [
+								"fs",
+								"files",
+								"{{USER_ID}}",
+								"test.md->",
+								"5245",
+								"2134523",
+								"412",
+								"341231",
+								"231",
+								"2312",
+								"3123",
+								"test.md"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Remove Permanently",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:{{PORT}}/fs/files/{{USER_ID}}/test.md",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "{{PORT}}",
+							"path": [
+								"fs",
+								"files",
+								"{{USER_ID}}",
+								"test.md"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"auth": {
+				"type": "noauth"
+			},
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				}
+			]
+		},
+		{
+			"name": "Directories",
+			"item": [
+				{
+					"name": "Create",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:{{PORT}}/fs/directories/{{USER_ID}}/1/2/3/4/5/6/7",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "{{PORT}}",
+							"path": [
+								"fs",
+								"directories",
+								"{{USER_ID}}",
+								"1",
+								"2",
+								"3",
+								"4",
+								"5",
+								"6",
+								"7"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:{{PORT}}/fs/directories/{{USER_ID}}/test1/",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "{{PORT}}",
+							"path": [
+								"fs",
+								"directories",
+								"{{USER_ID}}",
+								"test1",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Move / Rename",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:{{PORT}}/fs/directories/{{USER_ID}}/1/2/5/->/1/2/3/",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "{{PORT}}",
+							"path": [
+								"fs",
+								"directories",
+								"{{USER_ID}}",
+								"1",
+								"2",
+								"5",
+								"->",
+								"1",
+								"2",
+								"3",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Remove Permanently",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:{{PORT}}/fs/directories/{{USER_ID}}/5245",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "{{PORT}}",
+							"path": [
+								"fs",
+								"directories",
+								"{{USER_ID}}",
+								"5245"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"auth": {
+				"type": "noauth"
+			},
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				}
+			]
+		}
+	],
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "{{AUTH_TOKEN}}",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "PORT",
+			"value": "5000"
+		},
+		{
+			"key": "AUTH_TOKEN",
+			"value": "WHOA_SO_SAFE!",
+			"type": "default"
+		},
+		{
+			"key": "USER_ID",
+			"value": "123123",
+			"type": "default"
+		}
+	]
+}

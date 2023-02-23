@@ -1,0 +1,14 @@
+{
+  "@ordo-command-file-system/readable-name": "Действия с файловой системой",
+  "@ordo-command-file-system/create-file": "Создать файл",
+  "@ordo-command-file-system/create-directory": "Создать папку",
+  "@ordo-command-file-system/placeholder": "Название",
+  "@ordo-command-file-system/button-ok": "ОК",
+  "@ordo-command-file-system/button-cancel": "Отмена",
+  "@ordo-command-file-system/description": "TODO",
+  "@ordo-command-file-system/delete-file": "Удалить файл",
+  "@ordo-command-file-system/delete-directory": "Удалить папку",
+  "@ordo-command-file-system/delete-confirmation": "Вы уверены, что хотите удалить \"{{path}}\"?",
+  "@ordo-command-file-system/download-file": "Скачать файл",
+  "@ordo-command-file-system/invalid-path": "Путь содержит запрещенные символы."
+}

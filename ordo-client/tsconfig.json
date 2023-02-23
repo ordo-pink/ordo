@@ -1,0 +1,36 @@
+{
+  "compilerOptions": {
+    "lib": ["DOM", "DOM.Iterable", "ESNext"],
+    "module": "ESNext",
+    "jsx": "react-jsx",
+    "target": "ESNext",
+    "jsxImportSource": "react",
+    "allowJs": true,
+    "skipLibCheck": true,
+    "esModuleInterop": true,
+    "strict": true,
+    "allowSyntheticDefaultImports": true,
+    "strictBindCallApply": true,
+    "strictFunctionTypes": true,
+    "strictNullChecks": true,
+    "strictPropertyInitialization": true,
+    "alwaysStrict": true,
+    "sourceMap": true,
+    "baseUrl": ".",
+    "outDir": "dist",
+    "moduleResolution": "node",
+    "resolveJsonModule": true,
+    "paths": {
+      "$assets/*": ["src/assets/*"],
+      "$containers/*": ["src/containers/*"],
+      "$activities/*": ["src/activities/*"],
+      "$commands/*": ["src/commands/*"],
+      "$file-associations/*": ["src/file-associations/*"],
+      "$editor-plugins/*": ["src/editor-plugins/*"],
+      "$core/*": ["src/core/*"],
+      "*": ["node_modules/*"]
+    }
+  },
+  "include": ["src/**/*", "react-app-env.d.ts", "window.d.ts", "src/setupTests.ts"],
+  "exclude": ["**/*.test.ts"]
+}

@@ -1,0 +1,31 @@
+.editor {
+  @apply w-full h-full flex justify-center;
+}
+
+.editor_not-selected {
+  @apply h-full w-full flex items-center justify-center;
+}
+
+.editor_not-supported {
+  @apply h-full w-full flex flex-col items-center justify-center;
+}
+
+.editor_not-supported_link {
+  @apply underline hover:text-purple-600 hover:dark:text-purple-400 transition-colors duration-300;
+}
+
+.file-explorer {
+  @apply h-full flex flex-col justify-between p-2;
+}
+
+.file-explorer_files-container {
+  @apply h-full grow overflow-y-scroll;
+}
+
+.file-explorer_action-group {
+  @apply flex items-center justify-around p-1 rounded-md text-sm;
+}
+
+.file-explorer_action-group_action {
+  @apply flex items-center md:space-x-2;
+}

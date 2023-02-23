@@ -1,0 +1,15 @@
+.open-file_overlay {
+  @apply h-full flex items-start justify-center;
+}
+
+.open-file_modal {
+  @apply bg-neutral-100 dark:bg-neutral-700 shadow-xl rounded-md w-full max-w-2xl p-8 flex flex-col space-y-4 items-center;
+}
+
+.open-file_modal_input {
+  @apply w-full outline-none bg-white dark:bg-neutral-600 px-4 py-2;
+}
+
+.open-file_modal_command-container {
+  @apply w-full;
+}

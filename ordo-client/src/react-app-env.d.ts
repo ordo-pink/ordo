@@ -1,0 +1,7 @@
+declare module "*.png"
+declare module "*.svg"
+declare module "*.jpeg"
+declare module "*.jpg"
+declare module "draft-js-prism-plugin"
+declare module "draft-js-modifiers"
+declare module "@daypilot/daypilot-lite-react"

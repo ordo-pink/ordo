@@ -69,7 +69,17 @@ window.ordo = {
         }
       }
 
-      return fetch(url, params)
+      return fetch(url, params).catch(async (error) => {
+        if (error.status === 403) {
+          await keycloak.updateToken(600).catch(() => {
+            keycloak.logout({ redirectUri: "/home" })
+          })
+
+          return fetch(url, params)
+        }
+
+        return Promise.reject()
+      })
     },
     openExternal: (url) => {
       window.open(url, "_blank")

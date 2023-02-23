@@ -1,5 +1,5 @@
 import {
-  createExtensionPersistedState,
+  createExtensionPersistedStore,
   isActivityExtension,
   OrdoExtension,
   OrdoExtensionName,
@@ -161,7 +161,7 @@ export default function App() {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const Element: any = extension.Component
 
-        const persistedStore = createExtensionPersistedState(
+        const persistedStore = createExtensionPersistedStore(
           extension.name as OrdoExtensionName<string, OrdoExtensionType>,
           extension.persistedState,
         )

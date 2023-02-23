@@ -178,19 +178,11 @@ window.ordo = {
       },
     },
     extensions: {
-      create: ({ name, content }) =>
+      get: ({ name, defaults }) =>
         window.ordo.env
           .fetch(`${host}/internal/extensions/${keycloak.tokenParsed?.sub}/${name}`, {
             method: "POST",
-            body: JSON.stringify(content),
-            headers: {
-              [AUTHORIZATION_HEADER_KEY]: `Bearer ${LOCAL_TOKEN ?? keycloak.token}`,
-            },
-          })
-          .then((res) => res.json()),
-      get: (name) =>
-        window.ordo.env
-          .fetch(`${host}/internal/extensions/${keycloak.tokenParsed?.sub}/${name}`, {
+            body: JSON.stringify(defaults),
             headers: {
               [AUTHORIZATION_HEADER_KEY]: `Bearer ${LOCAL_TOKEN ?? keycloak.token}`,
             },

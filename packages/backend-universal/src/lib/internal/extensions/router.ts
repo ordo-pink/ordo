@@ -1,5 +1,4 @@
 import { Router } from "express"
-import { createExtensionFileHandler } from "./handlers/create"
 import { getExtensionFileHandler } from "./handlers/get"
 import { removeExtensionFileHandler } from "./handlers/remove"
 import { updateExtensionFileHandler } from "./handlers/update"
@@ -25,14 +24,6 @@ export const ExtensionsRouter = ({
 
   return Router()
     .post(
-      `/:${USER_ID_PARAM}/:extension`,
-
-      appendLogger(logger),
-      authorise,
-      compareTokensStrict,
-      createExtensionFileHandler(env),
-    )
-    .get(
       `/:${USER_ID_PARAM}/:extension`,
 
       appendLogger(logger),

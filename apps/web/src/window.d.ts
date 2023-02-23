@@ -44,9 +44,7 @@ declare global {
         }
         extensions: {
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          get: UnaryFn<OrdoExtensionName, Promise<any>>
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          create: UnaryFn<{ name: OrdoExtensionName; content?: any }, Promise<IOrdoFileRaw>>
+          get: UnaryFn<{ name: OrdoExtensionName; defaults: any }, Promise<any>>
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           update: UnaryFn<{ name: OrdoExtensionName; content: any }, Promise<IOrdoFileRaw>>
           remove: UnaryFn<OrdoExtensionName, Promise<IOrdoFileRaw>>

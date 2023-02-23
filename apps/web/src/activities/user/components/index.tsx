@@ -1,4 +1,4 @@
-import { Fieldset, useWorkspace } from "@ordo-pink/react-components"
+import { Fieldset, useWorkspace } from "@ordo-pink/react"
 import { Helmet } from "react-helmet"
 import { useTranslation } from "react-i18next"
 import DeleteAccountField from "./delete-account-field"

@@ -34,7 +34,7 @@
       "@ordo-pink/ordo-activity-features": ["packages/ordo-activity-features/src/index.ts"],
       "@ordo-pink/ordo-activity-home": ["packages/ordo-activity-home/src/index.ts"],
       "@ordo-pink/ordo-activity-pricing": ["packages/ordo-activity-pricing/src/index.ts"],
-      "@ordo-pink/react-components": ["packages/react-components/src/index.ts"],
+      "@ordo-pink/react": ["packages/react/src/index.ts"],
       "@ordo-pink/switch": ["packages/switch/src/index.ts"]
     },
     "plugins": [

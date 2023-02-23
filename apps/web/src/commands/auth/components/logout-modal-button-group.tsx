@@ -1,6 +1,6 @@
 import { lazyBox } from "@ordo-pink/fns"
 import { useKeycloak } from "@ordo-pink/keycloak"
-import { OrdoButtonSecondary, OrdoButtonPrimary } from "@ordo-pink/react-components"
+import { OrdoButtonSecondary, OrdoButtonPrimary } from "@ordo-pink/react"
 import { useTranslation } from "react-i18next"
 import { hideLogoutModal } from "../../../commands/auth/store"
 import { useAppDispatch } from "../../../core/state/hooks/use-app-dispatch"

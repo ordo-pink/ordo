@@ -1,6 +1,6 @@
 import { Either } from "@ordo-pink/either"
 import { lazyBox, stopPropagation, preventDefault } from "@ordo-pink/fns"
-import { Null } from "@ordo-pink/react-components"
+import { Null } from "@ordo-pink/react"
 import { MouseEvent, useEffect } from "react"
 import { useTranslation } from "react-i18next"
 import LogoutModalButtonGroup from "../../../commands/auth/components/logout-modal-button-group"

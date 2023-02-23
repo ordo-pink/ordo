@@ -1,4 +1,4 @@
-import { OrdoButton } from "@ordo-pink/react-components"
+import { OrdoButton } from "@ordo-pink/react"
 import { render, screen } from "@testing-library/react"
 import "@testing-library/jest-dom"
 

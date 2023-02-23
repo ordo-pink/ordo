@@ -1,5 +1,5 @@
 import { ColourTheme } from "@ordo-pink/common-types"
-import { Fieldset } from "@ordo-pink/react-components"
+import { Fieldset } from "@ordo-pink/react"
 import { ChangeEvent, useContext, useEffect, useState } from "react"
 import { useTranslation } from "react-i18next"
 import { SettingsContext } from "."

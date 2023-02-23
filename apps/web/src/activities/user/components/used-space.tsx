@@ -1,7 +1,7 @@
 import { Nullable } from "@ordo-pink/common-types"
 import { Either } from "@ordo-pink/either"
 import { IOrdoFile, IOrdoDirectory, OrdoDirectory } from "@ordo-pink/fs-entity"
-import { Null } from "@ordo-pink/react-components"
+import { Null } from "@ordo-pink/react"
 import { reduce } from "ramda"
 import { useTranslation } from "react-i18next"
 import { useAppSelector } from "../../../core/state/hooks/use-app-selector"

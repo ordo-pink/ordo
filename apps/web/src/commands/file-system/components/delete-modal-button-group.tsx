@@ -1,7 +1,7 @@
 import { Either } from "@ordo-pink/either"
 import { lazyBox } from "@ordo-pink/fns"
 import { OrdoDirectoryPath, OrdoFilePath, OrdoDirectory } from "@ordo-pink/fs-entity"
-import { OrdoButtonSecondary, OrdoButtonPrimary } from "@ordo-pink/react-components"
+import { OrdoButtonSecondary, OrdoButtonPrimary } from "@ordo-pink/react"
 import { useTranslation } from "react-i18next"
 import { removedFile, removedDirectory } from "../../../containers/app/store"
 import { useAppDispatch } from "../../../core/state/hooks/use-app-dispatch"

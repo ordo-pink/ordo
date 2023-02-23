@@ -1,4 +1,4 @@
-import { useWorkspace } from "@ordo-pink/react-components"
+import { useWorkspace } from "@ordo-pink/react"
 import Helmet from "react-helmet"
 import { useTranslation } from "react-i18next"
 import PricingPlan from "./pricing-plan"

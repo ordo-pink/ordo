@@ -1,6 +1,6 @@
 import { Either } from "@ordo-pink/either"
 import { lazyBox, preventDefault, stopPropagation, noOp } from "@ordo-pink/fns"
-import { Null } from "@ordo-pink/react-components"
+import { Null } from "@ordo-pink/react"
 import { Switch } from "@ordo-pink/switch"
 import Fuse from "fuse.js"
 import { useState, useEffect, ChangeEvent, KeyboardEvent, MouseEvent } from "react"

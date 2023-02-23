@@ -1,7 +1,7 @@
 import { Nullable } from "@ordo-pink/common-types"
 import { Either } from "@ordo-pink/either"
 import { OrdoFile, OrdoFilePath, IOrdoFile } from "@ordo-pink/fs-entity"
-import { useWorkspaceWithSidebar } from "@ordo-pink/react-components"
+import { useWorkspaceWithSidebar } from "@ordo-pink/react"
 import { Switch } from "@ordo-pink/switch"
 import { createContext, FC, useEffect, useState } from "react"
 import { Helmet } from "react-helmet"

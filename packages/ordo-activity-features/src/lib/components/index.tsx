@@ -1,4 +1,4 @@
-import { useWorkspaceWithSidebar } from "@ordo-pink/react-components"
+import { useWorkspaceWithSidebar } from "@ordo-pink/react"
 import { Switch } from "@ordo-pink/switch"
 import Helmet from "react-helmet"
 import { useTranslation } from "react-i18next"

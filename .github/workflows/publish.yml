@@ -25,7 +25,7 @@ jobs:
         run: npm ci
 
       - name: Publish to NPM
-        run: npm nx affected --target=publish --args="--ver=$GITHUB_REF_NAME --tag=latest"
+        run: npx nx affected --target=publish --args="--ver=$GITHUB_REF_NAME --tag=latest"
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GHP_TOKEN }}
 

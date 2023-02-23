@@ -26,7 +26,7 @@ jobs:
 
       - name: Publish to NPM
         run:
-          npm nx affected --target=publish --args="--ver=${GITHUB_REF_NAME} --tag=${GITHUB_SHA::6}"
+          npx nx affected --target=publish --args="--ver=${GITHUB_REF_NAME} --tag=${GITHUB_SHA::6}"
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GHP_TOKEN }}
 

@@ -45,11 +45,12 @@ export default function CreateModal() {
 
   useEffect(() => {
     const isDirectory = type === OrdoFSEntity.DIRECTORY
+    const trimmed = newName.trim()
 
     setIsValidPath(
-      newName.length > 1 && isDirectory
-        ? OrdoDirectory.isValidPath(`/${newName}/`)
-        : OrdoFile.isValidPath(`/${newName}`),
+      trimmed.length > 1 && isDirectory
+        ? OrdoDirectory.isValidPath(`/${trimmed}/`)
+        : OrdoFile.isValidPath(`/${trimmed}`),
     )
   }, [newName, translatedError, type])
 
@@ -85,8 +86,8 @@ export default function CreateModal() {
       .map(() =>
         Either.fromBoolean(type === OrdoFSEntity.DIRECTORY)
           .bimap(
-            () => `${root?.path ?? "/"}${newName}` as OrdoFilePath,
-            () => `${root?.path ?? "/"}${newName}/` as OrdoDirectoryPath,
+            () => `${root?.path ?? "/"}${newName.trim()}` as OrdoFilePath,
+            () => `${root?.path ?? "/"}${newName.trim()}/` as OrdoDirectoryPath,
           )
           .leftMap((path) =>
             OrdoFile.getFileExtension(path) ? path : (`${path}.md` as OrdoFilePath),

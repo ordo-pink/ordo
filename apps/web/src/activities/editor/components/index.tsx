@@ -12,6 +12,7 @@ import FileExplorer from "./file-explorer"
 import FileNotSelected from "./file-not-selected"
 import FileNotSupported from "./file-not-supported"
 import { EditorProps } from ".."
+import { createFile } from "../../../containers/app/store"
 import { useCurrentFileAssociation } from "../../../core/hooks/use-current-file-association"
 import { useAppDispatch } from "../../../core/state/hooks/use-app-dispatch"
 import { useAppSelector } from "../../../core/state/hooks/use-app-selector"
@@ -32,6 +33,11 @@ export default function Editor(props: EditorProps) {
   const Workspace = useWorkspaceWithSidebar()
   const association = useCurrentFileAssociation()
 
+  const translatedTitle = t("@ordo-activity-editor/title")
+  const translatedSaving = t("@ordo-activity-editor/saving")
+  const translatedInitialFile = t("@ordo-activity-editor/initial-file")
+  const translatedInitialFileName = t("@ordo-activity-editor/initial-file-name")
+
   const [Component, setComponent] = useState<Nullable<FC<Record<string, unknown>>>>(null)
 
   const editorSelector = useExtensionSelector<EditorActivityState>()
@@ -47,7 +53,16 @@ export default function Editor(props: EditorProps) {
     if (!queryPath) {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       props.persistedStore.get("recentFiles").then((recentFiles: any) => {
-        if (!recentFiles || !recentFiles[0]) return
+        if (!recentFiles || (!recentFiles[0] && !tree?.children.length)) {
+          dispatch(
+            createFile({
+              path: `/${translatedInitialFileName}.md`,
+              content: translatedInitialFile,
+            }),
+          )
+
+          recentFiles = [`/${translatedInitialFileName}.md`]
+        }
 
         const path = recentFiles[0]
 
@@ -119,9 +134,6 @@ export default function Editor(props: EditorProps) {
     })
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentFile, tree])
-
-  const translatedTitle = t("@ordo-activity-editor/title")
-  const translatedSaving = t("@ordo-activity-editor/saving")
 
   return (
     <EditorContext.Provider value={props}>

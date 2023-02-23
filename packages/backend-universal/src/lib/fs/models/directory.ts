@@ -51,7 +51,9 @@ export const OrdoDirectoryModel = {
             : Promise.reject(ExceptionResponse.BAD_REQUEST),
         )
         .then(driver.checkDirectoryExists)
-        .then((exists) => (path === "/" ? Promise.reject(ExceptionResponse.CONFLICT) : exists))
+        .then((exists) =>
+          /^\/[a-z0-9-]+\/$/i.test(path) ? Promise.reject(ExceptionResponse.CONFLICT) : exists,
+        )
         .then((exists) => (exists ? path : Promise.reject(ExceptionResponse.NOT_FOUND)))
         .then(() => OrdoDirectory.raw({ path, children: [] }))
         .then(async (directory) => {
@@ -68,7 +70,7 @@ export const OrdoDirectoryModel = {
         )
         .then((path) => driver.checkDirectoryExists(path))
         .then(async (exists) => {
-          if (/\/[a-z0-9-]+\//i.test(path) && !exists) {
+          if (/^\/[a-z0-9-]+\/$/i.test(path) && !exists) {
             await driver.createDirectory(path)
 
             return true

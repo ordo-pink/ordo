@@ -1,10 +1,10 @@
-import { OrdoExtensionMetadata, OrdoExtensionName } from "$core/types"
+import { OrdoExtensionPersistedStore, OrdoExtensionName } from "$core/types"
 
 const extensionMetadata = <T extends Record<string, unknown>>(
   name: OrdoExtensionName,
-  metadata: T,
-): OrdoExtensionMetadata<T> => {
-  let store = { ...metadata }
+  persistedState: T,
+): OrdoExtensionPersistedStore<T> => {
+  let store = { ...persistedState }
 
   return {
     init: async () => {
@@ -15,7 +15,7 @@ const extensionMetadata = <T extends Record<string, unknown>>(
       } catch (e) {
         await window.ordo.api.extensions.create({
           name,
-          content: metadata,
+          content: persistedState,
         })
         const json = await window.ordo.api.extensions.get(name)
 
@@ -33,17 +33,17 @@ const extensionMetadata = <T extends Record<string, unknown>>(
         store = {} as T
       })
     },
-    getDefaults: () => Promise.resolve(metadata),
+    getDefaults: () => Promise.resolve(persistedState),
     getState: () => Promise.resolve(store),
     resetDefaults: async () => {
-      store = { ...metadata }
+      store = { ...persistedState }
 
       await window.ordo.api.extensions.update({ name, content: store })
     },
   }
 }
 
-export const createExtensionMetadata = <T extends Record<string, unknown>>(
+export const createExtensionPersistedState = <T extends Record<string, unknown>>(
   name: OrdoExtensionName,
   defaultMetadata?: T,
 ) => (defaultMetadata ? extensionMetadata(name, defaultMetadata) : undefined)

@@ -1,100 +1,97 @@
-import { Nullable, OrdoFile, OrdoFilePath } from "@ordo-pink/core"
+import { IOrdoFile, Nullable, OrdoFile, OrdoFilePath } from "@ordo-pink/core"
 import { Switch } from "@ordo-pink/switch"
-import { createContext, useEffect, useState } from "react"
+import { createContext, FC, useEffect, useState } from "react"
 import { Helmet } from "react-helmet"
 import { useTranslation } from "react-i18next"
 import { AiOutlineLoading } from "react-icons/ai"
 import { createSearchParams, useNavigate, useSearchParams } from "react-router-dom"
 
+import { EditorProps } from ".."
 import { selectFile } from "../store"
 import FileExplorer from "$activities/editor/components/file-explorer"
 import FileNotSelected from "$activities/editor/components/file-not-selected"
 import FileNotSupported from "$activities/editor/components/file-not-supported"
-import { EditorActivityState, EditorMetadata } from "$activities/editor/types"
+import { EditorActivityState } from "$activities/editor/types"
 import { useWorkspaceWithSidebar } from "$containers/workspace/hooks/use-workspace"
 import { useCurrentFileAssociation } from "$core/hooks/use-current-file-association"
 import { useAppDispatch } from "$core/state/hooks/use-app-dispatch"
 import { useAppSelector } from "$core/state/hooks/use-app-selector"
 import { useExtensionSelector } from "$core/state/hooks/use-extension-selector"
-import { OrdoExtensionMetadata, OrdoExtensionProps } from "$core/types"
 import { Either } from "$core/utils/either"
 import { findOrdoFile } from "$core/utils/fs-helpers"
 
 import "$activities/editor/index.css"
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const EditorMetadataContext = createContext<OrdoExtensionMetadata<EditorMetadata>>({} as any)
+export const EditorContext = createContext({} as EditorProps)
 
-export default function Editor({ metadata }: OrdoExtensionProps<EditorMetadata>) {
-  const [path, setPath] = useState<Nullable<OrdoFilePath>>(null)
-
-  const dispatch = useAppDispatch()
-
-  const [query] = useSearchParams()
+export default function Editor(props: EditorProps) {
+  const { t } = useTranslation()
   const navigate = useNavigate()
+  const [query] = useSearchParams()
+  const dispatch = useAppDispatch()
+  const Workspace = useWorkspaceWithSidebar()
+  const association = useCurrentFileAssociation()
+
+  const [Component, setComponent] = useState<Nullable<FC<Record<string, unknown>>>>(null)
 
   const editorSelector = useExtensionSelector<EditorActivityState>()
 
-  const tree = useAppSelector((state) => state.app.personalProject)
   const isSaving = useAppSelector((state) => state.app.isSaving)
+  const tree = useAppSelector((state) => state.app.personalProject)
+  const fileAssociations = useAppSelector((state) => state.app.fileAssociationExtensions)
   const currentFile = editorSelector((state) => state["ordo-activity-editor"].currentFile)
 
-  const association = useCurrentFileAssociation()
-
-  const Workspace = useWorkspaceWithSidebar()
-
-  const fileAssociations = useAppSelector((state) => state.app.fileAssociationExtensions)
-
   useEffect(() => {
-    setPath((query.get("path") as OrdoFilePath) ?? null)
-  }, [query])
+    const queryPath = query.get("path")
 
-  useEffect(() => {
-    if (!path) return
+    if (!queryPath && !currentFile) {
+      props.persistedStore.get("recentFiles").then((recentFiles) => {
+        if (!recentFiles || !recentFiles[0]) return
 
-    const file = findOrdoFile(path, tree)
+        const path = recentFiles[0]
 
-    if (!file) return
+        const extension = OrdoFile.getFileExtension(path)
 
-    dispatch(selectFile(file))
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [path, tree])
-
-  useEffect(() => {
-    if (!path) {
-      metadata.get("recentFiles").then((files) => {
-        if (!files || !files[0]) return
-
-        const path = files[0]
-
-        const fileExtension = OrdoFile.from({ path, size: 0 }).extension
-
-        const association = fileAssociations.find((assoc) =>
-          assoc.fileExtensions.includes(fileExtension),
+        const pathAssociation = fileAssociations.find((assoc) =>
+          assoc.fileExtensions.includes(extension),
         )
+        const association = pathAssociation ? pathAssociation.name : "unsupported"
 
-        const searchParams = createSearchParams({
-          association: association ? association.name : "unsupported",
-          path,
-        })
+        const searchParams = createSearchParams({ path, association })
 
-        navigate({
+        return navigate({
           pathname: "/editor",
           search: searchParams.toString(),
         })
       })
     }
-  }, [metadata, association, navigate, path, fileAssociations])
+
+    if (!OrdoFile.isValidPath(queryPath)) {
+      return navigate("/editor")
+    }
+
+    const file = findOrdoFile(queryPath, tree)
+
+    if (file) {
+      dispatch(selectFile(file))
+
+      setComponent(
+        Either.fromNullable(association).fold(
+          () => () => FileNotSupported,
+          ({ Component }) =>
+            () =>
+              Component as FC,
+        ),
+      )
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentFile, query, tree, fileAssociations])
 
   useEffect(() => {
-    if (!path || !tree || !dispatch) return
+    if (!currentFile || !tree || !dispatch) return
 
-    const file = findOrdoFile(path, tree)
-
-    if (!file) return
-
-    metadata.get("recentFiles").then((recent) => {
-      Switch.of(file.path)
+    props.persistedStore.get("recentFiles").then((recent) => {
+      Switch.of(currentFile.path)
         .case(
           (path) => !recent || recent.indexOf(path) === 0,
           () => void 0,
@@ -104,28 +101,25 @@ export default function Editor({ metadata }: OrdoExtensionProps<EditorMetadata>)
           () => {
             const recentCopy = [...(recent as OrdoFilePath[])]
 
-            recentCopy.splice(recentCopy.indexOf(file.path), 1)
-            metadata.set("recentFiles", [file.path].concat(recentCopy))
+            recentCopy.splice(recentCopy.indexOf(currentFile.path), 1)
+            props.persistedStore.set("recentFiles", [currentFile.path].concat(recentCopy))
           },
         )
         .default(() => {
-          metadata.set("recentFiles", [file.path].concat(recent as OrdoFilePath[]))
+          props.persistedStore.set(
+            "recentFiles",
+            [currentFile.path].concat(recent as OrdoFilePath[]),
+          )
         })
     })
-  }, [path, tree, metadata, dispatch])
-
-  const Component = Either.fromNullable(association).fold(
-    () => FileNotSupported,
-    ({ Component }) => Component,
-  )
-
-  const { t } = useTranslation()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentFile, tree])
 
   const translatedTitle = t("@ordo-activity-editor/title")
   const translatedSaving = t("@ordo-activity-editor/saving")
 
   return (
-    <EditorMetadataContext.Provider value={metadata}>
+    <EditorContext.Provider value={props}>
       <Workspace sidebarChildren={<FileExplorer />}>
         <Helmet>
           <title>
@@ -135,14 +129,16 @@ export default function Editor({ metadata }: OrdoExtensionProps<EditorMetadata>)
         </Helmet>
 
         <div className="editor">
-          {Either.fromBoolean(Boolean(path)).fold(
-            () => (
-              <FileNotSelected />
-            ),
-            () => (
-              <Component />
-            ),
-          )}
+          {Either.fromNullable(currentFile)
+            .chain(() => Either.fromNullable(Component))
+            .fold(
+              () => (
+                <FileNotSelected />
+              ),
+              (Component) => (
+                <Component file={currentFile as IOrdoFile} />
+              ),
+            )}
         </div>
 
         <div
@@ -154,6 +150,6 @@ export default function Editor({ metadata }: OrdoExtensionProps<EditorMetadata>)
           <div>{translatedSaving}</div>
         </div>
       </Workspace>
-    </EditorMetadataContext.Provider>
+    </EditorContext.Provider>
   )
 }

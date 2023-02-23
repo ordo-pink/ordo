@@ -29,7 +29,7 @@ import { useSystemCommands } from "$containers/app/hooks/use-system-commands/use
 import { gotDirectory, registerExtensions } from "$containers/app/store"
 
 import { useKeycloak } from "$core/auth/hooks/use-keycloak"
-import { createExtensionMetadata } from "$core/extensions/create-extension-metadata"
+import { createExtensionPersistedState } from "$core/extensions/create-extension-metadata"
 import { isActivityExtension } from "$core/guards/is-extension"
 import { useActionContext } from "$core/hooks/use-action-context"
 import { useCommandIconButton } from "$core/hooks/use-command-icon-button"
@@ -40,7 +40,9 @@ import { useAppSelector } from "$core/state/hooks/use-app-selector"
 import { useExtensionSelector } from "$core/state/hooks/use-extension-selector"
 import { OrdoExtension, OrdoExtensionName } from "$core/types"
 
-import MarkdownShortcuts from "$editor-plugins/markdown-shortcuts"
+import AutolinkPlugin from "$editor-plugins/autolink"
+import HighlightCodePlugin from "$editor-plugins/highlight-code"
+import ToolbarPlugin from "$editor-plugins/toolbar"
 
 import ImgFileExtension from "$file-associations/img"
 import MdFileExtension from "$file-associations/md"
@@ -62,10 +64,12 @@ const loggedInExtensions = [
   OpenFile,
   UserSupportCommands,
   AuthCommands,
-  MarkdownShortcuts,
   ImgFileExtension,
   PDFFileExtension,
   MediaEditor,
+  ToolbarPlugin,
+  HighlightCodePlugin,
+  AutolinkPlugin,
 ]
 
 const loggedOutExtensions = [
@@ -74,8 +78,10 @@ const loggedOutExtensions = [
   Home,
   Features,
   Pricing,
-  MarkdownShortcuts,
   UserSupportCommands,
+  ToolbarPlugin,
+  HighlightCodePlugin,
+  AutolinkPlugin,
 ]
 
 export default function App() {
@@ -151,16 +157,22 @@ export default function App() {
         const Element = extension.Component
 
         for (const path of extension.routes) {
-          const metadata = createExtensionMetadata(
+          const persistedStore = createExtensionPersistedState(
             extension.name as OrdoExtensionName,
-            extension.metadata,
+            extension.persistedState,
           )
 
-          if (metadata) {
-            metadata.init().then(() => {
+          if (persistedStore) {
+            persistedStore.init().then(() => {
               router.routes[0].children?.unshift({
                 path,
-                element: <Element metadata={metadata} />,
+                element: (
+                  <Element
+                    persistedStore={persistedStore}
+                    selector={() => null} // TODO
+                    translate={() => null} // TODO
+                  />
+                ),
                 hasErrorBoundary: false,
                 id: extension.name,
               } as RouteObject)
@@ -173,7 +185,13 @@ export default function App() {
           } else {
             router.routes[0].children?.unshift({
               path,
-              element: <Element />,
+              element: (
+                <Element
+                  persistedStore={null} // TODO
+                  selector={() => null} // TODO
+                  translate={() => null} // TODO
+                />
+              ),
               hasErrorBoundary: false,
               id: extension.name,
             } as RouteObject)

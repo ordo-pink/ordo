@@ -1,24 +1,32 @@
 import { Language } from "@ordo-pink/core"
-import { ChangeEvent, useEffect, useState } from "react"
+import { ChangeEvent, useContext, useEffect, useState } from "react"
 import { useTranslation } from "react-i18next"
 
+import { SettingsContext } from "."
 import { useI18n } from "$containers/app/hooks/use-i18n"
 import Fieldset from "$core/components/fieldset"
 
 export default function LanguageField() {
   const i18n = useI18n()
+  const { t } = useTranslation()
+  const { persistedStore } = useContext(SettingsContext)
 
-  const [language, setLanguage] = useState(Language.ENGLISH)
+  const [language, setLanguage] = useState<Language>(Language.ENGLISH)
 
   useEffect(() => {
-    setLanguage(i18n.language as Language)
-  }, [i18n, i18n?.language])
+    persistedStore.get("language").then((language) => {
+      setLanguage(language)
+      i18n.changeLanguage(language)
+    })
+  }, [persistedStore, i18n])
 
   const handleChange = (event: ChangeEvent<HTMLSelectElement>) => {
-    i18n.changeLanguage(event.target.value)
-  }
+    const language = event.target.value as Language
 
-  const { t } = useTranslation()
+    persistedStore.set("language", language)
+    setLanguage(language)
+    i18n.changeLanguage(language)
+  }
 
   const translatedLanguage = t("@ordo-activity-settings/language")
   const translatedRussianLanguage = t("@ordo-activity-settings/rus-language")
@@ -27,10 +35,10 @@ export default function LanguageField() {
   return (
     <Fieldset>
       <div className="text-lg">{translatedLanguage}</div>
+
       <select
-        onChange={handleChange}
         className="px-4 py-1 rounded-lg border-0 bg-neutral-200 dark:bg-neutral-500"
-        name="select"
+        onChange={handleChange}
         value={language}
       >
         <option value={Language.ENGLISH}>{translatedEnglishLanguage}</option>

@@ -31,7 +31,7 @@ export default function ActivityBarActivity({ activity }: Props) {
     <NavLink
       title={translatedTitle}
       onMouseOver={handleMouseOver}
-      className="!text-neutral-700 dark:!text-neutral-300 hover:!text-purple-600 dark:hover:!text-purple-400 transition-all duration-300 p-2 text-xl rounded-lg activity-bar_activity"
+      className="!text-neutral-700 dark:!text-neutral-300 hover:!text-purple-600 dark:hover:!text-purple-400 transition-all duration-300 p-2 text-2xl md:text-xl rounded-lg activity-bar_activity"
       to={activityRoute}
     >
       <Icon />

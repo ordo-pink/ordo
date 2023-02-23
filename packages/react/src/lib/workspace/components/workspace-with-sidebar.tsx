@@ -4,6 +4,8 @@ import Sidebar from "./sidebar"
 import Workspace from ".."
 import { useWindowSize } from "../../use-window-size"
 
+import "./workspace-with-sidebar.css"
+
 type Props = {
   sidebarChildren: PropsWithChildren["children"]
 }
@@ -40,7 +42,7 @@ export default function WorkspaceWithSidebar({
       sizes={sizes}
       snapOffset={isNarrow ? width / 2 : 200}
       minSize={0}
-      className="flex w-screen h-screen"
+      className="workspace-wrapper"
       direction="horizontal"
       onDrag={() => {
         setSnapLeft(true)

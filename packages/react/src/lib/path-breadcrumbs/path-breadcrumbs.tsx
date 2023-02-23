@@ -1,6 +1,8 @@
 import { Nullable } from "@ordo-pink/common-types"
 import { PathBreadcrumbsItem } from "./path-breadcrumbs-item"
 
+import "./path-breadcrumbs-item.css"
+
 type Props = {
   path: Nullable<string>
 }
@@ -13,7 +15,7 @@ export const PathBreadcrumbs = ({ path }: Props) => {
   const chunks = pathWithoutLastSlash.split("/").filter(Boolean)
 
   return (
-    <div className="self-start flex flex-wrap text-neutral-500 text-xs">
+    <div className="path-breadcrumbs">
       <PathBreadcrumbsItem chunk="/" />
 
       {chunks.map((chunk, index) => (

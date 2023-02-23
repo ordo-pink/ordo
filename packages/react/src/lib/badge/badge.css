@@ -1,0 +1,3 @@
+.badge {
+  @apply px-1 py-0.5 text-xs uppercase rounded-sm;
+}

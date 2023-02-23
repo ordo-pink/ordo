@@ -10,9 +10,8 @@ type Props = PropsWithChildren<{
 export default function Sidebar({ children, onClick }: Props) {
   return (
     <div
+      className="sidebar"
       onClick={onClick}
-      role="none"
-      className="h-full min-h-screen bg-neutral-100 dark:bg-neutral-800 z-40 pb-11"
     >
       {children}
     </div>

@@ -5,6 +5,8 @@ import { PropsWithChildren, useRef } from "react"
 import { useHotkeys } from "react-hotkeys-hook"
 import { Accelerator } from "../accelerator/accelerator"
 
+import "./buttons.css"
+
 type Props = PropsWithChildren<{
   onClick: ThunkFn<void>
   onMouseOver?: ThunkFn<void>
@@ -41,14 +43,14 @@ export const OrdoButton = ({
       onClick={onClick}
       onMouseOver={onMouseOver}
       onFocus={onMouseOver}
-      className={`text-sm px-6 py-2 rounded-md shrink-0 ${outline ? "border-2" : ""} ${className}`}
+      className={`button ${outline ? "button-outline" : ""} ${className}`}
       disabled={disabled}
     >
-      <div className={`flex items-center space-x-2 ${center ? "justify-center" : ""}`}>
+      <div className={`button-content ${center ? "button-content-center" : ""}`}>
         <div className="shrink-0">{children}</div>
 
-        {hotkey && !disabled ? (
-          <div className="shrink-0 hidden md:block text-xs border border-neutral-400 dark:border-neutral-300 rounded-md px-1 py-0.5">
+        {hotkey ? (
+          <div className={`button-accelerator ${!disabled && "visible"}`}>
             <Accelerator accelerator={hotkey} />
           </div>
         ) : null}
@@ -71,17 +73,14 @@ export const OrdoButtonPrimary = ({
   let buttonClassNames: string
 
   if (disabled) {
-    buttonClassNames =
-      "bg-gradient-to-br from-slate-300 via-zinc-300 to-stone-300 dark:from-slate-900 dark:via-zinc-900 dark:to-stone-900"
+    buttonClassNames = "button-primary-disabled"
   } else if (inverted) {
-    buttonClassNames =
-      "bg-gradient-to-br from-purple-600 via-violet-600 to-purple-600 active-ring text-neutral-200"
+    buttonClassNames = "button-primary-inverted"
   } else {
-    buttonClassNames =
-      "bg-gradient-to-br from-sky-200 dark:from-purple-600 via-violet-200 dark:via-violet-600 to-purple-200 dark:to-purple-600 active-ring"
+    buttonClassNames = ""
   }
 
-  const classNames = `${buttonClassNames} ${className}`
+  const classNames = `button-primary ${buttonClassNames} ${className}`
 
   return (
     <OrdoButton
@@ -105,15 +104,21 @@ export const OrdoButtonSecondary = ({
   onMouseOver,
   hotkey,
   disabled,
+  inverted,
   outline,
   center,
 }: Props) => {
-  const buttonAppearanceClass = Either.fromBoolean(!!disabled).fold(
-    () => "text-neutral-600 dark:text-neutral-300 passive-ring",
-    () => "text-neutral-600 dark:text-neutral-300",
-  )
+  let buttonClassNames: string
 
-  const buttonClass = `${buttonAppearanceClass} ${className}`
+  if (disabled) {
+    buttonClassNames = "button-secondary-disabled"
+  } else if (inverted) {
+    buttonClassNames = "button-secondary-inverted"
+  } else {
+    buttonClassNames = ""
+  }
+
+  const buttonClass = `button-secondary ${buttonClassNames} ${className}`
 
   return (
     <OrdoButton
@@ -171,9 +176,20 @@ export const OrdoButtonNeutral = ({
   onMouseOver,
   hotkey,
   disabled,
+  inverted,
   outline,
   center,
 }: Props) => {
+  let buttonClassNames: string
+
+  if (disabled) {
+    buttonClassNames = "button-neutral-disabled"
+  } else if (inverted) {
+    buttonClassNames = "button-neutral-inverted"
+  } else {
+    buttonClassNames = ""
+  }
+
   const buttonAppearanceClass = Either.fromBoolean(!!disabled).fold(
     () =>
       "bg-gradient-to-r from-neutral-300 via-stone-300 to-neutral-300 dark:from-neutral-600 dark:via-stone-600 dark:to-neutral-600 active-ring",
@@ -181,7 +197,7 @@ export const OrdoButtonNeutral = ({
       "bg-gradient-to-r from-slate-300 via-zinc-300 to-stone-300 dark:from-slate-900 dark:via-zinc-900 dark:to-stone-900",
   )
 
-  const buttonClass = `${buttonAppearanceClass} ${className}`
+  const buttonClass = `button-neutral ${buttonClassNames} ${className}`
 
   return (
     <OrdoButton

@@ -7,6 +7,8 @@ import {
   PropsWithChildren,
 } from "react"
 
+import "./item.css"
+
 type Props = {
   text: string
   Icon: ComponentType
@@ -37,10 +39,7 @@ export const ActionListItem = ({
   return (
     <div>
       <div
-        className={`py-2 md:py-0.5 hover:bg-gradient-to-r hover:from-neutral-300 hover:dark:from-stone-700 hover:to-slate-300 hover:dark:to-slate-700 rounded-md px-2 flex justify-between items-center cursor-pointer ${
-          isCurrent &&
-          "bg-gradient-to-r from-rose-300 dark:from-violet-700 to-purple-300 dark:to-purple-700"
-        }`}
+        className={`action-list-item ${isCurrent && "active"}`}
         style={style}
         onClick={onClick}
         onMouseEnter={onMouseEnter}

@@ -16,6 +16,8 @@ import { useExtensionSelector } from "../../../core/state/hooks/use-extension-se
 import { hideOpenFile } from "../store"
 import { OpenFileExtensionStore } from "../types"
 
+import "../index.css"
+
 const getFiles = (directory: Nullable<IOrdoDirectory>, files: IOrdoFile[] = []) => {
   if (!directory) return files
 

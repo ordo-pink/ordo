@@ -16,26 +16,30 @@ export default function Settings() {
 
   return (
     <Workspace>
-      <Helmet>
-        <title>
-          {"Ordo.pink | "}
-          {translatedTitle}
-        </title>
-      </Helmet>
+      <div className="w-full flex justify-center mt-20 p-4">
+        <div className="w-full max-w-xl">
+          <Helmet>
+            <title>
+              {"Ordo.pink | "}
+              {translatedTitle}
+            </title>
+          </Helmet>
 
-      <form className="flex flex-col space-y-4">
-        <Fieldset>
-          <div className="w-full">
-            <UsedSpace />
-          </div>
-        </Fieldset>
+          <form className="flex flex-col space-y-4">
+            <Fieldset>
+              <div className="w-full">
+                <UsedSpace />
+              </div>
+            </Fieldset>
 
-        <EmailField />
-        {/* <EmailVerifiedField /> */}
-        <PasswordField />
-        <LogoutField />
-        <DeleteAccountField />
-      </form>
+            <EmailField />
+            {/* <EmailVerifiedField /> */}
+            <PasswordField />
+            <LogoutField />
+            <DeleteAccountField />
+          </form>
+        </div>
+      </div>
     </Workspace>
   )
 }

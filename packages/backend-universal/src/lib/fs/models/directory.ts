@@ -68,8 +68,8 @@ export const OrdoDirectoryModel = {
         )
         .then((path) => driver.checkDirectoryExists(path))
         .then(async (exists) => {
-          if (path === "/" && !exists) {
-            await driver.createDirectory("/")
+          if (/\/[a-z0-9-]+\//i.test(path) && !exists) {
+            await driver.createDirectory(path)
 
             return true
           }

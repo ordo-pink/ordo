@@ -1,7 +1,7 @@
 {
-  "name": "react-components",
+  "name": "react",
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
-  "sourceRoot": "packages/react-components/src",
+  "sourceRoot": "packages/react/src",
   "projectType": "library",
   "tags": [],
   "targets": {
@@ -9,7 +9,7 @@
       "executor": "@nrwl/linter:eslint",
       "outputs": ["{options.outputFile}"],
       "options": {
-        "lintFilePatterns": ["packages/react-components/**/*.{ts,tsx,js,jsx}"]
+        "lintFilePatterns": ["packages/react/**/*.{ts,tsx,js,jsx}"]
       }
     },
     "build": {
@@ -17,7 +17,7 @@
       "outputs": ["{options.outputPath}"],
       "defaultConfiguration": "production",
       "options": {
-        "outputPath": "dist/packages/react-components"
+        "outputPath": "dist/packages/react"
       },
       "configurations": {
         "development": {
@@ -30,10 +30,10 @@
     },
     "test": {
       "executor": "@nrwl/vite:test",
-      "outputs": ["coverage/packages/react-components"],
+      "outputs": ["coverage/packages/react"],
       "options": {
         "passWithNoTests": true,
-        "reportsDirectory": "../../coverage/packages/react-components"
+        "reportsDirectory": "../../coverage/packages/react"
       }
     }
   }

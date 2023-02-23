@@ -44,7 +44,7 @@ export default function Editor(props: EditorProps) {
   useEffect(() => {
     const queryPath = query.get("path")
 
-    if (!queryPath && !currentFile) {
+    if (!queryPath) {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       props.persistedStore.get("recentFiles").then((recentFiles: any) => {
         if (!recentFiles || !recentFiles[0]) return
@@ -87,7 +87,7 @@ export default function Editor(props: EditorProps) {
       )
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentFile, query, tree, fileAssociations])
+  }, [currentFile, query, tree, fileAssociations, props.persistedStore])
 
   useEffect(() => {
     if (!currentFile || !tree || !dispatch) return

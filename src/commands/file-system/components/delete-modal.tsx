@@ -1,3 +1,4 @@
+import { OrdoDirectory } from "@ordo-pink/core"
 import { MouseEvent, useEffect } from "react"
 import { useTranslation } from "react-i18next"
 import { BsFileEarmarkX, BsFolderX } from "react-icons/bs"
@@ -10,14 +11,11 @@ import { useModal } from "$containers/app/hooks/use-modal"
 
 import Null from "$core/components/null"
 import { OrdoFSEntity } from "$core/constants/ordo-fs-entity"
-import { isOrdoDirectory } from "$core/guards/is-fs-entity"
 import { useAppDispatch } from "$core/state/hooks/use-app-dispatch"
 import { useExtensionSelector } from "$core/state/hooks/use-extension-selector"
 import { Either } from "$core/utils/either"
 import { preventDefault, stopPropagation } from "$core/utils/event"
 import { lazyBox } from "$core/utils/lazy-box"
-
-import "$commands/file-system/index.css"
 
 export default function CreateModal() {
   const dispatch = useAppDispatch()
@@ -34,7 +32,7 @@ export default function CreateModal() {
     // eslint-disable-next-line
   }, [isShown])
 
-  const type = isOrdoDirectory(target) ? OrdoFSEntity.DIRECTORY : OrdoFSEntity.FILE
+  const type = OrdoDirectory.isOrdoDirectory(target) ? OrdoFSEntity.DIRECTORY : OrdoFSEntity.FILE
 
   const Icon = type === "file" ? BsFileEarmarkX : BsFolderX
 
@@ -54,15 +52,15 @@ export default function CreateModal() {
     .chain(() => Either.fromNullable(target))
     .fold(Null, (t) => (
       <Modal onHide={handleHide}>
-        <div className="file-system_delete-overlay">
+        <div className="h-full flex items-center justify-center">
           <div
             onClick={handleModalClick}
-            className="file-system_delete-modal"
+            className="bg-neutral-100 dark:bg-neutral-700 shadow-xl rounded-md w-full max-w-lg p-8 flex flex-col space-y-4 items-center"
             role="none"
           >
-            <div className="file-system_delete-modal_title">
+            <div className="flex flex-col items-center space-y-4">
               <Icon className="text-5xl shrink-0" />
-              <div>{translatedTitle}</div>
+              <div className=" break-inside-auto text-center">{translatedTitle}</div>
             </div>
 
             <CreateModalButtonGroup path={t.path} />

@@ -15,10 +15,7 @@ export default function LogoutModalButtonGroup() {
   const handleCancelButtonClick = lazyBox((box) => box.fold(() => dispatch(hideLogoutModal())))
 
   const handleOkButtonClick = lazyBox((box) =>
-    box.fold(() => {
-      window.ordo.env.isAuthenticated = false
-      keycloak.logout()
-    }),
+    box.fold(() => keycloak.logout({ redirectUri: "/home" })),
   )
 
   const { t } = useTranslation()

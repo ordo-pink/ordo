@@ -1,3 +1,4 @@
+import { ThunkFn } from "@ordo-pink/core"
 import { useEffect, useState, useRef, useLayoutEffect } from "react"
 import { useHotkeys } from "react-hotkeys-hook"
 
@@ -7,7 +8,6 @@ import { hideContextMenu } from "$containers/app/hooks/use-context-menu/store"
 import Null from "$core/components/null"
 import { useAppDispatch } from "$core/state/hooks/use-app-dispatch"
 import { useAppSelector } from "$core/state/hooks/use-app-selector"
-import { ThunkFn } from "$core/types"
 import { Either } from "$core/utils/either"
 import { preventDefault, stopPropagation } from "$core/utils/event"
 import { lazyBox } from "$core/utils/lazy-box"
@@ -28,15 +28,19 @@ export default function ContextMenu() {
   const contextMenuContainer = useRef<HTMLDivElement>(null)
 
   const [commandList, setCommandList] = useState(structure.children)
-  const [containerSize, setContainerSize] = useState<{ width: number, height: number} | undefined>(undefined)
 
-  const x = containerSize && window.innerWidth - (mouseX + containerSize.width) < 0 
-    ? mouseX - containerSize.width
-    : mouseX
-  const y = containerSize && window.innerHeight - (mouseY + containerSize.height) < 0 
-    ? mouseY - containerSize.height 
-    : mouseY
-  
+  const [containerSize, setContainerSize] = useState<{ width: number; height: number } | undefined>(
+    undefined,
+  )
+
+  const x =
+    containerSize && window.innerWidth - (mouseX + containerSize.width) < 0
+      ? mouseX - containerSize.width
+      : mouseX
+  const y =
+    containerSize && window.innerHeight - (mouseY + containerSize.height) < 0
+      ? mouseY - containerSize.height
+      : mouseY
 
   useEffect(() => {
     commands.forEach((command) => {
@@ -57,12 +61,12 @@ export default function ContextMenu() {
   }, [commands, target])
 
   useLayoutEffect(() => {
-    if(contextMenuContainer.current) {
+    if (contextMenuContainer.current) {
       setContainerSize(contextMenuContainer?.current?.getBoundingClientRect())
     }
-  // don't trust eslint. it works because this component renders 2 times due to useEffect on 50th line
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  },[contextMenuContainer.current])
+    // don't trust eslint. it works because this component renders 2 times due to useEffect on 50th line
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [contextMenuContainer.current])
 
   const hide = lazyBox<{ preventDefault: ThunkFn<void>; stopPropagation: ThunkFn<void> }>((box) =>
     box

@@ -6,6 +6,7 @@ import { OrdoCommand, OrdoCommandExtension } from "$core/types"
 
 import "$core/hooks/use-command-icon-button/index.css"
 
+// TODO: Refactor
 export const useCommandIconButton = <
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   State extends Record<string, any>,

@@ -1,6 +1,5 @@
+import { ThunkFn, UnaryFn } from "@ordo-pink/core"
 import { tap } from "ramda"
-
-import type { ThunkFn, UnaryFn } from "$core/types"
 
 const unsafeGet = Symbol("EventBoxUnsafeGet")
 
@@ -17,14 +16,14 @@ export interface IBox<T> {
   fold: <NewT>(f: UnaryFn<T, NewT> | ThunkFn<NewT>) => NewT
 }
 
-const eventBox = <T>(x: T): IBox<T> => ({
+const box = <T>(x: T): IBox<T> => ({
   [unsafeGet]: () => x,
   equals: (other) => other[unsafeGet]() === x,
-  map: (f) => eventBox(f(x)),
-  tap: (f) => eventBox(tap(f, x)),
+  map: (f) => box(f(x)),
+  tap: (f) => box(tap(f, x)),
   fold: (f) => f(x),
 })
 
-export const EventBox: IBoxStatic = {
-  of: (x) => eventBox(x),
+export const Box: IBoxStatic = {
+  of: (x) => box(x),
 }

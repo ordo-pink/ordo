@@ -3,6 +3,7 @@
     "lib": ["DOM", "DOM.Iterable", "ESNext"],
     "module": "ESNext",
     "jsx": "react-jsx",
+    "target": "ESNext",
     "jsxImportSource": "react",
     "allowJs": true,
     "skipLibCheck": true,
@@ -25,6 +26,7 @@
       "$activities/*": ["src/activities/*"],
       "$commands/*": ["src/commands/*"],
       "$file-associations/*": ["src/file-associations/*"],
+      "$editor-plugins/*": ["src/editor-plugins/*"],
       "$core/*": ["src/core/*"],
       "*": ["node_modules/*"]
     }

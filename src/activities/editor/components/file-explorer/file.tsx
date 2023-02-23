@@ -1,3 +1,4 @@
+import { IOrdoFile } from "@ordo-pink/core"
 import { MouseEvent } from "react"
 import { BsFileEarmarkBinary } from "react-icons/bs"
 import { createSearchParams, useNavigate, useSearchParams } from "react-router-dom"
@@ -7,12 +8,11 @@ import { useContextMenu } from "$containers/app/hooks/use-context-menu"
 import ActionListItem from "$core/components/action-list/item"
 import { useAppDispatch } from "$core/state/hooks/use-app-dispatch"
 import { useAppSelector } from "$core/state/hooks/use-app-selector"
-import { OrdoFile } from "$core/types"
 import { preventDefault, stopPropagation } from "$core/utils/event"
 import { lazyBox } from "$core/utils/lazy-box"
 
 type Props = {
-  file: OrdoFile
+  file: IOrdoFile
 }
 
 export default function File({ file }: Props) {
@@ -25,18 +25,20 @@ export default function File({ file }: Props) {
 
   const { showContextMenu } = useContextMenu()
 
-  const paddingLeft = `${file.depth * 10}px`
+  const depth = file.path.split("/").filter(Boolean).length
+
+  const paddingLeft = `${depth * 10}px`
   const isCurrent = query.has("path") && query.get("path") === file.path
 
   const association = fileAssociations.find((assoc) =>
     assoc.fileExtensions.includes(file.extension),
   )
+
   const Icon = association && association.Icon ? association.Icon : BsFileEarmarkBinary
 
   const handleClick = lazyBox<MouseEvent>((box) =>
     box
       .tap(preventDefault)
-      .tap(stopPropagation)
       .map(() =>
         createSearchParams({
           association: association ? association.name : "unsupported",

@@ -15,7 +15,7 @@
 }
 
 .file-explorer {
-  @apply h-full flex flex-col justify-between;
+  @apply h-full flex flex-col justify-between p-2;
 }
 
 .file-explorer_files-container {

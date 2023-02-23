@@ -8,5 +8,7 @@
   "@ordo-activity-user/password": "Пароль",
   "@ordo-activity-user/change-password": "Изменить пароль",
   "@ordo-activity-user/email-verified": "Email подтверждён",
-  "@ordo-activity-user/logout": "Выйти из аккаунта"
+  "@ordo-activity-user/logout": "Выйти из аккаунта",
+  "@ordo-activity-user/delete-account": "Удалить аккаунт",
+  "@ordo-activity-user/used-space": "Использованное место"
 }

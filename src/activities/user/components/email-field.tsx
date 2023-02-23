@@ -32,7 +32,7 @@ export default function EmailField() {
   return (
     <Fieldset className="relative">
       <div className="text-lg">{translatedEmail}</div>
-      <div>{actionContext.env.userData?.email}</div>
+      <div>{actionContext.userData?.email}</div>
       <div>
         <OrdoButtonSecondary
           onClick={handleButtonClick}

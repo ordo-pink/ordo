@@ -5,6 +5,7 @@
   "@ordo-activity-editor/unsupported-file": "Sorry, \"{{extension}}\" files are not supported yet. We will soon provide you with access to Ordo Store where you can extend Ordo, including the support for custom files. Stay tuned!",
   "@ordo-activity-editor/search-for-extensions": "There might be an extension to fix that.",
   "@ordo-activity-editor/remove": "Remove",
+  "@ordo-activity-editor/saving": "Saving...",
   "@ordo-activity-editor/create-file": "Create file",
   "@ordo-activity-editor/create-directory": "Create directory",
   "@ordo-activity-editor/create-modal.create-file.placeholder": "File name",

@@ -1,4 +1,11 @@
-import type { OrdoDirectory, OrdoFile, UnaryFn } from "$core/types"
+import type {
+  IOrdoDirectoryRaw,
+  IOrdoFileRaw,
+  OrdoFilePath,
+  OrdoDirectoryPath,
+  UnaryFn,
+} from "@ordo-pink/core"
+import { OrdoExtensionName } from "$core/types"
 
 declare global {
   interface Window {
@@ -7,31 +14,42 @@ declare global {
         type: "electron" | "browser"
         fetch: typeof fetch
         openExternal: UnaryFn<string, void>
-        isAuthenticated?: boolean
-        userData?: {
-          firstName: string
-          lastName: string
-          fullName: string
-          username: string
-          email: string
-          emailVerified: boolean
-        }
       }
       api: {
         fs: {
           files: {
-            get: (path: string) => Promise<string>
-            create: (path: string) => Promise<OrdoFile>
-            move: (oldPath: string, newPath: string) => Promise<OrdoFile | OrdoDirectory>
-            update: (path: string, content: string) => Promise<OrdoFile>
-            remove: (path: string) => Promise<OrdoFile>
+            get: UnaryFn<OrdoFilePath, Promise<string>>
+            getRaw: UnaryFn<OrdoFilePath, ReturnType<typeof fetch>>
+            getBlob: UnaryFn<OrdoFilePath, Promise<Blob>>
+            create: UnaryFn<
+              { path: OrdoFilePath; content?: string },
+              Promise<IOrdoFileRaw | IOrdoDirectoryRaw>
+            >
+            move: UnaryFn<
+              { oldPath: OrdoFilePath; newPath: OrdoFIlePath },
+              Promise<IOrdoFileRaw | IOrdoDirectoryRaw>
+            >
+            update: UnaryFn<{ path: OrdoFilePath; content: string }, Promise<IOrdoFileRaw>>
+            remove: UnaryFn<OrdoFilePath, Promise<IOrdoFileRaw>>
           }
           directories: {
-            get: (path: string) => Promise<OrdoDirectory>
-            create: (path: string) => Promise<OrdoDirectory>
-            move: (oldPath: string, newPath: string) => Promise<OrdoDirectory>
-            remove: (path: string) => Promise<void | OrdoDirectory>
+            get: UnaryFn<OrdoDirectoryPath, Promise<IOrdoDirectoryRaw>>
+            create: UnaryFn<OrdoDirectoryPath, Promise<IOrdoDirectoryRaw>>
+            move: UnaryFn<
+              { oldPath: OrdoDirectoryPath; newPath: OrdoDirectoryPath },
+              Promise<IOrdoDirectoryRaw>
+            >
+            remove: UnaryFn<OrdoDirectoryPath, Promise<IOrdoDirectoryRaw>>
           }
+        }
+        extensions: {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          get: UnaryFn<OrdoExtensionName, Promise<any>>
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          create: UnaryFn<{ name: OrdoExtensionName; content?: any }, Promise<IOrdoFileRaw>>
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          update: UnaryFn<{ name: OrdoExtensionName; content: any }, Promise<IOrdoFileRaw>>
+          remove: UnaryFn<OrdoExtensionName, Promise<IOrdoFileRaw>>
         }
       }
     }

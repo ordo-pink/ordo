@@ -1,7 +1,26 @@
 .workspace {
-  @apply w-full h-full overflow-auto;
+  @apply h-full overflow-auto;
 }
 
 .workspace-sidebar {
-  @apply h-full bg-neutral-200 dark:bg-neutral-800 w-full md:w-1/4 lg:w-1/6;
+  @apply h-full bg-neutral-100 dark:bg-neutral-800 z-40;
+}
+
+.gutter {
+  @apply bg-neutral-100 dark:bg-neutral-800;
+  @apply bg-no-repeat bg-center;
+  @apply z-50;
+}
+
+.gutter.gutter-horizontal {
+  @apply cursor-col-resize;
+  background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAeCAYAAADkftS9AAAAIklEQVQoU2M4c+bMfxAGAgYYmwGrIIiDjrELjpo5aiZeMwF+yNnOs5KSvgAAAABJRU5ErkJggg==");
+}
+
+.unsnapped {
+  @apply opacity-100 transition-opacity duration-300;
+}
+
+.snapped {
+  @apply opacity-0 transition-opacity duration-300;
 }

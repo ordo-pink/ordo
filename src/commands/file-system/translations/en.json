@@ -8,5 +8,7 @@
   "@ordo-command-file-system/description": "TODO",
   "@ordo-command-file-system/delete-file": "Delete file",
   "@ordo-command-file-system/delete-directory": "Delete directory",
-  "@ordo-command-file-system/delete-confirmation": "Are you sure you want to remove \"{{path}}\"?"
+  "@ordo-command-file-system/delete-confirmation": "Are you sure you want to remove \"{{path}}\"?",
+  "@ordo-command-file-system/download-file": "Download file",
+  "@ordo-command-file-system/invalid-path": "Provided path is not valid."
 }

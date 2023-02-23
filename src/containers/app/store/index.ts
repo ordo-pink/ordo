@@ -1,11 +1,25 @@
-import { createSlice, createAsyncThunk } from "@reduxjs/toolkit"
+import {
+  OrdoDirectoryPath,
+  OrdoFilePath,
+  IOrdoFileRaw,
+  OrdoFile,
+  OrdoDirectory,
+} from "@ordo-pink/core"
+import {
+  createSlice,
+  createAsyncThunk,
+  AsyncThunkPayloadCreator,
+  PayloadAction,
+} from "@reduxjs/toolkit"
+import { debounce } from "lodash"
 
-import { createdReducer } from "$containers/app/store/reducers/created"
-import { gotDirectoryReducer } from "$containers/app/store/reducers/got-directory"
 import { registeredExtensionsReducer } from "$containers/app/store/reducers/registered-extensions"
 import { rejectedReducer } from "$containers/app/store/reducers/rejected"
-import { removedReducer } from "$containers/app/store/reducers/removed"
-import { AppState, UpdatedFilePayload } from "$containers/app/types"
+import { updatedFileReducer } from "$containers/app/store/reducers/updated-file"
+import { AppState, UpdateFilePayload } from "$containers/app/types"
+import { Either } from "$core/utils/either"
+import { findParent } from "$core/utils/fs-helpers"
+import { noOp } from "$core/utils/no-op"
 
 const initialState: AppState = {
   personalProject: null,
@@ -13,64 +27,155 @@ const initialState: AppState = {
   activityExtensions: [],
   commandExtensions: [],
   fileAssociationExtensions: [],
-  ismParserExtensions: [],
+  editorPluginExtensions: [],
   commands: [],
   overlays: [],
+  isSaving: false,
 }
 
-export const createdFile = createAsyncThunk("@ordo-app/create-file", (path: string) =>
-  window.ordo.api.fs.files.create(path),
+const updateFileHandler: AsyncThunkPayloadCreator<IOrdoFileRaw, UpdateFilePayload> = async (
+  params,
+  { dispatch },
+) => {
+  const result = await window.ordo.api.fs.files.update(params)
+
+  dispatch(setIsSaving(false))
+
+  return result
+}
+
+const debounceSave = debounce(updateFileHandler, 500, { trailing: true, leading: false })
+
+export const createFile = createAsyncThunk(
+  "@ordo-app/create-file",
+  (params: { path: OrdoFilePath; content?: string }) => window.ordo.api.fs.files.create(params),
 )
 
-export const createdDirectory = createAsyncThunk("@ordo-app/create-directory", (path: string) =>
-  window.ordo.api.fs.directories.create(path),
+export const createdDirectory = createAsyncThunk(
+  "@ordo-app/create-directory",
+  (path: OrdoDirectoryPath) => window.ordo.api.fs.directories.create(path),
 )
 
-export const gotDirectory = createAsyncThunk("@ordo-app/get-directory", (path: string) =>
+export const gotDirectory = createAsyncThunk("@ordo-app/get-directory", (path: OrdoDirectoryPath) =>
   window.ordo.api.fs.directories.get(path),
 )
 
-export const removedFile = createAsyncThunk("@ordo-app/remove-file", (path: string) =>
+export const removedFile = createAsyncThunk("@ordo-app/remove-file", (path: OrdoFilePath) =>
   window.ordo.api.fs.files.remove(path),
 )
 
-export const removedDirectory = createAsyncThunk("@ordo-app/remove-directory", (path: string) =>
-  window.ordo.api.fs.directories.remove(path),
+export const removedDirectory = createAsyncThunk(
+  "@ordo-app/remove-directory",
+  (path: OrdoDirectoryPath) => window.ordo.api.fs.directories.remove(path),
 )
 
 export const updatedFile = createAsyncThunk(
   "@ordo-app/update-file",
-  ({ path, content }: UpdatedFilePayload) => window.ordo.api.fs.files.update(path, content),
+  ({ path, content }: UpdateFilePayload, { dispatch }) => {
+    dispatch(setIsSaving(true))
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    return debounceSave({ path, content }, { dispatch } as any)
+  },
 )
 
 export const appSlice = createSlice({
   name: "@ordo-app",
   initialState,
   reducers: {
-    registeredExtensions: registeredExtensionsReducer,
+    registerExtensions: registeredExtensionsReducer,
+    unregisterExtensions: (state) => {
+      state.activityExtensions = []
+      state.commandExtensions = []
+      state.editorPluginExtensions = []
+      state.fileAssociationExtensions = []
+      state.commands = []
+      state.overlays = []
+    },
     toggleSidebarVisibility: (state) => {
       state.isSidebarVisible = !state.isSidebarVisible
+    },
+    setIsSaving: (state, action: PayloadAction<boolean>) => {
+      state.isSaving = action.payload
     },
   },
   extraReducers: (builder) => {
     builder
-      .addCase(createdFile.fulfilled, createdReducer)
-      .addCase(createdFile.rejected, rejectedReducer)
+      .addCase(createFile.rejected, rejectedReducer)
+      .addCase(createFile.fulfilled, (state, action) =>
+        Either.fromNullable(action.payload)
+          .map((data) =>
+            OrdoDirectory.isOrdoDirectoryRaw(data) ? OrdoDirectory.from(data) : OrdoFile.from(data),
+          )
+          .chain((item) =>
+            Either.fromNullable(findParent(item.path, state.personalProject)).map((parent) => {
+              parent.children.push(item)
+              OrdoDirectory.sort(parent.children)
+            }),
+          )
+          .fold(noOp, noOp),
+      )
 
-      .addCase(createdDirectory.fulfilled, createdReducer)
       .addCase(createdDirectory.rejected, rejectedReducer)
+      .addCase(createdDirectory.fulfilled, (state, { payload }) =>
+        Either.fromNullable(payload)
+          .chain((item) => Either.fromNullable(findParent(item.path, state.personalProject)))
+          .fold(noOp, (parent) => {
+            parent.children.push(OrdoDirectory.from(payload))
+            OrdoDirectory.sort(parent.children)
+          }),
+      )
 
-      .addCase(gotDirectory.fulfilled, gotDirectoryReducer)
       .addCase(gotDirectory.rejected, rejectedReducer)
+      .addCase(gotDirectory.fulfilled, (state, { payload }) =>
+        Either.of(payload)
+          .chain((directory) =>
+            Either.fromBoolean(directory.path !== "/").bimap(
+              () => void (state.personalProject = OrdoDirectory.from(payload)),
+              () => directory,
+            ),
+          )
+          .chain((item) => Either.fromNullable(findParent(item.path, state.personalProject)))
+          .fold(noOp, (parent) => {
+            parent.children.push(OrdoDirectory.from(payload))
+          }),
+      )
 
-      .addCase(removedFile.fulfilled, removedReducer)
       .addCase(removedFile.rejected, rejectedReducer)
+      .addCase(removedFile.fulfilled, (state, { payload }) => {
+        Either.fromNullable(payload)
+          .chain((item) => Either.fromNullable(findParent(item.path, state.personalProject)))
+          .chain((parent) =>
+            Either.of(parent.children.findIndex((child) => child.path === payload.path)).chain(
+              (index) => Either.fromBoolean(index !== -1).map(() => ({ parent, index })),
+            ),
+          )
+          .fold(noOp, ({ parent, index }) => {
+            parent.children.splice(index, 1)
+          })
+      })
 
-      .addCase(removedDirectory.fulfilled, removedReducer)
       .addCase(removedDirectory.rejected, rejectedReducer)
+      .addCase(removedDirectory.fulfilled, (state, { payload }) => {
+        Either.fromNullable(payload)
+          .chain((item) => Either.fromNullable(findParent(item.path, state.personalProject)))
+          .chain((parent) =>
+            Either.of(parent.children.findIndex((child) => child.path === payload.path)).chain(
+              (index) => Either.fromBoolean(index !== -1).map(() => ({ parent, index })),
+            ),
+          )
+          .fold(noOp, ({ parent, index }) => {
+            parent.children.splice(index, 1)
+          })
+      })
+
+      .addCase(updatedFile.rejected, rejectedReducer)
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      .addCase(updatedFile.fulfilled, updatedFileReducer as any)
   },
 })
 
-export const { registeredExtensions, toggleSidebarVisibility } = appSlice.actions
+export const { registerExtensions, toggleSidebarVisibility, unregisterExtensions, setIsSaving } =
+  appSlice.actions
 
 export default appSlice.reducer

@@ -3,6 +3,7 @@ import { MouseEvent, useEffect } from "react"
 import FileOrDirectory from "$activities/editor/components/file-explorer/file-or-directory"
 import { closeFile } from "$activities/editor/store"
 
+import { UsedSpace } from "$activities/user/components/used-space"
 import { useContextMenu } from "$containers/app/hooks/use-context-menu"
 
 import { OrdoButtonNeutral } from "$core/components/buttons"
@@ -72,7 +73,7 @@ export default function FileExplorer() {
           />
         ))}
       </div>
-
+      <UsedSpace />
       <div className="file-explorer_action-group">
         <OrdoButtonNeutral onClick={handleCreateFileClick}>
           <div>

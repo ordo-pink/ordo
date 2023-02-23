@@ -1,12 +1,12 @@
 import Keycloak from "$core/auth"
 
-const HOST = process.env.REACT_APP_FS_API_HOST ?? "http://localhost:5000"
-const FAKE_TOKEN = process.env.REACT_APP_FAKE_TOKEN
+const fsApiHost = process.env.REACT_APP_FS_API_HOST ?? "http://localhost:5000"
+const authApiHost = process.env.REACT_APP_AUTH_API_HOST ?? "https://sso.ordo.pink"
+
+const AUTHORIZATION_HEADER_KEY = "authorization"
 
 const DIRECTORY_API = "fs/directories"
 const FILE_API = "fs/files"
-
-const AUTHORIZATION_HEADER_KEY = "authorization"
 
 const fetch = window.fetch
 
@@ -22,12 +22,8 @@ window.XMLHttpRequest = class extends XMLHttpRequest {
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   open(method: any, url: any, async?: any, username?: any, password?: any): void {
-    if (
-      method !== "POST" ||
-      !url.startsWith("https://sso.ordo.pink") ||
-      !url.endsWith("/protocol/openid-connect/token")
-    ) {
-      throw new Error("Invalid request")
+    if (method !== "POST" || !url.startsWith(authApiHost)) {
+      throw new Error("Disallowed XMLHttpRequest")
     }
 
     super.open(method, url, async, username, password)
@@ -37,7 +33,7 @@ window.XMLHttpRequest = class extends XMLHttpRequest {
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 window.fetch = undefined as any
 
-const host = HOST.endsWith("/") ? HOST.slice(0, -1) : HOST
+const host = fsApiHost.endsWith("/") ? fsApiHost.slice(0, -1) : fsApiHost
 
 window.ordo = {
   env: {
@@ -45,15 +41,15 @@ window.ordo = {
     // TODO: Extend this to support permissions provided by the user
     fetch: (...[url, params]: Parameters<typeof fetch>) => {
       if (typeof url === "string") {
-        if (!url.startsWith(HOST)) {
+        if (!url.startsWith(fsApiHost)) {
           throw new Error("Invalid request")
         }
       } else if (url instanceof URL) {
-        if (url.host !== HOST) {
+        if (url.host !== fsApiHost) {
           throw new Error("Invalid request")
         }
       } else {
-        if (!url.url.startsWith(HOST)) {
+        if (!url.url.startsWith(fsApiHost)) {
           throw new Error("Invalid request")
         }
       }
@@ -67,89 +63,143 @@ window.ordo = {
   api: {
     fs: {
       files: {
-        create: (path) =>
+        create: ({ path, content }) =>
           window.ordo.env
-            .fetch(`${host}/${FILE_API}${path}`, {
+            .fetch(`${host}/${FILE_API}/${Keycloak.tokenParsed?.sub}${path}`, {
               method: "POST",
+              body: content,
               headers: {
-                [AUTHORIZATION_HEADER_KEY]: `Bearer ${FAKE_TOKEN ?? Keycloak.token}`,
+                [AUTHORIZATION_HEADER_KEY]: `Bearer ${Keycloak.token}`,
               },
             })
             .then((res) => res.json()),
         get: (path) =>
           window.ordo.env
-            .fetch(`${host}/${FILE_API}${path}`, {
+            .fetch(`${host}/${FILE_API}/${Keycloak.tokenParsed?.sub}${path}`, {
               headers: {
-                [AUTHORIZATION_HEADER_KEY]: `Bearer ${FAKE_TOKEN ?? Keycloak.token}`,
+                [AUTHORIZATION_HEADER_KEY]: `Bearer ${Keycloak.token}`,
               },
             })
             .then((res) => res.text()),
+        getRaw: (path) =>
+          window.ordo.env.fetch(`${host}/${FILE_API}/${Keycloak.tokenParsed?.sub}${path}`, {
+            headers: {
+              [AUTHORIZATION_HEADER_KEY]: `Bearer ${Keycloak.token}`,
+            },
+          }),
+        getBlob: (path) =>
+          window.ordo.env
+            .fetch(`${host}/${FILE_API}/${Keycloak.tokenParsed?.sub}${path}`, {
+              headers: {
+                [AUTHORIZATION_HEADER_KEY]: `Bearer ${Keycloak.token}`,
+              },
+            })
+            .then((res) => res.blob()),
         remove: (path) =>
           window.ordo.env
-            .fetch(`${host}/${FILE_API}${path}`, {
+            .fetch(`${host}/${FILE_API}/${Keycloak.tokenParsed?.sub}${path}`, {
               method: "DELETE",
               headers: {
-                [AUTHORIZATION_HEADER_KEY]: `Bearer ${FAKE_TOKEN ?? Keycloak.token}`,
+                [AUTHORIZATION_HEADER_KEY]: `Bearer ${Keycloak.token}`,
               },
             })
             .then((res) => res.json()),
-        move: (from, to) =>
+        move: ({ oldPath, newPath }) =>
           window.ordo.env
-            .fetch(`${host}/${FILE_API}${from}->${to}`, {
+            .fetch(`${host}/${FILE_API}/${Keycloak.tokenParsed?.sub}${oldPath}->${newPath}`, {
               method: "PATCH",
               headers: {
-                [AUTHORIZATION_HEADER_KEY]: `Bearer ${FAKE_TOKEN ?? Keycloak.token}`,
+                [AUTHORIZATION_HEADER_KEY]: `Bearer ${Keycloak.token}`,
               },
             })
             .then((res) => res.json()),
-        update: (path, body) =>
+        update: ({ path, content }) =>
           window.ordo.env
-            .fetch(`${host}/${FILE_API}${path}`, {
+            .fetch(`${host}/${FILE_API}/${Keycloak.tokenParsed?.sub}${path}`, {
               method: "PUT",
               headers: {
-                [AUTHORIZATION_HEADER_KEY]: `Bearer ${FAKE_TOKEN ?? Keycloak.token}`,
+                [AUTHORIZATION_HEADER_KEY]: `Bearer ${Keycloak.token}`,
               },
-              body,
+              body: content,
             })
             .then((res) => res.json()),
       },
       directories: {
         create: (path) =>
           window.ordo.env
-            .fetch(`${host}/${DIRECTORY_API}${path}`, {
+            .fetch(`${host}/${DIRECTORY_API}/${Keycloak.tokenParsed?.sub}${path}`, {
               method: "POST",
               headers: {
-                [AUTHORIZATION_HEADER_KEY]: `Bearer ${FAKE_TOKEN ?? Keycloak.token}`,
+                [AUTHORIZATION_HEADER_KEY]: `Bearer ${Keycloak.token}`,
               },
             })
             .then((res) => res.json()),
         get: (path) =>
           window.ordo.env
-            .fetch(`${host}/${DIRECTORY_API}${path}`, {
+            .fetch(`${host}/${DIRECTORY_API}/${Keycloak.tokenParsed?.sub}${path}`, {
               headers: {
-                [AUTHORIZATION_HEADER_KEY]: `Bearer ${FAKE_TOKEN ?? Keycloak.token}`,
+                [AUTHORIZATION_HEADER_KEY]: `Bearer ${Keycloak.token}`,
               },
             })
             .then((res) => res.json()),
         remove: (path) =>
           window.ordo.env
-            .fetch(`${host}/${DIRECTORY_API}${path}`, {
+            .fetch(`${host}/${DIRECTORY_API}/${Keycloak.tokenParsed?.sub}${path}`, {
               method: "DELETE",
               headers: {
-                [AUTHORIZATION_HEADER_KEY]: `Bearer ${FAKE_TOKEN ?? Keycloak.token}`,
+                [AUTHORIZATION_HEADER_KEY]: `Bearer ${Keycloak.token}`,
               },
             })
             .then((res) => res.json()),
-        move: (from, to) =>
+        move: ({ oldPath, newPath }) =>
           window.ordo.env
-            .fetch(`${host}/${DIRECTORY_API}${from}->${to}`, {
+            .fetch(`${host}/${DIRECTORY_API}/${Keycloak.tokenParsed?.sub}${oldPath}->${newPath}`, {
               method: "PATCH",
               headers: {
-                [AUTHORIZATION_HEADER_KEY]: `Bearer ${FAKE_TOKEN ?? Keycloak.token}`,
+                [AUTHORIZATION_HEADER_KEY]: `Bearer ${Keycloak.token}`,
               },
             })
             .then((res) => res.json()),
       },
+    },
+    extensions: {
+      create: ({ name, content }) =>
+        window.ordo.env
+          .fetch(`${host}/extensions/${Keycloak.tokenParsed?.sub}/${name}`, {
+            method: "POST",
+            body: JSON.stringify(content),
+            headers: {
+              [AUTHORIZATION_HEADER_KEY]: `Bearer ${Keycloak.token}`,
+            },
+          })
+          .then((res) => res.json()),
+      get: (name) =>
+        window.ordo.env
+          .fetch(`${host}/extensions/${Keycloak.tokenParsed?.sub}/${name}`, {
+            headers: {
+              [AUTHORIZATION_HEADER_KEY]: `Bearer ${Keycloak.token}`,
+            },
+          })
+          .then((res) => res.json()),
+      remove: (name) =>
+        window.ordo.env
+          .fetch(`${host}/extensions/${Keycloak.tokenParsed?.sub}/${name}`, {
+            method: "DELETE",
+            headers: {
+              [AUTHORIZATION_HEADER_KEY]: `Bearer ${Keycloak.token}`,
+            },
+          })
+          .then((res) => res.json()),
+      update: ({ name, content }) =>
+        window.ordo.env
+          .fetch(`${host}/extensions/${Keycloak.tokenParsed?.sub}/${name}`, {
+            method: "PUT",
+            headers: {
+              [AUTHORIZATION_HEADER_KEY]: `Bearer ${Keycloak.token}`,
+            },
+            body: JSON.stringify(content),
+          })
+          .then((res) => res.json()),
     },
   },
 }

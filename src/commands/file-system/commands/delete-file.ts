@@ -1,9 +1,9 @@
+import { OrdoDirectory, OrdoFile } from "@ordo-pink/core"
 import type EditorExtension from "$activities/editor"
 
 import { showDeleteFileModal } from "$commands/file-system/store"
 
 import { createOrdoCommand } from "$core/extensions/create-ordo-command"
-import { isOrdoFile, isOrdoDirectory } from "$core/guards/is-fs-entity"
 import { ActionContext } from "$core/types"
 
 export const DeleteFileCommand = createOrdoCommand<"ordo-command-file-system">({
@@ -13,9 +13,9 @@ export const DeleteFileCommand = createOrdoCommand<"ordo-command-file-system">({
   showInCommandPalette: ({ state }: ActionContext<typeof EditorExtension>) => {
     return Boolean(state["ordo-activity-editor"].currentFile)
   },
-  showInContextMenu: isOrdoFile,
+  showInContextMenu: OrdoFile.isOrdoFile,
   action: ({ dispatch, contextMenuTarget, state }: ActionContext<typeof EditorExtension>) => {
-    if (contextMenuTarget && !isOrdoDirectory(contextMenuTarget)) {
+    if (contextMenuTarget && !OrdoDirectory.isOrdoDirectory(contextMenuTarget)) {
       return void dispatch(showDeleteFileModal(contextMenuTarget))
     }
 

@@ -1,25 +1,35 @@
+import { OrdoExtensionType } from "@ordo-pink/core"
 import { combineReducers, Reducer } from "@reduxjs/toolkit"
 import { MouseEvent, useEffect, useState } from "react"
+import { Helmet } from "react-helmet"
 import { useHotkeys } from "react-hotkeys-hook"
 import { Outlet, RouteObject, useLocation, useNavigate } from "react-router-dom"
 
 // import AllActivitiesExtension from "$activities/all-activities"
+import CalendarExtension from "$activities/calendar"
 import EditorExtension from "$activities/editor"
 // import ExtensionStoreExtension from "$activities/extension-store"
-// import SettingsExtension from "$activities/settings"
-import { EditorExtensionStore } from "$activities/editor/types"
+import { EditorActivityState } from "$activities/editor/types"
+import Features from "$activities/features"
+import Home from "$activities/home"
+import Pricing from "$activities/pricing"
+import SettingsExtension from "$activities/settings"
 import UserExtension from "$activities/user"
 
 import AuthCommands from "$commands/auth"
 import CommandPalette from "$commands/command-palette"
 import FileSystemCommands from "$commands/file-system"
+import OpenFile from "$commands/open-file"
 import UserSupportCommands from "$commands/user-support"
 
 import ActivityBar from "$containers/activity-bar"
 import ContextMenu from "$containers/app/hooks/use-context-menu/components/context-menu"
-import { useI18nInit } from "$containers/app/hooks/use-i18n-init"
-import { gotDirectory, registeredExtensions } from "$containers/app/store"
+import { useI18n } from "$containers/app/hooks/use-i18n"
+import { useSystemCommands } from "$containers/app/hooks/use-system-commands/use-system-commands"
+import { gotDirectory, registerExtensions } from "$containers/app/store"
 
+import { useKeycloak } from "$core/auth/hooks/use-keycloak"
+import { createExtensionPersistedState } from "$core/extensions/create-extension-metadata"
 import { isActivityExtension } from "$core/guards/is-extension"
 import { useActionContext } from "$core/hooks/use-action-context"
 import { useCommandIconButton } from "$core/hooks/use-command-icon-button"
@@ -28,32 +38,60 @@ import { reducer, store } from "$core/state"
 import { useAppDispatch } from "$core/state/hooks/use-app-dispatch"
 import { useAppSelector } from "$core/state/hooks/use-app-selector"
 import { useExtensionSelector } from "$core/state/hooks/use-extension-selector"
-import { ActionContext, UnaryFn } from "$core/types"
+import { OrdoExtension, OrdoExtensionName } from "$core/types"
 
+import AutolinkPlugin from "$editor-plugins/autolink"
+import HighlightCodePlugin from "$editor-plugins/highlight-code"
+import ToolbarPlugin from "$editor-plugins/toolbar"
+
+import ImgFileExtension from "$file-associations/img"
 import MdFileExtension from "$file-associations/md"
+import MediaEditor from "$file-associations/media"
+import PDFFileExtension from "$file-associations/pdf"
 
 import "$containers/app/index.css"
 
-const extensions = [
+const loggedInExtensions = [
+  CalendarExtension,
   // AllActivitiesExtension,
   EditorExtension,
   // ExtensionStoreExtension,
   UserExtension,
-  // SettingsExtension,
+  SettingsExtension,
   MdFileExtension,
   FileSystemCommands,
   CommandPalette,
+  OpenFile,
   UserSupportCommands,
   AuthCommands,
+  ImgFileExtension,
+  PDFFileExtension,
+  MediaEditor,
+  ToolbarPlugin,
+  HighlightCodePlugin,
+  AutolinkPlugin,
+]
+
+const loggedOutExtensions = [
+  AuthCommands,
+  CommandPalette,
+  Home,
+  Features,
+  Pricing,
+  UserSupportCommands,
+  ToolbarPlugin,
+  HighlightCodePlugin,
+  AutolinkPlugin,
 ]
 
 export default function App() {
   const dispatch = useAppDispatch()
-  const i18n = useI18nInit()
+  const i18n = useI18n()
 
-  const editorSelector = useExtensionSelector<EditorExtensionStore>()
+  const editorSelector = useExtensionSelector<EditorActivityState>()
 
-  const [accelerators, setAccelerators] = useState<Record<string, UnaryFn<ActionContext, void>>>({})
+  // const [accelerators, setAccelerators] = useState<Record<string, UnaryFn<ActionContext, void>>>({})
+  const [extensions, setExtensions] = useState<OrdoExtension<string, OrdoExtensionType>[]>([])
   const currentFile = editorSelector((state) => state?.["ordo-activity-editor"]?.currentFile)
 
   const handleContextMenu = (event: MouseEvent) => {
@@ -64,28 +102,27 @@ export default function App() {
   const activities = useAppSelector((state) => state.app.activityExtensions)
   const overlays = useAppSelector((state) => state.app.overlays)
   const commands = useAppSelector((state) => state.app.commands)
+  const { keycloak } = useKeycloak()
 
   const actionContext = useActionContext()
+
+  const isAuthenticated = keycloak.authenticated
 
   const currentRoute = useLocation()
   const navigate = useNavigate()
 
+  const accelerators = useSystemCommands(extensions, commands, currentFile)
+
   useEffect(() => {
-    dispatch(gotDirectory("/"))
+    if (isAuthenticated) {
+      dispatch(gotDirectory("/"))
+
+      setExtensions(loggedInExtensions)
+    } else {
+      setExtensions(loggedOutExtensions)
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
-
-  useEffect(() => {
-    const keybindings: Record<string, UnaryFn<ActionContext, void>> = {}
-
-    commands.forEach((command) => {
-      if (command.accelerator) {
-        keybindings[command.accelerator] = command.action
-      }
-    })
-
-    setAccelerators(() => keybindings)
-  }, [commands, currentFile])
+  }, [isAuthenticated])
 
   useHotkeys(
     Object.keys(accelerators).join(", "),
@@ -120,14 +157,50 @@ export default function App() {
         const Element = extension.Component
 
         for (const path of extension.routes) {
-          router.routes[0].children?.unshift({
-            path,
-            element: <Element />,
-            hasErrorBoundary: false,
-            id: extension.name,
-          } as RouteObject)
+          const persistedStore = createExtensionPersistedState(
+            extension.name as OrdoExtensionName,
+            extension.persistedState,
+          )
 
-          if (currentRoute.pathname.startsWith(`/${path}`)) navigate(currentRoute)
+          if (persistedStore) {
+            persistedStore.init().then(() => {
+              router.routes[0].children?.unshift({
+                path,
+                element: (
+                  <Element
+                    persistedStore={persistedStore}
+                    selector={() => null} // TODO
+                    translate={() => null} // TODO
+                  />
+                ),
+                hasErrorBoundary: false,
+                id: extension.name,
+              } as RouteObject)
+
+              if (currentRoute.pathname.startsWith(`/${path}`)) {
+                currentRoute.hash = ""
+                navigate(currentRoute)
+              }
+            })
+          } else {
+            router.routes[0].children?.unshift({
+              path,
+              element: (
+                <Element
+                  persistedStore={null} // TODO
+                  selector={() => null} // TODO
+                  translate={() => null} // TODO
+                />
+              ),
+              hasErrorBoundary: false,
+              id: extension.name,
+            } as RouteObject)
+
+            if (currentRoute.pathname.startsWith(`/${path}`)) {
+              currentRoute.hash = ""
+              navigate(currentRoute)
+            }
+          }
         }
       }
 
@@ -148,6 +221,10 @@ export default function App() {
       }
     })
 
+    if (currentRoute.pathname === "/") {
+      navigate(isAuthenticated ? "/editor" : "/home")
+    }
+
     const combinedReducer = combineReducers({
       ...reducer,
       ...reducers,
@@ -156,16 +233,20 @@ export default function App() {
     store.replaceReducer(combinedReducer)
 
     // Register installed extensions in the store
-    dispatch(registeredExtensions(extensions))
+    dispatch(registerExtensions(extensions))
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, [extensions, isAuthenticated])
 
   return (
     <div
       className="app"
       onContextMenu={handleContextMenu}
     >
+      <Helmet>
+        <title>{"Ordo.pink"}</title>
+      </Helmet>
+
       <ActivityBar />
 
       <Outlet />

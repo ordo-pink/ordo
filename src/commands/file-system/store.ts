@@ -1,9 +1,9 @@
+import { Nullable, IOrdoDirectory, IOrdoFile } from "@ordo-pink/core"
 import { createSlice, PayloadAction } from "@reduxjs/toolkit"
 
 import { FileSystemCommandsState } from "$commands/file-system/types"
 
 import { OrdoFSEntity } from "$core/constants/ordo-fs-entity"
-import type { Nullable, OrdoDirectory, OrdoFile } from "$core/types"
 
 const initialState: FileSystemCommandsState = {
   isCreateModalShown: false,
@@ -22,12 +22,12 @@ export const slice = createSlice({
       state.entityType = OrdoFSEntity.FILE
       state.isCreateModalShown = false
     },
-    showCreateFileModal: (state, action: PayloadAction<Nullable<OrdoDirectory>>) => {
+    showCreateFileModal: (state, action: PayloadAction<Nullable<IOrdoDirectory>>) => {
       state.parent = action.payload
       state.entityType = OrdoFSEntity.FILE
       state.isCreateModalShown = true
     },
-    showCreateDirectoryModal: (state, action: PayloadAction<Nullable<OrdoDirectory>>) => {
+    showCreateDirectoryModal: (state, action: PayloadAction<Nullable<IOrdoDirectory>>) => {
       state.parent = action.payload
       state.entityType = OrdoFSEntity.DIRECTORY
       state.isCreateModalShown = true
@@ -36,11 +36,11 @@ export const slice = createSlice({
       state.isDeleteModalShown = false
       state.target = null
     },
-    showDeleteFileModal: (state, action: PayloadAction<OrdoFile>) => {
+    showDeleteFileModal: (state, action: PayloadAction<IOrdoFile>) => {
       state.isDeleteModalShown = true
       state.target = action.payload
     },
-    showDeleteDirectoryModal: (state, action: PayloadAction<OrdoDirectory>) => {
+    showDeleteDirectoryModal: (state, action: PayloadAction<IOrdoDirectory>) => {
       state.isDeleteModalShown = true
       state.target = action.payload
     },

@@ -17,7 +17,7 @@ export default function LogoutField() {
 
   const { t } = useTranslation()
 
-  const translatedChangePassword = t("@ordo-activity-user/logout")
+  const translatedLogout = t("@ordo-activity-user/logout")
 
   const handleButtonClick = lazyBox<MouseEvent>((box) =>
     box
@@ -28,14 +28,14 @@ export default function LogoutField() {
 
   return (
     <Fieldset>
-      <div className="flex flex-row-reverse w-full">
+      <div className="md:flex md:flex-row-reverse md:w-full">
         <OrdoButtonSecondary
           onClick={handleButtonClick}
           center
         >
           <div className="flex items-center space-x-2">
             <AiOutlineLogout />
-            <div>{translatedChangePassword}</div>
+            <div>{translatedLogout}</div>
           </div>
         </OrdoButtonSecondary>
       </div>

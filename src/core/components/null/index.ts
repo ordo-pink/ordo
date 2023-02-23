@@ -1,4 +1,4 @@
-import type { ThunkFn } from "$core/types"
+import { ThunkFn } from "@ordo-pink/core"
 
 const Null: ThunkFn<null> = () => null
 

@@ -8,7 +8,7 @@
 }
 
 .action-list_item_left {
-  @apply flex items-center space-x-2 w-full;
+  @apply flex items-center space-x-2 w-full truncate;
 }
 
 .action-list_item_left_icon {

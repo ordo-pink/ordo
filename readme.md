@@ -1,6 +1,8 @@
 # Ordo Client
 
 [![lint](https://github.com/ordo-pink/ordo-client/actions/workflows/lint.yml/badge.svg)](https://github.com/ordo-pink/ordo-client/actions/workflows/lint.yml)
+[![test](https://github.com/ordo-pink/ordo-client/actions/workflows/test.yml/badge.svg)](https://github.com/ordo-pink/ordo-client/actions/workflows/test.yml)
+[![codecov](https://img.shields.io/codecov/c/gh/ordo-pink/ordo-client)](https://app.codecov.io/gh/ordo-pink/ordo-client)
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 

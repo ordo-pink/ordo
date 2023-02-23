@@ -1,8 +1,9 @@
+import { Switch } from "@ordo-pink/switch"
 import Fuse from "fuse.js"
 import { useState, useEffect, ChangeEvent, KeyboardEvent, MouseEvent } from "react"
 import { useTranslation } from "react-i18next"
 
-import { EditorExtensionStore } from "$activities/editor/types"
+import { EditorActivityState } from "$activities/editor/types"
 
 import CommandPaletteItem from "$commands/command-palette/components/palette-item"
 import { hideCommandPalette } from "$commands/command-palette/store"
@@ -21,7 +22,6 @@ import { Either } from "$core/utils/either"
 import { preventDefault, stopPropagation } from "$core/utils/event"
 import { lazyBox } from "$core/utils/lazy-box"
 import { noOp } from "$core/utils/no-op"
-import { Switch } from "$core/utils/switch"
 
 import "$commands/command-palette/index.css"
 
@@ -30,14 +30,14 @@ const fuse = new Fuse([] as SearchableCommand[], { keys: ["title"] })
 export default function CommandPalette() {
   const dispatch = useAppDispatch()
 
-  const editorSelector = useExtensionSelector<EditorExtensionStore>()
+  const editorSelector = useExtensionSelector<EditorActivityState>()
   const commandPaletteSelector = useExtensionSelector<CommandPaletteExtensionStore>()
 
   const root = useAppSelector((state) => state.app.personalProject)
   const commands = useAppSelector((state) => state.app.commands)
 
   const isShown = commandPaletteSelector((state) => state["ordo-command-command-palette"].isShown)
-  const currentFile = editorSelector((state) => state["ordo-activity-editor"].currentFile)
+  const currentFile = editorSelector((state) => state["ordo-activity-editor"]?.currentFile)
 
   const actionContext = useActionContext(root)
 
@@ -165,16 +165,13 @@ export default function CommandPalette() {
       .fold(setCurrentIndex),
   )
 
-  const handleKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
-    const handle = Switch.of(event.key)
+  const handleKeyDown = (event: KeyboardEvent<HTMLInputElement>) =>
+    Switch.of(event.key)
       .case("Escape", handleHideModal)
       .case("Enter", () => handleEnter(event))
       .case("ArrowUp", () => handleArrowUp(event))
       .case("ArrowDown", () => handleArrowDown(event))
       .default(noOp)
-
-    handle()
-  }
 
   const translatedPlaceholder = t(`@ordo-command-command-palette/placeholder`)
 

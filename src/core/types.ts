@@ -1,37 +1,51 @@
+import {
+  IOrdoDirectory,
+  IOrdoFile,
+  Language,
+  Nullable,
+  OrdoExtensionType,
+  OrdoFileExtension,
+  ThunkFn,
+  UnaryFn,
+} from "@ordo-pink/core"
 import type { Slice } from "@reduxjs/toolkit"
-import type { ContentBlock } from "draft-js"
 import type { TFunction } from "i18next"
-import type { Schema } from "jsonschema"
-import type Loadable from "react-loadable"
+import type { ComponentType } from "react"
+import type { LoadableComponent } from "react-loadable"
 
-import type { Language } from "$core/constants/language"
-import type { OrdoExtensionType } from "$core/constants/ordo-extension-type"
 import type { router } from "$core/router"
 import type { useAppDispatch } from "$core/state/hooks/use-app-dispatch"
 import type { RootState } from "$core/state/types"
 
-export type Nullable<T> = T | null
-
-export type Optional<T> = T | undefined
-
-export type ThunkFn<Result> = () => Result
-export type UnaryFn<Arg, Result> = (arg: Arg) => Result
-export type BinaryFn<Arg1, Arg2, Result> = (arg1: Arg1, arg2: Arg2) => Result
-export type TernaryFn<Arg1, Arg2, Arg3, Result> = (arg1: Arg1, arg2: Arg2, arg3: Arg3) => Result
-
-export type Unpack<T> = T extends Array<infer U> ? U : T
-
-export type OrdoLoadableComponent = ReturnType<typeof Loadable>
-
-export type FileExtension = `.${string}`
-
-export type FileAssociation = Record<OrdoExtensionName, FileExtension[]>
-
-export type AccessLevel = {
-  read: boolean
-  write: boolean
-  erase: boolean
+export type OrdoExtensionPersistedStore<T extends Record<string, unknown>> = {
+  init: ThunkFn<Promise<void>>
+  get<K extends keyof T>(key: K): Promise<T[K]>
+  set<K extends keyof T>(key: K, value: T[K]): Promise<void>
+  clear: ThunkFn<Promise<void>>
+  resetDefaults: ThunkFn<Promise<void>>
+  getState: ThunkFn<Promise<T>>
+  getDefaults: ThunkFn<Promise<T>>
 }
+
+export type OrdoLoadableComponent<T = Record<string, unknown>> = ComponentType<T> &
+  LoadableComponent
+
+export type OrdoExtensionProps<T extends OrdoExtension<string, OrdoExtensionType>> = {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  persistedStore: T extends OrdoExtension<string, OrdoExtensionType, Record<string, any>, infer U>
+    ? OrdoExtensionPersistedStore<U>
+    : null
+  selector: () => null // TODO
+  translate: () => null // TODO
+}
+
+export type OrdoActivityProps<T extends OrdoExtension<string, OrdoExtensionType>> =
+  OrdoExtensionProps<T>
+
+export type OrdoFileAssociationProps<T extends OrdoExtension<string, OrdoExtensionType>> =
+  OrdoExtensionProps<T> & {
+    file: IOrdoFile
+  }
 
 export type ActionContext<
   T extends OrdoExtension<string, OrdoExtensionType> = OrdoExtension<string, OrdoExtensionType>,
@@ -39,29 +53,30 @@ export type ActionContext<
   state: RootState<
     T extends OrdoExtension<string, OrdoExtensionType, infer U> ? U : Record<string, unknown>
   >
-  // TODO: Replace with `target` and add a boolean for whether it is `isContextMenuCall`
-  contextMenuTarget: Nullable<OrdoFile | OrdoDirectory>
+  contextMenuTarget: Nullable<IOrdoFile | IOrdoDirectory>
   dispatch: ReturnType<typeof useAppDispatch>
-  env: typeof window["ordo"]["env"]
+  env: typeof window.ordo.env
   navigate: typeof router.navigate
   translate: TFunction<"translation", undefined>
+  isAuthenticated: boolean
+  createLoginUrl: ThunkFn<string>
+  createRegisterUrl: ThunkFn<string>
+  userData?: {
+    email: string
+    username: string
+    emailVerified: boolean
+  }
 }
 
-export type IsmParserRule = {
-  validate: UnaryFn<ContentBlock, boolean>
-}
-
-export type ExtensionState<T extends OrdoExtension<string, OrdoExtensionType>> = Record<
-  T["name"],
+export type ExtensionState<T extends OrdoExtension<string, OrdoExtensionType>> =
   T extends OrdoExtension<string, OrdoExtensionType, infer U> ? U : null
->
 
 export type OrdoCommand<ExtensionName extends string> = {
   Icon: OrdoLoadableComponent
   accelerator?: string
   title: `@${ExtensionName}/${string}`
   action: UnaryFn<ActionContext, void | PromiseLike<void>>
-  showInContextMenu?: boolean | UnaryFn<OrdoFile | OrdoDirectory, boolean>
+  showInContextMenu?: boolean | UnaryFn<IOrdoFile | IOrdoDirectory, boolean>
   showInCommandPalette?: boolean | UnaryFn<ActionContext, boolean>
 }
 
@@ -70,37 +85,26 @@ export type OrdoExtensionName<
   ExtensionType extends OrdoExtensionType = OrdoExtensionType,
 > = `ordo-${ExtensionType}-${Name}`
 
-export type TranslationsRecord<Name extends string> = {
-  [Key in Language]?: Record<`@${Name}/${string}`, string>
+export type TranslationsRecord = {
+  [Key in Language]?: Record<string, string>
 }
 
-// TODO: Restrict things, provide them via env
-// TODO: Put patched fetch here
-// @see https://developer.mozilla.org/en-US/docs/Web/HTTP/Feature_Policy
-// @see https://w3c.github.io/webappsec-permissions-policy/#permissions-policy-http-header-field
-export type OrdoExtensionPermissions = Partial<{
-  http: string[]
-  clipboard: AccessLevel
-  localStorage: Record<string, AccessLevel>
-  cookies: Record<string, AccessLevel>
-  filesystem: Record<string, AccessLevel>
-  readSession: boolean
-  indexDB: Record<string, AccessLevel>
-}>
-
 export interface OrdoExtension<
-  Name extends string,
-  ExtensionType extends OrdoExtensionType,
+  Name extends string = string,
+  ExtensionType extends OrdoExtensionType = OrdoExtensionType,
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  TState extends Record<string, any> = Record<string, any>,
+  MemoryState extends Record<string, any> = Record<string, any>,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  PersistedState extends Record<string, any> = Record<string, any>,
 > {
   name: OrdoExtensionName<Name, ExtensionType>
-  translations?: TranslationsRecord<OrdoExtensionName<Name, ExtensionType>>
+  translations?: TranslationsRecord
   readableName?: string
   overlayComponents?: OrdoLoadableComponent[]
   description?: string
-  storeSlice?: Slice<TState>
+  storeSlice?: Slice<MemoryState>
   commands?: OrdoCommand<Name>[]
+  persistedState?: PersistedState
 }
 
 export interface OrdoCommandExtension<
@@ -111,13 +115,12 @@ export interface OrdoCommandExtension<
   commands: OrdoCommand<Name>[]
 }
 
-export interface OrdoIsmParserExtension<
+export interface OrdoEditorPluginExtension<
   Name extends string,
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   TState extends Record<string, any> = Record<string, any>,
-> extends OrdoExtension<Name, OrdoExtensionType.ISM_PARSER, TState> {
-  rules: IsmParserRule[]
-  Component: OrdoLoadableComponent
+> extends OrdoExtension<Name, OrdoExtensionType.EDITOR_PLUGIN, TState> {
+  plugins: ComponentType[]
 }
 
 export interface OrdoFileAssociationExtension<
@@ -125,58 +128,21 @@ export interface OrdoFileAssociationExtension<
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   TState extends Record<string, any> = Record<string, any>,
 > extends OrdoExtension<Name, OrdoExtensionType.FILE_ASSOCIATION, TState> {
-  fileExtensions: FileExtension[]
+  fileExtensions: OrdoFileExtension[]
   Icon?: OrdoLoadableComponent
   Component: OrdoLoadableComponent
-}
-
-export interface OrdoLocalSettingExtension<
-  Name extends string,
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  TState extends Record<string, any> = Record<string, any>,
-> extends OrdoExtension<Name, OrdoExtensionType.LOCAL_SETTING, TState> {
-  schema: Schema
-  peerAccess?: AccessLevel | boolean
-  dependantAccess?: AccessLevel | boolean
 }
 
 export interface OrdoActivityExtension<
   Name extends string,
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   TState extends Record<string, any> = Record<string, any>,
-> extends OrdoExtension<Name, OrdoExtensionType.ACTIVITY, TState> {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  PersistedState extends Record<string, any> = Record<string, any>,
+> extends OrdoExtension<Name, OrdoExtensionType.ACTIVITY, TState, PersistedState> {
   routes: string[]
   accelerator?: string
   Icon: OrdoLoadableComponent
   Component: OrdoLoadableComponent
-}
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export type OrdoFile<Metadata extends Record<string, any> = Record<string, any>> = {
-  path: string
-  readableName: string
-  extension: FileExtension
-  createdAt: Date
-  updatedAt: Date
-  accessedAt: Date
-  depth: number
-  size: number
-  metadata: Metadata
-}
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export type OrdoDirectory<Metadata extends Record<string, any> = Record<string, any>> = {
-  path: string
-  readableName: string
-  createdAt: Date
-  updatedAt: Date
-  accessedAt: Date
-  depth: number
-  children: Array<OrdoFile | OrdoDirectory>
-  metadata: Metadata
-}
-
-export type WorkerMessageData<T = unknown> = {
-  event: string
-  payload: T
+  persistedState?: PersistedState
 }

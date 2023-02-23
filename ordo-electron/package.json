@@ -1,0 +1,152 @@
+{
+  "name": "ordo",
+  "productName": "ordo",
+  "version": "0.3.0",
+  "description": "Bring Your Thoughts to Ordo",
+  "main": ".webpack/main",
+  "scripts": {
+    "start": "electron-forge start",
+    "test": "echo 'Add tests'",
+    "package": "electron-forge package",
+    "make": "electron-forge make",
+    "publish": "electron-forge publish",
+    "eslint:lint": "eslint --ext .ts,.tsx .",
+    "prettier:check": "prettier --check src/**/*.{ts,tsx}",
+    "prettier:format": "prettier --write src/**/*.{ts,tsx}",
+    "lint": "npm run eslint:lint && npm run prettier:check",
+    "prepare": "husky install",
+    "postinstall": "husky install"
+  },
+  "keywords": [],
+  "author": {
+    "name": "Ordo.pink",
+    "email": "hello@ordo.pink"
+  },
+  "license": "MIT",
+  "config": {
+    "forge": {
+      "packagerConfig": {
+        "icon": "src/assets/icons/icon"
+      },
+      "makers": [
+        {
+          "name": "@electron-forge/maker-squirrel",
+          "config": {
+            "name": "ordo",
+            "icon": "./src/assets/icons/icon.ico"
+          }
+        },
+        {
+          "name": "@electron-forge/maker-zip",
+          "config": {
+            "icon": "./src/assets/icons/icon.icns"
+          },
+          "platforms": [
+            "darwin"
+          ]
+        },
+        {
+          "name": "@electron-forge/maker-deb",
+          "config": {
+            "icon": "./src/assets/icons/icon.png"
+          }
+        },
+        {
+          "name": "@electron-forge/maker-rpm",
+          "config": {
+            "icon": "./src/assets/icons/icon.png"
+          }
+        }
+      ],
+      "plugins": [
+        [
+          "@electron-forge/plugin-webpack",
+          {
+            "mainConfig": "./webpack/main.config.js",
+            "renderer": {
+              "config": "./webpack/renderer.config.js",
+              "entryPoints": [
+                {
+                  "html": "./src/assets/index.html",
+                  "js": "./src/client/renderer.tsx",
+                  "name": "main_window",
+                  "preload": {
+                    "js": "./src/client/preload.ts"
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      ]
+    }
+  },
+  "devDependencies": {
+    "@electron-forge/cli": "^6.0.0-beta.66",
+    "@electron-forge/maker-deb": "^6.0.0-beta.66",
+    "@electron-forge/maker-rpm": "^6.0.0-beta.66",
+    "@electron-forge/maker-squirrel": "^6.0.0-beta.66",
+    "@electron-forge/maker-zip": "^6.0.0-beta.66",
+    "@electron-forge/plugin-webpack": "6.0.0-beta.66",
+    "@types/lodash": "^4.14.186",
+    "@types/ramda": "^0.28.15",
+    "@types/react": "^18.0.20",
+    "@types/react-dom": "^18.0.6",
+    "@types/react-redux": "^7.1.24",
+    "@types/sanitize-html": "^2.6.2",
+    "@typescript-eslint/eslint-plugin": "^5.0.0",
+    "@typescript-eslint/parser": "^5.0.0",
+    "@vercel/webpack-asset-relocator-loader": "1.7.3",
+    "autoprefixer": "^10.4.10",
+    "commitlint": "^11.0.0",
+    "commitlint-config-gitmoji": "^2.2.5",
+    "copy-webpack-plugin": "^11.0.0",
+    "css-loader": "^6.0.0",
+    "electron": "20.1.3",
+    "eslint": "^8.0.1",
+    "eslint-plugin-import": "^2.25.0",
+    "fork-ts-checker-webpack-plugin": "^7.2.1",
+    "husky": "^8.0.0",
+    "node-loader": "^2.0.0",
+    "postcss-loader": "^7.0.1",
+    "prettier": "^2.7.1",
+    "style-loader": "^3.0.0",
+    "ts-loader": "^9.2.2",
+    "typescript": "~4.5.4"
+  },
+  "dependencies": {
+    "@reduxjs/toolkit": "^1.8.5",
+    "electron-devtools-installer": "^3.2.0",
+    "electron-squirrel-startup": "^1.0.0",
+    "electron-store": "^8.1.0",
+    "electron-util": "^0.17.2",
+    "fuse.js": "^6.6.2",
+    "i18next": "^21.9.2",
+    "immer": "^9.0.15",
+    "lodash": "^4.17.21",
+    "ramda": "^0.28.0",
+    "react": "^18.2.0",
+    "react-contenteditable": "^3.3.6",
+    "react-contexify": "^5.0.0",
+    "react-dom": "^18.2.0",
+    "react-hotkeys-hook": "^3.4.7",
+    "react-i18next": "^11.18.6",
+    "react-icons": "^4.4.0",
+    "react-redux": "^8.0.2",
+    "react-router": "^6.4.0",
+    "react-split": "^2.0.14",
+    "react-type-animation": "^2.1.1",
+    "rehype-parse": "^8.0.4",
+    "rehype-raw": "^6.1.1",
+    "rehype-remark": "^9.1.2",
+    "rehype-stringify": "^9.0.3",
+    "remark-parse": "^10.0.1",
+    "remark-rehype": "^10.1.0",
+    "remark-stringify": "^10.0.2",
+    "sanitize-html": "^2.7.2",
+    "tailwindcss": "^3.1.8",
+    "unified": "^10.1.2",
+    "vis-data": "^7.1.4",
+    "vis-network": "^9.1.2"
+  }
+}

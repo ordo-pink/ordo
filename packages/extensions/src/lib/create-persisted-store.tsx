@@ -9,7 +9,7 @@ declare global {
 }
 
 // TODO: Provide API access as a param
-const extensionMetadata = <T extends Record<string, unknown>>(
+const persistedStore = <T extends Record<string, unknown>>(
   name: OrdoExtensionName<string, OrdoExtensionType>,
   persistedState: T,
 ): OrdoExtensionPersistedStore<T> => {
@@ -17,17 +17,10 @@ const extensionMetadata = <T extends Record<string, unknown>>(
 
   return {
     init: async () => {
-      try {
-        const json = await window.ordo.api.extensions.get(name)
-        store = json
-      } catch (e) {
-        await window.ordo.api.extensions.create({
-          name,
-          content: persistedState,
-        })
-        const json = await window.ordo.api.extensions.get(name)
-        store = json
-      }
+      if (!persistedState) return
+
+      const json = await window.ordo.api.extensions.get({ name, defaults: persistedState })
+      store = json
     },
     get: (key) => Promise.resolve(store[key]),
     set: (key, value) => {
@@ -49,7 +42,7 @@ const extensionMetadata = <T extends Record<string, unknown>>(
   }
 }
 
-export const createExtensionPersistedState = <T extends Record<string, unknown>>(
+export const createExtensionPersistedStore = <T extends Record<string, unknown>>(
   name: OrdoExtensionName<string, OrdoExtensionType>,
   defaultMetadata?: T,
-) => (defaultMetadata ? extensionMetadata(name, defaultMetadata) : undefined)
+) => (defaultMetadata ? persistedStore(name, defaultMetadata) : undefined)

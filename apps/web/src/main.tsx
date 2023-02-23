@@ -69,7 +69,17 @@ window.ordo = {
         }
       }
 
-      return fetch(url, params)
+      return fetch(url, params).catch(async (error) => {
+        if (error.status === 403) {
+          await keycloak.updateToken(600).catch(() => {
+            keycloak.logout({ redirectUri: "/home" })
+          })
+
+          return fetch(url, params)
+        }
+
+        return Promise.reject()
+      })
     },
     openExternal: (url) => {
       window.open(url, "_blank")
@@ -178,19 +188,11 @@ window.ordo = {
       },
     },
     extensions: {
-      create: ({ name, content }) =>
+      get: ({ name, defaults }) =>
         window.ordo.env
           .fetch(`${host}/internal/extensions/${keycloak.tokenParsed?.sub}/${name}`, {
             method: "POST",
-            body: JSON.stringify(content),
-            headers: {
-              [AUTHORIZATION_HEADER_KEY]: `Bearer ${LOCAL_TOKEN ?? keycloak.token}`,
-            },
-          })
-          .then((res) => res.json()),
-      get: (name) =>
-        window.ordo.env
-          .fetch(`${host}/internal/extensions/${keycloak.tokenParsed?.sub}/${name}`, {
+            body: JSON.stringify(defaults),
             headers: {
               [AUTHORIZATION_HEADER_KEY]: `Bearer ${LOCAL_TOKEN ?? keycloak.token}`,
             },

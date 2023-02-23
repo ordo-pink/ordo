@@ -1,5 +1,4 @@
 import { Router } from "express"
-import { createExtensionFileHandler } from "./handlers/create"
 import { getExtensionFileHandler } from "./handlers/get"
 import { removeExtensionFileHandler } from "./handlers/remove"
 import { updateExtensionFileHandler } from "./handlers/update"
@@ -15,23 +14,16 @@ export const ExtensionsRouter = ({
   fsDriver,
   authorise,
   logger,
+  limits,
 }: CreateOrdoBackendServerParams) => {
   const file = OrdoFileModel.of(fsDriver)
   const directory = OrdoDirectoryModel.of(fsDriver)
-  const internal = OrdoInternalModel.of(fsDriver)
+  const internal = OrdoInternalModel.of({ fsDriver, limits, directory })
 
   const env = { file, directory, logger, internal }
 
   return Router()
     .post(
-      `/:${USER_ID_PARAM}/:extension`,
-
-      appendLogger(logger),
-      authorise,
-      compareTokensStrict,
-      createExtensionFileHandler(env),
-    )
-    .get(
       `/:${USER_ID_PARAM}/:extension`,
 
       appendLogger(logger),

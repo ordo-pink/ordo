@@ -6,10 +6,33 @@ import { ExtensionsParams } from "../../../types"
 import { FsRequestHandler } from "../../../types"
 
 export const getExtensionFileHandler: FsRequestHandler<ExtensionsParams> =
-  ({ file: { getFileContent } }) =>
-  (req, res) => {
+  ({
+    file: { getFileContent, checkFileExists, createFile },
+    directory: { createDirectory, checkDirectoryExists },
+  }) =>
+  async (req, res) => {
     const userId = req.params[USER_ID_PARAM]
-    const path = `/${userId}${SystemDirectory.EXTENSIONS}${req.params.extension}.json` as const
+    const parent = `/${userId}${SystemDirectory.EXTENSIONS}` as const
+    const path = `${parent}${req.params.extension}.json` as const
+
+    const parentExists = await checkDirectoryExists(parent)
+    const fileExists = await checkFileExists(path)
+
+    if (!parentExists) {
+      try {
+        await createDirectory(parent)
+      } catch (e) {
+        req.params.logger.error(`Attempted to create directory that already exists: ${parent}`)
+      }
+    }
+
+    if (!fileExists) {
+      try {
+        await createFile({ path, content: req })
+      } catch (e) {
+        req.params.logger.error(`Attempted to create file that already exists: ${path}`)
+      }
+    }
 
     res.setHeader("content-type", contentType(".json") as string)
 

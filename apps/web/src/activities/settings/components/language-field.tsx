@@ -1,9 +1,9 @@
 import { TwoLetterLocale, ISO_639_1_Locale } from "@ordo-pink/locale"
+import { Fieldset } from "@ordo-pink/react-components"
 import { ChangeEvent, useContext, useEffect, useState } from "react"
 import { useTranslation } from "react-i18next"
 import { SettingsContext } from "."
 import { useI18n } from "../../../containers/app/hooks/use-i18n"
-import Fieldset from "../../../core/components/fieldset"
 
 export default function LanguageField() {
   const i18n = useI18n()

@@ -1,5 +1,5 @@
+import { OrdoButton } from "@ordo-pink/react-components"
 import { render, screen } from "@testing-library/react"
-import OrdoButton from "../../core/components/buttons"
 import "@testing-library/jest-dom"
 
 test("it should render button", () => {

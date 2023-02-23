@@ -1,11 +1,10 @@
+import { lazyBox } from "@ordo-pink/fns"
+import { OrdoButtonSecondary, OrdoButtonNeutral } from "@ordo-pink/react-components"
 import { useTranslation } from "react-i18next"
 import { AiTwotoneMail } from "react-icons/ai"
 import { BsTelegram } from "react-icons/bs"
-
-import { OrdoButtonSecondary, OrdoButtonNeutral } from "../../../core/components/buttons"
 import { useEnv } from "../../../core/hooks/use-env"
 import { useAppDispatch } from "../../../core/state/hooks/use-app-dispatch"
-import { lazyBox } from "../../../core/utils/lazy-box"
 import { hideSupportModal } from "../store"
 
 export default function DeleteModalButtonGroup() {

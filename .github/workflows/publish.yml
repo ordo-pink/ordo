@@ -1,0 +1,56 @@
+name: publish
+
+on:
+  release:
+    types: [released]
+
+  workflow_dispatch:
+
+jobs:
+  npm:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Install Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16
+          registry-url: "https://registry.npmjs.org"
+          scope: "@ordo-pink"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Publish to NPM
+        run: npm nx affected --target=publish --args="--ver=$GITHUB_REF_NAME --tag=latest"
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GHP_TOKEN }}
+
+  ghp:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Install Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16
+          registry-url: "https://npm.pkg.github.com"
+          scope: "@ordo-pink"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Publish to NPM
+        run: npx nx affected --target=publish --args="--ver=$GITHUB_REF_NAME --tag=latest"
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GHP_TOKEN }}

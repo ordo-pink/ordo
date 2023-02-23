@@ -1,10 +1,10 @@
 import { $isLinkNode, TOGGLE_LINK_COMMAND } from "@lexical/link"
 import { mergeRegister } from "@lexical/utils"
+import { OrdoButtonSecondary } from "@ordo-pink/react-components"
 import { $getSelection, $isRangeSelection, LexicalEditor, SELECTION_CHANGE_COMMAND } from "lexical"
 import { useRef, useState, useCallback, useEffect } from "react"
 import { BsCheck2, BsPencilSquare } from "react-icons/bs"
 import { Link } from "react-router-dom"
-import { OrdoButtonSecondary } from "../../../core/components/buttons"
 import { LOW_PRIORITY } from "../constants"
 import { getSelectedNode } from "../utils/get-selected-node"
 

@@ -1,4 +1,4 @@
-import { createOrdoCommand } from "../../../core/extensions/create-ordo-command"
+import { createOrdoCommand } from "@ordo-pink/extensions"
 import { showOpenFile } from "../store"
 
 export default createOrdoCommand<"ordo-command-open-file">({

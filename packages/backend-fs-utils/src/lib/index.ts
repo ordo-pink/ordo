@@ -5,5 +5,5 @@ export const promiseWriteStream = (readable: Readable, writable: Writable) =>
     pipeline(readable, writable, (error) => {
       if (error) return reject(error)
       resolve()
-    })
+    }),
   )

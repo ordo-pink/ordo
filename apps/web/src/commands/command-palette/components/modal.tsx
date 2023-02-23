@@ -1,4 +1,6 @@
 import { Either } from "@ordo-pink/either"
+import { lazyBox, preventDefault, stopPropagation, noOp } from "@ordo-pink/fns"
+import { Null } from "@ordo-pink/react-components"
 import { Switch } from "@ordo-pink/switch"
 import Fuse from "fuse.js"
 import { useState, useEffect, ChangeEvent, KeyboardEvent, MouseEvent } from "react"
@@ -11,15 +13,12 @@ import {
   SearchableCommand,
 } from "../../../commands/command-palette/types"
 import { useModal } from "../../../containers/app/hooks/use-modal"
-import Null from "../../../core/components/null"
 import { useActionContext } from "../../../core/hooks/use-action-context"
 import { useAppDispatch } from "../../../core/state/hooks/use-app-dispatch"
 import { useAppSelector } from "../../../core/state/hooks/use-app-selector"
 import { useExtensionSelector } from "../../../core/state/hooks/use-extension-selector"
 import { OrdoCommand } from "../../../core/types"
-import { preventDefault, stopPropagation } from "../../../core/utils/event"
-import { lazyBox } from "../../../core/utils/lazy-box"
-import { noOp } from "../../../core/utils/no-op"
+
 import "../index.css"
 
 const fuse = new Fuse([] as SearchableCommand[], { keys: ["title"] })

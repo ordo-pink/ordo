@@ -18,5 +18,14 @@
     "src/**/*.spec.jsx",
     "src/**/*.test.jsx"
   ],
-  "include": ["src/**/*.js", "src/**/*.jsx", "src/**/*.ts", "src/**/*.tsx"]
+  "include": [
+    "src/**/*.js",
+    "src/**/*.jsx",
+    "src/**/*.ts",
+    "src/**/*.tsx",
+    "../../packages/fns/src/lib/box.ts",
+    "../../packages/fns/src/lib/lazy-box.ts",
+    "../../packages/fns/src/lib/event.ts",
+    "../../packages/extensions/src/lib/create-activity-extension.tsx"
+  ]
 }

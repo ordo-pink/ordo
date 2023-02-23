@@ -1,10 +1,9 @@
 import { ColourTheme } from "@ordo-pink/common-types"
+import { createActivityExtension, OrdoActivityProps } from "@ordo-pink/extensions"
 import { TwoLetterLocale } from "@ordo-pink/locale"
 import en from "./translations/en.json"
 import ru from "./translations/ru.json"
 import { SettingsPersistedState } from "./types"
-import { createActivityExtension } from "../../core/extensions/create-activity-extension"
-import { OrdoExtensionProps } from "../../core/types"
 
 const settings = createActivityExtension("settings", {
   Component: () => import("./components"),
@@ -18,6 +17,6 @@ const settings = createActivityExtension("settings", {
   } as SettingsPersistedState,
 })
 
-export type SettingsProps = OrdoExtensionProps<typeof settings>
+export type SettingsProps = OrdoActivityProps<typeof settings>
 
 export default settings

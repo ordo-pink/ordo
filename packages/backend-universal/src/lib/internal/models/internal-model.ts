@@ -1,78 +1,107 @@
 import { Readable } from "stream"
 import { SystemDirectory } from "@ordo-pink/common-types"
-import { IOrdoInternal } from "@ordo-pink/fs-entity"
-import { FSDriver, IOrdoInternalModel } from "../../types"
+import { IOrdoDirectoryRaw, IOrdoInternal, OrdoDirectory, OrdoFile } from "@ordo-pink/fs-entity"
+import { FSDriver, IOrdoDirectoryModel, IOrdoInternalModel, StorageLimits } from "../../types"
 
-const MAX_UPLOAD_SIZE = process.env.VITE_FREE_UPLOAD_SIZE
-const MAX_TOTAL_SIZE = process.env.VITE_FREE_SPACE_LIMIT
+type IOrdoInternalModelParams = {
+  fsDriver: FSDriver
+  limits: StorageLimits
+  directory: IOrdoDirectoryModel
+}
 
-const maxUploadSize = Number(MAX_UPLOAD_SIZE)
-const maxTotalSize = Number(MAX_TOTAL_SIZE)
+const reduceDirectoryToSize = (directory: IOrdoDirectoryRaw, totalSize = 0) =>
+  directory.children.reduce((acc, child) => {
+    if (OrdoDirectory.isOrdoDirectoryRaw(child))
+      return acc + reduceDirectoryToSize(child, totalSize)
+    if (OrdoFile.isOrdoFileRaw(child)) return acc + child.size
 
-if (Number.isNaN(maxUploadSize) || maxUploadSize <= 0)
-  throw new Error("VITE_FREE_UPLOAD_VALUE is invalid")
-if (Number.isNaN(maxTotalSize) || maxTotalSize <= 0)
-  throw new Error("VITE_FREE_SPACE_LIMIT is invalid")
+    return acc
+  }, totalSize)
 
 export const OrdoInternalModel = {
-  of: (driver: FSDriver): IOrdoInternalModel => ({
-    getInternalValue: (userId, key) =>
-      OrdoInternalModel.of(driver)
-        .getValues(userId)
-        .then((internal: IOrdoInternal) => internal[key]),
-    setInternalValue: (userId, key, value) =>
-      OrdoInternalModel.of(driver)
-        .getValues(userId)
-        .then(async (internal: IOrdoInternal) => {
-          const path = `/${userId}${SystemDirectory.INTERNAL}ordo.json` as const
+  of: ({ fsDriver, limits, directory }: IOrdoInternalModelParams): IOrdoInternalModel => {
+    const { maxTotalSize, maxUploadSize } = limits
 
-          const internalCopy = { ...internal }
+    if (Number.isNaN(maxUploadSize) || maxUploadSize <= 0) {
+      throw new Error("Max upload size is invalid")
+    }
 
-          internalCopy[key] = value
+    if (Number.isNaN(maxTotalSize) || maxTotalSize <= 0) {
+      throw new Error("Max total size is invalid")
+    }
 
-          const content = new Readable()
+    return {
+      getInternalValue: (userId, key) =>
+        OrdoInternalModel.of({ fsDriver: fsDriver, limits, directory: directory })
+          .getValues(userId)
+          .then((internal: IOrdoInternal) => internal[key]),
+      setInternalValue: (userId, key, value) =>
+        OrdoInternalModel.of({ fsDriver: fsDriver, limits, directory: directory })
+          .getValues(userId)
+          .then(async (internal: IOrdoInternal) => {
+            const path = `/${userId}${SystemDirectory.INTERNAL}ordo.json` as const
 
-          content.push(JSON.stringify(internalCopy))
-          content.push(null)
+            const internalCopy = { ...internal }
 
-          await driver.updateFile({ path, content })
-        }),
-    getValues: (userId) => {
-      const path = `/${userId}${SystemDirectory.INTERNAL}ordo.json` as const
+            internalCopy[key] = value
 
-      return driver
-        .checkFileExists(path)
-        .then(async (exists) => {
-          if (!exists) {
             const content = new Readable()
 
-            const payload: IOrdoInternal = {
-              maxTotalSize: maxTotalSize,
-              maxUploadSize: maxUploadSize,
-              totalSize: 0,
-            }
-
-            content.push(JSON.stringify(payload))
+            content.push(JSON.stringify(internalCopy))
             content.push(null)
 
-            await driver.createFile({ path, content })
-          }
+            await fsDriver.updateFile({ path, content })
+          }),
+      getValues: (userId) => {
+        const parent = `/${userId}${SystemDirectory.INTERNAL}` as const
+        const path = `${parent}ordo.json` as const
 
-          return path
-        })
-        .then(driver.getFile)
-        .then(
-          (content) =>
-            new Promise<string>((resolve, reject) => {
-              const body = []
+        return fsDriver
+          .checkDirectoryExists(parent)
+          .then(async (exists) => {
+            if (!exists) {
+              await fsDriver.createDirectory(parent)
 
-              content
-                .on("data", (chunk) => body.push(chunk))
-                .on("error", reject)
-                .on("end", () => resolve(Buffer.concat(body).toString("utf8")))
-            }),
-        )
-        .then((content) => JSON.parse(content) as IOrdoInternal)
-    },
-  }),
+              return false
+            }
+
+            return fsDriver.checkFileExists(path)
+          })
+          .then(async (exists) => {
+            if (!exists) {
+              const content = new Readable()
+
+              const rootDir = await directory.getDirectory(`/${userId}/`)
+              const totalSize = reduceDirectoryToSize(rootDir)
+
+              const payload: IOrdoInternal = {
+                maxTotalSize: maxTotalSize,
+                maxUploadSize: maxUploadSize,
+                totalSize,
+              }
+
+              content.push(JSON.stringify(payload))
+              content.push(null)
+
+              await fsDriver.createFile({ path, content })
+            }
+
+            return path
+          })
+          .then(fsDriver.getFile)
+          .then(
+            (content) =>
+              new Promise<string>((resolve, reject) => {
+                const body = []
+
+                content
+                  .on("data", (chunk) => body.push(chunk))
+                  .on("error", reject)
+                  .on("end", () => resolve(Buffer.concat(body).toString("utf8")))
+              }),
+          )
+          .then((content) => JSON.parse(content) as IOrdoInternal)
+      },
+    }
+  },
 }

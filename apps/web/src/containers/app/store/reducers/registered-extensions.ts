@@ -1,17 +1,19 @@
-import { OrdoExtensionType } from "@ordo-pink/common-types"
-import { CaseReducer, PayloadAction } from "@reduxjs/toolkit"
 import {
+  OrdoExtension,
+  OrdoExtensionType,
   isActivityExtension,
   isCommandExtension,
   isFileAssociationExtension,
   isEditorPluginExtension,
-} from "../../../../core/guards/is-extension"
-import { OrdoExtension } from "../../../../core/types"
+} from "@ordo-pink/extensions"
+import { CaseReducer, PayloadAction } from "@reduxjs/toolkit"
 import { AppState } from "../../types"
 
 export const registeredExtensionsReducer: CaseReducer<
   AppState,
-  PayloadAction<OrdoExtension<string, OrdoExtensionType>[]>
+  PayloadAction<
+    OrdoExtension<string, OrdoExtensionType, Record<string, unknown>, Record<string, unknown>>[]
+  >
 > = (state, action) => {
   state.activityExtensions = []
   state.commandExtensions = []

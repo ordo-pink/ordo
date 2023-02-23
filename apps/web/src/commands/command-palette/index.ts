@@ -1,8 +1,8 @@
+import { createCommandExtension } from "@ordo-pink/extensions"
 import OpenCommandPalette from "./commands/open-command-palette"
 import { slice } from "./store"
 import en from "./translations/en.json"
 import ru from "./translations/ru.json"
-import { createCommandExtension } from "../../core/extensions/create-command-extension"
 
 export default createCommandExtension("command-palette", {
   commands: [OpenCommandPalette],

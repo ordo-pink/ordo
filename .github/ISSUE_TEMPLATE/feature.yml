@@ -21,7 +21,8 @@ body:
     id: what-is-it-you-truly-desire
     attributes:
       label: What is it you truly desire
-      description: Also tell us, what would be the usecase for you personally if Ordo had that feature?
+      description:
+        Also tell us, what would be the usecase for you personally if Ordo had that feature?
       placeholder: All other windows should automatically close when I open Ordo...
     validations:
       required: true
@@ -29,7 +30,8 @@ body:
     id: terms
     attributes:
       label: Code of Conduct
-      description: By submitting this issue, you agree to follow our [Code of Conduct](https://example.com)
+      description:
+        By submitting this issue, you agree to follow our [Code of Conduct](https://example.com)
       options:
         - label: I agree to follow this project's Code of Conduct
           required: true

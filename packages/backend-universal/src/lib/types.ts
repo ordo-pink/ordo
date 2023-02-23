@@ -62,6 +62,7 @@ export type CreateOrdoBackendServerParams = {
   corsOptions?: Parameters<typeof cors>[0]
   authorise: RequestHandler<Params<Record<string, unknown>>>
   logger: Logger
+  limits: StorageLimits
 }
 
 export type FSDriver = {
@@ -122,4 +123,9 @@ export type IOrdoDirectoryModel = {
     Promise<IOrdoDirectoryRaw>
   >
   createDirectory: UnaryFn<OrdoDirectoryPath, Promise<IOrdoDirectoryRaw>>
+}
+
+export type StorageLimits = {
+  maxUploadSize: number
+  maxTotalSize: number
 }

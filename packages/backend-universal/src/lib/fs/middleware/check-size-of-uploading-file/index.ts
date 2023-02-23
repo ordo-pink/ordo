@@ -7,8 +7,6 @@ export const checkSizeOfUploadingFile: FsRequestHandler<OrdoFilePathParams> =
   async (req, res, next) => {
     const userId = req.params[USER_ID_PARAM]
 
-    req.params.logger.info("HELLLOs")
-
     const contentSize = Number(req.headers["content-length"])
 
     const maxFileSizeMB = await internal.getInternalValue(userId, "maxUploadSize")

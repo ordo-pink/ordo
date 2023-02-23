@@ -1,12 +1,10 @@
 import { UnaryFn } from "@ordo-pink/common-types"
+import { noOp, lazyBox, preventDefault, stopPropagation } from "@ordo-pink/fns"
 import { IOrdoFile } from "@ordo-pink/fs-entity"
+import { ActionListItem } from "@ordo-pink/react-components"
 import { MouseEvent } from "react"
 import { BsFileEarmarkBinary } from "react-icons/bs"
-import ActionListItem from "../../../core/components/action-list/item"
 import { useAppSelector } from "../../../core/state/hooks/use-app-selector"
-import { preventDefault, stopPropagation } from "../../../core/utils/event"
-import { lazyBox } from "../../../core/utils/lazy-box"
-import { noOp } from "../../../core/utils/no-op"
 
 type Props = {
   isCurrent: boolean

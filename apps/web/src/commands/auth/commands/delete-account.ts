@@ -1,4 +1,4 @@
-import { createOrdoCommand } from "../../../core/extensions/create-ordo-command"
+import { createOrdoCommand } from "@ordo-pink/extensions"
 
 export const DeleteAccount = createOrdoCommand({
   title: "@ordo-command-auth/delete-account",

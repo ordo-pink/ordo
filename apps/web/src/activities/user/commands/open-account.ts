@@ -1,4 +1,4 @@
-import { createOrdoCommand } from "../../../core/extensions/create-ordo-command"
+import { createOrdoCommand } from "@ordo-pink/extensions"
 
 export const OpenAccountCommand = createOrdoCommand<"ordo-activity-user">({
   Icon: () => import("../components/icon"),

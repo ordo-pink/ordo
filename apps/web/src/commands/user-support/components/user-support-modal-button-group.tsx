@@ -31,6 +31,7 @@ export default function DeleteModalButtonGroup() {
     <div className="user-support-modal_button-group">
       <OrdoButtonSecondary
         hotkey="escape"
+        center
         onClick={handleCancelButtonClick}
       >
         {translatedCancel}

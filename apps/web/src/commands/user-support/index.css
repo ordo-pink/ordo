@@ -15,5 +15,5 @@
 }
 
 .user-support-modal_button-group {
-  @apply w-full flex items-center justify-around;
+  @apply w-full flex flex-col space-y-4 md:flex-row md:space-y-0 md:items-center md:justify-around;
 }

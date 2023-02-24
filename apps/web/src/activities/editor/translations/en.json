@@ -9,5 +9,7 @@
   "@ordo-activity-editor/create-file": "Create file",
   "@ordo-activity-editor/create-directory": "Create directory",
   "@ordo-activity-editor/create-modal.create-file.placeholder": "File name",
-  "@ordo-activity-editor/create-modal.create-directory.placeholder": "Directory name"
+  "@ordo-activity-editor/create-modal.create-directory.placeholder": "Directory name",
+  "@ordo-activity-editor/initial-file": "# Hello\n\nWelcome to Ordo!",
+  "@ordo-activity-editor/initial-file-name": "index"
 }

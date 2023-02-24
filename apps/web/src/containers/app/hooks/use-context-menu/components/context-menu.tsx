@@ -1,7 +1,7 @@
 import { ThunkFn } from "@ordo-pink/common-types"
 import { Either } from "@ordo-pink/either"
 import { lazyBox, preventDefault, stopPropagation } from "@ordo-pink/fns"
-import { Null } from "@ordo-pink/react-components"
+import { Null } from "@ordo-pink/react"
 import { useEffect, useState, useRef, useLayoutEffect } from "react"
 import { useHotkeys } from "react-hotkeys-hook"
 import ContextMenuItem from "../../../../../containers/app/hooks/use-context-menu/components/context-menu-item"

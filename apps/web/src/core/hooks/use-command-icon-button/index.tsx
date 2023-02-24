@@ -1,6 +1,6 @@
-import { Null } from "@ordo-pink/react-components"
+import { OrdoCommandExtension, OrdoCommand } from "@ordo-pink/extensions"
+import { Null } from "@ordo-pink/react"
 import { useTranslation } from "react-i18next"
-import { OrdoCommandExtension, OrdoCommand } from "../../types"
 import { useActionContext } from "../use-action-context"
 
 import "./index.css"
@@ -9,7 +9,8 @@ import "./index.css"
 export const useCommandIconButton = <
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   State extends Record<string, any>,
-  T extends OrdoCommandExtension<string, State>,
+  PersistedState extends Record<string, unknown>,
+  T extends OrdoCommandExtension<string, State, PersistedState>,
 >(
   extension: T,
   commandName: string,

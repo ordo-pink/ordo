@@ -1,6 +1,6 @@
 import { Either } from "@ordo-pink/either"
 import { lazyBox, preventDefault, stopPropagation } from "@ordo-pink/fns"
-import { Fieldset, OrdoButtonPrimary } from "@ordo-pink/react-components"
+import { Fieldset, OrdoButtonPrimary } from "@ordo-pink/react"
 import { MouseEvent } from "react"
 import { useTranslation } from "react-i18next"
 import { BsPatchCheckFill, BsPatchExclamationFill } from "react-icons/bs"

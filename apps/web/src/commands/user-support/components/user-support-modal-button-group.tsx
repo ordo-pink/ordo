@@ -1,5 +1,5 @@
 import { lazyBox } from "@ordo-pink/fns"
-import { OrdoButtonSecondary, OrdoButtonNeutral } from "@ordo-pink/react-components"
+import { OrdoButtonSecondary, OrdoButtonNeutral } from "@ordo-pink/react"
 import { useTranslation } from "react-i18next"
 import { AiTwotoneMail } from "react-icons/ai"
 import { BsTelegram } from "react-icons/bs"
@@ -31,6 +31,7 @@ export default function DeleteModalButtonGroup() {
     <div className="user-support-modal_button-group">
       <OrdoButtonSecondary
         hotkey="escape"
+        center
         onClick={handleCancelButtonClick}
       >
         {translatedCancel}

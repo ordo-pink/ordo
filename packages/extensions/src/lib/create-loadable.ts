@@ -1,5 +1,5 @@
 import { loadable } from "@ordo-pink/loadable"
-import { Loading } from "@ordo-pink/react-components"
+import { Loading } from "@ordo-pink/react"
 import { ComponentType } from "react"
 
 export const createLoadable = (
@@ -12,4 +12,5 @@ export const createLoadable = (
     loading,
     delay,
     timeout: 10000,
-  })
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  }) as any

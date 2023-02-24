@@ -1,6 +1,6 @@
 import { Either } from "@ordo-pink/either"
 import { IOrdoDirectory } from "@ordo-pink/fs-entity"
-import { Null } from "@ordo-pink/react-components"
+import { Null } from "@ordo-pink/react"
 import FileOrDirectory from "./file-or-directory"
 
 type Props = {

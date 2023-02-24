@@ -16,7 +16,7 @@ import { MarkdownShortcutPlugin } from "@lexical/react/LexicalMarkdownShortcutPl
 import { RichTextPlugin } from "@lexical/react/LexicalRichTextPlugin"
 import { HeadingNode, QuoteNode } from "@lexical/rich-text"
 import { TableNode, TableCellNode, TableRowNode } from "@lexical/table"
-import { useWorkspace } from "@ordo-pink/react-components"
+import { useWorkspace } from "@ordo-pink/react"
 import { EditorThemeClasses } from "lexical"
 // import { useState, useEffect, ComponentType } from "react"
 import Helmet from "react-helmet"

@@ -1,5 +1,5 @@
 import { lazyBox, preventDefault, stopPropagation } from "@ordo-pink/fns"
-import { Accelerator, Null } from "@ordo-pink/react-components"
+import { Accelerator, Null } from "@ordo-pink/react"
 import { MouseEvent } from "react"
 import { useTranslation } from "react-i18next"
 import { hideContextMenu } from "../../../../../containers/app/hooks/use-context-menu/store"

@@ -1,4 +1,4 @@
-import { ActionListItem, ComingSoonBadge } from "@ordo-pink/react-components"
+import { ActionListItem, ComingSoonBadge } from "@ordo-pink/react"
 import { useTranslation } from "react-i18next"
 import { AiOutlineMenu, AiOutlineTeam } from "react-icons/ai"
 import {

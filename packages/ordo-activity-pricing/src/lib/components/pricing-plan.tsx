@@ -1,5 +1,5 @@
 import { ThunkFn } from "@ordo-pink/common-types"
-import { OrdoButtonPrimary } from "@ordo-pink/react-components"
+import { OrdoButtonPrimary } from "@ordo-pink/react"
 import { useTranslation } from "react-i18next"
 import { BsArrowRight } from "react-icons/bs"
 import PricingPlanFeature from "./pricing-plan-feature"

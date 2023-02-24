@@ -1,0 +1,3 @@
+.workspace-wrapper {
+  @apply flex w-screen h-screen overflow-hidden pb-11;
+}

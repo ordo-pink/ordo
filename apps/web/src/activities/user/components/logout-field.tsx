@@ -1,5 +1,5 @@
 import { lazyBox, preventDefault, stopPropagation } from "@ordo-pink/fns"
-import { Fieldset, OrdoButtonSecondary } from "@ordo-pink/react-components"
+import { Fieldset, OrdoButtonSecondary } from "@ordo-pink/react"
 import { MouseEvent } from "react"
 import { useTranslation } from "react-i18next"
 import { AiOutlineLogout } from "react-icons/ai"

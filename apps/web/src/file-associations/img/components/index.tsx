@@ -1,5 +1,5 @@
 import { Either } from "@ordo-pink/either"
-import { Loading, PathBreadcrumbs } from "@ordo-pink/react-components"
+import { Loading, PathBreadcrumbs } from "@ordo-pink/react"
 import { useEffect, useState } from "react"
 import { ImgProps } from ".."
 import { useFileParentBreadcrumbs } from "../../../core/hooks/use-file-breadcrumbs"

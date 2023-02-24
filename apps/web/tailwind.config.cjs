@@ -8,7 +8,11 @@ module.exports = {
   ],
   darkMode: "class",
   theme: {
-    extend: {},
+    extend: {
+      transitionProperty: {
+        background: "background",
+      },
+    },
   },
   plugins: [],
 }

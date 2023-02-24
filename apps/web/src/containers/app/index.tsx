@@ -248,7 +248,7 @@ export default function App() {
 
   return (
     <div
-      className="bg-neutral-50 text-neutral-800 dark:bg-neutral-700 dark:text-neutral-200 flex flex-col min-h-screen"
+      className="bg-neutral-50 text-neutral-800 dark:bg-neutral-700 dark:text-neutral-200 flex flex-col min-h-screen overflow-hidden"
       onContextMenu={handleContextMenu}
     >
       <Helmet>

@@ -1,6 +1,6 @@
 import { ReactKeycloakProvider } from "@ordo-pink/keycloak"
 import { ConsoleLogger } from "@ordo-pink/logger"
-import { Loading } from "@ordo-pink/react-components"
+import { Loading } from "@ordo-pink/react"
 import Keycloak from "keycloak-js"
 import ReactDOM from "react-dom/client"
 import { Helmet } from "react-helmet"

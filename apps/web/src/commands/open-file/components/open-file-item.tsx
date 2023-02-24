@@ -1,7 +1,7 @@
 import { UnaryFn } from "@ordo-pink/common-types"
 import { noOp, lazyBox, preventDefault, stopPropagation } from "@ordo-pink/fns"
 import { IOrdoFile } from "@ordo-pink/fs-entity"
-import { ActionListItem } from "@ordo-pink/react-components"
+import { ActionListItem } from "@ordo-pink/react"
 import { MouseEvent } from "react"
 import { BsFileEarmarkBinary } from "react-icons/bs"
 import { useAppSelector } from "../../../core/state/hooks/use-app-selector"

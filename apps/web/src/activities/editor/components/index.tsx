@@ -45,7 +45,7 @@ export default function Editor(props: EditorProps) {
   const isSaving = useAppSelector((state) => state.app.isSaving)
   const tree = useAppSelector((state) => state.app.personalProject)
   const fileAssociations = useAppSelector((state) => state.app.fileAssociationExtensions)
-  const currentFile = editorSelector((state) => state["ordo-activity-editor"].currentFile)
+  const currentFile = editorSelector((state) => state["ordo-activity-editor"]?.currentFile)
 
   useEffect(() => {
     const queryPath = query.get("path")

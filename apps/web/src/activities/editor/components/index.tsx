@@ -161,7 +161,7 @@ export default function Editor(props: EditorProps) {
         <div
           className={`${
             isSaving ? "block" : "hidden"
-          } fixed bottom-2 right-2 opacity-50 flex items-center text-xs space-x-2 text-right`}
+          } fixed top-2 left-0 right-0 w-full opacity-50 flex items-center justify-center text-xs space-x-2 text-right md:pb-10`}
         >
           <AiOutlineLoading className="animate-spin" />
           <div>{translatedSaving}</div>

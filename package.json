@@ -119,6 +119,7 @@
     "mime-types": "^2.1.35",
     "morgan": "^1.10.0",
     "node-fetch": "^3.3.0",
+    "observable-hooks": "^4.2.1",
     "ramda": "^0.28.0",
     "react": "^18.2.0",
     "react-dom": "18.2.0",
@@ -130,6 +131,10 @@
     "react-redux": "^8.0.5",
     "react-router-dom": "^6.4.3",
     "react-split": "^2.0.14",
+    "router5": "^8.0.1",
+    "router5-plugin-browser": "^8.0.1",
+    "rxjs": "^7.8.0",
+    "silkrouter": "^4.2.16",
     "tslib": "^2.3.0"
   }
 }

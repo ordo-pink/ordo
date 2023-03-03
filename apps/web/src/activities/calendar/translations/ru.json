@@ -37,5 +37,11 @@
   "@ordo-activity-calendar/09": "Сентябрь",
   "@ordo-activity-calendar/10": "Октябрь",
   "@ordo-activity-calendar/11": "Ноябрь",
-  "@ordo-activity-calendar/12": "Декабрь"
+  "@ordo-activity-calendar/12": "Декабрь",
+  "@ordo-activity-calendar/all-day": "Весь день",
+  "@ordo-activity-calendar/title-placeholder": "Название",
+  "@ordo-activity-calendar/popup-is-allday": "Весь день",
+  "@ordo-activity-calendar/popup-save": "Создать",
+  "@ordo-activity-calendar/popup-edit": "Редактировать",
+  "@ordo-activity-calendar/popup-delete": "Удалить"
 }

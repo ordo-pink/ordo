@@ -41,5 +41,11 @@
   "@ordo-activity-calendar/month-09": "September",
   "@ordo-activity-calendar/month-10": "October",
   "@ordo-activity-calendar/month-11": "November",
-  "@ordo-activity-calendar/month-12": "December"
+  "@ordo-activity-calendar/month-12": "December",
+  "@ordo-activity-calendar/all-day": "All day",
+  "@ordo-activity-calendar/title-placeholder": "Subject",
+  "@ordo-activity-calendar/popup-is-allday": "All day",
+  "@ordo-activity-calendar/popup-save": "Create",
+  "@ordo-activity-calendar/popup-edit": "Edit",
+  "@ordo-activity-calendar/popup-delete": "Delete"
 }

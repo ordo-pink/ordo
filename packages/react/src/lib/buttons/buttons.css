@@ -1,9 +1,9 @@
-.active-ring {
-  @apply hover:ring-2 hover:ring-pink-300 dark:hover:ring-pink-500 focus:ring-2 focus:ring-pink-300 dark:focus:ring-pink-500 transition-all duration-300;
+.active-border {
+  @apply border-2 border-transparent hover:border-pink-300 dark:hover:border-pink-500 focus:border-pink-300 dark:focus:border-pink-500 transition-all duration-300;
 }
 
-.passive-ring {
-  @apply hover:ring-2 hover:ring-neutral-500 dark:hover:ring-neutral-500 focus:ring-2 focus:ring-neutral-500 dark:focus:ring-neutral-500 transition-all duration-300;
+.passive-border {
+  @apply border-2 border-transparent hover:border-neutral-500 dark:hover:border-neutral-500 focus:border-neutral-500 dark:focus:border-neutral-500 transition-all duration-300;
 }
 
 .button {
@@ -31,19 +31,19 @@
 }
 
 .button-primary {
-  @apply transition-all duration-300 bg-gradient-to-br from-sky-200 dark:from-purple-600 via-violet-200 dark:via-violet-600 to-purple-200 dark:to-purple-600 active-ring;
+  @apply transition-all duration-300 bg-gradient-to-br from-sky-200 dark:from-purple-600 via-violet-200 dark:via-violet-600 to-purple-200 dark:to-purple-600 active-border;
 }
 
 .button-primary-inverted {
-  @apply bg-gradient-to-br from-purple-600 via-violet-600 to-purple-600 active-ring text-neutral-200;
+  @apply bg-gradient-to-br from-purple-600 via-violet-600 to-purple-600 active-border text-neutral-200;
 }
 
 .button-primary-disabled {
-  @apply bg-gradient-to-br from-slate-300 via-zinc-300 to-stone-300 dark:from-slate-900 dark:via-zinc-900 dark:to-stone-900 passive-ring;
+  @apply bg-gradient-to-br from-slate-300 via-zinc-300 to-stone-300 dark:from-slate-900 dark:via-zinc-900 dark:to-stone-900 passive-border;
 }
 
 .button-secondary {
-  @apply transition-all duration-300 text-neutral-600 dark:text-neutral-300 passive-ring;
+  @apply transition-all duration-300 text-neutral-600 dark:text-neutral-300 passive-border;
 }
 
 .button-secondary-inverted {
@@ -51,17 +51,17 @@
 }
 
 .button-secondary-disabled {
-  @apply text-neutral-600 dark:text-neutral-300 passive-ring;
+  @apply text-neutral-600 dark:text-neutral-300 passive-border;
 }
 
 .button-neutral {
-  @apply transition-all duration-300 bg-gradient-to-r from-neutral-300 via-stone-300 to-neutral-300 dark:from-neutral-600 dark:via-stone-600 dark:to-neutral-600 active-ring;
+  @apply transition-all duration-300 bg-gradient-to-r from-neutral-300 via-stone-300 to-neutral-300 dark:from-neutral-600 dark:via-stone-600 dark:to-neutral-600 active-border;
 }
 
 .button-neutral-inverted {
-  @apply bg-gradient-to-br from-purple-600 via-violet-600 to-purple-600 active-ring text-neutral-200;
+  @apply bg-gradient-to-br from-purple-600 via-violet-600 to-purple-600 active-border text-neutral-200;
 }
 
 .button-neutral-disabled {
-  @apply bg-gradient-to-r from-slate-300 via-zinc-300 to-stone-300 dark:from-slate-900 dark:via-zinc-900 dark:to-stone-900 passive-ring;
+  @apply bg-gradient-to-r from-slate-300 via-zinc-300 to-stone-300 dark:from-slate-900 dark:via-zinc-900 dark:to-stone-900 passive-border;
 }

@@ -36,7 +36,7 @@ export default function Calendar() {
         </title>
       </Helmet>
 
-      <div className="flex items-center space-x-2 justify-center mt-4">
+      <div className="flex items-center space-x-2 justify-center py-4">
         <OrdoButtonSecondary
           onClick={() => setCurrentView(CalendarView.DAY)}
           outline={currentView === CalendarView.DAY}

@@ -6,7 +6,7 @@ import { $isHeadingNode } from "@lexical/rich-text"
 import { $getNearestNodeOfType, mergeRegister } from "@lexical/utils"
 import { Nullable } from "@ordo-pink/common-types"
 import { Either } from "@ordo-pink/either"
-import { Null } from "@ordo-pink/react"
+import { Null } from "@ordo-pink/react-utils"
 import {
   $getSelection,
   $isRangeSelection,

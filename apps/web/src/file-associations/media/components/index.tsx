@@ -1,5 +1,5 @@
 import { Either } from "@ordo-pink/either"
-import { Loading, PathBreadcrumbs } from "@ordo-pink/react"
+import { Loading, PathBreadcrumbs } from "@ordo-pink/react-utils"
 import { useEffect, useState } from "react"
 import { useIsVideo } from "./use-is-video"
 import { MediaProps } from ".."

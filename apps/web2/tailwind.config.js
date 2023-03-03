@@ -1,0 +1,19 @@
+const { join } = require("path")
+const { createGlobPatternsForDependencies } = require("@nrwl/react/tailwind")
+
+module.exports = {
+  content: [
+    join(__dirname, "src/**/*!(*.stories|*.spec).{ts,tsx,html,css}"),
+    join(__dirname, "index.html"),
+    ...createGlobPatternsForDependencies(__dirname),
+  ],
+  darkMode: "class",
+  theme: {
+    extend: {
+      transitionProperty: {
+        background: "background",
+      },
+    },
+  },
+  plugins: [],
+}

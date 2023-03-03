@@ -1,5 +1,5 @@
 import { lazyBox } from "@ordo-pink/fns"
-import { OrdoButtonSecondary, OrdoButtonNeutral } from "@ordo-pink/react"
+import { OrdoButtonSecondary, OrdoButtonNeutral } from "@ordo-pink/react-utils"
 import { useTranslation } from "react-i18next"
 import { AiTwotoneMail } from "react-icons/ai"
 import { BsTelegram } from "react-icons/bs"

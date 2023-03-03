@@ -1,6 +1,6 @@
 import { lazyBox, preventDefault, stopPropagation } from "@ordo-pink/fns"
 import { IOrdoFile } from "@ordo-pink/fs-entity"
-import { ActionListItem } from "@ordo-pink/react"
+import { ActionListItem } from "@ordo-pink/react-utils"
 import { MouseEvent } from "react"
 import { BsFileEarmarkBinary } from "react-icons/bs"
 import { createSearchParams, useNavigate, useSearchParams } from "react-router-dom"

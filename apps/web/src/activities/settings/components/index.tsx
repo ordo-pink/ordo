@@ -1,4 +1,4 @@
-import { useWorkspace } from "@ordo-pink/react"
+import { useWorkspace } from "@ordo-pink/react-utils"
 import { createContext } from "react"
 import { Helmet } from "react-helmet"
 import { useTranslation } from "react-i18next"

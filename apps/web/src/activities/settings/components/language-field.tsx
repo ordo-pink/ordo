@@ -1,5 +1,5 @@
 import { TwoLetterLocale, ISO_639_1_Locale } from "@ordo-pink/locale"
-import { Fieldset } from "@ordo-pink/react"
+import { Fieldset } from "@ordo-pink/react-utils"
 import { ChangeEvent, useContext, useEffect, useState } from "react"
 import { useTranslation } from "react-i18next"
 import { SettingsContext } from "."

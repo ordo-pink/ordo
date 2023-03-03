@@ -1,6 +1,6 @@
 import { Either } from "@ordo-pink/either"
 import { lazyBox, preventDefault, stopPropagation } from "@ordo-pink/fns"
-import { Null, OrdoButtonNeutral } from "@ordo-pink/react"
+import { Null, OrdoButtonNeutral } from "@ordo-pink/react-utils"
 import { MouseEvent, useEffect } from "react"
 import FileOrDirectory from "./file-or-directory"
 import { useContextMenu } from "../../../../containers/app/hooks/use-context-menu"

@@ -7,6 +7,7 @@
     "moduleResolution": "node",
     "esModuleInterop": true,
     "emitDecoratorMetadata": true,
+    "resolveJsonModule": true,
     "experimentalDecorators": true,
     "importHelpers": true,
     "target": "es2015",
@@ -34,8 +35,9 @@
       "@ordo-pink/ordo-activity-features": ["packages/ordo-activity-features/src/index.ts"],
       "@ordo-pink/ordo-activity-home": ["packages/ordo-activity-home/src/index.ts"],
       "@ordo-pink/ordo-activity-pricing": ["packages/ordo-activity-pricing/src/index.ts"],
-      "@ordo-pink/react": ["packages/react/src/index.ts"],
-      "@ordo-pink/switch": ["packages/switch/src/index.ts"]
+      "@ordo-pink/react-utils": ["packages/react-utils/src/index.ts"],
+      "@ordo-pink/switch": ["packages/switch/src/index.ts"],
+      "@ordo-pink/unauthorised": ["packages/unauthorised/src/index.ts"]
     },
     "plugins": [
       {

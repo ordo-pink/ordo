@@ -1,4 +1,4 @@
-import { Loading } from "@ordo-pink/react"
+import { Loading } from "@ordo-pink/react-utils"
 import { createBrowserRouter } from "react-router-dom"
 import App from "../../containers/app"
 

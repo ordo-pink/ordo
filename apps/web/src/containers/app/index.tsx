@@ -6,7 +6,7 @@ import {
   OrdoExtensionType,
 } from "@ordo-pink/extensions"
 import { useKeycloak } from "@ordo-pink/keycloak"
-import Features from "@ordo-pink/ordo-activity-features"
+import Features from "packages/unauthorised/src/lib/features/src"
 import Home from "@ordo-pink/ordo-activity-home"
 import Pricing from "@ordo-pink/ordo-activity-pricing"
 import { combineReducers, Reducer } from "@reduxjs/toolkit"

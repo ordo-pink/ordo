@@ -1,7 +1,12 @@
 import { Either } from "@ordo-pink/either"
 import { lazyBox, stopPropagation, preventDefault } from "@ordo-pink/fns"
 import { OrdoFilePath, OrdoDirectory, OrdoFile, OrdoDirectoryPath } from "@ordo-pink/fs-entity"
-import { Null, OrdoButtonPrimary, OrdoButtonSecondary, PathBreadcrumbs } from "@ordo-pink/react"
+import {
+  Null,
+  OrdoButtonPrimary,
+  OrdoButtonSecondary,
+  PathBreadcrumbs,
+} from "@ordo-pink/react-utils"
 import { ChangeEvent, MouseEvent, useEffect, useState } from "react"
 import { useTranslation } from "react-i18next"
 import { BsFileEarmarkPlus, BsFolderPlus } from "react-icons/bs"

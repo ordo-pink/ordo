@@ -1,4 +1,4 @@
-import { OrdoButtonSecondary, useWorkspace } from "@ordo-pink/react"
+import { OrdoButtonSecondary, useWorkspace } from "@ordo-pink/react-utils"
 import { Switch } from "@ordo-pink/switch"
 import { useState } from "react"
 import { Helmet } from "react-helmet"

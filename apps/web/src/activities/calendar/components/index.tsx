@@ -1,14 +1,17 @@
 import { useWorkspace } from "@ordo-pink/react"
+import { EventObject } from "@toast-ui/calendar/dist/toastui-calendar.min.css"
 import ToastCalendar from "@toast-ui/react-calendar"
+import ToastUIReactCalendar from "@toast-ui/react-calendar"
+// import createFrequency from "date-frequency"
 import { useEffect, useRef, useState } from "react"
 import { useTranslation } from "react-i18next"
-import ToastUIReactCalendar from "@toast-ui/react-calendar"
 
 import "@toast-ui/calendar/dist/toastui-calendar.min.css"
 import "tui-date-picker/dist/tui-date-picker.css"
 import "tui-time-picker/dist/tui-time-picker.css"
 import "./index.css"
-import { EventObject } from "@toast-ui/calendar/dist/toastui-calendar.min.css"
+
+// console.log(createFrequency().on("day", 2).toString())
 
 export default function Calendar() {
   const Workspace = useWorkspace()
@@ -25,7 +28,6 @@ export default function Calendar() {
     calendarRef.current.calendarInstance.on("afterRenderEvent", console.log) // When moved
     calendarRef.current.calendarInstance.on("clickDayName", console.log) // When header clicked
     calendarRef.current.calendarInstance.on("clickEvent", ({ event }) => {
-      console.log(event)
       // TODO: Show edit dialog
       // TODO: -> Remove (file)
       // TODO: -> Update (file)
@@ -51,7 +53,15 @@ export default function Calendar() {
   const popupEdit = t("@ordo-activity-calendar/popup-edit")
   const popupDelete = t("@ordo-activity-calendar/popup-delete")
 
-  const dow = [sun, mon, tue, wed, thu, fri, sat]
+  const dow = [sun, mon, tue, wed, thu, fri, sat] as [
+    string,
+    string,
+    string,
+    string,
+    string,
+    string,
+    string,
+  ]
 
   const [events, setEvents] = useState<EventObject[]>([
     {
@@ -72,6 +82,7 @@ export default function Calendar() {
           week={{
             startDayOfWeek: 1,
             taskView: false,
+            dayNames: dow,
           }}
           month={{ startDayOfWeek: 1, isAlways6Weeks: true }}
           height="85vh"
@@ -94,7 +105,6 @@ export default function Calendar() {
             monthGridFooter: (cellData) => "monthGridFooter",
             monthGridFooterExceed: (hiddenEventsCount: number) => "monthGridFooterExceed",
             monthDayName: (monthDayNameData) => "monthDayName",
-            weekDayName: (weekDayNameData) => dow[weekDayNameData.day],
             weekGridFooterExceed: (hiddenEventsCount) => "weekGridFooterExceed",
             collapseBtnTitle: () => "collapseBtnTitle",
             timezoneDisplayLabel: (props) => "timezoneDisplayLabel",

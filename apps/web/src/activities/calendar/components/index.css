@@ -1,5 +1,5 @@
 .calendar-wrapper {
-  @apply !min-w-full !overflow-x-auto pt-8;
+  @apply !min-w-full !overflow-x-auto pt-4;
 }
 
 .toastui-calendar-layout {

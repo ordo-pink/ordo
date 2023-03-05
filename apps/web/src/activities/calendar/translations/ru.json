@@ -43,5 +43,8 @@
   "@ordo-activity-calendar/popup-is-allday": "Весь день",
   "@ordo-activity-calendar/popup-save": "Создать",
   "@ordo-activity-calendar/popup-edit": "Редактировать",
-  "@ordo-activity-calendar/popup-delete": "Удалить"
+  "@ordo-activity-calendar/popup-delete": "Удалить",
+  "@ordo-activity-calendar/previous-view": "Назад",
+  "@ordo-activity-calendar/current-view": "Сегодня",
+  "@ordo-activity-calendar/next-view": "Вперед"
 }

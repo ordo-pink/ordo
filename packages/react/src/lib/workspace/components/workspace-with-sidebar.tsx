@@ -22,9 +22,9 @@ export default function WorkspaceWithSidebar({
   const [snapRight, setSnapRight] = useState(false)
 
   useEffect(() => {
-    const isNarrow = width < 448
+    const isNarrow = width < 768
 
-    setIsNarrow(width < 448)
+    setIsNarrow(width < 768)
 
     if (isNarrow) {
       setSizes([0, 100])

@@ -47,5 +47,8 @@
   "@ordo-activity-calendar/popup-is-allday": "All day",
   "@ordo-activity-calendar/popup-save": "Create",
   "@ordo-activity-calendar/popup-edit": "Edit",
-  "@ordo-activity-calendar/popup-delete": "Delete"
+  "@ordo-activity-calendar/popup-delete": "Delete",
+  "@ordo-activity-calendar/previous-view": "Previous",
+  "@ordo-activity-calendar/current-view": "Today",
+  "@ordo-activity-calendar/next-view": "Next"
 }

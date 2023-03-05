@@ -1,34 +1,111 @@
-import { OrdoButtonSecondary, useWorkspace } from "@ordo-pink/react"
-import { Switch } from "@ordo-pink/switch"
-import { useState } from "react"
+import { Either } from "@ordo-pink/either"
+import {
+  OrdoButtonSecondary,
+  OrdoButtonPrimary,
+  useWorkspaceWithSidebar,
+  useWindowSize,
+} from "@ordo-pink/react"
+import { EventObject } from "@toast-ui/calendar/*"
+import ToastCalendar from "@toast-ui/react-calendar"
+import ToastUIReactCalendar from "@toast-ui/react-calendar"
+import { useEffect, useRef, useState } from "react"
 import { Helmet } from "react-helmet"
 import { useTranslation } from "react-i18next"
-import { BsCalendarDay, BsCalendarWeek, BsCalendarMonth } from "react-icons/bs"
-import DayView from "../components/day-view"
-import MonthView from "../components/month-view"
-import WeekView from "../components/week-view"
+import { BsArrowClockwise, BsChevronLeft, BsChevronRight } from "react-icons/bs"
+import { Navigate, useParams } from "react-router-dom"
+import CalendarSidebar from "./sidebar"
+
+import "@toast-ui/calendar/dist/toastui-calendar.min.css"
+import "tui-date-picker/dist/tui-date-picker.css"
+import "tui-time-picker/dist/tui-time-picker.css"
+import "./index.css"
 
 // import YearView from "./components/year-view"
 // BsCalendar3 icon for YearButton
 
-enum CalendarView {
-  DAY = "day",
-  WEEK = "week",
-  MONTH = "month",
-  YEAR = "year",
-}
+const RedirectToDayView = () => <Navigate to="/calendar/week" />
 
 export default function Calendar() {
-  const Workspace = useWorkspace()
+  const Workspace = useWorkspaceWithSidebar()
+  const calendarRef = useRef<ToastUIReactCalendar>()
 
+  const { view } = useParams() as { view: "day" | "week" | "month" }
   const { t } = useTranslation()
+  const [width] = useWindowSize()
+
+  const [isWide, setIsWide] = useState(false)
+  const [events, setEvents] = useState<EventObject[]>([
+    {
+      id: "1",
+      title: "Lunch",
+      category: "time",
+      start: new Date(Date.now() + 1000 * 60 * 60 * 3),
+      end: new Date(Date.now() + 1000 * 60 * 60 * 7),
+    },
+  ])
+
+  useEffect(() => {
+    setIsWide(width >= 768)
+  }, [width])
+
+  useEffect(() => {
+    if (!calendarRef.current || !calendarRef.current.calendarInstance) return
+
+    calendarRef.current.calendarInstance.on("selectDateTime", console.log) // When selected range in calendar
+    calendarRef.current.calendarInstance.on("beforeCreateEvent", console.log)
+    calendarRef.current.calendarInstance.on("beforeUpdateEvent", console.log)
+    calendarRef.current.calendarInstance.on("beforeDeleteEvent", console.log)
+    calendarRef.current.calendarInstance.on("afterRenderEvent", console.log) // When moved
+    calendarRef.current.calendarInstance.on("clickDayName", console.log) // When header clicked
+    calendarRef.current.calendarInstance.on("clickEvent", ({ event }) => {
+      // TODO: Show edit dialog
+      // TODO: -> Remove (file)
+      // TODO: -> Update (file)
+    })
+    calendarRef.current.calendarInstance.on("clickMoreEventsBtn", console.log)
+    calendarRef.current.calendarInstance.on("clickTimezonesCollapseBtn", console.log)
+  }, [calendarRef])
+
+  const sun = t("@ordo-activity-calendar/sun")
+  const mon = t("@ordo-activity-calendar/mon")
+  const tue = t("@ordo-activity-calendar/tue")
+  const wed = t("@ordo-activity-calendar/wed")
+  const thu = t("@ordo-activity-calendar/thu")
+  const fri = t("@ordo-activity-calendar/fri")
+  const sat = t("@ordo-activity-calendar/sat")
 
   const translatedTitle = t("@ordo-activity-calendar/title")
+  const allDayTitle = t("@ordo-activity-calendar/all-day")
+  const popupIsAllDay = t("@ordo-activity-calendar/popup-is-allday")
+  const titlePlaceHolder = t("@ordo-activity-calendar/title-placeholder")
+  const popupSave = t("@ordo-activity-calendar/popup-save")
+  const popupEdit = t("@ordo-activity-calendar/popup-edit")
+  const popupDelete = t("@ordo-activity-calendar/popup-delete")
 
-  const [currentView, setCurrentView] = useState(CalendarView.MONTH)
+  const nextView = t("@ordo-activity-calendar/next-view")
+  const currentView = t("@ordo-activity-calendar/current-view")
+  const previousView = t("@ordo-activity-calendar/previous-view")
 
-  return (
-    <Workspace>
+  const toNextView = () => {
+    if (!calendarRef.current || !calendarRef.current.calendarInstance) return
+
+    calendarRef.current.calendarInstance.next()
+  }
+
+  const toPreviousView = () => {
+    if (!calendarRef.current || !calendarRef.current.calendarInstance) return
+
+    calendarRef.current.calendarInstance.prev()
+  }
+
+  const toCurrentView = () => {
+    if (!calendarRef.current || !calendarRef.current.calendarInstance) return
+
+    calendarRef.current.calendarInstance.today()
+  }
+
+  return Either.fromNullable(view).fold(RedirectToDayView, () => (
+    <Workspace sidebarChildren={<CalendarSidebar />}>
       <Helmet>
         <title>
           {"Ordo.pink | "}
@@ -36,41 +113,104 @@ export default function Calendar() {
         </title>
       </Helmet>
 
-      <div className="flex items-center space-x-2 justify-center py-4">
+      <div className="flex items-center space-x-2 justify-center">
         <OrdoButtonSecondary
-          onClick={() => setCurrentView(CalendarView.DAY)}
-          outline={currentView === CalendarView.DAY}
+          onClick={toPreviousView}
+          center
         >
-          <BsCalendarDay />
+          <div className="flex items-center space-x-2">
+            <BsChevronLeft />
+            {isWide && <div>{previousView}</div>}
+          </div>
         </OrdoButtonSecondary>
+
+        <OrdoButtonPrimary
+          onClick={toCurrentView}
+          center
+        >
+          <div className="flex items-center space-x-2">
+            <BsArrowClockwise />
+            {isWide && <div>{currentView}</div>}
+          </div>
+        </OrdoButtonPrimary>
+
         <OrdoButtonSecondary
-          onClick={() => setCurrentView(CalendarView.WEEK)}
-          outline={currentView === CalendarView.WEEK}
+          onClick={toNextView}
+          center
         >
-          <BsCalendarWeek />
+          <div className="flex items-center space-x-2">
+            {isWide && <div>{nextView}</div>}
+            <BsChevronRight />
+          </div>
         </OrdoButtonSecondary>
-        <OrdoButtonSecondary
-          onClick={() => setCurrentView(CalendarView.MONTH)}
-          outline={currentView === CalendarView.MONTH}
-        >
-          <BsCalendarMonth />
-        </OrdoButtonSecondary>
-        {/* <OrdoButtonSecondary
-          onClick={() => setCurrentView(CalendarView.YEAR)}
-          outline={currentView === CalendarView.YEAR}
-        >
-          <BsCalendar3 />
-        </OrdoButtonSecondary> */}
       </div>
 
-      <div className="flex flex-col">
-        {Switch.of(currentView)
-          .case(CalendarView.DAY, () => <DayView />)
-          .case(CalendarView.WEEK, () => <WeekView />)
-          .case(CalendarView.MONTH, () => <MonthView />)
-          // .case(CalendarView.YEAR, () => <YearView />)
-          .default(() => null)}
+      <div className="calendar-wrapper">
+        <ToastCalendar
+          ref={calendarRef as any}
+          view={view}
+          month={{
+            startDayOfWeek: 1,
+            dayNames: [sun, mon, tue, wed, thu, fri, sat],
+            isAlways6Weeks: true,
+          }}
+          week={{
+            startDayOfWeek: 1,
+            taskView: false,
+            dayNames: [sun, mon, tue, wed, thu, fri, sat],
+          }}
+          height="80vh"
+          events={events}
+          usageStatistics={false}
+          template={{
+            milestoneTitle: () => "milestoneTitle",
+            milestone: (event) => "milestone",
+            taskTitle: () => "taskTitle",
+            task: (event) => "task",
+            alldayTitle: () => allDayTitle,
+            allday: (event) => "allday",
+            time: (event) => event.title,
+            goingDuration: (event) => "goingDuration",
+            comingDuration: (event) => "comingDuration",
+            monthMoreTitleDate: (moreTitle) => "monthMoreTitleDate",
+            monthMoreClose: () => "monthMoreClose",
+            // monthGridHeader: (cellData) => "cellData",
+            monthGridHeaderExceed: (hiddenEventsCount) => "monthGridHeaderExceed",
+            monthGridFooter: (cellData) => "monthGridFooter",
+            monthGridFooterExceed: (hiddenEventsCount: number) => "monthGridFooterExceed",
+            // monthDayName: (monthDayNameData) => "monthDayName",
+            weekGridFooterExceed: (hiddenEventsCount) => "weekGridFooterExceed",
+            collapseBtnTitle: () => "collapseBtnTitle",
+            timezoneDisplayLabel: (props) => "timezoneDisplayLabel",
+            timegridDisplayPrimaryTime: (props) => `${props.time.getHours()}:00`,
+            timegridDisplayTime: (props) => "timegridDisplayTime",
+            timegridNowIndicatorLabel: (props) =>
+              `${props.time.getHours()}:${
+                props.time.getMinutes() < 10
+                  ? `0${props.time.getMinutes()}`
+                  : props.time.getMinutes()
+              }`,
+            popupIsAllday: () => popupIsAllDay,
+            popupStateFree: () => "popupStateFree",
+            popupStateBusy: () => "popupStateBusy",
+            titlePlaceholder: () => titlePlaceHolder,
+            locationPlaceholder: () => "locationPlaceholder",
+            startDatePlaceholder: () => "startDatePlaceholder",
+            endDatePlaceholder: () => "endDatePlaceholder",
+            popupSave: () => popupSave,
+            popupUpdate: () => "popupUpdate",
+            popupDetailTitle: (event) => event.title,
+            popupDetailDate: (event) => `${event.start.toString()} - ${event.end.toString()}`,
+            popupDetailLocation: (event) => "popupDetailLocation",
+            popupDetailAttendees: (event) => "popupDetailAttendees",
+            popupDetailState: (event) => "popupDetailState",
+            popupDetailRecurrenceRule: (event) => "popupDetailRecurrenceRule",
+            popupDetailBody: (event) => "popupDetailBody",
+            popupEdit: () => popupEdit,
+            popupDelete: () => popupDelete,
+          }}
+        />
       </div>
     </Workspace>
-  )
+  ))
 }

@@ -103,7 +103,10 @@ export const appSlice = createSlice({
 
       if (!file) return
 
-      file.metadata = action.payload.metadata
+      file.metadata = {
+        ...file.metadata,
+        ...action.payload.metadata,
+      }
     },
   },
   extraReducers: (builder) => {

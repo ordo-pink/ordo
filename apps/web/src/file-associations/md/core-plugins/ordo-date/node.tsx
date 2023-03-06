@@ -1,6 +1,5 @@
 import { Nullable } from "@ordo-pink/common-types"
 import { Spread, SerializedTextNode, DecoratorNode, NodeKey, LexicalNode } from "lexical"
-import { $applyNodeReplacement } from "lexical"
 import { ReactNode } from "react"
 import { DateComponent } from "./component"
 
@@ -109,7 +108,7 @@ export class OrdoDateNode extends DecoratorNode<ReactNode> {
 }
 
 export function $createOrdoDateNode(startDate: Date, endDate: Nullable<Date>): OrdoDateNode {
-  return $applyNodeReplacement(new OrdoDateNode(startDate, endDate))
+  return new OrdoDateNode(startDate, endDate)
 }
 
 export function $isOrdoDateNode(node: LexicalNode): boolean {

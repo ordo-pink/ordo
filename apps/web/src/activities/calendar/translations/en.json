@@ -51,5 +51,9 @@
   "@ordo-activity-calendar/previous-view": "Previous",
   "@ordo-activity-calendar/current-view": "Today",
   "@ordo-activity-calendar/next-view": "Next",
-  "@ordo-activity-editor/exceed": "{{count}} more"
+  "@ordo-activity-editor/exceed": "{{count}} more",
+  "@ordo-activity-editor/day": "Day",
+  "@ordo-activity-editor/week": "Week",
+  "@ordo-activity-editor/month": "Month",
+  "@ordo-activity-calendar/new-event-input-placeholder": "Title"
 }

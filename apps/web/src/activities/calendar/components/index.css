@@ -89,3 +89,7 @@
   @apply !transition-all duration-300 bg-gradient-to-br from-sky-200 dark:from-purple-600 via-violet-200 dark:via-violet-600 to-purple-200 dark:to-purple-600;
   @apply !border-2 !border-transparent hover:!border-pink-300 dark:hover:!border-pink-500 focus:!border-pink-300 dark:focus:!border-pink-500;
 }
+
+.toastui-calendar-template-monthMoreClose {
+  @apply bg-white;
+}

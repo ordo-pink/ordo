@@ -11,17 +11,21 @@ export const ORDO_DATE_TRANSFORMER: TextMatchTransformer = {
       return null
     }
 
-    return node.__date.toISOString()
+    const currentNode = node as OrdoDateNode
+
+    return `${currentNode.__startDate}${currentNode.__endDate ? `>>>${currentNode.__endDate}` : ""}`
   },
   importRegExp: rx,
   regExp: rx,
   replace: (textNode, match) => {
     const [date] = match
 
-    const dateRangeStr = date.includes(">>>")
-      ? (date.split(">>>").slice(0, 2) as [string, string])
-      : [date]
-    const dateRange = dateRangeStr.map((d) => new Date(d)) as [Date, Date]
+    const dateRange = date.includes(">>>")
+      ? date
+          .split(">>>")
+          .slice(0, 2)
+          .map((d) => new Date(d))
+      : [new Date(date)]
     const dateNode = $createOrdoDateNode(dateRange[0], dateRange[1])
 
     textNode.replace(dateNode)

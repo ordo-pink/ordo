@@ -7,6 +7,7 @@ import DatePicker from "tui-date-picker"
 
 import "tui-date-picker/dist/tui-date-picker.css"
 import "tui-time-picker/dist/tui-time-picker.css"
+import "./component.css"
 
 type Props = {
   startDate: Date
@@ -126,10 +127,17 @@ export const DateComponent = ({ startDate, endDate, nodeKey }: Props) => {
     } else {
       endDatePicker.setDate(currentEndDate as Date)
     }
-  }, [endDatePickerRef, currentEndDate, isTimePickerEnabled, endDate, endDatePicker])
+  }, [
+    endDatePickerRef,
+    currentEndDate,
+    isTimePickerEnabled,
+    endDate,
+    endDatePicker,
+    currentStartDate,
+  ])
 
   return (
-    <span className="rounded-lg shadow-md px-4 py-0.5 bg-slate-200 whitespace-nowrap">
+    <span className="rounded-lg shadow-md px-4 py-0.5 bg-slate-200 dark:bg-slate-800 whitespace-nowrap">
       <span>
         {currentStartDate.toLocaleDateString()}
         {currentStartDate.toTimeString().startsWith("00:00:00 ")

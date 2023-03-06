@@ -1,6 +1,7 @@
 import { Nullable } from "@ordo-pink/common-types"
 import { Either } from "@ordo-pink/either"
-import { IOrdoFile, OrdoFile } from "@ordo-pink/fs-entity"
+import { lazyBox } from "@ordo-pink/fns"
+import { IOrdoFile, OrdoFile, OrdoFilePath } from "@ordo-pink/fs-entity"
 import {
   OrdoButtonSecondary,
   OrdoButtonPrimary,
@@ -10,13 +11,14 @@ import {
 import { EventObject, TZDate } from "@toast-ui/calendar/*"
 import ToastCalendar from "@toast-ui/react-calendar"
 import ToastUIReactCalendar from "@toast-ui/react-calendar"
-import { LegacyRef, useEffect, useRef, useState } from "react"
+import { ChangeEvent, LegacyRef, useEffect, useRef, useState } from "react"
 import { Helmet } from "react-helmet"
 import { useTranslation } from "react-i18next"
 import { BsArrowClockwise, BsChevronLeft, BsChevronRight } from "react-icons/bs"
 import { createSearchParams, Navigate, useNavigate, useParams } from "react-router-dom"
 import CalendarSidebar from "./sidebar"
-import { updatedFile, updateFileMetadata } from "../../../containers/app/store"
+import { useModal } from "../../../containers/app/hooks/use-modal"
+import { createFile, updatedFile, updateFileMetadata } from "../../../containers/app/store"
 import { useFSAPI } from "../../../core/hooks/use-fs-api"
 import { useAppDispatch } from "../../../core/state/hooks/use-app-dispatch"
 import { useAppSelector } from "../../../core/state/hooks/use-app-selector"
@@ -38,6 +40,7 @@ export default function Calendar() {
   const calendarRef = useRef<ToastUIReactCalendar>()
   const dispatch = useAppDispatch()
   const navigate = useNavigate()
+  const { showModal, hideModal, Modal } = useModal()
 
   const root = useAppSelector((state) => state.app.personalProject)
 
@@ -48,8 +51,12 @@ export default function Calendar() {
   const { files } = useFSAPI()
 
   const [isWide, setIsWide] = useState(false)
-
   const [events, setEvents] = useState<EventObject[]>([])
+  const [newName, setNewName] = useState<OrdoFilePath | "">("")
+  const [newStart, setNewStart] = useState<Date>(new Date())
+  const [newEnd, setNewEnd] = useState<Date>(new Date())
+  const [newIsAllDay, setNewIsAllDay] = useState(false)
+  const [isValidPath, setIsValidPath] = useState(true)
 
   useEffect(() => {
     if (!root) return
@@ -57,17 +64,20 @@ export default function Calendar() {
     const dates = [
       ...getFiles(root)
         .filter((file) => Boolean(file.metadata.dates))
-        .map((file) =>
-          (file.metadata.dates as { start: Date; end: Nullable<Date> }[]).map(({ start, end }) => ({
-            start,
-            end,
-            title: file.readableName,
-            body: file.path,
-            backgroundColor: "#cbd5e1",
-            color: "#1e293b",
-          })),
-        )
-        .flat(),
+        .flatMap((file) =>
+          (file.metadata.dates as { start: Date; end: Nullable<Date> }[]).map(({ start, end }) => {
+            return {
+              start,
+              end,
+              isAllday: !end,
+              category: !end ? "allday" : "time",
+              title: file.readableName,
+              body: file.path,
+              backgroundColor: "#cbd5e1",
+              color: "#1e293b",
+            }
+          }),
+        ),
     ]
 
     setEvents(dates)
@@ -80,11 +90,14 @@ export default function Calendar() {
   useEffect(() => {
     if (!calendarRef.current || !calendarRef.current.calendarInstance) return
 
-    // calendarRef.current.calendarInstance.on("selectDateTime", console.log) // When selected range in calendar
-    // calendarRef.current.calendarInstance.on("beforeCreateEvent", console.log)
-    // calendarRef.current.calendarInstance.on("beforeDeleteEvent", console.log)
-    // calendarRef.current.calendarInstance.on("afterRenderEvent", console.log) // When moved
-    // calendarRef.current.calendarInstance.on("clickDayName", console.log) // When header clicked
+    calendarRef.current.calendarInstance.on("selectDateTime", ({ start, end, isAllday }) => {
+      setNewIsAllDay(isAllday)
+      setNewStart(start)
+      setNewEnd(end)
+
+      showModal()
+    })
+
     calendarRef.current.calendarInstance.on("clickEvent", ({ event }) => {
       if (OrdoFile.isValidPath(event.body)) {
         navigate({
@@ -93,54 +106,72 @@ export default function Calendar() {
         })
       }
     })
-    // calendarRef.current.calendarInstance.on("clickMoreEventsBtn", console.log)
-    // calendarRef.current.calendarInstance.on("clickTimezonesCollapseBtn", console.log)
-    calendarRef.current.calendarInstance.on("beforeUpdateEvent", ({ event, changes }) => {
-      files.get(event.body).then((content) => {
-        const file = findOrdoFile(event.body, root)
 
-        if (!file) return
+    const onBeforeUpdateEvent = calendarRef.current.calendarInstance.on(
+      "beforeUpdateEvent",
+      ({ event, changes }) => {
+        files.get(event.body).then((content) => {
+          const file = findOrdoFile(event.body, root)
 
-        const startDate = (changes.start as TZDate)?.toDate() ?? event.start.toDate()
-        const endDate = (changes.end as TZDate)?.toDate() ?? event.end?.toDate() ?? null
+          if (!file) return
 
-        const oldStartDate = event.start.toDate()
-        const oldEndDate = event.end?.toDate()
+          const startDate = (changes.start as TZDate)?.toDate() ?? event.start.toDate()
+          const endDate = (changes.end as TZDate)?.toDate() ?? event.end?.toDate() ?? null
 
-        const oldDateStr = `${event.start.toDate().toISOString()}${
-          event.end ? `>>>${event.end.toDate().toISOString()}` : ""
-        }`
-        const newDateStr = `${startDate.toISOString()}${
-          endDate ? `>>>${endDate.toISOString()}` : ""
-        }`
+          const oldStartDate = event.start.toDate()
+          const oldEndDate = event.end?.toDate() ?? null
 
-        const newContent = content.replace(oldDateStr, newDateStr)
+          const oldDateStr = `${event.start.toDate().toISOString()}${
+            event.end ? `>>>${event.end.toDate().toISOString()}` : ""
+          }`
+          const newDateStr = `${startDate.toISOString()}${
+            endDate ? `>>>${endDate.toISOString()}` : ""
+          }`
 
-        const newFile = OrdoFile.from({
-          path: file.path,
-          size: file.size,
-          metadata: {
-            ...file.metadata,
-            dates: [
-              ...(file.metadata as { dates: { start: string; end?: string }[] }).dates.filter(
-                ({ start, end }) =>
-                  start !== oldStartDate.toISOString() || oldEndDate
-                    ? end !== oldEndDate.toISOString()
-                    : true,
-              ),
-              { start: startDate.toISOString(), end: endDate.toISOString() },
-            ],
-          },
-          updatedAt: file.updatedAt,
-        }) as IOrdoFile<{
-          dates: { start: string; end: string }[]
-        }>
+          const newContent = content.replace(oldDateStr, newDateStr)
 
-        dispatch(updateFileMetadata(newFile))
-        dispatch(updatedFile({ file: newFile, content: newContent }))
-      })
-    })
-  }, [calendarRef, root, dispatch, files, navigate])
+          const newFile = OrdoFile.from({
+            path: file.path,
+            size: file.size,
+            metadata: {
+              ...file.metadata,
+              dates: [
+                ...(file.metadata as { dates: { start: Date; end?: Date }[] }).dates.filter(
+                  ({ start, end }) => {
+                    return start !== oldStartDate.toISOString() || end
+                      ? new Date(end as Date).toISOString() !== oldEndDate.toISOString()
+                      : true
+                  },
+                ),
+                { start: startDate.toISOString(), end: endDate.toISOString() },
+              ],
+            },
+            updatedAt: file.updatedAt,
+          }) as IOrdoFile<{
+            dates: { start: string; end: string }[]
+          }>
+
+          dispatch(updateFileMetadata(newFile))
+          dispatch(updatedFile({ file: newFile, content: newContent }))
+        })
+      },
+    )
+
+    return () => {
+      if (onBeforeUpdateEvent?.eventBus?.events?.beforeUpdateEvent) {
+        onBeforeUpdateEvent.eventBus.events.beforeUpdateEvent = []
+      }
+
+      if (onBeforeUpdateEvent?.eventBus?.events?.clickEvent) {
+        onBeforeUpdateEvent.eventBus.events.clickEvent = []
+      }
+
+      if (onBeforeUpdateEvent?.eventBus?.events?.selectDateTime) {
+        onBeforeUpdateEvent.eventBus.events.selectDateTime = []
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [calendarRef, root, navigate])
 
   const sun = t("@ordo-activity-calendar/sun")
   const mon = t("@ordo-activity-calendar/mon")
@@ -157,6 +188,10 @@ export default function Calendar() {
   const popupSave = t("@ordo-activity-calendar/popup-save")
   const popupEdit = t("@ordo-activity-calendar/popup-edit")
   const popupDelete = t("@ordo-activity-calendar/popup-delete")
+  const newEventInputPlaceholder = t("@ordo-activity-calendar/new-event-input-placeholder")
+  const translatedError = t("@ordo-command-file-system/invalid-path")
+  const translatedCancel = t("@ordo-command-file-system/button-cancel")
+  const translatedOk = t("@ordo-command-file-system/button-ok")
 
   const nextView = t("@ordo-activity-calendar/next-view")
   const currentView = t("@ordo-activity-calendar/current-view")
@@ -183,6 +218,58 @@ export default function Calendar() {
     calendarRef.current.calendarInstance.today()
   }
 
+  useEffect(() => {
+    const trimmed = newName.trim()
+
+    setIsValidPath(trimmed.length > 1 && OrdoFile.isValidPath(`/${trimmed}`))
+  }, [newName])
+
+  const handleHide = lazyBox((box) => box.map(() => setNewName("")).fold(() => hide()))
+
+  const hide = () => {
+    setNewIsAllDay(false)
+    setNewStart(new Date())
+    setNewEnd(new Date())
+    setNewName("")
+
+    calendarRef.current?.calendarInstance?.clearGridSelections()
+
+    hideModal()
+  }
+
+  const handleInputChange = lazyBox<ChangeEvent<HTMLInputElement>>((box) =>
+    box
+      .map((event) => event.target)
+      .map((target) => target.value as OrdoFilePath)
+      .fold(setNewName),
+  )
+
+  const handleCancelButtonClick = lazyBox((box) => box.tap(handleHide).fold(() => hide()))
+
+  const handleOkButtonClick = lazyBox((box) =>
+    box
+      .tap(handleHide)
+      .map(() => `${root?.path ?? "/"}${newName.trim()}` as OrdoFilePath)
+      .map((path) => (OrdoFile.getFileExtension(path) ? path : (`${path}.md` as OrdoFilePath)))
+      .map((path) =>
+        OrdoFile.from({
+          path,
+          size: 0,
+          metadata: { dates: [{ start: newStart, end: newEnd }] },
+          updatedAt: new Date(Date.now()),
+        }),
+      )
+      .tap((file) =>
+        dispatch(
+          createFile({
+            file,
+            content: `${newStart.toISOString()}${newIsAllDay ? "" : `>>>${newEnd.toISOString()}`}`,
+          }),
+        ).then(() => dispatch(updateFileMetadata(file))),
+      )
+      .fold(() => hide()),
+  )
+
   return Either.fromNullable(view).fold(RedirectToDayView, () => (
     <Workspace sidebarChildren={<CalendarSidebar />}>
       <Helmet>
@@ -191,6 +278,49 @@ export default function Calendar() {
           {translatedTitle}
         </title>
       </Helmet>
+
+      <Modal>
+        <div className="h-screen w-screen flex items-center justify-center">
+          <div
+            className="w-full max-w-lg bg-neutral-100 dark:bg-neutral-800 rounded-lg p-8"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <input
+              type="text"
+              className="w-full outline-none border dark:border-0 border-neutral-400 rounded-lg bg-white dark:bg-neutral-600 px-4 py-2"
+              placeholder={newEventInputPlaceholder}
+              value={newName}
+              autoFocus
+              onChange={handleInputChange}
+            />
+
+            <div
+              className={`text-red-500 text-sm transition-opacity duration-200 ${
+                newName && !isValidPath ? "opacity-100" : "opacity-0"
+              }`}
+            >
+              {translatedError}
+            </div>
+
+            <div className="w-full flex items-center justify-around">
+              <OrdoButtonSecondary
+                hotkey="escape"
+                onClick={handleCancelButtonClick}
+              >
+                {translatedCancel}
+              </OrdoButtonSecondary>
+
+              <OrdoButtonPrimary
+                hotkey="enter"
+                disabled={!newName || !isValidPath}
+                onClick={handleOkButtonClick}
+              >
+                {translatedOk}
+              </OrdoButtonPrimary>
+            </div>
+          </div>
+        </div>
+      </Modal>
 
       <div className="flex items-center space-x-2 justify-center">
         <OrdoButtonSecondary
@@ -251,8 +381,8 @@ export default function Calendar() {
             time: (event) => event.title,
             goingDuration: (event) => "goingDuration",
             comingDuration: (event) => "comingDuration",
-            monthMoreTitleDate: (moreTitle) => "monthMoreTitleDate",
-            monthMoreClose: () => "monthMoreClose",
+            monthMoreTitleDate: (moreTitle) => new Date(moreTitle.ymd).toLocaleDateString(),
+            monthMoreClose: () => "⨯",
             // monthGridHeader: (cellData) => "cellData",
             monthGridHeaderExceed: (hiddenEventsCount) =>
               t("@ordo-activity-editor/exceed", { count: hiddenEventsCount }) as string,

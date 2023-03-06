@@ -47,5 +47,9 @@
   "@ordo-activity-calendar/previous-view": "Назад",
   "@ordo-activity-calendar/current-view": "Сегодня",
   "@ordo-activity-calendar/next-view": "Вперед",
-  "@ordo-activity-editor/exceed": "Ещё {{count}}"
+  "@ordo-activity-editor/exceed": "Ещё {{count}}",
+  "@ordo-activity-editor/day": "День",
+  "@ordo-activity-editor/week": "Неделя",
+  "@ordo-activity-editor/month": "Месяц",
+  "@ordo-activity-calendar/new-event-input-placeholder": "Название события"
 }

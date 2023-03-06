@@ -1,21 +1,26 @@
+import { Nullable } from "@ordo-pink/common-types"
 import { Either } from "@ordo-pink/either"
+import { IOrdoFile, OrdoFile } from "@ordo-pink/fs-entity"
 import {
   OrdoButtonSecondary,
   OrdoButtonPrimary,
   useWorkspaceWithSidebar,
   useWindowSize,
 } from "@ordo-pink/react"
-import { EventObject } from "@toast-ui/calendar/*"
+import { EventObject, TZDate } from "@toast-ui/calendar/*"
 import ToastCalendar from "@toast-ui/react-calendar"
 import ToastUIReactCalendar from "@toast-ui/react-calendar"
-import { useEffect, useRef, useState } from "react"
+import { LegacyRef, useEffect, useRef, useState } from "react"
 import { Helmet } from "react-helmet"
 import { useTranslation } from "react-i18next"
 import { BsArrowClockwise, BsChevronLeft, BsChevronRight } from "react-icons/bs"
-import { Navigate, useParams } from "react-router-dom"
+import { createSearchParams, Navigate, useNavigate, useParams } from "react-router-dom"
 import CalendarSidebar from "./sidebar"
+import { updatedFile, updateFileMetadata } from "../../../containers/app/store"
+import { useFSAPI } from "../../../core/hooks/use-fs-api"
+import { useAppDispatch } from "../../../core/state/hooks/use-app-dispatch"
 import { useAppSelector } from "../../../core/state/hooks/use-app-selector"
-import { getFiles } from "../../../core/utils/fs-helpers"
+import { findOrdoFile, getFiles } from "../../../core/utils/fs-helpers"
 
 import "@toast-ui/calendar/dist/toastui-calendar.min.css"
 import "tui-date-picker/dist/tui-date-picker.css"
@@ -31,12 +36,16 @@ const RedirectToDayView = () => <Navigate to="/calendar/week" />
 export default function Calendar() {
   const Workspace = useWorkspaceWithSidebar()
   const calendarRef = useRef<ToastUIReactCalendar>()
+  const dispatch = useAppDispatch()
+  const navigate = useNavigate()
 
   const root = useAppSelector((state) => state.app.personalProject)
 
   const { view } = useParams<{ view: "day" | "week" | "month" }>()
   const { t } = useTranslation()
   const [width] = useWindowSize()
+
+  const { files } = useFSAPI()
 
   const [isWide, setIsWide] = useState(false)
 
@@ -49,11 +58,13 @@ export default function Calendar() {
       ...getFiles(root)
         .filter((file) => Boolean(file.metadata.dates))
         .map((file) =>
-          (file.metadata.dates as any).map(({ start, end }: any) => ({
+          (file.metadata.dates as { start: Date; end: Nullable<Date> }[]).map(({ start, end }) => ({
             start,
             end,
             title: file.readableName,
             body: file.path,
+            backgroundColor: "#cbd5e1",
+            color: "#1e293b",
           })),
         )
         .flat(),
@@ -69,20 +80,67 @@ export default function Calendar() {
   useEffect(() => {
     if (!calendarRef.current || !calendarRef.current.calendarInstance) return
 
-    calendarRef.current.calendarInstance.on("selectDateTime", console.log) // When selected range in calendar
-    calendarRef.current.calendarInstance.on("beforeCreateEvent", console.log)
-    calendarRef.current.calendarInstance.on("beforeUpdateEvent", console.log)
-    calendarRef.current.calendarInstance.on("beforeDeleteEvent", console.log)
-    calendarRef.current.calendarInstance.on("afterRenderEvent", console.log) // When moved
-    calendarRef.current.calendarInstance.on("clickDayName", console.log) // When header clicked
+    // calendarRef.current.calendarInstance.on("selectDateTime", console.log) // When selected range in calendar
+    // calendarRef.current.calendarInstance.on("beforeCreateEvent", console.log)
+    // calendarRef.current.calendarInstance.on("beforeDeleteEvent", console.log)
+    // calendarRef.current.calendarInstance.on("afterRenderEvent", console.log) // When moved
+    // calendarRef.current.calendarInstance.on("clickDayName", console.log) // When header clicked
     calendarRef.current.calendarInstance.on("clickEvent", ({ event }) => {
-      // TODO: Show edit dialog
-      // TODO: -> Remove (file)
-      // TODO: -> Update (file)
+      if (OrdoFile.isValidPath(event.body)) {
+        navigate({
+          pathname: "/editor",
+          search: createSearchParams({ path: event.body }).toString(),
+        })
+      }
     })
-    calendarRef.current.calendarInstance.on("clickMoreEventsBtn", console.log)
-    calendarRef.current.calendarInstance.on("clickTimezonesCollapseBtn", console.log)
-  }, [calendarRef])
+    // calendarRef.current.calendarInstance.on("clickMoreEventsBtn", console.log)
+    // calendarRef.current.calendarInstance.on("clickTimezonesCollapseBtn", console.log)
+    calendarRef.current.calendarInstance.on("beforeUpdateEvent", ({ event, changes }) => {
+      files.get(event.body).then((content) => {
+        const file = findOrdoFile(event.body, root)
+
+        if (!file) return
+
+        const startDate = (changes.start as TZDate)?.toDate() ?? event.start.toDate()
+        const endDate = (changes.end as TZDate)?.toDate() ?? event.end?.toDate() ?? null
+
+        const oldStartDate = event.start.toDate()
+        const oldEndDate = event.end?.toDate()
+
+        const oldDateStr = `${event.start.toDate().toISOString()}${
+          event.end ? `>>>${event.end.toDate().toISOString()}` : ""
+        }`
+        const newDateStr = `${startDate.toISOString()}${
+          endDate ? `>>>${endDate.toISOString()}` : ""
+        }`
+
+        const newContent = content.replace(oldDateStr, newDateStr)
+
+        const newFile = OrdoFile.from({
+          path: file.path,
+          size: file.size,
+          metadata: {
+            ...file.metadata,
+            dates: [
+              ...(file.metadata as { dates: { start: string; end?: string }[] }).dates.filter(
+                ({ start, end }) =>
+                  start !== oldStartDate.toISOString() || oldEndDate
+                    ? end !== oldEndDate.toISOString()
+                    : true,
+              ),
+              { start: startDate.toISOString(), end: endDate.toISOString() },
+            ],
+          },
+          updatedAt: file.updatedAt,
+        }) as IOrdoFile<{
+          dates: { start: string; end: string }[]
+        }>
+
+        dispatch(updateFileMetadata(newFile))
+        dispatch(updatedFile({ file: newFile, content: newContent }))
+      })
+    })
+  }, [calendarRef, root, dispatch, files, navigate])
 
   const sun = t("@ordo-activity-calendar/sun")
   const mon = t("@ordo-activity-calendar/mon")
@@ -168,7 +226,7 @@ export default function Calendar() {
 
       <div className="calendar-wrapper">
         <ToastCalendar
-          ref={calendarRef as any}
+          ref={calendarRef as LegacyRef<ToastUIReactCalendar>}
           view={view}
           month={{
             startDayOfWeek: 1,
@@ -196,7 +254,8 @@ export default function Calendar() {
             monthMoreTitleDate: (moreTitle) => "monthMoreTitleDate",
             monthMoreClose: () => "monthMoreClose",
             // monthGridHeader: (cellData) => "cellData",
-            monthGridHeaderExceed: (hiddenEventsCount) => "monthGridHeaderExceed",
+            monthGridHeaderExceed: (hiddenEventsCount) =>
+              t("@ordo-activity-editor/exceed", { count: hiddenEventsCount }) as string,
             monthGridFooter: (cellData) => "monthGridFooter",
             monthGridFooterExceed: (hiddenEventsCount: number) => "monthGridFooterExceed",
             // monthDayName: (monthDayNameData) => "monthDayName",

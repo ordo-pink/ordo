@@ -50,5 +50,6 @@
   "@ordo-activity-calendar/popup-delete": "Delete",
   "@ordo-activity-calendar/previous-view": "Previous",
   "@ordo-activity-calendar/current-view": "Today",
-  "@ordo-activity-calendar/next-view": "Next"
+  "@ordo-activity-calendar/next-view": "Next",
+  "@ordo-activity-editor/exceed": "{{count}} more"
 }

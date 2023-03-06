@@ -23,6 +23,10 @@
   @apply !bg-pink-500 !border-pink-500;
 }
 
+.toastui-calendar-template-time {
+  @apply text-base whitespace-normal;
+}
+
 .toastui-calendar-template-timegridNowIndicatorLabel {
   @apply !text-pink-500;
 }

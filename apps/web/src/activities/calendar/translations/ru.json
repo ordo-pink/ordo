@@ -46,5 +46,6 @@
   "@ordo-activity-calendar/popup-delete": "Удалить",
   "@ordo-activity-calendar/previous-view": "Назад",
   "@ordo-activity-calendar/current-view": "Сегодня",
-  "@ordo-activity-calendar/next-view": "Вперед"
+  "@ordo-activity-calendar/next-view": "Вперед",
+  "@ordo-activity-editor/exceed": "Ещё {{count}}"
 }

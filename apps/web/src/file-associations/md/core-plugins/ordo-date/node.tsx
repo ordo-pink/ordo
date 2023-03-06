@@ -1,3 +1,4 @@
+import { Nullable } from "@ordo-pink/common-types"
 import { Spread, SerializedTextNode, DecoratorNode, NodeKey, LexicalNode } from "lexical"
 import { $applyNodeReplacement } from "lexical"
 import { ReactNode } from "react"
@@ -7,24 +8,26 @@ type SerializedOrdoDateNode = Spread<
   {
     type: "ordo-date"
     version: 1
-    date: Date
+    startDate: Date
+    endDate: Nullable<Date>
   },
   SerializedTextNode
 >
 
 export class OrdoDateNode extends DecoratorNode<ReactNode> {
-  __date: Date
+  __startDate: Date
+  __endDate: Nullable<Date>
 
   static getType(): string {
     return "ordo-date"
   }
 
   static clone(node: OrdoDateNode): OrdoDateNode {
-    return new OrdoDateNode(node.__date, node.__key)
+    return new OrdoDateNode(node.__startDate, node.__endDate, node.__key)
   }
 
   static importJSON(serializedNode: SerializedOrdoDateNode): OrdoDateNode {
-    const node = $createOrdoDateNode(serializedNode.date)
+    const node = $createOrdoDateNode(serializedNode.startDate, serializedNode.endDate)
 
     node.setFormat(serializedNode.format)
     node.setDetail(serializedNode.detail)
@@ -34,22 +37,18 @@ export class OrdoDateNode extends DecoratorNode<ReactNode> {
     return node
   }
 
-  constructor(date: Date, key?: NodeKey) {
+  constructor(startDate: Date, endDate?: Nullable<Date>, key?: NodeKey) {
     super(key)
-    this.__date = date
-    this.__text = date.toISOString()
+    this.__startDate = startDate
+    this.__endDate = endDate ?? null
   }
 
   getTextContent(): string {
-    return this.__date.toISOString()
-  }
+    if (this.__endDate) {
+      return `${this.__startDate.toISOString()}>>>${this.__endDate.toISOString()}`
+    }
 
-  canInsertTextBefore(): false {
-    return false
-  }
-
-  canInsertTextAfter(): false {
-    return false
+    return this.__startDate.toISOString()
   }
 
   canBeEmpty(): false {
@@ -69,20 +68,26 @@ export class OrdoDateNode extends DecoratorNode<ReactNode> {
   }
 
   getDate(): Date {
-    return this.__date
+    return this.__startDate
   }
 
-  setDate(date: Date) {
+  setDate(startDate: Date, endDate?: Date) {
     const writable = this.getWritable()
-    writable.__date = date
-    writable.__text = date.toISOString()
+    writable.__startDate = startDate
+    writable.__text = startDate.toISOString()
+
+    if (endDate) {
+      writable.__endDate = endDate
+      writable.__text = `${startDate.toISOString()}>>>${endDate.toISOString()}`
+    }
   }
 
   decorate(): ReactNode {
     return (
       <DateComponent
         nodeKey={this.__key}
-        date={this.__date}
+        startDate={this.__startDate}
+        endDate={this.__endDate}
       />
     )
   }
@@ -93,7 +98,8 @@ export class OrdoDateNode extends DecoratorNode<ReactNode> {
       format: 0,
       mode: "token",
       style: "",
-      date: this.__date,
+      startDate: this.__startDate,
+      endDate: this.__endDate,
       text: this.__text,
       type: "ordo-date",
       version: 1,
@@ -101,8 +107,8 @@ export class OrdoDateNode extends DecoratorNode<ReactNode> {
   }
 }
 
-export function $createOrdoDateNode(date: Date): OrdoDateNode {
-  return $applyNodeReplacement(new OrdoDateNode(date))
+export function $createOrdoDateNode(startDate: Date, endDate: Nullable<Date>): OrdoDateNode {
+  return $applyNodeReplacement(new OrdoDateNode(startDate, endDate))
 }
 
 export function $isOrdoDateNode(node: LexicalNode): boolean {

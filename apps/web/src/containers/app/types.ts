@@ -1,5 +1,5 @@
 import { Nullable } from "@ordo-pink/common-types"
-import { IOrdoDirectory, OrdoFilePath } from "@ordo-pink/fs-entity"
+import { IOrdoDirectory, IOrdoFile } from "@ordo-pink/fs-entity"
 import {
   OrdoActivityExtension,
   OrdoCommandExtension,
@@ -22,11 +22,11 @@ export type AppState = {
 }
 
 export type UpdateFilePayload = {
-  path: OrdoFilePath
+  file: IOrdoFile
   content: string
 }
 
 export type CreateFilePayload = {
-  path: OrdoFilePath
+  file: IOrdoFile
   content?: string
 }

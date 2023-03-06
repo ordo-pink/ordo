@@ -14,6 +14,8 @@ import { useTranslation } from "react-i18next"
 import { BsArrowClockwise, BsChevronLeft, BsChevronRight } from "react-icons/bs"
 import { Navigate, useParams } from "react-router-dom"
 import CalendarSidebar from "./sidebar"
+import { useAppSelector } from "../../../core/state/hooks/use-app-selector"
+import { getFiles } from "../../../core/utils/fs-helpers"
 
 import "@toast-ui/calendar/dist/toastui-calendar.min.css"
 import "tui-date-picker/dist/tui-date-picker.css"
@@ -30,21 +32,34 @@ export default function Calendar() {
   const Workspace = useWorkspaceWithSidebar()
   const calendarRef = useRef<ToastUIReactCalendar>()
 
+  const root = useAppSelector((state) => state.app.personalProject)
+
   const { view } = useParams<{ view: "day" | "week" | "month" }>()
   const { t } = useTranslation()
   const [width] = useWindowSize()
 
   const [isWide, setIsWide] = useState(false)
 
-  const [events, setEvents] = useState<EventObject[]>([
-    {
-      id: "1",
-      title: "Lunch",
-      category: "time",
-      start: new Date(Date.now() + 1000 * 60 * 60 * 3),
-      end: new Date(Date.now() + 1000 * 60 * 60 * 7),
-    },
-  ])
+  const [events, setEvents] = useState<EventObject[]>([])
+
+  useEffect(() => {
+    if (!root) return
+
+    const dates = [
+      ...getFiles(root)
+        .filter((file) => Boolean(file.metadata.dates))
+        .map((file) =>
+          (file.metadata.dates as any).map(({ start, end }: any) => ({
+            start,
+            end,
+            title: file.readableName,
+          })),
+        )
+        .flat(),
+    ]
+
+    setEvents(dates)
+  }, [root])
 
   useEffect(() => {
     setIsWide(width >= 768)

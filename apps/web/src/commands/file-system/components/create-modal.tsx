@@ -88,7 +88,7 @@ export default function CreateModal() {
             OrdoFile.getFileExtension(path) ? path : (`${path}.md` as OrdoFilePath),
           )
           .fold(
-            (path) => dispatch(createFile({ path })),
+            (path) => dispatch(createFile({ file: OrdoFile.empty(path) })),
             (path) => dispatch(createdDirectory(path)),
           ),
       )

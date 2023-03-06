@@ -6,6 +6,7 @@ import {
   OrdoDirectoryPath,
   OrdoDirectory,
   OrdoFile,
+  IOrdoFile,
 } from "@ordo-pink/fs-entity"
 import {
   createSlice,
@@ -17,7 +18,7 @@ import { debounce } from "lodash"
 import { registeredExtensionsReducer } from "./reducers/registered-extensions"
 import { rejectedReducer } from "./reducers/rejected"
 import { updatedFileReducer } from "./reducers/updated-file"
-import { findParent } from "../../../core/utils/fs-helpers"
+import { findOrdoFile, findParent } from "../../../core/utils/fs-helpers"
 import { AppState, UpdateFilePayload } from "../types"
 
 const initialState: AppState = {
@@ -47,7 +48,7 @@ const debounceSave = debounce(updateFileHandler, 500, { trailing: true, leading:
 
 export const createFile = createAsyncThunk(
   "@ordo-app/create-file",
-  (params: { path: OrdoFilePath; content?: string }) => window.ordo.api.fs.files.create(params),
+  (params: { file: IOrdoFile; content?: string }) => window.ordo.api.fs.files.create(params),
 )
 
 export const createdDirectory = createAsyncThunk(
@@ -70,11 +71,11 @@ export const removedDirectory = createAsyncThunk(
 
 export const updatedFile = createAsyncThunk(
   "@ordo-app/update-file",
-  ({ path, content }: UpdateFilePayload, { dispatch }) => {
+  ({ file, content }: UpdateFilePayload, { dispatch }) => {
     dispatch(setIsSaving(true))
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    return debounceSave({ path, content }, { dispatch } as any)
+    return debounceSave({ file, content }, { dispatch } as any)
   },
 )
 
@@ -96,6 +97,13 @@ export const appSlice = createSlice({
     },
     setIsSaving: (state, action: PayloadAction<boolean>) => {
       state.isSaving = action.payload
+    },
+    updateFileMetadata: (state, action: PayloadAction<IOrdoFile>) => {
+      const file = findOrdoFile(action.payload.path, state.personalProject)
+
+      if (!file) return
+
+      file.metadata = action.payload.metadata
     },
   },
   extraReducers: (builder) => {
@@ -174,7 +182,12 @@ export const appSlice = createSlice({
   },
 })
 
-export const { registerExtensions, toggleSidebarVisibility, unregisterExtensions, setIsSaving } =
-  appSlice.actions
+export const {
+  registerExtensions,
+  toggleSidebarVisibility,
+  unregisterExtensions,
+  setIsSaving,
+  updateFileMetadata,
+} = appSlice.actions
 
 export default appSlice.reducer

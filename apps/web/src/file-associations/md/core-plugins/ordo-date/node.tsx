@@ -4,7 +4,7 @@ import { $applyNodeReplacement } from "lexical"
 import { ReactNode } from "react"
 import { DateComponent } from "./component"
 
-type SerializedOrdoDateNode = Spread<
+export type SerializedOrdoDateNode = Spread<
   {
     type: "ordo-date"
     version: 1
@@ -29,6 +29,7 @@ export class OrdoDateNode extends DecoratorNode<ReactNode> {
   static importJSON(serializedNode: SerializedOrdoDateNode): OrdoDateNode {
     const node = $createOrdoDateNode(serializedNode.startDate, serializedNode.endDate)
 
+    node.setDate(serializedNode.startDate, serializedNode.endDate)
     node.setFormat(serializedNode.format)
     node.setDetail(serializedNode.detail)
     node.setMode(serializedNode.mode)
@@ -71,7 +72,7 @@ export class OrdoDateNode extends DecoratorNode<ReactNode> {
     return this.__startDate
   }
 
-  setDate(startDate: Date, endDate?: Date) {
+  setDate(startDate: Date, endDate?: Nullable<Date>) {
     const writable = this.getWritable()
     writable.__startDate = startDate
     writable.__text = startDate.toISOString()

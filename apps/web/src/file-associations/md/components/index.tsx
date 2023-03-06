@@ -18,17 +18,30 @@ import { OnChangePlugin } from "@lexical/react/LexicalOnChangePlugin"
 import { RichTextPlugin } from "@lexical/react/LexicalRichTextPlugin"
 import { HeadingNode, QuoteNode } from "@lexical/rich-text"
 import { TableCellNode, TableNode, TableRowNode } from "@lexical/table"
+import { Nullable } from "@ordo-pink/common-types"
+import { OrdoFile } from "@ordo-pink/fs-entity"
 import { PathBreadcrumbs } from "@ordo-pink/react"
 import { EditorState, EditorThemeClasses } from "lexical"
 import { useState, useEffect, ComponentType, memo } from "react"
 import { MdProps } from ".."
-import { updatedFile } from "../../../containers/app/store"
+import { updatedFile, updateFileMetadata } from "../../../containers/app/store"
 import { useFileParentBreadcrumbs } from "../../../core/hooks/use-file-breadcrumbs"
 import { useAppDispatch } from "../../../core/state/hooks/use-app-dispatch"
 import { useAppSelector } from "../../../core/state/hooks/use-app-selector"
 import { LoadEditorStatePlugin } from "../core-plugins/load-editor-state"
-import { OrdoDateNode } from "../core-plugins/ordo-date/node"
+import { OrdoDateNode, SerializedOrdoDateNode } from "../core-plugins/ordo-date/node"
 import { ORDO_TRANSFORMERS } from "../transformers"
+
+const reduceToDateNodes = (tree: any) =>
+  tree.children.reduce(
+    (acc: any[], child: any) =>
+      child.children
+        ? acc.concat(reduceToDateNodes(child))
+        : child.type === "ordo-date"
+        ? acc.concat([child])
+        : acc,
+    [],
+  )
 
 const theme: EditorThemeClasses = {
   heading: {
@@ -144,7 +157,26 @@ export default memo(
       state.read(() => {
         const content = $convertToMarkdownString()
 
-        dispatch(updatedFile({ path: file.path, content }))
+        const ordoFile = OrdoFile.empty(file.path)
+
+        // TODO: Extract this to plugin
+        ordoFile.metadata.dates = []
+
+        const dateNodes = reduceToDateNodes(state.toJSON().root)
+
+        dateNodes.forEach((child: any) => {
+          if (child.type === "ordo-date") {
+            const { startDate, endDate } = child as SerializedOrdoDateNode
+
+            ;(ordoFile.metadata.dates as { start: Date; end?: Nullable<Date> }[]).push({
+              start: startDate,
+              end: endDate,
+            })
+          }
+        })
+
+        dispatch(updateFileMetadata(ordoFile))
+        dispatch(updatedFile({ file: ordoFile, content }))
       })
     }
 

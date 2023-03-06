@@ -49,6 +49,12 @@ export const OrdoFileModel = {
         .then(async (file) => {
           await driver.deleteFile(file.path)
 
+          const metadataPath = `${file.path}.metadata` as const
+
+          if (await driver.checkFileExists(metadataPath)) {
+            await driver.deleteFile(metadataPath)
+          }
+
           return file
         }),
     getFile: (path) =>
@@ -61,6 +67,26 @@ export const OrdoFileModel = {
         .then((path) => driver.checkFileExists(path))
         .then((exists) => (exists ? path : Promise.reject(ExceptionResponse.NOT_FOUND)))
         .then(() => driver.getFileDescriptor(path))
+        .then(async (desc) => {
+          const metadataPath = `${desc.path}.metadata` as const
+
+          if (await driver.checkFileExists(metadataPath)) {
+            const metadataStream = await driver.getFile(metadataPath)
+
+            const metadata = await new Promise<string>((resolve, reject) => {
+              const body = []
+
+              metadataStream
+                .on("data", (chunk) => body.push(chunk))
+                .on("error", reject)
+                .on("end", () => resolve(Buffer.concat(body).toString("utf8")))
+            })
+
+            desc.metadata = JSON.parse(metadata)
+          }
+
+          return desc
+        })
         .then(OrdoFile.raw),
     getFileContent: (path) =>
       Promise.resolve(path)
@@ -100,10 +126,21 @@ export const OrdoFileModel = {
 
           return { oldPath, newPath, parentDirectory }
         })
-        .then(async ({ oldPath, newPath, parentDirectory }) => ({
-          file: await driver.moveFile({ oldPath, newPath }),
-          parentDirectory,
-        }))
+        .then(async ({ oldPath, newPath, parentDirectory }) => {
+          const file = await driver.moveFile({ oldPath, newPath })
+
+          const oldMetadataPath = `${oldPath}.metadata` as const
+          const newMetadataPath = `${newPath}.metadata` as const
+
+          if (await driver.checkFileExists(oldMetadataPath)) {
+            await driver.moveFile({
+              oldPath: oldMetadataPath,
+              newPath: newMetadataPath,
+            })
+          }
+
+          return { file, parentDirectory }
+        })
         .then(({ file, parentDirectory }) =>
           parentDirectory
             ? OrdoDirectoryModel.of(driver).getDirectory(parentDirectory.path)

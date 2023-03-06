@@ -18,6 +18,7 @@ import CalendarSidebar from "./sidebar"
 import "@toast-ui/calendar/dist/toastui-calendar.min.css"
 import "tui-date-picker/dist/tui-date-picker.css"
 import "tui-time-picker/dist/tui-time-picker.css"
+
 import "./index.css"
 
 // import YearView from "./components/year-view"
@@ -29,11 +30,12 @@ export default function Calendar() {
   const Workspace = useWorkspaceWithSidebar()
   const calendarRef = useRef<ToastUIReactCalendar>()
 
-  const { view } = useParams() as { view: "day" | "week" | "month" }
+  const { view } = useParams<{ view: "day" | "week" | "month" }>()
   const { t } = useTranslation()
   const [width] = useWindowSize()
 
   const [isWide, setIsWide] = useState(false)
+
   const [events, setEvents] = useState<EventObject[]>([
     {
       id: "1",
@@ -87,18 +89,21 @@ export default function Calendar() {
   const previousView = t("@ordo-activity-calendar/previous-view")
 
   const toNextView = () => {
+    // TODO: Translate to query params
     if (!calendarRef.current || !calendarRef.current.calendarInstance) return
 
     calendarRef.current.calendarInstance.next()
   }
 
   const toPreviousView = () => {
+    // TODO: Translate to query params
     if (!calendarRef.current || !calendarRef.current.calendarInstance) return
 
     calendarRef.current.calendarInstance.prev()
   }
 
   const toCurrentView = () => {
+    // TODO: Translate to query params
     if (!calendarRef.current || !calendarRef.current.calendarInstance) return
 
     calendarRef.current.calendarInstance.today()

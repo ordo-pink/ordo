@@ -2,7 +2,7 @@ import { CodeHighlightNode, CodeNode } from "@lexical/code"
 import { HashtagNode } from "@lexical/hashtag"
 import { AutoLinkNode, LinkNode } from "@lexical/link"
 import { ListItemNode, ListNode } from "@lexical/list"
-import { $convertToMarkdownString, TRANSFORMERS } from "@lexical/markdown"
+import { $convertToMarkdownString } from "@lexical/markdown"
 
 import { CheckListPlugin } from "@lexical/react/LexicalCheckListPlugin"
 import { LexicalComposer } from "@lexical/react/LexicalComposer"
@@ -26,8 +26,9 @@ import { updatedFile } from "../../../containers/app/store"
 import { useFileParentBreadcrumbs } from "../../../core/hooks/use-file-breadcrumbs"
 import { useAppDispatch } from "../../../core/state/hooks/use-app-dispatch"
 import { useAppSelector } from "../../../core/state/hooks/use-app-selector"
-
 import { LoadEditorStatePlugin } from "../core-plugins/load-editor-state"
+import { OrdoDateNode } from "../core-plugins/ordo-date/node"
+import { ORDO_TRANSFORMERS } from "../transformers"
 
 const theme: EditorThemeClasses = {
   heading: {
@@ -53,7 +54,7 @@ const theme: EditorThemeClasses = {
   },
   quote:
     "border-l border-b border-slate-400 dark:border-slate-600 p-4 max-w-xl my-2 text-sm rounded-bl-lg",
-  code: "block px-6 py-4 bg-stone-200 dark:bg-stone-800 max-w-xl my-8 shadow-lg rounded-lg",
+  code: "block px-6 py-4 bg-stone-100 dark:bg-stone-800 max-w-xl my-8 shadow-lg rounded-lg",
   codeHighlight: {
     atrule: "text-neutral-500",
     attr: "text-neutral-500",
@@ -102,6 +103,7 @@ const nodes = [
   AutoLinkNode,
   LinkNode,
   HashtagNode,
+  OrdoDateNode,
 ]
 
 export default memo(
@@ -167,7 +169,9 @@ export default memo(
 
           <div className="w-full h-screen flex flex-col items-center">
             <div className="w-full py-8 px-4">
-              <MarkdownShortcutPlugin transformers={TRANSFORMERS} />
+              {/* <OrdoDatePlugin /> */}
+
+              <MarkdownShortcutPlugin transformers={ORDO_TRANSFORMERS} />
 
               <LinkPlugin />
               <ListPlugin />

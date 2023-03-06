@@ -1,5 +1,5 @@
 import { Spread, SerializedTextNode, DecoratorNode, NodeKey, LexicalNode } from "lexical"
-import { $applyNodeReplacement } from "lexical/LexicalUtils"
+import { $applyNodeReplacement } from "lexical"
 import { ReactNode } from "react"
 import { DateComponent } from "./component"
 

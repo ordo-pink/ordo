@@ -53,6 +53,7 @@ export default function Calendar() {
             start,
             end,
             title: file.readableName,
+            body: file.path,
           })),
         )
         .flat(),

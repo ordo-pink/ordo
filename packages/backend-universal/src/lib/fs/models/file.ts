@@ -154,10 +154,13 @@ export const OrdoFileModel = {
             : Promise.reject(ExceptionResponse.BAD_REQUEST),
         )
         .then((path) => driver.checkFileExists(path))
-        .then((exists) =>
-          exists ? { path, content } : Promise.reject(ExceptionResponse.NOT_FOUND),
-        )
-        .then(({ path, content }) => driver.updateFile({ path, content }))
+        .then((exists) => {
+          if (!exists) {
+            return driver.createFile({ path, content })
+          }
+
+          return driver.updateFile({ path, content })
+        })
         .then((path) => driver.getFileDescriptor(path))
         .then(OrdoFile.raw),
   }),

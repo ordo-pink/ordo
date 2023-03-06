@@ -129,7 +129,7 @@ export const DateComponent = ({ startDate, endDate, nodeKey }: Props) => {
   }, [endDatePickerRef, currentEndDate, isTimePickerEnabled, endDate, endDatePicker])
 
   return (
-    <span className="rounded-lg shadow-md px-4 py-0.5 bg-slate-200">
+    <span className="rounded-lg shadow-md px-4 py-0.5 bg-slate-200 whitespace-nowrap">
       <span>
         {currentStartDate.toLocaleDateString()}
         {currentStartDate.toTimeString().startsWith("00:00:00 ")

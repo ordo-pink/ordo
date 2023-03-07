@@ -76,19 +76,17 @@ export default function FeaturesSidebar() {
       />
 
       <ActionListItem
-        Icon={BsLink45Deg}
-        text={translatedCrossFileLinksTitle}
-        isCurrent={feature === "cross-file-links"}
-        onClick={() => navigate("/features/cross-file-links")}
-      >
-        <ComingSoonBadge>{translatedSpring}</ComingSoonBadge>
-      </ActionListItem>
-
-      <ActionListItem
         Icon={BsCalendar}
         text={translatedCalendarTitle}
         isCurrent={feature === "calendar"}
         onClick={() => navigate("/features/calendar")}
+      />
+
+      <ActionListItem
+        Icon={BsLink45Deg}
+        text={translatedCrossFileLinksTitle}
+        isCurrent={feature === "cross-file-links"}
+        onClick={() => navigate("/features/cross-file-links")}
       >
         <ComingSoonBadge>{translatedSpring}</ComingSoonBadge>
       </ActionListItem>

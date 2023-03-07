@@ -6,7 +6,7 @@
   "@ordo-activity-features/summer": "Summer",
   "@ordo-activity-features/go-to-features": "Go to Features",
   "@ordo-activity-features/calendar-title": "Calendar",
-  "@ordo-activity-features/calendar-text": "A note taking app will soon transform into a planning app!",
+  "@ordo-activity-features/calendar-text": "Not just taking notes - also planning notes!",
   "@ordo-activity-features/command-palette-title": "Command Palette",
   "@ordo-activity-features/command-palette-text": "Quickly access app commands via the Command Palette. Fuzzy search will help you quickly find the action you want to perform. Tap the burger icon in the top right corner, or use CTRL+SHIFT+P if you're on a device with a keyboard.",
   "@ordo-activity-features/cross-device-access-title": "Cross-device Access",

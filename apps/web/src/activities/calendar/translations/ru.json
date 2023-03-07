@@ -1,5 +1,6 @@
 {
   "@ordo-activity-calendar/title": "Календарь",
+  "@ordo-activity-calendar/open-calendar": "Открыть календарь",
   "@ordo-activity-calendar/day": "День",
   "@ordo-activity-calendar/week": "Неделя",
   "@ordo-activity-calendar/month": "Месяц",

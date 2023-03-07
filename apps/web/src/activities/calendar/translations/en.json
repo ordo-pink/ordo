@@ -1,5 +1,6 @@
 {
   "@ordo-activity-calendar/title": "Calendar",
+  "@ordo-activity-calendar/open-calendar": "Open Calendar",
   "@ordo-activity-calendar/day": "Day",
   "@ordo-activity-calendar/week": "Week",
   "@ordo-activity-calendar/month": "Month",

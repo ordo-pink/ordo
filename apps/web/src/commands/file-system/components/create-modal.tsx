@@ -81,8 +81,8 @@ export default function CreateModal() {
       .map(() =>
         Either.fromBoolean(type === OrdoFSEntity.DIRECTORY)
           .bimap(
-            () => `${root?.path ?? "/"}${newName.trim()}` as OrdoFilePath,
-            () => `${root?.path ?? "/"}${newName.trim()}/` as OrdoDirectoryPath,
+            () => `${parent?.path ?? "/"}${newName.trim()}` as OrdoFilePath,
+            () => `${parent?.path ?? "/"}${newName.trim()}/` as OrdoDirectoryPath,
           )
           .leftMap((path) =>
             OrdoFile.getFileExtension(path) ? path : (`${path}.md` as OrdoFilePath),

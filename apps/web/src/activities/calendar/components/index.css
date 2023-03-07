@@ -32,7 +32,48 @@
 }
 
 .toastui-calendar-panel-title {
-  @apply !text-sm;
+  @apply !text-sm dark:!border-neutral-800;
+}
+
+.toastui-calendar-panel.toastui-calendar-week-view-day-names {
+  @apply dark:!border-neutral-800;
+}
+
+.dayName-week-tue,
+.toastui-calendar-day-name__date,
+.toastui-calendar-day-name__name {
+  @apply dark:!text-neutral-400;
+}
+
+.toastui-calendar-panel-resizer,
+.toastui-calendar-column,
+.toastui-calendar-timegrid-hour-rows,
+.toastui-calendar-gridline-half,
+.toastui-calendar-panel.toastui-calendar-day-view-day-names,
+.toastui-calendar-daygrid-cell,
+.toastui-calendar-weekday-grid {
+  @apply dark:!border-neutral-800;
+}
+
+.toastui-calendar-weekday-event {
+  @apply border-0;
+}
+
+.toastui-calendar-grid-cell-date
+  .toastui-calendar-weekday-grid-date.toastui-calendar-weekday-grid-date-decorator {
+  @apply bg-pink-500;
+}
+
+.toastui-calendar-weekday-grid-date.toastui-calendar-template-monthGridHeader {
+  @apply dark:!text-neutral-200;
+}
+
+.toastui-calendar-weekday-event-block {
+  @apply dark:!text-neutral-200;
+}
+
+.toastui-calendar-template-time {
+  @apply dark:text-white;
 }
 
 /* Form Popup */
@@ -88,6 +129,10 @@
   @apply !text-sm !px-6 !py-2 !rounded-md shrink-0 !text-neutral-700;
   @apply !transition-all duration-300 bg-gradient-to-br from-sky-200 dark:from-purple-600 via-violet-200 dark:via-violet-600 to-purple-200 dark:to-purple-600;
   @apply !border-2 !border-transparent hover:!border-pink-300 dark:hover:!border-pink-500 focus:!border-pink-300 dark:focus:!border-pink-500;
+}
+
+.toastui-calendar-panel-grid {
+  @apply dark:!border-neutral-800;
 }
 
 .toastui-calendar-template-monthMoreClose {

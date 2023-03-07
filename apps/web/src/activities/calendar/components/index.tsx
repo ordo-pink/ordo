@@ -73,8 +73,8 @@ export default function Calendar() {
               category: !end ? "allday" : "time",
               title: file.readableName,
               body: file.path,
-              backgroundColor: "#cbd5e1",
-              color: "#1e293b",
+              backgroundColor: "#a78bfa",
+              color: "#4c1d95",
             }
           }),
         ),

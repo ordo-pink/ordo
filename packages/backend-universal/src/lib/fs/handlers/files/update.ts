@@ -12,7 +12,13 @@ export const updateFileHandler: FsRequestHandler<OrdoFilePathParams> =
 
     const contentLength = Number(req.headers["content-length"])
 
-    const { size } = await getFile(path)
+    let size: number
+
+    try {
+      size = (await getFile(path)).size
+    } catch (_) {
+      size = 0
+    }
 
     updateFile({ path, content: req })
       .then(removeUserIdFromPath(userId))

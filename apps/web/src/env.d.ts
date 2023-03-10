@@ -17,6 +17,7 @@ interface ImportMeta {
     VITE_AUTH_REALM: "test" | "master"
     VITE_AUTH_CLIENT_ID: "ordo-web-app" | "ordo-electron-app"
     VITE_BACKEND_LOCAL_TOKEN?: string
+    VITE_APP_VERSION?: string
     MODE: "development" | "production" | "test"
   }
 }

@@ -16,6 +16,7 @@ const LOCAL_TOKEN = import.meta.env.VITE_BACKEND_LOCAL_TOKEN
 const SSO_HOST = import.meta.env.VITE_AUTH_HOST
 const SSO_REALM = import.meta.env.VITE_AUTH_REALM
 const SSO_CLIENT_ID = import.meta.env.VITE_AUTH_CLIENT_ID
+const APP_VERSION = import.meta.env.VITE_APP_VERSION ?? "0.0.0"
 
 const keycloak = new Keycloak({ url: SSO_HOST, realm: SSO_REALM, clientId: SSO_CLIENT_ID })
 

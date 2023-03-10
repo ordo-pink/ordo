@@ -21,8 +21,9 @@ const auth$ = new Rx.Subject<Nullable<UserAuth>>()
 
 const unauthenticatedUser$ = Rx.of({
   auth: { isAuthenticated: false } as const,
-  extensions: ["http://localhost:7000/asdf/main.js"],
+  extensions: ["./home.ts"],
 })
+
 const createAuthencticatedUser$ = (auth: UserAuth) =>
   Rx.forkJoin({
     tree: Rx.from(getTree(auth)), // TODO

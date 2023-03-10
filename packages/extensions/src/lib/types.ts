@@ -1,91 +1,174 @@
-import { UnaryFn } from "@ordo-pink/common-types"
-import { IOrdoDirectory } from "@ordo-pink/fs-entity"
-import { KeycloakTokenParsed } from "keycloak-js"
-import { executeCommand, registerCommand } from "./commands"
-import { navigate, openExternal } from "./router"
-import { registerTranslations } from "./translations"
+import { Nullable, ThunkFn, UnaryFn } from "@ordo-pink/common-types"
+import { IOrdoFile, IOrdoDirectory, OrdoFileExtension } from "@ordo-pink/fs-entity"
+import { TwoLetterLocale } from "@ordo-pink/locale"
+import { Slice } from "@reduxjs/toolkit"
+import { TFunction } from "i18next"
+import { ComponentType } from "react"
+import { useDispatch } from "react-redux"
+import { OrdoExtensionType } from "./ordo-extension-type"
 
-export type Extension = {
-  activities: Activity[]
+export type OrdoExtensionName<
+  Name extends string,
+  ExtensionType extends OrdoExtensionType,
+> = `ordo-${ExtensionType}-${Name}`
+
+export type TranslationsRecord = {
+  [Key in TwoLetterLocale]?: Record<string, string>
 }
 
-export type ExtensionModule = {
-  init: () => Extension
-  deinit?: () => void
-}
-
-export type Route<Params extends Record<string, string> = Record<string, string>, Data = null> = {
-  params: Params
-  data: Data
-  hash: string
-  hashRouting: boolean
-  search: string
-  path: string
-  route: string
-}
-
-export type RenderActivityContext<
-  Params extends Record<string, string> = Record<string, string>,
-  Data = null,
+export type ActionContext<
+  T extends OrdoExtension<
+    string,
+    OrdoExtensionType,
+    Record<string, unknown>,
+    Record<string, unknown>
+  > = OrdoExtension<string, OrdoExtensionType, Record<string, unknown>, Record<string, unknown>>,
 > = {
-  container: HTMLDivElement
-  routeData: Route<Params, Data>
+  state: ExtensionState<T>
+  contextMenuTarget: Nullable<IOrdoFile | IOrdoDirectory>
+  dispatch: ReturnType<typeof useDispatch>
+  env: {
+    type: "browser"
+    fetch: typeof fetch
+    openExternal: UnaryFn<string, void>
+  }
+  navigate: UnaryFn<string, void>
+  translate: TFunction<"translation", undefined>
+  isAuthenticated: boolean
+  createLoginUrl: ThunkFn<string>
+  createRegisterUrl: ThunkFn<string>
+  userData?: {
+    email: string
+    username: string
+    emailVerified: boolean
+  }
 }
 
-export type RenderIconContext = RenderActivityContext
-export type RenderSidebarContext = RenderActivityContext
+export type OrdoCommand<ExtensionName extends string> = {
+  Icon: ComponentType
+  accelerator?: string
+  title: `@${ExtensionName}/${string}`
+  action: UnaryFn<ActionContext, void | PromiseLike<void>>
+  showInContextMenu?: boolean | UnaryFn<ActionContext, boolean>
+  showInCommandPalette?: boolean | UnaryFn<ActionContext, boolean>
+}
 
-export type Activity = {
+export type ExtensionState<
+  T extends OrdoExtension<
+    string,
+    OrdoExtensionType,
+    Record<string, unknown>,
+    Record<string, unknown>
+  >,
+> = T extends OrdoExtension<string, OrdoExtensionType, infer U, Record<string, unknown>> ? U : null
+
+export type ExtensionPersistedStore<
+  T extends OrdoExtension<
+    string,
+    OrdoExtensionType,
+    Record<string, unknown>,
+    Record<string, unknown>
+  >,
+> = T extends OrdoExtension<string, OrdoExtensionType, Record<string, unknown>, infer U>
+  ? U extends Record<string, unknown>
+    ? OrdoExtensionPersistedStore<U>
+    : null
+  : null
+
+export type OrdoExtensionProps<
+  T extends OrdoExtension<
+    string,
+    OrdoExtensionType,
+    Record<string, unknown>,
+    Record<string, unknown>
+  >,
+> = {
+  persistedStore: ExtensionPersistedStore<T>
+  selector: () => null // TODO
+  translate: () => null // TODO
+}
+
+export type OrdoExtensionPersistedStore<T extends Record<string, unknown>> = {
+  init: ThunkFn<Promise<void>>
+  get<K extends keyof T>(key: K): Promise<T[K]>
+  set<K extends keyof T>(key: K, value: T[K]): Promise<void>
+  clear: ThunkFn<Promise<void>>
+  resetDefaults: ThunkFn<Promise<void>>
+  getState: ThunkFn<Promise<T>>
+  getDefaults: ThunkFn<Promise<T>>
+}
+
+export interface OrdoExtension<
+  Name extends string,
+  ExtensionType extends OrdoExtensionType,
+  MemoryState extends Record<string, unknown> | undefined,
+  PersistedState extends Record<string, unknown> | undefined,
+> {
+  name: OrdoExtensionName<Name, ExtensionType>
+  translations?: TranslationsRecord
+  readableName?: string
+  overlayComponents?: ComponentType[]
+  description?: string
+  storeSlice?: Slice<MemoryState>
+  commands?: OrdoCommand<Name>[]
+  editorPlugins?: ComponentType[]
+  persistedState?: PersistedState
+}
+
+export type OrdoActivityProps<
+  T extends OrdoActivityExtension<string, Record<string, unknown>, Record<string, unknown>>,
+> = OrdoExtensionProps<T>
+
+export type OrdoFileAssociationProps<
+  T extends OrdoExtension<
+    string,
+    OrdoExtensionType,
+    Record<string, unknown>,
+    Record<string, unknown>
+  >,
+> = OrdoExtensionProps<T> & {
+  file: IOrdoFile
+}
+
+export interface OrdoCommandExtension<
+  Name extends string,
+  MemoryState extends Record<string, unknown>,
+  PersistedState extends Record<string, unknown>,
+> extends OrdoExtension<Name, OrdoExtensionType.COMMAND, MemoryState, PersistedState> {
+  commands: OrdoCommand<Name>[]
+}
+
+export interface OrdoEditorPluginExtension<
+  Name extends string,
+  MemoryState extends Record<string, unknown>,
+  PersistedState extends Record<string, unknown>,
+> extends OrdoExtension<Name, OrdoExtensionType.EDITOR_PLUGIN, MemoryState, PersistedState> {
+  editorPlugins: ComponentType[]
+}
+
+export interface OrdoFileAssociationExtension<
+  Name extends string,
+  MemoryState extends Record<string, unknown>,
+  PersistedStateState extends Record<string, unknown>,
+> extends OrdoExtension<
+    Name,
+    OrdoExtensionType.FILE_ASSOCIATION,
+    MemoryState,
+    PersistedStateState
+  > {
+  fileExtensions: OrdoFileExtension[]
+  Icon: ComponentType
+  Component: ComponentType
+}
+
+export interface OrdoActivityExtension<
+  Name extends string,
+  MemoryState extends Record<string, unknown>,
+  PersistedState extends Record<string, unknown>,
+> extends OrdoExtension<Name, OrdoExtensionType.ACTIVITY, MemoryState, PersistedState> {
   routes: string[]
-  name: string
-  render: UnaryFn<RenderActivityContext, void>
-  renderIcon: UnaryFn<RenderIconContext, void>
-  renderSidebar?: UnaryFn<RenderSidebarContext, void>
-}
-
-export type RenderFileAssociationContext<
-  Params extends Record<string, string> = Record<string, string>,
-  Data = null,
-> = {
-  container: HTMLDivElement
-  routeData: Route<Params, Data>
-}
-
-export type ExtensionCreatorScopedContext = {
-  executeCommand: typeof executeCommand
-  registerCommand: typeof registerCommand
-  navigate: typeof navigate
-  openExternal: typeof openExternal
-  registerTranslations: ReturnType<typeof registerTranslations>
-  translate: (key: string) => string
-}
-
-export type ExtensionCreatorContext = {
-  executeCommand: typeof executeCommand
-  registerCommand: typeof registerCommand
-  navigate: typeof navigate
-  openExternal: typeof openExternal
-  registerTranslations: typeof registerTranslations
-}
-
-export type UserAuth = { token: string; tokenParsed: KeycloakTokenParsed }
-
-export type UserStorage = {
-  totalSize: number
-  maxUploadSize: number
-  maxTotalSize: number
-}
-
-export type OrdoExtensionProducer = (ctx: ExtensionCreatorContext) => ExtensionModule
-
-export type UserExtensions = string[]
-
-export type AuthenticatedUser = {
-  auth: UserAuth
-  extensions: UserExtensions
-  storage: UserStorage
-  tree: IOrdoDirectory
-  // permissions: UserPermissions
-  // settings: UserSettings
-  // shares: UserShares
+  accelerator?: string
+  Icon: ComponentType
+  Component: ComponentType
+  persistedState?: PersistedState
 }

@@ -1,20 +1,12 @@
-import {
-  initAuth,
-  OrdoExtensionProducer,
-  executeCommand,
-  navigate,
-  noMatch,
-  openExternal,
-  refreshContainer,
-  registerCommand,
-  registerTranslations,
-  route,
-  Route,
-  router$,
-} from "@ordo-pink/extensions"
 import Keycloak from "keycloak-js"
 import * as R from "ramda"
 import * as Rx from "rxjs"
+import { initAuth } from "./auth"
+import { executeCommand, registerCommand } from "./commands"
+import { navigate, openExternal, router$, route, noMatch } from "./router"
+import { registerTranslations } from "./translations"
+import { OrdoExtensionProducer, Route } from "./types"
+import { refreshContainer } from "./utils/refresh-container"
 
 const SSO_HOST = "https://sso.ordo.pink"
 const SSO_REALM = "test"
@@ -37,7 +29,6 @@ const isFulfilled = <T>(x: PromiseSettledResult<T>): x is PromiseFulfilledResult
 const extensionCreators$ = extensionUrls$.pipe(
   Rx.map((exts) => exts.map((ext) => import(ext) as Promise<{ default: OrdoExtensionProducer }>)),
   Rx.mergeMap((exts) => Promise.allSettled(exts)),
-  Rx.tap(console.log),
   Rx.mergeAll(),
   Rx.filter(isFulfilled),
   Rx.map(R.prop("value")),

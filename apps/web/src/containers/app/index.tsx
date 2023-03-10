@@ -6,9 +6,8 @@ import {
   OrdoExtensionType,
 } from "@ordo-pink/extensions"
 import { useKeycloak } from "@ordo-pink/keycloak"
-import Features from "packages/unauthorised/src/lib/features/src"
-import Home from "@ordo-pink/ordo-activity-home"
-import Pricing from "@ordo-pink/ordo-activity-pricing"
+// import Features from "packages/unauthorised/src/lib/features/src"
+// import Pricing from "@ordo-pink/ordo-activity-pricing"
 import { combineReducers, Reducer } from "@reduxjs/toolkit"
 import { MouseEvent, useEffect, useState } from "react"
 import { Helmet } from "react-helmet"
@@ -75,9 +74,9 @@ const loggedInExtensions = [
 const loggedOutExtensions = [
   AuthCommands,
   CommandPalette,
-  Home,
-  Features,
-  Pricing,
+  // Home,
+  // Features,
+  // Pricing,
   UserSupportCommands,
   ToolbarPlugin,
   HighlightCodePlugin,

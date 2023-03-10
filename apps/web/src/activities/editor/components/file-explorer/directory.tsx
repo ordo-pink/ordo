@@ -52,8 +52,17 @@ export default function Directory({ directory }: Props) {
 
     if (currentFile.path.startsWith(directory.path)) {
       setIsExpanded(true)
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      persistedStore.get("expandedDirectories").then((expanded: any) => {
+        if (!expanded || expanded.includes(directory.path)) return
+
+        persistedStore
+          .set("expandedDirectories", expanded.concat([directory.path]))
+          .then(() => persistedStore.getState())
+      })
     }
-  }, [currentFile, directory])
+  }, [currentFile, directory, persistedStore])
 
   useEffect(() => {
     persistedStore

@@ -25,6 +25,10 @@ export default defineConfig({
     }),
   ],
 
+  define: {
+    APP_VERSION: JSON.stringify(process.env.npm_package_version),
+  },
+
   // Uncomment this if you are using workers.
   // worker: {
   //  plugins: [

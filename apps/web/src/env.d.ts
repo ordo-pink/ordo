@@ -5,6 +5,8 @@ declare module "*.jpg"
 declare module "date-frequency"
 declare module "@daypilot/daypilot-lite-react"
 
+declare const APP_VERSION: string
+
 interface ImportMeta {
   env: {
     VITE_FRONTEND_PORT: string

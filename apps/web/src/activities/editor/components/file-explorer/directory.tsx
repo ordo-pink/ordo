@@ -27,7 +27,7 @@ export default function Directory({ directory }: Props) {
 
   const editorSelector = useExtensionSelector<EditorActivityState>()
 
-  const currentFile = editorSelector((state) => state["ordo-activity-editor"].currentFile)
+  const currentFile = editorSelector((state) => state["ordo-activity-editor"]?.currentFile) ?? null
 
   const [expandedDirectories, setExpandedDirectories] = useState<string[]>([])
   const [isExpanded, setIsExpanded] = useState(false)

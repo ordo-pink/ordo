@@ -134,7 +134,8 @@ export default function Editor(props: EditorProps) {
           )
         })
     })
-  }, [currentFile, tree])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentFile, tree, props.persistedStore])
 
   return (
     <EditorContext.Provider value={props}>

@@ -31,7 +31,8 @@
             },
             "groups": ["builtin", "external", "index", "sibling", "parent", "internal"]
           }
-        ]
+        ],
+        "no-loop-func": "off"
       }
     },
     {

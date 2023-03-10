@@ -48,6 +48,8 @@ export default function Editor(props: EditorProps) {
   const currentFile = editorSelector((state) => state["ordo-activity-editor"]?.currentFile)
 
   useEffect(() => {
+    if (!tree) return
+
     const queryPath = query.get("path")
 
     if (!queryPath) {
@@ -132,7 +134,6 @@ export default function Editor(props: EditorProps) {
           )
         })
     })
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentFile, tree])
 
   return (

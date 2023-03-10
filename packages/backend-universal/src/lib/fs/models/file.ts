@@ -154,9 +154,9 @@ export const OrdoFileModel = {
             : Promise.reject(ExceptionResponse.BAD_REQUEST),
         )
         .then((path) => driver.checkFileExists(path))
-        .then((exists) => {
+        .then(async (exists) => {
           if (!exists) {
-            return driver.createFile({ path, content })
+            await OrdoFileModel.of(driver).createFile({ path })
           }
 
           return driver.updateFile({ path, content })

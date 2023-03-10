@@ -85,10 +85,6 @@
   @apply bg-neutral-50 dark:bg-neutral-700;
 }
 
-* {
-  @apply select-none;
-}
-
 *:focus {
   @apply outline-none ring-0;
 }

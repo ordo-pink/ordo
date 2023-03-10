@@ -26,10 +26,8 @@ export const findParent = (
 
   let parent: IOrdoDirectory = root
 
-  const parentPath = parent.path
-
   for (const chunk of parentPathChunks) {
-    const found = parent.children.find((child) => child.path === `${parentPath}${chunk}/`)
+    const found = parent.children.find((child) => child.path === `${parent.path}${chunk}/`)
 
     if (!found || !OrdoDirectory.isOrdoDirectory(found)) return parent
 

@@ -1,3 +1,4 @@
+import { useKeycloak } from "@ordo-pink/keycloak"
 import { useWorkspace } from "@ordo-pink/react"
 import Helmet from "react-helmet"
 import { useTranslation } from "react-i18next"
@@ -5,16 +6,15 @@ import PricingPlan from "./pricing-plan"
 
 export default function ExtensionStore() {
   const Workspace = useWorkspace()
-  // const actionContext = useActionContext()
 
-  // const commands = useAppSelector((state) => state.app.commands)
-  // const registerCommand = commands.find(
-  // (command) => command.title === "@ordo-command-auth/register",
-  // )
-
+  const { keycloak } = useKeycloak()
   const { t } = useTranslation()
 
   const translatedTitle = t("@ordo-activity-pricing/title")
+
+  const handleFreePricingPlanClick = () => {
+    window.location.href = keycloak.createLoginUrl({ redirectUri: "/editor" })
+  }
 
   return (
     <Workspace>
@@ -34,7 +34,7 @@ export default function ExtensionStore() {
           title="@ordo-activity-pricing/free-title"
           price="@ordo-activity-pricing/free-price"
           description="@ordo-activity-pricing/free-description"
-          // onClick={() => registerCommand && registerCommand.action(actionContext)}
+          onClick={handleFreePricingPlanClick}
           features={[
             { text: "@ordo-activity-pricing/free-cloud-storage" },
             { text: "@ordo-activity-pricing/free-file-size" },

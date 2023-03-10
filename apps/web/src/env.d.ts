@@ -5,6 +5,8 @@ declare module "*.jpg"
 declare module "date-frequency"
 declare module "@daypilot/daypilot-lite-react"
 
+declare const APP_VERSION: string
+
 interface ImportMeta {
   env: {
     VITE_FRONTEND_PORT: string
@@ -15,6 +17,7 @@ interface ImportMeta {
     VITE_AUTH_REALM: "test" | "master"
     VITE_AUTH_CLIENT_ID: "ordo-web-app" | "ordo-electron-app"
     VITE_BACKEND_LOCAL_TOKEN?: string
+    VITE_APP_VERSION?: string
     MODE: "development" | "production" | "test"
   }
 }

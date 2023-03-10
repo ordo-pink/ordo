@@ -15,6 +15,8 @@ import DirectoryContent from "./directory-content"
 import { EditorContext } from ".."
 import { useContextMenu } from "../../../../containers/app/hooks/use-context-menu"
 import { useAppDispatch } from "../../../../core/state/hooks/use-app-dispatch"
+import { useExtensionSelector } from "../../../../core/state/hooks/use-extension-selector"
+import { EditorActivityState } from "../../types"
 
 type Props = {
   directory: IOrdoDirectory
@@ -23,8 +25,11 @@ type Props = {
 export default function Directory({ directory }: Props) {
   const dispatch = useAppDispatch()
 
-  const [expandedDirectories, setExpandedDirectories] = useState<string[]>([])
+  const editorSelector = useExtensionSelector<EditorActivityState>()
 
+  const currentFile = editorSelector((state) => state["ordo-activity-editor"]?.currentFile) ?? null
+
+  const [expandedDirectories, setExpandedDirectories] = useState<string[]>([])
   const [isExpanded, setIsExpanded] = useState(false)
 
   const { persistedStore } = useContext(EditorContext)
@@ -41,6 +46,23 @@ export default function Directory({ directory }: Props) {
   const Icon = isExpanded ? OpenIcon : ClosedIcon
 
   const Chevron = isExpanded ? BsChevronDown : BsChevronUp
+
+  useEffect(() => {
+    if (!currentFile) return
+
+    if (currentFile.path.startsWith(directory.path)) {
+      setIsExpanded(true)
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      persistedStore.get("expandedDirectories").then((expanded: any) => {
+        if (!expanded || expanded.includes(directory.path)) return
+
+        persistedStore
+          .set("expandedDirectories", expanded.concat([directory.path]))
+          .then(() => persistedStore.getState())
+      })
+    }
+  }, [currentFile, directory, persistedStore])
 
   useEffect(() => {
     persistedStore

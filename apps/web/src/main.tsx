@@ -16,6 +16,7 @@ const LOCAL_TOKEN = import.meta.env.VITE_BACKEND_LOCAL_TOKEN
 const SSO_HOST = import.meta.env.VITE_AUTH_HOST
 const SSO_REALM = import.meta.env.VITE_AUTH_REALM
 const SSO_CLIENT_ID = import.meta.env.VITE_AUTH_CLIENT_ID
+const APP_VERSION = import.meta.env.VITE_APP_VERSION ?? "0.0.0"
 
 const keycloak = new Keycloak({ url: SSO_HOST, realm: SSO_REALM, clientId: SSO_CLIENT_ID })
 
@@ -101,7 +102,7 @@ window.ordo = {
             .then(
               tap(() =>
                 fetch(`${host}/${FILE_API}/${keycloak.tokenParsed?.sub}${file.path}.metadata`, {
-                  method: "POST",
+                  method: "PUT",
                   body: JSON.stringify(file.metadata),
                   headers: {
                     [AUTHORIZATION_HEADER_KEY]: `Bearer ${LOCAL_TOKEN ?? keycloak.token}`,
@@ -266,6 +267,15 @@ root.render(
         router={router}
         fallbackElement={<Loading />}
       />
+
+      {APP_VERSION ? (
+        <div className="fixed bottom-11 md:bottom-10 right-2 text-xs text-neutral-500 flex space-x-2">
+          <div>
+            {"v"}
+            {APP_VERSION}
+          </div>
+        </div>
+      ) : null}
     </Provider>
   </ReactKeycloakProvider>,
 )

@@ -1,5 +1,6 @@
 {
-  "@ordo-activity-calendar/title": "Настройки",
+  "@ordo-activity-calendar/title": "Календарь",
+  "@ordo-activity-calendar/open-calendar": "Открыть календарь",
   "@ordo-activity-calendar/day": "День",
   "@ordo-activity-calendar/week": "Неделя",
   "@ordo-activity-calendar/month": "Месяц",
@@ -37,5 +38,19 @@
   "@ordo-activity-calendar/09": "Сентябрь",
   "@ordo-activity-calendar/10": "Октябрь",
   "@ordo-activity-calendar/11": "Ноябрь",
-  "@ordo-activity-calendar/12": "Декабрь"
+  "@ordo-activity-calendar/12": "Декабрь",
+  "@ordo-activity-calendar/all-day": "Весь день",
+  "@ordo-activity-calendar/title-placeholder": "Название",
+  "@ordo-activity-calendar/popup-is-allday": "Весь день",
+  "@ordo-activity-calendar/popup-save": "Создать",
+  "@ordo-activity-calendar/popup-edit": "Редактировать",
+  "@ordo-activity-calendar/popup-delete": "Удалить",
+  "@ordo-activity-calendar/previous-view": "Назад",
+  "@ordo-activity-calendar/current-view": "Сегодня",
+  "@ordo-activity-calendar/next-view": "Вперед",
+  "@ordo-activity-editor/exceed": "Ещё {{count}}",
+  "@ordo-activity-editor/day": "День",
+  "@ordo-activity-editor/week": "Неделя",
+  "@ordo-activity-editor/month": "Месяц",
+  "@ordo-activity-calendar/new-event-input-placeholder": "Название события"
 }

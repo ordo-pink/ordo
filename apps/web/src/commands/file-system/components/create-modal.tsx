@@ -5,23 +5,22 @@ import { Null, OrdoButtonPrimary, OrdoButtonSecondary, PathBreadcrumbs } from "@
 import { ChangeEvent, MouseEvent, useEffect, useState } from "react"
 import { useTranslation } from "react-i18next"
 import { BsFileEarmarkPlus, BsFolderPlus } from "react-icons/bs"
+import { createSearchParams, useNavigate } from "react-router-dom"
 import { useModal } from "../../../containers/app/hooks/use-modal"
 import { createFile, createdDirectory } from "../../../containers/app/store"
 import { OrdoFSEntity } from "../../../core/constants/ordo-fs-entity"
 import { useAppDispatch } from "../../../core/state/hooks/use-app-dispatch"
-import { useAppSelector } from "../../../core/state/hooks/use-app-selector"
 import { useExtensionSelector } from "../../../core/state/hooks/use-extension-selector"
 import { hideCreateModal } from "../store"
 import { FileSystemExtensionStore } from "../types"
 
 export default function CreateModal() {
   const dispatch = useAppDispatch()
+  const navigate = useNavigate()
 
   const { showModal, Modal } = useModal()
 
   const fsSelector = useExtensionSelector<FileSystemExtensionStore>()
-
-  const root = useAppSelector((state) => state.app.personalProject)
 
   const isShown = fsSelector((state) => state["ordo-command-file-system"].isCreateModalShown)
   const parent = fsSelector((state) => state["ordo-command-file-system"].parent)
@@ -81,14 +80,20 @@ export default function CreateModal() {
       .map(() =>
         Either.fromBoolean(type === OrdoFSEntity.DIRECTORY)
           .bimap(
-            () => `${root?.path ?? "/"}${newName.trim()}` as OrdoFilePath,
-            () => `${root?.path ?? "/"}${newName.trim()}/` as OrdoDirectoryPath,
+            () => `${parent?.path ?? "/"}${newName.trim()}` as OrdoFilePath,
+            () => `${parent?.path ?? "/"}${newName.trim()}/` as OrdoDirectoryPath,
           )
           .leftMap((path) =>
             OrdoFile.getFileExtension(path) ? path : (`${path}.md` as OrdoFilePath),
           )
           .fold(
-            (path) => dispatch(createFile({ path })),
+            (path) => {
+              const file = OrdoFile.empty(path)
+
+              dispatch(createFile({ file })).then(() =>
+                navigate({ pathname: "/editor", search: createSearchParams({ path }).toString() }),
+              )
+            },
             (path) => dispatch(createdDirectory(path)),
           ),
       )

@@ -1,5 +1,6 @@
 {
   "@ordo-activity-calendar/title": "Calendar",
+  "@ordo-activity-calendar/open-calendar": "Open Calendar",
   "@ordo-activity-calendar/day": "Day",
   "@ordo-activity-calendar/week": "Week",
   "@ordo-activity-calendar/month": "Month",
@@ -41,5 +42,19 @@
   "@ordo-activity-calendar/month-09": "September",
   "@ordo-activity-calendar/month-10": "October",
   "@ordo-activity-calendar/month-11": "November",
-  "@ordo-activity-calendar/month-12": "December"
+  "@ordo-activity-calendar/month-12": "December",
+  "@ordo-activity-calendar/all-day": "All day",
+  "@ordo-activity-calendar/title-placeholder": "Subject",
+  "@ordo-activity-calendar/popup-is-allday": "All day",
+  "@ordo-activity-calendar/popup-save": "Create",
+  "@ordo-activity-calendar/popup-edit": "Edit",
+  "@ordo-activity-calendar/popup-delete": "Delete",
+  "@ordo-activity-calendar/previous-view": "Previous",
+  "@ordo-activity-calendar/current-view": "Today",
+  "@ordo-activity-calendar/next-view": "Next",
+  "@ordo-activity-editor/exceed": "{{count}} more",
+  "@ordo-activity-editor/day": "Day",
+  "@ordo-activity-editor/week": "Week",
+  "@ordo-activity-editor/month": "Month",
+  "@ordo-activity-calendar/new-event-input-placeholder": "Title"
 }

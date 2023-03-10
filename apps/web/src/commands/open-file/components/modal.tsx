@@ -1,7 +1,6 @@
-import { Nullable } from "@ordo-pink/common-types"
 import { Either } from "@ordo-pink/either"
 import { lazyBox, preventDefault, stopPropagation, noOp } from "@ordo-pink/fns"
-import { IOrdoDirectory, IOrdoFile, OrdoDirectory } from "@ordo-pink/fs-entity"
+import { IOrdoFile } from "@ordo-pink/fs-entity"
 import { Null } from "@ordo-pink/react"
 import { Switch } from "@ordo-pink/switch"
 import Fuse from "fuse.js"
@@ -13,24 +12,11 @@ import { useModal } from "../../../containers/app/hooks/use-modal"
 import { useAppDispatch } from "../../../core/state/hooks/use-app-dispatch"
 import { useAppSelector } from "../../../core/state/hooks/use-app-selector"
 import { useExtensionSelector } from "../../../core/state/hooks/use-extension-selector"
+import { getFiles } from "../../../core/utils/fs-helpers"
 import { hideOpenFile } from "../store"
 import { OpenFileExtensionStore } from "../types"
 
 import "../index.css"
-
-const getFiles = (directory: Nullable<IOrdoDirectory>, files: IOrdoFile[] = []) => {
-  if (!directory) return files
-
-  for (const item of directory.children) {
-    if (OrdoDirectory.isOrdoDirectory(item)) {
-      getFiles(item, files)
-    } else {
-      files.push(item)
-    }
-  }
-
-  return files
-}
 
 const fuse = new Fuse([] as IOrdoFile[], { keys: ["readableName"] })
 

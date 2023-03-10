@@ -56,7 +56,7 @@ export default function Editor(props: EditorProps) {
         if (!recentFiles || (!recentFiles[0] && !tree?.children.length)) {
           dispatch(
             createFile({
-              path: `/${translatedInitialFileName}.md`,
+              file: OrdoFile.empty(`/${translatedInitialFileName}.md`),
               content: translatedInitialFile,
             }),
           )

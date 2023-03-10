@@ -21,9 +21,10 @@ export const OrdoFile: IOrdoFileStatic = {
 
     const path = params.path
     const size = params.size
+    const metadata = params.metadata ?? {}
     const updatedAt = params.updatedAt ? new Date(params.updatedAt) : new Date()
 
-    return { path, size, updatedAt }
+    return { path, size, updatedAt, metadata }
   },
   empty: (path) => OrdoFile.from({ path, size: 0, updatedAt: new Date() }),
   from: (params) => OrdoFile.of(OrdoFile.raw(params)),
@@ -88,7 +89,7 @@ export const ordoFile = (raw: IOrdoFileRaw): IOrdoFile => {
     throw new TypeError("Invalid file path")
   }
 
-  const { path, size, updatedAt } = raw
+  const { path, size, updatedAt, metadata } = raw
 
   const readableName = OrdoFile.getReadableName(raw.path)
   const extension = OrdoFile.getFileExtension(raw.path)
@@ -101,5 +102,6 @@ export const ordoFile = (raw: IOrdoFileRaw): IOrdoFile => {
     updatedAt: new Date(updatedAt),
     size,
     readableSize,
+    metadata,
   }
 }

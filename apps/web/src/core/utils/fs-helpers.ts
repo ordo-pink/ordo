@@ -55,3 +55,17 @@ export const findOrdoFile = (
 
   return found
 }
+
+export const getFiles = (directory: Nullable<IOrdoDirectory>, files: IOrdoFile[] = []) => {
+  if (!directory) return files
+
+  for (const item of directory.children) {
+    if (OrdoDirectory.isOrdoDirectory(item)) {
+      getFiles(item, files)
+    } else {
+      files.push(item)
+    }
+  }
+
+  return files
+}

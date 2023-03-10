@@ -4,6 +4,7 @@ import type {
   IOrdoFileRaw,
   OrdoFilePath,
   OrdoDirectoryPath,
+  IOrdoFile,
 } from "@ordo-pink/fs-entity"
 import { OrdoExtensionName } from "./core/types"
 
@@ -22,14 +23,14 @@ declare global {
             getRaw: UnaryFn<OrdoFilePath, ReturnType<typeof fetch>>
             getBlob: UnaryFn<OrdoFilePath, Promise<Blob>>
             create: UnaryFn<
-              { path: OrdoFilePath; content?: string },
+              { file: IOrdoFile; content?: string },
               Promise<IOrdoFileRaw | IOrdoDirectoryRaw>
             >
             move: UnaryFn<
               { oldPath: OrdoFilePath; newPath: OrdoFIlePath },
               Promise<IOrdoFileRaw | IOrdoDirectoryRaw>
             >
-            update: UnaryFn<{ path: OrdoFilePath; content: string }, Promise<IOrdoFileRaw>>
+            update: UnaryFn<{ file: IOrdoFile; content: string }, Promise<IOrdoFileRaw>>
             remove: UnaryFn<OrdoFilePath, Promise<IOrdoFileRaw>>
           }
           directories: {

@@ -88,7 +88,7 @@ export const OrdoDirectoryModel = {
               result.push(
                 await OrdoDirectoryModel.of(driver).getDirectory(path as OrdoDirectoryPath),
               )
-            } else if (OrdoFile.isValidPath(path)) {
+            } else if (OrdoFile.isValidPath(path) && !path.endsWith(".metadata")) {
               result.push(await OrdoFileModel.of(driver).getFile(path as OrdoFilePath))
             }
           }

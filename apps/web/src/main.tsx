@@ -2,6 +2,7 @@ import { ReactKeycloakProvider } from "@ordo-pink/keycloak"
 import { ConsoleLogger } from "@ordo-pink/logger"
 import { Loading } from "@ordo-pink/react"
 import Keycloak from "keycloak-js"
+import { tap } from "ramda"
 import ReactDOM from "react-dom/client"
 import { Helmet } from "react-helmet"
 import { Provider } from "react-redux"
@@ -55,19 +56,19 @@ window.ordo = {
     type: "browser",
     // TODO: Extend this to support permissions provided by the user
     fetch: (...[url, params]: Parameters<typeof fetch>) => {
-      if (typeof url === "string") {
-        if (!url.startsWith(FS_HOST) && !url.startsWith(AUTH_HOST)) {
-          throw new Error("Invalid request")
-        }
-      } else if (url instanceof URL) {
-        if (url.host !== FS_HOST && url.host !== AUTH_HOST) {
-          throw new Error("Invalid request")
-        }
-      } else {
-        if (!url.url.startsWith(FS_HOST) && !url.url.startsWith(AUTH_HOST)) {
-          throw new Error("Invalid request")
-        }
-      }
+      // if (typeof url === "string") {
+      //   if (!url.startsWith(FS_HOST) && !url.startsWith(AUTH_HOST)) {
+      //     throw new Error("Invalid request")
+      //   }
+      // } else if (url instanceof URL) {
+      //   if (url.host !== FS_HOST && url.host !== AUTH_HOST) {
+      //     throw new Error("Invalid request")
+      //   }
+      // } else {
+      //   if (!url.url.startsWith(FS_HOST) && !url.url.startsWith(AUTH_HOST)) {
+      //     throw new Error("Invalid request")
+      //   }
+      // }
 
       return fetch(url, params).catch(async (error) => {
         if (error.status === 403) {
@@ -88,15 +89,26 @@ window.ordo = {
   api: {
     fs: {
       files: {
-        create: ({ path, content }) =>
+        create: ({ file, content }) =>
           window.ordo.env
-            .fetch(`${host}/${FILE_API}/${keycloak.tokenParsed?.sub}${path}`, {
+            .fetch(`${host}/${FILE_API}/${keycloak.tokenParsed?.sub}${file.path}`, {
               method: "POST",
               body: content,
               headers: {
                 [AUTHORIZATION_HEADER_KEY]: `Bearer ${LOCAL_TOKEN ?? keycloak.token}`,
               },
             })
+            .then(
+              tap(() =>
+                fetch(`${host}/${FILE_API}/${keycloak.tokenParsed?.sub}${file.path}.metadata`, {
+                  method: "POST",
+                  body: JSON.stringify(file.metadata),
+                  headers: {
+                    [AUTHORIZATION_HEADER_KEY]: `Bearer ${LOCAL_TOKEN ?? keycloak.token}`,
+                  },
+                }),
+              ),
+            )
             .then((res) => res.json()),
         get: (path) =>
           window.ordo.env
@@ -138,15 +150,27 @@ window.ordo = {
               },
             })
             .then((res) => res.json()),
-        update: ({ path, content }) =>
+        update: ({ file, content }) =>
           window.ordo.env
-            .fetch(`${host}/${FILE_API}/${keycloak.tokenParsed?.sub}${path}`, {
+            .fetch(`${host}/${FILE_API}/${keycloak.tokenParsed?.sub}${file.path}`, {
               method: "PUT",
               headers: {
                 [AUTHORIZATION_HEADER_KEY]: `Bearer ${LOCAL_TOKEN ?? keycloak.token}`,
               },
               body: content,
             })
+
+            .then(
+              tap(() =>
+                fetch(`${host}/${FILE_API}/${keycloak.tokenParsed?.sub}${file.path}.metadata`, {
+                  method: "PUT",
+                  body: JSON.stringify(file.metadata),
+                  headers: {
+                    [AUTHORIZATION_HEADER_KEY]: `Bearer ${LOCAL_TOKEN ?? keycloak.token}`,
+                  },
+                }),
+              ),
+            )
             .then((res) => res.json()),
       },
       directories: {

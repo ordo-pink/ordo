@@ -267,12 +267,14 @@ root.render(
         fallbackElement={<Loading />}
       />
 
-      <div className="fixed bottom-11 md:bottom-10 right-2 text-xs text-neutral-500 flex space-x-2">
-        <div>
-          {"v"}
-          {APP_VERSION}
+      {APP_VERSION ? (
+        <div className="fixed bottom-11 md:bottom-10 right-2 text-xs text-neutral-500 flex space-x-2">
+          <div>
+            {"v"}
+            {APP_VERSION}
+          </div>
         </div>
-      </div>
+      ) : null}
     </Provider>
   </ReactKeycloakProvider>,
 )

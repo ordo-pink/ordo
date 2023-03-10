@@ -1,0 +1,32 @@
+{
+  "name": "crypto",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "projectType": "application",
+  "sourceRoot": "apps/crypto/src",
+  "targets": {
+    "build": {
+      "executor": "@nxrs/cargo:build",
+      "options": {
+        "release": false
+      },
+      "configurations": {
+        "production": {
+          "release": true
+        }
+      }
+    },
+    "test": {
+      "executor": "@nxrs/cargo:test",
+      "options": {}
+    },
+    "lint": {
+      "executor": "@nxrs/cargo:clippy",
+      "options": {
+        "fix": false,
+        "failOnWarnings": true,
+        "noDeps": true
+      }
+    }
+  },
+  "tags": []
+}

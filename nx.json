@@ -1,14 +1,15 @@
 {
-  "$schema": "./node_modules/nx/schemas/nx-schema.json",
+  "plugins": ["@nxrs/cargo"],
   "npmScope": "ordo-pink",
-  "tasksRunnerOptions": {
-    "default": {
-      "runner": "@nrwl/nx-cloud",
-      "options": {
-        "cacheableOperations": ["build", "lint", "test", "e2e"],
-        "accessToken": "NmRhM2E0M2EtMmMzNi00ZGVmLWIzZDEtZWVjZDc3MjFmNzE5fHJlYWQtd3JpdGU="
-      }
-    }
+  "namedInputs": {
+    "default": ["{projectRoot}/**/*", "sharedGlobals"],
+    "production": [
+      "default",
+      "!{projectRoot}/**/?(*.)+(spec|test).[jt]s?(x)?(.snap)",
+      "!{projectRoot}/tsconfig.spec.json",
+      "!{projectRoot}/.eslintrc.json"
+    ],
+    "sharedGlobals": []
   },
   "targetDefaults": {
     "build": {
@@ -26,19 +27,18 @@
       "inputs": ["default", "^production"]
     }
   },
-  "namedInputs": {
-    "default": ["{projectRoot}/**/*", "sharedGlobals"],
-    "production": [
-      "default",
-      "!{projectRoot}/**/?(*.)+(spec|test).[jt]s?(x)?(.snap)",
-      "!{projectRoot}/tsconfig.spec.json",
-      "!{projectRoot}/.eslintrc.json"
-    ],
-    "sharedGlobals": []
-  },
   "workspaceLayout": {
     "appsDir": "apps",
     "libsDir": "packages"
+  },
+  "tasksRunnerOptions": {
+    "default": {
+      "runner": "@nrwl/nx-cloud",
+      "options": {
+        "cacheableOperations": ["build", "lint", "test", "e2e"],
+        "accessToken": "NmRhM2E0M2EtMmMzNi00ZGVmLWIzZDEtZWVjZDc3MjFmNzE5fHJlYWQtd3JpdGU="
+      }
+    }
   },
   "generators": {
     "@nrwl/react": {

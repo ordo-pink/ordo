@@ -17,7 +17,8 @@
     "e2e:watch": "nx affected --target=e2e --headless --watch",
     "build": "nx affected --target=build",
     "build:all": "nx run-many --target=build",
-    "postinstall": "husky install && gitmoji --update"
+    "postinstall": "husky install && gitmoji --update",
+    "nx": "nx"
   },
   "private": true,
   "devDependencies": {
@@ -33,6 +34,7 @@
     "@nrwl/vite": "^15.7.1",
     "@nrwl/webpack": "^15.7.1",
     "@nrwl/workspace": "15.7.1",
+    "@nxrs/cargo": "^0.3.3",
     "@testing-library/jest-dom": "^5.16.5",
     "@testing-library/react": "13.4.0",
     "@types/body-parser": "^1.19.2",

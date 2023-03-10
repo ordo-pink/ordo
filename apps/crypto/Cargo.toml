@@ -1,0 +1,17 @@
+[package]
+name = "crypto"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+axum = { version = "0.6.10", features = ["multipart"] }
+axum-extra = { version = "0.7.0", features = ["async-read-body"] }
+bytes = "1.4.0"
+futures = "0.3.26"
+hyper = { version = "0.14.25", features = ["full"] }
+tokio = { version = "1.26.0", features = ["full"] }
+tokio-util = { version = "0.7.7", features = ["io"] }
+tracing = "0.1.37"
+tracing-subscriber = { version = "0.3.16", features = ["env-filter"] }

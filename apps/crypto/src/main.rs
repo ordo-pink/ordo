@@ -85,7 +85,7 @@ async fn dec(
     key: [u8; 32],
     nonce: [u8; 24],
 ) -> Result<Response<BoxBody>> {
-    if req.body().size_hint().upper().unwrap_or(u64::MAX) > 64 * 1024 {
+    if req.body().size_hint().upper().unwrap_or(u64::MAX) <= 64 * 1024 + 24 {
         let body = req.collect().await.unwrap_or_default();
         let body = decrypt(&body.to_bytes(), &key, &nonce).unwrap();
         Ok(Response::new(full(body)))

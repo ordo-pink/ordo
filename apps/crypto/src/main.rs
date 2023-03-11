@@ -141,10 +141,6 @@ async fn main() -> Result<()> {
         let (stream, _) = listener.accept().await?;
 
         tokio::task::spawn(async move {
-            let key = key.clone();
-            let nonce = nonce.clone();
-
-            println!("key: {:?} nonce {:?}", key, nonce);
             let service = service_fn(move |req| register_routes(req, key, nonce));
 
             if let Err(err) = http1::Builder::new()

@@ -1,51 +1,79 @@
-use axum::{
-    body::boxed,
-    extract::BodyStream,
-    http::StatusCode,
-    response::Response,
-    routing::{on, MethodFilter},
-    Router,
-};
-use axum_extra::body::AsyncReadBody;
-use futures::StreamExt;
 use std::net::SocketAddr;
-use tokio::io::AsyncWriteExt;
-use tracing_subscriber::prelude::__tracing_subscriber_SubscriberExt;
-use tracing_subscriber::util::SubscriberInitExt;
 
-static MAX_BUF_SIZE: usize = 64 * 1024;
+use http_body_util::{BodyExt, Full};
+use hyper::body::Frame;
+use hyper::server::conn::http1;
+use hyper::service::service_fn;
+use hyper::{body::Bytes, Method};
+use hyper::{body::Incoming as IncomingBody, Request, Response, StatusCode};
+use tokio::net::TcpListener;
 
-#[tokio::main]
-async fn main() {
-    tracing_subscriber::registry()
-        .with(
-            tracing_subscriber::EnvFilter::try_from_default_env()
-                .unwrap_or_else(|_| "ordo-crypto=debug".into()),
-        )
-        .with(tracing_subscriber::fmt::layer())
-        .init();
+type GenericError = Box<dyn std::error::Error + Send + Sync>;
+type Result<T> = std::result::Result<T, GenericError>;
+type BoxBody = http_body_util::combinators::BoxBody<Bytes, hyper::Error>;
 
-    let app = Router::new().route("/return_the_same", on(MethodFilter::POST, return_the_same));
-
-    let addr = SocketAddr::from(([127, 0, 0, 1], 3000));
-    tracing::debug!("listening on {}", addr);
-    axum::Server::bind(&addr)
-        .serve(app.into_make_service())
-        .await
-        .unwrap();
+fn full<T: Into<Bytes>>(chunk: T) -> BoxBody {
+    Full::new(chunk.into())
+        .map_err(|never| match never {})
+        .boxed()
 }
 
-async fn return_the_same(mut stream: BodyStream) -> Result<Response, StatusCode> {
-    let (rx, tx) = tokio::io::duplex(MAX_BUF_SIZE);
-    let body = AsyncReadBody::new(rx);
-    tokio::task::spawn(async move {
-        futures::pin_mut!(tx);
-        while let Some(chunk) = stream.next().await {
-            tx.write_all(&chunk.unwrap())
-                .await
-                .expect("Dont able to write into stream ;(");
+// static INTERNAL_SERVER_ERROR: &[u8] = b"Internal Server Error";
+static NOTFOUND: &[u8] = b"Not Found";
+
+async fn register_routes(req: Request<IncomingBody>) -> Result<Response<BoxBody>> {
+    match (req.method(), req.uri().path()) {
+        (&Method::POST, "/return_the_same") => return_the_same(req).await,
+        (&Method::POST, "/return_the_same/mapped") => return_the_same_mapped(req).await,
+        _ => {
+            // Return 404 not found response.
+            Ok(Response::builder()
+                .status(StatusCode::NOT_FOUND)
+                .body(full(NOTFOUND))
+                .unwrap())
         }
+    }
+}
+
+async fn return_the_same(req: Request<IncomingBody>) -> Result<Response<BoxBody>> {
+    Ok(Response::new(req.into_body().boxed()))
+}
+
+async fn return_the_same_mapped(req: Request<IncomingBody>) -> Result<Response<BoxBody>> {
+    let frame_stream = req.into_body().map_frame(|frame| {
+        let frame = if let Ok(data) = frame.into_data() {
+            // Convert every byte in every Data frame to uppercase
+            data.iter()
+                .map(|byte| byte.to_be())
+                .collect::<Bytes>()
+        } else {
+            Bytes::new()
+        };
+
+        Frame::data(frame)
     });
 
-    Ok(Response::builder().body(boxed(body)).unwrap())
+    Ok(Response::new(frame_stream.boxed()))
+}
+
+#[tokio::main]
+async fn main() -> Result<()> {
+    let addr: SocketAddr = "127.0.0.1:1337".parse().unwrap();
+
+    let listener = TcpListener::bind(&addr).await?;
+    println!("Listening on http://{}", addr);
+    loop {
+        let (stream, _) = listener.accept().await?;
+
+        tokio::task::spawn(async move {
+            let service = service_fn(move |req| register_routes(req));
+
+            if let Err(err) = http1::Builder::new()
+                .serve_connection(stream, service)
+                .await
+            {
+                println!("Failed to serve connection: {:?}", err);
+            }
+        });
+    }
 }

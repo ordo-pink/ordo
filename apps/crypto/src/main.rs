@@ -13,7 +13,7 @@ use tokio::io::AsyncWriteExt;
 use tracing_subscriber::prelude::__tracing_subscriber_SubscriberExt;
 use tracing_subscriber::util::SubscriberInitExt;
 
-static MAX_BUF_SIZE: usize = 510241024;
+static MAX_BUF_SIZE: usize = 64 * 1024;
 
 #[tokio::main]
 async fn main() {
@@ -37,14 +37,15 @@ async fn main() {
 
 async fn return_the_same(mut stream: BodyStream) -> Result<Response, StatusCode> {
     let (rx, tx) = tokio::io::duplex(MAX_BUF_SIZE);
-    futures::pin_mut!(tx);
     let body = AsyncReadBody::new(rx);
-
-    while let Some(chunk) = stream.next().await {
-        tx.write_all(&chunk.unwrap())
-            .await
-            .expect("Dont able to write into stream ;(");
-    }
+    tokio::task::spawn(async move {
+        futures::pin_mut!(tx);
+        while let Some(chunk) = stream.next().await {
+            tx.write_all(&chunk.unwrap())
+                .await
+                .expect("Dont able to write into stream ;(");
+        }
+    });
 
     Ok(Response::builder().body(boxed(body)).unwrap())
 }

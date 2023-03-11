@@ -69,8 +69,6 @@ async fn enc(
     } else {
         let frame_stream = req.into_body().map_frame(move |frame| {
             let frame = if let Ok(data) = frame.into_data() {
-                println!("enc {:?}", data.len());
-                println!("enc {:?}", data.chunks(16).len());
                 encrypt(&data, &key, &nonce).unwrap()
             } else {
                 Bytes::new()
@@ -87,7 +85,6 @@ async fn dec(
     key: [u8; 32],
     nonce: [u8; 24],
 ) -> Result<Response<BoxBody>> {
-  println!("key: {:?} nonce {:?}", key, nonce);
     if req.body().size_hint().upper().unwrap_or(u64::MAX) > 64 * 1024 {
         let body = req.collect().await.unwrap_or_default();
         let body = decrypt(&body.to_bytes(), &key, &nonce).unwrap();
@@ -95,7 +92,6 @@ async fn dec(
     } else {
         let frame_stream = req.into_body().map_frame(move |frame| {
             let frame = if let Ok(data) = frame.into_data() {
-                println!("dec {:?}", data.len());
                 decrypt(&data, &key, &nonce).unwrap()
             } else {
                 Bytes::new()

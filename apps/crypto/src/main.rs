@@ -3,7 +3,7 @@ use std::net::SocketAddr;
 use chacha20poly1305::aead::OsRng;
 use chacha20poly1305::{aead::Aead, KeyInit, XChaCha20Poly1305};
 use http_body_util::{BodyExt, Full};
-use hyper::body::Frame;
+use hyper::body::{Body, Frame};
 use hyper::server::conn::http1;
 use hyper::service::service_fn;
 use hyper::{body::Bytes, Method};
@@ -62,9 +62,16 @@ async fn enc(
     key: [u8; 32],
     nonce: [u8; 24],
 ) -> Result<Response<BoxBody>> {
-    let body = req.collect().await.unwrap_or_default();
-    let body = encrypt(&body.to_bytes(), &key, &nonce).unwrap();
-    Ok(Response::new(full(body)))
+    let frame_stream = req.into_body().map_frame(move |frame| {
+        let frame = if let Ok(data) = frame.into_data() {
+            encrypt(&data, &key, &nonce).unwrap()
+        } else {
+            Bytes::new()
+        };
+        Frame::data(frame)
+    });
+
+    Ok(Response::new(frame_stream.boxed()))
 }
 
 async fn dec(

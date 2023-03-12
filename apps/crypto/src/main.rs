@@ -1,9 +1,9 @@
 use std::net::SocketAddr;
 
-use chacha20poly1305::aead::{OsRng};
+use chacha20poly1305::aead::OsRng;
 use chacha20poly1305::{aead::Aead, KeyInit, XChaCha20Poly1305};
 use http_body_util::{BodyExt, Full};
-use hyper::body::{Body, Frame};
+use hyper::body::Frame;
 use hyper::server::conn::http1;
 use hyper::service::service_fn;
 use hyper::{body::Bytes, Method};
@@ -62,22 +62,9 @@ async fn enc(
     key: [u8; 32],
     nonce: [u8; 24],
 ) -> Result<Response<BoxBody>> {
-    if req.body().size_hint().upper().unwrap_or(u64::MAX) <= 64 * 1024 {
-        let body = req.collect().await.unwrap_or_default();
-        let body = encrypt(&body.to_bytes(), &key, &nonce).unwrap();
-        Ok(Response::new(full(body)))
-    } else {
-        let frame_stream = req.into_body().map_frame(move |frame| {
-            let frame = if let Ok(data) = frame.into_data() {
-                encrypt(&data, &key, &nonce).unwrap()
-            } else {
-                Bytes::new()
-            };
-            Frame::data(frame)
-        });
-
-        Ok(Response::new(frame_stream.boxed()))
-    }
+    let body = req.collect().await.unwrap_or_default();
+    let body = encrypt(&body.to_bytes(), &key, &nonce).unwrap();
+    Ok(Response::new(full(body)))
 }
 
 async fn dec(
@@ -85,22 +72,16 @@ async fn dec(
     key: [u8; 32],
     nonce: [u8; 24],
 ) -> Result<Response<BoxBody>> {
-    if req.body().size_hint().upper().unwrap_or(u64::MAX) <= 64 * 1024 + 24 {
-        let body = req.collect().await.unwrap_or_default();
-        let body = decrypt(&body.to_bytes(), &key, &nonce).unwrap();
-        Ok(Response::new(full(body)))
-    } else {
-        let frame_stream = req.into_body().map_frame(move |frame| {
-            let frame = if let Ok(data) = frame.into_data() {
-                decrypt(&data, &key, &nonce).unwrap()
-            } else {
-                Bytes::new()
-            };
-            Frame::data(frame)
-        });
+    let frame_stream = req.into_body().map_frame(move |frame| {
+        let frame = if let Ok(data) = frame.into_data() {
+            decrypt(&data, &key, &nonce).unwrap()
+        } else {
+            Bytes::new()
+        };
+        Frame::data(frame)
+    });
 
-        Ok(Response::new(frame_stream.boxed()))
-    }
+    Ok(Response::new(frame_stream.boxed()))
 }
 
 async fn return_the_same(req: Request<IncomingBody>) -> Result<Response<BoxBody>> {

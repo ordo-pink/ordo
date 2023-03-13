@@ -1,9 +1,9 @@
-import { SystemDirectory } from "@ordo-pink/common-types"
 import { Either } from "@ordo-pink/either"
 import { lazyBox, preventDefault, stopPropagation } from "@ordo-pink/fns"
 import { IOrdoDirectory } from "@ordo-pink/fs-entity"
 import { ActionListItem, Null } from "@ordo-pink/react"
 import { MouseEvent, useContext, useEffect, useState } from "react"
+import { Draggable, Droppable } from "react-beautiful-dnd"
 import {
   AiFillFolder,
   AiFillFolderOpen,
@@ -20,9 +20,10 @@ import { EditorActivityState } from "../../types"
 
 type Props = {
   directory: IOrdoDirectory
+  index: number
 }
 
-export default function Directory({ directory }: Props) {
+export default function Directory({ directory, index }: Props) {
   const dispatch = useAppDispatch()
 
   const editorSelector = useExtensionSelector<EditorActivityState>()
@@ -116,24 +117,44 @@ export default function Directory({ directory }: Props) {
       .fold(({ x, y }) => dispatch(showContextMenu({ target: directory, x, y }))),
   )
 
-  return Either.fromNullable(directory)
-    .chain(() =>
-      Either.fromBoolean(directory.path !== SystemDirectory.INTERNAL).map(() => directory),
-    )
-    .fold(Null, (directory) => (
-      <ActionListItem
-        style={{ paddingLeft }}
-        text={directory.readableName}
-        Icon={Icon}
-        onClick={handleClick}
-        isCurrent={false}
-        onContextMenu={handleContextMenu}
-      >
-        <Chevron className="shrink-0" />
-        <DirectoryContent
-          directory={directory}
-          isExpanded={isExpanded}
-        />
-      </ActionListItem>
-    ))
+  return Either.fromNullable(directory).fold(Null, (directory) => (
+    <Droppable droppableId={directory.path}>
+      {(provided) => (
+        <div
+          ref={provided.innerRef}
+          {...provided.droppableProps}
+        >
+          <Draggable
+            draggableId={directory.path}
+            index={index}
+          >
+            {(provided) => (
+              <div
+                {...provided.draggableProps}
+                {...provided.dragHandleProps}
+                ref={provided.innerRef}
+              >
+                <ActionListItem
+                  style={{ paddingLeft }}
+                  text={directory.readableName}
+                  Icon={Icon}
+                  onClick={handleClick}
+                  isCurrent={false}
+                  onContextMenu={handleContextMenu}
+                >
+                  <Chevron className="shrink-0" />
+
+                  <DirectoryContent
+                    directory={directory}
+                    isExpanded={isExpanded}
+                  />
+                </ActionListItem>
+              </div>
+            )}
+          </Draggable>
+          {provided.placeholder}
+        </div>
+      )}
+    </Droppable>
+  ))
 }

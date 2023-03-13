@@ -2,6 +2,7 @@ import { lazyBox, preventDefault, stopPropagation } from "@ordo-pink/fns"
 import { IOrdoFile } from "@ordo-pink/fs-entity"
 import { ActionListItem } from "@ordo-pink/react"
 import { MouseEvent } from "react"
+import { Draggable } from "react-beautiful-dnd"
 import { BsFileEarmarkBinary } from "react-icons/bs"
 import { createSearchParams, useNavigate, useSearchParams } from "react-router-dom"
 import { useContextMenu } from "../../../../containers/app/hooks/use-context-menu"
@@ -10,9 +11,10 @@ import { useAppSelector } from "../../../../core/state/hooks/use-app-selector"
 
 type Props = {
   file: IOrdoFile
+  index: number
 }
 
-export default function File({ file }: Props) {
+export default function File({ file, index }: Props) {
   const dispatch = useAppDispatch()
 
   const fileAssociations = useAppSelector((state) => state.app.fileAssociationExtensions)
@@ -62,13 +64,26 @@ export default function File({ file }: Props) {
     file.extension === ".md" ? file.readableName : `${file.readableName}${file.extension}`
 
   return (
-    <ActionListItem
-      style={{ paddingLeft }}
-      text={name}
-      Icon={Icon}
-      isCurrent={isCurrent}
-      onClick={handleClick}
-      onContextMenu={handleContextMenu}
-    />
+    <Draggable
+      draggableId={file.path}
+      index={index}
+    >
+      {(provided) => (
+        <div
+          {...provided.draggableProps}
+          {...provided.dragHandleProps}
+          ref={provided.innerRef}
+        >
+          <ActionListItem
+            style={{ paddingLeft }}
+            text={name}
+            Icon={Icon}
+            isCurrent={isCurrent}
+            onClick={handleClick}
+            onContextMenu={handleContextMenu}
+          />
+        </div>
+      )}
+    </Draggable>
   )
 }

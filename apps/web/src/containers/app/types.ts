@@ -1,3 +1,4 @@
+import { Transformer } from "@lexical/markdown"
 import { Nullable } from "@ordo-pink/common-types"
 import {
   OrdoActivityExtension,
@@ -35,6 +36,11 @@ export type AppState = {
   commands: OrdoCommand<string>[]
   overlays: FC[]
   isSaving: boolean
+  editor: {
+    nodes: any[] // eslint-disable-line @typescript-eslint/no-explicit-any
+    transformers: Transformer[]
+    plugins: FC[]
+  }
 }
 
 export type UpdateFilePayload = {

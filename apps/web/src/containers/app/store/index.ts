@@ -30,6 +30,11 @@ const initialState: AppState = {
   editorPluginExtensions: [],
   commands: [],
   overlays: [],
+  editor: {
+    nodes: [],
+    plugins: [],
+    transformers: [],
+  },
   isSaving: false,
 }
 

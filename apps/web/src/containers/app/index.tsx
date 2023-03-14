@@ -20,6 +20,7 @@ import CalendarExtension from "../../activities/calendar"
 import EditorExtension from "../../activities/editor"
 // import ExtensionStoreExtension from "../../activities/extension-store"
 import { EditorActivityState } from "../../activities/editor/types"
+import KanbanExtension from "../../activities/kanban"
 import SettingsExtension from "../../activities/settings"
 import UserExtension from "../../activities/user"
 
@@ -70,6 +71,7 @@ const loggedInExtensions = [
   ToolbarPlugin,
   HighlightCodePlugin,
   AutolinkPlugin,
+  KanbanExtension,
 ]
 
 const loggedOutExtensions = [

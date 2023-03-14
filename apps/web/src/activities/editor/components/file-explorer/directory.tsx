@@ -119,42 +119,50 @@ export default function Directory({ directory, index }: Props) {
 
   return Either.fromNullable(directory).fold(Null, (directory) => (
     <Droppable droppableId={directory.path}>
-      {(provided) => (
-        <div
-          ref={provided.innerRef}
-          {...provided.droppableProps}
-        >
-          <Draggable
-            draggableId={directory.path}
-            index={index}
+      {(provided, droppableSnapshot) => {
+        return (
+          <div
+            className={`transition-all duration-300 ${
+              droppableSnapshot.isDraggingOver ? "bg-neutral-200 dark:bg-neutral-800" : ""
+            }`}
+            ref={provided.innerRef}
+            {...provided.droppableProps}
           >
-            {(provided) => (
-              <div
-                {...provided.draggableProps}
-                {...provided.dragHandleProps}
-                ref={provided.innerRef}
-              >
-                <ActionListItem
-                  style={{ paddingLeft }}
-                  text={directory.readableName}
-                  Icon={Icon}
-                  onClick={handleClick}
-                  isCurrent={false}
-                  onContextMenu={handleContextMenu}
-                >
-                  <Chevron className="shrink-0" />
+            <Draggable
+              draggableId={directory.path}
+              index={index}
+            >
+              {(provided, draggableSnapshot) => {
+                return (
+                  <div
+                    className=""
+                    {...provided.draggableProps}
+                    {...provided.dragHandleProps}
+                    ref={provided.innerRef}
+                  >
+                    <ActionListItem
+                      style={{ paddingLeft }}
+                      text={directory.readableName}
+                      Icon={Icon}
+                      onClick={handleClick}
+                      isCurrent={false}
+                      onContextMenu={handleContextMenu}
+                    >
+                      <Chevron className="shrink-0" />
 
-                  <DirectoryContent
-                    directory={directory}
-                    isExpanded={isExpanded}
-                  />
-                </ActionListItem>
-              </div>
-            )}
-          </Draggable>
-          {provided.placeholder}
-        </div>
-      )}
+                      <DirectoryContent
+                        directory={directory}
+                        isExpanded={isExpanded}
+                      />
+                    </ActionListItem>
+                  </div>
+                )
+              }}
+            </Draggable>
+            {provided.placeholder}
+          </div>
+        )
+      }}
     </Droppable>
   ))
 }

@@ -119,8 +119,11 @@ export default function FileExplorer() {
           onDragEnd={handleDragEnd}
         >
           <Droppable droppableId={rootDirectory.path}>
-            {(provided) => (
+            {(provided, snapshot) => (
               <div
+                className={`h-full transition-all duration-300  ${
+                  snapshot.isDraggingOver ? "bg-neutral-200 dark:bg-neutral-800" : ""
+                }`}
                 ref={provided.innerRef}
                 {...provided.droppableProps}
               >

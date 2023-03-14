@@ -68,8 +68,11 @@ export default function File({ file, index }: Props) {
       draggableId={file.path}
       index={index}
     >
-      {(provided) => (
+      {(provided, snapshot) => (
         <div
+          className={`rounded-md bg-neutral-100 dark:bg-neutral-900 z-50 transition-all duration-300 ${
+            snapshot.isDragging ? "ring-2 ring-pink-500" : "rounded-none"
+          }`}
           {...provided.draggableProps}
           {...provided.dragHandleProps}
           ref={provided.innerRef}

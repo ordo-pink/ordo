@@ -43,7 +43,7 @@ export default function Column({ directory, index }: Props) {
         >
           <div className="flex items-center justify-between p-2">
             <h3
-              className="justify-center"
+              className="justify-center font-extrabold"
               {...provided.dragHandleProps}
             >
               {directory.readableName}
@@ -81,7 +81,7 @@ export default function Column({ directory, index }: Props) {
             {(provided, snapshot) => (
               <div
                 className={`flex flex-col space-y-2 flex-grow min-h-min p-2 rounded-b-lg ${
-                  snapshot.isDraggingOver ? "bg-neutral-300" : "bg-neutral-200"
+                  snapshot.isDraggingOver ? "bg-neutral-400" : "bg-neutral-200"
                 }`}
                 ref={provided.innerRef}
                 {...provided.droppableProps}

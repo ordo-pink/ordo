@@ -28,7 +28,7 @@ export default function Column({ directory, index }: Props) {
     >
       {(provided) => (
         <div
-          className="flex flex-col bg-neutral-200 shadow-sm rounded-lg max-w-sm w-96"
+          className="flex flex-col bg-neutral-200 dark:bg-neutral-800 shadow-sm rounded-lg max-w-sm w-96"
           {...provided.draggableProps}
           ref={provided.innerRef}
           onContextMenu={(e) => {
@@ -81,7 +81,9 @@ export default function Column({ directory, index }: Props) {
             {(provided, snapshot) => (
               <div
                 className={`flex flex-col space-y-2 flex-grow min-h-min p-2 rounded-b-lg ${
-                  snapshot.isDraggingOver ? "bg-neutral-400" : "bg-neutral-200"
+                  snapshot.isDraggingOver
+                    ? "bg-neutral-300 dark:bg-zinc-800"
+                    : "bg-neutral-200 dark:bg-neutral-800"
                 }`}
                 ref={provided.innerRef}
                 {...provided.droppableProps}

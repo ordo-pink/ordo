@@ -44,8 +44,8 @@ export default function Card({ file, index }: Props) {
           }}
           className={`transition-all duration-300 flex flex-col space-y-4 rounded-lg p-2 shadow-sm ${
             snapshot.isDragging
-              ? "bg-gradient-to-tr from-sky-200 via-slate-200 to-pink-200"
-              : "bg-neutral-100"
+              ? "bg-gradient-to-tr from-sky-200 dark:from-violet-700 via-slate-200 to-pink-200 dark:to-purple-700"
+              : "bg-neutral-100 dark:bg-neutral-700"
           }`}
           {...provided.dragHandleProps}
           {...provided.draggableProps}

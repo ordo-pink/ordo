@@ -69,7 +69,7 @@ export default memo(() => {
           type="column"
         >
           {(provided) => (
-            <div className="flex flex-col space-y-4 m-4 mt-10 h-full rounded-lg bg-gradient-to-tr from-slate-400 to-stone-400 shadow-lg p-4">
+            <div className="flex flex-col space-y-4 m-4 mt-10 h-full rounded-lg bg-gradient-to-b from-slate-400 to-stone-400 dark:from-slate-800 dark:to-stone-900 shadow-lg p-4">
               <div
                 className="flex justify-center space-x-4"
                 {...provided.droppableProps}

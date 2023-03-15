@@ -10,6 +10,7 @@ const initialState: FileSystemCommandsState = {
   entityType: OrdoFSEntity.FILE,
   parent: null,
   target: null,
+  openOnCreate: true,
 }
 
 export const slice = createSlice({
@@ -20,9 +21,14 @@ export const slice = createSlice({
       state.parent = null
       state.entityType = OrdoFSEntity.FILE
       state.isCreateModalShown = false
+      state.openOnCreate = true
     },
-    showCreateFileModal: (state, action: PayloadAction<Nullable<IOrdoDirectory>>) => {
-      state.parent = action.payload
+    showCreateFileModal: (
+      state,
+      action: PayloadAction<{ parent: Nullable<IOrdoDirectory>; openOnCreate?: boolean }>,
+    ) => {
+      state.parent = action.payload.parent
+      state.openOnCreate = action.payload.openOnCreate ?? true
       state.entityType = OrdoFSEntity.FILE
       state.isCreateModalShown = true
     },

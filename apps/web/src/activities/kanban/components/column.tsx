@@ -33,7 +33,9 @@ export default function Column({ column, index }: Props) {
               {column.readableName}
             </h3>
 
-            <OrdoButtonNeutral onClick={() => dispatch(showCreateFileModal(column))}>
+            <OrdoButtonNeutral
+              onClick={() => dispatch(showCreateFileModal({ parent: column, openOnCreate: false }))}
+            >
               <BsPlus className="text-xl" />
             </OrdoButtonNeutral>
           </div>

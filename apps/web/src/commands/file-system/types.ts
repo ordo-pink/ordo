@@ -8,6 +8,7 @@ export type FileSystemCommandsState = {
   entityType: OrdoFSEntity
   parent: Nullable<IOrdoDirectory>
   target: Nullable<IOrdoFile | IOrdoDirectory>
+  openOnCreate: boolean
 }
 
 export type FileSystemExtensionStore = {

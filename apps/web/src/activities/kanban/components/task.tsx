@@ -16,17 +16,17 @@ export default function Task({ task, index }: Props) {
     >
       {(provided, snapshot) => (
         <div
-          className={`flex items-center justify-between rounded-lg p-2 shadow-sm ${
-            snapshot.isDragging ? "bg-gradient-to-tr from-sky-200 to-pink-200" : "bg-neutral-100"
+          className={`transition-all duration-300 flex items-center justify-between rounded-lg p-2 shadow-sm ${
+            snapshot.isDragging
+              ? "bg-gradient-to-tr from-sky-200 via-slate-200 to-pink-200"
+              : "bg-neutral-100"
           }`}
+          {...provided.dragHandleProps}
           {...provided.draggableProps}
           ref={provided.innerRef}
         >
           <div>{task.readableName}</div>
-          <div
-            className=""
-            {...provided.dragHandleProps}
-          >
+          <div className="">
             <RxDragHandleDots2 />
           </div>
         </div>

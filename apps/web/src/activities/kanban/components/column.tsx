@@ -1,11 +1,13 @@
 import { IOrdoDirectory, IOrdoFile, OrdoFile } from "@ordo-pink/fs-entity"
 import { OrdoButtonNeutral } from "@ordo-pink/react"
 import { Droppable, Draggable } from "react-beautiful-dnd"
-import { BsPlus } from "react-icons/bs"
+import { BsPencilSquare, BsPlus } from "react-icons/bs"
 import Card from "./card"
-import { showCreateFileModal } from "../../../commands/file-system/store"
+import { showCreateFileModal, showRenameDirectoryModal } from "../../../commands/file-system/store"
 import { useContextMenu } from "../../../containers/app/hooks/use-context-menu"
 import { useAppDispatch } from "../../../core/state/hooks/use-app-dispatch"
+import { useAppSelector } from "../../../core/state/hooks/use-app-selector"
+import { findParent } from "../../../core/utils/fs-helpers"
 
 type Props = {
   directory: IOrdoDirectory
@@ -14,6 +16,8 @@ type Props = {
 
 export default function Column({ directory, index }: Props) {
   const dispatch = useAppDispatch()
+
+  const tree = useAppSelector((state) => state.app.personalProject)
 
   const { showContextMenu } = useContextMenu()
 
@@ -45,14 +49,30 @@ export default function Column({ directory, index }: Props) {
               {directory.readableName}
             </h3>
 
-            <OrdoButtonNeutral
-              compact
-              onClick={() =>
-                dispatch(showCreateFileModal({ parent: directory, openOnCreate: false }))
-              }
-            >
-              <BsPlus className="text-xl" />
-            </OrdoButtonNeutral>
+            <div className="flex space-x-2">
+              <OrdoButtonNeutral
+                compact
+                onClick={() =>
+                  dispatch(showCreateFileModal({ parent: directory, openOnCreate: false }))
+                }
+              >
+                <BsPlus className="text-xl" />
+              </OrdoButtonNeutral>
+
+              <OrdoButtonNeutral
+                compact
+                onClick={() =>
+                  dispatch(
+                    showRenameDirectoryModal({
+                      parent: findParent(directory, tree) as IOrdoDirectory,
+                      target: directory,
+                    }),
+                  )
+                }
+              >
+                <BsPencilSquare />
+              </OrdoButtonNeutral>
+            </div>
           </div>
           <Droppable
             droppableId={directory.path}

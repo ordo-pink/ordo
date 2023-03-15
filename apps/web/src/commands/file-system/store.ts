@@ -51,6 +51,19 @@ export const slice = createSlice({
       state.entityType = OrdoFSEntity.FILE
       state.isRenameModalShown = true
     },
+    showRenameDirectoryModal: (
+      state,
+      action: PayloadAction<{
+        target: IOrdoDirectory
+        parent: IOrdoDirectory
+        openOnRename?: boolean
+      }>,
+    ) => {
+      state.target = action.payload.target
+      state.parent = action.payload.parent
+      state.entityType = OrdoFSEntity.DIRECTORY
+      state.isRenameModalShown = true
+    },
     showCreateDirectoryModal: (state, action: PayloadAction<Nullable<IOrdoDirectory>>) => {
       state.parent = action.payload
       state.entityType = OrdoFSEntity.DIRECTORY
@@ -76,6 +89,7 @@ export const {
   showCreateDirectoryModal,
   hideCreateModal,
   showRenameFileModal,
+  showRenameDirectoryModal,
   hideRenameModal,
   showDeleteFileModal,
   showDeleteDirectoryModal,

@@ -1,8 +1,9 @@
 {
   "@ordo-command-file-system/readable-name": "Действия с файловой системой",
   "@ordo-command-file-system/create-file": "Создать файл",
-  "@ordo-command-file-system/rename-file": "Переименовать файл",
   "@ordo-command-file-system/create-directory": "Создать папку",
+  "@ordo-command-file-system/rename-file": "Переименовать файл",
+  "@ordo-command-file-system/rename-directory": "Переименовать папку",
   "@ordo-command-file-system/placeholder": "Название",
   "@ordo-command-file-system/button-ok": "ОК",
   "@ordo-command-file-system/button-cancel": "Отмена",

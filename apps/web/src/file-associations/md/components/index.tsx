@@ -2,7 +2,7 @@ import { CodeHighlightNode, CodeNode } from "@lexical/code"
 import { HashtagNode } from "@lexical/hashtag"
 import { AutoLinkNode, LinkNode } from "@lexical/link"
 import { ListItemNode, ListNode } from "@lexical/list"
-import { $convertToMarkdownString } from "@lexical/markdown"
+import { $convertToMarkdownString, TRANSFORMERS } from "@lexical/markdown"
 
 import { CheckListPlugin } from "@lexical/react/LexicalCheckListPlugin"
 import { LexicalComposer } from "@lexical/react/LexicalComposer"
@@ -18,28 +18,24 @@ import { OnChangePlugin } from "@lexical/react/LexicalOnChangePlugin"
 import { RichTextPlugin } from "@lexical/react/LexicalRichTextPlugin"
 import { HeadingNode, QuoteNode } from "@lexical/rich-text"
 import { TableCellNode, TableNode, TableRowNode } from "@lexical/table"
-import { Nullable } from "@ordo-pink/common-types"
 import { OrdoFile } from "@ordo-pink/fs-entity"
 import { PathBreadcrumbs } from "@ordo-pink/react"
 import { EditorState, EditorThemeClasses } from "lexical"
-import { useState, useEffect, ComponentType, memo } from "react"
+import { mergeDeepWith } from "ramda"
+import { useState, useEffect, memo } from "react"
 import { MdProps } from ".."
 import { updatedFile, updateFileMetadata } from "../../../containers/app/store"
 import { useFileParentBreadcrumbs } from "../../../core/hooks/use-file-breadcrumbs"
 import { useAppDispatch } from "../../../core/state/hooks/use-app-dispatch"
 import { useAppSelector } from "../../../core/state/hooks/use-app-selector"
 import { LoadEditorStatePlugin } from "../core-plugins/load-editor-state"
-import { OrdoDateNode, SerializedOrdoDateNode } from "../core-plugins/ordo-date/node"
-import { ORDO_TRANSFORMERS } from "../transformers"
 
-const reduceToDateNodes = (tree: any) =>
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const toNodeArray = (tree: any) =>
   tree.children.reduce(
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (acc: any[], child: any) =>
-      child.children
-        ? acc.concat(reduceToDateNodes(child))
-        : child.type === "ordo-date"
-        ? acc.concat([child])
-        : acc,
+      child.children ? acc.concat(toNodeArray(child)) : acc.concat([child]),
     [],
   )
 
@@ -103,7 +99,7 @@ const theme: EditorThemeClasses = {
 }
 
 // TODO: Adding nodes
-const nodes = [
+const initialNodes = [
   HeadingNode,
   ListNode,
   ListItemNode,
@@ -116,7 +112,6 @@ const nodes = [
   AutoLinkNode,
   LinkNode,
   HashtagNode,
-  OrdoDateNode,
 ]
 
 export default memo(
@@ -124,10 +119,9 @@ export default memo(
     const dispatch = useAppDispatch()
     const breadcrumbsPath = useFileParentBreadcrumbs()
 
-    const pluginExtensions = useAppSelector((state) => state.app.editorPluginExtensions)
+    const { nodes, plugins, transformers } = useAppSelector((state) => state.app.editor)
 
     const [isInitialLoad, setIsInitialLoad] = useState(true)
-    const [plugins, setPlugins] = useState<ComponentType[]>([])
 
     // Prevent from updating the file at the moment it is opened
     useEffect(() => {
@@ -138,42 +132,30 @@ export default memo(
       }
     }, [file.path])
 
-    useEffect(() => {
-      if (!pluginExtensions || !pluginExtensions.length) return
-
-      setPlugins(
-        pluginExtensions.reduce(
-          (acc, extension) => acc.concat(extension.editorPlugins),
-          [] as ComponentType[],
-        ),
-      )
-
-      return () => setPlugins([])
-    }, [pluginExtensions])
-
     const handleChange = (state: EditorState) => {
       if (isInitialLoad) return
 
       state.read(() => {
-        const content = $convertToMarkdownString()
+        const content = $convertToMarkdownString(transformers.concat(TRANSFORMERS))
 
         const ordoFile = OrdoFile.empty(file.path)
 
-        // TODO: Extract this to plugin
-        ordoFile.metadata.dates = []
+        const nodes = toNodeArray(state.toJSON().root)
 
-        const dateNodes = reduceToDateNodes(state.toJSON().root)
+        let metadata = {}
 
-        dateNodes.forEach((child: any) => {
-          if (child.type === "ordo-date") {
-            const { startDate, endDate } = child as SerializedOrdoDateNode
-
-            ;(ordoFile.metadata.dates as { start: Date; end?: Nullable<Date> }[]).push({
-              start: startDate,
-              end: endDate,
-            })
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        nodes.forEach((child: any) => {
+          if (child.ordoMetadata) {
+            metadata = mergeDeepWith(
+              (a, b) => (Array.isArray(a) ? a.concat(b) : b ? b : a),
+              metadata,
+              child.ordoMetadata,
+            )
           }
         })
+
+        ordoFile.metadata = metadata
 
         dispatch(updateFileMetadata(ordoFile))
         dispatch(updatedFile({ file: ordoFile, content }))
@@ -190,7 +172,7 @@ export default memo(
             namespace: "md-editor-root",
             onError,
             theme,
-            nodes,
+            nodes: nodes.concat(initialNodes),
           }}
         >
           <div className="mb-8">
@@ -203,7 +185,7 @@ export default memo(
             <div className="w-full py-8 px-4">
               {/* <OrdoDatePlugin /> */}
 
-              <MarkdownShortcutPlugin transformers={ORDO_TRANSFORMERS} />
+              <MarkdownShortcutPlugin transformers={transformers} />
 
               <LinkPlugin />
               <ListPlugin />
@@ -221,7 +203,10 @@ export default memo(
                 ErrorBoundary={LexicalErrorBoundary}
               />
 
-              <LoadEditorStatePlugin file={file} />
+              <LoadEditorStatePlugin
+                file={file}
+                transformers={transformers.concat(TRANSFORMERS)}
+              />
               <OnChangePlugin
                 ignoreSelectionChange
                 onChange={handleChange}

@@ -30,6 +30,11 @@ const initialState: AppState = {
   editorPluginExtensions: [],
   commands: [],
   overlays: [],
+  editor: {
+    nodes: [],
+    plugins: [],
+    transformers: [],
+  },
   isSaving: false,
 }
 
@@ -49,6 +54,27 @@ const debounceSave = debounce(updateFileHandler, 500, { trailing: true, leading:
 export const createFile = createAsyncThunk(
   "@ordo-app/create-file",
   (params: { file: IOrdoFile; content?: string }) => window.ordo.api.fs.files.create(params),
+)
+
+export const moveFile = createAsyncThunk(
+  "@ordo-app/move-file",
+  async (params: { oldPath: OrdoFilePath; newPath: OrdoFilePath }) => {
+    const result = await window.ordo.api.fs.files.move(params)
+
+    return { result, params }
+  },
+)
+
+export const moveDirectory = createAsyncThunk(
+  "@ordo-app/move-directory",
+  async (params: { oldPath: OrdoDirectoryPath; newPath: OrdoDirectoryPath }) => {
+    const result = await window.ordo.api.fs.directories.move({
+      oldPath: params.oldPath.slice(0, -1) as OrdoDirectoryPath,
+      newPath: params.newPath.slice(0, -1) as OrdoDirectoryPath,
+    })
+
+    return { result, params }
+  },
 )
 
 export const createdDirectory = createAsyncThunk(
@@ -117,6 +143,60 @@ export const appSlice = createSlice({
           .map((data) =>
             OrdoDirectory.isOrdoDirectoryRaw(data) ? OrdoDirectory.from(data) : OrdoFile.from(data),
           )
+          .chain((item) =>
+            Either.fromNullable(findParent(item.path, state.personalProject)).map((parent) => {
+              parent.children.push(item)
+              OrdoDirectory.sort(parent.children)
+            }),
+          )
+          .fold(noOp, noOp),
+      )
+
+      .addCase(moveFile.rejected, rejectedReducer)
+      .addCase(moveFile.fulfilled, (state, action) =>
+        Either.fromNullable(action.payload)
+          .map((data) => {
+            const oldParent = findParent(data.params.oldPath, state.personalProject)
+
+            if (oldParent) {
+              const movedItemIndex = oldParent.children.findIndex(
+                ({ path }) => path === data.params.oldPath,
+              )
+
+              oldParent.children.splice(movedItemIndex, 1)
+            }
+
+            return data.result
+          })
+          .map((data) =>
+            OrdoDirectory.isOrdoDirectoryRaw(data) ? OrdoDirectory.from(data) : OrdoFile.from(data),
+          )
+          .chain((item) =>
+            Either.fromNullable(findParent(item.path, state.personalProject)).map((parent) => {
+              parent.children.push(item)
+              OrdoDirectory.sort(parent.children)
+            }),
+          )
+          .fold(noOp, noOp),
+      )
+
+      .addCase(moveDirectory.rejected, rejectedReducer)
+      .addCase(moveDirectory.fulfilled, (state, action) =>
+        Either.fromNullable(action.payload)
+          .map((data) => {
+            const oldParent = findParent(data.params.oldPath, state.personalProject)
+
+            if (oldParent) {
+              const movedItemIndex = oldParent.children.findIndex(
+                ({ path }) => path === data.params.oldPath,
+              )
+
+              oldParent.children.splice(movedItemIndex, 1)
+            }
+
+            return data.result
+          })
+          .map((data) => OrdoDirectory.from(data))
           .chain((item) =>
             Either.fromNullable(findParent(item.path, state.personalProject)).map((parent) => {
               parent.children.push(item)

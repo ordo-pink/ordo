@@ -1,6 +1,10 @@
 import { IOrdoDirectory, IOrdoFile, OrdoFile } from "@ordo-pink/fs-entity"
+import { OrdoButtonNeutral } from "@ordo-pink/react"
 import { Droppable, Draggable } from "react-beautiful-dnd"
+import { BsPlus } from "react-icons/bs"
 import Task from "./task"
+import { showCreateFileModal } from "../../../commands/file-system/store"
+import { useAppDispatch } from "../../../core/state/hooks/use-app-dispatch"
 
 type Props = {
   column: IOrdoDirectory
@@ -8,6 +12,8 @@ type Props = {
 }
 
 export default function Column({ column, index }: Props) {
+  const dispatch = useAppDispatch()
+
   return (
     <Draggable
       draggableId={column.path}
@@ -19,12 +25,18 @@ export default function Column({ column, index }: Props) {
           {...provided.draggableProps}
           ref={provided.innerRef}
         >
-          <h3
-            className="justify-center p-2"
-            {...provided.dragHandleProps}
-          >
-            {column.readableName}
-          </h3>
+          <div className="flex items-center justify-between p-2">
+            <h3
+              className="justify-center"
+              {...provided.dragHandleProps}
+            >
+              {column.readableName}
+            </h3>
+
+            <OrdoButtonNeutral onClick={() => dispatch(showCreateFileModal(column))}>
+              <BsPlus className="text-xl" />
+            </OrdoButtonNeutral>
+          </div>
           <Droppable
             droppableId={column.path}
             type="task"

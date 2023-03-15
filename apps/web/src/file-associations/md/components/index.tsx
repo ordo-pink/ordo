@@ -185,7 +185,7 @@ export default memo(
             <div className="w-full py-8 px-4">
               {/* <OrdoDatePlugin /> */}
 
-              <MarkdownShortcutPlugin transformers={transformers} />
+              <MarkdownShortcutPlugin transformers={transformers.concat(TRANSFORMERS)} />
 
               <LinkPlugin />
               <ListPlugin />

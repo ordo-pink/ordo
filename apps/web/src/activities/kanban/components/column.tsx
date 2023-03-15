@@ -28,7 +28,7 @@ export default function Column({ directory, index }: Props) {
     >
       {(provided) => (
         <div
-          className="flex flex-col bg-neutral-200 dark:bg-neutral-800 shadow-sm rounded-lg max-w-sm w-96"
+          className="flex flex-col bg-neutral-200 dark:bg-neutral-800 shadow-sm rounded-lg min-w-[calc(100vw-7rem)] md:min-w-[200px] w-96 max-w-xs"
           {...provided.draggableProps}
           ref={provided.innerRef}
           onContextMenu={(e) => {
@@ -41,7 +41,7 @@ export default function Column({ directory, index }: Props) {
             )
           }}
         >
-          <div className="flex items-center justify-between p-2">
+          <div className="flex flex-col md:flex-row items-center justify-between p-2">
             <h3
               className="justify-center font-extrabold"
               {...provided.dragHandleProps}

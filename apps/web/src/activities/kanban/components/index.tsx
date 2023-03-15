@@ -1,16 +1,19 @@
 import { Nullable } from "@ordo-pink/common-types"
 import { Either } from "@ordo-pink/either"
-import { IOrdoDirectory, OrdoDirectory } from "@ordo-pink/fs-entity"
+import { IOrdoDirectory, OrdoDirectory, OrdoFile, OrdoFilePath } from "@ordo-pink/fs-entity"
 import { Null, useWorkspaceWithSidebar } from "@ordo-pink/react"
-import { useEffect, useState } from "react"
-import { DragDropContext, Droppable } from "react-beautiful-dnd"
+import { memo, useEffect, useState } from "react"
+import { DragDropContext, Droppable, OnDragEndResponder } from "react-beautiful-dnd"
 import Column from "./column"
+import { moveFile } from "../../../containers/app/store"
+import { useAppDispatch } from "../../../core/state/hooks/use-app-dispatch"
 import { useAppSelector } from "../../../core/state/hooks/use-app-selector"
 
-export default function Kanban() {
+export default memo(() => {
   const Workspace = useWorkspaceWithSidebar()
-  const [state, setState] = useState<Nullable<IOrdoDirectory>>(null)
+  const dispatch = useAppDispatch()
   const tree = useAppSelector((state) => state.app.personalProject)
+  const [state, setState] = useState<Nullable<IOrdoDirectory>>(null)
 
   useEffect(() => {
     if (!tree) return
@@ -21,7 +24,6 @@ export default function Kanban() {
 
   // TODO: Moving files
   // TODO: Persist child order in directory
-  // TODO: Adding cards (reuse create modal)
   // TODO: Removing cards
   // TODO: Removing columns
   // TODO: Adding columns (reuse create modal)
@@ -30,80 +32,40 @@ export default function Kanban() {
   // TODO: Renaming cards
   // TODO: Kanban for Editor
 
-  // const onDragEnd = (result: any) => {
-  //   const { destination, source, draggableId, type } = result
+  const onDragEnd: OnDragEndResponder = (result) => {
+    if (!result.destination) {
+      // Ignore this as it's dropped outside a droppable
+      return
+    }
 
-  //   if (!destination) {
-  //     return
-  //   }
-  //   if (destination.droppableId === source.droppableId && destination.index === source.index) {
-  //     return
-  //   }
+    if (
+      result.destination.droppableId === result.source.droppableId &&
+      result.destination.index === result.source.index
+    ) {
+      // Ignore this as the draggable ended up in the same place as it was initially
+      return
+    }
 
-  //   if (type === "column") {
-  //     const newColumnOrder = Array.from(state.columnOrder)
-  //     newColumnOrder.splice(source.index, 1)
-  //     newColumnOrder.splice(destination.index, 0, draggableId)
-  //     const newState = {
-  //       ...state,
-  //       columnOrder: newColumnOrder,
-  //     }
-  //     setState(newState)
-  //     return
-  //   }
+    if (OrdoFile.isValidPath(result.draggableId)) {
+      const parentPath = OrdoFile.getParentPath(result.draggableId)
 
-  //   const start = state.columns[source.droppableId]
-  //   const finish = state.columns[destination.droppableId]
+      if (result.destination && result.destination.droppableId !== parentPath) {
+        const newReadableName = OrdoFile.getReadableName(result.draggableId)
+        const newExtension = OrdoFile.getFileExtension(result.draggableId)
+        const file = `${newReadableName}${newExtension}`
 
-  //   if (start === finish) {
-  //     const newTaskIds = Array.from(start.taskIds)
-
-  //     newTaskIds.splice(source.index, 1)
-  //     newTaskIds.splice(destination.index, 0, draggableId)
-
-  //     const newColumn = {
-  //       ...start,
-  //       taskIds: newTaskIds,
-  //     }
-
-  //     const newState = {
-  //       ...state,
-  //       columns: {
-  //         ...state.columns,
-  //         [newColumn.id]: newColumn,
-  //       },
-  //     }
-  //     setState(newState)
-  //     return
-  //   }
-
-  //   const startTaskIds = Array.from(start.taskIds)
-  //   startTaskIds.splice(source.index, 1)
-  //   const newStart = {
-  //     ...start,
-  //     taskIds: startTaskIds,
-  //   }
-
-  //   const finishTaskIds = Array.from(finish.taskIds)
-  //   finishTaskIds.splice(destination.index, 0, draggableId)
-  //   const newFinish = {
-  //     ...finish,
-  //     taskIds: finishTaskIds,
-  //   }
-  //   const newState = {
-  //     ...state,
-  //     columns: {
-  //       ...state.columns,
-  //       [newStart.id]: newStart,
-  //       [newFinish.id]: newFinish,
-  //     },
-  //   }
-  //   setState(newState)
-  // }
-  // onDragEnd={onDragEnd}
+        dispatch(
+          moveFile({
+            oldPath: result.draggableId,
+            newPath: `${result.destination.droppableId}${file}` as OrdoFilePath,
+          }),
+        )
+      }
+    }
+  }
   return Either.fromNullable(state).fold(Null, (dir) => (
     <Workspace sidebarChildren={null}>
-      <DragDropContext onDragEnd={() => void null}>
+      <DragDropContext onDragEnd={onDragEnd}>
         <Droppable
           droppableId="all-columns"
           direction="horizontal"
@@ -133,4 +95,4 @@ export default function Kanban() {
       </DragDropContext>
     </Workspace>
   ))
-}
+})

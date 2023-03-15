@@ -1,7 +1,6 @@
 /* eslint-disable react/require-render-return */
 import { IOrdoFile } from "@ordo-pink/fs-entity"
 import { Draggable } from "react-beautiful-dnd"
-import { RxDragHandleDots2 } from "react-icons/rx"
 
 type Props = {
   task: IOrdoFile
@@ -26,9 +25,6 @@ export default function Task({ task, index }: Props) {
           ref={provided.innerRef}
         >
           <div>{task.readableName}</div>
-          <div className="">
-            <RxDragHandleDots2 />
-          </div>
         </div>
       )}
     </Draggable>

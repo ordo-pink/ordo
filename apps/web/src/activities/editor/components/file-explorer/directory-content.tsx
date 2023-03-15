@@ -22,9 +22,10 @@ type Props = {
 export default function DirectoryContent({ directory, isExpanded }: Props) {
   return Either.fromBoolean(isExpanded).fold(Null, () => (
     <>
-      {directory.children.map((child) => (
+      {directory.children.map((child, index) => (
         <FileOrDirectory
           key={child.path}
+          index={index}
           item={child}
         />
       ))}

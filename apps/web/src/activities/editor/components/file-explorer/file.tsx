@@ -70,7 +70,7 @@ export default function File({ file, index }: Props) {
     >
       {(provided, snapshot) => (
         <div
-          className={`rounded-md bg-neutral-100 dark:bg-neutral-900 z-50 transition-all duration-300 ${
+          className={`rounded-md bg-neutral-100 dark:bg-neutral-800 z-50 transition-all duration-300 ${
             snapshot.isDragging ? "ring-2 ring-pink-500" : "rounded-none"
           }`}
           {...provided.draggableProps}

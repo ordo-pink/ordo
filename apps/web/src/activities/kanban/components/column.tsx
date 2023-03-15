@@ -4,6 +4,7 @@ import { Droppable, Draggable } from "react-beautiful-dnd"
 import { BsPlus } from "react-icons/bs"
 import Card from "./card"
 import { showCreateFileModal } from "../../../commands/file-system/store"
+import { useContextMenu } from "../../../containers/app/hooks/use-context-menu"
 import { useAppDispatch } from "../../../core/state/hooks/use-app-dispatch"
 
 type Props = {
@@ -13,6 +14,8 @@ type Props = {
 
 export default function Column({ directory, index }: Props) {
   const dispatch = useAppDispatch()
+
+  const { showContextMenu } = useContextMenu()
 
   return (
     <Draggable
@@ -24,6 +27,15 @@ export default function Column({ directory, index }: Props) {
           className="flex flex-col bg-neutral-200 shadow-sm rounded-lg max-w-sm w-96"
           {...provided.draggableProps}
           ref={provided.innerRef}
+          onContextMenu={(e) => {
+            dispatch(
+              showContextMenu({
+                target: directory,
+                x: e.pageX,
+                y: e.pageY,
+              }),
+            )
+          }}
         >
           <div className="flex items-center justify-between p-2">
             <h3

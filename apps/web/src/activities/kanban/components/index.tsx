@@ -22,16 +22,6 @@ export default memo(() => {
     setState(tasks)
   }, [tree])
 
-  // TODO: Moving files
-  // TODO: Persist child order in directory
-  // TODO: Removing cards
-  // TODO: Removing columns
-  // TODO: Adding columns (reuse create modal)
-  // TODO: Opening cards
-  // TODO: Display metadata
-  // TODO: Renaming cards
-  // TODO: Kanban for Editor
-
   const onDragEnd: OnDragEndResponder = (result) => {
     if (!result.destination) {
       // Ignore this as it's dropped outside a droppable
@@ -83,7 +73,7 @@ export default memo(() => {
                   return (
                     <Column
                       key={directory.path}
-                      column={directory as IOrdoDirectory}
+                      directory={directory as IOrdoDirectory}
                       index={index}
                     />
                   )

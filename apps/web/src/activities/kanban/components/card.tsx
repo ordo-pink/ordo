@@ -6,16 +6,16 @@ import { BsArrowsFullscreen } from "react-icons/bs"
 import { createSearchParams, useNavigate } from "react-router-dom"
 
 type Props = {
-  task: IOrdoFile
+  file: IOrdoFile
   index: number
 }
 
-export default function Task({ task, index }: Props) {
+export default function Card({ file, index }: Props) {
   const navigate = useNavigate()
 
   return (
     <Draggable
-      draggableId={task.path}
+      draggableId={file.path}
       index={index}
     >
       {(provided, snapshot) => (
@@ -29,14 +29,14 @@ export default function Task({ task, index }: Props) {
           {...provided.draggableProps}
           ref={provided.innerRef}
         >
-          <div>{task.readableName}</div>
+          <div>{file.readableName}</div>
           <div className="flex space-x-2 justify-end">
             <OrdoButtonSecondary
               compact
               onClick={() =>
                 navigate({
                   pathname: "/editor",
-                  search: createSearchParams({ path: task.path }).toString(),
+                  search: createSearchParams({ path: file.path }).toString(),
                 })
               }
             >

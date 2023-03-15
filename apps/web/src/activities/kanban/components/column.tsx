@@ -2,21 +2,21 @@ import { IOrdoDirectory, IOrdoFile, OrdoFile } from "@ordo-pink/fs-entity"
 import { OrdoButtonNeutral } from "@ordo-pink/react"
 import { Droppable, Draggable } from "react-beautiful-dnd"
 import { BsPlus } from "react-icons/bs"
-import Task from "./task"
+import Card from "./card"
 import { showCreateFileModal } from "../../../commands/file-system/store"
 import { useAppDispatch } from "../../../core/state/hooks/use-app-dispatch"
 
 type Props = {
-  column: IOrdoDirectory
+  directory: IOrdoDirectory
   index: number
 }
 
-export default function Column({ column, index }: Props) {
+export default function Column({ directory, index }: Props) {
   const dispatch = useAppDispatch()
 
   return (
     <Draggable
-      draggableId={column.path}
+      draggableId={directory.path}
       index={index}
     >
       {(provided) => (
@@ -30,17 +30,19 @@ export default function Column({ column, index }: Props) {
               className="justify-center"
               {...provided.dragHandleProps}
             >
-              {column.readableName}
+              {directory.readableName}
             </h3>
 
             <OrdoButtonNeutral
-              onClick={() => dispatch(showCreateFileModal({ parent: column, openOnCreate: false }))}
+              onClick={() =>
+                dispatch(showCreateFileModal({ parent: directory, openOnCreate: false }))
+              }
             >
               <BsPlus className="text-xl" />
             </OrdoButtonNeutral>
           </div>
           <Droppable
-            droppableId={column.path}
+            droppableId={directory.path}
             type="task"
           >
             {(provided, snapshot) => (
@@ -51,12 +53,12 @@ export default function Column({ column, index }: Props) {
                 ref={provided.innerRef}
                 {...provided.droppableProps}
               >
-                {column.children
+                {directory.children
                   .filter((item) => OrdoFile.isOrdoFile(item))
-                  .map((task, index) => (
-                    <Task
-                      key={task.path}
-                      task={task as IOrdoFile}
+                  .map((file, index) => (
+                    <Card
+                      key={file.path}
+                      file={file as IOrdoFile}
                       index={index}
                     />
                   ))}

@@ -46,6 +46,7 @@ export default function Column({ directory, index }: Props) {
             </h3>
 
             <OrdoButtonNeutral
+              compact
               onClick={() =>
                 dispatch(showCreateFileModal({ parent: directory, openOnCreate: false }))
               }

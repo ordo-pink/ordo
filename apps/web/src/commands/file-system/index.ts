@@ -4,6 +4,7 @@ import { CreateFileCommand } from "./commands/create-file"
 import { DeleteDirectoryCommand } from "./commands/delete-directory"
 import { DeleteFileCommand } from "./commands/delete-file"
 import { DownloadFileCommand } from "./commands/download-file"
+import { RenameFileCommand } from "./commands/rename-file"
 import { slice } from "./store"
 import en from "./translations/en.json"
 import ru from "./translations/ru.json"
@@ -19,9 +20,11 @@ export default createCommandExtension("file-system", {
     DeleteFileCommand,
     DeleteDirectoryCommand,
     DownloadFileCommand,
+    RenameFileCommand,
   ],
   overlayComponents: [
     () => import("./components/delete-modal"),
     () => import("./components/create-modal"),
+    () => import("./components/rename-modal"),
   ],
 })

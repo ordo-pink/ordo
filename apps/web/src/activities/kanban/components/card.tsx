@@ -1,11 +1,14 @@
 /* eslint-disable react/require-render-return */
-import { IOrdoFile } from "@ordo-pink/fs-entity"
+import { IOrdoDirectory, IOrdoFile } from "@ordo-pink/fs-entity"
 import { OrdoButtonSecondary } from "@ordo-pink/react"
 import { Draggable } from "react-beautiful-dnd"
-import { BsArrowsFullscreen } from "react-icons/bs"
+import { BsArrowsFullscreen, BsPencilSquare } from "react-icons/bs"
 import { createSearchParams, useNavigate } from "react-router-dom"
+import { showRenameFileModal } from "../../../commands/file-system/store"
 import { useContextMenu } from "../../../containers/app/hooks/use-context-menu"
 import { useAppDispatch } from "../../../core/state/hooks/use-app-dispatch"
+import { useAppSelector } from "../../../core/state/hooks/use-app-selector"
+import { findParent } from "../../../core/utils/fs-helpers"
 
 type Props = {
   file: IOrdoFile
@@ -17,6 +20,8 @@ export default function Card({ file, index }: Props) {
   const navigate = useNavigate()
 
   const { showContextMenu } = useContextMenu()
+
+  const tree = useAppSelector((state) => state.app.personalProject)
 
   return (
     <Draggable
@@ -47,7 +52,22 @@ export default function Card({ file, index }: Props) {
           ref={provided.innerRef}
         >
           <div>{file.readableName}</div>
-          <div className="flex space-x-2 justify-end">
+          <div className="flex justify-end">
+            <OrdoButtonSecondary
+              compact
+              onClick={() =>
+                dispatch(
+                  showRenameFileModal({
+                    target: file,
+                    parent: findParent(file, tree) as IOrdoDirectory,
+                    openOnRename: false,
+                  }),
+                )
+              }
+            >
+              <BsPencilSquare />
+            </OrdoButtonSecondary>
+
             <OrdoButtonSecondary
               compact
               onClick={() =>

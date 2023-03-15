@@ -7,10 +7,12 @@ import { OrdoFSEntity } from "../../core/constants/ordo-fs-entity"
 const initialState: FileSystemCommandsState = {
   isCreateModalShown: false,
   isDeleteModalShown: false,
+  isRenameModalShown: false,
   entityType: OrdoFSEntity.FILE,
   parent: null,
   target: null,
   openOnCreate: true,
+  openOnRename: true,
 }
 
 export const slice = createSlice({
@@ -31,6 +33,23 @@ export const slice = createSlice({
       state.openOnCreate = action.payload.openOnCreate ?? true
       state.entityType = OrdoFSEntity.FILE
       state.isCreateModalShown = true
+    },
+    hideRenameModal: (state) => {
+      state.target = null
+      state.parent = null
+      state.entityType = OrdoFSEntity.FILE
+      state.isRenameModalShown = false
+      state.openOnRename = true
+    },
+    showRenameFileModal: (
+      state,
+      action: PayloadAction<{ target: IOrdoFile; parent: IOrdoDirectory; openOnRename?: boolean }>,
+    ) => {
+      state.target = action.payload.target
+      state.parent = action.payload.parent
+      state.openOnRename = action.payload.openOnRename ?? true
+      state.entityType = OrdoFSEntity.FILE
+      state.isRenameModalShown = true
     },
     showCreateDirectoryModal: (state, action: PayloadAction<Nullable<IOrdoDirectory>>) => {
       state.parent = action.payload
@@ -56,6 +75,8 @@ export const {
   showCreateFileModal,
   showCreateDirectoryModal,
   hideCreateModal,
+  showRenameFileModal,
+  hideRenameModal,
   showDeleteFileModal,
   showDeleteDirectoryModal,
   hideDeleteModal,

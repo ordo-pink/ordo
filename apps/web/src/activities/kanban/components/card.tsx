@@ -4,6 +4,8 @@ import { OrdoButtonSecondary } from "@ordo-pink/react"
 import { Draggable } from "react-beautiful-dnd"
 import { BsArrowsFullscreen } from "react-icons/bs"
 import { createSearchParams, useNavigate } from "react-router-dom"
+import { useContextMenu } from "../../../containers/app/hooks/use-context-menu"
+import { useAppDispatch } from "../../../core/state/hooks/use-app-dispatch"
 
 type Props = {
   file: IOrdoFile
@@ -11,7 +13,10 @@ type Props = {
 }
 
 export default function Card({ file, index }: Props) {
+  const dispatch = useAppDispatch()
   const navigate = useNavigate()
+
+  const { showContextMenu } = useContextMenu()
 
   return (
     <Draggable
@@ -20,6 +25,15 @@ export default function Card({ file, index }: Props) {
     >
       {(provided, snapshot) => (
         <div
+          onContextMenu={(e) => {
+            dispatch(
+              showContextMenu({
+                target: file,
+                x: e.pageX,
+                y: e.pageY,
+              }),
+            )
+          }}
           className={`transition-all duration-300 flex flex-col space-y-4 rounded-lg p-2 shadow-sm ${
             snapshot.isDragging
               ? "bg-gradient-to-tr from-sky-200 via-slate-200 to-pink-200"

@@ -26,6 +26,9 @@ export default function Card({ file, index }: Props) {
       {(provided, snapshot) => (
         <div
           onContextMenu={(e) => {
+            e.preventDefault()
+            e.stopPropagation()
+
             dispatch(
               showContextMenu({
                 target: file,

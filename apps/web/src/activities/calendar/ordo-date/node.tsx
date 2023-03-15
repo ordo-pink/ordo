@@ -3,14 +3,20 @@ import { Spread, SerializedTextNode, DecoratorNode, NodeKey, LexicalNode } from 
 import { ReactNode } from "react"
 import { DateComponent } from "./component"
 
-export type SerializedOrdoDateNode = Spread<
-  {
-    type: "ordo-date"
-    version: 1
-    startDate: Date
-    endDate: Nullable<Date>
+// TODO: Extract this to types
+export type SerializedOrdoNode<
+  T extends Record<string, unknown>,
+  M extends Record<string, unknown>,
+> = Spread<
+  T & {
+    ordoMetadata?: M
   },
   SerializedTextNode
+>
+
+export type SerializedOrdoDateNode = SerializedOrdoNode<
+  { startDate: Date; endDate: Nullable<Date> },
+  { dates: Array<{ start: Date; end: Nullable<Date> }> }
 >
 
 export class OrdoDateNode extends DecoratorNode<ReactNode> {
@@ -41,14 +47,6 @@ export class OrdoDateNode extends DecoratorNode<ReactNode> {
     super(key)
     this.__startDate = startDate
     this.__endDate = endDate ?? null
-  }
-
-  getTextContent(): string {
-    if (this.__endDate) {
-      return `${this.__startDate.toISOString()}>>>${this.__endDate.toISOString()}`
-    }
-
-    return this.__startDate.toISOString()
   }
 
   canBeEmpty(): false {
@@ -101,6 +99,7 @@ export class OrdoDateNode extends DecoratorNode<ReactNode> {
       startDate: this.__startDate,
       endDate: this.__endDate,
       text: this.__text,
+      ordoMetadata: { dates: [{ start: this.__startDate, end: this.__endDate }] },
       type: "ordo-date",
       version: 1,
     }

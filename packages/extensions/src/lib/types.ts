@@ -1,8 +1,10 @@
+import { Transformer } from "@lexical/markdown"
 import { Nullable, ThunkFn, UnaryFn } from "@ordo-pink/common-types"
 import { IOrdoFile, IOrdoDirectory, OrdoFileExtension } from "@ordo-pink/fs-entity"
 import { TwoLetterLocale } from "@ordo-pink/locale"
 import { Slice } from "@reduxjs/toolkit"
 import { TFunction } from "i18next"
+import { TextNode, ElementNode, DecoratorNode } from "lexical"
 import { ComponentType } from "react"
 import { useDispatch } from "react-redux"
 import { OrdoExtensionType } from "./ordo-extension-type"
@@ -103,6 +105,7 @@ export interface OrdoExtension<
   ExtensionType extends OrdoExtensionType,
   MemoryState extends Record<string, unknown> | undefined,
   PersistedState extends Record<string, unknown> | undefined,
+  Nodes extends Array<TextNode | ElementNode | DecoratorNode<unknown>> = any[], // eslint-disable-line @typescript-eslint/no-explicit-any
 > {
   name: OrdoExtensionName<Name, ExtensionType>
   translations?: TranslationsRecord
@@ -112,6 +115,8 @@ export interface OrdoExtension<
   storeSlice?: Slice<MemoryState>
   commands?: OrdoCommand<Name>[]
   editorPlugins?: ComponentType[]
+  nodes?: Nodes
+  transformers?: Transformer[]
   persistedState?: PersistedState
 }
 

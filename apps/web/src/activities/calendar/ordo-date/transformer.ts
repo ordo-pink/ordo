@@ -13,7 +13,9 @@ export const ORDO_DATE_TRANSFORMER: TextMatchTransformer = {
 
     const currentNode = node as OrdoDateNode
 
-    return `${currentNode.__startDate}${currentNode.__endDate ? `>>>${currentNode.__endDate}` : ""}`
+    return `${currentNode.__startDate.toISOString()}${
+      currentNode.__endDate ? `>>>${currentNode.__endDate.toISOString()}` : ""
+    }`
   },
   importRegExp: rx,
   regExp: rx,

@@ -19,12 +19,12 @@ import { Outlet, RouteObject, useLocation, useNavigate } from "react-router-dom"
 import CalendarExtension from "../../activities/calendar"
 import EditorExtension from "../../activities/editor"
 // import ExtensionStoreExtension from "../../activities/extension-store"
-import { EditorActivityState } from "../../activities/editor/types"
 import KanbanExtension from "../../activities/kanban"
 import SettingsExtension from "../../activities/settings"
 import UserExtension from "../../activities/user"
 
 import AuthCommands from "../../commands/auth"
+import ColorCommands from "../../commands/colors"
 import CommandPalette from "../../commands/command-palette"
 import FileSystemCommands from "../../commands/file-system"
 import OpenFile from "../../commands/open-file"
@@ -61,6 +61,7 @@ const loggedInExtensions = [
   SettingsExtension,
   MdFileExtension,
   FileSystemCommands,
+  ColorCommands,
   CommandPalette,
   OpenFile,
   UserSupportCommands,
@@ -90,7 +91,8 @@ function App() {
   const dispatch = useAppDispatch()
   const i18n = useI18n()
 
-  const editorSelector = useExtensionSelector<EditorActivityState>()
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const editorSelector = useExtensionSelector<any>()
 
   // const [accelerators, setAccelerators] = useState<Record<string, UnaryFn<ActionContext, void>>>({})
   const [extensions, setExtensions] = useState<

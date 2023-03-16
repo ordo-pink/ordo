@@ -11,12 +11,13 @@ import {
 } from "react-icons/ai"
 import { BsChevronDown, BsChevronUp } from "react-icons/bs"
 import DirectoryContent from "./directory-content"
+import { iconColors } from "../../../../commands/colors/colors"
 import { useContextMenu } from "../../../../containers/app/hooks/use-context-menu"
 import { updateDirectoryMetadata } from "../../../../containers/app/store"
 import { useAppDispatch } from "../../../../core/state/hooks/use-app-dispatch"
 
 type Props = {
-  directory: IOrdoDirectory<{ isExpanded: boolean }>
+  directory: IOrdoDirectory<{ isExpanded: boolean; color: string }>
 }
 
 export default function Directory({ directory }: Props) {
@@ -31,7 +32,9 @@ export default function Directory({ directory }: Props) {
 
   const OpenIcon = hasChildren ? AiFillFolderOpen : AiOutlineFolderOpen
   const ClosedIcon = hasChildren ? AiFillFolder : AiOutlineFolder
-  const Icon = directory.metadata.isExpanded ? OpenIcon : ClosedIcon
+  const Icon = directory.metadata.isExpanded
+    ? () => <OpenIcon className={iconColors[directory.metadata.color] ?? iconColors.neutral} />
+    : () => <ClosedIcon className={iconColors[directory.metadata.color] ?? iconColors.neutral} />
 
   const Chevron = directory.metadata.isExpanded ? BsChevronDown : BsChevronUp
 

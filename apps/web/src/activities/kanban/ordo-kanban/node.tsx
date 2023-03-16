@@ -1,5 +1,13 @@
 import { OrdoDirectoryPath } from "@ordo-pink/fs-entity"
-import { Spread, SerializedTextNode, DecoratorNode, NodeKey, LexicalNode } from "lexical"
+import {
+  Spread,
+  SerializedTextNode,
+  DecoratorNode,
+  NodeKey,
+  LexicalNode,
+  ElementNode,
+  ParagraphNode,
+} from "lexical"
 import { ReactNode } from "react"
 import Kanban from "../components/kanban"
 
@@ -72,9 +80,13 @@ export class OrdoKanbanNode extends DecoratorNode<ReactNode> {
     writable.__directory = directory
   }
 
+  createParentElementNode(): ElementNode {
+    return new ParagraphNode()
+  }
+
   decorate(): ReactNode {
     return (
-      <div className="h-[calc(100vh-30rem)]">
+      <div className="h-[calc(100vh-30rem)] select-none">
         <Kanban
           nodeKey={this.__key}
           directoryPath={this.__directory}

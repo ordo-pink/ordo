@@ -74,7 +74,10 @@ const Kanban = ({ directoryPath }: Props) => {
   }
 
   return Either.fromNullable(directory).fold(Null, (dir) => (
-    <DragDropContext onDragEnd={onDragEnd}>
+    <DragDropContext
+      onDragEnd={onDragEnd}
+      key={`${dir.path}-kanban`}
+    >
       <Droppable
         droppableId={`${dir.path}-columns`}
         direction="horizontal"

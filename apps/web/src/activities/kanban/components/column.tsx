@@ -76,7 +76,7 @@ export default function Column({ directory, index }: Props) {
           >
             {(provided, snapshot) => (
               <div
-                className={`flex flex-col space-y-2 flex-grow min-h-min p-2 rounded-b-lg ${
+                className={`flex flex-col space-y-2 flex-grow min-h-min p-2 rounded-b-lg overflow-y-auto ${
                   snapshot.isDraggingOver
                     ? "bg-neutral-300 dark:bg-zinc-700"
                     : "bg-neutral-200 dark:bg-neutral-700"

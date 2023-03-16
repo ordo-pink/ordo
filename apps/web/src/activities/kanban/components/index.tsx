@@ -44,7 +44,9 @@ export default function KanbanActivity() {
       }
     >
       {Either.fromNullable(currentKanbanDirectory).fold(Null, (path) => (
-        <Kanban directoryPath={path} />
+        <div className="h-[calc(100vh-10rem)]">
+          <Kanban directoryPath={path} />
+        </div>
       ))}
     </Workspace>
   )

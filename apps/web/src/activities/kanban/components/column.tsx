@@ -23,13 +23,14 @@ export default function Column({ directory, index }: Props) {
 
   return (
     <Draggable
-      draggableId={directory.path}
+      draggableId={`${directory.path}-cards`}
       index={index}
     >
       {(provided) => (
         <div
           className="flex flex-col bg-neutral-200 dark:bg-neutral-700 shadow-sm rounded-lg min-w-[calc(100vw-7rem)] md:min-w-[200px] w-96 max-w-xs"
           {...provided.draggableProps}
+          {...provided.dragHandleProps}
           ref={provided.innerRef}
           onContextMenu={(e) => {
             dispatch(
@@ -42,12 +43,7 @@ export default function Column({ directory, index }: Props) {
           }}
         >
           <div className="flex flex-col md:flex-row items-center justify-between p-2">
-            <h3
-              className="justify-center font-extrabold"
-              {...provided.dragHandleProps}
-            >
-              {directory.readableName}
-            </h3>
+            <h3 className="justify-center font-extrabold">{directory.readableName}</h3>
 
             <div className="flex space-x-2">
               <OrdoButtonNeutral

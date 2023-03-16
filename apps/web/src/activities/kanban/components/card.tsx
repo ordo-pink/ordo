@@ -1,10 +1,10 @@
 /* eslint-disable react/require-render-return */
 import { Nullable } from "@ordo-pink/common-types"
 import { Either } from "@ordo-pink/either"
-import { IOrdoFile, OrdoFile } from "@ordo-pink/fs-entity"
+import { IOrdoFile, OrdoDirectoryPath, OrdoFile } from "@ordo-pink/fs-entity"
 import { Null } from "@ordo-pink/react"
 import { Draggable } from "react-beautiful-dnd"
-import { BsCalendarDate, BsTextLeft } from "react-icons/bs"
+import { BsCalendarDate, BsKanban, BsTextLeft } from "react-icons/bs"
 import { createSearchParams, useNavigate } from "react-router-dom"
 import { useContextMenu } from "../../../containers/app/hooks/use-context-menu"
 import { useAppDispatch } from "../../../core/state/hooks/use-app-dispatch"
@@ -44,12 +44,12 @@ export default function Card({ file, index }: Props) {
               ? "bg-gradient-to-tr from-sky-200 dark:from-violet-700 via-slate-200 to-pink-200 dark:to-purple-700"
               : "bg-neutral-100 dark:bg-neutral-800"
           }`}
-          {...provided.dragHandleProps}
           {...provided.draggableProps}
+          {...provided.dragHandleProps}
           ref={provided.innerRef}
         >
           <div>{file.readableName}</div>
-          <div className="flex justify-between items-center text-xs  text-neutral-500">
+          <div className="flex justify-between items-center text-xs text-neutral-500">
             <div className="flex items-center">
               {Either.fromBoolean(file.size > 0).fold(Null, () => (
                 <BsTextLeft
@@ -63,6 +63,17 @@ export default function Card({ file, index }: Props) {
                   title={OrdoFile.getReadableSize(file.size)}
                 />
               ))}
+
+              {Either.fromNullable(file.metadata.kanbans as OrdoDirectoryPath[]).fold(
+                Null,
+                (kanbans) => (
+                  <div className="flex items-center space-x-2 mr-4">
+                    <BsKanban className="cursor-pointer" />
+                    <div>{kanbans.length}</div>
+                  </div>
+                ),
+              )}
+
               {Either.fromNullable(
                 file.metadata.dates as Nullable<{ start: Date; end: Nullable<Date> }[]>,
               ).fold(Null, (dates) => (

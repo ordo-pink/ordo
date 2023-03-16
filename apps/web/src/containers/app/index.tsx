@@ -10,7 +10,7 @@ import Features from "@ordo-pink/ordo-activity-features"
 import Home from "@ordo-pink/ordo-activity-home"
 import Pricing from "@ordo-pink/ordo-activity-pricing"
 import { combineReducers, Reducer } from "@reduxjs/toolkit"
-import { MouseEvent, useEffect, useState } from "react"
+import { memo, MouseEvent, useEffect, useState } from "react"
 import { Helmet } from "react-helmet"
 import { useHotkeys } from "react-hotkeys-hook"
 import { Outlet, RouteObject, useLocation, useNavigate } from "react-router-dom"
@@ -86,7 +86,7 @@ const loggedOutExtensions = [
   AutolinkPlugin,
 ]
 
-export default function App() {
+function App() {
   const dispatch = useAppDispatch()
   const i18n = useI18n()
 
@@ -276,3 +276,5 @@ export default function App() {
     </div>
   )
 }
+
+export default memo(App, () => true)

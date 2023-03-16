@@ -1,7 +1,8 @@
+import { memo } from "react"
 import ActivityBarActivity from "../../containers/activity-bar/components/activity"
 import { useAppSelector } from "../../core/state/hooks/use-app-selector"
 
-export default function ActivityBar() {
+function ActivityBar() {
   const activities = useAppSelector((state) => state.app.activityExtensions)
 
   return (
@@ -15,3 +16,5 @@ export default function ActivityBar() {
     </div>
   )
 }
+
+export default memo(ActivityBar, () => true)

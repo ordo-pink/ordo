@@ -2,7 +2,6 @@ import { lazyBox, preventDefault, stopPropagation } from "@ordo-pink/fns"
 import { IOrdoFile } from "@ordo-pink/fs-entity"
 import { ActionListItem } from "@ordo-pink/react"
 import { MouseEvent } from "react"
-import { Draggable } from "react-beautiful-dnd"
 import { BsFileEarmarkBinary } from "react-icons/bs"
 import { createSearchParams, useNavigate, useSearchParams } from "react-router-dom"
 import { useContextMenu } from "../../../../containers/app/hooks/use-context-menu"
@@ -64,29 +63,17 @@ export default function File({ file, index }: Props) {
     file.extension === ".md" ? file.readableName : `${file.readableName}${file.extension}`
 
   return (
-    <Draggable
-      draggableId={file.path}
-      index={index}
+    <div
+      className={`rounded-md bg-neutral-100 dark:bg-neutral-800 z-50 transition-all duration-300`}
     >
-      {(provided, snapshot) => (
-        <div
-          className={`rounded-md bg-neutral-100 dark:bg-neutral-800 z-50 transition-all duration-300 ${
-            snapshot.isDragging ? "ring-2 ring-pink-500" : "rounded-none"
-          }`}
-          {...provided.draggableProps}
-          {...provided.dragHandleProps}
-          ref={provided.innerRef}
-        >
-          <ActionListItem
-            style={{ paddingLeft }}
-            text={name}
-            Icon={Icon}
-            isCurrent={isCurrent}
-            onClick={handleClick}
-            onContextMenu={handleContextMenu}
-          />
-        </div>
-      )}
-    </Draggable>
+      <ActionListItem
+        style={{ paddingLeft }}
+        text={name}
+        Icon={Icon}
+        isCurrent={isCurrent}
+        onClick={handleClick}
+        onContextMenu={handleContextMenu}
+      />
+    </div>
   )
 }

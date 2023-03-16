@@ -11,5 +11,6 @@
   "@ordo-activity-editor/create-modal.create-file.placeholder": "Название файла",
   "@ordo-activity-editor/create-modal.create-directory.placeholder": "Название папки",
   "@ordo-activity-editor/initial-file": "# Привет\n\nДобро пожаловать в Ordo!",
-  "@ordo-activity-editor/initial-file-name": "Велком ту Ордо"
+  "@ordo-activity-editor/initial-file-name": "Велкам ту Ордо",
+  "@ordo-activity-editor/open-in-editor": "Открыть в редакторе"
 }

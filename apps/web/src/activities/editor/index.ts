@@ -1,6 +1,7 @@
 import { createActivityExtension } from "@ordo-pink/extensions"
 import { IgnoreSave } from "./commands/ignore-save"
 import { OpenEditorCommand } from "./commands/open-editor"
+import { OpenInEditorCommand } from "./commands/open-in-editor"
 import { editorSlice } from "./store"
 import en from "./translations/en.json"
 import ru from "./translations/ru.json"
@@ -11,7 +12,7 @@ const editor = createActivityExtension("editor", {
   Icon: () => import("./components/icon"),
   readableName: "@ordo-activity-editor/title",
   routes: ["/editor"],
-  commands: [OpenEditorCommand, IgnoreSave],
+  commands: [OpenEditorCommand, OpenInEditorCommand, IgnoreSave],
   storeSlice: editorSlice,
   translations: { ru, en },
   persistedState: {

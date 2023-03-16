@@ -1,16 +1,12 @@
 /* eslint-disable react/require-render-return */
 import { Nullable } from "@ordo-pink/common-types"
 import { Either } from "@ordo-pink/either"
-import { IOrdoDirectory, IOrdoFile } from "@ordo-pink/fs-entity"
-import { Null, OrdoButtonSecondary } from "@ordo-pink/react"
+import { IOrdoFile } from "@ordo-pink/fs-entity"
+import { Null } from "@ordo-pink/react"
 import { Draggable } from "react-beautiful-dnd"
-import { BsArrowsFullscreen, BsCalendarDate, BsPencilSquare } from "react-icons/bs"
-import { createSearchParams, useNavigate } from "react-router-dom"
-import { showRenameFileModal } from "../../../commands/file-system/store"
+import { BsCalendarDate } from "react-icons/bs"
 import { useContextMenu } from "../../../containers/app/hooks/use-context-menu"
 import { useAppDispatch } from "../../../core/state/hooks/use-app-dispatch"
-import { useAppSelector } from "../../../core/state/hooks/use-app-selector"
-import { findParent } from "../../../core/utils/fs-helpers"
 
 type Props = {
   file: IOrdoFile
@@ -19,11 +15,8 @@ type Props = {
 
 export default function Card({ file, index }: Props) {
   const dispatch = useAppDispatch()
-  const navigate = useNavigate()
 
   const { showContextMenu } = useContextMenu()
-
-  const tree = useAppSelector((state) => state.app.personalProject)
 
   return (
     <Draggable
@@ -72,7 +65,8 @@ export default function Card({ file, index }: Props) {
                 </div>
               ))}
             </div>
-            <div className="flex justify-end">
+            {/* TODO: Display action buttons on mobile */}
+            {/* <div className="flex justify-end">
               <OrdoButtonSecondary
                 compact
                 onClick={() =>
@@ -99,7 +93,7 @@ export default function Card({ file, index }: Props) {
               >
                 <BsArrowsFullscreen />
               </OrdoButtonSecondary>
-            </div>
+            </div> */}
           </div>
         </div>
       )}

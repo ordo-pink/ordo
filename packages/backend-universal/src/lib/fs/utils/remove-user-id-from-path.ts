@@ -12,6 +12,7 @@ export const removeUserIdFromPath =
   (item: IOrdoDirectoryRaw | IOrdoFileRaw): IOrdoDirectoryRaw | IOrdoFileRaw =>
     OrdoDirectory.isOrdoDirectoryRaw(item)
       ? OrdoDirectory.raw({
+          ...item,
           path: item.path.replace(`/${userId}`, "") as OrdoDirectoryPath,
           children: item.children.map(removeUserIdFromPath(userId)),
         })

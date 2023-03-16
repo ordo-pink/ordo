@@ -16,7 +16,6 @@ const editor = createActivityExtension("editor", {
   storeSlice: editorSlice,
   translations: { ru, en },
   persistedState: {
-    expandedDirectories: [],
     recentFiles: [],
   } as EditorPersistedState,
 })

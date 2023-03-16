@@ -25,7 +25,7 @@ export type ValidatedOrdoDirectoryPath<T extends OrdoDirectoryPath> = NoForbidde
 /**
  * Raw OrdoDirectory content shared between the frontend and the backend.
  */
-export interface IOrdoDirectoryRaw {
+export interface IOrdoDirectoryRaw<T extends Record<string, unknown> = Record<string, unknown>> {
   /**
    * Path of the directory. Must be a valid OrdoDirectoryPath.
    */
@@ -35,12 +35,17 @@ export interface IOrdoDirectoryRaw {
    * Children of the directory.
    */
   children: OrdoFsEntityRaw[]
+
+  /**
+   * Meta information about the directory.
+   */
+  metadata: T
 }
 
 /**
  * OrdoDirectory to be used in the application.
  */
-export type IOrdoDirectory = {
+export type IOrdoDirectory<T extends Record<string, unknown> = Record<string, unknown>> = {
   /**
    * @see IOrdoDirectoryRaw.path
    */
@@ -55,6 +60,11 @@ export type IOrdoDirectory = {
    * Readable name of the directory.
    */
   readableName: string
+
+  /**
+   * @see IOrdoDirectoryRaw.metadata
+   */
+  metadata: T
 }
 
 /**
@@ -70,6 +80,11 @@ export interface IOrdoDirectoryRawInitParams<Path extends OrdoDirectoryPath> {
    * @see IOrdoDirectoryRaw.children
    */
   children: OrdoFsEntityRaw[]
+
+  /**
+   * @see IOrdoDirectoryRaw.metadata
+   */
+  metadata?: Record<string, unknown>
 }
 
 /**

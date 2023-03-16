@@ -34,6 +34,8 @@ const Kanban = ({ directoryPath }: Props) => {
   useEffect(() => {
     if (!tree) return
 
+    // TODO: Watch for directory movement and Kanban file movement for changes
+    // TODO: Apply metadata updates on change
     setDirectory(findOrdoDirectory(directoryPath, tree))
   }, [tree, directoryPath, directory])
 

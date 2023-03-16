@@ -31,19 +31,20 @@ const ordoDirectory = (raw: IOrdoDirectoryRaw): IOrdoDirectory => {
     readableName,
     children,
     path: raw.path,
+    metadata: raw.metadata,
   }
 }
 
 export const OrdoDirectory: IOrdoDirectoryStatic = {
   of: (raw) => ordoDirectory(raw),
-  raw: ({ path, children }) => {
+  raw: ({ path, children, metadata }) => {
     if (!OrdoDirectory.isValidPath(path)) {
       throw new TypeError("Invalid directory path")
     }
 
-    return { path, children }
+    return { path, children, metadata: metadata ?? {} }
   },
-  empty: (path) => OrdoDirectory.from({ path, children: [] }),
+  empty: (path) => OrdoDirectory.from({ path, children: [], metadata: {} }),
   from: (params) => OrdoDirectory.of(OrdoDirectory.raw(params)),
   isOrdoDirectoryRaw: (x): x is IOrdoDirectoryRaw =>
     Boolean(x) &&

@@ -1,10 +1,11 @@
 /* eslint-disable react/require-render-return */
 import { Nullable } from "@ordo-pink/common-types"
 import { Either } from "@ordo-pink/either"
-import { IOrdoFile } from "@ordo-pink/fs-entity"
+import { IOrdoFile, OrdoFile } from "@ordo-pink/fs-entity"
 import { Null } from "@ordo-pink/react"
 import { Draggable } from "react-beautiful-dnd"
-import { BsCalendarDate } from "react-icons/bs"
+import { BsCalendarDate, BsTextLeft } from "react-icons/bs"
+import { createSearchParams, useNavigate } from "react-router-dom"
 import { useContextMenu } from "../../../containers/app/hooks/use-context-menu"
 import { useAppDispatch } from "../../../core/state/hooks/use-app-dispatch"
 
@@ -17,6 +18,7 @@ export default function Card({ file, index }: Props) {
   const dispatch = useAppDispatch()
 
   const { showContextMenu } = useContextMenu()
+  const navigate = useNavigate()
 
   return (
     <Draggable
@@ -47,15 +49,27 @@ export default function Card({ file, index }: Props) {
           ref={provided.innerRef}
         >
           <div>{file.readableName}</div>
-          <div className="flex justify-between items-center">
-            <div>
+          <div className="flex justify-between items-center text-xs  text-neutral-500">
+            <div className="flex items-center">
+              {Either.fromBoolean(file.size > 0).fold(Null, () => (
+                <BsTextLeft
+                  onClick={() =>
+                    navigate({
+                      pathname: "/editor",
+                      search: createSearchParams({ path: file.path }).toString(),
+                    })
+                  }
+                  className="cursor-pointer mr-4"
+                  title={OrdoFile.getReadableSize(file.size)}
+                />
+              ))}
               {Either.fromNullable(
                 file.metadata.dates as Nullable<{ start: Date; end: Nullable<Date> }[]>,
               ).fold(Null, (dates) => (
                 <div>
                   {dates.slice(0, 3).map((date) => (
                     <div
-                      className="text-xs flex items-center space-x-2 text-neutral-500"
+                      className="flex items-center space-x-2 mr-4"
                       key={date.start.toString()}
                     >
                       <BsCalendarDate />

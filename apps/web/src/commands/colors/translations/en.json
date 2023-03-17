@@ -3,5 +3,13 @@
   "@ordo-command-colors/change-directory-color": "Change directory color",
   "@ordo-command-colors/button-ok": "Yes",
   "@ordo-command-colors/button-cancel": "Cancel",
-  "@ordo-command-colors/description": "TODO"
+  "@ordo-command-colors/description": "TODO",
+  "@ordo-command-colors/neutral": "Gray",
+  "@ordo-command-colors/pink": "Pink",
+  "@ordo-command-colors/red": "Red",
+  "@ordo-command-colors/orange": "Orange",
+  "@ordo-command-colors/yellow": "Yellow",
+  "@ordo-command-colors/green": "Green",
+  "@ordo-command-colors/blue": "Blue",
+  "@ordo-command-colors/purple": "Purple"
 }

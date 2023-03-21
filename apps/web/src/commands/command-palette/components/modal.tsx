@@ -183,6 +183,7 @@ export default function CommandPalette() {
             className="command-palette_modal_input"
             autoFocus
             type="text"
+            autoComplete="off"
             placeholder={translatedPlaceholder}
             value={inputValue}
             onChange={handleChange}

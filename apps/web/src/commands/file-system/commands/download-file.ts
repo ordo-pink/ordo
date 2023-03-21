@@ -27,7 +27,7 @@ export const DownloadFileCommand = createOrdoCommand<"ordo-command-file-system">
   accelerator: "alt+d",
   showInCommandPalette: ({ state }: ActionContext) => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    return Boolean((state as any)["ordo-activity-editor"].currentFile)
+    return Boolean((state as any)["ordo-activity-editor"]?.currentFile)
   },
   showInContextMenu: OrdoFile.isOrdoFile,
   action: ({ contextMenuTarget, state }: ActionContext) => {
@@ -36,9 +36,9 @@ export const DownloadFileCommand = createOrdoCommand<"ordo-command-file-system">
     }
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    if ((state as any)["ordo-activity-editor"].currentFile) {
+    if ((state as any)["ordo-activity-editor"]?.currentFile) {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      download((state as any)["ordo-activity-editor"].currentFile)
+      download((state as any)["ordo-activity-editor"]?.currentFile)
     }
   },
 })

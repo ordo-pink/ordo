@@ -1,9 +1,9 @@
 .active-ring {
-  @apply hover:ring-2 hover:ring-pink-300 dark:hover:ring-pink-500 focus:ring-2 focus:ring-pink-300 dark:focus:ring-pink-500 transition-all duration-300;
+  @apply ring-2 ring-transparent hover:ring-pink-300 dark:hover:ring-pink-500 focus:ring-pink-300 dark:focus:ring-pink-500 transition-all duration-300;
 }
 
 .passive-ring {
-  @apply hover:ring-2 hover:ring-neutral-500 dark:hover:ring-neutral-500 focus:ring-2 focus:ring-neutral-500 dark:focus:ring-neutral-500 transition-all duration-300;
+  @apply ring-2 ring-transparent hover:ring-neutral-500 dark:hover:ring-neutral-500 focus:ring-neutral-500 dark:focus:ring-neutral-500 transition-all duration-300;
 }
 
 .button {

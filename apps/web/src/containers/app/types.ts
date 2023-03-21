@@ -1,32 +1,53 @@
-import { Nullable } from "@ordo-pink/common-types"
-import { IOrdoDirectory, OrdoFilePath } from "@ordo-pink/fs-entity"
+import { Transformer } from "@lexical/markdown"
+import { IOrdoDirectory, IOrdoFile, Nullable } from "@ordo-pink/common-types"
 import {
   OrdoActivityExtension,
   OrdoCommandExtension,
   OrdoFileAssociationExtension,
   OrdoEditorPluginExtension,
   OrdoCommand,
-  OrdoLoadableComponent,
-} from "../../core/types"
+} from "@ordo-pink/extensions"
+import { FC } from "react"
 
 export type AppState = {
   isSidebarVisible: boolean
   personalProject: Nullable<IOrdoDirectory>
-  activityExtensions: OrdoActivityExtension<string>[]
-  commandExtensions: OrdoCommandExtension<string>[]
-  fileAssociationExtensions: OrdoFileAssociationExtension<string>[]
-  editorPluginExtensions: OrdoEditorPluginExtension<string>[]
+  activityExtensions: OrdoActivityExtension<
+    string,
+    Record<string, unknown>,
+    Record<string, unknown>
+  >[]
+  commandExtensions: OrdoCommandExtension<
+    string,
+    Record<string, unknown>,
+    Record<string, unknown>
+  >[]
+  fileAssociationExtensions: OrdoFileAssociationExtension<
+    string,
+    Record<string, unknown>,
+    Record<string, unknown>
+  >[]
+  editorPluginExtensions: OrdoEditorPluginExtension<
+    string,
+    Record<string, unknown>,
+    Record<string, unknown>
+  >[]
   commands: OrdoCommand<string>[]
-  overlays: OrdoLoadableComponent[]
+  overlays: FC[]
   isSaving: boolean
+  editor: {
+    nodes: any[] // eslint-disable-line @typescript-eslint/no-explicit-any
+    transformers: Transformer[]
+    plugins: FC[]
+  }
 }
 
 export type UpdateFilePayload = {
-  path: OrdoFilePath
+  file: IOrdoFile
   content: string
 }
 
 export type CreateFilePayload = {
-  path: OrdoFilePath
+  file: IOrdoFile
   content?: string
 }

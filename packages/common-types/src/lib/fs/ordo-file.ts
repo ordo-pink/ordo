@@ -37,7 +37,7 @@ export type ValidatedOrdoFilePath<T extends OrdoFilePath> = NonTrailingSlash<T> 
 /**
  * Raw OrdoFile content shared between the frontend and the backend.
  */
-export interface IOrdoFileRaw {
+export interface IOrdoFileRaw<T extends Record<string, unknown> = Record<string, unknown>> {
   /**
    * Path of the file. Must be a valid OrdoFilePath.
    */
@@ -52,12 +52,17 @@ export interface IOrdoFileRaw {
    * Last modified date.
    */
   updatedAt: Date
+
+  /**
+   * Meta information about the file.
+   */
+  metadata: T
 }
 
 /**
  * OrdoFile to be used in the application.
  */
-export type IOrdoFile = {
+export type IOrdoFile<T extends Record<string, unknown> = Record<string, unknown>> = {
   /**
    * @see IOrdoFileRaw.path
    */
@@ -72,6 +77,12 @@ export type IOrdoFile = {
    * @see IOrdoFileRaw.updatedAt
    */
   updatedAt: Date
+
+  /**
+   * @see IOrdoFileRaw.metadata
+   */
+  metadata: T
+
   /**
    * Readable name of the file.
    */
@@ -82,6 +93,9 @@ export type IOrdoFile = {
    */
   extension: OrdoFileExtension
 
+  /**
+   * File size in B/KB/MB/etc.
+   */
   readableSize: string
 }
 
@@ -104,6 +118,12 @@ export interface IOrdoFileRawInitParams<Path extends OrdoFilePath> {
    * @optional Equals to new Date() if not specified.
    */
   updatedAt?: Date
+
+  /**
+   * @see IOrdoFileRaw.metadata
+   * @optional Equals to {} if not specified.
+   */
+  metadata?: Record<string, unknown>
 }
 
 /**

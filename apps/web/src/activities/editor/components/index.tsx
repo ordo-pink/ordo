@@ -45,9 +45,11 @@ export default function Editor(props: EditorProps) {
   const isSaving = useAppSelector((state) => state.app.isSaving)
   const tree = useAppSelector((state) => state.app.personalProject)
   const fileAssociations = useAppSelector((state) => state.app.fileAssociationExtensions)
-  const currentFile = editorSelector((state) => state["ordo-activity-editor"].currentFile)
+  const currentFile = editorSelector((state) => state["ordo-activity-editor"]?.currentFile)
 
   useEffect(() => {
+    if (!tree) return
+
     const queryPath = query.get("path")
 
     if (!queryPath) {
@@ -56,7 +58,7 @@ export default function Editor(props: EditorProps) {
         if (!recentFiles || (!recentFiles[0] && !tree?.children.length)) {
           dispatch(
             createFile({
-              path: `/${translatedInitialFileName}.md`,
+              file: OrdoFile.empty(`/${translatedInitialFileName}.md`),
               content: translatedInitialFile,
             }),
           )
@@ -133,7 +135,7 @@ export default function Editor(props: EditorProps) {
         })
     })
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentFile, tree])
+  }, [currentFile, tree, props.persistedStore])
 
   return (
     <EditorContext.Provider value={props}>
@@ -161,7 +163,7 @@ export default function Editor(props: EditorProps) {
         <div
           className={`${
             isSaving ? "block" : "hidden"
-          } fixed bottom-2 right-2 opacity-50 flex items-center text-xs space-x-2 text-right`}
+          } fixed top-2 left-0 right-0 w-full opacity-50 flex items-center justify-center text-xs space-x-2 text-right md:pb-10`}
         >
           <AiOutlineLoading className="animate-spin" />
           <div>{translatedSaving}</div>

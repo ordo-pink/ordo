@@ -1,5 +1,5 @@
-import { AiOutlineCalendar } from "react-icons/ai"
+import { BsCalendar2 } from "react-icons/bs"
 
 export default function Icon() {
-  return <AiOutlineCalendar />
+  return <BsCalendar2 />
 }

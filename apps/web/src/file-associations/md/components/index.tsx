@@ -3,7 +3,6 @@ import { HashtagNode } from "@lexical/hashtag"
 import { AutoLinkNode, LinkNode } from "@lexical/link"
 import { ListItemNode, ListNode } from "@lexical/list"
 import { $convertToMarkdownString, TRANSFORMERS } from "@lexical/markdown"
-
 import { CheckListPlugin } from "@lexical/react/LexicalCheckListPlugin"
 import { LexicalComposer } from "@lexical/react/LexicalComposer"
 import { ContentEditable } from "@lexical/react/LexicalContentEditable"
@@ -18,16 +17,26 @@ import { OnChangePlugin } from "@lexical/react/LexicalOnChangePlugin"
 import { RichTextPlugin } from "@lexical/react/LexicalRichTextPlugin"
 import { HeadingNode, QuoteNode } from "@lexical/rich-text"
 import { TableCellNode, TableNode, TableRowNode } from "@lexical/table"
+import { OrdoFile } from "@ordo-pink/fs-entity"
 import { PathBreadcrumbs } from "@ordo-pink/react-utils"
 import { EditorState, EditorThemeClasses } from "lexical"
-import { useState, useEffect, ComponentType, memo } from "react"
+import { mergeDeepWith } from "ramda"
+import { useState, useEffect, memo } from "react"
 import { MdProps } from ".."
-import { updatedFile } from "../../../containers/app/store"
+import { updatedFile, updateFileMetadata } from "../../../containers/app/store"
 import { useFileParentBreadcrumbs } from "../../../core/hooks/use-file-breadcrumbs"
 import { useAppDispatch } from "../../../core/state/hooks/use-app-dispatch"
 import { useAppSelector } from "../../../core/state/hooks/use-app-selector"
-
 import { LoadEditorStatePlugin } from "../core-plugins/load-editor-state"
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const toNodeArray = (tree: any) =>
+  tree.children.reduce(
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (acc: any[], child: any) =>
+      child.children ? acc.concat(toNodeArray(child)) : acc.concat([child]),
+    [],
+  )
 
 const theme: EditorThemeClasses = {
   heading: {
@@ -53,7 +62,7 @@ const theme: EditorThemeClasses = {
   },
   quote:
     "border-l border-b border-slate-400 dark:border-slate-600 p-4 max-w-xl my-2 text-sm rounded-bl-lg",
-  code: "block px-6 py-4 bg-stone-200 dark:bg-stone-800 max-w-xl my-8 shadow-lg rounded-lg",
+  code: "block px-6 py-4 bg-stone-100 dark:bg-stone-800 max-w-xl my-8 shadow-lg rounded-lg",
   codeHighlight: {
     atrule: "text-neutral-500",
     attr: "text-neutral-500",
@@ -89,7 +98,7 @@ const theme: EditorThemeClasses = {
 }
 
 // TODO: Adding nodes
-const nodes = [
+const initialNodes = [
   HeadingNode,
   ListNode,
   ListItemNode,
@@ -109,10 +118,9 @@ export default memo(
     const dispatch = useAppDispatch()
     const breadcrumbsPath = useFileParentBreadcrumbs()
 
-    const pluginExtensions = useAppSelector((state) => state.app.editorPluginExtensions)
+    const { nodes, plugins, transformers } = useAppSelector((state) => state.app.editor)
 
     const [isInitialLoad, setIsInitialLoad] = useState(true)
-    const [plugins, setPlugins] = useState<ComponentType[]>([])
 
     // Prevent from updating the file at the moment it is opened
     useEffect(() => {
@@ -123,26 +131,33 @@ export default memo(
       }
     }, [file.path])
 
-    useEffect(() => {
-      if (!pluginExtensions || !pluginExtensions.length) return
-
-      setPlugins(
-        pluginExtensions.reduce(
-          (acc, extension) => acc.concat(extension.editorPlugins),
-          [] as ComponentType[],
-        ),
-      )
-
-      return () => setPlugins([])
-    }, [pluginExtensions])
-
     const handleChange = (state: EditorState) => {
       if (isInitialLoad) return
 
       state.read(() => {
-        const content = $convertToMarkdownString()
+        const content = $convertToMarkdownString(transformers.concat(TRANSFORMERS))
 
-        dispatch(updatedFile({ path: file.path, content }))
+        const ordoFile = OrdoFile.empty(file.path)
+
+        const nodes = toNodeArray(state.toJSON().root)
+
+        let metadata = {}
+
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        nodes.forEach((child: any) => {
+          if (child.ordoMetadata) {
+            metadata = mergeDeepWith(
+              (a, b) => (Array.isArray(a) ? a.concat(b) : b ? b : a),
+              metadata,
+              child.ordoMetadata,
+            )
+          }
+        })
+
+        ordoFile.metadata = metadata
+
+        dispatch(updateFileMetadata(ordoFile))
+        dispatch(updatedFile({ file: ordoFile, content }))
       })
     }
 
@@ -156,7 +171,7 @@ export default memo(
             namespace: "md-editor-root",
             onError,
             theme,
-            nodes,
+            nodes: nodes.concat(initialNodes),
           }}
         >
           <div className="mb-8">
@@ -167,7 +182,9 @@ export default memo(
 
           <div className="w-full h-screen flex flex-col items-center">
             <div className="w-full py-8 px-4">
-              <MarkdownShortcutPlugin transformers={TRANSFORMERS} />
+              {/* <OrdoDatePlugin /> */}
+
+              <MarkdownShortcutPlugin transformers={transformers} />
 
               <LinkPlugin />
               <ListPlugin />
@@ -185,7 +202,10 @@ export default memo(
                 ErrorBoundary={LexicalErrorBoundary}
               />
 
-              <LoadEditorStatePlugin file={file} />
+              <LoadEditorStatePlugin
+                file={file}
+                transformers={transformers.concat(TRANSFORMERS)}
+              />
               <OnChangePlugin
                 ignoreSelectionChange
                 onChange={handleChange}

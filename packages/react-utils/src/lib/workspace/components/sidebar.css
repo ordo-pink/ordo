@@ -1,9 +1,9 @@
 .sidebar {
-  @apply h-full min-h-screen bg-neutral-100 dark:bg-neutral-800 z-40 p-1 pb-12;
+  @apply h-full min-h-screen bg-neutral-100 dark:bg-neutral-800 p-1 pb-12;
 }
 
 .gutter {
-  @apply bg-neutral-50 dark:bg-neutral-700 bg-no-repeat bg-center z-40 p-4;
+  @apply bg-neutral-50 dark:bg-neutral-700 bg-no-repeat bg-center p-4;
 }
 
 .gutter.gutter-horizontal {

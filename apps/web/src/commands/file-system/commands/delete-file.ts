@@ -8,7 +8,7 @@ export const DeleteFileCommand = createOrdoCommand<"ordo-command-file-system">({
   accelerator: "alt+backspace",
   showInCommandPalette: ({ state }: ActionContext) => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    return Boolean((state as any)["ordo-activity-editor"].currentFile)
+    return Boolean((state as any)["ordo-activity-editor"]?.currentFile)
   },
   showInContextMenu: OrdoFile.isOrdoFile,
   action: ({ dispatch, contextMenuTarget, state }: ActionContext) => {
@@ -17,9 +17,9 @@ export const DeleteFileCommand = createOrdoCommand<"ordo-command-file-system">({
     }
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    if ((state as any)["ordo-activity-editor"].currentFile) {
+    if ((state as any)["ordo-activity-editor"]?.currentFile) {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      dispatch(showDeleteFileModal((state as any)["ordo-activity-editor"].currentFile))
+      dispatch(showDeleteFileModal((state as any)["ordo-activity-editor"]?.currentFile))
     }
   },
 })

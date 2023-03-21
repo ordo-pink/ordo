@@ -1,4 +1,5 @@
 import { ExceptionResponse } from "@ordo-pink/common-types"
+import { OrdoFile } from "@ordo-pink/fs-entity"
 import { FsRequestHandler, OrdoFilePathParams } from "../../../types"
 import { USER_ID_PARAM } from "../../constants"
 
@@ -17,7 +18,7 @@ export const checkSizeOfUploadingFile: FsRequestHandler<OrdoFilePathParams> =
 
     const totalSize = await internal.getInternalValue(userId, "totalSize")
 
-    req.params.logger.info(`Attempting to upload ${contentSize} file`)
+    req.params.logger.info(`Attempting to upload ${OrdoFile.getReadableSize(contentSize)} file`)
 
     if (Number.isNaN(contentSize)) {
       return void res.status(ExceptionResponse.LENGTH_REQUIRED).send()

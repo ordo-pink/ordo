@@ -1,11 +1,11 @@
-import { Nullable } from "@ordo-pink/common-types"
 import {
-  IOrdoFile,
   IOrdoDirectory,
-  OrdoFilePath,
+  IOrdoFile,
+  Nullable,
   OrdoDirectoryPath,
-  OrdoDirectory,
-} from "@ordo-pink/fs-entity"
+  OrdoFilePath,
+} from "@ordo-pink/common-types"
+import { OrdoDirectory } from "@ordo-pink/fs-entity"
 
 // TODO: Move elsewhere
 export const findParent = (
@@ -26,10 +26,8 @@ export const findParent = (
 
   let parent: IOrdoDirectory = root
 
-  const parentPath = parent.path
-
   for (const chunk of parentPathChunks) {
-    const found = parent.children.find((child) => child.path === `${parentPath}${chunk}/`)
+    const found = parent.children.find((child) => child.path === `${parent.path}${chunk}/`)
 
     if (!found || !OrdoDirectory.isOrdoDirectory(found)) return parent
 
@@ -54,4 +52,18 @@ export const findOrdoFile = (
   if (!found || OrdoDirectory.isOrdoDirectory(found)) return null
 
   return found
+}
+
+export const getFiles = (directory: Nullable<IOrdoDirectory>, files: IOrdoFile[] = []) => {
+  if (!directory) return files
+
+  for (const item of directory.children) {
+    if (OrdoDirectory.isOrdoDirectory(item)) {
+      getFiles(item, files)
+    } else {
+      files.push(item)
+    }
+  }
+
+  return files
 }

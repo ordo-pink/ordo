@@ -1,12 +1,7 @@
+import { IOrdoFileRaw, IOrdoFile, OrdoFilePath, OrdoDirectoryPath } from "@ordo-pink/common-types"
 import { Either } from "@ordo-pink/either"
 import { noOp } from "@ordo-pink/fns"
-import {
-  IOrdoFileRaw,
-  OrdoFilePath,
-  OrdoDirectoryPath,
-  OrdoDirectory,
-  OrdoFile,
-} from "@ordo-pink/fs-entity"
+import { OrdoDirectory, OrdoFile } from "@ordo-pink/fs-entity"
 import {
   createSlice,
   createAsyncThunk,
@@ -17,7 +12,7 @@ import { debounce } from "lodash"
 import { registeredExtensionsReducer } from "./reducers/registered-extensions"
 import { rejectedReducer } from "./reducers/rejected"
 import { updatedFileReducer } from "./reducers/updated-file"
-import { findParent } from "../../../core/utils/fs-helpers"
+import { findOrdoFile, findParent } from "../../../core/utils/fs-helpers"
 import { AppState, UpdateFilePayload } from "../types"
 
 const initialState: AppState = {
@@ -29,6 +24,11 @@ const initialState: AppState = {
   editorPluginExtensions: [],
   commands: [],
   overlays: [],
+  editor: {
+    nodes: [],
+    plugins: [],
+    transformers: [],
+  },
   isSaving: false,
 }
 
@@ -47,7 +47,28 @@ const debounceSave = debounce(updateFileHandler, 500, { trailing: true, leading:
 
 export const createFile = createAsyncThunk(
   "@ordo-app/create-file",
-  (params: { path: OrdoFilePath; content?: string }) => window.ordo.api.fs.files.create(params),
+  (params: { file: IOrdoFile; content?: string }) => window.ordo.api.fs.files.create(params),
+)
+
+export const moveFile = createAsyncThunk(
+  "@ordo-app/move-file",
+  async (params: { oldPath: OrdoFilePath; newPath: OrdoFilePath }) => {
+    const result = await window.ordo.api.fs.files.move(params)
+
+    return { result, params }
+  },
+)
+
+export const moveDirectory = createAsyncThunk(
+  "@ordo-app/move-directory",
+  async (params: { oldPath: OrdoDirectoryPath; newPath: OrdoDirectoryPath }) => {
+    const result = await window.ordo.api.fs.directories.move({
+      oldPath: params.oldPath.slice(0, -1) as OrdoDirectoryPath,
+      newPath: params.newPath.slice(0, -1) as OrdoDirectoryPath,
+    })
+
+    return { result, params }
+  },
 )
 
 export const createdDirectory = createAsyncThunk(
@@ -70,11 +91,11 @@ export const removedDirectory = createAsyncThunk(
 
 export const updatedFile = createAsyncThunk(
   "@ordo-app/update-file",
-  ({ path, content }: UpdateFilePayload, { dispatch }) => {
+  ({ file, content }: UpdateFilePayload, { dispatch }) => {
     dispatch(setIsSaving(true))
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    return debounceSave({ path, content }, { dispatch } as any)
+    return debounceSave({ file, content }, { dispatch } as any)
   },
 )
 
@@ -97,6 +118,16 @@ export const appSlice = createSlice({
     setIsSaving: (state, action: PayloadAction<boolean>) => {
       state.isSaving = action.payload
     },
+    updateFileMetadata: (state, action: PayloadAction<IOrdoFile>) => {
+      const file = findOrdoFile(action.payload.path, state.personalProject)
+
+      if (!file) return
+
+      file.metadata = {
+        ...file.metadata,
+        ...action.payload.metadata,
+      }
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -106,6 +137,60 @@ export const appSlice = createSlice({
           .map((data) =>
             OrdoDirectory.isOrdoDirectoryRaw(data) ? OrdoDirectory.from(data) : OrdoFile.from(data),
           )
+          .chain((item) =>
+            Either.fromNullable(findParent(item.path, state.personalProject)).map((parent) => {
+              parent.children.push(item)
+              OrdoDirectory.sort(parent.children)
+            }),
+          )
+          .fold(noOp, noOp),
+      )
+
+      .addCase(moveFile.rejected, rejectedReducer)
+      .addCase(moveFile.fulfilled, (state, action) =>
+        Either.fromNullable(action.payload)
+          .map((data) => {
+            const oldParent = findParent(data.params.oldPath, state.personalProject)
+
+            if (oldParent) {
+              const movedItemIndex = oldParent.children.findIndex(
+                ({ path }) => path === data.params.oldPath,
+              )
+
+              oldParent.children.splice(movedItemIndex, 1)
+            }
+
+            return data.result
+          })
+          .map((data) =>
+            OrdoDirectory.isOrdoDirectoryRaw(data) ? OrdoDirectory.from(data) : OrdoFile.from(data),
+          )
+          .chain((item) =>
+            Either.fromNullable(findParent(item.path, state.personalProject)).map((parent) => {
+              parent.children.push(item)
+              OrdoDirectory.sort(parent.children)
+            }),
+          )
+          .fold(noOp, noOp),
+      )
+
+      .addCase(moveDirectory.rejected, rejectedReducer)
+      .addCase(moveDirectory.fulfilled, (state, action) =>
+        Either.fromNullable(action.payload)
+          .map((data) => {
+            const oldParent = findParent(data.params.oldPath, state.personalProject)
+
+            if (oldParent) {
+              const movedItemIndex = oldParent.children.findIndex(
+                ({ path }) => path === data.params.oldPath,
+              )
+
+              oldParent.children.splice(movedItemIndex, 1)
+            }
+
+            return data.result
+          })
+          .map((data) => OrdoDirectory.from(data))
           .chain((item) =>
             Either.fromNullable(findParent(item.path, state.personalProject)).map((parent) => {
               parent.children.push(item)
@@ -174,7 +259,12 @@ export const appSlice = createSlice({
   },
 })
 
-export const { registerExtensions, toggleSidebarVisibility, unregisterExtensions, setIsSaving } =
-  appSlice.actions
+export const {
+  registerExtensions,
+  toggleSidebarVisibility,
+  unregisterExtensions,
+  setIsSaving,
+  updateFileMetadata,
+} = appSlice.actions
 
 export default appSlice.reducer

@@ -163,7 +163,7 @@ function createLoadableComponent(
     private _mounted!: boolean
     private _delay!: ReturnType<typeof setTimeout>
     private _timeout!: ReturnType<typeof setTimeout>
-    context: any
+    override context: any
 
     constructor(props: any) {
       super(props)
@@ -182,11 +182,11 @@ function createLoadableComponent(
       return init()
     }
 
-    UNSAFE_componentWillMount() {
+    override UNSAFE_componentWillMount() {
       this._loadModule()
     }
 
-    componentDidMount() {
+    override componentDidMount() {
       this._mounted = true
     }
 
@@ -246,7 +246,7 @@ function createLoadableComponent(
         })
     }
 
-    componentWillUnmount() {
+    override componentWillUnmount() {
       this._mounted = false
       this._clearTimeouts()
     }
@@ -262,7 +262,7 @@ function createLoadableComponent(
       this._loadModule()
     }
 
-    render() {
+    override render() {
       if (this.state.loading || this.state.error) {
         return createElement(opts.loading as any, {
           isLoading: this.state.loading,
@@ -307,7 +307,7 @@ class Capture extends Component<
     }
   }
 
-  render() {
+  override render() {
     return Children.only(this.props.children)
   }
 }
@@ -329,6 +329,8 @@ function flushInitializers(initializers: typeof ALL_INITIALIZERS): Promise<Compo
     if (initializers.length) {
       return flushInitializers(initializers)
     }
+
+    return null
   }) as Promise<ComponentType[]>
 }
 

@@ -1,6 +1,12 @@
 import { Transformer } from "@lexical/markdown"
-import { Nullable, ThunkFn, UnaryFn } from "@ordo-pink/common-types"
-import { IOrdoFile, IOrdoDirectory, OrdoFileExtension } from "@ordo-pink/fs-entity"
+import {
+  IOrdoDirectory,
+  IOrdoFile,
+  Nullable,
+  OrdoFileExtension,
+  ThunkFn,
+  UnaryFn,
+} from "@ordo-pink/common-types"
 import { TwoLetterLocale } from "@ordo-pink/locale"
 import { Slice } from "@reduxjs/toolkit"
 import { TFunction } from "i18next"

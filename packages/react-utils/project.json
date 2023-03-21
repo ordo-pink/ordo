@@ -17,7 +17,8 @@
       "outputs": ["{options.outputPath}"],
       "defaultConfiguration": "production",
       "options": {
-        "outputPath": "dist/packages/react-utils"
+        "outputPath": "dist/packages/react-utils",
+        "postcssConfig": "packages/react-utils/postcss.config.js"
       },
       "configurations": {
         "development": {

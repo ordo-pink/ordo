@@ -1,7 +1,7 @@
 import { createOrdoCommand } from "@ordo-pink/extensions"
 
 export const GoHomeCommand = createOrdoCommand<"ordo-activity-home">({
-  Icon: () => import("../components/icon"),
+  Icon: () => import("../components/home-icon"),
   title: "@ordo-activity-home/go-home",
   accelerator: "alt+h",
   showInCommandPalette: true,

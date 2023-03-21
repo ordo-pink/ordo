@@ -15,7 +15,7 @@ import i18next from "i18next"
 import { prop } from "ramda"
 import { ComponentType } from "react"
 import { mergeMap, Subject, BehaviorSubject, mergeAll, Observable } from "rxjs"
-import { map, filter, scan } from "rxjs/operators"
+import { map, filter, scan, shareReplay } from "rxjs/operators"
 import { Router } from "silkrouter"
 
 const scopeExtensionContextTo = (
@@ -54,13 +54,14 @@ export const _initExtensions = callOnce((user$: Observable<UserInfo>, router$: R
 
             router$.pipe(route(r, router$)).subscribe((routeData: Route) => {
               currentActivity$.next(activity)
-              currentRouteData$.next(routeData)
+              currentRoute$.next(routeData)
             })
           }),
         )
 
         router$.pipe(noMatch(router$)).subscribe(() => {
           currentActivity$.next(null)
+          currentRoute$.next(null)
         })
       }),
     )
@@ -70,7 +71,9 @@ export const _initExtensions = callOnce((user$: Observable<UserInfo>, router$: R
 const activityIcon$ = new Subject<ComponentType>()
 
 export const currentActivity$ = new BehaviorSubject<Nullable<Activity>>(null)
-export const currentRouteData$ = new BehaviorSubject<Nullable<Route>>(null)
+export const currentRoute$ = new BehaviorSubject<Nullable<Route>>(null)
+
 export const activityIcons$ = activityIcon$.pipe(
   scan((acc, c) => acc.concat([c]), [] as ComponentType[]),
+  shareReplay(1),
 )

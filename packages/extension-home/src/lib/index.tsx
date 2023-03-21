@@ -3,8 +3,8 @@ import { lazy } from "react"
 import en from "./translations/en.json"
 import ru from "./translations/ru.json"
 
-const Icon = lazy(() => import("./components/icon"))
-const Component = lazy(() => import("./components"))
+const Icon = lazy(() => import("./components/home-icon"))
+const Component = lazy(() => import("./components/home-component"))
 
 const homeActivity = { routes: ["/"], Component, Icon }
 

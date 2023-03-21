@@ -1,6 +1,12 @@
-import { IOrdoFileStatic, IOrdoFile, IOrdoFileRaw, OrdoFilePath, OrdoFileExtension } from "./types"
+import {
+  IOrdoFileStatic,
+  IOrdoFile,
+  IOrdoFileRaw,
+  OrdoFilePath,
+  OrdoDirectoryPath,
+  OrdoFileExtension,
+} from "@ordo-pink/common-types"
 import { endsWithSlash, isValidPath } from "../common"
-import { OrdoDirectoryPath } from "../ordo-directory/types"
 
 const toReadableSize = (a: number, b = 2, k = 1024): string => {
   const d = Math.floor(Math.log(a) / Math.log(k))

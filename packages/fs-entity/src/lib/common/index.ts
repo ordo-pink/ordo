@@ -1,19 +1,4 @@
-/**
- * Characters that cannot be used in an Ordo fs path.
- */
-export const disallowedCharacters = [
-  "<",
-  ">",
-  ":",
-  '"',
-  "\\",
-  "|",
-  "?",
-  "*",
-  "..",
-  "./",
-  "//",
-] as const
+import { disallowedCharacters } from "@ordo-pink/common-types"
 
 export const hasForbiddenChars = (path: string) =>
   disallowedCharacters.some((disallowed) => path.includes(disallowed))

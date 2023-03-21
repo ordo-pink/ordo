@@ -1,10 +1,10 @@
 import {
-  IOrdoDirectoryStatic,
   IOrdoDirectoryRaw,
   IOrdoDirectory,
-  OrdoDirectoryPath,
   OrdoFsEntity,
-} from "./types"
+  IOrdoDirectoryStatic,
+  OrdoDirectoryPath,
+} from "@ordo-pink/common-types"
 import { isValidPath, endsWithSlash } from "../common"
 import { OrdoFile } from "../ordo-file"
 

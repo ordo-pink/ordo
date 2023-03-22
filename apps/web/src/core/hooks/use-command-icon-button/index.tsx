@@ -1,5 +1,5 @@
 import { OrdoCommandExtension, OrdoCommand } from "@ordo-pink/extensions"
-import { Null } from "@ordo-pink/react"
+import { Null } from "@ordo-pink/ui-kit"
 import { useTranslation } from "react-i18next"
 import { useActionContext } from "../use-action-context"
 

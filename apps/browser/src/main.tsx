@@ -1,48 +1,160 @@
-import { AuthInfo, OrdoDrive } from "@ordo-pink/common-types"
-import { OrdoDirectory } from "@ordo-pink/fs-entity"
+import { FSDriver, UnaryFn } from "@ordo-pink/common-types"
+import { clearActivities, _initActivities } from "@ordo-pink/stream-activities"
 import { _initAuth } from "@ordo-pink/stream-auth"
 import { _initCommands } from "@ordo-pink/stream-commands"
+import { _initDrives } from "@ordo-pink/stream-drives"
 import { _initExtensions } from "@ordo-pink/stream-extensions"
 import { _initRouter } from "@ordo-pink/stream-router"
 import { _initI18n } from "@ordo-pink/stream-translations"
 import Keycloak from "keycloak-js"
+import { tap } from "ramda"
 import * as ReactDOM from "react-dom/client"
 import App from "./app/app"
 
 import "./styles.css"
 
-const getDrivesP = (auth: AuthInfo) =>
-  new Promise<OrdoDrive[]>((resolve) =>
-    auth && auth.isAuthenticated
-      ? resolve([
-          { params: { maxTotalSize: 50, maxUploadSize: 5 }, root: OrdoDirectory.empty("/") },
-        ])
-      : resolve([
-          { params: { maxTotalSize: 0, maxUploadSize: 0 }, root: OrdoDirectory.empty("/") },
-        ]),
-  )
+const loggedInExtensions = [
+  () => import("@ordo-pink/extension-editor"),
+  () => import("@ordo-pink/extension-fs"),
+]
+const loggedOutExtensions = [() => import("@ordo-pink/extension-home")]
 
-const loggedInExtensions = [import("@ordo-pink/extension-home")]
-const loggedOutExtensions = [import("@ordo-pink/extension-home")]
+const FS_HOST = process.env.BACKEND_HOST ?? "http://localhost:5000"
+const SSO_HOST = process.env.AUTH_HOST
+const SSO_REALM = process.env.AUTH_REALM
+const SSO_CLIENT_ID = process.env.AUTH_CLIENT_ID
 
-const url = "https://sso.ordo.pink"
-const realm = "test"
-const clientId = "ordo-web-app"
+const AUTHORIZATION_HEADER_KEY = "authorization"
+
+const DIRECTORY_API = "fs/directories"
+const FILE_API = "fs/files"
+
+const ssoUrl = SSO_HOST ?? "https://sso.ordo.pink"
+const realm = SSO_REALM ?? "test"
+const clientId = SSO_CLIENT_ID ?? "ordo-web-app"
+const fsUrl = FS_HOST.endsWith("/") ? FS_HOST.slice(0, -1) : FS_HOST
 
 _initCommands()
 
-const user$ = _initAuth(
-  new Keycloak({ url, realm, clientId }),
+const user$ = _initAuth({
+  keycloak: new Keycloak({ url: ssoUrl, realm, clientId }),
   loggedInExtensions,
   loggedOutExtensions,
-  getDrivesP,
-)
+  onChangeLoginStatus: () => clearActivities(),
+})
+
+const getFsDriver: UnaryFn<{ token: string; sub: string }, FSDriver> = ({ token, sub }) => ({
+  files: {
+    create: ({ file, content }) =>
+      fetch(`${fsUrl}/${FILE_API}/${sub}${file.path}`, {
+        method: "POST",
+        body: content,
+        headers: {
+          [AUTHORIZATION_HEADER_KEY]: `Bearer ${token}`,
+        },
+      })
+        .then(
+          tap(() =>
+            fetch(`${fsUrl}/${FILE_API}/${sub}${file.path}.metadata`, {
+              method: "PUT",
+              body: JSON.stringify(file.metadata),
+              headers: {
+                [AUTHORIZATION_HEADER_KEY]: `Bearer ${token}`,
+              },
+            }),
+          ),
+        )
+        .then((res) => res.json()),
+    get: (path) =>
+      fetch(`${fsUrl}/${FILE_API}/${sub}${path}`, {
+        headers: {
+          [AUTHORIZATION_HEADER_KEY]: `Bearer ${token}`,
+        },
+      }).then((res) => res.json()),
+    set: (file) =>
+      fetch(`${fsUrl}/${FILE_API}/${sub}${file.path}.metadata`, {
+        method: "PUT",
+        body: JSON.stringify(file.metadata),
+        headers: {
+          [AUTHORIZATION_HEADER_KEY]: `Bearer ${token}`,
+        },
+      }).then(() => file),
+    getContent: (path) =>
+      fetch(`${fsUrl}/${FILE_API}/${sub}${path}`, {
+        headers: {
+          [AUTHORIZATION_HEADER_KEY]: `Bearer ${token}`,
+        },
+      }),
+    setContent: ({ file, content }) =>
+      fetch(`${fsUrl}/${FILE_API}/${sub}${file.path}`, {
+        method: "PUT",
+        headers: {
+          [AUTHORIZATION_HEADER_KEY]: `Bearer ${token}`,
+        },
+        body: content,
+      }).then((res) => res.json()),
+    remove: (path) =>
+      fetch(`${fsUrl}/${FILE_API}/${sub}${path}`, {
+        method: "DELETE",
+        headers: {
+          [AUTHORIZATION_HEADER_KEY]: `Bearer ${token}`,
+        },
+      }).then((res) => res.json()),
+    move: ({ oldPath, newPath }) =>
+      fetch(`${fsUrl}/${FILE_API}/${sub}${oldPath}->${newPath}`, {
+        method: "PATCH",
+        headers: {
+          [AUTHORIZATION_HEADER_KEY]: `Bearer ${token}`,
+        },
+      }).then((res) => res.json()),
+  },
+  directories: {
+    create: (path) =>
+      fetch(`${fsUrl}/${DIRECTORY_API}/${sub}${path}`, {
+        method: "POST",
+        headers: {
+          [AUTHORIZATION_HEADER_KEY]: `Bearer ${token}`,
+        },
+      }).then((res) => res.json()),
+    set: (directory) =>
+      fetch(`${fsUrl}/${FILE_API}/${sub}${directory.path}.metadata`, {
+        method: "PUT",
+        body: JSON.stringify(directory.metadata),
+        headers: {
+          [AUTHORIZATION_HEADER_KEY]: `Bearer ${token}`,
+        },
+      }).then(() => directory),
+    get: (path) =>
+      fetch(`${fsUrl}/${DIRECTORY_API}/${sub}${path}`, {
+        headers: {
+          [AUTHORIZATION_HEADER_KEY]: `Bearer ${token}`,
+        },
+      }).then((res) => res.json()),
+    remove: (path) =>
+      fetch(`${fsUrl}/${DIRECTORY_API}/${sub}${path}`, {
+        method: "DELETE",
+        headers: {
+          [AUTHORIZATION_HEADER_KEY]: `Bearer ${token}`,
+        },
+      }).then((res) => res.json()),
+    move: ({ oldPath, newPath }) =>
+      fetch(`${fsUrl}/${DIRECTORY_API}/${sub}${oldPath}->${newPath}`, {
+        method: "PATCH",
+        headers: {
+          [AUTHORIZATION_HEADER_KEY]: `Bearer ${token}`,
+        },
+      }).then((res) => res.json()),
+  },
+})
+
+const drives$ = _initDrives(user$, getFsDriver)
 
 const router$ = _initRouter()
+const activities$ = _initActivities()
 
 _initI18n()
 
-_initExtensions(user$, router$)
+_initExtensions(user$, router$, activities$)
 
 const root = ReactDOM.createRoot(document.getElementById("root") as HTMLElement)
 

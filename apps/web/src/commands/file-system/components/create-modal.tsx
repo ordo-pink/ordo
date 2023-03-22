@@ -29,6 +29,7 @@ export default function CreateModal() {
 
   const isShown = fsSelector((state) => state["ordo-command-file-system"].isCreateModalShown)
   const parent = fsSelector((state) => state["ordo-command-file-system"].parent)
+  const openOnCreate = fsSelector((state) => state["ordo-command-file-system"].openOnCreate)
   const type = fsSelector((state) => state["ordo-command-file-system"].entityType)
 
   const { t } = useTranslation()
@@ -95,9 +96,11 @@ export default function CreateModal() {
             (path) => {
               const file = OrdoFile.empty(path)
 
-              dispatch(createFile({ file })).then(() =>
-                navigate({ pathname: "/editor", search: createSearchParams({ path }).toString() }),
-              )
+              dispatch(createFile({ file })).then(() => {
+                if (!openOnCreate) return
+
+                navigate({ pathname: "/editor", search: createSearchParams({ path }).toString() })
+              })
             },
             (path) => dispatch(createdDirectory(path)),
           ),

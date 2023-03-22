@@ -13,7 +13,7 @@ const toReadableSize = (a: number, b = 2, k = 1024): string => {
 
   return a === 0
     ? "0B"
-    : `${parseFloat((a / Math.pow(k, d)).toFixed(Math.max(0, b)))}${
+    : `${parseFloat((a / Math.pow(k, d)).toFixed(Math.max(0, b)))} ${
         ["B", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"][d]
       }`
 }

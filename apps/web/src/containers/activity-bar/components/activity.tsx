@@ -3,6 +3,7 @@ import {
   getExtensionReadableName,
   getActivityRoute,
 } from "@ordo-pink/extensions"
+import { memo } from "react"
 import { useTranslation } from "react-i18next"
 import { NavLink } from "react-router-dom"
 
@@ -12,7 +13,7 @@ type Props = {
   activity: OrdoActivityExtension<string, Record<string, unknown>, Record<string, unknown>>
 }
 
-export default function ActivityBarActivity({ activity }: Props) {
+function ActivityBarActivity({ activity }: Props) {
   const activityName = getExtensionReadableName(activity)
   const activityRoute = getActivityRoute(activity)
   const Icon = activity.Icon
@@ -38,3 +39,5 @@ export default function ActivityBarActivity({ activity }: Props) {
     </NavLink>
   )
 }
+
+export default memo(ActivityBarActivity, (prev, next) => prev.activity === next.activity)

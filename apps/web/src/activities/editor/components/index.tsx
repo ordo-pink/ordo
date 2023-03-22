@@ -3,7 +3,7 @@ import { Either } from "@ordo-pink/either"
 import { OrdoFile, OrdoFilePath, IOrdoFile } from "@ordo-pink/fs-entity"
 import { useWorkspaceWithSidebar } from "@ordo-pink/react-utils"
 import { Switch } from "@ordo-pink/switch"
-import { createContext, FC, useEffect, useState } from "react"
+import { createContext, FC, memo, useEffect, useState } from "react"
 import { Helmet } from "react-helmet"
 import { useTranslation } from "react-i18next"
 import { AiOutlineLoading } from "react-icons/ai"
@@ -25,7 +25,7 @@ import "../index.css"
 
 export const EditorContext = createContext({} as EditorProps)
 
-export default function Editor(props: EditorProps) {
+function Editor(props: EditorProps) {
   const { t } = useTranslation()
   const navigate = useNavigate()
   const [query] = useSearchParams()
@@ -172,3 +172,5 @@ export default function Editor(props: EditorProps) {
     </EditorContext.Provider>
   )
 }
+
+export default memo(Editor, () => true)

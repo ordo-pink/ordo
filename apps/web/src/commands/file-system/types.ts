@@ -5,9 +5,12 @@ import { OrdoFSEntity } from "../../core/constants/ordo-fs-entity"
 export type FileSystemCommandsState = {
   isCreateModalShown: boolean
   isDeleteModalShown: boolean
+  isRenameModalShown: boolean
   entityType: OrdoFSEntity
   parent: Nullable<IOrdoDirectory>
   target: Nullable<IOrdoFile | IOrdoDirectory>
+  openOnCreate: boolean
+  openOnRename: boolean
 }
 
 export type FileSystemExtensionStore = {

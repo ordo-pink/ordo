@@ -7,7 +7,15 @@
 }
 
 .button {
-  @apply text-sm px-6 py-2 rounded-md shrink-0;
+  @apply text-sm rounded-md shrink-0;
+}
+
+.button-compact {
+  @apply px-2 py-1;
+}
+
+.button-normal {
+  @apply px-6 py-2;
 }
 
 .button.button-outline {

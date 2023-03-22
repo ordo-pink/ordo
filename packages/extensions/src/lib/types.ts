@@ -40,7 +40,8 @@ export type ActionContext<
     fetch: typeof fetch
     openExternal: UnaryFn<string, void>
   }
-  navigate: UnaryFn<string, void>
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  navigate: UnaryFn<any, void>
   translate: TFunction<"translation", undefined>
   isAuthenticated: boolean
   createLoginUrl: ThunkFn<string>

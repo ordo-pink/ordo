@@ -15,6 +15,6 @@ export const CreateFileCommand = createOrdoCommand<"ordo-command-file-system">({
         : state.personalProject
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    dispatch(showCreateFileModal(target as any))
+    dispatch(showCreateFileModal({ parent: target as any, openOnCreate: true }))
   },
 })

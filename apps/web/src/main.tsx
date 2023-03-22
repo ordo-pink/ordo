@@ -1,3 +1,4 @@
+import { OrdoFile } from "@ordo-pink/fs-entity"
 import { ReactKeycloakProvider } from "@ordo-pink/keycloak"
 import { ConsoleLogger } from "@ordo-pink/logger"
 import { Loading } from "@ordo-pink/react-utils"
@@ -100,15 +101,17 @@ window.ordo = {
               },
             })
             .then(
-              tap(() =>
+              tap(() => {
+                if (OrdoFile.getFileExtension(file.path) !== ".md") return
+
                 fetch(`${host}/${FILE_API}/${keycloak.tokenParsed?.sub}${file.path}.metadata`, {
                   method: "PUT",
                   body: JSON.stringify(file.metadata),
                   headers: {
                     [AUTHORIZATION_HEADER_KEY]: `Bearer ${LOCAL_TOKEN ?? keycloak.token}`,
                   },
-                }),
-              ),
+                })
+              }),
             )
             .then((res) => res.json()),
         get: (path) =>
@@ -162,15 +165,17 @@ window.ordo = {
             })
 
             .then(
-              tap(() =>
+              tap(() => {
+                if (OrdoFile.getFileExtension(file.path) !== ".md") return
+
                 fetch(`${host}/${FILE_API}/${keycloak.tokenParsed?.sub}${file.path}.metadata`, {
                   method: "PUT",
                   body: JSON.stringify(file.metadata),
                   headers: {
                     [AUTHORIZATION_HEADER_KEY]: `Bearer ${LOCAL_TOKEN ?? keycloak.token}`,
                   },
-                }),
-              ),
+                })
+              }),
             )
             .then((res) => res.json()),
       },

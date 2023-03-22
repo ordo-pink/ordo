@@ -21,8 +21,7 @@ export default function FileOrDirectory({ item, index }: Props) {
       ),
       () => (
         <Directory
-          index={index}
-          directory={fileOrDirectory as IOrdoDirectory}
+          directory={fileOrDirectory as IOrdoDirectory<{ isExpanded: boolean; color: string }>}
         />
       ),
     ),

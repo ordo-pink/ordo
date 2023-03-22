@@ -1,0 +1,15 @@
+{
+  "@ordo-command-colors/readable-name": "Цвета",
+  "@ordo-command-colors/change-directory-color": "Изменить цвет",
+  "@ordo-command-colors/button-ok": "Да",
+  "@ordo-command-colors/button-cancel": "Отмена",
+  "@ordo-command-colors/description": "TODO",
+  "@ordo-command-colors/neutral": "Серый",
+  "@ordo-command-colors/pink": "Розовый",
+  "@ordo-command-colors/red": "Красный",
+  "@ordo-command-colors/orange": "Оранжевый",
+  "@ordo-command-colors/yellow": "Жёлтый",
+  "@ordo-command-colors/green": "Зелёный",
+  "@ordo-command-colors/blue": "Синий",
+  "@ordo-command-colors/purple": "Фиолетовый"
+}

@@ -1,4 +1,4 @@
-import { ExtensionCreatorContext, ExtensionModule } from "./extensions"
+import { ExtensionCreatorContext } from "./extensions"
 import { IOrdoDirectory } from "./fs/ordo-directory"
 import { UnaryFn } from "./types"
 
@@ -24,6 +24,5 @@ export type OrdoDrive = {
 
 export type UserInfo = {
   auth: AuthInfo
-  drives: OrdoDrive[]
-  extensions: Promise<{ default: UnaryFn<ExtensionCreatorContext, ExtensionModule> }>[]
+  extensions: Promise<{ default: UnaryFn<ExtensionCreatorContext, void> }>[]
 }

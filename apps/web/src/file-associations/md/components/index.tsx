@@ -165,7 +165,7 @@ export default memo(
     const onError = console.error
 
     return (
-      <div className="p-4 w-full max-w-2xl">
+      <div className="p-4 w-full h-full">
         <LexicalComposer
           initialConfig={{
             namespace: "md-editor-root",
@@ -184,7 +184,7 @@ export default memo(
             <div className="w-full py-8 px-4">
               {/* <OrdoDatePlugin /> */}
 
-              <MarkdownShortcutPlugin transformers={transformers} />
+              <MarkdownShortcutPlugin transformers={transformers.concat(TRANSFORMERS)} />
 
               <LinkPlugin />
               <ListPlugin />
@@ -197,7 +197,12 @@ export default memo(
               <CheckListPlugin />
 
               <RichTextPlugin
-                contentEditable={<ContentEditable spellCheck={false} />}
+                contentEditable={
+                  <ContentEditable
+                    className="h-full pb-12"
+                    spellCheck={false}
+                  />
+                }
                 placeholder={<div>...</div>}
                 ErrorBoundary={LexicalErrorBoundary}
               />

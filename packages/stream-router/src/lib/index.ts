@@ -22,7 +22,9 @@ export const openExternal: OpenExternalFn = ({ url, newTab = true }) => {
 
 export const _initRouter = callOnce(() => {
   registerCommand("router.navigate", (params: RouterSetParams) => {
-    router$.set(...params)
+    if (Array.isArray(params)) return router$.set(...params)
+
+    return router$.set(params)
   })
 
   registerCommand(

@@ -95,7 +95,27 @@ export const OrdoDirectoryModel = {
 
           return result
         })
-        .then((children) => OrdoDirectory.raw({ path, children })),
+        .then((children) => OrdoDirectory.raw({ path, children, metadata: { isExpanded: true } }))
+        .then(async (directory) => {
+          const metadataPath = `${directory.path}.metadata` as const
+
+          if (await driver.checkFileExists(metadataPath)) {
+            const metadataStream = await driver.getFile(metadataPath)
+
+            const metadata = await new Promise<string>((resolve, reject) => {
+              const body = []
+
+              metadataStream
+                .on("data", (chunk) => body.push(chunk))
+                .on("error", reject)
+                .on("end", () => resolve(Buffer.concat(body).toString("utf8")))
+            })
+
+            directory.metadata = JSON.parse(metadata)
+          }
+
+          return directory
+        }),
     moveDirectory: ({ oldPath, newPath }) =>
       Promise.resolve({ oldPath, newPath })
         .then(({ oldPath, newPath }) =>

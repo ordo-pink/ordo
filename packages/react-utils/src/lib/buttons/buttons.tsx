@@ -16,6 +16,7 @@ type Props = PropsWithChildren<{
   hotkey?: string
   center?: boolean
   inverted?: boolean
+  compact?: boolean
 }>
 
 export const OrdoButton = ({
@@ -27,6 +28,7 @@ export const OrdoButton = ({
   onMouseOver = noOp,
   outline = false,
   center = false,
+  compact = false,
 }: Props) => {
   const ref = useRef<HTMLButtonElement>(null)
 
@@ -43,7 +45,9 @@ export const OrdoButton = ({
       onClick={onClick}
       onMouseOver={onMouseOver}
       onFocus={onMouseOver}
-      className={`button ${outline ? "button-outline" : ""} ${className}`}
+      className={`button ${outline ? "button-outline" : ""} ${className} ${
+        compact ? "button-compact" : "button-normal"
+      }`}
       disabled={disabled}
     >
       <div className={`button-content ${center ? "button-content-center" : ""}`}>
@@ -69,6 +73,7 @@ export const OrdoButtonPrimary = ({
   inverted,
   outline,
   center,
+  compact,
 }: Props) => {
   let buttonClassNames: string
 
@@ -91,6 +96,7 @@ export const OrdoButtonPrimary = ({
       className={classNames}
       outline={outline}
       center={center}
+      compact={compact}
     >
       {children}
     </OrdoButton>
@@ -107,6 +113,7 @@ export const OrdoButtonSecondary = ({
   inverted,
   outline,
   center,
+  compact,
 }: Props) => {
   let buttonClassNames: string
 
@@ -129,6 +136,7 @@ export const OrdoButtonSecondary = ({
       className={buttonClass}
       outline={outline}
       center={center}
+      compact={compact}
     >
       {children}
     </OrdoButton>
@@ -144,6 +152,7 @@ export const OrdoButtonSuccess = ({
   disabled,
   outline,
   center,
+  compact,
 }: Props) => {
   const buttonAppearanceClass = Either.fromBoolean(!!disabled).fold(
     () =>
@@ -163,6 +172,7 @@ export const OrdoButtonSuccess = ({
       className={buttonClass}
       outline={outline}
       center={center}
+      compact={compact}
     >
       {children}
     </OrdoButton>
@@ -179,6 +189,7 @@ export const OrdoButtonNeutral = ({
   inverted,
   outline,
   center,
+  compact,
 }: Props) => {
   let buttonClassNames: string
 
@@ -201,6 +212,7 @@ export const OrdoButtonNeutral = ({
       className={buttonClass}
       outline={outline}
       center={center}
+      compact={compact}
     >
       {children}
     </OrdoButton>

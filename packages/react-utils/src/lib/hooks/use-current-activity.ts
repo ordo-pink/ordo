@@ -7,7 +7,9 @@ export const useCurrentActivity = () => {
   const [activity, setActivity] = useState<Nullable<Activity>>(null)
 
   useEffect(() => {
-    currentActivity$.subscribe(setActivity)
+    currentActivity$.subscribe((a) => {
+      setActivity(a)
+    })
   }, [])
 
   return activity

@@ -2,6 +2,8 @@ import {
   Command,
   CommandListener,
   ExecuteCommandFn,
+  ListenCommandFn,
+  Nullable,
   PayloadCommand,
   RegisterCommandFn,
   ThunkFn,
@@ -66,7 +68,9 @@ const commandRunner$ = commandQueue$.pipe(
       shareReplay(1),
     ),
   ),
-  map(([commands, listeners]) => {
+  map(([commands, listeners]): Nullable<Command | PayloadCommand> => {
+    let lastCommand: Nullable<Command | PayloadCommand> = null
+
     commands.forEach((command) => {
       const { type, payload } = command as PayloadCommand
 
@@ -77,9 +81,12 @@ const commandRunner$ = commandQueue$.pipe(
       if (commandListener) {
         removeFromQueue$.next({ type, payload })
         const listener = commandListener[1]
+        lastCommand = command
         listener(payload)
       }
     })
+
+    return lastCommand
   }),
 )
 
@@ -105,4 +112,17 @@ export const registerCommand: RegisterCommandFn = <Payload, Type extends string 
   commandStorage$.next(command as any)
 
   return command
+}
+
+export const listenCommand: ListenCommandFn = <Payload, Type extends string = string>(
+  type: Type,
+  listener: Payload extends void
+    ? ThunkFn<void | Promise<void>>
+    : UnaryFn<Payload, void | Promise<void>>,
+) => {
+  commandRunner$.subscribe((lastCommand) => {
+    if (lastCommand && type === lastCommand.type) {
+      listener((lastCommand as PayloadCommand).payload as Payload)
+    }
+  })
 }

@@ -9,7 +9,7 @@ import { useKeycloak } from "@ordo-pink/keycloak"
 // import Features from "packages/unauthorised/src/lib/features/src"
 // import Pricing from "@ordo-pink/ordo-activity-pricing"
 import { combineReducers, Reducer } from "@reduxjs/toolkit"
-import { MouseEvent, useEffect, useState } from "react"
+import { memo, MouseEvent, useEffect, useState } from "react"
 import { Helmet } from "react-helmet"
 import { useHotkeys } from "react-hotkeys-hook"
 import { Outlet, RouteObject, useLocation, useNavigate } from "react-router-dom"
@@ -18,11 +18,12 @@ import { Outlet, RouteObject, useLocation, useNavigate } from "react-router-dom"
 import CalendarExtension from "../../activities/calendar"
 import EditorExtension from "../../activities/editor"
 // import ExtensionStoreExtension from "../../activities/extension-store"
-import { EditorActivityState } from "../../activities/editor/types"
+import KanbanExtension from "../../activities/kanban"
 import SettingsExtension from "../../activities/settings"
 import UserExtension from "../../activities/user"
 
 import AuthCommands from "../../commands/auth"
+import ColorCommands from "../../commands/colors"
 import CommandPalette from "../../commands/command-palette"
 import FileSystemCommands from "../../commands/file-system"
 import OpenFile from "../../commands/open-file"
@@ -59,6 +60,7 @@ const loggedInExtensions = [
   SettingsExtension,
   MdFileExtension,
   FileSystemCommands,
+  ColorCommands,
   CommandPalette,
   OpenFile,
   UserSupportCommands,
@@ -69,6 +71,7 @@ const loggedInExtensions = [
   ToolbarPlugin,
   HighlightCodePlugin,
   AutolinkPlugin,
+  KanbanExtension,
 ]
 
 const loggedOutExtensions = [
@@ -83,11 +86,12 @@ const loggedOutExtensions = [
   AutolinkPlugin,
 ]
 
-export default function App() {
+function App() {
   const dispatch = useAppDispatch()
   const i18n = useI18n()
 
-  const editorSelector = useExtensionSelector<EditorActivityState>()
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const editorSelector = useExtensionSelector<any>()
 
   // const [accelerators, setAccelerators] = useState<Record<string, UnaryFn<ActionContext, void>>>({})
   const [extensions, setExtensions] = useState<
@@ -273,3 +277,5 @@ export default function App() {
     </div>
   )
 }
+
+export default memo(App, () => true)

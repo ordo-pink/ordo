@@ -1,9 +1,9 @@
+import { IOrdoDirectory } from "@ordo-pink/common-types"
 import { Either } from "@ordo-pink/either"
 import { lazyBox, preventDefault, stopPropagation } from "@ordo-pink/fns"
-import { IOrdoDirectory } from "@ordo-pink/fs-entity"
+import { OrdoDirectory } from "@ordo-pink/fs-entity"
 import { ActionListItem, Null } from "@ordo-pink/react-utils"
-import { MouseEvent, useContext, useEffect, useState } from "react"
-import { Draggable, Droppable } from "react-beautiful-dnd"
+import { MouseEvent } from "react"
 import {
   AiFillFolder,
   AiFillFolderOpen,
@@ -12,28 +12,17 @@ import {
 } from "react-icons/ai"
 import { BsChevronDown, BsChevronUp } from "react-icons/bs"
 import DirectoryContent from "./directory-content"
-import { EditorContext } from ".."
+import { iconColors } from "../../../../commands/colors/colors"
 import { useContextMenu } from "../../../../containers/app/hooks/use-context-menu"
+import { updateDirectoryMetadata } from "../../../../containers/app/store"
 import { useAppDispatch } from "../../../../core/state/hooks/use-app-dispatch"
-import { useExtensionSelector } from "../../../../core/state/hooks/use-extension-selector"
-import { EditorActivityState } from "../../types"
 
 type Props = {
-  directory: IOrdoDirectory
-  index: number
+  directory: IOrdoDirectory<{ isExpanded: boolean; color: string }>
 }
 
-export default function Directory({ directory, index }: Props) {
+export default function Directory({ directory }: Props) {
   const dispatch = useAppDispatch()
-
-  const editorSelector = useExtensionSelector<EditorActivityState>()
-
-  const currentFile = editorSelector((state) => state["ordo-activity-editor"]?.currentFile) ?? null
-
-  const [expandedDirectories, setExpandedDirectories] = useState<string[]>([])
-  const [isExpanded, setIsExpanded] = useState(false)
-
-  const { persistedStore } = useContext(EditorContext)
 
   const { showContextMenu } = useContextMenu()
 
@@ -44,68 +33,25 @@ export default function Directory({ directory, index }: Props) {
 
   const OpenIcon = hasChildren ? AiFillFolderOpen : AiOutlineFolderOpen
   const ClosedIcon = hasChildren ? AiFillFolder : AiOutlineFolder
-  const Icon = isExpanded ? OpenIcon : ClosedIcon
+  const Icon = directory.metadata.isExpanded
+    ? () => <OpenIcon className={iconColors[directory.metadata.color] ?? iconColors.neutral} />
+    : () => <ClosedIcon className={iconColors[directory.metadata.color] ?? iconColors.neutral} />
 
-  const Chevron = isExpanded ? BsChevronDown : BsChevronUp
-
-  useEffect(() => {
-    if (!currentFile) return
-
-    if (currentFile.path.startsWith(directory.path)) {
-      setIsExpanded(true)
-
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      persistedStore.get("expandedDirectories").then((expanded: any) => {
-        if (!expanded || expanded.includes(directory.path)) return
-
-        persistedStore
-          .set("expandedDirectories", expanded.concat([directory.path]))
-          .then(() => persistedStore.getState())
-      })
-    }
-  }, [currentFile, directory, persistedStore])
-
-  useEffect(() => {
-    persistedStore
-      .get("expandedDirectories")
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      .then((dirs: any) => setExpandedDirectories(dirs ?? []))
-  }, [persistedStore])
-
-  useEffect(() => {
-    setIsExpanded(expandedDirectories.includes(directory.path))
-  }, [expandedDirectories, directory])
+  const Chevron = directory.metadata.isExpanded ? BsChevronDown : BsChevronUp
 
   const handleClick = lazyBox<MouseEvent>((box) =>
     box
       .tap(preventDefault)
       .tap(stopPropagation)
       .fold(() => {
-        setIsExpanded((value) => !value)
-
-        if (!isExpanded) {
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          persistedStore.get("expandedDirectories").then((expanded: any) => {
-            if (!expanded || expanded.includes(directory.path)) return
-
-            persistedStore
-              .set("expandedDirectories", expanded.concat([directory.path]))
-              .then(() => persistedStore.getState())
-          })
-        } else {
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          persistedStore.get("expandedDirectories").then((expanded: any) => {
-            if (!expanded || !expanded.includes(directory.path)) return
-
-            const expandedCopy = [...expanded]
-
-            expandedCopy.splice(expanded.indexOf(directory.path), 1)
-
-            persistedStore
-              .set("expandedDirectories", expandedCopy)
-              .then(() => persistedStore.getState())
-          })
-        }
+        dispatch(
+          updateDirectoryMetadata(
+            OrdoDirectory.from({
+              ...directory,
+              metadata: { isExpanded: !directory.metadata.isExpanded },
+            }),
+          ),
+        )
       }),
   )
 
@@ -118,51 +64,24 @@ export default function Directory({ directory, index }: Props) {
   )
 
   return Either.fromNullable(directory).fold(Null, (directory) => (
-    <Droppable droppableId={directory.path}>
-      {(provided, droppableSnapshot) => {
-        return (
-          <div
-            className={`transition-all duration-300 ${
-              droppableSnapshot.isDraggingOver ? "bg-neutral-200 dark:bg-neutral-800" : ""
-            }`}
-            ref={provided.innerRef}
-            {...provided.droppableProps}
-          >
-            <Draggable
-              draggableId={directory.path}
-              index={index}
-            >
-              {(provided, draggableSnapshot) => {
-                return (
-                  <div
-                    className=""
-                    {...provided.draggableProps}
-                    {...provided.dragHandleProps}
-                    ref={provided.innerRef}
-                  >
-                    <ActionListItem
-                      style={{ paddingLeft }}
-                      text={directory.readableName}
-                      Icon={Icon}
-                      onClick={handleClick}
-                      isCurrent={false}
-                      onContextMenu={handleContextMenu}
-                    >
-                      <Chevron className="shrink-0" />
+    <div className="transition-all duration-300">
+      <div className="">
+        <ActionListItem
+          style={{ paddingLeft }}
+          text={directory.readableName}
+          Icon={Icon}
+          onClick={handleClick}
+          isCurrent={false}
+          onContextMenu={handleContextMenu}
+        >
+          <Chevron className="shrink-0" />
 
-                      <DirectoryContent
-                        directory={directory}
-                        isExpanded={isExpanded}
-                      />
-                    </ActionListItem>
-                  </div>
-                )
-              }}
-            </Draggable>
-            {provided.placeholder}
-          </div>
-        )
-      }}
-    </Droppable>
+          <DirectoryContent
+            directory={directory}
+            isExpanded={directory.metadata.isExpanded}
+          />
+        </ActionListItem>
+      </div>
+    </div>
   ))
 }

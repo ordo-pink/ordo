@@ -85,8 +85,8 @@
   @apply bg-neutral-50 dark:bg-neutral-700;
 }
 
-* {
-  @apply select-none;
+body {
+  @apply text-neutral-800 dark:text-neutral-200;
 }
 
 *:focus {

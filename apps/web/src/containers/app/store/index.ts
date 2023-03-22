@@ -1,4 +1,10 @@
-import { IOrdoFileRaw, IOrdoFile, OrdoFilePath, OrdoDirectoryPath } from "@ordo-pink/common-types"
+import {
+  IOrdoFileRaw,
+  IOrdoFile,
+  OrdoFilePath,
+  OrdoDirectoryPath,
+  IOrdoDirectory,
+} from "@ordo-pink/common-types"
 import { Either } from "@ordo-pink/either"
 import { noOp } from "@ordo-pink/fns"
 import { OrdoDirectory, OrdoFile } from "@ordo-pink/fs-entity"
@@ -9,10 +15,11 @@ import {
   PayloadAction,
 } from "@reduxjs/toolkit"
 import { debounce } from "lodash"
+import { mergeDeepRight } from "ramda"
 import { registeredExtensionsReducer } from "./reducers/registered-extensions"
 import { rejectedReducer } from "./reducers/rejected"
 import { updatedFileReducer } from "./reducers/updated-file"
-import { findOrdoFile, findParent } from "../../../core/utils/fs-helpers"
+import { findOrdoDirectory, findOrdoFile, findParent } from "../../../core/utils/fs-helpers"
 import { AppState, UpdateFilePayload } from "../types"
 
 const initialState: AppState = {
@@ -127,6 +134,18 @@ export const appSlice = createSlice({
         ...file.metadata,
         ...action.payload.metadata,
       }
+    },
+    updateDirectoryMetadata: (state, action: PayloadAction<IOrdoDirectory>) => {
+      const directory = findOrdoDirectory(action.payload.path, state.personalProject)
+
+      if (!directory) return
+
+      directory.metadata = mergeDeepRight(directory.metadata, action.payload.metadata)
+
+      window.ordo.api.fs.files.update({
+        file: OrdoFile.empty(`${directory.path}.metadata`),
+        content: JSON.stringify(directory.metadata),
+      })
     },
   },
   extraReducers: (builder) => {
@@ -265,6 +284,7 @@ export const {
   unregisterExtensions,
   setIsSaving,
   updateFileMetadata,
+  updateDirectoryMetadata,
 } = appSlice.actions
 
 export default appSlice.reducer

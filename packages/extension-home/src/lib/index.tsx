@@ -6,15 +6,15 @@ import ru from "./translations/ru.json"
 const Icon = lazy(() => import("./components/home-icon"))
 const Component = lazy(() => import("./components/home-component"))
 
-const homeActivity = { routes: ["/"], Component, Icon }
+const homeActivity = { routes: ["/"], Component, Icon, name: "home.landing-page" }
 
 export default createExtension(
   "home",
-  ({ registerTranslations, registerCommand, executeCommand }) => {
+  ({ registerTranslations, registerCommand, executeCommand, registerActivity }) => {
     registerTranslations({ ru, en })
 
-    registerCommand("go-home", () => executeCommand("navigate", "/"))
+    registerActivity(homeActivity)
 
-    return { activities: [homeActivity] }
+    registerCommand("go-home", () => executeCommand("navigate", "/"))
   },
 )

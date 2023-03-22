@@ -5,7 +5,7 @@ import {
   OrdoDirectoryPath,
   OrdoFilePath,
 } from "@ordo-pink/common-types"
-import { OrdoDirectory } from "@ordo-pink/fs-entity"
+import { OrdoDirectory, OrdoFile } from "@ordo-pink/fs-entity"
 
 // TODO: Move elsewhere
 export const findParent = (
@@ -50,6 +50,23 @@ export const findOrdoFile = (
   const found = parent?.children.find((child) => child.path === path)
 
   if (!found || OrdoDirectory.isOrdoDirectory(found)) return null
+
+  return found
+}
+
+export const findOrdoDirectory = (
+  child: IOrdoDirectory | OrdoFilePath | OrdoDirectoryPath,
+  root: Nullable<IOrdoDirectory>,
+) => {
+  if (!root || !child) return null
+
+  const path = typeof child === "string" ? child : child.path
+
+  const parent = findParent(path, root)
+
+  const found = parent?.children.find((child) => child.path === path)
+
+  if (!found || OrdoFile.isOrdoFile(found)) return null
 
   return found
 }

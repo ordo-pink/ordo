@@ -2,46 +2,52 @@ import {
   Nullable,
   AuthInfo,
   UserInfo,
-  OrdoDrive,
   UnaryFn,
   ExtensionCreatorContext,
-  ExtensionModule,
+  ThunkFn,
 } from "@ordo-pink/common-types"
 import { callOnce } from "@ordo-pink/fns"
 import { registerCommand, executeCommand } from "@ordo-pink/stream-commands"
 import Keycloak from "keycloak-js"
 import { of } from "ramda"
-import { BehaviorSubject, Observable, forkJoin, from, switchMap, iif } from "rxjs"
+import { BehaviorSubject, Observable, forkJoin, switchMap, iif, tap } from "rxjs"
+
+type InitParams = {
+  keycloak: Keycloak
+  loggedInExtensions: ThunkFn<
+    Promise<{
+      default: UnaryFn<ExtensionCreatorContext, void | Promise<void>>
+    }>
+  >[]
+  loggedOutExtensions: ThunkFn<
+    Promise<{
+      default: UnaryFn<ExtensionCreatorContext, void | Promise<void>>
+    }>
+  >[]
+  onChangeLoginStatus: UnaryFn<Nullable<AuthInfo>, void>
+}
 
 const auth$ = new BehaviorSubject<Nullable<AuthInfo>>(null)
 
 const createAuthenticatedUser$ = (
   auth: AuthInfo,
-  extensions: Promise<{ default: UnaryFn<ExtensionCreatorContext, ExtensionModule> }>[],
-  drives: Promise<OrdoDrive[]>,
+  extensions: Promise<{ default: UnaryFn<ExtensionCreatorContext, void | Promise<void>> }>[],
 ): Observable<UserInfo> =>
   forkJoin({
     auth: of(auth),
     extensions: of(extensions),
-    drives: from(drives),
   })
 
 const createUnauthenticatedUser$ = (
-  extensions: Promise<{ default: UnaryFn<ExtensionCreatorContext, ExtensionModule> }>[],
+  extensions: Promise<{ default: UnaryFn<ExtensionCreatorContext, void | Promise<void>> }>[],
 ) =>
   of<UserInfo>({
     auth: { isAuthenticated: false },
-    drives: [],
     extensions: extensions,
   })
 
 export const _initAuth = callOnce(
-  (
-    keycloak: Keycloak,
-    loggedInExtensions: Promise<{ default: UnaryFn<ExtensionCreatorContext, ExtensionModule> }>[],
-    loggedOutExtensions: Promise<{ default: UnaryFn<ExtensionCreatorContext, ExtensionModule> }>[],
-    getDrives: UnaryFn<AuthInfo, Promise<OrdoDrive[]>>,
-  ) => {
+  ({ keycloak, loggedInExtensions, loggedOutExtensions, onChangeLoginStatus }: InitParams) => {
     const newTab = false
 
     registerCommand("auth.login", (redirectUri = "/") => {
@@ -82,16 +88,16 @@ export const _initAuth = callOnce(
     }
 
     const user$ = auth$.pipe(
+      tap(onChangeLoginStatus),
       switchMap((auth) =>
         iif(
           () => Boolean(auth),
           createAuthenticatedUser$(
             auth as AuthInfo,
-            loggedInExtensions,
+            loggedInExtensions.map((f) => f()),
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            getDrives((auth as any)?.credentials?.token),
           ),
-          createUnauthenticatedUser$(loggedOutExtensions),
+          createUnauthenticatedUser$(loggedOutExtensions.map((f) => f())),
         ),
       ),
     )

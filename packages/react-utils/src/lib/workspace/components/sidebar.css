@@ -1,12 +1,11 @@
 .sidebar {
-  @apply h-full min-h-screen bg-neutral-100 dark:bg-neutral-800 p-1 pb-12;
+  @apply h-full bg-neutral-100 dark:bg-neutral-800;
 }
 
 .gutter {
-  @apply bg-neutral-50 dark:bg-neutral-700 bg-no-repeat bg-center p-4;
+  @apply bg-neutral-50 dark:bg-neutral-700;
 }
 
 .gutter.gutter-horizontal {
   @apply cursor-col-resize;
-  background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAeCAYAAADkftS9AAAAIklEQVQoU2M4c+bMfxAGAgYYmwGrIIiDjrELjpo5aiZeMwF+yNnOs5KSvgAAAABJRU5ErkJggg==");
 }

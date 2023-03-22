@@ -41,7 +41,9 @@
 
 .dayName-week-tue,
 .toastui-calendar-day-name__date,
-.toastui-calendar-day-name__name {
+.toastui-calendar-day-name__name,
+.toastui-calendar-template-monthDayName,
+.toastui-calendar-template-timegridDisplayPrimaryTime {
   @apply dark:!text-neutral-400;
 }
 

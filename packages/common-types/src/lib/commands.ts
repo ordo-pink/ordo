@@ -27,3 +27,10 @@ export type ExecuteCommandFn<Type extends string = string, Payload = any> = Bina
   Payload,
   void
 >
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type ListenCommandFn<Payload = any, Type extends string = string> = BinaryFn<
+  Type,
+  Payload extends void ? ThunkFn<void> : UnaryFn<Payload, void>,
+  void
+>

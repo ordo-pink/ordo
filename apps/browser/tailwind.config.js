@@ -6,7 +6,6 @@ module.exports = {
     join(__dirname, "src/**/*!(*.stories|*.spec).{ts,tsx,html,css}"),
     ...createGlobPatternsForDependencies(__dirname),
   ],
-  darkMode: "class",
   theme: {
     extend: {
       transitionProperty: {

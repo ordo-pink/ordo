@@ -2,6 +2,8 @@
   "@ordo-command-file-system/readable-name": "File System Commands",
   "@ordo-command-file-system/create-file": "Create file",
   "@ordo-command-file-system/create-directory": "Create directory",
+  "@ordo-command-file-system/rename-file": "Rename file",
+  "@ordo-command-file-system/rename-directory": "Rename directory",
   "@ordo-command-file-system/placeholder": "Name",
   "@ordo-command-file-system/button-ok": "Yes",
   "@ordo-command-file-system/button-cancel": "Cancel",

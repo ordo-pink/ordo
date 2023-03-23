@@ -28,6 +28,10 @@ const scopeExtensionContextTo = (
   ctx: ExtensionCreatorContext,
 ): ExtensionCreatorScopedContext => ({
   ...ctx,
+  registerActivity: ctx.registerActivity(name),
+  unregisterActivity: ctx.unregisterActivity(name),
+  registerFileAssociation: ctx.registerFileAssociation(name),
+  unregisterFileAssociation: ctx.unregisterFileAssociation(name),
   registerTranslations: ctx.registerTranslations(name),
   translate: (key: string) => i18next.t(key, { ns: name }),
   // TODO: persistedStore

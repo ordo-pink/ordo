@@ -4,15 +4,18 @@ import { ExecuteCommandFn, RegisterCommandFn } from "./commands"
 import { IOrdoFile, OrdoFileExtension } from "./fs/ordo-file"
 import { Route } from "./routing"
 import { RegisterTranslationsFn } from "./translations"
-import { UnaryFn } from "./types"
+import { BinaryFn, UnaryFn } from "./types"
 
-export type RegisterActivityFn = UnaryFn<Activity, void>
+export type RegisterActivityFn = UnaryFn<string, BinaryFn<string, Omit<Activity, "name">, void>>
 
-export type RegisterFileAssociationFn = UnaryFn<FileAssociation, void>
+export type RegisterFileAssociationFn = UnaryFn<
+  string,
+  BinaryFn<string, Omit<FileAssociation, "name">, void>
+>
 
-export type UnregisterActivityFn = UnaryFn<Activity, void>
+export type UnregisterActivityFn = UnaryFn<string, UnaryFn<string, void>>
 
-export type UnregisterFileAssociationFn = UnaryFn<FileAssociation, void>
+export type UnregisterFileAssociationFn = UnaryFn<string, UnaryFn<string, void>>
 
 export type ExtensionCreatorScopedContext = {
   commands: {
@@ -21,10 +24,10 @@ export type ExtensionCreatorScopedContext = {
     emit: ExecuteCommandFn
   }
   registerTranslations: ReturnType<RegisterTranslationsFn>
-  registerActivity: RegisterActivityFn
-  unregisterActivity: UnregisterActivityFn
-  registerFileAssociation: RegisterFileAssociationFn
-  unregisterFileAssociation: UnregisterFileAssociationFn
+  registerActivity: ReturnType<RegisterActivityFn>
+  unregisterActivity: ReturnType<UnregisterActivityFn>
+  registerFileAssociation: ReturnType<RegisterFileAssociationFn>
+  unregisterFileAssociation: ReturnType<UnregisterFileAssociationFn>
   translate: (key: string) => string
   logger: Logger
 }

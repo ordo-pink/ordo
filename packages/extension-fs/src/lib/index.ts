@@ -7,6 +7,7 @@ import { removeDirectory } from "./commands/directory/remove-directory"
 import { updateDirectory } from "./commands/directory/update-directory"
 import { createFile } from "./commands/files/create-file"
 import { moveFile } from "./commands/files/move-file"
+import { removeFile } from "./commands/files/remove-file"
 import { updateFile } from "./commands/files/update-file"
 
 export default createExtension("fs", ({ commands, logger }) => {
@@ -28,7 +29,7 @@ export default createExtension("fs", ({ commands, logger }) => {
   commands.on("fs.move-file", moveFile)
   commands.on("fs.create-file", createFile)
   commands.on("fs.update-file", updateFile)
-  // commands.on("fs.remove-file", removeFile)
+  commands.on("fs.remove-file", removeFile)
 
   logger.debug('"fs" initialisation complete')
 })

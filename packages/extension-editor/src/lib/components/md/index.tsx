@@ -1,12 +1,11 @@
-import { FileAssociation, IOrdoFile } from "@ordo-pink/common-types"
-import { useEffect, useState, memo } from "react"
 import { CodeHighlightNode, CodeNode } from "@lexical/code"
 import { HashtagNode } from "@lexical/hashtag"
 import { AutoLinkNode, LinkNode } from "@lexical/link"
 import { ListItemNode, ListNode } from "@lexical/list"
-import { $convertToMarkdownString, TRANSFORMERS } from "@lexical/markdown"
+import { TRANSFORMERS } from "@lexical/markdown"
 import { CheckListPlugin } from "@lexical/react/LexicalCheckListPlugin"
 import { LexicalComposer } from "@lexical/react/LexicalComposer"
+import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext"
 import { ContentEditable } from "@lexical/react/LexicalContentEditable"
 import LexicalErrorBoundary from "@lexical/react/LexicalErrorBoundary"
 import { HashtagPlugin } from "@lexical/react/LexicalHashtagPlugin"
@@ -19,10 +18,12 @@ import { OnChangePlugin } from "@lexical/react/LexicalOnChangePlugin"
 import { RichTextPlugin } from "@lexical/react/LexicalRichTextPlugin"
 import { HeadingNode, QuoteNode } from "@lexical/rich-text"
 import { TableCellNode, TableNode, TableRowNode } from "@lexical/table"
+import { IOrdoFile } from "@ordo-pink/common-types"
 import { OrdoFile } from "@ordo-pink/fs-entity"
-import { PathBreadcrumbs } from "@ordo-pink/react-utils"
 import { EditorState, EditorThemeClasses } from "lexical"
 import { mergeDeepWith } from "ramda"
+import { useEffect, useState, memo } from "react"
+import { useTranslation } from "react-i18next"
 import { LoadEditorStatePlugin } from "./load-state"
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -36,18 +37,18 @@ const toNodeArray = (tree: any) =>
 
 const theme: EditorThemeClasses = {
   heading: {
-    h1: "font-extrabold text-5xl my-2",
-    h2: "font-extrabold text-4xl my-2",
-    h3: "font-extrabold text-3xl my-2",
-    h4: "font-extrabold text-2xl my-2",
-    h5: "font-extrabold text-xl my-2",
+    h1: "font-extrabold text-5xl",
+    h2: "font-extrabold text-4xl",
+    h3: "font-extrabold text-3xl",
+    h4: "font-extrabold text-2xl",
+    h5: "font-extrabold text-xl",
   },
   list: {
-    ul: "list-inside list-disc my-2",
-    ol: "list-inside list-decimal my-2",
+    ul: "list-inside list-disc",
+    ol: "list-inside list-decimal",
   },
   link: "text-sky-700 visited:text-purple-700",
-  paragraph: "my-2",
+  // paragraph: "",
   hashtag: "text-pink-600 dark:text-pink-400",
   text: {
     strikethrough: "line-through",
@@ -57,7 +58,7 @@ const theme: EditorThemeClasses = {
     italic: "italic",
   },
   quote:
-    "border-l border-b border-slate-400 dark:border-slate-600 p-4 max-w-xl my-2 text-sm rounded-bl-lg",
+    "border-l border-b border-slate-400 dark:border-slate-600 p-4 max-w-xl text-sm rounded-bl-lg",
   code: "block px-6 py-4 bg-stone-100 dark:bg-stone-800 max-w-xl my-8 shadow-lg rounded-lg",
   codeHighlight: {
     atrule: "text-neutral-500",
@@ -113,6 +114,23 @@ type Props = {
   file: IOrdoFile
 }
 
+const Placeholder = () => {
+  const [editor] = useLexicalComposerContext()
+  const { t } = useTranslation("editor")
+
+  const tPlaceholder = t("placeholder")
+
+  return (
+    <div
+      style={{ marginTop: "-1.5rem" }}
+      className=" text-neutral-500"
+      onClick={() => editor && editor.focus()}
+    >
+      {tPlaceholder}
+    </div>
+  )
+}
+
 export default memo(
   function MdEditor({ file }: Props) {
     // const { nodes, plugins, transformers } = useAppSelector((state) => state.app.editor)
@@ -121,7 +139,7 @@ export default memo(
 
     // Prevent from updating the file at the moment it is opened
     useEffect(() => {
-      setTimeout(() => setIsInitialLoad(false), 500)
+      setTimeout(() => setIsInitialLoad(false), 1000)
 
       return () => {
         setIsInitialLoad(true)
@@ -132,6 +150,7 @@ export default memo(
       if (isInitialLoad) return
 
       state.read(() => {
+        // const content = $convertToMarkdownString(TRANSFORMERS)
         // const content = $convertToMarkdownString(transformers.concat(TRANSFORMERS))
 
         const ordoFile = OrdoFile.empty(file.path)
@@ -162,7 +181,8 @@ export default memo(
     const onError = console.error
 
     return (
-      <div className="p-4 w-full h-full">
+      // <div className="p-4 w-full h-full">
+      <div className="py-2 pl-2">
         <LexicalComposer
           initialConfig={{
             namespace: "md-editor-root",
@@ -172,56 +192,57 @@ export default memo(
             nodes: initialNodes,
           }}
         >
-          <div className="mb-8">
-            {/* <PathBreadcrumbs path={breadcrumbsPath} /> */}
+          {/* <div className="mb-8"> */}
+          {/* <PathBreadcrumbs path={breadcrumbsPath} /> */}
 
-            <h1 className="text-3xl font-black">{file.readableName}</h1>
-          </div>
+          {/* <h1 className="text-3xl font-black">{file.readableName}</h1> */}
+          {/* </div> */}
 
-          <div className="w-full h-screen flex flex-col items-center">
-            <div className="w-full py-8 px-4">
-              {/* <OrdoDatePlugin /> */}
+          {/* <div className="w-full h-screen flex flex-col items-center"> */}
+          {/* <div className="w-full py-8 px-4"> */}
+          {/* <OrdoDatePlugin /> */}
 
-              {/* <MarkdownShortcutPlugin transformers={transformers.concat(TRANSFORMERS)} /> */}
-              <MarkdownShortcutPlugin transformers={TRANSFORMERS} />
+          {/* <MarkdownShortcutPlugin transformers={transformers.concat(TRANSFORMERS)} /> */}
+          <MarkdownShortcutPlugin transformers={TRANSFORMERS} />
 
-              <LinkPlugin />
-              <ListPlugin />
-              <CheckListPlugin />
+          <LinkPlugin />
+          <ListPlugin />
+          <CheckListPlugin />
 
-              <HashtagPlugin />
-              <HistoryPlugin />
-              <HorizontalRulePlugin />
+          <HashtagPlugin />
+          <HistoryPlugin />
+          <HorizontalRulePlugin />
 
-              <CheckListPlugin />
+          <CheckListPlugin />
 
-              <RichTextPlugin
-                contentEditable={
-                  <ContentEditable
-                    className="h-full pb-12"
-                    spellCheck={false}
-                  />
-                }
-                placeholder={<div>...</div>}
-                ErrorBoundary={LexicalErrorBoundary}
+          <RichTextPlugin
+            contentEditable={
+              <ContentEditable
+                title="Editor"
+                spellCheck={false}
               />
+            }
+            placeholder={<Placeholder />}
+            ErrorBoundary={LexicalErrorBoundary}
+          />
 
-              <LoadEditorStatePlugin
-                file={file}
-                transformers={TRANSFORMERS}
-                // transformers={transformers.concat(TRANSFORMERS)}
-              />
-              <OnChangePlugin
-                ignoreSelectionChange
-                onChange={handleChange}
-              />
+          <LoadEditorStatePlugin
+            file={file}
+            transformers={TRANSFORMERS}
+            // transformers={transformers.concat(TRANSFORMERS)}
+          />
+          <OnChangePlugin
+            ignoreSelectionChange
+            onChange={handleChange}
+          />
 
-              {/* {plugins.map((Plugin, index) => (
+          {/* {plugins.map((Plugin, index) => (
                 <Plugin key={index} />
               ))} */}
-            </div>
-          </div>
+          {/* </div> */}
+          {/* </div> */}
         </LexicalComposer>
+        {/* </div> */}
       </div>
     )
   },

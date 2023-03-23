@@ -99,7 +99,7 @@ export default function WorkspaceWithSidebar({
         <div
           className={
             snapRight
-              ? "opacity-0 transition-opacity duration-300"
+              ? "opacity-50 transition-opacity duration-300"
               : "opacity-100 transition-opacity duration-300"
           }
         >

@@ -6,13 +6,12 @@ export const isPayloadCommand = (cmd: Command): cmd is PayloadCommand =>
   typeof cmd.type === "string" && (cmd as PayloadCommand).payload !== undefined
 
 const addActivity$ = new Subject<Activity>()
-const removeActivity$ = new Subject<Activity>()
+const removeActivity$ = new Subject<string>()
 const clearActivities$ = new Subject<null>()
 
 const add = (newActivity: Activity) => (state: Activity[]) => [...state, newActivity]
 
-const remove = (activity: Activity) => (state: Activity[]) =>
-  state.filter((a) => a.name === activity.name)
+const remove = (activity: string) => (state: Activity[]) => state.filter((a) => a.name === activity)
 
 const clear = () => () => [] as Activity[]
 
@@ -31,12 +30,16 @@ export const _initActivities = callOnce(() => {
   return activities$
 })
 
-export const registerActivity = (activity: Activity) => {
-  addActivity$.next(activity)
-}
+export const registerActivity =
+  (extensionName: string) => (name: string, activity: Omit<Activity, "name">) => {
+    addActivity$.next({
+      ...activity,
+      name: `${extensionName}.${name}`,
+    })
+  }
 
-export const unregisterActivity = (activity: Activity) => {
-  removeActivity$.next(activity)
+export const unregisterActivity = (extensionName: string) => (name: string) => {
+  removeActivity$.next(`${extensionName}.${name}`)
 }
 
 export const clearActivities = () => {

@@ -24,6 +24,8 @@ export const LoadEditorStatePlugin = ({ file, transformers }: Props) => {
         editor.update(() => {
           $convertFromMarkdownString(payload, transformers)
         })
+
+        editor.focus()
       })
   }, [editor, file, file.path, fsDriver, transformers])
 

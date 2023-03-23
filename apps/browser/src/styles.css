@@ -81,7 +81,14 @@
 }
 
 :root {
-  font-family: "Jost", system-ui;
+  --font-system: system-ui;
+  --font-sans: Jost;
+  --font-mono: Jost; /* TODO: Add JetBrains Mono */
+  --font-serif: Jost; /* TODO: Add ... */
+}
+
+:root {
+  font-family: var(--font-sans), system-ui;
   @apply bg-neutral-50 dark:bg-neutral-700;
 }
 

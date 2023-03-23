@@ -6,14 +6,14 @@ export const isPayloadCommand = (cmd: Command): cmd is PayloadCommand =>
   typeof cmd.type === "string" && (cmd as PayloadCommand).payload !== undefined
 
 const addFileAssociation$ = new Subject<FileAssociation>()
-const removeFileAssociation$ = new Subject<FileAssociation>()
+const removeFileAssociation$ = new Subject<string>()
 const clearFileAssociations$ = new Subject<null>()
 
 const add = (newFileAssociation: FileAssociation) => (state: FileAssociation[]) =>
   [...state, newFileAssociation]
 
-const remove = (FileAssociation: FileAssociation) => (state: FileAssociation[]) =>
-  state.filter((a) => a.name === FileAssociation.name)
+const remove = (fileAssociation: string) => (state: FileAssociation[]) =>
+  state.filter((a) => a.name === fileAssociation)
 
 const clear = () => () => [] as FileAssociation[]
 
@@ -32,14 +32,14 @@ export const _initFileAssociations = callOnce(() => {
   return fileAssociations$
 })
 
-export const registerFileAssociation = (FileAssociation: FileAssociation) => {
-  addFileAssociation$.next(FileAssociation)
-}
+export const registerFileAssociation =
+  (extensionName: string) => (name: string, fileAssociation: Omit<FileAssociation, "name">) => {
+    addFileAssociation$.next({
+      ...fileAssociation,
+      name: `${extensionName}.${name}`,
+    })
+  }
 
-export const unregisterFileAssociation = (FileAssociation: FileAssociation) => {
-  removeFileAssociation$.next(FileAssociation)
-}
-
-export const clearFileAssociations = () => {
-  clearFileAssociations$.next(null)
+export const unregisterFileAssociation = (extensionName: string) => (name: string) => {
+  removeFileAssociation$.next(`${extensionName}.${name}`)
 }

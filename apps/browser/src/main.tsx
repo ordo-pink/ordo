@@ -5,6 +5,7 @@ import { _initAuth } from "@ordo-pink/stream-auth"
 import { executeCommand, _initCommands } from "@ordo-pink/stream-commands"
 import { _initDrives } from "@ordo-pink/stream-drives"
 import { _initExtensions } from "@ordo-pink/stream-extensions"
+import { _initFileAssociations } from "@ordo-pink/stream-file-associations"
 import { _initRouter } from "@ordo-pink/stream-router"
 import { _initI18n } from "@ordo-pink/stream-translations"
 import Keycloak from "keycloak-js"
@@ -164,10 +165,11 @@ _initDrives(user$, getFsDriver)
 
 const router$ = _initRouter()
 const activities$ = _initActivities()
+const fileAssociations$ = _initFileAssociations()
 
 _initI18n()
 
-_initExtensions({ user$, router$, activities$, logger })
+_initExtensions({ user$, router$, activities$, fileAssociations$, logger })
 
 logger.info("Starting the application")
 

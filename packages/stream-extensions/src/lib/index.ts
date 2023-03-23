@@ -5,11 +5,16 @@ import {
   ExtensionCreatorContext,
   ExtensionCreatorScopedContext,
   UserInfo,
+  FileAssociation,
 } from "@ordo-pink/common-types"
 import { callOnce } from "@ordo-pink/fns"
 import { Logger } from "@ordo-pink/logger"
 import { registerActivity, unregisterActivity } from "@ordo-pink/stream-activities"
 import { executeCommand, unregisterCommand, registerCommand } from "@ordo-pink/stream-commands"
+import {
+  registerFileAssociation,
+  unregisterFileAssociation,
+} from "@ordo-pink/stream-file-associations"
 import { route, noMatch } from "@ordo-pink/stream-router"
 import { registerTranslations } from "@ordo-pink/stream-translations"
 import i18next from "i18next"
@@ -41,6 +46,7 @@ type InitExtensionsParams = {
   user$: Observable<UserInfo>
   router$: Router
   activities$: Observable<Activity[]>
+  fileAssociations$: Observable<FileAssociation[]>
 }
 
 export const _initExtensions = callOnce(
@@ -61,6 +67,8 @@ export const _initExtensions = callOnce(
               emit: executeCommand,
             },
             registerTranslations,
+            registerFileAssociation,
+            unregisterFileAssociation,
             registerActivity,
             unregisterActivity,
             logger,

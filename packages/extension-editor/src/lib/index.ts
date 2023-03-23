@@ -1,8 +1,18 @@
-import { CommandContext, OrdoFilePath } from "@ordo-pink/common-types"
+import { CommandContext, FileAssociation, OrdoFilePath } from "@ordo-pink/common-types"
 import { createExtension } from "@ordo-pink/stream-extensions"
 import { lazy } from "react"
+import { Subject } from "rxjs"
 
 import "./editor.css"
+
+export const currentFileAssociation$ = new Subject<FileAssociation>()
+
+const MdFileAssociation: FileAssociation = {
+  name: "editor.md",
+  Component: lazy(() => import("./components/md")),
+  Icon: lazy(() => import("./components/md/icon")),
+  fileExtensions: [".md"],
+}
 
 const EditorActivity = {
   routes: ["/editor", "/editor/:filePath*"],
@@ -12,15 +22,20 @@ const EditorActivity = {
   name: "editor.editor",
 }
 
-export default createExtension("editor", ({ registerActivity, commands, logger }) => {
-  logger.debug('Initialising "editor" extension')
+export default createExtension(
+  "editor",
+  ({ registerActivity, registerFileAssociation, commands, logger }) => {
+    logger.debug('Initialising "editor" extension')
 
-  commands.on("editor.open-file", ({ payload, logger }: CommandContext<OrdoFilePath>) => {
-    logger.debug('"editor.open-file" invoked:', payload)
-    commands.emit("router.navigate", `/editor${payload}`)
-  })
+    commands.on("editor.open-file", ({ payload, logger }: CommandContext<OrdoFilePath>) => {
+      logger.debug('"editor.open-file" invoked:', payload)
+      commands.emit("router.navigate", `/editor${payload}`)
+    })
 
-  registerActivity(EditorActivity)
+    registerActivity(EditorActivity)
 
-  logger.debug('"editor" initialisation complete')
-})
+    registerFileAssociation(MdFileAssociation)
+
+    logger.debug('"editor" initialisation complete')
+  },
+)

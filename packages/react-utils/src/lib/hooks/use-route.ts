@@ -30,7 +30,7 @@ export const useRouteParams = <T extends Record<string, string> = Record<string,
 
     const dynamicParamValue = route.route.slice(route.route.indexOf(route.params[dynamicParam]))
 
-    paramsCopy[dynamicParam] = `/${dynamicParamValue}`
+    paramsCopy[dynamicParam] = `/${decodeURI(dynamicParamValue)}`
 
     setParams(paramsCopy as T)
   }, [route])

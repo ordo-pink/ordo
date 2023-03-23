@@ -1,31 +1,49 @@
-import { Nullable, OrdoFilePath } from "@ordo-pink/common-types"
-import { useFsDriver, useRouteParams, useSubscription } from "@ordo-pink/react-utils"
-import { useEffect, useState } from "react"
-import { Subject } from "rxjs"
+import { IOrdoFile, Nullable, OrdoFilePath } from "@ordo-pink/common-types"
+import { Either } from "@ordo-pink/either"
+import { OrdoDirectory } from "@ordo-pink/fs-entity"
+import {
+  Null,
+  useDrive,
+  useFsDriver,
+  useRouteParams,
+  useSubscription,
+} from "@ordo-pink/react-utils"
+import { fileAssociations$ } from "@ordo-pink/stream-file-associations"
+import { ComponentType, useEffect, useState } from "react"
+import { currentFileAssociation$ } from ".."
 
-const currentFileContent$ = new Subject<Response>()
-
+// TODO: NotSelected component
 export default function Editor() {
   const params = useRouteParams()
   const fsDriver = useFsDriver()
+  const drive = useDrive()
 
-  const [content, setContent] = useState<Nullable<string>>(null)
+  const fileAssociations = useSubscription(fileAssociations$)
 
-  const fileContentRes = useSubscription(currentFileContent$)
+  const [currentFile, setCurrentFile] = useState<Nullable<IOrdoFile>>(null)
 
-  useEffect(() => {
-    if (!params || !fsDriver || !params["filePath*"]) return
-
-    fsDriver.files
-      .getContent(params["filePath*"] as OrdoFilePath)
-      .then((res) => currentFileContent$.next(res))
-  }, [params])
+  // TODO: NotSupported component
+  const [Component, setComponent] = useState<ComponentType<{ file: IOrdoFile }>>(() => () => null)
 
   useEffect(() => {
-    if (!fileContentRes) return
+    // TODO: Remove * from dynamic param
+    if (!params || !fsDriver || !params["filePath*"] || !fileAssociations || !drive) return
 
-    fileContentRes.clone().text().then(setContent)
-  }, [fileContentRes])
+    const file = OrdoDirectory.findFileDeep(params["filePath*"] as OrdoFilePath, drive.root)
 
-  return <h1>{content}</h1>
+    if (!file) return
+
+    setCurrentFile(file)
+
+    const association = fileAssociations.find((association) =>
+      association.fileExtensions.includes(file.extension),
+    )
+
+    if (association) {
+      currentFileAssociation$.next(association)
+      setComponent(association.Component)
+    }
+  }, [params?.["filePath*"], fileAssociations, drive, fsDriver])
+
+  return Either.fromNullable(currentFile).fold(Null, (file) => <Component file={file} />)
 }

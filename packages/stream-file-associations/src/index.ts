@@ -1,1 +1,1 @@
-export * from "./lib/stream-file-associations"
+export * from "./lib"

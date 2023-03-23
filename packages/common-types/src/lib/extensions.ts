@@ -1,14 +1,18 @@
 import { Logger } from "@ordo-pink/logger"
 import { ComponentType } from "react"
 import { ExecuteCommandFn, RegisterCommandFn } from "./commands"
-import { OrdoFileExtension } from "./fs/ordo-file"
+import { IOrdoFile, OrdoFileExtension } from "./fs/ordo-file"
 import { Route } from "./routing"
 import { RegisterTranslationsFn } from "./translations"
 import { UnaryFn } from "./types"
 
 export type RegisterActivityFn = UnaryFn<Activity, void>
 
+export type RegisterFileAssociationFn = UnaryFn<FileAssociation, void>
+
 export type UnregisterActivityFn = UnaryFn<Activity, void>
+
+export type UnregisterFileAssociationFn = UnaryFn<FileAssociation, void>
 
 export type ExtensionCreatorScopedContext = {
   commands: {
@@ -19,6 +23,8 @@ export type ExtensionCreatorScopedContext = {
   registerTranslations: ReturnType<RegisterTranslationsFn>
   registerActivity: RegisterActivityFn
   unregisterActivity: UnregisterActivityFn
+  registerFileAssociation: RegisterFileAssociationFn
+  unregisterFileAssociation: UnregisterFileAssociationFn
   translate: (key: string) => string
   logger: Logger
 }
@@ -31,6 +37,8 @@ export type ExtensionCreatorContext = {
   }
   registerActivity: RegisterActivityFn
   unregisterActivity: UnregisterActivityFn
+  registerFileAssociation: RegisterFileAssociationFn
+  unregisterFileAssociation: UnregisterFileAssociationFn
   registerTranslations: RegisterTranslationsFn
   logger: Logger
 }
@@ -55,7 +63,8 @@ export type Activity = {
 }
 
 export type FileAssociation = {
+  name: string
   fileExtensions: OrdoFileExtension[] | "*"
-  Component: ComponentType
+  Component: ComponentType<{ file: IOrdoFile }>
   Icon: ComponentType | Record<OrdoFileExtension, ComponentType>
 }

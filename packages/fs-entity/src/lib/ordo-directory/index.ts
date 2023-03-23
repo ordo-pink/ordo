@@ -184,6 +184,10 @@ export const OrdoDirectory: IOrdoDirectoryStatic = {
   findFileDeep: (path, root) => {
     if (!root) return null
 
+    const directChild = root.children.find((child) => child.path === path)
+
+    if (directChild && OrdoFile.isOrdoFile(directChild)) return directChild
+
     const parent = OrdoFile.findParent(path, root)
 
     const found = parent?.children.find((child) => child.path === path)

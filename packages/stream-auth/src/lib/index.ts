@@ -50,33 +50,38 @@ export const _initAuth = callOnce(
   ({ keycloak, loggedInExtensions, loggedOutExtensions, onChangeLoginStatus }: InitParams) => {
     const newTab = false
 
-    registerCommand("auth.login", (redirectUri = "/") => {
+    registerCommand("auth.login", ({ payload: { redirectUri = "/" }, logger }) => {
+      logger.debug('"auth.login" invoked')
       const url = keycloak.createLoginUrl({ redirectUri })
       executeCommand("router.open-external", { url, newTab })
     })
 
-    registerCommand("auth.register", (redirectUri = "/") => {
+    registerCommand("auth.register", ({ payload: { redirectUri = "/" }, logger }) => {
+      logger.debug('"auth.register" invoked')
       const url = keycloak.createRegisterUrl({ redirectUri })
       executeCommand("router.open-external", { url, newTab })
     })
 
-    registerCommand("auth.logout", (redirectUri = "/") => {
+    registerCommand("auth.logout", ({ payload: { redirectUri = "/" }, logger }) => {
+      logger.debug('"auth.logout" invoked')
       const url = keycloak.createLogoutUrl({ redirectUri })
       executeCommand("router.open-external", { url, newTab })
     })
 
-    keycloak.init({ onLoad: "check-sso" }).then(() => {
-      const { token, tokenParsed } = keycloak
-      const authInfo: AuthInfo =
-        token && tokenParsed
-          ? { isAuthenticated: true, credentials: { token, sub: tokenParsed.sub as string } }
-          : { isAuthenticated: false }
+    keycloak.init({ onLoad: "check-sso" }).then((isAuthenticated) => {
+      if (isAuthenticated) {
+        const { token, tokenParsed } = keycloak
+        const authInfo: AuthInfo =
+          token && tokenParsed
+            ? { isAuthenticated: true, credentials: { token, sub: tokenParsed.sub as string } }
+            : { isAuthenticated: false }
 
-      auth$.next(authInfo)
+        auth$.next(authInfo)
+      }
     })
 
     keycloak.onTokenExpired = () => {
-      keycloak.updateToken(60).then(() => {
+      keycloak.updateToken(300).then(() => {
         const { token, tokenParsed } = keycloak
         const authInfo: AuthInfo =
           token && tokenParsed

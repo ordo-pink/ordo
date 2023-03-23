@@ -1,6 +1,6 @@
 import { NoForbiddenCharacters } from "./common"
-import { OrdoDirectoryPath } from "./ordo-directory"
-import { UnaryFn } from "../types"
+import { IOrdoDirectory, OrdoDirectoryPath } from "./ordo-directory"
+import { Nullable, UnaryFn } from "../types"
 
 /**
  * Files might or might not have a file extension. These are the two possible
@@ -206,4 +206,9 @@ export interface IOrdoFileStatic {
    * @example 0 -> `0B`
    */
   getReadableSize: (size: number) => string
+
+  findParent: <Path extends OrdoFilePath>(
+    path: ValidatedOrdoFilePath<Path>,
+    root: IOrdoDirectory,
+  ) => Nullable<IOrdoDirectory>
 }

@@ -1,4 +1,4 @@
-import { NavigateFn, OpenExternalFn, RouterSetParams } from "@ordo-pink/common-types"
+import { NavigateFn, OpenExternalFn } from "@ordo-pink/common-types"
 import { callOnce } from "@ordo-pink/fns"
 import { registerCommand } from "@ordo-pink/stream-commands"
 import { Router, operators } from "silkrouter"
@@ -21,18 +21,18 @@ export const openExternal: OpenExternalFn = ({ url, newTab = true }) => {
 }
 
 export const _initRouter = callOnce(() => {
-  registerCommand("router.navigate", (params: RouterSetParams) => {
-    if (Array.isArray(params)) return router$.set(...params)
+  registerCommand("router.navigate", ({ payload }) => {
+    if (Array.isArray(payload)) {
+      router$.set(...(payload as [string]))
+      return
+    }
 
-    return router$.set(params)
+    router$.set(payload)
   })
 
-  registerCommand(
-    "router.open-external",
-    ({ url, newTab = true }: { url: string; newTab?: boolean }) => {
-      newTab ? window.open(url, "_blank")?.focus() : (window.location.href = url)
-    },
-  )
+  registerCommand("router.open-external", ({ payload: { url, newTab = true } }) => {
+    newTab ? window.open(url, "_blank")?.focus() : (window.location.href = url)
+  })
 
   return router$
 })

@@ -13,3 +13,27 @@ export const useRoute = () => {
 
   return route
 }
+
+export const useRouteParams = <T extends Record<string, string> = Record<string, string>>() => {
+  const route = useRoute()
+
+  const [params, setParams] = useState<Nullable<T>>(null)
+
+  useEffect(() => {
+    if (!route || !route.params) return
+
+    const dynamicParam = Object.keys(route.params).find((param) => param.endsWith("*"))
+
+    if (!dynamicParam) return setParams(route.params as T)
+
+    const paramsCopy = { ...route.params }
+
+    const dynamicParamValue = route.route.slice(route.route.indexOf(route.params[dynamicParam]))
+
+    paramsCopy[dynamicParam] = `/${dynamicParamValue}`
+
+    setParams(paramsCopy as T)
+  }, [route])
+
+  return params
+}

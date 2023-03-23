@@ -1,5 +1,6 @@
+import { Logger } from "@ordo-pink/logger"
 import { ComponentType } from "react"
-import { ExecuteCommandFn, ListenCommandFn, RegisterCommandFn } from "./commands"
+import { ExecuteCommandFn, RegisterCommandFn } from "./commands"
 import { OrdoFileExtension } from "./fs/ordo-file"
 import { Route } from "./routing"
 import { RegisterTranslationsFn } from "./translations"
@@ -10,22 +11,28 @@ export type RegisterActivityFn = UnaryFn<Activity, void>
 export type UnregisterActivityFn = UnaryFn<Activity, void>
 
 export type ExtensionCreatorScopedContext = {
-  executeCommand: ExecuteCommandFn
-  registerCommand: RegisterCommandFn
+  commands: {
+    on: RegisterCommandFn
+    off: RegisterCommandFn
+    emit: ExecuteCommandFn
+  }
   registerTranslations: ReturnType<RegisterTranslationsFn>
-  listenCommand: ListenCommandFn
   registerActivity: RegisterActivityFn
   unregisterActivity: UnregisterActivityFn
   translate: (key: string) => string
+  logger: Logger
 }
 
 export type ExtensionCreatorContext = {
-  executeCommand: ExecuteCommandFn
-  registerCommand: RegisterCommandFn
-  listenCommand: ListenCommandFn
+  commands: {
+    on: RegisterCommandFn
+    off: RegisterCommandFn
+    emit: ExecuteCommandFn
+  }
   registerActivity: RegisterActivityFn
   unregisterActivity: UnregisterActivityFn
   registerTranslations: RegisterTranslationsFn
+  logger: Logger
 }
 
 export type RenderActivityContext<

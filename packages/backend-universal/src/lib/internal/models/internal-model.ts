@@ -1,6 +1,6 @@
 import { Readable } from "stream"
-import { SystemDirectory } from "@ordo-pink/common-types"
-import { IOrdoDirectoryRaw, IOrdoInternal, OrdoDirectory, OrdoFile } from "@ordo-pink/fs-entity"
+import { IOrdoDirectoryRaw, SystemDirectory } from "@ordo-pink/common-types"
+import { IOrdoInternal, OrdoDirectory, OrdoFile } from "@ordo-pink/fs-entity"
 import { FSDriver, IOrdoDirectoryModel, IOrdoInternalModel, StorageLimits } from "../../types"
 
 type IOrdoInternalModelParams = {

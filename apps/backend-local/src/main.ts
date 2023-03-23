@@ -12,10 +12,10 @@ import morgan from "morgan"
  */
 const root = join(__dirname, "..", "..", "..", "..", "ordo-backend-local-assets")
 
-const PORT = process.env.VITE_BACKEND_LOCAL_PORT
-const TOKEN = process.env.VITE_BACKEND_LOCAL_TOKEN
-const MAX_UPLOAD_SIZE = process.env.VITE_FREE_UPLOAD_SIZE
-const MAX_TOTAL_SIZE = process.env.VITE_FREE_SPACE_LIMIT
+const PORT = process.env.BACKEND_LOCAL_PORT
+const TOKEN = process.env.BACKEND_LOCAL_TOKEN
+const MAX_UPLOAD_SIZE = process.env.FREE_UPLOAD_SIZE
+const MAX_TOTAL_SIZE = process.env.FREE_SPACE_LIMIT
 
 const maxUploadSize = Number(MAX_UPLOAD_SIZE)
 const maxTotalSize = Number(MAX_TOTAL_SIZE)

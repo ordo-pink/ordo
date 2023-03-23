@@ -29,7 +29,7 @@ import "./home-component.css"
 export default function Home() {
   const { t } = useTranslation("home")
 
-  const { execute } = useCommands()
+  const { emit: execute } = useCommands()
 
   const handleGetStarted = () => execute("auth.register", "/")
   const handleLogin = () => execute("auth.login", "/")
@@ -148,19 +148,19 @@ export default function Home() {
   const tRightsReserved = t("all-rights-reserved")
 
   return (
-    <div className="overflow-x-hidden">
+    <div className="overflow-x-hidden text-neutral-800 dark:text-neutral-200 bg-gradient-to-br from-slate-50 via-neutral-100 to-stone-200 dark:from-stone-900 dark:via-neutral-900 dark:to-zinc-900">
       <header className="relative w-screen">
         <img
           className="absolute top-0 left-0 right-0 bottom-0 h-full w-full"
           src={heroBg}
           alt="Gradient"
         />
-        <div className="absolute top-0 left-0 right-0 bottom-0 h-full bg-neutral-200 opacity-10 dark:opacity-80" />
+        <div className="absolute top-0 left-0 right-0 bottom-0 h-full bg-neutral-200 opacity-10 dark:bg-neutral-900 dark:opacity-80" />
 
         <div className="relative isolate px-6 pt-14 lg:px-8">
           <div className="mx-auto max-w-2xl py-32 sm:py-48 lg:py-42">
             <div className="hidden sm:mb-8 sm:flex sm:justify-center">
-              <div className="relative rounded-full py-1 px-3 text-sm leading-6 text-neutral-600 ring-1 ring-neutral-900/10 hover:ring-neutral-900/20 transition-all duration-300">
+              <div className="relative rounded-full py-1 px-3 text-sm leading-6 ring-1 dark:ring-neutral-200/20 ring-neutral-900/10 dark:hover:ring-neutral-200/40 hover:ring-neutral-900/20 transition-all duration-300">
                 {tHeadlineNews}{" "}
                 <a
                   href="#"
@@ -172,15 +172,13 @@ export default function Home() {
               </div>
             </div>
             <div className="text-center">
-              <h1 className="text-5xl px-8 font-bold md:font-black text-neutral-900 md:text-7xl">
+              <h1 className="text-5xl px-8 font-bold md:font-black md:text-7xl">
                 <span>{tSlogan} </span>
                 <span className="bg-gradient-to-tr from-purple-700 via-pink-700 to-violet-700 text-transparent bg-clip-text drop-shadow-md ">
                   {tTitle}
                 </span>
               </h1>
-              <p className="mt-6 font-semibold text-lg leading-8 text-neutral-800">
-                {tDescription}
-              </p>
+              <p className="mt-6 font-semibold text-lg leading-8">{tDescription}</p>
               <div className="mt-10 flex items-center justify-center gap-x-6">
                 <OrdoButtonPrimary
                   className="uppercase text-lg md:text-base font-semibold"
@@ -209,10 +207,12 @@ export default function Home() {
         <div className="mx-auto max-w-7xl px-6 lg:px-8">
           <div className="mx-auto max-w-2xl lg:text-center">
             <h2 className="text-base font-semibold leading-7 text-rose-700">{tKeyPrinciples}</h2>
-            <p className="mt-2 text-3xl font-bold tracking-tight text-neutral-900 sm:text-4xl">
+            <p className="mt-2 text-3xl font-bold tracking-tight sm:text-4xl">
               {tKeyPrinciplesExtended}
             </p>
-            <p className="mt-6 text-lg leading-8 text-neutral-600">{tKeyPrinciplesDescription}</p>
+            <p className="mt-6 text-lg leading-8 text-neutral-600 dark:text-neutral-400">
+              {tKeyPrinciplesDescription}
+            </p>
           </div>
           <div className="mx-auto mt-16 max-w-2xl sm:mt-20 lg:mt-24 lg:max-w-4xl">
             <dl className="grid max-w-xl grid-cols-1 gap-y-10 gap-x-8 lg:max-w-none lg:grid-cols-2 lg:gap-y-16">
@@ -235,11 +235,13 @@ export default function Home() {
             <div className="lg:pr-8 lg:pt-4">
               <div className="lg:max-w-lg">
                 <h2 className="text-base font-semibold leading-7 text-orange-700">{tFeatures}</h2>
-                <p className="mt-2 text-3xl font-bold tracking-tight text-neutral-900 sm:text-4xl">
+                <p className="mt-2 text-3xl font-bold tracking-tight sm:text-4xl">
                   {tFeaturesExtended}
                 </p>
-                <p className="mt-6 text-lg leading-8 text-neutral-600">{tFeaturesDescription}</p>
-                <dl className="mt-10 max-w-xl space-y-8 text-base leading-7 text-neutral-600 lg:max-w-none">
+                <p className="mt-6 text-lg leading-8 text-neutral-600 dark:text-neutral-400">
+                  {tFeaturesDescription}
+                </p>
+                <dl className="mt-10 max-w-xl space-y-8 text-base leading-7 text-neutral-600 dark:text-neutral-400 lg:max-w-none">
                   {features.map(({ title, Icon, description }) => (
                     <Feature
                       key={title}
@@ -307,16 +309,16 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="bg-gradient-to-b from-transparent to-emerald-300 py-24">
+      <section className="bg-gradient-to-b from-transparent to-emerald-300 dark:to-emerald-700 py-24">
         <div className="mx-auto max-w-7xl px-6 lg:px-8">
           <div className="mx-auto max-w-2xl sm:text-center">
-            <h2 className="text-3xl font-bold tracking-tight text-neutral-900 sm:text-4xl">
-              {tPricing}
-            </h2>
-            <p className="mt-6 text-lg leading-8 text-neutral-600">{tPricingDescription}</p>
+            <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">{tPricing}</h2>
+            <p className="mt-6 text-lg leading-8 text-neutral-600 dark:text-neutral-400">
+              {tPricingDescription}
+            </p>
           </div>
 
-          <div className="mx-auto bg-white shadow-lg mt-16 max-w-2xl rounded-3xl ring-1 ring-green-300 sm:mt-20 lg:mx-0 lg:flex lg:max-w-none">
+          <div className="mx-auto shadow-lg mt-16 max-w-2xl rounded-3xl ring-1 ring-green-300 dark:ring-green-800 bg-neutral-50 dark:bg-neutral-900 sm:mt-20 lg:mx-0 lg:flex lg:max-w-none">
             <PricingPlan
               features={includedFeatures}
               title="free"
@@ -325,7 +327,7 @@ export default function Home() {
             />
           </div>
 
-          <div className="mx-auto bg-white shadow-lg mt-16 max-w-2xl rounded-3xl ring-1 ring-green-300 sm:mt-20 lg:mx-0 lg:flex lg:max-w-none">
+          <div className="mx-auto shadow-lg mt-16 max-w-2xl rounded-3xl ring-1 ring-green-300 dark:ring-green-800 bg-neutral-50 dark:bg-neutral-900 sm:mt-20 lg:mx-0 lg:flex lg:max-w-none">
             <PricingPlan
               features={includedFeatures}
               title="pro"
@@ -365,10 +367,10 @@ export default function Home() {
       <section className="py-32 pt-40">
         <div className="mx-auto grid max-w-7xl gap-y-20 gap-x-8 px-6 lg:px-8 xl:grid-cols-3">
           <div className="max-w-2xl">
-            <h2 className="text-3xl font-bold tracking-tight text-neutral-900 sm:text-4xl">
-              {tTeam}
-            </h2>
-            <p className="mt-6 text-lg leading-8 text-neutral-600">{tTeamDescription}</p>
+            <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">{tTeam}</h2>
+            <p className="mt-6 text-lg leading-8 text-neutral-600 dark:text-neutral-400">
+              {tTeamDescription}
+            </p>
           </div>
           <ul
             role="list"
@@ -383,7 +385,7 @@ export default function Home() {
                     alt=""
                   />
                   <div>
-                    <h3 className="text-base font-semibold leading-7 tracking-tight text-neutral-900">
+                    <h3 className="text-base font-semibold leading-7 tracking-tight">
                       {person.name}
                     </h3>
                     <p className="text-sm font-semibold leading-6 text-cyan-600">{person.role}</p>

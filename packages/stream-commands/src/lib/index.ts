@@ -2,16 +2,17 @@ import {
   Command,
   CommandListener,
   ExecuteCommandFn,
-  ListenCommandFn,
-  Nullable,
   PayloadCommand,
   RegisterCommandFn,
-  ThunkFn,
-  UnaryFn,
 } from "@ordo-pink/common-types"
 import { callOnce } from "@ordo-pink/fns"
+import { Logger } from "@ordo-pink/logger"
 import { equals } from "ramda"
 import { combineLatestWith, map, merge, scan, shareReplay, Subject } from "rxjs"
+
+type InitCommandsParams = {
+  logger: Logger
+}
 
 export const isPayloadCommand = (cmd: Command): cmd is PayloadCommand =>
   typeof cmd.type === "string" && (cmd as PayloadCommand).payload !== undefined
@@ -19,79 +20,92 @@ export const isPayloadCommand = (cmd: Command): cmd is PayloadCommand =>
 const addToQueue$ = new Subject<Command | PayloadCommand>()
 const removeFromQueue$ = new Subject<Command | PayloadCommand>()
 
-const add = (newCommand: Command | PayloadCommand) => (state: (Command | PayloadCommand)[]) =>
-  [...state, newCommand]
+const addToStorage$ = new Subject<CommandListener>()
+const removeFromStorage$ = new Subject<CommandListener>()
 
-const remove = (command: Command | PayloadCommand) => (state: (Command | PayloadCommand)[]) => {
-  const targetHasPayload = isPayloadCommand(command)
+const addToQueue =
+  (newCommand: Command | PayloadCommand) => (state: (Command | PayloadCommand)[]) =>
+    [...state, newCommand]
 
-  return state.filter((cmd) => {
-    const currentHasPayload = isPayloadCommand(cmd)
+const removeFromQueue =
+  (command: Command | PayloadCommand) => (state: (Command | PayloadCommand)[]) => {
+    const targetHasPayload = isPayloadCommand(command)
 
-    const bothHaveNoPayload = !targetHasPayload && !currentHasPayload
-    const bothHavePayload = targetHasPayload && currentHasPayload
+    return state.filter((cmd) => {
+      const currentHasPayload = isPayloadCommand(cmd)
 
-    const typesMatch = command.type === cmd.type
+      const bothHaveNoPayload = !targetHasPayload && !currentHasPayload
+      const bothHavePayload = targetHasPayload && currentHasPayload
 
-    return !(
-      typesMatch &&
-      (bothHaveNoPayload || (bothHavePayload && equals(command.payload, cmd.payload)))
-    )
-  })
-}
+      const typesMatch = command.type === cmd.type
 
-const commandQueue$ = merge(addToQueue$.pipe(map(add)), removeFromQueue$.pipe(map(remove))).pipe(
+      return !(
+        typesMatch &&
+        (bothHaveNoPayload || (bothHavePayload && equals(command.payload, cmd.payload)))
+      )
+    })
+  }
+
+const addToStorage =
+  (newListener: CommandListener) => (state: Record<string, CommandListener[1][]>) => {
+    const listeners = state[newListener[0]]
+
+    if (!listeners) {
+      state[newListener[0]] = [newListener[1]]
+    } else {
+      state[newListener[0]].push(newListener[1])
+    }
+
+    return state
+  }
+
+const removeFromStorage =
+  (listener: CommandListener) => (state: Record<string, CommandListener[1][]>) => {
+    if (!state[listener[0]]) return state
+
+    state[listener[0]] = state[listener[0]].filter((f) => f.toString() !== listener[1].toString())
+
+    return state
+  }
+
+const commandQueue$ = merge(
+  addToQueue$.pipe(map(addToQueue)),
+  removeFromQueue$.pipe(map(removeFromQueue)),
+).pipe(
   scan((acc, f) => f(acc), [] as (Command | PayloadCommand)[]),
   shareReplay(1),
 )
 
-const commandStorage$ = new Subject<CommandListener>()
-
-const commandRunner$ = commandQueue$.pipe(
-  combineLatestWith(
-    commandStorage$.pipe(
-      scan(
-        (acc, v) => (acc.some((c) => c[0] === v[0]) ? acc : acc.concat([v])),
-        [] as CommandListener[],
-      ),
-      map((listeners) => {
-        const cleanListeners = [] as CommandListener[]
-
-        listeners.forEach((listener) => {
-          if (!cleanListeners.some((l) => l[0] === listener[0])) {
-            cleanListeners.push(listener)
-          }
-        })
-
-        return cleanListeners
-      }),
-      shareReplay(1),
-    ),
-  ),
-  map(([commands, listeners]): Nullable<Command | PayloadCommand> => {
-    let lastCommand: Nullable<Command | PayloadCommand> = null
-
-    commands.forEach((command) => {
-      const { type, payload } = command as PayloadCommand
-
-      const commandListener = listeners.find(
-        (listener) => listener && listener[0] === type,
-      ) as CommandListener<string, unknown>
-
-      if (commandListener) {
-        removeFromQueue$.next({ type, payload })
-        const listener = commandListener[1]
-        lastCommand = command
-        listener(payload)
-      }
-    })
-
-    return lastCommand
-  }),
+const commandStorage$ = merge(
+  addToStorage$.pipe(map(addToStorage)),
+  removeFromStorage$.pipe(map(removeFromStorage)),
+).pipe(
+  scan((acc, f) => f(acc), {} as Record<string, CommandListener[1][]>),
+  shareReplay(1),
 )
 
-export const _initCommands = callOnce(() => {
-  commandRunner$.subscribe()
+const commandRunner$ = (ctx: InitCommandsParams) =>
+  commandQueue$.pipe(
+    combineLatestWith(commandStorage$),
+    map(([commands, allListeners]) => {
+      commands.forEach((command) => {
+        const { type, payload } = command as PayloadCommand
+
+        const listeners = allListeners[type]
+
+        if (listeners) {
+          removeFromQueue$.next({ type, payload })
+
+          listeners.forEach((listener) => {
+            listener({ ...ctx, payload })
+          })
+        }
+      })
+    }),
+  )
+
+export const _initCommands = callOnce((ctx: InitCommandsParams) => {
+  commandRunner$(ctx).subscribe()
 })
 
 export const executeCommand: ExecuteCommandFn = <Type extends string, Payload>(
@@ -101,28 +115,20 @@ export const executeCommand: ExecuteCommandFn = <Type extends string, Payload>(
   addToQueue$.next({ type, payload })
 }
 
-export const registerCommand: RegisterCommandFn = <Payload, Type extends string = string>(
-  type: Type,
-  listener: Payload extends void
-    ? ThunkFn<void | Promise<void>>
-    : UnaryFn<Payload, void | Promise<void>>,
-) => {
-  const command = [type, listener as ThunkFn<void>] as [Type, Payload]
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const registerCommand: RegisterCommandFn = (type, listener): any => {
+  const command = [type, listener]
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  commandStorage$.next(command as any)
+  addToStorage$.next(command as any)
 
   return command
 }
 
-export const listenCommand: ListenCommandFn = <Payload, Type extends string = string>(
-  type: Type,
-  listener: Payload extends void
-    ? ThunkFn<void | Promise<void>>
-    : UnaryFn<Payload, void | Promise<void>>,
-) => {
-  commandRunner$.subscribe((lastCommand) => {
-    if (lastCommand && type === lastCommand.type) {
-      listener((lastCommand as PayloadCommand).payload as Payload)
-    }
-  })
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const unregisterCommand: RegisterCommandFn = (type, listener): any => {
+  const command = [type, listener]
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  removeFromStorage$.next(command as any)
+
+  return command
 }

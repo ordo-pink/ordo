@@ -1,5 +1,4 @@
-import { SuccessResponse, ExceptionResponse } from "@ordo-pink/common-types"
-import { IOrdoFileRaw } from "@ordo-pink/fs-entity"
+import { SuccessResponse, ExceptionResponse, IOrdoFileRaw } from "@ordo-pink/common-types"
 import { Switch } from "@ordo-pink/switch"
 import { FsRequestHandler, OrdoFilePathParams } from "../../../types"
 import { PATH_PARAM, USER_ID_PARAM } from "../../constants"

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /**
  * Logger type with methods in accordance with RFC5424
  *
@@ -10,7 +11,7 @@ export type Logger = {
    * Setting verbose to true will only log the message if verbose mode is
    * enabled.
    */
-  panic: <T>(message: T) => void
+  panic: <T extends any[]>(...message: T) => void
 
   /**
    * Severity Level 1: Alert: action must be taken immediately.
@@ -18,7 +19,7 @@ export type Logger = {
    * Setting verbose to true will only log the message if verbose mode is
    * enabled.
    */
-  alert: <T>(message: T) => void
+  alert: <T extends any[]>(...message: T) => void
 
   /**
    * Severity Level 2: Critical: critical conditions.
@@ -26,7 +27,7 @@ export type Logger = {
    * Setting verbose to true will only log the message if verbose mode is
    * enabled.
    */
-  critical: <T>(message: T) => void
+  critical: <T extends any[]>(...message: T) => void
 
   /**
    * Severity Level 3: Error: error conditions.
@@ -34,7 +35,7 @@ export type Logger = {
    * Setting verbose to true will only log the message if verbose mode is
    * enabled.
    */
-  error: <T>(message: T) => void
+  error: <T extends any[]>(...message: T) => void
 
   /**
    * Severity Level 4: Warning: warning conditions.
@@ -42,29 +43,20 @@ export type Logger = {
    * Setting verbose to true will only log the message if verbose mode is
    * enabled.
    */
-  warn: <T>(message: T) => void
+  warn: <T extends any[]>(...message: T) => void
 
   /**
    * Severity level 5: Notice: normal but significant condition.
-   *
-   * Setting verbose to true will only log the message if verbose mode is
-   * enabled.
    */
-  notice: <T>(message: T, verbose?: boolean) => void
+  notice: <T extends any[]>(...message: T) => void
 
   /**
    * Severity level 6: Informational: informational messages.
-   *
-   * Setting verbose to true will only log the message if verbose mode is
-   * enabled.
    */
-  info: <T>(message: T, verbose?: boolean) => void
+  info: <T extends any[]>(...message: T) => void
 
   /**
    * Severity level 7: Debug: debug-level messages.
-   *
-   * Setting verbose to true will only log the message if verbose mode is
-   * enabled.
    */
-  debug: <T>(message: T, verbose?: boolean) => void
+  debug: <T extends any[]>(...message: T) => void
 }

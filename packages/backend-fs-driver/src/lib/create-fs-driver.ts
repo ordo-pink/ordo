@@ -2,7 +2,7 @@ import { createReadStream, createWriteStream, promises } from "fs"
 import { join } from "path"
 import { promiseWriteStream } from "@ordo-pink/backend-fs-utils"
 import { FSDriver } from "@ordo-pink/backend-universal"
-import { OrdoDirectoryPath, OrdoFilePath } from "@ordo-pink/fs-entity"
+import { OrdoDirectoryPath, OrdoFilePath } from "@ordo-pink/common-types"
 
 const toAbsolutePath = (absolute: string) => (path: string) => join(absolute, path)
 

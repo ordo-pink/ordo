@@ -7,8 +7,9 @@ import {
   UserInfo,
 } from "@ordo-pink/common-types"
 import { callOnce } from "@ordo-pink/fns"
+import { Logger } from "@ordo-pink/logger"
 import { registerActivity, unregisterActivity } from "@ordo-pink/stream-activities"
-import { executeCommand, listenCommand, registerCommand } from "@ordo-pink/stream-commands"
+import { executeCommand, unregisterCommand, registerCommand } from "@ordo-pink/stream-commands"
 import { route, noMatch } from "@ordo-pink/stream-router"
 import { registerTranslations } from "@ordo-pink/stream-translations"
 import i18next from "i18next"
@@ -35,8 +36,15 @@ export const createExtension =
 const isFulfilled = <T>(x: PromiseSettledResult<T>): x is PromiseFulfilledResult<T> =>
   x.status === "fulfilled"
 
+type InitExtensionsParams = {
+  logger: Logger
+  user$: Observable<UserInfo>
+  router$: Router
+  activities$: Observable<Activity[]>
+}
+
 export const _initExtensions = callOnce(
-  (user$: Observable<UserInfo>, router$: Router, activities$: Observable<Activity[]>) =>
+  ({ logger, user$, router$, activities$ }: InitExtensionsParams) =>
     user$
       .pipe(
         map(prop("extensions")),
@@ -47,12 +55,15 @@ export const _initExtensions = callOnce(
         map(prop("default")),
         map((f) =>
           f({
-            executeCommand,
-            registerCommand,
+            commands: {
+              on: registerCommand,
+              off: unregisterCommand,
+              emit: executeCommand,
+            },
             registerTranslations,
-            listenCommand,
             registerActivity,
             unregisterActivity,
+            logger,
           }),
         ),
         switchMap(() => activities$),

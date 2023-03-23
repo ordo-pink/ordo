@@ -1,4 +1,5 @@
-import type { BinaryFn, ThunkFn, UnaryFn } from "./types"
+import { Logger } from "@ordo-pink/logger"
+import type { BinaryFn, UnaryFn } from "./types"
 
 export type Command<Type extends string = string> = {
   type: Type
@@ -9,28 +10,30 @@ export type PayloadCommand<Type extends string = string, Payload = unknown> = {
   payload: Payload
 }
 
-export type CommandListener<Type extends string = string, Payload = unknown> = [
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type CommandContext<Payload = any> = {
+  logger: Logger
+  payload: Payload
+}
+
+export type CommandHandler<Payload> = UnaryFn<CommandContext<Payload>, void | Promise<void>>
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type CommandListener<Type extends string = string, Payload = any> = [
   Type,
-  Payload extends void ? ThunkFn<void | Promise<void>> : UnaryFn<Payload, void | Promise<void>>,
+  CommandHandler<Payload>,
 ]
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type RegisterCommandFn<Payload = any, Type extends string = string> = BinaryFn<
   Type,
-  Payload extends void ? ThunkFn<void> : UnaryFn<Payload, void>,
-  [Type, Payload extends void ? ThunkFn<void> : UnaryFn<Payload, void>]
+  CommandHandler<Payload>,
+  CommandHandler<Payload>
 >
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type ExecuteCommandFn<Type extends string = string, Payload = any> = BinaryFn<
   Type,
   Payload,
-  void
->
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export type ListenCommandFn<Payload = any, Type extends string = string> = BinaryFn<
-  Type,
-  Payload extends void ? ThunkFn<void> : UnaryFn<Payload, void>,
   void
 >

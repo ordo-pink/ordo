@@ -11,7 +11,7 @@ type Props = {
 
 export default function PricingPlan({ features, title, description, price }: Props) {
   const { t } = useTranslation("home")
-  const { execute } = useCommands()
+  const { emit: execute } = useCommands()
 
   const tTitle = t(title)
   const tDescription = t(description)
@@ -27,17 +27,19 @@ export default function PricingPlan({ features, title, description, price }: Pro
   return (
     <>
       <div className="p-8 sm:p-10 lg:flex-auto">
-        <h3 className="text-2xl font-bold tracking-tight text-neutral-900">{tTitle}</h3>
-        <p className="mt-6 text-base leading-7 text-neutral-600">{tDescription}</p>
+        <h3 className="text-2xl font-bold tracking-tight">{tTitle}</h3>
+        <p className="mt-6 text-base leading-7 text-neutral-600 dark:text-neutral-400">
+          {tDescription}
+        </p>
         <div className="mt-10 flex items-center gap-x-4">
           <h4 className="flex-none text-sm font-semibold leading-6 text-indigo-600">
             {tWhatsIncluded}
           </h4>
-          <div className="h-px flex-auto bg-neutral-100" />
+          <div className="h-px flex-auto bg-neutral-100 dark:bg-neutral-800" />
         </div>
         <ul
           role="list"
-          className="mt-8 grid grid-cols-1 gap-4 text-sm leading-6 text-neutral-600 sm:grid-cols-2 sm:gap-6"
+          className="mt-8 grid grid-cols-1 gap-4 text-sm leading-6 text-neutral-600 dark:text-neutral-400 sm:grid-cols-2 sm:gap-6"
         >
           {features.map((feature) => (
             <li
@@ -54,12 +56,14 @@ export default function PricingPlan({ features, title, description, price }: Pro
         </ul>
       </div>
       <div className="-mt-2 p-2 lg:mt-0 lg:w-full lg:max-w-md lg:flex-shrink-0">
-        <div className="rounded-2xl bg-neutral-50 py-10 text-center ring-1 ring-inset ring-neutral-900/5 lg:flex lg:flex-col lg:justify-center lg:py-16">
+        <div className="rounded-2xl bg-neutral-100 dark:bg-neutral-800 py-10 text-center ring-1 ring-inset ring-neutral-900/5 lg:flex lg:flex-col lg:justify-center lg:py-16">
           <div className="mx-auto max-w-xs px-8">
-            <p className="text-base font-semibold text-neutral-600">{tPriceHeader}</p>
+            <p className="text-base font-semibold text-neutral-600 dark:text-neutral-400">
+              {tPriceHeader}
+            </p>
             <p className="mt-6 flex items-baseline justify-center gap-x-2">
-              <span className="text-5xl font-bold tracking-tight text-neutral-900">{tPrice}</span>
-              <span className="text-sm font-semibold leading-6 tracking-wide text-neutral-600">
+              <span className="text-5xl font-bold tracking-tight">{tPrice}</span>
+              <span className="text-sm font-semibold leading-6 tracking-wide text-neutral-600 dark:text-neutral-400">
                 {tCurrency}
               </span>
             </p>
@@ -70,7 +74,9 @@ export default function PricingPlan({ features, title, description, price }: Pro
             >
               {tGetStarted}
             </OrdoButtonPrimary>
-            <p className="mt-6 text-xs leading-5 text-neutral-600">{tPriceFooter}</p>
+            <p className="mt-6 text-xs leading-5 text-neutral-600 dark:text-neutral-400">
+              {tPriceFooter}
+            </p>
           </div>
         </div>
       </div>

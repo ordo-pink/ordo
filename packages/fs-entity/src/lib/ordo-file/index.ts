@@ -7,6 +7,7 @@ import {
   OrdoFileExtension,
 } from "@ordo-pink/common-types"
 import { endsWithSlash, isValidPath } from "../common"
+import { OrdoDirectory } from "../ordo-directory"
 
 const toReadableSize = (a: number, b = 2, k = 1024): string => {
   const d = Math.floor(Math.log(a) / Math.log(k))
@@ -87,6 +88,11 @@ export const OrdoFile: IOrdoFileStatic = {
     }
 
     return toReadableSize(size)
+  },
+  findParent: (path, root) => {
+    const parentPath = OrdoFile.getParentPath(path)
+
+    return OrdoDirectory.findDirectoryDeep(parentPath, root)
   },
 }
 

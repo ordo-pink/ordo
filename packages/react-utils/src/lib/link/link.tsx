@@ -8,7 +8,7 @@ type Props = HTMLProps<HTMLAnchorElement> &
   }>
 
 export const Link = ({ href, children, className }: Props) => {
-  const { execute } = useCommands()
+  const { emit: execute } = useCommands()
 
   const handleClick = (event: MouseEvent) => {
     event.preventDefault()

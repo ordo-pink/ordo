@@ -1,7 +1,7 @@
-import { registerCommand, executeCommand, listenCommand } from "@ordo-pink/stream-commands"
+import { registerCommand, executeCommand, unregisterCommand } from "@ordo-pink/stream-commands"
 
 export const useCommands = () => ({
-  register: registerCommand,
-  execute: executeCommand,
-  on: listenCommand,
+  on: registerCommand,
+  emit: executeCommand,
+  off: unregisterCommand,
 })

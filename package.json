@@ -3,8 +3,8 @@
   "version": "0.0.0",
   "license": "Unlicense",
   "scripts": {
-    "start": "cross-env VITE_BACKEND_LOCAL_PORT=5000 VITE_BACKEND_LOCAL_TOKEN=boop VITE_FREE_SPACE_LIMIT=100000 VITE_FREE_UPLOAD_SIZE=10000 VITE_FRONTEND_PORT=3000 VITE_BACKEND_HOST=http://localhost:5000 VITE_AUTH_HOST=https://sso.ordo.pink VITE_AUTH_REALM=test VITE_AUTH_CLIENT_ID=ordo-web-app nx run-many --target=serve",
-    "start:remote": "cross-env VITE_FREE_SPACE_LIMIT=25 VITE_FREE_UPLOAD_SIZE=2 VITE_FRONTEND_PORT=3000 VITE_BACKEND_HOST=https://api-test.ordo.pink VITE_AUTH_HOST=https://sso.ordo.pink VITE_AUTH_REALM=test VITE_AUTH_CLIENT_ID=ordo-web-app nx run serve --project=web",
+    "start": "cross-env BACKEND_LOCAL_PORT=5000 BACKEND_LOCAL_TOKEN=boop FREE_SPACE_LIMIT=100000 FREE_UPLOAD_SIZE=10000 FRONTEND_PORT=3000 BACKEND_HOST=http://localhost:5000 AUTH_HOST=https://sso.ordo.pink AUTH_REALM=test AUTH_CLIENT_ID=ordo-web-app nx run-many --target=serve",
+    "start:remote": "cross-env FREE_SPACE_LIMIT=25 FREE_UPLOAD_SIZE=2 FRONTEND_PORT=3000 BACKEND_HOST=https://api-test.ordo.pink AUTH_HOST=https://sso.ordo.pink AUTH_REALM=test AUTH_CLIENT_ID=ordo-web-app nx run serve --project=browser",
     "graph": "nx graph",
     "lint": "nx affected --target=lint",
     "lint:all": "nx run-many --target=lint",
@@ -127,6 +127,7 @@
     "express": "^4.18.2",
     "i18next": "^22.4.10",
     "i18next-browser-languagedetector": "^7.0.1",
+    "immer": "^9.0.19",
     "jsonwebtoken": "^9.0.0",
     "keycloak-js": "^20.0.3",
     "lexical": "^0.8.0",

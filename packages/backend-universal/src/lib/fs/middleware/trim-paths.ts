@@ -1,4 +1,4 @@
-import { OrdoDirectoryPath, OrdoFilePath } from "@ordo-pink/fs-entity"
+import { OrdoFilePath, OrdoDirectoryPath } from "@ordo-pink/common-types"
 import { RequestHandler } from "express"
 import {
   OrdoDirectoryPathParams,

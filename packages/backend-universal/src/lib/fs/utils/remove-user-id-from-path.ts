@@ -1,11 +1,10 @@
 import {
   IOrdoDirectoryRaw,
   IOrdoFileRaw,
-  OrdoDirectory,
   OrdoDirectoryPath,
-  OrdoFile,
   OrdoFilePath,
-} from "@ordo-pink/fs-entity"
+} from "@ordo-pink/common-types"
+import { OrdoDirectory, OrdoFile } from "@ordo-pink/fs-entity"
 
 export const removeUserIdFromPath =
   (userId: string) =>

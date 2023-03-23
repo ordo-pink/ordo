@@ -4,6 +4,7 @@ import {
   OrdoFsEntity,
   IOrdoDirectoryStatic,
   OrdoDirectoryPath,
+  IOrdoFile,
 } from "@ordo-pink/common-types"
 import { isValidPath, endsWithSlash } from "../common"
 import { OrdoFile } from "../ordo-file"
@@ -32,6 +33,53 @@ const ordoDirectory = (raw: IOrdoDirectoryRaw): IOrdoDirectory => {
     children,
     path: raw.path,
     metadata: raw.metadata,
+    findDirectory: (path) =>
+      (children.find(
+        (child) => child.path === path && OrdoDirectory.isOrdoDirectory(child),
+      ) as IOrdoDirectory) ?? null,
+    findFile: (path) =>
+      (children.find((child) => child.path === path && OrdoFile.isOrdoFile(child)) as IOrdoFile) ??
+      null,
+    findFileDeep: (path) => {
+      const found = children.find((child) => child.path === path)
+
+      if (!found || OrdoDirectory.isOrdoDirectory(found)) return null
+
+      return found
+    },
+    findDirectoryDeep: (path) => {
+      const found = children.find((child) => child.path === path)
+
+      if (!found || OrdoFile.isOrdoFile(found)) return null
+
+      return found
+    },
+    getFilesDeep: () => {
+      const files = [] as IOrdoFile[]
+
+      for (const item of children) {
+        if (OrdoDirectory.isOrdoDirectory(item)) {
+          files.push(...item.getFilesDeep())
+        } else {
+          files.push(item)
+        }
+      }
+
+      return files
+    },
+    toArray: () => {
+      const items = [] as Array<IOrdoDirectory | IOrdoFile>
+
+      for (const item of children) {
+        if (OrdoDirectory.isOrdoDirectory(item)) {
+          items.push(...item.toArray())
+        }
+
+        items.push(item)
+      }
+
+      return items
+    },
   }
 }
 
@@ -98,5 +146,50 @@ export const OrdoDirectory: IOrdoDirectoryStatic = {
     const lastSeparatorPosition = splittablePath.lastIndexOf("/") + 1
 
     return splittablePath.slice(0, lastSeparatorPosition) as OrdoDirectoryPath
+  },
+  findParent: (path, root) => {
+    if (!OrdoDirectory.isValidPath(path)) {
+      throw new TypeError("Invalid directory path")
+    }
+
+    const parentPath = OrdoDirectory.getParentPath(path as OrdoDirectoryPath)
+
+    const pathChunks = parentPath.split("/").filter(Boolean)
+
+    let parent = root
+
+    for (const chunk of pathChunks) {
+      const found = parent.children.find(
+        (child) => child.path === parent.path.concat(chunk).concat("/"),
+      )
+
+      if (!found || !OrdoDirectory.isOrdoDirectory(found)) return null
+
+      parent = found
+    }
+
+    return parent
+  },
+  findDirectoryDeep: (path, root) => {
+    if (!root) return null
+
+    const parent = OrdoDirectory.findParent(path, root)
+
+    const found = parent?.children.find((child) => child.path === path)
+
+    if (!found || OrdoFile.isOrdoFile(found)) return null
+
+    return found
+  },
+  findFileDeep: (path, root) => {
+    if (!root) return null
+
+    const parent = OrdoFile.findParent(path, root)
+
+    const found = parent?.children.find((child) => child.path === path)
+
+    if (!found || OrdoDirectory.isOrdoDirectory(found)) return null
+
+    return found
   },
 }

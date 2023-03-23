@@ -19,7 +19,9 @@ export function App() {
   useEffect(() => {
     const subscription = activities$.subscribe(setActivities)
 
-    return () => subscription.unsubscribe()
+    return () => {
+      subscription.unsubscribe()
+    }
   }, [])
 
   const Workspace = useWorkspace()

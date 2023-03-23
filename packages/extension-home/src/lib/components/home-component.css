@@ -16,5 +16,5 @@
 }
 
 .custom-shape-divider-top-1679427882 .shape-fill {
-  fill: #6ee7b7;
+  @apply fill-emerald-300 dark:fill-emerald-700;
 }

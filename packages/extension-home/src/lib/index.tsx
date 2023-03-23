@@ -8,13 +8,10 @@ const Component = lazy(() => import("./components/home-component"))
 
 const homeActivity = { routes: ["/"], Component, Icon, name: "home.landing-page" }
 
-export default createExtension(
-  "home",
-  ({ registerTranslations, registerCommand, executeCommand, registerActivity }) => {
-    registerTranslations({ ru, en })
+export default createExtension("home", ({ registerTranslations, commands, registerActivity }) => {
+  registerTranslations({ ru, en })
 
-    registerActivity(homeActivity)
+  registerActivity(homeActivity)
 
-    registerCommand("go-home", () => executeCommand("navigate", "/"))
-  },
-)
+  commands.on("go-home", () => commands.emit("navigate", "/"))
+})

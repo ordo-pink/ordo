@@ -1,7 +1,8 @@
 import { FSDriver, UnaryFn } from "@ordo-pink/common-types"
+import { ConsoleLogger } from "@ordo-pink/logger"
 import { clearActivities, _initActivities } from "@ordo-pink/stream-activities"
 import { _initAuth } from "@ordo-pink/stream-auth"
-import { _initCommands } from "@ordo-pink/stream-commands"
+import { executeCommand, _initCommands } from "@ordo-pink/stream-commands"
 import { _initDrives } from "@ordo-pink/stream-drives"
 import { _initExtensions } from "@ordo-pink/stream-extensions"
 import { _initRouter } from "@ordo-pink/stream-router"
@@ -34,13 +35,25 @@ const realm = SSO_REALM ?? "test"
 const clientId = SSO_CLIENT_ID ?? "ordo-web-app"
 const fsUrl = FS_HOST.endsWith("/") ? FS_HOST.slice(0, -1) : FS_HOST
 
-_initCommands()
+const logger = ConsoleLogger
+
+_initCommands({ logger })
 
 const user$ = _initAuth({
   keycloak: new Keycloak({ url: ssoUrl, realm, clientId }),
   loggedInExtensions,
   loggedOutExtensions,
-  onChangeLoginStatus: () => clearActivities(),
+  onChangeLoginStatus: (authInfo) => {
+    clearActivities()
+
+    if (authInfo?.isAuthenticated && window.location.pathname === "/") {
+      executeCommand("router.navigate", "/editor")
+    }
+
+    if (authInfo && !authInfo.isAuthenticated) {
+      executeCommand("router.navigate", "/")
+    }
+  },
 })
 
 const getFsDriver: UnaryFn<{ token: string; sub: string }, FSDriver> = ({ token, sub }) => ({
@@ -147,14 +160,16 @@ const getFsDriver: UnaryFn<{ token: string; sub: string }, FSDriver> = ({ token,
   },
 })
 
-const drives$ = _initDrives(user$, getFsDriver)
+_initDrives(user$, getFsDriver)
 
 const router$ = _initRouter()
 const activities$ = _initActivities()
 
 _initI18n()
 
-_initExtensions(user$, router$, activities$)
+_initExtensions({ user$, router$, activities$, logger })
+
+logger.info("Starting the application")
 
 const root = ReactDOM.createRoot(document.getElementById("root") as HTMLElement)
 

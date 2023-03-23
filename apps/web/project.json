@@ -21,24 +21,7 @@
         }
       }
     },
-    "serve": {
-      "executor": "@nrwl/vite:dev-server",
-      "defaultConfiguration": "development",
-      "options": {
-        "buildTarget": "web:build",
-        "postcssConfig": "apps/web/postcss.config.cjs"
-      },
-      "configurations": {
-        "development": {
-          "buildTarget": "web:build:development",
-          "hmr": true
-        },
-        "production": {
-          "buildTarget": "web:build:production",
-          "hmr": false
-        }
-      }
-    },
+
     "preview": {
       "executor": "@nrwl/vite:preview-server",
       "defaultConfiguration": "development",

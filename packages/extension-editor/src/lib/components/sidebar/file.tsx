@@ -1,6 +1,6 @@
 import { IOrdoFile } from "@ordo-pink/common-types"
 // import { lazyBox, preventDefault, stopPropagation } from "@ordo-pink/fns"
-import { ActionListItem, useCommands } from "@ordo-pink/react-utils"
+import { ActionListItem, useCommands, useRouteParams } from "@ordo-pink/react-utils"
 // import { MouseEvent } from "react"
 // import { BsFileEarmarkBinary } from "react-icons/bs"
 // import { createSearchParams, useNavigate, useSearchParams } from "react-router-dom"
@@ -14,7 +14,7 @@ type Props = {
 }
 
 export default function File({ file }: Props) {
-  const { emit: execute } = useCommands()
+  const { emit } = useCommands()
   // const dispatch = useAppDispatch()
 
   // const fileAssociations = useAppSelector((state) => state.app.fileAssociationExtensions)
@@ -24,10 +24,12 @@ export default function File({ file }: Props) {
 
   // const { showContextMenu } = useContextMenu()
 
+  const params = useRouteParams()
+
   const depth = file.path.split("/").filter(Boolean).length
 
   const paddingLeft = `${depth * 10}px`
-  // const isCurrent = query.has("path") && query.get("path") === file.path
+  const isCurrent = Boolean(params && params["filePath*"] && params["filePath*"] === file.path)
 
   // const association = fileAssociations.find((assoc) =>
   //   assoc.fileExtensions.includes(file.extension),
@@ -35,7 +37,7 @@ export default function File({ file }: Props) {
 
   // const Icon = association && association.Icon ? association.Icon : BsFileEarmarkBinary
 
-  const handleClick = () => execute("editor.open-file", file.path)
+  const handleClick = () => emit("editor.open-file", file.path)
 
   // const handleContextMenu = lazyBox<MouseEvent>((box) =>
   //   box
@@ -57,8 +59,7 @@ export default function File({ file }: Props) {
         text={name}
         // Icon={Icon}
         Icon={() => null}
-        // isCurrent={isCurrent}
-        isCurrent={false}
+        isCurrent={isCurrent}
         onClick={handleClick}
         // onContextMenu={handleContextMenu}
       />

@@ -13,7 +13,7 @@ import {
 } from "react-icons/ai"
 import { BsChevronDown, BsChevronUp } from "react-icons/bs"
 import DirectoryContent from "./directory-content"
-// import { iconColors } from "../../../../commands/colors/colors"
+import { iconColors } from "../../colors"
 // import { useContextMenu } from "../../../../containers/app/hooks/use-context-menu"
 // import { updateDirectoryMetadata } from "../../../../containers/app/store"
 // import { useAppDispatch } from "../../../../core/state/hooks/use-app-dispatch"
@@ -36,10 +36,8 @@ export default function Directory({ directory }: Props) {
   const OpenIcon = hasChildren ? AiFillFolderOpen : AiOutlineFolderOpen
   const ClosedIcon = hasChildren ? AiFillFolder : AiOutlineFolder
   const Icon = directory.metadata.isExpanded
-    ? // ? () => <OpenIcon className={iconColors[directory.metadata.color] ?? iconColors.neutral} />
-      // : () => <ClosedIcon className={iconColors[directory.metadata.color] ?? iconColors.neutral} />
-      () => <OpenIcon />
-    : () => <ClosedIcon />
+    ? () => <OpenIcon className={iconColors[directory.metadata.color] ?? iconColors["neutral"]} />
+    : () => <ClosedIcon className={iconColors[directory.metadata.color] ?? iconColors["neutral"]} />
 
   const Chevron = directory.metadata.isExpanded ? BsChevronDown : BsChevronUp
 
@@ -62,24 +60,20 @@ export default function Directory({ directory }: Props) {
   // )
 
   return Either.fromNullable(directory).fold(Null, (directory) => (
-    <div className="transition-all duration-300">
-      <div className="">
-        <ActionListItem
-          style={{ paddingLeft }}
-          text={directory.readableName}
-          Icon={Icon}
-          onClick={handleClick}
-          isCurrent={false}
-          // onContextMenu={handleContextMenu}
-        >
-          <Chevron className="shrink-0" />
+    <ActionListItem
+      style={{ paddingLeft }}
+      text={directory.readableName}
+      Icon={Icon}
+      onClick={handleClick}
+      isCurrent={false}
+      // onContextMenu={handleContextMenu}
+    >
+      <Chevron className="shrink-0 text-xs" />
 
-          <DirectoryContent
-            directory={directory}
-            isExpanded={directory.metadata.isExpanded}
-          />
-        </ActionListItem>
-      </div>
-    </div>
+      <DirectoryContent
+        directory={directory}
+        isExpanded={directory.metadata.isExpanded}
+      />
+    </ActionListItem>
   ))
 }

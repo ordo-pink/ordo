@@ -2,6 +2,8 @@ import { CommandContext, OrdoFilePath } from "@ordo-pink/common-types"
 import { createExtension } from "@ordo-pink/stream-extensions"
 import { lazy } from "react"
 
+import "./editor.css"
+
 const EditorActivity = {
   routes: ["/editor", "/editor/:filePath*"],
   Component: lazy(() => import("./components/editor-component")),

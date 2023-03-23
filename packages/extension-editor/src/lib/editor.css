@@ -1,0 +1,24 @@
+.icon-neutral {
+  @apply text-neutral-700 dark:text-neutral-300;
+}
+.icon-pink {
+  @apply text-pink-500;
+}
+.icon-red {
+  @apply text-rose-500;
+}
+.icon-orange {
+  @apply text-orange-500;
+}
+.icon-yellow {
+  @apply text-yellow-500;
+}
+.icon-green {
+  @apply text-emerald-500;
+}
+.icon-blue {
+  @apply text-blue-500;
+}
+.icon-purple {
+  @apply text-violet-500;
+}

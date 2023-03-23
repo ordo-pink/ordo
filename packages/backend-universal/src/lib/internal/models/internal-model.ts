@@ -100,7 +100,7 @@ export const OrdoInternalModel = {
                   .on("end", () => resolve(Buffer.concat(body).toString("utf8")))
               }),
           )
-          .then((content) => JSON.parse(content) as IOrdoInternal)
+          .then((content) => JSON.parse(content || "{}") as IOrdoInternal)
       },
     }
   },

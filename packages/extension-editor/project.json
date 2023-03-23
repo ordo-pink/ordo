@@ -11,6 +11,7 @@
         "outputPath": "dist/packages/extension-editor",
         "main": "packages/extension-editor/src/index.ts",
         "tsConfig": "packages/extension-editor/tsconfig.lib.json",
+        "postcssConfig": "packages/extension-editor/postcss.config.js",
         "assets": []
       }
     },
@@ -26,6 +27,7 @@
       "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
       "options": {
         "jestConfig": "packages/extension-editor/jest.config.ts",
+        "postcssConfig": "packages/extension-editor/postcss.config.js",
         "passWithNoTests": true
       },
       "configurations": {

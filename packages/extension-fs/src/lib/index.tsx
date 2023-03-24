@@ -2,7 +2,7 @@ import { OrdoDirectory } from "@ordo-pink/fs-entity"
 import { useModal } from "@ordo-pink/react-utils"
 import { drive$, fsDriver$ } from "@ordo-pink/stream-drives"
 import { createExtension } from "@ordo-pink/stream-extensions"
-import { BsFileEarmarkPlus } from "react-icons/bs"
+import { BsFileEarmarkPlus, BsFolderPlus } from "react-icons/bs"
 import { createDirectory } from "./commands/directory/create-directory"
 import { listDirectory } from "./commands/directory/list-directory"
 import { moveDirectory } from "./commands/directory/move-directory"
@@ -13,41 +13,79 @@ import { moveFile } from "./commands/files/move-file"
 import { removeFile } from "./commands/files/remove-file"
 import { updateFile } from "./commands/files/update-file"
 
+import CreateDirectoryModal from "./components/create-directory-modal"
 import CreateFileModal from "./components/create-file-modal"
 
-export default createExtension("fs", ({ commands, logger, registerContextMenuItem }) => {
-  logger.debug('Initialising "fs" extension')
+export default createExtension(
+  "fs",
+  ({ commands, logger, registerContextMenuItem, registerTranslations }) => {
+    logger.debug('Initialising "fs" extension')
 
-  commands.on("auth.logout", () => {
-    logger.debug("User is logging out. Removing user data.")
+    registerTranslations({
+      ru: {
+        "show-create-file-modal": "Создать файл",
+        "show-create-directory-modal": "Создать папку",
+        "create-file": "Создать файл",
+        "create-directory": "Создать папку",
+        "choose-name-placeholder": "Выбери название...",
+        "create-button": "Создать",
+        "cancel-button": "Да ну его",
+      },
+      en: {
+        "show-create-file-modal": "Create file",
+        "show-create-directory-modal": "Create directory",
+        "create-file": "Create file",
+        "create-directory": "Create directory",
+        "choose-name-placeholder": "Choose name...",
+        "create-button": "Create",
+        "cancel-button": "Cancel",
+      },
+    })
 
-    drive$.next(null)
-    fsDriver$.next(null)
-  })
+    commands.on("auth.logout", () => {
+      logger.debug("User is logging out. Removing user data.")
 
-  const CREATE_FILE_COMMAND = commands.on("fs.show-create-file-modal", ({ payload }) => {
-    const { showModal } = useModal()
+      drive$.next(null)
+      fsDriver$.next(null)
+    })
 
-    showModal(() => <CreateFileModal parent={payload.parent} />)
-  })
+    const CREATE_FILE_COMMAND = commands.on("show-create-file-modal", ({ payload }) => {
+      const { showModal } = useModal()
 
-  registerContextMenuItem(CREATE_FILE_COMMAND, {
-    Icon: BsFileEarmarkPlus,
-    payloadCreator: (target) => target,
-    shouldShow: (target) => OrdoDirectory.isOrdoDirectory(target),
-    accelerator: "ctrl+n",
-  })
+      showModal(() => <CreateFileModal parent={payload} />)
+    })
 
-  commands.on("fs.list-directory", listDirectory)
-  commands.on("fs.move-directory", moveDirectory)
-  commands.on("fs.create-directory", createDirectory)
-  commands.on("fs.update-directory", updateDirectory)
-  commands.on("fs.remove-directory", removeDirectory)
+    registerContextMenuItem(CREATE_FILE_COMMAND, {
+      Icon: BsFileEarmarkPlus,
+      payloadCreator: (target) => target,
+      shouldShow: (target) => OrdoDirectory.isOrdoDirectory(target),
+      accelerator: "alt+n",
+    })
 
-  commands.on("fs.move-file", moveFile)
-  commands.on("fs.create-file", createFile)
-  commands.on("fs.update-file", updateFile)
-  commands.on("fs.remove-file", removeFile)
+    const CREATE_DIRECTORY_COMMAND = commands.on("show-create-directory-modal", ({ payload }) => {
+      const { showModal } = useModal()
 
-  logger.debug('"fs" initialisation complete')
-})
+      showModal(() => <CreateDirectoryModal parent={payload} />)
+    })
+
+    registerContextMenuItem(CREATE_DIRECTORY_COMMAND, {
+      Icon: BsFolderPlus,
+      payloadCreator: (target) => target,
+      shouldShow: (target) => OrdoDirectory.isOrdoDirectory(target),
+      accelerator: "alt+shift+n",
+    })
+
+    commands.on("list-directory", listDirectory)
+    commands.on("move-directory", moveDirectory)
+    commands.on("create-directory", createDirectory)
+    commands.on("update-directory", updateDirectory)
+    commands.on("remove-directory", removeDirectory)
+
+    commands.on("move-file", moveFile)
+    commands.on("create-file", createFile)
+    commands.on("update-file", updateFile)
+    commands.on("remove-file", removeFile)
+
+    logger.debug('"fs" initialisation complete')
+  },
+)

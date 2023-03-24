@@ -19,7 +19,7 @@ export default function Modal() {
       onClick={hideModal}
     >
       <div
-        className="relative bg-white dark:bg-neutral-700 rounded-lg shadow-lg px-16 py-8"
+        className="relative bg-white dark:bg-neutral-700 rounded-lg shadow-lg"
         onClick={(e) => {
           e.stopPropagation()
         }}

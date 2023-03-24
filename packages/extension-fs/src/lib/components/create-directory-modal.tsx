@@ -1,5 +1,4 @@
 import { IOrdoDirectory } from "@ordo-pink/common-types"
-import { OrdoFile } from "@ordo-pink/fs-entity"
 import {
   OrdoButtonPrimary,
   OrdoButtonSecondary,
@@ -9,34 +8,33 @@ import {
 } from "@ordo-pink/react-utils"
 import { ChangeEvent, useState } from "react"
 import { useTranslation } from "react-i18next"
-import { BsFileEarmarkPlus } from "react-icons/bs"
+import { BsFolderPlus } from "react-icons/bs"
 
 type Props = {
   parent?: IOrdoDirectory
 }
 
-export default function CreateFileModal({ parent }: Props) {
+export default function CreateDirectoryModal({ parent }: Props) {
   const { hideModal } = useModal()
   const { emit } = useCommands()
   const { t } = useTranslation("fs")
 
-  const [fileName, setFileName] = useState("")
+  const [directoryName, setDirectoryName] = useState("")
 
   const handleInputChange = (event: ChangeEvent<HTMLInputElement>) =>
-    setFileName(event.target.value)
+    setDirectoryName(event.target.value)
 
   const handleCreateFile = () => {
     const parentPath = parent ? parent.path : "/"
-    const name = fileName.endsWith(".md") ? fileName.slice(0, -3) : fileName
-    const path = `${parentPath}${name}.md` as const
+    const path = `${parentPath}${directoryName}/` as const
 
-    emit("fs.create-file", { file: OrdoFile.empty(path) })
+    emit("fs.create-directory", path)
 
     hideModal()
   }
 
   const tPlaceholder = t("choose-name-placeholder") as string
-  const tTitle = t("create-file")
+  const tTitle = t("create-directory")
   const tCancel = t("cancel-button")
   const tCreate = t("create-button")
 
@@ -44,7 +42,7 @@ export default function CreateFileModal({ parent }: Props) {
     <div className="w-[30rem] max-w-full flex flex-col gap-8">
       <div className="flex space-x-2 px-8 pt-8 items-start">
         <div className="bg-gradient-to-tr from-slate-400 dark:from-slate-600 to-zinc-400 dark:to-zinc-600 rounded-full text-xl text-neutral-200 p-3 shadow-md">
-          <BsFileEarmarkPlus className="" />
+          <BsFolderPlus className="" />
         </div>
         <div className="grow flex flex-col gap-y-4">
           <h3 className="px-8 pt-1">{tTitle}</h3>
@@ -58,7 +56,7 @@ export default function CreateFileModal({ parent }: Props) {
               autoComplete="off"
               aria-autocomplete="none"
               autoFocus
-              value={fileName}
+              value={directoryName}
               onChange={handleInputChange}
             />
           </div>

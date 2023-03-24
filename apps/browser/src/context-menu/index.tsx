@@ -23,7 +23,7 @@ export default function ContextMenu({ state$ }: Props) {
   return (
     <div
       style={{ top: state?.y ?? -50, left: state?.x ?? -50 }}
-      className={`absolute z-[1000] bg-neutral-500 shadow-lg transition-opacity w-80 duration-300 rounded-lg p-2 ${
+      className={`absolute z-[1000] bg-neutral-200 dark:bg-neutral-500 shadow-lg transition-opacity w-80 duration-300 rounded-lg p-2 ${
         state && state.structure.length ? "opacity-100" : "opacity-0"
       }`}
     >

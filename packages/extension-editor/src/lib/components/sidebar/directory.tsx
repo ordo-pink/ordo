@@ -1,10 +1,8 @@
 import { IOrdoDirectory } from "@ordo-pink/common-types"
 import { Either } from "@ordo-pink/either"
 import { OrdoDirectory } from "@ordo-pink/fs-entity"
-// import { lazyBox, preventDefault, stopPropagation } from "@ordo-pink/fns"
-// import { OrdoDirectory } from "@ordo-pink/fs-entity"
-import { ActionListItem, Null, useCommands } from "@ordo-pink/react-utils"
-// import { MouseEvent } from "react"
+import { ActionListItem, Null, useCommands, useContextMenu } from "@ordo-pink/react-utils"
+import { MouseEvent } from "react"
 import {
   AiFillFolder,
   AiFillFolderOpen,
@@ -14,19 +12,15 @@ import {
 import { BsChevronDown, BsChevronUp } from "react-icons/bs"
 import DirectoryContent from "./directory-content"
 import { iconColors } from "../../colors"
-// import { useContextMenu } from "../../../../containers/app/hooks/use-context-menu"
-// import { updateDirectoryMetadata } from "../../../../containers/app/store"
-// import { useAppDispatch } from "../../../../core/state/hooks/use-app-dispatch"
 
 type Props = {
   directory: IOrdoDirectory<{ isExpanded: boolean; color: string }>
 }
 
 export default function Directory({ directory }: Props) {
-  // const dispatch = useAppDispatch()
+  const { emit } = useCommands()
 
-  // const { showContextMenu } = useContextMenu()
-  const { emit: execute } = useCommands()
+  const { showContextMenu } = useContextMenu()
 
   const depth = directory.path.slice(1, -1).split("/").filter(Boolean).length
 
@@ -42,7 +36,7 @@ export default function Directory({ directory }: Props) {
   const Chevron = directory.metadata.isExpanded ? BsChevronDown : BsChevronUp
 
   const handleClick = () => {
-    execute(
+    emit(
       "fs.update-directory",
       OrdoDirectory.from({
         ...directory,
@@ -51,13 +45,11 @@ export default function Directory({ directory }: Props) {
     )
   }
 
-  // const handleContextMenu = lazyBox<MouseEvent>((box) =>
-  //   box
-  //     .tap(preventDefault)
-  //     .tap(stopPropagation)
-  //     .map(({ pageX, pageY }) => ({ x: pageX, y: pageY }))
-  //     .fold(({ x, y }) => dispatch(showContextMenu({ target: directory, x, y }))),
-  // )
+  const handleContextMenu = (event: MouseEvent) => {
+    event.stopPropagation()
+    event.preventDefault()
+    showContextMenu({ x: event.pageX, y: event.pageY, target: directory })
+  }
 
   return Either.fromNullable(directory).fold(Null, (directory) => (
     <ActionListItem
@@ -66,7 +58,7 @@ export default function Directory({ directory }: Props) {
       Icon={Icon}
       onClick={handleClick}
       isCurrent={false}
-      // onContextMenu={handleContextMenu}
+      onContextMenu={handleContextMenu}
     >
       <Chevron className="shrink-0 text-xs" />
 

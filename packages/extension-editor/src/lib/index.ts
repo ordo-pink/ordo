@@ -9,7 +9,6 @@ import "./editor.css"
 export default createExtension(
   "editor",
   ({
-    logger,
     commands,
     registerActivity,
     registerTranslations,

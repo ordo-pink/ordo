@@ -24,7 +24,7 @@ export default function CreateDirectoryModal({ parent }: Props) {
   const handleInputChange = (event: ChangeEvent<HTMLInputElement>) =>
     setDirectoryName(event.target.value)
 
-  const handleCreateFile = () => {
+  const handleCreateDirectory = () => {
     const parentPath = parent ? parent.path : "/"
     const path = `${parentPath}${directoryName}/` as const
 
@@ -40,12 +40,12 @@ export default function CreateDirectoryModal({ parent }: Props) {
 
   return (
     <div className="w-[30rem] max-w-full flex flex-col gap-8">
-      <div className="flex space-x-2 px-8 pt-8 items-start">
+      <div className="flex space-x-2 px-8 pt-8 items-center">
         <div className="bg-gradient-to-tr from-slate-400 dark:from-slate-600 to-zinc-400 dark:to-zinc-600 rounded-full text-xl text-neutral-200 p-3 shadow-md">
-          <BsFolderPlus className="" />
+          <BsFolderPlus />
         </div>
         <div className="grow flex flex-col gap-y-4">
-          <h3 className="px-8 pt-1">{tTitle}</h3>
+          <h3 className="px-8 text-lg font-bold">{tTitle}</h3>
 
           <div className="pl-8">
             <PathBreadcrumbs path={parent?.path ?? "/"} />
@@ -71,7 +71,7 @@ export default function CreateDirectoryModal({ parent }: Props) {
         </OrdoButtonSecondary>
 
         <OrdoButtonPrimary
-          onClick={handleCreateFile}
+          onClick={handleCreateDirectory}
           hotkey="Enter"
         >
           {tCreate}

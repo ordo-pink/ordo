@@ -50,19 +50,21 @@ export const _initAuth = callOnce(
   ({ keycloak, loggedInExtensions, loggedOutExtensions, onChangeLoginStatus }: InitParams) => {
     const newTab = false
 
-    registerCommand("auth.login", ({ payload: { redirectUri = "/" }, logger }) => {
+    const on = registerCommand("auth")
+
+    on("login", ({ payload: { redirectUri = "/" }, logger }) => {
       logger.debug('"auth.login" invoked')
       const url = keycloak.createLoginUrl({ redirectUri })
       executeCommand("router.open-external", { url, newTab })
     })
 
-    registerCommand("auth.register", ({ payload: { redirectUri = "/" }, logger }) => {
+    on("register", ({ payload: { redirectUri = "/" }, logger }) => {
       logger.debug('"auth.register" invoked')
       const url = keycloak.createRegisterUrl({ redirectUri })
       executeCommand("router.open-external", { url, newTab })
     })
 
-    registerCommand("auth.logout", ({ payload: { redirectUri = "/" }, logger }) => {
+    on("logout", ({ payload: { redirectUri = "/" }, logger }) => {
       logger.debug('"auth.logout" invoked')
       const url = keycloak.createLogoutUrl({ redirectUri })
       executeCommand("router.open-external", { url, newTab })

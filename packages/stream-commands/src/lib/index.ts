@@ -116,19 +116,25 @@ export const executeCommand: ExecuteCommandFn = <Type extends string, Payload>(
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const registerCommand: RegisterCommandFn = (type, listener): any => {
-  const command = [type, listener]
+export const registerCommand: RegisterCommandFn =
+  (extensionName: string) =>
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  addToStorage$.next(command as any)
+  (type, listener): any => {
+    const command = [`${extensionName}.${type}`, listener]
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    addToStorage$.next(command as any)
 
-  return command
-}
+    return command
+  }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const unregisterCommand: RegisterCommandFn = (type, listener): any => {
-  const command = [type, listener]
+export const unregisterCommand: RegisterCommandFn =
+  (extensionName: string) =>
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  removeFromStorage$.next(command as any)
+  (type, listener): any => {
+    const command = [`${extensionName}.${type}`, listener]
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    removeFromStorage$.next(command as any)
 
-  return command
-}
+    return command
+  }

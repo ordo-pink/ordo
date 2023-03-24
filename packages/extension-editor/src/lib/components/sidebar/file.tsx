@@ -49,7 +49,7 @@ export default function File({ file }: Props) {
 
   const Icon = fileAssoc && fileAssoc.Icon ? fileAssoc.Icon : BsFileEarmarkBinary
 
-  const handleClick = () => emit("editor.open-file", file.path)
+  const handleClick = () => emit("editor.open-file-in-editor", file.path)
 
   const handleContextMenu = (event: MouseEvent) => {
     event.preventDefault()

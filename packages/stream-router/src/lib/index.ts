@@ -21,7 +21,9 @@ export const openExternal: OpenExternalFn = ({ url, newTab = true }) => {
 }
 
 export const _initRouter = callOnce(() => {
-  registerCommand("router.navigate", ({ payload }) => {
+  const on = registerCommand("router")
+
+  on("navigate", ({ payload }) => {
     if (Array.isArray(payload)) {
       router$.set(...(payload as [string]))
       return
@@ -30,7 +32,7 @@ export const _initRouter = callOnce(() => {
     router$.set(payload)
   })
 
-  registerCommand("router.open-external", ({ payload: { url, newTab = true } }) => {
+  on("open-external", ({ payload: { url, newTab = true } }) => {
     newTab ? window.open(url, "_blank")?.focus() : (window.location.href = url)
   })
 

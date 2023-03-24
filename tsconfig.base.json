@@ -44,6 +44,7 @@
       "@ordo-pink/stream-editor-plugins": ["packages/stream-editor-plugins/src/index.ts"],
       "@ordo-pink/stream-extensions": ["packages/stream-extensions/src/index.ts"],
       "@ordo-pink/stream-file-associations": ["packages/stream-file-associations/src/index.ts"],
+      "@ordo-pink/stream-modals": ["packages/stream-modals/src/index.ts"],
       "@ordo-pink/stream-router": ["packages/stream-router/src/index.ts"],
       "@ordo-pink/stream-translations": ["packages/stream-translations/src/index.ts"],
       "@ordo-pink/switch": ["packages/switch/src/index.ts"]

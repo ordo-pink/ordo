@@ -24,6 +24,7 @@ import { route, noMatch } from "@ordo-pink/stream-router"
 import { registerTranslations } from "@ordo-pink/stream-translations"
 import i18next from "i18next"
 import { prop } from "ramda"
+import { ComponentType } from "react"
 import { mergeMap, BehaviorSubject, mergeAll, Observable } from "rxjs"
 import { map, filter, switchMap } from "rxjs/operators"
 import { Router } from "silkrouter"
@@ -33,6 +34,11 @@ const scopeExtensionContextTo = (
   ctx: ExtensionCreatorContext,
 ): ExtensionCreatorScopedContext => ({
   ...ctx,
+  commands: {
+    on: ctx.commands.on(name),
+    off: ctx.commands.off(name),
+    emit: ctx.commands.emit,
+  },
   registerActivity: ctx.registerActivity(name),
   unregisterActivity: ctx.unregisterActivity(name),
   registerContextMenuItem: ctx.registerContextMenuItem(name),
@@ -58,6 +64,7 @@ type InitExtensionsParams = {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     Nullable<{ x: number; y: number; target: any; structure: ContextMenuItem[] }>
   >
+  modal$: Observable<Nullable<ComponentType>>
   user$: Observable<UserInfo>
   router$: Router
   activities$: Observable<Activity[]>

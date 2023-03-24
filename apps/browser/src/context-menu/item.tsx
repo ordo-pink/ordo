@@ -19,10 +19,9 @@ export default function ContextMenuItem({ item, state }: Props) {
     <ActionListItem
       key={item.name}
       Icon={item.Icon}
-      isLarge
       isCurrent={false}
       onClick={() => {
-        emit(item.commandName, item.payloadCreator(state.target))
+        emit(item.name, item.payloadCreator(state.target))
         hideContextMenu()
       }}
       text={t(item.commandName)}

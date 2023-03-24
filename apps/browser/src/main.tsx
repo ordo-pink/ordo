@@ -7,6 +7,7 @@ import { hideContextMenu, _initContextMenu } from "@ordo-pink/stream-context-men
 import { _initDrives } from "@ordo-pink/stream-drives"
 import { _initExtensions } from "@ordo-pink/stream-extensions"
 import { _initFileAssociations } from "@ordo-pink/stream-file-associations"
+import { _initModals } from "@ordo-pink/stream-modals"
 import { _initRouter } from "@ordo-pink/stream-router"
 import { _initI18n } from "@ordo-pink/stream-translations"
 import Keycloak from "keycloak-js"
@@ -14,6 +15,7 @@ import { tap } from "ramda"
 import * as ReactDOM from "react-dom/client"
 import App from "./app/app"
 import ContextMenu from "./context-menu"
+import Modal from "./modal"
 
 import "./styles.css"
 
@@ -174,7 +176,9 @@ const contextMenu$ = _initContextMenu()
 
 _initI18n()
 
-_initExtensions({ user$, router$, activities$, fileAssociations$, contextMenu$, logger })
+const modal$ = _initModals()
+
+_initExtensions({ user$, modal$, router$, activities$, fileAssociations$, contextMenu$, logger })
 
 logger.info("Starting the application")
 
@@ -184,5 +188,6 @@ root.render(
   <div onClick={hideContextMenu}>
     <App />
     <ContextMenu state$={contextMenu$} />
+    <Modal />
   </div>,
 )

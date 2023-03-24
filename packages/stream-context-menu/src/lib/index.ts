@@ -77,8 +77,8 @@ export const registerContextMenuItem: RegisterContextMenuItemFn =
     addContextMenuItem$.next({
       ...item,
       extensionName,
-      commandName: command[0],
-      name: `${extensionName}.${command[0]}`,
+      commandName: command[0].replace(`${extensionName}.`, ""),
+      name: command[0],
     })
   }
 

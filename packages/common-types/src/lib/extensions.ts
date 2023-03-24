@@ -34,8 +34,8 @@ export type UnregisterFileAssociationFn = UnaryFn<string, UnaryFn<string, void>>
 
 export type ExtensionCreatorScopedContext = {
   commands: {
-    on: RegisterCommandFn
-    off: RegisterCommandFn
+    on: ReturnType<RegisterCommandFn>
+    off: ReturnType<RegisterCommandFn>
     emit: ExecuteCommandFn
   }
   registerContextMenuItem: ReturnType<RegisterContextMenuItemFn>

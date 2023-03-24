@@ -21,6 +21,8 @@ const addToQueue$ = new Subject<Command | PayloadCommand>()
 const removeFromQueue$ = new Subject<Command | PayloadCommand>()
 
 const addToStorage$ = new Subject<CommandListener>()
+const addToStorageBefore$ = new Subject<CommandListener>()
+const addToStorageAfter$ = new Subject<CommandListener>()
 const removeFromStorage$ = new Subject<CommandListener>()
 
 const addToQueue =
@@ -44,6 +46,32 @@ const removeFromQueue =
         (bothHaveNoPayload || (bothHavePayload && equals(command.payload, cmd.payload)))
       )
     })
+  }
+
+const addToStorageBefore =
+  (newListener: CommandListener) => (state: Record<string, CommandListener[1][]>) => {
+    const listeners = state[newListener[0]]
+
+    if (!listeners) {
+      state[newListener[0]] = [newListener[1]]
+    } else if (!listeners.some((listener) => listener.toString() === newListener[1].toString())) {
+      state[newListener[0]].unshift(newListener[1])
+    }
+
+    return state
+  }
+
+const addToStorageAfter =
+  (newListener: CommandListener) => (state: Record<string, CommandListener[1][]>) => {
+    const listeners = state[newListener[0]]
+
+    if (!listeners) {
+      state[newListener[0]] = [newListener[1]]
+    } else if (!listeners.some((listener) => listener.toString() === newListener[1].toString())) {
+      state[newListener[0]].push(newListener[1])
+    }
+
+    return state
   }
 
 const addToStorage =
@@ -78,6 +106,8 @@ const commandQueue$ = merge(
 
 const commandStorage$ = merge(
   addToStorage$.pipe(map(addToStorage)),
+  addToStorageBefore$.pipe(map(addToStorageBefore)),
+  addToStorageAfter$.pipe(map(addToStorageAfter)),
   removeFromStorage$.pipe(map(removeFromStorage)),
 ).pipe(
   scan((acc, f) => f(acc), {} as Record<string, CommandListener[1][]>),
@@ -96,9 +126,13 @@ const commandRunner$ = (ctx: InitCommandsParams) =>
         if (listeners) {
           removeFromQueue$.next({ type, payload })
 
+          ctx.logger.debug(`Command "${type}" invoked for ${listeners.length} listeners`, payload)
+
           listeners.forEach((listener) => {
             listener({ ...ctx, payload })
           })
+        } else {
+          ctx.logger.notice(`Command "${type}" is not registerred`)
         }
       })
     }),
@@ -123,6 +157,26 @@ export const registerCommand: RegisterCommandFn =
     const command = [`${extensionName}.${type}`, listener]
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     addToStorage$.next(command as any)
+
+    return command
+  }
+
+export const prependListener: ReturnType<RegisterCommandFn> =
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  (type, listener): any => {
+    const command = [type, listener]
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    addToStorageBefore$.next(command as any)
+
+    return command
+  }
+
+export const appendListener: ReturnType<RegisterCommandFn> =
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  (type, listener): any => {
+    const command = [type, listener]
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    addToStorageAfter$.next(command as any)
 
     return command
   }

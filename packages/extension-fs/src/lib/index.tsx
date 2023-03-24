@@ -4,7 +4,6 @@ import { drive$, fsDriver$ } from "@ordo-pink/stream-drives"
 import { createExtension } from "@ordo-pink/stream-extensions"
 import { BsFileEarmarkPlus, BsFolderPlus } from "react-icons/bs"
 import { createDirectory } from "./commands/directory/create-directory"
-import { listDirectory } from "./commands/directory/list-directory"
 import { moveDirectory } from "./commands/directory/move-directory"
 import { removeDirectory } from "./commands/directory/remove-directory"
 import { updateDirectory } from "./commands/directory/update-directory"
@@ -18,9 +17,7 @@ import CreateFileModal from "./components/create-file-modal"
 
 export default createExtension(
   "fs",
-  ({ commands, logger, registerContextMenuItem, registerTranslations }) => {
-    logger.debug('Initialising "fs" extension')
-
+  ({ commands, registerContextMenuItem, registerTranslations }) => {
     registerTranslations({
       ru: {
         "show-create-file-modal": "Создать файл",
@@ -42,9 +39,7 @@ export default createExtension(
       },
     })
 
-    commands.on("auth.logout", () => {
-      logger.debug("User is logging out. Removing user data.")
-
+    commands.before("auth.logout", () => {
       drive$.next(null)
       fsDriver$.next(null)
     })
@@ -75,7 +70,6 @@ export default createExtension(
       accelerator: "alt+shift+n",
     })
 
-    commands.on("list-directory", listDirectory)
     commands.on("move-directory", moveDirectory)
     commands.on("create-directory", createDirectory)
     commands.on("update-directory", updateDirectory)
@@ -85,7 +79,5 @@ export default createExtension(
     commands.on("create-file", createFile)
     commands.on("update-file", updateFile)
     commands.on("remove-file", removeFile)
-
-    logger.debug('"fs" initialisation complete')
   },
 )

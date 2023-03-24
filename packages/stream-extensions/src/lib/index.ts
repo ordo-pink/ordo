@@ -10,7 +10,13 @@ import {
 import { callOnce } from "@ordo-pink/fns"
 import { Logger } from "@ordo-pink/logger"
 import { registerActivity, unregisterActivity } from "@ordo-pink/stream-activities"
-import { executeCommand, unregisterCommand, registerCommand } from "@ordo-pink/stream-commands"
+import {
+  executeCommand,
+  unregisterCommand,
+  registerCommand,
+  prependListener,
+  appendListener,
+} from "@ordo-pink/stream-commands"
 import {
   ContextMenuItem,
   registerContextMenuItem,
@@ -35,6 +41,8 @@ const scopeExtensionContextTo = (
 ): ExtensionCreatorScopedContext => ({
   ...ctx,
   commands: {
+    before: ctx.commands.before,
+    after: ctx.commands.after,
     on: ctx.commands.on(name),
     off: ctx.commands.off(name),
     emit: ctx.commands.emit,
@@ -84,6 +92,8 @@ export const _initExtensions = callOnce(
         map((f) =>
           f({
             commands: {
+              before: prependListener,
+              after: appendListener,
               on: registerCommand,
               off: unregisterCommand,
               emit: executeCommand,

@@ -20,8 +20,8 @@ import Modal from "./modal"
 import "./styles.css"
 
 const loggedInExtensions = [
-  () => import("@ordo-pink/extension-editor"),
   () => import("@ordo-pink/extension-fs"),
+  () => import("@ordo-pink/extension-editor"),
 ]
 const loggedOutExtensions = [() => import("@ordo-pink/extension-home")]
 
@@ -176,7 +176,7 @@ const contextMenu$ = _initContextMenu()
 
 _initI18n()
 
-const modal$ = _initModals()
+const modal$ = _initModals(logger)
 
 _initExtensions({ user$, modal$, router$, activities$, fileAssociations$, contextMenu$, logger })
 

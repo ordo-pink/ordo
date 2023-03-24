@@ -34,6 +34,8 @@ export type UnregisterFileAssociationFn = UnaryFn<string, UnaryFn<string, void>>
 
 export type ExtensionCreatorScopedContext = {
   commands: {
+    before: ReturnType<RegisterCommandFn>
+    after: ReturnType<RegisterCommandFn>
     on: ReturnType<RegisterCommandFn>
     off: ReturnType<RegisterCommandFn>
     emit: ExecuteCommandFn
@@ -51,6 +53,8 @@ export type ExtensionCreatorScopedContext = {
 
 export type ExtensionCreatorContext = {
   commands: {
+    before: ReturnType<RegisterCommandFn>
+    after: ReturnType<RegisterCommandFn>
     on: RegisterCommandFn
     off: RegisterCommandFn
     emit: ExecuteCommandFn

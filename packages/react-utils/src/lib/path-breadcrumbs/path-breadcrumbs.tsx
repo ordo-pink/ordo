@@ -12,7 +12,11 @@ export const PathBreadcrumbs = ({ path }: Props) => {
 
   const pathWithoutLastSlash = path.endsWith("/") && path.length > 1 ? path.slice(0, -1) : path
 
-  const chunks = pathWithoutLastSlash.split("/").filter(Boolean)
+  let chunks = pathWithoutLastSlash.split("/").filter(Boolean)
+
+  if (chunks.length > 3) {
+    chunks = chunks.slice(0, 1).concat(["..."]).concat(chunks.slice(-1))
+  }
 
   return (
     <div className="path-breadcrumbs">

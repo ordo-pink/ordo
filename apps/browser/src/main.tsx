@@ -51,6 +51,8 @@ const user$ = _initAuth({
       executeCommand("router.navigate", "/editor")
     }
 
+    // TODO: Handle situation when there is no authInfo
+
     if (authInfo && !authInfo.isAuthenticated) {
       executeCommand("router.navigate", "/")
     }

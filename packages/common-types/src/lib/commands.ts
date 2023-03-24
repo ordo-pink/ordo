@@ -5,8 +5,7 @@ export type Command<Type extends string = string> = {
   type: Type
 }
 
-export type PayloadCommand<Type extends string = string, Payload = unknown> = {
-  type: Type
+export type PayloadCommand<Type extends string = string, Payload = unknown> = Command<Type> & {
   payload: Payload
 }
 
@@ -28,7 +27,7 @@ export type CommandListener<Type extends string = string, Payload = any> = [
 export type RegisterCommandFn<Payload = any, Type extends string = string> = BinaryFn<
   Type,
   CommandHandler<Payload>,
-  CommandHandler<Payload>
+  [Type, CommandHandler<Payload>]
 >
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any

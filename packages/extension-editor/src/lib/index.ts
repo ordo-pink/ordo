@@ -1,11 +1,8 @@
-import { CommandContext, FileAssociation, OrdoFilePath } from "@ordo-pink/common-types"
+import { CommandContext, OrdoFilePath } from "@ordo-pink/common-types"
 import { createExtension } from "@ordo-pink/stream-extensions"
 import { lazy } from "react"
-import { Subject } from "rxjs"
 
 import "./editor.css"
-
-export const currentFileAssociation$ = new Subject<FileAssociation>()
 
 export default createExtension(
   "editor",

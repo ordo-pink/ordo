@@ -1,6 +1,12 @@
 import { IOrdoFile } from "@ordo-pink/common-types"
 // import { lazyBox, preventDefault, stopPropagation } from "@ordo-pink/fns"
-import { ActionListItem, useCommands, useRouteParams } from "@ordo-pink/react-utils"
+import {
+  ActionListItem,
+  useCommands,
+  useFileAssociationFor,
+  useRouteParams,
+} from "@ordo-pink/react-utils"
+import { BsFileEarmarkBinary } from "react-icons/bs"
 // import { MouseEvent } from "react"
 // import { BsFileEarmarkBinary } from "react-icons/bs"
 // import { createSearchParams, useNavigate, useSearchParams } from "react-router-dom"
@@ -26,6 +32,8 @@ export default function File({ file }: Props) {
 
   const params = useRouteParams()
 
+  const fileAssoc = useFileAssociationFor(file)
+
   const depth = file.path.split("/").filter(Boolean).length
 
   const paddingLeft = `${depth * 10}px`
@@ -35,7 +43,7 @@ export default function File({ file }: Props) {
   //   assoc.fileExtensions.includes(file.extension),
   // )
 
-  // const Icon = association && association.Icon ? association.Icon : BsFileEarmarkBinary
+  const Icon = fileAssoc && fileAssoc.Icon ? fileAssoc.Icon : BsFileEarmarkBinary
 
   const handleClick = () => emit("editor.open-file", file.path)
 
@@ -56,7 +64,7 @@ export default function File({ file }: Props) {
         style={{ paddingLeft }}
         text={name}
         // Icon={Icon}
-        Icon={() => null}
+        Icon={() => <Icon file={file} />}
         isCurrent={isCurrent}
         onClick={handleClick}
         // onContextMenu={handleContextMenu}

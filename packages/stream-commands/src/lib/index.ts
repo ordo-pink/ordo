@@ -52,7 +52,7 @@ const addToStorage =
 
     if (!listeners) {
       state[newListener[0]] = [newListener[1]]
-    } else {
+    } else if (!listeners.some((listener) => listener.toString() === newListener[1].toString())) {
       state[newListener[0]].push(newListener[1])
     }
 

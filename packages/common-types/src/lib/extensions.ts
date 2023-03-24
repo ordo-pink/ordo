@@ -69,5 +69,5 @@ export type FileAssociation = {
   name: string
   fileExtensions: OrdoFileExtension[] | "*"
   Component: ComponentType<{ file: IOrdoFile }>
-  Icon: ComponentType | Record<OrdoFileExtension, ComponentType>
+  Icon: ComponentType<{ file: IOrdoFile }>
 }

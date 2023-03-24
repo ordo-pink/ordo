@@ -1,7 +1,7 @@
 import { Either } from "@ordo-pink/either"
 // import { lazyBox, preventDefault, stopPropagation } from "@ordo-pink/fns"
-import { Null, useDrive } from "@ordo-pink/react-utils"
-import { memo } from "react"
+import { Null, useContextMenu, useDrive } from "@ordo-pink/react-utils"
+import { memo, MouseEvent } from "react"
 import FileOrDirectory from "./file-or-directory"
 // import { useContextMenu } from "../../../../containers/app/hooks/use-context-menu"
 // import { useActionContext } from "../../../../core/hooks/use-action-context"
@@ -12,6 +12,7 @@ import FileOrDirectory from "./file-or-directory"
 
 function FileExplorer() {
   const drive = useDrive()
+  const { showContextMenu } = useContextMenu()
   // const dispatch = useAppDispatch()
 
   // const directory = useAppSelector((state) => state.app.personalProject)
@@ -38,13 +39,14 @@ function FileExplorer() {
   // const CreateFileIcon = createFileCommand ? createFileCommand.Icon : () => null
   // const CreateDirectoryIcon = createDirectoryCommand ? createDirectoryCommand.Icon : () => null
 
-  // const handleContextMenu = lazyBox<MouseEvent>((box) =>
-  //   box
-  //     .tap(preventDefault)
-  //     .tap(stopPropagation)
-  //     .map(({ pageX, pageY }) => ({ x: pageX, y: pageY }))
-  //     .fold(({ x, y }) => dispatch(showContextMenu({ target: directory, x, y }))),
-  // )
+  const handleContextMenu = (event: MouseEvent) => {
+    event.preventDefault()
+    event.stopPropagation()
+
+    if (!drive) return
+
+    showContextMenu({ x: event.pageX, y: event.pageY, target: drive.root })
+  }
 
   // const handleCreateFileClick = lazyBox((box) =>
   //   box.map(() => actionContext).fold((ctx) => createFileCommand && createFileCommand.action(ctx)),
@@ -58,8 +60,8 @@ function FileExplorer() {
 
   return Either.fromNullable(drive).fold(Null, ({ root }) => (
     <div
-      className="p-4"
-      // onContextMenu={handleContextMenu}
+      className="p-4 h-full"
+      onContextMenu={handleContextMenu}
     >
       <div className="file-explorer_files-container">
         <div className={`h-full transition-all duration-300`}>

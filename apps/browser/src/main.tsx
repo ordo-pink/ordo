@@ -3,6 +3,7 @@ import { ConsoleLogger } from "@ordo-pink/logger"
 import { clearActivities, _initActivities } from "@ordo-pink/stream-activities"
 import { _initAuth } from "@ordo-pink/stream-auth"
 import { executeCommand, _initCommands } from "@ordo-pink/stream-commands"
+import { hideContextMenu, _initContextMenu } from "@ordo-pink/stream-context-menu"
 import { _initDrives } from "@ordo-pink/stream-drives"
 import { _initExtensions } from "@ordo-pink/stream-extensions"
 import { _initFileAssociations } from "@ordo-pink/stream-file-associations"
@@ -12,6 +13,7 @@ import Keycloak from "keycloak-js"
 import { tap } from "ramda"
 import * as ReactDOM from "react-dom/client"
 import App from "./app/app"
+import ContextMenu from "./context-menu"
 
 import "./styles.css"
 
@@ -168,13 +170,19 @@ _initDrives(user$, getFsDriver)
 const router$ = _initRouter()
 const activities$ = _initActivities()
 const fileAssociations$ = _initFileAssociations()
+const contextMenu$ = _initContextMenu()
 
 _initI18n()
 
-_initExtensions({ user$, router$, activities$, fileAssociations$, logger })
+_initExtensions({ user$, router$, activities$, fileAssociations$, contextMenu$, logger })
 
 logger.info("Starting the application")
 
 const root = ReactDOM.createRoot(document.getElementById("root") as HTMLElement)
 
-root.render(<App />)
+root.render(
+  <div onClick={hideContextMenu}>
+    <App />
+    <ContextMenu state$={contextMenu$} />
+  </div>,
+)

@@ -12,6 +12,11 @@ import { Logger } from "@ordo-pink/logger"
 import { registerActivity, unregisterActivity } from "@ordo-pink/stream-activities"
 import { executeCommand, unregisterCommand, registerCommand } from "@ordo-pink/stream-commands"
 import {
+  ContextMenuItem,
+  registerContextMenuItem,
+  unregisterContextMenuItem,
+} from "@ordo-pink/stream-context-menu"
+import {
   registerFileAssociation,
   unregisterFileAssociation,
 } from "@ordo-pink/stream-file-associations"
@@ -30,6 +35,8 @@ const scopeExtensionContextTo = (
   ...ctx,
   registerActivity: ctx.registerActivity(name),
   unregisterActivity: ctx.unregisterActivity(name),
+  registerContextMenuItem: ctx.registerContextMenuItem(name),
+  unregisterContextMenuItem: ctx.unregisterContextMenuItem(name),
   registerFileAssociation: ctx.registerFileAssociation(name),
   unregisterFileAssociation: ctx.unregisterFileAssociation(name),
   registerTranslations: ctx.registerTranslations(name),
@@ -47,6 +54,10 @@ const isFulfilled = <T>(x: PromiseSettledResult<T>): x is PromiseFulfilledResult
 
 type InitExtensionsParams = {
   logger: Logger
+  contextMenu$: Observable<
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    Nullable<{ x: number; y: number; target: any; structure: ContextMenuItem[] }>
+  >
   user$: Observable<UserInfo>
   router$: Router
   activities$: Observable<Activity[]>
@@ -70,6 +81,8 @@ export const _initExtensions = callOnce(
               off: unregisterCommand,
               emit: executeCommand,
             },
+            registerContextMenuItem,
+            unregisterContextMenuItem,
             registerTranslations,
             registerFileAssociation,
             unregisterFileAssociation,

@@ -39,6 +39,7 @@
       "@ordo-pink/stream-activities": ["packages/stream-activities/src/index.ts"],
       "@ordo-pink/stream-auth": ["packages/stream-auth/src/index.ts"],
       "@ordo-pink/stream-commands": ["packages/stream-commands/src/index.ts"],
+      "@ordo-pink/stream-context-menu": ["packages/stream-context-menu/src/index.ts"],
       "@ordo-pink/stream-drives": ["packages/stream-drives/src/index.ts"],
       "@ordo-pink/stream-editor-plugins": ["packages/stream-editor-plugins/src/index.ts"],
       "@ordo-pink/stream-extensions": ["packages/stream-extensions/src/index.ts"],

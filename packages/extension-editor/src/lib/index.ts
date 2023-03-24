@@ -1,22 +1,40 @@
 import { CommandContext, OrdoFilePath } from "@ordo-pink/common-types"
+import { OrdoFile } from "@ordo-pink/fs-entity"
 import { createExtension } from "@ordo-pink/stream-extensions"
 import { lazy } from "react"
+import { BsReverseLayoutTextSidebarReverse } from "react-icons/bs"
 
 import "./editor.css"
 
 export default createExtension(
   "editor",
-  ({ registerActivity, registerFileAssociation, commands, logger, registerTranslations }) => {
+  ({
+    registerActivity,
+    registerFileAssociation,
+    commands,
+    logger,
+    registerTranslations,
+    registerContextMenuItem,
+  }) => {
     logger.debug('Initialising "editor" extension')
 
     registerTranslations({
-      ru: { placeholder: "Можно начинать..." },
-      en: { placeholder: "Start typing..." },
+      ru: { placeholder: "Можно начинать...", "open-file-in-editor": "Открыть в редакторе" },
+      en: { placeholder: "Start typing...", "open-file-in-editor": "Open in Editor" },
     })
 
-    commands.on("editor.open-file", ({ payload, logger }: CommandContext<OrdoFilePath>) => {
-      logger.debug('"editor.open-file" invoked:', payload)
-      commands.emit("router.navigate", `/editor${payload}`)
+    const OPEN_FILE_COMMAND = commands.on(
+      "open-file-in-editor",
+      ({ payload, logger }: CommandContext<OrdoFilePath>) => {
+        logger.debug('"open-file-in-editor" invoked:', payload)
+        commands.emit("router.navigate", `/editor${payload}`)
+      },
+    )
+
+    registerContextMenuItem(OPEN_FILE_COMMAND, {
+      Icon: BsReverseLayoutTextSidebarReverse,
+      payloadCreator: (target) => target.path,
+      shouldShow: (target) => OrdoFile.isOrdoFile(target),
     })
 
     registerActivity("editor", {

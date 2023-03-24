@@ -13,6 +13,7 @@ type Props = {
   text: string
   Icon: ComponentType
   isCurrent: boolean
+  isLarge?: boolean
   style?: CSSProperties
   onClick?: MouseEventHandler
   onMouseEnter?: MouseEventHandler
@@ -27,6 +28,7 @@ export const ActionListItem = ({
   style = {},
   children,
   isCurrent,
+  isLarge,
   onClick = noOp,
   onMouseEnter = noOp,
   onMouseLeave = noOp,
@@ -39,7 +41,7 @@ export const ActionListItem = ({
   return (
     <div>
       <div
-        className={`action-list-item ${isCurrent && "active"}`}
+        className={`action-list-item ${isLarge && "px-4 py-2"} ${isCurrent && "active"}`}
         style={style}
         onClick={onClick}
         onMouseEnter={onMouseEnter}

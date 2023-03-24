@@ -3,9 +3,11 @@ import { IOrdoFile } from "@ordo-pink/common-types"
 import {
   ActionListItem,
   useCommands,
+  useContextMenu,
   useFileAssociationFor,
   useRouteParams,
 } from "@ordo-pink/react-utils"
+import { MouseEvent } from "react"
 import { BsFileEarmarkBinary } from "react-icons/bs"
 // import { MouseEvent } from "react"
 // import { BsFileEarmarkBinary } from "react-icons/bs"
@@ -30,6 +32,8 @@ export default function File({ file }: Props) {
 
   // const { showContextMenu } = useContextMenu()
 
+  const { showContextMenu } = useContextMenu()
+
   const params = useRouteParams()
 
   const fileAssoc = useFileAssociationFor(file)
@@ -47,13 +51,12 @@ export default function File({ file }: Props) {
 
   const handleClick = () => emit("editor.open-file", file.path)
 
-  // const handleContextMenu = lazyBox<MouseEvent>((box) =>
-  //   box
-  //     .tap(preventDefault)
-  //     .tap(stopPropagation)
-  //     .map(({ pageX, pageY }) => ({ x: pageX, y: pageY }))
-  //     .fold(({ x, y }) => dispatch(showContextMenu({ target: file, x, y }))),
-  // )
+  const handleContextMenu = (event: MouseEvent) => {
+    event.preventDefault()
+    event.stopPropagation()
+
+    showContextMenu({ x: event.pageX, y: event.pageY, target: file })
+  }
 
   const name =
     file.extension === ".md" ? file.readableName : `${file.readableName}${file.extension}`
@@ -67,7 +70,7 @@ export default function File({ file }: Props) {
         Icon={() => <Icon file={file} />}
         isCurrent={isCurrent}
         onClick={handleClick}
-        // onContextMenu={handleContextMenu}
+        onContextMenu={handleContextMenu}
       />
     </div>
   )

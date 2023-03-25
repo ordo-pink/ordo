@@ -102,12 +102,12 @@ function FileExplorer() {
       className="p-4 h-full"
       onContextMenu={handleContextMenu}
     >
-      <div className="flex items-center pl-2 mx-2 mt-2 mb-4 rounded-lg bg-neutral-300 dark:bg-neutral-700 shadow-inner">
+      <div className="mx-auto flex items-center pl-2 mt-2 mb-4 rounded-lg bg-neutral-300 dark:bg-neutral-700 shadow-inner max-w-xs">
         <BsSearch />
         <input
           type="text"
           aria-autocomplete="none"
-          className="w-full px-2 py-1 bg-transparent max-w-xs"
+          className="w-full px-2 py-1 bg-transparent"
           value={inputValue}
           onKeyDown={handleKeyDown}
           onChange={handleInputChange}

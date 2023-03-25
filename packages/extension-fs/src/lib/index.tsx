@@ -2,7 +2,7 @@ import { OrdoDirectory, OrdoFile } from "@ordo-pink/fs-entity"
 import { useModal } from "@ordo-pink/react-utils"
 import { drive$, fsDriver$ } from "@ordo-pink/stream-drives"
 import { createExtension } from "@ordo-pink/stream-extensions"
-import { BsFileEarmarkMinus, BsFileEarmarkPlus, BsFolderPlus } from "react-icons/bs"
+import { BsFileEarmarkMinus, BsFileEarmarkPlus, BsFolderMinus, BsFolderPlus } from "react-icons/bs"
 import { createDirectory } from "./commands/directory/create-directory"
 import { moveDirectory } from "./commands/directory/move-directory"
 import { removeDirectory } from "./commands/directory/remove-directory"
@@ -112,7 +112,7 @@ export default createExtension(
     })
 
     registerContextMenuItem(REMOVE_DIRECTORY_COMMAND, {
-      Icon: BsFileEarmarkMinus,
+      Icon: BsFolderMinus,
       payloadCreator: (target) => target,
       shouldShow: (target) => OrdoDirectory.isOrdoDirectory(target) && target.path !== "/",
       accelerator: "ctrl+alt+backspace",

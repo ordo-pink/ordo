@@ -20,12 +20,12 @@ export default createExtension(
       ru: {
         placeholder: "Можно начинать...",
         "open-file-in-editor": "Открыть в редакторе",
-        "search-file-placeholder": "Find file...",
+        "search-file-placeholder": "Найти файл...",
       },
       en: {
         placeholder: "Start typing...",
         "open-file-in-editor": "Open in Editor",
-        "search-file-placeholder": "Найти файл...",
+        "search-file-placeholder": "Find file...",
       },
     })
 

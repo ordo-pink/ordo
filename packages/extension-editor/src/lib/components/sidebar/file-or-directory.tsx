@@ -7,18 +7,12 @@ import File from "./file"
 
 type Props = {
   item: Nullable<IOrdoFile | IOrdoDirectory>
-  index: number
 }
 
-export default function FileOrDirectory({ item, index }: Props) {
+export default function FileOrDirectory({ item }: Props) {
   return Either.fromNullable(item).fold(Null, (fileOrDirectory) =>
     Either.fromBoolean(OrdoDirectory.isOrdoDirectory(fileOrDirectory)).fold(
-      () => (
-        <File
-          index={index}
-          file={fileOrDirectory as IOrdoFile}
-        />
-      ),
+      () => <File file={fileOrDirectory as IOrdoFile} />,
       () => (
         <Directory
           directory={fileOrDirectory as IOrdoDirectory<{ isExpanded: boolean; color: string }>}

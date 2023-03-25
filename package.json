@@ -22,6 +22,7 @@
   "private": true,
   "devDependencies": {
     "@babel/preset-react": "^7.14.5",
+    "@esbuild/win32-x64": "^0.17.13",
     "@nrwl/cypress": "^15.7.1",
     "@nrwl/eslint-plugin-nx": "^15.7.1",
     "@nrwl/express": "^15.7.1",

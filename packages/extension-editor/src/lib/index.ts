@@ -16,8 +16,16 @@ export default createExtension(
     registerContextMenuItem,
   }) => {
     registerTranslations({
-      ru: { placeholder: "Можно начинать...", "open-file-in-editor": "Открыть в редакторе" },
-      en: { placeholder: "Start typing...", "open-file-in-editor": "Open in Editor" },
+      ru: {
+        placeholder: "Можно начинать...",
+        "open-file-in-editor": "Открыть в редакторе",
+        "search-file-placeholder": "Find file...",
+      },
+      en: {
+        placeholder: "Start typing...",
+        "open-file-in-editor": "Open in Editor",
+        "search-file-placeholder": "Найти файл...",
+      },
     })
 
     commands.after(

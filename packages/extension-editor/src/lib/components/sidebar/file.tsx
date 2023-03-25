@@ -18,10 +18,10 @@ import { BsFileEarmarkBinary } from "react-icons/bs"
 
 type Props = {
   file: IOrdoFile
-  index: number
+  isSelected?: boolean
 }
 
-export default function File({ file }: Props) {
+export default function File({ file, isSelected }: Props) {
   const { emit } = useCommands()
   // const dispatch = useAppDispatch()
 
@@ -41,7 +41,8 @@ export default function File({ file }: Props) {
   const depth = file.path.split("/").filter(Boolean).length
 
   const paddingLeft = `${depth * 10}px`
-  const isCurrent = Boolean(params && params["filePath*"] && params["filePath*"] === file.path)
+  const isCurrent =
+    isSelected ?? Boolean(params && params["filePath*"] && params["filePath*"] === file.path)
 
   // const association = fileAssociations.find((assoc) =>
   //   assoc.fileExtensions.includes(file.extension),

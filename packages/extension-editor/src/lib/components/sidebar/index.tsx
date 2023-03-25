@@ -1,43 +1,52 @@
+import { IOrdoFile } from "@ordo-pink/common-types"
 import { Either } from "@ordo-pink/either"
-// import { lazyBox, preventDefault, stopPropagation } from "@ordo-pink/fns"
-import { Null, useContextMenu, useDrive } from "@ordo-pink/react-utils"
+import { noOp } from "@ordo-pink/fns"
+import { Null, useContextMenu, useDrive, useCommands } from "@ordo-pink/react-utils"
+import { Switch } from "@ordo-pink/switch"
+import Fuse from "fuse.js"
 import { memo, MouseEvent } from "react"
+import { useState, ChangeEvent, useEffect, KeyboardEvent } from "react"
+import { useTranslation } from "react-i18next"
+import { BsSearch } from "react-icons/bs"
+import File from "./file"
 import FileOrDirectory from "./file-or-directory"
-// import { useContextMenu } from "../../../../containers/app/hooks/use-context-menu"
-// import { useActionContext } from "../../../../core/hooks/use-action-context"
-// import { useAppDispatch } from "../../../../core/state/hooks/use-app-dispatch"
-// import { useAppSelector } from "../../../../core/state/hooks/use-app-selector"
-// import { UsedSpace } from "../../../user/components/used-space"
-// import { closeFile } from "../../store"
+
+const fuse = new Fuse([] as IOrdoFile[], { keys: ["readableName"] })
 
 function FileExplorer() {
   const drive = useDrive()
   const { showContextMenu } = useContextMenu()
-  // const dispatch = useAppDispatch()
+  const { emit, after, off } = useCommands()
+  const { t } = useTranslation("editor")
 
-  // const directory = useAppSelector((state) => state.app.personalProject)
-  // const commands = useAppSelector((state) => state.app.commands)
+  const [currentIndex, setCurrentIndex] = useState(0)
+  const [inputValue, setInputValue] = useState("")
+  const [visibleFiles, setVisibleFiles] = useState<IOrdoFile[]>([])
 
-  // useEffect(
-  //   () => () => {
-  //     dispatch(closeFile())
-  //   },
-  //   [dispatch],
-  // )
+  const resetInput = () => setInputValue("")
 
-  // const { showContextMenu } = useContextMenu()
+  useEffect(() => {
+    after("editor.open-file-in-editor", resetInput)
 
-  // const actionContext = useActionContext(directory)
+    return () => {
+      off("editor")("open-file-in-editor", resetInput)
+    }
+  }, [])
 
-  // const createFileCommand = commands.find(
-  //   (command) => command.title === "@ordo-command-file-system/create-file",
-  // )
-  // const createDirectoryCommand = commands.find(
-  //   (command) => command.title === "@ordo-command-file-system/create-directory",
-  // )
+  useEffect(() => {
+    if (!drive) return
 
-  // const CreateFileIcon = createFileCommand ? createFileCommand.Icon : () => null
-  // const CreateDirectoryIcon = createDirectoryCommand ? createDirectoryCommand.Icon : () => null
+    fuse.setCollection(drive.root.getFilesDeep())
+  }, [drive])
+
+  useEffect(() => {
+    if (!drive) return
+    if (inputValue === "") setVisibleFiles([])
+
+    const fusedFiles = fuse.search(inputValue)
+
+    setVisibleFiles(fusedFiles.map(({ item }) => item))
+  }, [inputValue, drive])
 
   const handleContextMenu = (event: MouseEvent) => {
     event.preventDefault()
@@ -48,30 +57,78 @@ function FileExplorer() {
     showContextMenu({ x: event.pageX, y: event.pageY, target: drive.root })
   }
 
-  // const handleCreateFileClick = lazyBox((box) =>
-  //   box.map(() => actionContext).fold((ctx) => createFileCommand && createFileCommand.action(ctx)),
-  // )
+  const handleInputChange = (event: ChangeEvent<HTMLInputElement>) => {
+    setInputValue(event.target.value)
+  }
 
-  // const handleCreateDirectoryClick = lazyBox((box) =>
-  //   box
-  //     .map(() => actionContext)
-  //     .fold((ctx) => createDirectoryCommand && createDirectoryCommand.action(ctx)),
-  // )
+  const handleEnter = (event: KeyboardEvent<HTMLInputElement>) => {
+    event.preventDefault()
+    const selectedFile = visibleFiles[currentIndex]
+    setInputValue("")
+
+    emit("editor.open-file-in-editor", selectedFile.path)
+  }
+
+  const handleArrowUp = (event: KeyboardEvent<HTMLInputElement>) => {
+    event.preventDefault()
+    const isFirstItem = currentIndex === 0
+
+    setCurrentIndex(isFirstItem ? visibleFiles.length - 1 : currentIndex - 1)
+  }
+
+  const handleArrowDown = (event: KeyboardEvent<HTMLInputElement>) => {
+    event.preventDefault()
+    const isLastItem = currentIndex === visibleFiles.length - 1
+
+    setCurrentIndex(isLastItem ? 0 : currentIndex + 1)
+  }
+
+  const handleEscape = () => {
+    setInputValue("")
+  }
+
+  const handleKeyDown = (event: KeyboardEvent<HTMLInputElement>) =>
+    Switch.of(event.key)
+      .case("Escape", () => handleEscape())
+      .case("Enter", () => handleEnter(event))
+      .case("ArrowUp", () => handleArrowUp(event))
+      .case("ArrowDown", () => handleArrowDown(event))
+      .default(noOp)
+
+  const tSearchFilePlaceholder = t("search-file-placeholder")
 
   return Either.fromNullable(drive).fold(Null, ({ root }) => (
     <div
       className="p-4 h-full"
       onContextMenu={handleContextMenu}
     >
+      <div className="flex items-center pl-2 mx-6 mt-2 mb-6 rounded-lg bg-neutral-300 dark:bg-neutral-700 shadow-inner">
+        <BsSearch />
+        <input
+          value={inputValue}
+          onChange={handleInputChange}
+          onKeyDown={handleKeyDown}
+          className="w-full px-2 py-1 bg-transparent"
+          type="text"
+          placeholder={tSearchFilePlaceholder}
+        />
+      </div>
       <div className="file-explorer_files-container">
-        <div className={`h-full transition-all duration-300`}>
-          {root.children.map((child, index) => (
-            <FileOrDirectory
-              key={child.path}
-              index={index}
-              item={child}
-            />
-          ))}
+        <div className="h-full">
+          {inputValue
+            ? visibleFiles.map((file, index) => (
+                <File
+                  isSelected={currentIndex === index}
+                  key={file.path}
+                  file={file}
+                />
+              ))
+            : root.children.map((child) => (
+                <FileOrDirectory
+                  key={child.path}
+                  item={child}
+                />
+              ))}
         </div>
       </div>
       {/* <UsedSpace />

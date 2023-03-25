@@ -30,8 +30,7 @@ export type RegisterCommandFn<Payload = any, Type extends string = string> = Una
 >
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export type ExecuteCommandFn<Type extends string = string, Payload = any> = BinaryFn<
-  Type,
-  Payload,
-  void
->
+export type ExecuteCommandFn<Type extends string = string, Payload = any> = (
+  type: Type,
+  payload?: Payload,
+) => void

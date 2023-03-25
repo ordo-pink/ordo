@@ -1,5 +1,6 @@
 import { CommandContext, IOrdoFile, OrdoFilePath } from "@ordo-pink/common-types"
-import { OrdoFile } from "@ordo-pink/fs-entity"
+import { OrdoDirectory, OrdoFile } from "@ordo-pink/fs-entity"
+import { drive$, fsDriver$ } from "@ordo-pink/stream-drives"
 import { createExtension, currentActivity$ } from "@ordo-pink/stream-extensions"
 import { lazy } from "react"
 import { BsReverseLayoutTextSidebarReverse } from "react-icons/bs"
@@ -39,10 +40,52 @@ export default createExtension(
       },
     )
 
+    commands.on("collapse-directory", ({ payload }) => {
+      const driver = fsDriver$.getValue()
+      const drive = drive$.getValue()
+
+      if (!driver || !drive || payload.metadata.isExpanded === false) return
+
+      commands.emit("fs.update-directory", {
+        ...payload,
+        metadata: {
+          ...payload.metadata,
+          isExpanded: false,
+        },
+      })
+    })
+
+    commands.on("expand-directory", ({ payload }) => {
+      const driver = fsDriver$.getValue()
+      const drive = drive$.getValue()
+
+      if (!driver || !drive || payload.metadata.isExpanded === true) return
+
+      commands.emit("fs.update-directory", {
+        ...payload,
+        metadata: {
+          ...payload.metadata,
+          isExpanded: true,
+        },
+      })
+    })
+
     const OPEN_FILE_COMMAND = commands.on(
       "open-file-in-editor",
       ({ payload }: CommandContext<OrdoFilePath>) => {
         commands.emit("router.navigate", `/editor${payload}`)
+
+        const drive = drive$.getValue()
+
+        if (!drive) return
+
+        let directory = OrdoFile.findParent(payload, drive.root)
+
+        while (directory && directory.path !== "/") {
+          commands.emit("editor.expand-directory", directory)
+
+          directory = OrdoDirectory.findParent(directory.path, drive.root)
+        }
       },
     )
 

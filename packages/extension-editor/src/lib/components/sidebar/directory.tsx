@@ -1,6 +1,5 @@
 import { IOrdoDirectory } from "@ordo-pink/common-types"
 import { Either } from "@ordo-pink/either"
-import { OrdoDirectory } from "@ordo-pink/fs-entity"
 import { ActionListItem, Null, useCommands, useContextMenu } from "@ordo-pink/react-utils"
 import { MouseEvent } from "react"
 import {
@@ -37,11 +36,8 @@ export default function Directory({ directory }: Props) {
 
   const handleClick = () => {
     emit(
-      "fs.update-directory",
-      OrdoDirectory.from({
-        ...directory,
-        metadata: { ...directory.metadata, isExpanded: !directory.metadata.isExpanded },
-      }),
+      directory.metadata.isExpanded ? "editor.collapse-directory" : "editor.expand-directory",
+      directory,
     )
   }
 

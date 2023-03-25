@@ -102,14 +102,15 @@ function FileExplorer() {
       className="p-4 h-full"
       onContextMenu={handleContextMenu}
     >
-      <div className="flex items-center pl-2 mx-6 mt-2 mb-6 rounded-lg bg-neutral-300 dark:bg-neutral-700 shadow-inner">
+      <div className="flex items-center pl-2 mx-2 mt-2 mb-4 rounded-lg bg-neutral-300 dark:bg-neutral-700 shadow-inner">
         <BsSearch />
         <input
-          value={inputValue}
-          onChange={handleInputChange}
-          onKeyDown={handleKeyDown}
-          className="w-full px-2 py-1 bg-transparent"
           type="text"
+          aria-autocomplete="none"
+          className="w-full px-2 py-1 bg-transparent max-w-xs"
+          value={inputValue}
+          onKeyDown={handleKeyDown}
+          onChange={handleInputChange}
           placeholder={tSearchFilePlaceholder}
         />
       </div>

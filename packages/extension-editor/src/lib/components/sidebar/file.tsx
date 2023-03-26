@@ -63,7 +63,7 @@ export default function File({ file, isSelected }: Props) {
     file.extension === ".md" ? file.readableName : `${file.readableName}${file.extension}`
 
   return (
-    <div className="rounded-md bg-neutral-100 dark:bg-neutral-800 z-50 transition-all duration-300">
+    <div className="rounded-md z-50 transition-all duration-300 select-none">
       <ActionListItem
         style={{ paddingLeft }}
         text={name}

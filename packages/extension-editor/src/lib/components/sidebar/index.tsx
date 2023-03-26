@@ -114,7 +114,7 @@ function FileExplorer() {
           placeholder={tSearchFilePlaceholder}
         />
       </div>
-      <div className="file-explorer_files-container">
+      <div className="file-explorer_files-container overflow-y-visible pb-6">
         <div className="h-full">
           {inputValue
             ? visibleFiles.map((file, index) => (

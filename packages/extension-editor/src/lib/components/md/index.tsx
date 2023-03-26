@@ -2,7 +2,7 @@ import { CodeHighlightNode, CodeNode } from "@lexical/code"
 import { HashtagNode } from "@lexical/hashtag"
 import { AutoLinkNode, LinkNode } from "@lexical/link"
 import { ListItemNode, ListNode } from "@lexical/list"
-import { TRANSFORMERS } from "@lexical/markdown"
+import { $convertToMarkdownString, TRANSFORMERS } from "@lexical/markdown"
 import { CheckListPlugin } from "@lexical/react/LexicalCheckListPlugin"
 import { LexicalComposer } from "@lexical/react/LexicalComposer"
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext"
@@ -18,13 +18,49 @@ import { OnChangePlugin } from "@lexical/react/LexicalOnChangePlugin"
 import { RichTextPlugin } from "@lexical/react/LexicalRichTextPlugin"
 import { HeadingNode, QuoteNode } from "@lexical/rich-text"
 import { TableCellNode, TableNode, TableRowNode } from "@lexical/table"
-import { IOrdoFile } from "@ordo-pink/common-types"
-import { OrdoFile } from "@ordo-pink/fs-entity"
-import { EditorState, EditorThemeClasses } from "lexical"
+import { ExecuteCommandFn, FSDriver, IOrdoFile } from "@ordo-pink/common-types"
+import { useCommands, useFsDriver } from "@ordo-pink/react-utils"
+import { createDraft, finishDraft } from "immer"
+import { EditorState, EditorThemeClasses, LexicalNode } from "lexical"
+import { debounce } from "lodash"
 import { mergeDeepWith } from "ramda"
 import { useEffect, useState, memo } from "react"
 import { useTranslation } from "react-i18next"
 import { LoadEditorStatePlugin } from "./load-state"
+
+const debouncedSave = debounce(
+  (
+    driver: FSDriver,
+    file: IOrdoFile,
+    nodes: LexicalNode[],
+    content: string,
+    emit: ExecuteCommandFn,
+  ) => {
+    let metadata = {}
+
+    const draft = createDraft(file)
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    nodes.forEach((child: any) => {
+      if (child.ordoMetadata) {
+        metadata = mergeDeepWith(
+          (a, b) => (Array.isArray(a) ? a.concat(b) : b ? b : a),
+          metadata,
+          child.ordoMetadata,
+        )
+      }
+    })
+
+    draft.metadata = metadata
+
+    const newFile = finishDraft(draft)
+
+    emit("fs.update-file", newFile)
+    // eslint-disable-next-line no-console
+    driver.files.setContent({ file, content }).catch(console.error)
+  },
+  1000,
+)
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const toNodeArray = (tree: any) =>
@@ -134,6 +170,8 @@ const Placeholder = () => {
 export default memo(
   function MdEditor({ file }: Props) {
     // const { nodes, plugins, transformers } = useAppSelector((state) => state.app.editor)
+    const { emit } = useCommands()
+    const driver = useFsDriver()
 
     const [isInitialLoad, setIsInitialLoad] = useState(true)
 
@@ -150,30 +188,14 @@ export default memo(
       if (isInitialLoad) return
 
       state.read(() => {
-        // const content = $convertToMarkdownString(TRANSFORMERS)
-        // const content = $convertToMarkdownString(transformers.concat(TRANSFORMERS))
+        if (!driver) return
 
-        const ordoFile = OrdoFile.empty(file.path)
+        const content = $convertToMarkdownString(TRANSFORMERS)
+        // const content = $convertToMarkdownString(transformers.concat(TRANSFORMERS))
 
         const nodes = toNodeArray(state.toJSON().root)
 
-        let metadata = {}
-
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        nodes.forEach((child: any) => {
-          if (child.ordoMetadata) {
-            metadata = mergeDeepWith(
-              (a, b) => (Array.isArray(a) ? a.concat(b) : b ? b : a),
-              metadata,
-              child.ordoMetadata,
-            )
-          }
-        })
-
-        ordoFile.metadata = metadata
-
-        // dispatch(updateFileMetadata(ordoFile))
-        // dispatch(updatedFile({ file: ordoFile, content }))
+        debouncedSave(driver, file, nodes, content, emit)
       })
     }
 

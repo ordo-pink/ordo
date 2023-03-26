@@ -41,7 +41,9 @@ export const ActionListItem = ({
   return (
     <div>
       <div
-        className={`action-list-item ${isLarge && "px-4 py-2"} ${isCurrent && "active"}`}
+        className={`action-list-item selection-none ${isLarge && "px-4 py-2"} ${
+          isCurrent && "active"
+        }`}
         style={style}
         onClick={onClick}
         onMouseEnter={onMouseEnter}

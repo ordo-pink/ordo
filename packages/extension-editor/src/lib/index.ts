@@ -107,5 +107,11 @@ export default createExtension(
       Icon: lazy(() => import("./components/md/icon")),
       fileExtensions: [".md"],
     })
+
+    registerFileAssociation("pdf", {
+      Component: lazy(() => import("./components/pdf")),
+      Icon: lazy(() => import("./components/pdf/icon")),
+      fileExtensions: [".pdf"],
+    })
   },
 )

@@ -10,8 +10,8 @@ import { useTranslation } from "react-i18next"
 import { BsFillPatchCheckFill, BsSearch, BsThreeDotsVertical } from "react-icons/bs"
 import File from "./file"
 import FileOrDirectory from "./file-or-directory"
-import logo from "../../assets/logo.png"
 import UsedSpace from "./used-space"
+import logo from "../../assets/logo.png"
 
 const fuse = new Fuse([] as IOrdoFile[], { keys: ["readableName"] })
 

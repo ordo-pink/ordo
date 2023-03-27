@@ -3,7 +3,7 @@ import { Either } from "@ordo-pink/either"
 import { OrdoDirectory } from "@ordo-pink/fs-entity"
 import { Null, useDrive } from "@ordo-pink/react-utils"
 import { reduce } from "ramda"
-import { useEffect, useMemo, useState } from "react"
+import { useEffect, useState } from "react"
 import { useTranslation } from "react-i18next"
 
 const sizeReducer = (totalSize: number) => (acc: number, item: IOrdoFile | IOrdoDirectory) =>
@@ -33,14 +33,6 @@ export default function UsedSpace() {
     const totalSize = calculateTreeSize(drive.root)
     const allFilesSizeMB = totalSize / 1024 / 1024
     const usedSpacePercent = (allFilesSizeMB / drive.params.maxTotalSize) * 100
-    console.log(
-      "total",
-      allFilesSizeMB,
-      "max total",
-      drive.params.maxTotalSize,
-      "percent",
-      usedPercent,
-    )
 
     setUsedPercent(usedSpacePercent > 100 ? 100 : usedSpacePercent)
     setUsedMb(allFilesSizeMB)

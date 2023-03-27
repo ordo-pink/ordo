@@ -40,7 +40,7 @@ export default function RemoveFileModal({ file }: Props) {
           <div className="pl-8">{tText}</div>
         </div>
       </div>
-      <div className="flex items-center justify-end space-x-2 px-8 pb-4 pt-4 bg-neutral-50 dark:bg-neutral-800/30 rounded-b-lg">
+      <div className="flex items-center justify-end space-x-2 px-8 pb-4 pt-4 bg-neutral-200/50 dark:bg-neutral-800/30 rounded-b-lg">
         <OrdoButtonSecondary
           onClick={hideModal}
           hotkey="Esc"

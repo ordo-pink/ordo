@@ -21,11 +21,13 @@ export default createExtension(
         placeholder: "Можно начинать...",
         "open-file-in-editor": "Открыть в редакторе",
         "search-file-placeholder": "Найти файл...",
+        "used-space": "Использовано",
       },
       en: {
         placeholder: "Start typing...",
         "open-file-in-editor": "Open in Editor",
         "search-file-placeholder": "Find file...",
+        "used-space": "Used space",
       },
     })
 

@@ -146,7 +146,7 @@ function FileExplorer() {
             ))}
       </div>
       <div className="flex items-center space-x-4 w-full max-w-xs self-center justify-center px-4">
-        <div className="rounded-full p-0.5 bg-gradient-to-tr from-sky-400 via-purple-400 to-rose-400 shadow-lg shrink-0">
+        <div className="rounded-full p-0.5 bg-gradient-to-tr from-sky-400 via-purple-400 to-rose-400 shadow-lg shrink-0 cursor-pointer">
           <div className="bg-white rounded-full">
             <img
               src={logo}
@@ -155,7 +155,7 @@ function FileExplorer() {
             />
           </div>
         </div>
-        <div className="flex flex-col text-sm text-neutral-700 w-full -mt-1">
+        <div className="flex flex-col text-sm text-neutral-700 dark:text-neutral-400 w-full -mt-1">
           <div className="flex space-x-2 items-center">
             <div className="font-bold truncate">Sergei Orlov</div>
             <div className="shrink-0">

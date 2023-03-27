@@ -18,6 +18,8 @@ export default function WorkspaceWithSidebar({
 
   const [isNarrow, setIsNarrow] = useState(true)
   const [sizes, setSizes] = useState(isNarrow ? [0, 100] : [25, 75])
+  const [snapLeft, setSnapLeft] = useState(isNarrow)
+  const [snapRight, setSnapRight] = useState(false)
 
   useEffect(() => {
     const isNarrow = width < 768
@@ -26,8 +28,12 @@ export default function WorkspaceWithSidebar({
 
     if (isNarrow) {
       setSizes([0, 100])
+      setSnapLeft(true)
+      setSnapRight(false)
     } else {
       setSizes([25, 75])
+      setSnapLeft(false)
+      setSnapRight(false)
     }
   }, [width])
 
@@ -38,6 +44,10 @@ export default function WorkspaceWithSidebar({
       minSize={0}
       className="workspace-wrapper"
       direction="horizontal"
+      onDrag={() => {
+        setSnapLeft(true)
+        setSnapRight(true)
+      }}
       onDragEnd={([left, right]) => {
         let newLeft = left
         let newRight = right
@@ -60,6 +70,9 @@ export default function WorkspaceWithSidebar({
           }
         }
 
+        setSnapLeft(newLeft === 0)
+        setSnapRight(newRight === 0)
+
         setSizes([newLeft, newRight])
       }}
     >
@@ -67,13 +80,31 @@ export default function WorkspaceWithSidebar({
         onClick={() => {
           if (isNarrow) {
             setSizes([0, 100])
+            setSnapLeft(true)
+            setSnapRight(false)
           }
         }}
       >
-        <div className="h-full">{sidebarChildren}</div>
+        <div
+          className={`h-full ${
+            snapLeft
+              ? "opacity-50 transition-opacity duration-300"
+              : "opacity-100 transition-opacity duration-300"
+          }`}
+        >
+          <div className={`h-full ${sizes[0] === 0 ? "hidden" : "block"}`}>{sidebarChildren}</div>
+        </div>
       </Sidebar>
       <Workspace>
-        <div className="h-full w-full">{children}</div>
+        <div
+          className={
+            snapRight
+              ? "h-full w-full opacity-50 transition-opacity duration-300"
+              : "h-full w-full opacity-100 transition-opacity duration-300"
+          }
+        >
+          {children}
+        </div>
       </Workspace>
     </ReactSplit>
   )

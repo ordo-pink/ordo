@@ -31,7 +31,13 @@ export function App() {
     () => <div></div>,
     ({ Component, Sidebar }) => (
       <Suspense fallback={<Loading />}>
-        <div className="flex flex-col h-screen">
+        <div className="flex h-screen">
+          {Either.fromNullable(currentActivity)
+            .chain((activity) => Either.fromBoolean(activity.name !== "home.landing-page"))
+            .fold(Null, () => (
+              <ActivityBar activities={activities} />
+            ))}
+
           <div className="flex-grow h-full">
             {Sidebar ? (
               <WorkspaceWithSidebar sidebarChildren={<Sidebar />}>
@@ -43,12 +49,6 @@ export function App() {
               </Workspace>
             )}
           </div>
-
-          {Either.fromNullable(currentActivity)
-            .chain((activity) => Either.fromBoolean(activity.name !== "home.landing-page"))
-            .fold(Null, () => (
-              <ActivityBar activities={activities} />
-            ))}
         </div>
       </Suspense>
     ),

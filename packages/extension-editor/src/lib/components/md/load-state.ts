@@ -1,27 +1,25 @@
 import { $convertFromMarkdownString, Transformer } from "@lexical/markdown"
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext"
-import { IOrdoFile } from "@ordo-pink/common-types"
-import { useFileContentText } from "@ordo-pink/react-utils"
+import { Nullable } from "@ordo-pink/common-types"
 import { useEffect } from "react"
 
 type Props = {
-  file: IOrdoFile
+  content: Nullable<string>
   transformers: Transformer[]
 }
 
-export const LoadEditorStatePlugin = ({ file, transformers }: Props) => {
+export const LoadEditorStatePlugin = ({ content, transformers }: Props) => {
   const [editor] = useLexicalComposerContext()
-  const content = useFileContentText(file)
 
   useEffect(() => {
-    if (!editor || !content) return
+    if (!editor) return
 
     editor.update(() => {
-      $convertFromMarkdownString(content, transformers)
+      $convertFromMarkdownString(content ?? "\n   \n", transformers)
     })
 
     editor.focus()
-  }, [editor, file, file.path, content, transformers])
+  }, [editor, content, transformers])
 
   return null
 }

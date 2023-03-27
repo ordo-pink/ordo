@@ -19,7 +19,7 @@ import { RichTextPlugin } from "@lexical/react/LexicalRichTextPlugin"
 import { HeadingNode, QuoteNode } from "@lexical/rich-text"
 import { TableCellNode, TableNode, TableRowNode } from "@lexical/table"
 import { ExecuteCommandFn, FSDriver, IOrdoFile } from "@ordo-pink/common-types"
-import { useCommands, useFsDriver } from "@ordo-pink/react-utils"
+import { useCommands, useFileContentText, useFsDriver } from "@ordo-pink/react-utils"
 import { createDraft, finishDraft } from "immer"
 import { EditorState, EditorThemeClasses, LexicalNode } from "lexical"
 import { debounce } from "lodash"
@@ -29,19 +29,13 @@ import { useTranslation } from "react-i18next"
 import { LoadEditorStatePlugin } from "./load-state"
 
 const debouncedSave = debounce(
-  ({
-    driver,
-    file,
-    nodes,
-    content,
-    emit,
-  }: {
-    driver: FSDriver
-    file: IOrdoFile
-    nodes: LexicalNode[]
-    content: string
-    emit: ExecuteCommandFn
-  }) => {
+  (
+    driver: FSDriver,
+    file: IOrdoFile,
+    nodes: LexicalNode[],
+    content: string,
+    emit: ExecuteCommandFn,
+  ) => {
     let metadata = {}
 
     const draft = createDraft(file)
@@ -178,18 +172,18 @@ export default memo(
     // const { nodes, plugins, transformers } = useAppSelector((state) => state.app.editor)
     const { emit } = useCommands()
     const driver = useFsDriver()
+    const content = useFileContentText(file)
 
     const handleChange = (state: EditorState) => {
       if (!driver) return
 
       state.read(() => {
-        const content = $convertToMarkdownString(TRANSFORMERS)
-
+        const text = $convertToMarkdownString(TRANSFORMERS)
         // const content = $convertToMarkdownString(transformers.concat(TRANSFORMERS))
 
         const nodes = toNodeArray(state.toJSON().root)
 
-        debouncedSave({ driver, file, nodes, content, emit })
+        debouncedSave(driver, file, nodes, text, emit)
       })
     }
 
@@ -243,7 +237,7 @@ export default memo(
           />
 
           <LoadEditorStatePlugin
-            file={file}
+            content={content}
             transformers={TRANSFORMERS}
             // transformers={transformers.concat(TRANSFORMERS)}
           />

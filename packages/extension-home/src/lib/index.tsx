@@ -6,7 +6,7 @@ import ru from "./translations/ru.json"
 export default createExtension("home", ({ registerTranslations, commands, registerActivity }) => {
   registerTranslations({ ru, en })
 
-  registerActivity("landing.page", {
+  registerActivity("landing-page", {
     routes: ["/"],
     Component: lazy(() => import("./components/home-component")),
     Icon: lazy(() => import("./components/home-icon")),

@@ -94,6 +94,7 @@ export const _initAuth = callOnce(
       })
     }
 
+    // TODO: Consider authInfo === null as no user (make userInfo Nullable)
     const user$ = auth$.pipe(
       switchMap((auth) =>
         iif(

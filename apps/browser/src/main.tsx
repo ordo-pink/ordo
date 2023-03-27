@@ -56,7 +56,6 @@ const user$ = _initAuth({
     }
 
     // TODO: Handle situation when there is no authInfo
-    console.log(authInfo)
 
     if (authInfo && !authInfo.isAuthenticated && window.location.pathname !== "/") {
       executeCommand("router.navigate", "/")

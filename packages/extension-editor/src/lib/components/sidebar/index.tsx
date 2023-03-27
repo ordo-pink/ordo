@@ -7,9 +7,10 @@ import Fuse from "fuse.js"
 import { memo, MouseEvent } from "react"
 import { useState, ChangeEvent, useEffect, KeyboardEvent } from "react"
 import { useTranslation } from "react-i18next"
-import { BsSearch } from "react-icons/bs"
+import { BsSearch, BsThreeDotsVertical } from "react-icons/bs"
 import File from "./file"
 import FileOrDirectory from "./file-or-directory"
+import logo from "../../assets/logo.png"
 
 const fuse = new Fuse([] as IOrdoFile[], { keys: ["readableName"] })
 
@@ -102,6 +103,19 @@ function FileExplorer() {
       className="p-4 h-full"
       onContextMenu={handleContextMenu}
     >
+      <div className="pb-4">
+        <div className="flex items-center justify-between">
+          <img
+            src={logo}
+            className="w-10"
+            alt="Ordo.pink Logo"
+          />
+          <div className="text-neutral-500 cursor-pointer">
+            {/* TODO: onClick show command palette */}
+            <BsThreeDotsVertical />
+          </div>
+        </div>
+      </div>
       <div className="mx-auto flex items-center pl-2 mt-2 mb-4 rounded-lg bg-neutral-300 dark:bg-neutral-700 shadow-inner max-w-xs">
         <BsSearch />
         <input

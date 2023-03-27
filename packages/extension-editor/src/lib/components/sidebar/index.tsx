@@ -7,10 +7,11 @@ import Fuse from "fuse.js"
 import { memo, MouseEvent } from "react"
 import { useState, ChangeEvent, useEffect, KeyboardEvent } from "react"
 import { useTranslation } from "react-i18next"
-import { BsSearch, BsThreeDotsVertical } from "react-icons/bs"
+import { BsFillPatchCheckFill, BsSearch, BsThreeDotsVertical } from "react-icons/bs"
 import File from "./file"
 import FileOrDirectory from "./file-or-directory"
 import logo from "../../assets/logo.png"
+import UsedSpace from "./used-space"
 
 const fuse = new Fuse([] as IOrdoFile[], { keys: ["readableName"] })
 
@@ -100,10 +101,10 @@ function FileExplorer() {
 
   return Either.fromNullable(drive).fold(Null, ({ root }) => (
     <div
-      className="p-4 h-full"
+      className="py-4 h-full flex flex-col space-y-4"
       onContextMenu={handleContextMenu}
     >
-      <div className="pb-4">
+      <div className="px-4 flex flex-col space-y-4">
         <div className="flex items-center justify-between">
           <img
             src={logo}
@@ -115,50 +116,69 @@ function FileExplorer() {
             <BsThreeDotsVertical />
           </div>
         </div>
-      </div>
-      <div className="mx-auto flex items-center pl-2 mt-2 mb-4 rounded-lg bg-neutral-300 dark:bg-neutral-700 shadow-inner max-w-xs">
-        <BsSearch />
-        <input
-          type="text"
-          aria-autocomplete="none"
-          className="w-full px-2 py-1 bg-transparent"
-          value={inputValue}
-          onKeyDown={handleKeyDown}
-          onChange={handleInputChange}
-          placeholder={tSearchFilePlaceholder}
-        />
-      </div>
-      <div className="file-explorer_files-container overflow-y-visible pb-6">
-        <div className="h-full">
-          {inputValue
-            ? visibleFiles.map((file, index) => (
-                <File
-                  isSelected={currentIndex === index}
-                  key={file.path}
-                  file={file}
-                />
-              ))
-            : root.children.map((child) => (
-                <FileOrDirectory
-                  key={child.path}
-                  item={child}
-                />
-              ))}
+        <div className="self-center flex items-center pl-2 rounded-lg bg-neutral-300 dark:bg-neutral-700 shadow-inner w-full max-w-sm">
+          <BsSearch />
+          <input
+            type="text"
+            aria-autocomplete="none"
+            className="w-full px-2 py-1 bg-transparent"
+            value={inputValue}
+            onKeyDown={handleKeyDown}
+            onChange={handleInputChange}
+            placeholder={tSearchFilePlaceholder}
+          />
         </div>
       </div>
-      {/* <UsedSpace />
-      <div className="file-explorer_action-group">
-        <OrdoButtonNeutral onClick={handleCreateFileClick}>
-          <div>
-            <CreateFileIcon />
+      <div className="px-4 overflow-y-auto h-[calc(100vh-12.5rem)] flex-grow">
+        {inputValue
+          ? visibleFiles.map((file, index) => (
+              <File
+                isSelected={currentIndex === index}
+                key={file.path}
+                file={file}
+              />
+            ))
+          : root.children.map((child) => (
+              <FileOrDirectory
+                key={child.path}
+                item={child}
+              />
+            ))}
+      </div>
+      <div className="flex items-center space-x-4 w-full max-w-xs self-center justify-center px-4">
+        <div className="rounded-full p-0.5 bg-gradient-to-tr from-sky-400 via-purple-400 to-rose-400 shadow-lg shrink-0">
+          <div className="bg-white rounded-full">
+            <img
+              src={logo}
+              alt="User avatar"
+              className="w-10 rounded-full"
+            />
           </div>
-        </OrdoButtonNeutral>
-        <OrdoButtonNeutral onClick={handleCreateDirectoryClick}>
-          <div>
-            <CreateDirectoryIcon />
+        </div>
+        <div className="flex flex-col text-sm text-neutral-700 w-full -mt-1">
+          <div className="flex space-x-2 items-center">
+            <div className="font-bold truncate">Sergei Orlov</div>
+            <div className="shrink-0">
+              <BsFillPatchCheckFill className="text-indigo-500 text-base" />
+            </div>
           </div>
-        </OrdoButtonNeutral>
-      </div> */}
+          <div className="w-full">
+            <UsedSpace />
+            {/* <div className="file-explorer_action-group">
+              <OrdoButtonNeutral onClick={handleCreateFileClick}>
+                <div>
+                  <CreateFileIcon />
+                </div>
+              </OrdoButtonNeutral>
+              <OrdoButtonNeutral onClick={handleCreateDirectoryClick}>
+                <div>
+                  <CreateDirectoryIcon />
+                </div>
+              </OrdoButtonNeutral>
+            </div> */}
+          </div>
+        </div>
+      </div>
     </div>
   ))
 }

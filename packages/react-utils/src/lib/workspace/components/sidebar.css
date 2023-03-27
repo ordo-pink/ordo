@@ -1,5 +1,5 @@
 .sidebar {
-  @apply h-full bg-neutral-200 dark:bg-neutral-800 overflow-y-auto;
+  @apply h-full bg-neutral-200 dark:bg-neutral-800;
 }
 
 .gutter {

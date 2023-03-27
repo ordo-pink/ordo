@@ -7,11 +7,9 @@ import Fuse from "fuse.js"
 import { memo, MouseEvent } from "react"
 import { useState, ChangeEvent, useEffect, KeyboardEvent } from "react"
 import { useTranslation } from "react-i18next"
-import { BsFillPatchCheckFill, BsSearch, BsThreeDotsVertical } from "react-icons/bs"
+import { BsSearch } from "react-icons/bs"
 import File from "./file"
 import FileOrDirectory from "./file-or-directory"
-import UsedSpace from "./used-space"
-import logo from "../../assets/logo.png"
 
 const fuse = new Fuse([] as IOrdoFile[], { keys: ["readableName"] })
 
@@ -104,18 +102,7 @@ function FileExplorer() {
       className="py-4 h-full flex flex-col space-y-4"
       onContextMenu={handleContextMenu}
     >
-      <div className="px-4 flex flex-col space-y-4">
-        <div className="flex items-center justify-between">
-          <img
-            src={logo}
-            className="w-10"
-            alt="Ordo.pink Logo"
-          />
-          <div className="text-neutral-500 cursor-pointer">
-            {/* TODO: onClick show command palette */}
-            <BsThreeDotsVertical />
-          </div>
-        </div>
+      <div className="px-2 flex flex-col space-y-4">
         <div className="self-center flex items-center pl-2 rounded-lg bg-neutral-300 dark:bg-neutral-700 shadow-inner w-full max-w-sm">
           <BsSearch />
           <input
@@ -129,7 +116,7 @@ function FileExplorer() {
           />
         </div>
       </div>
-      <div className="px-4 overflow-y-auto h-[calc(100vh-12.5rem)] flex-grow">
+      <div className="overflow-y-auto h-[calc(100vh-12.5rem)] flex-grow">
         {inputValue
           ? visibleFiles.map((file, index) => (
               <File
@@ -145,26 +132,8 @@ function FileExplorer() {
               />
             ))}
       </div>
-      <div className="flex items-center space-x-4 w-full max-w-xs self-center justify-center px-4">
-        <div className="rounded-full p-0.5 bg-gradient-to-tr from-sky-400 via-purple-400 to-rose-400 shadow-lg shrink-0 cursor-pointer">
-          <div className="bg-white rounded-full">
-            <img
-              src={logo}
-              alt="User avatar"
-              className="w-10 rounded-full"
-            />
-          </div>
-        </div>
-        <div className="flex flex-col text-sm text-neutral-700 dark:text-neutral-400 w-full -mt-1">
-          <div className="flex space-x-2 items-center">
-            <div className="font-bold truncate">Sergei Orlov</div>
-            <div className="shrink-0">
-              <BsFillPatchCheckFill className="text-indigo-500 text-base" />
-            </div>
-          </div>
-          <div className="w-full">
-            <UsedSpace />
-            {/* <div className="file-explorer_action-group">
+
+      {/* <div className="file-explorer_action-group">
               <OrdoButtonNeutral onClick={handleCreateFileClick}>
                 <div>
                   <CreateFileIcon />
@@ -176,9 +145,6 @@ function FileExplorer() {
                 </div>
               </OrdoButtonNeutral>
             </div> */}
-          </div>
-        </div>
-      </div>
     </div>
   ))
 }

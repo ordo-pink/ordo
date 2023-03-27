@@ -1,0 +1,3 @@
+.workspace {
+  @apply max-h-screen h-full flex overflow-auto w-full p-2 pr-6;
+}

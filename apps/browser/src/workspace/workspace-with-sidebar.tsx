@@ -1,8 +1,8 @@
+import { useWindowSize } from "@ordo-pink/react-utils"
 import { PropsWithChildren, useEffect, useState } from "react"
 import ReactSplit from "react-split"
 import Sidebar from "./sidebar"
-import Workspace from ".."
-import { useWindowSize } from "../../use-window-size"
+import Workspace from "./workspace"
 
 import "./workspace-with-sidebar.css"
 
@@ -18,8 +18,6 @@ export default function WorkspaceWithSidebar({
 
   const [isNarrow, setIsNarrow] = useState(true)
   const [sizes, setSizes] = useState(isNarrow ? [0, 100] : [25, 75])
-  const [snapLeft, setSnapLeft] = useState(isNarrow)
-  const [snapRight, setSnapRight] = useState(false)
 
   useEffect(() => {
     const isNarrow = width < 768
@@ -28,12 +26,8 @@ export default function WorkspaceWithSidebar({
 
     if (isNarrow) {
       setSizes([0, 100])
-      setSnapLeft(true)
-      setSnapRight(false)
     } else {
       setSizes([25, 75])
-      setSnapLeft(false)
-      setSnapRight(false)
     }
   }, [width])
 
@@ -44,9 +38,8 @@ export default function WorkspaceWithSidebar({
       minSize={0}
       className="workspace-wrapper"
       direction="horizontal"
-      onDrag={() => {
-        setSnapLeft(true)
-        setSnapRight(true)
+      onDrag={(sizes) => {
+        setSizes(sizes)
       }}
       onDragEnd={([left, right]) => {
         let newLeft = left
@@ -70,41 +63,24 @@ export default function WorkspaceWithSidebar({
           }
         }
 
-        setSnapLeft(newLeft === 0)
-        setSnapRight(newRight === 0)
-
         setSizes([newLeft, newRight])
       }}
     >
-      <Sidebar
-        onClick={() => {
-          if (isNarrow) {
-            setSizes([0, 100])
-            setSnapLeft(true)
-            setSnapRight(false)
-          }
-        }}
-      >
-        <div
-          className={`h-full ${
-            snapLeft
-              ? "opacity-50 transition-opacity duration-300"
-              : "opacity-100 transition-opacity duration-300"
-          }`}
-        >
-          <div className={`h-full ${sizes[0] === 0 ? "hidden" : "block"}`}>{sidebarChildren}</div>
+      <div className={`h-full`}>
+        <div className={sizes[0] <= 5 ? "hidden" : "block"}>
+          <Sidebar
+            onClick={() => {
+              if (isNarrow) {
+                setSizes([0, 100])
+              }
+            }}
+          >
+            {sidebarChildren}
+          </Sidebar>
         </div>
-      </Sidebar>
+      </div>
       <Workspace>
-        <div
-          className={
-            snapRight
-              ? "h-full w-full opacity-50 transition-opacity duration-300"
-              : "h-full w-full opacity-100 transition-opacity duration-300"
-          }
-        >
-          {children}
-        </div>
+        <div className="h-full w-full">{children}</div>
       </Workspace>
     </ReactSplit>
   )

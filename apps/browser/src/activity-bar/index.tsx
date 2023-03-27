@@ -7,7 +7,7 @@ type Props = {
 
 export default function ActivityBar({ activities }: Props) {
   return (
-    <div className="flex flex-col space-y-2 items-center p-2 text-lg sm:text-2xl z-50 bg-neutral-200 dark:bg-neutral-800">
+    <div className="flex flex-col space-y-2 items-center px-2 justify-center text-lg sm:text-2xl z-50 bg-neutral-200 dark:bg-neutral-800">
       <div className="">
         {activities.map((activity, index) => (
           <ActivityBarActivity

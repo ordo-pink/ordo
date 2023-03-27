@@ -24,18 +24,24 @@ import { createDraft, finishDraft } from "immer"
 import { EditorState, EditorThemeClasses, LexicalNode } from "lexical"
 import { debounce } from "lodash"
 import { mergeDeepWith } from "ramda"
-import { useEffect, useState, memo } from "react"
+import { memo } from "react"
 import { useTranslation } from "react-i18next"
 import { LoadEditorStatePlugin } from "./load-state"
 
 const debouncedSave = debounce(
-  (
-    driver: FSDriver,
-    file: IOrdoFile,
-    nodes: LexicalNode[],
-    content: string,
-    emit: ExecuteCommandFn,
-  ) => {
+  ({
+    driver,
+    file,
+    nodes,
+    content,
+    emit,
+  }: {
+    driver: FSDriver
+    file: IOrdoFile
+    nodes: LexicalNode[]
+    content: string
+    emit: ExecuteCommandFn
+  }) => {
     let metadata = {}
 
     const draft = createDraft(file)
@@ -173,31 +179,17 @@ export default memo(
     const { emit } = useCommands()
     const driver = useFsDriver()
 
-    const [isInitialLoad, setIsInitialLoad] = useState(true)
-
-    // Prevent from updating the file at the moment it is opened
-    useEffect(() => {
-      setIsInitialLoad(true)
-
-      setTimeout(() => setIsInitialLoad(false), 1000)
-
-      return () => {
-        setIsInitialLoad(true)
-      }
-    }, [file.path])
-
     const handleChange = (state: EditorState) => {
-      if (isInitialLoad) return
+      if (!driver) return
 
       state.read(() => {
-        if (!driver) return
-
         const content = $convertToMarkdownString(TRANSFORMERS)
+
         // const content = $convertToMarkdownString(transformers.concat(TRANSFORMERS))
 
         const nodes = toNodeArray(state.toJSON().root)
 
-        debouncedSave(driver, file, nodes, content, emit)
+        debouncedSave({ driver, file, nodes, content, emit })
       })
     }
 

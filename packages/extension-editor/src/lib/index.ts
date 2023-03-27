@@ -137,6 +137,7 @@ export default createExtension(
         ".ico",
         ".cur",
         ".tif",
+        ".jfif",
         ".tiff",
         ".png",
       ],

@@ -177,6 +177,8 @@ export default memo(
 
     // Prevent from updating the file at the moment it is opened
     useEffect(() => {
+      setIsInitialLoad(true)
+
       setTimeout(() => setIsInitialLoad(false), 1000)
 
       return () => {

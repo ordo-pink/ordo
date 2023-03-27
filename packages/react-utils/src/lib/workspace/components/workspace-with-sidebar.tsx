@@ -70,10 +70,10 @@ export default function WorkspaceWithSidebar({
           }
         }}
       >
-        <div className={`h-full}`}>{sidebarChildren}</div>
+        <div className="h-full">{sidebarChildren}</div>
       </Sidebar>
       <Workspace>
-        <div>{children}</div>
+        <div className="h-full w-full">{children}</div>
       </Workspace>
     </ReactSplit>
   )

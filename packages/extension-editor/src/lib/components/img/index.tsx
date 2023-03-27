@@ -34,10 +34,10 @@ export default function ImgViewer({ file }: Props) {
   return Either.fromNullable(content)
     .chain(() => Either.fromNullable(url))
     .fold(Loading, (url) => (
-      <div className="p-4 w-full max-w-6xl">
-        <div className="w-full h-screen flex flex-col items-center">
+      <div className="h-full flex justify-center items-center">
+        <div className="max-w-4xl">
           <img
-            className="shadow-lg"
+            className="shadow-xl rounded-lg"
             title={file.path}
             src={url}
             alt={file.readableName}

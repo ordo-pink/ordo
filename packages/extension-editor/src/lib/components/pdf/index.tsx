@@ -26,16 +26,16 @@ export default function PDFViewer({ file }: Props) {
   }, [file.path, content])
 
   return Either.fromNullable(url).fold(Loading, (url) => (
-    <div className="p-4 w-full max-w-6xl">
+    <div className="w-full h-full flex flex-col items-center justify-center">
       {/* <div className="mb-8">
         <PathBreadcrumbs path={breadcrumbsPath} />
 
         <h1 className="text-3xl font-black">{file.readableName}</h1>
       </div> */}
 
-      <div className="w-full h-screen flex flex-col items-center">
+      <div className="w-full flex-grow max-w-4xl">
         <iframe
-          className="w-full h-screen"
+          className="w-full h-full"
           title={file.path}
           src={url}
         />

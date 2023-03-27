@@ -17,15 +17,18 @@ export const useFileContentRaw = (file: IOrdoFile) => {
 }
 
 export const useFileContentBlob = (file: IOrdoFile) => {
-  const response = useFileContentRaw(file)
+  const driver = useFsDriver()
 
   const [content, setContent] = useState<Nullable<Blob>>(null)
 
   useEffect(() => {
-    if (!response) return
+    if (!driver) return
 
-    response.clone().blob().then(setContent)
-  }, [response, file])
+    driver.files
+      .getContent(file.path)
+      .then((res) => res.blob())
+      .then(setContent)
+  }, [driver, file])
 
   return content
 }

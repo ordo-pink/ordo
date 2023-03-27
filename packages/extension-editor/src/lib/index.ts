@@ -113,5 +113,33 @@ export default createExtension(
       Icon: lazy(() => import("./components/pdf/icon")),
       fileExtensions: [".pdf"],
     })
+
+    registerFileAssociation("media", {
+      Component: lazy(() => import("./components/media")),
+      Icon: lazy(() => import("./components/media/icon")),
+      fileExtensions: [".wav", ".mp3", ".ogg", ".mp4", ".adts", ".webm", ".caf", ".flac"],
+    })
+
+    registerFileAssociation("img", {
+      Component: lazy(() => import("./components/img")),
+      Icon: lazy(() => import("./components/img/icon")),
+      fileExtensions: [
+        ".apng",
+        ".avif",
+        ".gif",
+        ".jpg",
+        ".jpeg",
+        ".pjpeg",
+        ".pjp",
+        ".svg",
+        ".webp",
+        ".bmp",
+        ".ico",
+        ".cur",
+        ".tif",
+        ".tiff",
+        ".png",
+      ],
+    })
   },
 )

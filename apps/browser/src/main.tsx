@@ -56,8 +56,9 @@ const user$ = _initAuth({
     }
 
     // TODO: Handle situation when there is no authInfo
+    console.log(authInfo)
 
-    if (authInfo && !authInfo.isAuthenticated) {
+    if (authInfo && !authInfo.isAuthenticated && window.location.pathname !== "/") {
       executeCommand("router.navigate", "/")
     }
   },
@@ -81,16 +82,19 @@ const getFsDriver: UnaryFn<{ token: string; sub: string }, FSDriver> = ({ token,
               headers: {
                 [AUTHORIZATION_HEADER_KEY]: `Bearer ${token}`,
               },
-            }),
+            }).catch(logger.error),
           ),
         )
-        .then((res) => res.json()),
+        .then((res) => res.json())
+        .catch(logger.error),
     get: (path) =>
       fetch(`${fsUrl}/${FILE_API}/${sub}${path}`, {
         headers: {
           [AUTHORIZATION_HEADER_KEY]: `Bearer ${token}`,
         },
-      }).then((res) => res.json()),
+      })
+        .then((res) => res.json())
+        .catch(logger.error),
     set: (file) =>
       fetch(`${fsUrl}/${FILE_API}/${sub}${file.path}.metadata`, {
         method: "PUT",
@@ -98,7 +102,9 @@ const getFsDriver: UnaryFn<{ token: string; sub: string }, FSDriver> = ({ token,
         headers: {
           [AUTHORIZATION_HEADER_KEY]: `Bearer ${token}`,
         },
-      }).then(() => file),
+      })
+        .catch(logger.error)
+        .then(() => file),
     getContent: (path) =>
       fetch(`${fsUrl}/${FILE_API}/${sub}${path}`, {
         headers: {
@@ -112,21 +118,27 @@ const getFsDriver: UnaryFn<{ token: string; sub: string }, FSDriver> = ({ token,
           [AUTHORIZATION_HEADER_KEY]: `Bearer ${token}`,
         },
         body: content,
-      }).then((res) => res.json()),
+      })
+        .then((res) => res.json())
+        .catch(logger.error),
     remove: (path) =>
       fetch(`${fsUrl}/${FILE_API}/${sub}${path}`, {
         method: "DELETE",
         headers: {
           [AUTHORIZATION_HEADER_KEY]: `Bearer ${token}`,
         },
-      }).then((res) => res.json()),
+      })
+        .then((res) => res.json())
+        .catch(logger.error),
     move: ({ oldPath, newPath }) =>
       fetch(`${fsUrl}/${FILE_API}/${sub}${oldPath}->${newPath}`, {
         method: "PATCH",
         headers: {
           [AUTHORIZATION_HEADER_KEY]: `Bearer ${token}`,
         },
-      }).then((res) => res.json()),
+      })
+        .then((res) => res.json())
+        .catch(logger.error),
   },
   directories: {
     create: (path) =>
@@ -135,7 +147,9 @@ const getFsDriver: UnaryFn<{ token: string; sub: string }, FSDriver> = ({ token,
         headers: {
           [AUTHORIZATION_HEADER_KEY]: `Bearer ${token}`,
         },
-      }).then((res) => res.json()),
+      })
+        .then((res) => res.json())
+        .catch(logger.error),
     set: (directory) =>
       fetch(`${fsUrl}/${FILE_API}/${sub}${directory.path}.metadata`, {
         method: "PUT",
@@ -143,27 +157,35 @@ const getFsDriver: UnaryFn<{ token: string; sub: string }, FSDriver> = ({ token,
         headers: {
           [AUTHORIZATION_HEADER_KEY]: `Bearer ${token}`,
         },
-      }).then(() => directory),
+      })
+        .catch(logger.error)
+        .then(() => directory),
     get: (path) =>
       fetch(`${fsUrl}/${DIRECTORY_API}/${sub}${path}`, {
         headers: {
           [AUTHORIZATION_HEADER_KEY]: `Bearer ${token}`,
         },
-      }).then((res) => res.json()),
+      })
+        .then((res) => res.json())
+        .catch(logger.error),
     remove: (path) =>
       fetch(`${fsUrl}/${DIRECTORY_API}/${sub}${path}`, {
         method: "DELETE",
         headers: {
           [AUTHORIZATION_HEADER_KEY]: `Bearer ${token}`,
         },
-      }).then((res) => res.json()),
+      })
+        .then((res) => res.json())
+        .catch(logger.error),
     move: ({ oldPath, newPath }) =>
       fetch(`${fsUrl}/${DIRECTORY_API}/${sub}${oldPath}->${newPath}`, {
         method: "PATCH",
         headers: {
           [AUTHORIZATION_HEADER_KEY]: `Bearer ${token}`,
         },
-      }).then((res) => res.json()),
+      })
+        .then((res) => res.json())
+        .catch(logger.error),
   },
 })
 

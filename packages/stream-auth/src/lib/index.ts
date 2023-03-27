@@ -95,7 +95,6 @@ export const _initAuth = callOnce(
     }
 
     const user$ = auth$.pipe(
-      tap(onChangeLoginStatus),
       switchMap((auth) =>
         iif(
           () => Boolean(auth),
@@ -107,6 +106,7 @@ export const _initAuth = callOnce(
           createUnauthenticatedUser$(loggedOutExtensions.map((f) => f())),
         ),
       ),
+      tap((userInfo) => onChangeLoginStatus(userInfo.auth)),
     )
 
     return user$

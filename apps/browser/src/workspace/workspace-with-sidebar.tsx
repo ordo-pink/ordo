@@ -31,6 +31,12 @@ export default function WorkspaceWithSidebar({
     }
   }, [width])
 
+  const handleSidebarClick = () => {
+    if (!isNarrow || sizes[0] === 0) return
+
+    setSizes([0, 100])
+  }
+
   return (
     <ReactSplit
       sizes={sizes}
@@ -66,22 +72,25 @@ export default function WorkspaceWithSidebar({
         setSizes([newLeft, newRight])
       }}
     >
-      <div className={`h-full`}>
-        <div className={sizes[0] <= 5 ? "hidden" : "block"}>
-          <Sidebar
-            onClick={() => {
-              if (isNarrow) {
-                setSizes([0, 100])
-              }
-            }}
-          >
-            {sidebarChildren}
-          </Sidebar>
-        </div>
+      <div
+        className={`h-full ${sizes[0] <= 5 ? "hidden" : "block"}`}
+        onClick={handleSidebarClick}
+      >
+        <Sidebar
+          onClick={() => {
+            if (isNarrow) {
+              setSizes([0, 100])
+            }
+          }}
+        >
+          {sidebarChildren}
+        </Sidebar>
       </div>
-      <Workspace>
-        <div className="h-full w-full">{children}</div>
-      </Workspace>
+      <div className={`h-full w-full ${sizes[1] <= 5 ? "hidden" : "block"}`}>
+        <Workspace>
+          <div className="h-full w-full">{children}</div>
+        </Workspace>
+      </div>
     </ReactSplit>
   )
 }

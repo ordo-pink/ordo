@@ -26,7 +26,7 @@ export default function PDFViewer({ file }: Props) {
   }, [file.path, content])
 
   return Either.fromNullable(url).fold(Loading, (url) => (
-    <div className="w-full h-full flex flex-col items-center justify-center">
+    <div className="w-full h-full flex flex-col items-center justify-center p-2">
       {/* <div className="mb-8">
         <PathBreadcrumbs path={breadcrumbsPath} />
 

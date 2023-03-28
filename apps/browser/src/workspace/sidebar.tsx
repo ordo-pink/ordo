@@ -28,7 +28,7 @@ export default function Sidebar({ children, onClick }: Props) {
         </div>
       </div>
       <div className="flex-grow">{children}</div>
-      <div className="flex items-center space-x-4 w-full max-w-xs self-center justify-center">
+      <div className="flex items-center space-x-4 w-full max-w-sm self-center justify-center">
         <div className="rounded-full p-0.5 bg-gradient-to-tr from-sky-400 via-purple-400 to-rose-400 shadow-lg shrink-0 cursor-pointer">
           <div className="bg-white rounded-full">
             <img

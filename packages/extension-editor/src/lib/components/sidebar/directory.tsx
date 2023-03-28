@@ -1,6 +1,12 @@
 import { IOrdoDirectory } from "@ordo-pink/common-types"
 import { Either } from "@ordo-pink/either"
-import { ActionListItem, Null, useCommands, useContextMenu } from "@ordo-pink/react-utils"
+import {
+  ActionListItem,
+  Null,
+  useCommands,
+  useContextMenu,
+  useWindowSize,
+} from "@ordo-pink/react-utils"
 import { MouseEvent } from "react"
 import {
   AiFillFolder,
@@ -18,6 +24,9 @@ type Props = {
 
 export default function Directory({ directory }: Props) {
   const { emit } = useCommands()
+  const [width] = useWindowSize()
+
+  const isNarrow = width < 768
 
   const { showContextMenu } = useContextMenu()
 
@@ -34,7 +43,9 @@ export default function Directory({ directory }: Props) {
 
   const Chevron = directory.metadata.isExpanded ? BsChevronDown : BsChevronUp
 
-  const handleClick = () => {
+  const handleClick = (event: MouseEvent) => {
+    if (isNarrow) event.stopPropagation()
+
     emit(
       directory.metadata.isExpanded ? "editor.collapse-directory" : "editor.expand-directory",
       directory,

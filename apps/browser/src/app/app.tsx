@@ -31,7 +31,7 @@ export function App() {
               <ActivityBar activities={activities} />
             ))}
 
-          <div className="flex-grow h-full">
+          <div className="flex-grow h-full w-[calc(100vw-4rem)]">
             {Sidebar ? (
               <WorkspaceWithSidebar sidebarChildren={<Sidebar />}>
                 <Component />

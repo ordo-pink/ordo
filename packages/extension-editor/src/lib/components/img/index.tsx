@@ -34,7 +34,7 @@ export default function ImgViewer({ file }: Props) {
   return Either.fromNullable(content)
     .chain(() => Either.fromNullable(url))
     .fold(Loading, (url) => (
-      <div className="h-full flex justify-center items-center">
+      <div className="h-full flex justify-center items-center p-4">
         <div className="max-w-4xl">
           <img
             className="shadow-xl rounded-lg"

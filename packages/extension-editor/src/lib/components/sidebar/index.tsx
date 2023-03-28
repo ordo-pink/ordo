@@ -23,8 +23,6 @@ function FileExplorer() {
   const [inputValue, setInputValue] = useState("")
   const [visibleFiles, setVisibleFiles] = useState<IOrdoFile[]>([])
 
-  const resetInput = () => setInputValue("")
-
   useEffect(() => {
     after("editor.open-file-in-editor", resetInput)
 
@@ -47,6 +45,8 @@ function FileExplorer() {
 
     setVisibleFiles(fusedFiles.map(({ item }) => item))
   }, [inputValue, drive])
+
+  const resetInput = () => setInputValue("")
 
   const handleContextMenu = (event: MouseEvent) => {
     event.preventDefault()

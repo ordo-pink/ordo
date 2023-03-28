@@ -5,18 +5,25 @@ import { useHotkeys } from "react-hotkeys-hook"
 import { BsX } from "react-icons/bs"
 
 export default function Modal() {
-  const Component = useSubscription(modal$)
-
-  const Render = () => Component as unknown as JSX.Element
-
+  const modal = useSubscription(modal$)
   const { hideModal } = useModal()
 
-  useHotkeys("Esc", hideModal)
+  useHotkeys(
+    "Esc",
+    () => {
+      modal?.onHide()
+      hideModal()
+    },
+    [modal],
+  )
 
-  return Either.fromNullable(Component).fold(Null, (Comp) => (
+  return Either.fromNullable(modal).fold(Null, ({ Component, onHide, showCloseButton }) => (
     <div
       className="absolute z-[500] top-0 left-0 right-0 bottom-0 bg-gradient-to-tr from-neutral-900/80  to-stone-900/80  h-screen w-screen flex items-center justify-center"
-      onClick={hideModal}
+      onClick={() => {
+        onHide()
+        hideModal()
+      }}
     >
       <div
         className="relative bg-neutral-100 dark:bg-neutral-700 rounded-lg shadow-lg"
@@ -24,13 +31,15 @@ export default function Modal() {
           e.stopPropagation()
         }}
       >
-        <div
-          className="absolute right-1 top-1 text-neutral-500 p-2 cursor-pointer"
-          onClick={hideModal}
-        >
-          <BsX />
-        </div>
-        <Render />
+        {showCloseButton ? (
+          <div
+            className="absolute right-1 top-1 text-neutral-500 p-2 cursor-pointer"
+            onClick={hideModal}
+          >
+            <BsX />
+          </div>
+        ) : null}
+        <Component />
       </div>
     </div>
   ))

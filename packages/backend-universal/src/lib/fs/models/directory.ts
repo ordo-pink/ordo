@@ -111,7 +111,12 @@ export const OrdoDirectoryModel = {
                 .on("end", () => resolve(Buffer.concat(body).toString("utf8")))
             })
 
-            directory.metadata = JSON.parse(metadata)
+            try {
+              directory.metadata = JSON.parse(metadata)
+            } catch (e) {
+              driver.deleteFile(metadataPath)
+              directory.metadata = {}
+            }
           }
 
           return directory

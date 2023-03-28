@@ -1,7 +1,9 @@
 import { OrdoDirectory, OrdoFile } from "@ordo-pink/fs-entity"
-import { useModal } from "@ordo-pink/react-utils"
+import { FileIcon, useModal } from "@ordo-pink/react-utils"
+import { showCommandPalette } from "@ordo-pink/stream-command-palette"
 import { drive$, fsDriver$ } from "@ordo-pink/stream-drives"
 import { createExtension } from "@ordo-pink/stream-extensions"
+import { AiFillFolder, AiOutlineFolder } from "react-icons/ai"
 import { BsFileEarmarkMinus, BsFileEarmarkPlus, BsFolderMinus, BsFolderPlus } from "react-icons/bs"
 import { createDirectory } from "./commands/directory/create-directory"
 import { moveDirectory } from "./commands/directory/move-directory"
@@ -19,7 +21,13 @@ import RemoveFileModal from "./components/remove-file-modal"
 
 export default createExtension(
   "fs",
-  ({ commands, registerContextMenuItem, registerTranslations }) => {
+  ({
+    commands,
+    registerContextMenuItem,
+    registerTranslations,
+    registerCommandPaletteItem,
+    translate,
+  }) => {
     registerTranslations({
       ru: {
         "confirm-remove": 'Вы уверены, что хотите удалить "{{name}}"?',
@@ -29,11 +37,14 @@ export default createExtension(
         "show-remove-directory-modal": "Удалить",
         "create-file": "Создать файл",
         "remove-file": "Удалить файл",
+        "remove-file...": "Удалить файл...",
         "create-directory": "Создать папку",
+        "remove-directory": "Удалить папку...",
         "choose-name-placeholder": "Выбери название...",
         "create-button": "Создать",
         "remove-button": "Удалить",
         "cancel-button": "Не, ну его",
+        "invalid-name": "Выбранное название содержит запрещённые символы.",
       },
       en: {
         "confirm-remove": 'Are you sure you want to remove "{{name}}"?',
@@ -43,11 +54,14 @@ export default createExtension(
         "show-remove-directory-modal": "Remove",
         "create-file": "Create file",
         "remove-file": "Remove file",
+        "remove-file...": "Remove file...",
         "create-directory": "Create directory",
+        "remove-directory": "Remove directory...",
         "choose-name-placeholder": "Choose name...",
         "create-button": "Create",
         "remove-button": "Remove",
         "cancel-button": "Cancel",
+        "invalid-name": "Provided name contains forbidden characters.",
       },
     })
 
@@ -76,7 +90,19 @@ export default createExtension(
       Icon: BsFileEarmarkPlus,
       payloadCreator: (target) => target,
       shouldShow: (target) => OrdoDirectory.isOrdoDirectory(target),
-      accelerator: "alt+n",
+    })
+
+    registerCommandPaletteItem({
+      id: "create-file",
+      name: translate("create-file"),
+      Icon: BsFileEarmarkPlus,
+      onSelect: () => {
+        const drive = drive$.getValue()
+
+        if (!drive) return
+
+        commands.emit("fs.show-create-file-modal", drive.root)
+      },
     })
 
     const CREATE_DIRECTORY_COMMAND = commands.on("show-create-directory-modal", ({ payload }) => {
@@ -92,6 +118,19 @@ export default createExtension(
       accelerator: "alt+shift+n",
     })
 
+    registerCommandPaletteItem({
+      id: "create-directory",
+      name: translate("create-directory"),
+      Icon: BsFolderPlus,
+      onSelect: () => {
+        const drive = drive$.getValue()
+
+        if (!drive) return
+
+        commands.emit("fs.show-create-directory-modal", drive.root)
+      },
+    })
+
     const REMOVE_FILE_COMMAND = commands.on("show-remove-file-modal", ({ payload }) => {
       const { showModal } = useModal()
 
@@ -105,6 +144,33 @@ export default createExtension(
       accelerator: "ctrl+alt+backspace",
     })
 
+    registerCommandPaletteItem({
+      id: "remove-file",
+      name: translate("remove-file..."),
+      Icon: BsFileEarmarkMinus,
+      onSelect: () => {
+        const drive = drive$.getValue()
+
+        if (!drive) return
+
+        const files = drive.root.getFilesDeep()
+
+        showCommandPalette(
+          files.map((file) => ({
+            id: file.path,
+            name: file.readableName,
+            Icon: () => <FileIcon file={file} />,
+            onSelect: () => commands.emit("fs.show-remove-file-modal", file),
+            Comment: () => (
+              <div className="text-xs text-neutral-600 dark:text-neutral-400">
+                {OrdoFile.getParentPath(file.path)}
+              </div>
+            ),
+          })),
+        )
+      },
+    })
+
     const REMOVE_DIRECTORY_COMMAND = commands.on("show-remove-directory-modal", ({ payload }) => {
       const { showModal } = useModal()
 
@@ -116,6 +182,31 @@ export default createExtension(
       payloadCreator: (target) => target,
       shouldShow: (target) => OrdoDirectory.isOrdoDirectory(target) && target.path !== "/",
       accelerator: "ctrl+alt+backspace",
+    })
+
+    registerCommandPaletteItem({
+      id: "remove-directory",
+      name: translate("remove-directory"),
+      Icon: BsFolderMinus,
+      onSelect: () => {
+        const drive = drive$.getValue()
+
+        if (!drive) return
+
+        const directories = drive.root.getDirectoriesDeep()
+
+        showCommandPalette(
+          directories.map((directory) => ({
+            id: directory.path,
+            name: directory.readableName,
+            Icon: () => (directory.children.length > 0 ? <AiFillFolder /> : <AiOutlineFolder />),
+            onSelect: () => commands.emit("fs.show-remove-directory-modal", directory),
+            Comment: () => (
+              <div className="text-xs text-neutral-600 dark:text-neutral-400">{directory.path}</div>
+            ),
+          })),
+        )
+      },
     })
   },
 )

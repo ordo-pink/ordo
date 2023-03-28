@@ -1,5 +1,8 @@
 import { UnaryFn } from "@ordo-pink/common-types"
+import { useCommandPalette, useSubscription } from "@ordo-pink/react-utils"
+import { commandPaletteItems$ } from "@ordo-pink/stream-command-palette"
 import { MouseEvent, PropsWithChildren } from "react"
+import { useHotkeys } from "react-hotkeys-hook"
 import { BsFillPatchCheckFill, BsThreeDotsVertical } from "react-icons/bs"
 import UsedSpace from "./used-space"
 import logo from "../assets/logo.png"
@@ -11,6 +14,21 @@ type Props = PropsWithChildren<{
 }>
 
 export default function Sidebar({ children, onClick }: Props) {
+  const { showCommandPalette } = useCommandPalette()
+  const commandPaletteItems = useSubscription(commandPaletteItems$)
+
+  useHotkeys(
+    "ctrl+shift+p",
+    (event) => {
+      event.preventDefault()
+      event.stopPropagation()
+
+      showCommandPalette(commandPaletteItems)
+    },
+    { enableOnContentEditable: true },
+    [commandPaletteItems],
+  )
+
   return (
     <div
       className="sidebar"
@@ -22,7 +40,10 @@ export default function Sidebar({ children, onClick }: Props) {
           className="w-10"
           alt="Ordo.pink Logo"
         />
-        <div className="text-neutral-500 cursor-pointer">
+        <div
+          className="text-neutral-500 cursor-pointer"
+          onClick={() => showCommandPalette(commandPaletteItems)}
+        >
           {/* TODO: onClick show command palette */}
           <BsThreeDotsVertical />
         </div>

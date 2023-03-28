@@ -79,6 +79,12 @@ export type IOrdoDirectory<T extends Record<string, unknown> = Record<string, un
   getFilesDeep: ThunkFn<IOrdoFile[]>
 
   /**
+   * Returns all directories contained in the directory including directories
+   * in the child directories.
+   */
+  getDirectoriesDeep: ThunkFn<IOrdoDirectory[]>
+
+  /**
    * Returns a direct descendant directory of current directory with given
    * path.
    */

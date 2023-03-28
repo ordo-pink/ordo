@@ -1,4 +1,4 @@
-import { IOrdoDirectory } from "@ordo-pink/common-types"
+import { IOrdoDirectory, OrdoFilePath } from "@ordo-pink/common-types"
 import { OrdoFile } from "@ordo-pink/fs-entity"
 import {
   OrdoButtonPrimary,
@@ -21,9 +21,22 @@ export default function CreateFileModal({ parent }: Props) {
   const { t } = useTranslation("fs")
 
   const [fileName, setFileName] = useState("")
+  const [isValidPath, setIsValidPath] = useState(true)
+  const [breadcrumbsPath, setBreadcrumbsPath] = useState(parent?.path ?? "/")
 
-  const handleInputChange = (event: ChangeEvent<HTMLInputElement>) =>
+  const handleInputChange = (event: ChangeEvent<HTMLInputElement>) => {
     setFileName(event.target.value)
+    setIsValidPath(
+      event.target.value
+        ? OrdoFile.isValidPath((parent?.path ?? "/").concat(event.target.value))
+        : true,
+    )
+    setBreadcrumbsPath(
+      OrdoFile.isValidPath((parent?.path ?? "/").concat(event.target.value) as OrdoFilePath)
+        ? OrdoFile.getParentPath((parent?.path ?? "/").concat(event.target.value) as OrdoFilePath)
+        : parent?.path ?? "/",
+    )
+  }
 
   const handleCreateFile = () => {
     const parentPath = parent ? parent.path : "/"
@@ -39,6 +52,7 @@ export default function CreateFileModal({ parent }: Props) {
   const tTitle = t("create-file")
   const tCancel = t("cancel-button")
   const tCreate = t("create-button")
+  const tInvalidPath = t("invalid-name")
 
   return (
     <div className="w-[30rem] max-w-full flex flex-col gap-8">
@@ -50,7 +64,7 @@ export default function CreateFileModal({ parent }: Props) {
           <h3 className="px-8 text-lg font-bold">{tTitle}</h3>
 
           <div className="pl-8">
-            <PathBreadcrumbs path={parent?.path ?? "/"} />
+            <PathBreadcrumbs path={breadcrumbsPath} />
             <input
               className="w-full rounded-lg bg-neutral-200 dark:bg-neutral-600 px-4 py-2 shadow-inner"
               placeholder={tPlaceholder}
@@ -61,6 +75,13 @@ export default function CreateFileModal({ parent }: Props) {
               value={fileName}
               onChange={handleInputChange}
             />
+            <div
+              className={`mt-1 text-center text-rose-500 text-sm transition-opacity duration-100 ${
+                isValidPath ? "opacity-0" : "opacity-100"
+              }`}
+            >
+              {tInvalidPath}
+            </div>
           </div>
         </div>
       </div>
@@ -75,6 +96,7 @@ export default function CreateFileModal({ parent }: Props) {
         <OrdoButtonPrimary
           onClick={handleCreateFile}
           hotkey="Enter"
+          disabled={!fileName || !isValidPath}
         >
           {tCreate}
         </OrdoButtonPrimary>

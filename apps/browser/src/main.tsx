@@ -2,6 +2,7 @@ import { FSDriver, UnaryFn } from "@ordo-pink/common-types"
 import { ConsoleLogger } from "@ordo-pink/logger"
 import { clearActivities, _initActivities } from "@ordo-pink/stream-activities"
 import { _initAuth } from "@ordo-pink/stream-auth"
+import { _initCommandPalette } from "@ordo-pink/stream-command-palette"
 import { executeCommand, _initCommands } from "@ordo-pink/stream-commands"
 import { hideContextMenu, _initContextMenu } from "@ordo-pink/stream-context-menu"
 import { _initDrives } from "@ordo-pink/stream-drives"
@@ -9,11 +10,12 @@ import { _initExtensions } from "@ordo-pink/stream-extensions"
 import { _initFileAssociations } from "@ordo-pink/stream-file-associations"
 import { _initModals } from "@ordo-pink/stream-modals"
 import { _initRouter } from "@ordo-pink/stream-router"
-import { _initI18n } from "@ordo-pink/stream-translations"
+import { registerTranslations, _initI18n } from "@ordo-pink/stream-translations"
 import Keycloak from "keycloak-js"
 import { tap } from "ramda"
 import * as ReactDOM from "react-dom/client"
 import App from "./app/app"
+import { useDefaultCommandPalette } from "./command-palette"
 import ContextMenu from "./context-menu"
 import Modal from "./modal"
 
@@ -189,26 +191,37 @@ const getFsDriver: UnaryFn<{ token: string; sub: string }, FSDriver> = ({ token,
 })
 
 _initDrives(user$, getFsDriver)
+_initModals(logger)
 
 const router$ = _initRouter()
 const activities$ = _initActivities()
 const fileAssociations$ = _initFileAssociations()
 const contextMenu$ = _initContextMenu()
+const commandPalette$ = _initCommandPalette()
 
 _initI18n()
 
-const modal$ = _initModals(logger)
-
-_initExtensions({ user$, modal$, router$, activities$, fileAssociations$, contextMenu$, logger })
+_initExtensions({ user$, router$, activities$, fileAssociations$, contextMenu$, logger })
 
 logger.info("Starting the application")
 
+registerTranslations("ordo")({
+  ru: { "search-placeholder": "Искать..." },
+  en: { "search-placeholder": "Search..." },
+})
+
 const root = ReactDOM.createRoot(document.getElementById("root") as HTMLElement)
 
-root.render(
-  <div onClick={hideContextMenu}>
-    <App />
-    <ContextMenu state$={contextMenu$} />
-    <Modal />
-  </div>,
-)
+const Ordo = () => {
+  useDefaultCommandPalette(commandPalette$)
+
+  return (
+    <div onClick={hideContextMenu}>
+      <App />
+      <ContextMenu state$={contextMenu$} />
+      <Modal />
+    </div>
+  )
+}
+
+root.render(<Ordo />)

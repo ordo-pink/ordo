@@ -67,6 +67,18 @@ const ordoDirectory = (raw: IOrdoDirectoryRaw): IOrdoDirectory => {
 
       return files
     },
+    getDirectoriesDeep: () => {
+      const directories = [] as IOrdoDirectory[]
+
+      for (const item of children) {
+        if (OrdoDirectory.isOrdoDirectory(item)) {
+          directories.push(item)
+          directories.push(...item.getDirectoriesDeep())
+        }
+      }
+
+      return directories
+    },
     toArray: () => {
       const items = [] as Array<IOrdoDirectory | IOrdoFile>
 

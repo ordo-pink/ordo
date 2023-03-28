@@ -11,6 +11,10 @@ import { callOnce } from "@ordo-pink/fns"
 import { Logger } from "@ordo-pink/logger"
 import { registerActivity, unregisterActivity } from "@ordo-pink/stream-activities"
 import {
+  registerCommandPaletteItem,
+  unregisterCommandPaletteItem,
+} from "@ordo-pink/stream-command-palette"
+import {
   executeCommand,
   unregisterCommand,
   registerCommand,
@@ -30,7 +34,6 @@ import { route, noMatch } from "@ordo-pink/stream-router"
 import { registerTranslations } from "@ordo-pink/stream-translations"
 import i18next from "i18next"
 import { prop } from "ramda"
-import { ComponentType } from "react"
 import { mergeMap, BehaviorSubject, mergeAll, Observable } from "rxjs"
 import { map, filter, switchMap } from "rxjs/operators"
 import { Router } from "silkrouter"
@@ -72,7 +75,6 @@ type InitExtensionsParams = {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     Nullable<{ x: number; y: number; target: any; structure: ContextMenuItem[] }>
   >
-  modal$: Observable<Nullable<ComponentType>>
   user$: Observable<UserInfo>
   router$: Router
   activities$: Observable<Activity[]>
@@ -98,6 +100,8 @@ export const _initExtensions = callOnce(
               off: unregisterCommand,
               emit: executeCommand,
             },
+            registerCommandPaletteItem,
+            unregisterCommandPaletteItem,
             registerContextMenuItem,
             unregisterContextMenuItem,
             registerTranslations,

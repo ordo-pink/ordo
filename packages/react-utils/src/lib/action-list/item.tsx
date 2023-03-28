@@ -41,7 +41,7 @@ export const ActionListItem = ({
   return (
     <div>
       <div
-        className={`action-list-item selection-none ${isLarge && "px-4 py-2"} ${
+        className={`action-list-item select-none ${isLarge && "px-4 py-2 text-lg"} ${
           isCurrent && "active"
         }`}
         style={style}

@@ -82,7 +82,12 @@ export const OrdoFileModel = {
                 .on("end", () => resolve(Buffer.concat(body).toString("utf8")))
             })
 
-            desc.metadata = JSON.parse(metadata)
+            try {
+              desc.metadata = JSON.parse(metadata)
+            } catch (e) {
+              driver.deleteFile(metadataPath)
+              desc.metadata = {}
+            }
           }
 
           return desc

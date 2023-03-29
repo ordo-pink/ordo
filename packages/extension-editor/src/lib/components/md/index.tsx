@@ -2,7 +2,7 @@ import { CodeHighlightNode, CodeNode } from "@lexical/code"
 import { HashtagNode } from "@lexical/hashtag"
 import { AutoLinkNode, LinkNode } from "@lexical/link"
 import { ListItemNode, ListNode } from "@lexical/list"
-import { $convertToMarkdownString, TRANSFORMERS } from "@lexical/markdown"
+import { $convertToMarkdownString, TRANSFORMERS, Transformer } from "@lexical/markdown"
 import { CheckListPlugin } from "@lexical/react/LexicalCheckListPlugin"
 import { LexicalComposer } from "@lexical/react/LexicalComposer"
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext"
@@ -19,12 +19,18 @@ import { RichTextPlugin } from "@lexical/react/LexicalRichTextPlugin"
 import { HeadingNode, QuoteNode } from "@lexical/rich-text"
 import { TableCellNode, TableNode, TableRowNode } from "@lexical/table"
 import { ExecuteCommandFn, FSDriver, IOrdoFile } from "@ordo-pink/common-types"
-import { useCommands, useFileContentText, useFsDriver } from "@ordo-pink/react-utils"
+import {
+  useCommands,
+  useFileContentText,
+  useFsDriver,
+  useSubscription,
+} from "@ordo-pink/react-utils"
+import { editorPlugins$ } from "@ordo-pink/stream-editor-plugins"
 import { createDraft, finishDraft } from "immer"
 import { EditorState, EditorThemeClasses, LexicalNode } from "lexical"
 import { debounce } from "lodash"
 import { mergeDeepWith } from "ramda"
-import { memo } from "react"
+import { ComponentType, memo, useEffect, useState } from "react"
 import { useTranslation } from "react-i18next"
 import { LoadEditorStatePlugin } from "./load-state"
 
@@ -169,10 +175,38 @@ const Placeholder = () => {
 
 export default memo(
   function MdEditor({ file }: Props) {
-    // const { nodes, plugins, transformers } = useAppSelector((state) => state.app.editor)
+    const editorPlugins = useSubscription(editorPlugins$)
     const { emit } = useCommands()
     const driver = useFsDriver()
     const content = useFileContentText(file)
+
+    const [transformers, setTransformers] = useState(TRANSFORMERS)
+    const [nodes, setNodes] = useState(initialNodes)
+    const [plugins, setPlugins] = useState<ComponentType[]>([])
+
+    useEffect(() => {
+      if (!editorPlugins) {
+        setTransformers(TRANSFORMERS)
+        setNodes(initialNodes)
+        setPlugins([])
+
+        return
+      }
+
+      const ts = [] as Transformer[]
+      const ns = [] as LexicalNode[]
+      const ps = [] as ComponentType[]
+
+      editorPlugins.forEach(({ Plugin, node, transformer }) => {
+        if (node) ns.push(node)
+        if (Plugin) ps.push(Plugin)
+        if (transformer) ts.push(transformer)
+      })
+
+      setTransformers(ts.concat(TRANSFORMERS))
+      setPlugins(ps)
+      setNodes(nodes.concat(initialNodes))
+    }, [editorPlugins])
 
     const handleChange = (state: EditorState) => {
       if (!driver) return
@@ -199,7 +233,7 @@ export default memo(
             onError,
             theme,
             // nodes: nodes.concat(initialNodes),
-            nodes: initialNodes,
+            nodes,
           }}
         >
           {/* <div className="mb-8"> */}
@@ -212,8 +246,7 @@ export default memo(
           {/* <div className="w-full py-8 px-4"> */}
           {/* <OrdoDatePlugin /> */}
 
-          {/* <MarkdownShortcutPlugin transformers={transformers.concat(TRANSFORMERS)} /> */}
-          <MarkdownShortcutPlugin transformers={TRANSFORMERS} />
+          <MarkdownShortcutPlugin transformers={transformers} />
 
           <LinkPlugin />
           <ListPlugin />
@@ -238,17 +271,19 @@ export default memo(
 
           <LoadEditorStatePlugin
             content={content}
-            transformers={TRANSFORMERS}
-            // transformers={transformers.concat(TRANSFORMERS)}
+            transformers={transformers}
           />
+
           <OnChangePlugin
             ignoreSelectionChange
             onChange={handleChange}
           />
 
-          {/* {plugins.map((Plugin, index) => (
-                <Plugin key={index} />
-              ))} */}
+          <>
+            {plugins.map((Plugin, index) => (
+              <Plugin key={index} />
+            ))}
+          </>
           {/* </div> */}
           {/* </div> */}
         </LexicalComposer>

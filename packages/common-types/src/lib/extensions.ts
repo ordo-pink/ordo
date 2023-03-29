@@ -128,7 +128,7 @@ export type FileAssociation = {
 
 export type EditorPlugin = {
   name: string
-  Plugin: ComponentType
-  transformer: Transformer
-  node: LexicalNode
+  Plugin?: ComponentType
+  transformer?: Transformer
+  node?: LexicalNode
 }

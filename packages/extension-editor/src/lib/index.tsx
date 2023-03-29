@@ -15,6 +15,7 @@ export default createExtension(
     commands,
     registerActivity,
     registerTranslations,
+    registerEditorPlugin,
     registerFileAssociation,
     registerContextMenuItem,
     registerCommandPaletteItem,
@@ -41,6 +42,10 @@ export default createExtension(
         "open-in-editor": "Open file in Editor...",
         "used-space": "Used space",
       },
+    })
+
+    registerEditorPlugin("highlight-code", {
+      Plugin: lazy(() => import("./components/plugins/highlight-code-plugin")),
     })
 
     registerCommandPaletteItem({

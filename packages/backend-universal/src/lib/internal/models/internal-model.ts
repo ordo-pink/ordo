@@ -45,10 +45,7 @@ export const OrdoInternalModel = {
 
             internalCopy[key] = value
 
-            const content = new Readable()
-
-            content.push(JSON.stringify(internalCopy))
-            content.push(null)
+            const content = Readable.from(JSON.stringify(internalCopy))
 
             await fsDriver.updateFile({ path, content })
           }),
@@ -69,8 +66,6 @@ export const OrdoInternalModel = {
           })
           .then(async (exists) => {
             if (!exists) {
-              const content = new Readable()
-
               const rootDir = await directory.getDirectory(`/${userId}/`)
               const totalSize = reduceDirectoryToSize(rootDir)
 
@@ -80,8 +75,7 @@ export const OrdoInternalModel = {
                 totalSize,
               }
 
-              content.push(JSON.stringify(payload))
-              content.push(null)
+              const content = Readable.from(JSON.stringify(payload))
 
               await fsDriver.createFile({ path, content })
             }

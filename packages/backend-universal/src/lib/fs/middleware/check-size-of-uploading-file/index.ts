@@ -18,17 +18,24 @@ export const checkSizeOfUploadingFile: FsRequestHandler<OrdoFilePathParams> =
 
     const totalSize = await internal.getInternalValue(userId, "totalSize")
 
-    req.params.logger.info(`Attempting to upload ${OrdoFile.getReadableSize(contentSize)} file`)
-
     if (Number.isNaN(contentSize)) {
+      req.params.logger.warn(`Content-Size header not specified`)
       return void res.status(ExceptionResponse.LENGTH_REQUIRED).send()
     }
 
     if (contentSize > maxFileSize) {
+      req.params.logger.warn(
+        `File too large: ${OrdoFile.getReadableSize(contentSize)} out of allowed ${maxFileSize}MB`,
+      )
       return void res.status(ExceptionResponse.PAYLOAD_TOO_LARGE).send()
     }
 
     if (totalSize + contentSize > maxTotalSize) {
+      req.params.logger.warn(
+        `Insufficient space: ${OrdoFile.getReadableSize(contentSize)} with ${
+          maxFileSize - totalSize
+        }MB free space left`,
+      )
       return void res.status(ExceptionResponse.UNPROCESSABLE_ENTITY).send()
     }
 

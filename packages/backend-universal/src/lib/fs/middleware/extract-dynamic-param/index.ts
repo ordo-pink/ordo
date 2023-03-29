@@ -14,8 +14,6 @@ export const extractDynamicParam =
         } else {
           req.params[key] = `/${req.params[key]}`
         }
-
-        req.params.logger.info(`Extracted dynamic param: ${req.params[key]}`)
       }
     }
 

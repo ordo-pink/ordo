@@ -43,7 +43,7 @@ export default function CreateFileModal({ parent }: Props) {
     const name = fileName.endsWith(".md") ? fileName.slice(0, -3) : fileName
     const path = `${parentPath}${name}.md` as const
 
-    emit("fs.create-file", { file: OrdoFile.empty(path) })
+    emit("fs.create-file", { file: OrdoFile.empty(path.trim() as OrdoFilePath) })
 
     hideModal()
   }

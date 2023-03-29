@@ -35,7 +35,10 @@ export const compareTokens: FsRequestHandler = () => async (req, res, next) => {
     // const payload = decode(content, { complete: true })?.payload as JwtPayload
 
     // if (!payload || !payload.data || !payload.data.includes(userId)) {
-    req.params.logger.info("Attempted to access other user's internal data.")
+    req.params.logger.warn("Attempted to access other user's internal data", {
+      currentUser: req.params.tokenParsed.sub,
+      requestedUser: userId,
+    })
 
     return void res.status(ExceptionResponse.FORBIDDEN).send()
     // }

@@ -18,13 +18,8 @@ import { OnChangePlugin } from "@lexical/react/LexicalOnChangePlugin"
 import { RichTextPlugin } from "@lexical/react/LexicalRichTextPlugin"
 import { HeadingNode, QuoteNode } from "@lexical/rich-text"
 import { TableCellNode, TableNode, TableRowNode } from "@lexical/table"
-import { ExecuteCommandFn, FSDriver, IOrdoFile } from "@ordo-pink/common-types"
-import {
-  useCommands,
-  useFileContentText,
-  useFsDriver,
-  useSubscription,
-} from "@ordo-pink/react-utils"
+import { FSDriver, IOrdoFile } from "@ordo-pink/common-types"
+import { useFileContentText, useFsDriver, useSubscription } from "@ordo-pink/react-utils"
 import { editorPlugins$ } from "@ordo-pink/stream-editor-plugins"
 import { createDraft, finishDraft } from "immer"
 import { EditorState, EditorThemeClasses, LexicalNode } from "lexical"
@@ -35,13 +30,7 @@ import { useTranslation } from "react-i18next"
 import { LoadEditorStatePlugin } from "./load-state"
 
 const debouncedSave = debounce(
-  (
-    driver: FSDriver,
-    file: IOrdoFile,
-    nodes: LexicalNode[],
-    content: string,
-    emit: ExecuteCommandFn,
-  ) => {
+  (driver: FSDriver, file: IOrdoFile, nodes: LexicalNode[], content: string) => {
     let metadata = {}
 
     const draft = createDraft(file)
@@ -61,9 +50,8 @@ const debouncedSave = debounce(
 
     const newFile = finishDraft(draft)
 
-    emit("fs.update-file", newFile)
     // eslint-disable-next-line no-console
-    driver.files.setContent({ file, content }).catch(console.error)
+    driver.files.setContent({ file: newFile, content }).catch(console.error)
   },
   1000,
 )
@@ -176,7 +164,6 @@ const Placeholder = () => {
 export default memo(
   function MdEditor({ file }: Props) {
     const editorPlugins = useSubscription(editorPlugins$)
-    const { emit } = useCommands()
     const driver = useFsDriver()
     const content = useFileContentText(file)
 
@@ -217,7 +204,7 @@ export default memo(
 
         const nodes = toNodeArray(state.toJSON().root)
 
-        debouncedSave(driver, file, nodes, text, emit)
+        debouncedSave(driver, file, nodes, text)
       })
     }
 

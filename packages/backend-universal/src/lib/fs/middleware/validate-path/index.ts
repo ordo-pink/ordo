@@ -20,7 +20,7 @@ export const validateFilePath: RequestHandler<OrdoFilePathParams> = (req, res, n
     !OrdoFile.isValidPath(req.params[PATH_PARAM]) ||
     isInternalPath(req.params[PATH_PARAM])
   ) {
-    req.params.logger.debug(`Invalid file path: ${req.params[PATH_PARAM]}`)
+    req.params.logger.warn(`Invalid file path: ${req.params[PATH_PARAM]}`)
 
     return void res.status(ExceptionResponse.BAD_REQUEST).send("Invalid path")
   }
@@ -34,8 +34,8 @@ export const validateFileOldPathAndNewPath: RequestHandler<OrdoFileTwoPathsParam
   next,
 ) => {
   if (req.params[OLD_PATH_PARAM] === req.params[NEW_PATH_PARAM]) {
-    req.params.logger.info(
-      `Old file path and new file path are equal: ${req.params[OLD_PATH_PARAM]}, ${req.params[NEW_PATH_PARAM]}`,
+    req.params.logger.warn(
+      `Old file path and new file path are equal: ${req.params[OLD_PATH_PARAM]}`,
     )
 
     return void res
@@ -50,7 +50,7 @@ export const validateFileOldPathAndNewPath: RequestHandler<OrdoFileTwoPathsParam
     !OrdoFile.isValidPath(req.params[OLD_PATH_PARAM]) ||
     isInternalPath(req.params[OLD_PATH_PARAM])
   ) {
-    req.params.logger.info(`Invalid old file path: ${req.params[OLD_PATH_PARAM]}`)
+    req.params.logger.warn(`Invalid old file path: ${req.params[OLD_PATH_PARAM]}`)
 
     return void res.status(ExceptionResponse.BAD_REQUEST).send("Invalid oldPath")
   }
@@ -60,7 +60,7 @@ export const validateFileOldPathAndNewPath: RequestHandler<OrdoFileTwoPathsParam
     !OrdoFile.isValidPath(req.params[NEW_PATH_PARAM]) ||
     isInternalPath(req.params[NEW_PATH_PARAM])
   ) {
-    req.params.logger.info(`Invalid new file path: ${req.params[NEW_PATH_PARAM]}`)
+    req.params.logger.warn(`Invalid new file path: ${req.params[NEW_PATH_PARAM]}`)
 
     return void res.status(ExceptionResponse.BAD_REQUEST).send("Invalid newPath")
   }
@@ -76,7 +76,7 @@ export const validateDirectoryPath: RequestHandler<OrdoDirectoryPathParams> = (r
     !OrdoDirectory.isValidPath(req.params[PATH_PARAM]) ||
     isInternalPath(req.params[PATH_PARAM])
   ) {
-    req.params.logger.info(`Invalid directory path: ${req.params[PATH_PARAM]}`)
+    req.params.logger.warn(`Invalid directory path: ${req.params[PATH_PARAM]}`)
 
     return void res.status(ExceptionResponse.BAD_REQUEST).send("Invalid path")
   }
@@ -90,7 +90,7 @@ export const validateDirectoryOldPathAndNewPath: RequestHandler<OrdoDirectoryTwo
   next,
 ) => {
   if (req.params[OLD_PATH_PARAM] === "/" || req.params[NEW_PATH_PARAM] === "/") {
-    req.params.logger.info(
+    req.params.logger.warn(
       `Cannot move root: ${req.params[OLD_PATH_PARAM]}, ${req.params[NEW_PATH_PARAM]}`,
     )
 
@@ -98,8 +98,8 @@ export const validateDirectoryOldPathAndNewPath: RequestHandler<OrdoDirectoryTwo
   }
 
   if (req.params[OLD_PATH_PARAM] === req.params[NEW_PATH_PARAM]) {
-    req.params.logger.info(
-      `Old directory path and new directory path are equal: ${req.params[OLD_PATH_PARAM]}, ${req.params[NEW_PATH_PARAM]}`,
+    req.params.logger.warn(
+      `Old directory path and new directory path are equal: ${req.params[OLD_PATH_PARAM]}`,
     )
 
     return void res
@@ -114,7 +114,7 @@ export const validateDirectoryOldPathAndNewPath: RequestHandler<OrdoDirectoryTwo
     !OrdoDirectory.isValidPath(req.params[OLD_PATH_PARAM]) ||
     isInternalPath(req.params[OLD_PATH_PARAM])
   ) {
-    req.params.logger.info(`Invalid old directory path: ${req.params[OLD_PATH_PARAM]}`)
+    req.params.logger.warn(`Invalid old directory path: ${req.params[OLD_PATH_PARAM]}`)
 
     return void res.status(ExceptionResponse.BAD_REQUEST).send("Invalid oldPath")
   }
@@ -124,7 +124,7 @@ export const validateDirectoryOldPathAndNewPath: RequestHandler<OrdoDirectoryTwo
     !OrdoDirectory.isValidPath(req.params[NEW_PATH_PARAM]) ||
     isInternalPath(req.params[NEW_PATH_PARAM])
   ) {
-    req.params.logger.info(`Invalid new directory path: ${req.params[NEW_PATH_PARAM]}`)
+    req.params.logger.warn(`Invalid new directory path: ${req.params[NEW_PATH_PARAM]}`)
 
     return void res.status(ExceptionResponse.BAD_REQUEST).send("Invalid newPath")
   }

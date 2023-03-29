@@ -89,7 +89,7 @@ const getFsDriver: UnaryFn<{ token: string; sub: string }, FSDriver> = ({ token,
         .then(
           tap(() =>
             fetch(`${fsUrl}/${FILE_API}/${sub}${file.path}.metadata`, {
-              method: "PUT",
+              method: "POST",
               body: JSON.stringify(file.metadata),
               headers: {
                 [AUTHORIZATION_HEADER_KEY]: `Bearer ${token}`,
@@ -131,6 +131,17 @@ const getFsDriver: UnaryFn<{ token: string; sub: string }, FSDriver> = ({ token,
         },
         body: content,
       })
+        .then(
+          tap(() =>
+            fetch(`${fsUrl}/${FILE_API}/${sub}${file.path}.metadata`, {
+              method: "PUT",
+              body: JSON.stringify(file.metadata),
+              headers: {
+                [AUTHORIZATION_HEADER_KEY]: `Bearer ${token}`,
+              },
+            }).catch(logger.error),
+          ),
+        )
         .then((res) => res.json())
         .catch(logger.error),
     remove: (path) =>

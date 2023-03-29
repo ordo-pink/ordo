@@ -42,8 +42,8 @@ import { OrdoInternalModel } from "../internal/models/internal-model"
 import { CreateOrdoBackendServerParams } from "../types"
 
 const filesRouter = ({ fsDriver, authorise, logger, limits }: CreateOrdoBackendServerParams) => {
-  const file = OrdoFileModel.of(fsDriver)
-  const directory = OrdoDirectoryModel.of(fsDriver)
+  const file = OrdoFileModel.of({ driver: fsDriver, logger })
+  const directory = OrdoDirectoryModel.of({ driver: fsDriver, logger })
   const internal = OrdoInternalModel.of({ fsDriver, limits, directory })
 
   const env = { file, directory, logger, internal }
@@ -125,8 +125,8 @@ const directoriesRouter = ({
   logger,
   limits,
 }: CreateOrdoBackendServerParams) => {
-  const file = OrdoFileModel.of(fsDriver)
-  const directory = OrdoDirectoryModel.of(fsDriver)
+  const file = OrdoFileModel.of({ driver: fsDriver, logger })
+  const directory = OrdoDirectoryModel.of({ driver: fsDriver, logger })
   const internal = OrdoInternalModel.of({ fsDriver, limits, directory })
 
   const env = { file, directory, logger, internal }

@@ -13,12 +13,12 @@ export const createFSDriver = (rootDirectory: string): FSDriver => {
     checkDirectoryExists: (path) =>
       promises
         .stat(getAbsolute(path))
-        .catch(() => null)
+        .catch(() => false)
         .then(Boolean),
     checkFileExists: (path) =>
       promises
         .stat(getAbsolute(path))
-        .catch(() => null)
+        .catch(() => false)
         .then(Boolean),
     createDirectory: (path) => promises.mkdir(getAbsolute(path)).then(() => path),
     createFile: ({ path, content }) =>

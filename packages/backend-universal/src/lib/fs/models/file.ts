@@ -1,30 +1,53 @@
 import { ExceptionResponse } from "@ordo-pink/common-types"
 import { OrdoFile } from "@ordo-pink/fs-entity"
+import { Logger } from "@ordo-pink/logger"
 import { OrdoDirectoryModel } from "./directory"
 import { FSDriver, IOrdoFileModel } from "../../types"
 
+type InitParams = {
+  driver: FSDriver
+  logger: Logger
+}
+
+const GET_CONTENT_TAG = "OrdoFileModel::getFileContent"
+const CREATE_TAG = "OrdoFileModel::createFile"
+const REMOVE_TAG = "OrdoFileModel::removeFile"
+const UPDATE_TAG = "OrdoFileModel::updateFile"
+const MOVE_TAG = "OrdoFileModel::moveFile"
+const GET_TAG = "OrdoFileModel::getFile"
+
 export const OrdoFileModel = {
-  of: (driver: FSDriver): IOrdoFileModel => ({
+  of: ({ driver, logger }: InitParams): IOrdoFileModel => ({
     checkFileExists: driver.checkFileExists,
     createFile: ({ path, content }) =>
       Promise.resolve(path)
-        .then((path) =>
-          OrdoFile.isValidPath(path)
-            ? Promise.resolve(path)
-            : Promise.reject(ExceptionResponse.BAD_REQUEST),
-        )
+        .then((path) => {
+          if (!OrdoFile.isValidPath(path)) {
+            logger.warn(CREATE_TAG, "Invalid path", path)
+            throw ExceptionResponse.BAD_REQUEST
+          }
+
+          return path
+        })
         .then((path) =>
           Promise.all([
             driver.checkFileExists(path),
             driver.checkDirectoryExists(OrdoFile.getParentPath(path)),
           ]),
         )
-        .then(([fileExists, parentDirectoryExists]) =>
-          fileExists ? Promise.reject(ExceptionResponse.CONFLICT) : { path, parentDirectoryExists },
-        )
+        .then(([fileExists, parentDirectoryExists]) => {
+          if (fileExists) {
+            logger.warn(CREATE_TAG, "Already exists", path)
+            throw ExceptionResponse.CONFLICT
+          }
+
+          return { path, parentDirectoryExists }
+        })
         .then(async ({ path, parentDirectoryExists }) => {
           const parentDirectory = !parentDirectoryExists
-            ? await OrdoDirectoryModel.of(driver).createDirectory(OrdoFile.getParentPath(path))
+            ? await OrdoDirectoryModel.of({ driver, logger }).createDirectory(
+                OrdoFile.getParentPath(path),
+              )
             : null
 
           return { path, parentDirectory }
@@ -32,40 +55,67 @@ export const OrdoFileModel = {
         .then(async ({ path, parentDirectory }) => {
           await driver.createFile({ path, content })
 
+          logger.debug(CREATE_TAG, path)
+
           return parentDirectory
-            ? OrdoDirectoryModel.of(driver).getDirectory(parentDirectory.path)
-            : OrdoFileModel.of(driver).getFile(path)
+            ? OrdoDirectoryModel.of({ driver, logger }).getDirectory(parentDirectory.path)
+            : OrdoFileModel.of({ driver, logger }).getFile(path)
         }),
     deleteFile: (path) =>
       Promise.resolve(path)
-        .then((path) =>
-          OrdoFile.isValidPath(path)
-            ? Promise.resolve(path)
-            : Promise.reject(ExceptionResponse.BAD_REQUEST),
-        )
+        .then((path) => {
+          if (!OrdoFile.isValidPath(path)) {
+            logger.warn(REMOVE_TAG, "Invalid path", path)
+            throw ExceptionResponse.BAD_REQUEST
+          }
+
+          return path
+        })
         .then((path) => driver.checkFileExists(path))
-        .then((exists) => (exists ? path : Promise.reject(ExceptionResponse.NOT_FOUND)))
-        .then(OrdoFileModel.of(driver).getFile)
+        .then((exists) => {
+          if (!exists) {
+            logger.warn(REMOVE_TAG, "Not found", path)
+            throw ExceptionResponse.NOT_FOUND
+          }
+
+          return path
+        })
+        .then(OrdoFileModel.of({ driver, logger }).getFile)
         .then(async (file) => {
           await driver.deleteFile(file.path)
 
-          const metadataPath = `${file.path}.metadata` as const
+          if (!file.path.endsWith(".metadata")) {
+            const metadataPath = `${file.path}.metadata` as const
 
-          if (await driver.checkFileExists(metadataPath)) {
-            await driver.deleteFile(metadataPath)
+            if (await driver.checkFileExists(metadataPath)) {
+              await driver.deleteFile(metadataPath)
+              logger.debug(REMOVE_TAG, "Metadata deleted", metadataPath)
+            }
           }
+
+          logger.debug(REMOVE_TAG, path)
 
           return file
         }),
     getFile: (path) =>
       Promise.resolve(path)
-        .then((path) =>
-          OrdoFile.isValidPath(path)
-            ? Promise.resolve(path)
-            : Promise.reject(ExceptionResponse.BAD_REQUEST),
-        )
+        .then((path) => {
+          if (!OrdoFile.isValidPath(path)) {
+            logger.warn(GET_TAG, "Invalid path", path)
+            throw ExceptionResponse.BAD_REQUEST
+          }
+
+          return path
+        })
         .then((path) => driver.checkFileExists(path))
-        .then((exists) => (exists ? path : Promise.reject(ExceptionResponse.NOT_FOUND)))
+        .then((exists) => {
+          if (!exists) {
+            logger.warn(GET_TAG, "Not found", path)
+            throw ExceptionResponse.NOT_FOUND
+          }
+
+          return path
+        })
         .then(() => driver.getFileDescriptor(path))
         .then(async (desc) => {
           const metadataPath = `${desc.path}.metadata` as const
@@ -83,9 +133,9 @@ export const OrdoFileModel = {
             })
 
             try {
-              desc.metadata = JSON.parse(metadata)
+              desc.metadata = JSON.parse(metadata || "{}")
             } catch (e) {
-              driver.deleteFile(metadataPath)
+              logger.error(GET_TAG, e, metadata)
               desc.metadata = {}
             }
           }
@@ -95,21 +145,34 @@ export const OrdoFileModel = {
         .then(OrdoFile.raw),
     getFileContent: (path) =>
       Promise.resolve(path)
-        .then((path) =>
-          OrdoFile.isValidPath(path)
-            ? Promise.resolve(path)
-            : Promise.reject(ExceptionResponse.BAD_REQUEST),
-        )
+        .then((path) => {
+          if (!OrdoFile.isValidPath(path)) {
+            logger.warn(GET_CONTENT_TAG, "Invalid path", path)
+            throw ExceptionResponse.BAD_REQUEST
+          }
+
+          return path
+        })
         .then((path) => driver.checkFileExists(path))
-        .then((exists) => (exists ? path : Promise.reject(ExceptionResponse.NOT_FOUND)))
+        .then((exists) => {
+          if (!exists) {
+            logger.warn(GET_CONTENT_TAG, "Not found", path)
+            throw ExceptionResponse.NOT_FOUND
+          }
+
+          return path
+        })
         .then(driver.getFile),
     moveFile: ({ oldPath, newPath }) =>
       Promise.resolve({ oldPath, newPath })
-        .then(({ oldPath, newPath }) =>
-          OrdoFile.isValidPath(oldPath) && OrdoFile.isValidPath(newPath)
-            ? Promise.resolve({ oldPath, newPath })
-            : Promise.reject(ExceptionResponse.BAD_REQUEST),
-        )
+        .then(({ oldPath, newPath }) => {
+          if (!OrdoFile.isValidPath(oldPath) || !OrdoFile.isValidPath(newPath)) {
+            logger.warn(MOVE_TAG, "Invalid path", { oldPath, newPath })
+            throw ExceptionResponse.BAD_REQUEST
+          }
+
+          return { oldPath, newPath }
+        })
         .then(({ oldPath, newPath }) =>
           Promise.all([
             driver.checkFileExists(oldPath),
@@ -117,16 +180,24 @@ export const OrdoFileModel = {
             driver.checkDirectoryExists(OrdoFile.getParentPath(newPath)),
           ]),
         )
-        .then(([oldFileExists, newFileExists, newFileParentExists]) =>
-          newFileExists
-            ? Promise.reject(ExceptionResponse.CONFLICT)
-            : !oldFileExists
-            ? Promise.reject(ExceptionResponse.NOT_FOUND)
-            : { oldPath, newPath, newFileParentExists },
-        )
+        .then(([oldFileExists, newFileExists, newFileParentExists]) => {
+          if (!oldFileExists) {
+            logger.warn(MOVE_TAG, "Not found", oldFileExists)
+            throw ExceptionResponse.NOT_FOUND
+          }
+
+          if (newFileExists) {
+            logger.warn(MOVE_TAG, "Already exists", newFileExists)
+            throw ExceptionResponse.CONFLICT
+          }
+
+          return { oldPath, newPath, newFileParentExists }
+        })
         .then(async ({ oldPath, newPath, newFileParentExists }) => {
           const parentDirectory = !newFileParentExists
-            ? await OrdoDirectoryModel.of(driver).createDirectory(OrdoFile.getParentPath(newPath))
+            ? await OrdoDirectoryModel.of({ driver, logger }).createDirectory(
+                OrdoFile.getParentPath(newPath),
+              )
             : null
 
           return { oldPath, newPath, parentDirectory }
@@ -146,27 +217,46 @@ export const OrdoFileModel = {
 
           return { file, parentDirectory }
         })
-        .then(({ file, parentDirectory }) =>
-          parentDirectory
-            ? OrdoDirectoryModel.of(driver).getDirectory(parentDirectory.path)
-            : driver.getFileDescriptor(file).then(OrdoFile.raw),
-        ),
+        .then(async ({ file, parentDirectory }) => {
+          const result = await (parentDirectory
+            ? OrdoDirectoryModel.of({ driver, logger }).getDirectory(parentDirectory.path)
+            : driver.getFileDescriptor(file).then(OrdoFile.raw))
+
+          logger.debug(MOVE_TAG, result.path)
+
+          return result
+        }),
     updateFile: ({ path, content }) =>
       Promise.resolve(path)
-        .then((path) =>
-          OrdoFile.isValidPath(path)
-            ? Promise.resolve(path)
-            : Promise.reject(ExceptionResponse.BAD_REQUEST),
-        )
+        .then((path) => {
+          if (!OrdoFile.isValidPath(path)) {
+            logger.warn(UPDATE_TAG, "Invalid path", path)
+            throw ExceptionResponse.BAD_REQUEST
+          }
+
+          return path
+        })
         .then((path) => driver.checkFileExists(path))
+        .then((exists) => {
+          if (!exists) {
+            logger.warn(UPDATE_TAG, "Not found", path)
+            throw ExceptionResponse.NOT_FOUND
+          }
+
+          return path
+        })
         .then(async (exists) => {
           if (!exists) {
-            await OrdoFileModel.of(driver).createFile({ path })
+            await OrdoFileModel.of({ driver, logger }).createFile({ path })
           }
 
           return driver.updateFile({ path, content })
         })
-        .then((path) => driver.getFileDescriptor(path))
+        .then((path) => {
+          logger.debug(UPDATE_TAG, path)
+
+          return driver.getFileDescriptor(path)
+        })
         .then(OrdoFile.raw),
   }),
 }

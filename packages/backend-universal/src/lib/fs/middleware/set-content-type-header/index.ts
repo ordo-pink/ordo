@@ -17,7 +17,5 @@ export const setContentTypeHeader: RequestHandler<OrdoFilePathParams | OrdoDirec
 
   res.setHeader("content-type", type)
 
-  req.params.logger.info(`Set content type: ${type}`)
-
   next()
 }

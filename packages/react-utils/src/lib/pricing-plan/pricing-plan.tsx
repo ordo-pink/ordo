@@ -9,7 +9,7 @@ type Props = {
   price: string
 }
 
-export default function PricingPlan({ features, title, description, price }: Props) {
+export function PricingPlan({ features, title, description, price }: Props) {
   const { t } = useTranslation("home")
   const { emit: execute } = useCommands()
 

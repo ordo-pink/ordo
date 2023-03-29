@@ -1,4 +1,6 @@
+import { Transformer } from "@lexical/markdown"
 import { Logger } from "@ordo-pink/logger"
+import { LexicalNode } from "lexical"
 import { ComponentType } from "react"
 import { IconType } from "react-icons"
 import { CommandListener, ExecuteCommandFn, RegisterCommandFn } from "./commands"
@@ -30,8 +32,14 @@ export type RegisterFileAssociationFn = UnaryFn<
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type RegisterCommandPaletteItemFn = UnaryFn<CommandPaletteItem, void>
-export type UnregisterCommandPaletteItemFn = UnaryFn<string, void>
 
+export type RegisterEditorPluginFn = UnaryFn<
+  string,
+  BinaryFn<string, Omit<EditorPlugin, "name">, void>
+>
+
+export type UnregisterEditorPluginFn = UnaryFn<string, UnaryFn<string, void>>
+export type UnregisterCommandPaletteItemFn = UnaryFn<string, void>
 export type UnregisterActivityFn = UnaryFn<string, UnaryFn<string, void>>
 export type UnregisterContextMenuItemFn = UnaryFn<string, UnaryFn<string, void>>
 export type UnregisterFileAssociationFn = UnaryFn<string, UnaryFn<string, void>>
@@ -54,6 +62,8 @@ export type ExtensionCreatorScopedContext = {
     off: ReturnType<RegisterCommandFn>
     emit: ExecuteCommandFn
   }
+  registerEditorPlugin: ReturnType<RegisterEditorPluginFn>
+  unregisterEditorPlugin: ReturnType<UnregisterEditorPluginFn>
   registerContextMenuItem: ReturnType<RegisterContextMenuItemFn>
   unregisterContextMenuItem: ReturnType<UnregisterContextMenuItemFn>
   registerTranslations: ReturnType<RegisterTranslationsFn>
@@ -75,6 +85,8 @@ export type ExtensionCreatorContext = {
     off: RegisterCommandFn
     emit: ExecuteCommandFn
   }
+  registerEditorPlugin: RegisterEditorPluginFn
+  unregisterEditorPlugin: UnregisterEditorPluginFn
   registerContextMenuItem: RegisterContextMenuItemFn
   unregisterContextMenuItem: UnregisterContextMenuItemFn
   registerActivity: RegisterActivityFn
@@ -104,6 +116,7 @@ export type Activity = {
   Component: ComponentType
   Icon: ComponentType
   Sidebar?: ComponentType
+  show?: boolean
 }
 
 export type FileAssociation = {
@@ -111,4 +124,11 @@ export type FileAssociation = {
   fileExtensions: OrdoFileExtension[] | "*"
   Component: ComponentType<{ file: IOrdoFile }>
   Icon: ComponentType<{ file: IOrdoFile }>
+}
+
+export type EditorPlugin = {
+  name: string
+  Plugin: ComponentType
+  transformer: Transformer
+  node: LexicalNode
 }

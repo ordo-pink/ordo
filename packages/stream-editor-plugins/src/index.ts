@@ -1,1 +1,1 @@
-export * from "./lib/stream-editor-plugins"
+export * from "./lib"

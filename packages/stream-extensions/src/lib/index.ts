@@ -26,6 +26,7 @@ import {
   registerContextMenuItem,
   unregisterContextMenuItem,
 } from "@ordo-pink/stream-context-menu"
+import { registerEditorPlugin, unregisterEditorPlugin } from "@ordo-pink/stream-editor-plugins"
 import {
   registerFileAssociation,
   unregisterFileAssociation,
@@ -50,6 +51,8 @@ const scopeExtensionContextTo = (
     off: ctx.commands.off(name),
     emit: ctx.commands.emit,
   },
+  registerEditorPlugin: ctx.registerEditorPlugin(name),
+  unregisterEditorPlugin: ctx.unregisterEditorPlugin(name),
   registerActivity: ctx.registerActivity(name),
   unregisterActivity: ctx.unregisterActivity(name),
   registerContextMenuItem: ctx.registerContextMenuItem(name),
@@ -100,6 +103,8 @@ export const _initExtensions = callOnce(
               off: unregisterCommand,
               emit: executeCommand,
             },
+            registerEditorPlugin,
+            unregisterEditorPlugin,
             registerCommandPaletteItem,
             unregisterCommandPaletteItem,
             registerContextMenuItem,

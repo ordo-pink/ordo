@@ -7,15 +7,15 @@ type Props = {
 
 export default function ActivityBar({ activities }: Props) {
   return (
-    <div className="flex flex-col space-y-2 items-center px-2 justify-center text-lg sm:text-2xl z-50 bg-neutral-200 dark:bg-neutral-800">
-      <div className="">
-        {activities.map((activity, index) => (
+    <div className="flex flex-col space-y-4 items-center px-2 justify-center text-lg sm:text-2xl z-50 bg-neutral-200 dark:bg-neutral-800">
+      {activities.map((activity, index) =>
+        activity.show ?? true ? (
           <ActivityBarActivity
             key={index}
             activity={activity}
           />
-        ))}
-      </div>
+        ) : null,
+      )}
     </div>
   )
 }

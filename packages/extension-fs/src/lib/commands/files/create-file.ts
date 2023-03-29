@@ -17,7 +17,9 @@ export const createFile: CommandHandler<{ file: IOrdoFile; content?: string }> =
     .then((raw) => {
       const draft = createDraft(drive)
 
-      const parent = OrdoFile.findParent(raw.path, draft.root)
+      const parent = OrdoDirectory.isOrdoDirectoryRaw(raw)
+        ? OrdoDirectory.findParent(raw.path, draft.root)
+        : OrdoFile.findParent(raw.path, draft.root)
 
       if (!parent) throw new Error("Cannot find parent of the created file")
 

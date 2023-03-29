@@ -1,5 +1,5 @@
 import { UnaryFn } from "@ordo-pink/common-types"
-import { useCommandPalette, useSubscription } from "@ordo-pink/react-utils"
+import { Link, useCommandPalette, useSubscription } from "@ordo-pink/react-utils"
 import { commandPaletteItems$ } from "@ordo-pink/stream-command-palette"
 import { MouseEvent, PropsWithChildren } from "react"
 import { useHotkeys } from "react-hotkeys-hook"
@@ -52,16 +52,25 @@ export default function Sidebar({ children, onClick }: Props) {
       <div className="flex items-center space-x-4 w-full max-w-sm self-center justify-center">
         <div className="rounded-full p-0.5 bg-gradient-to-tr from-sky-400 via-purple-400 to-rose-400 shadow-lg shrink-0 cursor-pointer">
           <div className="bg-white rounded-full">
-            <img
-              src={logo}
-              alt="User avatar"
-              className="w-10 rounded-full"
-            />
+            <Link href="/user">
+              <img
+                src={logo}
+                alt="User avatar"
+                className="w-10 rounded-full"
+              />
+            </Link>
           </div>
         </div>
         <div className="flex flex-col text-sm text-neutral-700 dark:text-neutral-400 w-full -mt-1">
           <div className="flex space-x-2 items-center">
-            <div className="font-bold truncate">Sergei Orlov</div>
+            <div className="font-bold truncate">
+              <Link
+                href="/user"
+                className="no-underline text-neutral-700 dark:text-neutral-400"
+              >
+                Sergei Orlov
+              </Link>
+            </div>
             <div className="shrink-0">
               <BsFillPatchCheckFill className="text-indigo-500 text-base" />
             </div>

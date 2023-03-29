@@ -1,4 +1,9 @@
-import { OrdoButtonPrimary, OrdoButtonSecondary, useCommands } from "@ordo-pink/react-utils"
+import {
+  OrdoButtonPrimary,
+  OrdoButtonSecondary,
+  useCommands,
+  PricingPlan,
+} from "@ordo-pink/react-utils"
 import { useTranslation } from "react-i18next"
 import {
   BsArrowsFullscreen,
@@ -16,7 +21,6 @@ import {
 } from "react-icons/bs"
 import Feature from "./feature"
 import KeyPrinciple from "./key-principle"
-import PricingPlan from "./pricing-plan"
 import heroBg from "../assets/bg.jpg"
 import paint from "../assets/paint.jpg"
 import appDark from "../assets/rich-editor-1.png"

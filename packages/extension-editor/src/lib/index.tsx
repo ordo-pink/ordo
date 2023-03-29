@@ -50,6 +50,8 @@ export default createExtension(
       onSelect: () => {
         const drive = drive$.getValue()
 
+        hideCommandPalette()
+
         if (!drive) return
 
         showCommandPalette(

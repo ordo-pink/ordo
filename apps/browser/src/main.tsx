@@ -1,11 +1,12 @@
 import { FSDriver, UnaryFn } from "@ordo-pink/common-types"
 import { ConsoleLogger } from "@ordo-pink/logger"
-import { clearActivities, _initActivities } from "@ordo-pink/stream-activities"
+import { clearActivities, registerActivity, _initActivities } from "@ordo-pink/stream-activities"
 import { _initAuth } from "@ordo-pink/stream-auth"
 import { _initCommandPalette } from "@ordo-pink/stream-command-palette"
 import { executeCommand, _initCommands } from "@ordo-pink/stream-commands"
 import { hideContextMenu, _initContextMenu } from "@ordo-pink/stream-context-menu"
 import { _initDrives } from "@ordo-pink/stream-drives"
+import { _initEditorPlugins } from "@ordo-pink/stream-editor-plugins"
 import { _initExtensions } from "@ordo-pink/stream-extensions"
 import { _initFileAssociations } from "@ordo-pink/stream-file-associations"
 import { _initModals } from "@ordo-pink/stream-modals"
@@ -14,16 +15,19 @@ import { registerTranslations, _initI18n } from "@ordo-pink/stream-translations"
 import Keycloak from "keycloak-js"
 import { tap } from "ramda"
 import * as ReactDOM from "react-dom/client"
+import { BsPersonCircle } from "react-icons/bs"
 import App from "./app/app"
 import { useDefaultCommandPalette } from "./command-palette"
 import ContextMenu from "./context-menu"
 import Modal from "./modal"
 
 import "./styles.css"
+import UserPage from "./user"
 
 const loggedInExtensions = [
   () => import("@ordo-pink/extension-fs"),
   () => import("@ordo-pink/extension-editor"),
+  () => import("@ordo-pink/extension-links"),
 ]
 const loggedOutExtensions = [() => import("@ordo-pink/extension-home")]
 
@@ -53,6 +57,13 @@ const user$ = _initAuth({
   onChangeLoginStatus: (authInfo) => {
     clearActivities()
 
+    registerActivity("ordo")("user", {
+      Component: UserPage,
+      Icon: BsPersonCircle,
+      routes: ["/user"],
+      show: false,
+    })
+
     if (authInfo?.isAuthenticated && window.location.pathname === "/") {
       executeCommand("router.navigate", "/editor")
     }
@@ -60,7 +71,7 @@ const user$ = _initAuth({
     // TODO: Handle situation when there is no authInfo
 
     if (authInfo && !authInfo.isAuthenticated && window.location.pathname !== "/") {
-      executeCommand("router.navigate", "/")
+      // TODO: Show "session expired" message
     }
   },
 })
@@ -195,13 +206,21 @@ _initModals(logger)
 
 const router$ = _initRouter()
 const activities$ = _initActivities()
+_initEditorPlugins()
 const fileAssociations$ = _initFileAssociations()
 const contextMenu$ = _initContextMenu()
 const commandPalette$ = _initCommandPalette()
 
 _initI18n()
 
-_initExtensions({ user$, router$, activities$, fileAssociations$, contextMenu$, logger })
+_initExtensions({
+  user$,
+  router$,
+  activities$,
+  fileAssociations$,
+  contextMenu$,
+  logger,
+})
 
 logger.info("Starting the application")
 

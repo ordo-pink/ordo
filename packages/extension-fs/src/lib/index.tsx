@@ -1,6 +1,6 @@
 import { OrdoDirectory, OrdoFile } from "@ordo-pink/fs-entity"
 import { FileIcon, useModal } from "@ordo-pink/react-utils"
-import { showCommandPalette } from "@ordo-pink/stream-command-palette"
+import { hideCommandPalette, showCommandPalette } from "@ordo-pink/stream-command-palette"
 import { drive$, fsDriver$ } from "@ordo-pink/stream-drives"
 import { createExtension } from "@ordo-pink/stream-extensions"
 import { AiFillFolder, AiOutlineFolder } from "react-icons/ai"
@@ -149,6 +149,8 @@ export default createExtension(
       name: translate("remove-file..."),
       Icon: BsFileEarmarkMinus,
       onSelect: () => {
+        hideCommandPalette()
+
         const drive = drive$.getValue()
 
         if (!drive) return
@@ -189,6 +191,8 @@ export default createExtension(
       name: translate("remove-directory"),
       Icon: BsFolderMinus,
       onSelect: () => {
+        hideCommandPalette()
+
         const drive = drive$.getValue()
 
         if (!drive) return

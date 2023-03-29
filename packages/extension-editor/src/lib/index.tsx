@@ -5,7 +5,13 @@ import { hideCommandPalette, showCommandPalette } from "@ordo-pink/stream-comman
 import { drive$, fsDriver$ } from "@ordo-pink/stream-drives"
 import { createExtension, currentActivity$ } from "@ordo-pink/stream-extensions"
 import { lazy } from "react"
-import { BsFolder2, BsFolder2Open, BsReverseLayoutTextSidebarReverse } from "react-icons/bs"
+import {
+  BsFolder2,
+  BsFolder2Open,
+  BsPalette2,
+  BsReverseLayoutTextSidebarReverse,
+} from "react-icons/bs"
+import { backgroundColors } from "./colors"
 
 import "./editor.css"
 
@@ -24,6 +30,15 @@ export default createExtension(
     registerTranslations({
       ru: {
         placeholder: "Можно начинать...",
+        "color-neutral": "Без цвета",
+        "color-pink": "Розовый",
+        "color-red": "Красный",
+        "color-orange": "Оранжевый",
+        "color-yellow": "Жёлтый",
+        "color-green": "Зелёный",
+        "color-blue": "Синий",
+        "color-purple": "Фиолетовый",
+        "change-directory-color": "Изменить цвет...",
         "open-file-in-editor": "Открыть в редакторе",
         "search-file-placeholder": "Найти файл...",
         "open-editor": "Открыть редактор",
@@ -34,6 +49,15 @@ export default createExtension(
       },
       en: {
         placeholder: "Start typing...",
+        "change-directory-color": "Change color...",
+        "color-neutral": "No color",
+        "color-pink": "Pink",
+        "color-red": "Red",
+        "color-orange": "Orange",
+        "color-yellow": "Yellow",
+        "color-green": "Green",
+        "color-blue": "Blue",
+        "color-purple": "Purple",
         "open-file-in-editor": "Open in Editor",
         "search-file-placeholder": "Find file...",
         "open-editor": "Open Editor",
@@ -226,6 +250,30 @@ export default createExtension(
       Icon: BsReverseLayoutTextSidebarReverse,
       payloadCreator: (target) => target.path,
       shouldShow: (target) => OrdoFile.isOrdoFile(target),
+    })
+
+    const CHANGE_DIRECTORY_COLOR_COMMAND = commands.on("change-directory-color", ({ payload }) => {
+      showCommandPalette(
+        Object.keys(backgroundColors).map((color) => ({
+          id: color,
+          name: translate(`color-${color}`),
+          onSelect: () => {
+            commands.emit("fs.update-directory", {
+              ...payload,
+              metadata: { ...payload.metadata, color },
+            })
+
+            hideCommandPalette()
+          },
+          Icon: () => <div className={`rounded-full p-2 ${backgroundColors[color]}`} />,
+        })),
+      )
+    })
+
+    registerContextMenuItem(CHANGE_DIRECTORY_COLOR_COMMAND, {
+      Icon: BsPalette2,
+      payloadCreator: (target) => target,
+      shouldShow: (target) => OrdoDirectory.isOrdoDirectory(target) && target.path !== "/",
     })
 
     registerActivity("editor", {

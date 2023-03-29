@@ -115,7 +115,6 @@ export default createExtension(
       Icon: BsFolderPlus,
       payloadCreator: (target) => target,
       shouldShow: (target) => OrdoDirectory.isOrdoDirectory(target),
-      accelerator: "alt+shift+n",
     })
 
     registerCommandPaletteItem({
@@ -141,7 +140,6 @@ export default createExtension(
       Icon: BsFileEarmarkMinus,
       payloadCreator: (target) => target,
       shouldShow: (target) => OrdoFile.isOrdoFile(target),
-      accelerator: "ctrl+alt+backspace",
     })
 
     registerCommandPaletteItem({
@@ -183,7 +181,6 @@ export default createExtension(
       Icon: BsFolderMinus,
       payloadCreator: (target) => target,
       shouldShow: (target) => OrdoDirectory.isOrdoDirectory(target) && target.path !== "/",
-      accelerator: "ctrl+alt+backspace",
     })
 
     registerCommandPaletteItem({

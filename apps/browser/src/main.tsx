@@ -22,6 +22,7 @@ import "./styles.css"
 const loggedInExtensions = [
   () => import("@ordo-pink/extension-fs"),
   () => import("@ordo-pink/extension-editor"),
+  () => import("@ordo-pink/extension-calendar"),
 ]
 const loggedOutExtensions = [() => import("@ordo-pink/extension-home")]
 

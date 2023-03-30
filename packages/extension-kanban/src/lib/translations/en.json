@@ -1,4 +1,6 @@
 {
   "title": "Kanban",
-  "add-column": "Add column"
+  "add-column": "Add column",
+  "open-kanbans": "Open Kanban boards",
+  "open-kanban": "Open Kanban board..."
 }

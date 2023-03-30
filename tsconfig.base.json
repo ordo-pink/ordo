@@ -24,6 +24,7 @@
       "@ordo-pink/backend-universal": ["packages/backend-universal/src/index.ts"],
       "@ordo-pink/common-types": ["packages/common-types/src/index.ts"],
       "@ordo-pink/either": ["packages/either/src/index.ts"],
+      "@ordo-pink/extension-calendar": ["packages/extension-calendar/src/index.ts"],
       "@ordo-pink/extension-editor": ["packages/extension-editor/src/index.ts"],
       "@ordo-pink/extension-fs": ["packages/extension-fs/src/index.ts"],
       "@ordo-pink/extension-home": ["packages/extension-home/src/index.ts"],

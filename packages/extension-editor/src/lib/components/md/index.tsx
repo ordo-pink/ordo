@@ -63,7 +63,7 @@ const debouncedSave = debounce(
 
     const newFile = finishDraft(draft)
 
-    emit("editor.update-file-content", newFile)
+    emit("editor.update-file-content", { file: newFile, content })
   },
   1000,
 )

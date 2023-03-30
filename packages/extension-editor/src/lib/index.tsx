@@ -73,7 +73,7 @@ export default createExtension(
       Plugin: lazy(() => import("./components/plugins/highlight-code-plugin")),
     })
 
-    commands.on("editor.update-file-content", ({ payload }) => {
+    commands.on("update-file-content", ({ payload }) => {
       const driver = fsDriver$.getValue()
 
       if (!driver) return

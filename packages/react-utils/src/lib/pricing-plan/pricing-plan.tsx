@@ -1,6 +1,7 @@
-import { OrdoButtonPrimary, useCommands } from "@ordo-pink/react-utils"
 import { useTranslation } from "react-i18next"
 import { BsCheck2 } from "react-icons/bs"
+import { OrdoButtonPrimary } from "../buttons/buttons"
+import { useCommands } from "../hooks/use-commands"
 
 type Props = {
   features: string[]
@@ -37,10 +38,7 @@ export function PricingPlan({ features, title, description, price }: Props) {
           </h4>
           <div className="h-px flex-auto bg-neutral-100 dark:bg-neutral-800" />
         </div>
-        <ul
-          role="list"
-          className="mt-8 grid grid-cols-1 gap-4 text-sm leading-6 text-neutral-600 dark:text-neutral-400 sm:grid-cols-2 sm:gap-6"
-        >
+        <ul className="mt-8 grid grid-cols-1 gap-4 text-sm leading-6 text-neutral-600 dark:text-neutral-400 sm:grid-cols-2 sm:gap-6">
           {features.map((feature) => (
             <li
               key={feature}

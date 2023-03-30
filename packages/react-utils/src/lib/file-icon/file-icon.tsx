@@ -1,6 +1,6 @@
 import { IOrdoFile } from "@ordo-pink/common-types"
-import { useFileAssociationFor } from "@ordo-pink/react-utils"
 import { BsFileEarmarkBinary } from "react-icons/bs"
+import { useFileAssociationFor } from "../hooks/use-file-asssociation"
 
 type Props = {
   file: IOrdoFile

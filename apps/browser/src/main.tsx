@@ -20,14 +20,15 @@ import App from "./app/app"
 import { useDefaultCommandPalette } from "./command-palette"
 import ContextMenu from "./context-menu"
 import Modal from "./modal"
+import UserPage from "./user"
 
 import "./styles.css"
-import UserPage from "./user"
 
 const loggedInExtensions = [
   () => import("@ordo-pink/extension-fs"),
   () => import("@ordo-pink/extension-editor"),
   () => import("@ordo-pink/extension-links"),
+  () => import("@ordo-pink/extension-kanban"),
 ]
 const loggedOutExtensions = [() => import("@ordo-pink/extension-home")]
 

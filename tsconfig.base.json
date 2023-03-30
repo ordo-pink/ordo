@@ -27,6 +27,7 @@
       "@ordo-pink/extension-editor": ["packages/extension-editor/src/index.ts"],
       "@ordo-pink/extension-fs": ["packages/extension-fs/src/index.ts"],
       "@ordo-pink/extension-home": ["packages/extension-home/src/index.ts"],
+      "@ordo-pink/extension-kanban": ["packages/extension-kanban/src/index.ts"],
       "@ordo-pink/extension-links": ["packages/extension-links/src/index.ts"],
       "@ordo-pink/extensions": ["packages/extensions/src/index.ts"],
       "@ordo-pink/fns": ["packages/fns/src/index.ts"],

@@ -18,19 +18,32 @@ import { OnChangePlugin } from "@lexical/react/LexicalOnChangePlugin"
 import { RichTextPlugin } from "@lexical/react/LexicalRichTextPlugin"
 import { HeadingNode, QuoteNode } from "@lexical/rich-text"
 import { TableCellNode, TableNode, TableRowNode } from "@lexical/table"
-import { FSDriver, IOrdoFile } from "@ordo-pink/common-types"
-import { useFileContentText, useFsDriver, useSubscription } from "@ordo-pink/react-utils"
+import { ExecuteCommandFn, FSDriver, IOrdoFile } from "@ordo-pink/common-types"
+import { Either } from "@ordo-pink/either"
+import {
+  Null,
+  useCommands,
+  useFileContentText,
+  useFsDriver,
+  useSubscription,
+} from "@ordo-pink/react-utils"
 import { editorPlugins$ } from "@ordo-pink/stream-editor-plugins"
 import { createDraft, finishDraft } from "immer"
-import { EditorState, EditorThemeClasses, LexicalNode } from "lexical"
+import { EditorState, EditorThemeClasses, LexicalNode, ParagraphNode } from "lexical"
 import { debounce } from "lodash"
 import { mergeDeepWith } from "ramda"
-import { ComponentType, memo, useEffect, useState } from "react"
+import { ComponentType, memo } from "react"
 import { useTranslation } from "react-i18next"
 import { LoadEditorStatePlugin } from "./load-state"
 
 const debouncedSave = debounce(
-  (driver: FSDriver, file: IOrdoFile, nodes: LexicalNode[], content: string) => {
+  (
+    driver: FSDriver,
+    file: IOrdoFile,
+    nodes: LexicalNode[],
+    content: string,
+    emit: ExecuteCommandFn,
+  ) => {
     let metadata = {}
 
     const draft = createDraft(file)
@@ -50,8 +63,7 @@ const debouncedSave = debounce(
 
     const newFile = finishDraft(draft)
 
-    // eslint-disable-next-line no-console
-    driver.files.setContent({ file: newFile, content }).catch(console.error)
+    emit("editor.update-file-content", newFile)
   },
   1000,
 )
@@ -125,16 +137,17 @@ const theme: EditorThemeClasses = {
 }
 
 // TODO: Adding nodes
-const initialNodes = [
+const initialNodes: (typeof LexicalNode)[] = [
   HeadingNode,
-  ListNode,
-  ListItemNode,
+  ListNode as unknown as typeof LexicalNode,
+  ListItemNode as unknown as typeof LexicalNode,
   QuoteNode,
   CodeNode,
+  ParagraphNode,
   CodeHighlightNode,
   TableNode,
-  TableCellNode,
-  TableRowNode,
+  TableCellNode as unknown as typeof LexicalNode,
+  TableRowNode as unknown as typeof LexicalNode,
   AutoLinkNode,
   LinkNode,
   HashtagNode,
@@ -165,75 +178,52 @@ export default memo(
   function MdEditor({ file }: Props) {
     const editorPlugins = useSubscription(editorPlugins$)
     const driver = useFsDriver()
+    const { emit } = useCommands()
     const content = useFileContentText(file)
-
-    const [transformers, setTransformers] = useState(TRANSFORMERS)
-    const [nodes, setNodes] = useState(initialNodes)
-    const [plugins, setPlugins] = useState<ComponentType[]>([])
-
-    useEffect(() => {
-      if (!editorPlugins) {
-        setTransformers(TRANSFORMERS)
-        setNodes(initialNodes)
-        setPlugins([])
-
-        return
-      }
-
-      const ts = [] as Transformer[]
-      const ns = [] as LexicalNode[]
-      const ps = [] as ComponentType[]
-
-      editorPlugins.forEach(({ Plugin, node, transformer }) => {
-        if (node) ns.push(node)
-        if (Plugin) ps.push(Plugin)
-        if (transformer) ts.push(transformer)
-      })
-
-      setTransformers(ts.concat(TRANSFORMERS))
-      setPlugins(ps)
-      setNodes(nodes.concat(initialNodes))
-    }, [editorPlugins])
 
     const handleChange = (state: EditorState) => {
       if (!driver) return
 
       state.read(() => {
-        const text = $convertToMarkdownString(TRANSFORMERS)
-        // const content = $convertToMarkdownString(transformers.concat(TRANSFORMERS))
+        const text = $convertToMarkdownString(
+          editorPlugins.reduce(
+            (acc, plugin) => (plugin.transformer ? acc.concat([plugin.transformer]) : acc),
+            [] as Transformer[],
+          ),
+        )
 
         const nodes = toNodeArray(state.toJSON().root)
 
-        debouncedSave(driver, file, nodes, text)
+        debouncedSave(driver, file, nodes, text, emit)
       })
     }
 
     // eslint-disable-next-line no-console
     const onError = console.error
 
-    return (
-      // <div className="p-4 w-full h-full">
+    return Either.fromNullable(editorPlugins).fold(Null, (plugins) => (
       <div className="py-2 pl-2">
         <LexicalComposer
           initialConfig={{
             namespace: "md-editor-root",
             onError,
             theme,
-            // nodes: nodes.concat(initialNodes),
-            nodes,
+            nodes: plugins
+              .reduce(
+                (acc, plugin) => (plugin.nodes ? acc.concat(plugin.nodes) : acc),
+                [] as (typeof LexicalNode)[],
+              )
+              .concat(initialNodes),
           }}
         >
-          {/* <div className="mb-8"> */}
-          {/* <PathBreadcrumbs path={breadcrumbsPath} /> */}
-
-          {/* <h1 className="text-3xl font-black">{file.readableName}</h1> */}
-          {/* </div> */}
-
-          {/* <div className="w-full h-screen flex flex-col items-center"> */}
-          {/* <div className="w-full py-8 px-4"> */}
-          {/* <OrdoDatePlugin /> */}
-
-          <MarkdownShortcutPlugin transformers={transformers} />
+          <MarkdownShortcutPlugin
+            transformers={plugins
+              .reduce(
+                (acc, plugin) => (plugin.transformer ? acc.concat([plugin.transformer]) : acc),
+                [] as Transformer[],
+              )
+              .concat(TRANSFORMERS)}
+          />
 
           <LinkPlugin />
           <ListPlugin />
@@ -258,7 +248,12 @@ export default memo(
 
           <LoadEditorStatePlugin
             content={content}
-            transformers={transformers}
+            transformers={plugins
+              .reduce(
+                (acc, plugin) => (plugin.transformer ? acc.concat([plugin.transformer]) : acc),
+                [] as Transformer[],
+              )
+              .concat(TRANSFORMERS)}
           />
 
           <OnChangePlugin
@@ -267,16 +262,18 @@ export default memo(
           />
 
           <>
-            {plugins.map((Plugin, index) => (
-              <Plugin key={index} />
-            ))}
+            {plugins
+              .reduce(
+                (acc, plugin) => (plugin.Plugin ? acc.concat([plugin.Plugin]) : acc),
+                [] as ComponentType[],
+              )
+              .map((Plugin, index) => (
+                <Plugin key={index} />
+              ))}
           </>
-          {/* </div> */}
-          {/* </div> */}
         </LexicalComposer>
-        {/* </div> */}
       </div>
-    )
+    ))
   },
   (prev, next) => prev.file.path === next.file.path,
 )

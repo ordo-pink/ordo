@@ -36,6 +36,7 @@ export default function Editor() {
 
   // TODO: Fix updating route params
   // TODO: NotSupported component
+  // TODO: Provide updateFile and getFile functions via props
   const [Component, setComponent] = useState<ComponentType<{ file: IOrdoFile }>>(() => () => null)
   const [currentFile, setCurrentFile] = useState<Nullable<IOrdoFile>>(null)
 

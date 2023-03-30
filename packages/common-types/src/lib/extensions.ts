@@ -130,5 +130,5 @@ export type EditorPlugin = {
   name: string
   Plugin?: ComponentType
   transformer?: Transformer
-  node?: LexicalNode
+  nodes?: (typeof LexicalNode)[]
 }

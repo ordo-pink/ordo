@@ -18,14 +18,15 @@ import "./editor.css"
 export default createExtension(
   "editor",
   ({
+    logger,
     commands,
+    translate,
     registerActivity,
     registerTranslations,
     registerEditorPlugin,
     registerFileAssociation,
     registerContextMenuItem,
     registerCommandPaletteItem,
-    translate,
   }) => {
     registerTranslations({
       ru: {
@@ -70,6 +71,14 @@ export default createExtension(
 
     registerEditorPlugin("highlight-code", {
       Plugin: lazy(() => import("./components/plugins/highlight-code-plugin")),
+    })
+
+    commands.on("editor.update-file-content", ({ payload }) => {
+      const driver = fsDriver$.getValue()
+
+      if (!driver) return
+
+      driver.files.setContent(payload).catch(logger.error)
     })
 
     registerCommandPaletteItem({

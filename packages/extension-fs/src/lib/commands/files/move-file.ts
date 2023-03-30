@@ -1,36 +1,35 @@
 import { CommandContext, OrdoFilePath } from "@ordo-pink/common-types"
 import { OrdoDirectory, OrdoFile } from "@ordo-pink/fs-entity"
 import { fsDriver$, drive$ } from "@ordo-pink/stream-drives"
-import produce from "immer"
+import { createDraft, finishDraft } from "immer"
 
 export const moveFile = ({
   logger,
   payload: { oldPath, newPath },
 }: CommandContext<{ oldPath: OrdoFilePath; newPath: OrdoFilePath }>) => {
-  const driver = fsDriver$.value
-  const drive = drive$.value
+  const driver = fsDriver$.getValue()
+  const drive = drive$.getValue()
 
-  logger.debug("createFile invoked", { oldPath, newPath })
+  if (!driver || !drive) return
 
-  const nextDrive = produce(drive, (draft) => {
-    if (!draft) return
+  driver.files
+    .move({ oldPath, newPath })
+    .then((raw) => {
+      const draft = createDraft(drive)
 
-    driver?.files
-      .move({ oldPath, newPath })
-      .then((raw) => {
-        const oldParent = OrdoFile.findParent(oldPath, draft.root)
-        const newParent = OrdoFile.findParent(raw.path, draft.root)
+      const oldParent = OrdoFile.findParent(oldPath, draft.root)
+      const newParent = OrdoFile.findParent(raw.path, draft.root)
 
-        if (!oldParent) throw new Error("Could not find parent of the file to be moved")
-        if (!newParent) throw new Error("Target parent does not exist")
+      if (!oldParent) throw new Error("Could not find parent of the file to be moved")
+      if (!newParent) throw new Error("Target parent does not exist")
 
-        oldParent.children = oldParent.children.filter((child) => child.path === oldPath)
-        newParent.children.push(
-          OrdoDirectory.isOrdoDirectoryRaw(raw) ? OrdoDirectory.from(raw) : OrdoFile.from(raw),
-        )
-      })
-      .catch(logger.error)
-  })
+      oldParent.children = oldParent.children.filter((child) => child.path !== oldPath)
+      newParent.children.push(
+        OrdoDirectory.isOrdoDirectoryRaw(raw) ? OrdoDirectory.from(raw) : OrdoFile.from(raw),
+      )
 
-  drive$.next(nextDrive)
+      const newDrive = finishDraft(draft)
+      drive$.next(newDrive)
+    })
+    .catch(logger.error)
 }

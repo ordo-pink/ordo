@@ -4,7 +4,7 @@ import { hideCommandPalette, showCommandPalette } from "@ordo-pink/stream-comman
 import { drive$, fsDriver$ } from "@ordo-pink/stream-drives"
 import { createExtension } from "@ordo-pink/stream-extensions"
 import { AiFillFolder, AiOutlineFolder } from "react-icons/ai"
-import { BsFileEarmarkMinus, BsFileEarmarkPlus, BsFolderMinus, BsFolderPlus } from "react-icons/bs"
+import { BsFileEarmarkMinus, BsFileEarmarkPlus, BsFolderMinus, BsFolderPlus, BsUpload } from "react-icons/bs"
 import { createDirectory } from "./commands/directory/create-directory"
 import { moveDirectory } from "./commands/directory/move-directory"
 import { removeDirectory } from "./commands/directory/remove-directory"
@@ -18,6 +18,7 @@ import CreateDirectoryModal from "./components/create-directory-modal"
 import CreateFileModal from "./components/create-file-modal"
 import RemoveDirectoryModal from "./components/remove-directory-modal"
 import RemoveFileModal from "./components/remove-file-modal"
+import UploadFilesModal from './components/upload-files-modal';
 
 export default createExtension(
   "fs",
@@ -44,6 +45,7 @@ export default createExtension(
         "create-button": "Создать",
         "remove-button": "Удалить",
         "cancel-button": "Не, ну его",
+        "upload-files": "Загрузить",
         "invalid-name": "Выбранное название содержит запрещённые символы.",
       },
       en: {
@@ -61,6 +63,7 @@ export default createExtension(
         "create-button": "Create",
         "remove-button": "Remove",
         "cancel-button": "Cancel",
+        "upload-files": "Upload",
         "invalid-name": "Provided name contains forbidden characters.",
       },
     })
@@ -79,6 +82,17 @@ export default createExtension(
     commands.on("create-file", createFile)
     commands.on("update-file", updateFile)
     commands.on("remove-file", removeFile)
+
+    const uploadFilesCommand = commands.on('upload-files', ({ payload }) => {
+      const { showModal } = useModal()
+      showModal(() => <UploadFilesModal parent={payload} />)
+    })
+
+    registerContextMenuItem(uploadFilesCommand, {
+      Icon: BsUpload,
+      payloadCreator: (target) => target,
+      shouldShow: (target) => OrdoDirectory.isOrdoDirectory(target),
+    })
 
     const CREATE_FILE_COMMAND = commands.on("show-create-file-modal", ({ payload }) => {
       const { showModal } = useModal()

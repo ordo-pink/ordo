@@ -30,18 +30,18 @@ export default function SupportField() {
           onClick={handleButtonEmailClick}
           center
         >
-          <div className="flex flex-row items-center">
+          <div className="flex flex-row items-center space-x-2">
             <AiOutlineMail />
-            {translatedSupportEmail}
+            <div className="flex items-center">{translatedSupportEmail}</div>
           </div>
         </OrdoButtonPrimary>
         <OrdoButtonPrimary
           onClick={handleButtonTelegramClick}
           center
         >
-          <div className="flex flex-row items-center">
+          <div className="flex flex-row items-center space-x-2">
             <BsTelegram />
-            {translatedSupportTelegram}
+            <div className="flex items-center">{translatedSupportTelegram}</div>
           </div>
         </OrdoButtonPrimary>
       </div>

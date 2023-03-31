@@ -1,0 +1,19 @@
+{
+  "@ordo-activity-user/title": "Личный кабинет",
+  "@ordo-activity-user/open-account": "Открыть личный кабинет",
+  "@ordo-activity-user/email": "Email",
+  "@ordo-activity-user/change-email": "Изменить Email",
+  "@ordo-activity-user/email-not-verified": "Ваш Email не подтверждён.",
+  "@ordo-activity-user/resend-verification": "Подтвердить Email",
+  "@ordo-activity-user/password": "Пароль",
+  "@ordo-activity-user/change-password": "Изменить пароль",
+  "@ordo-activity-user/email-verified": "Email подтверждён",
+  "@ordo-activity-user/logout": "Выйти из аккаунта",
+  "@ordo-activity-user/delete-account": "Удалить аккаунт",
+  "@ordo-activity-user/used-space": "Использованное место",
+  "search-placeholder": "Искать...",
+  "logout": "Выйти из аккаунта",
+  "support-email": "Email",
+  "support-telegram": "Telegram",
+  "support": "Обратиться в поддержку"
+}

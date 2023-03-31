@@ -1,6 +1,7 @@
 import { OrdoButtonPrimary } from "@ordo-pink/react-utils"
 import { useTranslation } from "react-i18next"
 import { BsCheck2 } from "react-icons/bs"
+import SupportField from "./components/support-field"
 import logo from "../assets/logo.png"
 
 export default function UserPage() {
@@ -135,6 +136,7 @@ export default function UserPage() {
               />
             </div> */}
         </div>
+        <SupportField />
       </div>
     </div>
   )

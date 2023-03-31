@@ -3,7 +3,7 @@ import { ConsoleLogger } from "@ordo-pink/logger"
 import { clearActivities, registerActivity, _initActivities } from "@ordo-pink/stream-activities"
 import { _initAuth } from "@ordo-pink/stream-auth"
 import { registerCommandPaletteItem, _initCommandPalette } from "@ordo-pink/stream-command-palette"
-import { executeCommand, _initCommands } from "@ordo-pink/stream-commands"
+import { executeCommand, registerCommand, _initCommands } from "@ordo-pink/stream-commands"
 import { hideContextMenu, _initContextMenu } from "@ordo-pink/stream-context-menu"
 import { _initDrives } from "@ordo-pink/stream-drives"
 import { _initEditorPlugins } from "@ordo-pink/stream-editor-plugins"
@@ -22,6 +22,8 @@ import { useDefaultCommandPalette } from "./command-palette"
 import ContextMenu from "./context-menu"
 import Modal from "./modal"
 import UserPage from "./user"
+import en from "./translations/en.json"
+import ru from "./translations/ru.json"
 
 import "./styles.css"
 
@@ -236,12 +238,17 @@ _initExtensions({
   logger,
 })
 
-registerTranslations("ordo")({
-  ru: { "search-placeholder": "Искать...", logout: "Выйти из аккаунта" },
-  en: { "search-placeholder": "Search...", logout: "Log out" },
-})
+registerTranslations("ordo")({ ru, en })
 
 setTimeout(() => {
+  registerCommand("ordo")("support-email", () => {
+    executeCommand("router.open-external", { url: `mailto:support@ordo.pink` })
+  })
+
+  registerCommand("ordo")("support-telegram", () => {
+    executeCommand("router.open-external", { url: `https://t.me/ordo_pink` })
+  })
+
   registerCommandPaletteItem({
     id: "ordo.logout",
     name: translate("ordo")("logout"),

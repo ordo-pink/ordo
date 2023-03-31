@@ -10,6 +10,7 @@ export default createExtension("home", ({ registerTranslations, commands, regist
     routes: ["/"],
     Component: lazy(() => import("./components/home-component")),
     Icon: lazy(() => import("./components/home-icon")),
+    show: false,
   })
 
   commands.on("go-home", () => commands.emit("navigate", "/"))

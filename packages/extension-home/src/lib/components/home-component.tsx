@@ -21,10 +21,16 @@ import {
 } from "react-icons/bs"
 import Feature from "./feature"
 import KeyPrinciple from "./key-principle"
+import AleksandrKonovalov from "../assets/aleksandr-konovalov.jpg"
+import AndreiOrlov from "../assets/andrei-orlov.jpg"
+import AntonLaptev from "../assets/anton-laptev.jpg"
 import heroBg from "../assets/bg.jpg"
+import KonstantinTsepelev from "../assets/konstantin-tsepelev.jpg"
 import paint from "../assets/paint.jpg"
 import appDark from "../assets/rich-editor-1.png"
 import app from "../assets/rich-editor-2.png"
+import SergeiOrlov from "../assets/sergei-orlov.jpg"
+import TimurGafiulin from "../assets/timur-gafiulin.jpg"
 
 import "./home-component.css"
 
@@ -44,7 +50,30 @@ export default function Home() {
   const handleTwitterClick = () =>
     execute("router.open-external", { url: "https://twitter.com/ordo_pink" })
 
-  const includedFeatures = ["asdf"]
+  const freeFeatures = [t("free-feature-1"), t("free-feature-2"), t("free-feature-3")]
+
+  const proFeatures = [t("pro-feature-1"), t("pro-feature-2"), t("pro-feature-3")]
+
+  const proPlusFeatures = [
+    t("pro-plus-feature-1"),
+    t("pro-plus-feature-2"),
+    t("pro-plus-feature-3"),
+    t("pro-plus-feature-4"),
+  ]
+
+  // const teamFeatures = [
+  //   t("team-feature-size"),
+  //   t("team-feature-size-limit"),
+  //   t("team-feature-cross-device-access"),
+  //   t("team-feature-priority-support"),
+  // ]
+
+  // const enterpriseFeatures = [
+  //   t("enterprise-feature-size"),
+  //   t("enterprise-feature-size-limit"),
+  //   t("enterprise-feature-cross-device-access"),
+  //   t("enterprise-feature-priority-support"),
+  // ]
 
   const keyPrinciples = [
     { title: "security-title", Icon: BsLock, description: "security-description" },
@@ -60,72 +89,55 @@ export default function Home() {
     { title: "linking-title", Icon: BsLink45Deg, description: "linking-description" },
   ]
 
+  const tSergeiOrlov = t("sergei-orlov")
+  const tKonstantinTsepelev = t("konstantin-tsepelev")
+  const tAndreiOrlov = t("andrei-orlov")
+  const tNikolaiGromov = t("nikolai-gromov")
+  const tIliaBalenko = t("ilia-balenko")
+  const tAleksandrKonovalov = t("aleksandr-konovalov")
+  const tAntonLaptev = t("anton-laptev")
+  const tTimurGafiulin = t("timur-gafiulin")
+
   const team = [
     {
-      name: "Leslie Alexander",
-      role: "Co-Founder / CEO",
-      imageUrl:
-        "https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
+      name: tSergeiOrlov,
+      role: "Founder / End-to-end Developer / R2D2",
+      imageUrl: SergeiOrlov,
     },
     {
-      name: "Leslie Alexander",
-      role: "Co-Founder / CEO",
-      imageUrl:
-        "https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
+      name: tKonstantinTsepelev,
+      role: "Co-Founder / Back-end Developer / H2SO4",
+      imageUrl: KonstantinTsepelev,
     },
     {
-      name: "Leslie Alexander",
-      role: "Co-Founder / CEO",
-      imageUrl:
-        "https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
+      name: tAndreiOrlov,
+      role: "Co-Founder / Dead-end Developer / C3PO",
+      imageUrl: AndreiOrlov,
     },
     {
-      name: "Leslie Alexander",
-      role: "Co-Founder / CEO",
-      imageUrl:
-        "https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
+      name: tNikolaiGromov,
+      role: "Front-end Developer / C2H5OH",
+      imageUrl: paint,
     },
     {
-      name: "Leslie Alexander",
-      role: "Co-Founder / CEO",
-      imageUrl:
-        "https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
+      name: tIliaBalenko,
+      role: "Marketsman / H3PO4",
+      imageUrl: paint,
     },
     {
-      name: "Leslie Alexander",
-      role: "Co-Founder / CEO",
-      imageUrl:
-        "https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
+      name: tAleksandrKonovalov,
+      role: "Front-end Developer",
+      imageUrl: AleksandrKonovalov,
     },
     {
-      name: "Leslie Alexander",
-      role: "Co-Founder / CEO",
-      imageUrl:
-        "https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
+      name: tAntonLaptev,
+      role: "QA / FAQ",
+      imageUrl: AntonLaptev,
     },
     {
-      name: "Leslie Alexander",
-      role: "Co-Founder / CEO",
-      imageUrl:
-        "https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
-    },
-    {
-      name: "Leslie Alexander",
-      role: "Co-Founder / CEO",
-      imageUrl:
-        "https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
-    },
-    {
-      name: "Leslie Alexander",
-      role: "Co-Founder / CEO",
-      imageUrl:
-        "https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
-    },
-    {
-      name: "Leslie Alexander",
-      role: "Co-Founder / CEO",
-      imageUrl:
-        "https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
+      name: tTimurGafiulin,
+      role: "Front-end Developer / 10K",
+      imageUrl: TimurGafiulin,
     },
   ]
 
@@ -147,8 +159,8 @@ export default function Home() {
   const tCtaDescription = t("cta-description")
   const tPricing = t("pricing")
   const tPricingDescription = t("pricing-description")
-  const tTeam = t("team")
-  const tTeamDescription = t("team-description")
+  const tTeam = t("ordo-team")
+  const tTeamDescription = t("ordo-team-description")
   const tRightsReserved = t("all-rights-reserved")
 
   return (
@@ -322,22 +334,43 @@ export default function Home() {
             </p>
           </div>
 
-          <div className="mx-auto shadow-lg mt-16 max-w-2xl rounded-3xl ring-1 ring-green-300 dark:ring-green-800 bg-neutral-50 dark:bg-neutral-900 sm:mt-20 lg:mx-0 lg:flex lg:max-w-none">
+          <div className="w-full justify-center flex gap-4 mt-12 flex-wrap">
             <PricingPlan
-              features={includedFeatures}
+              features={freeFeatures}
+              available
               title="free"
               description="free-description"
               price="free-price"
             />
-          </div>
 
-          <div className="mx-auto shadow-lg mt-16 max-w-2xl rounded-3xl ring-1 ring-green-300 dark:ring-green-800 bg-neutral-50 dark:bg-neutral-900 sm:mt-20 lg:mx-0 lg:flex lg:max-w-none">
             <PricingPlan
-              features={includedFeatures}
+              features={proFeatures}
               title="pro"
               description="pro-description"
               price="pro-price"
             />
+
+            <PricingPlan
+              features={proPlusFeatures}
+              title="pro-plus"
+              description="pro-plus-description"
+              price="pro-plus-price"
+            />
+
+            {/* <PricingPlan
+              features={teamFeatures}
+              title="team"
+              pricePerUser
+              description="team-description"
+              price="team-price"
+            />
+
+            <PricingPlan
+              features={enterpriseFeatures}
+              title="enterprise"
+              description="enterprise-description"
+              price="enterprise-price"
+            /> */}
           </div>
         </div>
       </section>
@@ -434,7 +467,7 @@ export default function Home() {
               </OrdoButtonSecondary>
             </li>
           </ul>
-          <ul className="flex flex-wrap mt-3 text-sm text-neutral-200 sm:mt-0">
+          {/* <ul className="flex flex-wrap mt-3 text-sm text-neutral-200 sm:mt-0">
             <li>
               <a
                 href="#"
@@ -459,7 +492,7 @@ export default function Home() {
                 Contact
               </a>
             </li>
-          </ul>
+          </ul> */}
         </div>
       </footer>
     </div>

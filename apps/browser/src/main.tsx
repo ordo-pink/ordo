@@ -2,7 +2,7 @@ import { FSDriver, UnaryFn } from "@ordo-pink/common-types"
 import { ConsoleLogger } from "@ordo-pink/logger"
 import { clearActivities, registerActivity, _initActivities } from "@ordo-pink/stream-activities"
 import { _initAuth } from "@ordo-pink/stream-auth"
-import { _initCommandPalette } from "@ordo-pink/stream-command-palette"
+import { registerCommandPaletteItem, _initCommandPalette } from "@ordo-pink/stream-command-palette"
 import { executeCommand, _initCommands } from "@ordo-pink/stream-commands"
 import { hideContextMenu, _initContextMenu } from "@ordo-pink/stream-context-menu"
 import { _initDrives } from "@ordo-pink/stream-drives"
@@ -11,10 +11,11 @@ import { _initExtensions } from "@ordo-pink/stream-extensions"
 import { _initFileAssociations } from "@ordo-pink/stream-file-associations"
 import { _initModals } from "@ordo-pink/stream-modals"
 import { _initRouter } from "@ordo-pink/stream-router"
-import { registerTranslations, _initI18n } from "@ordo-pink/stream-translations"
+import { registerTranslations, translate, _initI18n } from "@ordo-pink/stream-translations"
 import Keycloak from "keycloak-js"
 import { tap } from "ramda"
 import * as ReactDOM from "react-dom/client"
+import { AiOutlineLogout } from "react-icons/ai"
 import { BsPersonCircle } from "react-icons/bs"
 import App from "./app/app"
 import { useDefaultCommandPalette } from "./command-palette"
@@ -235,12 +236,21 @@ _initExtensions({
   logger,
 })
 
-logger.info("Starting the application")
-
 registerTranslations("ordo")({
-  ru: { "search-placeholder": "Искать..." },
-  en: { "search-placeholder": "Search..." },
+  ru: { "search-placeholder": "Искать...", logout: "Выйти из аккаунта" },
+  en: { "search-placeholder": "Search...", logout: "Log out" },
 })
+
+setTimeout(() => {
+  registerCommandPaletteItem({
+    id: "ordo.logout",
+    name: translate("ordo")("logout"),
+    Icon: AiOutlineLogout,
+    onSelect: () => executeCommand("auth.logout", "/"),
+  })
+})
+
+logger.info("Starting the application")
 
 const root = ReactDOM.createRoot(document.getElementById("root") as HTMLElement)
 

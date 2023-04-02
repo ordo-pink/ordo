@@ -51,7 +51,9 @@
       "@ordo-pink/stream-modals": ["packages/stream-modals/src/index.ts"],
       "@ordo-pink/stream-router": ["packages/stream-router/src/index.ts"],
       "@ordo-pink/stream-translations": ["packages/stream-translations/src/index.ts"],
-      "@ordo-pink/switch": ["packages/switch/src/index.ts"]
+      "@ordo-pink/react": ["packages/react/src/index.ts"],
+      "@ordo-pink/switch": ["packages/switch/src/index.ts"],
+      "@ordo-pink/backend-encrypter": ["packages/backend-encrypter/src/index.ts"]
     },
     "plugins": [
       {

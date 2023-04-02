@@ -1,16 +1,19 @@
+import type { Readable } from "stream"
 import { SuccessResponse, ExceptionResponse } from "@ordo-pink/common-types"
 import { Switch } from "@ordo-pink/switch"
 import { FsRequestHandler, OrdoFilePathParams } from "../../../types"
 import { PATH_PARAM, USER_ID_PARAM } from "../../constants"
+import { processStream } from "../../utils/encrypt-stream"
 import { removeUserIdFromPath } from "../../utils/remove-user-id-from-path"
 
 export const updateFileHandler: FsRequestHandler<OrdoFilePathParams> =
-  ({ file: { updateFile, getFile }, internal: { getInternalValue, setInternalValue } }) =>
+  ({ file: { updateFile, getFile }, internal: { getInternalValue, setInternalValue }, encrypt }) =>
   async (req, res) => {
     const path = req.params[PATH_PARAM]
     const userId = req.params[USER_ID_PARAM]
 
     const contentLength = Number(req.headers["content-length"])
+    const processEncryption = processStream(encrypt)
 
     let size: number
 
@@ -20,7 +23,7 @@ export const updateFileHandler: FsRequestHandler<OrdoFilePathParams> =
       size = 0
     }
 
-    updateFile({ path, content: req })
+    updateFile({ path, content: processEncryption(path, req) as Readable })
       .then(removeUserIdFromPath(userId))
       .then((file) => res.status(SuccessResponse.OK).json(file))
       .then(() => getInternalValue(userId, "totalSize"))

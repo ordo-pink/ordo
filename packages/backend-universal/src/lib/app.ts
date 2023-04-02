@@ -14,10 +14,11 @@ export const createOrdoBackendServer = ({
   authorise,
   logger,
   limits,
+  encrypt,
 }: CreateOrdoBackendServerParams) =>
   prependMiddleware(app)
     .use(cors(corsOptions))
     .use(urlencoded({ extended: false }))
-    .use("/fs", FSRouter({ fsDriver, authorise, logger, limits }))
-    .use("/internal", InternalRouter({ fsDriver, authorise, logger, limits }))
+    .use("/fs", FSRouter({ fsDriver, authorise, logger, limits, encrypt }))
+    .use("/internal", InternalRouter({ fsDriver, authorise, logger, limits, encrypt }))
     .disable("x-powered-by")

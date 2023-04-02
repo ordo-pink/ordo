@@ -1,4 +1,4 @@
-import { Readable } from "stream"
+import { Readable, Stream, Transform, Writable } from "stream"
 import {
   IOrdoDirectoryRaw,
   IOrdoFileRaw,
@@ -20,6 +20,11 @@ import {
   OLD_PATH_PARAM,
   NEW_PATH_PARAM,
 } from "./fs/constants"
+
+export type Encrypt = {
+  encryptStream: UnaryFn<Stream, Transform>
+  decryptStream: UnaryFn<Writable, Transform>
+}
 
 export type Params<T extends Record<string, unknown> = Record<string, unknown>> = T & {
   [USER_ID_PARAM]: string
@@ -46,6 +51,7 @@ export type FsRequestHandler<T = Params> = UnaryFn<
     directory: IOrdoDirectoryModel
     internal: IOrdoInternalModel
     logger: Logger
+    encrypt: Encrypt
   },
   RequestHandler<T>
 >
@@ -63,6 +69,7 @@ export type CreateOrdoBackendServerParams = {
   authorise: RequestHandler<Params<Record<string, unknown>>>
   logger: Logger
   limits: StorageLimits
+  encrypt: Encrypt
 }
 
 export type FSDriver = {

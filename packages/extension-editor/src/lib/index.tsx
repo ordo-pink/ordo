@@ -150,7 +150,9 @@ export default createExtension(
 
     commands.after(
       "fs.create-file",
-      ({ payload }: CommandContext<{ file: IOrdoFile; content?: string, ignoreOpenInEditor?: boolean }>) => {
+      ({
+        payload,
+      }: CommandContext<{ file: IOrdoFile; content?: string; ignoreOpenInEditor?: boolean }>) => {
         if (payload.ignoreOpenInEditor) return
         const currentActivity = currentActivity$.value
 

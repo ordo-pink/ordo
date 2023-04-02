@@ -4,7 +4,13 @@ import { hideCommandPalette, showCommandPalette } from "@ordo-pink/stream-comman
 import { drive$, fsDriver$ } from "@ordo-pink/stream-drives"
 import { createExtension } from "@ordo-pink/stream-extensions"
 import { AiFillFolder, AiOutlineFolder } from "react-icons/ai"
-import { BsFileEarmarkMinus, BsFileEarmarkPlus, BsFolderMinus, BsFolderPlus, BsUpload } from "react-icons/bs"
+import {
+  BsFileEarmarkMinus,
+  BsFileEarmarkPlus,
+  BsFolderMinus,
+  BsFolderPlus,
+  BsUpload,
+} from "react-icons/bs"
 import { createDirectory } from "./commands/directory/create-directory"
 import { moveDirectory } from "./commands/directory/move-directory"
 import { removeDirectory } from "./commands/directory/remove-directory"
@@ -18,7 +24,7 @@ import CreateDirectoryModal from "./components/create-directory-modal"
 import CreateFileModal from "./components/create-file-modal"
 import RemoveDirectoryModal from "./components/remove-directory-modal"
 import RemoveFileModal from "./components/remove-file-modal"
-import UploadFilesModal from './components/upload-files-modal';
+import UploadFilesModal from "./components/upload-files-modal"
 
 export default createExtension(
   "fs",
@@ -83,7 +89,7 @@ export default createExtension(
     commands.on("update-file", updateFile)
     commands.on("remove-file", removeFile)
 
-    const uploadFilesCommand = commands.on('upload-files', ({ payload }) => {
+    const uploadFilesCommand = commands.on("upload-files", ({ payload }) => {
       const { showModal } = useModal()
       showModal(() => <UploadFilesModal parent={payload} />)
     })

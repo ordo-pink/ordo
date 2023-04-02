@@ -1,5 +1,5 @@
 import { IOrdoDirectory, OrdoFilePath } from "@ordo-pink/common-types"
-import { OrdoFile } from '@ordo-pink/fs-entity';
+import { OrdoFile } from "@ordo-pink/fs-entity"
 import {
   OrdoButtonPrimary,
   OrdoButtonSecondary,
@@ -21,7 +21,7 @@ export default function UploadFilesModal({ parent }: Props) {
   const { t } = useTranslation("fs")
 
   const [breadcrumbsPath] = useState(parent?.path ?? "/")
-  const [files, setFiles] = useState<File[]>([]);
+  const [files, setFiles] = useState<File[]>([])
 
   const tPlaceholder = t("choose-name-placeholder") as string
   const tTitle = t("create-file")
@@ -29,10 +29,10 @@ export default function UploadFilesModal({ parent }: Props) {
   const tUpload = t("upload-files")
 
   const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
-    e.target.files && setFiles(Array.from(e.target.files));
-  };
+    e.target.files && setFiles(Array.from(e.target.files))
+  }
 
-  const handleOkButtonClick =  () => {
+  const handleOkButtonClick = () => {
     files.forEach(async (file) => {
       const parentPath = parent ? parent.path : "/"
       const name = file.name
@@ -65,12 +65,11 @@ export default function UploadFilesModal({ parent }: Props) {
             />
 
             <ul>
-              {
-                Array.from(files).map((file, i) => (
-                  <li key={i}>
-                    {file.name} - {file.type}
-                  </li>
-                ))}
+              {Array.from(files).map((file, i) => (
+                <li key={i}>
+                  {file.name} - {file.type}
+                </li>
+              ))}
             </ul>
           </div>
         </div>

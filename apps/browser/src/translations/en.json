@@ -1,0 +1,19 @@
+{
+  "@ordo-activity-user/title": "Account",
+  "@ordo-activity-user/open-account": "Open Account",
+  "@ordo-activity-user/email": "Email",
+  "@ordo-activity-user/change-email": "Change Email",
+  "@ordo-activity-user/email-not-verified": "Your Email is not verified.",
+  "@ordo-activity-user/resend-verification": "Verify Email",
+  "@ordo-activity-user/password": "Password",
+  "@ordo-activity-user/change-password": "Change password",
+  "@ordo-activity-user/email-verified": "Email verified",
+  "@ordo-activity-user/logout": "Log Out",
+  "@ordo-activity-user/delete-account": "Delete account",
+  "@ordo-activity-user/used-space": "Used Space",
+  "search-placeholder": "Search...",
+  "logout": "Log out",
+  "support-email": "Email",
+  "support-telegram": "Telegram",
+  "support": "Contact support"
+}

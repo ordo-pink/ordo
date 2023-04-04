@@ -54,26 +54,26 @@ export default function Home() {
 
   const proFeatures = [tOrdo("pro-feature-1"), tOrdo("pro-feature-2"), tOrdo("pro-feature-3")]
 
-  // const proPlusFeatures = [
-  //   tOrdo("pro-plus-feature-1"),
-  //   tOrdo("pro-plus-feature-2"),
-  //   tOrdo("pro-plus-feature-3"),
-  //   tOrdo("pro-plus-feature-4"),
-  // ]
+  const proPlusFeatures = [
+    tOrdo("pro-plus-feature-1"),
+    tOrdo("pro-plus-feature-2"),
+    tOrdo("pro-plus-feature-3"),
+    tOrdo("pro-plus-feature-4"),
+  ]
 
-  // const teamFeatures = [
-  //   tOrdo("team-feature-size"),
-  //   tOrdo("team-feature-size-limit"),
-  //   tOrdo("team-feature-cross-device-access"),
-  //   tOrdo("team-feature-priority-support"),
-  // ]
+  const teamFeatures = [
+    tOrdo("team-feature-1"),
+    tOrdo("team-feature-2"),
+    tOrdo("team-feature-3"),
+    tOrdo("team-feature-4"),
+  ]
 
-  // const enterpriseFeatures = [
-  //   tOrdo("enterprise-feature-size"),
-  //   tOrdo("enterprise-feature-size-limit"),
-  //   tOrdo("enterprise-feature-cross-device-access"),
-  //   tOrdo("enterprise-feature-priority-support"),
-  // ]
+  const enterpriseFeatures = [
+    tOrdo("enterprise-feature-1"),
+    tOrdo("enterprise-feature-2"),
+    tOrdo("enterprise-feature-3"),
+    tOrdo("enterprise-feature-4"),
+  ]
 
   const keyPrinciples = [
     { title: "security-title", Icon: BsLock, description: "security-description" },
@@ -83,10 +83,10 @@ export default function Home() {
   ]
 
   const features = [
-    { title: "calendar-title", Icon: BsCalendar, description: "calendar-description" },
-    { title: "kanban-title", Icon: BsKanban, description: "kanban-description" },
     { title: "md-title", Icon: BsMarkdown, description: "md-description" },
     { title: "linking-title", Icon: BsLink45Deg, description: "linking-description" },
+    { title: "kanban-title", Icon: BsKanban, description: "kanban-description" },
+    { title: "calendar-title", Icon: BsCalendar, description: "calendar-description" },
   ]
 
   const tSergeiOrlov = t("sergei-orlov")
@@ -158,7 +158,7 @@ export default function Home() {
   const tCtaExtended = t("cta-extended")
   const tCtaDescription = t("cta-description")
   const tPricing = t("pricing")
-  const tPricingDescription = t("pricing-description")
+  // const tPricingDescription = t("pricing-description")
   const tTeam = t("ordo-team")
   const tTeamDescription = t("ordo-team-description")
   const tRightsReserved = t("all-rights-reserved")
@@ -245,7 +245,7 @@ export default function Home() {
       <section className="overflow-hidden py-24">
         <div className="mx-auto max-w-7xl px-6 lg:px-8">
           <div className="mx-auto grid max-w-2xl grid-cols-1 gap-y-16 gap-x-8 sm:gap-y-20 lg:mx-0 lg:max-w-none lg:grid-cols-2">
-            <div className="lg:pr-8 lg:pt-4">
+            <div className="lg:pr-8 ">
               <div className="lg:max-w-lg">
                 <h2 className="text-base font-semibold leading-7 text-orange-700">{tFeatures}</h2>
                 <p className="mt-2 text-3xl font-bold tracking-tight sm:text-4xl">
@@ -326,9 +326,9 @@ export default function Home() {
         <div className="mx-auto max-w-7xl px-6 lg:px-8">
           <div className="mx-auto max-w-2xl sm:text-center">
             <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">{tPricing}</h2>
-            <p className="mt-6 text-lg leading-8 text-neutral-600 dark:text-neutral-400">
+            {/* <p className="mt-6 text-lg leading-8 text-neutral-600 dark:text-neutral-400">
               {tPricingDescription}
-            </p>
+            </p> */}
           </div>
 
           <div className="w-full justify-center flex gap-4 mt-12 flex-wrap">
@@ -347,14 +347,14 @@ export default function Home() {
               price="pro-price"
             />
 
-            {/* <PricingPlan
+            <PricingPlan
               features={proPlusFeatures}
               title="pro-plus"
               description="pro-plus-description"
               price="pro-plus-price"
-            /> */}
+            />
 
-            {/* <PricingPlan
+            <PricingPlan
               features={teamFeatures}
               title="team"
               pricePerUser
@@ -367,7 +367,7 @@ export default function Home() {
               title="enterprise"
               description="enterprise-description"
               price="enterprise-price"
-            /> */}
+            />
           </div>
         </div>
       </section>

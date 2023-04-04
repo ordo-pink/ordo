@@ -40,7 +40,9 @@ export function PricingPlan({
         {tPrice ? (
           <div className="flex items-end">
             <h3 className="text-2xl font-black">{tPrice}</h3>
-            <p className="text-lg font-bold">{pricePerUser ? tCurrencyPerUser : tCurrency}</p>
+            {Number.isNaN(Number.parseInt(tPrice)) ? null : (
+              <p className="text-lg font-bold">{pricePerUser ? tCurrencyPerUser : tCurrency}</p>
+            )}
           </div>
         ) : null}
 

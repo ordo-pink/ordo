@@ -8,7 +8,6 @@ import { useTranslation } from "react-i18next"
 import {
   BsArrowsFullscreen,
   BsCalendar,
-  BsChevronDown,
   BsCodeSlash,
   BsGithub,
   BsKanban,
@@ -145,10 +144,10 @@ export default function Home() {
   const tTitle = t("title")
   const tSlogan = t("slogan")
   const tDescription = t("description")
-  const tLearnMore = t("learn-more")
+  // const tLearnMore = t("learn-more")
   const tGetStarted = t("get-started")
   const tLogin = t("login")
-  const tHeadlineNews = t("headline-news")
+  // const tHeadlineNews = t("headline-news")
   const tKeyPrinciples = t("key-principles")
   const tKeyPrinciplesExtended = t("key-principles-extended")
   const tKeyPrinciplesDescription = t("key-principles-description")
@@ -166,7 +165,7 @@ export default function Home() {
 
   return (
     <div className="overflow-x-hidden text-neutral-800 dark:text-neutral-200 bg-gradient-to-br from-slate-50 via-neutral-100 to-stone-200 dark:from-stone-900 dark:via-neutral-900 dark:to-zinc-900">
-      <header className="relative w-screen">
+      <header className="relative w-screen h-screen">
         <img
           className="absolute top-0 left-0 right-0 bottom-0 h-full w-full"
           src={heroBg}
@@ -174,9 +173,9 @@ export default function Home() {
         />
         <div className="absolute top-0 left-0 right-0 bottom-0 h-full bg-neutral-200 opacity-10 dark:bg-neutral-900 dark:opacity-80" />
 
-        <div className="relative isolate px-6 pt-14 lg:px-8">
-          <div className="mx-auto max-w-2xl py-32 sm:py-48 lg:py-42">
-            <div className="hidden sm:mb-8 sm:flex sm:justify-center">
+        <div className="relative isolate px-6 pt-14 lg:px-8 w-full h-full flex flex-col items-center justify-center">
+          <div className="mx-auto max-w-2xl py-32">
+            {/* <div className="hidden sm:mb-8 sm:flex sm:justify-center">
               <div className="relative rounded-full py-1 px-3 text-sm leading-6 ring-1 dark:ring-neutral-200/20 ring-neutral-900/10 dark:hover:ring-neutral-200/40 hover:ring-neutral-900/20 transition-all duration-300">
                 {tHeadlineNews}{" "}
                 <a
@@ -187,7 +186,7 @@ export default function Home() {
                   {tLearnMore}
                 </a>
               </div>
-            </div>
+            </div> */}
             <div className="text-center">
               <h1 className="text-5xl px-8 font-bold md:font-black md:text-7xl">
                 <span>{tSlogan} </span>
@@ -213,9 +212,6 @@ export default function Home() {
                 </OrdoButtonSecondary>
               </div>
             </div>
-          </div>
-          <div className="py-2 flex justify-center text-neutral-500">
-            <BsChevronDown />
           </div>
         </div>
       </header>

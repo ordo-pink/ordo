@@ -38,6 +38,7 @@ import "./home-component.css"
 
 export default function Home() {
   const { t } = useTranslation("home")
+  const { t: tOrdo } = useTranslation("ordo")
 
   const { emit: execute } = useCommands()
 
@@ -50,29 +51,29 @@ export default function Home() {
   const handleTwitterClick = () =>
     execute("router.open-external", { url: "https://twitter.com/ordo_pink" })
 
-  const freeFeatures = [t("free-feature-1"), t("free-feature-2"), t("free-feature-3")]
+  const freeFeatures = [tOrdo("free-feature-1"), tOrdo("free-feature-2"), tOrdo("free-feature-3")]
 
-  const proFeatures = [t("pro-feature-1"), t("pro-feature-2"), t("pro-feature-3")]
+  const proFeatures = [tOrdo("pro-feature-1"), tOrdo("pro-feature-2"), tOrdo("pro-feature-3")]
 
-  const proPlusFeatures = [
-    t("pro-plus-feature-1"),
-    t("pro-plus-feature-2"),
-    t("pro-plus-feature-3"),
-    t("pro-plus-feature-4"),
-  ]
+  // const proPlusFeatures = [
+  //   tOrdo("pro-plus-feature-1"),
+  //   tOrdo("pro-plus-feature-2"),
+  //   tOrdo("pro-plus-feature-3"),
+  //   tOrdo("pro-plus-feature-4"),
+  // ]
 
   // const teamFeatures = [
-  //   t("team-feature-size"),
-  //   t("team-feature-size-limit"),
-  //   t("team-feature-cross-device-access"),
-  //   t("team-feature-priority-support"),
+  //   tOrdo("team-feature-size"),
+  //   tOrdo("team-feature-size-limit"),
+  //   tOrdo("team-feature-cross-device-access"),
+  //   tOrdo("team-feature-priority-support"),
   // ]
 
   // const enterpriseFeatures = [
-  //   t("enterprise-feature-size"),
-  //   t("enterprise-feature-size-limit"),
-  //   t("enterprise-feature-cross-device-access"),
-  //   t("enterprise-feature-priority-support"),
+  //   tOrdo("enterprise-feature-size"),
+  //   tOrdo("enterprise-feature-size-limit"),
+  //   tOrdo("enterprise-feature-cross-device-access"),
+  //   tOrdo("enterprise-feature-priority-support"),
   // ]
 
   const keyPrinciples = [
@@ -350,12 +351,12 @@ export default function Home() {
               price="pro-price"
             />
 
-            <PricingPlan
+            {/* <PricingPlan
               features={proPlusFeatures}
               title="pro-plus"
               description="pro-plus-description"
               price="pro-plus-price"
-            />
+            /> */}
 
             {/* <PricingPlan
               features={teamFeatures}

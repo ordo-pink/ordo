@@ -36,14 +36,5 @@
   "free": "Free",
   "free-description": "Barebone minimum to get started",
   "pricing-whats-included": "What's inside?",
-  "pricing-header": "Price per month",
-  "free-price": "0",
-  "pro-price": "10",
-  "pricing-currency": "$",
-  "price-footer": "Public offer",
-  "pro": "Pro",
-  "pro-description": "More features + Free",
-  "get-started": "Let's GO!",
-  "team": "Our team",
-  "team-description": "They all tried for you"
+  "pricing-header": "Price per month"
 }

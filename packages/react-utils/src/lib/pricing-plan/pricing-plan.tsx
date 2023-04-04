@@ -20,7 +20,7 @@ export function PricingPlan({
   available = false,
   pricePerUser = false,
 }: Props) {
-  const { t } = useTranslation("home")
+  const { t } = useTranslation("ordo")
   const { emit: execute } = useCommands()
 
   const tTitle = t(title)
@@ -33,7 +33,7 @@ export function PricingPlan({
   const handleGetStartedClick = () => execute("auth.register", "/")
 
   return (
-    <div className="flex w-80 p-6 rounded-3xl self-stretch justify-between flex-col space-y-8 bg-gradient-to-t from-slate-100 to-stone-100 dark:from-zinc-800 dark:to-stone-800 border border-emerald-300 dark:border-emerald-700">
+    <div className="flex w-80 p-6 rounded-3xl self-stretch justify-between flex-col space-y-8 bg-neutral-100 dark:bg-neutral-800">
       <div className="flex flex-col space-y-4">
         <h4 className="text-xl font-bold">{tTitle}</h4>
 

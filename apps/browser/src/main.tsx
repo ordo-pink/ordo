@@ -21,9 +21,9 @@ import App from "./app/app"
 import { useDefaultCommandPalette } from "./command-palette"
 import ContextMenu from "./context-menu"
 import Modal from "./modal"
-import UserPage from "./user"
 import en from "./translations/en.json"
 import ru from "./translations/ru.json"
+import UserPage from "./user"
 
 import "./styles.css"
 

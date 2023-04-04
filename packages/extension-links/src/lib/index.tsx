@@ -7,7 +7,7 @@ export default createExtension(
   ({ registerActivity, registerTranslations, commands, registerCommandPaletteItem, translate }) => {
     registerActivity("file-graph", {
       routes: ["/file-graph"],
-      Component: () => <div>Andry Geydry</div>,
+      Component: () => <div>TODO</div>,
       Icon: BsShare,
     })
 

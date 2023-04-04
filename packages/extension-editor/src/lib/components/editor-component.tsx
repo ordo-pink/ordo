@@ -2,6 +2,7 @@ import { CommandContext, IOrdoFile, Nullable, OrdoFilePath } from "@ordo-pink/co
 import { Either } from "@ordo-pink/either"
 import { OrdoDirectory } from "@ordo-pink/fs-entity"
 import {
+  Loading,
   Null,
   useCommands,
   useCurrentFileAssociation,
@@ -9,7 +10,7 @@ import {
   useFsDriver,
   useRouteParams,
 } from "@ordo-pink/react-utils"
-import { ComponentType, useEffect, useState } from "react"
+import { ComponentType, Suspense, useEffect, useState } from "react"
 
 // TODO: NotSelected component
 export default function Editor() {
@@ -57,5 +58,9 @@ export default function Editor() {
 
   return Either.fromNullable(params)
     .chain(() => Either.fromNullable(currentFile))
-    .fold(Null, (file) => <Component file={file} />)
+    .fold(Null, (file) => (
+      <Suspense fallback={<Loading />}>
+        <Component file={file} />
+      </Suspense>
+    ))
 }

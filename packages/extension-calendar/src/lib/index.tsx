@@ -1,15 +1,25 @@
 import { hideCommandPalette } from "@ordo-pink/stream-command-palette"
 import { createExtension } from "@ordo-pink/stream-extensions"
+import { LexicalNode } from "lexical"
 import { lazy } from "react"
 import { BsCalendarDay, BsCalendarMonth, BsCalendarWeek } from "react-icons/bs"
+import { OrdoDateNode } from "./ordo-date/node"
+import { ORDO_DATE_TRANSFORMER } from "./ordo-date/transformer"
 import en from "./translations/en.json"
 import ru from "./translations/ru.json"
 
 export default createExtension(
   "calendar",
-  ({ commands, registerActivity, registerTranslations, registerCommandPaletteItem, translate }) => {
+  ({
+    commands,
+    registerActivity,
+    registerTranslations,
+    registerCommandPaletteItem,
+    registerEditorPlugin,
+    translate,
+  }) => {
     registerActivity("calendar", {
-      routes: ["/calendar", "/calendar/:view"],
+      routes: ["/calendar/week", "/calendar/:view"],
       Component: lazy(() => import("./components/component")),
       Icon: lazy(() => import("./components/icon")),
       Sidebar: lazy(() => import("./components/sidebar")),
@@ -17,8 +27,13 @@ export default createExtension(
 
     registerTranslations({ ru, en })
 
+    registerEditorPlugin("kanban-plugin", {
+      nodes: [OrdoDateNode as unknown as typeof LexicalNode],
+      transformer: ORDO_DATE_TRANSFORMER,
+    })
+
     commands.on("open-calendar", () => {
-      commands.emit("router.navigate", "/calendar")
+      commands.emit("calendar.open-week-view", "/calendar")
     })
 
     commands.on("open-week-view", () => {

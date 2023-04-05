@@ -9,6 +9,7 @@ import {
   BsFileEarmarkPlus,
   BsFolderMinus,
   BsFolderPlus,
+  BsPencil,
   BsUpload,
 } from "react-icons/bs"
 import { createDirectory } from "./commands/directory/create-directory"
@@ -24,6 +25,8 @@ import CreateDirectoryModal from "./components/create-directory-modal"
 import CreateFileModal from "./components/create-file-modal"
 import RemoveDirectoryModal from "./components/remove-directory-modal"
 import RemoveFileModal from "./components/remove-file-modal"
+import RenameDirectoryModal from "./components/rename-directory-modal"
+import RenameFileModal from "./components/rename-file-modal"
 import UploadFilesModal from "./components/upload-files-modal"
 
 export default createExtension(
@@ -42,13 +45,18 @@ export default createExtension(
         "show-remove-file-modal": "Удалить",
         "show-create-directory-modal": "Создать папку",
         "show-remove-directory-modal": "Удалить",
+        "show-rename-file-modal": "Переименовать",
+        "show-rename-directory-modal": "Переименовать",
         "create-file": "Создать файл",
+        "rename-file": "Переименовать файл",
+        "rename-directory": "Переименовать папку",
         "remove-file": "Удалить файл",
         "remove-file...": "Удалить файл...",
         "create-directory": "Создать папку",
         "remove-directory": "Удалить папку...",
         "choose-name-placeholder": "Выбери название...",
         "create-button": "Создать",
+        "rename-button": "Переименовать",
         "remove-button": "Удалить",
         "cancel-button": "Не, ну его",
         "upload-files": "Загрузить",
@@ -60,13 +68,18 @@ export default createExtension(
         "show-remove-file-modal": "Remove",
         "show-create-directory-modal": "Create directory",
         "show-remove-directory-modal": "Remove",
+        "show-rename-file-modal": "Rename",
+        "show-rename-directory-modal": "Rename",
         "create-file": "Create file",
+        "rename-file": "Rename file",
+        "rename-directory": "Rename directory",
         "remove-file": "Remove file",
         "remove-file...": "Remove file...",
         "create-directory": "Create directory",
         "remove-directory": "Remove directory...",
         "choose-name-placeholder": "Choose name...",
         "create-button": "Create",
+        "rename-button": "Rename",
         "remove-button": "Remove",
         "cancel-button": "Cancel",
         "upload-files": "Upload",
@@ -100,10 +113,40 @@ export default createExtension(
       shouldShow: (target) => OrdoDirectory.isOrdoDirectory(target),
     })
 
+    const RENAME_FILE_COMMAND = commands.on("show-rename-file-modal", ({ payload }) => {
+      const { showModal } = useModal()
+
+      showModal(() => <RenameFileModal file={payload.file} />)
+    })
+
+    registerContextMenuItem(RENAME_FILE_COMMAND, {
+      Icon: BsPencil,
+      payloadCreator: (target) => ({ file: target }),
+      shouldShow: (target) => OrdoFile.isOrdoFile(target),
+    })
+
+    const RENAME_DIRECTORY_COMMAND = commands.on("show-rename-directory-modal", ({ payload }) => {
+      const { showModal } = useModal()
+
+      showModal(() => <RenameDirectoryModal directory={payload.directory} />)
+    })
+
+    registerContextMenuItem(RENAME_DIRECTORY_COMMAND, {
+      Icon: BsPencil,
+      payloadCreator: (directory) => ({ directory }),
+      shouldShow: (target) => OrdoDirectory.isOrdoDirectory(target),
+    })
+
     const CREATE_FILE_COMMAND = commands.on("show-create-file-modal", ({ payload }) => {
       const { showModal } = useModal()
 
-      showModal(() => <CreateFileModal parent={payload} />)
+      showModal(() => (
+        <CreateFileModal
+          parent={payload.parent}
+          content={payload.content}
+          openInEditor={payload.openFileInEditor}
+        />
+      ))
     })
 
     registerContextMenuItem(CREATE_FILE_COMMAND, {
@@ -121,7 +164,7 @@ export default createExtension(
 
         if (!drive) return
 
-        commands.emit("fs.show-create-file-modal", drive.root)
+        commands.emit("fs.show-create-file-modal", { parent: drive.root, openInEditor: true })
       },
     })
 

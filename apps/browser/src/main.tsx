@@ -206,12 +206,17 @@ const getFsDriver: UnaryFn<{ token: string; sub: string }, FSDriver> = ({ token,
         .then((res) => res.json())
         .catch(logger.error),
     move: ({ oldPath, newPath }) =>
-      fetch(`${fsUrl}/${DIRECTORY_API}/${sub}${oldPath}->${newPath}`, {
-        method: "PATCH",
-        headers: {
-          [AUTHORIZATION_HEADER_KEY]: `Bearer ${token}`,
+      fetch(
+        `${fsUrl}/${DIRECTORY_API}/${sub}${
+          oldPath.endsWith("/") ? oldPath.slice(0, -1) : oldPath
+        }->${newPath.endsWith("/") ? newPath.slice(0, -1) : newPath}`,
+        {
+          method: "PATCH",
+          headers: {
+            [AUTHORIZATION_HEADER_KEY]: `Bearer ${token}`,
+          },
         },
-      })
+      )
         .then((res) => res.json())
         .catch(logger.error),
   },

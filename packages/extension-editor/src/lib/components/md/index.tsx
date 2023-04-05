@@ -166,7 +166,7 @@ const Placeholder = () => {
   return (
     <div
       style={{ marginTop: "-1.5rem" }}
-      className=" text-neutral-500"
+      className="text-neutral-500"
       onClick={() => editor && editor.focus()}
     >
       {tPlaceholder}
@@ -186,10 +186,12 @@ export default memo(
 
       state.read(() => {
         const text = $convertToMarkdownString(
-          editorPlugins.reduce(
-            (acc, plugin) => (plugin.transformer ? acc.concat([plugin.transformer]) : acc),
-            [] as Transformer[],
-          ),
+          editorPlugins
+            .reduce(
+              (acc, plugin) => (plugin.transformer ? acc.concat([plugin.transformer]) : acc),
+              [] as Transformer[],
+            )
+            .concat(TRANSFORMERS),
         )
 
         const nodes = toNodeArray(state.toJSON().root)

@@ -158,6 +158,7 @@
     "silkrouter": "^4.2.16",
     "tslib": "^2.3.0",
     "tui-date-picker": "^4.3.3",
-    "tui-time-picker": "^2.1.6"
+    "tui-time-picker": "^2.1.6",
+    "vis-network": "^9.1.6"
   }
 }

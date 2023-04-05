@@ -10,7 +10,7 @@ import { BsPlusLg } from "react-icons/bs"
 import Column from "./column"
 
 type Props = {
-  nodeKey?: string
+  nodeKey?: string // TODO: Provide node and make updates on it if they happen
   directoryPath: OrdoDirectoryPath
 }
 
@@ -76,7 +76,7 @@ const Kanban = ({ directoryPath }: Props) => {
             {...provided.droppableProps}
             className="flex flex-col space-y-4 md:m-4 mt-10 h-full rounded-lg bg-gradient-to-b from-slate-400 to-stone-400 dark:from-zinc-900 dark:to-stone-900 shadow-lg p-4"
           >
-            <div className="flex space-x-4 overflow-x-auto">
+            <div className="h-full flex space-x-4 overflow-x-auto">
               {dir.children
                 .filter((item) => OrdoDirectory.isOrdoDirectory(item))
                 .map((directory, index) => {
@@ -96,9 +96,7 @@ const Kanban = ({ directoryPath }: Props) => {
               <OrdoButtonNeutral
                 center
                 onClick={() => {
-                  if (!directory) return
-
-                  // dispatch(showCreateDirectoryModal(directory))
+                  emit("fs.show-create-directory-modal", dir)
                 }}
               >
                 <div className="flex space-x-2 items-center">

@@ -19,12 +19,12 @@ export default function Column({ directory, index }: Props) {
 
   return (
     <Draggable
-      draggableId={`${directory.path}-cards`}
+      draggableId={`${directory.path}`}
       index={index}
     >
       {(provided) => (
         <div
-          className={`flex flex-col ${
+          className={`flex flex-col h-full ${
             backgroundColors[color] ?? backgroundColors["neutral"]
           } shadow-sm rounded-lg min-w-[calc(100vw-8.75rem)] md:min-w-[200px] w-96 max-w-xs`}
           {...provided.draggableProps}
@@ -49,22 +49,14 @@ export default function Column({ directory, index }: Props) {
             <div className="flex space-x-2">
               <OrdoButtonSecondary
                 compact
-                onClick={() => emit("fs.show-create-file-modal", directory)}
+                onClick={() => emit("fs.show-create-file-modal", { parent: directory })}
               >
                 <BsPlus className="text-xl text-neutral-900 dark:text-neutral-100" />
               </OrdoButtonSecondary>
 
               <OrdoButtonSecondary
                 compact
-                onClick={
-                  () => void 0
-                  // dispatch(
-                  //   showRenameDirectoryModal({
-                  //     parent: findParent(directory, tree) as IOrdoDirectory,
-                  //     target: directory,
-                  //   }),
-                  // )
-                }
+                onClick={() => emit("fs.show-rename-directory-modal", { directory })}
               >
                 <BsPencilSquare className="text-neutral-900 dark:text-neutral-100" />
               </OrdoButtonSecondary>

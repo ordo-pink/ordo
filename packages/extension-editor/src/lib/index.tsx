@@ -152,8 +152,9 @@ export default createExtension(
       "fs.create-file",
       ({
         payload,
-      }: CommandContext<{ file: IOrdoFile; content?: string; ignoreOpenInEditor?: boolean }>) => {
-        if (payload.ignoreOpenInEditor) return
+      }: CommandContext<{ file: IOrdoFile; content?: string; openFileInEditor?: boolean }>) => {
+        if (!payload.openFileInEditor) return
+
         const currentActivity = currentActivity$.value
 
         if (currentActivity?.name === "editor.editor") {

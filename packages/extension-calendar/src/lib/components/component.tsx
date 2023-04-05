@@ -30,7 +30,6 @@ import "./index.css"
 
 export default function Calendar() {
   const calendarRef = useRef<ToastUIReactCalendar>()
-  // const { showModal, hideModal } = useModal()
   const drive = useDrive()
   const { emit } = useCommands()
   const driver = useFsDriver()
@@ -41,36 +40,27 @@ export default function Calendar() {
 
   const [isWide, setIsWide] = useState(false)
   const [events, setEvents] = useState<EventObject[]>([])
-  // const [newName, setNewName] = useState<OrdoFilePath | "">("")
-  // const [newStart, setNewStart] = useState<Date>(new Date())
-  // const [newEnd, setNewEnd] = useState<Date>(new Date())
-  // const [newIsAllDay, setNewIsAllDay] = useState(false)
-  // const [isValidPath, setIsValidPath] = useState(true)
 
   useEffect(() => {
     if (!drive) return
 
-    const dates = [
-      ...drive.root
-        .getFilesDeep()
-        .filter((file) => Boolean(file.metadata["dates"]))
-        .flatMap((file) =>
-          (file.metadata["dates"] as { start: Date; end: Nullable<Date> }[]).map(
-            ({ start, end }) => {
-              return {
-                start,
-                end,
-                isAllday: !end,
-                category: !end ? "allday" : "time",
-                title: file.readableName,
-                body: file.path,
-                backgroundColor: "#a78bfa",
-                color: "#4c1d95",
-              }
-            },
-          ),
-        ),
-    ]
+    const dates = drive.root
+      .getFilesDeep()
+      .filter((file) => Boolean(file.metadata["dates"]))
+      .flatMap((file) =>
+        (file.metadata["dates"] as { start: Date; end: Nullable<Date> }[]).map(({ start, end }) => {
+          return {
+            start,
+            end,
+            isAllday: !end,
+            category: !end ? "allday" : "time",
+            title: file.readableName,
+            body: file.path,
+            backgroundColor: "#a78bfa",
+            color: "#4c1d95",
+          }
+        }),
+      )
 
     setEvents(dates)
   }, [drive])
@@ -80,15 +70,14 @@ export default function Calendar() {
   }, [width])
 
   useEffect(() => {
-    if (!calendarRef.current || !calendarRef.current.calendarInstance) return
+    if (!calendarRef.current || !calendarRef.current.calendarInstance || !emit) return
 
-    // calendarRef.current.calendarInstance.on("selectDateTime", ({ start, end, isAllday }) => {
-    //   // setNewIsAllDay(isAllday)
-    //   // setNewStart(start)
-    //   // setNewEnd(end)
-
-    //   // showModal()
-    // })
+    calendarRef.current.calendarInstance.on("selectDateTime", ({ start, end }) => {
+      emit("fs.show-create-file-modal", {
+        parent: drive?.root,
+        content: `${start.toISOString()}>>>${end.toISOString()}`,
+      })
+    })
 
     calendarRef.current.calendarInstance.on("clickEvent", ({ event }) => {
       if (OrdoFile.isValidPath(event.body)) {
@@ -99,7 +88,7 @@ export default function Calendar() {
     const onBeforeUpdateEvent = calendarRef.current.calendarInstance.on(
       "beforeUpdateEvent",
       ({ event, changes }) => {
-        if (!driver || !drive) return
+        if (!driver || !drive || !emit) return
 
         driver.files
           .getContent(event.body)
@@ -145,7 +134,8 @@ export default function Calendar() {
               dates: { start: string; end: string }[]
             }>
 
-            emit("fs.update-file", { file: newFile, content: newContent })
+            emit("fs.update-file", newFile)
+            emit("editor.update-file-content", { file: newFile, content: newContent })
           })
       },
     )
@@ -154,16 +144,14 @@ export default function Calendar() {
       if (onBeforeUpdateEvent?.eventBus?.events?.beforeUpdateEvent) {
         onBeforeUpdateEvent.eventBus.events.beforeUpdateEvent = []
       }
-
       if (onBeforeUpdateEvent?.eventBus?.events?.clickEvent) {
         onBeforeUpdateEvent.eventBus.events.clickEvent = []
       }
-
       if (onBeforeUpdateEvent?.eventBus?.events?.selectDateTime) {
         onBeforeUpdateEvent.eventBus.events.selectDateTime = []
       }
     }
-  }, [calendarRef, drive])
+  }, [calendarRef.current, drive, emit])
 
   const sun = t("sun")
   const mon = t("mon")
@@ -180,10 +168,6 @@ export default function Calendar() {
   const popupSave = t("popup-save")
   const popupEdit = t("popup-edit")
   const popupDelete = t("popup-delete")
-  // const newEventInputPlaceholder = t("new-event-input-placeholder")
-  // const translatedError = t("@ordo-command-file-system/invalid-path")
-  // const translatedCancel = t("@ordo-command-file-system/button-cancel")
-  // const translatedOk = t("@ordo-command-file-system/button-ok")
 
   const nextView = t("next-view")
   const currentView = t("current-view")
@@ -210,56 +194,6 @@ export default function Calendar() {
     calendarRef.current.calendarInstance.today()
   }
 
-  // useEffect(() => {
-  //   // const trimmed = newName.trim()
-
-  //   // setIsValidPath(trimmed.length > 1 && OrdoFile.isValidPath(`/${trimmed}`))
-  // }, [newName])
-
-  // const handleHide = lazyBox((box) => box.map(() => setNewName("")).fold(() => hide()))
-
-  // const hide = () => {
-  //   setNewIsAllDay(false)
-  //   setNewStart(new Date())
-  //   setNewEnd(new Date())
-  //   setNewName("")
-
-  //   calendarRef.current?.calendarInstance?.clearGridSelections()
-
-  //   // hideModal()
-  // }
-
-  // const handleInputChange = lazyBox<ChangeEvent<HTMLInputElement>>((box) =>
-  //   box
-  //     .map((event) => event.target)
-  //     .map((target) => target.value as OrdoFilePath)
-  //     .fold(setNewName),
-  // )
-
-  // const handleCancelButtonClick = lazyBox((box) => box.tap(handleHide).fold(() => hide()))
-
-  // const handleOkButtonClick = lazyBox((box) =>
-  //   box
-  //     .tap(handleHide)
-  //     .map(() => `${drive?.root?.path ?? "/"}${newName.trim()}` as OrdoFilePath)
-  //     .map((path) => (OrdoFile.getFileExtension(path) ? path : (`${path}.md` as OrdoFilePath)))
-  //     .map((path) =>
-  //       OrdoFile.from({
-  //         path,
-  //         size: 0,
-  //         metadata: { dates: [{ start: newStart, end: newEnd }] },
-  //         updatedAt: new Date(Date.now()),
-  //       }),
-  //     )
-  //     .tap((file) => {
-  //       emit("fs.create-file", {
-  //         file,
-  //         content: `${newStart.toISOString()}${newIsAllDay ? "" : `>>>${newEnd.toISOString()}`}`,
-  //       })
-  //     })
-  //     .fold(() => hide()),
-  // )
-
   return Either.fromNullable(params?.view).fold(Null, () => (
     <div className="p-4 w-full h-screen flex flex-col items-center">
       <Helmet>
@@ -268,49 +202,6 @@ export default function Calendar() {
           {translatedTitle}
         </title>
       </Helmet>
-
-      {/* <Modal>
-        <div className="h-screen w-screen flex items-center justify-center">
-          <div
-            className="w-full max-w-lg bg-neutral-100 dark:bg-neutral-800 rounded-lg p-8"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <input
-              type="text"
-              className="w-full outline-none border dark:border-0 border-neutral-400 rounded-lg bg-white dark:bg-neutral-600 px-4 py-2"
-              placeholder={newEventInputPlaceholder}
-              value={newName}
-              autoFocus
-              onChange={handleInputChange}
-            />
-
-            <div
-              className={`text-red-500 text-sm transition-opacity duration-200 ${
-                newName && !isValidPath ? "opacity-100" : "opacity-0"
-              }`}
-            >
-              {translatedError}
-            </div>
-
-            <div className="w-full flex items-center justify-around">
-              <OrdoButtonSecondary
-                hotkey="escape"
-                onClick={handleCancelButtonClick}
-              >
-                {translatedCancel}
-              </OrdoButtonSecondary>
-
-              <OrdoButtonPrimary
-                hotkey="enter"
-                disabled={!newName || !isValidPath}
-                onClick={handleOkButtonClick}
-              >
-                {translatedOk}
-              </OrdoButtonPrimary>
-            </div>
-          </div>
-        </div>
-      </Modal> */}
 
       <div className="flex items-center space-x-2 justify-center">
         <OrdoButtonSecondary

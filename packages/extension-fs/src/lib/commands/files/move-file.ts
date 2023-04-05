@@ -28,7 +28,10 @@ export const moveFile = ({
         OrdoDirectory.isOrdoDirectoryRaw(raw) ? OrdoDirectory.from(raw) : OrdoFile.from(raw),
       )
 
+      OrdoDirectory.sort(newParent.children)
+
       const newDrive = finishDraft(draft)
+
       drive$.next(newDrive)
     })
     .catch(logger.error)

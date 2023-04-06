@@ -151,7 +151,9 @@ export default createExtension(
 
     registerContextMenuItem(CREATE_FILE_COMMAND, {
       Icon: BsFileEarmarkPlus,
-      payloadCreator: (target) => target,
+      payloadCreator: (target) => ({
+        parent: target,
+      }),
       shouldShow: (target) => OrdoDirectory.isOrdoDirectory(target),
     })
 

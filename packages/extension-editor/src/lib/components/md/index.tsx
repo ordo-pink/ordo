@@ -79,18 +79,18 @@ const toNodeArray = (tree: any) =>
 
 const theme: EditorThemeClasses = {
   heading: {
-    h1: "font-extrabold text-5xl",
-    h2: "font-extrabold text-4xl",
-    h3: "font-extrabold text-3xl",
-    h4: "font-extrabold text-2xl",
-    h5: "font-extrabold text-xl",
+    h1: "font-extrabold text-5xl my-4",
+    h2: "font-extrabold text-4xl my-4",
+    h3: "font-extrabold text-3xl my-4",
+    h4: "font-extrabold text-2xl my-4",
+    h5: "font-extrabold text-xl my-4",
   },
   list: {
-    ul: "list-inside list-disc",
-    ol: "list-inside list-decimal",
+    ul: "list-inside list-disc my-4",
+    ol: "list-inside list-decimal my-4",
   },
   link: "text-sky-700 visited:text-purple-700",
-  // paragraph: "",
+  paragraph: "my-2",
   hashtag: "text-pink-600 dark:text-pink-400",
   text: {
     strikethrough: "line-through",

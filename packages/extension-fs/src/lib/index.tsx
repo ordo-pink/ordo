@@ -5,6 +5,7 @@ import { drive$, fsDriver$ } from "@ordo-pink/stream-drives"
 import { createExtension } from "@ordo-pink/stream-extensions"
 import { AiFillFolder, AiOutlineFolder } from "react-icons/ai"
 import {
+  BsDownload,
   BsFileEarmarkMinus,
   BsFileEarmarkPlus,
   BsFolderMinus,
@@ -47,11 +48,14 @@ export default createExtension(
         "show-remove-directory-modal": "Удалить",
         "show-rename-file-modal": "Переименовать",
         "show-rename-directory-modal": "Переименовать",
+        "show-upload-file-modal": "Загрузить файл",
         "create-file": "Создать файл",
         "rename-file": "Переименовать файл",
         "rename-directory": "Переименовать папку",
         "remove-file": "Удалить файл",
         "remove-file...": "Удалить файл...",
+        "download-file": "Скачать файл",
+        "download-file...": "Скачать файл...",
         "create-directory": "Создать папку",
         "remove-directory": "Удалить папку...",
         "choose-name-placeholder": "Выбери название...",
@@ -59,7 +63,7 @@ export default createExtension(
         "rename-button": "Переименовать",
         "remove-button": "Удалить",
         "cancel-button": "Не, ну его",
-        "upload-files": "Загрузить",
+        "upload-file": "Загрузить файл",
         "invalid-name": "Выбранное название содержит запрещённые символы.",
       },
       en: {
@@ -70,11 +74,14 @@ export default createExtension(
         "show-remove-directory-modal": "Remove",
         "show-rename-file-modal": "Rename",
         "show-rename-directory-modal": "Rename",
+        "show-upload-directory-modal": "Upload file",
         "create-file": "Create file",
         "rename-file": "Rename file",
         "rename-directory": "Rename directory",
         "remove-file": "Remove file",
         "remove-file...": "Remove file...",
+        "download-file": "Download file",
+        "download-file...": "Download file...",
         "create-directory": "Create directory",
         "remove-directory": "Remove directory...",
         "choose-name-placeholder": "Choose name...",
@@ -82,7 +89,7 @@ export default createExtension(
         "rename-button": "Rename",
         "remove-button": "Remove",
         "cancel-button": "Cancel",
-        "upload-files": "Upload",
+        "upload-file": "Upload",
         "invalid-name": "Provided name contains forbidden characters.",
       },
     })
@@ -102,9 +109,85 @@ export default createExtension(
     commands.on("update-file", updateFile)
     commands.on("remove-file", removeFile)
 
-    const uploadFilesCommand = commands.on("upload-files", ({ payload }) => {
+    const downloadFileCommand = commands.on("download-file", ({ payload }) => {
+      const driver = fsDriver$.getValue()
+
+      if (!driver) return
+
+      driver.files
+        .getContent(payload.path)
+        .then((res) => res.blob())
+        .then((blob) => URL.createObjectURL(blob))
+        .then((url) => {
+          const a = document.createElement("a")
+
+          a.href = url
+          a.download = `${payload.readableName}${payload.extension}`
+          document.body.appendChild(a)
+
+          a.click()
+
+          setTimeout(() => {
+            document.body.removeChild(a)
+            URL.revokeObjectURL(url)
+          }, 0)
+        })
+    })
+
+    registerContextMenuItem(downloadFileCommand, {
+      Icon: BsDownload,
+      payloadCreator: (target) => target,
+      shouldShow: (target) => OrdoFile.isOrdoFile(target),
+    })
+
+    registerCommandPaletteItem({
+      id: "download-file",
+      name: translate("download-file..."),
+      Icon: BsDownload,
+      onSelect: () => {
+        hideCommandPalette()
+
+        const drive = drive$.getValue()
+
+        if (!drive) return
+
+        const files = drive.root.getFilesDeep()
+
+        showCommandPalette(
+          files.map((file) => ({
+            id: file.path,
+            name: file.readableName,
+            Icon: () => <FileIcon file={file} />,
+            onSelect: () => {
+              commands.emit("fs.download-file", file)
+              hideCommandPalette()
+            },
+            Comment: () => (
+              <div className="text-xs text-neutral-600 dark:text-neutral-400">
+                {OrdoFile.getParentPath(file.path)}
+              </div>
+            ),
+          })),
+        )
+      },
+    })
+
+    const uploadFilesCommand = commands.on("show-upload-file-modal", ({ payload }) => {
       const { showModal } = useModal()
       showModal(() => <UploadFilesModal parent={payload} />)
+    })
+
+    registerCommandPaletteItem({
+      id: "upload-file",
+      name: translate("upload-file"),
+      Icon: BsUpload,
+      onSelect: () => {
+        const drive = drive$.getValue()
+
+        if (!drive) return
+
+        commands.emit("fs.show-upload-file-modal", { parent: drive.root, openInEditor: true })
+      },
     })
 
     registerContextMenuItem(uploadFilesCommand, {
@@ -225,7 +308,10 @@ export default createExtension(
             id: file.path,
             name: file.readableName,
             Icon: () => <FileIcon file={file} />,
-            onSelect: () => commands.emit("fs.show-remove-file-modal", file),
+            onSelect: () => {
+              commands.emit("fs.show-remove-file-modal", file)
+              hideCommandPalette()
+            },
             Comment: () => (
               <div className="text-xs text-neutral-600 dark:text-neutral-400">
                 {OrdoFile.getParentPath(file.path)}

@@ -1,6 +1,7 @@
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext"
 import { Nullable } from "@ordo-pink/common-types"
-import { $getNodeByKey } from "lexical"
+import { Either } from "@ordo-pink/either"
+import { $getNodeByKey, $getSelection } from "lexical"
 import { useEffect, useRef, useState } from "react"
 import { BsCalendarDate } from "react-icons/bs"
 import DatePicker from "tui-date-picker"
@@ -29,6 +30,7 @@ export const DateComponent = ({ startDate, endDate, nodeKey }: Props) => {
   const [isPickerVisible, setIsPickerVisible] = useState(false)
   const [isTimePickerEnabled] = useState(true)
   const [isEndDatePickerEnabled] = useState(true)
+  const [isSelected, setIsSelected] = useState(false)
 
   const [startDatePicker, setStartDatePicker] = useState<Nullable<DatePicker>>(null)
   const [endDatePicker, setEndDatePicker] = useState<Nullable<DatePicker>>(null)
@@ -86,6 +88,31 @@ export const DateComponent = ({ startDate, endDate, nodeKey }: Props) => {
   }, [endDatePicker])
 
   useEffect(() => {
+    if (!editor) return
+
+    editor.registerUpdateListener(({ editorState }) => {
+      editorState.read(() => {
+        const selection = $getSelection()
+        const node = $getNodeByKey(nodeKey)
+
+        const parentKey = node?.getParent()?.getKey()
+
+        if (!node || !selection || !parentKey) {
+          setIsSelected(false)
+          return
+        }
+
+        const parent = $getNodeByKey(parentKey)
+
+        const isSelected =
+          selection.getNodes().includes(node) || (parent && selection.getNodes().includes(parent))
+
+        setIsSelected(Boolean(isSelected))
+      })
+    })
+  }, [editor])
+
+  useEffect(() => {
     editor.update(() => {
       const node = $getNodeByKey(nodeKey)
 
@@ -136,37 +163,48 @@ export const DateComponent = ({ startDate, endDate, nodeKey }: Props) => {
     currentStartDate,
   ])
 
-  return (
-    <span className="rounded-lg shadow-md px-4 py-0.5 bg-slate-200 dark:bg-slate-800 whitespace-nowrap">
+  return Either.fromBoolean(!isSelected).fold(
+    () => (
       <span>
-        {currentStartDate.toLocaleDateString()}
-        {currentStartDate.toTimeString().startsWith("00:00:00 ")
-          ? null
-          : ` ${currentStartDate.toLocaleTimeString()}`}
+        {currentStartDate
+          .toISOString()
+          .concat(currentEndDate ? `>>>${currentEndDate.toISOString()}` : "")}
       </span>
-      {currentEndDate ? (
+    ),
+    () => (
+      <span className="rounded-lg shadow-md px-4 py-0.5 bg-slate-200 dark:bg-slate-800 whitespace-nowrap">
         <span>
-          {" — "}
-          {currentEndDate.toLocaleDateString()}{" "}
-          {currentEndDate.toTimeString().startsWith("00:00:00 ")
+          {currentStartDate.toLocaleDateString()}
+          {currentStartDate.toTimeString().startsWith("00:00:00 ")
             ? null
-            : currentEndDate.toLocaleTimeString()}
+            : ` ${currentStartDate.toLocaleTimeString()}`}
         </span>
-      ) : null}
-      <BsCalendarDate
-        className="inline align-bottom ml-2 mb-1 cursor-pointer"
-        onClick={() => setIsPickerVisible(true)}
-      />
-      <span className={`relative bg-neutral-200 w-[900px] ${isPickerVisible} ? "block" : "hidden"`}>
-        <span
-          className={`absolute top-5 whitespace-normal left-[-400px]`}
-          ref={startDatePickerRef}
+        {currentEndDate ? (
+          <span>
+            {" — "}
+            {currentEndDate.toLocaleDateString()}{" "}
+            {currentEndDate.toTimeString().startsWith("00:00:00 ")
+              ? null
+              : currentEndDate.toLocaleTimeString()}
+          </span>
+        ) : null}
+        <BsCalendarDate
+          className="inline align-bottom ml-2 mb-1 cursor-pointer"
+          onClick={() => setIsPickerVisible(true)}
         />
         <span
-          className={`absolute top-5 whitespace-normal left-[-400px] ml-[275px]`}
-          ref={endDatePickerRef}
-        />
+          className={`relative bg-neutral-200 w-[900px] ${isPickerVisible} ? "block" : "hidden"`}
+        >
+          <span
+            className={`absolute top-5 whitespace-normal left-[-400px]`}
+            ref={startDatePickerRef}
+          />
+          <span
+            className={`absolute top-5 whitespace-normal left-[-400px] ml-[275px]`}
+            ref={endDatePickerRef}
+          />
+        </span>
       </span>
-    </span>
+    ),
   )
 }

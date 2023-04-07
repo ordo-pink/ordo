@@ -34,12 +34,12 @@ export default function MediaViewer({ file }: Props) {
   return Either.fromNullable(content)
     .chain(() => Either.fromNullable(url))
     .fold(Loading, (url) => (
-      <div className="p-4 w-full max-w-6xl">
-        <div className="w-full h-screen flex flex-col items-center">
+      <div className="h-full flex justify-center items-center p-4">
+        <div className="max-w-4xl">
           {content?.type.startsWith("video") ? (
             <video
               controls
-              className="w-full"
+              className="shadow-xl rounded-lg"
             >
               <source
                 src={url}

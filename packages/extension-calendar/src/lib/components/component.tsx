@@ -31,10 +31,10 @@ import "./index.css"
 export default function Calendar() {
   const calendarRef = useRef<ToastUIReactCalendar>()
   const drive = useDrive()
-  const { emit } = useCommands()
   const driver = useFsDriver()
+  const { emit } = useCommands()
+  const { view } = useRouteParams<"view">()
 
-  const params = useRouteParams<{ view: "day" | "week" | "month" }>()
   const { t } = useTranslation("calendar")
   const [width] = useWindowSize()
 
@@ -194,7 +194,7 @@ export default function Calendar() {
     calendarRef.current.calendarInstance.today()
   }
 
-  return Either.fromNullable(params?.view).fold(Null, () => (
+  return Either.fromNullable(view).fold(Null, (view) => (
     <div className="p-4 w-full h-screen flex flex-col items-center">
       <Helmet>
         <title>
@@ -238,7 +238,7 @@ export default function Calendar() {
       <div className="calendar-wrapper justify-self-center">
         <ToastCalendar
           ref={calendarRef as LegacyRef<ToastUIReactCalendar>}
-          view={params?.view}
+          view={view as "month" | "day" | "week"}
           month={{
             startDayOfWeek: 1,
             dayNames: [sun, mon, tue, wed, thu, fri, sat],

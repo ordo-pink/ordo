@@ -4,8 +4,6 @@ import ReactSplit from "react-split"
 import Sidebar from "./sidebar"
 import Workspace from "./workspace"
 
-import "./workspace-with-sidebar.css"
-
 type Props = {
   sidebarChildren: PropsWithChildren["children"]
 }
@@ -42,7 +40,7 @@ export default function WorkspaceWithSidebar({
       sizes={sizes}
       snapOffset={isNarrow ? width / 2 : 200}
       minSize={0}
-      className="workspace-wrapper"
+      className="flex overflow-hidden h-screen"
       direction="horizontal"
       onDrag={(sizes) => {
         setSizes(sizes)

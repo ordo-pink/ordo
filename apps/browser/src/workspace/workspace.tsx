@@ -1,7 +1,5 @@
 import { PropsWithChildren } from "react"
 
-import "./workspace.css"
-
 export default function Workspace({ children }: PropsWithChildren) {
-  return <div className="workspace">{children}</div>
+  return <div className="max-h-screen h-full flex overflow-auto w-full">{children}</div>
 }

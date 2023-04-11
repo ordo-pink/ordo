@@ -1,7 +1,3 @@
-.sidebar {
-  @apply flex flex-col p-4 h-full bg-neutral-200 dark:bg-neutral-800;
-}
-
 .gutter {
   @apply bg-neutral-200 sm:bg-neutral-50 dark:bg-neutral-800 sm:dark:bg-neutral-700 bg-no-repeat z-40 pr-2;
   background-position: 50% 50%;

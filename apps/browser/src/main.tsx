@@ -1,4 +1,3 @@
-import { FSDriver, UnaryFn } from "@ordo-pink/common-types"
 import { ConsoleLogger } from "@ordo-pink/logger"
 import { clearActivities, registerActivity, _initActivities } from "@ordo-pink/stream-activities"
 import { _initAuth } from "@ordo-pink/stream-auth"
@@ -13,7 +12,6 @@ import { _initModals } from "@ordo-pink/stream-modals"
 import { _initRouter } from "@ordo-pink/stream-router"
 import { registerTranslations, translate, _initI18n } from "@ordo-pink/stream-translations"
 import Keycloak from "keycloak-js"
-import { tap } from "ramda"
 import * as ReactDOM from "react-dom/client"
 import { AiOutlineLogout } from "react-icons/ai"
 import { BsPersonCircle } from "react-icons/bs"
@@ -24,37 +22,38 @@ import Modal from "./modal"
 import en from "./translations/en.json"
 import ru from "./translations/ru.json"
 import UserPage from "./user"
+import { getFsDriver } from "./utils/get-fs-driver"
 
 import "./styles.css"
+
+// Register extensions --------------------------------------------------------
 
 const loggedInExtensions = [
   () => import("@ordo-pink/extension-fs"),
   () => import("@ordo-pink/extension-editor"),
-  () => import("@ordo-pink/extension-links"),
+  // () => import("@ordo-pink/extension-links"),
   () => import("@ordo-pink/extension-kanban"),
   () => import("@ordo-pink/extension-calendar"),
 ]
+
 const loggedOutExtensions = [() => import("@ordo-pink/extension-home")]
 
+// Define variables -----------------------------------------------------------
+
 const FS_HOST = process.env.BACKEND_HOST ?? "http://localhost:5000"
-const SSO_HOST = process.env.AUTH_HOST
-const SSO_REALM = process.env.AUTH_REALM
-const SSO_CLIENT_ID = process.env.AUTH_CLIENT_ID
 
-const AUTHORIZATION_HEADER_KEY = "authorization"
-
-const DIRECTORY_API = "fs/directories"
-const FILE_API = "fs/files"
-
-const ssoUrl = SSO_HOST ?? "https://sso.ordo.pink"
-const realm = SSO_REALM ?? "test"
-const clientId = SSO_CLIENT_ID ?? "ordo-web-app"
-const fsUrl = FS_HOST.endsWith("/") ? FS_HOST.slice(0, -1) : FS_HOST
+const ssoUrl = process.env.AUTH_HOST ?? "https://sso.ordo.pink"
+const realm = process.env.AUTH_REALM ?? "test"
+const clientId = process.env.AUTH_CLIENT_ID ?? "ordo-web-app"
 
 const logger = ConsoleLogger
 
+// Initialise app -------------------------------------------------------------
+
+// Initialise command storage to allow other modules to register commands
 _initCommands({ logger })
 
+// Initialise user
 const user$ = _initAuth({
   keycloak: new Keycloak({ url: ssoUrl, realm, clientId }),
   loggedInExtensions,
@@ -81,158 +80,18 @@ const user$ = _initAuth({
   },
 })
 
-const getFsDriver: UnaryFn<{ token: string; sub: string }, FSDriver> = ({ token, sub }) => ({
-  files: {
-    create: ({ file, content }) =>
-      fetch(`${fsUrl}/${FILE_API}/${sub}${file.path}`, {
-        method: "POST",
-        body: content,
-        headers: {
-          [AUTHORIZATION_HEADER_KEY]: `Bearer ${token}`,
-        },
-      })
-        .then(
-          tap(() =>
-            fetch(`${fsUrl}/${FILE_API}/${sub}${file.path}.metadata`, {
-              method: "POST",
-              body: JSON.stringify(file.metadata),
-              headers: {
-                [AUTHORIZATION_HEADER_KEY]: `Bearer ${token}`,
-              },
-            }).catch(logger.error),
-          ),
-        )
-        .then((res) => res.json())
-        .catch(logger.error),
-    get: (path) =>
-      fetch(`${fsUrl}/${FILE_API}/${sub}${path}`, {
-        headers: {
-          [AUTHORIZATION_HEADER_KEY]: `Bearer ${token}`,
-        },
-      })
-        .then((res) => res.json())
-        .catch(logger.error),
-    set: (file) =>
-      fetch(`${fsUrl}/${FILE_API}/${sub}${file.path}.metadata`, {
-        method: "PUT",
-        body: JSON.stringify(file.metadata),
-        headers: {
-          [AUTHORIZATION_HEADER_KEY]: `Bearer ${token}`,
-        },
-      })
-        .catch(logger.error)
-        .then(() => file),
-    getContent: (path) =>
-      fetch(`${fsUrl}/${FILE_API}/${sub}${path}`, {
-        headers: {
-          [AUTHORIZATION_HEADER_KEY]: `Bearer ${token}`,
-        },
-      }),
-    setContent: ({ file, content }) =>
-      fetch(`${fsUrl}/${FILE_API}/${sub}${file.path}`, {
-        method: "PUT",
-        headers: {
-          [AUTHORIZATION_HEADER_KEY]: `Bearer ${token}`,
-        },
-        body: content,
-      })
-        .then(
-          tap(() =>
-            fetch(`${fsUrl}/${FILE_API}/${sub}${file.path}.metadata`, {
-              method: "PUT",
-              body: JSON.stringify(file.metadata),
-              headers: {
-                [AUTHORIZATION_HEADER_KEY]: `Bearer ${token}`,
-              },
-            }).catch(logger.error),
-          ),
-        )
-        .then((res) => res.json())
-        .catch(logger.error),
-    remove: (path) =>
-      fetch(`${fsUrl}/${FILE_API}/${sub}${path}`, {
-        method: "DELETE",
-        headers: {
-          [AUTHORIZATION_HEADER_KEY]: `Bearer ${token}`,
-        },
-      })
-        .then((res) => res.json())
-        .catch(logger.error),
-    move: ({ oldPath, newPath }) =>
-      fetch(`${fsUrl}/${FILE_API}/${sub}${oldPath}->${newPath}`, {
-        method: "PATCH",
-        headers: {
-          [AUTHORIZATION_HEADER_KEY]: `Bearer ${token}`,
-        },
-      })
-        .then((res) => res.json())
-        .catch(logger.error),
-  },
-  directories: {
-    create: (path) =>
-      fetch(`${fsUrl}/${DIRECTORY_API}/${sub}${path}`, {
-        method: "POST",
-        headers: {
-          [AUTHORIZATION_HEADER_KEY]: `Bearer ${token}`,
-        },
-      })
-        .then((res) => res.json())
-        .catch(logger.error),
-    set: (directory) =>
-      fetch(`${fsUrl}/${FILE_API}/${sub}${directory.path}.metadata`, {
-        method: "PUT",
-        body: JSON.stringify(directory.metadata),
-        headers: {
-          [AUTHORIZATION_HEADER_KEY]: `Bearer ${token}`,
-        },
-      })
-        .catch(logger.error)
-        .then(() => directory),
-    get: (path) =>
-      fetch(`${fsUrl}/${DIRECTORY_API}/${sub}${path}`, {
-        headers: {
-          [AUTHORIZATION_HEADER_KEY]: `Bearer ${token}`,
-        },
-      })
-        .then((res) => res.json())
-        .catch(logger.error),
-    remove: (path) =>
-      fetch(`${fsUrl}/${DIRECTORY_API}/${sub}${path}`, {
-        method: "DELETE",
-        headers: {
-          [AUTHORIZATION_HEADER_KEY]: `Bearer ${token}`,
-        },
-      })
-        .then((res) => res.json())
-        .catch(logger.error),
-    move: ({ oldPath, newPath }) =>
-      fetch(
-        `${fsUrl}/${DIRECTORY_API}/${sub}${
-          oldPath.endsWith("/") ? oldPath.slice(0, -1) : oldPath
-        }->${newPath.endsWith("/") ? newPath.slice(0, -1) : newPath}`,
-        {
-          method: "PATCH",
-          headers: {
-            [AUTHORIZATION_HEADER_KEY]: `Bearer ${token}`,
-          },
-        },
-      )
-        .then((res) => res.json())
-        .catch(logger.error),
-  },
-})
+const host = FS_HOST.endsWith("/") ? FS_HOST.slice(0, -1) : FS_HOST
 
-_initDrives(user$, getFsDriver)
+_initI18n()
+_initDrives(user$, getFsDriver({ host, logger }))
 _initModals(logger)
+_initEditorPlugins()
 
 const router$ = _initRouter()
 const activities$ = _initActivities()
-_initEditorPlugins()
 const fileAssociations$ = _initFileAssociations()
 const contextMenu$ = _initContextMenu()
 const commandPalette$ = _initCommandPalette()
-
-_initI18n()
 
 _initExtensions({
   user$,
@@ -245,21 +104,19 @@ _initExtensions({
 
 registerTranslations("ordo")({ ru, en })
 
-setTimeout(() => {
-  registerCommand("ordo")("support-email", () => {
-    executeCommand("router.open-external", { url: `mailto:support@ordo.pink` })
-  })
+registerCommand("ordo")("support-email", () => {
+  executeCommand("router.open-external", { url: `mailto:support@ordo.pink` })
+})
 
-  registerCommand("ordo")("support-telegram", () => {
-    executeCommand("router.open-external", { url: `https://t.me/ordo_pink` })
-  })
+registerCommand("ordo")("support-telegram", () => {
+  executeCommand("router.open-external", { url: `https://t.me/ordo_pink` })
+})
 
-  registerCommandPaletteItem({
-    id: "ordo.logout",
-    name: translate("ordo")("logout"),
-    Icon: AiOutlineLogout,
-    onSelect: () => executeCommand("auth.logout", "/"),
-  })
+registerCommandPaletteItem({
+  id: "ordo.logout",
+  name: translate("ordo")("logout"),
+  Icon: AiOutlineLogout,
+  onSelect: () => executeCommand("auth.logout", "/"),
 })
 
 logger.info("Starting the application")

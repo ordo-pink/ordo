@@ -31,26 +31,22 @@ export const useFileAssociationFor = (file: Nullable<IOrdoFile>) => {
 
 export const useCurrentFileAssociation = () => {
   const associations = useFileAssociations()
-  const params = useRouteParams()
+  const { filePath } = useRouteParams<"filePath">()
 
   const [currentFileAssoc, setCurrentFileAssoc] = useState<Nullable<FileAssociation>>(null)
 
   useEffect(() => {
     Either.fromNullable(associations)
-      .chain((assocs) =>
-        Either.fromNullable(params).chain((routeParams) =>
-          Either.fromNullable(routeParams["filePath*"]).map((path) => ({ assocs, path })),
-        ),
-      )
+      .chain((assocs) => Either.fromNullable(filePath).map((path) => ({ assocs, path })))
       .map((params) => ({
         ...params,
-        fileExtension: OrdoFile.getFileExtension(params.path as OrdoFilePath),
+        fileExtension: OrdoFile.getFileExtension(`/${params.path}` as OrdoFilePath),
       }))
       .chain(({ assocs, fileExtension }) =>
         Either.fromNullable(assocs.find((assoc) => assoc.fileExtensions.includes(fileExtension))),
       )
       .fold(() => setCurrentFileAssoc(null), setCurrentFileAssoc)
-  }, [associations, params])
+  }, [associations, filePath])
 
   return currentFileAssoc
 }

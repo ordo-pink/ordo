@@ -6,6 +6,12 @@ import { OrdoDirectoryPath, OrdoFilePath } from "@ordo-pink/common-types"
 
 const toAbsolutePath = (absolute: string) => (path: string) => join(absolute, path)
 
+/**
+ * FS driver for ordo that uses files and directories on the disk to store the
+ * data.
+ *
+ * @param rootDirectory Path to the directory where the data should be stored
+ */
 export const createFSDriver = (rootDirectory: string): FSDriver => {
   const getAbsolute = toAbsolutePath(rootDirectory)
 

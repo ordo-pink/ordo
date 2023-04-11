@@ -5,6 +5,10 @@ type Props = {
   activities: Activity[]
 }
 
+/**
+ * ActivityBar is the place to get quick access to all the activities user has
+ * enabled in their Ordo account.
+ */
 export default function ActivityBar({ activities }: Props) {
   return (
     <div className="flex flex-col space-y-4 items-center px-2 justify-center text-lg sm:text-2xl z-50 bg-neutral-200 dark:bg-neutral-800">

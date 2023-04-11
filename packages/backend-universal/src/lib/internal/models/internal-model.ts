@@ -1,11 +1,10 @@
 import { Readable } from "stream"
 import { IOrdoDirectoryRaw, SystemDirectory } from "@ordo-pink/common-types"
 import { IOrdoInternal, OrdoDirectory, OrdoFile } from "@ordo-pink/fs-entity"
-import { FSDriver, IOrdoDirectoryModel, IOrdoInternalModel, StorageLimits } from "../../types"
+import { FSDriver, IOrdoDirectoryModel, IOrdoInternalModel } from "../../types"
 
 type IOrdoInternalModelParams = {
   fsDriver: FSDriver
-  limits: StorageLimits
   directory: IOrdoDirectoryModel
 }
 
@@ -19,24 +18,14 @@ const reduceDirectoryToSize = (directory: IOrdoDirectoryRaw, totalSize = 0) =>
   }, totalSize)
 
 export const OrdoInternalModel = {
-  of: ({ fsDriver, limits, directory }: IOrdoInternalModelParams): IOrdoInternalModel => {
-    const { maxTotalSize, maxUploadSize } = limits
-
-    if (Number.isNaN(maxUploadSize) || maxUploadSize <= 0) {
-      throw new Error("Max upload size is invalid")
-    }
-
-    if (Number.isNaN(maxTotalSize) || maxTotalSize <= 0) {
-      throw new Error("Max total size is invalid")
-    }
-
+  of: ({ fsDriver, directory }: IOrdoInternalModelParams): IOrdoInternalModel => {
     return {
       getInternalValue: (userId, key) =>
-        OrdoInternalModel.of({ fsDriver: fsDriver, limits, directory: directory })
+        OrdoInternalModel.of({ fsDriver, directory })
           .getValues(userId)
           .then((internal: IOrdoInternal) => internal[key]),
       setInternalValue: (userId, key, value) =>
-        OrdoInternalModel.of({ fsDriver: fsDriver, limits, directory: directory })
+        OrdoInternalModel.of({ fsDriver, directory })
           .getValues(userId)
           .then(async (internal: IOrdoInternal) => {
             const path = `/${userId}${SystemDirectory.INTERNAL}ordo.json` as const
@@ -70,9 +59,9 @@ export const OrdoInternalModel = {
               const totalSize = reduceDirectoryToSize(rootDir)
 
               const payload: IOrdoInternal = {
-                maxTotalSize: maxTotalSize,
-                maxUploadSize: maxUploadSize,
-                totalSize,
+                maxTotalSize: 0,
+                maxUploadSize: 5,
+                totalSize, // TODO: Store externally
               }
 
               const content = Readable.from(JSON.stringify(payload))

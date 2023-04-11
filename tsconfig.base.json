@@ -30,7 +30,6 @@
       "@ordo-pink/extension-home": ["packages/extension-home/src/index.ts"],
       "@ordo-pink/extension-kanban": ["packages/extension-kanban/src/index.ts"],
       "@ordo-pink/extension-links": ["packages/extension-links/src/index.ts"],
-      "@ordo-pink/extensions": ["packages/extensions/src/index.ts"],
       "@ordo-pink/fns": ["packages/fns/src/index.ts"],
       "@ordo-pink/fs-entity": ["packages/fs-entity/src/index.ts"],
       "@ordo-pink/keycloak": ["packages/keycloak/src/index.ts"],

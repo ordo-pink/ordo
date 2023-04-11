@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next"
 import { BsCalendarDay, BsCalendarMonth, BsCalendarWeek } from "react-icons/bs"
 
 export default function CalendarSidebar() {
-  const params = useRouteParams<{ view: string }>()
+  const { view } = useRouteParams<"view">()
   const { emit } = useCommands()
 
   const { t } = useTranslation("calendar")
@@ -15,19 +15,19 @@ export default function CalendarSidebar() {
   return (
     <div className="p-2">
       <ActionListItem
-        isCurrent={params?.["view"] === "day"}
+        isCurrent={view === "day"}
         text={day}
         onClick={() => emit("router.navigate", "/calendar/day")}
         Icon={() => <BsCalendarDay />}
       />
       <ActionListItem
-        isCurrent={params?.["view"] === "week"}
+        isCurrent={view === "week"}
         text={week}
         onClick={() => emit("router.navigate", "/calendar/week")}
         Icon={() => <BsCalendarWeek />}
       />
       <ActionListItem
-        isCurrent={params?.["view"] === "month"}
+        isCurrent={view === "month"}
         text={month}
         onClick={() => emit("router.navigate", "/calendar/month")}
         Icon={() => <BsCalendarMonth />}

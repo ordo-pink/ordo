@@ -5,7 +5,7 @@ import KanbanFileReference from "./kanban-file-reference"
 
 export default function Sidebar() {
   const drive = useDrive()
-  const params = useRouteParams<{ board: string }>()
+  const params = useRouteParams<"board">()
 
   const [kanbans, setKanbans] = useState(
     {} as Record<OrdoDirectoryPath, IOrdoFile<{ kanbans: OrdoDirectoryPath[] }>[]>,

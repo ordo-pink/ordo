@@ -1,4 +1,4 @@
-import { CommandContext, IOrdoFile, Nullable, OrdoFilePath } from "@ordo-pink/common-types"
+import { CommandContext, IOrdoFile, Nullable } from "@ordo-pink/common-types"
 import { Either } from "@ordo-pink/either"
 import { OrdoDirectory } from "@ordo-pink/fs-entity"
 import {
@@ -14,7 +14,7 @@ import { ComponentType, Suspense, useEffect, useState } from "react"
 
 // TODO: NotSelected component
 export default function Editor() {
-  const params = useRouteParams()
+  const { filePath } = useRouteParams<"filePath">()
   const fsDriver = useFsDriver()
   const drive = useDrive()
   const { after, emit, off } = useCommands()
@@ -22,7 +22,7 @@ export default function Editor() {
   const currentFileAssociation = useCurrentFileAssociation()
 
   const handleAfterRemoveFile = ({ payload }: CommandContext<IOrdoFile>) => {
-    if (!params || !params["filePath*"] || payload.path !== params["filePath*"]) return
+    if (!filePath || payload.path !== `/${filePath}`) return
 
     emit("router.navigate", "/editor")
   }
@@ -33,7 +33,7 @@ export default function Editor() {
     return () => {
       off("fs")("remove-file", handleAfterRemoveFile)
     }
-  }, [params])
+  }, [filePath])
 
   // TODO: Fix updating route params
   // TODO: NotSupported component
@@ -43,9 +43,9 @@ export default function Editor() {
 
   useEffect(() => {
     // TODO: Remove * from dynamic param
-    if (!params || !fsDriver || !params["filePath*"] || !drive) return
+    if (!filePath || !fsDriver || !drive) return
 
-    const file = OrdoDirectory.findFileDeep(params["filePath*"] as OrdoFilePath, drive.root)
+    const file = OrdoDirectory.findFileDeep(`/${filePath}`, drive.root)
 
     if (!file) return
 
@@ -54,9 +54,9 @@ export default function Editor() {
     if (currentFileAssociation) {
       setComponent(currentFileAssociation.Component)
     }
-  }, [params?.["filePath*"], currentFileAssociation, drive, fsDriver])
+  }, [filePath, currentFileAssociation, drive, fsDriver])
 
-  return Either.fromNullable(params)
+  return Either.fromNullable(filePath)
     .chain(() => Either.fromNullable(currentFile))
     .fold(Null, (file) => (
       <Suspense fallback={<Loading />}>

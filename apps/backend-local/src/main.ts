@@ -16,11 +16,6 @@ const root = join(__dirname, "..", "..", "..", "..", "ordo-backend-local-assets"
 const ENCRYPTION_KEY = process.env.BACKEND_ENCRYPTION_KEY
 const PORT = process.env.BACKEND_LOCAL_PORT
 const TOKEN = process.env.BACKEND_LOCAL_TOKEN
-const MAX_UPLOAD_SIZE = process.env.FREE_UPLOAD_SIZE
-const MAX_TOTAL_SIZE = process.env.FREE_SPACE_LIMIT
-
-const maxUploadSize = Number(MAX_UPLOAD_SIZE)
-const maxTotalSize = Number(MAX_TOTAL_SIZE)
 
 if (!existsSync(root)) mkdirSync(root, { recursive: true })
 
@@ -31,7 +26,6 @@ const server = createOrdoBackendServer({
   authorise: createAuthorisationStub(TOKEN),
   prependMiddleware: (app) => app.use(morgan("dev")),
   logger: ConsoleLogger,
-  limits: { maxTotalSize, maxUploadSize },
   encrypt,
 })
 

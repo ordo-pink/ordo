@@ -6,6 +6,10 @@ import {
 } from "@ordo-pink/common-types"
 import { OrdoDirectory, OrdoFile } from "@ordo-pink/fs-entity"
 
+/**
+ * Removes userId from the path to get it back to the way it is used in the
+ * client application.
+ */
 export const removeUserIdFromPath =
   (userId: string) =>
   (item: IOrdoDirectoryRaw | IOrdoFileRaw): IOrdoDirectoryRaw | IOrdoFileRaw =>

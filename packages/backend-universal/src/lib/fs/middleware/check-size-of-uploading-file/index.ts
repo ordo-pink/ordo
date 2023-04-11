@@ -18,6 +18,8 @@ export const checkSizeOfUploadingFile: FsRequestHandler<OrdoFilePathParams> =
 
     const totalSize = await internal.getInternalValue(userId, "totalSize")
 
+    req.params.logger.info(maxFileSize, maxTotalSize, contentSize, totalSize)
+
     if (Number.isNaN(contentSize)) {
       req.params.logger.warn(`Content-Size header not specified`)
       return void res.status(ExceptionResponse.LENGTH_REQUIRED).send()

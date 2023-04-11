@@ -3,6 +3,7 @@ import { FileIcon, useModal } from "@ordo-pink/react-utils"
 import { hideCommandPalette, showCommandPalette } from "@ordo-pink/stream-command-palette"
 import { drive$, fsDriver$ } from "@ordo-pink/stream-drives"
 import { createExtension } from "@ordo-pink/stream-extensions"
+import { lazy } from "react"
 import { AiFillFolder, AiOutlineFolder } from "react-icons/ai"
 import {
   BsDownload,
@@ -21,7 +22,6 @@ import { createFile } from "./commands/files/create-file"
 import { moveFile } from "./commands/files/move-file"
 import { removeFile } from "./commands/files/remove-file"
 import { updateFile } from "./commands/files/update-file"
-
 import CreateDirectoryModal from "./components/create-directory-modal"
 import CreateFileModal from "./components/create-file-modal"
 import RemoveDirectoryModal from "./components/remove-directory-modal"
@@ -30,14 +30,17 @@ import RenameDirectoryModal from "./components/rename-directory-modal"
 import RenameFileModal from "./components/rename-file-modal"
 import UploadFilesModal from "./components/upload-files-modal"
 
+import "./fs.css"
+
 export default createExtension(
   "fs",
   ({
     commands,
-    registerContextMenuItem,
-    registerTranslations,
-    registerCommandPaletteItem,
     translate,
+    registerActivity,
+    registerTranslations,
+    registerContextMenuItem,
+    registerCommandPaletteItem,
   }) => {
     registerTranslations({
       ru: {
@@ -217,7 +220,7 @@ export default createExtension(
     registerContextMenuItem(RENAME_DIRECTORY_COMMAND, {
       Icon: BsPencil,
       payloadCreator: (directory) => ({ directory }),
-      shouldShow: (target) => OrdoDirectory.isOrdoDirectory(target),
+      shouldShow: (target) => OrdoDirectory.isOrdoDirectory(target) && target.path !== "/",
     })
 
     const CREATE_FILE_COMMAND = commands.on("show-create-file-modal", ({ payload }) => {
@@ -359,6 +362,13 @@ export default createExtension(
           })),
         )
       },
+    })
+
+    registerActivity("fs.file-explorer", {
+      Component: lazy(() => import("./components/fs-activity")),
+      Icon: lazy(() => import("./components/fs-activity-icon")),
+      Sidebar: lazy(() => import("./components/fs-activity-sidebar")),
+      routes: ["/fs", "/fs/", "/fs/:path*"],
     })
   },
 )

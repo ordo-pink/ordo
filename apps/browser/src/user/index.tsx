@@ -3,6 +3,9 @@ import { useTranslation } from "react-i18next"
 import SupportField from "./components/support-field"
 import logo from "../assets/logo.png"
 
+/**
+ * User area.
+ */
 export default function UserPage() {
   const { t } = useTranslation("ordo")
 
@@ -15,7 +18,6 @@ export default function UserPage() {
   const tSubscriptionPlanTitle = t("subscription-plan-title")
 
   const freeFeatures = [t("free-feature-1"), t("free-feature-2"), t("free-feature-3")]
-
   const proFeatures = [t("pro-feature-1"), t("pro-feature-2"), t("pro-feature-3")]
 
   return (
@@ -69,6 +71,7 @@ export default function UserPage() {
           <div className="w-full flex flex-col items-center space-y-2 md:flex-row md:space-y-0 md:space-x-2 md:justify-between">
             <PricingPlan
               features={freeFeatures}
+              current
               available
               title="free"
               description="free-description"

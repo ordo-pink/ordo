@@ -1,4 +1,4 @@
-import { Readable, Stream, Transform, Writable } from "stream"
+import { Readable, Transform, Writable } from "stream"
 import {
   IOrdoDirectoryRaw,
   IOrdoFileRaw,
@@ -21,8 +21,21 @@ import {
   NEW_PATH_PARAM,
 } from "./fs/constants"
 
+/**
+ * Encryption module API.
+ */
 export type Encrypt = {
-  encryptStream: UnaryFn<Stream, Transform>
+  /**
+   * Encrypts readable stream.
+   */
+  encryptStream: UnaryFn<Readable, Transform>
+
+  /**
+   * Decrypts readable stream.
+   *
+   * @param Writable Stream to write decrypted data to.
+   * @returns {Transform} Stream containing decypted data.
+   */
   decryptStream: UnaryFn<Writable, Transform>
 }
 
@@ -32,11 +45,11 @@ export type Params<T extends Record<string, unknown> = Record<string, unknown>> 
   logger: Logger
 }
 
-export type PathParams<T extends OrdoDirectoryPath | OrdoFilePath> = Params<{
+export type ParamsWithPath<T extends OrdoDirectoryPath | OrdoFilePath> = Params<{
   [PATH_PARAM]: T
 }>
 
-export type TwoPathsParams<T extends OrdoDirectoryPath | OrdoFilePath> = Params<{
+export type ParamsWithOldPathAndNewPath<T extends OrdoDirectoryPath | OrdoFilePath> = Params<{
   [OLD_PATH_PARAM]: T
   [NEW_PATH_PARAM]: T
 }>
@@ -56,11 +69,11 @@ export type FsRequestHandler<T = Params> = UnaryFn<
   RequestHandler<T>
 >
 
-export type OrdoFilePathParams = PathParams<OrdoFilePath>
-export type OrdoFileTwoPathsParams = TwoPathsParams<OrdoFilePath>
+export type OrdoFilePathParams = ParamsWithPath<OrdoFilePath>
+export type OrdoFileTwoPathsParams = ParamsWithOldPathAndNewPath<OrdoFilePath>
 
-export type OrdoDirectoryPathParams = PathParams<OrdoDirectoryPath>
-export type OrdoDirectoryTwoPathsParams = TwoPathsParams<OrdoDirectoryPath>
+export type OrdoDirectoryPathParams = ParamsWithPath<OrdoDirectoryPath>
+export type OrdoDirectoryTwoPathsParams = ParamsWithOldPathAndNewPath<OrdoDirectoryPath>
 
 export type CreateOrdoBackendServerParams = {
   fsDriver: FSDriver
@@ -68,7 +81,6 @@ export type CreateOrdoBackendServerParams = {
   corsOptions?: Parameters<typeof cors>[0]
   authorise: RequestHandler<Params<Record<string, unknown>>>
   logger: Logger
-  limits: StorageLimits
   encrypt: Encrypt
 }
 
@@ -130,9 +142,4 @@ export type IOrdoDirectoryModel = {
     Promise<IOrdoDirectoryRaw>
   >
   createDirectory: UnaryFn<OrdoDirectoryPath, Promise<IOrdoDirectoryRaw>>
-}
-
-export type StorageLimits = {
-  maxUploadSize: number
-  maxTotalSize: number
 }

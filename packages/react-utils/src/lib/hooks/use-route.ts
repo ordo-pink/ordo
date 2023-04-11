@@ -14,25 +14,27 @@ export const useRoute = () => {
   return route
 }
 
-export const useRouteParams = <T extends Record<string, string> = Record<string, string>>() => {
+export const useRouteParams = <T extends string = string>() => {
   const route = useRoute()
 
-  const [params, setParams] = useState<Nullable<T>>(null)
+  const [params, setParams] = useState<Record<T, string | undefined>>(
+    {} as Record<T, string | undefined>,
+  )
 
   useEffect(() => {
-    if (!route || !route.params) return
+    if (!route || !route.params) return setParams({} as Record<T, string | undefined>)
 
     const dynamicParam = Object.keys(route.params).find((param) => param.endsWith("*"))
 
-    if (!dynamicParam) return setParams(route.params as T)
+    if (!dynamicParam) return setParams(route.params as Record<T, string | undefined>)
 
     const paramsCopy = { ...route.params }
 
     const dynamicParamValue = route.route.slice(route.route.indexOf(route.params[dynamicParam]))
 
-    paramsCopy[dynamicParam] = `/${decodeURI(dynamicParamValue)}`
+    paramsCopy[dynamicParam.slice(0, -1)] = decodeURI(dynamicParamValue)
 
-    setParams(paramsCopy as T)
+    setParams(paramsCopy as Record<T, string | undefined>)
   }, [route])
 
   return params

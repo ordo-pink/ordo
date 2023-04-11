@@ -13,6 +13,15 @@ type Props = PropsWithChildren<{
   onClick: UnaryFn<MouseEvent, void>
 }>
 
+/**
+ * The sidebar component. It is only shown if the `Sidebar` property is
+ * specified for the current activity. Sidebar always includes the Ordo.pink
+ * logo and the CommandPalette button at the top, and User info at the bottom.
+ *
+ * If the activity does not specify the Sidebar, the CommandPalette button
+ * moves to the top of the ActivityBar, and the User avatar moves to the bottom
+ * of the ActivityBar.
+ */
 export default function Sidebar({ children, onClick }: Props) {
   const { showCommandPalette } = useCommandPalette()
   const commandPaletteItems = useSubscription(commandPaletteItems$)
@@ -31,7 +40,7 @@ export default function Sidebar({ children, onClick }: Props) {
 
   return (
     <div
-      className="sidebar"
+      className="flex flex-col p-4 h-full bg-neutral-200 dark:bg-neutral-800"
       onClick={onClick}
     >
       <div className="flex items-center justify-between">

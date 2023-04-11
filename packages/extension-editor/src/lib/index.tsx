@@ -155,7 +155,7 @@ export default createExtension(
       }: CommandContext<{ file: IOrdoFile; content?: string; openFileInEditor?: boolean }>) => {
         if (!payload.openFileInEditor) return
 
-        const currentActivity = currentActivity$.value
+        const currentActivity = currentActivity$.getValue()
 
         if (currentActivity?.name === "editor.editor") {
           commands.emit("editor.open-file-in-editor", payload.file.path)
@@ -186,7 +186,15 @@ export default createExtension(
     registerContextMenuItem(EXPAND_DIRECTORIES_COMMAND, {
       Icon: BsFolder2Open,
       payloadCreator: (target) => target,
-      shouldShow: (target) => OrdoDirectory.isOrdoDirectory(target),
+      shouldShow: (target) => {
+        const currentActivity = currentActivity$.getValue()
+
+        return (
+          !!currentActivity &&
+          currentActivity.name === "editor.editor" &&
+          OrdoDirectory.isOrdoDirectory(target)
+        )
+      },
     })
 
     const COLLAPSE_DIRECTORIES_COMMAND = commands.on(
@@ -212,7 +220,15 @@ export default createExtension(
     registerContextMenuItem(COLLAPSE_DIRECTORIES_COMMAND, {
       Icon: BsFolder2,
       payloadCreator: (target) => target,
-      shouldShow: (target) => OrdoDirectory.isOrdoDirectory(target),
+      shouldShow: (target) => {
+        const currentActivity = currentActivity$.getValue()
+
+        return (
+          !!currentActivity &&
+          currentActivity.name === "editor.editor" &&
+          OrdoDirectory.isOrdoDirectory(target)
+        )
+      },
     })
 
     commands.on("collapse-directory", ({ payload }) => {
@@ -297,26 +313,26 @@ export default createExtension(
     })
 
     registerFileAssociation("md", {
-      Component: lazy(() => import("./components/md")),
-      Icon: lazy(() => import("./components/md/icon")),
+      Component: lazy(() => import("./associations/md")),
+      Icon: lazy(() => import("./associations/md/icon")),
       fileExtensions: [".md"],
     })
 
     registerFileAssociation("pdf", {
-      Component: lazy(() => import("./components/pdf")),
-      Icon: lazy(() => import("./components/pdf/icon")),
+      Component: lazy(() => import("./associations/pdf")),
+      Icon: lazy(() => import("./associations/pdf/icon")),
       fileExtensions: [".pdf"],
     })
 
     registerFileAssociation("media", {
-      Component: lazy(() => import("./components/media")),
-      Icon: lazy(() => import("./components/media/icon")),
+      Component: lazy(() => import("./associations/media")),
+      Icon: lazy(() => import("./associations/media/icon")),
       fileExtensions: [".wav", ".mp3", ".ogg", ".mp4", ".adts", ".webm", ".caf", ".flac"],
     })
 
     registerFileAssociation("img", {
-      Component: lazy(() => import("./components/img")),
-      Icon: lazy(() => import("./components/img/icon")),
+      Component: lazy(() => import("./associations/img")),
+      Icon: lazy(() => import("./associations/img/icon")),
       fileExtensions: [
         ".apng",
         ".avif",

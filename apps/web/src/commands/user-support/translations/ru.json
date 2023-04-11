@@ -1,8 +1,0 @@
-{
-  "@ordo-command-user-support/readable-name": "Поддержка",
-  "@ordo-command-user-support/open-user-support": "Связаться с поддержкой",
-  "@ordo-command-user-support/call-to-support": "Какой способ связи вы предпочитаете?",
-  "@ordo-command-user-support/button-telegram": "Telegram",
-  "@ordo-command-user-support/button-email": "Email",
-  "@ordo-command-user-support/button-cancel": "Отмена"
-}

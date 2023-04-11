@@ -6,21 +6,19 @@ import { useTranslation } from "react-i18next"
 import Kanban from "./kanban"
 
 export default function KanbanActivity() {
-  const routeParams = useRouteParams<{ board: string }>()
+  const { board } = useRouteParams<"board">()
   const { t } = useTranslation("kanban")
 
   const tTitle = t("title")
-  const title = `Ordo.pink | ${tTitle}${routeParams?.board ? ` | ${routeParams?.board}` : ""}`
+  const title = `Ordo.pink | ${tTitle}${board ? ` | ${board}` : ""}`
 
-  return Either.fromNullable(routeParams)
-    .chain((params) => Either.fromNullable(params.board))
-    .fold(Null, (path) => (
-      <div className="h-[95vh]">
-        <Helmet>
-          <title>{title}</title>
-        </Helmet>
+  return Either.fromNullable(board).fold(Null, (path) => (
+    <div className="h-[95vh]">
+      <Helmet>
+        <title>{title}</title>
+      </Helmet>
 
-        <Kanban directoryPath={`/${path}/`} />
-      </div>
-    ))
+      <Kanban directoryPath={`/${path}/`} />
+    </div>
+  ))
 }

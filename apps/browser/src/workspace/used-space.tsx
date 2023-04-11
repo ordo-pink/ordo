@@ -19,7 +19,10 @@ export const calculateTreeSize = (directory: Nullable<IOrdoDirectory>, size = 0)
       (size) => size,
     )
 
-// TODO: Get available space of the user from the backend
+/**
+ * The amount of space used on User's drive.
+ * TODO: Get available space of the user from the backend
+ */
 export default function UsedSpace() {
   const drive = useDrive()
   const { t } = useTranslation("editor")

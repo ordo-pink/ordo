@@ -1,14 +1,14 @@
-import { ThunkFn } from "@ordo-pink/common-types"
+import { ThunkFn, UnaryFn } from "@ordo-pink/common-types"
 import { Either } from "@ordo-pink/either"
 import { noOp } from "@ordo-pink/fns"
-import { PropsWithChildren, useRef } from "react"
+import { MouseEvent, PropsWithChildren, useRef } from "react"
 import { useHotkeys } from "react-hotkeys-hook"
 import { Accelerator } from "../accelerator/accelerator"
 
 import "./buttons.css"
 
 type Props = PropsWithChildren<{
-  onClick: ThunkFn<void>
+  onClick: ThunkFn<void> | UnaryFn<MouseEvent<HTMLButtonElement>, void>
   onMouseOver?: ThunkFn<void>
   disabled?: boolean
   className?: string

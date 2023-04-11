@@ -1,3 +1,4 @@
+import { Switch } from "@ordo-pink/switch"
 import { useTranslation } from "react-i18next"
 import { BsCheck2 } from "react-icons/bs"
 import { OrdoButtonPrimary } from "../buttons/buttons"
@@ -9,6 +10,7 @@ type Props = {
   description: string
   price: string
   available?: boolean
+  current?: boolean
   pricePerUser?: boolean
 }
 
@@ -18,6 +20,7 @@ export function PricingPlan({
   description,
   price,
   available = false,
+  current = false,
   pricePerUser = false,
 }: Props) {
   const { t } = useTranslation("ordo")
@@ -25,10 +28,22 @@ export function PricingPlan({
 
   const tTitle = t(title)
   const tPrice = t(price)
+  const tCurrency = t("currency")
   const tGetStarted = t("get-started")
   const tComingSoon = t("coming-soon")
-  const tCurrency = t("currency")
+  const tCurrentPlan = t("current-plan")
   const tCurrencyPerUser = t("currency-user")
+
+  const tActionButton = Switch.of(null)
+    .case(
+      () => current,
+      () => tCurrentPlan,
+    )
+    .case(
+      () => available,
+      () => tGetStarted,
+    )
+    .default(() => tComingSoon)
 
   const handleGetStartedClick = () => execute("auth.register", "/")
 
@@ -59,11 +74,11 @@ export function PricingPlan({
         </ul>
       </div>
       <OrdoButtonPrimary
-        disabled={!available}
+        disabled={!available || current}
         center
         onClick={handleGetStartedClick}
       >
-        {available ? tGetStarted : tComingSoon}
+        {tActionButton}
       </OrdoButtonPrimary>
     </div>
   )

@@ -4,6 +4,11 @@ import { modal$ } from "@ordo-pink/stream-modals"
 import { useHotkeys } from "react-hotkeys-hook"
 import { BsX } from "react-icons/bs"
 
+/**
+ * The modal window wrapper.
+ *
+ * You can use the modal window with the `useModal` hook.
+ */
 export default function Modal() {
   const modal = useSubscription(modal$)
   const { hideModal } = useModal()

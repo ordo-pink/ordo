@@ -1,3 +1,4 @@
+import { useDraggable } from "@dnd-kit/core"
 import { IOrdoFile } from "@ordo-pink/common-types"
 import { FileIcon, useCommands, useContextMenu } from "@ordo-pink/react-utils"
 import { MouseEvent } from "react"
@@ -9,6 +10,11 @@ type Props = {
 export default function FSActivityFile({ file }: Props) {
   const { showContextMenu } = useContextMenu()
   const { emit } = useCommands()
+
+  const { setNodeRef, listeners, attributes } = useDraggable({
+    id: file.path,
+    data: file,
+  })
 
   const handleContextMenu = (e: MouseEvent<HTMLDivElement>) => {
     e.preventDefault()
@@ -27,6 +33,9 @@ export default function FSActivityFile({ file }: Props) {
 
   return (
     <div
+      ref={setNodeRef}
+      {...listeners}
+      {...attributes}
       className="flex flex-col items-center p-2 h-max rounded-lg ring-0 cursor-pointer ring-pink-500 hover:ring-1 hover:bg-pink-500/10"
       key={file.path}
       title={file.path}

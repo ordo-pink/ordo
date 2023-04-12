@@ -1,7 +1,17 @@
-import { IOrdoDirectory, Nullable, OrdoDirectoryPath } from "@ordo-pink/common-types"
+import {
+  Active,
+  DndContext,
+  DragOverlay,
+  KeyboardSensor,
+  MouseSensor,
+  TouchSensor,
+  useSensor,
+  useSensors,
+} from "@dnd-kit/core"
+import { IOrdoDirectory, IOrdoFile, Nullable, OrdoDirectoryPath } from "@ordo-pink/common-types"
 import { Either } from "@ordo-pink/either"
 import { OrdoDirectory } from "@ordo-pink/fs-entity"
-import { Null, useContextMenu, useDrive, useRouteParams } from "@ordo-pink/react-utils"
+import { Null, useCommands, useContextMenu, useDrive, useRouteParams } from "@ordo-pink/react-utils"
 import { MouseEvent, useEffect, useState } from "react"
 import Helmet from "react-helmet"
 import { useTranslation } from "react-i18next"
@@ -11,10 +21,30 @@ import FSActivityFile from "./fs-activity-file"
 export default function FSActivity() {
   const drive = useDrive()
   const { path } = useRouteParams<"path">()
+  const { emit } = useCommands()
   const { showContextMenu } = useContextMenu()
   const { t } = useTranslation("fs")
 
-  const [currentDirectory, setCurrentDirectory] = useState<Nullable<IOrdoDirectory>>()
+  const mouseSensor = useSensor(MouseSensor, {
+    activationConstraint: {
+      delay: 250,
+      tolerance: 5,
+    },
+  })
+
+  const touchSensor = useSensor(TouchSensor, {
+    activationConstraint: {
+      delay: 250,
+      tolerance: 5,
+    },
+  })
+
+  const keyboardSensor = useSensor(KeyboardSensor, {})
+
+  const sensors = useSensors(mouseSensor, touchSensor, keyboardSensor)
+
+  const [currentDirectory, setCurrentDirectory] = useState<Nullable<IOrdoDirectory>>(null)
+  const [activeDraggable, setActiveDraggable] = useState<Nullable<Active>>(null)
 
   useEffect(() => {
     if (!drive) return setCurrentDirectory(null)
@@ -47,19 +77,66 @@ export default function FSActivity() {
       <Helmet title={`${root.readableName || tRoot} (${tFs})`} />
 
       <div className="flex flex-wrap items-start">
-        {root.children.map((child) =>
-          OrdoDirectory.isOrdoDirectory(child) ? (
-            <FSActivityDirectory
-              key={child.path}
-              directory={child}
-            />
-          ) : (
-            <FSActivityFile
-              key={child.path}
-              file={child}
-            />
-          ),
-        )}
+        <DndContext
+          autoScroll
+          sensors={sensors}
+          onDragEnd={(event) => {
+            setActiveDraggable(null)
+
+            if (!event.over || event.active.id === event.over.id) {
+              return
+            }
+
+            const draggableItem = event.active.data.current as IOrdoDirectory | IOrdoFile
+
+            const isOrdoDirectory = OrdoDirectory.isOrdoDirectory(draggableItem)
+            const command = isOrdoDirectory ? "fs.move-directory" : "fs.move-file"
+            const payload = {
+              oldPath: event.active.id,
+              newPath: isOrdoDirectory
+                ? `${event.over.id}${draggableItem.readableName}/`
+                : `${event.over.id}${draggableItem.readableName}${
+                    (draggableItem as IOrdoFile).extension
+                  }`,
+            }
+
+            emit(command, payload)
+          }}
+          onDragStart={(event) => {
+            setActiveDraggable(event.active)
+          }}
+        >
+          {root.children.map((child) =>
+            OrdoDirectory.isOrdoDirectory(child) ? (
+              <FSActivityDirectory
+                key={child.path}
+                directory={child}
+              />
+            ) : (
+              <FSActivityFile
+                key={child.path}
+                file={child}
+              />
+            ),
+          )}
+
+          <DragOverlay dropAnimation={null}>
+            {activeDraggable ? (
+              OrdoDirectory.isOrdoDirectory(activeDraggable.data.current) ? (
+                <FSActivityDirectory
+                  key={activeDraggable.id}
+                  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                  directory={activeDraggable.data.current}
+                />
+              ) : (
+                <FSActivityFile
+                  key={activeDraggable.id}
+                  file={activeDraggable.data.current as IOrdoFile}
+                />
+              )
+            ) : null}
+          </DragOverlay>
+        </DndContext>
       </div>
     </div>
   ))

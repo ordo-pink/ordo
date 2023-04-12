@@ -1,3 +1,4 @@
+import { useDraggable, useDroppable } from "@dnd-kit/core"
 import { IOrdoDirectory } from "@ordo-pink/common-types"
 import { useContextMenu, useCommands } from "@ordo-pink/react-utils"
 import { MouseEvent } from "react"
@@ -11,6 +12,16 @@ type Props = {
 export default function FSActivityDirectory({ directory }: Props) {
   const { showContextMenu } = useContextMenu()
   const { emit } = useCommands()
+
+  const { setNodeRef, listeners, attributes } = useDraggable({
+    id: directory.path,
+    data: directory,
+  })
+
+  const { setNodeRef: setDroppableNodeRef, isOver } = useDroppable({
+    id: directory.path,
+    data: directory,
+  })
 
   const handleContextMenu = (e: MouseEvent<HTMLDivElement>) => {
     e.preventDefault()
@@ -29,13 +40,21 @@ export default function FSActivityDirectory({ directory }: Props) {
 
   return (
     <div
-      className="flex flex-col items-center p-2 h-max rounded-lg ring-0 cursor-pointer ring-pink-500 hover:ring-1 hover:bg-pink-500/10"
+      ref={setNodeRef}
+      {...listeners}
+      {...attributes}
+      className={`flex flex-col items-center p-2 h-max rounded-lg ring-0 cursor-pointer ring-pink-500 hover:ring-1 hover:bg-pink-500/10 ${
+        isOver ? "ring-neutral-500 ring-1 bg-neutral-500/10" : ""
+      }`}
       key={directory.path}
       title={directory.path}
       onContextMenu={handleContextMenu}
       onClick={handleClick}
     >
-      <div className="text-5xl">
+      <div
+        className={`text-5xl`}
+        ref={setDroppableNodeRef}
+      >
         {directory && directory.children && directory.children.length > 0 ? (
           <BsFillFolderFill
             className={

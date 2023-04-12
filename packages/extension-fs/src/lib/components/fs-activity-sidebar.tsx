@@ -12,7 +12,7 @@ import {
 } from "@ordo-pink/react-utils"
 import { MouseEvent, useEffect, useState } from "react"
 import { useTranslation } from "react-i18next"
-import { BsDeviceHdd, BsPlus } from "react-icons/bs"
+import { BsDeviceHdd, BsFolderSymlink, BsLaptop, BsPlus, BsTrash3 } from "react-icons/bs"
 
 export default function FSActivitySidebar() {
   const { path } = useRouteParams()
@@ -36,9 +36,12 @@ export default function FSActivitySidebar() {
 
   const tCreateButton = t("create-button")
   const tRoot = t("root")
+  const tShared = t("shared-directories")
   const tLocations = t("locations")
   const tRecent = t("recent")
   const tFavourites = t("favourites")
+  const tDevices = t("devices")
+  const tTrash = t("trash")
 
   const handleCreateClick = (event: MouseEvent<HTMLButtonElement>) => {
     event.preventDefault()
@@ -66,7 +69,7 @@ export default function FSActivitySidebar() {
         </div>
       </OrdoButtonSuccess>
 
-      <div className="flex flex-col space-y-1 w-full">
+      <div className="flex flex-col w-full">
         <h2 className="uppercase text-neutral-500 font-bold text-sm text-center">{tLocations}</h2>
         {/* {directory && directory.path !== "/" ? (
           <ActionListItem
@@ -82,6 +85,30 @@ export default function FSActivitySidebar() {
           isCurrent={directory.path === "/"}
           Icon={BsDeviceHdd}
           text={tRoot}
+          onClick={() => emit("router.navigate", "/fs")}
+        />
+
+        <ActionListItem
+          isLarge
+          isCurrent={directory.path === "/__internal__/devices/"}
+          Icon={BsLaptop}
+          text={tDevices}
+          onClick={() => emit("router.navigate", "/fs")}
+        />
+
+        <ActionListItem
+          isLarge
+          isCurrent={directory.path === "/__internal__/shared/"}
+          Icon={BsFolderSymlink}
+          text={tShared}
+          onClick={() => emit("router.navigate", "/fs")}
+        />
+
+        <ActionListItem
+          isLarge
+          isCurrent={directory.path === "/.trash/"}
+          Icon={BsTrash3}
+          text={tTrash}
           onClick={() => emit("router.navigate", "/fs")}
         />
       </div>

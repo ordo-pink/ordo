@@ -4,6 +4,7 @@ import {
   useCommands,
   PricingPlan,
 } from "@ordo-pink/react-utils"
+import Helmet from "react-helmet"
 import { useTranslation } from "react-i18next"
 import {
   BsArrowsFullscreen,
@@ -165,6 +166,8 @@ export default function Home() {
 
   return (
     <div className="overflow-x-hidden text-neutral-800 dark:text-neutral-200 bg-gradient-to-br from-slate-50 via-neutral-100 to-stone-200 dark:from-stone-900 dark:via-neutral-900 dark:to-zinc-900">
+      <Helmet title={`${tSlogan} ${tTitle}`} />
+
       <header className="relative w-screen h-screen">
         <img
           className="absolute top-0 left-0 right-0 bottom-0 h-full w-full"

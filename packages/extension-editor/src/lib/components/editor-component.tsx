@@ -11,6 +11,8 @@ import {
   useRouteParams,
 } from "@ordo-pink/react-utils"
 import { ComponentType, Suspense, useEffect, useState } from "react"
+import Helmet from "react-helmet"
+import { useTranslation } from "react-i18next"
 
 // TODO: NotSelected component
 export default function Editor() {
@@ -18,22 +20,9 @@ export default function Editor() {
   const fsDriver = useFsDriver()
   const drive = useDrive()
   const { after, emit, off } = useCommands()
+  const { t } = useTranslation("editor")
 
   const currentFileAssociation = useCurrentFileAssociation()
-
-  const handleAfterRemoveFile = ({ payload }: CommandContext<IOrdoFile>) => {
-    if (!filePath || payload.path !== `/${filePath}`) return
-
-    emit("router.navigate", "/editor")
-  }
-
-  useEffect(() => {
-    after("fs.remove-file", handleAfterRemoveFile)
-
-    return () => {
-      off("fs")("remove-file", handleAfterRemoveFile)
-    }
-  }, [filePath])
 
   // TODO: Fix updating route params
   // TODO: NotSupported component
@@ -42,7 +31,20 @@ export default function Editor() {
   const [currentFile, setCurrentFile] = useState<Nullable<IOrdoFile>>(null)
 
   useEffect(() => {
-    // TODO: Remove * from dynamic param
+    const handleAfterRemoveFile = ({ payload }: CommandContext<IOrdoFile>) => {
+      if (!filePath || payload.path !== `/${filePath}`) return
+
+      emit("router.navigate", "/editor")
+    }
+
+    after("fs.remove-file", handleAfterRemoveFile)
+
+    return () => {
+      off("fs")("remove-file", handleAfterRemoveFile)
+    }
+  }, [filePath])
+
+  useEffect(() => {
     if (!filePath || !fsDriver || !drive) return
 
     const file = OrdoDirectory.findFileDeep(`/${filePath}`, drive.root)
@@ -56,10 +58,13 @@ export default function Editor() {
     }
   }, [filePath, currentFileAssociation, drive, fsDriver])
 
+  const tEditor = t("editor")
+
   return Either.fromNullable(filePath)
     .chain(() => Either.fromNullable(currentFile))
     .fold(Null, (file) => (
       <Suspense fallback={<Loading />}>
+        <Helmet title={`${file.readableName}${file.extension} (${tEditor})`} />
         <Component file={file} />
       </Suspense>
     ))

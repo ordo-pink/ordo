@@ -3,6 +3,8 @@ import { Either } from "@ordo-pink/either"
 import { OrdoDirectory } from "@ordo-pink/fs-entity"
 import { Null, useContextMenu, useDrive, useRouteParams } from "@ordo-pink/react-utils"
 import { MouseEvent, useEffect, useState } from "react"
+import Helmet from "react-helmet"
+import { useTranslation } from "react-i18next"
 import FSActivityDirectory from "./fs-activity-directory"
 import FSActivityFile from "./fs-activity-file"
 
@@ -10,6 +12,7 @@ export default function FSActivity() {
   const drive = useDrive()
   const { path } = useRouteParams<"path">()
   const { showContextMenu } = useContextMenu()
+  const { t } = useTranslation("fs")
 
   const [currentDirectory, setCurrentDirectory] = useState<Nullable<IOrdoDirectory>>()
 
@@ -21,6 +24,9 @@ export default function FSActivity() {
       OrdoDirectory.findDirectoryDeep(`/${path}` as OrdoDirectoryPath, drive.root),
     )
   }, [path, drive])
+
+  const tRoot = t("root")
+  const tFs = t("fs")
 
   const handleContextMenu = (e: MouseEvent<HTMLDivElement>) => {
     e.preventDefault()
@@ -38,6 +44,8 @@ export default function FSActivity() {
       className="p-4 h-full w-full"
       onContextMenu={handleContextMenu}
     >
+      <Helmet title={`${root.readableName || tRoot} (${tFs})`} />
+
       <div className="flex flex-wrap items-start">
         {root.children.map((child) =>
           OrdoDirectory.isOrdoDirectory(child) ? (

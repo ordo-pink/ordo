@@ -13,6 +13,7 @@ import { _initRouter } from "@ordo-pink/stream-router"
 import { registerTranslations, translate, _initI18n } from "@ordo-pink/stream-translations"
 import Keycloak from "keycloak-js"
 import * as ReactDOM from "react-dom/client"
+import { Helmet } from "react-helmet"
 import { AiOutlineLogout } from "react-icons/ai"
 import { BsPersonCircle } from "react-icons/bs"
 import App from "./app/app"
@@ -128,6 +129,10 @@ const Ordo = () => {
 
   return (
     <div onClick={hideContextMenu}>
+      <Helmet
+        titleTemplate="%s | Ordo.pink"
+        defaultTitle="Ordo.pink"
+      />
       <App />
       <ContextMenu state$={contextMenu$} />
       <Modal />

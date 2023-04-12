@@ -30,6 +30,7 @@ export default createExtension(
   }) => {
     registerTranslations({
       ru: {
+        editor: "Редактор",
         placeholder: "Можно начинать...",
         "color-neutral": "Без цвета",
         "color-pink": "Розовый",
@@ -49,6 +50,7 @@ export default createExtension(
         "used-space": "Использовано",
       },
       en: {
+        editor: "Editor",
         placeholder: "Start typing...",
         "change-directory-color": "Change color...",
         "color-neutral": "No color",

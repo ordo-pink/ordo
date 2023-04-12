@@ -44,6 +44,7 @@ export default createExtension(
   }) => {
     registerTranslations({
       ru: {
+        fs: "Файловая система",
         "confirm-remove": 'Вы уверены, что хотите удалить "{{name}}"?',
         root: "Диски",
         devices: "Устройства",
@@ -74,6 +75,7 @@ export default createExtension(
         "invalid-name": "Выбранное название содержит запрещённые символы.",
       },
       en: {
+        fs: "File System",
         "confirm-remove": 'Are you sure you want to remove "{{name}}"?',
         root: "Disks",
         devices: "Devices",

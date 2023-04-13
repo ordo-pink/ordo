@@ -1,7 +1,7 @@
-import { OrdoDirectoryPath, IOrdoFile } from "@ordo-pink/common-types"
-import { OrdoDirectory } from "@ordo-pink/fs-entity"
+import { OrdoDirectoryPath, IOrdoFile, CommandContext } from "@ordo-pink/common-types"
+import { OrdoDirectory, OrdoFile } from "@ordo-pink/fs-entity"
 import { hideCommandPalette, showCommandPalette } from "@ordo-pink/stream-command-palette"
-import { drive$ } from "@ordo-pink/stream-drives"
+import { drive$, fsDriver$ } from "@ordo-pink/stream-drives"
 import { createExtension } from "@ordo-pink/stream-extensions"
 import { lazy } from "react"
 import { BsKanban } from "react-icons/bs"
@@ -27,6 +27,49 @@ export default createExtension(
     commands.on("open-kanban-board", ({ payload }) => {
       commands.emit("router.navigate", payload ? `/kanban${payload}` : "/kanban")
     })
+
+    commands.after(
+      "fs.move-directory.complete",
+      ({ payload }: CommandContext<{ oldPath: OrdoDirectoryPath; newPath: OrdoDirectoryPath }>) => {
+        const drive = drive$.getValue()
+        const driver = fsDriver$.getValue()
+
+        if (!drive || !driver) return
+
+        const files = OrdoDirectory.getFilesDeep(drive.root) as IOrdoFile<{
+          kanbans?: OrdoDirectoryPath[]
+        }>[]
+
+        files.forEach((file) => {
+          if (file.metadata.kanbans && file.metadata.kanbans.includes(payload.oldPath)) {
+            const updatedFile = OrdoFile.from({
+              ...file,
+              metadata: {
+                ...file.metadata,
+                kanbans: file.metadata.kanbans
+                  .filter((kanban) => kanban !== payload.oldPath)
+                  .concat([payload.newPath]),
+              },
+            })
+
+            commands.emit("fs.update-file", updatedFile)
+
+            driver.files
+              .getContent(file.path)
+              .then((res) => res.text())
+              .then((content) => {
+                commands.emit("fs.update-file-content", {
+                  file: updatedFile,
+                  content: content.replace(
+                    `(((Kanban::${payload.oldPath})))`,
+                    `(((Kanban::${payload.newPath})))`,
+                  ),
+                })
+              })
+          }
+        })
+      },
+    )
 
     registerEditorPlugin("kanban-plugin", {
       nodes: [OrdoKanbanNode],
@@ -81,9 +124,6 @@ export default createExtension(
         hideCommandPalette()
       },
     })
-
-    // TODO: Watch files for content updates, extract kanbans
-    // commands.after("editor.update-file-content", console.log)
 
     registerActivity("board", {
       routes: ["/kanban", "/kanban/:board"],

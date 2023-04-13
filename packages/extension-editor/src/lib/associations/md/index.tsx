@@ -63,7 +63,7 @@ const debouncedSave = debounce(
 
     const newFile = finishDraft(draft)
 
-    emit("editor.update-file-content", { file: newFile, content })
+    emit("fs.update-file-content", { file: newFile, content })
   },
   1000,
 )
@@ -182,7 +182,7 @@ export default memo(
     const content = useFileContentText(file)
 
     const handleChange = (state: EditorState) => {
-      if (!driver) return
+      if (!driver || content === null) return
 
       state.read(() => {
         const text = $convertToMarkdownString(
@@ -196,7 +196,9 @@ export default memo(
 
         const nodes = toNodeArray(state.toJSON().root)
 
-        debouncedSave(driver, file, nodes, text, emit)
+        if (content !== text) {
+          debouncedSave(driver, file, nodes, text, emit)
+        }
       })
     }
 

@@ -12,7 +12,6 @@ import "./editor.css"
 export default createExtension(
   "editor",
   ({
-    logger,
     commands,
     translate,
     registerActivity,
@@ -49,14 +48,6 @@ export default createExtension(
 
     registerEditorPlugin("highlight-code", {
       Plugin: lazy(() => import("./components/plugins/highlight-code-plugin")),
-    })
-
-    commands.on("update-file-content", ({ payload }) => {
-      const driver = fsDriver$.getValue()
-
-      if (!driver) return
-
-      driver.files.setContent(payload).catch(logger.error)
     })
 
     registerCommandPaletteItem({

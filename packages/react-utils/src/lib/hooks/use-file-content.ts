@@ -1,5 +1,6 @@
-import { IOrdoFile, Nullable } from "@ordo-pink/common-types"
+import { CommandContext, IOrdoFile, Nullable } from "@ordo-pink/common-types"
 import { useEffect, useState } from "react"
+import { useCommands } from "./use-commands"
 import { useFsDriver } from "./use-fs"
 
 export const useFileContentRaw = (file: IOrdoFile) => {
@@ -37,6 +38,24 @@ export const useFileContentText = (file: IOrdoFile) => {
   const response = useFileContentRaw(file)
 
   const [content, setContent] = useState<Nullable<string>>(null)
+  const { after, off } = useCommands()
+
+  useEffect(() => {
+    const handleUpdateFileContent = ({
+      payload,
+    }: CommandContext<{ file: IOrdoFile; content: string }>) => {
+      setContent(payload.content)
+    }
+
+    after("fs.update-file-content.complete", handleUpdateFileContent)
+
+    return () => {
+      off("fs")("update-file-content.complete", handleUpdateFileContent)
+    }
+  }, [after, off])
+
+  // TODO: Move updating file content to FS
+  // TODO: Hook on file content update and reload file
 
   useEffect(() => {
     if (!response) return

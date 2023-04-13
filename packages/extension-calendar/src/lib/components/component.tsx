@@ -134,7 +134,7 @@ export default function Calendar() {
             }>
 
             emit("fs.update-file", newFile)
-            emit("editor.update-file-content", { file: newFile, content: newContent })
+            emit("fs.update-file-content", { file: newFile, content: newContent })
           })
       },
     )

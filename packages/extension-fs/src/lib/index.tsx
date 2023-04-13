@@ -48,6 +48,7 @@ import { showCreateFileModal } from "./commands/files/show-create-file-modal"
 import { showRemoveFileModal } from "./commands/files/show-remove-file-modal"
 import { unarchiveFile } from "./commands/files/unarchive-file"
 import { updateFile } from "./commands/files/update-file"
+import { updateFileContent } from "./commands/files/update-file-content"
 import { uploadFile } from "./commands/files/upload-file"
 
 import en from "./translations/en.json"
@@ -96,6 +97,7 @@ export default createExtension(
     commands.on("create-file", createFile)
     commands.on("update-file", updateFile)
     commands.on("remove-file", removeFile)
+    commands.on("update-file-content", updateFileContent)
 
     // Colors -----------------------------------------------------------------
 

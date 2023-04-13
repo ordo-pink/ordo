@@ -1,4 +1,4 @@
-import { CommandContext, IOrdoFile, Nullable } from "@ordo-pink/common-types"
+import { CommandContext, IOrdoFile, Nullable, OrdoFilePath } from "@ordo-pink/common-types"
 import { Either } from "@ordo-pink/either"
 import { OrdoDirectory } from "@ordo-pink/fs-entity"
 import {
@@ -31,16 +31,26 @@ export default function Editor() {
   const [currentFile, setCurrentFile] = useState<Nullable<IOrdoFile>>(null)
 
   useEffect(() => {
+    const handleAfterMoveFile = ({
+      payload,
+    }: CommandContext<{ oldPath: OrdoFilePath; newPath: OrdoFilePath }>) => {
+      if (filePath && payload.oldPath === `/${filePath}`) {
+        emit("editor.open-file-in-editor", payload.newPath)
+      }
+    }
+
     const handleAfterRemoveFile = ({ payload }: CommandContext<IOrdoFile>) => {
       if (!filePath || payload.path !== `/${filePath}`) return
 
       emit("router.navigate", "/editor")
     }
 
-    after("fs.remove-file", handleAfterRemoveFile)
+    after("fs.remove-file.complete", handleAfterRemoveFile)
+    after("fs.move-file.complete", handleAfterMoveFile)
 
     return () => {
-      off("fs")("remove-file", handleAfterRemoveFile)
+      off("fs")("remove-file.complete", handleAfterRemoveFile)
+      off("fs")("move-file.complete", handleAfterMoveFile)
     }
   }, [filePath])
 

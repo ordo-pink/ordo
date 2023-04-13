@@ -38,7 +38,7 @@ export const moveFile = ({
 
       drive$.next(newDrive)
 
-      emit("fs.move-file.complete", result)
+      emit("fs.move-file.complete", { oldPath, newPath })
     })
     .catch((error) => {
       logger.error(error)

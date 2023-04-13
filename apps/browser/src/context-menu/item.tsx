@@ -25,6 +25,7 @@ export default function ContextMenuItem({ item, state }: Props) {
         hideContextMenu()
       }}
       text={t(item.commandName)}
+      disabled={item.disabled ? item.disabled(state.target) : false}
     >
       {item.accelerator ? <Accelerator accelerator={item.accelerator} /> : null}
     </ActionListItem>

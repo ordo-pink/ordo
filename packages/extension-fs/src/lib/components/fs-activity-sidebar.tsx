@@ -75,7 +75,10 @@ export default function FSActivitySidebar() {
   // TODO: Path breadcrumbs
   return Either.fromNullable(currentDirectory).fold(Null, (directory) => (
     <div className="flex flex-col space-y-8 px-2 py-8 items-start">
-      <OrdoButtonSuccess onClick={handleCreateClick}>
+      <OrdoButtonSuccess
+        onClick={handleCreateClick}
+        disabled={directory.path === "/.trash/"}
+      >
         <div className="flex items-center space-x-2">
           <BsPlus />
           <div>{tCreateButton}</div>

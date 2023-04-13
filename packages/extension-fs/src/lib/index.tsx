@@ -13,6 +13,7 @@ import {
   BsPencil,
   BsStar,
   BsStarFill,
+  BsTrash2Fill,
   BsTrash3,
   BsUpload,
 } from "react-icons/bs"
@@ -33,6 +34,7 @@ import { removeDirectory } from "./commands/directory/remove-directory"
 import { renameDirectory } from "./commands/directory/rename-directory"
 import { setDirectoryColor } from "./commands/directory/set-directory-color"
 import { setFavourite } from "./commands/directory/set-favourite"
+import { showClearTrashBinModal } from "./commands/directory/show-clear-trash-bin-modal"
 import { showCreateDirectoryModal } from "./commands/directory/show-create-directory-modal"
 import { showRemoveDirectoryModal } from "./commands/directory/show-remove-directory-modal"
 import { unarchiveDirectory } from "./commands/directory/unarchive-directory"
@@ -164,18 +166,45 @@ export default createExtension(
 
     // Trash bin --------------------------------------------------------------
 
-    // Archive ----------------------------------------------------------------
+    // Clear ------------------------------------------------------------------
 
-    const ARCHIVE_FILE_COMMAND = commands.on("archive-file", archiveFile)
-    registerContextMenuItem(ARCHIVE_FILE_COMMAND, {
+    commands.on("clear-trash-bin", () => {
+      const drive = drive$.getValue()
+
+      if (!drive) return
+
+      const trash = OrdoDirectory.findDirectoryDeep("/.trash/", drive.root)
+
+      trash && commands.emit("fs.remove-directory", trash)
+    })
+
+    commands.after("fs.remove-directory.complete", ({ payload }) => {
+      if (payload.path === "/.trash/") {
+        commands.emit("fs.create-directory", "/.trash/")
+      }
+    })
+
+    const CLEAR_TRASH_BIN = commands.on("show-clear-trash-bin-modal", showClearTrashBinModal)
+    registerContextMenuItem(CLEAR_TRASH_BIN, {
+      type: "delete",
+      Icon: BsTrash2Fill,
+      payloadCreator: () => void 0,
+      shouldShow: (target) => OrdoDirectory.isOrdoDirectory(target) && target.path === "/.trash/",
+      disabled: (target) => target.children.length === 0,
+    })
+
+    // Put to trash -----------------------------------------------------------
+
+    const MOVE_FILE_TO_TRASH = commands.on("move-file-to-trash", archiveFile)
+    registerContextMenuItem(MOVE_FILE_TO_TRASH, {
       type: "delete",
       Icon: BsTrash3,
       payloadCreator: (target) => target,
       shouldShow: (target) => OrdoFile.isOrdoFile(target) && !target.path.startsWith("/.trash/"),
     })
 
-    const ARCHIVE_DIRECTORY_COMMAND = commands.on("archive-directory", archiveDirectory)
-    registerContextMenuItem(ARCHIVE_DIRECTORY_COMMAND, {
+    const MOVE_DIRECTORY_TO_TRASH = commands.on("move-directory-to-trash", archiveDirectory)
+    registerContextMenuItem(MOVE_DIRECTORY_TO_TRASH, {
       type: "delete",
       Icon: BsTrash3,
       payloadCreator: (target) => target,
@@ -187,12 +216,11 @@ export default createExtension(
     })
 
     // TODO: CommandPalette
-    // TODO: Clear trash
     // TODO: Restore to where the file was moved to trash from (not to "/")
 
-    // Unarchive --------------------------------------------------------------
+    // Restore from trash -----------------------------------------------------
 
-    const UNARCHIVE_FILE_COMMAND = commands.on("unarchive-file", unarchiveFile)
+    const UNARCHIVE_FILE_COMMAND = commands.on("restore-file-from-trash", unarchiveFile)
     registerContextMenuItem(UNARCHIVE_FILE_COMMAND, {
       type: "delete",
       Icon: BsArrowCounterclockwise,
@@ -200,7 +228,10 @@ export default createExtension(
       shouldShow: (target) => OrdoFile.isOrdoFile(target) && target.path.startsWith("/.trash/"),
     })
 
-    const UNARCHIVE_DIRECTORY_COMMAND = commands.on("unarchive-directory", unarchiveDirectory)
+    const UNARCHIVE_DIRECTORY_COMMAND = commands.on(
+      "restore-directory-from-trash",
+      unarchiveDirectory,
+    )
     registerContextMenuItem(UNARCHIVE_DIRECTORY_COMMAND, {
       type: "delete",
       Icon: BsArrowCounterclockwise,

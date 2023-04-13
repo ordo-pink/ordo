@@ -22,6 +22,8 @@ export type RegisterContextMenuItemFn = UnaryFn<
       Icon: IconType
       accelerator?: string
       type: "create" | "read" | "update" | "delete"
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      disabled?: (target: any) => boolean
     },
     void
   >

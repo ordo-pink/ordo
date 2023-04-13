@@ -15,6 +15,7 @@ type Props = {
   isCurrent: boolean
   isLarge?: boolean
   style?: CSSProperties
+  disabled?: boolean
   onClick?: MouseEventHandler
   onMouseEnter?: MouseEventHandler
   onMouseLeave?: MouseEventHandler
@@ -29,6 +30,7 @@ export const ActionListItem = ({
   children,
   isCurrent,
   isLarge,
+  disabled,
   onClick = noOp,
   onMouseEnter = noOp,
   onMouseLeave = noOp,
@@ -42,10 +44,12 @@ export const ActionListItem = ({
     <div>
       <div
         className={`action-list-item select-none ${isLarge && "px-4 py-2 text-lg"} ${
-          isCurrent && "active"
-        }`}
+          disabled
+            ? "text-neutral-300 dark:text-neutral-400"
+            : "hover:bg-gradient-to-r from-rose-300/40 dark:from-slate-600 to-purple-300/40 dark:to-gray-600 cursor-pointer"
+        } ${isCurrent && "active"}`}
         style={style}
-        onClick={onClick}
+        onClick={(e) => (disabled ? void 0 : onClick(e))}
         onMouseEnter={onMouseEnter}
         onMouseLeave={onMouseLeave}
         onContextMenu={onContextMenu}

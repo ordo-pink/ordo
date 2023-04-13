@@ -1,5 +1,5 @@
 .action-list-item {
-  @apply py-2 md:py-0.5 hover:bg-gradient-to-r from-rose-300/40 dark:from-slate-600 to-purple-300/40 dark:to-gray-600 rounded-md px-2 flex space-x-8 justify-between items-center cursor-pointer;
+  @apply py-2 md:py-0.5 rounded-md px-2 flex space-x-8 justify-between items-center;
 }
 
 .action-list-item.active {

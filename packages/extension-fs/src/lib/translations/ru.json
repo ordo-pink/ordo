@@ -11,10 +11,10 @@
   "locations": "Быстрый доступ",
   "shared-directories": "Общий доступ",
   "trash": "Корзина",
-  "archive-file": "В корзину",
-  "unarchive-file": "Вернуть из корзины",
-  "archive-directory": "В корзину",
-  "unarchive-directory": "Вернуть из корзины",
+  "move-file-to-trash": "В корзину",
+  "restore-file-from-trash": "Вернуть из корзины",
+  "move-directory-to-trash": "В корзину",
+  "restore-directory-from-trash": "Вернуть из корзины",
   "show-create-file-modal": "Создать файл",
   "show-remove-file-modal": "Удалить",
   "show-create-directory-modal": "Создать папку",
@@ -48,5 +48,9 @@
   "color-green": "Зелёный",
   "color-blue": "Синий",
   "color-purple": "Фиолетовый",
-  "change-directory-color": "Изменить цвет..."
+  "change-directory-color": "Изменить цвет...",
+  "show-clear-trash-bin-modal": "Очистить корзину",
+  "clear-trash-bin": "Очистить корзину",
+  "confirm-clear-trash-bin": "Вы уверены, что хотите полностью удалить содержимое корзины? Это действие необратимо.",
+  "clear-trash-bin-button": "Очистить"
 }

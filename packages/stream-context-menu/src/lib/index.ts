@@ -31,6 +31,8 @@ export type ContextMenuItem = {
   Icon: IconType
   accelerator?: string
   type: ContextMenuItemType
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  disabled?: (target: any) => boolean
 }
 
 const addContextMenuItem$ = new Subject<ContextMenuItem>()

@@ -11,10 +11,10 @@
   "locations": "Quick Access",
   "shared-directories": "Shared Access",
   "trash": "Trash",
-  "archive-file": "Put to trash",
-  "unarchive-file": "Restore from trash",
-  "archive-directory": "Put to trash",
-  "unarchive-directory": "Restore from trash",
+  "move-file-to-trash": "Put to trash",
+  "restore-file-from-trash": "Restore from trash",
+  "move-directory-to-trash": "Put to trash",
+  "restore-directory-from-trash": "Restore from trash",
   "show-create-file-modal": "Create file",
   "show-remove-file-modal": "Remove",
   "show-create-directory-modal": "Create directory",
@@ -48,5 +48,9 @@
   "color-yellow": "Yellow",
   "color-green": "Green",
   "color-blue": "Blue",
-  "color-purple": "Purple"
+  "color-purple": "Purple",
+  "show-clear-trash-bin-modal": "Clear trash bin",
+  "clear-trash-bin": "Clear trash bin",
+  "confirm-clear-trash-bin": "Are you sure you want to remove all files in the trash bin? This action is irreversible.",
+  "clear-trash-bin-button": "Clear"
 }

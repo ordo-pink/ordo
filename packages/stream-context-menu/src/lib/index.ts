@@ -14,6 +14,8 @@ export type ShowContextMenuParams = {
 
 export const contextMenuToggle$ = new BehaviorSubject<Nullable<ShowContextMenuParams>>(null)
 
+export type ContextMenuItemType = "create" | "read" | "update" | "delete"
+
 export type ContextMenuItem = {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   shouldShow: (target: any) => boolean
@@ -24,6 +26,7 @@ export type ContextMenuItem = {
   name: string
   Icon: IconType
   accelerator?: string
+  type: ContextMenuItemType
 }
 
 const addContextMenuItem$ = new Subject<ContextMenuItem>()

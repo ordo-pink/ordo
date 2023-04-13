@@ -162,6 +162,7 @@ export default createExtension(
     )
 
     registerContextMenuItem(EXPAND_DIRECTORIES_COMMAND, {
+      type: "update",
       Icon: BsFolder2Open,
       payloadCreator: (target) => target,
       shouldShow: (target) => {
@@ -196,6 +197,7 @@ export default createExtension(
     )
 
     registerContextMenuItem(COLLAPSE_DIRECTORIES_COMMAND, {
+      type: "update",
       Icon: BsFolder2,
       payloadCreator: (target) => target,
       shouldShow: (target) => {
@@ -254,6 +256,7 @@ export default createExtension(
     )
 
     registerContextMenuItem(OPEN_FILE_COMMAND, {
+      type: "read",
       Icon: BsReverseLayoutTextSidebarReverse,
       payloadCreator: (target) => target.path,
       shouldShow: (target) => OrdoFile.isOrdoFile(target),

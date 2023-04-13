@@ -104,6 +104,7 @@ export default createExtension(
     const CHANGE_DIRECTORY_COLOR_COMMAND = commands.on("change-directory-color", setDirectoryColor)
 
     registerContextMenuItem(CHANGE_DIRECTORY_COLOR_COMMAND, {
+      type: "update",
       Icon: BsPalette2,
       payloadCreator: (target) => target,
       shouldShow: (target) =>
@@ -120,6 +121,7 @@ export default createExtension(
     const SET_FAVIOURITE_COMMAND = commands.on("set-favourite", setFavourite)
 
     registerContextMenuItem(SET_FAVIOURITE_COMMAND, {
+      type: "update",
       Icon: BsStarFill,
       payloadCreator: (target) => target,
       shouldShow: (target) =>
@@ -141,6 +143,7 @@ export default createExtension(
     const UNSET_FAVOURITE_COMMAND = commands.on("unset-favourite", unsetFavourite)
 
     registerContextMenuItem(UNSET_FAVOURITE_COMMAND, {
+      type: "update",
       Icon: BsStar,
       payloadCreator: (target) => target,
       shouldShow: (target) =>
@@ -163,6 +166,7 @@ export default createExtension(
 
     const ARCHIVE_FILE_COMMAND = commands.on("archive-file", archiveFile)
     registerContextMenuItem(ARCHIVE_FILE_COMMAND, {
+      type: "delete",
       Icon: BsTrash3,
       payloadCreator: (target) => target,
       shouldShow: (target) => OrdoFile.isOrdoFile(target) && !target.path.startsWith("/.trash/"),
@@ -170,6 +174,7 @@ export default createExtension(
 
     const ARCHIVE_DIRECTORY_COMMAND = commands.on("archive-directory", archiveDirectory)
     registerContextMenuItem(ARCHIVE_DIRECTORY_COMMAND, {
+      type: "delete",
       Icon: BsTrash3,
       payloadCreator: (target) => target,
       shouldShow: (target) =>
@@ -187,6 +192,7 @@ export default createExtension(
 
     const UNARCHIVE_FILE_COMMAND = commands.on("unarchive-file", unarchiveFile)
     registerContextMenuItem(UNARCHIVE_FILE_COMMAND, {
+      type: "delete",
       Icon: BsArrowCounterclockwise,
       payloadCreator: (target) => target,
       shouldShow: (target) => OrdoFile.isOrdoFile(target) && target.path.startsWith("/.trash/"),
@@ -194,6 +200,7 @@ export default createExtension(
 
     const UNARCHIVE_DIRECTORY_COMMAND = commands.on("unarchive-directory", unarchiveDirectory)
     registerContextMenuItem(UNARCHIVE_DIRECTORY_COMMAND, {
+      type: "delete",
       Icon: BsArrowCounterclockwise,
       payloadCreator: (target) => target,
       shouldShow: (target) =>
@@ -209,6 +216,7 @@ export default createExtension(
 
     const DOWNLOAD_FILE_COMMAND = commands.on("download-file", downloadFile)
     registerContextMenuItem(DOWNLOAD_FILE_COMMAND, {
+      type: "read",
       Icon: BsDownload,
       payloadCreator: (target) => target,
       shouldShow: (target) => OrdoFile.isOrdoFile(target),
@@ -227,6 +235,7 @@ export default createExtension(
 
     const UPLOAD_FILE_COMMAND = commands.on("show-upload-file-modal", uploadFile)
     registerContextMenuItem(UPLOAD_FILE_COMMAND, {
+      type: "create",
       Icon: BsUpload,
       payloadCreator: (target) => target,
       shouldShow: (target) => OrdoDirectory.isOrdoDirectory(target) && target.path !== "/.trash/",
@@ -245,6 +254,7 @@ export default createExtension(
 
     const RENAME_FILE_COMMAND = commands.on("show-rename-file-modal", renameFile)
     registerContextMenuItem(RENAME_FILE_COMMAND, {
+      type: "update",
       Icon: BsPencil,
       payloadCreator: (target) => ({ file: target }),
       shouldShow: (target) => OrdoFile.isOrdoFile(target),
@@ -252,6 +262,7 @@ export default createExtension(
 
     const RENAME_DIRECTORY_COMMAND = commands.on("show-rename-directory-modal", renameDirectory)
     registerContextMenuItem(RENAME_DIRECTORY_COMMAND, {
+      type: "update",
       Icon: BsPencil,
       payloadCreator: (directory) => ({ directory }),
       shouldShow: (target) =>
@@ -265,6 +276,7 @@ export default createExtension(
     const CREATE_FILE_COMMAND = commands.on("show-create-file-modal", showCreateFileModal)
 
     registerContextMenuItem(CREATE_FILE_COMMAND, {
+      type: "create",
       Icon: BsFileEarmarkPlus,
       payloadCreator: (parent) => ({ parent }),
       shouldShow: (target) => OrdoDirectory.isOrdoDirectory(target) && target.path !== "/.trash/",
@@ -287,6 +299,7 @@ export default createExtension(
     )
 
     registerContextMenuItem(CREATE_DIRECTORY_COMMAND, {
+      type: "create",
       Icon: BsFolderPlus,
       payloadCreator: (target) => target,
       shouldShow: (target) => OrdoDirectory.isOrdoDirectory(target) && target.path !== "/.trash/",
@@ -306,6 +319,7 @@ export default createExtension(
     const REMOVE_FILE_COMMAND = commands.on("show-remove-file-modal", showRemoveFileModal)
 
     registerContextMenuItem(REMOVE_FILE_COMMAND, {
+      type: "delete",
       Icon: BsFileEarmarkMinus,
       payloadCreator: (target) => target,
       shouldShow: (target) => OrdoFile.isOrdoFile(target),
@@ -326,6 +340,7 @@ export default createExtension(
     )
 
     registerContextMenuItem(REMOVE_DIRECTORY_COMMAND, {
+      type: "delete",
       Icon: BsFolderMinus,
       payloadCreator: (target) => target,
       shouldShow: (target) =>

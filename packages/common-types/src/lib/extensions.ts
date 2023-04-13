@@ -21,6 +21,7 @@ export type RegisterContextMenuItemFn = UnaryFn<
       payloadCreator: (target: any) => any
       Icon: IconType
       accelerator?: string
+      type: "create" | "read" | "update" | "delete"
     },
     void
   >

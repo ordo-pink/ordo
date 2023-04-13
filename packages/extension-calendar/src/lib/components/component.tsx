@@ -44,8 +44,7 @@ export default function Calendar() {
   useEffect(() => {
     if (!drive) return
 
-    const dates = drive.root
-      .getFilesDeep()
+    const dates = OrdoDirectory.getFilesDeep(drive.root)
       .filter((file) => Boolean(file.metadata["dates"]))
       .flatMap((file) =>
         (file.metadata["dates"] as { start: Date; end: Nullable<Date> }[]).map(({ start, end }) => {

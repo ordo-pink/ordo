@@ -100,7 +100,7 @@ export default createExtension(
         if (!drive) return
 
         showCommandPalette(
-          drive.root.getFilesDeep().map((file) => ({
+          OrdoDirectory.getFilesDeep(drive.root).map((file) => ({
             id: file.path,
             name: file.readableName,
             Icon: () => <FileIcon file={file} />,

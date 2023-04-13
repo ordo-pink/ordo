@@ -8,7 +8,7 @@ export const useSubscription = <T>(observable: Observable<T>, initialState?: T) 
   )
 
   useEffect(() => {
-    const subscription = observable.subscribe(setState)
+    const subscription = observable.subscribe((value) => setState(value))
 
     return () => {
       subscription.unsubscribe()

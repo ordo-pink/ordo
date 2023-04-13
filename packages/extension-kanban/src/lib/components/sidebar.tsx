@@ -1,4 +1,5 @@
 import { OrdoDirectoryPath, IOrdoFile } from "@ordo-pink/common-types"
+import { OrdoDirectory } from "@ordo-pink/fs-entity"
 import { useDrive, useRouteParams } from "@ordo-pink/react-utils"
 import { useState, useEffect } from "react"
 import KanbanFileReference from "./kanban-file-reference"
@@ -14,7 +15,9 @@ export default function Sidebar() {
   useEffect(() => {
     if (!drive) return
 
-    const files = drive.root.getFilesDeep() as IOrdoFile<{ kanbans: OrdoDirectoryPath[] }>[]
+    const files = OrdoDirectory.getFilesDeep(drive.root) as IOrdoFile<{
+      kanbans: OrdoDirectoryPath[]
+    }>[]
 
     setKanbans(
       files

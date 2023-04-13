@@ -24,9 +24,15 @@ export type CommandListener<Type extends string = string, Payload = any> = [
 ]
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type RegisterredCommand<Payload = any, Type extends string = string> = [
+  Type,
+  CommandHandler<Payload>,
+]
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type RegisterCommandFn<Payload = any, Type extends string = string> = UnaryFn<
   string,
-  BinaryFn<Type, CommandHandler<Payload>, [Type, CommandHandler<Payload>]>
+  BinaryFn<Type, CommandHandler<Payload>, RegisterredCommand<Payload, Type>>
 >
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any

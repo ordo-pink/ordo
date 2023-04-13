@@ -1,6 +1,7 @@
 import { IOrdoFile } from "@ordo-pink/common-types"
 import { Either } from "@ordo-pink/either"
 import { noOp } from "@ordo-pink/fns"
+import { OrdoDirectory } from "@ordo-pink/fs-entity"
 import { Null, useContextMenu, useDrive, useCommands } from "@ordo-pink/react-utils"
 import { Switch } from "@ordo-pink/switch"
 import Fuse from "fuse.js"
@@ -34,7 +35,7 @@ function FileExplorer() {
   useEffect(() => {
     if (!drive) return
 
-    fuse.setCollection(drive.root.getFilesDeep())
+    fuse.setCollection(OrdoDirectory.getFilesDeep(drive.root))
   }, [drive])
 
   useEffect(() => {

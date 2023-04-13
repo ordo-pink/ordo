@@ -33,65 +33,6 @@ const ordoDirectory = (raw: IOrdoDirectoryRaw): IOrdoDirectory => {
     children,
     path: raw.path,
     metadata: raw.metadata,
-    findDirectory: (path) =>
-      (children.find(
-        (child) => child.path === path && OrdoDirectory.isOrdoDirectory(child),
-      ) as IOrdoDirectory) ?? null,
-    findFile: (path) =>
-      (children.find((child) => child.path === path && OrdoFile.isOrdoFile(child)) as IOrdoFile) ??
-      null,
-    findFileDeep: (path) => {
-      const found = children.find((child) => child.path === path)
-
-      if (!found || OrdoDirectory.isOrdoDirectory(found)) return null
-
-      return found
-    },
-    findDirectoryDeep: (path) => {
-      const found = children.find((child) => child.path === path)
-
-      if (!found || OrdoFile.isOrdoFile(found)) return null
-
-      return found
-    },
-    getFilesDeep: () => {
-      const files = [] as IOrdoFile[]
-
-      for (const item of children) {
-        if (OrdoDirectory.isOrdoDirectory(item)) {
-          files.push(...item.getFilesDeep())
-        } else {
-          files.push(item)
-        }
-      }
-
-      return files
-    },
-    getDirectoriesDeep: () => {
-      const directories = [] as IOrdoDirectory[]
-
-      for (const item of children) {
-        if (OrdoDirectory.isOrdoDirectory(item)) {
-          directories.push(item)
-          directories.push(...item.getDirectoriesDeep())
-        }
-      }
-
-      return directories
-    },
-    toArray: () => {
-      const items = [] as Array<IOrdoDirectory | IOrdoFile>
-
-      for (const item of children) {
-        if (OrdoDirectory.isOrdoDirectory(item)) {
-          items.push(...item.toArray())
-        }
-
-        items.push(item)
-      }
-
-      return items
-    },
   }
 }
 
@@ -213,5 +154,30 @@ export const OrdoDirectory: IOrdoDirectoryStatic = {
     if (!found || OrdoDirectory.isOrdoDirectory(found)) return null
 
     return found
+  },
+  getDirectoriesDeep: (directory) => {
+    const directories = [] as IOrdoDirectory[]
+
+    for (const child of directory.children) {
+      if (OrdoDirectory.isOrdoDirectory(child)) {
+        directories.push(child)
+        directories.push(...OrdoDirectory.getDirectoriesDeep(child))
+      }
+    }
+
+    return directories
+  },
+  getFilesDeep: (directory) => {
+    const files = [] as IOrdoFile[]
+
+    for (const child of directory.children) {
+      if (OrdoFile.isOrdoFile(child)) {
+        files.push(child)
+      } else {
+        files.push(...OrdoDirectory.getFilesDeep(child))
+      }
+    }
+
+    return files
   },
 }

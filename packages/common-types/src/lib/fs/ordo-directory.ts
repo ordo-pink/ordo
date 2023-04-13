@@ -1,6 +1,6 @@
 import { NoForbiddenCharacters } from "./common"
 import { IOrdoFileRaw, IOrdoFile, OrdoFilePath, ValidatedOrdoFilePath } from "./ordo-file"
-import { Nullable, ThunkFn, UnaryFn } from "../types"
+import { Nullable, UnaryFn } from "../types"
 
 /**
  * A union of possible children of an OrdoDirectoryRaw.
@@ -78,46 +78,6 @@ export type IOrdoDirectory<T extends Record<string, unknown> = Record<string, un
    * @see IOrdoDirectoryRaw.metadata
    */
   metadata: { color?: Colour; isExpanded?: boolean; isFavourite?: boolean } & T
-
-  /**
-   * Returns an array of all elements of the directory including the
-   * descendants of nested directories.
-   */
-  toArray: ThunkFn<Array<IOrdoDirectory | IOrdoFile>>
-
-  /**
-   * Returns all files contained in the directory including files in the child
-   * directories.
-   */
-  getFilesDeep: ThunkFn<IOrdoFile[]>
-
-  /**
-   * Returns all directories contained in the directory including directories
-   * in the child directories.
-   */
-  getDirectoriesDeep: ThunkFn<IOrdoDirectory[]>
-
-  /**
-   * Returns a direct descendant directory of current directory with given
-   * path.
-   */
-  findDirectory: UnaryFn<OrdoDirectoryPath, Nullable<IOrdoDirectory>>
-
-  /**
-   * Returns a nested descendant directory of current directory with given
-   * path.
-   */
-  findDirectoryDeep: UnaryFn<OrdoDirectoryPath, Nullable<IOrdoDirectory>>
-
-  /**
-   * Returns a direct descendant file of current directory with given path.
-   */
-  findFile: UnaryFn<OrdoFilePath, Nullable<IOrdoFile>>
-
-  /**
-   * Returns a nested descendant file of current directory with given path.
-   */
-  findFileDeep: UnaryFn<OrdoFilePath, Nullable<IOrdoFile>>
 }
 
 /**
@@ -228,4 +188,8 @@ export interface IOrdoDirectoryStatic {
     path: ValidatedOrdoDirectoryPath<Path>,
     root: IOrdoDirectory,
   ) => Nullable<IOrdoDirectory>
+
+  getFilesDeep: (directory: IOrdoDirectory) => IOrdoFile[]
+
+  getDirectoriesDeep: (directory: IOrdoDirectory) => IOrdoDirectory[]
 }

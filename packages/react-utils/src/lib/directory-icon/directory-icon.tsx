@@ -6,7 +6,7 @@ import {
   AiFillFolder,
   AiOutlineFolder,
 } from "react-icons/ai"
-import { BsFolder, BsFolderFill, BsTrash3, BsTrash3Fill } from "react-icons/bs"
+import { BsFolder, BsFolderFill, BsStarFill, BsTrash3, BsTrash3Fill } from "react-icons/bs"
 import { Null } from "../null/null"
 
 export enum IconSize {
@@ -95,13 +95,25 @@ export const DirectoryIcon = ({ directory, showExpansion, size }: Props) => {
     .case(IconSize.LARGE, () => (
       <div className="relative">
         <Icon className={` ${iconColors["neutral"]}`} />
-        <div
-          className={`absolute p-2 w-4 bottom-0.5 rounded-full shadow-md ${
-            directory.metadata.color && directory.metadata.color !== "neutral"
-              ? backgroundColors[directory.metadata.color ?? ""]
-              : ""
-          }`}
-        />
+        {directory.metadata.isFavourite ? (
+          <div
+            className={`absolute text-lg bottom-0 ${
+              directory.metadata.color && directory.metadata.color !== "neutral"
+                ? iconColors[directory.metadata.color]
+                : "text-neutral-500"
+            }`}
+          >
+            <BsStarFill className="drop-shadow-md" />
+          </div>
+        ) : (
+          <div
+            className={`absolute p-2 w-4 bottom-0.5 rounded-full shadow-md ${
+              directory.metadata.color && directory.metadata.color !== "neutral"
+                ? backgroundColors[directory.metadata.color ?? ""]
+                : ""
+            }`}
+          />
+        )}
       </div>
     ))
     .default(() => (

@@ -5,6 +5,12 @@
     "declaration": true,
     "types": ["node"]
   },
-  "include": ["src/**/*.ts", "src/lib/index.tsx"],
+  "include": [
+    "src/**/*.ts",
+    "src/lib/index.tsx",
+    "src/lib/commands/files/rename-file.tsx",
+    "src/lib/commands/files/upload-file.tsx",
+    "src/lib/commands/directory/rename-directory.tsx"
+  ],
   "exclude": ["jest.config.ts", "src/**/*.spec.ts", "src/**/*.test.ts"]
 }

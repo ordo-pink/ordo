@@ -4,8 +4,8 @@ import { fsDriver$, drive$ } from "@ordo-pink/stream-drives"
 import { createDraft, finishDraft } from "immer"
 
 export const updateFile: CommandHandler<IOrdoFile> = ({ logger, payload }) => {
-  const driver = fsDriver$.value
-  const drive = drive$.value
+  const driver = fsDriver$.getValue()
+  const drive = drive$.getValue()
 
   if (!driver || !drive) return
 

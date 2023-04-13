@@ -3,6 +3,8 @@ import { Either } from "@ordo-pink/either"
 import { OrdoDirectory } from "@ordo-pink/fs-entity"
 import {
   ActionListItem,
+  DirectoryIcon,
+  IconSize,
   Null,
   OrdoButtonSuccess,
   useCommands,
@@ -22,9 +24,17 @@ export default function FSActivitySidebar() {
   const { emit } = useCommands()
 
   const [currentDirectory, setCurrentDirectory] = useState<Nullable<IOrdoDirectory>>(null)
+  const [favourites, setFavourites] = useState<IOrdoDirectory[]>([])
 
   useEffect(() => {
     if (!drive) return setCurrentDirectory(null)
+
+    setFavourites(
+      OrdoDirectory.getDirectoriesDeep(drive.root)
+        .filter((item) => item.metadata.isFavourite)
+        .sort((a, b) => a.readableName.localeCompare(b.readableName)),
+    )
+
     if (!path) return setCurrentDirectory(drive.root)
 
     setCurrentDirectory(
@@ -107,11 +117,40 @@ export default function FSActivitySidebar() {
         />
       </div>
 
-      <div className="flex flex-col w-full">
-        <h2 className="mb-4 uppercase text-neutral-500 font-bold text-sm text-center">
-          {tFavourites}
-        </h2>
-      </div>
+      {Either.fromBoolean(favourites.length > 0)
+        .map(() => favourites)
+        .fold(Null, (favs) => (
+          <div className="flex flex-col w-full">
+            <h2 className="mb-4 uppercase text-neutral-500 font-bold text-sm text-center">
+              {tFavourites}
+            </h2>
+
+            {favs.map((favourite) => (
+              <ActionListItem
+                key={favourite.path}
+                isCurrent={directory.path === favourite.path}
+                text={favourite.readableName}
+                Icon={() => (
+                  <DirectoryIcon
+                    directory={favourite}
+                    size={IconSize.EXTRA_SMALL}
+                  />
+                )}
+                onContextMenu={(event) => {
+                  event.preventDefault()
+                  event.stopPropagation()
+
+                  showContextMenu({
+                    x: event.pageX,
+                    y: event.pageY,
+                    target: favourite,
+                  })
+                }}
+                onClick={() => emit("router.navigate", `/fs${favourite.path}`)}
+              />
+            ))}
+          </div>
+        ))}
 
       <div className="flex flex-col w-full">
         <h2 className="mb-4 uppercase text-neutral-500 font-bold text-sm text-center">{tRecent}</h2>

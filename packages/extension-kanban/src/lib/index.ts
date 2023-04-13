@@ -1,4 +1,5 @@
 import { OrdoDirectoryPath, IOrdoFile } from "@ordo-pink/common-types"
+import { OrdoDirectory } from "@ordo-pink/fs-entity"
 import { hideCommandPalette, showCommandPalette } from "@ordo-pink/stream-command-palette"
 import { drive$ } from "@ordo-pink/stream-drives"
 import { createExtension } from "@ordo-pink/stream-extensions"
@@ -43,8 +44,7 @@ export default createExtension(
 
         hideCommandPalette()
 
-        const kanbanFiles = drive.root
-          .getFilesDeep()
+        const kanbanFiles = OrdoDirectory.getFilesDeep(drive.root)
           .filter((file) => Boolean(file.metadata["kanbans"]))
           .reduce((acc, file) => {
             ;(file.metadata["kanbans"] as OrdoDirectoryPath[]).forEach((kanban) => {

@@ -1,11 +1,13 @@
 import { CommandContext, IOrdoFile } from "@ordo-pink/common-types"
 import { OrdoFile } from "@ordo-pink/fs-entity"
+import { useCommands } from "@ordo-pink/react-utils"
 import { fsDriver$, drive$ } from "@ordo-pink/stream-drives"
 import { createDraft, finishDraft } from "immer"
 
 export const removeFile = ({ logger, payload }: CommandContext<IOrdoFile>) => {
-  const driver = fsDriver$.value
-  const drive = drive$.value
+  const driver = fsDriver$.getValue()
+  const drive = drive$.getValue()
+  const { emit } = useCommands()
 
   if (!drive || !driver) return
 
@@ -21,5 +23,18 @@ export const removeFile = ({ logger, payload }: CommandContext<IOrdoFile>) => {
 
   drive$.next(newDrive)
 
-  driver?.files.remove(payload.path).catch(logger.error)
+  driver?.files
+    .remove(payload.path)
+    .then(() => {
+      emit("fs.remove-file.complete", payload)
+    })
+    .catch((error) => {
+      logger.error(error)
+
+      parent.children.push(payload)
+      const revertDrive = finishDraft(draft)
+      drive$.next(revertDrive)
+
+      emit("fs.remove-file.error", error)
+    })
 }

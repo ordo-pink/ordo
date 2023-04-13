@@ -19,6 +19,7 @@ export const downloadFile = ({ payload }: CommandContext<IOrdoFile>) => {
 
       a.click()
 
+      // TODO: Check if it actually works!
       setTimeout(() => {
         document.body.removeChild(a)
         URL.revokeObjectURL(url)

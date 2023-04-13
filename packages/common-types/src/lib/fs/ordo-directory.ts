@@ -42,6 +42,19 @@ export interface IOrdoDirectoryRaw<T extends Record<string, unknown> = Record<st
   metadata: T
 }
 
+export const Colours = [
+  "neutral",
+  "pink",
+  "red",
+  "orange",
+  "yellow",
+  "green",
+  "blue",
+  "purple",
+] as const
+
+export type Colour = (typeof Colours)[number]
+
 /**
  * OrdoDirectory to be used in the application.
  */
@@ -64,7 +77,7 @@ export type IOrdoDirectory<T extends Record<string, unknown> = Record<string, un
   /**
    * @see IOrdoDirectoryRaw.metadata
    */
-  metadata: T
+  metadata: { color?: Colour; isExpanded?: boolean; isFavourite?: boolean } & T
 
   /**
    * Returns an array of all elements of the directory including the

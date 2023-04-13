@@ -1,4 +1,10 @@
-import { CommandContext, IOrdoDirectory, IOrdoFile, OrdoFilePath } from "@ordo-pink/common-types"
+import {
+  Colours,
+  CommandContext,
+  IOrdoDirectory,
+  IOrdoFile,
+  OrdoFilePath,
+} from "@ordo-pink/common-types"
 import { OrdoDirectory, OrdoFile } from "@ordo-pink/fs-entity"
 import { FileIcon } from "@ordo-pink/react-utils"
 import { hideCommandPalette, showCommandPalette } from "@ordo-pink/stream-command-palette"
@@ -11,7 +17,6 @@ import {
   BsPalette2,
   BsReverseLayoutTextSidebarReverse,
 } from "react-icons/bs"
-import { backgroundColors } from "./colors"
 
 import "./editor.css"
 
@@ -285,7 +290,7 @@ export default createExtension(
 
     const CHANGE_DIRECTORY_COLOR_COMMAND = commands.on("change-directory-color", ({ payload }) => {
       showCommandPalette(
-        Object.keys(backgroundColors).map((color) => ({
+        Colours.map((color) => ({
           id: color,
           name: translate(`color-${color}`),
           onSelect: () => {
@@ -296,7 +301,7 @@ export default createExtension(
 
             hideCommandPalette()
           },
-          Icon: () => <div className={`rounded-full p-2 ${backgroundColors[color]}`} />,
+          Icon: () => <div className={`rounded-full p-2 ${`bg-${color}`}`} />,
         })),
       )
     })

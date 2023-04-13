@@ -88,7 +88,7 @@ export default function FSActivity() {
               const isOrdoDirectory = OrdoDirectory.isOrdoDirectory(event.active.data.current)
 
               emit(
-                isOrdoDirectory ? "fs.show-remove-directory-modal" : "fs.show-remove-file-modal",
+                isOrdoDirectory ? "fs.archive-directory" : "fs.archive-file",
                 event.active.data.current,
               )
 

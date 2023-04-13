@@ -6,21 +6,28 @@ import { createExtension } from "@ordo-pink/stream-extensions"
 import { lazy } from "react"
 import { AiFillFolder, AiOutlineFolder } from "react-icons/ai"
 import {
+  BsArrowCounterclockwise,
   BsDownload,
   BsFileEarmarkMinus,
   BsFileEarmarkPlus,
   BsFolderMinus,
   BsFolderPlus,
   BsPencil,
+  BsTrash3,
   BsUpload,
 } from "react-icons/bs"
+import { archiveDirectory } from "./commands/directory/archive-directory"
 import { createDirectory } from "./commands/directory/create-directory"
 import { moveDirectory } from "./commands/directory/move-directory"
 import { removeDirectory } from "./commands/directory/remove-directory"
+import { unarchiveDirectory } from "./commands/directory/unarchive-directory"
 import { updateDirectory } from "./commands/directory/update-directory"
+import { archiveFile } from "./commands/files/archive-file"
 import { createFile } from "./commands/files/create-file"
+import { downloadFile } from "./commands/files/download-file"
 import { moveFile } from "./commands/files/move-file"
 import { removeFile } from "./commands/files/remove-file"
+import { unarchiveFile } from "./commands/files/unarchive-file"
 import { updateFile } from "./commands/files/update-file"
 import CreateDirectoryModal from "./components/create-directory-modal"
 import CreateFileModal from "./components/create-file-modal"
@@ -46,13 +53,17 @@ export default createExtension(
       ru: {
         fs: "Файловая система",
         "confirm-remove": 'Вы уверены, что хотите удалить "{{name}}"?',
-        root: "Диски",
-        devices: "Устройства",
+        root: "Мой диск",
+        devices: "Мои устройства",
         favourites: "Избранное",
         recent: "Недавние",
         locations: "Быстрый доступ",
         "shared-directories": "Общий доступ",
-        trash: "Трэш",
+        trash: "Корзина",
+        "archive-file": "Отправить в корзину",
+        "unarchive-file": "Вернуть из корзины",
+        "archive-directory": "Отправить в корзину",
+        "unarchive-directory": "Вернуть из корзины",
         "show-create-file-modal": "Создать файл",
         "show-remove-file-modal": "Удалить",
         "show-create-directory-modal": "Создать папку",
@@ -80,13 +91,17 @@ export default createExtension(
       en: {
         fs: "File System",
         "confirm-remove": 'Are you sure you want to remove "{{name}}"?',
-        root: "Disks",
-        devices: "Devices",
+        root: "My Disk",
+        devices: "My Devices",
         favourites: "Favourites",
         recent: "Recent",
         locations: "Quick Access",
         "shared-directories": "Shared Access",
         trash: "Trash",
+        "archive-file": "Put to trash",
+        "unarchive-file": "Restore from trash",
+        "archive-directory": "Put to trash",
+        "unarchive-directory": "Restore from trash",
         "show-create-file-modal": "Create file",
         "show-remove-file-modal": "Remove",
         "show-create-directory-modal": "Create directory",
@@ -128,32 +143,42 @@ export default createExtension(
     commands.on("update-file", updateFile)
     commands.on("remove-file", removeFile)
 
-    const downloadFileCommand = commands.on("download-file", ({ payload }) => {
-      const driver = fsDriver$.getValue()
-
-      if (!driver) return
-
-      driver.files
-        .getContent(payload.path)
-        .then((res) => res.blob())
-        .then((blob) => URL.createObjectURL(blob))
-        .then((url) => {
-          const a = document.createElement("a")
-
-          a.href = url
-          a.download = `${payload.readableName}${payload.extension}`
-          document.body.appendChild(a)
-
-          a.click()
-
-          setTimeout(() => {
-            document.body.removeChild(a)
-            URL.revokeObjectURL(url)
-          }, 0)
-        })
+    const ARCHIVE_FILE_COMMAND = commands.on("archive-file", archiveFile)
+    registerContextMenuItem(ARCHIVE_FILE_COMMAND, {
+      Icon: BsTrash3,
+      payloadCreator: (target) => target,
+      shouldShow: (target) => OrdoFile.isOrdoFile(target) && !target.path.startsWith("/.trash/"),
     })
 
-    registerContextMenuItem(downloadFileCommand, {
+    const UNARCHIVE_FILE_COMMAND = commands.on("unarchive-file", unarchiveFile)
+    registerContextMenuItem(UNARCHIVE_FILE_COMMAND, {
+      Icon: BsArrowCounterclockwise,
+      payloadCreator: (target) => target,
+      shouldShow: (target) => OrdoFile.isOrdoFile(target) && target.path.startsWith("/.trash/"),
+    })
+
+    const ARCHIVE_DIRECTORY_COMMAND = commands.on("archive-directory", archiveDirectory)
+    registerContextMenuItem(ARCHIVE_DIRECTORY_COMMAND, {
+      Icon: BsTrash3,
+      payloadCreator: (target) => target,
+      shouldShow: (target) =>
+        OrdoDirectory.isOrdoDirectory(target) &&
+        !target.path.startsWith("/.trash/") &&
+        target.path !== "/.trash/",
+    })
+
+    const UNARCHIVE_DIRECTORY_COMMAND = commands.on("unarchive-directory", unarchiveDirectory)
+    registerContextMenuItem(UNARCHIVE_DIRECTORY_COMMAND, {
+      Icon: BsArrowCounterclockwise,
+      payloadCreator: (target) => target,
+      shouldShow: (target) =>
+        OrdoDirectory.isOrdoDirectory(target) &&
+        target.path.startsWith("/.trash/") &&
+        target.path !== "/.trash/",
+    })
+
+    const DOWNLOAD_FILE_COMMAND = commands.on("download-file", downloadFile)
+    registerContextMenuItem(DOWNLOAD_FILE_COMMAND, {
       Icon: BsDownload,
       payloadCreator: (target) => target,
       shouldShow: (target) => OrdoFile.isOrdoFile(target),

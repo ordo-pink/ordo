@@ -12,7 +12,7 @@ import {
 } from "@ordo-pink/react-utils"
 import { MouseEvent, useEffect, useState } from "react"
 import { useTranslation } from "react-i18next"
-import { BsDeviceHdd, BsFolderSymlink, BsLaptop, BsPlus, BsTrash3 } from "react-icons/bs"
+import { BsDeviceHdd, BsPlus, BsTrash3 } from "react-icons/bs"
 
 export default function FSActivitySidebar() {
   const { path } = useRouteParams()
@@ -36,11 +36,11 @@ export default function FSActivitySidebar() {
 
   const tCreateButton = t("create-button")
   const tRoot = t("root")
-  const tShared = t("shared-directories")
+  // const tShared = t("shared-directories")
   const tLocations = t("locations")
   const tRecent = t("recent")
   const tFavourites = t("favourites")
-  const tDevices = t("devices")
+  // const tDevices = t("devices")
   const tTrash = t("trash")
 
   const handleCreateClick = (event: MouseEvent<HTMLButtonElement>) => {
@@ -70,15 +70,9 @@ export default function FSActivitySidebar() {
       </OrdoButtonSuccess>
 
       <div className="flex flex-col w-full">
-        <h2 className="uppercase text-neutral-500 font-bold text-sm text-center">{tLocations}</h2>
-        {/* {directory && directory.path !== "/" ? (
-          <ActionListItem
-            isLarge
-            isCurrent
-            Icon={BsFolder2Open}
-            text={directory.readableName}
-          />
-        ) : null} */}
+        <h2 className="mb-4 uppercase text-neutral-500 font-bold text-sm text-center">
+          {tLocations}
+        </h2>
 
         <ActionListItem
           isLarge
@@ -88,7 +82,7 @@ export default function FSActivitySidebar() {
           onClick={() => emit("router.navigate", "/fs")}
         />
 
-        <ActionListItem
+        {/* <ActionListItem
           isLarge
           isCurrent={directory.path === "/__internal__/devices/"}
           Icon={BsLaptop}
@@ -102,23 +96,25 @@ export default function FSActivitySidebar() {
           Icon={BsFolderSymlink}
           text={tShared}
           onClick={() => emit("router.navigate", "/fs")}
-        />
+        /> */}
 
         <ActionListItem
           isLarge
           isCurrent={directory.path === "/.trash/"}
           Icon={BsTrash3}
           text={tTrash}
-          onClick={() => emit("router.navigate", "/fs")}
+          onClick={() => emit("router.navigate", "/fs/.trash/")}
         />
       </div>
 
-      <div className="flex flex-col space-y-1 w-full">
-        <h2 className="uppercase text-neutral-500 font-bold text-sm text-center">{tFavourites}</h2>
+      <div className="flex flex-col w-full">
+        <h2 className="mb-4 uppercase text-neutral-500 font-bold text-sm text-center">
+          {tFavourites}
+        </h2>
       </div>
 
-      <div className="flex flex-col space-y-1 w-full">
-        <h2 className="uppercase text-neutral-500 font-bold text-sm text-center">{tRecent}</h2>
+      <div className="flex flex-col w-full">
+        <h2 className="mb-4 uppercase text-neutral-500 font-bold text-sm text-center">{tRecent}</h2>
       </div>
     </div>
   ))

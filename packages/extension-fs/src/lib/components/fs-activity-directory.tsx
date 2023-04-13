@@ -1,9 +1,8 @@
 import { useDraggable, useDroppable } from "@dnd-kit/core"
 import { IOrdoDirectory } from "@ordo-pink/common-types"
-import { useContextMenu, useCommands } from "@ordo-pink/react-utils"
+import { useContextMenu, useCommands, DirectoryIcon, IconSize } from "@ordo-pink/react-utils"
 import { MouseEvent } from "react"
-import { BsFillFolderFill, BsFolder } from "react-icons/bs"
-import { iconColors } from "../colors"
+import { useTranslation } from "react-i18next"
 
 type Props = {
   directory: IOrdoDirectory
@@ -12,6 +11,7 @@ type Props = {
 export default function FSActivityDirectory({ directory }: Props) {
   const { showContextMenu } = useContextMenu()
   const { emit } = useCommands()
+  const { t } = useTranslation("fs")
 
   const { setNodeRef, listeners, attributes } = useDraggable({
     id: directory.path,
@@ -55,23 +55,12 @@ export default function FSActivityDirectory({ directory }: Props) {
         className={`text-5xl`}
         ref={setDroppableNodeRef}
       >
-        {directory && directory.children && directory.children.length > 0 ? (
-          <BsFillFolderFill
-            className={
-              iconColors[(directory as IOrdoDirectory<{ color: string }>).metadata.color] ??
-              iconColors["neutral"]
-            }
-          />
-        ) : (
-          <BsFolder
-            className={
-              iconColors[(directory as IOrdoDirectory<{ color: string }>).metadata.color] ??
-              iconColors["neutral"]
-            }
-          />
-        )}
+        <DirectoryIcon
+          directory={directory}
+          size={IconSize.LARGE}
+        />
       </div>
-      <p className="truncate w-[100px] text-center">{directory.readableName}</p>
+      <p className="truncate w-[100px] text-center">{t(directory.readableName)}</p>
     </div>
   )
 }

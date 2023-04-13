@@ -74,9 +74,9 @@ const Kanban = ({ directoryPath }: Props) => {
           <div
             ref={provided.innerRef}
             {...provided.droppableProps}
-            className="flex flex-col space-y-4 md:m-4 mt-10 h-full p-4"
+            className="flex flex-col space-y-4 mt-10 h-full"
           >
-            <div className="h-full flex space-x-4 overflow-x-auto">
+            <div className="h-full flex space-x-4 overflow-x-auto pb-6 px-2">
               {dir.children
                 .filter((item) => OrdoDirectory.isOrdoDirectory(item))
                 .map((directory, index) => {

@@ -32,7 +32,7 @@ export default function Column({ directory, index }: Props) {
         <div
           className={`flex flex-col h-full ${
             backgroundColors[color] ?? backgroundColors["neutral"]
-          } shadow-sm rounded-lg min-w-[calc(100vw-8.75rem)] md:min-w-[200px] w-96 max-w-xs`}
+          } shadow-lg rounded-lg min-w-[calc(100vw-6.5rem)] sm:min-w-[16rem] w-64 max-w-xs`}
           {...provided.draggableProps}
           ref={provided.innerRef}
           onContextMenu={(e) => {
@@ -76,7 +76,7 @@ export default function Column({ directory, index }: Props) {
               <div
                 className={`flex flex-col space-y-2 flex-grow min-h-min p-2 rounded-b-lg overflow-y-auto ${
                   snapshot.isDraggingOver
-                    ? "bg-neutral-300 dark:bg-zinc-700"
+                    ? "bg-neutral-300 dark:bg-zinc-600"
                     : backgroundColors[color] ?? backgroundColors["neutral"]
                 }`}
                 ref={provided.innerRef}

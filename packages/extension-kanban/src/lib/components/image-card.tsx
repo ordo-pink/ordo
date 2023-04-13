@@ -51,7 +51,7 @@ export default function ImageCard({ file, index }: Props) {
               y: e.pageY,
             })
           }}
-          className={`transition-all duration-300 flex flex-col space-y-4 rounded-lg shadow-sm focus:ring-2 focus:ring-pink-500 ${
+          className={`transition-all duration-300 flex flex-col space-y-4 rounded-lg focus:ring-2 focus:ring-pink-500 ${
             snapshot.isDragging
               ? "bg-gradient-to-tr from-sky-200 dark:from-violet-700 via-slate-200 to-pink-200 dark:to-purple-700"
               : "bg-neutral-100 dark:bg-neutral-800"
@@ -62,7 +62,7 @@ export default function ImageCard({ file, index }: Props) {
         >
           <div className="">
             <img
-              className="shadow-xl rounded-lg"
+              className="rounded-lg"
               title={file.path}
               src={url}
               alt={file.readableName}

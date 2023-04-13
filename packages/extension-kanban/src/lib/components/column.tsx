@@ -1,9 +1,15 @@
 import { IOrdoDirectory, IOrdoFile } from "@ordo-pink/common-types"
 import { OrdoFile } from "@ordo-pink/fs-entity"
-import { useContextMenu, OrdoButtonSecondary, useCommands } from "@ordo-pink/react-utils"
+import {
+  useContextMenu,
+  OrdoButtonSecondary,
+  useCommands,
+  useFileAssociationFor,
+} from "@ordo-pink/react-utils"
 import { Droppable, Draggable } from "react-beautiful-dnd"
 import { BsPencilSquare, BsPlus } from "react-icons/bs"
 import Card from "./card"
+import ImageCard from "./image-card"
 import { backgroundColors } from "../colors"
 
 type Props = {
@@ -78,13 +84,23 @@ export default function Column({ directory, index }: Props) {
               >
                 {directory.children
                   .filter((item) => OrdoFile.isOrdoFile(item))
-                  .map((file, index) => (
-                    <Card
-                      key={file.path}
-                      file={file as IOrdoFile}
-                      index={index}
-                    />
-                  ))}
+                  .map((file, index) => {
+                    const association = useFileAssociationFor(file as IOrdoFile)
+
+                    return association && association.name === "editor.img" ? (
+                      <ImageCard
+                        key={file.path}
+                        file={file as IOrdoFile}
+                        index={index}
+                      />
+                    ) : (
+                      <Card
+                        key={file.path}
+                        file={file as IOrdoFile}
+                        index={index}
+                      />
+                    )
+                  })}
                 {provided.placeholder}
               </div>
             )}

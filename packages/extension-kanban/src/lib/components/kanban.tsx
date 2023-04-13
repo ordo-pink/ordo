@@ -74,7 +74,7 @@ const Kanban = ({ directoryPath }: Props) => {
           <div
             ref={provided.innerRef}
             {...provided.droppableProps}
-            className="flex flex-col space-y-4 md:m-4 mt-10 h-full rounded-lg bg-gradient-to-b from-slate-400 to-stone-400 dark:from-zinc-900 dark:to-stone-900 shadow-lg p-4"
+            className="flex flex-col space-y-4 md:m-4 mt-10 h-full p-4"
           >
             <div className="h-full flex space-x-4 overflow-x-auto">
               {dir.children

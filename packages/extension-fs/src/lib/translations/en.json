@@ -39,5 +39,14 @@
   "remove-button": "Remove",
   "cancel-button": "Cancel",
   "upload-file": "Upload",
-  "invalid-name": "Provided name contains forbidden characters."
+  "invalid-name": "Provided name contains forbidden characters.",
+  "change-directory-color": "Change color...",
+  "color-neutral": "No color",
+  "color-pink": "Pink",
+  "color-red": "Red",
+  "color-orange": "Orange",
+  "color-yellow": "Yellow",
+  "color-green": "Green",
+  "color-blue": "Blue",
+  "color-purple": "Purple"
 }

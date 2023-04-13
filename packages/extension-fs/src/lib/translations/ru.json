@@ -39,5 +39,14 @@
   "remove-button": "Удалить",
   "cancel-button": "Не, ну его",
   "upload-file": "Загрузить файл",
-  "invalid-name": "Выбранное название содержит запрещённые символы."
+  "invalid-name": "Выбранное название содержит запрещённые символы.",
+  "color-neutral": "Без цвета",
+  "color-pink": "Розовый",
+  "color-red": "Красный",
+  "color-orange": "Оранжевый",
+  "color-yellow": "Жёлтый",
+  "color-green": "Зелёный",
+  "color-blue": "Синий",
+  "color-purple": "Фиолетовый",
+  "change-directory-color": "Изменить цвет..."
 }

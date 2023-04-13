@@ -9,6 +9,7 @@ import {
   BsFileEarmarkPlus,
   BsFolderMinus,
   BsFolderPlus,
+  BsPalette2,
   BsPencil,
   BsStar,
   BsStarFill,
@@ -30,6 +31,7 @@ import { createDirectory } from "./commands/directory/create-directory"
 import { moveDirectory } from "./commands/directory/move-directory"
 import { removeDirectory } from "./commands/directory/remove-directory"
 import { renameDirectory } from "./commands/directory/rename-directory"
+import { setDirectoryColor } from "./commands/directory/set-directory-color"
 import { setFavourite } from "./commands/directory/set-favourite"
 import { showCreateDirectoryModal } from "./commands/directory/show-create-directory-modal"
 import { showRemoveDirectoryModal } from "./commands/directory/show-remove-directory-modal"
@@ -94,6 +96,21 @@ export default createExtension(
     commands.on("create-file", createFile)
     commands.on("update-file", updateFile)
     commands.on("remove-file", removeFile)
+
+    // Colors -----------------------------------------------------------------
+
+    // Set directory color ----------------------------------------------------
+
+    const CHANGE_DIRECTORY_COLOR_COMMAND = commands.on("change-directory-color", setDirectoryColor)
+
+    registerContextMenuItem(CHANGE_DIRECTORY_COLOR_COMMAND, {
+      Icon: BsPalette2,
+      payloadCreator: (target) => target,
+      shouldShow: (target) =>
+        OrdoDirectory.isOrdoDirectory(target) && target.path !== "/" && target.path !== "/.trash/",
+    })
+
+    // TODO: Set file color
 
     // Favourites -------------------------------------------------------------
 

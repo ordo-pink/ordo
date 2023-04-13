@@ -70,7 +70,7 @@ const user$ = _initAuth({
     })
 
     if (authInfo?.isAuthenticated && window.location.pathname === "/") {
-      executeCommand("router.navigate", "/editor")
+      executeCommand("router.navigate", "/fs")
     }
 
     // TODO: Handle situation when there is no authInfo

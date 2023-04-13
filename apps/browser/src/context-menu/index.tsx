@@ -11,8 +11,19 @@ import { Observable } from "rxjs"
 import ContextMenuItem from "./item"
 
 type Props = {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  state$: Observable<Nullable<{ x: number; y: number; target: any; structure: TContextMenuItem[] }>>
+  state$: Observable<
+    Nullable<{
+      x: number
+      y: number
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      target: any
+      structure: TContextMenuItem[]
+      hideCreateCommands?: boolean
+      hideReadCommands?: boolean
+      hideUpdateCommands?: boolean
+      hideDeleteCommands?: boolean
+    }>
+  >
 }
 
 export default function ContextMenu({ state$ }: Props) {
@@ -64,53 +75,61 @@ export default function ContextMenu({ state$ }: Props) {
     >
       {state ? (
         <div className="flex flex-col divide-y">
-          {Either.fromBoolean(create.length > 0).fold(Null, () => (
-            <div className="py-2">
-              {create.map((item) => (
-                <ContextMenuItem
-                  key={item.name}
-                  item={item}
-                  state={{ ...state, structure: create }}
-                />
-              ))}
-            </div>
-          ))}
+          {Either.fromBoolean(create.length > 0)
+            .chain(() => Either.fromBoolean(!state.hideCreateCommands))
+            .fold(Null, () => (
+              <div className="py-2">
+                {create.map((item) => (
+                  <ContextMenuItem
+                    key={item.name}
+                    item={item}
+                    state={{ ...state, structure: create }}
+                  />
+                ))}
+              </div>
+            ))}
 
-          {Either.fromBoolean(read.length > 0).fold(Null, () => (
-            <div className="py-2">
-              {read.map((item) => (
-                <ContextMenuItem
-                  key={item.name}
-                  item={item}
-                  state={{ ...state, structure: read }}
-                />
-              ))}
-            </div>
-          ))}
+          {Either.fromBoolean(read.length > 0)
+            .chain(() => Either.fromBoolean(!state.hideReadCommands))
+            .fold(Null, () => (
+              <div className="py-2">
+                {read.map((item) => (
+                  <ContextMenuItem
+                    key={item.name}
+                    item={item}
+                    state={{ ...state, structure: read }}
+                  />
+                ))}
+              </div>
+            ))}
 
-          {Either.fromBoolean(update.length > 0).fold(Null, () => (
-            <div className="py-2">
-              {update.map((item) => (
-                <ContextMenuItem
-                  key={item.name}
-                  item={item}
-                  state={{ ...state, structure: update }}
-                />
-              ))}
-            </div>
-          ))}
+          {Either.fromBoolean(update.length > 0)
+            .chain(() => Either.fromBoolean(!state.hideUpdateCommands))
+            .fold(Null, () => (
+              <div className="py-2">
+                {update.map((item) => (
+                  <ContextMenuItem
+                    key={item.name}
+                    item={item}
+                    state={{ ...state, structure: update }}
+                  />
+                ))}
+              </div>
+            ))}
 
-          {Either.fromBoolean(_delete.length > 0).fold(Null, () => (
-            <div className="py-2">
-              {_delete.map((item) => (
-                <ContextMenuItem
-                  key={item.name}
-                  item={item}
-                  state={{ ...state, structure: _delete }}
-                />
-              ))}
-            </div>
-          ))}
+          {Either.fromBoolean(_delete.length > 0)
+            .chain(() => Either.fromBoolean(!state.hideDeleteCommands))
+            .fold(Null, () => (
+              <div className="py-2">
+                {_delete.map((item) => (
+                  <ContextMenuItem
+                    key={item.name}
+                    item={item}
+                    state={{ ...state, structure: _delete }}
+                  />
+                ))}
+              </div>
+            ))}
         </div>
       ) : null}
     </div>

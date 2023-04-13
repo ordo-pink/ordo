@@ -10,6 +10,10 @@ export type ShowContextMenuParams = {
   y: number
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   target: any
+  hideCreateCommands?: boolean
+  hideReadCommands?: boolean
+  hideUpdateCommands?: boolean
+  hideDeleteCommands?: boolean
 }
 
 export const contextMenuToggle$ = new BehaviorSubject<Nullable<ShowContextMenuParams>>(null)
@@ -94,8 +98,24 @@ export const clearContextMenuItems = () => {
   clearContextMenuItems$.next(null)
 }
 
-export const showContextMenu = ({ x, y, target }: ShowContextMenuParams) => {
-  contextMenuToggle$.next({ x, y, target })
+export const showContextMenu = ({
+  x,
+  y,
+  target,
+  hideCreateCommands,
+  hideDeleteCommands,
+  hideReadCommands,
+  hideUpdateCommands,
+}: ShowContextMenuParams) => {
+  contextMenuToggle$.next({
+    x,
+    y,
+    target,
+    hideCreateCommands,
+    hideDeleteCommands,
+    hideReadCommands,
+    hideUpdateCommands,
+  })
 }
 
 export const hideContextMenu = () => {

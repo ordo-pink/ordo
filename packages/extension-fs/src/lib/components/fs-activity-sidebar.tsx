@@ -63,6 +63,9 @@ export default function FSActivitySidebar() {
       x: event.pageX,
       y: event.pageY,
       target: currentDirectory,
+      hideDeleteCommands: true,
+      hideReadCommands: true,
+      hideUpdateCommands: true,
     })
   }
 

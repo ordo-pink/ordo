@@ -1,4 +1,5 @@
 import { useCommands } from "@ordo-pink/react-utils"
+import { hideCommandPalette } from "@ordo-pink/stream-command-palette"
 import { drive$ } from "@ordo-pink/stream-drives"
 
 export const handleUploadFileCommandPalette = () => {
@@ -8,4 +9,5 @@ export const handleUploadFileCommandPalette = () => {
   if (!drive) return
 
   emit("fs.show-upload-file-modal", { parent: drive.root, openInEditor: true })
+  hideCommandPalette()
 }

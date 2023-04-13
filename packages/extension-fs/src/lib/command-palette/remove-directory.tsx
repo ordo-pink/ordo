@@ -21,7 +21,10 @@ export const handleRemoveDirectoryCommandPalette = () => {
       id: directory.path,
       name: directory.readableName,
       Icon: () => (directory.children.length > 0 ? <AiFillFolder /> : <AiOutlineFolder />),
-      onSelect: () => emit("fs.show-remove-directory-modal", directory),
+      onSelect: () => {
+        emit("fs.show-remove-directory-modal", directory)
+        hideCommandPalette()
+      },
       Comment: () => (
         <div className="text-xs text-neutral-600 dark:text-neutral-400">{directory.path}</div>
       ),

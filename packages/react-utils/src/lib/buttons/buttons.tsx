@@ -156,7 +156,7 @@ export const OrdoButtonSuccess = ({
 }: Props) => {
   const buttonAppearanceClass = Either.fromBoolean(!!disabled).fold(
     () =>
-      "bg-gradient-to-r from-sky-200 dark:from-cyan-600 via-teal-200 dark:via-teal-600 to-emerald-200 dark:to-emerald-600 active-ring",
+      "bg-gradient-to-r from-sky-300 dark:from-cyan-600 via-teal-300 dark:via-teal-600 to-emerald-300 dark:to-emerald-600 active-ring",
     () =>
       "bg-gradient-to-r from-slate-300 via-zinc-300 to-stone-300 dark:from-slate-900 dark:via-zinc-900 dark:to-stone-900",
   )

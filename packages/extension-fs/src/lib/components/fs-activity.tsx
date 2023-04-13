@@ -10,11 +10,12 @@ import {
 } from "@dnd-kit/core"
 import { IOrdoDirectory, IOrdoFile, Nullable, OrdoDirectoryPath } from "@ordo-pink/common-types"
 import { Either } from "@ordo-pink/either"
-import { OrdoDirectory } from "@ordo-pink/fs-entity"
+import { OrdoDirectory, OrdoFile } from "@ordo-pink/fs-entity"
 import { Null, useCommands, useContextMenu, useDrive, useRouteParams } from "@ordo-pink/react-utils"
 import { MouseEvent, useEffect, useState } from "react"
 import Helmet from "react-helmet"
 import { useTranslation } from "react-i18next"
+import FSActivityActionsOverlay from "./fs-activity-actions-overlay"
 import FSActivityDirectory from "./fs-activity-directory"
 import FSActivityFile from "./fs-activity-file"
 
@@ -27,14 +28,14 @@ export default function FSActivity() {
 
   const mouseSensor = useSensor(MouseSensor, {
     activationConstraint: {
-      delay: 250,
+      delay: 100,
       tolerance: 5,
     },
   })
 
   const touchSensor = useSensor(TouchSensor, {
     activationConstraint: {
-      delay: 250,
+      delay: 100,
       tolerance: 5,
     },
   })
@@ -82,6 +83,52 @@ export default function FSActivity() {
           sensors={sensors}
           onDragEnd={(event) => {
             setActiveDraggable(null)
+
+            if (event.over && event.over.id === "action.remove") {
+              const isOrdoDirectory = OrdoDirectory.isOrdoDirectory(event.active.data.current)
+
+              emit(
+                isOrdoDirectory ? "fs.show-remove-directory-modal" : "fs.show-remove-file-modal",
+                event.active.data.current,
+              )
+
+              return
+            }
+
+            if (event.over && event.over.id === "action.send-to-parent") {
+              if (!drive) return
+
+              const isOrdoDirectory = OrdoDirectory.isOrdoDirectory(event.active.data.current)
+
+              const parent = isOrdoDirectory
+                ? OrdoDirectory.findParent(
+                    (event.active.data.current as IOrdoDirectory).path,
+                    drive.root,
+                  )
+                : OrdoFile.findParent((event.active.data.current as IOrdoFile).path, drive.root)
+
+              if (!parent || parent.path === "/") return
+
+              const parentParent = OrdoDirectory.findParent(parent.path, drive.root)
+
+              if (!parentParent) return
+
+              const draggableItem = event.active.data.current as IOrdoDirectory | IOrdoFile
+
+              const command = isOrdoDirectory ? "fs.move-directory" : "fs.move-file"
+              const payload = {
+                oldPath: event.active.id,
+                newPath: isOrdoDirectory
+                  ? `${parentParent.path}${draggableItem.readableName}/`
+                  : `${parentParent.path}${draggableItem.readableName}${
+                      (draggableItem as IOrdoFile).extension
+                    }`,
+              }
+
+              emit(command, payload)
+
+              return
+            }
 
             if (!event.over || event.active.id === event.over.id) {
               return
@@ -136,6 +183,8 @@ export default function FSActivity() {
               )
             ) : null}
           </DragOverlay>
+
+          <FSActivityActionsOverlay active={activeDraggable} />
         </DndContext>
       </div>
     </div>

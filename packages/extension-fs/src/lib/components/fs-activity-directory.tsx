@@ -43,7 +43,7 @@ export default function FSActivityDirectory({ directory }: Props) {
       ref={setNodeRef}
       {...listeners}
       {...attributes}
-      className={`flex flex-col items-center p-2 h-max rounded-lg ring-0 cursor-pointer ring-pink-500 hover:ring-1 hover:bg-pink-500/10 ${
+      className={`select-none flex flex-col items-center p-2 h-max rounded-lg ring-0 cursor-pointer ring-pink-500 hover:ring-1 hover:bg-pink-500/10 ${
         isOver ? "ring-neutral-500 ring-1 bg-neutral-500/10" : ""
       }`}
       key={directory.path}

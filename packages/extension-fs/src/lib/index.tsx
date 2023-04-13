@@ -111,6 +111,7 @@ export default createExtension(
     })
 
     // TODO: Set file color
+    // TODO: Reset directory color & reset file color
 
     // Favourites -------------------------------------------------------------
 
@@ -178,6 +179,10 @@ export default createExtension(
         target.path !== "/",
     })
 
+    // TODO: CommandPalette
+    // TODO: Clear trash
+    // TODO: Restore to where the file was moved to trash from (not to "/")
+
     // Unarchive --------------------------------------------------------------
 
     const UNARCHIVE_FILE_COMMAND = commands.on("unarchive-file", unarchiveFile)
@@ -198,6 +203,8 @@ export default createExtension(
         target.path !== "/",
     })
 
+    // TODO: CommandPalette
+
     // Download file ----------------------------------------------------------
 
     const DOWNLOAD_FILE_COMMAND = commands.on("download-file", downloadFile)
@@ -214,6 +221,8 @@ export default createExtension(
       onSelect: handleDownloadCommandPalette,
     })
 
+    // TODO: Download directory
+
     // Upload file ------------------------------------------------------------
 
     const UPLOAD_FILE_COMMAND = commands.on("show-upload-file-modal", uploadFile)
@@ -229,6 +238,8 @@ export default createExtension(
       Icon: BsUpload,
       onSelect: handleUploadFileCommandPalette,
     })
+
+    // TODO: Upload multiple files
 
     // Rename -----------------------------------------------------------------
 
@@ -265,6 +276,8 @@ export default createExtension(
       Icon: BsFileEarmarkPlus,
       onSelect: handleShowCreateFileModalCommandPalette,
     })
+
+    // TODO: Create a virtual file if it doesn't have content
 
     // Create directory -------------------------------------------------------
 

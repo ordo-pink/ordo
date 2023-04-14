@@ -1,0 +1,14 @@
+.editor-scroller {
+  border: 0;
+  position: relative;
+  outline: 0;
+  z-index: 0;
+  resize: vertical;
+}
+
+.editor {
+  flex: auto;
+  position: relative;
+  resize: vertical;
+  z-index: -1;
+}

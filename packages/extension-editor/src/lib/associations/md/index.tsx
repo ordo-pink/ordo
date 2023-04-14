@@ -32,11 +32,13 @@ import { createDraft, finishDraft } from "immer"
 import { EditorState, EditorThemeClasses, LexicalNode, ParagraphNode } from "lexical"
 import { debounce } from "lodash"
 import { mergeDeepWith } from "ramda"
-import { ComponentType, memo } from "react"
+import { ComponentType, memo, useEffect, useState } from "react"
 import { useTranslation } from "react-i18next"
 import { LoadEditorStatePlugin } from "./load-state"
 // import { TreeViewPlugin } from "./tree-view"
-import { CustomParagraphNode } from "../nodes/paragraph"
+import DraggableBlockPlugin from "./plugins/draggable-block-plugin"
+
+import "./index.css"
 
 const debouncedSave = debounce(
   (
@@ -81,18 +83,18 @@ const toNodeArray = (tree: any) =>
 
 const theme: EditorThemeClasses = {
   heading: {
-    h1: "mx-4 font-black text-3xl my-4",
-    h2: "mx-4 text-3xl my-4",
-    h3: "mx-4 font-black text-xl my-4",
-    h4: "mx-4 text-xl my-4",
-    h5: "mx-4 font-black text-lg my-4",
+    h1: "m-4 ml-6 font-black text-3xl",
+    h2: "m-4 ml-6 text-3xl",
+    h3: "m-4 ml-6 font-black text-xl",
+    h4: "m-4 ml-6 text-xl",
+    h5: "m-4 ml-6 font-black text-lg",
   },
   list: {
-    ul: "mx-4 list-inside list-disc my-4",
-    ol: "mx-4 list-inside list-decimal my-4",
+    ul: "m-4 ml-6 list-inside list-disc",
+    ol: "m-4 ml-6 list-inside list-decimal",
   },
   link: "text-sky-700 visited:text-purple-700",
-  paragraph: "mx-4 my-2",
+  paragraph: "m-4 ml-6 my-2",
   hashtag: "text-pink-600 dark:text-pink-400",
   text: {
     strikethrough: "line-through",
@@ -101,8 +103,8 @@ const theme: EditorThemeClasses = {
     bold: "font-bold",
     italic: "italic",
   },
-  quote: "mx-4 p-4 text-sm rounded-lg shadow-lg bg-neutral-200 dark:bg-neutral-800 mr-4",
-  code: "mx-4 block px-6 py-4 bg-neutral-100 dark:bg-neutral-800 my-8 shadow-lg rounded-lg mr-4",
+  quote: "m-4 ml-6 p-4 text-sm rounded-lg shadow-lg bg-neutral-200 dark:bg-neutral-800 mr-4",
+  code: "m-4 ml-6 block px-6 py-4 bg-neutral-100 dark:bg-neutral-800 my-8 shadow-lg rounded-lg mr-4",
   codeHighlight: {
     atrule: "text-neutral-500",
     attr: "text-neutral-500",
@@ -151,11 +153,7 @@ const initialNodes: (typeof LexicalNode)[] = [
   AutoLinkNode,
   LinkNode,
   HashtagNode,
-  CustomParagraphNode,
-  {
-    replace: ParagraphNode,
-    with: () => new CustomParagraphNode(),
-  } as unknown as typeof LexicalNode,
+  ParagraphNode,
 ]
 
 type Props = {
@@ -185,6 +183,31 @@ export default memo(
     const driver = useFsDriver()
     const { emit } = useCommands()
     const content = useFileContentText(file)
+
+    const [floatingAnchorElem, setFloatingAnchorElem] = useState<HTMLDivElement | null>(null)
+    const [isSmallWidthViewport, setIsSmallWidthViewport] = useState<boolean>(false)
+
+    const onRef = (_floatingAnchorElem: HTMLDivElement) => {
+      if (_floatingAnchorElem !== null) {
+        setFloatingAnchorElem(_floatingAnchorElem)
+      }
+    }
+
+    useEffect(() => {
+      const updateViewPortWidth = () => {
+        const isNextSmallWidthViewport = window.matchMedia("(max-width: 1025px)").matches
+
+        if (isNextSmallWidthViewport !== isSmallWidthViewport) {
+          setIsSmallWidthViewport(isNextSmallWidthViewport)
+        }
+      }
+
+      window.addEventListener("resize", updateViewPortWidth)
+
+      return () => {
+        window.removeEventListener("resize", updateViewPortWidth)
+      }
+    }, [isSmallWidthViewport])
 
     const handleChange = (state: EditorState) => {
       if (!driver || content === null) return
@@ -225,6 +248,12 @@ export default memo(
               .concat(initialNodes),
           }}
         >
+          {floatingAnchorElem && !isSmallWidthViewport ? (
+            <DraggableBlockPlugin anchorElem={floatingAnchorElem} />
+          ) : (
+            ""
+          )}
+
           <MarkdownShortcutPlugin
             transformers={plugins
               .reduce(
@@ -246,10 +275,17 @@ export default memo(
 
           <RichTextPlugin
             contentEditable={
-              <ContentEditable
-                title="Editor"
-                spellCheck={false}
-              />
+              <div className="editor-scroller">
+                <div
+                  className="editor"
+                  ref={onRef}
+                >
+                  <ContentEditable
+                    title="Editor"
+                    spellCheck={false}
+                  />
+                </div>
+              </div>
             }
             placeholder={<Placeholder />}
             ErrorBoundary={LexicalErrorBoundary}

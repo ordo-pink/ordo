@@ -28,10 +28,12 @@ import { handleShowCreateDirectoryModalCommandPalette } from "./command-palette/
 import { handleShowCreateFileModalCommandPalette } from "./command-palette/show-create-file-modal"
 import { handleUploadFileCommandPalette } from "./command-palette/upload-file"
 import { archiveDirectory } from "./commands/directory/archive-directory"
+import { clearTrashBin } from "./commands/directory/clear-trash-bin"
 import { createDirectory } from "./commands/directory/create-directory"
 import { moveDirectory } from "./commands/directory/move-directory"
 import { removeDirectory } from "./commands/directory/remove-directory"
 import { renameDirectory } from "./commands/directory/rename-directory"
+import { restoreTrashBin } from "./commands/directory/restore-trash-bin"
 import { setDirectoryColor } from "./commands/directory/set-directory-color"
 import { setFavourite } from "./commands/directory/set-favourite"
 import { showClearTrashBinModal } from "./commands/directory/show-clear-trash-bin-modal"
@@ -168,21 +170,8 @@ export default createExtension(
 
     // Clear ------------------------------------------------------------------
 
-    commands.on("clear-trash-bin", () => {
-      const drive = drive$.getValue()
-
-      if (!drive) return
-
-      const trash = OrdoDirectory.findDirectoryDeep("/.trash/", drive.root)
-
-      trash && commands.emit("fs.remove-directory", trash)
-    })
-
-    commands.after("fs.remove-directory.complete", ({ payload }) => {
-      if (payload.path === "/.trash/") {
-        commands.emit("fs.create-directory", "/.trash/")
-      }
-    })
+    commands.after("fs.remove-directory.complete", restoreTrashBin)
+    commands.on("clear-trash-bin", clearTrashBin)
 
     const CLEAR_TRASH_BIN = commands.on("show-clear-trash-bin-modal", showClearTrashBinModal)
     registerContextMenuItem(CLEAR_TRASH_BIN, {

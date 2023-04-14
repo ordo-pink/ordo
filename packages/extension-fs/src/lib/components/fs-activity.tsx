@@ -72,12 +72,12 @@ export default function FSActivity() {
 
   return Either.fromNullable(currentDirectory).fold(Null, (root) => (
     <div
-      className="p-4 h-full w-full"
+      className={`h-full w-full`}
       onContextMenu={handleContextMenu}
     >
-      <Helmet title={`${root.readableName || tRoot} (${tFs})`} />
+      <Helmet title={` ${root.readableName || tRoot} (${tFs})`} />
 
-      <div className="flex flex-wrap items-start">
+      <div className={`p-4 min-h-screen flex flex-wrap items-start`}>
         <DndContext
           autoScroll
           sensors={sensors}

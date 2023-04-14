@@ -43,6 +43,7 @@ export const OrdoButton = ({
     <button
       ref={ref}
       onClick={onClick}
+      onContextMenu={onClick}
       onMouseOver={onMouseOver}
       onFocus={onMouseOver}
       className={`button ${outline ? "button-outline" : ""} ${className} ${

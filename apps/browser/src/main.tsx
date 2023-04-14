@@ -122,6 +122,10 @@ registerCommandPaletteItem({
 
 logger.info("Starting the application")
 
+document.addEventListener("contextmenu", (event) => {
+  event.preventDefault()
+})
+
 const root = ReactDOM.createRoot(document.getElementById("root") as HTMLElement)
 
 const Ordo = () => {

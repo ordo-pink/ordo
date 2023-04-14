@@ -7,6 +7,7 @@ import {
   BsDownload,
   BsFileEarmarkMinus,
   BsFileEarmarkPlus,
+  BsFiles,
   BsFolderMinus,
   BsFolderPlus,
   BsPalette2,
@@ -45,6 +46,7 @@ import { updateDirectory } from "./commands/directory/update-directory"
 import { archiveFile } from "./commands/files/archive-file"
 import { createFile } from "./commands/files/create-file"
 import { downloadFile } from "./commands/files/download-file"
+import { duplicateFile } from "./commands/files/duplicate-file"
 import { moveFile } from "./commands/files/move-file"
 import { removeFile } from "./commands/files/remove-file"
 import { showCreateFileModal } from "./commands/files/show-create-file-modal"
@@ -119,6 +121,17 @@ export default createExtension(
 
     // TODO: Set file color
     // TODO: Reset directory color & reset file color
+
+    // Duplicate file ---------------------------------------------------------
+
+    const DUPLICATE_FILE_COMMAND = commands.on("duplicate-file", duplicateFile)
+
+    registerContextMenuItem(DUPLICATE_FILE_COMMAND, {
+      type: "create",
+      Icon: BsFiles,
+      payloadCreator: (target) => target,
+      shouldShow: (target) => OrdoFile.isOrdoFile(target) && !target.path.startsWith("/.trash/"),
+    })
 
     // Favourites -------------------------------------------------------------
 

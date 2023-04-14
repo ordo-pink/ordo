@@ -30,19 +30,31 @@ export const moveFile: CommandHandler<{ oldPath: OrdoFilePath; newPath: OrdoFile
       oldParent.children = oldParent.children.filter((child) => child.path !== oldPath)
       newParent.children.push(result)
 
-      let oldParentChildIndex: Nullable<number> = null
+      if (oldParent.path === newParent.path) {
+        if (oldParent.metadata.childOrder) {
+          oldParent.metadata.childOrder.splice(
+            oldParent.metadata.childOrder.indexOf(oldPath),
+            1,
+            raw.path,
+          )
 
-      if (oldParent.metadata.childOrder) {
-        oldParentChildIndex = oldParent.metadata.childOrder.indexOf(oldPath)
-        oldParent.metadata.childOrder.splice(oldParentChildIndex, 1)
-        emit("fs.update-directory", OrdoDirectory.from(oldParent))
-      }
+          emit("fs.update-directory", OrdoDirectory.from(oldParent))
+        }
+      } else {
+        let oldParentChildIndex: Nullable<number> = null
 
-      if (newParent.metadata.childOrder) {
-        oldParentChildIndex != null
-          ? newParent.metadata.childOrder.splice(oldParentChildIndex, 0, raw.path)
-          : newParent.metadata.childOrder.push(raw.path)
-        emit("fs.update-directory", OrdoDirectory.from(newParent))
+        if (oldParent.metadata.childOrder) {
+          oldParentChildIndex = oldParent.metadata.childOrder.indexOf(oldPath)
+          oldParent.metadata.childOrder.splice(oldParentChildIndex, 1)
+          emit("fs.update-directory", OrdoDirectory.from(oldParent))
+        }
+
+        if (newParent.metadata.childOrder) {
+          oldParentChildIndex != null
+            ? newParent.metadata.childOrder.splice(oldParentChildIndex, 0, raw.path)
+            : newParent.metadata.childOrder.push(raw.path)
+          emit("fs.update-directory", OrdoDirectory.from(newParent))
+        }
       }
 
       OrdoDirectory.sort(newParent.children)
@@ -51,8 +63,6 @@ export const moveFile: CommandHandler<{ oldPath: OrdoFilePath; newPath: OrdoFile
 
       setDrive(newDrive)
 
-      emit("fs.update-directory", oldParent)
-      emit("fs.update-directory", newParent)
       emit("fs.move-file.complete", { oldPath, newPath })
     })
     .catch((error) => {

@@ -77,7 +77,9 @@ export default function FSActivity() {
     >
       <Helmet title={` ${root.readableName || tRoot} (${tFs})`} />
 
-      <div className={`p-4 min-h-screen flex flex-wrap items-start`}>
+      <div
+        className={`p-4 flex flex-wrap items-center md:items-start justify-center md:justify-start`}
+      >
         <DndContext
           autoScroll
           sensors={sensors}

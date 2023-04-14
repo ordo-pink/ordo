@@ -26,7 +26,7 @@ export const createFileHandler: FsRequestHandler<OrdoFilePathParams> =
       })
       .catch((error: ExceptionResponse.CONFLICT | Error) =>
         Switch.of(error)
-          .case(ExceptionResponse.CONFLICT, () => res.status(ExceptionResponse.CONFLICT).send())
+          .case(ExceptionResponse.CONFLICT, () => res.status(ExceptionResponse.CONFLICT).send("{}"))
           .default(() => {
             req.params.logger.error(error)
             res.status(ExceptionResponse.UNKNOWN_ERROR).send(error.toString())

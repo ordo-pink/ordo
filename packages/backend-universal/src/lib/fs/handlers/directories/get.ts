@@ -33,7 +33,9 @@ export const getDirectoryHandler: FsRequestHandler<OrdoDirectoryPathParams> =
       .then((directory) => res.status(SuccessResponse.OK).json(directory))
       .catch((error: ExceptionResponse.NOT_FOUND | Error) =>
         Switch.of(error)
-          .case(ExceptionResponse.NOT_FOUND, () => res.status(ExceptionResponse.NOT_FOUND).send())
+          .case(ExceptionResponse.NOT_FOUND, () =>
+            res.status(ExceptionResponse.NOT_FOUND).send("{}"),
+          )
           .default(() => {
             req.params.logger.error(error)
             res.status(ExceptionResponse.UNKNOWN_ERROR).send(error.toString())

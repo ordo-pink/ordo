@@ -41,7 +41,7 @@ export const getExtensionFileHandler: FsRequestHandler<ExtensionsParams> =
       .catch((error: ExceptionResponse.NOT_FOUND | Error) =>
         Switch.of(error)
           .case(ExceptionResponse.NOT_FOUND, async () => {
-            res.status(ExceptionResponse.NOT_FOUND).send()
+            res.status(ExceptionResponse.NOT_FOUND).send("{}")
           })
           .default(() => {
             req.params.logger.error(error)

@@ -16,8 +16,10 @@ export const moveFileHandler: FsRequestHandler<OrdoFileTwoPathsParams> =
       .then((fileOrDirectory) => res.status(SuccessResponse.CREATED).json(fileOrDirectory))
       .catch((error: ExceptionResponse.CONFLICT | ExceptionResponse.NOT_FOUND | Error) =>
         Switch.of(error)
-          .case(ExceptionResponse.NOT_FOUND, () => res.status(ExceptionResponse.NOT_FOUND).send())
-          .case(ExceptionResponse.CONFLICT, () => res.status(ExceptionResponse.CONFLICT).send())
+          .case(ExceptionResponse.NOT_FOUND, () =>
+            res.status(ExceptionResponse.NOT_FOUND).send("{}"),
+          )
+          .case(ExceptionResponse.CONFLICT, () => res.status(ExceptionResponse.CONFLICT).send("{}"))
           .default(() => {
             req.params.logger.error(error)
             res.status(ExceptionResponse.UNKNOWN_ERROR).send(error.toString())

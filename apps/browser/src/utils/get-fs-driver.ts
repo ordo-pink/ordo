@@ -22,14 +22,16 @@ export const getFsDriver =
           },
         })
           .then(
-            tap(() =>
-              fetch(`${host}/${files}/${sub}${file.path}.metadata`, {
-                method: "POST",
-                body: JSON.stringify(file.metadata),
-                headers: {
-                  [authHeader]: `Bearer ${token}`,
-                },
-              }).catch(logger.error),
+            tap(
+              (res) =>
+                res.ok &&
+                fetch(`${host}/${files}/${sub}${file.path}.metadata`, {
+                  method: "POST",
+                  body: JSON.stringify(file.metadata),
+                  headers: {
+                    [authHeader]: `Bearer ${token}`,
+                  },
+                }).catch(logger.error),
             ),
           )
           .then((res) => res.json())
@@ -67,14 +69,16 @@ export const getFsDriver =
           body: content,
         })
           .then(
-            tap(() =>
-              fetch(`${host}/${files}/${sub}${file.path}.metadata`, {
-                method: "PUT",
-                body: JSON.stringify(file.metadata),
-                headers: {
-                  [authHeader]: `Bearer ${token}`,
-                },
-              }).catch(logger.error),
+            tap(
+              (res) =>
+                res.ok &&
+                fetch(`${host}/${files}/${sub}${file.path}.metadata`, {
+                  method: "PUT",
+                  body: JSON.stringify(file.metadata),
+                  headers: {
+                    [authHeader]: `Bearer ${token}`,
+                  },
+                }).catch(logger.error),
             ),
           )
           .then((res) => res.json())

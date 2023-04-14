@@ -11,7 +11,7 @@ export const compareTokensStrict: RequestHandler<Params> = (req, res, next) => {
       `Attempted to access other user's internal data: ${userId}, ${req.params.tokenParsed.sub}`,
     )
 
-    return void res.status(ExceptionResponse.FORBIDDEN).send()
+    return void res.status(ExceptionResponse.FORBIDDEN).send("{}")
   }
 
   return next()
@@ -40,7 +40,7 @@ export const compareTokens: FsRequestHandler = () => async (req, res, next) => {
       requestedUser: userId,
     })
 
-    return void res.status(ExceptionResponse.FORBIDDEN).send()
+    return void res.status(ExceptionResponse.FORBIDDEN).send("{}")
     // }
   }
 

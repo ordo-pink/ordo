@@ -15,7 +15,7 @@ export const createDirectoryHandler: FsRequestHandler<OrdoDirectoryPathParams> =
       .then((directory) => res.status(SuccessResponse.CREATED).json(directory))
       .catch((error: ExceptionResponse.CONFLICT | Error) =>
         Switch.of(error)
-          .case(ExceptionResponse.CONFLICT, () => res.status(ExceptionResponse.CONFLICT).send())
+          .case(ExceptionResponse.CONFLICT, () => res.status(ExceptionResponse.CONFLICT).send("{}"))
           .default(() => {
             req.params.logger.error(error)
             res.status(ExceptionResponse.UNKNOWN_ERROR).send(error.toString())

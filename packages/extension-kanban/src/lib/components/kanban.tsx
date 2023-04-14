@@ -98,18 +98,17 @@ const Kanban = ({ directoryPath }: Props) => {
               {dir.metadata.childOrder
                 ? dir.metadata.childOrder
                     .filter((child) => OrdoDirectory.isValidPath(child))
-                    .map((child, index) => (
-                      <Column
-                        key={child}
-                        directory={
-                          OrdoDirectory.findDirectoryDeep(
-                            child as OrdoDirectoryPath,
-                            dir,
-                          ) as IOrdoDirectory
-                        }
-                        index={index}
-                      />
-                    ))
+                    .map((child, index) =>
+                      Either.fromNullable(
+                        OrdoDirectory.findDirectoryDeep(child as OrdoDirectoryPath, dir),
+                      ).fold(Null, (column) => (
+                        <Column
+                          key={child}
+                          directory={column}
+                          index={index}
+                        />
+                      )),
+                    )
                 : dir.children
                     .filter((item) => OrdoDirectory.isOrdoDirectory(item))
                     .map((directory, index) => {

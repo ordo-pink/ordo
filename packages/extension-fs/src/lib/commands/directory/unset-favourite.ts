@@ -1,13 +1,10 @@
-import { CommandContext, IOrdoDirectory } from "@ordo-pink/common-types"
-import { useCommands } from "@ordo-pink/react-utils"
-import { fsDriver$, drive$ } from "@ordo-pink/stream-drives"
+import { CommandHandler, IOrdoDirectory } from "@ordo-pink/common-types"
+import { wieldCommands } from "@ordo-pink/react-utils"
 
-export const unsetFavourite = ({ payload }: CommandContext<IOrdoDirectory>) => {
-  const driver = fsDriver$.getValue()
-  const drive = drive$.getValue()
-  const { emit } = useCommands()
+export const unsetFavourite: CommandHandler<IOrdoDirectory> = ({ payload }) => {
+  const { emit } = wieldCommands()
 
-  if (!driver || !drive || payload.metadata.isFavourite === false) return
+  if (payload.metadata.isFavourite === false) return
 
   emit("fs.update-directory", {
     ...payload,

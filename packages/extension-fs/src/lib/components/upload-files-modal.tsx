@@ -41,7 +41,6 @@ export default function UploadFilesModal({ parent }: Props) {
       emit("fs.create-file", {
         file: OrdoFile.empty(path.trim() as OrdoFilePath),
         content: await file.arrayBuffer(),
-        openInEditor: true, // TODO: Move this out
       })
     })
     hideModal()

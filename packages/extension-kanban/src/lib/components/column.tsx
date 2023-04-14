@@ -62,7 +62,7 @@ export default function Column({ directory, index }: Props) {
 
               <OrdoButtonSecondary
                 compact
-                onClick={() => emit("fs.show-rename-directory-modal", { directory })}
+                onClick={() => emit("fs.show-rename-directory-modal", directory)}
               >
                 <BsPencilSquare className="text-neutral-900 dark:text-neutral-100" />
               </OrdoButtonSecondary>

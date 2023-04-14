@@ -8,6 +8,6 @@ export const handleUploadFileCommandPalette = () => {
 
   if (!drive) return
 
-  emit("fs.show-upload-file-modal", { parent: drive.root, openInEditor: true })
+  emit("fs.show-upload-file-modal", { parent: drive.root })
   hideCommandPalette()
 }

@@ -13,3 +13,11 @@ export const useCommands = () => ({
   emit: executeCommand,
   off: unregisterCommand,
 })
+
+export const wieldCommands = () => ({
+  before: prependListener,
+  after: appendListener,
+  on: registerCommand,
+  emit: executeCommand,
+  off: unregisterCommand,
+})

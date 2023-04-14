@@ -1,4 +1,4 @@
-import { IOrdoDirectory, OrdoFilePath } from "@ordo-pink/common-types"
+import { IOrdoDirectory, IOrdoFile, OrdoFilePath } from "@ordo-pink/common-types"
 import { OrdoFile } from "@ordo-pink/fs-entity"
 import {
   OrdoButtonPrimary,
@@ -13,11 +13,11 @@ import { BsFileEarmarkPlus } from "react-icons/bs"
 
 type Props = {
   parent?: IOrdoDirectory
-  openInEditor?: boolean
   content?: string
+  metadata?: IOrdoFile["metadata"]
 }
 
-export default function CreateFileModal({ parent, openInEditor, content }: Props) {
+export default function CreateFileModal({ parent, content = "", metadata = {} }: Props) {
   const { hideModal } = useModal()
   const { emit } = useCommands()
   const { t } = useTranslation("fs")
@@ -45,11 +45,13 @@ export default function CreateFileModal({ parent, openInEditor, content }: Props
     const name = fileName.endsWith(".md") ? fileName.slice(0, -3) : fileName
     const path = `${parentPath}${name}.md` as const
 
-    emit("fs.create-file", {
-      file: OrdoFile.empty(path.trim() as OrdoFilePath),
-      content,
-      openInEditor,
+    const file = OrdoFile.from({
+      path: path.trim() as OrdoFilePath,
+      size: content.length,
+      metadata,
     })
+
+    emit("fs.create-file", { file, content })
 
     hideModal()
   }

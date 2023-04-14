@@ -4,3 +4,8 @@ export const useCommandPalette = () => ({
   showCommandPalette,
   hideCommandPalette,
 })
+
+export const wieldCommandPalette = () => ({
+  showCommandPalette,
+  hideCommandPalette,
+})

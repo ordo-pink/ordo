@@ -1,16 +1,22 @@
-import { CommandContext, OrdoDirectoryPath } from "@ordo-pink/common-types"
+import { CommandContext, Nullable, OrdoDirectoryPath } from "@ordo-pink/common-types"
 import { OrdoDirectory } from "@ordo-pink/fs-entity"
-import { useCommands } from "@ordo-pink/react-utils"
-import { fsDriver$, drive$ } from "@ordo-pink/stream-drives"
+import { wieldCommands, wieldDrive, wieldFsDriver } from "@ordo-pink/react-utils"
 import { createDraft, finishDraft } from "immer"
 
 export const moveDirectory = ({
-  logger,
   payload: { oldPath, newPath },
 }: CommandContext<{ oldPath: OrdoDirectoryPath; newPath: OrdoDirectoryPath }>) => {
-  const driver = fsDriver$.getValue()
-  const drive = drive$.getValue()
-  const { emit } = useCommands()
+  const driver = wieldFsDriver()
+  const [drive, setDrive] = wieldDrive()
+  const { emit } = wieldCommands()
+
+  if (oldPath === "/") {
+    return emit("fs.move-directory.error", new Error("Cannot move root directory"))
+  }
+
+  if (oldPath === "/.trash/") {
+    return emit("fs.move-directory.error", new Error("Cannot move trash bin"))
+  }
 
   if (!drive || !driver) return
 
@@ -28,19 +34,43 @@ export const moveDirectory = ({
       const directory = OrdoDirectory.from(raw)
 
       oldParent.children = oldParent.children.filter((child) => child.path !== oldPath)
-      newParent?.children.push(directory)
+
+      newParent.children.push(directory)
+
+      if (oldParent.path === newParent.path) {
+        if (oldParent.metadata.childOrder) {
+          oldParent.metadata.childOrder.splice(
+            oldParent.metadata.childOrder.indexOf(oldPath),
+            1,
+            raw.path,
+          )
+
+          emit("fs.update-directory", OrdoDirectory.from(oldParent))
+        }
+      } else {
+        let oldParentChildIndex: Nullable<number> = null
+
+        if (oldParent.metadata.childOrder) {
+          oldParentChildIndex = oldParent.metadata.childOrder.indexOf(oldPath)
+          oldParent.metadata.childOrder.splice(oldParentChildIndex, 1)
+          emit("fs.update-directory", OrdoDirectory.from(oldParent))
+        }
+
+        if (newParent.metadata.childOrder) {
+          oldParentChildIndex != null
+            ? newParent.metadata.childOrder.splice(oldParentChildIndex, 0, raw.path)
+            : newParent.metadata.childOrder.push(raw.path)
+          emit("fs.update-directory", OrdoDirectory.from(newParent))
+        }
+      }
 
       OrdoDirectory.sort(newParent.children)
 
       const newDrive = finishDraft(draft)
 
-      drive$.next(newDrive)
+      setDrive(newDrive)
 
       emit("fs.move-directory.complete", { oldPath, newPath })
     })
-    .catch((error) => {
-      logger.error(error)
-
-      emit("fs.move-directory.error", error)
-    })
+    .catch((error) => emit("fs.move-directory.error", error))
 }

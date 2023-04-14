@@ -13,7 +13,6 @@ import { BsPencil } from "react-icons/bs"
 
 type Props = {
   directory: IOrdoDirectory
-  openInEditor?: boolean
   content?: string
 }
 

@@ -1,13 +1,12 @@
-import { CommandContext, IOrdoDirectory } from "@ordo-pink/common-types"
+import { CommandHandler, IOrdoDirectory } from "@ordo-pink/common-types"
 import { OrdoDirectory } from "@ordo-pink/fs-entity"
-import { useCommands } from "@ordo-pink/react-utils"
-import { fsDriver$, drive$ } from "@ordo-pink/stream-drives"
+import { wieldCommands, wieldDrive, wieldFsDriver } from "@ordo-pink/react-utils"
 import { createDraft, finishDraft } from "immer"
 
-export const updateDirectory = ({ logger, payload }: CommandContext<IOrdoDirectory>) => {
-  const driver = fsDriver$.getValue()
-  const drive = drive$.getValue()
-  const { emit } = useCommands()
+export const updateDirectory: CommandHandler<IOrdoDirectory> = ({ payload }) => {
+  const driver = wieldFsDriver()
+  const [drive, setDrive] = wieldDrive()
+  const { emit } = wieldCommands()
 
   if (!drive || !driver) return
 
@@ -15,7 +14,12 @@ export const updateDirectory = ({ logger, payload }: CommandContext<IOrdoDirecto
 
   const directory = OrdoDirectory.findDirectoryDeep(payload.path, draft.root)
 
-  if (!directory) throw new Error("Could not find directory that needs an update")
+  if (!directory) {
+    return emit(
+      "fs.update-directory.error",
+      new Error("Could not find directory that needs an update"),
+    )
+  }
 
   const metadata = directory.metadata
 
@@ -23,19 +27,17 @@ export const updateDirectory = ({ logger, payload }: CommandContext<IOrdoDirecto
 
   const newDrive = finishDraft(draft)
 
-  drive$.next(newDrive)
+  setDrive(newDrive)
 
-  driver?.directories
+  driver.directories
     .set(payload)
     .then(() => {
       emit("fs.update-directory.complete", payload)
     })
     .catch((error) => {
-      logger.error(error)
-
       directory.metadata = metadata
       const revertDrive = finishDraft(draft)
-      drive$.next(revertDrive)
+      setDrive(revertDrive)
 
       emit("fs.update-directory.error", error)
     })

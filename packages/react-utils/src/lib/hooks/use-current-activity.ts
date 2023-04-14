@@ -13,3 +13,5 @@ export const useCurrentActivity = () => {
 
   return activity
 }
+
+export const wieldCurrentActivity = () => currentActivity$.getValue()

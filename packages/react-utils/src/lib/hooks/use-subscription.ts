@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react"
-import { Observable } from "rxjs"
+import { BehaviorSubject, Observable } from "rxjs"
 import { Nullable } from "vitest"
 
 export const useSubscription = <T>(observable: Observable<T>, initialState?: T) => {
@@ -16,4 +16,13 @@ export const useSubscription = <T>(observable: Observable<T>, initialState?: T) 
   }, [observable])
 
   return state
+}
+
+export const wieldSubscription = <T>(observable: Observable<T>, initialState: T) => {
+  const subject = new BehaviorSubject<T>(initialState)
+
+  const sub = observable.subscribe(subject)
+  sub.unsubscribe()
+
+  return subject.getValue()
 }

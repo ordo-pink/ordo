@@ -1,16 +1,14 @@
-import { CommandContext, OrdoFilePath } from "@ordo-pink/common-types"
+import { CommandHandler, Nullable, OrdoFilePath } from "@ordo-pink/common-types"
 import { OrdoDirectory, OrdoFile } from "@ordo-pink/fs-entity"
-import { useCommands } from "@ordo-pink/react-utils"
-import { fsDriver$, drive$ } from "@ordo-pink/stream-drives"
+import { wieldCommands, wieldDrive, wieldFsDriver } from "@ordo-pink/react-utils"
 import { createDraft, finishDraft } from "immer"
 
-export const moveFile = ({
-  logger,
+export const moveFile: CommandHandler<{ oldPath: OrdoFilePath; newPath: OrdoFilePath }> = ({
   payload: { oldPath, newPath },
-}: CommandContext<{ oldPath: OrdoFilePath; newPath: OrdoFilePath }>) => {
-  const driver = fsDriver$.getValue()
-  const drive = drive$.getValue()
-  const { emit } = useCommands()
+}) => {
+  const driver = wieldFsDriver()
+  const [drive, setDrive] = wieldDrive()
+  const { emit } = wieldCommands()
 
   if (!driver || !drive) return
 
@@ -32,17 +30,32 @@ export const moveFile = ({
       oldParent.children = oldParent.children.filter((child) => child.path !== oldPath)
       newParent.children.push(result)
 
+      let oldParentChildIndex: Nullable<number> = null
+
+      if (oldParent.metadata.childOrder) {
+        oldParentChildIndex = oldParent.metadata.childOrder.indexOf(oldPath)
+        oldParent.metadata.childOrder.splice(oldParentChildIndex, 1)
+        emit("fs.update-directory", OrdoDirectory.from(oldParent))
+      }
+
+      if (newParent.metadata.childOrder) {
+        oldParentChildIndex != null
+          ? newParent.metadata.childOrder.splice(oldParentChildIndex, 0, raw.path)
+          : newParent.metadata.childOrder.push(raw.path)
+        emit("fs.update-directory", OrdoDirectory.from(newParent))
+      }
+
       OrdoDirectory.sort(newParent.children)
 
       const newDrive = finishDraft(draft)
 
-      drive$.next(newDrive)
+      setDrive(newDrive)
 
+      emit("fs.update-directory", oldParent)
+      emit("fs.update-directory", newParent)
       emit("fs.move-file.complete", { oldPath, newPath })
     })
     .catch((error) => {
-      logger.error(error)
-
       emit("fs.move-file.error", error)
     })
 }

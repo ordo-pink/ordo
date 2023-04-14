@@ -8,6 +8,6 @@ export const handleShowCreateFileModalCommandPalette = () => {
 
   if (!drive) return
 
-  emit("fs.show-create-file-modal", { parent: drive.root, openInEditor: true })
+  emit("fs.show-create-file-modal", { parent: drive.root })
   hideCommandPalette()
 }

@@ -1,7 +1,7 @@
 import { OrdoDirectoryPath, IOrdoFile, CommandContext } from "@ordo-pink/common-types"
 import { OrdoDirectory, OrdoFile } from "@ordo-pink/fs-entity"
+import { wieldDrive, wieldFsDriver } from "@ordo-pink/react-utils"
 import { hideCommandPalette, showCommandPalette } from "@ordo-pink/stream-command-palette"
-import { drive$, fsDriver$ } from "@ordo-pink/stream-drives"
 import { createExtension } from "@ordo-pink/stream-extensions"
 import { lazy } from "react"
 import { BsKanban } from "react-icons/bs"
@@ -31,8 +31,8 @@ export default createExtension(
     commands.after(
       "fs.move-directory.complete",
       ({ payload }: CommandContext<{ oldPath: OrdoDirectoryPath; newPath: OrdoDirectoryPath }>) => {
-        const drive = drive$.getValue()
-        const driver = fsDriver$.getValue()
+        const [drive] = wieldDrive()
+        const driver = wieldFsDriver()
 
         if (!drive || !driver) return
 
@@ -81,7 +81,7 @@ export default createExtension(
       name: translate("open-kanban"),
       Icon: BsKanban,
       onSelect: () => {
-        const drive = drive$.getValue()
+        const [drive] = wieldDrive()
 
         if (!drive) return
 

@@ -1,8 +1,8 @@
-import { useModal } from "@ordo-pink/react-utils"
+import { wieldModal } from "@ordo-pink/react-utils"
 import ClearTrashBinModal from "../../components/clear-trash-bin-modal"
 
 export const showClearTrashBinModal = () => {
-  const { showModal } = useModal()
+  const { showModal } = wieldModal()
 
   showModal(() => <ClearTrashBinModal />)
 }

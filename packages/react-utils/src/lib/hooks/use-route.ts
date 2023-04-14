@@ -14,6 +14,8 @@ export const useRoute = () => {
   return route
 }
 
+export const wieldRoute = () => currentRoute$.getValue()
+
 export const useRouteParams = <T extends string = string>() => {
   const route = useRoute()
 
@@ -38,4 +40,22 @@ export const useRouteParams = <T extends string = string>() => {
   }, [route])
 
   return params
+}
+
+export const wieldRouteParams = <T extends string = string>() => {
+  const route = wieldRoute()
+
+  if (!route) return {} as Record<T, string | undefined>
+
+  const dynamicParam = Object.keys(route.params).find((param) => param.endsWith("*"))
+
+  if (!dynamicParam) return route.params as Record<T, string | undefined>
+
+  const paramsCopy = { ...route.params }
+
+  const dynamicParamValue = route.route.slice(route.route.indexOf(route.params[dynamicParam]))
+
+  paramsCopy[dynamicParam.slice(0, -1)] = decodeURI(dynamicParamValue)
+
+  return paramsCopy as Record<T, string | undefined>
 }

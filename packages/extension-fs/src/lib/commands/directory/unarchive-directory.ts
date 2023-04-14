@@ -1,12 +1,8 @@
-import { CommandContext, IOrdoDirectory } from "@ordo-pink/common-types"
-import { useCommands } from "@ordo-pink/react-utils"
-import { fsDriver$ } from "@ordo-pink/stream-drives"
+import { CommandHandler, IOrdoDirectory } from "@ordo-pink/common-types"
+import { wieldCommands } from "@ordo-pink/react-utils"
 
-export const unarchiveDirectory = ({ payload }: CommandContext<IOrdoDirectory>) => {
-  const driver = fsDriver$.getValue()
-  const commands = useCommands()
-
-  if (!driver) return
+export const unarchiveDirectory: CommandHandler<IOrdoDirectory> = ({ payload }) => {
+  const commands = wieldCommands()
 
   commands.emit("fs.move-directory", {
     oldPath: payload.path,

@@ -1,8 +1,8 @@
-import { CommandContext, IOrdoFile } from "@ordo-pink/common-types"
-import { fsDriver$ } from "@ordo-pink/stream-drives"
+import { CommandHandler, IOrdoFile } from "@ordo-pink/common-types"
+import { wieldFsDriver } from "@ordo-pink/react-utils"
 
-export const downloadFile = ({ payload }: CommandContext<IOrdoFile>) => {
-  const driver = fsDriver$.getValue()
+export const downloadFile: CommandHandler<IOrdoFile> = ({ payload }) => {
+  const driver = wieldFsDriver()
 
   if (!driver) return
 

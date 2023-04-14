@@ -1,9 +1,9 @@
-import { CommandContext, IOrdoFile } from "@ordo-pink/common-types"
-import { useModal } from "@ordo-pink/react-utils"
+import { CommandHandler, IOrdoFile } from "@ordo-pink/common-types"
+import { wieldModal } from "@ordo-pink/react-utils"
 import RemoveFileModal from "../../components/remove-file-modal"
 
-export const showRemoveFileModal = ({ payload }: CommandContext<IOrdoFile>) => {
-  const { showModal } = useModal()
+export const showRemoveFileModal: CommandHandler<IOrdoFile> = ({ payload }) => {
+  const { showModal } = wieldModal()
 
   showModal(() => <RemoveFileModal file={payload} />)
 }

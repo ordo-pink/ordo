@@ -1,13 +1,12 @@
 import { CommandHandler, IOrdoFile } from "@ordo-pink/common-types"
 import { OrdoDirectory } from "@ordo-pink/fs-entity"
-import { useCommands } from "@ordo-pink/react-utils"
-import { fsDriver$, drive$ } from "@ordo-pink/stream-drives"
+import { wieldCommands, wieldDrive, wieldFsDriver } from "@ordo-pink/react-utils"
 import { createDraft, finishDraft } from "immer"
 
-export const updateFile: CommandHandler<IOrdoFile> = ({ logger, payload }) => {
-  const driver = fsDriver$.getValue()
-  const drive = drive$.getValue()
-  const { emit } = useCommands()
+export const updateFile: CommandHandler<IOrdoFile> = ({ payload }) => {
+  const driver = wieldFsDriver()
+  const [drive, setDrive] = wieldDrive()
+  const { emit } = wieldCommands()
 
   if (!driver || !drive) return
 
@@ -22,19 +21,17 @@ export const updateFile: CommandHandler<IOrdoFile> = ({ logger, payload }) => {
 
   const newDrive = finishDraft(draft)
 
-  drive$.next(newDrive)
+  setDrive(newDrive)
 
-  driver?.files
+  driver.files
     .set(payload)
     .then(() => {
       emit("fs.update-file.complete", payload)
     })
     .catch((error) => {
-      logger.error(error)
-
       ordoFile.metadata = metadata
       const revertDrive = finishDraft(draft)
-      drive$.next(revertDrive)
+      setDrive(revertDrive)
 
       emit("fs.update-file.error", error)
     })

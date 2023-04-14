@@ -1,14 +1,11 @@
 import { OrdoDirectory } from "@ordo-pink/fs-entity"
-import { useCommands } from "@ordo-pink/react-utils"
-import { drive$ } from "@ordo-pink/stream-drives"
+import { wieldCommands, wieldDrive } from "@ordo-pink/react-utils"
 
 export const clearTrashBin = () => {
-  const drive = drive$.getValue()
-  const { emit } = useCommands()
+  const [drive] = wieldDrive()
+  const { emit } = wieldCommands()
 
-  if (!drive) return
-
-  const trash = OrdoDirectory.findDirectoryDeep("/.trash/", drive.root)
+  const trash = drive && OrdoDirectory.findDirectoryDeep("/.trash/", drive.root)
 
   trash && emit("fs.remove-directory", trash)
 }

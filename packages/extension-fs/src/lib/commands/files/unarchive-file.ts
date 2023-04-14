@@ -1,12 +1,8 @@
-import { CommandContext, IOrdoFile } from "@ordo-pink/common-types"
-import { useCommands } from "@ordo-pink/react-utils"
-import { fsDriver$ } from "@ordo-pink/stream-drives"
+import { CommandHandler, IOrdoFile } from "@ordo-pink/common-types"
+import { wieldCommands } from "@ordo-pink/react-utils"
 
-export const unarchiveFile = ({ payload }: CommandContext<IOrdoFile>) => {
-  const driver = fsDriver$.getValue()
-  const commands = useCommands()
-
-  if (!driver) return
+export const unarchiveFile: CommandHandler<IOrdoFile> = ({ payload }) => {
+  const commands = wieldCommands()
 
   commands.emit("fs.move-file", {
     oldPath: payload.path,

@@ -1,39 +1,47 @@
-import { CommandContext, IOrdoFile } from "@ordo-pink/common-types"
-import { OrdoFile } from "@ordo-pink/fs-entity"
-import { useCommands } from "@ordo-pink/react-utils"
-import { fsDriver$, drive$ } from "@ordo-pink/stream-drives"
+import { CommandHandler, IOrdoFile } from "@ordo-pink/common-types"
+import { OrdoDirectory, OrdoFile } from "@ordo-pink/fs-entity"
+import { wieldCommands, wieldDrive, wieldFsDriver } from "@ordo-pink/react-utils"
 import { createDraft, finishDraft } from "immer"
 
-export const removeFile = ({ logger, payload }: CommandContext<IOrdoFile>) => {
-  const driver = fsDriver$.getValue()
-  const drive = drive$.getValue()
-  const { emit } = useCommands()
+export const removeFile: CommandHandler<IOrdoFile> = ({ payload }) => {
+  const driver = wieldFsDriver()
+  const [drive, setDrive] = wieldDrive()
+  const { emit } = wieldCommands()
 
   if (!drive || !driver) return
 
   const draft = createDraft(drive)
-
   const parent = OrdoFile.findParent(payload.path, draft.root)
 
   if (!parent) throw new Error("Could not find parent of the directory being removed")
 
   parent.children = parent.children.filter((child) => child.path !== payload.path)
 
+  let childOrderIndex: number
+
+  if (parent.metadata.childOrder) {
+    childOrderIndex = parent.metadata.childOrder.indexOf(payload.path)
+    parent.metadata.childOrder.splice(childOrderIndex, 1)
+  }
+
   const newDrive = finishDraft(draft)
 
-  drive$.next(newDrive)
+  setDrive(newDrive)
 
-  driver?.files
+  driver.files
     .remove(payload.path)
     .then(() => {
       emit("fs.remove-file.complete", payload)
     })
     .catch((error) => {
-      logger.error(error)
-
       parent.children.push(payload)
-      const revertDrive = finishDraft(draft)
-      drive$.next(revertDrive)
+
+      if (childOrderIndex != null) {
+        parent.metadata.childOrder?.splice(childOrderIndex, 0, payload.path)
+        emit("fs.update-directory", OrdoDirectory.from(parent))
+      }
+
+      setDrive(finishDraft(draft))
 
       emit("fs.remove-file.error", error)
     })

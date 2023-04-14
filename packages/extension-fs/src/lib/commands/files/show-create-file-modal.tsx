@@ -1,21 +1,20 @@
-import { CommandContext, IOrdoDirectory } from "@ordo-pink/common-types"
-import { useModal } from "@ordo-pink/react-utils"
+import { CommandHandler, IOrdoDirectory, IOrdoFile } from "@ordo-pink/common-types"
+import { wieldModal } from "@ordo-pink/react-utils"
 import CreateFileModal from "../../components/create-file-modal"
 
-export const showCreateFileModal = ({
-  payload,
-}: CommandContext<{
+export const showCreateFileModal: CommandHandler<{
   parent: IOrdoDirectory
   content?: string
+  metadata?: IOrdoFile["metadata"]
   openFileInEditor?: boolean
-}>) => {
-  const { showModal } = useModal()
+}> = ({ payload }) => {
+  const { showModal } = wieldModal()
 
   showModal(() => (
     <CreateFileModal
       parent={payload.parent}
       content={payload.content}
-      openInEditor={payload.openFileInEditor}
+      metadata={payload.metadata}
     />
   ))
 }

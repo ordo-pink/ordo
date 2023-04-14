@@ -1,13 +1,12 @@
-import { CommandContext, IOrdoFile } from "@ordo-pink/common-types"
-import { useCommands } from "@ordo-pink/react-utils"
-import { fsDriver$ } from "@ordo-pink/stream-drives"
+import { CommandHandler, IOrdoFile } from "@ordo-pink/common-types"
+import { wieldCommands, wieldFsDriver } from "@ordo-pink/react-utils"
 
-export const updateFileContent = ({
+export const updateFileContent: CommandHandler<{ file: IOrdoFile; content: string }> = ({
   payload,
   logger,
-}: CommandContext<{ file: IOrdoFile; content: string }>) => {
-  const driver = fsDriver$.getValue()
-  const { emit } = useCommands()
+}) => {
+  const driver = wieldFsDriver()
+  const { emit } = wieldCommands()
 
   if (!driver) return
 

@@ -4,3 +4,8 @@ export const useModal = () => ({
   showModal,
   hideModal,
 })
+
+export const wieldModal = () => ({
+  showModal,
+  hideModal,
+})

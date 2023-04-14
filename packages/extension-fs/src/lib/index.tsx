@@ -32,13 +32,13 @@ import { clearTrashBin } from "./commands/directory/clear-trash-bin"
 import { createDirectory } from "./commands/directory/create-directory"
 import { moveDirectory } from "./commands/directory/move-directory"
 import { removeDirectory } from "./commands/directory/remove-directory"
-import { renameDirectory } from "./commands/directory/rename-directory"
 import { restoreTrashBin } from "./commands/directory/restore-trash-bin"
 import { setDirectoryColor } from "./commands/directory/set-directory-color"
 import { setFavourite } from "./commands/directory/set-favourite"
 import { showClearTrashBinModal } from "./commands/directory/show-clear-trash-bin-modal"
 import { showCreateDirectoryModal } from "./commands/directory/show-create-directory-modal"
 import { showRemoveDirectoryModal } from "./commands/directory/show-remove-directory-modal"
+import { showRenameDirectoryModal } from "./commands/directory/show-rename-directory-modal"
 import { unarchiveDirectory } from "./commands/directory/unarchive-directory"
 import { unsetFavourite } from "./commands/directory/unset-favourite"
 import { updateDirectory } from "./commands/directory/update-directory"
@@ -47,9 +47,9 @@ import { createFile } from "./commands/files/create-file"
 import { downloadFile } from "./commands/files/download-file"
 import { moveFile } from "./commands/files/move-file"
 import { removeFile } from "./commands/files/remove-file"
-import { renameFile } from "./commands/files/rename-file"
 import { showCreateFileModal } from "./commands/files/show-create-file-modal"
 import { showRemoveFileModal } from "./commands/files/show-remove-file-modal"
+import { showRenameFileModal } from "./commands/files/show-rename-file-modal"
 import { unarchiveFile } from "./commands/files/unarchive-file"
 import { updateFile } from "./commands/files/update-file"
 import { updateFileContent } from "./commands/files/update-file-content"
@@ -274,19 +274,22 @@ export default createExtension(
 
     // Rename -----------------------------------------------------------------
 
-    const RENAME_FILE_COMMAND = commands.on("show-rename-file-modal", renameFile)
+    const RENAME_FILE_COMMAND = commands.on("show-rename-file-modal", showRenameFileModal)
     registerContextMenuItem(RENAME_FILE_COMMAND, {
       type: "update",
       Icon: BsPencil,
-      payloadCreator: (target) => ({ file: target }),
+      payloadCreator: (target) => target,
       shouldShow: (target) => OrdoFile.isOrdoFile(target),
     })
 
-    const RENAME_DIRECTORY_COMMAND = commands.on("show-rename-directory-modal", renameDirectory)
+    const RENAME_DIRECTORY_COMMAND = commands.on(
+      "show-rename-directory-modal",
+      showRenameDirectoryModal,
+    )
     registerContextMenuItem(RENAME_DIRECTORY_COMMAND, {
       type: "update",
       Icon: BsPencil,
-      payloadCreator: (directory) => ({ directory }),
+      payloadCreator: (target) => target,
       shouldShow: (target) =>
         OrdoDirectory.isOrdoDirectory(target) && target.path !== "/" && target.path !== "/.trash/",
     })

@@ -1,16 +1,15 @@
-import { Colours, CommandContext, IOrdoDirectory } from "@ordo-pink/common-types"
-import { useCommands } from "@ordo-pink/react-utils"
+import { Colours, CommandHandler, IOrdoDirectory } from "@ordo-pink/common-types"
+import { wieldCommands, wieldTranslate } from "@ordo-pink/react-utils"
 import { showCommandPalette, hideCommandPalette } from "@ordo-pink/stream-command-palette"
-import i18next from "i18next"
 
-export const setDirectoryColor = ({ payload }: CommandContext<IOrdoDirectory>) => {
-  const { t } = i18next
-  const { emit } = useCommands()
+export const setDirectoryColor: CommandHandler<IOrdoDirectory> = ({ payload }) => {
+  const { t } = wieldTranslate("fs")
+  const { emit } = wieldCommands()
 
   showCommandPalette(
     Colours.map((color) => ({
       id: color,
-      name: t(`color-${color}`, { ns: "fs" }),
+      name: t(`color-${color}`),
       onSelect: () => {
         emit("fs.update-directory", {
           ...payload,

@@ -10,7 +10,9 @@
     "src/lib/components/editor-sidebar.tsx",
     "src/lib/components/editor-icon.tsx",
     "src/lib/components/editor-component.tsx",
-    "src/lib/index.tsx"
+    "src/lib/index.tsx",
+    "src/lib/associations/md/tree-view.tsx",
+    "src/lib/associations/md/nodes/paragraph.tsx"
   ],
   "exclude": ["jest.config.ts", "src/**/*.spec.ts", "src/**/*.test.ts"]
 }

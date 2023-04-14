@@ -35,6 +35,8 @@ import { mergeDeepWith } from "ramda"
 import { ComponentType, memo } from "react"
 import { useTranslation } from "react-i18next"
 import { LoadEditorStatePlugin } from "./load-state"
+// import { TreeViewPlugin } from "./tree-view"
+import { CustomParagraphNode } from "../nodes/paragraph"
 
 const debouncedSave = debounce(
   (
@@ -79,18 +81,18 @@ const toNodeArray = (tree: any) =>
 
 const theme: EditorThemeClasses = {
   heading: {
-    h1: "font-extrabold text-5xl my-4",
-    h2: "font-extrabold text-4xl my-4",
-    h3: "font-extrabold text-3xl my-4",
-    h4: "font-extrabold text-2xl my-4",
-    h5: "font-extrabold text-xl my-4",
+    h1: "mx-4 font-black text-3xl my-4",
+    h2: "mx-4 text-3xl my-4",
+    h3: "mx-4 font-black text-xl my-4",
+    h4: "mx-4 text-xl my-4",
+    h5: "mx-4 font-black text-lg my-4",
   },
   list: {
-    ul: "list-inside list-disc my-4",
-    ol: "list-inside list-decimal my-4",
+    ul: "mx-4 list-inside list-disc my-4",
+    ol: "mx-4 list-inside list-decimal my-4",
   },
   link: "text-sky-700 visited:text-purple-700",
-  paragraph: "my-2",
+  paragraph: "mx-4 my-2",
   hashtag: "text-pink-600 dark:text-pink-400",
   text: {
     strikethrough: "line-through",
@@ -99,9 +101,8 @@ const theme: EditorThemeClasses = {
     bold: "font-bold",
     italic: "italic",
   },
-  quote:
-    "border-l border-b border-slate-400 dark:border-slate-600 p-4 max-w-xl text-sm rounded-bl-lg",
-  code: "block px-6 py-4 bg-stone-100 dark:bg-stone-800 max-w-xl my-8 shadow-lg rounded-lg",
+  quote: "mx-4 p-4 text-sm rounded-lg shadow-lg bg-neutral-200 dark:bg-neutral-800 mr-4",
+  code: "mx-4 block px-6 py-4 bg-neutral-100 dark:bg-neutral-800 my-8 shadow-lg rounded-lg mr-4",
   codeHighlight: {
     atrule: "text-neutral-500",
     attr: "text-neutral-500",
@@ -109,14 +110,14 @@ const theme: EditorThemeClasses = {
     builtin: "text-emerald-600 font-bold",
     cdata: "text-neutral-400",
     char: "text-emerald-600",
-    class: "text-emerald-900",
-    "class-name": "text-emerald-900",
+    class: "text-emerald-800",
+    "class-name": "text-emerald-800",
     comment: "text-neutral-400",
     constant: "text-orange-700",
     deleted: "text-orange-700",
     doctype: "text-neutral-400",
     entity: "text-stone-600",
-    function: "text-emerald-900",
+    function: "text-emerald-800",
     important: "text-neutral-600",
     inserted: "text-emerald-600",
     keyword: "text-neutral-500",
@@ -143,7 +144,6 @@ const initialNodes: (typeof LexicalNode)[] = [
   ListItemNode as unknown as typeof LexicalNode,
   QuoteNode,
   CodeNode,
-  ParagraphNode,
   CodeHighlightNode,
   TableNode,
   TableCellNode as unknown as typeof LexicalNode,
@@ -151,6 +151,11 @@ const initialNodes: (typeof LexicalNode)[] = [
   AutoLinkNode,
   LinkNode,
   HashtagNode,
+  CustomParagraphNode,
+  {
+    replace: ParagraphNode,
+    with: () => new CustomParagraphNode(),
+  } as unknown as typeof LexicalNode,
 ]
 
 type Props = {
@@ -275,6 +280,8 @@ export default memo(
                 <Plugin key={index} />
               ))}
           </>
+
+          {/* <TreeViewPlugin /> */}
         </LexicalComposer>
       </div>
     ))

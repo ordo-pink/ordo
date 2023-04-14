@@ -6,7 +6,7 @@ import {
   OrdoFilePath,
 } from "@ordo-pink/common-types"
 import { OrdoDirectory, OrdoFile } from "@ordo-pink/fs-entity"
-import { FileIcon } from "@ordo-pink/react-utils"
+import { FileIcon, wieldCurrentActivity } from "@ordo-pink/react-utils"
 import { hideCommandPalette, showCommandPalette } from "@ordo-pink/stream-command-palette"
 import { drive$, fsDriver$ } from "@ordo-pink/stream-drives"
 import { createExtension, currentActivity$ } from "@ordo-pink/stream-extensions"
@@ -129,13 +129,11 @@ export default createExtension(
     })
 
     commands.after(
-      "fs.create-file",
+      "fs.create-file.complete",
       ({
         payload,
       }: CommandContext<{ file: IOrdoFile; content?: string; openFileInEditor?: boolean }>) => {
-        if (!payload.openFileInEditor) return
-
-        const currentActivity = currentActivity$.getValue()
+        const currentActivity = wieldCurrentActivity()
 
         if (currentActivity?.name === "editor.editor") {
           commands.emit("editor.open-file-in-editor", payload.file.path)

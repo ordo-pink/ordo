@@ -57,7 +57,7 @@ export default function Directory({ directory }: Props) {
         />
       )}
       onClick={handleClick}
-      isCurrent={false}
+      current={false}
       onContextMenu={handleContextMenu}
     >
       <Chevron className="shrink-0 text-xs" />

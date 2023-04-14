@@ -6,7 +6,6 @@ import {
   DirectoryIcon,
   Null,
   OrdoButtonSuccess,
-  useCommands,
   useContextMenu,
   useDrive,
   useRouteParams,
@@ -20,7 +19,6 @@ export default function FSActivitySidebar() {
   const drive = useDrive()
   const { showContextMenu } = useContextMenu()
   const { t } = useTranslation("fs")
-  const { emit } = useCommands()
 
   const [currentDirectory, setCurrentDirectory] = useState<Nullable<IOrdoDirectory>>(null)
   const [favourites, setFavourites] = useState<IOrdoDirectory[]>([])
@@ -90,11 +88,11 @@ export default function FSActivitySidebar() {
         </h2>
 
         <ActionListItem
-          isLarge
-          isCurrent={directory.path === "/"}
+          large
+          current={directory.path === "/"}
           Icon={BsDeviceHdd}
           text={tRoot}
-          onClick={() => emit("router.navigate", "/fs")}
+          href="/fs"
         />
 
         {/* <ActionListItem
@@ -114,11 +112,11 @@ export default function FSActivitySidebar() {
         /> */}
 
         <ActionListItem
-          isLarge
-          isCurrent={directory.path === "/.trash/"}
+          large
+          current={directory.path === "/.trash/"}
           Icon={BsTrash3}
           text={tTrash}
-          onClick={() => emit("router.navigate", "/fs/.trash/")}
+          href="/fs/.trash/"
         />
       </div>
 
@@ -133,7 +131,7 @@ export default function FSActivitySidebar() {
             {favs.map((favourite) => (
               <ActionListItem
                 key={favourite.path}
-                isCurrent={directory.path === favourite.path}
+                current={directory.path === favourite.path}
                 text={favourite.readableName}
                 Icon={() => (
                   <DirectoryIcon
@@ -151,7 +149,7 @@ export default function FSActivitySidebar() {
                     target: favourite,
                   })
                 }}
-                onClick={() => emit("router.navigate", `/fs${favourite.path}`)}
+                href={`/fs${favourite.path}`}
               />
             ))}
           </div>

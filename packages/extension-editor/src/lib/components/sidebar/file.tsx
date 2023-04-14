@@ -1,11 +1,5 @@
 import { IOrdoFile, IconSize } from "@ordo-pink/common-types"
-import {
-  ActionListItem,
-  FileIcon,
-  useCommands,
-  useContextMenu,
-  useRouteParams,
-} from "@ordo-pink/react-utils"
+import { ActionListItem, FileIcon, useContextMenu, useRouteParams } from "@ordo-pink/react-utils"
 import { MouseEvent } from "react"
 
 type Props = {
@@ -14,7 +8,6 @@ type Props = {
 }
 
 export default function File({ file, isSelected }: Props) {
-  const { emit } = useCommands()
   const { showContextMenu } = useContextMenu()
   const { filePath } = useRouteParams<"filePath">()
 
@@ -22,8 +15,6 @@ export default function File({ file, isSelected }: Props) {
 
   const paddingLeft = `${depth * 10}px`
   const isCurrent = isSelected ?? Boolean(filePath && `/${filePath}` === file.path)
-
-  const handleClick = () => emit("editor.open-file-in-editor", file.path)
 
   const handleContextMenu = (event: MouseEvent) => {
     event.preventDefault()
@@ -46,8 +37,8 @@ export default function File({ file, isSelected }: Props) {
             file={file}
           />
         )}
-        isCurrent={isCurrent}
-        onClick={handleClick}
+        current={isCurrent}
+        href={`/editor${file.path}`}
         onContextMenu={handleContextMenu}
       />
     </div>

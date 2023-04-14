@@ -114,9 +114,9 @@ const CommandPaletteModal = ({ items }: Props) => {
             key={id}
             text={name}
             Icon={Icon || (() => null)}
-            isCurrent={currentIndex === index}
+            current={currentIndex === index}
             onClick={onSelect}
-            isLarge
+            large
           >
             {Comment ? <Comment /> : null}
           </ActionListItem>

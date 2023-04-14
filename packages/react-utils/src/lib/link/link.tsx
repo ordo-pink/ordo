@@ -12,7 +12,6 @@ export const Link = ({ href, children, className }: Props) => {
 
   const handleClick = (event: MouseEvent) => {
     event.preventDefault()
-    event.stopPropagation()
 
     execute("router.navigate", href)
   }

@@ -15,19 +15,19 @@ export default function CalendarSidebar() {
   return (
     <div className="p-2">
       <ActionListItem
-        isCurrent={view === "day"}
+        current={view === "day"}
         text={day}
         onClick={() => emit("router.navigate", "/calendar/day")}
         Icon={() => <BsCalendarDay />}
       />
       <ActionListItem
-        isCurrent={view === "week"}
+        current={view === "week"}
         text={week}
         onClick={() => emit("router.navigate", "/calendar/week")}
         Icon={() => <BsCalendarWeek />}
       />
       <ActionListItem
-        isCurrent={view === "month"}
+        current={view === "month"}
         text={month}
         onClick={() => emit("router.navigate", "/calendar/month")}
         Icon={() => <BsCalendarMonth />}

@@ -13,7 +13,7 @@ import ImageCard from "./image-card"
 import { backgroundColors } from "../colors"
 
 type Props = {
-  directory: IOrdoDirectory<{ color: string }>
+  directory: IOrdoDirectory
   index: number
 }
 

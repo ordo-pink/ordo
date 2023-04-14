@@ -3,6 +3,7 @@ import { Either } from "@ordo-pink/either"
 import { OrdoDirectory, OrdoFile } from "@ordo-pink/fs-entity"
 import { Null, OrdoButtonNeutral, useCommands } from "@ordo-pink/react-utils"
 import { useDrive } from "@ordo-pink/react-utils"
+import { createDraft, finishDraft } from "immer"
 import { memo, useEffect, useState } from "react"
 import { DragDropContext, Droppable, OnDragEndResponder } from "react-beautiful-dnd"
 import { useTranslation } from "react-i18next"
@@ -24,8 +25,6 @@ const Kanban = ({ directoryPath }: Props) => {
   useEffect(() => {
     if (!drive) return
 
-    // TODO: Watch for directory movement and Kanban file movement for changes
-    // TODO: Apply metadata updates on change
     setDirectory(OrdoDirectory.findDirectoryDeep(directoryPath, drive.root))
   }, [drive, directoryPath])
 
@@ -41,6 +40,25 @@ const Kanban = ({ directoryPath }: Props) => {
     ) {
       // Ignore this as the draggable ended up in the same place as it was initially
       return
+    }
+
+    if (
+      directory &&
+      OrdoDirectory.isValidPath(result.draggableId) &&
+      result.destination.droppableId === `${directoryPath}columns`
+    ) {
+      const draft = createDraft(directory)
+
+      if (!draft.metadata.childOrder) {
+        draft.metadata.childOrder = directory.children.map((child) => child.path)
+      }
+
+      const order = draft.metadata.childOrder as (OrdoDirectoryPath | OrdoFilePath)[]
+
+      order.splice(order.indexOf(result.draggableId), 1)
+      order.splice(result.destination.index, 0, result.draggableId)
+
+      emit("fs.update-directory", finishDraft(draft))
     }
 
     if (OrdoFile.isValidPath(result.draggableId)) {
@@ -64,10 +82,10 @@ const Kanban = ({ directoryPath }: Props) => {
   return Either.fromNullable(directory).fold(Null, (dir) => (
     <DragDropContext
       onDragEnd={onDragEnd}
-      key={`${dir.path}-kanban`}
+      key={`${dir.path}kanban`}
     >
       <Droppable
-        droppableId={`${dir.path}-columns`}
+        droppableId={`${dir.path}columns`}
         direction="horizontal"
       >
         {(provided) => (
@@ -77,20 +95,35 @@ const Kanban = ({ directoryPath }: Props) => {
             className="flex flex-col space-y-4 mt-10 h-full"
           >
             <div className="h-full flex space-x-4 overflow-x-auto pb-6 px-2">
-              {dir.children
-                .filter((item) => OrdoDirectory.isOrdoDirectory(item))
-                .map((directory, index) => {
-                  return (
-                    <Column
-                      key={directory.path}
-                      directory={directory as IOrdoDirectory<{ color: string }>}
-                      index={index}
-                    />
-                  )
-                })}
-            </div>
+              {dir.metadata.childOrder
+                ? dir.metadata.childOrder
+                    .filter((child) => OrdoDirectory.isValidPath(child))
+                    .map((child, index) => (
+                      <Column
+                        key={child}
+                        directory={
+                          OrdoDirectory.findDirectoryDeep(
+                            child as OrdoDirectoryPath,
+                            dir,
+                          ) as IOrdoDirectory
+                        }
+                        index={index}
+                      />
+                    ))
+                : dir.children
+                    .filter((item) => OrdoDirectory.isOrdoDirectory(item))
+                    .map((directory, index) => {
+                      return (
+                        <Column
+                          key={directory.path}
+                          directory={directory as IOrdoDirectory}
+                          index={index}
+                        />
+                      )
+                    })}
 
-            {provided.placeholder}
+              {provided.placeholder}
+            </div>
 
             <div className="flex self-center">
               <OrdoButtonNeutral

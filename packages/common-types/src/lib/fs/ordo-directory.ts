@@ -77,7 +77,12 @@ export type IOrdoDirectory<T extends Record<string, unknown> = Record<string, un
   /**
    * @see IOrdoDirectoryRaw.metadata
    */
-  metadata: { color?: Colour; isExpanded?: boolean; isFavourite?: boolean } & T
+  metadata: {
+    color?: Colour
+    isExpanded?: boolean
+    isFavourite?: boolean
+    childOrder?: (OrdoFilePath | OrdoDirectoryPath)[]
+  } & T
 }
 
 /**

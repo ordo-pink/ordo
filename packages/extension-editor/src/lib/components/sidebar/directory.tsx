@@ -1,9 +1,8 @@
-import { IOrdoDirectory } from "@ordo-pink/common-types"
+import { IOrdoDirectory, IconSize } from "@ordo-pink/common-types"
 import { Either } from "@ordo-pink/either"
 import {
   ActionListItem,
   DirectoryIcon,
-  IconSize,
   Null,
   useCommands,
   useContextMenu,

@@ -1,10 +1,9 @@
-import { IOrdoDirectory, Nullable, OrdoDirectoryPath } from "@ordo-pink/common-types"
+import { IOrdoDirectory, IconSize, Nullable, OrdoDirectoryPath } from "@ordo-pink/common-types"
 import { Either } from "@ordo-pink/either"
 import { OrdoDirectory } from "@ordo-pink/fs-entity"
 import {
   ActionListItem,
   DirectoryIcon,
-  IconSize,
   Null,
   OrdoButtonSuccess,
   useCommands,

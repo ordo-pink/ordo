@@ -1,4 +1,10 @@
-import { CommandContext, IOrdoDirectory, IOrdoFile, OrdoFilePath } from "@ordo-pink/common-types"
+import {
+  CommandContext,
+  IOrdoDirectory,
+  IOrdoFile,
+  IconSize,
+  OrdoFilePath,
+} from "@ordo-pink/common-types"
 import { OrdoDirectory, OrdoFile } from "@ordo-pink/fs-entity"
 import { FileIcon } from "@ordo-pink/react-utils"
 import { hideCommandPalette, showCommandPalette } from "@ordo-pink/stream-command-palette"
@@ -65,7 +71,12 @@ export default createExtension(
           OrdoDirectory.getFilesDeep(drive.root).map((file) => ({
             id: file.path,
             name: file.readableName,
-            Icon: () => <FileIcon file={file} />,
+            Icon: () => (
+              <FileIcon
+                size={IconSize.SMALL}
+                file={file}
+              />
+            ),
             onSelect: () => {
               commands.emit("editor.open-file-in-editor", file.path)
 

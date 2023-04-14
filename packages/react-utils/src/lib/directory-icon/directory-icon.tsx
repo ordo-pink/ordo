@@ -1,4 +1,4 @@
-import { IOrdoDirectory } from "@ordo-pink/common-types"
+import { IOrdoDirectory, IconSize } from "@ordo-pink/common-types"
 import { Switch } from "@ordo-pink/switch"
 import {
   AiFillFolderOpen,
@@ -8,15 +8,6 @@ import {
 } from "react-icons/ai"
 import { BsFolder, BsFolderFill, BsStarFill, BsTrash2, BsTrash2Fill } from "react-icons/bs"
 import { Null } from "../null/null"
-
-export enum IconSize {
-  EXTRA_SMALL = "xs",
-  SMALL = "sm",
-  MEDIUM = "md",
-  LARGE = "lg",
-  EXTRA_LARGE = "xl",
-  TILE = "2xl",
-}
 
 export const iconColors: Record<string, string> = {
   neutral: "icon-neutral",

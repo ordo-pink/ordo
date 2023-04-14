@@ -1,4 +1,4 @@
-import { IOrdoFile } from "@ordo-pink/common-types"
+import { IOrdoFile, IconSize } from "@ordo-pink/common-types"
 import {
   ActionListItem,
   FileIcon,
@@ -40,7 +40,12 @@ export default function File({ file, isSelected }: Props) {
       <ActionListItem
         style={{ paddingLeft }}
         text={name}
-        Icon={() => <FileIcon file={file} />}
+        Icon={() => (
+          <FileIcon
+            size={IconSize.EXTRA_SMALL}
+            file={file}
+          />
+        )}
         isCurrent={isCurrent}
         onClick={handleClick}
         onContextMenu={handleContextMenu}

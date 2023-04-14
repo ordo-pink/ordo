@@ -9,6 +9,15 @@ import { Route } from "./routing"
 import { RegisterTranslationsFn } from "./translations"
 import { BinaryFn, ThunkFn, UnaryFn } from "./types"
 
+export enum IconSize {
+  EXTRA_SMALL = "xs",
+  SMALL = "sm",
+  MEDIUM = "md",
+  LARGE = "lg",
+  EXTRA_LARGE = "xl",
+  TILE = "2xl",
+}
+
 export type RegisterActivityFn = UnaryFn<string, BinaryFn<string, Omit<Activity, "name">, void>>
 export type RegisterContextMenuItemFn = UnaryFn<
   string,
@@ -126,7 +135,7 @@ export type FileAssociation = {
   name: string
   fileExtensions: OrdoFileExtension[] | "*"
   Component: ComponentType<{ file: IOrdoFile }>
-  Icon: ComponentType<{ file: IOrdoFile }>
+  Icon: ComponentType<{ file: IOrdoFile; size: IconSize }>
 }
 
 export type EditorPlugin = {

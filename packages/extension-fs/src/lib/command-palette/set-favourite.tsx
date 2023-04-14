@@ -1,5 +1,6 @@
+import { IconSize } from "@ordo-pink/common-types"
 import { OrdoDirectory } from "@ordo-pink/fs-entity"
-import { DirectoryIcon, IconSize, useCommands } from "@ordo-pink/react-utils"
+import { DirectoryIcon, useCommands } from "@ordo-pink/react-utils"
 import { hideCommandPalette, showCommandPalette } from "@ordo-pink/stream-command-palette"
 import { drive$ } from "@ordo-pink/stream-drives"
 

@@ -1,4 +1,5 @@
 import { OrdoDirectory, OrdoFile } from "@ordo-pink/fs-entity"
+import { wieldCurrentActivity } from "@ordo-pink/react-utils"
 import { drive$, fsDriver$ } from "@ordo-pink/stream-drives"
 import { createExtension } from "@ordo-pink/stream-extensions"
 import { lazy } from "react"
@@ -8,6 +9,7 @@ import {
   BsFileEarmarkMinus,
   BsFileEarmarkPlus,
   BsFiles,
+  BsFolder2Open,
   BsFolderMinus,
   BsFolderPlus,
   BsPalette2,
@@ -32,6 +34,7 @@ import { archiveDirectory } from "./commands/directory/archive-directory"
 import { clearTrashBin } from "./commands/directory/clear-trash-bin"
 import { createDirectory } from "./commands/directory/create-directory"
 import { moveDirectory } from "./commands/directory/move-directory"
+import { openDirectoryInFs } from "./commands/directory/open-in-fs"
 import { removeDirectory } from "./commands/directory/remove-directory"
 import { restoreTrashBin } from "./commands/directory/restore-trash-bin"
 import { setDirectoryColor } from "./commands/directory/set-directory-color"
@@ -78,7 +81,7 @@ export default createExtension(
 
     // Activities -------------------------------------------------------------
 
-    registerActivity("fs.file-explorer", {
+    registerActivity("file-explorer", {
       Component: lazy(() => import("./components/fs-activity")),
       Icon: lazy(() => import("./components/fs-activity-icon")),
       Sidebar: lazy(() => import("./components/fs-activity-sidebar")),
@@ -104,6 +107,23 @@ export default createExtension(
     commands.on("update-file", updateFile)
     commands.on("remove-file", removeFile)
     commands.on("update-file-content", updateFileContent)
+
+    // Open in FS -------------------------------------------------------------
+
+    const OPEN_DIRECTORY_IN_FS = commands.on("open-directory-in-fs", openDirectoryInFs)
+
+    registerContextMenuItem(OPEN_DIRECTORY_IN_FS, {
+      type: "read",
+      Icon: BsFolder2Open,
+      payloadCreator: (target) => target,
+      shouldShow: (target) => {
+        const currentActivity = wieldCurrentActivity()
+
+        return OrdoDirectory.isOrdoDirectory(target) && currentActivity?.name !== "fs.file-explorer"
+      },
+    })
+
+    // TODO: Reveal file in FS
 
     // Colors -----------------------------------------------------------------
 

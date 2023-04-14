@@ -6,6 +6,7 @@
   "unset-favourite...": "Убрать из избранного...",
   "root": "Мой диск",
   "devices": "Мои устройства",
+  "open-directory-in-fs": "Открыть в файловом менеджере",
   "favourites": "Избранное",
   "recent": "Недавние",
   "duplicate-file": "Создать копию",

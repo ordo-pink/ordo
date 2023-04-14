@@ -12,10 +12,6 @@ export const removeDirectory = ({ payload }: CommandContext<IOrdoDirectory>) => 
     return emit("fs.remove-directory.error", new Error("Cannot remove root directory"))
   }
 
-  if (payload.path === "/.trash/") {
-    return emit("fs.remove-directory.error", new Error("Cannot remove trash bin"))
-  }
-
   if (!drive || !driver) return
 
   const draft = createDraft(drive)

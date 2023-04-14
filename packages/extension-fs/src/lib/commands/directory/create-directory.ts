@@ -14,10 +14,6 @@ export const createDirectory = ({ payload: path }: CommandContext<OrdoDirectoryP
     return emit("fs.create-directory.error", new Error("Cannot create root directory"))
   }
 
-  if (path === "/.trash/") {
-    return emit("fs.create-directory.error", new Error("Cannot create trash bin"))
-  }
-
   driver.directories
     .create(path)
     .then((raw) => {

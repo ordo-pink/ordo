@@ -82,25 +82,49 @@ export default function Column({ directory, index }: Props) {
                 ref={provided.innerRef}
                 {...provided.droppableProps}
               >
-                {directory.children
-                  .filter((item) => OrdoFile.isOrdoFile(item))
-                  .map((file, index) => {
-                    const association = useFileAssociationFor(file as IOrdoFile)
+                {directory.metadata.childOrder
+                  ? directory.metadata.childOrder
+                      .filter((item) => OrdoFile.isValidPath(item))
+                      .map((path, index) => {
+                        const file = directory.children.find((child) => child.path === path)
 
-                    return association && association.name === "editor.img" ? (
-                      <ImageCard
-                        key={file.path}
-                        file={file as IOrdoFile}
-                        index={index}
-                      />
-                    ) : (
-                      <Card
-                        key={file.path}
-                        file={file as IOrdoFile}
-                        index={index}
-                      />
-                    )
-                  })}
+                        if (!file) return null
+
+                        const association = useFileAssociationFor(file as IOrdoFile)
+
+                        return association && association.name === "editor.img" ? (
+                          <ImageCard
+                            key={file.path}
+                            file={file as IOrdoFile}
+                            index={index}
+                          />
+                        ) : (
+                          <Card
+                            key={file.path}
+                            file={file as IOrdoFile}
+                            index={index}
+                          />
+                        )
+                      })
+                  : directory.children
+                      .filter((item) => OrdoFile.isOrdoFile(item))
+                      .map((file, index) => {
+                        const association = useFileAssociationFor(file as IOrdoFile)
+
+                        return association && association.name === "editor.img" ? (
+                          <ImageCard
+                            key={file.path}
+                            file={file as IOrdoFile}
+                            index={index}
+                          />
+                        ) : (
+                          <Card
+                            key={file.path}
+                            file={file as IOrdoFile}
+                            index={index}
+                          />
+                        )
+                      })}
                 {provided.placeholder}
               </div>
             )}

@@ -75,6 +75,30 @@ const Kanban = ({ directoryPath }: Props) => {
         })
       }
     }
+
+    if (OrdoFile.isValidPath(result.draggableId)) {
+      if (!drive) return
+
+      const column = OrdoDirectory.findDirectoryDeep(
+        result.destination.droppableId as OrdoDirectoryPath,
+        drive.root,
+      )
+
+      if (!column) return
+
+      const draft = createDraft(column)
+
+      if (!draft.metadata.childOrder) {
+        draft.metadata.childOrder = column.children.map((child) => child.path)
+      }
+
+      const order = draft.metadata.childOrder as (OrdoDirectoryPath | OrdoFilePath)[]
+
+      order.splice(order.indexOf(result.draggableId), 1)
+      order.splice(result.destination.index, 0, result.draggableId)
+
+      emit("fs.update-directory", OrdoDirectory.from(finishDraft(draft)))
+    }
   }
 
   const translatedAddColumn = t("add-column")

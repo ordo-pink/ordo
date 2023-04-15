@@ -1,3 +1,4 @@
+import { OrdoDirectoryPath } from "@ordo-pink/common-types"
 import { Either } from "@ordo-pink/either"
 import { Null } from "@ordo-pink/react-utils"
 import { useRouteParams } from "@ordo-pink/react-utils"
@@ -18,7 +19,7 @@ export default function KanbanActivity() {
         <title>{title}</title>
       </Helmet>
 
-      <Kanban directoryPath={`/${path}/`} />
+      <Kanban directoryPath={`/${path}` as OrdoDirectoryPath} />
     </div>
   ))
 }

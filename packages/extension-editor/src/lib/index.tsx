@@ -128,18 +128,13 @@ export default createExtension(
       },
     })
 
-    commands.after(
-      "fs.create-file.complete",
-      ({
-        payload,
-      }: CommandContext<{ file: IOrdoFile; content?: string; openFileInEditor?: boolean }>) => {
-        const currentActivity = wieldCurrentActivity()
+    commands.after("fs.create-file.complete", ({ payload }: CommandContext<IOrdoFile>) => {
+      const currentActivity = wieldCurrentActivity()
 
-        if (currentActivity?.name === "editor.editor") {
-          commands.emit("editor.open-file-in-editor", payload.file.path)
-        }
-      },
-    )
+      if (currentActivity?.name === "editor.editor") {
+        commands.emit("editor.open-file-in-editor", payload.path)
+      }
+    })
 
     const EXPAND_DIRECTORIES_COMMAND = commands.on(
       "expand-directories",

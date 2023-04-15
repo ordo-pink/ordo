@@ -1,15 +1,9 @@
-import { IOrdoDirectory, IOrdoFile } from "@ordo-pink/common-types"
+import { IOrdoDirectory } from "@ordo-pink/common-types"
 import { OrdoFile } from "@ordo-pink/fs-entity"
-import {
-  useContextMenu,
-  OrdoButtonSecondary,
-  useCommands,
-  useFileAssociationFor,
-} from "@ordo-pink/react-utils"
+import { useContextMenu, OrdoButtonSecondary, useCommands } from "@ordo-pink/react-utils"
 import { Droppable, Draggable } from "react-beautiful-dnd"
 import { BsPencilSquare, BsPlus } from "react-icons/bs"
-import Card from "./card"
-import ImageCard from "./image-card"
+import ColumnItem from "./column-item"
 import { backgroundColors } from "../colors"
 
 type Props = {
@@ -85,46 +79,24 @@ export default function Column({ directory, index }: Props) {
                 {directory.metadata.childOrder
                   ? directory.metadata.childOrder
                       .filter((item) => OrdoFile.isValidPath(item))
-                      .map((path, index) => {
-                        const file = directory.children.find((child) => child.path === path)
-
-                        if (!file) return null
-
-                        const association = useFileAssociationFor(file as IOrdoFile)
-
-                        return association && association.name === "editor.img" ? (
-                          <ImageCard
-                            key={file.path}
-                            file={file as IOrdoFile}
-                            index={index}
-                          />
-                        ) : (
-                          <Card
-                            key={file.path}
-                            file={file as IOrdoFile}
-                            index={index}
-                          />
-                        )
-                      })
+                      .map((path, index) => (
+                        <ColumnItem
+                          path={path}
+                          parent={directory}
+                          index={index}
+                          key={path}
+                        />
+                      ))
                   : directory.children
                       .filter((item) => OrdoFile.isOrdoFile(item))
-                      .map((file, index) => {
-                        const association = useFileAssociationFor(file as IOrdoFile)
-
-                        return association && association.name === "editor.img" ? (
-                          <ImageCard
-                            key={file.path}
-                            file={file as IOrdoFile}
-                            index={index}
-                          />
-                        ) : (
-                          <Card
-                            key={file.path}
-                            file={file as IOrdoFile}
-                            index={index}
-                          />
-                        )
-                      })}
+                      .map((file, index) => (
+                        <ColumnItem
+                          path={file.path}
+                          parent={directory}
+                          index={index}
+                          key={file.path}
+                        />
+                      ))}
                 {provided.placeholder}
               </div>
             )}

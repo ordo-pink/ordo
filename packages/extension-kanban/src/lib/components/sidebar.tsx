@@ -41,7 +41,7 @@ export default function Sidebar() {
       {Object.keys(kanbans).map((kanban) => (
         <KanbanFileReference
           key={kanban}
-          isCurrent={!!params && `/${params.board}/` === kanban}
+          isCurrent={!!params && `/${params.board}` === kanban}
           kanban={kanban as OrdoDirectoryPath}
           files={kanbans[kanban as OrdoDirectoryPath]}
         />

@@ -126,7 +126,7 @@ export default createExtension(
     })
 
     registerActivity("board", {
-      routes: ["/kanban", "/kanban/:board"],
+      routes: ["/kanban", "/kanban/:board*"],
       Component: lazy(() => import("./components/component")),
       Icon: lazy(() => import("./components/icon")),
       Sidebar: lazy(() => import("./components/sidebar")),

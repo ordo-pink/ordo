@@ -58,5 +58,7 @@
   "enterprise-feature-2": "Загрузка файлов любых размеров",
   "enterprise-feature-3": "Командный доступ, неограниченные гостевые аккаунты",
   "enterprise-feature-4": "Выделенная команда поддержки",
-  "current-plan": "Текущий план"
+  "current-plan": "Текущий план",
+  "upload-avatar": "Загрузить аватар",
+  "cancel-button": "Не, ну его"
 }

@@ -264,8 +264,8 @@ export default function Calendar() {
             monthMoreTitleDate: (moreTitle) => new Date(moreTitle.ymd).toLocaleDateString(),
             monthMoreClose: () => "⨯",
             // monthGridHeader: (cellData) => "cellData",
-            monthGridHeaderExceed: (hiddenEventsCount) =>
-              t("@ordo-activity-editor/exceed", { count: hiddenEventsCount }) as string,
+            // monthGridHeaderExceed: (hiddenEventsCount) =>
+            //   t("@ordo-activity-editor/exceed", { count: hiddenEventsCount }) as string,
             monthGridFooter: () => "monthGridFooter",
             monthGridFooterExceed: () => "monthGridFooterExceed",
             // monthDayName: (monthDayNameData) => "monthDayName",

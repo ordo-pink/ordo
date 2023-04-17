@@ -1,16 +1,4 @@
 {
-  "@ordo-activity-user/title": "Account",
-  "@ordo-activity-user/open-account": "Open Account",
-  "@ordo-activity-user/email": "Email",
-  "@ordo-activity-user/change-email": "Change Email",
-  "@ordo-activity-user/email-not-verified": "Your email is not confirmed.",
-  "@ordo-activity-user/resend-verification": "Confirm Email",
-  "@ordo-activity-user/password": "Password",
-  "@ordo-activity-user/change-password": "Change Password",
-  "@ordo-activity-user/email-verified": "Email confirmed",
-  "@ordo-activity-user/logout": "Log out",
-  "@ordo-activity-user/delete-account": "Remove account",
-  "@ordo-activity-user/used-space": "Used space",
   "search-placeholder": "Search...",
   "coming-soon": "Soon",
   "get-started": "Get Started",
@@ -53,5 +41,7 @@
   "enterprise-feature-2": "Any size file upload",
   "enterprise-feature-3": "Team administration, company administration, unlimited access from devices",
   "enterprise-feature-4": "Dedicated support team",
-  "current-plan": "Current plan"
+  "current-plan": "Current plan",
+  "upload-avatar": "Upload avatar",
+  "cancel-button": "Cancel"
 }

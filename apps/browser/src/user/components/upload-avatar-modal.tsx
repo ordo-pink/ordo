@@ -40,7 +40,7 @@ export default function UploadAvatarModal({ onAvatarChanged }: Props) {
   const { hideModal } = useModal()
   const driver = useFsDriver()
   const { emit } = useCommands()
-  const { t } = useTranslation("fs")
+  const { t } = useTranslation("ordo")
 
   const [imgSrc, setImgSrc] = useState("")
   const previewCanvasRef = useRef<HTMLCanvasElement>(null)

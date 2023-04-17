@@ -1,4 +1,4 @@
-import { CommandHandler, Nullable, OrdoFilePath } from "@ordo-pink/common-types"
+import { CommandHandler, OrdoFilePath } from "@ordo-pink/common-types"
 import { OrdoDirectory, OrdoFile } from "@ordo-pink/fs-entity"
 import { wieldCommands, wieldDrive, wieldFsDriver } from "@ordo-pink/react-utils"
 import { createDraft, finishDraft } from "immer"
@@ -27,35 +27,34 @@ export const moveFile: CommandHandler<{ oldPath: OrdoFilePath; newPath: OrdoFile
         ? OrdoDirectory.from(raw)
         : OrdoFile.from(raw)
 
-      oldParent.children = oldParent.children.filter((child) => child.path !== oldPath)
-      newParent.children.push(result)
+      if (!oldParent.metadata.childOrder) {
+        oldParent.metadata.childOrder = oldParent.children.map((child) => child.readableName)
+      }
+
+      if (!newParent.metadata.childOrder) {
+        newParent.metadata.childOrder = newParent.children.map((child) => child.readableName)
+      }
 
       if (oldParent.path === newParent.path) {
-        if (oldParent.metadata.childOrder) {
-          oldParent.metadata.childOrder.splice(
-            oldParent.metadata.childOrder.indexOf(oldPath),
-            1,
-            raw.path,
-          )
+        oldParent.metadata.childOrder.splice(
+          oldParent.metadata.childOrder.indexOf(OrdoFile.getReadableName(oldPath)),
+          1,
+          result.readableName,
+        )
 
-          emit("fs.update-directory", OrdoDirectory.from(oldParent))
-        }
+        emit("fs.update-directory", OrdoDirectory.from(oldParent))
       } else {
-        let oldParentChildIndex: Nullable<number> = null
+        const oldParentChildIndex = oldParent.metadata.childOrder.indexOf(oldPath)
 
-        if (oldParent.metadata.childOrder) {
-          oldParentChildIndex = oldParent.metadata.childOrder.indexOf(oldPath)
-          oldParent.metadata.childOrder.splice(oldParentChildIndex, 1)
-          emit("fs.update-directory", OrdoDirectory.from(oldParent))
-        }
+        oldParent.metadata.childOrder.splice(oldParentChildIndex, 1)
+        newParent.metadata.childOrder.splice(oldParentChildIndex, 0, result.readableName)
 
-        if (newParent.metadata.childOrder) {
-          oldParentChildIndex != null
-            ? newParent.metadata.childOrder.splice(oldParentChildIndex, 0, raw.path)
-            : newParent.metadata.childOrder.push(raw.path)
-          emit("fs.update-directory", OrdoDirectory.from(newParent))
-        }
+        emit("fs.update-directory", OrdoDirectory.from(oldParent))
+        emit("fs.update-directory", OrdoDirectory.from(newParent))
       }
+
+      oldParent.children = oldParent.children.filter((child) => child.path !== oldPath)
+      newParent.children.push(result)
 
       OrdoDirectory.sort(newParent.children)
 

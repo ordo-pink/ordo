@@ -3,6 +3,16 @@ import { IOrdoDirectory, OrdoDirectoryPath } from "./ordo-directory"
 import { Nullable, UnaryFn } from "../types"
 
 /**
+ * These are the default fields that always exist on a file.
+ */
+export type DefaultFileMetadata = {
+  createdAt?: Date
+  updatedAt?: Date
+  createdBy?: string
+  updatedBy?: string
+}
+
+/**
  * Files might or might not have a file extension. These are the two possible
  * options.
  *
@@ -56,7 +66,7 @@ export interface IOrdoFileRaw<T extends Record<string, unknown> = Record<string,
   /**
    * Meta information about the file.
    */
-  metadata: T
+  metadata: T & DefaultFileMetadata
 }
 
 /**
@@ -81,7 +91,7 @@ export type IOrdoFile<T extends Record<string, unknown> = Record<string, unknown
   /**
    * @see IOrdoFileRaw.metadata
    */
-  metadata: T
+  metadata: T & DefaultFileMetadata
 
   /**
    * Readable name of the file.

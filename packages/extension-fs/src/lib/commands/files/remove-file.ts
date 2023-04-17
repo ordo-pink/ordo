@@ -17,12 +17,14 @@ export const removeFile: CommandHandler<IOrdoFile> = ({ payload }) => {
 
   parent.children = parent.children.filter((child) => child.path !== payload.path)
 
-  let childOrderIndex: number
-
-  if (parent.metadata.childOrder) {
-    childOrderIndex = parent.metadata.childOrder.indexOf(payload.path)
-    parent.metadata.childOrder.splice(childOrderIndex, 1)
+  if (!parent.metadata.childOrder) {
+    parent.metadata.childOrder = parent.children.map((child) => child.readableName)
   }
+
+  const childOrderIndex = parent.metadata.childOrder.indexOf(payload.readableName)
+  parent.metadata.childOrder.splice(childOrderIndex, 1)
+
+  emit("fs.update-directory", OrdoDirectory.from(parent))
 
   const newDrive = finishDraft(draft)
 
@@ -36,10 +38,8 @@ export const removeFile: CommandHandler<IOrdoFile> = ({ payload }) => {
     .catch((error) => {
       parent.children.push(payload)
 
-      if (childOrderIndex != null) {
-        parent.metadata.childOrder?.splice(childOrderIndex, 0, payload.path)
-        emit("fs.update-directory", OrdoDirectory.from(parent))
-      }
+      parent.metadata.childOrder?.splice(childOrderIndex, 0, payload.readableName)
+      emit("fs.update-directory", OrdoDirectory.from(parent))
 
       setDrive(finishDraft(draft))
 

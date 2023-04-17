@@ -1,4 +1,4 @@
-import { IOrdoDirectory } from "@ordo-pink/common-types"
+import { IOrdoDirectory, IOrdoFile } from "@ordo-pink/common-types"
 import { OrdoFile } from "@ordo-pink/fs-entity"
 import { useContextMenu, OrdoButtonSecondary, useCommands } from "@ordo-pink/react-utils"
 import { Droppable, Draggable } from "react-beautiful-dnd"
@@ -78,13 +78,16 @@ export default function Column({ directory, index }: Props) {
               >
                 {directory.metadata.childOrder
                   ? directory.metadata.childOrder
-                      .filter((item) => OrdoFile.isValidPath(item))
-                      .map((path, index) => (
+                      .map((item) =>
+                        directory.children.find((child) => child.readableName === item),
+                      )
+                      .filter((item) => item && OrdoFile.isOrdoFile(item))
+                      .map((item, index) => (
                         <ColumnItem
-                          path={path}
+                          path={(item as IOrdoFile).path}
                           parent={directory}
                           index={index}
-                          key={path}
+                          key={(item as IOrdoFile).path}
                         />
                       ))
                   : directory.children

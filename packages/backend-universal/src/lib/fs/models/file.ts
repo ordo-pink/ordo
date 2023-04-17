@@ -281,7 +281,7 @@ export const OrdoFileModel = {
         })
         .then((path) => driver.checkFileExists(path))
         .then((exists) => {
-          if (!exists) {
+          if (!exists && !path.endsWith(".metadata")) {
             logger.warn(UPDATE_TAG, "Not found", path)
             throw ExceptionResponse.NOT_FOUND
           }

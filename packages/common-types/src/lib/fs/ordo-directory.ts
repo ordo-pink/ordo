@@ -23,6 +23,20 @@ export type OrdoDirectoryPath = `/${string}/` | "/"
 export type ValidatedOrdoDirectoryPath<T extends OrdoDirectoryPath> = NoForbiddenCharacters<T> | "/"
 
 /**
+ * These are the default fileds that always exist on a directory.
+ */
+export type DefaultDirectoryMetadata = {
+  color?: Colour
+  createdAt?: Date
+  updatedAt?: Date
+  createdBy?: string
+  updatedBy?: string
+  isExpanded?: boolean
+  isFavourite?: boolean
+  childOrder?: string[]
+}
+
+/**
  * Raw OrdoDirectory content shared between the frontend and the backend.
  */
 export interface IOrdoDirectoryRaw<T extends Record<string, unknown> = Record<string, unknown>> {
@@ -39,7 +53,7 @@ export interface IOrdoDirectoryRaw<T extends Record<string, unknown> = Record<st
   /**
    * Meta information about the directory.
    */
-  metadata: T
+  metadata: T & DefaultDirectoryMetadata
 }
 
 export const Colours = [
@@ -77,12 +91,7 @@ export type IOrdoDirectory<T extends Record<string, unknown> = Record<string, un
   /**
    * @see IOrdoDirectoryRaw.metadata
    */
-  metadata: {
-    color?: Colour
-    isExpanded?: boolean
-    isFavourite?: boolean
-    childOrder?: (OrdoFilePath | OrdoDirectoryPath)[]
-  } & T
+  metadata: T & DefaultDirectoryMetadata
 }
 
 /**

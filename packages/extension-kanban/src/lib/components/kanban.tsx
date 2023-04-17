@@ -50,13 +50,14 @@ const Kanban = ({ directoryPath }: Props) => {
       const draft = createDraft(directory)
 
       if (!draft.metadata.childOrder) {
-        draft.metadata.childOrder = directory.children.map((child) => child.path)
+        draft.metadata.childOrder = directory.children.map((child) => child.readableName)
       }
 
-      const order = draft.metadata.childOrder as (OrdoDirectoryPath | OrdoFilePath)[]
+      const order = draft.metadata.childOrder
+      const draggableName = OrdoDirectory.getReadableName(result.draggableId)
 
-      order.splice(order.indexOf(result.draggableId), 1)
-      order.splice(result.destination.index, 0, result.draggableId)
+      order.splice(order.indexOf(draggableName), 1)
+      order.splice(result.destination.index, 0, draggableName)
 
       emit("fs.update-directory", finishDraft(draft))
     }
@@ -64,19 +65,6 @@ const Kanban = ({ directoryPath }: Props) => {
     if (OrdoFile.isValidPath(result.draggableId)) {
       const parentPath = OrdoFile.getParentPath(result.draggableId)
 
-      if (result.destination && result.destination.droppableId !== parentPath) {
-        const newReadableName = OrdoFile.getReadableName(result.draggableId)
-        const newExtension = OrdoFile.getFileExtension(result.draggableId)
-        const file = `${newReadableName}${newExtension}`
-
-        emit("fs.move-file", {
-          oldPath: result.draggableId,
-          newPath: `${result.destination.droppableId}${file}` as OrdoFilePath,
-        })
-      }
-    }
-
-    if (OrdoFile.isValidPath(result.draggableId)) {
       if (!drive) return
 
       const column = OrdoDirectory.findDirectoryDeep(
@@ -89,13 +77,25 @@ const Kanban = ({ directoryPath }: Props) => {
       const draft = createDraft(column)
 
       if (!draft.metadata.childOrder) {
-        draft.metadata.childOrder = column.children.map((child) => child.path)
+        draft.metadata.childOrder = column.children.map((child) => child.readableName)
       }
 
-      const order = draft.metadata.childOrder as (OrdoDirectoryPath | OrdoFilePath)[]
+      const order = draft.metadata.childOrder
+      const draggableName = OrdoFile.getReadableName(result.draggableId)
 
-      order.splice(order.indexOf(result.draggableId), 1)
-      order.splice(result.destination.index, 0, result.draggableId)
+      order.splice(order.indexOf(draggableName), 1)
+      order.splice(result.destination.index, 0, draggableName)
+
+      if (result.destination && result.destination.droppableId !== parentPath) {
+        const newReadableName = OrdoFile.getReadableName(result.draggableId)
+        const newExtension = OrdoFile.getFileExtension(result.draggableId)
+        const file = `${newReadableName}${newExtension}`
+
+        emit("fs.move-file", {
+          oldPath: result.draggableId,
+          newPath: `${result.destination.droppableId}${file}` as OrdoFilePath,
+        })
+      }
 
       emit("fs.update-directory", OrdoDirectory.from(finishDraft(draft)))
     }
@@ -121,13 +121,14 @@ const Kanban = ({ directoryPath }: Props) => {
             <div className="h-full flex space-x-4 overflow-x-auto pb-6 px-2">
               {dir.metadata.childOrder
                 ? dir.metadata.childOrder
-                    .filter((child) => OrdoDirectory.isValidPath(child))
+                    .map((item) => dir.children.find((child) => child.readableName === item))
+                    .filter((item) => item && OrdoDirectory.isOrdoDirectory(item))
                     .map((child, index) =>
                       Either.fromNullable(
-                        OrdoDirectory.findDirectoryDeep(child as OrdoDirectoryPath, dir),
+                        OrdoDirectory.findDirectoryDeep((child as IOrdoDirectory).path, dir),
                       ).fold(Null, (column) => (
                         <Column
-                          key={child}
+                          key={(child as IOrdoDirectory).path}
                           directory={column}
                           index={index}
                         />

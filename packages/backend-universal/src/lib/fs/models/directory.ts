@@ -18,7 +18,7 @@ const GET_TAG = "OrdoDirectoryModel::getDirectory"
 export const OrdoDirectoryModel = {
   of: ({ driver, logger }: InitParams): IOrdoDirectoryModel => ({
     checkDirectoryExists: driver.checkDirectoryExists,
-    createDirectory: (path) =>
+    createDirectory: ({ path, issuerId }) =>
       Promise.resolve(path)
         .then((path) => {
           if (!OrdoDirectory.isValidPath(path)) {
@@ -43,15 +43,11 @@ export const OrdoDirectoryModel = {
           return { path, parentDirectoryExists }
         })
         .then(async ({ path, parentDirectoryExists }) => {
-          if (OrdoDirectory.getParentPath(path) === "/" && !parentDirectoryExists) {
-            await driver.createDirectory("/")
-            parentDirectoryExists = true
-          }
-
           const parentDirectory = !parentDirectoryExists
-            ? await OrdoDirectoryModel.of({ driver, logger }).createDirectory(
-                OrdoDirectory.getParentPath(path),
-              )
+            ? await OrdoDirectoryModel.of({ driver, logger }).createDirectory({
+                path: OrdoDirectory.getParentPath(path),
+                issuerId,
+              })
             : null
 
           return { path, parentDirectory }
@@ -64,6 +60,9 @@ export const OrdoDirectoryModel = {
               JSON.stringify({
                 isExpanded: false,
                 createdAt: new Date(Date.now()),
+                updatedAt: new Date(Date.now()),
+                createdBy: issuerId,
+                updatedBy: issuerId,
                 color: "neutral",
               }),
             )
@@ -72,14 +71,17 @@ export const OrdoDirectoryModel = {
           }
 
           const result = parentDirectory
-            ? await OrdoDirectoryModel.of({ driver, logger }).getDirectory(parentDirectory.path)
-            : await OrdoDirectoryModel.of({ driver, logger }).getDirectory(path)
+            ? await OrdoDirectoryModel.of({ driver, logger }).getDirectory({
+                path: parentDirectory.path,
+                issuerId,
+              })
+            : await OrdoDirectoryModel.of({ driver, logger }).getDirectory({ path, issuerId })
 
           logger.debug(CREATE_TAG, result)
 
           return result
         }),
-    deleteDirectory: (path) =>
+    deleteDirectory: ({ path }) =>
       Promise.resolve(path)
         .then((path) => {
           if (!OrdoDirectory.isValidPath(path)) {
@@ -114,7 +116,7 @@ export const OrdoDirectoryModel = {
 
           return directory
         }),
-    getDirectory: (path) =>
+    getDirectory: ({ path, issuerId }) =>
       Promise.resolve(path)
         .then((path) => {
           if (!OrdoDirectory.isValidPath(path)) {
@@ -150,12 +152,18 @@ export const OrdoDirectoryModel = {
           for (const path of children) {
             if (OrdoDirectory.isValidPath(path)) {
               result.push(
-                await OrdoDirectoryModel.of({ driver, logger }).getDirectory(
-                  path as OrdoDirectoryPath,
-                ),
+                await OrdoDirectoryModel.of({ driver, logger }).getDirectory({
+                  path: path as OrdoDirectoryPath,
+                  issuerId,
+                }),
               )
             } else if (OrdoFile.isValidPath(path) && !path.endsWith(".metadata")) {
-              result.push(await OrdoFileModel.of({ driver, logger }).getFile(path as OrdoFilePath))
+              result.push(
+                await OrdoFileModel.of({ driver, logger }).getFile({
+                  path: path as OrdoFilePath,
+                  issuerId,
+                }),
+              )
             }
           }
 
@@ -187,7 +195,7 @@ export const OrdoDirectoryModel = {
 
           return directory
         }),
-    moveDirectory: ({ oldPath, newPath }) =>
+    moveDirectory: ({ oldPath, newPath, issuerId }) =>
       Promise.resolve({ oldPath, newPath })
         .then(({ oldPath, newPath }) => {
           if (!OrdoDirectory.isValidPath(oldPath) || !OrdoDirectory.isValidPath(newPath)) {
@@ -218,10 +226,64 @@ export const OrdoDirectoryModel = {
           return { oldPath, newPath, newDirectoryParentExists }
         })
         .then(async ({ oldPath, newPath, newDirectoryParentExists }) => {
+          const metadataPath = `${oldPath}.metadata` as const
+
+          if (await driver.checkFileExists(metadataPath)) {
+            const metadataStream = await driver.getFile(metadataPath)
+
+            const metadata = await new Promise<string>((resolve, reject) => {
+              const body = []
+
+              metadataStream
+                .on("data", (chunk) => body.push(chunk))
+                .on("error", reject)
+                .on("end", () => resolve(Buffer.concat(body).toString("utf8")))
+            })
+
+            try {
+              const data = JSON.parse(metadata || "{}")
+              data.updatedAt = new Date(Date.now())
+              data.updatedBy = issuerId
+
+              if (!data.createdAt) data.createdAt = new Date(Date.now())
+              if (!data.createdBy) data.createdBy = metadataPath.split("/")[1]
+
+              const readable = Readable.from(JSON.stringify(data))
+
+              await driver.updateFile({ path: metadataPath, content: readable })
+            } catch (e) {
+              await driver.createFile({
+                path: metadataPath,
+                content: Readable.from(
+                  JSON.stringify({
+                    createdAt: new Date(Date.now()),
+                    updatedAt: new Date(Date.now()),
+                    createdBy: issuerId,
+                    updatedBy: issuerId,
+                  }),
+                ),
+              })
+              logger.error(MOVE_TAG, e)
+            }
+          } else {
+            await driver.createFile({
+              path: metadataPath,
+              content: Readable.from(
+                JSON.stringify({
+                  createdAt: new Date(Date.now()),
+                  updatedAt: new Date(Date.now()),
+                  createdBy: issuerId,
+                  updatedBy: issuerId,
+                }),
+              ),
+            })
+          }
+
           const parentDirectory = !newDirectoryParentExists
-            ? await OrdoDirectoryModel.of({ driver, logger }).createDirectory(
-                OrdoDirectory.getParentPath(newPath),
-              )
+            ? await OrdoDirectoryModel.of({ driver, logger }).createDirectory({
+                path: OrdoDirectory.getParentPath(newPath),
+                issuerId,
+              })
             : null
 
           return { oldPath, newPath, parentDirectory }
@@ -232,8 +294,11 @@ export const OrdoDirectoryModel = {
         }))
         .then(({ directory, parentDirectory }) => {
           const result = parentDirectory
-            ? OrdoDirectoryModel.of({ driver, logger }).getDirectory(parentDirectory.path)
-            : OrdoDirectoryModel.of({ driver, logger }).getDirectory(directory)
+            ? OrdoDirectoryModel.of({ driver, logger }).getDirectory({
+                path: parentDirectory.path,
+                issuerId,
+              })
+            : OrdoDirectoryModel.of({ driver, logger }).getDirectory({ path: directory, issuerId })
 
           logger.debug(MOVE_TAG, result)
 

@@ -106,16 +106,19 @@ export type FSDriver = {
 
 export type IOrdoFileModel = {
   checkFileExists: UnaryFn<OrdoFilePath, Promise<boolean>>
-  getFileContent: UnaryFn<OrdoFilePath, Promise<Readable>>
-  getFile: UnaryFn<OrdoFilePath, Promise<IOrdoFileRaw>>
-  updateFile: UnaryFn<{ path: OrdoFilePath; content: Readable }, Promise<IOrdoFileRaw>>
-  deleteFile: UnaryFn<OrdoFilePath, Promise<IOrdoFileRaw>>
+  getFileContent: UnaryFn<{ path: OrdoFilePath; issuerId: string }, Promise<Readable>>
+  getFile: UnaryFn<{ path: OrdoFilePath; issuerId: string }, Promise<IOrdoFileRaw>>
+  updateFile: UnaryFn<
+    { path: OrdoFilePath; content: Readable; issuerId: string },
+    Promise<IOrdoFileRaw>
+  >
+  deleteFile: UnaryFn<{ path: OrdoFilePath; issuerId: string }, Promise<IOrdoFileRaw>>
   moveFile: UnaryFn<
-    { oldPath: OrdoFilePath; newPath: OrdoFilePath },
+    { oldPath: OrdoFilePath; newPath: OrdoFilePath; issuerId: string },
     Promise<IOrdoFileRaw | IOrdoDirectoryRaw>
   >
   createFile: UnaryFn<
-    { path: OrdoFilePath; content?: Readable },
+    { path: OrdoFilePath; content?: Readable; issuerId },
     Promise<IOrdoFileRaw | IOrdoDirectoryRaw>
   >
 }
@@ -135,11 +138,17 @@ export type IOrdoInternalModel = {
 
 export type IOrdoDirectoryModel = {
   checkDirectoryExists: UnaryFn<OrdoDirectoryPath, Promise<boolean>>
-  getDirectory: UnaryFn<OrdoDirectoryPath, Promise<IOrdoDirectoryRaw>>
-  deleteDirectory: UnaryFn<OrdoDirectoryPath, Promise<IOrdoDirectoryRaw>>
-  moveDirectory: UnaryFn<
-    { oldPath: OrdoDirectoryPath; newPath: OrdoDirectoryPath },
+  getDirectory: UnaryFn<{ path: OrdoDirectoryPath; issuerId: string }, Promise<IOrdoDirectoryRaw>>
+  deleteDirectory: UnaryFn<
+    { path: OrdoDirectoryPath; issuerId: string },
     Promise<IOrdoDirectoryRaw>
   >
-  createDirectory: UnaryFn<OrdoDirectoryPath, Promise<IOrdoDirectoryRaw>>
+  moveDirectory: UnaryFn<
+    { oldPath: OrdoDirectoryPath; newPath: OrdoDirectoryPath; issuerId: string },
+    Promise<IOrdoDirectoryRaw>
+  >
+  createDirectory: UnaryFn<
+    { path: OrdoDirectoryPath; issuerId: string },
+    Promise<IOrdoDirectoryRaw>
+  >
 }

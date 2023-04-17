@@ -6,7 +6,7 @@ import {
 } from "@ordo-pink/common-types"
 import { Switch } from "@ordo-pink/switch"
 import { FsRequestHandler, OrdoDirectoryPathParams } from "../../../types"
-import { PATH_PARAM, USER_ID_PARAM } from "../../constants"
+import { PATH_PARAM, TOKEN_PARSED_PARAM, USER_ID_PARAM } from "../../constants"
 import { removeUserIdFromPath } from "../../utils/remove-user-id-from-path"
 
 export const getDirectoryHandler: FsRequestHandler<OrdoDirectoryPathParams> =
@@ -14,8 +14,9 @@ export const getDirectoryHandler: FsRequestHandler<OrdoDirectoryPathParams> =
   (req, res) => {
     const path = req.params[PATH_PARAM]
     const userId = req.params[USER_ID_PARAM]
+    const issuerId = req.params[TOKEN_PARSED_PARAM].sub
 
-    getDirectory(path)
+    getDirectory({ path, issuerId })
       .then(removeUserIdFromPath(userId))
       .then((directory: IOrdoDirectoryRaw) => {
         if (directory.path !== "/") return directory

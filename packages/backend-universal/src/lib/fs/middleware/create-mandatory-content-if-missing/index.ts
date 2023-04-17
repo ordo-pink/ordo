@@ -23,12 +23,12 @@ export const createMandatoryContentIfMissing =
     if (!rootExists) {
       // TODO: Log to metrics
       req.params.logger.info("New user created!")
-      await directory.createDirectory(root)
+      await directory.createDirectory({ path: root, issuerId: userId })
     }
 
     if (!trashExists) {
       req.params.logger.debug("Trash bin is missing. Creating...")
-      await directory.createDirectory(trash)
+      await directory.createDirectory({ path: trash, issuerId: userId })
       req.params.logger.debug("Trash bin created")
     }
 

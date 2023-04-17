@@ -27,7 +27,13 @@ export const getFsDriver =
                 res.ok &&
                 fetch(`${host}/${files}/${sub}${file.path}.metadata`, {
                   method: "POST",
-                  body: JSON.stringify(file.metadata),
+                  body: JSON.stringify({
+                    ...file.metadata,
+                    createdAt: new Date(Date.now()),
+                    updatedAt: new Date(Date.now()),
+                    createdBy: sub,
+                    updatedBy: sub,
+                  }),
                   headers: {
                     [authHeader]: `Bearer ${token}`,
                   },
@@ -47,7 +53,12 @@ export const getFsDriver =
       set: (file) =>
         fetch(`${host}/${files}/${sub}${file.path}.metadata`, {
           method: "PUT",
-          body: JSON.stringify(file.metadata),
+          body: JSON.stringify({
+            ...file.metadata,
+            ...file.metadata,
+            updatedAt: new Date(Date.now()),
+            updatedBy: sub,
+          }),
           headers: {
             [authHeader]: `Bearer ${token}`,
           },
@@ -74,7 +85,11 @@ export const getFsDriver =
                 res.ok &&
                 fetch(`${host}/${files}/${sub}${file.path}.metadata`, {
                   method: "PUT",
-                  body: JSON.stringify(file.metadata),
+                  body: JSON.stringify({
+                    ...file.metadata,
+                    updatedAt: new Date(Date.now()),
+                    updatedBy: sub,
+                  }),
                   headers: {
                     [authHeader]: `Bearer ${token}`,
                   },
@@ -115,7 +130,11 @@ export const getFsDriver =
       set: (directory) =>
         fetch(`${host}/${files}/${sub}${directory.path}.metadata`, {
           method: "PUT",
-          body: JSON.stringify(directory.metadata),
+          body: JSON.stringify({
+            ...directory.metadata,
+            updatedAt: new Date(Date.now()),
+            updatedBy: sub,
+          }),
           headers: {
             [authHeader]: `Bearer ${token}`,
           },

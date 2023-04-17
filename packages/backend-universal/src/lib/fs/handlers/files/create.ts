@@ -2,7 +2,7 @@ import type { Readable } from "stream"
 import { SuccessResponse, ExceptionResponse } from "@ordo-pink/common-types"
 import { Switch } from "@ordo-pink/switch"
 import { FsRequestHandler, OrdoFilePathParams } from "../../../types"
-import { PATH_PARAM, USER_ID_PARAM } from "../../constants"
+import { PATH_PARAM, TOKEN_PARSED_PARAM, USER_ID_PARAM } from "../../constants"
 import { processStream } from "../../utils/encrypt-stream"
 import { removeUserIdFromPath } from "../../utils/remove-user-id-from-path"
 
@@ -11,10 +11,11 @@ export const createFileHandler: FsRequestHandler<OrdoFilePathParams> =
   (req, res) => {
     const path = req.params[PATH_PARAM]
     const userId = req.params[USER_ID_PARAM]
+    const issuerId = req.params[TOKEN_PARSED_PARAM].sub
     const contentLength = Number(req.headers["content-length"])
     const processEncryption = processStream(encrypt)
 
-    createFile({ path, content: processEncryption(path, req) as Readable })
+    createFile({ path, content: processEncryption(path, req) as Readable, issuerId })
       .then(removeUserIdFromPath(userId))
       .then((fileOrDirectory) => res.status(SuccessResponse.CREATED).json(fileOrDirectory))
       .then(() => {

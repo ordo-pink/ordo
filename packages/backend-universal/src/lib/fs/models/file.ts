@@ -1,3 +1,4 @@
+import { Readable } from "stream"
 import { ExceptionResponse } from "@ordo-pink/common-types"
 import { OrdoFile } from "@ordo-pink/fs-entity"
 import { Logger } from "@ordo-pink/logger"
@@ -19,7 +20,7 @@ const GET_TAG = "OrdoFileModel::getFile"
 export const OrdoFileModel = {
   of: ({ driver, logger }: InitParams): IOrdoFileModel => ({
     checkFileExists: driver.checkFileExists,
-    createFile: ({ path, content }) =>
+    createFile: ({ path, content, issuerId }) =>
       Promise.resolve(path)
         .then((path) => {
           if (!OrdoFile.isValidPath(path)) {
@@ -45,9 +46,10 @@ export const OrdoFileModel = {
         })
         .then(async ({ path, parentDirectoryExists }) => {
           const parentDirectory = !parentDirectoryExists
-            ? await OrdoDirectoryModel.of({ driver, logger }).createDirectory(
-                OrdoFile.getParentPath(path),
-              )
+            ? await OrdoDirectoryModel.of({ driver, logger }).createDirectory({
+                path: OrdoFile.getParentPath(path),
+                issuerId,
+              })
             : null
 
           return { path, parentDirectory }
@@ -58,10 +60,13 @@ export const OrdoFileModel = {
           logger.debug(CREATE_TAG, path)
 
           return parentDirectory
-            ? OrdoDirectoryModel.of({ driver, logger }).getDirectory(parentDirectory.path)
-            : OrdoFileModel.of({ driver, logger }).getFile(path)
+            ? OrdoDirectoryModel.of({ driver, logger }).getDirectory({
+                path: parentDirectory.path,
+                issuerId,
+              })
+            : OrdoFileModel.of({ driver, logger }).getFile({ path, issuerId })
         }),
-    deleteFile: (path) =>
+    deleteFile: ({ path, issuerId }) =>
       Promise.resolve(path)
         .then((path) => {
           if (!OrdoFile.isValidPath(path)) {
@@ -80,7 +85,7 @@ export const OrdoFileModel = {
 
           return path
         })
-        .then(OrdoFileModel.of({ driver, logger }).getFile)
+        .then((path) => OrdoFileModel.of({ driver, logger }).getFile({ path, issuerId }))
         .then(async (file) => {
           await driver.deleteFile(file.path)
 
@@ -97,7 +102,7 @@ export const OrdoFileModel = {
 
           return file
         }),
-    getFile: (path) =>
+    getFile: ({ path }) =>
       Promise.resolve(path)
         .then((path) => {
           if (!OrdoFile.isValidPath(path)) {
@@ -143,7 +148,7 @@ export const OrdoFileModel = {
           return desc
         })
         .then(OrdoFile.raw),
-    getFileContent: (path) =>
+    getFileContent: ({ path }) =>
       Promise.resolve(path)
         .then((path) => {
           if (!OrdoFile.isValidPath(path)) {
@@ -163,7 +168,7 @@ export const OrdoFileModel = {
           return path
         })
         .then(driver.getFile),
-    moveFile: ({ oldPath, newPath }) =>
+    moveFile: ({ oldPath, newPath, issuerId }) =>
       Promise.resolve({ oldPath, newPath })
         .then(({ oldPath, newPath }) => {
           if (!OrdoFile.isValidPath(oldPath) || !OrdoFile.isValidPath(newPath)) {
@@ -195,9 +200,10 @@ export const OrdoFileModel = {
         })
         .then(async ({ oldPath, newPath, newFileParentExists }) => {
           const parentDirectory = !newFileParentExists
-            ? await OrdoDirectoryModel.of({ driver, logger }).createDirectory(
-                OrdoFile.getParentPath(newPath),
-              )
+            ? await OrdoDirectoryModel.of({ driver, logger }).createDirectory({
+                path: OrdoFile.getParentPath(newPath),
+                issuerId,
+              })
             : null
 
           return { oldPath, newPath, parentDirectory }
@@ -209,24 +215,61 @@ export const OrdoFileModel = {
           const newMetadataPath = `${newPath}.metadata` as const
 
           if (await driver.checkFileExists(oldMetadataPath)) {
-            await driver.moveFile({
-              oldPath: oldMetadataPath,
-              newPath: newMetadataPath,
+            const metadataStream = await driver.getFile(oldMetadataPath)
+
+            const metadata = await new Promise<string>((resolve, reject) => {
+              const body = []
+
+              metadataStream
+                .on("data", (chunk) => body.push(chunk))
+                .on("error", reject)
+                .on("end", () => resolve(Buffer.concat(body).toString("utf8")))
             })
+
+            try {
+              const data = JSON.parse(metadata || "{}")
+              data.updatedAt = new Date(Date.now())
+              data.updatedBy = issuerId
+
+              if (!data.createdAt) data.createdAt = new Date(Date.now())
+              if (!data.createdBy) data.createdBy = oldMetadataPath.split("/")[1]
+
+              const readable = Readable.from(JSON.stringify(data))
+
+              await driver.createFile({ path: newMetadataPath, content: readable })
+            } catch (e) {
+              await driver.createFile({
+                path: newMetadataPath,
+                content: Readable.from(
+                  JSON.stringify({
+                    createdAt: new Date(Date.now()),
+                    updatedAt: new Date(Date.now()),
+                    createdBy: issuerId,
+                    updatedBy: issuerId,
+                  }),
+                ),
+              })
+              logger.error(MOVE_TAG, e)
+            }
+
+            await driver.deleteFile(oldMetadataPath)
           }
 
           return { file, parentDirectory }
         })
         .then(async ({ file, parentDirectory }) => {
           const result = await (parentDirectory
-            ? OrdoDirectoryModel.of({ driver, logger }).getDirectory(parentDirectory.path)
+            ? OrdoDirectoryModel.of({ driver, logger }).getDirectory({
+                path: parentDirectory.path,
+                issuerId,
+              })
             : driver.getFileDescriptor(file).then(OrdoFile.raw))
 
           logger.debug(MOVE_TAG, result.path)
 
           return result
         }),
-    updateFile: ({ path, content }) =>
+    updateFile: ({ path, content, issuerId }) =>
       Promise.resolve(path)
         .then((path) => {
           if (!OrdoFile.isValidPath(path)) {
@@ -247,7 +290,7 @@ export const OrdoFileModel = {
         })
         .then(async (exists) => {
           if (!exists) {
-            await OrdoFileModel.of({ driver, logger }).createFile({ path })
+            await OrdoFileModel.of({ driver, logger }).createFile({ path, issuerId })
           }
 
           return driver.updateFile({ path, content })

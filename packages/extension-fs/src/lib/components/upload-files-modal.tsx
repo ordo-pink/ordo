@@ -24,7 +24,7 @@ export default function UploadFilesModal({ parent }: Props) {
   const [files, setFiles] = useState<File[]>([])
 
   const tPlaceholder = t("choose-name-placeholder") as string
-  const tTitle = t("create-file")
+  const tTitle = t("upload-file")
   const tCancel = t("cancel-button")
   const tUpload = t("upload-file")
 

@@ -59,7 +59,6 @@ export default function UploadAvatarModal({ onAvatarChanged }: Props) {
         imgRef.current &&
         previewCanvasRef.current
       ) {
-        // We use canvasPreview as it's much faster than imgPreview.
         canvasPreview(imgRef.current, previewCanvasRef.current, completedCrop)
       }
     },

@@ -11,10 +11,10 @@ export const checkSizeOfUploadingFile: FsRequestHandler<OrdoFilePathParams> =
     const contentSize = Number(req.headers["content-length"])
     const subscription = req.params[TOKEN_PARSED_PARAM].subscription
 
-    const maxFileSizeMB = subscription ? subscription.maxFileSize : 50
+    const maxFileSizeMB = subscription ? subscription.maxFileSize : 5
     const maxFileSize = maxFileSizeMB * 1024 * 1024
 
-    const maxTotalSizeMB = subscription ? subscription.maxUploadSize : 5
+    const maxTotalSizeMB = subscription ? subscription.maxUploadSize : 50
     const maxTotalSize = maxTotalSizeMB * 1024 * 1024
 
     const totalSize = await internal.getInternalValue(userId, "totalSize")
@@ -35,9 +35,9 @@ export const checkSizeOfUploadingFile: FsRequestHandler<OrdoFilePathParams> =
 
     if (totalSize + contentSize > maxTotalSize) {
       req.params.logger.warn(
-        `Insufficient space: ${OrdoFile.getReadableSize(contentSize)} with ${
-          maxFileSize - totalSize
-        } free space left`,
+        `Insufficient space: ${OrdoFile.getReadableSize(contentSize)} with ${Math.floor(
+          (maxFileSize - totalSize) / 1024 / 1024,
+        )} MB free space left`,
       )
       return void res.status(ExceptionResponse.UNPROCESSABLE_ENTITY).send("{}")
     }

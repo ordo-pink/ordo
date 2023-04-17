@@ -22,7 +22,12 @@ export default function UserPage() {
     if (!driver || !isRefreshRequired) return
 
     driver.files.getContent("/.avatar.png").then((res) => {
-      if (!res.ok) return
+      if (!res.ok) {
+        setIsRefreshRequired(false)
+        setIsLoading(false)
+
+        return
+      }
 
       res.blob().then((blob) => {
         setIsRefreshRequired(false)

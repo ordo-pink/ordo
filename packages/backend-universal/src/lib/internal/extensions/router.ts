@@ -5,6 +5,7 @@ import { updateExtensionFileHandler } from "./handlers/update"
 import { USER_ID_PARAM } from "../../fs/constants"
 import { appendLogger } from "../../fs/middleware/append-logger"
 import { compareTokensStrict } from "../../fs/middleware/compare-tokens"
+import { createMandatoryContentIfMissing } from "../../fs/middleware/create-mandatory-content-if-missing"
 import { OrdoDirectoryModel } from "../../fs/models/directory"
 import { OrdoFileModel } from "../../fs/models/file"
 import { CreateOrdoBackendServerParams } from "../../types"
@@ -29,6 +30,7 @@ export const ExtensionsRouter = ({
       appendLogger(logger),
       authorise,
       compareTokensStrict,
+      createMandatoryContentIfMissing({ directory }),
       getExtensionFileHandler(env),
     )
     .put(
@@ -37,6 +39,7 @@ export const ExtensionsRouter = ({
       appendLogger(logger),
       authorise,
       compareTokensStrict,
+      createMandatoryContentIfMissing({ directory }),
       updateExtensionFileHandler(env),
     )
     .delete(
@@ -45,6 +48,7 @@ export const ExtensionsRouter = ({
       appendLogger(logger),
       authorise,
       compareTokensStrict,
+      createMandatoryContentIfMissing({ directory }),
       removeExtensionFileHandler(env),
     )
 }

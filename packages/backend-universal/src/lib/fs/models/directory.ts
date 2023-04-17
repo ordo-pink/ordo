@@ -59,19 +59,21 @@ export const OrdoDirectoryModel = {
         .then(async ({ path, parentDirectory }) => {
           await driver.createDirectory(path)
 
-          const readable = Readable.from(
-            JSON.stringify({
-              isExpanded: false,
-              createdAt: new Date(Date.now()),
-              color: "neutral",
-            }),
-          )
+          if (!path.endsWith("/.trash/")) {
+            const readable = Readable.from(
+              JSON.stringify({
+                isExpanded: false,
+                createdAt: new Date(Date.now()),
+                color: "neutral",
+              }),
+            )
 
-          await driver.createFile({ path: `${path}.metadata`, content: readable })
+            await driver.createFile({ path: `${path}.metadata`, content: readable })
+          }
 
           const result = parentDirectory
-            ? OrdoDirectoryModel.of({ driver, logger }).getDirectory(parentDirectory.path)
-            : OrdoDirectoryModel.of({ driver, logger }).getDirectory(path)
+            ? await OrdoDirectoryModel.of({ driver, logger }).getDirectory(parentDirectory.path)
+            : await OrdoDirectoryModel.of({ driver, logger }).getDirectory(path)
 
           logger.debug(CREATE_TAG, result)
 

@@ -25,6 +25,7 @@ import {
 } from "./middleware/append-trailing-directory-slash"
 import { checkSizeOfUploadingFile } from "./middleware/check-size-of-uploading-file"
 import { compareTokens } from "./middleware/compare-tokens"
+import { createMandatoryContentIfMissing } from "./middleware/create-mandatory-content-if-missing"
 import { extractDynamicParam } from "./middleware/extract-dynamic-param"
 import { prependPathSlash, prependOldPathAndNewPathSlashes } from "./middleware/prepend-slash"
 import { setContentTypeHeader } from "./middleware/set-content-type-header"
@@ -60,6 +61,7 @@ const filesRouter = ({ fsDriver, authorise, logger, encrypt }: CreateOrdoBackend
       prependPathSlash,
       addUserIdToPath,
       validateFilePath,
+      createMandatoryContentIfMissing({ directory }),
       checkSizeOfUploadingFile(env),
       createFileHandler(env),
     )
@@ -74,6 +76,7 @@ const filesRouter = ({ fsDriver, authorise, logger, encrypt }: CreateOrdoBackend
       prependPathSlash,
       addUserIdToPath,
       validateFilePath,
+      createMandatoryContentIfMissing({ directory }),
       setContentTypeHeader,
       getFileHandler(env),
     )
@@ -88,6 +91,7 @@ const filesRouter = ({ fsDriver, authorise, logger, encrypt }: CreateOrdoBackend
       prependPathSlash,
       addUserIdToPath,
       validateFilePath,
+      createMandatoryContentIfMissing({ directory }),
       checkSizeOfUploadingFile(env),
       updateFileHandler(env),
     )
@@ -102,6 +106,7 @@ const filesRouter = ({ fsDriver, authorise, logger, encrypt }: CreateOrdoBackend
       prependOldPathAndNewPathSlashes,
       addUserIdToOldPathAndNewPath,
       validateFileOldPathAndNewPath,
+      createMandatoryContentIfMissing({ directory }),
       moveFileHandler(env),
     )
     .delete(
@@ -115,6 +120,7 @@ const filesRouter = ({ fsDriver, authorise, logger, encrypt }: CreateOrdoBackend
       prependPathSlash,
       addUserIdToPath,
       validateFilePath,
+      createMandatoryContentIfMissing({ directory }),
       removeFileHandler(env),
     )
 }
@@ -143,6 +149,7 @@ const directoriesRouter = ({
       appendTrailingDirectoryPathSlash,
       addUserIdToPath,
       validateDirectoryPath,
+      createMandatoryContentIfMissing({ directory }),
       createDirectoryHandler(env),
     )
     .get(
@@ -155,6 +162,7 @@ const directoriesRouter = ({
       appendTrailingDirectoryPathSlash,
       addUserIdToPath,
       validateDirectoryPath,
+      createMandatoryContentIfMissing({ directory }),
       getDirectoryHandler(env),
     )
     .get(
@@ -168,6 +176,7 @@ const directoriesRouter = ({
       appendTrailingDirectoryPathSlash,
       addUserIdToPath,
       validateDirectoryPath,
+      createMandatoryContentIfMissing({ directory }),
       getDirectoryHandler(env),
     )
     .patch(
@@ -181,6 +190,7 @@ const directoriesRouter = ({
       appendTrailingDirectoryOldPathAndNewPathSlashes,
       addUserIdToOldPathAndNewPath,
       validateDirectoryOldPathAndNewPath,
+      createMandatoryContentIfMissing({ directory }),
       moveDirectoryHandler(env),
     )
     .delete(
@@ -194,6 +204,7 @@ const directoriesRouter = ({
       appendTrailingDirectoryPathSlash,
       addUserIdToPath,
       validateDirectoryPath,
+      createMandatoryContentIfMissing({ directory }),
       removeDirectoryHandler(env),
     )
 }

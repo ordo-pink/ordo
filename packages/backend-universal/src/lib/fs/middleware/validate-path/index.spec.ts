@@ -1,6 +1,5 @@
 /* eslint-disable */
 import { Request, Response } from "express"
-import { disallowedCharacters } from "@ordo-pink/fs-entity"
 import {
   validateDirectoryPath,
   validateFilePath,
@@ -8,6 +7,7 @@ import {
   validateFileOldPathAndNewPath,
 } from "."
 import { IgnoreLogger } from "@ordo-pink/logger"
+import { disallowedCharacters } from "@ordo-pink/common-types"
 
 const logger = IgnoreLogger
 

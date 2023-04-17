@@ -19,13 +19,16 @@ export const PathBreadcrumbs = ({ path }: Props) => {
   }
 
   return (
-    <div className="path-breadcrumbs">
+    <div
+      className="path-breadcrumbs"
+      title={path}
+    >
       <PathBreadcrumbsItem chunk="/" />
 
       {chunks.map((chunk, index) => (
         <PathBreadcrumbsItem
           key={`${chunk}-${index}`}
-          chunk={chunk}
+          chunk={chunk.length < 7 ? chunk : chunk.slice(0, 6).concat("...")}
         />
       ))}
     </div>

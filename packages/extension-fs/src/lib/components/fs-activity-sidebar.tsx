@@ -58,7 +58,7 @@ export default function FSActivitySidebar() {
   const tRoot = t("root")
   // const tShared = t("shared-directories")
   const tLocations = t("locations")
-  const tRecent = t("recent")
+  // const tRecent = t("recent")
   const tFavourites = t("favourites")
   // const tDevices = t("devices")
   const tTrash = t("trash")
@@ -179,9 +179,9 @@ export default function FSActivitySidebar() {
           </div>
         ))}
 
-      <div className="flex flex-col w-full">
+      {/* <div className="flex flex-col w-full">
         <h2 className="mb-4 uppercase text-neutral-500 font-bold text-sm text-center">{tRecent}</h2>
-      </div>
+      </div> */}
     </div>
   ))
 }

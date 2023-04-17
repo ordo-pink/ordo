@@ -84,42 +84,10 @@ export default function Card({ file, index }: Props) {
               className={`p-2 rounded-full shadow-inner cursor-pointer  ${
                 file.metadata.colour && file.metadata.colour !== "neutral"
                   ? backgroundColors[file.metadata.colour ?? ""]
-                  : "bg-neutral-100"
-                // file.metadata.colour && file.metadata.colour !== "neutral"
-                //   ? iconColors[file.metadata.colour]
-                //   : "text-neutral-400 dark:text-neutral-500"
+                  : "bg-neutral-100 dark:bg-neutral-700"
               }`}
               onClick={() => emit("fs.change-file-colour", file)}
             />
-            {/* TODO: Display action buttons on mobile */}
-            {/* <div className="flex justify-end">
-              <OrdoButtonSecondary
-                compact
-                onClick={() =>
-                  dispatch(
-                    showRenameFileModal({
-                      target: file,
-                      parent: findParent(file, tree) as IOrdoDirectory,
-                      openOnRename: false,
-                    }),
-                  )
-                }
-              >
-                <BsPencilSquare />
-              </OrdoButtonSecondary>
-
-              <OrdoButtonSecondary
-                compact
-                onClick={() =>
-                  navigate({
-                    pathname: "/editor",
-                    search: createSearchParams({ path: file.path }).toString(),
-                  })
-                }
-              >
-                <BsArrowsFullscreen />
-              </OrdoButtonSecondary>
-            </div> */}
           </div>
         </div>
       )}

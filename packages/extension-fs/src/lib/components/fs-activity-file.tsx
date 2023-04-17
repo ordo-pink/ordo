@@ -42,7 +42,7 @@ export default function FSActivityFile({ file }: Props) {
       onContextMenu={handleContextMenu}
       onClick={handleClick}
     >
-      <div className="max-w-[6rem] h-16">
+      <div className="max-w-[4rem] h-16">
         <div className="text-6xl flex flex-col justify-center items-center h-full">
           <FileIcon
             size={IconSize.LARGE}

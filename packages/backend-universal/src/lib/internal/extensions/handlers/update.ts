@@ -1,6 +1,6 @@
 import { SystemDirectory, SuccessResponse, ExceptionResponse } from "@ordo-pink/common-types"
 import { Switch } from "@ordo-pink/switch"
-import { USER_ID_PARAM } from "../../../fs/constants"
+import { TOKEN_PARSED_PARAM, USER_ID_PARAM } from "../../../fs/constants"
 import { removeUserIdFromPath } from "../../../fs/utils/remove-user-id-from-path"
 import { FsRequestHandler } from "../../../types"
 import { ExtensionsParams } from "../../../types"
@@ -9,13 +9,14 @@ export const updateExtensionFileHandler: FsRequestHandler<ExtensionsParams> =
   ({ file: { updateFile, getFile }, internal: { getInternalValue, setInternalValue } }) =>
   async (req, res) => {
     const userId = req.params[USER_ID_PARAM]
+    const issuerId = req.params[TOKEN_PARSED_PARAM].sub
     const path = `/${userId}${SystemDirectory.EXTENSIONS}${req.params.extension}.json` as const
 
     const contentLength = Number(req.headers["content-length"])
 
-    const { size } = await getFile(path)
+    const { size } = await getFile({ path, issuerId })
 
-    updateFile({ path, content: req })
+    updateFile({ path, content: req, issuerId })
       .then(removeUserIdFromPath(userId))
       .then((file) => res.status(SuccessResponse.OK).json(file))
       .then(() => getInternalValue(userId, "totalSize"))

@@ -1,7 +1,7 @@
-import { UnaryFn } from "@ordo-pink/common-types"
-import { Link, useCommandPalette, useSubscription } from "@ordo-pink/react-utils"
+import { Nullable, UnaryFn } from "@ordo-pink/common-types"
+import { Link, useCommandPalette, useFsDriver, useSubscription } from "@ordo-pink/react-utils"
 import { commandPaletteItems$ } from "@ordo-pink/stream-command-palette"
-import { MouseEvent, PropsWithChildren } from "react"
+import { MouseEvent, PropsWithChildren, useEffect, useState } from "react"
 import { useHotkeys } from "react-hotkeys-hook"
 import { BsFillPatchCheckFill, BsThreeDotsVertical } from "react-icons/bs"
 import UsedSpace from "./used-space"
@@ -25,6 +25,21 @@ type Props = PropsWithChildren<{
 export default function Sidebar({ children, onClick }: Props) {
   const { showCommandPalette } = useCommandPalette()
   const commandPaletteItems = useSubscription(commandPaletteItems$)
+  const driver = useFsDriver()
+
+  const [userAvatar, setUserAvatar] = useState<Nullable<string>>(null)
+
+  useEffect(() => {
+    if (!driver) return
+
+    driver.files.getContent("/.avatar.png").then((res) => {
+      if (!res.ok) return
+
+      res.blob().then((blob) => {
+        setUserAvatar(URL.createObjectURL(blob))
+      })
+    })
+  }, [driver])
 
   useHotkeys(
     "ctrl+shift+p",
@@ -63,7 +78,7 @@ export default function Sidebar({ children, onClick }: Props) {
           <div className="bg-white rounded-full">
             <Link href="/user">
               <img
-                src={logo}
+                src={userAvatar ?? logo}
                 alt="User avatar"
                 className="w-10 rounded-full"
               />

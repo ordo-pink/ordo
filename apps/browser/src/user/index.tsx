@@ -1,6 +1,9 @@
-import { PricingPlan } from "@ordo-pink/react-utils"
+import { Loader, PricingPlan, useFsDriver, useModal } from "@ordo-pink/react-utils"
+import { useState, useEffect } from "react"
 import { useTranslation } from "react-i18next"
+import { Nullable } from "vitest"
 import SupportField from "./components/support-field"
+import UploadAvatarModal from "./components/upload-avatar-modal"
 import logo from "../assets/logo.png"
 
 /**
@@ -8,6 +11,41 @@ import logo from "../assets/logo.png"
  */
 export default function UserPage() {
   const { t } = useTranslation("ordo")
+  const driver = useFsDriver()
+  const { showModal } = useModal()
+
+  const [userAvatar, setUserAvatar] = useState<Nullable<string>>(null)
+  const [isRefreshRequired, setIsRefreshRequired] = useState(true)
+  const [isLoading, setIsLoading] = useState(true)
+
+  useEffect(() => {
+    if (!driver || !isRefreshRequired) return
+
+    driver.files.getContent("/.avatar.png").then((res) => {
+      if (!res.ok) return
+
+      res.blob().then((blob) => {
+        setIsRefreshRequired(false)
+        setIsLoading(false)
+        setUserAvatar(URL.createObjectURL(blob))
+      })
+    })
+
+    // return () => {
+    //   if (userAvatar) {
+    //     URL.revokeObjectURL(userAvatar)
+    //     setUserAvatar(null)
+    //   }
+    // }
+  }, [driver, isRefreshRequired, userAvatar])
+
+  const handleAvatarChanged = () => {
+    setIsLoading(true)
+
+    setTimeout(() => {
+      setIsRefreshRequired(true)
+    }, 2000)
+  }
 
   const tFirstName = t("first-name")
   const tLastName = t("last-name")
@@ -24,11 +62,20 @@ export default function UserPage() {
     <div className="w-full p-4 flex flex-col items-center">
       <div className="w-full mt-16 p-8 flex flex-col space-y-8 items-center max-w-2xl rounded-lg shadow-lg bg-neutral-100 dark:bg-neutral-800">
         <div className="-mt-20 p-1 rounded-full bg-gradient-to-tr from-sky-400 via-purple-400 to-rose-400 shadow-lg shrink-0 cursor-pointer">
-          <img
-            src={logo}
-            alt="Ordo.pink Logo"
-            className="h-32 rounded-full bg-white dark:bg-neutral-900"
-          />
+          {isLoading ? (
+            <div className="p-6 bg-neutral-100 dark:bg-neutral-800 rounded-full">
+              <Loader />
+            </div>
+          ) : (
+            <img
+              src={userAvatar ?? logo}
+              alt="Ordo.pink Logo"
+              className="h-32 rounded-full bg-white dark:bg-neutral-900"
+              onClick={() =>
+                showModal(() => <UploadAvatarModal onAvatarChanged={handleAvatarChanged} />)
+              }
+            />
+          )}
         </div>
 
         <div className="w-full flex flex-col space-y-4 sm:flex-row sm:space-y-0 sm:space-x-4 items-center">

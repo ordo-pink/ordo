@@ -55,7 +55,10 @@ export const OrdoInternalModel = {
           })
           .then(async (exists) => {
             if (!exists) {
-              const rootDir = await directory.getDirectory(`/${userId}/`)
+              const rootDir = await directory.getDirectory({
+                path: `/${userId}/`,
+                issuerId: userId,
+              })
               const totalSize = reduceDirectoryToSize(rootDir)
 
               const payload: IOrdoInternal = {

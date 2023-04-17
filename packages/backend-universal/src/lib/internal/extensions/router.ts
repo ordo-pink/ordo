@@ -30,7 +30,7 @@ export const ExtensionsRouter = ({
       appendLogger(logger),
       authorise,
       compareTokensStrict,
-      createMandatoryContentIfMissing({ directory }),
+      createMandatoryContentIfMissing({ directory, file }),
       getExtensionFileHandler(env),
     )
     .put(
@@ -39,7 +39,7 @@ export const ExtensionsRouter = ({
       appendLogger(logger),
       authorise,
       compareTokensStrict,
-      createMandatoryContentIfMissing({ directory }),
+      createMandatoryContentIfMissing({ directory, file }),
       updateExtensionFileHandler(env),
     )
     .delete(
@@ -48,7 +48,7 @@ export const ExtensionsRouter = ({
       appendLogger(logger),
       authorise,
       compareTokensStrict,
-      createMandatoryContentIfMissing({ directory }),
+      createMandatoryContentIfMissing({ directory, file }),
       removeExtensionFileHandler(env),
     )
 }

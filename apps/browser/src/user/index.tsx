@@ -1,5 +1,13 @@
-import { Loader, PricingPlan, useFsDriver, useModal } from "@ordo-pink/react-utils"
-import { useState, useEffect } from "react"
+import { OrdoFile } from "@ordo-pink/fs-entity"
+import {
+  Loader,
+  PricingPlan,
+  useCommands,
+  useDebounceEffect,
+  useFsDriver,
+  useModal,
+} from "@ordo-pink/react-utils"
+import { useState, useEffect, ChangeEvent } from "react"
 import { useTranslation } from "react-i18next"
 import { Nullable } from "vitest"
 import SupportField from "./components/support-field"
@@ -12,11 +20,37 @@ import logo from "../assets/logo.png"
 export default function UserPage() {
   const { t } = useTranslation("ordo")
   const driver = useFsDriver()
+  const { emit } = useCommands()
   const { showModal } = useModal()
 
   const [userAvatar, setUserAvatar] = useState<Nullable<string>>(null)
   const [isRefreshRequired, setIsRefreshRequired] = useState(true)
   const [isLoading, setIsLoading] = useState(true)
+
+  const [firstName, setFirstName] = useState("")
+  const [lastName, setLastName] = useState("")
+
+  useDebounceEffect(
+    () =>
+      emit("fs.update-file-content", {
+        file: OrdoFile.empty("/user.metadata"),
+        content: JSON.stringify({ firstName, lastName }),
+      }),
+    500,
+    [firstName, lastName],
+  )
+
+  useEffect(() => {
+    if (!driver) return
+
+    driver.files
+      .getContent("/user.metadata")
+      .then((res) => res.json())
+      .then(({ firstName, lastName }) => {
+        setFirstName(firstName)
+        setLastName(lastName)
+      })
+  }, [driver])
 
   useEffect(() => {
     if (!driver || !isRefreshRequired) return
@@ -44,6 +78,12 @@ export default function UserPage() {
       setIsRefreshRequired(true)
     }, 2000)
   }
+
+  const handleFirstNameChange = (event: ChangeEvent<HTMLInputElement>) =>
+    setFirstName(event.target.value)
+
+  const handleLastNameChange = (event: ChangeEvent<HTMLInputElement>) =>
+    setLastName(event.target.value)
 
   const tFirstName = t("first-name")
   const tLastName = t("last-name")
@@ -82,6 +122,8 @@ export default function UserPage() {
             <input
               className="w-full max-w-xs bg-neutral-200 dark:bg-neutral-900 rounded-lg px-2 py-1 text-lg shadow-inner"
               type="text"
+              value={firstName}
+              onChange={handleFirstNameChange}
               placeholder={tFirstNamePlaceholder}
             />
           </label>
@@ -90,6 +132,8 @@ export default function UserPage() {
             <input
               className="w-full max-w-xs bg-neutral-200 dark:bg-neutral-900 rounded-lg px-2 py-1 text-lg shadow-inner"
               type="text"
+              value={lastName}
+              onChange={handleLastNameChange}
               placeholder={tLastNamePlaceholder}
             />
           </label>

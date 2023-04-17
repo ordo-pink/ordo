@@ -25,6 +25,7 @@ export const getFsDriver =
             tap(
               (res) =>
                 res.ok &&
+                !file.path.endsWith(".metadata") &&
                 fetch(`${host}/${files}/${sub}${file.path}.metadata`, {
                   method: "POST",
                   body: JSON.stringify({
@@ -83,6 +84,7 @@ export const getFsDriver =
             tap(
               (res) =>
                 res.ok &&
+                !file.path.endsWith(".metadata") &&
                 fetch(`${host}/${files}/${sub}${file.path}.metadata`, {
                   method: "PUT",
                   body: JSON.stringify({

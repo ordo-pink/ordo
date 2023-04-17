@@ -3,7 +3,7 @@ import { Link, useCommandPalette, useFsDriver, useSubscription } from "@ordo-pin
 import { commandPaletteItems$ } from "@ordo-pink/stream-command-palette"
 import { MouseEvent, PropsWithChildren, useEffect, useState } from "react"
 import { useHotkeys } from "react-hotkeys-hook"
-import { BsFillPatchCheckFill, BsThreeDotsVertical } from "react-icons/bs"
+import { BsThreeDotsVertical } from "react-icons/bs"
 import UsedSpace from "./used-space"
 import logo from "../assets/logo.png"
 
@@ -27,6 +27,7 @@ export default function Sidebar({ children, onClick }: Props) {
   const commandPaletteItems = useSubscription(commandPaletteItems$)
   const driver = useFsDriver()
 
+  const [userInfo, setUserInfo] = useState<Nullable<{ firstName: string; lastName: string }>>(null)
   const [userAvatar, setUserAvatar] = useState<Nullable<string>>(null)
 
   useEffect(() => {
@@ -38,6 +39,12 @@ export default function Sidebar({ children, onClick }: Props) {
       res.blob().then((blob) => {
         setUserAvatar(URL.createObjectURL(blob))
       })
+    })
+
+    driver.files.getContent("/user.metadata").then((res) => {
+      if (!res.ok) return
+
+      res.json().then(setUserInfo)
     })
   }, [driver])
 
@@ -68,7 +75,6 @@ export default function Sidebar({ children, onClick }: Props) {
           className="text-neutral-500 cursor-pointer"
           onClick={() => showCommandPalette(commandPaletteItems)}
         >
-          {/* TODO: onClick show command palette */}
           <BsThreeDotsVertical />
         </div>
       </div>
@@ -92,12 +98,12 @@ export default function Sidebar({ children, onClick }: Props) {
                 href="/user"
                 className="no-underline text-neutral-700 dark:text-neutral-400"
               >
-                Sergei Orlov
+                {userInfo?.firstName} {userInfo?.lastName}
               </Link>
             </div>
-            <div className="shrink-0">
+            {/* <div className="shrink-0">
               <BsFillPatchCheckFill className="text-indigo-500 text-base" />
-            </div>
+            </div> */}
           </div>
           <div className="w-full">
             <UsedSpace />

@@ -1,4 +1,4 @@
-export const backgroundColors: Record<string, string> = {
+export const backgroundColours: Record<string, string> = {
   neutral: "column-neutral",
   pink: "column-pink",
   red: "column-red",

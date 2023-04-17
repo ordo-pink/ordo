@@ -13,11 +13,7 @@ export default function FileOrDirectory({ item }: Props) {
   return Either.fromNullable(item).fold(Null, (fileOrDirectory) =>
     Either.fromBoolean(OrdoDirectory.isOrdoDirectory(fileOrDirectory)).fold(
       () => <File file={fileOrDirectory as IOrdoFile} />,
-      () => (
-        <Directory
-          directory={fileOrDirectory as IOrdoDirectory<{ isExpanded: boolean; color: string }>}
-        />
-      ),
+      () => <Directory directory={fileOrDirectory as IOrdoDirectory} />,
     ),
   )
 }

@@ -37,7 +37,7 @@ import { moveDirectory } from "./commands/directory/move-directory"
 import { openDirectoryInFs } from "./commands/directory/open-in-fs"
 import { removeDirectory } from "./commands/directory/remove-directory"
 import { restoreTrashBin } from "./commands/directory/restore-trash-bin"
-import { setDirectoryColor } from "./commands/directory/set-directory-color"
+import { setDirectoryColor } from "./commands/directory/set-directory-colour"
 import { setFavourite } from "./commands/directory/set-favourite"
 import { showClearTrashBinModal } from "./commands/directory/show-clear-trash-bin-modal"
 import { showCreateDirectoryModal } from "./commands/directory/show-create-directory-modal"
@@ -52,6 +52,7 @@ import { downloadFile } from "./commands/files/download-file"
 import { duplicateFile } from "./commands/files/duplicate-file"
 import { moveFile } from "./commands/files/move-file"
 import { removeFile } from "./commands/files/remove-file"
+import { setFileColor } from "./commands/files/set-file-colour"
 import { showCreateFileModal } from "./commands/files/show-create-file-modal"
 import { showRemoveFileModal } from "./commands/files/show-remove-file-modal"
 import { showRenameFileModal } from "./commands/files/show-rename-file-modal"
@@ -127,11 +128,14 @@ export default createExtension(
 
     // Colors -----------------------------------------------------------------
 
-    // Set directory color ----------------------------------------------------
+    // Set directory colour ---------------------------------------------------
 
-    const CHANGE_DIRECTORY_COLOR_COMMAND = commands.on("change-directory-color", setDirectoryColor)
+    const CHANGE_DIRECTORY_COLOUR_COMMAND = commands.on(
+      "change-directory-colour",
+      setDirectoryColor,
+    )
 
-    registerContextMenuItem(CHANGE_DIRECTORY_COLOR_COMMAND, {
+    registerContextMenuItem(CHANGE_DIRECTORY_COLOUR_COMMAND, {
       type: "update",
       Icon: BsPalette2,
       payloadCreator: (target) => target,
@@ -139,8 +143,18 @@ export default createExtension(
         OrdoDirectory.isOrdoDirectory(target) && target.path !== "/" && target.path !== "/.trash/",
     })
 
-    // TODO: Set file color
-    // TODO: Reset directory color & reset file color
+    // Set file colour --------------------------------------------------------
+
+    const CHANGE_FILE_COLOUR_COMMAND = commands.on("change-file-colour", setFileColor)
+
+    registerContextMenuItem(CHANGE_FILE_COLOUR_COMMAND, {
+      type: "update",
+      Icon: BsPalette2,
+      payloadCreator: (target) => target,
+      shouldShow: (target) => OrdoFile.isOrdoFile(target) && target.path !== "/.avatar.png",
+    })
+
+    // TODO: Reset directory colour & reset file colour
 
     // Duplicate file ---------------------------------------------------------
 

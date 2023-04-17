@@ -63,7 +63,7 @@ export const OrdoDirectoryModel = {
                 updatedAt: new Date(Date.now()),
                 createdBy: issuerId,
                 updatedBy: issuerId,
-                color: "neutral",
+                colour: "neutral",
               }),
             )
 

@@ -26,7 +26,7 @@ export type ValidatedOrdoDirectoryPath<T extends OrdoDirectoryPath> = NoForbidde
  * These are the default fileds that always exist on a directory.
  */
 export type DefaultDirectoryMetadata = {
-  color?: Colour
+  colour?: Colour
   createdAt?: Date
   updatedAt?: Date
   createdBy?: string

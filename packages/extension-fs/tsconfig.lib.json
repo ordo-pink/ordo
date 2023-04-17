@@ -5,13 +5,6 @@
     "declaration": true,
     "types": ["node"]
   },
-  "include": [
-    "src/**/*.ts",
-    "src/lib/index.tsx",
-    "src/lib/commands/files/show-rename-file-modal.tsx",
-    "src/lib/commands/files/upload-file.tsx",
-    "src/lib/commands/directory/show-rename-directory-modal.tsx",
-    "src/lib/commands/directory/set-directory-color.tsx"
-  ],
+  "include": ["src/**/*.ts", "src/**/*.tsx"],
   "exclude": ["jest.config.ts", "src/**/*.spec.ts", "src/**/*.test.ts"]
 }

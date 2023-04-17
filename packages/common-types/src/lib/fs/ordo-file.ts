@@ -1,5 +1,5 @@
 import { NoForbiddenCharacters } from "./common"
-import { IOrdoDirectory, OrdoDirectoryPath } from "./ordo-directory"
+import { Colour, IOrdoDirectory, OrdoDirectoryPath } from "./ordo-directory"
 import { Nullable, UnaryFn } from "../types"
 
 /**
@@ -10,6 +10,7 @@ export type DefaultFileMetadata = {
   updatedAt?: Date
   createdBy?: string
   updatedBy?: string
+  colour?: Colour
 }
 
 /**

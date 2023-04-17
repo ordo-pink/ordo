@@ -1,7 +1,7 @@
 import { IOrdoFile, Nullable, OrdoDirectoryPath } from "@ordo-pink/common-types"
 import { Either } from "@ordo-pink/either"
 import { OrdoFile } from "@ordo-pink/fs-entity"
-import { useContextMenu, Null, useCommands } from "@ordo-pink/react-utils"
+import { useContextMenu, Null, useCommands, backgroundColors } from "@ordo-pink/react-utils"
 import { Draggable } from "react-beautiful-dnd"
 import { BsCalendarDate, BsKanban, BsTextLeft } from "react-icons/bs"
 
@@ -79,6 +79,18 @@ export default function Card({ file, index }: Props) {
                 </div>
               ))}
             </div>
+
+            <div
+              className={`p-2 rounded-full shadow-inner cursor-pointer  ${
+                file.metadata.colour && file.metadata.colour !== "neutral"
+                  ? backgroundColors[file.metadata.colour ?? ""]
+                  : "bg-neutral-100"
+                // file.metadata.colour && file.metadata.colour !== "neutral"
+                //   ? iconColors[file.metadata.colour]
+                //   : "text-neutral-400 dark:text-neutral-500"
+              }`}
+              onClick={() => emit("fs.change-file-colour", file)}
+            />
             {/* TODO: Display action buttons on mobile */}
             {/* <div className="flex justify-end">
               <OrdoButtonSecondary

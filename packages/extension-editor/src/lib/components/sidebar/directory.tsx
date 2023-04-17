@@ -13,7 +13,7 @@ import { BsChevronDown, BsChevronUp } from "react-icons/bs"
 import DirectoryContent from "./directory-content"
 
 type Props = {
-  directory: IOrdoDirectory<{ isExpanded: boolean; color: string }>
+  directory: IOrdoDirectory
 }
 
 export default function Directory({ directory }: Props) {

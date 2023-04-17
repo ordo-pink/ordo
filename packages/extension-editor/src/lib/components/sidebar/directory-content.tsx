@@ -12,7 +12,7 @@ type Props = {
   /**
    * Whether the directory is expanded or collapsed.
    */
-  isExpanded: boolean
+  isExpanded?: boolean
 }
 
 /**

@@ -4,7 +4,7 @@ import { useContextMenu, OrdoButtonSecondary, useCommands } from "@ordo-pink/rea
 import { Droppable, Draggable } from "react-beautiful-dnd"
 import { BsPencilSquare, BsPlus } from "react-icons/bs"
 import ColumnItem from "./column-item"
-import { backgroundColors } from "../colors"
+import { backgroundColours } from "../colours"
 
 type Props = {
   directory: IOrdoDirectory
@@ -12,7 +12,7 @@ type Props = {
 }
 
 export default function Column({ directory, index }: Props) {
-  const color = directory.metadata.color ?? "neutral"
+  const colour = directory.metadata.colour ?? "neutral"
 
   const { showContextMenu } = useContextMenu()
   const { emit } = useCommands()
@@ -25,7 +25,7 @@ export default function Column({ directory, index }: Props) {
       {(provided) => (
         <div
           className={`flex flex-col h-full ${
-            backgroundColors[color] ?? backgroundColors["neutral"]
+            backgroundColours[colour] ?? backgroundColours["neutral"]
           } shadow-lg rounded-lg min-w-[calc(100vw-6.5rem)] sm:min-w-[16rem] w-64 max-w-xs`}
           {...provided.draggableProps}
           ref={provided.innerRef}
@@ -71,7 +71,7 @@ export default function Column({ directory, index }: Props) {
                 className={`flex flex-col space-y-2 flex-grow min-h-min p-2 rounded-b-lg overflow-y-auto ${
                   snapshot.isDraggingOver
                     ? "bg-neutral-300 dark:bg-zinc-600"
-                    : backgroundColors[color] ?? backgroundColors["neutral"]
+                    : backgroundColours[colour] ?? backgroundColours["neutral"]
                 }`}
                 ref={provided.innerRef}
                 {...provided.droppableProps}

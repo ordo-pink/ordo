@@ -30,13 +30,6 @@ export default function UserPage() {
         setUserAvatar(URL.createObjectURL(blob))
       })
     })
-
-    // return () => {
-    //   if (userAvatar) {
-    //     URL.revokeObjectURL(userAvatar)
-    //     setUserAvatar(null)
-    //   }
-    // }
   }, [driver, isRefreshRequired, userAvatar])
 
   const handleAvatarChanged = () => {

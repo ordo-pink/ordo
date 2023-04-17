@@ -89,8 +89,8 @@ export const DirectoryIcon = ({ directory, showExpansion, size }: Props) => {
         {directory.metadata.isFavourite ? (
           <div
             className={`absolute text-lg bottom-[calc(100%-50%-0.6rem)] left-[calc(100%-50%-0.6rem)] ${
-              directory.metadata.color && directory.metadata.color !== "neutral"
-                ? iconColors[directory.metadata.color]
+              directory.metadata.colour && directory.metadata.colour !== "neutral"
+                ? iconColors[directory.metadata.colour]
                 : "text-neutral-400 dark:text-neutral-500"
             }`}
           >
@@ -99,8 +99,8 @@ export const DirectoryIcon = ({ directory, showExpansion, size }: Props) => {
         ) : (
           <div
             className={`absolute p-2 w-4 bottom-[calc(100%-50%-0.6rem)] left-[calc(100%-50%-0.55rem)] rounded-full ${
-              directory.metadata.color && directory.metadata.color !== "neutral"
-                ? backgroundColors[directory.metadata.color ?? ""]
+              directory.metadata.colour && directory.metadata.colour !== "neutral"
+                ? backgroundColors[directory.metadata.colour ?? ""]
                 : ""
             }`}
           />
@@ -108,6 +108,6 @@ export const DirectoryIcon = ({ directory, showExpansion, size }: Props) => {
       </div>
     ))
     .default(() => (
-      <Icon className={iconColors[directory.metadata.color ?? ""] ?? iconColors["neutral"]} />
+      <Icon className={iconColors[directory.metadata.colour ?? ""] ?? iconColors["neutral"]} />
     ))
 }

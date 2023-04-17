@@ -1,6 +1,12 @@
 import { IOrdoFile, Nullable } from "@ordo-pink/common-types"
 import { Either } from "@ordo-pink/either"
-import { Null, useContextMenu, useFileContentBlob } from "@ordo-pink/react-utils"
+import {
+  Null,
+  backgroundColors,
+  useCommands,
+  useContextMenu,
+  useFileContentBlob,
+} from "@ordo-pink/react-utils"
 import { useEffect, useState } from "react"
 import { Draggable } from "react-beautiful-dnd"
 
@@ -12,6 +18,7 @@ type Props = {
 export default function ImageCard({ file, index }: Props) {
   const content = useFileContentBlob(file)
   const { showContextMenu } = useContextMenu()
+  const { emit } = useCommands()
 
   const [url, setUrl] = useState<Nullable<string>>(null)
 
@@ -60,13 +67,25 @@ export default function ImageCard({ file, index }: Props) {
           {...provided.dragHandleProps}
           ref={provided.innerRef}
         >
-          <div className="">
+          <div className="relative">
             <img
               className="rounded-lg"
               title={file.path}
               src={url}
               alt={file.readableName}
             />
+
+            <div className="absolute bottom-0 left-0 right-0 flex items-center justify-between">
+              <div></div>
+              <div
+                className={`m-2 p-2 w-4 rounded-full cursor-pointer shadow-inner ${
+                  file.metadata.colour && file.metadata.colour !== "neutral"
+                    ? backgroundColors[file.metadata.colour ?? ""]
+                    : ""
+                }`}
+                onClick={() => emit("fs.change-file-colour", file)}
+              />
+            </div>
           </div>
 
           {/* TODO: Display action buttons on mobile */}

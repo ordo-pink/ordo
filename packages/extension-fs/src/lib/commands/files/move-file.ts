@@ -44,7 +44,9 @@ export const moveFile: CommandHandler<{ oldPath: OrdoFilePath; newPath: OrdoFile
 
         emit("fs.update-directory", OrdoDirectory.from(oldParent))
       } else {
-        const oldParentChildIndex = oldParent.metadata.childOrder.indexOf(oldPath)
+        const oldParentChildIndex = oldParent.metadata.childOrder.indexOf(
+          OrdoFile.getReadableName(oldPath),
+        )
 
         oldParent.metadata.childOrder.splice(oldParentChildIndex, 1)
         newParent.metadata.childOrder.splice(oldParentChildIndex, 0, result.readableName)

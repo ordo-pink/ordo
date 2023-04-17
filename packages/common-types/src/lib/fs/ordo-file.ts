@@ -11,6 +11,7 @@ export type DefaultFileMetadata = {
   createdBy?: string
   updatedBy?: string
   colour?: Colour
+  isFavourite?: boolean
 }
 
 /**

@@ -4,7 +4,7 @@ import { DirectoryIcon, useCommands } from "@ordo-pink/react-utils"
 import { hideCommandPalette, showCommandPalette } from "@ordo-pink/stream-command-palette"
 import { drive$ } from "@ordo-pink/stream-drives"
 
-export const handleSetFavouriteCommandPalette = () => {
+export const handleSetFavouriteDirectoryCommandPalette = () => {
   hideCommandPalette()
 
   const drive = drive$.getValue()
@@ -28,7 +28,7 @@ export const handleSetFavouriteCommandPalette = () => {
         />
       ),
       onSelect: () => {
-        emit("fs.set-favourite", directory)
+        emit("fs.set-favourite-directory", directory)
         hideCommandPalette()
       },
       Comment: () => (
@@ -40,7 +40,7 @@ export const handleSetFavouriteCommandPalette = () => {
   )
 }
 
-export const handleUnsetFavouriteCommandPalette = () => {
+export const handleUnsetFavouriteDirectoryCommandPalette = () => {
   hideCommandPalette()
 
   const drive = drive$.getValue()
@@ -64,7 +64,7 @@ export const handleUnsetFavouriteCommandPalette = () => {
         />
       ),
       onSelect: () => {
-        emit("fs.unset-favourite", directory)
+        emit("fs.unset-favourite-directory", directory)
         hideCommandPalette()
       },
       Comment: () => (

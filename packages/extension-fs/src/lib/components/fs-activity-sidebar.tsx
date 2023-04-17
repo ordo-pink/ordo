@@ -1,9 +1,16 @@
-import { IOrdoDirectory, IconSize, Nullable, OrdoDirectoryPath } from "@ordo-pink/common-types"
+import {
+  IOrdoDirectory,
+  IOrdoFile,
+  IconSize,
+  Nullable,
+  OrdoDirectoryPath,
+} from "@ordo-pink/common-types"
 import { Either } from "@ordo-pink/either"
 import { OrdoDirectory } from "@ordo-pink/fs-entity"
 import {
   ActionListItem,
   DirectoryIcon,
+  FileIcon,
   Null,
   OrdoButtonSuccess,
   useContextMenu,
@@ -21,15 +28,21 @@ export default function FSActivitySidebar() {
   const { t } = useTranslation("fs")
 
   const [currentDirectory, setCurrentDirectory] = useState<Nullable<IOrdoDirectory>>(null)
-  const [favourites, setFavourites] = useState<IOrdoDirectory[]>([])
+  const [favourites, setFavourites] = useState<(IOrdoDirectory | IOrdoFile)[]>([])
 
   useEffect(() => {
     if (!drive) return setCurrentDirectory(null)
 
     setFavourites(
-      OrdoDirectory.getDirectoriesDeep(drive.root)
+      OrdoDirectory.toArray(drive.root)
         .filter((item) => item.metadata.isFavourite)
-        .sort((a, b) => a.readableName.localeCompare(b.readableName)),
+        .sort((a, b) =>
+          a.path.endsWith("/") && !b.path.endsWith("/")
+            ? -1
+            : !a.path.endsWith("/") && b.path.endsWith("/")
+            ? 1
+            : a.readableName.localeCompare(b.readableName),
+        ),
     )
 
     if (!path) return setCurrentDirectory(drive.root)
@@ -133,12 +146,19 @@ export default function FSActivitySidebar() {
                 key={favourite.path}
                 current={directory.path === favourite.path}
                 text={favourite.readableName}
-                Icon={() => (
-                  <DirectoryIcon
-                    directory={favourite}
-                    size={IconSize.EXTRA_SMALL}
-                  />
-                )}
+                Icon={() =>
+                  OrdoDirectory.isOrdoDirectory(favourite) ? (
+                    <DirectoryIcon
+                      directory={favourite}
+                      size={IconSize.EXTRA_SMALL}
+                    />
+                  ) : (
+                    <FileIcon
+                      file={favourite}
+                      size={IconSize.EXTRA_SMALL}
+                    />
+                  )
+                }
                 onContextMenu={(event) => {
                   event.preventDefault()
                   event.stopPropagation()
@@ -149,7 +169,11 @@ export default function FSActivitySidebar() {
                     target: favourite,
                   })
                 }}
-                href={`/fs${favourite.path}`}
+                href={
+                  OrdoDirectory.isOrdoDirectory(favourite)
+                    ? `/fs${favourite.path}`
+                    : `/editor${favourite.path}`
+                }
               />
             ))}
           </div>

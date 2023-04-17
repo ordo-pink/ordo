@@ -24,9 +24,9 @@ import { handleDownloadCommandPalette } from "./command-palette/download-file"
 import { handleRemoveDirectoryCommandPalette } from "./command-palette/remove-directory"
 import { handleRemoveFileCommandPalette } from "./command-palette/remove-file"
 import {
-  handleSetFavouriteCommandPalette,
-  handleUnsetFavouriteCommandPalette,
-} from "./command-palette/set-favourite"
+  handleSetFavouriteDirectoryCommandPalette,
+  handleUnsetFavouriteDirectoryCommandPalette,
+} from "./command-palette/set-favourite-directory"
 import { handleShowCreateDirectoryModalCommandPalette } from "./command-palette/show-create-directory-modal"
 import { handleShowCreateFileModalCommandPalette } from "./command-palette/show-create-file-modal"
 import { handleUploadFileCommandPalette } from "./command-palette/upload-file"
@@ -38,13 +38,13 @@ import { openDirectoryInFs } from "./commands/directory/open-in-fs"
 import { removeDirectory } from "./commands/directory/remove-directory"
 import { restoreTrashBin } from "./commands/directory/restore-trash-bin"
 import { setDirectoryColor } from "./commands/directory/set-directory-colour"
-import { setFavourite } from "./commands/directory/set-favourite"
+import { setFavouriteDirectory } from "./commands/directory/set-favourite-directory"
 import { showClearTrashBinModal } from "./commands/directory/show-clear-trash-bin-modal"
 import { showCreateDirectoryModal } from "./commands/directory/show-create-directory-modal"
 import { showRemoveDirectoryModal } from "./commands/directory/show-remove-directory-modal"
 import { showRenameDirectoryModal } from "./commands/directory/show-rename-directory-modal"
 import { unarchiveDirectory } from "./commands/directory/unarchive-directory"
-import { unsetFavourite } from "./commands/directory/unset-favourite"
+import { unsetFavouriteDirectory } from "./commands/directory/unset-favourite-directory"
 import { updateDirectory } from "./commands/directory/update-directory"
 import { archiveFile } from "./commands/files/archive-file"
 import { createFile } from "./commands/files/create-file"
@@ -52,11 +52,13 @@ import { downloadFile } from "./commands/files/download-file"
 import { duplicateFile } from "./commands/files/duplicate-file"
 import { moveFile } from "./commands/files/move-file"
 import { removeFile } from "./commands/files/remove-file"
+import { setFavouriteFile } from "./commands/files/set-favourite-file"
 import { setFileColor } from "./commands/files/set-file-colour"
 import { showCreateFileModal } from "./commands/files/show-create-file-modal"
 import { showRemoveFileModal } from "./commands/files/show-remove-file-modal"
 import { showRenameFileModal } from "./commands/files/show-rename-file-modal"
 import { unarchiveFile } from "./commands/files/unarchive-file"
+import { unsetFavouriteFile } from "./commands/files/unset-favourite-file"
 import { updateFile } from "./commands/files/update-file"
 import { updateFileContent } from "./commands/files/update-file-content"
 import { uploadFile } from "./commands/files/upload-file"
@@ -169,11 +171,14 @@ export default createExtension(
 
     // Favourites -------------------------------------------------------------
 
-    // Set favourite ----------------------------------------------------------
+    // Set favourite directory ------------------------------------------------
 
-    const SET_FAVIOURITE_COMMAND = commands.on("set-favourite", setFavourite)
+    const SET_FAVIOURITE_DIRECTORY_COMMAND = commands.on(
+      "set-favourite-directory",
+      setFavouriteDirectory,
+    )
 
-    registerContextMenuItem(SET_FAVIOURITE_COMMAND, {
+    registerContextMenuItem(SET_FAVIOURITE_DIRECTORY_COMMAND, {
       type: "update",
       Icon: BsStarFill,
       payloadCreator: (target) => target,
@@ -188,14 +193,17 @@ export default createExtension(
       id: "set-favourite",
       name: translate("set-favourite..."),
       Icon: BsStarFill,
-      onSelect: handleSetFavouriteCommandPalette,
+      onSelect: handleSetFavouriteDirectoryCommandPalette,
     })
 
-    // Unset favourite --------------------------------------------------------
+    // Unset favourite directory ----------------------------------------------
 
-    const UNSET_FAVOURITE_COMMAND = commands.on("unset-favourite", unsetFavourite)
+    const UNSET_FAVOURITE_DIRECTORY_COMMAND = commands.on(
+      "unset-favourite-directory",
+      unsetFavouriteDirectory,
+    )
 
-    registerContextMenuItem(UNSET_FAVOURITE_COMMAND, {
+    registerContextMenuItem(UNSET_FAVOURITE_DIRECTORY_COMMAND, {
       type: "update",
       Icon: BsStar,
       payloadCreator: (target) => target,
@@ -210,7 +218,35 @@ export default createExtension(
       id: "unset-favourite",
       name: translate("unset-favourite..."),
       Icon: BsStar,
-      onSelect: handleUnsetFavouriteCommandPalette,
+      onSelect: handleUnsetFavouriteDirectoryCommandPalette,
+    })
+
+    // Set favourite file -----------------------------------------------------
+
+    const SET_FAVIOURITE_FILE_COMMAND = commands.on("set-favourite-file", setFavouriteFile)
+
+    registerContextMenuItem(SET_FAVIOURITE_FILE_COMMAND, {
+      type: "update",
+      Icon: BsStarFill,
+      payloadCreator: (target) => target,
+      shouldShow: (target) =>
+        OrdoFile.isOrdoFile(target) &&
+        !target.metadata.isFavourite &&
+        target.path !== "/.avatar.png",
+    })
+
+    // Unset favourite file ---------------------------------------------------
+
+    const UNSET_FAVOURITE_FILE_COMMAND = commands.on("unset-favourite-file", unsetFavouriteFile)
+
+    registerContextMenuItem(UNSET_FAVOURITE_FILE_COMMAND, {
+      type: "update",
+      Icon: BsStar,
+      payloadCreator: (target) => target,
+      shouldShow: (target) =>
+        OrdoFile.isOrdoFile(target) &&
+        !!target.metadata.isFavourite &&
+        target.path !== "/.avatar.png",
     })
 
     // Trash bin --------------------------------------------------------------

@@ -180,4 +180,17 @@ export const OrdoDirectory: IOrdoDirectoryStatic = {
 
     return files
   },
+  toArray: (directory) => {
+    const items = [] as (IOrdoDirectory | IOrdoFile)[]
+
+    for (const child of directory.children) {
+      items.push(child)
+
+      if (OrdoDirectory.isOrdoDirectory(child)) {
+        items.push(...OrdoDirectory.toArray(child))
+      }
+    }
+
+    return items
+  },
 }

@@ -206,4 +206,6 @@ export interface IOrdoDirectoryStatic {
   getFilesDeep: (directory: IOrdoDirectory) => IOrdoFile[]
 
   getDirectoriesDeep: (directory: IOrdoDirectory) => IOrdoDirectory[]
+
+  toArray: (directory: IOrdoDirectory) => (IOrdoDirectory | IOrdoFile)[]
 }

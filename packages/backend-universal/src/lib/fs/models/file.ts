@@ -249,6 +249,7 @@ export const OrdoFileModel = {
                   }),
                 ),
               })
+
               logger.error(MOVE_TAG, e)
             }
 
@@ -263,7 +264,10 @@ export const OrdoFileModel = {
                 path: parentDirectory.path,
                 issuerId,
               })
-            : driver.getFileDescriptor(file).then(OrdoFile.raw))
+            : OrdoFileModel.of({ driver, logger }).getFile({
+                path: file,
+                issuerId,
+              }))
 
           logger.debug(MOVE_TAG, result.path)
 

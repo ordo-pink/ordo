@@ -1,1 +1,1 @@
-export * from "./lib/backend-s3-driver"
+export * from "./lib"

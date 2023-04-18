@@ -1,7 +1,7 @@
 import { IOrdoDirectory, Nullable, OrdoDirectoryPath, OrdoFilePath } from "@ordo-pink/common-types"
 import { Either } from "@ordo-pink/either"
 import { OrdoDirectory, OrdoFile } from "@ordo-pink/fs-entity"
-import { Null, OrdoButtonNeutral, useCommands } from "@ordo-pink/react-utils"
+import { Null, OrdoButtonPrimary, useCommands } from "@ordo-pink/react-utils"
 import { useDrive } from "@ordo-pink/react-utils"
 import { createDraft, finishDraft } from "immer"
 import { memo, useEffect, useState } from "react"
@@ -9,9 +9,10 @@ import { DragDropContext, Droppable, OnDragEndResponder } from "react-beautiful-
 import { useTranslation } from "react-i18next"
 import { BsPlusLg } from "react-icons/bs"
 import Column from "./column"
+import { OrdoKanbanNode } from "../ordo-kanban/node"
 
 type Props = {
-  nodeKey?: string // TODO: Provide node and make updates on it if they happen
+  node?: OrdoKanbanNode // TODO: Provide node and make updates on it if they happen
   directoryPath: OrdoDirectoryPath
 }
 
@@ -101,7 +102,7 @@ const Kanban = ({ directoryPath }: Props) => {
     }
   }
 
-  const translatedAddColumn = t("add-column")
+  const tAddColumn = t("add-column")
 
   return Either.fromNullable(directory).fold(Null, (dir) => (
     <DragDropContext
@@ -116,7 +117,7 @@ const Kanban = ({ directoryPath }: Props) => {
           <div
             ref={provided.innerRef}
             {...provided.droppableProps}
-            className="flex flex-col space-y-4 mt-10 h-full"
+            className="flex flex-col space-y-4 h-full"
           >
             <div className="h-full flex space-x-4 overflow-x-auto pb-6 px-2">
               {dir.metadata.childOrder
@@ -149,8 +150,8 @@ const Kanban = ({ directoryPath }: Props) => {
               {provided.placeholder}
             </div>
 
-            <div className="flex self-center">
-              <OrdoButtonNeutral
+            <div className="flex self-center space-x-4">
+              <OrdoButtonPrimary
                 center
                 onClick={() => {
                   emit("fs.show-create-directory-modal", dir)
@@ -158,9 +159,9 @@ const Kanban = ({ directoryPath }: Props) => {
               >
                 <div className="flex space-x-2 items-center">
                   <BsPlusLg />
-                  <div className="text-lg">{translatedAddColumn}</div>
+                  <div>{tAddColumn}</div>
                 </div>
-              </OrdoButtonNeutral>
+              </OrdoButtonPrimary>
             </div>
           </div>
         )}

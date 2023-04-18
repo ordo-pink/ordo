@@ -9,7 +9,7 @@ import {
   ParagraphNode,
 } from "lexical"
 import { ReactNode } from "react"
-import Kanban from "../components/kanban"
+import EditorKanban from "../components/editor-kanban"
 
 // TODO: Extract this to types
 export type SerializedOrdoNode<
@@ -85,14 +85,7 @@ export class OrdoKanbanNode extends DecoratorNode<ReactNode> {
   }
 
   override decorate(): ReactNode {
-    return (
-      <div className="h-[80vh] md:h-[50vh] select-none">
-        <Kanban
-          nodeKey={this.__key}
-          directoryPath={this.__directory}
-        />
-      </div>
-    )
+    return <EditorKanban node={this} />
   }
 
   override exportJSON(): SerializedOrdoKanbanNode {

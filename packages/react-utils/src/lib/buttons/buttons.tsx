@@ -17,6 +17,7 @@ type Props = PropsWithChildren<{
   center?: boolean
   inverted?: boolean
   compact?: boolean
+  title?: string
 }>
 
 export const OrdoButton = ({
@@ -29,6 +30,7 @@ export const OrdoButton = ({
   outline = false,
   center = false,
   compact = false,
+  title = "",
 }: Props) => {
   const ref = useRef<HTMLButtonElement>(null)
 
@@ -42,6 +44,7 @@ export const OrdoButton = ({
   return (
     <button
       ref={ref}
+      title={title}
       onClick={onClick}
       onContextMenu={onClick}
       onMouseOver={onMouseOver}
@@ -70,6 +73,7 @@ export const OrdoButtonPrimary = ({
   className,
   onMouseOver,
   hotkey,
+  title,
   disabled,
   inverted,
   outline,
@@ -94,6 +98,7 @@ export const OrdoButtonPrimary = ({
       onMouseOver={onMouseOver}
       disabled={disabled}
       hotkey={hotkey}
+      title={title}
       className={classNames}
       outline={outline}
       center={center}
@@ -115,6 +120,7 @@ export const OrdoButtonSecondary = ({
   outline,
   center,
   compact,
+  title,
 }: Props) => {
   let buttonClassNames: string
 
@@ -134,6 +140,7 @@ export const OrdoButtonSecondary = ({
       onMouseOver={onMouseOver}
       disabled={disabled}
       hotkey={hotkey}
+      title={title}
       className={buttonClass}
       outline={outline}
       center={center}
@@ -154,6 +161,7 @@ export const OrdoButtonSuccess = ({
   outline,
   center,
   compact,
+  title,
 }: Props) => {
   const buttonAppearanceClass = Either.fromBoolean(!!disabled).fold(
     () =>
@@ -172,6 +180,7 @@ export const OrdoButtonSuccess = ({
       hotkey={hotkey}
       className={buttonClass}
       outline={outline}
+      title={title}
       center={center}
       compact={compact}
     >
@@ -191,6 +200,7 @@ export const OrdoButtonNeutral = ({
   outline,
   center,
   compact,
+  title,
 }: Props) => {
   let buttonClassNames: string
 
@@ -212,6 +222,7 @@ export const OrdoButtonNeutral = ({
       hotkey={hotkey}
       className={buttonClass}
       outline={outline}
+      title={title}
       center={center}
       compact={compact}
     >

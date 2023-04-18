@@ -8,6 +8,7 @@
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext"
 import { eventFiles } from "@lexical/rich-text"
 import { mergeRegister } from "@lexical/utils"
+import { useContextMenu } from "@ordo-pink/react-utils"
 import {
   $getNearestNodeFromDOMNode,
   $getNodeByKey,
@@ -20,7 +21,6 @@ import {
 } from "lexical"
 import { DragEvent as ReactDragEvent, useEffect, useRef, useState } from "react"
 import { createPortal } from "react-dom"
-
 import { isHTMLElement } from "../utils/guard"
 import { Point } from "../utils/point"
 import { Rect } from "../utils/rect"
@@ -198,6 +198,8 @@ function useDraggableBlockMenu(
 ): JSX.Element {
   const scrollerElem = anchorElem.parentElement
 
+  const { showContextMenu } = useContextMenu()
+
   const menuRef = useRef<HTMLDivElement>(null)
   const targetLineRef = useRef<HTMLDivElement>(null)
   const isDraggingBlockRef = useRef<boolean>(false)
@@ -351,6 +353,16 @@ function useDraggableBlockMenu(
         draggable={true}
         onDragStart={onDragStart}
         onDragEnd={onDragEnd}
+        onContextMenu={(event) => {
+          showContextMenu({
+            x: event.pageX,
+            y: event.pageY,
+            target: {
+              element: draggableBlockElem,
+              editor,
+            },
+          })
+        }}
       >
         <div className={isEditable ? "icon" : ""} />
       </div>

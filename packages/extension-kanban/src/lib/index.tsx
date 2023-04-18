@@ -1,10 +1,18 @@
-import { OrdoDirectoryPath, IOrdoFile, CommandContext } from "@ordo-pink/common-types"
+import {
+  OrdoDirectoryPath,
+  IOrdoFile,
+  CommandContext,
+  IconSize,
+  IOrdoDirectory,
+  CommandHandler,
+} from "@ordo-pink/common-types"
 import { OrdoDirectory, OrdoFile } from "@ordo-pink/fs-entity"
-import { wieldDrive, wieldFsDriver } from "@ordo-pink/react-utils"
+import { DirectoryIcon, wieldCommands, wieldDrive, wieldFsDriver } from "@ordo-pink/react-utils"
 import { hideCommandPalette, showCommandPalette } from "@ordo-pink/stream-command-palette"
 import { createExtension } from "@ordo-pink/stream-extensions"
+import { LexicalEditor, $getNearestNodeFromDOMNode, $createParagraphNode } from "lexical"
 import { lazy } from "react"
-import { BsKanban } from "react-icons/bs"
+import { BsKanban, BsKanbanFill } from "react-icons/bs"
 import { OrdoKanbanNode } from "./ordo-kanban/node"
 import { ORDO_KANBAN_TRANSFORMER } from "./ordo-kanban/transformer"
 import en from "./translations/en.json"
@@ -18,11 +26,103 @@ export default createExtension(
     registerTranslations,
     registerActivity,
     registerEditorPlugin,
+    registerContextMenuItem,
     registerCommandPaletteItem,
     commands,
     translate,
   }) => {
     registerTranslations({ ru, en })
+
+    // Kanban -----------------------------------------------------------------
+
+    const TURN_TO_KANBAN = commands.on(
+      "turn-to-kanban",
+      ({ payload }: CommandContext<{ element: HTMLElement; editor: LexicalEditor }>) => {
+        const [drive] = wieldDrive()
+        const commands = wieldCommands()
+
+        drive &&
+          showCommandPalette([
+            {
+              id: "create-new-directory",
+              name: translate("create-new-directory"),
+              onSelect: () => {
+                commands.emit("fs.show-create-directory-modal")
+
+                const onDirectoryCreated: CommandHandler<IOrdoDirectory> = ({
+                  payload: directory,
+                }) => {
+                  payload.editor &&
+                    payload.editor.update(() => {
+                      const node = $getNearestNodeFromDOMNode(payload.element)
+
+                      if (!node) return
+
+                      const newNode = node.replace($createParagraphNode(), true)
+                      newNode.append(new OrdoKanbanNode(directory.path))
+
+                      hideCommandPalette()
+
+                      commands.off("fs")("fs.create-diretory.complete", onDirectoryCreated)
+                    })
+                }
+
+                commands.after("fs.create-directory.complete", onDirectoryCreated)
+
+                setTimeout(() => {
+                  hideCommandPalette()
+                  commands.off("fs")("fs.create-diretory.complete", onDirectoryCreated)
+                }, 60000)
+              },
+            },
+            {
+              id: "open-existing-directory",
+              name: translate("open-existing-directory"),
+              onSelect: () => {
+                hideCommandPalette()
+
+                showCommandPalette(
+                  OrdoDirectory.getDirectoriesDeep(drive.root).map((directory) => ({
+                    id: directory.path,
+                    name: directory.readableName,
+                    onSelect: () => {
+                      payload.editor.update(() => {
+                        const node = $getNearestNodeFromDOMNode(payload.element)
+
+                        if (!node) return
+
+                        const newNode = node.replace($createParagraphNode(), true)
+                        newNode.append(new OrdoKanbanNode(directory.path))
+
+                        hideCommandPalette()
+                      })
+                    },
+                    Comment: () => <div className="text-xs text-neutral-500">{directory.path}</div>,
+                    Icon: () => (
+                      <DirectoryIcon
+                        directory={directory}
+                        size={IconSize.EXTRA_SMALL}
+                      />
+                    ),
+                  })),
+                )
+              },
+            },
+          ])
+      },
+    )
+
+    registerContextMenuItem(TURN_TO_KANBAN, {
+      payloadCreator: (payload) => payload,
+      type: "create",
+      Icon: BsKanbanFill,
+      shouldShow: (target) => Boolean(target.element) && Boolean(target.editor),
+      disabled: (
+        target, // TODO: Extract to a guard
+      ) =>
+        (target.element as HTMLElement).children.length !== 1 ||
+        (target.element as HTMLElement).children[0].tagName !== "BR",
+    })
 
     commands.on("open-kanban-board", ({ payload }) => {
       commands.emit("router.navigate", payload ? `/kanban${payload}` : "/kanban")

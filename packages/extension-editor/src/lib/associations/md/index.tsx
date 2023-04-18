@@ -1,7 +1,7 @@
 import { CodeHighlightNode, CodeNode } from "@lexical/code"
 import { HashtagNode } from "@lexical/hashtag"
 import { AutoLinkNode, LinkNode } from "@lexical/link"
-import { ListItemNode, ListNode } from "@lexical/list"
+import { ListNode, ListItemNode } from "@lexical/list"
 import { $convertToMarkdownString, TRANSFORMERS, Transformer } from "@lexical/markdown"
 import { CheckListPlugin } from "@lexical/react/LexicalCheckListPlugin"
 import { LexicalComposer } from "@lexical/react/LexicalComposer"
@@ -152,6 +152,8 @@ const initialNodes: (typeof LexicalNode)[] = [
   TableRowNode as unknown as typeof LexicalNode,
   AutoLinkNode,
   LinkNode,
+  ListNode as unknown as typeof LexicalNode,
+  ListItemNode as unknown as typeof LexicalNode,
   HashtagNode,
   ParagraphNode,
 ]

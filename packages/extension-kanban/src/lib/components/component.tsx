@@ -14,7 +14,7 @@ export default function KanbanActivity() {
   const title = `Ordo.pink | ${tTitle}${board ? ` | ${board}` : ""}`
 
   return Either.fromNullable(board).fold(Null, (path) => (
-    <div className="h-[92vh]">
+    <div className="h-[95vh] flex flex-col justify-center m-8 mr-0">
       <Helmet>
         <title>{title}</title>
       </Helmet>

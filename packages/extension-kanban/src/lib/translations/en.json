@@ -2,5 +2,8 @@
   "title": "Kanban",
   "add-column": "Add column",
   "open-kanbans": "Open Kanban boards",
-  "open-kanban": "Open Kanban board..."
+  "open-kanban": "Open Kanban board...",
+  "change-kanban-directory": "Change directory",
+  "remove-kanban-board": "Remove board",
+  "turn-to-kanban": "Add Kanban board"
 }

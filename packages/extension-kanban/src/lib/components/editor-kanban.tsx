@@ -60,7 +60,7 @@ export default function EditorKanban({ node }: Props) {
   }
 
   return (
-    <div className="h-[80vh] md:h-[70vh] select-none flex flex-col">
+    <div className="h-[80vh] md:h-[70vh] select-none flex flex-col mb-16">
       <div className="flex space-x-2 m-2 mt-0">
         <OrdoButtonSecondary
           center

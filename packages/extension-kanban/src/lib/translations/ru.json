@@ -2,5 +2,8 @@
   "title": "Kanban",
   "add-column": "Добавить колонку",
   "open-kanbans": "Открыть канбан доски",
-  "open-kanban": "Открыть канбан доску..."
+  "open-kanban": "Открыть канбан доску...",
+  "change-kanban-directory": "Изменить папку",
+  "remove-kanban-board": "Удалить доску",
+  "turn-to-kanban": "Добавить Канбан-доску"
 }

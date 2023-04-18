@@ -16,6 +16,7 @@ export default function ColumnItem({ path, index, parent }: Props) {
 
   const association = useFileAssociationFor(file as IOrdoFile)
 
+  // TODO: Size-dependent rendering
   return association && association.name === "editor.img" ? (
     <ImageCard
       key={file.path}

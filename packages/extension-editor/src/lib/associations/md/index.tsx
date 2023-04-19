@@ -60,6 +60,8 @@ const debouncedSave = debounce(
           metadata,
           child.ordoMetadata,
         )
+      } else {
+        metadata = file.metadata
       }
     })
 
@@ -67,6 +69,7 @@ const debouncedSave = debounce(
 
     const newFile = finishDraft(draft)
 
+    emit("fs.update-file", file)
     emit("fs.update-file-content", { file: newFile, content })
   },
   1000,

@@ -7,7 +7,7 @@ import { FsRequestHandler } from "../../../types"
 
 export const getExtensionFileHandler: FsRequestHandler<ExtensionsParams> =
   ({
-    file: { getFileContent, checkFileExists, createFile },
+    file: { getFileContentStream: getFileContent, checkFileExists, createFile },
     directory: { createDirectory, checkDirectoryExists },
   }) =>
   async (req, res) => {

@@ -1,4 +1,4 @@
-import { NoForbiddenCharacters } from "./common"
+import { Colour, NoForbiddenCharacters } from "./common"
 import { IOrdoFileRaw, IOrdoFile, OrdoFilePath, ValidatedOrdoFilePath } from "./ordo-file"
 import { Nullable, UnaryFn } from "../types"
 
@@ -26,11 +26,11 @@ export type ValidatedOrdoDirectoryPath<T extends OrdoDirectoryPath> = NoForbidde
  * These are the default fileds that always exist on a directory.
  */
 export type DefaultDirectoryMetadata = {
-  colour?: Colour
   createdAt?: Date
   updatedAt?: Date
   createdBy?: string
   updatedBy?: string
+  colour?: Colour
   isExpanded?: boolean
   isFavourite?: boolean
   childOrder?: string[]
@@ -55,19 +55,6 @@ export interface IOrdoDirectoryRaw<T extends Record<string, unknown> = Record<st
    */
   metadata: T & DefaultDirectoryMetadata
 }
-
-export const Colours = [
-  "neutral",
-  "pink",
-  "red",
-  "orange",
-  "yellow",
-  "green",
-  "blue",
-  "purple",
-] as const
-
-export type Colour = (typeof Colours)[number]
 
 /**
  * OrdoDirectory to be used in the application.

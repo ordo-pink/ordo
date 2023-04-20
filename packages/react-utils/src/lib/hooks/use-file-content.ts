@@ -56,7 +56,12 @@ export const useFileContentText = (file: IOrdoFile) => {
   useEffect(() => {
     if (!response) return
 
-    response.clone().text().then(setContent)
+    response
+      .clone()
+      .text()
+      .then((value) => {
+        setContent(value)
+      })
   }, [response, file])
 
   return content

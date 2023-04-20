@@ -61,19 +61,19 @@ export const OrdoDirectory: IOrdoDirectoryStatic = {
     typeof path === "string" && isValidPath(path) && endsWithSlash(path),
   sort: (children) => {
     children.sort((a, b) => {
-      if (OrdoDirectory.isOrdoDirectory(a)) {
+      if (OrdoDirectory.isOrdoDirectoryRaw(a)) {
         OrdoDirectory.sort(a.children)
       }
 
-      if (OrdoDirectory.isOrdoDirectory(b)) {
+      if (OrdoDirectory.isOrdoDirectoryRaw(b)) {
         OrdoDirectory.sort(b.children)
       }
 
-      if (!OrdoDirectory.isOrdoDirectory(a) && OrdoDirectory.isOrdoDirectory(b)) {
+      if (!OrdoDirectory.isOrdoDirectoryRaw(a) && OrdoDirectory.isOrdoDirectoryRaw(b)) {
         return 1
       }
 
-      if (OrdoDirectory.isOrdoDirectory(a) && !OrdoDirectory.isOrdoDirectory(b)) {
+      if (OrdoDirectory.isOrdoDirectoryRaw(a) && !OrdoDirectory.isOrdoDirectoryRaw(b)) {
         return -1
       }
 
@@ -116,7 +116,7 @@ export const OrdoDirectory: IOrdoDirectoryStatic = {
         (child) => child.path === parent.path.concat(chunk).concat("/"),
       )
 
-      if (!found || !OrdoDirectory.isOrdoDirectory(found)) return null
+      if (!found || !OrdoDirectory.isOrdoDirectoryRaw(found)) return null
 
       parent = found
     }
@@ -130,13 +130,13 @@ export const OrdoDirectory: IOrdoDirectoryStatic = {
 
     const directChild = root.children.find((child) => child.path === path)
 
-    if (directChild && OrdoDirectory.isOrdoDirectory(directChild)) return directChild
+    if (directChild && OrdoDirectory.isOrdoDirectoryRaw(directChild)) return directChild
 
     const parent = OrdoDirectory.findParent(path, root)
 
     const found = parent?.children.find((child) => child.path === path)
 
-    if (!found || OrdoFile.isOrdoFile(found)) return null
+    if (!found || OrdoFile.isOrdoFileRaw(found)) return null
 
     return found
   },
@@ -145,13 +145,13 @@ export const OrdoDirectory: IOrdoDirectoryStatic = {
 
     const directChild = root.children.find((child) => child.path === path)
 
-    if (directChild && OrdoFile.isOrdoFile(directChild)) return directChild
+    if (directChild && OrdoFile.isOrdoFileRaw(directChild)) return directChild
 
     const parent = OrdoFile.findParent(path, root)
 
     const found = parent?.children.find((child) => child.path === path)
 
-    if (!found || OrdoDirectory.isOrdoDirectory(found)) return null
+    if (!found || OrdoDirectory.isOrdoDirectoryRaw(found)) return null
 
     return found
   },
@@ -159,7 +159,7 @@ export const OrdoDirectory: IOrdoDirectoryStatic = {
     const directories = [] as IOrdoDirectory[]
 
     for (const child of directory.children) {
-      if (OrdoDirectory.isOrdoDirectory(child)) {
+      if (OrdoDirectory.isOrdoDirectoryRaw(child)) {
         directories.push(child)
         directories.push(...OrdoDirectory.getDirectoriesDeep(child))
       }
@@ -171,7 +171,7 @@ export const OrdoDirectory: IOrdoDirectoryStatic = {
     const files = [] as IOrdoFile[]
 
     for (const child of directory.children) {
-      if (OrdoFile.isOrdoFile(child)) {
+      if (OrdoFile.isOrdoFileRaw(child)) {
         files.push(child)
       } else {
         files.push(...OrdoDirectory.getFilesDeep(child))
@@ -186,7 +186,7 @@ export const OrdoDirectory: IOrdoDirectoryStatic = {
     for (const child of directory.children) {
       items.push(child)
 
-      if (OrdoDirectory.isOrdoDirectory(child)) {
+      if (OrdoDirectory.isOrdoDirectoryRaw(child)) {
         items.push(...OrdoDirectory.toArray(child))
       }
     }

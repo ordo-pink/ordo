@@ -1,4 +1,5 @@
 import { Readable } from "stream"
+import { promiseReadStream } from "@ordo-pink/backend-fs-utils"
 import { ExceptionResponse } from "@ordo-pink/common-types"
 import { OrdoFile } from "@ordo-pink/fs-entity"
 import { Logger } from "@ordo-pink/logger"
@@ -148,7 +149,7 @@ export const OrdoFileModel = {
           return desc
         })
         .then(OrdoFile.raw),
-    getFileContent: ({ path }) =>
+    getFileContentStream: ({ path }) =>
       Promise.resolve(path)
         .then((path) => {
           if (!OrdoFile.isValidPath(path)) {
@@ -168,6 +169,25 @@ export const OrdoFileModel = {
           return path
         })
         .then(driver.getFile),
+    getFileContentString: ({ path, issuerId }) =>
+      OrdoFileModel.of({ driver, logger })
+        .getFileContentStream({ path, issuerId })
+        .then(promiseReadStream),
+    getMetadata: ({ path, issuerId }) =>
+      OrdoFileModel.of({ driver, logger })
+        .getFileContentString({
+          path: path.endsWith(".metadata") ? path : `${path}.metadata`,
+          issuerId,
+        })
+        .then(JSON.parse),
+    setMetadata: ({ path, issuerId, content }) =>
+      OrdoFileModel.of({ driver, logger })
+        .updateFile({
+          path: path.endsWith(".metadata") ? path : `${path}.metadata`,
+          content: Readable.from(JSON.stringify(content)),
+          issuerId,
+        })
+        .then(() => content),
     moveFile: ({ oldPath, newPath, issuerId }) =>
       Promise.resolve({ oldPath, newPath })
         .then(({ oldPath, newPath }) => {

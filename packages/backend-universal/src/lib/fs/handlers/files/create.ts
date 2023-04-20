@@ -7,12 +7,29 @@ import { processStream } from "../../utils/encrypt-stream"
 import { removeUserIdFromPath } from "../../utils/remove-user-id-from-path"
 
 export const createFileHandler: FsRequestHandler<OrdoFilePathParams> =
-  ({ file: { createFile }, internal: { getInternalValue, setInternalValue }, encrypt }) =>
-  (req, res) => {
+  ({
+    file: { createFile, getMetadata, setMetadata },
+    internal: { getInternalValue, setInternalValue },
+    encrypt,
+  }) =>
+  async (req, res) => {
     const path = req.params[PATH_PARAM]
     const userId = req.params[USER_ID_PARAM]
     const issuerId = req.params[TOKEN_PARSED_PARAM].sub
+
     const contentLength = Number(req.headers["content-length"])
+
+    let metadata = await getMetadata({ path, issuerId }).catch(() => null)
+
+    if (!metadata) {
+      metadata = {}
+    }
+
+    if (!metadata.encryption) {
+      metadata.encryption = "v1"
+      await setMetadata({ path, issuerId, content: metadata })
+    }
+
     const processEncryption = processStream(encrypt)
 
     createFile({ path, content: processEncryption(path, req) as Readable, issuerId })

@@ -5,14 +5,28 @@ import { PATH_PARAM, TOKEN_PARSED_PARAM } from "../../constants"
 import { ENCRYPT_ACTION, processStream } from "../../utils/encrypt-stream"
 
 export const getFileHandler: FsRequestHandler<OrdoFilePathParams> =
-  ({ file: { getFileContent }, encrypt }) =>
-  (req, res) => {
+  ({ file: { getFileContentStream, getMetadata }, encrypt }) =>
+  async (req, res) => {
     const path = req.params[PATH_PARAM]
     const issuerId = req.params[TOKEN_PARSED_PARAM].sub
+
+    let encryption = false
+
+    try {
+      const metadata = await getMetadata({ path, issuerId }).catch(() => null)
+      encryption = metadata && metadata.encryption && metadata.encryption === "v1"
+    } catch (_) {
+      req.params.logger.debug("Metadata not found")
+    }
+
     const processEncryption = processStream(encrypt)
 
-    getFileContent({ path, issuerId })
-      .then((content) => processEncryption(path, content, res, ENCRYPT_ACTION.DECRYPT))
+    getFileContentStream({ path, issuerId })
+      .then((content) =>
+        encryption
+          ? processEncryption(path, content, res, ENCRYPT_ACTION.DECRYPT)
+          : content.pipe(res),
+      )
       .catch((error: ExceptionResponse.NOT_FOUND | Error) =>
         Switch.of(error)
           .case(ExceptionResponse.NOT_FOUND, () =>

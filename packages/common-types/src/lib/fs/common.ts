@@ -54,3 +54,16 @@ export type FSDriver = {
     remove: UnaryFn<OrdoFilePath, Promise<IOrdoFileRaw>>
   }
 }
+
+export const Colours = [
+  "neutral",
+  "pink",
+  "red",
+  "orange",
+  "yellow",
+  "green",
+  "blue",
+  "purple",
+] as const
+
+export type Colour = (typeof Colours)[number]

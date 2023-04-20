@@ -34,6 +34,7 @@ export const getFsDriver =
                     updatedAt: new Date(Date.now()),
                     createdBy: sub,
                     updatedBy: sub,
+                    encryption: "v1", // TODO: Remove this,
                   }),
                   headers: {
                     [authHeader]: `Bearer ${token}`,
@@ -91,6 +92,7 @@ export const getFsDriver =
                     ...file.metadata,
                     updatedAt: new Date(Date.now()),
                     updatedBy: sub,
+                    encryption: "v1", // TODO: Remove this
                   }),
                   headers: {
                     [authHeader]: `Bearer ${token}`,

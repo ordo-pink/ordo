@@ -106,7 +106,13 @@ export type FSDriver = {
 
 export type IOrdoFileModel = {
   checkFileExists: UnaryFn<OrdoFilePath, Promise<boolean>>
-  getFileContent: UnaryFn<{ path: OrdoFilePath; issuerId: string }, Promise<Readable>>
+  getMetadata: UnaryFn<{ path: OrdoFilePath; issuerId: string }, Promise<IOrdoFileRaw["metadata"]>>
+  setMetadata: UnaryFn<
+    { path: OrdoFilePath; issuerId: string; content: IOrdoFileRaw["metadata"] },
+    Promise<IOrdoFileRaw["metadata"]>
+  >
+  getFileContentStream: UnaryFn<{ path: OrdoFilePath; issuerId: string }, Promise<Readable>>
+  getFileContentString: UnaryFn<{ path: OrdoFilePath; issuerId: string }, Promise<string>>
   getFile: UnaryFn<{ path: OrdoFilePath; issuerId: string }, Promise<IOrdoFileRaw>>
   updateFile: UnaryFn<
     { path: OrdoFilePath; content: Readable; issuerId: string },
@@ -118,7 +124,7 @@ export type IOrdoFileModel = {
     Promise<IOrdoFileRaw | IOrdoDirectoryRaw>
   >
   createFile: UnaryFn<
-    { path: OrdoFilePath; content?: Readable; issuerId },
+    { path: OrdoFilePath; content?: Readable; issuerId: string },
     Promise<IOrdoFileRaw | IOrdoDirectoryRaw>
   >
 }

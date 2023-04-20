@@ -27,9 +27,9 @@ export const createDirectory = ({ payload: path }: CommandContext<OrdoDirectoryP
 
       if (!parent.metadata.childOrder) {
         parent.metadata.childOrder = parent.children.map((child) => child.readableName)
+      } else {
+        parent.metadata.childOrder.push(directory.readableName)
       }
-
-      parent.metadata.childOrder.push(directory.readableName)
 
       emit("fs.update-directory", OrdoDirectory.from(parent))
 

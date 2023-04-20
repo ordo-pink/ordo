@@ -31,10 +31,10 @@ export const createFile: CommandHandler<{ file: IOrdoFile; content?: string }> =
 
       if (!parent.metadata.childOrder) {
         parent.metadata.childOrder = parent.children.map((child) => child.readableName)
+      } else {
+        parent.metadata.childOrder.push(result.readableName)
       }
 
-      // TODO: If this creates problems, also use file extension in the childOrder
-      parent.metadata.childOrder.push(result.readableName)
       emit("fs.update-directory", OrdoDirectory.from(parent))
 
       OrdoDirectory.sort(parent.children)

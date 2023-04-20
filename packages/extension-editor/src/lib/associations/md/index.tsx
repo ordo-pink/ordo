@@ -10,6 +10,7 @@ import { ContentEditable } from "@lexical/react/LexicalContentEditable"
 import LexicalErrorBoundary from "@lexical/react/LexicalErrorBoundary"
 import { HashtagPlugin } from "@lexical/react/LexicalHashtagPlugin"
 import { HistoryPlugin } from "@lexical/react/LexicalHistoryPlugin"
+import { HorizontalRuleNode } from "@lexical/react/LexicalHorizontalRuleNode"
 import { HorizontalRulePlugin } from "@lexical/react/LexicalHorizontalRulePlugin"
 import { LinkPlugin } from "@lexical/react/LexicalLinkPlugin"
 import { ListPlugin } from "@lexical/react/LexicalListPlugin"
@@ -36,6 +37,7 @@ import { ComponentType, memo, useEffect, useState } from "react"
 import { useTranslation } from "react-i18next"
 import { LoadEditorStatePlugin } from "./load-state"
 // import { TreeViewPlugin } from "./tree-view"
+// import ComponentPickerMenuPlugin from "./plugins/component-picker"
 import DraggableBlockPlugin from "./plugins/draggable-block-plugin"
 
 import "./index.css"
@@ -95,6 +97,8 @@ const theme: EditorThemeClasses = {
   list: {
     ul: "m-4 ml-6 list-inside list-disc",
     ol: "m-4 ml-6 list-inside list-decimal",
+    listitemChecked: "PlaygroundEditorTheme__listItemChecked",
+    listitemUnchecked: "PlaygroundEditorTheme__listItemUnchecked",
   },
   link: "text-sky-700 visited:text-purple-700",
   paragraph: "m-4 ml-6 my-2",
@@ -159,6 +163,7 @@ const initialNodes: (typeof LexicalNode)[] = [
   ListItemNode as unknown as typeof LexicalNode,
   HashtagNode,
   ParagraphNode,
+  HorizontalRuleNode,
 ]
 
 type Props = {
@@ -239,7 +244,7 @@ export default memo(
     const onError = console.error
 
     return Either.fromNullable(editorPlugins).fold(Null, (plugins) => (
-      <div className="py-2 pl-2">
+      <div className="py-2 pl-2 pb-96">
         <LexicalComposer
           initialConfig={{
             namespace: "md-editor-root",
@@ -272,6 +277,8 @@ export default memo(
           <ListPlugin />
           <CheckListPlugin />
 
+          {/* <ComponentPickerMenuPlugin /> */}
+
           <HashtagPlugin />
           <HistoryPlugin />
           <HorizontalRulePlugin />
@@ -280,7 +287,7 @@ export default memo(
 
           <RichTextPlugin
             contentEditable={
-              <div className="editor-scroller">
+              <div className="editor-scroller pb-96">
                 <div
                   className="editor"
                   ref={onRef}

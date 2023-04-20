@@ -1,14 +1,8 @@
 import { $createListNode } from "@lexical/list"
 import { $createHeadingNode, $createQuoteNode } from "@lexical/rich-text"
-import {
-  CommandContext,
-  IOrdoDirectory,
-  IOrdoFile,
-  IconSize,
-  OrdoFilePath,
-} from "@ordo-pink/common-types"
+import { CommandContext, IOrdoDirectory, IconSize, OrdoFilePath } from "@ordo-pink/common-types"
 import { OrdoDirectory, OrdoFile } from "@ordo-pink/fs-entity"
-import { FileIcon, wieldCurrentActivity } from "@ordo-pink/react-utils"
+import { FileIcon } from "@ordo-pink/react-utils"
 import { hideCommandPalette, showCommandPalette } from "@ordo-pink/stream-command-palette"
 import { drive$, fsDriver$ } from "@ordo-pink/stream-drives"
 import { createExtension, currentActivity$ } from "@ordo-pink/stream-extensions"
@@ -321,13 +315,13 @@ export default createExtension(
       },
     })
 
-    commands.after("fs.create-file.complete", ({ payload }: CommandContext<IOrdoFile>) => {
-      const currentActivity = wieldCurrentActivity()
+    // commands.after("fs.create-file.complete", ({ payload }: CommandContext<IOrdoFile>) => {
+    //   const currentActivity = wieldCurrentActivity()
 
-      if (currentActivity?.name === "editor.editor") {
-        commands.emit("editor.open-file-in-editor", payload.path)
-      }
-    })
+    //   if (currentActivity?.name === "editor.editor") {
+    //     commands.emit("editor.open-file-in-editor", payload.path)
+    //   }
+    // })
 
     const EXPAND_DIRECTORIES_COMMAND = commands.on(
       "expand-directories",

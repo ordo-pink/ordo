@@ -12,6 +12,13 @@
         "lintFilePatterns": ["packages/react-utils/**/*.{ts,tsx,js,jsx}"]
       }
     },
+    "publish": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "node tools/scripts/publish.mjs react-utils {args.ver} {args.tag}"
+      },
+      "dependsOn": ["build"]
+    },
     "build": {
       "executor": "@nrwl/vite:build",
       "outputs": ["{options.outputPath}"],

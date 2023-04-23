@@ -27,8 +27,10 @@ import AntonLaptev from "../assets/anton-laptev.jpg"
 import heroBg from "../assets/bg.jpg"
 import KonstantinTsepelev from "../assets/konstantin-tsepelev.jpg"
 import paint from "../assets/paint.jpg"
-import appDark from "../assets/rich-editor-1.png"
-import app from "../assets/rich-editor-2.png"
+import kanbanDark from "../assets/screenshot-kanban-dark.png"
+import kanbanLight from "../assets/screenshot-kanban-light.png"
+import mdDark from "../assets/screenshot-md-dark.png"
+import mdLight from "../assets/screenshot-md-light.png"
 import SergeiOrlov from "../assets/sergei-orlov.jpg"
 import TimurGafiulin from "../assets/timur-gafiulin.jpg"
 
@@ -55,26 +57,26 @@ export default function Home() {
 
   const proFeatures = [tOrdo("pro-feature-1"), tOrdo("pro-feature-2"), tOrdo("pro-feature-3")]
 
-  const proPlusFeatures = [
-    tOrdo("pro-plus-feature-1"),
-    tOrdo("pro-plus-feature-2"),
-    tOrdo("pro-plus-feature-3"),
-    tOrdo("pro-plus-feature-4"),
-  ]
+  // const proPlusFeatures = [
+  //   tOrdo("pro-plus-feature-1"),
+  //   tOrdo("pro-plus-feature-2"),
+  //   tOrdo("pro-plus-feature-3"),
+  //   tOrdo("pro-plus-feature-4"),
+  // ]
 
-  const teamFeatures = [
-    tOrdo("team-feature-1"),
-    tOrdo("team-feature-2"),
-    tOrdo("team-feature-3"),
-    tOrdo("team-feature-4"),
-  ]
+  // const teamFeatures = [
+  //   tOrdo("team-feature-1"),
+  //   tOrdo("team-feature-2"),
+  //   tOrdo("team-feature-3"),
+  //   tOrdo("team-feature-4"),
+  // ]
 
-  const enterpriseFeatures = [
-    tOrdo("enterprise-feature-1"),
-    tOrdo("enterprise-feature-2"),
-    tOrdo("enterprise-feature-3"),
-    tOrdo("enterprise-feature-4"),
-  ]
+  // const enterpriseFeatures = [
+  //   tOrdo("enterprise-feature-1"),
+  //   tOrdo("enterprise-feature-2"),
+  //   tOrdo("enterprise-feature-3"),
+  //   tOrdo("enterprise-feature-4"),
+  // ]
 
   const keyPrinciples = [
     { title: "security-title", Icon: BsLock, description: "security-description" },
@@ -270,7 +272,7 @@ export default function Home() {
               </div>
             </div>
             <img
-              src={app}
+              src={kanbanLight}
               alt="Product screenshot"
               className="dark:hidden w-[48rem] max-w-none rounded-xl shadow-xl ring-1 ring-neutral-400/10 sm:w-[57rem] md:-ml-4 lg:-ml-0"
               width={2432}
@@ -278,7 +280,7 @@ export default function Home() {
             />
 
             <img
-              src={appDark}
+              src={kanbanDark}
               alt="Product screenshot"
               className="hidden dark:inline-block w-[48rem] max-w-none rounded-xl shadow-xl ring-1 ring-neutral-400/10 sm:w-[57rem] md:-ml-4 lg:-ml-0"
               width={2432}
@@ -315,8 +317,16 @@ export default function Home() {
           </div>
           <div className="relative mt-16 h-80 lg:mt-8">
             <img
-              className="absolute top-0 left-0 w-[57rem] max-w-none rounded-md bg-white/5 ring-1 ring-white/10"
-              src={appDark}
+              className="dark:hidden absolute top-0 left-0 w-[57rem] max-w-none rounded-md bg-white/5 ring-1 ring-white/10"
+              src={mdLight}
+              alt="App screenshot"
+              width={1824}
+              height={1080}
+            />
+
+            <img
+              className="hidden dark:block absolute top-0 left-0 w-[57rem] max-w-none rounded-md bg-white/5 ring-1 ring-white/10"
+              src={mdDark}
               alt="App screenshot"
               width={1824}
               height={1080}
@@ -350,7 +360,7 @@ export default function Home() {
               price="pro-price"
             />
 
-            <PricingPlan
+            {/* <PricingPlan
               features={proPlusFeatures}
               title="pro-plus"
               description="pro-plus-description"
@@ -370,7 +380,7 @@ export default function Home() {
               title="enterprise"
               description="enterprise-description"
               price="enterprise-price"
-            />
+            /> */}
           </div>
         </div>
       </section>

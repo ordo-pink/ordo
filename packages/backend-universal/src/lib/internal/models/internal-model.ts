@@ -62,8 +62,6 @@ export const OrdoInternalModel = {
               const totalSize = reduceDirectoryToSize(rootDir)
 
               const payload: IOrdoInternal = {
-                maxTotalSize: 0,
-                maxUploadSize: 5,
                 totalSize, // TODO: Store externally
               }
 

@@ -119,7 +119,7 @@
     "@faker-js/faker": "^7.6.0",
     "@lexical/code": "^0.8.0",
     "@lexical/link": "^0.8.0",
-    "@lexical/list": "^0.8.0",
+    "@lexical/list": "^0.8.1",
     "@lexical/markdown": "^0.8.0",
     "@lexical/react": "^0.8.0",
     "@lexical/rich-text": "^0.8.0",

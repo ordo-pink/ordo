@@ -5,10 +5,14 @@
   "projectType": "library",
   "targets": {
     "build": {
-      "executor": "@nrwl/vite:build",
+      "executor": "@nrwl/js:tsc",
       "outputs": ["{options.outputPath}"],
       "options": {
-        "outputPath": "dist/packages/locale"
+        "outputPath": "dist/packages/locale",
+        "tsConfig": "packages/locale/tsconfig.lib.json",
+        "packageJson": "packages/locale/package.json",
+        "main": "packages/locale/src/index.ts",
+        "assets": ["packages/locale/*.md"]
       }
     },
     "test": {

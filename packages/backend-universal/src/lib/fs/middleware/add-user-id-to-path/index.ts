@@ -14,8 +14,6 @@ export const addUserIdToPath: RequestHandler<OrdoDirectoryPathParams | OrdoFileP
 ) => {
   req.params[PATH_PARAM] = `/${req.params[USER_ID_PARAM]}${req.params[PATH_PARAM]}`
 
-  req.params.logger.debug("Appended userId to path")
-
   next()
 }
 
@@ -24,8 +22,6 @@ export const addUserIdToOldPathAndNewPath: RequestHandler<
 > = (req, _, next) => {
   req.params[OLD_PATH_PARAM] = `/${req.params[USER_ID_PARAM]}${req.params[OLD_PATH_PARAM]}`
   req.params[NEW_PATH_PARAM] = `/${req.params[USER_ID_PARAM]}${req.params[NEW_PATH_PARAM]}`
-
-  req.params.logger.debug("Appended userId to old path and new path")
 
   next()
 }

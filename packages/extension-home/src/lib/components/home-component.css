@@ -1,0 +1,20 @@
+.custom-shape-divider-top-1679427882 {
+  position: absolute;
+  top: -1px;
+  left: 0;
+  width: 100%;
+  overflow: hidden;
+  line-height: 0;
+}
+
+.custom-shape-divider-top-1679427882 svg {
+  position: relative;
+  display: block;
+  width: calc(123% + 1.3px);
+  height: 55px;
+  transform: rotateY(180deg);
+}
+
+.custom-shape-divider-top-1679427882 .shape-fill {
+  @apply fill-emerald-300 dark:fill-emerald-700;
+}

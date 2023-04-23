@@ -11,6 +11,9 @@
     }
   },
   "targetDefaults": {
+    "serve": {
+      "dependsOn": ["^build"]
+    },
     "build": {
       "dependsOn": ["^build"],
       "inputs": ["production", "^production"]

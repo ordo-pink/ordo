@@ -1,7 +1,7 @@
 import { ExceptionResponse } from "@ordo-pink/common-types"
 import { OrdoFile } from "@ordo-pink/fs-entity"
 import { FsRequestHandler, OrdoFilePathParams } from "../../../types"
-import { USER_ID_PARAM } from "../../constants"
+import { TOKEN_PARSED_PARAM, USER_ID_PARAM } from "../../constants"
 
 export const checkSizeOfUploadingFile: FsRequestHandler<OrdoFilePathParams> =
   ({ internal }) =>
@@ -9,27 +9,37 @@ export const checkSizeOfUploadingFile: FsRequestHandler<OrdoFilePathParams> =
     const userId = req.params[USER_ID_PARAM]
 
     const contentSize = Number(req.headers["content-length"])
+    const subscription = req.params[TOKEN_PARSED_PARAM].subscription
 
-    const maxFileSizeMB = await internal.getInternalValue(userId, "maxUploadSize")
+    const maxFileSizeMB = subscription ? subscription.maxFileSize : 5
     const maxFileSize = maxFileSizeMB * 1024 * 1024
 
-    const maxTotalSizeMB = await internal.getInternalValue(userId, "maxTotalSize")
+    const maxTotalSizeMB = subscription ? subscription.maxUploadSize : 50
     const maxTotalSize = maxTotalSizeMB * 1024 * 1024
 
     const totalSize = await internal.getInternalValue(userId, "totalSize")
 
-    req.params.logger.info(`Attempting to upload ${OrdoFile.getReadableSize(contentSize)} file`)
-
     if (Number.isNaN(contentSize)) {
-      return void res.status(ExceptionResponse.LENGTH_REQUIRED).send()
+      req.params.logger.warn(`Content-Size header not specified`)
+      return void res.status(ExceptionResponse.LENGTH_REQUIRED).send("{}")
     }
 
     if (contentSize > maxFileSize) {
-      return void res.status(ExceptionResponse.PAYLOAD_TOO_LARGE).send()
+      req.params.logger.warn(
+        `File too large: ${OrdoFile.getReadableSize(
+          contentSize,
+        )} out of allowed ${maxFileSizeMB}MB`,
+      )
+      return void res.status(ExceptionResponse.PAYLOAD_TOO_LARGE).send("{}")
     }
 
     if (totalSize + contentSize > maxTotalSize) {
-      return void res.status(ExceptionResponse.UNPROCESSABLE_ENTITY).send()
+      req.params.logger.warn(
+        `Insufficient space: ${OrdoFile.getReadableSize(contentSize)} with ${Math.floor(
+          (maxFileSize - totalSize) / 1024 / 1024,
+        )} MB free space left`,
+      )
+      return void res.status(ExceptionResponse.UNPROCESSABLE_ENTITY).send("{}")
     }
 
     return next()

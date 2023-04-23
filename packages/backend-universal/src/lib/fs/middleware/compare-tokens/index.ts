@@ -11,7 +11,7 @@ export const compareTokensStrict: RequestHandler<Params> = (req, res, next) => {
       `Attempted to access other user's internal data: ${userId}, ${req.params.tokenParsed.sub}`,
     )
 
-    return void res.status(ExceptionResponse.FORBIDDEN).send()
+    return void res.status(ExceptionResponse.FORBIDDEN).send("{}")
   }
 
   return next()
@@ -35,9 +35,12 @@ export const compareTokens: FsRequestHandler = () => async (req, res, next) => {
     // const payload = decode(content, { complete: true })?.payload as JwtPayload
 
     // if (!payload || !payload.data || !payload.data.includes(userId)) {
-    req.params.logger.info("Attempted to access other user's internal data.")
+    req.params.logger.warn("Attempted to access other user's internal data", {
+      currentUser: req.params.tokenParsed.sub,
+      requestedUser: userId,
+    })
 
-    return void res.status(ExceptionResponse.FORBIDDEN).send()
+    return void res.status(ExceptionResponse.FORBIDDEN).send("{}")
     // }
   }
 

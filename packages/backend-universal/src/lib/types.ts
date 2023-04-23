@@ -1,14 +1,14 @@
-import { Readable } from "stream"
-import { UnaryFn } from "@ordo-pink/common-types"
+import { Readable, Transform, Writable } from "stream"
 import {
-  OrdoDirectoryPath,
-  OrdoFilePath,
-  ValidatedOrdoFilePath,
-  IOrdoFileRawInitParams,
   IOrdoDirectoryRaw,
   IOrdoFileRaw,
-  IOrdoInternal,
-} from "@ordo-pink/fs-entity"
+  IOrdoFileRawInitParams,
+  OrdoDirectoryPath,
+  OrdoFilePath,
+  UnaryFn,
+  ValidatedOrdoFilePath,
+} from "@ordo-pink/common-types"
+import { IOrdoInternal } from "@ordo-pink/fs-entity"
 import { Logger } from "@ordo-pink/logger"
 import cors from "cors"
 import express, { RequestHandler } from "express"
@@ -21,17 +21,35 @@ import {
   NEW_PATH_PARAM,
 } from "./fs/constants"
 
+/**
+ * Encryption module API.
+ */
+export type Encrypt = {
+  /**
+   * Encrypts readable stream.
+   */
+  encryptStream: UnaryFn<Readable, Transform>
+
+  /**
+   * Decrypts readable stream.
+   *
+   * @param Writable Stream to write decrypted data to.
+   * @returns {Transform} Stream containing decypted data.
+   */
+  decryptStream: UnaryFn<Writable, Transform>
+}
+
 export type Params<T extends Record<string, unknown> = Record<string, unknown>> = T & {
   [USER_ID_PARAM]: string
   [TOKEN_PARSED_PARAM]: JwtPayload
   logger: Logger
 }
 
-export type PathParams<T extends OrdoDirectoryPath | OrdoFilePath> = Params<{
+export type ParamsWithPath<T extends OrdoDirectoryPath | OrdoFilePath> = Params<{
   [PATH_PARAM]: T
 }>
 
-export type TwoPathsParams<T extends OrdoDirectoryPath | OrdoFilePath> = Params<{
+export type ParamsWithOldPathAndNewPath<T extends OrdoDirectoryPath | OrdoFilePath> = Params<{
   [OLD_PATH_PARAM]: T
   [NEW_PATH_PARAM]: T
 }>
@@ -46,15 +64,16 @@ export type FsRequestHandler<T = Params> = UnaryFn<
     directory: IOrdoDirectoryModel
     internal: IOrdoInternalModel
     logger: Logger
+    encrypt: Encrypt
   },
   RequestHandler<T>
 >
 
-export type OrdoFilePathParams = PathParams<OrdoFilePath>
-export type OrdoFileTwoPathsParams = TwoPathsParams<OrdoFilePath>
+export type OrdoFilePathParams = ParamsWithPath<OrdoFilePath>
+export type OrdoFileTwoPathsParams = ParamsWithOldPathAndNewPath<OrdoFilePath>
 
-export type OrdoDirectoryPathParams = PathParams<OrdoDirectoryPath>
-export type OrdoDirectoryTwoPathsParams = TwoPathsParams<OrdoDirectoryPath>
+export type OrdoDirectoryPathParams = ParamsWithPath<OrdoDirectoryPath>
+export type OrdoDirectoryTwoPathsParams = ParamsWithOldPathAndNewPath<OrdoDirectoryPath>
 
 export type CreateOrdoBackendServerParams = {
   fsDriver: FSDriver
@@ -62,7 +81,7 @@ export type CreateOrdoBackendServerParams = {
   corsOptions?: Parameters<typeof cors>[0]
   authorise: RequestHandler<Params<Record<string, unknown>>>
   logger: Logger
-  limits: StorageLimits
+  encrypt: Encrypt
 }
 
 export type FSDriver = {
@@ -87,16 +106,25 @@ export type FSDriver = {
 
 export type IOrdoFileModel = {
   checkFileExists: UnaryFn<OrdoFilePath, Promise<boolean>>
-  getFileContent: UnaryFn<OrdoFilePath, Promise<Readable>>
-  getFile: UnaryFn<OrdoFilePath, Promise<IOrdoFileRaw>>
-  updateFile: UnaryFn<{ path: OrdoFilePath; content: Readable }, Promise<IOrdoFileRaw>>
-  deleteFile: UnaryFn<OrdoFilePath, Promise<IOrdoFileRaw>>
+  getMetadata: UnaryFn<{ path: OrdoFilePath; issuerId: string }, Promise<IOrdoFileRaw["metadata"]>>
+  setMetadata: UnaryFn<
+    { path: OrdoFilePath; issuerId: string; content: IOrdoFileRaw["metadata"] },
+    Promise<IOrdoFileRaw["metadata"]>
+  >
+  getFileContentStream: UnaryFn<{ path: OrdoFilePath; issuerId: string }, Promise<Readable>>
+  getFileContentString: UnaryFn<{ path: OrdoFilePath; issuerId: string }, Promise<string>>
+  getFile: UnaryFn<{ path: OrdoFilePath; issuerId: string }, Promise<IOrdoFileRaw>>
+  updateFile: UnaryFn<
+    { path: OrdoFilePath; content: Readable; issuerId: string },
+    Promise<IOrdoFileRaw>
+  >
+  deleteFile: UnaryFn<{ path: OrdoFilePath; issuerId: string }, Promise<IOrdoFileRaw>>
   moveFile: UnaryFn<
-    { oldPath: OrdoFilePath; newPath: OrdoFilePath },
+    { oldPath: OrdoFilePath; newPath: OrdoFilePath; issuerId: string },
     Promise<IOrdoFileRaw | IOrdoDirectoryRaw>
   >
   createFile: UnaryFn<
-    { path: OrdoFilePath; content?: Readable },
+    { path: OrdoFilePath; content?: Readable; issuerId: string },
     Promise<IOrdoFileRaw | IOrdoDirectoryRaw>
   >
 }
@@ -116,16 +144,17 @@ export type IOrdoInternalModel = {
 
 export type IOrdoDirectoryModel = {
   checkDirectoryExists: UnaryFn<OrdoDirectoryPath, Promise<boolean>>
-  getDirectory: UnaryFn<OrdoDirectoryPath, Promise<IOrdoDirectoryRaw>>
-  deleteDirectory: UnaryFn<OrdoDirectoryPath, Promise<IOrdoDirectoryRaw>>
-  moveDirectory: UnaryFn<
-    { oldPath: OrdoDirectoryPath; newPath: OrdoDirectoryPath },
+  getDirectory: UnaryFn<{ path: OrdoDirectoryPath; issuerId: string }, Promise<IOrdoDirectoryRaw>>
+  deleteDirectory: UnaryFn<
+    { path: OrdoDirectoryPath; issuerId: string },
     Promise<IOrdoDirectoryRaw>
   >
-  createDirectory: UnaryFn<OrdoDirectoryPath, Promise<IOrdoDirectoryRaw>>
-}
-
-export type StorageLimits = {
-  maxUploadSize: number
-  maxTotalSize: number
+  moveDirectory: UnaryFn<
+    { oldPath: OrdoDirectoryPath; newPath: OrdoDirectoryPath; issuerId: string },
+    Promise<IOrdoDirectoryRaw>
+  >
+  createDirectory: UnaryFn<
+    { path: OrdoDirectoryPath; issuerId: string },
+    Promise<IOrdoDirectoryRaw>
+  >
 }

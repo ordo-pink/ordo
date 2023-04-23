@@ -1,8 +1,7 @@
 /* eslint-disable */
+import { IOrdoDirectory, OrdoDirectoryPath, disallowedCharacters } from "@ordo-pink/common-types"
 import { OrdoDirectory } from "."
-import { disallowedCharacters } from "../common"
 import { OrdoFile } from "../ordo-file"
-import { IOrdoDirectory, OrdoDirectoryPath } from "./types"
 
 describe("ordo-directory", () => {
   describe("of", () => {

@@ -1,6 +1,5 @@
+import { IOrdoFile, OrdoFilePath, disallowedCharacters } from "@ordo-pink/common-types"
 import { OrdoFile } from "."
-import { IOrdoFile, OrdoFilePath } from "./types"
-import { disallowedCharacters } from "../common"
 
 describe("ordo-file", () => {
   describe("of", () => {

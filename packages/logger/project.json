@@ -5,10 +5,14 @@
   "projectType": "library",
   "targets": {
     "build": {
-      "executor": "@nrwl/vite:build",
+      "executor": "@nrwl/js:tsc",
       "outputs": ["{options.outputPath}"],
       "options": {
-        "outputPath": "dist/packages/logger"
+        "outputPath": "dist/packages/logger",
+        "tsConfig": "packages/logger/tsconfig.lib.json",
+        "packageJson": "packages/logger/package.json",
+        "main": "packages/logger/src/index.ts",
+        "assets": ["packages/logger/*.md"]
       }
     },
     "test": {

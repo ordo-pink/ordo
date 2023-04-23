@@ -1,13 +1,20 @@
-import { IOrdoFileStatic, IOrdoFile, IOrdoFileRaw, OrdoFilePath, OrdoFileExtension } from "./types"
+import {
+  IOrdoFileStatic,
+  IOrdoFile,
+  IOrdoFileRaw,
+  OrdoFilePath,
+  OrdoDirectoryPath,
+  OrdoFileExtension,
+} from "@ordo-pink/common-types"
 import { endsWithSlash, isValidPath } from "../common"
-import { OrdoDirectoryPath } from "../ordo-directory/types"
+import { OrdoDirectory } from "../ordo-directory"
 
 const toReadableSize = (a: number, b = 2, k = 1024): string => {
   const d = Math.floor(Math.log(a) / Math.log(k))
 
   return a === 0
     ? "0B"
-    : `${parseFloat((a / Math.pow(k, d)).toFixed(Math.max(0, b)))}${
+    : `${parseFloat((a / Math.pow(k, d)).toFixed(Math.max(0, b)))} ${
         ["B", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"][d]
       }`
 }
@@ -81,6 +88,11 @@ export const OrdoFile: IOrdoFileStatic = {
     }
 
     return toReadableSize(size)
+  },
+  findParent: (path, root) => {
+    const parentPath = OrdoFile.getParentPath(path)
+
+    return OrdoDirectory.findDirectoryDeep(parentPath, root)
   },
 }
 

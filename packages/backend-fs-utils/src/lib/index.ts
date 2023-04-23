@@ -7,3 +7,13 @@ export const promiseWriteStream = (readable: Readable, writable: Writable) =>
       resolve()
     }),
   )
+
+export const promiseReadStream = (readable: Readable) =>
+  new Promise<string>((resolve, reject) => {
+    const body = []
+
+    readable
+      .on("data", (chunk) => body.push(chunk))
+      .on("error", reject)
+      .on("end", () => resolve(Buffer.concat(body).toString("utf8")))
+  })

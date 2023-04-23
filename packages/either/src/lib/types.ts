@@ -4,7 +4,7 @@ export interface IEitherStatic {
   readonly isLeft: false
   readonly isRight: false
   try: <TRight, TLeft extends Error>(thunk: ThunkFn<TRight>) => IEither<TRight, TLeft>
-  fromNullable: <TRight>(x: Nullable<TRight>) => IEither<TRight, null>
+  fromNullable: <TRight>(x: Nullable<TRight>) => IEither<NonNullable<TRight>, null>
   fromBoolean: (x: unknown) => IEither<true, false>
   right: <TRight, TLeft = unknown>(x: TRight) => IEither<TRight, TLeft>
   left: <TLeft, TRight = unknown>(x: TLeft) => IEither<TRight, TLeft>

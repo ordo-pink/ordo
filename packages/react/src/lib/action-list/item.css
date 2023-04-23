@@ -1,7 +1,0 @@
-.action-list-item {
-  @apply py-2 md:py-0.5 hover:bg-gradient-to-r hover:from-neutral-300 hover:dark:from-stone-700 hover:to-slate-300 hover:dark:to-slate-700 rounded-md px-2 flex justify-between items-center cursor-pointer;
-}
-
-.action-list-item.active {
-  @apply bg-gradient-to-r from-rose-300 dark:from-violet-700 to-purple-300 dark:to-purple-700;
-}

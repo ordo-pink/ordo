@@ -1,17 +1,18 @@
 import { SystemDirectory, ExceptionResponse } from "@ordo-pink/common-types"
 import { Switch } from "@ordo-pink/switch"
 import { contentType } from "mime-types"
-import { USER_ID_PARAM } from "../../../fs/constants"
+import { TOKEN_PARSED_PARAM, USER_ID_PARAM } from "../../../fs/constants"
 import { ExtensionsParams } from "../../../types"
 import { FsRequestHandler } from "../../../types"
 
 export const getExtensionFileHandler: FsRequestHandler<ExtensionsParams> =
   ({
-    file: { getFileContent, checkFileExists, createFile },
+    file: { getFileContentStream: getFileContent, checkFileExists, createFile },
     directory: { createDirectory, checkDirectoryExists },
   }) =>
   async (req, res) => {
     const userId = req.params[USER_ID_PARAM]
+    const issuerId = req.params[TOKEN_PARSED_PARAM].sub
     const parent = `/${userId}${SystemDirectory.EXTENSIONS}` as const
     const path = `${parent}${req.params.extension}.json` as const
 
@@ -20,7 +21,7 @@ export const getExtensionFileHandler: FsRequestHandler<ExtensionsParams> =
 
     if (!parentExists) {
       try {
-        await createDirectory(parent)
+        await createDirectory({ path: parent, issuerId })
       } catch (e) {
         req.params.logger.error(`Attempted to create directory that already exists: ${parent}`)
       }
@@ -28,7 +29,7 @@ export const getExtensionFileHandler: FsRequestHandler<ExtensionsParams> =
 
     if (!fileExists) {
       try {
-        await createFile({ path, content: req })
+        await createFile({ path, content: req, issuerId })
       } catch (e) {
         req.params.logger.error(`Attempted to create file that already exists: ${path}`)
       }
@@ -36,12 +37,12 @@ export const getExtensionFileHandler: FsRequestHandler<ExtensionsParams> =
 
     res.setHeader("content-type", contentType(".json") as string)
 
-    getFileContent(path)
+    getFileContent({ path, issuerId })
       .then((content) => content.pipe(res))
       .catch((error: ExceptionResponse.NOT_FOUND | Error) =>
         Switch.of(error)
           .case(ExceptionResponse.NOT_FOUND, async () => {
-            res.status(ExceptionResponse.NOT_FOUND).send()
+            res.status(ExceptionResponse.NOT_FOUND).send("{}")
           })
           .default(() => {
             req.params.logger.error(error)

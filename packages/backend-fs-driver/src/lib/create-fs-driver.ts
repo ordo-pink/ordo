@@ -2,10 +2,16 @@ import { createReadStream, createWriteStream, promises } from "fs"
 import { join } from "path"
 import { promiseWriteStream } from "@ordo-pink/backend-fs-utils"
 import { FSDriver } from "@ordo-pink/backend-universal"
-import { OrdoDirectoryPath, OrdoFilePath } from "@ordo-pink/fs-entity"
+import { OrdoDirectoryPath, OrdoFilePath } from "@ordo-pink/common-types"
 
 const toAbsolutePath = (absolute: string) => (path: string) => join(absolute, path)
 
+/**
+ * FS driver for ordo that uses files and directories on the disk to store the
+ * data.
+ *
+ * @param rootDirectory Path to the directory where the data should be stored
+ */
 export const createFSDriver = (rootDirectory: string): FSDriver => {
   const getAbsolute = toAbsolutePath(rootDirectory)
 
@@ -13,12 +19,12 @@ export const createFSDriver = (rootDirectory: string): FSDriver => {
     checkDirectoryExists: (path) =>
       promises
         .stat(getAbsolute(path))
-        .catch(() => null)
+        .catch(() => false)
         .then(Boolean),
     checkFileExists: (path) =>
       promises
         .stat(getAbsolute(path))
-        .catch(() => null)
+        .catch(() => false)
         .then(Boolean),
     createDirectory: (path) => promises.mkdir(getAbsolute(path)).then(() => path),
     createFile: ({ path, content }) =>

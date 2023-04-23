@@ -25,6 +25,7 @@ import {
 } from "./middleware/append-trailing-directory-slash"
 import { checkSizeOfUploadingFile } from "./middleware/check-size-of-uploading-file"
 import { compareTokens } from "./middleware/compare-tokens"
+import { createMandatoryContentIfMissing } from "./middleware/create-mandatory-content-if-missing"
 import { extractDynamicParam } from "./middleware/extract-dynamic-param"
 import { prependPathSlash, prependOldPathAndNewPathSlashes } from "./middleware/prepend-slash"
 import { setContentTypeHeader } from "./middleware/set-content-type-header"
@@ -41,12 +42,12 @@ import { OrdoFileModel } from "./models/file"
 import { OrdoInternalModel } from "../internal/models/internal-model"
 import { CreateOrdoBackendServerParams } from "../types"
 
-const filesRouter = ({ fsDriver, authorise, logger, limits }: CreateOrdoBackendServerParams) => {
-  const file = OrdoFileModel.of(fsDriver)
-  const directory = OrdoDirectoryModel.of(fsDriver)
-  const internal = OrdoInternalModel.of({ fsDriver, limits, directory })
+const filesRouter = ({ fsDriver, authorise, logger, encrypt }: CreateOrdoBackendServerParams) => {
+  const file = OrdoFileModel.of({ driver: fsDriver, logger })
+  const directory = OrdoDirectoryModel.of({ driver: fsDriver, logger })
+  const internal = OrdoInternalModel.of({ fsDriver, directory })
 
-  const env = { file, directory, logger, internal }
+  const env = { file, directory, logger, internal, encrypt }
 
   return Router()
     .post(
@@ -60,6 +61,7 @@ const filesRouter = ({ fsDriver, authorise, logger, limits }: CreateOrdoBackendS
       prependPathSlash,
       addUserIdToPath,
       validateFilePath,
+      createMandatoryContentIfMissing({ directory, file }),
       checkSizeOfUploadingFile(env),
       createFileHandler(env),
     )
@@ -74,6 +76,7 @@ const filesRouter = ({ fsDriver, authorise, logger, limits }: CreateOrdoBackendS
       prependPathSlash,
       addUserIdToPath,
       validateFilePath,
+      createMandatoryContentIfMissing({ directory, file }),
       setContentTypeHeader,
       getFileHandler(env),
     )
@@ -88,6 +91,7 @@ const filesRouter = ({ fsDriver, authorise, logger, limits }: CreateOrdoBackendS
       prependPathSlash,
       addUserIdToPath,
       validateFilePath,
+      createMandatoryContentIfMissing({ directory, file }),
       checkSizeOfUploadingFile(env),
       updateFileHandler(env),
     )
@@ -102,6 +106,7 @@ const filesRouter = ({ fsDriver, authorise, logger, limits }: CreateOrdoBackendS
       prependOldPathAndNewPathSlashes,
       addUserIdToOldPathAndNewPath,
       validateFileOldPathAndNewPath,
+      createMandatoryContentIfMissing({ directory, file }),
       moveFileHandler(env),
     )
     .delete(
@@ -115,6 +120,7 @@ const filesRouter = ({ fsDriver, authorise, logger, limits }: CreateOrdoBackendS
       prependPathSlash,
       addUserIdToPath,
       validateFilePath,
+      createMandatoryContentIfMissing({ directory, file }),
       removeFileHandler(env),
     )
 }
@@ -123,13 +129,13 @@ const directoriesRouter = ({
   fsDriver,
   authorise,
   logger,
-  limits,
+  encrypt,
 }: CreateOrdoBackendServerParams) => {
-  const file = OrdoFileModel.of(fsDriver)
-  const directory = OrdoDirectoryModel.of(fsDriver)
-  const internal = OrdoInternalModel.of({ fsDriver, limits, directory })
+  const file = OrdoFileModel.of({ driver: fsDriver, logger })
+  const directory = OrdoDirectoryModel.of({ driver: fsDriver, logger })
+  const internal = OrdoInternalModel.of({ fsDriver, directory })
 
-  const env = { file, directory, logger, internal }
+  const env = { file, directory, logger, internal, encrypt }
 
   return Router()
     .post(
@@ -143,6 +149,7 @@ const directoriesRouter = ({
       appendTrailingDirectoryPathSlash,
       addUserIdToPath,
       validateDirectoryPath,
+      createMandatoryContentIfMissing({ directory, file }),
       createDirectoryHandler(env),
     )
     .get(
@@ -155,6 +162,7 @@ const directoriesRouter = ({
       appendTrailingDirectoryPathSlash,
       addUserIdToPath,
       validateDirectoryPath,
+      createMandatoryContentIfMissing({ directory, file }),
       getDirectoryHandler(env),
     )
     .get(
@@ -168,6 +176,7 @@ const directoriesRouter = ({
       appendTrailingDirectoryPathSlash,
       addUserIdToPath,
       validateDirectoryPath,
+      createMandatoryContentIfMissing({ directory, file }),
       getDirectoryHandler(env),
     )
     .patch(
@@ -181,6 +190,7 @@ const directoriesRouter = ({
       appendTrailingDirectoryOldPathAndNewPathSlashes,
       addUserIdToOldPathAndNewPath,
       validateDirectoryOldPathAndNewPath,
+      createMandatoryContentIfMissing({ directory, file }),
       moveDirectoryHandler(env),
     )
     .delete(
@@ -194,6 +204,7 @@ const directoriesRouter = ({
       appendTrailingDirectoryPathSlash,
       addUserIdToPath,
       validateDirectoryPath,
+      createMandatoryContentIfMissing({ directory, file }),
       removeDirectoryHandler(env),
     )
 }

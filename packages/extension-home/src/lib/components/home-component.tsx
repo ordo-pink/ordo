@@ -26,6 +26,7 @@ import AndreiOrlov from "../assets/andrei-orlov.jpg"
 import AntonLaptev from "../assets/anton-laptev.jpg"
 import heroBg from "../assets/bg.jpg"
 import KonstantinTsepelev from "../assets/konstantin-tsepelev.jpg"
+import NikolaiGromov from "../assets/nikolai-gromov.jpg"
 import paint from "../assets/paint.jpg"
 import appDark from "../assets/rich-editor-1.png"
 import app from "../assets/rich-editor-2.png"
@@ -94,7 +95,7 @@ export default function Home() {
   const tKonstantinTsepelev = t("konstantin-tsepelev")
   const tAndreiOrlov = t("andrei-orlov")
   const tNikolaiGromov = t("nikolai-gromov")
-  const tIliaBalenko = t("ilia-balenko")
+  // const tIliaBalenko = t("ilia-balenko")
   const tAleksandrKonovalov = t("aleksandr-konovalov")
   const tAntonLaptev = t("anton-laptev")
   const tTimurGafiulin = t("timur-gafiulin")
@@ -118,13 +119,13 @@ export default function Home() {
     {
       name: tNikolaiGromov,
       role: "Front-end Developer / C2H5OH",
-      imageUrl: paint,
+      imageUrl: NikolaiGromov,
     },
-    {
-      name: tIliaBalenko,
-      role: "Marketsman / H3PO4",
-      imageUrl: paint,
-    },
+    // {
+    //   name: tIliaBalenko,
+    //   role: "Marketsman / H3PO4",
+    //   imageUrl: paint,
+    // },
     {
       name: tAleksandrKonovalov,
       role: "Front-end Developer",

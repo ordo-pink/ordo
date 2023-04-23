@@ -7,7 +7,6 @@ import {
   useCommandPalette,
 } from "@ordo-pink/react-utils"
 import { hideCommandPalette } from "@ordo-pink/stream-command-palette"
-import { hideModal } from "@ordo-pink/stream-modals"
 import { Switch } from "@ordo-pink/switch"
 import Fuse from "fuse.js"
 import { ChangeEvent, KeyboardEvent, useEffect, useState } from "react"
@@ -55,9 +54,10 @@ const CommandPaletteModal = ({ items }: Props) => {
 
   const handleEnter = (event: KeyboardEvent<HTMLInputElement>) => {
     event.preventDefault()
+    event.stopPropagation()
 
     const selectedItem = visibleItems[currentIndex]
-    setInputValue("")
+    handleEscape()
 
     selectedItem.onSelect()
   }
@@ -78,8 +78,8 @@ const CommandPaletteModal = ({ items }: Props) => {
 
   const handleEscape = () => {
     setInputValue("")
+    setCurrentIndex(0)
     hideCommandPalette()
-    hideModal()
   }
 
   const handleKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
@@ -115,7 +115,10 @@ const CommandPaletteModal = ({ items }: Props) => {
             text={name}
             Icon={Icon || (() => null)}
             current={currentIndex === index}
-            onClick={onSelect}
+            onClick={() => {
+              handleEscape()
+              onSelect()
+            }}
             large
           >
             {Comment ? <Comment /> : null}
@@ -133,18 +136,12 @@ export const useDefaultCommandPalette = (
   const { showModal, hideModal } = useModal()
 
   useEffect(() => {
-    if (!items) {
-      return hideModal()
-    }
+    if (!items) return
 
     showModal(() => <CommandPaletteModal items={items} />, {
       showCloseButton: false,
       onHide: () => hideCommandPalette(),
     })
-
-    return () => {
-      hideModal()
-    }
   }, [items, showModal, hideModal])
 
   return null

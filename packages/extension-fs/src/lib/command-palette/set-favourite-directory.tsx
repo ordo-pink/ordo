@@ -29,7 +29,6 @@ export const handleSetFavouriteDirectoryCommandPalette = () => {
       ),
       onSelect: () => {
         emit("fs.set-favourite-directory", directory)
-        hideCommandPalette()
       },
       Comment: () => (
         <div className="text-xs text-neutral-600 dark:text-neutral-400">
@@ -65,7 +64,6 @@ export const handleUnsetFavouriteDirectoryCommandPalette = () => {
       ),
       onSelect: () => {
         emit("fs.unset-favourite-directory", directory)
-        hideCommandPalette()
       },
       Comment: () => (
         <div className="text-xs text-neutral-600 dark:text-neutral-400">

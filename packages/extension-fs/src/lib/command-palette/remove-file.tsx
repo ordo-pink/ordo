@@ -1,12 +1,10 @@
 import { IconSize } from "@ordo-pink/common-types"
 import { OrdoDirectory, OrdoFile } from "@ordo-pink/fs-entity"
 import { FileIcon, useCommands } from "@ordo-pink/react-utils"
-import { hideCommandPalette, showCommandPalette } from "@ordo-pink/stream-command-palette"
+import { showCommandPalette } from "@ordo-pink/stream-command-palette"
 import { drive$ } from "@ordo-pink/stream-drives"
 
 export const handleRemoveFileCommandPalette = () => {
-  hideCommandPalette()
-
   const drive = drive$.getValue()
   const { emit } = useCommands()
 
@@ -26,7 +24,6 @@ export const handleRemoveFileCommandPalette = () => {
       ),
       onSelect: () => {
         emit("fs.show-remove-file-modal", file)
-        hideCommandPalette()
       },
       Comment: () => (
         <div className="text-xs text-neutral-600 dark:text-neutral-400">

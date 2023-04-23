@@ -250,8 +250,6 @@ export default createExtension(
       onSelect: () => {
         const drive = drive$.getValue()
 
-        hideCommandPalette()
-
         if (!drive) return
 
         showCommandPalette(
@@ -280,8 +278,6 @@ export default createExtension(
       Icon: BsReverseLayoutTextSidebarReverse,
       onSelect: () => {
         commands.emit("router.navigate", "/editor")
-
-        hideCommandPalette()
       },
     })
 
@@ -295,8 +291,6 @@ export default createExtension(
         if (!drive) return
 
         commands.emit("editor.collapse-directories", drive.root)
-
-        hideCommandPalette()
       },
     })
 
@@ -310,8 +304,6 @@ export default createExtension(
         if (!drive) return
 
         commands.emit("editor.expand-directories", drive.root)
-
-        hideCommandPalette()
       },
     })
 

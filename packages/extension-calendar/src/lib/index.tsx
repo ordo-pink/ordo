@@ -54,7 +54,6 @@ export default createExtension(
       Icon: BsCalendarDay,
       onSelect: () => {
         commands.emit("calendar.open-day-view")
-        hideCommandPalette()
       },
     })
 
@@ -64,7 +63,6 @@ export default createExtension(
       Icon: BsCalendarWeek,
       onSelect: () => {
         commands.emit("calendar.open-week-view")
-        hideCommandPalette()
       },
     })
 
@@ -74,7 +72,6 @@ export default createExtension(
       Icon: BsCalendarMonth,
       onSelect: () => {
         commands.emit("calendar.open-month-view")
-        hideCommandPalette()
       },
     })
   },

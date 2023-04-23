@@ -5,5 +5,7 @@
   "open-kanban": "Open Kanban board...",
   "change-kanban-directory": "Change directory",
   "remove-kanban-board": "Remove board",
-  "turn-to-kanban": "Add Kanban board"
+  "turn-to-kanban": "Add Kanban board",
+  "create-new-directory": "Create new directory",
+  "open-existing-directory": "Use existing directory..."
 }

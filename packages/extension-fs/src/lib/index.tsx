@@ -190,8 +190,8 @@ export default createExtension(
     })
 
     registerCommandPaletteItem({
-      id: "set-favourite",
-      name: translate("set-favourite..."),
+      id: "set-favourite-directory",
+      name: translate("set-favourite-directory..."),
       Icon: BsStarFill,
       onSelect: handleSetFavouriteDirectoryCommandPalette,
     })
@@ -215,8 +215,8 @@ export default createExtension(
     })
 
     registerCommandPaletteItem({
-      id: "unset-favourite",
-      name: translate("unset-favourite..."),
+      id: "unset-favourite-directory",
+      name: translate("unset-favourite-directory..."),
       Icon: BsStar,
       onSelect: handleUnsetFavouriteDirectoryCommandPalette,
     })

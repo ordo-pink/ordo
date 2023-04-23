@@ -41,7 +41,7 @@ const loggedOutExtensions = [() => import("@ordo-pink/extension-home")]
 
 // Define variables -----------------------------------------------------------
 
-const FS_HOST = process.env.BACKEND_HOST ?? "http://localhost:5000"
+const FS_HOST = process.env.BACKEND_HOST ?? "http://localhost:1337"
 
 const ssoUrl = process.env.AUTH_HOST ?? "https://sso.ordo.pink"
 const realm = process.env.AUTH_REALM ?? "test"

@@ -2,7 +2,7 @@ name: publish-preview
 
 on:
   release:
-    types: [prereleased]
+    types: [released]
 
   workflow_dispatch:
 

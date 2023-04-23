@@ -1,4 +1,3 @@
-import { hideCommandPalette } from "@ordo-pink/stream-command-palette"
 import { createExtension } from "@ordo-pink/stream-extensions"
 import { LexicalNode } from "lexical"
 import { lazy } from "react"

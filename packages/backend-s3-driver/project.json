@@ -11,6 +11,13 @@
         "lintFilePatterns": ["packages/backend-s3-driver/**/*.ts"]
       }
     },
+    "publish": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "node tools/scripts/publish.mjs backend-s3-driver {args.ver} {args.tag}"
+      },
+      "dependsOn": ["build"]
+    },
     "test": {
       "executor": "@nrwl/jest:jest",
       "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],

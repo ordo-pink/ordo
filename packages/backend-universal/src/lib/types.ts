@@ -12,7 +12,7 @@ import { IOrdoInternal } from "@ordo-pink/fs-entity"
 import { Logger } from "@ordo-pink/logger"
 import cors from "cors"
 import express, { RequestHandler } from "express"
-import { JwtPayload } from "jsonwebtoken"
+import type { JwtPayload } from "jsonwebtoken"
 import {
   USER_ID_PARAM,
   TOKEN_PARSED_PARAM,
@@ -31,10 +31,7 @@ export type Encrypt = {
   encryptStream: UnaryFn<Readable, Transform>
 
   /**
-   * Decrypts readable stream.
-   *
-   * @param Writable Stream to write decrypted data to.
-   * @returns {Transform} Stream containing decypted data.
+   * Decrypts to writable stream.
    */
   decryptStream: UnaryFn<Writable, Transform>
 }
@@ -84,23 +81,83 @@ export type CreateOrdoBackendServerParams = {
   encrypt: Encrypt
 }
 
+/**
+ * Ordo file system driver.
+ */
 export type FSDriver = {
+  /**
+   * Check if a directory exists under given path.
+   */
   checkDirectoryExists: UnaryFn<OrdoDirectoryPath, Promise<boolean>>
+
+  /**
+   * Check if file exists under given path.
+   */
   checkFileExists: UnaryFn<OrdoFilePath, Promise<boolean>>
+
+  /**
+   * Create file under given path. If content is provided, populate the file.
+   * Rejects if a file already exists under given path.
+   */
   createFile: UnaryFn<{ path: OrdoFilePath; content?: Readable }, Promise<OrdoFilePath>>
+
+  /**
+   * Create directory under given path.
+   */
   createDirectory: UnaryFn<OrdoDirectoryPath, Promise<OrdoDirectoryPath>>
+
+  /**
+   * Remove file under given path. Rejects if the file does not exist under
+   * given path.
+   */
   deleteFile: UnaryFn<OrdoFilePath, Promise<OrdoFilePath>>
+
+  /**
+   * Remove directory under given path. Rejects if the directory does not exist
+   * under given path.
+   */
   deleteDirectory: UnaryFn<OrdoDirectoryPath, Promise<OrdoDirectoryPath>>
+
+  /**
+   * Get direct descendants of directory under given path. Rejects if the 
+   * directory does not exist under given path. Returns an array of file and/or
+   * directory paths.
+   */
   getDirectoryChildren: UnaryFn<OrdoDirectoryPath, Promise<Array<OrdoDirectoryPath | OrdoFilePath>>>
+
+  /**
+   * Get contends of a file under given path. Rejects if the file does not
+   * exist under given path.
+   */
   getFile: UnaryFn<OrdoFilePath, Promise<Readable>>
+
+  /**
+   * Get descriptor of a file under given path. Rejects if the file does not
+   * exist under given path.
+   */
   getFileDescriptor: <Path extends OrdoFilePath>(
     path: ValidatedOrdoFilePath<Path>,
   ) => Promise<IOrdoFileRawInitParams<Path>>
+
+  /**
+   * Moves file from old path to new path. Rejects if old path does not exist.
+   * Rejects if a file under new path already exists.
+   */
   moveFile: UnaryFn<{ oldPath: OrdoFilePath; newPath: OrdoFilePath }, Promise<OrdoFilePath>>
+
+  /**
+   * Moves directory from old path to new path. Rejects if old path does not
+   * exist. Rejects if a directory under new path already exists.
+   */
   moveDirectory: UnaryFn<
     { oldPath: OrdoDirectoryPath; newPath: OrdoDirectoryPath },
     Promise<OrdoDirectoryPath>
   >
+
+  /**
+   * Updates file under given path with given content. Rejects if a file does
+   * not exist under given path.
+   */
   updateFile: UnaryFn<{ path: OrdoFilePath; content: Readable }, Promise<OrdoFilePath>>
 }
 

@@ -9,6 +9,10 @@ on:
 jobs:
   ghp:
     runs-on: ubuntu-latest
+    
+    permissions:
+      contents: read
+      packages: write
 
     steps:
       - name: Checkout code
@@ -36,7 +40,7 @@ jobs:
 
     permissions:
       contents: read
-      packages: write
+      id-token: write
 
     steps:
       - name: Checkout code
@@ -58,3 +62,4 @@ jobs:
           --tag=preview.${GITHUB_SHA::6}"
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          NPM_CONFIG_PROVENANCE: true

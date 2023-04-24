@@ -1,5 +1,6 @@
-import { Readable, Transform, Writable } from "stream"
+import { Readable } from "stream"
 import {
+  Encrypter,
   IOrdoDirectoryRaw,
   IOrdoFileRaw,
   IOrdoFileRawInitParams,
@@ -20,21 +21,6 @@ import {
   OLD_PATH_PARAM,
   NEW_PATH_PARAM,
 } from "./fs/constants"
-
-/**
- * Encryption module API.
- */
-export type Encrypt = {
-  /**
-   * Encrypts readable stream.
-   */
-  encryptStream: UnaryFn<Readable, Transform>
-
-  /**
-   * Decrypts to writable stream.
-   */
-  decryptStream: UnaryFn<Writable, Transform>
-}
 
 export type Params<T extends Record<string, unknown> = Record<string, unknown>> = T & {
   [USER_ID_PARAM]: string
@@ -61,7 +47,7 @@ export type FsRequestHandler<T = Params> = UnaryFn<
     directory: IOrdoDirectoryModel
     internal: IOrdoInternalModel
     logger: Logger
-    encrypt: Encrypt
+    encrypt: Encrypter
   },
   RequestHandler<T>
 >
@@ -78,7 +64,7 @@ export type CreateOrdoBackendServerParams = {
   corsOptions?: Parameters<typeof cors>[0]
   authorise: RequestHandler<Params<Record<string, unknown>>>
   logger: Logger
-  encrypt: Encrypt
+  encrypt: Encrypter
 }
 
 /**
@@ -119,7 +105,7 @@ export type FSDriver = {
   deleteDirectory: UnaryFn<OrdoDirectoryPath, Promise<OrdoDirectoryPath>>
 
   /**
-   * Get direct descendants of directory under given path. Rejects if the 
+   * Get direct descendants of directory under given path. Rejects if the
    * directory does not exist under given path. Returns an array of file and/or
    * directory paths.
    */

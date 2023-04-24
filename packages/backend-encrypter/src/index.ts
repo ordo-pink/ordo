@@ -6,21 +6,29 @@ import { DecryptFn, Encrypter, EncryptFn, UnaryFn } from "@ordo-pink/common-type
 
 // Types ----------------------------------------------------------------------
 
-export type Params = {
+export type CreateEncryptionModuleParams = {
   /**
    * Algorithm to be used for encryption.
    *
    * @optional
    * @default "aes-256-cbc"
    */
-  algorithm: string
+  cipherAlgorithm?: string
 
   /**
-   * Cipher key to be used for encryption and decryption.
+   * Hashing algorithm.
+   *
+   * @optional
+   * @default sha256
+   */
+  hashAlgorithm?: string
+
+  /**
+   * Key to be used for encryption and decryption.
    *
    * @required
    */
-  encryptionKey: CipherKey
+  encryptionKey: string
 
   /**
    * Initialisation vector size.
@@ -28,7 +36,7 @@ export type Params = {
    * @optional
    * @default 16
    */
-  ivSize: number
+  ivSize?: number
 
   /**
    * Transform stream options.
@@ -39,30 +47,57 @@ export type Params = {
   options?: TransformOptions
 }
 
+export type EncryptDecryptParams = {
+  /**
+   * Cipher key for creating cipher initialisation vector.
+   */
+  cipherKey: CipherKey
+
+  /**
+   * @see CreateEncryptionModuleParams.ivSize
+   */
+  ivSize: number
+
+  /**
+   * @see CreateEncryptionModuleParams.options
+   */
+  options?: TransformOptions
+
+  /**
+   * @see CreateEncryptionModuleParams.cipherAlgorithm
+   */
+  cipherAlgorithm: string
+}
+
 // Impl -----------------------------------------------------------------------
 
 /**
- * Creates encryption module that applies aes-256-cbc encryption and decryption
+ * Creates encryption module that applies AES-256-CBC encryption and decryption
  * on the stream of data.
  */
-export const createEncryptionModule = (key: string) => {
-  const hash = createHash("sha256")
+export const createEncryptionModule = ({
+  cipherAlgorithm = "aes-256-cbc",
+  hashAlgorithm = "sha256",
+  ivSize = 16,
+  options,
+  encryptionKey,
+}: CreateEncryptionModuleParams): Encrypter => {
+  const hash = createHash(hashAlgorithm).update(encryptionKey)
+  const cipherKey = hash.digest()
 
-  hash.update(key)
-
-  const digest = hash.digest()
-  const transform = encrypter("aes-256-cbc")
-
-  return transform(digest)
+  return {
+    encryptStream: encryptStream({ cipherAlgorithm, cipherKey, ivSize, options }),
+    decryptStream: decryptStream({ cipherAlgorithm, cipherKey, ivSize, options }),
+  }
 }
 
 // Internal -------------------------------------------------------------------
 
-const encryptStream: UnaryFn<Params, EncryptFn> =
-  ({ algorithm, encryptionKey, ivSize, options }) =>
+const encryptStream: UnaryFn<EncryptDecryptParams, EncryptFn> =
+  ({ cipherAlgorithm, cipherKey, ivSize, options }) =>
   (input) => {
     const iv = randomBytes(ivSize)
-    const cipher = createCipheriv(algorithm, encryptionKey, iv, options)
+    const cipher = createCipheriv(cipherAlgorithm, cipherKey, iv, options)
 
     let initialised = false
 
@@ -82,8 +117,8 @@ const encryptStream: UnaryFn<Params, EncryptFn> =
     )
   }
 
-const decryptStream: UnaryFn<Params, DecryptFn> =
-  ({ algorithm, encryptionKey, ivSize }) =>
+const decryptStream: UnaryFn<EncryptDecryptParams, DecryptFn> =
+  ({ cipherAlgorithm, cipherKey, ivSize }) =>
   (output: Writable) => {
     let iv: string
 
@@ -91,7 +126,7 @@ const decryptStream: UnaryFn<Params, DecryptFn> =
       transform(chunk, _, callback) {
         if (!iv) {
           iv = chunk.slice(0, ivSize)
-          const cipher = createDecipheriv(algorithm, encryptionKey, iv)
+          const cipher = createDecipheriv(cipherAlgorithm, cipherKey, iv)
 
           this.pipe(cipher).pipe(output)
           this.push(chunk.slice(ivSize))
@@ -103,10 +138,3 @@ const decryptStream: UnaryFn<Params, DecryptFn> =
       },
     })
   }
-
-const encrypter =
-  (algorithm: string, options?: TransformOptions) =>
-  (encryptionKey: CipherKey, ivSize = 16): Encrypter => ({
-    encryptStream: encryptStream({ algorithm, encryptionKey, ivSize, options }),
-    decryptStream: decryptStream({ algorithm, encryptionKey, ivSize, options }),
-  })

@@ -19,7 +19,7 @@ const TOKEN = process.env.BACKEND_LOCAL_TOKEN
 
 if (!existsSync(root)) mkdirSync(root, { recursive: true })
 
-const encrypt = createEncryptionModule(ENCRYPTION_KEY)
+const encrypt = createEncryptionModule({ encryptionKey: ENCRYPTION_KEY })
 
 const server = createOrdoBackendServer({
   fsDriver: createFSDriver(root),

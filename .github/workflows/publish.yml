@@ -10,6 +10,10 @@ jobs:
   ghp:
     runs-on: ubuntu-latest
 
+    permissions:
+      contents: read
+      packages: write
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -34,7 +38,7 @@ jobs:
 
     permissions:
       contents: read
-      packages: write
+      id-token: write
 
     steps:
       - name: Checkout code
@@ -54,3 +58,4 @@ jobs:
         run: npx nx run-many --target=publish --args="--ver=${GITHUB_REF_NAME} --tag=latest"
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          NPM_CONFIG_PROVENANCE: true

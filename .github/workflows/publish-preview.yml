@@ -30,7 +30,7 @@ jobs:
 
       - name: Publish to GHP
         run:
-          npx nx run-many --target=publish --args="--ver=${GITHUB_REF_NAME}
+          npx nx run-affected --target=publish --args="--ver=${GITHUB_REF_NAME}
           --tag=preview.${GITHUB_SHA::6}"
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GHP_TOKEN }}
@@ -58,7 +58,7 @@ jobs:
 
       - name: Publish to NPM
         run:
-          npx nx run-many --target=publish --args="--ver=${GITHUB_REF_NAME}
+          npx nx run-affected --target=publish --args="--ver=${GITHUB_REF_NAME}
           --tag=preview.${GITHUB_SHA::6}"
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

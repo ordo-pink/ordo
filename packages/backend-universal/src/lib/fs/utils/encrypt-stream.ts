@@ -1,6 +1,5 @@
 import type { Readable, Writable } from "stream"
-import { OrdoFilePath } from "@ordo-pink/common-types"
-import { Encrypt } from "../../types"
+import { Encrypter, OrdoFilePath } from "@ordo-pink/common-types"
 
 export enum ENCRYPT_ACTION {
   ENCRYPT,
@@ -8,7 +7,7 @@ export enum ENCRYPT_ACTION {
 }
 
 export const processStream =
-  ({ encryptStream, decryptStream }: Encrypt) =>
+  ({ encryptStream, decryptStream }: Encrypter) =>
   (path: OrdoFilePath, input: Readable, output?: Writable, shouldEncrypt: ENCRYPT_ACTION = 0) =>
     path.endsWith(".metadata")
       ? shouldEncrypt === ENCRYPT_ACTION.ENCRYPT

@@ -20,6 +20,15 @@ export type ISwitchStatic = {
   of: <TResult extends unknown[] = [], TContext = unknown>(
     x: TContext,
   ) => ISwitch<TContext, TResult>
+
+  /**
+   * A pointing interface to create a Switch with no value. It may be useful
+   * when you want to loop over a set of validators that do not rely on the
+   * same input.
+   *
+   * @example `Switch.empty().case(isOffline, F).case(isMobile, F).default(T)`
+   */
+  empty: <TResult extends unknown[] = []>() => ISwitch<undefined, TResult>
 }
 
 /**

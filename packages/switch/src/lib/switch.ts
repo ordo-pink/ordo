@@ -1,29 +1,58 @@
-import { UnaryFn, ThunkFn, Unpack } from "@ordo-pink/common-types"
-import { ISwitchStatic, ISwitch, LazySwitch } from "./types"
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import type { UnaryFn } from "@ordo-pink/common-types"
+import type { ISwitchStatic, ISwitch, LazySwitch } from "./types"
+
+// Internal -------------------------------------------------------------------
+
+// Types ----------------------------------------------------------------------
+
+type _SwitchCase = <TContext, TResult extends unknown[]>(
+  x: TContext,
+) => ISwitch<TContext, TResult>["case"]
+
+type _SwitchDefault = <TContext, TResult extends unknown[]>(
+  x: TContext,
+) => ISwitch<TContext, TResult>["default"]
+
+type _Switch = <TContext, TResult extends unknown[] = []>(x: TContext) => ISwitch<TContext, TResult>
+
+// Helpers --------------------------------------------------------------------
 
 const isFunction = <T = unknown, K = T>(x: unknown): x is UnaryFn<T, K> => typeof x == "function"
 
-export const Switch: ISwitchStatic = {
-  of: (x) => swich(x),
+// Impl  ----------------------------------------------------------------------
+
+// Unmatched switch -----------------------------------------------------------
+
+const _switchCase: _SwitchCase = (x) => (predicate, onTrue) => {
+  const isTrue = isFunction(predicate) ? predicate(x) : predicate === x
+
+  return isTrue ? _switchMatched(onTrue) : (_switch(x) as any)
 }
 
-const swichMatched = <TContext, TResult extends unknown[] = []>(
-  x: TContext,
-): ISwitch<TContext, TResult> => ({
-  case: () => swichMatched(x),
-  default: () => (x as ThunkFn<Unpack<TResult>>)(),
+const _switchDefault: _SwitchDefault = () => (defaultValue) => defaultValue()
+
+const _switch: _Switch = (x) => ({
+  case: _switchCase(x),
+  default: _switchDefault(x),
 })
 
-const swich = <TContext, TResult extends unknown[] = []>(
-  x: TContext,
-): ISwitch<TContext, TResult> => ({
-  case: (predicate, onTrue) => {
-    const isTrue = isFunction(predicate) ? predicate(x) : predicate === x
+// Matched switch -------------------------------------------------------------
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    return isTrue ? swichMatched(onTrue) : (swich(x) as any)
-  },
-  default: (defaultValue) => defaultValue(),
+const _switchMatchedCase: _SwitchCase = (x) => () => _switchMatched(x)
+
+const _switchMatchedDefault: _SwitchDefault = (x) => x as any
+
+const _switchMatched: _Switch = (x) => ({
+  case: _switchMatchedCase(x),
+  default: _switchMatchedDefault(x),
 })
+
+// Public ---------------------------------------------------------------------
+
+export const Switch: ISwitchStatic = {
+  of: (x) => _switch(x),
+  empty: () => _switch(undefined),
+}
 
 export const lazySwitch: LazySwitch = (callback) => (x) => callback(Switch.of(x))

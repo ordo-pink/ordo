@@ -2,6 +2,15 @@
 import type { UnaryFn } from "@ordo-pink/common-types"
 import type { ISwitchStatic, ISwitch, LazySwitch } from "./types"
 
+// Public ---------------------------------------------------------------------
+
+export const Switch: ISwitchStatic = {
+  of: (x) => _switch(x),
+  empty: () => _switch(undefined),
+}
+
+export const lazySwitch: LazySwitch = (callback) => (x) => callback(Switch.of(x))
+
 // Internal -------------------------------------------------------------------
 
 // Types ----------------------------------------------------------------------
@@ -47,12 +56,3 @@ const _switchMatched: _Switch = (x) => ({
   case: _switchMatchedCase(x),
   default: _switchMatchedDefault(x),
 })
-
-// Public ---------------------------------------------------------------------
-
-export const Switch: ISwitchStatic = {
-  of: (x) => _switch(x),
-  empty: () => _switch(undefined),
-}
-
-export const lazySwitch: LazySwitch = (callback) => (x) => callback(Switch.of(x))

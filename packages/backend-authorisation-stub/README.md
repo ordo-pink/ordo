@@ -12,7 +12,7 @@ to use the backend as if you were authenticated with the token you define for th
 To make it work, simply provide it as an authorise function to the Backend Universal server factory.
 
 ```typescript
-import { authorisationStub } from "@ordo-pink/authorisation-stub"
+import { authorisationStub } from "@ordo-pink/backend-authorisation-stub"
 
 const myAuthToken = process.env.AUTH_TOKEN || "WHOA_NOT_SO_SAFE!"
 
@@ -32,5 +32,5 @@ purposes.
 ## Installation
 
 ```sh
-npm i -S @ordo-pink/authorisation-stub
+npm i -S @ordo-pink/backend-authorisation-stub
 ```

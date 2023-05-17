@@ -17,15 +17,13 @@ export const createFile: CommandHandler<{ file: IOrdoFile; content?: string }> =
     .then((raw) => {
       const draft = createDraft(drive)
 
-      const parent = OrdoDirectory.isOrdoDirectoryRaw(raw)
+      const parent = OrdoDirectory.isOrdoDirectory(raw)
         ? OrdoDirectory.findParent(raw.path, draft.root)
         : OrdoFile.findParent(raw.path, draft.root)
 
       if (!parent) throw new Error("Cannot find parent of the created file")
 
-      const result = OrdoDirectory.isOrdoDirectoryRaw(raw)
-        ? OrdoDirectory.from(raw)
-        : OrdoFile.from(raw)
+      const result = OrdoDirectory.isOrdoDirectory(raw) ? OrdoDirectory.of(raw) : OrdoFile.of(raw)
 
       parent.children.push(result)
 

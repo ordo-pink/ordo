@@ -6,7 +6,6 @@ import {
   NEW_PATH_PARAM,
   FILES_PARAM,
   DIRECTORIES_PARAM,
-  USER_ID_PARAM,
 } from "./constants"
 import { createDirectoryHandler } from "./handlers/directories/create"
 import { getDirectoryHandler } from "./handlers/directories/get"
@@ -18,15 +17,12 @@ import { moveFileHandler } from "./handlers/files/move"
 import { removeFileHandler } from "./handlers/files/remove"
 import { updateFileHandler } from "./handlers/files/update"
 import { addUserIdToOldPathAndNewPath, addUserIdToPath } from "./middleware/add-user-id-to-path"
-import { appendLogger } from "./middleware/append-logger"
 import {
   appendTrailingDirectoryOldPathAndNewPathSlashes,
   appendTrailingDirectoryPathSlash,
 } from "./middleware/append-trailing-directory-slash"
 import { checkSizeOfUploadingFile } from "./middleware/check-size-of-uploading-file"
-import { compareTokens } from "./middleware/compare-tokens"
 import { createMandatoryContentIfMissing } from "./middleware/create-mandatory-content-if-missing"
-import { extractDynamicParam } from "./middleware/extract-dynamic-param"
 import { prependPathSlash, prependOldPathAndNewPathSlashes } from "./middleware/prepend-slash"
 import { setContentTypeHeader } from "./middleware/set-content-type-header"
 import { setRootPathParam } from "./middleware/set-root-path-param"
@@ -39,15 +35,22 @@ import {
 } from "./middleware/validate-path"
 import { OrdoDirectoryModel } from "./models/directory"
 import { OrdoFileModel } from "./models/file"
-import { OrdoInternalModel } from "../internal/models/internal-model"
+import { USER_ID_PARAM } from "../constants"
+import { appendLogger } from "../middleware/append-logger"
+import { compareTokens } from "../middleware/compare-tokens"
+import { extractDynamicParam } from "../middleware/extract-dynamic-param"
 import { CreateOrdoBackendServerParams } from "../types"
 
-const filesRouter = ({ fsDriver, authorise, logger, encrypt }: CreateOrdoBackendServerParams) => {
+const filesRouter = ({
+  fileDriver: fsDriver,
+  authorise,
+  logger,
+  encrypters,
+}: CreateOrdoBackendServerParams) => {
   const file = OrdoFileModel.of({ driver: fsDriver, logger })
   const directory = OrdoDirectoryModel.of({ driver: fsDriver, logger })
-  const internal = OrdoInternalModel.of({ fsDriver, directory })
 
-  const env = { file, directory, logger, internal, encrypt }
+  const env = { file, directory, logger, encrypters }
 
   return Router()
     .post(
@@ -126,16 +129,15 @@ const filesRouter = ({ fsDriver, authorise, logger, encrypt }: CreateOrdoBackend
 }
 
 const directoriesRouter = ({
-  fsDriver,
+  fileDriver: fsDriver,
   authorise,
   logger,
-  encrypt,
+  encrypters,
 }: CreateOrdoBackendServerParams) => {
   const file = OrdoFileModel.of({ driver: fsDriver, logger })
   const directory = OrdoDirectoryModel.of({ driver: fsDriver, logger })
-  const internal = OrdoInternalModel.of({ fsDriver, directory })
 
-  const env = { file, directory, logger, internal, encrypt }
+  const env = { file, directory, logger, encrypters }
 
   return Router()
     .post(

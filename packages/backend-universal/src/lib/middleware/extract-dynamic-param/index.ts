@@ -1,5 +1,5 @@
 import { RequestHandler } from "express"
-import { Params } from "../../../types"
+import { Params } from "../../types"
 
 export const extractDynamicParam =
   (keys: string[]): RequestHandler<Params<Record<string, unknown>>> =>

@@ -1,142 +1,39 @@
-import { Colour, NoForbiddenCharacters } from "./common"
-import { IOrdoFileRaw, IOrdoFile, OrdoFilePath, ValidatedOrdoFilePath } from "./ordo-file"
+import { FSID, NoForbiddenCharacters, NotEndingWithDot, UserID } from "./common"
+import { IOrdoFile, OrdoFilePath, ValidatedOrdoFilePath } from "./ordo-file"
 import { Nullable, UnaryFn } from "../types"
 
 /**
- * A union of possible children of an OrdoDirectoryRaw.
- */
-export type OrdoFsEntityRaw = IOrdoFileRaw | IOrdoDirectoryRaw
-
-/**
- * A union of possible children of an OrdoDirectory.
- */
-export type OrdoFsEntity = IOrdoFile | IOrdoDirectory
-
-/**
- * Valid structure of a valid OrdoDirectory and OrdoDirectoryRaw path.
+ * Valid structure of a valid OrdoDirectory and OrdoDirectory path.
  */
 export type OrdoDirectoryPath = `/${string}/` | "/"
 
 /**
  * Proper OrdoDirectoryPath or never.
  */
-export type ValidatedOrdoDirectoryPath<T extends OrdoDirectoryPath> = NoForbiddenCharacters<T> | "/"
-
-/**
- * These are the default fileds that always exist on a directory.
- */
-export type DefaultDirectoryMetadata = {
-  createdAt?: Date
-  updatedAt?: Date
-  createdBy?: string
-  updatedBy?: string
-  colour?: Colour
-  isExpanded?: boolean
-  isFavourite?: boolean
-  childOrder?: string[]
-}
-
-/**
- * Raw OrdoDirectory content shared between the frontend and the backend.
- */
-export interface IOrdoDirectoryRaw<T extends Record<string, unknown> = Record<string, unknown>> {
-  /**
-   * Path of the directory. Must be a valid OrdoDirectoryPath.
-   */
-  path: OrdoDirectoryPath
-
-  /**
-   * Children of the directory.
-   */
-  children: OrdoFsEntityRaw[]
-
-  /**
-   * Meta information about the directory.
-   */
-  metadata: T & DefaultDirectoryMetadata
-}
+export type ValidatedOrdoDirectoryPath<T extends OrdoDirectoryPath> =
+  | (NotEndingWithDot<T> & NoForbiddenCharacters<T>)
+  | "/"
 
 /**
  * OrdoDirectory to be used in the application.
  */
-export type IOrdoDirectory<T extends Record<string, unknown> = Record<string, unknown>> = {
-  /**
-   * @see IOrdoDirectoryRaw.path
-   */
+export type IOrdoDirectory<T extends Record<string, unknown> = Record<string, unknown>> = T & {
   path: OrdoDirectoryPath
-
-  /**
-   * @see IOrdoDirectoryRaw.children
-   */
-  children: OrdoFsEntity[]
-
-  /**
-   * Readable name of the directory.
-   */
-  readableName: string
-
-  /**
-   * @see IOrdoDirectoryRaw.metadata
-   */
-  metadata: T & DefaultDirectoryMetadata
+  fsid: FSID
+  createdAt: Date
+  updatedAt: Date
+  createdBy: UserID
+  updatedBy: UserID
 }
 
-/**
- * Initialisation params for creating an IOrdoDirectoryRaw.
- */
-export interface IOrdoDirectoryRawInitParams<Path extends OrdoDirectoryPath> {
-  /**
-   * @see IOrdoDirectoryRaw.path
-   */
+export type IOrdoDirectoryInitParams<Path extends OrdoDirectoryPath> = Partial<IOrdoDirectory> & {
   path: ValidatedOrdoDirectoryPath<Path>
-
-  /**
-   * @see IOrdoDirectoryRaw.children
-   */
-  children: OrdoFsEntityRaw[]
-
-  /**
-   * @see IOrdoDirectoryRaw.metadata
-   */
-  metadata?: Record<string, unknown>
 }
 
 /**
  * Static methods of an OrdoDirectory.
  */
 export interface IOrdoDirectoryStatic {
-  /**
-   * Creates an IOrdoDirectory from an IOrdoDirectoryRaw.
-   *
-   * @throws TypeError if provided path is invalid.
-   */
-  of: UnaryFn<IOrdoDirectoryRaw, IOrdoDirectory>
-
-  /**
-   * Creates an empty IOrdoDirectory with given path.
-   *
-   * @throws TypeError if provided path is invalid.
-   */
-  empty: <Path extends OrdoDirectoryPath>(path: ValidatedOrdoDirectoryPath<Path>) => IOrdoDirectory
-
-  /**
-   * Creates an IOrdoDirectory from IOrdoDirectoryRawInitParams.
-   *
-   * @throws TypeError if provided path is invalid.
-   */
-  from: <Path extends OrdoDirectoryPath>(
-    params: IOrdoDirectoryRawInitParams<Path>,
-  ) => IOrdoDirectory
-
-  /**
-   * Creates IOrdoDirectoryRaw from IOrdoDirectoryRawInitParams.
-   *
-   * @throws TypeError if provided path is invalid.
-   */
-  raw: <Path extends OrdoDirectoryPath>(
-    params: IOrdoDirectoryRawInitParams<Path>,
-  ) => IOrdoDirectoryRaw
-
   /**
    * Check if provided path is a valid IOrdoDirectory path.
    */
@@ -146,11 +43,6 @@ export interface IOrdoDirectoryStatic {
    * Check if provided object is an IOrdoDirectory.
    */
   isOrdoDirectory: (x: unknown) => x is IOrdoDirectory
-
-  /**
-   * Check if provided object is an IOrdoDirectoryRaw.
-   */
-  isOrdoDirectoryRaw: (x: unknown) => x is IOrdoDirectoryRaw
 
   /**
    * Get path of the parent directory of a given directory path.
@@ -173,26 +65,27 @@ export interface IOrdoDirectoryStatic {
   /**
    * Sort given array of IOrdoDirectory children. This is a mutable operation.
    */
-  sort: UnaryFn<IOrdoDirectory["children"], void>
+  sort: UnaryFn<(IOrdoDirectory | IOrdoFile)[], (IOrdoDirectory | IOrdoFile)[]>
 
   findParent: <Path extends OrdoDirectoryPath>(
     path: ValidatedOrdoDirectoryPath<Path>,
-    root: IOrdoDirectory,
+    drive: (IOrdoDirectory | IOrdoFile)[],
   ) => Nullable<IOrdoDirectory>
 
   findFileDeep: <Path extends OrdoFilePath>(
     path: ValidatedOrdoFilePath<Path>,
-    root: IOrdoDirectory,
+    drive: (IOrdoDirectory | IOrdoFile)[],
   ) => Nullable<IOrdoFile>
 
   findDirectoryDeep: <Path extends OrdoDirectoryPath>(
     path: ValidatedOrdoDirectoryPath<Path>,
-    root: IOrdoDirectory,
+    drive: (IOrdoDirectory | IOrdoFile)[],
   ) => Nullable<IOrdoDirectory>
 
-  getFilesDeep: (directory: IOrdoDirectory) => IOrdoFile[]
+  getFilesDeep: (directory: IOrdoDirectory, drive: (IOrdoDirectory | IOrdoFile)[]) => IOrdoFile[]
 
-  getDirectoriesDeep: (directory: IOrdoDirectory) => IOrdoDirectory[]
-
-  toArray: (directory: IOrdoDirectory) => (IOrdoDirectory | IOrdoFile)[]
+  getDirectoriesDeep: (
+    directory: IOrdoDirectory,
+    drive: (IOrdoDirectory | IOrdoFile)[],
+  ) => IOrdoDirectory[]
 }

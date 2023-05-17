@@ -1,7 +1,7 @@
-import { ExceptionResponse } from "@ordo-pink/common-types"
 import { RequestHandler } from "express"
-import { FsRequestHandler, Params } from "../../../types"
 import { USER_ID_PARAM } from "../../constants"
+import { ExceptionResponse } from "../../response-code"
+import { FsRequestHandler, Params } from "../../types"
 
 export const compareTokensStrict: RequestHandler<Params> = (req, res, next) => {
   const userId = req.params[USER_ID_PARAM]

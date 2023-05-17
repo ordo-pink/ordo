@@ -1,8 +1,8 @@
 import { createReadStream, createWriteStream, promises } from "fs"
 import { join } from "path"
-import { promiseWriteStream } from "@ordo-pink/backend-fs-utils"
 import { FSDriver } from "@ordo-pink/backend-universal"
 import { OrdoDirectoryPath, OrdoFilePath, UnaryFn } from "@ordo-pink/common-types"
+import { promiseWriteStream } from "./utils"
 
 // Public ---------------------------------------------------------------------
 

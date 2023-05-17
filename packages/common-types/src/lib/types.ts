@@ -31,6 +31,18 @@ export type BinaryFn<Arg1, Arg2, Result> = (arg1: Arg1, arg2: Arg2) => Result
 export type TernaryFn<Arg1, Arg2, Arg3, Result> = (arg1: Arg1, arg2: Arg2, arg3: Arg3) => Result
 
 /**
+ * Quadrinomial function accepts 4 arguments.
+ *
+ * @example `(x, y, z, a) => x + y + z + a`
+ */
+export type QuadrinomialFn<Arg1, Arg2, Arg3, Arg4, Result> = (
+  arg1: Arg1,
+  arg2: Arg2,
+  arg3: Arg3,
+  arg4: Arg4,
+) => Result
+
+/**
  * The notorious argument-free function.
  *
  * @example `() => "REDUX"`

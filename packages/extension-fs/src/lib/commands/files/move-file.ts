@@ -23,9 +23,7 @@ export const moveFile: CommandHandler<{ oldPath: OrdoFilePath; newPath: OrdoFile
       if (!oldParent) throw new Error("Could not find parent of the file to be moved")
       if (!newParent) throw new Error("Target parent does not exist")
 
-      const result = OrdoDirectory.isOrdoDirectoryRaw(raw)
-        ? OrdoDirectory.from(raw)
-        : OrdoFile.from(raw)
+      const result = OrdoDirectory.isOrdoDirectory(raw) ? OrdoDirectory.of(raw) : OrdoFile.of(raw)
 
       if (!oldParent.metadata.childOrder) {
         oldParent.metadata.childOrder = oldParent.children.map((child) => child.readableName)

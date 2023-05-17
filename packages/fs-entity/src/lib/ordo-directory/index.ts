@@ -1,7 +1,5 @@
 import {
-  IOrdoDirectoryRaw,
   IOrdoDirectory,
-  OrdoFsEntity,
   IOrdoDirectoryStatic,
   OrdoDirectoryPath,
   IOrdoFile,
@@ -9,75 +7,24 @@ import {
 import { isValidPath, endsWithSlash } from "../common"
 import { OrdoFile } from "../ordo-file"
 
-const ordoDirectory = (raw: IOrdoDirectoryRaw): IOrdoDirectory => {
-  if (!OrdoDirectory.isValidPath(raw.path)) {
-    throw new TypeError("Invalid directory path")
-  }
-
-  const readableName = OrdoDirectory.getReadableName(raw.path)
-
-  const children = [] as OrdoFsEntity[]
-
-  for (const child of raw.children) {
-    if (OrdoDirectory.isOrdoDirectoryRaw(child)) {
-      children.push(OrdoDirectory.of(child))
-    } else if (OrdoFile.isOrdoFileRaw(child)) {
-      children.push(OrdoFile.of(child))
-    }
-  }
-
-  OrdoDirectory.sort(children)
-
-  return {
-    readableName,
-    children,
-    path: raw.path,
-    metadata: raw.metadata,
-  }
-}
-
 export const OrdoDirectory: IOrdoDirectoryStatic = {
-  of: (raw) => ordoDirectory(raw),
-  raw: ({ path, children, metadata }) => {
-    if (!OrdoDirectory.isValidPath(path)) {
-      throw new TypeError("Invalid directory path")
-    }
-
-    return { path, children, metadata: metadata ?? {} }
-  },
-  empty: (path) => OrdoDirectory.from({ path, children: [], metadata: {} }),
-  from: (params) => OrdoDirectory.of(OrdoDirectory.raw(params)),
-  isOrdoDirectoryRaw: (x): x is IOrdoDirectoryRaw =>
-    Boolean(x) &&
-    typeof (x as IOrdoDirectoryRaw).path === "string" &&
-    OrdoDirectory.isValidPath((x as IOrdoDirectoryRaw).path) &&
-    Array.isArray((x as IOrdoDirectoryRaw).children),
   isOrdoDirectory: (x): x is IOrdoDirectory =>
     Boolean(x) &&
-    typeof (x as IOrdoDirectory).readableName === "string" &&
-    Array.isArray((x as IOrdoDirectory).children) &&
-    OrdoDirectory.isOrdoDirectoryRaw(x),
+    typeof (x as IOrdoDirectory).path === "string" &&
+    typeof (x as IOrdoDirectory).fsid === "string",
   isValidPath: (path): path is OrdoDirectoryPath =>
     typeof path === "string" && isValidPath(path) && endsWithSlash(path),
   sort: (children) => {
-    children.sort((a, b) => {
-      if (OrdoDirectory.isOrdoDirectoryRaw(a)) {
-        OrdoDirectory.sort(a.children)
-      }
-
-      if (OrdoDirectory.isOrdoDirectoryRaw(b)) {
-        OrdoDirectory.sort(b.children)
-      }
-
-      if (!OrdoDirectory.isOrdoDirectoryRaw(a) && OrdoDirectory.isOrdoDirectoryRaw(b)) {
+    return children.sort((a, b) => {
+      if (!OrdoDirectory.isOrdoDirectory(a) && OrdoDirectory.isOrdoDirectory(b)) {
         return 1
       }
 
-      if (OrdoDirectory.isOrdoDirectoryRaw(a) && !OrdoDirectory.isOrdoDirectoryRaw(b)) {
+      if (OrdoDirectory.isOrdoDirectory(a) && !OrdoDirectory.isOrdoDirectory(b)) {
         return -1
       }
 
-      return a.readableName.localeCompare(b.readableName)
+      return a.path.localeCompare(b.path)
     })
   },
   getReadableName: (path) => {
@@ -94,11 +41,13 @@ export const OrdoDirectory: IOrdoDirectoryStatic = {
       throw new TypeError("Invalid directory path")
     }
 
-    const splittablePath = path.slice(0, -1)
-    if (!splittablePath) return path
-    const lastSeparatorPosition = splittablePath.lastIndexOf("/") + 1
+    const sliceablePath = path.slice(0, -1)
 
-    return splittablePath.slice(0, lastSeparatorPosition) as OrdoDirectoryPath
+    if (!sliceablePath) return path
+
+    const lastSeparatorPosition = sliceablePath.lastIndexOf("/") + 1
+
+    return sliceablePath.slice(0, lastSeparatorPosition) as OrdoDirectoryPath
   },
   findParent: (path, root) => {
     if (!OrdoDirectory.isValidPath(path)) {
@@ -107,90 +56,36 @@ export const OrdoDirectory: IOrdoDirectoryStatic = {
 
     const parentPath = OrdoDirectory.getParentPath(path as OrdoDirectoryPath)
 
-    const pathChunks = parentPath.split("/").filter(Boolean)
+    const found = root.find(
+      (item) => OrdoDirectory.isOrdoDirectory(item) && item.path === parentPath,
+    )
 
-    let parent = root
+    if (!found) return null
 
-    for (const chunk of pathChunks) {
-      const found = parent.children.find(
-        (child) => child.path === parent.path.concat(chunk).concat("/"),
-      )
-
-      if (!found || !OrdoDirectory.isOrdoDirectoryRaw(found)) return null
-
-      parent = found
-    }
-
-    return parent
+    return found as IOrdoDirectory
   },
   findDirectoryDeep: (path, root) => {
-    if (!root) return null
+    const found = root.find((item) => OrdoDirectory.isOrdoDirectory(item) && item.path === path)
 
-    if (path === "/") return root
+    if (!found) return null
 
-    const directChild = root.children.find((child) => child.path === path)
-
-    if (directChild && OrdoDirectory.isOrdoDirectoryRaw(directChild)) return directChild
-
-    const parent = OrdoDirectory.findParent(path, root)
-
-    const found = parent?.children.find((child) => child.path === path)
-
-    if (!found || OrdoFile.isOrdoFileRaw(found)) return null
-
-    return found
+    return found as IOrdoDirectory
   },
   findFileDeep: (path, root) => {
-    if (!root) return null
+    const found = root.find((item) => OrdoFile.isOrdoFile(item) && item.path === path)
 
-    const directChild = root.children.find((child) => child.path === path)
+    if (!found) return null
 
-    if (directChild && OrdoFile.isOrdoFileRaw(directChild)) return directChild
-
-    const parent = OrdoFile.findParent(path, root)
-
-    const found = parent?.children.find((child) => child.path === path)
-
-    if (!found || OrdoDirectory.isOrdoDirectoryRaw(found)) return null
-
-    return found
+    return found as IOrdoFile
   },
-  getDirectoriesDeep: (directory) => {
-    const directories = [] as IOrdoDirectory[]
-
-    for (const child of directory.children) {
-      if (OrdoDirectory.isOrdoDirectoryRaw(child)) {
-        directories.push(child)
-        directories.push(...OrdoDirectory.getDirectoriesDeep(child))
-      }
-    }
-
-    return directories
+  getDirectoriesDeep: (directory, root) => {
+    return root.filter(
+      (item) => OrdoDirectory.isOrdoDirectory(item) && item.path.startsWith(directory.path),
+    ) as IOrdoDirectory[]
   },
-  getFilesDeep: (directory) => {
-    const files = [] as IOrdoFile[]
-
-    for (const child of directory.children) {
-      if (OrdoFile.isOrdoFileRaw(child)) {
-        files.push(child)
-      } else {
-        files.push(...OrdoDirectory.getFilesDeep(child))
-      }
-    }
-
-    return files
-  },
-  toArray: (directory) => {
-    const items = [] as (IOrdoDirectory | IOrdoFile)[]
-
-    for (const child of directory.children) {
-      items.push(child)
-
-      if (OrdoDirectory.isOrdoDirectoryRaw(child)) {
-        items.push(...OrdoDirectory.toArray(child))
-      }
-    }
-
-    return items
+  getFilesDeep: (directory, root) => {
+    return root.filter(
+      (item) => OrdoFile.isOrdoFile(item) && item.path.startsWith(directory.path),
+    ) as IOrdoFile[]
   },
 }

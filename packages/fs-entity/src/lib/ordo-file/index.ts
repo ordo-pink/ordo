@@ -1,7 +1,6 @@
 import {
   IOrdoFileStatic,
   IOrdoFile,
-  IOrdoFileRaw,
   OrdoFilePath,
   OrdoDirectoryPath,
   OrdoFileExtension,
@@ -20,31 +19,13 @@ const toReadableSize = (a: number, b = 2, k = 1024): string => {
 }
 
 export const OrdoFile: IOrdoFileStatic = {
-  of: (raw) => ordoFile(raw),
-  raw: (params) => {
-    if (!OrdoFile.isValidPath(params.path)) {
-      throw new TypeError("Invalid file path")
-    }
-
-    const path = params.path
-    const size = params.size
-    const metadata = params.metadata ?? {}
-    const updatedAt = params.updatedAt ? new Date(params.updatedAt) : new Date()
-
-    return { path, size, updatedAt, metadata }
-  },
-  empty: (path) => OrdoFile.from({ path, size: 0, updatedAt: new Date() }),
-  from: (params) => OrdoFile.of(OrdoFile.raw(params)),
   isOrdoFile: (x): x is IOrdoFile =>
     Boolean(x) &&
-    typeof (x as IOrdoFile).readableName === "string" &&
-    typeof (x as IOrdoFile).extension === "string" &&
-    OrdoFile.isOrdoFileRaw(x),
-  isOrdoFileRaw: (x): x is IOrdoFileRaw =>
-    Boolean(x) &&
-    typeof (x as IOrdoFileRaw).size === "number" &&
-    typeof (x as IOrdoFileRaw).path === "string" &&
-    OrdoFile.isValidPath((x as IOrdoFileRaw).path),
+    typeof (x as IOrdoFile).fsid === "string" &&
+    typeof (x as IOrdoFile).size === "number" &&
+    typeof (x as IOrdoFile).path === "string" &&
+    OrdoFile.isValidPath((x as IOrdoFile).path),
+
   isValidPath: (path): path is OrdoFilePath =>
     typeof path === "string" && isValidPath(path) && !endsWithSlash(path),
   getParentPath: (path) => {
@@ -94,26 +75,4 @@ export const OrdoFile: IOrdoFileStatic = {
 
     return OrdoDirectory.findDirectoryDeep(parentPath, root)
   },
-}
-
-export const ordoFile = (raw: IOrdoFileRaw): IOrdoFile => {
-  if (!OrdoFile.isValidPath(raw.path)) {
-    throw new TypeError("Invalid file path")
-  }
-
-  const { path, size, updatedAt, metadata } = raw
-
-  const readableName = OrdoFile.getReadableName(raw.path)
-  const extension = OrdoFile.getFileExtension(raw.path)
-  const readableSize = toReadableSize(size)
-
-  return {
-    readableName,
-    extension,
-    path,
-    updatedAt: new Date(updatedAt),
-    size,
-    readableSize,
-    metadata,
-  }
 }

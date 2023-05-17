@@ -1,7 +1,8 @@
-import { ExceptionResponse, SuccessResponse } from "@ordo-pink/common-types"
 import { Switch } from "@ordo-pink/switch"
+import { USER_ID_PARAM, TOKEN_PARSED_PARAM } from "../../../constants"
+import { SuccessResponse, ExceptionResponse } from "../../../response-code"
 import { FsRequestHandler, OrdoDirectoryPathParams } from "../../../types"
-import { PATH_PARAM, TOKEN_PARSED_PARAM, USER_ID_PARAM } from "../../constants"
+import { PATH_PARAM } from "../../constants"
 import { removeUserIdFromPath } from "../../utils/remove-user-id-from-path"
 
 export const createDirectoryHandler: FsRequestHandler<OrdoDirectoryPathParams> =

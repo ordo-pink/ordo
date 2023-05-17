@@ -1,8 +1,8 @@
-import { Colours, CommandHandler, IOrdoDirectory } from "@ordo-pink/common-types"
+import { Colours, CommandHandler, OrdoDirectoryDTO } from "@ordo-pink/common-types"
 import { wieldCommands, wieldTranslate } from "@ordo-pink/react-utils"
 import { showCommandPalette, hideCommandPalette } from "@ordo-pink/stream-command-palette"
 
-export const setDirectoryColor: CommandHandler<IOrdoDirectory> = ({ payload }) => {
+export const setDirectoryColor: CommandHandler<OrdoDirectoryDTO> = ({ payload }) => {
   const { t } = wieldTranslate("fs")
   const { emit } = wieldCommands()
 

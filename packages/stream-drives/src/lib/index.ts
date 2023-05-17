@@ -1,6 +1,6 @@
 import { FSDriver, Nullable, OrdoDrive, UnaryFn, UserInfo } from "@ordo-pink/common-types"
 import { callOnce } from "@ordo-pink/fns"
-import { OrdoDirectory } from "@ordo-pink/fs-entity"
+import { Directory } from "@ordo-pink/fs-entity"
 import { BehaviorSubject, map, Observable } from "rxjs"
 
 export const drive$ = new BehaviorSubject<Nullable<OrdoDrive>>(null)
@@ -30,7 +30,7 @@ export const _initDrives = callOnce(
             drive$.next({
               // TODO: Get params from user
               params: { maxTotalSize: 50, maxUploadSize: 5 },
-              root: OrdoDirectory.from(raw),
+              root: Directory.from(raw),
             })
           })
         }),

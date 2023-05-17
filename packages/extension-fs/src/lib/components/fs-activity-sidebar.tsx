@@ -1,5 +1,5 @@
 import {
-  IOrdoDirectory,
+  OrdoDirectoryDTO,
   IOrdoFile,
   IconSize,
   Nullable,
@@ -27,8 +27,8 @@ export default function FSActivitySidebar() {
   const { showContextMenu } = useContextMenu()
   const { t } = useTranslation("fs")
 
-  const [currentDirectory, setCurrentDirectory] = useState<Nullable<IOrdoDirectory>>(null)
-  const [favourites, setFavourites] = useState<(IOrdoDirectory | IOrdoFile)[]>([])
+  const [currentDirectory, setCurrentDirectory] = useState<Nullable<OrdoDirectoryDTO>>(null)
+  const [favourites, setFavourites] = useState<(OrdoDirectoryDTO | IOrdoFile)[]>([])
 
   useEffect(() => {
     if (!drive) return setCurrentDirectory(null)

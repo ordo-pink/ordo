@@ -1,4 +1,4 @@
-import { IOrdoDirectory, IOrdoFile, OrdoFilePath } from "@ordo-pink/common-types"
+import { OrdoDirectoryDTO, IOrdoFile, OrdoFilePath } from "@ordo-pink/common-types"
 import { useFileAssociationFor } from "@ordo-pink/react-utils"
 import Card from "./card"
 import ImageCard from "./image-card"
@@ -6,7 +6,7 @@ import ImageCard from "./image-card"
 type Props = {
   path: OrdoFilePath
   index: number
-  parent: IOrdoDirectory
+  parent: OrdoDirectoryDTO
 }
 
 export default function ColumnItem({ path, index, parent }: Props) {

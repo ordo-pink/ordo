@@ -1,4 +1,4 @@
-import { FileAssociation, IOrdoFile, Nullable, OrdoFilePath } from "@ordo-pink/common-types"
+import { FileAssociation, FileDTO, Nullable, FilePath } from "@ordo-pink/common-types"
 import { Either } from "@ordo-pink/either"
 import { OrdoFile } from "@ordo-pink/fs-entity"
 import { fileAssociations$ } from "@ordo-pink/stream-file-associations"
@@ -14,7 +14,7 @@ export const wieldFileAssociations = () => {
   return wieldSubscription(fileAssociations$, [])
 }
 
-export const useFileAssociationFor = (file: Nullable<IOrdoFile>) => {
+export const useFileAssociationFor = (file: Nullable<FileDTO>) => {
   const associations = useFileAssociations()
 
   const [fileAssoc, setFileAssoc] = useState<Nullable<FileAssociation>>(null)
@@ -33,7 +33,7 @@ export const useFileAssociationFor = (file: Nullable<IOrdoFile>) => {
   return fileAssoc
 }
 
-export const wieldFileAssociationFor = (file: Nullable<IOrdoFile>): Nullable<FileAssociation> => {
+export const wieldFileAssociationFor = (file: Nullable<FileDTO>): Nullable<FileAssociation> => {
   const associations = wieldFileAssociations()
 
   return Either.fromNullable(associations)
@@ -60,7 +60,7 @@ export const useCurrentFileAssociation = () => {
       .chain((assocs) => Either.fromNullable(filePath).map((path) => ({ assocs, path })))
       .map((params) => ({
         ...params,
-        fileExtension: OrdoFile.getFileExtension(`/${params.path}` as OrdoFilePath),
+        fileExtension: OrdoFile.getFileExtension(`/${params.path}` as FilePath),
       }))
       .chain(({ assocs, fileExtension }) =>
         Either.fromNullable(assocs.find((assoc) => assoc.fileExtensions.includes(fileExtension))),
@@ -79,7 +79,7 @@ export const wieldCurrentFileAssociation = (): Nullable<FileAssociation> => {
     .chain((assocs) => Either.fromNullable(filePath).map((path) => ({ assocs, path })))
     .map((params) => ({
       ...params,
-      fileExtension: OrdoFile.getFileExtension(`/${params.path}` as OrdoFilePath),
+      fileExtension: OrdoFile.getFileExtension(`/${params.path}` as FilePath),
     }))
     .chain(({ assocs, fileExtension }) =>
       Either.fromNullable(assocs.find((assoc) => assoc.fileExtensions.includes(fileExtension))),

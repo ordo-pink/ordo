@@ -1,4 +1,4 @@
-import { IOrdoDirectory, IOrdoFile } from "@ordo-pink/common-types"
+import { OrdoDirectoryDTO, IOrdoFile } from "@ordo-pink/common-types"
 import { OrdoFile } from "@ordo-pink/fs-entity"
 import { useContextMenu, OrdoButtonSecondary, useCommands } from "@ordo-pink/react-utils"
 import { Droppable, Draggable } from "react-beautiful-dnd"
@@ -7,7 +7,7 @@ import ColumnItem from "./column-item"
 import { backgroundColours } from "../colours"
 
 type Props = {
-  directory: IOrdoDirectory
+  directory: OrdoDirectoryDTO
   index: number
 }
 

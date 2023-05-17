@@ -1,6 +1,6 @@
 import { S3 } from "@aws-sdk/client-s3"
 import { FSDriver } from "@ordo-pink/backend-universal"
-import { OrdoDirectory, OrdoFile } from "@ordo-pink/fs-entity"
+import { Directory, OrdoFile } from "@ordo-pink/fs-entity"
 import { F, T } from "ramda"
 import { func, toDirectoryPath, toFilePath, toPrefixD, toPrefixF } from "./utils"
 
@@ -21,7 +21,7 @@ const filterBySamePathAnd =
 
 const mapToFilePath = ({ Key = "" }) => OrdoFile.empty(toFilePath(Key)).path
 
-const mapToDirectoryPath = ({ Prefix = "/" }) => OrdoDirectory.empty(toDirectoryPath(Prefix)).path
+const mapToDirectoryPath = ({ Prefix = "/" }) => Directory.empty(toDirectoryPath(Prefix)).path
 
 export const createDefaultS3Driver = ({
   accessKeyId,

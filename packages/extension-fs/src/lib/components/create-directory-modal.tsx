@@ -1,4 +1,4 @@
-import { IOrdoDirectory } from "@ordo-pink/common-types"
+import { OrdoDirectoryDTO } from "@ordo-pink/common-types"
 import {
   OrdoButtonPrimary,
   OrdoButtonSecondary,
@@ -11,7 +11,7 @@ import { useTranslation } from "react-i18next"
 import { BsFolderPlus } from "react-icons/bs"
 
 type Props = {
-  parent?: IOrdoDirectory
+  parent?: OrdoDirectoryDTO
 }
 
 export default function CreateDirectoryModal({ parent }: Props) {

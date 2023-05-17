@@ -1,8 +1,8 @@
 import { createReadStream, createWriteStream, promises } from "fs"
 import { join } from "path"
-import { promiseWriteStream } from "@ordo-pink/backend-fs-utils"
 import { FSDriver } from "@ordo-pink/backend-universal"
-import { OrdoDirectoryPath, OrdoFilePath, UnaryFn } from "@ordo-pink/common-types"
+import { DirectoryPath, FilePath, UnaryFn } from "@ordo-pink/common-types"
+import { promiseWriteStream } from "./utils"
 
 // Public ---------------------------------------------------------------------
 
@@ -85,8 +85,8 @@ const _getDirectoryChildren: WithAbsolutePathFn<FSDriver["getDirectoryChildren"]
       .then((children) =>
         children.map((child) =>
           child.isDirectory()
-            ? (`${path}${child.name}/` as OrdoDirectoryPath)
-            : (`${path}${child.name}` as OrdoFilePath),
+            ? (`${path}${child.name}/` as DirectoryPath)
+            : (`${path}${child.name}` as FilePath),
         ),
       )
 

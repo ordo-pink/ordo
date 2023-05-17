@@ -86,6 +86,7 @@ export const createEncryptionModule = ({
   const cipherKey = hash.digest()
 
   return {
+    encryptionType: "v1",
     encryptStream: encryptStream({ cipherAlgorithm, cipherKey, ivSize, options }),
     decryptStream: decryptStream({ cipherAlgorithm, cipherKey, ivSize, options }),
   }

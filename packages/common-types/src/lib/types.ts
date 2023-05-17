@@ -31,6 +31,18 @@ export type BinaryFn<Arg1, Arg2, Result> = (arg1: Arg1, arg2: Arg2) => Result
 export type TernaryFn<Arg1, Arg2, Arg3, Result> = (arg1: Arg1, arg2: Arg2, arg3: Arg3) => Result
 
 /**
+ * Quadrinomial function accepts 4 arguments.
+ *
+ * @example `(x, y, z, a) => x + y + z + a`
+ */
+export type QuadrinomialFn<Arg1, Arg2, Arg3, Arg4, Result> = (
+  arg1: Arg1,
+  arg2: Arg2,
+  arg3: Arg3,
+  arg4: Arg4,
+) => Result
+
+/**
  * The notorious argument-free function.
  *
  * @example `() => "REDUX"`
@@ -85,7 +97,7 @@ export type CamelCasedKeys<T> = { [P in keyof T as CamelCase<P & string>]: T[P] 
 
 /**
  * Turns an object type with PascalCase, kebab-case, or snake_case keys to an
- * object type with camelCase keys. Deep as Tartaros.
+ * object type with camelCase keys. Deep as Tartarus.
  *
  * @example `CamelCasedKeysDeep<{ my_key: { nested_key: 1 } }> -> { myKey: { nestedKey: 1 } }`
  * @example `CamelCasedKeysDeep<{ MyKey: { NestedKey: 1 } }> -> { myKey: { nestedKey: 1 } }`
@@ -96,15 +108,3 @@ export type CamelCasedKeys<T> = { [P in keyof T as CamelCase<P & string>]: T[P] 
 export type CamelCasedKeysDeep<T> = {
   [P in keyof T as CamelCase<P & string>]: T[P] extends object ? CamelCasedKeys<T[P]> : T[P]
 }
-
-/**
- * Disallows using characters in a provided union of characters in a provided string.
- *
- * @example ForbidCharacters<"*" | "+", "2*2"> -> never
- * @example ForbidCharacters<"*" | "+", "2+2"> -> never
- * @example ForbidCharacters<"*" | "+", "2-2"> -> "2-2"
- */
-export type ForbidCharacters<
-  Chars extends string,
-  Str extends string,
-> = Str extends `${string}${Chars}${string}` ? never : Str

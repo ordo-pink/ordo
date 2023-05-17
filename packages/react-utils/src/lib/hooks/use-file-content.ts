@@ -1,8 +1,8 @@
-import { IOrdoFile, Nullable } from "@ordo-pink/common-types"
+import { FileDTO, Nullable } from "@ordo-pink/common-types"
 import { useEffect, useState } from "react"
 import { useFsDriver } from "./use-fs"
 
-export const useFileContentRaw = (file: IOrdoFile) => {
+export const useFileContentRaw = (file: FileDTO) => {
   const driver = useFsDriver()
 
   const [content, setContent] = useState<Nullable<Response>>(null)
@@ -16,7 +16,7 @@ export const useFileContentRaw = (file: IOrdoFile) => {
   return content
 }
 
-export const useFileContentBlob = (file: IOrdoFile) => {
+export const useFileContentBlob = (file: FileDTO) => {
   const driver = useFsDriver()
 
   const [content, setContent] = useState<Nullable<Blob>>(null)
@@ -33,7 +33,7 @@ export const useFileContentBlob = (file: IOrdoFile) => {
   return content
 }
 
-export const useFileContentText = (file: IOrdoFile) => {
+export const useFileContentText = (file: FileDTO) => {
   const response = useFileContentRaw(file)
 
   const [content, setContent] = useState<Nullable<string>>(null)
@@ -67,7 +67,7 @@ export const useFileContentText = (file: IOrdoFile) => {
   return content
 }
 
-export const useFileContentJSON = (file: IOrdoFile) => {
+export const useFileContentJSON = (file: FileDTO) => {
   const response = useFileContentRaw(file)
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any

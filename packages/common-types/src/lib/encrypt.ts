@@ -15,6 +15,7 @@ export type DecryptFn = UnaryFn<Writable, Transform>
  * Stream encryption module.
  */
 export type Encrypter = {
+  encryptionType: string
   encryptStream: EncryptFn
   decryptStream: DecryptFn
 }

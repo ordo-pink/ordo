@@ -1,11 +1,11 @@
 import { useDraggable, useDroppable } from "@dnd-kit/core"
-import { IOrdoDirectory, IconSize } from "@ordo-pink/common-types"
+import { OrdoDirectoryDTO, IconSize } from "@ordo-pink/common-types"
 import { useContextMenu, useCommands, DirectoryIcon } from "@ordo-pink/react-utils"
 import { MouseEvent } from "react"
 import { useTranslation } from "react-i18next"
 
 type Props = {
-  directory: IOrdoDirectory
+  directory: OrdoDirectoryDTO
 }
 
 export default function FSActivityDirectory({ directory }: Props) {

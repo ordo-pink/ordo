@@ -1,6 +1,6 @@
 import { $createListNode } from "@lexical/list"
 import { $createHeadingNode, $createQuoteNode } from "@lexical/rich-text"
-import { CommandContext, IOrdoDirectory, IconSize, OrdoFilePath } from "@ordo-pink/common-types"
+import { CommandContext, OrdoDirectoryDTO, IconSize, OrdoFilePath } from "@ordo-pink/common-types"
 import { OrdoDirectory, OrdoFile } from "@ordo-pink/fs-entity"
 import { FileIcon } from "@ordo-pink/react-utils"
 import { hideCommandPalette, showCommandPalette } from "@ordo-pink/stream-command-palette"
@@ -317,15 +317,15 @@ export default createExtension(
 
     const EXPAND_DIRECTORIES_COMMAND = commands.on(
       "expand-directories",
-      ({ payload }: CommandContext<IOrdoDirectory>) => {
+      ({ payload }: CommandContext<OrdoDirectoryDTO>) => {
         const drive = drive$.getValue()
 
         if (!drive) return
 
         const directories = payload.children.filter((child) =>
           OrdoDirectory.isOrdoDirectory(child),
-        ) as IOrdoDirectory<{ isExpanded: boolean }>[]
-        directories.push(payload as IOrdoDirectory<{ isExpanded: boolean }>)
+        ) as OrdoDirectoryDTO<{ isExpanded: boolean }>[]
+        directories.push(payload as OrdoDirectoryDTO<{ isExpanded: boolean }>)
 
         directories.forEach((directory) => {
           if (directory.metadata.isExpanded) return
@@ -352,15 +352,15 @@ export default createExtension(
 
     const COLLAPSE_DIRECTORIES_COMMAND = commands.on(
       "collapse-directories",
-      ({ payload }: CommandContext<IOrdoDirectory>) => {
+      ({ payload }: CommandContext<OrdoDirectoryDTO>) => {
         const drive = drive$.getValue()
 
         if (!drive) return
 
         const directories = payload.children.filter((child) =>
           OrdoDirectory.isOrdoDirectory(child),
-        ) as IOrdoDirectory<{ isExpanded: boolean }>[]
-        directories.push(payload as IOrdoDirectory<{ isExpanded: boolean }>)
+        ) as OrdoDirectoryDTO<{ isExpanded: boolean }>[]
+        directories.push(payload as OrdoDirectoryDTO<{ isExpanded: boolean }>)
 
         directories.forEach((directory) => {
           if (!directory.metadata.isExpanded) return

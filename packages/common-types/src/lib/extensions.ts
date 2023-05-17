@@ -4,7 +4,7 @@ import { LexicalNode } from "lexical"
 import { ComponentType } from "react"
 import { IconType } from "react-icons"
 import { CommandListener, ExecuteCommandFn, RegisterCommandFn } from "./commands"
-import { IOrdoFile, OrdoFileExtension } from "./fs/ordo-file"
+import { FileDTO, FileExtension } from "./fs"
 import { Route } from "./routing"
 import { RegisterTranslationsFn } from "./translations"
 import { BinaryFn, ThunkFn, UnaryFn } from "./types"
@@ -133,9 +133,9 @@ export type Activity = {
 
 export type FileAssociation = {
   name: string
-  fileExtensions: OrdoFileExtension[] | "*"
-  Component: ComponentType<{ file: IOrdoFile }>
-  Icon: ComponentType<{ file: IOrdoFile; size: IconSize }>
+  fileExtensions: FileExtension[] | "*"
+  Component: ComponentType<{ file: FileDTO }>
+  Icon: ComponentType<{ file: FileDTO; size: IconSize }>
 }
 
 export type EditorPlugin = {

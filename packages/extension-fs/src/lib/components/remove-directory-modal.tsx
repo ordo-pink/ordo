@@ -1,4 +1,4 @@
-import { IOrdoDirectory } from "@ordo-pink/common-types"
+import { OrdoDirectoryDTO } from "@ordo-pink/common-types"
 import {
   OrdoButtonPrimary,
   OrdoButtonSecondary,
@@ -9,7 +9,7 @@ import { useTranslation } from "react-i18next"
 import { BsFolderMinus } from "react-icons/bs"
 
 type Props = {
-  directory: IOrdoDirectory
+  directory: OrdoDirectoryDTO
 }
 
 export default function RemoveDirectoryModal({ directory }: Props) {

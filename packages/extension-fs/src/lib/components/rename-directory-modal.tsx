@@ -1,4 +1,4 @@
-import { IOrdoDirectory, OrdoFilePath } from "@ordo-pink/common-types"
+import { OrdoDirectoryDTO, OrdoFilePath } from "@ordo-pink/common-types"
 import { OrdoDirectory, OrdoFile } from "@ordo-pink/fs-entity"
 import {
   OrdoButtonPrimary,
@@ -12,7 +12,7 @@ import { useTranslation } from "react-i18next"
 import { BsPencil } from "react-icons/bs"
 
 type Props = {
-  directory: IOrdoDirectory
+  directory: OrdoDirectoryDTO
   content?: string
 }
 

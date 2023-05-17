@@ -3,7 +3,7 @@ import {
   IOrdoFile,
   CommandContext,
   IconSize,
-  IOrdoDirectory,
+  OrdoDirectoryDTO,
   CommandHandler,
 } from "@ordo-pink/common-types"
 import { OrdoDirectory, OrdoFile } from "@ordo-pink/fs-entity"
@@ -49,7 +49,7 @@ export default createExtension(
               onSelect: () => {
                 commands.emit("fs.show-create-directory-modal")
 
-                const onDirectoryCreated: CommandHandler<IOrdoDirectory> = ({
+                const onDirectoryCreated: CommandHandler<OrdoDirectoryDTO> = ({
                   payload: directory,
                 }) => {
                   payload.editor &&

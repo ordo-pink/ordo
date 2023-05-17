@@ -8,7 +8,7 @@ import {
   useSensor,
   useSensors,
 } from "@dnd-kit/core"
-import { IOrdoDirectory, IOrdoFile, Nullable, OrdoDirectoryPath } from "@ordo-pink/common-types"
+import { OrdoDirectoryDTO, IOrdoFile, Nullable, OrdoDirectoryPath } from "@ordo-pink/common-types"
 import { Either } from "@ordo-pink/either"
 import { OrdoDirectory, OrdoFile } from "@ordo-pink/fs-entity"
 import { Null, useCommands, useContextMenu, useDrive, useRouteParams } from "@ordo-pink/react-utils"
@@ -44,7 +44,7 @@ export default function FSActivity() {
 
   const sensors = useSensors(mouseSensor, touchSensor, keyboardSensor)
 
-  const [currentDirectory, setCurrentDirectory] = useState<Nullable<IOrdoDirectory>>(null)
+  const [currentDirectory, setCurrentDirectory] = useState<Nullable<OrdoDirectoryDTO>>(null)
   const [activeDraggable, setActiveDraggable] = useState<Nullable<Active>>(null)
 
   useEffect(() => {
@@ -104,7 +104,7 @@ export default function FSActivity() {
 
               const parent = isOrdoDirectory
                 ? OrdoDirectory.findParent(
-                    (event.active.data.current as IOrdoDirectory).path,
+                    (event.active.data.current as OrdoDirectoryDTO).path,
                     drive.root,
                   )
                 : OrdoFile.findParent((event.active.data.current as IOrdoFile).path, drive.root)
@@ -115,7 +115,7 @@ export default function FSActivity() {
 
               if (!parentParent) return
 
-              const draggableItem = event.active.data.current as IOrdoDirectory | IOrdoFile
+              const draggableItem = event.active.data.current as OrdoDirectoryDTO | IOrdoFile
 
               const command = isOrdoDirectory ? "fs.move-directory" : "fs.move-file"
               const payload = {
@@ -136,7 +136,7 @@ export default function FSActivity() {
               return
             }
 
-            const draggableItem = event.active.data.current as IOrdoDirectory | IOrdoFile
+            const draggableItem = event.active.data.current as OrdoDirectoryDTO | IOrdoFile
 
             const isOrdoDirectory = OrdoDirectory.isOrdoDirectory(draggableItem)
             const command = isOrdoDirectory ? "fs.move-directory" : "fs.move-file"

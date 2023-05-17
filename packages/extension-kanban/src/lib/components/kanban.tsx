@@ -1,4 +1,9 @@
-import { IOrdoDirectory, Nullable, OrdoDirectoryPath, OrdoFilePath } from "@ordo-pink/common-types"
+import {
+  OrdoDirectoryDTO,
+  Nullable,
+  OrdoDirectoryPath,
+  OrdoFilePath,
+} from "@ordo-pink/common-types"
 import { Either } from "@ordo-pink/either"
 import { OrdoDirectory, OrdoFile } from "@ordo-pink/fs-entity"
 import { Null, OrdoButtonPrimary, useCommands } from "@ordo-pink/react-utils"
@@ -21,7 +26,7 @@ const Kanban = ({ directoryPath }: Props) => {
   const { t } = useTranslation("kanban")
   const { emit } = useCommands()
 
-  const [directory, setDirectory] = useState<Nullable<IOrdoDirectory>>(null)
+  const [directory, setDirectory] = useState<Nullable<OrdoDirectoryDTO>>(null)
 
   useEffect(() => {
     if (!drive) return
@@ -126,10 +131,10 @@ const Kanban = ({ directoryPath }: Props) => {
                     .filter((item) => item && OrdoDirectory.isOrdoDirectory(item))
                     .map((child, index) =>
                       Either.fromNullable(
-                        OrdoDirectory.findDirectoryDeep((child as IOrdoDirectory).path, dir),
+                        OrdoDirectory.findDirectoryDeep((child as OrdoDirectoryDTO).path, dir),
                       ).fold(Null, (column) => (
                         <Column
-                          key={(child as IOrdoDirectory).path}
+                          key={(child as OrdoDirectoryDTO).path}
                           directory={column}
                           index={index}
                         />
@@ -141,7 +146,7 @@ const Kanban = ({ directoryPath }: Props) => {
                       return (
                         <Column
                           key={directory.path}
-                          directory={directory as IOrdoDirectory}
+                          directory={directory as OrdoDirectoryDTO}
                           index={index}
                         />
                       )

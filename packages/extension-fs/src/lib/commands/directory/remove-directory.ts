@@ -1,9 +1,9 @@
-import { CommandContext, IOrdoDirectory } from "@ordo-pink/common-types"
+import { CommandContext, OrdoDirectoryDTO } from "@ordo-pink/common-types"
 import { OrdoDirectory } from "@ordo-pink/fs-entity"
 import { wieldCommands, wieldDrive, wieldFsDriver } from "@ordo-pink/react-utils"
 import { createDraft, finishDraft } from "immer"
 
-export const removeDirectory = ({ payload }: CommandContext<IOrdoDirectory>) => {
+export const removeDirectory = ({ payload }: CommandContext<OrdoDirectoryDTO>) => {
   const driver = wieldFsDriver()
   const [drive, setDrive] = wieldDrive()
   const { emit } = wieldCommands()

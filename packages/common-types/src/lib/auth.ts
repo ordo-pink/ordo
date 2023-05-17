@@ -1,5 +1,5 @@
 import { ExtensionCreatorContext } from "./extensions"
-import { IOrdoDirectory } from "./fs/ordo-directory"
+import { DirectoryDTO } from "./fs"
 import { UnaryFn } from "./types"
 
 export type AuthInfo =
@@ -19,7 +19,7 @@ export type OrdoDrive = {
     maxUploadSize: number
     maxTotalSize: number
   }
-  root: IOrdoDirectory
+  root: DirectoryDTO
 }
 
 export type UserInfo = {

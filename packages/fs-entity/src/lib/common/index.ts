@@ -1,7 +1,7 @@
-import { disallowedCharacters } from "@ordo-pink/common-types"
+import { FORBIDDEN_PATH_SYMBOLS } from "@ordo-pink/common-types"
 
 export const hasForbiddenChars = (path: string) =>
-  disallowedCharacters.some((disallowed) => path.includes(disallowed))
+  FORBIDDEN_PATH_SYMBOLS.some((disallowed) => path.includes(disallowed))
 
 export const isEmpty = (path: string) => path.trim() === ""
 

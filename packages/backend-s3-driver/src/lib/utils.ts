@@ -15,7 +15,7 @@ import {
   S3,
 } from "@aws-sdk/client-s3"
 import { Upload } from "@aws-sdk/lib-storage"
-import { OrdoDirectoryPath, OrdoFilePath, UnaryFn } from "@ordo-pink/common-types"
+import { DirectoryPath, FilePath, UnaryFn } from "@ordo-pink/common-types"
 import {
   pipe,
   ifElse,
@@ -162,21 +162,21 @@ export const func = (client: S3, bucket: string) => ({
 export const toPrefixD = pipe(
   ifElse(startsWith("/"), slice(1, Infinity), identity),
   ifElse(endsWith("/"), identity, concat(__, "/")),
-) as UnaryFn<string, OrdoDirectoryPath>
+) as UnaryFn<string, DirectoryPath>
 
 export const toPrefixF = pipe(
   ifElse(startsWith("/"), slice(1, Infinity), identity),
   ifElse(endsWith("/"), slice(0, -1), identity),
-) as UnaryFn<string, OrdoFilePath>
+) as UnaryFn<string, FilePath>
 
 export const toFilePath = ifElse(startsWith("/"), identity, concat("/")) as UnaryFn<
   string,
-  OrdoFilePath
+  FilePath
 >
 export const toDirectoryPath = pipe(
   toFilePath,
   ifElse(endsWith("/"), identity, concat(__, "/")),
-) as UnaryFn<string, OrdoDirectoryPath>
+) as UnaryFn<string, DirectoryPath>
 
 export const isDirectory = pipe(
   props(["Key", "Prefix"]),

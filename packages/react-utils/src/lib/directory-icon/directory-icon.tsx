@@ -1,4 +1,4 @@
-import { IOrdoDirectory, IconSize } from "@ordo-pink/common-types"
+import { OrdoDirectoryDTO, IconSize } from "@ordo-pink/common-types"
 import { Switch } from "@ordo-pink/switch"
 import {
   AiFillFolderOpen,
@@ -32,7 +32,7 @@ export const backgroundColors: Record<string, string> = {
 }
 
 type Props = {
-  directory: IOrdoDirectory
+  directory: OrdoDirectoryDTO
   size: IconSize
   showExpansion?: boolean
 }

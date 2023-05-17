@@ -1,4 +1,4 @@
-import { IOrdoDirectory } from "@ordo-pink/common-types"
+import { OrdoDirectoryDTO } from "@ordo-pink/common-types"
 import { Either } from "@ordo-pink/either"
 import { Null } from "@ordo-pink/react-utils"
 import FileOrDirectory from "./file-or-directory"
@@ -7,7 +7,7 @@ type Props = {
   /**
    * Directory the content refers to.
    */
-  directory: IOrdoDirectory
+  directory: OrdoDirectoryDTO
 
   /**
    * Whether the directory is expanded or collapsed.

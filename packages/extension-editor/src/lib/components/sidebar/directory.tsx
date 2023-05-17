@@ -1,4 +1,4 @@
-import { IOrdoDirectory, IconSize } from "@ordo-pink/common-types"
+import { OrdoDirectoryDTO, IconSize } from "@ordo-pink/common-types"
 import { Either } from "@ordo-pink/either"
 import {
   ActionListItem,
@@ -13,7 +13,7 @@ import { BsChevronDown, BsChevronUp } from "react-icons/bs"
 import DirectoryContent from "./directory-content"
 
 type Props = {
-  directory: IOrdoDirectory
+  directory: OrdoDirectoryDTO
 }
 
 export default function Directory({ directory }: Props) {

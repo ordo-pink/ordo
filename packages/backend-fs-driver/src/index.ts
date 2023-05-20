@@ -1,6 +1,5 @@
 import { createReadStream, createWriteStream, promises } from "fs"
 import { join } from "path"
-import { FSDriver } from "@ordo-pink/backend-universal"
 import { DirectoryPath, FilePath, UnaryFn } from "@ordo-pink/common-types"
 import { promiseWriteStream } from "./utils"
 

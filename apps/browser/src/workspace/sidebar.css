@@ -1,9 +1,0 @@
-.gutter {
-  @apply bg-neutral-200 sm:bg-neutral-50 dark:bg-neutral-800 sm:dark:bg-neutral-700 bg-no-repeat z-40 pr-2;
-  background-position: 50% 50%;
-}
-
-.gutter.gutter-horizontal {
-  @apply cursor-col-resize;
-  background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAeCAYAAADkftS9AAAAIklEQVQoU2M4c+bMfxAGAgYYmwGrIIiDjrELjpo5aiZeMwF+yNnOs5KSvgAAAABJRU5ErkJggg==");
-}

@@ -1,7 +1,0 @@
-.action-list-item {
-  @apply py-2 md:py-0.5 rounded-md px-2 flex space-x-8 justify-between items-center;
-}
-
-.action-list-item.active {
-  @apply bg-gradient-to-r from-rose-300 dark:from-violet-700 to-purple-300 dark:to-purple-700;
-}

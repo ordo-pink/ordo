@@ -1,0 +1,11 @@
+/root/ @orlowdev
+/bin/ @orlowdev
+/etc/ @orlowdev
+/opt/ @orlowdev
+/srv/ @orlowdev
+/usr/orlowdev/ @orlowdev
+license.md @orlowdev
+
+*.go @m3bwc
+*.ts @orlowdev
+*.test.ts @Amzoobalance

@@ -1,3 +1,5 @@
 {
-  "cSpell.words": ["synchronise"]
+	"deno.enable": true,
+	"deno.unstable": true,
+	"deno.cache": "./var/tmp/deno"
 }

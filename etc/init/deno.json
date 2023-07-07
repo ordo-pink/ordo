@@ -1,0 +1,7 @@
+{
+	"imports": {
+		"#std/": "https://deno.land/std@0.192.0/",
+		"#lib/": "./lib/"
+	},
+	"lock": "etc/deno/deno.lock"
+}

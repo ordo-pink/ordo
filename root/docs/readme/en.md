@@ -50,8 +50,7 @@ The `/opt` directory contains third-party applications.
 
 ### SRV
 
-The `/srv` directory contains compiled server application code. Put your built
-servable apps here.
+The `/srv` directory contains application code. Put your servable apps here.
 
 # USR
 

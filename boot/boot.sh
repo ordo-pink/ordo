@@ -17,7 +17,7 @@ PLATFORM=$(uname -ms)
 ESBUILD_VERSION='0.18.9'
 DENO_VERSION='v1.35.0'
 
-ln -nf etc/init/deno.json deno.json
+ln -snf etc/deno/deno.jsonc deno.jsonc
 
 # Internal --------------------------------------------------------------------
 

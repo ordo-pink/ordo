@@ -65,14 +65,14 @@ export const main = async () => {
 		const path = join(configPath, source.name)
 
 		const command = new Deno.Command("ln", {
-			args: ["-nf", path, source.name],
+			args: ["-snf", path, source.name],
 			stdout: "piped",
 			stderr: "piped",
 		})
 
 		Deno.stdout.write(
 			encoder.encode(
-				`${c.yellow("◌")} Creating hard link for ${source.name}... `
+				`${c.yellow("◌")} Creating soft link for ${source.name}... `
 			)
 		)
 

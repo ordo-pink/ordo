@@ -9,7 +9,7 @@
 
 /tsconfig.json
 /.prettierrc
-/deno.json
+/deno.jsonc
 
 .idea
 .vscode

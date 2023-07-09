@@ -8,7 +8,7 @@ import type {
 } from "./types.ts"
 
 import { Either, TEither } from "#lib/either/mod.ts"
-import { GetOptsErrorString } from "./error-string.ts"
+import { CLIBErrorString } from "./error-string.ts"
 import { createHelpMessage } from "./create-help-message.ts"
 import { eitherIsObject, isLongOption, isShortOption } from "./is.ts"
 
@@ -40,7 +40,7 @@ export const clib = <
 		.chain(eitherGetOpts(argv))
 		.chain(eitherNormalizeArgs)
 		.leftMap(x =>
-			x != null ? x : GetOptsErrorString.invalidExpectations()
+			x != null ? x : CLIBErrorString.invalidExpectations()
 		) as TEither<CLIConfig<Options>, string>
 
 // Internal -------------------------------------------------------------------
@@ -70,7 +70,7 @@ const eitherNormalizeArgs: TEitherNormalizeArgs = opts =>
 
 				// Throw if the amount of provided arguments is less than expected
 				if (!opts.args[i]) {
-					throw GetOptsErrorString.missingArgument(argName)
+					throw CLIBErrorString.missingArgument(argName)
 				}
 
 				// Assign the argument to the opts
@@ -115,28 +115,40 @@ const eitherGetOpts: TEitherGetOpts = providedArgv => expectations =>
 
 				if (!expectation) continue
 
-				if (expectation.inputRequired) {
+				if (expectation.inputRequired || expectation.values) {
 					const nextArgument = argv[i + 1]
 
 					if (
 						!value &&
+						expectation.inputRequired &&
 						(isLongOption(nextArgument) ||
 							isShortOption(nextArgument) ||
 							i === argv.length - 1)
 					) {
 						// TODO: Add support for default values
-						throw GetOptsErrorString.missingRequiredLongOptionInput(argument)
+						throw CLIBErrorString.missingRequiredLongOptionInput(argument)
 					}
 
-					if (!value) value = argv[++i]
+					if (
+						!value &&
+						!isLongOption(nextArgument) &&
+						!isShortOption(nextArgument) &&
+						i !== argv.length - 1
+					)
+						value = argv[++i]
 
-					if (!value) {
-						// TODO: Add support for default values
-						throw GetOptsErrorString.missingRequiredLongOptionInput(argument)
+					if (!value && expectation.inputRequired) {
+						throw CLIBErrorString.missingRequiredLongOptionInput(argument)
+					}
+
+					if (
+						value &&
+						expectation.values &&
+						!Object.keys(expectation.values).includes(value)
+					) {
+						throw CLIBErrorString.invalidOptionValueProvided(value, expectation)
 					}
 				}
-
-				// TODO: Check if provided value is in expectation.values
 
 				longOptions[argument.slice(2)] = value ?? true
 			} else if (isShortOption(argument)) {

@@ -125,8 +125,11 @@ const eitherGetOpts: TEitherGetOpts = providedArgv => expectations =>
 							isShortOption(nextArgument) ||
 							i === argv.length - 1)
 					) {
-						// TODO: Add support for default values
-						throw CLIBErrorString.missingRequiredLongOptionInput(argument)
+						if (expectation.default) {
+							value = expectation.default
+						} else {
+							throw CLIBErrorString.missingRequiredLongOptionInput(argument)
+						}
 					}
 
 					if (
@@ -138,7 +141,11 @@ const eitherGetOpts: TEitherGetOpts = providedArgv => expectations =>
 						value = argv[++i]
 
 					if (!value && expectation.inputRequired) {
-						throw CLIBErrorString.missingRequiredLongOptionInput(argument)
+						if (expectation.default) {
+							value = expectation.default
+						} else {
+							throw CLIBErrorString.missingRequiredLongOptionInput(argument)
+						}
 					}
 
 					if (

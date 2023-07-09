@@ -3,5 +3,9 @@
 		"#std/": "https://deno.land/std@0.192.0/",
 		"#lib/": "./lib/"
 	},
+<<<<<<< HEAD
 	"lock": "./etc/deno/deno.lock"
+=======
+	"lock": "etc/deno/deno.lock"
+>>>>>>> bdbbdb2145f1f400526a331b40486d41b7157c97
 }

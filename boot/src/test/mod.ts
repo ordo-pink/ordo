@@ -18,22 +18,6 @@ const opts = clib(Deno.args, {
 
 // INTERNAL -------------------------------------------------------------------
 
-// TYPES ----------------------------------------------------------------------
-
-type TransformArgumentToAbsolutePath = (arg: string) => string
-
-type ReduceToTestBinaryAbsolutePaths = (
-	path: string
-) => (acc: string[], child: Deno.DirEntry) => string[]
-
-type CreateCommand = (testBinPath: string) => Deno.Command
-
-type PrintCommandOutput = (output: Deno.CommandOutput) => Promise<number>
-
-type CollectCommandOutput = (
-	onEnd: PrintCommandOutput
-) => (command: Deno.Command) => Promise<number>
-
 // IMPL -----------------------------------------------------------------------
 
 const testFiles: string[] = []
@@ -43,18 +27,14 @@ const testFiles: string[] = []
  * from an array of directory children.
  */
 const collectTestFiles = async (path: string) => {
-	try {
-		const children = Deno.readDir(path)
+	const children = Deno.readDir(path)
 
-		for await (const child of children) {
-			if (child.isDirectory) {
-				await collectTestFiles(join(path, child.name))
-			} else if (child.isFile && child.name.endsWith(".test.ts")) {
-				testFiles.push(join(path, child.name))
-			}
+	for await (const child of children) {
+		if (child.isDirectory) {
+			await collectTestFiles(join(path, child.name))
+		} else if (child.isFile && child.name.endsWith(".test.ts")) {
+			testFiles.push(join(path, child.name))
 		}
-	} catch (e) {
-		console.error(e)
 	}
 }
 
@@ -68,7 +48,12 @@ const main = async (args: string[]) => {
 	const denoPath = join(Deno.cwd(), "opt", "deno")
 
 	for (const path of paths) {
-		await collectTestFiles(path)
+		try {
+			await collectTestFiles(path)
+		} catch (_) {
+			console.error(`Could not find directory "${path}".`)
+			Deno.exit(1)
+		}
 	}
 
 	for (const testFile of testFiles) {

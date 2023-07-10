@@ -1,4 +1,20 @@
 import { join } from "#std/path/mod.ts"
+import { clib } from "#lib/clib/mod.ts"
+
+/**
+ * CLI opts for `bin/mklib`.
+ */
+const opts = clib(Deno.args, {
+	name: "test",
+	description:
+		`The "test" command runs tests found deeply nested in directories ` +
+		`provided as arguments. Using "bin/test ." will find and run all tests ` +
+		`in the repository.`,
+	args: [{ name: "name", description: "Name of the bin executable." }],
+}).getOrElse(str => {
+	console.log(str)
+	Deno.exit()
+})
 
 // INTERNAL -------------------------------------------------------------------
 
@@ -46,10 +62,6 @@ const collectTestFiles = async (path: string) => {
 
 /**
  * ./bin/test source code.
- *
- * TODO: Add --silent option
- * TODO: Add --color option
- * TODO: Add --bail option
  */
 const main = async (args: string[]) => {
 	const paths = args.map(arg => join(Deno.cwd(), arg))

@@ -5,6 +5,7 @@ import type {
 	TEitherGetOpts,
 	Argv,
 	CLIBExpectations,
+	TProvideDefaultExpectations,
 } from "./types.ts"
 
 import { Either, TEither } from "#lib/either/mod.ts"
@@ -36,6 +37,7 @@ export const clib = <
 ): TEither<CLIConfig<Options>, string> =>
 	Either.fromNullable(expectations)
 		.chain(eitherIsObject)
+		.map(provideDefaultExpectations)
 		.chain(eitherCreateHelpMessage(argv))
 		.chain(eitherGetOpts(argv))
 		.chain(eitherNormalizeArgs)
@@ -45,6 +47,38 @@ export const clib = <
 
 // Internal -------------------------------------------------------------------
 
+const provideDefaultExpectations: TProvideDefaultExpectations =
+	expectations => {
+		if (!expectations.options) {
+			expectations.options = []
+		}
+
+		expectations.options.push(
+			{
+				long: "--color",
+				default: "yes",
+				description:
+					"The color option specifies under which conditions colorized terminal output should be generated.",
+				values: {
+					yes: "The output will be colorized.",
+					no: "The output will not be colorized.",
+				},
+			},
+			{
+				long: "--silent",
+				description:
+					"The silent option specifies whether terminal output should be generated.",
+			},
+			{
+				long: "--help",
+				description:
+					"The help option specifies whether the information about the command should be shown instead of running the command itself.",
+			}
+		)
+
+		return expectations
+	}
+
 const eitherCreateHelpMessage: TEitherCreateHelpMessage =
 	argv => expectations =>
 		Either.fromBooleanLazy(
@@ -52,8 +86,6 @@ const eitherCreateHelpMessage: TEitherCreateHelpMessage =
 			() => expectations,
 			() =>
 				createHelpMessage(expectations, {
-					// TODO: refactor and provide to Opts
-					// TODO: Append to the end of the options description
 					noColor: argv.includes("--color=no") || argv.includes("--no-color"),
 					silent: argv.includes("--silent"),
 					dryRun: argv.includes("--dry-run"),

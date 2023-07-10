@@ -175,6 +175,10 @@ export type TEitherCreateHelpMessage = (
 	argv: Argv
 ) => (expectations: CLIBExpectations) => TEither<CLIBExpectations, string>
 
+export type TProvideDefaultExpectations = (
+	expectations: CLIBExpectations
+) => CLIBExpectations
+
 export type TCreateHelpMessage = (
 	expectations: CLIBExpectations,
 	ctx: { noColor: boolean; silent: boolean; dryRun: boolean }

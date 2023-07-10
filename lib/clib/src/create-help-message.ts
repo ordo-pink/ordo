@@ -1,7 +1,6 @@
 import type { TCreateHelpMessage } from "./types.ts"
 
 import { iro } from "#lib/iro/mod.ts"
-import { CLIOption } from "../mod.ts"
 
 export const createHelpMessage: TCreateHelpMessage = (
 	expectations,
@@ -13,30 +12,6 @@ export const createHelpMessage: TCreateHelpMessage = (
 
 	const c = iro(noColor)
 
-	const options = [
-		...(expectations.options ?? []),
-		{
-			long: "--color",
-			description:
-				"The color option specifies under which conditions colorized terminal output should be generated.",
-			values: {
-				yes: "The output will be colorized.",
-				no: "The output will not be colorized.",
-			},
-		},
-		{
-			long: "--silent",
-			description:
-				"The silent option specifies whether terminal output should be generated.",
-		},
-
-		{
-			long: "--dry-run",
-			description:
-				"The dry-run option specifies whether file output should be generated.",
-		},
-	] as CLIOption[]
-
 	let message = `${c.bold("USAGE:")}\n\n$ ${expectations.name} ${(
 		expectations.args ?? []
 	)
@@ -47,10 +22,10 @@ export const createHelpMessage: TCreateHelpMessage = (
 		? `\n\n${c.bold("DESCRIPTION:")}\n\n${expectations.description}`
 		: ""
 
-	if (options) {
+	if (expectations.options) {
 		message += `\n\n${c.bold("OPTIONS:")}`
 
-		for (const option of options) {
+		for (const option of expectations.options) {
 			message += `\n${c.blue(option.long)}`
 
 			const values = Object.keys(option.values ?? {}).join("|") ?? "VALUE"

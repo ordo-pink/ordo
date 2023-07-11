@@ -1,8 +1,7 @@
 // deno-lint-ignore-file
 import { Either } from "#lib/either/mod.ts"
 import { isObject } from "#lib/tau/mod.ts"
-import { CLIConfig } from "../../clib/mod.ts"
-import { iro } from "../../iro/mod.ts"
+import { iro } from "#lib/iro/mod.ts"
 import {
 	ExpectFn,
 	GroupFn,

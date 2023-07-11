@@ -11,7 +11,8 @@
 /deno.jsonc
 
 .idea
-.vscode
+.vscode/*
+!.vscode/settings.json
 .vim
 
 .DS_Store

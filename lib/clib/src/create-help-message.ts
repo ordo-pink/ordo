@@ -38,8 +38,6 @@ export const createHelpMessage: TCreateHelpMessage = (
 
 			const values = Object.keys(option.values ?? {}).join("|") ?? "VALUE"
 
-			// TODO: Default value
-
 			if (option.inputRequired) {
 				message += values ? `=${values}` : ""
 			} else {
@@ -52,7 +50,11 @@ export const createHelpMessage: TCreateHelpMessage = (
 
 			if (option.values) {
 				for (const key of Object.keys(option.values)) {
-					message += `\n    ${c.green(key)} - ${option.values[key]}`
+					message += `\n    ${c.green(key)}${
+						option.default && option.default === key
+							? c.disabled(" [default]")
+							: ""
+					} - ${option.values[key]}`
 				}
 			}
 		}

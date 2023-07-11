@@ -64,8 +64,10 @@ const main = async (args: string[]) => {
 		})
 
 		try {
-			const { code, stdout, stderr } = await command.output()
-			code === 0 ? Deno.stdout.write(stdout) : Deno.stderr.write(stderr)
+			const { stdout, stderr } = await command.output()
+
+			Deno.stdout.write(stdout)
+			Deno.stderr.write(stderr)
 		} catch (e) {
 			console.log(e)
 		}

@@ -23,13 +23,13 @@ const name = opts.args.name
 const c = iro(opts.options.color === "no")
 const encoder = new TextEncoder()
 
-const parentPath = join(Deno.cwd(), "boot", "src", name)
+const parentPath = join(Deno.cwd(), "boot", "src", name as string)
 
 const stat = await Deno.stat(parentPath).catch(() => null)
 
 if (stat && stat.isDirectory) {
 	console.error(
-		`${c.red("✗")} ${c.underline(name)} already exists in ${c.bold(
+		`${c.red("✗")} ${c.underline(name as string)} already exists in ${c.bold(
 			"./boot/src/"
 		)}. Terminating.`
 	)
@@ -39,12 +39,12 @@ if (stat && stat.isDirectory) {
 const filePath = join(parentPath, "mod.ts")
 const testFilePath = join(parentPath, "mod.test.ts")
 
-const fileContent = `export const ${name} = "${name}"`
+const fileContent = `export const ${name as string} = "${name as string}"`
 const testFileContent = `import { tsushi } from "#lib/tsushi/mod.ts"
 
 const t = tsushi()
 
-t.group("${titleize(name)}", ({ test, todo }) => {
+t.group("${titleize(name as string)}", ({ test, todo }) => {
 	test("should pass", ({ expect }) => expect().toPass())
 })`
 
@@ -52,4 +52,4 @@ await Deno.mkdir(parentPath)
 await Deno.writeFile(filePath, encoder.encode(fileContent + "\n"))
 await Deno.writeFile(testFilePath, encoder.encode(testFileContent + "\n"))
 
-console.log(`${c.green("✓")} ${c.underline(name)} created!`)
+console.log(`${c.green("✓")} ${c.underline(name as string)} created!`)

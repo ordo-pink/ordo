@@ -105,8 +105,14 @@ const eitherNormalizeArgs: TEitherNormalizeArgs = opts =>
 					throw CLIBErrorString.missingArgument(argName)
 				}
 
-				// Assign the argument to the opts
-				args[argName] = opts.args[i]
+				if (opts.expectations.args[i].multiple) {
+					// Assign all the following arguments to the argument in opts
+					args[argName] = opts.args.slice(i)
+					i = opts.expectations.args.length - 1
+				} else {
+					// Assign the argument to the opts
+					args[argName] = opts.args[i]
+				}
 			}
 		}
 

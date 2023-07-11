@@ -12,10 +12,18 @@ export const createHelpMessage: TCreateHelpMessage = (
 
 	const c = iro(noColor)
 
-	let message = `${c.bold("USAGE:")}\n\n$ ${expectations.name} ${(
+	let message = `${c.bold("USAGE:")}\n\n$ bin/${expectations.name} ${(
 		expectations.args ?? []
 	)
-		.map(arg => c.inverse(arg.name.toLocaleUpperCase()))
+		.map(arg => {
+			if (arg.multiple) {
+				return c.bold(
+					`${arg.name.toLocaleUpperCase()}1 ${arg.name.toLocaleUpperCase()}2 ... ${arg.name.toLocaleUpperCase()}N`
+				)
+			} else {
+				return c.bold(arg.name.toLocaleUpperCase())
+			}
+		})
 		.join(" ")}`
 
 	message += expectations.description

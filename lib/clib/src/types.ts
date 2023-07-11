@@ -11,12 +11,12 @@ export type CLIConfig<
 	Options extends Record<string, string | string[] | boolean> = Record<
 		string,
 		string | string[] | boolean
-	> & { color?: "yes" | "no"; silent?: boolean; "dry-run"?: boolean }
+	> & { color?: "yes" | "no"; silent?: boolean; help?: boolean }
 > = {
 	/**
 	 * Arguments provided by the user.
 	 */
-	args: Record<string, string>
+	args: Record<string, string | string[]>
 
 	/**
 	 * Options provided by the user.
@@ -113,6 +113,18 @@ export type CLIArg = {
 	 * Description of the argument used for creating a help message.
 	 */
 	description?: string
+
+	/**
+	 * If the arg is marked as `multiple=true`, all the arguments that follow
+	 * afterwards will be assigned to the current CLI arg definition.
+	 *
+	 * @example `{ name: "myarg", description: "", multiple: true }` // Expect
+	 * @example `mycommand a b c` // Invocation
+	 * @example `{ ..., args: { myarg: ["a", "b", "c"]} }` // Opts
+	 *
+	 * TODO: Detect if argument is a multiple argument
+	 */
+	multiple?: boolean
 }
 
 /**

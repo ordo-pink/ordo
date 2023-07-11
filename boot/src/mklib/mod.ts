@@ -21,15 +21,15 @@ const name = opts.args.name
 const c = iro(opts.options.color === "no")
 const encoder = new TextEncoder()
 
-const parentPath = join(Deno.cwd(), "lib", name)
+const parentPath = join(Deno.cwd(), "lib", name as string)
 
-const srcPath = join(Deno.cwd(), "lib", name, "src")
+const srcPath = join(Deno.cwd(), "lib", name as string, "src")
 
 const stat = await Deno.stat(parentPath).catch(() => null)
 
 if (stat && stat.isDirectory) {
 	console.error(
-		`${c.red("✗")} ${c.underline(name)} already exists in ${c.bold(
+		`${c.red("✗")} ${c.underline(name as string)} already exists in ${c.bold(
 			"./lib"
 		)}. Terminating.`
 	)
@@ -42,24 +42,30 @@ const testPath = join(srcPath, "impl.test.ts")
 const modPath = join(parentPath, "mod.ts")
 const readmePath = join(parentPath, "readme.md")
 
-const implContent = `import type { ${titleize(name)} } from "./types.ts"
+const implContent = `import type { ${titleize(
+	name as string
+)} } from "./types.ts"
 
-export const ${name}: ${titleize(name)} = "${name}"`
+export const ${name as string}: ${titleize(name as string)} = "${
+	name as string
+}"`
 
-const typesContent = `export type ${titleize(name)} = "${name}"`
+const typesContent = `export type ${titleize(name as string)} = "${
+	name as string
+}"`
 
 const testContent = `import { tsushi } from "#lib/tsushi/mod.ts"
 
 const t = tsushi()
 
-t.group("${titleize(name)}", ({ test, todo }) => {
+t.group("${name as string}", ({ test, todo }) => {
 	test("should pass", ({ expect }) => expect().toPass())
 })`
 
 const modContent = `export * from "./src/impl.ts"
 export * from "./src/types.ts"`
 
-const readmeContent = `# ${titleize(name)}`
+const readmeContent = `# ${titleize(name as string)}`
 
 await Deno.mkdir(parentPath)
 await Deno.mkdir(srcPath)
@@ -70,4 +76,4 @@ await Deno.writeFile(typesPath, encoder.encode(typesContent + "\n"))
 await Deno.writeFile(testPath, encoder.encode(testContent + "\n"))
 await Deno.writeFile(implPath, encoder.encode(implContent + "\n"))
 
-console.log(`${c.green("✓")} ${c.underline(name)} created!`)
+console.log(`${c.green("✓")} ${c.underline(name as string)} created!`)

@@ -10,7 +10,13 @@ const opts = clib(Deno.args, {
 		`The "test" command runs tests found deeply nested in directories ` +
 		`provided as arguments. Using "bin/test ." will find and run all tests ` +
 		`in the repository.`,
-	args: [{ name: "name", description: "Name of the bin executable." }],
+	args: [
+		{
+			name: "name",
+			description: "Name of the bin executable.",
+			multiple: true,
+		},
+	],
 }).getOrElse(str => {
 	console.log(str)
 	Deno.exit()

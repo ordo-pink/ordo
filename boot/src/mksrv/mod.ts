@@ -5,29 +5,30 @@ import { titleize } from "#lib/tau/mod.ts"
 import { isReservedJavaScriptKeyword } from "#lib/rkwjs/mod.ts"
 
 /**
- * CLI opts for `bin/mklib`.
+ * CLI opts for `bin/mksrv`.
  */
 const opts = clib(Deno.args, {
-	name: "mklib",
+	name: "mksrv",
 	description:
-		`The "mklib" command creates a new directory inside "lib" with the conventional file ` +
-		`structure to make a new library.`,
-	args: [{ name: "name", description: "Name of the library." }],
+		`The "mksrv" command creates a new directory inside "srv" with the conventional file ` +
+		`structure to make a new application.`,
+	args: [{ name: "name", description: "Name of the application." }],
 }).getOrElse(str => {
 	console.log(str)
 	Deno.exit()
 })
 
 const name = opts.args.name
+
 const codeName = isReservedJavaScriptKeyword(opts.args.name as unknown)
-	? `${opts.args.name}Lib`
+	? `${opts.args.name}Srv`
 	: opts.args.name
 
 const c = iro(opts.options.color === "no")
 const encoder = new TextEncoder()
 
-const libPath = join(Deno.cwd(), "lib")
-const parentPath = join(libPath, name as string)
+const srvPath = join(Deno.cwd(), "srv")
+const parentPath = join(srvPath, name as string)
 const srcPath = join(parentPath, "src")
 
 const stat = await Deno.stat(parentPath).catch(() => null)
@@ -35,7 +36,7 @@ const stat = await Deno.stat(parentPath).catch(() => null)
 if (stat && stat.isDirectory) {
 	console.error(
 		`${c.red("✗")} ${c.underline(name as string)} already exists in ${c.bold(
-			"./lib"
+			"./srv"
 		)}. Terminating.`
 	)
 	Deno.exit(1)
@@ -72,8 +73,8 @@ export * from "./src/types.ts"`
 
 const readmeContent = `# ${titleize(name as string)}`
 
-if (!(await Deno.stat(libPath).catch(() => null))) {
-	await Deno.mkdir(libPath)
+if (!(await Deno.stat(srvPath).catch(() => null))) {
+	await Deno.mkdir(srvPath)
 }
 
 await Deno.mkdir(parentPath)

@@ -2,6 +2,7 @@ import { join } from "#std/path/mod.ts"
 import { clib } from "#lib/clib/mod.ts"
 import { iro } from "#lib/iro/mod.ts"
 import { titleize } from "#lib/tau/mod.ts"
+import { isReservedJavaScriptKeyword } from "#lib/rkwjs/mod.ts"
 
 /**
  * CLI opts for `bin/mkbin`.
@@ -20,6 +21,10 @@ const opts = clib(Deno.args, {
 })
 
 const name = opts.args.name
+const codeName = isReservedJavaScriptKeyword(opts.args.name as unknown)
+	? `${opts.args.name}Bin`
+	: opts.args.name
+
 const c = iro(opts.options.color === "no")
 const encoder = new TextEncoder()
 
@@ -39,12 +44,14 @@ if (stat && stat.isDirectory) {
 const filePath = join(parentPath, "mod.ts")
 const testFilePath = join(parentPath, "mod.test.ts")
 
-const fileContent = `export const ${name as string} = "${name as string}"`
+const fileContent = `export const ${codeName as string} = "${
+	codeName as string
+}"`
 const testFileContent = `import { tsushi } from "#lib/tsushi/mod.ts"
 
 const t = tsushi()
 
-t.group("${titleize(name as string)}", ({ test, todo }) => {
+t.group("${name}", ({ test }) => {
 	test("should pass", ({ expect }) => expect().toPass())
 })`
 

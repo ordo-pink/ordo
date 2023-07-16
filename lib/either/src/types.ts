@@ -34,7 +34,7 @@ export type TEither<TRightValue, TLeftValue> = {
 export type TEitherStatic = {
 	fromNullable: <TRightValue>(
 		x: Nullable<TRightValue>
-	) => TEither<TRightValue, null>
+	) => TEither<NonNullable<TRightValue>, null>
 	fromBoolean: <TRightValue, TLeftValue = undefined>(
 		f: () => boolean,
 		x: TRightValue,

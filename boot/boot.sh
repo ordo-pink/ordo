@@ -15,9 +15,13 @@ EOL='\n'
 PLATFORM=$(uname -ms)
 
 ESBUILD_VERSION='0.18.9'
-DENO_VERSION='v1.35.0'
+DENO_VERSION='v1.35.1'
 
 ln -snf etc/deno/deno.jsonc deno.jsonc
+
+if [ ! -d ./opt ]; then
+  mkdir ./opt
+fi
 
 # Internal --------------------------------------------------------------------
 

@@ -1,0 +1,1 @@
+{"accessTokenExpireIn":300,"refreshTokenExpireIn":864000,"port":3001,"origin":"https://ordo.pink","saltRounds":10,"privateKeyFileName":"private.key","publicKeyFileName":"cert.pem","kvDbPath":"./var/id-db"}

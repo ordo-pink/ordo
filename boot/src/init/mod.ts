@@ -90,6 +90,40 @@ export const main = async () => {
 			console.error(e)
 		}
 	}
+
+	const srvsPath = join(Deno.cwd(), "srv")
+	const srvs = Deno.readDir(srvsPath)
+
+	for await (const srv of srvs) {
+		if (!srv.isDirectory) continue
+
+		const path = join(srvsPath, srv.name, "bin", "init.ts")
+
+		const command = new Deno.Command(denoPath, {
+			args: ["run", "--allow-read", "--allow-write", "--allow-run", path],
+			stdout: "piped",
+			stderr: "piped",
+		})
+
+		Deno.stdout.write(
+			encoder.encode(
+				`${c.yellow("◌")} Executing srv/${srv.name}/bin/init.ts... `
+			)
+		)
+
+		try {
+			const { code, stdout } = await command.output()
+			Deno.stdout.write(encoder.encode(`${c.green("✓")}\n`))
+			Deno.stdout.write(stdout)
+
+			if (code !== 0) {
+				Deno.stdout.write(encoder.encode(`${c.red("✗")}\n`))
+			}
+		} catch (e) {
+			Deno.stdout.write(encoder.encode(`${c.red("✗")}\n`))
+			console.log(e)
+		}
+	}
 }
 
 await main()

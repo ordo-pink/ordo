@@ -1,50 +1,56 @@
-import { Application, etag, Router } from "#x/oak@v12.6.0/mod.ts"
-import { oakCors } from "#x/cors@v1.2.2/mod.ts"
+import { join } from "#std/path/mod.ts"
+import { DenoKVUserDriver } from "#lib/deno-kv-user-driver/mod.ts"
+import { DenoKVTokenDriver } from "#lib/deno-kv-token-driver/mod.ts"
+import { createIDServer } from "#lib/be-id/mod.ts"
+import { getKey } from "./utils/get-key.ts"
+import { getc } from "#lib/getc/mod.ts"
 
-const PORT = Deno.env.get("ID_PORT")
-const ALLOWED_ORIGIN = Deno.env.get("ID_ALLOWED_ORIGIN")
+type Config = {
+	accessTokenExpireIn: number
+	refreshTokenExpireIn: number
+	port: number
+	origin: string
+	saltRounds: number
+	privateKeyFileName: string
+	publicKeyFileName: string
+	kvDbPath: string
+}
 
-const port = PORT ? Number(PORT) : 3001
-const origin = ALLOWED_ORIGIN ?? "https://ordo.pink"
+const {
+	port,
+	accessTokenExpireIn,
+	origin,
+	refreshTokenExpireIn,
+	saltRounds,
+	privateKeyFileName,
+	publicKeyFileName,
+	kvDbPath,
+} = await getc<Config>("id")
 
-const router = new Router()
+const privateKey = await getKey(
+	join(Deno.cwd(), "var", "etc", "auth", privateKeyFileName),
+	"private"
+)
+const publicKey = await getKey(
+	join(Deno.cwd(), "var", "etc", "auth", publicKeyFileName),
+	"public"
+)
 
-router.get("/healthcheck", ctx => {
-	ctx.response.body = "OK"
-	ctx.response.status = 200
+const userDriver = await DenoKVUserDriver.of(kvDbPath)
+const tokenDriver = await DenoKVTokenDriver.of(kvDbPath)
+
+const app = await createIDServer({
+	userDriver,
+	tokenDriver,
+	origin,
+	privateKey,
+	publicKey,
+	saltRounds,
+	alg: "ES384",
+	accessTokenExpireIn,
+	refreshTokenExpireIn,
 })
 
-const app = new Application({
-	state: {
-		logger: {
-			log: console.log,
-		},
-	},
-})
-
-app.use(async (ctx, next) => {
-	await next()
-
-	const rt = ctx.response.headers.get("X-Response-Time")
-	const message = `${ctx.request.method} ${ctx.request.url} - ${rt}`
-
-	ctx.app.state.logger.log(message)
-})
-
-app.use(async (ctx, next) => {
-	const start = Date.now()
-
-	await next()
-
-	const ms = Date.now() - start
-	ctx.response.headers.set("X-Response-Time", `${ms}ms`)
-})
-
-app.use(etag.factory())
-app.use(oakCors({ origin }))
-app.use(router.routes())
-app.use(router.allowedMethods())
-
-console.log(`ID server running on port ${port}`)
+console.log(`ID server running on http://localhost:${port}`)
 
 await app.listen({ port })

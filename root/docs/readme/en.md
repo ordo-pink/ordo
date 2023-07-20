@@ -14,35 +14,34 @@
 
 ### BIN
 
-The `/bin` directory contains executables improve the developer experience while
-working with Ordo monorepo. After you initialise the repository with a **boot**
-script, check out the commands in the `/bin` directory with the _--help_ option.
+The `/bin` directory contains executables improve the developer experience while working with Ordo
+monorepo. After you initialise the repository with a **boot** script, check out the commands in the
+`/bin` directory with the _--help_ option.
 
-````sh
+```sh
 bin/mkbin --help
 ```
 
 ### BOOT
 
-The `/boot` directory contains repo source code and initialisation scripts that
-are intended to be executed when you fetch the repository. The `/bin` apps are
-created from here.
+The `/boot` directory contains repo source code and initialisation scripts that are intended to be
+executed when you fetch the repository. The `/bin` apps are created from here.
 
 After you fetch the repository, run the `boot/boot.sh` script.
 
 ```sh
 boot/boot.sh
-````
+```
 
 ### ETC
 
-The `/etc` directory contains configuration files for all the services, scripts
-and third-party applications that are installed in the monorepo.
+The `/etc` directory contains configuration files for all the services, scripts and third-party
+applications that are installed in the monorepo.
 
 ### LIB
 
-The `/lib` directory contains library code code. Put the source code of
-publishable and non-publishable libraries here.
+The `/lib` directory contains library code code. Put the source code of publishable and
+non-publishable libraries here.
 
 ### OPT
 
@@ -58,5 +57,4 @@ The `/usr` directory contains user specific configuration. Put your config here.
 
 # VAR
 
-The `/var` directory contains variable data such as build results, cache,
-backups, etc.
+The `/var` directory contains variable data such as build results, cache, backups, etc.

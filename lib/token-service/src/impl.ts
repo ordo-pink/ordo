@@ -1,105 +1,129 @@
 import {
-	TokenDriver,
+	TokenAdapter,
+	RefreshTokenParsed,
 	TokenServiceOptions,
-} from "#lib/token-service/src/types.ts"
+	TokenMap,
+	SUB,
+	JTI,
+	AccessTokenParsed,
+	UIP,
+} from "./types.ts"
 import { create, decode, getNumericDate, verify } from "#x/djwt@v2.9.1/mod.ts"
 import { Algorithm } from "#x/djwt@v2.9.1/algorithm.ts"
-import { TokenMap } from "#lib/token-service/mod.ts"
-
-export type TokenParsed = {
-	header: {}
-	payload: { sub: string }
-	signature: Uint8Array
-}
 
 export class TokenService {
-	#driver: TokenDriver
-	#publicKey: CryptoKey
-	#privateKey: CryptoKey
-	#alg: Algorithm
+	#driver: TokenAdapter
+	#algorithm: Algorithm
 	#accessTokenExpireIn: number
 	#refreshTokenExpireIn: number
+	#accessTokenPublicKey: CryptoKey
+	#accessTokenPrivateKey: CryptoKey
+	#refreshTokenPublicKey: CryptoKey
+	#refreshTokenPrivateKey: CryptoKey
 
-	public static async of(driver: TokenDriver, options: TokenServiceOptions) {
+	public static async of(driver: TokenAdapter, options: TokenServiceOptions) {
 		return new TokenService(driver, options)
 	}
 
-	protected constructor(driver: TokenDriver, options: TokenServiceOptions) {
+	protected constructor(driver: TokenAdapter, options: TokenServiceOptions) {
 		this.#driver = driver
-		this.#privateKey = options.privateKey
-		this.#publicKey = options.publicKey
-		this.#alg = options.alg
+		this.#accessTokenPublicKey = options.keys.access.public
+		this.#accessTokenPrivateKey = options.keys.access.private
+		this.#refreshTokenPublicKey = options.keys.refresh.public
+		this.#refreshTokenPrivateKey = options.keys.refresh.private
+		this.#algorithm = options.alg
 		this.#accessTokenExpireIn = options.accessTokenExpireIn
 		this.#refreshTokenExpireIn = options.refreshTokenExpireIn
 	}
 
-	public async verify(token: string) {
-		return verify(token, this.#publicKey).catch(() => false)
+	public async verifyAccessToken(token: string): Promise<boolean> {
+		const { payload } = this.decode(token)
+		const { sub, jti } = payload
+
+		const tokenE = await this.getToken(sub, jti)
+
+		return tokenE.fold(
+			() => false,
+			() => this.verify(token, this.#accessTokenPublicKey) as Promise<boolean>
+		)
+	}
+
+	public async verifyRefreshToken(sub: SUB, jti: JTI): Promise<boolean> {
+		const tokenE = await this.getToken(sub, jti)
+
+		return tokenE.fold(
+			() => false,
+			token =>
+				this.verify(token, this.#refreshTokenPublicKey) as Promise<boolean>
+		)
+	}
+
+	public async getToken(sub: SUB, jti: JTI) {
+		return this.#driver.get(sub, jti)
 	}
 
 	public decode(token: string) {
-		const [header, payload, signature] = decode(token) // TODO: Add types
+		const [header, payload, signature] = decode(token)
 
-		return { header, payload, signature } as TokenParsed
+		return { header, payload, signature } as
+			| AccessTokenParsed
+			| RefreshTokenParsed
 	}
 
-	public async get(id: string) {
-		return this.#driver.get(id)
+	public async getTokens(sub: SUB) {
+		return this.#driver.getAll(sub)
 	}
 
-	public async remove(id: string, ip?: string) {
-		return ip
-			? this.#driver.setToken(id, ip, null)
-			: this.#driver.set(id, {} as TokenMap)
+	public async removeAllTokens(sub: SUB) {
+		return this.#driver.removeAll(sub)
+	}
+
+	public async removeToken(sub: SUB, jti: JTI) {
+		return this.#driver.remove(sub, jti)
 	}
 
 	public async createAccessToken(
-		sub: string,
-		uip: string,
+		jti: JTI,
+		sub: SUB,
 		aud = "https://ordo.pink"
 	) {
+		const iat = this.createIAT()
+		const iss = this.createISS()
+		const exp = this.createEXP("access")
+		const payload = { sub, aud, jti, iat, iss, exp }
+
 		return create(
-			{ alg: this.#alg, type: "JWT" }, // TODO: Extract to env variable
-			{
-				uip,
-				sub,
-				aud,
-				iat: this.createIAT(),
-				jti: this.createJTI(),
-				iss: this.createISS(),
-				exp: this.createEXP("access"),
-			},
-			this.#privateKey
+			{ alg: this.#algorithm, type: "JWT" },
+			payload,
+			this.#accessTokenPrivateKey
 		)
 	}
 
 	public async createRefreshToken(
-		sub: string,
-		uip: string,
+		sub: SUB,
+		uip: UIP,
 		aud = "https://ordo.pink"
 	) {
+		const jti = this.createJTI()
+		const iat = this.createIAT()
+		const iss = this.createISS()
+		const exp = this.createEXP("refresh")
+		const payload = { uip, sub, aud, jti, iat, iss, exp }
+
 		const token = await create(
-			{ alg: this.#alg, type: "JWT" }, // TODO: Extract to env variable
-			{
-				uip,
-				sub,
-				aud,
-				iat: this.createIAT(),
-				jti: this.createJTI(),
-				iss: this.createISS(),
-				exp: this.createEXP("refresh"),
-			},
-			this.#privateKey
+			{ alg: this.#algorithm, type: "JWT" },
+			payload,
+			this.#refreshTokenPrivateKey
 		)
 
-		await this.#driver.setToken(sub, uip, token)
+		await this.#driver.set(sub, jti, token)
 
-		return token
+		return { jti, exp }
 	}
 
 	private createEXP(type: "access" | "refresh") {
 		return getNumericDate(
-			"access" ? this.#accessTokenExpireIn : this.#refreshTokenExpireIn
+			type === "access" ? this.#accessTokenExpireIn : this.#refreshTokenExpireIn
 		)
 	}
 
@@ -113,5 +137,9 @@ export class TokenService {
 
 	private createISS() {
 		return "https://id.ordo.pink"
+	}
+
+	private async verify(token: string, key: CryptoKey) {
+		return verify(token, key).catch(() => false)
 	}
 }

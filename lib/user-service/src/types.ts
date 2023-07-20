@@ -1,4 +1,5 @@
 import { Nullable } from "#lib/tau/mod.ts"
+import { Oath } from "#lib/oath/mod.ts"
 
 export type PublicUser = {
 	email: string
@@ -17,15 +18,12 @@ export type InternalUser = User & {
 	password: string
 }
 
-export type UserDriver = {
+export type UserAdapter = {
 	// existsById: (id: string) => Promise<boolean>
 	// existsByEmail: (email: string) => Promise<boolean>
-	create: (user: InternalUser) => Promise<InternalUser>
-	getById: (id: string) => Promise<Nullable<InternalUser>>
-	getByEmail: (email: string) => Promise<Nullable<InternalUser>>
-	update: (
-		id: string,
-		user: Partial<InternalUser>
-	) => Promise<Nullable<InternalUser>>
+	create(user: InternalUser): Oath<InternalUser, "User already exists">
+	getById(id: string): Oath<InternalUser, null>
+	getByEmail(email: string): Oath<InternalUser, null>
+	update(id: string, user: Partial<InternalUser>): Oath<InternalUser, null>
 	// remove: (id: string) => Promise<Nullable<InternalUser>>
 }

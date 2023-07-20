@@ -1,9 +1,0 @@
-{
-	"deno.enable": true,
-	"deno.lint": false,
-	"deno.unstable": true,
-	"deno.config": "./deno.jsonc",
-	"deno.path": "./opt/deno",
-	"deno.cache": "./var/cache/deno",
-	"deno.importMap": "./deno.jsonc"
-}

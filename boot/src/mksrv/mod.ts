@@ -49,20 +49,8 @@ const modPath = join(parentPath, "mod.ts")
 const binInitPath = join(binPath, "init.ts")
 const readmePath = join(parentPath, "readme.md")
 
-const implContent = `import { getc } from "#lib/getc/mod.ts"
-
-// Define the type for the srv configuration
-type Config = {}
-
-// This is the merge of configuration in /etc/srv/${name}.json and
-// /usr/srv/${name}.json. USR content overrides ETC content. ETC content is
-// published to git remote whereas USR content is gitignored and available
-// locally. Share config for initial app startup in ETC and tune it for your
-// own needs in USR.
-const config = await getc<Config>("${name}")
-
-const main = () => {
-	// Your awesome app here
+const implContent = `const main = () => {
+	console.log("Hello, world!")
 }
 
 await main()`
@@ -77,52 +65,11 @@ t.group("${name as string}", ({ test }) => {
 
 const modContent = `export * from "./src/impl.ts"`
 
-const binInitContent = `import { join } from "#std/path/mod.ts"
-import { cyan, green } from "#std/fmt/colors.ts"
-
-// Put the configuration for you srv here
-// It will be generated on "bin/init" and regenerated on "bin/reinit"
-const defaultConfig = {}
-
-const generateDefaultConfiguration = async () => {
-	const encoder = new TextEncoder()
-
-	const etcParentPath = join(Deno.cwd(), "etc", "srv")
-	const usrParentPath = join(Deno.cwd(), "usr", "srv")
-	const etcPath = join(etcParentPath, "${name}.json")
-	const usrPath = join(usrParentPath, "${name}.json")
-
-	const etcParentExists = await Deno.stat(etcParentPath).catch(() => null)
-	const usrParentExists = await Deno.stat(usrParentPath).catch(() => null)
-	const etcExists = await Deno.stat(etcPath).catch(() => null)
-	const usrExists = await Deno.stat(usrPath).catch(() => null)
-
-	if (!etcParentExists) await Deno.mkdir(etcParentPath, { recursive: true })
-	if (!usrParentExists) await Deno.mkdir(usrParentPath, { recursive: true })
-
-	if (!etcExists)
-		await Deno.writeFile(
-			etcPath,
-			encoder.encode(JSON.stringify(defaultConfig, null, 2))
-		)
-	if (!usrExists)
-		await Deno.writeFile(
-			usrPath,
-			encoder.encode(JSON.stringify(defaultConfig, null, 2))
-		)
-}
-
+const binInitContent = `// Put first launch automation tasks here
 const main = async () => {
 	const encoder = new TextEncoder()
 
-	Deno.stdout.write(
-		encoder.encode(
-			\`  \${cyan("→")} Generating configuration files in /etc/ and /usr/ ...\`
-		)
-	)
-
-	await generateDefaultConfiguration()
-
+	Deno.stdout.write(encoder.encode(\`  \${cyan("→")} Doing nothing...\`))
 	Deno.stdout.write(encoder.encode(\` \${green("✓")}\n\`))
 }
 

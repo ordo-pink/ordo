@@ -13,33 +13,33 @@ export const okpwd: OkpwdFn = options => password => {
 		o.skipCheckForSpecialCharacters = false
 
 	return Either.fromNullable(password)
-		.leftMap(() => "No password provided")
+		.leftMap(() => "No password provided.")
 		.chain(password =>
 			Either.fromBooleanLazy(
 				() => password.length >= o.min,
 				() => password,
-				() => `Password must be at least ${o.min} characters long`
+				() => `Password must be at least ${o.min} characters long.`
 			)
 		)
 		.chain(password =>
 			Either.fromBooleanLazy(
 				() => password.length <= o.max,
 				() => password,
-				() => `Password must be under ${o.max} characters long`
+				() => `Password must be under ${o.max} characters long.`
 			)
 		)
 		.chain(password =>
 			Either.fromBooleanLazy(
 				() => (o.skipCheckForAlphaCharacters ? true : /\p{L}/u.test(password)),
 				() => password,
-				() => `Password must contain contain letters`
+				() => `Password must contain contain letters.`
 			)
 		)
 		.chain(password =>
 			Either.fromBooleanLazy(
 				() => (o.skipCheckForNumbers ? true : /\d/u.test(password)),
 				() => password,
-				() => `Password must contain contain numbers`
+				() => `Password must contain contain numbers.`
 			)
 		)
 		.chain(password =>
@@ -50,7 +50,7 @@ export const okpwd: OkpwdFn = options => password => {
 						: /[`!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~]/.test(password),
 				() => password,
 				() =>
-					`Password must contain contain special characters ([\`!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~])`
+					`Password must contain contain special characters ([\`!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~]).`
 			)
 		)
 		.fold(

@@ -49,7 +49,7 @@ export const handleChangePassword: ChangePasswordFn =
 			return ctx.throw(404, "User not found")
 		}
 
-		await tokenService.remove(result.id)
+		await tokenService.removeAllTokens(result.id)
 
 		ctx.response.status = 204
 	}

@@ -1,108 +1,104 @@
-import { base64 } from "#x/oak@v12.6.0/deps.ts"
-import { join } from "#std/path/mod.ts"
+import { join, resolve } from "#std/path/mod.ts"
 import { cyan, green } from "#std/fmt/colors.ts"
+import { encode } from "#std/encoding/base64.ts"
+import { getc } from "#lib/getc/mod.ts"
 
-const defaultConfig = {
-	accessTokenExpireIn: 300,
-	refreshTokenExpireIn: 864000,
-	port: 3001,
-	origin: "https://ordo.pink",
-	saltRounds: 10,
-	privateKeyFileName: "private.key",
-	publicKeyFileName: "cert.pem",
-	kvDbPath: "./var/id-db",
+// TODO: write configuration updates to dotenvs
+
+const {
+	ID_KV_DB_PATH,
+	ID_ACCESS_TOKEN_PRIVATE_KEY_PATH,
+	ID_ACCESS_TOKEN_PUBLIC_KEY_PATH,
+	ID_REFRESH_TOKEN_PRIVATE_KEY_PATH,
+	ID_REFRESH_TOKEN_PUBLIC_KEY_PATH,
+} = getc([
+	"ID_KV_DB_PATH",
+	"ID_ACCESS_TOKEN_PRIVATE_KEY_PATH",
+	"ID_ACCESS_TOKEN_PUBLIC_KEY_PATH",
+	"ID_REFRESH_TOKEN_PRIVATE_KEY_PATH",
+	"ID_REFRESH_TOKEN_PUBLIC_KEY_PATH",
+])
+
+const getParentPath = (path: string) => {
+	const cleanPath = path.endsWith("/") ? path.slice(0, -1) : path
+
+	return join(...cleanPath.split("/").slice(0, -1))
 }
 
-const generateDefaultConfiguration = async () => {
-	const encoder = new TextEncoder()
-
-	const etcParentPath = join(Deno.cwd(), "etc", "srv")
-	const usrParentPath = join(Deno.cwd(), "usr", "srv")
-	const etcPath = join(etcParentPath, "id.json")
-	const usrPath = join(usrParentPath, "id.json")
-
-	const etcParentExists = await Deno.stat(etcParentPath).catch(() => null)
-	const usrParentExists = await Deno.stat(usrParentPath).catch(() => null)
-	const etcExists = await Deno.stat(etcPath).catch(() => null)
-	const usrExists = await Deno.stat(usrPath).catch(() => null)
-
-	if (!etcParentExists) await Deno.mkdir(etcParentPath, { recursive: true })
-	if (!usrParentExists) await Deno.mkdir(usrParentPath, { recursive: true })
-
-	if (!etcExists)
-		await Deno.writeFile(
-			etcPath,
-			encoder.encode(JSON.stringify(defaultConfig, null, 2))
-		)
-	if (!usrExists)
-		await Deno.writeFile(
-			usrPath,
-			encoder.encode(JSON.stringify(defaultConfig, null, 2))
-		)
-}
-
-const generateAuthKeys = async () => {
-	const parentPath = join(Deno.cwd(), "var", "etc", "auth")
-
-	const parentExists = await Deno.stat(parentPath).catch(() => null)
-
-	if (!parentExists) {
-		await Deno.mkdir(parentPath, { recursive: true })
-	}
-
-	const publicPath = join(parentPath, defaultConfig.publicKeyFileName)
-	const privatePath = join(parentPath, defaultConfig.privateKeyFileName)
-
-	const publicKeyExists = await Deno.stat(publicPath).catch(() => null)
-
-	const privateKeyExists = await Deno.stat(privatePath).catch(() => null)
-
-	if (publicKeyExists && privateKeyExists) return
-
+const generateKeyPair = async (privatePath: string, publicPath: string) => {
 	const { privateKey, publicKey } = await crypto.subtle.generateKey(
 		{ name: "ECDSA", namedCurve: "P-384" },
 		true,
 		["sign", "verify"]
 	)
 
-	const priv = await crypto.subtle.exportKey("pkcs8", privateKey)
-	const pub = await crypto.subtle.exportKey("spki", publicKey)
+	const exportedPrivateKey = await crypto.subtle.exportKey("pkcs8", privateKey)
+	const exportedPublicKey = await crypto.subtle.exportKey("spki", publicKey)
 
-	const cert = `-----BEGIN PUBLIC KEY-----
-${base64
-	.encode(pub)
+	const key = `-----BEGIN PRIVATE KEY-----
+${encode(exportedPrivateKey)
+	.match(/.{1,42}/g)
+	?.join("\n")}
+-----END PRIVATE KEY-----`
+	const pub = `-----BEGIN PUBLIC KEY-----
+${encode(exportedPublicKey)
 	.match(/.{1,42}/g)
 	?.join("\n")}
 -----END PUBLIC KEY-----`
 
-	const key = `-----BEGIN PRIVATE KEY-----
-${base64
-	.encode(priv)
-	.match(/.{1,42}/g)
-	?.join("\n")}
------END PRIVATE KEY-----`
-
-	await Deno.writeFile(publicPath, new TextEncoder().encode(cert))
 	await Deno.writeFile(privatePath, new TextEncoder().encode(key))
+	await Deno.writeFile(publicPath, new TextEncoder().encode(pub))
+}
+
+const createRequiredDirectories = async () => {
+	const dbDirectoryPath = resolve(ID_KV_DB_PATH)
+	const dbDirectoryExists = await Deno.stat(dbDirectoryPath).catch(() => ({
+		isDirectory: false,
+	}))
+
+	if (!dbDirectoryExists || !dbDirectoryExists.isDirectory) {
+		await Deno.mkdir(dbDirectoryPath, { recursive: true })
+	}
+}
+
+const generateAuthKeys = async () => {
+	const keys = [
+		ID_ACCESS_TOKEN_PRIVATE_KEY_PATH,
+		ID_ACCESS_TOKEN_PUBLIC_KEY_PATH,
+		ID_REFRESH_TOKEN_PRIVATE_KEY_PATH,
+		ID_REFRESH_TOKEN_PUBLIC_KEY_PATH,
+	]
+
+	for (const key of keys) {
+		const parentPath = getParentPath(key)
+		const parentPathExists = await Deno.stat(parentPath).catch(() => ({
+			isDirectory: false,
+		}))
+
+		if (!parentPathExists || !parentPathExists.isDirectory) {
+			await Deno.mkdir(parentPath, { recursive: true })
+		}
+	}
+
+	await generateKeyPair(
+		resolve(ID_ACCESS_TOKEN_PRIVATE_KEY_PATH),
+		resolve(ID_ACCESS_TOKEN_PUBLIC_KEY_PATH)
+	)
+	await generateKeyPair(
+		resolve(ID_REFRESH_TOKEN_PRIVATE_KEY_PATH),
+		resolve(ID_REFRESH_TOKEN_PUBLIC_KEY_PATH)
+	)
 }
 
 const main = async () => {
 	const encoder = new TextEncoder()
 
-	Deno.stdout.write(encoder.encode(`  ${cyan("→")} Generating auth keys...`))
-
-	await generateAuthKeys()
-
+	Deno.stdout.write(encoder.encode(`  ${cyan("→")} Creating directories...`))
+	await createRequiredDirectories()
 	Deno.stdout.write(encoder.encode(` ${green("✓")}\n`))
 
-	Deno.stdout.write(
-		encoder.encode(
-			`  ${cyan("→")} Generating configuration files in /etc/ and /usr/ ...`
-		)
-	)
-
-	await generateDefaultConfiguration()
-
+	Deno.stdout.write(encoder.encode(`  ${cyan("→")} Generating auth keys...`))
+	await generateAuthKeys()
 	Deno.stdout.write(encoder.encode(` ${green("✓")}\n`))
 }
 

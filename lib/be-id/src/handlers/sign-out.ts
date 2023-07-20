@@ -1,22 +1,25 @@
 import { useBearerAuthorization } from "#lib/be-use/mod.ts"
+import { TokenMap } from "#lib/token-service/mod.ts"
 import { HandleSignOutFn } from "../types.ts"
 
 export const handleSignOut: HandleSignOutFn =
 	({ tokenService }) =>
 	async ctx => {
-		// TODO: Signing out from other devices (https://deno.land/x/location@1.1.0/iplocationservice.ts)
 		const { payload } = await useBearerAuthorization(ctx, tokenService)
+		const { sub, jti } = payload
 
-		const id = payload.sub
-		const ip = ctx.request.ip
+		const tokenMap = (await tokenService.getTokens(sub)).getOrElse(
+			() => ({} as TokenMap)
+		)
 
-		const tokenMap = await tokenService.get(id)
-
-		if (!tokenMap || !tokenMap[ip]) {
+		if (!tokenMap || !tokenMap[jti]) {
 			return ctx.throw(403, "Unverified or outdated access token")
 		}
 
-		await tokenService.remove(id, ip)
+		await tokenService.removeToken(sub, jti)
+
+		await ctx.cookies.delete("jti")
+		await ctx.cookies.delete("sub")
 
 		ctx.response.status = 204
 	}

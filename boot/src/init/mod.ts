@@ -2,6 +2,8 @@ import { join } from "#std/path/mod.ts"
 import { clib } from "#lib/clib/mod.ts"
 import { iro } from "#lib/iro/mod.ts"
 
+// TODO: Rewrite with cliffy
+
 const opts = clib(Deno.args, {
 	name: "init",
 	description:
@@ -100,7 +102,14 @@ export const main = async () => {
 		const path = join(srvsPath, srv.name, "bin", "init.ts")
 
 		const command = new Deno.Command(denoPath, {
-			args: ["run", "--allow-read", "--allow-write", "--allow-run", path],
+			args: [
+				"run",
+				"--allow-read",
+				"--allow-write",
+				"--allow-run",
+				"--allow-env",
+				path,
+			],
 			stdout: "piped",
 			stderr: "piped",
 		})
@@ -112,15 +121,16 @@ export const main = async () => {
 		)
 
 		try {
-			const { code, stdout } = await command.output()
+			const { code, stdout, stderr } = await command.output()
 			Deno.stdout.write(encoder.encode(`${c.green("✓")}\n`))
 			Deno.stdout.write(stdout)
 
 			if (code !== 0) {
-				Deno.stdout.write(encoder.encode(`${c.red("✗")}\n`))
+				Deno.stdout.write(encoder.encode(`\n  ${c.red("✗")} `))
+				Deno.stdout.write(stderr)
 			}
 		} catch (e) {
-			Deno.stdout.write(encoder.encode(`${c.red("✗")}\n`))
+			Deno.stdout.write(encoder.encode(`\n  ${c.red("✗")} `))
 			console.log(e)
 		}
 	}

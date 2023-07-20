@@ -9,6 +9,7 @@
 /tsconfig.json
 /.prettierrc
 /deno.jsonc
+/tailwind.config.cjs
 
 .idea
 .vscode/*
@@ -17,3 +18,6 @@
 
 .DS_Store
 .Thumb
+
+*.env*
+!/.env.example

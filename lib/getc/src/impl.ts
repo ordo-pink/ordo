@@ -1,17 +1,18 @@
-import type { GetcFn } from "./types.ts"
+import "#std/dotenv/load.ts"
 
-export const getc = async <T extends Record<string, unknown>>(
-	name: string
-): Promise<ReturnType<GetcFn<T>>> => {
-	const etc = await import(`#etc/srv/${name}.json`, {
-		assert: { type: "json" },
-	}).catch(() => ({ default: {} }))
-	const usr = await import(`#usr/srv/${name}.json`, {
-		assert: { type: "json" },
-	}).catch(() => ({ default: {} }))
+// TODO: Merge all dotenvs in the repo into environment
+export const getc = <K extends string>(variables: K[]): { [Key in K]: string } => {
+	const vars = {} as { [Key in K]: string }
 
-	return {
-		...etc.default,
-		...usr.default,
-	} as T
+	for (const variable of variables) {
+		const envVar = Deno.env.get(variable)
+
+		if (!envVar) {
+			throw new Error(`Missing environment variable "${variable}".`)
+		}
+
+		vars[variable] = envVar
+	}
+
+	return vars
 }

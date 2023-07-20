@@ -2,7 +2,7 @@
 	"semi": false,
 	"useTabs": true,
 	"arrowParens": "avoid",
-	"printWidth": 80,
+	"printWidth": 100,
 	"endOfLine": "lf",
 	"singleAttributePerLine": true,
 	"singleQuote": false,

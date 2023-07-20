@@ -12,7 +12,10 @@ export const handleSignUp: HandleSignUpFn =
 			return ctx.throw(400, "Invalid email")
 		}
 
-		const user = await userService.getByEmail(email)
+		const user = await userService.getByEmail(email).fork(
+			() => null,
+			user => user
+		)
 
 		if (user) {
 			return ctx.throw(409, "User with this email already exists")
@@ -26,16 +29,30 @@ export const handleSignUp: HandleSignUpFn =
 		}
 
 		try {
-			const newUser = await userService.createUser(email, password!)
+			const newUser = await userService.createUser(email, password!).toPromise()
 
-			const id = newUser.id
-			const ip = ctx.request.ip
+			const sub = newUser.id
+			const uip = ctx.request.ip
 
-			const accessToken = await tokenService.createAccessToken(id, ip)
-			const refreshToken = await tokenService.createRefreshToken(id, ip)
+			const { jti, exp } = await tokenService.createRefreshToken(sub, uip)
+			const accessToken = await tokenService.createAccessToken(jti, sub)
 
-			ctx.response.body = { accessToken, refreshToken }
+			await ctx.cookies.set("jti", jti, {
+				httpOnly: true,
+				sameSite: "lax",
+				expires: new Date(Date.now() + exp),
+			})
+
+			await ctx.cookies.set("sub", sub, {
+				httpOnly: true,
+				sameSite: "lax",
+				expires: new Date(Date.now() + exp),
+			})
+
+			ctx.response.body = { accessToken, refreshToken: jti, userId: sub }
 		} catch (e) {
+			console.log(e)
+
 			ctx.throw(409, "User with this email already exists")
 		}
 	}

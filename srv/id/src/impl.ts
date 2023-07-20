@@ -1,56 +1,99 @@
-import { join } from "#std/path/mod.ts"
-import { DenoKVUserDriver } from "#lib/deno-kv-user-driver/mod.ts"
-import { DenoKVTokenDriver } from "#lib/deno-kv-token-driver/mod.ts"
+import { join, resolve } from "#std/path/mod.ts"
+import { DenoKVUserAdapter } from "#lib/deno-kv-user-driver/mod.ts"
+import { DenoKVTokenAdapter } from "#lib/deno-kv-token-driver/mod.ts"
 import { createIDServer } from "#lib/be-id/mod.ts"
-import { getKey } from "./utils/get-key.ts"
+import { getKey, getPrivateKey, getPublicKey } from "./utils/get-key.ts"
+import { DynamoDBUserAdapter } from "#lib/dynamodb-user-driver/mod.ts"
+import { Switch } from "#lib/switch/mod.ts"
 import { getc } from "#lib/getc/mod.ts"
 
-type Config = {
-	accessTokenExpireIn: number
-	refreshTokenExpireIn: number
-	port: number
-	origin: string
-	saltRounds: number
-	privateKeyFileName: string
-	publicKeyFileName: string
-	kvDbPath: string
-}
-
 const {
-	port,
-	accessTokenExpireIn,
-	origin,
-	refreshTokenExpireIn,
-	saltRounds,
-	privateKeyFileName,
-	publicKeyFileName,
-	kvDbPath,
-} = await getc<Config>("id")
+	ID_USER_ADAPTER,
+	ID_DYNAMODB_ENDPOINT,
+	ID_DYNAMODB_ACCESS_KEY,
+	ID_DYNAMODB_SECRET_KEY,
+	ID_DYNAMODB_REGION,
+	ID_PORT,
+	ID_ACCESS_TOKEN_EXPIRE_IN,
+	ID_REFRESH_TOKEN_EXPIRE_IN,
+	ID_ACCESS_CONTROL_ALLOW_ORIGIN,
+	ID_SALT_ROUNDS,
+	ID_KV_DB_PATH,
+	ID_ACCESS_TOKEN_PRIVATE_KEY_PATH,
+	ID_ACCESS_TOKEN_PUBLIC_KEY_PATH,
+	ID_REFRESH_TOKEN_PRIVATE_KEY_PATH,
+	ID_REFRESH_TOKEN_PUBLIC_KEY_PATH,
+	ID_USER_TABLE_NAME,
+	ID_TOKENS_TABLE_NAME,
+} = getc([
+	"ID_USER_ADAPTER",
+	"ID_DYNAMODB_ENDPOINT",
+	"ID_DYNAMODB_ACCESS_KEY",
+	"ID_DYNAMODB_SECRET_KEY",
+	"ID_DYNAMODB_REGION",
+	"ID_PORT",
+	"ID_ACCESS_TOKEN_EXPIRE_IN",
+	"ID_REFRESH_TOKEN_EXPIRE_IN",
+	"ID_ACCESS_CONTROL_ALLOW_ORIGIN",
+	"ID_SALT_ROUNDS",
+	"ID_KV_DB_PATH",
+	"ID_ACCESS_TOKEN_PRIVATE_KEY_PATH",
+	"ID_ACCESS_TOKEN_PUBLIC_KEY_PATH",
+	"ID_REFRESH_TOKEN_PRIVATE_KEY_PATH",
+	"ID_REFRESH_TOKEN_PUBLIC_KEY_PATH",
+	"ID_USER_TABLE_NAME",
+	"ID_TOKENS_TABLE_NAME",
+])
 
-const privateKey = await getKey(
-	join(Deno.cwd(), "var", "etc", "auth", privateKeyFileName),
-	"private"
-)
-const publicKey = await getKey(
-	join(Deno.cwd(), "var", "etc", "auth", publicKeyFileName),
-	"public"
-)
+const accessPrivateKeyString = resolve(ID_ACCESS_TOKEN_PRIVATE_KEY_PATH)
+const accessPublicKeyString = resolve(ID_ACCESS_TOKEN_PUBLIC_KEY_PATH)
+const refreshPrivateKeyString = resolve(ID_REFRESH_TOKEN_PRIVATE_KEY_PATH)
+const refreshPublicKeyString = resolve(ID_REFRESH_TOKEN_PUBLIC_KEY_PATH)
 
-const userDriver = await DenoKVUserDriver.of(kvDbPath)
-const tokenDriver = await DenoKVTokenDriver.of(kvDbPath)
+const accessTokenPrivateKey = await getPrivateKey(accessPrivateKeyString)
+const accessTokenPublicKey = await getPublicKey(accessPublicKeyString)
+const refreshTokenPrivateKey = await getPrivateKey(refreshPrivateKeyString)
+const refreshTokenPublicKey = await getPublicKey(refreshPublicKeyString)
+
+const kvPath = `${
+	ID_KV_DB_PATH.endsWith("/") ? ID_KV_DB_PATH : `${ID_KV_DB_PATH}/`
+}kvdb`
+
+const tokenDriver = await DenoKVTokenAdapter.of(kvPath, ID_TOKENS_TABLE_NAME)
+
+const userDriver = await Switch.of(ID_USER_ADAPTER)
+	.case("dynamodb", () =>
+		DynamoDBUserAdapter.of({
+			region: ID_DYNAMODB_REGION,
+			endpoint: ID_DYNAMODB_ENDPOINT,
+			awsAccessKeyId: ID_DYNAMODB_ACCESS_KEY,
+			awsSecretKey: ID_DYNAMODB_SECRET_KEY,
+			tableName: ID_USER_TABLE_NAME,
+		})
+	)
+	.case("kv", () => DenoKVUserAdapter.of(kvPath, ID_USER_TABLE_NAME))
+	.default(() => DenoKVUserAdapter.of(kvPath, ID_USER_TABLE_NAME))
 
 const app = await createIDServer({
 	userDriver,
 	tokenDriver,
-	origin,
-	privateKey,
-	publicKey,
-	saltRounds,
-	alg: "ES384",
-	accessTokenExpireIn,
-	refreshTokenExpireIn,
+	origin: ID_ACCESS_CONTROL_ALLOW_ORIGIN,
+	keys: {
+		access: {
+			private: accessTokenPrivateKey,
+			public: accessTokenPublicKey,
+		},
+		refresh: {
+			private: refreshTokenPrivateKey,
+			public: refreshTokenPublicKey,
+		},
+	},
+	saltRounds: Number(ID_SALT_ROUNDS),
+	alg: "ES384", // TODO: Add support for switching to RSA
+	accessTokenExpireIn: Number(ID_ACCESS_TOKEN_EXPIRE_IN),
+	refreshTokenExpireIn: Number(ID_REFRESH_TOKEN_EXPIRE_IN),
 })
 
-console.log(`ID server running on http://localhost:${port}`)
+console.log(`ID server running on http://localhost:${ID_PORT}`)
 
-await app.listen({ port })
+await app.listen({ port: Number(ID_PORT) })

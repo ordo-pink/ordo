@@ -1,0 +1,299 @@
+import { Nullable, keysOf } from "#lib/tau/mod.ts"
+import { resolve } from "#std/path/win32.ts"
+
+/**
+ * Recursively unwraps the "awaited type" of a type. Non-promise "thenables" should resolve to `never`. This emulates the behavior of `await`.
+ */
+type UnderOath<T> = T extends object & {
+	// TODO: Add support for the second function (catch) type extraction
+	and(onfulfilled: infer F, ...args: infer _): any
+} // `await` only unwraps object types with a callable `then`. Non-object types are not unwrapped
+	? F extends (value: infer V, ...args: infer _) => any // if the argument to `then` is callable, extracts the first argument
+		? UnderOath<V> // recursively unwrap the value
+		: never // the argument to `then` was not callable
+	: Awaited<T> // non-object or non-thenable
+
+export class Oath<TRight, TLeft = never> {
+	public static resolve<TRight, TLeft = never>(value: TRight): Oath<TRight, TLeft> {
+		return new Oath(resolve => {
+			resolve(value)
+		})
+	}
+
+	public static all<TSomeThings extends readonly unknown[] | [] | Record<string, unknown>>(
+		values: TSomeThings
+	): Oath<
+		TSomeThings extends []
+			? { -readonly [P in keyof TSomeThings]: UnderOath<TSomeThings[P]> }
+			: { [P in keyof TSomeThings]: UnderOath<TSomeThings[P]> }
+	> {
+		let rejected = false
+
+		if (Array.isArray(values)) {
+			const resolvedValues = [] as any[]
+			let resolvedLength = 0
+
+			return new Oath((outerResolve: any, outerReject: any) => {
+				if (!values.length) return outerResolve([])
+
+				values.forEach((value, index) => {
+					if (value.isOath) {
+						value.fork(
+							(e: any) => {
+								if (!rejected) {
+									rejected = true
+									outerReject(e)
+								}
+							},
+							(s: any) => {
+								if (rejected) return
+
+								resolvedValues.push(s)
+								resolvedLength++
+
+								if (resolvedLength === values.length) outerResolve(resolvedValues)
+							}
+						)
+					} else if (value.then) {
+						value.then(
+							(s: any) => {
+								if (rejected) return
+								resolvedValues.push(s)
+								resolvedLength++
+
+								if (resolvedLength === values.length) outerResolve(resolvedValues)
+							},
+							(e: any) => {
+								if (!rejected) {
+									rejected = true
+									outerReject(e)
+								}
+							}
+						)
+					} else {
+						resolvedValues.push(value)
+						resolvedLength++
+					}
+				})
+			})
+		} else {
+			const resolvedValues = {} as any
+			let resolvedLength = 0
+
+			return new Oath((outerResolve: any, outerReject: any) => {
+				const keys = keysOf(values)
+				if (!keys.length) return outerResolve({})
+
+				keys.forEach(key => {
+					const value = values[key] as any
+
+					if (value.isOath) {
+						value.fork(
+							(e: any) => {
+								if (!rejected) {
+									rejected = true
+									outerReject(e)
+								}
+							},
+							(s: any) => {
+								if (rejected) return
+
+								resolvedValues[key] = s
+								resolvedLength++
+
+								if (resolvedLength === keys.length) outerResolve(resolvedValues)
+							}
+						)
+					} else if (value.then) {
+						value.then(
+							(s: any) => {
+								if (rejected) return
+
+								resolvedValues[key] = s
+								resolvedLength++
+
+								if (resolvedLength === keys.length) outerResolve(resolvedValues)
+							},
+							(e: any) => {
+								if (!rejected) {
+									rejected = true
+									outerReject(e)
+								}
+							}
+						)
+					} else {
+						resolvedValues[key] = value
+						resolvedLength++
+						if (resolvedLength === keys.length) outerResolve(resolvedValues)
+					}
+				})
+			})
+		}
+
+		return Array.isArray(values) ? Oath.resolve([]) : (Oath.resolve({}) as any) // TODO
+	}
+
+	public static of<TRight, TLeft = never>(value: TRight): Oath<TRight, TLeft> {
+		return new Oath(resolve => {
+			resolve(value)
+		})
+	}
+
+	public static from<TRight, TLeft = never>(thunk: () => Promise<TRight>): Oath<TRight, TLeft> {
+		return new Oath((resolve, reject) => {
+			thunk().then(resolve, reject)
+		})
+	}
+
+	public static fromNullable<T>(value?: Nullable<T>): Oath<NonNullable<T>, null> {
+		return value == null ? Oath.reject(null) : Oath.resolve(value)
+	}
+
+	public static fromBoolean<T, F = null>(
+		f: () => boolean,
+		onTrue: () => T,
+		onFalse: () => F = () => null as any
+	): Oath<T, F> {
+		return f() ? Oath.resolve(onTrue()) : Oath.reject(onFalse())
+	}
+
+	public static reject<TLeft, TRight = never>(error?: TLeft): Oath<TRight, TLeft> {
+		return new Oath((_, reject) => {
+			reject(error)
+		})
+	}
+
+	public constructor(
+		private resolver: (
+			resolve: <TNewRight>(value: TRight) => TNewRight,
+			reject: <TNewLeft>(err?: TLeft) => TNewLeft
+		) => void
+	) {}
+
+	public get isOath() {
+		return true
+	}
+
+	public swap(): Oath<TLeft, TRight> {
+		return new Oath<TLeft, TRight>((resolve, reject) =>
+			this.fork(
+				a => resolve(a),
+				b => reject(b)
+			)
+		)
+	}
+
+	public map<ThenRight>(f: (x: TRight) => ThenRight): Oath<ThenRight, TLeft> {
+		return new Oath<ThenRight, TLeft>((resolve, reject) =>
+			this.fork(
+				a => reject(a),
+				b => resolve(f(b))
+			)
+		)
+	}
+
+	public rejectedMap<ThenLeft>(f: (x: TLeft) => ThenLeft): Oath<TRight, ThenLeft> {
+		return new Oath<TRight, ThenLeft>((resolve, reject) =>
+			this.fork(
+				a => reject(f(a)),
+				b => resolve(b)
+			)
+		)
+	}
+
+	public bimap<ThenRight, ThenLeft>(
+		f: (x: TLeft) => ThenLeft,
+		g: (x: TRight) => ThenRight
+	): Oath<ThenRight, ThenLeft> {
+		return new Oath<ThenRight, ThenLeft>((resolve, reject) =>
+			this.fork(
+				a => reject(f(a)),
+				b => resolve(g(b))
+			)
+		)
+	}
+
+	public chain<ThenRight, ThenLeft>(
+		f: (x: TRight) => Oath<ThenRight, ThenLeft>
+	): Oath<ThenRight, TLeft | ThenLeft> {
+		return new Oath((resolve, reject) =>
+			this.fork(
+				a => reject(a),
+				b => f(b).fork(reject, resolve)
+			)
+		)
+	}
+
+	public rejectedChain<ThenRight, ThenLeft>(
+		f: (x: TLeft) => Oath<TRight, ThenLeft>
+	): Oath<TRight, ThenLeft> {
+		return new Oath((resolve, reject) =>
+			this.fork(
+				a => f(a).fork(reject, resolve),
+				b => resolve(b)
+			)
+		)
+	}
+
+	// TODO: Add support for the second function (catch)
+	public and<ThenRight, ThenLeft>(
+		f: (x: TRight) => PromiseLike<ThenRight> | Oath<ThenRight, ThenLeft> | ThenRight
+	): Oath<ThenRight, TLeft | ThenLeft> {
+		return new Oath((resolve, reject) =>
+			this.fork(
+				a => reject(a),
+				b => {
+					try {
+						const forked: any = f(b)
+
+						if (!forked) return resolve(forked)
+						if (forked.isOath) return forked.fork(reject, resolve)
+						if (forked.then) return Oath.from(() => forked).fork(reject as any, resolve as any)
+						return resolve(forked)
+					} catch (e) {
+						reject(e)
+					}
+				}
+			)
+		)
+	}
+
+	public catch<ThenRight, ThenLeft = never>(
+		f: (x: TLeft) => PromiseLike<ThenRight> | Oath<ThenRight, ThenLeft> | ThenRight
+	): Oath<TRight | ThenRight, ThenLeft> {
+		return new Oath((resolve, reject) =>
+			this.fork(
+				a => {
+					try {
+						const forked: any = f(a)
+
+						if (!forked) return resolve(forked)
+						if (forked.isOath) return forked.fork(reject, resolve)
+						if (forked.then) return Oath.from(() => forked)
+						return resolve(forked)
+					} catch (e) {
+						reject(e)
+					}
+				},
+				b => resolve(b)
+			)
+		)
+	}
+
+	public fork<TNewRight, TNewLeft>(
+		onLeft: (error: TLeft) => TNewLeft,
+		onRight: (value: TRight) => TNewRight
+	): Promise<TNewRight> {
+		// TODO: Store reject (https://medium.com/@masnun/creating-cancellable-promises-33bf4b9da39c)
+
+		return new Promise<TNewRight>((resolve, reject) => {
+			this.resolver(resolve as any, reject as any)
+		}).then((x: any) => onRight(x), onLeft) as any
+	}
+
+	public toPromise() {
+		return new Promise<TRight>((resolve, reject) => {
+			this.resolver(resolve as any, reject as any)
+		})
+	}
+}

@@ -16,6 +16,7 @@ PLATFORM=$(uname -ms)
 
 ESBUILD_VERSION='0.18.9'
 DENO_VERSION='v1.35.1'
+TAILWIND_VERSION='v3.1.6'
 
 ln -snf etc/deno/deno.jsonc deno.jsonc
 
@@ -24,6 +25,24 @@ if [ ! -d ./opt ]; then
 fi
 
 # Internal --------------------------------------------------------------------
+
+function download_tailwind {
+  if [ ! -f ./opt/tailwind ]; then
+    dir=$(mktemp -d)
+    file=$dir/tailwind-$TAILWIND_VERSION
+
+    case $PLATFORM in
+      'Darwin arm64') curl -fLo $file "https://github.com/tailwindlabs/tailwindcss/releases/download/$TAILWIND_VERSION/tailwindcss-macos-arm64" &>/dev/null;;
+      'Darwin x86_64') curl -fLo $file "https://github.com/tailwindlabs/tailwindcss/releases/download/$TAILWIND_VERSION/tailwindcss-macos-x64" &>/dev/null;;
+      'Linux arm64' | 'Linux aarch64') curl -fLo $file "https://github.com/tailwindlabs/tailwindcss/releases/download/$TAILWIND_VERSION/tailwindcss-linux-arm64" &>/dev/null;;
+      'Linux x86_64') curl -fLo $file "https://github.com/tailwindlabs/tailwindcss/releases/download/$TAILWIND_VERSION/tailwindcss-linux-x64" &>/dev/null;;
+      *) echo "Error: Unsupported platform: $PLATFORM"; exit 1
+    esac
+
+    mv $dir/tailwind-$TAILWIND_VERSION opt/tailwind
+    chmod +x opt/tailwind
+  fi
+}
 
 function download_deno {
   if [ ! -f ./opt/deno ]; then
@@ -79,6 +98,7 @@ function compile_init_script {
     --allow-read \
     --allow-write \
     --allow-run \
+    --allow-env \
     -o bin/init \
     boot/src/init/mod.ts \
     &>/dev/null
@@ -95,6 +115,14 @@ function start_init_script {
 printf "$BLUE→$DEFAULT Downloading "esbuild"... "
 
 download_esbuild
+
+printf "$GREEN✓$DEFAULT $EOL"
+
+## Download TailwindCSS -------------------------------------------------------
+
+printf "$BLUE→$DEFAULT Downloading "tailwind"... "
+
+download_tailwind
 
 printf "$GREEN✓$DEFAULT $EOL"
 

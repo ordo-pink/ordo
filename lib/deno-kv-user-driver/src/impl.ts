@@ -1,21 +1,23 @@
-import { InternalUser, PublicUser, UserDriver } from "#lib/user-service/mod.ts"
+import { InternalUser, PublicUser, UserAdapter } from "#lib/user-service/mod.ts"
 import { Nullable } from "#lib/tau/mod.ts"
 
-export class DenoKVUserDriver implements UserDriver {
+export class DenoKVUserAdapter implements UserAdapter {
 	#db: Deno.Kv
+	#tableName: string
 
-	public static async of(path: string) {
+	public static async of(path: string, tableName: string) {
 		const db = await Deno.openKv(path)
-		return new DenoKVUserDriver(db)
+		return new DenoKVUserAdapter(db, tableName)
 	}
 
-	protected constructor(db: Deno.Kv) {
+	protected constructor(db: Deno.Kv, tableName: string) {
 		this.#db = db
+		this.#tableName = tableName
 	}
 
 	public async create(user: InternalUser): Promise<InternalUser> {
-		const pk = ["users", user.id]
-		const sk = ["users_by_email", user.email]
+		const pk = [this.#tableName, user.id]
+		const sk = [`${this.#tableName}_by_email`, user.email]
 
 		const res = await this.#db
 			.atomic()
@@ -32,7 +34,7 @@ export class DenoKVUserDriver implements UserDriver {
 
 	public async getByEmail(email: string): Promise<Nullable<InternalUser>> {
 		const maybeUser: Deno.KvEntryMaybe<InternalUser> = await this.#db.get([
-			"users_by_email",
+			`${this.#tableName}_by_email`,
 			email,
 		])
 
@@ -41,7 +43,7 @@ export class DenoKVUserDriver implements UserDriver {
 
 	public async getById(id: string): Promise<Nullable<InternalUser>> {
 		const maybeUser: Deno.KvEntryMaybe<InternalUser> = await this.#db.get([
-			"users",
+			this.#tableName,
 			id,
 		])
 
@@ -53,7 +55,7 @@ export class DenoKVUserDriver implements UserDriver {
 		user: Partial<PublicUser>
 	): Promise<Nullable<InternalUser>> {
 		const maybeUser: Deno.KvEntryMaybe<InternalUser> = await this.#db.get([
-			"users",
+			this.#tableName,
 			id,
 		])
 
@@ -64,11 +66,11 @@ export class DenoKVUserDriver implements UserDriver {
 			...user,
 		}
 
-		const pk = ["users", id]
+		const pk = [this.#tableName, id]
 
 		if (user.email) {
-			const osk = ["users_by_email", maybeUser.value.email]
-			const sk = ["users_by_email", user.email]
+			const osk = [`${this.#tableName}_by_email`, maybeUser.value.email]
+			const sk = [`${this.#tableName}_by_email`, user.email]
 
 			const res = await this.#db
 				.atomic() // TODO: Add versionstamp checks
@@ -80,7 +82,7 @@ export class DenoKVUserDriver implements UserDriver {
 			return res.ok ? updatedUser : null
 		}
 
-		const sk = ["users_by_email", maybeUser.value.email]
+		const sk = [`${this.#tableName}_by_email`, maybeUser.value.email]
 
 		const res = await this.#db
 			.atomic() // TODO: Add versionstamp checks

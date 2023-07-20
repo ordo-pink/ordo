@@ -30,3 +30,6 @@ export const getKey = (path: string, type: "public" | "private") =>
 			},
 			x => x
 		)
+
+export const getPublicKey = (path: string) => getKey(path, "public")
+export const getPrivateKey = (path: string) => getKey(path, "private")

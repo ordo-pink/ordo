@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: Copyright 2023, Sergei Orlov and the Ordo.pink contributors
+// SPDX-License-Identifier: Unlicense
+
 import { join, resolve } from "#std/path/mod.ts"
 import { cyan, green } from "#std/fmt/colors.ts"
 import { encode } from "#std/encoding/base64.ts"

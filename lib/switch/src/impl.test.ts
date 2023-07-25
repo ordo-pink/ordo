@@ -1,5 +1,5 @@
 import { tsushi } from "#lib/tsushi/mod.ts"
-import { lazySwitch, Switch } from "./impl.ts"
+import { Switch } from "./impl.ts"
 
 const t = tsushi()
 
@@ -12,9 +12,7 @@ t.group("switch", ({ group }) => {
 					.default(() => false)
 			).toEqual(true))
 
-		test("should apply fall into case if the validation succeeded", ({
-			expect,
-		}) =>
+		test("should apply fall into case if the validation succeeded", ({ expect }) =>
 			expect(
 				Switch.of(1)
 					.case(
@@ -24,9 +22,7 @@ t.group("switch", ({ group }) => {
 					.default(() => false)
 			).toEqual(true))
 
-		test("should apply fall into default none of the cases succeeded", ({
-			expect,
-		}) =>
+		test("should apply fall into default none of the cases succeeded", ({ expect }) =>
 			expect(
 				Switch.of(2)
 					.case(1, () => false)
@@ -41,26 +37,5 @@ t.group("switch", ({ group }) => {
 					.case(1, () => false)
 					.default(() => false)
 			).toEqual(true))
-	})
-
-	group("lazySwitch", ({ test }) => {
-		test("should allow assigning switch behaviour before the context argument is provided", ({
-			expect,
-		}) => {
-			const run = lazySwitch<number>(s =>
-				s
-					.case(
-						n => n > 1,
-						() => true
-					)
-					.case(
-						n => n < 2,
-						() => false
-					)
-					.default(() => null)
-			)
-
-			return expect(run(1.5)).toEqual(true)
-		})
 	})
 })

@@ -1,6 +1,6 @@
 import { useSignal } from "@preact/signals"
 import { JSX } from "preact"
-import { Either, TEither } from "#lib/either/mod.ts"
+import { Either, Either } from "#lib/either/mod.ts"
 import { isEmail } from "#x/deno_validator@v0.0.5/mod.ts"
 import { okpwd } from "#lib/okpwd/mod.ts"
 
@@ -16,11 +16,11 @@ type InputProps = {
 }
 
 type EmailInputProps = Partial<InputProps> & {
-	onChange?: (ev: TEither<string, string[]>) => any
+	onChange?: (ev: Either<string, string[]>) => any
 }
 
 type PasswordInputProps = Partial<InputProps> & {
-	onChange?: (ev: TEither<string, string[]>) => any
+	onChange?: (ev: Either<string, string[]>) => any
 }
 
 export const TextInput = ({
@@ -77,7 +77,7 @@ export const EmailInput = ({
 
 					if (!value) return onChange(Either.right(""))
 
-					const errors = Either.fromBooleanLazy(
+					const errors = Either.fromBoolean(
 						() => isEmail(value, {}),
 						() => value,
 						() => ["Invalid email."]

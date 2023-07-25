@@ -1,6 +1,14 @@
-import { HandleRefreshTokenFn } from "../types.ts"
+// SPDX-FileCopyrightText: Copyright 2023, Sergei Orlov and the Ordo.pink contributors
+// SPDX-License-Identifier: MPL-2.0
 
-export const handleRefreshToken: HandleRefreshTokenFn =
+import type { UserService } from "#lib/user-service/mod.ts"
+import type { TokenService } from "#lib/token-service/mod.ts"
+import type { Middleware } from "#x/oak@v12.6.0/middleware.ts"
+
+export type Params = { userService: UserService; tokenService: TokenService }
+export type Fn = (params: Params) => Middleware
+
+export const handleRefreshToken: Fn =
 	({ tokenService }) =>
 	async ctx => {
 		const oldJti = await ctx.cookies.get("jti")

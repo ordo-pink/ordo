@@ -1,22 +1,27 @@
-import type { ISwitchStatic, ISwitch, LazySwitch, Unpack } from "./types.ts"
+// SPDX-FileCopyrightText: Copyright 2023, Sergei Orlov and the Ordo.pink contributors
+// SPDX-License-Identifier: Unlicense
 
-const isFunction = <T = unknown, K = T>(x: unknown): x is (x: T) => K =>
-	typeof x == "function"
+// deno-lint-ignore-file no-explicit-any
+import type * as T from "./types.ts"
 
-export const Switch: ISwitchStatic = {
+import { isFunction } from "#lib/tau/mod.ts"
+
+// PUBLIC -----------------------------------------------------------------------------------------
+
+export const Switch: T.SwitchStatic = {
 	of: x => swich(x),
 }
 
 const swichMatched = <TContext, TResult extends unknown[] = []>(
 	x: TContext
-): ISwitch<TContext, TResult> => ({
+): T.Switch<TContext, TResult> => ({
 	case: () => swichMatched(x),
-	default: () => (x as () => Unpack<TResult>)(),
+	default: () => (x as any)(),
 })
 
 const swich = <TContext, TResult extends unknown[] = []>(
 	x: TContext
-): ISwitch<TContext, TResult> => ({
+): T.Switch<TContext, TResult> => ({
 	case: (predicate, onTrue) => {
 		const isTrue = isFunction(predicate) ? predicate(x) : predicate === x
 
@@ -24,5 +29,3 @@ const swich = <TContext, TResult extends unknown[] = []>(
 	},
 	default: defaultValue => defaultValue(),
 })
-
-export const lazySwitch: LazySwitch = callback => x => callback(Switch.of(x))

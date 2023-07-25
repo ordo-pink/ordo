@@ -1,49 +1,52 @@
-import { Either } from "#lib/either/mod.ts"
-import type { OkpwdFn, OkpwdOptions } from "./types.ts"
+// SPDX-FileCopyrightText: Copyright 2023, Sergei Orlov and the Ordo.pink contributors
+// SPDX-License-Identifier: Unlicense
 
-export const okpwd: OkpwdFn = options => password => {
-	const o = (options ? options : {}) as Required<OkpwdOptions>
+import type * as T from "./types.ts"
+
+import { Either } from "#lib/either/mod.ts"
+import { identity } from "#lib/tau/mod.ts"
+
+export const okpwd: T.Fn = options => password => {
+	const o = (options ? options : {}) as Required<T.Options>
 
 	if (o.min == null) o.min = 8
 	if (o.max == null) o.max = 50
-	if (o.skipCheckForAlphaCharacters == null)
-		o.skipCheckForAlphaCharacters = false
+	if (o.skipCheckForAlphaCharacters == null) o.skipCheckForAlphaCharacters = false
 	if (o.skipCheckForNumbers == null) o.skipCheckForNumbers = false
-	if (o.skipCheckForSpecialCharacters == null)
-		o.skipCheckForSpecialCharacters = false
+	if (o.skipCheckForSpecialCharacters == null) o.skipCheckForSpecialCharacters = false
 
 	return Either.fromNullable(password)
 		.leftMap(() => "No password provided.")
 		.chain(password =>
-			Either.fromBooleanLazy(
+			Either.fromBoolean(
 				() => password.length >= o.min,
 				() => password,
 				() => `Password must be at least ${o.min} characters long.`
 			)
 		)
 		.chain(password =>
-			Either.fromBooleanLazy(
+			Either.fromBoolean(
 				() => password.length <= o.max,
 				() => password,
 				() => `Password must be under ${o.max} characters long.`
 			)
 		)
 		.chain(password =>
-			Either.fromBooleanLazy(
+			Either.fromBoolean(
 				() => (o.skipCheckForAlphaCharacters ? true : /\p{L}/u.test(password)),
 				() => password,
 				() => `Password must contain contain letters.`
 			)
 		)
 		.chain(password =>
-			Either.fromBooleanLazy(
+			Either.fromBoolean(
 				() => (o.skipCheckForNumbers ? true : /\d/u.test(password)),
 				() => password,
 				() => `Password must contain contain numbers.`
 			)
 		)
 		.chain(password =>
-			Either.fromBooleanLazy(
+			Either.fromBoolean(
 				() =>
 					o.skipCheckForSpecialCharacters
 						? true
@@ -53,8 +56,5 @@ export const okpwd: OkpwdFn = options => password => {
 					`Password must contain contain special characters ([\`!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~]).`
 			)
 		)
-		.fold(
-			x => x,
-			() => null
-		)
+		.fold(identity, () => null)
 }

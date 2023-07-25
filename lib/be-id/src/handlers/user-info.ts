@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: Copyright 2023, Sergei Orlov and the Ordo.pink contributors
+// SPDX-License-Identifier: MPL-2.0
+
 import type { Context, RouterMiddleware } from "#x/oak@v12.6.0/mod.ts"
 import type { PublicUser, UserService } from "#lib/user-service/mod.ts"
 import type { TokenService } from "#lib/token-service/mod.ts"
@@ -12,7 +15,7 @@ export type Fn = (params: Params) => RouterMiddleware<"/users/:email">
 
 export const handleUserInfo: Fn =
 	({ tokenService, userService }) =>
-	async ctx =>
+	ctx =>
 		Oath.from(() => useBearerAuthorization(ctx, tokenService))
 			.map(() => ctx.params.email)
 			.chain(getPublicUserByEmail(userService))

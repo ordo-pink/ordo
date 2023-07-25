@@ -2,23 +2,23 @@
 
 # Configuration ---------------------------------------------------------------
 
-set -eu
+set -e
 
 # Variables -------------------------------------------------------------------
 
-BLUE='\033[0;34m'
-GREEN='\033[0;32m'
-YELLOW='\033[1;33m'
-DEFAULT='\033[0m'
-EOL='\n'
+EOL="\n"
 
 PLATFORM=$(uname -ms)
 
-ESBUILD_VERSION='0.18.9'
-DENO_VERSION='v1.35.1'
-TAILWIND_VERSION='v3.1.6'
+ESBUILD_VERSION="0.18.9" # TODO: Move to init script
+DENO_VERSION="v1.35.1"
+TAILWIND_VERSION="v3.1.6" # TODO: Move to init script
 
 ln -snf etc/deno/deno.jsonc deno.jsonc
+
+if [ ! -f ./.env ]; then
+  cp .env.example .env
+fi
 
 if [ ! -d ./opt ]; then
   mkdir ./opt
@@ -26,6 +26,7 @@ fi
 
 # Internal --------------------------------------------------------------------
 
+# TODO: Move to init script
 function download_tailwind {
   if [ ! -f ./opt/tailwind ]; then
     dir=$(mktemp -d)
@@ -68,6 +69,7 @@ function download_deno {
   fi
 }
 
+# TODO: Move to init script
 # Download the ESBuild executable
 function download_esbuild {
   if [ ! -f ./opt/esbuild ]; then
@@ -112,41 +114,37 @@ function start_init_script {
 
 ## Download ESBuild -----------------------------------------------------------
 
-printf "$BLUE→$DEFAULT Downloading "esbuild"... "
+printf "→ Downloading "esbuild"... "
 
 download_esbuild
 
-printf "$GREEN✓$DEFAULT $EOL"
+printf "✓ $EOL"
 
 ## Download TailwindCSS -------------------------------------------------------
 
-printf "$BLUE→$DEFAULT Downloading "tailwind"... "
+printf "→ Downloading "tailwind"... "
 
 download_tailwind
 
-printf "$GREEN✓$DEFAULT $EOL"
+printf "✓ $EOL"
 
 ## Download Deno --------------------------------------------------------------
 
-printf "$BLUE→$DEFAULT Downloading "deno", this might take a while... "
+printf "→ Downloading "deno", this might take a while... "
 
 download_deno
 
-printf "$GREEN✓$DEFAULT $EOL"
+printf "✓ $EOL"
 
-# TODO Move to separate scripts
-# TODO Build deno compiler script and run it
-# TODO Add go to opt
-# TODO Add node to opt
-# TODO Creating separate repositories (git subtree) 
+# TODO: Move downloading anything but deno to init script
 
 # Build init script -----------------------------------------------------------
 
-printf "$BLUE→$DEFAULT Compiling init executable... "
+printf "→ Compiling init executable... "
 
 compile_init_script
 
-printf "$GREEN✓$DEFAULT $EOL"
+printf "✓ $EOL"
 
 # Start init script -----------------------------------------------------------
 

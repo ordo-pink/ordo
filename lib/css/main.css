@@ -1,3 +1,8 @@
+/*
+SPDX-FileCopyrightText: Copyright 2023, Sergei Orlov and the Ordo.pink contributors
+SPDX-License-Identifier: MIT
+*/
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -6,9 +11,8 @@
 	font-family: system-ui;
 	font-style: normal;
 	font-weight: 300;
-	src: local(".SFNS-Light"), local(".SFNSText-Light"),
-		local(".HelveticaNeueDeskInterface-Light"), local(".LucidaGrandeUI"),
-		local("Segoe UI Light"), local("Ubuntu Light"), local("Roboto-Light"),
+	src: local(".SFNS-Light"), local(".SFNSText-Light"), local(".HelveticaNeueDeskInterface-Light"),
+		local(".LucidaGrandeUI"), local("Segoe UI Light"), local("Ubuntu Light"), local("Roboto-Light"),
 		local("DroidSans"), local("Tahoma");
 }
 
@@ -18,8 +22,8 @@
 	font-weight: 300;
 	src: local(".SFNS-LightItalic"), local(".SFNSText-LightItalic"),
 		local(".HelveticaNeueDeskInterface-Italic"), local(".LucidaGrandeUI"),
-		local("Segoe UI Light Italic"), local("Ubuntu Light Italic"),
-		local("Roboto-LightItalic"), local("DroidSans"), local("Tahoma");
+		local("Segoe UI Light Italic"), local("Ubuntu Light Italic"), local("Roboto-LightItalic"),
+		local("DroidSans"), local("Tahoma");
 }
 
 @font-face {
@@ -27,19 +31,17 @@
 	font-style: normal;
 	font-weight: 400;
 	src: local(".SFNS-Regular"), local(".SFNSText-Regular"),
-		local(".HelveticaNeueDeskInterface-Regular"), local(".LucidaGrandeUI"),
-		local("Segoe UI"), local("Ubuntu"), local("Roboto-Regular"),
-		local("DroidSans"), local("Tahoma");
+		local(".HelveticaNeueDeskInterface-Regular"), local(".LucidaGrandeUI"), local("Segoe UI"),
+		local("Ubuntu"), local("Roboto-Regular"), local("DroidSans"), local("Tahoma");
 }
 
 @font-face {
 	font-family: system-ui;
 	font-style: italic;
 	font-weight: 400;
-	src: local(".SFNS-Italic"), local(".SFNSText-Italic"),
-		local(".HelveticaNeueDeskInterface-Italic"), local(".LucidaGrandeUI"),
-		local("Segoe UI Italic"), local("Ubuntu Italic"), local("Roboto-Italic"),
-		local("DroidSans"), local("Tahoma");
+	src: local(".SFNS-Italic"), local(".SFNSText-Italic"), local(".HelveticaNeueDeskInterface-Italic"),
+		local(".LucidaGrandeUI"), local("Segoe UI Italic"), local("Ubuntu Italic"),
+		local("Roboto-Italic"), local("DroidSans"), local("Tahoma");
 }
 
 @font-face {
@@ -57,9 +59,8 @@
 	font-style: italic;
 	font-weight: 500;
 	src: local(".SFNS-MediumItalic"), local(".SFNSText-MediumItalic"),
-		local(".HelveticaNeueDeskInterface-MediumItalicP4"),
-		local(".LucidaGrandeUI"), local("Segoe UI Semibold Italic"),
-		local("Ubuntu Medium Italic"), local("Roboto-MediumItalic"),
+		local(".HelveticaNeueDeskInterface-MediumItalicP4"), local(".LucidaGrandeUI"),
+		local("Segoe UI Semibold Italic"), local("Ubuntu Medium Italic"), local("Roboto-MediumItalic"),
 		local("DroidSans-Bold"), local("Tahoma Bold");
 }
 
@@ -67,9 +68,8 @@
 	font-family: system-ui;
 	font-style: normal;
 	font-weight: 700;
-	src: local(".SFNS-Bold"), local(".SFNSText-Bold"),
-		local(".HelveticaNeueDeskInterface-Bold"), local(".LucidaGrandeUI"),
-		local("Segoe UI Bold"), local("Ubuntu Bold"), local("Roboto-Bold"),
+	src: local(".SFNS-Bold"), local(".SFNSText-Bold"), local(".HelveticaNeueDeskInterface-Bold"),
+		local(".LucidaGrandeUI"), local("Segoe UI Bold"), local("Ubuntu Bold"), local("Roboto-Bold"),
 		local("DroidSans-Bold"), local("Tahoma Bold");
 }
 
@@ -79,8 +79,8 @@
 	font-weight: 700;
 	src: local(".SFNS-BoldItalic"), local(".SFNSText-BoldItalic"),
 		local(".HelveticaNeueDeskInterface-BoldItalic"), local(".LucidaGrandeUI"),
-		local("Segoe UI Bold Italic"), local("Ubuntu Bold Italic"),
-		local("Roboto-BoldItalic"), local("DroidSans-Bold"), local("Tahoma Bold");
+		local("Segoe UI Bold Italic"), local("Ubuntu Bold Italic"), local("Roboto-BoldItalic"),
+		local("DroidSans-Bold"), local("Tahoma Bold");
 }
 
 :root {

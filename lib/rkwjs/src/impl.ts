@@ -1,5 +1,9 @@
-import { ReservedJavaScriptKeyword } from "#lib/rkwjs/mod.ts"
+// SPDX-FileCopyrightText: Copyright 2023, Sergei Orlov and the Ordo.pink contributors
+// SPDX-License-Identifier: Unlicense
 
+import type * as T from "./types.ts"
+
+// TODO: Add comments
 export const RESERVED_JAVASCRIPT_KEYWORDS = [
 	"break",
 	"case",
@@ -39,8 +43,5 @@ export const RESERVED_JAVASCRIPT_KEYWORDS = [
 	"with",
 ] as const
 
-export const isReservedJavaScriptKeyword = (
-	x: unknown
-): x is ReservedJavaScriptKeyword =>
-	typeof x === "string" &&
-	RESERVED_JAVASCRIPT_KEYWORDS.includes(x as ReservedJavaScriptKeyword)
+export const isReservedJavaScriptKeyword = (x: unknown): x is T.ReservedJavaScriptKeyword =>
+	typeof x === "string" && RESERVED_JAVASCRIPT_KEYWORDS.includes(x as T.ReservedJavaScriptKeyword)

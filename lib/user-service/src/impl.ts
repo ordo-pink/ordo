@@ -1,23 +1,22 @@
-import { Nullable } from "#lib/tau/mod.ts"
 import { compare, genSalt, hash } from "#x/bcrypt@v0.4.1/mod.ts"
 import { Oath } from "#lib/oath/mod.ts"
-import { InternalUser, PublicUser, User, UserAdapter } from "./types.ts"
+import * as T from "./types.ts"
 
 export type UserServiceOptions = {
 	saltRounds: number
 }
 
 export class UserService {
-	#driver: UserAdapter
+	#driver: T.Adapter
 	#salt: string
 
-	public static async of(driver: UserAdapter, options: UserServiceOptions) {
+	public static async of(driver: T.Adapter, options: UserServiceOptions) {
 		const salt = await genSalt(options.saltRounds)
 
 		return new UserService(driver, salt)
 	}
 
-	protected constructor(driver: UserAdapter, salt: string) {
+	protected constructor(driver: T.Adapter, salt: string) {
 		this.#driver = driver
 		this.#salt = salt
 	}
@@ -36,7 +35,7 @@ export class UserService {
 			.map(this.serialize)
 	}
 
-	public updateUserPassword(user: User, oldPassword: string, newPassword: string) {
+	public updateUserPassword(user: T.User, oldPassword: string, newPassword: string) {
 		return this.#driver.getById(user.id).chain(oldUser =>
 			Oath.from(() => compare(oldPassword, oldUser.password))
 				.chain(valid =>
@@ -52,7 +51,7 @@ export class UserService {
 							({
 								...user,
 								password,
-							} as InternalUser)
+							} as T.InternalUser)
 					)
 				)
 				.chain(user => this.#driver.update(oldUser.id, user).rejectedMap(() => "User not found"))
@@ -60,7 +59,7 @@ export class UserService {
 		)
 	}
 
-	public update(id: string, user: Partial<User>) {
+	public update(id: string, user: Partial<T.User>) {
 		return this.#driver.update(id, user).map(user => this.serialize(user))
 	}
 
@@ -89,7 +88,7 @@ export class UserService {
 			)
 	}
 
-	private serialize(user: InternalUser): User {
+	private serialize(user: T.InternalUser): T.User {
 		return {
 			createdAt: user.createdAt,
 			email: user.email,
@@ -101,7 +100,7 @@ export class UserService {
 		}
 	}
 
-	private serializePublic(user: InternalUser): PublicUser {
+	private serializePublic(user: T.InternalUser): T.PublicUser {
 		return {
 			createdAt: user.createdAt,
 			email: user.email, // TODO: obfuscate email

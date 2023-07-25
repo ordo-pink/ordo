@@ -1,43 +1,34 @@
+// SPDX-FileCopyrightText: Copyright 2023, Sergei Orlov and the Ordo.pink contributors
+// SPDX-License-Identifier: Unlicense
+
 import { join } from "#std/path/mod.ts"
-import { clib } from "#lib/clib/mod.ts"
-import { iro } from "#lib/iro/mod.ts"
-import { titleize } from "#lib/tau/mod.ts"
+import { titleCase, pascalCase } from "#x/case@2.1.1/mod.ts"
 import { isReservedJavaScriptKeyword } from "#lib/rkwjs/mod.ts"
+import { Command } from "#x/cliffy@v1.0.0-rc.2/command/command.ts"
+import { bold, green, red, underline } from "#std/fmt/colors.ts"
 
-/**
- * CLI opts for `bin/mklib`.
- */
-const opts = clib(Deno.args, {
-	name: "mklib",
-	description:
+const opts = await new Command()
+	.name("mkbin")
+	.version("0.1.0")
+	.description(
 		`The "mklib" command creates a new directory inside "lib" with the conventional file ` +
-		`structure to make a new library.`,
-	args: [{ name: "name", description: "Name of the library." }],
-}).getOrElse(str => {
-	console.log(str)
-	Deno.exit()
-})
+			`structure to make a new library.`
+	)
+	.arguments("<name>")
+	.parse(Deno.args)
 
-const name = opts.args.name
-const codeName = isReservedJavaScriptKeyword(opts.args.name as unknown)
-	? `${opts.args.name}Lib`
-	: opts.args.name
-
-const c = iro(opts.options.color === "no")
+const name = opts.args[0].toLocaleLowerCase()
+const codeName = isReservedJavaScriptKeyword(name) ? `${name}Lib` : name
 const encoder = new TextEncoder()
 
 const libPath = join(Deno.cwd(), "lib")
-const parentPath = join(libPath, name as string)
+const parentPath = join(libPath, name)
 const srcPath = join(parentPath, "src")
 
 const stat = await Deno.stat(parentPath).catch(() => null)
 
 if (stat && stat.isDirectory) {
-	console.error(
-		`${c.red("✗")} ${c.underline(name as string)} already exists in ${c.bold(
-			"./lib"
-		)}. Terminating.`
-	)
+	console.error(`${red("✗")} ${underline(name)} already exists in ${bold("./lib")}. Terminating.`)
 	Deno.exit(1)
 }
 
@@ -47,30 +38,24 @@ const testPath = join(srcPath, "impl.test.ts")
 const modPath = join(parentPath, "mod.ts")
 const readmePath = join(parentPath, "readme.md")
 
-const implContent = `import type { ${titleize(
-	codeName as string
-)} } from "./types.ts"
+const implContent = `import type { ${pascalCase(codeName)} } from "./types.ts"
 
-export const ${codeName as string}: ${titleize(codeName as string)} = "${
-	codeName as string
-}"`
+export const ${codeName}: ${pascalCase(codeName)} = "${codeName}"`
 
-const typesContent = `export type ${titleize(codeName as string)} = "${
-	codeName as string
-}"`
+const typesContent = `export type ${pascalCase(codeName)} = "${codeName}"`
 
 const testContent = `import { tsushi } from "#lib/tsushi/mod.ts"
 
 const t = tsushi()
 
-t.group("${name as string}", ({ test }) => {
+t.group("${name}", ({ test }) => {
 	test("should pass", ({ expect }) => expect().toPass())
 })`
 
 const modContent = `export * from "./src/impl.ts"
-export * from "./src/types.ts"`
+export * as T from "./src/types.ts"`
 
-const readmeContent = `# ${titleize(name as string)}`
+const readmeContent = `# ${titleCase(name)}`
 
 if (!(await Deno.stat(libPath).catch(() => null))) {
 	await Deno.mkdir(libPath)
@@ -85,4 +70,4 @@ await Deno.writeFile(typesPath, encoder.encode(typesContent + "\n"))
 await Deno.writeFile(testPath, encoder.encode(testContent + "\n"))
 await Deno.writeFile(implPath, encoder.encode(implContent + "\n"))
 
-console.log(`${c.green("✓")} ${c.underline(name as string)} created!`)
+console.log(`${green("✓")} ${underline(name)} created!`)

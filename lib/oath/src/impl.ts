@@ -1,5 +1,11 @@
-import { Nullable, keysOf } from "#lib/tau/mod.ts"
-import { resolve } from "#std/path/win32.ts"
+// SPDX-FileCopyrightText: Copyright 2023, Sergei Orlov and the Ordo.pink contributors
+// SPDX-License-Identifier: Unlicense
+
+// deno-lint-ignore-file no-explicit-any
+
+import type { T as TAU } from "#lib/tau/mod.ts"
+
+import { keysOf } from "#lib/tau/mod.ts"
 
 /**
  * Recursively unwraps the "awaited type" of a type. Non-promise "thenables" should resolve to `never`. This emulates the behavior of `await`.
@@ -20,6 +26,16 @@ export class Oath<TRight, TLeft = never> {
 		})
 	}
 
+	public static try<TRight, TLeft = Error>(f: () => TRight): Oath<Awaited<TRight>, TLeft> {
+		return new Oath(async (resolve, reject) => {
+			try {
+				resolve(await f())
+			} catch (e) {
+				reject(e)
+			}
+		})
+	}
+
 	public static all<TSomeThings extends readonly unknown[] | [] | Record<string, unknown>>(
 		values: TSomeThings
 	): Oath<
@@ -36,7 +52,7 @@ export class Oath<TRight, TLeft = never> {
 			return new Oath((outerResolve: any, outerReject: any) => {
 				if (!values.length) return outerResolve([])
 
-				values.forEach((value, index) => {
+				values.forEach(value => {
 					if (value.isOath) {
 						value.fork(
 							(e: any) => {
@@ -129,8 +145,6 @@ export class Oath<TRight, TLeft = never> {
 				})
 			})
 		}
-
-		return Array.isArray(values) ? Oath.resolve([]) : (Oath.resolve({}) as any) // TODO
 	}
 
 	public static of<TRight, TLeft = never>(value: TRight): Oath<TRight, TLeft> {
@@ -145,7 +159,7 @@ export class Oath<TRight, TLeft = never> {
 		})
 	}
 
-	public static fromNullable<T>(value?: Nullable<T>): Oath<NonNullable<T>, null> {
+	public static fromNullable<T>(value?: TAU.Nullable<T>): Oath<NonNullable<T>, null> {
 		return value == null ? Oath.reject(null) : Oath.resolve(value)
 	}
 

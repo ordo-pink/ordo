@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: Copyright 2023, Sergei Orlov and the Ordo.pink contributors
+// SPDX-License-Identifier: MPL-2.0
+
 import type { Context, Middleware } from "#x/oak@v12.6.0/mod.ts"
 import type { SUB, TokenService, AccessTokenParsed } from "#lib/token-service/mod.ts"
 import type { User, UserService } from "#lib/user-service/mod.ts"

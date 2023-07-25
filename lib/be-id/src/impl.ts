@@ -1,6 +1,12 @@
+// SPDX-FileCopyrightText: Copyright 2023, Sergei Orlov and the Ordo.pink contributors
+// SPDX-License-Identifier: MPL-2.0
+
+import { ConsoleLogger, type T as LoggerTypes } from "#lib/logger/mod.ts"
+import type { T as TokenServiceTypes } from "#lib/token-service/mod.ts"
+import { TokenService } from "#lib/token-service/mod.ts"
+
+import { type Adapter, UserService } from "#lib/user-service/mod.ts"
 import { Application, Router } from "#x/oak@v12.6.0/mod.ts"
-import { UserAdapter, UserService } from "#lib/user-service/mod.ts"
-import { IDKeyChain, TokenAdapter, TokenService } from "#lib/token-service/mod.ts"
 import { oakCors } from "#x/cors@v1.2.2/oakCors.ts"
 import { handleAccount } from "./handlers/account.ts"
 import { handleChangeEmail } from "./handlers/change-email.ts"
@@ -13,41 +19,48 @@ import { handleUserInfo } from "./handlers/user-info.ts"
 import { handleError } from "./middleware/handle-error.ts"
 import { logRequest } from "./middleware/log-request.ts"
 import { setResponseTimeHeader } from "./middleware/response-time.ts"
-import { Algorithm } from "#x/djwt@v2.9.1/algorithm.ts"
 
 // TODO: Extract errors to enum
 // TODO: Audit
 export type CreateIDServerFnParams = {
-	userDriver: UserAdapter
-	tokenDriver: TokenAdapter
+	userStorageAdapter: Adapter
+	tokenStorageAdapter: TokenServiceTypes.Adapter
 	accessTokenExpireIn: number
 	refreshTokenExpireIn: number
 	saltRounds: number
 	origin: string
-	alg: Algorithm
-	keys: IDKeyChain
+	alg: "ES384" // TODO: Add support for switching to RSA
+	accessKeys: TokenServiceTypes.CryptoKeyPair
+	refreshKeys: TokenServiceTypes.CryptoKeyPair
+	logger?: LoggerTypes.Logger
 }
 
 export type CreateIDServerFn = (params: CreateIDServerFnParams) => Promise<Application>
 
 export const createIDServer: CreateIDServerFn = async ({
-	userDriver,
-	tokenDriver,
+	userStorageAdapter,
+	tokenStorageAdapter,
 	origin,
 	accessTokenExpireIn,
 	refreshTokenExpireIn,
-	keys,
+	accessKeys,
+	refreshKeys,
 	saltRounds,
+	logger = ConsoleLogger,
 	alg,
 }) => {
 	const router = new Router()
 
-	const userService = await UserService.of(userDriver, { saltRounds })
-	const tokenService = await TokenService.of(tokenDriver, {
-		accessTokenExpireIn,
-		refreshTokenExpireIn,
-		alg,
-		keys,
+	const userService = await UserService.of(userStorageAdapter, { saltRounds })
+	const tokenService = TokenService.of({
+		adapter: tokenStorageAdapter,
+		options: {
+			accessTokenExpireIn,
+			refreshTokenExpireIn,
+			alg,
+			keys: { access: accessKeys, refresh: refreshKeys },
+			logger,
+		},
 	})
 
 	router.get("/healthcheck", ctx => {
@@ -100,5 +113,5 @@ export const createIDServer: CreateIDServerFn = async ({
 	app.use(router.routes())
 	app.use(router.allowedMethods())
 
-	return app as any
+	return app as Application
 }

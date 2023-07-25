@@ -1,6 +1,13 @@
-import { TEither } from "#lib/either/mod.ts"
+// SPDX-FileCopyrightText: Copyright 2023, Sergei Orlov and the Ordo.pink contributors
+// SPDX-License-Identifier: Unlicense
 
-export type OkpwdOptions = {
+import { T as TAU } from "#lib/tau/mod.ts"
+
+// PUBLIC -----------------------------------------------------------------------------------------
+
+// TODO: Add comments
+
+export type Options = {
 	min?: number
 	max?: number
 	skipCheckForNumbers?: boolean
@@ -8,6 +15,6 @@ export type OkpwdOptions = {
 	skipCheckForSpecialCharacters?: boolean
 }
 
-export type OkpwdFn = (
-	options?: OkpwdOptions
-) => (pwd?: string) => string | null
+export type Result = TAU.Nullable<string>
+
+export type Fn = (options?: Options) => (pwd?: string) => Result

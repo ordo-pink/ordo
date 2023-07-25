@@ -1,7 +1,11 @@
-// deno-lint-ignore-file no-explicit-any
-import type { TLeftFn, TRightFn, TEitherStatic } from "./types.ts"
+// SPDX-FileCopyrightText: Copyright 2023, Sergei Orlov and the Ordo.pink contributors
+// SPDX-License-Identifier: Unlicense
 
-const left: TLeftFn = x => ({
+// deno-lint-ignore-file no-explicit-any
+
+import type * as T from "./types.ts"
+
+const left: T.LeftFn = x => ({
 	isEither: true,
 	isLeft: true,
 	isRight: false,
@@ -13,7 +17,7 @@ const left: TLeftFn = x => ({
 	fold: f => f(x),
 })
 
-const right: TRightFn = x => ({
+const right: T.RightFn = x => ({
 	isEither: true,
 	isLeft: false,
 	isRight: true,
@@ -25,11 +29,9 @@ const right: TRightFn = x => ({
 	fold: (_, g) => g(x),
 })
 
-export const Either: TEitherStatic = {
+export const Either: T.EitherStatic = {
 	fromNullable: x => (x == null ? left(null) : right(x)),
-	fromBoolean: (f, x, l?) => (f() ? right(x) : left(l)) as any,
-	fromBooleanLazy: (f, r, l?) =>
-		(f() ? right(r()) : left(l ? l() : undefined)) as any,
+	fromBoolean: (f, r, l?) => (f() ? right(r()) : left(l ? l() : undefined)) as any,
 	try: f => {
 		try {
 			return right(f())

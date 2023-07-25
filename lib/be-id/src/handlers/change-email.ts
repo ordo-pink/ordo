@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: Copyright 2023, Sergei Orlov and the Ordo.pink contributors
+// SPDX-License-Identifier: MPL-2.0
+
 import type { Context, Middleware } from "#x/oak@v12.6.0/mod.ts"
 import type { AccessTokenParsed, TokenService } from "#lib/token-service/mod.ts"
 import type { UserService } from "#lib/user-service/mod.ts"
@@ -16,7 +19,7 @@ type Fn = (params: Params) => Middleware
 
 export const handleChangeEmail: Fn =
 	({ tokenService, userService }) =>
-	async ctx =>
+	ctx =>
 		Oath.all({
 			token: useBearerAuthorization(ctx, tokenService),
 			body: useBody<Body>(ctx),

@@ -1,11 +1,14 @@
-import { join, resolve } from "#std/path/mod.ts"
-import { DenoKVUserAdapter } from "#lib/deno-kv-user-driver/mod.ts"
-import { DenoKVTokenAdapter } from "#lib/deno-kv-token-driver/mod.ts"
+// SPDX-FileCopyrightText: Copyright 2023, Sergei Orlov and the Ordo.pink contributors
+// SPDX-License-Identifier: MPL-2.0
+
+import { resolve } from "#std/path/mod.ts"
 import { createIDServer } from "#lib/be-id/mod.ts"
-import { getKey, getPrivateKey, getPublicKey } from "./utils/get-key.ts"
-import { DynamoDBUserAdapter } from "#lib/dynamodb-user-driver/mod.ts"
+import { getPrivateKey, getPublicKey } from "./utils/get-key.ts"
+import { DynamoDBUserStorageAdapter } from "#lib/dynamodb-user-storage-adapter/mod.ts"
 import { Switch } from "#lib/switch/mod.ts"
 import { getc } from "#lib/getc/mod.ts"
+import { DenoKVTokenStorageAdapter } from "#lib/deno-kv-token-storage-adapter/mod.ts"
+import { DenoKVUserStorageAdapter } from "#lib/deno-kv-user-storage-adapter/mod.ts"
 
 const {
 	ID_USER_ADAPTER,
@@ -55,15 +58,12 @@ const accessTokenPublicKey = await getPublicKey(accessPublicKeyString)
 const refreshTokenPrivateKey = await getPrivateKey(refreshPrivateKeyString)
 const refreshTokenPublicKey = await getPublicKey(refreshPublicKeyString)
 
-const kvPath = `${
-	ID_KV_DB_PATH.endsWith("/") ? ID_KV_DB_PATH : `${ID_KV_DB_PATH}/`
-}kvdb`
+const kvPath = `${ID_KV_DB_PATH.endsWith("/") ? ID_KV_DB_PATH : `${ID_KV_DB_PATH}/`}kvdb`
 
-const tokenDriver = await DenoKVTokenAdapter.of(kvPath, ID_TOKENS_TABLE_NAME)
-
-const userDriver = await Switch.of(ID_USER_ADAPTER)
+const tokenStorageAdapter = await DenoKVTokenStorageAdapter.of(kvPath, ID_TOKENS_TABLE_NAME)
+const userStorageAdapter = await Switch.of(ID_USER_ADAPTER)
 	.case("dynamodb", () =>
-		DynamoDBUserAdapter.of({
+		DynamoDBUserStorageAdapter.of({
 			region: ID_DYNAMODB_REGION,
 			endpoint: ID_DYNAMODB_ENDPOINT,
 			awsAccessKeyId: ID_DYNAMODB_ACCESS_KEY,
@@ -71,23 +71,15 @@ const userDriver = await Switch.of(ID_USER_ADAPTER)
 			tableName: ID_USER_TABLE_NAME,
 		})
 	)
-	.case("kv", () => DenoKVUserAdapter.of(kvPath, ID_USER_TABLE_NAME))
-	.default(() => DenoKVUserAdapter.of(kvPath, ID_USER_TABLE_NAME))
+	.case("kv", () => DenoKVUserStorageAdapter.of({ path: kvPath, key: ID_USER_TABLE_NAME }))
+	.default(() => DenoKVUserStorageAdapter.of({ path: kvPath, key: ID_USER_TABLE_NAME }))
 
 const app = await createIDServer({
-	userDriver,
-	tokenDriver,
+	userStorageAdapter,
+	tokenStorageAdapter,
 	origin: ID_ACCESS_CONTROL_ALLOW_ORIGIN,
-	keys: {
-		access: {
-			private: accessTokenPrivateKey,
-			public: accessTokenPublicKey,
-		},
-		refresh: {
-			private: refreshTokenPrivateKey,
-			public: refreshTokenPublicKey,
-		},
-	},
+	accessKeys: { private: accessTokenPrivateKey, public: accessTokenPublicKey },
+	refreshKeys: { private: refreshTokenPrivateKey, public: refreshTokenPublicKey },
 	saltRounds: Number(ID_SALT_ROUNDS),
 	alg: "ES384", // TODO: Add support for switching to RSA
 	accessTokenExpireIn: Number(ID_ACCESS_TOKEN_EXPIRE_IN),

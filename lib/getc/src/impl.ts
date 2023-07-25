@@ -1,18 +1,12 @@
+// SPDX-FileCopyrightText: Copyright 2023, Sergei Orlov and the Ordo.pink contributors
+// SPDX-License-Identifier: Unlicense
+
 import "#std/dotenv/load.ts"
 
 // TODO: Merge all dotenvs in the repo into environment
 export const getc = <K extends string>(variables: K[]): { [Key in K]: string } => {
-	const vars = {} as { [Key in K]: string }
-
-	for (const variable of variables) {
-		const envVar = Deno.env.get(variable)
-
-		if (!envVar) {
-			throw new Error(`Missing environment variable "${variable}".`)
-		}
-
-		vars[variable] = envVar
-	}
-
-	return vars
+	return variables.reduce((env, variable) => {
+		env[variable] = Deno.env.get(variable) ?? ""
+		return env
+	}, {} as { [Key in K]: string })
 }

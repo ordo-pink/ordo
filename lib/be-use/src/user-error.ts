@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: Copyright 2023, Sergei Orlov and the Ordo.pink contributors
+// SPDX-License-Identifier: MPL-2.0
+
 import { Context } from "#x/oak@v12.6.0/mod.ts"
 
 export type THttpError = readonly [number, string]

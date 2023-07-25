@@ -1,56 +1,30 @@
-import type { Nullable } from "#lib/tau/src/types.ts"
+// SPDX-FileCopyrightText: Copyright 2023, Sergei Orlov and the Ordo.pink contributors
+// SPDX-License-Identifier: Unlicense
 
-export type TLeftFn = <LeftValue, RightValue = unknown>(
-	x: LeftValue
-) => TEither<RightValue, LeftValue>
+// TODO: Add comments
 
-export type TRightFn = <RightValue, LeftValue = unknown>(
-	x: RightValue
-) => TEither<RightValue, LeftValue>
+import type { T as TAU } from "#lib/tau/mod.ts"
 
-export type TEither<TRightValue, TLeftValue> = {
+export type LeftFn = <L, R = unknown>(x: L) => Either<R, L>
+export type RightFn = <R, L = unknown>(x: R) => Either<R, L>
+
+export type Either<R, L> = {
 	readonly isLeft: boolean
 	readonly isRight: boolean
 	readonly isEither: boolean
-	UNSAFE_get: () => TLeftValue | TRightValue
-	map: <TNewRightValue>(
-		f: (x: TRightValue) => TNewRightValue
-	) => TEither<TNewRightValue, TLeftValue>
-	leftMap: <TNewLeftValue>(
-		f: (x: TLeftValue) => TNewLeftValue
-	) => TEither<TRightValue, TNewLeftValue>
-	getOrElse: <TNewLeftValue>(
-		f: (x: TLeftValue) => TNewLeftValue
-	) => TRightValue | TNewLeftValue
-	chain: <TNewRightValue, TNewLeftValue>(
-		f: (x: TRightValue) => TEither<TNewRightValue, TNewLeftValue>
-	) => TEither<TNewRightValue, TLeftValue | TNewLeftValue>
-	fold: <TNewRightValue, TNewLeftValue>(
-		f: (x: TLeftValue) => TNewLeftValue,
-		g: (x: TRightValue) => TNewRightValue
-	) => TNewLeftValue | TNewRightValue
+	UNSAFE_get: () => L | R
+	map: <R1>(f: (x: R) => R1) => Either<R1, L>
+	leftMap: <L1>(f: (x: L) => L1) => Either<R, L1>
+	getOrElse: <L1>(f: (x: L) => L1) => R | L1
+	chain: <R1, L1>(f: (x: R) => Either<R1, L1>) => Either<R1, L | L1>
+	fold: <R1, L1>(f: (x: L) => L1, g: (x: R) => R1) => L1 | R1
 }
 
-export type TEitherStatic = {
-	fromNullable: <TRightValue>(
-		x: Nullable<TRightValue>
-	) => TEither<NonNullable<TRightValue>, null>
-	fromBoolean: <TRightValue, TLeftValue = undefined>(
-		f: () => boolean,
-		x: TRightValue,
-		l?: TLeftValue
-	) => TEither<TRightValue, TLeftValue>
-	fromBooleanLazy: <TRightValue, TLeftValue = undefined>(
-		f: () => boolean,
-		r: () => TRightValue,
-		l?: () => TLeftValue
-	) => TEither<TRightValue, TLeftValue>
-	try: <TRightValue, TLeftValue>(
-		f: () => TRightValue
-	) => TEither<TRightValue, TLeftValue>
-	right: TRightFn
-	left: TLeftFn
-	of: TRightFn
+export type EitherStatic = {
+	fromNullable: <R>(x: TAU.Nullable<R>) => Either<NonNullable<R>, null>
+	fromBoolean: <R, L = undefined>(f: () => boolean, r: () => R, l?: () => L) => Either<R, L>
+	try: <R, L>(f: () => R) => Either<R, L>
+	right: RightFn
+	left: LeftFn
+	of: RightFn
 }
-
-// Impl -----------------------------------------------------------------------

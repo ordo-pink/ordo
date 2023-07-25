@@ -1,30 +1,19 @@
-/**
- * Transforms an array into a union type.
- *
- * @example `[string, number, string, boolean] -> string | number | boolean`
- */
-export type Unpack<T> = T extends Array<infer U> ? U : T
+// SPDX-FileCopyrightText: Copyright 2023, Sergei Orlov and the Ordo.pink contributors
+// SPDX-License-Identifier: Unlicense
 
-/**
- * Validation function.
- *
- * @example `(num) => num > 3`
- */
-export type ValidatorFn<Arg> = (arg: Arg) => boolean
+import type { T as TAU } from "#lib/tau/mod.ts"
 
 /**
  * Helper object that contains a pointing interface to put value
  * into Switch.
  */
-export type ISwitchStatic = {
+export type SwitchStatic = {
 	/**
 	 * A pointing interface to put the value into Switch.
 	 *
 	 * @example `Switch.of(myVariableWithIDontKnowWhichThingInside)`
 	 */
-	of: <TResult extends unknown[] = [], TContext = unknown>(
-		x: TContext
-	) => ISwitch<TContext, TResult>
+	of: <TResult extends unknown[] = [], TContext = unknown>(x: TContext) => Switch<TContext, TResult>
 }
 
 /**
@@ -39,7 +28,7 @@ export type ISwitchStatic = {
  * Switch to fold and give you back the value, you have to end the case chain
  * with the `.default` call.
  */
-export type ISwitch<TContext, TResult extends unknown[]> = {
+export type Switch<TContext, TResult extends unknown[]> = {
 	/**
 	 * Define cases like you would normally do with a switch statement, or use
 	 * predicate functions to validate the value held inside Switch.
@@ -52,7 +41,7 @@ export type ISwitch<TContext, TResult extends unknown[]> = {
 		 * A value to compare with, or a validator function that accepts the value
 		 * held inside Switch and returns a boolean.
 		 */
-		predicate: TContext | ValidatorFn<TContext>,
+		predicate: TContext | TAU.ValidatorFn<TContext>,
 
 		/**
 		 * A thunk containing the value the Switch is to return when you fold the
@@ -61,7 +50,7 @@ export type ISwitch<TContext, TResult extends unknown[]> = {
 		 * match, the `.default` argument thunk will be called.
 		 */
 		onTrue: () => TNewResult
-	) => ISwitch<TContext, [Unpack<TResult>, TNewResult]>
+	) => Switch<TContext, [TAU.Unpack<TResult>, TNewResult]>
 
 	/**
 	 * Folds the Switch and returns a value that was defined in the matched
@@ -72,17 +61,5 @@ export type ISwitch<TContext, TResult extends unknown[]> = {
 	 */
 	default: <TDefaultResult>(
 		onAllFalse: () => TDefaultResult
-	) => Unpack<TResult> | TDefaultResult
+	) => TAU.Unpack<TResult> | TDefaultResult
 }
-
-/**
- * Makes Switch even lazier. LazySwitch allows you to define the behaviour of
- * Switch before the context of the Switch is available. Simply call lazySwitch
- * with the definition of Switch cases in the callback, and then call it with
- * the value expected as the Switch context.
- *
- * @example `lazySwitch((s) => s.case(1, () => "yay!").default(() => "Nah..."))(1)`
- */
-export type LazySwitch = <TContext, TResult extends unknown[] = unknown[]>(
-	callback: (s: ISwitch<TContext, TResult>) => Unpack<TResult>
-) => (x: TContext) => Unpack<TResult>

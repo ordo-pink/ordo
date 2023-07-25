@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: Copyright 2023, Sergei Orlov and the Ordo.pink contributors
+// SPDX-License-Identifier: MPL-2.0
+
 import { Middleware } from "#x/oak@v12.6.0/mod.ts"
 import { cyan, green, red, setColorEnabled, yellow } from "#std/fmt/colors.ts"
 import { Switch } from "#lib/switch/mod.ts"
@@ -34,7 +37,5 @@ export const logRequest: LogRequestFn = options => async (ctx, next) => {
 		.case(lte(100), () => cyan(`${responseTimeHeader}ms`))
 		.default(() => green(`${responseTimeHeader}ms`))
 
-	ctx.app.state.logger.log(
-		`[${time}]: ${ip} ${status} ${method} ${url} - ${rt}`
-	)
+	ctx.app.state.logger.log(`[${time}]: ${ip} ${status} ${method} ${url} - ${rt}`)
 }

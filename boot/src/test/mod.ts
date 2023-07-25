@@ -1,30 +1,22 @@
+// SPDX-FileCopyrightText: Copyright 2023, Sergei Orlov and the Ordo.pink contributors
+// SPDX-License-Identifier: Unlicense
+
 import { join } from "#std/path/mod.ts"
-import { clib } from "#lib/clib/mod.ts"
+import { Command } from "#x/cliffy@v1.0.0-rc.2/command/command.ts"
+import { red } from "#std/fmt/colors.ts"
 
-/**
- * CLI opts for `bin/mklib`.
- */
-const opts = clib(Deno.args, {
-	name: "test",
-	description:
+const opts = await new Command()
+	.name("test")
+	.version("0.1.0")
+	.description(
 		`The "test" command runs tests found deeply nested in directories ` +
-		`provided as arguments. Using "bin/test ." will find and run all tests ` +
-		`in the repository.`,
-	args: [
-		{
-			name: "name",
-			description: "Name of the bin executable.",
-			multiple: true,
-		},
-	],
-}).getOrElse(str => {
-	console.log(str)
-	Deno.exit()
-})
-
-// INTERNAL -------------------------------------------------------------------
-
-// IMPL -----------------------------------------------------------------------
+			`provided as arguments. Using "bin/test ." will find and run all tests ` +
+			`in the repository.`
+	)
+	.arguments("<directories...>")
+	.option("--verbose", "Enable output")
+	.option("--no-color", "Disable color output")
+	.parse(Deno.args)
 
 const testFiles: string[] = []
 
@@ -44,11 +36,6 @@ const collectTestFiles = async (path: string) => {
 	}
 }
 
-// EXECUTABLE -----------------------------------------------------------------
-
-/**
- * ./bin/test source code.
- */
 const main = async (args: string[]) => {
 	const paths = args.map(arg => join(Deno.cwd(), arg))
 	const denoPath = join(Deno.cwd(), "opt", "deno")
@@ -57,14 +44,19 @@ const main = async (args: string[]) => {
 		try {
 			await collectTestFiles(path)
 		} catch (_) {
-			console.error(`Could not find directory "${path}".`)
+			console.error(`${red("✗")} Could not find directory "${path}".`)
 			Deno.exit(1)
 		}
 	}
 
 	for (const testFile of testFiles) {
+		const args = ["run", "--allow-read", testFile]
+
+		if (opts.options.verbose) args.push("--verbose")
+		if (!opts.options.color) args.push("--no-color")
+
 		const command = new Deno.Command(denoPath, {
-			args: ["run", "--allow-read", testFile],
+			args,
 			stdout: "piped",
 			stderr: "piped",
 		})
@@ -79,9 +71,5 @@ const main = async (args: string[]) => {
 		}
 	}
 }
-// .map(createCommand)
-// .map(collectCommandOutput(printCommandOutput))
 
-// RUN ------------------------------------------------------------------------
-
-await main(Deno.args)
+await main(opts.args)

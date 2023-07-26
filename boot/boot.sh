@@ -33,11 +33,11 @@ function download_tailwind {
     file=$dir/tailwind-$TAILWIND_VERSION
 
     case $PLATFORM in
-      'Darwin arm64') curl -fLo $file "https://github.com/tailwindlabs/tailwindcss/releases/download/$TAILWIND_VERSION/tailwindcss-macos-arm64" &>/dev/null;;
-      'Darwin x86_64') curl -fLo $file "https://github.com/tailwindlabs/tailwindcss/releases/download/$TAILWIND_VERSION/tailwindcss-macos-x64" &>/dev/null;;
-      'Linux arm64' | 'Linux aarch64') curl -fLo $file "https://github.com/tailwindlabs/tailwindcss/releases/download/$TAILWIND_VERSION/tailwindcss-linux-arm64" &>/dev/null;;
-      'Linux x86_64') curl -fLo $file "https://github.com/tailwindlabs/tailwindcss/releases/download/$TAILWIND_VERSION/tailwindcss-linux-x64" &>/dev/null;;
-      *) echo "Error: Unsupported platform: $PLATFORM"; exit 1
+      'Darwin arm64') curl -fLo $file "https://github.com/tailwindlabs/tailwindcss/releases/download/$TAILWIND_VERSION/tailwindcss-macos-arm64";;
+      'Darwin x86_64') curl -fLo $file "https://github.com/tailwindlabs/tailwindcss/releases/download/$TAILWIND_VERSION/tailwindcss-macos-x64";;
+      'Linux arm64' | 'Linux aarch64') curl -fLo $file "https://github.com/tailwindlabs/tailwindcss/releases/download/$TAILWIND_VERSION/tailwindcss-linux-arm64";;
+      'Linux x86_64') curl -fLo $file "https://github.com/tailwindlabs/tailwindcss/releases/download/$TAILWIND_VERSION/tailwindcss-linux-x64";;
+      *) echo "Error: Unsupported platform: $PLATFORM"; exit 1;;
     esac
 
     mv $dir/tailwind-$TAILWIND_VERSION opt/tailwind
@@ -56,10 +56,10 @@ function download_deno {
 
     # Download the binary executable for the current platform
     case $PLATFORM in
-      'Darwin arm64') curl -fLo "$zip" "https://github.com/denoland/deno/releases/download/$DENO_VERSION/deno-aarch64-apple-darwin.zip" &>/dev/null;;
-      'Darwin x86_64') curl -fLo "$zip" "https://github.com/denoland/deno/releases/download/$DENO_VERSION/deno-x86_64-apple-darwin.zip" &>/dev/null;;
-      'Linux x86_64') curl -fLo "$zip" "https://github.com/denoland/deno/releases/download/$DENO_VERSION/deno-x86_64-unknown-linux-gnu.zip" &>/dev/null;;
-      *) echo "Error: Unsupported platform: $PLATFORM"; exit 1
+      'Darwin arm64') curl -fLo "$zip" "https://github.com/denoland/deno/releases/download/$DENO_VERSION/deno-aarch64-apple-darwin.zip";;
+      'Darwin x86_64') curl -fLo "$zip" "https://github.com/denoland/deno/releases/download/$DENO_VERSION/deno-x86_64-apple-darwin.zip";;
+      'Linux x86_64') curl -fLo "$zip" "https://github.com/denoland/deno/releases/download/$DENO_VERSION/deno-x86_64-unknown-linux-gnu.zip";;
+      *) echo "Error: Unsupported platform: $PLATFORM"; exit 1;;
     esac
 
   # Extract the binary executable to the opt directory
@@ -78,13 +78,13 @@ function download_esbuild {
 
     # Download the binary executable for the current platform
     case $PLATFORM in
-      'Darwin arm64') curl -fo "$tgz" "https://registry.npmjs.org/@esbuild/darwin-arm64/-/darwin-arm64-0.18.9.tgz" &>/dev/null;;
-      'Darwin x86_64') curl -fo "$tgz" "https://registry.npmjs.org/@esbuild/darwin-x64/-/darwin-x64-0.18.9.tgz" &>/dev/null;;
-      'Linux arm64' | 'Linux aarch64') curl -fo "$tgz" "https://registry.npmjs.org/@esbuild/linux-arm64/-/linux-arm64-0.18.9.tgz" &>/dev/null;;
-      'Linux x86_64') curl -fo "$tgz" "https://registry.npmjs.org/@esbuild/linux-x64/-/linux-x64-0.18.9.tgz" &>/dev/null;;
-      'NetBSD amd64') curl -fo "$tgz" "https://registry.npmjs.org/@esbuild/netbsd-x64/-/netbsd-x64-0.18.9.tgz" &>/dev/null;;
-      'OpenBSD amd64') curl -fo "$tgz" "https://registry.npmjs.org/@esbuild/openbsd-x64/-/openbsd-x64-0.18.9.tgz" &>/dev/null;;
-      *) echo "Error: Unsupported platform: $PLATFORM"; exit 1
+      'Darwin arm64') curl -fo "$tgz" "https://registry.npmjs.org/@esbuild/darwin-arm64/-/darwin-arm64-0.18.9.tgz";;
+      'Darwin x86_64') curl -fo "$tgz" "https://registry.npmjs.org/@esbuild/darwin-x64/-/darwin-x64-0.18.9.tgz";;
+      'Linux arm64' | 'Linux aarch64') curl -fo "$tgz" "https://registry.npmjs.org/@esbuild/linux-arm64/-/linux-arm64-0.18.9.tgz";;
+      'Linux x86_64') curl -fo "$tgz" "https://registry.npmjs.org/@esbuild/linux-x64/-/linux-x64-0.18.9.tgz";;
+      'NetBSD amd64') curl -fo "$tgz" "https://registry.npmjs.org/@esbuild/netbsd-x64/-/netbsd-x64-0.18.9.tgz";;
+      'OpenBSD amd64') curl -fo "$tgz" "https://registry.npmjs.org/@esbuild/openbsd-x64/-/openbsd-x64-0.18.9.tgz";;
+      *) echo "Error: Unsupported platform: $PLATFORM"; exit 1;;
     esac
 
     # Extract the binary executable to the opt directory
@@ -102,8 +102,7 @@ function compile_init_script {
     --allow-run \
     --allow-env \
     -o bin/init \
-    boot/src/init/mod.ts \
-    &>/dev/null
+    boot/src/init/mod.ts
 }
 
 function start_init_script {
@@ -114,37 +113,21 @@ function start_init_script {
 
 ## Download ESBuild -----------------------------------------------------------
 
-printf "→ Downloading "esbuild"... "
-
 download_esbuild
-
-printf "✓ $EOL"
 
 ## Download TailwindCSS -------------------------------------------------------
 
-printf "→ Downloading "tailwind"... "
-
 download_tailwind
-
-printf "✓ $EOL"
 
 ## Download Deno --------------------------------------------------------------
 
-printf "→ Downloading "deno", this might take a while... "
-
 download_deno
-
-printf "✓ $EOL"
 
 # TODO: Move downloading anything but deno to init script
 
 # Build init script -----------------------------------------------------------
 
-printf "→ Compiling init executable... "
-
 compile_init_script
-
-printf "✓ $EOL"
 
 # Start init script -----------------------------------------------------------
 

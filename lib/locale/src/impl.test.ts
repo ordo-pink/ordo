@@ -1,12 +1,13 @@
-import { tsushi } from "../../tsushi/mod.ts"
-import { TwoLetterLocale, TwoLetterLocaleReadableName } from "./impl.ts"
-import { twoLetterLocaleToReadableName } from "./impl.ts"
+import {
+	TwoLetterLocale,
+	TwoLetterLocaleReadableName,
+	twoLetterLocaleToReadableName,
+} from "./impl.ts"
 
-const t = tsushi()
+import { assertEquals } from "#std/testing/asserts.ts"
 
-t.group("locale", ({ test }) => {
+Deno.test("locale", () => {
 	const locale = Object.values(TwoLetterLocale).filter(value => Number.isNaN(Number(value)))[0]
 
-	test(`twoLetterLocaleToReadableName should provide valid readable name`, ({ expect }) =>
-		expect(twoLetterLocaleToReadableName(locale)).toEqual(TwoLetterLocaleReadableName[locale]))
+	assertEquals(twoLetterLocaleToReadableName(locale), TwoLetterLocaleReadableName[locale])
 })

@@ -1,9 +1,11 @@
-// SPDX-FileCopyrightText: Copyright 2023, Sergei Orlov and the Ordo.pink contributors
+// SPDX-FileCopyrightText: Copyright 2023, 谢尔盖||↓ and the Ordo.pink contributors
 // SPDX-License-Identifier: Unlicense
 
-import { join } from "#std/path/mod.ts"
 import { Command } from "#x/cliffy@v1.0.0-rc.2/command/mod.ts"
-import { bold, green, red, underline } from "#std/fmt/colors.ts"
+import { green, red, underline } from "#std/fmt/colors.ts"
+import { getAbsolutePath } from "#lib/fs/mod.ts"
+import { generateFile } from "#lib/binutil/mod.ts"
+import { checkDirectoryExists } from "#lib/fs/src/impl.ts"
 
 const opts = await new Command()
 	.name("mkbin")
@@ -18,43 +20,37 @@ const opts = await new Command()
 	.parse(Deno.args)
 
 const name = opts.args[0].toLocaleLowerCase()
+const path = getAbsolutePath(`boot/src/${name}`)
 
-const encoder = new TextEncoder()
-
-const parentPath = join(Deno.cwd(), "boot", "src", name)
-
-const stat = await Deno.stat(parentPath).catch(() => null)
-
-if (stat && stat.isDirectory) {
-	console.error(
-		`${red("✗")} ${underline(name)} already exists in ${bold("./boot/src/")}. Terminating.`
-	)
+if (await checkDirectoryExists(path)) {
+	console.error(`${red("✗")} Bin "${name}" already exists.`)
 	Deno.exit(1)
 }
 
-const filePath = join(parentPath, "mod.ts")
-const testFilePath = join(parentPath, "mod.test.ts")
+const MOD_TEMPLATE = `// SPDX-FileCopyrightText: Copyright 2023, 谢尔盖||↓ and the Ordo.pink contributors
+// SPDX-License-Identifier: Unlicense
 
-const fileContent = `import { Command } from "#x/cliffy@v1.0.0-rc.2/command/mod.ts"
+import { Command } from "#x/cliffy@v1.0.0-rc.2/command/mod.ts"
 
 const opts = await new Command()
 	.name("${name}")
+	.description("${name}")
 	.version("0.1.0")
 	.parse(Deno.args)
 
-console.log(opts)
+const main = () => {
+	console.log(opts)
+}
+
+main()
 `
 
-const testFileContent = `import { tsushi } from "#lib/tsushi/mod.ts"
+const TEST_TEMPLATE = `import { assertEquals } from "#std/testing/asserts.ts"
 
-const t = tsushi()
+Deno.test("${name} should pass", () => assertEquals(true, true))
+`
 
-t.group("${name}", ({ test }) => {
-	test("should pass", ({ expect }) => expect().toPass())
-})`
-
-await Deno.mkdir(parentPath)
-await Deno.writeFile(filePath, encoder.encode(fileContent + "\n"))
-await Deno.writeFile(testFilePath, encoder.encode(testFileContent + "\n"))
+await generateFile(`${path}/mod.ts`, MOD_TEMPLATE)
+await generateFile(`${path}/mod.test.ts`, TEST_TEMPLATE)
 
 console.log(`${green("✓")} ${underline(name)} created!`)

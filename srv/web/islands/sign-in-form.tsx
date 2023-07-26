@@ -58,8 +58,6 @@ export default function SignInForm() {
 							}),
 							method: "POST",
 						}).then(res => res.json())
-
-						console.log(response)
 					}}
 				>
 					Sign in

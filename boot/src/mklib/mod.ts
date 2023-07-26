@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: Copyright 2023, Sergei Orlov and the Ordo.pink contributors
+// SPDX-FileCopyrightText: Copyright 2023, 谢尔盖||↓ and the Ordo.pink contributors
 // SPDX-License-Identifier: Unlicense
 
 import { join } from "#std/path/mod.ts"
@@ -38,19 +38,21 @@ const testPath = join(srcPath, "impl.test.ts")
 const modPath = join(parentPath, "mod.ts")
 const readmePath = join(parentPath, "readme.md")
 
-const implContent = `import type { ${pascalCase(codeName)} } from "./types.ts"
+const implContent = `// SPDX-FileCopyrightText: Copyright 2023, 谢尔盖||↓ and the Ordo.pink contributors
+// SPDX-License-Identifier: Unlicense
+
+import type { ${pascalCase(codeName)} } from "./types.ts"
 
 export const ${codeName}: ${pascalCase(codeName)} = "${codeName}"`
 
-const typesContent = `export type ${pascalCase(codeName)} = "${codeName}"`
+const typesContent = `// SPDX-FileCopyrightText: Copyright 2023, 谢尔盖||↓ and the Ordo.pink contributors
+// SPDX-License-Identifier: Unlicense
 
-const testContent = `import { tsushi } from "#lib/tsushi/mod.ts"
+export type ${pascalCase(codeName)} = "${codeName}"`
 
-const t = tsushi()
+const testContent = `import { assertEquals } from "#std/testing/asserts.ts"
 
-t.group("${name}", ({ test }) => {
-	test("should pass", ({ expect }) => expect().toPass())
-})`
+Deno.test("mock", () => assertEquals(true, true))`
 
 const modContent = `export * from "./src/impl.ts"
 export * as T from "./src/types.ts"`

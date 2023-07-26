@@ -1,7 +1,3 @@
-import { tsushi } from "#lib/tsushi/mod.ts"
+import { assertEquals } from "#std/testing/asserts.ts"
 
-const t = tsushi()
-
-t.group("test", ({ test }) => {
-	test("should pass", ({ expect }) => expect().toPass())
-})
+Deno.test("mock", () => assertEquals(true, true))

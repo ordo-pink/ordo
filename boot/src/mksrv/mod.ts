@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: Copyright 2023, Sergei Orlov and the Ordo.pink contributors
+// SPDX-FileCopyrightText: Copyright 2023, 谢尔盖||↓ and the Ordo.pink contributors
 // SPDX-License-Identifier: Unlicense
 
 import { join } from "#std/path/mod.ts"
@@ -40,23 +40,28 @@ const modPath = join(parentPath, "mod.ts")
 const binInitPath = join(binPath, "init.ts")
 const readmePath = join(parentPath, "readme.md")
 
-const implContent = `const main = () => {
+const implContent = `// SPDX-FileCopyrightText: Copyright 2023, 谢尔盖||↓ and the Ordo.pink contributors
+// SPDX-License-Identifier: MPL-2.0
+
+const main = () => {
 	console.log("Hello, world!")
 }
 
 await main()`
 
-const testContent = `import { tsushi } from "#lib/tsushi/mod.ts"
+const testContent = `import { assertEquals } from "#std/testing/asserts.ts"
 
-const t = tsushi()
+Deno.test("mock", () => assertEquals(true, true))`
 
-t.group("${name}", ({ test }) => {
-	test("should pass", ({ expect }) => expect().toPass())
-})`
+const modContent = `// SPDX-FileCopyrightText: Copyright 2023, 谢尔盖||↓ and the Ordo.pink contributors
+// SPDX-License-Identifier: MPL-2.0
 
-const modContent = `export * from "./src/impl.ts"`
+export * from "./src/impl.ts"`
 
-const binInitContent = `// Put first launch automation tasks here
+const binInitContent = `// SPDX-FileCopyrightText: Copyright 2023, 谢尔盖||↓ and the Ordo.pink contributors
+// SPDX-License-Identifier: Unlicense
+
+// Put first launch automation tasks here
 const main = async () => {
 	const encoder = new TextEncoder()
 

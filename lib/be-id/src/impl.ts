@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: Copyright 2023, Sergei Orlov and the Ordo.pink contributors
+// SPDX-FileCopyrightText: Copyright 2023, 谢尔盖||↓ and the Ordo.pink contributors
 // SPDX-License-Identifier: MPL-2.0
 
 import { ConsoleLogger, type T as LoggerTypes } from "#lib/logger/mod.ts"
@@ -100,9 +100,7 @@ export const createIDServer: CreateIDServerFn = async ({
 	// TODO: Redirect if cookies are present and valid
 	const app = new Application({
 		state: {
-			logger: {
-				log: console.log,
-			},
+			logger: ConsoleLogger,
 		},
 	})
 

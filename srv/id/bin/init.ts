@@ -1,10 +1,11 @@
-// SPDX-FileCopyrightText: Copyright 2023, Sergei Orlov and the Ordo.pink contributors
+// SPDX-FileCopyrightText: Copyright 2023, 谢尔盖||↓ and the Ordo.pink contributors
 // SPDX-License-Identifier: Unlicense
 
 import { join, resolve } from "#std/path/mod.ts"
 import { cyan, green } from "#std/fmt/colors.ts"
 import { encode } from "#std/encoding/base64.ts"
 import { getc } from "#lib/getc/mod.ts"
+import { getParentPath } from "#lib/fs/mod.ts"
 
 // TODO: write configuration updates to dotenvs
 
@@ -21,12 +22,6 @@ const {
 	"ID_REFRESH_TOKEN_PRIVATE_KEY_PATH",
 	"ID_REFRESH_TOKEN_PUBLIC_KEY_PATH",
 ])
-
-const getParentPath = (path: string) => {
-	const cleanPath = path.endsWith("/") ? path.slice(0, -1) : path
-
-	return join(...cleanPath.split("/").slice(0, -1))
-}
 
 const generateKeyPair = async (privatePath: string, publicPath: string) => {
 	const { privateKey, publicKey } = await crypto.subtle.generateKey(

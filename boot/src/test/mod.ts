@@ -1,18 +1,14 @@
 // SPDX-FileCopyrightText: Copyright 2023, 谢尔盖||↓ and the Ordo.pink contributors
-// SPDX-License-Identifier: Unlicense
+// SPDX-License-Identifier: MIT
 
 import { Command } from "#x/cliffy@v1.0.0-rc.2/command/command.ts"
-import { getDenoPath, runDenoCommand } from "#lib/binutil/mod.ts"
+import { test } from "./src/impl.ts"
 
-await new Command()
+const opts = await new Command()
 	.name("test")
 	.version("0.1.0")
-	.description(
-		`The "test" command runs tests found deeply nested in directories ` +
-			`provided as arguments. Using "bin/test ." will find and run all tests ` +
-			`in the repository.`
-	)
+	.description(`The "test" command runs tests found deeply nested in directories in the project.`)
+	.option("--coverage", "Enable collecting coverage")
 	.parse(Deno.args)
 
-const denoPath = getDenoPath()
-await runDenoCommand(denoPath, ["test", "--coverage=./var/coverage", "--parallel", Deno.cwd()])
+await test(opts.options.coverage).toPromise()

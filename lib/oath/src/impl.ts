@@ -1,32 +1,65 @@
 // SPDX-FileCopyrightText: Copyright 2023, 谢尔盖||↓ and the Ordo.pink contributors
-// SPDX-License-Identifier: Unlicense
+// SPDX-License-Identifier: MIT
 
 // deno-lint-ignore-file no-explicit-any
 
 import type { T as TAU } from "#lib/tau/mod.ts"
 
-import { keysOf } from "#lib/tau/mod.ts"
+import { keysOf, noop } from "#lib/tau/mod.ts"
+import { resolve } from "#std/path/win32.ts"
 
-/**
- * Recursively unwraps the "awaited type" of a type. Non-promise "thenables" should resolve to `never`. This emulates the behavior of `await`.
- */
 type UnderOath<T> = T extends object & {
-	// TODO: Add support for the second function (catch) type extraction
 	and(onfulfilled: infer F, ...args: infer _): any
-} // `await` only unwraps object types with a callable `then`. Non-object types are not unwrapped
-	? F extends (value: infer V, ...args: infer _) => any // if the argument to `then` is callable, extracts the first argument
-		? UnderOath<V> // recursively unwrap the value
-		: never // the argument to `then` was not callable
-	: Awaited<T> // non-object or non-thenable
+}
+	? F extends (value: infer V, ...args: infer _) => any
+		? UnderOath<V>
+		: never
+	: Awaited<T>
 
 export class Oath<TRight, TLeft = never> {
+	public static of<TRight, TLeft = never>(value: TRight): Oath<TRight, TLeft> {
+		return new Oath(resolve => {
+			resolve(value)
+		})
+	}
+
+	public static empty(): Oath<void, never> {
+		return new Oath(resolve => {
+			resolve()
+		})
+	}
+
 	public static resolve<TRight, TLeft = never>(value: TRight): Oath<TRight, TLeft> {
 		return new Oath(resolve => {
 			resolve(value)
 		})
 	}
 
-	public static try<TRight, TLeft = Error>(f: () => TRight): Oath<Awaited<TRight>, TLeft> {
+	public static reject<TLeft, TRight = never>(error?: TLeft): Oath<TRight, TLeft> {
+		return new Oath((_, reject) => {
+			reject(error)
+		})
+	}
+
+	public static from<TRight, TLeft = unknown>(thunk: () => Promise<TRight>): Oath<TRight, TLeft> {
+		return new Oath((resolve, reject) => {
+			thunk().then(resolve, reject)
+		})
+	}
+
+	public static fromNullable<T>(value?: TAU.Nullable<T>): Oath<NonNullable<T>, null> {
+		return value == null ? Oath.reject(null) : Oath.resolve(value)
+	}
+
+	public static fromBoolean<T, F = null>(
+		f: () => boolean,
+		onTrue: () => T,
+		onFalse: () => F = () => null as any
+	): Oath<T, F> {
+		return f() ? Oath.resolve(onTrue()) : Oath.reject(onFalse())
+	}
+
+	public static try<TRight, TLeft = unknown>(f: () => TRight): Oath<Awaited<TRight>, TLeft> {
 		return new Oath(async (resolve, reject) => {
 			try {
 				resolve(await f())
@@ -147,36 +180,6 @@ export class Oath<TRight, TLeft = never> {
 		}
 	}
 
-	public static of<TRight, TLeft = never>(value: TRight): Oath<TRight, TLeft> {
-		return new Oath(resolve => {
-			resolve(value)
-		})
-	}
-
-	public static from<TRight, TLeft = never>(thunk: () => Promise<TRight>): Oath<TRight, TLeft> {
-		return new Oath((resolve, reject) => {
-			thunk().then(resolve, reject)
-		})
-	}
-
-	public static fromNullable<T>(value?: TAU.Nullable<T>): Oath<NonNullable<T>, null> {
-		return value == null ? Oath.reject(null) : Oath.resolve(value)
-	}
-
-	public static fromBoolean<T, F = null>(
-		f: () => boolean,
-		onTrue: () => T,
-		onFalse: () => F = () => null as any
-	): Oath<T, F> {
-		return f() ? Oath.resolve(onTrue()) : Oath.reject(onFalse())
-	}
-
-	public static reject<TLeft, TRight = never>(error?: TLeft): Oath<TRight, TLeft> {
-		return new Oath((_, reject) => {
-			reject(error)
-		})
-	}
-
 	public constructor(
 		private resolver: (
 			resolve: <TNewRight>(value: TRight) => TNewRight,
@@ -193,6 +196,21 @@ export class Oath<TRight, TLeft = never> {
 			this.fork(
 				a => resolve(a),
 				b => reject(b)
+			)
+		)
+	}
+
+	public tap(f: (x: TRight) => any, g: (x: TLeft) => any = noop): Oath<TRight, TLeft> {
+		return new Oath<TRight, TLeft>((resolve, reject) =>
+			this.fork(
+				a => {
+					g(a)
+					return reject(a)
+				},
+				b => {
+					f(b)
+					return resolve(b)
+				}
 			)
 		)
 	}
@@ -272,7 +290,7 @@ export class Oath<TRight, TLeft = never> {
 		)
 	}
 
-	public catch<ThenRight, ThenLeft = never>(
+	public fix<ThenRight, ThenLeft = never>(
 		f: (x: TLeft) => PromiseLike<ThenRight> | Oath<ThenRight, ThenLeft> | ThenRight
 	): Oath<TRight | ThenRight, ThenLeft> {
 		return new Oath((resolve, reject) =>

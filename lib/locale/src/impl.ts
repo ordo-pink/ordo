@@ -1,5 +1,5 @@
 // SPDX-FileCopyrightText: Copyright 2023, 谢尔盖||↓ and the Ordo.pink contributors
-// SPDX-License-Identifier: Unlicense
+// SPDX-License-Identifier: MIT
 
 /**
  * A list of languages based on ISO 639-1 codes (two-letter codes).

@@ -1,2 +1,2 @@
 export { Either } from "./src/impl.ts"
-export * as T from "./src/types.ts"
+export * as TEither from "./src/types.ts"

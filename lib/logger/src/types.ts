@@ -1,5 +1,5 @@
 // SPDX-FileCopyrightText: Copyright 2023, 谢尔盖||↓ and the Ordo.pink contributors
-// SPDX-License-Identifier: Unlicense
+// SPDX-License-Identifier: MIT
 
 // deno-lint-ignore-file no-explicit-any
 
@@ -31,7 +31,7 @@ export type Logger = {
 	 * Setting verbose to true will only log the message if verbose mode is
 	 * enabled.
 	 */
-	critical: <T extends any[]>(...message: T) => void
+	crit: <T extends any[]>(...message: T) => void
 
 	/**
 	 * Severity Level 3: Error: error conditions.

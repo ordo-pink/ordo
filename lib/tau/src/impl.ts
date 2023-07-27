@@ -1,5 +1,5 @@
 // SPDX-FileCopyrightText: Copyright 2023, 谢尔盖||↓ and the Ordo.pink contributors
-// SPDX-License-Identifier: Unlicense
+// SPDX-License-Identifier: MIT
 
 // deno-lint-ignore-file no-explicit-any
 
@@ -15,10 +15,4 @@ export const keysOf: T._KeysOfFn = o => {
 	return Object.keys(o) as any
 }
 
-export const titleize: T._TitleizeFn = s => {
-	const chars = s.split("")
-
-	return chars[0]
-		.toLocaleUpperCase()
-		.concat(...chars.slice(1).map(char => char.toLocaleLowerCase())) as any
-}
+export const noop = () => {}

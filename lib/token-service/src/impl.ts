@@ -59,7 +59,7 @@ const verifyToken: T._VerifyToken = key =>
 	pipe(
 		getTokenPayload(key),
 		o => o.map(Boolean),
-		o => o.catch(F)
+		o => o.fix(F)
 	)
 
 const getAccessTokenPayload = getTokenPayload as T._GetTokenPayloadFn<T.AccessTokenPayload>

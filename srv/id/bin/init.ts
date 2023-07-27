@@ -1,11 +1,11 @@
 // SPDX-FileCopyrightText: Copyright 2023, 谢尔盖||↓ and the Ordo.pink contributors
-// SPDX-License-Identifier: Unlicense
+// SPDX-License-Identifier: MIT
 
-import { join, resolve } from "#std/path/mod.ts"
+import { resolve } from "#std/path/mod.ts"
 import { cyan, green } from "#std/fmt/colors.ts"
 import { encode } from "#std/encoding/base64.ts"
 import { getc } from "#lib/getc/mod.ts"
-import { getParentPath } from "#lib/fs/mod.ts"
+import { getParentPath, getAbsolutePath } from "#lib/fs/mod.ts"
 
 // TODO: write configuration updates to dotenvs
 
@@ -49,7 +49,7 @@ ${encode(exportedPublicKey)
 }
 
 const createRequiredDirectories = async () => {
-	const dbDirectoryPath = resolve(ID_KV_DB_PATH)
+	const dbDirectoryPath = getAbsolutePath(ID_KV_DB_PATH)
 	const dbDirectoryExists = await Deno.stat(dbDirectoryPath).catch(() => ({
 		isDirectory: false,
 	}))

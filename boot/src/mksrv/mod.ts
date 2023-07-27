@@ -1,5 +1,5 @@
 // SPDX-FileCopyrightText: Copyright 2023, 谢尔盖||↓ and the Ordo.pink contributors
-// SPDX-License-Identifier: Unlicense
+// SPDX-License-Identifier: MIT
 
 import { join } from "#std/path/mod.ts"
 import { titleCase } from "#x/case@2.1.1/mod.ts"
@@ -40,7 +40,9 @@ const modPath = join(parentPath, "mod.ts")
 const binInitPath = join(binPath, "init.ts")
 const readmePath = join(parentPath, "readme.md")
 
-const implContent = `// SPDX-FileCopyrightText: Copyright 2023, 谢尔盖||↓ and the Ordo.pink contributors
+const implContent = `// SPDX-FileCopyrightText: Copyright ${new Date(
+	Date.now()
+).getFullYear()}, 谢尔盖||↓ and the Ordo.pink contributors
 // SPDX-License-Identifier: MPL-2.0
 
 const main = () => {
@@ -53,13 +55,17 @@ const testContent = `import { assertEquals } from "#std/testing/asserts.ts"
 
 Deno.test("mock", () => assertEquals(true, true))`
 
-const modContent = `// SPDX-FileCopyrightText: Copyright 2023, 谢尔盖||↓ and the Ordo.pink contributors
+const modContent = `// SPDX-FileCopyrightText: Copyright ${new Date(
+	Date.now()
+).getFullYear()}, 谢尔盖||↓ and the Ordo.pink contributors
 // SPDX-License-Identifier: MPL-2.0
 
 export * from "./src/impl.ts"`
 
-const binInitContent = `// SPDX-FileCopyrightText: Copyright 2023, 谢尔盖||↓ and the Ordo.pink contributors
-// SPDX-License-Identifier: Unlicense
+const binInitContent = `// SPDX-FileCopyrightText: Copyright ${new Date(
+	Date.now()
+).getFullYear()}, 谢尔盖||↓ and the Ordo.pink contributors
+// SPDX-License-Identifier: MIT
 
 // Put first launch automation tasks here
 const main = async () => {

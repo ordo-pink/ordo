@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: Copyright 2023, 谢尔盖||↓ and the Ordo.pink contributors
 // SPDX-License-Identifier: MPL-2.0
 
-import type { T as TS } from "#lib/token-service/mod.ts"
+import type { TTokenService as TS } from "#lib/token-service/mod.ts"
 import type { T as TAU } from "#lib/tau/mod.ts"
 
 // PUBLIC -----------------------------------------------------------------------------------------

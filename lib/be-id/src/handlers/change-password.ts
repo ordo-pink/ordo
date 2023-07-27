@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: Copyright 2023, 谢尔盖||↓ and the Ordo.pink contributors
 // SPDX-License-Identifier: MPL-2.0
 
-import type { TokenService } from "#lib/token-service/mod.ts"
+import type { TTokenService } from "#lib/token-service/mod.ts"
 import type { UserService } from "#lib/user-service/mod.ts"
 import type { Middleware } from "#x/oak@v12.6.0/middleware.ts"
 
@@ -9,7 +9,7 @@ import { okpwd } from "#lib/okpwd/mod.ts"
 import { useBearerAuthorization, useBody } from "#lib/be-use/mod.ts"
 
 export type Body = { oldPassword?: string; newPassword?: string }
-export type Params = { tokenService: TokenService; userService: UserService }
+export type Params = { tokenService: TTokenService.TokenService; userService: UserService }
 export type Fn = (params: Params) => Middleware
 
 export const handleChangePassword: Fn =
@@ -52,7 +52,7 @@ export const handleChangePassword: Fn =
 			return ctx.throw(404, "User not found")
 		}
 
-		await tokenService.removeAllTokens(result.id)
+		await tokenService.removePersistedTokenDict(result.id).toPromise()
 
 		ctx.response.status = 204
 	}

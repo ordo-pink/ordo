@@ -4,9 +4,9 @@
 import { Command } from "#x/cliffy@v1.0.0-rc.2/command/mod.ts"
 import { run } from "./src/impl.ts"
 
-const opts = await new Command()
+await new Command()
 	.name("run")
-	.description("Starts all srvs at once.")
+	.description("Starts all srvs at once by running their bin/run.ts scripts.")
 	.version("0.1.0")
 	.parse(Deno.args)
 

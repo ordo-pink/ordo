@@ -2,10 +2,13 @@
 // SPDX-License-Identifier: MPL-2.0
 
 import { Context } from "#x/oak@v12.6.0/mod.ts"
-import { TokenService } from "#lib/token-service/mod.ts"
+import { TTokenService } from "#lib/token-service/mod.ts"
 
 // TODO: Rewrite with Oath
-export const useBearerAuthorization = async (ctx: Context, tokenService: TokenService) => {
+export const useBearerAuthorization = async (
+	ctx: Context,
+	tokenService: TTokenService.TokenService
+) => {
 	const authorization = ctx.request.headers.get("Authorization")
 
 	if (!authorization || !authorization.startsWith("Bearer ")) {
@@ -19,5 +22,5 @@ export const useBearerAuthorization = async (ctx: Context, tokenService: TokenSe
 		return ctx.throw(403, "Unverified or outdated access token")
 	}
 
-	return tokenService.decode(token) // TODO: types
+	return tokenService.decodeAccessToken(token).toPromise() // TODO: types
 }

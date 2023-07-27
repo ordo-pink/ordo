@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: Copyright 2023, 谢尔盖||↓ and the Ordo.pink contributors
 // SPDX-License-Identifier: MPL-2.0
 
-import type { T as TS } from "#lib/token-service/mod.ts"
+import type { TTokenService as TS } from "#lib/token-service/mod.ts"
 import type * as T from "./types.ts"
 
 import { keysOf } from "#lib/tau/mod.ts"
@@ -46,7 +46,7 @@ const getToken: T._GetTokenFn =
 const getTokenDict: T._GetTokenDictFn =
 	({ db, key }) =>
 	sub =>
-		Oath.try(() => db.get([key, sub]))
+		Oath.try(() => db.get([key, sub])).map(dict => dict.value)
 
 const removeToken: T._RemoveTokenFn =
 	({ db, key }) =>
@@ -73,4 +73,4 @@ const setToken: T._SetTokenFn =
 const setTokenDict: T._SetTokenDictFn =
 	({ db, key }) =>
 	(sub, map) =>
-		db.set([key, sub], map)
+		Oath.try(() => db.set([key, sub], map))

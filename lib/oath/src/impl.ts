@@ -41,7 +41,7 @@ export class Oath<TRight, TLeft = never> {
 		})
 	}
 
-	public static from<TRight, TLeft = unknown>(thunk: () => Promise<TRight>): Oath<TRight, TLeft> {
+	public static from<TRight, TLeft = never>(thunk: () => Promise<TRight>): Oath<TRight, TLeft> {
 		return new Oath((resolve, reject) => {
 			thunk().then(resolve, reject)
 		})
@@ -59,7 +59,7 @@ export class Oath<TRight, TLeft = never> {
 		return f() ? Oath.resolve(onTrue()) : Oath.reject(onFalse())
 	}
 
-	public static try<TRight, TLeft = unknown>(f: () => TRight): Oath<Awaited<TRight>, TLeft> {
+	public static try<TRight, TLeft = Error>(f: () => TRight): Oath<Awaited<TRight>, TLeft> {
 		return new Oath(async (resolve, reject) => {
 			try {
 				resolve(await f())

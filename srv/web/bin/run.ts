@@ -15,9 +15,9 @@ await Oath.all([
 	]),
 	runCommand("opt/tailwind", [
 		"-i",
-		"lib/css/main.css",
+		"./lib/css/main.css",
 		"-o",
-		"var/srv/web/main.css",
+		"./var/srv/web/main.css",
 		"--watch",
 		"-c",
 		"./tailwind.config.cjs",

@@ -346,7 +346,7 @@ export type TokenService = {
 
 // INTERNAL ---------------------------------------------------------------------------------------
 
-export type _CreateTokensParams = { sub: SUB; uip: UIP; prevJti: JTI; aud?: AUD }
+export type _CreateTokensParams = { sub: SUB; uip: UIP; prevJti?: JTI; aud?: AUD }
 export type _CreatedTokens = RefreshTokenPayload & { access: string; refresh: string }
 export type _Props = { adapter: Adapter; options: TokenServiceOptions }
 export type _Fn = (props: _Props) => TokenService

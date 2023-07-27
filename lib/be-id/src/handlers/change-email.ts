@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: MPL-2.0
 
 import type { Context, Middleware } from "#x/oak@v12.6.0/mod.ts"
-import type { AccessTokenParsed, TokenService } from "#lib/token-service/mod.ts"
+import type { TTokenService } from "#lib/token-service/mod.ts"
 import type { UserService } from "#lib/user-service/mod.ts"
 import type { User } from "#lib/user-service/mod.ts"
 
@@ -14,7 +14,7 @@ import { Oath } from "#lib/oath/mod.ts"
 // Public -----------------------------------------------------------------------------------------
 
 type Body = { email?: string }
-type Params = { tokenService: TokenService; userService: UserService }
+type Params = { tokenService: TTokenService.TokenService; userService: UserService }
 type Fn = (params: Params) => Middleware
 
 export const handleChangeEmail: Fn =
@@ -32,7 +32,7 @@ export const handleChangeEmail: Fn =
 
 // Validate input from Bearer token and body ------------------------------------------------------
 
-type Input = { token: AccessTokenParsed; body: Body }
+type Input = { token: TTokenService.AccessTokenParsed; body: Body }
 type ValidatedInput = { user: User; email: string }
 type ValidateInputFn = (service: UserService) => (input: Input) => Oath<ValidatedInput, THttpError>
 
@@ -58,7 +58,10 @@ type UpdateUserFn = (service: UserService) => (input: ValidatedInput) => Oath<Us
 const updateUser: UpdateUserFn =
 	userService =>
 	({ user, email }) =>
-		userService.update(user.id, { email })
+		userService
+			.update(user.id, { email })
+			.rejectedMap(console.error)
+			.rejectedMap(() => null)
 
 // Send updated user in response ------------------------------------------------------------------
 
@@ -105,7 +108,7 @@ const validateEmailIsNotTaken: ValidateEmailFn =
 			.getByEmail(email)
 			.chain(() => Oath.reject())
 			// TODO: Rewrite with userService.checkUserByEmail
-			.catch(userExists =>
+			.fix(userExists =>
 				Oath.fromBoolean(
 					() => !userExists,
 					() => "OK" as const,

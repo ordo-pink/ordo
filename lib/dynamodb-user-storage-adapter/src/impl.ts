@@ -36,13 +36,13 @@ const existsById: US.ExistsByIdMethod<T.Params> = params => id =>
 	adapter(params)
 		.getById(id)
 		.map(() => true)
-		.catch(() => false)
+		.fix(() => false)
 
 const existsByEmail: US.ExistsByEmailMethod<T.Params> = params => email =>
 	adapter(params)
 		.getByEmail(email)
 		.map(() => true)
-		.catch(() => false)
+		.fix(() => false)
 
 const create: US.CreateMethod<T.Params> =
 	({ db, table }) =>

@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: MPL-2.0
 
 import { ConsoleLogger, type T as LoggerTypes } from "#lib/logger/mod.ts"
-import type { T as TokenServiceTypes } from "#lib/token-service/mod.ts"
+import type { TTokenService as TokenServiceTypes } from "#lib/token-service/mod.ts"
 import { TokenService } from "#lib/token-service/mod.ts"
 
 import { type Adapter, UserService } from "#lib/user-service/mod.ts"

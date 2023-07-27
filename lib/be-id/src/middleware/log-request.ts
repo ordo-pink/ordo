@@ -21,7 +21,6 @@ export const logRequest: LogRequestFn = options => async (ctx, next) => {
 	const url = ctx.request.url.toString()
 	const method = cyan(ctx.request.method)
 	const responseStatus = ctx.response.status
-	const time = new Date(Date.now()).toISOString()
 	const responseTimeHeader = Number(ctx.response.headers.get("X-Response-Time"))
 
 	const status = Switch.of(responseStatus)
@@ -37,5 +36,5 @@ export const logRequest: LogRequestFn = options => async (ctx, next) => {
 		.case(lte(100), () => cyan(`${responseTimeHeader}ms`))
 		.default(() => green(`${responseTimeHeader}ms`))
 
-	ctx.app.state.logger.log(`[${time}]: ${ip} ${status} ${method} ${url} - ${rt}`)
+	ctx.app.state.logger.debug(`${ip} ${status} ${method} ${url} - ${rt}`)
 }

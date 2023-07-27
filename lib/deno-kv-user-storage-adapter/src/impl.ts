@@ -36,13 +36,15 @@ const create: US.CreateMethod<T.Params> =
 	user =>
 		Oath.try(() =>
 			db.atomic().set([idKey, user.id], user).set([emailKey, user.email], user).commit()
-		).chain(res =>
-			Oath.fromBoolean(
-				() => res.ok,
-				() => user,
-				() => new Error("User with given email already exists")
-			)
 		)
+			.tap(console.log)
+			.chain(res =>
+				Oath.fromBoolean(
+					() => res.ok,
+					() => user,
+					() => new Error("User with given email already exists")
+				)
+			)
 
 const update: US.UpdateMethod<T.Params> =
 	({ db, idKey, emailKey }) =>
@@ -96,10 +98,10 @@ const existsByEmail: US.ExistsByEmailMethod<T.Params> = params => email =>
 	adapter(params)
 		.getByEmail(email)
 		.map(() => true)
-		.catch(() => false)
+		.fix(() => false)
 
 const existsById: US.ExistsByIdMethod<T.Params> = params => id =>
 	adapter(params)
 		.getById(id)
 		.map(() => true)
-		.catch(() => false)
+		.fix(() => false)

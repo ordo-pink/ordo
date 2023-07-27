@@ -11,7 +11,7 @@ export const handleError: Middleware = async (ctx, next) => {
 			ctx.response.status = e.status
 			ctx.response.body = { error: e.message }
 		} else {
-			console.error(e)
+			ctx.app.state.logger.error(e)
 		}
 	}
 }

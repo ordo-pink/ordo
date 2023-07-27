@@ -9,7 +9,7 @@ export const useBody = async <T>(
 	ctx: Context,
 	type: BodyType = "json",
 	expect: "string" | "array" | "object" = "object"
-): Promise<T> => {
+) => {
 	const bodyContent = ctx.request.body({ type })
 
 	const body: T = await bodyContent.value

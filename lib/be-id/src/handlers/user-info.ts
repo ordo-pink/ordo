@@ -3,14 +3,14 @@
 
 import type { Context, RouterMiddleware } from "#x/oak@v12.6.0/mod.ts"
 import type { PublicUser, UserService } from "#lib/user-service/mod.ts"
-import type { TokenService } from "#lib/token-service/mod.ts"
+import type { TTokenService } from "#lib/token-service/mod.ts"
 
 import { ResponseError, THttpError, useBearerAuthorization } from "#lib/be-use/mod.ts"
 import { Oath } from "#lib/oath/mod.ts"
 
 // Public -----------------------------------------------------------------------------------------
 
-export type Params = { tokenService: TokenService; userService: UserService }
+export type Params = { tokenService: TTokenService.TokenService; userService: UserService }
 export type Fn = (params: Params) => RouterMiddleware<"/users/:email">
 
 export const handleUserInfo: Fn =

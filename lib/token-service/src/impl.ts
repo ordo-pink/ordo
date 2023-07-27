@@ -143,9 +143,13 @@ const createTokens: T._CreateTokensFn =
 					params.options.keys.refresh.private
 				),
 			}).chain(res =>
-				service(params)
-					.removePersistedToken(sub, prevJti)
-					.chain(() => service(params).setPersistedToken(sub, jti, res.refresh))
-					.map(() => res)
+				prevJti
+					? service(params)
+							.removePersistedToken(sub, prevJti)
+							.chain(() => service(params).setPersistedToken(sub, jti, res.refresh))
+							.map(() => res)
+					: Oath.empty()
+							.chain(() => service(params).setPersistedToken(sub, jti, res.refresh))
+							.map(() => res)
 			)
 		)

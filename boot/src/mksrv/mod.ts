@@ -6,6 +6,8 @@ import { titleCase } from "#x/case@2.1.1/mod.ts"
 import { Command } from "#x/cliffy@v1.0.0-rc.2/command/command.ts"
 import { bold, green, red, underline } from "#std/fmt/colors.ts"
 
+// TODO: Clean this up and add https://github.com/denoland/react18-with-deno?ysclid=lklrtvtvzo724165469
+
 // TODO: Add run scripts and run command
 
 const opts = await new Command()

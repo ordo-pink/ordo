@@ -6,10 +6,12 @@ import * as $0 from "./routes/[name].tsx";
 import * as $1 from "./routes/_404.tsx";
 import * as $2 from "./routes/_500.tsx";
 import * as $3 from "./routes/_app.tsx";
-import * as $4 from "./routes/forgot-password.tsx";
-import * as $5 from "./routes/index.tsx";
-import * as $6 from "./routes/sign-in.tsx";
-import * as $7 from "./routes/sign-up.tsx";
+import * as $4 from "./routes/_middleware.ts";
+import * as $5 from "./routes/forgot-password.tsx";
+import * as $6 from "./routes/index.tsx";
+import * as $7 from "./routes/sign-in.tsx";
+import * as $8 from "./routes/sign-out.tsx";
+import * as $9 from "./routes/sign-up.tsx";
 import * as $$0 from "./islands/sign-in-form.tsx";
 import * as $$1 from "./islands/sign-up-form.tsx";
 
@@ -19,10 +21,12 @@ const manifest = {
     "./routes/_404.tsx": $1,
     "./routes/_500.tsx": $2,
     "./routes/_app.tsx": $3,
-    "./routes/forgot-password.tsx": $4,
-    "./routes/index.tsx": $5,
-    "./routes/sign-in.tsx": $6,
-    "./routes/sign-up.tsx": $7,
+    "./routes/_middleware.ts": $4,
+    "./routes/forgot-password.tsx": $5,
+    "./routes/index.tsx": $6,
+    "./routes/sign-in.tsx": $7,
+    "./routes/sign-out.tsx": $8,
+    "./routes/sign-up.tsx": $9,
   },
   islands: {
     "./islands/sign-in-form.tsx": $$0,

@@ -107,7 +107,7 @@ export const createIDServer: CreateIDServerFn = async ({
 	app.use(logRequest({ color: true }))
 	app.use(setResponseTimeHeader)
 	app.use(handleError)
-	app.use(oakCors({ origin }))
+	app.use(oakCors({ origin, credentials: true }))
 	app.use(router.routes())
 	app.use(router.allowedMethods())
 

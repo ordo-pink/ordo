@@ -6,7 +6,6 @@
 import type { T as TAU } from "#lib/tau/mod.ts"
 
 import { keysOf, noop } from "#lib/tau/mod.ts"
-import { resolve } from "#std/path/win32.ts"
 
 type UnderOath<T> = T extends object & {
 	and(onfulfilled: infer F, ...args: infer _): any

@@ -3,6 +3,7 @@ import { Button } from "../components/button.tsx"
 import { Callout } from "../components/callout.tsx"
 import { EmailInput, PasswordInput } from "../components/input.tsx"
 import { useEffect, useState } from "preact/hooks"
+import { signIn } from "../streams/auth.ts"
 
 export default function SignInForm() {
 	const [emailErrors, setEmailErrors] = useState<string[]>([])
@@ -13,8 +14,7 @@ export default function SignInForm() {
 	const password = useSignal<string>("")
 
 	const bannerOpacity = errors.value.length > 0 ? "opacity-100" : "opacity-0"
-	const isButtonDisabled =
-		!Boolean(email.value) || !Boolean(password.value) || errors.value.length > 0
+	const isButtonDisabled = !email.value || !password.value || errors.value.length > 0
 
 	useEffect(() => {
 		errors.value = emailErrors.concat(passwordErrors)
@@ -51,13 +51,17 @@ export default function SignInForm() {
 
 						if (isButtonDisabled) return
 
-						const response = await fetch("http://localhost:3001/sign-in", {
+						await fetch("http://localhost:3001/sign-in", {
+							credentials: "include",
 							body: JSON.stringify({
 								email: email.value,
 								password: password.value,
 							}),
 							method: "POST",
-						}).then(res => res.json())
+						})
+							.then(res => res.json())
+							.then(signIn)
+							.then(() => window.location.replace("/~/"))
 					}}
 				>
 					Sign in

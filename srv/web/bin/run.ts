@@ -11,6 +11,7 @@ await Oath.all([
 		"--allow-write",
 		"--allow-run",
 		"--unstable",
+		"--watch=srv/web/components,srv/web/islands,srv/web/routes/,var/srv/web/",
 		"srv/web/dev.ts",
 	]),
 	runCommand("opt/tailwind", [

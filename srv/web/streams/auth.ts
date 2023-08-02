@@ -1,18 +1,20 @@
+import type { T as TAU } from "#lib/tau/mod.ts"
 import { BehaviorSubject } from "#x/rxjs@v1.0.2/mod.ts"
-import { Nullable } from "#lib/tau/mod.ts"
 
-export type TokenPair = {
+// TODO: Reuse types
+export type TokenInfo = {
 	accessToken: string
-	refreshToken: string
+	jti: string
+	sub: string
 }
 
-const auth$ = new BehaviorSubject<Nullable<TokenPair>>(null)
+const auth$ = new BehaviorSubject<TAU.Nullable<TokenInfo>>(null)
 
-export const signIn = (pair: TokenPair) => {
-	auth$.next(pair)
+export const signIn = (info: TokenInfo) => {
+	auth$.next(info)
 }
 
-export const signOut = (pair: TokenPair) => {
+export const signOut = () => {
 	auth$.next(null)
 }
 

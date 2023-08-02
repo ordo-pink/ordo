@@ -1,6 +1,8 @@
 // SPDX-FileCopyrightText: Copyright 2023, 谢尔盖||↓ and the Ordo.pink contributors
 // SPDX-License-Identifier: MIT
 
+// deno-lint-ignore-file no-explicit-any
+
 import { join } from "#std/path/mod.ts"
 import { Oath } from "#lib/oath/mod.ts"
 import { F, noop, prop } from "#lib/tau/mod.ts"

@@ -8,20 +8,20 @@ import { isFunction } from "#lib/tau/mod.ts"
 
 // PUBLIC -----------------------------------------------------------------------------------------
 
-export const Switch: T.SwitchStatic = {
+export const Switch: T.TSwitchStatic = {
 	of: x => swich(x),
 }
 
 const swichMatched = <TContext, TResult extends unknown[] = []>(
 	x: TContext
-): T.Switch<TContext, TResult> => ({
+): T.TSwitch<TContext, TResult> => ({
 	case: () => swichMatched(x),
 	default: () => (x as any)(),
 })
 
 const swich = <TContext, TResult extends unknown[] = []>(
 	x: TContext
-): T.Switch<TContext, TResult> => ({
+): T.TSwitch<TContext, TResult> => ({
 	case: (predicate, onTrue) => {
 		const isTrue = isFunction(predicate) ? predicate(x) : predicate === x
 

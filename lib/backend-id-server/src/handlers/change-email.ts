@@ -2,19 +2,19 @@
 // SPDX-License-Identifier: MPL-2.0
 
 import type { Context, Middleware } from "#x/oak@v12.6.0/mod.ts"
-import type { TTokenService } from "#lib/token-service/mod.ts"
+import type { AccessTokenParsed, TTokenService } from "#lib/token-service/mod.ts"
 import type { UserService } from "#lib/user-service/mod.ts"
 import type { User } from "#lib/user-service/mod.ts"
 
 import { isEmail } from "#x/deno_validator@v0.0.5/mod.ts"
-import { THttpError, useBearerAuthorization, useBody } from "#lib/be-use/mod.ts"
-import { ResponseError } from "#lib/be-use/mod.ts"
+import { HttpError, useBearerAuthorization, useBody } from "#lib/backend-utils/mod.ts"
+import { ResponseError } from "#lib/backend-utils/mod.ts"
 import { Oath } from "#lib/oath/mod.ts"
 
 // Public -----------------------------------------------------------------------------------------
 
 type Body = { email?: string }
-type Params = { tokenService: TTokenService.TokenService; userService: UserService }
+type Params = { tokenService: TTokenService; userService: UserService }
 type Fn = (params: Params) => Middleware
 
 export const handleChangeEmail: Fn =
@@ -32,9 +32,9 @@ export const handleChangeEmail: Fn =
 
 // Validate input from Bearer token and body ------------------------------------------------------
 
-type Input = { token: TTokenService.AccessTokenParsed; body: Body }
+type Input = { token: AccessTokenParsed; body: Body }
 type ValidatedInput = { user: User; email: string }
-type ValidateInputFn = (service: UserService) => (input: Input) => Oath<ValidatedInput, THttpError>
+type ValidateInputFn = (service: UserService) => (input: Input) => Oath<ValidatedInput, HttpError>
 
 const validateInput: ValidateInputFn =
 	userService =>
@@ -72,7 +72,7 @@ const sendUser: SendUserFn = ctx => user => {
 }
 
 type ValidateEmailFnParams = { user: User; userService: UserService }
-type ValidateEmailFn = (params: ValidateEmailFnParams) => (email: string) => Oath<"OK", THttpError>
+type ValidateEmailFn = (params: ValidateEmailFnParams) => (email: string) => Oath<"OK", HttpError>
 
 const validateEmail: ValidateEmailFn =
 	({ user, userService }) =>

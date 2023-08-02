@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: Copyright 2023, 谢尔盖||↓ and the Ordo.pink contributors
 // SPDX-License-Identifier: MIT
 
-import type { TBinutil } from "#lib/binutil/mod.ts"
+import type { License } from "#lib/binutil/mod.ts"
 
 import { join } from "#std/path/mod.ts"
 import { Oath } from "#lib/oath/mod.ts"
@@ -32,7 +32,7 @@ export const createRepositoryFile = (path: string, content: string) =>
 
 export const COPYRIGHT_OWNERS = `谢尔盖||↓ and the Ordo.pink contributors`
 
-export const getSPDXRecord = (license: TBinutil.License) => {
+export const getSPDXRecord = (license: License) => {
 	const year = getCurrentYear()
 
 	return `// SPDX-FileCopyrightText: Copyright ${year}, ${COPYRIGHT_OWNERS}
@@ -48,7 +48,7 @@ ${
 }`
 }
 
-export const getLicense = (license: TBinutil.License) =>
+export const getLicense = (license: License) =>
 	license === "MIT" ? getMitLicense() : getMplLicense()
 
 const getMitLicense = () => {

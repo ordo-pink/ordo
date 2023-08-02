@@ -1,11 +1,12 @@
 // SPDX-FileCopyrightText: Copyright 2023, 谢尔盖||↓ and the Ordo.pink contributors
 // SPDX-License-Identifier: MPL-2.0
 
-import { Context } from "#x/oak@v12.6.0/mod.ts"
+// deno-lint-ignore-file no-explicit-any
 
-export type THttpError = readonly [number, string]
+import type { Context } from "#x/oak@v12.6.0/mod.ts"
+import type * as T from "./types.ts"
 
-export const sendError = (ctx: Context) => (err: THttpError | unknown) => {
+export const sendError = (ctx: Context) => (err: T.HttpError | unknown) => {
 	if (
 		Array.isArray(err) &&
 		err.length === 2 &&

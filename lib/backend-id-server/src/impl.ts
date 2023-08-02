@@ -1,11 +1,10 @@
 // SPDX-FileCopyrightText: Copyright 2023, 谢尔盖||↓ and the Ordo.pink contributors
 // SPDX-License-Identifier: MPL-2.0
 
-import { ConsoleLogger, type T as LoggerTypes } from "#lib/logger/mod.ts"
-import type { TTokenService as TokenServiceTypes } from "#lib/token-service/mod.ts"
-import { TokenService } from "#lib/token-service/mod.ts"
+import { ConsoleLogger, Logger } from "#lib/logger/mod.ts"
+import { CryptoKeyPair, TokenRepository, TokenService } from "#lib/token-service/mod.ts"
 
-import { type Adapter, UserService } from "#lib/user-service/mod.ts"
+import { type UserRepository, UserService } from "#lib/user-service/mod.ts"
 import { Application, Router } from "#x/oak@v12.6.0/mod.ts"
 import { oakCors } from "#x/cors@v1.2.2/oakCors.ts"
 import { handleAccount } from "./handlers/account.ts"
@@ -23,16 +22,16 @@ import { setResponseTimeHeader } from "./middleware/response-time.ts"
 // TODO: Extract errors to enum
 // TODO: Audit
 export type CreateIDServerFnParams = {
-	userStorageAdapter: Adapter
-	tokenStorageAdapter: TokenServiceTypes.Adapter
+	userStorageAdapter: UserRepository
+	tokenStorageAdapter: TokenRepository
 	accessTokenExpireIn: number
 	refreshTokenExpireIn: number
 	saltRounds: number
 	origin: string
 	alg: "ES384" // TODO: Add support for switching to RSA
-	accessKeys: TokenServiceTypes.CryptoKeyPair
-	refreshKeys: TokenServiceTypes.CryptoKeyPair
-	logger?: LoggerTypes.Logger
+	accessKeys: CryptoKeyPair
+	refreshKeys: CryptoKeyPair
+	logger?: Logger
 }
 
 export type CreateIDServerFn = (params: CreateIDServerFnParams) => Promise<Application>

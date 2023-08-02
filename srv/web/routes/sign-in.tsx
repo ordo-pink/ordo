@@ -9,13 +9,15 @@ export default function SignInPage() {
 			centerX
 			centerY
 		>
-			<section class="w-full px-4 mx-auto text-center">
-				<PageHeader>Sign in</PageHeader>
-			</section>
+			<div class="w-full max-w-sm">
+				<section class="w-full px-4 mx-auto text-center">
+					<PageHeader>Sign in</PageHeader>
+				</section>
 
-			<section class="w-full px-4 py-8 mx-auto">
-				<SignInForm />
-			</section>
+				<section class="w-full px-4 py-8 mx-auto">
+					<SignInForm />
+				</section>
+			</div>
 		</CenteredPage>
 	)
 }

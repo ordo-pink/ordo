@@ -1,11 +1,11 @@
-import type { TTau } from "#lib/tau/mod.ts"
-import type { TBeID } from "#lib/be-id/mod.ts"
+import type { Nullable } from "#lib/tau/mod.ts"
+import type { AuthResponse } from "#lib/backend-id-server/mod.ts"
 
 import { BehaviorSubject } from "#x/rxjs@v1.0.2/mod.ts"
 
-const auth$ = new BehaviorSubject<TTau.Nullable<TBeID.AuthResponse>>(null)
+const auth$ = new BehaviorSubject<Nullable<AuthResponse>>(null)
 
-export const signIn = (info: TBeID.AuthResponse) => {
+export const signIn = (info: AuthResponse) => {
 	auth$.next(info)
 }
 

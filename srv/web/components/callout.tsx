@@ -24,9 +24,7 @@ export const Callout = ({ type, children }: RenderableProps<Props>) => {
 		})
 		.case("warn", () => {
 			background = "bg-amber-100 dark:bg-amber-800"
-			Icon = () => (
-				<BsExclamationCircle class="shrink-0 text-amber-500 text-xl" />
-			)
+			Icon = () => <BsExclamationCircle class="shrink-0 text-amber-500 text-xl" />
 		})
 		.case("success", () => {
 			background = "bg-emerald-100 dark:bg-emerald-800"

@@ -1,5 +1,5 @@
 import { getDenoPath, runDenoCommand } from "#lib/binutil/mod.ts"
-import { identity } from "#lib/tau/mod.ts"
+import { identity } from "#ramda"
 
 await runDenoCommand(getDenoPath(), [
 	"run",

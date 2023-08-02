@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 import { Command } from "#x/cliffy@v1.0.0-rc.2/command/mod.ts"
-import { identity } from "#lib/tau/mod.ts"
+import { identity } from "#lib/ramda/mod.ts"
 import { init } from "./src/impl.ts"
 import { ConsoleLogger } from "#lib/logger/mod.ts"
 

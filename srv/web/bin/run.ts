@@ -1,5 +1,5 @@
 import { getDenoPath, runCommand, runDenoCommand } from "#lib/binutil/mod.ts"
-import { identity } from "#lib/tau/mod.ts"
+import { identity } from "#ramda"
 import { Oath } from "#lib/oath/mod.ts"
 
 await Oath.all([

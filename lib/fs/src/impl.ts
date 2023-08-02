@@ -5,7 +5,8 @@
 
 import { join } from "#std/path/mod.ts"
 import { Oath } from "#lib/oath/mod.ts"
-import { F, noop, prop } from "#lib/tau/mod.ts"
+import { F, prop } from "#ramda"
+import { noop } from "#lib/tau/mod.ts"
 
 export const oathify =
 	<Args extends any[], Result extends Promise<any>>(f: (...args: Args) => Result) =>

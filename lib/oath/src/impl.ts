@@ -3,9 +3,7 @@
 
 // deno-lint-ignore-file no-explicit-any
 
-import type { TTau as TAU } from "#lib/tau/mod.ts"
-
-import { keysOf, noop } from "#lib/tau/mod.ts"
+import { Nullable, keysOf, noop } from "#lib/tau/mod.ts"
 
 type UnderOath<T> = T extends object & {
 	and(onfulfilled: infer F, ...args: infer _): any
@@ -46,7 +44,7 @@ export class Oath<TRight, TLeft = never> {
 		})
 	}
 
-	public static fromNullable<T>(value?: TAU.Nullable<T>): Oath<NonNullable<T>, null> {
+	public static fromNullable<T>(value?: Nullable<T>): Oath<NonNullable<T>, null> {
 		return value == null ? Oath.reject(null) : Oath.resolve(value)
 	}
 

@@ -6,13 +6,13 @@ import type {
 	GetItemOutput,
 	UpdateItemInput,
 } from "#x/aws_api@v0.8.1/services/dynamodb/mod.ts"
-import type { InternalUser, Adapter } from "#lib/user-service/mod.ts"
-import type { T as TAU } from "#lib/tau/mod.ts"
+import type { Unary } from "#lib/tau/mod.ts"
+import type { InternalUser, UserRepository } from "#lib/user-service/mod.ts"
 
 // PUBLIC -----------------------------------------------------------------------------------------
 
 export type Params = { db: DynamoDB; table: string }
-export type Fn = (params: Params) => Adapter
+export type Fn = (params: Params) => UserRepository
 export type Config = {
 	region: string
 	endpoint: string
@@ -23,8 +23,8 @@ export type Config = {
 
 // INTERNAL ---------------------------------------------------------------------------------------
 
-export type _SerializeFn = TAU.Unary<NonNullable<GetItemOutput["Item"]>, InternalUser>
-export type _ReduceUserToAttributeUpdatesFn = TAU.Unary<
+export type _SerializeFn = Unary<NonNullable<GetItemOutput["Item"]>, InternalUser>
+export type _ReduceUserToAttributeUpdatesFn = Unary<
 	Partial<InternalUser>,
 	NonNullable<UpdateItemInput["AttributeUpdates"]>
 >

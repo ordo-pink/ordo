@@ -1,19 +1,21 @@
 // SPDX-FileCopyrightText: Copyright 2023, 谢尔盖||↓ and the Ordo.pink contributors
 // SPDX-License-Identifier: MIT
 
-import type { TTau as TAU } from "#lib/tau/mod.ts"
+import type { ValidatorFn, Unpack } from "#lib/tau/mod.ts"
 
 /**
  * Helper object that contains a pointing interface to put value
  * into Switch.
  */
-export type SwitchStatic = {
+export type TSwitchStatic = {
 	/**
 	 * A pointing interface to put the value into Switch.
 	 *
 	 * @example `Switch.of(myVariableWithIDontKnowWhichThingInside)`
 	 */
-	of: <TResult extends unknown[] = [], TContext = unknown>(x: TContext) => Switch<TContext, TResult>
+	of: <TResult extends unknown[] = [], TContext = unknown>(
+		x: TContext
+	) => TSwitch<TContext, TResult>
 }
 
 /**
@@ -28,7 +30,7 @@ export type SwitchStatic = {
  * Switch to fold and give you back the value, you have to end the case chain
  * with the `.default` call.
  */
-export type Switch<TContext, TResult extends unknown[]> = {
+export type TSwitch<TContext, TResult extends unknown[]> = {
 	/**
 	 * Define cases like you would normally do with a switch statement, or use
 	 * predicate functions to validate the value held inside Switch.
@@ -41,7 +43,7 @@ export type Switch<TContext, TResult extends unknown[]> = {
 		 * A value to compare with, or a validator function that accepts the value
 		 * held inside Switch and returns a boolean.
 		 */
-		predicate: TContext | TAU.ValidatorFn<TContext>,
+		predicate: TContext | ValidatorFn<TContext>,
 
 		/**
 		 * A thunk containing the value the Switch is to return when you fold the
@@ -50,7 +52,7 @@ export type Switch<TContext, TResult extends unknown[]> = {
 		 * match, the `.default` argument thunk will be called.
 		 */
 		onTrue: () => TNewResult
-	) => Switch<TContext, [TAU.Unpack<TResult>, TNewResult]>
+	) => TSwitch<TContext, [Unpack<TResult>, TNewResult]>
 
 	/**
 	 * Folds the Switch and returns a value that was defined in the matched
@@ -59,7 +61,5 @@ export type Switch<TContext, TResult extends unknown[]> = {
 	 *
 	 * @example `Switch.of(myBoolean).case(true, () => "oh, thanks!").default(() => "You WHAT?")`
 	 */
-	default: <TDefaultResult>(
-		onAllFalse: () => TDefaultResult
-	) => TAU.Unpack<TResult> | TDefaultResult
+	default: <TDefaultResult>(onAllFalse: () => TDefaultResult) => Unpack<TResult> | TDefaultResult
 }

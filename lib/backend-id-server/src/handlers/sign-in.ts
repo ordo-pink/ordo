@@ -2,18 +2,18 @@
 // SPDX-License-Identifier: MPL-2.0
 
 import type { Context, Middleware } from "#x/oak@v12.6.0/mod.ts"
-import type { TTokenService } from "#lib/token-service/mod.ts"
+import type { EXP, TTokenService } from "#lib/token-service/mod.ts"
 import type { UserService } from "#lib/user-service/mod.ts"
 
-import { ResponseError } from "#lib/be-use/mod.ts"
-import { useBody } from "#lib/be-use/mod.ts"
+import { ResponseError } from "#lib/backend-utils/mod.ts"
+import { useBody } from "#lib/backend-utils/mod.ts"
 import { Oath } from "#lib/oath/mod.ts"
-import { prop } from "#lib/tau/mod.ts"
+import { prop } from "#ramda"
 
 // Public -----------------------------------------------------------------------------------------
 
 type Body = { email?: string; password?: string }
-type Params = { userService: UserService; tokenService: TTokenService.TokenService }
+type Params = { userService: UserService; tokenService: TTokenService }
 type Fn = (params: Params) => Middleware
 
 export const handleSignIn: Fn =
@@ -48,12 +48,7 @@ export const handleSignIn: Fn =
 
 // Internal ---------------------------------------------------------------------------------------
 
-const setSignInCookie = (
-	name: "sub" | "jti",
-	value: string,
-	exp: TTokenService.EXP,
-	ctx: Context
-) =>
+const setSignInCookie = (name: "sub" | "jti", value: string, exp: EXP, ctx: Context) =>
 	ctx.cookies.set(name, value, {
 		httpOnly: true,
 		sameSite: "lax",

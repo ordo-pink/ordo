@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: Copyright 2023, 谢尔盖||↓ and the Ordo.pink contributors
 // SPDX-License-Identifier: MIT
 
-import type { TBinutil } from "#lib/binutil/mod.ts"
+import type { License } from "#lib/binutil/mod.ts"
 
 import { Command } from "#x/cliffy@v1.0.0-rc.2/command/mod.ts"
 import { green, red, underline } from "#std/fmt/colors.ts"
@@ -31,7 +31,7 @@ const opts = await new Command()
 const name = opts.args[0].toLocaleLowerCase()
 const license = opts.options.license
 
-await main(name, license as TBinutil.License).fork(
+await main(name, license as License).fork(
 	() => ConsoleLogger.error(`${red("✗")} Bin "${name}" already exists.`),
 	() => ConsoleLogger.notice(`${green("✓")} ${underline(name)} created!`)
 )

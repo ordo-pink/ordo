@@ -1,13 +1,13 @@
 // SPDX-FileCopyrightText: Copyright 2023, 谢尔盖||↓ and the Ordo.pink contributors
 // SPDX-License-Identifier: MPL-2.0
 
-import type { TTokenService } from "#lib/token-service/mod.ts"
+import type { TTokenService, TokenRecord } from "#lib/token-service/mod.ts"
 import type { Middleware } from "#x/oak@v12.6.0/middleware.ts"
 import type { UserService } from "#lib/user-service/mod.ts"
 
-import { useBearerAuthorization } from "#lib/be-use/mod.ts"
+import { useBearerAuthorization } from "#lib/backend-utils/mod.ts"
 
-type Params = { userService: UserService; tokenService: TTokenService.TokenService }
+type Params = { userService: UserService; tokenService: TTokenService }
 type Fn = (params: Params) => Middleware
 
 export const handleSignOut: Fn =
@@ -17,8 +17,8 @@ export const handleSignOut: Fn =
 		const { sub, jti } = payload
 
 		const tokenMap = await tokenService
-			.getPersistedTokenDict(sub)
-			.fix(() => ({} as TTokenService.TokenDict))
+			.getPersistedTokens(sub)
+			.fix(() => ({} as TokenRecord))
 			.toPromise()
 
 		if (!tokenMap || !tokenMap[jti]) {

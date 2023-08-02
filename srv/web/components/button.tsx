@@ -6,11 +6,7 @@ type Props = {
 	disabled?: boolean
 }
 
-export const Button = ({
-	children,
-	disabled,
-	onClick,
-}: RenderableProps<Props>) => {
+export const Button = ({ children, disabled, onClick }: RenderableProps<Props>) => {
 	return (
 		<button
 			disabled={disabled}

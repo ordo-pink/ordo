@@ -2,6 +2,7 @@
 	"imports": {
 		"#std/": "https://deno.land/std@0.193.0/",
 		"#x/": "https://deno.land/x/",
+		"#ramda": "./lib/ramda/mod.ts",
 		"#lib/": "./lib/",
 		"#etc/": "./etc/",
 		"#usr/": "./usr/",

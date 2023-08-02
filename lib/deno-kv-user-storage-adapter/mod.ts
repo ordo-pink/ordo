@@ -2,4 +2,4 @@
 // SPDX-License-Identifier: MPL-2.0
 
 export * from "./src/impl.ts"
-export * as TDEnoKvUserStorageAdapter from "./src/types.ts"
+export * from "./src/types.ts"

@@ -2,4 +2,4 @@
 // SPDX-License-Identifier: MIT
 
 export * from "./src/impl.ts"
-export * as T from "./src/types.ts"
+export * from "./src/types.ts"

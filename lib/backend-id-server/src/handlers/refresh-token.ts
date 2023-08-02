@@ -5,7 +5,7 @@ import type { UserService } from "#lib/user-service/mod.ts"
 import type { TTokenService } from "#lib/token-service/mod.ts"
 import type { Middleware } from "#x/oak@v12.6.0/middleware.ts"
 
-export type Params = { userService: UserService; tokenService: TTokenService.TokenService }
+export type Params = { userService: UserService; tokenService: TTokenService }
 export type Fn = (params: Params) => Middleware
 
 export const handleRefreshToken: Fn =

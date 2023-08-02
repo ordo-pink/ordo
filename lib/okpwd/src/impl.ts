@@ -4,7 +4,7 @@
 import type * as T from "./types.ts"
 
 import { Either } from "#lib/either/mod.ts"
-import { identity } from "#lib/tau/mod.ts"
+import { identity } from "#ramda"
 
 export const okpwd: T.Fn = options => password => {
 	const o = (options ? options : {}) as Required<T.Options>

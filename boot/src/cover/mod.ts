@@ -2,8 +2,8 @@
 // SPDX-License-Identifier: MIT
 
 import { Command } from "#x/cliffy@v1.0.0-rc.2/command/mod.ts"
-import { identity } from "#lib/tau/mod.ts"
-import { main } from "./src/impl.ts"
+import { identity } from "#ramda"
+import { cover } from "./src/impl.ts"
 import { ConsoleLogger } from "#lib/logger/mod.ts"
 
 const opts = await new Command()
@@ -17,7 +17,7 @@ const opts = await new Command()
 	.option("--no-lcov", "Disable generating LCOV report.")
 	.parse(Deno.args)
 
-await main(opts.options).fork(identity, () =>
+await cover(opts.options).fork(identity, () =>
 	ConsoleLogger.notice(
 		`🎉 Done! To generate an HTML version of the report, run ` +
 			`"genhtml -o var/coverage/profile/html var/coverage/profile.lcov". ` +

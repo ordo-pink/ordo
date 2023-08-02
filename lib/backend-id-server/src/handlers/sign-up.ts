@@ -7,7 +7,7 @@ import type { UserService } from "#lib/user-service/mod.ts"
 
 import { isEmail } from "#x/deno_validator@v0.0.5/mod.ts"
 import { okpwd } from "#lib/okpwd/mod.ts"
-import { useBody } from "#lib/be-use/mod.ts"
+import { useBody } from "#lib/backend-utils/mod.ts"
 
 type Body = { email?: string; password?: string }
 type Params = { userService: UserService; tokenService: TTokenService.TokenService }

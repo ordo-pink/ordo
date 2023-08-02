@@ -7,16 +7,16 @@ export type UserServiceOptions = {
 }
 
 export class UserService {
-	#driver: T.Adapter
+	#driver: T.UserRepository
 	#salt: string
 
-	public static async of(driver: T.Adapter, options: UserServiceOptions) {
+	public static async of(driver: T.UserRepository, options: UserServiceOptions) {
 		const salt = await genSalt(options.saltRounds)
 
 		return new UserService(driver, salt)
 	}
 
-	protected constructor(driver: T.Adapter, salt: string) {
+	protected constructor(driver: T.UserRepository, salt: string) {
 		this.#driver = driver
 		this.#salt = salt
 	}

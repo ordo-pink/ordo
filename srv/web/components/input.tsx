@@ -1,3 +1,5 @@
+// deno-lint-ignore-file no-explicit-any
+
 import { useSignal } from "@preact/signals"
 import { JSX } from "preact"
 import { Either, TEither } from "#lib/either/mod.ts"
@@ -16,11 +18,11 @@ type InputProps = {
 }
 
 type EmailInputProps = Partial<InputProps> & {
-	onChange?: (ev: TEither.Either<string, string[]>) => any
+	onChange?: (ev: TEither<string, string[]>) => any
 }
 
 type PasswordInputProps = Partial<InputProps> & {
-	onChange?: (ev: TEither.Either<string, string[]>) => any
+	onChange?: (ev: TEither<string, string[]>) => any
 }
 
 export const TextInput = ({

@@ -19,8 +19,7 @@ export default function SignUpForm() {
 	const repeatPassword = useSignal("")
 
 	const bannerOpacity = errors.value.length > 0 ? "opacity-100" : "opacity-0"
-	const isButtonDisabled =
-		!Boolean(email.value) || !Boolean(password.value) || errors.value.length > 0
+	const isButtonDisabled = !email.value || !password.value || errors.value.length > 0
 
 	useEffect(() => {
 		errors.value = emailErrors.concat(passwordErrors)
@@ -66,9 +65,7 @@ export default function SignUpForm() {
 							e.fold(setPasswordErrors, v => {
 								repeatPassword.value = v
 								setPasswordErrors(
-									password.value && password.value !== v
-										? ["Passwords must match."]
-										: []
+									password.value && password.value !== v ? ["Passwords must match."] : []
 								)
 							})
 						}
@@ -103,8 +100,6 @@ export default function SignUpForm() {
 
 			<div class="flex space-x-2">
 				<a href="/sign-in">Already a member?</a>
-				<div>|</div>
-				<a href="/forgot-password">Forgot password?</a>
 			</div>
 
 			<div

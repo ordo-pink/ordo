@@ -23,42 +23,44 @@ export default function ForgotPasswordPage({ url }: PageProps) {
 			centerX
 			centerY
 		>
-			<section class="w-full px-4 mx-auto text-center">
-				<PageHeader>Forgot password</PageHeader>
-			</section>
+			<div class="w-full max-w-sm">
+				<section class="w-full px-4 mx-auto text-center">
+					<PageHeader>Forgot password</PageHeader>
+				</section>
 
-			<section class="w-full px-4 py-8 mx-auto">
-				<form
-					method="post"
-					class="w-full flex flex-col items-center space-y-12"
-				>
-					<div class="w-full flex flex-col space-y-6">
+				<section class="w-full px-4 py-8 mx-auto">
+					<form
+						method="post"
+						class="w-full flex flex-col items-center space-y-12"
+					>
+						<div class="w-full flex flex-col space-y-6">
+							{success ? null : (
+								<fieldset class="w-full">
+									<EmailInput />
+								</fieldset>
+							)}
+
+							<legend class="w-full">
+								<ContextualCallout />
+							</legend>
+						</div>
+
 						{success ? null : (
-							<fieldset class="w-full">
-								<EmailInput />
-							</fieldset>
+							<div class="w-full flex flex-col">
+								<Button>Send</Button>
+							</div>
 						)}
 
-						<legend class="w-full">
-							<ContextualCallout />
-						</legend>
-					</div>
-
-					{success ? null : (
-						<div class="w-full flex flex-col">
-							<Button>Send</Button>
-						</div>
-					)}
-
-					{success ? null : (
-						<div class="flex space-x-2">
-							<a href="/sign-up">Not a member?</a>
-							<div>|</div>
-							<a href="/sign-in">Sign in?</a>
-						</div>
-					)}
-				</form>
-			</section>
+						{success ? null : (
+							<div class="flex space-x-2">
+								<a href="/sign-up">Not a member?</a>
+								<div>|</div>
+								<a href="/sign-in">Sign in?</a>
+							</div>
+						)}
+					</form>
+				</section>
+			</div>
 		</CenteredPage>
 	)
 }

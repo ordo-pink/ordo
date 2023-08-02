@@ -6,15 +6,15 @@ import type * as T from "./types.ts"
 
 import { create, decode, getNumericDate, verify } from "#x/djwt@v2.9.1/mod.ts"
 import { Oath } from "#lib/oath/mod.ts"
-import { F, pipe, thunkify } from "#lib/tau/mod.ts"
+import { F, pipe, thunkify } from "#ramda"
 
 // PUBLIC -----------------------------------------------------------------------------------------
 
 /**
  * Creates a `TokenService` from given TokenStorageAdapter and `TokenService` options.
- * @see T.Adapter
+ * @see T.TokenRepository
  * @see T.TokenServiceOptions
- * @see T.TokenService
+ * @see T.TTokenService
  */
 const service: T._Fn = params => ({
 	verifyAccessToken: verifyToken(params.options.keys.access.public),
@@ -22,11 +22,11 @@ const service: T._Fn = params => ({
 	getAccessTokenPayload: getAccessTokenPayload(params.options.keys.access.public),
 	getRefreshTokenPayload: getRefreshTokenPayload(params.options.keys.refresh.public),
 	getPersistedToken: getRefreshToken(params.adapter),
-	getPersistedTokenDict: getRefreshTokenMap(params.adapter),
+	getPersistedTokens: getRefreshTokenMap(params.adapter),
 	removePersistedToken: removeRefreshToken(params.adapter),
-	removePersistedTokenDict: removeRefreshTokenMap(params.adapter),
+	removePersistedTokens: removeRefreshTokenMap(params.adapter),
 	setPersistedToken: setRefreshToken(params.adapter),
-	setPersistedTokenDict: setRefreshTokenMap(params.adapter),
+	setPersistedTokens: setRefreshTokenMap(params.adapter),
 	createTokens: createTokens(params),
 	decodeAccessToken,
 	decodeRefreshToken,
@@ -72,9 +72,9 @@ const getRefreshToken: T._GetTokenFn = adapter => (sub, jti) =>
 		.rejectedMap(console.error)
 		.rejectedMap(() => null)
 
-const getRefreshTokenMap: T._GetTokenDictFn = adapter => sub =>
+const getRefreshTokenMap: T._GetTokenRecordFn = adapter => sub =>
 	adapter
-		.getTokenDict(sub)
+		.getTokenRecord(sub)
 		.rejectedMap(console.error)
 		.rejectedMap(() => null)
 
@@ -84,9 +84,9 @@ const removeRefreshToken: T._RemoveTokenFn = adapter => (sub, jti) =>
 		.rejectedMap(console.error)
 		.rejectedMap(() => null)
 
-const removeRefreshTokenMap: T._RemoveTokenDictFn = adapter => sub =>
+const removeRefreshTokenMap: T._RemoveTokenRecordFn = adapter => sub =>
 	adapter
-		.removeTokenDict(sub)
+		.removeTokenRecord(sub)
 		.rejectedMap(console.error)
 		.rejectedMap(() => null)
 
@@ -96,9 +96,9 @@ const setRefreshToken: T._SetTokenFn = adapter => (sub, jti, token) =>
 		.rejectedMap(console.error)
 		.rejectedMap(() => null)
 
-const setRefreshTokenMap: T._SetTokenDictFn = adapter => (sub, map) =>
+const setRefreshTokenMap: T._SetTokenRecordFn = adapter => (sub, map) =>
 	adapter
-		.setTokenDict(sub, map)
+		.setTokenRecord(sub, map)
 		.rejectedMap(console.error)
 		.rejectedMap(() => null)
 

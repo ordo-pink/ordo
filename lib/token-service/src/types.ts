@@ -2,16 +2,16 @@
 // SPDX-License-Identifier: MPL-2.0
 
 import type { Header, Payload } from "#x/djwt@v2.9.1/mod.ts"
-import type { TTau as TAU } from "#lib/tau/mod.ts"
-import type { T as LoggerTypes } from "#lib/logger/mod.ts"
 import type { Oath } from "#lib/oath/mod.ts"
+import type { Nullable, Unary, Binary, Ternary, Thunk, Curry } from "#lib/tau/mod.ts"
+import type { Logger } from "#lib/logger/mod.ts"
 
 // PUBLIC -----------------------------------------------------------------------------------------
 
 /**
  * A record of refresh token ids and tokens.
  */
-export type TokenDict = Record<JTI, string>
+export type TokenRecord = Record<JTI, string>
 
 /**
  * A pair of CryptoKeys.
@@ -148,7 +148,7 @@ export type RefreshTokenParsed = TokenParsed<RefreshTokenPayload>
  * list of methods and type-level implementation details of what TokenService provides and what it
  * expects to get back.
  */
-export type Adapter = {
+export type TokenRepository = {
 	/**
 	 * Get token associated with given user id and token id.
 	 * @rejects with `null` if no reference to given user id is persisted.
@@ -156,7 +156,7 @@ export type Adapter = {
 	 * @rejects with `Error` if a database error occurs. Resolves with a token.
 	 * @resolves with an Oath of the token for given sub and jti.
 	 */
-	getToken(sub: SUB, jti: JTI): Oath<string, TAU.Nullable<Error>>
+	getToken(sub: SUB, jti: JTI): Oath<string, Nullable<Error>>
 
 	/**
 	 * Get an object that contains mapping of JTIs to corresponding tokens.
@@ -164,24 +164,24 @@ export type Adapter = {
 	 * @rejects with `Error` if a database error occurs.
 	 * @resolves with a record of JTIs to corresponding tokens.
 	 */
-	getTokenDict(sub: SUB): Oath<TokenDict, TAU.Nullable<Error>>
+	getTokenRecord(sub: SUB): Oath<TokenRecord, Nullable<Error>>
 
 	/**
 	 * Remove a token associated with given user id and token id.
 	 * @rejects with `null` if no reference to given user id is persisted.
 	 * @rejects with `Error` if a database error occurs.
-	 * @resolves with "OK" if user's token dict did not contain the token hence it was not removed.
+	 * @resolves with "OK" if user's token record did not contain the token hence it was not removed.
 	 * @resolves with "OK".
 	 */
-	removeToken(sub: SUB, jti: JTI): Oath<"OK", TAU.Nullable<Error>>
+	removeToken(sub: SUB, jti: JTI): Oath<"OK", Nullable<Error>>
 
 	/**
-	 * Remove token dict of a user under given user id.
+	 * Remove token record of a user under given user id.
 	 * @rejects with `null` if no reference to given user id is persisted.
 	 * @rejects with `Error` if a database error occurs.
 	 * @resolves with "OK".
 	 */
-	removeTokenDict(sub: SUB): Oath<"OK", TAU.Nullable<Error>>
+	removeTokenRecord(sub: SUB): Oath<"OK", Nullable<Error>>
 
 	/**
 	 * Set a token for given user id and token id.
@@ -189,15 +189,15 @@ export type Adapter = {
 	 * @rejects with `Error` if a database error occurs.
 	 * @resolves with "OK".
 	 */
-	setToken(sub: SUB, jti: JTI, token: string): Oath<"OK", TAU.Nullable<Error>>
+	setToken(sub: SUB, jti: JTI, token: string): Oath<"OK", Nullable<Error>>
 
 	/**
-	 * Set token dict for a user under given user id.
+	 * Set token record for a user under given user id.
 	 * @rejects with `null` if no reference to given user id is persisted.
 	 * @rejects with `Error` if a database error occurs.
 	 * @resolves with "OK"
 	 */
-	setTokenDict(sub: SUB, map: TokenDict): Oath<"OK", TAU.Nullable<Error>>
+	setTokenRecord(sub: SUB, map: TokenRecord): Oath<"OK", Nullable<Error>>
 }
 
 /**
@@ -237,7 +237,7 @@ export type TokenServiceOptions = {
 	/**
 	 * TODO: Add logger and propper logging of errors
 	 */
-	readonly logger: LoggerTypes.Logger
+	readonly logger: Logger
 }
 
 /**
@@ -248,15 +248,15 @@ export type TokenServiceOptions = {
  * the TokenStorageDriver). Other options for TokenService can be configured via the options
  * provided as the second argument.
  *
- * @see Adapter
+ * @see TokenRepository
  */
-export type TokenService = {
+export type TTokenService = {
 	/**
 	 * Verify given access token.
 	 * @resolves with `true` if the token is valid.
 	 * @resolves with `false` otherwise.
 	 */
-	verifyAccessToken: TAU.Unary<string, Oath<boolean, never>>
+	verifyAccessToken: Unary<string, Oath<boolean, never>>
 
 	/**
 	 * Verify given refresh token.
@@ -264,103 +264,103 @@ export type TokenService = {
 	 * @resolves with `false` otherwise.
 	 * @rejects `never`.
 	 */
-	verifyRefreshToken: TAU.Unary<string, Oath<boolean, never>>
+	verifyRefreshToken: Unary<string, Oath<boolean, never>>
 
 	/**
 	 * Get payload of a given access token.
 	 * @resolves with `AccessTokenPayload` if the token is valid.
 	 * @rejects with `null` otherwise.
 	 */
-	getAccessTokenPayload: TAU.Unary<string, Oath<AccessTokenPayload, null>>
+	getAccessTokenPayload: Unary<string, Oath<AccessTokenPayload, null>>
 
 	/**
 	 * Get payload of a given refresh token.
 	 * @resolves with `RefreshTokenPayload` if the token is valid.
 	 * @rejects with `null` otherwise.
 	 */
-	getRefreshTokenPayload: TAU.Unary<string, Oath<RefreshTokenPayload, null>>
+	getRefreshTokenPayload: Unary<string, Oath<RefreshTokenPayload, null>>
 
 	/**
 	 * Get parsed access token content from given token.
 	 * @resolves with `AccessTokenParsed` if the token is valid.
 	 * @rejects with `null` otherwise.
 	 */
-	decodeAccessToken: TAU.Unary<string, Oath<AccessTokenParsed, null>>
+	decodeAccessToken: Unary<string, Oath<AccessTokenParsed, null>>
 
 	/**
 	 * Get parsed refresh token content from given token.
 	 * @resolves with `RefreshTokenParsed` if the token is valid.
 	 * @rejects with `null` otherwise.
 	 */
-	decodeRefreshToken: TAU.Unary<string, Oath<RefreshTokenParsed, null>>
+	decodeRefreshToken: Unary<string, Oath<RefreshTokenParsed, null>>
 
 	/**
 	 * Create a pair of tokens for given user id.
 	 * @resolves with a record of tokens after removing old JTI and persisting new JTI-token pair.
 	 * @rejects with `null` otherwise.
 	 */
-	createTokens: TAU.Unary<_CreateTokensParams, Oath<_CreatedTokens, null>>
+	createTokens: Unary<_CreateTokensParams, Oath<_CreatedTokens, null>>
 
 	/**
 	 * Get a refresh token for given user id and token id.
 	 * @resolves with refresh token if such token was persisted.
 	 * @rejects with `null` otherwise.
 	 */
-	getPersistedToken: TAU.Binary<SUB, JTI, Oath<string, null>>
+	getPersistedToken: Binary<SUB, JTI, Oath<string, null>>
 
 	/**
-	 * Get a token dict for given user id.
-	 * @resolves with `TokenDict` if such token dict was persisted.
+	 * Get a token record for given user id.
+	 * @resolves with `TokenDict` if such token record was persisted.
 	 * @rejects with `null` otherwise.
 	 */
-	getPersistedTokenDict: TAU.Unary<SUB, Oath<TokenDict, null>>
+	getPersistedTokens: Unary<SUB, Oath<TokenRecord, null>>
 
 	/**
 	 * Remove a token for given user id and token id.
-	 * @resolves with `"OK"` if token was removed or the user token dict did not have such token.
+	 * @resolves with `"OK"` if token was removed or the user token record did not have such token.
 	 * @rejects with `null` otherwise.
 	 */
-	removePersistedToken: TAU.Binary<SUB, JTI, Oath<"OK", null>>
+	removePersistedToken: Binary<SUB, JTI, Oath<"OK", null>>
 
 	/**
-	 * Remove a token dict for given user id.
-	 * @resolves with `"OK"` if token dict was removed or token dict for such user did not exist.
+	 * Remove a token record for given user id.
+	 * @resolves with `"OK"` if token record was removed or token record for such user did not exist.
 	 * @rejects with `null` otherwise.
 	 */
-	removePersistedTokenDict: TAU.Unary<SUB, Oath<"OK", null>>
+	removePersistedTokens: Unary<SUB, Oath<"OK", null>>
 
 	/**
 	 * Set a token for given user id and token id.
 	 * @resolves with `"OK"` if token was set.
 	 * @rejects with `null` otherwise.
 	 */
-	setPersistedToken: TAU.Ternary<SUB, JTI, string, Oath<"OK", null>>
+	setPersistedToken: Ternary<SUB, JTI, string, Oath<"OK", null>>
 
 	/**
-	 * Set a token dict for given user id.
-	 * @resolves with `"OK"` if token dict was set.
+	 * Set a token record for given user id.
+	 * @resolves with `"OK"` if token record was set.
 	 * @rejects with `null` otherwise.
 	 */
-	setPersistedTokenDict: TAU.Binary<SUB, TokenDict, Oath<"OK", null>>
+	setPersistedTokens: Binary<SUB, TokenRecord, Oath<"OK", null>>
 }
 
 // INTERNAL ---------------------------------------------------------------------------------------
 
 export type _CreateTokensParams = { sub: SUB; uip: UIP; prevJti?: JTI; aud?: AUD }
 export type _CreatedTokens = RefreshTokenPayload & { access: string; refresh: string }
-export type _Props = { adapter: Adapter; options: TokenServiceOptions }
-export type _Fn = (props: _Props) => TokenService
-export type _GetTokenPayloadFn<T> = (key: CryptoKey) => TAU.Unary<string, Oath<T, null>>
-export type _DecodePayloadFn<T extends TokenParsed> = TAU.Unary<string, Oath<T, null>>
-export type _GetTokenFn = TAU.Unary<Adapter, TokenService["getPersistedToken"]>
-export type _GetTokenDictFn = TAU.Unary<Adapter, TokenService["getPersistedTokenDict"]>
-export type _RemoveTokenFn = TAU.Unary<Adapter, TokenService["removePersistedToken"]>
-export type _RemoveTokenDictFn = TAU.Unary<Adapter, TokenService["removePersistedTokenDict"]>
-export type _SetTokenFn = TAU.Unary<Adapter, TokenService["setPersistedToken"]>
-export type _SetTokenDictFn = TAU.Unary<Adapter, TokenService["setPersistedTokenDict"]>
-export type _CreateEXPFn = TAU.Unary<number, EXP>
-export type _CreateJTIFn = TAU.Thunk<JTI>
-export type _CreateIATFn = TAU.Thunk<IAT>
-export type _CreateISSFn = TAU.Thunk<ISS>
-export type _VerifyToken = TAU.Curry<TAU.Binary<CryptoKey, string, Oath<boolean, never>>>
-export type _CreateTokensFn = TAU.Unary<_Props, TokenService["createTokens"]>
+export type _Props = { adapter: TokenRepository; options: TokenServiceOptions }
+export type _Fn = (props: _Props) => TTokenService
+export type _GetTokenPayloadFn<T> = (key: CryptoKey) => Unary<string, Oath<T, null>>
+export type _DecodePayloadFn<T extends TokenParsed> = Unary<string, Oath<T, null>>
+export type _GetTokenFn = Unary<TokenRepository, TTokenService["getPersistedToken"]>
+export type _GetTokenRecordFn = Unary<TokenRepository, TTokenService["getPersistedTokens"]>
+export type _RemoveTokenFn = Unary<TokenRepository, TTokenService["removePersistedToken"]>
+export type _RemoveTokenRecordFn = Unary<TokenRepository, TTokenService["removePersistedTokens"]>
+export type _SetTokenFn = Unary<TokenRepository, TTokenService["setPersistedToken"]>
+export type _SetTokenRecordFn = Unary<TokenRepository, TTokenService["setPersistedTokens"]>
+export type _CreateEXPFn = Unary<number, EXP>
+export type _CreateJTIFn = Thunk<JTI>
+export type _CreateIATFn = Thunk<IAT>
+export type _CreateISSFn = Thunk<ISS>
+export type _VerifyToken = Curry<Binary<CryptoKey, string, Oath<boolean, never>>>
+export type _CreateTokensFn = Unary<_Props, TTokenService["createTokens"]>

@@ -1,4 +1,5 @@
 import { ErrorPageProps } from "$fresh/server.ts"
+import { Callout } from "../components/callout.tsx"
 import { CenteredPage } from "../components/centered-page.tsx"
 
 export default function Error500Page({ error }: ErrorPageProps) {
@@ -7,8 +8,8 @@ export default function Error500Page({ error }: ErrorPageProps) {
 			centerX
 			centerY
 		>
-			<h1 class="text-5xl md:text-9xl text-center">BOOM!</h1>
-			<p class="text-center">{(error as Error).message}</p>
+			<h1 class="text-5xl md:text-9xl text-center mb-8">BOOM!</h1>
+			<Callout type="error">{(error as Error).message}</Callout>
 		</CenteredPage>
 	)
 }

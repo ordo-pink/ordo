@@ -1,10 +1,15 @@
+// SPDX-FileCopyrightText: Copyright 2023, 谢尔盖||↓ and the Ordo.pink contributors
+// SPDX-License-Identifier: MIT
+
 import { getDenoPath, runCommand, runDenoCommand } from "#lib/binutil/mod.ts"
 import { isFile, readdir } from "#lib/fs/mod.ts"
 import { Oath } from "#lib/oath/mod.ts"
+import { Binary, Curry, Thunk, Unary } from "#lib/tau/mod.ts"
+import { prop } from "#ramda"
 
 // PUBLIC -----------------------------------------------------------------------------------------
 
-export const init = () =>
+export const init: CoverFn = () =>
 	Oath.of(getDenoPath()).chain(path =>
 		compileBin(path)
 			.chain(() => initSrv(path))
@@ -13,7 +18,13 @@ export const init = () =>
 
 // INTERNAL ---------------------------------------------------------------------------------------
 
-const initSrv = (denoPath: string) =>
+type CoverFn = Thunk<Oath<number, Error>>
+type InitSrvFn = Unary<string, Oath<number, never>>
+type CreateSymlincsFn = Thunk<Oath<number, never>>
+type CompileBinFn = Unary<string, Oath<number, never>>
+type LogFn = Curry<Binary<string, number, void>>
+
+const initSrv: InitSrvFn = denoPath =>
 	readdir("./srv")
 		.map(entries => entries.filter(entry => entry.isDirectory))
 		.map(entries =>
@@ -37,10 +48,10 @@ const initSrv = (denoPath: string) =>
 						path,
 					])
 				)
-			)
+			).map(prop("length"))
 		)
 
-const createSymlinks = () =>
+const createSymlinks: CreateSymlincsFn = () =>
 	readdir("./etc/init")
 		.map(entries => entries.filter(entry => entry.isFile))
 		.chain(entries =>
@@ -48,8 +59,9 @@ const createSymlinks = () =>
 				entries.map(entry => runCommand("ln", ["-snfv", `./etc/init/${entry.name}`, entry.name]))
 			)
 		)
+		.map(prop("length"))
 
-const compileBin = (denoPath: string) =>
+const compileBin: CompileBinFn = (denoPath: string) =>
 	readdir("./boot/src")
 		.map(entries => entries.filter(entry => entry.isDirectory && entry.name !== "init"))
 		.chain(entries =>
@@ -66,3 +78,4 @@ const compileBin = (denoPath: string) =>
 				)
 			)
 		)
+		.map(prop("length"))

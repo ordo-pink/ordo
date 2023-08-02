@@ -2,9 +2,9 @@
 // SPDX-License-Identifier: MPL-2.0
 
 import type { Context, Middleware } from "#x/oak@v12.6.0/mod.ts"
-import type { AccessTokenParsed, TTokenService } from "#lib/token-service/mod.ts"
-import type { UserService } from "#lib/user-service/mod.ts"
-import type { User } from "#lib/user-service/mod.ts"
+import type { AccessTokenParsed, TTokenService } from "#lib/backend-token-service/mod.ts"
+import type { UserService } from "#lib/backend-user-service/mod.ts"
+import type { User } from "#lib/backend-user-service/mod.ts"
 
 import { isEmail } from "#x/deno_validator@v0.0.5/mod.ts"
 import { HttpError, useBearerAuthorization, useBody } from "#lib/backend-utils/mod.ts"

@@ -2,8 +2,8 @@
 // SPDX-License-Identifier: MPL-2.0
 
 import type { Context, Middleware } from "#x/oak@v12.6.0/mod.ts"
-import type { EXP, TTokenService } from "#lib/token-service/mod.ts"
-import type { UserService } from "#lib/user-service/mod.ts"
+import type { EXP, TTokenService } from "#lib/backend-token-service/mod.ts"
+import type { UserService } from "#lib/backend-user-service/mod.ts"
 
 import { ResponseError } from "#lib/backend-utils/mod.ts"
 import { useBody } from "#lib/backend-utils/mod.ts"

@@ -2,9 +2,9 @@
 // SPDX-License-Identifier: MPL-2.0
 
 import { ConsoleLogger, Logger } from "#lib/logger/mod.ts"
-import { CryptoKeyPair, TokenRepository, TokenService } from "#lib/token-service/mod.ts"
+import { CryptoKeyPair, TokenRepository, TokenService } from "#lib/backend-token-service/mod.ts"
 
-import { type UserRepository, UserService } from "#lib/user-service/mod.ts"
+import { type UserRepository, UserService } from "#lib/backend-user-service/mod.ts"
 import { Application, Router } from "#x/oak@v12.6.0/mod.ts"
 import { oakCors } from "#x/cors@v1.2.2/oakCors.ts"
 import { handleAccount } from "./handlers/account.ts"

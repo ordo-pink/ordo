@@ -14,7 +14,7 @@ import {
 	UpdateMethod,
 	GetByIdMethod,
 	GetByEmailMethod,
-} from "#lib/user-service/mod.ts"
+} from "#lib/backend-user-service/mod.ts"
 
 // PUBLIC -----------------------------------------------------------------------------------------
 

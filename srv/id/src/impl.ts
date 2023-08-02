@@ -2,13 +2,13 @@
 // SPDX-License-Identifier: MPL-2.0
 
 import { resolve } from "#std/path/mod.ts"
+import { DynamoDBUserStorageAdapter } from "#lib/backend-dynamodb-user-repository/mod.ts"
+import { DenoKVTokenStorageAdapter } from "#lib/backend-deno-kv-token-repository/mod.ts"
+import { DenoKVUserStorageAdapter } from "#lib/backend-deno-kv-user-repository/mod.ts"
 import { createIDServer } from "#lib/backend-id-server/mod.ts"
-import { getPrivateKey, getPublicKey } from "./utils/get-key.ts"
-import { DynamoDBUserStorageAdapter } from "#lib/dynamodb-user-storage-adapter/mod.ts"
-import { getc } from "#lib/getc/mod.ts"
-import { DenoKVTokenStorageAdapter } from "#lib/deno-kv-token-storage-adapter/mod.ts"
-import { DenoKVUserStorageAdapter } from "#lib/deno-kv-user-storage-adapter/mod.ts"
 import { Switch } from "#lib/switch/mod.ts"
+import { getc } from "#lib/getc/mod.ts"
+import { getPrivateKey, getPublicKey } from "./utils/get-key.ts"
 
 const {
 	ID_USER_ADAPTER,

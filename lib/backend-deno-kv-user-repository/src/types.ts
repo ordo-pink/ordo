@@ -3,8 +3,8 @@
 
 // deno-lint-ignore-file no-explicit-any
 
-import { T as US } from "#lib/user-service/mod.ts"
+import { UserRepository } from "#lib/backend-user-service/mod.ts"
 
 export type Config = { path?: string; key?: string }
 export type Params = { db: any; idKey: string; emailKey: string }
-export type Fn = (params: Params) => US.Adapter
+export type Fn = (params: Params) => UserRepository

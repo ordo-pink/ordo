@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: Copyright 2023, 谢尔盖||↓ and the Ordo.pink contributors
 // SPDX-License-Identifier: MPL-2.0
 
-import type { TokenRecord } from "#lib/token-service/mod.ts"
+import type { TokenRecord } from "#lib/backend-token-service/mod.ts"
 import type * as T from "./types.ts"
 
 import { keysOf } from "#lib/tau/mod.ts"

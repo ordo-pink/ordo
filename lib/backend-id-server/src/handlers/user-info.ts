@@ -2,8 +2,8 @@
 // SPDX-License-Identifier: MPL-2.0
 
 import type { Context, RouterMiddleware } from "#x/oak@v12.6.0/mod.ts"
-import type { PublicUser, UserService } from "#lib/user-service/mod.ts"
-import type { TTokenService } from "#lib/token-service/mod.ts"
+import type { PublicUser, UserService } from "#lib/backend-user-service/mod.ts"
+import type { TTokenService } from "#lib/backend-token-service/mod.ts"
 
 import { ResponseError, HttpError, useBearerAuthorization } from "#lib/backend-utils/mod.ts"
 import { Oath } from "#lib/oath/mod.ts"

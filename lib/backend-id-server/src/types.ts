@@ -1,4 +1,4 @@
-import { TTokenService } from "#lib/token-service/mod.ts"
+import { TTokenService } from "#lib/backend-token-service/mod.ts"
 
 export type AuthResponse = {
 	accessToken: string

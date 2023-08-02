@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: Copyright 2023, 谢尔盖||↓ and the Ordo.pink contributors
 // SPDX-License-Identifier: MPL-2.0
 
-import type { JTI, TokenRecord, TokenRepository } from "#lib/token-service/mod.ts"
+import type { JTI, TokenRecord, TokenRepository } from "#lib/backend-token-service/mod.ts"
 import type {} from "#ramda"
 import { Unary, Curry, Binary, Method } from "#lib/tau/mod.ts"
 

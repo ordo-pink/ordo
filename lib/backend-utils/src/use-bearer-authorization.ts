@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: MPL-2.0
 
 import { Context } from "#x/oak@v12.6.0/mod.ts"
-import { TTokenService } from "#lib/token-service/mod.ts"
+import { TTokenService } from "#lib/backend-token-service/mod.ts"
 
 // TODO: Rewrite with Oath
 export const useBearerAuthorization = async (

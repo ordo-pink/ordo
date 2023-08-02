@@ -3,7 +3,7 @@
 
 // deno-lint-ignore-file no-explicit-any
 
-import type { T as US } from "#lib/user-service/mod.ts"
+import type { T as US } from "#lib/backend-user-service/mod.ts"
 import type * as T from "./types.ts"
 
 import { Oath } from "#lib/oath/mod.ts"

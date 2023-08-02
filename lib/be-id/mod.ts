@@ -2,3 +2,4 @@
 // SPDX-License-Identifier: MPL-2.0
 
 export * from "./src/impl.ts"
+export * as TBeID from "./src/types.ts"

@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: MPL-2.0
 
 import type { TTokenService as TS } from "#lib/token-service/mod.ts"
-import type { T as TAU } from "#lib/tau/mod.ts"
+import type { TTau as TAU } from "#lib/tau/mod.ts"
 
 // PUBLIC -----------------------------------------------------------------------------------------
 

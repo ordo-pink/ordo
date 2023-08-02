@@ -2,7 +2,7 @@
 // This file SHOULD be checked into source version control.
 // This file is automatically updated during development when running `dev.ts`.
 
-import * as $0 from "./routes/[name].tsx";
+import * as $0 from "./routes/[path].tsx";
 import * as $1 from "./routes/_404.tsx";
 import * as $2 from "./routes/_500.tsx";
 import * as $3 from "./routes/_app.tsx";
@@ -12,12 +12,16 @@ import * as $6 from "./routes/index.tsx";
 import * as $7 from "./routes/sign-in.tsx";
 import * as $8 from "./routes/sign-out.tsx";
 import * as $9 from "./routes/sign-up.tsx";
-import * as $$0 from "./islands/sign-in-form.tsx";
-import * as $$1 from "./islands/sign-up-form.tsx";
+import * as $10 from "./routes/~/[activity].tsx";
+import * as $11 from "./routes/~/[path].tsx";
+import * as $12 from "./routes/~/index.tsx";
+import * as $$0 from "./islands/app.tsx";
+import * as $$1 from "./islands/sign-in-form.tsx";
+import * as $$2 from "./islands/sign-up-form.tsx";
 
 const manifest = {
   routes: {
-    "./routes/[name].tsx": $0,
+    "./routes/[path].tsx": $0,
     "./routes/_404.tsx": $1,
     "./routes/_500.tsx": $2,
     "./routes/_app.tsx": $3,
@@ -27,10 +31,14 @@ const manifest = {
     "./routes/sign-in.tsx": $7,
     "./routes/sign-out.tsx": $8,
     "./routes/sign-up.tsx": $9,
+    "./routes/~/[activity].tsx": $10,
+    "./routes/~/[path].tsx": $11,
+    "./routes/~/index.tsx": $12,
   },
   islands: {
-    "./islands/sign-in-form.tsx": $$0,
-    "./islands/sign-up-form.tsx": $$1,
+    "./islands/app.tsx": $$0,
+    "./islands/sign-in-form.tsx": $$1,
+    "./islands/sign-up-form.tsx": $$2,
   },
   baseUrl: import.meta.url,
 };

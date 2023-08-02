@@ -4,7 +4,10 @@ import SignUpForm from "../islands/sign-up-form.tsx"
 
 export default function SignUpPage() {
 	return (
-		<CenteredPage>
+		<CenteredPage
+			centerX
+			centerY
+		>
 			<section class="w-full px-4 mx-auto text-center">
 				<PageHeader>Sign up</PageHeader>
 			</section>

@@ -1,4 +1,4 @@
-import { T as TAU } from "#lib/tau/mod.ts"
+import { TTau as TAU } from "#lib/tau/mod.ts"
 import { Oath } from "#lib/oath/mod.ts"
 
 export type PublicUser = {

@@ -3,7 +3,7 @@
 
 // TODO: Add comments
 
-import type { T as TAU } from "#lib/tau/mod.ts"
+import type { TTau as TAU } from "#lib/tau/mod.ts"
 
 export type LeftFn = <L, R = unknown>(x: L) => Either<R, L>
 export type RightFn = <R, L = unknown>(x: R) => Either<R, L>

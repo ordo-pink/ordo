@@ -5,7 +5,10 @@ import { PageProps } from "$fresh/server.ts"
 
 export default function SignInPage() {
 	return (
-		<CenteredPage>
+		<CenteredPage
+			centerX
+			centerY
+		>
 			<section class="w-full px-4 mx-auto text-center">
 				<PageHeader>Sign in</PageHeader>
 			</section>

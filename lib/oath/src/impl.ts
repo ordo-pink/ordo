@@ -3,7 +3,7 @@
 
 // deno-lint-ignore-file no-explicit-any
 
-import type { T as TAU } from "#lib/tau/mod.ts"
+import type { TTau as TAU } from "#lib/tau/mod.ts"
 
 import { keysOf, noop } from "#lib/tau/mod.ts"
 

@@ -1,16 +1,11 @@
-import type { T as TAU } from "#lib/tau/mod.ts"
+import type { TTau } from "#lib/tau/mod.ts"
+import type { TBeID } from "#lib/be-id/mod.ts"
+
 import { BehaviorSubject } from "#x/rxjs@v1.0.2/mod.ts"
 
-// TODO: Reuse types
-export type TokenInfo = {
-	accessToken: string
-	jti: string
-	sub: string
-}
+const auth$ = new BehaviorSubject<TTau.Nullable<TBeID.AuthResponse>>(null)
 
-const auth$ = new BehaviorSubject<TAU.Nullable<TokenInfo>>(null)
-
-export const signIn = (info: TokenInfo) => {
+export const signIn = (info: TBeID.AuthResponse) => {
 	auth$.next(info)
 }
 

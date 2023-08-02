@@ -1,2 +1,7 @@
-// SPDX-FileCopyrightText: Copyright 2023, 谢尔盖||↓ and the Ordo.pink contributors
-// SPDX-License-Identifier: MPL-2.0
+import { TTokenService } from "#lib/token-service/mod.ts"
+
+export type AuthResponse = {
+	accessToken: string
+	jti: TTokenService.JTI
+	sub: TTokenService.SUB
+}

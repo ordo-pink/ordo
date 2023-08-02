@@ -10,23 +10,19 @@ import { PageHeader } from "../components/page-header.tsx"
 export default function ForgotPasswordPage({ url }: PageProps) {
 	const error = url.searchParams.get("error")
 	const success = url.searchParams.get("success")
-	const text =
-		"Please enter your email address to receive a password reset link."
+	const text = "Please enter your email address to receive a password reset link."
 
 	const ContextualCallout = Switch.of(true)
-		.case(
-			() => Boolean(error),
-			() => () => <Callout type="error">{error}</Callout>
-		)
-		.case(
-			() => Boolean(success),
-			() => () => <Callout type="success">{success}</Callout>
-		)
+		.case(Boolean(error), () => () => <Callout type="error">{error}</Callout>)
+		.case(Boolean(success), () => () => <Callout type="success">{success}</Callout>)
 		.default(() => () => <Callout type="info">{text}</Callout>)
 
 	// TODO: Send form to an island
 	return (
-		<CenteredPage>
+		<CenteredPage
+			centerX
+			centerY
+		>
 			<section class="w-full px-4 mx-auto text-center">
 				<PageHeader>Forgot password</PageHeader>
 			</section>

@@ -14,7 +14,7 @@ export const handler = (req: Request, ctx: MiddlewareHandlerContext) => {
 		return new Response(null, { status: 307, headers: new Headers({ Location: "/~/" }) })
 	}
 
-	if ((!cookies.jti || !cookies.sub) && url.pathname === "/~/") {
+	if ((!cookies.jti || !cookies.sub) && url.pathname.startsWith("/~")) {
 		return new Response(null, { status: 307, headers: new Headers({ Location: "/sign-in" }) })
 	}
 

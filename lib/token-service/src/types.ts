@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: MPL-2.0
 
 import type { Header, Payload } from "#x/djwt@v2.9.1/mod.ts"
-import type { T as TAU } from "#lib/tau/mod.ts"
+import type { TTau as TAU } from "#lib/tau/mod.ts"
 import type { T as LoggerTypes } from "#lib/logger/mod.ts"
 import type { Oath } from "#lib/oath/mod.ts"
 

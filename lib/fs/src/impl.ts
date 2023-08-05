@@ -25,6 +25,7 @@ export const getAbsolutePath = (path: string) => {
 
 export const mkdir = oathify(Deno.mkdir)
 export const rmdir = oathify(Deno.remove)
+export const createFile = oathify(Deno.create)
 export const writeFile = oathify(Deno.writeFile)
 export const readFile = oathify(Deno.readFile)
 export const removeFile = rmdir

@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: Copyright 2023, 谢尔盖||↓ and the Ordo.pink contributors
 // SPDX-License-Identifier: MIT
 
-import { assert, assertEquals, assertRejects } from "#std/testing/asserts.ts"
+import { assert, assertEquals, assertInstanceOf, assertRejects } from "#std/testing/asserts.ts"
 import { readFile, rmdir } from "#lib/fs/mod.ts"
 import { BackendFSDataRepository } from "./impl.ts"
 import { resolve } from "#std/path/mod.ts"
@@ -77,11 +77,11 @@ Deno.test("backend-fs-user-data-repository", async t => {
 	await t.step("read file", async t => {
 		await t.step("read file that exists", async () => {
 			const fsid = await repository.create({ sub }).toPromise()
-			const file = await repository.read({ sub, fsid }).toPromise()
+			const stream = await repository.read({ sub, fsid }).toPromise()
 
-			assert(file)
+			assert(stream)
+			assertInstanceOf(stream, ReadableStream)
 
-			file.close()
 			await rmdir(resolve(root, sub.split("-")[0]), { recursive: true }).toPromise()
 		})
 

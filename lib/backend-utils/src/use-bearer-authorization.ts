@@ -2,10 +2,13 @@
 // SPDX-License-Identifier: MPL-2.0
 
 import { Context } from "#x/oak@v12.6.0/mod.ts"
-import { TTokenService } from "#lib/backend-token-service/mod.ts"
+import { AccessTokenParsed, TTokenService } from "#lib/backend-token-service/mod.ts"
 
 // TODO: Rewrite with Oath
-export const useBearerAuthorization = async (ctx: Context, tokenService: TTokenService) => {
+export const useBearerAuthorization = async (
+	ctx: Context,
+	tokenServiceOrIDHost: TTokenService | string
+): Promise<AccessTokenParsed> => {
 	const authorization = ctx.request.headers.get("Authorization")
 
 	if (!authorization || !authorization.startsWith("Bearer ")) {
@@ -13,11 +16,23 @@ export const useBearerAuthorization = async (ctx: Context, tokenService: TTokenS
 	}
 
 	const token = authorization.slice(7)
-	const verified = await tokenService.verifyAccessToken(token)
 
-	if (!verified) {
-		return ctx.throw(403, "Unverified or outdated access token")
+	if (typeof tokenServiceOrIDHost === "string") {
+		const body = await fetch(`${tokenServiceOrIDHost}/verify-token`, {
+			method: "POST",
+			headers: { authorization },
+		}).then(res => res.json())
+
+		if (body.token === "valid") return body.token
+
+		ctx.throw(403, "Unverified or outdated access token")
+	} else {
+		const verified = await tokenServiceOrIDHost.verifyAccessToken(token).toPromise()
+
+		if (!verified) {
+			return ctx.throw(403, "Unverified or outdated access token")
+		}
+
+		return tokenServiceOrIDHost.decodeAccessToken(token).toPromise()
 	}
-
-	return tokenService.decodeAccessToken(token).toPromise() // TODO: types
 }

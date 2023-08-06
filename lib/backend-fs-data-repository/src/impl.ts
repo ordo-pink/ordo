@@ -8,7 +8,7 @@ import { resolve } from "#std/path/mod.ts"
 import { createFile, createParentDirectoryFor, removeFile, stat } from "#lib/fs/mod.ts"
 
 type Params = { root: string }
-type Fn = Unary<Params, DataRepository<Deno.FsFile, ReadableStream>>
+type Fn = Unary<Params, DataRepository<ReadableStream>>
 
 const of: Fn = ({ root }) => ({
 	create: ({ sub, fsid }) =>
@@ -31,7 +31,13 @@ const of: Fn = ({ root }) => ({
 		),
 	read: ({ sub, fsid }) =>
 		Oath.of(resolve(root, ...sub.split("-"), ...fsid.split("-"))).chain(path =>
-			Oath.try(() => Deno.open(path))
+			Oath.try(async () => {
+				const file = await Deno.open(path)
+				const stream = new ReadableStream(file.readable)
+				file.close()
+
+				return stream
+			})
 		),
 	update: ({ content, fsid, sub, upsert = false }) =>
 		Oath.of(resolve(root, ...sub.split("-"), ...fsid.split("-")))

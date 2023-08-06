@@ -8,6 +8,8 @@ import { create, decode, getNumericDate, verify } from "#x/djwt@v2.9.1/mod.ts"
 import { Oath } from "#lib/oath/mod.ts"
 import { F, pipe, thunkify } from "#ramda"
 
+// TODO: Drop storing token values
+
 // PUBLIC -----------------------------------------------------------------------------------------
 
 /**

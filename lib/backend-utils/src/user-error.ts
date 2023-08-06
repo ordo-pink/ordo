@@ -51,10 +51,10 @@ export const handleError =
 		} catch (e) {
 			if (e instanceof HttpError) {
 				ctx.response.status = e.status
-				ctx.response.body = { error: e.message }
+				ctx.response.body = { success: false, message: e.message }
 			} else {
 				ctx.response.status = 500
-				ctx.response.body = "Internal error"
+				ctx.response.body = { success: false, message: "Internal error" }
 				options.logger.error(e)
 			}
 		}

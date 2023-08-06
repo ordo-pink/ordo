@@ -17,22 +17,22 @@ const SIZE_ABBREVIATIONS = ["B", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"]
 const EMPTY_READABLE_SIZE = `0${SIZE_ABBREVIATIONS[0]}`
 
 /**
- * OrdoFile represents a file in Ordo. It contains the "head" of the file, also
+ * FileModel represents a file in Ordo. It contains the "head" of the file, also
  * referred to as file `metadata`. Apart from default Ordo metadata, custom
  * values can be provided as well. Custom metadata is used by extensions to do
  * whatever they need to do with files. Metadata is persistent which means that
- * the assigned values last between sessions. OrdoFile is an immutable object.
+ * the assigned values last between sessions. FileModel is an immutable object.
  * It is not intended to be changed directly. All the changes to the file need
- * to be made with `OrdoFileModel` that returns a new OrdoFile with all the
+ * to be made with `FileModel` that returns a new FileModel with all the
  * changes applied.
  */
-export class OrdoFile<CustomMetadata extends Record<string, unknown> = Record<string, unknown>> {
+export class FileModel<CustomMetadata extends Record<string, unknown> = Record<string, unknown>> {
 	/**
-	 * Creates an OrdoFile from a list of required fields. You would not need
-	 * this method usually. Use `OrdoFile.from` to create an OrdoFile from an
-	 * `IOrdoFile`.
+	 * Creates an FileModel from a list of required fields. You would not need
+	 * this method usually. Use `FileModel.from` to create an FileModel from an
+	 * `IFileModel`.
 	 *
-	 * @throws if provided path is not a valid `OrdoFilePath`.
+	 * @throws if provided path is not a valid `FileModelPath`.
 	 * @throws if any of the required fields is missing.
 	 * @throws if provided size is less than 0.
 	 *
@@ -46,7 +46,7 @@ export class OrdoFile<CustomMetadata extends Record<string, unknown> = Record<st
 	 * @param {CustomMetadata} metadata - custom file metadata provided by Ordo extensions.
 	 * @param {string | false} encryption - file body encryption type.
 	 *
-	 * @returns {OrdoFile<CustomMetadata>} - Ordo file.
+	 * @returns {FileModel<CustomMetadata>} - Ordo file.
 	 */
 	public static of<CustomMetadata extends Record<string, unknown> = Record<string, unknown>>(
 		path: FilePath,
@@ -59,13 +59,13 @@ export class OrdoFile<CustomMetadata extends Record<string, unknown> = Record<st
 		metadata: CustomMetadata = {} as CustomMetadata,
 		encryption: string | false = false
 	) {
-		if (!OrdoFile.isValidPath(path)) throw new Error("Invalid file path")
+		if (!FileModel.isValidPath(path)) throw new Error("Invalid file path")
 		if (size < 0) throw new Error("Invalid file size")
 		if (!fsid) throw new Error("FSID not provided")
 		if (!createdBy) throw new Error("Unknown createdBy")
 		if (!updatedBy) throw new Error("Unknown updatedBy")
 
-		return new OrdoFile(
+		return new FileModel(
 			path,
 			fsid,
 			size,
@@ -79,11 +79,11 @@ export class OrdoFile<CustomMetadata extends Record<string, unknown> = Record<st
 	}
 
 	/**
-	 * Creates an OrdoFile from an IOrdoFile.
+	 * Creates an FileModel from an IFileModel.
 	 *
-	 * @param {File} - IOrdoFile to create an OrdoFile from.
+	 * @param {File} - IFileModel to create an FileModel from.
 	 *
-	 * @returns {OrdoFile} - a valid OrdoFile.
+	 * @returns {FileModel} - a valid FileModel.
 	 */
 	public static from<CustomMetadata extends Record<string, unknown> = Record<string, unknown>>({
 		path,
@@ -95,8 +95,8 @@ export class OrdoFile<CustomMetadata extends Record<string, unknown> = Record<st
 		updatedBy,
 		encryption,
 		...metadata
-	}: File<CustomMetadata>): OrdoFile<CustomMetadata> {
-		return OrdoFile.of(
+	}: File<CustomMetadata>): FileModel<CustomMetadata> {
+		return FileModel.of(
 			path,
 			fsid,
 			createdBy,
@@ -121,13 +121,13 @@ export class OrdoFile<CustomMetadata extends Record<string, unknown> = Record<st
 	}
 
 	/**
-	 * A guard method to check whether provided file is an IOrdoFile.
+	 * A guard method to check whether provided file is an IFileModel.
 	 *
 	 * @param x - object to be validated.
 	 *
-	 * @returns {x is File} - whether provided object is an IOrdoFile.
+	 * @returns {x is File} - whether provided object is an IFileModel.
 	 */
-	public static isOrdoFile(x: unknown): x is File {
+	public static isFileModel(x: unknown): x is File {
 		const file = x as File
 
 		return (
@@ -141,7 +141,7 @@ export class OrdoFile<CustomMetadata extends Record<string, unknown> = Record<st
 			file.createdAt instanceof Date &&
 			file.updatedAt instanceof Date &&
 			file.size >= 0 &&
-			OrdoFile.isValidPath(file.path)
+			FileModel.isValidPath(file.path)
 		)
 	}
 
@@ -175,7 +175,7 @@ export class OrdoFile<CustomMetadata extends Record<string, unknown> = Record<st
 	 * @returns {FileExtension} - extension of the file under given path.
 	 */
 	public static extractFileExtension(path: FilePath): FileExtension {
-		if (!OrdoFile.isValidPath(path)) {
+		if (!FileModel.isValidPath(path)) {
 			throw new Error("Invalid file path")
 		}
 
@@ -310,7 +310,7 @@ export class OrdoFile<CustomMetadata extends Record<string, unknown> = Record<st
 	 * @example `/dir/My file.txt -> .txt`
 	 */
 	public get extension(): FileExtension {
-		return OrdoFile.extractFileExtension(this.#path)
+		return FileModel.extractFileExtension(this.#path)
 	}
 
 	/**
@@ -320,7 +320,7 @@ export class OrdoFile<CustomMetadata extends Record<string, unknown> = Record<st
 	 * @example `1202 -> 1KB`
 	 */
 	public get readableSize(): string {
-		return OrdoFile.toReadableSize(this.#size)
+		return FileModel.toReadableSize(this.#size)
 	}
 
 	/**
@@ -345,11 +345,11 @@ export class OrdoFile<CustomMetadata extends Record<string, unknown> = Record<st
 	}
 
 	/**
-	 * Converts OrdoFile to a plain object that can be used for transferring
-	 * between the client and the server. Use `OrdoFile.from` to wrap the plain
-	 * IOrdoFile object back to OrdoFile.
+	 * Converts FileModel to a plain object that can be used for transferring
+	 * between the client and the server. Use `FileModel.from` to wrap the plain
+	 * IFileModel object back to FileModel.
 	 *
-	 * @returns {File<CustomMetadata>} - plain OrdoFile object.
+	 * @returns {File<CustomMetadata>} - plain FileModel object.
 	 */
 	public get toDTO(): File<CustomMetadata> {
 		return {

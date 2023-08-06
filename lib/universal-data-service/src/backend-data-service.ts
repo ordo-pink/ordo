@@ -12,9 +12,9 @@ import { equals } from "#ramda"
 
 type Params = {
 	metadataRepository: T.MetadataRepository
-	dataRepository: T.DataRepository<ReadableStream, WritableStream>
+	dataRepository: T.DataRepository<ReadableStream>
 }
-type Fn = Unary<Params, TDataService<ReadableStream, WritableStream>>
+type Fn = Unary<Params, TDataService<ReadableStream>>
 
 const service: Fn = ({ metadataRepository, dataRepository }) => ({
 	checkDirectoryExists: metadataRepository.directory.exists,

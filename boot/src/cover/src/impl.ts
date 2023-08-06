@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: Copyright 2023, 谢尔盖||↓ and the Ordo.pink contributors
 // SPDX-License-Identifier: MIT
 
-import type { Unary } from "#ramda"
+import type { Unary } from "#lib/tau/mod.ts"
 
 import { getDenoPath, runDenoCommand } from "#lib/binutil/mod.ts"
 import { Oath } from "#lib/oath/mod.ts"

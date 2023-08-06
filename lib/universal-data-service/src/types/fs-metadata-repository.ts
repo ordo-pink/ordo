@@ -37,6 +37,7 @@ type FileExistsFn = Unary<FileExistsParams, Oath<boolean>>
 
 type DirectoryCreateParams<T extends Record<string, unknown> = Record<string, unknown>> = {
 	sub: SUB
+	path: DirectoryPath
 	directory: Directory<T>
 }
 type DirectoryCreateFn = <T extends Record<string, unknown> = Record<string, unknown>>(
@@ -46,13 +47,13 @@ type DirectoryCreateFn = <T extends Record<string, unknown> = Record<string, unk
 type FileCreateParams<T extends Record<string, unknown> = Record<string, unknown>> = {
 	sub: SUB
 	path: FilePath
-	content: File<T>
+	file: File<T>
 }
 type FileCreateFn = <T extends Record<string, unknown> = Record<string, unknown>>(
 	params: FileCreateParams<T>
 ) => Oath<File, Error>
 
-type DirectoryReadParams = { sub: SUB; path: DirectoryPath; depth?: number }
+type DirectoryReadParams = { sub: SUB; path: DirectoryPath }
 type DirectoryReadFn = Unary<DirectoryReadParams, Oath<Nullable<Directory>, Error>>
 
 type FileReadParams = { sub: SUB; path: FilePath }
@@ -61,7 +62,7 @@ type FileReadFn = Unary<FileReadParams, Oath<Nullable<File>, Error>>
 type DirectoryUpdateParams<T extends Record<string, unknown> = Record<string, unknown>> = {
 	sub: SUB
 	path: DirectoryPath
-	content: Directory<T>
+	directory: Directory<T>
 }
 type DirectoryUpdateFn = <T extends Record<string, unknown> = Record<string, unknown>>(
 	params: DirectoryUpdateParams<T>
@@ -70,7 +71,7 @@ type DirectoryUpdateFn = <T extends Record<string, unknown> = Record<string, unk
 type FileUpdateParams<T extends Record<string, unknown> = Record<string, unknown>> = {
 	sub: SUB
 	path: FilePath
-	content: File<T>
+	file: File<T>
 }
 type FileUpdateFn = <T extends Record<string, unknown> = Record<string, unknown>>(
 	params: FileUpdateParams<T>

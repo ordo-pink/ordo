@@ -2,7 +2,8 @@
 // SPDX-License-Identifier: MIT
 
 import type { SUB } from "#lib/backend-token-service/mod.ts"
-import { NonEmpty, StartsWithSlash, EndsWithSlash, NoForbiddenSymbols } from "./common.ts"
+import type { NonEmpty, StartsWithSlash, EndsWithSlash, NoForbiddenSymbols } from "./common.ts"
+import type { File } from "./file.ts"
 
 /**
  * Valid structure of a Directory path.

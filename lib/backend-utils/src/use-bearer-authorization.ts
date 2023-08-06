@@ -5,10 +5,7 @@ import { Context } from "#x/oak@v12.6.0/mod.ts"
 import { TTokenService } from "#lib/backend-token-service/mod.ts"
 
 // TODO: Rewrite with Oath
-export const useBearerAuthorization = async (
-	ctx: Context,
-	tokenService: TTokenService.TokenService
-) => {
+export const useBearerAuthorization = async (ctx: Context, tokenService: TTokenService) => {
 	const authorization = ctx.request.headers.get("Authorization")
 
 	if (!authorization || !authorization.startsWith("Bearer ")) {

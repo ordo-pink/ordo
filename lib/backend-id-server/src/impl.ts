@@ -1,23 +1,23 @@
 // SPDX-FileCopyrightText: Copyright 2023, 谢尔盖||↓ and the Ordo.pink contributors
 // SPDX-License-Identifier: MPL-2.0
 
-import { ConsoleLogger, Logger } from "#lib/logger/mod.ts"
-import { CryptoKeyPair, TokenRepository, TokenService } from "#lib/backend-token-service/mod.ts"
-
-import { type UserRepository, UserService } from "#lib/backend-user-service/mod.ts"
 import { Application, Router } from "#x/oak@v12.6.0/mod.ts"
 import { oakCors } from "#x/cors@v1.2.2/oakCors.ts"
-import { handleAccount } from "./handlers/account.ts"
-import { handleChangeEmail } from "./handlers/change-email.ts"
+
+import { CryptoKeyPair, TokenRepository, TokenService } from "#lib/backend-token-service/mod.ts"
+import { handleError, logRequest, setResponseTimeHeader } from "#lib/backend-utils/mod.ts"
+import { UserRepository, UserService } from "#lib/backend-user-service/mod.ts"
+import { ConsoleLogger, Logger } from "#lib/logger/mod.ts"
+
 import { handleChangePassword } from "./handlers/change-password.ts"
 import { handleRefreshToken } from "./handlers/refresh-token.ts"
-import { handleSignIn } from "./handlers/sign-in.ts"
-import { handleSignOut } from "./handlers/sign-out.ts"
-import { handleSignUp } from "./handlers/sign-up.ts"
+import { handleVerifyToken } from "./handlers/verify-token.ts"
+import { handleChangeEmail } from "./handlers/change-email.ts"
 import { handleUserInfo } from "./handlers/user-info.ts"
-import { handleError } from "./middleware/handle-error.ts"
-import { logRequest } from "./middleware/log-request.ts"
-import { setResponseTimeHeader } from "./middleware/response-time.ts"
+import { handleSignOut } from "./handlers/sign-out.ts"
+import { handleAccount } from "./handlers/account.ts"
+import { handleSignIn } from "./handlers/sign-in.ts"
+import { handleSignUp } from "./handlers/sign-up.ts"
 
 // TODO: Extract errors to enum
 // TODO: Audit
@@ -75,10 +75,7 @@ export const createIDServer: CreateIDServerFn = async ({
 	router.get("/users/:email", handleUserInfo({ userService, tokenService }))
 	router.patch("/change-email", handleChangeEmail({ userService, tokenService }))
 	router.patch("/change-password", handleChangePassword({ userService, tokenService }))
-
-	// router.get("/avatar", ctx => {
-	// 	ctx.response.body = "TODO"
-	// })
+	router.post("/verify-token", handleVerifyToken({ userService, tokenService }))
 
 	// router.get("/send-activation-email/:email", ctx => {
 	// 	ctx.response.body = "TODO"
@@ -96,16 +93,11 @@ export const createIDServer: CreateIDServerFn = async ({
 	// 	ctx.response.body = "TODO"
 	// })
 
-	// TODO: Redirect if cookies are present and valid
-	const app = new Application({
-		state: {
-			logger: ConsoleLogger,
-		},
-	})
+	const app = new Application()
 
-	app.use(logRequest({ color: true }))
+	app.use(logRequest({ logger }))
 	app.use(setResponseTimeHeader)
-	app.use(handleError)
+	app.use(handleError({ logger }))
 	app.use(oakCors({ origin, credentials: true }))
 	app.use(router.routes())
 	app.use(router.allowedMethods())

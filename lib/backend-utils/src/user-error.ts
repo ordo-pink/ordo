@@ -3,7 +3,8 @@
 
 // deno-lint-ignore-file no-explicit-any
 
-import type { Context } from "#x/oak@v12.6.0/mod.ts"
+import { Context, Middleware, HttpError } from "#x/oak@v12.6.0/mod.ts"
+import { Logger } from "#lib/logger/mod.ts"
 import type * as T from "./types.ts"
 
 export const sendError = (ctx: Context) => (err: T.HttpError | unknown) => {
@@ -39,3 +40,22 @@ export const useResponseError = () => ({
 })
 
 export const ResponseError = useResponseError()
+
+export type HandleErrorParams = { logger: Logger }
+
+export const handleError =
+	(options: HandleErrorParams): Middleware =>
+	async (ctx, next) => {
+		try {
+			await next()
+		} catch (e) {
+			if (e instanceof HttpError) {
+				ctx.response.status = e.status
+				ctx.response.body = { error: e.message }
+			} else {
+				ctx.response.status = 500
+				ctx.response.body = "Internal error"
+				options.logger.error(e)
+			}
+		}
+	}

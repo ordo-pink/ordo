@@ -2,20 +2,19 @@
 // SPDX-License-Identifier: MPL-2.0
 
 import { Middleware } from "#x/oak@v12.6.0/mod.ts"
-import { cyan, green, red, setColorEnabled, yellow } from "#std/fmt/colors.ts"
+import { cyan, green, red, yellow } from "#std/fmt/colors.ts"
 import { Switch } from "#lib/switch/mod.ts"
 import { lte } from "#x/ramda@v0.27.2/mod.ts"
+import { Logger } from "#lib/logger/mod.ts"
 
 export type LogRequestOptions = {
-	color?: boolean
+	logger: Logger
 }
 
-export type LogRequestFn = (options?: LogRequestOptions) => Middleware
+export type LogRequestFn = (options: LogRequestOptions) => Middleware
 
 export const logRequest: LogRequestFn = options => async (ctx, next) => {
 	await next()
-
-	setColorEnabled(options?.color ?? true)
 
 	const ip = ctx.request.ip
 	const url = ctx.request.url.toString()
@@ -36,5 +35,5 @@ export const logRequest: LogRequestFn = options => async (ctx, next) => {
 		.case(lte(100), () => cyan(`${responseTimeHeader}ms`))
 		.default(() => green(`${responseTimeHeader}ms`))
 
-	ctx.app.state.logger.debug(`${ip} ${status} ${method} ${url} - ${rt}`)
+	options?.logger.info(`${ip} ${status} ${method} ${url} - ${rt}`)
 }

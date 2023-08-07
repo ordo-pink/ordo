@@ -10,6 +10,7 @@ import { DataRepository, FSID } from "#lib/universal-data-service/mod.ts"
 import { Oath } from "#lib/oath/mod.ts"
 import { resolve } from "#std/path/mod.ts"
 import { createFile, createParentDirectoryFor, removeFile, stat } from "#lib/fs/mod.ts"
+import { readableStreamFromReader } from "#std/streams/readable_stream_from_reader.ts"
 
 type Params = { root: string }
 type Fn = Unary<Params, DataRepository<ReadableStream>>
@@ -35,13 +36,7 @@ const of: Fn = ({ root }) => ({
 		),
 	read: ({ sub, fsid }) =>
 		Oath.of(resolve(root, ...sub.split("-"), ...fsid.split("-"))).chain(path =>
-			Oath.try(async () => {
-				const file = await Deno.open(path)
-				const stream = new ReadableStream(file.readable)
-				file.close()
-
-				return stream
-			})
+			Oath.try(async () => readableStreamFromReader(await Deno.open(path)))
 		),
 	update: ({ content, fsid, sub, upsert = false }) =>
 		Oath.of(resolve(root, ...sub.split("-"), ...fsid.split("-")))
@@ -67,4 +62,4 @@ const of: Fn = ({ root }) => ({
 			),
 })
 
-export const BackendFSDataRepository = { of }
+export const FSDataRepository = { of }

@@ -6,6 +6,7 @@
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 import type { Middleware } from "#x/oak@v12.6.0/middleware.ts"
+import type { TDataService } from "#lib/universal-data-service/mod.ts"
 import type { TTokenService } from "#lib/backend-token-service/mod.ts"
 import type { UserService } from "#lib/backend-user-service/mod.ts"
 
@@ -14,12 +15,16 @@ import { okpwd } from "#lib/okpwd/mod.ts"
 import { useBody } from "#lib/backend-utils/mod.ts"
 
 type Body = { email?: string; password?: string }
-type Params = { userService: UserService; tokenService: TTokenService }
+type Params = {
+	userService: UserService
+	tokenService: TTokenService
+	dataService: TDataService<ReadableStream>
+}
 type Fn = (params: Params) => Middleware
 
 // TODO: Rewrite with Oath
 export const handleSignUp: Fn =
-	({ userService, tokenService }) =>
+	({ userService, tokenService, dataService }) =>
 	async ctx => {
 		const { email, password } = await useBody<Body>(ctx)
 
@@ -48,20 +53,12 @@ export const handleSignUp: Fn =
 
 			const sub = newUser.id
 			const uip = ctx.request.ip
-
 			const { access, jti, exp } = await tokenService.createTokens({ sub, uip }).toPromise()
+			const expires = new Date(Date.now() + exp)
 
-			await ctx.cookies.set("jti", jti, {
-				httpOnly: true,
-				sameSite: "lax",
-				expires: new Date(Date.now() + exp),
-			})
-
-			await ctx.cookies.set("sub", sub, {
-				httpOnly: true,
-				sameSite: "lax",
-				expires: new Date(Date.now() + exp),
-			})
+			await dataService.createUserSpace(sub).toPromise()
+			await ctx.cookies.set("jti", jti, { httpOnly: true, sameSite: "lax", expires })
+			await ctx.cookies.set("sub", sub, { httpOnly: true, sameSite: "lax", expires })
 
 			ctx.response.body = { accessToken: access, refreshToken: jti, userId: sub }
 		} catch (e) {

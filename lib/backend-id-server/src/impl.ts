@@ -8,9 +8,14 @@
 import { Application } from "#x/oak@v12.6.0/mod.ts"
 
 import { CryptoKeyPair, TokenRepository, TokenService } from "#lib/backend-token-service/mod.ts"
-import { createServer } from "#lib/backend-utils/mod.ts"
+import {
+	BackendDataService,
+	DataRepository,
+	MetadataRepository,
+} from "#lib/universal-data-service/mod.ts"
 import { UserRepository, UserService } from "#lib/backend-user-service/mod.ts"
 import { ConsoleLogger, Logger } from "#lib/logger/mod.ts"
+import { createServer } from "#lib/backend-utils/mod.ts"
 
 import { handleChangePassword } from "./handlers/change-password.ts"
 import { handleRefreshToken } from "./handlers/refresh-token.ts"
@@ -25,8 +30,10 @@ import { handleSignUp } from "./handlers/sign-up.ts"
 // TODO: Extract errors to enum
 // TODO: Audit
 export type CreateIDServerFnParams = {
-	userStorageAdapter: UserRepository
-	tokenStorageAdapter: TokenRepository
+	userStorageRepository: UserRepository
+	tokenStorageRepository: TokenRepository
+	metadataRepository: MetadataRepository
+	dataRepository: DataRepository<ReadableStream>
 	accessTokenExpireIn: number
 	refreshTokenExpireIn: number
 	saltRounds: number
@@ -40,8 +47,10 @@ export type CreateIDServerFnParams = {
 export type CreateIDServerFn = (params: CreateIDServerFnParams) => Promise<Application>
 
 export const createIDServer: CreateIDServerFn = async ({
-	userStorageAdapter,
-	tokenStorageAdapter,
+	userStorageRepository,
+	tokenStorageRepository,
+	dataRepository,
+	metadataRepository,
 	origin,
 	accessTokenExpireIn,
 	refreshTokenExpireIn,
@@ -51,9 +60,10 @@ export const createIDServer: CreateIDServerFn = async ({
 	logger = ConsoleLogger,
 	alg,
 }) => {
-	const userService = await UserService.of(userStorageAdapter, { saltRounds })
+	const dataService = BackendDataService.of({ dataRepository, metadataRepository })
+	const userService = await UserService.of(userStorageRepository, { saltRounds })
 	const tokenService = TokenService.of({
-		adapter: tokenStorageAdapter,
+		repository: tokenStorageRepository,
 		options: {
 			accessTokenExpireIn,
 			refreshTokenExpireIn,
@@ -63,21 +73,23 @@ export const createIDServer: CreateIDServerFn = async ({
 		},
 	})
 
+	const ctx = { userService, tokenService, dataService }
+
 	return createServer({
 		origin,
 		logger,
 		serverName: "id-server",
 		extendRouter: r =>
 			r
-				.post("/sign-up", handleSignUp({ userService, tokenService }))
-				.post("/sign-in", handleSignIn({ userService, tokenService }))
-				.post("/sign-out", handleSignOut({ userService, tokenService }))
-				.post("/refresh-token", handleRefreshToken({ userService, tokenService }))
-				.get("/account", handleAccount({ userService, tokenService }))
-				.get("/users/:email", handleUserInfo({ userService, tokenService }))
-				.patch("/change-email", handleChangeEmail({ userService, tokenService }))
-				.patch("/change-password", handleChangePassword({ userService, tokenService }))
-				.post("/verify-token", handleVerifyToken({ userService, tokenService })),
+				.post("/sign-up", handleSignUp(ctx))
+				.post("/sign-in", handleSignIn(ctx))
+				.post("/sign-out", handleSignOut(ctx))
+				.post("/refresh-token", handleRefreshToken(ctx))
+				.get("/account", handleAccount(ctx))
+				.get("/users/:email", handleUserInfo(ctx))
+				.patch("/change-email", handleChangeEmail(ctx))
+				.patch("/change-password", handleChangePassword(ctx))
+				.post("/verify-token", handleVerifyToken(ctx)),
 		// .get("/send-activation-email/:email", () => {})
 		// .get("/send-forgot-password-email/:email", () => {})
 		// .get("/activate", () => {})

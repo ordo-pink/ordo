@@ -51,6 +51,16 @@ export class DirectoryModel<
 		return new DirectoryModel(path, createdAt, updatedAt, createdBy, updatedBy, metadata)
 	}
 
+	public static getParentPath(path: DirectoryPath): Nullable<DirectoryPath> {
+		const sliceablePath = path.slice(0, -1)
+
+		if (!sliceablePath) return null
+
+		const lastSeparatorPosition = sliceablePath.lastIndexOf("/") + 1
+
+		return sliceablePath.slice(0, lastSeparatorPosition) as DirectoryPath
+	}
+
 	/**
 	 * Creates an OrdoDirectory from an DirectoryDTO.
 	 *

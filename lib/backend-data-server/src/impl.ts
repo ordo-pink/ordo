@@ -18,6 +18,7 @@ import { handleCreateFile } from "./handlers/create-file.handler.ts"
 import { handleRemoveFile } from "./handlers/remove-file.handler.ts"
 import { handleUpdateFile } from "./handlers/update-file.handler.ts"
 import { handleGetFile } from "./handlers/get-file.handler.ts"
+import { handleGetRoot } from "./handlers/get-root.handler.ts"
 
 // TODO: Audit
 export type Params = {
@@ -37,7 +38,7 @@ export const createDataServer: Fn = ({ origin, dataService, idHost, logger = Con
 		extendRouter: r =>
 			r
 				.post("/directories/:userId", handleCreateDirectory({ dataService, idHost }))
-				.get("/directories/:userId", handleGetDirectory({ dataService, idHost }))
+				.get("/directories/:userId", handleGetRoot({ dataService, idHost }))
 				.get("/directories/:userId/:path*", handleGetDirectory({ dataService, idHost }))
 				.patch("/directories/:userId/:path*", handleUpdateDirectory({ dataService, idHost }))
 				.delete("/directories/:userId/:path*", handleRemoveDirectory({ dataService, idHost }))

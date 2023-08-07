@@ -14,6 +14,8 @@ import { Switch } from "#lib/switch/mod.ts"
 import { getc } from "#lib/getc/mod.ts"
 import { getPrivateKey, getPublicKey } from "./utils/get-key.ts"
 import { ConsoleLogger } from "#lib/logger/mod.ts"
+import { FSDataRepository } from "#lib/backend-fs-data-repository/mod.ts"
+import { FSMetadataRepository } from "#lib/backend-fs-metadata-repository/mod.ts"
 
 const {
 	ID_USER_ADAPTER,
@@ -33,6 +35,8 @@ const {
 	ID_REFRESH_TOKEN_PUBLIC_KEY_PATH,
 	ID_USER_TABLE_NAME,
 	ID_TOKENS_TABLE_NAME,
+	DATA_DATA_PATH,
+	DATA_METADATA_PATH,
 } = getc([
 	"ID_USER_ADAPTER",
 	"ID_DYNAMODB_ENDPOINT",
@@ -51,6 +55,8 @@ const {
 	"ID_REFRESH_TOKEN_PUBLIC_KEY_PATH",
 	"ID_USER_TABLE_NAME",
 	"ID_TOKENS_TABLE_NAME",
+	"DATA_DATA_PATH",
+	"DATA_METADATA_PATH",
 ])
 
 const accessPrivateKeyString = resolve(ID_ACCESS_TOKEN_PRIVATE_KEY_PATH)
@@ -65,8 +71,11 @@ const refreshTokenPublicKey = await getPublicKey(refreshPublicKeyString)
 
 const kvPath = `${ID_KV_DB_PATH.endsWith("/") ? ID_KV_DB_PATH : `${ID_KV_DB_PATH}/`}kvdb`
 
-const tokenStorageAdapter = await DenoKVTokenStorageAdapter.of(kvPath, ID_TOKENS_TABLE_NAME)
-const userStorageAdapter = await Switch.of(ID_USER_ADAPTER)
+const dataRepository = FSDataRepository.of({ root: DATA_DATA_PATH })
+const metadataRepository = FSMetadataRepository.of({ root: DATA_METADATA_PATH })
+
+const tokenStorageRepository = await DenoKVTokenStorageAdapter.of(kvPath, ID_TOKENS_TABLE_NAME)
+const userStorageRepository = await Switch.of(ID_USER_ADAPTER)
 	.case("dynamodb", () =>
 		DynamoDBUserStorageAdapter.of({
 			region: ID_DYNAMODB_REGION,
@@ -80,8 +89,10 @@ const userStorageAdapter = await Switch.of(ID_USER_ADAPTER)
 	.default(() => DenoKVUserStorageAdapter.of({ path: kvPath, key: ID_USER_TABLE_NAME }))
 
 const app = await createIDServer({
-	userStorageAdapter,
-	tokenStorageAdapter,
+	userStorageRepository,
+	tokenStorageRepository,
+	dataRepository,
+	metadataRepository,
 	origin: ID_ACCESS_CONTROL_ALLOW_ORIGIN,
 	accessKeys: { private: accessTokenPrivateKey, public: accessTokenPublicKey },
 	refreshKeys: { private: refreshTokenPrivateKey, public: refreshTokenPublicKey },

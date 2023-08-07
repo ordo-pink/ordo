@@ -24,12 +24,15 @@ export const handleGetFile: Fn =
 		Oath.from(() => useBearerAuthorization(ctx, idHost))
 			.map(prop("payload"))
 			.chain(({ sub }) =>
-				getPath0(ctx.params)
+				getPath0(ctx.params as unknown as Record<"path", string>)
 					.chain(validateIsValidPath0(ctx))
 					.chain(getFileContent0({ service: dataService, sub }))
+					.rejectedMap(e =>
+						e.message === "File not found" ? new httpErrors.NotFound("Not found") : e
+					)
 			)
 			.chain(throwIfFileDoesNotExist0)
-			.fork(ResponseError.send(ctx), formGetFileResponse)
+			.fork(ResponseError.send(ctx), formGetFileResponse(ctx))
 
 // --- INTERNAL ---
 
@@ -38,9 +41,8 @@ type Fn = Unary<Params, RouterMiddleware<"/files/:userId/:path*">>
 
 // ---
 
-type GetPathFn = Unary<Record<"path*", Optional<string>>, Oath<string, never>>
-const getPath0: GetPathFn = params =>
-	Oath.of(params["path*"] ? pathParamToFilePath(params["path*"]) : "/")
+type GetPathFn = Unary<Record<"path", Optional<string>>, Oath<string, never>>
+const getPath0: GetPathFn = params => Oath.of(params.path ? pathParamToFilePath(params.path) : "/")
 
 // ---
 
@@ -69,7 +71,8 @@ const throwIfFileDoesNotExist0: ThrowIfFileDoesNotExistFn = file =>
 
 // ---
 
-type FormGetFileResponseFn = Unary<ReadableStream, void>
-const formGetFileResponse: FormGetFileResponseFn = file => {
-	return new Response(file)
+type FormGetFileResponseFn = Curry<Binary<Context, ReadableStream, void>>
+const formGetFileResponse: FormGetFileResponseFn = ctx => file => {
+	const body = file as ReadableStream<Uint8Array>
+	ctx.request.originalRequest.respond(new Response(body))
 }

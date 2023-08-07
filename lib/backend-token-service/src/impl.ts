@@ -22,32 +22,43 @@ import { F, pipe, thunkify } from "#ramda"
  * @see T.TokenServiceOptions
  * @see T.TTokenService
  */
-const service: T._Fn = params => ({
-	verifyAccessToken: verifyToken(params.options.keys.access.public),
-	verifyRefreshToken: verifyToken(params.options.keys.refresh.public),
-	getAccessTokenPayload: getAccessTokenPayload(params.options.keys.access.public),
-	getRefreshTokenPayload: getRefreshTokenPayload(params.options.keys.refresh.public),
-	getPersistedToken: getRefreshToken(params.adapter),
-	getPersistedTokens: getRefreshTokenMap(params.adapter),
-	removePersistedToken: removeRefreshToken(params.adapter),
-	removePersistedTokens: removeRefreshTokenMap(params.adapter),
-	setPersistedToken: setRefreshToken(params.adapter),
-	setPersistedTokens: setRefreshTokenMap(params.adapter),
+const of: T._Fn = params => ({
+	verifyAccessToken: verifyToken({
+		key: params.options.keys.access.public,
+		repository: params.repository,
+	}),
+	verifyRefreshToken: verifyToken({
+		key: params.options.keys.refresh.public,
+		repository: params.repository,
+	}),
+	getAccessTokenPayload: getAccessTokenPayload({
+		key: params.options.keys.access.public,
+		repository: params.repository,
+	}),
+	getRefreshTokenPayload: getRefreshTokenPayload({
+		key: params.options.keys.refresh.public,
+		repository: params.repository,
+	}),
+	getPersistedToken: getRefreshToken(params.repository),
+	getPersistedTokens: getRefreshTokenMap(params.repository),
+	removePersistedToken: removeRefreshToken(params.repository),
+	removePersistedTokens: removeRefreshTokenMap(params.repository),
+	setPersistedToken: setRefreshToken(params.repository),
+	setPersistedTokens: setRefreshTokenMap(params.repository),
 	createTokens: createTokens(params),
 	decodeAccessToken,
 	decodeRefreshToken,
 })
 
-export const TokenService = {
-	of: service,
-}
+export const TokenService = { of }
 
 // INTERNAL ---------------------------------------------------------------------------------------
 
-const getTokenPayload: T._GetTokenPayloadFn<Payload> = key =>
+const getTokenPayload: T._GetTokenPayloadFn<Payload> = ({ key, repository }) =>
 	pipe(
 		thunkify((token: string) => verify(token, key)),
 		Oath.from,
+		o => o.chain(payload => repository.getToken(payload.sub!, payload.jti!).map(() => payload)),
 		o => o.rejectedMap(() => null)
 	)
 
@@ -61,9 +72,9 @@ const decodeAccessToken = decodeToken as T._DecodePayloadFn<T.AccessTokenParsed>
 
 const decodeRefreshToken = decodeToken as T._DecodePayloadFn<T.RefreshTokenParsed>
 
-const verifyToken: T._VerifyToken = key =>
+const verifyToken: T._VerifyToken = ({ key, repository }) =>
 	pipe(
-		getTokenPayload(key),
+		getTokenPayload({ key, repository }),
 		o => o.map(Boolean),
 		o => o.fix(F)
 	)
@@ -140,22 +151,22 @@ const createTokens: T._CreateTokensFn =
 				uip,
 				access: create(
 					{ alg: params.options.alg, type: "JWT" },
-					{ jti, iat, iss, aexp, sub, aud },
+					{ jti, iat, iss, exp: aexp, sub, aud },
 					params.options.keys.access.private
 				),
 				refresh: create(
 					{ alg: params.options.alg, type: "JWT" },
-					{ jti, iat, iss, rexp, sub, aud, uip },
+					{ jti, iat, iss, exp: rexp, sub, aud, uip },
 					params.options.keys.refresh.private
 				),
 			}).chain(res =>
 				prevJti
-					? service(params)
+					? of(params)
 							.removePersistedToken(sub, prevJti)
-							.chain(() => service(params).setPersistedToken(sub, jti, res.refresh))
+							.chain(() => of(params).setPersistedToken(sub, jti, res.refresh))
 							.map(() => res)
 					: Oath.empty()
-							.chain(() => service(params).setPersistedToken(sub, jti, res.refresh))
+							.chain(() => of(params).setPersistedToken(sub, jti, res.refresh))
 							.map(() => res)
 			)
 		)

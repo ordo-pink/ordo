@@ -17,6 +17,8 @@ type Params = {
 type Fn = Unary<Params, TDataService<ReadableStream>>
 
 const service: Fn = ({ metadataRepository, dataRepository }) => ({
+	getRoot: metadataRepository.directory.getRoot,
+	createUserSpace: metadataRepository._internal.createUserSpace,
 	checkDirectoryExists: metadataRepository.directory.exists,
 	getDirectory: metadataRepository.directory.read,
 	createDirectory: ({ directory, sub }) =>
@@ -87,16 +89,17 @@ const service: Fn = ({ metadataRepository, dataRepository }) => ({
 			)
 			.chain(({ sub }) => dataRepository.create({ sub }))
 			.map(fsid => {
-				const file = {} as File
+				const createdFile = { ...file } as File
+
 				const date = new Date(Date.now())
 
-				file.fsid = fsid
-				file.size = 0
-				file.createdAt = file.updatedAt = date
-				file.createdBy = file.updatedBy = sub
-				file.encryption = encryption
+				createdFile.fsid = fsid
+				createdFile.size = 0
+				createdFile.createdAt = createdFile.updatedAt = date
+				createdFile.createdBy = createdFile.updatedBy = sub
+				createdFile.encryption = encryption
 
-				return file
+				return createdFile
 			})
 			.chain(file =>
 				content

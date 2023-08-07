@@ -22,6 +22,27 @@ import { Oath } from "#lib/oath/mod.ts"
 // --- Public ---
 
 const of: Fn = ({ root }) => ({
+	_internal: {
+		createUserSpace: sub =>
+			Oath.of(resolve(root, sub)).chain(path =>
+				Oath.of(path)
+					.map(() => new TextEncoder())
+					.map(encoder =>
+						encoder.encode(
+							JSON.stringify([
+								{
+									path: "/",
+									createdAt: new Date(Date.now()),
+									updatedAt: new Date(Date.now()),
+									createdBy: sub,
+									updatedBy: sub,
+								},
+							])
+						)
+					)
+					.chain(data => writeFile(resolve(path), data))
+			),
+	},
 	directory: {
 		create: ({ directory, path, sub }) =>
 			getUserMetadata0({ root, sub })
@@ -32,6 +53,7 @@ const of: Fn = ({ root }) => ({
 			getUserMetadata0({ root, sub }).map(
 				metadata => metadata.find(item => item.path === path) as Directory
 			),
+		getRoot: sub => getUserMetadata0({ root, sub }),
 		update: ({ directory, path, sub }) =>
 			getUserMetadata0({ root, sub })
 				.chain(metadata =>
@@ -112,7 +134,8 @@ type Fn = Unary<Params, MetadataRepository>
 type GetUserMetadataParams = { root: string; sub: SUB }
 type GetUserMetadataFn = Unary<GetUserMetadataParams, Oath<Array<Directory | File>, Error>>
 const getUserMetadata0: GetUserMetadataFn = ({ root, sub }) =>
-	readFile(resolve(root, sub))
+	Oath.of(resolve(root, sub))
+		.chain(readFile)
 		.map(content => new TextDecoder().decode(content))
 		.map(JSON.parse)
 

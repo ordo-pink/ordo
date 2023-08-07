@@ -24,7 +24,7 @@ export const handleUpdateFileContent: Fn =
 		Oath.from(() => useBearerAuthorization(ctx, idHost))
 			.map(prop("payload"))
 			.chain(({ sub }) =>
-				getPath0(ctx.params)
+				getPath0(ctx.params as unknown as Record<"path", string>)
 					.chain(validateIsValidPath0(ctx))
 					.chain(path =>
 						Oath.from(() => ctx.request.body({ type: "bytes" }).value)
@@ -42,9 +42,8 @@ type Fn = Unary<Params, RouterMiddleware<"/files/:userId/:path*">>
 
 // ---
 
-type GetPathFn = Unary<Record<"path*", Optional<string>>, Oath<string, never>>
-const getPath0: GetPathFn = params =>
-	Oath.of(params["path*"] ? pathParamToFilePath(params["path*"]) : "/")
+type GetPathFn = Unary<Record<"path", Optional<string>>, Oath<string, never>>
+const getPath0: GetPathFn = params => Oath.of(params.path ? pathParamToFilePath(params.path) : "/")
 
 // ---
 

@@ -35,6 +35,7 @@ export const handleSignIn: Fn =
 					)
 					.bimap(ResponseError.create(404, "User not found"), prop("user"))
 			)
+			// TODO: Drop previous token if it exists for given IP
 			.chain(user =>
 				Oath.of({ sub: user.id, uip: ctx.request.ip }).chain(({ sub, uip }) =>
 					tokenService.createTokens({ sub, uip })

@@ -24,7 +24,7 @@ export const handleRemoveDirectory: Fn =
 		Oath.from(() => useBearerAuthorization(ctx, idHost))
 			.map(prop("payload"))
 			.chain(({ sub }) =>
-				getPath0(ctx.params)
+				getPath0(ctx.params as unknown as Record<"path", string>)
 					.chain(validateIsValidPath0(ctx))
 					.chain(removeDirectory0({ service: dataService, sub }))
 			)
@@ -38,9 +38,9 @@ type Fn = Unary<Params, RouterMiddleware<"/directories/:userId/:path*">>
 
 // ---
 
-type GetPathFn = Unary<Record<"path*", Optional<string>>, Oath<string, never>>
+type GetPathFn = Unary<Record<"path", Optional<string>>, Oath<string, never>>
 const getPath0: GetPathFn = params =>
-	Oath.of(params["path*"] ? pathParamToDirectoryPath(params["path*"]) : "/")
+	Oath.of(params.path ? pathParamToDirectoryPath(params.path) : "/")
 
 // ---
 

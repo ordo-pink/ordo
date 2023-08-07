@@ -352,9 +352,12 @@ export type TTokenService = {
 
 export type _CreateTokensParams = { sub: SUB; uip: UIP; prevJti?: JTI; aud?: AUD }
 export type _CreatedTokens = RefreshTokenPayload & { access: string; refresh: string }
-export type _Props = { adapter: TokenRepository; options: TokenServiceOptions }
+export type _Props = { repository: TokenRepository; options: TokenServiceOptions }
 export type _Fn = (props: _Props) => TTokenService
-export type _GetTokenPayloadFn<T> = (key: CryptoKey) => Unary<string, Oath<T, null>>
+export type _GetTokenPayloadFn<T> = (params: {
+	key: CryptoKey
+	repository: TokenRepository
+}) => Unary<string, Oath<T, null>>
 export type _DecodePayloadFn<T extends TokenParsed> = Unary<string, Oath<T, null>>
 export type _GetTokenFn = Unary<TokenRepository, TTokenService["getPersistedToken"]>
 export type _GetTokenRecordFn = Unary<TokenRepository, TTokenService["getPersistedTokens"]>
@@ -366,5 +369,14 @@ export type _CreateEXPFn = Unary<number, EXP>
 export type _CreateJTIFn = Thunk<JTI>
 export type _CreateIATFn = Thunk<IAT>
 export type _CreateISSFn = Thunk<ISS>
-export type _VerifyToken = Curry<Binary<CryptoKey, string, Oath<boolean, never>>>
+export type _VerifyToken = Curry<
+	Binary<
+		{
+			key: CryptoKey
+			repository: TokenRepository
+		},
+		string,
+		Oath<boolean, never>
+	>
+>
 export type _CreateTokensFn = Unary<_Props, TTokenService["createTokens"]>

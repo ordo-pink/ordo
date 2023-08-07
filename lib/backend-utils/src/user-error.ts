@@ -63,8 +63,8 @@ export const handleError =
 				ctx.response.body = { success: false, message: e.message }
 			} else {
 				ctx.response.status = 500
+				options.logger.notice(e)
 				ctx.response.body = { success: false, message: "Internal error" }
-				options.logger.error(e)
 			}
 		}
 	}

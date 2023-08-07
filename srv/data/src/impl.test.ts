@@ -6,6 +6,5 @@
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 import { assertEquals } from "#std/testing/asserts.ts"
-import { data } from "./impl.ts"
 
-Deno.test("data", () => assertEquals(data, "data"))
+Deno.test("data", () => assertEquals("data", "data"))

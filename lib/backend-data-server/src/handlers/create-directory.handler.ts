@@ -5,7 +5,7 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-import type { Context, Middleware } from "#x/oak@v12.6.0/mod.ts"
+import { httpErrors, type Context, type Middleware } from "#x/oak@v12.6.0/mod.ts"
 import type * as DATA_SERVICE_TYPES from "#lib/universal-data-service/mod.ts"
 import type { SUB } from "#lib/backend-token-service/mod.ts"
 import type { Binary, Curry, Unary } from "#lib/tau/mod.ts"
@@ -24,7 +24,7 @@ export const handleCreateDirectory: Fn =
 			.map(prop("payload"))
 			.chain(({ sub }) =>
 				Oath.from(() => useBody<DATA_SERVICE_TYPES.DirectoryCreateParams>(ctx))
-					.chain(validateCreateDirectoryParams0(ctx))
+					.chain(validateCreateDirectoryParams0({ ctx, sub, service: dataService }))
 					.chain(createDirectory0({ service: dataService, sub }))
 			)
 			.fork(ResponseError.send(ctx), formCreateDirectoryResponse(ctx))
@@ -36,17 +36,32 @@ type Fn = Unary<Params, Middleware>
 
 // ---
 
+type ValidateCreateDirectoryParams = {
+	ctx: Context
+	sub: SUB
+	service: DATA_SERVICE_TYPES.TDataService<ReadableStream>
+}
 type ValidateCreateDirectoryParamsFn = Curry<
 	Binary<
-		Context,
+		ValidateCreateDirectoryParams,
 		DATA_SERVICE_TYPES.DirectoryCreateParams,
 		Oath<DATA_SERVICE_TYPES.DirectoryCreateParams, Error>
 	>
 >
-const validateCreateDirectoryParams0: ValidateCreateDirectoryParamsFn = ctx => params =>
-	Oath.try(() =>
-		DirectoryModel.isValidPath(params.path) ? params : ctx.throw(400, "Invalid directory path")
-	)
+const validateCreateDirectoryParams0: ValidateCreateDirectoryParamsFn =
+	({ ctx, sub, service }) =>
+	params =>
+		Oath.try(() =>
+			DirectoryModel.isValidPath(params.path) ? params : ctx.throw(400, "Invalid directory path")
+		)
+			.chain(({ path }) =>
+				Oath.fromNullable(DirectoryModel.getParentPath(path))
+					.chain(path => service.checkDirectoryExists({ path, sub }))
+					.rejectedMap(() => new httpErrors.BadRequest("Invalid directory path"))
+			)
+			.chain(exists =>
+				Oath.try(() => (exists ? params : ctx.throw(404, "Missing parent directory")))
+			)
 
 // ---
 

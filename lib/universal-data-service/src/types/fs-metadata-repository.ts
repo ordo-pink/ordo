@@ -10,6 +10,10 @@ import { FilePath, File } from "./file.ts"
 // PUBLIC -----------------------------------------------------------------------------------------
 
 export type MetadataRepository = {
+	_internal: {
+		createUserSpace: CreateUserSpaceFn
+		// removeUserSpace: RemoveUserSpaceFn
+	}
 	directory: {
 		read: DirectoryReadFn
 		exists: DirectoryExistsFn
@@ -17,6 +21,7 @@ export type MetadataRepository = {
 		update: DirectoryUpdateFn
 		delete: DirectoryDeleteFn
 		readWithChildren: DirectoryGetWithChildrenFn
+		getRoot: GetRootFn
 	}
 	file: {
 		read: FileReadFn
@@ -88,3 +93,8 @@ type DirectoryGetWithChildrenFn = Unary<
 	DirectoryGetWithChildrenParams,
 	Oath<Nullable<DirectoryWithChildren>, Error>
 >
+
+type CreateUserSpaceFn = Unary<SUB, Oath<void, Error>>
+type RemoveUserSpaceFn = Unary<SUB, Oath<void, Error>>
+
+type GetRootFn = Unary<SUB, Oath<Nullable<Array<Directory | File>>, Error>>

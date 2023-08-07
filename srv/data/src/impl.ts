@@ -9,7 +9,7 @@ import { createDataServer } from "#lib/backend-data-server/mod.ts"
 import { getc } from "#lib/getc/mod.ts"
 import { BackendDataService } from "#lib/universal-data-service/mod.ts"
 import { FSMetadataRepository } from "#lib/backend-fs-metadata-repository/mod.ts"
-import { BackendFSDataRepository } from "#lib/backend-fs-data-repository/mod.ts"
+import { FSDataRepository } from "#lib/backend-fs-data-repository/mod.ts"
 import { ConsoleLogger } from "#lib/logger/mod.ts"
 
 const {
@@ -28,8 +28,8 @@ const {
 	"ID_HOST",
 ])
 
-const metadataRepository = FSMetadataRepository.of({ root: DATA_DATA_PATH })
-const dataRepository = BackendFSDataRepository.of({ root: DATA_METADATA_PATH })
+const metadataRepository = FSMetadataRepository.of({ root: DATA_METADATA_PATH })
+const dataRepository = FSDataRepository.of({ root: DATA_DATA_PATH })
 const dataService = BackendDataService.of({ dataRepository, metadataRepository })
 
 const app = createDataServer({

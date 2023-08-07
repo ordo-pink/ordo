@@ -7,13 +7,13 @@
 
 import { assert, assertEquals, assertInstanceOf, assertRejects } from "#std/testing/asserts.ts"
 import { readFile, rmdir } from "#lib/fs/mod.ts"
-import { BackendFSDataRepository } from "./impl.ts"
+import { FSDataRepository } from "./impl.ts"
 import { resolve } from "#std/path/mod.ts"
 import { FSID } from "#lib/universal-data-service/mod.ts"
 
 const root = "./var/test"
 const sub = crypto.randomUUID()
-const repository = BackendFSDataRepository.of({ root })
+const repository = FSDataRepository.of({ root })
 
 Deno.test("backend-fs-user-data-repository", async t => {
 	await t.step("create file", async t => {

@@ -17,6 +17,7 @@ import {
 export type TDataService<TReadContent, TWriteContent = TReadContent> = {
 	// findFiles: FindFilesFn
 	// findDirectories: FindDirectoriesFn
+	createUserSpace: CreateUserSpaceFn
 
 	getFile: GetFileFn
 	checkFileExistsByPath: CheckFileExistsByPathFn
@@ -27,6 +28,7 @@ export type TDataService<TReadContent, TWriteContent = TReadContent> = {
 	setFileContent: SetFileContentFn<TWriteContent>
 
 	checkDirectoryExists: CheckDirectoryExists
+	getRoot: GetRootFn
 	getDirectory: FindDirectoryFn
 	getDirectoryChildren: GetDirectoryWithChildrenFn
 	createDirectory: CreateDirectoryFn
@@ -102,3 +104,7 @@ type CheckFileExistsByPathFn = Unary<CheckFileExistsByPathParams, Oath<boolean>>
 
 type CheckDirectoryExistsParams = { sub: SUB; path: DirectoryPath }
 type CheckDirectoryExists = Unary<CheckDirectoryExistsParams, Oath<boolean>>
+
+type CreateUserSpaceFn = Unary<SUB, Oath<void, Error>>
+
+type GetRootFn = Unary<SUB, Oath<Nullable<Array<Directory | File>>, Error>>

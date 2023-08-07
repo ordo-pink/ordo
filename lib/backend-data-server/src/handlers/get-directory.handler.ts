@@ -27,6 +27,11 @@ export const handleGetDirectory: Fn =
 				getPath0(ctx.params as Record<"path*", Optional<string>>)
 					.chain(validateIsValidPath0(ctx))
 					.chain(getDirectory0({ service: dataService, sub }))
+					.rejectedMap(e =>
+						e.message.startsWith("No such file or directory")
+							? new httpErrors.NotFound("Not found")
+							: e
+					)
 			)
 			.chain(throwIfDirectoryDoesNotExist0)
 			.fork(ResponseError.send(ctx), formGetDirectoryResponse(ctx))

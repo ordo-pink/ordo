@@ -33,6 +33,7 @@ export const createDataServer: Fn = ({ origin, dataService, idHost, logger = Con
 	return createServer({
 		origin,
 		logger,
+		serverName: "data-server",
 		extendRouter: r =>
 			r
 				.post("/directories/:userId", handleCreateDirectory({ dataService, idHost }))

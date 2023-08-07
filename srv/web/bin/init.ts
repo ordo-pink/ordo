@@ -4,9 +4,9 @@
 import "#std/dotenv/load.ts"
 
 import { Oath } from "#lib/oath/mod.ts"
-import { createDirectoryIfNotExists, getParentPath } from "#lib/fs/mod.ts"
+import { createDirectoryIfNotExists } from "#lib/fs/mod.ts"
+import { getc } from "#lib/getc/mod.ts"
 
-await Oath.fromNullable(Deno.env.get("ID_KV_DB_PATH"))
-	.map(getParentPath)
-	.chain(createDirectoryIfNotExists)
-	.toPromise()
+const { WEB_STATIC_ROOT } = getc(["WEB_STATIC_ROOT"])
+
+await Oath.fromNullable(WEB_STATIC_ROOT).chain(createDirectoryIfNotExists).toPromise()

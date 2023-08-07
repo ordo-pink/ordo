@@ -5,7 +5,7 @@ import { resolve } from "#std/path/mod.ts"
 import { cyan, green } from "#std/fmt/colors.ts"
 import { encode } from "#std/encoding/base64.ts"
 import { getc } from "#lib/getc/mod.ts"
-import { getParentPath, getAbsolutePath } from "#lib/fs/mod.ts"
+import { createDirectoryIfNotExists, createParentDirectoryFor } from "#lib/fs/mod.ts"
 
 // TODO: write configuration updates to dotenvs
 
@@ -48,17 +48,6 @@ ${encode(exportedPublicKey)
 	await Deno.writeFile(publicPath, new TextEncoder().encode(pub))
 }
 
-const createRequiredDirectories = async () => {
-	const dbDirectoryPath = getAbsolutePath(ID_KV_DB_PATH)
-	const dbDirectoryExists = await Deno.stat(dbDirectoryPath).catch(() => ({
-		isDirectory: false,
-	}))
-
-	if (!dbDirectoryExists || !dbDirectoryExists.isDirectory) {
-		await Deno.mkdir(dbDirectoryPath, { recursive: true })
-	}
-}
-
 const generateAuthKeys = async () => {
 	const keys = [
 		ID_ACCESS_TOKEN_PRIVATE_KEY_PATH,
@@ -68,20 +57,14 @@ const generateAuthKeys = async () => {
 	]
 
 	for (const key of keys) {
-		const parentPath = getParentPath(key)
-		const parentPathExists = await Deno.stat(parentPath).catch(() => ({
-			isDirectory: false,
-		}))
-
-		if (!parentPathExists || !parentPathExists.isDirectory) {
-			await Deno.mkdir(parentPath, { recursive: true })
-		}
+		await createParentDirectoryFor(key).toPromise()
 	}
 
 	await generateKeyPair(
 		resolve(ID_ACCESS_TOKEN_PRIVATE_KEY_PATH),
 		resolve(ID_ACCESS_TOKEN_PUBLIC_KEY_PATH)
 	)
+
 	await generateKeyPair(
 		resolve(ID_REFRESH_TOKEN_PRIVATE_KEY_PATH),
 		resolve(ID_REFRESH_TOKEN_PUBLIC_KEY_PATH)
@@ -92,7 +75,7 @@ const main = async () => {
 	const encoder = new TextEncoder()
 
 	Deno.stdout.write(encoder.encode(`  ${cyan("→")} Creating directories...`))
-	await createRequiredDirectories()
+	await createDirectoryIfNotExists(ID_KV_DB_PATH).toPromise()
 	Deno.stdout.write(encoder.encode(` ${green("✓")}\n`))
 
 	Deno.stdout.write(encoder.encode(`  ${cyan("→")} Generating auth keys...`))

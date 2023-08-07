@@ -66,6 +66,7 @@ export const createIDServer: CreateIDServerFn = async ({
 	return createServer({
 		origin,
 		logger,
+		serverName: "id-server",
 		extendRouter: r =>
 			r
 				.post("/sign-up", handleSignUp({ userService, tokenService }))

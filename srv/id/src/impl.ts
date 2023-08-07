@@ -13,6 +13,7 @@ import { createIDServer } from "#lib/backend-id-server/mod.ts"
 import { Switch } from "#lib/switch/mod.ts"
 import { getc } from "#lib/getc/mod.ts"
 import { getPrivateKey, getPublicKey } from "./utils/get-key.ts"
+import { ConsoleLogger } from "#lib/logger/mod.ts"
 
 const {
 	ID_USER_ADAPTER,
@@ -90,6 +91,6 @@ const app = await createIDServer({
 	refreshTokenExpireIn: Number(ID_REFRESH_TOKEN_EXPIRE_IN),
 })
 
-console.log(`ID server running on http://localhost:${ID_PORT}`)
+ConsoleLogger.info(`ID server running on http://localhost:${ID_PORT}`)
 
 await app.listen({ port: Number(ID_PORT) })

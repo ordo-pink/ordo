@@ -13,6 +13,7 @@ import { Logger } from "#lib/logger/mod.ts"
 
 export type LogRequestOptions = {
 	logger: Logger
+	serverName: string
 }
 
 export type LogRequestFn = (options: LogRequestOptions) => Middleware
@@ -20,6 +21,7 @@ export type LogRequestFn = (options: LogRequestOptions) => Middleware
 export const logRequest: LogRequestFn = options => async (ctx, next) => {
 	await next()
 
+	const name = options.serverName
 	const ip = ctx.request.ip
 	const url = ctx.request.url.toString()
 	const method = cyan(ctx.request.method)
@@ -39,5 +41,5 @@ export const logRequest: LogRequestFn = options => async (ctx, next) => {
 		.case(lte(100), () => cyan(`${responseTimeHeader}ms`))
 		.default(() => green(`${responseTimeHeader}ms`))
 
-	options?.logger.info(`${ip} ${status} ${method} ${url} - ${rt}`)
+	options?.logger.info(`${ip} ${status} ${method} ${url} - ${rt} - ${name}`)
 }

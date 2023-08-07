@@ -21,7 +21,7 @@ import { Oath } from "#lib/oath/mod.ts"
 
 // --- Public ---
 
-export const of: Fn = ({ root }) => ({
+const of: Fn = ({ root }) => ({
 	directory: {
 		create: ({ directory, path, sub }) =>
 			getUserMetadata0({ root, sub })
@@ -99,6 +99,8 @@ export const of: Fn = ({ root }) => ({
 				.fix(() => false),
 	},
 })
+
+export const FSMetadataRepository = { of }
 
 // --- Internal ---
 

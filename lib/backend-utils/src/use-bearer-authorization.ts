@@ -27,7 +27,7 @@ export const useBearerAuthorization = async (
 			headers: { authorization },
 		}).then(res => res.json())
 
-		if (body.token === "valid") return body.token
+		if (body.valid) return body.token
 
 		ctx.throw(403, "Unverified or outdated access token")
 	} else {

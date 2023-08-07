@@ -24,9 +24,14 @@ export const sendError = (ctx: Context) => (err: T.HttpError | unknown) => {
 
 		ctx.response.status = status
 		ctx.response.body = { error: message }
+	} else if (err instanceof HttpError) {
+		ctx.response.status = err.status
+		ctx.response.body = {
+			error: err && (err as any).message ? (err as any).message : "Unknown error",
+		}
 	} else {
 		ctx.response.status = 500
-		console.log(err)
+		console.log(err) // TODO: Replace with logger
 		ctx.response.body = {
 			error: err && (err as any).message ? (err as any).message : "Unknown error",
 		}
@@ -53,7 +58,7 @@ export const handleError =
 		try {
 			await next()
 		} catch (e) {
-			if (e instanceof HttpError) {
+			if (e instanceof HttpError || e.status) {
 				ctx.response.status = e.status
 				ctx.response.body = { success: false, message: e.message }
 			} else {

@@ -11,13 +11,13 @@ export const ConsoleLogger: T.Logger = {
 	crit: (...args) => console.error(`🚑️ [${new Date(Date.now()).toISOString()}] [CRIT]:`, ...args),
 	debug: (...args) => console.debug(`🔨 [${new Date(Date.now()).toISOString()}] [DEBG]:`, ...args),
 	error: (...args) => console.error(`💥 [${new Date(Date.now()).toISOString()}] [ERRR]:`, ...args),
-	notice: (...args) => console.info(`📝 [${new Date(Date.now()).toISOString()}] [NOTI]:`, ...args),
-	info: (...args) => console.info(`💬 [${new Date(Date.now()).toISOString()}] [INFO]:`, ...args),
+	notice: (...args) => console.info(`📝 [${new Date(Date.now()).toISOString()}] [NOTE]:`, ...args),
+	info: (...args) => console.info(`✅ [${new Date(Date.now()).toISOString()}] [INFO]:`, ...args),
 	panic: (...args) => console.error(`🔥 [${new Date(Date.now()).toISOString()}] [PANC]:`, ...args),
 	warn: (...args) => console.warn(`⚠️ [${new Date(Date.now()).toISOString()}] [WARN]:`, ...args),
 }
 
-/**
+/**✓
  * An average silence fan.
  */
 export const IgnoreLogger: T.Logger = {

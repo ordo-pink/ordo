@@ -17,12 +17,14 @@ import { identity } from "#ramda"
 export type CreateServerParams = {
 	origin?: string
 	logger?: Logger
+	serverName: string
 	extendRouter?: Unary<Router, Router>
 }
 export type CreateServerFn = Unary<CreateServerParams, Application>
 
 export const createServer: CreateServerFn = ({
 	origin,
+	serverName,
 	extendRouter = identity,
 	logger = ConsoleLogger,
 }) => {
@@ -35,7 +37,7 @@ export const createServer: CreateServerFn = ({
 
 	const app = new Application()
 
-	app.use(logRequest({ logger }))
+	app.use(logRequest({ logger, serverName }))
 	app.use(setResponseTimeHeader)
 	app.use(handleError({ logger }))
 	app.use(oakCors({ origin, credentials: true }))

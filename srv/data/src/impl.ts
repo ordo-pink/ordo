@@ -5,6 +5,40 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-import type { Data } from "./types.ts"
+import { createDataServer } from "#lib/backend-data-server/mod.ts"
+import { getc } from "#lib/getc/mod.ts"
+import { BackendDataService } from "#lib/universal-data-service/mod.ts"
+import { FSMetadataRepository } from "#lib/backend-fs-metadata-repository/mod.ts"
+import { BackendFSDataRepository } from "#lib/backend-fs-data-repository/mod.ts"
+import { ConsoleLogger } from "#lib/logger/mod.ts"
 
-export const data: Data = "data"
+const {
+	DATA_DATA_PATH,
+	DATA_HOST,
+	DATA_METADATA_PATH,
+	DATA_PORT,
+	DATA_ACCESS_CONTROL_ALLOW_ORIGIN,
+	ID_HOST,
+} = getc([
+	"DATA_DATA_PATH",
+	"DATA_METADATA_PATH",
+	"DATA_PORT",
+	"DATA_HOST",
+	"DATA_ACCESS_CONTROL_ALLOW_ORIGIN",
+	"ID_HOST",
+])
+
+const metadataRepository = FSMetadataRepository.of({ root: DATA_DATA_PATH })
+const dataRepository = BackendFSDataRepository.of({ root: DATA_METADATA_PATH })
+const dataService = BackendDataService.of({ dataRepository, metadataRepository })
+
+const app = createDataServer({
+	dataService,
+	idHost: ID_HOST,
+	origin: DATA_ACCESS_CONTROL_ALLOW_ORIGIN,
+	logger: ConsoleLogger,
+})
+
+ConsoleLogger.info(`DATA server running on ${DATA_HOST}`)
+
+await app.listen({ port: Number(DATA_PORT) })

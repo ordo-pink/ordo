@@ -12,7 +12,7 @@ import type { TTokenService } from "#lib/backend-token-service/mod.ts"
 import { useBearerAuthorization } from "#lib/backend-utils/mod.ts"
 import { Oath } from "#lib/oath/mod.ts"
 
-// Public -----------------------------------------------------------------------------------------
+// --- Public ---
 
 export type Params = { tokenService: TTokenService; userService: UserService }
 export type Fn = (params: Params) => Middleware

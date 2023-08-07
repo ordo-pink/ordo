@@ -16,7 +16,7 @@ import { Oath } from "#lib/oath/mod.ts"
 import { prop } from "#ramda"
 import { pathParamToDirectoryPath } from "../utils.ts"
 
-// --- PUBLIC ---
+// --- Public ---
 
 export const handleUpdateDirectory: Fn =
 	({ dataService, idHost }) =>
@@ -35,7 +35,7 @@ export const handleUpdateDirectory: Fn =
 			.chain(throwIfDirectoryDoesNotExist0)
 			.fork(ResponseError.send(ctx), formUpdateDirectoryResponse(ctx))
 
-// --- INTERNAL ---
+// --- Internal ---
 
 type Params = { dataService: DATA_SERVICE_TYPES.TDataService<ReadableStream>; idHost: string }
 type Fn = Unary<Params, RouterMiddleware<"/directories/:userId/:path*">>

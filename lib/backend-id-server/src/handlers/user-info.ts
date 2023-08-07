@@ -12,7 +12,7 @@ import type { TTokenService } from "#lib/backend-token-service/mod.ts"
 import { ResponseError, HttpError, useBearerAuthorization } from "#lib/backend-utils/mod.ts"
 import { Oath } from "#lib/oath/mod.ts"
 
-// Public -----------------------------------------------------------------------------------------
+// --- Public ---
 
 export type Params = { tokenService: TTokenService; userService: UserService }
 export type Fn = (params: Params) => RouterMiddleware<"/users/:email">
@@ -25,7 +25,7 @@ export const handleUserInfo: Fn =
 			.chain(getPublicUserByEmail(userService))
 			.fork(ResponseError.send(ctx), sendUserInfo(ctx))
 
-// Internal ---------------------------------------------------------------------------------------
+// --- Internal ---
 
 // Get user entity by id --------------------------------------------------------------------------
 

@@ -7,7 +7,7 @@ import { Oath } from "#lib/oath/mod.ts"
 import { Binary, Curry, Thunk, Unary } from "#lib/tau/mod.ts"
 import { prop } from "#ramda"
 
-// PUBLIC -----------------------------------------------------------------------------------------
+// --- Public ---
 
 export const init: CoverFn = () =>
 	Oath.of(getDenoPath()).chain(path =>
@@ -16,7 +16,7 @@ export const init: CoverFn = () =>
 			.chain(createSymlinks)
 	)
 
-// INTERNAL ---------------------------------------------------------------------------------------
+// --- Internal ---
 
 type CoverFn = Thunk<Oath<number, Error>>
 type InitSrvFn = Unary<string, Oath<number, never>>

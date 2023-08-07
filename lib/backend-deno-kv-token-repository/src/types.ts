@@ -9,13 +9,13 @@ import type { JTI, TokenRecord, TokenRepository } from "#lib/backend-token-servi
 import type {} from "#ramda"
 import { Unary, Curry, Binary, Method } from "#lib/tau/mod.ts"
 
-// PUBLIC -----------------------------------------------------------------------------------------
+// --- Public ---
 
 // deno-lint-ignore no-explicit-any
 export type Params = { db: any; key: string }
 export type Fn = Unary<Params, TokenRepository>
 
-// INTERNAL ---------------------------------------------------------------------------------------
+// --- Internal ---
 
 export type _DropKeyFn = Curry<Binary<JTI, TokenRecord, TokenRecord>>
 export type _DropKeyReducerFn = Binary<

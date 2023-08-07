@@ -15,7 +15,7 @@ import { DirectoryModel } from "#lib/universal-data-service/mod.ts"
 import { Oath } from "#lib/oath/mod.ts"
 import { prop } from "#ramda"
 
-// --- PUBLIC ---
+// --- Public ---
 
 export const handleCreateDirectory: Fn =
 	({ dataService, idHost }) =>
@@ -32,7 +32,7 @@ export const handleCreateDirectory: Fn =
 			)
 			.fork(ResponseError.send(ctx), formCreateDirectoryResponse(ctx))
 
-// --- INTERNAL ---
+// --- Internal ---
 
 type Params = { dataService: DATA_SERVICE_TYPES.TDataService<ReadableStream>; idHost: string }
 type Fn = Unary<Params, Middleware>

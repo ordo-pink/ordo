@@ -7,7 +7,7 @@ import { Nullable, Unary } from "#lib/tau/mod.ts"
 import { DirectoryPath, Directory, DirectoryWithChildren } from "./directory.ts"
 import { FilePath, File } from "./file.ts"
 
-// PUBLIC -----------------------------------------------------------------------------------------
+// --- Public ---
 
 export type MetadataRepository = {
 	_internal: {
@@ -32,7 +32,7 @@ export type MetadataRepository = {
 	}
 }
 
-// INTERNAL ---------------------------------------------------------------------------------------
+// --- Internal ---
 
 type DirectoryExistsParams = { sub: SUB; path: DirectoryPath }
 type DirectoryExistsFn = Unary<DirectoryExistsParams, Oath<boolean>>

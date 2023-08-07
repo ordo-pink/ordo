@@ -9,7 +9,7 @@ import { directoryExists, getAbsolutePath } from "#lib/fs/mod.ts"
 import { Oath } from "#lib/oath/mod.ts"
 import { noop } from "#lib/tau/mod.ts"
 
-// PUBLIC -----------------------------------------------------------------------------------------
+// --- Public ---
 
 export const main = (name: string, license: License) =>
 	Oath.of(getAbsolutePath(`boot/src/${name}`)).chain(path =>
@@ -26,7 +26,7 @@ export const main = (name: string, license: License) =>
 			.map(noop)
 	)
 
-// INTERNAL ---------------------------------------------------------------------------------------
+// --- Internal ---
 
 const impl = (name: string, license: License) => `${getSPDXRecord(license)}
 export const ${camelCase(name)} = () => {

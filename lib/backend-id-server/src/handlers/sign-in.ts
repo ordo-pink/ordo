@@ -14,7 +14,7 @@ import { useBody } from "#lib/backend-utils/mod.ts"
 import { Oath } from "#lib/oath/mod.ts"
 import { prop } from "#ramda"
 
-// Public -----------------------------------------------------------------------------------------
+// --- Public ---
 
 type Body = { email?: string; password?: string }
 type Params = { userService: UserService; tokenService: TTokenService }
@@ -51,7 +51,7 @@ export const handleSignIn: Fn =
 				ctx.response.body = { accessToken: access, jti, sub }
 			})
 
-// Internal ---------------------------------------------------------------------------------------
+// --- Internal ---
 
 const setSignInCookie = (name: "sub" | "jti", value: string, exp: EXP, ctx: Context) =>
 	ctx.cookies.set(name, value, {

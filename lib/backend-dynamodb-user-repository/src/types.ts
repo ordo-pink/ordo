@@ -13,7 +13,7 @@ import type {
 import type { Unary } from "#lib/tau/mod.ts"
 import type { InternalUser, UserRepository } from "#lib/backend-user-service/mod.ts"
 
-// PUBLIC -----------------------------------------------------------------------------------------
+// --- Public ---
 
 export type Params = { db: DynamoDB; table: string }
 export type Fn = (params: Params) => UserRepository
@@ -25,7 +25,7 @@ export type Config = {
 	tableName: string
 }
 
-// INTERNAL ---------------------------------------------------------------------------------------
+// --- Internal ---
 
 export type _SerializeFn = Unary<NonNullable<GetItemOutput["Item"]>, InternalUser>
 export type _ReduceUserToAttributeUpdatesFn = Unary<

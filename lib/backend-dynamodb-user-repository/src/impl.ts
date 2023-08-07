@@ -20,7 +20,7 @@ import {
 	GetByEmailMethod,
 } from "#lib/backend-user-service/mod.ts"
 
-// PUBLIC -----------------------------------------------------------------------------------------
+// --- Public ---
 
 const adapter: T.Fn = params => ({
 	create: create(params),
@@ -41,7 +41,7 @@ export const DynamoDBUserStorageAdapter = {
 	},
 }
 
-// INTERNAL ---------------------------------------------------------------------------------------
+// --- Internal ---
 
 const existsById: ExistsByIdMethod<T.Params> = params => id =>
 	adapter(params)

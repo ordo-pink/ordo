@@ -11,7 +11,7 @@ import { getAbsolutePath, isDirectory } from "#lib/fs/mod.ts"
 import { Oath } from "#lib/oath/mod.ts"
 import { noop } from "#lib/tau/mod.ts"
 
-// PUBLIC -----------------------------------------------------------------------------------------
+// --- Public ---
 
 export const main = (name: string, license: License) =>
 	Oath.of(isReservedJavaScriptKeyword(name) ? `${name}-srv` : name).chain(name =>
@@ -32,7 +32,7 @@ export const main = (name: string, license: License) =>
 		)
 	)
 
-// INTERNAL ---------------------------------------------------------------------------------------
+// --- Internal ---
 
 const mod = (license: License) => `${getSPDXRecord(license)}
 export * from "./src/impl.ts"

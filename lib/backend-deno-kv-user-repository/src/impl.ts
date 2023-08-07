@@ -12,7 +12,7 @@ import type * as T from "./types.ts"
 
 import { Oath } from "#lib/oath/mod.ts"
 
-// PUBLIC -----------------------------------------------------------------------------------------
+// --- Public ---
 
 const adapter: T.Fn = params => ({
 	create: create(params),
@@ -33,7 +33,7 @@ export const DenoKVUserStorageAdapter = {
 	},
 }
 
-// INTERNAL ---------------------------------------------------------------------------------------
+// --- Internal ---
 
 const create: US.CreateMethod<T.Params> =
 	({ db, idKey, emailKey }) =>

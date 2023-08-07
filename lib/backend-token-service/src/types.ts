@@ -10,7 +10,7 @@ import type { Oath } from "#lib/oath/mod.ts"
 import type { Nullable, Unary, Binary, Ternary, Thunk, Curry } from "#lib/tau/mod.ts"
 import type { Logger } from "#lib/logger/mod.ts"
 
-// PUBLIC -----------------------------------------------------------------------------------------
+// --- Public ---
 
 /**
  * A record of refresh token ids and tokens.
@@ -348,7 +348,7 @@ export type TTokenService = {
 	setPersistedTokens: Binary<SUB, TokenRecord, Oath<"OK", null>>
 }
 
-// INTERNAL ---------------------------------------------------------------------------------------
+// --- Internal ---
 
 export type _CreateTokensParams = { sub: SUB; uip: UIP; prevJti?: JTI; aud?: AUD }
 export type _CreatedTokens = RefreshTokenPayload & { access: string; refresh: string }

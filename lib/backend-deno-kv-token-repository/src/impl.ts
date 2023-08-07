@@ -13,7 +13,7 @@ import { Oath } from "#lib/oath/mod.ts"
 
 // TODO: Remove any when Deno.Kv starts working again
 
-// PUBLIC -----------------------------------------------------------------------------------------
+// --- Public ---
 
 const adapter: T.Fn = params => ({
 	getToken: getToken(params),
@@ -32,7 +32,7 @@ export const DenoKVTokenStorageAdapter = {
 	},
 }
 
-// INTERNAL ---------------------------------------------------------------------------------------
+// --- Internal ---
 
 const dropKeyReducer: T._DropKeyReducerFn = (jti, dict) => (newMap, key) =>
 	key === jti ? newMap : { ...newMap, [key]: dict[key] }

@@ -12,7 +12,7 @@ import {
 	DirectoryCreateParams,
 } from "./directory.ts"
 
-// PUBLIC -----------------------------------------------------------------------------------------
+// --- Public ---
 
 export type TDataService<TReadContent, TWriteContent = TReadContent> = {
 	// findFiles: FindFilesFn
@@ -36,7 +36,7 @@ export type TDataService<TReadContent, TWriteContent = TReadContent> = {
 	removeDirectory: RemoveDirectoryFn
 }
 
-// INTERNAL ---------------------------------------------------------------------------------------
+// --- Internal ---
 
 type GetFileParams = { sub: SUB; path: FilePath }
 type GetFileFn = Unary<GetFileParams, Oath<Nullable<File>, Error>>

@@ -7,7 +7,7 @@ import { getDenoPath, runDenoCommand } from "#lib/binutil/mod.ts"
 import { Oath } from "#lib/oath/mod.ts"
 import { rmdir } from "#lib/fs/mod.ts"
 
-// PUBLIC -----------------------------------------------------------------------------------------
+// --- Public ---
 
 export const cover: CoverFn = options =>
 	Oath.of("./var/coverage")

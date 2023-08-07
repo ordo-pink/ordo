@@ -6,7 +6,7 @@ import { Oath } from "#lib/oath/mod.ts"
 import { Unary, Nullable } from "#lib/tau/mod.ts"
 import { FSID } from "./file.ts"
 
-// PUBLIC -----------------------------------------------------------------------------------------
+// --- Public ---
 
 export type DataRepository<TReadContent, TWriteContent = TReadContent> = {
 	exists: FileExistsFn
@@ -16,7 +16,7 @@ export type DataRepository<TReadContent, TWriteContent = TReadContent> = {
 	delete: FileDeleteFn
 }
 
-// INTERNAL ---------------------------------------------------------------------------------------
+// --- Internal ---
 
 type FileExistsParams = { sub: SUB; fsid: FSID }
 type FileExistsFn = Unary<FileExistsParams, Oath<boolean>>

@@ -16,7 +16,7 @@ import { Oath } from "#lib/oath/mod.ts"
 import { prop } from "#ramda"
 import { pathParamToFilePath } from "../utils.ts"
 
-// --- PUBLIC ---
+// --- Public ---
 
 export const handleUpdateFileContent: Fn =
 	({ dataService, idHost }) =>
@@ -35,7 +35,7 @@ export const handleUpdateFileContent: Fn =
 			.chain(throwIfFileDoesNotExist0)
 			.fork(ResponseError.send(ctx), formUpdateFileResponse(ctx))
 
-// --- INTERNAL ---
+// --- Internal ---
 
 type Params = { dataService: DATA_SERVICE_TYPES.TDataService<ReadableStream>; idHost: string }
 type Fn = Unary<Params, RouterMiddleware<"/files/:userId/:path*">>

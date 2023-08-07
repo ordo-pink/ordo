@@ -15,7 +15,7 @@ import { HttpError, useBearerAuthorization, useBody } from "#lib/backend-utils/m
 import { ResponseError } from "#lib/backend-utils/mod.ts"
 import { Oath } from "#lib/oath/mod.ts"
 
-// Public -----------------------------------------------------------------------------------------
+// --- Public ---
 
 type Body = { email?: string }
 type Params = { tokenService: TTokenService; userService: UserService }
@@ -32,7 +32,7 @@ export const handleChangeEmail: Fn =
 			.chain(updateUser(userService))
 			.fork(ResponseError.send(ctx), sendUser(ctx))
 
-// Internal ---------------------------------------------------------------------------------------
+// --- Internal ---
 
 // Validate input from Bearer token and body ------------------------------------------------------
 

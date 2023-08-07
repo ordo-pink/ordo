@@ -14,7 +14,7 @@ import { ResponseError, useBearerAuthorization } from "#lib/backend-utils/mod.ts
 import { Oath } from "#lib/oath/mod.ts"
 import { prop } from "#ramda"
 
-// --- PUBLIC ---
+// --- Public ---
 
 export const handleGetRoot: Fn =
 	({ dataService, idHost }) =>
@@ -28,7 +28,7 @@ export const handleGetRoot: Fn =
 			.chain(throwIfDirectoryDoesNotExist0)
 			.fork(ResponseError.send(ctx), formGetDirectoryResponse(ctx))
 
-// --- INTERNAL ---
+// --- Internal ---
 
 type Params = { dataService: DATA_SERVICE_TYPES.TDataService<ReadableStream>; idHost: string }
 type Fn = Unary<Params, RouterMiddleware<"/directories/:userId">>

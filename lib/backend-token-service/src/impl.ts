@@ -14,7 +14,7 @@ import { F, pipe, thunkify } from "#ramda"
 
 // TODO: Drop storing token values
 
-// PUBLIC -----------------------------------------------------------------------------------------
+// --- Public ---
 
 /**
  * Creates a `TokenService` from given TokenStorageAdapter and `TokenService` options.
@@ -52,7 +52,7 @@ const of: T._Fn = params => ({
 
 export const TokenService = { of }
 
-// INTERNAL ---------------------------------------------------------------------------------------
+// --- Internal ---
 
 const getTokenPayload: T._GetTokenPayloadFn<Payload> = ({ key, repository }) =>
 	pipe(

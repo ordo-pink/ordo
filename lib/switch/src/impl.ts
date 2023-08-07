@@ -6,7 +6,7 @@ import type * as T from "./types.ts"
 
 import { isFunction } from "#lib/tau/mod.ts"
 
-// PUBLIC -----------------------------------------------------------------------------------------
+// --- Public ---
 
 export const Switch: T.TSwitchStatic = {
 	of: x => swich(x),

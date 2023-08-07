@@ -38,7 +38,9 @@ const service: Fn = ({ metadataRepository, dataRepository }) => ({
 
 				return { directory, sub } as { directory: T.Directory; sub: SUB }
 			})
-			.chain(metadataRepository.directory.create),
+			.chain(({ directory, sub }) =>
+				metadataRepository.directory.create({ directory, sub, path: directory.path })
+			),
 	getDirectoryChildren: metadataRepository.directory.readWithChildren,
 	removeDirectory: metadataRepository.directory.delete,
 	updateDirectory: ({ path, content, sub, upsert = false }) =>
@@ -66,7 +68,7 @@ const service: Fn = ({ metadataRepository, dataRepository }) => ({
 					? metadataRepository.directory.update({
 							sub,
 							path: directory.path,
-							content: updatedDirectory,
+							directory: updatedDirectory,
 					  })
 					: Oath.of(updatedDirectory)
 			}),
@@ -103,7 +105,7 @@ const service: Fn = ({ metadataRepository, dataRepository }) => ({
 							.map(size => ({ ...file, size }))
 					: Oath.of(file)
 			)
-			.chain(file => metadataRepository.file.create({ path: file.path, sub, content: file })),
+			.chain(file => metadataRepository.file.create({ path: file.path, sub, file })),
 	getFile: metadataRepository.file.read,
 	getFileContent: ({ path, sub }) =>
 		metadataRepository.file
@@ -130,7 +132,7 @@ const service: Fn = ({ metadataRepository, dataRepository }) => ({
 			.chain(file =>
 				dataRepository.update({ sub, fsid: file.fsid, content }).map(size => ({ ...file, size }))
 			)
-			.chain(file => metadataRepository.file.update({ sub, content: file, path: file.path })),
+			.chain(file => metadataRepository.file.update({ sub, file, path: file.path })),
 	updateFile: metadataRepository.file.update,
 })
 

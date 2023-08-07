@@ -47,7 +47,7 @@ type CreateFileParams<TWriteContent> = {
 }
 type CreateFileFn<TWriteContent> = Unary<CreateFileParams<TWriteContent>, Oath<File, Error>>
 
-type UpdateFileParams = { sub: SUB; path: FilePath; content: File }
+type UpdateFileParams = { sub: SUB; path: FilePath; file: File }
 type UpdateFileFn = Unary<UpdateFileParams, Oath<Nullable<File>, Error>>
 
 type RemoveFileParams = { sub: SUB; path: FilePath }

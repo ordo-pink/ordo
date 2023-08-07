@@ -44,5 +44,5 @@ Deno.test("should license the files with MPL-2.0", async () => {
 })
 
 Deno.test("should throw on attempt to create a srv that already exists", () => {
-	assertRejects(() => main("oath", "MIT").toPromise())
+	assertRejects(() => main("id", "MIT").toPromise())
 })

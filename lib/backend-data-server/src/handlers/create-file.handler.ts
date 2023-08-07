@@ -5,7 +5,7 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-import type { Context, Middleware } from "#x/oak@v12.6.0/mod.ts"
+import { httpErrors, type Context, type Middleware } from "#x/oak@v12.6.0/mod.ts"
 import type * as DATA_SERVICE_TYPES from "#lib/universal-data-service/mod.ts"
 import type { SUB } from "#lib/backend-token-service/mod.ts"
 import type { Binary, Curry, Unary } from "#lib/tau/mod.ts"
@@ -61,7 +61,11 @@ type CreateFileFn = Curry<
 const createFile0: CreateFileFn =
 	({ service, sub }) =>
 	file =>
-		service.createFile({ sub, file })
+		service
+			.createFile({ sub, file })
+			.rejectedMap(e =>
+				e.message === "File already exists" ? new httpErrors.Conflict(e.message) : e
+			)
 
 // ---
 

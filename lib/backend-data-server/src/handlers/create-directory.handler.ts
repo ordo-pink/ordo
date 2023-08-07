@@ -26,6 +26,9 @@ export const handleCreateDirectory: Fn =
 				Oath.from(() => useBody<DATA_SERVICE_TYPES.DirectoryCreateParams>(ctx))
 					.chain(validateCreateDirectoryParams0({ ctx, sub, service: dataService }))
 					.chain(createDirectory0({ service: dataService, sub }))
+					.rejectedMap(e =>
+						e.message === "Directory already exists" ? new httpErrors.Conflict(e.message) : e
+					)
 			)
 			.fork(ResponseError.send(ctx), formCreateDirectoryResponse(ctx))
 

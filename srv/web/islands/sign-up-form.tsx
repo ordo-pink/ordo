@@ -91,7 +91,7 @@ export default function SignUpForm() {
 
 						signIn(response)
 
-						window.location
+						window.location.replace("/~/")
 					}}
 				>
 					Sign up

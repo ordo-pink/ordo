@@ -10,4 +10,4 @@ import manifest from "./fresh.gen.ts"
 // TODO: Add a bin for starting tailwind in parallel
 // TODO: Add a script for copying
 // TODO: Move staticDir to dotenv
-await start(manifest, { staticDir: "../../var/srv/web" })
+await start(manifest, { staticDir: "../../var/srv/web/static" })

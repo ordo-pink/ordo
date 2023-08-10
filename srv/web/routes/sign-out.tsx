@@ -2,7 +2,7 @@ import { Handlers } from "$fresh/server.ts"
 import { deleteCookie } from "#std/http/cookie.ts"
 
 export const handler: Handlers = {
-	GET: async (req, ctx) => {
+	GET: async () => {
 		await fetch("http://localhost:3001/sign-out", {
 			credentials: "include",
 			method: "POST",

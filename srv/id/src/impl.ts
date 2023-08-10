@@ -26,7 +26,6 @@ const {
 	ID_PORT,
 	ID_ACCESS_TOKEN_EXPIRE_IN,
 	ID_REFRESH_TOKEN_EXPIRE_IN,
-	ID_ACCESS_CONTROL_ALLOW_ORIGIN,
 	ID_SALT_ROUNDS,
 	ID_KV_DB_PATH,
 	ID_ACCESS_TOKEN_PRIVATE_KEY_PATH,
@@ -37,6 +36,7 @@ const {
 	ID_TOKENS_TABLE_NAME,
 	DATA_DATA_PATH,
 	DATA_METADATA_PATH,
+	WEB_HOST,
 } = getc([
 	"ID_USER_ADAPTER",
 	"ID_DYNAMODB_ENDPOINT",
@@ -57,6 +57,7 @@ const {
 	"ID_TOKENS_TABLE_NAME",
 	"DATA_DATA_PATH",
 	"DATA_METADATA_PATH",
+	"WEB_HOST",
 ])
 
 const accessPrivateKeyString = resolve(ID_ACCESS_TOKEN_PRIVATE_KEY_PATH)
@@ -93,7 +94,7 @@ const app = await createIDServer({
 	tokenStorageRepository,
 	dataRepository,
 	metadataRepository,
-	origin: ID_ACCESS_CONTROL_ALLOW_ORIGIN,
+	origin: WEB_HOST,
 	accessKeys: { private: accessTokenPrivateKey, public: accessTokenPublicKey },
 	refreshKeys: { private: refreshTokenPrivateKey, public: refreshTokenPublicKey },
 	saltRounds: Number(ID_SALT_ROUNDS),

@@ -1,5 +1,6 @@
 {
 	"deno.enable": true,
 	"deno.unstable": true,
-	"deno.path": "./opt/deno"
+	"deno.path": "./opt/deno",
+	"deno.cache": "./var/cache/deno"
 }

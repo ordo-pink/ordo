@@ -16,3 +16,17 @@ export const keysOf: T._KeysOfFn = o => {
 }
 
 export const noop = () => {}
+
+export const callOnce = <T extends any[], R>(fn: (...args: T) => R) => {
+	let wasCalled = false
+
+	return (...args: T): R => {
+		if (wasCalled) throw new Error("Attempted to call a single call function twice.")
+
+		const result = fn(...args)
+
+		wasCalled = true
+
+		return result
+	}
+}

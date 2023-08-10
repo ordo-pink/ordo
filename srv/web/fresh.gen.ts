@@ -16,9 +16,10 @@ import * as $10 from "./routes/~/[activity].tsx";
 import * as $11 from "./routes/~/[path].tsx";
 import * as $12 from "./routes/~/index.tsx";
 import * as $$0 from "./islands/app.tsx";
-import * as $$1 from "./islands/index-hero.tsx";
-import * as $$2 from "./islands/sign-in-form.tsx";
-import * as $$3 from "./islands/sign-up-form.tsx";
+import * as $$1 from "./islands/component.tsx";
+import * as $$2 from "./islands/forms/sign-in-form.tsx";
+import * as $$3 from "./islands/forms/sign-up-form.tsx";
+import * as $$4 from "./islands/pages/index-hero.tsx";
 
 const manifest = {
   routes: {
@@ -38,9 +39,10 @@ const manifest = {
   },
   islands: {
     "./islands/app.tsx": $$0,
-    "./islands/index-hero.tsx": $$1,
-    "./islands/sign-in-form.tsx": $$2,
-    "./islands/sign-up-form.tsx": $$3,
+    "./islands/component.tsx": $$1,
+    "./islands/forms/sign-in-form.tsx": $$2,
+    "./islands/forms/sign-up-form.tsx": $$3,
+    "./islands/pages/index-hero.tsx": $$4,
   },
   baseUrl: import.meta.url,
 };

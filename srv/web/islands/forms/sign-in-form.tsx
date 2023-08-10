@@ -1,9 +1,9 @@
 import { useSignal } from "@preact/signals"
-import { Button } from "../components/button.tsx"
-import { Callout } from "../components/callout.tsx"
-import { EmailInput, PasswordInput } from "../components/input.tsx"
 import { useEffect, useState } from "preact/hooks"
-import { signIn } from "../streams/auth.ts"
+import { Button } from "../../components/button.tsx"
+import { Callout } from "../../components/callout.tsx"
+import { EmailInput, PasswordInput } from "../../components/input.tsx"
+import { refreshAuthInfo } from "../../streams/auth.ts"
 
 export default function SignInForm() {
 	const [emailErrors, setEmailErrors] = useState<string[]>([])
@@ -60,7 +60,7 @@ export default function SignInForm() {
 							method: "POST",
 						})
 							.then(res => res.json())
-							.then(signIn)
+							.then(refreshAuthInfo)
 							.then(() => window.location.replace("/~/"))
 					}}
 				>

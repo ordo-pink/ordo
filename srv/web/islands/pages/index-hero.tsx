@@ -1,5 +1,5 @@
 import { useLayoutEffect } from "preact/hooks"
-import { Button } from "../components/button.tsx"
+import { Button } from "../../components/button.tsx"
 
 export default function IndexHeroSection() {
 	useLayoutEffect(() => {
@@ -46,7 +46,7 @@ export default function IndexHeroSection() {
 					class="absolute inset-0 bg-cover bg-center flex flex-col items-center justify-center"
 					style="transform: translateZ(250px); font-size: calc(var(--index) * 0.6)"
 				>
-					<h1 class="text-center uppercase drop-shadow-2xl tracking-tight">
+					<h1 class="text-center uppercase tracking-tight">
 						Bring your thoughts to
 						<span class="block text-7xl tracking-tight font-black first-letter:bg-gradient-to-tr first-letter:from-pink-500 first-letter:to-purple-500 first-letter:bg-clip-text first-letter:text-transparent">
 							ORDO

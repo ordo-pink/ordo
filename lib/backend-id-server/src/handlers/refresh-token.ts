@@ -15,30 +15,46 @@ export type Fn = (params: Params) => Middleware
 export const handleRefreshToken: Fn =
 	({ tokenService }) =>
 	async ctx => {
+		// TODO: Also get sub and jti from body
 		const prevJti = await ctx.cookies.get("jti")
 		const sub = await ctx.cookies.get("sub")
-
 		if (!prevJti || !sub) return ctx.throw(400, "Missing required cookies")
 
-		const isTokenValid = await tokenService.verifyRefreshToken(sub)
+		const token = await tokenService
+			.getPersistedToken(sub, prevJti)
+			.toPromise()
+			.catch(() => null)
+		if (!token) {
+			await ctx.cookies.delete("jti")
+			await ctx.cookies.delete("sub")
 
-		if (!isTokenValid) return ctx.throw(403, "Invalid or outdated token")
+			return ctx.throw(403, "Invalid or outdated token")
+		}
 
+		const isTokenValid = await tokenService
+			.verifyRefreshToken(token)
+			.toPromise()
+			.catch(() => false)
+		if (!isTokenValid) {
+			await ctx.cookies.delete("jti")
+			await ctx.cookies.delete("sub")
+
+			return ctx.throw(403, "Invalid or outdated token")
+		}
+
+		const decodedToken = await tokenService.decodeRefreshToken(token).toPromise()
 		const uip = ctx.request.ip
+		if (decodedToken.payload.uip !== uip) {
+			await ctx.cookies.delete("jti")
+			await ctx.cookies.delete("sub")
+
+			return ctx.throw(403, "Invalid or outdated token")
+		}
 
 		const { access, jti, exp } = await tokenService.createTokens({ sub, uip, prevJti }).toPromise()
+		const expires = new Date(Date.now() + exp)
+		await ctx.cookies.set("jti", jti, { httpOnly: true, sameSite: "lax", expires })
+		await ctx.cookies.set("sub", sub, { httpOnly: true, sameSite: "lax", expires })
 
-		await ctx.cookies.set("jti", jti, {
-			httpOnly: true,
-			sameSite: "lax",
-			expires: new Date(Date.now() + exp),
-		})
-
-		await ctx.cookies.set("sub", sub, {
-			httpOnly: true,
-			sameSite: "lax",
-			expires: new Date(Date.now() + exp),
-		})
-
-		ctx.response.body = { accessToken: access, refreshToken: jti, userId: sub }
+		ctx.response.body = { accessToken: access, jti, sub, exp }
 	}

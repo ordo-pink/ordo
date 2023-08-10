@@ -1,6 +1,6 @@
 import { PageHeader } from "../components/page-header.tsx"
 import { CenteredPage } from "../components/centered-page.tsx"
-import SignUpForm from "../islands/sign-up-form.tsx"
+import SignUpForm from "../islands/forms/sign-up-form.tsx"
 
 export default function SignUpPage() {
 	return (

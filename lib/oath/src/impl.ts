@@ -325,4 +325,16 @@ export class Oath<TRight, TLeft = never> {
 			this.resolver(resolve as any, reject as any)
 		})
 	}
+
+	public orElse<TNewLeft>(f: (error: TLeft) => TNewLeft) {
+		return new Promise<TRight>((resolve, reject) =>
+			this.resolver(resolve as any, reject as any)
+		).catch(f)
+	}
+
+	public orNothing() {
+		return new Promise<TRight>((resolve, reject) =>
+			this.resolver(resolve as any, reject as any)
+		).catch(() => void 0)
+	}
 }

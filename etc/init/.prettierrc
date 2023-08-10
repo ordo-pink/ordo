@@ -4,7 +4,7 @@
 	"arrowParens": "avoid",
 	"printWidth": 100,
 	"endOfLine": "lf",
-	"singleAttributePerLine": true,
+	"singleAttributePerLine": false,
 	"singleQuote": false,
 	"htmlWhitespaceSensitivity": "strict",
 	"proseWrap": "always"

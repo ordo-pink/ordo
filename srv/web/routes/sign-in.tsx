@@ -1,7 +1,6 @@
 import { PageHeader } from "../components/page-header.tsx"
 import { CenteredPage } from "../components/centered-page.tsx"
-import SignInForm from "../islands/sign-in-form.tsx"
-import { PageProps } from "$fresh/server.ts"
+import SignInForm from "../islands/forms/sign-in-form.tsx"
 
 export default function SignInPage() {
 	return (

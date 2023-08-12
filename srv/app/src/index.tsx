@@ -4,5 +4,6 @@ import App from "./app"
 
 const root = ReactDOM.createRoot(document.getElementById("root")!)
 root.render(
+	// TODO: Provide env variables
 	<App id="http://localhost:3001" data="http://localhost:3002" web="http://localhost:8000" />
 )

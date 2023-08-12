@@ -6,6 +6,7 @@ import ActivityItem from "./activity"
 import { useCommands } from "src/hooks/use-commands"
 import { useCommandPaletteItems } from "src/streams/command-palette"
 import { Activity, useActivities } from "src/streams/extensions"
+import { Either } from "#lib/either/mod"
 
 export default function ActivityBar() {
 	const user = useUser()
@@ -17,6 +18,8 @@ export default function ActivityBar() {
 
 	const showCommandPalette = () => commands.emit("command-palette.show", commandPaletteItems)
 
+	const isSidebarCollapsed = sidebar.disabled || sidebar.sizes[0] === 0
+
 	return (
 		<div
 			className={`h-screen ${
@@ -26,7 +29,7 @@ export default function ActivityBar() {
 			<div>
 				<div
 					className={`text-neutral-500 cursor-pointer transition-opacity duration-300 ${
-						sidebar.disabled || sidebar.sizes[0] === 0 ? "opacity-100" : "opacity-0"
+						isSidebarCollapsed ? "opacity-100" : "opacity-0"
 					}`}
 				>
 					<div onClick={showCommandPalette}>
@@ -39,7 +42,17 @@ export default function ActivityBar() {
 					activity.background ? null : <ActivityItem key={activity.name} activity={activity} />
 				)}
 			</div>
-			<div>{user.fold(Null, user => user.email.slice(0, 1))}</div>
+			<div>
+				{user.fold(Null, user => (
+					<div
+						className={`cursor-pointer transition-opacity duration-300 ${
+							isSidebarCollapsed ? "opacity-100" : "opacity-0"
+						}`}
+					>
+						{user.email.slice(0, 1)}
+					</div>
+				))}
+			</div>
 		</div>
 	)
 }

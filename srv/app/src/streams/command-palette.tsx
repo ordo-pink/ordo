@@ -68,10 +68,10 @@ export const initCommandPalette = callOnce(() => {
 })
 
 export const useCommandPalette = () => ({
-	showCommandPalette,
-	hideCommandPalette,
-	registerCommandPaletteItem,
-	unregisterCommandPaletteItem,
+	show: showCommandPalette,
+	hide: hideCommandPalette,
+	addItem: registerCommandPaletteItem,
+	removeItem: unregisterCommandPaletteItem,
 })
 
 // TODO: Rename to reflect difference between command palette and search

@@ -16,11 +16,11 @@ type Props = {
 const fuse = new Fuse([] as CommandPaletteItem[], { keys: ["name"] })
 
 export const CommandPaletteModal = ({ items }: Props) => {
-	const { hideCommandPalette } = useCommandPalette()
+	const { hide } = useCommandPalette()
 
 	// const { t } = useTranslation("ordo")
 
-	useHotkeys("Esc", hideCommandPalette)
+	useHotkeys("Esc", hide)
 
 	const [currentIndex, setCurrentIndex] = useState(0)
 	const [inputValue, setInputValue] = useState("")
@@ -74,7 +74,7 @@ export const CommandPaletteModal = ({ items }: Props) => {
 		setInputValue("")
 		console.log("HERE")
 		setCurrentIndex(0)
-		hideCommandPalette()
+		hide()
 	}
 
 	const handleKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {

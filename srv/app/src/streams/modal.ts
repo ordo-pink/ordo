@@ -7,7 +7,8 @@ export const modal$ = new BehaviorSubject<
 	Nullable<{ Component: ComponentType; showCloseButton: boolean; onHide: Thunk<void> }>
 >(null)
 
-export const initModals = callOnce((logger: Logger) => {
+type Params = { logger: Logger }
+export const initModals = callOnce(({ logger }: Params) => {
 	modal$
 		.pipe(tap(state => (state ? logger.debug("Modal shown") : logger.debug("Modal hidden"))))
 		.subscribe()

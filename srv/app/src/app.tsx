@@ -17,7 +17,7 @@ type OnDragEndFn = OnDragFn
 
 export default function App({ id, data, web }: Hosts) {
 	useAppInit({ id, data, web })
-	useOnAuthenticated()
+	useOnAuthenticated({ id, data, web })
 	useDefaultCommandPalette()
 
 	const sidebar = useSidebar()

@@ -1,10 +1,11 @@
 import { useEffect } from "react"
-import { Hosts, initHosts, refreshAuthInfo, signOut } from "../streams/auth"
+import { Hosts, initHosts, refreshAuthInfo, onBeforeQuit } from "../streams/auth"
 import { initCommands } from "../streams/commands"
 import { ConsoleLogger } from "#lib/logger/mod"
 import { initSidebar } from "../streams/sidebar"
 import { initModals } from "../streams/modal"
 import { initCommandPalette } from "../streams/command-palette"
+import { initRouter } from "src/streams/router"
 
 const refreshToken = (hosts: Hosts) => {
 	fetch(`${hosts.id}/refresh-token`, { method: "POST", credentials: "include" })
@@ -22,7 +23,8 @@ export const useAppInit = (hosts: Hosts) => {
 	useEffect(() => {
 		initHosts(hosts)
 		initCommands({ logger: ConsoleLogger })
-		initModals(ConsoleLogger)
+		initRouter({ logger: ConsoleLogger })
+		initModals({ logger: ConsoleLogger })
 		initCommandPalette()
 		initSidebar()
 		// initActivities()
@@ -33,8 +35,8 @@ export const useAppInit = (hosts: Hosts) => {
 		const interval = setInterval(() => refreshToken(hosts), 50000)
 
 		return () => {
+			onBeforeQuit()
 			clearInterval(interval)
-			signOut()
 		}
 	}, [])
 }

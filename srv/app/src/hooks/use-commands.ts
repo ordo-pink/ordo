@@ -13,5 +13,3 @@ export const useCommands = () => ({
 	emit: executeCommand,
 	off: unregisterCommand,
 })
-
-export const _useCommands = useCommands

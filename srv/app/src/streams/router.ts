@@ -1,5 +1,6 @@
+import { Logger } from "#lib/logger/mod"
 import { Unary, callOnce } from "#lib/tau/mod"
-import { registerCommand } from "./commands"
+import { useCommands } from "src/hooks/use-commands"
 import { Router, operators } from "silkrouter"
 
 /**
@@ -48,8 +49,13 @@ export const openExternal: OpenExternalFn = ({ url, newTab = true }) => {
 	newTab ? window.open(url, "_blank")?.focus() : (window.location.href = url)
 }
 
-export const initRouter = callOnce(() => {
-	registerCommand("router.navigate", ({ payload }) => {
+type Params = { logger: Logger }
+export const initRouter = callOnce(({ logger }: Params) => {
+	const commands = useCommands()
+
+	commands.on("router.navigate", ({ payload }) => {
+		logger.debug("Navigating to", payload)
+
 		if (Array.isArray(payload)) {
 			router$.set(...(payload as [string]))
 			return
@@ -58,7 +64,8 @@ export const initRouter = callOnce(() => {
 		router$.set(payload.url)
 	})
 
-	registerCommand("router.open-external", ({ payload: { url, newTab = true } }) => {
+	commands.on("router.open-external", ({ payload: { url, newTab = true } }) => {
+		logger.debug("Opening external page", { url, newTab })
 		newTab ? window.open(url, "_blank")?.focus() : (window.location.href = url)
 	})
 

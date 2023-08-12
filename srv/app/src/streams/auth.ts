@@ -33,13 +33,11 @@ export const refreshAuthInfo = (info: AuthResponse) => {
 
 export const initHosts = (hosts: Hosts) => hosts$.next(hosts)
 
-export const signOut = () => {
+export const onBeforeQuit = () => {
 	auth$.next(null)
 	metadata$.next([])
 	user$.next(null)
 	error$.next(null)
-
-	// executeCommand("router.open-external", { url: `${hosts$.value?.web}/sign-out`, newTab: false })
 }
 
 export const isSignedIn = () => auth$.value !== null

@@ -8,7 +8,9 @@ import {
 } from "../streams/auth"
 import { useCommands } from "./use-commands"
 import { useCommandPalette } from "src/streams/command-palette"
-import { AiOutlineLogout } from "react-icons/ai"
+import { AiOutlineLogout, AiOutlineAim } from "react-icons/ai"
+import { useExtensions } from "src/streams/extensions"
+import Asdf from "./asdf"
 
 export const useOnAuthenticated = (hosts: Hosts) => {
 	const isAuthenticated = useAuthStatus()
@@ -16,6 +18,7 @@ export const useOnAuthenticated = (hosts: Hosts) => {
 	const ms0 = useMetadataAPIService0()
 	const commands = useCommands()
 	const commandPalette = useCommandPalette()
+	const exts = useExtensions()
 
 	useEffect(() => {
 		if (!isAuthenticated) return
@@ -37,6 +40,12 @@ export const useOnAuthenticated = (hosts: Hosts) => {
 		commands.on("core.refresh-user-info", handleRefreshUserInfo)
 		commands.on("core.refresh-metadata-root", handleRefreshMetadataRoot)
 		commands.on("core.sign-out", handleSignOut)
+
+		exts.activities.add("test", {
+			Component: Asdf,
+			Icon: AiOutlineAim,
+			routes: ["/asdf"],
+		})
 
 		commands.emit("core.refresh-user-info")
 		commands.emit("core.refresh-metadata-root")

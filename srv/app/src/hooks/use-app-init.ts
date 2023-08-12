@@ -7,6 +7,7 @@ import { initModals } from "../streams/modal"
 import { initCommandPalette } from "../streams/command-palette"
 import { initRouter } from "src/streams/router"
 import { initContextMenu } from "src/streams/context-menu"
+import { initActivities, initExtensions } from "src/streams/extensions"
 
 const refreshToken = (hosts: Hosts) => {
 	fetch(`${hosts.id}/refresh-token`, { method: "POST", credentials: "include" })
@@ -24,13 +25,13 @@ export const useAppInit = (hosts: Hosts) => {
 	useEffect(() => {
 		initHosts(hosts)
 		initCommands({ logger: ConsoleLogger })
-		initRouter({ logger: ConsoleLogger })
+		const router$ = initRouter({ logger: ConsoleLogger })
 		initModals({ logger: ConsoleLogger })
 		initContextMenu()
 		initCommandPalette()
 		initSidebar()
-		// initExtensions({ logger: ConsoleLogger, router$, contextMenu$, extensions: [] })
-		// initActivities()
+		initExtensions({ logger: ConsoleLogger, router$, extensions: [] })
+		initActivities()
 
 		// TODO: Allow native context menu if custom context menu is not available
 		const suppressRightClickBehavior = (event: MouseEvent) => event.preventDefault()

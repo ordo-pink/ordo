@@ -1,9 +1,25 @@
-import { Nullable, callOnce } from "#lib/tau/mod"
+import { Binary, Nullable, Unary, callOnce } from "#lib/tau/mod"
 import { IconType } from "react-icons"
 import { combineLatestWith, map, merge, scan, shareReplay, Subject } from "rxjs"
 import { BehaviorSubject } from "rxjs"
-import { RegisterContextMenuItemFn, UnregisterContextMenuItemFn } from "./extensions"
 import { useSubscription } from "src/hooks/use-subscription"
+import { CommandListener } from "./commands"
+
+export type UnregisterContextMenuItemFn = Unary<string, void>
+export type RegisterContextMenuItemFn = Binary<
+	CommandListener,
+	{
+		// eslint-disable-next-line @typescript-eslint/no-explicit-any
+		shouldShow: (target: any) => boolean
+		Icon: IconType
+		accelerator?: string
+		type: "create" | "read" | "update" | "delete"
+		// eslint-disable-next-line @typescript-eslint/no-explicit-any
+		disabled?: (target: any) => boolean
+		payloadCreator?: () => any
+	},
+	void
+>
 
 export type ShowContextMenuParams = {
 	x: number

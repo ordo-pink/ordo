@@ -1,14 +1,11 @@
 import { Logger } from "#lib/logger/mod"
 import { Binary, Nullable, Thunk, Unary, callOnce } from "#lib/tau/mod"
-import i18next from "i18next"
-import { UserInfo } from "os"
 import { prop } from "ramda"
 import { ComponentType } from "react"
 import { mergeMap, BehaviorSubject, mergeAll, Observable, of, merge, Subject } from "rxjs"
 import { map, filter, switchMap, scan, shareReplay } from "rxjs/operators"
 import { Router } from "silkrouter"
 import {
-	CommandListener,
 	RegisterCommandFn,
 	ExecuteCommandFn,
 	prependListener,
@@ -23,8 +20,9 @@ import { route, Route, noMatch } from "./router"
 import { RegisterTranslationsFn, registerTranslations } from "./translations"
 import { File, FileExtension } from "#lib/universal-data-service/mod"
 import { IconType } from "react-icons"
-import { User } from "#lib/backend-user-service/mod"
-import { CommandPaletteItem } from "./command-palette"
+import { RegisterContextMenuItemFn, UnregisterContextMenuItemFn } from "./context-menu"
+import { RegisterCommandPaletteItemFn, UnregisterCommandPaletteItemFn } from "./command-palette"
+import { useSubscription } from "src/hooks/use-subscription"
 
 export type ContextMenuItemType = "create" | "read" | "update" | "delete"
 
@@ -49,7 +47,7 @@ export type Activity = {
 	Component: ComponentType
 	Icon: ComponentType
 	Sidebar?: ComponentType
-	show?: boolean
+	background?: boolean
 }
 
 export type FileAssociation = {
@@ -69,28 +67,12 @@ export enum IconSize {
 }
 
 export type RegisterActivityFn = Unary<string, Binary<string, Omit<Activity, "name">, void>>
-export type RegisterContextMenuItemFn = Binary<
-	CommandListener,
-	{
-		// eslint-disable-next-line @typescript-eslint/no-explicit-any
-		shouldShow: (target: any) => boolean
-		Icon: IconType
-		accelerator?: string
-		type: "create" | "read" | "update" | "delete"
-		// eslint-disable-next-line @typescript-eslint/no-explicit-any
-		disabled?: (target: any) => boolean
-		payloadCreator?: () => any
-	},
-	void
->
-
 export type RegisterFileAssociationFn = Unary<
 	string,
 	Binary<string, Omit<FileAssociation, "name">, void>
 >
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export type RegisterCommandPaletteItemFn = Unary<CommandPaletteItem, void>
 
 // export type RegisterEditorPluginFn = Unary<
 // 	string,
@@ -98,30 +80,12 @@ export type RegisterCommandPaletteItemFn = Unary<CommandPaletteItem, void>
 // >
 
 export type UnregisterEditorPluginFn = Unary<string, Unary<string, void>>
-export type UnregisterCommandPaletteItemFn = Unary<string, void>
+
 export type UnregisterActivityFn = Unary<string, Unary<string, void>>
-export type UnregisterContextMenuItemFn = Unary<string, void>
+
 export type UnregisterFileAssociationFn = Unary<string, Unary<string, void>>
 
 export type ExtensionCreatorContext = {
-	commands: {
-		before: RegisterCommandFn
-		after: RegisterCommandFn
-		on: RegisterCommandFn
-		off: RegisterCommandFn
-		emit: ExecuteCommandFn
-	}
-	// registerEditorPlugin: RegisterEditorPluginFn
-	// unregisterEditorPlugin: UnregisterEditorPluginFn
-	// registerContextMenuItem: RegisterContextMenuItemFn
-	// unregisterContextMenuItem: UnregisterContextMenuItemFn
-	registerActivity: RegisterActivityFn
-	unregisterActivity: UnregisterActivityFn
-	// registerFileAssociation: RegisterFileAssociationFn
-	// unregisterFileAssociation: UnregisterFileAssociationFn
-	registerTranslations: RegisterTranslationsFn
-	// registerCommandPaletteItem: RegisterCommandPaletteItemFn
-	// unregisterCommandPaletteItem: UnregisterCommandPaletteItemFn
 	logger: Logger
 }
 
@@ -144,10 +108,6 @@ const isFulfilled = <T>(x: PromiseSettledResult<T>): x is PromiseFulfilledResult
 
 type InitExtensionsParams = {
 	logger: Logger
-	contextMenu$: Observable<
-		// eslint-disable-next-line @typescript-eslint/no-explicit-any
-		Nullable<{ x: number; y: number; target: any; structure: ContextMenuItem[] }>
-	>
 	extensions: Thunk<Promise<{ default: Unary<ExtensionCreatorContext, void> }>>[]
 	router$: Router
 }
@@ -155,35 +115,13 @@ type InitExtensionsParams = {
 export const initExtensions = callOnce(({ logger, router$, extensions }: InitExtensionsParams) =>
 	of(extensions)
 		.pipe(
-			map(exts => exts.map(f => f())),
-			mergeMap(exts => Promise.allSettled(exts)),
-			mergeAll(),
-			filter(isFulfilled),
-			map(prop("value")),
-			map(prop("default")),
-			map(f =>
-				f({
-					commands: {
-						before: prependListener,
-						after: appendListener,
-						on: registerCommand,
-						off: unregisterCommand,
-						emit: executeCommand,
-					},
-					// registerEditorPlugin,
-					// unregisterEditorPlugin,
-					// registerCommandPaletteItem,
-					// unregisterCommandPaletteItem,
-					// registerContextMenuItem,
-					// unregisterContextMenuItem,
-					registerTranslations,
-					// registerFileAssociation,
-					// unregisterFileAssociation,
-					registerActivity,
-					unregisterActivity,
-					logger,
-				})
-			),
+			// map(exts => exts.map(f => f())),
+			// mergeMap(exts => Promise.allSettled(exts)),
+			// mergeAll(),
+			// filter(isFulfilled),
+			// map(prop("value")),
+			// map(prop("default")),
+			// map(f => f({ logger })),
 			switchMap(() => activities$),
 			map(activities => {
 				activities?.map(activity => {
@@ -235,18 +173,26 @@ export const initActivities = callOnce(() => {
 	return activities$
 })
 
-export const registerActivity =
-	(extensionName: string) => (name: string, activity: Omit<Activity, "name">) => {
-		addActivity$.next({
-			...activity,
-			name: `${extensionName}.${name}`,
-		})
-	}
+export const registerActivity = (name: string, activity: Omit<Activity, "name">) => {
+	addActivity$.next({ ...activity, name })
+}
 
-export const unregisterActivity = (extensionName: string) => (name: string) => {
-	removeActivity$.next(`${extensionName}.${name}`)
+export const unregisterActivity = (name: string) => {
+	removeActivity$.next(name)
 }
 
 export const clearActivities = () => {
 	clearActivities$.next(null)
 }
+
+export const useExtensions = () => ({
+	activities: {
+		add: registerActivity,
+		remove: unregisterActivity,
+		clear: clearActivities,
+	},
+})
+
+export const useCurrentActivity = () => useSubscription(currentActivity$)
+export const useRoute = () => useSubscription(currentRoute$)
+export const useActivities = () => useSubscription(activities$, [])

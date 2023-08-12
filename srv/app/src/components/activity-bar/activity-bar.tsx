@@ -2,18 +2,16 @@ import { BsThreeDotsVertical } from "react-icons/bs"
 import { useSidebar } from "src/streams/sidebar"
 import { useUser } from "../../streams/auth"
 import Null from "../null"
-import Activity from "./activity"
+import ActivityItem from "./activity"
 import { useCommands } from "src/hooks/use-commands"
 import { useCommandPaletteItems } from "src/streams/command-palette"
+import { Activity, useActivities } from "src/streams/extensions"
 
-type Props = {
-	activities: any[]
-}
-
-export default function ActivityBar({ activities }: Props) {
+export default function ActivityBar() {
 	const user = useUser()
 	const sidebar = useSidebar()
 	const commands = useCommands()
+	const activities = useActivities()
 
 	const commandPaletteItems = useCommandPaletteItems()
 
@@ -38,9 +36,7 @@ export default function ActivityBar({ activities }: Props) {
 			</div>
 			<div className="flex flex-col space-y-4 items-center">
 				{activities.map(activity =>
-					activity.background ? null : (
-						<Activity key={activity.name} name={activity.name} version={activity.version} />
-					)
+					activity.background ? null : <ActivityItem key={activity.name} activity={activity} />
 				)}
 			</div>
 			<div>{user.fold(Null, user => user.email.slice(0, 1))}</div>

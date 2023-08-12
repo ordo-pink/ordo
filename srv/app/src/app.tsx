@@ -13,6 +13,7 @@ import Modal from "./components/modal"
 import { useDefaultCommandPalette } from "./streams/command-palette"
 import ContextMenu from "./components/context-menu/context-menu"
 import { useContextMenu } from "./streams/context-menu"
+import { useActivities } from "./streams/extensions"
 
 type OnDragFn = Unary<[number, number], void>
 type OnDragEndFn = OnDragFn
@@ -70,7 +71,7 @@ export default function App({ id, data, web }: Hosts) {
 
 	return (
 		<div className="flex" onClick={contextMenu.hide}>
-			<ActivityBar activities={[{ name: "file-explorer", version: "0.1.0", background: false }]} />
+			<ActivityBar />
 			{sidebar?.disabled ? (
 				<div className="max-h-screen h-full flex overflow-auto w-full">NO SIDEBAR</div>
 			) : (

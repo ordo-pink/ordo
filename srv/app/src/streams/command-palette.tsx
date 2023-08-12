@@ -1,5 +1,4 @@
-import type { RegisterCommandPaletteItemFn } from "./extensions"
-import { Thunk, callOnce } from "#lib/tau/mod"
+import { Thunk, Unary, callOnce } from "#lib/tau/mod"
 import { BehaviorSubject, map, merge, scan, shareReplay, Subject } from "rxjs"
 import { IconType } from "react-icons"
 import { useSubscription } from "../hooks/use-subscription"
@@ -8,6 +7,9 @@ import { ComponentType, useEffect } from "react"
 import { CommandPaletteModal } from "../components/command-palette"
 import { useCommands } from "src/hooks/use-commands"
 import { hideModal } from "./modal"
+
+export type UnregisterCommandPaletteItemFn = Unary<string, void>
+export type RegisterCommandPaletteItemFn = Unary<CommandPaletteItem, void>
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type CommandPaletteItem = {

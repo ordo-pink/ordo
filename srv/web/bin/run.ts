@@ -8,7 +8,7 @@ import { getc } from "#lib/getc/mod.ts"
 const { WEB_STATIC_ROOT } = getc(["WEB_STATIC_ROOT"])
 
 await Oath.all([
-	runCommand("cp", ["-r", `./srv/web/assets/`, WEB_STATIC_ROOT]),
+	runCommand("cp", ["-a", `./srv/web/assets/.`, WEB_STATIC_ROOT]),
 	runDenoCommand(getDenoPath(), [
 		"run",
 		"--allow-net",

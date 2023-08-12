@@ -75,7 +75,7 @@ const main = async () => {
 	const encoder = new TextEncoder()
 
 	Deno.stdout.write(encoder.encode(`  ${cyan("→")} Creating directories...`))
-	await createDirectoryIfNotExists(ID_KV_DB_PATH).toPromise()
+	await createDirectoryIfNotExists(ID_KV_DB_PATH).orElse(console.error)
 	Deno.stdout.write(encoder.encode(` ${green("✓")}\n`))
 
 	Deno.stdout.write(encoder.encode(`  ${cyan("→")} Generating auth keys...`))

@@ -5,6 +5,11 @@ const PROJECT_ROOT = import.meta.dir
 const PUBLIC_DIR = path.resolve(PROJECT_ROOT, "public")
 const BUILD_DIR = path.resolve(PROJECT_ROOT, "build")
 
+await Bun.build({
+	entrypoints: ["./src/index.tsx"],
+	outdir: "./build",
+}).catch(console.log)
+
 watch("./src", { recursive: true }, async () => {
 	await Bun.build({
 		entrypoints: ["./src/index.tsx"],

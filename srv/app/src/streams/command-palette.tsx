@@ -1,3 +1,4 @@
+import type { RegisterCommandPaletteItemFn } from "./extensions"
 import { Thunk, callOnce } from "#lib/tau/mod"
 import { BehaviorSubject, map, merge, scan, shareReplay, Subject } from "rxjs"
 import { IconType } from "react-icons"
@@ -38,7 +39,9 @@ export const commandPaletteItems$ = merge(
 	shareReplay(1)
 )
 
-export const registerCommandPaletteItem: any = (item: CommandPaletteItem) => {
+export const registerCommandPaletteItem: RegisterCommandPaletteItemFn = (
+	item: CommandPaletteItem
+) => {
 	addContextMenuItem$.next(item)
 }
 

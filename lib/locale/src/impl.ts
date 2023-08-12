@@ -383,3 +383,5 @@ export enum TwoLetterLocaleReadableName {
 
 export const twoLetterLocaleToReadableName = (locale: TwoLetterLocale) =>
 	TwoLetterLocaleReadableName[locale]
+
+export type ISO_639_1_Locale = `${TwoLetterLocale}`

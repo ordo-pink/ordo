@@ -3,15 +3,10 @@ import { useEffect, useState } from "preact/hooks"
 import { Button } from "../../components/button.tsx"
 import { Callout } from "../../components/callout.tsx"
 import { EmailInput, PasswordInput } from "../../components/input.tsx"
-import { isSignedIn, refreshAuthInfo } from "../../streams/auth.ts"
 
 export default function SignUpForm() {
 	const [emailErrors, setEmailErrors] = useState<string[]>([])
 	const [passwordErrors, setPasswordErrors] = useState<string[]>([])
-
-	if (isSignedIn()) {
-		window.location.href = "/"
-	}
 
 	const errors = useSignal<string[]>([])
 	const email = useSignal("")
@@ -88,8 +83,6 @@ export default function SignUpForm() {
 							}),
 							method: "POST",
 						}).then(res => res.json())
-
-						refreshAuthInfo(response)
 
 						window.location.replace("/~/")
 					}}

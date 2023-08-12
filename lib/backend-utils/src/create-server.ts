@@ -15,7 +15,7 @@ import { ConsoleLogger, Logger } from "#lib/logger/mod.ts"
 import { identity } from "#ramda"
 
 export type CreateServerParams = {
-	origin?: string
+	origin?: string | string[]
 	logger?: Logger
 	serverName: string
 	extendRouter?: Unary<Router, Router>

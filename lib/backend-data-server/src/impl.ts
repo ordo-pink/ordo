@@ -22,7 +22,7 @@ import { handleGetRoot } from "./handlers/get-root.handler.ts"
 
 // TODO: Audit
 export type Params = {
-	origin: string
+	origin: string | string[]
 	dataService: TDataService<ReadableStream>
 	idHost: string
 	logger?: Logger

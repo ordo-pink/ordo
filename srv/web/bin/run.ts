@@ -2,14 +2,13 @@
 // SPDX-License-Identifier: MIT
 
 import { getDenoPath, runCommand, runDenoCommand } from "#lib/binutil/mod.ts"
-import { identity } from "#ramda"
 import { Oath } from "#lib/oath/mod.ts"
 import { getc } from "#lib/getc/mod.ts"
 
 const { WEB_STATIC_ROOT } = getc(["WEB_STATIC_ROOT"])
 
 await Oath.all([
-	runCommand("cp", ["-r", `srv/web/assets/*`, WEB_STATIC_ROOT]),
+	runCommand("cp", ["-r", `./srv/web/assets/`, WEB_STATIC_ROOT]),
 	runDenoCommand(getDenoPath(), [
 		"run",
 		"--allow-net",
@@ -30,4 +29,4 @@ await Oath.all([
 		"-c",
 		"./tailwind.config.cjs",
 	]),
-]).fork(identity, identity)
+]).orElse(Deno.stdout.write)

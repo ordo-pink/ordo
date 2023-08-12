@@ -10,14 +10,19 @@ import { createParentDirectoryFor } from "#lib/fs/src/impl.ts"
 
 export const getDenoPath = () => join(Deno.cwd(), "opt", "deno")
 
-export const runCommand = (command: string, args: string[]) =>
+export const runCommand = (
+	command: string,
+	args?: string[],
+	cwd?: string,
+	env?: Record<string, string>
+) =>
 	Oath.of(args)
-		.map(args => new Deno.Command(command, { args, stdout: "piped", stderr: "piped" }))
+		.map(args => new Deno.Command(command, { args, stdout: "piped", stderr: "piped", cwd, env }))
 		.chain(command => Oath.try(() => command.spawn()))
 		.chain(({ stdout, stderr }) =>
 			Oath.from(async () => {
 				for await (const chunk of stdout) Deno.stdout.write(chunk)
-				for await (const chunk of stderr) Deno.stderr.write(chunk)
+				for await (const chunk of stderr) Deno.stdout.write(chunk)
 			})
 		)
 

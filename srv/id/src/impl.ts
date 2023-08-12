@@ -36,6 +36,7 @@ const {
 	ID_TOKENS_TABLE_NAME,
 	DATA_DATA_PATH,
 	DATA_METADATA_PATH,
+	APP_HOST,
 	WEB_HOST,
 } = getc([
 	"ID_USER_ADAPTER",
@@ -57,6 +58,7 @@ const {
 	"ID_TOKENS_TABLE_NAME",
 	"DATA_DATA_PATH",
 	"DATA_METADATA_PATH",
+	"APP_HOST",
 	"WEB_HOST",
 ])
 
@@ -94,7 +96,7 @@ const app = await createIDServer({
 	tokenStorageRepository,
 	dataRepository,
 	metadataRepository,
-	origin: WEB_HOST,
+	origin: [WEB_HOST, APP_HOST],
 	accessKeys: { private: accessTokenPrivateKey, public: accessTokenPublicKey },
 	refreshKeys: { private: refreshTokenPrivateKey, public: refreshTokenPublicKey },
 	saltRounds: Number(ID_SALT_ROUNDS),

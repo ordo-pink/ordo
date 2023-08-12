@@ -37,7 +37,7 @@ export type CreateIDServerFnParams = {
 	accessTokenExpireIn: number
 	refreshTokenExpireIn: number
 	saltRounds: number
-	origin: string
+	origin: string | string[]
 	alg: "ES384" // TODO: Add support for switching to RSA
 	accessKeys: CryptoKeyPair
 	refreshKeys: CryptoKeyPair

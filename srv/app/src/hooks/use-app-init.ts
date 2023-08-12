@@ -6,6 +6,7 @@ import { initSidebar } from "../streams/sidebar"
 import { initModals } from "../streams/modal"
 import { initCommandPalette } from "../streams/command-palette"
 import { initRouter } from "src/streams/router"
+import { initContextMenu } from "src/streams/context-menu"
 
 const refreshToken = (hosts: Hosts) => {
 	fetch(`${hosts.id}/refresh-token`, { method: "POST", credentials: "include" })
@@ -25,16 +26,21 @@ export const useAppInit = (hosts: Hosts) => {
 		initCommands({ logger: ConsoleLogger })
 		initRouter({ logger: ConsoleLogger })
 		initModals({ logger: ConsoleLogger })
+		initContextMenu()
 		initCommandPalette()
 		initSidebar()
+		// initExtensions({ logger: ConsoleLogger, router$, contextMenu$, extensions: [] })
 		// initActivities()
 
-		// initExtensions({ logger: ConsoleLogger, router$, contextMenu$, extensions: [] })
+		// TODO: Allow native context menu if custom context menu is not available
+		const suppressRightClickBehavior = (event: MouseEvent) => event.preventDefault()
+		document.addEventListener("contextmenu", suppressRightClickBehavior)
 
 		refreshToken(hosts)
 		const interval = setInterval(() => refreshToken(hosts), 50000)
 
 		return () => {
+			document.removeEventListener("contextmenu", suppressRightClickBehavior)
 			onBeforeQuit()
 			clearInterval(interval)
 		}

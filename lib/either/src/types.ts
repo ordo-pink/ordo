@@ -22,7 +22,11 @@ export type TEither<R, L> = {
 
 export type EitherStatic = {
 	fromNullable: <R>(x: Nullable<R>) => TEither<NonNullable<R>, null>
-	fromBoolean: <R, L = undefined>(f: () => boolean, r: () => R, l?: () => L) => TEither<R, L>
+	fromBoolean: <R = undefined, L = undefined>(
+		f: () => boolean,
+		r?: () => R,
+		l?: () => L
+	) => TEither<R, L>
 	try: <R, L>(f: () => R) => TEither<R, L>
 	right: RightFn
 	left: LeftFn

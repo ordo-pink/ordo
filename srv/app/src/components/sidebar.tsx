@@ -8,6 +8,7 @@ import { useCommands } from "../hooks/use-commands"
 import { useSubscription } from "src/hooks/use-subscription"
 import { commandPaletteItems$, useCommandPaletteItems } from "src/streams/command-palette"
 import { useHotkeys } from "react-hotkeys-hook"
+import { useContextMenu } from "src/streams/context-menu"
 
 type Props = { isNarrow: boolean }
 
@@ -16,6 +17,7 @@ export default function Sidebar({ children, isNarrow }: PropsWithChildren<Props>
 	const sidebar = useSidebar()
 	const commands = useCommands()
 	const commandPaletteItems = useCommandPaletteItems()
+	const contextMenu = useContextMenu()
 
 	const onSidebarClick = () => {
 		if (!isNarrow || sidebar.disabled || sidebar.sizes[0] === 0) return
@@ -30,6 +32,13 @@ export default function Sidebar({ children, isNarrow }: PropsWithChildren<Props>
 		<div
 			className="h-screen w-full flex justify-between flex-col p-4 bg-neutral-200 dark:bg-neutral-900"
 			onClick={onSidebarClick}
+			onContextMenu={event =>
+				contextMenu.show({
+					x: event.clientX,
+					y: event.clientY,
+					target: "sidebar",
+				})
+			}
 		>
 			<div>
 				<div className="flex items-center justify-between">

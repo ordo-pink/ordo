@@ -69,24 +69,21 @@ export enum IconSize {
 }
 
 export type RegisterActivityFn = Unary<string, Binary<string, Omit<Activity, "name">, void>>
-export type RegisterContextMenuItemFn = Unary<
-	string,
-	Binary<
-		CommandListener,
-		{
-			// eslint-disable-next-line @typescript-eslint/no-explicit-any
-			shouldShow: (target: any) => boolean
-			// eslint-disable-next-line @typescript-eslint/no-explicit-any
-			payloadCreator: (target: any) => any
-			Icon: IconType
-			accelerator?: string
-			type: "create" | "read" | "update" | "delete"
-			// eslint-disable-next-line @typescript-eslint/no-explicit-any
-			disabled?: (target: any) => boolean
-		},
-		void
-	>
+export type RegisterContextMenuItemFn = Binary<
+	CommandListener,
+	{
+		// eslint-disable-next-line @typescript-eslint/no-explicit-any
+		shouldShow: (target: any) => boolean
+		Icon: IconType
+		accelerator?: string
+		type: "create" | "read" | "update" | "delete"
+		// eslint-disable-next-line @typescript-eslint/no-explicit-any
+		disabled?: (target: any) => boolean
+		payloadCreator?: () => any
+	},
+	void
 >
+
 export type RegisterFileAssociationFn = Unary<
 	string,
 	Binary<string, Omit<FileAssociation, "name">, void>
@@ -103,7 +100,7 @@ export type RegisterCommandPaletteItemFn = Unary<CommandPaletteItem, void>
 export type UnregisterEditorPluginFn = Unary<string, Unary<string, void>>
 export type UnregisterCommandPaletteItemFn = Unary<string, void>
 export type UnregisterActivityFn = Unary<string, Unary<string, void>>
-export type UnregisterContextMenuItemFn = Unary<string, Unary<string, void>>
+export type UnregisterContextMenuItemFn = Unary<string, void>
 export type UnregisterFileAssociationFn = Unary<string, Unary<string, void>>
 
 export type ExtensionCreatorContext = {

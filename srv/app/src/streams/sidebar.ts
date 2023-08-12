@@ -4,6 +4,7 @@ import { AiOutlineRight, AiOutlineLeft } from "react-icons/ai"
 import { useSubscription } from "../hooks/use-subscription"
 import { useCommands } from "src/hooks/use-commands"
 import { useCommandPalette } from "./command-palette"
+import { useContextMenu } from "./context-menu"
 
 type State =
 	| {
@@ -17,6 +18,7 @@ const sidebar$ = new BehaviorSubject<State>({ disabled: false, sizes: [25, 75] }
 export const initSidebar = callOnce(() => {
 	const commands = useCommands()
 	const commandPalette = useCommandPalette()
+	const contextMenu = useContextMenu()
 
 	commands.on("sidebar.disable", () => {
 		const sidebar = sidebar$.value
@@ -42,7 +44,7 @@ export const initSidebar = callOnce(() => {
 		sidebar$.next({ disabled: false, sizes: payload })
 	})
 
-	commands.on("sidebar.hide", () => {
+	const HIDE_SIDEBAR_COMMAND = commands.on("sidebar.hide", () => {
 		const sidebar = sidebar$.value
 		if (sidebar.disabled) return
 		sidebar$.next({ disabled: false, sizes: [0, 100] })
@@ -60,6 +62,13 @@ export const initSidebar = callOnce(() => {
 		name: "Hide sidebar",
 		Icon: AiOutlineLeft,
 		onSelect: () => commands.emit("sidebar.hide"),
+	})
+
+	contextMenu.addItem(HIDE_SIDEBAR_COMMAND, {
+		Icon: AiOutlineLeft,
+		shouldShow: target =>
+			target === "sidebar" && !sidebar$.value.disabled && sidebar$.value.sizes[0] > 0,
+		type: "update",
 	})
 })
 

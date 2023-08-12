@@ -31,7 +31,7 @@ const right: T.RightFn = x => ({
 
 export const Either: T.EitherStatic = {
 	fromNullable: x => (x == null ? left(null) : right(x)),
-	fromBoolean: (f, r, l?) => (f() ? right(r()) : left(l ? l() : undefined)) as any,
+	fromBoolean: (f, r?, l?) => (f() ? right(r ? r() : undefined) : left(l ? l() : undefined)) as any,
 	try: f => {
 		try {
 			return right(f())

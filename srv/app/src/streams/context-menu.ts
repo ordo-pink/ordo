@@ -3,12 +3,13 @@ import { IconType } from "react-icons"
 import { combineLatestWith, map, merge, scan, shareReplay, Subject } from "rxjs"
 import { BehaviorSubject } from "rxjs"
 import { RegisterContextMenuItemFn, UnregisterContextMenuItemFn } from "./extensions"
+import { useSubscription } from "src/hooks/use-subscription"
 
 export type ShowContextMenuParams = {
 	x: number
 	y: number
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	target: any
+	target: any // TODO: Collect targets
 	hideCreateCommands?: boolean
 	hideReadCommands?: boolean
 	hideUpdateCommands?: boolean
@@ -22,16 +23,13 @@ export type ContextMenuItemType = "create" | "read" | "update" | "delete"
 export type ContextMenuItem = {
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	shouldShow: (target: any) => boolean
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	payloadCreator: (target: any) => any
-	extensionName: string
-	commandName: string
 	name: string
 	Icon: IconType
 	accelerator?: string
 	type: ContextMenuItemType
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	disabled?: (target: any) => boolean
+	disabled?: (target: any) => boolean // TODO: Define target types
+	payloadCreator?: (target: any) => any
 }
 
 const addContextMenuItem$ = new Subject<ContextMenuItem>()
@@ -80,20 +78,13 @@ export const initContextMenu = callOnce(() => {
 	return contextMenu$
 })
 
-export const registerContextMenuItem: RegisterContextMenuItemFn =
-	extensionName => (command, item) => {
-		addContextMenuItem$.next({
-			...item,
-			extensionName,
-			commandName: command[0].replace(`${extensionName}.`, ""),
-			name: command[0],
-		})
-	}
+export const registerContextMenuItem: RegisterContextMenuItemFn = (command, item) => {
+	addContextMenuItem$.next({ ...item, name: command[0] })
+}
 
-export const unregisterContextMenuItem: UnregisterContextMenuItemFn =
-	extensionName => commandName => {
-		removeContextMenuItem$.next(`${extensionName}.${commandName}`)
-	}
+export const unregisterContextMenuItem: UnregisterContextMenuItemFn = commandName => {
+	removeContextMenuItem$.next(commandName)
+}
 
 export const clearContextMenuItems = () => {
 	clearContextMenuItems$.next(null)
@@ -122,3 +113,13 @@ export const showContextMenu = ({
 export const hideContextMenu = () => {
 	contextMenuToggle$.next(null)
 }
+
+export const useContextMenu = () => ({
+	show: showContextMenu,
+	hide: hideContextMenu,
+	clear: clearContextMenuItems,
+	addItem: registerContextMenuItem,
+	remove: unregisterContextMenuItem,
+})
+
+export const useContextMenuState = () => useSubscription(contextMenu$)

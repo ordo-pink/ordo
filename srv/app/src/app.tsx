@@ -11,6 +11,8 @@ import { executeCommand } from "./streams/commands"
 import { Unary } from "#lib/tau/mod"
 import Modal from "./components/modal"
 import { useDefaultCommandPalette } from "./streams/command-palette"
+import ContextMenu from "./components/context-menu/context-menu"
+import { useContextMenu } from "./streams/context-menu"
 
 type OnDragFn = Unary<[number, number], void>
 type OnDragEndFn = OnDragFn
@@ -22,6 +24,7 @@ export default function App({ id, data, web }: Hosts) {
 
 	const sidebar = useSidebar()
 	const [windowWidth] = useWindowSize()
+	const contextMenu = useContextMenu()
 
 	const [isNarrow, setIsNarrow] = useState(true)
 	const [sizes, setSizes] = useState([25, 75])
@@ -66,7 +69,7 @@ export default function App({ id, data, web }: Hosts) {
 	}, [!sidebar.disabled && sidebar.sizes[0]])
 
 	return (
-		<div className="flex">
+		<div className="flex" onClick={contextMenu.hide}>
 			<ActivityBar activities={[{ name: "file-explorer", version: "0.1.0", background: false }]} />
 			{sidebar?.disabled ? (
 				<div className="max-h-screen h-full flex overflow-auto w-full">NO SIDEBAR</div>
@@ -93,6 +96,8 @@ export default function App({ id, data, web }: Hosts) {
 					</div>
 				</Split>
 			)}
+
+			<ContextMenu />
 
 			<Modal />
 		</div>

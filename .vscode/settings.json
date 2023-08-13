@@ -3,5 +3,12 @@
 	"deno.unstable": true,
 	"deno.path": "./opt/deno",
 	"deno.cache": "./var/cache/deno",
-	"deno.enablePaths": ["./srv/id", "./lib", "./srv/data", "./srv/web", "./srv/app/bin"]
+	"deno.enablePaths": [
+		"./srv/exts",
+		"./srv/id",
+		"./lib",
+		"./srv/data",
+		"./srv/web",
+		"./srv/app/bin"
+	]
 }

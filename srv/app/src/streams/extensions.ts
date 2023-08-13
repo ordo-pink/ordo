@@ -18,7 +18,7 @@ import {
 } from "./commands"
 import { route, Route, noMatch } from "./router"
 import { RegisterTranslationsFn, registerTranslations } from "./translations"
-import { File, FileExtension } from "#lib/universal-data-service/mod"
+import { File, FileExtension } from "#lib/backend-data-service/mod"
 import { IconType } from "react-icons"
 import { RegisterContextMenuItemFn, UnregisterContextMenuItemFn } from "./context-menu"
 import { RegisterCommandPaletteItemFn, UnregisterCommandPaletteItemFn } from "./command-palette"

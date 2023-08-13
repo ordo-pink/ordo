@@ -12,7 +12,7 @@ import {
 	BackendDataService,
 	DataRepository,
 	MetadataRepository,
-} from "#lib/universal-data-service/mod.ts"
+} from "#lib/backend-data-service/mod.ts"
 import { UserRepository, UserService } from "#lib/backend-user-service/mod.ts"
 import { ConsoleLogger, Logger } from "#lib/logger/mod.ts"
 import { createServer } from "#lib/backend-utils/mod.ts"

@@ -5,7 +5,7 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-import { DirectoryPath, FilePath } from "#lib/universal-data-service/mod.ts"
+import { DirectoryPath, FilePath } from "#lib/backend-data-service/mod.ts"
 
 export const pathParamToDirectoryPath = (path: string) => `/${path}/` as DirectoryPath
 

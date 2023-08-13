@@ -9,7 +9,7 @@ import { assert, assertEquals, assertInstanceOf, assertRejects } from "#std/test
 import { readFile, rmdir } from "#lib/fs/mod.ts"
 import { FSDataRepository } from "./impl.ts"
 import { resolve } from "#std/path/mod.ts"
-import { FSID } from "#lib/universal-data-service/mod.ts"
+import { FSID } from "#lib/backend-data-service/mod.ts"
 
 const root = "./var/test"
 const sub = crypto.randomUUID()

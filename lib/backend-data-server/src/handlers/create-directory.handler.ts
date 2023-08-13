@@ -6,12 +6,12 @@
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 import { httpErrors, type Context, type Middleware } from "#x/oak@v12.6.0/mod.ts"
-import type * as DATA_SERVICE_TYPES from "#lib/universal-data-service/mod.ts"
+import type * as DATA_SERVICE_TYPES from "#lib/backend-data-service/mod.ts"
 import type { SUB } from "#lib/backend-token-service/mod.ts"
 import type { Binary, Curry, Unary } from "#lib/tau/mod.ts"
 
 import { ResponseError, useBearerAuthorization, useBody } from "#lib/backend-utils/mod.ts"
-import { DirectoryModel } from "#lib/universal-data-service/mod.ts"
+import { DirectoryModel } from "#lib/backend-data-service/mod.ts"
 import { Oath } from "#lib/oath/mod.ts"
 import { prop } from "#ramda"
 

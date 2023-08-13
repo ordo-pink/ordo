@@ -8,7 +8,7 @@
 import { Application } from "#x/oak@v12.6.0/mod.ts"
 import { createServer } from "#lib/backend-utils/mod.ts"
 import { ConsoleLogger, Logger } from "#lib/logger/mod.ts"
-import { TDataService } from "#lib/universal-data-service/mod.ts"
+import { TDataService } from "#lib/backend-data-service/mod.ts"
 import { handleUpdateFileContent } from "./handlers/update-file-content.handler.ts"
 import { handleCreateDirectory } from "./handlers/create-directory.handler.ts"
 import { handleRemoveDirectory } from "./handlers/remove-directory.handler.ts"

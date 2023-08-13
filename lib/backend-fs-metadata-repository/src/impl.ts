@@ -11,7 +11,7 @@ import {
 	type DirectoryWithChildren,
 	type File,
 	type MetadataRepository,
-} from "#lib/universal-data-service/mod.ts"
+} from "#lib/backend-data-service/mod.ts"
 import type { SUB } from "#lib/backend-token-service/mod.ts"
 import type { Binary, Unary } from "#lib/tau/mod.ts"
 

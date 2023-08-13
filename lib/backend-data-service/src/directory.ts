@@ -3,7 +3,7 @@
 
 import { SUB } from "#lib/backend-token-service/mod.ts"
 import { isValidPath, endsWithSlash } from "./common.ts"
-import { Directory, DirectoryPath } from "#lib/universal-data-service/mod.ts"
+import { Directory, DirectoryPath } from "#lib/backend-data-service/mod.ts"
 import { Nullable } from "#lib/tau/mod.ts"
 
 /**

@@ -7,7 +7,7 @@
 
 import { createDataServer } from "#lib/backend-data-server/mod.ts"
 import { getc } from "#lib/getc/mod.ts"
-import { BackendDataService } from "#lib/universal-data-service/mod.ts"
+import { BackendDataService } from "#lib/backend-data-service/mod.ts"
 import { FSMetadataRepository } from "#lib/backend-fs-metadata-repository/mod.ts"
 import { FSDataRepository } from "#lib/backend-fs-data-repository/mod.ts"
 import { ConsoleLogger } from "#lib/logger/mod.ts"

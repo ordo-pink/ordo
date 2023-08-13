@@ -1,7 +1,7 @@
 import type { Nullable } from "#lib/tau/mod"
 import type { AuthResponse } from "#lib/backend-id-server/mod"
 import type { User } from "#lib/backend-user-service/mod"
-import type { Directory, File } from "#lib/universal-data-service/mod"
+import type { Directory, File } from "#lib/backend-data-service/mod"
 
 import { BehaviorSubject, combineLatestWith, map } from "rxjs"
 import { Oath } from "#lib/oath/mod"

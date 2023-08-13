@@ -6,7 +6,7 @@
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 import { Unary } from "#lib/tau/mod.ts"
-import { DataRepository, FSID } from "#lib/universal-data-service/mod.ts"
+import { DataRepository, FSID } from "#lib/backend-data-service/mod.ts"
 import { Oath } from "#lib/oath/mod.ts"
 import { resolve } from "#std/path/mod.ts"
 import { createFile, createParentDirectoryFor, removeFile, stat } from "#lib/fs/mod.ts"

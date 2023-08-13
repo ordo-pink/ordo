@@ -1,10 +1,10 @@
 // SPDX-FileCopyrightText: Copyright 2023, 谢尔盖||↓ and the Ordo.pink contributors
 // SPDX-License-Identifier: MIT
 
-import type { TDataService } from "#lib/universal-data-service/mod.ts"
+import type { TDataService } from "#lib/backend-data-service/mod.ts"
 import type { Unary } from "#lib/tau/mod.ts"
 import type { SUB } from "#lib/backend-token-service/mod.ts"
-import type * as T from "#lib/universal-data-service/mod.ts"
+import type * as T from "#lib/backend-data-service/mod.ts"
 import type { File } from "./types/file.ts"
 
 import { Oath } from "#lib/oath/mod.ts"

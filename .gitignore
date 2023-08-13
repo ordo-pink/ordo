@@ -5,6 +5,7 @@
 /opt/*
 /var/*
 /usr/*
+/srv/app/build/*
 
 /tsconfig.json
 /.prettierrc

@@ -6,14 +6,14 @@ import { useCommands } from "src/hooks/use-commands"
 import { useCommandPalette } from "./command-palette"
 import { useContextMenu } from "./context-menu"
 
-type State =
+export type SidebarState =
 	| {
 			disabled: false
 			sizes: [number, number]
 	  }
 	| { disabled: true }
 
-const sidebar$ = new BehaviorSubject<State>({ disabled: false, sizes: [25, 75] })
+const sidebar$ = new BehaviorSubject<SidebarState>({ disabled: false, sizes: [25, 75] })
 
 export const initSidebar = callOnce(() => {
 	const commands = useCommands()

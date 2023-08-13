@@ -72,7 +72,6 @@ export const CommandPaletteModal = ({ items }: Props) => {
 
 	const handleEscape = () => {
 		setInputValue("")
-		console.log("HERE")
 		setCurrentIndex(0)
 		hide()
 	}

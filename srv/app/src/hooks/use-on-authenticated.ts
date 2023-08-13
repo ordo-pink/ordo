@@ -56,6 +56,8 @@ export const useOnAuthenticated = (hosts: Hosts) => {
 			commands.off("core.sign-out", handleSignOut)
 
 			commandPalette.removeItem("core.sign-out")
+
+			exts.activities.remove("test")
 		}
 	}, [isAuthenticated])
 }

@@ -6,6 +6,8 @@ import { ContextMenuItem, __ContextMenu$, getContextMenu } from "$streams/contex
 import ContextMenuItemList from "$components/context-menu/context-menu-item-list"
 import Null from "$components/null"
 
+const contextMenu = getContextMenu()
+
 type _P = { menu$: __ContextMenu$ }
 export default function ContextMenu({ menu$ }: _P) {
 	const [readers, setReaders] = useState<ContextMenuItem[]>([])
@@ -14,7 +16,6 @@ export default function ContextMenu({ menu$ }: _P) {
 	const [removers, setRemovers] = useState<ContextMenuItem[]>([])
 
 	const menu = useSubscription(menu$)
-	const contextMenu = getContextMenu()
 
 	useHotkeys("Esc", contextMenu.hide)
 

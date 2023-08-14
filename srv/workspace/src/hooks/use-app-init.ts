@@ -5,7 +5,7 @@ import { Hosts, initHosts, refreshAuthInfo, onBeforeQuit } from "$streams/auth"
 import { __ContextMenu$, __initContextMenu } from "$streams/context-menu"
 import { initActivities, initExtensions } from "$streams/extensions"
 import { initCommandPalette } from "$streams/command-palette"
-import { initCommands } from "$streams/commands"
+import { __initCommands } from "$streams/commands"
 import { initSidebar } from "$streams/sidebar"
 import { initRouter } from "$streams/router"
 import { initModals } from "$streams/modal"
@@ -31,7 +31,7 @@ export const useAppInit = (hosts: Hosts): UseAppInitReturns => {
 
 	useEffect(() => {
 		initHosts(hosts)
-		initCommands({ logger: ConsoleLogger })
+		__initCommands({ logger: ConsoleLogger })
 		const router$ = initRouter({ logger: ConsoleLogger })
 		initModals({ logger: ConsoleLogger })
 		initCommandPalette()

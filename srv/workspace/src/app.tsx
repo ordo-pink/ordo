@@ -10,11 +10,12 @@ import Workspace from "$components/workspace"
 import Modal from "$components/modal"
 import Null from "$components/null"
 
-export default function App({ id, data, web }: Hosts) {
-	const init = useAppInit({ id, data, web })
-	useOnAuthenticated({ id, data, web })
+const contextMenu = getContextMenu()
+
+export default function App(hosts: Hosts) {
+	const init = useAppInit(hosts)
+	useOnAuthenticated(hosts)
 	useDefaultCommandPalette()
-	const contextMenu = getContextMenu()
 
 	return Either.fromNullable(init.contextMenu$)
 		.map(() => init as { [K in keyof typeof init]: NonNullable<(typeof init)[K]> }) // TODO: Extract to tau

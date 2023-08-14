@@ -3,10 +3,12 @@ import { ComponentType, useEffect } from "react"
 import { IconType } from "react-icons"
 import { Thunk, Unary, callOnce } from "#lib/tau/mod"
 import { useSubscription } from "$hooks/use-subscription"
-import { useCommands } from "$hooks/use-commands"
+import { getCommands } from "$streams/commands"
 import { useModal } from "$hooks/use-modal"
 import { hideModal } from "$streams/modal"
 import CommandPaletteModal from "$components/command-palette"
+
+const commands = getCommands()
 
 export type UnregisterCommandPaletteItemFn = Unary<string, void>
 export type RegisterCommandPaletteItemFn = Unary<CommandPaletteItem, void>
@@ -62,8 +64,6 @@ export const hideCommandPalette = () => {
 }
 
 export const initCommandPalette = callOnce(() => {
-	const commands = useCommands()
-
 	commandPaletteItems$.subscribe()
 	commandPalette$.subscribe()
 

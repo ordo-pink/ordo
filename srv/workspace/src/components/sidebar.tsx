@@ -1,7 +1,7 @@
 import { useHotkeys } from "react-hotkeys-hook"
 import { BsThreeDotsVertical } from "react-icons/bs"
 import { MouseEvent, PropsWithChildren } from "react"
-import { useCommands } from "$hooks/use-commands"
+import { getCommands } from "$streams/commands"
 import { useCommandPaletteItems } from "$streams/command-palette"
 import { getContextMenu } from "$streams/context-menu"
 import { useSidebar } from "$streams/sidebar"
@@ -9,14 +9,14 @@ import { useUser } from "$streams/auth"
 import UsedSpace from "$components/used-space"
 import Null from "$components/null"
 
-type Props = { isNarrow: boolean }
+const commands = getCommands()
+const contextMenu = getContextMenu()
 
-export default function Sidebar({ children, isNarrow }: PropsWithChildren<Props>) {
+type _P = { isNarrow: boolean }
+export default function Sidebar({ children, isNarrow }: PropsWithChildren<_P>) {
 	const user = useUser()
 	const sidebar = useSidebar()
-	const commands = useCommands()
 	const commandPaletteItems = useCommandPaletteItems()
-	const contextMenu = getContextMenu()
 
 	const onSidebarClick = () => {
 		if (!isNarrow || sidebar.disabled || sidebar.sizes[0] === 0) return

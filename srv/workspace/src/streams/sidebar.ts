@@ -2,7 +2,7 @@ import { AiOutlineLeft, AiOutlineLayout, AiOutlineRight } from "react-icons/ai"
 import { BehaviorSubject } from "rxjs"
 import { callOnce } from "#lib/tau/mod"
 import { useSubscription } from "$hooks/use-subscription"
-import { useCommands } from "$hooks/use-commands"
+import { getCommands } from "$streams/commands"
 import { useCommandPalette } from "$streams/command-palette"
 import { getContextMenu } from "$streams/context-menu"
 
@@ -13,12 +13,13 @@ export type SidebarState =
 	  }
 	| { disabled: true }
 
+const commands = getCommands()
+const contextMenu = getContextMenu()
+
 const sidebar$ = new BehaviorSubject<SidebarState>({ disabled: false, sizes: [25, 75] })
 
 export const initSidebar = callOnce(() => {
-	const commands = useCommands()
 	const commandPalette = useCommandPalette()
-	const contextMenu = getContextMenu()
 
 	commands.on("sidebar.disable", () => {
 		const sidebar = sidebar$.value

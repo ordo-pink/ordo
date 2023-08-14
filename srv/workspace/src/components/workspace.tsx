@@ -6,12 +6,14 @@ import { Either } from "#lib/either/mod"
 import { useWindowSize } from "../hooks/use-window-size"
 import { useCurrentActivity, Activity } from "../streams/extensions"
 import { useSidebar, SidebarState } from "../streams/sidebar"
-import { executeCommand } from "../streams/commands"
+import { getCommands } from "$streams/commands"
 import Sidebar from "./sidebar"
 
 // TODO: Render Welcome page if activity is null
 
 // --- Public ---
+
+const commands = getCommands()
 
 export default function Workspace() {
 	const sidebar = useSidebar()
@@ -49,7 +51,7 @@ const EnabledSidebar = ({ sidebar, activity }: EnabledSidebarProps) => {
 
 	useEffect(() => {
 		const isNarrow = windowWidth < 768
-		executeCommand("sidebar.set-size", isNarrow ? [0, 100] : [25, 75])
+		commands.emit("sidebar.set-size", isNarrow ? [0, 100] : [25, 75])
 
 		setIsNarrow(isNarrow)
 	}, [windowWidth])
@@ -83,7 +85,7 @@ const EnabledSidebar = ({ sidebar, activity }: EnabledSidebarProps) => {
 			newRight = 0
 		}
 
-		executeCommand("sidebar.set-size", [newLeft, newRight])
+		commands.emit("sidebar.set-size", [newLeft, newRight])
 	}
 
 	return Either.fromNullable(activity).fold(

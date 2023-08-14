@@ -1,16 +1,16 @@
 import { useHotkeys } from "react-hotkeys-hook"
 import { Either } from "#lib/either/mod"
-import { useCommands } from "$hooks/use-commands"
+import { getCommands } from "$streams/commands"
 import { ContextMenuItem, getContextMenu } from "$streams/context-menu"
 import RenderFromNullable from "$components/render-from-nullable"
 import ActionListItem from "$components/action-list-item"
 import Accelerator from "$components/accelerator"
 
+const commands = getCommands()
+const contextMenu = getContextMenu()
+
 type _P = { target: HTMLElement; item: ContextMenuItem; payload?: any }
 export default function MenuItem({ item, target, payload: p }: _P) {
-	const commands = useCommands()
-	const contextMenu = getContextMenu()
-
 	const payload = item.payloadCreator ? item.payloadCreator({ payload: p, target }) : p
 	const isDisabled = item.shouldBeDisabled && item.shouldBeDisabled({ target, payload })
 	const emitContextMenuItemCommand = () =>

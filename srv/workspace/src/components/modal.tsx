@@ -1,8 +1,8 @@
 import { Either } from "#lib/either/mod"
 import { useHotkeys } from "react-hotkeys-hook"
 import { BsX } from "react-icons/bs"
-import { useModal } from "../hooks/use-modal"
-import { useSubscription } from "../hooks/use-subscription"
+import { useModal } from "../streamsmodal"
+import { useSubscription } from "../streamssubscription"
 import { modal$ } from "../streams/modal"
 import Null from "./null"
 

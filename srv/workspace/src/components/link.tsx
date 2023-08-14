@@ -1,5 +1,7 @@
 import { MouseEvent, PropsWithChildren, HTMLProps } from "react"
-import { useCommands } from "$hooks/use-commands"
+import { getCommands } from "$streams/commands"
+
+const commands = getCommands()
 
 type _P = HTMLProps<HTMLAnchorElement> &
 	PropsWithChildren<{
@@ -10,8 +12,6 @@ type _P = HTMLProps<HTMLAnchorElement> &
 	}>
 
 export default function Link({ href, children, className, external = false, newTab = false }: _P) {
-	const commands = useCommands()
-
 	const handleClick = (event: MouseEvent) => {
 		event.preventDefault()
 

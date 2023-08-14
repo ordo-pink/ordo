@@ -1,5 +1,5 @@
 import { BsThreeDotsVertical } from "react-icons/bs"
-import { useCommands } from "$hooks/use-commands"
+import { getCommands } from "$streams/commands"
 import { useCommandPaletteItems } from "$streams/command-palette"
 import { getContextMenu } from "$streams/context-menu"
 import { useActivities } from "$streams/extensions"
@@ -12,12 +12,12 @@ import { Unary } from "#lib/tau/mod"
 
 type ShowContextMenu = Unary<MouseEvent<HTMLDivElement>, void>
 
+const commands = getCommands()
 const contextMenu = getContextMenu()
 
 export default function ActivityBar() {
 	const user = useUser()
 	const sidebar = useSidebar()
-	const commands = useCommands()
 	const activities = useActivities()
 	const commandPaletteItems = useCommandPaletteItems()
 

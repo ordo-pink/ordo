@@ -1,9 +1,11 @@
 import { Router, operators } from "silkrouter"
 import { Unary, callOnce } from "#lib/tau/mod"
 import { Logger } from "#lib/logger/mod"
-import { useCommands } from "$hooks/use-commands"
+import { getCommands } from "$streams/commands"
 
 // TODO: Consider moving to react-router
+
+const commands = getCommands()
 
 /**
  * Route descriptor to be passed for navigating.
@@ -53,8 +55,6 @@ export const openExternal: OpenExternalFn = ({ url, newTab = true }) => {
 
 type Params = { logger: Logger }
 export const initRouter = callOnce(({ logger }: Params) => {
-	const commands = useCommands()
-
 	commands.on("router.navigate", ({ payload }) => {
 		logger.debug("Navigating to", payload)
 

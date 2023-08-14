@@ -7,7 +7,7 @@ import { Binary, Curry, Nullable, Thunk, Unary, callOnce } from "#lib/tau/mod"
 import { File, FileExtension } from "#lib/backend-data-service/mod"
 import { Logger } from "#lib/logger/mod"
 import { route, Route, noMatch } from "$streams/router"
-import { useSubscription } from "$hooks/use-subscription"
+import { useSubscription } from "$streamssubscription"
 
 export type ContextMenuItemType = "create" | "read" | "update" | "delete"
 

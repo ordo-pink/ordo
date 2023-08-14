@@ -6,7 +6,8 @@ import { Switch } from "#lib/switch/mod"
 
 // --- Public ---
 
-export const Accelerator = ({ accelerator }: Props) => {
+type _P = { accelerator: string }
+export default function Accelerator({ accelerator }: _P) {
 	const split = accelerator.split("+")
 	const alt = isDarwin ? "⌥" : "Alt"
 	const ctrl = isDarwin ? "⌘" : "Ctrl"
@@ -27,7 +28,6 @@ export const Accelerator = ({ accelerator }: Props) => {
 
 // --- Internal ---
 
-type Props = { accelerator: string }
 type KeyProps = { symbol: string }
 
 const isDarwin = navigator.appVersion.indexOf("Mac") !== -1

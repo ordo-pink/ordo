@@ -1,13 +1,12 @@
-import {
+import type {
 	ComponentType,
 	CSSProperties,
 	KeyboardEventHandler,
 	MouseEventHandler,
 	PropsWithChildren,
 } from "react"
-
-import { Link } from "./link"
 import { noop } from "#lib/tau/mod"
+import Link from "$components/link"
 
 type Props = {
 	text: string
@@ -24,7 +23,7 @@ type Props = {
 	onEnterKeyDown?: KeyboardEventHandler
 }
 
-export const ActionListItem = ({
+export default function ActionListItem({
 	Icon,
 	text,
 	href,
@@ -38,7 +37,7 @@ export const ActionListItem = ({
 	onMouseLeave = noop,
 	onContextMenu = noop,
 	onEnterKeyDown = noop,
-}: PropsWithChildren<Props>) => {
+}: PropsWithChildren<Props>) {
 	const right = Array.isArray(children) ? children[0] : children
 	const bottom = Array.isArray(children) ? children[1] : null
 
@@ -61,7 +60,7 @@ export const ActionListItem = ({
 				onMouseLeave={onMouseLeave}
 				onContextMenu={onContextMenu}
 				role="none"
-				onKeyDown={onEnterKeyDown}
+				onKeyDown={e => (disabled ? void 0 : onEnterKeyDown(e))}
 			>
 				<div className="flex items-center space-x-2 w-full truncate">
 					<div className="shrink-0">

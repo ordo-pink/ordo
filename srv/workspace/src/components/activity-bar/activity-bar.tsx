@@ -1,11 +1,11 @@
 import { BsThreeDotsVertical } from "react-icons/bs"
-import { useSidebar } from "../../streams/sidebar"
-import { useUser } from "../../streams/auth"
-import Null from "../null"
-import ActivityItem from "./activity"
-import { useCommands } from "../../hooks/use-commands"
-import { useCommandPaletteItems } from "../../streams/command-palette"
-import { useActivities } from "../../streams/extensions"
+import { useCommands } from "$hooks/use-commands"
+import { useCommandPaletteItems } from "$streams/command-palette"
+import { useActivities } from "$streams/extensions"
+import { useSidebar } from "$streams/sidebar"
+import { useUser } from "$streams/auth"
+import ActivityItem from "$components/activity-bar/activity"
+import Null from "$components/null"
 
 export default function ActivityBar() {
 	const user = useUser()
@@ -48,7 +48,7 @@ export default function ActivityBar() {
 							isSidebarCollapsed ? "opacity-100" : "opacity-0"
 						}`}
 					>
-						{user.email.slice(0, 1)}
+						{user.email && user.email.slice(0, 1)}
 					</div>
 				))}
 			</div>

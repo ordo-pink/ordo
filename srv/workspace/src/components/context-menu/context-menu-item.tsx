@@ -1,30 +1,38 @@
-import { useCommands } from "../../hooks/use-commands"
-import { ContextMenuItem, hideContextMenu } from "../../streams/context-menu"
-import { Accelerator } from "../accelerator"
-import { ActionListItem } from "../action-list-item"
+import { useHotkeys } from "react-hotkeys-hook"
+import { Either } from "#lib/either/mod"
+import { useCommands } from "$hooks/use-commands"
+import { ContextMenuItem, getContextMenu } from "$streams/context-menu"
+import RenderFromNullable from "$components/render-from-nullable"
+import ActionListItem from "$components/action-list-item"
+import Accelerator from "$components/accelerator"
 
-type Props = {
-	state: { x: number; y: number; target: any; structure: ContextMenuItem[] }
-	item: ContextMenuItem
-}
-
-export default function MenuItem({ item, state }: Props) {
+type _P = { target: HTMLElement; item: ContextMenuItem; payload?: any }
+export default function MenuItem({ item, target, payload: p }: _P) {
 	const commands = useCommands()
-	const payloadCreator = item.payloadCreator ?? (() => void 0)
+	const contextMenu = getContextMenu()
+
+	const payload = item.payloadCreator ? item.payloadCreator({ payload: p, target }) : p
+	const isDisabled = item.shouldBeDisabled && item.shouldBeDisabled({ target, payload })
+	const emitContextMenuItemCommand = () =>
+		Either.fromNullable(item.accelerator)
+			.chain(() => Either.fromBoolean(() => !isDisabled))
+			.map(() => commands.emit(item.commandName, payload))
+			.map(() => contextMenu.hide())
+
+	useHotkeys(item.accelerator ?? [], emitContextMenuItemCommand)
 
 	return (
 		<ActionListItem
-			key={item.name}
+			key={item.commandName}
 			Icon={item.Icon}
 			current={false}
-			onClick={() => {
-				commands.emit(item.name as `${string}.${string}`, payloadCreator(state.target))
-				hideContextMenu()
-			}}
-			text={item.name}
-			disabled={item.disabled ? item.disabled(state.target) : false}
+			onClick={emitContextMenuItemCommand}
+			text={item.readableName}
+			disabled={isDisabled}
 		>
-			{item.accelerator ? <Accelerator accelerator={item.accelerator} /> : null}
+			<RenderFromNullable having={item.accelerator}>
+				<Accelerator accelerator={item.accelerator!} />
+			</RenderFromNullable>
 		</ActionListItem>
 	)
 }

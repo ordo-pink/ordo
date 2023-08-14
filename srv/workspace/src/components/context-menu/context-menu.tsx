@@ -1,23 +1,25 @@
 import { useEffect, useState } from "react"
 import { useHotkeys } from "react-hotkeys-hook"
-import MenuItem from "./context-menu-item"
 import { Either } from "#lib/either/mod"
-import { ContextMenuItem, useContextMenu, useContextMenuState } from "../../streams/context-menu"
-import Null from "../null"
+import { useSubscription } from "$hooks/use-subscription"
+import { ContextMenuItem, __ContextMenu$, getContextMenu } from "$streams/context-menu"
+import ContextMenuItemList from "$components/context-menu/context-menu-item-list"
+import Null from "$components/null"
 
-export default function ContextMenu() {
-	const state = useContextMenuState()
-	const contextMenu = useContextMenu()
-
-	useHotkeys("Esc", () => contextMenu.hide())
-
+type _P = { menu$: __ContextMenu$ }
+export default function ContextMenu({ menu$ }: _P) {
 	const [readers, setReaders] = useState<ContextMenuItem[]>([])
 	const [creators, setCreators] = useState<ContextMenuItem[]>([])
 	const [updaters, setUpdaters] = useState<ContextMenuItem[]>([])
 	const [removers, setRemovers] = useState<ContextMenuItem[]>([])
 
+	const menu = useSubscription(menu$)
+	const contextMenu = getContextMenu()
+
+	useHotkeys("Esc", contextMenu.hide)
+
 	useEffect(() => {
-		if (!state) {
+		if (!menu) {
 			setReaders([])
 			setCreators([])
 			setUpdaters([])
@@ -31,7 +33,7 @@ export default function ContextMenu() {
 		const updateCommands = [] as ContextMenuItem[]
 		const deleteCommands = [] as ContextMenuItem[]
 
-		state.structure.forEach(item => {
+		menu.structure.forEach(item => {
 			if (item.type === "create") createCommands.push(item)
 			else if (item.type === "read") readCommands.push(item)
 			else if (item.type === "update") updateCommands.push(item)
@@ -42,55 +44,39 @@ export default function ContextMenu() {
 		setReaders(readCommands)
 		setUpdaters(updateCommands)
 		setRemovers(deleteCommands)
-	}, [state])
+	}, [menu])
 
 	return (
 		<div
-			style={{ top: state?.y ?? -50, left: state?.x ?? -50 }}
+			style={{ top: menu?.y ?? -50, left: menu?.x ?? -50 }}
 			className={`absolute z-[1000] bg-white dark:bg-neutral-500 shadow-lg transition-opacity w-80 duration-300 rounded-lg p-2 ${
-				state && state.structure.length ? "opacity-100" : "opacity-0"
+				menu && menu.structure.length ? "opacity-100" : "opacity-0"
 			}`}
 		>
-			{state ? (
+			{menu ? (
 				<div className="flex flex-col divide-y">
 					{Either.fromBoolean(() => creators.length > 0)
-						.chain(() => Either.fromBoolean(() => !state.hideCreateCommands))
+						.chain(() => Either.fromBoolean(() => !menu.hideCreateItems))
 						.fold(Null, () => (
-							<div className="py-2">
-								{creators.map(item => (
-									<MenuItem key={item.name} item={item} state={{ ...state, structure: creators }} />
-								))}
-							</div>
+							<ContextMenuItemList items={creators} target={menu.target} payload={menu.payload} />
 						))}
 
 					{Either.fromBoolean(() => readers.length > 0)
-						.chain(() => Either.fromBoolean(() => !state.hideReadCommands))
+						.chain(() => Either.fromBoolean(() => !menu.hideReadItems))
 						.fold(Null, () => (
-							<div className="py-2">
-								{readers.map(item => (
-									<MenuItem key={item.name} item={item} state={{ ...state, structure: readers }} />
-								))}
-							</div>
+							<ContextMenuItemList items={readers} target={menu.target} payload={menu.payload} />
 						))}
 
 					{Either.fromBoolean(() => updaters.length > 0)
-						.chain(() => Either.fromBoolean(() => !state.hideUpdateCommands))
+						.chain(() => Either.fromBoolean(() => !menu.hideUpdateItems))
 						.fold(Null, () => (
-							<div className="py-2">
-								{updaters.map(item => (
-									<MenuItem key={item.name} item={item} state={{ ...state, structure: updaters }} />
-								))}
-							</div>
+							<ContextMenuItemList items={updaters} target={menu.target} payload={menu.payload} />
 						))}
 
 					{Either.fromBoolean(() => removers.length > 0)
-						.chain(() => Either.fromBoolean(() => !state.hideDeleteCommands))
+						.chain(() => Either.fromBoolean(() => !menu.hideDeleteItems))
 						.fold(Null, () => (
-							<div className="py-2">
-								{removers.map(item => (
-									<MenuItem key={item.name} item={item} state={{ ...state, structure: removers }} />
-								))}
-							</div>
+							<ContextMenuItemList items={removers} target={menu.target} payload={menu.payload} />
 						))}
 				</div>
 			) : null}

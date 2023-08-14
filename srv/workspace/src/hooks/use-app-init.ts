@@ -1,13 +1,14 @@
-import { useEffect } from "react"
-import { Hosts, initHosts, refreshAuthInfo, onBeforeQuit } from "../streams/auth"
-import { initCommands } from "../streams/commands"
+import { useEffect, useState } from "react"
 import { ConsoleLogger } from "#lib/logger/mod"
-import { initSidebar } from "../streams/sidebar"
-import { initModals } from "../streams/modal"
-import { initCommandPalette } from "../streams/command-palette"
-import { initRouter } from "../streams/router"
-import { initContextMenu } from "../streams/context-menu"
-import { initActivities, initExtensions } from "../streams/extensions"
+import { Nullable } from "#lib/tau/mod"
+import { Hosts, initHosts, refreshAuthInfo, onBeforeQuit } from "$streams/auth"
+import { __ContextMenu$, __initContextMenu } from "$streams/context-menu"
+import { initActivities, initExtensions } from "$streams/extensions"
+import { initCommandPalette } from "$streams/command-palette"
+import { initCommands } from "$streams/commands"
+import { initSidebar } from "$streams/sidebar"
+import { initRouter } from "$streams/router"
+import { initModals } from "$streams/modal"
 
 const refreshToken = (hosts: Hosts) => {
 	fetch(`${hosts.id}/refresh-token`, { method: "POST", credentials: "include" })
@@ -21,17 +22,26 @@ const refreshToken = (hosts: Hosts) => {
 		})
 }
 
-export const useAppInit = (hosts: Hosts) => {
+export type UseAppInitReturns = {
+	contextMenu$: Nullable<__ContextMenu$>
+}
+
+export const useAppInit = (hosts: Hosts): UseAppInitReturns => {
+	const [contextMenu$, setContextMenu$] = useState<Nullable<__ContextMenu$>>(null)
+
 	useEffect(() => {
 		initHosts(hosts)
 		initCommands({ logger: ConsoleLogger })
 		const router$ = initRouter({ logger: ConsoleLogger })
 		initModals({ logger: ConsoleLogger })
-		initContextMenu()
 		initCommandPalette()
 		initSidebar()
 		initExtensions({ logger: ConsoleLogger, router$, extensions: [] })
 		initActivities()
+
+		const contextMenu$ = __initContextMenu({ logger: ConsoleLogger })
+
+		setContextMenu$(contextMenu$)
 
 		// TODO: Allow native context menu if custom context menu is not available
 		const suppressRightClickBehavior = (event: MouseEvent) => event.preventDefault()
@@ -47,4 +57,6 @@ export const useAppInit = (hosts: Hosts) => {
 		}
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [])
+
+	return { contextMenu$ }
 }

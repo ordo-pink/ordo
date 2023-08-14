@@ -1,5 +1,5 @@
-import { Activity, useCurrentActivity } from "../../streams/extensions"
-import { Link } from "../link"
+import { Activity, useCurrentActivity } from "$streams/extensions"
+import Link from "$components/link"
 
 type Props = {
 	activity: Activity

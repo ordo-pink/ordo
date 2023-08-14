@@ -1,13 +1,14 @@
-import Fuse from "fuse.js"
 import { ChangeEvent, KeyboardEvent, useEffect, useState } from "react"
 import { useHotkeys } from "react-hotkeys-hook"
-// import { useTranslation } from "react-i18next"
 import { BsSearch } from "react-icons/bs"
-import { useCommandPalette } from "../streams/command-palette"
+import Fuse from "fuse.js"
 import { Switch } from "#lib/switch/mod"
 import { noop } from "#lib/tau/mod"
-import { CommandPaletteItem } from "../streams/command-palette"
-import { ActionListItem } from "./action-list-item"
+import { CommandPaletteItem } from "$streams/command-palette"
+import { useCommandPalette } from "$streams/command-palette"
+import ActionListItem from "$components/action-list-item"
+import RenderFromNullable from "./render-from-nullable"
+import Accelerator from "$components/accelerator"
 
 type Props = {
 	items: CommandPaletteItem[]
@@ -15,7 +16,8 @@ type Props = {
 
 const fuse = new Fuse([] as CommandPaletteItem[], { keys: ["name"] })
 
-export const CommandPaletteModal = ({ items }: Props) => {
+// TODO: Make accelerators work
+export default function CommandPaletteModal({ items }: Props) {
 	const { hide } = useCommandPalette()
 
 	// const { t } = useTranslation("ordo")
@@ -103,7 +105,7 @@ export const CommandPaletteModal = ({ items }: Props) => {
 			</div>
 
 			<div className="px-2 py-4 overflow-y-auto h-[32rem]">
-				{visibleItems.map(({ id, name, Icon, Comment, onSelect }, index) => (
+				{visibleItems.map(({ id, name, Icon, Comment, onSelect, accelerator }, index) => (
 					<ActionListItem
 						key={id}
 						text={name}
@@ -115,7 +117,9 @@ export const CommandPaletteModal = ({ items }: Props) => {
 						}}
 						large
 					>
-						{Comment ? <Comment /> : null}
+						<RenderFromNullable having={accelerator}>
+							<Accelerator accelerator={accelerator!} />
+						</RenderFromNullable>
 					</ActionListItem>
 				))}
 			</div>

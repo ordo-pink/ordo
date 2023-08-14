@@ -1,13 +1,13 @@
-import { useSidebar } from "../streams/sidebar"
+import { useHotkeys } from "react-hotkeys-hook"
 import { BsThreeDotsVertical } from "react-icons/bs"
 import { PropsWithChildren } from "react"
-import { useUser } from "../streams/auth"
-import Null from "./null"
-import UsedSpace from "./used-space"
-import { useCommands } from "../hooks/use-commands"
-import { useCommandPaletteItems } from "../streams/command-palette"
-import { useHotkeys } from "react-hotkeys-hook"
-import { useContextMenu } from "../streams/context-menu"
+import { useCommands } from "$hooks/use-commands"
+import { useCommandPaletteItems } from "$streams/command-palette"
+import { getContextMenu } from "$streams/context-menu"
+import { useSidebar } from "$streams/sidebar"
+import { useUser } from "$streams/auth"
+import UsedSpace from "$components/used-space"
+import Null from "$components/null"
 
 type Props = { isNarrow: boolean }
 
@@ -16,7 +16,7 @@ export default function Sidebar({ children, isNarrow }: PropsWithChildren<Props>
 	const sidebar = useSidebar()
 	const commands = useCommands()
 	const commandPaletteItems = useCommandPaletteItems()
-	const contextMenu = useContextMenu()
+	const contextMenu = getContextMenu()
 
 	const onSidebarClick = () => {
 		if (!isNarrow || sidebar.disabled || sidebar.sizes[0] === 0) return
@@ -35,7 +35,8 @@ export default function Sidebar({ children, isNarrow }: PropsWithChildren<Props>
 				contextMenu.show({
 					x: event.clientX,
 					y: event.clientY,
-					target: "sidebar",
+					target: event.currentTarget,
+					payload: "sidebar",
 				})
 			}
 		>

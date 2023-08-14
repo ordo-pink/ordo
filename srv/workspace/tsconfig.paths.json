@@ -3,7 +3,10 @@
 	"compilerOptions": {
 		"baseUrl": ".",
 		"paths": {
-			"#lib/*": ["../../lib/*"]
+			"#lib/*": ["../../lib/*"],
+			"$streams/*": ["./src/streams/*"],
+			"$components/*": ["./src/components/*"],
+			"$hooks/*": ["./src/hooks/*"]
 		}
 	}
 }

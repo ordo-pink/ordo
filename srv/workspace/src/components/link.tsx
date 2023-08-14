@@ -1,7 +1,7 @@
 import { MouseEvent, PropsWithChildren, HTMLProps } from "react"
-import { useCommands } from "../hooks/use-commands"
+import { useCommands } from "$hooks/use-commands"
 
-type Props = HTMLProps<HTMLAnchorElement> &
+type _P = HTMLProps<HTMLAnchorElement> &
 	PropsWithChildren<{
 		href: string
 		className?: string
@@ -9,7 +9,7 @@ type Props = HTMLProps<HTMLAnchorElement> &
 		newTab?: boolean
 	}>
 
-export const Link = ({ href, children, className, external = false, newTab = false }: Props) => {
+export default function Link({ href, children, className, external = false, newTab = false }: _P) {
 	const commands = useCommands()
 
 	const handleClick = (event: MouseEvent) => {

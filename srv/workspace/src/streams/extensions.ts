@@ -1,21 +1,18 @@
-import { Logger } from "#lib/logger/mod"
-import { Binary, Nullable, Thunk, Unary, callOnce } from "#lib/tau/mod"
-import { ComponentType } from "react"
-import { BehaviorSubject, of, merge, Subject } from "rxjs"
 import { map, switchMap, scan, shareReplay } from "rxjs/operators"
-import { Router } from "silkrouter"
-import { Command, PayloadCommand } from "./commands"
-import { route, Route, noMatch } from "./router"
-import { File, FileExtension } from "#lib/backend-data-service/mod"
+import { BehaviorSubject, of, merge, Subject } from "rxjs"
 import { IconType } from "react-icons"
-import { useSubscription } from "../hooks/use-subscription"
+import { ComponentType } from "react"
+import { Router } from "silkrouter"
+import { Binary, Curry, Nullable, Thunk, Unary, callOnce } from "#lib/tau/mod"
+import { File, FileExtension } from "#lib/backend-data-service/mod"
+import { Logger } from "#lib/logger/mod"
+import { route, Route, noMatch } from "$streams/router"
+import { useSubscription } from "$hooks/use-subscription"
 
 export type ContextMenuItemType = "create" | "read" | "update" | "delete"
 
 export type ContextMenuItem = {
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	shouldShow: (target: any) => boolean
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	payloadCreator: (target: any) => any
 	extensionName: string
 	commandName: string
@@ -23,7 +20,6 @@ export type ContextMenuItem = {
 	Icon: IconType
 	accelerator?: string
 	type: ContextMenuItemType
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	disabled?: (target: any) => boolean
 }
 
@@ -57,8 +53,6 @@ export type RegisterFileAssociationFn = Unary<
 	string,
 	Binary<string, Omit<FileAssociation, "name">, void>
 >
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 
 // export type RegisterEditorPluginFn = Unary<
 // 	string,
@@ -112,17 +106,19 @@ export const initExtensions = callOnce(({ logger, router$, extensions }: InitExt
 			map(activities => {
 				activities?.map(activity => {
 					return activity.routes.forEach(activityRoute => {
-						router$.pipe(route(activityRoute)).subscribe((routeData: Route) => {
-							currentActivity$.next(activity)
-							currentRoute$.next(routeData)
-						})
+						router$ &&
+							router$.pipe(route(activityRoute)).subscribe((routeData: Route) => {
+								currentActivity$.next(activity)
+								currentRoute$.next(routeData)
+							})
 					})
 				})
 
-				router$.pipe(noMatch(router$)).subscribe(() => {
-					currentActivity$.next(null)
-					currentRoute$.next(null)
-				})
+				router$ &&
+					router$.pipe(noMatch(router$)).subscribe(() => {
+						currentActivity$.next(null)
+						currentRoute$.next(null)
+					})
 			})
 		)
 		.subscribe()
@@ -131,23 +127,23 @@ export const initExtensions = callOnce(({ logger, router$, extensions }: InitExt
 export const currentActivity$ = new BehaviorSubject<Nullable<Activity>>(null)
 export const currentRoute$ = new BehaviorSubject<Nullable<Route>>(null)
 
-export const isPayloadCommand = (cmd: Command): cmd is PayloadCommand =>
-	typeof cmd.name === "string" && (cmd as PayloadCommand).payload !== undefined
+const add$ = new Subject<Activity>()
+const remove$ = new Subject<string>()
+const clear$ = new Subject<null>()
 
-const addActivity$ = new Subject<Activity>()
-const removeActivity$ = new Subject<string>()
-const clearActivities$ = new Subject<null>()
+type AddP = Curry<Binary<Activity, Activity[], Activity[]>>
+const addP: AddP = newActivity => state => [...state, newActivity]
 
-const add = (newActivity: Activity) => (state: Activity[]) => [...state, newActivity]
+type RemoveP = Curry<Binary<string, Activity[], Activity[]>>
+const removeP: RemoveP = activity => state => state.filter(a => a.name === activity)
 
-const remove = (activity: string) => (state: Activity[]) => state.filter(a => a.name === activity)
-
-const clear = () => () => [] as Activity[]
+type ClearP = Thunk<Thunk<Activity[]>>
+const clearP: ClearP = () => () => []
 
 export const activities$ = merge(
-	addActivity$.pipe(map(add)),
-	removeActivity$.pipe(map(remove)),
-	clearActivities$.pipe(map(clear))
+	add$.pipe(map(addP)),
+	remove$.pipe(map(removeP)),
+	clear$.pipe(map(clearP))
 ).pipe(
 	scan((acc, f) => f(acc), [] as Activity[]),
 	shareReplay(1)
@@ -159,24 +155,17 @@ export const initActivities = callOnce(() => {
 	return activities$
 })
 
-export const registerActivity = (name: string, activity: Omit<Activity, "name">) => {
-	addActivity$.next({ ...activity, name })
-}
+type Add = Binary<string, Omit<Activity, "name">, void>
+export const add: Add = (name, activity) => add$.next({ ...activity, name })
 
-export const unregisterActivity = (name: string) => {
-	removeActivity$.next(name)
-}
+type Remove = Unary<string, void>
+export const remove: Remove = name => remove$.next(name)
 
-export const clearActivities = () => {
-	clearActivities$.next(null)
-}
+type Clear = Thunk<void>
+export const clear: Clear = () => clear$.next(null)
 
 export const useExtensions = () => ({
-	activities: {
-		add: registerActivity,
-		remove: unregisterActivity,
-		clear: clearActivities,
-	},
+	activities: { add, remove, clear },
 })
 
 export const useCurrentActivity = () => useSubscription(currentActivity$)

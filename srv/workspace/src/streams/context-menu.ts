@@ -1,72 +1,185 @@
-import { Binary, Nullable, Unary, callOnce } from "#lib/tau/mod"
+import { combineLatestWith, map, merge, Observable, scan, shareReplay, Subject } from "rxjs"
 import { IconType } from "react-icons"
-import { combineLatestWith, map, merge, scan, shareReplay, Subject } from "rxjs"
 import { BehaviorSubject } from "rxjs"
-import { useSubscription } from "../hooks/use-subscription"
-import { CommandListener } from "./commands"
+import { Binary, Curry, Nullable, Thunk, Unary, callOnce } from "#lib/tau/mod"
+import { Logger } from "#lib/logger/mod"
+import { Either } from "#lib/either/mod"
+import Null from "$components/null"
 
-export type UnregisterContextMenuItemFn = Unary<string, void>
-export type RegisterContextMenuItemFn = Binary<
-	CommandListener,
-	{
-		// eslint-disable-next-line @typescript-eslint/no-explicit-any
-		shouldShow: (target: any) => boolean
-		Icon: IconType
-		accelerator?: string
-		type: "create" | "read" | "update" | "delete"
-		// eslint-disable-next-line @typescript-eslint/no-explicit-any
-		disabled?: (target: any) => boolean
-		payloadCreator?: () => any
-	},
-	void
->
+// --- Public ---
 
-export type ShowContextMenuParams = {
-	x: number
-	y: number
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	target: any // TODO: Collect targets
-	hideCreateCommands?: boolean
-	hideReadCommands?: boolean
-	hideUpdateCommands?: boolean
-	hideDeleteCommands?: boolean
+/**
+ * Context menu item.
+ */
+export type ContextMenuItem<T = any> = {
+	/**
+	 * Check whether the item needs to be shown.
+	 */
+	shouldShow: ContextMenuItemMethod<T, boolean>
+
+	/**
+	 * Name of the context command to be invoked when the context menu item is used.
+	 */
+	commandName: `${string}.${string}`
+
+	/**
+	 * Readable name of the context menu item. Put a translated value here.
+	 */
+	readableName: string
+
+	/**
+	 * Icon to be displayed for the context menu item.
+	 */
+	Icon: IconType
+
+	/**
+	 * Keyboard accelerator for the context menu item. It only works while the context menu is
+	 * opened.
+	 */
+	accelerator?: string
+
+	/**
+	 * @see ContextMenuItemType
+	 */
+	type: ContextMenuItemType
+
+	/**
+	 * Check whether the item needs to be shown disabled.
+	 */
+	shouldBeDisabled?: ContextMenuItemMethod<T, boolean>
+
+	/**
+	 * This function allows you to override the incoming payload that will be passed to the command
+	 * invoked by the context menu item.
+	 */
+	payloadCreator?: ContextMenuItemMethod<T>
 }
 
-export const contextMenuToggle$ = new BehaviorSubject<Nullable<ShowContextMenuParams>>(null)
+/**
+ * Show context menu item parameters.
+ */
+export type ShowContextMenuP = {
+	/**
+	 * Right click coordinate X.
+	 */
+	x: number
 
+	/**
+	 * Right click coordinate Y.
+	 */
+	y: number
+
+	/**
+	 * Right click target element.
+	 */
+	target: HTMLElement
+
+	/**
+	 * Payload to be passed to the context menu item methods.
+	 * @optional
+	 */
+	payload?: any
+
+	/**
+	 * Avoid showing create items.
+	 * @optional
+	 * @default false
+	 */
+	hideCreateItems?: boolean
+
+	/**
+	 * Avoid showing read items.
+	 * @optional
+	 * @default false
+	 */
+	hideReadItems?: boolean
+
+	/**
+	 * Avoid showing update items.
+	 * @optional
+	 * @default false
+	 */
+	hideUpdateItems?: boolean
+
+	/**
+	 * Avoid showing delete items.
+	 * @optional
+	 * @default false
+	 */
+	hideDeleteItems?: boolean
+}
+
+/**
+ * Context menu item method parameters.
+ */
+export type ContextMenuItemMethodP<T = any> = { target: HTMLElement; payload?: T }
+
+/**
+ * Context menu item method descriptor.
+ */
+export type ContextMenuItemMethod<T = any, Result = any> = Unary<ContextMenuItemMethodP<T>, Result>
+
+/**
+ * Context menu item type. This impacts two things:
+ *
+ * 1. Grouping items in the context menu.
+ * 2. Given type can be hidden when showing context menu.
+ */
 export type ContextMenuItemType = "create" | "read" | "update" | "delete"
 
-export type ContextMenuItem = {
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	shouldShow: (target: any) => boolean
-	name: string
-	Icon: IconType
-	accelerator?: string
-	type: ContextMenuItemType
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	disabled?: (target: any) => boolean // TODO: Define target types
-	payloadCreator?: (target: any) => any
+/**
+ * Context menu.
+ */
+export type ContextMenu = ShowContextMenuP & {
+	/**
+	 * Items to be shown in the context menu.
+	 */
+	structure: ContextMenuItem[]
 }
 
-const addContextMenuItem$ = new Subject<ContextMenuItem>()
-const removeContextMenuItem$ = new Subject<string>()
-const clearContextMenuItems$ = new Subject<null>()
+export const getContextMenu = () => ({ show, hide, clear, add, remove })
 
-const add = (newContextMenuItem: ContextMenuItem) => (state: ContextMenuItem[]) => {
-	const exists = state.some(item => item.name === newContextMenuItem.name)
+// --- Internal ---
 
-	return exists ? state : [...state, newContextMenuItem]
-}
+export type __ContextMenu$ = Observable<Nullable<ContextMenu>>
+export const __initContextMenu: InitContextMenu = callOnce(({ logger }) => {
+	logger.debug("Initializing context menu")
 
-const remove = (ContextMenuItem: string) => (state: ContextMenuItem[]) =>
-	state.filter(a => a.name !== ContextMenuItem)
+	return contextMenu$
+})
 
-const clear = () => () => [] as ContextMenuItem[]
+type AddP = Curry<Binary<ContextMenuItem, ContextMenuItem[], ContextMenuItem[]>>
+type RemoveP = Curry<Binary<string, ContextMenuItem[], ContextMenuItem[]>>
+type ClearP = Thunk<Thunk<ContextMenuItem[]>>
+type Add = Unary<ContextMenuItem, void>
+type Remove = Unary<string, void>
+type Clear = Thunk<void>
+type Show = Unary<ShowContextMenuP, void>
+type Hide = Thunk<void>
+type InitContextMenuP = { logger: Logger }
+type InitContextMenu = Unary<InitContextMenuP, Nullable<__ContextMenu$>>
 
-export const contextMenuItems$ = merge(
-	addContextMenuItem$.pipe(map(add)),
-	removeContextMenuItem$.pipe(map(remove)),
-	clearContextMenuItems$.pipe(map(clear))
+const add: Add = item => add$.next(item)
+const remove: Remove = commandName => remove$.next(commandName)
+const clear: Clear = () => clear$.next(null)
+const show: Show = params => params$.next(params)
+const hide: Hide = () => params$.next(null)
+
+const addP: AddP = newContextMenuItem => state =>
+	state.some(item => item.commandName === newContextMenuItem.commandName)
+		? state
+		: [...state, newContextMenuItem]
+const removeP: RemoveP = name => state => state.filter(a => a.commandName !== name)
+const clearP: ClearP = () => () => []
+
+const params$ = new BehaviorSubject<Nullable<ShowContextMenuP>>(null)
+const add$ = new Subject<ContextMenuItem>()
+const remove$ = new Subject<string>()
+const clear$ = new Subject<null>()
+const contextMenuItems$ = merge(
+	add$.pipe(map(addP)),
+	remove$.pipe(map(removeP)),
+	clear$.pipe(map(clearP))
 ).pipe(
 	scan((acc, f) => f(acc), [] as ContextMenuItem[]),
 	shareReplay(1)
@@ -74,68 +187,14 @@ export const contextMenuItems$ = merge(
 
 contextMenuItems$.subscribe()
 
-const contextMenu$ = contextMenuToggle$.pipe(
+const contextMenu$ = params$.pipe(
 	combineLatestWith(contextMenuItems$),
-	map(([toggle, items]) => {
-		if (!toggle) return null
-
-		const structure = items.filter(item => item.shouldShow(toggle.target))
-
-		return {
-			...toggle,
-			structure,
-		}
-	})
+	map(([state, items]) =>
+		Either.fromNullable(state).fold(Null, state => ({
+			...state,
+			structure: items.filter(item =>
+				item.shouldShow({ target: state.target, payload: state.payload })
+			),
+		}))
+	)
 )
-
-export const initContextMenu = callOnce(() => {
-	contextMenu$.subscribe()
-
-	return contextMenu$
-})
-
-export const registerContextMenuItem: RegisterContextMenuItemFn = (command, item) => {
-	addContextMenuItem$.next({ ...item, name: command[0] })
-}
-
-export const unregisterContextMenuItem: UnregisterContextMenuItemFn = commandName => {
-	removeContextMenuItem$.next(commandName)
-}
-
-export const clearContextMenuItems = () => {
-	clearContextMenuItems$.next(null)
-}
-
-export const showContextMenu = ({
-	x,
-	y,
-	target,
-	hideCreateCommands,
-	hideDeleteCommands,
-	hideReadCommands,
-	hideUpdateCommands,
-}: ShowContextMenuParams) => {
-	contextMenuToggle$.next({
-		x,
-		y,
-		target,
-		hideCreateCommands,
-		hideDeleteCommands,
-		hideReadCommands,
-		hideUpdateCommands,
-	})
-}
-
-export const hideContextMenu = () => {
-	contextMenuToggle$.next(null)
-}
-
-export const useContextMenu = () => ({
-	show: showContextMenu,
-	hide: hideContextMenu,
-	clear: clearContextMenuItems,
-	addItem: registerContextMenuItem,
-	remove: unregisterContextMenuItem,
-})
-
-export const useContextMenuState = () => useSubscription(contextMenu$)

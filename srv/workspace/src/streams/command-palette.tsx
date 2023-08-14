@@ -1,17 +1,16 @@
-import { Thunk, Unary, callOnce } from "#lib/tau/mod"
 import { BehaviorSubject, map, merge, scan, shareReplay, Subject } from "rxjs"
-import { IconType } from "react-icons"
-import { useSubscription } from "../hooks/use-subscription"
-import { useModal } from "../hooks/use-modal"
 import { ComponentType, useEffect } from "react"
-import { CommandPaletteModal } from "../components/command-palette"
-import { useCommands } from "../hooks/use-commands"
-import { hideModal } from "./modal"
+import { IconType } from "react-icons"
+import { Thunk, Unary, callOnce } from "#lib/tau/mod"
+import { useSubscription } from "$hooks/use-subscription"
+import { useCommands } from "$hooks/use-commands"
+import { useModal } from "$hooks/use-modal"
+import { hideModal } from "$streams/modal"
+import CommandPaletteModal from "$components/command-palette"
 
 export type UnregisterCommandPaletteItemFn = Unary<string, void>
 export type RegisterCommandPaletteItemFn = Unary<CommandPaletteItem, void>
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type CommandPaletteItem = {
 	id: string
 	name: string
@@ -19,6 +18,7 @@ export type CommandPaletteItem = {
 	Comment?: ComponentType
 	Footer?: ComponentType
 	onSelect: Thunk<void>
+	accelerator?: string
 }
 
 const addContextMenuItem$ = new Subject<CommandPaletteItem>()

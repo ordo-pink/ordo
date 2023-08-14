@@ -1,10 +1,10 @@
+import { AiOutlineLeft, AiOutlineLayout } from "react-icons/ai"
 import { BehaviorSubject } from "rxjs"
 import { callOnce } from "#lib/tau/mod"
-import { AiOutlineRight, AiOutlineLeft } from "react-icons/ai"
-import { useSubscription } from "../hooks/use-subscription"
-import { useCommands } from "../hooks/use-commands"
-import { useCommandPalette } from "./command-palette"
-import { useContextMenu } from "./context-menu"
+import { useSubscription } from "$hooks/use-subscription"
+import { useCommands } from "$hooks/use-commands"
+import { useCommandPalette } from "$streams/command-palette"
+import { getContextMenu } from "$streams/context-menu"
 
 export type SidebarState =
 	| {
@@ -18,7 +18,7 @@ const sidebar$ = new BehaviorSubject<SidebarState>({ disabled: false, sizes: [25
 export const initSidebar = callOnce(() => {
 	const commands = useCommands()
 	const commandPalette = useCommandPalette()
-	const contextMenu = useContextMenu()
+	const contextMenu = getContextMenu()
 
 	commands.on("sidebar.disable", () => {
 		const sidebar = sidebar$.value
@@ -44,31 +44,34 @@ export const initSidebar = callOnce(() => {
 		sidebar$.next({ disabled: false, sizes: payload })
 	})
 
-	const HIDE_SIDEBAR_COMMAND = commands.on("sidebar.hide", () => {
+	commands.on("sidebar.hide", () => {
 		const sidebar = sidebar$.value
 		if (sidebar.disabled) return
 		sidebar$.next({ disabled: false, sizes: [0, 100] })
 	})
 
-	commandPalette.addItem({
-		id: "sidebar.show",
-		name: "Show sidebar",
-		Icon: AiOutlineRight,
-		onSelect: () => commands.emit("sidebar.show"),
+	commands.on("sidebar.toggle", () => {
+		const sidebar = sidebar$.value
+		if (sidebar.disabled) return
+		commands.emit(sidebar.sizes[0] > 0 ? "sidebar.hide" : "sidebar.show")
 	})
 
 	commandPalette.addItem({
-		id: "sidebar.hide",
-		name: "Hide sidebar",
-		Icon: AiOutlineLeft,
-		onSelect: () => commands.emit("sidebar.hide"),
+		id: "sidebar.toggle",
+		name: "Toggle sidebar",
+		Icon: AiOutlineLayout,
+		onSelect: () => commands.emit("sidebar.toggle"),
+		accelerator: "ctrl+b",
 	})
 
-	contextMenu.addItem(HIDE_SIDEBAR_COMMAND, {
+	contextMenu.add({
+		commandName: "sidebar.hide",
+		readableName: "Hide sidebar",
 		Icon: AiOutlineLeft,
-		shouldShow: target =>
-			target === "sidebar" && !sidebar$.value.disabled && sidebar$.value.sizes[0] > 0,
+		shouldShow: ({ payload }) =>
+			payload === "sidebar" && !sidebar$.value.disabled && sidebar$.value.sizes[0] > 0,
 		type: "update",
+		accelerator: "ctrl+b",
 	})
 })
 

@@ -1,7 +1,9 @@
-import { Logger } from "#lib/logger/mod"
-import { Unary, callOnce } from "#lib/tau/mod"
-import { useCommands } from "../hooks/use-commands"
 import { Router, operators } from "silkrouter"
+import { Unary, callOnce } from "#lib/tau/mod"
+import { Logger } from "#lib/logger/mod"
+import { useCommands } from "$hooks/use-commands"
+
+// TODO: Consider moving to react-router
 
 /**
  * Route descriptor to be passed for navigating.

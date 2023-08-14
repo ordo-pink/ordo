@@ -59,5 +59,6 @@ export const useOnAuthenticated = (hosts: Hosts) => {
 
 			exts.activities.remove("test")
 		}
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [isAuthenticated])
 }

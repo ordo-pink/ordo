@@ -1,27 +1,13 @@
 import { Logger } from "#lib/logger/mod"
 import { Binary, Nullable, Thunk, Unary, callOnce } from "#lib/tau/mod"
-import { prop } from "ramda"
 import { ComponentType } from "react"
-import { mergeMap, BehaviorSubject, mergeAll, Observable, of, merge, Subject } from "rxjs"
-import { map, filter, switchMap, scan, shareReplay } from "rxjs/operators"
+import { BehaviorSubject, of, merge, Subject } from "rxjs"
+import { map, switchMap, scan, shareReplay } from "rxjs/operators"
 import { Router } from "silkrouter"
-import {
-	RegisterCommandFn,
-	ExecuteCommandFn,
-	prependListener,
-	appendListener,
-	registerCommand,
-	unregisterCommand,
-	executeCommand,
-	Command,
-	PayloadCommand,
-} from "./commands"
+import { Command, PayloadCommand } from "./commands"
 import { route, Route, noMatch } from "./router"
-import { RegisterTranslationsFn, registerTranslations } from "./translations"
 import { File, FileExtension } from "#lib/backend-data-service/mod"
 import { IconType } from "react-icons"
-import { RegisterContextMenuItemFn, UnregisterContextMenuItemFn } from "./context-menu"
-import { RegisterCommandPaletteItemFn, UnregisterCommandPaletteItemFn } from "./command-palette"
 import { useSubscription } from "../hooks/use-subscription"
 
 export type ContextMenuItemType = "create" | "read" | "update" | "delete"
@@ -103,8 +89,8 @@ export const createExtension =
 	(ctx: ExtensionCreatorContext) =>
 		callback(scopeExtensionContextTo(name, ctx))
 
-const isFulfilled = <T>(x: PromiseSettledResult<T>): x is PromiseFulfilledResult<T> =>
-	x.status === "fulfilled"
+// const isFulfilled = <T>(x: PromiseSettledResult<T>): x is PromiseFulfilledResult<T> =>
+// 	x.status === "fulfilled"
 
 type InitExtensionsParams = {
 	logger: Logger
@@ -125,7 +111,7 @@ export const initExtensions = callOnce(({ logger, router$, extensions }: InitExt
 			switchMap(() => activities$),
 			map(activities => {
 				activities?.map(activity => {
-					return activity.routes.map(activityRoute => {
+					return activity.routes.forEach(activityRoute => {
 						router$.pipe(route(activityRoute)).subscribe((routeData: Route) => {
 							currentActivity$.next(activity)
 							currentRoute$.next(routeData)

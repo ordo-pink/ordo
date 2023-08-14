@@ -5,8 +5,7 @@ import Null from "../null"
 import ActivityItem from "./activity"
 import { useCommands } from "../../hooks/use-commands"
 import { useCommandPaletteItems } from "../../streams/command-palette"
-import { Activity, useActivities } from "../../streams/extensions"
-import { Either } from "#lib/either/mod"
+import { useActivities } from "../../streams/extensions"
 
 export default function ActivityBar() {
 	const user = useUser()

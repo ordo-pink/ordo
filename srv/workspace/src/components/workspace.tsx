@@ -57,6 +57,7 @@ const EnabledSidebar = ({ sidebar, activity }: EnabledSidebarProps) => {
 	useEffect(() => {
 		if (sidebar.disabled) return
 		setSizes(sidebar.sizes)
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [!sidebar.disabled && sidebar.sizes[0]])
 
 	const snapOffset = isNarrow ? windowWidth / 2 : 200

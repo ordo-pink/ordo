@@ -31,8 +31,8 @@ export const useOnAuthenticated = (hosts: Hosts) => {
 		}
 
 		commandPalette.addItem({
-			id: "core.sign-out",
-			name: "Sign out",
+			commandName: "core.sign-out",
+			readableName: "Sign out",
 			Icon: AiOutlineLogout,
 			onSelect: () => commands.emit("core.sign-out"),
 		})

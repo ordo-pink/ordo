@@ -105,23 +105,28 @@ export default function CommandPaletteModal({ items }: Props) {
 			</div>
 
 			<div className="px-2 py-4 overflow-y-auto h-[32rem]">
-				{visibleItems.map(({ id, name, Icon, Comment, onSelect, accelerator }, index) => (
-					<ActionListItem
-						key={id}
-						text={name}
-						Icon={Icon || (() => null)}
-						current={currentIndex === index}
-						onClick={() => {
-							handleEscape()
-							onSelect()
-						}}
-						large
-					>
-						<RenderFromNullable having={accelerator}>
-							<Accelerator accelerator={accelerator!} />
-						</RenderFromNullable>
-					</ActionListItem>
-				))}
+				{visibleItems.map(
+					(
+						{ commandName: id, readableName: name, Icon, Comment, onSelect, accelerator },
+						index
+					) => (
+						<ActionListItem
+							key={id}
+							text={name}
+							Icon={Icon || (() => null)}
+							current={currentIndex === index}
+							onClick={() => {
+								handleEscape()
+								onSelect()
+							}}
+							large
+						>
+							<RenderFromNullable having={accelerator}>
+								<Accelerator accelerator={accelerator!} />
+							</RenderFromNullable>
+						</ActionListItem>
+					)
+				)}
 			</div>
 		</div>
 	)

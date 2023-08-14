@@ -35,7 +35,7 @@ const DisabledSidebar = ({ activity }: DisabledSidebarProps) =>
 	Either.fromNullable(activity).fold(
 		() => <div>Welcome</div>,
 		({ Component }) => (
-			<div className="max-h-screen h-full flex overflow-auto w-full">
+			<div className="workspace max-h-screen h-full flex overflow-auto w-full">
 				<Component />
 			</div>
 		)
@@ -98,11 +98,11 @@ const EnabledSidebar = ({ sidebar, activity }: EnabledSidebarProps) => {
 				minSize={0}
 				direction="horizontal"
 			>
-				<div className={`h-full ${sizes[0] <= 5 ? "hidden" : "block"}`}>
+				<div className={`sidebar h-full ${sizes[0] <= 5 ? "hidden" : "block"}`}>
 					<Sidebar isNarrow={isNarrow} />
 				</div>
 
-				<div className={`h-full w-full ${sizes[1] <= 5 ? "hidden" : "block"}`}>
+				<div className={`workspace h-full w-full ${sizes[1] <= 5 ? "hidden" : "block"}`}>
 					<Component />
 				</div>
 			</Split>

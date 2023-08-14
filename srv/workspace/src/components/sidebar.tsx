@@ -1,6 +1,6 @@
 import { useHotkeys } from "react-hotkeys-hook"
 import { BsThreeDotsVertical } from "react-icons/bs"
-import { PropsWithChildren } from "react"
+import { MouseEvent, PropsWithChildren } from "react"
 import { useCommands } from "$hooks/use-commands"
 import { useCommandPaletteItems } from "$streams/command-palette"
 import { getContextMenu } from "$streams/context-menu"
@@ -24,6 +24,8 @@ export default function Sidebar({ children, isNarrow }: PropsWithChildren<Props>
 	}
 
 	const openCommandPalette = () => commands.emit("command-palette.show", commandPaletteItems)
+	const showContextMenu = (event: MouseEvent<HTMLDivElement>) =>
+		contextMenu.show({ x: event.clientX, y: event.clientY, target: event.currentTarget })
 
 	useHotkeys("ctrl+shift+p", openCommandPalette)
 
@@ -31,14 +33,7 @@ export default function Sidebar({ children, isNarrow }: PropsWithChildren<Props>
 		<div
 			className="h-screen w-full flex justify-between flex-col p-4 bg-neutral-200 dark:bg-neutral-900"
 			onClick={onSidebarClick}
-			onContextMenu={event =>
-				contextMenu.show({
-					x: event.clientX,
-					y: event.clientY,
-					target: event.currentTarget,
-					payload: "sidebar",
-				})
-			}
+			onContextMenu={showContextMenu}
 		>
 			<div>
 				<div className="flex items-center justify-between">

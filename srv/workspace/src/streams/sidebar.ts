@@ -1,4 +1,4 @@
-import { AiOutlineLeft, AiOutlineLayout } from "react-icons/ai"
+import { AiOutlineLeft, AiOutlineLayout, AiOutlineRight } from "react-icons/ai"
 import { BehaviorSubject } from "rxjs"
 import { callOnce } from "#lib/tau/mod"
 import { useSubscription } from "$hooks/use-subscription"
@@ -57,10 +57,26 @@ export const initSidebar = callOnce(() => {
 	})
 
 	commandPalette.addItem({
-		id: "sidebar.toggle",
-		name: "Toggle sidebar",
+		commandName: "sidebar.toggle",
+		readableName: "Toggle sidebar",
 		Icon: AiOutlineLayout,
 		onSelect: () => commands.emit("sidebar.toggle"),
+		accelerator: "ctrl+b",
+	})
+
+	contextMenu.add({
+		commandName: "sidebar.show",
+		readableName: "Show sidebar",
+		Icon: AiOutlineRight,
+		shouldShow: ({ target }) => {
+			console.log(target, !sidebar$.value.disabled, (sidebar$.value as any).sizes)
+			return (
+				(target.classList.contains("activity-bar") || Boolean(target.closest(".activity-bar"))) &&
+				!sidebar$.value.disabled &&
+				sidebar$.value.sizes[0] === 0
+			)
+		},
+		type: "update",
 		accelerator: "ctrl+b",
 	})
 
@@ -68,8 +84,13 @@ export const initSidebar = callOnce(() => {
 		commandName: "sidebar.hide",
 		readableName: "Hide sidebar",
 		Icon: AiOutlineLeft,
-		shouldShow: ({ payload }) =>
-			payload === "sidebar" && !sidebar$.value.disabled && sidebar$.value.sizes[0] > 0,
+		shouldShow: ({ target }) =>
+			(target.classList.contains("sidebar") ||
+				target.classList.contains("activity-bar") ||
+				Boolean(target.closest(".sidebar")) ||
+				Boolean(target.closest(".activity-bar"))) &&
+			!sidebar$.value.disabled &&
+			sidebar$.value.sizes[0] !== 0,
 		type: "update",
 		accelerator: "ctrl+b",
 	})

@@ -1,13 +1,9 @@
-// deno-lint-ignore-file no-explicit-any
 import type { Logger } from "#lib/logger/mod"
-
-import { equals } from "ramda"
 import { combineLatestWith, map, merge, scan, shareReplay, Subject } from "rxjs"
+import { equals } from "ramda"
 import { Binary, callOnce, Unary } from "#lib/tau/mod"
 
-type InitCommandsParams = {
-	logger: Logger
-}
+type InitCommandsP = { logger: Logger }
 
 export type Command<Name extends `${string}.${string}` = `${string}.${string}`> = {
 	name: Name
@@ -147,7 +143,7 @@ const commandStorage$ = merge(
 	shareReplay(1)
 )
 
-const commandRunner$ = (ctx: InitCommandsParams) =>
+const commandRunner$ = (ctx: InitCommandsP) =>
 	commandQueue$.pipe(
 		combineLatestWith(commandStorage$),
 		map(([commands, allListeners]) => {
@@ -174,7 +170,7 @@ const commandRunner$ = (ctx: InitCommandsParams) =>
 		})
 	)
 
-export const initCommands = callOnce((ctx: InitCommandsParams) => {
+export const initCommands = callOnce((ctx: InitCommandsP) => {
 	commandRunner$(ctx).subscribe()
 })
 

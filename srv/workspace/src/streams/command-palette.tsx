@@ -12,8 +12,8 @@ export type UnregisterCommandPaletteItemFn = Unary<string, void>
 export type RegisterCommandPaletteItemFn = Unary<CommandPaletteItem, void>
 
 export type CommandPaletteItem = {
-	id: string
-	name: string
+	commandName: string
+	readableName: string
 	Icon?: IconType
 	Comment?: ComponentType
 	Footer?: ComponentType
@@ -26,12 +26,13 @@ const removeContextMenuItem$ = new Subject<string>()
 const commandPalette$ = new BehaviorSubject<CommandPaletteItem[]>([])
 
 const add = (newContextMenuItem: CommandPaletteItem) => (state: CommandPaletteItem[]) => {
-	const exists = state.some(item => item.name === newContextMenuItem.name)
+	const exists = state.some(item => item.readableName === newContextMenuItem.readableName)
 
 	return exists ? state : [...state, newContextMenuItem]
 }
 
-const remove = (id: string) => (state: CommandPaletteItem[]) => state.filter(a => a.id !== id)
+const remove = (id: string) => (state: CommandPaletteItem[]) =>
+	state.filter(a => a.commandName !== id)
 
 export const commandPaletteItems$ = merge(
 	addContextMenuItem$.pipe(map(add)),

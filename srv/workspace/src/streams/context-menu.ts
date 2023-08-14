@@ -18,6 +18,11 @@ export type ContextMenuItem<T = any> = {
 	shouldShow: ContextMenuItemMethod<T, boolean>
 
 	/**
+	 * @see ContextMenuItemType
+	 */
+	type: ContextMenuItemType
+
+	/**
 	 * Name of the context command to be invoked when the context menu item is used.
 	 */
 	commandName: `${string}.${string}`
@@ -35,22 +40,25 @@ export type ContextMenuItem<T = any> = {
 	/**
 	 * Keyboard accelerator for the context menu item. It only works while the context menu is
 	 * opened.
+	 *
+	 * @optional
 	 */
 	accelerator?: string
 
 	/**
-	 * @see ContextMenuItemType
-	 */
-	type: ContextMenuItemType
-
-	/**
 	 * Check whether the item needs to be shown disabled.
+	 *
+	 * @optional
+	 * @default () => false
 	 */
 	shouldBeDisabled?: ContextMenuItemMethod<T, boolean>
 
 	/**
 	 * This function allows you to override the incoming payload that will be passed to the command
 	 * invoked by the context menu item.
+	 *
+	 * @optional
+	 * @default () => payload
 	 */
 	payloadCreator?: ContextMenuItemMethod<T>
 }

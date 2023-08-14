@@ -145,7 +145,35 @@ export type ContextMenu = ShowContextMenuP & {
 	structure: ContextMenuItem[]
 }
 
-export const getContextMenu = () => ({ show, hide, clear, add, remove })
+/**
+ * Entrypoint for using context menu.
+ */
+export const getContextMenu = () => ({
+	/**
+	 * Show context menu for given target element as well as mouse (x, y) coordinate.
+	 */
+	show,
+
+	/**
+	 * Hide context menu.
+	 */
+	hide,
+
+	/**
+	 * Clear context menu items.
+	 */
+	clear,
+
+	/**
+	 * Add context menu item.
+	 */
+	add,
+
+	/**
+	 * Remove context menu item.
+	 */
+	remove,
+})
 
 // --- Internal ---
 

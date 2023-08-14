@@ -6,17 +6,18 @@ import {
 	onBeforeQuit,
 	Hosts,
 } from "../streams/auth"
-import { useCommands } from "./use-commands"
+import { getCommands } from "$streams/commands"
 import { useCommandPalette } from "../streams/command-palette"
 import { AiOutlineLogout, AiOutlineAim } from "react-icons/ai"
 import { useExtensions } from "../streams/extensions"
 import Asdf from "./asdf"
 
+const commands = getCommands()
+
 export const useOnAuthenticated = (hosts: Hosts) => {
 	const isAuthenticated = useAuthStatus()
 	const us0 = useUserAPIService0()
 	const ms0 = useMetadataAPIService0()
-	const commands = useCommands()
 	const commandPalette = useCommandPalette()
 	const exts = useExtensions()
 

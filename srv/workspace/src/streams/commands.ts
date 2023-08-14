@@ -5,15 +5,56 @@ import { Binary, callOnce, Curry, Unary } from "#lib/tau/mod"
 
 // --- Public ---
 
+/**
+ * Command name.
+ */
 export type CmdName = `${string}.${string}`
 
+/**
+ * Command without payload.
+ */
 export type Cmd<N extends CmdName = CmdName> = { name: N }
-export type CmdCtx<P = any> = { logger: Logger; payload: P }
-export type CmdHandler<P> = Unary<CmdCtx<P>, void | Promise<void>>
-export type CmdListener<N extends CmdName = CmdName, P = any> = [N, CmdHandler<P>]
+
+/**
+ * Command with payload.
+ */
 export type PayloadCmd<N extends CmdName = CmdName, P = any> = Cmd<N> & { payload: P }
 
-export const getCommands = () => ({ on, off, emit, after, before })
+/**
+ * Context provided to command handler.
+ */
+export type CmdCtx<P = any> = { logger: Logger; payload: P }
+
+/**
+ * Command handler.
+ */
+export type CmdHandler<P> = Unary<CmdCtx<P>, void | Promise<void>>
+
+/**
+ * Entrypoint for using commands.
+ */
+export const getCommands = () => ({
+	/**
+	 * Append a listener to a given command.
+	 */
+	on,
+
+	/**
+	 * Remove given listener for a given command. Make sure you provide a reference to the same
+	 * function as you did when calling `on`.
+	 */
+	off,
+
+	/**
+	 * Emit given command with given payload.
+	 */
+	emit,
+
+	/**
+	 * Prepend listener to a given command.
+	 */
+	before,
+})
 
 // --- Internal ---
 
@@ -28,6 +69,7 @@ type Command = Cmd | PayloadCmd
 type EnqueueP = Curry<Binary<Command, Command[], Command[]>>
 type DequeueP = Curry<Binary<Command, Command[], Command[]>>
 type CmdHandlerState = Record<string, CmdHandler<any>[]>
+type CmdListener<N extends CmdName = CmdName, P = any> = [N, CmdHandler<P>]
 type AddP = Curry<Binary<CmdListener, Record<string, CmdListener[1][]>, CmdHandlerState>>
 type RemoveP = Curry<Binary<CmdListener, Record<string, CmdListener[1][]>, CmdHandlerState>>
 
@@ -37,7 +79,6 @@ const isPayloadCmd = (cmd: Cmd): cmd is PayloadCmd =>
 const on: OnFn = (name, handler) => add$.next([name, handler])
 const off: OnFn = (name, handler) => remove$.next([name, handler])
 const emit: EmitFn = (name, payload) => enqueue$.next({ name, payload })
-const after: OnFn = (name, handler) => addAfter$.next([name, handler])
 const before: OnFn = (name, handler) => addBefore$.next([name, handler])
 
 const enqueueP: EnqueueP = newCommand => state => [...state, newCommand]
@@ -71,18 +112,6 @@ const addBeforeP: AddP = newListener => state => {
 	return state
 }
 
-const addAfterP: AddP = newListener => state => {
-	const listeners = state[newListener[0]]
-
-	if (!listeners) {
-		state[newListener[0]] = [newListener[1]]
-	} else if (!listeners.some(listener => listener.toString() === newListener[1].toString())) {
-		state[newListener[0]].push(newListener[1])
-	}
-
-	return state
-}
-
 const addP: AddP = newListener => state => {
 	const listeners = state[newListener[0]]
 
@@ -107,7 +136,6 @@ const enqueue$ = new Subject<Command>()
 const dequeue$ = new Subject<Command>()
 const add$ = new Subject<CmdListener>()
 const addBefore$ = new Subject<CmdListener>()
-const addAfter$ = new Subject<CmdListener>()
 const remove$ = new Subject<CmdListener>()
 const commandQueue$ = merge(enqueue$.pipe(map(enqueueP)), dequeue$.pipe(map(dequeueP))).pipe(
 	scan((acc, f) => f(acc), [] as (Cmd | PayloadCmd)[]),
@@ -117,7 +145,6 @@ const commandQueue$ = merge(enqueue$.pipe(map(enqueueP)), dequeue$.pipe(map(dequ
 const commandStorage$ = merge(
 	add$.pipe(map(addP)),
 	addBefore$.pipe(map(addBeforeP)),
-	addAfter$.pipe(map(addAfterP)),
 	remove$.pipe(map(removeP))
 ).pipe(
 	scan((acc, f) => f(acc), {} as Record<string, CmdListener[1][]>),

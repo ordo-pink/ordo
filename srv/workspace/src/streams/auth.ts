@@ -5,7 +5,7 @@ import type { Directory, File } from "#lib/backend-data-service/mod"
 
 import { BehaviorSubject, combineLatestWith, map } from "rxjs"
 import { Oath } from "#lib/oath/mod"
-import { useSubscription } from "../streamssubscription"
+import { useSubscription } from "../hooks/use-subscription"
 import { Either } from "#lib/either/mod"
 
 export type Hosts = { id: string; data: string; web: string }

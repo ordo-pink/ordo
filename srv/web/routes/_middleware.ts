@@ -2,7 +2,7 @@ import { MiddlewareHandlerContext } from "$fresh/server.ts"
 import { getCookies } from "#std/http/cookie.ts"
 import { getc } from "#lib/getc/mod.ts"
 
-const { APP_HOST } = getc(["APP_HOST"])
+const { WORKSPACE_HOST } = getc(["WORKSPACE_HOST"])
 
 export const handler = (req: Request, ctx: MiddlewareHandlerContext) => {
 	const cookies = getCookies(req.headers)
@@ -13,7 +13,7 @@ export const handler = (req: Request, ctx: MiddlewareHandlerContext) => {
 		hasRequiredCookies &&
 		["/sign-in", "/sign-up", "/forgot-password", "/"].includes(url.pathname)
 	) {
-		return new Response(null, { status: 307, headers: new Headers({ Location: APP_HOST }) })
+		return new Response(null, { status: 307, headers: new Headers({ Location: WORKSPACE_HOST }) })
 	}
 
 	if (!hasRequiredCookies && url.pathname.startsWith("/~")) {

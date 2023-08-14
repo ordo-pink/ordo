@@ -5,10 +5,10 @@ import { getDenoPath, runCommand, runDenoCommand } from "#lib/binutil/mod.ts"
 import { Oath } from "#lib/oath/mod.ts"
 import { getc } from "#lib/getc/mod.ts"
 
-const { WEB_STATIC_ROOT } = getc(["WEB_STATIC_ROOT"])
+const { STATIC_ROOT } = getc(["STATIC_ROOT"])
 
 await Oath.all([
-	runCommand("cp", ["-a", `./srv/web/assets/.`, WEB_STATIC_ROOT]),
+	runCommand("cp", ["-a", `./srv/web/assets/.`, STATIC_ROOT]),
 	runDenoCommand(getDenoPath(), [
 		"run",
 		"--allow-net",
@@ -24,7 +24,7 @@ await Oath.all([
 		"-i",
 		"./lib/css/main.css",
 		"-o",
-		`${WEB_STATIC_ROOT}/main.css`,
+		`${STATIC_ROOT}/main.css`,
 		"--watch",
 		"-c",
 		"./tailwind.config.cjs",

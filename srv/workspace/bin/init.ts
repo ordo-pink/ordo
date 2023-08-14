@@ -1,17 +1,14 @@
 // SPDX-FileCopyrightText: Copyright 2023, 谢尔盖||↓ and the Ordo.pink contributors
 // SPDX-License-Identifier: MIT
 
+import { runCommand } from "#lib/binutil/mod.ts"
 import { cyan, green } from "#std/fmt/colors.ts"
-import { getc } from "#lib/getc/mod.ts"
-import { createDirectoryIfNotExists } from "#lib/fs/mod.ts"
-
-const { STATIC_ROOT } = getc(["STATIC_ROOT"])
 
 const main = async () => {
 	const encoder = new TextEncoder()
 
-	Deno.stdout.write(encoder.encode(`  ${cyan("→")} Creating exts directories...`))
-	await createDirectoryIfNotExists(STATIC_ROOT).toPromise()
+	Deno.stdout.write(encoder.encode(`  ${cyan("→")} Installing dependencies...`))
+	await runCommand("npm", ["i"], "./srv/workspace").orElse(console.error)
 	Deno.stdout.write(encoder.encode(` ${green("✓")}\n`))
 }
 

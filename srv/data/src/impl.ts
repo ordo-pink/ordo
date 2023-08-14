@@ -12,17 +12,24 @@ import { FSMetadataRepository } from "#lib/backend-fs-metadata-repository/mod.ts
 import { FSDataRepository } from "#lib/backend-fs-data-repository/mod.ts"
 import { ConsoleLogger } from "#lib/logger/mod.ts"
 
-const { DATA_DATA_PATH, DATA_HOST, DATA_METADATA_PATH, DATA_PORT, APP_HOST, WEB_HOST, ID_HOST } =
-	getc([
-		"DATA_DATA_PATH",
-		"DATA_METADATA_PATH",
-		"DATA_PORT",
-		"DATA_HOST",
-		"DATA_ACCESS_CONTROL_ALLOW_ORIGIN",
-		"APP_HOST",
-		"ID_HOST",
-		"WEB_HOST",
-	])
+const {
+	DATA_DATA_PATH,
+	DATA_HOST,
+	DATA_METADATA_PATH,
+	DATA_PORT,
+	WORKSPACE_HOST,
+	WEB_HOST,
+	ID_HOST,
+} = getc([
+	"DATA_DATA_PATH",
+	"DATA_METADATA_PATH",
+	"DATA_PORT",
+	"DATA_HOST",
+	"DATA_ACCESS_CONTROL_ALLOW_ORIGIN",
+	"WORKSPACE_HOST",
+	"ID_HOST",
+	"WEB_HOST",
+])
 
 const metadataRepository = FSMetadataRepository.of({ root: DATA_METADATA_PATH })
 const dataRepository = FSDataRepository.of({ root: DATA_DATA_PATH })
@@ -31,7 +38,7 @@ const dataService = BackendDataService.of({ dataRepository, metadataRepository }
 const app = createDataServer({
 	dataService,
 	idHost: ID_HOST,
-	origin: [APP_HOST, WEB_HOST],
+	origin: [WORKSPACE_HOST, WEB_HOST],
 	logger: ConsoleLogger,
 })
 

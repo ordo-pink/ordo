@@ -3,7 +3,7 @@ import { CenteredPage } from "../components/centered-page.tsx"
 import SignInForm from "../islands/forms/sign-in-form.tsx"
 import { getc } from "#lib/getc/mod.ts"
 
-const { APP_HOST } = getc(["APP_HOST"])
+const { WORKSPACE_HOST } = getc(["WORKSPACE_HOST"])
 
 export default function SignInPage() {
 	return (
@@ -14,7 +14,7 @@ export default function SignInPage() {
 				</section>
 
 				<section class="w-full px-4 py-8 mx-auto">
-					<SignInForm host={APP_HOST} />
+					<SignInForm host={WORKSPACE_HOST} />
 				</section>
 			</div>
 		</CenteredPage>

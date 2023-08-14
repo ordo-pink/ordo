@@ -4,10 +4,10 @@
 import { serveDir } from "#std/http/file_server.ts"
 import { getc } from "#lib/getc/mod.ts"
 
-const { EXTS_EXTENSIONS_ROOT, EXTS_PORT } = getc(["EXTS_EXTENSIONS_ROOT", "EXTS_PORT"])
+const { STATIC_ROOT, STATIC_PORT } = getc(["STATIC_ROOT", "STATIC_PORT"])
 
-Deno.serve({ port: Number(EXTS_PORT) }, (req: Request) => {
+Deno.serve({ port: Number(STATIC_PORT) }, (req: Request) => {
 	return serveDir(req, {
-		fsRoot: EXTS_EXTENSIONS_ROOT,
+		fsRoot: STATIC_ROOT,
 	})
 })

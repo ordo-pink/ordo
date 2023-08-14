@@ -4,11 +4,11 @@
 	"deno.path": "./opt/deno",
 	"deno.cache": "./var/cache/deno",
 	"deno.enablePaths": [
+		"./lib",
 		"./srv/exts",
 		"./srv/id",
-		"./lib",
 		"./srv/data",
 		"./srv/web",
-		"./srv/app/bin"
+		"./srv/workspace/bin"
 	]
 }

@@ -8,6 +8,7 @@ import Null from "$components/null"
 import { __CommandPalette$ } from "$streams/command-palette"
 import { useSubscription } from "$hooks/use-subscription"
 import { Nullable } from "#lib/tau/mod"
+import { ShowContextMenuP } from "$streams/context-menu"
 
 const commands = getCommands()
 
@@ -25,11 +26,7 @@ export default function Sidebar({ children, isNarrow, commandPalette$ }: _P) {
 
 	const openCommandPalette = () => commands.emit("command-palette.show", commandPaletteItems)
 	const showContextMenu = (event: MouseEvent<HTMLDivElement>) =>
-		commands.emit("context-menu.show", {
-			x: event.clientX,
-			y: event.clientY,
-			target: event.currentTarget,
-		})
+		commands.emit<ShowContextMenuP>("context-menu.show", { event })
 
 	return (
 		<div

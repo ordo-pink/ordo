@@ -30,6 +30,8 @@ export default function ContextMenu({ menu$ }: _P) {
 			return
 		}
 
+		menu.event.preventDefault()
+
 		const readCommands = [] as ContextMenuItem[]
 		const createCommands = [] as ContextMenuItem[]
 		const updateCommands = [] as ContextMenuItem[]
@@ -50,7 +52,7 @@ export default function ContextMenu({ menu$ }: _P) {
 
 	return (
 		<div
-			style={{ top: menu?.y ?? -50, left: menu?.x ?? -50 }}
+			style={{ top: menu?.event.clientY ?? -50, left: menu?.event.clientX ?? -50 }}
 			className={`absolute z-[1000] bg-white dark:bg-neutral-500 shadow-lg transition-opacity w-80 duration-300 rounded-lg p-2 ${
 				menu && menu.structure.length ? "opacity-100" : "opacity-0"
 			}`}
@@ -60,25 +62,25 @@ export default function ContextMenu({ menu$ }: _P) {
 					{Either.fromBoolean(() => creators.length > 0)
 						.chain(() => Either.fromBoolean(() => !menu.hideCreateItems))
 						.fold(Null, () => (
-							<ContextMenuItemList items={creators} target={menu.target} payload={menu.payload} />
+							<ContextMenuItemList items={creators} event={menu.event} payload={menu.payload} />
 						))}
 
 					{Either.fromBoolean(() => readers.length > 0)
 						.chain(() => Either.fromBoolean(() => !menu.hideReadItems))
 						.fold(Null, () => (
-							<ContextMenuItemList items={readers} target={menu.target} payload={menu.payload} />
+							<ContextMenuItemList items={readers} event={menu.event} payload={menu.payload} />
 						))}
 
 					{Either.fromBoolean(() => updaters.length > 0)
 						.chain(() => Either.fromBoolean(() => !menu.hideUpdateItems))
 						.fold(Null, () => (
-							<ContextMenuItemList items={updaters} target={menu.target} payload={menu.payload} />
+							<ContextMenuItemList items={updaters} event={menu.event} payload={menu.payload} />
 						))}
 
 					{Either.fromBoolean(() => removers.length > 0)
 						.chain(() => Either.fromBoolean(() => !menu.hideDeleteItems))
 						.fold(Null, () => (
-							<ContextMenuItemList items={removers} target={menu.target} payload={menu.payload} />
+							<ContextMenuItemList items={removers} event={menu.event} payload={menu.payload} />
 						))}
 				</div>
 			) : null}

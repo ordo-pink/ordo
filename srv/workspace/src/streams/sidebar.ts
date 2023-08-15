@@ -65,9 +65,10 @@ export const initSidebar = callOnce(() => {
 		commandName: "sidebar.show",
 		readableName: "Show sidebar",
 		Icon: AiOutlineRight,
-		shouldShow: ({ target }) => {
+		shouldShow: ({ event }) => {
 			return (
-				(target.classList.contains("activity-bar") || Boolean(target.closest(".activity-bar"))) &&
+				(event.currentTarget.classList.contains("activity-bar") ||
+					Boolean(event.currentTarget.closest(".activity-bar"))) &&
 				!sidebar$.value.disabled &&
 				sidebar$.value.sizes[0] === 0
 			)
@@ -80,11 +81,11 @@ export const initSidebar = callOnce(() => {
 		commandName: "sidebar.hide",
 		readableName: "Hide sidebar",
 		Icon: AiOutlineLeft,
-		shouldShow: ({ target }) =>
-			(target.classList.contains("sidebar") ||
-				target.classList.contains("activity-bar") ||
-				Boolean(target.closest(".sidebar")) ||
-				Boolean(target.closest(".activity-bar"))) &&
+		shouldShow: ({ event }) =>
+			(event.currentTarget.classList.contains("sidebar") ||
+				event.currentTarget.classList.contains("activity-bar") ||
+				Boolean(event.currentTarget.closest(".sidebar")) ||
+				Boolean(event.currentTarget.closest(".activity-bar"))) &&
 			!sidebar$.value.disabled &&
 			sidebar$.value.sizes[0] !== 0,
 		type: "update",

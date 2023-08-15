@@ -76,32 +76,28 @@ export const useAppInit = (hosts: Hosts): UseAppInitReturns => {
 	useEffect(() => {
 		initHosts(hosts) // TODO: 4
 		__initCommands(ctx)
-		const router$ = initRouter(ctx) // TODO: 5
 
 		const modal$ = __initModal(ctx)
 		setModal$(modal$)
+
+		const contextMenu$ = __initContextMenu(ctx)
+		setContextMenu$(contextMenu$)
 
 		const commandPalettes = __initCommandPalette(ctx)
 
 		setGlobalCommandPalette$(commandPalettes?.globalCommandPalette$)
 		setCurrentCommandPalette$(commandPalettes?.currentCommandPalette$)
 
+		const router$ = initRouter(ctx) // TODO: 5
+
 		initSidebar() // TODO: 3
 		initExtensions({ logger: ConsoleLogger, router$, extensions: [] }) // TODO: 6
 		initActivities()
-
-		const contextMenu$ = __initContextMenu(ctx)
-		setContextMenu$(contextMenu$)
-
-		// TODO: Allow native context menu if custom context menu is not available
-		const suppressRightClickBehavior = (event: MouseEvent) => event.preventDefault()
-		document.addEventListener("contextmenu", suppressRightClickBehavior)
 
 		refreshToken(hosts)
 		const interval = setInterval(() => refreshToken(hosts), 50000)
 
 		return () => {
-			document.removeEventListener("contextmenu", suppressRightClickBehavior)
 			onBeforeQuit()
 			clearInterval(interval)
 		}

@@ -6,6 +6,7 @@ import { Logger } from "#lib/logger/mod"
 import { Either } from "#lib/either/mod"
 import { getCommands } from "$streams/commands"
 import Null from "$components/null"
+import { MouseEvent } from "react"
 
 const commands = getCommands()
 
@@ -71,19 +72,9 @@ export type ContextMenuItem<T = any> = {
  */
 export type ShowContextMenuP = {
 	/**
-	 * Right click coordinate X.
+	 * Accepted mouse event.
 	 */
-	x: number
-
-	/**
-	 * Right click coordinate Y.
-	 */
-	y: number
-
-	/**
-	 * Right click target element.
-	 */
-	target: HTMLElement
+	event: MouseEvent
 
 	/**
 	 * Payload to be passed to the context menu item methods.
@@ -123,7 +114,7 @@ export type ShowContextMenuP = {
 /**
  * Context menu item method parameters.
  */
-export type ContextMenuItemMethodP<T = any> = { target: HTMLElement; payload?: T }
+export type ContextMenuItemMethodP<T = any> = { event: MouseEvent; payload?: T }
 
 /**
  * Context menu item method descriptor.
@@ -196,7 +187,7 @@ const contextMenu$ = params$.pipe(
 		Either.fromNullable(state).fold(Null, state => ({
 			...state,
 			structure: items.filter(item =>
-				item.shouldShow({ target: state.target, payload: state.payload })
+				item.shouldShow({ event: state.event, payload: state.payload })
 			),
 		}))
 	)

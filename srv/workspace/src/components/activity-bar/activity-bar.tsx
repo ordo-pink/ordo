@@ -25,8 +25,8 @@ export default function ActivityBar({ commandPalette$ }: _P) {
 	const isSidebarCollapsed = sidebar.disabled || sidebar.sizes[0] === 0
 
 	const showCommandPalette = () => commands.emit("command-palette.show", commandPaletteItems)
-	const showContextMenu: ShowContextMenu = ({ clientX: x, clientY: y, currentTarget: target }) =>
-		commands.emit<ShowContextMenuP>("context-menu.show", { x, y, target })
+	const showContextMenu: ShowContextMenu = (event: MouseEvent) =>
+		commands.emit<ShowContextMenuP>("context-menu.show", { event })
 
 	return (
 		<div

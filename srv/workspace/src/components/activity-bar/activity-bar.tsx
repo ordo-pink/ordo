@@ -10,6 +10,7 @@ import { Unary } from "#lib/tau/mod"
 import { __CommandPalette$ } from "$streams/command-palette"
 import { useSubscription } from "$hooks/use-subscription"
 import { ShowContextMenuP } from "$streams/context-menu"
+import { useAccelerator } from "$hooks/use-accelerator"
 
 type ShowContextMenu = Unary<MouseEvent<HTMLDivElement>, void>
 
@@ -27,6 +28,8 @@ export default function ActivityBar({ commandPalette$ }: _P) {
 	const showCommandPalette = () => commands.emit("command-palette.show", commandPaletteItems)
 	const showContextMenu: ShowContextMenu = (event: MouseEvent) =>
 		commands.emit<ShowContextMenuP>("context-menu.show", { event })
+
+	useAccelerator("mod+shift+p", showCommandPalette)
 
 	return (
 		<div

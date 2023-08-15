@@ -59,11 +59,14 @@ export const getCommands = () => ({
 
 // --- Internal ---
 
-export const __initCommands = callOnce((ctx: InitCommandsP) => {
-	commandRunner$(ctx).subscribe()
+export const __initCommands: InitCommands = callOnce(({ logger }) => {
+	logger.debug("Initialising commands")
+
+	commandRunner$({ logger }).subscribe()
 })
 
 type InitCommandsP = { logger: Logger }
+type InitCommands = Unary<InitCommandsP, void>
 type OnFn<Payload = any, Name extends CmdName = CmdName> = Binary<Name, CmdHandler<Payload>, void>
 type Command = Cmd | PayloadCmd
 type EnqueueP = Curry<Binary<Command, Command[], Command[]>>

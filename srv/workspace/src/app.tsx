@@ -18,13 +18,14 @@ export default function App(hosts: Hosts) {
 	useDefaultCommandPalette()
 
 	return Either.fromNullable(init.contextMenu$)
+		.chain(() => Either.fromNullable(init.modal$))
 		.map(() => init as { [K in keyof typeof init]: NonNullable<(typeof init)[K]> }) // TODO: Extract to tau
-		.fold(Null, ({ contextMenu$ }) => (
+		.fold(Null, ({ contextMenu$, modal$ }) => (
 			<div className="flex" onClick={contextMenu.hide}>
 				<ActivityBar />
 				<Workspace />
 				<ContextMenu menu$={contextMenu$} />
-				<Modal />
+				<Modal modal$={modal$} />
 			</div>
 		))
 }

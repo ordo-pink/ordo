@@ -4,11 +4,11 @@ import { IconType } from "react-icons"
 import { Thunk, Unary, callOnce } from "#lib/tau/mod"
 import { useSubscription } from "$hooks/use-subscription"
 import { getCommands } from "$streams/commands"
-import { useModal } from "$hooks/use-modal"
-import { hideModal } from "$streams/modal"
+import { getModal } from "$streams/modal"
 import CommandPaletteModal from "$components/command-palette"
 
 const commands = getCommands()
+const modal = getModal()
 
 export type UnregisterCommandPaletteItemFn = Unary<string, void>
 export type RegisterCommandPaletteItemFn = Unary<CommandPaletteItem, void>
@@ -60,7 +60,7 @@ export const showCommandPalette = (items: CommandPaletteItem[]) => {
 
 export const hideCommandPalette = () => {
 	commandPalette$.next([])
-	hideModal()
+	modal.hide()
 }
 
 export const initCommandPalette = callOnce(() => {
@@ -83,16 +83,15 @@ export const useCommandPalette = () => ({
 // TODO: Rename to reflect difference between command palette and search
 export const useDefaultCommandPalette = () => {
 	const items = useSubscription(commandPalette$)
-	const { showModal, hideModal } = useModal()
 
 	useEffect(() => {
 		if (!items || !items.length) return
 
-		showModal(() => <CommandPaletteModal items={items} />, {
+		modal.show(() => <CommandPaletteModal items={items} />, {
 			showCloseButton: false,
 			onHide: () => hideCommandPalette(),
 		})
-	}, [items, showModal, hideModal])
+	}, [items])
 
 	return null
 }

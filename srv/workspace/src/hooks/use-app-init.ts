@@ -5,10 +5,10 @@ import { Hosts, initHosts, refreshAuthInfo, onBeforeQuit } from "$streams/auth"
 import { __ContextMenu$, __initContextMenu } from "$streams/context-menu"
 import { initActivities, initExtensions } from "$streams/extensions"
 import { initCommandPalette } from "$streams/command-palette"
+import { __Modal$, __initModal } from "$streams/modal"
 import { __initCommands } from "$streams/commands"
 import { initSidebar } from "$streams/sidebar"
 import { initRouter } from "$streams/router"
-import { initModals } from "$streams/modal"
 
 const refreshToken = (hosts: Hosts) => {
 	fetch(`${hosts.id}/refresh-token`, { method: "POST", credentials: "include" })
@@ -24,23 +24,25 @@ const refreshToken = (hosts: Hosts) => {
 
 export type UseAppInitReturns = {
 	contextMenu$: Nullable<__ContextMenu$>
+	modal$: Nullable<__Modal$>
 }
 
 export const useAppInit = (hosts: Hosts): UseAppInitReturns => {
 	const [contextMenu$, setContextMenu$] = useState<Nullable<__ContextMenu$>>(null)
+	const [modal$, setModal$] = useState<Nullable<__Modal$>>(null)
 
 	useEffect(() => {
-		initHosts(hosts)
+		initHosts(hosts) // TODO: 4
 		__initCommands({ logger: ConsoleLogger })
-		const router$ = initRouter({ logger: ConsoleLogger })
-		initModals({ logger: ConsoleLogger })
-		initCommandPalette()
-		initSidebar()
-		initExtensions({ logger: ConsoleLogger, router$, extensions: [] })
+		const router$ = initRouter({ logger: ConsoleLogger }) // TODO: 5
+		const modal$ = __initModal({ logger: ConsoleLogger })
+		setModal$(modal$)
+		initCommandPalette() // TODO: 2
+		initSidebar() // TODO: 3
+		initExtensions({ logger: ConsoleLogger, router$, extensions: [] }) // TODO: 6
 		initActivities()
 
 		const contextMenu$ = __initContextMenu({ logger: ConsoleLogger })
-
 		setContextMenu$(contextMenu$)
 
 		// TODO: Allow native context menu if custom context menu is not available
@@ -58,5 +60,5 @@ export const useAppInit = (hosts: Hosts): UseAppInitReturns => {
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [])
 
-	return { contextMenu$ }
+	return { contextMenu$, modal$ }
 }

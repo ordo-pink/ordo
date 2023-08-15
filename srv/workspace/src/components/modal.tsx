@@ -1,30 +1,27 @@
-import { Either } from "#lib/either/mod"
 import { useHotkeys } from "react-hotkeys-hook"
 import { BsX } from "react-icons/bs"
-import { useModal } from "../hooks/use-modal"
-import { useSubscription } from "../hooks/use-subscription"
-import { modal$ } from "../streams/modal"
-import Null from "./null"
+import { Either } from "#lib/either/mod"
+import { getModal } from "$streams/modal"
+import { useSubscription } from "$hooks/use-subscription"
+import { __Modal$ } from "$streams/modal"
+import Null from "$components/null"
 
-/**
- * The modal window wrapper.
- *
- * You can use the modal window with the `useModal` hook.
- */
-export default function Modal() {
-	const modal = useSubscription(modal$)
-	const { hideModal } = useModal()
+const modal = getModal()
+
+type _P = { modal$: __Modal$ }
+export default function Modal({ modal$ }: _P) {
+	const modalState = useSubscription(modal$)
 
 	const handleHide = () => {
-		modal?.onHide()
-		hideModal()
+		modalState?.onHide()
+		modal.hide()
 	}
 
-	useHotkeys("Esc", handleHide, [modal])
+	useHotkeys("Esc", handleHide, [modalState])
 
-	return Either.fromNullable(modal).fold(Null, ({ Component, showCloseButton }) => (
+	return Either.fromNullable(modalState).fold(Null, ({ Component, showCloseButton }) => (
 		<div
-			className="absolute z-[500] top-0 left-0 right-0 bottom-0 bg-gradient-to-tr from-neutral-900/80  to-stone-900/80  h-screen w-screen flex items-center justify-center"
+			className="modal absolute z-[500] top-0 left-0 right-0 bottom-0 bg-gradient-to-tr from-neutral-900/80  to-stone-900/80  h-screen w-screen flex items-center justify-center"
 			onClick={handleHide}
 		>
 			<div

@@ -1,12 +1,14 @@
 import { map, switchMap, scan, shareReplay } from "rxjs/operators"
 import { BehaviorSubject, of, merge, Subject } from "rxjs"
 import { ComponentType } from "react"
-import { Router } from "silkrouter"
+import { Router as Silkrouter, operators } from "silkrouter"
 import { Binary, Curry, Nullable, Thunk, Unary, callOnce } from "#lib/tau/mod"
 import { File, FileExtension } from "#lib/backend-data-service/mod"
 import { Logger } from "#lib/logger/mod"
-import { route, Route, noMatch } from "$streams/router"
 import { useStrictSubscription, useSubscription } from "$hooks/use-subscription"
+import { Router } from "#lib/libfe/mod"
+
+const { route, noMatch } = operators
 
 export type ContextMenuItemType = "create" | "read" | "update" | "delete"
 
@@ -66,7 +68,7 @@ const scopeExtensionContextTo = (
 })
 
 export const createExtension =
-	(name: string, callback: (ctx: ExtensionCreatorContext) => void | Promise<void>) =>
+	(name: string, callback: (ctx: ExtensionCreatorContext) => any) =>
 	(ctx: ExtensionCreatorContext) =>
 		callback(scopeExtensionContextTo(name, ctx))
 
@@ -76,7 +78,7 @@ export const createExtension =
 type InitExtensionsParams = {
 	logger: Logger
 	extensions: Thunk<Promise<{ default: Unary<ExtensionCreatorContext, void> }>>[]
-	router$: Router
+	router$: Silkrouter
 }
 
 export const initExtensions = callOnce(({ logger, router$, extensions }: InitExtensionsParams) =>
@@ -94,7 +96,7 @@ export const initExtensions = callOnce(({ logger, router$, extensions }: InitExt
 				activities?.map(activity => {
 					return activity.routes.forEach(activityRoute => {
 						router$ &&
-							router$.pipe(route(activityRoute)).subscribe((routeData: Route) => {
+							router$.pipe(route(activityRoute)).subscribe((routeData: Router.Route) => {
 								currentActivity$.next(activity)
 								currentRoute$.next(routeData)
 							})
@@ -112,7 +114,7 @@ export const initExtensions = callOnce(({ logger, router$, extensions }: InitExt
 )
 
 export const currentActivity$ = new BehaviorSubject<Nullable<Activity>>(null)
-export const currentRoute$ = new BehaviorSubject<Nullable<Route>>(null)
+export const currentRoute$ = new BehaviorSubject<Nullable<Router.Route>>(null)
 
 const add$ = new Subject<Activity>()
 const remove$ = new Subject<string>()

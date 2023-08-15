@@ -5,26 +5,26 @@ import Fuse from "fuse.js"
 import { Switch } from "#lib/switch/mod"
 import { noop } from "#lib/tau/mod"
 import { useAccelerator } from "$hooks/use-accelerator"
-import { CommandPaletteItem } from "$streams/command-palette"
 import { getCommands } from "$streams/commands"
 import RenderFromNullable from "$components/render-from-nullable"
 import ActionListItem from "$components/action-list-item"
 import Accelerator from "$components/accelerator"
+import { CommandPalette } from "#lib/libfe/mod"
 
 const commands = getCommands()
 
 type Props = {
-	items: CommandPaletteItem[]
+	items: CommandPalette.Item[]
 }
 
-const fuse = new Fuse([] as CommandPaletteItem[], { keys: ["name"] })
+const fuse = new Fuse([] as CommandPalette.Item[], { keys: ["name"] })
 
 export default function CommandPaletteModal({ items }: Props) {
 	useHotkeys("Esc", () => commands.emit("command-palette.close"))
 
 	const [currentIndex, setCurrentIndex] = useState(0)
 	const [inputValue, setInputValue] = useState("")
-	const [visibleItems, setVisibleItems] = useState<CommandPaletteItem[]>([])
+	const [visibleItems, setVisibleItems] = useState<CommandPalette.Item[]>([])
 
 	useEffect(() => {
 		fuse.setCollection(items)

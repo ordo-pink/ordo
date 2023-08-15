@@ -39,5 +39,8 @@ const getPublicUserByEmail: GetUserByEmailFn = userService => email =>
 type SendUserInfoFn = (ctx: Context) => (user: PublicUser) => void
 
 const sendUserInfo: SendUserInfoFn = ctx => user => {
-	ctx.response.body = user
+	ctx.response.body = {
+		success: true,
+		result: user,
+	}
 }

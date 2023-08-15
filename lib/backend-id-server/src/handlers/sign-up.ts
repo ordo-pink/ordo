@@ -60,7 +60,10 @@ export const handleSignUp: Fn =
 			await ctx.cookies.set("jti", jti, { httpOnly: true, sameSite: "lax", expires })
 			await ctx.cookies.set("sub", sub, { httpOnly: true, sameSite: "lax", expires })
 
-			ctx.response.body = { accessToken: access, refreshToken: jti, userId: sub }
+			ctx.response.body = {
+				success: true,
+				result: { accessToken: access, refreshToken: jti, userId: sub },
+			}
 		} catch (e) {
 			console.log(e)
 

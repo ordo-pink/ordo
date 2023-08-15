@@ -1,15 +1,15 @@
 import { Either } from "#lib/either/mod"
 import { useAccelerator } from "$hooks/use-accelerator"
 import { getCommands } from "$streams/commands"
-import { ContextMenuItem } from "$streams/context-menu"
 import RenderFromNullable from "$components/render-from-nullable"
 import ActionListItem from "$components/action-list-item"
 import Accelerator from "$components/accelerator"
 import { MouseEvent } from "react"
+import { ContextMenu } from "#lib/libfe/mod"
 
 const commands = getCommands()
 
-type _P = { event: MouseEvent; item: ContextMenuItem; payload?: any }
+type _P = { event: MouseEvent; item: ContextMenu.Item; payload?: any }
 export default function MenuItem({ item, event, payload: p }: _P) {
 	const payload = item.payloadCreator ? item.payloadCreator({ payload: p, event }) : p
 	const isDisabled = item.shouldBeDisabled && item.shouldBeDisabled({ event, payload })

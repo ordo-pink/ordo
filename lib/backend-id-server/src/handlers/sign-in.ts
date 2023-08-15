@@ -48,7 +48,10 @@ export const handleSignIn: Fn =
 				]).map(() => tokens)
 			)
 			.fork(ResponseError.send(ctx), ({ access, jti, sub }) => {
-				ctx.response.body = { accessToken: access, jti, sub }
+				ctx.response.body = {
+					success: true,
+					result: { accessToken: access, jti, sub },
+				}
 			})
 
 // --- Internal ---

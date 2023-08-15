@@ -56,5 +56,8 @@ export const handleRefreshToken: Fn =
 		await ctx.cookies.set("jti", jti, { httpOnly: true, sameSite: "lax", expires })
 		await ctx.cookies.set("sub", sub, { httpOnly: true, sameSite: "lax", expires })
 
-		ctx.response.body = { accessToken: access, jti, sub, exp }
+		ctx.response.body = {
+			success: true,
+			result: { accessToken: access, jti, sub, exp },
+		}
 	}

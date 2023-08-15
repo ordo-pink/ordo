@@ -1,5 +1,6 @@
 import { MouseEvent, PropsWithChildren, HTMLProps } from "react"
 import { getCommands } from "$streams/commands"
+import { cmd } from "#lib/libfe/mod"
 
 const commands = getCommands()
 
@@ -16,8 +17,8 @@ export default function Link({ href, children, className, external = false, newT
 		event.preventDefault()
 
 		external
-			? commands.emit("router.open-external", { url: href })
-			: commands.emit("router.navigate", { url: href, newTab })
+			? commands.emit<cmd.router.openExternal>("router.open-external", { url: href })
+			: commands.emit<cmd.router.navigate>("router.navigate", href)
 	}
 
 	return (

@@ -26,7 +26,7 @@ export const handleSignOut: Fn =
 			.toPromise()
 
 		if (!tokenMap || !tokenMap[jti]) {
-			return ctx.throw(403, "Unverified or outdated access token")
+			return ctx.throw(403, "Invalid or outdated token")
 		}
 
 		await tokenService.removePersistedToken(sub, jti).toPromise()

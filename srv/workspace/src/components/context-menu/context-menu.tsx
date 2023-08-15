@@ -2,19 +2,20 @@ import { useEffect, useState } from "react"
 import { useHotkeys } from "react-hotkeys-hook"
 import { Either } from "#lib/either/mod"
 import { useSubscription } from "$hooks/use-subscription"
-import { ContextMenuItem, __ContextMenu$ } from "$streams/context-menu"
+import { __ContextMenu$ } from "$streams/context-menu"
 import ContextMenuItemList from "$components/context-menu/context-menu-item-list"
 import Null from "$components/null"
 import { getCommands } from "$streams/commands"
+import { ContextMenu as TContextMenu } from "#lib/libfe/mod"
 
 const commands = getCommands()
 
 type _P = { menu$: __ContextMenu$ }
 export default function ContextMenu({ menu$ }: _P) {
-	const [readers, setReaders] = useState<ContextMenuItem[]>([])
-	const [creators, setCreators] = useState<ContextMenuItem[]>([])
-	const [updaters, setUpdaters] = useState<ContextMenuItem[]>([])
-	const [removers, setRemovers] = useState<ContextMenuItem[]>([])
+	const [readers, setReaders] = useState<TContextMenu.Item[]>([])
+	const [creators, setCreators] = useState<TContextMenu.Item[]>([])
+	const [updaters, setUpdaters] = useState<TContextMenu.Item[]>([])
+	const [removers, setRemovers] = useState<TContextMenu.Item[]>([])
 
 	const menu = useSubscription(menu$)
 
@@ -32,10 +33,10 @@ export default function ContextMenu({ menu$ }: _P) {
 
 		menu.event.preventDefault()
 
-		const readCommands = [] as ContextMenuItem[]
-		const createCommands = [] as ContextMenuItem[]
-		const updateCommands = [] as ContextMenuItem[]
-		const deleteCommands = [] as ContextMenuItem[]
+		const readCommands = [] as TContextMenu.Item[]
+		const createCommands = [] as TContextMenu.Item[]
+		const updateCommands = [] as TContextMenu.Item[]
+		const deleteCommands = [] as TContextMenu.Item[]
 
 		menu.structure.forEach(item => {
 			if (item.type === "create") createCommands.push(item)

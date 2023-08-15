@@ -72,7 +72,10 @@ const updateUser: UpdateUserFn =
 type SendUserFn = (ctx: Context) => (user: User) => void
 
 const sendUser: SendUserFn = ctx => user => {
-	ctx.response.body = user
+	ctx.response.body = {
+		success: true,
+		result: user,
+	}
 }
 
 type ValidateEmailFnParams = { user: User; userService: UserService }

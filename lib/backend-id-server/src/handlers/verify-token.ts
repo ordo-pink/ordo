@@ -24,9 +24,12 @@ export const handleVerifyToken: Fn =
 			.chain(Oath.fromNullable)
 			.fork(
 				() => {
-					ctx.response.body = { valid: false }
+					ctx.response.body = {
+						success: true,
+						result: { valid: false },
+					}
 				},
 				token => {
-					ctx.response.body = { valid: true, token }
+					ctx.response.body = { success: true, result: { valid: true, token } }
 				}
 			)

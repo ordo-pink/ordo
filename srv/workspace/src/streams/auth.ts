@@ -1,92 +1,108 @@
-import type { Nullable } from "#lib/tau/mod"
 import type { AuthResponse } from "#lib/backend-id-server/mod"
 import type { User } from "#lib/backend-user-service/mod"
 import type { Directory, File } from "#lib/backend-data-service/mod"
-
-import { BehaviorSubject, combineLatestWith, map } from "rxjs"
-import { Oath } from "#lib/oath/mod"
-import { useSubscription } from "../hooks/use-subscription"
+import { AiOutlineLogout } from "react-icons/ai"
+import { BehaviorSubject } from "rxjs"
+import { callOnce, Unary, Nullable } from "#lib/tau/mod"
+import { cmd } from "#lib/libfe/mod"
 import { Either } from "#lib/either/mod"
+import { Logger } from "#lib/logger/mod"
+import { Oath } from "#lib/oath/mod"
+import { useSubscription } from "$hooks/use-subscription"
+import { getCommands } from "$streams/commands"
 
-export type Hosts = { id: string; data: string; web: string }
-type APIRepositoryParams = { hosts: Hosts; auth: AuthResponse }
+const commands = getCommands()
 
-const hosts$ = new BehaviorSubject<Nullable<Hosts>>(null)
+const refreshToken = () =>
+	fetch(`${process.env.REACT_APP_ID_HOST}/refresh-token`, {
+		method: "POST",
+		credentials: "include",
+	})
+		.then(res => res.json())
+		.then(res => {
+			if (res.success) return auth$.next(res.result)
+
+			window.location.href = `${process.env.REACT_APP_WEB_HOST}/sign-out`
+		})
+
+type InitAuthP = { logger: Logger }
+type InitAuth = Unary<InitAuthP, void>
+
+export const __initAuth: InitAuth = callOnce(({ logger }) => {
+	logger.debug("Initializing auth")
+
+	refreshToken()
+
+	const interval = setInterval(refreshToken, 50000)
+	window.addEventListener("beforeunload", () => clearInterval(interval))
+
+	commands.on("core.refresh-user-info", () =>
+		Oath.fromNullable(auth$.value)
+			.chain(auth =>
+				Oath.try(() =>
+					fetch(`${process.env.REACT_APP_ID_HOST}/account`, {
+						headers: { Authorization: `Bearer ${auth.accessToken}` },
+					})
+				)
+			)
+			.chain(res => Oath.from(() => res.json()))
+			.chain(body => (body.success ? Oath.of(body.result) : Oath.reject(body.error)))
+			.fork(
+				(error: any) => error$.next(error),
+				result => user$.next(result)
+			)
+	)
+
+	commands.on("core.refresh-metadata-root", () =>
+		Oath.fromNullable(auth$.value)
+			.chain(auth =>
+				Oath.try(() =>
+					fetch(`${process.env.REACT_APP_DATA_HOST}/directories/${auth.sub}`, {
+						headers: { Authorization: `Bearer ${auth.accessToken}` },
+					})
+				)
+			)
+			.chain(res => Oath.from(() => res.json()))
+			.chain(body => (body.success ? Oath.of(body.result) : Oath.reject(body.error)))
+			.fork(
+				error => error$.next(error),
+				result => metadata$.next(result)
+			)
+	)
+
+	commands.on("core.sign-out", () =>
+		commands.emit<cmd.router.openExternal>("router.open-external", {
+			url: `${process.env.REACT_APP_WEB_HOST}/sign-out`,
+			newTab: false,
+		})
+	)
+
+	commands.emit<cmd.commandPalette.add>("command-palette.add", {
+		id: "core.sign-out",
+		readableName: "Sign out",
+		Icon: AiOutlineLogout,
+		onSelect: () => commands.emit("core.sign-out"),
+	})
+})
+
 const auth$ = new BehaviorSubject<Nullable<AuthResponse>>(null)
 const metadata$ = new BehaviorSubject<(Directory | File)[]>([])
 const user$ = new BehaviorSubject<Nullable<User>>(null)
 const error$ = new BehaviorSubject<Nullable<string>>(null)
-
-const userService$ = auth$.pipe(
-	combineLatestWith(hosts$),
-	map(([auth, hosts]) => (auth && hosts ? createUserRepository({ hosts, auth }) : null))
-)
-
-const metadataService$ = auth$.pipe(
-	combineLatestWith(hosts$),
-	map(([auth, hosts]) => (auth && hosts ? createMetadataService({ hosts, auth }) : null))
-)
-
-export const refreshAuthInfo = (info: AuthResponse) => {
-	auth$.next(info)
-}
-
-export const initHosts = (hosts: Hosts) => hosts$.next(hosts)
-
-export const onBeforeQuit = () => {
-	auth$.next(null)
-	metadata$.next([])
-	user$.next(null)
-	error$.next(null)
-}
-
-export const isSignedIn = () => auth$.value !== null
 
 export const useAuthStatus = () => {
 	const auth = useSubscription(auth$)
 	return auth != null
 }
 
-export const useMetadataAPIService0 = () => {
-	const repository = useSubscription(metadataService$)
-	return Oath.fromNullable(repository)
-}
-
-export const useUserAPIService0 = () => {
-	const repository = useSubscription(userService$)
-	return Oath.fromNullable(repository)
-}
-
 export const useMetadata = () => {
 	const metadata = useSubscription(metadata$)
 	return Either.fromNullable(metadata)
 }
+
 export const useUser = () => {
 	const user = useSubscription(user$)
 	return Either.fromNullable(user)
 }
+
 export const useError = () => useSubscription(error$)
-
-const createUserRepository = ({ hosts, auth }: APIRepositoryParams) => ({
-	getCurrentUserAccount: () =>
-		Oath.from(() =>
-			fetch(`${hosts.id}/account`, { headers: { Authorization: `Bearer ${auth.accessToken}` } })
-		)
-			.chain(res => Oath.from(() => res.json())) // TODO: Unify ID with Data ({ success boolean, result value })
-			.tap(result => user$.next(result)),
-})
-
-const createMetadataService = ({ hosts, auth }: APIRepositoryParams) => ({
-	getRoot: () =>
-		Oath.from(() =>
-			fetch(`${hosts.data}/directories/${auth.sub}`, {
-				headers: { Authorization: `Bearer ${auth.accessToken}` },
-			})
-		)
-			.chain(res => Oath.from(() => res.json()))
-			.chain(body => (body.success ? Oath.of(body.result) : Oath.reject(body.error)))
-			.tap(
-				result => metadata$.next(result),
-				error => error$.next(error)
-			),
-})

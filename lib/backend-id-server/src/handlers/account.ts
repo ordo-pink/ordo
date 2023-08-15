@@ -24,5 +24,8 @@ export const handleAccount: Fn =
 			.map(prop("sub"))
 			.chain(id => userService.getById(id).rejectedMap(ResponseError.create(404, "User not found")))
 			.fork(ResponseError.send(ctx), user => {
-				ctx.response.body = user
+				ctx.response.body = {
+					success: true,
+					result: user,
+				}
 			})

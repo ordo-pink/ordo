@@ -25,16 +25,18 @@ export const useBearerAuthorization = async (
 		const body = await fetch(`${tokenServiceOrIDHost}/verify-token`, {
 			method: "POST",
 			headers: { authorization },
-		}).then(res => res.json())
+		})
+			.then(res => res.json())
+			.then(res => (res.success ? res.result : { valid: false }))
 
 		if (body.valid) return body.token
 
-		ctx.throw(403, "Unverified or outdated access token")
+		ctx.throw(403, "Invalid or outdated token")
 	} else {
 		const verified = await tokenServiceOrIDHost.verifyAccessToken(token).toPromise()
 
 		if (!verified) {
-			return ctx.throw(403, "Unverified or outdated access token")
+			return ctx.throw(403, "Invalid or outdated token")
 		}
 
 		return tokenServiceOrIDHost.decodeAccessToken(token).toPromise()

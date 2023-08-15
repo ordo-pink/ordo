@@ -1,4 +1,3 @@
-import type { Hosts } from "$streams/auth"
 import { Either } from "#lib/either/mod"
 import { useOnAuthenticated } from "$hooks/use-on-authenticated"
 import { useAppInit } from "$hooks/use-app-init"
@@ -12,9 +11,9 @@ import { useSubscription } from "$hooks/use-subscription"
 
 const commands = getCommands()
 
-export default function App(hosts: Hosts) {
-	const streams = useAppInit(hosts)
-	useOnAuthenticated(hosts)
+export default function App() {
+	const streams = useAppInit()
+	useOnAuthenticated()
 
 	const contextMenu = useSubscription(streams.contextMenu$)
 

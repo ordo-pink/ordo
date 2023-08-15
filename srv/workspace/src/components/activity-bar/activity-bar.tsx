@@ -8,9 +8,10 @@ import { MouseEvent } from "react"
 import { Unary } from "#lib/tau/mod"
 import { __CommandPalette$ } from "$streams/command-palette"
 import { useStrictSubscription, useSubscription } from "$hooks/use-subscription"
-import { ShowContextMenuP } from "$streams/context-menu"
 import { useAccelerator } from "$hooks/use-accelerator"
 import { __Sidebar$ } from "$streams/sidebar"
+import { cmd } from "#lib/libfe/mod"
+import { Either } from "#lib/either/mod"
 
 type ShowContextMenu = Unary<MouseEvent<HTMLDivElement>, void>
 
@@ -25,9 +26,13 @@ export default function ActivityBar({ commandPalette$, sidebar$ }: _P) {
 
 	const isSidebarCollapsed = sidebar.disabled || sidebar.sizes[0] === 0
 
-	const showCommandPalette = () => commands.emit("command-palette.show", commandPaletteItems)
+	const showCommandPalette = () =>
+		Either.fromNullable(commandPaletteItems).map(items =>
+			commands.emit<cmd.commandPalette.show>("command-palette.show", items)
+		)
+
 	const showContextMenu: ShowContextMenu = (event: MouseEvent) =>
-		commands.emit<ShowContextMenuP>("context-menu.show", { event })
+		commands.emit<cmd.contextMenu.show>("context-menu.show", { event })
 
 	useAccelerator("mod+shift+p", showCommandPalette)
 

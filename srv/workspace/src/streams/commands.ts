@@ -28,7 +28,7 @@ export type CmdCtx<P = any> = { logger: Logger; payload: P }
 /**
  * Command handler.
  */
-export type CmdHandler<P> = Unary<CmdCtx<P>, void | Promise<void>>
+export type CmdHandler<P> = Unary<CmdCtx<P>, any>
 
 /**
  * Entrypoint for using commands.
@@ -37,37 +37,67 @@ export const getCommands = () => ({
 	/**
 	 * Append a listener to a given command.
 	 */
-	on,
+	on: <
+		T extends { name: `${string}.${string}`; payload?: any } = {
+			name: `${string}.${string}`
+			payload: any
+		}
+	>(
+		name: T extends { name: infer U; payload?: any } ? U : never,
+		handler: CmdHandler<T extends { name: any; payload?: infer U } ? U : never>
+	) => add$.next([name, handler]),
 
 	/**
 	 * Remove given listener for a given command. Make sure you provide a reference to the same
 	 * function as you did when calling `on`.
 	 */
-	off,
+	off: <
+		T extends { name: `${string}.${string}`; payload?: any } = {
+			name: `${string}.${string}`
+			payload: any
+		}
+	>(
+		name: T extends { name: infer U; payload?: any } ? U : never,
+		handler: CmdHandler<T extends { name: any; payload?: infer U } ? U : never>
+	) => remove$.next([name, handler]),
 
 	/**
 	 * Emit given command with given payload.
 	 */
-	emit: <Payload = any, Name extends CmdName = CmdName>(name: Name, payload?: Payload) =>
-		enqueue$.next({ name, payload }),
+	emit: <
+		T extends { name: `${string}.${string}`; payload?: any } = {
+			name: `${string}.${string}`
+			payload?: any
+		}
+	>(
+		name: T extends { name: infer U; payload?: any } ? U : never,
+		payload?: T extends { name: any; payload: infer U } ? U : never
+	) => enqueue$.next({ name, payload } as any),
 
 	/**
 	 * Prepend listener to a given command.
 	 */
-	before,
+	before: <
+		T extends { name: `${string}.${string}`; payload: any } = {
+			name: `${string}.${string}`
+			payload: any
+		}
+	>(
+		name: T extends { name: infer U; payload: any } ? U : never,
+		handler: CmdHandler<T extends { name: any; payload: infer U } ? U : never>
+	) => addBefore$.next([name, handler]),
 })
 
 // --- Internal ---
 
 export const __initCommands: InitCommands = callOnce(({ logger }) => {
-	logger.debug("Initialising commands")
+	logger.debug("Initializing commands")
 
 	commandRunner$({ logger }).subscribe()
 })
 
 type InitCommandsP = { logger: Logger }
 type InitCommands = Unary<InitCommandsP, void>
-type OnFn<Payload = any, Name extends CmdName = CmdName> = Binary<Name, CmdHandler<Payload>, void>
 type Command = Cmd | PayloadCmd
 type EnqueueP = Curry<Binary<Command, Command[], Command[]>>
 type DequeueP = Curry<Binary<Command, Command[], Command[]>>
@@ -78,10 +108,6 @@ type RemoveP = Curry<Binary<CmdListener, Record<string, CmdListener[1][]>, CmdHa
 
 const isPayloadCmd = (cmd: Cmd): cmd is PayloadCmd =>
 	typeof cmd.name === "string" && (cmd as PayloadCmd).payload !== undefined
-
-const on: OnFn = (name, handler) => add$.next([name, handler])
-const off: OnFn = (name, handler) => remove$.next([name, handler])
-const before: OnFn = (name, handler) => addBefore$.next([name, handler])
 
 const enqueueP: EnqueueP = newCommand => state => [...state, newCommand]
 const dequeueP: DequeueP = command => state => {

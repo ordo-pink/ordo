@@ -1,8 +1,8 @@
-import type { ContextMenuItem } from "$streams/context-menu"
-import MenuItem from "$components/context-menu/context-menu-item"
 import { MouseEvent } from "react"
+import { ContextMenu } from "#lib/libfe/mod"
+import MenuItem from "$components/context-menu/context-menu-item"
 
-type _P = { items: ContextMenuItem[]; event: MouseEvent; payload?: any }
+type _P = { items: ContextMenu.Item[]; event: MouseEvent; payload?: any }
 export default function ContextMenuItemList({ items, event, payload }: _P) {
 	return (
 		<div className="py-2">

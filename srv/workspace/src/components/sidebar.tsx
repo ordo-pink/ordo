@@ -1,22 +1,26 @@
 import { BsThreeDotsVertical } from "react-icons/bs"
 import { MouseEvent, PropsWithChildren } from "react"
 import { getCommands } from "$streams/commands"
-import { useSidebar } from "$streams/sidebar"
 import { useUser } from "$streams/auth"
 import UsedSpace from "$components/used-space"
 import Null from "$components/null"
 import { __CommandPalette$ } from "$streams/command-palette"
-import { useSubscription } from "$hooks/use-subscription"
+import { useStrictSubscription, useSubscription } from "$hooks/use-subscription"
 import { Nullable } from "#lib/tau/mod"
 import { ShowContextMenuP } from "$streams/context-menu"
+import { __Sidebar$ } from "$streams/sidebar"
 
 const commands = getCommands()
 
 // TODO: Use hosts
-type _P = PropsWithChildren<{ isNarrow: boolean; commandPalette$: Nullable<__CommandPalette$> }>
-export default function Sidebar({ children, isNarrow, commandPalette$ }: _P) {
+type _P = PropsWithChildren<{
+	isNarrow: boolean
+	commandPalette$: Nullable<__CommandPalette$>
+	sidebar$: Nullable<__Sidebar$>
+}>
+export default function Sidebar({ children, isNarrow, commandPalette$, sidebar$ }: _P) {
 	const user = useUser()
-	const sidebar = useSidebar()
+	const sidebar = useStrictSubscription(sidebar$, { disabled: true })
 	const commandPaletteItems = useSubscription(commandPalette$)
 
 	const onSidebarClick = () => {

@@ -13,7 +13,9 @@ export default function Modal({ modal$ }: _P) {
 	const modalState = useSubscription(modal$)
 
 	const handleHide = () => {
-		modalState?.onHide()
+		if (!modalState) return
+
+		modalState.onHide()
 		commands.emit("modal.hide")
 	}
 

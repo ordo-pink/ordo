@@ -18,7 +18,7 @@ export default function ContextMenu({ menu$ }: _P) {
 
 	const menu = useSubscription(menu$)
 
-	useHotkeys("Esc", () => commands.emit("context-menu.hide"))
+	useHotkeys("Esc", () => menu && commands.emit("context-menu.hide"))
 
 	useEffect(() => {
 		if (!menu) {

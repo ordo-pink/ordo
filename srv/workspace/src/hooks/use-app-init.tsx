@@ -7,18 +7,15 @@ import { initActivities, initExtensions } from "$streams/extensions"
 import { __CommandPalette$, __initCommandPalette } from "$streams/command-palette"
 import { __Modal$, __initModal } from "$streams/modal"
 import { __initCommands, getCommands } from "$streams/commands"
-import { initSidebar } from "$streams/sidebar"
+import { __initSidebar, __Sidebar$ } from "$streams/sidebar"
 import { initRouter } from "$streams/router"
 import CommandPaletteModal from "$components/command-palette"
 import { useSubscription } from "./use-subscription"
 import { useHotkeys } from "react-hotkeys-hook"
 
-const ctx = { logger: ConsoleLogger }
-
 const commands = getCommands()
-const isDarwin = navigator.appVersion.indexOf("Mac") !== -1
 
-const refreshToken = (hosts: Hosts) => {
+const refreshToken = (hosts: Hosts) =>
 	fetch(`${hosts.id}/refresh-token`, { method: "POST", credentials: "include" })
 		.then(res => res.json())
 		.then(res => {
@@ -26,13 +23,15 @@ const refreshToken = (hosts: Hosts) => {
 
 			window.location.href = `${hosts.web}`
 		})
-}
 
+const isDarwin = navigator.appVersion.indexOf("Mac") !== -1
 const IGNORED_KEYS = ["Control", "Shift", "Alt", "Control", "Meta"]
+const ctx = { logger: ConsoleLogger }
 
 export type UseAppInitReturns = {
-	contextMenu$: Nullable<__ContextMenu$>
 	modal$: Nullable<__Modal$>
+	sidebar$: Nullable<__Sidebar$>
+	contextMenu$: Nullable<__ContextMenu$>
 	globalCommandPalette$: Nullable<__CommandPalette$>
 	currentCommandPalette$: Nullable<__CommandPalette$>
 }
@@ -44,31 +43,28 @@ export const useAppInit = (hosts: Hosts): UseAppInitReturns => {
 		useState<Nullable<__CommandPalette$>>(null)
 	const [contextMenu$, setContextMenu$] = useState<Nullable<__ContextMenu$>>(null)
 	const [modal$, setModal$] = useState<Nullable<__Modal$>>(null)
+	const [sidebar$, setSidebar$] = useState<Nullable<__Sidebar$>>(null)
 
 	const commandPaletteItems = useSubscription(currentCommandPalette$)
 	const globalCommandPaletteItems = useSubscription(globalCommandPalette$)
 
 	useHotkeys(
 		"*",
-		event => {
-			if (IGNORED_KEYS.includes(event.key)) return
+		e => {
+			if (IGNORED_KEYS.includes(e.key)) return
 
 			let hotkey = ""
 
-			if (event.ctrlKey) hotkey += isDarwin ? "ctrl+" : "mod+"
-			if (event.metaKey) hotkey += "mod+"
-			if (event.altKey) hotkey += "meta+"
-			if (event.shiftKey) hotkey += "shift+"
+			if (e.ctrlKey) hotkey += isDarwin ? "ctrl+" : "mod+"
+			if (e.metaKey) hotkey += "mod+"
+			if (e.altKey) hotkey += "meta+"
+			if (e.shiftKey) hotkey += "shift+"
 
-			hotkey += event.code.replace("Key", "").toLocaleLowerCase()
+			hotkey += e.code.replace("Key", "").toLocaleLowerCase()
 
-			const command = globalCommandPaletteItems?.find(command =>
-				command.accelerator?.includes(hotkey)
-			)
+			const command = globalCommandPaletteItems?.find(c => c.accelerator?.includes(hotkey))
 
-			if (command) {
-				command.onSelect()
-			}
+			if (command) command.onSelect()
 		},
 		[globalCommandPaletteItems]
 	)
@@ -90,7 +86,9 @@ export const useAppInit = (hosts: Hosts): UseAppInitReturns => {
 
 		const router$ = initRouter(ctx) // TODO: 5
 
-		initSidebar() // TODO: 3
+		const sidebar$ = __initSidebar(ctx)
+		setSidebar$(sidebar$)
+
 		initExtensions({ logger: ConsoleLogger, router$, extensions: [] }) // TODO: 6
 		initActivities()
 
@@ -115,5 +113,5 @@ export const useAppInit = (hosts: Hosts): UseAppInitReturns => {
 		})
 	}, [commandPaletteItems])
 
-	return { contextMenu$, modal$, globalCommandPalette$, currentCommandPalette$ }
+	return { contextMenu$, modal$, globalCommandPalette$, currentCommandPalette$, sidebar$ }
 }

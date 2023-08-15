@@ -24,11 +24,12 @@ export default function App(hosts: Hosts) {
 		.chain(() => Either.fromNullable(streams.contextMenu$))
 		.chain(() => Either.fromNullable(streams.modal$))
 		.chain(() => Either.fromNullable(streams.globalCommandPalette$))
+		.chain(() => Either.fromNullable(streams.sidebar$))
 		.map(() => streams as { [K in keyof typeof streams]: NonNullable<(typeof streams)[K]> }) // TODO: Extract to tau
-		.fold(Null, ({ contextMenu$, modal$, globalCommandPalette$ }) => (
+		.fold(Null, ({ contextMenu$, modal$, globalCommandPalette$, sidebar$ }) => (
 			<div className="flex" onClick={hideContextMenu}>
-				<ActivityBar commandPalette$={globalCommandPalette$} />
-				<Workspace commandPalette$={globalCommandPalette$} />
+				<ActivityBar sidebar$={sidebar$} commandPalette$={globalCommandPalette$} />
+				<Workspace sidebar$={sidebar$} commandPalette$={globalCommandPalette$} />
 				<ContextMenu menu$={contextMenu$} />
 				<Modal modal$={modal$} />
 			</div>

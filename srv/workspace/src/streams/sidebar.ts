@@ -1,22 +1,18 @@
 import { AiOutlineLeft, AiOutlineLayout, AiOutlineRight } from "react-icons/ai"
-import { BehaviorSubject } from "rxjs"
-import { callOnce } from "#lib/tau/mod"
-import { useStrictSubscription } from "$hooks/use-subscription"
+import { BehaviorSubject, Observable } from "rxjs"
+import { Unary, callOnce } from "#lib/tau/mod"
 import { getCommands } from "$streams/commands"
 import { ContextMenuItem } from "$streams/context-menu"
-
-export type SidebarState =
-	| {
-			disabled: false
-			sizes: [number, number]
-	  }
-	| { disabled: true }
+import { Logger } from "#lib/logger/mod"
 
 const commands = getCommands()
 
-const sidebar$ = new BehaviorSubject<SidebarState>({ disabled: false, sizes: [25, 75] })
+// --- Internal ---
 
-export const initSidebar = callOnce(() => {
+export type __Sidebar$ = Observable<SidebarState>
+export const __initSidebar: InitSidebar = callOnce(({ logger }) => {
+	logger.debug("Initializing sidebar")
+
 	commands.on("sidebar.disable", () => {
 		const sidebar = sidebar$.value
 		if (sidebar.disabled) return
@@ -50,7 +46,12 @@ export const initSidebar = callOnce(() => {
 	commands.on("sidebar.toggle", () => {
 		const sidebar = sidebar$.value
 		if (sidebar.disabled) return
-		commands.emit(sidebar.sizes[0] > 0 ? "sidebar.hide" : "sidebar.show")
+
+		sidebar$.next(
+			sidebar.sizes[0] > 0
+				? { disabled: false, sizes: [0, 100] }
+				: { disabled: false, sizes: [25, 75] }
+		)
 	})
 
 	commands.emit("command-palette.add", {
@@ -91,7 +92,12 @@ export const initSidebar = callOnce(() => {
 		type: "update",
 		accelerator: "mod+b",
 	})
+
+	return sidebar$
 })
 
-export const useSidebar = () =>
-	useStrictSubscription(sidebar$, { disabled: false, sizes: [25, 75] })
+type SidebarState = { disabled: false; sizes: [number, number] } | { disabled: true }
+type InitSidebarP = { logger: Logger }
+type InitSidebar = Unary<InitSidebarP, __Sidebar$>
+
+const sidebar$ = new BehaviorSubject<SidebarState>({ disabled: false, sizes: [25, 75] })

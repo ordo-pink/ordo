@@ -1,25 +1,25 @@
 import { BsThreeDotsVertical } from "react-icons/bs"
 import { getCommands } from "$streams/commands"
 import { useActivities } from "$streams/extensions"
-import { useSidebar } from "$streams/sidebar"
 import { useUser } from "$streams/auth"
 import ActivityItem from "$components/activity-bar/activity"
 import Null from "$components/null"
 import { MouseEvent } from "react"
 import { Unary } from "#lib/tau/mod"
 import { __CommandPalette$ } from "$streams/command-palette"
-import { useSubscription } from "$hooks/use-subscription"
+import { useStrictSubscription, useSubscription } from "$hooks/use-subscription"
 import { ShowContextMenuP } from "$streams/context-menu"
 import { useAccelerator } from "$hooks/use-accelerator"
+import { __Sidebar$ } from "$streams/sidebar"
 
 type ShowContextMenu = Unary<MouseEvent<HTMLDivElement>, void>
 
 const commands = getCommands()
 
-type _P = { commandPalette$: __CommandPalette$ }
-export default function ActivityBar({ commandPalette$ }: _P) {
+type _P = { commandPalette$: __CommandPalette$; sidebar$: __Sidebar$ }
+export default function ActivityBar({ commandPalette$, sidebar$ }: _P) {
 	const user = useUser()
-	const sidebar = useSidebar()
+	const sidebar = useStrictSubscription(sidebar$, { disabled: true })
 	const activities = useActivities()
 	const commandPaletteItems = useSubscription(commandPalette$)
 

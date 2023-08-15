@@ -5,10 +5,11 @@ import Split from "react-split"
 import { Either } from "#lib/either/mod"
 import { useWindowSize } from "../hooks/use-window-size"
 import { useCurrentActivity, Activity } from "../streams/extensions"
-import { useSidebar, SidebarState } from "../streams/sidebar"
 import { getCommands } from "$streams/commands"
 import Sidebar from "./sidebar"
 import { __CommandPalette$ } from "$streams/command-palette"
+import { __Sidebar$ } from "$streams/sidebar"
+import { useStrictSubscription } from "$hooks/use-subscription"
 
 // TODO: Render Welcome page if activity is null
 // TODO: Extract internal components to separate files
@@ -17,18 +18,20 @@ import { __CommandPalette$ } from "$streams/command-palette"
 
 const commands = getCommands()
 
-type _P = { commandPalette$: Nullable<__CommandPalette$> }
-export default function Workspace({ commandPalette$ }: _P) {
-	const sidebar = useSidebar()
+type _P = { commandPalette$: Nullable<__CommandPalette$>; sidebar$: Nullable<__Sidebar$> }
+export default function Workspace({ commandPalette$, sidebar$ }: _P) {
+	const sidebar = useStrictSubscription(sidebar$, { disabled: true })
 	const activity = useCurrentActivity()
 
-	return Either.fromNullable(sidebar)
-		.chain(state => Either.fromBoolean(() => !state.disabled))
+	return Either.fromNullable(sidebar$)
+		.chain($ =>
+			Either.fromNullable(sidebar).chain(state =>
+				Either.fromBoolean(() => !state.disabled).map(() => $)
+			)
+		)
 		.fold(
 			() => <DisabledSidebar activity={activity} />,
-			() => (
-				<EnabledSidebar commandPalette$={commandPalette$} sidebar={sidebar} activity={activity} />
-			)
+			$ => <EnabledSidebar commandPalette$={commandPalette$} sidebar$={$} activity={activity} />
 		)
 }
 
@@ -37,7 +40,7 @@ export default function Workspace({ commandPalette$ }: _P) {
 type OnDragEndFn = Unary<[number, number], void>
 type DisabledSidebarProps = { activity: Nullable<Activity> }
 type EnabledSidebarP = DisabledSidebarProps & {
-	sidebar: SidebarState
+	sidebar$: __Sidebar$
 	commandPalette$: Nullable<__CommandPalette$>
 }
 
@@ -51,8 +54,9 @@ const DisabledSidebar = ({ activity }: DisabledSidebarProps) =>
 		)
 	)
 
-const EnabledSidebar = ({ sidebar, activity, commandPalette$ }: EnabledSidebarP) => {
+const EnabledSidebar = ({ sidebar$, activity, commandPalette$ }: EnabledSidebarP) => {
 	const [windowWidth] = useWindowSize()
+	const sidebar = useStrictSubscription(sidebar$, { disabled: true })
 
 	const [isNarrow, setIsNarrow] = useState(true)
 	const [sizes, setSizes] = useState([25, 75])
@@ -109,7 +113,7 @@ const EnabledSidebar = ({ sidebar, activity, commandPalette$ }: EnabledSidebarP)
 				direction="horizontal"
 			>
 				<div className={`sidebar h-full ${sizes[0] <= 5 ? "hidden" : "block"}`}>
-					<Sidebar commandPalette$={commandPalette$} isNarrow={isNarrow} />
+					<Sidebar sidebar$={sidebar$} commandPalette$={commandPalette$} isNarrow={isNarrow} />
 				</div>
 
 				<div className={`workspace h-full w-full ${sizes[1] <= 5 ? "hidden" : "block"}`}>

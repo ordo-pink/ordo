@@ -1,10 +1,9 @@
 import { AiOutlineLeft, AiOutlineLayout, AiOutlineRight } from "react-icons/ai"
 import { BehaviorSubject } from "rxjs"
 import { callOnce } from "#lib/tau/mod"
-import { useSubscription } from "$hooks/use-subscription"
+import { useStrictSubscription } from "$hooks/use-subscription"
 import { getCommands } from "$streams/commands"
-import { useCommandPalette } from "$streams/command-palette"
-import { getContextMenu } from "$streams/context-menu"
+import { ContextMenuItem } from "$streams/context-menu"
 
 export type SidebarState =
 	| {
@@ -14,13 +13,10 @@ export type SidebarState =
 	| { disabled: true }
 
 const commands = getCommands()
-const contextMenu = getContextMenu()
 
 const sidebar$ = new BehaviorSubject<SidebarState>({ disabled: false, sizes: [25, 75] })
 
 export const initSidebar = callOnce(() => {
-	const commandPalette = useCommandPalette()
-
 	commands.on("sidebar.disable", () => {
 		const sidebar = sidebar$.value
 		if (sidebar.disabled) return
@@ -57,20 +53,19 @@ export const initSidebar = callOnce(() => {
 		commands.emit(sidebar.sizes[0] > 0 ? "sidebar.hide" : "sidebar.show")
 	})
 
-	commandPalette.addItem({
-		commandName: "sidebar.toggle",
+	commands.emit("command-palette.add", {
+		id: "sidebar.toggle",
 		readableName: "Toggle sidebar",
 		Icon: AiOutlineLayout,
 		onSelect: () => commands.emit("sidebar.toggle"),
-		accelerator: "ctrl+b",
+		accelerator: "mod+b",
 	})
 
-	contextMenu.add({
+	commands.emit<ContextMenuItem>("context-menu.add", {
 		commandName: "sidebar.show",
 		readableName: "Show sidebar",
 		Icon: AiOutlineRight,
 		shouldShow: ({ target }) => {
-			console.log(target, !sidebar$.value.disabled, (sidebar$.value as any).sizes)
 			return (
 				(target.classList.contains("activity-bar") || Boolean(target.closest(".activity-bar"))) &&
 				!sidebar$.value.disabled &&
@@ -78,10 +73,10 @@ export const initSidebar = callOnce(() => {
 			)
 		},
 		type: "update",
-		accelerator: "ctrl+b",
+		accelerator: "mod+b",
 	})
 
-	contextMenu.add({
+	commands.emit<ContextMenuItem>("context-menu.add", {
 		commandName: "sidebar.hide",
 		readableName: "Hide sidebar",
 		Icon: AiOutlineLeft,
@@ -93,8 +88,9 @@ export const initSidebar = callOnce(() => {
 			!sidebar$.value.disabled &&
 			sidebar$.value.sizes[0] !== 0,
 		type: "update",
-		accelerator: "ctrl+b",
+		accelerator: "mod+b",
 	})
 })
 
-export const useSidebar = () => useSubscription(sidebar$, { disabled: false, sizes: [25, 75] })
+export const useSidebar = () =>
+	useStrictSubscription(sidebar$, { disabled: false, sizes: [25, 75] })

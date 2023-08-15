@@ -1,99 +1,105 @@
-import { BehaviorSubject, map, merge, scan, shareReplay, Subject } from "rxjs"
-import { ComponentType, useEffect } from "react"
+import { BehaviorSubject, map, merge, Observable, scan, shareReplay, Subject } from "rxjs"
 import { IconType } from "react-icons"
-import { Thunk, Unary, callOnce } from "#lib/tau/mod"
-import { useSubscription } from "$hooks/use-subscription"
+import { BsCommand } from "react-icons/bs"
+import { Binary, Curry, Nullable, Thunk, Unary, callOnce } from "#lib/tau/mod"
+import { Logger } from "#lib/logger/mod"
 import { getCommands } from "$streams/commands"
-import { getModal } from "$streams/modal"
-import CommandPaletteModal from "$components/command-palette"
 
 const commands = getCommands()
-const modal = getModal()
 
-export type UnregisterCommandPaletteItemFn = Unary<string, void>
-export type RegisterCommandPaletteItemFn = Unary<CommandPaletteItem, void>
+// TODO: Merge commands, command palette and context menu item creation
 
+// --- Public ---
+
+/**
+ * Command palette item.
+ */
 export type CommandPaletteItem = {
-	commandName: string
+	/**
+	 * ID of the command to be invoked when the command palette item is used.
+	 */
+	id: string
+
+	/**
+	 * Readable name of the command palette item. Put a translated value here.
+	 */
 	readableName: string
-	Icon?: IconType
-	Comment?: ComponentType
-	Footer?: ComponentType
+
+	/**
+	 * Action to be executed when command palette item is used.
+	 */
 	onSelect: Thunk<void>
+
+	/**
+	 * Icon to be displayed for the context menu item.
+	 *
+	 * @optional
+	 */
+	Icon?: IconType
+
+	/**
+	 * Keyboard accelerator for the context menu item. It only works while the context menu is
+	 * opened.
+	 *
+	 * @optional
+	 */
 	accelerator?: string
 }
 
-const addContextMenuItem$ = new Subject<CommandPaletteItem>()
-const removeContextMenuItem$ = new Subject<string>()
-const commandPalette$ = new BehaviorSubject<CommandPaletteItem[]>([])
+// --- Internal ---
 
-const add = (newContextMenuItem: CommandPaletteItem) => (state: CommandPaletteItem[]) => {
-	const exists = state.some(item => item.readableName === newContextMenuItem.readableName)
+export type __CommandPalette$ = Observable<CommandPaletteItem[]>
+export const __initCommandPalette: InitCommandPalette = callOnce(({ logger }) => {
+	logger.debug("Initializing command palette")
 
-	return exists ? state : [...state, newContextMenuItem]
+	commands.on("command-palette.show", ({ payload }) => show(payload))
+	commands.on("command-palette.add", ({ payload }) => add(payload))
+	commands.on("command-palette.remove", ({ payload }) => remove(payload))
+	commands.on("command-palette.hide", hide)
+
+	add({
+		id: "command-palette.hide",
+		onSelect: hide,
+		readableName: "Hide command palette",
+		Icon: BsCommand,
+		accelerator: "mod+shift+p",
+	})
+
+	return { globalCommandPalette$, currentCommandPalette$ }
+})
+
+type Add = Unary<CommandPaletteItem, void>
+type Remove = Unary<string, void>
+type Show = Unary<CommandPaletteItem[], void>
+type Hide = Thunk<void>
+type AddP = Curry<Binary<CommandPaletteItem, CommandPaletteItem[], CommandPaletteItem[]>>
+type RemoveP = Curry<Binary<string, CommandPaletteItem[], CommandPaletteItem[]>>
+type InitCommandPaletteP = { logger: Logger }
+type InitCommandPaletteR = {
+	globalCommandPalette$: Nullable<__CommandPalette$>
+	currentCommandPalette$: Nullable<__CommandPalette$>
+}
+type InitCommandPalette = Unary<InitCommandPaletteP, InitCommandPaletteR>
+
+const currentCommandPalette$ = new BehaviorSubject<CommandPaletteItem[]>([])
+
+export const add: Add = item => add$.next(item)
+export const remove: Remove = id => remove$.next(id)
+export const show: Show = items => currentCommandPalette$.next(items)
+export const hide: Hide = () => {
+	currentCommandPalette$.next([])
+	commands.emit("modal.hide")
 }
 
-const remove = (id: string) => (state: CommandPaletteItem[]) =>
-	state.filter(a => a.commandName !== id)
+const addP: AddP = item => state =>
+	state.some(({ id: commandName }) => commandName === item.id) ? state : [...state, item]
+const removeP: RemoveP = id => state => state.filter(a => a.id !== id)
 
-export const commandPaletteItems$ = merge(
-	addContextMenuItem$.pipe(map(add)),
-	removeContextMenuItem$.pipe(map(remove))
-).pipe(
+const add$ = new Subject<CommandPaletteItem>()
+const remove$ = new Subject<string>()
+const globalCommandPalette$ = merge(add$.pipe(map(addP)), remove$.pipe(map(removeP))).pipe(
 	scan((acc, f) => f(acc), [] as CommandPaletteItem[]),
 	shareReplay(1)
 )
 
-export const registerCommandPaletteItem: RegisterCommandPaletteItemFn = (
-	item: CommandPaletteItem
-) => {
-	addContextMenuItem$.next(item)
-}
-
-export const unregisterCommandPaletteItem = (id: string) => {
-	removeContextMenuItem$.next(id)
-}
-
-export const showCommandPalette = (items: CommandPaletteItem[]) => {
-	commandPalette$.next(items)
-}
-
-export const hideCommandPalette = () => {
-	commandPalette$.next([])
-	modal.hide()
-}
-
-export const initCommandPalette = callOnce(() => {
-	commandPaletteItems$.subscribe()
-	commandPalette$.subscribe()
-
-	commands.on("command-palette.show", ({ payload }) => showCommandPalette(payload))
-	commands.on("command-palette.hide", hideCommandPalette)
-
-	return commandPalette$
-})
-
-export const useCommandPalette = () => ({
-	show: showCommandPalette,
-	hide: hideCommandPalette,
-	addItem: registerCommandPaletteItem,
-	removeItem: unregisterCommandPaletteItem,
-})
-
-// TODO: Rename to reflect difference between command palette and search
-export const useDefaultCommandPalette = () => {
-	const items = useSubscription(commandPalette$)
-
-	useEffect(() => {
-		if (!items || !items.length) return
-
-		modal.show(() => <CommandPaletteModal items={items} />, {
-			showCloseButton: false,
-			onHide: () => hideCommandPalette(),
-		})
-	}, [items])
-
-	return null
-}
-
-export const useCommandPaletteItems = () => useSubscription(commandPaletteItems$)
+globalCommandPalette$.subscribe()

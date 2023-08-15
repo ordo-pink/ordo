@@ -2,6 +2,9 @@ import { BehaviorSubject, Observable } from "rxjs"
 import type { ComponentType } from "react"
 import { Nullable, Thunk, callOnce } from "#lib/tau/mod"
 import { Logger } from "#lib/logger/mod"
+import { getCommands } from "$streams/commands"
+
+const commands = getCommands()
 
 // --- Public ---
 
@@ -26,29 +29,15 @@ export type ShowModalOptions = {
 	onHide?: Thunk<void>
 }
 
-/**
- * Entrypoint for using modal.
- */
-export const getModal = () => ({
-	/**
-	 * Show modal.
-	 *
-	 * @param ComponentType React component to be shown in the body of the modal.
-	 * @param ShowModalOptions Modal options.
-	 */
-	show,
-
-	/**
-	 * Hide modal.
-	 */
-	hide,
-})
-
 // --- Internal ---
 
 export type __Modal$ = Observable<Nullable<Modal>>
 export const __initModal = callOnce(({ logger }: InitModalP) => {
 	logger.debug("Initializing modal")
+
+	commands.on("modal.hide", hide)
+	commands.on("modal.show", ({ payload }) => show(payload.Component, payload.options))
+
 	return modal$
 })
 

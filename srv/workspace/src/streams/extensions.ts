@@ -1,27 +1,14 @@
 import { map, switchMap, scan, shareReplay } from "rxjs/operators"
 import { BehaviorSubject, of, merge, Subject } from "rxjs"
-import { IconType } from "react-icons"
 import { ComponentType } from "react"
 import { Router } from "silkrouter"
 import { Binary, Curry, Nullable, Thunk, Unary, callOnce } from "#lib/tau/mod"
 import { File, FileExtension } from "#lib/backend-data-service/mod"
 import { Logger } from "#lib/logger/mod"
 import { route, Route, noMatch } from "$streams/router"
-import { useSubscription } from "$hooks/use-subscription"
+import { useStrictSubscription, useSubscription } from "$hooks/use-subscription"
 
 export type ContextMenuItemType = "create" | "read" | "update" | "delete"
-
-export type ContextMenuItem = {
-	shouldShow: (target: any) => boolean
-	payloadCreator: (target: any) => any
-	extensionName: string
-	commandName: string
-	name: string
-	Icon: IconType
-	accelerator?: string
-	type: ContextMenuItemType
-	disabled?: (target: any) => boolean
-}
 
 export type Activity = {
 	name: string
@@ -170,4 +157,4 @@ export const useExtensions = () => ({
 
 export const useCurrentActivity = () => useSubscription(currentActivity$)
 export const useRoute = () => useSubscription(currentRoute$)
-export const useActivities = () => useSubscription(activities$, [])
+export const useActivities = () => useStrictSubscription(activities$, [])

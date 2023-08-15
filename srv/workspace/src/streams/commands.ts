@@ -48,7 +48,8 @@ export const getCommands = () => ({
 	/**
 	 * Emit given command with given payload.
 	 */
-	emit,
+	emit: <Payload = any, Name extends CmdName = CmdName>(name: Name, payload?: Payload) =>
+		enqueue$.next({ name, payload }),
 
 	/**
 	 * Prepend listener to a given command.
@@ -64,7 +65,6 @@ export const __initCommands = callOnce((ctx: InitCommandsP) => {
 
 type InitCommandsP = { logger: Logger }
 type OnFn<Payload = any, Name extends CmdName = CmdName> = Binary<Name, CmdHandler<Payload>, void>
-type EmitFn<Name extends CmdName = CmdName, Payload = any> = (type: Name, payload?: Payload) => void
 type Command = Cmd | PayloadCmd
 type EnqueueP = Curry<Binary<Command, Command[], Command[]>>
 type DequeueP = Curry<Binary<Command, Command[], Command[]>>
@@ -78,7 +78,6 @@ const isPayloadCmd = (cmd: Cmd): cmd is PayloadCmd =>
 
 const on: OnFn = (name, handler) => add$.next([name, handler])
 const off: OnFn = (name, handler) => remove$.next([name, handler])
-const emit: EmitFn = (name, payload) => enqueue$.next({ name, payload })
 const before: OnFn = (name, handler) => addBefore$.next([name, handler])
 
 const enqueueP: EnqueueP = newCommand => state => [...state, newCommand]

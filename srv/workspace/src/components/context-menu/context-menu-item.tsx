@@ -1,13 +1,12 @@
-import { useHotkeys } from "react-hotkeys-hook"
 import { Either } from "#lib/either/mod"
+import { useAccelerator } from "$hooks/use-accelerator"
 import { getCommands } from "$streams/commands"
-import { ContextMenuItem, getContextMenu } from "$streams/context-menu"
+import { ContextMenuItem } from "$streams/context-menu"
 import RenderFromNullable from "$components/render-from-nullable"
 import ActionListItem from "$components/action-list-item"
 import Accelerator from "$components/accelerator"
 
 const commands = getCommands()
-const contextMenu = getContextMenu()
 
 type _P = { target: HTMLElement; item: ContextMenuItem; payload?: any }
 export default function MenuItem({ item, target, payload: p }: _P) {
@@ -17,9 +16,9 @@ export default function MenuItem({ item, target, payload: p }: _P) {
 		Either.fromNullable(item.accelerator)
 			.chain(() => Either.fromBoolean(() => !isDisabled))
 			.map(() => commands.emit(item.commandName, payload))
-			.map(() => contextMenu.hide())
+			.map(() => commands.emit("context-menu.hide"))
 
-	useHotkeys(item.accelerator ?? [], emitContextMenuItemCommand)
+	useAccelerator(item.accelerator, emitContextMenuItemCommand)
 
 	return (
 		<ActionListItem

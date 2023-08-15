@@ -4,7 +4,10 @@ import { BehaviorSubject } from "rxjs"
 import { Binary, Curry, Nullable, Thunk, Unary, callOnce } from "#lib/tau/mod"
 import { Logger } from "#lib/logger/mod"
 import { Either } from "#lib/either/mod"
+import { getCommands } from "$streams/commands"
 import Null from "$components/null"
+
+const commands = getCommands()
 
 // --- Public ---
 
@@ -23,7 +26,7 @@ export type ContextMenuItem<T = any> = {
 	type: ContextMenuItemType
 
 	/**
-	 * Name of the context command to be invoked when the context menu item is used.
+	 * Name of the command to be invoked when the context menu item is used.
 	 */
 	commandName: `${string}.${string}`
 
@@ -145,51 +148,24 @@ export type ContextMenu = ShowContextMenuP & {
 	structure: ContextMenuItem[]
 }
 
-/**
- * Entrypoint for using context menu.
- */
-export const getContextMenu = () => ({
-	/**
-	 * Show context menu for given target element as well as mouse (x, y) coordinate.
-	 */
-	show,
-
-	/**
-	 * Hide context menu.
-	 */
-	hide,
-
-	/**
-	 * Clear context menu items.
-	 */
-	clear,
-
-	/**
-	 * Add context menu item.
-	 */
-	add,
-
-	/**
-	 * Remove context menu item.
-	 */
-	remove,
-})
-
 // --- Internal ---
 
 export type __ContextMenu$ = Observable<Nullable<ContextMenu>>
 export const __initContextMenu: InitContextMenu = callOnce(({ logger }) => {
 	logger.debug("Initializing context menu")
 
+	commands.on("context-menu.show", ({ payload }) => show(payload))
+	commands.on("context-menu.add", ({ payload }) => add(payload))
+	commands.on("context-menu.remove", ({ payload }) => remove(payload))
+	commands.on("context-menu.hide", hide)
+
 	return contextMenu$
 })
 
 type AddP = Curry<Binary<ContextMenuItem, ContextMenuItem[], ContextMenuItem[]>>
 type RemoveP = Curry<Binary<string, ContextMenuItem[], ContextMenuItem[]>>
-type ClearP = Thunk<Thunk<ContextMenuItem[]>>
 type Add = Unary<ContextMenuItem, void>
 type Remove = Unary<string, void>
-type Clear = Thunk<void>
 type Show = Unary<ShowContextMenuP, void>
 type Hide = Thunk<void>
 type InitContextMenuP = { logger: Logger }
@@ -197,34 +173,25 @@ type InitContextMenu = Unary<InitContextMenuP, Nullable<__ContextMenu$>>
 
 const add: Add = item => add$.next(item)
 const remove: Remove = commandName => remove$.next(commandName)
-const clear: Clear = () => clear$.next(null)
 const show: Show = params => params$.next(params)
 const hide: Hide = () => params$.next(null)
 
-const addP: AddP = newContextMenuItem => state =>
-	state.some(item => item.commandName === newContextMenuItem.commandName)
-		? state
-		: [...state, newContextMenuItem]
+const addP: AddP = item => state =>
+	state.some(({ commandName }) => commandName === item.commandName) ? state : [...state, item]
 const removeP: RemoveP = name => state => state.filter(a => a.commandName !== name)
-const clearP: ClearP = () => () => []
 
 const params$ = new BehaviorSubject<Nullable<ShowContextMenuP>>(null)
 const add$ = new Subject<ContextMenuItem>()
 const remove$ = new Subject<string>()
-const clear$ = new Subject<null>()
-const contextMenuItems$ = merge(
-	add$.pipe(map(addP)),
-	remove$.pipe(map(removeP)),
-	clear$.pipe(map(clearP))
-).pipe(
+const globalContextMenuItems$ = merge(add$.pipe(map(addP)), remove$.pipe(map(removeP))).pipe(
 	scan((acc, f) => f(acc), [] as ContextMenuItem[]),
 	shareReplay(1)
 )
 
-contextMenuItems$.subscribe()
+globalContextMenuItems$.subscribe()
 
 const contextMenu$ = params$.pipe(
-	combineLatestWith(contextMenuItems$),
+	combineLatestWith(globalContextMenuItems$),
 	map(([state, items]) =>
 		Either.fromNullable(state).fold(Null, state => ({
 			...state,

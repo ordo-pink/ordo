@@ -7,7 +7,6 @@ import {
 	Hosts,
 } from "../streams/auth"
 import { getCommands } from "$streams/commands"
-import { useCommandPalette } from "../streams/command-palette"
 import { AiOutlineLogout, AiOutlineAim } from "react-icons/ai"
 import { useExtensions } from "../streams/extensions"
 import Asdf from "./asdf"
@@ -18,7 +17,6 @@ export const useOnAuthenticated = (hosts: Hosts) => {
 	const isAuthenticated = useAuthStatus()
 	const us0 = useUserAPIService0()
 	const ms0 = useMetadataAPIService0()
-	const commandPalette = useCommandPalette()
 	const exts = useExtensions()
 
 	useEffect(() => {
@@ -31,17 +29,11 @@ export const useOnAuthenticated = (hosts: Hosts) => {
 			commands.emit("router.open-external", { url: `${hosts.web}/sign-out`, newTab: false })
 		}
 
-		commandPalette.addItem({
-			commandName: "core.sign-out",
-			readableName: "Sign out",
-			Icon: AiOutlineLogout,
-			onSelect: () => commands.emit("core.sign-out"),
-		})
-
 		commands.on("core.refresh-user-info", handleRefreshUserInfo)
 		commands.on("core.refresh-metadata-root", handleRefreshMetadataRoot)
 		commands.on("core.sign-out", handleSignOut)
 
+		// TODO: Remove
 		exts.activities.add("test", {
 			Component: Asdf,
 			Icon: AiOutlineAim,
@@ -50,13 +42,19 @@ export const useOnAuthenticated = (hosts: Hosts) => {
 
 		commands.emit("core.refresh-user-info")
 		commands.emit("core.refresh-metadata-root")
+		commands.emit("command-palette.add", {
+			id: "core.sign-out",
+			readableName: "Sign out",
+			Icon: AiOutlineLogout,
+			onSelect: () => commands.emit("core.sign-out"),
+		})
 
 		return () => {
 			commands.off("core.refresh-user-info", handleRefreshUserInfo)
 			commands.off("core.refresh-metadata-root", handleRefreshMetadataRoot)
 			commands.off("core.sign-out", handleSignOut)
 
-			commandPalette.removeItem("core.sign-out")
+			commands.emit("command-palette.remove", "core.sign-out")
 
 			exts.activities.remove("test")
 		}

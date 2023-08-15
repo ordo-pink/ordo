@@ -8,17 +8,31 @@ import { Switch } from "#lib/switch/mod"
 
 type _P = { accelerator: string }
 export default function Accelerator({ accelerator }: _P) {
+	const hotkeys = accelerator.split("||")
+
+	return (
+		<div className="flex space-x-2">
+			{hotkeys.map(accelerator => (
+				<Hotkey key={accelerator} accelerator={accelerator} />
+			))}
+		</div>
+	)
+}
+
+const Hotkey = ({ accelerator }: _P) => {
 	const split = accelerator.split("+")
-	const alt = isDarwin ? "⌥" : "Alt"
-	const ctrl = isDarwin ? "⌘" : "Ctrl"
+	const meta = isDarwin ? "⌥" : "Alt"
+	const mod = isDarwin ? "⌘" : "Ctrl"
+	const ctrl = "Ctrl"
 
 	const symbol = split[split.length - 1].toLowerCase()
 
 	return (
 		<div className="hidden md:flex shrink-0 items-center space-x-1 text-neutral-500 dark:text-neutral-300 text-xs">
-			{split.includes("alt") && <div>{alt} +</div>}
-			{split.includes("option") && <div>⌥ +</div>}
 			{split.includes("ctrl") && <div>{ctrl} +</div>}
+			{split.includes("meta") && <div>{meta} +</div>}
+			{split.includes("option") && <div>⌥ +</div>}
+			{split.includes("mod") && <div>{mod} +</div>}
 			{split.includes("shift") && <div>⇧ +</div>}
 
 			<Key symbol={symbol} />

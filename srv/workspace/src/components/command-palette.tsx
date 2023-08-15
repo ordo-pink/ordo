@@ -4,11 +4,14 @@ import { BsSearch } from "react-icons/bs"
 import Fuse from "fuse.js"
 import { Switch } from "#lib/switch/mod"
 import { noop } from "#lib/tau/mod"
+import { useAccelerator } from "$hooks/use-accelerator"
 import { CommandPaletteItem } from "$streams/command-palette"
-import { useCommandPalette } from "$streams/command-palette"
+import { getCommands } from "$streams/commands"
+import RenderFromNullable from "$components/render-from-nullable"
 import ActionListItem from "$components/action-list-item"
-import RenderFromNullable from "./render-from-nullable"
 import Accelerator from "$components/accelerator"
+
+const commands = getCommands()
 
 type Props = {
 	items: CommandPaletteItem[]
@@ -16,13 +19,8 @@ type Props = {
 
 const fuse = new Fuse([] as CommandPaletteItem[], { keys: ["name"] })
 
-// TODO: Make accelerators work
 export default function CommandPaletteModal({ items }: Props) {
-	const { hide } = useCommandPalette()
-
-	// const { t } = useTranslation("ordo")
-
-	useHotkeys("Esc", hide)
+	useHotkeys("Esc", () => commands.emit("command-palette.close"))
 
 	const [currentIndex, setCurrentIndex] = useState(0)
 	const [inputValue, setInputValue] = useState("")
@@ -48,14 +46,10 @@ export default function CommandPaletteModal({ items }: Props) {
 		setInputValue(event.target.value)
 	}
 
-	const handleEnter = (event: KeyboardEvent<HTMLInputElement>) => {
-		event.preventDefault()
-		event.stopPropagation()
-
-		const selectedItem = visibleItems[currentIndex]
-		handleEscape()
-
+	const handleEnter = (index: number) => {
+		const selectedItem = visibleItems[index]
 		selectedItem.onSelect()
+		handleEscape()
 	}
 
 	const handleArrowUp = (event: KeyboardEvent<HTMLInputElement>) => {
@@ -75,13 +69,13 @@ export default function CommandPaletteModal({ items }: Props) {
 	const handleEscape = () => {
 		setInputValue("")
 		setCurrentIndex(0)
-		hide()
+		commands.emit("command-palette.hide")
 	}
 
 	const handleKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
 		Switch.of(event.key)
 			.case("Escape", () => handleEscape())
-			.case("Enter", () => handleEnter(event))
+			.case("Enter", () => handleEnter(currentIndex))
 			.case("ArrowUp", () => handleArrowUp(event))
 			.case("ArrowDown", () => handleArrowDown(event))
 			.default(noop)
@@ -105,29 +99,37 @@ export default function CommandPaletteModal({ items }: Props) {
 			</div>
 
 			<div className="px-2 py-4 overflow-y-auto h-[32rem]">
-				{visibleItems.map(
-					(
-						{ commandName: id, readableName: name, Icon, Comment, onSelect, accelerator },
-						index
-					) => (
-						<ActionListItem
-							key={id}
-							text={name}
-							Icon={Icon || (() => null)}
-							current={currentIndex === index}
-							onClick={() => {
-								handleEscape()
-								onSelect()
-							}}
-							large
-						>
-							<RenderFromNullable having={accelerator}>
-								<Accelerator accelerator={accelerator!} />
-							</RenderFromNullable>
-						</ActionListItem>
-					)
-				)}
+				{visibleItems.map((item, index) => (
+					<Item
+						key={item.id}
+						readableName={item.readableName}
+						commandName={item.id}
+						Icon={item.Icon}
+						accelerator={item.accelerator}
+						isCurrent={currentIndex === index}
+						onSelect={() => handleEnter(index)}
+					/>
+				))}
 			</div>
 		</div>
+	)
+}
+
+const Item = ({ commandName, readableName, Icon, accelerator, isCurrent, onSelect }: any) => {
+	useAccelerator(accelerator, onSelect)
+
+	return (
+		<ActionListItem
+			key={commandName}
+			text={readableName}
+			Icon={Icon || (() => null)}
+			current={isCurrent}
+			onClick={onSelect}
+			large
+		>
+			<RenderFromNullable having={accelerator}>
+				<Accelerator accelerator={accelerator!} />
+			</RenderFromNullable>
+		</ActionListItem>
 	)
 }

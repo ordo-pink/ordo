@@ -44,8 +44,8 @@ export default function ActionListItem({
 	return href ? (
 		<Link className="no-underline !text-neutral-800 dark:!text-neutral-200" href={href}>
 			<div
-				className={`py-2 md:py-0.5 rounded-md px-2 flex space-x-8 justify-between items-center select-none ${
-					large && "px-4 py-2 text-lg"
+				className={`p-2 md:py-0.5 rounded-md flex space-x-8 justify-between items-center select-none ${
+					large && "p-4 text-lg"
 				} ${
 					disabled
 						? "text-neutral-300 dark:text-neutral-400"
@@ -75,8 +75,8 @@ export default function ActionListItem({
 	) : (
 		<div>
 			<div
-				className={`py-2 md:py-0.5 rounded-md px-2 flex space-x-8 justify-between items-center select-none ${
-					large && "px-4 py-2 text-lg"
+				className={`p-2 md:py-0.5 rounded-md flex space-x-8 justify-between items-center select-none ${
+					large && "p-4 text-lg"
 				} ${
 					disabled
 						? "text-neutral-300 dark:text-neutral-400"

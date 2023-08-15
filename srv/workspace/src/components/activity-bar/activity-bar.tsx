@@ -1,7 +1,5 @@
 import { BsThreeDotsVertical } from "react-icons/bs"
 import { getCommands } from "$streams/commands"
-import { useCommandPaletteItems } from "$streams/command-palette"
-import { getContextMenu } from "$streams/context-menu"
 import { useActivities } from "$streams/extensions"
 import { useSidebar } from "$streams/sidebar"
 import { useUser } from "$streams/auth"
@@ -9,23 +7,26 @@ import ActivityItem from "$components/activity-bar/activity"
 import Null from "$components/null"
 import { MouseEvent } from "react"
 import { Unary } from "#lib/tau/mod"
+import { __CommandPalette$ } from "$streams/command-palette"
+import { useSubscription } from "$hooks/use-subscription"
+import { ShowContextMenuP } from "$streams/context-menu"
 
 type ShowContextMenu = Unary<MouseEvent<HTMLDivElement>, void>
 
 const commands = getCommands()
-const contextMenu = getContextMenu()
 
-export default function ActivityBar() {
+type _P = { commandPalette$: __CommandPalette$ }
+export default function ActivityBar({ commandPalette$ }: _P) {
 	const user = useUser()
 	const sidebar = useSidebar()
 	const activities = useActivities()
-	const commandPaletteItems = useCommandPaletteItems()
+	const commandPaletteItems = useSubscription(commandPalette$)
 
 	const isSidebarCollapsed = sidebar.disabled || sidebar.sizes[0] === 0
 
 	const showCommandPalette = () => commands.emit("command-palette.show", commandPaletteItems)
-	const showContextMenu: ShowContextMenu = e =>
-		contextMenu.show({ x: e.clientX, y: e.clientY, target: e.currentTarget })
+	const showContextMenu: ShowContextMenu = ({ clientX: x, clientY: y, currentTarget: target }) =>
+		commands.emit<ShowContextMenuP>("context-menu.show", { x, y, target })
 
 	return (
 		<div

@@ -1,22 +1,22 @@
-import { useHotkeys } from "react-hotkeys-hook"
 import { BsThreeDotsVertical } from "react-icons/bs"
 import { MouseEvent, PropsWithChildren } from "react"
 import { getCommands } from "$streams/commands"
-import { useCommandPaletteItems } from "$streams/command-palette"
-import { getContextMenu } from "$streams/context-menu"
 import { useSidebar } from "$streams/sidebar"
 import { useUser } from "$streams/auth"
 import UsedSpace from "$components/used-space"
 import Null from "$components/null"
+import { __CommandPalette$ } from "$streams/command-palette"
+import { useSubscription } from "$hooks/use-subscription"
+import { Nullable } from "#lib/tau/mod"
 
 const commands = getCommands()
-const contextMenu = getContextMenu()
 
-type _P = { isNarrow: boolean }
-export default function Sidebar({ children, isNarrow }: PropsWithChildren<_P>) {
+// TODO: Use hosts
+type _P = PropsWithChildren<{ isNarrow: boolean; commandPalette$: Nullable<__CommandPalette$> }>
+export default function Sidebar({ children, isNarrow, commandPalette$ }: _P) {
 	const user = useUser()
 	const sidebar = useSidebar()
-	const commandPaletteItems = useCommandPaletteItems()
+	const commandPaletteItems = useSubscription(commandPalette$)
 
 	const onSidebarClick = () => {
 		if (!isNarrow || sidebar.disabled || sidebar.sizes[0] === 0) return
@@ -25,9 +25,11 @@ export default function Sidebar({ children, isNarrow }: PropsWithChildren<_P>) {
 
 	const openCommandPalette = () => commands.emit("command-palette.show", commandPaletteItems)
 	const showContextMenu = (event: MouseEvent<HTMLDivElement>) =>
-		contextMenu.show({ x: event.clientX, y: event.clientY, target: event.currentTarget })
-
-	useHotkeys("ctrl+shift+p", openCommandPalette)
+		commands.emit("context-menu.show", {
+			x: event.clientX,
+			y: event.clientY,
+			target: event.currentTarget,
+		})
 
 	return (
 		<div

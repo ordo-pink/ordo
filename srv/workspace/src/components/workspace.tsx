@@ -8,14 +8,17 @@ import { useCurrentActivity, Activity } from "../streams/extensions"
 import { useSidebar, SidebarState } from "../streams/sidebar"
 import { getCommands } from "$streams/commands"
 import Sidebar from "./sidebar"
+import { __CommandPalette$ } from "$streams/command-palette"
 
 // TODO: Render Welcome page if activity is null
+// TODO: Extract internal components to separate files
 
 // --- Public ---
 
 const commands = getCommands()
 
-export default function Workspace() {
+type _P = { commandPalette$: Nullable<__CommandPalette$> }
+export default function Workspace({ commandPalette$ }: _P) {
 	const sidebar = useSidebar()
 	const activity = useCurrentActivity()
 
@@ -23,7 +26,9 @@ export default function Workspace() {
 		.chain(state => Either.fromBoolean(() => !state.disabled))
 		.fold(
 			() => <DisabledSidebar activity={activity} />,
-			() => <EnabledSidebar sidebar={sidebar} activity={activity} />
+			() => (
+				<EnabledSidebar commandPalette$={commandPalette$} sidebar={sidebar} activity={activity} />
+			)
 		)
 }
 
@@ -31,7 +36,10 @@ export default function Workspace() {
 
 type OnDragEndFn = Unary<[number, number], void>
 type DisabledSidebarProps = { activity: Nullable<Activity> }
-type EnabledSidebarProps = DisabledSidebarProps & { sidebar: SidebarState }
+type EnabledSidebarP = DisabledSidebarProps & {
+	sidebar: SidebarState
+	commandPalette$: Nullable<__CommandPalette$>
+}
 
 const DisabledSidebar = ({ activity }: DisabledSidebarProps) =>
 	Either.fromNullable(activity).fold(
@@ -43,7 +51,7 @@ const DisabledSidebar = ({ activity }: DisabledSidebarProps) =>
 		)
 	)
 
-const EnabledSidebar = ({ sidebar, activity }: EnabledSidebarProps) => {
+const EnabledSidebar = ({ sidebar, activity, commandPalette$ }: EnabledSidebarP) => {
 	const [windowWidth] = useWindowSize()
 
 	const [isNarrow, setIsNarrow] = useState(true)
@@ -101,7 +109,7 @@ const EnabledSidebar = ({ sidebar, activity }: EnabledSidebarProps) => {
 				direction="horizontal"
 			>
 				<div className={`sidebar h-full ${sizes[0] <= 5 ? "hidden" : "block"}`}>
-					<Sidebar isNarrow={isNarrow} />
+					<Sidebar commandPalette$={commandPalette$} isNarrow={isNarrow} />
 				</div>
 
 				<div className={`workspace h-full w-full ${sizes[1] <= 5 ? "hidden" : "block"}`}>

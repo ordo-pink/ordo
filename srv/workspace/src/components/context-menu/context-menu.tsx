@@ -2,11 +2,12 @@ import { useEffect, useState } from "react"
 import { useHotkeys } from "react-hotkeys-hook"
 import { Either } from "#lib/either/mod"
 import { useSubscription } from "$hooks/use-subscription"
-import { ContextMenuItem, __ContextMenu$, getContextMenu } from "$streams/context-menu"
+import { ContextMenuItem, __ContextMenu$ } from "$streams/context-menu"
 import ContextMenuItemList from "$components/context-menu/context-menu-item-list"
 import Null from "$components/null"
+import { getCommands } from "$streams/commands"
 
-const contextMenu = getContextMenu()
+const commands = getCommands()
 
 type _P = { menu$: __ContextMenu$ }
 export default function ContextMenu({ menu$ }: _P) {
@@ -17,7 +18,7 @@ export default function ContextMenu({ menu$ }: _P) {
 
 	const menu = useSubscription(menu$)
 
-	useHotkeys("Esc", contextMenu.hide)
+	useHotkeys("Esc", () => commands.emit("context-menu.hide"))
 
 	useEffect(() => {
 		if (!menu) {

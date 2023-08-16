@@ -3,7 +3,7 @@
 
 // deno-lint-ignore-file no-explicit-any
 
-import { Nullable, keysOf, noop } from "#lib/tau/mod.ts"
+import { Nullable, keysOf, noop } from "@ordo-pink/tau"
 
 type UnderOath<T> = T extends object & {
 	and(onfulfilled: infer F, ...args: infer _): any
@@ -61,7 +61,9 @@ export class Oath<TRight, TLeft = never> {
 			try {
 				resolve(await f())
 			} catch (e) {
-				reject(e)
+				console.log(e)
+
+				reject(e instanceof Error ? e : (new Error(String(e)) as any))
 			}
 		})
 	}
@@ -280,7 +282,9 @@ export class Oath<TRight, TLeft = never> {
 						if (forked.then) return Oath.from(() => forked).fork(reject as any, resolve as any)
 						return resolve(forked)
 					} catch (e) {
-						reject(e)
+						console.log(e)
+
+						reject(e instanceof Error ? e : (new Error(String(e)) as any))
 					}
 				}
 			)
@@ -301,7 +305,9 @@ export class Oath<TRight, TLeft = never> {
 						if (forked.then) return Oath.from(() => forked)
 						return resolve(forked)
 					} catch (e) {
-						reject(e)
+						console.log(e)
+
+						reject(e instanceof Error ? e : (new Error(String(e)) as any))
 					}
 				},
 				b => resolve(b)
@@ -309,7 +315,7 @@ export class Oath<TRight, TLeft = never> {
 		)
 	}
 
-	public fork<TNewRight, TNewLeft>(
+	public async fork<TNewRight, TNewLeft>(
 		onLeft: (error: TLeft) => TNewLeft,
 		onRight: (value: TRight) => TNewRight
 	): Promise<TNewRight> {
@@ -320,19 +326,19 @@ export class Oath<TRight, TLeft = never> {
 		}).then((x: any) => onRight(x), onLeft) as any
 	}
 
-	public toPromise() {
+	public async toPromise() {
 		return new Promise<TRight>((resolve, reject) => {
 			this.resolver(resolve as any, reject as any)
 		})
 	}
 
-	public orElse<TNewLeft>(f: (error: TLeft) => TNewLeft) {
+	public async orElse<TNewLeft>(f: (error: TLeft) => TNewLeft) {
 		return new Promise<TRight>((resolve, reject) =>
 			this.resolver(resolve as any, reject as any)
 		).catch(f)
 	}
 
-	public orNothing() {
+	public async orNothing() {
 		return new Promise<TRight>((resolve, reject) =>
 			this.resolver(resolve as any, reject as any)
 		).catch(() => void 0)

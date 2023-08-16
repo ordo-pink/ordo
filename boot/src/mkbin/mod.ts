@@ -6,7 +6,7 @@ import type { License } from "#lib/binutil/mod.ts"
 import { Command } from "#x/cliffy@v1.0.0-rc.2/command/mod.ts"
 import { green, red, underline } from "#std/fmt/colors.ts"
 import { Switch } from "#lib/switch/mod.ts"
-import { main } from "./src/impl.ts"
+import { mkbin } from "./src/impl.ts"
 import { ConsoleLogger } from "#lib/logger/mod.ts"
 
 const opts = await new Command()
@@ -31,7 +31,7 @@ const opts = await new Command()
 const name = opts.args[0].toLocaleLowerCase()
 const license = opts.options.license
 
-await main(name, license as License).fork(
+await mkbin(name, license as License).fork(
 	() => ConsoleLogger.error(`${red("✗")} Bin "${name}" already exists.`),
 	() => ConsoleLogger.notice(`${green("✓")} ${underline(name)} created!`)
 )

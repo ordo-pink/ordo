@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: Copyright 2023, 谢尔盖||↓ and the Ordo.pink contributors
 // SPDX-License-Identifier: MIT
 
-import type { ValidatorFn, Unpack } from "#lib/tau/mod.ts"
+import type { ValidatorFn, Unpack } from "@ordo-pink/tau"
 
 /**
  * Helper object that contains a pointing interface to put value

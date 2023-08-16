@@ -21,7 +21,7 @@ export const callOnce = <T extends any[], R>(fn: (...args: T) => R) => {
 	let wasCalled = false
 
 	return (...args: T): R => {
-		if (wasCalled) return
+		if (wasCalled) return void 0 as unknown as R
 
 		const result = fn(...args)
 

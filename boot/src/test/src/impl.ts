@@ -1,10 +1,21 @@
-import { getDenoPath, runDenoCommand } from "#lib/binutil/mod.ts"
-import { Oath } from "#lib/oath/mod.ts"
+import { Subprocess } from "bun"
+import { runCommand } from "@ordo-pink/binutil"
+import { Binary, Curry, Thunk, Unary } from "@ordo-pink/tau"
+import { Oath } from "@ordo-pink/oath"
+import { identity } from "ramda"
 
-export const test = (coverage?: boolean) =>
-	Oath.of(getDenoPath()).chain(path =>
-		Oath.of(["test", "--allow-run", "--allow-read", "--allow-write", "--parallel"])
-			.map(args => (coverage ? args.concat(["--coverage=./var/coverage"]) : args))
-			.map(args => args.concat(Deno.cwd()))
-			.chain(args => runDenoCommand(path, args))
-	)
+type _P = { coverage?: boolean }
+export const test: Unary<_P, void> = async options => {
+	await Oath.of("bun test .")
+		.chain(setTestCommand(options.coverage))
+		.fix(identity)
+		.map(run)
+		.orNothing()
+}
+
+const run: Unary<string, Subprocess> = command => runCommand({ command })
+const enableCov: Unary<string, Thunk<string>> = cmd => () => `${cmd} --coverage`
+const disableCov: Unary<string, Thunk<string>> = cmd => () => cmd
+const isCovOn: Unary<boolean | void, Thunk<boolean>> = x => () => Boolean(x)
+const setTestCommand: Curry<Binary<boolean | void, string, Oath<string, string>>> = cov => cmd =>
+	Oath.fromBoolean(isCovOn(cov), enableCov(cmd), disableCov(cmd))

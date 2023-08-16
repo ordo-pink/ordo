@@ -1,5 +1,18 @@
 {
   "dependencies": {
+    "case": "^1.6.3",
+    "commander": "^11.0.0",
+    "ramda": "^0.29.0",
     "react-router-dom": "^6.15.0"
+  },
+  "name": "@ordo-pink/ordo",
+  "module": "index.ts",
+  "type": "module",
+  "devDependencies": {
+    "@types/ramda": "^0.29.3",
+    "bun-types": "latest"
+  },
+  "peerDependencies": {
+    "typescript": "^5.0.0"
   }
 }

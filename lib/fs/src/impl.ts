@@ -1,12 +1,11 @@
 // SPDX-FileCopyrightText: Copyright 2023, 谢尔盖||↓ and the Ordo.pink contributors
 // SPDX-License-Identifier: MIT
 
-// deno-lint-ignore-file no-explicit-any
-
-import { join } from "#std/path/mod.ts"
-import { Oath } from "#lib/oath/mod.ts"
-import { F, prop } from "#ramda"
-import { noop } from "#lib/tau/mod.ts"
+import { join } from "path"
+import { Oath } from "@ordo-pink/oath"
+import { noop } from "@ordo-pink/tau"
+import { cwd } from "process"
+import { promises } from "fs"
 
 export const oathify =
 	<Args extends any[], Result extends Promise<any>>(f: (...args: Args) => Result) =>
@@ -20,40 +19,37 @@ export const getParentPath = (path: string) => {
 }
 
 export const getAbsolutePath = (path: string) => {
-	return join(Deno.cwd(), path)
+	return join(cwd(), path)
 }
 
-export const mkdir = oathify(Deno.mkdir)
-export const rmdir = oathify(Deno.remove)
-export const createFile = oathify(Deno.create)
-export const writeFile = oathify(Deno.writeFile)
-export const readFile = oathify(Deno.readFile)
-export const removeFile = rmdir
-export const stat = oathify(Deno.stat)
+export const mkdir0 = oathify(promises.mkdir)
+export const rmdir0 = oathify(promises.rm)
+export const createFile0 = oathify(promises.writeFile)
+export const writeFile0 = createFile0
+export const readFile0 = oathify(promises.readFile)
+export const removeFile0 = rmdir0
+export const stat0 = (...args: Parameters<typeof promises.stat>) =>
+	Oath.from(() => promises.stat(...args).catch(() => Promise.reject(null)))
+export const readdir0 = oathify(promises.readdir)
+export const mkdirRecursive0 = (path: string) => mkdir0(path, { recursive: true })
 
-export const mkdirRecursive = (path: string) => mkdir(path, { recursive: true })
-
-export const createDirectoryIfNotExists = (path: string) =>
-	stat(path)
+export const createDirectoryIfNotExists0 = (path: string) =>
+	stat0(path)
+		.fix(() => mkdirRecursive0(path))
 		.map(noop)
-		.fix(() => mkdirRecursive(path))
 
-export const createParentDirectoryFor = (path: string) =>
-	Oath.of(path).map(getParentPath).chain(createDirectoryIfNotExists)
+export const createParentDirectory0 = (path: string) =>
+	Oath.of(path).map(getParentPath).chain(createDirectoryIfNotExists0)
 
-export const readdir = (path: string) =>
-	Oath.from(async () => {
-		const result = [] as Deno.DirEntry[]
+export const fileExists0 = (path: string) =>
+	stat0(path)
+		.map(stat => stat.isFile())
+		.fix(() => false)
 
-		for await (const item of Deno.readDir(path)) {
-			result.push(item)
-		}
+export const directoryExists0 = (path: string) =>
+	stat0(path)
+		.map(stat => stat.isDirectory())
+		.fix(() => false)
 
-		return result
-	})
-
-export const fileExists = (path: string) => stat(path).map(prop("isFile")).fix(F)
-export const directoryExists = (path: string) => stat(path).map(prop("isDirectory")).fix(F)
-
-export const isFile = fileExists
-export const isDirectory = directoryExists
+export const isFile0 = fileExists0
+export const isDirectory0 = directoryExists0

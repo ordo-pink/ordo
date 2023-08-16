@@ -1,31 +1,31 @@
 // SPDX-FileCopyrightText: Copyright 2023, 谢尔盖||↓ and the Ordo.pink contributors
 // SPDX-License-Identifier: MIT
 
-import type { License } from "#lib/binutil/mod.ts"
+import type { License } from "@ordo-pink/binutil"
 
-import { titleCase, camelCase } from "#x/case@2.1.1/mod.ts"
-import pascalCase from "#x/case@2.1.1/pascalCase.ts"
-import { createRepositoryFile, getLicense, getSPDXRecord } from "#lib/binutil/mod.ts"
-import { isReservedJavaScriptKeyword } from "#lib/rkwjs/mod.ts"
-import { getAbsolutePath, isDirectory } from "#lib/fs/mod.ts"
-import { Oath } from "#lib/oath/mod.ts"
-import { noop } from "#lib/tau/mod.ts"
+import { createRepositoryFile0, getLicense, getSPDXRecord } from "@ordo-pink/binutil"
+import { isReservedJavaScriptKeyword } from "@ordo-pink/rkwjs"
+import { getAbsolutePath, isDirectory0 } from "@ordo-pink/fs"
+import { Oath } from "@ordo-pink/oath"
+import { noop } from "@ordo-pink/tau"
+import Case from "case"
 
 // --- Public ---
 
-export const main = (name: string, license: License) =>
+export const mksrv = (name: string, license: License) =>
 	Oath.of(isReservedJavaScriptKeyword(name) ? `${name}-srv` : name).chain(name =>
 		Oath.of(getAbsolutePath(`./srv/${name}`)).chain(path =>
-			isDirectory(path)
+			isDirectory0(path)
 				.chain(exists => Oath.fromBoolean(() => !exists, noop, noop))
+				.tap(console.log)
 				.chain(() =>
 					Oath.all([
-						createRepositoryFile(`${path}/license`, getLicense(license)),
-						createRepositoryFile(`${path}/readme.md`, readme(name)),
-						createRepositoryFile(`${path}/mod.ts`, mod(license)),
-						createRepositoryFile(`${path}/src/impl.ts`, impl(name, license)),
-						createRepositoryFile(`${path}/src/impl.test.ts`, test(name, license)),
-						createRepositoryFile(`${path}/src/types.ts`, types(name, license)),
+						createRepositoryFile0(`${path}/license`, getLicense(license)),
+						createRepositoryFile0(`${path}/readme.md`, readme(name)),
+						createRepositoryFile0(`${path}/mod.ts`, mod(license)),
+						createRepositoryFile0(`${path}/src/impl.ts`, impl(name, license)),
+						createRepositoryFile0(`${path}/src/impl.test.ts`, test(name, license)),
+						createRepositoryFile0(`${path}/src/types.ts`, types(name, license)),
 					])
 				)
 				.map(noop)
@@ -40,21 +40,21 @@ export * from "./src/types.ts"
 `
 
 const impl = (name: string, license: License) => `${getSPDXRecord(license)}
-import type { ${pascalCase(name)} } from "./types.ts"
+import type { ${Case.pascal(name)} } from "./types.ts"
 
-export const ${camelCase(name)}: ${pascalCase(name)} = "${name}"
+export const ${Case.camel(name)}: ${Case.pascal(name)} = "${name}"
 `
 
 const types = (name: string, license: License) => `${getSPDXRecord(license)}
-export type ${pascalCase(name)} = "${name}"
+export type ${Case.pascal(name)} = "${name}"
 `
 
 const test = (name: string, license: License) => `${getSPDXRecord(license)}
 import { assertEquals } from "#std/testing/asserts.ts"
-import { ${camelCase(name)} } from "./impl.ts"
+import { ${Case.camel(name)} } from "./impl.ts"
 
-Deno.test("${name}", () => assertEquals(${camelCase(name)}, "${name}"))
+Deno.test("${name}", () => assertEquals(${Case.camel(name)}, "${name}"))
 `
 
-const readme = (name: string) => `# ${titleCase(name)}
+const readme = (name: string) => `# ${Case.title(name)}
 `

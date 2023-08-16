@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: Copyright 2023, 谢尔盖||↓ and the Ordo.pink contributors
 // SPDX-License-Identifier: MIT
 
-import type { License } from "#lib/binutil/mod.ts"
+import type { License } from "@ordo-pink/binutil"
 
 import { camelCase } from "#x/case@2.1.1/mod.ts"
 import { createRepositoryFile, getLicense, getSPDXRecord } from "#lib/binutil/mod.ts"
@@ -11,7 +11,7 @@ import { noop } from "#lib/tau/mod.ts"
 
 // --- Public ---
 
-export const main = (name: string, license: License) =>
+export const mkbin = (name: string, license: License) =>
 	Oath.of(getAbsolutePath(`boot/src/${name}`)).chain(path =>
 		directoryExists(path)
 			.chain(exists => Oath.fromBoolean(() => !exists, noop, noop))

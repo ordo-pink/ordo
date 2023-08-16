@@ -1,14 +1,16 @@
 // SPDX-FileCopyrightText: Copyright 2023, 谢尔盖||↓ and the Ordo.pink contributors
 // SPDX-License-Identifier: MIT
 
-import { Command } from "#x/cliffy@v1.0.0-rc.2/command/command.ts"
-import { test } from "./src/impl.ts"
+import { Command } from "commander"
+import { test } from "./src/impl"
 
-const opts = await new Command()
+const program = new Command()
+
+program
 	.name("test")
-	.version("0.1.0")
-	.description(`The "test" command runs tests found deeply nested in directories in the project.`)
-	.option("--coverage", "Enable collecting coverage")
-	.parse(Deno.args)
+	.version("0.2.0")
+	.description("Run tests with 'bun test' all over the monorepo.")
+	.option("-c, --coverage", "collect coverage")
+	.action(test)
 
-await test(opts.options.coverage).toPromise()
+program.parse()

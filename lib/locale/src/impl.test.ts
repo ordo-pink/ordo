@@ -1,13 +1,11 @@
-import {
-	TwoLetterLocale,
-	TwoLetterLocaleReadableName,
-	twoLetterLocaleToReadableName,
-} from "./impl.ts"
+// SPDX-FileCopyrightText: Copyright 2023, 谢尔盖||↓ and the Ordo.pink contributors
+// SPDX-License-Identifier: MIT
 
-import { assertEquals } from "#std/testing/asserts.ts"
+import { test, expect } from "bun:test"
+import { TwoLetterLocale, TwoLetterLocaleReadableName, twoLetterLocaleToReadableName } from "./impl"
 
-Deno.test("locale", () => {
+test("locale", () => {
 	const locale = Object.values(TwoLetterLocale).filter(value => Number.isNaN(Number(value)))[0]
 
-	assertEquals(twoLetterLocaleToReadableName(locale), TwoLetterLocaleReadableName[locale])
+	expect(twoLetterLocaleToReadableName(locale)).toEqual(TwoLetterLocaleReadableName[locale])
 })

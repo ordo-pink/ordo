@@ -4,7 +4,7 @@
 // deno-lint-ignore-file no-explicit-any
 import type * as T from "./types.ts"
 
-import { isFunction } from "#lib/tau/mod.ts"
+import { isFunction } from "@ordo-pink/tau"
 
 // --- Public ---
 

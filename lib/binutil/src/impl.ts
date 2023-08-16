@@ -6,6 +6,7 @@ import type { License } from "./types"
 import { writeFile0, createParentDirectory0 } from "@ordo-pink/fs"
 import { Oath } from "@ordo-pink/oath"
 import { SpawnOptions } from "bun"
+import chalk from "chalk"
 
 type RunCommand = (cmd: string, options?: SpawnOptions.OptionsObject) => Oath<void, Error>
 export const runCommand0: RunCommand = (command, options) =>
@@ -16,6 +17,33 @@ export const runCommand0: RunCommand = (command, options) =>
 // TODO: install bun locally in the repo
 export const runBunCommand0: RunCommand = (command, options) =>
 	runCommand0(`bun ${command}`, options)
+
+export const createProgress = () => {
+	let currentLine = ""
+
+	return {
+		start: (msg: string) => {
+			currentLine += msg
+			process.stdout.write(`${chalk.yellow("◌")} ${currentLine}`)
+		},
+		inc: () => {
+			currentLine += "."
+			process.stdout.write(".")
+		},
+		finish: () => {
+			process.stdout.clearLine(0)
+			process.stdout.cursorTo(0)
+			process.stdout.write(`${chalk.green("✔")} ${currentLine}\n`)
+			currentLine = ""
+		},
+		break: () => {
+			process.stdout.clearLine(0)
+			process.stdout.cursorTo(0)
+			process.stdout.write(`${chalk.red("✘")} ${currentLine}\n`)
+			currentLine = ""
+		},
+	}
+}
 
 export const getCurrentYear = () => new Date(Date.now()).getFullYear()
 

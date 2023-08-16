@@ -1,9 +1,7 @@
 // SPDX-FileCopyrightText: Copyright 2023, 谢尔盖||↓ and the Ordo.pink contributors
 // SPDX-License-Identifier: MIT
 
-// deno-lint-ignore-file no-explicit-any
-import type * as T from "./types.ts"
-
+import type * as T from "./types"
 import { isFunction } from "@ordo-pink/tau"
 
 // --- Public ---
@@ -11,6 +9,8 @@ import { isFunction } from "@ordo-pink/tau"
 export const Switch: T.TSwitchStatic = {
 	of: x => swich(x),
 }
+
+// --- Internal ---
 
 const swichMatched = <TContext, TResult extends unknown[] = []>(
 	x: TContext

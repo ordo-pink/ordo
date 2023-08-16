@@ -3,51 +3,84 @@
 
 import type { License } from "@ordo-pink/binutil"
 
-import { camelCase } from "#x/case@2.1.1/mod.ts"
-import { createRepositoryFile, getLicense, getSPDXRecord } from "#lib/binutil/mod.ts"
-import { directoryExists, getAbsolutePath } from "#lib/fs/mod.ts"
-import { Oath } from "#lib/oath/mod.ts"
-import { noop } from "#lib/tau/mod.ts"
+import {
+	createProgress,
+	createRepositoryFile0,
+	getLicense,
+	getSPDXRecord,
+} from "@ordo-pink/binutil"
+import { directoryExists0 } from "@ordo-pink/fs"
+import { Oath } from "@ordo-pink/oath"
+import { noop } from "@ordo-pink/tau"
+import { camel } from "case"
 
 // --- Public ---
 
 export const mkbin = (name: string, license: License) =>
-	Oath.of(getAbsolutePath(`boot/src/${name}`)).chain(path =>
-		directoryExists(path)
-			.chain(exists => Oath.fromBoolean(() => !exists, noop, noop))
-			.chain(() =>
-				Oath.all([
-					createRepositoryFile(`${path}/license`, getLicense(license)),
-					createRepositoryFile(`${path}/mod.ts`, mod(name, license)),
-					createRepositoryFile(`${path}/src/impl.ts`, impl(name, license)),
-					createRepositoryFile(`${path}/src/impl.test.ts`, test(name, license)),
-				])
-			)
-			.map(noop)
-	)
+	Oath.of(`./boot/src/${name}`)
+		.tap(() => progress.start("Initializing new binary"))
+		.chain(path =>
+			directoryExists0(path)
+				.chain(exists =>
+					Oath.fromBoolean(
+						() => !exists,
+						noop,
+						() => `"bin/${name}" already exists!`
+					)
+				)
+				.chain(() =>
+					Oath.all([
+						createRepositoryFile0(`${path}/license`, getLicense(license)).tap(progress.inc),
+						createRepositoryFile0(`${path}/mod.ts`, mod(name, license)).tap(progress.inc),
+						createRepositoryFile0(`${path}/src/impl.ts`, impl(name, license)).tap(progress.inc),
+						createRepositoryFile0(`${path}/src/impl.test.ts`, test(name, license)).tap(
+							progress.inc
+						),
+					])
+				)
+		)
+		.map(progress.finish)
+		.orElse(e => {
+			progress.break()
+			console.error(e)
+			return false
+		})
 
 // --- Internal ---
 
+const progress = createProgress()
+
 const impl = (name: string, license: License) => `${getSPDXRecord(license)}
-export const ${camelCase(name)} = () => {
-	console.log("Hello, ${name} bin")
+export const ${camel(name)} = () => {
+	const message = "Hello from ${name} bin!"
+
+	console.log(message)
+
+	return message
 }`
 
 const mod = (name: string, license: License) => `${getSPDXRecord(license)}
-import { Command } from "#x/cliffy@v1.0.0-rc.2/command/mod.ts"
-import { ${camelCase(name)} } from "./src/impl.ts"
+import { Command } from "commander"
+import { ${camel(name)} } from "./src/impl"
 
-const opts = await new Command()
+const program = new Command()
+
+program
 	.name("${name}")
-	.description("${name} description.")
 	.version("0.1.0")
-	.parse(Deno.args)
+	.description("${name} description.")
+	.action(() => {
+		${camel(name)}()
+	})
 
-${camelCase(name)}()
+program.parse()
 `
 
 const test = (name: string, license: License) => `${getSPDXRecord(license)}
-import { assertEquals } from "#std/testing/asserts.ts"
+import { test, expect } from "bun:test"
+import { ${camel(name)} } from "./impl"
 
-Deno.test("${name} should pass", () => assertEquals(true, true))
+test("${name} should pass", () => {
+	expect(${camel(name)}).toEqual("Hello from ${name} bin!")
+})
 `

@@ -3,7 +3,7 @@
 
 // deno-lint-ignore-file no-explicit-any
 
-import type * as T from "./types.ts"
+import type * as T from "./types"
 
 export const isObject = (x: unknown): x is Record<string, unknown> =>
 	x != null && typeof x === "object" && !Array.isArray(x)

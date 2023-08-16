@@ -3,30 +3,10 @@
 
 import { isFile0, readdir0 } from "@ordo-pink/fs"
 import { Oath } from "@ordo-pink/oath"
-import { runCommand0, runBunCommand0 } from "@ordo-pink/binutil"
-import chalk from "chalk"
+import { runCommand0, runBunCommand0, createProgress } from "@ordo-pink/binutil"
 import { noop } from "@ordo-pink/tau"
 
 // --- Public ---
-
-let currentLine = ""
-
-const progress = {
-	start: (msg: string) => {
-		currentLine += msg
-		process.stdout.write(`${chalk.yellow("◌")} ${currentLine}`)
-	},
-	write: (msg: string) => {
-		currentLine += msg
-		process.stdout.write(msg)
-	},
-	finish: () => {
-		process.stdout.clearLine(0)
-		process.stdout.cursorTo(0)
-		process.stdout.write(`${chalk.green("✔")} ${currentLine}\n`)
-		currentLine = ""
-	},
-}
 
 export const init = () =>
 	Oath.empty()
@@ -42,6 +22,10 @@ export const init = () =>
 		.map(noop)
 		.toPromise()
 
+// Internal
+
+const progress = createProgress()
+
 const initSrv = () =>
 	readdir0("./srv", { withFileTypes: true })
 		.map(dirents => dirents.filter(dirent => dirent.isDirectory()))
@@ -50,7 +34,7 @@ const initSrv = () =>
 			Oath.all(paths.map(path => isFile0(path).map(exists => (exists ? path : (false as const)))))
 		)
 		.map(paths => paths.filter(Boolean) as string[])
-		.chain(paths => Oath.all(paths.map(path => runBunCommand0(`run ${path}`))))
+		.chain(paths => Oath.all(paths.map(path => runBunCommand0(`run ${path}`).tap(progress.inc))))
 		.map(srvs => srvs.length)
 
 const createSymlinks = () =>
@@ -58,9 +42,7 @@ const createSymlinks = () =>
 		.map(dirents => dirents.filter(dirent => dirent.isFile()).map(item => item.name))
 		.chain(files =>
 			Oath.all(
-				files.map(file =>
-					runCommand0(`ln -snf ./etc/init/${file} ${file}`).tap(() => progress.write("."))
-				)
+				files.map(file => runCommand0(`ln -snf ./etc/init/${file} ${file}`).tap(progress.inc))
 			)
 		)
 		.map(links => links.length)
@@ -81,7 +63,7 @@ const compileBin = () =>
 				dirs.map(dir =>
 					runBunCommand0(`build ./boot/src/${dir}/index.ts --compile --outfile ${dir}`)
 						.chain(() => runCommand0(`mv -fv ${dir} bin/${dir}`))
-						.tap(() => progress.write("."))
+						.tap(progress.inc)
 				)
 			)
 		)

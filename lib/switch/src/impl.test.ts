@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 import { test, expect } from "bun:test"
-import { Switch } from "./impl.ts"
+import { Switch } from "./impl"
 
 test("should apply fall into case if the value matches", () =>
 	expect(

@@ -1,20 +1,18 @@
 #!/usr/bin/env bash
 
-# Configuration ---------------------------------------------------------------
+# Configuration
 
 set -e
 
-# Variables -------------------------------------------------------------------
+# Variables
 
 EOL="\n"
 
 PLATFORM=$(uname -ms)
 
 ESBUILD_VERSION="0.18.9" # TODO: Move to init script
-DENO_VERSION="v1.35.1"
+BUN_VERSION="0.7.3" # TODO: Replace with bun
 TAILWIND_VERSION="v3.1.6" # TODO: Move to init script
-
-ln -snf etc/deno/deno.jsonc deno.jsonc
 
 if [ ! -f ./.env ]; then
   cp .env.example .env
@@ -24,7 +22,7 @@ if [ ! -d ./opt ]; then
   mkdir ./opt
 fi
 
-# Internal --------------------------------------------------------------------
+# Internal
 
 # TODO: Move to init script
 function download_tailwind {
@@ -45,26 +43,27 @@ function download_tailwind {
   fi
 }
 
-function download_deno {
-  if [ ! -f ./opt/deno ]; then
+function download_bun {
+  if [ ! -f ./opt/bun ]; then
     if ! command -v unzip >/dev/null; then
-      echo "Error: unzip is required to install Deno"; exit 1
+      echo "Error: unzip is required to proceed"; exit 1
     fi
 
     dir=$(mktemp -d)
-    zip=$dir/deno-$DENO_VERSION.zip
+    zip=$dir/bun-$BUN_VERSION.zip
 
     # Download the binary executable for the current platform
     case $PLATFORM in
-      'Darwin arm64') curl -fLo "$zip" "https://github.com/denoland/deno/releases/download/$DENO_VERSION/deno-aarch64-apple-darwin.zip";;
-      'Darwin x86_64') curl -fLo "$zip" "https://github.com/denoland/deno/releases/download/$DENO_VERSION/deno-x86_64-apple-darwin.zip";;
-      'Linux x86_64') curl -fLo "$zip" "https://github.com/denoland/deno/releases/download/$DENO_VERSION/deno-x86_64-unknown-linux-gnu.zip";;
+      'Darwin arm64') curl -fLo "$zip" "https://github.com/oven-sh/bun/releases/download/bun-v$BUN_VERSION/bun-darwin-aarch64.zip";;
+      'Darwin x86_64') curl -fLo "$zip" "https://github.com/oven-sh/bun/releases/download/bun-v$BUN_VERSION/bun-darwin-x64.zip";;
+      'Linux aarch64' | 'Linux arm64') "https://github.com/oven-sh/bun/releases/download/bun-v$BUN_VERSION/bun-linux-x64.zip";;
+      'Linux x86_64') curl -fLo "$zip" "https://github.com/oven-sh/bun/releases/download/bun-v$BUN_VERSION/bun-linux-x64-baseline.zip";;
       *) echo "Error: Unsupported platform: $PLATFORM"; exit 1;;
     esac
 
   # Extract the binary executable to the opt directory
     unzip -o $zip -d opt &>/dev/null
-    chmod +x opt/deno
+    chmod +x opt/bun
     rm $zip
   fi
 }
@@ -94,41 +93,33 @@ function download_esbuild {
   fi
 }
 
-# Build a binary from given source with Deno and puts it to the bin directory.
+# Build a binary from given source with Bun and puts it to the bin directory.
 function compile_init_script {
-  opt/deno compile \
-    --allow-read \
-    --allow-write \
-    --allow-run \
-    --allow-env \
-    -o bin/init \
-    boot/src/init/mod.ts
+  opt/bun build boot/src/init/index.ts --compile --outfile init && mv -f init bin/init
 }
 
 function start_init_script {
   bin/init
 }
 
-# Download opt binaries -------------------------------------------------------
+# Download opt binaries
 
-## Download ESBuild -----------------------------------------------------------
+## Download ESBuild
 
 download_esbuild
 
-## Download TailwindCSS -------------------------------------------------------
+## Download TailwindCSS
 
 download_tailwind
 
-## Download Deno --------------------------------------------------------------
+## Download Bun
 
-download_deno
+download_bun
 
-# TODO: Move downloading anything but deno to init script
-
-# Build init script -----------------------------------------------------------
+# Build init script
 
 compile_init_script
 
-# Start init script -----------------------------------------------------------
+# Start init script
 
 start_init_script

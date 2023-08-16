@@ -2,28 +2,20 @@
 // SPDX-License-Identifier: MIT
 
 import type { License } from "./types"
-import type { Subprocess } from "bun"
-import type { Unary } from "@ordo-pink/tau"
 
 import { writeFile0, createParentDirectory0 } from "@ordo-pink/fs"
+import { Oath } from "@ordo-pink/oath"
+import { SpawnOptions } from "bun"
 
-type RunCommandP = {
-	command: string
-	cwd?: string
-	env?: Record<string, string>
-}
-type RunCommand = Unary<RunCommandP, Subprocess>
-export const runCommand: RunCommand = ({ command, cwd, env }) =>
-	Bun.spawn(command.trim().split(" "), {
-		cwd,
-		env,
-		stdin: "inherit",
-		stderr: "inherit",
-		stdout: "inherit",
+type RunCommand = (cmd: string, options?: SpawnOptions.OptionsObject) => Oath<void, Error>
+export const runCommand0: RunCommand = (command, options) =>
+	Oath.try(() => {
+		Bun.spawnSync(command.trim().split(" "), options)
 	})
 
 // TODO: install bun locally in the repo
-export const runDenoCommand = (command: string) => runCommand({ command: `bun ${command}` })
+export const runBunCommand0: RunCommand = (command, options) =>
+	runCommand0(`bun ${command}`, options)
 
 export const getCurrentYear = () => new Date(Date.now()).getFullYear()
 

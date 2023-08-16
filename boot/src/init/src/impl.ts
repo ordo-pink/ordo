@@ -1,81 +1,88 @@
 // SPDX-FileCopyrightText: Copyright 2023, 谢尔盖||↓ and the Ordo.pink contributors
 // SPDX-License-Identifier: MIT
 
-import { getDenoPath, runCommand, runDenoCommand } from "#lib/binutil/mod.ts"
-import { isFile, readdir } from "#lib/fs/mod.ts"
-import { Oath } from "#lib/oath/mod.ts"
-import { Binary, Curry, Thunk, Unary } from "#lib/tau/mod.ts"
-import { prop } from "#ramda"
+import { isFile0, readdir0 } from "@ordo-pink/fs"
+import { Oath } from "@ordo-pink/oath"
+import { runCommand0, runBunCommand0 } from "@ordo-pink/binutil"
+import chalk from "chalk"
+import { noop } from "@ordo-pink/tau"
 
 // --- Public ---
 
-export const init: CoverFn = () =>
-	Oath.of(getDenoPath()).chain(path =>
-		compileBin(path)
-			.chain(() => initSrv(path))
-			.chain(createSymlinks)
-	)
+let currentLine = ""
 
-// --- Internal ---
+const progress = {
+	start: (msg: string) => {
+		currentLine += msg
+		process.stdout.write(`${chalk.yellow("◌")} ${currentLine}`)
+	},
+	write: (msg: string) => {
+		currentLine += msg
+		process.stdout.write(msg)
+	},
+	finish: () => {
+		process.stdout.clearLine(0)
+		process.stdout.cursorTo(0)
+		process.stdout.write(`${chalk.green("✔")} ${currentLine}\n`)
+		currentLine = ""
+	},
+}
 
-type CoverFn = Thunk<Oath<number, Error>>
-type InitSrvFn = Unary<string, Oath<number, never>>
-type CreateSymlincsFn = Thunk<Oath<number, never>>
-type CompileBinFn = Unary<string, Oath<number, never>>
-type LogFn = Curry<Binary<string, number, void>>
+export const init = () =>
+	Oath.empty()
+		.tap(() => progress.start("Initializing server applications"))
+		.chain(() => initSrv())
+		.tap(() => progress.finish())
+		.tap(() => progress.start("Creating symbolic links"))
+		.chain(() => createSymlinks())
+		.tap(() => progress.finish())
+		.tap(() => progress.start("Compiling binaries"))
+		.chain(() => compileBin())
+		.tap(() => progress.finish())
+		.map(noop)
+		.toPromise()
 
-const initSrv: InitSrvFn = denoPath =>
-	readdir("./srv")
-		.map(entries => entries.filter(entry => entry.isDirectory))
-		.map(entries =>
-			entries.map(entry =>
-				isFile(`./srv/${entry.name}/bin/init.ts`).map(x =>
-					x ? `./srv/${entry.name}/bin/init.ts` : null
+const initSrv = () =>
+	readdir0("./srv", { withFileTypes: true })
+		.map(dirents => dirents.filter(dirent => dirent.isDirectory()))
+		.map(dirs => dirs.map(dir => `./srv/${dir.name}/bin/asdf.ts`))
+		.chain(paths =>
+			Oath.all(paths.map(path => isFile0(path).map(exists => (exists ? path : (false as const)))))
+		)
+		.map(paths => paths.filter(Boolean) as string[])
+		.chain(paths => Oath.all(paths.map(path => runBunCommand0(`run ${path}`))))
+		.map(srvs => srvs.length)
+
+const createSymlinks = () =>
+	readdir0("./etc/init", { withFileTypes: true })
+		.map(dirents => dirents.filter(dirent => dirent.isFile()).map(item => item.name))
+		.chain(files =>
+			Oath.all(
+				files.map(file =>
+					runCommand0(`ln -snf ./etc/init/${file} ${file}`).tap(() => progress.write("."))
 				)
 			)
 		)
-		.chain(entries => Oath.all(entries))
-		.map(entries => entries.filter(Boolean) as string[])
-		.chain(entries =>
-			Oath.all(
-				entries.map(path =>
-					runDenoCommand(denoPath, [
-						"run",
-						"--allow-read",
-						"--allow-write",
-						"--allow-run",
-						"--allow-env",
-						path,
-					])
-				)
-			).map(prop("length"))
-		)
+		.map(links => links.length)
 
-const createSymlinks: CreateSymlincsFn = () =>
-	readdir("./etc/init")
-		.map(entries => entries.filter(entry => entry.isFile))
-		.chain(entries =>
+const compileBin = () =>
+	readdir0("./boot/src", { withFileTypes: true })
+		.map(dirents => dirents.filter(dirent => dirent.isDirectory()).map(dir => dir.name))
+		.chain(dirs =>
 			Oath.all(
-				entries.map(entry => runCommand("ln", ["-snfv", `./etc/init/${entry.name}`, entry.name]))
-			)
-		)
-		.map(prop("length"))
-
-const compileBin: CompileBinFn = (denoPath: string) =>
-	readdir("./boot/src")
-		.map(entries => entries.filter(entry => entry.isDirectory && entry.name !== "init"))
-		.chain(entries =>
-			Oath.all(
-				entries.map(entry =>
-					runDenoCommand(denoPath, [
-						"compile",
-						"--allow-read",
-						"--allow-write",
-						"--allow-run",
-						`--output=bin/${entry.name}`,
-						`./boot/src/${entry.name}/mod.ts`,
-					])
+				dirs.map(path =>
+					isFile0(`./boot/src/${path}/index.ts`).map(exists => (exists ? path : (false as const)))
 				)
 			)
 		)
-		.map(prop("length"))
+		.map(dirs => dirs.filter(Boolean))
+		.chain(dirs =>
+			Oath.all(
+				dirs.map(dir =>
+					runBunCommand0(`build ./boot/src/${dir}/index.ts --compile --outfile ${dir}`)
+						.chain(() => runCommand0(`mv -fv ${dir} bin/${dir}`))
+						.tap(() => progress.write("."))
+				)
+			)
+		)
+		.map(bins => bins.length)

@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 import { Command } from "commander"
-import { init } from "./src/impl"
+import { init } from "./src"
 
 const program = new Command()
 

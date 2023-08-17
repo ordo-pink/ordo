@@ -2,11 +2,13 @@
 // SPDX-License-Identifier: MIT
 
 import type { License } from "./types"
-
-import { writeFile0, createParentDirectory0 } from "@ordo-pink/fs"
-import { Oath } from "@ordo-pink/oath"
+import { filter, prop, map, pipe } from "ramda"
 import { SpawnOptions } from "bun"
+import { Dirent } from "fs"
 import chalk from "chalk"
+import { writeFile0, createParentDirectory0, isFile0 } from "@ordo-pink/fs"
+import { Oath } from "@ordo-pink/oath"
+import { Unary } from "@ordo-pink/tau"
 
 type RunCommand = (cmd: string, options?: SpawnOptions.OptionsObject) => Oath<void, Error>
 export const runCommand0: RunCommand = (command, options) =>
@@ -16,7 +18,7 @@ export const runCommand0: RunCommand = (command, options) =>
 
 // TODO: install bun locally in the repo
 export const runBunCommand0: RunCommand = (command, options) =>
-	runCommand0(`bun ${command}`, options)
+	runCommand0(`opt/bun ${command}`, options)
 
 export const createProgress = () => {
 	let currentLine = ""
@@ -44,6 +46,25 @@ export const createProgress = () => {
 		},
 	}
 }
+
+const _direntIsFile: Unary<Dirent, boolean> = dirent => dirent.isFile()
+export const direntsToFiles: Unary<Dirent[], Dirent[]> = filter(_direntIsFile)
+
+const _direntIsDir: Unary<Dirent, boolean> = dirent => dirent.isDirectory()
+export const direntsToDirs: Unary<Dirent[], Dirent[]> = filter<Dirent>(_direntIsDir)
+
+const _getName: Unary<Dirent, string> = prop("name")
+export const getNames: Unary<Dirent[], string[]> = map(_getName)
+
+const _checkFileExists0: Unary<string, Oath<string | boolean>> = path =>
+	isFile0(path).map(e => (e ? path : e))
+export const checkFilesExist0: Unary<string[], Oath<(string | boolean)[]>> = pipe(
+	map(_checkFileExists0),
+	Oath.all
+)
+
+export const getExistingPaths: Unary<(string | boolean)[], string[]> = paths =>
+	paths.filter(Boolean) as string[]
 
 export const getCurrentYear = () => new Date(Date.now()).getFullYear()
 

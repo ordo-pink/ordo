@@ -5,14 +5,13 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-import type { Middleware } from "#x/oak@v12.6.0/middleware.ts"
-import type { TDataService } from "#lib/backend-data-service/mod.ts"
-import type { TTokenService } from "#lib/backend-token-service/mod.ts"
-import type { UserService } from "#lib/backend-user-service/mod.ts"
-
-import { isEmail } from "#x/deno_validator@v0.0.5/mod.ts"
-import { okpwd } from "#lib/okpwd/mod.ts"
-import { useBody } from "#lib/backend-utils/mod.ts"
+import type { TDataService } from "@ordo-pink/backend-data-service"
+import type { TTokenService } from "@ordo-pink/backend-token-service"
+import type { UserService } from "@ordo-pink/backend-user-service"
+import type { Middleware } from "koa"
+import validator from "validator"
+import { okpwd } from "@ordo-pink/okpwd"
+import { useBody } from "@ordo-pink/backend-utils"
 
 type Body = { email?: string; password?: string }
 type Params = {
@@ -28,18 +27,16 @@ export const handleSignUp: Fn =
 	async ctx => {
 		const { email, password } = await useBody<Body>(ctx)
 
-		if (!email || !isEmail(email, {})) {
+		if (!email || !validator.isEmail(email, {})) {
 			return ctx.throw(400, "Invalid email")
 		}
 
 		const user = await userService.getByEmail(email).fork(
 			() => null,
-			user => user,
+			user => user
 		)
 
-		if (user) {
-			return ctx.throw(409, "User with this email already exists")
-		}
+		if (user) return ctx.throw(409, "User with this email already exists")
 
 		const validatePassword = okpwd()
 		const error = validatePassword(password)
@@ -53,12 +50,13 @@ export const handleSignUp: Fn =
 
 			const sub = newUser.id
 			const uip = ctx.request.ip
-			const { access, jti, exp } = await tokenService.createTokens({ sub, uip }).toPromise()
+			const { access, jti, exp } = await tokenService.createPair({ sub, uip }).toPromise()
 			const expires = new Date(Date.now() + exp)
 
 			await dataService.createUserSpace(sub).toPromise()
-			await ctx.cookies.set("jti", jti, { httpOnly: true, sameSite: "lax", expires })
-			await ctx.cookies.set("sub", sub, { httpOnly: true, sameSite: "lax", expires })
+
+			ctx.cookies.set("jti", jti, { httpOnly: true, sameSite: "lax", expires })
+			ctx.cookies.set("sub", sub, { httpOnly: true, sameSite: "lax", expires })
 
 			ctx.response.body = {
 				success: true,

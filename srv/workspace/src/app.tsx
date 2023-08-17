@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: Copyright 2023, 谢尔盖||↓ and the Ordo.pink contributors
 // SPDX-License-Identifier: MIT
 
-import { Either } from "#lib/either/mod"
+import { Either } from "@ordo-pink/either/mod"
 import { useOnAuthenticated } from "$hooks/use-on-authenticated"
 import { useAppInit } from "$hooks/use-app-init"
 import ActivityBar from "$components/activity-bar/activity-bar"

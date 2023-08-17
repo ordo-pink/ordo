@@ -3,7 +3,7 @@
 
 import { useHotkeys } from "react-hotkeys-hook"
 import { BsX } from "react-icons/bs"
-import { Either } from "#lib/either/mod"
+import { Either } from "@ordo-pink/either/mod"
 import { useSubscription } from "$hooks/use-subscription"
 import { __Modal$ } from "$streams/modal"
 import Null from "$components/null"

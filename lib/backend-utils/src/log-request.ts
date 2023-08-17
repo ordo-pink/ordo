@@ -5,11 +5,11 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-import { Middleware } from "#x/oak@v12.6.0/mod.ts"
-import { cyan, green, red, yellow } from "#std/fmt/colors.ts"
-import { Switch } from "#lib/switch/mod.ts"
-import { lte } from "#x/ramda@v0.27.2/mod.ts"
-import { Logger } from "#lib/logger/mod.ts"
+import { Middleware } from "koa"
+import { Switch } from "@ordo-pink/switch"
+import { lte } from "ramda"
+import { Logger } from "@ordo-pink/logger"
+import chalk from "chalk"
 
 export type LogRequestOptions = {
 	logger: Logger
@@ -24,22 +24,22 @@ export const logRequest: LogRequestFn = options => async (ctx, next) => {
 	const name = options.serverName
 	const ip = ctx.request.ip
 	const url = ctx.request.url.toString()
-	const method = cyan(ctx.request.method)
+	const method = chalk.cyan(ctx.request.method)
 	const responseStatus = ctx.response.status
-	const responseTimeHeader = Number(ctx.response.headers.get("X-Response-Time"))
+	const responseTimeHeader = Number(ctx.response.headers["X-Response-Time"])
 
 	const status = Switch.of(responseStatus)
-		.case(lte(500), () => red(responseStatus.toString()))
-		.case(lte(400), () => yellow(responseStatus.toString()))
-		.case(lte(300), () => cyan(responseStatus.toString()))
-		.case(lte(200), () => green(responseStatus.toString()))
+		.case(lte(500), () => chalk.red(responseStatus.toString()))
+		.case(lte(400), () => chalk.yellow(responseStatus.toString()))
+		.case(lte(300), () => chalk.cyan(responseStatus.toString()))
+		.case(lte(200), () => chalk.green(responseStatus.toString()))
 		.default(() => responseStatus.toString())
 
 	const rt = Switch.of(responseTimeHeader)
-		.case(lte(300), () => red(`${responseTimeHeader}ms`))
-		.case(lte(200), () => yellow(`${responseTimeHeader}ms`))
-		.case(lte(100), () => cyan(`${responseTimeHeader}ms`))
-		.default(() => green(`${responseTimeHeader}ms`))
+		.case(lte(300), () => chalk.red(`${responseTimeHeader}ms`))
+		.case(lte(200), () => chalk.yellow(`${responseTimeHeader}ms`))
+		.case(lte(100), () => chalk.cyan(`${responseTimeHeader}ms`))
+		.default(() => chalk.green(`${responseTimeHeader}ms`))
 
 	options?.logger.info(`${ip} ${status} ${method} ${url} - ${rt} - ${name}`)
 }

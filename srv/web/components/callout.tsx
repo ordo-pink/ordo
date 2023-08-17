@@ -14,7 +14,7 @@ import {
 	BsCheckCircle,
 	BsCircle,
 } from "#x/react_icons_bs@1.0.8/mod.ts"
-import { Switch } from "#lib/switch/mod.ts"
+import { Switch } from "@ordo-pink/switch/mod.ts"
 
 type Props = {
 	type?: "info" | "warn" | "error" | "success" | "question"

@@ -8,13 +8,13 @@ import { useUser } from "$streams/auth"
 import ActivityItem from "$components/activity-bar/activity"
 import Null from "$components/null"
 import { MouseEvent } from "react"
-import { Unary } from "#lib/tau/mod"
+import { Unary } from "@ordo-pink/tau/mod"
 import { __CommandPalette$ } from "$streams/command-palette"
 import { useStrictSubscription, useSubscription } from "$hooks/use-subscription"
 import { useAccelerator } from "$hooks/use-accelerator"
 import { __Sidebar$ } from "$streams/sidebar"
-import { cmd } from "#lib/libfe/mod"
-import { Either } from "#lib/either/mod"
+import { cmd } from "@ordo-pink/libfe/mod"
+import { Either } from "@ordo-pink/either/mod"
 
 type ShowContextMenu = Unary<MouseEvent<HTMLDivElement>, void>
 
@@ -31,7 +31,7 @@ export default function ActivityBar({ commandPalette$, sidebar$ }: _P) {
 
 	const showCommandPalette = () =>
 		Either.fromNullable(commandPaletteItems).map(items =>
-			commands.emit<cmd.commandPalette.show>("command-palette.show", items),
+			commands.emit<cmd.commandPalette.show>("command-palette.show", items)
 		)
 
 	const showContextMenu: ShowContextMenu = (event: MouseEvent) =>
@@ -59,7 +59,7 @@ export default function ActivityBar({ commandPalette$, sidebar$ }: _P) {
 			</div>
 			<div className="flex flex-col space-y-4 items-center">
 				{activities.map(activity =>
-					activity.background ? null : <ActivityItem key={activity.name} activity={activity} />,
+					activity.background ? null : <ActivityItem key={activity.name} activity={activity} />
 				)}
 			</div>
 			<div>

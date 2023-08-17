@@ -3,13 +3,13 @@
 
 import { useEffect, useState } from "react"
 import { useHotkeys } from "react-hotkeys-hook"
-import { Either } from "#lib/either/mod"
+import { Either } from "@ordo-pink/either/mod"
 import { useSubscription } from "$hooks/use-subscription"
 import { __ContextMenu$ } from "$streams/context-menu"
 import ContextMenuItemList from "$components/context-menu/context-menu-item-list"
 import Null from "$components/null"
 import { getCommands } from "$streams/commands"
-import { ContextMenu as TContextMenu } from "#lib/libfe/mod"
+import { ContextMenu as TContextMenu } from "@ordo-pink/libfe/mod"
 
 const commands = getCommands()
 

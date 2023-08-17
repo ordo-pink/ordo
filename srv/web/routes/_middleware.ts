@@ -7,7 +7,7 @@
 
 import { MiddlewareHandlerContext } from "$fresh/server.ts"
 import { getCookies } from "#std/http/cookie.ts"
-import { getc } from "#lib/getc/mod.ts"
+import { getc } from "@ordo-pink/getc/mod.ts"
 
 const { WORKSPACE_HOST } = getc(["WORKSPACE_HOST"])
 

@@ -5,11 +5,11 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-import { Unary } from "#lib/tau/mod.ts"
-import { DataRepository, FSID } from "#lib/backend-data-service/mod.ts"
-import { Oath } from "#lib/oath/mod.ts"
+import { Unary } from "@ordo-pink/tau/mod.ts"
+import { DataRepository, FSID } from "@ordo-pink/backend-data-service/mod.ts"
+import { Oath } from "@ordo-pink/oath/mod.ts"
 import { resolve } from "#std/path/mod.ts"
-import { createFile, createParentDirectoryFor, removeFile, stat } from "#lib/fs/mod.ts"
+import { createFile, createParentDirectoryFor, removeFile, stat } from "@ordo-pink/fs/mod.ts"
 import { readableStreamFromReader } from "#std/streams/readable_stream_from_reader.ts"
 
 type Params = { root: string }
@@ -21,8 +21,8 @@ const of: Fn = ({ root }) => ({
 			Oath.of(resolve(root, ...sub.split("-"), ...fsid.split("-"))).chain(path =>
 				createParentDirectoryFor(path)
 					.chain(() => createFile(path).map(f => f.close()))
-					.map(() => fsid as FSID),
-			),
+					.map(() => fsid as FSID)
+			)
 		),
 	delete: ({ fsid, sub }) =>
 		Oath.of(resolve(root, ...sub.split("-"), ...fsid.split("-")))
@@ -32,11 +32,11 @@ const of: Fn = ({ root }) => ({
 		Oath.of(resolve(root, ...sub.split("-"), ...fsid.split("-"))).chain(path =>
 			stat(path)
 				.map(() => true)
-				.fix(() => false),
+				.fix(() => false)
 		),
 	read: ({ sub, fsid }) =>
 		Oath.of(resolve(root, ...sub.split("-"), ...fsid.split("-"))).chain(path =>
-			Oath.try(async () => readableStreamFromReader(await Deno.open(path))),
+			Oath.try(async () => readableStreamFromReader(await Deno.open(path)))
 		),
 	update: ({ content, fsid, sub, upsert = false }) =>
 		Oath.of(resolve(root, ...sub.split("-"), ...fsid.split("-")))
@@ -50,15 +50,15 @@ const of: Fn = ({ root }) => ({
 							? of({ root })
 									.create({ sub, fsid })
 									.map(() => path)
-							: Oath.reject(new Error("file not found")),
-					),
+							: Oath.reject(new Error("file not found"))
+					)
 			)
 			.chain(path =>
 				Oath.try(() => Deno.open(path, { write: true })).chain(file =>
 					Oath.try(() => content.pipeTo(file.writable))
 						.chain(() => stat(path))
-						.map(stat => stat.size),
-				),
+						.map(stat => stat.size)
+				)
 			),
 })
 

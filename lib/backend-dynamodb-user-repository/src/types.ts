@@ -13,8 +13,8 @@ import type {
 	GetItemOutput,
 	UpdateItemInput,
 } from "#x/aws_api@v0.8.1/services/dynamodb/mod.ts"
-import type { Unary } from "#lib/tau/mod.ts"
-import type { InternalUser, UserRepository } from "#lib/backend-user-service/mod.ts"
+import type { Unary } from "@ordo-pink/tau/mod.ts"
+import type { InternalUser, UserRepository } from "@ordo-pink/backend-user-service/mod.ts"
 
 // --- Public ---
 

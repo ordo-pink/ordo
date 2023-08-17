@@ -5,37 +5,35 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-import { decode } from "#std/encoding/base64.ts"
-import { Either } from "#lib/either/mod.ts"
+import { isFile0, readFile0 } from "@ordo-pink/fs"
+import { Oath } from "@ordo-pink/oath"
 
 export const getKey = (path: string, type: "public" | "private") =>
-	Either.fromNullable(path)
-		.chain(path => Either.try(() => Deno.statSync(path)))
+	Oath.fromNullable(path)
+		.chain(isFile0)
 		.map(() => path)
-		.map(Deno.readFileSync)
-		.map(x => new TextDecoder().decode(x))
-		.map(s => s.split("\n"))
+		.chain(path => readFile0(path, "utf-8"))
+		.map(s => (s as string).split("\n"))
 		.map(ss => ss.slice(1, -1))
-		.map(ss => ss.join(""))
-		.map(decode)
-		.map(key =>
-			crypto.subtle.importKey(
-				type === "private" ? "pkcs8" : "spki",
-				key,
-				{ name: "ECDSA", namedCurve: "P-384" },
-				false,
-				type === "private" ? ["sign"] : ["verify"],
-			),
-		)
-		.fold(
+		.map(ss => ss.flatMap(line => line.split("")))
+		.map(cs => cs.map(char => char.charCodeAt(0)))
+		.map(ns => Uint8Array.from(ns))
+		.fork(
 			() => {
 				console.error(
 					// TODO: Rename when renaming "bin/dev"
-					`${path} not found. Run "bin/dev" to create a dev pair, or provide production-ready key pair.`,
+					`${path} not found. Run "bin/dev" to create a dev pair, or provide production-ready key pair.`
 				)
-				Deno.exit(1)
+				process.exit(1)
 			},
-			x => x,
+			key =>
+				crypto.subtle.importKey(
+					type === "private" ? "pkcs8" : "spki",
+					key,
+					{ name: "ECDSA", namedCurve: "P-384" },
+					false,
+					type === "private" ? ["sign"] : ["verify"]
+				)
 		)
 
 export const getPublicKey = (path: string) => getKey(path, "public")

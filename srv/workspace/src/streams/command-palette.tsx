@@ -3,10 +3,10 @@
 
 import { BehaviorSubject, map, merge, Observable, scan, shareReplay, Subject } from "rxjs"
 import { BsCommand } from "react-icons/bs"
-import { Binary, Curry, Nullable, Thunk, Unary, callOnce } from "#lib/tau/mod"
-import { Logger } from "#lib/logger/mod"
+import { Binary, Curry, Nullable, Thunk, Unary, callOnce } from "@ordo-pink/tau/mod"
+import { Logger } from "@ordo-pink/logger/mod"
 import { getCommands } from "$streams/commands"
-import { CommandPalette, cmd } from "#lib/libfe/mod"
+import { CommandPalette, cmd } from "@ordo-pink/libfe/mod"
 
 // TODO: Merge commands, command palette and context menu item creation
 
@@ -63,7 +63,7 @@ const add$ = new Subject<CommandPalette.Item>()
 const remove$ = new Subject<string>()
 const globalCommandPalette$ = merge(add$.pipe(map(addP)), remove$.pipe(map(removeP))).pipe(
 	scan((acc, f) => f(acc), [] as CommandPalette.Item[]),
-	shareReplay(1),
+	shareReplay(1)
 )
 
 globalCommandPalette$.subscribe()

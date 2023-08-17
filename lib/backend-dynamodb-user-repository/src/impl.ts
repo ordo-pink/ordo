@@ -12,8 +12,8 @@ import type * as T from "./types.ts"
 
 import { ApiFactory } from "#x/aws_api@v0.8.1/client/mod.ts"
 import { DynamoDB } from "#x/aws_api@v0.8.1/services/dynamodb/mod.ts"
-import { keysOf } from "#lib/tau/mod.ts"
-import { Oath } from "#lib/oath/mod.ts"
+import { keysOf } from "@ordo-pink/tau/mod.ts"
+import { Oath } from "@ordo-pink/oath/mod.ts"
 import {
 	ExistsByIdMethod,
 	ExistsByEmailMethod,
@@ -21,7 +21,7 @@ import {
 	UpdateMethod,
 	GetByIdMethod,
 	GetByEmailMethod,
-} from "#lib/backend-user-service/mod.ts"
+} from "@ordo-pink/backend-user-service/mod.ts"
 
 // --- Public ---
 
@@ -74,7 +74,7 @@ const create: CreateMethod<T.Params> =
 					lastName: { S: user.lastName ?? "" },
 					createdAt: { S: user.createdAt.toISOString() },
 				},
-			}),
+			})
 		).map(() => user)
 
 const update: UpdateMethod<T.Params> =
@@ -86,10 +86,10 @@ const update: UpdateMethod<T.Params> =
 				Oath.resolve(reduceUserToAttributeUpdates(oldUser))
 					.chain(AttributeUpdates =>
 						Oath.from(() =>
-							db.updateItem({ TableName: table, Key: { id: { S: id } }, AttributeUpdates }),
-						),
+							db.updateItem({ TableName: table, Key: { id: { S: id } }, AttributeUpdates })
+						)
 					)
-					.map(() => ({ ...oldUser, ...user })),
+					.map(() => ({ ...oldUser, ...user }))
 			)
 
 const getById: GetByIdMethod<T.Params> =
@@ -107,7 +107,7 @@ const getByEmail: GetByEmailMethod<T.Params> =
 				TableName: table,
 				FilterExpression: "email = :e",
 				ExpressionAttributeValues: { ":e": { S: email } },
-			}),
+			})
 		)
 			.chain(output => Oath.fromNullable(output.Items))
 			.chain(items => Oath.fromNullable(items[0]))

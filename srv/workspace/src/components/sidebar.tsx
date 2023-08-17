@@ -9,7 +9,7 @@ import UsedSpace from "$components/used-space"
 import Null from "$components/null"
 import { __CommandPalette$ } from "$streams/command-palette"
 import { useStrictSubscription, useSubscription } from "$hooks/use-subscription"
-import { Nullable } from "#lib/tau/mod"
+import { Nullable } from "@ordo-pink/tau/mod"
 import { ShowContextMenuP } from "$streams/context-menu"
 import { __Sidebar$ } from "$streams/sidebar"
 

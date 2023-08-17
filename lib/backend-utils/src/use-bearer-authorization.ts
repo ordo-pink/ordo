@@ -5,17 +5,18 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-import { Context } from "#x/oak@v12.6.0/mod.ts"
-import { AccessTokenParsed, TTokenService } from "#lib/backend-token-service/mod.ts"
+import { AccessTokenParsed, TTokenService } from "@ordo-pink/backend-token-service"
+import { Nullable } from "@ordo-pink/tau"
+import { Context } from "koa"
 
 // TODO: Rewrite with Oath
 export const useBearerAuthorization = async (
 	ctx: Context,
-	tokenServiceOrIDHost: TTokenService | string,
+	tokenServiceOrIDHost: TTokenService | string
 ): Promise<AccessTokenParsed> => {
-	const authorization = ctx.request.headers.get("Authorization")
+	const authorization = ctx.request.headers["Authorization"]
 
-	if (!authorization || !authorization.startsWith("Bearer ")) {
+	if (!authorization || typeof authorization !== "string" || !authorization.startsWith("Bearer ")) {
 		return ctx.throw(401, "Unauthorized")
 	}
 
@@ -33,12 +34,14 @@ export const useBearerAuthorization = async (
 
 		ctx.throw(403, "Invalid or outdated token")
 	} else {
-		const verified = await tokenServiceOrIDHost.verifyAccessToken(token).toPromise()
+		const verified = await tokenServiceOrIDHost.verifyToken(token, "access").toPromise()
 
 		if (!verified) {
 			return ctx.throw(403, "Invalid or outdated token")
 		}
 
-		return tokenServiceOrIDHost.decodeAccessToken(token).toPromise()
+		return tokenServiceOrIDHost
+			.decode(token, "access")
+			.toPromise() as unknown as Promise<AccessTokenParsed>
 	}
 }

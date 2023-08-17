@@ -3,7 +3,7 @@
 
 import { MouseEvent, PropsWithChildren, HTMLProps } from "react"
 import { getCommands } from "$streams/commands"
-import { cmd } from "#lib/libfe/mod"
+import { cmd } from "@ordo-pink/libfe/mod"
 
 const commands = getCommands()
 

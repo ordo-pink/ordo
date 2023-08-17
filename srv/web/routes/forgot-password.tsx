@@ -6,7 +6,7 @@
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 import { Handlers, PageProps } from "$fresh/server.ts"
-import { Switch } from "#lib/switch/mod.ts"
+import { Switch } from "@ordo-pink/switch/mod.ts"
 import { isEmail } from "#x/deno_validator@v0.0.5/mod.ts"
 import { Button } from "../components/button.tsx"
 import { Callout } from "../components/callout.tsx"
@@ -83,7 +83,7 @@ export const handler: Handlers = {
 
 		headers.set(
 			"Location",
-			"/forgot-password?success=Thank you! We will send you a recovery link if there is a user associated with the email you provided. You can close this page.",
+			"/forgot-password?success=Thank you! We will send you a recovery link if there is a user associated with the email you provided. You can close this page."
 		)
 
 		return new Response(null, { status: 303, headers })

@@ -9,9 +9,9 @@
 
 import { useSignal } from "@preact/signals"
 import { JSX } from "preact"
-import { Either, TEither } from "#lib/either/mod.ts"
+import { Either, TEither } from "@ordo-pink/either/mod.ts"
 import { isEmail } from "#x/deno_validator@v0.0.5/mod.ts"
-import { okpwd } from "#lib/okpwd/mod.ts"
+import { okpwd } from "@ordo-pink/okpwd/mod.ts"
 
 type InputProps = {
 	value?: string
@@ -86,7 +86,7 @@ export const EmailInput = ({
 					const errors = Either.fromBoolean(
 						() => isEmail(value, {}),
 						() => value,
-						() => ["Invalid email."],
+						() => ["Invalid email."]
 					)
 
 					onChange(errors)

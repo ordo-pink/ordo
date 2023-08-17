@@ -3,7 +3,7 @@
 
 import { useEffect, useState } from "react"
 import { useMetadata } from "../streams/auth"
-import { noop } from "#lib/tau/mod"
+import { noop } from "@ordo-pink/tau/mod"
 import Null from "./null"
 
 // TODO: Move to user info
@@ -18,7 +18,7 @@ export default function UsedSpace() {
 	useEffect(() => {
 		metadata
 			.map(items =>
-				items.reduce((acc, item) => (typeof item.size === "number" ? acc + item.size : acc), 0),
+				items.reduce((acc, item) => (typeof item.size === "number" ? acc + item.size : acc), 0)
 			)
 			.map(size => size / 1024 / 1024)
 			.fold(noop, megabytes => {

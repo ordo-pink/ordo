@@ -6,12 +6,12 @@
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 import { httpErrors, type Context, type RouterMiddleware } from "#x/oak@v12.6.0/mod.ts"
-import type * as DATA_SERVICE_TYPES from "#lib/backend-data-service/mod.ts"
-import type { Binary, Curry, Nullable, Unary } from "#lib/tau/mod.ts"
-import type { SUB } from "#lib/backend-token-service/mod.ts"
+import type * as DATA_SERVICE_TYPES from "@ordo-pink/backend-data-service/mod.ts"
+import type { Binary, Curry, Nullable, Unary } from "@ordo-pink/tau/mod.ts"
+import type { SUB } from "@ordo-pink/backend-token-service/mod.ts"
 
-import { ResponseError, useBearerAuthorization } from "#lib/backend-utils/mod.ts"
-import { Oath } from "#lib/oath/mod.ts"
+import { ResponseError, useBearerAuthorization } from "@ordo-pink/backend-utils/mod.ts"
+import { Oath } from "@ordo-pink/oath/mod.ts"
 import { prop } from "#ramda"
 
 // --- Public ---
@@ -23,9 +23,7 @@ export const handleGetRoot: Fn =
 			.map(prop("payload"))
 			.chain(({ sub }) => getDirectory0({ service: dataService, sub }))
 			.rejectedMap(e =>
-				e.message.startsWith("No such file or directory")
-					? new httpErrors.NotFound("Not found")
-					: e,
+				e.message.startsWith("No such file or directory") ? new httpErrors.NotFound("Not found") : e
 			)
 			.chain(throwIfDirectoryDoesNotExist0)
 			.fork(ResponseError.send(ctx), formGetDirectoryResponse(ctx))

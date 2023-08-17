@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 import { serveDir } from "#std/http/file_server.ts"
-import { getc } from "#lib/getc/mod.ts"
+import { getc } from "@ordo-pink/getc/mod.ts"
 
 const { STATIC_ROOT, STATIC_PORT } = getc(["STATIC_ROOT", "STATIC_PORT"])
 

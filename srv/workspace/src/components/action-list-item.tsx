@@ -8,7 +8,7 @@ import type {
 	MouseEventHandler,
 	PropsWithChildren,
 } from "react"
-import { noop } from "#lib/tau/mod"
+import { noop } from "@ordo-pink/tau/mod"
 import Link from "$components/link"
 
 type Props = {

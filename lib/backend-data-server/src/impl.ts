@@ -5,20 +5,19 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-import { Application } from "#x/oak@v12.6.0/mod.ts"
-import { createServer } from "#lib/backend-utils/mod.ts"
-import { ConsoleLogger, Logger } from "#lib/logger/mod.ts"
-import { TDataService } from "#lib/backend-data-service/mod.ts"
-import { handleUpdateFileContent } from "./handlers/update-file-content.handler.ts"
-import { handleCreateDirectory } from "./handlers/create-directory.handler.ts"
-import { handleRemoveDirectory } from "./handlers/remove-directory.handler.ts"
-import { handleUpdateDirectory } from "./handlers/update-directory.handler.ts"
-import { handleGetDirectory } from "./handlers/get-directory.handler.ts"
-import { handleCreateFile } from "./handlers/create-file.handler.ts"
-import { handleRemoveFile } from "./handlers/remove-file.handler.ts"
-import { handleUpdateFile } from "./handlers/update-file.handler.ts"
-import { handleGetFile } from "./handlers/get-file.handler.ts"
-import { handleGetRoot } from "./handlers/get-root.handler.ts"
+import { createServer } from "@ordo-pink/backend-utils"
+import { ConsoleLogger, Logger } from "@ordo-pink/logger"
+import { TDataService } from "@ordo-pink/backend-data-service"
+import { handleUpdateFileContent } from "./handlers/update-file-content.handler"
+import { handleCreateDirectory } from "./handlers/create-directory.handler"
+import { handleRemoveDirectory } from "./handlers/remove-directory.handler"
+import { handleUpdateDirectory } from "./handlers/update-directory.handler"
+import { handleGetDirectory } from "./handlers/get-directory.handler"
+import { handleCreateFile } from "./handlers/create-file.handler"
+import { handleRemoveFile } from "./handlers/remove-file.handler"
+import { handleUpdateFile } from "./handlers/update-file.handler"
+import { handleGetFile } from "./handlers/get-file.handler"
+import { handleGetRoot } from "./handlers/get-root.handler"
 
 // TODO: Audit
 export type Params = {

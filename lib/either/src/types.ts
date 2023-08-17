@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: Copyright 2023, 谢尔盖||↓ and the Ordo.pink contributors
 // SPDX-License-Identifier: MIT
 
-import { Nullable } from "#lib/tau/mod.ts"
+import { Nullable } from "@ordo-pink/tau/mod.ts"
 
 // TODO: Add comments
 
@@ -25,7 +25,7 @@ export type EitherStatic = {
 	fromBoolean: <R = undefined, L = undefined>(
 		f: () => boolean,
 		r?: () => R,
-		l?: () => L,
+		l?: () => L
 	) => TEither<R, L>
 	try: <R, L>(f: () => R) => TEither<R, L>
 	right: RightFn

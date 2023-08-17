@@ -5,18 +5,15 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-import { BodyType, Context } from "#x/oak@v12.6.0/mod.ts"
-import { isObject } from "#lib/tau/mod.ts"
+import { Context } from "koa"
+import { isObject } from "@ordo-pink/tau"
 
 // TODO: Rewrite useBody with Oath
 export const useBody = async <T>(
 	ctx: Context,
-	type: BodyType = "json",
-	expect: "string" | "array" | "object" = "object",
+	expect: "string" | "array" | "object" = "object"
 ) => {
-	const bodyContent = ctx.request.body({ type })
-
-	const body: T = await bodyContent.value
+	const body = (await ctx.request.body) as T
 
 	if (expect === "object" && !isObject(body)) {
 		ctx.throw(400, "Request body must be an object")

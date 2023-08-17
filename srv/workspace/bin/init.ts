@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: Copyright 2023, 谢尔盖||↓ and the Ordo.pink contributors
 // SPDX-License-Identifier: MIT
 
-import { runCommand } from "#lib/binutil/mod.ts"
+import { runCommand } from "@ordo-pink/binutil/mod.ts"
 import { cyan, green } from "#std/fmt/colors.ts"
 
 const main = async () => {

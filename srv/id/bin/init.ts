@@ -5,13 +5,9 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-import { resolve } from "#std/path/mod.ts"
-import { cyan, green } from "#std/fmt/colors.ts"
-import { encode } from "#std/encoding/base64.ts"
-import { getc } from "#lib/getc/mod.ts"
-import { createDirectoryIfNotExists, createParentDirectoryFor } from "#lib/fs/mod.ts"
-
-// TODO: write configuration updates to dotenvs
+import { getc } from "@ordo-pink/getc"
+import { createDirectoryIfNotExists0, createParentDirectory0, writeFile0 } from "@ordo-pink/fs"
+import { resolve } from "path"
 
 const {
 	ID_KV_DB_PATH,
@@ -31,25 +27,28 @@ const generateKeyPair = async (privatePath: string, publicPath: string) => {
 	const { privateKey, publicKey } = await crypto.subtle.generateKey(
 		{ name: "ECDSA", namedCurve: "P-384" },
 		true,
-		["sign", "verify"],
+		["sign", "verify"]
 	)
 
 	const exportedPrivateKey = await crypto.subtle.exportKey("pkcs8", privateKey)
 	const exportedPublicKey = await crypto.subtle.exportKey("spki", publicKey)
 
 	const key = `-----BEGIN PRIVATE KEY-----
-${encode(exportedPrivateKey)
+${Buffer.from(exportedPrivateKey)
+	.toString("base64")
 	.match(/.{1,42}/g)
 	?.join("\n")}
 -----END PRIVATE KEY-----`
+
 	const pub = `-----BEGIN PUBLIC KEY-----
-${encode(exportedPublicKey)
+${Buffer.from(exportedPublicKey)
+	.toString("base64")
 	.match(/.{1,42}/g)
 	?.join("\n")}
 -----END PUBLIC KEY-----`
 
-	await Deno.writeFile(privatePath, new TextEncoder().encode(key))
-	await Deno.writeFile(publicPath, new TextEncoder().encode(pub))
+	await writeFile0(privatePath, key).orElse(console.error)
+	await writeFile0(publicPath, pub).orElse(console.error)
 }
 
 const generateAuthKeys = async () => {
@@ -61,30 +60,23 @@ const generateAuthKeys = async () => {
 	]
 
 	for (const key of keys) {
-		await createParentDirectoryFor(key).toPromise()
+		await createParentDirectory0(key).toPromise()
 	}
 
 	await generateKeyPair(
 		resolve(ID_ACCESS_TOKEN_PRIVATE_KEY_PATH),
-		resolve(ID_ACCESS_TOKEN_PUBLIC_KEY_PATH),
+		resolve(ID_ACCESS_TOKEN_PUBLIC_KEY_PATH)
 	)
 
 	await generateKeyPair(
 		resolve(ID_REFRESH_TOKEN_PRIVATE_KEY_PATH),
-		resolve(ID_REFRESH_TOKEN_PUBLIC_KEY_PATH),
+		resolve(ID_REFRESH_TOKEN_PUBLIC_KEY_PATH)
 	)
 }
 
 const main = async () => {
-	const encoder = new TextEncoder()
-
-	Deno.stdout.write(encoder.encode(`  ${cyan("→")} Creating directories...`))
-	await createDirectoryIfNotExists(ID_KV_DB_PATH).orElse(console.error)
-	Deno.stdout.write(encoder.encode(` ${green("✓")}\n`))
-
-	Deno.stdout.write(encoder.encode(`  ${cyan("→")} Generating auth keys...`))
+	await createDirectoryIfNotExists0(ID_KV_DB_PATH).orElse(console.error)
 	await generateAuthKeys()
-	Deno.stdout.write(encoder.encode(` ${green("✓")}\n`))
 }
 
-await main()
+main()

@@ -5,12 +5,12 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-import { createDataServer } from "#lib/backend-data-server/mod.ts"
-import { getc } from "#lib/getc/mod.ts"
-import { BackendDataService } from "#lib/backend-data-service/mod.ts"
-import { FSMetadataRepository } from "#lib/backend-fs-metadata-repository/mod.ts"
-import { FSDataRepository } from "#lib/backend-fs-data-repository/mod.ts"
-import { ConsoleLogger } from "#lib/logger/mod.ts"
+import { createDataServer } from "@ordo-pink/backend-data-server/mod.ts"
+import { getc } from "@ordo-pink/getc/mod.ts"
+import { BackendDataService } from "@ordo-pink/backend-data-service/mod.ts"
+import { FSMetadataRepository } from "@ordo-pink/backend-fs-metadata-repository/mod.ts"
+import { FSDataRepository } from "@ordo-pink/backend-fs-data-repository/mod.ts"
+import { ConsoleLogger } from "@ordo-pink/logger/mod.ts"
 
 const {
 	DATA_DATA_PATH,

@@ -5,8 +5,8 @@ import i18next from "i18next"
 import LanguageDetector from "i18next-browser-languagedetector"
 import { initReactI18next } from "react-i18next"
 import { Subject, switchMap, of } from "rxjs"
-import { ISO_639_1_Locale } from "#lib/locale/mod"
-import { Unary, callOnce } from "#lib/tau/mod"
+import { ISO_639_1_Locale } from "@ordo-pink/locale/mod"
+import { Unary, callOnce } from "@ordo-pink/tau/mod"
 
 export type Bundle = Partial<Record<ISO_639_1_Locale, Record<string, string>>>
 
@@ -24,8 +24,8 @@ const translations$ = new Subject<LanguageResource>()
 
 export const i18n$ = translations$.pipe(
 	switchMap(({ language, ns, resources }) =>
-		of(i18next.addResourceBundle(language, ns, resources, true)),
-	),
+		of(i18next.addResourceBundle(language, ns, resources, true))
+	)
 )
 
 export const _initI18n = callOnce(() => {
@@ -38,7 +38,7 @@ export const registerTranslations = (extensionName: string) => (bundle: Bundle) 
 			language,
 			ns: extensionName,
 			resources: (bundle as Record<string, string>)[language],
-		} as unknown as LanguageResource),
+		} as unknown as LanguageResource)
 	)
 }
 

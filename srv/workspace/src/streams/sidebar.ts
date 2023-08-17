@@ -3,10 +3,10 @@
 
 import { AiOutlineLeft, AiOutlineLayout, AiOutlineRight } from "react-icons/ai"
 import { BehaviorSubject, Observable } from "rxjs"
-import { Unary, callOnce } from "#lib/tau/mod"
+import { Unary, callOnce } from "@ordo-pink/tau/mod"
 import { getCommands } from "$streams/commands"
-import { Logger } from "#lib/logger/mod"
-import { cmd } from "#lib/libfe/mod"
+import { Logger } from "@ordo-pink/logger/mod"
+import { cmd } from "@ordo-pink/libfe/mod"
 
 const commands = getCommands()
 
@@ -53,7 +53,7 @@ export const __initSidebar: InitSidebar = callOnce(({ logger }) => {
 		sidebar$.next(
 			sidebar.sizes[0] > 0
 				? { disabled: false, sizes: [0, 100] }
-				: { disabled: false, sizes: [25, 75] },
+				: { disabled: false, sizes: [25, 75] }
 		)
 	})
 

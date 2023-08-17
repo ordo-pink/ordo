@@ -6,13 +6,13 @@
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 import { httpErrors, type Context, type RouterMiddleware } from "#x/oak@v12.6.0/mod.ts"
-import type * as DATA_SERVICE_TYPES from "#lib/backend-data-service/mod.ts"
-import type { Binary, Curry, Nullable, Optional, Unary } from "#lib/tau/mod.ts"
-import type { SUB } from "#lib/backend-token-service/mod.ts"
+import type * as DATA_SERVICE_TYPES from "@ordo-pink/backend-data-service/mod.ts"
+import type { Binary, Curry, Nullable, Optional, Unary } from "@ordo-pink/tau/mod.ts"
+import type { SUB } from "@ordo-pink/backend-token-service/mod.ts"
 
-import { ResponseError, useBearerAuthorization } from "#lib/backend-utils/mod.ts"
-import { FileModel } from "#lib/backend-data-service/mod.ts"
-import { Oath } from "#lib/oath/mod.ts"
+import { ResponseError, useBearerAuthorization } from "@ordo-pink/backend-utils/mod.ts"
+import { FileModel } from "@ordo-pink/backend-data-service/mod.ts"
+import { Oath } from "@ordo-pink/oath/mod.ts"
 import { prop } from "#ramda"
 import { pathParamToFilePath } from "../utils.ts"
 
@@ -29,8 +29,8 @@ export const handleUpdateFileContent: Fn =
 					.chain(path =>
 						Oath.from(() => ctx.request.body({ type: "bytes" }).value)
 							.map(body => ReadableStream.from(body))
-							.chain(updateFile0({ service: dataService, sub, path })),
-					),
+							.chain(updateFile0({ service: dataService, sub, path }))
+					)
 			)
 			.chain(throwIfFileDoesNotExist0)
 			.fork(ResponseError.send(ctx), formUpdateFileResponse(ctx))

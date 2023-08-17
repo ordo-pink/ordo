@@ -5,17 +5,15 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-import { resolve } from "#std/path/mod.ts"
-import { DynamoDBUserStorageAdapter } from "#lib/backend-dynamodb-user-repository/mod.ts"
-import { DenoKVTokenStorageAdapter } from "#lib/backend-deno-kv-token-repository/mod.ts"
-import { DenoKVUserStorageAdapter } from "#lib/backend-deno-kv-user-repository/mod.ts"
-import { createIDServer } from "#lib/backend-id-server/mod.ts"
-import { Switch } from "#lib/switch/mod.ts"
-import { getc } from "#lib/getc/mod.ts"
-import { getPrivateKey, getPublicKey } from "./utils/get-key.ts"
-import { ConsoleLogger } from "#lib/logger/mod.ts"
-import { FSDataRepository } from "#lib/backend-fs-data-repository/mod.ts"
-import { FSMetadataRepository } from "#lib/backend-fs-metadata-repository/mod.ts"
+import { resolve } from "#std/path"
+import { DynamoDBUserStorageAdapter } from "@ordo-pink/backend-dynamodb-user-repository"
+import { createIDServer } from "@ordo-pink/backend-id-server"
+import { Switch } from "@ordo-pink/switch"
+import { getc } from "@ordo-pink/getc"
+import { ConsoleLogger } from "@ordo-pink/logger"
+import { FSDataRepository } from "@ordo-pink/backend-fs-data-repository"
+import { FSMetadataRepository } from "@ordo-pink/backend-fs-metadata-repository"
+import { getPrivateKey, getPublicKey } from "./utils/get-key"
 
 const {
 	ID_USER_ADAPTER,
@@ -62,49 +60,53 @@ const {
 	"WEB_HOST",
 ])
 
-const accessPrivateKeyString = resolve(ID_ACCESS_TOKEN_PRIVATE_KEY_PATH)
-const accessPublicKeyString = resolve(ID_ACCESS_TOKEN_PUBLIC_KEY_PATH)
-const refreshPrivateKeyString = resolve(ID_REFRESH_TOKEN_PRIVATE_KEY_PATH)
-const refreshPublicKeyString = resolve(ID_REFRESH_TOKEN_PUBLIC_KEY_PATH)
+const main = async () => {
+	const accessPrivateKeyString = resolve(ID_ACCESS_TOKEN_PRIVATE_KEY_PATH)
+	const accessPublicKeyString = resolve(ID_ACCESS_TOKEN_PUBLIC_KEY_PATH)
+	const refreshPrivateKeyString = resolve(ID_REFRESH_TOKEN_PRIVATE_KEY_PATH)
+	const refreshPublicKeyString = resolve(ID_REFRESH_TOKEN_PUBLIC_KEY_PATH)
 
-const accessTokenPrivateKey = await getPrivateKey(accessPrivateKeyString)
-const accessTokenPublicKey = await getPublicKey(accessPublicKeyString)
-const refreshTokenPrivateKey = await getPrivateKey(refreshPrivateKeyString)
-const refreshTokenPublicKey = await getPublicKey(refreshPublicKeyString)
+	const accessTokenPrivateKey = await getPrivateKey(accessPrivateKeyString)
+	const accessTokenPublicKey = await getPublicKey(accessPublicKeyString)
+	const refreshTokenPrivateKey = await getPrivateKey(refreshPrivateKeyString)
+	const refreshTokenPublicKey = await getPublicKey(refreshPublicKeyString)
 
-const kvPath = `${ID_KV_DB_PATH.endsWith("/") ? ID_KV_DB_PATH : `${ID_KV_DB_PATH}/`}kvdb`
+	const kvPath = `${ID_KV_DB_PATH.endsWith("/") ? ID_KV_DB_PATH : `${ID_KV_DB_PATH}/`}kvdb`
 
-const dataRepository = FSDataRepository.of({ root: DATA_DATA_PATH })
-const metadataRepository = FSMetadataRepository.of({ root: DATA_METADATA_PATH })
+	const dataRepository = FSDataRepository.of({ root: DATA_DATA_PATH })
+	const metadataRepository = FSMetadataRepository.of({ root: DATA_METADATA_PATH })
 
-const tokenStorageRepository = await DenoKVTokenStorageAdapter.of(kvPath, ID_TOKENS_TABLE_NAME)
-const userStorageRepository = await Switch.of(ID_USER_ADAPTER)
-	.case("dynamodb", () =>
-		DynamoDBUserStorageAdapter.of({
-			region: ID_DYNAMODB_REGION,
-			endpoint: ID_DYNAMODB_ENDPOINT,
-			awsAccessKeyId: ID_DYNAMODB_ACCESS_KEY,
-			awsSecretKey: ID_DYNAMODB_SECRET_KEY,
-			tableName: ID_USER_TABLE_NAME,
-		}),
-	)
-	.case("kv", () => DenoKVUserStorageAdapter.of({ path: kvPath, key: ID_USER_TABLE_NAME }))
-	.default(() => DenoKVUserStorageAdapter.of({ path: kvPath, key: ID_USER_TABLE_NAME }))
+	const tokenStorageRepository = await DenoKVTokenStorageAdapter.of(kvPath, ID_TOKENS_TABLE_NAME)
+	const userStorageRepository = await Switch.of(ID_USER_ADAPTER)
+		.case("dynamodb", () =>
+			DynamoDBUserStorageAdapter.of({
+				region: ID_DYNAMODB_REGION,
+				endpoint: ID_DYNAMODB_ENDPOINT,
+				awsAccessKeyId: ID_DYNAMODB_ACCESS_KEY,
+				awsSecretKey: ID_DYNAMODB_SECRET_KEY,
+				tableName: ID_USER_TABLE_NAME,
+			})
+		)
+		.case("kv", () => DenoKVUserStorageAdapter.of({ path: kvPath, key: ID_USER_TABLE_NAME }))
+		.default(() => DenoKVUserStorageAdapter.of({ path: kvPath, key: ID_USER_TABLE_NAME }))
 
-const app = await createIDServer({
-	userStorageRepository,
-	tokenStorageRepository,
-	dataRepository,
-	metadataRepository,
-	origin: [WEB_HOST, WORKSPACE_HOST],
-	accessKeys: { private: accessTokenPrivateKey, public: accessTokenPublicKey },
-	refreshKeys: { private: refreshTokenPrivateKey, public: refreshTokenPublicKey },
-	saltRounds: Number(ID_SALT_ROUNDS),
-	alg: "ES384", // TODO: Add support for switching to RSA
-	accessTokenExpireIn: Number(ID_ACCESS_TOKEN_EXPIRE_IN),
-	refreshTokenExpireIn: Number(ID_REFRESH_TOKEN_EXPIRE_IN),
-})
+	const app = await createIDServer({
+		userStorageRepository,
+		tokenStorageRepository,
+		dataRepository,
+		metadataRepository,
+		origin: [WEB_HOST, WORKSPACE_HOST],
+		accessKeys: { private: accessTokenPrivateKey, public: accessTokenPublicKey },
+		refreshKeys: { private: refreshTokenPrivateKey, public: refreshTokenPublicKey },
+		saltRounds: Number(ID_SALT_ROUNDS),
+		alg: "ES384", // TODO: Add support for switching to RSA
+		accessTokenExpireIn: Number(ID_ACCESS_TOKEN_EXPIRE_IN),
+		refreshTokenExpireIn: Number(ID_REFRESH_TOKEN_EXPIRE_IN),
+	})
 
-ConsoleLogger.info(`ID server running on http://localhost:${ID_PORT}`)
+	ConsoleLogger.info(`ID server running on http://localhost:${ID_PORT}`)
 
-await app.listen({ port: Number(ID_PORT) })
+	app.listen({ port: Number(ID_PORT) })
+}
+
+main()

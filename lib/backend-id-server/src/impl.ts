@@ -5,27 +5,25 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-import { Application } from "#x/oak@v12.6.0/mod.ts"
-
-import { CryptoKeyPair, TokenRepository, TokenService } from "#lib/backend-token-service/mod.ts"
+import { CryptoKeyPair, TokenRepository, TokenService } from "@ordo-pink/backend-token-service"
 import {
 	BackendDataService,
 	DataRepository,
 	MetadataRepository,
-} from "#lib/backend-data-service/mod.ts"
-import { UserRepository, UserService } from "#lib/backend-user-service/mod.ts"
-import { ConsoleLogger, Logger } from "#lib/logger/mod.ts"
-import { createServer } from "#lib/backend-utils/mod.ts"
+} from "@ordo-pink/backend-data-service"
+import { UserRepository, UserService } from "@ordo-pink/backend-user-service"
+import { ConsoleLogger, Logger } from "@ordo-pink/logger"
+import { createServer } from "@ordo-pink/backend-utils"
 
-import { handleChangePassword } from "./handlers/change-password.ts"
-import { handleRefreshToken } from "./handlers/refresh-token.ts"
-import { handleVerifyToken } from "./handlers/verify-token.ts"
-import { handleChangeEmail } from "./handlers/change-email.ts"
-import { handleUserInfo } from "./handlers/user-info.ts"
-import { handleSignOut } from "./handlers/sign-out.ts"
-import { handleAccount } from "./handlers/account.ts"
-import { handleSignIn } from "./handlers/sign-in.ts"
-import { handleSignUp } from "./handlers/sign-up.ts"
+import { handleChangePassword } from "./handlers/change-password"
+import { handleRefreshToken } from "./handlers/refresh-token"
+import { handleVerifyToken } from "./handlers/verify-token"
+import { handleChangeEmail } from "./handlers/change-email"
+import { handleUserInfo } from "./handlers/user-info"
+import { handleSignOut } from "./handlers/sign-out"
+import { handleAccount } from "./handlers/account"
+import { handleSignIn } from "./handlers/sign-in"
+import { handleSignUp } from "./handlers/sign-up"
 
 // TODO: Extract errors to enum
 // TODO: Audit
@@ -44,9 +42,7 @@ export type CreateIDServerFnParams = {
 	logger?: Logger
 }
 
-export type CreateIDServerFn = (params: CreateIDServerFnParams) => Promise<Application>
-
-export const createIDServer: CreateIDServerFn = async ({
+export const createIDServer = async ({
 	userStorageRepository,
 	tokenStorageRepository,
 	dataRepository,
@@ -59,7 +55,7 @@ export const createIDServer: CreateIDServerFn = async ({
 	saltRounds,
 	logger = ConsoleLogger,
 	alg,
-}) => {
+}: CreateIDServerFnParams) => {
 	const dataService = BackendDataService.of({ dataRepository, metadataRepository })
 	const userService = await UserService.of(userStorageRepository, { saltRounds })
 	const tokenService = TokenService.of({

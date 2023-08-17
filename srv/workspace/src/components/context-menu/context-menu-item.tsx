@@ -1,14 +1,14 @@
 // SPDX-FileCopyrightText: Copyright 2023, 谢尔盖||↓ and the Ordo.pink contributors
 // SPDX-License-Identifier: MIT
 
-import { Either } from "#lib/either/mod"
+import { Either } from "@ordo-pink/either/mod"
 import { useAccelerator } from "$hooks/use-accelerator"
 import { getCommands } from "$streams/commands"
 import RenderFromNullable from "$components/render-from-nullable"
 import ActionListItem from "$components/action-list-item"
 import Accelerator from "$components/accelerator"
 import { MouseEvent } from "react"
-import { ContextMenu } from "#lib/libfe/mod"
+import { ContextMenu } from "@ordo-pink/libfe/mod"
 
 const commands = getCommands()
 

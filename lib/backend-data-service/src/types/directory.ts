@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: Copyright 2023, 谢尔盖||↓ and the Ordo.pink contributors
 // SPDX-License-Identifier: MIT
 
-import type { SUB } from "#lib/backend-token-service/mod.ts"
+import type { SUB } from "@ordo-pink/backend-token-service/mod.ts"
 import type { NonEmpty, StartsWithSlash, EndsWithSlash, NoForbiddenSymbols } from "./common.ts"
 import type { File } from "./file.ts"
 
@@ -14,7 +14,7 @@ export type DirectoryPath = `/${string}/` | "/"
  * Initialisation params for creating a Directory.
  */
 export type DirectoryCreateParams<
-	CustomMetadata extends Record<string, unknown> = Record<string, unknown>,
+	CustomMetadata extends Record<string, unknown> = Record<string, unknown>
 > = Partial<Directory<CustomMetadata>> & {
 	path: DirectoryPath
 }

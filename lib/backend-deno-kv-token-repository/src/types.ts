@@ -8,9 +8,9 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-import type { JTI, TokenRecord, TokenRepository } from "#lib/backend-token-service/mod.ts"
+import type { JTI, TokenRecord, TokenRepository } from "@ordo-pink/backend-token-service/mod.ts"
 import type {} from "#ramda"
-import { Unary, Curry, Binary, Method } from "#lib/tau/mod.ts"
+import { Unary, Curry, Binary, Method } from "@ordo-pink/tau/mod.ts"
 
 // --- Public ---
 

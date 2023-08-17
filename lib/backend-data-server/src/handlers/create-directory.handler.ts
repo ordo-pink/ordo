@@ -6,13 +6,13 @@
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 import { httpErrors, type Context, type Middleware } from "#x/oak@v12.6.0/mod.ts"
-import type * as DATA_SERVICE_TYPES from "#lib/backend-data-service/mod.ts"
-import type { SUB } from "#lib/backend-token-service/mod.ts"
-import type { Binary, Curry, Unary } from "#lib/tau/mod.ts"
+import type * as DATA_SERVICE_TYPES from "@ordo-pink/backend-data-service/mod.ts"
+import type { SUB } from "@ordo-pink/backend-token-service/mod.ts"
+import type { Binary, Curry, Unary } from "@ordo-pink/tau/mod.ts"
 
-import { ResponseError, useBearerAuthorization, useBody } from "#lib/backend-utils/mod.ts"
-import { DirectoryModel } from "#lib/backend-data-service/mod.ts"
-import { Oath } from "#lib/oath/mod.ts"
+import { ResponseError, useBearerAuthorization, useBody } from "@ordo-pink/backend-utils/mod.ts"
+import { DirectoryModel } from "@ordo-pink/backend-data-service/mod.ts"
+import { Oath } from "@ordo-pink/oath/mod.ts"
 import { prop } from "#ramda"
 
 // --- Public ---
@@ -27,8 +27,8 @@ export const handleCreateDirectory: Fn =
 					.chain(validateCreateDirectoryParams0({ ctx, sub, service: dataService }))
 					.chain(createDirectory0({ service: dataService, sub }))
 					.rejectedMap(e =>
-						e.message === "Directory already exists" ? new httpErrors.Conflict(e.message) : e,
-					),
+						e.message === "Directory already exists" ? new httpErrors.Conflict(e.message) : e
+					)
 			)
 			.fork(ResponseError.send(ctx), formCreateDirectoryResponse(ctx))
 
@@ -55,15 +55,15 @@ const validateCreateDirectoryParams0: ValidateCreateDirectoryParamsFn =
 	({ ctx, sub, service }) =>
 	params =>
 		Oath.try(() =>
-			DirectoryModel.isValidPath(params.path) ? params : ctx.throw(400, "Invalid directory path"),
+			DirectoryModel.isValidPath(params.path) ? params : ctx.throw(400, "Invalid directory path")
 		)
 			.chain(({ path }) =>
 				Oath.fromNullable(DirectoryModel.getParentPath(path))
 					.chain(path => service.checkDirectoryExists({ path, sub }))
-					.rejectedMap(() => new httpErrors.BadRequest("Invalid directory path")),
+					.rejectedMap(() => new httpErrors.BadRequest("Invalid directory path"))
 			)
 			.chain(exists =>
-				Oath.try(() => (exists ? params : ctx.throw(404, "Missing parent directory"))),
+				Oath.try(() => (exists ? params : ctx.throw(404, "Missing parent directory")))
 			)
 
 // ---

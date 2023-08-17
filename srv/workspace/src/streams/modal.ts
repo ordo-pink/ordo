@@ -3,10 +3,10 @@
 
 import { BehaviorSubject, Observable } from "rxjs"
 import type { ComponentType } from "react"
-import { Nullable, Thunk, callOnce } from "#lib/tau/mod"
-import { Logger } from "#lib/logger/mod"
+import { Nullable, Thunk, callOnce } from "@ordo-pink/tau/mod"
+import { Logger } from "@ordo-pink/logger/mod"
 import { getCommands } from "$streams/commands"
-import { cmd, Modal as TModal } from "#lib/libfe/mod"
+import { cmd, Modal as TModal } from "@ordo-pink/libfe/mod"
 
 const commands = getCommands()
 

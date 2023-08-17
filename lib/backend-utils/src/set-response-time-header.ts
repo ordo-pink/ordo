@@ -5,12 +5,12 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-import { Middleware } from "#x/oak@v12.6.0/mod.ts"
+import { Middleware } from "koa"
 
 export const setResponseTimeHeader: Middleware = async (ctx, next) => {
 	const start = Date.now()
 	await next()
 	const ms = Date.now() - start
 
-	ctx.response.headers.set("X-Response-Time", ms.toString())
+	ctx.response.headers["X-Response-Time"] = ms.toString()
 }

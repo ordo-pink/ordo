@@ -7,9 +7,9 @@
 
 import "#std/dotenv/load.ts"
 
-import { Oath } from "#lib/oath/mod.ts"
-import { createDirectoryIfNotExists } from "#lib/fs/mod.ts"
-import { getc } from "#lib/getc/mod.ts"
+import { Oath } from "@ordo-pink/oath/mod.ts"
+import { createDirectoryIfNotExists } from "@ordo-pink/fs/mod.ts"
+import { getc } from "@ordo-pink/getc/mod.ts"
 import { cyan, green } from "#std/fmt/colors.ts"
 
 const { STATIC_ROOT } = getc(["STATIC_ROOT"])

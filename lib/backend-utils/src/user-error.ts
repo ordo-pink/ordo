@@ -7,9 +7,9 @@
 
 // deno-lint-ignore-file no-explicit-any
 
-import { Context, Middleware, HttpError } from "#x/oak@v12.6.0/mod.ts"
-import { Logger } from "#lib/logger/mod.ts"
-import type * as T from "./types.ts"
+import { Logger } from "@ordo-pink/logger"
+import { HttpError, Context, Middleware } from "koa"
+import type * as T from "./types"
 
 export const sendError = (ctx: Context) => (err: T.HttpError | unknown) => {
 	if (
@@ -58,8 +58,8 @@ export const handleError =
 		try {
 			await next()
 		} catch (e) {
-			if (e instanceof HttpError || e.status) {
-				ctx.response.status = e.status
+			if (e instanceof HttpError || (e instanceof Error && (e as any).status)) {
+				ctx.response.status = (e as any).status
 				ctx.response.body = { success: false, message: e.message }
 			} else {
 				ctx.response.status = 500

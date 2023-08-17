@@ -13,10 +13,10 @@
 // // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 // import { assert, assertEquals, assertInstanceOf, assertRejects } from "#std/testing/asserts.ts"
-// import { readFile, rmdir } from "#lib/fs/mod.ts"
+// import { readFile, rmdir } from "@ordo-pink/fs/mod.ts"
 // import { FSDataRepository } from "./impl.ts"
 // import { resolve } from "#std/path/mod.ts"
-// import { FSID } from "#lib/backend-data-service/mod.ts"
+// import { FSID } from "@ordo-pink/backend-data-service/mod.ts"
 
 // const root = "./var/test"
 // const sub = crypto.randomUUID()

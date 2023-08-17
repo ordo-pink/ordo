@@ -5,9 +5,9 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-import { getDenoPath, runCommand, runDenoCommand } from "#lib/binutil/mod.ts"
-import { Oath } from "#lib/oath/mod.ts"
-import { getc } from "#lib/getc/mod.ts"
+import { getDenoPath, runCommand, runDenoCommand } from "@ordo-pink/binutil/mod.ts"
+import { Oath } from "@ordo-pink/oath/mod.ts"
+import { getc } from "@ordo-pink/getc/mod.ts"
 
 const { STATIC_ROOT } = getc(["STATIC_ROOT"])
 

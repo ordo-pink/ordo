@@ -5,10 +5,10 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-import type { Header, Payload } from "#x/djwt@v2.9.1/mod.ts"
-import type { Oath } from "#lib/oath/mod.ts"
-import type { Nullable, Unary, Binary, Ternary, Thunk, Curry } from "#lib/tau/mod.ts"
-import type { Logger } from "#lib/logger/mod.ts"
+import type { Jwt, JwtHeader, JwtPayload, Algorithm } from "jsonwebtoken"
+import type { Nullable, Unary, Binary, Ternary, Thunk, Curry } from "@ordo-pink/tau"
+import type { Logger } from "@ordo-pink/logger"
+import type { Oath } from "@ordo-pink/oath"
 
 // --- Public ---
 
@@ -70,7 +70,7 @@ export type UIP = string
 /**
  * Payload of the access JWT.
  */
-export interface AccessTokenPayload extends Payload {
+export interface AccessTokenPayload extends JwtPayload {
 	/**
 	 * JWT subject. User id is stored here.
 	 */
@@ -118,11 +118,11 @@ export interface RefreshTokenPayload extends AccessTokenPayload {
 /**
  * Parsed token content.
  */
-export type TokenParsed<TPayload extends Payload = Payload> = {
+export type TokenParsed<TPayload extends JwtPayload = JwtPayload> = {
 	/**
-	 * @see Header
+	 * @see JwtHeader
 	 */
-	readonly header: Header
+	readonly header: JwtHeader
 
 	/**
 	 * @see Payload
@@ -155,53 +155,49 @@ export type RefreshTokenParsed = TokenParsed<RefreshTokenPayload>
 export type TokenRepository = {
 	/**
 	 * Get token associated with given user id and token id.
-	 * @rejects with `null` if no reference to given user id is persisted.
-	 * @rejects with `null` if token was not found.
 	 * @rejects with `Error` if a database error occurs. Resolves with a token.
+	 * @resolves with `null` if no reference to given user id is persisted.
+	 * @resolves with `null` if token was not found.
 	 * @resolves with an Oath of the token for given sub and jti.
 	 */
-	getToken(sub: SUB, jti: JTI): Oath<string, Nullable<Error>>
+	getToken(sub: SUB, jti: JTI): Oath<Nullable<string>, Error>
 
 	/**
 	 * Get an object that contains mapping of JTIs to corresponding tokens.
-	 * @rejects with `null` if no reference to given user id is persisted.
 	 * @rejects with `Error` if a database error occurs.
+	 * @resolves with `null` if no reference to given user id is persisted.
 	 * @resolves with a record of JTIs to corresponding tokens.
 	 */
-	getTokenRecord(sub: SUB): Oath<TokenRecord, Nullable<Error>>
+	getTokenRecord(sub: SUB): Oath<Nullable<TokenRecord>, Error>
 
 	/**
 	 * Remove a token associated with given user id and token id.
-	 * @rejects with `null` if no reference to given user id is persisted.
 	 * @rejects with `Error` if a database error occurs.
 	 * @resolves with "OK" if user's token record did not contain the token hence it was not removed.
 	 * @resolves with "OK".
 	 */
-	removeToken(sub: SUB, jti: JTI): Oath<"OK", Nullable<Error>>
+	removeToken(sub: SUB, jti: JTI): Oath<"OK", Error>
 
 	/**
 	 * Remove token record of a user under given user id.
-	 * @rejects with `null` if no reference to given user id is persisted.
 	 * @rejects with `Error` if a database error occurs.
 	 * @resolves with "OK".
 	 */
-	removeTokenRecord(sub: SUB): Oath<"OK", Nullable<Error>>
+	removeTokenRecord(sub: SUB): Oath<"OK", Error>
 
 	/**
 	 * Set a token for given user id and token id.
-	 * @rejects with `null` if no reference to given user id is persisted.
 	 * @rejects with `Error` if a database error occurs.
 	 * @resolves with "OK".
 	 */
-	setToken(sub: SUB, jti: JTI, token: string): Oath<"OK", Nullable<Error>>
+	setToken(sub: SUB, jti: JTI, token: string): Oath<"OK", Error>
 
 	/**
 	 * Set token record for a user under given user id.
-	 * @rejects with `null` if no reference to given user id is persisted.
 	 * @rejects with `Error` if a database error occurs.
 	 * @resolves with "OK"
 	 */
-	setTokenRecord(sub: SUB, map: TokenRecord): Oath<"OK", Nullable<Error>>
+	setTokenRecord(sub: SUB, map: TokenRecord): Oath<"OK", Error>
 }
 
 /**
@@ -224,9 +220,9 @@ export type TokenServiceOptions = {
 	}
 
 	/**
-	 * TODO: Add support for switching to other algorithms.
+	 * @see Algorithm
 	 */
-	readonly alg: "ES384"
+	readonly alg: Algorithm
 
 	/**
 	 * Lifetime of an access token in seconds.
@@ -239,144 +235,28 @@ export type TokenServiceOptions = {
 	readonly refreshTokenExpireIn: number
 
 	/**
-	 * TODO: Add logger and propper logging of errors
+	 * Dedicated logger.
 	 */
 	readonly logger: Logger
 }
 
-/**
- * TokenService is used for working with tokens. It's main purpose is to create, verify, and decode
- * tokens, and provide CRUD access to the tokens in the storage. The storage can be overriden with
- * a TokenStorageAdapter that is accepted by TokenService as an argument. Provided adapter will be
- * used for storing and retrieving tokens wherever they are stored (this is controlled solely by
- * the TokenStorageDriver). Other options for TokenService can be configured via the options
- * provided as the second argument.
- *
- * @see TokenRepository
- */
 export type TTokenService = {
-	/**
-	 * Verify given access token.
-	 * @resolves with `true` if the token is valid.
-	 * @resolves with `false` otherwise.
-	 */
-	verifyAccessToken: Unary<string, Oath<boolean, never>>
+	verifyToken: (token: string, type: "access" | "refresh") => Oath<boolean>
 
-	/**
-	 * Verify given refresh token.
-	 * @resolves with `true` if the token is valid.
-	 * @resolves with `false` otherwise.
-	 * @rejects `never`.
-	 */
-	verifyRefreshToken: Unary<string, Oath<boolean, never>>
+	getPayload: (
+		token: string,
+		type: "access" | "refresh"
+	) => Oath<Nullable<typeof type extends "access" ? AccessTokenParsed : RefreshTokenParsed>>
 
-	/**
-	 * Get payload of a given access token.
-	 * @resolves with `AccessTokenPayload` if the token is valid.
-	 * @rejects with `null` otherwise.
-	 */
-	getAccessTokenPayload: Unary<string, Oath<AccessTokenPayload, null>>
+	decode: (
+		token: string,
+		type: "access" | "refresh"
+	) => Oath<Nullable<typeof type extends "access" ? AccessTokenParsed : RefreshTokenParsed>>
 
-	/**
-	 * Get payload of a given refresh token.
-	 * @resolves with `RefreshTokenPayload` if the token is valid.
-	 * @rejects with `null` otherwise.
-	 */
-	getRefreshTokenPayload: Unary<string, Oath<RefreshTokenPayload, null>>
-
-	/**
-	 * Get parsed access token content from given token.
-	 * @resolves with `AccessTokenParsed` if the token is valid.
-	 * @rejects with `null` otherwise.
-	 */
-	decodeAccessToken: Unary<string, Oath<AccessTokenParsed, null>>
-
-	/**
-	 * Get parsed refresh token content from given token.
-	 * @resolves with `RefreshTokenParsed` if the token is valid.
-	 * @rejects with `null` otherwise.
-	 */
-	decodeRefreshToken: Unary<string, Oath<RefreshTokenParsed, null>>
-
-	/**
-	 * Create a pair of tokens for given user id.
-	 * @resolves with a record of tokens after removing old JTI and persisting new JTI-token pair.
-	 * @rejects with `null` otherwise.
-	 */
-	createTokens: Unary<_CreateTokensParams, Oath<_CreatedTokens, null>>
-
-	/**
-	 * Get a refresh token for given user id and token id.
-	 * @resolves with refresh token if such token was persisted.
-	 * @rejects with `null` otherwise.
-	 */
-	getPersistedToken: Binary<SUB, JTI, Oath<string, null>>
-
-	/**
-	 * Get a token record for given user id.
-	 * @resolves with `TokenDict` if such token record was persisted.
-	 * @rejects with `null` otherwise.
-	 */
-	getPersistedTokens: Unary<SUB, Oath<TokenRecord, null>>
-
-	/**
-	 * Remove a token for given user id and token id.
-	 * @resolves with `"OK"` if token was removed or the user token record did not have such token.
-	 * @rejects with `null` otherwise.
-	 */
-	removePersistedToken: Binary<SUB, JTI, Oath<"OK", null>>
-
-	/**
-	 * Remove a token record for given user id.
-	 * @resolves with `"OK"` if token record was removed or token record for such user did not exist.
-	 * @rejects with `null` otherwise.
-	 */
-	removePersistedTokens: Unary<SUB, Oath<"OK", null>>
-
-	/**
-	 * Set a token for given user id and token id.
-	 * @resolves with `"OK"` if token was set.
-	 * @rejects with `null` otherwise.
-	 */
-	setPersistedToken: Ternary<SUB, JTI, string, Oath<"OK", null>>
-
-	/**
-	 * Set a token record for given user id.
-	 * @resolves with `"OK"` if token record was set.
-	 * @rejects with `null` otherwise.
-	 */
-	setPersistedTokens: Binary<SUB, TokenRecord, Oath<"OK", null>>
-}
-
-// --- Internal ---
-
-export type _CreateTokensParams = { sub: SUB; uip: UIP; prevJti?: JTI; aud?: AUD }
-export type _CreatedTokens = RefreshTokenPayload & { access: string; refresh: string }
-export type _Props = { repository: TokenRepository; options: TokenServiceOptions }
-export type _Fn = (props: _Props) => TTokenService
-export type _GetTokenPayloadFn<T> = (params: {
-	key: CryptoKey
-	repository: TokenRepository
-}) => Unary<string, Oath<T, null>>
-export type _DecodePayloadFn<T extends TokenParsed> = Unary<string, Oath<T, null>>
-export type _GetTokenFn = Unary<TokenRepository, TTokenService["getPersistedToken"]>
-export type _GetTokenRecordFn = Unary<TokenRepository, TTokenService["getPersistedTokens"]>
-export type _RemoveTokenFn = Unary<TokenRepository, TTokenService["removePersistedToken"]>
-export type _RemoveTokenRecordFn = Unary<TokenRepository, TTokenService["removePersistedTokens"]>
-export type _SetTokenFn = Unary<TokenRepository, TTokenService["setPersistedToken"]>
-export type _SetTokenRecordFn = Unary<TokenRepository, TTokenService["setPersistedTokens"]>
-export type _CreateEXPFn = Unary<number, EXP>
-export type _CreateJTIFn = Thunk<JTI>
-export type _CreateIATFn = Thunk<IAT>
-export type _CreateISSFn = Thunk<ISS>
-export type _VerifyToken = Curry<
-	Binary<
-		{
-			key: CryptoKey
-			repository: TokenRepository
-		},
-		string,
-		Oath<boolean, never>
+	createPair: Unary<
+		{ sub: SUB; uip: UIP; prevJti?: JTI; aud?: AUD },
+		Oath<RefreshTokenPayload & { tokens: { access: string; refresh: string } }, Error>
 	>
->
-export type _CreateTokensFn = Unary<_Props, TTokenService["createTokens"]>
+
+	repository: TokenRepository
+}

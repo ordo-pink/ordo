@@ -5,25 +5,25 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-import { compare, genSalt, hash } from "#x/bcrypt@v0.4.1/mod.ts"
-import { Oath } from "#lib/oath/mod.ts"
-import * as T from "./types.ts"
+import type { User, InternalUser, PublicUser, UserRepository } from "./types"
+import { hash, compare, genSalt } from "bcryptjs"
+import { Oath } from "@ordo-pink/oath"
 
 export type UserServiceOptions = {
 	saltRounds: number
 }
 
 export class UserService {
-	#driver: T.UserRepository
+	#driver: UserRepository
 	#salt: string
 
-	public static async of(driver: T.UserRepository, options: UserServiceOptions) {
+	public static async of(driver: UserRepository, options: UserServiceOptions) {
 		const salt = await genSalt(options.saltRounds)
 
 		return new UserService(driver, salt)
 	}
 
-	protected constructor(driver: T.UserRepository, salt: string) {
+	protected constructor(driver: UserRepository, salt: string) {
 		this.#driver = driver
 		this.#salt = salt
 	}
@@ -37,20 +37,20 @@ export class UserService {
 					password,
 					emailConfirmed: false,
 					createdAt: new Date(Date.now()),
-				}),
+				})
 			)
 			.map(this.serialize)
 	}
 
-	public updateUserPassword(user: T.User, oldPassword: string, newPassword: string) {
+	public updateUserPassword(user: User, oldPassword: string, newPassword: string) {
 		return this.#driver.getById(user.id).chain(oldUser =>
 			Oath.from(() => compare(oldPassword, oldUser.password))
 				.chain(valid =>
 					Oath.fromBoolean(
 						() => valid,
 						() => user,
-						() => "Invalid password",
-					),
+						() => "Invalid password"
+					)
 				)
 				.chain(user =>
 					Oath.from(() => hash(newPassword, this.#salt)).map(
@@ -58,15 +58,15 @@ export class UserService {
 							({
 								...user,
 								password,
-							}) as T.InternalUser,
-					),
+							} as InternalUser)
+					)
 				)
 				.chain(user => this.#driver.update(oldUser.id, user).rejectedMap(() => "User not found"))
-				.map(user => this.serialize(user)),
+				.map(user => this.serialize(user))
 		)
 	}
 
-	public update(id: string, user: Partial<T.User>) {
+	public update(id: string, user: Partial<User>) {
 		return this.#driver.update(id, user).map(user => this.serialize(user))
 	}
 
@@ -90,12 +90,12 @@ export class UserService {
 				Oath.fromBoolean(
 					() => x,
 					() => x,
-					() => x,
-				),
+					() => x
+				)
 			)
 	}
 
-	private serialize(user: T.InternalUser): T.User {
+	private serialize(user: InternalUser): User {
 		return {
 			createdAt: user.createdAt,
 			email: user.email,
@@ -107,10 +107,10 @@ export class UserService {
 		}
 	}
 
-	private serializePublic(user: T.InternalUser): T.PublicUser {
+	private serializePublic(user: InternalUser): PublicUser {
 		return {
 			createdAt: user.createdAt,
-			email: user.email, // TODO: obfuscate email
+			email: user.email,
 			firstName: user.firstName,
 			lastName: user.lastName,
 			username: user.username,

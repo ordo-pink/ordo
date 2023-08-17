@@ -10,10 +10,10 @@
 
 // deno-lint-ignore-file no-explicit-any
 
-import type * as US from "#lib/backend-user-service/mod.ts"
+import type * as US from "@ordo-pink/backend-user-service/mod.ts"
 import type * as T from "./types.ts"
 
-import { Oath } from "#lib/oath/mod.ts"
+import { Oath } from "@ordo-pink/oath/mod.ts"
 
 // --- Public ---
 
@@ -42,13 +42,13 @@ const create: US.CreateMethod<T.Params> =
 	({ db, idKey, emailKey }) =>
 	user =>
 		Oath.try(() =>
-			db.atomic().set([idKey, user.id], user).set([emailKey, user.email], user).commit(),
+			db.atomic().set([idKey, user.id], user).set([emailKey, user.email], user).commit()
 		).chain(res =>
 			Oath.fromBoolean(
 				() => res.ok,
 				() => user,
-				() => new Error("User with given email already exists"),
-			),
+				() => new Error("User with given email already exists")
+			)
 		)
 
 const update: US.UpdateMethod<T.Params> =
@@ -66,27 +66,27 @@ const update: US.UpdateMethod<T.Params> =
 								.delete([emailKey, user.email])
 								.set([idKey, user.id], newUser)
 								.set([emailKey, newUser.email], newUser)
-								.commit(),
+								.commit()
 					  ).chain(res =>
 							Oath.fromBoolean(
 								() => res.ok,
 								() => newUser,
-								() => null,
-							),
+								() => null
+							)
 					  )
 					: Oath.try(() =>
 							db
 								.atomic()
 								.set([idKey, user.id], newUser)
 								.set([emailKey, user.email], newUser)
-								.commit(),
+								.commit()
 					  ).chain(res =>
 							Oath.fromBoolean(
 								() => res.ok,
 								() => newUser,
-								() => null,
-							),
-					  ),
+								() => null
+							)
+					  )
 			)
 
 const getByEmail: US.GetByEmailMethod<T.Params> =

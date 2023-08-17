@@ -5,14 +5,14 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-import type { Context, Middleware } from "#x/oak@v12.6.0/mod.ts"
-import type { EXP, TTokenService } from "#lib/backend-token-service/mod.ts"
-import type { UserService } from "#lib/backend-user-service/mod.ts"
+import type { Context, Middleware } from "koa"
+import type { EXP, TTokenService } from "@ordo-pink/backend-token-service"
+import type { UserService } from "@ordo-pink/backend-user-service"
 
-import { ResponseError } from "#lib/backend-utils/mod.ts"
-import { useBody } from "#lib/backend-utils/mod.ts"
-import { Oath } from "#lib/oath/mod.ts"
-import { prop } from "#ramda"
+import { ResponseError } from "@ordo-pink/backend-utils"
+import { useBody } from "@ordo-pink/backend-utils"
+import { Oath } from "@ordo-pink/oath"
+import { prop } from "ramda"
 
 // --- Public ---
 
@@ -31,21 +31,21 @@ export const handleSignIn: Fn =
 						Oath.all({
 							user: userService.getByEmail(email),
 							ok: userService.comparePassword(email, password),
-						}),
+						})
 					)
-					.bimap(ResponseError.create(404, "User not found"), prop("user")),
+					.bimap(ResponseError.create(404, "User not found"), prop("user"))
 			)
 			// TODO: Drop previous token if it exists for given IP
 			.chain(user =>
 				Oath.of({ sub: user.id, uip: ctx.request.ip }).chain(({ sub, uip }) =>
-					tokenService.createTokens({ sub, uip }),
-				),
+					tokenService.createPair({ sub, uip })
+				)
 			)
 			.chain(tokens =>
 				Oath.all([
 					setSignInCookie("jti", tokens.jti, tokens.exp, ctx),
 					setSignInCookie("sub", tokens.sub, tokens.exp, ctx),
-				]).map(() => tokens),
+				]).map(() => tokens)
 			)
 			.fork(ResponseError.send(ctx), ({ access, jti, sub }) => {
 				ctx.response.body = {

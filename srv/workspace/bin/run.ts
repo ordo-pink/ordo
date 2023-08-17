@@ -1,8 +1,8 @@
 // SPDX-FileCopyrightText: Copyright 2023, 谢尔盖||↓ and the Ordo.pink contributors
 // SPDX-License-Identifier: MIT
 
-import { runCommand } from "#lib/binutil/mod.ts"
-import { getc } from "#lib/getc/mod.ts"
+import { runCommand } from "@ordo-pink/binutil/mod.ts"
+import { getc } from "@ordo-pink/getc/mod.ts"
 
 const { STATIC_HOST, WORKSPACE_PORT, ID_HOST, WEB_HOST, DATA_HOST } = getc([
 	"STATIC_HOST",

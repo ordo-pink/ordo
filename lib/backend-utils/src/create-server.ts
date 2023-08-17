@@ -5,14 +5,17 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-import { Unary } from "#lib/tau/mod.ts"
-import { Application, Router } from "#x/oak@v12.6.0/mod.ts"
-import { logRequest } from "#lib/backend-utils/src/log-request.ts"
-import { setResponseTimeHeader } from "#lib/backend-utils/src/set-response-time-header.ts"
-import { handleError } from "#lib/backend-utils/src/user-error.ts"
-import { oakCors } from "#x/cors@v1.2.2/oakCors.ts"
-import { ConsoleLogger, Logger } from "#lib/logger/mod.ts"
-import { identity } from "#ramda"
+import { Unary } from "@ordo-pink/tau"
+import { logRequest } from "./log-request"
+import { setResponseTimeHeader } from "./set-response-time-header"
+import { handleError } from "./user-error"
+import cors from "koa-cors"
+import { ConsoleLogger, Logger } from "@ordo-pink/logger"
+import { identity } from "ramda"
+import Router from "@koa/router"
+import Application from "koa"
+import { Either } from "@ordo-pink/either/mod"
+import bodyparser from "koa-bodyparser"
 
 export type CreateServerParams = {
 	origin?: string | string[]
@@ -38,9 +41,30 @@ export const createServer: CreateServerFn = ({
 	const app = new Application()
 
 	app.use(logRequest({ logger, serverName }))
+	app.use(bodyparser())
 	app.use(setResponseTimeHeader)
 	app.use(handleError({ logger }))
-	app.use(oakCors({ origin, credentials: true }))
+	app.use(
+		cors({
+			origin: ctx =>
+				Either.fromNullable(ctx.get("Origin"))
+					.chain(o =>
+						Either.fromNullable(origin)
+							.chain(os =>
+								Either.fromBoolean(
+									() => Array.isArray(os),
+									() => (os as string[]).includes(o as string),
+									() => o === os
+								)
+							)
+							.map(allowed => (allowed ? (o as string) : ""))
+							.leftMap(allowed => (allowed ? (o as string) : ""))
+					)
+					.leftMap(result => (result === null ? "" : result))
+					.fold(identity, identity),
+			credentials: true,
+		})
+	)
 	app.use(router.routes())
 	app.use(router.allowedMethods())
 

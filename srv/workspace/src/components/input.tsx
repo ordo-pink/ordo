@@ -3,9 +3,9 @@
 
 // deno-lint-ignore-file no-explicit-any
 
-import { Either, TEither } from "#lib/either/mod"
+import { Either, TEither } from "@ordo-pink/either/mod"
 import isEmail from "validator/es/lib/isEmail"
-import { okpwd } from "#lib/okpwd/mod"
+import { okpwd } from "@ordo-pink/okpwd/mod"
 import { ChangeEventHandler } from "react"
 
 type InputProps = {
@@ -78,7 +78,7 @@ export const EmailInput = ({
 				const errors = Either.fromBoolean(
 					() => isEmail(value, {}),
 					() => value,
-					() => ["Invalid email."],
+					() => ["Invalid email."]
 				)
 
 				onChange(errors)

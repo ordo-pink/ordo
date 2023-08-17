@@ -5,7 +5,7 @@
 
 import type { IconType } from "react-icons"
 import type { ComponentType, MouseEvent } from "react"
-import type { Thunk, Unary } from "#lib/tau/mod"
+import type { Thunk, Unary } from "@ordo-pink/tau/mod"
 
 export namespace cmd {
 	export namespace contextMenu {
@@ -69,7 +69,7 @@ export namespace Router {
 	export type NavigateParams = [
 		routeConfig: string | RouteConfig,
 		replace?: boolean,
-		exec?: boolean,
+		exec?: boolean
 	]
 
 	export type OpenExternalParams = { url: string; newTab?: boolean }

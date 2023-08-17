@@ -3,12 +3,12 @@
 
 import { combineLatestWith, map, merge, Observable, scan, shareReplay, Subject } from "rxjs"
 import { BehaviorSubject } from "rxjs"
-import { Binary, Curry, Nullable, Thunk, Unary, callOnce } from "#lib/tau/mod"
-import { Logger } from "#lib/logger/mod"
-import { Either } from "#lib/either/mod"
+import { Binary, Curry, Nullable, Thunk, Unary, callOnce } from "@ordo-pink/tau/mod"
+import { Logger } from "@ordo-pink/logger/mod"
+import { Either } from "@ordo-pink/either/mod"
 import { getCommands } from "$streams/commands"
 import Null from "$components/null"
-import { ContextMenu } from "#lib/libfe/mod"
+import { ContextMenu } from "@ordo-pink/libfe/mod"
 
 const commands = getCommands()
 
@@ -49,7 +49,7 @@ const add$ = new Subject<ContextMenu.Item>()
 const remove$ = new Subject<string>()
 const globalItems$ = merge(add$.pipe(map(addP)), remove$.pipe(map(removeP))).pipe(
 	scan((acc, f) => f(acc), [] as ContextMenu.Item[]),
-	shareReplay(1),
+	shareReplay(1)
 )
 
 globalItems$.subscribe()
@@ -60,8 +60,8 @@ const contextMenu$ = params$.pipe(
 		Either.fromNullable(state).fold(Null, state => ({
 			...state,
 			structure: items.filter(item =>
-				item.shouldShow({ event: state.event, payload: state.payload }),
+				item.shouldShow({ event: state.event, payload: state.payload })
 			),
-		})),
-	),
+		}))
+	)
 )

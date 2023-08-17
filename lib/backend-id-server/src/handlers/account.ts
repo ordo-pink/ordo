@@ -5,13 +5,13 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-import type { Middleware } from "#x/oak@v12.6.0/mod.ts"
-import type { TTokenService } from "#lib/backend-token-service/mod.ts"
-import type { UserService } from "#lib/backend-user-service/mod.ts"
+import type { Middleware } from "koa"
+import type { TTokenService } from "@ordo-pink/backend-token-service"
+import type { UserService } from "@ordo-pink/backend-user-service"
 
-import { ResponseError, useBearerAuthorization } from "#lib/backend-utils/mod.ts"
-import { Oath } from "#lib/oath/mod.ts"
-import { prop } from "#ramda"
+import { ResponseError, useBearerAuthorization } from "@ordo-pink/backend-utils"
+import { Oath } from "@ordo-pink/oath"
+import { prop } from "ramda"
 
 type Params = { tokenService: TTokenService; userService: UserService }
 type Fn = (params: Params) => Middleware

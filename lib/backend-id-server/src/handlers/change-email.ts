@@ -5,15 +5,15 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-import type { Context, Middleware } from "#x/oak@v12.6.0/mod.ts"
-import type { AccessTokenParsed, TTokenService } from "#lib/backend-token-service/mod.ts"
-import type { UserService } from "#lib/backend-user-service/mod.ts"
-import type { User } from "#lib/backend-user-service/mod.ts"
+import type { Context, Middleware } from "koa"
+import type { AccessTokenParsed, TTokenService } from "@ordo-pink/backend-token-service"
+import type { UserService } from "@ordo-pink/backend-user-service"
+import type { User } from "@ordo-pink/backend-user-service"
 
-import { isEmail } from "#x/deno_validator@v0.0.5/mod.ts"
-import { HttpError, useBearerAuthorization, useBody } from "#lib/backend-utils/mod.ts"
-import { ResponseError } from "#lib/backend-utils/mod.ts"
-import { Oath } from "#lib/oath/mod.ts"
+import validator from "validator"
+import { HttpError, useBearerAuthorization, useBody } from "@ordo-pink/backend-utils"
+import { ResponseError } from "@ordo-pink/backend-utils"
+import { Oath } from "@ordo-pink/oath"
 
 // --- Public ---
 
@@ -51,7 +51,7 @@ const validateInput: ValidateInputFn =
 			.chain(({ user, email }) =>
 				Oath.fromNullable(email)
 					.chain(validateEmail({ user, userService }))
-					.map(() => ({ user, email: email! })),
+					.map(() => ({ user, email: email! }))
 			)
 			.rejectedMap(ResponseError.create(400, "Invalid email"))
 
@@ -89,14 +89,14 @@ const validateEmail: ValidateEmailFn =
 				validateEmailIsCorrect,
 				validateEmailIsNotCurrentUserEmail({ user, userService }),
 				validateEmailIsNotTaken({ user, userService }),
-			].map(f => f(email)),
+			].map(f => f(email))
 		).map(() => "OK")
 
 const validateEmailIsCorrect: ReturnType<ValidateEmailFn> = email =>
 	Oath.fromBoolean(
-		() => isEmail(email, {}),
+		() => validator.isEmail(email, {}),
 		() => "OK" as const,
-		() => false,
+		() => false
 	).rejectedMap(ResponseError.create(400, "Invalid email"))
 
 const validateEmailIsNotCurrentUserEmail: ValidateEmailFn =
@@ -105,7 +105,7 @@ const validateEmailIsNotCurrentUserEmail: ValidateEmailFn =
 		Oath.fromBoolean(
 			() => user.email !== email,
 			() => "OK" as const,
-			() => false,
+			() => false
 		).rejectedMap(ResponseError.create(400, "This is your current email"))
 
 const validateEmailIsNotTaken: ValidateEmailFn =
@@ -119,7 +119,7 @@ const validateEmailIsNotTaken: ValidateEmailFn =
 				Oath.fromBoolean(
 					() => !userExists,
 					() => "OK" as const,
-					() => false,
-				),
+					() => false
+				)
 			)
 			.rejectedMap(ResponseError.create(409, "Email already taken"))

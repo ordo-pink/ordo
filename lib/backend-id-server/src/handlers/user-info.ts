@@ -5,17 +5,16 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-import type { Context, RouterMiddleware } from "#x/oak@v12.6.0/mod.ts"
-import type { PublicUser, UserService } from "#lib/backend-user-service/mod.ts"
-import type { TTokenService } from "#lib/backend-token-service/mod.ts"
-
-import { ResponseError, HttpError, useBearerAuthorization } from "#lib/backend-utils/mod.ts"
-import { Oath } from "#lib/oath/mod.ts"
+import type { Context, Middleware } from "koa"
+import type { PublicUser, UserService } from "@ordo-pink/backend-user-service"
+import type { TTokenService } from "@ordo-pink/backend-token-service"
+import { ResponseError, HttpError, useBearerAuthorization } from "@ordo-pink/backend-utils"
+import { Oath } from "@ordo-pink/oath"
 
 // --- Public ---
 
 export type Params = { tokenService: TTokenService; userService: UserService }
-export type Fn = (params: Params) => RouterMiddleware<"/users/:email">
+export type Fn = (params: Params) => Middleware
 
 export const handleUserInfo: Fn =
 	({ tokenService, userService }) =>

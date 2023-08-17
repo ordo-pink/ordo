@@ -10,7 +10,7 @@
 
 // deno-lint-ignore-file no-explicit-any
 
-import { UserRepository } from "#lib/backend-user-service/mod.ts"
+import { UserRepository } from "@ordo-pink/backend-user-service/mod.ts"
 
 export type Config = { path?: string; key?: string }
 export type Params = { db: any; idKey: string; emailKey: string }

@@ -6,13 +6,13 @@
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 import { httpErrors, type Context, type RouterMiddleware } from "#x/oak@v12.6.0/mod.ts"
-import type * as DATA_SERVICE_TYPES from "#lib/backend-data-service/mod.ts"
-import type { Binary, Curry, Nullable, Optional, Unary } from "#lib/tau/mod.ts"
-import type { SUB } from "#lib/backend-token-service/mod.ts"
+import type * as DATA_SERVICE_TYPES from "@ordo-pink/backend-data-service/mod.ts"
+import type { Binary, Curry, Nullable, Optional, Unary } from "@ordo-pink/tau/mod.ts"
+import type { SUB } from "@ordo-pink/backend-token-service/mod.ts"
 
-import { ResponseError, useBearerAuthorization, useBody } from "#lib/backend-utils/mod.ts"
-import { DirectoryModel } from "#lib/backend-data-service/mod.ts"
-import { Oath } from "#lib/oath/mod.ts"
+import { ResponseError, useBearerAuthorization, useBody } from "@ordo-pink/backend-utils/mod.ts"
+import { DirectoryModel } from "@ordo-pink/backend-data-service/mod.ts"
+import { Oath } from "@ordo-pink/oath/mod.ts"
 import { prop } from "#ramda"
 import { pathParamToDirectoryPath } from "../utils.ts"
 
@@ -28,9 +28,9 @@ export const handleUpdateDirectory: Fn =
 					.chain(validateIsValidPath0(ctx))
 					.chain(path =>
 						Oath.from(() => useBody<DATA_SERVICE_TYPES.Directory>(ctx)).chain(
-							updateDirectory0({ service: dataService, sub, path }),
-						),
-					),
+							updateDirectory0({ service: dataService, sub, path })
+						)
+					)
 			)
 			.chain(throwIfDirectoryDoesNotExist0)
 			.fork(ResponseError.send(ctx), formUpdateDirectoryResponse(ctx))
@@ -53,7 +53,7 @@ type ValidateIsValidPathFn = Curry<
 >
 const validateIsValidPath0: ValidateIsValidPathFn = ctx => path =>
 	Oath.try(() =>
-		DirectoryModel.isValidPath(path) ? path : ctx.throw(400, "Invalid directory path"),
+		DirectoryModel.isValidPath(path) ? path : ctx.throw(400, "Invalid directory path")
 	)
 
 // ---

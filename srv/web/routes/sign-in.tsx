@@ -8,7 +8,7 @@
 import { PageHeader } from "../components/page-header.tsx"
 import { CenteredPage } from "../components/centered-page.tsx"
 import SignInForm from "../islands/forms/sign-in-form.tsx"
-import { getc } from "#lib/getc/mod.ts"
+import { getc } from "@ordo-pink/getc/mod.ts"
 
 const { WORKSPACE_HOST } = getc(["WORKSPACE_HOST"])
 

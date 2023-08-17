@@ -5,8 +5,8 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-import { Method, Nullable } from "#lib/tau/mod.ts"
-import { Oath } from "#lib/oath/mod.ts"
+import { Method, Nullable } from "@ordo-pink/tau"
+import { Oath } from "@ordo-pink/oath"
 
 export type PublicUser = {
 	email: string

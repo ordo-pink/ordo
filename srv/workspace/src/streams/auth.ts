@@ -1,16 +1,16 @@
 // SPDX-FileCopyrightText: Copyright 2023, 谢尔盖||↓ and the Ordo.pink contributors
 // SPDX-License-Identifier: MIT
 
-import type { AuthResponse } from "#lib/backend-id-server/mod"
-import type { User } from "#lib/backend-user-service/mod"
-import type { Directory, File } from "#lib/backend-data-service/mod"
+import type { AuthResponse } from "@ordo-pink/backend-id-server/mod"
+import type { User } from "@ordo-pink/backend-user-service/mod"
+import type { Directory, File } from "@ordo-pink/backend-data-service/mod"
 import { AiOutlineLogout } from "react-icons/ai"
 import { BehaviorSubject } from "rxjs"
-import { callOnce, Unary, Nullable } from "#lib/tau/mod"
-import { cmd } from "#lib/libfe/mod"
-import { Either } from "#lib/either/mod"
-import { Logger } from "#lib/logger/mod"
-import { Oath } from "#lib/oath/mod"
+import { callOnce, Unary, Nullable } from "@ordo-pink/tau/mod"
+import { cmd } from "@ordo-pink/libfe/mod"
+import { Either } from "@ordo-pink/either/mod"
+import { Logger } from "@ordo-pink/logger/mod"
+import { Oath } from "@ordo-pink/oath/mod"
 import { useSubscription } from "$hooks/use-subscription"
 import { getCommands } from "$streams/commands"
 
@@ -45,15 +45,15 @@ export const __initAuth: InitAuth = callOnce(({ logger }) => {
 				Oath.try(() =>
 					fetch(`${process.env.REACT_APP_ID_HOST}/account`, {
 						headers: { Authorization: `Bearer ${auth.accessToken}` },
-					}),
-				),
+					})
+				)
 			)
 			.chain(res => Oath.from(() => res.json()))
 			.chain(body => (body.success ? Oath.of(body.result) : Oath.reject(body.error)))
 			.fork(
 				(error: any) => error$.next(error),
-				result => user$.next(result),
-			),
+				result => user$.next(result)
+			)
 	)
 
 	commands.on("core.refresh-metadata-root", () =>
@@ -62,22 +62,22 @@ export const __initAuth: InitAuth = callOnce(({ logger }) => {
 				Oath.try(() =>
 					fetch(`${process.env.REACT_APP_DATA_HOST}/directories/${auth.sub}`, {
 						headers: { Authorization: `Bearer ${auth.accessToken}` },
-					}),
-				),
+					})
+				)
 			)
 			.chain(res => Oath.from(() => res.json()))
 			.chain(body => (body.success ? Oath.of(body.result) : Oath.reject(body.error)))
 			.fork(
 				error => error$.next(error),
-				result => metadata$.next(result),
-			),
+				result => metadata$.next(result)
+			)
 	)
 
 	commands.on("core.sign-out", () =>
 		commands.emit<cmd.router.openExternal>("router.open-external", {
 			url: `${process.env.REACT_APP_WEB_HOST}/sign-out`,
 			newTab: false,
-		}),
+		})
 	)
 
 	commands.emit<cmd.commandPalette.add>("command-palette.add", {

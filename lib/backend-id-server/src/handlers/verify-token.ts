@@ -5,12 +5,11 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-import type { Middleware } from "#x/oak@v12.6.0/mod.ts"
-import type { UserService } from "#lib/backend-user-service/mod.ts"
-import type { TTokenService } from "#lib/backend-token-service/mod.ts"
-
-import { useBearerAuthorization } from "#lib/backend-utils/mod.ts"
-import { Oath } from "#lib/oath/mod.ts"
+import type { Middleware } from "koa"
+import type { UserService } from "@ordo-pink/backend-user-service"
+import type { TTokenService } from "@ordo-pink/backend-token-service"
+import { useBearerAuthorization } from "@ordo-pink/backend-utils"
+import { Oath } from "@ordo-pink/oath"
 
 // --- Public ---
 
@@ -31,5 +30,5 @@ export const handleVerifyToken: Fn =
 				},
 				token => {
 					ctx.response.body = { success: true, result: { valid: true, token } }
-				},
+				}
 			)

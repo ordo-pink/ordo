@@ -2,10 +2,10 @@
 // SPDX-License-Identifier: MIT
 
 import { Router } from "silkrouter"
-import { Unary, callOnce } from "#lib/tau/mod"
-import { Logger } from "#lib/logger/mod"
+import { Unary, callOnce } from "@ordo-pink/tau/mod"
+import { Logger } from "@ordo-pink/logger/mod"
 import { getCommands } from "$streams/commands"
-import { cmd } from "#lib/libfe/mod"
+import { cmd } from "@ordo-pink/libfe/mod"
 
 // TODO: Consider moving to react-router
 
@@ -30,7 +30,7 @@ export const __initRouter: InitRouter = callOnce(({ logger }) => {
 		({ payload: { url, newTab = true } }) => {
 			logger.debug("Opening external page", { url, newTab })
 			newTab ? window.open(url, "_blank")?.focus() : (window.location.href = url)
-		},
+		}
 	)
 
 	return { router$ }

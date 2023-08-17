@@ -8,11 +8,11 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-import type { TokenRecord } from "#lib/backend-token-service/mod.ts"
+import type { TokenRecord } from "@ordo-pink/backend-token-service/mod.ts"
 import type * as T from "./types.ts"
 
-import { keysOf } from "#lib/tau/mod.ts"
-import { Oath } from "#lib/oath/mod.ts"
+import { keysOf } from "@ordo-pink/tau/mod.ts"
+import { Oath } from "@ordo-pink/oath/mod.ts"
 
 // TODO: Remove any when Deno.Kv starts working again
 
@@ -73,7 +73,7 @@ const setToken: T._SetTokenFn =
 	(sub, jti, token) =>
 		adapter({ db, key })
 			.getTokenRecord(sub)
-			.fix(() => ({}) as TokenRecord)
+			.fix(() => ({} as TokenRecord))
 			.map(dict => ({ ...dict, [jti]: token }))
 			.chain(dict => adapter({ db, key }).setTokenRecord(sub, dict))
 

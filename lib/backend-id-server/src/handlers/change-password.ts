@@ -5,12 +5,11 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-import type { TTokenService } from "#lib/backend-token-service/mod.ts"
-import type { UserService } from "#lib/backend-user-service/mod.ts"
-import type { Middleware } from "#x/oak@v12.6.0/middleware.ts"
-
-import { okpwd } from "#lib/okpwd/mod.ts"
-import { useBearerAuthorization, useBody } from "#lib/backend-utils/mod.ts"
+import type { TTokenService } from "@ordo-pink/backend-token-service"
+import type { UserService } from "@ordo-pink/backend-user-service"
+import type { Middleware } from "koa"
+import { okpwd } from "@ordo-pink/okpwd"
+import { useBearerAuthorization, useBody } from "@ordo-pink/backend-utils"
 
 export type Body = { oldPassword?: string; newPassword?: string }
 export type Params = { tokenService: TTokenService; userService: UserService }
@@ -56,7 +55,7 @@ export const handleChangePassword: Fn =
 			return ctx.throw(404, "User not found")
 		}
 
-		await tokenService.removePersistedTokens(result.id).toPromise()
+		await tokenService.repository.removeTokenRecord(result.id).toPromise()
 
 		ctx.response.status = 204
 	}

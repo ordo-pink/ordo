@@ -37,7 +37,7 @@ const createFiles0: Ternary<string, string, License, Thunk<Oath<void, Error>>> =
 		Oath.all([
 			createRepositoryFile0(`${path}/license`, getLicense(license)).tap(progress.inc),
 			createRepositoryFile0(`${path}/readme.md`, readme(name)).tap(progress.inc),
-			createRepositoryFile0(`${path}/mod.ts`, mod(license)).tap(progress.inc),
+			createRepositoryFile0(`${path}/index.ts`, index(license)).tap(progress.inc),
 			createRepositoryFile0(`${path}/src/impl.ts`, impl(name, license)).tap(progress.inc),
 			createRepositoryFile0(`${path}/src/impl.test.ts`, test(name, license)).tap(progress.inc),
 			createRepositoryFile0(`${path}/src/types.ts`, types(name, license)).tap(progress.inc),
@@ -47,7 +47,7 @@ const rejectIfExists0: Curry<Binary<string, boolean, Oath<void, string>>> = name
 	Oath.fromBoolean(
 		() => !exists,
 		noop,
-		() => `"bin/${name}" already exists!`
+		() => `"lib/${name}" already exists!`
 	)
 
 const createFilesIfNotExists0: Binary<string, License, Unary<string, Oath<void, string | Error>>> =
@@ -56,7 +56,7 @@ const createFilesIfNotExists0: Binary<string, License, Unary<string, Oath<void, 
 
 // --- Internal ---
 
-const mod = (license: License) => `${getSPDXRecord(license)}
+const index = (license: License) => `${getSPDXRecord(license)}
 export * from "./src/impl"
 export * from "./src/types"
 `

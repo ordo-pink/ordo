@@ -36,7 +36,7 @@ const createFiles0: Ternary<string, string, License, Thunk<Oath<void, Error>>> =
 	(path, name, license) => () =>
 		Oath.all([
 			createRepositoryFile0(`${path}/license`, getLicense(license)).tap(progress.inc),
-			createRepositoryFile0(`${path}/mod.ts`, mod(name, license)).tap(progress.inc),
+			createRepositoryFile0(`${path}/index.ts`, index(name, license)).tap(progress.inc),
 			createRepositoryFile0(`${path}/src/impl.ts`, impl(name, license)).tap(progress.inc),
 			createRepositoryFile0(`${path}/src/impl.test.ts`, test(name, license)).tap(progress.inc),
 		]).map(progress.finish)
@@ -61,7 +61,7 @@ export const ${camel(name)} = () => {
 	return message
 }`
 
-const mod = (name: string, license: License) => `${getSPDXRecord(license)}
+const index = (name: string, license: License) => `${getSPDXRecord(license)}
 import { Command } from "commander"
 import { ${camel(name)} } from "./src/impl"
 

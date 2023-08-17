@@ -43,15 +43,21 @@ function download_bun {
     dir=$(mktemp -d)
     zip=$dir/bun-$BUN_VERSION.zip
 
+    
+
     case $PLATFORM in
-      'Darwin arm64') curl -fLo "$zip" "https://github.com/oven-sh/bun/releases/download/bun-v$BUN_VERSION/bun-darwin-aarch64.zip";;
-      'Darwin x86_64') curl -fLo "$zip" "https://github.com/oven-sh/bun/releases/download/bun-v$BUN_VERSION/bun-darwin-x64.zip";;
-      'Linux arm64' | 'Linux aarch64') "https://github.com/oven-sh/bun/releases/download/bun-v$BUN_VERSION/bun-linux-x64.zip";;
-      'Linux x86_64') curl -fLo "$zip" "https://github.com/oven-sh/bun/releases/download/bun-v$BUN_VERSION/bun-linux-x64-baseline.zip";;
+      'Darwin arm64') NESTED_DIR="bun-darwin-aarch64";;
+      'Darwin x86_64') NESTED_DIR="bun-darwin-x64";;
+      'Linux arm64' | 'Linux aarch64') NESTED_DIR="bun-linux-x64";;
+      'Linux x86_64') NESTED_DIR="bun-linux-x64-baseline";;
       *) echo "Error: Unsupported platform: $PLATFORM"; exit 1;;
     esac
 
+    curl -fLo "$zip" "https://github.com/oven-sh/bun/releases/download/bun-v$BUN_VERSION/$NESTED_DIR.zip"
+
     unzip -o $zip -d opt &>/dev/null
+    mv opt/$NESTED_DIR/bun opt/bun
+    rm -rf opt/$NESTED_DIR
     chmod +x opt/bun
     rm $zip
   fi

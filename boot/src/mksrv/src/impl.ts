@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 import type { License } from "@ordo-pink/binutil"
-import Case from "case"
+import { camel, pascal, title } from "case"
 import {
 	createProgress,
 	createRepositoryFile0,
@@ -36,17 +36,19 @@ const createFiles0: Ternary<string, string, License, Thunk<Oath<void, Error>>> =
 		Oath.all([
 			createRepositoryFile0(`${path}/license`, getLicense(license)).tap(progress.inc),
 			createRepositoryFile0(`${path}/readme.md`, readme(name)).tap(progress.inc),
-			createRepositoryFile0(`${path}/mod.ts`, mod(license)).tap(progress.inc),
+			createRepositoryFile0(`${path}/index.ts`, index(license)).tap(progress.inc),
 			createRepositoryFile0(`${path}/src/impl.ts`, impl(name, license)).tap(progress.inc),
 			createRepositoryFile0(`${path}/src/impl.test.ts`, test(name, license)).tap(progress.inc),
 			createRepositoryFile0(`${path}/src/types.ts`, types(name, license)).tap(progress.inc),
+			createRepositoryFile0(`${path}/bin/run.ts`, run(name, license)).tap(progress.inc),
+			createRepositoryFile0(`${path}/bin/init.ts`, init(name, license)).tap(progress.inc),
 		]).map(progress.finish)
 
 const rejectIfExists0: Curry<Binary<string, boolean, Oath<void, string>>> = name => exists =>
 	Oath.fromBoolean(
 		() => !exists,
 		noop,
-		() => `"bin/${name}" already exists!`
+		() => `"srv/${name}" already exists!`
 	)
 
 const createFilesIfNotExists0: Binary<string, License, Unary<string, Oath<void, string | Error>>> =
@@ -54,29 +56,48 @@ const createFilesIfNotExists0: Binary<string, License, Unary<string, Oath<void, 
 		directoryExists0(path).chain(rejectIfExists0(name)).chain(createFiles0(path, name, license))
 
 const initProgress: Unary<string, void> = name =>
-	progress.start(`Initializing new application "${name}"`)
+	progress.start(`Initializing new server application "${name}"`)
 
-const mod = (license: License) => `${getSPDXRecord(license)}
-export * from "./src/impl.ts"
-export * from "./src/types.ts"
+const run = (name: string, license: License) => `${getSPDXRecord(license)}
+
+// This file is run with bun when executing "bin/run".
+// Configure starting the app here.
+
+console.log("TODO: set up ${name}")
+`
+
+const init = (name: string, license: License) => `${getSPDXRecord(license)}
+
+// This file is run with bun when executing "bin/init".
+// If you need something to be done before running the app, this is the right place to start.
+// If the app does not require any configuration, just remove this file.
+
+console.log("TODO: set up ${name} initialization")
+`
+
+const index = (license: License) => `${getSPDXRecord(license)}
+export * from "./src/impl"
+export * from "./src/types"
 `
 
 const impl = (name: string, license: License) => `${getSPDXRecord(license)}
-import type { ${Case.pascal(name)} } from "./types.ts"
+import type { ${pascal(name)} } from "./types"
 
-export const ${Case.camel(name)}: ${Case.pascal(name)} = "${name}"
+export const ${camel(name)}: ${pascal(name)} = "${name}"
 `
 
 const types = (name: string, license: License) => `${getSPDXRecord(license)}
-export type ${Case.pascal(name)} = "${name}"
+export type ${pascal(name)} = "${name}"
 `
 
 const test = (name: string, license: License) => `${getSPDXRecord(license)}
-import { assertEquals } from "#std/testing/asserts.ts"
-import { ${Case.camel(name)} } from "./impl.ts"
+import { test, expect } from "bun:test"
+import { ${camel(name)} } from "./impl"
 
-Deno.test("${name}", () => assertEquals(${Case.camel(name)}, "${name}"))
+test("${name} should pass", () => {
+	expect(${camel(name)}).toEqual("${name}")
+})
 `
 
-const readme = (name: string) => `# ${Case.title(name)}
+const readme = (name: string) => `# ${title(name)}
 `

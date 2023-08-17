@@ -1,48 +1,43 @@
-// // SPDX-FileCopyrightText: Copyright 2023, 谢尔盖||↓ and the Ordo.pink contributors
-// // SPDX-License-Identifier: MIT
+// SPDX-FileCopyrightText: Copyright 2023, 谢尔盖||↓ and the Ordo.pink contributors
+// SPDX-License-Identifier: MIT
 
-// import { assert, assertEquals } from "#std/testing/asserts.ts"
-// import { main } from "./impl.ts"
-// import { isDirectory, isFile, readFile, rmdir } from "#lib/fs/mod.ts"
-// import { assertRejects } from "https://deno.land/std@0.192.0/testing/asserts.ts"
-// import { getLicense } from "#lib/binutil/mod.ts"
+import { test, expect } from "bun:test"
+import { mklib } from "./impl"
+import { isDirectory0, isFile0, readFile0, rmdir0 } from "@ordo-pink/fs"
+import { getLicense } from "@ordo-pink/binutil"
 
-// Deno.test("should create test lib src files", async () => {
-// 	await main("test-lib", "MIT").toPromise()
+test("should create test lib src files", async () => {
+	await mklib("test-lib", "MIT")
 
-// 	assert(await isDirectory("./lib/test-lib").toPromise())
-// 	assert(await isFile("./lib/test-lib/mod.ts").toPromise())
-// 	assert(await isFile("./lib/test-lib/license").toPromise())
-// 	assert(await isFile("./lib/test-lib/readme.md").toPromise())
-// 	assert(await isFile("./lib/test-lib/src/impl.ts").toPromise())
-// 	assert(await isFile("./lib/test-lib/src/types.ts").toPromise())
-// 	assert(await isFile("./lib/test-lib/src/impl.test.ts").toPromise())
+	expect(await isDirectory0("./lib/test-lib").toPromise()).toBeTrue()
+	expect(await isFile0("./lib/test-lib/mod.ts").toPromise()).toBeTrue()
+	expect(await isFile0("./lib/test-lib/license").toPromise()).toBeTrue()
+	expect(await isFile0("./lib/test-lib/readme.md").toPromise()).toBeTrue()
+	expect(await isFile0("./lib/test-lib/src/impl.ts").toPromise()).toBeTrue()
+	expect(await isFile0("./lib/test-lib/src/types.ts").toPromise()).toBeTrue()
+	expect(await isFile0("./lib/test-lib/src/impl.test.ts").toPromise()).toBeTrue()
 
-// 	await rmdir("./lib/test-lib", { recursive: true }).toPromise()
-// })
+	await rmdir0("./lib/test-lib", { recursive: true }).toPromise()
+})
 
-// Deno.test("should license the files with MIT", async () => {
-// 	await main("test-lib", "MIT").toPromise()
+test("should license the files with MIT", async () => {
+	await mklib("test-lib", "MIT")
 
-// 	const decoder = new TextDecoder()
-// 	const text = await readFile("./lib/test-lib/license").toPromise()
+	const text = await readFile0("./lib/test-lib/license", { encoding: "utf-8" }).toPromise()
+	expect(text).toEqual(getLicense("MIT"))
 
-// 	assertEquals(decoder.decode(text), getLicense("MIT"))
+	await rmdir0("./lib/test-lib", { recursive: true }).toPromise()
+})
 
-// 	await rmdir("./lib/test-lib", { recursive: true }).toPromise()
-// })
+test("should license the files with MPL-2.0", async () => {
+	await mklib("test-lib", "MPL-2.0")
 
-// Deno.test("should license the files with MPL-2.0", async () => {
-// 	await main("test-lib", "MPL-2.0").toPromise()
+	const text = await readFile0("./lib/test-lib/license", { encoding: "utf-8" }).toPromise()
+	expect(text).toEqual(getLicense("MPL-2.0"))
 
-// 	const decoder = new TextDecoder()
-// 	const text = await readFile("./lib/test-lib/license").toPromise()
+	await rmdir0("./lib/test-lib", { recursive: true }).toPromise()
+})
 
-// 	assertEquals(decoder.decode(text), getLicense("MPL-2.0"))
-
-// 	await rmdir("./lib/test-lib", { recursive: true }).toPromise()
-// })
-
-// Deno.test("should throw on attempt to create a lib that already exists", () => {
-// 	assertRejects(() => main("oath", "MIT").toPromise())
-// })
+test("should throw on attempt to create a lib that already exists", async () => {
+	expect(await mklib("oath", "MIT")).toBeFalse()
+})

@@ -9,37 +9,22 @@ import {
 	getLicense,
 	getSPDXRecord,
 } from "@ordo-pink/binutil"
+import { isReservedJavaScriptKeyword } from "@ordo-pink/rkwjs"
 import { directoryExists0 } from "@ordo-pink/fs"
 import { Oath } from "@ordo-pink/oath"
-import { noop } from "@ordo-pink/tau"
+import { Binary, Curry, Ternary, Thunk, Unary, noop } from "@ordo-pink/tau"
 import { camel } from "case"
 
 // --- Public ---
 
 export const mkbin = (name: string, license: License) =>
-	Oath.of(`./boot/src/${name}`)
-		.tap(() => progress.start("Initializing new binary"))
-		.chain(path =>
-			directoryExists0(path)
-				.chain(exists =>
-					Oath.fromBoolean(
-						() => !exists,
-						noop,
-						() => `"bin/${name}" already exists!`
-					)
-				)
-				.chain(() =>
-					Oath.all([
-						createRepositoryFile0(`${path}/license`, getLicense(license)).tap(progress.inc),
-						createRepositoryFile0(`${path}/mod.ts`, mod(name, license)).tap(progress.inc),
-						createRepositoryFile0(`${path}/src/impl.ts`, impl(name, license)).tap(progress.inc),
-						createRepositoryFile0(`${path}/src/impl.test.ts`, test(name, license)).tap(
-							progress.inc
-						),
-					])
-				)
+	Oath.of(isReservedJavaScriptKeyword(name) ? `${name}-bin` : name)
+		.chain(name =>
+			Oath.of(`./boot/src/${name}`)
+				.tap(initProgress)
+				.chain(createFilesIfNotExists0(name, license))
+				.map(progress.finish)
 		)
-		.map(progress.finish)
 		.orElse(e => {
 			progress.break(e)
 			return false
@@ -48,6 +33,28 @@ export const mkbin = (name: string, license: License) =>
 // --- Internal ---
 
 const progress = createProgress()
+
+const initProgress = () => progress.start("Initializing new binary")
+
+const createFiles0: Ternary<string, string, License, Thunk<Oath<void, Error>>> =
+	(path, name, license) => () =>
+		Oath.all([
+			createRepositoryFile0(`${path}/license`, getLicense(license)).tap(progress.inc),
+			createRepositoryFile0(`${path}/mod.ts`, mod(name, license)).tap(progress.inc),
+			createRepositoryFile0(`${path}/src/impl.ts`, impl(name, license)).tap(progress.inc),
+			createRepositoryFile0(`${path}/src/impl.test.ts`, test(name, license)).tap(progress.inc),
+		]).map(noop)
+
+const rejectIfExists0: Curry<Binary<string, boolean, Oath<void, string>>> = name => exists =>
+	Oath.fromBoolean(
+		() => !exists,
+		noop,
+		() => `"bin/${name}" already exists!`
+	)
+
+const createFilesIfNotExists0: Binary<string, License, Unary<string, Oath<void, string | Error>>> =
+	(name, license) => path =>
+		directoryExists0(path).chain(rejectIfExists0(name)).chain(createFiles0(path, name, license))
 
 const impl = (name: string, license: License) => `${getSPDXRecord(license)}
 export const ${camel(name)} = () => {

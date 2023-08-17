@@ -9,7 +9,7 @@ import { Oath } from "@ordo-pink/oath"
 
 // --- Public ---
 
-type _F = Thunk<Oath<void, Error>>
+type _F = Thunk<Oath<void, void>>
 export const compileBin: _F = () =>
 	readdir0("./boot/src", { withFileTypes: true })
 		.tap(startCompileBinsProgress)
@@ -18,7 +18,7 @@ export const compileBin: _F = () =>
 		.chain(checkBinIndexFilesExist0)
 		.map(util.getExistingPaths)
 		.chain(runCompileBinCommands0)
-		.map(finishCompileBinsProgress)
+		.bimap(breakCompileBinsProgress, finishCompileBinsProgress)
 
 // --- Internal ---
 
@@ -26,6 +26,7 @@ const _compileBinsProgress = util.createProgress()
 const startCompileBinsProgress = () => _compileBinsProgress.start("Compiling binaries")
 const incCompileBinsProgress = _compileBinsProgress.inc
 const finishCompileBinsProgress = _compileBinsProgress.finish
+const breakCompileBinsProgress = _compileBinsProgress.break
 
 const _dirToBinIndexPath: Unary<string, string> = dir => `./boot/src/${dir}/index.ts`
 const dirsToBinIndexPaths: Unary<string[], string[]> = map(_dirToBinIndexPath)

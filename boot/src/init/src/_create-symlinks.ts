@@ -9,14 +9,14 @@ import { Oath } from "@ordo-pink/oath"
 
 // --- Public ---
 
-type _F = Thunk<Oath<void, Error>>
+type _F = Thunk<Oath<void, void>>
 export const createSymlinks: _F = () =>
 	readdir0("./etc/init", { withFileTypes: true })
 		.tap(startSymlinksProgress)
 		.map(util.direntsToFiles)
 		.map(util.getNames)
 		.chain(runSymlinkCommands0)
-		.map(finishSymlinksProgress)
+		.bimap(breakSymlinksProgress, finishSymlinksProgress)
 
 // --- Internal ---
 
@@ -24,6 +24,7 @@ const _symlinksProgress = util.createProgress()
 const startSymlinksProgress = () => _symlinksProgress.start("Creating symbolic links")
 const incSymlinksProgress = _symlinksProgress.inc
 const finishSymlinksProgress = _symlinksProgress.finish
+const breakSymlinksProgress = _symlinksProgress.break
 
 const _runSymlinkCommand0: Unary<string, Oath<void, Error>> = file =>
 	util.runCommand0(`ln -snf ./etc/init/${file} ${file}`).tap(incSymlinksProgress)

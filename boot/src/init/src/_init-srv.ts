@@ -9,7 +9,7 @@ import { Thunk, Unary } from "@ordo-pink/tau"
 
 // --- Public ---
 
-type _F = Thunk<Oath<void, Error>>
+type _F = Thunk<Oath<void, void>>
 export const initSrv: _F = () =>
 	readdir0("./srv", { withFileTypes: true })
 		.tap(startInitSrvProgress)
@@ -19,7 +19,7 @@ export const initSrv: _F = () =>
 		.chain(util.checkFilesExist0)
 		.map(util.getExistingPaths)
 		.chain(runInitCommands0)
-		.map(finishInitSrvProgress)
+		.bimap(breakInitSrvProgress, finishInitSrvProgress)
 
 // --- Internal ---
 
@@ -27,6 +27,7 @@ const _intSrvProgress = util.createProgress()
 const startInitSrvProgress = () => _intSrvProgress.start("Initializing server applications")
 const incInitSrvProgress = _intSrvProgress.inc
 const finishInitSrvProgress = _intSrvProgress.finish
+const breakInitSrvProgress = _intSrvProgress.break
 
 const _dirToInitFilePath: Unary<string, string> = dir => `./srv/${dir}/bin/index1.ts` // TODO: replace with index.ts
 const dirsToInitFilePaths: Unary<string[], string[]> = map(_dirToInitFilePath)

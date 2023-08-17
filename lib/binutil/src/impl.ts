@@ -16,7 +16,6 @@ export const runCommand0: RunCommand = (command, options) =>
 		Bun.spawnSync(command.trim().split(" "), options)
 	})
 
-// TODO: install bun locally in the repo
 export const runBunCommand0: RunCommand = (command, options) =>
 	runCommand0(`opt/bun ${command}`, options)
 
@@ -38,11 +37,13 @@ export const createProgress = () => {
 			process.stdout.write(`${chalk.green("✔")} ${currentLine}\n`)
 			currentLine = ""
 		},
-		break: () => {
+		break: (error: Error) => {
 			process.stdout.clearLine(0)
 			process.stdout.cursorTo(0)
 			process.stdout.write(`${chalk.red("✘")} ${currentLine}\n`)
 			currentLine = ""
+
+			console.error(error)
 		},
 	}
 }

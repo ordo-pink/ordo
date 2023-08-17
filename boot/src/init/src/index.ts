@@ -9,4 +9,4 @@ export const init = () =>
 	createSymlinks()
 		.chain(() => compileBin())
 		.chain(() => initSrv())
-		.orElse(console.error)
+		.orNothing()

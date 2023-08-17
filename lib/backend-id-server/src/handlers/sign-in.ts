@@ -31,21 +31,21 @@ export const handleSignIn: Fn =
 						Oath.all({
 							user: userService.getByEmail(email),
 							ok: userService.comparePassword(email, password),
-						})
+						}),
 					)
-					.bimap(ResponseError.create(404, "User not found"), prop("user"))
+					.bimap(ResponseError.create(404, "User not found"), prop("user")),
 			)
 			// TODO: Drop previous token if it exists for given IP
 			.chain(user =>
 				Oath.of({ sub: user.id, uip: ctx.request.ip }).chain(({ sub, uip }) =>
-					tokenService.createPair({ sub, uip })
-				)
+					tokenService.createPair({ sub, uip }),
+				),
 			)
 			.chain(tokens =>
 				Oath.all([
 					setSignInCookie("jti", tokens.jti, tokens.exp, ctx),
 					setSignInCookie("sub", tokens.sub, tokens.exp, ctx),
-				]).map(() => tokens)
+				]).map(() => tokens),
 			)
 			.fork(ResponseError.send(ctx), ({ access, jti, sub }) => {
 				ctx.response.body = {

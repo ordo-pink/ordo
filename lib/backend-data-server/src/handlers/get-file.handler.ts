@@ -28,8 +28,8 @@ export const handleGetFile: Fn =
 					.chain(validateIsValidPath0(ctx))
 					.chain(getFileContent0({ service: dataService, sub }))
 					.rejectedMap(e =>
-						e.message === "File not found" ? new httpErrors.NotFound("Not found") : e
-					)
+						e.message === "File not found" ? new httpErrors.NotFound("Not found") : e,
+					),
 			)
 			.chain(throwIfFileDoesNotExist0)
 			.fork(ResponseError.send(ctx), formGetFileResponse(ctx))

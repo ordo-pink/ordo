@@ -15,6 +15,6 @@ export const useAccelerator = (accelerator: Optional<string>, callback: HotkeyCa
 
 			callback(keyboardEvent, hotkeyEvent)
 		},
-		{ enableOnFormTags: true, enableOnContentEditable: true }
+		{ enableOnFormTags: true, enableOnContentEditable: true },
 	)
 }

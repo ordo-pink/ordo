@@ -33,7 +33,7 @@ export const handleSignUp: Fn =
 
 		const user = await userService.getByEmail(email).fork(
 			() => null,
-			user => user
+			user => user,
 		)
 
 		if (user) return ctx.throw(409, "User with this email already exists")

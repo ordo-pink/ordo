@@ -22,7 +22,7 @@ export const getKey = (path: string, type: "public" | "private") =>
 			() => {
 				console.error(
 					// TODO: Rename when renaming "bin/dev"
-					`${path} not found. Run "bin/dev" to create a dev pair, or provide production-ready key pair.`
+					`${path} not found. Run "bin/dev" to create a dev pair, or provide production-ready key pair.`,
 				)
 				process.exit(1)
 			},
@@ -32,8 +32,8 @@ export const getKey = (path: string, type: "public" | "private") =>
 					key,
 					{ name: "ECDSA", namedCurve: "P-384" },
 					false,
-					type === "private" ? ["sign"] : ["verify"]
-				)
+					type === "private" ? ["sign"] : ["verify"],
+				),
 		)
 
 export const getPublicKey = (path: string) => getKey(path, "public")

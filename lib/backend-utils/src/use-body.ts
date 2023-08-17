@@ -11,7 +11,7 @@ import { isObject } from "@ordo-pink/tau"
 // TODO: Rewrite useBody with Oath
 export const useBody = async <T>(
 	ctx: Context,
-	expect: "string" | "array" | "object" = "object"
+	expect: "string" | "array" | "object" = "object",
 ) => {
 	const body = (await ctx.request.body) as T
 

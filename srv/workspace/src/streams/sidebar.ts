@@ -53,7 +53,7 @@ export const __initSidebar: InitSidebar = callOnce(({ logger }) => {
 		sidebar$.next(
 			sidebar.sizes[0] > 0
 				? { disabled: false, sizes: [0, 100] }
-				: { disabled: false, sizes: [25, 75] }
+				: { disabled: false, sizes: [25, 75] },
 		)
 	})
 

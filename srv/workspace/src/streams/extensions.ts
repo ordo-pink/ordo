@@ -63,7 +63,7 @@ export type ExtensionCreatorContext = {
 
 const scopeExtensionContextTo = (
 	name: string,
-	ctx: ExtensionCreatorContext
+	ctx: ExtensionCreatorContext,
 ): ExtensionCreatorContext => ({
 	...ctx,
 	// translate: (key: string) => i18next.t(key, { ns: name }),
@@ -111,9 +111,9 @@ export const initExtensions = callOnce(({ logger, router$, extensions }: InitExt
 						currentActivity$.next(null)
 						currentRoute$.next(null)
 					})
-			})
+			}),
 		)
-		.subscribe()
+		.subscribe(),
 )
 
 export const currentActivity$ = new BehaviorSubject<Nullable<Activity>>(null)
@@ -135,10 +135,10 @@ const clearP: ClearP = () => () => []
 export const activities$ = merge(
 	add$.pipe(map(addP)),
 	remove$.pipe(map(removeP)),
-	clear$.pipe(map(clearP))
+	clear$.pipe(map(clearP)),
 ).pipe(
 	scan((acc, f) => f(acc), [] as Activity[]),
-	shareReplay(1)
+	shareReplay(1),
 )
 
 export const initActivities = callOnce(() => {

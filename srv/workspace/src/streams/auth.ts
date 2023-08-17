@@ -45,15 +45,15 @@ export const __initAuth: InitAuth = callOnce(({ logger }) => {
 				Oath.try(() =>
 					fetch(`${process.env.REACT_APP_ID_HOST}/account`, {
 						headers: { Authorization: `Bearer ${auth.accessToken}` },
-					})
-				)
+					}),
+				),
 			)
 			.chain(res => Oath.from(() => res.json()))
 			.chain(body => (body.success ? Oath.of(body.result) : Oath.reject(body.error)))
 			.fork(
 				(error: any) => error$.next(error),
-				result => user$.next(result)
-			)
+				result => user$.next(result),
+			),
 	)
 
 	commands.on("core.refresh-metadata-root", () =>
@@ -62,22 +62,22 @@ export const __initAuth: InitAuth = callOnce(({ logger }) => {
 				Oath.try(() =>
 					fetch(`${process.env.REACT_APP_DATA_HOST}/directories/${auth.sub}`, {
 						headers: { Authorization: `Bearer ${auth.accessToken}` },
-					})
-				)
+					}),
+				),
 			)
 			.chain(res => Oath.from(() => res.json()))
 			.chain(body => (body.success ? Oath.of(body.result) : Oath.reject(body.error)))
 			.fork(
 				error => error$.next(error),
-				result => metadata$.next(result)
-			)
+				result => metadata$.next(result),
+			),
 	)
 
 	commands.on("core.sign-out", () =>
 		commands.emit<cmd.router.openExternal>("router.open-external", {
 			url: `${process.env.REACT_APP_WEB_HOST}/sign-out`,
 			newTab: false,
-		})
+		}),
 	)
 
 	commands.emit<cmd.commandPalette.add>("command-palette.add", {

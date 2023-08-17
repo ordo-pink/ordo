@@ -85,7 +85,7 @@ const main = async () => {
 				awsAccessKeyId: ID_DYNAMODB_ACCESS_KEY,
 				awsSecretKey: ID_DYNAMODB_SECRET_KEY,
 				tableName: ID_USER_TABLE_NAME,
-			})
+			}),
 		)
 		.case("kv", () => DenoKVUserStorageAdapter.of({ path: kvPath, key: ID_USER_TABLE_NAME }))
 		.default(() => DenoKVUserStorageAdapter.of({ path: kvPath, key: ID_USER_TABLE_NAME }))

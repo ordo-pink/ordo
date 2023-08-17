@@ -26,7 +26,7 @@ export const handleRemoveDirectory: Fn =
 			.chain(({ sub }) =>
 				getPath0(ctx.params as unknown as Record<"path", string>)
 					.chain(validateIsValidPath0(ctx))
-					.chain(removeDirectory0({ service: dataService, sub }))
+					.chain(removeDirectory0({ service: dataService, sub })),
 			)
 			.chain(throwIfDirectoryDoesNotExist0)
 			.fork(ResponseError.send(ctx), formRemoveDirectoryResponse(ctx))
@@ -49,7 +49,7 @@ type ValidateIsValidPathFn = Curry<
 >
 const validateIsValidPath0: ValidateIsValidPathFn = ctx => path =>
 	Oath.try(() =>
-		DirectoryModel.isValidPath(path) ? path : ctx.throw(400, "Invalid directory path")
+		DirectoryModel.isValidPath(path) ? path : ctx.throw(400, "Invalid directory path"),
 	)
 
 // ---

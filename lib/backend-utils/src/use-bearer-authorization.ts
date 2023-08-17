@@ -12,7 +12,7 @@ import { Context } from "koa"
 // TODO: Rewrite with Oath
 export const useBearerAuthorization = async (
 	ctx: Context,
-	tokenServiceOrIDHost: TTokenService | string
+	tokenServiceOrIDHost: TTokenService | string,
 ): Promise<AccessTokenParsed> => {
 	const authorization = ctx.request.headers["Authorization"]
 

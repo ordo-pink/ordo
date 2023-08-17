@@ -74,7 +74,7 @@ const create: CreateMethod<T.Params> =
 					lastName: { S: user.lastName ?? "" },
 					createdAt: { S: user.createdAt.toISOString() },
 				},
-			})
+			}),
 		).map(() => user)
 
 const update: UpdateMethod<T.Params> =
@@ -86,10 +86,10 @@ const update: UpdateMethod<T.Params> =
 				Oath.resolve(reduceUserToAttributeUpdates(oldUser))
 					.chain(AttributeUpdates =>
 						Oath.from(() =>
-							db.updateItem({ TableName: table, Key: { id: { S: id } }, AttributeUpdates })
-						)
+							db.updateItem({ TableName: table, Key: { id: { S: id } }, AttributeUpdates }),
+						),
 					)
-					.map(() => ({ ...oldUser, ...user }))
+					.map(() => ({ ...oldUser, ...user })),
 			)
 
 const getById: GetByIdMethod<T.Params> =
@@ -107,7 +107,7 @@ const getByEmail: GetByEmailMethod<T.Params> =
 				TableName: table,
 				FilterExpression: "email = :e",
 				ExpressionAttributeValues: { ":e": { S: email } },
-			})
+			}),
 		)
 			.chain(output => Oath.fromNullable(output.Items))
 			.chain(items => Oath.fromNullable(items[0]))

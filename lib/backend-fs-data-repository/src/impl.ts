@@ -21,8 +21,8 @@ const of: Fn = ({ root }) => ({
 			Oath.of(resolve(root, ...sub.split("-"), ...fsid.split("-"))).chain(path =>
 				createParentDirectoryFor(path)
 					.chain(() => createFile(path).map(f => f.close()))
-					.map(() => fsid as FSID)
-			)
+					.map(() => fsid as FSID),
+			),
 		),
 	delete: ({ fsid, sub }) =>
 		Oath.of(resolve(root, ...sub.split("-"), ...fsid.split("-")))
@@ -32,11 +32,11 @@ const of: Fn = ({ root }) => ({
 		Oath.of(resolve(root, ...sub.split("-"), ...fsid.split("-"))).chain(path =>
 			stat(path)
 				.map(() => true)
-				.fix(() => false)
+				.fix(() => false),
 		),
 	read: ({ sub, fsid }) =>
 		Oath.of(resolve(root, ...sub.split("-"), ...fsid.split("-"))).chain(path =>
-			Oath.try(async () => readableStreamFromReader(await Deno.open(path)))
+			Oath.try(async () => readableStreamFromReader(await Deno.open(path))),
 		),
 	update: ({ content, fsid, sub, upsert = false }) =>
 		Oath.of(resolve(root, ...sub.split("-"), ...fsid.split("-")))
@@ -50,15 +50,15 @@ const of: Fn = ({ root }) => ({
 							? of({ root })
 									.create({ sub, fsid })
 									.map(() => path)
-							: Oath.reject(new Error("file not found"))
-					)
+							: Oath.reject(new Error("file not found")),
+					),
 			)
 			.chain(path =>
 				Oath.try(() => Deno.open(path, { write: true })).chain(file =>
 					Oath.try(() => content.pipeTo(file.writable))
 						.chain(() => stat(path))
-						.map(stat => stat.size)
-				)
+						.map(stat => stat.size),
+				),
 			),
 })
 

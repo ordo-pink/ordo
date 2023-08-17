@@ -30,8 +30,8 @@ export const handleGetDirectory: Fn =
 					.rejectedMap(e =>
 						e.message.startsWith("No such file or directory")
 							? new httpErrors.NotFound("Not found")
-							: e
-					)
+							: e,
+					),
 			)
 			.chain(throwIfDirectoryDoesNotExist0)
 			.fork(ResponseError.send(ctx), formGetDirectoryResponse(ctx))
@@ -54,7 +54,7 @@ type ValidateIsValidPathFn = Curry<
 >
 const validateIsValidPath0: ValidateIsValidPathFn = ctx => path =>
 	Oath.try(() =>
-		DirectoryModel.isValidPath(path) ? path : ctx.throw(400, "Invalid directory path")
+		DirectoryModel.isValidPath(path) ? path : ctx.throw(400, "Invalid directory path"),
 	)
 
 // ---

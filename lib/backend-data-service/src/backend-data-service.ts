@@ -28,8 +28,8 @@ const service: Fn = ({ metadataRepository, dataRepository }) => ({
 				Oath.fromBoolean(
 					() => !exists,
 					() => ({ directory, sub }),
-					() => new Error("Directory already exists")
-				)
+					() => new Error("Directory already exists"),
+				),
 			)
 			.map(({ directory, sub }) => {
 				// TODO: Use Directory model to create a directory
@@ -41,7 +41,7 @@ const service: Fn = ({ metadataRepository, dataRepository }) => ({
 				return { directory, sub } as { directory: T.Directory; sub: SUB }
 			})
 			.chain(({ directory, sub }) =>
-				metadataRepository.directory.create({ directory, sub, path: directory.path })
+				metadataRepository.directory.create({ directory, sub, path: directory.path }),
 			),
 	getDirectoryChildren: metadataRepository.directory.readWithChildren,
 	removeDirectory: metadataRepository.directory.delete,
@@ -49,14 +49,14 @@ const service: Fn = ({ metadataRepository, dataRepository }) => ({
 		service({ metadataRepository, dataRepository })
 			.getDirectory({ path, sub })
 			.chain(directory =>
-				Oath.fromNullable(directory).rejectedMap(() => new Error("Directory does not exist"))
+				Oath.fromNullable(directory).rejectedMap(() => new Error("Directory does not exist")),
 			)
 			.chain(directory =>
 				Oath.fromBoolean(
 					() => Boolean(directory) || upsert,
 					() => directory,
-					() => new Error("Directory does not exist")
-				)
+					() => new Error("Directory does not exist"),
+				),
 			)
 			.chain(directory => {
 				const updatedDirectory = { ...directory, ...content }
@@ -84,8 +84,8 @@ const service: Fn = ({ metadataRepository, dataRepository }) => ({
 				Oath.fromBoolean(
 					() => !exists,
 					() => ({ file, sub, content, encryption }),
-					() => new Error("File already exists")
-				)
+					() => new Error("File already exists"),
+				),
 			)
 			.chain(({ sub }) => dataRepository.create({ sub }))
 			.map(fsid => {
@@ -106,7 +106,7 @@ const service: Fn = ({ metadataRepository, dataRepository }) => ({
 					? dataRepository
 							.update({ content, sub, fsid: file.fsid, upsert: true })
 							.map(size => ({ ...file, size }))
-					: Oath.of(file)
+					: Oath.of(file),
 			)
 			.chain(file => metadataRepository.file.create({ path: file.path, sub, file })),
 	getFile: metadataRepository.file.read,
@@ -125,7 +125,7 @@ const service: Fn = ({ metadataRepository, dataRepository }) => ({
 				Oath.all([
 					dataRepository.delete({ sub, fsid: file.fsid }),
 					metadataRepository.file.delete({ sub, path: file.path }),
-				]).map(() => file)
+				]).map(() => file),
 			),
 	setFileContent: ({ path, sub, content }) =>
 		metadataRepository.file
@@ -133,7 +133,7 @@ const service: Fn = ({ metadataRepository, dataRepository }) => ({
 			.chain(Oath.fromNullable)
 			.rejectedMap(() => new Error("File not found"))
 			.chain(file =>
-				dataRepository.update({ sub, fsid: file.fsid, content }).map(size => ({ ...file, size }))
+				dataRepository.update({ sub, fsid: file.fsid, content }).map(size => ({ ...file, size })),
 			)
 			.chain(file => metadataRepository.file.update({ sub, file, path: file.path })),
 	updateFile: metadataRepository.file.update,

@@ -69,7 +69,7 @@ export namespace Router {
 	export type NavigateParams = [
 		routeConfig: string | RouteConfig,
 		replace?: boolean,
-		exec?: boolean
+		exec?: boolean,
 	]
 
 	export type OpenExternalParams = { url: string; newTab?: boolean }

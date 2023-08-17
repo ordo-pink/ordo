@@ -29,8 +29,8 @@ export const handleUpdateFileContent: Fn =
 					.chain(path =>
 						Oath.from(() => ctx.request.body({ type: "bytes" }).value)
 							.map(body => ReadableStream.from(body))
-							.chain(updateFile0({ service: dataService, sub, path }))
-					)
+							.chain(updateFile0({ service: dataService, sub, path })),
+					),
 			)
 			.chain(throwIfFileDoesNotExist0)
 			.fork(ResponseError.send(ctx), formUpdateFileResponse(ctx))

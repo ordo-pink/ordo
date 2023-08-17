@@ -54,16 +54,16 @@ export const createServer: CreateServerFn = ({
 								Either.fromBoolean(
 									() => Array.isArray(os),
 									() => (os as string[]).includes(o as string),
-									() => o === os
-								)
+									() => o === os,
+								),
 							)
 							.map(allowed => (allowed ? (o as string) : ""))
-							.leftMap(allowed => (allowed ? (o as string) : ""))
+							.leftMap(allowed => (allowed ? (o as string) : "")),
 					)
 					.leftMap(result => (result === null ? "" : result))
 					.fold(identity, identity),
 			credentials: true,
-		})
+		}),
 	)
 	app.use(router.routes())
 	app.use(router.allowedMethods())

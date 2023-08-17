@@ -83,7 +83,7 @@ export const handler: Handlers = {
 
 		headers.set(
 			"Location",
-			"/forgot-password?success=Thank you! We will send you a recovery link if there is a user associated with the email you provided. You can close this page."
+			"/forgot-password?success=Thank you! We will send you a recovery link if there is a user associated with the email you provided. You can close this page.",
 		)
 
 		return new Response(null, { status: 303, headers })

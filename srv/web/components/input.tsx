@@ -86,7 +86,7 @@ export const EmailInput = ({
 					const errors = Either.fromBoolean(
 						() => isEmail(value, {}),
 						() => value,
-						() => ["Invalid email."]
+						() => ["Invalid email."],
 					)
 
 					onChange(errors)

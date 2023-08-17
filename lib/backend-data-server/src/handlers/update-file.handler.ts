@@ -28,9 +28,9 @@ export const handleUpdateFile: Fn =
 					.chain(validateIsValidPath0(ctx))
 					.chain(path =>
 						Oath.from(() => useBody<DATA_SERVICE_TYPES.File>(ctx)).chain(
-							updateFile0({ service: dataService, sub, path })
-						)
-					)
+							updateFile0({ service: dataService, sub, path }),
+						),
+					),
 			)
 			.chain(throwIfFileDoesNotExist0)
 			.fork(ResponseError.send(ctx), formUpdateFileResponse(ctx))

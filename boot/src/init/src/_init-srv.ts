@@ -1,11 +1,11 @@
 // SPDX-FileCopyrightText: Copyright 2023, 谢尔盖||↓ and the Ordo.pink contributors
 // SPDX-License-Identifier: MIT
 
+import type { Thunk, Unary } from "@ordo-pink/tau"
 import { map, pipe } from "ramda"
 import * as util from "@ordo-pink/binutil"
 import { readdir0 } from "@ordo-pink/fs"
 import { Oath } from "@ordo-pink/oath"
-import { Thunk, Unary } from "@ordo-pink/tau"
 
 // --- Public ---
 

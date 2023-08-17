@@ -1,8 +1,7 @@
-import { SpawnOptions, Subprocess } from "bun"
-import { runCommand0 } from "@ordo-pink/binutil"
-import { Binary, Curry, Thunk, Unary } from "@ordo-pink/tau"
-import { Oath } from "@ordo-pink/oath"
+import type { Thunk, Unary } from "@ordo-pink/tau"
 import { identity } from "ramda"
+import { runCommand0 } from "@ordo-pink/binutil"
+import { Oath } from "@ordo-pink/oath"
 
 type _P = { coverage: boolean }
 export const test: Unary<_P, void> = async ({ coverage: cov }) => {

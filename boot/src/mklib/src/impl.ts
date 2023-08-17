@@ -1,6 +1,7 @@
 // SPDX-FileCopyrightText: Copyright 2023, 谢尔盖||↓ and the Ordo.pink contributors
 // SPDX-License-Identifier: MIT
 
+import { camel, pascal, title } from "case"
 import {
 	License,
 	createProgress,
@@ -8,11 +9,10 @@ import {
 	getLicense,
 	getSPDXRecord,
 } from "@ordo-pink/binutil"
+import { Binary, Curry, Ternary, Thunk, Unary, noop } from "@ordo-pink/tau"
+import { isReservedJavaScriptKeyword } from "@ordo-pink/rkwjs"
 import { directoryExists0 } from "@ordo-pink/fs"
 import { Oath } from "@ordo-pink/oath"
-import { isReservedJavaScriptKeyword } from "@ordo-pink/rkwjs"
-import { Binary, Curry, Ternary, Thunk, Unary, noop } from "@ordo-pink/tau"
-import { camel, pascal, title } from "case"
 
 // --- Public ---
 

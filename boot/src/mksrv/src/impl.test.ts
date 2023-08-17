@@ -2,9 +2,9 @@
 // SPDX-License-Identifier: MIT
 
 import { test, expect } from "bun:test"
-import { mksrv } from "./impl"
 import { isDirectory0, isFile0, readFile0, rmdir0 } from "@ordo-pink/fs"
 import { getLicense } from "@ordo-pink/binutil"
+import { mksrv } from "./impl"
 
 test("should create test srv src files", async () => {
 	await mksrv("test-srv", "MIT")

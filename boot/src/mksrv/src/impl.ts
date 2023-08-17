@@ -2,18 +2,17 @@
 // SPDX-License-Identifier: MIT
 
 import type { License } from "@ordo-pink/binutil"
-
+import Case from "case"
 import {
 	createProgress,
 	createRepositoryFile0,
 	getLicense,
 	getSPDXRecord,
 } from "@ordo-pink/binutil"
-import { isReservedJavaScriptKeyword } from "@ordo-pink/rkwjs"
-import { directoryExists0, getAbsolutePath, isDirectory0 } from "@ordo-pink/fs"
-import { Oath } from "@ordo-pink/oath"
 import { Binary, Curry, Ternary, Thunk, Unary, noop } from "@ordo-pink/tau"
-import Case from "case"
+import { directoryExists0, getAbsolutePath } from "@ordo-pink/fs"
+import { isReservedJavaScriptKeyword } from "@ordo-pink/rkwjs"
+import { Oath } from "@ordo-pink/oath"
 
 // --- Public ---
 

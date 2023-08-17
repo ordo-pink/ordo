@@ -7,7 +7,7 @@ import { isDirectory0, isFile0, readFile0, rmdir0 } from "@ordo-pink/fs"
 import { getLicense } from "@ordo-pink/binutil"
 
 test("should create test srv src files", async () => {
-	await mksrv("test-srv", "MIT").toPromise()
+	await mksrv("test-srv", "MIT")
 
 	expect(await isDirectory0("./srv/test-srv").toPromise()).toBeTrue()
 	expect(await isFile0("./srv/test-srv/mod.ts").toPromise()).toBeTrue()
@@ -21,7 +21,7 @@ test("should create test srv src files", async () => {
 })
 
 test("should license the files with MIT", async () => {
-	await mksrv("test-srv", "MIT").toPromise()
+	await mksrv("test-srv", "MIT")
 
 	const text = await readFile0("./srv/test-srv/license", "utf-8").toPromise()
 	expect(text).toEqual(getLicense("MIT"))
@@ -30,7 +30,7 @@ test("should license the files with MIT", async () => {
 })
 
 test("should license the files with MPL-2.0", async () => {
-	await mksrv("test-srv", "MPL-2.0").toPromise()
+	await mksrv("test-srv", "MPL-2.0")
 
 	const text = await readFile0("./srv/test-srv/license", "utf-8").toPromise()
 	expect(text).toEqual(getLicense("MPL-2.0"))
@@ -38,6 +38,6 @@ test("should license the files with MPL-2.0", async () => {
 	await rmdir0("./srv/test-srv", { recursive: true }).toPromise()
 })
 
-test("should throw on attempt to create a srv that already exists", () => {
-	expect(() => mksrv("id", "MIT").toPromise()).toThrow()
+test("should throw on attempt to create a srv that already exists", async () => {
+	expect(await mksrv("id", "MIT")).toBeFalse()
 })

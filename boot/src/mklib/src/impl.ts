@@ -18,12 +18,8 @@ import { camel, pascal, title } from "case"
 
 export const mklib = (name: string, license: License) =>
 	Oath.of(isReservedJavaScriptKeyword(name) ? `${name}-bin` : name)
-		.chain(name =>
-			Oath.of(`./lib/${name}`)
-				.tap(initProgress)
-				.chain(createFilesIfNotExists0(name, license))
-				.map(progress.finish)
-		)
+		.tap(initProgress)
+		.chain(name => Oath.of(`./lib/${name}`).chain(createFilesIfNotExists0(name, license)))
 		.orElse(e => {
 			progress.break(e)
 			return false
@@ -33,7 +29,8 @@ export const mklib = (name: string, license: License) =>
 
 const progress = createProgress()
 
-const initProgress = () => progress.start("Initializing new binary")
+const initProgress: Unary<string, void> = name =>
+	progress.start(`Initializing new library "${name}"`)
 
 const createFiles0: Ternary<string, string, License, Thunk<Oath<void, Error>>> =
 	(path, name, license) => () =>
@@ -44,7 +41,7 @@ const createFiles0: Ternary<string, string, License, Thunk<Oath<void, Error>>> =
 			createRepositoryFile0(`${path}/src/impl.ts`, impl(name, license)).tap(progress.inc),
 			createRepositoryFile0(`${path}/src/impl.test.ts`, test(name, license)).tap(progress.inc),
 			createRepositoryFile0(`${path}/src/types.ts`, types(name, license)).tap(progress.inc),
-		]).map(noop)
+		]).map(progress.finish)
 
 const rejectIfExists0: Curry<Binary<string, boolean, Oath<void, string>>> = name => exists =>
 	Oath.fromBoolean(

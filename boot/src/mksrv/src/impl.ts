@@ -3,36 +3,59 @@
 
 import type { License } from "@ordo-pink/binutil"
 
-import { createRepositoryFile0, getLicense, getSPDXRecord } from "@ordo-pink/binutil"
+import {
+	createProgress,
+	createRepositoryFile0,
+	getLicense,
+	getSPDXRecord,
+} from "@ordo-pink/binutil"
 import { isReservedJavaScriptKeyword } from "@ordo-pink/rkwjs"
-import { getAbsolutePath, isDirectory0 } from "@ordo-pink/fs"
+import { directoryExists0, getAbsolutePath, isDirectory0 } from "@ordo-pink/fs"
 import { Oath } from "@ordo-pink/oath"
-import { noop } from "@ordo-pink/tau"
+import { Binary, Curry, Ternary, Thunk, Unary, noop } from "@ordo-pink/tau"
 import Case from "case"
 
 // --- Public ---
 
 export const mksrv = (name: string, license: License) =>
-	Oath.of(isReservedJavaScriptKeyword(name) ? `${name}-srv` : name).chain(name =>
-		Oath.of(getAbsolutePath(`./srv/${name}`)).chain(path =>
-			isDirectory0(path)
-				.chain(exists => Oath.fromBoolean(() => !exists, noop, noop))
-				.tap(console.log)
-				.chain(() =>
-					Oath.all([
-						createRepositoryFile0(`${path}/license`, getLicense(license)),
-						createRepositoryFile0(`${path}/readme.md`, readme(name)),
-						createRepositoryFile0(`${path}/mod.ts`, mod(license)),
-						createRepositoryFile0(`${path}/src/impl.ts`, impl(name, license)),
-						createRepositoryFile0(`${path}/src/impl.test.ts`, test(name, license)),
-						createRepositoryFile0(`${path}/src/types.ts`, types(name, license)),
-					])
-				)
-				.map(noop)
+	Oath.of(isReservedJavaScriptKeyword(name) ? `${name}-srv` : name)
+		.tap(initProgress)
+		.chain(name =>
+			Oath.of(getAbsolutePath(`./srv/${name}`)).chain(createFilesIfNotExists0(name, license))
 		)
-	)
+		.orElse(e => {
+			progress.break(e)
+			return false
+		})
 
 // --- Internal ---
+
+const progress = createProgress()
+
+const createFiles0: Ternary<string, string, License, Thunk<Oath<void, Error>>> =
+	(path, name, license) => () =>
+		Oath.all([
+			createRepositoryFile0(`${path}/license`, getLicense(license)).tap(progress.inc),
+			createRepositoryFile0(`${path}/readme.md`, readme(name)).tap(progress.inc),
+			createRepositoryFile0(`${path}/mod.ts`, mod(license)).tap(progress.inc),
+			createRepositoryFile0(`${path}/src/impl.ts`, impl(name, license)).tap(progress.inc),
+			createRepositoryFile0(`${path}/src/impl.test.ts`, test(name, license)).tap(progress.inc),
+			createRepositoryFile0(`${path}/src/types.ts`, types(name, license)).tap(progress.inc),
+		]).map(progress.finish)
+
+const rejectIfExists0: Curry<Binary<string, boolean, Oath<void, string>>> = name => exists =>
+	Oath.fromBoolean(
+		() => !exists,
+		noop,
+		() => `"bin/${name}" already exists!`
+	)
+
+const createFilesIfNotExists0: Binary<string, License, Unary<string, Oath<void, string | Error>>> =
+	(name, license) => path =>
+		directoryExists0(path).chain(rejectIfExists0(name)).chain(createFiles0(path, name, license))
+
+const initProgress: Unary<string, void> = name =>
+	progress.start(`Initializing new application "${name}"`)
 
 const mod = (license: License) => `${getSPDXRecord(license)}
 export * from "./src/impl.ts"

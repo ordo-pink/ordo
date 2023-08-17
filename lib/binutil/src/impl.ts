@@ -14,7 +14,12 @@ type RunCommand = (cmd: string, options?: SpawnOptions.OptionsObject) => Oath<vo
 export const runCommand0: RunCommand = (command, options) =>
 	Oath.try(() => {
 		const result = Bun.spawnSync(command.trim().split(" "), options)
-		if (!result.success && result.stderr) throw new Error(result.stderr.toString("utf-8"))
+		if (!result.success && result.stderr)
+			throw new Error(
+				result.stderr
+					? result.stderr.toString("utf-8")
+					: "Something went wrong, but the output is not piped."
+			)
 	})
 
 export const runBunCommand0: RunCommand = (command, options) =>

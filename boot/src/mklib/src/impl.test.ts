@@ -10,8 +10,8 @@ test("should create test lib src files", async () => {
 	await mklib("test-lib", "MIT")
 
 	expect(await isDirectory0("./lib/test-lib").toPromise()).toBeTrue()
-	expect(await isFile0("./lib/test-lib/mod.ts").toPromise()).toBeTrue()
 	expect(await isFile0("./lib/test-lib/license").toPromise()).toBeTrue()
+	expect(await isFile0("./lib/test-lib/index.ts").toPromise()).toBeTrue()
 	expect(await isFile0("./lib/test-lib/readme.md").toPromise()).toBeTrue()
 	expect(await isFile0("./lib/test-lib/src/impl.ts").toPromise()).toBeTrue()
 	expect(await isFile0("./lib/test-lib/src/types.ts").toPromise()).toBeTrue()

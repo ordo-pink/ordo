@@ -10,8 +10,8 @@ test("should create test srv src files", async () => {
 	await mksrv("test-srv", "MIT")
 
 	expect(await isDirectory0("./srv/test-srv").toPromise()).toBeTrue()
-	expect(await isFile0("./srv/test-srv/mod.ts").toPromise()).toBeTrue()
 	expect(await isFile0("./srv/test-srv/license").toPromise()).toBeTrue()
+	expect(await isFile0("./srv/test-srv/index.ts").toPromise()).toBeTrue()
 	expect(await isFile0("./srv/test-srv/readme.md").toPromise()).toBeTrue()
 	expect(await isFile0("./srv/test-srv/src/impl.ts").toPromise()).toBeTrue()
 	expect(await isFile0("./srv/test-srv/src/types.ts").toPromise()).toBeTrue()

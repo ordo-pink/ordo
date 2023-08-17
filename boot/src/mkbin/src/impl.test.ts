@@ -10,8 +10,8 @@ test("should create test boot src files", async () => {
 	await mkbin("test-mkbin", "MIT")
 
 	expect(await isDirectory0("./boot/src/test-mkbin").orNothing()).toBeTrue()
-	expect(await isFile0("./boot/src/test-mkbin/mod.ts").orNothing()).toBeTrue()
 	expect(await isFile0("./boot/src/test-mkbin/license").orNothing()).toBeTrue()
+	expect(await isFile0("./boot/src/test-mkbin/index.ts").orNothing()).toBeTrue()
 	expect(await isFile0("./boot/src/test-mkbin/src/impl.ts").orNothing()).toBeTrue()
 	expect(await isFile0("./boot/src/test-mkbin/src/impl.test.ts").orNothing()).toBeTrue()
 

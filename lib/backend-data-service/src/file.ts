@@ -1,10 +1,10 @@
 // SPDX-FileCopyrightText: Copyright 2023, 谢尔盖||↓ and the Ordo.pink contributors
 // SPDX-License-Identifier: MIT
 
-import { SUB } from "#lib/backend-token-service/mod.ts"
-import { FilePath, FSID, FileExtension, File } from "./types/file.ts"
-import { DirectoryPath } from "./types/directory.ts"
-import { isValidPath, endsWithSlash } from "./common.ts"
+import type { SUB } from "@ordo-pink/backend-token-service/mod"
+import type { FilePath, FSID, FileExtension, File } from "./types/file"
+import type { DirectoryPath } from "./types/directory"
+import { isValidPath, endsWithSlash } from "./common"
 
 /**
  * A list of abbreviated file sizes (bytes, kilobytes, megabytes, etc.).
@@ -165,6 +165,14 @@ export class FileModel<CustomMetadata extends Record<string, unknown> = Record<s
 		return size === 0 ? EMPTY_READABLE_SIZE : `${num}${SIZE_ABBREVIATIONS[d]}`
 	}
 
+	public static extractFileName(path: FilePath): string {
+		if (!FileModel.isValidPath(path)) {
+			throw new Error("Invalid file path")
+		}
+
+		return path.split("/").reverse()[0] as string
+	}
+
 	/**
 	 * Extract file extension from the given path.
 	 *
@@ -175,11 +183,7 @@ export class FileModel<CustomMetadata extends Record<string, unknown> = Record<s
 	 * @returns {FileExtension} - extension of the file under given path.
 	 */
 	public static extractFileExtension(path: FilePath): FileExtension {
-		if (!FileModel.isValidPath(path)) {
-			throw new Error("Invalid file path")
-		}
-
-		const fileName = path.split("/").reverse()[0] as string
+		const fileName = FileModel.extractFileName(path)
 
 		const lastDotPosition = fileName.lastIndexOf(".")
 

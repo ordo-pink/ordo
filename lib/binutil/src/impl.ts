@@ -6,7 +6,7 @@ import { filter, prop, map, pipe } from "ramda"
 import { SpawnOptions } from "bun"
 import { Dirent } from "fs"
 import chalk from "chalk"
-import { writeFile0, createParentDirectory0, isFile0 } from "@ordo-pink/fs"
+import { writeFile0, createParentDirectory0, isFile0, fileExists0 } from "@ordo-pink/fs"
 import { Oath } from "@ordo-pink/oath"
 import { Unary } from "@ordo-pink/tau"
 
@@ -71,7 +71,9 @@ export const getExistingPaths: Unary<(string | boolean)[], string[]> = paths =>
 export const getCurrentYear = () => new Date(Date.now()).getFullYear()
 
 export const createRepositoryFile0 = (path: string, content: string) =>
-	createParentDirectory0(path).chain(() => writeFile0(path, content, "utf-8"))
+	createParentDirectory0(path).chain(() =>
+		fileExists0(path).chain(exists => (exists ? Oath.empty() : writeFile0(path, content, "utf-8")))
+	)
 
 export const COPYRIGHT_OWNERS = `谢尔盖||↓ and the Ordo.pink contributors`
 

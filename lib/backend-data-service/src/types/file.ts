@@ -1,8 +1,8 @@
 // SPDX-FileCopyrightText: Copyright 2023, 谢尔盖||↓ and the Ordo.pink contributors
 // SPDX-License-Identifier: MIT
 
-import type { SUB } from "#lib/backend-token-service/mod.ts"
-import type { NoForbiddenSymbols, NonSlash, NonTrailingSlash, StartsWithSlash } from "./common.ts"
+import type { SUB } from "@ordo-pink/backend-token-service/mod"
+import type { NoForbiddenSymbols, NonSlash, NonTrailingSlash, StartsWithSlash } from "./common"
 
 /**
  * Unique identifier of a file body.

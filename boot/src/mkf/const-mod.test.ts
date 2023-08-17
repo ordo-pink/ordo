@@ -2,5 +2,8 @@
 // SPDX-License-Identifier: MIT
 
 import { test, expect } from "bun:test"
+import { constMod } from "./const-mod"
 
-test("mock", () => expect(true).toBeTrue())
+test("const-mod should pass", () => {
+	expect(constMod).toEqual("const-mod")
+})

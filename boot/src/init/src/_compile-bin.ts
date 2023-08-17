@@ -15,8 +15,7 @@ export const compileBin: _F = () =>
 		.tap(startCompileBinsProgress)
 		.map(util.direntsToDirs)
 		.map(util.getNames)
-		.map(dirsToBinIndexPaths)
-		.chain(util.checkFilesExist0)
+		.chain(checkBinIndexFilesExist0)
 		.map(util.getExistingPaths)
 		.chain(runCompileBinCommands0)
 		.map(finishCompileBinsProgress)
@@ -30,10 +29,15 @@ const finishCompileBinsProgress = _compileBinsProgress.finish
 
 const _dirToBinIndexPath: Unary<string, string> = dir => `./boot/src/${dir}/index.ts`
 const dirsToBinIndexPaths: Unary<string[], string[]> = map(_dirToBinIndexPath)
+const checkBinIndexFilesExist0: Unary<string[], Oath<(string | boolean)[]>> = names =>
+	Oath.of(dirsToBinIndexPaths(names))
+		.chain(util.checkFilesExist0)
+		.map(() => names)
 
 const _runCompileBinCommand0: Unary<string, Oath<void, Error>> = file =>
 	util
-		.runBunCommand0(`build ./boot/src/${file}/index.ts --compile --outfile ${file}`)
+		.runBunCommand0(`build boot/src/${file}/index.ts --compile --outfile ${file}`)
+		.chain(() => util.runCommand0(`mv -f ${file} bin/${file}`))
 		.tap(incCompileBinsProgress)
 const runCompileBinCommands0: Unary<string[], Oath<void[], Error>> = pipe(
 	map(_runCompileBinCommand0),

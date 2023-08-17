@@ -2,18 +2,68 @@
 // SPDX-License-Identifier: MIT
 
 import * as util from "@ordo-pink/binutil"
-import { isFile0, readdir0 } from "@ordo-pink/fs"
+import { isFile0, readFile0, readdir0, writeFile0 } from "@ordo-pink/fs"
 import { Oath } from "@ordo-pink/oath"
-import { Binary, Curry, Unary } from "@ordo-pink/tau"
+import { Binary, Curry, Unary, noop } from "@ordo-pink/tau"
+
+// --- Public ---
 
 export const precommit = () =>
-	Oath.empty().chain(checkAndCreateMissingLicenses0).orElse(console.error)
+	Oath.empty()
+		.chain(checkAndCreateMissingLicenses0)
+		.chain(checkAndCreateMissingSPDXRecords0)
+		.orElse(console.error)
+
+// --- Internal ---
+
+const spdxRecordsProgress = util.createProgress()
+
+const startSPDXRecordProgress = () => spdxRecordsProgress.start("Creating missing SPDX records")
+
+const checkAndCreateMissingSPDXRecords0 = () =>
+	Oath.empty()
+		.tap(startSPDXRecordProgress)
+		.chain(() => createSPDXRecords0("lib"))
+		.chain(() => createSPDXRecords0("srv"))
+		.chain(() => createSPDXRecords0("boot/src"))
+		.bimap(spdxRecordsProgress.break, spdxRecordsProgress.finish)
+
+const createSPDXRecords0: Unary<string, Oath<void[], Error>> = (path: string) =>
+	readdir0(path, { withFileTypes: true }).chain(dirents =>
+		Oath.all(
+			dirents.map(dirent =>
+				dirent.isDirectory()
+					? createSPDXRecords0(`${path}/${dirent.name}`).map(noop)
+					: dirent.name.endsWith(".ts") || dirent.name.endsWith(".tsx")
+					? createSPDXRecord0(`${path}/${dirent.name}`)
+					: Oath.empty()
+			)
+		)
+	)
+
+const createSPDXRecord0 = (path: string) =>
+	Oath.of(path.trim().split("/").slice(0, 2).join("/")).chain(space =>
+		isFile0(`${space}/license`).chain(exists =>
+			exists
+				? readFile0(`${space}/license`, "utf-8")
+						.map(license => (license === mitLicense ? ("MIT" as const) : ("MPL-2.0" as const)))
+						.map(license => util.getSPDXRecord(license))
+						.chain(spdx =>
+							// TODO: Replace invalid SPDX
+							readFile0(path, "utf-8").chain(content =>
+								(content as string).startsWith(spdx)
+									? Oath.empty()
+									: writeFile0(path, `${spdx}\n${content}`).map(spdxRecordsProgress.inc)
+							)
+						)
+				: Oath.empty()
+		)
+	)
 
 const createLicensesProgress = util.createProgress()
 
 const startLicenseGenerationProgress = () =>
 	createLicensesProgress.start("Creating missing licenses")
-const mitLicense = util.getLicense("MIT")
 
 const checkAndCreateMissingLicenses0 = () =>
 	Oath.empty()
@@ -44,3 +94,5 @@ const createLicenseFiles0: Unary<string[], Oath<void[], Error>> = paths =>
 	Oath.all(
 		paths.map(path => util.createRepositoryFile0(path, mitLicense).tap(createLicensesProgress.inc))
 	)
+
+const mitLicense = util.getLicense("MIT")

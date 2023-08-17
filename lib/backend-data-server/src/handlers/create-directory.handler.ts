@@ -27,8 +27,8 @@ export const handleCreateDirectory: Fn =
 					.chain(validateCreateDirectoryParams0({ ctx, sub, service: dataService }))
 					.chain(createDirectory0({ service: dataService, sub }))
 					.rejectedMap(e =>
-						e.message === "Directory already exists" ? new httpErrors.Conflict(e.message) : e
-					)
+						e.message === "Directory already exists" ? new httpErrors.Conflict(e.message) : e,
+					),
 			)
 			.fork(ResponseError.send(ctx), formCreateDirectoryResponse(ctx))
 
@@ -55,15 +55,15 @@ const validateCreateDirectoryParams0: ValidateCreateDirectoryParamsFn =
 	({ ctx, sub, service }) =>
 	params =>
 		Oath.try(() =>
-			DirectoryModel.isValidPath(params.path) ? params : ctx.throw(400, "Invalid directory path")
+			DirectoryModel.isValidPath(params.path) ? params : ctx.throw(400, "Invalid directory path"),
 		)
 			.chain(({ path }) =>
 				Oath.fromNullable(DirectoryModel.getParentPath(path))
 					.chain(path => service.checkDirectoryExists({ path, sub }))
-					.rejectedMap(() => new httpErrors.BadRequest("Invalid directory path"))
+					.rejectedMap(() => new httpErrors.BadRequest("Invalid directory path")),
 			)
 			.chain(exists =>
-				Oath.try(() => (exists ? params : ctx.throw(404, "Missing parent directory")))
+				Oath.try(() => (exists ? params : ctx.throw(404, "Missing parent directory"))),
 			)
 
 // ---

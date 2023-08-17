@@ -34,7 +34,7 @@ export const handleSignUp: Fn =
 
 		const user = await userService.getByEmail(email).fork(
 			() => null,
-			user => user
+			user => user,
 		)
 
 		if (user) {

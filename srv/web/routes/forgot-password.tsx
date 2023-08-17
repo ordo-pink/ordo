@@ -26,20 +26,14 @@ export default function ForgotPasswordPage({ url }: PageProps) {
 
 	// TODO: Send form to an island
 	return (
-		<CenteredPage
-			centerX
-			centerY
-		>
+		<CenteredPage centerX centerY>
 			<div class="w-full max-w-sm">
 				<section class="w-full px-4 mx-auto text-center">
 					<PageHeader>Forgot password</PageHeader>
 				</section>
 
 				<section class="w-full px-4 py-8 mx-auto">
-					<form
-						method="post"
-						class="w-full flex flex-col items-center space-y-12"
-					>
+					<form method="post" class="w-full flex flex-col items-center space-y-12">
 						<div class="w-full flex flex-col space-y-6">
 							{success ? null : (
 								<fieldset class="w-full">
@@ -89,7 +83,7 @@ export const handler: Handlers = {
 
 		headers.set(
 			"Location",
-			"/forgot-password?success=Thank you! We will send you a recovery link if there is a user associated with the email you provided. You can close this page."
+			"/forgot-password?success=Thank you! We will send you a recovery link if there is a user associated with the email you provided. You can close this page.",
 		)
 
 		return new Response(null, { status: 303, headers })

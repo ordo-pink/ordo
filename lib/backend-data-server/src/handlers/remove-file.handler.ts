@@ -26,7 +26,7 @@ export const handleRemoveFile: Fn =
 			.chain(({ sub }) =>
 				getPath0(ctx.params as unknown as Record<"path", string>)
 					.chain(validateIsValidPath0(ctx))
-					.chain(removeFile0({ service: dataService, sub }))
+					.chain(removeFile0({ service: dataService, sub })),
 			)
 			.chain(throwIfFileDoesNotExist0)
 			.fork(ResponseError.send(ctx), formRemoveFileResponse(ctx))

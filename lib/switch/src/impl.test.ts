@@ -8,7 +8,7 @@ test("should apply fall into case if the value matches", () =>
 	expect(
 		Switch.of(1)
 			.case(1, () => true)
-			.default(() => false)
+			.default(() => false),
 	).toBeTrue())
 
 test("should apply fall into case if the validation succeeded", () =>
@@ -16,9 +16,9 @@ test("should apply fall into case if the validation succeeded", () =>
 		Switch.of(1)
 			.case(
 				x => x === 1,
-				() => true
+				() => true,
 			)
-			.default(() => false)
+			.default(() => false),
 	).toBeTrue())
 
 test("should apply fall into default none of the cases succeeded", () =>
@@ -26,7 +26,7 @@ test("should apply fall into default none of the cases succeeded", () =>
 		Switch.of(2)
 			.case(1, () => false)
 			.case(3, () => false)
-			.default(() => true)
+			.default(() => true),
 	).toBeTrue())
 
 test("should apply the first case where the value matched", () =>
@@ -34,5 +34,5 @@ test("should apply the first case where the value matched", () =>
 		Switch.of(1)
 			.case(1, () => true)
 			.case(1, () => false)
-			.default(() => false)
+			.default(() => false),
 	).toBeTrue())

@@ -57,7 +57,7 @@ export class FileModel<CustomMetadata extends Record<string, unknown> = Record<s
 		createdAt = new Date(Date.now()),
 		updatedAt = new Date(Date.now()),
 		metadata: CustomMetadata = {} as CustomMetadata,
-		encryption: string | false = false
+		encryption: string | false = false,
 	) {
 		if (!FileModel.isValidPath(path)) throw new Error("Invalid file path")
 		if (size < 0) throw new Error("Invalid file size")
@@ -74,7 +74,7 @@ export class FileModel<CustomMetadata extends Record<string, unknown> = Record<s
 			createdBy,
 			updatedBy,
 			metadata,
-			encryption
+			encryption,
 		)
 	}
 
@@ -105,7 +105,7 @@ export class FileModel<CustomMetadata extends Record<string, unknown> = Record<s
 			createdAt,
 			updatedAt,
 			metadata as unknown as CustomMetadata,
-			encryption
+			encryption,
 		)
 	}
 
@@ -216,7 +216,7 @@ export class FileModel<CustomMetadata extends Record<string, unknown> = Record<s
 		createdBy: SUB,
 		updatedBy: SUB,
 		metadata: CustomMetadata,
-		encryption: string | false
+		encryption: string | false,
 	) {
 		this.#path = path
 		this.#fsid = fsid

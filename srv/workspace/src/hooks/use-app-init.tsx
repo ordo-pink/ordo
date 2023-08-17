@@ -61,7 +61,7 @@ export const useAppInit = (): UseAppInitReturns => {
 
 			if (command) command.onSelect()
 		},
-		[globalCommandPaletteItems]
+		[globalCommandPaletteItems],
 	)
 
 	useEffect(() => {

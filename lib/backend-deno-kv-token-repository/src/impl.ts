@@ -73,7 +73,7 @@ const setToken: T._SetTokenFn =
 	(sub, jti, token) =>
 		adapter({ db, key })
 			.getTokenRecord(sub)
-			.fix(() => ({} as TokenRecord))
+			.fix(() => ({}) as TokenRecord)
 			.map(dict => ({ ...dict, [jti]: token }))
 			.chain(dict => adapter({ db, key }).setTokenRecord(sub, dict))
 

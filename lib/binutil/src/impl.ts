@@ -18,7 +18,7 @@ export const runCommand0: RunCommand = (command, options) =>
 			throw new Error(
 				result.stderr
 					? result.stderr.toString("utf-8")
-					: "Something went wrong, but the output is not piped."
+					: "Something went wrong, but the output is not piped.",
 			)
 	})
 
@@ -67,7 +67,7 @@ const _checkFileExists0: Unary<string, Oath<string | boolean>> = path =>
 	isFile0(path).map(e => (e ? path : e))
 export const checkFilesExist0: Unary<string[], Oath<(string | boolean)[]>> = pipe(
 	map(_checkFileExists0),
-	Oath.all
+	Oath.all,
 )
 
 export const getExistingPaths: Unary<(string | boolean)[], string[]> = paths =>
@@ -77,7 +77,7 @@ export const getCurrentYear = () => new Date(Date.now()).getFullYear()
 
 export const createRepositoryFile0 = (path: string, content: string) =>
 	createParentDirectory0(path).chain(() =>
-		fileExists0(path).chain(exists => (exists ? Oath.empty() : writeFile0(path, content, "utf-8")))
+		fileExists0(path).chain(exists => (exists ? Oath.empty() : writeFile0(path, content, "utf-8"))),
 	)
 
 export const COPYRIGHT_OWNERS = `谢尔盖||↓ and the Ordo.pink contributors`

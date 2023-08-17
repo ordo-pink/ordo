@@ -24,18 +24,18 @@ export const getKey = (path: string, type: "public" | "private") =>
 				key,
 				{ name: "ECDSA", namedCurve: "P-384" },
 				false,
-				type === "private" ? ["sign"] : ["verify"]
-			)
+				type === "private" ? ["sign"] : ["verify"],
+			),
 		)
 		.fold(
 			() => {
 				console.error(
 					// TODO: Rename when renaming "bin/dev"
-					`${path} not found. Run "bin/dev" to create a dev pair, or provide production-ready key pair.`
+					`${path} not found. Run "bin/dev" to create a dev pair, or provide production-ready key pair.`,
 				)
 				Deno.exit(1)
 			},
-			x => x
+			x => x,
 		)
 
 export const getPublicKey = (path: string) => getKey(path, "public")

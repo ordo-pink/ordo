@@ -29,12 +29,12 @@ export default function Workspace({ commandPalette$, sidebar$ }: _P) {
 	return Either.fromNullable(sidebar$)
 		.chain($ =>
 			Either.fromNullable(sidebar).chain(state =>
-				Either.fromBoolean(() => !state.disabled).map(() => $)
-			)
+				Either.fromBoolean(() => !state.disabled).map(() => $),
+			),
 		)
 		.fold(
 			() => <DisabledSidebar activity={activity} />,
-			$ => <EnabledSidebar commandPalette$={commandPalette$} sidebar$={$} activity={activity} />
+			$ => <EnabledSidebar commandPalette$={commandPalette$} sidebar$={$} activity={activity} />,
 		)
 }
 
@@ -54,7 +54,7 @@ const DisabledSidebar = ({ activity }: DisabledSidebarProps) =>
 			<div className="workspace max-h-screen h-full flex overflow-auto w-full">
 				<Component />
 			</div>
-		)
+		),
 	)
 
 const EnabledSidebar = ({ sidebar$, activity, commandPalette$ }: EnabledSidebarP) => {
@@ -123,6 +123,6 @@ const EnabledSidebar = ({ sidebar$, activity, commandPalette$ }: EnabledSidebarP
 					<Component />
 				</div>
 			</Split>
-		)
+		),
 	)
 }

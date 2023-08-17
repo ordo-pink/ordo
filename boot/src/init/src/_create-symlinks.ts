@@ -30,5 +30,5 @@ const _runSymlinkCommand0: Unary<string, Oath<void, Error>> = file =>
 	util.runCommand0(`ln -snf ./etc/init/${file} ${file}`).tap(incSymlinksProgress)
 const runSymlinkCommands0: Unary<string[], Oath<void[], Error>> = pipe(
 	map(_runSymlinkCommand0),
-	Oath.all
+	Oath.all,
 )

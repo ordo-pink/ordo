@@ -51,7 +51,7 @@ const validateInput: ValidateInputFn =
 			.chain(({ user, email }) =>
 				Oath.fromNullable(email)
 					.chain(validateEmail({ user, userService }))
-					.map(() => ({ user, email: email! }))
+					.map(() => ({ user, email: email! })),
 			)
 			.rejectedMap(ResponseError.create(400, "Invalid email"))
 
@@ -89,14 +89,14 @@ const validateEmail: ValidateEmailFn =
 				validateEmailIsCorrect,
 				validateEmailIsNotCurrentUserEmail({ user, userService }),
 				validateEmailIsNotTaken({ user, userService }),
-			].map(f => f(email))
+			].map(f => f(email)),
 		).map(() => "OK")
 
 const validateEmailIsCorrect: ReturnType<ValidateEmailFn> = email =>
 	Oath.fromBoolean(
 		() => isEmail(email, {}),
 		() => "OK" as const,
-		() => false
+		() => false,
 	).rejectedMap(ResponseError.create(400, "Invalid email"))
 
 const validateEmailIsNotCurrentUserEmail: ValidateEmailFn =
@@ -105,7 +105,7 @@ const validateEmailIsNotCurrentUserEmail: ValidateEmailFn =
 		Oath.fromBoolean(
 			() => user.email !== email,
 			() => "OK" as const,
-			() => false
+			() => false,
 		).rejectedMap(ResponseError.create(400, "This is your current email"))
 
 const validateEmailIsNotTaken: ValidateEmailFn =
@@ -119,7 +119,7 @@ const validateEmailIsNotTaken: ValidateEmailFn =
 				Oath.fromBoolean(
 					() => !userExists,
 					() => "OK" as const,
-					() => false
-				)
+					() => false,
+				),
 			)
 			.rejectedMap(ResponseError.create(409, "Email already taken"))

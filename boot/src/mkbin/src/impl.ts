@@ -45,12 +45,14 @@ const rejectIfExists0: Curry<Binary<string, boolean, Oath<void, string>>> = name
 	Oath.fromBoolean(
 		() => !exists,
 		noop,
-		() => `"bin/${name}" already exists!`
+		() => `"bin/${name}" already exists!`,
 	)
 
 const createFilesIfNotExists0: Binary<string, License, Unary<string, Oath<void, string | Error>>> =
 	(name, license) => path =>
-		directoryExists0(path).chain(rejectIfExists0(name)).chain(createFiles0(path, name, license))
+		directoryExists0(path)
+			.chain(rejectIfExists0(name))
+			.chain(createFiles0(path, name, license))
 
 const impl = (name: string, license: License) => `${getSPDXRecord(license)}
 export const ${camel(name)} = () => {

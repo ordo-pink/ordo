@@ -55,7 +55,7 @@ export default function SignUpForm() {
 								setPasswordErrors(
 									repeatPassword.value && repeatPassword.value !== v
 										? ["Passwords must match."]
-										: []
+										: [],
 								)
 							})
 						}
@@ -67,7 +67,7 @@ export default function SignUpForm() {
 							e.fold(setPasswordErrors, v => {
 								repeatPassword.value = v
 								setPasswordErrors(
-									password.value && password.value !== v ? ["Passwords must match."] : []
+									password.value && password.value !== v ? ["Passwords must match."] : [],
 								)
 							})
 						}

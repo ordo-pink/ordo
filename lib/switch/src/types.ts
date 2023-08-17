@@ -14,7 +14,7 @@ export type TSwitchStatic = {
 	 * @example `Switch.of(myVariableWithIDontKnowWhichThingInside)`
 	 */
 	of: <TResult extends unknown[] = [], TContext = unknown>(
-		x: TContext
+		x: TContext,
 	) => TSwitch<TContext, TResult>
 }
 
@@ -51,7 +51,7 @@ export type TSwitch<TContext, TResult extends unknown[]> = {
 		 * thunk that is defined for the matched case. If none of the cases did
 		 * match, the `.default` argument thunk will be called.
 		 */
-		onTrue: () => TNewResult
+		onTrue: () => TNewResult,
 	) => TSwitch<TContext, [Unpack<TResult>, TNewResult]>
 
 	/**

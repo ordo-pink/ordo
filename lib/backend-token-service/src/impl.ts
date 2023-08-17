@@ -59,14 +59,14 @@ const getTokenPayload: T._GetTokenPayloadFn<Payload> = ({ key, repository }) =>
 		thunkify((token: string) => verify(token, key)),
 		Oath.from,
 		o => o.chain(payload => repository.getToken(payload.sub!, payload.jti!).map(() => payload)),
-		o => o.rejectedMap(() => null)
+		o => o.rejectedMap(() => null),
 	)
 
 const decodeToken: T._DecodePayloadFn<T.TokenParsed> = token =>
 	Oath.try(() => decode(token))
 		.rejectedMap(console.error)
 		.rejectedMap(() => null)
-		.map(([header, payload, signature]) => ({ header, payload, signature } as T.TokenParsed))
+		.map(([header, payload, signature]) => ({ header, payload, signature }) as T.TokenParsed)
 
 const decodeAccessToken = decodeToken as T._DecodePayloadFn<T.AccessTokenParsed>
 
@@ -76,7 +76,7 @@ const verifyToken: T._VerifyToken = ({ key, repository }) =>
 	pipe(
 		getTokenPayload({ key, repository }),
 		o => o.map(Boolean),
-		o => o.fix(F)
+		o => o.fix(F),
 	)
 
 const getAccessTokenPayload = getTokenPayload as T._GetTokenPayloadFn<T.AccessTokenPayload>
@@ -152,12 +152,12 @@ const createTokens: T._CreateTokensFn =
 				access: create(
 					{ alg: params.options.alg, type: "JWT" },
 					{ jti, iat, iss, exp: aexp, sub, aud },
-					params.options.keys.access.private
+					params.options.keys.access.private,
 				),
 				refresh: create(
 					{ alg: params.options.alg, type: "JWT" },
 					{ jti, iat, iss, exp: rexp, sub, aud, uip },
-					params.options.keys.refresh.private
+					params.options.keys.refresh.private,
 				),
 			}).chain(res =>
 				prevJti
@@ -167,6 +167,6 @@ const createTokens: T._CreateTokensFn =
 							.map(() => res)
 					: Oath.empty()
 							.chain(() => of(params).setPersistedToken(sub, jti, res.refresh))
-							.map(() => res)
-			)
+							.map(() => res),
+			),
 		)

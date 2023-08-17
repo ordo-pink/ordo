@@ -25,7 +25,7 @@ export type EitherStatic = {
 	fromBoolean: <R = undefined, L = undefined>(
 		f: () => boolean,
 		r?: () => R,
-		l?: () => L
+		l?: () => L,
 	) => TEither<R, L>
 	try: <R, L>(f: () => R) => TEither<R, L>
 	right: RightFn

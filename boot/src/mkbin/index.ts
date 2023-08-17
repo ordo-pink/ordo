@@ -14,7 +14,7 @@ program
 		`The "mkbin" command creates a new directory inside "boot/src" with the conventional ` +
 			`file structure to start a new "bin". Bins are the executable CLI tools that provide ` +
 			`improved developer experience within the repository without hiding the complexity ` +
-			`of what is actually happening under the hood.`
+			`of what is actually happening under the hood.`,
 	)
 	.argument("name", "name of the bin to be created")
 	.option("-l, --license <mit|mpl>", "license for the generated code", "mit")

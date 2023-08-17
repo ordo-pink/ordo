@@ -37,7 +37,7 @@ export class UserService {
 					password,
 					emailConfirmed: false,
 					createdAt: new Date(Date.now()),
-				})
+				}),
 			)
 			.map(this.serialize)
 	}
@@ -49,8 +49,8 @@ export class UserService {
 					Oath.fromBoolean(
 						() => valid,
 						() => user,
-						() => "Invalid password"
-					)
+						() => "Invalid password",
+					),
 				)
 				.chain(user =>
 					Oath.from(() => hash(newPassword, this.#salt)).map(
@@ -58,11 +58,11 @@ export class UserService {
 							({
 								...user,
 								password,
-							} as T.InternalUser)
-					)
+							}) as T.InternalUser,
+					),
 				)
 				.chain(user => this.#driver.update(oldUser.id, user).rejectedMap(() => "User not found"))
-				.map(user => this.serialize(user))
+				.map(user => this.serialize(user)),
 		)
 	}
 
@@ -90,8 +90,8 @@ export class UserService {
 				Oath.fromBoolean(
 					() => x,
 					() => x,
-					() => x
-				)
+					() => x,
+				),
 			)
 	}
 

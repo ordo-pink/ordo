@@ -29,10 +29,10 @@ export const mkf = ({ space, path: initialPath, createTest, fileExtension }: _P)
 						.chain(parentPath =>
 							isFile0(`${space}/license`)
 								.chain(getSpaceLicenseType0(space))
-								.chain(createFiles0({ parentPath, fileExtension, createTest, name }))
-						)
-				)
-			)
+								.chain(createFiles0({ parentPath, fileExtension, createTest, name })),
+						),
+				),
+			),
 		)
 		.map(progress.finish)
 		.orElse(e => {
@@ -45,8 +45,7 @@ export const mkf = ({ space, path: initialPath, createTest, fileExtension }: _P)
 const progress = util.createProgress()
 
 const rejectIfSpaceDoesNotExist0: Curry<Binary<string, boolean, Oath<string, string>>> =
-	space => exists =>
-		exists ? Oath.of(space) : Oath.reject(`"${space}" does not exist`)
+	space => exists => (exists ? Oath.of(space) : Oath.reject(`"${space}" does not exist`))
 const normalizeProvidedSpace: Unary<string, Thunk<string>> = space => () =>
 	space.startsWith("./") ? space : `./${space}`
 const normalizeFileName: Unary<string, string> = unverifiedName =>
@@ -58,7 +57,7 @@ const getFileName: Unary<string, string> = path => path.split("/").reverse()[0] 
 const getParentPathForCreatedFile: Ternary<string, string, string, string> = (
 	space,
 	initialPath,
-	unverifiedName
+	unverifiedName,
 ) => join(space, `${initialPath.replace(unverifiedName, "")}`)
 const trimTrailingSlashIfExists: Unary<string, string> = path =>
 	path.endsWith("/") ? path.slice(0, -1) : path
@@ -70,7 +69,7 @@ const verifyProvidedSpaceIsValid0: Unary<string, Oath<string, string>> = unverif
 			unverifiedSpace.startsWith("./srv") ||
 			unverifiedSpace.startsWith("./boot/src"),
 		() => unverifiedSpace,
-		() => "Invalid space"
+		() => "Invalid space",
 	)
 
 const checkIfSpaceExists0: Unary<string, Oath<string, string>> = space =>
@@ -83,28 +82,29 @@ const createFiles0: Curry<Binary<_CF0P, string, Oath<void[], Error>>> =
 		Oath.all([
 			util.createRepositoryFile0(
 				`${parentPath}/${name}.${fileExtension}`,
-				index(name, license as util.License)
+				index(name, license as util.License),
 			),
 			createTest
 				? util.createRepositoryFile0(
 						`${parentPath}/${name}.test.${fileExtension}`,
-						test(name, license as util.License)
+						test(name, license as util.License),
 				  )
 				: Oath.empty(),
 		])
 
-const getSpaceLicenseType0: Curry<Binary<string, boolean, Oath<string, Error>>> = space => exists =>
-	exists
-		? readFile0(`${space}/license`, "utf-8").map(content =>
-				Switch.of(content)
-					.case(mpl, () => "MPL-2.0")
-					.default(() => "MIT")
-		  )
-		: Oath.of("")
+const getSpaceLicenseType0: Curry<Binary<string, boolean, Oath<string, Error>>> =
+	space => exists =>
+		exists
+			? readFile0(`${space}/license`, "utf-8").map(content =>
+					Switch.of(content)
+						.case(mpl, () => "MPL-2.0")
+						.default(() => "MIT"),
+			  )
+			: Oath.of("")
 
 const index = (name: string, license: util.License | "") =>
 	`${license ? util.getSPDXRecord(license).concat("\n") : ""}export const ${camel(
-		name
+		name,
 	)} = "${name}"`
 const test = (name: string, license: util.License | "") =>
 	`${license ? util.getSPDXRecord(license).concat("\n") : ""}import { test, expect } from "bun:test"

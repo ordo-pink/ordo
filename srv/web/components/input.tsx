@@ -43,10 +43,7 @@ export const TextInput = ({
 	autocomplete = "off",
 }: InputProps) => (
 	<div class="flex flex-col">
-		<label
-			for="email"
-			class="w-full text-sm font-medium leading-6 mb-2"
-		>
+		<label for="email" class="w-full text-sm font-medium leading-6 mb-2">
 			{label}
 		</label>
 		<input
@@ -89,7 +86,7 @@ export const EmailInput = ({
 					const errors = Either.fromBoolean(
 						() => isEmail(value, {}),
 						() => value,
-						() => ["Invalid email."]
+						() => ["Invalid email."],
 					)
 
 					onChange(errors)

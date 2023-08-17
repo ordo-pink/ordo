@@ -13,11 +13,11 @@ program
 	.description(
 		"Create a TypeScript file in given lib, srv or bin with given path. This command " +
 			"automatically detects the license type of the space it is used in. Creates parent " +
-			"directories if they do not exist."
+			"directories if they do not exist.",
 	)
 	.argument(
 		"space",
-		"place where the file should be created (lib/$DIR, boot/src/$DIR, or srv/$DIR)"
+		"place where the file should be created (lib/$DIR, boot/src/$DIR, or srv/$DIR)",
 	)
 	.argument("path", "path to the file to be created")
 	.option("-t, --create-test", "generate test")

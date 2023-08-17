@@ -11,7 +11,7 @@ import { AccessTokenParsed, TTokenService } from "#lib/backend-token-service/mod
 // TODO: Rewrite with Oath
 export const useBearerAuthorization = async (
 	ctx: Context,
-	tokenServiceOrIDHost: TTokenService | string
+	tokenServiceOrIDHost: TTokenService | string,
 ): Promise<AccessTokenParsed> => {
 	const authorization = ctx.request.headers.get("Authorization")
 

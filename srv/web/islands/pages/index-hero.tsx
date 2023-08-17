@@ -27,10 +27,7 @@ export default function IndexHeroSection() {
 	const handleJoinClick = () => void (window.location.href = "/sign-up")
 
 	return (
-		<section
-			class="overflow-hidden"
-			style="perspective: 1000px;"
-		>
+		<section class="overflow-hidden" style="perspective: 1000px;">
 			<div
 				class="h-screen will-change-transform transition-transform"
 				style="transform-style: preserve-3d; transform: rotateX(var(--move-y)) rotateY(var(--move-x)); transition: var(--transition);"

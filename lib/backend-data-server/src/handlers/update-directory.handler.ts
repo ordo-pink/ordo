@@ -28,9 +28,9 @@ export const handleUpdateDirectory: Fn =
 					.chain(validateIsValidPath0(ctx))
 					.chain(path =>
 						Oath.from(() => useBody<DATA_SERVICE_TYPES.Directory>(ctx)).chain(
-							updateDirectory0({ service: dataService, sub, path })
-						)
-					)
+							updateDirectory0({ service: dataService, sub, path }),
+						),
+					),
 			)
 			.chain(throwIfDirectoryDoesNotExist0)
 			.fork(ResponseError.send(ctx), formUpdateDirectoryResponse(ctx))
@@ -53,7 +53,7 @@ type ValidateIsValidPathFn = Curry<
 >
 const validateIsValidPath0: ValidateIsValidPathFn = ctx => path =>
 	Oath.try(() =>
-		DirectoryModel.isValidPath(path) ? path : ctx.throw(400, "Invalid directory path")
+		DirectoryModel.isValidPath(path) ? path : ctx.throw(400, "Invalid directory path"),
 	)
 
 // ---

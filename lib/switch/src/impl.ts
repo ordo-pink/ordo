@@ -13,14 +13,14 @@ export const Switch: T.TSwitchStatic = {
 // --- Internal ---
 
 const swichMatched = <TContext, TResult extends unknown[] = []>(
-	x: TContext
+	x: TContext,
 ): T.TSwitch<TContext, TResult> => ({
 	case: () => swichMatched(x),
 	default: () => (x as any)(),
 })
 
 const swich = <TContext, TResult extends unknown[] = []>(
-	x: TContext
+	x: TContext,
 ): T.TSwitch<TContext, TResult> => ({
 	case: (predicate, onTrue) => {
 		const isTrue = isFunction(predicate) ? predicate(x) : predicate === x

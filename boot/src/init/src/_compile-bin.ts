@@ -46,5 +46,5 @@ const _runCompileBinCommand0: Unary<string, Oath<void, Error>> = file =>
 		.tap(incCompileBinsProgress)
 const runCompileBinCommands0: Unary<string[], Oath<void[], Error>> = pipe(
 	map(_runCompileBinCommand0),
-	Oath.all
+	Oath.all,
 )

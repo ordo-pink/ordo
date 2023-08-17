@@ -38,7 +38,7 @@ export type ForbiddenPathSymbol = (typeof FORBIDDEN_PATH_SYMBOLS)[number]
  */
 export type ForbidCharacters<
 	Chars extends string,
-	Str extends string
+	Str extends string,
 > = Str extends `${string}${Chars}${string}` ? never : Str
 
 /**

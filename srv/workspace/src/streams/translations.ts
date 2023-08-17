@@ -24,8 +24,8 @@ const translations$ = new Subject<LanguageResource>()
 
 export const i18n$ = translations$.pipe(
 	switchMap(({ language, ns, resources }) =>
-		of(i18next.addResourceBundle(language, ns, resources, true))
-	)
+		of(i18next.addResourceBundle(language, ns, resources, true)),
+	),
 )
 
 export const _initI18n = callOnce(() => {
@@ -38,7 +38,7 @@ export const registerTranslations = (extensionName: string) => (bundle: Bundle) 
 			language,
 			ns: extensionName,
 			resources: (bundle as Record<string, string>)[language],
-		} as unknown as LanguageResource)
+		} as unknown as LanguageResource),
 	)
 }
 

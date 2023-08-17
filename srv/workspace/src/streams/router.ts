@@ -30,7 +30,7 @@ export const __initRouter: InitRouter = callOnce(({ logger }) => {
 		({ payload: { url, newTab = true } }) => {
 			logger.debug("Opening external page", { url, newTab })
 			newTab ? window.open(url, "_blank")?.focus() : (window.location.href = url)
-		}
+		},
 	)
 
 	return { router$ }

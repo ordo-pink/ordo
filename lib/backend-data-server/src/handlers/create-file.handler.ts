@@ -25,7 +25,7 @@ export const handleCreateFile: Fn =
 			.chain(({ sub }) =>
 				Oath.from(() => useBody<DATA_SERVICE_TYPES.FileCreateParams>(ctx))
 					.chain(validateCreateFileParams0(ctx))
-					.chain(createFile0({ service: dataService, sub }))
+					.chain(createFile0({ service: dataService, sub })),
 			)
 			.fork(ResponseError.send(ctx), formCreateFileResponse(ctx))
 
@@ -45,7 +45,7 @@ type ValidateCreateFileParamsFn = Curry<
 >
 const validateCreateFileParams0: ValidateCreateFileParamsFn = ctx => params =>
 	Oath.try(() =>
-		FileModel.isValidPath(params.path) ? params : ctx.throw(400, "Invalid file path")
+		FileModel.isValidPath(params.path) ? params : ctx.throw(400, "Invalid file path"),
 	)
 
 // ---
@@ -64,7 +64,7 @@ const createFile0: CreateFileFn =
 		service
 			.createFile({ sub, file })
 			.rejectedMap(e =>
-				e.message === "File already exists" ? new httpErrors.Conflict(e.message) : e
+				e.message === "File already exists" ? new httpErrors.Conflict(e.message) : e,
 			)
 
 // ---

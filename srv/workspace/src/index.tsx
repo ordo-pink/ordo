@@ -11,5 +11,5 @@ root.render(
 		id={process.env.REACT_APP_ID_HOST!}
 		data={process.env.REACT_APP_DATA_HOST!}
 		web={process.env.REACT_APP_WEB_HOST!}
-	/>
+	/>,
 )

@@ -31,5 +31,5 @@ export const handleVerifyToken: Fn =
 				},
 				token => {
 					ctx.response.body = { success: true, result: { valid: true, token } }
-				}
+				},
 			)

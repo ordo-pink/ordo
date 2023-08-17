@@ -12,7 +12,7 @@ import { isObject } from "#lib/tau/mod.ts"
 export const useBody = async <T>(
 	ctx: Context,
 	type: BodyType = "json",
-	expect: "string" | "array" | "object" = "object"
+	expect: "string" | "array" | "object" = "object",
 ) => {
 	const bodyContent = ctx.request.body({ type })
 

@@ -22,7 +22,7 @@ export const handleSignOut: Fn =
 
 		const tokenMap = await tokenService
 			.getPersistedTokens(sub)
-			.fix(() => ({} as TokenRecord))
+			.fix(() => ({}) as TokenRecord)
 			.toPromise()
 
 		if (!tokenMap || !tokenMap[jti]) {

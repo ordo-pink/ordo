@@ -12,7 +12,7 @@ program
 	.version("0.2.0")
 	.description(
 		`The "mksrv" command creates a new directory inside "srv" with the conventional file ` +
-			`structure to make a new server application.`
+			`structure to make a new server application.`,
 	)
 	.argument("name", "name of the srv to be created")
 	.option("-l, --license <mit|mpl>", "license for the generated code", "mit")

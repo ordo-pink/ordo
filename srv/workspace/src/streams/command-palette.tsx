@@ -63,7 +63,7 @@ const add$ = new Subject<CommandPalette.Item>()
 const remove$ = new Subject<string>()
 const globalCommandPalette$ = merge(add$.pipe(map(addP)), remove$.pipe(map(removeP))).pipe(
 	scan((acc, f) => f(acc), [] as CommandPalette.Item[]),
-	shareReplay(1)
+	shareReplay(1),
 )
 
 globalCommandPalette$.subscribe()

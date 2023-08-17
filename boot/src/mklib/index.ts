@@ -12,7 +12,7 @@ program
 	.version("0.2.0")
 	.description(
 		`The "mklib" command creates a new directory inside "lib" with the conventional file ` +
-			`structure to make a new library.`
+			`structure to make a new library.`,
 	)
 	.argument("name", "name of the lib to be created")
 	.option("-l, --license <mit|mpl>", "license for the generated code", "mit")

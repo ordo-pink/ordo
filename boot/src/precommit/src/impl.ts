@@ -36,9 +36,9 @@ const createSPDXRecords0: Unary<string, Oath<void[], Error>> = (path: string) =>
 					? createSPDXRecords0(`${path}/${dirent.name}`).map(noop)
 					: dirent.name.endsWith(".ts") || dirent.name.endsWith(".tsx")
 					? createSPDXRecord0(`${path}/${dirent.name}`)
-					: Oath.empty()
-			)
-		)
+					: Oath.empty(),
+			),
+		),
 	)
 
 const createSPDXRecord0 = (path: string) =>
@@ -53,11 +53,11 @@ const createSPDXRecord0 = (path: string) =>
 							readFile0(path, "utf-8").chain(content =>
 								(content as string).startsWith(spdx)
 									? Oath.empty()
-									: writeFile0(path, `${spdx}\n${content}`).map(spdxRecordsProgress.inc)
-							)
+									: writeFile0(path, `${spdx}\n${content}`).map(spdxRecordsProgress.inc),
+							),
 						)
-				: Oath.empty()
-		)
+				: Oath.empty(),
+		),
 	)
 
 const createLicensesProgress = util.createProgress()
@@ -85,14 +85,14 @@ const collectMissingLicensePaths0: Curry<Binary<string, string[], Oath<string[]>
 		Oath.all(
 			dirs.map(dir =>
 				isFile0(`${space}/${dir}/license`).map(exists =>
-					exists ? null : `${space}/${dir}/license`
-				)
-			)
+					exists ? null : `${space}/${dir}/license`,
+				),
+			),
 		).map(paths => paths.filter(Boolean) as string[])
 
 const createLicenseFiles0: Unary<string[], Oath<void[], Error>> = paths =>
 	Oath.all(
-		paths.map(path => util.createRepositoryFile0(path, mitLicense).tap(createLicensesProgress.inc))
+		paths.map(path => util.createRepositoryFile0(path, mitLicense).tap(createLicensesProgress.inc)),
 	)
 
 const mitLicense = util.getLicense("MIT")

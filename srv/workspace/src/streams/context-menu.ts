@@ -49,7 +49,7 @@ const add$ = new Subject<ContextMenu.Item>()
 const remove$ = new Subject<string>()
 const globalItems$ = merge(add$.pipe(map(addP)), remove$.pipe(map(removeP))).pipe(
 	scan((acc, f) => f(acc), [] as ContextMenu.Item[]),
-	shareReplay(1)
+	shareReplay(1),
 )
 
 globalItems$.subscribe()
@@ -60,8 +60,8 @@ const contextMenu$ = params$.pipe(
 		Either.fromNullable(state).fold(Null, state => ({
 			...state,
 			structure: items.filter(item =>
-				item.shouldShow({ event: state.event, payload: state.payload })
+				item.shouldShow({ event: state.event, payload: state.payload }),
 			),
-		}))
-	)
+		})),
+	),
 )

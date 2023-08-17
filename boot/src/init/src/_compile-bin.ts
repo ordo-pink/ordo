@@ -16,7 +16,6 @@ export const compileBin: _F = () =>
 		.map(util.direntsToDirs)
 		.map(util.getNames)
 		.chain(checkBinIndexFilesExist0)
-		.map(util.getExistingPaths)
 		.chain(runCompileBinCommands0)
 		.bimap(breakCompileBinsProgress, finishCompileBinsProgress)
 
@@ -28,12 +27,17 @@ const incCompileBinsProgress = _compileBinsProgress.inc
 const finishCompileBinsProgress = _compileBinsProgress.finish
 const breakCompileBinsProgress = _compileBinsProgress.break
 
-const _dirToBinIndexPath: Unary<string, string> = dir => `./boot/src/${dir}/index.ts`
-const dirsToBinIndexPaths: Unary<string[], string[]> = map(_dirToBinIndexPath)
-const checkBinIndexFilesExist0: Unary<string[], Oath<(string | boolean)[]>> = names =>
-	Oath.of(dirsToBinIndexPaths(names))
+const _binIndexPathToName: Unary<string, string> = path => path.slice(9, -9)
+const binIndexPathsToNames: Unary<string[], string[]> = map(_binIndexPathToName)
+
+const _nameToBinIndexPath: Unary<string, string> = name => `boot/src/${name}/index.ts`
+const namesToBinIndexPaths: Unary<string[], string[]> = map(_nameToBinIndexPath)
+
+const checkBinIndexFilesExist0: Unary<string[], Oath<string[]>> = names =>
+	Oath.of(namesToBinIndexPaths(names))
 		.chain(util.checkFilesExist0)
-		.map(() => names)
+		.map(util.getExistingPaths)
+		.map(binIndexPathsToNames)
 
 const _runCompileBinCommand0: Unary<string, Oath<void, Error>> = file =>
 	util

@@ -13,7 +13,8 @@ import { Unary } from "@ordo-pink/tau"
 type RunCommand = (cmd: string, options?: SpawnOptions.OptionsObject) => Oath<void, Error>
 export const runCommand0: RunCommand = (command, options) =>
 	Oath.try(() => {
-		Bun.spawnSync(command.trim().split(" "), options)
+		const result = Bun.spawnSync(command.trim().split(" "), options)
+		if (!result.success) throw new Error(result.stderr.toString("utf-8"))
 	})
 
 export const runBunCommand0: RunCommand = (command, options) =>
@@ -65,7 +66,7 @@ export const checkFilesExist0: Unary<string[], Oath<(string | boolean)[]>> = pip
 )
 
 export const getExistingPaths: Unary<(string | boolean)[], string[]> = paths =>
-	paths.filter(Boolean) as string[]
+	paths.filter(path => Boolean(path)) as string[]
 
 export const getCurrentYear = () => new Date(Date.now()).getFullYear()
 

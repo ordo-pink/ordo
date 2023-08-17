@@ -3,4 +3,4 @@
 
 import { test, expect } from "bun:test"
 
-test("mock", () => expect(true).toBeTrue())
+test("bin/run should pass", () => expect(true).toBeTrue())

@@ -1,33 +1,27 @@
 // SPDX-FileCopyrightText: Copyright 2023, 谢尔盖||↓ and the Ordo.pink contributors
 // SPDX-License-Identifier: MIT
 
-import { getDenoPath, runDenoCommand } from "#lib/binutil/mod.ts"
-import { readdir, isFile } from "#lib/fs/mod.ts"
-import { Oath } from "#lib/oath/mod.ts"
+import {
+	checkFilesExist0,
+	direntsToDirs,
+	getExistingPaths,
+	getNames,
+	runBunCommand0,
+} from "@ordo-pink/binutil"
+import { readdir0 } from "@ordo-pink/fs"
+import { Oath } from "@ordo-pink/oath"
+import { noop } from "@ordo-pink/tau"
 
 export const run = () =>
-	readdir("./srv")
-		.map(entries => entries.filter(entry => entry.isDirectory))
-		.map(entries =>
-			entries.map(entry =>
-				isFile(`./srv/${entry.name}/bin/run.ts`).map(x =>
-					x ? `./srv/${entry.name}/bin/run.ts` : null
-				)
-			)
-		)
-		.chain(entries => Oath.all(entries))
-		.map(entries => entries.filter(Boolean) as string[])
-		.chain(entries =>
+	readdir0("./srv", { withFileTypes: true })
+		.map(direntsToDirs)
+		.map(getNames)
+		.map(names => names.map(name => `./srv/${name}/bin/run1.ts`)) // TODO: Replace with run.ts
+		.chain(checkFilesExist0)
+		.map(getExistingPaths)
+		.chain(paths =>
 			Oath.all(
-				entries.map(path =>
-					runDenoCommand(getDenoPath(), [
-						"run",
-						"--allow-read",
-						"--allow-write",
-						"--allow-run",
-						"--allow-env",
-						path,
-					])
-				)
-			)
+				paths.map(path => runBunCommand0(`run ${path}`, { stderr: "inherit", stdout: "inherit" }))
+			).map(noop)
 		)
+		.orElse(console.error)

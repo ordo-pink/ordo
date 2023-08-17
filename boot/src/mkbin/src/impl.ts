@@ -41,8 +41,7 @@ export const mkbin = (name: string, license: License) =>
 		)
 		.map(progress.finish)
 		.orElse(e => {
-			progress.break()
-			console.error(e)
+			progress.break(e)
 			return false
 		})
 

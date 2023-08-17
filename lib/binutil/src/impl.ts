@@ -38,7 +38,7 @@ export const createProgress = () => {
 			process.stdout.write(`${chalk.green("✔")} ${currentLine}\n`)
 			currentLine = ""
 		},
-		break: (error: Error) => {
+		break: (error: unknown) => {
 			process.stdout.clearLine(0)
 			process.stdout.cursorTo(0)
 			process.stdout.write(`${chalk.red("✘")} ${currentLine}\n`)

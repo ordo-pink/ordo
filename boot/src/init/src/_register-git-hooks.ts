@@ -1,25 +1,21 @@
-import { createProgress, runBunCommand0, runCommand0 } from "@ordo-pink/binutil"
-import { writeFile0 } from "@ordo-pink/fs"
+import { createProgress, runCommand0 } from "@ordo-pink/binutil"
 import { Oath } from "@ordo-pink/oath"
 
 export const registerGitHooks = () =>
 	Oath.empty()
 		.tap(startProgress)
 		.chain(() =>
-			runBunCommand0(`build ./etc/git/hooks/pre-commit.ts --compile --outfile pre-commit`)
-				.chain(() => runCommand0("mv -f pre-commit .git/hooks/pre-commit"))
+			runCommand0(`cp ./etc/git/hooks/pre-commit.sh .git/hooks/pre-commit`)
 				.chain(() => runCommand0("chmod a+x .git/hooks/pre-commit"))
 				.tap(progress.inc)
 		)
 		.chain(() =>
-			runBunCommand0(`build ./etc/git/hooks/commit-msg.ts --compile --outfile commit-msg`)
-				.chain(() => runCommand0("mv -f commit-msg .git/hooks/commit-msg"))
+			runCommand0(`cp ./etc/git/hooks/commit-msg.sh .git/hooks/commit-msg`)
 				.chain(() => runCommand0("chmod a+x .git/hooks/commit-msg"))
 				.tap(progress.inc)
 		)
 		.chain(() =>
-			runBunCommand0(`build ./etc/git/hooks/pre-push.ts --compile --outfile pre-push`)
-				.chain(() => runCommand0("mv -f pre-push .git/hooks/pre-push"))
+			runCommand0(`cp ./etc/git/hooks/pre-push.sh .git/hooks/pre-push`)
 				.chain(() => runCommand0("chmod a+x .git/hooks/pre-push"))
 				.tap(progress.inc)
 		)

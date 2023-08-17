@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: Copyright 2023, 谢尔盖||↓ and the Ordo.pink contributors
+// SPDX-License-Identifier: MIT
+
 import { MouseEvent } from "react"
 import { ContextMenu } from "#lib/libfe/mod"
 import MenuItem from "$components/context-menu/context-menu-item"

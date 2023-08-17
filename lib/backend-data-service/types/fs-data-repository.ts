@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: Copyright 2023, 谢尔盖||↓ and the Ordo.pink contributors
+// SPDX-License-Identifier: MIT
+
 import { SUB } from "#lib/backend-token-service/mod.ts"
 import { Oath } from "#lib/oath/mod.ts"
 import { Unary, Nullable } from "#lib/tau/mod.ts"

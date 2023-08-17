@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: Copyright 2023, 谢尔盖||↓ and the Ordo.pink contributors
+// SPDX-License-Identifier: MIT
+
 import { map, switchMap, scan, shareReplay } from "rxjs/operators"
 import { BehaviorSubject, of, merge, Subject } from "rxjs"
 import { ComponentType } from "react"

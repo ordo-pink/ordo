@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: Copyright 2023, 谢尔盖||↓ and the Ordo.pink contributors
+// SPDX-License-Identifier: MIT
+
 import { MouseEvent, PropsWithChildren, HTMLProps } from "react"
 import { getCommands } from "$streams/commands"
 import { cmd } from "#lib/libfe/mod"

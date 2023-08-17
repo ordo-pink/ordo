@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: Copyright 2023, 谢尔盖||↓ and the Ordo.pink contributors
+// SPDX-License-Identifier: MIT
+
 import { BehaviorSubject, map, merge, Observable, scan, shareReplay, Subject } from "rxjs"
 import { BsCommand } from "react-icons/bs"
 import { Binary, Curry, Nullable, Thunk, Unary, callOnce } from "#lib/tau/mod"

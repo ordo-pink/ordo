@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: Copyright 2023, 谢尔盖||↓ and the Ordo.pink contributors
+// SPDX-License-Identifier: MIT
+
 import type { Logger } from "#lib/logger/mod"
 import { combineLatestWith, map, merge, scan, shareReplay, Subject } from "rxjs"
 import { equals } from "ramda"

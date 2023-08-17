@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: Copyright 2023, 谢尔盖||↓ and the Ordo.pink contributors
+// SPDX-License-Identifier: MIT
+
 // deno-lint-ignore-file no-explicit-any
 
 import { Either, TEither } from "#lib/either/mod"

@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: Copyright 2023, 谢尔盖||↓ and the Ordo.pink contributors
+// SPDX-License-Identifier: MIT
+
 import { useState, useEffect } from "react"
 import { Observable } from "rxjs"
 import type { Nullable } from "#lib/tau/mod"

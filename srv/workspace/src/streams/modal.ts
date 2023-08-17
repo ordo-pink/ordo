@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: Copyright 2023, 谢尔盖||↓ and the Ordo.pink contributors
+// SPDX-License-Identifier: MIT
+
 import { BehaviorSubject, Observable } from "rxjs"
 import type { ComponentType } from "react"
 import { Nullable, Thunk, callOnce } from "#lib/tau/mod"

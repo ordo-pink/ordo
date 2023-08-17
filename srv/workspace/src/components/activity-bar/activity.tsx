@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: Copyright 2023, 谢尔盖||↓ and the Ordo.pink contributors
+// SPDX-License-Identifier: MIT
+
 import { Activity, useCurrentActivity } from "$streams/extensions"
 import Link from "$components/link"
 

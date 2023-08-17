@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: Copyright 2023, 谢尔盖||↓ and the Ordo.pink contributors
+// SPDX-License-Identifier: MIT
+
 import { AiOutlineLeft, AiOutlineLayout, AiOutlineRight } from "react-icons/ai"
 import { BehaviorSubject, Observable } from "rxjs"
 import { Unary, callOnce } from "#lib/tau/mod"

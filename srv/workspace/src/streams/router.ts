@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: Copyright 2023, 谢尔盖||↓ and the Ordo.pink contributors
+// SPDX-License-Identifier: MIT
+
 import { Router } from "silkrouter"
 import { Unary, callOnce } from "#lib/tau/mod"
 import { Logger } from "#lib/logger/mod"

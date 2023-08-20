@@ -13,28 +13,28 @@ import { Switch } from "@ordo-pink/switch"
 
 export const useBody = <T>(
 	ctx: Context,
-	expect: "string" | "array" | "object" = "object"
+	expect: "string" | "array" | "object" = "object",
 ): Oath<T, HttpError> =>
 	Oath.from(() => ctx.request.body as Promise<T>)
 		.map(body =>
 			Switch.of(expect)
 				.case(
 					expect => expect === "object" && !isObject(body),
-					() => HttpError.BadRequest("Request body must be an object")
+					() => HttpError.BadRequest("Request body must be an object"),
 				)
 				.case(
 					expect => expect === "string" && typeof body !== "string",
-					() => HttpError.BadRequest("Request body must be a string")
+					() => HttpError.BadRequest("Request body must be a string"),
 				)
 				.case(
 					expect => expect === "array" && !Array.isArray(body),
-					() => HttpError.BadRequest("Request body must be an array")
+					() => HttpError.BadRequest("Request body must be an array"),
 				)
-				.default(() => body)
+				.default(() => body),
 		)
 		.chain(result =>
 			Oath.try(() => {
 				if (result instanceof HttpError) throw result
 				return result
-			})
+			}),
 		)

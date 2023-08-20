@@ -27,9 +27,9 @@ export const handleCreateFile: Fn =
 					.chain(validateCreateFileParams0(ctx))
 					.chain(params =>
 						createFile0({ service: dataService, sub })(params).rejectedMap(e =>
-							ctx.throw(409, "File already exists")
-						)
-					)
+							ctx.throw(409, "File already exists"),
+						),
+					),
 			)
 			.fork(sendError(ctx), formCreateFileResponse(ctx))
 

@@ -26,7 +26,7 @@ export const handleCreateDirectory: Fn =
 			.chain(({ sub }) =>
 				useBody<DATA_SERVICE_TYPES.DirectoryCreateParams>(ctx, "object")
 					.chain(validateCreateDirectoryParams0({ ctx, sub, service: dataService }))
-					.chain(createDirectory0({ service: dataService, sub }))
+					.chain(createDirectory0({ service: dataService, sub })),
 			)
 			.fork(sendError(ctx), formCreateDirectoryResponse(ctx))
 
@@ -60,13 +60,13 @@ const validateCreateDirectoryParams0: ValidateCreateDirectoryParamsFn =
 			.chain(({ path }) =>
 				Oath.fromNullable(DirectoryModel.getParentPath(path))
 					.chain(path => service.checkDirectoryExists({ path, sub }))
-					.rejectedMap(() => HttpError.BadRequest("Invalid directory path"))
+					.rejectedMap(() => HttpError.BadRequest("Invalid directory path")),
 			)
 			.chain(exists =>
 				Oath.try(() => {
 					if (!exists) throw HttpError.NotFound("Missing parent directory")
 					return params
-				})
+				}),
 			)
 			.rejectedMap(error => (error instanceof HttpError ? error : HttpError.from(error)))
 

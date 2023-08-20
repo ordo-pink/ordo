@@ -26,7 +26,7 @@ export const handleGetDirectory: Fn =
 			.chain(({ sub }) =>
 				getPath0(ctx.params)
 					.chain(validateIsValidPath0(ctx))
-					.chain(getDirectory0({ service: dataService, sub }))
+					.chain(getDirectory0({ service: dataService, sub })),
 			)
 			.fork(sendError(ctx), formGetDirectoryResponse(ctx))
 

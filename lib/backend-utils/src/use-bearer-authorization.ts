@@ -13,7 +13,7 @@ import { Oath } from "@ordo-pink/oath"
 // TODO: Rewrite with Oath
 export const useBearerAuthorization = (
 	ctx: Context,
-	tokenServiceOrIDHost: TTokenService | string
+	tokenServiceOrIDHost: TTokenService | string,
 ): Oath<AccessTokenParsed, HttpError> =>
 	Oath.of(ctx.header.authorization)
 		.chain(authorization =>
@@ -23,24 +23,24 @@ export const useBearerAuthorization = (
 					typeof authorization === "string" &&
 					authorization.startsWith("Bearer "),
 				() => authorization as string,
-				() => HttpError.Unauthorized("Authorization token not provided")
-			)
+				() => HttpError.Unauthorized("Authorization token not provided"),
+			),
 		)
 		.map(authorization => authorization.slice(7))
 		.chain(token =>
 			typeof tokenServiceOrIDHost === "string"
 				? verifyWithIdServer0(tokenServiceOrIDHost, token)
-				: verifyWithTokenService0(tokenServiceOrIDHost, token)
+				: verifyWithTokenService0(tokenServiceOrIDHost, token),
 		)
 
 const verifyWithIdServer0 = (idHost: string, authorization: string) =>
 	Oath.from(() =>
 		fetch(`${idHost}/verify-token`, { method: "POST", headers: { authorization } })
 			.then(res => res.json())
-			.then(res => (res.success ? res.result : { valid: false }))
+			.then(res => (res.success ? res.result : { valid: false })),
 	)
 		.chain(res =>
-			res.success ? Oath.of(res.result) : Oath.reject(HttpError.Forbidden("Invalid token"))
+			res.success ? Oath.of(res.result) : Oath.reject(HttpError.Forbidden("Invalid token")),
 		)
 		.map(res => res.token)
 

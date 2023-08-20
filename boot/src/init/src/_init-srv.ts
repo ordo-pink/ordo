@@ -29,7 +29,7 @@ const incInitSrvProgress = _intSrvProgress.inc
 const finishInitSrvProgress = _intSrvProgress.finish
 const breakInitSrvProgress = _intSrvProgress.break
 
-const _dirToInitFilePath: Unary<string, string> = dir => `./srv/${dir}/bin/init1.ts` // TODO: replace with init.ts
+const _dirToInitFilePath: Unary<string, string> = dir => `./srv/${dir}/bin/init.ts` // TODO: replace with init.ts
 const dirsToInitFilePaths: Unary<string[], string[]> = map(_dirToInitFilePath)
 
 const _runInitCommand0: Unary<string, Oath<void, Error>> = path =>

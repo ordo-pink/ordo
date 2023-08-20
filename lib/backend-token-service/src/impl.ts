@@ -5,6 +5,7 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
+import { randomUUID } from "crypto"
 import { JwtPayload, decode, verify, sign } from "jsonwebtoken"
 
 import { Oath } from "@ordo-pink/oath"
@@ -15,7 +16,7 @@ type Params = { repository: TokenRepository; options: TokenServiceOptions }
 const getSecret = (
 	options: TokenServiceOptions,
 	type: "access" | "refresh",
-	visibility: "public" | "private",
+	visibility: "public" | "private"
 ) => options.keys[type][visibility]
 
 /**
@@ -36,11 +37,11 @@ const of = ({ repository, options }: Params): TTokenService => ({
 	decode: token => Oath.try(() => decode(token, { complete: true })).fix(() => null) as any,
 	createPair: ({ sub, uip, prevJti, aud = "https://ordo.pink" }) =>
 		Oath.all({
-			jti: crypto.randomUUID(),
-			iat: Date.now(),
+			jti: randomUUID(),
+			iat: Math.floor(Date.now() / 1000),
 			iss: "https://id.ordo.pink",
-			aexp: Date.now() + options.accessTokenExpireIn * 1000,
-			rexp: Date.now() + options.refreshTokenExpireIn * 1000,
+			aexp: Math.floor(Date.now() / 1000) + options.accessTokenExpireIn,
+			rexp: Math.floor(Date.now() / 1000) + options.refreshTokenExpireIn,
 			sub,
 			aud,
 			uip,
@@ -56,17 +57,13 @@ const of = ({ repository, options }: Params): TTokenService => ({
 				tokens: {
 					access: sign(
 						{ jti, iat, iss, exp: aexp, sub, aud },
-						// getSecret(options, "access", "private"),
-						// { algorithm: options.alg }
-						null,
-						{ algorithm: "none" },
+						getSecret(options, "access", "private"),
+						{ algorithm: options.alg }
 					),
 					refresh: sign(
 						{ jti, iat, iss, exp: rexp, sub, aud, uip },
-						// getSecret(options, "refresh", "private"),
-						// { algorithm: options.alg }
-						null,
-						{ algorithm: "none" },
+						getSecret(options, "refresh", "private"),
+						{ algorithm: options.alg }
 					),
 				},
 			}).chain(res =>
@@ -77,8 +74,8 @@ const of = ({ repository, options }: Params): TTokenService => ({
 							.map(() => res)
 					: Oath.empty()
 							.chain(() => repository.setToken(sub, jti, res.tokens.refresh))
-							.map(() => res),
-			),
+							.map(() => res)
+			)
 		),
 })
 

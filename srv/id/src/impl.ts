@@ -13,7 +13,6 @@ import { FSDataRepository } from "@ordo-pink/backend-fs-data-repository"
 import { FSMetadataRepository } from "@ordo-pink/backend-fs-metadata-repository"
 import { getPrivateKey, getPublicKey } from "./utils/get-key"
 import { MemoryTokenRepository } from "@ordo-pink/backend-memory-token-repository"
-import crypto from "crypto"
 
 const {
 	ID_DYNAMODB_ENDPOINT,

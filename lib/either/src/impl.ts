@@ -3,7 +3,7 @@
 
 // deno-lint-ignore-file no-explicit-any
 
-import type * as T from "./types.ts"
+import type * as T from "./types"
 
 const left: T.LeftFn = x => ({
 	isEither: true,
@@ -36,7 +36,7 @@ export const Either: T.EitherStatic = {
 		try {
 			return right(f())
 		} catch (e) {
-			return left(e)
+			return left(e) as any
 		}
 	},
 	right,

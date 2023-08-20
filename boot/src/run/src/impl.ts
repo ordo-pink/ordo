@@ -16,12 +16,12 @@ export const run = () =>
 	readdir0("./srv", { withFileTypes: true })
 		.map(direntsToDirs)
 		.map(getNames)
-		.map(names => names.map(name => `./srv/${name}/bin/run1.ts`)) // TODO: Replace with run.ts
+		.map(names => names.map(name => `./srv/${name}/bin/run.ts`)) // TODO: Replace with run.ts
 		.chain(checkFilesExist0)
 		.map(getExistingPaths)
 		.chain(paths =>
 			Oath.all(
-				paths.map(path => runBunCommand0(`run ${path}`, { stderr: "inherit", stdout: "inherit" })),
-			).map(noop),
+				paths.map(path => runBunCommand0(`run ${path}`, { stderr: "inherit", stdout: "inherit" }))
+			).map(noop)
 		)
 		.orElse(console.error)

@@ -5,9 +5,9 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-import { runBunCommand0 } from "@ordo-pink/binutil"
+import { runCommand0 } from "@ordo-pink/binutil"
 
-runBunCommand0("run srv/id/index.ts --watch", {
+runCommand0("npx nodemon -r tsconfig-paths/register srv/id/index.ts", {
 	stderr: "inherit",
 	stdout: "inherit",
 }).orElse(console.error)

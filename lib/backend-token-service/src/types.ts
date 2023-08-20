@@ -9,6 +9,7 @@ import type { Jwt, JwtHeader, JwtPayload, Algorithm } from "jsonwebtoken"
 import type { Nullable, Unary } from "@ordo-pink/tau"
 import type { Logger } from "@ordo-pink/logger"
 import type { Oath } from "@ordo-pink/oath"
+import type { KeyObject } from "crypto"
 
 // --- Public ---
 
@@ -24,12 +25,12 @@ export type CryptoKeyPair = {
 	/**
 	 * Private CryptoKey used for signing.
 	 */
-	readonly private: string
+	readonly private: KeyObject
 
 	/**
 	 * Public CryptoKey used for verifying.
 	 */
-	readonly public: string
+	readonly public: KeyObject
 }
 
 /**
@@ -245,12 +246,12 @@ export type TTokenService = {
 
 	getPayload: (
 		token: string,
-		type: "access" | "refresh",
+		type: "access" | "refresh"
 	) => Oath<Nullable<typeof type extends "access" ? AccessTokenParsed : RefreshTokenParsed>>
 
 	decode: (
 		token: string,
-		type: "access" | "refresh",
+		type: "access" | "refresh"
 	) => Oath<Nullable<typeof type extends "access" ? AccessTokenParsed : RefreshTokenParsed>>
 
 	createPair: Unary<

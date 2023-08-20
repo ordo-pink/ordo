@@ -7,22 +7,24 @@
 
 import { isFile0, readFile0 } from "@ordo-pink/fs"
 import { Oath } from "@ordo-pink/oath"
+import { createPrivateKey, createPublicKey } from "crypto"
 
 export const getKey = (path: string, type: "public" | "private") =>
 	Oath.fromNullable(path)
 		.chain(isFile0)
 		.map(() => path)
 		.chain(path => readFile0(path, "utf-8"))
+		.map(key => (type === "private" ? createPrivateKey(key) : createPublicKey(key)))
 		.fork(
 			() => {
 				console.error(
 					// TODO: Rename when renaming "bin/dev"
-					`${path} not found. Run "bin/dev" to create a dev pair, or provide production-ready key pair.`,
+					`${path} not found. Run "bin/dev" to create a dev pair, or provide production-ready key pair.`
 				)
 				process.exit(1)
 			},
-			key => key,
+			key => key
 		)
 
-export const getPublicKey = (path: string) => getKey(path, "public") as Promise<string>
-export const getPrivateKey = (path: string) => getKey(path, "private") as Promise<string>
+export const getPublicKey = (path: string) => getKey(path, "public")
+export const getPrivateKey = (path: string) => getKey(path, "private")

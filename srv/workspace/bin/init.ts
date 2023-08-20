@@ -1,15 +1,10 @@
 // SPDX-FileCopyrightText: Copyright 2023, 谢尔盖||↓ and the Ordo.pink contributors
 // SPDX-License-Identifier: MIT
 
-import { runCommand } from "@ordo-pink/binutil/mod.ts"
-import { cyan, green } from "#std/fmt/colors.ts"
+import { runCommand0 } from "@ordo-pink/binutil"
 
-const main = async () => {
-	const encoder = new TextEncoder()
-
-	Deno.stdout.write(encoder.encode(`  ${cyan("→")} Installing dependencies...`))
-	await runCommand("npm", ["i"], "./srv/workspace").orElse(console.error)
-	Deno.stdout.write(encoder.encode(` ${green("✓")}\n`))
-}
-
-await main()
+runCommand0("npm i", {
+	cwd: "./srv/workspace",
+	stdin: "inherit",
+	stderr: "inherit",
+}).orElse(console.error)

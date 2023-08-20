@@ -11,7 +11,7 @@ import { Context } from "koa"
 // TODO: Rewrite with Oath
 export const useBearerAuthorization = async (
 	ctx: Context,
-	tokenServiceOrIDHost: TTokenService | string,
+	tokenServiceOrIDHost: TTokenService | string
 ): Promise<AccessTokenParsed> => {
 	const authorization = ctx.header.authorization
 
@@ -34,7 +34,6 @@ export const useBearerAuthorization = async (
 		ctx.throw(403, "Invalid or outdated token")
 	} else {
 		const verified = await tokenServiceOrIDHost.verifyToken(token, "access").toPromise()
-		console.log(verified)
 
 		if (!verified) {
 			return ctx.throw(403, "Invalid or outdated token")

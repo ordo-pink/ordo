@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: Copyright 2023, 谢尔盖||↓ and the Ordo.pink contributors
 // SPDX-License-Identifier: MIT
 
-import { TTau as TAU } from "#ramda"
+import { Nullable } from "@ordo-pink/tau"
 
 // --- Public ---
 
@@ -15,6 +15,6 @@ export type Options = {
 	skipCheckForSpecialCharacters?: boolean
 }
 
-export type Result = TAU.Nullable<string>
+export type Result = Nullable<string>
 
 export type Fn = (options?: Options) => (pwd?: string) => Result

@@ -5,29 +5,33 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-import { httpErrors, type Context, type Middleware } from "#x/oak@v12.6.0/mod.ts"
-import type * as DATA_SERVICE_TYPES from "@ordo-pink/backend-data-service/mod.ts"
-import type { SUB } from "@ordo-pink/backend-token-service/mod.ts"
-import type { Binary, Curry, Unary } from "@ordo-pink/tau/mod.ts"
-
-import { ResponseError, useBearerAuthorization, useBody } from "@ordo-pink/backend-utils/mod.ts"
-import { FileModel } from "@ordo-pink/backend-data-service/mod.ts"
-import { Oath } from "@ordo-pink/oath/mod.ts"
-import { prop } from "#ramda"
+import type { Context, Middleware } from "koa"
+import type * as DATA_SERVICE_TYPES from "@ordo-pink/backend-data-service"
+import type { SUB } from "@ordo-pink/backend-token-service"
+import type { Binary, Curry, Unary } from "@ordo-pink/tau"
+import { prop } from "ramda"
+import { sendError, useBearerAuthorization, useBody } from "@ordo-pink/backend-utils"
+import { FileModel } from "@ordo-pink/backend-data-service"
+import { Oath } from "@ordo-pink/oath"
+import { HttpError } from "@ordo-pink/rrr"
 
 // --- Public ---
 
 export const handleCreateFile: Fn =
 	({ dataService, idHost }) =>
 	ctx =>
-		Oath.from(() => useBearerAuthorization(ctx, idHost))
+		useBearerAuthorization(ctx, idHost)
 			.map(prop("payload"))
 			.chain(({ sub }) =>
-				Oath.from(() => useBody<DATA_SERVICE_TYPES.FileCreateParams>(ctx))
+				useBody<DATA_SERVICE_TYPES.FileCreateParams>(ctx)
 					.chain(validateCreateFileParams0(ctx))
-					.chain(createFile0({ service: dataService, sub })),
+					.chain(params =>
+						createFile0({ service: dataService, sub })(params).rejectedMap(e =>
+							ctx.throw(409, "File already exists")
+						)
+					)
 			)
-			.fork(ResponseError.send(ctx), formCreateFileResponse(ctx))
+			.fork(sendError(ctx), formCreateFileResponse(ctx))
 
 // --- Internal ---
 
@@ -40,13 +44,14 @@ type ValidateCreateFileParamsFn = Curry<
 	Binary<
 		Context,
 		DATA_SERVICE_TYPES.FileCreateParams,
-		Oath<DATA_SERVICE_TYPES.FileCreateParams, Error>
+		Oath<DATA_SERVICE_TYPES.FileCreateParams, HttpError>
 	>
 >
 const validateCreateFileParams0: ValidateCreateFileParamsFn = ctx => params =>
-	Oath.try(() =>
-		FileModel.isValidPath(params.path) ? params : ctx.throw(400, "Invalid file path"),
-	)
+	Oath.try(() => {
+		if (!FileModel.isValidPath(params.path)) throw HttpError.BadRequest("Invalid file path")
+		return params
+	})
 
 // ---
 
@@ -55,17 +60,13 @@ type CreateFileFn = Curry<
 	Binary<
 		CreateFileFnParams,
 		DATA_SERVICE_TYPES.FileCreateParams,
-		Oath<DATA_SERVICE_TYPES.File, Error>
+		Oath<DATA_SERVICE_TYPES.File, HttpError>
 	>
 >
 const createFile0: CreateFileFn =
 	({ service, sub }) =>
 	file =>
-		service
-			.createFile({ sub, file })
-			.rejectedMap(e =>
-				e.message === "File already exists" ? new httpErrors.Conflict(e.message) : e,
-			)
+		service.createFile({ sub, file }).rejectedMap(() => HttpError.Conflict("File already exists"))
 
 // ---
 

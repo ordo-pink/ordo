@@ -7,8 +7,7 @@
 
 export * from "./src/use-bearer-authorization"
 export * from "./src/use-body"
-export * from "./src/user-error"
-export * from "./src/types"
+export * from "./src/use-error"
 export * from "./src/log-request"
 export * from "./src/set-response-time-header"
 export * from "./src/create-server"

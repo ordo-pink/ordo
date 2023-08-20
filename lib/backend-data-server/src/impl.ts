@@ -27,9 +27,12 @@ export type Params = {
 	logger?: Logger
 }
 
-export type Fn = (params: Params) => Application
-
-export const createDataServer: Fn = ({ origin, dataService, idHost, logger = ConsoleLogger }) => {
+export const createDataServer = ({
+	origin,
+	dataService,
+	idHost,
+	logger = ConsoleLogger,
+}: Params) => {
 	return createServer({
 		origin,
 		logger,

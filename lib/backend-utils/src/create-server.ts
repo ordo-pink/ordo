@@ -8,7 +8,7 @@
 import { Unary } from "@ordo-pink/tau"
 import { logRequest } from "./log-request"
 import { setResponseTimeHeader } from "./set-response-time-header"
-import { handleError } from "./user-error"
+import { handleError } from "./use-error"
 import cors from "koa-cors"
 import { ConsoleLogger, Logger } from "@ordo-pink/logger"
 import { identity } from "ramda"
@@ -40,10 +40,10 @@ export const createServer: CreateServerFn = ({
 
 	const app = new Application()
 
-	app.use(logRequest({ logger, serverName }))
-	app.use(bodyparser())
 	app.use(setResponseTimeHeader)
+	app.use(bodyparser())
 	app.use(handleError({ logger }))
+	app.use(logRequest({ logger, serverName }))
 	app.use(
 		cors({
 			origin: ctx =>
@@ -54,16 +54,16 @@ export const createServer: CreateServerFn = ({
 								Either.fromBoolean(
 									() => Array.isArray(os),
 									() => (os as string[]).includes(o as string),
-									() => o === os,
-								),
+									() => o === os
+								)
 							)
 							.map(allowed => (allowed ? (o as string) : ""))
-							.leftMap(allowed => (allowed ? (o as string) : "")),
+							.leftMap(allowed => (allowed ? (o as string) : ""))
 					)
 					.leftMap(result => (result === null ? "" : result))
 					.fold(identity, identity),
 			credentials: true,
-		}),
+		})
 	)
 	app.use(router.routes())
 	app.use(router.allowedMethods())

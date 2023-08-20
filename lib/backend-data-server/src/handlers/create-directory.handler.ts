@@ -5,32 +5,30 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-import { httpErrors, type Context, type Middleware } from "#x/oak@v12.6.0/mod.ts"
-import type * as DATA_SERVICE_TYPES from "@ordo-pink/backend-data-service/mod.ts"
-import type { SUB } from "@ordo-pink/backend-token-service/mod.ts"
-import type { Binary, Curry, Unary } from "@ordo-pink/tau/mod.ts"
+import type * as DATA_SERVICE_TYPES from "@ordo-pink/backend-data-service"
+import type { SUB } from "@ordo-pink/backend-token-service"
+import type { Binary, Curry, Unary } from "@ordo-pink/tau"
 
-import { ResponseError, useBearerAuthorization, useBody } from "@ordo-pink/backend-utils/mod.ts"
-import { DirectoryModel } from "@ordo-pink/backend-data-service/mod.ts"
-import { Oath } from "@ordo-pink/oath/mod.ts"
-import { prop } from "#ramda"
+import { sendError, useBearerAuthorization, useBody } from "@ordo-pink/backend-utils"
+import { DirectoryModel } from "@ordo-pink/backend-data-service"
+import { Oath } from "@ordo-pink/oath"
+import { prop } from "ramda"
+import { Middleware, Context } from "koa"
+import { HttpError } from "@ordo-pink/rrr"
 
 // --- Public ---
 
 export const handleCreateDirectory: Fn =
 	({ dataService, idHost }) =>
 	ctx =>
-		Oath.from(() => useBearerAuthorization(ctx, idHost))
+		useBearerAuthorization(ctx, idHost)
 			.map(prop("payload"))
 			.chain(({ sub }) =>
-				Oath.from(() => useBody<DATA_SERVICE_TYPES.DirectoryCreateParams>(ctx))
+				useBody<DATA_SERVICE_TYPES.DirectoryCreateParams>(ctx, "object")
 					.chain(validateCreateDirectoryParams0({ ctx, sub, service: dataService }))
 					.chain(createDirectory0({ service: dataService, sub }))
-					.rejectedMap(e =>
-						e.message === "Directory already exists" ? new httpErrors.Conflict(e.message) : e,
-					),
 			)
-			.fork(ResponseError.send(ctx), formCreateDirectoryResponse(ctx))
+			.fork(sendError(ctx), formCreateDirectoryResponse(ctx))
 
 // --- Internal ---
 
@@ -48,23 +46,29 @@ type ValidateCreateDirectoryParamsFn = Curry<
 	Binary<
 		ValidateCreateDirectoryParams,
 		DATA_SERVICE_TYPES.DirectoryCreateParams,
-		Oath<DATA_SERVICE_TYPES.DirectoryCreateParams, Error>
+		Oath<DATA_SERVICE_TYPES.DirectoryCreateParams, HttpError>
 	>
 >
 const validateCreateDirectoryParams0: ValidateCreateDirectoryParamsFn =
 	({ ctx, sub, service }) =>
 	params =>
-		Oath.try(() =>
-			DirectoryModel.isValidPath(params.path) ? params : ctx.throw(400, "Invalid directory path"),
-		)
+		Oath.try(() => {
+			if (!DirectoryModel.isValidPath(params.path))
+				throw HttpError.BadRequest("Invalid directory path")
+			return params
+		})
 			.chain(({ path }) =>
 				Oath.fromNullable(DirectoryModel.getParentPath(path))
 					.chain(path => service.checkDirectoryExists({ path, sub }))
-					.rejectedMap(() => new httpErrors.BadRequest("Invalid directory path")),
+					.rejectedMap(() => HttpError.BadRequest("Invalid directory path"))
 			)
 			.chain(exists =>
-				Oath.try(() => (exists ? params : ctx.throw(404, "Missing parent directory"))),
+				Oath.try(() => {
+					if (!exists) throw HttpError.NotFound("Missing parent directory")
+					return params
+				})
 			)
+			.rejectedMap(error => (error instanceof HttpError ? error : HttpError.from(error)))
 
 // ---
 
@@ -73,13 +77,15 @@ type CreateDirectoryFn = Curry<
 	Binary<
 		CreateDirectoryFnParams,
 		DATA_SERVICE_TYPES.DirectoryCreateParams,
-		Oath<DATA_SERVICE_TYPES.Directory, Error>
+		Oath<DATA_SERVICE_TYPES.Directory, HttpError>
 	>
 >
 const createDirectory0: CreateDirectoryFn =
 	({ service, sub }) =>
 	directory =>
-		service.createDirectory({ sub, directory })
+		service
+			.createDirectory({ sub, directory })
+			.rejectedMap(() => HttpError.Conflict("Directory already exists"))
 
 // ---
 

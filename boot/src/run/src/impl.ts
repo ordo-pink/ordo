@@ -21,7 +21,7 @@ export const run = () =>
 		.map(getExistingPaths)
 		.chain(paths =>
 			Oath.all(
-				paths.map(path => runBunCommand0(`run ${path}`, { stderr: "inherit", stdout: "inherit" }))
-			).map(noop)
+				paths.map(path => runBunCommand0(`run ${path}`, { stderr: "inherit", stdout: "inherit" })),
+			).map(noop),
 		)
 		.orElse(console.error)

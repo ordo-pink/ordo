@@ -246,12 +246,12 @@ export type TTokenService = {
 
 	getPayload: (
 		token: string,
-		type: "access" | "refresh"
+		type: "access" | "refresh",
 	) => Oath<Nullable<typeof type extends "access" ? AccessTokenParsed : RefreshTokenParsed>>
 
 	decode: (
 		token: string,
-		type: "access" | "refresh"
+		type: "access" | "refresh",
 	) => Oath<Nullable<typeof type extends "access" ? AccessTokenParsed : RefreshTokenParsed>>
 
 	createPair: Unary<

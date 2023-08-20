@@ -28,14 +28,14 @@ const router = (
 	ctx: Context = { isMethod, isRoute, store } as any,
 	middleware: Middleware[] = [],
 	routes: RouteMap = [],
-	beforeSendMiddleware: RouterBeforeSendMiddleware[] = [] // TODO: Fix type
+	beforeSendMiddleware: RouterBeforeSendMiddleware[] = [], // TODO: Fix type
 ): TRouter => ({
 	use: mw => router(handleError, ctx, middleware.concat([mw]), routes, beforeSendMiddleware),
 	delete: (route, handle) =>
 		router(handleError, ctx, middleware, routes, beforeSendMiddleware).each(
 			["DELETE"],
 			route,
-			handle
+			handle,
 		),
 	get: (route, handle) =>
 		router(handleError, ctx, middleware, routes, beforeSendMiddleware).each(["GET"], route, handle),
@@ -43,25 +43,25 @@ const router = (
 		router(handleError, ctx, middleware, routes, beforeSendMiddleware).each(
 			["HEAD"],
 			route,
-			handle
+			handle,
 		),
 	options: (route, handle) =>
 		router(handleError, ctx, middleware, routes, beforeSendMiddleware).each(
 			["OPTIONS"],
 			route,
-			handle
+			handle,
 		),
 	patch: (route, handle) =>
 		router(handleError, ctx, middleware, routes, beforeSendMiddleware).each(
 			["PATCH"],
 			route,
-			handle
+			handle,
 		),
 	post: (route, handle) =>
 		router(handleError, ctx, middleware, routes, beforeSendMiddleware).each(
 			["POST"],
 			route,
-			handle
+			handle,
 		),
 	put: (route, handle) =>
 		router(handleError, ctx, middleware, routes, beforeSendMiddleware).each(["PUT"], route, handle),
@@ -74,7 +74,7 @@ const router = (
 			ctx,
 			middleware,
 			routes.concat(methods.map(m => [m, route, handle])),
-			beforeSendMiddleware
+			beforeSendMiddleware,
 		) as any,
 	orElse: handle => req =>
 		Oath.fromNullable(routes.find(([m, r]) => ctx.isMethod(m, req) && ctx.isRoute(r, req)))
@@ -87,9 +87,9 @@ const router = (
 						? sequence.reduce(
 								(acc, handler) =>
 									acc.chain(r =>
-										Oath.try(async () => await handler(req, { ...ctx, route, routes }))
+										Oath.try(async () => await handler(req, { ...ctx, route, routes })),
 									),
-								Oath.empty()
+								Oath.empty(),
 						  )
 						: Oath.try(async () => await sequence[0](req, { ...ctx, route, routes }))
 
@@ -100,9 +100,9 @@ const router = (
 									Oath.try(async () => {
 										await mw(req, res, ctx)
 										return res
-									})
+									}),
 								),
-							oath
+							oath,
 					  )
 					: oath
 			})

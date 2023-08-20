@@ -21,7 +21,7 @@ export type RouteMap = [HttpMethod, Route, Handle][]
 
 export type Handler<T extends Record<string, unknown> = Record<string, unknown>> = (
 	request: Request,
-	ctx: Context<T>
+	ctx: Context<T>,
 ) => Promise<Response> | Response // TODO: Support for returned Oaths
 
 export type Route = string | RegExp
@@ -35,7 +35,7 @@ export type HttpMethod = "GET" | "PUT" | "HEAD" | "POST" | "PATCH" | "DELETE" | 
 export type RouterEachHandler = (methods: HttpMethod[], route: Route, handle: Handle) => TRouter
 
 export type RouterOrElseHandler = (
-	handleUnmatched: Handle
+	handleUnmatched: Handle,
 ) => (request: Request) => Promise<Response>
 
 export type RouterErrorHandler = (handleError: (error: unknown) => any) => TRouter
@@ -43,11 +43,11 @@ export type RouterErrorHandler = (handleError: (error: unknown) => any) => TRout
 export type RouterUseHandler = (middleware: Middleware) => TRouter
 
 export type RouterBeforeSendMiddleware<
-	S extends Record<string, unknown> = Record<string, unknown>
+	S extends Record<string, unknown> = Record<string, unknown>,
 > = (
 	request: Request,
 	response: Response,
-	ctx: Context<S>
+	ctx: Context<S>,
 ) => Response | Promise<Response> | void | Promise<void>
 
 export type RouterHandleBeforeSend = (handleBeforeSent: RouterBeforeSendMiddleware) => TRouter // TODO: Support for returned Oaths

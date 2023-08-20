@@ -31,7 +31,7 @@ export default function ActivityBar({ commandPalette$, sidebar$ }: _P) {
 
 	const showCommandPalette = () =>
 		Either.fromNullable(commandPaletteItems).map(items =>
-			commands.emit<cmd.commandPalette.show>("command-palette.show", items)
+			commands.emit<cmd.commandPalette.show>("command-palette.show", items),
 		)
 
 	const showContextMenu: ShowContextMenu = (event: MouseEvent) =>
@@ -59,7 +59,7 @@ export default function ActivityBar({ commandPalette$, sidebar$ }: _P) {
 			</div>
 			<div className="flex flex-col space-y-4 items-center">
 				{activities.map(activity =>
-					activity.background ? null : <ActivityItem key={activity.name} activity={activity} />
+					activity.background ? null : <ActivityItem key={activity.name} activity={activity} />,
 				)}
 			</div>
 			<div>

@@ -44,7 +44,7 @@ export type File<CustomMetadata extends Record<string, unknown> = Record<string,
  * Initialisation params for creating a File.
  */
 export type FileCreateParams<
-	CustomMetadata extends Record<string, unknown> = Record<string, unknown>
+	CustomMetadata extends Record<string, unknown> = Record<string, unknown>,
 > = Partial<File<CustomMetadata>> & {
 	path: FilePath
 }

@@ -51,7 +51,7 @@ export class Oath<TRight, TLeft = never> {
 	public static fromBoolean<T, F = null>(
 		f: () => boolean,
 		onTrue: () => T,
-		onFalse: () => F = () => null as any
+		onFalse: () => F = () => null as any,
 	): Oath<T, F> {
 		return f() ? Oath.resolve(onTrue()) : Oath.reject(onFalse())
 	}
@@ -67,7 +67,7 @@ export class Oath<TRight, TLeft = never> {
 	}
 
 	public static all<TSomeThings extends readonly unknown[] | [] | Record<string, unknown>>(
-		values: TSomeThings
+		values: TSomeThings,
 	): Oath<
 		TSomeThings extends []
 			? { -readonly [P in keyof TSomeThings]: UnderOath<TSomeThings[P]> }
@@ -98,7 +98,7 @@ export class Oath<TRight, TLeft = never> {
 								resolvedLength++
 
 								if (resolvedLength === values.length) outerResolve(resolvedValues)
-							}
+							},
 						)
 					} else if (value.then) {
 						value.then(
@@ -114,7 +114,7 @@ export class Oath<TRight, TLeft = never> {
 									rejected = true
 									outerReject(e)
 								}
-							}
+							},
 						)
 					} else {
 						resolvedValues.push(value)
@@ -148,7 +148,7 @@ export class Oath<TRight, TLeft = never> {
 								resolvedLength++
 
 								if (resolvedLength === keys.length) outerResolve(resolvedValues)
-							}
+							},
 						)
 					} else if (value.then) {
 						value.then(
@@ -165,7 +165,7 @@ export class Oath<TRight, TLeft = never> {
 									rejected = true
 									outerReject(e)
 								}
-							}
+							},
 						)
 					} else {
 						resolvedValues[key] = value
@@ -180,8 +180,8 @@ export class Oath<TRight, TLeft = never> {
 	public constructor(
 		private resolver: (
 			resolve: <TNewRight>(value: TRight) => TNewRight,
-			reject: <TNewLeft>(err?: TLeft) => TNewLeft
-		) => void
+			reject: <TNewLeft>(err?: TLeft) => TNewLeft,
+		) => void,
 	) {}
 
 	public get isOath() {
@@ -192,8 +192,8 @@ export class Oath<TRight, TLeft = never> {
 		return new Oath<TLeft, TRight>((resolve, reject) =>
 			this.fork(
 				a => resolve(a),
-				b => reject(b)
-			)
+				b => reject(b),
+			),
 		)
 	}
 
@@ -207,8 +207,8 @@ export class Oath<TRight, TLeft = never> {
 				b => {
 					f(b)
 					return resolve(b)
-				}
-			)
+				},
+			),
 		)
 	}
 
@@ -216,8 +216,8 @@ export class Oath<TRight, TLeft = never> {
 		return new Oath<ThenRight, TLeft>((resolve, reject) =>
 			this.fork(
 				a => reject(a),
-				b => resolve(f(b))
-			)
+				b => resolve(f(b)),
+			),
 		)
 	}
 
@@ -225,48 +225,48 @@ export class Oath<TRight, TLeft = never> {
 		return new Oath<TRight, ThenLeft>((resolve, reject) =>
 			this.fork(
 				a => reject(f(a)),
-				b => resolve(b)
-			)
+				b => resolve(b),
+			),
 		)
 	}
 
 	public bimap<ThenRight, ThenLeft>(
 		f: (x: TLeft) => ThenLeft,
-		g: (x: TRight) => ThenRight
+		g: (x: TRight) => ThenRight,
 	): Oath<ThenRight, ThenLeft> {
 		return new Oath<ThenRight, ThenLeft>((resolve, reject) =>
 			this.fork(
 				a => reject(f(a)),
-				b => resolve(g(b))
-			)
+				b => resolve(g(b)),
+			),
 		)
 	}
 
 	public chain<ThenRight, ThenLeft>(
-		f: (x: TRight) => Oath<ThenRight, ThenLeft>
+		f: (x: TRight) => Oath<ThenRight, ThenLeft>,
 	): Oath<ThenRight, TLeft | ThenLeft> {
 		return new Oath((resolve, reject) =>
 			this.fork(
 				a => reject(a),
-				b => f(b).fork(reject, resolve)
-			)
+				b => f(b).fork(reject, resolve),
+			),
 		)
 	}
 
 	public rejectedChain<ThenRight, ThenLeft>(
-		f: (x: TLeft) => Oath<TRight, ThenLeft>
+		f: (x: TLeft) => Oath<TRight, ThenLeft>,
 	): Oath<TRight, ThenLeft> {
 		return new Oath((resolve, reject) =>
 			this.fork(
 				a => f(a).fork(reject, resolve),
-				b => resolve(b)
-			)
+				b => resolve(b),
+			),
 		)
 	}
 
 	// TODO: Add support for the second function (catch)
 	public and<ThenRight, ThenLeft>(
-		f: (x: TRight) => PromiseLike<ThenRight> | Oath<ThenRight, ThenLeft> | ThenRight
+		f: (x: TRight) => PromiseLike<ThenRight> | Oath<ThenRight, ThenLeft> | ThenRight,
 	): Oath<ThenRight, TLeft | ThenLeft> {
 		return new Oath((resolve, reject) =>
 			this.fork(
@@ -282,13 +282,13 @@ export class Oath<TRight, TLeft = never> {
 					} catch (e) {
 						reject(e instanceof Error ? e : (new Error(String(e)) as any))
 					}
-				}
-			)
+				},
+			),
 		)
 	}
 
 	public fix<ThenRight, ThenLeft = never>(
-		f: (x: TLeft) => PromiseLike<ThenRight> | Oath<ThenRight, ThenLeft> | ThenRight
+		f: (x: TLeft) => PromiseLike<ThenRight> | Oath<ThenRight, ThenLeft> | ThenRight,
 	): Oath<TRight | ThenRight, ThenLeft> {
 		return new Oath((resolve, reject) =>
 			this.fork(
@@ -304,14 +304,14 @@ export class Oath<TRight, TLeft = never> {
 						reject(e instanceof Error ? e : (new Error(String(e)) as any))
 					}
 				},
-				b => resolve(b)
-			)
+				b => resolve(b),
+			),
 		)
 	}
 
 	public async fork<TNewRight, TNewLeft>(
 		onLeft: (error: TLeft) => TNewLeft,
-		onRight: (value: TRight) => TNewRight
+		onRight: (value: TRight) => TNewRight,
 	): Promise<TNewRight> {
 		// TODO: Store reject (https://medium.com/@masnun/creating-cancellable-promises-33bf4b9da39c)
 
@@ -328,13 +328,13 @@ export class Oath<TRight, TLeft = never> {
 
 	public async orElse<TNewLeft>(f: (error: TLeft) => TNewLeft) {
 		return new Promise<TRight>((resolve, reject) =>
-			this.resolver(resolve as any, reject as any)
+			this.resolver(resolve as any, reject as any),
 		).catch(f)
 	}
 
 	public async orNothing() {
 		return new Promise<TRight>((resolve, reject) =>
-			this.resolver(resolve as any, reject as any)
+			this.resolver(resolve as any, reject as any),
 		).catch(() => void 0)
 	}
 }

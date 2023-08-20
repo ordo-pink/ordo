@@ -14,7 +14,7 @@ export type DirectoryPath = `/${string}/` | "/"
  * Initialisation params for creating a Directory.
  */
 export type DirectoryCreateParams<
-	CustomMetadata extends Record<string, unknown> = Record<string, unknown>
+	CustomMetadata extends Record<string, unknown> = Record<string, unknown>,
 > = Partial<Directory<CustomMetadata>> & {
 	path: DirectoryPath
 }

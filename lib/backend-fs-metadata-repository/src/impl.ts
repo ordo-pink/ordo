@@ -37,10 +37,10 @@ const of: Fn = ({ root }) => ({
 									createdBy: sub,
 									updatedBy: sub,
 								},
-							])
-						)
+							]),
+						),
 					)
-					.chain(data => writeFile0(resolve(path), data))
+					.chain(data => writeFile0(resolve(path), data)),
 			),
 	},
 	directory: {
@@ -51,7 +51,7 @@ const of: Fn = ({ root }) => ({
 				.map(() => ({ ...directory, path })),
 		read: ({ path, sub }) =>
 			getUserMetadata0({ root, sub }).map(
-				metadata => metadata.find(item => item.path === path) as Directory
+				metadata => metadata.find(item => item.path === path) as Directory,
 			),
 		getRoot: sub => getUserMetadata0({ root, sub }),
 		update: ({ directory, path, sub }) =>
@@ -60,7 +60,7 @@ const of: Fn = ({ root }) => ({
 					Oath.of(metadata.findIndex(item => item.path === path)).map(itemToUpdate => {
 						metadata.splice(itemToUpdate, 1, directory)
 						return metadata
-					})
+					}),
 				)
 				.chain(content => setUserMetadata0({ root, sub, content }))
 				.map(() => directory),
@@ -71,8 +71,8 @@ const of: Fn = ({ root }) => ({
 						? Oath.of(metadata.filter(x => x.path !== item.path))
 								.chain(content => setUserMetadata0({ root, sub, content }))
 								.map(() => item as Directory)
-						: Oath.of(null)
-				)
+						: Oath.of(null),
+				),
 			),
 		exists: ({ path, sub }) =>
 			getUserMetadata0({ root, sub })
@@ -81,8 +81,8 @@ const of: Fn = ({ root }) => ({
 		readWithChildren: ({ path, sub }) =>
 			getUserMetadata0({ root, sub }).chain(items =>
 				Oath.of(items.find(item => item.path === path)).map(directory =>
-					createDirectoryTree(items, directory as Directory)
-				)
+					createDirectoryTree(items, directory as Directory),
+				),
 			),
 	},
 	file: {
@@ -93,7 +93,7 @@ const of: Fn = ({ root }) => ({
 				.map(() => ({ ...file, path })),
 		read: ({ path, sub }) =>
 			getUserMetadata0({ root, sub }).map(
-				metadata => metadata.find(item => item.path === path) as File
+				metadata => metadata.find(item => item.path === path) as File,
 			),
 		update: ({ file, path, sub }) =>
 			getUserMetadata0({ root, sub })
@@ -101,7 +101,7 @@ const of: Fn = ({ root }) => ({
 					Oath.of(metadata.findIndex(item => item.path === path)).map(itemToUpdate => {
 						metadata.splice(itemToUpdate, 1, file)
 						return metadata
-					})
+					}),
 				)
 				.chain(content => setUserMetadata0({ root, sub, content }))
 				.map(() => file),
@@ -112,8 +112,8 @@ const of: Fn = ({ root }) => ({
 						? Oath.of(metadata.filter(x => x.path !== item.path))
 								.chain(content => setUserMetadata0({ root, sub, content }))
 								.map(() => item as File)
-						: Oath.of(null)
-				)
+						: Oath.of(null),
+				),
 			),
 		exists: ({ path, sub }) =>
 			getUserMetadata0({ root, sub })

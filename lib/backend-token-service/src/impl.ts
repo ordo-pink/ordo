@@ -15,7 +15,7 @@ type Params = { repository: TokenRepository; options: TokenServiceOptions }
 const getSecret = (
 	options: TokenServiceOptions,
 	type: "access" | "refresh",
-	visibility: "public" | "private"
+	visibility: "public" | "private",
 ) => options.keys[type][visibility]
 
 /**
@@ -59,14 +59,14 @@ const of = ({ repository, options }: Params): TTokenService => ({
 						// getSecret(options, "access", "private"),
 						// { algorithm: options.alg }
 						null,
-						{ algorithm: "none" }
+						{ algorithm: "none" },
 					),
 					refresh: sign(
 						{ jti, iat, iss, exp: rexp, sub, aud, uip },
 						// getSecret(options, "refresh", "private"),
 						// { algorithm: options.alg }
 						null,
-						{ algorithm: "none" }
+						{ algorithm: "none" },
 					),
 				},
 			}).chain(res =>
@@ -77,8 +77,8 @@ const of = ({ repository, options }: Params): TTokenService => ({
 							.map(() => res)
 					: Oath.empty()
 							.chain(() => repository.setToken(sub, jti, res.tokens.refresh))
-							.map(() => res)
-			)
+							.map(() => res),
+			),
 		),
 })
 

@@ -1,10 +1,10 @@
 // SPDX-FileCopyrightText: Copyright 2023, 谢尔盖||↓ and the Ordo.pink contributors
 // SPDX-License-Identifier: MIT
 
-import { SUB } from "@ordo-pink/backend-token-service/mod.ts"
-import { isValidPath, endsWithSlash } from "./common.ts"
-import { Directory, DirectoryPath } from "@ordo-pink/backend-data-service/mod.ts"
-import { Nullable } from "@ordo-pink/tau/mod.ts"
+import { SUB } from "@ordo-pink/backend-token-service"
+import { isValidPath, endsWithSlash } from "./common"
+import { Directory, DirectoryPath } from "@ordo-pink/backend-data-service"
+import { Nullable } from "@ordo-pink/tau"
 
 /**
  * OrdoDirectory represents a directory in Ordo. It contains the "head" of the
@@ -17,7 +17,7 @@ import { Nullable } from "@ordo-pink/tau/mod.ts"
  * applied.
  */
 export class DirectoryModel<
-	CustomMetadata extends Record<string, unknown> = Record<string, unknown>,
+	CustomMetadata extends Record<string, unknown> = Record<string, unknown>
 > {
 	/**
 	 * Creates an OrdoDirectory from a list of required fields. You would not
@@ -42,7 +42,7 @@ export class DirectoryModel<
 		updatedBy: SUB,
 		createdAt = new Date(Date.now()),
 		updatedAt = new Date(Date.now()),
-		metadata: CustomMetadata = {} as CustomMetadata,
+		metadata: CustomMetadata = {} as CustomMetadata
 	) {
 		if (!DirectoryModel.isValidPath(path)) throw new Error("Invalid file path")
 		if (!createdBy) throw new Error("Unknown createdBy")
@@ -82,7 +82,7 @@ export class DirectoryModel<
 			updatedBy,
 			createdAt,
 			updatedAt,
-			metadata as unknown as CustomMetadata,
+			metadata as unknown as CustomMetadata
 		)
 	}
 
@@ -143,7 +143,7 @@ export class DirectoryModel<
 		updatedAt: Date,
 		createdBy: SUB,
 		updatedBy: SUB,
-		metadata: CustomMetadata,
+		metadata: CustomMetadata
 	) {
 		this.#path = path
 		this.#createdAt = createdAt

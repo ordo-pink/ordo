@@ -8,7 +8,7 @@ import RenderFromNullable from "$components/render-from-nullable"
 import ActionListItem from "$components/action-list-item"
 import Accelerator from "$components/accelerator"
 import { MouseEvent } from "react"
-import { ContextMenu } from "@ordo-pink/libfe/mod"
+import { ContextMenu } from "@ordo-pink/libfe"
 
 const commands = getCommands()
 

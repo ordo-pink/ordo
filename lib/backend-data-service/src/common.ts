@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: Copyright 2023, 谢尔盖||↓ and the Ordo.pink contributors
 // SPDX-License-Identifier: MIT
 
-import { FORBIDDEN_PATH_SYMBOLS } from "@ordo-pink/backend-data-service/mod.ts"
+import { FORBIDDEN_PATH_SYMBOLS } from "@ordo-pink/backend-data-service"
 
 export const hasForbiddenChars = (path: string) =>
 	FORBIDDEN_PATH_SYMBOLS.some(disallowed => path.includes(disallowed))

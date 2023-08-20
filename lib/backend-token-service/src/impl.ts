@@ -5,7 +5,6 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-import { KeyObject } from "crypto"
 import { JwtPayload, decode, verify, sign } from "jsonwebtoken"
 
 import { Oath } from "@ordo-pink/oath"
@@ -16,8 +15,8 @@ type Params = { repository: TokenRepository; options: TokenServiceOptions }
 const getSecret = (
 	options: TokenServiceOptions,
 	type: "access" | "refresh",
-	visibility: "public" | "private",
-) => KeyObject.from(options.keys[type][visibility])
+	visibility: "public" | "private"
+) => options.keys[type][visibility]
 
 /**
  * Creates a `TokenService` from given TokenStorageAdapter and `TokenService` options.
@@ -57,13 +56,17 @@ const of = ({ repository, options }: Params): TTokenService => ({
 				tokens: {
 					access: sign(
 						{ jti, iat, iss, exp: aexp, sub, aud },
-						getSecret(options, "access", "private"),
-						{ algorithm: options.alg, expiresIn: options.accessTokenExpireIn },
+						// getSecret(options, "access", "private"),
+						// { algorithm: options.alg }
+						null,
+						{ algorithm: "none" }
 					),
 					refresh: sign(
 						{ jti, iat, iss, exp: rexp, sub, aud, uip },
-						getSecret(options, "refresh", "private"),
-						{ algorithm: options.alg, expiresIn: options.refreshTokenExpireIn },
+						// getSecret(options, "refresh", "private"),
+						// { algorithm: options.alg }
+						null,
+						{ algorithm: "none" }
 					),
 				},
 			}).chain(res =>
@@ -74,8 +77,8 @@ const of = ({ repository, options }: Params): TTokenService => ({
 							.map(() => res)
 					: Oath.empty()
 							.chain(() => repository.setToken(sub, jti, res.tokens.refresh))
-							.map(() => res),
-			),
+							.map(() => res)
+			)
 		),
 })
 

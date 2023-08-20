@@ -3,7 +3,7 @@
 
 import { useState, useEffect } from "react"
 import { Observable } from "rxjs"
-import type { Nullable } from "@ordo-pink/tau/mod"
+import type { Nullable } from "@ordo-pink/tau"
 
 export const useSubscription = <T>(observable: Nullable<Observable<T>>) => {
 	const [state, setState] = useState<Nullable<T>>(null)

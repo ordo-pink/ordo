@@ -5,18 +5,23 @@ import { Oath } from "@ordo-pink/oath"
 
 export type Middleware<Ctx = Context, Result = any> = (request: Request, ctx: Ctx) => Result
 
-export type Context<C extends Record<string, unknown> = Record<string, unknown>> = C & {
+export type Context<S extends Record<string, unknown> = Record<string, unknown>> = {
 	routes: RouteMap
 	route: Route
 	isMethod: (method: HttpMethod, req: Request) => boolean
 	isRoute: (route: Route, req: Request) => boolean
+	store: {
+		set: <K extends keyof S>(key: K, value: S[K]) => void
+		get: <K extends keyof S>(key: K) => S[K]
+		del: <K extends keyof S>(key: K) => void
+	}
 }
 
 export type RouteMap = [HttpMethod, Route, Handle][]
 
 export type Handler<T extends Record<string, unknown> = Record<string, unknown>> = (
 	request: Request,
-	ctx: Context<T>,
+	ctx: Context<T>
 ) => Promise<Response> | Response // TODO: Support for returned Oaths
 
 export type Route = string | RegExp
@@ -29,19 +34,23 @@ export type HttpMethod = "GET" | "PUT" | "HEAD" | "POST" | "PATCH" | "DELETE" | 
 
 export type RouterEachHandler = (methods: HttpMethod[], route: Route, handle: Handle) => TRouter
 
-export type RouterOrElseHandler = (handleUnmatched: Handle) => (request: Request) => any
+export type RouterOrElseHandler = (
+	handleUnmatched: Handle
+) => (request: Request) => Promise<Response>
 
 export type RouterErrorHandler = (handleError: (error: unknown) => any) => TRouter
 
 export type RouterUseHandler = (middleware: Middleware) => TRouter
 
-export type RouterBeforeSendHandler = (
+export type RouterBeforeSendMiddleware<
+	S extends Record<string, unknown> = Record<string, unknown>
+> = (
 	request: Request,
 	response: Response,
-	ctx: Context,
+	ctx: Context<S>
 ) => Response | Promise<Response> | void | Promise<void>
 
-export type RouterHandleBeforeSend = (handleBeforeSent: RouterBeforeSendHandler) => TRouter // TODO: Support for returned Oaths
+export type RouterHandleBeforeSend = (handleBeforeSent: RouterBeforeSendMiddleware) => TRouter // TODO: Support for returned Oaths
 
 export type TRouter = {
 	get: RouteHandler

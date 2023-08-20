@@ -5,10 +5,9 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-import type { Context, Middleware } from "koa"
-import type { EXP, TTokenService } from "@ordo-pink/backend-token-service"
+import type { Middleware } from "koa"
+import type { TTokenService } from "@ordo-pink/backend-token-service"
 import type { UserService } from "@ordo-pink/backend-user-service"
-
 import { ResponseError } from "@ordo-pink/backend-utils"
 import { useBody } from "@ordo-pink/backend-utils"
 import { Oath } from "@ordo-pink/oath"
@@ -31,23 +30,31 @@ export const handleSignIn: Fn =
 						Oath.all({
 							user: userService.getByEmail(email),
 							ok: userService.comparePassword(email, password),
-						}),
+						})
 					)
-					.bimap(ResponseError.create(404, "User not found"), prop("user")),
+					.bimap(ResponseError.create(404, "User not found"), prop("user"))
 			)
 			// TODO: Drop previous token if it exists for given IP
 			.chain(user =>
 				Oath.of({ sub: user.id, uip: ctx.request.ip }).chain(({ sub, uip }) =>
-					tokenService.createPair({ sub, uip }),
-				),
+					tokenService.createPair({ sub, uip })
+				)
 			)
-			.chain(tokens =>
-				Oath.all([
-					setSignInCookie("jti", tokens.jti, tokens.exp, ctx),
-					setSignInCookie("sub", tokens.sub, tokens.exp, ctx),
-				]).map(() => tokens),
+			.tap(tokens =>
+				ctx.cookies.set("sub", tokens.sub, {
+					httpOnly: true,
+					sameSite: "lax",
+					expires: new Date(Date.now() + tokens.exp),
+				})
 			)
-			.fork(ResponseError.send(ctx), ({ access, jti, sub }) => {
+			.tap(tokens =>
+				ctx.cookies.set("jti", tokens.jti, {
+					httpOnly: true,
+					sameSite: "lax",
+					expires: new Date(Date.now() + tokens.exp),
+				})
+			)
+			.fork(ResponseError.send(ctx), ({ tokens: { access }, jti, sub }) => {
 				ctx.response.body = {
 					success: true,
 					result: { accessToken: access, jti, sub },
@@ -55,10 +62,3 @@ export const handleSignIn: Fn =
 			})
 
 // --- Internal ---
-
-const setSignInCookie = (name: "sub" | "jti", value: string, exp: EXP, ctx: Context) =>
-	ctx.cookies.set(name, value, {
-		httpOnly: true,
-		sameSite: "lax",
-		expires: new Date(Date.now() + exp),
-	})

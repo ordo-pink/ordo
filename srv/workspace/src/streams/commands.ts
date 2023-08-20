@@ -1,10 +1,10 @@
 // SPDX-FileCopyrightText: Copyright 2023, 谢尔盖||↓ and the Ordo.pink contributors
 // SPDX-License-Identifier: MIT
 
-import type { Logger } from "@ordo-pink/logger/mod"
+import type { Logger } from "@ordo-pink/logger"
 import { combineLatestWith, map, merge, scan, shareReplay, Subject } from "rxjs"
 import { equals } from "ramda"
-import { Binary, callOnce, Curry, Unary } from "@ordo-pink/tau/mod"
+import { Binary, callOnce, Curry, Unary } from "@ordo-pink/tau"
 
 // --- Public ---
 
@@ -44,10 +44,10 @@ export const getCommands = () => ({
 		T extends { name: `${string}.${string}`; payload?: any } = {
 			name: `${string}.${string}`
 			payload: any
-		},
+		}
 	>(
 		name: T extends { name: infer U; payload?: any } ? U : never,
-		handler: CmdHandler<T extends { name: any; payload?: infer U } ? U : never>,
+		handler: CmdHandler<T extends { name: any; payload?: infer U } ? U : never>
 	) => add$.next([name, handler]),
 
 	/**
@@ -58,10 +58,10 @@ export const getCommands = () => ({
 		T extends { name: `${string}.${string}`; payload?: any } = {
 			name: `${string}.${string}`
 			payload: any
-		},
+		}
 	>(
 		name: T extends { name: infer U; payload?: any } ? U : never,
-		handler: CmdHandler<T extends { name: any; payload?: infer U } ? U : never>,
+		handler: CmdHandler<T extends { name: any; payload?: infer U } ? U : never>
 	) => remove$.next([name, handler]),
 
 	/**
@@ -71,10 +71,10 @@ export const getCommands = () => ({
 		T extends { name: `${string}.${string}`; payload?: any } = {
 			name: `${string}.${string}`
 			payload?: any
-		},
+		}
 	>(
 		name: T extends { name: infer U; payload?: any } ? U : never,
-		payload?: T extends { name: any; payload: infer U } ? U : never,
+		payload?: T extends { name: any; payload: infer U } ? U : never
 	) => enqueue$.next({ name, payload } as any),
 
 	/**
@@ -84,10 +84,10 @@ export const getCommands = () => ({
 		T extends { name: `${string}.${string}`; payload: any } = {
 			name: `${string}.${string}`
 			payload: any
-		},
+		}
 	>(
 		name: T extends { name: infer U; payload: any } ? U : never,
-		handler: CmdHandler<T extends { name: any; payload: infer U } ? U : never>,
+		handler: CmdHandler<T extends { name: any; payload: infer U } ? U : never>
 	) => addBefore$.next([name, handler]),
 })
 
@@ -170,16 +170,16 @@ const addBefore$ = new Subject<CmdListener>()
 const remove$ = new Subject<CmdListener>()
 const commandQueue$ = merge(enqueue$.pipe(map(enqueueP)), dequeue$.pipe(map(dequeueP))).pipe(
 	scan((acc, f) => f(acc), [] as (Cmd | PayloadCmd)[]),
-	shareReplay(1),
+	shareReplay(1)
 )
 
 const commandStorage$ = merge(
 	add$.pipe(map(addP)),
 	addBefore$.pipe(map(addBeforeP)),
-	remove$.pipe(map(removeP)),
+	remove$.pipe(map(removeP))
 ).pipe(
 	scan((acc, f) => f(acc), {} as Record<string, CmdListener[1][]>),
-	shareReplay(1),
+	shareReplay(1)
 )
 
 const commandRunner$ = (ctx: InitCommandsP) =>
@@ -196,7 +196,7 @@ const commandRunner$ = (ctx: InitCommandsP) =>
 
 					ctx.logger.debug(
 						`Command ${name} invoked for ${listeners.length} listeners, payload: `,
-						payload,
+						payload
 					)
 
 					listeners.forEach(listener => {
@@ -206,5 +206,5 @@ const commandRunner$ = (ctx: InitCommandsP) =>
 					ctx.logger.notice(`Command "${name}" is not registerred`)
 				}
 			})
-		}),
+		})
 	)

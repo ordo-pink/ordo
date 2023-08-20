@@ -14,6 +14,7 @@ import {
 import { UserRepository, UserService } from "@ordo-pink/backend-user-service"
 import { ConsoleLogger, Logger } from "@ordo-pink/logger"
 import { createServer } from "@ordo-pink/backend-utils"
+import { Readable } from "stream"
 
 import { handleChangePassword } from "./handlers/change-password"
 import { handleRefreshToken } from "./handlers/refresh-token"
@@ -28,10 +29,10 @@ import { handleSignUp } from "./handlers/sign-up"
 // TODO: Extract errors to enum
 // TODO: Audit
 export type CreateIDServerFnParams = {
-	userStorageRepository: UserRepository
-	tokenStorageRepository: TokenRepository
+	userRepository: UserRepository
+	tokenRepository: TokenRepository
 	metadataRepository: MetadataRepository
-	dataRepository: DataRepository<ReadableStream>
+	dataRepository: DataRepository<Readable>
 	accessTokenExpireIn: number
 	refreshTokenExpireIn: number
 	saltRounds: number
@@ -43,8 +44,8 @@ export type CreateIDServerFnParams = {
 }
 
 export const createIDServer = async ({
-	userStorageRepository,
-	tokenStorageRepository,
+	userRepository,
+	tokenRepository,
 	dataRepository,
 	metadataRepository,
 	origin,
@@ -57,9 +58,9 @@ export const createIDServer = async ({
 	alg,
 }: CreateIDServerFnParams) => {
 	const dataService = BackendDataService.of({ dataRepository, metadataRepository })
-	const userService = await UserService.of(userStorageRepository, { saltRounds })
+	const userService = await UserService.of(userRepository, { saltRounds })
 	const tokenService = TokenService.of({
-		repository: tokenStorageRepository,
+		repository: tokenRepository,
 		options: {
 			accessTokenExpireIn,
 			refreshTokenExpireIn,

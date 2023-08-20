@@ -12,5 +12,5 @@ export const setResponseTimeHeader: Middleware = async (ctx, next) => {
 	await next()
 	const ms = Date.now() - start
 
-	ctx.response.headers["X-Response-Time"] = ms.toString()
+	ctx.set("X-Response-Time", ms.toString())
 }

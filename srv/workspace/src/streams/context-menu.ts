@@ -3,12 +3,12 @@
 
 import { combineLatestWith, map, merge, Observable, scan, shareReplay, Subject } from "rxjs"
 import { BehaviorSubject } from "rxjs"
-import { Binary, Curry, Nullable, Thunk, Unary, callOnce } from "@ordo-pink/tau/mod"
-import { Logger } from "@ordo-pink/logger/mod"
-import { Either } from "@ordo-pink/either/mod"
+import { Binary, Curry, Nullable, Thunk, Unary, callOnce } from "@ordo-pink/tau"
+import { Logger } from "@ordo-pink/logger"
+import { Either } from "@ordo-pink/either"
 import { getCommands } from "$streams/commands"
 import Null from "$components/null"
-import { ContextMenu } from "@ordo-pink/libfe/mod"
+import { cmd, ContextMenu } from "@ordo-pink/libfe"
 
 const commands = getCommands()
 
@@ -18,10 +18,10 @@ export type __ContextMenu$ = Observable<Nullable<ContextMenu.ContextMenu>>
 export const __initContextMenu: InitContextMenu = callOnce(({ logger }) => {
 	logger.debug("Initializing context menu")
 
-	commands.on("context-menu.show", ({ payload }) => show(payload))
-	commands.on("context-menu.add", ({ payload }) => add(payload))
-	commands.on("context-menu.remove", ({ payload }) => remove(payload))
-	commands.on("context-menu.hide", hide)
+	commands.on<cmd.contextMenu.show>("context-menu.show", ({ payload }) => show(payload))
+	commands.on<cmd.contextMenu.add>("context-menu.add", ({ payload }) => add(payload))
+	commands.on<cmd.contextMenu.remove>("context-menu.remove", ({ payload }) => remove(payload))
+	commands.on<cmd.contextMenu.hide>("context-menu.hide", hide)
 
 	return contextMenu$
 })
@@ -49,7 +49,7 @@ const add$ = new Subject<ContextMenu.Item>()
 const remove$ = new Subject<string>()
 const globalItems$ = merge(add$.pipe(map(addP)), remove$.pipe(map(removeP))).pipe(
 	scan((acc, f) => f(acc), [] as ContextMenu.Item[]),
-	shareReplay(1),
+	shareReplay(1)
 )
 
 globalItems$.subscribe()
@@ -60,8 +60,8 @@ const contextMenu$ = params$.pipe(
 		Either.fromNullable(state).fold(Null, state => ({
 			...state,
 			structure: items.filter(item =>
-				item.shouldShow({ event: state.event, payload: state.payload }),
+				item.shouldShow({ event: state.event, payload: state.payload })
 			),
-		})),
-	),
+		}))
+	)
 )

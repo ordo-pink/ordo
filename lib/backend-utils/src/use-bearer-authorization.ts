@@ -6,15 +6,14 @@
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 import { AccessTokenParsed, TTokenService } from "@ordo-pink/backend-token-service"
-import { Nullable } from "@ordo-pink/tau"
 import { Context } from "koa"
 
 // TODO: Rewrite with Oath
 export const useBearerAuthorization = async (
 	ctx: Context,
-	tokenServiceOrIDHost: TTokenService | string,
+	tokenServiceOrIDHost: TTokenService | string
 ): Promise<AccessTokenParsed> => {
-	const authorization = ctx.request.headers["Authorization"]
+	const authorization = ctx.header.authorization
 
 	if (!authorization || typeof authorization !== "string" || !authorization.startsWith("Bearer ")) {
 		return ctx.throw(401, "Unauthorized")
@@ -35,6 +34,7 @@ export const useBearerAuthorization = async (
 		ctx.throw(403, "Invalid or outdated token")
 	} else {
 		const verified = await tokenServiceOrIDHost.verifyToken(token, "access").toPromise()
+		console.log(verified)
 
 		if (!verified) {
 			return ctx.throw(403, "Invalid or outdated token")

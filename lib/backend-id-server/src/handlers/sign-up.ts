@@ -12,12 +12,13 @@ import type { Middleware } from "koa"
 import validator from "validator"
 import { okpwd } from "@ordo-pink/okpwd"
 import { useBody } from "@ordo-pink/backend-utils"
+import { Readable } from "stream"
 
 type Body = { email?: string; password?: string }
 type Params = {
 	userService: UserService
 	tokenService: TTokenService
-	dataService: TDataService<ReadableStream>
+	dataService: TDataService<Readable>
 }
 type Fn = (params: Params) => Middleware
 
@@ -33,7 +34,7 @@ export const handleSignUp: Fn =
 
 		const user = await userService.getByEmail(email).fork(
 			() => null,
-			user => user,
+			user => user
 		)
 
 		if (user) return ctx.throw(409, "User with this email already exists")

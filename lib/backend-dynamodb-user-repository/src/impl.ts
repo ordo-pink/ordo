@@ -8,12 +8,10 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-import type * as T from "./types.ts"
-
-import { ApiFactory } from "#x/aws_api@v0.8.1/client/mod.ts"
-import { DynamoDB } from "#x/aws_api@v0.8.1/services/dynamodb/mod.ts"
-import { keysOf } from "@ordo-pink/tau/mod.ts"
-import { Oath } from "@ordo-pink/oath/mod.ts"
+import type * as T from "./types"
+import { DynamoDB } from "aws-sdk"
+import { keysOf } from "@ordo-pink/tau"
+import { Oath } from "@ordo-pink/oath"
 import {
 	ExistsByIdMethod,
 	ExistsByEmailMethod,
@@ -21,11 +19,11 @@ import {
 	UpdateMethod,
 	GetByIdMethod,
 	GetByEmailMethod,
-} from "@ordo-pink/backend-user-service/mod.ts"
+} from "@ordo-pink/backend-user-service"
 
 // --- Public ---
 
-const adapter: T.Fn = params => ({
+const repository: T.Fn = params => ({
 	create: create(params),
 	update: update(params),
 	getById: getById(params),
@@ -36,24 +34,26 @@ const adapter: T.Fn = params => ({
 
 export const DynamoDBUserStorageAdapter = {
 	of: ({ awsAccessKeyId, awsSecretKey, region, endpoint, tableName }: T.Config) => {
-		const credentials = { awsAccessKeyId, awsSecretKey }
-		const fixedEndpoint = endpoint
-		const db = new ApiFactory({ credentials, region, fixedEndpoint }).makeNew(DynamoDB)
+		const db = new DynamoDB({
+			credentials: { accessKeyId: awsAccessKeyId, secretAccessKey: awsSecretKey }, // TODO: Fix names
+			region,
+			endpoint,
+		})
 
-		return adapter({ db, table: tableName })
+		return repository({ db, table: tableName })
 	},
 }
 
 // --- Internal ---
 
 const existsById: ExistsByIdMethod<T.Params> = params => id =>
-	adapter(params)
+	repository(params)
 		.getById(id)
 		.map(() => true)
 		.fix(() => false)
 
 const existsByEmail: ExistsByEmailMethod<T.Params> = params => email =>
-	adapter(params)
+	repository(params)
 		.getByEmail(email)
 		.map(() => true)
 		.fix(() => false)
@@ -74,28 +74,30 @@ const create: CreateMethod<T.Params> =
 					lastName: { S: user.lastName ?? "" },
 					createdAt: { S: user.createdAt.toISOString() },
 				},
-			}),
+			})
 		).map(() => user)
 
 const update: UpdateMethod<T.Params> =
 	({ db, table }) =>
 	(id, user) =>
-		adapter({ db, table })
+		repository({ db, table })
 			.getById(id)
 			.chain(oldUser =>
 				Oath.resolve(reduceUserToAttributeUpdates(oldUser))
 					.chain(AttributeUpdates =>
 						Oath.from(() =>
-							db.updateItem({ TableName: table, Key: { id: { S: id } }, AttributeUpdates }),
-						),
+							db
+								.updateItem({ TableName: table, Key: { id: { S: id } }, AttributeUpdates })
+								.promise()
+						)
 					)
-					.map(() => ({ ...oldUser, ...user })),
+					.map(() => ({ ...oldUser, ...user }))
 			)
 
 const getById: GetByIdMethod<T.Params> =
 	({ db, table }) =>
 	id =>
-		Oath.try(() => db.getItem({ TableName: table, Key: { id: { S: id } } }))
+		Oath.try(() => db.getItem({ TableName: table, Key: { id: { S: id } } }).promise())
 			.chain(({ Item }) => Oath.fromNullable(Item).rejectedMap(() => new Error("User not found")))
 			.map(serialize)
 
@@ -103,11 +105,13 @@ const getByEmail: GetByEmailMethod<T.Params> =
 	({ db, table }) =>
 	email =>
 		Oath.try(() =>
-			db.scan({
-				TableName: table,
-				FilterExpression: "email = :e",
-				ExpressionAttributeValues: { ":e": { S: email } },
-			}),
+			db
+				.scan({
+					TableName: table,
+					FilterExpression: "email = :e",
+					ExpressionAttributeValues: { ":e": { S: email } },
+				})
+				.promise()
 		)
 			.chain(output => Oath.fromNullable(output.Items))
 			.chain(items => Oath.fromNullable(items[0]))

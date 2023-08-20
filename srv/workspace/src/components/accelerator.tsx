@@ -3,9 +3,7 @@
 
 import { AiOutlineEnter } from "react-icons/ai"
 import { BsBackspace } from "react-icons/bs"
-import { Switch } from "@ordo-pink/switch/mod"
-
-// TODO: Add support for comma-separated accelerators
+import { Switch } from "@ordo-pink/switch"
 
 // --- Public ---
 

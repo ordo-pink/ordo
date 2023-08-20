@@ -8,13 +8,9 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-import type {
-	DynamoDB,
-	GetItemOutput,
-	UpdateItemInput,
-} from "#x/aws_api@v0.8.1/services/dynamodb/mod.ts"
-import type { Unary } from "@ordo-pink/tau/mod.ts"
-import type { InternalUser, UserRepository } from "@ordo-pink/backend-user-service/mod.ts"
+import { DynamoDB } from "aws-sdk"
+import type { Unary } from "@ordo-pink/tau"
+import type { InternalUser, UserRepository } from "@ordo-pink/backend-user-service"
 
 // --- Public ---
 
@@ -30,8 +26,8 @@ export type Config = {
 
 // --- Internal ---
 
-export type _SerializeFn = Unary<NonNullable<GetItemOutput["Item"]>, InternalUser>
+export type _SerializeFn = Unary<NonNullable<DynamoDB.GetItemOutput["Item"]>, InternalUser>
 export type _ReduceUserToAttributeUpdatesFn = Unary<
 	Partial<InternalUser>,
-	NonNullable<UpdateItemInput["AttributeUpdates"]>
+	NonNullable<DynamoDB.UpdateItemInput["AttributeUpdates"]>
 >

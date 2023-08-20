@@ -1,10 +1,10 @@
 // SPDX-FileCopyrightText: Copyright 2023, 谢尔盖||↓ and the Ordo.pink contributors
 // SPDX-License-Identifier: MIT
 
-import type * as T from "./types.ts"
+import type * as T from "./types"
 
-import { Either } from "@ordo-pink/either/mod.ts"
-import { identity } from "#ramda"
+import { Either } from "@ordo-pink/either"
+import { identity } from "ramda"
 
 export const okpwd: T.Fn = options => password => {
 	const o = (options ? options : {}) as Required<T.Options>
@@ -21,29 +21,29 @@ export const okpwd: T.Fn = options => password => {
 			Either.fromBoolean(
 				() => password.length >= o.min,
 				() => password,
-				() => `Password must be at least ${o.min} characters long.`,
-			),
+				() => `Password must be at least ${o.min} characters long.`
+			)
 		)
 		.chain(password =>
 			Either.fromBoolean(
 				() => password.length <= o.max,
 				() => password,
-				() => `Password must be under ${o.max} characters long.`,
-			),
+				() => `Password must be under ${o.max} characters long.`
+			)
 		)
 		.chain(password =>
 			Either.fromBoolean(
 				() => (o.skipCheckForAlphaCharacters ? true : /\p{L}/u.test(password)),
 				() => password,
-				() => `Password must contain contain letters.`,
-			),
+				() => `Password must contain contain letters.`
+			)
 		)
 		.chain(password =>
 			Either.fromBoolean(
 				() => (o.skipCheckForNumbers ? true : /\d/u.test(password)),
 				() => password,
-				() => `Password must contain contain numbers.`,
-			),
+				() => `Password must contain contain numbers.`
+			)
 		)
 		.chain(password =>
 			Either.fromBoolean(
@@ -53,8 +53,8 @@ export const okpwd: T.Fn = options => password => {
 						: /[`!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~]/.test(password),
 				() => password,
 				() =>
-					`Password must contain contain special characters ([\`!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~]).`,
-			),
+					`Password must contain contain special characters ([\`!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~]).`
+			)
 		)
 		.fold(identity, () => null)
 }

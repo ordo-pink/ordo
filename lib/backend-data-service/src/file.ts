@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: Copyright 2023, 谢尔盖||↓ and the Ordo.pink contributors
 // SPDX-License-Identifier: MIT
 
-import type { SUB } from "@ordo-pink/backend-token-service/mod"
+import type { SUB } from "@ordo-pink/backend-token-service"
 import type { FilePath, FSID, FileExtension, File } from "./types/file"
 import type { DirectoryPath } from "./types/directory"
 import { isValidPath, endsWithSlash } from "./common"
@@ -53,11 +53,11 @@ export class FileModel<CustomMetadata extends Record<string, unknown> = Record<s
 		fsid: FSID,
 		createdBy: SUB,
 		updatedBy: SUB,
-		size = 0,
+		size: number | bigint = 0,
 		createdAt = new Date(Date.now()),
 		updatedAt = new Date(Date.now()),
 		metadata: CustomMetadata = {} as CustomMetadata,
-		encryption: string | false = false,
+		encryption: string | false = false
 	) {
 		if (!FileModel.isValidPath(path)) throw new Error("Invalid file path")
 		if (size < 0) throw new Error("Invalid file size")
@@ -74,7 +74,7 @@ export class FileModel<CustomMetadata extends Record<string, unknown> = Record<s
 			createdBy,
 			updatedBy,
 			metadata,
-			encryption,
+			encryption
 		)
 	}
 
@@ -105,7 +105,7 @@ export class FileModel<CustomMetadata extends Record<string, unknown> = Record<s
 			createdAt,
 			updatedAt,
 			metadata as unknown as CustomMetadata,
-			encryption,
+			encryption
 		)
 	}
 
@@ -153,6 +153,8 @@ export class FileModel<CustomMetadata extends Record<string, unknown> = Record<s
 	 * @param {number} size - size to be transformed to a readable size.
 	 *
 	 * @returns {string} - readable size.
+	 *
+	 * TODO: Support for bigint
 	 */
 	public static toReadableSize(size: number): string {
 		if (size < 0) {
@@ -196,7 +198,7 @@ export class FileModel<CustomMetadata extends Record<string, unknown> = Record<s
 
 	#path: FilePath
 	#fsid: FSID
-	#size: number
+	#size: number | bigint
 	#createdAt: Date
 	#updatedAt: Date
 	#createdBy: SUB
@@ -210,13 +212,13 @@ export class FileModel<CustomMetadata extends Record<string, unknown> = Record<s
 	protected constructor(
 		path: FilePath,
 		fsid: FSID,
-		size: number,
+		size: number | bigint,
 		createdAt: Date,
 		updatedAt: Date,
 		createdBy: SUB,
 		updatedBy: SUB,
 		metadata: CustomMetadata,
-		encryption: string | false,
+		encryption: string | false
 	) {
 		this.#path = path
 		this.#fsid = fsid
@@ -249,7 +251,7 @@ export class FileModel<CustomMetadata extends Record<string, unknown> = Record<s
 	 *
 	 * @default {0}
 	 */
-	public get size(): number {
+	public get size(): number | bigint {
 		return this.#size
 	}
 
@@ -324,7 +326,7 @@ export class FileModel<CustomMetadata extends Record<string, unknown> = Record<s
 	 * @example `1202 -> 1KB`
 	 */
 	public get readableSize(): string {
-		return FileModel.toReadableSize(this.#size)
+		return FileModel.toReadableSize(this.#size as number) // TODO: Support for bigint
 	}
 
 	/**

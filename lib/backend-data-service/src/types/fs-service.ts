@@ -1,16 +1,11 @@
 // SPDX-FileCopyrightText: Copyright 2023, 谢尔盖||↓ and the Ordo.pink contributors
 // SPDX-License-Identifier: MIT
 
-import { SUB } from "@ordo-pink/backend-token-service/mod.ts"
-import { Oath } from "@ordo-pink/oath/mod.ts"
-import { Unary, Nullable } from "@ordo-pink/tau/mod.ts"
-import { FilePath, FileCreateParams, File } from "./file.ts"
-import {
-	Directory,
-	DirectoryPath,
-	DirectoryWithChildren,
-	DirectoryCreateParams,
-} from "./directory.ts"
+import { SUB } from "@ordo-pink/backend-token-service"
+import { Oath } from "@ordo-pink/oath"
+import { Unary, Nullable } from "@ordo-pink/tau"
+import { FilePath, FileCreateParams, File } from "./file"
+import { Directory, DirectoryPath, DirectoryWithChildren, DirectoryCreateParams } from "./directory"
 
 // --- Public ---
 

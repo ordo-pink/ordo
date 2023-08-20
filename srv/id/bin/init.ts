@@ -27,7 +27,7 @@ const generateKeyPair = async (privatePath: string, publicPath: string) => {
 	const { privateKey, publicKey } = await crypto.subtle.generateKey(
 		{ name: "ECDSA", namedCurve: "P-384" },
 		true,
-		["sign", "verify"],
+		["sign", "verify"]
 	)
 
 	const exportedPrivateKey = await crypto.subtle.exportKey("pkcs8", privateKey)
@@ -65,12 +65,12 @@ const generateAuthKeys = async () => {
 
 	await generateKeyPair(
 		resolve(ID_ACCESS_TOKEN_PRIVATE_KEY_PATH),
-		resolve(ID_ACCESS_TOKEN_PUBLIC_KEY_PATH),
+		resolve(ID_ACCESS_TOKEN_PUBLIC_KEY_PATH)
 	)
 
 	await generateKeyPair(
 		resolve(ID_REFRESH_TOKEN_PRIVATE_KEY_PATH),
-		resolve(ID_REFRESH_TOKEN_PUBLIC_KEY_PATH),
+		resolve(ID_REFRESH_TOKEN_PUBLIC_KEY_PATH)
 	)
 }
 

@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: Copyright 2023, 谢尔盖||↓ and the Ordo.pink contributors
 // SPDX-License-Identifier: MIT
 
-import type { SUB } from "@ordo-pink/backend-token-service/mod"
+import type { SUB } from "@ordo-pink/backend-token-service"
 import type { NoForbiddenSymbols, NonSlash, NonTrailingSlash, StartsWithSlash } from "./common"
 
 /**
@@ -32,7 +32,7 @@ export type File<CustomMetadata extends Record<string, unknown> = Record<string,
 	CustomMetadata & {
 		fsid: FSID
 		path: FilePath
-		size: number
+		size: number | bigint
 		createdAt: Date
 		updatedAt: Date
 		createdBy: SUB
@@ -44,7 +44,7 @@ export type File<CustomMetadata extends Record<string, unknown> = Record<string,
  * Initialisation params for creating a File.
  */
 export type FileCreateParams<
-	CustomMetadata extends Record<string, unknown> = Record<string, unknown>,
+	CustomMetadata extends Record<string, unknown> = Record<string, unknown>
 > = Partial<File<CustomMetadata>> & {
 	path: FilePath
 }

@@ -1,10 +1,10 @@
 // SPDX-FileCopyrightText: Copyright 2023, 谢尔盖||↓ and the Ordo.pink contributors
 // SPDX-License-Identifier: MIT
 
-import { SUB } from "@ordo-pink/backend-token-service/mod.ts"
-import { Oath } from "@ordo-pink/oath/mod.ts"
-import { Unary, Nullable } from "@ordo-pink/tau/mod.ts"
-import { FSID } from "./file.ts"
+import { SUB } from "@ordo-pink/backend-token-service"
+import { Oath } from "@ordo-pink/oath"
+import { Unary, Nullable } from "@ordo-pink/tau"
+import { FSID } from "./file"
 
 // --- Public ---
 
@@ -33,7 +33,7 @@ type FileUpdateParams<T> = {
 	content: T
 	upsert?: boolean
 }
-type FileUpdateFn<T> = Unary<FileUpdateParams<T>, Oath<number, Error>>
+type FileUpdateFn<T> = Unary<FileUpdateParams<T>, Oath<number | bigint, Error>>
 
 type FileDeleteParams = { sub: SUB; fsid: FSID }
 type FileDeleteFn = Unary<FileDeleteParams, Oath<Nullable<FSID>, Error>>

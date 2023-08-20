@@ -5,18 +5,17 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-import { resolve } from "#std/path"
 import { DynamoDBUserStorageAdapter } from "@ordo-pink/backend-dynamodb-user-repository"
 import { createIDServer } from "@ordo-pink/backend-id-server"
-import { Switch } from "@ordo-pink/switch"
 import { getc } from "@ordo-pink/getc"
 import { ConsoleLogger } from "@ordo-pink/logger"
 import { FSDataRepository } from "@ordo-pink/backend-fs-data-repository"
 import { FSMetadataRepository } from "@ordo-pink/backend-fs-metadata-repository"
 import { getPrivateKey, getPublicKey } from "./utils/get-key"
+import { MemoryTokenRepository } from "@ordo-pink/backend-memory-token-repository"
+import crypto from "crypto"
 
 const {
-	ID_USER_ADAPTER,
 	ID_DYNAMODB_ENDPOINT,
 	ID_DYNAMODB_ACCESS_KEY,
 	ID_DYNAMODB_SECRET_KEY,
@@ -25,13 +24,11 @@ const {
 	ID_ACCESS_TOKEN_EXPIRE_IN,
 	ID_REFRESH_TOKEN_EXPIRE_IN,
 	ID_SALT_ROUNDS,
-	ID_KV_DB_PATH,
 	ID_ACCESS_TOKEN_PRIVATE_KEY_PATH,
 	ID_ACCESS_TOKEN_PUBLIC_KEY_PATH,
 	ID_REFRESH_TOKEN_PRIVATE_KEY_PATH,
 	ID_REFRESH_TOKEN_PUBLIC_KEY_PATH,
 	ID_USER_TABLE_NAME,
-	ID_TOKENS_TABLE_NAME,
 	DATA_DATA_PATH,
 	DATA_METADATA_PATH,
 	WORKSPACE_HOST,
@@ -61,38 +58,32 @@ const {
 ])
 
 const main = async () => {
-	const accessPrivateKeyString = resolve(ID_ACCESS_TOKEN_PRIVATE_KEY_PATH)
-	const accessPublicKeyString = resolve(ID_ACCESS_TOKEN_PUBLIC_KEY_PATH)
-	const refreshPrivateKeyString = resolve(ID_REFRESH_TOKEN_PRIVATE_KEY_PATH)
-	const refreshPublicKeyString = resolve(ID_REFRESH_TOKEN_PUBLIC_KEY_PATH)
+	const accessPrivateKeyPath = ID_ACCESS_TOKEN_PRIVATE_KEY_PATH
+	const accessPublicKeyPath = ID_ACCESS_TOKEN_PUBLIC_KEY_PATH
+	const refreshPrivateKeyPath = ID_REFRESH_TOKEN_PRIVATE_KEY_PATH
+	const refreshPublicKeyPath = ID_REFRESH_TOKEN_PUBLIC_KEY_PATH
 
-	const accessTokenPrivateKey = await getPrivateKey(accessPrivateKeyString)
-	const accessTokenPublicKey = await getPublicKey(accessPublicKeyString)
-	const refreshTokenPrivateKey = await getPrivateKey(refreshPrivateKeyString)
-	const refreshTokenPublicKey = await getPublicKey(refreshPublicKeyString)
-
-	const kvPath = `${ID_KV_DB_PATH.endsWith("/") ? ID_KV_DB_PATH : `${ID_KV_DB_PATH}/`}kvdb`
+	const accessTokenPrivateKey = await getPrivateKey(accessPrivateKeyPath)
+	const accessTokenPublicKey = await getPublicKey(accessPublicKeyPath)
+	const refreshTokenPrivateKey = await getPrivateKey(refreshPrivateKeyPath)
+	const refreshTokenPublicKey = await getPublicKey(refreshPublicKeyPath)
 
 	const dataRepository = FSDataRepository.of({ root: DATA_DATA_PATH })
 	const metadataRepository = FSMetadataRepository.of({ root: DATA_METADATA_PATH })
 
-	const tokenStorageRepository = await DenoKVTokenStorageAdapter.of(kvPath, ID_TOKENS_TABLE_NAME)
-	const userStorageRepository = await Switch.of(ID_USER_ADAPTER)
-		.case("dynamodb", () =>
-			DynamoDBUserStorageAdapter.of({
-				region: ID_DYNAMODB_REGION,
-				endpoint: ID_DYNAMODB_ENDPOINT,
-				awsAccessKeyId: ID_DYNAMODB_ACCESS_KEY,
-				awsSecretKey: ID_DYNAMODB_SECRET_KEY,
-				tableName: ID_USER_TABLE_NAME,
-			}),
-		)
-		.case("kv", () => DenoKVUserStorageAdapter.of({ path: kvPath, key: ID_USER_TABLE_NAME }))
-		.default(() => DenoKVUserStorageAdapter.of({ path: kvPath, key: ID_USER_TABLE_NAME }))
+	const tokenStorageRepository = MemoryTokenRepository.create()
+
+	const userStorageRepository = DynamoDBUserStorageAdapter.of({
+		region: ID_DYNAMODB_REGION,
+		endpoint: ID_DYNAMODB_ENDPOINT,
+		awsAccessKeyId: ID_DYNAMODB_ACCESS_KEY,
+		awsSecretKey: ID_DYNAMODB_SECRET_KEY,
+		tableName: ID_USER_TABLE_NAME,
+	})
 
 	const app = await createIDServer({
-		userStorageRepository,
-		tokenStorageRepository,
+		userRepository: userStorageRepository,
+		tokenRepository: tokenStorageRepository,
 		dataRepository,
 		metadataRepository,
 		origin: [WEB_HOST, WORKSPACE_HOST],

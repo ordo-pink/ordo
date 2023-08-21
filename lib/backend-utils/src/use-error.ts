@@ -10,7 +10,7 @@ import { HttpError } from "@ordo-pink/rrr"
 import { Context, Middleware } from "koa"
 
 export const sendError = (ctx: Context) => (err: HttpError) => {
-	ctx.response.status = err.status
+	ctx.response.status = typeof err.status === "number" ? err.status : 500
 	ctx.response.body = { success: false, error: err.message }
 }
 

@@ -19,16 +19,9 @@ export type Fn = (params: Params) => Middleware
 export const handleVerifyToken: Fn =
 	({ tokenService }) =>
 	ctx =>
-		Oath.from(() => useBearerAuthorization(ctx, tokenService))
+		useBearerAuthorization(ctx, tokenService)
 			.chain(Oath.fromNullable)
 			.fork(
-				() => {
-					ctx.response.body = {
-						success: true,
-						result: { valid: false },
-					}
-				},
-				token => {
-					ctx.response.body = { success: true, result: { valid: true, token } }
-				},
+				() => void (ctx.response.body = { success: true, result: { valid: false } }),
+				token => void (ctx.response.body = { success: true, result: { valid: true, token } }),
 			)

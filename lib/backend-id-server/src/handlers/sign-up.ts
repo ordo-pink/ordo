@@ -11,8 +11,10 @@ import type { UserService } from "@ordo-pink/backend-user-service"
 import type { Middleware } from "koa"
 import validator from "validator"
 import { okpwd } from "@ordo-pink/okpwd"
-import { useBody } from "@ordo-pink/backend-utils"
+import { sendError, useBody } from "@ordo-pink/backend-utils"
 import { Readable } from "stream"
+import { Oath } from "@ordo-pink/oath"
+import { HttpError } from "@ordo-pink/rrr"
 
 type Body = { email?: string; password?: string }
 type Params = {
@@ -25,47 +27,69 @@ type Fn = (params: Params) => Middleware
 // TODO: Rewrite with Oath
 export const handleSignUp: Fn =
 	({ userService, tokenService, dataService }) =>
-	async ctx => {
-		const { email, password } = await useBody<Body>(ctx)
-
-		if (!email || !validator.isEmail(email, {})) {
-			return ctx.throw(400, "Invalid email")
-		}
-
-		const user = await userService.getByEmail(email).fork(
-			() => null,
-			user => user,
-		)
-
-		if (user) return ctx.throw(409, "User with this email already exists")
-
-		const validatePassword = okpwd()
-		const error = validatePassword(password)
-
-		if (error) {
-			return ctx.throw(400, error)
-		}
-
-		try {
-			const newUser = await userService.createUser(email, password!).toPromise()
-
-			const sub = newUser.id
-			const uip = ctx.request.ip
-			const { access, jti, exp } = await tokenService.createPair({ sub, uip }).toPromise()
-			const expires = new Date(Date.now() + exp)
-
-			await dataService.createUserSpace(sub).toPromise()
-
-			ctx.cookies.set("jti", jti, { httpOnly: true, sameSite: "lax", expires })
-			ctx.cookies.set("sub", sub, { httpOnly: true, sameSite: "lax", expires })
-
-			ctx.response.body = {
-				success: true,
-				result: { accessToken: access, refreshToken: jti, userId: sub },
-			}
-		} catch (e) {
-			console.log(e)
-
-			ctx.throw(409, "User with this email already exists")
-		}
-	}
+	ctx =>
+		useBody<Body>(ctx)
+			.chain(body =>
+				Oath.all({
+					email: Oath.fromNullable(body.email)
+						.map(validator.isEmail)
+						.chain(isValidEmail =>
+							Oath.fromBoolean(
+								() => isValidEmail,
+								() => body.email!,
+								() => HttpError.BadRequest("Invalid email"),
+							),
+						),
+					password: Oath.fromNullable(body.password)
+						.map(okpwd())
+						.chain(error =>
+							Oath.fromBoolean(
+								() => !error,
+								() => body.password!,
+								() => HttpError.BadRequest(error!),
+							),
+						),
+				}),
+			)
+			.chain(({ email, password }) =>
+				userService
+					.getByEmail(email)
+					.fix(() => null)
+					.chain(user =>
+						Oath.fromBoolean(
+							() => !user,
+							() => ({ email, password }),
+							() => HttpError.Conflict("User with given email already exists"),
+						),
+					),
+			)
+			.chain(({ email, password }) =>
+				userService.createUser(email, password).rejectedMap(HttpError.from),
+			)
+			.chain(user =>
+				tokenService
+					.createPair({ sub: user.id, uip: ctx.request.ip })
+					.rejectedMap(HttpError.from)
+					.chain(tokens =>
+						dataService
+							.createUserSpace(tokens.sub)
+							.rejectedMap(HttpError.from)
+							.map(() => new Date(Date.now() + tokens.exp))
+							.tap(expires =>
+								ctx.cookies.set("jti", tokens.jti, { httpOnly: true, sameSite: "lax", expires }),
+							)
+							.tap(expires =>
+								ctx.cookies.set("sub", tokens.sub, { httpOnly: true, sameSite: "lax", expires }),
+							)
+							.map(expires => ({
+								accessToken: tokens.tokens.access,
+								sub: tokens.sub,
+								jti: tokens.jti,
+								expires,
+							})),
+					),
+			)
+			.fork(sendError(ctx), body => {
+				ctx.response.status = 201
+				ctx.response.body = body
+			})

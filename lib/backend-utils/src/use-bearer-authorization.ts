@@ -49,4 +49,3 @@ const verifyWithTokenService0 = (tokenService: TTokenService, token: string) =>
 		.verifyToken(token, "access")
 		.chain(() => tokenService.decode(token, "access"))
 		.rejectedMap(() => HttpError.Forbidden("Invalid token"))
-		.toPromise() as any // TODO: Fix type inference for token type

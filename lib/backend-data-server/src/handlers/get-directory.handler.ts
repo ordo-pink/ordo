@@ -5,78 +5,40 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-import type { Context, Middleware } from "koa"
-import type { Binary, Curry, Nullable, Optional, Unary } from "@ordo-pink/tau"
-import type * as DATA_SERVICE_TYPES from "@ordo-pink/backend-data-service"
-import type { SUB } from "@ordo-pink/backend-token-service"
+import type { Readable } from "stream"
+import type { Middleware } from "koa"
+import type { Unary } from "@ordo-pink/tau"
 import { prop } from "ramda"
+import { DirectoryModel, TDataService } from "@ordo-pink/backend-data-service"
 import { sendError, useBearerAuthorization } from "@ordo-pink/backend-utils"
-import { DirectoryModel } from "@ordo-pink/backend-data-service"
 import { HttpError } from "@ordo-pink/rrr"
 import { Oath } from "@ordo-pink/oath"
 import { pathParamToDirectoryPath } from "../utils"
 
-// --- Public ---
-
-export const handleGetDirectory: Fn =
+export const handleGetDirectory: Unary<
+	{ dataService: TDataService<Readable>; idHost: string },
+	Middleware
+> =
 	({ dataService, idHost }) =>
 	ctx =>
 		useBearerAuthorization(ctx, idHost)
 			.map(prop("payload"))
 			.chain(({ sub }) =>
-				getPath0(ctx.params)
-					.chain(validateIsValidPath0(ctx))
-					.chain(getDirectory0({ service: dataService, sub })),
+				Oath.of(ctx.params.path ? pathParamToDirectoryPath(ctx.params.path) : "/")
+					.chain(path =>
+						Oath.fromBoolean(
+							() => DirectoryModel.isValidPath(path),
+							() => path,
+							() => HttpError.BadRequest("Invalid directory path"),
+						),
+					)
+					.chain(path =>
+						dataService
+							.getDirectory({ sub, path })
+							.chain(Oath.fromNullable)
+							.rejectedMap(() => HttpError.NotFound("Not found")),
+					),
 			)
-			.fork(sendError(ctx), formGetDirectoryResponse(ctx))
-
-// --- Internal ---
-
-type Params = { dataService: DATA_SERVICE_TYPES.TDataService<ReadableStream>; idHost: string }
-type Fn = Unary<Params, Middleware<{ params: { userId: string; path: string } }>>
-
-// ---
-
-type GetPathFn = Unary<Record<"path", Optional<string>>, Oath<string, never>>
-const getPath0: GetPathFn = params =>
-	Oath.of(params.path ? pathParamToDirectoryPath(params.path) : "/")
-
-// ---
-
-type ValidateIsValidPathFn = Curry<
-	Binary<Context, string, Oath<DATA_SERVICE_TYPES.DirectoryPath, HttpError>>
->
-const validateIsValidPath0: ValidateIsValidPathFn = ctx => path =>
-	Oath.try(() => {
-		if (!DirectoryModel.isValidPath(path)) throw HttpError.BadRequest("Invalid directory path")
-		return path
-	})
-
-// ---
-
-type GetDirectoryFnParams = { service: Params["dataService"]; sub: SUB }
-type GetDirectoryFn = Curry<
-	Binary<
-		GetDirectoryFnParams,
-		DATA_SERVICE_TYPES.DirectoryPath,
-		Oath<DATA_SERVICE_TYPES.Directory, HttpError>
-	>
->
-const getDirectory0: GetDirectoryFn =
-	({ service, sub }) =>
-	path =>
-		service
-			.getDirectory({ sub, path })
-			.chain(Oath.fromNullable)
-			.rejectedMap(() => HttpError.NotFound("Not found"))
-
-// ---
-
-type FormGetDirectoryResponseFn = Curry<Binary<Context, DATA_SERVICE_TYPES.Directory, void>>
-const formGetDirectoryResponse: FormGetDirectoryResponseFn = ctx => directory => {
-	ctx.response.status = 200
-	ctx.response.body = {
-		success: true,
-		result: directory,
-	}
-}
+			.fork(sendError(ctx), result => {
+				ctx.response.body = { success: true, result }
+			})

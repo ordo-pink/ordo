@@ -7,7 +7,4 @@
 
 import { runCommand0 } from "@ordo-pink/binutil"
 
-runCommand0("npx nodemon -r tsconfig-paths/register srv/id/index.ts", {
-	stderr: "inherit",
-	stdout: "inherit",
-}).orElse(console.error)
+runCommand0("npx nodemon -r tsconfig-paths/register srv/id/index.ts").orElse(console.error)

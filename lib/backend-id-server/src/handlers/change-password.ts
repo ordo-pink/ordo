@@ -9,7 +9,10 @@ import type { TTokenService } from "@ordo-pink/backend-token-service"
 import type { UserService } from "@ordo-pink/backend-user-service"
 import type { Middleware } from "koa"
 import { okpwd } from "@ordo-pink/okpwd"
-import { useBearerAuthorization, useBody } from "@ordo-pink/backend-utils"
+import { sendError, useBearerAuthorization, useBody } from "@ordo-pink/backend-utils"
+import { Oath } from "@ordo-pink/oath"
+import { HttpError } from "@ordo-pink/rrr"
+import { noop } from "@ordo-pink/tau"
 
 export type Body = { oldPassword?: string; newPassword?: string }
 export type Params = { tokenService: TTokenService; userService: UserService }
@@ -17,45 +20,93 @@ export type Fn = (params: Params) => Middleware
 
 export const handleChangePassword: Fn =
 	({ tokenService, userService }) =>
-	async ctx => {
-		const { payload } = await useBearerAuthorization(ctx, tokenService)
-		const { oldPassword, newPassword } = await useBody<Body>(ctx)
-		const validatePassword = okpwd()
-
-		if (!oldPassword) {
-			return ctx.throw(400, "Invalid password")
-		}
-
-		const newPasswordError = validatePassword(newPassword)
-
-		if (newPasswordError) {
-			return ctx.throw(400, newPasswordError)
-		}
-
-		if (oldPassword === newPassword) {
-			return ctx.throw(400, "Passwords must not match")
-		}
-
-		const id = payload.sub
-		const user = await userService.getById(id).toPromise()
-
-		if (!user) {
-			return ctx.throw(404, "User not found")
-		}
-
-		const passwordVerified = await userService.comparePassword(user.email, oldPassword).toPromise()
-
-		if (!passwordVerified) {
-			return ctx.throw(404, "User not found")
-		}
-
-		const result = await userService.updateUserPassword(user, oldPassword, newPassword!).toPromise()
-
-		if (!result) {
-			return ctx.throw(404, "User not found")
-		}
-
-		await tokenService.repository.removeTokenRecord(result.id).toPromise()
-
-		ctx.response.status = 204
-	}
+	ctx =>
+		Oath.all({
+			auth: useBearerAuthorization(ctx, tokenService),
+			body: useBody<Body>(ctx, "object"),
+		})
+			.chain(({ auth, body }) =>
+				Oath.all({
+					payload: auth.payload,
+					oldPassword: Oath.of(body.oldPassword)
+						.map(okpwd())
+						.chain(e =>
+							Oath.fromBoolean(
+								() => !e,
+								noop,
+								() => HttpError.BadRequest(e ?? "Invalid new password"),
+							),
+						),
+					newPassword: Oath.of(body.oldPassword)
+						.map(okpwd())
+						.chain(e =>
+							Oath.fromBoolean(
+								() => !e,
+								noop,
+								() => HttpError.BadRequest(e ?? "Invalid old password"),
+							),
+						)
+						.chain(() =>
+							Oath.fromBoolean(
+								() => body.oldPassword === body.newPassword,
+								noop,
+								() => HttpError.BadRequest("Passwords do not match"),
+							),
+						),
+				})
+					.chain(() =>
+						userService
+							.getById(auth.payload.sub)
+							.rejectedMap(() => HttpError.NotFound("User not found")),
+					)
+					.chain(user =>
+						userService
+							.comparePassword(user.email, body.oldPassword!)
+							.rejectedMap(() => HttpError.NotFound("User not found"))
+							.chain(() =>
+								userService
+									.updateUserPassword(user, body.oldPassword!, body.newPassword!)
+									.rejectedMap(error =>
+										error && error instanceof Error
+											? HttpError.from(error)
+											: HttpError.NotFound(error ?? "User not found"),
+									),
+							)
+							.chain(() =>
+								tokenService.repository
+									.removeTokenRecord(auth.payload.sub)
+									.rejectedMap(HttpError.from),
+							)
+							.chain(() =>
+								tokenService
+									.createPair({ sub: auth.payload.sub, uip: ctx.request.ip })
+									.rejectedMap(HttpError.from)
+									.chain(tokens =>
+										Oath.of(new Date(Date.now() + tokens.exp))
+											.tap(expires =>
+												ctx.cookies.set("jti", tokens.jti, {
+													httpOnly: true,
+													sameSite: "lax",
+													expires,
+												}),
+											)
+											.tap(expires =>
+												ctx.cookies.set("sub", tokens.sub, {
+													httpOnly: true,
+													sameSite: "lax",
+													expires,
+												}),
+											)
+											.map(expires => ({
+												accessToken: tokens.tokens.access,
+												sub: tokens.sub,
+												jti: tokens.jti,
+												expires,
+											})),
+									),
+							),
+					),
+			)
+			.fork(sendError(ctx), result => {
+				ctx.response.body = { success: true, result }
+			})

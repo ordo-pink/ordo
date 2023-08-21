@@ -7,6 +7,7 @@
 
 import type { User, InternalUser, PublicUser, UserRepository } from "./types"
 import { hash, compare, genSalt } from "bcryptjs"
+import crypto from "crypto"
 import { Oath } from "@ordo-pink/oath"
 
 export type UserServiceOptions = {

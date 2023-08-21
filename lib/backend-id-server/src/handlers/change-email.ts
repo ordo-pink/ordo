@@ -6,16 +6,15 @@
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 import type { Context, Middleware } from "koa"
-import type { AccessTokenParsed, TTokenService } from "@ordo-pink/backend-token-service"
+import type { TTokenService } from "@ordo-pink/backend-token-service"
 import type { UserService } from "@ordo-pink/backend-user-service"
 import type { User } from "@ordo-pink/backend-user-service"
 
 import validator from "validator"
-import { HttpError, useBearerAuthorization, useBody } from "@ordo-pink/backend-utils"
-import { ResponseError } from "@ordo-pink/backend-utils"
+import { useBearerAuthorization, useBody } from "@ordo-pink/backend-utils"
+import { sendError } from "@ordo-pink/backend-utils"
 import { Oath } from "@ordo-pink/oath"
-
-// --- Public ---
+import { HttpError } from "@ordo-pink/rrr"
 
 type Body = { email?: string }
 type Params = { tokenService: TTokenService; userService: UserService }
@@ -28,98 +27,48 @@ export const handleChangeEmail: Fn =
 			token: useBearerAuthorization(ctx, tokenService),
 			body: useBody<Body>(ctx),
 		})
-			.chain(validateInput(userService))
-			.chain(updateUser(userService))
-			.fork(ResponseError.send(ctx), sendUser(ctx))
-
-// --- Internal ---
-
-// Validate input from Bearer token and body ------------------------------------------------------
-
-type Input = { token: AccessTokenParsed; body: Body }
-type ValidatedInput = { user: User; email: string }
-type ValidateInputFn = (service: UserService) => (input: Input) => Oath<ValidatedInput, HttpError>
-
-const validateInput: ValidateInputFn =
-	userService =>
-	({ token, body }) =>
-		Oath.all({
-			user: userService.getById(token.payload.sub),
-			email: body.email,
-		})
-			.rejectedMap(ResponseError.create(404, "User not found"))
+			.chain(({ token, body }) =>
+				Oath.all({
+					user: userService.getById(token.payload.sub),
+					email: body.email,
+				})
+					.rejectedMap(() => HttpError.NotFound("User not found"))
+					.chain(({ user, email }) =>
+						Oath.fromNullable(email)
+							.chain(email =>
+								Oath.all([
+									Oath.fromBoolean(
+										() => validator.isEmail(email, {}),
+										() => "OK" as const,
+										() => false,
+									).rejectedMap(() => HttpError.BadRequest("Invalid email")),
+									Oath.fromBoolean(
+										() => user.email !== email,
+										() => "OK" as const,
+										() => false,
+									).rejectedMap(() => HttpError.BadRequest("This is your current email")),
+									userService
+										.getByEmail(email)
+										.chain(() => Oath.reject())
+										.fix(userExists =>
+											Oath.fromBoolean(
+												() => !userExists,
+												() => "OK" as const,
+												() => false,
+											),
+										)
+										.rejectedMap(() => HttpError.Conflict("Email already taken")),
+								]),
+							)
+							.map(() => ({ user, email: email! })),
+					)
+					.rejectedMap(() => HttpError.BadRequest("Invalid email")),
+			)
 			.chain(({ user, email }) =>
-				Oath.fromNullable(email)
-					.chain(validateEmail({ user, userService }))
-					.map(() => ({ user, email: email! })),
+				userService
+					.update(user.id, { email })
+					.rejectedMap(() => HttpError.NotFound("User not found")),
 			)
-			.rejectedMap(ResponseError.create(400, "Invalid email"))
-
-// Update user content ----------------------------------------------------------------------------
-
-type UpdateUserFn = (service: UserService) => (input: ValidatedInput) => Oath<User, null>
-
-const updateUser: UpdateUserFn =
-	userService =>
-	({ user, email }) =>
-		userService
-			.update(user.id, { email })
-			.rejectedMap(console.error)
-			.rejectedMap(() => null)
-
-// Send updated user in response ------------------------------------------------------------------
-
-type SendUserFn = (ctx: Context) => (user: User) => void
-
-const sendUser: SendUserFn = ctx => user => {
-	ctx.response.body = {
-		success: true,
-		result: user,
-	}
-}
-
-type ValidateEmailFnParams = { user: User; userService: UserService }
-type ValidateEmailFn = (params: ValidateEmailFnParams) => (email: string) => Oath<"OK", HttpError>
-
-const validateEmail: ValidateEmailFn =
-	({ user, userService }) =>
-	email =>
-		Oath.all(
-			[
-				validateEmailIsCorrect,
-				validateEmailIsNotCurrentUserEmail({ user, userService }),
-				validateEmailIsNotTaken({ user, userService }),
-			].map(f => f(email)),
-		).map(() => "OK")
-
-const validateEmailIsCorrect: ReturnType<ValidateEmailFn> = email =>
-	Oath.fromBoolean(
-		() => validator.isEmail(email, {}),
-		() => "OK" as const,
-		() => false,
-	).rejectedMap(ResponseError.create(400, "Invalid email"))
-
-const validateEmailIsNotCurrentUserEmail: ValidateEmailFn =
-	({ user }) =>
-	email =>
-		Oath.fromBoolean(
-			() => user.email !== email,
-			() => "OK" as const,
-			() => false,
-		).rejectedMap(ResponseError.create(400, "This is your current email"))
-
-const validateEmailIsNotTaken: ValidateEmailFn =
-	({ userService }) =>
-	email =>
-		userService
-			.getByEmail(email)
-			.chain(() => Oath.reject())
-			// TODO: Rewrite with userService.checkUserByEmail
-			.fix(userExists =>
-				Oath.fromBoolean(
-					() => !userExists,
-					() => "OK" as const,
-					() => false,
-				),
-			)
-			.rejectedMap(ResponseError.create(409, "Email already taken"))
+			.fork(sendError(ctx), result => {
+				ctx.response.body = { success: true, result }
+			})

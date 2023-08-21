@@ -8,10 +8,9 @@
 import type { Middleware } from "koa"
 import type { TTokenService } from "@ordo-pink/backend-token-service"
 import type { UserService } from "@ordo-pink/backend-user-service"
-
-import { ResponseError, useBearerAuthorization } from "@ordo-pink/backend-utils"
-import { Oath } from "@ordo-pink/oath"
 import { prop } from "ramda"
+import { sendError, useBearerAuthorization } from "@ordo-pink/backend-utils"
+import { HttpError } from "@ordo-pink/rrr"
 
 type Params = { tokenService: TTokenService; userService: UserService }
 type Fn = (params: Params) => Middleware
@@ -19,13 +18,10 @@ type Fn = (params: Params) => Middleware
 export const handleAccount: Fn =
 	({ tokenService, userService }) =>
 	ctx =>
-		Oath.from(() => useBearerAuthorization(ctx, tokenService))
+		useBearerAuthorization(ctx, tokenService)
 			.map(prop("payload"))
 			.map(prop("sub"))
-			.chain(id => userService.getById(id).rejectedMap(ResponseError.create(404, "User not found")))
-			.fork(ResponseError.send(ctx), user => {
-				ctx.response.body = {
-					success: true,
-					result: user,
-				}
+			.chain(id => userService.getById(id).rejectedMap(() => HttpError.NotFound("User not found")))
+			.fork(sendError(ctx), result => {
+				ctx.response.body = { success: true, result }
 			})

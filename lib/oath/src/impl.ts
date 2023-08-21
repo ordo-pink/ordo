@@ -276,7 +276,7 @@ export class Oath<TRight, TLeft = never> {
 						const forked: any = f(b)
 
 						if (!forked) return resolve(forked)
-						if (forked.isOath) return forked.fork(reject, resolve)
+						if (forked.isOath) return forked.fork(reject, resolve) as any
 						if (forked.then) return Oath.from(() => forked).fork(reject as any, resolve as any)
 						return resolve(forked)
 					} catch (e) {

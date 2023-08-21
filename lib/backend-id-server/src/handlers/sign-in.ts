@@ -8,10 +8,10 @@
 import type { Middleware } from "koa"
 import type { TTokenService } from "@ordo-pink/backend-token-service"
 import type { UserService } from "@ordo-pink/backend-user-service"
-import { ResponseError } from "@ordo-pink/backend-utils"
-import { useBody } from "@ordo-pink/backend-utils"
+import { sendError, useBody } from "@ordo-pink/backend-utils"
 import { Oath } from "@ordo-pink/oath"
 import { prop } from "ramda"
+import { HttpError } from "@ordo-pink/rrr"
 
 // --- Public ---
 
@@ -22,43 +22,40 @@ type Fn = (params: Params) => Middleware
 export const handleSignIn: Fn =
 	({ userService, tokenService }) =>
 	ctx =>
-		Oath.from(() => useBody<Body>(ctx))
+		useBody<Body>(ctx)
 			.chain(({ email, password }) =>
 				Oath.all({ email: Oath.fromNullable(email), password: Oath.fromNullable(password) })
-					.rejectedMap(ResponseError.create(400, "Invalid body content"))
+					.rejectedMap(() => HttpError.BadRequest("Invalid body content"))
 					.chain(({ email, password }) =>
 						Oath.all({
 							user: userService.getByEmail(email),
 							ok: userService.comparePassword(email, password),
 						}),
 					)
-					.bimap(ResponseError.create(404, "User not found"), prop("user")),
+					.bimap(() => HttpError.NotFound("User not found"), prop("user")),
 			)
-			// TODO: Drop previous token if it exists for given IP
 			.chain(user =>
 				Oath.of({ sub: user.id, uip: ctx.request.ip }).chain(({ sub, uip }) =>
-					tokenService.createPair({ sub, uip }),
+					tokenService
+						.createPair({ sub, uip })
+						.rejectedMap(HttpError.from)
+						.chain(tokens =>
+							Oath.of(new Date(Date.now() + tokens.exp))
+								.tap(expires =>
+									ctx.cookies.set("jti", tokens.jti, { httpOnly: true, sameSite: "lax", expires }),
+								)
+								.tap(expires =>
+									ctx.cookies.set("sub", tokens.sub, { httpOnly: true, sameSite: "lax", expires }),
+								)
+								.map(expires => ({
+									accessToken: tokens.tokens.access,
+									sub: tokens.sub,
+									jti: tokens.jti,
+									expires,
+								})),
+						),
 				),
 			)
-			.tap(tokens =>
-				ctx.cookies.set("sub", tokens.sub, {
-					httpOnly: true,
-					sameSite: "lax",
-					expires: new Date(Date.now() + tokens.exp),
-				}),
-			)
-			.tap(tokens =>
-				ctx.cookies.set("jti", tokens.jti, {
-					httpOnly: true,
-					sameSite: "lax",
-					expires: new Date(Date.now() + tokens.exp),
-				}),
-			)
-			.fork(ResponseError.send(ctx), ({ tokens: { access }, jti, sub }) => {
-				ctx.response.body = {
-					success: true,
-					result: { accessToken: access, jti, sub },
-				}
+			.fork(sendError(ctx), result => {
+				ctx.response.body = { success: true, result }
 			})
-
-// --- Internal ---

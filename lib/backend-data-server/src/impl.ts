@@ -5,9 +5,10 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
+import type { Readable } from "stream"
+import type { TDataService } from "@ordo-pink/backend-data-service"
 import { createServer } from "@ordo-pink/backend-utils"
 import { ConsoleLogger, Logger } from "@ordo-pink/logger"
-import { TDataService } from "@ordo-pink/backend-data-service"
 import { handleUpdateFileContent } from "./handlers/update-file-content.handler"
 import { handleCreateDirectory } from "./handlers/create-directory.handler"
 import { handleRemoveDirectory } from "./handlers/remove-directory.handler"
@@ -22,7 +23,7 @@ import { handleGetRoot } from "./handlers/get-root.handler"
 // TODO: Audit
 export type Params = {
 	origin: string | string[]
-	dataService: TDataService<ReadableStream>
+	dataService: TDataService<Readable>
 	idHost: string
 	logger?: Logger
 }

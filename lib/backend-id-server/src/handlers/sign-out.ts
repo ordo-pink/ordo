@@ -8,30 +8,30 @@
 import type { TTokenService, TokenRecord } from "@ordo-pink/backend-token-service"
 import type { Middleware } from "koa"
 import type { UserService } from "@ordo-pink/backend-user-service"
-import { useBearerAuthorization } from "@ordo-pink/backend-utils"
+import { sendError, useBearerAuthorization } from "@ordo-pink/backend-utils"
+import { prop } from "ramda"
+import { Oath } from "@ordo-pink/oath"
+import { HttpError } from "@ordo-pink/rrr"
 
 type Params = { userService: UserService; tokenService: TTokenService }
 type Fn = (params: Params) => Middleware
 
 export const handleSignOut: Fn =
 	({ tokenService }) =>
-	async ctx => {
-		const { payload } = await useBearerAuthorization(ctx, tokenService)
-		const { sub, jti } = payload
-
-		const tokenMap = await tokenService.repository
-			.getTokenRecord(sub)
-			.fix(() => ({}) as TokenRecord)
-			.toPromise()
-
-		if (!tokenMap || !tokenMap[jti]) {
-			return ctx.throw(403, "Invalid or outdated token")
-		}
-
-		await tokenService.repository.removeToken(sub, jti).toPromise()
-
-		ctx.cookies.set("jti", null)
-		ctx.cookies.set("sub", null)
-
-		ctx.response.status = 204
-	}
+	async ctx =>
+		useBearerAuthorization(ctx, tokenService)
+			.map(prop("payload"))
+			.chain(({ sub, jti }) =>
+				tokenService.repository
+					.getToken(sub, jti)
+					.chain(Oath.fromNullable)
+					.rejectedMap(() => HttpError.Forbidden("Invalid token"))
+					.chain(() => tokenService.repository.removeToken(sub, jti).fix(() => "OK" as const))
+					.map(() => {
+						ctx.cookies.set("jti", null)
+						ctx.cookies.set("sub", null)
+					}),
+			)
+			.fork(sendError(ctx), () => {
+				ctx.response.status = 204
+			})

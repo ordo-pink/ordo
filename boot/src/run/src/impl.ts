@@ -19,9 +19,5 @@ export const run = () =>
 		.map(names => names.map(name => `./srv/${name}/bin/run.ts`)) // TODO: Replace with run.ts
 		.chain(checkFilesExist0)
 		.map(getExistingPaths)
-		.chain(paths =>
-			Oath.all(
-				paths.map(path => runBunCommand0(`run ${path}`, { stderr: "inherit", stdout: "inherit" })),
-			).map(noop),
-		)
+		.chain(paths => Oath.all(paths.map(path => runBunCommand0(`run ${path}`))).map(noop))
 		.orElse(console.error)

@@ -5,92 +5,48 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-import { httpErrors, type Context, type RouterMiddleware } from "#x/oak@v12.6.0/mod.ts"
-import type * as DATA_SERVICE_TYPES from "@ordo-pink/backend-data-service/mod.ts"
-import type { Binary, Curry, Nullable, Optional, Unary } from "@ordo-pink/tau/mod.ts"
-import type { SUB } from "@ordo-pink/backend-token-service/mod.ts"
+import type { Readable } from "stream"
+import type { Middleware } from "koa"
+import type { Unary } from "@ordo-pink/tau"
+import { prop } from "ramda"
+import {
+	Directory,
+	DirectoryModel,
+	DirectoryPath,
+	TDataService,
+} from "@ordo-pink/backend-data-service"
+import { sendError, useBearerAuthorization, useBody } from "@ordo-pink/backend-utils"
+import { HttpError } from "@ordo-pink/rrr"
+import { Oath } from "@ordo-pink/oath"
+import { pathParamToDirectoryPath } from "../utils"
 
-import { ResponseError, useBearerAuthorization, useBody } from "@ordo-pink/backend-utils/mod.ts"
-import { DirectoryModel } from "@ordo-pink/backend-data-service/mod.ts"
-import { Oath } from "@ordo-pink/oath/mod.ts"
-import { prop } from "#ramda"
-import { pathParamToDirectoryPath } from "../utils.ts"
-
-// --- Public ---
-
-export const handleUpdateDirectory: Fn =
+export const handleUpdateDirectory: Unary<
+	{ dataService: TDataService<Readable>; idHost: string },
+	Middleware
+> =
 	({ dataService, idHost }) =>
 	ctx =>
-		Oath.from(() => useBearerAuthorization(ctx, idHost))
+		useBearerAuthorization(ctx, idHost)
 			.map(prop("payload"))
 			.chain(({ sub }) =>
-				getPath0(ctx.params as unknown as Record<"path", string>)
-					.chain(validateIsValidPath0(ctx))
+				Oath.of(ctx.params.path ? pathParamToDirectoryPath(ctx.params.path) : "/")
 					.chain(path =>
-						Oath.from(() => useBody<DATA_SERVICE_TYPES.Directory>(ctx)).chain(
-							updateDirectory0({ service: dataService, sub, path }),
+						Oath.fromBoolean(
+							() => DirectoryModel.isValidPath(path),
+							() => path as DirectoryPath,
+							() => HttpError.BadRequest("Invalid directory path"),
+						),
+					)
+					.chain(path =>
+						useBody<Directory>(ctx).chain(content =>
+							dataService
+								.updateDirectory({ sub, path, content })
+								.chain(Oath.fromNullable)
+								.rejectedMap(() => HttpError.NotFound("Directory not found")),
 						),
 					),
 			)
-			.chain(throwIfDirectoryDoesNotExist0)
-			.fork(ResponseError.send(ctx), formUpdateDirectoryResponse(ctx))
-
-// --- Internal ---
-
-type Params = { dataService: DATA_SERVICE_TYPES.TDataService<ReadableStream>; idHost: string }
-type Fn = Unary<Params, RouterMiddleware<"/directories/:userId/:path*">>
-
-// ---
-
-type GetPathFn = Unary<Record<"path", Optional<string>>, Oath<string, never>>
-const getPath0: GetPathFn = params =>
-	Oath.of(params.path ? pathParamToDirectoryPath(params.path) : "/")
-
-// ---
-
-type ValidateIsValidPathFn = Curry<
-	Binary<Context, string, Oath<DATA_SERVICE_TYPES.DirectoryPath, Error>>
->
-const validateIsValidPath0: ValidateIsValidPathFn = ctx => path =>
-	Oath.try(() =>
-		DirectoryModel.isValidPath(path) ? path : ctx.throw(400, "Invalid directory path"),
-	)
-
-// ---
-
-type UpdateDirectoryFnParams = {
-	path: DATA_SERVICE_TYPES.DirectoryPath
-	service: Params["dataService"]
-	sub: SUB
-}
-type UpdateDirectoryFn = Curry<
-	Binary<
-		UpdateDirectoryFnParams,
-		DATA_SERVICE_TYPES.Directory,
-		Oath<Nullable<DATA_SERVICE_TYPES.Directory>, Error>
-	>
->
-const updateDirectory0: UpdateDirectoryFn =
-	({ path, service, sub }) =>
-	content =>
-		service.updateDirectory({ sub, path, content })
-
-// ---
-
-type ThrowIfDirectoryDoesNotExistFn = Unary<
-	Nullable<DATA_SERVICE_TYPES.Directory>,
-	Oath<DATA_SERVICE_TYPES.Directory, Error>
->
-const throwIfDirectoryDoesNotExist0: ThrowIfDirectoryDoesNotExistFn = directory =>
-	Oath.fromNullable(directory).rejectedMap(() => new httpErrors.NotFound("Not found"))
-
-// ---
-
-type FormUpdateDirectoryResponseFn = Curry<Binary<Context, DATA_SERVICE_TYPES.Directory, void>>
-const formUpdateDirectoryResponse: FormUpdateDirectoryResponseFn = ctx => directory => {
-	ctx.response.status = 200
-	ctx.response.body = {
-		success: true,
-		result: directory,
-	}
-}
+			.fork(sendError(ctx), result => {
+				ctx.response.status = 200
+				ctx.response.body = { success: true, result }
+			})

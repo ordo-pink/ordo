@@ -5,65 +5,30 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-import { httpErrors, type Context, type RouterMiddleware } from "#x/oak@v12.6.0/mod.ts"
-import type * as DATA_SERVICE_TYPES from "@ordo-pink/backend-data-service/mod.ts"
-import type { Binary, Curry, Nullable, Unary } from "@ordo-pink/tau/mod.ts"
-import type { SUB } from "@ordo-pink/backend-token-service/mod.ts"
+import type { Readable } from "stream"
+import type { Middleware } from "koa"
+import type { TDataService } from "@ordo-pink/backend-data-service"
+import type { Unary } from "@ordo-pink/tau"
+import { prop } from "ramda"
+import { sendError, useBearerAuthorization } from "@ordo-pink/backend-utils"
+import { HttpError } from "@ordo-pink/rrr"
+import { Oath } from "@ordo-pink/oath"
 
-import { ResponseError, useBearerAuthorization } from "@ordo-pink/backend-utils/mod.ts"
-import { Oath } from "@ordo-pink/oath/mod.ts"
-import { prop } from "#ramda"
-
-// --- Public ---
-
-export const handleGetRoot: Fn =
+export const handleGetRoot: Unary<
+	{ dataService: TDataService<Readable>; idHost: string },
+	Middleware
+> =
 	({ dataService, idHost }) =>
 	ctx =>
-		Oath.from(() => useBearerAuthorization(ctx, idHost))
+		useBearerAuthorization(ctx, idHost)
 			.map(prop("payload"))
-			.chain(({ sub }) => getDirectory0({ service: dataService, sub }))
-			.rejectedMap(e =>
-				e.message.startsWith("No such file or directory")
-					? new httpErrors.NotFound("Not found")
-					: e,
+			.chain(({ sub }) =>
+				dataService
+					.getRoot(sub)
+					.chain(Oath.fromNullable)
+					.rejectedMap(() => HttpError.NotFound("Directory not found")),
 			)
-			.chain(throwIfDirectoryDoesNotExist0)
-			.fork(ResponseError.send(ctx), formGetDirectoryResponse(ctx))
-
-// --- Internal ---
-
-type Params = { dataService: DATA_SERVICE_TYPES.TDataService<ReadableStream>; idHost: string }
-type Fn = Unary<Params, RouterMiddleware<"/directories/:userId">>
-
-// ---
-
-type GetDirectoryFnParams = { service: Params["dataService"]; sub: SUB }
-type GetDirectoryFn = Curry<
-	Unary<
-		GetDirectoryFnParams,
-		Oath<Nullable<Array<DATA_SERVICE_TYPES.Directory | DATA_SERVICE_TYPES.File>>, Error>
-	>
->
-const getDirectory0: GetDirectoryFn = ({ service, sub }) => service.getRoot(sub)
-
-// ---
-
-type ThrowIfDirectoryDoesNotExistFn = Unary<
-	Nullable<Array<DATA_SERVICE_TYPES.Directory | DATA_SERVICE_TYPES.File>>,
-	Oath<Array<DATA_SERVICE_TYPES.Directory | DATA_SERVICE_TYPES.File>, Error>
->
-const throwIfDirectoryDoesNotExist0: ThrowIfDirectoryDoesNotExistFn = items =>
-	Oath.fromNullable(items).rejectedMap(() => new httpErrors.NotFound("Not found"))
-
-// ---
-
-type FormGetDirectoryResponseFn = Curry<
-	Binary<Context, Array<DATA_SERVICE_TYPES.Directory | DATA_SERVICE_TYPES.File>, void>
->
-const formGetDirectoryResponse: FormGetDirectoryResponseFn = ctx => directory => {
-	ctx.response.status = 200
-	ctx.response.body = {
-		success: true,
-		result: directory,
-	}
-}
+			.fork(sendError(ctx), result => {
+				ctx.response.status = 200
+				ctx.response.body = { success: true, result }
+			})

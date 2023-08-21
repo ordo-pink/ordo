@@ -5,74 +5,40 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-import { httpErrors, type Context, type RouterMiddleware } from "#x/oak@v12.6.0/mod.ts"
-import type * as DATA_SERVICE_TYPES from "@ordo-pink/backend-data-service/mod.ts"
-import type { Binary, Curry, Nullable, Optional, Unary } from "@ordo-pink/tau/mod.ts"
-import type { SUB } from "@ordo-pink/backend-token-service/mod.ts"
+import type { Readable } from "stream"
+import type { Middleware } from "koa"
+import type { Unary } from "@ordo-pink/tau"
+import { prop } from "ramda"
+import { FileModel, FilePath, TDataService } from "@ordo-pink/backend-data-service"
+import { sendError, useBearerAuthorization } from "@ordo-pink/backend-utils"
+import { HttpError } from "@ordo-pink/rrr"
+import { Oath } from "@ordo-pink/oath"
+import { pathParamToFilePath } from "../utils"
 
-import { ResponseError, useBearerAuthorization } from "@ordo-pink/backend-utils/mod.ts"
-import { FileModel } from "@ordo-pink/backend-data-service/mod.ts"
-import { Oath } from "@ordo-pink/oath/mod.ts"
-import { prop } from "#ramda"
-import { pathParamToFilePath } from "../utils.ts"
-
-// --- Public ---
-
-export const handleGetFile: Fn =
+export const handleGetFile: Unary<
+	{ dataService: TDataService<Readable>; idHost: string },
+	Middleware
+> =
 	({ dataService, idHost }) =>
 	ctx =>
-		Oath.from(() => useBearerAuthorization(ctx, idHost))
+		useBearerAuthorization(ctx, idHost)
 			.map(prop("payload"))
 			.chain(({ sub }) =>
-				getPath0(ctx.params as unknown as Record<"path", string>)
-					.chain(validateIsValidPath0(ctx))
-					.chain(getFileContent0({ service: dataService, sub }))
-					.rejectedMap(e =>
-						e.message === "File not found" ? new httpErrors.NotFound("Not found") : e,
+				Oath.of(ctx.params.path ? pathParamToFilePath(ctx.params.path) : "/")
+					.chain(path =>
+						Oath.fromBoolean(
+							() => !FileModel.isValidPath(path),
+							() => path as FilePath,
+							() => HttpError.BadRequest("Invalid file path"),
+						),
+					)
+					.chain(path =>
+						dataService
+							.getFileContent({ sub, path })
+							.chain(Oath.fromNullable)
+							.rejectedMap(() => HttpError.NotFound("File not found")),
 					),
 			)
-			.chain(throwIfFileDoesNotExist0)
-			.fork(ResponseError.send(ctx), formGetFileResponse(ctx))
-
-// --- Internal ---
-
-type Params = { dataService: DATA_SERVICE_TYPES.TDataService<ReadableStream>; idHost: string }
-type Fn = Unary<Params, RouterMiddleware<"/files/:userId/:path*">>
-
-// ---
-
-type GetPathFn = Unary<Record<"path", Optional<string>>, Oath<string, never>>
-const getPath0: GetPathFn = params => Oath.of(params.path ? pathParamToFilePath(params.path) : "/")
-
-// ---
-
-type ValidateIsValidPathFn = Curry<
-	Binary<Context, string, Oath<DATA_SERVICE_TYPES.FilePath, Error>>
->
-const validateIsValidPath0: ValidateIsValidPathFn = ctx => path =>
-	Oath.try(() => (FileModel.isValidPath(path) ? path : ctx.throw(400, "Invalid file path")))
-
-// ---
-
-type GetFileContentFnParams = { service: Params["dataService"]; sub: SUB }
-type GetFileContentFn = Curry<
-	Binary<GetFileContentFnParams, DATA_SERVICE_TYPES.FilePath, Oath<Nullable<ReadableStream>, Error>>
->
-const getFileContent0: GetFileContentFn =
-	({ service, sub }) =>
-	path =>
-		service.getFileContent({ sub, path })
-
-// ---
-
-type ThrowIfFileDoesNotExistFn = Unary<Nullable<ReadableStream>, Oath<ReadableStream, Error>>
-const throwIfFileDoesNotExist0: ThrowIfFileDoesNotExistFn = file =>
-	Oath.fromNullable(file).rejectedMap(() => new httpErrors.NotFound("Not found"))
-
-// ---
-
-type FormGetFileResponseFn = Curry<Binary<Context, ReadableStream, void>>
-const formGetFileResponse: FormGetFileResponseFn = ctx => file => {
-	const body = file as ReadableStream<Uint8Array>
-	ctx.request.originalRequest.respond(new Response(body))
-}
+			.fork(sendError(ctx), file => {
+				ctx.response.body = file
+			})

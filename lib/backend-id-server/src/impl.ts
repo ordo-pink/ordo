@@ -75,7 +75,7 @@ export const createIDServer = async ({
 	return createServer({
 		origin,
 		logger,
-		serverName: "id-server",
+		serverName: "id",
 		extendRouter: r =>
 			r
 				.post("/sign-up", handleSignUp(ctx))

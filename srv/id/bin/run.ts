@@ -10,4 +10,5 @@ import { runAsyncCommand0 } from "@ordo-pink/binutil"
 runAsyncCommand0("npx nodemon -r tsconfig-paths/register -e ts srv/id/index.ts", {
 	stdout: "pipe",
 	stderr: "pipe",
+	env: { ...process.env, FORCE_COLOR: "1" },
 }).orElse(console.error)

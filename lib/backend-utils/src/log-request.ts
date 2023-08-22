@@ -22,11 +22,10 @@ export const logRequest: LogRequestFn = options => async (ctx, next) => {
 	await next()
 
 	const name = options.serverName
-	const ip = ctx.request.ip
 	const url = ctx.request.url.toString()
-	const method = chalk.cyan(ctx.request.method)
+	const method = chalk.cyan(ctx.request.method.concat(" ".repeat(7 - ctx.request.method.length)))
 	const responseStatus = ctx.response.status
-	const responseTimeHeader = Number(ctx.response.headers["X-Response-Time"])
+	const responseTimeHeader = Number(ctx.get("X-Response-Time"))
 
 	const status = Switch.of(responseStatus)
 		.case(lte(500), () => chalk.red(responseStatus.toString()))
@@ -41,5 +40,5 @@ export const logRequest: LogRequestFn = options => async (ctx, next) => {
 		.case(lte(100), () => chalk.cyan(`${responseTimeHeader}ms`))
 		.default(() => chalk.green(`${responseTimeHeader}ms`))
 
-	options?.logger.info(`${ip} ${status} ${method} ${url} - ${rt} - ${name}`)
+	options?.logger.info(`${name} - ${rt} - ${status} ${method} ${url}`)
 }

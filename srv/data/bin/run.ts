@@ -7,6 +7,8 @@
 
 import { runAsyncCommand0 } from "@ordo-pink/binutil"
 
-runAsyncCommand0("bun run --watch srv/data/index.ts", { stdout: "pipe", stderr: "pipe" }).orElse(
-	console.error,
-)
+runAsyncCommand0("bun run --watch srv/data/index.ts", {
+	stdout: "pipe",
+	stderr: "pipe",
+	env: { ...process.env, FORCE_COLOR: "1" },
+}).orElse(console.error)

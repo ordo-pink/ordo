@@ -23,5 +23,6 @@ runCommand0("npm run dev", {
 		REACT_APP_ID_HOST: ID_HOST,
 		REACT_APP_WEB_HOST: WEB_HOST,
 		REACT_APP_DATA_HOST: DATA_HOST,
+		FORCE_COLOR: "1",
 	},
 }).orElse(console.error)

@@ -30,17 +30,21 @@ const {
 	"WEB_HOST",
 ])
 
-const metadataRepository = FSMetadataRepository.of({ root: DATA_METADATA_PATH })
-const dataRepository = FSDataRepository.of({ root: DATA_DATA_PATH })
-const dataService = BackendDataService.of({ dataRepository, metadataRepository })
+const main = async () => {
+	const metadataRepository = FSMetadataRepository.of({ root: DATA_METADATA_PATH })
+	const dataRepository = FSDataRepository.of({ root: DATA_DATA_PATH })
+	const dataService = BackendDataService.of({ dataRepository, metadataRepository })
 
-const app = createDataServer({
-	dataService,
-	idHost: ID_HOST,
-	origin: [WORKSPACE_HOST, WEB_HOST],
-	logger: ConsoleLogger,
-})
+	const app = createDataServer({
+		dataService,
+		idHost: ID_HOST,
+		origin: [WORKSPACE_HOST, WEB_HOST],
+		logger: ConsoleLogger,
+	})
 
-ConsoleLogger.info(`DATA server running on ${DATA_HOST}`)
+	ConsoleLogger.info(`DATA server running on ${DATA_HOST}`)
 
-await app.listen({ port: Number(DATA_PORT) })
+	app.listen({ port: Number(DATA_PORT) })
+}
+
+main()

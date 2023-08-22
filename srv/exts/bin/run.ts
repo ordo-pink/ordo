@@ -13,4 +13,5 @@
 // 	"--allow-read",
 // 	"--watch",
 // 	"srv/exts/mod.ts",
-// ]).toPromise()
+// ]).toPromise(),
+//	env: { ...process.env, FORCE_COLOR: "1" },

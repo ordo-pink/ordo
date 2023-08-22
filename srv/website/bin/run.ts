@@ -23,5 +23,6 @@ runAsyncCommand0("npm run dev", {
 		NEXT_PUBLIC_ID_HOST: ID_HOST,
 		NEXT_PUBLIC_WORKSPACE_HOST: WORKSPACE_HOST,
 		NEXT_PUBLIC_DATA_HOST: DATA_HOST,
+		FORCE_COLOR: "1",
 	},
 }).orElse(console.error)

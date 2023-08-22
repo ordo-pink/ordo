@@ -1,17 +1,10 @@
 // SPDX-FileCopyrightText: Copyright 2023, 谢尔盖||↓ and the Ordo.pink contributors
-// SPDX-License-Identifier: MPL-2.0
+// SPDX-License-Identifier: MIT
 
-// This Source Code Form is subject to the terms of the Mozilla Public
-// License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
-
-// deno-lint-ignore-file no-explicit-any
-
-import { Either, TEither } from "@ordo-pink/either"
 import validator from "validator"
 import { Oath } from "@ordo-pink/oath"
 import { okpwd } from "@ordo-pink/okpwd"
-import { ChangeEventHandler, useState } from "react"
+import { ChangeEventHandler } from "react"
 
 type InputProps = {
 	value?: string

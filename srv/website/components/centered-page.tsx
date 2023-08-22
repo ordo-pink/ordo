@@ -5,16 +5,16 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-import { RenderableProps } from "preact"
+import { PropsWithChildren } from "react"
 
-type Props = {
+type Props = PropsWithChildren<{
 	centerX?: boolean
 	centerY?: boolean
-}
+}>
 
-export const CenteredPage = ({ children, centerX, centerY }: RenderableProps<Props>) => (
+export const CenteredPage = ({ children, centerX, centerY }: Props) => (
 	<div
-		class={`h-full w-full flex flex-col ${centerX ? "items-center" : "items-start"} ${
+		className={`h-full w-full flex flex-col ${centerX ? "items-center" : "items-start"} ${
 			centerY ? "justify-center" : "justify-start"
 		} min-h-screen`}
 	>

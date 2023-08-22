@@ -7,15 +7,15 @@
 
 // deno-lint-ignore-file no-explicit-any
 
-import { useSignal } from "@preact/signals"
-import { JSX } from "preact"
-import { Either, TEither } from "@ordo-pink/either/mod.ts"
-import { isEmail } from "#x/deno_validator@v0.0.5/mod.ts"
-import { okpwd } from "@ordo-pink/okpwd/mod.ts"
+import { Either, TEither } from "@ordo-pink/either"
+import validator from "validator"
+import { Oath } from "@ordo-pink/oath"
+import { okpwd } from "@ordo-pink/okpwd"
+import { ChangeEventHandler, useState } from "react"
 
 type InputProps = {
 	value?: string
-	onInput?: JSX.EventHandler<JSX.TargetedEvent<HTMLInputElement>>
+	onChange?: ChangeEventHandler<HTMLInputElement>
 	id: string
 	label: string
 	name?: string
@@ -25,16 +25,16 @@ type InputProps = {
 }
 
 type EmailInputProps = Partial<InputProps> & {
-	onChange?: (ev: TEither<string, string[]>) => any
+	onInput?: (ev: Oath<string, string[]>) => any
 }
 
 type PasswordInputProps = Partial<InputProps> & {
-	onChange?: (ev: TEither<string, string[]>) => any
+	onInput?: (ev: Oath<string, string[]>) => any
 }
 
 export const TextInput = ({
 	value,
-	onInput = () => void 0,
+	onChange = () => void 0,
 	id,
 	label,
 	placeholder = "",
@@ -42,19 +42,19 @@ export const TextInput = ({
 	name = "",
 	autocomplete = "off",
 }: InputProps) => (
-	<div class="flex flex-col">
-		<label for="email" class="w-full text-sm font-medium leading-6 mb-2">
+	<div className="flex flex-col">
+		<label htmlFor="email" className="w-full text-sm font-medium leading-6 mb-2">
 			{label}
 		</label>
 		<input
 			id={id}
 			name={name}
 			type={type}
-			autocomplete={autocomplete}
+			autoComplete={autocomplete}
 			value={value}
-			onInput={onInput}
+			onChange={onChange}
 			placeholder={placeholder}
-			class="w-full px-2 py-1 rounded-md border-0 shadow-inner placeholder:text-neutral-500 bg-neutral-200 dark:bg-neutral-700 outline-none sm:text-sm sm:leading-6"
+			className="w-full px-2 py-1 rounded-md border-0 shadow-inner placeholder:text-neutral-500 bg-neutral-200 dark:bg-neutral-700 outline-none sm:text-sm sm:leading-6"
 		/>
 	</div>
 )
@@ -69,34 +69,34 @@ export const EmailInput = ({
 	name = "email",
 	placeholder = "hello@ordo.pink",
 }: EmailInputProps) => {
-	const error = useSignal("")
-
 	return (
 		<TextInput
 			value={value}
 			id={id}
-			onInput={e => {
-				if (onInput) onInput(e)
-
-				if (onChange) {
-					const value = e.currentTarget.value
-
-					if (!value) return onChange(Either.right(""))
-
-					const errors = Either.fromBoolean(
-						() => isEmail(value, {}),
-						() => value,
-						() => ["Invalid email."],
-					)
-
-					onChange(errors)
-				}
-			}}
 			label={label}
 			autocomplete={autocomplete}
 			name={name}
 			placeholder={placeholder}
 			type="email"
+			onChange={event => {
+				if (onChange) onChange(event)
+
+				if (onInput) {
+					if (!event.target.value) return onInput(Oath.resolve(""))
+
+					onInput(
+						Oath.of(event.target.value)
+							.chain(v => new Oath<string>(resolve => setTimeout(() => resolve(v), 1000)))
+							.chain(v =>
+								Oath.fromBoolean(
+									() => validator.isEmail(v),
+									() => v,
+									() => ["Invalid email"],
+								),
+							),
+					)
+				}
+			}}
 		/>
 	)
 }
@@ -117,14 +117,24 @@ export const PasswordInput = ({
 		<TextInput
 			value={value}
 			id={id}
-			onInput={e => {
-				if (onInput) onInput(e)
+			onChange={event => {
+				if (onChange) onChange(event)
 
-				if (onChange) {
-					const value = e.currentTarget.value
-					const errors = validatePassword(value)
+				if (onInput) {
+					if (!event.target.value) return onInput(Oath.resolve(""))
 
-					onChange(errors ? Either.left([errors]) : Either.right(value))
+					onInput(
+						Oath.of(event.target.value)
+							.chain(v => new Oath<string>(resolve => setTimeout(() => resolve(v), 1000)))
+							.map(validatePassword)
+							.chain(error =>
+								Oath.fromBoolean(
+									() => !error,
+									() => event.target.value,
+									() => [error as string],
+								),
+							),
+					)
 				}
 			}}
 			label={label}

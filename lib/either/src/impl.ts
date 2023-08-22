@@ -1,11 +1,9 @@
 // SPDX-FileCopyrightText: Copyright 2023, 谢尔盖||↓ and the Ordo.pink contributors
 // SPDX-License-Identifier: MIT
 
-// deno-lint-ignore-file no-explicit-any
+import type { LeftFn, RightFn, EitherStatic } from "./types"
 
-import type * as T from "./types"
-
-const left: T.LeftFn = x => ({
+const left: LeftFn = x => ({
 	isEither: true,
 	isLeft: true,
 	isRight: false,
@@ -17,7 +15,7 @@ const left: T.LeftFn = x => ({
 	fold: f => f(x),
 })
 
-const right: T.RightFn = x => ({
+const right: RightFn = x => ({
 	isEither: true,
 	isLeft: false,
 	isRight: true,
@@ -29,7 +27,7 @@ const right: T.RightFn = x => ({
 	fold: (_, g) => g(x),
 })
 
-export const Either: T.EitherStatic = {
+export const Either: EitherStatic = {
 	fromNullable: x => (x == null ? left(null) : right(x)),
 	fromBoolean: (f, r?, l?) => (f() ? right(r ? r() : undefined) : left(l ? l() : undefined)) as any,
 	try: f => {

@@ -1,11 +1,7 @@
 // SPDX-FileCopyrightText: Copyright 2023, 谢尔盖||↓ and the Ordo.pink contributors
 // SPDX-License-Identifier: MIT
 
-// deno-lint-ignore-file no-explicit-any
-
-import { Nullable, keysOf, noop } from "@ordo-pink/tau"
-
-type UnderOath<T> = T extends object & {
+export type UnderOath<T> = T extends object & {
 	and(onfulfilled: infer F, ...args: infer _): any
 }
 	? F extends (value: infer V, ...args: infer _) => any
@@ -44,7 +40,7 @@ export class Oath<TRight, TLeft = never> {
 		})
 	}
 
-	public static fromNullable<T>(value?: Nullable<T>): Oath<NonNullable<T>, null> {
+	public static fromNullable<T>(value?: T | null): Oath<NonNullable<T>, null> {
 		return value == null ? Oath.reject(null) : Oath.resolve(value)
 	}
 
@@ -127,11 +123,11 @@ export class Oath<TRight, TLeft = never> {
 			let resolvedLength = 0
 
 			return new Oath((outerResolve: any, outerReject: any) => {
-				const keys = keysOf(values)
+				const keys = Object.keys(values)
 				if (!keys.length) return outerResolve({})
 
 				keys.forEach(key => {
-					const value = values[key] as any
+					const value = (values as any)[key] as any
 
 					if (value.isOath) {
 						value.fork(
@@ -197,7 +193,7 @@ export class Oath<TRight, TLeft = never> {
 		)
 	}
 
-	public tap(f: (x: TRight) => any, g: (x: TLeft) => any = noop): Oath<TRight, TLeft> {
+	public tap(f: (x: TRight) => any, g: (x: TLeft) => any = () => void 0): Oath<TRight, TLeft> {
 		return new Oath<TRight, TLeft>((resolve, reject) =>
 			this.fork(
 				a => {

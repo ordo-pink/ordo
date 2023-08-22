@@ -69,9 +69,8 @@ const main = async () => {
 	const dataRepository = FSDataRepository.of({ root: DATA_DATA_PATH })
 	const metadataRepository = FSMetadataRepository.of({ root: DATA_METADATA_PATH })
 
-	const tokenStorageRepository = MemoryTokenRepository.create()
-
-	const userStorageRepository = DynamoDBUserStorageAdapter.of({
+	const tokenRepository = await MemoryTokenRepository.create("./var/srv/id/tokens.json")
+	const userRepository = DynamoDBUserStorageAdapter.of({
 		region: ID_DYNAMODB_REGION,
 		endpoint: ID_DYNAMODB_ENDPOINT,
 		awsAccessKeyId: ID_DYNAMODB_ACCESS_KEY,
@@ -80,8 +79,8 @@ const main = async () => {
 	})
 
 	const app = await createIDServer({
-		userRepository: userStorageRepository,
-		tokenRepository: tokenStorageRepository,
+		userRepository,
+		tokenRepository,
 		dataRepository,
 		metadataRepository,
 		origin: [WEB_HOST, WORKSPACE_HOST],

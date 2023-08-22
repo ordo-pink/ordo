@@ -64,11 +64,6 @@ export type ISS = string
 export type EXP = number
 
 /**
- * @see RefreshTokenPayload.uip
- */
-export type UIP = string
-
-/**
  * Payload of the access JWT.
  */
 export interface AccessTokenPayload extends JwtPayload {
@@ -109,12 +104,7 @@ export interface AccessTokenPayload extends JwtPayload {
 /**
  * Payload of the refresh JWT.
  */
-export interface RefreshTokenPayload extends AccessTokenPayload {
-	/**
-	 * User IP. This value is only stored in refresh tokens.
-	 */
-	readonly uip: UIP
-}
+export interface RefreshTokenPayload extends AccessTokenPayload {}
 
 /**
  * Parsed token content.
@@ -255,7 +245,7 @@ export type TTokenService = {
 	) => Oath<Nullable<typeof type extends "access" ? AccessTokenParsed : RefreshTokenParsed>>
 
 	createPair: Unary<
-		{ sub: SUB; uip: UIP; prevJti?: JTI; aud?: AUD },
+		{ sub: SUB; prevJti?: JTI; aud?: AUD },
 		Oath<RefreshTokenPayload & { tokens: { access: string; refresh: string } }, Error>
 	>
 

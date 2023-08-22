@@ -47,18 +47,9 @@ export const handleRefreshToken: Fn =
 							.chain(Oath.fromNullable)
 							.rejectedMap(() => HttpError.Forbidden("Invalid token")),
 					)
-					.chain(token =>
-						Oath.fromBoolean(
-							() => token.payload.uip === ctx.request.ip,
-							() => token,
-							() => HttpError.Unauthorized("Invalid token"),
-						),
-					)
-					.map(prop("payload"))
-					.map(prop("uip"))
-					.chain(uip =>
+					.chain(() =>
 						tokenService
-							.createPair({ sub, prevJti, uip })
+							.createPair({ sub, prevJti })
 							.rejectedMap(HttpError.from)
 							.chain(tokens =>
 								Oath.of(new Date(Date.now() + tokens.exp))

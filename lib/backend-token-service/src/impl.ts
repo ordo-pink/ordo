@@ -35,7 +35,7 @@ const of = ({ repository, options }: Params): TTokenService => ({
 			.chain(payload => repository.getToken(payload.sub!, payload.jti!).map(() => payload))
 			.fix(() => null) as any,
 	decode: token => Oath.try(() => decode(token, { complete: true })).fix(() => null) as any,
-	createPair: ({ sub, uip, prevJti, aud = "https://ordo.pink" }) =>
+	createPair: ({ sub, prevJti, aud = "https://ordo.pink" }) =>
 		Oath.all({
 			jti: randomUUID(),
 			iat: Math.floor(Date.now() / 1000),
@@ -44,8 +44,7 @@ const of = ({ repository, options }: Params): TTokenService => ({
 			rexp: Math.floor(Date.now() / 1000) + options.refreshTokenExpireIn,
 			sub,
 			aud,
-			uip,
-		}).chain(({ jti, iat, iss, aexp, rexp, sub, aud, uip }) =>
+		}).chain(({ jti, iat, iss, aexp, rexp, sub, aud }) =>
 			Oath.all({
 				jti,
 				iat,
@@ -53,7 +52,6 @@ const of = ({ repository, options }: Params): TTokenService => ({
 				exp: rexp,
 				sub,
 				aud,
-				uip,
 				tokens: {
 					access: sign(
 						{ jti, iat, iss, exp: aexp, sub, aud },
@@ -61,7 +59,7 @@ const of = ({ repository, options }: Params): TTokenService => ({
 						{ algorithm: options.alg },
 					),
 					refresh: sign(
-						{ jti, iat, iss, exp: rexp, sub, aud, uip },
+						{ jti, iat, iss, exp: rexp, sub, aud },
 						getSecret(options, "refresh", "private"),
 						{ algorithm: options.alg },
 					),

@@ -79,7 +79,7 @@ export const handleChangePassword: Fn =
 							)
 							.chain(() =>
 								tokenService
-									.createPair({ sub: auth.payload.sub, uip: ctx.request.ip })
+									.createPair({ sub: auth.payload.sub })
 									.rejectedMap(HttpError.from)
 									.chain(tokens =>
 										Oath.of(new Date(Date.now() + tokens.exp))

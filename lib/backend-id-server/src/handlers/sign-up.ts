@@ -68,7 +68,7 @@ export const handleSignUp: Fn =
 			)
 			.chain(user =>
 				tokenService
-					.createPair({ sub: user.id, uip: ctx.request.ip })
+					.createPair({ sub: user.id })
 					.rejectedMap(HttpError.from)
 					.chain(tokens =>
 						dataService

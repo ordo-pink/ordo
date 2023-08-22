@@ -35,9 +35,9 @@ export const handleSignIn: Fn =
 					.bimap(() => HttpError.NotFound("User not found"), prop("user")),
 			)
 			.chain(user =>
-				Oath.of({ sub: user.id, uip: ctx.request.ip }).chain(({ sub, uip }) =>
+				Oath.of({ sub: user.id }).chain(({ sub }) =>
 					tokenService
-						.createPair({ sub, uip })
+						.createPair({ sub })
 						.rejectedMap(HttpError.from)
 						.chain(tokens =>
 							Oath.of(new Date(Date.now() + tokens.exp))

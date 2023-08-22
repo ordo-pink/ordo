@@ -6,6 +6,7 @@ import {
 	direntsToDirs,
 	getExistingPaths,
 	getNames,
+	runAsyncCommand0,
 	runBunCommand0,
 } from "@ordo-pink/binutil"
 import { readdir0 } from "@ordo-pink/fs"
@@ -19,5 +20,9 @@ export const run = () =>
 		.map(names => names.map(name => `./srv/${name}/bin/run.ts`)) // TODO: Replace with run.ts
 		.chain(checkFilesExist0)
 		.map(getExistingPaths)
-		.chain(paths => Oath.all(paths.map(path => runBunCommand0(`run ${path}`))).map(noop))
+		.chain(paths =>
+			Oath.all(
+				paths.map(path => runAsyncCommand0(`bun run ${path}`, { stdout: "pipe", stderr: "pipe" }))
+			).map(noop)
+		)
 		.orElse(console.error)

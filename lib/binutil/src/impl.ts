@@ -10,6 +10,14 @@ import { writeFile0, createParentDirectory0, isFile0, fileExists0 } from "@ordo-
 import { Oath } from "@ordo-pink/oath"
 import { Unary } from "@ordo-pink/tau"
 
+export const runAsyncCommand0: RunCommand = (command, options) =>
+	Oath.of(Bun.spawn(command.trim().split(" "), options)).chain(proc =>
+		Oath.try(async () => {
+			if (options?.stdout === "pipe" || options?.stdout === "inherit")
+				for await (const chunk of proc.stdout) process.stdout.write(chunk)
+		}),
+	)
+
 type RunCommand = (cmd: string, options?: SpawnOptions.OptionsObject) => Oath<void, Error>
 export const runCommand0: RunCommand = (command, options) =>
 	Oath.try(() => {

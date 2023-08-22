@@ -18,6 +18,7 @@
 				"name": "next"
 			}
 		],
+		"baseUrl": ".",
 		"paths": {
 			"@ordo-pink/*": ["../../lib/*"]
 		}

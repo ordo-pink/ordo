@@ -15,7 +15,7 @@ export const useBody = <T>(
 	ctx: Context,
 	expect: "string" | "array" | "object" = "object",
 ): Oath<T, HttpError> =>
-	Oath.try(async () => ctx.request.body as T)
+	Oath.try(async () => (await ctx.request.body) as T)
 		.rejectedMap(HttpError.from)
 		.map(body =>
 			Switch.of(expect)

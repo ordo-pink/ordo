@@ -5,7 +5,6 @@ import { Jost } from "next/font/google"
 import type { Metadata } from "next"
 import "@ordo-pink/css/main.css"
 import "../components/index-hero.css"
-import { PropsWithChildren } from "react"
 import { AppProps } from "next/app"
 
 const jost = Jost({ preload: true, subsets: ["latin"], fallback: ["system-ui"] })

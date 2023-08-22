@@ -58,11 +58,15 @@ export default function SignInForm({ workspaceHost, idHost }: Props) {
 
 						await fetch(`${idHost}/sign-in`, {
 							credentials: "include",
+							headers: { "content-type": "application/json;charset=UTF-8" },
 							body: JSON.stringify({ email, password }),
 							method: "POST",
 						})
 							.then(res => res.json())
-							.then(() => window.location.replace(workspaceHost))
+							.then(res => {
+								if (res.success) return window.location.replace(workspaceHost)
+								console.log(res)
+							})
 					}}
 				>
 					Sign in

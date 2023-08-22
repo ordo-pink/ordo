@@ -33,7 +33,7 @@ const of = ({ repository, options }: Params): TTokenService => ({
 		Oath.try(() => verify(token, getSecret(options, type, "public"), { complete: true }))
 			.map(token => token.payload as JwtPayload)
 			.chain(payload => repository.getToken(payload.sub!, payload.jti!).map(() => payload))
-			.fix(() => null) as any,
+			.fix(() => null as any),
 	decode: token => Oath.try(() => decode(token, { complete: true })).fix(() => null) as any,
 	createPair: ({ sub, prevJti, aud = "https://ordo.pink" }) =>
 		Oath.all({

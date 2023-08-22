@@ -62,10 +62,9 @@ export const __initAuth: InitAuth = callOnce(({ logger }) => {
 				Oath.try(() =>
 					fetch(`${process.env.REACT_APP_DATA_HOST}/directories/${auth.sub}`, {
 						headers: { Authorization: `Bearer ${auth.accessToken}` },
-					}),
+					}).then(res => res.json()),
 				),
 			)
-			.chain(res => Oath.from(() => res.json()))
 			.chain(body => (body.success ? Oath.of(body.result) : Oath.reject(body.error)))
 			.fork(
 				error => error$.next(error),

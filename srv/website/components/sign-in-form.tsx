@@ -65,7 +65,6 @@ export default function SignInForm({ workspaceHost, idHost }: Props) {
 							.then(res => res.json())
 							.then(res => {
 								if (res.success) return window.location.replace(workspaceHost)
-								console.log(res)
 							})
 					}}
 				>

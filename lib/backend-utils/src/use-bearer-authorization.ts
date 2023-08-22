@@ -26,23 +26,24 @@ export const useBearerAuthorization = (
 				() => HttpError.Unauthorized("Authorization token not provided"),
 			),
 		)
-		.map(authorization => authorization.slice(7))
 		.chain(token =>
 			typeof tokenServiceOrIDHost === "string"
 				? verifyWithIdServer0(tokenServiceOrIDHost, token)
-				: verifyWithTokenService0(tokenServiceOrIDHost, token),
+				: verifyWithTokenService0(tokenServiceOrIDHost, token.slice(7)),
 		)
 
 const verifyWithIdServer0 = (idHost: string, authorization: string) =>
 	Oath.from(() =>
-		fetch(`${idHost}/verify-token`, { method: "POST", headers: { authorization } })
+		fetch(`${idHost}/verify-token`, {
+			method: "POST",
+			headers: { authorization },
+		})
 			.then(res => res.json())
+
 			.then(res => (res.success ? res.result : { valid: false })),
+	).chain(res =>
+		res.valid ? Oath.of(res.token) : Oath.reject(HttpError.Forbidden("Invalid token")),
 	)
-		.chain(res =>
-			res.success ? Oath.of(res.result) : Oath.reject(HttpError.Forbidden("Invalid token")),
-		)
-		.map(res => res.token)
 
 const verifyWithTokenService0 = (tokenService: TTokenService, token: string) =>
 	tokenService

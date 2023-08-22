@@ -11,7 +11,7 @@ import { __CommandPalette$ } from "$streams/command-palette"
 import { useStrictSubscription, useSubscription } from "$hooks/use-subscription"
 import { Nullable } from "@ordo-pink/tau"
 import { __Sidebar$ } from "$streams/sidebar"
-import { cmd } from "@ordo-pink/libfe"
+import { cmd } from "@ordo-pink/frontend-core"
 
 const commands = getCommands()
 

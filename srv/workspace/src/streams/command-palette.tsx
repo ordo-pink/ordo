@@ -6,7 +6,7 @@ import { BsCommand } from "react-icons/bs"
 import { Binary, Curry, Nullable, Thunk, Unary, callOnce } from "@ordo-pink/tau"
 import { Logger } from "@ordo-pink/logger"
 import { getCommands } from "$streams/commands"
-import { CommandPalette, cmd } from "@ordo-pink/libfe"
+import { CommandPalette, cmd } from "@ordo-pink/frontend-core"
 
 // TODO: Merge commands, command palette and context menu item creation
 

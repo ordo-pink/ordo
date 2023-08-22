@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 import { MouseEvent } from "react"
-import { ContextMenu } from "@ordo-pink/libfe"
+import { ContextMenu } from "@ordo-pink/frontend-core"
 import MenuItem from "$components/context-menu/context-menu-item"
 
 type _P = { items: ContextMenu.Item[]; event: MouseEvent; payload?: any }

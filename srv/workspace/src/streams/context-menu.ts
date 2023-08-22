@@ -8,7 +8,7 @@ import { Logger } from "@ordo-pink/logger"
 import { Either } from "@ordo-pink/either"
 import { getCommands } from "$streams/commands"
 import Null from "$components/null"
-import { cmd, ContextMenu } from "@ordo-pink/libfe"
+import { cmd, ContextMenu } from "@ordo-pink/frontend-core"
 
 const commands = getCommands()
 

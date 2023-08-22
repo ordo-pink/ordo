@@ -13,7 +13,7 @@ import { __CommandPalette$ } from "$streams/command-palette"
 import { useStrictSubscription, useSubscription } from "$hooks/use-subscription"
 import { useAccelerator } from "$hooks/use-accelerator"
 import { __Sidebar$ } from "$streams/sidebar"
-import { cmd } from "@ordo-pink/libfe"
+import { cmd } from "@ordo-pink/frontend-core"
 import { Either } from "@ordo-pink/either"
 
 type ShowContextMenu = Unary<MouseEvent<HTMLDivElement>, void>

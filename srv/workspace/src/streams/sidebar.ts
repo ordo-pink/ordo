@@ -6,7 +6,7 @@ import { BehaviorSubject, Observable } from "rxjs"
 import { Unary, callOnce } from "@ordo-pink/tau"
 import { getCommands } from "$streams/commands"
 import { Logger } from "@ordo-pink/logger"
-import { cmd } from "@ordo-pink/libfe"
+import { cmd } from "@ordo-pink/frontend-core"
 
 const commands = getCommands()
 

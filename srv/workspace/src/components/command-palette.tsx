@@ -12,7 +12,7 @@ import { getCommands } from "$streams/commands"
 import RenderFromNullable from "$components/render-from-nullable"
 import ActionListItem from "$components/action-list-item"
 import Accelerator from "$components/accelerator"
-import { CommandPalette } from "@ordo-pink/libfe"
+import { CommandPalette } from "@ordo-pink/frontend-core"
 
 const commands = getCommands()
 

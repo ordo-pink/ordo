@@ -6,7 +6,7 @@ import type { ComponentType } from "react"
 import { Nullable, Thunk, callOnce } from "@ordo-pink/tau"
 import { Logger } from "@ordo-pink/logger"
 import { getCommands } from "$streams/commands"
-import { cmd, Modal as TModal } from "@ordo-pink/libfe"
+import { cmd, Modal as TModal } from "@ordo-pink/frontend-core"
 
 const commands = getCommands()
 

@@ -9,7 +9,7 @@ import { __ContextMenu$ } from "$streams/context-menu"
 import ContextMenuItemList from "$components/context-menu/context-menu-item-list"
 import Null from "$components/null"
 import { getCommands } from "$streams/commands"
-import { ContextMenu as TContextMenu } from "@ordo-pink/libfe"
+import { ContextMenu as TContextMenu } from "@ordo-pink/frontend-core"
 
 const commands = getCommands()
 

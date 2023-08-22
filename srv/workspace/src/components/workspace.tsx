@@ -12,7 +12,7 @@ import Sidebar from "./sidebar"
 import { __CommandPalette$ } from "$streams/command-palette"
 import { __Sidebar$ } from "$streams/sidebar"
 import { useStrictSubscription } from "$hooks/use-subscription"
-import { cmd } from "@ordo-pink/libfe"
+import { cmd } from "@ordo-pink/frontend-core"
 
 // TODO: Render Welcome page if activity is null
 // TODO: Extract internal components to separate files

@@ -15,7 +15,7 @@ import { __initRouter } from "$streams/router"
 import CommandPaletteModal from "$components/command-palette"
 import { useSubscription } from "./use-subscription"
 import { useHotkeys } from "react-hotkeys-hook"
-import { cmd } from "@ordo-pink/libfe"
+import { cmd } from "@ordo-pink/frontend-core"
 
 const commands = getCommands()
 

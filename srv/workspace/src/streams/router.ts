@@ -5,7 +5,7 @@ import { Router } from "silkrouter"
 import { Unary, callOnce } from "@ordo-pink/tau"
 import { Logger } from "@ordo-pink/logger"
 import { getCommands } from "$streams/commands"
-import { cmd } from "@ordo-pink/libfe"
+import { cmd } from "@ordo-pink/frontend-core"
 
 // TODO: Consider moving to react-router
 

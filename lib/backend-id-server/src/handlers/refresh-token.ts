@@ -21,10 +21,10 @@ export const handleRefreshToken: Fn =
 	({ tokenService }) =>
 	async ctx =>
 		Oath.all({
-			sub: ctx.cookies.get("jti") ?? Oath.reject("Missing required cookies"),
-			prevJti: ctx.cookies.get("jti" ?? Oath.reject("Missing required cookies")),
+			sub: ctx.cookies.get("jti") ?? Oath.reject(HttpError.BadRequest("Missing required cookies")),
+			prevJti:
+				ctx.cookies.get("jti") ?? Oath.reject(HttpError.BadRequest("Missing required cookies")),
 		})
-			.rejectedMap(message => HttpError.BadRequest(message))
 			.chain(({ sub, prevJti }) =>
 				tokenService.repository
 					.getToken(sub, prevJti!)

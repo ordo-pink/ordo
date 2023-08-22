@@ -22,7 +22,7 @@ export const run = () =>
 		.map(getExistingPaths)
 		.chain(paths =>
 			Oath.all(
-				paths.map(path => runAsyncCommand0(`bun run ${path}`, { stdout: "pipe", stderr: "pipe" }))
-			).map(noop)
+				paths.map(path => runAsyncCommand0(`bun run ${path}`, { stdout: "pipe", stderr: "pipe" })),
+			).map(noop),
 		)
 		.orElse(console.error)

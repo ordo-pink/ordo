@@ -5,8 +5,8 @@ import i18next from "i18next"
 import LanguageDetector from "i18next-browser-languagedetector"
 import { initReactI18next } from "react-i18next"
 import { Subject, switchMap, of } from "rxjs"
-import { ISO_639_1_Locale } from "@ordo-pink/locale/mod"
-import { Unary, callOnce } from "@ordo-pink/tau/mod"
+import { ISO_639_1_Locale } from "@ordo-pink/locale"
+import { Unary, callOnce } from "@ordo-pink/tau"
 
 export type Bundle = Partial<Record<ISO_639_1_Locale, Record<string, string>>>
 

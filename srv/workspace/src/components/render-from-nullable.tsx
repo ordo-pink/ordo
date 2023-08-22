@@ -1,9 +1,9 @@
 // SPDX-FileCopyrightText: Copyright 2023, 谢尔盖||↓ and the Ordo.pink contributors
 // SPDX-License-Identifier: MIT
 
-import type { Nullable } from "@ordo-pink/tau/mod"
+import type { Nullable } from "@ordo-pink/tau"
 import { PropsWithChildren } from "react"
-import { Either } from "@ordo-pink/either/mod"
+import { Either } from "@ordo-pink/either"
 import Null from "$components/null"
 
 type _P<T = any> = PropsWithChildren<{ having: Nullable<T> }>

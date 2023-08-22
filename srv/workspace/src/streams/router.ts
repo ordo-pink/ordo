@@ -2,10 +2,10 @@
 // SPDX-License-Identifier: MIT
 
 import { Router } from "silkrouter"
-import { Unary, callOnce } from "@ordo-pink/tau/mod"
-import { Logger } from "@ordo-pink/logger/mod"
+import { Unary, callOnce } from "@ordo-pink/tau"
+import { Logger } from "@ordo-pink/logger"
 import { getCommands } from "$streams/commands"
-import { cmd } from "@ordo-pink/libfe/mod"
+import { cmd } from "@ordo-pink/libfe"
 
 // TODO: Consider moving to react-router
 

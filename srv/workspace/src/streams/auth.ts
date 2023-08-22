@@ -1,16 +1,16 @@
 // SPDX-FileCopyrightText: Copyright 2023, 谢尔盖||↓ and the Ordo.pink contributors
 // SPDX-License-Identifier: MIT
 
-import type { AuthResponse } from "@ordo-pink/backend-id-server/mod"
-import type { User } from "@ordo-pink/backend-user-service/mod"
-import type { Directory, File } from "@ordo-pink/backend-data-service/mod"
+import type { AuthResponse } from "@ordo-pink/backend-id-server"
+import type { User } from "@ordo-pink/backend-user-service"
+import type { Directory, File } from "@ordo-pink/backend-data-service"
 import { AiOutlineLogout } from "react-icons/ai"
 import { BehaviorSubject } from "rxjs"
-import { callOnce, Unary, Nullable } from "@ordo-pink/tau/mod"
-import { cmd } from "@ordo-pink/libfe/mod"
-import { Either } from "@ordo-pink/either/mod"
-import { Logger } from "@ordo-pink/logger/mod"
-import { Oath } from "@ordo-pink/oath/mod"
+import { callOnce, Unary, Nullable } from "@ordo-pink/tau"
+import { cmd } from "@ordo-pink/libfe"
+import { Either } from "@ordo-pink/either"
+import { Logger } from "@ordo-pink/logger"
+import { Oath } from "@ordo-pink/oath"
 import { useSubscription } from "$hooks/use-subscription"
 import { getCommands } from "$streams/commands"
 

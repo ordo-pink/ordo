@@ -3,9 +3,9 @@
 
 // deno-lint-ignore-file no-explicit-any
 
-import { Either, TEither } from "@ordo-pink/either/mod"
+import { Either, TEither } from "@ordo-pink/either"
 import isEmail from "validator/es/lib/isEmail"
-import { okpwd } from "@ordo-pink/okpwd/mod"
+import { okpwd } from "@ordo-pink/okpwd"
 import { ChangeEventHandler } from "react"
 
 type InputProps = {

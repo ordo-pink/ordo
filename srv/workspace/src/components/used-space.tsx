@@ -3,7 +3,7 @@
 
 import { useEffect, useState } from "react"
 import { useMetadata } from "../streams/auth"
-import { noop } from "@ordo-pink/tau/mod"
+import { noop } from "@ordo-pink/tau"
 import Null from "./null"
 
 // TODO: Move to user info

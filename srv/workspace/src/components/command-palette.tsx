@@ -5,14 +5,14 @@ import { ChangeEvent, KeyboardEvent, useEffect, useState } from "react"
 import { useHotkeys } from "react-hotkeys-hook"
 import { BsSearch } from "react-icons/bs"
 import Fuse from "fuse.js"
-import { Switch } from "@ordo-pink/switch/mod"
-import { noop } from "@ordo-pink/tau/mod"
+import { Switch } from "@ordo-pink/switch"
+import { noop } from "@ordo-pink/tau"
 import { useAccelerator } from "$hooks/use-accelerator"
 import { getCommands } from "$streams/commands"
 import RenderFromNullable from "$components/render-from-nullable"
 import ActionListItem from "$components/action-list-item"
 import Accelerator from "$components/accelerator"
-import { CommandPalette } from "@ordo-pink/libfe/mod"
+import { CommandPalette } from "@ordo-pink/libfe"
 
 const commands = getCommands()
 

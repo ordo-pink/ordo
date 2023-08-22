@@ -3,10 +3,10 @@
 
 import { BehaviorSubject, map, merge, Observable, scan, shareReplay, Subject } from "rxjs"
 import { BsCommand } from "react-icons/bs"
-import { Binary, Curry, Nullable, Thunk, Unary, callOnce } from "@ordo-pink/tau/mod"
-import { Logger } from "@ordo-pink/logger/mod"
+import { Binary, Curry, Nullable, Thunk, Unary, callOnce } from "@ordo-pink/tau"
+import { Logger } from "@ordo-pink/logger"
 import { getCommands } from "$streams/commands"
-import { CommandPalette, cmd } from "@ordo-pink/libfe/mod"
+import { CommandPalette, cmd } from "@ordo-pink/libfe"
 
 // TODO: Merge commands, command palette and context menu item creation
 

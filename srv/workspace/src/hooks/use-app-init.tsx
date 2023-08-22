@@ -2,8 +2,8 @@
 // SPDX-License-Identifier: MIT
 
 import { useEffect, useState } from "react"
-import { ConsoleLogger } from "@ordo-pink/logger/mod"
-import { Nullable } from "@ordo-pink/tau/mod"
+import { ConsoleLogger } from "@ordo-pink/logger"
+import { Nullable } from "@ordo-pink/tau"
 import { __initAuth } from "$streams/auth"
 import { __ContextMenu$, __initContextMenu } from "$streams/context-menu"
 import { initActivities, initExtensions } from "$streams/extensions"
@@ -15,7 +15,7 @@ import { __initRouter } from "$streams/router"
 import CommandPaletteModal from "$components/command-palette"
 import { useSubscription } from "./use-subscription"
 import { useHotkeys } from "react-hotkeys-hook"
-import { cmd } from "@ordo-pink/libfe/mod"
+import { cmd } from "@ordo-pink/libfe"
 
 const commands = getCommands()
 

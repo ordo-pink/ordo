@@ -9,9 +9,9 @@ import UsedSpace from "$components/used-space"
 import Null from "$components/null"
 import { __CommandPalette$ } from "$streams/command-palette"
 import { useStrictSubscription, useSubscription } from "$hooks/use-subscription"
-import { Nullable } from "@ordo-pink/tau/mod"
-import { ShowContextMenuP } from "$streams/context-menu"
+import { Nullable } from "@ordo-pink/tau"
 import { __Sidebar$ } from "$streams/sidebar"
+import { cmd } from "@ordo-pink/libfe"
 
 const commands = getCommands()
 
@@ -28,12 +28,14 @@ export default function Sidebar({ children, isNarrow, commandPalette$, sidebar$ 
 
 	const onSidebarClick = () => {
 		if (!isNarrow || sidebar.disabled || sidebar.sizes[0] === 0) return
-		commands.emit("sidebar.set-size", [0, 100])
+		commands.emit<cmd.sidebar.setSize>("sidebar.set-size", [0, 100])
 	}
 
-	const openCommandPalette = () => commands.emit("command-palette.show", commandPaletteItems)
+	const openCommandPalette = () =>
+		commandPaletteItems &&
+		commands.emit<cmd.commandPalette.show>("command-palette.show", commandPaletteItems)
 	const showContextMenu = (event: MouseEvent<HTMLDivElement>) =>
-		commands.emit<ShowContextMenuP>("context-menu.show", { event })
+		commands.emit<cmd.contextMenu.show>("context-menu.show", { event })
 
 	return (
 		<div

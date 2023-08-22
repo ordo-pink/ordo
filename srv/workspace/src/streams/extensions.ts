@@ -5,11 +5,11 @@ import { map, switchMap, scan, shareReplay } from "rxjs/operators"
 import { BehaviorSubject, of, merge, Subject } from "rxjs"
 import { ComponentType } from "react"
 import { Router as Silkrouter, operators } from "silkrouter"
-import { Binary, Curry, Nullable, Thunk, Unary, callOnce } from "@ordo-pink/tau/mod"
-import { File, FileExtension } from "@ordo-pink/backend-data-service/mod"
-import { Logger } from "@ordo-pink/logger/mod"
+import { Binary, Curry, Nullable, Thunk, Unary, callOnce } from "@ordo-pink/tau"
+import { File, FileExtension } from "@ordo-pink/backend-data-service"
+import { Logger } from "@ordo-pink/logger"
 import { useStrictSubscription, useSubscription } from "$hooks/use-subscription"
-import { Router } from "@ordo-pink/libfe/mod"
+import { Router } from "@ordo-pink/libfe"
 
 const { route, noMatch } = operators
 

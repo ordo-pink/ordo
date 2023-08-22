@@ -10,7 +10,7 @@ import {
 	BsCheckCircle,
 	BsCircle,
 } from "react-icons/bs"
-import { Switch } from "@ordo-pink/switch/mod"
+import { Switch } from "@ordo-pink/switch"
 
 type Props = {
 	type?: "info" | "warn" | "error" | "success" | "question"

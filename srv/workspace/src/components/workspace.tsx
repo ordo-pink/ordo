@@ -1,11 +1,10 @@
 // SPDX-FileCopyrightText: Copyright 2023, 谢尔盖||↓ and the Ordo.pink contributors
 // SPDX-License-Identifier: MIT
 
-import type { Unary, Nullable } from "#lib/tau/mod"
-
+import type { Unary, Nullable } from "@ordo-pink/tau"
 import { useState, useEffect } from "react"
 import Split from "react-split"
-import { Either } from "#lib/either/mod"
+import { Either } from "@ordo-pink/either"
 import { useWindowSize } from "../hooks/use-window-size"
 import { useCurrentActivity, Activity } from "../streams/extensions"
 import { getCommands } from "$streams/commands"
@@ -13,6 +12,7 @@ import Sidebar from "./sidebar"
 import { __CommandPalette$ } from "$streams/command-palette"
 import { __Sidebar$ } from "$streams/sidebar"
 import { useStrictSubscription } from "$hooks/use-subscription"
+import { cmd } from "@ordo-pink/libfe"
 
 // TODO: Render Welcome page if activity is null
 // TODO: Extract internal components to separate files
@@ -66,7 +66,7 @@ const EnabledSidebar = ({ sidebar$, activity, commandPalette$ }: EnabledSidebarP
 
 	useEffect(() => {
 		const isNarrow = windowWidth < 768
-		commands.emit("sidebar.set-size", isNarrow ? [0, 100] : [25, 75])
+		commands.emit<cmd.sidebar.setSize>("sidebar.set-size", isNarrow ? [0, 100] : [25, 75])
 
 		setIsNarrow(isNarrow)
 	}, [windowWidth])
@@ -100,7 +100,7 @@ const EnabledSidebar = ({ sidebar$, activity, commandPalette$ }: EnabledSidebarP
 			newRight = 0
 		}
 
-		commands.emit("sidebar.set-size", [newLeft, newRight])
+		commands.emit<cmd.sidebar.setSize>("sidebar.set-size", [newLeft, newRight])
 	}
 
 	return Either.fromNullable(activity).fold(

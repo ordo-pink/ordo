@@ -25,7 +25,7 @@ export namespace cmd {
 	export namespace sidebar {
 		export type enable = { name: "sidebar.enable" }
 		export type disable = { name: "sidebar.disable" }
-		export type setSize = { name: "sidebar.set-size"; payload?: [number, number] }
+		export type setSize = { name: "sidebar.set-size"; payload: [number, number] }
 		export type show = { name: "sidebar.show"; payload?: [number, number] }
 		export type hide = { name: "sidebar.hide" }
 		export type toggle = { name: "sidebar.toggle" }

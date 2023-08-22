@@ -3,10 +3,10 @@
 
 import { AiOutlineLeft, AiOutlineLayout, AiOutlineRight } from "react-icons/ai"
 import { BehaviorSubject, Observable } from "rxjs"
-import { Unary, callOnce } from "@ordo-pink/tau/mod"
+import { Unary, callOnce } from "@ordo-pink/tau"
 import { getCommands } from "$streams/commands"
-import { Logger } from "@ordo-pink/logger/mod"
-import { cmd } from "@ordo-pink/libfe/mod"
+import { Logger } from "@ordo-pink/logger"
+import { cmd } from "@ordo-pink/libfe"
 
 const commands = getCommands()
 

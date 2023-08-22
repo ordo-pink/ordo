@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: Copyright 2023, 谢尔盖||↓ and the Ordo.pink contributors
 // SPDX-License-Identifier: MIT
 
-import { Optional } from "@ordo-pink/tau/mod"
+import { Optional } from "@ordo-pink/tau"
 import { HotkeyCallback, useHotkeys } from "react-hotkeys-hook"
 
 export const useAccelerator = (accelerator: Optional<string>, callback: HotkeyCallback) => {

@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: Copyright 2023, 谢尔盖||↓ and the Ordo.pink contributors
 // SPDX-License-Identifier: MIT
 
-import { Either } from "@ordo-pink/either/mod"
+import { Either } from "@ordo-pink/either"
 import { useAccelerator } from "$hooks/use-accelerator"
 import { getCommands } from "$streams/commands"
 import RenderFromNullable from "$components/render-from-nullable"

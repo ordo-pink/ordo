@@ -21,7 +21,7 @@ export const handleRefreshToken: Fn =
 	({ tokenService }) =>
 	async ctx =>
 		Oath.all({
-			sub: ctx.cookies.get("jti") ?? Oath.reject(HttpError.BadRequest("Missing required cookies")),
+			sub: ctx.cookies.get("sub") ?? Oath.reject(HttpError.BadRequest("Missing required cookies")),
 			prevJti:
 				ctx.cookies.get("jti") ?? Oath.reject(HttpError.BadRequest("Missing required cookies")),
 		})

@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: Copyright 2023, 谢尔盖||↓ and the Ordo.pink contributors
 // SPDX-License-Identifier: MIT
 
-import type { TDataService } from "@ordo-pink/backend-data-service"
+import { FileModel, type TDataService } from "@ordo-pink/backend-data-service"
 import type { Unary } from "@ordo-pink/tau"
 import type { SUB } from "@ordo-pink/backend-token-service"
 import type * as T from "@ordo-pink/backend-data-service"
@@ -99,6 +99,8 @@ const service: Fn = ({ metadataRepository, dataRepository }) => ({
 				createdFile.createdAt = createdFile.updatedAt = date
 				createdFile.createdBy = createdFile.updatedBy = sub
 				createdFile.encryption = encryption
+				createdFile.links = []
+				createdFile.labels = []
 
 				return createdFile
 			})
@@ -137,7 +139,43 @@ const service: Fn = ({ metadataRepository, dataRepository }) => ({
 				dataRepository.update({ sub, fsid: file.fsid, content }).map(size => ({ ...file, size })),
 			)
 			.chain(file => metadataRepository.file.update({ sub, file, path: file.path })),
-	updateFile: metadataRepository.file.update,
+	updateFile: ({ file, path, sub }) =>
+		metadataRepository.file
+			.exists({ path, sub })
+			.chain(exists =>
+				Oath.fromBoolean(
+					() => exists,
+					() => path,
+					() => new Error("File not found"),
+				),
+			)
+			.chain(path => metadataRepository.file.read({ path, sub }))
+			.chain(file => Oath.fromNullable(file).rejectedMap(() => new Error("File not found")))
+			.map(
+				oldFile =>
+					({
+						createdAt: oldFile.createdAt,
+						updatedAt: new Date(Date.now()),
+						createdBy: oldFile.createdBy,
+						updatedBy: sub,
+						encryption: oldFile.encryption,
+						fsid: oldFile.fsid,
+						labels:
+							file.labels && Array.isArray(file.labels)
+								? Array.from(new Set(file.labels))
+								: oldFile.labels,
+						links:
+							file.links && Array.isArray(file.links)
+								? Array.from(new Set(file.links))
+								: oldFile.links,
+						path:
+							file.path && file.path !== oldFile.path && FileModel.isValidPath(file.path)
+								? file.path
+								: oldFile.path,
+						size: oldFile.size,
+					} satisfies File),
+			)
+			.chain(file => metadataRepository.file.update({ file, path, sub })),
 })
 
 export const BackendDataService = {

@@ -58,6 +58,8 @@ export class FileModel<CustomMetadata extends Record<string, unknown> = Record<s
 		updatedAt = new Date(Date.now()),
 		metadata: CustomMetadata = {} as CustomMetadata,
 		encryption: string | false = false,
+		labels: string[] = [],
+		links: FSID[] = [],
 	) {
 		if (!FileModel.isValidPath(path)) throw new Error("Invalid file path")
 		if (size < 0) throw new Error("Invalid file size")
@@ -75,6 +77,8 @@ export class FileModel<CustomMetadata extends Record<string, unknown> = Record<s
 			updatedBy,
 			metadata,
 			encryption,
+			labels,
+			links,
 		)
 	}
 
@@ -205,6 +209,8 @@ export class FileModel<CustomMetadata extends Record<string, unknown> = Record<s
 	#updatedBy: SUB
 	#metadata: CustomMetadata
 	#encryption: string | false
+	#labels: string[]
+	#links: FSID[]
 
 	/**
 	 * @constructor
@@ -219,6 +225,8 @@ export class FileModel<CustomMetadata extends Record<string, unknown> = Record<s
 		updatedBy: SUB,
 		metadata: CustomMetadata,
 		encryption: string | false,
+		labels: string[],
+		links: FSID[],
 	) {
 		this.#path = path
 		this.#fsid = fsid
@@ -229,6 +237,8 @@ export class FileModel<CustomMetadata extends Record<string, unknown> = Record<s
 		this.#updatedBy = updatedBy
 		this.#metadata = metadata
 		this.#encryption = encryption
+		this.#labels = labels
+		this.#links = links
 	}
 
 	/**
@@ -368,6 +378,8 @@ export class FileModel<CustomMetadata extends Record<string, unknown> = Record<s
 			createdBy: this.#createdBy,
 			updatedBy: this.#updatedBy,
 			encryption: this.#encryption,
+			labels: this.#labels,
+			links: this.#links,
 		}
 	}
 }

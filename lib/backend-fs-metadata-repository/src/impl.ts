@@ -25,22 +25,17 @@ const of: Fn = ({ root }) => ({
 	_internal: {
 		createUserSpace: sub =>
 			Oath.of(resolve(root, sub)).chain(path =>
-				Oath.of(path)
-					.map(() => new TextEncoder())
-					.map(encoder =>
-						encoder.encode(
-							JSON.stringify([
-								{
-									path: "/",
-									createdAt: new Date(Date.now()),
-									updatedAt: new Date(Date.now()),
-									createdBy: sub,
-									updatedBy: sub,
-								},
-							]),
-						),
-					)
-					.chain(data => writeFile0(resolve(path), data)),
+				Oath.of(
+					JSON.stringify([
+						{
+							path: "/",
+							createdAt: new Date(Date.now()),
+							updatedAt: new Date(Date.now()),
+							createdBy: sub,
+							updatedBy: sub,
+						},
+					]),
+				).chain(data => writeFile0(resolve(path), data)),
 			),
 	},
 	directory: {
@@ -143,9 +138,7 @@ const getUserMetadata0: GetUserMetadataFn = ({ root, sub }) =>
 type SetUserMetadataParams = { root: string; sub: SUB; content: Array<Directory | File> }
 type SetUserMetadataFn = Unary<SetUserMetadataParams, Oath<void, Error>>
 const setUserMetadata0: SetUserMetadataFn = ({ root, sub, content }) =>
-	Oath.of(JSON.stringify(content))
-		.map(str => new TextEncoder().encode(str))
-		.chain(arr => writeFile0(resolve(root, sub), arr, "utf-8"))
+	Oath.of(JSON.stringify(content)).chain(arr => writeFile0(resolve(root, sub), arr, "utf-8"))
 
 // ---
 

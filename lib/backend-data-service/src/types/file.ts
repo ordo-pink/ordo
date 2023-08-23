@@ -38,6 +38,8 @@ export type File<CustomMetadata extends Record<string, unknown> = Record<string,
 		createdBy: SUB
 		updatedBy: SUB
 		encryption: string | false
+		links: FSID[]
+		labels: string[]
 	}
 
 /**

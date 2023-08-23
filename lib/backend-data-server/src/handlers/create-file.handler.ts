@@ -24,10 +24,10 @@ export const handleCreateFile: Unary<
 			.map(prop("payload"))
 			.chain(({ sub }) =>
 				useBody<FileCreateParams>(ctx)
-					.chain(() =>
+					.chain(body =>
 						Oath.fromBoolean(
-							() => FileModel.isValidPath(ctx.params.path),
-							() => ctx.params,
+							() => FileModel.isValidPath(body.path),
+							() => body,
 							() => HttpError.BadRequest("Invalid file path"),
 						),
 					)

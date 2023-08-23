@@ -173,7 +173,7 @@ const service: Fn = ({ metadataRepository, dataRepository }) => ({
 								? file.path
 								: oldFile.path,
 						size: oldFile.size,
-					} satisfies File),
+					}) satisfies File,
 			)
 			.chain(file => metadataRepository.file.update({ file, path, sub })),
 })

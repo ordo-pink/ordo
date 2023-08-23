@@ -129,7 +129,7 @@ export class Oath<TRight, TLeft = never> {
 				keys.forEach(key => {
 					const value = (values as any)[key] as any
 
-					if (value.isOath) {
+					if (value && value.isOath) {
 						value.fork(
 							(e: any) => {
 								if (!rejected) {
@@ -146,7 +146,7 @@ export class Oath<TRight, TLeft = never> {
 								if (resolvedLength === keys.length) outerResolve(resolvedValues)
 							},
 						)
-					} else if (value.then) {
+					} else if (value && value.then) {
 						value.then(
 							(s: any) => {
 								if (rejected) return

@@ -9,11 +9,12 @@ import type { Readable } from "stream"
 import type { Middleware } from "koa"
 import type { Unary } from "@ordo-pink/tau"
 import { prop } from "ramda"
-import { FileModel, FilePath, TDataService } from "@ordo-pink/backend-data-service"
+import { TDataService } from "@ordo-pink/backend-data-service"
 import { sendError, useBearerAuthorization } from "@ordo-pink/backend-utils"
 import { HttpError } from "@ordo-pink/rrr"
 import { Oath } from "@ordo-pink/oath"
 import { pathParamToFilePath } from "../utils"
+import { FilePath, FileUtils } from "@ordo-pink/datautil"
 
 // --- Public ---
 
@@ -29,7 +30,7 @@ export const handleUpdateFileContent: Unary<
 				Oath.of(ctx.params.path ? pathParamToFilePath(ctx.params.path) : "/")
 					.chain(path =>
 						Oath.fromBoolean(
-							() => FileModel.isValidPath(path),
+							() => FileUtils.isValidPath(path),
 							() => path as FilePath,
 							() => HttpError.BadRequest("Invalid file path"),
 						),

@@ -9,10 +9,11 @@ import type { Readable } from "stream"
 import type { Middleware } from "koa"
 import type { Unary } from "@ordo-pink/tau"
 import { prop } from "ramda"
-import { FileCreateParams, FileModel, TDataService } from "@ordo-pink/backend-data-service"
+import { TDataService } from "@ordo-pink/backend-data-service"
 import { sendError, useBearerAuthorization, useBody } from "@ordo-pink/backend-utils"
 import { HttpError } from "@ordo-pink/rrr"
 import { Oath } from "@ordo-pink/oath"
+import { CreateFileParams, FileUtils } from "@ordo-pink/datautil"
 
 export const handleCreateFile: Unary<
 	{ dataService: TDataService<Readable>; idHost: string },
@@ -23,17 +24,17 @@ export const handleCreateFile: Unary<
 		useBearerAuthorization(ctx, idHost)
 			.map(prop("payload"))
 			.chain(({ sub }) =>
-				useBody<FileCreateParams>(ctx)
+				useBody<CreateFileParams>(ctx)
 					.chain(body =>
 						Oath.fromBoolean(
-							() => FileModel.isValidPath(body.path),
+							() => FileUtils.isValidPath(body.path),
 							() => body,
 							() => HttpError.BadRequest("Invalid file path"),
 						),
 					)
-					.chain(file =>
+					.chain(params =>
 						dataService
-							.createFile({ sub, file })
+							.createFile({ sub, params })
 							.rejectedMap(() => HttpError.Conflict("File already exists")),
 					),
 			)

@@ -9,11 +9,12 @@ import type { Readable } from "stream"
 import type { Middleware } from "koa"
 import type { Unary } from "@ordo-pink/tau"
 import { prop } from "ramda"
-import { DirectoryModel, TDataService } from "@ordo-pink/backend-data-service"
+import { TDataService } from "@ordo-pink/backend-data-service"
 import { sendError, useBearerAuthorization } from "@ordo-pink/backend-utils"
 import { HttpError } from "@ordo-pink/rrr"
 import { Oath } from "@ordo-pink/oath"
 import { pathParamToDirectoryPath } from "../utils"
+import { DirectoryUtils } from "@ordo-pink/datautil"
 
 export const handleGetDirectory: Unary<
 	{ dataService: TDataService<Readable>; idHost: string },
@@ -27,7 +28,7 @@ export const handleGetDirectory: Unary<
 				Oath.of(ctx.params.path ? pathParamToDirectoryPath(ctx.params.path) : "/")
 					.chain(path =>
 						Oath.fromBoolean(
-							() => DirectoryModel.isValidPath(path),
+							() => DirectoryUtils.isValidPath(path),
 							() => path,
 							() => HttpError.BadRequest("Invalid directory path"),
 						),

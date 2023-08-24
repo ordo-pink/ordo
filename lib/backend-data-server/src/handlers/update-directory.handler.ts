@@ -9,16 +9,12 @@ import type { Readable } from "stream"
 import type { Middleware } from "koa"
 import type { Unary } from "@ordo-pink/tau"
 import { prop } from "ramda"
-import {
-	Directory,
-	DirectoryModel,
-	DirectoryPath,
-	TDataService,
-} from "@ordo-pink/backend-data-service"
+import { TDataService } from "@ordo-pink/backend-data-service"
 import { sendError, useBearerAuthorization, useBody } from "@ordo-pink/backend-utils"
 import { HttpError } from "@ordo-pink/rrr"
 import { Oath } from "@ordo-pink/oath"
 import { pathParamToDirectoryPath } from "../utils"
+import { DirectoryPath, DirectoryUtils, UpdateDirectoryParams } from "@ordo-pink/datautil"
 
 export const handleUpdateDirectory: Unary<
 	{ dataService: TDataService<Readable>; idHost: string },
@@ -32,15 +28,15 @@ export const handleUpdateDirectory: Unary<
 				Oath.of(ctx.params.path ? pathParamToDirectoryPath(ctx.params.path) : "/")
 					.chain(path =>
 						Oath.fromBoolean(
-							() => DirectoryModel.isValidPath(path),
+							() => DirectoryUtils.isValidPath(path),
 							() => path as DirectoryPath,
 							() => HttpError.BadRequest("Invalid directory path"),
 						),
 					)
 					.chain(path =>
-						useBody<Directory>(ctx).chain(content =>
+						useBody<UpdateDirectoryParams>(ctx).chain(content =>
 							dataService
-								.updateDirectory({ sub, path, content })
+								.updateDirectory({ sub, path, params: content })
 								.chain(Oath.fromNullable)
 								.rejectedMap(() => HttpError.NotFound("Directory not found")),
 						),

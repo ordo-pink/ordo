@@ -17,13 +17,13 @@ export type FSDataRepository<TReadContent, TWriteContent = TReadContent> = {
 type FileExistsParams = { sub: SUB; fsid: FSID }
 type FileExistsFn = Unary<FileExistsParams, Oath<boolean>>
 
-type FileCreateParams<TWriteContent> = {
+type CreateFileParams<TWriteContent> = {
 	sub: SUB
 	path: FilePath
 	encryption?: string | false
 	content?: TWriteContent
 }
-type FileCreateFn<TWriteContent> = Unary<FileCreateParams<TWriteContent>, Oath<FSID, Error>>
+type FileCreateFn<TWriteContent> = Unary<CreateFileParams<TWriteContent>, Oath<FSID, Error>>
 
 type FileReadParams = { sub: SUB; fsid: FSID; encryption?: string | false }
 type FileReadFn<TReadContent> = Unary<FileReadParams, Oath<Nullable<TReadContent>, Error>>

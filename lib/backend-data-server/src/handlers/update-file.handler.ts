@@ -9,11 +9,12 @@ import type { Readable } from "stream"
 import type { Middleware } from "koa"
 import type { Unary } from "@ordo-pink/tau"
 import { prop } from "ramda"
-import { File, FileModel, FilePath, TDataService } from "@ordo-pink/backend-data-service"
+import { TDataService } from "@ordo-pink/backend-data-service"
 import { sendError, useBearerAuthorization, useBody } from "@ordo-pink/backend-utils"
 import { Oath } from "@ordo-pink/oath"
 import { HttpError } from "@ordo-pink/rrr"
 import { pathParamToFilePath } from "../utils"
+import { UpdateFileParams, FilePath, FileUtils } from "@ordo-pink/datautil"
 
 // --- Public ---
 
@@ -29,15 +30,15 @@ export const handleUpdateFile: Unary<
 				Oath.of(ctx.params.path ? pathParamToFilePath(ctx.params.path) : "/")
 					.chain(path =>
 						Oath.fromBoolean(
-							() => FileModel.isValidPath(path),
+							() => FileUtils.isValidPath(path),
 							() => path as FilePath,
 							() => HttpError.BadRequest("Invalid file path"),
 						),
 					)
 					.chain(path =>
-						useBody<File>(ctx).chain(file =>
+						useBody<UpdateFileParams>(ctx).chain(params =>
 							dataService
-								.updateFile({ sub, path, file })
+								.updateFile({ sub, path, params })
 								.chain(Oath.fromNullable)
 								.rejectedMap(() => HttpError.NotFound("File not found")),
 						),

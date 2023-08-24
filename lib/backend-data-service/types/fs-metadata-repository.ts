@@ -2,10 +2,18 @@
 // SPDX-License-Identifier: MIT
 
 import { SUB } from "@ordo-pink/backend-token-service"
+import {
+	CreateDirectoryParams,
+	CreateFileParams,
+	Directory,
+	DirectoryPath,
+	File,
+	FilePath,
+	UpdateDirectoryParams,
+	UpdateFileParams,
+} from "@ordo-pink/datautil"
 import { Oath } from "@ordo-pink/oath"
 import { Nullable, Unary } from "@ordo-pink/tau"
-import { DirectoryPath, Directory } from "../src/types/directory"
-import { File, FilePath } from "../src/types/file"
 
 export type FSMetadataRepository = {
 	directory: {
@@ -30,23 +38,8 @@ type DirectoryExistsFn = Unary<DirectoryExistsParams, Oath<boolean>>
 type FileExistsParams = { sub: SUB; path: FilePath }
 type FileExistsFn = Unary<FileExistsParams, Oath<boolean>>
 
-type DirectoryCreateParams<T extends Record<string, unknown> = Record<string, unknown>> = {
-	sub: SUB
-	path: DirectoryPath
-	content: Directory<T>
-}
-type DirectoryCreateFn = <T extends Record<string, unknown> = Record<string, unknown>>(
-	params: DirectoryCreateParams<T>,
-) => Oath<Directory, Error>
-
-type FileCreateParams<T extends Record<string, unknown> = Record<string, unknown>> = {
-	sub: SUB
-	path: FilePath
-	content: File<T>
-}
-type FileCreateFn = <T extends Record<string, unknown> = Record<string, unknown>>(
-	params: FileCreateParams<T>,
-) => Oath<File, Error>
+type DirectoryCreateFn = (params: CreateDirectoryParams) => Oath<Directory, Error>
+type FileCreateFn = (params: CreateFileParams) => Oath<File, Error>
 
 type DirectoryReadParams = { sub: SUB; path: DirectoryPath; depth?: number }
 type DirectoryReadFn = Unary<DirectoryReadParams, Oath<Nullable<Directory>, Error>>
@@ -54,23 +47,8 @@ type DirectoryReadFn = Unary<DirectoryReadParams, Oath<Nullable<Directory>, Erro
 type FileReadParams = { sub: SUB; path: FilePath }
 type FileReadFn = Unary<FileReadParams, Oath<Nullable<File>, Error>>
 
-type DirectoryUpdateParams<T extends Record<string, unknown> = Record<string, unknown>> = {
-	sub: SUB
-	path: DirectoryPath
-	content: Directory<T>
-}
-type DirectoryUpdateFn = <T extends Record<string, unknown> = Record<string, unknown>>(
-	params: DirectoryUpdateParams<T>,
-) => Oath<Nullable<Directory>, Error>
-
-type FileUpdateParams<T extends Record<string, unknown> = Record<string, unknown>> = {
-	sub: SUB
-	path: FilePath
-	content: File<T>
-}
-type FileUpdateFn = <T extends Record<string, unknown> = Record<string, unknown>>(
-	params: FileUpdateParams<T>,
-) => Oath<Nullable<File>, Error>
+type DirectoryUpdateFn = (params: UpdateDirectoryParams) => Oath<Nullable<Directory>, Error>
+type FileUpdateFn = (params: UpdateFileParams) => Oath<Nullable<File>, Error>
 
 type DirectoryDeleteParams = { sub: SUB; path: DirectoryPath; depth?: number }
 type DirectoryDeleteFn = Unary<DirectoryDeleteParams, Oath<Nullable<Directory>, Error>>

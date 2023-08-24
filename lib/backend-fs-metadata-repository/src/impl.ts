@@ -5,19 +5,14 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-import {
-	FileModel,
-	type Directory,
-	type DirectoryWithChildren,
-	type File,
-	type MetadataRepository,
-} from "@ordo-pink/backend-data-service"
+import { type MetadataRepository } from "@ordo-pink/backend-data-service"
 import type { SUB } from "@ordo-pink/backend-token-service"
-import type { Binary, Unary } from "@ordo-pink/tau"
+import type { Unary } from "@ordo-pink/tau"
 
-import { getParentPath, readFile0, writeFile0 } from "@ordo-pink/fs"
+import { readFile0, writeFile0 } from "@ordo-pink/fs"
 import { resolve } from "path"
 import { Oath } from "@ordo-pink/oath"
+import { Directory, File } from "@ordo-pink/datautil"
 
 // --- Public ---
 
@@ -73,12 +68,6 @@ const of: Fn = ({ root }) => ({
 			getUserMetadata0({ root, sub })
 				.map(metadata => metadata.some(item => item.path === path))
 				.fix(() => false),
-		readWithChildren: ({ path, sub }) =>
-			getUserMetadata0({ root, sub }).chain(items =>
-				Oath.of(items.find(item => item.path === path)).map(directory =>
-					createDirectoryTree(items, directory as Directory),
-				),
-			),
 	},
 	file: {
 		create: ({ file, path, sub }) =>
@@ -139,23 +128,3 @@ type SetUserMetadataParams = { root: string; sub: SUB; content: Array<Directory 
 type SetUserMetadataFn = Unary<SetUserMetadataParams, Oath<void, Error>>
 const setUserMetadata0: SetUserMetadataFn = ({ root, sub, content }) =>
 	Oath.of(JSON.stringify(content)).chain(arr => writeFile0(resolve(root, sub), arr, "utf-8"))
-
-// ---
-
-type CreateDirectoryTreeFn = Binary<Array<File | Directory>, Directory, DirectoryWithChildren>
-const createDirectoryTree: CreateDirectoryTreeFn = (items, directory) => {
-	const neededItems = items.filter(item => item.path.startsWith(directory.path))
-	const directoryWithChildren: DirectoryWithChildren = { ...directory, children: [] }
-
-	for (const item of neededItems) {
-		if (getParentPath(item.path) === directory.path) {
-			if (FileModel.isValidPath(item.path)) {
-				directoryWithChildren.children.push(item as File)
-			} else {
-				directoryWithChildren.children.push(createDirectoryTree(neededItems, item as Directory))
-			}
-		}
-	}
-
-	return directoryWithChildren
-}

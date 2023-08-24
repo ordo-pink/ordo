@@ -2,10 +2,9 @@
 // SPDX-License-Identifier: MIT
 
 import { SUB } from "@ordo-pink/backend-token-service"
+import { Directory, DirectoryPath, File, FilePath } from "@ordo-pink/datautil"
 import { Oath } from "@ordo-pink/oath"
 import { Nullable, Unary } from "@ordo-pink/tau"
-import { DirectoryPath, Directory, DirectoryWithChildren } from "./directory"
-import { FilePath, File } from "./file"
 
 // --- Public ---
 
@@ -20,7 +19,6 @@ export type MetadataRepository = {
 		create: DirectoryCreateFn
 		update: DirectoryUpdateFn
 		delete: DirectoryDeleteFn
-		readWithChildren: DirectoryGetWithChildrenFn
 		getRoot: GetRootFn
 	}
 	file: {
@@ -40,23 +38,13 @@ type DirectoryExistsFn = Unary<DirectoryExistsParams, Oath<boolean>>
 type FileExistsParams = { sub: SUB; path: FilePath }
 type FileExistsFn = Unary<FileExistsParams, Oath<boolean>>
 
-type DirectoryCreateParams<T extends Record<string, unknown> = Record<string, unknown>> = {
+type DirectoryCreateFn = (params: {
 	sub: SUB
 	path: DirectoryPath
-	directory: Directory<T>
-}
-type DirectoryCreateFn = <T extends Record<string, unknown> = Record<string, unknown>>(
-	params: DirectoryCreateParams<T>,
-) => Oath<Directory, Error>
+	directory: Directory
+}) => Oath<Directory, Error>
 
-type FileCreateParams<T extends Record<string, unknown> = Record<string, unknown>> = {
-	sub: SUB
-	path: FilePath
-	file: File<T>
-}
-type FileCreateFn = <T extends Record<string, unknown> = Record<string, unknown>>(
-	params: FileCreateParams<T>,
-) => Oath<File, Error>
+type FileCreateFn = (params: { sub: SUB; path: FilePath; file: File }) => Oath<File, Error>
 
 type DirectoryReadParams = { sub: SUB; path: DirectoryPath }
 type DirectoryReadFn = Unary<DirectoryReadParams, Oath<Nullable<Directory>, Error>>
@@ -64,35 +52,23 @@ type DirectoryReadFn = Unary<DirectoryReadParams, Oath<Nullable<Directory>, Erro
 type FileReadParams = { sub: SUB; path: FilePath }
 type FileReadFn = Unary<FileReadParams, Oath<Nullable<File>, Error>>
 
-type DirectoryUpdateParams<T extends Record<string, unknown> = Record<string, unknown>> = {
+type DirectoryUpdateFn = (params: {
 	sub: SUB
 	path: DirectoryPath
-	directory: Directory<T>
-}
-type DirectoryUpdateFn = <T extends Record<string, unknown> = Record<string, unknown>>(
-	params: DirectoryUpdateParams<T>,
-) => Oath<Nullable<Directory>, Error>
+	directory: Directory
+}) => Oath<Nullable<Directory>, Error>
 
-type FileUpdateParams<T extends Record<string, unknown> = Record<string, unknown>> = {
+type FileUpdateFn = (params: {
 	sub: SUB
 	path: FilePath
-	file: File<T>
-}
-type FileUpdateFn = <T extends Record<string, unknown> = Record<string, unknown>>(
-	params: FileUpdateParams<T>,
-) => Oath<Nullable<File>, Error>
+	file: File
+}) => Oath<Nullable<File>, Error>
 
 type DirectoryDeleteParams = { sub: SUB; path: DirectoryPath }
 type DirectoryDeleteFn = Unary<DirectoryDeleteParams, Oath<Nullable<Directory>, Error>>
 
 type FileDeleteParams = { sub: SUB; path: FilePath }
 type FileDeleteFn = Unary<FileDeleteParams, Oath<Nullable<File>, Error>>
-
-type DirectoryGetWithChildrenParams = { sub: SUB; path: DirectoryPath }
-type DirectoryGetWithChildrenFn = Unary<
-	DirectoryGetWithChildrenParams,
-	Oath<Nullable<DirectoryWithChildren>, Error>
->
 
 type CreateUserSpaceFn = Unary<SUB, Oath<void, Error>>
 type RemoveUserSpaceFn = Unary<SUB, Oath<void, Error>>

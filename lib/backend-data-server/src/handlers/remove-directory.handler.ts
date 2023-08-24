@@ -9,11 +9,12 @@ import type { Unary } from "@ordo-pink/tau"
 import type { Readable } from "stream"
 import type { Middleware } from "koa"
 import { prop } from "ramda"
-import { DirectoryModel, DirectoryPath, TDataService } from "@ordo-pink/backend-data-service"
+import { TDataService } from "@ordo-pink/backend-data-service"
 import { sendError, useBearerAuthorization } from "@ordo-pink/backend-utils"
 import { HttpError } from "@ordo-pink/rrr"
 import { Oath } from "@ordo-pink/oath"
 import { pathParamToDirectoryPath } from "../utils"
+import { DirectoryPath, DirectoryUtils } from "@ordo-pink/datautil"
 
 // --- Public ---
 
@@ -29,7 +30,7 @@ export const handleRemoveDirectory: Unary<
 				Oath.of(ctx.params.path ? pathParamToDirectoryPath(ctx.params.path) : "/")
 					.chain(path =>
 						Oath.fromBoolean(
-							() => DirectoryModel.isValidPath(path),
+							() => DirectoryUtils.isValidPath(path),
 							() => path as DirectoryPath,
 							() => HttpError.BadRequest("Invalid directory path"),
 						),

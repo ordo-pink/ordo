@@ -9,14 +9,12 @@ import type { Readable } from "stream"
 import type { Middleware } from "koa"
 import type { Unary } from "@ordo-pink/tau"
 import { prop } from "ramda"
-import {
-	DirectoryCreateParams,
-	DirectoryModel,
-	TDataService,
-} from "@ordo-pink/backend-data-service"
+import { TDataService } from "@ordo-pink/backend-data-service"
 import { sendError, useBearerAuthorization, useBody } from "@ordo-pink/backend-utils"
 import { HttpError } from "@ordo-pink/rrr"
 import { Oath } from "@ordo-pink/oath"
+import { CreateDirectoryParams, DirectoryUtils } from "@ordo-pink/datautil"
+import { pathParamToDirectoryPath } from "../utils"
 
 export const handleCreateDirectory: Unary<
 	{ dataService: TDataService<Readable>; idHost: string },
@@ -27,30 +25,29 @@ export const handleCreateDirectory: Unary<
 		useBearerAuthorization(ctx, idHost)
 			.map(prop("payload"))
 			.chain(({ sub }) =>
-				useBody<DirectoryCreateParams>(ctx, "object")
-					.chain(() =>
+				useBody<CreateDirectoryParams>(ctx, "object")
+					.chain(body =>
 						Oath.fromBoolean(
-							() => DirectoryModel.isValidPath(ctx.params.path),
-							() => ctx.params,
+							() => DirectoryUtils.isValidPath(body.path),
+							() => body,
 							() => HttpError.BadRequest("Invalid directory path"),
 						)
 							.chain(({ path }) =>
-								Oath.fromNullable(DirectoryModel.getParentPath(path))
+								Oath.fromNullable(DirectoryUtils.getParentPath(path))
 									.chain(path => dataService.checkDirectoryExists({ path, sub }))
 									.rejectedMap(() => HttpError.BadRequest("Invalid directory path")),
 							)
 							.chain(exists =>
 								Oath.fromBoolean(
 									() => exists,
-									() => ctx.params,
+									() => body,
 									() => HttpError.NotFound("Missing parent directory"),
 								),
-							)
-							.rejectedMap(error => (error instanceof HttpError ? error : HttpError.from(error))),
+							),
 					)
-					.chain(directory =>
+					.chain(params =>
 						dataService
-							.createDirectory({ sub, directory })
+							.createDirectory({ sub, params })
 							.rejectedMap(() => HttpError.Conflict("Directory already exists")),
 					),
 			)

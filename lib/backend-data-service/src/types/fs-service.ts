@@ -4,8 +4,16 @@
 import { SUB } from "@ordo-pink/backend-token-service"
 import { Oath } from "@ordo-pink/oath"
 import { Unary, Nullable } from "@ordo-pink/tau"
-import { FilePath, FileCreateParams, File } from "./file"
-import { Directory, DirectoryPath, DirectoryWithChildren, DirectoryCreateParams } from "./directory"
+import {
+	FilePath,
+	CreateFileParams,
+	File,
+	Directory,
+	DirectoryPath,
+	CreateDirectoryParams,
+	UpdateFileParams,
+	UpdateDirectoryParams,
+} from "@ordo-pink/datautil"
 
 // --- Public ---
 
@@ -25,7 +33,6 @@ export type TDataService<TReadContent, TWriteContent = TReadContent> = {
 	checkDirectoryExists: CheckDirectoryExists
 	getRoot: GetRootFn
 	getDirectory: FindDirectoryFn
-	getDirectoryChildren: GetDirectoryWithChildrenFn
 	createDirectory: CreateDirectoryFn
 	updateDirectory: UpdateDirectoryFn
 	removeDirectory: RemoveDirectoryFn
@@ -36,16 +43,20 @@ export type TDataService<TReadContent, TWriteContent = TReadContent> = {
 type GetFileParams = { sub: SUB; path: FilePath }
 type GetFileFn = Unary<GetFileParams, Oath<Nullable<File>, Error>>
 
-type CreateFileParams<TWriteContent> = {
-	sub: SUB
-	file: FileCreateParams
-	encryption?: string | false
-	content?: TWriteContent
-}
-type CreateFileFn<TWriteContent> = Unary<CreateFileParams<TWriteContent>, Oath<File, Error>>
+type CreateFileFn<TWriteContent> = Unary<
+	{
+		sub: SUB
+		params: CreateFileParams
+		encryption?: string | false
+		content?: TWriteContent
+	},
+	Oath<File, Error>
+>
 
-type UpdateFileParams = { sub: SUB; path: FilePath; file: File }
-type UpdateFileFn = Unary<UpdateFileParams, Oath<Nullable<File>, Error>>
+type UpdateFileFn = Unary<
+	{ sub: SUB; path: FilePath; params: UpdateFileParams },
+	Oath<Nullable<File>, Error>
+>
 
 type RemoveFileParams = { sub: SUB; path: FilePath }
 type RemoveFileFn = Unary<RemoveFileParams, Oath<Nullable<File>, Error>>
@@ -71,22 +82,17 @@ type FindDirectoriesFn = Unary<FindDirectoriesParams, Oath<Directory[], Error>>
 type FindDirectoryByPathParams = { sub: SUB; path: DirectoryPath }
 type FindDirectoryFn = Unary<FindDirectoryByPathParams, Oath<Nullable<Directory>, Error>>
 
-type GetDirectoryWithChildrenParams = { sub: SUB; path: DirectoryPath }
-type GetDirectoryWithChildrenFn = Unary<
-	GetDirectoryWithChildrenParams,
-	Oath<Nullable<DirectoryWithChildren>, Error>
+type CreateDirectoryFn = Unary<{ sub: SUB; params: CreateDirectoryParams }, Oath<Directory, Error>>
+
+type UpdateDirectoryFn = Unary<
+	{
+		sub: SUB
+		path: DirectoryPath
+		params: UpdateDirectoryParams
+		upsert?: boolean
+	},
+	Oath<Nullable<Directory>, Error>
 >
-
-type CreateDirectoryParams = { sub: SUB; directory: DirectoryCreateParams }
-type CreateDirectoryFn = Unary<CreateDirectoryParams, Oath<Directory, Error>>
-
-type UpdateDirectoryParams = {
-	sub: SUB
-	path: DirectoryPath
-	content: Directory
-	upsert?: boolean
-}
-type UpdateDirectoryFn = Unary<UpdateDirectoryParams, Oath<Nullable<Directory>, Error>>
 
 type RemoveDirectoryParams = { sub: SUB; path: DirectoryPath }
 type RemoveDirectoryFn = Unary<RemoveDirectoryParams, Oath<Nullable<Directory>, Error>>

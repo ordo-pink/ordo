@@ -2,9 +2,9 @@
 // SPDX-License-Identifier: MIT
 
 import { SUB } from "@ordo-pink/backend-token-service"
+import { FSID } from "@ordo-pink/datautil/src/common"
 import { Oath } from "@ordo-pink/oath"
 import { Unary, Nullable } from "@ordo-pink/tau"
-import { FSID } from "./file"
 
 // --- Public ---
 

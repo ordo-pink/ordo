@@ -1,15 +1,15 @@
 // SPDX-FileCopyrightText: Copyright 2023, 谢尔盖||↓ and the Ordo.pink contributors
 // SPDX-License-Identifier: MIT
 
-import { FileModel, type TDataService } from "@ordo-pink/backend-data-service"
+import type { TDataService } from "@ordo-pink/backend-data-service"
 import type { Unary } from "@ordo-pink/tau"
-import type { SUB } from "@ordo-pink/backend-token-service"
 import type * as T from "@ordo-pink/backend-data-service"
-import type { File } from "./types/file"
 
+import { randomUUID } from "crypto"
 import { Oath } from "@ordo-pink/oath"
-import { equals } from "ramda"
 import { Readable } from "stream"
+import { DirectoryUtils, FileUtils } from "@ordo-pink/datautil"
+import { FSID } from "@ordo-pink/datautil/src/common"
 
 type Params = {
 	metadataRepository: T.MetadataRepository
@@ -22,31 +22,22 @@ const service: Fn = ({ metadataRepository, dataRepository }) => ({
 	createUserSpace: metadataRepository._internal.createUserSpace,
 	checkDirectoryExists: metadataRepository.directory.exists,
 	getDirectory: metadataRepository.directory.read,
-	createDirectory: ({ directory, sub }) =>
+	createDirectory: ({ params, sub }) =>
 		service({ metadataRepository, dataRepository })
-			.checkDirectoryExists({ path: directory.path, sub })
+			.checkDirectoryExists({ path: params.path, sub })
 			.chain(exists =>
 				Oath.fromBoolean(
 					() => !exists,
-					() => ({ directory, sub }),
+					() => ({ params, sub }),
 					() => new Error("Directory already exists"),
 				),
 			)
-			.map(({ directory, sub }) => {
-				// TODO: Use Directory model to create a directory
-				const date = new Date(Date.now())
-
-				directory.createdAt = directory.updatedAt = date
-				directory.createdBy = directory.updatedBy = sub
-
-				return { directory, sub } as { directory: T.Directory; sub: SUB }
-			})
-			.chain(({ directory, sub }) =>
+			.map(({ params, sub }) => DirectoryUtils.create({ params, sub, fsid: randomUUID() as FSID }))
+			.chain(directory =>
 				metadataRepository.directory.create({ directory, sub, path: directory.path }),
 			),
-	getDirectoryChildren: metadataRepository.directory.readWithChildren,
 	removeDirectory: metadataRepository.directory.delete,
-	updateDirectory: ({ path, content, sub, upsert = false }) =>
+	updateDirectory: ({ path, params, sub, upsert = false }) =>
 		service({ metadataRepository, dataRepository })
 			.getDirectory({ path, sub })
 			.chain(directory =>
@@ -59,51 +50,29 @@ const service: Fn = ({ metadataRepository, dataRepository }) => ({
 					() => new Error("Directory does not exist"),
 				),
 			)
-			.chain(directory => {
-				const updatedDirectory = { ...directory, ...content }
-
-				updatedDirectory.createdAt = directory.createdAt
-				updatedDirectory.createdBy = directory.createdBy
-				updatedDirectory.updatedAt = new Date(Date.now())
-				updatedDirectory.updatedBy = sub
-
-				return equals(updatedDirectory, content)
-					? metadataRepository.directory.update({
-							sub,
-							path: directory.path,
-							directory: updatedDirectory,
-					  })
-					: Oath.of(updatedDirectory)
-			}),
+			.map(directory => DirectoryUtils.update({ directory, params, sub }))
+			.chain(directory =>
+				metadataRepository.directory.update({
+					sub,
+					path: directory.path,
+					directory,
+				}),
+			),
 
 	checkFileExists: dataRepository.exists,
 	checkFileExistsByPath: metadataRepository.file.exists,
-	createFile: ({ file, sub, content, encryption = false }) =>
+	createFile: ({ params, sub, content, encryption = false }) =>
 		metadataRepository.file
-			.exists({ sub, path: file.path })
+			.exists({ sub, path: params.path })
 			.chain(exists =>
 				Oath.fromBoolean(
 					() => !exists,
-					() => ({ file, sub, content, encryption }),
+					() => ({ params, sub, content, encryption }),
 					() => new Error("File already exists"),
 				),
 			)
 			.chain(({ sub }) => dataRepository.create({ sub }))
-			.map(fsid => {
-				const createdFile = { ...file } as File
-
-				const date = new Date(Date.now())
-
-				createdFile.fsid = fsid
-				createdFile.size = 0
-				createdFile.createdAt = createdFile.updatedAt = date
-				createdFile.createdBy = createdFile.updatedBy = sub
-				createdFile.encryption = encryption
-				createdFile.links = []
-				createdFile.labels = []
-
-				return createdFile
-			})
+			.map(fsid => FileUtils.create({ params, sub, fsid }))
 			.chain(file =>
 				content
 					? dataRepository
@@ -116,6 +85,7 @@ const service: Fn = ({ metadataRepository, dataRepository }) => ({
 	getFileContent: ({ path, sub }) =>
 		metadataRepository.file
 			.read({ path, sub })
+			.tap(console.log)
 			.chain(Oath.fromNullable)
 			.rejectedMap(() => new Error("File not found"))
 			.chain(file => dataRepository.read({ sub, fsid: file.fsid })),
@@ -139,7 +109,7 @@ const service: Fn = ({ metadataRepository, dataRepository }) => ({
 				dataRepository.update({ sub, fsid: file.fsid, content }).map(size => ({ ...file, size })),
 			)
 			.chain(file => metadataRepository.file.update({ sub, file, path: file.path })),
-	updateFile: ({ file, path, sub }) =>
+	updateFile: ({ params, path, sub }) =>
 		metadataRepository.file
 			.exists({ path, sub })
 			.chain(exists =>
@@ -151,30 +121,7 @@ const service: Fn = ({ metadataRepository, dataRepository }) => ({
 			)
 			.chain(path => metadataRepository.file.read({ path, sub }))
 			.chain(file => Oath.fromNullable(file).rejectedMap(() => new Error("File not found")))
-			.map(
-				oldFile =>
-					({
-						createdAt: oldFile.createdAt,
-						updatedAt: new Date(Date.now()),
-						createdBy: oldFile.createdBy,
-						updatedBy: sub,
-						encryption: oldFile.encryption,
-						fsid: oldFile.fsid,
-						labels:
-							file.labels && Array.isArray(file.labels)
-								? Array.from(new Set(file.labels))
-								: oldFile.labels,
-						links:
-							file.links && Array.isArray(file.links)
-								? Array.from(new Set(file.links))
-								: oldFile.links,
-						path:
-							file.path && file.path !== oldFile.path && FileModel.isValidPath(file.path)
-								? file.path
-								: oldFile.path,
-						size: oldFile.size,
-					}) satisfies File,
-			)
+			.map(file => FileUtils.update({ file, params, sub }))
 			.chain(file => metadataRepository.file.update({ file, path, sub })),
 })
 

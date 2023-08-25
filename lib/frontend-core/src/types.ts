@@ -4,8 +4,38 @@
 import type { IconType } from "react-icons"
 import type { ComponentType, MouseEvent } from "react"
 import type { Thunk, Unary } from "@ordo-pink/tau"
+import type {
+	FilePath,
+	DirectoryPath,
+	CreateDirectoryParams,
+	CreateFileParams,
+	UpdateDirectoryParams,
+	UpdateFileParams,
+} from "@ordo-pink/datautil"
 
 export namespace cmd {
+	export namespace user {
+		export type refreshInfo = { name: "user.refresh" }
+		export type signOut = { name: "user.sign-out" }
+	}
+
+	export namespace data {
+		export type refreshRoot = { name: "data.refresh-root" }
+		export type getFileContent = { name: "data.get-file-content"; payload: FilePath }
+
+		export namespace file {
+			export type create = { name: "data.create-file"; payload: CreateFileParams }
+			export type update = { name: "data.update-file"; payload: UpdateFileParams }
+			export type remove = { name: "data.remove-file"; payload: FilePath }
+		}
+
+		export namespace directory {
+			export type create = { name: "data.create-directory"; payload: CreateDirectoryParams }
+			export type update = { name: "data.update-directory"; payload: UpdateDirectoryParams }
+			export type remove = { name: "data.remove-directory"; payload: DirectoryPath }
+		}
+	}
+
 	export namespace contextMenu {
 		export type add = { name: "context-menu.add"; payload: ContextMenu.Item }
 		export type remove = { name: "context-menu.remove"; payload: string }

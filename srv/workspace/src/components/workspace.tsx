@@ -119,7 +119,9 @@ const EnabledSidebar = ({ sidebar$, activity, commandPalette$ }: EnabledSidebarP
 					<Sidebar sidebar$={sidebar$} commandPalette$={commandPalette$} isNarrow={isNarrow} />
 				</div>
 
-				<div className={`workspace h-full w-full ${sizes[1] <= 5 ? "hidden" : "block"}`}>
+				<div
+					className={`workspace h-full w-full ${sizes[1] <= 5 ? "hidden" : "block"} overflow-auto`}
+				>
 					<Component />
 				</div>
 			</Split>

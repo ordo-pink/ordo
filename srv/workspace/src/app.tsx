@@ -11,16 +11,37 @@ import Modal from "$components/modal"
 import Null from "$components/null"
 import { getCommands } from "$streams/commands"
 import { useSubscription } from "$hooks/use-subscription"
+import { useEffect } from "react"
+import { useExtensions } from "$streams/extensions"
+import { BsPersonCircle } from "react-icons/bs"
+import UserPage from "./pages/user.page"
 
 const commands = getCommands()
 
 export default function App() {
 	const streams = useAppInit()
-	useOnAuthenticated()
+	useOnAuthenticated(streams.auth$)
+	const exts = useExtensions()
+	const auth = useSubscription(streams.auth$)
 
 	const contextMenu = useSubscription(streams.contextMenu$)
 
 	const hideContextMenu = () => contextMenu && commands.emit("context-menu.hide")
+
+	useEffect(() => {
+		if (!auth) return
+
+		exts.activities.add("user", {
+			Component: () => <UserPage auth={auth} />,
+			Icon: BsPersonCircle,
+			routes: ["/user"],
+		})
+
+		return () => {
+			exts.activities.remove("user")
+		}
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [auth === null])
 
 	return Either.fromNullable(streams)
 		.chain(() => Either.fromNullable(streams.contextMenu$))

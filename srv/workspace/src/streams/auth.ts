@@ -3,9 +3,8 @@
 
 import type { AuthResponse } from "@ordo-pink/backend-id-server"
 import type { User } from "@ordo-pink/backend-user-service"
-import type { Directory, File } from "@ordo-pink/backend-data-service"
 import { AiOutlineLogout } from "react-icons/ai"
-import { BehaviorSubject } from "rxjs"
+import { BehaviorSubject, Observable } from "rxjs"
 import { callOnce, Unary, Nullable } from "@ordo-pink/tau"
 import { cmd } from "@ordo-pink/frontend-core"
 import { Either } from "@ordo-pink/either"
@@ -13,6 +12,7 @@ import { Logger } from "@ordo-pink/logger"
 import { Oath } from "@ordo-pink/oath"
 import { useSubscription } from "$hooks/use-subscription"
 import { getCommands } from "$streams/commands"
+import { FSEntity } from "@ordo-pink/datautil/src/common"
 
 const commands = getCommands()
 
@@ -29,8 +29,9 @@ const refreshToken = () =>
 		})
 
 type InitAuthP = { logger: Logger }
-type InitAuth = Unary<InitAuthP, void>
+type InitAuth = Unary<InitAuthP, __Auth$>
 
+export type __Auth$ = Observable<Nullable<AuthResponse>>
 export const __initAuth: InitAuth = callOnce(({ logger }) => {
 	logger.debug("Initializing auth")
 
@@ -39,7 +40,7 @@ export const __initAuth: InitAuth = callOnce(({ logger }) => {
 	const interval = setInterval(refreshToken, 50000)
 	window.addEventListener("beforeunload", () => clearInterval(interval))
 
-	commands.on("core.refresh-user-info", () =>
+	commands.on<cmd.user.refreshInfo>("user.refresh", () =>
 		Oath.fromNullable(auth$.value)
 			.chain(auth =>
 				Oath.try(() =>
@@ -56,7 +57,7 @@ export const __initAuth: InitAuth = callOnce(({ logger }) => {
 			),
 	)
 
-	commands.on("core.refresh-metadata-root", () =>
+	commands.on<cmd.data.refreshRoot>("data.refresh-root", () =>
 		Oath.fromNullable(auth$.value)
 			.chain(auth =>
 				Oath.try(() =>
@@ -85,10 +86,12 @@ export const __initAuth: InitAuth = callOnce(({ logger }) => {
 		Icon: AiOutlineLogout,
 		onSelect: () => commands.emit("core.sign-out"),
 	})
+
+	return auth$
 })
 
 const auth$ = new BehaviorSubject<Nullable<AuthResponse>>(null)
-const metadata$ = new BehaviorSubject<(Directory | File)[]>([])
+const metadata$ = new BehaviorSubject<FSEntity[]>([])
 const user$ = new BehaviorSubject<Nullable<User>>(null)
 const error$ = new BehaviorSubject<Nullable<string>>(null)
 

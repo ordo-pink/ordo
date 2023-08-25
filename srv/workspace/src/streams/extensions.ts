@@ -6,10 +6,10 @@ import { BehaviorSubject, of, merge, Subject } from "rxjs"
 import { ComponentType } from "react"
 import { Router as Silkrouter, operators } from "silkrouter"
 import { Binary, Curry, Nullable, Thunk, Unary, callOnce } from "@ordo-pink/tau"
-import { File, FileExtension } from "@ordo-pink/backend-data-service"
 import { Logger } from "@ordo-pink/logger"
 import { useStrictSubscription, useSubscription } from "$hooks/use-subscription"
 import { Router } from "@ordo-pink/frontend-core"
+import { FileExtension } from "@ordo-pink/datautil/src/file"
 
 const { route, noMatch } = operators
 
@@ -141,9 +141,9 @@ export const activities$ = merge(
 	shareReplay(1),
 )
 
-export const initActivities = callOnce(() => {
-	activities$.subscribe()
+activities$.subscribe()
 
+export const initActivities = callOnce(() => {
 	return activities$
 })
 

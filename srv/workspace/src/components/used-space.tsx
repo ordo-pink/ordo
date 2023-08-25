@@ -5,6 +5,7 @@ import { useEffect, useState } from "react"
 import { useMetadata } from "../streams/auth"
 import { noop } from "@ordo-pink/tau"
 import Null from "./null"
+import { FileUtils } from "@ordo-pink/datautil"
 
 // TODO: Move to user info
 const MAX_TOTAL_SIZE_MB = 50
@@ -18,7 +19,7 @@ export default function UsedSpace() {
 	useEffect(() => {
 		metadata
 			.map(items =>
-				items.reduce((acc, item) => (typeof item.size === "number" ? acc + item.size : acc), 0),
+				items.reduce((acc, item) => (FileUtils.isFile(item) ? acc + Number(item.size) : acc), 0),
 			)
 			.map(size => size / 1024 / 1024)
 			.fold(noop, megabytes => {

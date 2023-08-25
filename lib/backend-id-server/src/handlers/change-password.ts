@@ -14,7 +14,7 @@ import { Oath } from "@ordo-pink/oath"
 import { HttpError } from "@ordo-pink/rrr"
 import { noop } from "@ordo-pink/tau"
 
-export type Body = { oldPassword?: string; newPassword?: string }
+export type Body = { oldPassword?: string; newPassword?: string; repeatNewPassword?: string }
 export type Params = { tokenService: TTokenService; userService: UserService }
 export type Fn = (params: Params) => Middleware
 
@@ -48,7 +48,7 @@ export const handleChangePassword: Fn =
 						)
 						.chain(() =>
 							Oath.fromBoolean(
-								() => body.oldPassword === body.newPassword,
+								() => body.newPassword === body.repeatNewPassword,
 								noop,
 								() => HttpError.BadRequest("Passwords do not match"),
 							),
@@ -82,6 +82,7 @@ export const handleChangePassword: Fn =
 									.createPair({ sub: auth.payload.sub })
 									.rejectedMap(HttpError.from)
 									.chain(tokens =>
+										// TODO: Drop sessions other than the current one
 										Oath.of(new Date(Date.now() + tokens.exp))
 											.tap(expires =>
 												ctx.cookies.set("jti", tokens.jti, {

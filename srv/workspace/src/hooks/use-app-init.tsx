@@ -4,7 +4,7 @@
 import { useEffect, useState } from "react"
 import { ConsoleLogger } from "@ordo-pink/logger"
 import { Nullable } from "@ordo-pink/tau"
-import { __initAuth } from "$streams/auth"
+import { __Auth$, __initAuth } from "$streams/auth"
 import { __ContextMenu$, __initContextMenu } from "$streams/context-menu"
 import { initActivities, initExtensions } from "$streams/extensions"
 import { __CommandPalette$, __initCommandPalette } from "$streams/command-palette"
@@ -24,6 +24,7 @@ const IGNORED_KEYS = ["Control", "Shift", "Alt", "Control", "Meta"]
 const ctx = { logger: ConsoleLogger }
 
 export type UseAppInitReturns = {
+	auth$: Nullable<__Auth$>
 	modal$: Nullable<__Modal$>
 	sidebar$: Nullable<__Sidebar$>
 	contextMenu$: Nullable<__ContextMenu$>
@@ -39,6 +40,7 @@ export const useAppInit = (): UseAppInitReturns => {
 	const [contextMenu$, setContextMenu$] = useState<Nullable<__ContextMenu$>>(null)
 	const [modal$, setModal$] = useState<Nullable<__Modal$>>(null)
 	const [sidebar$, setSidebar$] = useState<Nullable<__Sidebar$>>(null)
+	const [auth$, setAuth$] = useState<Nullable<__Auth$>>(null)
 
 	const commandPaletteItems = useSubscription(currentCommandPalette$)
 	const globalCommandPaletteItems = useSubscription(globalCommandPalette$)
@@ -66,7 +68,8 @@ export const useAppInit = (): UseAppInitReturns => {
 
 	useEffect(() => {
 		__initCommands(ctx)
-		__initAuth(ctx)
+		const auth$ = __initAuth(ctx)
+		setAuth$(auth$)
 
 		const modal$ = __initModal(ctx)
 		setModal$(modal$)
@@ -103,5 +106,5 @@ export const useAppInit = (): UseAppInitReturns => {
 		})
 	}, [commandPaletteItems])
 
-	return { contextMenu$, modal$, globalCommandPalette$, currentCommandPalette$, sidebar$ }
+	return { contextMenu$, modal$, globalCommandPalette$, currentCommandPalette$, sidebar$, auth$ }
 }

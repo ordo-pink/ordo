@@ -83,7 +83,17 @@ const update: UpdateMethod<T.Params> =
 		repository({ db, table })
 			.getById(id)
 			.chain(oldUser =>
-				Oath.resolve(reduceUserToAttributeUpdates(oldUser))
+				Oath.of({
+					...oldUser,
+					firstName: user.firstName ?? oldUser.firstName,
+					email: user.email ?? oldUser.email,
+					emailConfirmed:
+						user.emailConfirmed != null ? user.emailConfirmed : oldUser.emailConfirmed,
+					lastName: user.lastName ?? oldUser.lastName,
+					username: user.username ?? oldUser.username,
+					password: user.password ?? oldUser.password,
+				})
+					.chain(user => Oath.of(reduceUserToAttributeUpdates(user)))
 					.chain(AttributeUpdates =>
 						Oath.from(() =>
 							db

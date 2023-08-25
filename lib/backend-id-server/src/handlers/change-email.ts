@@ -30,39 +30,36 @@ export const handleChangeEmail: Fn =
 			.chain(({ token, body }) =>
 				Oath.all({
 					user: userService.getById(token.payload.sub),
-					email: body.email,
+					email: Oath.fromNullable(body.email).rejectedMap(() =>
+						HttpError.BadRequest("Email not provided"),
+					),
 				})
 					.rejectedMap(() => HttpError.NotFound("User not found"))
 					.chain(({ user, email }) =>
-						Oath.fromNullable(email)
-							.chain(email =>
-								Oath.all([
+						Oath.all([
+							Oath.fromBoolean(
+								() => validator.isEmail(email),
+								() => "OK" as const,
+								() => false,
+							).rejectedMap(() => HttpError.BadRequest("Invalid email")),
+							Oath.fromBoolean(
+								() => user.email !== email,
+								() => "OK" as const,
+								() => false,
+							).rejectedMap(() => HttpError.BadRequest("This is your current email")),
+							userService
+								.getByEmail(email)
+								.chain(() => Oath.reject(true))
+								.fix(userExists =>
 									Oath.fromBoolean(
-										() => validator.isEmail(email, {}),
+										() => !userExists,
 										() => "OK" as const,
 										() => false,
-									).rejectedMap(() => HttpError.BadRequest("Invalid email")),
-									Oath.fromBoolean(
-										() => user.email !== email,
-										() => "OK" as const,
-										() => false,
-									).rejectedMap(() => HttpError.BadRequest("This is your current email")),
-									userService
-										.getByEmail(email)
-										.chain(() => Oath.reject())
-										.fix(userExists =>
-											Oath.fromBoolean(
-												() => !userExists,
-												() => "OK" as const,
-												() => false,
-											),
-										)
-										.rejectedMap(() => HttpError.Conflict("Email already taken")),
-								]),
-							)
-							.map(() => ({ user, email: email! })),
-					)
-					.rejectedMap(() => HttpError.BadRequest("Invalid email")),
+									),
+								)
+								.rejectedMap(() => HttpError.Conflict("Email already taken")),
+						]).map(() => ({ user, email: email! })),
+					),
 			)
 			.chain(({ user, email }) =>
 				userService

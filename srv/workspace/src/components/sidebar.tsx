@@ -12,6 +12,8 @@ import { useStrictSubscription, useSubscription } from "$hooks/use-subscription"
 import { Nullable } from "@ordo-pink/tau"
 import { __Sidebar$ } from "$streams/sidebar"
 import { cmd } from "@ordo-pink/frontend-core"
+import Link from "./link"
+import { Title } from "./page-header"
 
 const commands = getCommands()
 
@@ -45,7 +47,11 @@ export default function Sidebar({ children, isNarrow, commandPalette$, sidebar$ 
 		>
 			<div>
 				<div className="flex items-center justify-between">
-					<img src="http://localhost:8000/logo.png" className="w-10" alt="Ordo.pink Logo" />
+					<img
+						src={`${process.env.REACT_APP_STATIC_HOST}/logo.png`}
+						className="w-10"
+						alt="Ordo.pink Logo"
+					/>
 					<div className="text-neutral-500 cursor-pointer" onClick={openCommandPalette}>
 						<BsThreeDotsVertical />
 					</div>
@@ -54,10 +60,27 @@ export default function Sidebar({ children, isNarrow, commandPalette$, sidebar$ 
 				<div>{children}</div>
 			</div>
 
-			<div>
-				<div>{user.fold(Null, u => u.email)}</div>
+			<div className="flex space-x-2 items-center">
+				<div className="flex items-center justify-center rounded-full mt-1 p-0.5 bg-gradient-to-tr from-sky-400 via-purple-400 to-rose-400 shadow-lg shrink-0 cursor-pointer">
+					<div className="bg-white rounded-full">
+						<Link href="/user">
+							<img
+								className="h-10 rounded-full"
+								src={`${process.env.REACT_APP_STATIC_HOST}/logo.png`}
+								alt="avatar"
+							/>
+						</Link>
+					</div>
+				</div>
 				<div className="w-full">
-					<UsedSpace />
+					<div>
+						{user.fold(Null, u => (
+							<Title level="5">{u.email}</Title>
+						))}
+					</div>
+					<div className="w-full">
+						<UsedSpace />
+					</div>
 				</div>
 			</div>
 		</div>

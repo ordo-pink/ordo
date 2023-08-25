@@ -26,15 +26,11 @@ export default function Workspace({ commandPalette$, sidebar$ }: _P) {
 	const sidebar = useStrictSubscription(sidebar$, { disabled: true })
 	const activity = useCurrentActivity()
 
-	return Either.fromNullable(sidebar$)
-		.chain($ =>
-			Either.fromNullable(sidebar).chain(state =>
-				Either.fromBoolean(() => !state.disabled).map(() => $),
-			),
-		)
+	return Either.fromNullable(sidebar)
+		.chain(state => Either.fromBoolean(() => !state.disabled).map(() => sidebar$))
 		.fold(
 			() => <DisabledSidebar activity={activity} />,
-			$ => <EnabledSidebar commandPalette$={commandPalette$} sidebar$={$} activity={activity} />,
+			$ => <EnabledSidebar commandPalette$={commandPalette$} sidebar$={$!} activity={activity} />,
 		)
 }
 
@@ -51,7 +47,7 @@ const DisabledSidebar = ({ activity }: DisabledSidebarProps) =>
 	Either.fromNullable(activity).fold(
 		() => <div>Welcome</div>,
 		({ Component }) => (
-			<div className="workspace max-h-screen h-full flex overflow-auto w-full">
+			<div className="workspace w-full h-full overflow-auto">
 				<Component />
 			</div>
 		),

@@ -104,4 +104,4 @@ type SidebarState = { disabled: false; sizes: [number, number] } | { disabled: t
 type InitSidebarP = { logger: Logger }
 type InitSidebar = Unary<InitSidebarP, __Sidebar$>
 
-const sidebar$ = new BehaviorSubject<SidebarState>({ disabled: false, sizes: [25, 75] })
+const sidebar$ = new BehaviorSubject<SidebarState>({ disabled: true })

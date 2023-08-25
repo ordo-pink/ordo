@@ -15,6 +15,7 @@ import { useAccelerator } from "$hooks/use-accelerator"
 import { __Sidebar$ } from "$streams/sidebar"
 import { cmd } from "@ordo-pink/frontend-core"
 import { Either } from "@ordo-pink/either"
+import Link from "$components/link"
 
 type ShowContextMenu = Unary<MouseEvent<HTMLDivElement>, void>
 
@@ -26,6 +27,7 @@ export default function ActivityBar({ commandPalette$, sidebar$ }: _P) {
 	const sidebar = useStrictSubscription(sidebar$, { disabled: true })
 	const activities = useActivities()
 	const commandPaletteItems = useSubscription(commandPalette$)
+	console.log(sidebar)
 
 	const isSidebarCollapsed = sidebar.disabled || sidebar.sizes[0] === 0
 
@@ -42,14 +44,12 @@ export default function ActivityBar({ commandPalette$, sidebar$ }: _P) {
 	return (
 		<div
 			onContextMenu={showContextMenu}
-			className={`activity-bar h-screen ${
-				sidebar.disabled ? "w-[calc(3rem-10px)]" : "w-12"
-			} flex flex-col justify-between items-center py-4 text-lg sm:text-2xl z-50 bg-neutral-200 dark:bg-neutral-900`}
+			className={`activity-bar w-12 h-screen flex flex-col justify-between items-center py-4 text-lg sm:text-2xl z-50 bg-neutral-200 dark:bg-neutral-900`}
 		>
 			<div>
 				<div
-					className={`text-neutral-500 cursor-pointer transition-opacity duration-300 ${
-						isSidebarCollapsed ? "opacity-100" : "opacity-0"
+					className={`select-none text-neutral-500 cursor-pointer transition-opacity duration-300 ${
+						isSidebarCollapsed ? "opacity-100" : "opacity-0 cursor-default pointer-events-none"
 					}`}
 				>
 					<div onClick={showCommandPalette}>
@@ -65,11 +65,21 @@ export default function ActivityBar({ commandPalette$, sidebar$ }: _P) {
 			<div>
 				{user.fold(Null, user => (
 					<div
-						className={`cursor-pointer transition-opacity duration-300 ${
-							isSidebarCollapsed ? "opacity-100" : "opacity-0"
+						className={`select-none cursor-pointer transition-opacity duration-300 ${
+							isSidebarCollapsed ? "opacity-100" : "opacity-0 cursor-default pointer-events-none"
 						}`}
 					>
-						{user.email && user.email.slice(0, 1)}
+						<div className="flex items-center justify-center rounded-full p-0.5 bg-gradient-to-tr from-sky-400 via-purple-400 to-rose-400 shadow-lg shrink-0 cursor-pointer">
+							<div className="bg-white rounded-full">
+								<Link href="/user">
+									<img
+										className="h-7 rounded-full"
+										src={`${process.env.REACT_APP_STATIC_HOST}/logo.png`}
+										alt="avatar"
+									/>
+								</Link>
+							</div>
+						</div>
 					</div>
 				))}
 			</div>

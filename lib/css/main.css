@@ -102,7 +102,7 @@ a {
 }
 
 .gutter {
-	@apply bg-neutral-200 sm:bg-neutral-50 dark:bg-neutral-900 sm:dark:bg-neutral-900 bg-no-repeat z-40 pr-2;
+	@apply bg-transparent z-40 pr-2;
 	background-position: 50% 50%;
 }
 

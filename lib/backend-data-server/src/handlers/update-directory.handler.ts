@@ -34,12 +34,20 @@ export const handleUpdateDirectory: Unary<
 						),
 					)
 					.chain(path =>
-						useBody<UpdateDirectoryParams>(ctx).chain(content =>
-							dataService
-								.updateDirectory({ sub, path, params: content })
-								.chain(Oath.fromNullable)
-								.rejectedMap(() => HttpError.NotFound("Directory not found")),
-						),
+						useBody<UpdateDirectoryParams>(ctx)
+							.chain(params =>
+								Oath.fromBoolean(
+									() => DirectoryUtils.isUpdateParams(params),
+									() => params,
+									() => HttpError.BadRequest("Invalid body"),
+								),
+							)
+							.chain(params =>
+								dataService
+									.updateDirectory({ sub, path, params })
+									.chain(Oath.fromNullable)
+									.rejectedMap(() => HttpError.NotFound("Directory not found")),
+							),
 					),
 			)
 			.fork(sendError(ctx), result => {

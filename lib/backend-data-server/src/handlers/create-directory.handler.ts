@@ -14,7 +14,6 @@ import { sendError, useBearerAuthorization, useBody } from "@ordo-pink/backend-u
 import { HttpError } from "@ordo-pink/rrr"
 import { Oath } from "@ordo-pink/oath"
 import { CreateDirectoryParams, DirectoryUtils } from "@ordo-pink/datautil"
-import { pathParamToDirectoryPath } from "../utils"
 
 export const handleCreateDirectory: Unary<
 	{ dataService: TDataService<Readable>; idHost: string },
@@ -28,14 +27,14 @@ export const handleCreateDirectory: Unary<
 				useBody<CreateDirectoryParams>(ctx, "object")
 					.chain(body =>
 						Oath.fromBoolean(
-							() => DirectoryUtils.isValidPath(body.path),
+							() => DirectoryUtils.isCreateParams(body),
 							() => body,
-							() => HttpError.BadRequest("Invalid directory path"),
+							() => HttpError.BadRequest("Invalid body"),
 						)
 							.chain(({ path }) =>
 								Oath.fromNullable(DirectoryUtils.getParentPath(path))
 									.chain(path => dataService.checkDirectoryExists({ path, sub }))
-									.rejectedMap(() => HttpError.BadRequest("Invalid directory path")),
+									.rejectedMap(() => HttpError.BadRequest("Parent directory does not exist")),
 							)
 							.chain(exists =>
 								Oath.fromBoolean(

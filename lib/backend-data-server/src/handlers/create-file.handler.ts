@@ -27,9 +27,9 @@ export const handleCreateFile: Unary<
 				useBody<CreateFileParams>(ctx)
 					.chain(body =>
 						Oath.fromBoolean(
-							() => FileUtils.isValidPath(body.path),
+							() => FileUtils.isCreateParams(body),
 							() => body,
-							() => HttpError.BadRequest("Invalid file path"),
+							() => HttpError.BadRequest("Invalid body"),
 						),
 					)
 					.chain(params =>

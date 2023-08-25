@@ -36,12 +36,20 @@ export const handleUpdateFile: Unary<
 						),
 					)
 					.chain(path =>
-						useBody<UpdateFileParams>(ctx).chain(params =>
-							dataService
-								.updateFile({ sub, path, params })
-								.chain(Oath.fromNullable)
-								.rejectedMap(() => HttpError.NotFound("File not found")),
-						),
+						useBody<UpdateFileParams>(ctx)
+							.chain(params =>
+								Oath.fromBoolean(
+									() => FileUtils.isUpdateParams(params),
+									() => params,
+									() => HttpError.BadRequest("Invalid body"),
+								),
+							)
+							.chain(params =>
+								dataService
+									.updateFile({ sub, path, params })
+									.chain(Oath.fromNullable)
+									.rejectedMap(() => HttpError.NotFound("File not found")),
+							),
 					),
 			)
 			.fork(sendError(ctx), result => {

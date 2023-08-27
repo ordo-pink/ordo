@@ -3,14 +3,9 @@
 
 import { SUB } from "@ordo-pink/backend-token-service"
 import { Switch } from "@ordo-pink/switch"
-import { isObject } from "@ordo-pink/tau"
+import { isArray, isDate, isObject, isString } from "@ordo-pink/tau"
 import { FilePath } from "./file"
 import { DirectoryPath } from "./directory"
-
-// TODO: Move to TAU
-export const isArray = Array.isArray
-export const isDate = (x: unknown): x is Date => !!x && x instanceof Date
-export const isString = (x: unknown): x is string => !!x && typeof x === "string"
 
 /**
  * Characters that cannot be used in FS path.

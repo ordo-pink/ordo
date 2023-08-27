@@ -11,6 +11,10 @@ export const isObject = (x: unknown): x is Record<string, unknown> =>
 export const isFunction = <T = unknown, K = T>(x: unknown): x is (x: T) => K =>
 	typeof x == "function"
 
+export const isArray = Array.isArray
+export const isDate = (x: unknown): x is Date => !!x && x instanceof Date
+export const isString = (x: unknown): x is string => !!x && typeof x === "string"
+
 export const keysOf: T._KeysOfFn = o => {
 	return Object.keys(o) as any
 }

@@ -88,7 +88,6 @@ const service: Fn = ({ metadataRepository, dataRepository }) => ({
 	getFileContent: ({ path, sub }) =>
 		metadataRepository.file
 			.read({ path, sub })
-			.tap(console.log)
 			.chain(Oath.fromNullable)
 			.rejectedMap(() => new Error("File not found"))
 			.chain(file => dataRepository.read({ sub, fsid: file.fsid })),

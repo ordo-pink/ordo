@@ -17,6 +17,7 @@ export type TEither<R, L> = {
 	leftMap: <L1>(f: (x: L) => L1) => TEither<R, L1>
 	getOrElse: <L1>(f: (x: L) => L1) => R | L1
 	chain: <R1, L1>(f: (x: R) => TEither<R1, L1>) => TEither<R1, L | L1>
+	fix: <R1>(f: (x: L) => R1) => TEither<R | R1, never>
 	fold: <R1, L1>(f: (x: L) => L1, g: (x: R) => R1) => L1 | R1
 }
 

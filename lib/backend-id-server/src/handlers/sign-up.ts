@@ -73,7 +73,6 @@ export const handleSignUp: Fn =
 					.chain(tokens =>
 						dataService
 							.createUserSpace(tokens.sub)
-							.tap(console.log, console.log)
 							.rejectedMap(HttpError.from)
 							.map(() => new Date(Date.now() + tokens.exp))
 							.tap(expires =>

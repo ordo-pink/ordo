@@ -19,6 +19,11 @@ export namespace cmd {
 		export type signOut = { name: "user.sign-out" }
 	}
 
+	export namespace notification {
+		export type show = { name: "notification.show"; payload: Notification.Item }
+		export type hide = { name: "notification.hide"; payload: string }
+	}
+
 	export namespace data {
 		export type refreshRoot = { name: "data.refresh-root" }
 		export type getFileContent = { name: "data.get-file-content"; payload: FilePath }
@@ -77,6 +82,22 @@ export namespace cmd {
 			}
 		}
 		export type hide = { name: "modal.hide" }
+	}
+}
+
+export namespace Notification {
+	export type Type = "success" | "rrr" | "info" | "warn" | "question" | "default"
+
+	export type RegisterredItem<T = null> = Notification.Item & { id: string }
+
+	export type Item<T = null> = {
+		type: Type
+		persist?: boolean
+		title?: string
+		message: string
+		payload?: T
+		action?: (id: string, payload: T) => any
+		actionText?: string
 	}
 }
 

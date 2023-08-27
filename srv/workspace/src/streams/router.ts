@@ -15,8 +15,6 @@ export const __initRouter: InitRouter = callOnce(({ logger }) => {
 	logger.debug("Initializing router")
 
 	commands.on<cmd.router.navigate>("router.navigate", ({ payload }) => {
-		logger.debug("Navigating to", payload)
-
 		if (Array.isArray(payload)) {
 			router$.set(...(payload as [string]))
 			return
@@ -33,11 +31,10 @@ export const __initRouter: InitRouter = callOnce(({ logger }) => {
 		},
 	)
 
-	return { router$ }
+	return router$
 })
 
 type InitRouterP = { logger: Logger }
-type InitRouterR = { router$: Router }
-type InitRouter = Unary<InitRouterP, InitRouterR>
+type InitRouter = Unary<InitRouterP, Router>
 
 const router$ = new Router({ hashRouting: false, init: true })

@@ -16,6 +16,7 @@ import CommandPaletteModal from "$components/command-palette"
 import { useSubscription } from "./use-subscription"
 import { useHotkeys } from "react-hotkeys-hook"
 import { cmd } from "@ordo-pink/frontend-core"
+import { __Notification$, __initNotification } from "$streams/notification"
 
 const commands = getCommands()
 
@@ -28,6 +29,7 @@ export type UseAppInitReturns = {
 	modal$: Nullable<__Modal$>
 	sidebar$: Nullable<__Sidebar$>
 	contextMenu$: Nullable<__ContextMenu$>
+	notification$: Nullable<__Notification$>
 	globalCommandPalette$: Nullable<__CommandPalette$>
 	currentCommandPalette$: Nullable<__CommandPalette$>
 }
@@ -40,6 +42,7 @@ export const useAppInit = (): UseAppInitReturns => {
 	const [contextMenu$, setContextMenu$] = useState<Nullable<__ContextMenu$>>(null)
 	const [modal$, setModal$] = useState<Nullable<__Modal$>>(null)
 	const [sidebar$, setSidebar$] = useState<Nullable<__Sidebar$>>(null)
+	const [notification$, setNotification$] = useState<Nullable<__Notification$>>(null)
 	const [auth$, setAuth$] = useState<Nullable<__Auth$>>(null)
 
 	const commandPaletteItems = useSubscription(currentCommandPalette$)
@@ -71,6 +74,9 @@ export const useAppInit = (): UseAppInitReturns => {
 		const auth$ = __initAuth(ctx)
 		setAuth$(auth$)
 
+		const notification$ = __initNotification(ctx)
+		setNotification$(notification$)
+
 		const modal$ = __initModal(ctx)
 		setModal$(modal$)
 
@@ -82,7 +88,7 @@ export const useAppInit = (): UseAppInitReturns => {
 		setGlobalCommandPalette$(commandPalettes?.globalCommandPalette$)
 		setCurrentCommandPalette$(commandPalettes?.currentCommandPalette$)
 
-		const { router$ } = __initRouter(ctx)
+		const router$ = __initRouter(ctx)
 
 		const sidebar$ = __initSidebar(ctx)
 		setSidebar$(sidebar$)
@@ -106,5 +112,13 @@ export const useAppInit = (): UseAppInitReturns => {
 		})
 	}, [commandPaletteItems])
 
-	return { contextMenu$, modal$, globalCommandPalette$, currentCommandPalette$, sidebar$, auth$ }
+	return {
+		contextMenu$,
+		modal$,
+		globalCommandPalette$,
+		currentCommandPalette$,
+		notification$,
+		sidebar$,
+		auth$,
+	}
 }

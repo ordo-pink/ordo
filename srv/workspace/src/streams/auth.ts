@@ -13,6 +13,7 @@ import { Oath } from "@ordo-pink/oath"
 import { useSubscription } from "$hooks/use-subscription"
 import { getCommands } from "$streams/commands"
 import { FSEntity } from "@ordo-pink/datautil/src/common"
+import { rrrToNotification } from "$utils/error-to-notification"
 
 const commands = getCommands()
 
@@ -50,9 +51,10 @@ export const __initAuth: InitAuth = callOnce(({ logger }) => {
 				),
 			)
 			.chain(res => Oath.from(() => res.json()))
-			.chain(body => (body.success ? Oath.of(body.result) : Oath.reject(body.error)))
+			.chain(body => (body.success ? Oath.of(body.result) : Oath.reject(body.error as string)))
+			.rejectedMap(rrrToNotification("Error fetching user info"))
 			.fork(
-				(error: any) => error$.next(error),
+				item => commands.emit<cmd.notification.show>("notification.show", item),
 				result => user$.next(result),
 			),
 	)
@@ -66,14 +68,15 @@ export const __initAuth: InitAuth = callOnce(({ logger }) => {
 					}).then(res => res.json()),
 				),
 			)
-			.chain(body => (body.success ? Oath.of(body.result) : Oath.reject(body.error)))
+			.chain(body => (body.success ? Oath.of(body.result) : Oath.reject(body.error as string)))
+			.rejectedMap(rrrToNotification("Error fetching directories"))
 			.fork(
-				error => error$.next(error),
+				item => commands.emit<cmd.notification.show>("notification.show", item),
 				result => metadata$.next(result),
 			),
 	)
 
-	commands.on("core.sign-out", () =>
+	commands.on<cmd.user.signOut>("user.sign-out", () =>
 		commands.emit<cmd.router.openExternal>("router.open-external", {
 			url: `${process.env.REACT_APP_WEB_HOST}/sign-out`,
 			newTab: false,
@@ -84,7 +87,7 @@ export const __initAuth: InitAuth = callOnce(({ logger }) => {
 		id: "core.sign-out",
 		readableName: "Sign out",
 		Icon: AiOutlineLogout,
-		onSelect: () => commands.emit("core.sign-out"),
+		onSelect: () => commands.emit<cmd.user.signOut>("user.sign-out"),
 	})
 
 	return auth$
@@ -93,7 +96,6 @@ export const __initAuth: InitAuth = callOnce(({ logger }) => {
 const auth$ = new BehaviorSubject<Nullable<AuthResponse>>(null)
 const metadata$ = new BehaviorSubject<FSEntity[]>([])
 const user$ = new BehaviorSubject<Nullable<User>>(null)
-const error$ = new BehaviorSubject<Nullable<string>>(null)
 
 export const useAuthStatus = () => {
 	const auth = useSubscription(auth$)
@@ -109,5 +111,3 @@ export const useUser = () => {
 	const user = useSubscription(user$)
 	return Either.fromNullable(user)
 }
-
-export const useError = () => useSubscription(error$)

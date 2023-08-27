@@ -9,7 +9,7 @@ import { __ContextMenu$ } from "$streams/context-menu"
 import ContextMenuItemList from "$components/context-menu/context-menu-item-list"
 import Null from "$components/null"
 import { getCommands } from "$streams/commands"
-import { ContextMenu as TContextMenu } from "@ordo-pink/frontend-core"
+import { ContextMenu as TContextMenu, cmd } from "@ordo-pink/frontend-core"
 
 const commands = getCommands()
 
@@ -22,7 +22,7 @@ export default function ContextMenu({ menu$ }: _P) {
 
 	const menu = useSubscription(menu$)
 
-	useHotkeys("Esc", () => menu && commands.emit("context-menu.hide"))
+	useHotkeys("Esc", () => menu && commands.emit<cmd.contextMenu.hide>("context-menu.hide"))
 
 	useEffect(() => {
 		if (!menu) {

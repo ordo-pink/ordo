@@ -8,6 +8,7 @@ import { useSubscription } from "$hooks/use-subscription"
 import { __Modal$ } from "$streams/modal"
 import Null from "$components/null"
 import { getCommands } from "$streams/commands"
+import { cmd } from "@ordo-pink/frontend-core"
 
 const commands = getCommands()
 
@@ -19,7 +20,7 @@ export default function Modal({ modal$ }: _P) {
 		if (!modalState) return
 
 		modalState.onHide()
-		commands.emit("modal.hide")
+		commands.emit<cmd.modal.hide>("modal.hide")
 	}
 
 	useHotkeys("Esc", handleHide, [modalState])

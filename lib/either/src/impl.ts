@@ -12,6 +12,7 @@ const left: LeftFn = x => ({
 	leftMap: f => left(f(x)),
 	getOrElse: f => f(x),
 	chain: () => left(x),
+	fix: f => right(f(x)),
 	fold: f => f(x),
 })
 
@@ -24,6 +25,7 @@ const right: RightFn = x => ({
 	leftMap: () => right(x),
 	getOrElse: () => x,
 	chain: f => f(x),
+	fix: () => right(x),
 	fold: (_, g) => g(x),
 })
 

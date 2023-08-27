@@ -8,7 +8,7 @@ import RenderFromNullable from "$components/render-from-nullable"
 import ActionListItem from "$components/action-list-item"
 import Accelerator from "$components/accelerator"
 import { MouseEvent } from "react"
-import { ContextMenu } from "@ordo-pink/frontend-core"
+import { ContextMenu, cmd } from "@ordo-pink/frontend-core"
 
 const commands = getCommands()
 
@@ -20,7 +20,7 @@ export default function MenuItem({ item, event, payload: p }: _P) {
 		Either.fromNullable(item.accelerator)
 			.chain(() => Either.fromBoolean(() => !isDisabled))
 			.map(() => commands.emit(item.commandName, payload))
-			.map(() => commands.emit("context-menu.hide"))
+			.map(() => commands.emit<cmd.contextMenu.hide>("context-menu.hide"))
 
 	useAccelerator(item.accelerator, emitContextMenuItemCommand)
 

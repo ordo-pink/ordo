@@ -27,7 +27,6 @@ export default function ActivityBar({ commandPalette$, sidebar$ }: _P) {
 	const sidebar = useStrictSubscription(sidebar$, { disabled: true })
 	const activities = useActivities()
 	const commandPaletteItems = useSubscription(commandPalette$)
-	console.log(sidebar)
 
 	const isSidebarCollapsed = sidebar.disabled || sidebar.sizes[0] === 0
 

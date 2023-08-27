@@ -11,9 +11,10 @@ import {
 	BsCircle,
 } from "react-icons/bs"
 import { Switch } from "@ordo-pink/switch"
+import { Notification } from "@ordo-pink/frontend-core"
 
 type Props = {
-	type?: "info" | "warn" | "error" | "success" | "question"
+	type?: Notification.Type
 }
 
 export const Callout = ({ type, children }: PropsWithChildren<Props>) => {
@@ -37,7 +38,7 @@ export const Callout = ({ type, children }: PropsWithChildren<Props>) => {
 			background = "bg-violet-100 dark:bg-violet-800"
 			Icon = () => <BsQuestionCircle className="shrink-0 text-violet-500 text-xl" />
 		})
-		.case("error", () => {
+		.case("rrr", () => {
 			background = "bg-rose-100 dark:bg-rose-800"
 			Icon = () => <BsXCircle className="shrink-0 text-rose-500 text-xl" />
 		})

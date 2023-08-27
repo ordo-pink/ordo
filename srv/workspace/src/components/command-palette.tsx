@@ -12,7 +12,7 @@ import { getCommands } from "$streams/commands"
 import RenderFromNullable from "$components/render-from-nullable"
 import ActionListItem from "$components/action-list-item"
 import Accelerator from "$components/accelerator"
-import { CommandPalette } from "@ordo-pink/frontend-core"
+import { CommandPalette, cmd } from "@ordo-pink/frontend-core"
 
 const commands = getCommands()
 
@@ -23,7 +23,7 @@ type Props = {
 const fuse = new Fuse([] as CommandPalette.Item[], { keys: ["name"] })
 
 export default function CommandPaletteModal({ items }: Props) {
-	useHotkeys("Esc", () => commands.emit("command-palette.close"))
+	useHotkeys("Esc", () => commands.emit<cmd.commandPalette.hide>("command-palette.hide"))
 
 	const [currentIndex, setCurrentIndex] = useState(0)
 	const [inputValue, setInputValue] = useState("")
@@ -72,7 +72,7 @@ export default function CommandPaletteModal({ items }: Props) {
 	const handleEscape = () => {
 		setInputValue("")
 		setCurrentIndex(0)
-		commands.emit("command-palette.hide")
+		commands.emit<cmd.commandPalette.hide>("command-palette.hide")
 	}
 
 	const handleKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {

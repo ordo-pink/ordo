@@ -13,10 +13,12 @@ import { getCommands } from "$streams/commands"
 import { useSubscription } from "$hooks/use-subscription"
 import { useEffect } from "react"
 import { useExtensions } from "$streams/extensions"
-import { BsPersonCircle } from "react-icons/bs"
+import { BsFolder2Open, BsHouse, BsPersonCircle } from "react-icons/bs"
 import UserPage from "./pages/user.page"
 import { cmd } from "@ordo-pink/frontend-core"
 import Notifications from "$components/notifications/notifications.component"
+import WelcomePage from "./pages/welcome.page"
+import FsPage from "./pages/fs.page"
 
 const commands = getCommands()
 
@@ -42,11 +44,23 @@ export default function App() {
 			onSelect: () => commands.emit<cmd.router.navigate>("router.navigate", "/user"),
 		})
 
+		exts.activities.add("welcome", {
+			Component: () => <WelcomePage />,
+			Icon: BsHouse,
+			routes: ["/"],
+		})
+
 		exts.activities.add("user", {
 			Component: () => <UserPage auth={auth} />,
 			Icon: BsPersonCircle,
 			routes: ["/user"],
 			background: true,
+		})
+
+		exts.activities.add("fs", {
+			Component: () => <FsPage />,
+			Icon: BsFolder2Open,
+			routes: ["/fs", "/fs/:path*"],
 		})
 
 		return () => {

@@ -16,7 +16,7 @@ import { cmd } from "@ordo-pink/frontend-core"
 import { Oath } from "@ordo-pink/oath"
 import { Switch } from "@ordo-pink/switch"
 import { Nullable, noop } from "@ordo-pink/tau"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { BsPatchCheckFill, BsPatchExclamation } from "react-icons/bs"
 
 const commands = getCommands()
@@ -24,6 +24,10 @@ const commands = getCommands()
 type _P = { auth: Nullable<AuthResponse> }
 export default function UserPage({ auth }: _P) {
 	const userE = useUser()
+
+	useEffect(() => {
+		commands.emit<cmd.sidebar.disable>("sidebar.disable")
+	}, [])
 
 	return Either.fromNullable(auth)
 		.chain(() => userE)

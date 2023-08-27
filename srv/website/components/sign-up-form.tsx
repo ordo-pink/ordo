@@ -6,7 +6,9 @@ import { Button } from "./button"
 import { Callout } from "./callout"
 import { EmailInput, PasswordInput } from "./input"
 
-export default function SignUpForm() {
+type _P = { idHost: string; workspaceHost: string }
+
+export default function SignUpForm({ idHost, workspaceHost }: _P) {
 	const [emailErrors, setEmailErrors] = useState<string[]>([])
 	const [passwordErrors, setPasswordErrors] = useState<string[]>([])
 
@@ -70,7 +72,9 @@ export default function SignUpForm() {
 
 						if (isButtonDisabled) return
 
-						await fetch("http://localhost:3001/sign-up", {
+						await fetch(`${idHost}/sign-up`, {
+							credentials: "include",
+							headers: { "content-type": "application/json" },
 							body: JSON.stringify({
 								email: email,
 								password: password,
@@ -78,7 +82,7 @@ export default function SignUpForm() {
 							method: "POST",
 						}).then(res => res.json())
 
-						window.location.replace("/~/")
+						window.location.replace(workspaceHost)
 					}}
 				>
 					Sign up

@@ -13,8 +13,10 @@ import { FSDataRepository } from "@ordo-pink/backend-fs-data-repository"
 import { FSMetadataRepository } from "@ordo-pink/backend-fs-metadata-repository"
 import { getPrivateKey, getPublicKey } from "./utils/get-key"
 import { MemoryTokenRepository } from "@ordo-pink/backend-memory-token-repository"
+import { FSUserRepository } from "@ordo-pink/backend-fs-user-repository"
 
 const {
+	ID_USER_REPOSITORY,
 	ID_DYNAMODB_ENDPOINT,
 	ID_DYNAMODB_ACCESS_KEY,
 	ID_DYNAMODB_SECRET_KEY,
@@ -33,7 +35,7 @@ const {
 	WORKSPACE_HOST,
 	WEB_HOST,
 } = getc([
-	"ID_USER_ADAPTER",
+	"ID_USER_REPOSITORY",
 	"ID_DYNAMODB_ENDPOINT",
 	"ID_DYNAMODB_ACCESS_KEY",
 	"ID_DYNAMODB_SECRET_KEY",
@@ -70,13 +72,16 @@ const main = async () => {
 	const metadataRepository = FSMetadataRepository.of({ root: DATA_METADATA_PATH })
 
 	const tokenRepository = await MemoryTokenRepository.create("./var/srv/id/tokens.json")
-	const userRepository = DynamoDBUserStorageAdapter.of({
-		region: ID_DYNAMODB_REGION,
-		endpoint: ID_DYNAMODB_ENDPOINT,
-		awsAccessKeyId: ID_DYNAMODB_ACCESS_KEY,
-		awsSecretKey: ID_DYNAMODB_SECRET_KEY,
-		tableName: ID_USER_TABLE_NAME,
-	})
+	const userRepository =
+		ID_USER_REPOSITORY === "dynamodb"
+			? DynamoDBUserStorageAdapter.of({
+					region: ID_DYNAMODB_REGION,
+					endpoint: ID_DYNAMODB_ENDPOINT,
+					awsAccessKeyId: ID_DYNAMODB_ACCESS_KEY,
+					awsSecretKey: ID_DYNAMODB_SECRET_KEY,
+					tableName: ID_USER_TABLE_NAME,
+			  })
+			: FSUserRepository.of("./var/srv/id/users.json")
 
 	const app = await createIDServer({
 		userRepository,

@@ -40,6 +40,15 @@ export const stat0 = (...args: Parameters<typeof promises.stat>) =>
 export const readdir0 = oathify(promises.readdir)
 export const mkdirRecursive0 = (path: string) => mkdir0(path, { recursive: true })
 
+export const writeFileRecursive0 = (...[path, data, options]: Parameters<typeof writeFile0>) =>
+	Oath.fromBoolean(
+		() => typeof path === "string",
+		noop,
+		() => new Error("writeFileRecursive0 can only create files from string paths"),
+	)
+		.chain(() => createParentDirectory0(path as string))
+		.chain(() => writeFile0(path, data, options))
+
 export const createDirectoryIfNotExists0 = (path: string) =>
 	stat0(path)
 		.fix(() => mkdirRecursive0(path))

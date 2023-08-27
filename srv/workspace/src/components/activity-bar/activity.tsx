@@ -1,11 +1,15 @@
 // SPDX-FileCopyrightText: Copyright 2023, 谢尔盖||↓ and the Ordo.pink contributors
 // SPDX-License-Identifier: MIT
 
-import { Activity, useCurrentActivity } from "$streams/extensions"
+import { useCurrentActivity } from "$streams/extensions"
 import Link from "$components/link"
+import { getCommands } from "$streams/commands"
+import { Activity, ComponentSpace } from "@ordo-pink/frontend-core"
+
+const commands = getCommands()
 
 type Props = {
-	activity: Activity
+	activity: Activity.Activity
 }
 
 /**
@@ -15,7 +19,7 @@ export default function ActivityBarActivity({ activity }: Props) {
 	const currentActivity = useCurrentActivity()
 
 	const activityRoute = activity.routes[0]
-	const Icon = activity.Icon
+	const Icon = activity.Component
 
 	return (
 		<Link
@@ -26,7 +30,7 @@ export default function ActivityBarActivity({ activity }: Props) {
 			}`}
 			href={activityRoute}
 		>
-			<Icon />
+			<Icon commands={commands} space={ComponentSpace.ICON} />
 		</Link>
 	)
 }

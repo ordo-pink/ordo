@@ -13,12 +13,11 @@ import { getCommands } from "$streams/commands"
 import { useSubscription } from "$hooks/use-subscription"
 import { useEffect } from "react"
 import { useExtensions } from "$streams/extensions"
-import { BsFolder2Open, BsHouse, BsPersonCircle } from "react-icons/bs"
-import UserPage from "./pages/user.page"
+import { BsPersonCircle } from "react-icons/bs"
+import UserPage from "./extensions/user.page"
 import { cmd } from "@ordo-pink/frontend-core"
 import Notifications from "$components/notifications/notifications.component"
-import WelcomePage from "./pages/welcome.page"
-import FsPage from "./pages/fs.page"
+import WelcomePage from "./extensions/welcome.page"
 
 const commands = getCommands()
 
@@ -44,24 +43,26 @@ export default function App() {
 			onSelect: () => commands.emit<cmd.router.navigate>("router.navigate", "/user"),
 		})
 
-		exts.activities.add("welcome", {
-			Component: () => <WelcomePage />,
-			Icon: BsHouse,
+		// TODO: Move to import
+		exts.activities.add({
+			name: "ordo.welcome",
+			Component: WelcomePage,
 			routes: ["/"],
 		})
 
-		exts.activities.add("user", {
-			Component: () => <UserPage auth={auth} />,
-			Icon: BsPersonCircle,
-			routes: ["/user"],
-			background: true,
-		})
+		import("./extensions/fs").then(f => f.default())
 
-		exts.activities.add("fs", {
-			Component: () => <FsPage />,
-			Icon: BsFolder2Open,
-			routes: ["/fs", "/fs/:path*"],
-		})
+		// TODO: Move to import
+		// exts.activities.add("user", {
+		// 	Component: props => <UserPage auth={auth} {...props} />,
+		// 	routes: ["/user"],
+		// 	background: true,
+		// })
+
+		// exts.activities.add("fs", {
+		// 	Component: FsPage,
+		// 	routes: ["/fs", "/fs/:path*"],
+		// })
 
 		return () => {
 			exts.activities.remove("user")

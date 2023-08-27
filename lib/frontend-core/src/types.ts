@@ -12,6 +12,8 @@ import type {
 	UpdateDirectoryParams,
 	UpdateFileParams,
 } from "@ordo-pink/datautil"
+import { Logger } from "@ordo-pink/logger"
+import { ComponentSpace } from "./constants/component-space.constants"
 
 export namespace cmd {
 	export namespace user {
@@ -22,6 +24,11 @@ export namespace cmd {
 	export namespace notification {
 		export type show = { name: "notification.show"; payload: Notification.Item }
 		export type hide = { name: "notification.hide"; payload: string }
+	}
+
+	export namespace activities {
+		export type add = { name: "activities.add"; payload: Activity.Activity }
+		export type remove = { name: "activities.remove"; payload: string }
 	}
 
 	export namespace data {
@@ -82,6 +89,86 @@ export namespace cmd {
 			}
 		}
 		export type hide = { name: "modal.hide" }
+	}
+}
+
+export namespace Activity {
+	export type Activity = {
+		name: string
+		routes: string[]
+		Component: ComponentType<Activity.ComponentProps>
+		background?: boolean
+	}
+
+	export type ComponentProps = {
+		commands: Commands.Commands
+		space: ComponentSpace
+	}
+}
+
+export namespace Commands {
+	/**
+	 * Context provided to command handler.
+	 */
+	export type Context<P = any> = { logger: Logger; payload: P }
+
+	/**
+	 * Command handler.
+	 */
+	export type Handler<P> = Unary<Commands.Context<P>, any>
+
+	export type Commands = {
+		/**
+		 * Append a listener to a given command.
+		 */
+		on: <
+			T extends { name: `${string}.${string}`; payload?: any } = {
+				name: `${string}.${string}`
+				payload: any
+			},
+		>(
+			name: T extends { name: infer U; payload?: any } ? U : never,
+			handler: Commands.Handler<T extends { name: any; payload?: infer U } ? U : never>,
+		) => any
+
+		/**
+		 * Remove given listener for a given command. Make sure you provide a reference to the same
+		 * function as you did when calling `on`.
+		 */
+		off: <
+			T extends { name: `${string}.${string}`; payload?: any } = {
+				name: `${string}.${string}`
+				payload: any
+			},
+		>(
+			name: T extends { name: infer U; payload?: any } ? U : never,
+			handler: Commands.Handler<T extends { name: any; payload?: infer U } ? U : never>,
+		) => any
+
+		/**
+		 * Emit given command with given payload.
+		 */
+		emit: <
+			T extends { name: `${string}.${string}`; payload?: any } = {
+				name: `${string}.${string}`
+				payload?: any
+			},
+		>(
+			name: T extends { name: infer U; payload?: any } ? U : never,
+			payload?: T extends { name: any; payload: infer U } ? U : never,
+		) => any
+		/**
+		 * Prepend listener to a given command.
+		 */
+		before: <
+			T extends { name: `${string}.${string}`; payload: any } = {
+				name: `${string}.${string}`
+				payload: any
+			},
+		>(
+			name: T extends { name: infer U; payload: any } ? U : never,
+			handler: Commands.Handler<T extends { name: any; payload: infer U } ? U : never>,
+		) => any
 	}
 }
 

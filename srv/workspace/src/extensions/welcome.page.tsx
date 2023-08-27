@@ -4,23 +4,32 @@
 import Card from "$components/card.component"
 import { CenteredPage } from "$components/centered-page"
 import { Title } from "$components/page-header"
-import { getCommands } from "$streams/commands"
-import { cmd } from "@ordo-pink/frontend-core"
-import { useEffect } from "react"
+import { Activity, ComponentSpace, cmd } from "@ordo-pink/frontend-core"
+import { Switch } from "@ordo-pink/switch"
+import { memo, useEffect } from "react"
+import { BsCollection } from "react-icons/bs"
 
-const commands = getCommands()
+const WelcomePage = ({ commands, space }: Activity.ComponentProps) =>
+	Switch.of(space)
+		.case(ComponentSpace.ICON, () => <Icon />)
+		.default(() => <Workspace commands={commands} />)
 
-export default function WelcomePage() {
+export default memo(WelcomePage, (prev, next) => prev.space === next.space)
+
+const Icon = () => <BsCollection />
+
+const Workspace = ({ commands }: Pick<Activity.ComponentProps, "commands">) => {
 	useEffect(() => {
 		commands.emit<cmd.sidebar.disable>("sidebar.disable")
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [])
 
 	return (
-		<CenteredPage centerX centerY>
-			<div className="mb-8">
+		<CenteredPage centerX>
+			<div className="my-8">
 				<Title level="1">Welcome to Ordo!</Title>
 			</div>
-			<div className="w-full grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 px-8">
+			<div className="container grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 px-8">
 				<Card title="Announcements" className="row-span-3">
 					<p>TODO: Announcements</p>
 				</Card>

@@ -6,13 +6,13 @@ import { useState, useEffect } from "react"
 import Split from "react-split"
 import { Either } from "@ordo-pink/either"
 import { useWindowSize } from "../hooks/use-window-size"
-import { useCurrentActivity, Activity } from "../streams/extensions"
+import { useCurrentActivity } from "../streams/extensions"
 import { getCommands } from "$streams/commands"
 import Sidebar from "./sidebar"
 import { __CommandPalette$ } from "$streams/command-palette"
 import { __Sidebar$ } from "$streams/sidebar"
 import { useStrictSubscription } from "$hooks/use-subscription"
-import { cmd } from "@ordo-pink/frontend-core"
+import { Activity, ComponentSpace, cmd } from "@ordo-pink/frontend-core"
 
 // TODO: Render Welcome page if activity is null
 // TODO: Extract internal components to separate files
@@ -37,7 +37,7 @@ export default function Workspace({ commandPalette$, sidebar$ }: _P) {
 // --- Internal ---
 
 type OnDragEndFn = Unary<[number, number], void>
-type DisabledSidebarProps = { activity: Nullable<Activity> }
+type DisabledSidebarProps = { activity: Nullable<Activity.Activity> }
 type EnabledSidebarP = DisabledSidebarProps & {
 	sidebar$: __Sidebar$
 	commandPalette$: Nullable<__CommandPalette$>
@@ -48,7 +48,7 @@ const DisabledSidebar = ({ activity }: DisabledSidebarProps) =>
 		() => <div>Welcome</div>,
 		({ Component }) => (
 			<div className="workspace w-full h-full overflow-auto">
-				<Component />
+				<Component commands={commands} space={ComponentSpace.WORKSPACE} />
 			</div>
 		),
 	)
@@ -118,7 +118,7 @@ const EnabledSidebar = ({ sidebar$, activity, commandPalette$ }: EnabledSidebarP
 				<div
 					className={`workspace h-full w-full ${sizes[1] <= 5 ? "hidden" : "block"} overflow-auto`}
 				>
-					<Component />
+					<Component commands={commands} space={ComponentSpace.WORKSPACE} />
 				</div>
 			</Split>
 		),

@@ -31,11 +31,11 @@ export default function App() {
 		commands.emit<cmd.user.refreshInfo>("user.refresh")
 		commands.emit<cmd.data.refreshRoot>("data.refresh-root")
 
-		import("./extensions/home").then(f => f.default())
-		import("./extensions/file-explorer").then(f => f.default())
-		import("./extensions/user").then(f => f.default(auth))
+		import("./functions/home").then(f => f.default())
+		import("./functions/file-explorer").then(f => f.default())
+		import("./functions/user").then(f => f.default(auth))
 
-		// TODO: Enable user extensions
+		// TODO: Enable user functions
 
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [auth === null])
@@ -47,16 +47,39 @@ export default function App() {
 			.chain(() => Either.fromNullable(streams.globalCommandPalette$))
 			.chain(() => Either.fromNullable(streams.sidebar$))
 			.chain(() => Either.fromNullable(streams.notification$))
+			.chain(() => Either.fromNullable(streams.activities$))
+			.chain(() => Either.fromNullable(streams.currentActivity$))
+			.chain(() => Either.fromNullable(streams.currentRoute$))
 			.map(() => streams as { [K in keyof typeof streams]: NonNullable<(typeof streams)[K]> }) // TODO: Extract to tau
 			// TODO: Render loading instead of Null
-			.fold(Null, ({ contextMenu$, modal$, globalCommandPalette$, sidebar$, notification$ }) => (
-				<div className="flex" onClick={hideContextMenu}>
-					<ActivityBar sidebar$={sidebar$} commandPalette$={globalCommandPalette$} />
-					<Workspace sidebar$={sidebar$} commandPalette$={globalCommandPalette$} />
-					<ContextMenu menu$={contextMenu$} />
-					<Modal modal$={modal$} />
-					<Notifications notification$={notification$} />
-				</div>
-			))
+			.fold(
+				Null,
+				({
+					contextMenu$,
+					modal$,
+					globalCommandPalette$,
+					sidebar$,
+					notification$,
+					activities$,
+					currentActivity$,
+				}) => (
+					<div className="flex" onClick={hideContextMenu}>
+						<ActivityBar
+							sidebar$={sidebar$}
+							currentActivity$={currentActivity$}
+							commandPalette$={globalCommandPalette$}
+							activities$={activities$}
+						/>
+						<Workspace
+							sidebar$={sidebar$}
+							commandPalette$={globalCommandPalette$}
+							currentActivity$={currentActivity$}
+						/>
+						<ContextMenu menu$={contextMenu$} />
+						<Modal modal$={modal$} />
+						<Notifications notification$={notification$} />
+					</div>
+				),
+			)
 	)
 }

@@ -7,10 +7,10 @@ import { Switch } from "@ordo-pink/switch"
 export const UserUtils = {
 	getUserName: (user: User) =>
 		Switch.of(user)
-			.case(
-				u => !!u.firstName && !!u.lastName && !!u.handle,
-				() => `${user.firstName} ${user.lastName} (${user.handle})`,
-			)
+			// .case(
+			// 	u => !!u.firstName && !!u.lastName && !!u.handle,
+			// 	() => `${user.firstName} ${user.lastName} (${user.handle})`,
+			// )
 			.case(
 				u => !!u.firstName && !!u.lastName,
 				() => `${user.firstName!} ${user.lastName}`,
@@ -19,9 +19,9 @@ export const UserUtils = {
 				u => !!u.firstName,
 				() => user.firstName,
 			)
-			.case(
-				u => !!u.handle,
-				() => user.handle,
-			)
+			// .case(
+			// 	u => !!u.handle,
+			// 	() => user.handle,
+			// )
 			.default(() => user.email),
 }

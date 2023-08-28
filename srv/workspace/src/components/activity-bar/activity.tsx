@@ -1,22 +1,24 @@
 // SPDX-FileCopyrightText: Copyright 2023, 谢尔盖||↓ and the Ordo.pink contributors
 // SPDX-License-Identifier: MIT
 
-import { useCurrentActivity } from "$streams/extensions"
+import { __CurrentActivity$ } from "$streams/activities"
 import Link from "$components/link"
 import { getCommands } from "$streams/commands"
 import { Activity, ComponentSpace } from "@ordo-pink/frontend-core"
+import { useSubscription } from "$hooks/use-subscription"
 
 const commands = getCommands()
 
 type Props = {
 	activity: Activity.Activity
+	currentActivity$: __CurrentActivity$
 }
 
 /**
  * ActivityBarActivity is the Icon user can click to get to the activity.
  */
-export default function ActivityBarActivity({ activity }: Props) {
-	const currentActivity = useCurrentActivity()
+export default function ActivityBarActivity({ activity, currentActivity$ }: Props) {
+	const currentActivity = useSubscription(currentActivity$)
 
 	const activityRoute = activity.routes[0]
 	const Icon = activity.Component

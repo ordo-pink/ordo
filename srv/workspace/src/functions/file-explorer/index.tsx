@@ -7,7 +7,7 @@ import { Activity, ComponentSpace, cmd } from "@ordo-pink/frontend-core"
 import { memo, useEffect } from "react"
 import { Switch } from "@ordo-pink/switch"
 import { BsFolder2Open } from "react-icons/bs"
-import { createExtension } from "$utils/create-extension.util"
+import { createOrdoFunction } from "$utils/create-function.util"
 
 const FileExplorerComponent = ({ space, commands }: Activity.ComponentProps) =>
 	Switch.of(space)
@@ -17,8 +17,8 @@ const FileExplorerComponent = ({ space, commands }: Activity.ComponentProps) =>
 const FSActivity = memo(FileExplorerComponent, (prev, next) => prev.space === next.space)
 
 // TODO: Provide commands and queries via the import
-export default function createFileExplorerExtension() {
-	return createExtension(commands => {
+export default function createFileExplorerFunction() {
+	return createOrdoFunction(commands => {
 		commands.emit<cmd.activities.add>("activities.add", {
 			Component: FSActivity,
 			name: "ordo.file-explorer",

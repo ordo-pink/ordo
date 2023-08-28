@@ -8,8 +8,9 @@ import Null from "$components/null"
 import { Title } from "$components/page-header"
 import UsedSpace from "$components/used-space"
 import { useUser } from "$streams/auth"
-import { createExtension } from "$utils/create-extension.util"
-import { UserUtils } from "$utils/user.utils"
+import { createOrdoFunction } from "$utils/create-function.util"
+import { Hosts } from "$utils/hosts"
+import { UserUtils } from "$utils/user-utils.util"
 import { AuthResponse } from "@ordo-pink/backend-id-server"
 import { User } from "@ordo-pink/backend-user-service"
 import { Either } from "@ordo-pink/either"
@@ -31,8 +32,8 @@ const UserActivity = memo(UserComponent, (prev, next) => prev.auth !== next.auth
 
 const Icon = () => <BsPersonBadge />
 
-export default function createUserExtension(auth: Nullable<AuthResponse>) {
-	return createExtension(commands => {
+export default function createUserFunction(auth: Nullable<AuthResponse>) {
+	return createOrdoFunction(commands => {
 		commands.emit<cmd.activities.add>("activities.add", {
 			Component: props => <UserActivity auth={auth} {...props} />,
 			name: "user",
@@ -86,7 +87,7 @@ const UserInfo = ({ user, auth, commands }: _UIP) => {
 			<div className="w-full max-w-lg flex space-x-4 mb-8 md:mb-4 items-center">
 				<div className="flex items-center justify-center rounded-full p-0.5 bg-gradient-to-tr from-sky-400 via-purple-400 to-rose-400 shadow-lg shrink-0 cursor-pointer">
 					<img
-						src={`${process.env.REACT_APP_STATIC_HOST}/logo.png`}
+						src={`${Hosts.STATIC}/logo.png`}
 						alt="avatar"
 						className="h-16 md:h-20 rounded-full bg-white dark:from-stone-900 dark:via-zinc-900 dark:to-neutral-900"
 						// onClick={() =>
@@ -131,7 +132,7 @@ const UserInfo = ({ user, auth, commands }: _UIP) => {
 								disabled={emailErrors.length > 0 || email === user.email}
 								onClick={() =>
 									Oath.try(() =>
-										fetch(`${process.env.REACT_APP_ID_HOST}/change-email`, {
+										fetch(`${Hosts.ID}/change-email`, {
 											method: "PATCH",
 											headers: {
 												authorization: `Bearer ${auth!.accessToken}`,
@@ -190,7 +191,7 @@ const UserInfo = ({ user, auth, commands }: _UIP) => {
 							}
 							onClick={() =>
 								Oath.try(() =>
-									fetch(`${process.env.REACT_APP_ID_HOST}/change-account-info`, {
+									fetch(`${Hosts.ID}/change-account-info`, {
 										method: "PATCH",
 										headers: {
 											authorization: `Bearer ${auth!.accessToken}`,
@@ -272,7 +273,7 @@ const UserInfo = ({ user, auth, commands }: _UIP) => {
 							}
 							onClick={() =>
 								Oath.try(() =>
-									fetch(`${process.env.REACT_APP_ID_HOST}/change-password`, {
+									fetch(`${Hosts.ID}/change-password`, {
 										method: "PATCH",
 										credentials: "include",
 										headers: {

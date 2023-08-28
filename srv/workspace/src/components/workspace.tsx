@@ -6,12 +6,12 @@ import { useState, useEffect } from "react"
 import Split from "react-split"
 import { Either } from "@ordo-pink/either"
 import { useWindowSize } from "../hooks/use-window-size"
-import { useCurrentActivity } from "../streams/extensions"
+import { __CurrentActivity$ } from "../streams/activities"
 import { getCommands } from "$streams/commands"
 import Sidebar from "./sidebar"
 import { __CommandPalette$ } from "$streams/command-palette"
 import { __Sidebar$ } from "$streams/sidebar"
-import { useStrictSubscription } from "$hooks/use-subscription"
+import { useStrictSubscription, useSubscription } from "$hooks/use-subscription"
 import { Activity, ComponentSpace, cmd } from "@ordo-pink/frontend-core"
 
 // TODO: Render Welcome page if activity is null
@@ -21,10 +21,14 @@ import { Activity, ComponentSpace, cmd } from "@ordo-pink/frontend-core"
 
 const commands = getCommands()
 
-type _P = { commandPalette$: Nullable<__CommandPalette$>; sidebar$: Nullable<__Sidebar$> }
-export default function Workspace({ commandPalette$, sidebar$ }: _P) {
+type _P = {
+	commandPalette$: Nullable<__CommandPalette$>
+	sidebar$: Nullable<__Sidebar$>
+	currentActivity$: __CurrentActivity$
+}
+export default function Workspace({ commandPalette$, sidebar$, currentActivity$ }: _P) {
 	const sidebar = useStrictSubscription(sidebar$, { disabled: true })
-	const activity = useCurrentActivity()
+	const activity = useSubscription(currentActivity$)
 
 	return Either.fromNullable(sidebar)
 		.chain(state => Either.fromBoolean(() => !state.disabled).map(() => sidebar$))

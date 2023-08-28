@@ -3,7 +3,7 @@
 
 import { BsThreeDotsVertical } from "react-icons/bs"
 import { getCommands } from "$streams/commands"
-import { useActivities } from "$streams/extensions"
+import { __Activities$, __CurrentActivity$ } from "$streams/activities"
 import { useUser } from "$streams/auth"
 import ActivityItem from "$components/activity-bar/activity"
 import Null from "$components/null"
@@ -16,16 +16,27 @@ import { __Sidebar$ } from "$streams/sidebar"
 import { cmd } from "@ordo-pink/frontend-core"
 import { Either } from "@ordo-pink/either"
 import Link from "$components/link"
+import { Hosts } from "$utils/hosts"
 
 type ShowContextMenu = Unary<MouseEvent<HTMLDivElement>, void>
 
 const commands = getCommands()
 
-type _P = { commandPalette$: __CommandPalette$; sidebar$: __Sidebar$ }
-export default function ActivityBar({ commandPalette$, sidebar$ }: _P) {
+type _P = {
+	commandPalette$: __CommandPalette$
+	sidebar$: __Sidebar$
+	activities$: __Activities$
+	currentActivity$: __CurrentActivity$
+}
+export default function ActivityBar({
+	commandPalette$,
+	sidebar$,
+	activities$,
+	currentActivity$,
+}: _P) {
 	const user = useUser()
 	const sidebar = useStrictSubscription(sidebar$, { disabled: true })
-	const activities = useActivities()
+	const activities = useStrictSubscription(activities$, [])
 	const commandPaletteItems = useSubscription(commandPalette$)
 
 	const isSidebarCollapsed = sidebar.disabled || sidebar.sizes[0] === 0
@@ -58,7 +69,13 @@ export default function ActivityBar({ commandPalette$, sidebar$ }: _P) {
 			</div>
 			<div className="flex flex-col space-y-4 items-center">
 				{activities.map(activity =>
-					activity.background ? null : <ActivityItem key={activity.name} activity={activity} />,
+					activity.background ? null : (
+						<ActivityItem
+							key={activity.name}
+							activity={activity}
+							currentActivity$={currentActivity$}
+						/>
+					),
 				)}
 			</div>
 			<div>
@@ -71,11 +88,7 @@ export default function ActivityBar({ commandPalette$, sidebar$ }: _P) {
 						<div className="flex items-center justify-center rounded-full p-0.5 bg-gradient-to-tr from-sky-400 via-purple-400 to-rose-400 shadow-lg shrink-0 cursor-pointer">
 							<div className="bg-white rounded-full">
 								<Link href="/user">
-									<img
-										className="h-7 rounded-full"
-										src={`${process.env.REACT_APP_STATIC_HOST}/logo.png`}
-										alt="avatar"
-									/>
+									<img className="h-7 rounded-full" src={`${Hosts.STATIC}/logo.png`} alt="avatar" />
 								</Link>
 							</div>
 						</div>

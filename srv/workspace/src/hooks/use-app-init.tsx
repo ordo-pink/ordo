@@ -6,12 +6,12 @@ import { ConsoleLogger } from "@ordo-pink/logger"
 import { Nullable } from "@ordo-pink/tau"
 import { __Auth$, __initAuth } from "$streams/auth"
 import { __ContextMenu$, __initContextMenu } from "$streams/context-menu"
-import { initActivities, initExtensions } from "$streams/extensions"
+import { __Activities$, __CurrentActivity$, __initActivities } from "$streams/activities"
 import { __CommandPalette$, __initCommandPalette } from "$streams/command-palette"
 import { __Modal$, __initModal } from "$streams/modal"
 import { __initCommands, getCommands } from "$streams/commands"
 import { __initSidebar, __Sidebar$ } from "$streams/sidebar"
-import { __initRouter } from "$streams/router"
+import { __CurrentRoute$, __initRouter } from "$streams/router"
 import CommandPaletteModal from "$components/command-palette"
 import { useSubscription } from "./use-subscription"
 import { useHotkeys } from "react-hotkeys-hook"
@@ -32,6 +32,9 @@ export type UseAppInitReturns = {
 	notification$: Nullable<__Notification$>
 	globalCommandPalette$: Nullable<__CommandPalette$>
 	currentCommandPalette$: Nullable<__CommandPalette$>
+	activities$: Nullable<__Activities$>
+	currentActivity$: Nullable<__CurrentActivity$>
+	currentRoute$: Nullable<__CurrentRoute$>
 }
 
 export const useAppInit = (): UseAppInitReturns => {
@@ -44,6 +47,9 @@ export const useAppInit = (): UseAppInitReturns => {
 	const [sidebar$, setSidebar$] = useState<Nullable<__Sidebar$>>(null)
 	const [notification$, setNotification$] = useState<Nullable<__Notification$>>(null)
 	const [auth$, setAuth$] = useState<Nullable<__Auth$>>(null)
+	const [activities$, setActivities$] = useState<Nullable<__Activities$>>(null)
+	const [currentActivity$, setCurrentActivity$] = useState<Nullable<__CurrentActivity$>>(null)
+	const [currentRoute$, setCurrentRoute$] = useState<Nullable<__CurrentRoute$>>(null)
 
 	const commandPaletteItems = useSubscription(currentCommandPalette$)
 	const globalCommandPaletteItems = useSubscription(globalCommandPalette$)
@@ -89,17 +95,19 @@ export const useAppInit = (): UseAppInitReturns => {
 		setContextMenu$(contextMenu$)
 
 		const commandPalettes = __initCommandPalette(ctx)
+		setGlobalCommandPalette$(commandPalettes?.globalCommandPalette$ ?? null)
+		setCurrentCommandPalette$(commandPalettes?.currentCommandPalette$ ?? null)
 
-		setGlobalCommandPalette$(commandPalettes?.globalCommandPalette$)
-		setCurrentCommandPalette$(commandPalettes?.currentCommandPalette$)
+		const activities = __initActivities({ logger: ConsoleLogger })
+		setActivities$(activities?.activities$ ?? null)
+		setCurrentActivity$(activities?.currentActivity$ ?? null)
 
-		const router$ = __initRouter(ctx)
+		const currentRoute$ = __initRouter({ ...ctx, activities$: activities?.activities$ })
+		setCurrentRoute$(currentRoute$)
 
 		const sidebar$ = __initSidebar(ctx)
 		setSidebar$(sidebar$)
 
-		initExtensions({ logger: ConsoleLogger, router$, extensions: [] }) // TODO: 6
-		initActivities()
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [])
 
@@ -118,12 +126,15 @@ export const useAppInit = (): UseAppInitReturns => {
 	}, [commandPaletteItems])
 
 	return {
-		contextMenu$,
+		auth$,
 		modal$,
+		sidebar$,
+		activities$,
+		contextMenu$,
+		notification$,
+		currentRoute$,
+		currentActivity$,
 		globalCommandPalette$,
 		currentCommandPalette$,
-		notification$,
-		sidebar$,
-		auth$,
 	}
 }

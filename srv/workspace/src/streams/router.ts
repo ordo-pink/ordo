@@ -1,17 +1,22 @@
 // SPDX-FileCopyrightText: Copyright 2023, 谢尔盖||↓ and the Ordo.pink contributors
 // SPDX-License-Identifier: MIT
 
-import { Router } from "silkrouter"
-import { Unary, callOnce } from "@ordo-pink/tau"
+import { Router, operators } from "silkrouter"
+import { Nullable, Unary, callOnce } from "@ordo-pink/tau"
 import { Logger } from "@ordo-pink/logger"
 import { getCommands } from "$streams/commands"
-import { cmd } from "@ordo-pink/frontend-core"
+import { cmd, Router as TRouter } from "@ordo-pink/frontend-core"
+import { BehaviorSubject, Observable, map } from "rxjs"
+import { __Activities$ } from "./activities"
 
 // TODO: Consider moving to react-router
 
 const commands = getCommands()
 
-export const __initRouter: InitRouter = callOnce(({ logger }) => {
+const { route, noMatch } = operators
+
+export type __CurrentRoute$ = Observable<Nullable<TRouter.Route>>
+export const __initRouter: InitRouter = callOnce(({ logger, activities$ }) => {
 	logger.debug("Initializing router")
 
 	commands.on<cmd.router.navigate>("router.navigate", ({ payload }) => {
@@ -31,10 +36,44 @@ export const __initRouter: InitRouter = callOnce(({ logger }) => {
 		},
 	)
 
-	return router$
+	activities$
+		.pipe(
+			map(activities => {
+				activities?.map(activity => {
+					return activity.routes.forEach(activityRoute => {
+						router$ &&
+							router$.pipe(route(activityRoute)).subscribe((routeData: TRouter.Route) => {
+								commands.emit<cmd.activities.setCurrent>("activities.set-current", activity)
+								currentRoute$.next(routeData)
+							})
+					})
+				})
+
+				router$ &&
+					router$.pipe(noMatch(router$)).subscribe(() => {
+						commands.emit<cmd.activities.setCurrent>(
+							"activities.set-current",
+							activities.find(activity => activity.name === "home"),
+						)
+						currentRoute$.next({
+							data: null,
+							hash: "",
+							hashRouting: false,
+							params: {},
+							path: "/",
+							route: "/",
+							search: "",
+						})
+					})
+			}),
+		)
+		.subscribe()
+
+	return currentRoute$
 })
 
-type InitRouterP = { logger: Logger }
-type InitRouter = Unary<InitRouterP, Router>
+type Params = { logger: Logger; activities$: __Activities$ }
+type InitRouter = Unary<Params, __CurrentRoute$>
 
 const router$ = new Router({ hashRouting: false, init: true })
+const currentRoute$ = new BehaviorSubject<Nullable<TRouter.Route>>(null)

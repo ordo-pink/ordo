@@ -14,11 +14,12 @@ import { useSubscription } from "$hooks/use-subscription"
 import { getCommands } from "$streams/commands"
 import { FSEntity } from "@ordo-pink/datautil/src/common"
 import { rrrToNotification } from "$utils/error-to-notification"
+import { Hosts } from "$utils/hosts"
 
 const commands = getCommands()
 
 const refreshToken = () =>
-	fetch(`${process.env.REACT_APP_ID_HOST}/refresh-token`, {
+	fetch(`${Hosts.ID}/refresh-token`, {
 		method: "POST",
 		credentials: "include",
 	})
@@ -26,7 +27,7 @@ const refreshToken = () =>
 		.then(res => {
 			if (res.success) return auth$.next(res.result)
 
-			window.location.href = `${process.env.REACT_APP_WEB_HOST}/sign-out`
+			window.location.href = `${Hosts.WEBSITE}/sign-out`
 		})
 
 type InitAuthP = { logger: Logger }
@@ -45,7 +46,7 @@ export const __initAuth: InitAuth = callOnce(({ logger }) => {
 		Oath.fromNullable(auth$.value)
 			.chain(auth =>
 				Oath.try(() =>
-					fetch(`${process.env.REACT_APP_ID_HOST}/account`, {
+					fetch(`${Hosts.ID}/account`, {
 						headers: { Authorization: `Bearer ${auth.accessToken}` },
 					}),
 				),
@@ -63,7 +64,7 @@ export const __initAuth: InitAuth = callOnce(({ logger }) => {
 		Oath.fromNullable(auth$.value)
 			.chain(auth =>
 				Oath.try(() =>
-					fetch(`${process.env.REACT_APP_DATA_HOST}/directories/${auth.sub}`, {
+					fetch(`${Hosts.DATA}/directories/${auth.sub}`, {
 						headers: { Authorization: `Bearer ${auth.accessToken}` },
 					}).then(res => res.json()),
 				),
@@ -78,7 +79,7 @@ export const __initAuth: InitAuth = callOnce(({ logger }) => {
 
 	commands.on<cmd.user.signOut>("user.sign-out", () =>
 		commands.emit<cmd.router.openExternal>("router.open-external", {
-			url: `${process.env.REACT_APP_WEB_HOST}/sign-out`,
+			url: `${Hosts.WEBSITE}/sign-out`,
 			newTab: false,
 		}),
 	)

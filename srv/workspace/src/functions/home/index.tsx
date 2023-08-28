@@ -4,14 +4,14 @@
 import Card from "$components/card.component"
 import { CenteredPage } from "$components/centered-page"
 import { Title } from "$components/page-header"
-import { createExtension } from "$utils/create-extension.util"
+import { createOrdoFunction } from "$utils/create-function.util"
 import { Activity, ComponentSpace, cmd } from "@ordo-pink/frontend-core"
 import { Switch } from "@ordo-pink/switch"
 import { memo, useEffect } from "react"
 import { BsCollection } from "react-icons/bs"
 
-export default function createHomeExtension() {
-	return createExtension(commands => {
+export default function createHomeFunction() {
+	return createOrdoFunction(commands => {
 		commands.emit<cmd.activities.add>("activities.add", {
 			Component: HomeActivity,
 			name: "home",

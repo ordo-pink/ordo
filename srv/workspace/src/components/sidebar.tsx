@@ -14,7 +14,8 @@ import { __Sidebar$ } from "$streams/sidebar"
 import { cmd } from "@ordo-pink/frontend-core"
 import Link from "./link"
 import { Title } from "./page-header"
-import { UserUtils } from "$utils/user.utils"
+import { UserUtils } from "$utils/user-utils.util"
+import { Hosts } from "$utils/hosts"
 
 const commands = getCommands()
 
@@ -48,11 +49,7 @@ export default function Sidebar({ children, isNarrow, commandPalette$, sidebar$ 
 		>
 			<div>
 				<div className="flex items-center justify-between">
-					<img
-						src={`${process.env.REACT_APP_STATIC_HOST}/logo.png`}
-						className="w-10"
-						alt="Ordo.pink Logo"
-					/>
+					<img src={`${Hosts.STATIC}/logo.png`} className="w-10" alt="Ordo.pink Logo" />
 					<div className="text-neutral-500 cursor-pointer" onClick={openCommandPalette}>
 						<BsThreeDotsVertical />
 					</div>

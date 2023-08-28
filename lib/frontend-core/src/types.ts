@@ -29,6 +29,7 @@ export namespace cmd {
 	export namespace activities {
 		export type add = { name: "activities.add"; payload: Activity.Activity }
 		export type remove = { name: "activities.remove"; payload: string }
+		export type setCurrent = { name: "activities.set-current"; payload: Activity.Activity }
 	}
 
 	export namespace data {
@@ -73,7 +74,6 @@ export namespace cmd {
 
 	export namespace router {
 		export type navigate = { name: "router.navigate"; payload: Router.NavigateParams | string }
-		export type add = { name: "router.add"; payload: string | string[] }
 		export type openExternal = {
 			name: "router.open-external"
 			payload: Router.OpenExternalParams

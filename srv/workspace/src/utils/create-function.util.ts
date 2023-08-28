@@ -3,5 +3,5 @@
 
 import { getCommands } from "$streams/commands"
 
-export const createExtension = (callback: (commands: ReturnType<typeof getCommands>) => any) =>
+export const createOrdoFunction = (callback: (commands: ReturnType<typeof getCommands>) => any) =>
 	callback(getCommands())

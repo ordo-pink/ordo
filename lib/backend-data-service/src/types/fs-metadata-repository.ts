@@ -70,7 +70,7 @@ type DirectoryDeleteFn = Unary<DirectoryDeleteParams, Oath<Nullable<Directory>, 
 type FileDeleteParams = { sub: SUB; path: FilePath }
 type FileDeleteFn = Unary<FileDeleteParams, Oath<Nullable<File>, Error>>
 
-type CreateUserSpaceFn = Unary<SUB, Oath<void, Error>>
+type CreateUserSpaceFn = Unary<Directory, Oath<void, Error>>
 type RemoveUserSpaceFn = Unary<SUB, Oath<void, Error>>
 
 type GetRootFn = Unary<SUB, Oath<Nullable<Array<Directory | File>>, Error>>

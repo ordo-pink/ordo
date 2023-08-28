@@ -18,19 +18,9 @@ import { Directory, File } from "@ordo-pink/datautil"
 
 const of: Fn = ({ root }) => ({
 	_internal: {
-		createUserSpace: sub =>
-			Oath.of(resolve(root, sub)).chain(path =>
-				Oath.of(
-					JSON.stringify([
-						{
-							path: "/",
-							createdAt: new Date(Date.now()),
-							updatedAt: new Date(Date.now()),
-							createdBy: sub,
-							updatedBy: sub,
-						},
-					]),
-				).chain(data => writeFile0(resolve(path), data)),
+		createUserSpace: directory =>
+			Oath.of(resolve(root, directory.createdBy)).chain(path =>
+				Oath.of(JSON.stringify([directory])).chain(data => writeFile0(resolve(path), data)),
 			),
 	},
 	directory: {

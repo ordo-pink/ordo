@@ -19,7 +19,14 @@ type Fn = Unary<Params, TDataService<Readable>>
 
 const service: Fn = ({ metadataRepository, dataRepository }) => ({
 	getRoot: metadataRepository.directory.getRoot,
-	createUserSpace: metadataRepository._internal.createUserSpace,
+	createUserSpace: sub =>
+		metadataRepository._internal.createUserSpace(
+			DirectoryUtils.create({
+				sub,
+				fsid: randomUUID() as FSID,
+				params: { path: "/" },
+			}),
+		),
 	checkDirectoryExists: metadataRepository.directory.exists,
 	getDirectory: metadataRepository.directory.read,
 	// TODO: Create parent directory if it does not exist

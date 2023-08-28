@@ -4,16 +4,19 @@
 import Card from "$components/card.component"
 import { CenteredPage } from "$components/centered-page"
 import { Title } from "$components/page-header"
+import { useStrictSubscription } from "$hooks/use-subscription"
+import { __Activities$ } from "$streams/activities"
 import { createOrdoFunction } from "$utils/create-function.util"
 import { Activity, ComponentSpace, cmd } from "@ordo-pink/frontend-core"
 import { Switch } from "@ordo-pink/switch"
+import { Nullable } from "@ordo-pink/tau"
 import { memo, useEffect } from "react"
 import { BsCollection } from "react-icons/bs"
 
-export default function createHomeFunction() {
+export default function createHomeFunction(activities$: Nullable<__Activities$>) {
 	return createOrdoFunction(commands => {
 		commands.emit<cmd.activities.add>("activities.add", {
-			Component: HomeActivity,
+			Component: props => <HomeActivity activities$={activities$} {...props} />,
 			name: "home",
 			routes: ["/"],
 		})
@@ -28,16 +31,19 @@ export default function createHomeFunction() {
 	})
 }
 
-const WelcomePage = ({ commands, space }: Activity.ComponentProps) =>
+type P = Activity.ComponentProps & { activities$: Nullable<__Activities$> }
+const WelcomePage = ({ commands, space, activities$ }: P) =>
 	Switch.of(space)
 		.case(ComponentSpace.ICON, () => <Icon />)
-		.default(() => <Workspace commands={commands} />)
+		.default(() => <Workspace commands={commands} activities$={activities$} />)
 
 const HomeActivity = memo(WelcomePage, (prev, next) => prev.space === next.space)
 
 const Icon = () => <BsCollection />
 
-const Workspace = ({ commands }: Pick<Activity.ComponentProps, "commands">) => {
+const Workspace = ({ commands, activities$ }: Pick<P, "commands" | "activities$">) => {
+	const activities = useStrictSubscription(activities$, [])
+
 	useEffect(() => {
 		commands.emit<cmd.sidebar.disable>("sidebar.disable")
 		// eslint-disable-next-line react-hooks/exhaustive-deps
@@ -62,6 +68,17 @@ const Workspace = ({ commands }: Pick<Activity.ComponentProps, "commands">) => {
 				<Card title="Quick actions">
 					<p>TODO: Keyboard shortcuts</p>
 				</Card>
+
+				{/* TODO: Support for resizing cards */}
+				{/* TODO: Support for adding and removing cards */}
+				{/* TODO: Support for reordering cards */}
+				{activities
+					.filter(activity => activity.name !== "home")
+					.map(Activity => (
+						<Card key={Activity.name} title={Activity.name}>
+							<Activity.Component commands={commands} space={ComponentSpace.WIDGET} />
+						</Card>
+					))}
 
 				<Card title="Useful links">TODO: Useful links</Card>
 			</div>

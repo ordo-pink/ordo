@@ -30,6 +30,14 @@ export const __initData: Fn = ({ logger, auth$ }) => {
 				)
 				.chain(body => (body.success ? Oath.of(body.result) : Oath.reject(body.error as string)))
 				.rejectedMap(rrrToNotification("Error fetching directories"))
+				.map(body =>
+					body.map((item: FSEntity) => ({
+						...item,
+						updatedAt: new Date(body.updatedAt),
+						createdAt: new Date(body.createdAt),
+					})),
+				)
+				.tap(console.log)
 				.tap(() => subscription.unsubscribe())
 				.fork(
 					item => commands.emit<cmd.notification.show>("notification.show", item),

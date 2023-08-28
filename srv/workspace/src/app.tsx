@@ -23,6 +23,8 @@ import { FSEntity } from "@ordo-pink/datautil"
 const commands = getCommands()
 const SharedContext = createContext<{ metadata: Nullable<FSEntity[]> }>({ metadata: null })
 
+// TODO: Avoid refreshing app on refreshing token
+// BUG: Token refresh ticks two times in a row
 export default function App() {
 	const streams = useAppInit()
 	const metadata = useSubscription(streams.metadata$)
@@ -40,7 +42,7 @@ export default function App() {
 		commands.emit<cmd.user.refreshInfo>("user.refresh")
 		commands.emit<cmd.data.refreshRoot>("data.refresh-root")
 
-		import("./functions/home").then(f => f.default())
+		import("./functions/home").then(f => f.default(streams.activities$))
 		import("./functions/file-explorer").then(f => f.default())
 		import("./functions/user").then(f => f.default(auth))
 		// TODO: Enable user functions

@@ -57,6 +57,11 @@ export const __initAuth: InitAuth = callOnce(({ logger }) => {
 			)
 			.chain(res => Oath.from(() => res.json()))
 			.chain(body => (body.success ? Oath.of(body.result) : Oath.reject(body.error as string)))
+			.map(body => ({
+				...body,
+				createdAt: new Date(body.createdAt),
+				updatedAt: new Date(body.updatedAt),
+			}))
 			.rejectedMap(rrrToNotification("Error fetching user info"))
 			.fork(
 				item => commands.emit<cmd.notification.show>("notification.show", item),

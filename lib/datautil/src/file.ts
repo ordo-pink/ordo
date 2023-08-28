@@ -92,7 +92,7 @@ export const FileUtils = {
 	 */
 	isFile: (x: unknown): x is File => {
 		const file = x as File
-		return isFSEntity(file) && FileUtils.isValidPath(file.path) && file.isFile
+		return isFSEntity(file) && FileUtils.isValidPath(file.path)
 	},
 
 	/**
@@ -228,8 +228,6 @@ export const FileUtils = {
 	 * It does not validate provided inputs.
 	 */
 	create: (args: { params: CreateFileParams; sub: SUB; fsid: FSID }): File => ({
-		isDirectory: false,
-		isFile: true,
 		path: args.params.path,
 		fsid: args.fsid,
 		createdAt: new Date(Date.now()),
@@ -248,8 +246,6 @@ export const FileUtils = {
 	 * It does not validate provided inputs.
 	 */
 	update: (args: { file: File; params: UpdateFileParams; sub: SUB }): File => ({
-		isDirectory: true,
-		isFile: false,
 		path:
 			FileUtils.isValidPath(args.params.path) && args.params.path !== args.file.path
 				? args.params.path

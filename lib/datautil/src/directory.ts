@@ -33,16 +33,6 @@ export interface Directory extends FSEntity {
 	 * @see FORBIDDEN_PATH_SYMBOLS
 	 */
 	path: DirectoryPath
-
-	/**
-	 * @inheritdoc
-	 */
-	isFile: false
-
-	/**
-	 * @inheritdoc
-	 */
-	isDirectory: true
 }
 
 /**
@@ -104,9 +94,7 @@ export const DirectoryUtils = {
 	 */
 	isDirectory: (x: unknown): x is Directory => {
 		const directory = x as Directory
-		return (
-			isFSEntity(directory) && DirectoryUtils.isValidPath(directory.path) && directory.isDirectory
-		)
+		return isFSEntity(directory) && DirectoryUtils.isValidPath(directory.path)
 	},
 
 	/**
@@ -178,8 +166,6 @@ export const DirectoryUtils = {
 	 * It does not validate provided inputs.
 	 */
 	create: (args: { params: CreateDirectoryParams; sub: SUB; fsid: FSID }): Directory => ({
-		isDirectory: true,
-		isFile: false,
 		path: args.params.path,
 		fsid: args.fsid,
 		createdAt: new Date(Date.now()),
@@ -196,8 +182,6 @@ export const DirectoryUtils = {
 	 * It does not validate provided inputs.
 	 */
 	update: (args: { directory: Directory; params: UpdateDirectoryParams; sub: SUB }): Directory => ({
-		isDirectory: true,
-		isFile: false,
 		path:
 			DirectoryUtils.isValidPath(args.params.path) && args.params.path !== args.directory.path
 				? args.params.path

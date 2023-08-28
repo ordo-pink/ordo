@@ -43,16 +43,6 @@ export const isSUB = (x: unknown): x is SUB => isFSID(x)
  */
 export interface FSEntity {
 	/**
-	 * A helper to programmatically check if the FSEntity is a File.
-	 */
-	isFile: boolean
-
-	/**
-	 * A helper to programmatically check if the FSEntity is a Directory.
-	 */
-	isDirectory: boolean
-
-	/**
 	 * Path of the FSEntity.
 	 */
 	path: FilePath | DirectoryPath
@@ -108,12 +98,13 @@ export const isFSEntity = (x: unknown): x is FSEntity => {
 	return (
 		isObject(directory) &&
 		isFSID(directory.fsid) &&
-		isString(directory.createdBy) &&
-		isString(directory.updatedBy) &&
+		isSUB(directory.createdBy) &&
+		isSUB(directory.updatedBy) &&
 		isDate(directory.createdAt) &&
 		isDate(directory.updatedAt) &&
 		isFSLinks(directory.links) &&
-		isFSLabels(directory.labels)
+		isFSLabels(directory.labels) &&
+		isFSProperties(directory.properties)
 	)
 }
 

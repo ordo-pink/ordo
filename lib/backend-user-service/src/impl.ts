@@ -104,7 +104,7 @@ export class UserService {
 			id: user.id,
 			firstName: user.firstName,
 			lastName: user.lastName,
-			username: user.username,
+			handle: user.handle,
 		}
 	}
 
@@ -114,7 +114,7 @@ export class UserService {
 			email: user.email,
 			firstName: user.firstName,
 			lastName: user.lastName,
-			username: user.username,
+			handle: user.handle,
 		}
 	}
 }

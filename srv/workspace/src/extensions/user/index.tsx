@@ -69,7 +69,7 @@ const UserPage = ({ auth, commands }: _P) => {
 type _UIP = _P & { user: User }
 const UserInfo = ({ user, auth, commands }: _UIP) => {
 	const [email, setEmail] = useState(user.email)
-	// const [username, setUsername] = useState(user.username ?? "")
+	// const [handle, setHandle] = useState(user.handle ?? "")
 	const [oldPassword, setOldPassword] = useState("")
 	const [newPassword, setNewPassword] = useState("")
 	const [repeatNewPassword, setRepeatNewPassword] = useState("")
@@ -111,9 +111,9 @@ const UserInfo = ({ user, auth, commands }: _UIP) => {
 							type="text"
 							placeholder="E.g. moonmarine"
 							id="publicHandle"
-							autocomplete="username"
-							value={username}
-							onInput={e => setUsername(e.target.value)}
+							autocomplete="handle"
+							value={handle}
+							onInput={e => setHandle(e.target.value)}
 						/> */}
 
 							<EmailInput
@@ -186,7 +186,7 @@ const UserInfo = ({ user, auth, commands }: _UIP) => {
 						<Button
 							disabled={
 								firstName === user.firstName && lastName === user.lastName
-								// && username === user.username
+								// && handle === user.handle
 							}
 							onClick={() =>
 								Oath.try(() =>

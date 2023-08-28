@@ -68,7 +68,7 @@ const create: CreateMethod<T.Params> =
 					email: { S: user.email },
 					id: { S: user.id },
 					emailConfirmed: { N: user.emailConfirmed ? "1" : "0" },
-					username: { S: user.username ?? "" },
+					handle: { S: user.handle ?? "" },
 					password: { S: user.password },
 					firstName: { S: user.firstName ?? "" },
 					lastName: { S: user.lastName ?? "" },
@@ -90,7 +90,7 @@ const update: UpdateMethod<T.Params> =
 					emailConfirmed:
 						user.emailConfirmed != null ? user.emailConfirmed : oldUser.emailConfirmed,
 					lastName: user.lastName ?? oldUser.lastName,
-					username: user.username ?? oldUser.username,
+					handle: user.handle ?? oldUser.handle,
 					password: user.password ?? oldUser.password,
 				})
 					.chain(user => Oath.of(reduceUserToAttributeUpdates(user)))
@@ -134,7 +134,7 @@ const serialize: T._SerializeFn = item => ({
 	createdAt: new Date(item.createdAt!.S!),
 	lastName: item.lastName!.S!,
 	password: item.password!.S!,
-	username: item.username!.S!,
+	handle: item.handle!.S!,
 	id: item.id!.S!,
 })
 
@@ -147,7 +147,7 @@ const reduceUserToAttributeUpdates: T._ReduceUserToAttributeUpdatesFn = user =>
 			key === "firstName" ||
 			key === "lastName" ||
 			key === "password" ||
-			key === "username"
+			key === "handle"
 		) {
 			AttributeUpdates[key] = {
 				Action: "PUT",

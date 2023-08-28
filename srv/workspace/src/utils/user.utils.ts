@@ -8,8 +8,8 @@ export const UserUtils = {
 	getUserName: (user: User) =>
 		Switch.of(user)
 			.case(
-				u => !!u.firstName && !!u.lastName && !!u.username,
-				() => `${user.firstName} ${user.lastName} (${user.username})`,
+				u => !!u.firstName && !!u.lastName && !!u.handle,
+				() => `${user.firstName} ${user.lastName} (${user.handle})`,
 			)
 			.case(
 				u => !!u.firstName && !!u.lastName,
@@ -20,8 +20,8 @@ export const UserUtils = {
 				() => user.firstName,
 			)
 			.case(
-				u => !!u.username,
-				() => user.username,
+				u => !!u.handle,
+				() => user.handle,
 			)
 			.default(() => user.email),
 }

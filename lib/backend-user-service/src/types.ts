@@ -10,7 +10,7 @@ import { Oath } from "@ordo-pink/oath"
 
 export type PublicUser = {
 	email: string
-	username?: string
+	handle?: string
 	createdAt: Date
 	firstName?: string
 	lastName?: string

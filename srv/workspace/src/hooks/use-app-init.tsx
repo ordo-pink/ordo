@@ -17,6 +17,7 @@ import { useSubscription } from "./use-subscription"
 import { useHotkeys } from "react-hotkeys-hook"
 import { cmd } from "@ordo-pink/frontend-core"
 import { __Notification$, __initNotification } from "$streams/notification"
+import { __Metadata$, __initData } from "$streams/data"
 
 const commands = getCommands()
 
@@ -35,6 +36,7 @@ export type UseAppInitReturns = {
 	activities$: Nullable<__Activities$>
 	currentActivity$: Nullable<__CurrentActivity$>
 	currentRoute$: Nullable<__CurrentRoute$>
+	metadata$: Nullable<__Metadata$>
 }
 
 export const useAppInit = (): UseAppInitReturns => {
@@ -50,6 +52,7 @@ export const useAppInit = (): UseAppInitReturns => {
 	const [activities$, setActivities$] = useState<Nullable<__Activities$>>(null)
 	const [currentActivity$, setCurrentActivity$] = useState<Nullable<__CurrentActivity$>>(null)
 	const [currentRoute$, setCurrentRoute$] = useState<Nullable<__CurrentRoute$>>(null)
+	const [metadata$, setMetadata$] = useState<Nullable<__Metadata$>>(null)
 
 	const commandPaletteItems = useSubscription(currentCommandPalette$)
 	const globalCommandPaletteItems = useSubscription(globalCommandPalette$)
@@ -108,6 +111,9 @@ export const useAppInit = (): UseAppInitReturns => {
 		const sidebar$ = __initSidebar(ctx)
 		setSidebar$(sidebar$)
 
+		const metadata$ = __initData({ ...ctx, auth$ })
+		setMetadata$(metadata$)
+
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [])
 
@@ -129,6 +135,7 @@ export const useAppInit = (): UseAppInitReturns => {
 		auth$,
 		modal$,
 		sidebar$,
+		metadata$,
 		activities$,
 		contextMenu$,
 		notification$,

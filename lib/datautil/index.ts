@@ -3,3 +3,4 @@
 
 export * from "./src/directory"
 export * from "./src/file"
+export * from "./src/common"

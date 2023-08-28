@@ -11,6 +11,8 @@ import type {
 	CreateFileParams,
 	UpdateDirectoryParams,
 	UpdateFileParams,
+	File,
+	Directory,
 } from "@ordo-pink/datautil"
 import { Logger } from "@ordo-pink/logger"
 import { ComponentSpace } from "./constants/component-space.constants"

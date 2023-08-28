@@ -12,7 +12,6 @@ import { Logger } from "@ordo-pink/logger"
 import { Oath } from "@ordo-pink/oath"
 import { useSubscription } from "$hooks/use-subscription"
 import { getCommands } from "$streams/commands"
-import { FSEntity } from "@ordo-pink/datautil/src/common"
 import { rrrToNotification } from "$utils/error-to-notification"
 import { Hosts } from "$utils/hosts"
 
@@ -39,8 +38,13 @@ export const __initAuth: InitAuth = callOnce(({ logger }) => {
 
 	refreshToken()
 
+	const beforeUnloadListener = () => {
+		clearInterval(interval)
+		window.removeEventListener("beforeunload", beforeUnloadListener)
+	}
+
 	const interval = setInterval(refreshToken, 50000)
-	window.addEventListener("beforeunload", () => clearInterval(interval))
+	window.addEventListener("beforeunload", beforeUnloadListener)
 
 	commands.on<cmd.user.refreshInfo>("user.refresh", () =>
 		Oath.fromNullable(auth$.value)
@@ -57,23 +61,6 @@ export const __initAuth: InitAuth = callOnce(({ logger }) => {
 			.fork(
 				item => commands.emit<cmd.notification.show>("notification.show", item),
 				result => user$.next(result),
-			),
-	)
-
-	commands.on<cmd.data.refreshRoot>("data.refresh-root", () =>
-		Oath.fromNullable(auth$.value)
-			.chain(auth =>
-				Oath.try(() =>
-					fetch(`${Hosts.DATA}/directories/${auth.sub}`, {
-						headers: { Authorization: `Bearer ${auth.accessToken}` },
-					}).then(res => res.json()),
-				),
-			)
-			.chain(body => (body.success ? Oath.of(body.result) : Oath.reject(body.error as string)))
-			.rejectedMap(rrrToNotification("Error fetching directories"))
-			.fork(
-				item => commands.emit<cmd.notification.show>("notification.show", item),
-				result => metadata$.next(result),
 			),
 	)
 
@@ -95,17 +82,11 @@ export const __initAuth: InitAuth = callOnce(({ logger }) => {
 })
 
 const auth$ = new BehaviorSubject<Nullable<AuthResponse>>(null)
-const metadata$ = new BehaviorSubject<FSEntity[]>([])
 const user$ = new BehaviorSubject<Nullable<User>>(null)
 
 export const useAuthStatus = () => {
 	const auth = useSubscription(auth$)
 	return auth != null
-}
-
-export const useMetadata = () => {
-	const metadata = useSubscription(metadata$)
-	return Either.fromNullable(metadata)
 }
 
 export const useUser = () => {

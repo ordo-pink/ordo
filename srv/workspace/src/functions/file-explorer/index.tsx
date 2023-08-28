@@ -1,27 +1,19 @@
 // SPDX-FileCopyrightText: Copyright 2023, 谢尔盖||↓ and the Ordo.pink contributors
 // SPDX-License-Identifier: MIT
 
-import Null from "$components/null"
-import { useMetadata } from "$streams/auth"
 import { Activity, ComponentSpace, cmd } from "@ordo-pink/frontend-core"
-import { memo, useEffect } from "react"
+import { memo } from "react"
 import { Switch } from "@ordo-pink/switch"
 import { BsFolder2Open } from "react-icons/bs"
 import { createOrdoFunction } from "$utils/create-function.util"
-
-const FileExplorerComponent = ({ space, commands }: Activity.ComponentProps) =>
-	Switch.of(space)
-		.case(ComponentSpace.ICON, () => <Icon />)
-		.default(() => <Workspace commands={commands} />)
-
-const FSActivity = memo(FileExplorerComponent, (prev, next) => prev.space === next.space)
+import FileExplorerActivityComponent from "./components/file-explorer-activity.component"
 
 // TODO: Provide commands and queries via the import
 export default function createFileExplorerFunction() {
 	return createOrdoFunction(commands => {
 		commands.emit<cmd.activities.add>("activities.add", {
 			Component: FSActivity,
-			name: "ordo.file-explorer",
+			name: "file-explorer",
 			routes: ["/fs", "/fs/path*"],
 		})
 
@@ -29,21 +21,17 @@ export default function createFileExplorerFunction() {
 			id: "file-explorer.navigate",
 			readableName: "Go to File Explorer",
 			accelerator: "mod+shift+e",
-			Icon,
+			Icon: FileExplorerIcon,
 			onSelect: () => commands.emit<cmd.router.navigate>("router.navigate", "/fs"),
 		})
 	})
 }
 
-const Icon = () => <BsFolder2Open />
+const FileExplorerComponent = ({ space, commands }: Activity.ComponentProps) =>
+	Switch.of(space)
+		.case(ComponentSpace.ICON, () => <FileExplorerIcon />)
+		.default(() => <FileExplorerActivityComponent commands={commands} />)
 
-const Workspace = ({ commands }: Pick<Activity.ComponentProps, "commands">) => {
-	const root = useMetadata() // TODO: Move metadata to separate stream
+const FSActivity = memo(FileExplorerComponent, (prev, next) => prev.space === next.space)
 
-	useEffect(() => {
-		commands.emit<cmd.sidebar.enable>("sidebar.enable")
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [])
-
-	return root.fold(Null, content => content.map(item => <div key={item.path}>{item.path}</div>))
-}
+const FileExplorerIcon = () => <BsFolder2Open />

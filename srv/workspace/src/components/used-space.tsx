@@ -2,22 +2,23 @@
 // SPDX-License-Identifier: MIT
 
 import { useEffect, useState } from "react"
-import { useMetadata } from "../streams/auth"
 import { noop } from "@ordo-pink/tau"
 import Null from "./null"
 import { FileUtils } from "@ordo-pink/datautil"
+import { useSharedContext } from "@ordo-pink/frontend-core"
+import { Either } from "@ordo-pink/either"
 
 // TODO: Move to user info
 const MAX_TOTAL_SIZE_MB = 50
 
 export default function UsedSpace() {
-	const metadata = useMetadata()
+	const { metadata } = useSharedContext()
 
 	const [percentage, setPercentage] = useState(0)
 	const [size, setSize] = useState(0)
 
 	useEffect(() => {
-		metadata
+		Either.fromNullable(metadata)
 			.map(items =>
 				items.reduce((acc, item) => (FileUtils.isFile(item) ? acc + Number(item.size) : acc), 0),
 			)
@@ -28,7 +29,7 @@ export default function UsedSpace() {
 			})
 	}, [metadata])
 
-	return metadata.fold(Null, metadata => (
+	return Either.fromNullable(metadata).fold(Null, metadata => (
 		<div className="w-full max-w-sm">
 			<div className="flex justify-between items-center w-full">
 				<div className="text-xs truncate">Used space</div>

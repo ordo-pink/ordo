@@ -3,3 +3,4 @@
 
 export * from "./src/types"
 export * from "./src/constants/component-space.constants"
+export * from "./src/shared-context"

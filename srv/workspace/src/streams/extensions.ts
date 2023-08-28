@@ -74,7 +74,6 @@ export const initExtensions = callOnce(({ logger, router$, extensions }: InitExt
 			switchMap(() => activities$),
 			map(activities => {
 				activities?.map(activity => {
-					console.log(activity)
 					return activity.routes.forEach(activityRoute => {
 						router$ &&
 							router$.pipe(route(activityRoute)).subscribe((routeData: Router.Route) => {

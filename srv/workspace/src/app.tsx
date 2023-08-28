@@ -2,31 +2,23 @@
 // SPDX-License-Identifier: MIT
 
 import { Either } from "@ordo-pink/either/mod"
-import { useOnAuthenticated } from "$hooks/use-on-authenticated"
 import { useAppInit } from "$hooks/use-app-init"
+import { getCommands } from "$streams/commands"
+import { useSubscription } from "$hooks/use-subscription"
+import { useEffect } from "react"
+import { cmd } from "@ordo-pink/frontend-core"
+import Notifications from "$components/notifications/notifications.component"
 import ActivityBar from "$components/activity-bar/activity-bar"
 import ContextMenu from "$components/context-menu/context-menu"
 import Workspace from "$components/workspace"
 import Modal from "$components/modal"
 import Null from "$components/null"
-import { getCommands } from "$streams/commands"
-import { useSubscription } from "$hooks/use-subscription"
-import { useEffect } from "react"
-import { useExtensions } from "$streams/extensions"
-import { BsPersonCircle } from "react-icons/bs"
-import UserPage from "./extensions/user.page"
-import { cmd } from "@ordo-pink/frontend-core"
-import Notifications from "$components/notifications/notifications.component"
-import WelcomePage from "./extensions/welcome.page"
 
 const commands = getCommands()
 
 export default function App() {
 	const streams = useAppInit()
-	const exts = useExtensions()
 	const auth = useSubscription(streams.auth$)
-
-	useOnAuthenticated(streams.auth$)
 
 	const contextMenu = useSubscription(streams.contextMenu$)
 
@@ -36,54 +28,35 @@ export default function App() {
 	useEffect(() => {
 		if (!auth) return
 
-		commands.emit<cmd.commandPalette.add>("command-palette.add", {
-			id: "user.go-to-user",
-			readableName: "Go to Account",
-			Icon: BsPersonCircle,
-			onSelect: () => commands.emit<cmd.router.navigate>("router.navigate", "/user"),
-		})
+		commands.emit<cmd.user.refreshInfo>("user.refresh")
+		commands.emit<cmd.data.refreshRoot>("data.refresh-root")
 
-		// TODO: Move to import
-		exts.activities.add({
-			name: "ordo.welcome",
-			Component: WelcomePage,
-			routes: ["/"],
-		})
+		import("./extensions/home").then(f => f.default())
+		import("./extensions/file-explorer").then(f => f.default())
+		import("./extensions/user").then(f => f.default(auth))
 
-		import("./extensions/fs").then(f => f.default())
+		// TODO: Enable user extensions
 
-		// TODO: Move to import
-		// exts.activities.add("user", {
-		// 	Component: props => <UserPage auth={auth} {...props} />,
-		// 	routes: ["/user"],
-		// 	background: true,
-		// })
-
-		// exts.activities.add("fs", {
-		// 	Component: FsPage,
-		// 	routes: ["/fs", "/fs/:path*"],
-		// })
-
-		return () => {
-			exts.activities.remove("user")
-		}
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [auth === null])
 
-	return Either.fromNullable(streams)
-		.chain(() => Either.fromNullable(streams.contextMenu$))
-		.chain(() => Either.fromNullable(streams.modal$))
-		.chain(() => Either.fromNullable(streams.globalCommandPalette$))
-		.chain(() => Either.fromNullable(streams.sidebar$))
-		.chain(() => Either.fromNullable(streams.notification$))
-		.map(() => streams as { [K in keyof typeof streams]: NonNullable<(typeof streams)[K]> }) // TODO: Extract to tau
-		.fold(Null, ({ contextMenu$, modal$, globalCommandPalette$, sidebar$, notification$ }) => (
-			<div className="flex" onClick={hideContextMenu}>
-				<ActivityBar sidebar$={sidebar$} commandPalette$={globalCommandPalette$} />
-				<Workspace sidebar$={sidebar$} commandPalette$={globalCommandPalette$} />
-				<ContextMenu menu$={contextMenu$} />
-				<Modal modal$={modal$} />
-				<Notifications notification$={notification$} />
-			</div>
-		))
+	return (
+		Either.fromNullable(streams)
+			.chain(() => Either.fromNullable(streams.contextMenu$))
+			.chain(() => Either.fromNullable(streams.modal$))
+			.chain(() => Either.fromNullable(streams.globalCommandPalette$))
+			.chain(() => Either.fromNullable(streams.sidebar$))
+			.chain(() => Either.fromNullable(streams.notification$))
+			.map(() => streams as { [K in keyof typeof streams]: NonNullable<(typeof streams)[K]> }) // TODO: Extract to tau
+			// TODO: Render loading instead of Null
+			.fold(Null, ({ contextMenu$, modal$, globalCommandPalette$, sidebar$, notification$ }) => (
+				<div className="flex" onClick={hideContextMenu}>
+					<ActivityBar sidebar$={sidebar$} commandPalette$={globalCommandPalette$} />
+					<Workspace sidebar$={sidebar$} commandPalette$={globalCommandPalette$} />
+					<ContextMenu menu$={contextMenu$} />
+					<Modal modal$={modal$} />
+					<Notifications notification$={notification$} />
+				</div>
+			))
+	)
 }

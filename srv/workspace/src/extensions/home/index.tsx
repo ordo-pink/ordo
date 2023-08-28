@@ -4,17 +4,36 @@
 import Card from "$components/card.component"
 import { CenteredPage } from "$components/centered-page"
 import { Title } from "$components/page-header"
+import { createExtension } from "$utils/create-extension.util"
 import { Activity, ComponentSpace, cmd } from "@ordo-pink/frontend-core"
 import { Switch } from "@ordo-pink/switch"
 import { memo, useEffect } from "react"
 import { BsCollection } from "react-icons/bs"
+
+export default function createHomeExtension() {
+	return createExtension(commands => {
+		commands.emit<cmd.activities.add>("activities.add", {
+			Component: HomeActivity,
+			name: "home",
+			routes: ["/"],
+		})
+
+		commands.emit<cmd.commandPalette.add>("command-palette.add", {
+			id: "home.navigate",
+			readableName: "Go to Welcome Screen",
+			accelerator: "mod+h",
+			Icon,
+			onSelect: () => commands.emit<cmd.router.navigate>("router.navigate", "/"),
+		})
+	})
+}
 
 const WelcomePage = ({ commands, space }: Activity.ComponentProps) =>
 	Switch.of(space)
 		.case(ComponentSpace.ICON, () => <Icon />)
 		.default(() => <Workspace commands={commands} />)
 
-export default memo(WelcomePage, (prev, next) => prev.space === next.space)
+const HomeActivity = memo(WelcomePage, (prev, next) => prev.space === next.space)
 
 const Icon = () => <BsCollection />
 

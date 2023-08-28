@@ -8,30 +8,58 @@ import Null from "$components/null"
 import { Title } from "$components/page-header"
 import UsedSpace from "$components/used-space"
 import { useUser } from "$streams/auth"
-import { getCommands } from "$streams/commands"
+import { createExtension } from "$utils/create-extension.util"
 import { AuthResponse } from "@ordo-pink/backend-id-server"
 import { User } from "@ordo-pink/backend-user-service"
 import { Either } from "@ordo-pink/either"
-import { cmd } from "@ordo-pink/frontend-core"
+import { Activity, ComponentSpace, cmd } from "@ordo-pink/frontend-core"
 import { Oath } from "@ordo-pink/oath"
 import { Switch } from "@ordo-pink/switch"
 import { Nullable, noop } from "@ordo-pink/tau"
-import { useEffect, useState } from "react"
-import { BsPatchCheckFill, BsPatchExclamation } from "react-icons/bs"
+import { memo, useEffect, useState } from "react"
+import { BsPatchCheckFill, BsPatchExclamation, BsPersonBadge } from "react-icons/bs"
 
-const commands = getCommands()
+type UserComponentParams = Activity.ComponentProps & { auth: Nullable<AuthResponse> }
+const UserComponent = ({ space, auth, commands }: UserComponentParams) =>
+	Switch.of(space)
+		.case(ComponentSpace.ICON, () => <Icon />)
+		.case(ComponentSpace.WIDGET, () => <Null />)
+		.default(() => <UserPage auth={auth} commands={commands} />)
 
-type _P = { auth: Nullable<AuthResponse> }
-export default function UserPage({ auth }: _P) {
+const UserActivity = memo(UserComponent, (prev, next) => prev.auth !== next.auth)
+
+const Icon = () => <BsPersonBadge />
+
+export default function createUserExtension(auth: Nullable<AuthResponse>) {
+	return createExtension(commands => {
+		commands.emit<cmd.activities.add>("activities.add", {
+			Component: props => <UserActivity auth={auth} {...props} />,
+			name: "user",
+			routes: ["/user"],
+			background: true,
+		})
+
+		commands.emit<cmd.commandPalette.add>("command-palette.add", {
+			id: "user.go-to-user",
+			readableName: "Go to Account",
+			Icon,
+			onSelect: () => commands.emit<cmd.router.navigate>("router.navigate", "/user"),
+		})
+	})
+}
+
+type _P = { auth: Nullable<AuthResponse> } & Pick<Activity.ComponentProps, "commands">
+const UserPage = ({ auth, commands }: _P) => {
 	const userE = useUser()
 
 	useEffect(() => {
 		commands.emit<cmd.sidebar.disable>("sidebar.disable")
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [])
 
 	return Either.fromNullable(auth)
 		.chain(() => userE)
-		.fold(Null, user => <UserInfo auth={auth} user={user} />)
+		.fold(Null, user => <UserInfo auth={auth} user={user} commands={commands} />)
 }
 
 // TODO: Collect errors
@@ -40,7 +68,7 @@ export default function UserPage({ auth }: _P) {
 // TODO: Add uploading avatar
 
 type _UIP = _P & { user: User }
-const UserInfo = ({ user, auth }: _UIP) => {
+const UserInfo = ({ user, auth, commands }: _UIP) => {
 	const [email, setEmail] = useState(user.email)
 	const [username, setUsername] = useState(user.username)
 	const [oldPassword, setOldPassword] = useState("")

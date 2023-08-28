@@ -9,15 +9,16 @@ import { Switch } from "@ordo-pink/switch"
 import { BsFolder2Open } from "react-icons/bs"
 import { createExtension } from "$utils/create-extension.util"
 
-const FsPage = ({ space, commands }: Activity.ComponentProps) =>
+const FileExplorerComponent = ({ space, commands }: Activity.ComponentProps) =>
 	Switch.of(space)
 		.case(ComponentSpace.ICON, () => <Icon />)
 		.default(() => <Workspace commands={commands} />)
 
-const FSActivity = memo(FsPage, (prev, next) => prev.space === next.space)
+const FSActivity = memo(FileExplorerComponent, (prev, next) => prev.space === next.space)
 
-export default () =>
-	createExtension(commands => {
+// TODO: Provide commands and queries via the import
+export default function createFileExplorerExtension() {
+	return createExtension(commands => {
 		commands.emit<cmd.activities.add>("activities.add", {
 			Component: FSActivity,
 			name: "ordo.file-explorer",
@@ -25,12 +26,14 @@ export default () =>
 		})
 
 		commands.emit<cmd.commandPalette.add>("command-palette.add", {
-			id: "go-to-file-explorer",
+			id: "file-explorer.navigate",
 			readableName: "Go to File Explorer",
 			accelerator: "mod+shift+e",
+			Icon,
 			onSelect: () => commands.emit<cmd.router.navigate>("router.navigate", "/fs"),
 		})
 	})
+}
 
 const Icon = () => <BsFolder2Open />
 
@@ -42,5 +45,5 @@ const Workspace = ({ commands }: Pick<Activity.ComponentProps, "commands">) => {
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [])
 
-	return root.fold(Null, content => content.map(item => <div key={item.fsid}>{item.path}</div>))
+	return root.fold(Null, content => content.map(item => <div key={item.path}>{item.path}</div>))
 }

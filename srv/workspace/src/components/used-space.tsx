@@ -29,7 +29,7 @@ export default function UsedSpace() {
 	}, [metadata])
 
 	return metadata.fold(Null, metadata => (
-		<div className="w-full">
+		<div className="w-full max-w-sm">
 			<div className="flex justify-between items-center w-full">
 				<div className="text-xs truncate">Used space</div>
 				<div className="text-xs">

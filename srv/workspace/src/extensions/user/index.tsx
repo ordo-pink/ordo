@@ -9,6 +9,7 @@ import { Title } from "$components/page-header"
 import UsedSpace from "$components/used-space"
 import { useUser } from "$streams/auth"
 import { createExtension } from "$utils/create-extension.util"
+import { UserUtils } from "$utils/user.utils"
 import { AuthResponse } from "@ordo-pink/backend-id-server"
 import { User } from "@ordo-pink/backend-user-service"
 import { Either } from "@ordo-pink/either"
@@ -17,7 +18,7 @@ import { Oath } from "@ordo-pink/oath"
 import { Switch } from "@ordo-pink/switch"
 import { Nullable, noop } from "@ordo-pink/tau"
 import { memo, useEffect, useState } from "react"
-import { BsPatchCheckFill, BsPatchExclamation, BsPersonBadge } from "react-icons/bs"
+import { BsPersonBadge } from "react-icons/bs"
 
 type UserComponentParams = Activity.ComponentProps & { auth: Nullable<AuthResponse> }
 const UserComponent = ({ space, auth, commands }: UserComponentParams) =>
@@ -63,14 +64,12 @@ const UserPage = ({ auth, commands }: _P) => {
 }
 
 // TODO: Collect errors
-// TODO: Hide email confirmation status (until the endpoint is available)
-// TODO: Add endpoint for changing personal info
 // TODO: Add uploading avatar
 
 type _UIP = _P & { user: User }
 const UserInfo = ({ user, auth, commands }: _UIP) => {
 	const [email, setEmail] = useState(user.email)
-	const [username, setUsername] = useState(user.username ?? "")
+	// const [username, setUsername] = useState(user.username ?? "")
 	const [oldPassword, setOldPassword] = useState("")
 	const [newPassword, setNewPassword] = useState("")
 	const [repeatNewPassword, setRepeatNewPassword] = useState("")
@@ -80,8 +79,11 @@ const UserInfo = ({ user, auth, commands }: _UIP) => {
 	const [passwordErrors, setPasswordErrors] = useState<string[]>([])
 
 	return (
-		<form className="px-2 py-4 md:px-8 md:py-8 flex flex-col items-center space-y-4 overflow-x-auto">
-			<div className="max-w-lg flex space-x-4 mb-8 md:mb-4 items-center">
+		<form
+			onSubmit={e => e.preventDefault()}
+			className="px-2 py-4 md:px-8 md:py-8 flex flex-col items-center space-y-4 overflow-x-auto"
+		>
+			<div className="w-full max-w-lg flex space-x-4 mb-8 md:mb-4 items-center">
 				<div className="flex items-center justify-center rounded-full p-0.5 bg-gradient-to-tr from-sky-400 via-purple-400 to-rose-400 shadow-lg shrink-0 cursor-pointer">
 					<img
 						src={`${process.env.REACT_APP_STATIC_HOST}/logo.png`}
@@ -92,35 +94,28 @@ const UserInfo = ({ user, auth, commands }: _UIP) => {
 						// }
 					/>
 				</div>
-				<div className="flex flex-col space-y-1 md:space-y-2">
-					<Title level="2" trim>
-						{Switch.of(user)
-							.case(
-								u => !!u.firstName && !!u.lastName && !!u.username,
-								() => `${user.firstName} ${user.lastName} (${user.username})`,
-							)
-							.case(
-								u => !!u.firstName && !!u.lastName,
-								() => `${user.firstName![0]}. ${user.lastName}`,
-							)
-							.case(
-								u => !!u.firstName,
-								() => user.firstName,
-							)
-							.case(
-								u => !!u.username,
-								() => user.username,
-							)
-							.default(() => user.email)}
+				<div className="w-full max-w-md flex flex-col space-y-1 md:space-y-2">
+					<Title level="2" trim styledFirstLetter>
+						{UserUtils.getUserName(user)}
 					</Title>
 					<UsedSpace />
 				</div>
 			</div>
 
 			<div className="container grid grid-cols-1 md:grid-cols-3 gap-2 md:gap-4">
-				<Card title="Email">
+				<Card title="Identification">
 					<fieldset className="w-full h-full justify-center flex flex-col space-y-4">
 						<div className="flex flex-col space-y-4 md:flex-row md:space-y-0 md:space-x-2">
+							{/* <TextInput
+							label="Public handle"
+							type="text"
+							placeholder="E.g. moonmarine"
+							id="publicHandle"
+							autocomplete="username"
+							value={username}
+							onInput={e => setUsername(e.target.value)}
+						/> */}
+
 							<EmailInput
 								value={email}
 								onInput={e => setEmail(e.target.value)}
@@ -163,24 +158,14 @@ const UserInfo = ({ user, auth, commands }: _UIP) => {
 							</Button>
 						</div>
 
-						<div>
+						{/* <div>
 							<EmailConfirmation confirmed={user.emailConfirmed} />
-						</div>
+						</div> */}
 					</fieldset>
 				</Card>
 
 				<Card title="Personal info">
 					<fieldset className="w-full h-full justify-center flex flex-col space-y-4">
-						<TextInput
-							label="Public handle"
-							type="text"
-							placeholder="E.g. moonmarine"
-							id="publicHandle"
-							autocomplete="username"
-							value={username}
-							onInput={e => setUsername(e.target.value)}
-						/>
-
 						<TextInput
 							placeholder="E.g. Neil"
 							value={firstName}
@@ -200,9 +185,32 @@ const UserInfo = ({ user, auth, commands }: _UIP) => {
 
 						<Button
 							disabled={
-								firstName === user.firstName &&
-								lastName === user.lastName &&
-								username === user.username
+								firstName === user.firstName && lastName === user.lastName
+								// && username === user.username
+							}
+							onClick={() =>
+								Oath.try(() =>
+									fetch(`${process.env.REACT_APP_ID_HOST}/change-account-info`, {
+										method: "PATCH",
+										headers: {
+											authorization: `Bearer ${auth!.accessToken}`,
+											"content-type": "application/json",
+										},
+										body: JSON.stringify({ firstName, lastName }),
+									}).then(res => res.json()),
+								)
+									.rejectedMap(() => "Connection error")
+									.chain(res =>
+										Oath.fromBoolean(
+											() => res.success,
+											noop,
+											() => res.error,
+										),
+									)
+									.fork(
+										err => setEmailErrors([err ? err : "Invalid email"]),
+										() => commands.emit<cmd.user.refreshInfo>("user.refresh"),
+									)
 							}
 						>
 							Change
@@ -313,22 +321,22 @@ const UserInfo = ({ user, auth, commands }: _UIP) => {
 	)
 }
 
-type _ECP = { confirmed: boolean }
-const EmailConfirmation = ({ confirmed }: _ECP) =>
-	Either.fromBoolean(() => confirmed, EmailConfirmed).getOrElse(EmailNotConfirmed)
+// type _ECP = { confirmed: boolean }
+// const EmailConfirmation = ({ confirmed }: _ECP) =>
+// 	Either.fromBoolean(() => confirmed, EmailConfirmed).getOrElse(EmailNotConfirmed)
 
-const EmailNotConfirmed = () => (
-	<div className="flex items-center justify-center space-x-2">
-		<BsPatchExclamation className="text-rose-500" />
-		<div>
-			Email not confirmed. <button className="text-sky-500">Confirm</button>.
-		</div>
-	</div>
-)
+// const EmailNotConfirmed = () => (
+// 	<div className="flex items-center justify-center space-x-2">
+// 		<BsPatchExclamation className="text-rose-500" />
+// 		<div>
+// 			Email not confirmed. <button className="text-sky-500">Confirm</button>.
+// 		</div>
+// 	</div>
+// )
 
-const EmailConfirmed = () => (
-	<div className="flex items-center justify-center space-x-2">
-		<BsPatchCheckFill className="text-emerald-500" />
-		<div>Email confirmed.</div>
-	</div>
-)
+// const EmailConfirmed = () => (
+// 	<div className="flex items-center justify-center space-x-2">
+// 		<BsPatchCheckFill className="text-emerald-500" />
+// 		<div>Email confirmed.</div>
+// 	</div>
+// )

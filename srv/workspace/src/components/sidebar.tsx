@@ -14,6 +14,7 @@ import { __Sidebar$ } from "$streams/sidebar"
 import { cmd } from "@ordo-pink/frontend-core"
 import Link from "./link"
 import { Title } from "./page-header"
+import { UserUtils } from "$utils/user.utils"
 
 const commands = getCommands()
 
@@ -60,7 +61,7 @@ export default function Sidebar({ children, isNarrow, commandPalette$, sidebar$ 
 				<div>{children}</div>
 			</div>
 
-			<div className="flex space-x-2 items-center">
+			<div className="w-full flex space-x-2 items-center justify-center">
 				<div className="flex items-center justify-center rounded-full mt-1 p-0.5 bg-gradient-to-tr from-sky-400 via-purple-400 to-rose-400 shadow-lg shrink-0 cursor-pointer">
 					<div className="bg-white rounded-full">
 						<Link href="/user">
@@ -72,13 +73,15 @@ export default function Sidebar({ children, isNarrow, commandPalette$, sidebar$ 
 						</Link>
 					</div>
 				</div>
-				<div className="w-full">
+				<div className="w-full max-w-md">
 					<div>
 						{user.fold(Null, u => (
-							<Title level="5">{u.email}</Title>
+							<Title level="5" styledFirstLetter trim>
+								{UserUtils.getUserName(u)}
+							</Title>
 						))}
 					</div>
-					<div className="w-full">
+					<div>
 						<UsedSpace />
 					</div>
 				</div>

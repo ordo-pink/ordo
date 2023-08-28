@@ -16,15 +16,16 @@ import { ConsoleLogger, Logger } from "@ordo-pink/logger"
 import { createServer } from "@ordo-pink/backend-utils"
 import { Readable } from "stream"
 
-import { handleChangePassword } from "./handlers/change-password"
-import { handleRefreshToken } from "./handlers/refresh-token"
-import { handleVerifyToken } from "./handlers/verify-token"
-import { handleChangeEmail } from "./handlers/change-email"
-import { handleUserInfo } from "./handlers/user-info"
-import { handleSignOut } from "./handlers/sign-out"
-import { handleAccount } from "./handlers/account"
-import { handleSignIn } from "./handlers/sign-in"
-import { handleSignUp } from "./handlers/sign-up"
+import { handleChangeAccountInfo } from "./handlers/change-account-info.handler"
+import { handleChangePassword } from "./handlers/change-password.handler"
+import { handleRefreshToken } from "./handlers/refresh-token.handler"
+import { handleVerifyToken } from "./handlers/verify-token.handler"
+import { handleChangeEmail } from "./handlers/change-email.handler"
+import { handleUserInfo } from "./handlers/user-info.handler"
+import { handleSignOut } from "./handlers/sign-out.handler"
+import { handleAccount } from "./handlers/account.handler"
+import { handleSignIn } from "./handlers/sign-in.handler"
+import { handleSignUp } from "./handlers/sign-up.handler"
 
 // TODO: Extract errors to enum
 // TODO: Audit
@@ -84,6 +85,7 @@ export const createIDServer = async ({
 				.post("/refresh-token", handleRefreshToken(ctx))
 				.get("/account", handleAccount(ctx))
 				.get("/users/:email", handleUserInfo(ctx))
+				.patch("/change-account-info", handleChangeAccountInfo(ctx))
 				.patch("/change-email", handleChangeEmail(ctx))
 				.patch("/change-password", handleChangePassword(ctx))
 				.post("/verify-token", handleVerifyToken(ctx)),

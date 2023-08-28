@@ -70,17 +70,17 @@ const UserPage = ({ auth, commands }: _P) => {
 type _UIP = _P & { user: User }
 const UserInfo = ({ user, auth, commands }: _UIP) => {
 	const [email, setEmail] = useState(user.email)
-	const [username, setUsername] = useState(user.username)
+	const [username, setUsername] = useState(user.username ?? "")
 	const [oldPassword, setOldPassword] = useState("")
 	const [newPassword, setNewPassword] = useState("")
 	const [repeatNewPassword, setRepeatNewPassword] = useState("")
-	const [firstName, setFirstName] = useState(user.firstName)
-	const [lastName, setLastName] = useState(user.lastName)
+	const [firstName, setFirstName] = useState(user.firstName ?? "")
+	const [lastName, setLastName] = useState(user.lastName ?? "")
 	const [emailErrors, setEmailErrors] = useState<string[]>([])
 	const [passwordErrors, setPasswordErrors] = useState<string[]>([])
 
 	return (
-		<div className="px-2 py-4 md:px-8 md:py-8 flex flex-col items-center space-y-4 overflow-x-auto">
+		<form className="px-2 py-4 md:px-8 md:py-8 flex flex-col items-center space-y-4 overflow-x-auto">
 			<div className="max-w-lg flex space-x-4 mb-8 md:mb-4 items-center">
 				<div className="flex items-center justify-center rounded-full p-0.5 bg-gradient-to-tr from-sky-400 via-purple-400 to-rose-400 shadow-lg shrink-0 cursor-pointer">
 					<img
@@ -172,10 +172,11 @@ const UserInfo = ({ user, auth, commands }: _UIP) => {
 				<Card title="Personal info">
 					<fieldset className="w-full h-full justify-center flex flex-col space-y-4">
 						<TextInput
-							label="Username"
+							label="Public handle"
 							type="text"
 							placeholder="E.g. moonmarine"
-							id="username"
+							id="publicHandle"
+							autocomplete="username"
 							value={username}
 							onInput={e => setUsername(e.target.value)}
 						/>
@@ -184,6 +185,7 @@ const UserInfo = ({ user, auth, commands }: _UIP) => {
 							placeholder="E.g. Neil"
 							value={firstName}
 							id="firstName"
+							autocomplete="given-name"
 							label="First name"
 							onInput={e => setFirstName(e.target.value)}
 						/>
@@ -191,6 +193,7 @@ const UserInfo = ({ user, auth, commands }: _UIP) => {
 							placeholder="E.g. Armstrong"
 							value={lastName}
 							id="lastName"
+							autocomplete="family-name"
 							label="Last name"
 							onInput={e => setLastName(e.target.value)}
 						/>
@@ -211,6 +214,8 @@ const UserInfo = ({ user, auth, commands }: _UIP) => {
 					<fieldset className="w-full h-full justify-center flex flex-col space-y-4">
 						<PasswordInput
 							label="Old password"
+							id="currentPassword"
+							autocomplete="current-password"
 							value={oldPassword}
 							onInput={e => setOldPassword(e.target.value)}
 							onChange={response =>
@@ -223,6 +228,8 @@ const UserInfo = ({ user, auth, commands }: _UIP) => {
 
 						<PasswordInput
 							label="New password"
+							id="newPassword"
+							autocomplete="new-password"
 							value={newPassword}
 							onInput={e => setNewPassword(e.target.value)}
 							onChange={response =>
@@ -235,6 +242,8 @@ const UserInfo = ({ user, auth, commands }: _UIP) => {
 
 						<PasswordInput
 							label="Repeat new password"
+							id="repeatPassword"
+							autocomplete="new-password"
 							value={repeatNewPassword}
 							onInput={e => setRepeatNewPassword(e.target.value)}
 							onChange={response =>
@@ -300,7 +309,7 @@ const UserInfo = ({ user, auth, commands }: _UIP) => {
 					</p>
 				</Card>
 			</div>
-		</div>
+		</form>
 	)
 }
 

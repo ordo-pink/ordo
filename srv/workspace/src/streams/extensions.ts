@@ -57,7 +57,7 @@ type InitExtensionsParams = {
 }
 
 export const initExtensions = callOnce(({ logger, router$, extensions }: InitExtensionsParams) => {
-	logger.info("Initializing extensions")
+	logger.debug("Initializing extensions")
 
 	commands.on<cmd.activities.add>("activities.add", ({ payload }) => add(payload))
 	commands.on<cmd.activities.remove>("activities.remove", ({ payload }) => remove(payload))

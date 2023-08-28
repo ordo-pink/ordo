@@ -64,7 +64,12 @@ export const useAppInit = (): UseAppInitReturns => {
 
 			const command = globalCommandPaletteItems?.find(c => c.accelerator?.includes(hotkey))
 
-			if (command) command.onSelect()
+			if (command) {
+				e.preventDefault()
+				e.stopPropagation()
+
+				command.onSelect()
+			}
 		},
 		[globalCommandPaletteItems],
 	)

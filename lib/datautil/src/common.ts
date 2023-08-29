@@ -4,8 +4,8 @@
 import { SUB } from "@ordo-pink/backend-token-service"
 import { Switch } from "@ordo-pink/switch"
 import { isArray, isDate, isObject, isString } from "@ordo-pink/tau"
-import { FilePath } from "./file"
-import { DirectoryPath } from "./directory"
+import { FilePath, FileUtils } from "./file"
+import { Directory, DirectoryPath, DirectoryUtils } from "./directory"
 
 /**
  * Characters that cannot be used in FS path.
@@ -106,6 +106,18 @@ export const isFSEntity = (x: unknown): x is FSEntity => {
 		isFSLabels(directory.labels) &&
 		isFSProperties(directory.properties)
 	)
+}
+
+export const FSEntityUtils = {
+	isFSEntity,
+	isParent: (maybeParent: Directory, child: FSEntity) =>
+		Switch.of(child)
+			.case(
+				DirectoryUtils.isDirectory,
+				() => DirectoryUtils.getParentPath(child.path as DirectoryPath) === maybeParent.path,
+			)
+			.case(FileUtils.isFile, () => FileUtils.getParentPath(child.path) === maybeParent.path)
+			.default(() => false),
 }
 
 export type FSProperties = Record<string, never>

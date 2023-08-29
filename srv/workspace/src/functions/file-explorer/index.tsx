@@ -15,7 +15,7 @@ export default function createFileExplorerFunction() {
 		commands.emit<cmd.activities.add>("activities.add", {
 			Component: props => <FSActivity {...props} />,
 			name: "file-explorer",
-			routes: ["/fs", "/fs/path*"],
+			routes: ["/fs", "/fs/:path*"],
 		})
 
 		commands.emit<cmd.commandPalette.add>("command-palette.add", {
@@ -32,7 +32,7 @@ type P = Activity.ComponentProps
 const FileExplorerComponent = ({ space, commands }: P) =>
 	Switch.of(space)
 		.case(ComponentSpace.ICON, () => <FileExplorerIcon />)
-		.case(ComponentSpace.WIDGET, FileExplorerCardComponent)
+		.case(ComponentSpace.CARD, FileExplorerCardComponent)
 		.case(ComponentSpace.WIDGET, FileExplorerCardComponent)
 		.default(() => <FileExplorerActivityComponent commands={commands} />)
 

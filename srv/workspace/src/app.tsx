@@ -6,7 +6,7 @@ import { useAppInit } from "$hooks/use-app-init"
 import { getCommands } from "$streams/commands"
 import { useSubscription } from "$hooks/use-subscription"
 import { createContext, useContext, useEffect } from "react"
-import { __useSharedContextInit, cmd } from "@ordo-pink/frontend-core"
+import { Router, __useSharedContextInit, cmd } from "@ordo-pink/frontend-core"
 import Notifications from "$components/notifications/notifications.component"
 import ActivityBar from "$components/activity-bar/activity-bar"
 import ContextMenu from "$components/context-menu/context-menu"
@@ -21,7 +21,10 @@ import { FSEntity } from "@ordo-pink/datautil"
 // TODO: Remove useAppInit
 // TODO: Add InternalContext and put streams there
 const commands = getCommands()
-const SharedContext = createContext<{ metadata: Nullable<FSEntity[]> }>({ metadata: null })
+const SharedContext = createContext<{
+	metadata: Nullable<FSEntity[]>
+	currentRoute: Nullable<Router.Route>
+}>({ metadata: null, currentRoute: null })
 
 // TODO: Avoid refreshing app on refreshing token
 // BUG: Token refresh ticks two times in a row
@@ -29,6 +32,7 @@ export default function App() {
 	const streams = useAppInit()
 	const metadata = useSubscription(streams.metadata$)
 	const auth = useSubscription(streams.auth$)
+	const currentRoute = useSubscription(streams.currentRoute$)
 	__useSharedContextInit(SharedContext, useContext)
 
 	const contextMenu = useSubscription(streams.contextMenu$)
@@ -74,7 +78,7 @@ export default function App() {
 					activities$,
 					currentActivity$,
 				}) => (
-					<SharedContext.Provider value={{ metadata }}>
+					<SharedContext.Provider value={{ metadata, currentRoute }}>
 						<div className="flex" onClick={hideContextMenu}>
 							<ActivityBar
 								sidebar$={sidebar$}

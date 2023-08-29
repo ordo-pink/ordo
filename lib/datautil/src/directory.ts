@@ -5,6 +5,7 @@ import type { SUB } from "@ordo-pink/backend-token-service"
 import { Nullable, isObject } from "@ordo-pink/tau"
 import {
 	FSEntity,
+	FSEntityUtils,
 	FSID,
 	endsWithSlash,
 	isFSEntity,
@@ -201,4 +202,7 @@ export const DirectoryUtils = {
 			? args.params.properties
 			: args.directory.properties,
 	}),
+
+	getDirectChildren: (metadata: FSEntity[], directory: Directory) =>
+		metadata.filter(child => FSEntityUtils.isParent(directory, child)),
 }

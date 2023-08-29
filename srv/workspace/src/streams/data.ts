@@ -37,7 +37,6 @@ export const __initData: Fn = ({ logger, auth$ }) => {
 						createdAt: new Date(body.createdAt),
 					})),
 				)
-				.tap(console.log)
 				.tap(() => subscription.unsubscribe())
 				.fork(
 					item => commands.emit<cmd.notification.show>("notification.show", item),

@@ -31,6 +31,10 @@ export const handleCreateDirectory: Unary<
 							() => body,
 							() => HttpError.BadRequest("Invalid body"),
 						)
+							.tap(
+								() => console.log(body),
+								() => console.log(body),
+							)
 							.chain(({ path }) =>
 								Oath.fromNullable(DirectoryUtils.getParentPath(path))
 									.chain(path => dataService.checkDirectoryExists({ path, sub }))

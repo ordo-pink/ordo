@@ -2,29 +2,67 @@
 // SPDX-License-Identifier: MIT
 
 import { memo } from "react"
-import { Activity, ComponentSpace, cmd } from "@ordo-pink/frontend-core"
+import { Activity, ComponentSpace, Functions, cmd } from "@ordo-pink/frontend-core"
 import { Switch } from "@ordo-pink/switch"
-import { createOrdoFunction } from "$utils/create-function.util"
 import FileExplorerActivityComponent from "./components/file-explorer-activity.component"
 import FileExplorerIcon from "./components/file-explorer-icon.component"
 import FileExplorerCardComponent from "./components/file-explorer-card.component"
+import { BsFolderCheck } from "react-icons/bs"
+import { BehaviorSubject } from "rxjs"
+import { Directory, DirectoryPath, DirectoryUtils, FSEntity } from "@ordo-pink/datautil"
+
+type openInFileExplorer = { name: "file-explorer.go-to"; payload: DirectoryPath }
+type openRootInFileExplorer = { name: "file-explorer.open-root" }
 
 // TODO: Provide commands and queries via the import
-export default function createFileExplorerFunction() {
-	return createOrdoFunction(commands => {
-		commands.emit<cmd.activities.add>("activities.add", {
-			Component: props => <FSActivity {...props} />,
-			name: "file-explorer",
-			routes: ["/fs", "/fs/:path*"],
-		})
+export default function createFileExplorerFunction({
+	commands,
+	metadata$,
+}: Functions.CreateFunctionParams) {
+	commands.on<openInFileExplorer>("file-explorer.go-to", ({ payload }) =>
+		commands.emit<cmd.router.navigate>("router.navigate", `/fs${payload}`),
+	)
+	commands.on<openRootInFileExplorer>("file-explorer.open-root", () =>
+		commands.emit<cmd.router.navigate>("router.navigate", "/fs"),
+	)
 
-		commands.emit<cmd.commandPalette.add>("command-palette.add", {
-			id: "file-explorer.navigate",
-			readableName: "Go to File Explorer",
-			accelerator: "mod+shift+e",
-			Icon: FileExplorerIcon,
-			onSelect: () => commands.emit<cmd.router.navigate>("router.navigate", "/fs"),
-		})
+	commands.emit<cmd.activities.add>("activities.add", {
+		Component: props => <FSActivity {...props} />,
+		name: "file-explorer",
+		routes: ["/fs", "/fs/:path*"],
+	})
+
+	commands.emit<cmd.commandPalette.add>("command-palette.add", {
+		id: "file-explorer.open-in-file-explorer",
+		readableName: "Go to File Explorer",
+		accelerator: "mod+shift+e",
+		Icon: FileExplorerIcon,
+		onSelect: () => {
+			commands.emit<cmd.commandPalette.hide>("command-palette.hide")
+			commands.emit<openRootInFileExplorer>("file-explorer.open-root")
+		},
+	})
+
+	commands.emit<cmd.commandPalette.add>("command-palette.add", {
+		id: "file-explorer.choose-directory",
+		readableName: "Open directory in File Explorer...",
+		Icon: BsFolderCheck,
+		onSelect: () => {
+			commands.emit<cmd.commandPalette.hide>("command-palette.hide")
+			commands.emit<cmd.commandPalette.show>(
+				"command-palette.show",
+				(metadata$ as BehaviorSubject<FSEntity[]>).value
+					.filter(item => DirectoryUtils.isDirectory(item) && item.path !== "/")
+					.map(item => ({
+						id: item.path,
+						readableName: `Open ${DirectoryUtils.getReadableName((item as Directory).path)}`,
+						onSelect: () => {
+							commands.emit<cmd.commandPalette.hide>("command-palette.hide")
+							commands.emit<openInFileExplorer>("file-explorer.go-to", (item as Directory).path)
+						},
+					})),
+			)
+		},
 	})
 }
 

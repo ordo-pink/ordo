@@ -6,28 +6,29 @@ import { CenteredPage } from "$components/centered-page"
 import { Title } from "$components/page-header"
 import { useStrictSubscription } from "$hooks/use-subscription"
 import { __Activities$ } from "$streams/activities"
-import { createOrdoFunction } from "$utils/create-function.util"
-import { Activity, ComponentSpace, cmd } from "@ordo-pink/frontend-core"
+import { Activity, ComponentSpace, Functions, cmd } from "@ordo-pink/frontend-core"
 import { Switch } from "@ordo-pink/switch"
 import { Nullable } from "@ordo-pink/tau"
 import { memo, useEffect } from "react"
 import { BsCollection } from "react-icons/bs"
 
-export default function createHomeFunction(activities$: Nullable<__Activities$>) {
-	return createOrdoFunction(commands => {
-		commands.emit<cmd.activities.add>("activities.add", {
-			Component: props => <HomeActivity activities$={activities$} {...props} />,
-			name: "home",
-			routes: ["/"],
-		})
+type Params = Functions.CreateFunctionParams & { activities$: Nullable<__Activities$> }
+export default function createHomeFunction({ commands, activities$ }: Params) {
+	commands.emit<cmd.activities.add>("activities.add", {
+		Component: props => <HomeActivity activities$={activities$} {...props} />,
+		name: "home",
+		routes: ["/"],
+	})
 
-		commands.emit<cmd.commandPalette.add>("command-palette.add", {
-			id: "home.navigate",
-			readableName: "Go to Welcome Screen",
-			accelerator: "mod+h",
-			Icon,
-			onSelect: () => commands.emit<cmd.router.navigate>("router.navigate", "/"),
-		})
+	commands.emit<cmd.commandPalette.add>("command-palette.add", {
+		id: "home.navigate",
+		readableName: "Go to Welcome Screen",
+		accelerator: "mod+h",
+		Icon,
+		onSelect: () => {
+			commands.emit<cmd.commandPalette.hide>("command-palette.hide")
+			commands.emit<cmd.router.navigate>("router.navigate", "/")
+		},
 	})
 }
 

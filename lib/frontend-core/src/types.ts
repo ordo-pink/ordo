@@ -3,7 +3,7 @@
 
 import type { IconType } from "react-icons"
 import type { ComponentType, MouseEvent } from "react"
-import type { Thunk, Unary } from "@ordo-pink/tau"
+import type { Nullable, Thunk, Unary } from "@ordo-pink/tau"
 import type {
 	FilePath,
 	DirectoryPath,
@@ -11,11 +11,19 @@ import type {
 	CreateFileParams,
 	UpdateDirectoryParams,
 	UpdateFileParams,
-	File,
-	Directory,
+	FSEntity,
 } from "@ordo-pink/datautil"
+import type { Observable } from "rxjs"
 import { Logger } from "@ordo-pink/logger"
 import { ComponentSpace } from "./constants/component-space.constants"
+
+export namespace Functions {
+	export type CreateFunctionParams = {
+		commands: Commands.Commands
+		metadata$: Nullable<Observable<FSEntity[]>>
+	}
+	export type CreateFunctionFn = Unary<Functions.CreateFunctionParams, void | Promise<void>>
+}
 
 export namespace cmd {
 	export namespace user {

@@ -52,7 +52,7 @@ export default function CommandPaletteModal({ items }: Props) {
 	const handleEnter = (index: number) => {
 		const selectedItem = visibleItems[index]
 		selectedItem.onSelect()
-		handleEscape()
+		// handleEscape()
 	}
 
 	const handleArrowUp = (event: KeyboardEvent<HTMLInputElement>) => {

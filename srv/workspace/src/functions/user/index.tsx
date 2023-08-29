@@ -7,51 +7,49 @@ import { EmailInput, PasswordInput, TextInput } from "$components/input"
 import Null from "$components/null"
 import { Title } from "$components/page-header"
 import UsedSpace from "$components/used-space"
-import { useUser } from "$streams/auth"
-import { createOrdoFunction } from "$utils/create-function.util"
+import { useSubscription } from "$hooks/use-subscription"
+import { __Auth$, useUser } from "$streams/auth"
 import { Hosts } from "$utils/hosts"
 import { UserUtils } from "$utils/user-utils.util"
-import { AuthResponse } from "@ordo-pink/backend-id-server"
 import { User } from "@ordo-pink/backend-user-service"
-import { Either } from "@ordo-pink/either"
-import { Activity, ComponentSpace, cmd } from "@ordo-pink/frontend-core"
+import { Activity, ComponentSpace, Functions, cmd } from "@ordo-pink/frontend-core"
 import { Oath } from "@ordo-pink/oath"
 import { Switch } from "@ordo-pink/switch"
 import { Nullable, noop } from "@ordo-pink/tau"
-import { memo, useEffect, useState } from "react"
+import { useEffect, useState } from "react"
 import { BsPersonBadge } from "react-icons/bs"
 
-type UserComponentParams = Activity.ComponentProps & { auth: Nullable<AuthResponse> }
-const UserComponent = ({ space, auth, commands }: UserComponentParams) =>
+type UserComponentParams = Activity.ComponentProps & { auth$: Nullable<__Auth$> }
+const UserActivity = ({ space, auth$, commands }: UserComponentParams) =>
 	Switch.of(space)
 		.case(ComponentSpace.ICON, () => <Icon />)
 		.case(ComponentSpace.WIDGET, () => <Null />)
-		.default(() => <UserPage auth={auth} commands={commands} />)
-
-const UserActivity = memo(UserComponent, (prev, next) => prev.auth !== next.auth)
+		.default(() => <UserPage auth$={auth$} commands={commands} />)
 
 const Icon = () => <BsPersonBadge />
 
-export default function createUserFunction(auth: Nullable<AuthResponse>) {
-	return createOrdoFunction(commands => {
-		commands.emit<cmd.activities.add>("activities.add", {
-			Component: props => <UserActivity auth={auth} {...props} />,
-			name: "user",
-			routes: ["/user"],
-			background: true,
-		})
+type Params = Functions.CreateFunctionParams & { auth$: Nullable<__Auth$> }
+export default function createUserFunction({ commands, auth$ }: Params) {
+	commands.emit<cmd.activities.add>("activities.add", {
+		Component: props => <UserActivity auth$={auth$} {...props} />,
+		name: "user",
+		routes: ["/user"],
+		background: true,
+	})
 
-		commands.emit<cmd.commandPalette.add>("command-palette.add", {
-			id: "user.go-to-user",
-			readableName: "Go to Account",
-			Icon,
-			onSelect: () => commands.emit<cmd.router.navigate>("router.navigate", "/user"),
-		})
+	commands.emit<cmd.commandPalette.add>("command-palette.add", {
+		id: "user.go-to-user",
+		readableName: "Go to Account",
+		Icon,
+		onSelect: () => {
+			commands.emit<cmd.commandPalette.hide>("command-palette.hide")
+			commands.emit<cmd.router.navigate>("router.navigate", "/user")
+		},
 	})
 }
 
-type _P = { auth: Nullable<AuthResponse> } & Pick<Activity.ComponentProps, "commands">
-const UserPage = ({ auth, commands }: _P) => {
+type _P = { auth$: Nullable<__Auth$> } & Pick<Activity.ComponentProps, "commands">
+const UserPage = ({ auth$, commands }: _P) => {
 	const userE = useUser()
 
 	useEffect(() => {
@@ -59,16 +57,16 @@ const UserPage = ({ auth, commands }: _P) => {
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [])
 
-	return Either.fromNullable(auth)
-		.chain(() => userE)
-		.fold(Null, user => <UserInfo auth={auth} user={user} commands={commands} />)
+	return userE.fold(Null, user => <UserInfo auth$={auth$} user={user} commands={commands} />)
 }
 
 // TODO: Collect errors
 // TODO: Add uploading avatar
 
 type _UIP = _P & { user: User }
-const UserInfo = ({ user, auth, commands }: _UIP) => {
+const UserInfo = ({ user, auth$, commands }: _UIP) => {
+	const auth = useSubscription(auth$)
+
 	const [email, setEmail] = useState(user.email)
 	// const [handle, setHandle] = useState(user.handle ?? "")
 	const [oldPassword, setOldPassword] = useState("")

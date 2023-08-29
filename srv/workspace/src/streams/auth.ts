@@ -80,7 +80,10 @@ export const __initAuth: InitAuth = callOnce(({ logger }) => {
 		id: "core.sign-out",
 		readableName: "Sign out",
 		Icon: AiOutlineLogout,
-		onSelect: () => commands.emit<cmd.user.signOut>("user.sign-out"),
+		onSelect: () => {
+			commands.emit<cmd.commandPalette.hide>("command-palette.hide")
+			commands.emit<cmd.user.signOut>("user.sign-out")
+		},
 	})
 
 	return auth$

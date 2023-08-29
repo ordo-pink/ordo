@@ -46,9 +46,15 @@ export default function App() {
 		commands.emit<cmd.user.refreshInfo>("user.refresh")
 		commands.emit<cmd.data.refreshRoot>("data.refresh-root")
 
-		import("./functions/home").then(f => f.default(streams.activities$))
-		import("./functions/file-explorer").then(f => f.default())
-		import("./functions/user").then(f => f.default(auth))
+		import("./functions/home").then(f =>
+			f.default({ commands, metadata$: streams.metadata$, activities$: streams.activities$ }),
+		)
+		import("./functions/file-explorer").then(f =>
+			f.default({ commands, metadata$: streams.metadata$ }),
+		)
+		import("./functions/user").then(f =>
+			f.default({ commands, metadata$: streams.metadata$, auth$: streams.auth$ }),
+		)
 		// TODO: Enable user functions
 
 		// eslint-disable-next-line react-hooks/exhaustive-deps

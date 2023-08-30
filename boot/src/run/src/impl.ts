@@ -17,7 +17,7 @@ export const run = () =>
 	readdir0("./srv", { withFileTypes: true })
 		.map(direntsToDirs)
 		.map(getNames)
-		.map(names => names.map(name => `./srv/${name}/bin/run.ts`)) // TODO: Replace with run.ts
+		.map(names => names.map(name => `./srv/${name}/bin/run.ts`))
 		.chain(checkFilesExist0)
 		.map(getExistingPaths)
 		.chain(paths =>

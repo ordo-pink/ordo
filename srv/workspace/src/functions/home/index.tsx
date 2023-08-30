@@ -70,9 +70,6 @@ const Workspace = ({ commands, activities$ }: Pick<P, "commands" | "activities$"
 					<p>TODO: Keyboard shortcuts</p>
 				</Card>
 
-				{/* TODO: Support for resizing cards */}
-				{/* TODO: Support for adding and removing cards */}
-				{/* TODO: Support for reordering cards */}
 				{activities
 					.filter(activity => activity.name !== "home")
 					.map(Activity => (

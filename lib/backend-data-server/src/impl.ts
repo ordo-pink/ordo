@@ -20,7 +20,6 @@ import { handleUpdateFile } from "./handlers/update-file.handler"
 import { handleGetFile } from "./handlers/get-file.handler"
 import { handleGetRoot } from "./handlers/get-root.handler"
 
-// TODO: Audit
 export type Params = {
 	origin: string | string[]
 	dataService: TDataService<Readable>

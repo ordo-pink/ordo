@@ -15,7 +15,6 @@ export type SharedContextValue = {
 	commands: Commands.Commands
 }
 
-// TODO: Fix issue with importing react directly
 export const __useSharedContextInit = (
 	context: typeof SharedContext,
 	useContext: typeof UseContext,

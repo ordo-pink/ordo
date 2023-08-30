@@ -260,7 +260,6 @@ export class Oath<TRight, TLeft = never> {
 		)
 	}
 
-	// TODO: Add support for the second function (catch)
 	public and<ThenRight, ThenLeft>(
 		f: (x: TRight) => PromiseLike<ThenRight> | Oath<ThenRight, ThenLeft> | ThenRight,
 	): Oath<ThenRight, TLeft | ThenLeft> {

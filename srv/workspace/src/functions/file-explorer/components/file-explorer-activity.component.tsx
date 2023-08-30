@@ -80,7 +80,6 @@ export default function FileExplorerActivityComponent({
 										: setSelectedItems([item.path])
 								}
 								onDoubleClick={() => {
-									// TODO: Opening files in Editor
 									if (DirectoryUtils.isDirectory(item))
 										return commands.emit<cmd.router.navigate>("router.navigate", `/fs${item.path}`)
 									alert("TODO")

@@ -28,8 +28,6 @@ import { handleSignIn } from "./handlers/sign-in.handler"
 import { handleSignUp } from "./handlers/sign-up.handler"
 import { Algorithm } from "@ordo-pink/wjwt"
 
-// TODO: Extract errors to enum
-// TODO: Audit
 export type CreateIDServerFnParams = {
 	userRepository: UserRepository
 	tokenRepository: TokenRepository

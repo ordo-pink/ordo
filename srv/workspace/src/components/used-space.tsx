@@ -8,7 +8,6 @@ import { FileUtils } from "@ordo-pink/datautil"
 import { useSharedContext } from "@ordo-pink/frontend-core"
 import { Either } from "@ordo-pink/either"
 
-// TODO: Move to user info
 const MAX_TOTAL_SIZE_MB = 50
 
 export default function UsedSpace() {

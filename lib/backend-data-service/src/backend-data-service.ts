@@ -29,7 +29,6 @@ const service: Fn = ({ metadataRepository, dataRepository }) => ({
 		),
 	checkDirectoryExists: metadataRepository.directory.exists,
 	getDirectory: metadataRepository.directory.read,
-	// TODO: Create parent directory if it does not exist
 	createDirectory: ({ params, sub }) =>
 		service({ metadataRepository, dataRepository })
 			.checkDirectoryExists({ path: params.path, sub })
@@ -50,7 +49,6 @@ const service: Fn = ({ metadataRepository, dataRepository }) => ({
 			() => ({ path, sub }),
 			() => new Error("Cannot remove root"),
 		).chain(metadataRepository.directory.delete),
-	// TODO: Create parent directory if new path is provided and new path parent directory does not exist
 	updateDirectory: ({ path, params, sub, upsert = false }) =>
 		service({ metadataRepository, dataRepository })
 			.getDirectory({ path, sub })
@@ -75,7 +73,6 @@ const service: Fn = ({ metadataRepository, dataRepository }) => ({
 
 	checkFileExists: dataRepository.exists,
 	checkFileExistsByPath: metadataRepository.file.exists,
-	// TODO: Create parent directory if it does not exist
 	createFile: ({ params, sub, content, encryption = false }) =>
 		metadataRepository.file
 			.exists({ sub, path: params.path })
@@ -114,7 +111,6 @@ const service: Fn = ({ metadataRepository, dataRepository }) => ({
 					metadataRepository.file.delete({ sub, path: file.path }),
 				]).map(() => file),
 			),
-	// TODO: Create parent directory if new path is provided and new path parent directory does not exist
 	setFileContent: ({ path, sub, content }) =>
 		metadataRepository.file
 			.read({ path, sub })
@@ -126,7 +122,6 @@ const service: Fn = ({ metadataRepository, dataRepository }) => ({
 				dataRepository.update({ sub, fsid: file.fsid, content }).map(size => ({ ...file, size })),
 			)
 			.chain(file => metadataRepository.file.update({ sub, file, path: file.path })),
-	// TODO: Create parent directory if new path is provided and new path parent directory does not exist
 	updateFile: ({ params, path, sub }) =>
 		metadataRepository.file
 			.exists({ path, sub })

@@ -8,8 +8,6 @@ import { Logger } from "@ordo-pink/logger"
 import { getCommands } from "$streams/commands"
 import { CommandPalette, cmd } from "@ordo-pink/frontend-core"
 
-// TODO: Merge commands, command palette and context menu item creation
-
 const commands = getCommands()
 
 export type __CommandPalette$ = Observable<CommandPalette.Item[]>

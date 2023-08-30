@@ -35,7 +35,7 @@ const repository: T.Fn = params => ({
 export const DynamoDBUserStorageAdapter = {
 	of: ({ awsAccessKeyId, awsSecretKey, region, endpoint, tableName }: T.Config) => {
 		const db = new DynamoDB({
-			credentials: { accessKeyId: awsAccessKeyId, secretAccessKey: awsSecretKey }, // TODO: Fix names
+			credentials: { awsAccessKeyId, awsSecretKey },
 			region,
 			endpoint,
 		})

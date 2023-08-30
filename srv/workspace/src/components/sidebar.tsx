@@ -19,7 +19,6 @@ import { Hosts } from "$utils/hosts"
 
 const commands = getCommands()
 
-// TODO: Use hosts
 type _P = PropsWithChildren<{
 	isNarrow: boolean
 	commandPalette$: Nullable<__CommandPalette$>

@@ -129,7 +129,6 @@ export const __initData: Fn = ({ logger, auth$ }) => {
 					}).then(res => res.json()),
 				),
 			)
-			// TODO: Show upload progress
 			.chain(body => (body.success ? Oath.of(body.result) : Oath.reject(body.error as string)))
 			.rejectedMap(rrrToNotification("Error uploading files"))
 			.fork(

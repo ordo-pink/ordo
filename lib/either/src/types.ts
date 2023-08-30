@@ -3,8 +3,6 @@
 
 import { Nullable } from "@ordo-pink/tau"
 
-// TODO: Add comments
-
 export type LeftFn = <L, R = unknown>(x: L) => TEither<R, L>
 export type RightFn = <R, L = unknown>(x: R) => TEither<R, L>
 

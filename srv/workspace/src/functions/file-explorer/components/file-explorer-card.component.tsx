@@ -8,7 +8,6 @@ import { useSharedContext } from "@ordo-pink/frontend-core"
 export default function FileExplorerCardComponent() {
 	const { metadata } = useSharedContext()
 
-	// TODO: Show recent files
 	return Either.fromNullable(metadata).fold(Null, items => (
 		<div className="w-full h-full flex items-center justify-center">
 			<h1>TODO: Recent files, favourite files</h1>

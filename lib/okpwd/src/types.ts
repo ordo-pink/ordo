@@ -5,8 +5,6 @@ import { Nullable } from "@ordo-pink/tau"
 
 // --- Public ---
 
-// TODO: Add comments
-
 export type Options = {
 	min?: number
 	max?: number

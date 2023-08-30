@@ -9,8 +9,6 @@ import { cmd, Router as TRouter } from "@ordo-pink/frontend-core"
 import { BehaviorSubject, Observable, map } from "rxjs"
 import { __Activities$ } from "./activities"
 
-// TODO: Consider moving to react-router
-
 const commands = getCommands()
 
 const { route, noMatch } = operators

@@ -10,7 +10,6 @@ import { JWAT, TTokenService } from "@ordo-pink/backend-token-service"
 import { HttpError } from "@ordo-pink/rrr"
 import { Oath } from "@ordo-pink/oath"
 
-// TODO: Rewrite with Oath
 export const useBearerAuthorization = (
 	ctx: Context,
 	tokenServiceOrIDHost: TTokenService | string,

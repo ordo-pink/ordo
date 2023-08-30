@@ -49,7 +49,6 @@ const createSPDXRecord0 = (path: string) =>
 						.map(license => (license === mitLicense ? ("MIT" as const) : ("MPL-2.0" as const)))
 						.map(license => util.getSPDXRecord(license))
 						.chain(spdx =>
-							// TODO: Replace invalid SPDX
 							readFile0(path, "utf-8").chain(content =>
 								(content as string).startsWith(spdx)
 									? Oath.empty()

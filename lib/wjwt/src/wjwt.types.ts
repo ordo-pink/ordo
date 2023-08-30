@@ -54,7 +54,7 @@ export type Algorithm =
 	| {
 			name: "ECDSA"
 			namedCurve: "P-256" | "P-384" | "P-512"
-			hash: "SHA-256" | "SHA-384" | "SHA-512" // TODO: Infer hash from namedCurve
+			hash: "SHA-256" | "SHA-384" | "SHA-512"
 	  }
 
 export type JWTPayload = {

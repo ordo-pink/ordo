@@ -14,9 +14,6 @@ import { __Sidebar$ } from "$streams/sidebar"
 import { useStrictSubscription, useSubscription } from "$hooks/use-subscription"
 import { Activity, ComponentSpace, cmd } from "@ordo-pink/frontend-core"
 
-// TODO: Render Welcome page if activity is null
-// TODO: Extract internal components to separate files
-
 // --- Public ---
 
 const commands = getCommands()

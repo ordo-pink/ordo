@@ -24,7 +24,6 @@ type Params = {
 }
 type Fn = (params: Params) => Middleware
 
-// TODO: Rewrite with Oath
 export const handleSignUp: Fn =
 	({ userService, tokenService, dataService }) =>
 	ctx =>

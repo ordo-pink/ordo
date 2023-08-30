@@ -10,13 +10,11 @@ import type { TTokenService } from "@ordo-pink/backend-token-service"
 import type { Middleware } from "koa"
 import { Oath } from "@ordo-pink/oath"
 import { HttpError } from "@ordo-pink/rrr"
-import { prop } from "ramda"
 import { sendError } from "@ordo-pink/backend-utils"
 
 export type Params = { userService: UserService; tokenService: TTokenService }
 export type Fn = (params: Params) => Middleware
 
-// TODO: Also get sub and jti from body
 export const handleRefreshToken: Fn =
 	({ tokenService }) =>
 	async ctx =>

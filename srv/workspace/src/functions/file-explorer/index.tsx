@@ -21,7 +21,6 @@ import { Directory, DirectoryPath, DirectoryUtils, FSEntity, FileUtils } from "@
 type openInFileExplorer = { name: "file-explorer.go-to"; payload: DirectoryPath }
 type openRootInFileExplorer = { name: "file-explorer.open-root" }
 
-// TODO: Provide commands and queries via the import
 export default function createFileExplorerFunction({
 	commands,
 	metadata$,

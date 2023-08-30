@@ -60,9 +60,6 @@ const UserPage = ({ auth$, commands }: _P) => {
 	return userE.fold(Null, user => <UserInfo auth$={auth$} user={user} commands={commands} />)
 }
 
-// TODO: Collect errors
-// TODO: Add uploading avatar
-
 type _UIP = _P & { user: User }
 const UserInfo = ({ user, auth$, commands }: _UIP) => {
 	const auth = useSubscription(auth$)

@@ -308,8 +308,6 @@ export class Oath<TRight, TLeft = never> {
 		onLeft: (error: TLeft) => TNewLeft,
 		onRight: (value: TRight) => TNewRight,
 	): Promise<TNewRight> {
-		// TODO: Store reject (https://medium.com/@masnun/creating-cancellable-promises-33bf4b9da39c)
-
 		return new Promise<TNewRight>((resolve, reject) => {
 			this.resolver(resolve as any, reject as any)
 		}).then((x: any) => onRight(x), onLeft) as any

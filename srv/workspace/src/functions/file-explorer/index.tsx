@@ -7,9 +7,9 @@ import { Switch } from "@ordo-pink/switch"
 import FileExplorerActivityComponent from "./components/file-explorer-activity.component"
 import FileExplorerIcon from "./components/file-explorer-icon.component"
 import FileExplorerCardComponent from "./components/file-explorer-card.component"
-import { BsFolderCheck, BsFolderMinus, BsFolderPlus } from "react-icons/bs"
+import { BsFileMinus, BsFilePlus, BsFolderCheck, BsFolderMinus, BsFolderPlus } from "react-icons/bs"
 import { BehaviorSubject } from "rxjs"
-import { Directory, DirectoryPath, DirectoryUtils, FSEntity } from "@ordo-pink/datautil"
+import { Directory, DirectoryPath, DirectoryUtils, FSEntity, FileUtils } from "@ordo-pink/datautil"
 
 type openInFileExplorer = { name: "file-explorer.go-to"; payload: DirectoryPath }
 type openRootInFileExplorer = { name: "file-explorer.open-root" }
@@ -30,10 +30,7 @@ export default function createFileExplorerFunction({
 		commandName: "data.show-create-directory-modal",
 		Icon: BsFolderPlus,
 		readableName: "Create directory",
-		shouldShow: ({ payload }) => {
-			console.log(">>>>>>>>>>>>", payload)
-			return payload && DirectoryUtils.isDirectory(payload)
-		},
+		shouldShow: ({ payload }) => payload && DirectoryUtils.isDirectory(payload),
 		type: "create",
 		accelerator: "meta+shift+n",
 	})
@@ -44,6 +41,23 @@ export default function createFileExplorerFunction({
 		readableName: "Remove directory",
 		shouldShow: ({ payload }) =>
 			payload && DirectoryUtils.isDirectory(payload) && payload.path !== "/",
+		type: "delete",
+	})
+
+	commands.emit<cmd.contextMenu.add>("context-menu.add", {
+		commandName: "data.show-create-file-modal",
+		Icon: BsFilePlus,
+		readableName: "Create file",
+		shouldShow: ({ payload }) => payload && DirectoryUtils.isDirectory(payload),
+		type: "create",
+		accelerator: "meta+n",
+	})
+
+	commands.emit<cmd.contextMenu.add>("context-menu.add", {
+		commandName: "data.show-remove-file-modal",
+		Icon: BsFileMinus,
+		readableName: "Remove file",
+		shouldShow: ({ payload }) => payload && FileUtils.isFile(payload),
 		type: "delete",
 	})
 
@@ -72,16 +86,16 @@ export default function createFileExplorerFunction({
 			commands.emit<cmd.commandPalette.hide>("command-palette.hide")
 			commands.emit<cmd.commandPalette.show>(
 				"command-palette.show",
-				(metadata$ as BehaviorSubject<FSEntity[]>).value
-					.filter(item => DirectoryUtils.isDirectory(item) && item.path !== "/")
-					.map(item => ({
-						id: item.path,
-						readableName: `Open ${DirectoryUtils.getReadableName((item as Directory).path)}`,
-						onSelect: () => {
-							commands.emit<cmd.commandPalette.hide>("command-palette.hide")
-							commands.emit<openInFileExplorer>("file-explorer.go-to", (item as Directory).path)
-						},
-					})),
+				(metadata$ as BehaviorSubject<FSEntity[]>).value.map(item => ({
+					id: item.path,
+					readableName: item.path,
+					onSelect: () => {
+						commands.emit<cmd.commandPalette.hide>("command-palette.hide")
+						item.path === "/"
+							? commands.emit<openRootInFileExplorer>("file-explorer.open-root")
+							: commands.emit<openInFileExplorer>("file-explorer.go-to", (item as Directory).path)
+					},
+				})),
 			)
 		},
 	})

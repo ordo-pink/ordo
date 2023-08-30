@@ -15,6 +15,8 @@ import { AuthResponse } from "@ordo-pink/backend-id-server"
 import CreateDirectoryModal from "$components/modals/create-directory-modal.component"
 import { BsFolderPlus } from "react-icons/bs"
 import RemoveDirectoryModal from "$components/modals/remove-directory-modal.component"
+import CreateFileModal from "$components/modals/create-file-modal.component"
+import RemoveFileModal from "$components/modals/remove-file-modal.component"
 
 const commands = getCommands()
 
@@ -40,13 +42,55 @@ export const __initData: Fn = ({ logger, auth$ }) => {
 		},
 	)
 
-	commands.on<cmd.data.directory.remove>("data.remove-directory", ({ payload }) => {
+	commands.on<cmd.data.file.showCreateModal>("data.show-create-file-modal", ({ payload }) => {
+		commands.emit<cmd.modal.show>("modal.show", {
+			Component: () => <CreateFileModal parent={payload} />,
+		})
+	})
+
+	commands.on<cmd.data.file.showRemoveModal>("data.show-remove-file-modal", ({ payload }) => {
+		commands.emit<cmd.modal.show>("modal.show", {
+			Component: () => <RemoveFileModal file={payload} />,
+		})
+	})
+
+	commands.on<cmd.data.file.create>("data.create-file", ({ payload }) => {
 		const auth = (auth$ as BehaviorSubject<AuthResponse>).value
 
 		Oath.fromNullable(auth)
 			.chain(auth =>
 				Oath.try(() =>
-					fetch(`${Hosts.DATA}/directories/${auth.sub}${payload}`, {
+					fetch(`${Hosts.DATA}/files/${auth.sub}`, {
+						method: "POST",
+						body: JSON.stringify(payload),
+						headers: {
+							"content-type": "application/json",
+							authorization: `Bearer ${auth.accessToken}`,
+						},
+					}).then(res => res.json()),
+				),
+			)
+			.chain(body => (body.success ? Oath.of(body.result) : Oath.reject(body.error as string)))
+			.rejectedMap(rrrToNotification("Error creating file"))
+			.fork(
+				item => {
+					commands.emit<cmd.commandPalette.hide>("command-palette.hide")
+					commands.emit<cmd.notification.show>("notification.show", item)
+				},
+				() => {
+					commands.emit<cmd.commandPalette.hide>("command-palette.hide")
+					commands.emit<cmd.data.refreshRoot>("data.refresh-root")
+				},
+			)
+	})
+
+	commands.on<cmd.data.file.remove>("data.remove-file", ({ payload }) => {
+		const auth = (auth$ as BehaviorSubject<AuthResponse>).value
+
+		Oath.fromNullable(auth)
+			.chain(auth =>
+				Oath.try(() =>
+					fetch(`${Hosts.DATA}/files/${auth.sub}${payload}`, {
 						method: "DELETE",
 						headers: {
 							"content-type": "application/json",
@@ -56,7 +100,7 @@ export const __initData: Fn = ({ logger, auth$ }) => {
 				),
 			)
 			.chain(body => (body.success ? Oath.of(body.result) : Oath.reject(body.error as string)))
-			.rejectedMap(rrrToNotification("Error creating directory"))
+			.rejectedMap(rrrToNotification("Error removing file"))
 			.fork(
 				item => {
 					commands.emit<cmd.commandPalette.hide>("command-palette.hide")
@@ -78,6 +122,35 @@ export const __initData: Fn = ({ logger, auth$ }) => {
 					fetch(`${Hosts.DATA}/directories/${auth.sub}`, {
 						method: "POST",
 						body: JSON.stringify(payload),
+						headers: {
+							"content-type": "application/json",
+							authorization: `Bearer ${auth.accessToken}`,
+						},
+					}).then(res => res.json()),
+				),
+			)
+			.chain(body => (body.success ? Oath.of(body.result) : Oath.reject(body.error as string)))
+			.rejectedMap(rrrToNotification("Error creating directory"))
+			.fork(
+				item => {
+					commands.emit<cmd.commandPalette.hide>("command-palette.hide")
+					commands.emit<cmd.notification.show>("notification.show", item)
+				},
+				() => {
+					commands.emit<cmd.commandPalette.hide>("command-palette.hide")
+					commands.emit<cmd.data.refreshRoot>("data.refresh-root")
+				},
+			)
+	})
+
+	commands.on<cmd.data.directory.remove>("data.remove-directory", ({ payload }) => {
+		const auth = (auth$ as BehaviorSubject<AuthResponse>).value
+
+		Oath.fromNullable(auth)
+			.chain(auth =>
+				Oath.try(() =>
+					fetch(`${Hosts.DATA}/directories/${auth.sub}${payload}`, {
+						method: "DELETE",
 						headers: {
 							"content-type": "application/json",
 							authorization: `Bearer ${auth.accessToken}`,

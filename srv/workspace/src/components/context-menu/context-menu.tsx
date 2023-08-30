@@ -57,7 +57,7 @@ export default function ContextMenu({ menu$ }: _P) {
 	return (
 		<div
 			style={{ top: menu?.event.clientY ?? -50, left: menu?.event.clientX ?? -50 }}
-			className={`absolute z-[1000] bg-white dark:bg-neutral-500 shadow-lg transition-opacity w-80 duration-300 rounded-lg p-2 ${
+			className={`absolute z-[1000] bg-white dark:bg-neutral-500 shadow-lg transition-opacity w-80 duration-300 rounded-lg px-2 ${
 				menu && menu.structure.length ? "opacity-100" : "opacity-0"
 			}`}
 		>

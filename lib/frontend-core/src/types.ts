@@ -13,6 +13,7 @@ import type {
 	UpdateFileParams,
 	FSEntity,
 	Directory,
+	File,
 } from "@ordo-pink/datautil"
 import type { Observable } from "rxjs"
 import { Logger } from "@ordo-pink/logger"
@@ -48,6 +49,14 @@ export namespace cmd {
 		export type getFileContent = { name: "data.get-file-content"; payload: FilePath }
 
 		export namespace file {
+			export type showCreateModal = {
+				name: "data.show-create-file-modal"
+				payload?: Directory
+			}
+			export type showRemoveModal = {
+				name: "data.show-remove-file-modal"
+				payload: File
+			}
 			export type create = { name: "data.create-file"; payload: CreateFileParams }
 			export type update = { name: "data.update-file"; payload: UpdateFileParams }
 			export type remove = { name: "data.remove-file"; payload: FilePath }

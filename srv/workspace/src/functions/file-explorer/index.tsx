@@ -7,7 +7,7 @@ import { Switch } from "@ordo-pink/switch"
 import FileExplorerActivityComponent from "./components/file-explorer-activity.component"
 import FileExplorerIcon from "./components/file-explorer-icon.component"
 import FileExplorerCardComponent from "./components/file-explorer-card.component"
-import { BsFolderCheck } from "react-icons/bs"
+import { BsFolderCheck, BsFolderMinus, BsFolderPlus } from "react-icons/bs"
 import { BehaviorSubject } from "rxjs"
 import { Directory, DirectoryPath, DirectoryUtils, FSEntity } from "@ordo-pink/datautil"
 
@@ -25,6 +25,27 @@ export default function createFileExplorerFunction({
 	commands.on<openRootInFileExplorer>("file-explorer.open-root", () =>
 		commands.emit<cmd.router.navigate>("router.navigate", "/fs"),
 	)
+
+	commands.emit<cmd.contextMenu.add>("context-menu.add", {
+		commandName: "data.show-create-directory-modal",
+		Icon: BsFolderPlus,
+		readableName: "Create directory",
+		shouldShow: ({ payload }) => {
+			console.log(">>>>>>>>>>>>", payload)
+			return payload && DirectoryUtils.isDirectory(payload)
+		},
+		type: "create",
+		accelerator: "meta+shift+n",
+	})
+
+	commands.emit<cmd.contextMenu.add>("context-menu.add", {
+		commandName: "data.show-remove-directory-modal",
+		Icon: BsFolderMinus,
+		readableName: "Remove directory",
+		shouldShow: ({ payload }) =>
+			payload && DirectoryUtils.isDirectory(payload) && payload.path !== "/",
+		type: "delete",
+	})
 
 	commands.emit<cmd.activities.add>("activities.add", {
 		Component: props => <FSActivity {...props} />,

@@ -17,8 +17,7 @@ export default function MenuItem({ item, event, payload: p }: _P) {
 	const payload = item.payloadCreator ? item.payloadCreator({ payload: p, event }) : p
 	const isDisabled = item.shouldBeDisabled && item.shouldBeDisabled({ event, payload })
 	const emitContextMenuItemCommand = () =>
-		Either.fromNullable(item.accelerator)
-			.chain(() => Either.fromBoolean(() => !isDisabled))
+		Either.fromBoolean(() => !isDisabled)
 			.map(() => commands.emit(item.commandName, payload))
 			.map(() => commands.emit<cmd.contextMenu.hide>("context-menu.hide"))
 

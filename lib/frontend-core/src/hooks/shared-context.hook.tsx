@@ -4,7 +4,7 @@
 import type { Context, useContext as UseContext } from "react"
 import type { FSEntity } from "@ordo-pink/datautil"
 import type { Nullable } from "@ordo-pink/tau"
-import { Router } from "../types"
+import { Commands, Router } from "../types"
 
 let SharedContext: Context<SharedContextValue>
 let useContextHook: typeof UseContext
@@ -12,6 +12,7 @@ let useContextHook: typeof UseContext
 export type SharedContextValue = {
 	metadata: Nullable<FSEntity[]>
 	currentRoute: Nullable<Router.Route>
+	commands: Commands.Commands
 }
 
 // TODO: Fix issue with importing react directly

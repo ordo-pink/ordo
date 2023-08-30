@@ -44,7 +44,12 @@ const service: Fn = ({ metadataRepository, dataRepository }) => ({
 			.chain(directory =>
 				metadataRepository.directory.create({ directory, sub, path: directory.path }),
 			),
-	removeDirectory: metadataRepository.directory.delete,
+	removeDirectory: ({ path, sub }) =>
+		Oath.fromBoolean(
+			() => path !== "/",
+			() => ({ path, sub }),
+			() => new Error("Cannot remove root"),
+		).chain(metadataRepository.directory.delete),
 	// TODO: Create parent directory if new path is provided and new path parent directory does not exist
 	updateDirectory: ({ path, params, sub, upsert = false }) =>
 		service({ metadataRepository, dataRepository })

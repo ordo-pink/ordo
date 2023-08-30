@@ -1,0 +1,11 @@
+.support-badge {
+  @apply bg-gradient-to-tr from-rose-300 to-pink-300 dark:from-rose-800 dark:to-pink-800;
+}
+
+.support-badge-text-wrapper {
+  @apply flex items-center space-x-1;
+}
+
+.support-badge-icon {
+  @apply shrink-0;
+}

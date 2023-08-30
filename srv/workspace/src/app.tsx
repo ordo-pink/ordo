@@ -6,7 +6,7 @@ import { useAppInit } from "$hooks/use-app-init"
 import { getCommands } from "$streams/commands"
 import { useSubscription } from "$hooks/use-subscription"
 import { createContext, useContext, useEffect } from "react"
-import { Router, __useSharedContextInit, cmd } from "@ordo-pink/frontend-core"
+import { Commands, Router, __useSharedContextInit, cmd } from "@ordo-pink/frontend-core"
 import Notifications from "$components/notifications/notifications.component"
 import ActivityBar from "$components/activity-bar/activity-bar"
 import ContextMenu from "$components/context-menu/context-menu"
@@ -24,7 +24,8 @@ const commands = getCommands()
 const SharedContext = createContext<{
 	metadata: Nullable<FSEntity[]>
 	currentRoute: Nullable<Router.Route>
-}>({ metadata: null, currentRoute: null })
+	commands: Commands.Commands
+}>({ metadata: null, currentRoute: null, commands })
 
 // TODO: Avoid refreshing app on refreshing token
 // BUG: Token refresh ticks two times in a row
@@ -84,7 +85,7 @@ export default function App() {
 					activities$,
 					currentActivity$,
 				}) => (
-					<SharedContext.Provider value={{ metadata, currentRoute }}>
+					<SharedContext.Provider value={{ metadata, currentRoute, commands }}>
 						<div className="flex" onClick={hideContextMenu}>
 							<ActivityBar
 								sidebar$={sidebar$}

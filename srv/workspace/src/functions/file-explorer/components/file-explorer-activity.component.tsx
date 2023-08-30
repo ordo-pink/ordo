@@ -12,7 +12,7 @@ import {
 } from "@ordo-pink/datautil"
 import { Either } from "@ordo-pink/either"
 import { Activity, cmd, useSharedContext } from "@ordo-pink/frontend-core"
-import { useEffect, useState } from "react"
+import { MouseEvent, useEffect, useState } from "react"
 import FileCardComponent from "./file-card.component"
 import DirectoryCardComponent from "./directory-card.component"
 import { Switch } from "@ordo-pink/switch"
@@ -26,6 +26,9 @@ export default function FileExplorerActivityComponent({
 	const { metadata, currentRoute } = useSharedContext()
 	const [selectedItems, setSelectedItems] = useState<Path[]>([])
 	const [currentDirectory, setCurrentDirectory] = useState<Nullable<Directory>>(null)
+
+	const showContextMenu = (event: MouseEvent<HTMLDivElement>) =>
+		commands.emit<cmd.contextMenu.show>("context-menu.show", { event, payload: currentDirectory })
 
 	useEffect(() => {
 		Switch.of(true)
@@ -61,36 +64,37 @@ export default function FileExplorerActivityComponent({
 		)
 
 		.fold(Null, items => (
-			<div className="container grid grid-cols-3 md:grid-cols-6 lg:grid-cols-12 gap-4 p-4">
-				{items
-					.filter(item => item.path !== "/")
-					.map(item => (
-						<div
-							key={item.path}
-							className={`cursor-pointer select-none p-2 rounded-lg ${
-								selectedItems.includes(item.path) ? "bg-neutral-300 dark:bg-neutral-700" : ""
-							}`}
-							onClick={() =>
-								selectedItems.includes(item.path)
-									? setSelectedItems([])
-									: setSelectedItems([item.path])
-							}
-							onDoubleClick={() => {
-								// TODO: Opening files in Editor
-								// TODO: Opening directories in Filer
-								if (DirectoryUtils.isDirectory(item))
-									return commands.emit<cmd.router.navigate>("router.navigate", `/fs${item.path}`)
-								alert("TODO")
-							}}
-						>
-							{Switch.of(item)
-								.case(DirectoryUtils.isDirectory, () => (
-									<DirectoryCardComponent directory={item as Directory} />
-								))
-								.case(FileUtils.isFile, () => <FileCardComponent file={item as File} />)
-								.default(Null)}
-						</div>
-					))}
+			<div className="h-full w-full" onContextMenu={showContextMenu}>
+				<div className="file-explorer w-full container grid grid-cols-3 md:grid-cols-6 lg:grid-cols-12 gap-4 p-4">
+					{items
+						.filter(item => item.path !== "/")
+						.map(item => (
+							<div
+								key={item.path}
+								className={`cursor-pointer max-h-min select-none p-2 rounded-lg ${
+									selectedItems.includes(item.path) ? "bg-neutral-300 dark:bg-neutral-700" : ""
+								}`}
+								onClick={() =>
+									selectedItems.includes(item.path)
+										? setSelectedItems([])
+										: setSelectedItems([item.path])
+								}
+								onDoubleClick={() => {
+									// TODO: Opening files in Editor
+									if (DirectoryUtils.isDirectory(item))
+										return commands.emit<cmd.router.navigate>("router.navigate", `/fs${item.path}`)
+									alert("TODO")
+								}}
+							>
+								{Switch.of(item)
+									.case(DirectoryUtils.isDirectory, () => (
+										<DirectoryCardComponent directory={item as Directory} />
+									))
+									.case(FileUtils.isFile, () => <FileCardComponent file={item as File} />)
+									.default(Null)}
+							</div>
+						))}
+				</div>
 			</div>
 		))
 }

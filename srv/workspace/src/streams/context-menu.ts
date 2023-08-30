@@ -41,8 +41,8 @@ const show: Show = params => params$.next(params)
 const hide: Hide = () => params$.next(null)
 
 const addP: AddP = item => state =>
-	state.some(({ commandName }) => commandName === item.commandName) ? state : [...state, item]
-const removeP: RemoveP = name => state => state.filter(a => a.commandName !== name)
+	state.filter(i => i.commandName !== item.commandName).concat([item])
+const removeP: RemoveP = name => state => state.filter(item => item.commandName !== name)
 
 const params$ = new BehaviorSubject<Nullable<ContextMenu.ShowOptions>>(null)
 const add$ = new Subject<ContextMenu.Item>()
@@ -59,9 +59,13 @@ const contextMenu$ = params$.pipe(
 	map(([state, items]) =>
 		Either.fromNullable(state).fold(Null, state => ({
 			...state,
-			structure: items.filter(item =>
-				item.shouldShow({ event: state.event, payload: state.payload }),
-			),
+			structure: items.filter(item => {
+				const shouldShow = item.shouldShow({ event: state.event, payload: state.payload })
+
+				if (shouldShow) state.event.stopPropagation()
+
+				return shouldShow
+			}),
 		})),
 	),
 )

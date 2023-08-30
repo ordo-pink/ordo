@@ -12,6 +12,7 @@ import type {
 	UpdateDirectoryParams,
 	UpdateFileParams,
 	FSEntity,
+	Directory,
 } from "@ordo-pink/datautil"
 import type { Observable } from "rxjs"
 import { Logger } from "@ordo-pink/logger"
@@ -53,6 +54,14 @@ export namespace cmd {
 		}
 
 		export namespace directory {
+			export type showCreateModal = {
+				name: "data.show-create-directory-modal"
+				payload?: Directory
+			}
+			export type showRemoveModal = {
+				name: "data.show-remove-directory-modal"
+				payload: Directory
+			}
 			export type create = { name: "data.create-directory"; payload: CreateDirectoryParams }
 			export type update = { name: "data.update-directory"; payload: UpdateDirectoryParams }
 			export type remove = { name: "data.remove-directory"; payload: DirectoryPath }

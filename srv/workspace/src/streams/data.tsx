@@ -13,10 +13,11 @@ import { __Auth$ } from "./auth"
 import { Unary } from "@ordo-pink/tau"
 import { AuthResponse } from "@ordo-pink/backend-id-server"
 import CreateDirectoryModal from "$components/modals/create-directory-modal.component"
-import { BsFolderPlus } from "react-icons/bs"
+import { BsFolderPlus, BsUpload } from "react-icons/bs"
 import RemoveDirectoryModal from "$components/modals/remove-directory-modal.component"
 import CreateFileModal from "$components/modals/create-file-modal.component"
 import RemoveFileModal from "$components/modals/remove-file-modal.component"
+import UploadFilesModal from "$components/modals/upload-files-modal.component"
 
 const commands = getCommands()
 
@@ -54,6 +55,12 @@ export const __initData: Fn = ({ logger, auth$ }) => {
 		})
 	})
 
+	commands.on<cmd.data.showUploadModal>("data.show-upload-modal", ({ payload }) => {
+		commands.emit<cmd.modal.show>("modal.show", {
+			Component: () => <UploadFilesModal parent={payload} />,
+		})
+	})
+
 	commands.on<cmd.data.file.create>("data.create-file", ({ payload }) => {
 		const auth = (auth$ as BehaviorSubject<AuthResponse>).value
 
@@ -74,11 +81,9 @@ export const __initData: Fn = ({ logger, auth$ }) => {
 			.rejectedMap(rrrToNotification("Error creating file"))
 			.fork(
 				item => {
-					commands.emit<cmd.commandPalette.hide>("command-palette.hide")
 					commands.emit<cmd.notification.show>("notification.show", item)
 				},
 				() => {
-					commands.emit<cmd.commandPalette.hide>("command-palette.hide")
 					commands.emit<cmd.data.refreshRoot>("data.refresh-root")
 				},
 			)
@@ -103,11 +108,35 @@ export const __initData: Fn = ({ logger, auth$ }) => {
 			.rejectedMap(rrrToNotification("Error removing file"))
 			.fork(
 				item => {
-					commands.emit<cmd.commandPalette.hide>("command-palette.hide")
 					commands.emit<cmd.notification.show>("notification.show", item)
 				},
 				() => {
-					commands.emit<cmd.commandPalette.hide>("command-palette.hide")
+					commands.emit<cmd.data.refreshRoot>("data.refresh-root")
+				},
+			)
+	})
+
+	commands.on<cmd.data.file.setContent>("data.set-file-content", ({ payload }) => {
+		const auth = (auth$ as BehaviorSubject<AuthResponse>).value
+
+		Oath.fromNullable(auth)
+			.chain(auth =>
+				Oath.try(() =>
+					fetch(`${Hosts.DATA}/files/${auth.sub}${payload.path}`, {
+						method: "PUT",
+						headers: { authorization: `Bearer ${auth.accessToken}` },
+						body: payload.content,
+					}).then(res => res.json()),
+				),
+			)
+			// TODO: Show upload progress
+			.chain(body => (body.success ? Oath.of(body.result) : Oath.reject(body.error as string)))
+			.rejectedMap(rrrToNotification("Error uploading files"))
+			.fork(
+				item => {
+					commands.emit<cmd.notification.show>("notification.show", item)
+				},
+				() => {
 					commands.emit<cmd.data.refreshRoot>("data.refresh-root")
 				},
 			)
@@ -133,11 +162,9 @@ export const __initData: Fn = ({ logger, auth$ }) => {
 			.rejectedMap(rrrToNotification("Error creating directory"))
 			.fork(
 				item => {
-					commands.emit<cmd.commandPalette.hide>("command-palette.hide")
 					commands.emit<cmd.notification.show>("notification.show", item)
 				},
 				() => {
-					commands.emit<cmd.commandPalette.hide>("command-palette.hide")
 					commands.emit<cmd.data.refreshRoot>("data.refresh-root")
 				},
 			)
@@ -162,11 +189,9 @@ export const __initData: Fn = ({ logger, auth$ }) => {
 			.rejectedMap(rrrToNotification("Error creating directory"))
 			.fork(
 				item => {
-					commands.emit<cmd.commandPalette.hide>("command-palette.hide")
 					commands.emit<cmd.notification.show>("notification.show", item)
 				},
 				() => {
-					commands.emit<cmd.commandPalette.hide>("command-palette.hide")
 					commands.emit<cmd.data.refreshRoot>("data.refresh-root")
 				},
 			)
@@ -180,6 +205,17 @@ export const __initData: Fn = ({ logger, auth$ }) => {
 		onSelect: () => {
 			commands.emit<cmd.commandPalette.hide>("command-palette.hide")
 			commands.emit<cmd.data.directory.showCreateModal>("data.show-create-directory-modal")
+		},
+	})
+
+	commands.emit<cmd.commandPalette.add>("command-palette.add", {
+		id: "data.show-upload-modal",
+		Icon: BsUpload,
+		readableName: "Upload files",
+		accelerator: "mod+u",
+		onSelect: () => {
+			commands.emit<cmd.commandPalette.hide>("command-palette.hide")
+			commands.emit<cmd.data.showUploadModal>("data.show-upload-modal")
 		},
 	})
 

@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: Copyright 2023, 谢尔盖||↓ and the Ordo.pink contributors
 // SPDX-License-Identifier: MIT
 
-import type { SUB } from "@ordo-pink/backend-token-service"
+import type { SUB } from "@ordo-pink/wjwt"
 import { Nullable, isObject } from "@ordo-pink/tau"
 import {
 	FSEntity,

@@ -46,7 +46,7 @@ export const createServer: CreateServerFn = ({
 	app.use(logRequest({ logger, serverName }))
 	app.use(
 		cors({
-			methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
+			methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
 			origin: ctx =>
 				Either.fromNullable(ctx.get("Origin"))
 					.chain(o =>

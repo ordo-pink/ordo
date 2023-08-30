@@ -114,11 +114,14 @@ const service: Fn = ({ metadataRepository, dataRepository }) => ({
 					metadataRepository.file.delete({ sub, path: file.path }),
 				]).map(() => file),
 			),
+	// TODO: Create parent directory if new path is provided and new path parent directory does not exist
 	setFileContent: ({ path, sub, content }) =>
 		metadataRepository.file
 			.read({ path, sub })
 			.chain(Oath.fromNullable)
-			.rejectedMap(() => new Error("File not found"))
+			.fix(() =>
+				service({ dataRepository, metadataRepository }).createFile({ sub, params: { path } }),
+			)
 			.chain(file =>
 				dataRepository.update({ sub, fsid: file.fsid, content }).map(size => ({ ...file, size })),
 			)

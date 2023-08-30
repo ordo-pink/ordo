@@ -1,7 +1,6 @@
 // SPDX-FileCopyrightText: Copyright 2023, 谢尔盖||↓ and the Ordo.pink contributors
 // SPDX-License-Identifier: MIT
 
-import { SUB } from "@ordo-pink/backend-token-service"
 import { Oath } from "@ordo-pink/oath"
 import { Unary, Nullable } from "@ordo-pink/tau"
 import {
@@ -14,6 +13,7 @@ import {
 	UpdateFileParams,
 	UpdateDirectoryParams,
 } from "@ordo-pink/datautil"
+import { SUB } from "@ordo-pink/wjwt"
 
 // --- Public ---
 

@@ -1,7 +1,6 @@
 // SPDX-FileCopyrightText: Copyright 2023, 谢尔盖||↓ and the Ordo.pink contributors
 // SPDX-License-Identifier: MIT
 
-import type { SUB } from "@ordo-pink/backend-token-service"
 import { Nullable, isObject } from "@ordo-pink/tau"
 import {
 	FSEntity,
@@ -14,6 +13,7 @@ import {
 	isPath,
 } from "./common"
 import { DirectoryPath } from "./directory"
+import { SUB } from "@ordo-pink/wjwt"
 
 /**
  * A list of abbreviated file sizes (bytes, kilobytes, megabytes, etc.).
@@ -66,6 +66,7 @@ export type CreateFileParams = {
 }
 
 export type UpdateFileParams = {
+	size?: number
 	path?: File["path"]
 	links?: File["links"]
 	labels?: File["labels"]
@@ -255,7 +256,7 @@ export const FileUtils = {
 		createdBy: args.file.createdBy,
 		updatedAt: new Date(Date.now()),
 		updatedBy: args.sub,
-		size: args.file.size,
+		size: args.params.size ?? args.file.size,
 		encryption: args.file.encryption,
 		labels: isFSLabels(args.params.labels)
 			? Array.from(new Set(args.params.labels))

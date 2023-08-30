@@ -5,10 +5,9 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-import { type MetadataRepository } from "@ordo-pink/backend-data-service"
-import type { SUB } from "@ordo-pink/backend-token-service"
+import type { MetadataRepository } from "@ordo-pink/backend-data-service"
+import type { SUB } from "@ordo-pink/wjwt"
 import type { Unary } from "@ordo-pink/tau"
-
 import { readFile0, writeFile0 } from "@ordo-pink/fs"
 import { resolve } from "path"
 import { Oath } from "@ordo-pink/oath"

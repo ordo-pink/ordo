@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: Copyright 2023, 谢尔盖||↓ and the Ordo.pink contributors
 // SPDX-License-Identifier: MIT
 
-import { SUB } from "@ordo-pink/backend-token-service"
+import { SUB } from "@ordo-pink/wjwt"
 import { Switch } from "@ordo-pink/switch"
 import { isArray, isDate, isObject, isString } from "@ordo-pink/tau"
 import { FilePath, FileUtils } from "./file"

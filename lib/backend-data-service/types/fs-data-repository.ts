@@ -1,10 +1,10 @@
 // SPDX-FileCopyrightText: Copyright 2023, 谢尔盖||↓ and the Ordo.pink contributors
 // SPDX-License-Identifier: MIT
 
-import { SUB } from "@ordo-pink/backend-token-service/mod.ts"
-import { Oath } from "@ordo-pink/oath/mod.ts"
-import { Unary, Nullable } from "@ordo-pink/tau/mod.ts"
-import { FilePath, FSID } from "../src/types/file.ts"
+import { SUB } from "@ordo-pink/wjwt"
+import { Oath } from "@ordo-pink/oath"
+import { Unary, Nullable } from "@ordo-pink/tau"
+import { FilePath, FSID } from "@ordo-pink/datautil"
 
 export type FSDataRepository<TReadContent, TWriteContent = TReadContent> = {
 	exists: FileExistsFn

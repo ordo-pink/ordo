@@ -47,6 +47,7 @@ export namespace cmd {
 	export namespace data {
 		export type refreshRoot = { name: "data.refresh-root" }
 		export type getFileContent = { name: "data.get-file-content"; payload: FilePath }
+		export type showUploadModal = { name: "data.show-upload-modal"; payload?: Directory }
 
 		export namespace file {
 			export type showCreateModal = {
@@ -56,6 +57,10 @@ export namespace cmd {
 			export type showRemoveModal = {
 				name: "data.show-remove-file-modal"
 				payload: File
+			}
+			export type setContent = {
+				name: "data.set-file-content"
+				payload: { path: FilePath; content: string | ArrayBuffer }
 			}
 			export type create = { name: "data.create-file"; payload: CreateFileParams }
 			export type update = { name: "data.update-file"; payload: UpdateFileParams }

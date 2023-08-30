@@ -5,6 +5,6 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-import { JTI, SUB } from "@ordo-pink/backend-token-service"
+import { JTI, SUB } from "@ordo-pink/wjwt"
 
 export type AuthResponse = { accessToken: string; jti: JTI; sub: SUB }

@@ -53,7 +53,12 @@ const of: Fn = ({ root }) => ({
 			)
 			.chain(path =>
 				Oath.try(() => createWriteStream(path)).chain(file =>
-					Oath.try(() => content.pipe(file))
+					Oath.try(
+						() =>
+							new Promise((resolve, reject) => {
+								content.pipe(file).on("error", reject).on("finish", resolve)
+							}),
+					)
 						.chain(() => stat0(path))
 						.map(stat => stat.size),
 				),

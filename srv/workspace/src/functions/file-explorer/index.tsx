@@ -7,7 +7,14 @@ import { Switch } from "@ordo-pink/switch"
 import FileExplorerActivityComponent from "./components/file-explorer-activity.component"
 import FileExplorerIcon from "./components/file-explorer-icon.component"
 import FileExplorerCardComponent from "./components/file-explorer-card.component"
-import { BsFileMinus, BsFilePlus, BsFolderCheck, BsFolderMinus, BsFolderPlus } from "react-icons/bs"
+import {
+	BsFileMinus,
+	BsFilePlus,
+	BsFolderCheck,
+	BsFolderMinus,
+	BsFolderPlus,
+	BsUpload,
+} from "react-icons/bs"
 import { BehaviorSubject } from "rxjs"
 import { Directory, DirectoryPath, DirectoryUtils, FSEntity, FileUtils } from "@ordo-pink/datautil"
 
@@ -51,6 +58,15 @@ export default function createFileExplorerFunction({
 		shouldShow: ({ payload }) => payload && DirectoryUtils.isDirectory(payload),
 		type: "create",
 		accelerator: "meta+n",
+	})
+
+	commands.emit<cmd.contextMenu.add>("context-menu.add", {
+		commandName: "data.show-upload-modal",
+		Icon: BsUpload,
+		readableName: "Upload files",
+		shouldShow: ({ payload }) => payload && DirectoryUtils.isDirectory(payload),
+		type: "create",
+		accelerator: "mod+u",
 	})
 
 	commands.emit<cmd.contextMenu.add>("context-menu.add", {

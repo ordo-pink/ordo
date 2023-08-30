@@ -23,9 +23,9 @@ export const handleSignOut: Fn =
 		})
 			.chain(({ sub, jti }) => tokenService.repository.removeToken(sub, jti))
 			.fix(() => "OK")
-			.map(() => {
-				ctx.cookies.set("jti", "")
-				ctx.cookies.set("sub", "")
+			.tap(expires => {
+				ctx.response.set("Set-Cookie", `jti=; Expires=Thu, 01 Jan 1970 00:00:01 GMT;`)
+				ctx.response.set("Set-Cookie", `sub=; Expires=Thu, 01 Jan 1970 00:00:01 GMT;`)
 			})
 			.fork(sendError(ctx), () => {
 				ctx.response.status = 204

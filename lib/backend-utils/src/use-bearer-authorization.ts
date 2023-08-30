@@ -6,7 +6,7 @@
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 import { Context } from "koa"
-import { AccessTokenParsed, TTokenService } from "@ordo-pink/backend-token-service"
+import { JWAT, TTokenService } from "@ordo-pink/backend-token-service"
 import { HttpError } from "@ordo-pink/rrr"
 import { Oath } from "@ordo-pink/oath"
 
@@ -14,7 +14,7 @@ import { Oath } from "@ordo-pink/oath"
 export const useBearerAuthorization = (
 	ctx: Context,
 	tokenServiceOrIDHost: TTokenService | string,
-): Oath<AccessTokenParsed, HttpError> =>
+): Oath<JWAT, HttpError> =>
 	Oath.of(ctx.header.authorization)
 		.chain(authorization =>
 			Oath.fromBoolean(

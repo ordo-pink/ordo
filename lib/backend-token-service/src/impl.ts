@@ -6,18 +6,13 @@
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 import { randomUUID } from "crypto"
-import { JwtPayload, decode, verify, sign } from "jsonwebtoken"
+import { WJWT } from "@ordo-pink/wjwt"
 
 import { Oath } from "@ordo-pink/oath"
 import { TTokenService, TokenRepository, TokenServiceOptions } from "./types"
+import { Switch } from "@ordo-pink/switch"
 
 type Params = { repository: TokenRepository; options: TokenServiceOptions }
-
-const getSecret = (
-	options: TokenServiceOptions,
-	type: "access" | "refresh",
-	visibility: "public" | "private",
-) => options.keys[type][visibility]
 
 /**
  * Creates a `TokenService` from given TokenStorageAdapter and `TokenService` options.
@@ -25,56 +20,81 @@ const getSecret = (
  * @see TokenServiceOptions
  * @see of
  */
-const of = ({ repository, options }: Params): TTokenService => ({
-	repository,
-	verifyToken: (token, type) =>
-		TokenService.of({ repository, options }).getPayload(token, type).map(Boolean),
-	getPayload: (token, type) =>
-		Oath.try(() => verify(token, getSecret(options, type, "public"), { complete: true }))
-			.map(token => token.payload as JwtPayload)
-			.chain(payload => repository.getToken(payload.sub!, payload.jti!).map(() => payload))
-			.fix(() => null as any),
-	decode: token => Oath.try(() => decode(token, { complete: true })).fix(() => null) as any,
-	createPair: ({ sub, prevJti, aud = "https://ordo.pink" }) =>
-		Oath.all({
-			jti: randomUUID(),
-			iat: Math.floor(Date.now() / 1000),
-			iss: "https://id.ordo.pink",
-			aexp: Math.floor(Date.now() / 1000) + options.accessTokenExpireIn,
-			rexp: Math.floor(Date.now() / 1000) + options.refreshTokenExpireIn,
-			sub,
-			aud,
-		}).chain(({ jti, iat, iss, aexp, rexp, sub, aud }) =>
+const of = ({ repository, options }: Params): TTokenService => {
+	const refreshWJWT = WJWT({
+		alg: options.alg,
+		privateKey: options.keys.refresh.privateKey,
+		publicKey: options.keys.refresh.publicKey,
+	})
+
+	const accessWJWT = WJWT({
+		alg: options.alg,
+		privateKey: options.keys.access.privateKey,
+		publicKey: options.keys.access.publicKey,
+	})
+
+	const wjwt = (type: "access" | "refresh") =>
+		Switch.of(type)
+			.case("refresh", () => refreshWJWT)
+			.default(() => accessWJWT)
+
+	return {
+		repository,
+		verifyToken: (token, type) =>
+			wjwt(type)
+				.verify0(token)
+				.fix(() => false),
+		getPayload: (token, type) =>
+			wjwt(type)
+				.verify0(token)
+				.chain(valid =>
+					Oath.fromBoolean(
+						() => valid,
+						() => token,
+						() => null,
+					),
+				)
+				.chain(token => wjwt(type).decode0(token))
+				.map(jwt => jwt.payload)
+				.chain(payload => repository.getToken(payload.sub, payload.jti).map(() => payload))
+				.fix(() => null),
+		decode: token =>
+			wjwt("access")
+				.decode0(token)
+				.fix(() => null),
+		createPair: ({ sub, prevJti, aud = ["https://ordo.pink"] }) =>
 			Oath.all({
-				jti,
-				iat,
-				iss,
-				exp: rexp,
+				jti: randomUUID(),
+				iat: Math.floor(Date.now() / 1000),
+				iss: "https://id.ordo.pink",
+				aexp: Math.floor(Date.now() / 1000) + options.accessTokenExpireIn,
+				rexp: Math.floor(Date.now() / 1000) + options.refreshTokenExpireIn,
 				sub,
 				aud,
-				tokens: {
-					access: sign(
-						{ jti, iat, iss, exp: aexp, sub, aud },
-						getSecret(options, "access", "private"),
-						{ algorithm: options.alg },
-					),
-					refresh: sign(
-						{ jti, iat, iss, exp: rexp, sub, aud },
-						getSecret(options, "refresh", "private"),
-						{ algorithm: options.alg },
-					),
-				},
-			}).chain(res =>
-				prevJti
-					? repository
-							.removeToken(sub, prevJti)
-							.chain(() => repository.setToken(sub, jti, res.tokens.refresh))
-							.map(() => res)
-					: Oath.empty()
-							.chain(() => repository.setToken(sub, jti, res.tokens.refresh))
-							.map(() => res),
+			}).chain(({ jti, iat, iss, aexp, rexp, sub, aud }) =>
+				Oath.all({
+					jti,
+					iat,
+					iss,
+					exp: rexp,
+					sub,
+					aud,
+					tokens: Oath.all({
+						access: accessWJWT.sign0({ jti, iat, iss, exp: aexp, sub, aud }),
+						refresh: refreshWJWT.sign0({ jti, iat, iss, exp: rexp, sub, aud }),
+					}),
+				}).chain(res =>
+					prevJti
+						? repository
+								.removeToken(sub, prevJti)
+								.chain(() => repository.setToken(sub, jti, res.tokens.refresh))
+								.map(() => res)
+						: Oath.empty()
+								.chain(() => repository.setToken(sub, jti, res.tokens.refresh))
+								.map(() => res),
+				),
 			),
-		),
-})
+	}
+}
 
 export const TokenService = { of }

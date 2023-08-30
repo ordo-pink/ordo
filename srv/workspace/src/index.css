@@ -6,3 +6,13 @@ SPDX-License-Identifier: MIT
 body {
 	font-family: "Jost", sans-serif;
 }
+
+.gutter {
+	@apply bg-transparent z-40 pr-2;
+	background-position: 50% 50%;
+}
+
+.gutter.gutter-horizontal {
+	@apply cursor-col-resize bg-no-repeat;
+	background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAeCAYAAADkftS9AAAAIklEQVQoU2M4c+bMfxAGAgYYmwGrIIiDjrELjpo5aiZeMwF+yNnOs5KSvgAAAABJRU5ErkJggg==");
+}

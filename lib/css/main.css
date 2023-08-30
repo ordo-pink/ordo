@@ -100,13 +100,3 @@ body {
 a {
 	@apply underline text-sky-500 visited:text-purple-500 active:text-rose-500;
 }
-
-.gutter {
-	@apply bg-transparent z-40 pr-2;
-	background-position: 50% 50%;
-}
-
-.gutter.gutter-horizontal {
-	@apply cursor-col-resize;
-	background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAeCAYAAADkftS9AAAAIklEQVQoU2M4c+bMfxAGAgYYmwGrIIiDjrELjpo5aiZeMwF+yNnOs5KSvgAAAABJRU5ErkJggg==");
-}

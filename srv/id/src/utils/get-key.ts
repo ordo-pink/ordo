@@ -7,24 +7,26 @@
 
 import { isFile0, readFile0 } from "@ordo-pink/fs"
 import { Oath } from "@ordo-pink/oath"
-import { createPrivateKey, createPublicKey } from "crypto"
 
-export const getKey = (path: string, type: "public" | "private") =>
+export const getKey = (path: string, type: "public" | "private", alg: Algorithm) =>
 	Oath.fromNullable(path)
 		.chain(isFile0)
 		.map(() => path)
 		.chain(path => readFile0(path, "utf-8"))
-		.map(key => (type === "private" ? createPrivateKey(key) : createPublicKey(key)))
-		.fork(
-			() => {
-				console.error(
-					// TODO: Rename when renaming "bin/dev"
-					`${path} not found. Run "bin/dev" to create a dev pair, or provide production-ready key pair.`,
-				)
-				process.exit(1)
-			},
-			key => key,
+		.map(key => (key as string).split("\n").slice(1, -1).join(""))
+		.map(key => Buffer.from(key, "base64"))
+		.map(buffer => new Uint8Array(buffer))
+		.chain(key =>
+			Oath.from(() =>
+				type === "private"
+					? crypto.subtle.importKey("pkcs8", key, alg, true, ["sign"])
+					: crypto.subtle.importKey("spki", key, alg, true, ["verify"]),
+			),
 		)
+		.orElse(e => {
+			console.error(e)
+			process.exit(1)
+		})
 
-export const getPublicKey = (path: string) => getKey(path, "public")
-export const getPrivateKey = (path: string) => getKey(path, "private")
+export const getPublicKey = (path: string, alg: Algorithm) => getKey(path, "public", alg)
+export const getPrivateKey = (path: string, alg: Algorithm) => getKey(path, "private", alg)

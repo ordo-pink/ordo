@@ -17,6 +17,9 @@ export default function IndexHeroSection() {
 				style: `
         --move-x: ${(event.clientX - window.innerWidth / 2) * -0.005}deg;
         --move-y: ${(event.clientY - window.innerHeight / 2) * -0.01}deg;
+				--layer-0: ;
+				--layer-1: ${process.env.NEXT_PUBLIC_STATIC_HOST}/index-hero-layer-1.png;
+				--layer-2: ${process.env.NEXT_PUBLIC_STATIC_HOST}/index-hero-layer-2.png;
         `,
 			})
 		}
@@ -31,9 +34,24 @@ export default function IndexHeroSection() {
 	return (
 		<section className="hero-section overflow-hidden">
 			<div className="hero-layers h-screen will-change-transform transition-transform">
-				<div className="hero-layer-1 absolute inset-[-40vw] bg-cover bg-center flex items-center justify-center scale-125 pointer-events-none" />
-				<div className="hero-layer-2 absolute inset-0 bg-cover bg-center flex items-center justify-center opacity-20 pointer-events-none" />
-				<div className="hero-layer-3 absolute inset-0 bg-cover bg-center flex items-center justify-center opacity-30 pointer-events-none" />
+				<div
+					className="hero-layer-1 absolute inset-[-40vw] bg-cover bg-center flex items-center justify-center scale-125 pointer-events-none"
+					style={{
+						backgroundImage: `url(${process.env.NEXT_PUBLIC_STATIC_HOST}/index-hero-layer-0.png)`,
+					}}
+				/>
+				<div
+					className="hero-layer-2 absolute inset-0 bg-cover bg-center flex items-center justify-center opacity-20 pointer-events-none"
+					style={{
+						backgroundImage: `url(${process.env.NEXT_PUBLIC_STATIC_HOST}/index-hero-layer-1.png)`,
+					}}
+				/>
+				<div
+					className="hero-layer-3 absolute inset-0 bg-cover bg-center flex items-center justify-center opacity-30 pointer-events-none"
+					style={{
+						backgroundImage: `url(${process.env.NEXT_PUBLIC_STATIC_HOST}/index-hero-layer-2.png)`,
+					}}
+				/>
 				<div className="hero-layer-4 absolute inset-0 bg-cover bg-center flex flex-col items-center justify-center">
 					<h1 className="text-center text-2xl uppercase tracking-tight">
 						Bring your thoughts to

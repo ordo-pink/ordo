@@ -84,20 +84,17 @@ export const handleChangePassword: Fn =
 									.chain(tokens =>
 										// TODO: Drop sessions other than the current one
 										Oath.of(new Date(Date.now() + tokens.exp))
-											.tap(expires =>
-												ctx.cookies.set("jti", tokens.jti, {
-													httpOnly: true,
-													sameSite: "lax",
-													expires,
-												}),
-											)
-											.tap(expires =>
-												ctx.cookies.set("sub", tokens.sub, {
-													httpOnly: true,
-													sameSite: "lax",
-													expires,
-												}),
-											)
+											.tap(expires => {
+												ctx.response.set(
+													"Set-Cookie",
+													`jti=${tokens.jti}; Expires=${expires}; SameSite=Lax; Path=/; HttpOnly;`,
+												)
+
+												ctx.response.set(
+													"Set-Cookie",
+													`sub=${tokens.sub}; Expires=${expires}; SameSite=Lax; Path=/; HttpOnly;`,
+												)
+											})
 											.map(expires => ({
 												accessToken: tokens.tokens.access,
 												sub: tokens.sub,

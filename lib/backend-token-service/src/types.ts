@@ -5,11 +5,10 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-import type { Jwt, JwtHeader, JwtPayload, Algorithm } from "jsonwebtoken"
 import type { Nullable, Unary } from "@ordo-pink/tau"
 import type { Logger } from "@ordo-pink/logger"
 import type { Oath } from "@ordo-pink/oath"
-import type { KeyObject } from "crypto"
+import { AUD, JTI, JWT, JWTPayload, SUB, Algorithm } from "@ordo-pink/wjwt"
 
 // --- Public ---
 
@@ -19,123 +18,24 @@ import type { KeyObject } from "crypto"
 export type TokenRecord = Record<JTI, string>
 
 /**
- * A pair of CryptoKeys.
- */
-export type CryptoKeyPair = {
-	/**
-	 * Private CryptoKey used for signing.
-	 */
-	readonly private: KeyObject
-
-	/**
-	 * Public CryptoKey used for verifying.
-	 */
-	readonly public: KeyObject
-}
-
-/**
- * @see AccessTokenPayload.sub
- */
-export type SUB = string
-
-/**
- * @see AccessTokenPayload.aud
- */
-export type AUD = string
-
-/**
- * @see AccessTokenPayload.iat
- */
-export type IAT = number
-
-/**
- * @see AccessTokenPayload.jti
- */
-export type JTI = string
-
-/**
- * @see AccessTokenPayload.iss
- */
-export type ISS = string
-
-/**
- * @see AccessTokenPayload.exp
- */
-export type EXP = number
-
-/**
  * Payload of the access JWT.
  */
-export interface AccessTokenPayload extends JwtPayload {
-	/**
-	 * JWT subject. User id is stored here.
-	 */
-	readonly sub: SUB
-
-	/**
-	 * JWT audience.
-	 * @default "https://ordo.pink"
-	 */
-	readonly aud: AUD
-
-	/**
-	 * JWT issue time stamp.
-	 */
-	readonly iat: IAT
-
-	/**
-	 * JWT id. This value is the same for refresh token and access token. This way access token can
-	 * be revoked even if its expiration time hasn't come yet.
-	 */
-	readonly jti: JTI
-
-	/**
-	 * JWT issuer.
-	 * @default "https://id.ordo.pink"
-	 */
-	readonly iss: ISS
-
-	/**
-	 * JWT expiration time stamp.
-	 */
-	readonly exp: EXP
-}
+export type AccessTokenPayload = JWTPayload
 
 /**
  * Payload of the refresh JWT.
  */
-export interface RefreshTokenPayload extends AccessTokenPayload {}
-
-/**
- * Parsed token content.
- */
-export type TokenParsed<TPayload extends JwtPayload = JwtPayload> = {
-	/**
-	 * @see JwtHeader
-	 */
-	readonly header: JwtHeader
-
-	/**
-	 * @see Payload
-	 */
-	readonly payload: TPayload
-
-	/**
-	 * JWT signature.
-	 * @type {Uint8Array}
-	 */
-	readonly signature: Uint8Array
-}
+export type RefreshTokenPayload = AccessTokenPayload
 
 /**
  * Parsed access token content.
  */
-export type AccessTokenParsed = TokenParsed<AccessTokenPayload>
+export type JWAT = JWT<AccessTokenPayload>
 
 /**
  * Parsed refresh token content.
  */
-export type RefreshTokenParsed = TokenParsed<RefreshTokenPayload>
+export type JWRT = JWT<RefreshTokenPayload>
 
 /**
  * Token storage adapter is used as an adapter over a database driver that provides a small set of
@@ -237,12 +137,12 @@ export type TTokenService = {
 	getPayload: (
 		token: string,
 		type: "access" | "refresh",
-	) => Oath<Nullable<typeof type extends "access" ? AccessTokenParsed : RefreshTokenParsed>>
+	) => Oath<Nullable<typeof type extends "access" ? AccessTokenPayload : RefreshTokenPayload>>
 
 	decode: (
 		token: string,
 		type: "access" | "refresh",
-	) => Oath<Nullable<typeof type extends "access" ? AccessTokenParsed : RefreshTokenParsed>>
+	) => Oath<Nullable<typeof type extends "access" ? JWAT : JWRT>>
 
 	createPair: Unary<
 		{ sub: SUB; prevJti?: JTI; aud?: AUD },

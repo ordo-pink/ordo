@@ -5,7 +5,7 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-import { CryptoKeyPair, TokenRepository, TokenService } from "@ordo-pink/backend-token-service"
+import { TokenRepository, TokenService } from "@ordo-pink/backend-token-service"
 import {
 	BackendDataService,
 	DataRepository,
@@ -26,6 +26,7 @@ import { handleSignOut } from "./handlers/sign-out.handler"
 import { handleAccount } from "./handlers/account.handler"
 import { handleSignIn } from "./handlers/sign-in.handler"
 import { handleSignUp } from "./handlers/sign-up.handler"
+import { Algorithm } from "@ordo-pink/wjwt"
 
 // TODO: Extract errors to enum
 // TODO: Audit
@@ -38,7 +39,7 @@ export type CreateIDServerFnParams = {
 	refreshTokenExpireIn: number
 	saltRounds: number
 	origin: string | string[]
-	alg: "ES384" // TODO: Add support for switching to RSA
+	alg: Algorithm
 	accessKeys: CryptoKeyPair
 	refreshKeys: CryptoKeyPair
 	logger?: Logger

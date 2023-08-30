@@ -7,11 +7,8 @@
 
 import { runAsyncCommand0 } from "@ordo-pink/binutil"
 
-runAsyncCommand0(
-	"npx nodemon -r tsconfig-paths/register --ignore var,srv/data,srv/static,srv/website,srv/workspace -e ts srv/id/index.ts",
-	{
-		stdout: "pipe",
-		stderr: "pipe",
-		env: { ...process.env, FORCE_COLOR: "1" },
-	},
-).orElse(console.error)
+runAsyncCommand0("bun run --watch srv/id/index.ts", {
+	stdout: "pipe",
+	stderr: "pipe",
+	env: { ...process.env, FORCE_COLOR: "1" },
+}).orElse(console.error)

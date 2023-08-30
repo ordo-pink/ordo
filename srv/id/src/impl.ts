@@ -63,10 +63,22 @@ const main = async () => {
 	const refreshPrivateKeyPath = ID_REFRESH_TOKEN_PRIVATE_KEY_PATH
 	const refreshPublicKeyPath = ID_REFRESH_TOKEN_PUBLIC_KEY_PATH
 
-	const accessTokenPrivateKey = await getPrivateKey(accessPrivateKeyPath)
-	const accessTokenPublicKey = await getPublicKey(accessPublicKeyPath)
-	const refreshTokenPrivateKey = await getPrivateKey(refreshPrivateKeyPath)
-	const refreshTokenPublicKey = await getPublicKey(refreshPublicKeyPath)
+	const accessTokenPrivateKey = await getPrivateKey(accessPrivateKeyPath, {
+		name: "ECDSA",
+		namedCurve: "P-384",
+	} as any)
+	const accessTokenPublicKey = await getPublicKey(accessPublicKeyPath, {
+		name: "ECDSA",
+		namedCurve: "P-384",
+	} as any)
+	const refreshTokenPrivateKey = await getPrivateKey(refreshPrivateKeyPath, {
+		name: "ECDSA",
+		namedCurve: "P-384",
+	} as any)
+	const refreshTokenPublicKey = await getPublicKey(refreshPublicKeyPath, {
+		name: "ECDSA",
+		namedCurve: "P-384",
+	} as any)
 
 	const dataRepository = FSDataRepository.of({ root: DATA_DATA_PATH })
 	const metadataRepository = FSMetadataRepository.of({ root: DATA_METADATA_PATH })
@@ -89,10 +101,10 @@ const main = async () => {
 		dataRepository,
 		metadataRepository,
 		origin: [WEB_HOST, WORKSPACE_HOST],
-		accessKeys: { private: accessTokenPrivateKey, public: accessTokenPublicKey },
-		refreshKeys: { private: refreshTokenPrivateKey, public: refreshTokenPublicKey },
+		accessKeys: { privateKey: accessTokenPrivateKey, publicKey: accessTokenPublicKey },
+		refreshKeys: { privateKey: refreshTokenPrivateKey, publicKey: refreshTokenPublicKey },
 		saltRounds: Number(ID_SALT_ROUNDS),
-		alg: "ES384", // TODO: Add support for switching to RSA
+		alg: { name: "ECDSA", namedCurve: "P-384", hash: "SHA-384" }, // TODO: Add support for switching to RSA
 		accessTokenExpireIn: Number(ID_ACCESS_TOKEN_EXPIRE_IN),
 		refreshTokenExpireIn: Number(ID_REFRESH_TOKEN_EXPIRE_IN),
 	})

@@ -18,6 +18,7 @@ import RemoveDirectoryModal from "$components/modals/remove-directory-modal.comp
 import CreateFileModal from "$components/modals/create-file-modal.component"
 import RemoveFileModal from "$components/modals/remove-file-modal.component"
 import UploadFilesModal from "$components/modals/upload-files-modal.component"
+import RenameDirectoryModal from "$components/modals/rename-directory-modal.component"
 
 const commands = getCommands()
 
@@ -39,6 +40,15 @@ export const __initData: Fn = ({ logger, auth$ }) => {
 		({ payload }) => {
 			commands.emit<cmd.modal.show>("modal.show", {
 				Component: () => <CreateDirectoryModal parent={payload} />,
+			})
+		},
+	)
+
+	commands.on<cmd.data.directory.showRenameModal>(
+		"data.show-rename-directory-modal",
+		({ payload }) => {
+			commands.emit<cmd.modal.show>("modal.show", {
+				Component: () => <RenameDirectoryModal directory={payload} />,
 			})
 		},
 	)
@@ -159,6 +169,34 @@ export const __initData: Fn = ({ logger, auth$ }) => {
 			)
 			.chain(body => (body.success ? Oath.of(body.result) : Oath.reject(body.error as string)))
 			.rejectedMap(rrrToNotification("Error creating directory"))
+			.fork(
+				item => {
+					commands.emit<cmd.notification.show>("notification.show", item)
+				},
+				() => {
+					commands.emit<cmd.data.refreshRoot>("data.refresh-root")
+				},
+			)
+	})
+
+	commands.on<cmd.data.directory.update>("data.update-directory", ({ payload }) => {
+		const auth = (auth$ as BehaviorSubject<AuthResponse>).value
+
+		Oath.fromNullable(auth)
+			.chain(auth =>
+				Oath.try(() =>
+					fetch(`${Hosts.DATA}/directories/${auth.sub}${payload.path}`, {
+						method: "PATCH",
+						headers: {
+							"content-type": "application/json",
+							authorization: `Bearer ${auth.accessToken}`,
+						},
+						body: JSON.stringify(payload.update),
+					}).then(res => res.json()),
+				),
+			)
+			.chain(body => (body.success ? Oath.of(body.result) : Oath.reject(body.error as string)))
+			.rejectedMap(rrrToNotification("Error updating directory"))
 			.fork(
 				item => {
 					commands.emit<cmd.notification.show>("notification.show", item)

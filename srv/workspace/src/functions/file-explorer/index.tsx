@@ -13,6 +13,7 @@ import {
 	BsFolderCheck,
 	BsFolderMinus,
 	BsFolderPlus,
+	BsPencilSquare,
 	BsUpload,
 } from "react-icons/bs"
 import { BehaviorSubject } from "rxjs"
@@ -39,6 +40,15 @@ export default function createFileExplorerFunction({
 		shouldShow: ({ payload }) => payload && DirectoryUtils.isDirectory(payload),
 		type: "create",
 		accelerator: "meta+shift+n",
+	})
+
+	commands.emit<cmd.contextMenu.add>("context-menu.add", {
+		commandName: "data.show-rename-directory-modal",
+		Icon: BsPencilSquare,
+		readableName: "Rename directory",
+		shouldShow: ({ payload }) =>
+			payload && DirectoryUtils.isDirectory(payload) && payload.path !== "/",
+		type: "update",
 	})
 
 	commands.emit<cmd.contextMenu.add>("context-menu.add", {

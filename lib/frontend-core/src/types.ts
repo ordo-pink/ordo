@@ -50,20 +50,18 @@ export namespace cmd {
 		export type showUploadModal = { name: "data.show-upload-modal"; payload?: Directory }
 
 		export namespace file {
-			export type showCreateModal = {
-				name: "data.show-create-file-modal"
-				payload?: Directory
-			}
-			export type showRemoveModal = {
-				name: "data.show-remove-file-modal"
-				payload: File
-			}
+			export type showCreateModal = { name: "data.show-create-file-modal"; payload?: Directory }
+			export type showRemoveModal = { name: "data.show-remove-file-modal"; payload: File }
+			export type showRenameModal = { name: "data.show-rename-file-modal"; payload: File }
 			export type setContent = {
 				name: "data.set-file-content"
 				payload: { path: FilePath; content: string | ArrayBuffer }
 			}
 			export type create = { name: "data.create-file"; payload: CreateFileParams }
-			export type update = { name: "data.update-file"; payload: UpdateFileParams }
+			export type update = {
+				name: "data.update-file"
+				payload: { path: FilePath; update: UpdateFileParams }
+			}
 			export type remove = { name: "data.remove-file"; payload: FilePath }
 		}
 
@@ -76,8 +74,15 @@ export namespace cmd {
 				name: "data.show-remove-directory-modal"
 				payload: Directory
 			}
+			export type showRenameModal = {
+				name: "data.show-rename-directory-modal"
+				payload: Directory
+			}
 			export type create = { name: "data.create-directory"; payload: CreateDirectoryParams }
-			export type update = { name: "data.update-directory"; payload: UpdateDirectoryParams }
+			export type update = {
+				name: "data.update-directory"
+				payload: { path: DirectoryPath; update: UpdateDirectoryParams }
+			}
 			export type remove = { name: "data.remove-directory"; payload: DirectoryPath }
 		}
 	}

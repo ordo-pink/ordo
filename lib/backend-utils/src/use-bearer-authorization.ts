@@ -38,7 +38,6 @@ const verifyWithIdServer0 = (idHost: string, authorization: string) =>
 			headers: { authorization },
 		})
 			.then(res => res.json())
-
 			.then(res => (res.success ? res.result : { valid: false })),
 	).chain(res =>
 		res.valid ? Oath.of(res.token) : Oath.reject(HttpError.Forbidden("Invalid token")),
@@ -47,5 +46,11 @@ const verifyWithIdServer0 = (idHost: string, authorization: string) =>
 const verifyWithTokenService0 = (tokenService: TTokenService, token: string) =>
 	tokenService
 		.verifyToken(token, "access")
+		.chain(isValid =>
+			Oath.fromBoolean(
+				() => isValid,
+				() => "OK",
+				() => HttpError.Forbidden("Invalid token"),
+			),
+		)
 		.chain(() => tokenService.decode(token, "access"))
-		.rejectedMap(() => HttpError.Forbidden("Invalid token"))

@@ -84,6 +84,7 @@ export type WJWTVerifyFn = (params: {
 	alg: Algorithm
 }) => (
 	token: string,
+	aud?: string,
 ) => Oath<boolean, RRR<"INVALID_TOKEN"> | RRR<"INVALID_KEY"> | RRR<"ALG_KEY_MISMATCH">>
 
 export type WJWTSignFn = <T extends R = R>(params: {

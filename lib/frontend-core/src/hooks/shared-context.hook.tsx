@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 import type { Context, useContext as UseContext } from "react"
-import type { FSEntity } from "@ordo-pink/datautil"
+import type { FSEntity } from "@ordo-pink/data"
 import type { Nullable } from "@ordo-pink/tau"
 import { Commands, Router } from "../types"
 

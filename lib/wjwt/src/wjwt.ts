@@ -9,5 +9,5 @@ import { verify0 } from "./_verify"
 export const WJWT: TWJWT = ({ alg, privateKey, publicKey }) => ({
 	sign0: sign0({ alg, key: privateKey }),
 	verify0: verify0({ alg, key: publicKey }),
-	decode0: decode0,
+	decode0,
 })

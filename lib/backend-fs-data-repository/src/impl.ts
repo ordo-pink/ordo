@@ -12,7 +12,7 @@ import { Unary } from "@ordo-pink/tau"
 import { DataRepository } from "@ordo-pink/backend-data-service"
 import { Oath } from "@ordo-pink/oath"
 import { createFile0, createParentDirectory0, removeFile0, fileExists0, stat0 } from "@ordo-pink/fs"
-import { FSID } from "@ordo-pink/datautil/src/common"
+import { FSID } from "@ordo-pink/data/src/common"
 
 type Params = { root: string }
 type Fn = Unary<Params, DataRepository<Readable>>

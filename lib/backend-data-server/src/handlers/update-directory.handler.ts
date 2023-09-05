@@ -14,7 +14,7 @@ import { sendError, useBearerAuthorization, useBody } from "@ordo-pink/backend-u
 import { HttpError } from "@ordo-pink/rrr"
 import { Oath } from "@ordo-pink/oath"
 import { pathParamToDirectoryPath } from "../utils"
-import { DirectoryPath, DirectoryUtils, UpdateDirectoryParams } from "@ordo-pink/datautil"
+import { DirectoryPath, DirectoryUtils, UpdateDirectoryParams } from "@ordo-pink/data"
 
 export const handleUpdateDirectory: Unary<
 	{ dataService: TDataService<Readable>; idHost: string },

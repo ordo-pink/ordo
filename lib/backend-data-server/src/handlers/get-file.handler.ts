@@ -14,7 +14,7 @@ import { sendError, useBearerAuthorization } from "@ordo-pink/backend-utils"
 import { HttpError } from "@ordo-pink/rrr"
 import { Oath } from "@ordo-pink/oath"
 import { pathParamToFilePath } from "../utils"
-import { FilePath, FileUtils } from "@ordo-pink/datautil"
+import { FilePath, FileUtils } from "@ordo-pink/data"
 
 export const handleGetFile: Unary<
 	{ dataService: TDataService<Readable>; idHost: string },

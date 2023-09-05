@@ -13,7 +13,7 @@ import { TDataService } from "@ordo-pink/backend-data-service"
 import { sendError, useBearerAuthorization, useBody } from "@ordo-pink/backend-utils"
 import { HttpError } from "@ordo-pink/rrr"
 import { Oath } from "@ordo-pink/oath"
-import { CreateDirectoryParams, DirectoryUtils } from "@ordo-pink/datautil"
+import { CreateDirectoryParams, DirectoryUtils } from "@ordo-pink/data"
 
 export const handleCreateDirectory: Unary<
 	{ dataService: TDataService<Readable>; idHost: string },

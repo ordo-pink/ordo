@@ -9,7 +9,7 @@ import {
 	File,
 	FilePath,
 	FileUtils,
-} from "@ordo-pink/datautil"
+} from "@ordo-pink/data"
 import { Either } from "@ordo-pink/either"
 import { Activity, cmd, useSharedContext } from "@ordo-pink/frontend-core"
 import { MouseEvent, useEffect, useState } from "react"

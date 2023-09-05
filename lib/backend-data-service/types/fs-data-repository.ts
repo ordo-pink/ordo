@@ -4,7 +4,7 @@
 import { SUB } from "@ordo-pink/wjwt"
 import { Oath } from "@ordo-pink/oath"
 import { Unary, Nullable } from "@ordo-pink/tau"
-import { FilePath, FSID } from "@ordo-pink/datautil"
+import { FilePath, FSID } from "@ordo-pink/data"
 
 export type FSDataRepository<TReadContent, TWriteContent = TReadContent> = {
 	exists: FileExistsFn

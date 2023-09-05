@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 import { OrdoButtonSecondary, OrdoButtonPrimary } from "$components/buttons/buttons"
-import { File } from "@ordo-pink/datautil"
+import { File } from "@ordo-pink/data"
 import { cmd, useSharedContext } from "@ordo-pink/frontend-core"
 import { BsFolderMinus } from "react-icons/bs"
 

@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: Copyright 2023, 谢尔盖||↓ and the Ordo.pink contributors
 // SPDX-License-Identifier: MIT
 
-import { FSID } from "@ordo-pink/datautil/src/common"
+import { FSID } from "@ordo-pink/data"
 import { Oath } from "@ordo-pink/oath"
 import { Unary, Nullable } from "@ordo-pink/tau"
 import { SUB } from "@ordo-pink/wjwt"

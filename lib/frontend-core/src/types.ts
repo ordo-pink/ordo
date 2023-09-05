@@ -14,7 +14,7 @@ import type {
 	FSEntity,
 	Directory,
 	File,
-} from "@ordo-pink/datautil"
+} from "@ordo-pink/data"
 import type { Observable } from "rxjs"
 import { Logger } from "@ordo-pink/logger"
 import { ComponentSpace } from "./constants/component-space.constants"

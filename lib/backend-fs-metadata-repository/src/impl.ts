@@ -11,7 +11,7 @@ import type { Unary } from "@ordo-pink/tau"
 import { readFile0, writeFile0 } from "@ordo-pink/fs"
 import { resolve } from "path"
 import { Oath } from "@ordo-pink/oath"
-import { Directory, File } from "@ordo-pink/datautil"
+import { Directory, File } from "@ordo-pink/data"
 
 // --- Public ---
 

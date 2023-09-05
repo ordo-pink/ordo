@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: Copyright 2023, 谢尔盖||↓ and the Ordo.pink contributors
 // SPDX-License-Identifier: MIT
 
-import { File, FileUtils } from "@ordo-pink/datautil"
+import { File, FileUtils } from "@ordo-pink/data"
 import { Switch } from "@ordo-pink/switch"
 import { BsFileBinary } from "react-icons/bs"
 

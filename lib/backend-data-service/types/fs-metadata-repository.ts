@@ -11,7 +11,7 @@ import {
 	FilePath,
 	UpdateDirectoryParams,
 	UpdateFileParams,
-} from "@ordo-pink/datautil"
+} from "@ordo-pink/data"
 import { Oath } from "@ordo-pink/oath"
 import { Nullable, Unary } from "@ordo-pink/tau"
 

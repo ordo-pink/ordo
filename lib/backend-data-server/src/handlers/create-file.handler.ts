@@ -13,7 +13,7 @@ import { TDataService } from "@ordo-pink/backend-data-service"
 import { sendError, useBearerAuthorization, useBody } from "@ordo-pink/backend-utils"
 import { HttpError } from "@ordo-pink/rrr"
 import { Oath } from "@ordo-pink/oath"
-import { CreateFileParams, FileUtils } from "@ordo-pink/datautil"
+import { CreateFileParams, FileUtils } from "@ordo-pink/data"
 
 export const handleCreateFile: Unary<
 	{ dataService: TDataService<Readable>; idHost: string },

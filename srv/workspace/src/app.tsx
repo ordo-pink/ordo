@@ -14,7 +14,7 @@ import Workspace from "$components/workspace"
 import Modal from "$components/modal"
 import Null from "$components/null"
 import { Nullable } from "@ordo-pink/tau"
-import { FSEntity } from "@ordo-pink/datautil"
+import { FSEntity } from "@ordo-pink/data"
 
 // TODO: Remove useAppInit
 const commands = getCommands()

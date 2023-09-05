@@ -12,7 +12,7 @@ import {
 	CreateDirectoryParams,
 	UpdateFileParams,
 	UpdateDirectoryParams,
-} from "@ordo-pink/datautil"
+} from "@ordo-pink/data"
 import { SUB } from "@ordo-pink/wjwt"
 
 // --- Public ---

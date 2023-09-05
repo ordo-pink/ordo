@@ -8,8 +8,8 @@ import type * as T from "@ordo-pink/backend-data-service"
 import { randomUUID } from "crypto"
 import { Oath } from "@ordo-pink/oath"
 import { Readable } from "stream"
-import { DirectoryUtils, FileUtils } from "@ordo-pink/datautil"
-import { FSID } from "@ordo-pink/datautil/src/common"
+import { DirectoryUtils, FileUtils } from "@ordo-pink/data"
+import { FSID } from "@ordo-pink/data/src/common"
 
 type Params = {
 	metadataRepository: T.MetadataRepository

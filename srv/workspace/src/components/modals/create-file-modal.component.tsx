@@ -3,7 +3,7 @@
 
 import { OrdoButtonSecondary, OrdoButtonPrimary } from "$components/buttons/buttons"
 import { PathBreadcrumbs } from "$components/path-breadcrumbs/path-breadcrumbs"
-import { Directory, FileUtils } from "@ordo-pink/datautil"
+import { Directory, FileUtils } from "@ordo-pink/data"
 import { cmd, useSharedContext } from "@ordo-pink/frontend-core"
 
 import { ChangeEvent, useState } from "react"

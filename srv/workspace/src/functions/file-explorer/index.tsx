@@ -17,7 +17,7 @@ import {
 	BsUpload,
 } from "react-icons/bs"
 import { BehaviorSubject } from "rxjs"
-import { Directory, DirectoryPath, DirectoryUtils, FSEntity, FileUtils } from "@ordo-pink/datautil"
+import { Directory, DirectoryPath, DirectoryUtils, FSEntity, FileUtils } from "@ordo-pink/data"
 
 type openInFileExplorer = { name: "file-explorer.go-to"; payload: DirectoryPath }
 type openRootInFileExplorer = { name: "file-explorer.open-root" }

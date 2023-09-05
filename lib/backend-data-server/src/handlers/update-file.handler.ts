@@ -14,7 +14,7 @@ import { sendError, useBearerAuthorization, useBody } from "@ordo-pink/backend-u
 import { Oath } from "@ordo-pink/oath"
 import { HttpError } from "@ordo-pink/rrr"
 import { pathParamToFilePath } from "../utils"
-import { UpdateFileParams, FilePath, FileUtils } from "@ordo-pink/datautil"
+import { UpdateFileParams, FilePath, FileUtils } from "@ordo-pink/data"
 
 // --- Public ---
 

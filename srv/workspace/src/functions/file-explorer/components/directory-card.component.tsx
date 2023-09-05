@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: Copyright 2023, 谢尔盖||↓ and the Ordo.pink contributors
 // SPDX-License-Identifier: MIT
 
-import { Directory, DirectoryUtils } from "@ordo-pink/datautil"
+import { Directory, DirectoryUtils } from "@ordo-pink/data"
 import DirectoryIconComponent from "./directory-icon.component"
 import { cmd, useSharedContext } from "@ordo-pink/frontend-core"
 import { MouseEvent } from "react"

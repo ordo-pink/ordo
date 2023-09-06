@@ -8,7 +8,7 @@
 import type { Middleware } from "koa"
 import type { TTokenService } from "@ordo-pink/backend-token-service"
 import type { UserService } from "@ordo-pink/backend-user-service"
-import { sendError, useBody } from "@ordo-pink/backend-utils"
+import { sendError, parseBody0 } from "@ordo-pink/backend-utils"
 import { Oath } from "@ordo-pink/oath"
 import { prop } from "ramda"
 import { HttpError } from "@ordo-pink/rrr"
@@ -22,7 +22,7 @@ type Fn = (params: Params) => Middleware
 export const handleSignIn: Fn =
 	({ userService, tokenService }) =>
 	ctx =>
-		useBody<Body>(ctx)
+		parseBody0<Body>(ctx)
 			.chain(({ email, password }) =>
 				Oath.all({ email: Oath.fromNullable(email), password: Oath.fromNullable(password) })
 					.rejectedMap(() => HttpError.BadRequest("Invalid body content"))

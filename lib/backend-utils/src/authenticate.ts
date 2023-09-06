@@ -10,7 +10,7 @@ import { JWAT, TTokenService } from "@ordo-pink/backend-token-service"
 import { HttpError } from "@ordo-pink/rrr"
 import { Oath } from "@ordo-pink/oath"
 
-export const useBearerAuthorization = (
+export const authenticate0 = (
 	ctx: Context,
 	tokenServiceOrIDHost: TTokenService | string,
 ): Oath<JWAT, HttpError> =>

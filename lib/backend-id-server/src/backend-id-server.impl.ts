@@ -6,15 +6,9 @@
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 import { TokenRepository, TokenService } from "@ordo-pink/backend-token-service"
-import {
-	BackendDataService,
-	DataRepository,
-	MetadataRepository,
-} from "@ordo-pink/backend-data-service"
 import { UserRepository, UserService } from "@ordo-pink/backend-user-service"
 import { ConsoleLogger, Logger } from "@ordo-pink/logger"
 import { createServer } from "@ordo-pink/backend-utils"
-import { Readable } from "stream"
 
 import { handleChangeAccountInfo } from "./handlers/change-account-info.handler"
 import { handleChangePassword } from "./handlers/change-password.handler"
@@ -31,8 +25,6 @@ import { Algorithm } from "@ordo-pink/wjwt"
 export type CreateIDServerFnParams = {
 	userRepository: UserRepository
 	tokenRepository: TokenRepository
-	metadataRepository: MetadataRepository
-	dataRepository: DataRepository<Readable>
 	accessTokenExpireIn: number
 	refreshTokenExpireIn: number
 	saltRounds: number
@@ -46,8 +38,6 @@ export type CreateIDServerFnParams = {
 export const createIDServer = async ({
 	userRepository,
 	tokenRepository,
-	dataRepository,
-	metadataRepository,
 	origin,
 	accessTokenExpireIn,
 	refreshTokenExpireIn,
@@ -57,7 +47,6 @@ export const createIDServer = async ({
 	logger = ConsoleLogger,
 	alg,
 }: CreateIDServerFnParams) => {
-	const dataService = BackendDataService.of({ dataRepository, metadataRepository })
 	const userService = await UserService.of(userRepository, { saltRounds })
 	const tokenService = TokenService.of({
 		repository: tokenRepository,
@@ -70,7 +59,7 @@ export const createIDServer = async ({
 		},
 	})
 
-	const ctx = { userService, tokenService, dataService }
+	const ctx = { userService, tokenService }
 
 	return createServer({
 		origin,

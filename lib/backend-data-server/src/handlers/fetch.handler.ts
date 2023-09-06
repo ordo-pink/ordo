@@ -5,23 +5,23 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
+import type { Readable } from "stream"
 import type { Middleware } from "koa"
-import type { TTokenService } from "@ordo-pink/backend-token-service"
-import type { UserService } from "@ordo-pink/backend-user-service"
-import { prop } from "ramda"
+import type { TDataCommands } from "@ordo-pink/data"
+import type { Unary } from "@ordo-pink/tau"
 import { sendError, authenticate0 } from "@ordo-pink/backend-utils"
 import { HttpError } from "@ordo-pink/rrr"
 
-type Params = { tokenService: TTokenService; userService: UserService }
-type Fn = (params: Params) => Middleware
-
-export const handleAccount: Fn =
-	({ tokenService, userService }) =>
+export const handleFetch: Unary<
+	{ dataService: TDataCommands<Readable>; idHost: string },
+	Middleware
+> =
+	({ dataService, idHost }) =>
 	ctx =>
-		authenticate0(ctx, tokenService)
-			.map(prop("payload"))
-			.map(prop("sub"))
-			.chain(id => userService.getById(id).rejectedMap(() => HttpError.NotFound("User not found")))
+		authenticate0(ctx, idHost)
+			.map(({ payload }) => payload)
+			.chain(({ sub }) => dataService.fetch({ createdBy: sub }).rejectedMap(HttpError.NotFound))
 			.fork(sendError(ctx), result => {
+				ctx.response.status = 200
 				ctx.response.body = { success: true, result }
 			})

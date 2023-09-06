@@ -9,7 +9,7 @@ import type { TTokenService } from "@ordo-pink/backend-token-service"
 import type { UserService } from "@ordo-pink/backend-user-service"
 import type { Middleware } from "koa"
 import { okpwd } from "@ordo-pink/okpwd"
-import { sendError, useBearerAuthorization, useBody } from "@ordo-pink/backend-utils"
+import { sendError, authenticate0, parseBody0 } from "@ordo-pink/backend-utils"
 import { Oath } from "@ordo-pink/oath"
 import { HttpError } from "@ordo-pink/rrr"
 import { noop } from "@ordo-pink/tau"
@@ -22,8 +22,8 @@ export const handleChangePassword: Fn =
 	({ tokenService, userService }) =>
 	ctx =>
 		Oath.all({
-			auth: useBearerAuthorization(ctx, tokenService),
-			body: useBody<Body>(ctx, "object"),
+			auth: authenticate0(ctx, tokenService),
+			body: parseBody0<Body>(ctx, "object"),
 		})
 			.chain(({ auth, body }) =>
 				Oath.all({

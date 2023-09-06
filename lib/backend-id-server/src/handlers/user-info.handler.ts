@@ -8,7 +8,7 @@
 import type { Context, Middleware } from "koa"
 import type { PublicUser, UserService } from "@ordo-pink/backend-user-service"
 import type { TTokenService } from "@ordo-pink/backend-token-service"
-import { useBearerAuthorization, sendError } from "@ordo-pink/backend-utils"
+import { authenticate0, sendError } from "@ordo-pink/backend-utils"
 import { Oath } from "@ordo-pink/oath"
 import { HttpError } from "@ordo-pink/rrr"
 
@@ -20,7 +20,7 @@ export type Fn = (params: Params) => Middleware
 export const handleUserInfo: Fn =
 	({ tokenService, userService }) =>
 	ctx =>
-		useBearerAuthorization(ctx, tokenService)
+		authenticate0(ctx, tokenService)
 			.map(() => ctx.params.email)
 			.chain(e =>
 				userService.getUserInfo(e).rejectedMap(() => HttpError.NotFound("User not found")),

@@ -6,23 +6,23 @@
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 import type { Readable } from "stream"
-import type { TDataService } from "@ordo-pink/backend-data-service"
+import type { TDataCommands } from "@ordo-pink/data"
 import { createServer } from "@ordo-pink/backend-utils"
 import { ConsoleLogger, Logger } from "@ordo-pink/logger"
-import { handleUpdateFileContent } from "./handlers/update-file-content.handler"
-import { handleCreateDirectory } from "./handlers/create-directory.handler"
-import { handleRemoveDirectory } from "./handlers/remove-directory.handler"
-import { handleUpdateDirectory } from "./handlers/update-directory.handler"
-import { handleGetDirectory } from "./handlers/get-directory.handler"
-import { handleCreateFile } from "./handlers/create-file.handler"
-import { handleRemoveFile } from "./handlers/remove-file.handler"
-import { handleUpdateFile } from "./handlers/update-file.handler"
-import { handleGetFile } from "./handlers/get-file.handler"
-import { handleGetRoot } from "./handlers/get-root.handler"
+import { handleGetContent } from "./handlers/get-content.handler"
+import { handleSetContent } from "./handlers/set-content.handler"
+import { handleCreate } from "./handlers/create.handler"
+import { handleRemove } from "./handlers/remove.handler"
+import { handleRename } from "./handlers/rename.handler"
+import { handleUnlink } from "./handlers/unlink.handler"
+import { handleFetch } from "./handlers/fetch.handler"
+import { handleMove } from "./handlers/move.handler"
+import { handleLink } from "./handlers/link.handler"
+import { handleUpload } from "./handlers/upload.handler"
 
 export type Params = {
 	origin: string | string[]
-	dataService: TDataService<Readable>
+	dataService: TDataCommands<Readable>
 	idHost: string
 	logger?: Logger
 }
@@ -37,17 +37,17 @@ export const createDataServer = ({
 		origin,
 		logger,
 		serverName: "dt",
-		extendRouter: r =>
-			r
-				.post("/directories/:userId", handleCreateDirectory({ dataService, idHost }))
-				.get("/directories/:userId", handleGetRoot({ dataService, idHost }))
-				.get("/directories/:userId/:path*", handleGetDirectory({ dataService, idHost }))
-				.patch("/directories/:userId/:path*", handleUpdateDirectory({ dataService, idHost }))
-				.delete("/directories/:userId/:path*", handleRemoveDirectory({ dataService, idHost }))
-				.post("/files/:userId", handleCreateFile({ dataService, idHost }))
-				.get("/files/:userId/:path*", handleGetFile({ dataService, idHost }))
-				.patch("/files/:userId/:path*", handleUpdateFile({ dataService, idHost }))
-				.put("/files/:userId/:path*", handleUpdateFileContent({ dataService, idHost }))
-				.delete("/files/:userId/:path*", handleRemoveFile({ dataService, idHost })),
+		extendRouter: router =>
+			router
+				.get("/", handleFetch({ dataService, idHost }))
+				.post("/:userId", handleCreate({ dataService, idHost }))
+				.delete("/:userId/:fsid", handleRemove({ dataService, idHost }))
+				.get("/:userId/:fsid", handleGetContent({ dataService, idHost }))
+				.put("/:userId/:name/upload", handleUpload({ dataService, idHost }))
+				.put("/:userId/:fsid/update", handleSetContent({ dataService, idHost }))
+				.patch("/:userId/:fsid/move", handleMove({ dataService, idHost }))
+				.patch("/:userId/:fsid/link", handleLink({ dataService, idHost }))
+				.patch("/:userId/:fsid/unlink", handleUnlink({ dataService, idHost }))
+				.patch("/:userId/:fsid/rename", handleRename({ dataService, idHost })),
 	})
 }

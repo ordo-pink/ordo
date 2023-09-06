@@ -9,6 +9,7 @@ import type { User, InternalUser, PublicUser, UserRepository } from "./types"
 import { hash, compare, genSalt } from "bcryptjs"
 import crypto from "crypto"
 import { Oath } from "@ordo-pink/oath"
+import { UUIDv4 } from "@ordo-pink/tau"
 
 export type UserServiceOptions = {
 	saltRounds: number
@@ -33,7 +34,7 @@ export class UserService {
 		return Oath.from(() => hash(password, this.#salt))
 			.chain(password =>
 				this.#driver.create({
-					id: crypto.randomUUID(),
+					id: crypto.randomUUID() as UUIDv4,
 					email,
 					password,
 					emailConfirmed: false,

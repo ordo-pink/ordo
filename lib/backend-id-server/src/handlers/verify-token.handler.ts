@@ -8,7 +8,7 @@
 import type { Middleware } from "koa"
 import type { UserService } from "@ordo-pink/backend-user-service"
 import type { TTokenService } from "@ordo-pink/backend-token-service"
-import { useBearerAuthorization } from "@ordo-pink/backend-utils"
+import { authenticate0 } from "@ordo-pink/backend-utils"
 import { Oath } from "@ordo-pink/oath"
 
 // --- Public ---
@@ -19,7 +19,7 @@ export type Fn = (params: Params) => Middleware
 export const handleVerifyToken: Fn =
 	({ tokenService }) =>
 	ctx =>
-		useBearerAuthorization(ctx, tokenService)
+		authenticate0(ctx, tokenService)
 			.chain(Oath.fromNullable)
 			.fork(
 				() => void (ctx.response.body = { success: true, result: { valid: false } }),

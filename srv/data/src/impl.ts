@@ -7,10 +7,10 @@
 
 import { createDataServer } from "@ordo-pink/backend-data-server"
 import { getc } from "@ordo-pink/getc"
-import { BackendDataService } from "@ordo-pink/backend-data-service"
-import { FSMetadataRepository } from "@ordo-pink/backend-fs-metadata-repository"
+import { FSContentRepository } from "@ordo-pink/backend-fs-content-repository"
 import { FSDataRepository } from "@ordo-pink/backend-fs-data-repository"
 import { ConsoleLogger } from "@ordo-pink/logger"
+import { DataCommands } from "@ordo-pink/data"
 
 const {
 	DATA_DATA_PATH,
@@ -31,9 +31,9 @@ const {
 ])
 
 const main = async () => {
-	const metadataRepository = FSMetadataRepository.of({ root: DATA_METADATA_PATH })
-	const dataRepository = FSDataRepository.of({ root: DATA_DATA_PATH })
-	const dataService = BackendDataService.of({ dataRepository, metadataRepository })
+	const dataRepository = FSDataRepository.of({ root: DATA_METADATA_PATH })
+	const contentRepository = FSContentRepository.of({ root: DATA_DATA_PATH })
+	const dataService = DataCommands.of({ dataRepository, contentRepository })
 
 	const app = createDataServer({
 		dataService,

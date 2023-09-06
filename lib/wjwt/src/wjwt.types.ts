@@ -3,6 +3,7 @@
 
 import { Oath } from "@ordo-pink/oath"
 import { RRR } from "./wjwt.constants"
+import { UUIDv4 } from "@ordo-pink/tau"
 
 export type R = Record<string, unknown>
 
@@ -15,7 +16,7 @@ export type TWJWT = (params: { alg: Algorithm; publicKey: CryptoKey; privateKey:
 /**
  * JWT subject. User id is stored here.
  */
-export type SUB = string
+export type SUB = UUIDv4
 
 /**
  * JWT audience.
@@ -31,7 +32,7 @@ export type IAT = number
  * JWT id. This value is the same for refresh token and access token. This way access token can
  * be revoked even if its expiration time hasn't come yet.
  */
-export type JTI = string
+export type JTI = UUIDv4
 
 /**
  * JWT issuer.

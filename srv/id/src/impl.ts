@@ -9,8 +9,6 @@ import { DynamoDBUserStorageAdapter } from "@ordo-pink/backend-dynamodb-user-rep
 import { createIDServer } from "@ordo-pink/backend-id-server"
 import { getc } from "@ordo-pink/getc"
 import { ConsoleLogger } from "@ordo-pink/logger"
-import { FSDataRepository } from "@ordo-pink/backend-fs-data-repository"
-import { FSMetadataRepository } from "@ordo-pink/backend-fs-metadata-repository"
 import { getPrivateKey, getPublicKey } from "./utils/get-key"
 import { MemoryTokenRepository } from "@ordo-pink/backend-memory-token-repository"
 import { FSUserRepository } from "@ordo-pink/backend-fs-user-repository"
@@ -30,8 +28,6 @@ const {
 	ID_REFRESH_TOKEN_PRIVATE_KEY_PATH,
 	ID_REFRESH_TOKEN_PUBLIC_KEY_PATH,
 	ID_USER_TABLE_NAME,
-	DATA_DATA_PATH,
-	DATA_METADATA_PATH,
 	WORKSPACE_HOST,
 	WEB_HOST,
 } = getc([
@@ -80,9 +76,6 @@ const main = async () => {
 		namedCurve: "P-384",
 	} as any)
 
-	const dataRepository = FSDataRepository.of({ root: DATA_DATA_PATH })
-	const metadataRepository = FSMetadataRepository.of({ root: DATA_METADATA_PATH })
-
 	const tokenRepository = await MemoryTokenRepository.create("./var/srv/id/tokens.json")
 	const userRepository =
 		ID_USER_REPOSITORY === "dynamodb"
@@ -98,8 +91,6 @@ const main = async () => {
 	const app = await createIDServer({
 		userRepository,
 		tokenRepository,
-		dataRepository,
-		metadataRepository,
 		origin: [WEB_HOST, WORKSPACE_HOST],
 		accessKeys: { privateKey: accessTokenPrivateKey, publicKey: accessTokenPublicKey },
 		refreshKeys: { privateKey: refreshTokenPrivateKey, publicKey: refreshTokenPublicKey },

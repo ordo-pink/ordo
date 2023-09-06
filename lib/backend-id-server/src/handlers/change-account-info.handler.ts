@@ -7,7 +7,7 @@
 
 import { TTokenService } from "@ordo-pink/backend-token-service"
 import { PublicUser, UserService } from "@ordo-pink/backend-user-service"
-import { sendError, useBearerAuthorization, useBody } from "@ordo-pink/backend-utils"
+import { sendError, authenticate0, parseBody0 } from "@ordo-pink/backend-utils"
 import { Oath } from "@ordo-pink/oath"
 import { HttpError } from "@ordo-pink/rrr"
 import { isString } from "@ordo-pink/tau"
@@ -21,14 +21,14 @@ export const handleChangeAccountInfo: Fn =
 	({ tokenService, userService }) =>
 	ctx =>
 		Oath.all({
-			body: useBody<Body>(ctx).chain(({ firstName, lastName }) =>
+			body: parseBody0<Body>(ctx).chain(({ firstName, lastName }) =>
 				Oath.fromBoolean(
 					() => isString(firstName) || isString(lastName),
 					() => ({ firstName, lastName }),
 					() => HttpError.BadRequest("Invalid body"),
 				),
 			),
-			authorization: useBearerAuthorization(ctx, tokenService),
+			authorization: authenticate0(ctx, tokenService),
 		})
 			.chain(({ body, authorization }) =>
 				userService

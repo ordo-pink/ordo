@@ -11,7 +11,7 @@ import { isObject } from "@ordo-pink/tau"
 import { HttpError } from "@ordo-pink/rrr"
 import { Switch } from "@ordo-pink/switch"
 
-export const useBody = <T>(
+export const parseBody0 = <T>(
 	ctx: Context,
 	expect: "string" | "array" | "object" = "object",
 ): Oath<T, HttpError> =>

@@ -11,7 +11,7 @@ import type { UserService } from "@ordo-pink/backend-user-service"
 import type { User } from "@ordo-pink/backend-user-service"
 
 import validator from "validator"
-import { useBearerAuthorization, useBody } from "@ordo-pink/backend-utils"
+import { authenticate0, parseBody0 } from "@ordo-pink/backend-utils"
 import { sendError } from "@ordo-pink/backend-utils"
 import { Oath } from "@ordo-pink/oath"
 import { HttpError } from "@ordo-pink/rrr"
@@ -24,8 +24,8 @@ export const handleChangeEmail: Fn =
 	({ tokenService, userService }) =>
 	ctx =>
 		Oath.all({
-			token: useBearerAuthorization(ctx, tokenService),
-			body: useBody<Body>(ctx),
+			token: authenticate0(ctx, tokenService),
+			body: parseBody0<Body>(ctx),
 		})
 			.chain(({ token, body }) =>
 				Oath.all({

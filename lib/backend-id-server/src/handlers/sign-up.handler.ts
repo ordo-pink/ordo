@@ -5,14 +5,12 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-import type { TDataService } from "@ordo-pink/backend-data-service"
 import type { TTokenService } from "@ordo-pink/backend-token-service"
 import type { UserService } from "@ordo-pink/backend-user-service"
 import type { Middleware } from "koa"
 import validator from "validator"
 import { okpwd } from "@ordo-pink/okpwd"
-import { sendError, useBody } from "@ordo-pink/backend-utils"
-import { Readable } from "stream"
+import { sendError, parseBody0 } from "@ordo-pink/backend-utils"
 import { Oath } from "@ordo-pink/oath"
 import { HttpError } from "@ordo-pink/rrr"
 
@@ -20,14 +18,13 @@ type Body = { email?: string; password?: string }
 type Params = {
 	userService: UserService
 	tokenService: TTokenService
-	dataService: TDataService<Readable>
 }
 type Fn = (params: Params) => Middleware
 
 export const handleSignUp: Fn =
-	({ userService, tokenService, dataService }) =>
+	({ userService, tokenService }) =>
 	ctx =>
-		useBody<Body>(ctx)
+		parseBody0<Body>(ctx)
 			.chain(body =>
 				Oath.all({
 					email: Oath.fromNullable(body.email)
@@ -70,9 +67,7 @@ export const handleSignUp: Fn =
 					.createPair({ sub: user.id })
 					.rejectedMap(HttpError.from)
 					.chain(tokens =>
-						dataService
-							.createUserSpace(tokens.sub)
-							.rejectedMap(HttpError.from)
+						Oath.of(tokens)
 							.map(() => new Date(Date.now() + tokens.exp))
 							.tap(expires => {
 								ctx.response.set(

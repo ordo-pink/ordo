@@ -52,6 +52,19 @@ export class Oath<TRight, TLeft = never> {
 		return f() ? Oath.resolve(onTrue()) : Oath.reject(onFalse())
 	}
 
+	public static ifElse<C, T = C, F = C>(
+		validate: (x: C) => boolean,
+		{
+			onTrue = x => x as any,
+			onFalse = x => x as any,
+		}: {
+			onTrue?: (x: C) => T
+			onFalse?: (x: C) => F
+		},
+	) {
+		return (x: C) => (validate(x) ? Oath.resolve(onTrue(x)) : Oath.reject(onFalse(x)))
+	}
+
 	public static try<TRight, TLeft = Error>(f: () => TRight): Oath<Awaited<TRight>, TLeft> {
 		return new Oath(async (resolve, reject) => {
 			try {

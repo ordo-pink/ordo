@@ -2,14 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 import Null from "$components/null"
-import {
-	Directory,
-	DirectoryPath,
-	DirectoryUtils,
-	File,
-	FilePath,
-	FileUtils,
-} from "@ordo-pink/data"
+import { PlainData, Data, FSID } from "@ordo-pink/data"
 import { Either } from "@ordo-pink/either"
 import { Activity, cmd, useSharedContext } from "@ordo-pink/frontend-core"
 import { MouseEvent, useEffect, useState } from "react"
@@ -18,14 +11,12 @@ import DirectoryCardComponent from "./directory-card.component"
 import { Switch } from "@ordo-pink/switch"
 import { Nullable } from "@ordo-pink/tau"
 
-type Path = DirectoryPath | FilePath
-
 export default function FileExplorerActivityComponent({
 	commands,
 }: Pick<Activity.ComponentProps, "commands">) {
 	const { metadata, currentRoute } = useSharedContext()
-	const [selectedItems, setSelectedItems] = useState<Path[]>([])
-	const [currentDirectory, setCurrentDirectory] = useState<Nullable<Directory>>(null)
+	const [selectedItems, setSelectedItems] = useState<FSID[]>([])
+	const [currentDirectory, setCurrentDirectory] = useState<Nullable<PlainData>>(null)
 
 	const showContextMenu = (event: MouseEvent<HTMLDivElement>) =>
 		commands.emit<cmd.contextMenu.show>("context-menu.show", { event, payload: currentDirectory })
@@ -34,66 +25,60 @@ export default function FileExplorerActivityComponent({
 		Switch.of(true)
 			.case(!currentRoute || !metadata, () => setCurrentDirectory(null))
 			.case(currentRoute!.path === "/fs", () =>
-				Either.fromNullable(metadata)
-					.chain(items => Either.fromNullable(items.find(item => item.path === "/")))
-					.fold(
-						() => setCurrentDirectory(null),
-						root => setCurrentDirectory(root as Directory),
-					),
+				Either.fromNullable(metadata).fold(
+					() => setCurrentDirectory(null),
+					root => setCurrentDirectory(null),
+				),
 			)
 			.default(() =>
 				Either.fromNullable(metadata)
 					.chain(items =>
-						Either.fromNullable(items.find(item => item.path === currentRoute!.path.slice(3))),
+						Either.fromNullable(items.find(item => item.fsid === currentRoute!.path.slice(4))),
 					)
 					.fold(
 						() => setCurrentDirectory(null),
-						root => setCurrentDirectory(root as Directory),
+						root => setCurrentDirectory(root),
 					),
 			)
 	}, [metadata, currentRoute])
 
-	useEffect(() => {
-		commands.emit<cmd.sidebar.enable>("sidebar.enable")
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [])
-
-	return Either.fromNullable(currentDirectory)
-		.chain(dir =>
-			Either.fromNullable(metadata).map(items => DirectoryUtils.getDirectChildren(items, dir)),
-		)
-
-		.fold(Null, items => (
-			<div className="h-full w-full" onContextMenu={showContextMenu}>
-				<div className="file-explorer w-full container grid grid-cols-3 md:grid-cols-6 lg:grid-cols-12 gap-4 p-4">
-					{items
-						.filter(item => item.path !== "/")
-						.map(item => (
-							<div
-								key={item.path}
-								className={`cursor-pointer max-h-min select-none p-2 rounded-lg ${
-									selectedItems.includes(item.path) ? "bg-neutral-300 dark:bg-neutral-700" : ""
-								}`}
-								onClick={() =>
-									selectedItems.includes(item.path)
-										? setSelectedItems([])
-										: setSelectedItems([item.path])
-								}
-								onDoubleClick={() => {
-									if (DirectoryUtils.isDirectory(item))
-										return commands.emit<cmd.router.navigate>("router.navigate", `/fs${item.path}`)
-									alert("TODO")
-								}}
-							>
-								{Switch.of(item)
-									.case(DirectoryUtils.isDirectory, () => (
-										<DirectoryCardComponent directory={item as Directory} />
-									))
-									.case(FileUtils.isFile, () => <FileCardComponent file={item as File} />)
-									.default(Null)}
-							</div>
-						))}
-				</div>
+	return Either.fromNullable(metadata).fold(Null, items => (
+		<div className="h-full w-full" onContextMenu={showContextMenu}>
+			<div className="file-explorer w-full container grid grid-cols-3 md:grid-cols-6 lg:grid-cols-12 gap-4 p-4">
+				{items
+					.filter(item =>
+						currentDirectory ? item.parent === currentDirectory.fsid : item.parent === null,
+					)
+					.map(item => (
+						<div
+							key={item.fsid}
+							className={`cursor-pointer max-h-min select-none p-2 rounded-lg ${
+								selectedItems.includes(item.fsid) ? "bg-neutral-300 dark:bg-neutral-700" : ""
+							}`}
+							onClick={() =>
+								selectedItems.includes(item.fsid)
+									? setSelectedItems([])
+									: setSelectedItems([item.fsid])
+							}
+							onDoubleClick={() => {
+								if (item.children.length)
+									return commands.emit<cmd.router.navigate>("router.navigate", `/fs/${item.fsid}`)
+								alert("TODO")
+							}}
+						>
+							{Switch.of(item)
+								.case(
+									item => item.children.length > 0,
+									() => <DirectoryCardComponent plain={item} />,
+								)
+								.case(
+									item => item.children.length === 0,
+									() => <FileCardComponent plain={item} />,
+								)
+								.default(Null)}
+						</div>
+					))}
 			</div>
-		))
+		</div>
+	))
 }

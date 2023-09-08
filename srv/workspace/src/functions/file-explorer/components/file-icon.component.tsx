@@ -1,13 +1,11 @@
 // SPDX-FileCopyrightText: Copyright 2023, 谢尔盖||↓ and the Ordo.pink contributors
 // SPDX-License-Identifier: MIT
 
-import { File, FileUtils } from "@ordo-pink/data"
+import { PlainData } from "@ordo-pink/data"
 import { Switch } from "@ordo-pink/switch"
 import { BsFileBinary } from "react-icons/bs"
 
-type P = { file: File }
-export default function FileIconComponent({ file }: P) {
-	return Switch.of(FileUtils.getExtension(file.path)).default(() => (
-		<BsFileBinary className="w-full h-full" />
-	))
+type P = { plain: PlainData }
+export default function FileIconComponent({ plain }: P) {
+	return Switch.of(plain.name).default(() => <BsFileBinary className="w-full h-full" />)
 }

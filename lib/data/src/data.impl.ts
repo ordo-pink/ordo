@@ -1,6 +1,7 @@
 // SPDX-FileCopyrightText: Copyright 2023, 谢尔盖||↓ and the Ordo.pink contributors
 // SPDX-License-Identifier: MIT
 
+import { Either } from "@ordo-pink/either"
 import { validations } from "./data-validations.impl"
 import { PlainData, TData, DataStatic, FSID } from "./data.types"
 import { Errors } from "./errors.impl"
@@ -35,6 +36,13 @@ const setParentE =
 		validations
 			.isValidParentE(parent)
 			.chain(parent => validations.isValidSubE(updatedBy).map(updatedBy => ({ parent, updatedBy })))
+			.chain(({ parent, updatedBy }) =>
+				Either.fromBoolean(
+					() => parent !== plain.fsid,
+					() => ({ parent, updatedBy }),
+					() => Data.Errors.SelfReferencingParent,
+				),
+			)
 			.map(extend(() => ({ updatedAt: Date.now() })))
 			.map(increment => Data.of({ ...plain, ...increment }))
 
@@ -44,6 +52,13 @@ const addChildE =
 		validations
 			.isValidFsidE(child)
 			.chain(child => validations.isValidSubE(updatedBy).map(updatedBy => ({ child, updatedBy })))
+			.chain(({ child, updatedBy }) =>
+				Either.fromBoolean(
+					() => child !== plain.fsid,
+					() => ({ child, updatedBy }),
+					() => Data.Errors.SelfReferencingChild,
+				),
+			)
 			.map(({ child, updatedBy }) => ({ updatedBy, children: addUnique(plain.children, child) }))
 			.map(extend(() => ({ updatedAt: Date.now() })))
 			.map(increment => Data.of({ ...plain, ...increment }))
@@ -73,6 +88,13 @@ const addLinkE =
 		validations
 			.isValidFsidE(link)
 			.chain(link => validations.isValidSubE(updatedBy).map(updatedBy => ({ link, updatedBy })))
+			.chain(({ link, updatedBy }) =>
+				Either.fromBoolean(
+					() => link !== plain.fsid,
+					() => ({ link, updatedBy }),
+					() => Data.Errors.SelfReferencingLink,
+				),
+			)
 			.map(({ link, updatedBy }) => ({ updatedBy, links: addUnique(plain.links, link) }))
 			.map(extend(() => ({ updatedAt: Date.now() })))
 			.map(increment => Data.of({ ...plain, ...increment }))

@@ -7,19 +7,10 @@ import { Switch } from "@ordo-pink/switch"
 import FileExplorerActivityComponent from "./components/file-explorer-activity.component"
 import FileExplorerIcon from "./components/file-explorer-icon.component"
 import FileExplorerCardComponent from "./components/file-explorer-card.component"
-import {
-	BsFileMinus,
-	BsFilePlus,
-	BsFolderCheck,
-	BsFolderMinus,
-	BsFolderPlus,
-	BsPencilSquare,
-	BsUpload,
-} from "react-icons/bs"
-import { BehaviorSubject } from "rxjs"
-import { Directory, DirectoryPath, DirectoryUtils, FSEntity, FileUtils } from "@ordo-pink/data"
+import { BsNodePlus, BsNodeMinus } from "react-icons/bs"
+import { PlainData } from "@ordo-pink/data"
 
-type openInFileExplorer = { name: "file-explorer.go-to"; payload: DirectoryPath }
+type openInFileExplorer = { name: "file-explorer.go-to"; payload: { data: PlainData } }
 type openRootInFileExplorer = { name: "file-explorer.open-root" }
 
 export default function createFileExplorerFunction({
@@ -33,97 +24,95 @@ export default function createFileExplorerFunction({
 		commands.emit<cmd.router.navigate>("router.navigate", "/fs"),
 	)
 
-	commands.emit<cmd.contextMenu.add>("context-menu.add", {
-		commandName: "data.show-create-directory-modal",
-		Icon: BsFolderPlus,
-		readableName: "Create directory",
-		shouldShow: ({ payload }) => payload && DirectoryUtils.isDirectory(payload),
-		type: "create",
-		accelerator: "meta+shift+n",
-	})
+	// commands.emit<cmd.contextMenu.add>("context-menu.add", {
+	// 	commandName: "data.show-create-directory-modal",
+	// 	Icon: BsFolderPlus,
+	// 	readableName: "Create directory",
+	// 	shouldShow: ({ payload }) => payload && DirectoryUtils.isDirectory(payload),
+	// 	type: "create",
+	// 	accelerator: "meta+shift+n",
+	// })
+
+	// commands.emit<cmd.contextMenu.add>("context-menu.add", {
+	// 	commandName: "data.show-rename-directory-modal",
+	// 	Icon: BsPencilSquare,
+	// 	readableName: "Rename directory",
+	// 	shouldShow: ({ payload }) =>
+	// 		payload && DirectoryUtils.isDirectory(payload) && payload.path !== "/",
+	// 	type: "update",
+	// })
+
+	// commands.emit<cmd.contextMenu.add>("context-menu.add", {
+	// 	commandName: "data.show-remove-directory-modal",
+	// 	Icon: BsFolderMinus,
+	// 	readableName: "Remove directory",
+	// 	shouldShow: ({ payload }) =>
+	// 		payload && DirectoryUtils.isDirectory(payload) && payload.path !== "/",
+	// 	type: "delete",
+	// })
 
 	commands.emit<cmd.contextMenu.add>("context-menu.add", {
-		commandName: "data.show-rename-directory-modal",
-		Icon: BsPencilSquare,
-		readableName: "Rename directory",
-		shouldShow: ({ payload }) =>
-			payload && DirectoryUtils.isDirectory(payload) && payload.path !== "/",
-		type: "update",
-	})
-
-	commands.emit<cmd.contextMenu.add>("context-menu.add", {
-		commandName: "data.show-remove-directory-modal",
-		Icon: BsFolderMinus,
-		readableName: "Remove directory",
-		shouldShow: ({ payload }) =>
-			payload && DirectoryUtils.isDirectory(payload) && payload.path !== "/",
-		type: "delete",
-	})
-
-	commands.emit<cmd.contextMenu.add>("context-menu.add", {
-		commandName: "data.show-create-file-modal",
-		Icon: BsFilePlus,
-		readableName: "Create file",
-		shouldShow: ({ payload }) => payload && DirectoryUtils.isDirectory(payload),
+		commandName: "data.show-create-modal",
+		Icon: BsNodePlus,
+		readableName: "Add page",
+		shouldShow: ({ payload }) => payload && payload.fsid,
 		type: "create",
 		accelerator: "meta+n",
 	})
 
-	commands.emit<cmd.contextMenu.add>("context-menu.add", {
-		commandName: "data.show-upload-modal",
-		Icon: BsUpload,
-		readableName: "Upload files",
-		shouldShow: ({ payload }) => payload && DirectoryUtils.isDirectory(payload),
-		type: "create",
-		accelerator: "mod+u",
-	})
+	// commands.emit<cmd.contextMenu.add>("context-menu.add", {
+	// 	commandName: "data.show-upload-modal",
+	// 	Icon: BsUpload,
+	// 	readableName: "Upload files",
+	// 	shouldShow: ({ payload }) => payload && DirectoryUtils.isDirectory(payload),
+	// 	type: "create",
+	// 	accelerator: "mod+u",
+	// })
 
 	commands.emit<cmd.contextMenu.add>("context-menu.add", {
-		commandName: "data.show-remove-file-modal",
-		Icon: BsFileMinus,
-		readableName: "Remove file",
-		shouldShow: ({ payload }) => payload && FileUtils.isFile(payload),
+		commandName: "data.show-remove-modal",
+		Icon: BsNodeMinus,
+		readableName: "Remove",
+		shouldShow: ({ payload }) => payload && payload.fsid,
 		type: "delete",
 	})
 
 	commands.emit<cmd.activities.add>("activities.add", {
 		Component: props => <FSActivity {...props} />,
 		name: "file-explorer",
-		routes: ["/fs", "/fs/:path*"],
+		routes: ["/fs", "/fs/:fsid"],
 	})
 
-	commands.emit<cmd.commandPalette.add>("command-palette.add", {
-		id: "file-explorer.open-in-file-explorer",
-		readableName: "Go to File Explorer",
-		accelerator: "mod+shift+e",
-		Icon: FileExplorerIcon,
-		onSelect: () => {
-			commands.emit<cmd.commandPalette.hide>("command-palette.hide")
-			commands.emit<openRootInFileExplorer>("file-explorer.open-root")
-		},
-	})
+	// commands.emit<cmd.commandPalette.add>("command-palette.add", {
+	// 	id: "file-explorer.open-in-file-explorer",
+	// 	readableName: "Go to File Explorer",
+	// 	accelerator: "mod+shift+e",
+	// 	Icon: FileExplorerIcon,
+	// 	onSelect: () => {
+	// 		commands.emit<cmd.commandPalette.hide>("command-palette.hide")
+	// 		commands.emit<openRootInFileExplorer>("file-explorer.open-root")
+	// 	},
+	// })
 
-	commands.emit<cmd.commandPalette.add>("command-palette.add", {
-		id: "file-explorer.choose-directory",
-		readableName: "Open directory in File Explorer...",
-		Icon: BsFolderCheck,
-		onSelect: () => {
-			commands.emit<cmd.commandPalette.hide>("command-palette.hide")
-			commands.emit<cmd.commandPalette.show>(
-				"command-palette.show",
-				(metadata$ as BehaviorSubject<FSEntity[]>).value.map(item => ({
-					id: item.path,
-					readableName: item.path,
-					onSelect: () => {
-						commands.emit<cmd.commandPalette.hide>("command-palette.hide")
-						item.path === "/"
-							? commands.emit<openRootInFileExplorer>("file-explorer.open-root")
-							: commands.emit<openInFileExplorer>("file-explorer.go-to", (item as Directory).path)
-					},
-				})),
-			)
-		},
-	})
+	// commands.emit<cmd.commandPalette.add>("command-palette.add", {
+	// 	id: "file-explorer.choose-directory",
+	// 	readableName: "Open directory in File Explorer...",
+	// 	Icon: BsFolderCheck,
+	// 	onSelect: () => {
+	// 		commands.emit<cmd.commandPalette.hide>("command-palette.hide")
+	// 		commands.emit<cmd.commandPalette.show>(
+	// 			"command-palette.show",
+	// 			(metadata$ as BehaviorSubject<PlainData[]>).value.map(item => ({
+	// 				id: item.fsid,
+	// 				readableName: item.name,
+	// 				onSelect: () => {
+	// 					commands.emit<cmd.commandPalette.hide>("command-palette.hide")
+	// 					commands.emit<openInFileExplorer>("file-explorer.go-to", (item as Directory).path)
+	// 				},
+	// 			})),
+	// 		)
+	// 	},
+	// })
 }
 
 type P = Activity.ComponentProps

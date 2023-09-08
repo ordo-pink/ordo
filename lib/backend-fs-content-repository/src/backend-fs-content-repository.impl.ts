@@ -43,12 +43,16 @@ const of = ({ root }: Params): ContentRepository<Readable> => ({
 				Oath.try(() => createWriteStream(path))
 					.rejectedMap(() => "Data not found" as const)
 					.chain(file =>
-						Oath.try(
+						Oath.from(
 							() =>
 								new Promise((resolve, reject) => {
-									content.pipe(file).on("error", reject).on("finish", resolve)
+									file.on("finish", resolve)
+									file.on("error", reject)
+									content.on("error", reject)
+									content.pipe(file)
 								}),
 						)
+
 							.rejectedMap(() => "Data not found" as const)
 							.chain(() => stat0(path))
 							.map(stat => Number(stat.size)),

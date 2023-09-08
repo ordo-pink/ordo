@@ -2,34 +2,35 @@
 // SPDX-License-Identifier: MIT
 
 import { OrdoButtonSecondary, OrdoButtonPrimary } from "$components/buttons/buttons"
-import { PathBreadcrumbs } from "$components/path-breadcrumbs/path-breadcrumbs"
-import { Directory, DirectoryUtils } from "@ordo-pink/data"
+// import { PathBreadcrumbs } from "$components/path-breadcrumbs/path-breadcrumbs"
+import { PlainData } from "@ordo-pink/data"
 import { cmd, useSharedContext } from "@ordo-pink/frontend-core"
+import { Nullable, isNonEmptyString } from "@ordo-pink/tau"
 
 import { ChangeEvent, useState } from "react"
-import { BsFolderPlus } from "react-icons/bs"
+import { BsNodePlus } from "react-icons/bs"
 
 type Props = {
-	parent?: Directory
+	parent: Nullable<PlainData>
 }
 
-export default function CreateDirectoryModal({ parent }: Props) {
+export default function CreatePageModal({ parent }: Props) {
 	const { commands } = useSharedContext()
-	const [directoryName, setDirectoryName] = useState("")
+	const [name, setName] = useState("")
+	console.log(parent)
 
-	const handleInputChange = (event: ChangeEvent<HTMLInputElement>) =>
-		setDirectoryName(event.target.value)
+	const handleInputChange = (event: ChangeEvent<HTMLInputElement>) => setName(event.target.value)
 
-	const handleCreateDirectory = () => {
-		const parentPath = parent ? parent.path : "/"
-		const path = `${parentPath}${directoryName}/` as const
-
-		commands.emit<cmd.data.directory.create>("data.create-directory", { path })
+	const handleCreateFile = () => {
+		commands.emit<cmd.data.create>("data.create", {
+			name,
+			parent: parent?.fsid ?? null,
+		})
 		commands.emit<cmd.modal.hide>("modal.hide")
 	}
 
-	const tPlaceholder = "E.g. 123/123"
-	const tTitle = "Create directory"
+	const tPlaceholder = "Add your page name here..."
+	const tTitle = "Add page"
 	const tCancel = "Cancel"
 	const tCreate = "Create"
 
@@ -37,13 +38,13 @@ export default function CreateDirectoryModal({ parent }: Props) {
 		<div className="w-[30rem] max-w-full flex flex-col gap-8">
 			<div className="flex space-x-2 px-8 pt-8 items-center">
 				<div className="bg-gradient-to-tr from-slate-400 dark:from-slate-600 to-zinc-400 dark:to-zinc-600 rounded-full text-xl text-neutral-200 p-3 shadow-md">
-					<BsFolderPlus />
+					<BsNodePlus />
 				</div>
 				<div className="grow flex flex-col gap-y-4">
 					<h3 className="px-8 text-lg font-bold">{tTitle}</h3>
 
 					<div className="pl-8">
-						<PathBreadcrumbs path={parent?.path ?? "/"} />
+						{/* <PathBreadcrumbs path={parent?.path ?? "/"} /> */}
 						<input
 							className="w-full rounded-lg bg-neutral-200 dark:bg-neutral-600 px-4 py-2 shadow-inner outline-none"
 							placeholder={tPlaceholder}
@@ -51,7 +52,7 @@ export default function CreateDirectoryModal({ parent }: Props) {
 							autoComplete="off"
 							aria-autocomplete="none"
 							autoFocus
-							value={directoryName}
+							value={name}
 							onChange={handleInputChange}
 						/>
 					</div>
@@ -66,8 +67,8 @@ export default function CreateDirectoryModal({ parent }: Props) {
 				</OrdoButtonSecondary>
 
 				<OrdoButtonPrimary
-					disabled={!DirectoryUtils.isValidPath(`/${directoryName}/`)}
-					onClick={handleCreateDirectory}
+					disabled={!isNonEmptyString(name)}
+					onClick={handleCreateFile}
 					hotkey="mod+enter"
 				>
 					{tCreate}

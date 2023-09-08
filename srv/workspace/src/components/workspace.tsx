@@ -27,6 +27,15 @@ export default function Workspace({ commandPalette$, sidebar$, currentActivity$ 
 	const sidebar = useStrictSubscription(sidebar$, { disabled: true })
 	const activity = useSubscription(currentActivity$)
 
+	useEffect(() => {
+		if (activity?.Sidebar) {
+			commands.emit<cmd.sidebar.enable>("sidebar.enable")
+		} else {
+			commands.emit<cmd.sidebar.disable>("sidebar.disable")
+		}
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [activity?.Sidebar?.displayName, activity?.name])
+
 	return Either.fromNullable(sidebar)
 		.chain(state => Either.fromBoolean(() => !state.disabled).map(() => sidebar$))
 		.fold(
@@ -102,7 +111,7 @@ const EnabledSidebar = ({ sidebar$, activity, commandPalette$ }: EnabledSidebarP
 
 	return Either.fromNullable(activity).fold(
 		() => <div>Welcome</div>,
-		({ Component }) => (
+		({ Component, Sidebar: SidebarComponent }) => (
 			<Split
 				className="flex overflow-hidden h-screen w-full"
 				sizes={sizes}
@@ -113,7 +122,9 @@ const EnabledSidebar = ({ sidebar$, activity, commandPalette$ }: EnabledSidebarP
 				direction="horizontal"
 			>
 				<div className={`sidebar h-full ${sizes[0] <= 5 ? "hidden" : "block"}`}>
-					<Sidebar sidebar$={sidebar$} commandPalette$={commandPalette$} isNarrow={isNarrow} />
+					<Sidebar sidebar$={sidebar$} commandPalette$={commandPalette$} isNarrow={isNarrow}>
+						{SidebarComponent && <SidebarComponent />}
+					</Sidebar>
 				</div>
 
 				<div

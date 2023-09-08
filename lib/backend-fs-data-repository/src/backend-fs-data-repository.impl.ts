@@ -74,7 +74,10 @@ const of = ({ root }: Params): DataRepository => ({
 			.chain(data =>
 				Oath.of(data.findIndex(item => item.fsid === plain.fsid))
 					.chain(Oath.ifElse(x => x >= 0, { onFalse: () => Data.Errors.DataNotFound }))
-					.map(index => data.splice(index, 1, plain))
+					.map(index => {
+						data.splice(index, 1, plain)
+						return data
+					})
 					.chain(data => write0(root, plain.createdBy, data).rejectedMap(UnexpectedError))
 					.map(() => "OK"),
 			),

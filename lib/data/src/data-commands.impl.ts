@@ -70,17 +70,12 @@ const of = <T>({ dataRepository, contentRepository }: DataCommandsParams<T>): TD
 			.chain(plain => Data.of(plain).removeLink(link, updatedBy).fold(Oath.reject, Oath.resolve))
 			.chain(data => dataRepository.update(data.plain)),
 	// TODO: Roll back on error
-	move: ({ createdBy, fsid, newParent, oldParent, updatedBy }) =>
+	move: ({ createdBy, fsid, parent, updatedBy }) =>
 		Oath.all({
-			newParent:
-				newParent &&
+			parent:
+				parent &&
 				dataRepository
-					.exists(createdBy, newParent)
-					.chain(Oath.ifElse(x => !!x, { onFalse: () => Errors.DataNotFound })),
-			oldParent:
-				oldParent &&
-				dataRepository
-					.exists(createdBy, oldParent)
+					.exists(createdBy, parent)
 					.chain(Oath.ifElse(x => !!x, { onFalse: () => Errors.DataNotFound })),
 			child: dataRepository
 				.exists(createdBy, fsid)
@@ -88,24 +83,23 @@ const of = <T>({ dataRepository, contentRepository }: DataCommandsParams<T>): TD
 		})
 			.chain(() => dataRepository.get(createdBy, fsid))
 			.chain(plain =>
-				Data.of(plain).setParent(newParent, updatedBy).fold(Oath.reject, Oath.resolve),
-			)
-			.chain(data => dataRepository.update(data.plain))
-			.chain(() =>
-				oldParent
-					? dataRepository.get(createdBy, oldParent).chain(plain =>
-							Data.of(plain)
+				plain.parent
+					? dataRepository.get(createdBy, plain.parent).chain(parent =>
+							Data.of(parent)
 								.removeChild(fsid, updatedBy)
 								.fold(Oath.reject, Oath.resolve)
-								.chain(data => dataRepository.update(data.plain)),
+								.chain(data => dataRepository.update(data.plain))
+								.map(() => plain),
 					  )
-					: Oath.resolve("OK"),
+					: Oath.resolve(plain),
 			)
+			.chain(plain => Data.of(plain).setParent(parent, updatedBy).fold(Oath.reject, Oath.resolve))
+			.chain(data => dataRepository.update(data.plain))
 			.chain(() =>
-				newParent
-					? dataRepository.get(createdBy, newParent).chain(plain =>
+				parent
+					? dataRepository.get(createdBy, parent).chain(plain =>
 							Data.of(plain)
-								.removeChild(fsid, updatedBy)
+								.addChild(fsid, updatedBy)
 								.fold(Oath.reject, Oath.resolve)
 								.chain(data => dataRepository.update(data.plain)),
 					  )
@@ -153,7 +147,6 @@ const of = <T>({ dataRepository, contentRepository }: DataCommandsParams<T>): TD
 			.chain(plain =>
 				contentRepository
 					.write(createdBy, plain.fsid, content)
-					.tap(console.log)
 					.chain(size => Data.of(plain).setSize(size, updatedBy).fold(Oath.reject, Oath.resolve))
 					.chain(data => dataRepository.update(data.plain)),
 			),

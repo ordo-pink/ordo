@@ -19,6 +19,8 @@ type Props = {
 	style?: CSSProperties
 	disabled?: boolean
 	href?: string
+	className?: string
+	title?: string
 	onClick?: MouseEventHandler
 	onMouseEnter?: MouseEventHandler
 	onMouseLeave?: MouseEventHandler
@@ -35,6 +37,8 @@ export default function ActionListItem({
 	current,
 	large,
 	disabled,
+	className,
+	title,
 	onClick = noop,
 	onMouseEnter = noop,
 	onMouseLeave = noop,
@@ -45,10 +49,14 @@ export default function ActionListItem({
 	const bottom = Array.isArray(children) ? children[1] : null
 
 	return href ? (
-		<Link className="no-underline !text-neutral-800 dark:!text-neutral-200" href={href}>
+		<Link
+			className={`no-underline !text-neutral-800 dark:!text-neutral-200 ${className}`}
+			href={href}
+		>
 			<div
+				title={title ?? text}
 				className={`p-2 md:py-0.5 rounded-md flex space-x-8 justify-between items-center select-none ${
-					large && "p-4 text-lg"
+					large && "p-4 md:py-2 text-lg"
 				} ${
 					disabled
 						? "text-neutral-300 dark:text-neutral-400"

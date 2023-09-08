@@ -4,17 +4,7 @@
 import type { IconType } from "react-icons"
 import type { ComponentType, MouseEvent } from "react"
 import type { Nullable, Thunk, Unary } from "@ordo-pink/tau"
-import type {
-	FilePath,
-	DirectoryPath,
-	CreateDirectoryParams,
-	CreateFileParams,
-	UpdateDirectoryParams,
-	UpdateFileParams,
-	FSEntity,
-	Directory,
-	File,
-} from "@ordo-pink/data"
+import type { FSID, PlainData } from "@ordo-pink/data"
 import type { Observable } from "rxjs"
 import { Logger } from "@ordo-pink/logger"
 import { ComponentSpace } from "./constants/component-space.constants"
@@ -22,7 +12,7 @@ import { ComponentSpace } from "./constants/component-space.constants"
 export namespace Functions {
 	export type CreateFunctionParams = {
 		commands: Commands.Commands
-		metadata$: Nullable<Observable<FSEntity[]>>
+		metadata$: Nullable<Observable<PlainData[]>>
 	}
 	export type CreateFunctionFn = Unary<Functions.CreateFunctionParams, void | Promise<void>>
 }
@@ -46,45 +36,18 @@ export namespace cmd {
 
 	export namespace data {
 		export type refreshRoot = { name: "data.refresh-root" }
-		export type getFileContent = { name: "data.get-file-content"; payload: FilePath }
-		export type showUploadModal = { name: "data.show-upload-modal"; payload?: Directory }
-
-		export namespace file {
-			export type showCreateModal = { name: "data.show-create-file-modal"; payload?: Directory }
-			export type showRemoveModal = { name: "data.show-remove-file-modal"; payload: File }
-			export type showRenameModal = { name: "data.show-rename-file-modal"; payload: File }
-			export type setContent = {
-				name: "data.set-file-content"
-				payload: { path: FilePath; content: string | ArrayBuffer }
-			}
-			export type create = { name: "data.create-file"; payload: CreateFileParams }
-			export type update = {
-				name: "data.update-file"
-				payload: { path: FilePath; update: UpdateFileParams }
-			}
-			export type remove = { name: "data.remove-file"; payload: FilePath }
+		export type getFileContent = { name: "data.get-content"; payload: { fsid: FSID } }
+		export type showUploadModal = { name: "data.show-upload-modal"; payload: Nullable<PlainData> }
+		export type showCreateModal = { name: "data.show-create-modal"; payload: Nullable<PlainData> }
+		export type showRemoveModal = { name: "data.show-remove-modal"; payload: PlainData }
+		export type showRenameModal = { name: "data.show-rename-modal"; payload: { fsid: FSID } }
+		export type setContent = {
+			name: "data.set-content"
+			payload: { fsid: FSID; content: string | ArrayBuffer }
 		}
-
-		export namespace directory {
-			export type showCreateModal = {
-				name: "data.show-create-directory-modal"
-				payload?: Directory
-			}
-			export type showRemoveModal = {
-				name: "data.show-remove-directory-modal"
-				payload: Directory
-			}
-			export type showRenameModal = {
-				name: "data.show-rename-directory-modal"
-				payload: Directory
-			}
-			export type create = { name: "data.create-directory"; payload: CreateDirectoryParams }
-			export type update = {
-				name: "data.update-directory"
-				payload: { path: DirectoryPath; update: UpdateDirectoryParams }
-			}
-			export type remove = { name: "data.remove-directory"; payload: DirectoryPath }
-		}
+		export type create = { name: "data.create"; payload: { name: string; parent: Nullable<FSID> } }
+		export type remove = { name: "data.remove"; payload: { fsid: FSID } }
+		export type move = { name: "data.move"; payload: { fsid: FSID; parent: Nullable<FSID> } }
 	}
 
 	export namespace contextMenu {
@@ -135,6 +98,7 @@ export namespace Activity {
 		name: string
 		routes: string[]
 		Component: ComponentType<Activity.ComponentProps>
+		Sidebar?: ComponentType
 		background?: boolean
 	}
 

@@ -5,63 +5,43 @@ import { cmd } from "@ordo-pink/frontend-core"
 import { getCommands } from "./commands"
 import { rrrToNotification } from "$utils/error-to-notification"
 import { Hosts } from "$utils/hosts"
-import { FSEntity } from "@ordo-pink/data/src/common"
 import { Oath } from "@ordo-pink/oath"
 import { BehaviorSubject, Observable } from "rxjs"
 import { Logger } from "@ordo-pink/logger"
 import { __Auth$ } from "./auth"
 import { Unary } from "@ordo-pink/tau"
 import { AuthResponse } from "@ordo-pink/backend-id-server"
-import CreateDirectoryModal from "$components/modals/create-directory-modal.component"
-import { BsFolderPlus, BsUpload } from "react-icons/bs"
-import RemoveDirectoryModal from "$components/modals/remove-directory-modal.component"
-import CreateFileModal from "$components/modals/create-file-modal.component"
-import RemoveFileModal from "$components/modals/remove-file-modal.component"
+import { BsNodePlus, BsUpload } from "react-icons/bs"
+import CreatePageModal from "$components/modals/create-page-modal.component"
 import UploadFilesModal from "$components/modals/upload-files-modal.component"
-import RenameDirectoryModal from "$components/modals/rename-directory-modal.component"
+import { DataCommands, PlainData } from "@ordo-pink/data"
+import { ClientDataRepository } from "../repositories/client-data-repository.impl"
+import { ClientContentRepository } from "../repositories/client-content-repository"
+import RemoveFileModal from "$components/modals/remove-page-modal.component"
 
 const commands = getCommands()
 
-export type __Metadata$ = Observable<FSEntity[]>
+export type __Metadata$ = Observable<PlainData[]>
 type Params = { logger: Logger; auth$: __Auth$ }
 type Fn = Unary<Params, __Metadata$>
+
 export const __initData: Fn = ({ logger, auth$ }) => {
-	commands.on<cmd.data.directory.showRemoveModal>(
-		"data.show-remove-directory-modal",
-		({ payload }) => {
-			commands.emit<cmd.modal.show>("modal.show", {
-				Component: () => <RemoveDirectoryModal directory={payload} />,
-			})
-		},
-	)
+	logger.debug("Initializing data")
 
-	commands.on<cmd.data.directory.showCreateModal>(
-		"data.show-create-directory-modal",
-		({ payload }) => {
-			commands.emit<cmd.modal.show>("modal.show", {
-				Component: () => <CreateDirectoryModal parent={payload} />,
-			})
-		},
-	)
+	const dataRepository = ClientDataRepository.of(metadata$, auth$ as any, commands)
+	const contentRepository = ClientContentRepository.of()
 
-	commands.on<cmd.data.directory.showRenameModal>(
-		"data.show-rename-directory-modal",
-		({ payload }) => {
-			commands.emit<cmd.modal.show>("modal.show", {
-				Component: () => <RenameDirectoryModal directory={payload} />,
-			})
-		},
-	)
+	const dataCommands = DataCommands.of({ dataRepository, contentRepository })
 
-	commands.on<cmd.data.file.showCreateModal>("data.show-create-file-modal", ({ payload }) => {
+	commands.on<cmd.data.showCreateModal>("data.show-create-modal", ({ payload }) => {
 		commands.emit<cmd.modal.show>("modal.show", {
-			Component: () => <CreateFileModal parent={payload} />,
+			Component: () => <CreatePageModal parent={payload} />,
 		})
 	})
 
-	commands.on<cmd.data.file.showRemoveModal>("data.show-remove-file-modal", ({ payload }) => {
+	commands.on<cmd.data.showRemoveModal>("data.show-remove-modal", ({ payload }) => {
 		commands.emit<cmd.modal.show>("modal.show", {
-			Component: () => <RemoveFileModal file={payload} />,
+			Component: () => <RemoveFileModal data={payload} />,
 		})
 	})
 
@@ -71,177 +51,135 @@ export const __initData: Fn = ({ logger, auth$ }) => {
 		})
 	})
 
-	commands.on<cmd.data.file.create>("data.create-file", ({ payload }) => {
+	commands.on<cmd.data.create>("data.create", ({ payload }) => {
 		const auth = (auth$ as BehaviorSubject<AuthResponse>).value
+		const { name, parent } = payload
 
-		Oath.fromNullable(auth)
-			.chain(auth =>
-				Oath.try(() =>
-					fetch(`${Hosts.DATA}/files/${auth.sub}`, {
-						method: "POST",
-						body: JSON.stringify(payload),
-						headers: {
-							"content-type": "application/json",
-							authorization: `Bearer ${auth.accessToken}`,
-						},
-					}).then(res => res.json()),
-				),
-			)
-			.chain(body => (body.success ? Oath.of(body.result) : Oath.reject(body.error as string)))
-			.rejectedMap(rrrToNotification("Error creating file"))
-			.fork(
-				item => {
-					commands.emit<cmd.notification.show>("notification.show", item)
-				},
-				() => {
-					commands.emit<cmd.data.refreshRoot>("data.refresh-root")
-				},
-			)
+		dataCommands.create({ name, parent, createdBy: auth.sub, updatedBy: auth.sub }).orNothing()
 	})
 
-	commands.on<cmd.data.file.remove>("data.remove-file", ({ payload }) => {
+	commands.on<cmd.data.remove>("data.remove", ({ payload }) => {
 		const auth = (auth$ as BehaviorSubject<AuthResponse>).value
 
-		Oath.fromNullable(auth)
-			.chain(auth =>
-				Oath.try(() =>
-					fetch(`${Hosts.DATA}/files/${auth.sub}${payload}`, {
-						method: "DELETE",
-						headers: {
-							"content-type": "application/json",
-							authorization: `Bearer ${auth.accessToken}`,
-						},
-					}).then(res => res.json()),
-				),
-			)
-			.chain(body => (body.success ? Oath.of(body.result) : Oath.reject(body.error as string)))
-			.rejectedMap(rrrToNotification("Error removing file"))
-			.fork(
-				item => {
-					commands.emit<cmd.notification.show>("notification.show", item)
-				},
-				() => {
-					commands.emit<cmd.data.refreshRoot>("data.refresh-root")
-				},
-			)
+		dataCommands.remove({ fsid: payload.fsid, createdBy: auth.sub }).orNothing()
 	})
 
-	commands.on<cmd.data.file.setContent>("data.set-file-content", ({ payload }) => {
-		const auth = (auth$ as BehaviorSubject<AuthResponse>).value
+	// commands.on<cmd.data.file.setContent>("data.set-file-content", ({ payload }) => {
+	// 	const auth = (auth$ as BehaviorSubject<AuthResponse>).value
 
-		Oath.fromNullable(auth)
-			.chain(auth =>
-				Oath.try(() =>
-					fetch(`${Hosts.DATA}/files/${auth.sub}${payload.path}`, {
-						method: "PUT",
-						headers: { authorization: `Bearer ${auth.accessToken}` },
-						body: payload.content,
-					}).then(res => res.json()),
-				),
-			)
-			.chain(body => (body.success ? Oath.of(body.result) : Oath.reject(body.error as string)))
-			.rejectedMap(rrrToNotification("Error uploading files"))
-			.fork(
-				item => {
-					commands.emit<cmd.notification.show>("notification.show", item)
-				},
-				() => {
-					commands.emit<cmd.data.refreshRoot>("data.refresh-root")
-				},
-			)
-	})
+	// 	Oath.fromNullable(auth)
+	// 		.chain(auth =>
+	// 			Oath.try(() =>
+	// 				fetch(`${Hosts.DATA}/files/${auth.sub}${payload.path}`, {
+	// 					method: "PUT",
+	// 					headers: { authorization: `Bearer ${auth.accessToken}` },
+	// 					body: payload.content,
+	// 				}).then(res => res.json()),
+	// 			),
+	// 		)
+	// 		.chain(body => (body.success ? Oath.of(body.result) : Oath.reject(body.error as string)))
+	// 		.rejectedMap(rrrToNotification("Error uploading files"))
+	// 		.fork(
+	// 			item => {
+	// 				commands.emit<cmd.notification.show>("notification.show", item)
+	// 			},
+	// 			() => {
+	// 				commands.emit<cmd.data.refreshRoot>("data.refresh-root")
+	// 			},
+	// 		)
+	// })
 
-	commands.on<cmd.data.directory.create>("data.create-directory", ({ payload }) => {
-		const auth = (auth$ as BehaviorSubject<AuthResponse>).value
+	// commands.on<cmd.data.directory.create>("data.create-directory", ({ payload }) => {
+	// 	const auth = (auth$ as BehaviorSubject<AuthResponse>).value
 
-		Oath.fromNullable(auth)
-			.chain(auth =>
-				Oath.try(() =>
-					fetch(`${Hosts.DATA}/directories/${auth.sub}`, {
-						method: "POST",
-						body: JSON.stringify(payload),
-						headers: {
-							"content-type": "application/json",
-							authorization: `Bearer ${auth.accessToken}`,
-						},
-					}).then(res => res.json()),
-				),
-			)
-			.chain(body => (body.success ? Oath.of(body.result) : Oath.reject(body.error as string)))
-			.rejectedMap(rrrToNotification("Error creating directory"))
-			.fork(
-				item => {
-					commands.emit<cmd.notification.show>("notification.show", item)
-				},
-				() => {
-					commands.emit<cmd.data.refreshRoot>("data.refresh-root")
-				},
-			)
-	})
+	// 	Oath.fromNullable(auth)
+	// 		.chain(auth =>
+	// 			Oath.try(() =>
+	// 				fetch(`${Hosts.DATA}/directories/${auth.sub}`, {
+	// 					method: "POST",
+	// 					body: JSON.stringify(payload),
+	// 					headers: {
+	// 						"content-type": "application/json",
+	// 						authorization: `Bearer ${auth.accessToken}`,
+	// 					},
+	// 				}).then(res => res.json()),
+	// 			),
+	// 		)
+	// 		.chain(body => (body.success ? Oath.of(body.result) : Oath.reject(body.error as string)))
+	// 		.rejectedMap(rrrToNotification("Error creating directory"))
+	// 		.fork(
+	// 			item => {
+	// 				commands.emit<cmd.notification.show>("notification.show", item)
+	// 			},
+	// 			() => {
+	// 				commands.emit<cmd.data.refreshRoot>("data.refresh-root")
+	// 			},
+	// 		)
+	// })
 
-	commands.on<cmd.data.directory.update>("data.update-directory", ({ payload }) => {
-		const auth = (auth$ as BehaviorSubject<AuthResponse>).value
+	// commands.on<cmd.data.directory.update>("data.update-directory", ({ payload }) => {
+	// 	const auth = (auth$ as BehaviorSubject<AuthResponse>).value
 
-		Oath.fromNullable(auth)
-			.chain(auth =>
-				Oath.try(() =>
-					fetch(`${Hosts.DATA}/directories/${auth.sub}${payload.path}`, {
-						method: "PATCH",
-						headers: {
-							"content-type": "application/json",
-							authorization: `Bearer ${auth.accessToken}`,
-						},
-						body: JSON.stringify(payload.update),
-					}).then(res => res.json()),
-				),
-			)
-			.chain(body => (body.success ? Oath.of(body.result) : Oath.reject(body.error as string)))
-			.rejectedMap(rrrToNotification("Error updating directory"))
-			.fork(
-				item => {
-					commands.emit<cmd.notification.show>("notification.show", item)
-				},
-				() => {
-					commands.emit<cmd.data.refreshRoot>("data.refresh-root")
-				},
-			)
-	})
+	// 	Oath.fromNullable(auth)
+	// 		.chain(auth =>
+	// 			Oath.try(() =>
+	// 				fetch(`${Hosts.DATA}/directories/${auth.sub}${payload.path}`, {
+	// 					method: "PATCH",
+	// 					headers: {
+	// 						"content-type": "application/json",
+	// 						authorization: `Bearer ${auth.accessToken}`,
+	// 					},
+	// 					body: JSON.stringify(payload.update),
+	// 				}).then(res => res.json()),
+	// 			),
+	// 		)
+	// 		.chain(body => (body.success ? Oath.of(body.result) : Oath.reject(body.error as string)))
+	// 		.rejectedMap(rrrToNotification("Error updating directory"))
+	// 		.fork(
+	// 			item => {
+	// 				commands.emit<cmd.notification.show>("notification.show", item)
+	// 			},
+	// 			() => {
+	// 				commands.emit<cmd.data.refreshRoot>("data.refresh-root")
+	// 			},
+	// 		)
+	// })
 
-	commands.on<cmd.data.directory.remove>("data.remove-directory", ({ payload }) => {
-		const auth = (auth$ as BehaviorSubject<AuthResponse>).value
+	// commands.on<cmd.data.directory.remove>("data.remove-directory", ({ payload }) => {
+	// 	const auth = (auth$ as BehaviorSubject<AuthResponse>).value
 
-		Oath.fromNullable(auth)
-			.chain(auth =>
-				Oath.try(() =>
-					fetch(`${Hosts.DATA}/directories/${auth.sub}${payload}`, {
-						method: "DELETE",
-						headers: {
-							"content-type": "application/json",
-							authorization: `Bearer ${auth.accessToken}`,
-						},
-					}).then(res => res.json()),
-				),
-			)
-			.chain(body => (body.success ? Oath.of(body.result) : Oath.reject(body.error as string)))
-			.rejectedMap(rrrToNotification("Error creating directory"))
-			.fork(
-				item => {
-					commands.emit<cmd.notification.show>("notification.show", item)
-				},
-				() => {
-					commands.emit<cmd.data.refreshRoot>("data.refresh-root")
-				},
-			)
-	})
+	// 	Oath.fromNullable(auth)
+	// 		.chain(auth =>
+	// 			Oath.try(() =>
+	// 				fetch(`${Hosts.DATA}/directories/${auth.sub}${payload}`, {
+	// 					method: "DELETE",
+	// 					headers: {
+	// 						"content-type": "application/json",
+	// 						authorization: `Bearer ${auth.accessToken}`,
+	// 					},
+	// 				}).then(res => res.json()),
+	// 			),
+	// 		)
+	// 		.chain(body => (body.success ? Oath.of(body.result) : Oath.reject(body.error as string)))
+	// 		.rejectedMap(rrrToNotification("Error creating directory"))
+	// 		.fork(
+	// 			item => {
+	// 				commands.emit<cmd.notification.show>("notification.show", item)
+	// 			},
+	// 			() => {
+	// 				commands.emit<cmd.data.refreshRoot>("data.refresh-root")
+	// 			},
+	// 		)
+	// })
 
 	commands.emit<cmd.commandPalette.add>("command-palette.add", {
-		id: "data.show-create-directory-modal",
-		Icon: BsFolderPlus,
-		readableName: "Create directory",
-		accelerator: "meta+shift+n",
+		id: "data.show-create-modal",
+		Icon: BsNodePlus,
+		readableName: "Create page",
+		accelerator: "meta+n",
 		onSelect: () => {
 			commands.emit<cmd.commandPalette.hide>("command-palette.hide")
-			commands.emit<cmd.data.directory.showCreateModal>("data.show-create-directory-modal")
+			commands.emit<cmd.data.showCreateModal>("data.show-create-modal")
 		},
 	})
 
@@ -262,7 +200,7 @@ export const __initData: Fn = ({ logger, auth$ }) => {
 		Oath.fromNullable(auth)
 			.chain(auth =>
 				Oath.try(() =>
-					fetch(`${Hosts.DATA}/directories/${auth.sub}`, {
+					fetch(`${Hosts.DATA}`, {
 						headers: { Authorization: `Bearer ${auth.accessToken}` },
 					}).then(res => res.json()),
 				),
@@ -270,7 +208,7 @@ export const __initData: Fn = ({ logger, auth$ }) => {
 			.chain(body => (body.success ? Oath.of(body.result) : Oath.reject(body.error as string)))
 			.rejectedMap(rrrToNotification("Error fetching directories"))
 			.map(body =>
-				body.map((item: FSEntity) => ({
+				body.map((item: PlainData) => ({
 					...item,
 					updatedAt: new Date(body.updatedAt),
 					createdAt: new Date(body.createdAt),
@@ -285,4 +223,4 @@ export const __initData: Fn = ({ logger, auth$ }) => {
 	return metadata$
 }
 
-const metadata$ = new BehaviorSubject<FSEntity[]>([])
+const metadata$ = new BehaviorSubject<PlainData[]>([])

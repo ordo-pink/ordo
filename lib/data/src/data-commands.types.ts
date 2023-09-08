@@ -17,10 +17,7 @@ export type TDataCommands<T> = {
 	) => Oath<PlainData, DataError>
 	remove: (params: Pick<PlainData, "fsid" | "createdBy">) => Oath<"OK", DataError>
 	move: (
-		params: Pick<PlainData, "fsid" | "createdBy" | "updatedBy"> & {
-			oldParent: Nullable<FSID>
-			newParent: Nullable<FSID>
-		},
+		params: Pick<PlainData, "fsid" | "createdBy" | "updatedBy" | "parent">,
 	) => Oath<"OK", DataError>
 	rename: (
 		params: Pick<PlainData, "fsid" | "name" | "createdBy" | "updatedBy">,

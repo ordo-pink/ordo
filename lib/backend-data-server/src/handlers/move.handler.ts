@@ -23,22 +23,16 @@ export const handleMove: Unary<
 		authenticate0(ctx, idHost)
 			.map(({ payload }) => payload)
 			.chain(({ sub }) =>
-				parseBody0<{ newParent: Nullable<FSID>; oldParent: Nullable<FSID> }>(ctx).chain(body =>
+				parseBody0<{ parent: Nullable<FSID> }>(ctx).chain(({ parent }) =>
 					Oath.of({ fsid: ctx.params.fsid as FSID, createdBy: ctx.params.userId as SUB }).chain(
 						({ fsid, createdBy }) =>
 							dataService
-								.move({
-									fsid,
-									createdBy,
-									updatedBy: sub,
-									newParent: body.newParent,
-									oldParent: body.oldParent,
-								})
+								.move({ fsid, parent, createdBy, updatedBy: sub })
 								.rejectedMap(HttpError.NotFound),
 					),
 				),
 			)
 			.fork(sendError(ctx), result => {
-				ctx.response.status = 201
+				ctx.response.status = 200
 				ctx.response.body = { success: true, result }
 			})

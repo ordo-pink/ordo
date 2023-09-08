@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 import type { Context, useContext as UseContext } from "react"
-import type { FSEntity } from "@ordo-pink/data"
+import type { PlainData } from "@ordo-pink/data"
 import type { Nullable } from "@ordo-pink/tau"
 import { Commands, Router } from "../types"
 
@@ -10,7 +10,7 @@ let SharedContext: Context<SharedContextValue>
 let useContextHook: typeof UseContext
 
 export type SharedContextValue = {
-	metadata: Nullable<FSEntity[]>
+	metadata: Nullable<PlainData[]>
 	currentRoute: Nullable<Router.Route>
 	commands: Commands.Commands
 }

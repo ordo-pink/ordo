@@ -4,7 +4,6 @@
 import { useEffect, useState } from "react"
 import { noop } from "@ordo-pink/tau"
 import Null from "./null"
-import { FileUtils } from "@ordo-pink/data"
 import { useSharedContext } from "@ordo-pink/frontend-core"
 import { Either } from "@ordo-pink/either"
 
@@ -18,9 +17,7 @@ export default function UsedSpace() {
 
 	useEffect(() => {
 		Either.fromNullable(metadata)
-			.map(items =>
-				items.reduce((acc, item) => (FileUtils.isFile(item) ? acc + Number(item.size) : acc), 0),
-			)
+			.map(items => items.reduce((acc, item) => acc + Number(item.size), 0))
 			.map(size => size / 1024 / 1024)
 			.fold(noop, megabytes => {
 				setSize(megabytes)

@@ -45,11 +45,6 @@ const Icon = () => <BsCollection />
 const Workspace = ({ commands, activities$ }: Pick<P, "commands" | "activities$">) => {
 	const activities = useStrictSubscription(activities$, [])
 
-	useEffect(() => {
-		commands.emit<cmd.sidebar.disable>("sidebar.disable")
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [])
-
 	return (
 		<CenteredPage centerX>
 			<div className="my-8">

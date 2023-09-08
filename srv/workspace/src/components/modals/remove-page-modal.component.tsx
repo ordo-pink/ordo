@@ -2,24 +2,24 @@
 // SPDX-License-Identifier: MIT
 
 import { OrdoButtonSecondary, OrdoButtonPrimary } from "$components/buttons/buttons"
-import { Directory } from "@ordo-pink/data"
+import { PlainData } from "@ordo-pink/data"
 import { cmd, useSharedContext } from "@ordo-pink/frontend-core"
-import { BsFolderMinus } from "react-icons/bs"
+import { BsNodeMinus } from "react-icons/bs"
 
 type Props = {
-	directory: Directory
+	data: PlainData
 }
 
-export default function RemoveDirectoryModal({ directory }: Props) {
+export default function RemoveFileModal({ data }: Props) {
 	const { commands } = useSharedContext()
 
 	const handleRemoveFile = () => {
-		commands.emit<cmd.data.directory.remove>("data.remove-directory", directory.path)
+		commands.emit<cmd.data.remove>("data.remove", { fsid: data.fsid })
 		commands.emit<cmd.modal.hide>("modal.hide")
 	}
 
-	const tTitle = "Remove directory"
-	const tText = `Are you sure you want to remove "${directory.path}"? This action is irreversible.`
+	const tTitle = "Remove page"
+	const tText = `Are you sure you want to remove "${data.name}"? This action is irreversible.`
 	const tCancel = "Cancel"
 	const tRemove = "Remove"
 
@@ -27,7 +27,7 @@ export default function RemoveDirectoryModal({ directory }: Props) {
 		<div className="w-[30rem] max-w-full flex flex-col gap-8">
 			<div className="flex space-x-2 px-8 pt-8 items-center">
 				<div className="bg-gradient-to-tr from-red-400 dark:from-red-600 to-rose-400 dark:to-rose-600 rounded-full text-xl text-neutral-200 p-3 shadow-md">
-					<BsFolderMinus />
+					<BsNodeMinus />
 				</div>
 				<div className="grow flex flex-col gap-y-4">
 					<h3 className="px-8 text-lg font-bold">{tTitle}</h3>

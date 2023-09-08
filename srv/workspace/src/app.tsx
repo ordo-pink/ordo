@@ -14,12 +14,12 @@ import Workspace from "$components/workspace"
 import Modal from "$components/modal"
 import Null from "$components/null"
 import { Nullable } from "@ordo-pink/tau"
-import { FSEntity } from "@ordo-pink/data"
+import { PlainData } from "@ordo-pink/data"
 
 // TODO: Remove useAppInit
 const commands = getCommands()
 const SharedContext = createContext<{
-	metadata: Nullable<FSEntity[]>
+	metadata: Nullable<PlainData[]>
 	currentRoute: Nullable<Router.Route>
 	commands: Commands.Commands
 }>({ metadata: null, currentRoute: null, commands })
@@ -48,6 +48,7 @@ export default function App() {
 		import("./functions/file-explorer").then(f =>
 			f.default({ commands, metadata$: streams.metadata$ }),
 		)
+		import("./functions/gtd").then(f => f.default({ commands, metadata$: streams.metadata$ }))
 		import("./functions/user").then(f =>
 			f.default({ commands, metadata$: streams.metadata$, auth$: streams.auth$ }),
 		)

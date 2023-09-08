@@ -3,7 +3,6 @@
 
 import type { Oath } from "@ordo-pink/oath"
 import type { PlainData, UserID } from "./data.types"
-import type { Errors } from "./errors.impl"
 import type { FSID } from "./data.types"
 import { DataError } from "./errors.types"
 import { Nullable } from "@ordo-pink/tau"

@@ -21,6 +21,25 @@ const setNameE =
 			.map(extend(() => ({ updatedAt: Date.now() })))
 			.map(increment => Data.of({ ...plain, ...increment }))
 
+const updateE =
+	(plain: PlainData): TData["update"] =>
+	increment =>
+		validations.isValidDataE(increment).map(increment =>
+			Data.of({
+				children: increment.children,
+				createdAt: Date.now(),
+				createdBy: plain.createdBy,
+				fsid: plain.fsid,
+				labels: increment.labels,
+				links: increment.links,
+				name: increment.name,
+				parent: increment.parent,
+				size: increment.size,
+				updatedAt: Date.now(),
+				updatedBy: increment.updatedBy,
+			}),
+		)
+
 const setSizeE =
 	(plain: PlainData): TData["setSize"] =>
 	(size, updatedBy) =>
@@ -161,6 +180,7 @@ const of = (plain: PlainData): TData => ({
 	addLabel: addLabelE(plain),
 	removeLabel: removeLabelE(plain),
 	dropLabels: dropLabelsE(plain),
+	update: updateE(plain),
 })
 
 export const Data: DataStatic = {

@@ -6,7 +6,7 @@
 import { Either, TEither } from "@ordo-pink/either"
 import isEmail from "validator/es/lib/isEmail"
 import { okpwd } from "@ordo-pink/okpwd"
-import { ChangeEventHandler } from "react"
+import { ChangeEventHandler, RefObject } from "react"
 
 type InputProps = {
 	value?: string
@@ -17,6 +17,7 @@ type InputProps = {
 	type?: string
 	placeholder?: string
 	autocomplete?: string
+	forwardRef?: RefObject<HTMLInputElement>
 }
 
 type EmailInputProps = Partial<InputProps> & {
@@ -36,12 +37,14 @@ export const TextInput = ({
 	type = "text",
 	name = "",
 	autocomplete = "off",
+	forwardRef: ref,
 }: InputProps) => (
 	<div className="w-full flex flex-col">
 		<label htmlFor="email" className="w-full text-sm font-medium leading-6 mb-2">
 			{label}
 		</label>
 		<input
+			ref={ref}
 			id={id}
 			name={name}
 			type={type}

@@ -17,7 +17,6 @@ type Props = {
 export default function CreatePageModal({ parent }: Props) {
 	const { commands } = useSharedContext()
 	const [name, setName] = useState("")
-	console.log(parent)
 
 	const handleInputChange = (event: ChangeEvent<HTMLInputElement>) => setName(event.target.value)
 

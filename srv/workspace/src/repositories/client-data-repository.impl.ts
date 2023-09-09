@@ -42,7 +42,7 @@ const of = (
 					commands.emit<cmd.notification.show>("notification.show", item)
 				},
 				() => {
-					commands.emit<cmd.data.refreshRoot>("data.refresh-root")
+					// commands.emit<cmd.data.refreshRoot>("data.refresh-root")
 				},
 			)
 
@@ -73,7 +73,7 @@ const of = (
 					commands.emit<cmd.notification.show>("notification.show", item)
 				},
 				() => {
-					commands.emit<cmd.data.refreshRoot>("data.refresh-root")
+					// commands.emit<cmd.data.refreshRoot>("data.refresh-root")
 				},
 			)
 
@@ -126,6 +126,7 @@ const of = (
 	},
 	update: plain => {
 		const metadata = metadata$.value
+		const auth = auth$.value
 
 		if (!metadata) return Oath.reject(Data.Errors.DataNotFound)
 
@@ -133,9 +134,35 @@ const of = (
 
 		if (updatedItem < 0) return Oath.reject(Data.Errors.DataNotFound)
 
-		metadata.splice(updatedItem, 1, plain)
+		const metadataCopy = [...metadata]
 
-		metadata$.next(metadata)
+		metadataCopy.splice(updatedItem, 1, plain)
+
+		metadata$.next(metadataCopy)
+
+		Oath.fromNullable(auth)
+			.chain(auth =>
+				Oath.try(() =>
+					fetch(`${Hosts.DATA}/${auth.sub}/${plain.fsid}`, {
+						method: "PUT",
+						body: JSON.stringify(plain),
+						headers: {
+							"content-type": "application/json",
+							authorization: `Bearer ${auth.accessToken}`,
+						},
+					}).then(res => res.json()),
+				),
+			)
+			.chain(body => (body.success ? Oath.of(body.result) : Oath.reject(body.error as string)))
+			.rejectedMap(rrrToNotification("Error creating file"))
+			.fork(
+				item => {
+					commands.emit<cmd.notification.show>("notification.show", item)
+				},
+				() => {
+					// commands.emit<cmd.data.refreshRoot>("data.refresh-root")
+				},
+			)
 
 		return Oath.of("OK")
 	},

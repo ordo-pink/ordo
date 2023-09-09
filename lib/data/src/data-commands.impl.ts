@@ -69,6 +69,21 @@ const of = <T>({ dataRepository, contentRepository }: DataCommandsParams<T>): TD
 			.get(createdBy, fsid)
 			.chain(plain => Data.of(plain).removeLink(link, updatedBy).fold(Oath.reject, Oath.resolve))
 			.chain(data => dataRepository.update(data.plain)),
+	addLabel: ({ createdBy, fsid, label, updatedBy }) =>
+		dataRepository
+			.get(createdBy, fsid)
+			.chain(plain => Data.of(plain).addLabel(label, updatedBy).fold(Oath.reject, Oath.resolve))
+			.chain(data => dataRepository.update(data.plain)),
+	removeLabel: ({ createdBy, fsid, label, updatedBy }) =>
+		dataRepository
+			.get(createdBy, fsid)
+			.chain(plain => Data.of(plain).removeLabel(label, updatedBy).fold(Oath.reject, Oath.resolve))
+			.chain(data => dataRepository.update(data.plain)),
+	update: ({ data, fsid, createdBy, updatedBy }) =>
+		dataRepository
+			.get(createdBy, fsid)
+			.chain(plain => Data.of(plain).update(data).fold(Oath.reject, Oath.resolve))
+			.chain(data => dataRepository.update(data.plain)),
 	// TODO: Roll back on error
 	move: ({ createdBy, fsid, parent, updatedBy }) =>
 		Oath.all({

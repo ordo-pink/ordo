@@ -46,8 +46,13 @@ export namespace cmd {
 			payload: { fsid: FSID; content: string | ArrayBuffer }
 		}
 		export type create = { name: "data.create"; payload: { name: string; parent: Nullable<FSID> } }
-		export type remove = { name: "data.remove"; payload: { fsid: FSID } }
+		export type remove = { name: "data.remove"; payload: PlainData }
 		export type move = { name: "data.move"; payload: { fsid: FSID; parent: Nullable<FSID> } }
+		export type addLabel = { name: "data.add-label"; payload: { item: PlainData; label: string } }
+		export type removeLabel = {
+			name: "data.remove-label"
+			payload: { item: PlainData; label: string }
+		}
 	}
 
 	export namespace contextMenu {

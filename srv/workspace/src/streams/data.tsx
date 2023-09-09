@@ -64,6 +64,32 @@ export const __initData: Fn = ({ logger, auth$ }) => {
 		dataCommands.remove({ fsid: payload.fsid, createdBy: auth.sub }).orNothing()
 	})
 
+	commands.on<cmd.data.addLabel>("data.add-label", ({ payload }) => {
+		const auth = (auth$ as BehaviorSubject<AuthResponse>).value
+
+		dataCommands
+			.addLabel({
+				fsid: payload.item.fsid,
+				createdBy: auth.sub,
+				updatedBy: auth.sub,
+				label: payload.label,
+			})
+			.orNothing()
+	})
+
+	commands.on<cmd.data.removeLabel>("data.remove-label", ({ payload }) => {
+		const auth = (auth$ as BehaviorSubject<AuthResponse>).value
+
+		dataCommands
+			.removeLabel({
+				fsid: payload.item.fsid,
+				createdBy: auth.sub,
+				updatedBy: auth.sub,
+				label: payload.label,
+			})
+			.orNothing()
+	})
+
 	// commands.on<cmd.data.file.setContent>("data.set-file-content", ({ payload }) => {
 	// 	const auth = (auth$ as BehaviorSubject<AuthResponse>).value
 
@@ -172,27 +198,27 @@ export const __initData: Fn = ({ logger, auth$ }) => {
 	// 		)
 	// })
 
-	commands.emit<cmd.commandPalette.add>("command-palette.add", {
-		id: "data.show-create-modal",
-		Icon: BsNodePlus,
-		readableName: "Create page",
-		accelerator: "meta+n",
-		onSelect: () => {
-			commands.emit<cmd.commandPalette.hide>("command-palette.hide")
-			commands.emit<cmd.data.showCreateModal>("data.show-create-modal")
-		},
-	})
+	// commands.emit<cmd.commandPalette.add>("command-palette.add", {
+	// 	id: "data.show-create-modal",
+	// 	Icon: BsNodePlus,
+	// 	readableName: "Create page",
+	// 	accelerator: "meta+n",
+	// 	onSelect: () => {
+	// 		commands.emit<cmd.commandPalette.hide>("command-palette.hide")
+	// 		commands.emit<cmd.data.showCreateModal>("data.show-create-modal")
+	// 	},
+	// })
 
-	commands.emit<cmd.commandPalette.add>("command-palette.add", {
-		id: "data.show-upload-modal",
-		Icon: BsUpload,
-		readableName: "Upload files",
-		accelerator: "mod+u",
-		onSelect: () => {
-			commands.emit<cmd.commandPalette.hide>("command-palette.hide")
-			commands.emit<cmd.data.showUploadModal>("data.show-upload-modal")
-		},
-	})
+	// commands.emit<cmd.commandPalette.add>("command-palette.add", {
+	// 	id: "data.show-upload-modal",
+	// 	Icon: BsUpload,
+	// 	readableName: "Upload files",
+	// 	accelerator: "mod+u",
+	// 	onSelect: () => {
+	// 		commands.emit<cmd.commandPalette.hide>("command-palette.hide")
+	// 		commands.emit<cmd.data.showUploadModal>("data.show-upload-modal")
+	// 	},
+	// })
 
 	commands.on<cmd.data.refreshRoot>("data.refresh-root", () => {
 		const auth = (auth$ as BehaviorSubject<AuthResponse>).value
@@ -207,13 +233,6 @@ export const __initData: Fn = ({ logger, auth$ }) => {
 			)
 			.chain(body => (body.success ? Oath.of(body.result) : Oath.reject(body.error as string)))
 			.rejectedMap(rrrToNotification("Error fetching directories"))
-			.map(body =>
-				body.map((item: PlainData) => ({
-					...item,
-					updatedAt: new Date(body.updatedAt),
-					createdAt: new Date(body.createdAt),
-				})),
-			)
 			.fork(
 				item => commands.emit<cmd.notification.show>("notification.show", item),
 				result => metadata$.next(result),

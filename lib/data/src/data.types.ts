@@ -45,6 +45,7 @@ export type TData = {
 	addLabel: (link: string, updatedBy: UserID) => TEither<TData, DataError>
 	removeLabel: (link: string, updatedBy: UserID) => TEither<TData, DataError>
 	dropLabels: (updatedBy: UserID) => TEither<TData, DataError>
+	update: (plain: PlainData) => TEither<TData, DataError>
 }
 
 export type DataStatic = {

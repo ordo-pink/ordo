@@ -19,6 +19,9 @@ import { handleFetch } from "./handlers/fetch.handler"
 import { handleMove } from "./handlers/move.handler"
 import { handleLink } from "./handlers/link.handler"
 import { handleUpload } from "./handlers/upload.handler"
+import { handleAddLabel } from "./handlers/add-label.handler"
+import { handleRemoveLabel } from "./handlers/remove-label.handler"
+import { handleUpdate } from "./handlers/update.handler"
 
 export type Params = {
 	origin: string | string[]
@@ -43,11 +46,14 @@ export const createDataServer = ({
 				.post("/:userId", handleCreate({ dataService, idHost }))
 				.delete("/:userId/:fsid", handleRemove({ dataService, idHost }))
 				.get("/:userId/:fsid", handleGetContent({ dataService, idHost }))
+				.put("/:userId/:fsid", handleUpdate({ dataService, idHost }))
 				.put("/:userId/:name/upload", handleUpload({ dataService, idHost }))
 				.put("/:userId/:fsid/update", handleSetContent({ dataService, idHost }))
 				.patch("/:userId/:fsid/move", handleMove({ dataService, idHost }))
 				.patch("/:userId/:fsid/link", handleLink({ dataService, idHost }))
 				.patch("/:userId/:fsid/unlink", handleUnlink({ dataService, idHost }))
+				.patch("/:userId/:fsid/add-label", handleAddLabel({ dataService, idHost }))
+				.patch("/:userId/:fsid/remove-label", handleRemoveLabel({ dataService, idHost }))
 				.patch("/:userId/:fsid/rename", handleRename({ dataService, idHost })),
 	})
 }

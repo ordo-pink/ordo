@@ -9,6 +9,7 @@ export const Errors = {
 	SelfReferencingParent: "Parent must not be equal to FSID",
 	SelfReferencingLink: "Link must not be equal to FSID",
 	SelfReferencingChild: "Child must not be equal to FSID",
+	InvalidData: "Data must be PlainData",
 	InvalidFSID: "FSID must be a valid UUIDv4",
 	InvalidSUB: "SUB must be a valid UUIDv4",
 	InvalidLabel: "Label must be a non-empty string",

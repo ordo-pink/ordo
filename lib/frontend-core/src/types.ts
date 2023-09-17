@@ -40,7 +40,12 @@ export namespace cmd {
 		export type showUploadModal = { name: "data.show-upload-modal"; payload: Nullable<PlainData> }
 		export type showCreateModal = { name: "data.show-create-modal"; payload: Nullable<PlainData> }
 		export type showRemoveModal = { name: "data.show-remove-modal"; payload: PlainData }
-		export type showRenameModal = { name: "data.show-rename-modal"; payload: { fsid: FSID } }
+		export type showRenameModal = { name: "data.show-rename-modal"; payload: PlainData }
+		export type showAddLabelPalette = { name: "data.show-add-label-palette"; payload: PlainData }
+		export type showRemoveLabelPalette = {
+			name: "data.show-remove-label-palette"
+			payload: PlainData
+		}
 		export type setContent = {
 			name: "data.set-content"
 			payload: { fsid: FSID; content: string | ArrayBuffer }
@@ -48,6 +53,7 @@ export namespace cmd {
 		export type create = { name: "data.create"; payload: { name: string; parent: Nullable<FSID> } }
 		export type remove = { name: "data.remove"; payload: PlainData }
 		export type move = { name: "data.move"; payload: { fsid: FSID; parent: Nullable<FSID> } }
+		export type rename = { name: "data.rename"; payload: { fsid: FSID; name: string } }
 		export type addLabel = { name: "data.add-label"; payload: { item: PlainData; label: string } }
 		export type removeLabel = {
 			name: "data.remove-label"
@@ -65,7 +71,13 @@ export namespace cmd {
 	export namespace commandPalette {
 		export type add = { name: "command-palette.add"; payload: CommandPalette.Item }
 		export type remove = { name: "command-palette.remove"; payload: string }
-		export type show = { name: "command-palette.show"; payload: CommandPalette.Item[] }
+		export type show = {
+			name: "command-palette.show"
+			payload: {
+				items: CommandPalette.Item[]
+				onNewItem?: (newItem: string) => any
+			}
+		}
 		export type hide = { name: "command-palette.hide"; payload: void }
 	}
 

@@ -37,12 +37,12 @@ export default function ActivityBar({
 	const user = useUser()
 	const sidebar = useStrictSubscription(sidebar$, { disabled: true })
 	const activities = useStrictSubscription(activities$, [])
-	const commandPaletteItems = useSubscription(commandPalette$)
+	const commandPalette = useSubscription(commandPalette$)
 
 	const isSidebarCollapsed = sidebar.disabled || sidebar.sizes[0] === 0
 
 	const showCommandPalette = () =>
-		Either.fromNullable(commandPaletteItems).map(items =>
+		Either.fromNullable(commandPalette).map(items =>
 			commands.emit<cmd.commandPalette.show>("command-palette.show", items),
 		)
 

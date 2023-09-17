@@ -6,11 +6,12 @@
 import { Either, TEither } from "@ordo-pink/either"
 import isEmail from "validator/es/lib/isEmail"
 import { okpwd } from "@ordo-pink/okpwd"
-import { ChangeEventHandler, RefObject } from "react"
+import { ChangeEventHandler, KeyboardEventHandler, RefObject } from "react"
 
 type InputProps = {
 	value?: string
 	onInput?: ChangeEventHandler<HTMLInputElement>
+	onKeyDown?: KeyboardEventHandler<HTMLInputElement>
 	id: string
 	label: string
 	name?: string
@@ -31,6 +32,7 @@ type PasswordInputProps = Partial<InputProps> & {
 export const TextInput = ({
 	value,
 	onInput = () => void 0,
+	onKeyDown = () => void 0,
 	id,
 	label,
 	placeholder = "",
@@ -50,9 +52,10 @@ export const TextInput = ({
 			type={type}
 			autoComplete={autocomplete}
 			value={value}
+			onKeyDown={onKeyDown}
 			onChange={onInput}
 			placeholder={placeholder}
-			className="w-full px-2 py-1 rounded-md border-0 shadow-inner placeholder:text-neutral-500 bg-neutral-200 dark:bg-neutral-700 outline-none sm:text-sm sm:leading-6"
+			className="w-full px-2 py-1 rounded-md border-0 shadow-inner placeholder:text-neutral-500 bg-neutral-50 dark:bg-neutral-700 focus:ring-0 sm:text-sm sm:leading-6"
 		/>
 	</div>
 )

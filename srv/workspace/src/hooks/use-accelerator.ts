@@ -38,7 +38,6 @@ export const useAccelerator = (accelerator: Optional<string>, callback: HotkeyCa
 			enableOnFormTags: true,
 			enableOnContentEditable: true,
 			preventDefault: true,
-			scopes: "local",
 		},
 	)
 }

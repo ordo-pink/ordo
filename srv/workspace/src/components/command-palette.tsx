@@ -3,7 +3,7 @@
 
 import { ChangeEvent, KeyboardEvent, useEffect, useState } from "react"
 import { useHotkeys } from "react-hotkeys-hook"
-import { BsSearch } from "react-icons/bs"
+import { BsPlus, BsSearch } from "react-icons/bs"
 import Fuse from "fuse.js"
 import { Switch } from "@ordo-pink/switch"
 import { noop } from "@ordo-pink/tau"
@@ -13,16 +13,18 @@ import RenderFromNullable from "$components/render-from-nullable"
 import ActionListItem from "$components/action-list-item"
 import Accelerator from "$components/accelerator"
 import { CommandPalette, cmd } from "@ordo-pink/frontend-core"
+import { Either } from "@ordo-pink/either"
 
 const commands = getCommands()
 
 type Props = {
 	items: CommandPalette.Item[]
+	onNewItem?: (newItem: string) => any
 }
 
-const fuse = new Fuse([] as CommandPalette.Item[], { keys: ["name"] })
+const fuse = new Fuse([] as CommandPalette.Item[], { keys: ["id"], threshold: 0.1 })
 
-export default function CommandPaletteModal({ items }: Props) {
+export default function CommandPaletteModal({ items, onNewItem }: Props) {
 	useHotkeys("Esc", () => commands.emit<cmd.commandPalette.hide>("command-palette.hide"))
 
 	const [currentIndex, setCurrentIndex] = useState(0)
@@ -50,9 +52,13 @@ export default function CommandPaletteModal({ items }: Props) {
 	}
 
 	const handleEnter = (index: number) => {
-		const selectedItem = visibleItems[index]
-		selectedItem.onSelect()
-		// handleEscape()
+		Either.fromNullable(visibleItems[index]).fold(
+			() => {
+				if (onNewItem) onNewItem(inputValue)
+				handleEscape()
+			},
+			selectedItem => selectedItem.onSelect(),
+		)
 	}
 
 	const handleArrowUp = (event: KeyboardEvent<HTMLInputElement>) => {
@@ -96,7 +102,7 @@ export default function CommandPaletteModal({ items }: Props) {
 					onKeyDown={handleKeyDown}
 					type="text"
 					autoFocus
-					className="w-full rounded-lg text-lg px-1 bg-transparent outline-none"
+					className="w-full rounded-lg px-2 py-1 text-sm bg-transparent focus:outline-none border-none"
 					placeholder={tSearchPlaceholder}
 				/>
 			</div>
@@ -113,6 +119,19 @@ export default function CommandPaletteModal({ items }: Props) {
 						onSelect={() => handleEnter(index)}
 					/>
 				))}
+
+				{onNewItem && inputValue.length ? (
+					<ActionListItem
+						large
+						Icon={BsPlus}
+						text={`Add new item "${inputValue}"...`}
+						current={false}
+						onClick={() => {
+							onNewItem(inputValue)
+							handleEscape()
+						}}
+					/>
+				) : null}
 			</div>
 		</div>
 	)
@@ -123,12 +142,12 @@ const Item = ({ commandName, readableName, Icon, accelerator, isCurrent, onSelec
 
 	return (
 		<ActionListItem
+			large
 			key={commandName}
 			text={readableName}
 			Icon={Icon || (() => null)}
 			current={isCurrent}
 			onClick={onSelect}
-			large
 		>
 			<RenderFromNullable having={accelerator}>
 				<Accelerator accelerator={accelerator!} />

@@ -60,7 +60,7 @@ export default function ActionListItem({
 				} ${
 					disabled
 						? "text-neutral-300 dark:text-neutral-400"
-						: "hover:bg-gradient-to-r from-rose-300/40 dark:from-slate-600 to-purple-300/40 dark:to-gray-600 cursor-pointer"
+						: "hover:bg-gradient-to-r from-slate-300/40 dark:from-slate-600 to-slate-300/40 dark:to-gray-600 cursor-pointer ring-0"
 				} ${
 					current &&
 					"bg-gradient-to-r from-rose-300 dark:from-violet-700 to-purple-300 dark:to-purple-700"

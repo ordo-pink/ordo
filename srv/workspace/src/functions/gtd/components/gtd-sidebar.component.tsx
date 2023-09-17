@@ -20,10 +20,14 @@ export default function GTDSidebar() {
 
 	useEffect(() => {
 		if (!metadata) return
+
 		const gtdDirectory = metadata.find(item => item.name === ".gtd" && item.parent === null)
+
 		if (!gtdDirectory)
 			return commands.emit<cmd.data.create>("data.create", { name: ".gtd", parent: null })
+
 		setGtd(gtdDirectory)
+
 		const inboxDirectory = metadata.find(
 			item => item.name === ".inbox" && item.parent === gtdDirectory.fsid,
 		)
@@ -33,9 +37,12 @@ export default function GTDSidebar() {
 				name: ".inbox",
 				parent: gtdDirectory.fsid,
 			})
+
 		setInbox(inboxDirectory)
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [metadata])
+
+	console.log(currentRoute?.params?.project)
 
 	return Either.fromNullable(inbox).fold(Loading, inbox => (
 		<div className="mt-8 flex flex-col space-y-8">
@@ -72,9 +79,9 @@ export default function GTDSidebar() {
 									}
 									large
 									key={item.fsid}
-									href={`/gtd/projects/${encodeURIComponent(item.name)}`}
+									href={`/gtd/projects/${item.name}`}
 									Icon={BsFolder}
-									current={currentRoute?.path === `/gtd/projects/${encodeURIComponent(item.name)}`}
+									current={decodeURIComponent(currentRoute?.params?.project ?? "") === item.name}
 									text={item.name}
 								/>
 							)),

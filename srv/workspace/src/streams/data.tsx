@@ -11,13 +11,14 @@ import { Logger } from "@ordo-pink/logger"
 import { __Auth$ } from "./auth"
 import { Unary } from "@ordo-pink/tau"
 import { AuthResponse } from "@ordo-pink/backend-id-server"
-import { BsNodePlus, BsUpload } from "react-icons/bs"
 import CreatePageModal from "$components/modals/create-page-modal.component"
 import UploadFilesModal from "$components/modals/upload-files-modal.component"
 import { DataCommands, PlainData } from "@ordo-pink/data"
 import { ClientDataRepository } from "../repositories/client-data-repository.impl"
 import { ClientContentRepository } from "../repositories/client-content-repository"
 import RemoveFileModal from "$components/modals/remove-page-modal.component"
+import RenameDirectoryModal from "$components/modals/rename-directory-modal.component"
+import { BsTag } from "react-icons/bs"
 
 const commands = getCommands()
 
@@ -39,9 +40,50 @@ export const __initData: Fn = ({ logger, auth$ }) => {
 		})
 	})
 
+	commands.on<cmd.data.showAddLabelPalette>("data.show-add-label-palette", ({ payload }) => {
+		const metadata = metadata$.value
+		const labels = Array.from(new Set(metadata.flatMap(item => item.labels)))
+
+		commands.emit<cmd.commandPalette.show>("command-palette.show", {
+			onNewItem: label => {
+				commands.emit<cmd.data.addLabel>("data.add-label", { item: payload, label })
+				commands.emit<cmd.commandPalette.hide>("command-palette.hide")
+			},
+			items: labels.map(label => ({
+				id: label,
+				readableName: label,
+				Icon: BsTag,
+				onSelect: () => {
+					commands.emit<cmd.data.addLabel>("data.add-label", { item: payload, label })
+					commands.emit<cmd.commandPalette.hide>("command-palette.hide")
+				},
+			})),
+		})
+	})
+
+	commands.on<cmd.data.showRemoveLabelPalette>("data.show-remove-label-palette", ({ payload }) => {
+		commands.emit<cmd.commandPalette.show>("command-palette.show", {
+			items: payload.labels.map(label => ({
+				id: label,
+				readableName: label,
+				Icon: BsTag,
+				onSelect: () => {
+					commands.emit<cmd.data.removeLabel>("data.remove-label", { item: payload, label })
+					commands.emit<cmd.commandPalette.hide>("command-palette.hide")
+				},
+			})),
+		})
+	})
+
 	commands.on<cmd.data.showRemoveModal>("data.show-remove-modal", ({ payload }) => {
 		commands.emit<cmd.modal.show>("modal.show", {
 			Component: () => <RemoveFileModal data={payload} />,
+		})
+	})
+
+	commands.on<cmd.data.showRenameModal>("data.show-rename-modal", ({ payload }) => {
+		commands.emit<cmd.modal.show>("modal.show", {
+			Component: () => <RenameDirectoryModal data={payload} />,
 		})
 	})
 
@@ -60,8 +102,15 @@ export const __initData: Fn = ({ logger, auth$ }) => {
 
 	commands.on<cmd.data.remove>("data.remove", ({ payload }) => {
 		const auth = (auth$ as BehaviorSubject<AuthResponse>).value
-
 		dataCommands.remove({ fsid: payload.fsid, createdBy: auth.sub }).orNothing()
+	})
+
+	commands.on<cmd.data.rename>("data.rename", ({ payload }) => {
+		const auth = (auth$ as BehaviorSubject<AuthResponse>).value
+
+		dataCommands
+			.rename({ fsid: payload.fsid, createdBy: auth.sub, name: payload.name, updatedBy: auth.sub })
+			.orNothing()
 	})
 
 	commands.on<cmd.data.addLabel>("data.add-label", ({ payload }) => {

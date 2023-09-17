@@ -10,7 +10,10 @@ import { CommandPalette, cmd } from "@ordo-pink/frontend-core"
 
 const commands = getCommands()
 
-export type __CommandPalette$ = Observable<CommandPalette.Item[]>
+export type __CommandPalette$ = Observable<{
+	items: CommandPalette.Item[]
+	onNewItem?: (newItem: string) => any
+}>
 export const __initCommandPalette: InitCommandPalette = callOnce(({ logger }) => {
 	logger.debug("Initializing command palette")
 
@@ -32,10 +35,22 @@ export const __initCommandPalette: InitCommandPalette = callOnce(({ logger }) =>
 
 type Add = Unary<CommandPalette.Item, void>
 type Remove = Unary<string, void>
-type Show = Unary<CommandPalette.Item[], void>
+type Show = Unary<{ items: CommandPalette.Item[]; onNewItem?: (newItem: string) => any }, void>
 type Hide = Thunk<void>
-type AddP = Curry<Binary<CommandPalette.Item, CommandPalette.Item[], CommandPalette.Item[]>>
-type RemoveP = Curry<Binary<string, CommandPalette.Item[], CommandPalette.Item[]>>
+type AddP = Curry<
+	Binary<
+		CommandPalette.Item,
+		{ items: CommandPalette.Item[]; onNewItem?: (newItem: string) => any },
+		{ items: CommandPalette.Item[]; onNewItem?: (newItem: string) => any }
+	>
+>
+type RemoveP = Curry<
+	Binary<
+		string,
+		{ items: CommandPalette.Item[]; onNewItem?: (newItem: string) => any },
+		{ items: CommandPalette.Item[]; onNewItem?: (newItem: string) => any }
+	>
+>
 type InitCommandPaletteP = { logger: Logger }
 type InitCommandPaletteR = {
 	globalCommandPalette$: Nullable<__CommandPalette$>
@@ -43,24 +58,35 @@ type InitCommandPaletteR = {
 }
 type InitCommandPalette = Unary<InitCommandPaletteP, InitCommandPaletteR>
 
-const currentCommandPalette$ = new BehaviorSubject<CommandPalette.Item[]>([])
+const currentCommandPalette$ = new BehaviorSubject<{
+	items: CommandPalette.Item[]
+	onNewItem?: (newItem: string) => any
+}>({ items: [] })
 
 export const add: Add = item => add$.next(item)
 export const remove: Remove = id => remove$.next(id)
 export const show: Show = items => currentCommandPalette$.next(items)
 export const hide: Hide = () => {
-	currentCommandPalette$.next([])
+	currentCommandPalette$.next({ items: [] })
 	commands.emit<cmd.modal.hide>("modal.hide")
 }
 
 const addP: AddP = item => state =>
-	state.some(({ id: commandName }) => commandName === item.id) ? state : [...state, item]
-const removeP: RemoveP = id => state => state.filter(a => a.id !== id)
+	state.items.some(({ id: commandName }) => commandName === item.id)
+		? state
+		: { ...state, items: [...state.items, item] }
+const removeP: RemoveP = id => state => ({
+	...state,
+	items: state.items.filter(a => a.id !== id),
+})
 
 const add$ = new Subject<CommandPalette.Item>()
 const remove$ = new Subject<string>()
 const globalCommandPalette$ = merge(add$.pipe(map(addP)), remove$.pipe(map(removeP))).pipe(
-	scan((acc, f) => f(acc), [] as CommandPalette.Item[]),
+	scan((acc, f) => f(acc), { items: [] } as {
+		items: CommandPalette.Item[]
+		onNewItem?: (newItem: string) => any
+	}),
 	shareReplay(1),
 )
 

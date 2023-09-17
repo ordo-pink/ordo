@@ -27,7 +27,7 @@ type _P = PropsWithChildren<{
 export default function Sidebar({ children, isNarrow, commandPalette$, sidebar$ }: _P) {
 	const user = useUser()
 	const sidebar = useStrictSubscription(sidebar$, { disabled: true })
-	const commandPaletteItems = useSubscription(commandPalette$)
+	const commandPalette = useSubscription(commandPalette$)
 
 	const onSidebarClick = () => {
 		if (!isNarrow || sidebar.disabled || sidebar.sizes[0] === 0) return
@@ -35,8 +35,7 @@ export default function Sidebar({ children, isNarrow, commandPalette$, sidebar$ 
 	}
 
 	const openCommandPalette = () =>
-		commandPaletteItems &&
-		commands.emit<cmd.commandPalette.show>("command-palette.show", commandPaletteItems)
+		commandPalette && commands.emit<cmd.commandPalette.show>("command-palette.show", commandPalette)
 	const showContextMenu = (event: MouseEvent<HTMLDivElement>) =>
 		commands.emit<cmd.contextMenu.show>("context-menu.show", { event })
 

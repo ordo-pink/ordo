@@ -54,8 +54,8 @@ export const useAppInit = (): UseAppInitReturns => {
 	const [currentRoute$, setCurrentRoute$] = useState<Nullable<__CurrentRoute$>>(null)
 	const [metadata$, setMetadata$] = useState<Nullable<__Metadata$>>(null)
 
-	const commandPaletteItems = useSubscription(currentCommandPalette$)
-	const globalCommandPaletteItems = useSubscription(globalCommandPalette$)
+	const commandPalette = useSubscription(currentCommandPalette$)
+	const globalCommandPalette = useSubscription(globalCommandPalette$)
 
 	useHotkeys(
 		"*",
@@ -71,7 +71,7 @@ export const useAppInit = (): UseAppInitReturns => {
 
 			hotkey += e.code.replace("Key", "").toLocaleLowerCase()
 
-			const command = globalCommandPaletteItems?.find(c => c.accelerator?.includes(hotkey))
+			const command = globalCommandPalette?.items.find(c => c.accelerator?.includes(hotkey))
 
 			if (command) {
 				e.preventDefault()
@@ -80,7 +80,7 @@ export const useAppInit = (): UseAppInitReturns => {
 				command.onSelect()
 			}
 		},
-		[globalCommandPaletteItems],
+		[globalCommandPalette],
 	)
 
 	useEffect(() => {
@@ -118,10 +118,12 @@ export const useAppInit = (): UseAppInitReturns => {
 	}, [])
 
 	useEffect(() => {
-		if (!commandPaletteItems || !commandPaletteItems.length) return
+		if (!commandPalette || !commandPalette.items.length) return
 
 		commands.emit<cmd.modal.show>("modal.show", {
-			Component: () => <CommandPaletteModal items={commandPaletteItems} />,
+			Component: () => (
+				<CommandPaletteModal items={commandPalette.items} onNewItem={commandPalette.onNewItem} />
+			),
 			// The onHide hook makes a redundant call for hiding modal, but helps with closing the
 			// command palette when the modal is closed with a click on the overlay or Esc key press.
 			options: {
@@ -129,7 +131,7 @@ export const useAppInit = (): UseAppInitReturns => {
 				onHide: () => commands.emit<cmd.commandPalette.hide>("command-palette.hide"),
 			},
 		})
-	}, [commandPaletteItems])
+	}, [commandPalette])
 
 	return {
 		auth$,

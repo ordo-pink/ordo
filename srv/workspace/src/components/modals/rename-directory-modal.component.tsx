@@ -2,46 +2,28 @@
 // SPDX-License-Identifier: MIT
 
 import { OrdoButtonPrimary, OrdoButtonSecondary } from "$components/buttons/buttons"
-import { PathBreadcrumbs } from "$components/path-breadcrumbs/path-breadcrumbs"
-import { Directory, DirectoryPath, DirectoryUtils } from "@ordo-pink/data"
+import { PlainData } from "@ordo-pink/data"
 import { cmd, useSharedContext } from "@ordo-pink/frontend-core"
+import { isNonEmptyString } from "@ordo-pink/tau"
 import { ChangeEvent, useState } from "react"
 import { BsPencil } from "react-icons/bs"
 
 type Props = {
-	directory: Directory
+	data: PlainData
 }
 
-export default function RenameDirectoryModal({ directory }: Props) {
+export default function RenameDirectoryModal({ data }: Props) {
 	const { commands } = useSharedContext()
-	const [directoryName, setDirectoryName] = useState(
-		DirectoryUtils.getReadableName(directory.path) ?? "",
-	)
+	const [name, setName] = useState(data.name)
 	const [isValidPath, setIsValidPath] = useState(true)
-	const [parentPath, setParentPath] = useState(DirectoryUtils.getParentPath(directory.path) ?? "/")
 
 	const handleInputChange = (event: ChangeEvent<HTMLInputElement>) => {
-		setDirectoryName(event.target.value)
-		setIsValidPath(
-			event.target.value
-				? DirectoryUtils.isValidPath(parentPath.concat(event.target.value).concat("/"))
-				: true,
-		)
-		setParentPath(
-			DirectoryUtils.isValidPath(parentPath.concat(event.target.value))
-				? DirectoryUtils.getParentPath(parentPath.concat(event.target.value) as DirectoryPath) ??
-						"/"
-				: parentPath,
-		)
+		setName(event.target.value)
+		setIsValidPath(isNonEmptyString(event.target.value))
 	}
 
 	const renameDirectory = () => {
-		const newPath = `${parentPath}${directoryName}/` as const
-		commands.emit<cmd.data.directory.update>("data.update-directory", {
-			path: directory.path,
-			update: { path: newPath },
-		})
-
+		commands.emit<cmd.data.rename>("data.rename", { fsid: data.fsid, name })
 		commands.emit<cmd.modal.hide>("modal.hide")
 	}
 
@@ -61,7 +43,7 @@ export default function RenameDirectoryModal({ directory }: Props) {
 					<h3 className="px-8 text-lg font-bold">{tTitle}</h3>
 
 					<div className="pl-8">
-						<PathBreadcrumbs path={parentPath ?? "/"} />
+						{/* <PathBreadcrumbs path={parentPath ?? "/"} /> */}
 						<input
 							className="w-full rounded-lg outline-none bg-neutral-200 dark:bg-neutral-600 px-4 py-2 shadow-inner"
 							placeholder={tPlaceholder}
@@ -69,7 +51,7 @@ export default function RenameDirectoryModal({ directory }: Props) {
 							autoComplete="off"
 							aria-autocomplete="none"
 							autoFocus
-							value={directoryName}
+							value={name}
 							onChange={handleInputChange}
 						/>
 						<div
@@ -93,7 +75,7 @@ export default function RenameDirectoryModal({ directory }: Props) {
 				<OrdoButtonPrimary
 					onClick={renameDirectory}
 					hotkey="mod+enter"
-					disabled={!directoryName || !isValidPath}
+					disabled={!name || !isValidPath}
 				>
 					{tCreate}
 				</OrdoButtonPrimary>

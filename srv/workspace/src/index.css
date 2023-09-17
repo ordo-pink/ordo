@@ -16,3 +16,22 @@ body {
 	@apply cursor-col-resize bg-no-repeat;
 	background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAeCAYAAADkftS9AAAAIklEQVQoU2M4c+bMfxAGAgYYmwGrIIiDjrELjpo5aiZeMwF+yNnOs5KSvgAAAABJRU5ErkJggg==");
 }
+
+* {
+	&::-webkit-scrollbar {
+		width: 5px;
+		height: 5px;
+
+		&-thumb {
+			@apply invisible rounded-lg bg-neutral-300 dark:bg-neutral-600 my-2;
+		}
+	}
+
+	&:hover {
+		&::-webkit-scrollbar {
+			&-thumb {
+				@apply visible;
+			}
+		}
+	}
+}

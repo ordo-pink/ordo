@@ -7,6 +7,7 @@ import GTDIcon from "./components/gtd-icon.component"
 import GDTCard from "./components/gtd-card.component"
 import GTDSidebar from "./components/gtd-sidebar.component"
 import GTD from "./components/gtd.component"
+import { BsInbox } from "react-icons/bs"
 
 export default function createGTDFunction({ commands }: Functions.CreateFunctionParams) {
 	commands.emit<cmd.activities.add>("activities.add", {
@@ -17,12 +18,21 @@ export default function createGTDFunction({ commands }: Functions.CreateFunction
 			"/gtd",
 			"/gtd/projects",
 			"/gtd/projects/:project",
+			"/gtd/labels/:label",
 			"/gtd/today",
 			"/gtd/this-week",
 			"/gtd/this-month",
 			"/gtd/this-year",
 		],
 		background: false,
+	})
+
+	commands.emit<cmd.commandPalette.add>("command-palette.add", {
+		id: "gtd.open-inbox",
+		onSelect: () => commands.emit<cmd.router.navigate>("router.navigate", "/gtd"),
+		Icon: BsInbox,
+		readableName: "Open GTD Inbox",
+		accelerator: "mod+i",
 	})
 }
 

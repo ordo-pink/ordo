@@ -1,0 +1,24 @@
+.hero-section {
+	perspective: 1000px;
+}
+
+.hero-layers {
+	transform-style: preserve-3d;
+	transform: rotateX(var(--move-y)) rotateY(var(--move-x));
+	transition: var(--transition);
+}
+
+.hero-layer-1 {
+	background-image: url(/index-hero-layer-0.png);
+	transform: translateZ(-250px);
+}
+
+.hero-layer-2 {
+	background-image: url(/index-hero-layer-1.png);
+	transform: translateZ(120px);
+}
+
+.hero-layer-3 {
+	background-image: url(/index-hero-layer-2.png);
+	transform: translateZ(500px);
+}

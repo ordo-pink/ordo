@@ -2,9 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 import type { Oath } from "@ordo-pink/oath"
-import type { Nullable } from "@ordo-pink/tau"
-import type { FSID } from "./common"
-import type { PlainData } from "./data.types"
+import type { FSID, PlainData } from "./data.types"
 import type { DataError } from "./errors.types"
 import type { DataRepository } from "./data-repository.types"
 import type { ContentRepository } from "./content-repository.types"

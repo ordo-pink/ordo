@@ -47,7 +47,7 @@ export default function ActivityBar({
 		)
 
 	const showContextMenu: ShowContextMenu = (event: MouseEvent) =>
-		commands.emit<cmd.contextMenu.show>("context-menu.show", { event })
+		commands.emit<cmd.ctxMenu.show>("context-menu.show", { event })
 
 	useAccelerator("mod+shift+p", showCommandPalette)
 

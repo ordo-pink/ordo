@@ -37,18 +37,18 @@ export default function Sidebar({ children, isNarrow, commandPalette$, sidebar$ 
 	const openCommandPalette = () =>
 		commandPalette && commands.emit<cmd.commandPalette.show>("command-palette.show", commandPalette)
 	const showContextMenu = (event: MouseEvent<HTMLDivElement>) =>
-		commands.emit<cmd.contextMenu.show>("context-menu.show", { event })
+		commands.emit<cmd.ctxMenu.show>("context-menu.show", { event })
 
 	return (
 		<div
-			className="h-screen w-full flex justify-between flex-col p-4 bg-neutral-200 dark:bg-neutral-900"
+			className="h-screen w-full flex justify-between flex-col px-4 py-3 bg-neutral-200 dark:bg-neutral-900"
 			onClick={onSidebarClick}
 			onContextMenu={showContextMenu}
 		>
 			<div>
 				<div className="flex items-center justify-between">
-					<img src={`${Hosts.STATIC}/logo.png`} className="w-10" alt="Ordo.pink Logo" />
-					<div className="text-neutral-500 cursor-pointer" onClick={openCommandPalette}>
+					<img src={`${Hosts.STATIC}/logo.png`} className="w-8" alt="Ordo.pink Logo" />
+					<div className="text-neutral-500 cursor-pointer text-2xl" onClick={openCommandPalette}>
 						<BsThreeDotsVertical />
 					</div>
 				</div>

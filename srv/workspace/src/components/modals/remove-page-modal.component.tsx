@@ -14,7 +14,7 @@ export default function RemoveFileModal({ data }: Props) {
 	const { commands } = useSharedContext()
 
 	const handleRemoveFile = () => {
-		commands.emit<cmd.data.remove>("data.remove", { fsid: data.fsid })
+		commands.emit<cmd.data.remove>("data.remove", data)
 		commands.emit<cmd.modal.hide>("modal.hide")
 	}
 

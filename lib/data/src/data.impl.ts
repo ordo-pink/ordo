@@ -6,7 +6,7 @@ import { validations } from "./data-validations.impl"
 import { PlainData, TData, DataStatic, FSID } from "./data.types"
 import { Errors } from "./errors.impl"
 
-const addUnique = <T>(array: T[], element: T) => Array.from(new Set([...array, element]))
+const addUnique = <T>(array: T[], element: T) => Array.from(new Set([element, ...array]))
 const drop = <T>(array: T[], element: T) => array.filter(item => item !== element)
 const extend =
 	<T extends Record<string, unknown>, N extends Record<string, unknown>>(f: (obj: T) => N) =>

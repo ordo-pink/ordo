@@ -28,53 +28,26 @@ const router = (
 	ctx: Context = { isMethod, isRoute, store } as any,
 	middleware: Middleware[] = [],
 	routes: RouteMap = [],
-	beforeSendMiddleware: RouterBeforeSendMiddleware[] = [], // TODO: Fix type
 ): TRouter => ({
-	use: mw => router(handleError, ctx, middleware.concat([mw]), routes, beforeSendMiddleware),
 	delete: (route, handle) =>
-		router(handleError, ctx, middleware, routes, beforeSendMiddleware).each(
-			["DELETE"],
-			route,
-			handle,
-		),
-	get: (route, handle) =>
-		router(handleError, ctx, middleware, routes, beforeSendMiddleware).each(["GET"], route, handle),
+		router(handleError, ctx, middleware, routes).each(["DELETE"], route, handle),
+	get: (route, handle) => router(handleError, ctx, middleware, routes).each(["GET"], route, handle),
 	head: (route, handle) =>
-		router(handleError, ctx, middleware, routes, beforeSendMiddleware).each(
-			["HEAD"],
-			route,
-			handle,
-		),
+		router(handleError, ctx, middleware, routes).each(["HEAD"], route, handle),
 	options: (route, handle) =>
-		router(handleError, ctx, middleware, routes, beforeSendMiddleware).each(
-			["OPTIONS"],
-			route,
-			handle,
-		),
+		router(handleError, ctx, middleware, routes).each(["OPTIONS"], route, handle),
 	patch: (route, handle) =>
-		router(handleError, ctx, middleware, routes, beforeSendMiddleware).each(
-			["PATCH"],
-			route,
-			handle,
-		),
+		router(handleError, ctx, middleware, routes).each(["PATCH"], route, handle),
 	post: (route, handle) =>
-		router(handleError, ctx, middleware, routes, beforeSendMiddleware).each(
-			["POST"],
-			route,
-			handle,
-		),
-	put: (route, handle) =>
-		router(handleError, ctx, middleware, routes, beforeSendMiddleware).each(["PUT"], route, handle),
-	onError: handleError => router(handleError, ctx, middleware, routes, beforeSendMiddleware),
-	beforeSent: beforeSent =>
-		router(handleError, ctx, middleware, routes, [...beforeSendMiddleware, beforeSent]),
+		router(handleError, ctx, middleware, routes).each(["POST"], route, handle),
+	put: (route, handle) => router(handleError, ctx, middleware, routes).each(["PUT"], route, handle),
+	onError: handleError => router(handleError, ctx, middleware, routes),
 	each: (methods, route, handle) =>
 		router(
 			handleError,
 			ctx,
 			middleware,
 			routes.concat(methods.map(m => [m, route, handle])),
-			beforeSendMiddleware,
 		) as any,
 	orElse: handle => req =>
 		Oath.fromNullable(routes.find(([m, r]) => ctx.isMethod(m, req) && ctx.isRoute(r, req)))
@@ -82,29 +55,13 @@ const router = (
 			.chain(([_, route, handle]) => {
 				const sequence = middleware.concat(handle)
 
-				const oath =
-					sequence.length > 1
-						? sequence.reduce(
-								(acc, handler) =>
-									acc.chain(r =>
-										Oath.try(async () => await handler(req, { ...ctx, route, routes })),
-									),
-								Oath.empty(),
-						  )
-						: Oath.try(async () => await sequence[0](req, { ...ctx, route, routes }))
-
-				return beforeSendMiddleware.length > 0
-					? beforeSendMiddleware.reduce(
-							(acc, mw) =>
-								acc.chain(res =>
-									Oath.try(async () => {
-										await mw(req, res, ctx)
-										return res
-									}),
-								),
-							oath,
+				return sequence.length > 1
+					? sequence.reduce(
+							(acc, handler) =>
+								acc.chain(r => Oath.try(async () => await handler(req, { ...ctx, route, routes }))),
+							Oath.empty(),
 					  )
-					: oath
+					: Oath.try(async () => await sequence[0](req, { ...ctx, route, routes }))
 			})
 			.orElse(handleError),
 })

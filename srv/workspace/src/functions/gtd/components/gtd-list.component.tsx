@@ -6,6 +6,15 @@ import GTDItem from "./gtd-item.component"
 import { useEffect, useState } from "react"
 import { BsCheckCircle, BsChevronDown, BsChevronUp, BsListCheck } from "react-icons/bs"
 import { Switch } from "@ordo-pink/switch"
+import {
+	DndContext,
+	useDroppable,
+	closestCenter,
+	KeyboardSensor,
+	PointerSensor,
+	useSensor,
+	useSensors,
+} from "@dnd-kit/core"
 
 type P = { items: PlainData[] }
 export default function GTDList({ items }: P) {
@@ -13,6 +22,7 @@ export default function GTDList({ items }: P) {
 	const [hasDoneItems, setHasDoneItems] = useState(false)
 	const [doneItems, setDoneItems] = useState<PlainData[]>([])
 	const [pendingItems, setPendingItems] = useState<PlainData[]>([])
+	const { isOver, setNodeRef } = useDroppable({ id: "123" })
 
 	useEffect(() => {
 		const done = items.filter(item => item.labels.includes("done"))
@@ -20,12 +30,12 @@ export default function GTDList({ items }: P) {
 
 		setHasDoneItems(done.length > 0)
 		setDoneItems(done.sort((a, b) => (a.updatedAt < b.updatedAt ? 1 : -1)))
-		setPendingItems(pending.sort((a, b) => (a.updatedAt < b.updatedAt ? 1 : -1)))
+		setPendingItems(pending)
 	}, [items])
 
 	return Switch.of(true)
 		.case(pendingItems.length === 0 && doneItems.length === 0, () => (
-			<div className="flex flex-col items-center justify-center w-full h-full text-neutral-500">
+			<div className="flex flex-col items-center justify-center w-full h-full text-neutral-500 p-0.5">
 				<BsListCheck className="text-9xl" />
 				<div className="text-sm">
 					This list looks empty. Type something in the input to get started!
@@ -33,7 +43,7 @@ export default function GTDList({ items }: P) {
 			</div>
 		))
 		.case(pendingItems.length === 0 && doneItems.length > 0, () => (
-			<div className="overflow-y-auto h-full">
+			<div className="overflow-y-auto h-full p-0.5 flex flex-col space-y-2">
 				<div className="my-8 space-y-4 flex flex-col items-center justify-center w-full text-neutral-500">
 					<BsCheckCircle className="text-6xl text-emerald-500" />
 					<div className="text-sm">Quest complete! Congratulations!</div>
@@ -67,38 +77,40 @@ export default function GTDList({ items }: P) {
 			</div>
 		))
 		.default(() => (
-			<div className="overflow-y-auto flex flex-col space-y-2">
-				{pendingItems
-					.filter(child => !child.labels.includes("done"))
-					.map(child => (
-						<GTDItem key={child.fsid} item={child} />
-					))}
-
-				{showDone ? (
-					<>
-						{hasDoneItems ? (
-							<div
-								className="text-center text-sm text-neutral-500 cursor-pointer flex space-x-2 items-center justify-center"
-								onClick={() => setShowDone(v => !v)}
-							>
-								<BsChevronUp />
-								<div>Hide done items</div>
-							</div>
-						) : null}
-
-						{doneItems.map(child => (
+			<DndContext onDragEnd={console.log}>
+				<div ref={setNodeRef} className="overflow-y-auto flex flex-col space-y-2 p-0.5">
+					{pendingItems
+						.filter(child => !child.labels.includes("done"))
+						.map(child => (
 							<GTDItem key={child.fsid} item={child} />
 						))}
-					</>
-				) : hasDoneItems ? (
-					<div
-						className="text-center text-sm text-neutral-500 cursor-pointer flex space-x-2 items-center justify-center"
-						onClick={() => setShowDone(v => !v)}
-					>
-						<BsChevronDown />
-						<div>Show done items</div>
-					</div>
-				) : null}
-			</div>
+
+					{showDone ? (
+						<>
+							{hasDoneItems ? (
+								<div
+									className="text-center text-sm text-neutral-500 cursor-pointer flex space-x-2 items-center justify-center"
+									onClick={() => setShowDone(v => !v)}
+								>
+									<BsChevronUp />
+									<div>Hide done items</div>
+								</div>
+							) : null}
+
+							{doneItems.map(child => (
+								<GTDItem key={child.fsid} item={child} />
+							))}
+						</>
+					) : hasDoneItems ? (
+						<div
+							className="text-center text-sm text-neutral-500 cursor-pointer flex space-x-2 items-center justify-center"
+							onClick={() => setShowDone(v => !v)}
+						>
+							<BsChevronDown />
+							<div>Show done items</div>
+						</div>
+					) : null}
+				</div>
+			</DndContext>
 		))
 }

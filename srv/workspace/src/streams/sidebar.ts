@@ -68,8 +68,8 @@ export const __initSidebar: InitSidebar = callOnce(({ logger }) => {
 		accelerator: "mod+b",
 	})
 
-	commands.emit<cmd.contextMenu.add>("context-menu.add", {
-		commandName: "sidebar.show",
+	commands.emit<cmd.ctxMenu.add>("context-menu.add", {
+		cmd: "sidebar.show",
 		readableName: "Show sidebar",
 		Icon: AiOutlineRight,
 		shouldShow: ({ event }) => {
@@ -85,8 +85,8 @@ export const __initSidebar: InitSidebar = callOnce(({ logger }) => {
 		accelerator: "mod+b",
 	})
 
-	commands.emit<cmd.contextMenu.add>("context-menu.add", {
-		commandName: "sidebar.hide",
+	commands.emit<cmd.ctxMenu.add>("context-menu.add", {
+		cmd: "sidebar.hide",
 		readableName: "Hide sidebar",
 		Icon: AiOutlineLeft,
 		shouldShow: ({ event }) =>

@@ -17,7 +17,7 @@ import { DataCommands, PlainData } from "@ordo-pink/data"
 import { ClientDataRepository } from "../repositories/client-data-repository.impl"
 import { ClientContentRepository } from "../repositories/client-content-repository"
 import RemoveFileModal from "$components/modals/remove-page-modal.component"
-import RenameDirectoryModal from "$components/modals/rename-directory-modal.component"
+import RenameDirectoryModal from "$components/modals/rename-modal.component"
 import { BsTag } from "react-icons/bs"
 
 const commands = getCommands()
@@ -29,7 +29,7 @@ type Fn = Unary<Params, __Metadata$>
 export const __initData: Fn = ({ logger, auth$ }) => {
 	logger.debug("Initializing data")
 
-	const dataRepository = ClientDataRepository.of(metadata$, auth$ as any, commands)
+	const dataRepository = ClientDataRepository.of(data$, auth$ as any, commands)
 	const contentRepository = ClientContentRepository.of()
 
 	const dataCommands = DataCommands.of({ dataRepository, contentRepository })
@@ -41,23 +41,25 @@ export const __initData: Fn = ({ logger, auth$ }) => {
 	})
 
 	commands.on<cmd.data.showAddLabelPalette>("data.show-add-label-palette", ({ payload }) => {
-		const metadata = metadata$.value
-		const labels = Array.from(new Set(metadata.flatMap(item => item.labels)))
+		const data = data$.value
+		const labels = Array.from(new Set(data.flatMap(item => item.labels)))
 
 		commands.emit<cmd.commandPalette.show>("command-palette.show", {
 			onNewItem: label => {
 				commands.emit<cmd.data.addLabel>("data.add-label", { item: payload, label })
 				commands.emit<cmd.commandPalette.hide>("command-palette.hide")
 			},
-			items: labels.map(label => ({
-				id: label,
-				readableName: label,
-				Icon: BsTag,
-				onSelect: () => {
-					commands.emit<cmd.data.addLabel>("data.add-label", { item: payload, label })
-					commands.emit<cmd.commandPalette.hide>("command-palette.hide")
-				},
-			})),
+			items: labels
+				.filter(label => !payload.labels.includes(label))
+				.map(label => ({
+					id: label,
+					readableName: label,
+					Icon: BsTag,
+					onSelect: () => {
+						commands.emit<cmd.data.addLabel>("data.add-label", { item: payload, label })
+						commands.emit<cmd.commandPalette.hide>("command-palette.hide")
+					},
+				})),
 		})
 	})
 
@@ -110,6 +112,19 @@ export const __initData: Fn = ({ logger, auth$ }) => {
 
 		dataCommands
 			.rename({ fsid: payload.fsid, createdBy: auth.sub, name: payload.name, updatedBy: auth.sub })
+			.orNothing()
+	})
+
+	commands.on<cmd.data.move>("data.move", ({ payload }) => {
+		const auth = (auth$ as BehaviorSubject<AuthResponse>).value
+
+		dataCommands
+			.move({
+				fsid: payload.fsid,
+				createdBy: auth.sub,
+				parent: payload.parent,
+				updatedBy: auth.sub,
+			})
 			.orNothing()
 	})
 
@@ -284,11 +299,11 @@ export const __initData: Fn = ({ logger, auth$ }) => {
 			.rejectedMap(rrrToNotification("Error fetching directories"))
 			.fork(
 				item => commands.emit<cmd.notification.show>("notification.show", item),
-				result => metadata$.next(result),
+				result => data$.next(result),
 			)
 	})
 
-	return metadata$
+	return data$
 }
 
-const metadata$ = new BehaviorSubject<PlainData[]>([])
+const data$ = new BehaviorSubject<PlainData[]>([])

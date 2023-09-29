@@ -7,33 +7,39 @@ import Null from "./null"
 import { useSharedContext } from "@ordo-pink/frontend-core"
 import { Either } from "@ordo-pink/either"
 
-const MAX_TOTAL_SIZE_MB = 50
+// const MAX_TOTAL_SIZE_MB = 50
 
 export default function UsedSpace() {
-	const { metadata } = useSharedContext()
+	const { data } = useSharedContext()
 
 	const [percentage, setPercentage] = useState(0)
 	const [size, setSize] = useState(0)
 
 	useEffect(() => {
-		Either.fromNullable(metadata)
-			.map(items => items.reduce((acc, item) => acc + Number(item.size), 0))
-			.map(size => size / 1024 / 1024)
-			.fold(noop, megabytes => {
-				setSize(megabytes)
-				setPercentage((megabytes / MAX_TOTAL_SIZE_MB) * 100)
+		// Either.fromNullable(data)
+		// 	.map(items => items.reduce((acc, item) => acc + Number(item.size), 0))
+		// 	.map(size => size / 1024 / 1024)
+		// 	.fold(noop, megabytes => {
+		// 		setSize(megabytes)
+		// 		setPercentage((megabytes / MAX_TOTAL_SIZE_MB) * 100)
+		// 	})
+		Either.fromNullable(data)
+			.map(items => items.length)
+			.fold(noop, length => {
+				setSize(length)
+				setPercentage(length / 10)
 			})
-	}, [metadata])
+	}, [data])
 
-	return Either.fromNullable(metadata).fold(Null, metadata => (
+	return Either.fromNullable(data).fold(Null, () => (
 		<div className="w-full max-w-sm">
 			<div className="flex justify-between items-center w-full">
-				<div className="text-xs truncate">Used space</div>
+				<div className="text-xs truncate">File limit</div>
 				<div className="text-xs">
 					{size.toFixed(0)}
 					{"/"}
-					{MAX_TOTAL_SIZE_MB}
-					{"MB"}
+					{1000}
+					{/* {"MB"} */}
 				</div>
 			</div>
 			<div className="w-full bg-neutral-300 rounded-full dark:bg-neutral-700 shadow-inner">

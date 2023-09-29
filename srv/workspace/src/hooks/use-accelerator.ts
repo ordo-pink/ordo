@@ -30,8 +30,6 @@ export const useAccelerator = (accelerator: Optional<string>, callback: HotkeyCa
 			keyboardEvent.stopPropagation()
 			keyboardEvent.preventDefault()
 
-			console.log("HERE")
-
 			callback(keyboardEvent, hotkeyEvent)
 		},
 		{

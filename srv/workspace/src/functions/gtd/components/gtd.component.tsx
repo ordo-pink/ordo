@@ -6,142 +6,80 @@ import { CenteredPage } from "$components/centered-page"
 import { TextInput } from "$components/input"
 import { useAccelerator } from "$hooks/use-accelerator"
 import { PlainData } from "@ordo-pink/data"
-import { CommandPalette, cmd, useSharedContext } from "@ordo-pink/frontend-core"
-import { Nullable } from "@ordo-pink/tau"
+import { Commands, cmd, useSharedContext } from "@ordo-pink/frontend-core"
+import { Nullable, noop } from "@ordo-pink/tau"
 import { useEffect, useRef, useState } from "react"
-import {
-	BsArrowRightSquare,
-	BsFileEarmarkPlus,
-	BsNodePlus,
-	BsPencilSquare,
-	BsTags,
-	BsTagsFill,
-} from "react-icons/bs"
 import GTDList from "./gtd-list.component"
-import FileIconComponent from "../../file-explorer/components/file-icon.component"
+import { GTDCommands } from "../types"
+import { GTDCtxMenu } from "../context-menu-items"
+import { Either } from "@ordo-pink/either"
+import { useChildren } from "$hooks/use-children"
+import Null from "$components/null"
 
 export default function GTD() {
-	const { commands, currentRoute, metadata } = useSharedContext()
+	const { commands, route, data } = useSharedContext()
 	const [currentItem, setCurrentItem] = useState<Nullable<PlainData>>(null)
-	const [children, setChildren] = useState<PlainData[]>([])
+	const children = useChildren(currentItem?.fsid ?? null)
 	const [newItem, setNewItem] = useState("")
-	const gtdDirectory = metadata?.find(item => item.name === ".gtd" && item.parent === null)
+	const gtdDirectory = data?.find(item => item.name === ".gtd" && item.parent === null)
 	const createInputRef = useRef<HTMLInputElement>(null)
-
-	useEffect(() => {
-		commands.emit<cmd.commandPalette.add>("command-palette.add", {
-			id: "add-gtd-task-to-current-list",
-			onSelect: () => {
-				createInputRef.current?.focus()
-				commands.emit<cmd.commandPalette.hide>("command-palette.hide")
-			},
-			readableName: "Add GTD task to current project",
-			accelerator: "meta+n",
-			Icon: BsFileEarmarkPlus,
-		})
-
-		return () => {
-			commands.emit<cmd.commandPalette.remove>(
-				"command-palette.remove",
-				"add-gtd-task-to-current-list",
-			)
-		}
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [])
 
 	useAccelerator("meta+n", () => createInputRef.current?.focus())
 
 	useEffect(() => {
-		commands.emit<cmd.contextMenu.add>("context-menu.add", {
-			commandName: "data.show-rename-modal",
-			Icon: BsPencilSquare,
-			readableName: "Rename",
-			shouldShow: ({ payload }) =>
-				payload && payload.fsid && payload.name && payload.name !== ".inbox",
-			type: "update",
-		})
+		const handleRedirectOnRemove: Commands.Handler<PlainData> = ({ payload }) =>
+			route?.params?.item === payload.fsid && commands.emit<GTDCommands.openInbox>("gtd.open-inbox")
 
-		commands.emit<cmd.contextMenu.add>("context-menu.add", {
-			commandName: "data.show-add-label-palette",
-			Icon: BsTags,
-			readableName: "Add label",
-			shouldShow: ({ payload }) => payload && payload.fsid && payload.name,
-			type: "update",
-		})
+		const handleShowMovePalette = GTDCtxMenu.move(data, commands)
 
-		commands.emit<cmd.contextMenu.add>("context-menu.add", {
-			commandName: "data.show-remove-label-palette",
-			Icon: BsTagsFill,
-			readableName: "Remove label",
-			shouldShow: ({ payload }) => payload && payload.fsid && payload.name,
-			type: "update",
-			shouldBeDisabled: ({ payload }) => payload.labels.length === 0,
-		})
+		commands.on<cmd.data.remove>("data.remove", handleRedirectOnRemove)
+		commands.emit<cmd.ctxMenu.add>("context-menu.add", GTDCtxMenu.rename)
+		commands.emit<cmd.ctxMenu.add>("context-menu.add", GTDCtxMenu.addLabelPalette)
+		commands.emit<cmd.ctxMenu.add>("context-menu.add", GTDCtxMenu.removeLabelPalette)
+		commands.emit<cmd.ctxMenu.add>("context-menu.add", GTDCtxMenu.createModal)
+		commands.emit<cmd.ctxMenu.add>("context-menu.add", handleShowMovePalette)
 
-		commands.emit<cmd.contextMenu.add>("context-menu.add", {
-			commandName: "data.show-create-modal",
-			Icon: BsNodePlus,
-			readableName: "Add",
-			shouldShow: ({ payload }) => payload && payload.fsid,
-			type: "create",
-		})
-
-		commands.emit<cmd.contextMenu.add>("context-menu.add", {
-			commandName: "command-palette.show",
-			Icon: BsArrowRightSquare,
-			readableName: "Move...",
-			shouldShow: ({ payload }) =>
-				payload && payload.fsid && payload.name && payload.name !== ".inbox",
-			payloadCreator: () => ({
-				items: metadata?.map(
-					item =>
-						({
-							id: item.name,
-							readableName: item.name,
-							onSelect: () => alert("TODO"),
-							Icon: () => <FileIconComponent plain={item} />,
-						}) satisfies CommandPalette.Item,
-				),
-			}),
-			type: "update",
-		})
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [])
+		return () => {
+			commands.off<cmd.data.remove>("data.remove", handleRedirectOnRemove)
+			commands.emit<cmd.ctxMenu.remove>("context-menu.remove", GTDCtxMenu.rename.cmd)
+			commands.emit<cmd.ctxMenu.remove>("context-menu.remove", GTDCtxMenu.addLabelPalette.cmd)
+			commands.emit<cmd.ctxMenu.remove>("context-menu.remove", GTDCtxMenu.removeLabelPalette.cmd)
+			commands.emit<cmd.ctxMenu.remove>("context-menu.remove", GTDCtxMenu.createModal.cmd)
+			commands.emit<cmd.ctxMenu.remove>("context-menu.remove", handleShowMovePalette.cmd)
+		}
+	}, [commands, data, route?.params?.item])
 
 	useEffect(() => {
-		if (!metadata || !currentRoute) return
-
-		const gtd = metadata.find(item => item.name === ".gtd" && item.parent === null)
-
-		const currentItem = metadata.find(item =>
-			currentRoute.path === "/gtd"
-				? item.name === ".inbox" && item.parent === gtd?.fsid
-				: item.name === decodeURIComponent(currentRoute.params.project) &&
-				  item.parent === gtd?.fsid,
-		)
-
-		setCurrentItem(currentItem ?? null)
-
-		if (currentItem) {
-			setChildren(
-				currentItem.children
-					.map(child => metadata.find(item => item.fsid === child))
-					.filter(Boolean) as PlainData[],
+		Either.fromNullable(data)
+			.chain(data =>
+				Either.fromNullable(route).chain(route =>
+					Either.fromNullable(data.find(item => item.name === ".gtd" && item.parent === null)).map(
+						gtd => ({ data, route, gtd }),
+					),
+				),
 			)
-		}
-
+			.chain(({ gtd, data, route }) =>
+				Either.fromNullable(
+					data.find(item =>
+						route.path === "/gtd"
+							? item.name === ".inbox" && item.parent === gtd?.fsid
+							: item.fsid === route.params.item,
+					),
+				),
+			)
+			.fold(noop, setCurrentItem)
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [currentRoute, gtdDirectory, metadata])
+	}, [route, gtdDirectory, data])
 
 	const tAddToInboxInputPlaceholder = "Sell milk..."
 
-	return (
+	return Either.fromNullable(currentItem).fold(Null, currentItem => (
 		<CenteredPage centerX centerY>
 			<div className="px-4 py-8 w-full flex flex-col space-y-4 items-center overflow-y-hidden">
 				<div className="w-full max-w-2xl flex flex-col space-y-4">
 					<Card
 						className="h-[90vh]"
-						title={currentItem?.name === ".inbox" ? "Inbox" : currentItem?.name}
+						title={currentItem.name === ".inbox" ? "Inbox" : currentItem.name}
 					>
 						<TextInput
 							forwardRef={createInputRef}
@@ -167,5 +105,5 @@ export default function GTD() {
 				</div>
 			</div>
 		</CenteredPage>
-	)
+	))
 }

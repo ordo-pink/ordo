@@ -38,6 +38,16 @@ const of = <T>({ dataRepository, contentRepository }: DataCommandsParams<T>): TD
 		)
 			.chain(() => Data.new(params).fold(Oath.reject, Oath.resolve))
 			.chain(child =>
+				dataRepository
+					.create(child.plain)
+					.chain(() =>
+						contentRepository
+							.create(child.plain.createdBy, child.plain.fsid)
+							.map(() => child.plain),
+					)
+					.map(() => child),
+			)
+			.chain(child =>
 				child.plain.parent
 					? dataRepository
 							.get(child.plain.createdBy, child.plain.parent)
@@ -46,17 +56,8 @@ const of = <T>({ dataRepository, contentRepository }: DataCommandsParams<T>): TD
 									.addChild(child.plain.fsid, child.plain.updatedBy)
 									.fold(Oath.reject, Oath.resolve),
 							)
-							.chain(parent => dataRepository.update(parent.plain).map(() => child))
-					: Oath.resolve(child),
-			)
-			.chain(child =>
-				dataRepository
-					.create(child.plain)
-					.chain(() =>
-						contentRepository
-							.create(child.plain.createdBy, child.plain.fsid)
-							.map(() => child.plain),
-					),
+							.chain(parent => dataRepository.update(parent.plain).map(() => child.plain))
+					: Oath.resolve(child.plain),
 			),
 	fetch: ({ createdBy }) => dataRepository.getAll(createdBy),
 	link: ({ createdBy, fsid, link, updatedBy }) =>
@@ -124,12 +125,40 @@ const of = <T>({ dataRepository, contentRepository }: DataCommandsParams<T>): TD
 	remove: ({ createdBy, fsid }) =>
 		dataRepository
 			.exists(createdBy, fsid)
-			.chain(exists =>
-				exists
-					? dataRepository
-							.delete(createdBy, fsid)
-							.chain(() => contentRepository.delete(createdBy, fsid))
-					: Oath.reject(Data.Errors.DataNotFound),
+			.chain(Oath.ifElse(x => !!x, { onFalse: () => Errors.DataNotFound }))
+			.chain(() => dataRepository.getAll(createdBy))
+			.chain(data =>
+				Oath.all(
+					data.map(async item => {
+						const hasRemovedItemInChildren = item.children.includes(fsid)
+						const hasRemovedItemInLinks = item.links.includes(fsid)
+						const hasRemovedItemInParent = item.parent === fsid
+
+						if (hasRemovedItemInParent) {
+							await DataCommands.of({ dataRepository, contentRepository })
+								.remove({
+									createdBy: item.createdBy,
+									fsid: item.fsid,
+								})
+								.toPromise()
+						}
+
+						if (hasRemovedItemInChildren || hasRemovedItemInLinks) {
+							if (hasRemovedItemInChildren) item.children.splice(item.children.indexOf(fsid), 1)
+							if (hasRemovedItemInLinks) item.links.splice(item.links.indexOf(fsid, 1))
+
+							await dataRepository.update(item).toPromise()
+						}
+
+						return "OK"
+					}),
+				),
+			)
+			.chain(() =>
+				dataRepository
+					.delete(createdBy, fsid)
+					.chain(() => contentRepository.delete(createdBy, fsid))
+					.fix(() => "OK"),
 			),
 	rename: ({ fsid, createdBy, name, updatedBy }) =>
 		dataRepository

@@ -18,7 +18,6 @@ Oath.of("./srv")
 		Oath.all(paths.map(path => directoryExists0(path).map(exists => (exists ? path : false)))),
 	)
 	.map(items => items.filter(Boolean) as string[])
-	.tap(console.log)
 	.chain(publicPaths =>
 		Oath.all(
 			publicPaths.map(publicPath =>

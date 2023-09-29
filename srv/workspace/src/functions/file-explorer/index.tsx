@@ -15,7 +15,7 @@ type openRootInFileExplorer = { name: "file-explorer.open-root" }
 
 export default function createFileExplorerFunction({
 	commands,
-	metadata$,
+	data$,
 }: Functions.CreateFunctionParams) {
 	commands.on<openInFileExplorer>("file-explorer.go-to", ({ payload }) =>
 		commands.emit<cmd.router.navigate>("router.navigate", `/fs${payload}`),
@@ -51,8 +51,8 @@ export default function createFileExplorerFunction({
 	// 	type: "delete",
 	// })
 
-	commands.emit<cmd.contextMenu.add>("context-menu.add", {
-		commandName: "data.show-create-modal",
+	commands.emit<cmd.ctxMenu.add>("context-menu.add", {
+		cmd: "data.show-create-modal",
 		Icon: BsNodePlus,
 		readableName: "Add page",
 		shouldShow: ({ payload }) => payload && payload.fsid,
@@ -69,8 +69,8 @@ export default function createFileExplorerFunction({
 	// 	accelerator: "mod+u",
 	// })
 
-	commands.emit<cmd.contextMenu.add>("context-menu.add", {
-		commandName: "data.show-remove-modal",
+	commands.emit<cmd.ctxMenu.add>("context-menu.add", {
+		cmd: "data.show-remove-modal",
 		Icon: BsNodeMinus,
 		readableName: "Remove",
 		shouldShow: ({ payload }) => payload && payload.fsid,
@@ -102,7 +102,7 @@ export default function createFileExplorerFunction({
 	// 		commands.emit<cmd.commandPalette.hide>("command-palette.hide")
 	// 		commands.emit<cmd.commandPalette.show>(
 	// 			"command-palette.show",
-	// 			(metadata$ as BehaviorSubject<PlainData[]>).value.map(item => ({
+	// 			(data$ as BehaviorSubject<PlainData[]>).value.map(item => ({
 	// 				id: item.fsid,
 	// 				readableName: item.name,
 	// 				onSelect: () => {

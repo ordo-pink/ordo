@@ -35,6 +35,9 @@ export const keysOf: T._KeysOfFn = o => {
 }
 
 export const noop = () => {}
+export const extend =
+	<T extends Record<string, unknown>, N extends Record<string, unknown>>(f: (obj: T) => N) =>
+	(obj: T) => ({ ...obj, ...f(obj) })
 
 export const callOnce = <T extends any[], R>(fn: (...args: T) => R) => {
 	let wasCalled = false

@@ -36,7 +36,7 @@ export type UseAppInitReturns = {
 	activities$: Nullable<__Activities$>
 	currentActivity$: Nullable<__CurrentActivity$>
 	currentRoute$: Nullable<__CurrentRoute$>
-	metadata$: Nullable<__Metadata$>
+	data$: Nullable<__Metadata$>
 }
 
 export const useAppInit = (): UseAppInitReturns => {
@@ -52,7 +52,7 @@ export const useAppInit = (): UseAppInitReturns => {
 	const [activities$, setActivities$] = useState<Nullable<__Activities$>>(null)
 	const [currentActivity$, setCurrentActivity$] = useState<Nullable<__CurrentActivity$>>(null)
 	const [currentRoute$, setCurrentRoute$] = useState<Nullable<__CurrentRoute$>>(null)
-	const [metadata$, setMetadata$] = useState<Nullable<__Metadata$>>(null)
+	const [data$, setData$] = useState<Nullable<__Metadata$>>(null)
 
 	const commandPalette = useSubscription(currentCommandPalette$)
 	const globalCommandPalette = useSubscription(globalCommandPalette$)
@@ -64,14 +64,14 @@ export const useAppInit = (): UseAppInitReturns => {
 
 			let hotkey = ""
 
+			if (e.altKey) hotkey += "meta+"
 			if (e.ctrlKey) hotkey += isDarwin ? "ctrl+" : "mod+"
 			if (e.metaKey) hotkey += "mod+"
-			if (e.altKey) hotkey += "meta+"
 			if (e.shiftKey) hotkey += "shift+"
 
 			hotkey += e.code.replace("Key", "").toLocaleLowerCase()
 
-			const command = globalCommandPalette?.items.find(c => c.accelerator?.includes(hotkey))
+			const command = globalCommandPalette?.items.find(c => c.accelerator === hotkey)
 
 			if (command) {
 				e.preventDefault()
@@ -111,8 +111,8 @@ export const useAppInit = (): UseAppInitReturns => {
 		const sidebar$ = __initSidebar(ctx)
 		setSidebar$(sidebar$)
 
-		const metadata$ = __initData({ ...ctx, auth$ })
-		setMetadata$(metadata$)
+		const data$ = __initData({ ...ctx, auth$ })
+		setData$(data$)
 
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [])
@@ -137,7 +137,7 @@ export const useAppInit = (): UseAppInitReturns => {
 		auth$,
 		modal$,
 		sidebar$,
-		metadata$,
+		data$: data$,
 		activities$,
 		contextMenu$,
 		notification$,

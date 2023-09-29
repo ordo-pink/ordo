@@ -37,15 +37,25 @@ export default function CommandPaletteModal({ items, onNewItem }: Props) {
 
 	useEffect(() => {
 		if (!items) return
+
 		if (inputValue === "") {
 			setVisibleItems(items)
+
+			if (items.length - 1 < currentIndex) {
+				setCurrentIndex(items.length > 0 ? items.length - 1 : 0)
+			}
+
 			return
 		}
 
 		const fusedItems = fuse.search(inputValue)
 
 		setVisibleItems(fusedItems.map(({ item }) => item))
-	}, [inputValue, items])
+
+		if (fusedItems.length - 1 < currentIndex) {
+			setCurrentIndex(fusedItems.length > 0 ? fusedItems.length - 1 : 0)
+		}
+	}, [inputValue, items, currentIndex])
 
 	const handleInputChange = (event: ChangeEvent<HTMLInputElement>) => {
 		setInputValue(event.target.value)
@@ -120,7 +130,7 @@ export default function CommandPaletteModal({ items, onNewItem }: Props) {
 					/>
 				))}
 
-				{onNewItem && inputValue.length ? (
+				{onNewItem && inputValue.length > 0 && visibleItems.length === 0 ? (
 					<ActionListItem
 						large
 						Icon={BsPlus}

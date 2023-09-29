@@ -9,7 +9,7 @@ import { __Activities$ } from "$streams/activities"
 import { Activity, ComponentSpace, Functions, cmd } from "@ordo-pink/frontend-core"
 import { Switch } from "@ordo-pink/switch"
 import { Nullable } from "@ordo-pink/tau"
-import { memo, useEffect } from "react"
+import { memo } from "react"
 import { BsCollection } from "react-icons/bs"
 
 type Params = Functions.CreateFunctionParams & { activities$: Nullable<__Activities$> }

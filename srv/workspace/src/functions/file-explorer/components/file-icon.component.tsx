@@ -3,9 +3,14 @@
 
 import { PlainData } from "@ordo-pink/data"
 import { Switch } from "@ordo-pink/switch"
-import { BsFileBinary } from "react-icons/bs"
+import { BsFileEarmark, BsFolder2 } from "react-icons/bs"
 
 type P = { plain: PlainData }
 export default function FileIconComponent({ plain }: P) {
-	return Switch.of(plain.name).default(() => <BsFileBinary className="w-full h-full" />)
+	return Switch.of(plain)
+		.case(
+			plain => plain.children.length > 0,
+			() => <BsFolder2 />,
+		)
+		.default(() => <BsFileEarmark className="w-full h-full" />)
 }

@@ -11,7 +11,7 @@ export default function DirectoryCardComponent({ plain }: P) {
 	const { commands } = useSharedContext()
 
 	const showContextMenu = (event: MouseEvent<HTMLDivElement>) =>
-		commands.emit<cmd.contextMenu.show>("context-menu.show", { event, payload: plain })
+		commands.emit<cmd.ctxMenu.show>("context-menu.show", { event, payload: plain })
 
 	return (
 		<div className="directory-card flex flex-col items-center" onContextMenu={showContextMenu}>

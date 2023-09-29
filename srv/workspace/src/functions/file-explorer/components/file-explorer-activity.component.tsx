@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 import Null from "$components/null"
-import { PlainData, Data, FSID } from "@ordo-pink/data"
+import { PlainData, FSID } from "@ordo-pink/data"
 import { Either } from "@ordo-pink/either"
 import { Activity, cmd, useSharedContext } from "@ordo-pink/frontend-core"
 import { MouseEvent, useEffect, useState } from "react"
@@ -14,35 +14,35 @@ import { Nullable } from "@ordo-pink/tau"
 export default function FileExplorerActivityComponent({
 	commands,
 }: Pick<Activity.ComponentProps, "commands">) {
-	const { metadata, currentRoute } = useSharedContext()
+	const { data, route } = useSharedContext()
 	const [selectedItems, setSelectedItems] = useState<FSID[]>([])
 	const [currentDirectory, setCurrentDirectory] = useState<Nullable<PlainData>>(null)
 
 	const showContextMenu = (event: MouseEvent<HTMLDivElement>) =>
-		commands.emit<cmd.contextMenu.show>("context-menu.show", { event, payload: currentDirectory })
+		commands.emit<cmd.ctxMenu.show>("context-menu.show", { event, payload: currentDirectory })
 
 	useEffect(() => {
 		Switch.of(true)
-			.case(!currentRoute || !metadata, () => setCurrentDirectory(null))
-			.case(currentRoute!.path === "/fs", () =>
-				Either.fromNullable(metadata).fold(
+			.case(!route || !data, () => setCurrentDirectory(null))
+			.case(route!.path === "/fs", () =>
+				Either.fromNullable(data).fold(
 					() => setCurrentDirectory(null),
 					root => setCurrentDirectory(null),
 				),
 			)
 			.default(() =>
-				Either.fromNullable(metadata)
+				Either.fromNullable(data)
 					.chain(items =>
-						Either.fromNullable(items.find(item => item.fsid === currentRoute!.path.slice(4))),
+						Either.fromNullable(items.find(item => item.fsid === route!.path.slice(4))),
 					)
 					.fold(
 						() => setCurrentDirectory(null),
 						root => setCurrentDirectory(root),
 					),
 			)
-	}, [metadata, currentRoute])
+	}, [data, route])
 
-	return Either.fromNullable(metadata).fold(Null, items => (
+	return Either.fromNullable(data).fold(Null, items => (
 		<div className="h-full w-full" onContextMenu={showContextMenu}>
 			<div className="file-explorer w-full container grid grid-cols-3 md:grid-cols-6 lg:grid-cols-12 gap-4 p-4">
 				{items

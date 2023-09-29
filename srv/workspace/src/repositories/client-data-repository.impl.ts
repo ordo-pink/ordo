@@ -10,17 +10,17 @@ import { Oath } from "@ordo-pink/oath"
 import { BehaviorSubject } from "rxjs"
 
 const of = (
-	metadata$: BehaviorSubject<PlainData[]>,
+	data$: BehaviorSubject<PlainData[]>,
 	auth$: BehaviorSubject<AuthResponse>,
 	commands: Commands.Commands,
 ): DataRepository => ({
 	create: plain => {
-		const metadata = metadata$.value
+		const data = data$.value
 		const auth = auth$.value
 
-		if (!metadata) return Oath.reject(Data.Errors.DataNotFound)
+		if (!data) return Oath.reject(Data.Errors.DataNotFound)
 
-		metadata$.next([...metadata, plain])
+		data$.next([...data, plain])
 
 		Oath.fromNullable(auth)
 			.chain(auth =>
@@ -49,10 +49,10 @@ const of = (
 		return Oath.of(plain)
 	},
 	delete: (_, fsid) => {
-		const metadata = metadata$.value
+		const data = data$.value
 		const auth = auth$.value
 
-		if (!metadata) return Oath.of("OK")
+		if (!data) return Oath.of("OK")
 
 		Oath.fromNullable(auth)
 			.chain(auth =>
@@ -77,32 +77,32 @@ const of = (
 				},
 			)
 
-		metadata$.next(metadata.filter(item => item.fsid !== fsid))
+		data$.next(data.filter(item => item.fsid !== fsid))
 
 		return Oath.of("OK")
 	},
 	exists: (_, fsid) => {
-		const metadata = metadata$.value
+		const data = data$.value
 
-		if (!metadata) return Oath.of(false)
+		if (!data) return Oath.of(false)
 
-		return Oath.of(metadata.some(item => item.fsid === fsid))
+		return Oath.of(data.some(item => item.fsid === fsid))
 	},
 	find: (_, name, parent) => {
-		const metadata = metadata$.value
+		const data = data$.value
 
-		if (!metadata) return Oath.reject(Data.Errors.DataNotFound)
+		if (!data) return Oath.reject(Data.Errors.DataNotFound)
 
-		return Oath.of(metadata.find(item => item.name === name && item.parent === parent))
+		return Oath.of(data.find(item => item.name === name && item.parent === parent))
 			.chain(Oath.fromNullable)
 			.rejectedMap(() => Data.Errors.DataNotFound)
 	},
 	get: (_, fsid) => {
-		const metadata = metadata$.value
+		const data = data$.value
 
-		if (!metadata) return Oath.reject(Data.Errors.DataNotFound)
+		if (!data) return Oath.reject(Data.Errors.DataNotFound)
 
-		return Oath.of(metadata.find(item => item.fsid === fsid))
+		return Oath.of(data.find(item => item.fsid === fsid))
 			.chain(Oath.fromNullable)
 			.rejectedMap(() => Data.Errors.DataNotFound)
 	},
@@ -121,24 +121,24 @@ const of = (
 			.rejectedMap(() => Data.Errors.DataNotFound)
 			.tap(
 				// item => commands.emit<cmd.notification.show>("notification.show", item),
-				result => metadata$.next(result),
+				result => data$.next(result),
 			)
 	},
 	update: plain => {
-		const metadata = metadata$.value
+		const data = data$.value
 		const auth = auth$.value
 
-		if (!metadata) return Oath.reject(Data.Errors.DataNotFound)
+		if (!data) return Oath.reject(Data.Errors.DataNotFound)
 
-		const updatedItem = metadata.findIndex(item => item.fsid === plain.fsid)
+		const updatedItem = data.findIndex(item => item.fsid === plain.fsid)
 
 		if (updatedItem < 0) return Oath.reject(Data.Errors.DataNotFound)
 
-		const metadataCopy = [...metadata]
+		const dataCopy = [...data]
 
-		metadataCopy.splice(updatedItem, 1, plain)
+		dataCopy.splice(updatedItem, 1, plain)
 
-		metadata$.next(metadataCopy)
+		data$.next(dataCopy)
 
 		Oath.fromNullable(auth)
 			.chain(auth =>

@@ -1,8 +1,6 @@
 // SPDX-FileCopyrightText: Copyright 2023, 谢尔盖||↓ and the Ordo.pink contributors
 // SPDX-License-Identifier: MIT
 
-import { Oath } from "@ordo-pink/oath"
-
 export type Middleware<Ctx = Context, Result = any> = (request: Request, ctx: Ctx) => Result
 
 export type Context<S extends Record<string, unknown> = Record<string, unknown>> = {
@@ -60,11 +58,9 @@ export type TRouter = {
 	patch: RouteHandler
 	delete: RouteHandler
 	options: RouteHandler
-	use: RouterUseHandler
 	each: RouterEachHandler
 	orElse: RouterOrElseHandler
 	onError: RouterErrorHandler
-	beforeSent: RouterHandleBeforeSend
 }
 
 // export type Intake = Request

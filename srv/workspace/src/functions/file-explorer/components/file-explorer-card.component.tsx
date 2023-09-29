@@ -6,9 +6,9 @@ import { Either } from "@ordo-pink/either"
 import { useSharedContext } from "@ordo-pink/frontend-core"
 
 export default function FileExplorerCardComponent() {
-	const { metadata } = useSharedContext()
+	const { data } = useSharedContext()
 
-	return Either.fromNullable(metadata).fold(Null, items => (
+	return Either.fromNullable(data).fold(Null, items => (
 		<div className="w-full h-full flex items-center justify-center">
 			<h1>TODO: Recent files, favourite files</h1>
 		</div>

@@ -2,14 +2,14 @@
 // SPDX-License-Identifier: MIT
 
 import { OrdoButtonPrimary, OrdoButtonSecondary } from "$components/buttons/buttons"
-import { PathBreadcrumbs } from "$components/path-breadcrumbs/path-breadcrumbs"
-import { Directory } from "@ordo-pink/data"
+import { PlainData } from "@ordo-pink/data"
 import { cmd, useSharedContext } from "@ordo-pink/frontend-core"
+import { Nullable } from "@ordo-pink/tau"
 import { ChangeEvent, useState } from "react"
 import { BsFileEarmarkPlus } from "react-icons/bs"
 
 type Props = {
-	parent?: Directory
+	parent: Nullable<PlainData>
 }
 
 export default function UploadFilesModal({ parent }: Props) {
@@ -23,12 +23,11 @@ export default function UploadFilesModal({ parent }: Props) {
 
 	const handleOkButtonClick = async () => {
 		for (const file of files) {
-			const parentPath = parent ? parent.path : "/"
 			const name = file.name
-			const path = `${parentPath}${name}` as const
 
-			commands.emit<cmd.data.file.setContent>("data.set-file-content", {
-				path,
+			commands.emit<cmd.data.uploadContent>("data.upload-content", {
+				name,
+				parent: parent?.fsid ?? null,
 				content: await file.arrayBuffer(),
 			})
 		}
@@ -49,7 +48,7 @@ export default function UploadFilesModal({ parent }: Props) {
 					<h3 className="px-8 text-lg font-bold">{tTitle}</h3>
 
 					<div className="pl-8">
-						<PathBreadcrumbs path={parent?.path ?? "/"} />
+						{/* <PathBreadcrumbs path={parent?.path ?? "/"} /> */}
 						<input
 							type="file"
 							multiple

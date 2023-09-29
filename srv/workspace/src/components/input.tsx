@@ -15,6 +15,7 @@ type InputProps = {
 	id: string
 	label: string
 	name?: string
+	autoFocus?: boolean
 	type?: string
 	placeholder?: string
 	autocomplete?: string
@@ -38,6 +39,7 @@ export const TextInput = ({
 	placeholder = "",
 	type = "text",
 	name = "",
+	autoFocus,
 	autocomplete = "off",
 	forwardRef: ref,
 }: InputProps) => (
@@ -48,6 +50,7 @@ export const TextInput = ({
 		<input
 			ref={ref}
 			id={id}
+			autoFocus={autoFocus}
 			name={name}
 			type={type}
 			autoComplete={autocomplete}
@@ -55,7 +58,7 @@ export const TextInput = ({
 			onKeyDown={onKeyDown}
 			onChange={onInput}
 			placeholder={placeholder}
-			className="w-full px-2 py-1 rounded-md border-0 shadow-inner placeholder:text-neutral-500 bg-neutral-50 dark:bg-neutral-700 focus:ring-0 sm:text-sm sm:leading-6"
+			className="w-full px-2 py-1 rounded-md border-0 shadow-inner placeholder:text-neutral-500 bg-neutral-50 dark:bg-neutral-600 focus:ring-0 sm:text-sm sm:leading-6"
 		/>
 	</div>
 )

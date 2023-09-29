@@ -3,8 +3,16 @@
 
 import { test, expect } from "bun:test"
 import { WJWT } from "./wjwt"
+import { SUB } from "./wjwt.types"
 
-const payload = { aud: ["asdf"], exp: 60, iat: Date.now(), iss: "asdf", jti: "asdf", sub: "asdf" }
+const payload = {
+	aud: ["asdf"],
+	exp: Date.now() / 1000 + 600,
+	iat: Date.now(),
+	iss: "asdf",
+	jti: crypto.randomUUID() as SUB,
+	sub: crypto.randomUUID() as SUB,
+}
 const getEcdsaWjwt = async () => {
 	const { privateKey, publicKey } = (await crypto.subtle.generateKey(
 		{ name: "ECDSA", namedCurve: "P-256" },

@@ -19,22 +19,21 @@ import { PlainData } from "@ordo-pink/data"
 // TODO: Remove useAppInit
 const commands = getCommands()
 const SharedContext = createContext<{
-	metadata: Nullable<PlainData[]>
-	currentRoute: Nullable<Router.Route>
+	data: Nullable<PlainData[]>
+	route: Nullable<Router.Route>
 	commands: Commands.Commands
-}>({ metadata: null, currentRoute: null, commands })
+}>({ data: null, route: null, commands })
 
 export default function App() {
 	const streams = useAppInit()
-	const metadata = useSubscription(streams.metadata$)
+	const data = useSubscription(streams.data$)
 	const auth = useSubscription(streams.auth$)
 	const currentRoute = useSubscription(streams.currentRoute$)
 	__useSharedContextInit(SharedContext, useContext)
 
 	const contextMenu = useSubscription(streams.contextMenu$)
 
-	const hideContextMenu = () =>
-		contextMenu && commands.emit<cmd.contextMenu.hide>("context-menu.hide")
+	const hideContextMenu = () => contextMenu && commands.emit<cmd.ctxMenu.hide>("context-menu.hide")
 
 	useEffect(() => {
 		if (!auth) return
@@ -43,14 +42,12 @@ export default function App() {
 		commands.emit<cmd.data.refreshRoot>("data.refresh-root")
 
 		import("./functions/home").then(f =>
-			f.default({ commands, metadata$: streams.metadata$, activities$: streams.activities$ }),
+			f.default({ commands, data$: streams.data$, activities$: streams.activities$ }),
 		)
-		import("./functions/file-explorer").then(f =>
-			f.default({ commands, metadata$: streams.metadata$ }),
-		)
-		import("./functions/gtd").then(f => f.default({ commands, metadata$: streams.metadata$ }))
+		import("./functions/file-explorer").then(f => f.default({ commands, data$: streams.data$ }))
+		import("./functions/gtd").then(f => f.default({ commands, data$: streams.data$ }))
 		import("./functions/user").then(f =>
-			f.default({ commands, metadata$: streams.metadata$, auth$: streams.auth$ }),
+			f.default({ commands, data$: streams.data$, auth$: streams.auth$ }),
 		)
 
 		// TODO: Enable user functions
@@ -59,7 +56,7 @@ export default function App() {
 
 	return Either.fromNullable(streams)
 		.chain(() => Either.fromNullable(streams.contextMenu$))
-		.chain(() => Either.fromNullable(streams.metadata$))
+		.chain(() => Either.fromNullable(streams.data$))
 		.chain(() => Either.fromNullable(streams.modal$))
 		.chain(() => Either.fromNullable(streams.globalCommandPalette$))
 		.chain(() => Either.fromNullable(streams.sidebar$))
@@ -79,7 +76,7 @@ export default function App() {
 				activities$,
 				currentActivity$,
 			}) => (
-				<SharedContext.Provider value={{ metadata, currentRoute, commands }}>
+				<SharedContext.Provider value={{ data: data, route: currentRoute, commands }}>
 					<div className="flex" onClick={hideContextMenu}>
 						<ActivityBar
 							sidebar$={sidebar$}

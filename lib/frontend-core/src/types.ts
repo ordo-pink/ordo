@@ -12,7 +12,7 @@ import { ComponentSpace } from "./constants/component-space.constants"
 export namespace Functions {
 	export type CreateFunctionParams = {
 		commands: Commands.Commands
-		metadata$: Nullable<Observable<PlainData[]>>
+		data$: Nullable<Observable<PlainData[]>>
 	}
 	export type CreateFunctionFn = Unary<Functions.CreateFunctionParams, void | Promise<void>>
 }
@@ -50,6 +50,10 @@ export namespace cmd {
 			name: "data.set-content"
 			payload: { fsid: FSID; content: string | ArrayBuffer }
 		}
+		export type uploadContent = {
+			name: "data.upload-content"
+			payload: { name: string; parent: Nullable<FSID>; content: string | ArrayBuffer }
+		}
 		export type create = { name: "data.create"; payload: { name: string; parent: Nullable<FSID> } }
 		export type remove = { name: "data.remove"; payload: PlainData }
 		export type move = { name: "data.move"; payload: { fsid: FSID; parent: Nullable<FSID> } }
@@ -61,10 +65,10 @@ export namespace cmd {
 		}
 	}
 
-	export namespace contextMenu {
-		export type add = { name: "context-menu.add"; payload: ContextMenu.Item }
+	export namespace ctxMenu {
+		export type add = { name: "context-menu.add"; payload: CtxMenu.Item }
 		export type remove = { name: "context-menu.remove"; payload: string }
-		export type show = { name: "context-menu.show"; payload: ContextMenu.ShowOptions }
+		export type show = { name: "context-menu.show"; payload: CtxMenu.ShowOptions }
 		export type hide = { name: "context-menu.hide"; payload: void }
 	}
 
@@ -263,7 +267,7 @@ export namespace Modal {
 	}
 }
 
-export namespace ContextMenu {
+export namespace CtxMenu {
 	/**
 	 * Context menu item.
 	 */
@@ -281,7 +285,7 @@ export namespace ContextMenu {
 		/**
 		 * Name of the command to be invoked when the context menu item is used.
 		 */
-		commandName: `${string}.${string}` // TODO: Move to Commands
+		cmd: `${string}.${string}` // TODO: Move to Commands
 
 		/**
 		 * Readable name of the context menu item. Put a translated value here.

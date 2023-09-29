@@ -28,10 +28,10 @@ export default function RenameDirectoryModal({ data }: Props) {
 	}
 
 	const tPlaceholder = "E.g. 123/123"
-	const tTitle = "Rename directory"
+	const tTitle = "Rename"
 	const tCancel = "Cancel"
 	const tCreate = "Rename"
-	const tInvalidPath = "Invalid directory name"
+	const tInvalidPath = "Invalid name"
 
 	return (
 		<div className="w-[30rem] max-w-full flex flex-col gap-8">

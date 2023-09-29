@@ -10,8 +10,8 @@ let SharedContext: Context<SharedContextValue>
 let useContextHook: typeof UseContext
 
 export type SharedContextValue = {
-	metadata: Nullable<PlainData[]>
-	currentRoute: Nullable<Router.Route>
+	data: Nullable<PlainData[]>
+	route: Nullable<Router.Route>
 	commands: Commands.Commands
 }
 

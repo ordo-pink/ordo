@@ -85,6 +85,10 @@ function download_esbuild {
 
 # Build a binary from given source with Bun and puts it to the bin directory.
 function compile_init_script {
+  if [ ! -f ./opt/esbuild ]; then
+    mkdir bin
+  fi
+
   opt/bun build boot/src/init/index.ts --compile --outfile init && mv -f init bin/init
 }
 
@@ -113,6 +117,9 @@ download_tailwind
 
 ## Download Bun
 download_bun
+
+## Install bin dependencies
+bun i
 
 ## Build init script
 compile_init_script

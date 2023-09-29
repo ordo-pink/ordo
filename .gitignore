@@ -7,14 +7,8 @@
 /usr/*
 /srv/app/build/*
 
-/tsconfig.json
-/.prettierrc
-/deno.jsonc
-/tailwind.config.cjs
-
 .idea
-.vscode/*
-!.vscode/settings.json
+.vscode
 .vim
 
 .DS_Store

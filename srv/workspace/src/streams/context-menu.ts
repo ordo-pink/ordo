@@ -8,29 +8,29 @@ import { Logger } from "@ordo-pink/logger"
 import { Either } from "@ordo-pink/either"
 import { getCommands } from "$streams/commands"
 import Null from "$components/null"
-import { cmd, ContextMenu } from "@ordo-pink/frontend-core"
+import { cmd, CtxMenu } from "@ordo-pink/frontend-core"
 
 const commands = getCommands()
 
 // --- Internal ---
 
-export type __ContextMenu$ = Observable<Nullable<ContextMenu.ContextMenu>>
+export type __ContextMenu$ = Observable<Nullable<CtxMenu.ContextMenu>>
 export const __initContextMenu: InitContextMenu = callOnce(({ logger }) => {
 	logger.debug("Initializing context menu")
 
-	commands.on<cmd.contextMenu.show>("context-menu.show", ({ payload }) => show(payload))
-	commands.on<cmd.contextMenu.add>("context-menu.add", ({ payload }) => add(payload))
-	commands.on<cmd.contextMenu.remove>("context-menu.remove", ({ payload }) => remove(payload))
-	commands.on<cmd.contextMenu.hide>("context-menu.hide", hide)
+	commands.on<cmd.ctxMenu.show>("context-menu.show", ({ payload }) => show(payload))
+	commands.on<cmd.ctxMenu.add>("context-menu.add", ({ payload }) => add(payload))
+	commands.on<cmd.ctxMenu.remove>("context-menu.remove", ({ payload }) => remove(payload))
+	commands.on<cmd.ctxMenu.hide>("context-menu.hide", hide)
 
 	return contextMenu$
 })
 
-type AddP = Curry<Binary<ContextMenu.Item, ContextMenu.Item[], ContextMenu.Item[]>>
-type RemoveP = Curry<Binary<string, ContextMenu.Item[], ContextMenu.Item[]>>
-type Add = Unary<ContextMenu.Item, void>
+type AddP = Curry<Binary<CtxMenu.Item, CtxMenu.Item[], CtxMenu.Item[]>>
+type RemoveP = Curry<Binary<string, CtxMenu.Item[], CtxMenu.Item[]>>
+type Add = Unary<CtxMenu.Item, void>
 type Remove = Unary<string, void>
-type Show = Unary<ContextMenu.ShowOptions, void>
+type Show = Unary<CtxMenu.ShowOptions, void>
 type Hide = Thunk<void>
 type InitContextMenuP = { logger: Logger }
 type InitContextMenu = Unary<InitContextMenuP, Nullable<__ContextMenu$>>
@@ -40,15 +40,14 @@ const remove: Remove = commandName => remove$.next(commandName)
 const show: Show = params => params$.next(params)
 const hide: Hide = () => params$.next(null)
 
-const addP: AddP = item => state =>
-	state.filter(i => i.commandName !== item.commandName).concat([item])
-const removeP: RemoveP = name => state => state.filter(item => item.commandName !== name)
+const addP: AddP = item => state => state.filter(i => i.cmd !== item.cmd).concat([item])
+const removeP: RemoveP = name => state => state.filter(item => item.cmd !== name)
 
-const params$ = new BehaviorSubject<Nullable<ContextMenu.ShowOptions>>(null)
-const add$ = new Subject<ContextMenu.Item>()
+const params$ = new BehaviorSubject<Nullable<CtxMenu.ShowOptions>>(null)
+const add$ = new Subject<CtxMenu.Item>()
 const remove$ = new Subject<string>()
 const globalItems$ = merge(add$.pipe(map(addP)), remove$.pipe(map(removeP))).pipe(
-	scan((acc, f) => f(acc), [] as ContextMenu.Item[]),
+	scan((acc, f) => f(acc), [] as CtxMenu.Item[]),
 	shareReplay(1),
 )
 

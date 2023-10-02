@@ -9,15 +9,10 @@
 // SPDX-License-Identifier: MIT
 
 import { join } from "path"
-import { Oath } from "@ordo-pink/oath"
+import { Oath, oathify } from "@ordo-pink/oath"
 import { noop } from "@ordo-pink/tau"
 import { cwd } from "process"
 import { promises } from "fs"
-
-export const oathify =
-	<Args extends any[], Result extends Promise<any>>(f: (...args: Args) => Result) =>
-	(...args: Args) =>
-		Oath.try(() => f(...args))
 
 export const getParentPath = (path: string) => {
 	const cleanPath = path.endsWith("/") ? path.slice(0, -1) : path

@@ -1,0 +1,43 @@
+{
+	"name": "oathify",
+	"version": "0.1.0",
+	"description": "Lazy promises with extended API and type inference for the rejected branch",
+	"main": "index.js",
+	"scripts": {
+		"test": "bun test",
+		"build": "bun build ./index.ts --outdir=min --minify && bun build ./index.ts --outdir=. --sourcemap=inline",
+		"clear": "rm -rf ./min && rm index.js"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/ordo-pink/ordo.git#main"
+	},
+	"keywords": [
+		"promise",
+		"promises",
+		"async",
+		"await",
+		"deferred",
+		"future",
+		"flow",
+		"control",
+		"fluent",
+		"interface",
+		"types",
+		"task",
+		"bluebird"
+	],
+	"author": {
+		"email": "sergei_orlov@ordo.pink",
+		"name": "谢尔盖 ||↓"
+	},
+	"license": "MIT",
+	"bugs": {
+		"url": "https://github.com/ordo-pink/ordo/issues"
+	},
+	"homepage": "https://github.com/ordo-pink/ordo/blob/main/lib/oath/readme.md",
+	"readme": "# Oath\n\n📝 Docs: https://github.com/ordo-pink/ordo/blob/main/lib/oath/readme.md",
+	"devDependencies": {
+		"typescript": "^5.2.2"
+	}
+}

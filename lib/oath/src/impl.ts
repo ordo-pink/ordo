@@ -1,71 +1,69 @@
 // SPDX-FileCopyrightText: Copyright 2023, 谢尔盖||↓ and the Ordo.pink contributors
 // SPDX-License-Identifier: MIT
 
+export const oathify =
+	<Args extends any[], Result extends Promise<any>>(f: (...args: Args) => Result) =>
+	(...args: Args) =>
+		Oath.try(() => f(...args))
+
 export type UnderOath<T> = T extends object & {
 	and(onfulfilled: infer F, ...args: infer _): any
+	isOath: true
 }
 	? F extends (value: infer V, ...args: infer _) => any
 		? UnderOath<V>
 		: never
 	: Awaited<T>
 
-export class Oath<TRight, TLeft = never> {
-	public static of<TRight, TLeft = never>(value: TRight): Oath<TRight, TLeft> {
-		return new Oath(resolve => {
-			resolve(value)
-		})
+export class Oath<Resolve, Reject = never> {
+	public static of<Resolve, Reject = never>(value: Resolve): Oath<Resolve, Reject> {
+		return new Oath(resolve => resolve(value))
 	}
 
-	public static empty(): Oath<void, never> {
-		return new Oath(resolve => {
-			resolve()
-		})
+	public static empty<Reject = never>(): Oath<void, Reject> {
+		return new Oath(resolve => resolve(undefined))
 	}
 
-	public static resolve<TRight, TLeft = never>(value: TRight): Oath<TRight, TLeft> {
-		return new Oath(resolve => {
-			resolve(value)
-		})
+	public static resolve<Resolve, Reject = never>(value: Resolve): Oath<Resolve, Reject> {
+		return new Oath(resolve => resolve(value))
 	}
 
-	public static reject<TLeft, TRight = never>(error?: TLeft): Oath<TRight, TLeft> {
-		return new Oath((_, reject) => {
-			reject(error)
-		})
+	public static reject<Reject, Resolve = never>(error?: Reject): Oath<Resolve, Reject> {
+		return new Oath((_, reject) => reject(error))
 	}
 
-	public static from<TRight, TLeft = never>(thunk: () => Promise<TRight>): Oath<TRight, TLeft> {
-		return new Oath((resolve, reject) => {
-			thunk().then(resolve, reject)
-		})
+	public static from<Resolve, Reject = never>(
+		thunk: () => Promise<Resolve>,
+	): Oath<Resolve, Reject> {
+		return new Oath((resolve, reject) => thunk().then(resolve, reject))
 	}
 
-	public static fromNullable<T>(value?: T | null): Oath<NonNullable<T>, null> {
+	public static fromNullable<Resolve>(value?: Resolve | null): Oath<NonNullable<Resolve>, null> {
 		return value == null ? Oath.reject(null) : Oath.resolve(value)
 	}
 
-	public static fromBoolean<T, F = null>(
+	public static fromBoolean<Resolve, Reject = null>(
 		f: () => boolean,
-		onTrue: () => T,
-		onFalse: () => F = () => null as any,
-	): Oath<T, F> {
+		onTrue: () => Resolve,
+		onFalse: () => Reject = () => null as any,
+	): Oath<Resolve, Reject> {
 		return f() ? Oath.resolve(onTrue()) : Oath.reject(onFalse())
 	}
 
-	public static ifElse<C, T = C, F = C>(
-		validate: (x: C) => boolean,
+	public static ifElse<Resolve, OnTrue = Resolve, OnFalse = Resolve>(
+		validate: (x: Resolve) => boolean,
 		{
 			onTrue = x => x as any,
 			onFalse = x => x as any,
 		}: {
-			onTrue?: (x: C) => T
-			onFalse?: (x: C) => F
+			onTrue?: (x: Resolve) => OnTrue
+			onFalse?: (x: Resolve) => OnFalse
 		},
 	) {
-		return (x: C) => (validate(x) ? Oath.resolve(onTrue(x)) : Oath.reject(onFalse(x)))
+		return (x: Resolve) => (validate(x) ? Oath.resolve(onTrue(x)) : Oath.reject(onFalse(x)))
 	}
 
-	public static try<TRight, TLeft = Error>(f: () => TRight): Oath<Awaited<TRight>, TLeft> {
+	public static try<Resolve, Reject = Error>(f: () => Resolve): Oath<Awaited<Resolve>, Reject> {
 		return new Oath(async (resolve, reject) => {
 			try {
 				resolve(await f())
@@ -188,8 +186,8 @@ export class Oath<TRight, TLeft = never> {
 
 	public constructor(
 		private resolver: (
-			resolve: <TNewRight>(value: TRight) => TNewRight,
-			reject: <TNewLeft>(err?: TLeft) => TNewLeft,
+			resolve: <NewResolve>(value: Resolve) => NewResolve,
+			reject: <NewReject>(err?: Reject) => NewReject,
 		) => void,
 	) {}
 
@@ -197,8 +195,8 @@ export class Oath<TRight, TLeft = never> {
 		return true
 	}
 
-	public swap(): Oath<TLeft, TRight> {
-		return new Oath<TLeft, TRight>((resolve, reject) =>
+	public swap(): Oath<Reject, Resolve> {
+		return new Oath<Reject, Resolve>((resolve, reject) =>
 			this.fork(
 				a => resolve(a),
 				b => reject(b),
@@ -206,23 +204,26 @@ export class Oath<TRight, TLeft = never> {
 		)
 	}
 
-	public tap(f: (x: TRight) => any, g: (x: TLeft) => any = () => void 0): Oath<TRight, TLeft> {
-		return new Oath<TRight, TLeft>((resolve, reject) =>
+	public tap(
+		onResolved: (x: Resolve) => any,
+		onRejected: (x: Reject) => any = () => void 0,
+	): Oath<Resolve, Reject> {
+		return new Oath<Resolve, Reject>((resolve, reject) =>
 			this.fork(
 				a => {
-					g(a)
+					onRejected(a)
 					return reject(a)
 				},
 				b => {
-					f(b)
+					onResolved(b)
 					return resolve(b)
 				},
 			),
 		)
 	}
 
-	public map<ThenRight>(f: (x: TRight) => ThenRight): Oath<ThenRight, TLeft> {
-		return new Oath<ThenRight, TLeft>((resolve, reject) =>
+	public map<NewResolve>(f: (x: Resolve) => NewResolve): Oath<NewResolve, Reject> {
+		return new Oath<NewResolve, Reject>((resolve, reject) =>
 			this.fork(
 				a => reject(a),
 				b => resolve(f(b)),
@@ -230,8 +231,8 @@ export class Oath<TRight, TLeft = never> {
 		)
 	}
 
-	public rejectedMap<ThenLeft>(f: (x: TLeft) => ThenLeft): Oath<TRight, ThenLeft> {
-		return new Oath<TRight, ThenLeft>((resolve, reject) =>
+	public rejectedMap<NewReject>(f: (x: Reject) => NewReject): Oath<Resolve, NewReject> {
+		return new Oath<Resolve, NewReject>((resolve, reject) =>
 			this.fork(
 				a => reject(f(a)),
 				b => resolve(b),
@@ -239,11 +240,11 @@ export class Oath<TRight, TLeft = never> {
 		)
 	}
 
-	public bimap<ThenRight, ThenLeft>(
-		f: (x: TLeft) => ThenLeft,
-		g: (x: TRight) => ThenRight,
-	): Oath<ThenRight, ThenLeft> {
-		return new Oath<ThenRight, ThenLeft>((resolve, reject) =>
+	public bimap<NewResolve, NewReject>(
+		f: (x: Reject) => NewReject,
+		g: (x: Resolve) => NewResolve,
+	): Oath<NewResolve, NewReject> {
+		return new Oath<NewResolve, NewReject>((resolve, reject) =>
 			this.fork(
 				a => reject(f(a)),
 				b => resolve(g(b)),
@@ -251,9 +252,9 @@ export class Oath<TRight, TLeft = never> {
 		)
 	}
 
-	public chain<ThenRight, ThenLeft>(
-		f: (x: TRight) => Oath<ThenRight, ThenLeft>,
-	): Oath<ThenRight, TLeft | ThenLeft> {
+	public chain<NewResolve, NewReject>(
+		f: (x: Resolve) => Oath<NewResolve, NewReject>,
+	): Oath<NewResolve, Reject | NewReject> {
 		return new Oath((resolve, reject) =>
 			this.fork(
 				a => reject(a),
@@ -262,9 +263,9 @@ export class Oath<TRight, TLeft = never> {
 		)
 	}
 
-	public rejectedChain<ThenRight, ThenLeft>(
-		f: (x: TLeft) => Oath<TRight, ThenLeft>,
-	): Oath<TRight, ThenLeft> {
+	public rejectedChain<NewReject>(
+		f: (x: Reject) => Oath<Resolve, NewReject>,
+	): Oath<Resolve, NewReject> {
 		return new Oath((resolve, reject) =>
 			this.fork(
 				a => f(a).fork(reject, resolve),
@@ -273,9 +274,9 @@ export class Oath<TRight, TLeft = never> {
 		)
 	}
 
-	public and<ThenRight, ThenLeft>(
-		f: (x: TRight) => PromiseLike<ThenRight> | Oath<ThenRight, ThenLeft> | ThenRight,
-	): Oath<ThenRight, TLeft | ThenLeft> {
+	public and<NewResolve, NewReject>(
+		f: (x: Resolve) => PromiseLike<NewResolve> | Oath<NewResolve, NewReject> | NewResolve,
+	): Oath<NewResolve, Reject | NewReject> {
 		return new Oath((resolve, reject) =>
 			this.fork(
 				a => reject(a),
@@ -295,9 +296,9 @@ export class Oath<TRight, TLeft = never> {
 		)
 	}
 
-	public fix<ThenRight, ThenLeft = never>(
-		f: (x: TLeft) => PromiseLike<ThenRight> | Oath<ThenRight, ThenLeft> | ThenRight,
-	): Oath<TRight | ThenRight, ThenLeft> {
+	public fix<NewResolve, NewReject = never>(
+		f: (x: Reject) => PromiseLike<NewResolve> | Oath<NewResolve, NewReject> | NewResolve,
+	): Oath<Resolve | NewResolve, NewReject> {
 		return new Oath((resolve, reject) =>
 			this.fork(
 				a => {
@@ -317,29 +318,29 @@ export class Oath<TRight, TLeft = never> {
 		)
 	}
 
-	public async fork<TNewRight, TNewLeft>(
-		onLeft: (error: TLeft) => TNewLeft,
-		onRight: (value: TRight) => TNewRight,
-	): Promise<TNewRight> {
-		return new Promise<TNewRight>((resolve, reject) => {
+	public async fork<NewResolve, NewReject>(
+		onRejected: (error: Reject) => NewReject,
+		onResolved: (value: Resolve) => NewResolve,
+	): Promise<NewResolve | NewReject> {
+		return new Promise<NewResolve>((resolve, reject) => {
 			this.resolver(resolve as any, reject as any)
-		}).then((x: any) => onRight(x), onLeft) as any
+		}).then((x: any) => onResolved(x), onRejected) as any
 	}
 
 	public async toPromise() {
-		return new Promise<TRight>((resolve, reject) => {
+		return new Promise<Resolve>((resolve, reject) => {
 			this.resolver(resolve as any, reject as any)
 		})
 	}
 
-	public async orElse<TNewLeft>(f: (error: TLeft) => TNewLeft) {
-		return new Promise<TRight>((resolve, reject) =>
+	public async orElse<NewReject>(onRejected: (error: Reject) => NewReject) {
+		return new Promise<Resolve>((resolve, reject) =>
 			this.resolver(resolve as any, reject as any),
-		).catch(f)
+		).catch(onRejected)
 	}
 
 	public async orNothing() {
-		return new Promise<TRight>((resolve, reject) =>
+		return new Promise<Resolve>((resolve, reject) =>
 			this.resolver(resolve as any, reject as any),
 		).catch(() => void 0)
 	}

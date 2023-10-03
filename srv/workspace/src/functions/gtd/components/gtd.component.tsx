@@ -87,7 +87,7 @@ export default function GTD() {
 							placeholder={tAddToInboxInputPlaceholder}
 						/>
 
-						<GTDList items={children} />
+						<GTDList items={children} fsid={currentItem.fsid} />
 					</Card>
 				</div>
 			</div>

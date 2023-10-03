@@ -136,6 +136,24 @@ export const __initData: Fn = ({ logger, auth$ }) => {
 			.orNothing()
 	})
 
+	commands.on<cmd.data.setChildOrder>("data.set-child-order", ({ payload }) => {
+		const auth = (auth$ as BehaviorSubject<AuthResponse>).value
+		const data = data$.value
+
+		const item = data.find(d => d.fsid === payload.fsid && d.createdBy === auth.sub)
+
+		if (!item) return
+
+		dataCommands
+			.update({
+				createdBy: auth.sub,
+				updatedBy: auth.sub,
+				fsid: payload.fsid,
+				data: { ...item, children: payload.children },
+			})
+			.orNothing()
+	})
+
 	commands.on<cmd.data.addLabel>("data.add-label", ({ payload }) => {
 		const auth = (auth$ as BehaviorSubject<AuthResponse>).value
 

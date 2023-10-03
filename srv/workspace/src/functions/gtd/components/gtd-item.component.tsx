@@ -5,10 +5,10 @@ import { useChildren } from "$hooks/use-children"
 import { PlainData } from "@ordo-pink/data"
 import { cmd, useSharedContext } from "@ordo-pink/frontend-core"
 import { Nullable } from "@ordo-pink/tau"
-import { MouseEvent } from "react"
+import { ChangeEvent, MouseEvent } from "react"
 import { GTDCommands } from "../types"
 import { BsCheckCircle } from "react-icons/bs"
-import { useDraggable } from "@dnd-kit/core"
+import { useSortable } from "@dnd-kit/sortable"
 import { CSS } from "@dnd-kit/utilities"
 
 type P = { item: PlainData }
@@ -18,18 +18,25 @@ const checkIsDone = (item: Nullable<PlainData>) => (item && item.labels.includes
 export default function GTDItem({ item }: P) {
 	const { commands } = useSharedContext()
 	const children = useChildren(item.fsid)
-	const { attributes, listeners, setNodeRef, transform } = useDraggable({ id: item.fsid })
+	const { attributes, listeners, setNodeRef, transform, transition } = useSortable({
+		id: item.fsid,
+		resizeObserverConfig: {},
+	})
 	const style = {
 		transform: CSS.Translate.toString(transform),
+		transition,
 	}
 
 	const isDone = checkIsDone(item)
 	const doneChildren = children.filter(checkIsDone)
 
-	const onCheckboxChange = () =>
+	const onCheckboxChange = () => {
+		console.log(isDone)
+
 		isDone
 			? commands.emit<GTDCommands.markNotDone>("gtd.mark-not-done", item)
 			: commands.emit<GTDCommands.markDone>("gtd.mark-done", item)
+	}
 
 	const onContextMenu = (event: MouseEvent<HTMLDivElement>) =>
 		commands.emit<cmd.ctxMenu.show>("context-menu.show", { event, payload: item })
@@ -49,8 +56,9 @@ export default function GTDItem({ item }: P) {
 				type="checkbox"
 				checked={isDone}
 				id={item.fsid}
-				tabIndex={-1}
+				onClick={onCheckboxChange}
 				onChange={onCheckboxChange}
+				tabIndex={0}
 			/>
 			<div className="flex justify-between w-full">
 				<div className="flex flex-col w-full justify-center">

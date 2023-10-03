@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: Copyright 2023, 谢尔盖||↓ and the Ordo.pink contributors
 // SPDX-License-Identifier: MIT
 
-import { PlainData } from "@ordo-pink/data"
+import { FSID, PlainData } from "@ordo-pink/data"
 import GTDItem from "./gtd-item.component"
 import { useEffect, useState } from "react"
 import { BsCheckCircle, BsChevronDown, BsChevronUp, BsListCheck } from "react-icons/bs"
@@ -15,19 +15,33 @@ import {
 	useSensor,
 	useSensors,
 } from "@dnd-kit/core"
+import {
+	arrayMove,
+	SortableContext,
+	sortableKeyboardCoordinates,
+	verticalListSortingStrategy,
+} from "@dnd-kit/sortable"
+import { cmd, useSharedContext } from "@ordo-pink/frontend-core"
 
-type P = { items: PlainData[] }
-export default function GTDList({ items }: P) {
+type P = { items: PlainData[]; fsid: FSID }
+export default function GTDList({ items, fsid }: P) {
+	const { commands } = useSharedContext()
+
 	const [showDone, setShowDone] = useState(false)
 	const [hasDoneItems, setHasDoneItems] = useState(false)
 	const [doneItems, setDoneItems] = useState<PlainData[]>([])
 	const [pendingItems, setPendingItems] = useState<PlainData[]>([])
-	const { isOver, setNodeRef } = useDroppable({ id: "123" })
+
+	const sensors = useSensors(
+		useSensor(PointerSensor),
+		useSensor(KeyboardSensor, {
+			coordinateGetter: sortableKeyboardCoordinates,
+		}),
+	)
 
 	useEffect(() => {
 		const done = items.filter(item => item.labels.includes("done"))
 		const pending = items.filter(item => !item.labels.includes("done"))
-
 		setHasDoneItems(done.length > 0)
 		setDoneItems(done.sort((a, b) => (a.updatedAt < b.updatedAt ? 1 : -1)))
 		setPendingItems(pending)
@@ -77,13 +91,36 @@ export default function GTDList({ items }: P) {
 			</div>
 		))
 		.default(() => (
-			<DndContext onDragEnd={console.log}>
-				<div ref={setNodeRef} className="overflow-y-auto flex flex-col space-y-2 p-0.5">
-					{pendingItems
-						.filter(child => !child.labels.includes("done"))
-						.map(child => (
+			<DndContext
+				onDragEnd={({ active, over }) => {
+					if (!active || !over || active.id === over.id) return
+
+					const fsids = pendingItems.map(data => data.fsid)
+
+					const oldIndex = fsids.indexOf(active.id as FSID)
+					const newIndex = fsids.indexOf(over.id as FSID)
+
+					const updatedChildren = arrayMove(pendingItems, oldIndex, newIndex)
+
+					commands.emit<cmd.data.setChildOrder>("data.set-child-order", {
+						fsid,
+						children: updatedChildren
+							.map(child => child.fsid)
+							.concat(doneItems.map(child => child.fsid)),
+					})
+				}}
+				sensors={sensors}
+				collisionDetection={closestCenter}
+			>
+				<div className="overflow-y-auto flex flex-col space-y-2 p-0.5">
+					<SortableContext
+						items={pendingItems.map(item => item.fsid)}
+						strategy={verticalListSortingStrategy}
+					>
+						{pendingItems.map(child => (
 							<GTDItem key={child.fsid} item={child} />
 						))}
+					</SortableContext>
 
 					{showDone ? (
 						<>

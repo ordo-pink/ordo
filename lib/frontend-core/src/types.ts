@@ -59,6 +59,10 @@ export namespace cmd {
 		export type move = { name: "data.move"; payload: { fsid: FSID; parent: Nullable<FSID> } }
 		export type rename = { name: "data.rename"; payload: { fsid: FSID; name: string } }
 		export type addLabel = { name: "data.add-label"; payload: { item: PlainData; label: string } }
+		export type setChildOrder = {
+			name: "data.set-child-order"
+			payload: { fsid: FSID; children: FSID[] }
+		}
 		export type removeLabel = {
 			name: "data.remove-label"
 			payload: { item: PlainData; label: string }

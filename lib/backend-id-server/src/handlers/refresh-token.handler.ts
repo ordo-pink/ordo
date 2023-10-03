@@ -11,6 +11,7 @@ import type { Middleware } from "koa"
 import { Oath } from "@ordo-pink/oath"
 import { HttpError } from "@ordo-pink/rrr"
 import { sendError } from "@ordo-pink/backend-utils"
+import { JTI, SUB } from "@ordo-pink/wjwt"
 
 export type Params = { userService: UserService; tokenService: TTokenService }
 export type Fn = (params: Params) => Middleware
@@ -19,9 +20,12 @@ export const handleRefreshToken: Fn =
 	({ tokenService }) =>
 	async ctx =>
 		Oath.all({
-			sub: ctx.cookies.get("sub") ?? Oath.reject(HttpError.BadRequest("Missing required cookies")),
+			sub:
+				(ctx.cookies.get("sub") as SUB) ??
+				Oath.reject(HttpError.BadRequest("Missing required cookies")),
 			prevJti:
-				ctx.cookies.get("jti") ?? Oath.reject(HttpError.BadRequest("Missing required cookies")),
+				(ctx.cookies.get("jti") as JTI) ??
+				Oath.reject(HttpError.BadRequest("Missing required cookies")),
 		})
 			.chain(({ sub, prevJti }) =>
 				tokenService.repository

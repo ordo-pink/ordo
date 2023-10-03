@@ -20,7 +20,7 @@ export default function GTDSidebar() {
 	const [inbox, setInbox] = useState<Nullable<PlainData>>(null)
 
 	useEffect(() => {
-		if (!data) return
+		if (!data || !data.length) return
 
 		const gtdDirectory = data.find(item => item.name === ".gtd" && item.parent === null)
 

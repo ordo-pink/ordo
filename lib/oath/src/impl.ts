@@ -8,7 +8,6 @@ export const oathify =
 
 export type UnderOath<T> = T extends object & {
 	and(onfulfilled: infer F, ...args: infer _): any
-	isOath: true
 }
 	? F extends (value: infer V, ...args: infer _) => any
 		? UnderOath<V>

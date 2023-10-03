@@ -11,7 +11,7 @@ export type TDataCommands<T> = {
 	dataRepository: DataRepository
 	contentRepository: ContentRepository<T>
 	create: (
-		params: Pick<PlainData, "name" | "parent" | "createdBy" | "updatedBy"> & { fsid?: FSID },
+		params: Pick<PlainData, "name" | "parent" | "createdBy"> & { fsid?: FSID },
 	) => Oath<PlainData, DataError>
 	remove: (params: Pick<PlainData, "fsid" | "createdBy">) => Oath<"OK", DataError>
 	move: (

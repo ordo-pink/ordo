@@ -11,7 +11,6 @@ import { Nullable, noop } from "@ordo-pink/tau"
 import { useEffect, useRef, useState } from "react"
 import GTDList from "./gtd-list.component"
 import { GTDCommands } from "../types"
-import { GTDCtxMenu } from "../context-menu-items"
 import { Either } from "@ordo-pink/either"
 import { useChildren } from "$hooks/use-children"
 import Null from "$components/null"
@@ -30,22 +29,10 @@ export default function GTD() {
 		const handleRedirectOnRemove: Commands.Handler<PlainData> = ({ payload }) =>
 			route?.params?.item === payload.fsid && commands.emit<GTDCommands.openInbox>("gtd.open-inbox")
 
-		const handleShowMovePalette = GTDCtxMenu.move(data, commands)
-
 		commands.on<cmd.data.remove>("data.remove", handleRedirectOnRemove)
-		commands.emit<cmd.ctxMenu.add>("context-menu.add", GTDCtxMenu.rename)
-		commands.emit<cmd.ctxMenu.add>("context-menu.add", GTDCtxMenu.addLabelPalette)
-		commands.emit<cmd.ctxMenu.add>("context-menu.add", GTDCtxMenu.removeLabelPalette)
-		commands.emit<cmd.ctxMenu.add>("context-menu.add", GTDCtxMenu.createModal)
-		commands.emit<cmd.ctxMenu.add>("context-menu.add", handleShowMovePalette)
 
 		return () => {
 			commands.off<cmd.data.remove>("data.remove", handleRedirectOnRemove)
-			commands.emit<cmd.ctxMenu.remove>("context-menu.remove", GTDCtxMenu.rename.cmd)
-			commands.emit<cmd.ctxMenu.remove>("context-menu.remove", GTDCtxMenu.addLabelPalette.cmd)
-			commands.emit<cmd.ctxMenu.remove>("context-menu.remove", GTDCtxMenu.removeLabelPalette.cmd)
-			commands.emit<cmd.ctxMenu.remove>("context-menu.remove", GTDCtxMenu.createModal.cmd)
-			commands.emit<cmd.ctxMenu.remove>("context-menu.remove", handleShowMovePalette.cmd)
 		}
 	}, [commands, data, route?.params?.item])
 

@@ -33,28 +33,23 @@ After you fetch the repository, run the `boot/boot.sh` script.
 boot/boot.sh
 ```
 
-### ETC
-
-The `/etc` directory contains configuration files for all the services, scripts and third-party
-applications that are installed in the monorepo.
-
 ### LIB
 
-The `/lib` directory contains library code code. Put the source code of publishable and
-non-publishable libraries here.
+The `/lib` directory contains library code. Put the source code of publishable and non-publishable
+libraries here.
 
 ### OPT
 
 The `/opt` directory contains third-party applications.
 
+### ROOT
+
+The `/root` directory contains root owned things like repo assets and docs.
+
 ### SRV
 
 The `/srv` directory contains application code. Put your servable apps here.
 
-# USR
-
-The `/usr` directory contains user specific configuration. Put your config here.
-
-# VAR
+### VAR
 
 The `/var` directory contains variable data such as build results, cache, backups, etc.

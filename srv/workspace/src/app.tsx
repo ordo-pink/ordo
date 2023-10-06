@@ -13,7 +13,7 @@ import ContextMenu from "$components/context-menu/context-menu"
 import Workspace from "$components/workspace"
 import Modal from "$components/modal"
 import Null from "$components/null"
-import { Nullable } from "@ordo-pink/tau"
+import { AllKeysRequired, Nullable } from "@ordo-pink/tau"
 import { PlainData } from "@ordo-pink/data"
 
 // TODO: Remove useAppInit
@@ -64,7 +64,7 @@ export default function App() {
 		.chain(() => Either.fromNullable(streams.activities$))
 		.chain(() => Either.fromNullable(streams.currentActivity$))
 		.chain(() => Either.fromNullable(streams.currentRoute$))
-		.map(() => streams as { [K in keyof typeof streams]: NonNullable<(typeof streams)[K]> }) // TODO: Extract to tau
+		.map(() => streams as AllKeysRequired<typeof streams>) // TODO: Extract to tau
 		.fold(
 			Null,
 			({

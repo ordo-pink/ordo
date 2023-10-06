@@ -7,6 +7,8 @@ export const UUIDv4_RX = /^[0-9A-F]{8}-[0-9A-F]{4}-[4][0-9A-F]{3}-[89AB][0-9A-F]
 
 export type UUIDv4 = `${string}-${string}-${string}-${string}-${string}`
 
+export type AllKeysRequired<T extends Record<string, any>> = { [K in keyof T]: NonNullable<T[K]> }
+
 export const isObject = (x: unknown): x is Record<string, unknown> =>
 	x != null && typeof x === "object" && !Array.isArray(x)
 

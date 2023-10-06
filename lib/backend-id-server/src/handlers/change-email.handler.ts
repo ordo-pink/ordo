@@ -5,10 +5,9 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-import type { Context, Middleware } from "koa"
+import type { Middleware } from "koa"
 import type { TTokenService } from "@ordo-pink/backend-token-service"
 import type { UserService } from "@ordo-pink/backend-user-service"
-import type { User } from "@ordo-pink/backend-user-service"
 
 import validator from "validator"
 import { authenticate0, parseBody0 } from "@ordo-pink/backend-utils"

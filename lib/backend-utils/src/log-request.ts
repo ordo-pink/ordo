@@ -10,6 +10,7 @@ import { Switch } from "@ordo-pink/switch"
 import { lte } from "ramda"
 import { Logger } from "@ordo-pink/logger"
 import chalk from "chalk"
+import { Context, Gear, Gear as RoutaryMiddleware } from "@ordo-pink/routary"
 
 export type LogRequestOptions = {
 	logger: Logger
@@ -26,6 +27,31 @@ export const logRequest: LogRequestFn = options => async (ctx, next) => {
 	const method = chalk.cyan(ctx.request.method.concat(" ".repeat(7 - ctx.request.method.length)))
 	const responseStatus = ctx.response.status
 	const responseTimeHeader = Number(ctx.get("X-Response-Time"))
+
+	const status = Switch.of(responseStatus)
+		.case(lte(500), () => chalk.red(responseStatus.toString()))
+		.case(lte(400), () => chalk.yellow(responseStatus.toString()))
+		.case(lte(300), () => chalk.cyan(responseStatus.toString()))
+		.case(lte(200), () => chalk.green(responseStatus.toString()))
+		.default(() => responseStatus.toString())
+
+	const rt = Switch.of(responseTimeHeader)
+		.case(lte(300), () => chalk.red(`${responseTimeHeader}ms`))
+		.case(lte(200), () => chalk.yellow(`${responseTimeHeader}ms`))
+		.case(lte(100), () => chalk.cyan(`${responseTimeHeader}ms`))
+		.default(() => chalk.green(`${responseTimeHeader}ms`))
+
+	options?.logger.info(`${name} - ${rt} - ${status} ${method} ${url}`)
+}
+
+export const logBunRequest = (options: LogRequestOptions) => (ctx: Context) => {
+	const name = options.serverName
+	const url = ctx.req.url
+	const method = chalk.cyan(ctx.req.method.concat(" ".repeat(7 - ctx.req.method.length)))
+	const responseStatus = ctx.res.status
+	const responseTimeHeader = Math.ceil(
+		Number(ctx.res.headers["x-response-time"].slice(0, -2)) / 1000,
+	)
 
 	const status = Switch.of(responseStatus)
 		.case(lte(500), () => chalk.red(responseStatus.toString()))

@@ -10,6 +10,7 @@ import type { Middleware } from "koa"
 import type { UserService } from "@ordo-pink/backend-user-service"
 import { sendError } from "@ordo-pink/backend-utils"
 import { Oath } from "@ordo-pink/oath"
+import { JTI, SUB } from "@ordo-pink/wjwt"
 
 type Params = { userService: UserService; tokenService: TTokenService }
 type Fn = (params: Params) => Middleware
@@ -18,8 +19,8 @@ export const handleSignOut: Fn =
 	({ tokenService }) =>
 	async ctx =>
 		Oath.all({
-			sub: Oath.fromNullable(ctx.cookies.get("sub")),
-			jti: Oath.fromNullable(ctx.cookies.get("jti")),
+			sub: Oath.fromNullable(ctx.cookies.get("sub") as SUB),
+			jti: Oath.fromNullable(ctx.cookies.get("jti") as JTI),
 		})
 			.chain(({ sub, jti }) => tokenService.repository.removeToken(sub, jti))
 			.fix(() => "OK")

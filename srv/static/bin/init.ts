@@ -6,4 +6,4 @@ import { getc } from "@ordo-pink/getc"
 
 const { STATIC_ROOT } = getc(["STATIC_ROOT"])
 
-createDirectoryIfNotExists0(STATIC_ROOT).orElse(console.error)
+createDirectoryIfNotExists0(STATIC_ROOT).orElse(console.log)

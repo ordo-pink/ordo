@@ -38,6 +38,7 @@ Oath.of("./srv")
 runAsyncCommand0("bun run --watch srv/static/index.ts", {
 	stdout: "pipe",
 	stderr: "pipe",
+	env: { ...process.env, FORCE_COLOR: "1" },
 }).orElse(console.error)
 
 Oath.of("./srv")

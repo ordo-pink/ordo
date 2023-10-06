@@ -10,8 +10,9 @@ import { Oath } from "@ordo-pink/oath"
 
 export type PublicUser = {
 	email: string
-	handle?: string
 	createdAt: Date
+	subscription: string
+	handle?: string
 	firstName?: string
 	lastName?: string
 }
@@ -19,6 +20,8 @@ export type PublicUser = {
 export type User = PublicUser & {
 	id: UUIDv4
 	emailConfirmed: boolean
+	fileLimit: number
+	maxUploadSize: number
 }
 
 export type InternalUser = User & {

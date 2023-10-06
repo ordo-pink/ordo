@@ -39,6 +39,9 @@ export class UserService {
 					password,
 					emailConfirmed: false,
 					createdAt: new Date(Date.now()),
+					fileLimit: 1000,
+					maxUploadSize: 1.5,
+					subscription: "free",
 				}),
 			)
 			.map(this.serialize)
@@ -60,7 +63,7 @@ export class UserService {
 							({
 								...user,
 								password,
-							}) as InternalUser,
+							} as InternalUser),
 					),
 				)
 				.chain(user => this.#driver.update(oldUser.id, user).rejectedMap(() => "User not found"))
@@ -106,16 +109,42 @@ export class UserService {
 			firstName: user.firstName,
 			lastName: user.lastName,
 			handle: user.handle,
+			fileLimit: user.fileLimit,
+			maxUploadSize: user.maxUploadSize,
+			subscription: user.subscription,
 		}
 	}
 
 	private serializePublic(user: InternalUser): PublicUser {
 		return {
 			createdAt: user.createdAt,
-			email: user.email,
+			email: this.obfuscateEmail(user.email),
 			firstName: user.firstName,
 			lastName: user.lastName,
 			handle: user.handle,
+			subscription: user.subscription,
 		}
+	}
+
+	private obfuscateEmail(email: string): string {
+		const [localPart, domainPart] = email.split("@")
+
+		const topLevelDomainStartIndex = domainPart.lastIndexOf(".")
+
+		const higherLevelDomain = domainPart.slice(0, topLevelDomainStartIndex)
+		const topLevelDomain = domainPart.slice(topLevelDomainStartIndex)
+
+		const localTrimSize = localPart.length > 5 ? 4 : localPart.length > 2 ? 2 : 0
+		const domainTrimSize = higherLevelDomain.length > 5 ? 4 : higherLevelDomain.length > 2 ? 2 : 0
+
+		return localPart
+			.slice(0, localTrimSize / 2)
+			.concat("*".repeat(localPart.length - localTrimSize))
+			.concat(localTrimSize ? localPart.slice(-localTrimSize / 2) : "")
+			.concat("@")
+			.concat(higherLevelDomain.slice(0, domainTrimSize / 2))
+			.concat("*".repeat(higherLevelDomain.length - domainTrimSize))
+			.concat(domainTrimSize ? higherLevelDomain.slice(-domainTrimSize / 2) : "")
+			.concat(topLevelDomain)
 	}
 }

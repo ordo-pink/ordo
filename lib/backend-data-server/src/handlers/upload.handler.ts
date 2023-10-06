@@ -22,6 +22,18 @@ export const handleUpload: Unary<
 	ctx =>
 		authenticate0(ctx, idHost)
 			.map(({ payload }) => payload)
+			.chain(payload =>
+				Oath.fromNullable(ctx.req.headers["content-length"]).bimap(
+					() => HttpError.UnprocessableEntity("Unknown size"),
+					() => payload,
+				),
+			)
+			.chain(
+				Oath.ifElse(
+					payload => Number(ctx.req.headers["content-length"]) / 1024 / 1024 > payload.fms,
+					{ onFalse: () => HttpError.PayloadTooLarge("File too large") },
+				),
+			)
 			.chain(({ sub }) =>
 				Oath.of({ name: ctx.params.name as string, createdBy: ctx.params.userId as SUB }).chain(
 					({ name, createdBy }) =>

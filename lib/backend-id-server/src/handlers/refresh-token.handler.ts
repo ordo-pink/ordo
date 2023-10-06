@@ -17,7 +17,7 @@ export type Params = { userService: UserService; tokenService: TTokenService }
 export type Fn = (params: Params) => Middleware
 
 export const handleRefreshToken: Fn =
-	({ tokenService }) =>
+	({ tokenService, userService }) =>
 	async ctx =>
 		Oath.all({
 			sub:
@@ -50,8 +50,19 @@ export const handleRefreshToken: Fn =
 							.rejectedMap(() => HttpError.Forbidden("Invalid token")),
 					)
 					.chain(() =>
+						userService.getById(sub).rejectedMap(() => HttpError.Forbidden("User not found")),
+					)
+					.chain(user =>
 						tokenService
-							.createPair({ sub, prevJti })
+							.createPair({
+								sub,
+								prevJti,
+								data: {
+									fms: user.maxUploadSize,
+									lim: user.fileLimit,
+									sbs: user.subscription,
+								},
+							})
 							.rejectedMap(HttpError.from)
 							.chain(tokens =>
 								Oath.of(new Date(Date.now() + tokens.exp))

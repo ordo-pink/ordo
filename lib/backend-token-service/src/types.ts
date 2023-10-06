@@ -20,7 +20,7 @@ export type TokenRecord = Record<JTI, string>
 /**
  * Payload of the access JWT.
  */
-export type AccessTokenPayload = JWTPayload
+export type AccessTokenPayload = JWTPayload & { lim: number; fms: number; sbs: string }
 
 /**
  * Payload of the refresh JWT.
@@ -145,7 +145,7 @@ export type TTokenService = {
 	) => Oath<Nullable<typeof type extends "access" ? JWAT : JWRT>>
 
 	createPair: Unary<
-		{ sub: SUB; prevJti?: JTI; aud?: AUD },
+		{ sub: SUB; prevJti?: JTI; aud?: AUD; data?: Record<string, any> },
 		Oath<RefreshTokenPayload & { tokens: { access: string; refresh: string } }, Error>
 	>
 

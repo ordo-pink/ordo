@@ -11,6 +11,7 @@ import { WJWT } from "@ordo-pink/wjwt"
 import { Oath } from "@ordo-pink/oath"
 import { TTokenService, TokenRepository, TokenServiceOptions } from "./types"
 import { Switch } from "@ordo-pink/switch"
+import { UUIDv4 } from "@ordo-pink/tau"
 
 type Params = { repository: TokenRepository; options: TokenServiceOptions }
 
@@ -55,16 +56,16 @@ const of = ({ repository, options }: Params): TTokenService => {
 					),
 				)
 				.chain(token => wjwt(type).decode0(token))
-				.map(jwt => jwt.payload)
+				.map(jwt => jwt.payload as any)
 				.chain(payload => repository.getToken(payload.sub, payload.jti).map(() => payload))
 				.fix(() => null),
 		decode: token =>
 			wjwt("access")
 				.decode0(token)
-				.fix(() => null),
-		createPair: ({ sub, prevJti, aud = ["https://ordo.pink"] }) =>
+				.fix(() => null) as any,
+		createPair: ({ sub, prevJti, aud = ["https://ordo.pink"], data = {} }) =>
 			Oath.all({
-				jti: randomUUID(),
+				jti: randomUUID() as UUIDv4,
 				iat: Math.floor(Date.now() / 1000),
 				iss: "https://id.ordo.pink",
 				aexp: Math.floor(Date.now() / 1000) + options.accessTokenExpireIn,
@@ -80,15 +81,15 @@ const of = ({ repository, options }: Params): TTokenService => {
 					sub,
 					aud,
 					tokens: Oath.all({
-						access: accessWJWT.sign0({ jti, iat, iss, exp: aexp, sub, aud }),
-						refresh: refreshWJWT.sign0({ jti, iat, iss, exp: rexp, sub, aud }),
+						access: accessWJWT.sign0({ ...data, jti, iat, iss, exp: aexp, sub, aud }),
+						refresh: refreshWJWT.sign0({ ...data, jti, iat, iss, exp: rexp, sub, aud }),
 					}),
 				}).chain(res =>
 					prevJti
 						? repository
 								.removeToken(sub, prevJti)
 								.chain(() => repository.setToken(sub, jti, res.tokens.refresh))
-								.map(() => res)
+								.map(() => res as any)
 						: Oath.empty()
 								.chain(() => repository.setToken(sub, jti, res.tokens.refresh))
 								.map(() => res),

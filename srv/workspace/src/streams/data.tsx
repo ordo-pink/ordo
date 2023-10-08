@@ -20,6 +20,7 @@ import RemoveFileModal from "$components/modals/remove-page-modal.component"
 import RenameDirectoryModal from "$components/modals/rename-modal.component"
 import {
 	BsArrowRightSquare,
+	BsNodeMinus,
 	BsNodePlus,
 	BsPencilSquare,
 	BsTag,
@@ -212,6 +213,14 @@ export const __initData: Fn = ({ logger, auth$ }) => {
 		readableName: "Add",
 		shouldShow: ({ payload }) => payload && payload.fsid,
 		type: "create",
+	})
+
+	commands.emit<cmd.ctxMenu.add>("context-menu.add", {
+		cmd: "data.show-remove-modal",
+		Icon: BsNodeMinus,
+		readableName: "Remove",
+		shouldShow: ({ payload }) => payload && payload.fsid,
+		type: "delete",
 	})
 
 	commands.emit<cmd.ctxMenu.add>("context-menu.add", {

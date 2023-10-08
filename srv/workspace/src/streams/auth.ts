@@ -2,11 +2,10 @@
 // SPDX-License-Identifier: MIT
 
 import type { AuthResponse } from "@ordo-pink/backend-id-server"
-import type { User } from "@ordo-pink/backend-user-service"
 import { AiOutlineLogout } from "react-icons/ai"
 import { BehaviorSubject, Observable } from "rxjs"
 import { callOnce, Unary, Nullable } from "@ordo-pink/tau"
-import { cmd } from "@ordo-pink/frontend-core"
+import { User, cmd } from "@ordo-pink/frontend-core"
 import { Either } from "@ordo-pink/either"
 import { Logger } from "@ordo-pink/logger"
 import { Oath } from "@ordo-pink/oath"
@@ -90,7 +89,7 @@ export const __initAuth: InitAuth = callOnce(({ logger }) => {
 })
 
 const auth$ = new BehaviorSubject<Nullable<AuthResponse>>(null)
-const user$ = new BehaviorSubject<Nullable<User>>(null)
+const user$ = new BehaviorSubject<Nullable<User.User>>(null)
 
 export const useAuthStatus = () => {
 	const auth = useSubscription(auth$)

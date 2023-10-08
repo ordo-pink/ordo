@@ -3,7 +3,7 @@
 
 import type { IconType } from "react-icons"
 import type { ComponentType, MouseEvent } from "react"
-import type { Nullable, Thunk, Unary } from "@ordo-pink/tau"
+import type { Nullable, Thunk, UUIDv4, Unary } from "@ordo-pink/tau"
 import type { FSID, PlainData } from "@ordo-pink/data"
 import type { Observable } from "rxjs"
 import { Logger } from "@ordo-pink/logger"
@@ -196,6 +196,28 @@ export namespace Commands {
 			name: T extends { name: infer U; payload: any } ? U : never,
 			handler: Commands.Handler<T extends { name: any; payload: infer U } ? U : never>,
 		) => any
+	}
+}
+
+export namespace User {
+	export type PublicUser = {
+		email: string
+		createdAt: Date
+		subscription: string
+		handle?: string
+		firstName?: string
+		lastName?: string
+	}
+
+	export type User = User.PublicUser & {
+		id: UUIDv4
+		emailConfirmed: boolean
+		fileLimit: number
+		maxUploadSize: number
+	}
+
+	export type InternalUser = User.User & {
+		password: string
 	}
 }
 

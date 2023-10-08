@@ -20,6 +20,7 @@ import {
 	GetByIdMethod,
 	GetByEmailMethod,
 } from "@ordo-pink/backend-user-service"
+import { SUB } from "@ordo-pink/wjwt"
 
 // --- Public ---
 
@@ -35,7 +36,7 @@ const repository: T.Fn = params => ({
 export const DynamoDBUserStorageAdapter = {
 	of: ({ awsAccessKeyId, awsSecretKey, region, endpoint, tableName }: T.Config) => {
 		const db = new DynamoDB({
-			credentials: { awsAccessKeyId, awsSecretKey },
+			credentials: { accessKeyId: awsAccessKeyId, secretAccessKey: awsSecretKey },
 			region,
 			endpoint,
 		})
@@ -135,7 +136,10 @@ const serialize: T._SerializeFn = item => ({
 	lastName: item.lastName!.S!,
 	password: item.password!.S!,
 	handle: item.handle!.S!,
-	id: item.id!.S!,
+	subscription: item.subscription!.S!,
+	fileLimit: Number(item.fileLimit!.N!),
+	maxUploadSize: Number(item.maxUploadSize!.N!),
+	id: item.id!.S! as SUB,
 })
 
 const reduceUserToAttributeUpdates: T._ReduceUserToAttributeUpdatesFn = user =>

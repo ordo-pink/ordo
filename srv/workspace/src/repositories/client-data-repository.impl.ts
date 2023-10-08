@@ -14,6 +14,7 @@ const of = (
 	auth$: BehaviorSubject<AuthResponse>,
 	commands: Commands.Commands,
 ): DataRepository => ({
+	count: () => Oath.of(data$.value.length),
 	create: plain => {
 		const data = data$.value
 		const auth = auth$.value
@@ -36,10 +37,12 @@ const of = (
 				),
 			)
 			.chain(body => (body.success ? Oath.of(body.result) : Oath.reject(body.error as string)))
+			.tap(console.log, console.log)
 			.rejectedMap(rrrToNotification("Error creating file"))
 			.fork(
 				item => {
 					commands.emit<cmd.notification.show>("notification.show", item)
+					data$.next(data)
 				},
 				() => {
 					// commands.emit<cmd.data.refreshRoot>("data.refresh-root")

@@ -39,6 +39,10 @@ const sorter = (a: PlainData, b: PlainData) => (a.name < b.name ? -1 : a.name > 
 type Params = { root: string }
 
 const of = ({ root }: Params): DataRepository => ({
+	count: uid =>
+		read0(root, uid)
+			.map(arr => arr.length)
+			.rejectedMap(() => Data.Errors.DataNotFound),
 	find: (uid, name, parent) =>
 		read0(root, uid)
 			.rejectedMap(UnexpectedError)

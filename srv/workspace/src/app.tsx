@@ -6,7 +6,7 @@ import { useAppInit } from "$hooks/use-app-init"
 import { getCommands } from "$streams/commands"
 import { useSubscription } from "$hooks/use-subscription"
 import { createContext, useContext, useEffect } from "react"
-import { Commands, Router, __useSharedContextInit, cmd } from "@ordo-pink/frontend-core"
+import { Commands, Router, User, __useSharedContextInit, cmd } from "@ordo-pink/frontend-core"
 import Notifications from "$components/notifications/notifications.component"
 import ActivityBar from "$components/activity-bar/activity-bar"
 import ContextMenu from "$components/context-menu/context-menu"
@@ -15,19 +15,23 @@ import Modal from "$components/modal"
 import Null from "$components/null"
 import { AllKeysRequired, Nullable } from "@ordo-pink/tau"
 import { PlainData } from "@ordo-pink/data"
+import { useUser } from "$streams/auth"
+import { UserUtils } from "$utils/user-utils.util"
 
 // TODO: Remove useAppInit
 const commands = getCommands()
 const SharedContext = createContext<{
 	data: Nullable<PlainData[]>
 	route: Nullable<Router.Route>
+	user: Nullable<User.User>
 	commands: Commands.Commands
-}>({ data: null, route: null, commands })
+}>({ data: null, route: null, user: null, commands })
 
 export default function App() {
 	const streams = useAppInit()
 	const data = useSubscription(streams.data$)
 	const auth = useSubscription(streams.auth$)
+	const user = useUser()
 	const currentRoute = useSubscription(streams.currentRoute$)
 	__useSharedContextInit(SharedContext, useContext)
 
@@ -76,7 +80,17 @@ export default function App() {
 				activities$,
 				currentActivity$,
 			}) => (
-				<SharedContext.Provider value={{ data: data, route: currentRoute, commands }}>
+				<SharedContext.Provider
+					value={{
+						data: data,
+						route: currentRoute,
+						commands,
+						user: user.fold(
+							() => null,
+							u => ({ ...u, email: UserUtils.obfuscateEmail(u.email) }),
+						),
+					}}
+				>
 					<div className="flex" onClick={hideContextMenu}>
 						<ActivityBar
 							sidebar$={sidebar$}

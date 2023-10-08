@@ -13,6 +13,7 @@ export type DataRepository = {
 	create: (plain: PlainData) => Oath<PlainData, DataError>
 	get: (uid: UserID, fsid: FSID) => Oath<PlainData, DataError>
 	getAll: (uid: UserID) => Oath<PlainData[], DataError>
+	count: (uid: UserID) => Oath<number, DataError>
 	update: (plain: PlainData) => Oath<"OK", DataError>
 	delete: (uid: UserID, fsid: FSID) => Oath<"OK", DataError>
 }

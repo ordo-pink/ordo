@@ -10,7 +10,8 @@
 
 import { DynamoDB } from "aws-sdk"
 import type { Unary } from "@ordo-pink/tau"
-import type { InternalUser, UserRepository } from "@ordo-pink/backend-user-service"
+import type { UserRepository } from "@ordo-pink/backend-user-service"
+import { User } from "@ordo-pink/frontend-core"
 
 // --- Public ---
 
@@ -26,8 +27,8 @@ export type Config = {
 
 // --- Internal ---
 
-export type _SerializeFn = Unary<NonNullable<DynamoDB.GetItemOutput["Item"]>, InternalUser>
+export type _SerializeFn = Unary<NonNullable<DynamoDB.GetItemOutput["Item"]>, User.InternalUser>
 export type _ReduceUserToAttributeUpdatesFn = Unary<
-	Partial<InternalUser>,
+	Partial<User.InternalUser>,
 	NonNullable<DynamoDB.UpdateItemInput["AttributeUpdates"]>
 >

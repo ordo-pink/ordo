@@ -5,11 +5,12 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-import type { User, InternalUser, PublicUser, UserRepository } from "./types"
+import type { UserRepository } from "./types"
 import { hash, compare, genSalt } from "bcryptjs"
 import crypto from "crypto"
 import { Oath } from "@ordo-pink/oath"
 import { UUIDv4 } from "@ordo-pink/tau"
+import { User } from "@ordo-pink/frontend-core"
 
 export type UserServiceOptions = {
 	saltRounds: number
@@ -47,7 +48,7 @@ export class UserService {
 			.map(this.serialize)
 	}
 
-	public updateUserPassword(user: User, oldPassword: string, newPassword: string) {
+	public updateUserPassword(user: User.User, oldPassword: string, newPassword: string) {
 		return this.#driver.getById(user.id).chain(oldUser =>
 			Oath.from(() => compare(oldPassword, oldUser.password))
 				.chain(valid =>
@@ -63,7 +64,7 @@ export class UserService {
 							({
 								...user,
 								password,
-							} as InternalUser),
+							} as User.InternalUser),
 					),
 				)
 				.chain(user => this.#driver.update(oldUser.id, user).rejectedMap(() => "User not found"))
@@ -71,7 +72,7 @@ export class UserService {
 		)
 	}
 
-	public update(id: string, user: Partial<User>) {
+	public update(id: string, user: Partial<User.User>) {
 		return this.#driver.update(id, user).map(user => this.serialize(user))
 	}
 
@@ -100,7 +101,7 @@ export class UserService {
 			)
 	}
 
-	private serialize(user: InternalUser): User {
+	private serialize(user: User.InternalUser): User.User {
 		return {
 			createdAt: user.createdAt,
 			email: user.email,
@@ -115,7 +116,7 @@ export class UserService {
 		}
 	}
 
-	private serializePublic(user: InternalUser): PublicUser {
+	private serializePublic(user: User.InternalUser): User.PublicUser {
 		return {
 			createdAt: user.createdAt,
 			email: this.obfuscateEmail(user.email),

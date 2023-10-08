@@ -6,14 +6,15 @@
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 import { TTokenService } from "@ordo-pink/backend-token-service"
-import { PublicUser, UserService } from "@ordo-pink/backend-user-service"
+import { UserService } from "@ordo-pink/backend-user-service"
 import { sendError, authenticate0, parseBody0 } from "@ordo-pink/backend-utils"
+import { User } from "@ordo-pink/frontend-core"
 import { Oath } from "@ordo-pink/oath"
 import { HttpError } from "@ordo-pink/rrr"
 import { isString } from "@ordo-pink/tau"
 import { Middleware } from "koa"
 
-type Body = Pick<PublicUser, "firstName" | "lastName">
+type Body = Pick<User.PublicUser, "firstName" | "lastName">
 type Params = { tokenService: TTokenService; userService: UserService }
 type Fn = (params: Params) => Middleware
 

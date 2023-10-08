@@ -21,12 +21,23 @@ export const handleCreate: Unary<
 	ctx =>
 		authenticate0(ctx, idHost)
 			.map(({ payload }) => payload)
+			.chain(payload =>
+				dataService.dataRepository
+					.count(payload.sub)
+					.rejectedMap(() => HttpError.NotFound("User not found"))
+					.chain(
+						Oath.ifElse(totalFiles => totalFiles < payload.lim, {
+							onFalse: () => HttpError.PaymentRequired("Subscription file limit exceeded"),
+						}),
+					)
+					.map(() => payload),
+			)
 			.chain(({ sub }) =>
 				parseBody0<{ name: string; parent: Nullable<FSID>; fsid?: FSID }>(ctx).chain(
 					({ name, parent, fsid }) =>
-						Oath.of(ctx.params.userId).chain(createdBy =>
+						Oath.of(ctx.params.userId).chain(() =>
 							dataService
-								.create({ createdBy, name, parent, updatedBy: sub, fsid })
+								.create({ createdBy: sub, name, parent, fsid })
 								.rejectedMap(HttpError.Conflict),
 						),
 				),

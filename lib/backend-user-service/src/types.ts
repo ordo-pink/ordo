@@ -5,36 +5,17 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-import { Method, Nullable, UUIDv4 } from "@ordo-pink/tau"
+import { Method, Nullable } from "@ordo-pink/tau"
 import { Oath } from "@ordo-pink/oath"
-
-export type PublicUser = {
-	email: string
-	createdAt: Date
-	subscription: string
-	handle?: string
-	firstName?: string
-	lastName?: string
-}
-
-export type User = PublicUser & {
-	id: UUIDv4
-	emailConfirmed: boolean
-	fileLimit: number
-	maxUploadSize: number
-}
-
-export type InternalUser = User & {
-	password: string
-}
+import { User } from "@ordo-pink/frontend-core"
 
 export type UserRepository = {
 	existsById: (id: string) => Oath<boolean, Error>
 	existsByEmail: (email: string) => Oath<boolean, Error>
-	create(user: InternalUser): Oath<InternalUser, Error>
-	getById(id: string): Oath<InternalUser, Nullable<Error>>
-	getByEmail(email: string): Oath<InternalUser, Nullable<Error>>
-	update(id: string, user: Partial<InternalUser>): Oath<InternalUser, Nullable<Error>>
+	create(user: User.InternalUser): Oath<User.InternalUser, Error>
+	getById(id: string): Oath<User.InternalUser, Nullable<Error>>
+	getByEmail(email: string): Oath<User.InternalUser, Nullable<Error>>
+	update(id: string, user: Partial<User.InternalUser>): Oath<User.InternalUser, Nullable<Error>>
 	// remove: (id: string) => Promise<Nullable<InternalUser>>
 }
 

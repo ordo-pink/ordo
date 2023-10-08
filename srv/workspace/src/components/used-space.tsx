@@ -10,24 +10,17 @@ import { Either } from "@ordo-pink/either"
 // const MAX_TOTAL_SIZE_MB = 50
 
 export default function UsedSpace() {
-	const { data } = useSharedContext()
+	const { data, user } = useSharedContext()
 
 	const [percentage, setPercentage] = useState(0)
 	const [size, setSize] = useState(0)
 
 	useEffect(() => {
-		// Either.fromNullable(data)
-		// 	.map(items => items.reduce((acc, item) => acc + Number(item.size), 0))
-		// 	.map(size => size / 1024 / 1024)
-		// 	.fold(noop, megabytes => {
-		// 		setSize(megabytes)
-		// 		setPercentage((megabytes / MAX_TOTAL_SIZE_MB) * 100)
-		// 	})
 		Either.fromNullable(data)
-			.map(items => items.length)
-			.fold(noop, length => {
-				setSize(length)
-				setPercentage(length / 10)
+			.chain(data => Either.fromNullable(user).map(user => ({ data, user })))
+			.fold(noop, ({ data, user }) => {
+				setSize(data.length)
+				setPercentage((data.length / user.fileLimit) * 100)
 			})
 	}, [data])
 
@@ -38,8 +31,7 @@ export default function UsedSpace() {
 				<div className="text-xs">
 					{size.toFixed(0)}
 					{"/"}
-					{1000}
-					{/* {"MB"} */}
+					{user?.fileLimit}
 				</div>
 			</div>
 			<div className="w-full bg-neutral-300 rounded-full dark:bg-neutral-700 shadow-inner">

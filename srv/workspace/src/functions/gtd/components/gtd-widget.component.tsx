@@ -2,17 +2,43 @@
 // SPDX-License-Identifier: MIT
 
 import { TextInput } from "$components/input"
+import { Loader } from "$components/loading/loader"
+import { PlainData } from "@ordo-pink/data"
+import { Either } from "@ordo-pink/either"
 import { cmd, useSharedContext } from "@ordo-pink/frontend-core"
-import { isNonEmptyString } from "@ordo-pink/tau"
-import { useState } from "react"
+import { Switch } from "@ordo-pink/switch"
+import { isNonEmptyString, noop } from "@ordo-pink/tau"
+import { FC, useEffect, useState } from "react"
+import { BsCheckCircle, BsInfoCircle, BsXCircle } from "react-icons/bs"
 
 export default function GTDWidget() {
 	const { commands, data } = useSharedContext()
-
+	const [inboxChildren, setInboxChildren] = useState<PlainData[] | null>(null)
 	const [newItem, setNewItem] = useState("")
+
+	useEffect(() => {
+		Either.fromNullable(data)
+			.chain(data =>
+				Either.fromNullable(data.find(item => item.name === ".gtd" && item.parent === null)).chain(
+					gtd =>
+						Either.fromNullable(
+							data.find(item => item.name === ".inbox" && item.parent === gtd.fsid),
+						),
+				),
+			)
+			.map(
+				inbox =>
+					inbox.children.map(child => data!.find(item => item.fsid === child)) as PlainData[],
+			)
+			.fold(noop, setInboxChildren)
+	}, [data])
 
 	return (
 		<div className="w-full max-w-lg p-4">
+			<div className="space-y-4 pb-4 flex flex-col items-center justify-center w-full text-neutral-500">
+				<InboxStatus inboxChildren={inboxChildren} />
+			</div>
+
 			<TextInput
 				id="inbox"
 				label="Add quick reminder"
@@ -33,9 +59,58 @@ export default function GTDWidget() {
 							})
 
 						setNewItem("")
+						commands.emit<cmd.notification.show>("notification.show", {
+							message: newItem,
+							type: "success",
+							title: "New reminder created",
+						})
 					}
 				}}
 			/>
 		</div>
 	)
 }
+
+type InboxStatusP = { inboxChildren: PlainData[] | null }
+const InboxStatus = ({ inboxChildren }: InboxStatusP) =>
+	Switch.of(inboxChildren)
+		.case(null, () => <Loader />)
+		.case(
+			data => data!.length === 0,
+			() => (
+				<>
+					<BsCheckCircle className="text-6xl text-emerald-500" />
+					<div className="text-sm">Your inbox is very tidy! Did you forget something?</div>
+				</>
+			),
+		)
+		.case(
+			data => data!.length === 1,
+			() => (
+				<>
+					<BsInfoCircle className="text-6xl text-yellow-500" />
+					<div className="text-sm">
+						{inboxChildren!.length} item in your inbox. Why wasn't it moved yet?
+					</div>
+				</>
+			),
+		)
+		.case(
+			data => data!.length <= 10,
+			() => (
+				<>
+					<BsInfoCircle className="text-6xl text-yellow-500" />
+					<div className="text-sm">
+						{inboxChildren!.length} items in your inbox. You've been busy!
+					</div>
+				</>
+			),
+		)
+		.default(() => (
+			<>
+				<BsXCircle className="text-6xl text-rose-500" />
+				<div className="text-sm">
+					{inboxChildren!.length} items in your inbox. This definitely needs a refinement!
+				</div>
+			</>
+		))

@@ -10,6 +10,15 @@ import { BsX } from "react-icons/bs"
 
 const commands = getCommands()
 
+const HoverColor: Record<Notification.Type, string> = {
+	default: "hover:bg-neutral-300 hover:dark:bg-neutral-900",
+	info: "hover:bg-sky-300 hover:dark:bg-sky-900",
+	question: "hover:bg-violet-300 hover:dark:bg-violet-900",
+	rrr: "hover:bg-rose-300 hover:dark:bg-rose-900",
+	success: "hover:bg-emerald-300 hover:dark:bg-emerald-900",
+	warn: "hover:bg-amber-300 hover:dark:bg-amber-900",
+}
+
 type _P = { notification: Notification.Item & { id: string } }
 export default function NotificationComponent({ notification }: _P) {
 	return (
@@ -18,7 +27,9 @@ export default function NotificationComponent({ notification }: _P) {
 				<Title notification={notification} />
 				<Message notification={notification} />
 				<div
-					className="absolute top-2 right-2 rounded-full p-1 hover:bg-rose-900 transition-colors duration-300 cursor-pointer"
+					className={`absolute top-2 right-2 rounded-full p-1 ${
+						HoverColor[notification.type]
+					} transition-colors duration-300 cursor-pointer`}
 					onClick={() => commands.emit<cmd.notification.hide>("notification.hide", notification.id)}
 				>
 					<BsX />

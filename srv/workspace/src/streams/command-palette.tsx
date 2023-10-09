@@ -35,20 +35,48 @@ export const __initCommandPalette: InitCommandPalette = callOnce(({ logger }) =>
 
 type Add = Unary<CommandPalette.Item, void>
 type Remove = Unary<string, void>
-type Show = Unary<{ items: CommandPalette.Item[]; onNewItem?: (newItem: string) => any }, void>
+type Show = Unary<
+	{
+		items: CommandPalette.Item[]
+		onNewItem?: (newItem: string) => any
+		multiple?: boolean
+		pinnedItems?: CommandPalette.Item[]
+	},
+	void
+>
 type Hide = Thunk<void>
 type AddP = Curry<
 	Binary<
 		CommandPalette.Item,
-		{ items: CommandPalette.Item[]; onNewItem?: (newItem: string) => any },
-		{ items: CommandPalette.Item[]; onNewItem?: (newItem: string) => any }
+		{
+			items: CommandPalette.Item[]
+			onNewItem?: (newItem: string) => any
+			multiple?: boolean
+			pinnedItems?: CommandPalette.Item[]
+		},
+		{
+			items: CommandPalette.Item[]
+			onNewItem?: (newItem: string) => any
+			multiple?: boolean
+			pinnedItems?: CommandPalette.Item[]
+		}
 	>
 >
 type RemoveP = Curry<
 	Binary<
 		string,
-		{ items: CommandPalette.Item[]; onNewItem?: (newItem: string) => any },
-		{ items: CommandPalette.Item[]; onNewItem?: (newItem: string) => any }
+		{
+			items: CommandPalette.Item[]
+			onNewItem?: (newItem: string) => any
+			multiple?: boolean
+			pinnedItems?: CommandPalette.Item[]
+		},
+		{
+			items: CommandPalette.Item[]
+			onNewItem?: (newItem: string) => any
+			multiple?: boolean
+			pinnedItems?: CommandPalette.Item[]
+		}
 	>
 >
 type InitCommandPaletteP = { logger: Logger }

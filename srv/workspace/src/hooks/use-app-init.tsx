@@ -122,7 +122,12 @@ export const useAppInit = (): UseAppInitReturns => {
 
 		commands.emit<cmd.modal.show>("modal.show", {
 			Component: () => (
-				<CommandPaletteModal items={commandPalette.items} onNewItem={commandPalette.onNewItem} />
+				<CommandPaletteModal
+					items={commandPalette.items}
+					onNewItem={commandPalette.onNewItem}
+					multiple={commandPalette.multiple}
+					pinnedItems={commandPalette.pinnedItems}
+				/>
 			),
 			// The onHide hook makes a redundant call for hiding modal, but helps with closing the
 			// command palette when the modal is closed with a click on the overlay or Esc key press.

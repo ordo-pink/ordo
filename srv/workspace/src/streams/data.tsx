@@ -20,6 +20,7 @@ import RemoveFileModal from "$components/modals/remove-page-modal.component"
 import RenameDirectoryModal from "$components/modals/rename-modal.component"
 import {
 	BsArrowRightSquare,
+	BsFillTagFill,
 	BsNodeMinus,
 	BsNodePlus,
 	BsPencilSquare,
@@ -53,11 +54,23 @@ export const __initData: Fn = ({ logger, auth$ }) => {
 		const data = data$.value
 		const labels = Array.from(new Set(data.flatMap(item => item.labels)))
 
+		console.log("HERE")
+
 		commands.emit<cmd.commandPalette.show>("command-palette.show", {
 			onNewItem: label => {
 				commands.emit<cmd.data.addLabel>("data.add-label", { item: payload, label })
 				commands.emit<cmd.commandPalette.hide>("command-palette.hide")
 			},
+			multiple: true,
+			pinnedItems: payload.labels.map(label => ({
+				id: label,
+				readableName: label,
+				Icon: BsFillTagFill,
+				onSelect: () => {
+					commands.emit<cmd.data.removeLabel>("data.remove-label", { item: payload, label })
+					// commands.emit<cmd.commandPalette.hide>("command-palette.hide")
+				},
+			})),
 			items: labels
 				.filter(label => !payload.labels.includes(label))
 				.map(label => ({
@@ -66,7 +79,7 @@ export const __initData: Fn = ({ logger, auth$ }) => {
 					Icon: BsTag,
 					onSelect: () => {
 						commands.emit<cmd.data.addLabel>("data.add-label", { item: payload, label })
-						commands.emit<cmd.commandPalette.hide>("command-palette.hide")
+						// commands.emit<cmd.commandPalette.hide>("command-palette.hide")
 					},
 				})),
 		})

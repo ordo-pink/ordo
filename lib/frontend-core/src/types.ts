@@ -84,6 +84,8 @@ export namespace cmd {
 			payload: {
 				items: CommandPalette.Item[]
 				onNewItem?: (newItem: string) => any
+				multiple?: boolean
+				pinnedItems?: CommandPalette.Item[]
 			}
 		}
 		export type hide = { name: "command-palette.hide"; payload: void }

@@ -20,29 +20,36 @@ const commands = getCommands()
 type Props = {
 	items: CommandPalette.Item[]
 	onNewItem?: (newItem: string) => any
+	multiple?: boolean
+	pinnedItems?: CommandPalette.Item[]
 }
 
 const fuse = new Fuse([] as CommandPalette.Item[], { keys: ["id"], threshold: 0.1 })
 
-export default function CommandPaletteModal({ items, onNewItem }: Props) {
+export default function CommandPaletteModal({ items, onNewItem, multiple, pinnedItems }: Props) {
 	useHotkeys("Esc", () => commands.emit<cmd.commandPalette.hide>("command-palette.hide"))
 
 	const [currentIndex, setCurrentIndex] = useState(0)
 	const [inputValue, setInputValue] = useState("")
-	const [visibleItems, setVisibleItems] = useState<CommandPalette.Item[]>([])
+	const [pointerLocation, setPointerLocation] = useState<"selected" | "suggested">(
+		pinnedItems && pinnedItems.length > 0 ? "selected" : "suggested",
+	)
+	const [allItems, setAllItems] = useState<CommandPalette.Item[]>(items)
+	const [selectedItems, setSelectedItems] = useState<CommandPalette.Item[]>(pinnedItems ?? [])
+	const [suggestedItems, setSuggestedItems] = useState<CommandPalette.Item[]>([])
 
 	useEffect(() => {
-		fuse.setCollection(items)
-	}, [items])
+		fuse.setCollection(allItems)
+	}, [allItems])
 
 	useEffect(() => {
-		if (!items) return
+		if (!allItems) return
 
 		if (inputValue === "") {
-			setVisibleItems(items)
+			setSuggestedItems(allItems)
 
-			if (items.length - 1 < currentIndex) {
-				setCurrentIndex(items.length > 0 ? items.length - 1 : 0)
+			if (allItems.length - 1 < currentIndex && pointerLocation === "suggested") {
+				setCurrentIndex(allItems.length > 0 ? allItems.length - 1 : 0)
 			}
 
 			return
@@ -50,44 +57,135 @@ export default function CommandPaletteModal({ items, onNewItem }: Props) {
 
 		const fusedItems = fuse.search(inputValue)
 
-		setVisibleItems(fusedItems.map(({ item }) => item))
+		setSuggestedItems(fusedItems.map(({ item }) => item))
 
-		if (fusedItems.length - 1 < currentIndex) {
+		if (fusedItems.length - 1 < currentIndex && pointerLocation === "suggested") {
 			setCurrentIndex(fusedItems.length > 0 ? fusedItems.length - 1 : 0)
 		}
-	}, [inputValue, items, currentIndex])
+	}, [inputValue, allItems, currentIndex])
 
 	const handleInputChange = (event: ChangeEvent<HTMLInputElement>) => {
 		setInputValue(event.target.value)
 	}
 
 	const handleEnter = (index: number) => {
-		Either.fromNullable(visibleItems[index]).fold(
+		Either.fromNullable(
+			pointerLocation === "selected" ? selectedItems[index] : suggestedItems[index],
+		).fold(
 			() => {
 				if (onNewItem) onNewItem(inputValue)
-				handleEscape()
+				if (!multiple) handleEscape()
 			},
-			selectedItem => selectedItem.onSelect(),
+			selectedItem => {
+				selectedItem.onSelect()
+
+				if (pointerLocation === "selected") {
+					const selectedItemsCopy = [...selectedItems]
+					selectedItemsCopy.splice(index, 1)
+					setSelectedItems(selectedItemsCopy)
+					setAllItems([selectedItem, ...suggestedItems])
+				}
+
+				if (pointerLocation === "suggested") {
+					const allItemsCopy = [...allItems]
+					allItemsCopy.splice(
+						allItems.findIndex(v => v.id === selectedItem.id),
+						1,
+					)
+					setAllItems(allItemsCopy)
+					setSelectedItems([...selectedItems, selectedItem])
+				}
+			},
 		)
 	}
 
 	const handleArrowUp = (event: KeyboardEvent<HTMLInputElement>) => {
 		event.preventDefault()
-		const isFirstItem = currentIndex === 0
 
-		setCurrentIndex(isFirstItem ? visibleItems.length - 1 : currentIndex - 1)
+		Switch.of(true)
+			.case(
+				() => currentIndex > 0,
+				() => setCurrentIndex(index => index - 1),
+			)
+			.case(
+				() => pointerLocation === "suggested" && currentIndex === 0 && selectedItems.length === 0,
+				() => setCurrentIndex(suggestedItems.length - 1),
+			)
+			.case(
+				() => pointerLocation === "selected" && currentIndex === 0 && suggestedItems.length === 0,
+				() => setCurrentIndex(selectedItems.length - 1),
+			)
+			.case(
+				() => pointerLocation === "suggested" && currentIndex === 0 && selectedItems.length > 0,
+				() => {
+					setPointerLocation("selected")
+					setCurrentIndex(selectedItems.length - 1)
+				},
+			)
+			.case(
+				() => pointerLocation === "selected" && currentIndex === 0 && suggestedItems.length > 0,
+				() => {
+					setPointerLocation("suggested")
+					setCurrentIndex(suggestedItems.length - 1)
+				},
+			)
+			.default(() => setCurrentIndex(0))
 	}
 
 	const handleArrowDown = (event: KeyboardEvent<HTMLInputElement>) => {
 		event.preventDefault()
-		const isLastItem = currentIndex === visibleItems.length - 1
 
-		setCurrentIndex(isLastItem ? 0 : currentIndex + 1)
+		Switch.of(true)
+			.case(
+				() => pointerLocation === "suggested" && currentIndex < suggestedItems.length - 1,
+				() => setCurrentIndex(index => index + 1),
+			)
+			.case(
+				() => pointerLocation === "selected" && currentIndex < selectedItems.length - 1,
+				() => setCurrentIndex(index => index + 1),
+			)
+			.case(
+				() =>
+					pointerLocation === "suggested" &&
+					currentIndex === suggestedItems.length - 1 &&
+					selectedItems.length === 0,
+				() => setCurrentIndex(0),
+			)
+			.case(
+				() =>
+					pointerLocation === "selected" &&
+					currentIndex === selectedItems.length - 1 &&
+					suggestedItems.length === 0,
+				() => setCurrentIndex(0),
+			)
+			.case(
+				() =>
+					pointerLocation === "suggested" &&
+					currentIndex === suggestedItems.length - 1 &&
+					selectedItems.length > 0,
+				() => {
+					setPointerLocation("selected")
+					setCurrentIndex(0)
+				},
+			)
+			.case(
+				() =>
+					pointerLocation === "selected" &&
+					currentIndex === selectedItems.length - 1 &&
+					suggestedItems.length > 0,
+				() => {
+					setPointerLocation("suggested")
+					setCurrentIndex(0)
+				},
+			)
+			.default(() => void 0)
 	}
 
 	const handleEscape = () => {
 		setInputValue("")
 		setCurrentIndex(0)
+		setPointerLocation(selectedItems.length ? "selected" : "suggested")
+
 		commands.emit<cmd.commandPalette.hide>("command-palette.hide")
 	}
 
@@ -117,20 +215,36 @@ export default function CommandPaletteModal({ items, onNewItem }: Props) {
 				/>
 			</div>
 
-			<div className="px-2 py-4 overflow-y-auto h-[32rem]">
-				{visibleItems.map((item, index) => (
-					<Item
-						key={item.id}
-						readableName={item.readableName}
-						commandName={item.id}
-						Icon={item.Icon}
-						accelerator={item.accelerator}
-						isCurrent={currentIndex === index}
-						onSelect={() => handleEnter(index)}
-					/>
-				))}
+			<div className="px-2 py-4 overflow-y-auto h-[31.5rem]">
+				<div className="pb-2 border-b border-neutral-500">
+					{selectedItems.map((item, index) => (
+						<Item
+							key={item.id}
+							readableName={item.readableName}
+							commandName={item.id}
+							Icon={item.Icon}
+							accelerator={item.accelerator}
+							isCurrent={currentIndex === index && pointerLocation === "selected"}
+							onSelect={() => handleEnter(index)}
+						/>
+					))}
+				</div>
 
-				{onNewItem && inputValue.length > 0 && visibleItems.length === 0 ? (
+				<div className="pt-2">
+					{suggestedItems.map((item, index) => (
+						<Item
+							key={item.id}
+							readableName={item.readableName}
+							commandName={item.id}
+							Icon={item.Icon}
+							accelerator={item.accelerator}
+							isCurrent={currentIndex === index && pointerLocation === "suggested"}
+							onSelect={() => handleEnter(index)}
+						/>
+					))}
+				</div>
+
+				{onNewItem && inputValue.length > 0 && suggestedItems.length === 0 ? (
 					<ActionListItem
 						large
 						Icon={BsPlus}
@@ -143,6 +257,12 @@ export default function CommandPaletteModal({ items, onNewItem }: Props) {
 					/>
 				) : null}
 			</div>
+
+			{multiple ? (
+				<div className="text-center text-neutral-500 text-sm">
+					Press <strong>ESC</strong> to complete
+				</div>
+			) : null}
 		</div>
 	)
 }

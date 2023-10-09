@@ -1,7 +1,13 @@
 // SPDX-FileCopyrightText: Copyright 2023, 谢尔盖||↓ and the Ordo.pink contributors
 // SPDX-License-Identifier: MIT
 
+import {
+	OrdoButtonNeutral,
+	OrdoButtonPrimary,
+	OrdoButtonSecondary,
+} from "$components/buttons/buttons"
 import { TextInput } from "$components/input"
+import Link from "$components/link"
 import { Loader } from "$components/loading/loader"
 import { PlainData } from "@ordo-pink/data"
 import { Either } from "@ordo-pink/either"
@@ -10,6 +16,7 @@ import { Switch } from "@ordo-pink/switch"
 import { isNonEmptyString, noop } from "@ordo-pink/tau"
 import { FC, useEffect, useState } from "react"
 import { BsCheckCircle, BsInfoCircle, BsXCircle } from "react-icons/bs"
+import { GTDCommands } from "../types"
 
 export default function GTDWidget() {
 	const { commands, data } = useSharedContext()
@@ -34,7 +41,7 @@ export default function GTDWidget() {
 	}, [data])
 
 	return (
-		<div className="w-full max-w-lg p-4">
+		<div className="w-full max-w-lg p-4 flex flex-col space-y-4 items-start">
 			<div className="space-y-4 pb-4 flex flex-col items-center justify-center w-full text-neutral-500">
 				<InboxStatus inboxChildren={inboxChildren} />
 			</div>
@@ -67,6 +74,13 @@ export default function GTDWidget() {
 					}
 				}}
 			/>
+
+			<OrdoButtonPrimary
+				hotkey="mod+i"
+				onClick={() => commands.emit<GTDCommands.openInbox>("gtd.open-inbox")}
+			>
+				Go to Inbox
+			</OrdoButtonPrimary>
 		</div>
 	)
 }
@@ -78,39 +92,39 @@ const InboxStatus = ({ inboxChildren }: InboxStatusP) =>
 		.case(
 			data => data!.length === 0,
 			() => (
-				<>
-					<BsCheckCircle className="text-6xl text-emerald-500" />
+				<div className="flex items-center space-x-2">
+					<BsCheckCircle className="text-xl text-emerald-500" />
 					<div className="text-sm">Your inbox is very tidy! Did you forget something?</div>
-				</>
+				</div>
 			),
 		)
 		.case(
 			data => data!.length === 1,
 			() => (
-				<>
-					<BsInfoCircle className="text-6xl text-yellow-500" />
+				<div className="flex items-center space-x-2">
+					<BsInfoCircle className="text-xl text-yellow-500" />
 					<div className="text-sm">
 						{inboxChildren!.length} item in your inbox. Why wasn't it moved yet?
 					</div>
-				</>
+				</div>
 			),
 		)
 		.case(
 			data => data!.length <= 10,
 			() => (
-				<>
-					<BsInfoCircle className="text-6xl text-yellow-500" />
+				<div className="flex items-center space-x-2">
+					<BsInfoCircle className="text-xl text-yellow-500" />
 					<div className="text-sm">
 						{inboxChildren!.length} items in your inbox. You've been busy!
 					</div>
-				</>
+				</div>
 			),
 		)
 		.default(() => (
-			<>
-				<BsXCircle className="text-6xl text-rose-500" />
+			<div className="flex items-center space-x-2">
+				<BsXCircle className="text-xl text-rose-500" />
 				<div className="text-sm">
 					{inboxChildren!.length} items in your inbox. This definitely needs a refinement!
 				</div>
-			</>
+			</div>
 		))

@@ -41,11 +41,11 @@ export namespace cmd {
 		export type showCreateModal = { name: "data.show-create-modal"; payload: Nullable<PlainData> }
 		export type showRemoveModal = { name: "data.show-remove-modal"; payload: PlainData }
 		export type showRenameModal = { name: "data.show-rename-modal"; payload: PlainData }
-		export type showAddLabelPalette = { name: "data.show-add-label-palette"; payload: PlainData }
-		export type showRemoveLabelPalette = {
-			name: "data.show-remove-label-palette"
+		export type showEditLabelsPalette = {
+			name: "data.show-edit-labels-palette"
 			payload: PlainData
 		}
+
 		export type setContent = {
 			name: "data.set-content"
 			payload: { fsid: FSID; content: string | ArrayBuffer }

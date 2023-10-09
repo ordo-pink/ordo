@@ -50,11 +50,9 @@ export const __initData: Fn = ({ logger, auth$ }) => {
 		})
 	})
 
-	commands.on<cmd.data.showAddLabelPalette>("data.show-add-label-palette", ({ payload }) => {
+	commands.on<cmd.data.showEditLabelsPalette>("data.show-edit-labels-palette", ({ payload }) => {
 		const data = data$.value
 		const labels = Array.from(new Set(data.flatMap(item => item.labels)))
-
-		console.log("HERE")
 
 		commands.emit<cmd.commandPalette.show>("command-palette.show", {
 			onNewItem: label => {
@@ -65,10 +63,9 @@ export const __initData: Fn = ({ logger, auth$ }) => {
 			pinnedItems: payload.labels.map(label => ({
 				id: label,
 				readableName: label,
-				Icon: BsFillTagFill,
+				Icon: BsTag,
 				onSelect: () => {
 					commands.emit<cmd.data.removeLabel>("data.remove-label", { item: payload, label })
-					// commands.emit<cmd.commandPalette.hide>("command-palette.hide")
 				},
 			})),
 			items: labels
@@ -79,23 +76,8 @@ export const __initData: Fn = ({ logger, auth$ }) => {
 					Icon: BsTag,
 					onSelect: () => {
 						commands.emit<cmd.data.addLabel>("data.add-label", { item: payload, label })
-						// commands.emit<cmd.commandPalette.hide>("command-palette.hide")
 					},
 				})),
-		})
-	})
-
-	commands.on<cmd.data.showRemoveLabelPalette>("data.show-remove-label-palette", ({ payload }) => {
-		commands.emit<cmd.commandPalette.show>("command-palette.show", {
-			items: payload.labels.map(label => ({
-				id: label,
-				readableName: label,
-				Icon: BsTag,
-				onSelect: () => {
-					commands.emit<cmd.data.removeLabel>("data.remove-label", { item: payload, label })
-					commands.emit<cmd.commandPalette.hide>("command-palette.hide")
-				},
-			})),
 		})
 	})
 
@@ -212,20 +194,11 @@ export const __initData: Fn = ({ logger, auth$ }) => {
 	})
 
 	commands.emit<cmd.ctxMenu.add>("context-menu.add", {
-		cmd: "data.show-add-label-palette",
+		cmd: "data.show-edit-labels-palette",
 		Icon: BsTags,
-		readableName: "Add label",
+		readableName: "Edit labels",
 		shouldShow: ({ payload }) => payload && payload.fsid && payload.name,
 		type: "update",
-	})
-
-	commands.emit<cmd.ctxMenu.add>("context-menu.add", {
-		cmd: "data.show-remove-label-palette",
-		Icon: BsTagsFill,
-		readableName: "Remove label",
-		shouldShow: ({ payload }) => payload && payload.fsid && payload.name,
-		type: "update",
-		shouldBeDisabled: ({ payload }) => payload.labels.length === 0,
 	})
 
 	commands.emit<cmd.ctxMenu.add>("context-menu.add", {

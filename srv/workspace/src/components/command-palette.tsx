@@ -62,6 +62,9 @@ export default function CommandPaletteModal({ items, onNewItem, multiple, pinned
 		if (fusedItems.length - 1 < currentIndex && pointerLocation === "suggested") {
 			setCurrentIndex(fusedItems.length > 0 ? fusedItems.length - 1 : 0)
 		}
+
+		if (!!onNewItem && inputValue.length > 0 && suggestedItems.length === 0)
+			setPointerLocation("suggested")
 	}, [inputValue, allItems, currentIndex])
 
 	const handleInputChange = (event: ChangeEvent<HTMLInputElement>) => {
@@ -77,6 +80,11 @@ export default function CommandPaletteModal({ items, onNewItem, multiple, pinned
 				if (!multiple) handleEscape()
 			},
 			selectedItem => {
+				if (onNewItem && inputValue.length > 0 && suggestedItems.length === 0) {
+					onNewItem(inputValue)
+					return
+				}
+
 				selectedItem.onSelect()
 
 				if (pointerLocation === "selected") {
@@ -103,6 +111,10 @@ export default function CommandPaletteModal({ items, onNewItem, multiple, pinned
 		event.preventDefault()
 
 		Switch.of(true)
+			.case(
+				() => !!onNewItem && inputValue.length > 0 && suggestedItems.length === 0,
+				() => setPointerLocation("suggested"),
+			)
 			.case(
 				() => currentIndex > 0,
 				() => setCurrentIndex(index => index - 1),
@@ -216,19 +228,21 @@ export default function CommandPaletteModal({ items, onNewItem, multiple, pinned
 			</div>
 
 			<div className="px-2 py-4 overflow-y-auto h-[31.5rem]">
-				<div className="pb-2 border-b border-neutral-500">
-					{selectedItems.map((item, index) => (
-						<Item
-							key={item.id}
-							readableName={item.readableName}
-							commandName={item.id}
-							Icon={item.Icon}
-							accelerator={item.accelerator}
-							isCurrent={currentIndex === index && pointerLocation === "selected"}
-							onSelect={() => handleEnter(index)}
-						/>
-					))}
-				</div>
+				{selectedItems.length ? (
+					<div className="pb-2 border-b border-neutral-500">
+						{selectedItems.map((item, index) => (
+							<Item
+								key={item.id}
+								readableName={item.readableName}
+								commandName={item.id}
+								Icon={item.Icon}
+								accelerator={item.accelerator}
+								isCurrent={currentIndex === index && pointerLocation === "selected"}
+								onSelect={() => handleEnter(index)}
+							/>
+						))}
+					</div>
+				) : null}
 
 				<div className="pt-2">
 					{suggestedItems.map((item, index) => (
@@ -249,7 +263,7 @@ export default function CommandPaletteModal({ items, onNewItem, multiple, pinned
 						large
 						Icon={BsPlus}
 						text={`Add new item "${inputValue}"...`}
-						current={false}
+						current={true}
 						onClick={() => {
 							onNewItem(inputValue)
 							handleEscape()

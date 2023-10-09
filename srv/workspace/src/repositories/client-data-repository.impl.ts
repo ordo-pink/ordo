@@ -37,7 +37,6 @@ const of = (
 				),
 			)
 			.chain(body => (body.success ? Oath.of(body.result) : Oath.reject(body.error as string)))
-			.tap(console.log, console.log)
 			.rejectedMap(rrrToNotification("Error creating file"))
 			.fork(
 				item => {

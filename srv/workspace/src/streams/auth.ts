@@ -23,6 +23,8 @@ const refreshToken = () =>
 	})
 		.then(res => res.json())
 		.then(res => {
+			console.log(res.result)
+
 			if (res.success) return auth$.next(res.result)
 
 			window.location.href = `${Hosts.WEBSITE}/sign-out`

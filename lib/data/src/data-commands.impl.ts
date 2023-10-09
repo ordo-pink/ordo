@@ -37,6 +37,16 @@ const of = <T>({ dataRepository, contentRepository }: DataCommandsParams<T>): TD
 			  })
 		)
 			.chain(() => Data.new(params).fold(Oath.reject, Oath.resolve))
+			.chain(data =>
+				dataRepository
+					.count(data.plain.createdBy)
+					.chain(
+						Oath.ifElse(length => length < params.fileLimit, {
+							onTrue: () => data,
+							onFalse: () => Errors.TooMuchData,
+						}),
+					),
+			)
 			.chain(child =>
 				dataRepository
 					.create(child.plain)
@@ -174,7 +184,7 @@ const of = <T>({ dataRepository, contentRepository }: DataCommandsParams<T>): TD
 				.chain(data => dataRepository.update(data.plain)),
 		),
 	// TODO: Roll back on error
-	uploadContent: ({ content, createdBy, updatedBy, name, parent }) =>
+	uploadContent: ({ content, createdBy, updatedBy, name, parent, fileLimit }) =>
 		dataRepository
 			.find(createdBy, name, parent)
 			.fix(() => null)
@@ -185,7 +195,7 @@ const of = <T>({ dataRepository, contentRepository }: DataCommandsParams<T>): TD
 							name,
 							createdBy,
 							parent,
-							updatedBy,
+							fileLimit,
 					  }),
 			)
 			.chain(plain =>

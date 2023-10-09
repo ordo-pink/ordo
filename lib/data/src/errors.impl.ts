@@ -5,6 +5,7 @@ export const Errors = {
 	InvalidName: "Name must be a non-empty string",
 	InvalidSize: "Size must be a non-negative finite integer",
 	InvalidTimestamp: "Timestamp must be a non-negative finite integer",
+	TooMuchData: "Subscription file limit exceeded",
 	InvalidParent: "Parent must be null for root elements or a valid UUIDv4 for nested elements",
 	SelfReferencingParent: "Parent must not be equal to FSID",
 	SelfReferencingLink: "Link must not be equal to FSID",

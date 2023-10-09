@@ -32,12 +32,12 @@ export const handleCreate: Unary<
 					)
 					.map(() => payload),
 			)
-			.chain(({ sub }) =>
+			.chain(({ sub, lim }) =>
 				parseBody0<{ name: string; parent: Nullable<FSID>; fsid?: FSID }>(ctx).chain(
 					({ name, parent, fsid }) =>
 						Oath.of(ctx.params.userId).chain(() =>
 							dataService
-								.create({ createdBy: sub, name, parent, fsid })
+								.create({ createdBy: sub, name, parent, fsid, fileLimit: lim })
 								.rejectedMap(HttpError.Conflict),
 						),
 				),

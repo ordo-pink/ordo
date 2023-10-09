@@ -11,7 +11,7 @@ export type TDataCommands<T> = {
 	dataRepository: DataRepository
 	contentRepository: ContentRepository<T>
 	create: (
-		params: Pick<PlainData, "name" | "parent" | "createdBy"> & { fsid?: FSID },
+		params: Pick<PlainData, "name" | "parent" | "createdBy"> & { fsid?: FSID; fileLimit: number },
 	) => Oath<PlainData, DataError>
 	remove: (params: Pick<PlainData, "fsid" | "createdBy">) => Oath<"OK", DataError>
 	move: (
@@ -39,7 +39,10 @@ export type TDataCommands<T> = {
 		params: Pick<PlainData, "createdBy" | "updatedBy" | "fsid"> & { content: T },
 	) => Oath<"OK", DataError>
 	uploadContent: (
-		params: Pick<PlainData, "createdBy" | "updatedBy" | "name" | "parent"> & { content: T },
+		params: Pick<PlainData, "createdBy" | "updatedBy" | "name" | "parent"> & {
+			content: T
+			fileLimit: number
+		},
 	) => Oath<"OK", DataError>
 	getContent: (params: Pick<PlainData, "fsid" | "createdBy">) => Oath<T, DataError>
 	fetch: (params: Pick<PlainData, "createdBy">) => Oath<PlainData[], DataError>

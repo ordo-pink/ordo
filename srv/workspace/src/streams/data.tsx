@@ -108,7 +108,15 @@ export const __initData: Fn = ({ logger, auth$ }) => {
 		const auth = (auth$ as BehaviorSubject<AuthResponse>).value
 		const { name, parent } = payload
 
-		dataCommands.create({ name, parent, createdBy: auth.sub }).orNothing()
+		dataCommands
+			.create({ name, parent, createdBy: auth.sub, fileLimit: auth.fileLimit })
+			.orElse(message =>
+				commands.emit<cmd.notification.show>("notification.show", {
+					message,
+					type: "rrr",
+					title: "Error creating data",
+				}),
+			)
 	})
 
 	commands.on<cmd.data.remove>("data.remove", ({ payload }) => {

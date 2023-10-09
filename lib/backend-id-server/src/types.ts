@@ -7,4 +7,10 @@
 
 import { JTI, SUB } from "@ordo-pink/wjwt"
 
-export type AuthResponse = { accessToken: string; jti: JTI; sub: SUB }
+export type AuthResponse = {
+	accessToken: string
+	jti: JTI
+	sub: SUB
+	fileLimit: number
+	maxUploadSize: number
+}

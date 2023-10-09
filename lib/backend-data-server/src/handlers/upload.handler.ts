@@ -34,7 +34,7 @@ export const handleUpload: Unary<
 					{ onFalse: () => HttpError.PayloadTooLarge("File too large") },
 				),
 			)
-			.chain(({ sub }) =>
+			.chain(({ sub, lim }) =>
 				Oath.of({ name: ctx.params.name as string, createdBy: ctx.params.userId as SUB }).chain(
 					({ name, createdBy }) =>
 						Oath.of((ctx.get("ordo-parent") as FSID) || null).chain(parent =>
@@ -45,6 +45,7 @@ export const handleUpload: Unary<
 									createdBy,
 									updatedBy: sub,
 									content: ctx.request.req,
+									fileLimit: lim,
 								})
 								.rejectedMap(HttpError.NotFound),
 						),

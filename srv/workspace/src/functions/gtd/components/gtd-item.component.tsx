@@ -55,9 +55,11 @@ export default function GTDItem({ item }: P) {
 				type="checkbox"
 				checked={isDone}
 				id={item.fsid}
-				onClick={onCheckboxChange}
+				onMouseDown={onCheckboxChange}
 				onChange={onCheckboxChange}
+				tabIndex={0}
 			/>
+
 			<div className="flex justify-between w-full">
 				<div className="flex flex-col w-full justify-center">
 					{item.children.length > 0 && item.labels.length === 0 ? (

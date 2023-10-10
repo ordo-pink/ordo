@@ -234,6 +234,7 @@ export namespace Notification {
 		title?: string
 		message: string
 		payload?: T
+		duration?: number
 		action?: (id: string, payload: T) => any
 		actionText?: string
 	}

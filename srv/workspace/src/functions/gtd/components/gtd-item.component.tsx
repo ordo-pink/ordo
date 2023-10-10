@@ -31,6 +31,7 @@ export default function GTDItem({ item }: P) {
 	const doneChildren = children.filter(checkIsDone)
 
 	const onCheckboxChange = () => {
+		console.log("HERE")
 		isDone
 			? commands.emit<GTDCommands.markNotDone>("gtd.mark-not-done", item)
 			: commands.emit<GTDCommands.markDone>("gtd.mark-done", item)
@@ -45,18 +46,17 @@ export default function GTDItem({ item }: P) {
 			{...listeners}
 			{...attributes}
 			style={style}
-			className="flex space-x-4 bg-neutral-400 dark:bg-neutral-800 hover:bg-neutral-300 dark:hover:bg-neutral-800 p-4 md:p-2 rounded-md focus:ring-1 focus:ring-purple-500 outline-none"
+			className="flex space-x-4 bg-neutral-300 dark:bg-neutral-800 hover:bg-neutral-300 dark:hover:bg-neutral-800 p-4 md:p-2 rounded-md focus:ring-1 focus:ring-purple-500 outline-none"
 			onContextMenu={onContextMenu}
 			tabIndex={0}
 		>
 			<input
-				className="h-6 w-6 rounded-sm focus:ring-0 text-emerald-500 bg-neutral-500 cursor-pointer"
+				className="h-6 w-6 rounded-sm focus:ring-0 text-emerald-500 bg-neutral-200 dark:bg-neutral-500 cursor-pointer"
 				type="checkbox"
 				checked={isDone}
 				id={item.fsid}
 				onClick={onCheckboxChange}
 				onChange={onCheckboxChange}
-				tabIndex={0}
 			/>
 			<div className="flex justify-between w-full">
 				<div className="flex flex-col w-full justify-center">
@@ -64,7 +64,7 @@ export default function GTDItem({ item }: P) {
 						<div className="flex justify-between items-center">
 							<div className={isDone ? "line-through text-neutral-500" : ""}>{item.name}</div>
 							<div
-								className="flex items-center justify-center text-xs shadow-sm rounded-md px-2 py-0.5 bg-neutral-500 dark:bg-neutral-700 cursor-pointer"
+								className="flex items-center justify-center text-xs shadow-sm rounded-md px-2 py-0.5 bg-neutral-200 dark:bg-neutral-700 cursor-pointer"
 								title={`${doneChildren.length} out of ${children.length} items done. Click to open subproject.`}
 								onClick={() =>
 									commands.emit<cmd.router.navigate>("router.navigate", `/gtd/items/${item.fsid}`)
@@ -96,7 +96,7 @@ export default function GTDItem({ item }: P) {
 									.sort((a, b) => a.localeCompare(b))
 									.map(label => (
 										<div
-											className="text-xs shadow-sm text-neutral-500 bg-neutral-900 rounded-md px-1 py-0.5"
+											className="text-xs shadow-sm text-neutral-500 bg-neutral-200 dark:bg-neutral-900 rounded-md px-1 py-0.5"
 											key={label}
 										>
 											{label}
@@ -106,7 +106,7 @@ export default function GTDItem({ item }: P) {
 
 							{item.children.length > 0 ? (
 								<div
-									className="flex items-center justify-center text-xs shadow-sm rounded-md px-2 py-0.5 bg-neutral-500 dark:bg-neutral-700 cursor-pointer"
+									className="flex items-center justify-center text-xs shadow-sm rounded-md px-2 py-0.5 bg-neutral-200 dark:bg-neutral-700 cursor-pointer"
 									title={`${doneChildren.length} out of ${children.length} items done. Click to open subproject.`}
 									onClick={() =>
 										commands.emit<cmd.router.navigate>("router.navigate", `/gtd/items/${item.fsid}`)

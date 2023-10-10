@@ -69,6 +69,7 @@ export default function GTDWidget() {
 						commands.emit<cmd.notification.show>("notification.show", {
 							message: newItem,
 							type: "success",
+							duration: 3,
 							title: "New reminder created",
 						})
 					}

@@ -49,6 +49,7 @@ export default function App() {
 			f.default({ commands, data$: streams.data$, activities$: streams.activities$ }),
 		)
 		import("./functions/file-explorer").then(f => f.default({ commands, data$: streams.data$ }))
+		import("./functions/links").then(f => f.default({ commands, data$: streams.data$ }))
 		import("./functions/gtd").then(f => f.default({ commands, data$: streams.data$ }))
 		import("./functions/user").then(f =>
 			f.default({ commands, data$: streams.data$, auth$: streams.auth$ }),

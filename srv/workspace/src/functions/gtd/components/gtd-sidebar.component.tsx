@@ -10,7 +10,7 @@ import { Either } from "@ordo-pink/either"
 import { cmd, useSharedContext } from "@ordo-pink/frontend-core"
 import { Nullable } from "@ordo-pink/tau"
 import { useEffect, useState } from "react"
-import { BsInbox, BsPlus } from "react-icons/bs"
+import { BsInbox, BsPlus, BsTag } from "react-icons/bs"
 import { HiOutlineSparkles } from "react-icons/hi"
 import GTDSidebarProject from "./gtd-sidebar-project.component"
 
@@ -18,6 +18,7 @@ export default function GTDSidebar() {
 	const { route, data, commands } = useSharedContext()
 	const [gtd, setGtd] = useState<Nullable<PlainData>>(null)
 	const [inbox, setInbox] = useState<Nullable<PlainData>>(null)
+	const [pinned, setPinned] = useState<PlainData | null>(null)
 
 	useEffect(() => {
 		if (!data || !data.length) return
@@ -39,6 +40,18 @@ export default function GTDSidebar() {
 				parent: gtdDirectory.fsid,
 			})
 
+		const pinnedLabels = data.find(
+			item => item.name === ".pinned" && item.parent === gtdDirectory.fsid,
+		)
+
+		if (!pinnedLabels) {
+			return commands.emit<cmd.data.create>("data.create", {
+				name: ".pinned",
+				parent: gtdDirectory.fsid,
+			})
+		}
+
+		setPinned(pinnedLabels)
 		setInbox(inboxDirectory)
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [data])
@@ -70,7 +83,7 @@ export default function GTDSidebar() {
 				</Title>
 				<div>
 					{gtd!.children
-						.filter(item => item !== inbox.fsid)
+						.filter(item => item !== inbox.fsid && item !== pinned!.fsid)
 						.map(child => (
 							<GTDSidebarProject key={child} fsid={child} />
 						))}
@@ -82,6 +95,34 @@ export default function GTDSidebar() {
 					title="Add Project"
 					compact
 					onClick={() => commands.emit<cmd.data.showCreateModal>("data.show-create-modal", gtd)}
+				>
+					<BsPlus className="text-lg" />
+				</OrdoButtonSecondary>
+			</div>
+
+			<div className="flex flex-col space-y-2">
+				<Title level="5" center uppercase styledFirstLetter>
+					Pinned Labels
+				</Title>
+				<div>
+					{pinned!.labels.map(label => (
+						<ActionListItem
+							Icon={BsTag}
+							current={decodeURIComponent(route?.params?.label ?? "") === label}
+							text={label}
+							href={`/gtd/labels/${label}`}
+						/>
+					))}
+				</div>
+
+				<OrdoButtonSecondary
+					className="text-lg"
+					center
+					title="Add Pinned Label"
+					compact
+					onClick={() =>
+						commands.emit<cmd.data.showEditLabelsPalette>("data.show-edit-labels-palette", pinned!)
+					}
 				>
 					<BsPlus className="text-lg" />
 				</OrdoButtonSecondary>

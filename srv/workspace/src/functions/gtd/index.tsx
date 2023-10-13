@@ -16,7 +16,7 @@ export default function createGTDFunction({ commands }: Functions.CreateFunction
 		Component,
 		Sidebar: GTDSidebar,
 		name: "gtd",
-		routes: ["/gtd", "/gtd/items/:item"],
+		routes: ["/gtd", "/gtd/items/:item", "/gtd/labels/:label"],
 		background: false,
 	})
 

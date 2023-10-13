@@ -22,6 +22,7 @@ export default function GTD() {
 	const [newItem, setNewItem] = useState("")
 	const gtdDirectory = data?.find(item => item.name === ".gtd" && item.parent === null)
 	const createInputRef = useRef<HTMLInputElement>(null)
+	const [items, setItems] = useState<PlainData[]>([])
 
 	useAccelerator("meta+n", () => createInputRef.current?.focus())
 
@@ -60,13 +61,13 @@ export default function GTD() {
 
 	const tAddToInboxInputPlaceholder = "Sell milk..."
 
-	return Either.fromNullable(currentItem).fold(Null, currentItem => (
+	return (
 		<CenteredPage centerX centerY>
 			<div className="px-4 py-8 w-full flex flex-col space-y-4 items-center overflow-y-hidden">
 				<div className="w-full max-w-2xl flex flex-col space-y-4">
 					<Card
 						className="h-[90vh]"
-						title={currentItem.name === ".inbox" ? "Inbox" : currentItem.name}
+						title={currentItem?.name === ".inbox" ? "Inbox" : currentItem?.name}
 					>
 						<TextInput
 							forwardRef={createInputRef}
@@ -87,10 +88,19 @@ export default function GTD() {
 							placeholder={tAddToInboxInputPlaceholder}
 						/>
 
-						<GTDList items={children} fsid={currentItem.fsid} />
+						<GTDList
+							items={
+								route?.params?.label
+									? data?.filter(
+											item => item.labels.includes(route.params.label) && item.name !== ".pinned",
+									  )
+									: children ?? []
+							}
+							fsid={currentItem?.fsid}
+						/>
 					</Card>
 				</div>
 			</div>
 		</CenteredPage>
-	))
+	)
 }

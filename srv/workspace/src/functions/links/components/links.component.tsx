@@ -53,7 +53,7 @@ export default function LinksComponent() {
 					.distance(50)
 					.strength(1),
 			)
-			.force("charge", d3.forceManyBody().theta(1).strength(-900))
+			.force("charge", d3.forceManyBody().theta(1).strength(-300))
 			.force(
 				"collision",
 				d3.forceCollide().radius(function (d) {

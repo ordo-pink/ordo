@@ -50,24 +50,36 @@ export default function LinksComponent() {
 				d3
 					.forceLink(links)
 					.id(d => d.id)
-					.distance(20)
+					.distance(50)
 					.strength(1),
 			)
-			.force("charge", d3.forceManyBody().strength(-90))
+			.force("charge", d3.forceManyBody().theta(1).strength(-900))
+			.force(
+				"collision",
+				d3.forceCollide().radius(function (d) {
+					return d.radius
+				}),
+			)
 			.force("x", d3.forceX())
 			.force("y", d3.forceY())
 
 		// Create the container SVG.
 		const svg = d3
 			.select(wrapperRef.current)
-			.attr("viewBox", [-800 / 2, -900 / 2, 800, 900])
-			.attr("style", "max-width: 100%; height: auto;")
+			.attr("viewBox", [
+				-window.innerWidth / 2,
+				-window.innerHeight / 2,
+				window.innerWidth,
+				window.innerHeight,
+			])
 			.on("contextmenu", event => {
-				const id = event.srcElement.__data__.id
+				event.preventDefault()
+				const id = event.srcElement?.__data__?.id
+				if (!id) return
 				const payload = data.find(item => item.fsid === id)
-				console.log(event)
 				commands.emit<cmd.ctxMenu.show>("context-menu.show", { event, payload })
 			})
+			.call(d3.zoom().on("zoom", e => svg.attr("transform", e.transform)) as any)
 
 		// Append links.
 		const link = svg
@@ -82,27 +94,35 @@ export default function LinksComponent() {
 		const node = svg
 			.append("g")
 			.attr("fill", "#fff")
-			.attr("stroke", "#000")
-			.attr("stroke-width", 1.5)
 			.selectAll("circle")
 			.data(nodes)
 			.join("circle")
-			.attr("fill", d => (d.children ? null : "#000"))
-			.attr("stroke", d => (d.children ? null : "#fff"))
 			.attr("r", 10)
 			.call(drag(simulation))
 
-		node
-			.append("p")
-			.attr("x", 0)
-			.attr("text-anchor", "middle")
-			.attr("y", "3em")
-			.attr("stroke-width", 0)
-			.attr("fill", "#333")
-			.attr("style", "font-size: 2px")
-			.text(d => d.data.name)
-
 		node.append("title").text(d => d.data.name)
+
+		var label = svg
+			.append("g")
+			.selectAll("text")
+			.data(nodes)
+			.enter()
+			.append("text")
+			.text(d => d.data.name)
+			.attr("x", 20)
+			.attr("class", "fill-neutral-500 cursor-grab text-xs")
+			.call(drag(simulation))
+
+		// const texts = node
+		// 	.selectAll(null)
+		// 	.append("text")
+		// 	.attr("x", 0)
+		// 	.attr("y", 0)
+		// 	.attr("text-anchor", "middle")
+		// 	.attr("stroke-width", 1)
+		// 	.attr("fill", "#333")
+		// 	.attr("style", "font-size: 25px")
+		// 	.text(d => d.data.name)
 
 		simulation.on("tick", () => {
 			link
@@ -111,10 +131,22 @@ export default function LinksComponent() {
 				.attr("x2", d => d.target.x)
 				.attr("y2", d => d.target.y)
 
-			node.attr("cx", d => d.x).attr("cy", d => d.y)
-		})
+			node
+				.attr("cx", function (d) {
+					return d.x + 5
+				})
+				.attr("cy", function (d) {
+					return d.y - 3
+				})
 
-		svg.node()
+			label
+				.attr("x", function (d) {
+					return d.x
+				})
+				.attr("y", function (d) {
+					return d.y
+				})
+		})
 
 		return () => {
 			if (!wrapperRef.current) return
@@ -122,5 +154,5 @@ export default function LinksComponent() {
 		}
 	}, [data])
 
-	return <svg ref={wrapperRef} className="h-screen w-full"></svg>
+	return <svg ref={wrapperRef} className="w-full h-screen overflow-none"></svg>
 }

@@ -21,7 +21,6 @@ export type PlainData = {
 	fsid: FSID
 	name: string
 	parent: Nullable<FSID>
-	children: FSID[]
 	links: FSID[]
 	labels: string[]
 	createdAt: number
@@ -36,9 +35,6 @@ export type TData = {
 	setName: (name: string, updatedBy: UserID) => TEither<TData, DataError>
 	setSize: (size: number, updatedBy: UserID) => TEither<TData, DataError>
 	setParent: (parent: Nullable<FSID>, updatedBy: UserID) => TEither<TData, DataError>
-	addChild: (child: FSID, updatedBy: UserID) => TEither<TData, DataError>
-	removeChild: (child: FSID, updatedBy: UserID) => TEither<TData, DataError>
-	dropChildren: (updatedBy: UserID) => TEither<TData, DataError>
 	addLink: (link: FSID, updatedBy: UserID) => TEither<TData, DataError>
 	removeLink: (link: FSID, updatedBy: UserID) => TEither<TData, DataError>
 	dropLinks: (updatedBy: UserID) => TEither<TData, DataError>

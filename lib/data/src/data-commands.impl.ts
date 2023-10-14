@@ -38,14 +38,12 @@ const of = <T>({ dataRepository, contentRepository }: DataCommandsParams<T>): TD
 		)
 			.chain(() => Data.new(params).fold(Oath.reject, Oath.resolve))
 			.chain(data =>
-				dataRepository
-					.count(data.plain.createdBy)
-					.chain(
-						Oath.ifElse(length => length < params.fileLimit, {
-							onTrue: () => data,
-							onFalse: () => Errors.TooMuchData,
-						}),
-					),
+				dataRepository.count(data.plain.createdBy).chain(
+					Oath.ifElse(length => length < params.fileLimit, {
+						onTrue: () => data,
+						onFalse: () => Errors.TooMuchData,
+					}),
+				),
 			)
 			.chain(child =>
 				dataRepository
@@ -54,20 +52,7 @@ const of = <T>({ dataRepository, contentRepository }: DataCommandsParams<T>): TD
 						contentRepository
 							.create(child.plain.createdBy, child.plain.fsid)
 							.map(() => child.plain),
-					)
-					.map(() => child),
-			)
-			.chain(child =>
-				child.plain.parent
-					? dataRepository
-							.get(child.plain.createdBy, child.plain.parent)
-							.chain(parent =>
-								Data.of(parent)
-									.addChild(child.plain.fsid, child.plain.updatedBy)
-									.fold(Oath.reject, Oath.resolve),
-							)
-							.chain(parent => dataRepository.update(parent.plain).map(() => child.plain))
-					: Oath.resolve(child.plain),
+					),
 			),
 	fetch: ({ createdBy }) => dataRepository.getAll(createdBy),
 	link: ({ createdBy, fsid, link, updatedBy }) =>
@@ -108,29 +93,8 @@ const of = <T>({ dataRepository, contentRepository }: DataCommandsParams<T>): TD
 				.chain(Oath.ifElse(x => !!x, { onFalse: () => Errors.DataNotFound })),
 		})
 			.chain(() => dataRepository.get(createdBy, fsid))
-			.chain(plain =>
-				plain.parent
-					? dataRepository.get(createdBy, plain.parent).chain(parent =>
-							Data.of(parent)
-								.removeChild(fsid, updatedBy)
-								.fold(Oath.reject, Oath.resolve)
-								.chain(data => dataRepository.update(data.plain))
-								.map(() => plain),
-					  )
-					: Oath.resolve(plain),
-			)
 			.chain(plain => Data.of(plain).setParent(parent, updatedBy).fold(Oath.reject, Oath.resolve))
-			.chain(data => dataRepository.update(data.plain))
-			.chain(() =>
-				parent
-					? dataRepository.get(createdBy, parent).chain(plain =>
-							Data.of(plain)
-								.addChild(fsid, updatedBy)
-								.fold(Oath.reject, Oath.resolve)
-								.chain(data => dataRepository.update(data.plain)),
-					  )
-					: Oath.resolve("OK"),
-			),
+			.chain(data => dataRepository.update(data.plain)),
 	// TODO: Roll back on error
 	remove: ({ createdBy, fsid }) =>
 		dataRepository
@@ -140,7 +104,6 @@ const of = <T>({ dataRepository, contentRepository }: DataCommandsParams<T>): TD
 			.chain(data =>
 				Oath.all(
 					data.map(async item => {
-						const hasRemovedItemInChildren = item.children.includes(fsid)
 						const hasRemovedItemInLinks = item.links.includes(fsid)
 						const hasRemovedItemInParent = item.parent === fsid
 
@@ -153,8 +116,7 @@ const of = <T>({ dataRepository, contentRepository }: DataCommandsParams<T>): TD
 								.toPromise()
 						}
 
-						if (hasRemovedItemInChildren || hasRemovedItemInLinks) {
-							if (hasRemovedItemInChildren) item.children.splice(item.children.indexOf(fsid), 1)
+						if (hasRemovedItemInLinks) {
 							if (hasRemovedItemInLinks) item.links.splice(item.links.indexOf(fsid, 1))
 
 							await dataRepository.update(item).toPromise()

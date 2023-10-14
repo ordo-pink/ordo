@@ -7,10 +7,5 @@ import { BsFileEarmark, BsFolder2 } from "react-icons/bs"
 
 type P = { plain: PlainData }
 export default function FileIconComponent({ plain }: P) {
-	return Switch.of(plain)
-		.case(
-			plain => plain.children.length > 0,
-			() => <BsFolder2 />,
-		)
-		.default(() => <BsFileEarmark className="w-full h-full" />)
+	return <BsFileEarmark className="w-full h-full" />
 }

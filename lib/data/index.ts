@@ -4,7 +4,6 @@
 export * from "./src/content-repository.types"
 export * from "./src/data-commands.impl"
 export * from "./src/data-commands.types"
-export * from "./src/data-queries.types"
 export * from "./src/data-repository.types"
 export * from "./src/data-validations.impl"
 export * from "./src/data-validations.types"

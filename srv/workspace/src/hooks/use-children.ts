@@ -11,5 +11,5 @@ export const useChildren = (fsid: FSID | null) => {
 
 	if (!currentItem || !data) return []
 
-	return currentItem.children.map(child => data.find(x => x.fsid === child)) as PlainData[]
+	return data.filter(item => item.parent === currentItem.fsid)
 }

@@ -19,12 +19,6 @@ export const validations: Validations = {
 			.chain(() => validations.isValidSubE(x.createdBy))
 			.chain(() => validations.isValidSubE(x.updatedBy))
 			.chain(() =>
-				x.children.reduce(
-					(acc, v) => acc.chain(() => validations.isValidFsidE(v)),
-					Either.right(""),
-				),
-			)
-			.chain(() =>
 				x.links.reduce((acc, v) => acc.chain(() => validations.isValidFsidE(v)), Either.right("")),
 			)
 			.chain(() =>

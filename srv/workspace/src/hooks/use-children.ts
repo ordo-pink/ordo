@@ -3,11 +3,13 @@
 
 import { FSID, PlainData } from "@ordo-pink/data"
 import { useSharedContext } from "@ordo-pink/frontend-core"
-import { useData } from "./use-data"
+import { useDataByFSID } from "./use-data-selector"
 
-export const useChildren = (fsid: FSID | null) => {
+export const useChildren = (item: PlainData | FSID | null) => {
 	const { data } = useSharedContext()
-	const currentItem = useData(fsid)
+	const currentItem = useDataByFSID(
+		item && (item as PlainData).fsid ? (item as PlainData).fsid : (item as FSID | null),
+	)
 
 	if (!currentItem || !data) return []
 

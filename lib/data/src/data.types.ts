@@ -49,6 +49,6 @@ export type DataStatic = {
 	Errors: typeof Errors
 	of: (plain: PlainData) => TData
 	new: (
-		params: Pick<PlainData, "name" | "parent" | "createdBy"> & { fsid?: FSID },
+		params: Pick<PlainData, "name" | "parent" | "createdBy"> & { fsid?: FSID; labels?: string[] },
 	) => TEither<TData, DataError>
 }

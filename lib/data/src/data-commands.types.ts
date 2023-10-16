@@ -11,7 +11,11 @@ export type TDataCommands<T> = {
 	dataRepository: DataRepository
 	contentRepository: ContentRepository<T>
 	create: (
-		params: Pick<PlainData, "name" | "parent" | "createdBy"> & { fsid?: FSID; fileLimit: number },
+		params: Pick<PlainData, "name" | "parent" | "createdBy"> & {
+			fsid?: FSID
+			fileLimit: number
+			labels?: string[]
+		},
 	) => Oath<PlainData, DataError>
 	remove: (params: Pick<PlainData, "fsid" | "createdBy">) => Oath<"OK", DataError>
 	move: (

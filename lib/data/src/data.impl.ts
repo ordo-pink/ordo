@@ -5,6 +5,7 @@ import { Either } from "@ordo-pink/either"
 import { validations } from "./data-validations.impl"
 import { PlainData, TData, DataStatic, FSID } from "./data.types"
 import { Errors } from "./errors.impl"
+import { DataError } from "./errors.types"
 
 const addUnique = <T>(array: T[], element: T) => Array.from(new Set([element, ...array]))
 const drop = <T>(array: T[], element: T) => array.filter(item => item !== element)
@@ -147,11 +148,17 @@ export const Data: DataStatic = {
 	Validations: validations,
 	Errors,
 	of,
-	new: ({ name, parent, createdBy, fsid }) =>
+	new: ({ name, parent, createdBy, fsid, labels = [] }) =>
 		validations
 			.isValidNameE(name)
 			.chain(() => validations.isValidParentE(parent))
 			.chain(() => validations.isValidSubE(createdBy))
+			.chain(() =>
+				labels.reduce(
+					(acc, v) => acc.chain(() => validations.isValidLabelE(v)),
+					Either.right<string, DataError>(""),
+				),
+			)
 			.chain(() => validations.isValidFsidE(fsid ?? (crypto.randomUUID() as FSID)))
 			.map(fsid =>
 				Data.of({
@@ -162,7 +169,7 @@ export const Data: DataStatic = {
 					updatedBy: createdBy,
 					updatedAt: Date.now(),
 					fsid,
-					labels: [],
+					labels,
 					links: [],
 					size: 0,
 				}),

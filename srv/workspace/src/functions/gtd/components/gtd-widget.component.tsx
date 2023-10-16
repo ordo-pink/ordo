@@ -1,49 +1,27 @@
 // SPDX-FileCopyrightText: Copyright 2023, 谢尔盖||↓ and the Ordo.pink contributors
 // SPDX-License-Identifier: MIT
 
-import {
-	OrdoButtonNeutral,
-	OrdoButtonPrimary,
-	OrdoButtonSecondary,
-} from "$components/buttons/buttons"
+import { OrdoButtonPrimary } from "$components/buttons/buttons"
 import { TextInput } from "$components/input"
-import Link from "$components/link"
 import { Loader } from "$components/loading/loader"
 import { PlainData } from "@ordo-pink/data"
-import { Either } from "@ordo-pink/either"
 import { cmd, useSharedContext } from "@ordo-pink/frontend-core"
 import { Switch } from "@ordo-pink/switch"
-import { isNonEmptyString, noop } from "@ordo-pink/tau"
-import { FC, useEffect, useState } from "react"
+import { isNonEmptyString } from "@ordo-pink/tau"
+import { useState } from "react"
 import { BsCheckCircle, BsInfoCircle, BsXCircle } from "react-icons/bs"
 import { GTDCommands } from "../types"
+import { useInbox } from "../hooks/use-inbox"
 
 export default function GTDWidget() {
 	const { commands, data } = useSharedContext()
-	const [inboxChildren, setInboxChildren] = useState<PlainData[] | null>(null)
+	const inbox = useInbox()
 	const [newItem, setNewItem] = useState("")
-
-	useEffect(() => {
-		Either.fromNullable(data)
-			.chain(data =>
-				Either.fromNullable(data.find(item => item.name === ".gtd" && item.parent === null)).chain(
-					gtd =>
-						Either.fromNullable(
-							data.find(item => item.name === ".inbox" && item.parent === gtd.fsid),
-						),
-				),
-			)
-			.map(
-				inbox =>
-					inbox.children.map(child => data!.find(item => item.fsid === child)) as PlainData[],
-			)
-			.fold(noop, setInboxChildren)
-	}, [data])
 
 	return (
 		<div className="w-full max-w-lg p-4 flex flex-col space-y-4 items-start">
 			<div className="space-y-4 pb-4 flex flex-col items-center justify-center w-full text-neutral-500">
-				<InboxStatus inboxChildren={inboxChildren} />
+				<InboxStatus inboxChildren={inbox} />
 			</div>
 
 			<TextInput
@@ -63,6 +41,7 @@ export default function GTDWidget() {
 							commands.emit<cmd.data.create>("data.create", {
 								name: newItem,
 								parent: inboxDirectory.fsid,
+								labels: ["todo"],
 							})
 
 						setNewItem("")

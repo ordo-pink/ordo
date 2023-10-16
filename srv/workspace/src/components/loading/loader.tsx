@@ -9,7 +9,6 @@ const getParentBackground = (element: Element) => {
 
 	while (element.parentElement) {
 		color = window.getComputedStyle(element.parentElement).backgroundColor
-		console.log(color)
 
 		if (color !== "rgba(0, 0, 0, 0)") break
 
@@ -26,7 +25,7 @@ export const Loader = () => {
 		if (!ref.current) return
 
 		ref.current.style.setProperty("--background", getParentBackground(ref.current))
-	}, [ref.current])
+	}, [ref])
 
 	return (
 		<div ref={ref} className="loader">

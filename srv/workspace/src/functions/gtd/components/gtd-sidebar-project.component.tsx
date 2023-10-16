@@ -4,17 +4,17 @@
 import ActionListItem from "$components/action-list-item"
 import Null from "$components/null"
 import { useChildren } from "$hooks/use-children"
-import { useData } from "$hooks/use-data"
 import { FSID } from "@ordo-pink/data"
 import { Either } from "@ordo-pink/either"
 import { cmd, useSharedContext } from "@ordo-pink/frontend-core"
 import FileIconComponent from "$functions/file-explorer/components/file-icon.component"
 import { HiOutlineSparkles } from "react-icons/hi"
+import { useDataByFSID } from "$hooks/use-data-selector"
 
 type Props = { fsid: FSID }
 export default function GTDSidebarProject({ fsid }: Props) {
 	const { commands, route } = useSharedContext()
-	const data = useData(fsid)
+	const data = useDataByFSID(fsid)
 	const children = useChildren(fsid)
 	const pendingChildren = children.filter(child => !child.labels.includes("done"))
 

@@ -54,7 +54,10 @@ export namespace cmd {
 			name: "data.upload-content"
 			payload: { name: string; parent: Nullable<FSID>; content: string | ArrayBuffer }
 		}
-		export type create = { name: "data.create"; payload: { name: string; parent: Nullable<FSID> } }
+		export type create = {
+			name: "data.create"
+			payload: { name: string; parent: Nullable<FSID>; labels?: string[] }
+		}
 		export type remove = { name: "data.remove"; payload: PlainData }
 		export type move = { name: "data.move"; payload: { fsid: FSID; parent: Nullable<FSID> } }
 		export type rename = { name: "data.rename"; payload: { fsid: FSID; name: string } }

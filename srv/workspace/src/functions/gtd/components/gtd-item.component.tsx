@@ -5,7 +5,7 @@ import { useChildren } from "$hooks/use-children"
 import { PlainData } from "@ordo-pink/data"
 import { cmd, useSharedContext } from "@ordo-pink/frontend-core"
 import { Nullable } from "@ordo-pink/tau"
-import { ChangeEvent, MouseEvent } from "react"
+import { MouseEvent } from "react"
 import { GTDCommands } from "../types"
 import { BsCheckCircle } from "react-icons/bs"
 import { useSortable } from "@dnd-kit/sortable"
@@ -17,7 +17,7 @@ const checkIsDone = (item: Nullable<PlainData>) => (item && item.labels.includes
 
 export default function GTDItem({ item }: P) {
 	const { commands } = useSharedContext()
-	const children = useChildren(item.fsid)
+	const children = useChildren(item)
 	const { attributes, listeners, setNodeRef, transform, transition } = useSortable({
 		id: item.fsid,
 		resizeObserverConfig: {},
@@ -62,7 +62,7 @@ export default function GTDItem({ item }: P) {
 
 			<div className="flex justify-between w-full">
 				<div className="flex flex-col w-full justify-center">
-					{item.children.length > 0 && item.labels.length === 0 ? (
+					{children.length > 0 && item.labels.length === 0 ? (
 						<div className="flex justify-between items-center">
 							<div className={isDone ? "line-through text-neutral-500" : ""}>{item.name}</div>
 							<div
@@ -106,7 +106,7 @@ export default function GTDItem({ item }: P) {
 									))}
 							</div>
 
-							{item.children.length > 0 ? (
+							{children.length > 0 ? (
 								<div
 									className="flex items-center justify-center text-xs shadow-sm rounded-md px-2 py-0.5 bg-neutral-200 dark:bg-neutral-700 cursor-pointer"
 									title={`${doneChildren.length} out of ${children.length} items done. Click to open subproject.`}

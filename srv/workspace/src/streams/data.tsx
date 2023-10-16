@@ -20,13 +20,11 @@ import RemoveFileModal from "$components/modals/remove-page-modal.component"
 import RenameDirectoryModal from "$components/modals/rename-modal.component"
 import {
 	BsArrowRightSquare,
-	BsFillTagFill,
 	BsNodeMinus,
 	BsNodePlus,
 	BsPencilSquare,
 	BsTag,
 	BsTags,
-	BsTagsFill,
 } from "react-icons/bs"
 import FileIconComponent from "$functions/file-explorer/components/file-icon.component"
 
@@ -101,10 +99,10 @@ export const __initData: Fn = ({ logger, auth$ }) => {
 
 	commands.on<cmd.data.create>("data.create", ({ payload }) => {
 		const auth = (auth$ as BehaviorSubject<AuthResponse>).value
-		const { name, parent } = payload
+		const { name, parent, labels = [] } = payload
 
 		dataCommands
-			.create({ name, parent, createdBy: auth.sub, fileLimit: auth.fileLimit })
+			.create({ name, parent, createdBy: auth.sub, fileLimit: auth.fileLimit, labels })
 			.orElse(message =>
 				commands.emit<cmd.notification.show>("notification.show", {
 					message,

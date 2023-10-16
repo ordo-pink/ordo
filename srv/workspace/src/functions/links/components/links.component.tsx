@@ -5,42 +5,30 @@ import { noop } from "@ordo-pink/tau"
 import * as d3 from "d3"
 import { useEffect, useLayoutEffect, useRef, useState } from "react"
 
-export default function LinksComponent() {
+type P = {
+	nodes: { id: string; data?: PlainData }[]
+	links: { target: string; source: string; type: "child" | "label" | "link" }[]
+}
+export default function Links({ nodes, links }: P) {
 	const wrapperRef = useRef<SVGSVGElement>(null)
 	const { commands, data } = useSharedContext()
 
 	useEffect(() => {
 		if (!data) return
 
-		const nodes = [] as { id: string; data?: PlainData }[]
-		const links = [] as { target: string; source: string; type: "child" | "label" | "link" }[]
-
-		data.forEach(item => {
-			nodes.push({ id: item.fsid, data: item })
-
-			if (item.parent) links.push({ source: item.fsid, target: item.parent, type: "child" })
-
-			if (item.labels.length > 0) {
-				item.labels.forEach(id => {
-					if (!nodes.some(node => node.id === id)) nodes.push({ id })
-					links.push({ source: item.fsid, target: id, type: "label" })
-				})
-			}
-		})
-
 		const drag = (simulation: d3.Simulation<any, any>) => {
 			return d3
 				.drag()
-				.on("start", (event, d) => {
+				.on("start", (event, d: any) => {
 					if (!event.active) simulation.alphaTarget(0.3).restart()
 					d.fx = d.x
 					d.fy = d.y
 				})
-				.on("drag", (event, d) => {
+				.on("drag", (event, d: any) => {
 					d.fx = event.x
 					d.fy = event.y
 				})
-				.on("end", (event, d) => {
+				.on("end", (event, d: any) => {
 					if (!event.active) simulation.alphaTarget(0)
 					d.fx = null
 					d.fy = null
@@ -48,12 +36,12 @@ export default function LinksComponent() {
 		}
 
 		const simulation = d3
-			.forceSimulation(nodes)
+			.forceSimulation(nodes as any)
 			.force(
 				"link",
 				d3
 					.forceLink(links)
-					.id(d => d.id)
+					.id((d: any) => d.id)
 					.distance(50)
 					.strength(1),
 			)
@@ -80,7 +68,7 @@ export default function LinksComponent() {
 			.call(
 				d3.zoom().on("zoom", e => {
 					svg.attr("transform", e.transform)
-				}),
+				}) as any,
 			)
 
 		// Append links.
@@ -100,7 +88,7 @@ export default function LinksComponent() {
 			.join("circle")
 			.attr("r", 10)
 			.attr("class", d => (d.data ? "fill-neutral-100 cursor-grab" : "fill-purple-500 cursor-grab"))
-			.call(drag(simulation))
+			.call(drag(simulation) as any)
 
 		node.append("title").text(d => d.data?.name ?? d.id)
 
@@ -113,24 +101,24 @@ export default function LinksComponent() {
 			.text(d => d.data?.name ?? d.id)
 			.attr("x", 20)
 			.attr("class", "fill-neutral-500 cursor-grab text-xs")
-			.call(drag(simulation))
+			.call(drag(simulation) as any)
 
 		simulation.on("tick", () => {
 			link
-				.attr("x1", d => d.source.x - 12)
-				.attr("y1", d => d.source.y)
-				.attr("x2", d => d.target.x - 12)
-				.attr("y2", d => d.target.y)
+				.attr("x1", (d: any) => d.source.x - 12)
+				.attr("y1", (d: any) => d.source.y)
+				.attr("x2", (d: any) => d.target.x - 12)
+				.attr("y2", (d: any) => d.target.y)
 
-			node.attr("cx", d => d.x - 14).attr("cy", d => d.y - 3)
-			label.attr("x", d => d.x).attr("y", d => d.y)
+			node.attr("cx", (d: any) => d.x - 14).attr("cy", (d: any) => d.y - 3)
+			label.attr("x", (d: any) => d.x).attr("y", (d: any) => d.y)
 		})
 
 		return () => {
 			if (!wrapperRef.current) return
 			wrapperRef.current.innerHTML = ""
 		}
-	}, [data])
+	}, [data, nodes, links])
 
-	return <svg ref={wrapperRef} className="w-full h-screen overflow-none"></svg>
+	return <svg ref={wrapperRef} className="w-full h-full overflow-none"></svg>
 }

@@ -16,7 +16,7 @@ export default function DirectoryCardComponent({ plain }: P) {
 	return (
 		<div className="directory-card flex flex-col items-center" onContextMenu={showContextMenu}>
 			<DirectoryIconComponent />
-			<div>{plain.name}</div>
+			<div className="text-sm text-center mt-1 line-clamp-1 break-all">{plain.name}</div>
 		</div>
 	)
 }

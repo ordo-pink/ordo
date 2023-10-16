@@ -16,7 +16,7 @@ export default function FileCardComponent({ plain }: P) {
 	return (
 		<div title={plain.name} onContextMenu={showContextMenu} className="flex flex-col items-center">
 			<FileIconComponent plain={plain} />
-			<div className="text-sm mt-1 line-clamp-1 break-all">{plain.name}</div>
+			<div className="text-sm text-center mt-1 line-clamp-1 break-all">{plain.name}</div>
 		</div>
 	)
 }

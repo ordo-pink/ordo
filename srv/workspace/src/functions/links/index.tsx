@@ -2,13 +2,15 @@ import { Activity, ComponentSpace, Functions, cmd } from "@ordo-pink/frontend-co
 import { Switch } from "@ordo-pink/switch"
 import { PiGraph } from "react-icons/pi"
 import LinksComponent from "./components/links.component"
+import LinksSidebar from "./components/links-sidebar.component"
+import LinksWorkspace from "./components/links-workspace.component"
 
 export default function createLinksFunction({ commands, data$ }: Functions.CreateFunctionParams) {
 	commands.emit<cmd.activities.add>("activities.add", {
 		Component: ({ space }) => <Component space={space} commands={commands} />,
-		Sidebar: () => <h1>Hello</h1>,
+		Sidebar: LinksSidebar,
 		name: "links",
-		routes: ["/links"],
+		routes: ["/links", "/links/:label"],
 		background: false,
 	})
 }
@@ -16,4 +18,4 @@ export default function createLinksFunction({ commands, data$ }: Functions.Creat
 const Component = ({ space }: Activity.ComponentProps) =>
 	Switch.of(space)
 		.case(ComponentSpace.ICON, () => <PiGraph />)
-		.default(() => <LinksComponent />)
+		.default(() => <LinksWorkspace />)

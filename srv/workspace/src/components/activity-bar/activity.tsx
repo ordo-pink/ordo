@@ -4,13 +4,13 @@
 import { __CurrentActivity$ } from "$streams/activities"
 import Link from "$components/link"
 import { getCommands } from "$streams/commands"
-import { Activity, ComponentSpace } from "@ordo-pink/frontend-core"
+import { Extensions, ComponentSpace } from "@ordo-pink/frontend-core"
 import { useSubscription } from "$hooks/use-subscription"
 
 const commands = getCommands()
 
 type Props = {
-	activity: Activity.Activity
+	activity: Extensions.Activity
 	currentActivity$: __CurrentActivity$
 }
 

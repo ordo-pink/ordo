@@ -5,6 +5,8 @@
 	"dependencies": {
 		"@dnd-kit/core": "^6.0.8",
 		"@dnd-kit/utilities": "^3.2.1",
+		"@lexical/list": "^0.12.2",
+		"@lexical/rich-text": "^0.12.2",
 		"@testing-library/jest-dom": "^5.17.0",
 		"@testing-library/react": "^13.4.0",
 		"@testing-library/user-event": "^13.5.0",
@@ -15,6 +17,7 @@
 		"d3": "^7.8.5",
 		"fuse.js": "^6.6.2",
 		"i18next-browser-languagedetector": "^7.1.0",
+		"lexical": "^0.12.2",
 		"ramda": "^0.29.0",
 		"react": "^18.2.0",
 		"react-dom": "^18.2.0",

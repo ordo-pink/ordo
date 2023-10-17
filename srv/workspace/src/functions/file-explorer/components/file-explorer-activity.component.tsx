@@ -4,14 +4,14 @@
 import Null from "$components/null"
 import { PlainData, FSID } from "@ordo-pink/data"
 import { Either } from "@ordo-pink/either"
-import { Activity, cmd, useSharedContext } from "@ordo-pink/frontend-core"
+import { Extensions, cmd, useSharedContext } from "@ordo-pink/frontend-core"
 import { MouseEvent, useEffect, useState } from "react"
 import { Switch } from "@ordo-pink/switch"
 import FSDataIcon from "./data-icon.component"
 
 export default function FileExplorerActivityComponent({
 	commands,
-}: Pick<Activity.ComponentProps, "commands">) {
+}: Pick<Extensions.ComponentProps, "commands">) {
 	const { data, route } = useSharedContext()
 	const [selectedItems, setSelectedItems] = useState<FSID[]>([])
 	const [currentItem, setCurrentItem] = useState<PlainData | null>(null)

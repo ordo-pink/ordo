@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 import { memo } from "react"
-import { Activity, ComponentSpace, Functions, cmd } from "@ordo-pink/frontend-core"
+import { Extensions, ComponentSpace, Functions, cmd } from "@ordo-pink/frontend-core"
 import { Switch } from "@ordo-pink/switch"
 import FileExplorerActivityComponent from "./components/file-explorer-activity.component"
 import FileExplorerIcon from "./components/file-explorer-icon.component"
@@ -28,7 +28,7 @@ export default function createFileExplorerFunction({ commands }: Functions.Creat
 	})
 }
 
-type P = Activity.ComponentProps
+type P = Extensions.ComponentProps
 const FileExplorerComponent = ({ space, commands }: P) =>
 	Switch.of(space)
 		.case(ComponentSpace.ICON, () => <FileExplorerIcon />)

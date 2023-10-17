@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: Copyright 2023, 谢尔盖||↓ and the Ordo.pink contributors
 // SPDX-License-Identifier: MIT
 
-import { Activity, ComponentSpace, Functions, cmd } from "@ordo-pink/frontend-core"
+import { Extensions, ComponentSpace, Functions, cmd } from "@ordo-pink/frontend-core"
 import { Switch } from "@ordo-pink/switch"
 import GTDIcon from "./components/gtd-icon.component"
 import GDTCard from "./components/gtd-card.component"
@@ -73,7 +73,7 @@ export default function createGTDFunction({ commands }: Functions.CreateFunction
 	})
 }
 
-const Component = ({ space }: Activity.ComponentProps) =>
+const Component = ({ space }: Extensions.ComponentProps) =>
 	Switch.of(space)
 		.case(ComponentSpace.ICON, GTDIcon)
 		.case(ComponentSpace.CARD, GDTCard)

@@ -23,6 +23,7 @@ import {
 	BsNodeMinus,
 	BsNodePlus,
 	BsPencilSquare,
+	BsSlash,
 	BsTag,
 	BsTags,
 } from "react-icons/bs"
@@ -225,17 +226,32 @@ export const __initData: Fn = ({ logger, auth$ }) => {
 			const data = data$.value
 
 			return {
-				items: data?.map(
-					item =>
-						({
-							id: item.name,
-							readableName: item.name,
-							onSelect: () => {
-								commands.emit<cmd.data.move>("data.move", { parent: item.fsid, fsid: payload.fsid })
-								commands.emit<cmd.modal.hide>("modal.hide")
-							},
-							Icon: () => <FileIconComponent plain={item} />,
-						} satisfies CommandPalette.Item),
+				items: [
+					{
+						id: "move-to-root",
+						readableName: "Move to /",
+						Icon: () => <BsSlash />,
+						onSelect: () => {
+							commands.emit<cmd.data.move>("data.move", { parent: null, fsid: payload.fsid })
+							commands.emit<cmd.modal.hide>("modal.hide")
+						},
+					},
+				].concat(
+					data?.map(
+						item =>
+							({
+								id: item.name,
+								readableName: item.name,
+								onSelect: () => {
+									commands.emit<cmd.data.move>("data.move", {
+										parent: item.fsid,
+										fsid: payload.fsid,
+									})
+									commands.emit<cmd.modal.hide>("modal.hide")
+								},
+								Icon: () => <FileIconComponent plain={item} />,
+							} satisfies CommandPalette.Item),
+					),
 				),
 			}
 		},

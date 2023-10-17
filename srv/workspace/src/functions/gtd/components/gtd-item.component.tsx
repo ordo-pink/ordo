@@ -10,6 +10,7 @@ import { GTDCommands } from "../types"
 import { BsCheckCircle } from "react-icons/bs"
 import { useSortable } from "@dnd-kit/sortable"
 import { CSS } from "@dnd-kit/utilities"
+import DataLabel from "$components/data/label.component"
 
 type P = { item: PlainData }
 
@@ -97,12 +98,7 @@ export default function GTDItem({ item }: P) {
 									.filter(label => label !== "done")
 									.sort((a, b) => a.localeCompare(b))
 									.map(label => (
-										<div
-											className="text-xs shadow-sm text-neutral-500 bg-neutral-200 dark:bg-neutral-900 rounded-md px-1 py-0.5"
-											key={label}
-										>
-											{label}
-										</div>
+										<DataLabel key={label}>{label}</DataLabel>
 									))}
 							</div>
 

@@ -12,7 +12,7 @@ import Sidebar from "./sidebar"
 import { __CommandPalette$ } from "$streams/command-palette"
 import { __Sidebar$ } from "$streams/sidebar"
 import { useStrictSubscription, useSubscription } from "$hooks/use-subscription"
-import { Activity, ComponentSpace, cmd } from "@ordo-pink/frontend-core"
+import { Extensions, ComponentSpace, cmd } from "@ordo-pink/frontend-core"
 
 // --- Public ---
 
@@ -47,7 +47,7 @@ export default function Workspace({ commandPalette$, sidebar$, currentActivity$ 
 // --- Internal ---
 
 type OnDragEndFn = Unary<[number, number], void>
-type DisabledSidebarProps = { activity: Nullable<Activity.Activity> }
+type DisabledSidebarProps = { activity: Nullable<Extensions.Activity> }
 type EnabledSidebarP = DisabledSidebarProps & {
 	sidebar$: __Sidebar$
 	commandPalette$: Nullable<__CommandPalette$>

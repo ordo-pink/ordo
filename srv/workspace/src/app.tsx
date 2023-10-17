@@ -1,12 +1,19 @@
 // SPDX-FileCopyrightText: Copyright 2023, 谢尔盖||↓ and the Ordo.pink contributors
 // SPDX-License-Identifier: MIT
 
-import { Either } from "@ordo-pink/either/mod"
+import { Either } from "@ordo-pink/either"
 import { useAppInit } from "$hooks/use-app-init"
 import { getCommands } from "$streams/commands"
-import { useSubscription } from "$hooks/use-subscription"
+import { useStrictSubscription, useSubscription } from "$hooks/use-subscription"
 import { createContext, useContext, useEffect } from "react"
-import { Commands, Router, User, __useSharedContextInit, cmd } from "@ordo-pink/frontend-core"
+import {
+	Commands,
+	Extensions,
+	Router,
+	User,
+	__useSharedContextInit,
+	cmd,
+} from "@ordo-pink/frontend-core"
 import Notifications from "$components/notifications/notifications.component"
 import ActivityBar from "$components/activity-bar/activity-bar"
 import ContextMenu from "$components/context-menu/context-menu"
@@ -25,12 +32,14 @@ const SharedContext = createContext<{
 	route: Nullable<Router.Route>
 	user: Nullable<User.User>
 	commands: Commands.Commands
-}>({ data: null, route: null, user: null, commands })
+	fileAssociations: Extensions.FileAssociation[]
+}>({ data: null, route: null, user: null, commands, fileAssociations: [] })
 
 export default function App() {
 	const streams = useAppInit()
 	const data = useSubscription(streams.data$)
 	const auth = useSubscription(streams.auth$)
+	const fileAssociations = useStrictSubscription(streams.fileAssociations$, [])
 	const user = useUser()
 	const currentRoute = useSubscription(streams.currentRoute$)
 	__useSharedContextInit(SharedContext, useContext)
@@ -50,6 +59,7 @@ export default function App() {
 		)
 		import("./functions/file-explorer").then(f => f.default({ commands, data$: streams.data$ }))
 		import("./functions/links").then(f => f.default({ commands, data$: streams.data$ }))
+		import("./functions/editor").then(f => f.default({ commands, data$: streams.data$ }))
 		import("./functions/gtd").then(f => f.default({ commands, data$: streams.data$ }))
 		import("./functions/user").then(f =>
 			f.default({ commands, data$: streams.data$, auth$: streams.auth$ }),
@@ -69,6 +79,7 @@ export default function App() {
 		.chain(() => Either.fromNullable(streams.activities$))
 		.chain(() => Either.fromNullable(streams.currentActivity$))
 		.chain(() => Either.fromNullable(streams.currentRoute$))
+		.chain(() => Either.fromNullable(streams.fileAssociations$))
 		.map(() => streams as AllKeysRequired<typeof streams>) // TODO: Extract to tau
 		.fold(
 			Null,
@@ -86,6 +97,7 @@ export default function App() {
 						data: data,
 						route: currentRoute,
 						commands,
+						fileAssociations,
 						user: user.fold(
 							() => null,
 							u => ({ ...u, email: UserUtils.obfuscateEmail(u.email) }),

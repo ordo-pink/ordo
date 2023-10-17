@@ -6,8 +6,10 @@ import type { ComponentType, MouseEvent } from "react"
 import type { Nullable, Thunk, UUIDv4, Unary } from "@ordo-pink/tau"
 import type { FSID, PlainData } from "@ordo-pink/data"
 import type { Observable } from "rxjs"
-import { Logger } from "@ordo-pink/logger"
-import { ComponentSpace } from "./constants/component-space.constants"
+import type { Logger } from "@ordo-pink/logger"
+import type { ComponentSpace } from "./constants/component-space.constants"
+import type { Transformer } from "@lexical/markdown"
+import type { LexicalNode } from "lexical"
 
 export namespace Functions {
 	export type CreateFunctionParams = {
@@ -29,9 +31,18 @@ export namespace cmd {
 	}
 
 	export namespace activities {
-		export type add = { name: "activities.add"; payload: Activity.Activity }
+		export type add = { name: "activities.add"; payload: Extensions.Activity }
 		export type remove = { name: "activities.remove"; payload: string }
-		export type setCurrent = { name: "activities.set-current"; payload: Activity.Activity }
+		export type setCurrent = { name: "activities.set-current"; payload: Extensions.Activity }
+	}
+
+	export namespace fileAssociations {
+		export type add = { name: "file-associations.add"; payload: Extensions.FileAssociation }
+		export type remove = { name: "file-associations.remove"; payload: string }
+		export type setCurrent = {
+			name: "file-associations.set-current"
+			payload: Extensions.FileAssociation
+		}
 	}
 
 	export namespace data {
@@ -123,11 +134,11 @@ export namespace cmd {
 	}
 }
 
-export namespace Activity {
+export namespace Extensions {
 	export type Activity = {
 		name: string
 		routes: string[]
-		Component: ComponentType<Activity.ComponentProps>
+		Component: ComponentType<ComponentProps>
 		Sidebar?: ComponentType
 		background?: boolean
 	}
@@ -135,6 +146,21 @@ export namespace Activity {
 	export type ComponentProps = {
 		commands: Commands.Commands
 		space: ComponentSpace
+	}
+
+	export type FileExtension = `.${string}`
+
+	export type FileAssociation = {
+		name: string
+		fileExtensions: FileExtension[] | "*"
+		Component: ComponentType<ComponentProps>
+	}
+
+	export type EditorPlugin = {
+		name: string
+		Plugin?: ComponentType
+		transformer?: Transformer
+		nodes?: (typeof LexicalNode)[]
 	}
 }
 

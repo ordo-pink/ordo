@@ -12,14 +12,14 @@ import { __Auth$, useUser } from "$streams/auth"
 import { Hosts } from "$utils/hosts"
 import { UserUtils } from "$utils/user-utils.util"
 import { User } from "@ordo-pink/backend-user-service"
-import { Activity, ComponentSpace, Functions, cmd } from "@ordo-pink/frontend-core"
+import { Extensions, ComponentSpace, Functions, cmd } from "@ordo-pink/frontend-core"
 import { Oath } from "@ordo-pink/oath"
 import { Switch } from "@ordo-pink/switch"
 import { Nullable, noop } from "@ordo-pink/tau"
 import { useEffect, useState } from "react"
 import { BsPersonBadge } from "react-icons/bs"
 
-type UserComponentParams = Activity.ComponentProps & { auth$: Nullable<__Auth$> }
+type UserComponentParams = Extensions.ComponentProps & { auth$: Nullable<__Auth$> }
 const UserActivity = ({ space, auth$, commands }: UserComponentParams) =>
 	Switch.of(space)
 		.case(ComponentSpace.ICON, () => <Icon />)
@@ -48,7 +48,7 @@ export default function createUserFunction({ commands, auth$ }: Params) {
 	})
 }
 
-type _P = { auth$: Nullable<__Auth$> } & Pick<Activity.ComponentProps, "commands">
+type _P = { auth$: Nullable<__Auth$> } & Pick<Extensions.ComponentProps, "commands">
 const UserPage = ({ auth$, commands }: _P) => {
 	const userE = useUser()
 

@@ -6,7 +6,7 @@ import { CenteredPage } from "$components/centered-page"
 import { Title } from "$components/page-header"
 import { useStrictSubscription } from "$hooks/use-subscription"
 import { __Activities$ } from "$streams/activities"
-import { Activity, ComponentSpace, Functions, cmd } from "@ordo-pink/frontend-core"
+import { Extensions, ComponentSpace, Functions, cmd } from "@ordo-pink/frontend-core"
 import { Switch } from "@ordo-pink/switch"
 import { Nullable } from "@ordo-pink/tau"
 import { memo } from "react"
@@ -32,7 +32,7 @@ export default function createHomeFunction({ commands, activities$ }: Params) {
 	})
 }
 
-type P = Activity.ComponentProps & { activities$: Nullable<__Activities$> }
+type P = Extensions.ComponentProps & { activities$: Nullable<__Activities$> }
 const WelcomePage = ({ commands, space, activities$ }: P) =>
 	Switch.of(space)
 		.case(ComponentSpace.ICON, () => <Icon />)

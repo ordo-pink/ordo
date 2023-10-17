@@ -18,6 +18,7 @@ import { useHotkeys } from "react-hotkeys-hook"
 import { cmd } from "@ordo-pink/frontend-core"
 import { __Notification$, __initNotification } from "$streams/notification"
 import { __Metadata$, __initData } from "$streams/data"
+import { __FileAssociations$, __initFileAssociations } from "$streams/file-associations"
 
 const commands = getCommands()
 
@@ -37,6 +38,7 @@ export type UseAppInitReturns = {
 	currentActivity$: Nullable<__CurrentActivity$>
 	currentRoute$: Nullable<__CurrentRoute$>
 	data$: Nullable<__Metadata$>
+	fileAssociations$: Nullable<__FileAssociations$>
 }
 
 export const useAppInit = (): UseAppInitReturns => {
@@ -53,6 +55,7 @@ export const useAppInit = (): UseAppInitReturns => {
 	const [currentActivity$, setCurrentActivity$] = useState<Nullable<__CurrentActivity$>>(null)
 	const [currentRoute$, setCurrentRoute$] = useState<Nullable<__CurrentRoute$>>(null)
 	const [data$, setData$] = useState<Nullable<__Metadata$>>(null)
+	const [fileAssociations$, setFileAssociations$] = useState<Nullable<__FileAssociations$>>(null)
 
 	const commandPalette = useSubscription(currentCommandPalette$)
 	const globalCommandPalette = useSubscription(globalCommandPalette$)
@@ -105,6 +108,9 @@ export const useAppInit = (): UseAppInitReturns => {
 		setActivities$(activities?.activities$ ?? null)
 		setCurrentActivity$(activities?.currentActivity$ ?? null)
 
+		const fileAssociations = __initFileAssociations({ logger: ConsoleLogger })
+		setFileAssociations$(fileAssociations)
+
 		const currentRoute$ = __initRouter({ ...ctx, activities$: activities?.activities$ })
 		setCurrentRoute$(currentRoute$)
 
@@ -148,6 +154,7 @@ export const useAppInit = (): UseAppInitReturns => {
 		notification$,
 		currentRoute$,
 		currentActivity$,
+		fileAssociations$,
 		globalCommandPalette$,
 		currentCommandPalette$,
 	}

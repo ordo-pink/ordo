@@ -5,7 +5,7 @@ import { map, scan, shareReplay } from "rxjs/operators"
 import { BehaviorSubject, merge, Subject, Observable } from "rxjs"
 import { Binary, Curry, Nullable, callOnce } from "@ordo-pink/tau"
 import { Logger } from "@ordo-pink/logger"
-import { Activity, cmd } from "@ordo-pink/frontend-core"
+import { Extensions, cmd } from "@ordo-pink/frontend-core"
 import { getCommands } from "./commands"
 
 const commands = getCommands()
@@ -13,8 +13,8 @@ const commands = getCommands()
 type Params = { logger: Logger }
 type Result = { activities$: __Activities$; currentActivity$: __CurrentActivity$ }
 type InitActivitiesFn = (params: Params) => Result
-export type __Activities$ = Observable<Activity.Activity[]>
-export type __CurrentActivity$ = Observable<Nullable<Activity.Activity>>
+export type __Activities$ = Observable<Extensions.Activity[]>
+export type __CurrentActivity$ = Observable<Nullable<Extensions.Activity>>
 export const __initActivities: InitActivitiesFn = callOnce(({ logger }) => {
 	logger.debug("Initializing activities")
 
@@ -27,19 +27,19 @@ export const __initActivities: InitActivitiesFn = callOnce(({ logger }) => {
 	return { activities$, currentActivity$ }
 })
 
-const currentActivity$ = new BehaviorSubject<Nullable<Activity.Activity>>(null)
+const currentActivity$ = new BehaviorSubject<Nullable<Extensions.Activity>>(null)
 
-const add$ = new Subject<Activity.Activity>()
+const add$ = new Subject<Extensions.Activity>()
 const remove$ = new Subject<string>()
 
-type AddP = Curry<Binary<Activity.Activity, Activity.Activity[], Activity.Activity[]>>
+type AddP = Curry<Binary<Extensions.Activity, Extensions.Activity[], Extensions.Activity[]>>
 const addP: AddP = newActivity => state => [...state, newActivity]
 
-type RemoveP = Curry<Binary<string, Activity.Activity[], Activity.Activity[]>>
+type RemoveP = Curry<Binary<string, Extensions.Activity[], Extensions.Activity[]>>
 const removeP: RemoveP = activity => state => state.filter(a => a.name === activity)
 
 const activities$ = merge(add$.pipe(map(addP)), remove$.pipe(map(removeP))).pipe(
-	scan((acc, f) => f(acc), [] as Activity.Activity[]),
+	scan((acc, f) => f(acc), [] as Extensions.Activity[]),
 	shareReplay(1),
 )
 

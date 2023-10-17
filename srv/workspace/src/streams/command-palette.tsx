@@ -13,6 +13,8 @@ const commands = getCommands()
 export type __CommandPalette$ = Observable<{
 	items: CommandPalette.Item[]
 	onNewItem?: (newItem: string) => any
+	multiple?: boolean
+	pinnedItems?: CommandPalette.Item[]
 }>
 export const __initCommandPalette: InitCommandPalette = callOnce(({ logger }) => {
 	logger.debug("Initializing command palette")

@@ -30,6 +30,11 @@ export default function FileCardComponent({ plain }: P) {
 					<div
 						className="flex items-center space-x-1 text-xs"
 						title={`Labels:\n\n- ${plain.labels.join("\n- ")}`}
+						onClick={e => {
+							e.preventDefault()
+
+							commands.emit<cmd.data.showEditLabelsPalette>("data.show-edit-labels-palette", plain)
+						}}
 					>
 						<BsTags />
 						<p>{plain.labels.length}</p>

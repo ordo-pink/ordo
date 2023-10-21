@@ -8,6 +8,8 @@ import { isFunction } from "@ordo-pink/tau"
 
 export const Switch: T.TSwitchStatic = {
 	of: x => swich(x),
+	empty: () => swich(true),
+	negate: () => swich(false),
 }
 
 // --- Internal ---

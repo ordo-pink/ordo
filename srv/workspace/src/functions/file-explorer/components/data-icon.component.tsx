@@ -18,7 +18,7 @@ export default function FSDataIcon({ data, isSelected, onSelect }: P) {
 
 	return (
 		<div
-			className={`cursor-pointer max-h-min select-none p-2 rounded-lg hover:bg-neutral-200 dark:hover:bg-neutral-900 ${
+			className={`cursor-pointer w-24 max-h-min select-none p-2 rounded-lg hover:bg-neutral-200 dark:hover:bg-neutral-900 ${
 				isSelected
 					? "bg-neutral-300 dark:bg-neutral-700 hover:bg-neutral-300 hover:dark:bg-neutral-700"
 					: ""

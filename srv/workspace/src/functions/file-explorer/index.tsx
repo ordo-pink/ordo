@@ -1,10 +1,9 @@
 // SPDX-FileCopyrightText: Copyright 2023, 谢尔盖||↓ and the Ordo.pink contributors
 // SPDX-License-Identifier: MIT
 
-import { memo } from "react"
 import { Extensions, ComponentSpace, Functions, cmd } from "@ordo-pink/frontend-core"
 import { Switch } from "@ordo-pink/switch"
-import FileExplorerActivityComponent from "./components/file-explorer-activity.component"
+import FileExplorerActivity from "./components/file-explorer-activity.component"
 import FileExplorerIcon from "./components/file-explorer-icon.component"
 import FileExplorerCardComponent from "./components/file-explorer-card.component"
 import { PlainData } from "@ordo-pink/data"
@@ -22,18 +21,17 @@ export default function createFileExplorerFunction({ commands }: Functions.Creat
 	)
 
 	commands.emit<cmd.activities.add>("activities.add", {
-		Component: props => <FSActivity {...props} />,
+		Component: FileExplorerComponent,
 		name: "file-explorer",
 		routes: ["/fs", "/fs/:fsid"],
 	})
 }
 
+// TODO: Register widgets separately
 type P = Extensions.ComponentProps
-const FileExplorerComponent = ({ space, commands }: P) =>
+const FileExplorerComponent = ({ space }: P) =>
 	Switch.of(space)
-		.case(ComponentSpace.ICON, () => <FileExplorerIcon />)
+		.case(ComponentSpace.ICON, FileExplorerIcon)
 		.case(ComponentSpace.CARD, FileExplorerCardComponent)
 		.case(ComponentSpace.WIDGET, FileExplorerCardComponent)
-		.default(() => <FileExplorerActivityComponent commands={commands} />)
-
-const FSActivity = memo(FileExplorerComponent, (prev, next) => prev.space === next.space)
+		.default(FileExplorerActivity)

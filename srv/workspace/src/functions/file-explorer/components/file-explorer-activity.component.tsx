@@ -1,56 +1,52 @@
 // SPDX-FileCopyrightText: Copyright 2023, 谢尔盖||↓ and the Ordo.pink contributors
 // SPDX-License-Identifier: MIT
 
-import Null from "$components/null"
 import { PlainData, FSID } from "@ordo-pink/data"
-import { Either } from "@ordo-pink/either"
-import { Extensions, cmd, useSharedContext } from "@ordo-pink/frontend-core"
-import { MouseEvent, useEffect, useState } from "react"
-import { Switch } from "@ordo-pink/switch"
+import { Commands, cmd, useSharedContext } from "@ordo-pink/frontend-core"
+import { Dispatch, MouseEventHandler, ReactNode, SetStateAction, useState } from "react"
 import FSDataIcon from "./data-icon.component"
+import { useChildren } from "$hooks/use-children"
+import { useDataFromRouteFSID } from "$hooks/use-data-from-route-fsid"
 
-export default function FileExplorerActivityComponent({
-	commands,
-}: Pick<Extensions.ComponentProps, "commands">) {
-	const { data, route } = useSharedContext()
+export default function FileExplorerActivity(): ReactNode {
+	const { commands } = useSharedContext()
+	const currentData = useDataFromRouteFSID()
+	const currentDataChildren = useChildren(currentData ?? "root")
+
+	// TODO: Extract storing selectedItems to clipboard$.
 	const [selectedItems, setSelectedItems] = useState<FSID[]>([])
-	const [currentItem, setCurrentItem] = useState<PlainData | null>(null)
 
-	const showContextMenu = (event: MouseEvent<HTMLDivElement>) =>
-		commands.emit<cmd.ctxMenu.show>("context-menu.show", { event, payload: currentItem })
-
-	useEffect(() => {
-		Switch.of(true)
-			.case(!route || !data, () => setCurrentItem(null))
-			.case(route!.path === "/fs", () => setCurrentItem(null))
-			.default(() =>
-				Either.fromNullable(data)
-					.chain(items =>
-						Either.fromNullable(items.find(item => item.fsid === route!.path.slice(4))),
-					)
-					.fold(
-						() => setCurrentItem(null),
-						root => setCurrentItem(root),
-					),
-			)
-	}, [data, route])
-
-	return Either.fromNullable(data).fold(Null, items => (
-		<div className="h-full w-full" onContextMenu={showContextMenu}>
-			<div className="file-explorer w-full container grid grid-cols-3 md:grid-cols-6 lg:grid-cols-12 p-4">
-				{items
-					.filter(item => (currentItem ? item.parent === currentItem.fsid : item.parent === null))
-					.map(item => (
-						<FSDataIcon
-							key={item.fsid}
-							data={item}
-							isSelected={selectedItems.includes(item.fsid)}
-							onSelect={fsid =>
-								selectedItems.includes(fsid) ? setSelectedItems([]) : setSelectedItems([fsid])
-							}
-						/>
-					))}
+	return (
+		<div
+			className="h-full w-full"
+			onContextMenu={showContextMenu({ commands, payload: currentData })}
+		>
+			<div className="file-explorer w-full flex flex-wrap p-4">
+				{currentDataChildren.map(item => (
+					<FSDataIcon
+						key={item.fsid}
+						data={item}
+						isSelected={selectedItems.includes(item.fsid)}
+						onSelect={handleSelectData({ items: selectedItems, setItems: setSelectedItems })}
+					/>
+				))}
 			</div>
 		</div>
-	))
+	)
 }
+
+type ShowContextMenuParams = { commands: Commands.Commands; payload: PlainData | null }
+type ShowContextMenuFn = (params: ShowContextMenuParams) => MouseEventHandler<HTMLDivElement>
+const showContextMenu: ShowContextMenuFn =
+	({ commands, payload }) =>
+	event =>
+		// TODO: Show context menu for the root if (payload === null)
+		payload && commands.emit<cmd.ctxMenu.show>("context-menu.show", { event, payload })
+
+// TODO: Extract storing selectedItems to clipboard$.
+type HandleSelectDataParams = { setItems: Dispatch<SetStateAction<FSID[]>>; items: FSID[] }
+type HandleSelectData = (params: HandleSelectDataParams) => (fsid: FSID) => void
+const handleSelectData: HandleSelectData =
+	({ setItems, items }) =>
+	fsid =>
+		items.includes(fsid) ? setItems([]) : setItems([fsid])

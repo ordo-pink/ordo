@@ -21,9 +21,9 @@
 		],
 		"baseUrl": ".",
 		"paths": {
-			"@ordo-pink/*": ["../../lib/*"]
+			"@ordo-pink/*": ["../../lib/*"],
+			"react": ["node_modules/@types/react"]
 		}
 	},
-	"include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
-	"exclude": ["node_modules"]
+	"include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"]
 }

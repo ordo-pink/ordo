@@ -1,30 +1,23 @@
 // SPDX-FileCopyrightText: Copyright 2023, 谢尔盖||↓ and the Ordo.pink contributors
 // SPDX-License-Identifier: MIT
 
-import { Optional } from "@ordo-pink/tau"
 import { HotkeyCallback, useHotkeys } from "react-hotkeys-hook"
+import { Either } from "@ordo-pink/either"
 
-const isDarwin = navigator.appVersion.indexOf("Mac") !== -1
+type UseAccelerator = (accelerator: string | undefined, callback: HotkeyCallback) => void
 
-export const useAccelerator = (accelerator: Optional<string>, callback: HotkeyCallback) => {
-	const hotkeys = accelerator
-		? accelerator.split("||").map(hotkey => {
-				const keys = hotkey.split("+")
+/**
+ * Registers provided keyboard accelerator that is compatible with the Ordo notation.
+ *
+ * @type {UseAccelerator}
+ *
+ * @todo Add support for multiple accelerators
+ * @todo Provide link to accelerator description
+ */
+export const useAccelerator: UseAccelerator = (accelerator, callback) => {
+	const hotkeys = Either.fromNullable(accelerator).fold(() => [], renameToAppleOrNormalModifierKeys)
 
-				let key = ""
-
-				if (keys.includes("mod")) key += isDarwin ? "cmd+" : "ctrl+"
-				if (keys.includes("meta")) key += isDarwin ? "option+" : "alt+"
-				if (keys.includes("ctrl")) key += "ctrl+"
-				if (keys.includes("shift")) key += "shift+"
-
-				key += keys.at(-1)
-
-				return key
-		  })
-		: []
-
-	return useHotkeys(
+	useHotkeys(
 		hotkeys,
 		(keyboardEvent, hotkeyEvent) => {
 			keyboardEvent.stopPropagation()
@@ -38,4 +31,23 @@ export const useAccelerator = (accelerator: Optional<string>, callback: HotkeyCa
 			preventDefault: true,
 		},
 	)
+}
+
+// --- Internal ---
+
+const isDarwin: boolean = navigator.appVersion.indexOf("Mac") !== -1
+
+type RenameToAppleOrNormalModifierKeys = (accelerator: string) => string
+const renameToAppleOrNormalModifierKeys: RenameToAppleOrNormalModifierKeys = accelerator => {
+	const keys: string[] = accelerator.split("+")
+	const newKeys: string[] = []
+
+	if (keys.includes("mod")) newKeys.push(isDarwin ? "cmd" : "ctrl")
+	if (keys.includes("meta")) newKeys.push(isDarwin ? "option" : "alt")
+	if (keys.includes("ctrl") && isDarwin) newKeys.push("ctrl")
+	if (keys.includes("shift")) newKeys.push("shift")
+
+	newKeys.push(keys.at(-1)!)
+
+	return newKeys.join("+")
 }

@@ -16,6 +16,16 @@ export type TSwitchStatic = {
 	of: <TResult extends unknown[] = [], TContext = unknown>(
 		x: TContext,
 	) => TSwitch<TContext, TResult>
+
+	/**
+	 * Create an empty switch that compares provided values against `true`.
+	 */
+	empty: <TResult extends unknown[] = []>() => TSwitch<boolean, TResult>
+
+	/**
+	 * Create an empty switch that compares provided values against `false`.
+	 */
+	negate: <TResult extends unknown[] = []>() => TSwitch<boolean, TResult>
 }
 
 /**

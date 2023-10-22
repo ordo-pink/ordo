@@ -42,10 +42,14 @@ export const handleSignIn: Fn =
 						.chain(tokens =>
 							Oath.of(new Date(Date.now() + tokens.exp))
 								.tap(expires => {
-									ctx.response.set("Set-Cookie", [
+									ctx.response.set(
+										"Set-Cookie",
 										`jti=${tokens.jti}; Expires=${expires}; SameSite=Lax; Path=/; HttpOnly;`,
+									)
+									ctx.response.set(
+										"Set-Cookie",
 										`sub=${tokens.sub}; Expires=${expires}; SameSite=Lax; Path=/; HttpOnly;`,
-									])
+									)
 								})
 								.map(expires => ({
 									accessToken: tokens.tokens.access,

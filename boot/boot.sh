@@ -124,7 +124,7 @@ download_tailwind
 download_bun
 
 ## Install bin dependencies
-bun i
+opt/bun i
 
 ## Build init script
 compile_init_script

@@ -21,10 +21,12 @@ import { handleAccount } from "./handlers/account.handler"
 import { handleSignIn } from "./handlers/sign-in.handler"
 import { handleSignUp } from "./handlers/sign-up.handler"
 import { Algorithm } from "@ordo-pink/wjwt"
+import { EmailRepository, EmailService } from "@ordo-pink/backend-email-service"
 
 export type CreateIDServerFnParams = {
 	userRepository: UserRepository
 	tokenRepository: TokenRepository
+	emailRepository: EmailRepository
 	accessTokenExpireIn: number
 	refreshTokenExpireIn: number
 	saltRounds: number
@@ -38,6 +40,7 @@ export type CreateIDServerFnParams = {
 export const createIDServer = async ({
 	userRepository,
 	tokenRepository,
+	emailRepository,
 	origin,
 	accessTokenExpireIn,
 	refreshTokenExpireIn,
@@ -48,6 +51,7 @@ export const createIDServer = async ({
 	alg,
 }: CreateIDServerFnParams) => {
 	const userService = await UserService.of(userRepository, { saltRounds })
+	const emailService = EmailService.of(emailRepository)
 	const tokenService = TokenService.of({
 		repository: tokenRepository,
 		options: {
@@ -59,7 +63,7 @@ export const createIDServer = async ({
 		},
 	})
 
-	const ctx = { userService, tokenService }
+	const ctx = { userService, tokenService, emailService }
 
 	return createServer({
 		origin,

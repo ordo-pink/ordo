@@ -32,19 +32,14 @@ export default function GTDWidget() {
 				onInput={e => setNewItem(e.target.value)}
 				onKeyDown={e => {
 					if (e.key === "Enter" && isNonEmptyString(newItem)) {
-						const gtdDirectory = data?.find(item => item.name === ".gtd" && item.parent === null)
-						const inboxDirectory = data?.find(
-							item => item.name === ".inbox" && item.parent === gtdDirectory?.fsid,
-						)
-
-						inboxDirectory &&
-							commands.emit<cmd.data.create>("data.create", {
-								name: newItem,
-								parent: inboxDirectory.fsid,
-								labels: ["todo"],
-							})
+						commands.emit<cmd.data.create>("data.create", {
+							name: newItem,
+							parent: null,
+							labels: ["todo", "inbox"],
+						})
 
 						setNewItem("")
+
 						commands.emit<cmd.notification.show>("notification.show", {
 							message: newItem,
 							type: "success",

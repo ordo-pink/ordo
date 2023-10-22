@@ -3,18 +3,17 @@
 
 import { FSID, PlainData } from "@ordo-pink/data"
 import { useSharedContext } from "@ordo-pink/frontend-core"
-import { useData } from "./use-data"
+import { useDataByFSID } from "./use-data.hook"
 
 export const useParentChain = (fsid: FSID) => {
 	const { data } = useSharedContext()
-	let currentItem = useData(fsid)
+	let currentItem = useDataByFSID(fsid)
 
 	const parentChain = [] as PlainData[]
 
 	if (!data || !currentItem || currentItem.parent === null) return parentChain
 
 	while (currentItem && currentItem.parent !== null) {
-		// eslint-disable-next-line no-loop-func
 		const parent = data?.find(x => x.fsid === currentItem?.parent) ?? null
 
 		if (parent) parentChain.push(parent)

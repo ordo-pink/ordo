@@ -2,8 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 import { PlainData } from "@ordo-pink/data"
-import { Switch } from "@ordo-pink/switch"
-import { BsFileEarmark, BsFolder2 } from "react-icons/bs"
+import { BsFileEarmark } from "react-icons/bs"
 
 type P = { plain: PlainData }
 export default function FileIconComponent({ plain }: P) {

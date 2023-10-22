@@ -12,25 +12,16 @@ type UseAccelerator = (accelerator: string | undefined, callback: HotkeyCallback
  * @type {UseAccelerator}
  *
  * @todo Add support for multiple accelerators
- * @todo Provide link to accelerator description
+ * @todo Provide at_see link to accelerators description
  */
 export const useAccelerator: UseAccelerator = (accelerator, callback) => {
 	const hotkeys = Either.fromNullable(accelerator).fold(() => [], renameToAppleOrNormalModifierKeys)
 
-	useHotkeys(
-		hotkeys,
-		(keyboardEvent, hotkeyEvent) => {
-			keyboardEvent.stopPropagation()
-			keyboardEvent.preventDefault()
-
-			callback(keyboardEvent, hotkeyEvent)
-		},
-		{
-			enableOnFormTags: true,
-			enableOnContentEditable: true,
-			preventDefault: true,
-		},
-	)
+	useHotkeys(hotkeys, callback, {
+		enableOnFormTags: true,
+		enableOnContentEditable: true,
+		preventDefault: true,
+	})
 }
 
 // --- Internal ---

@@ -1,4 +1,4 @@
-import { useDataFilter } from "$hooks/use-data-selector"
+import { useDataFilter } from "$hooks/use-data.hook"
 
 export const useInbox = () =>
 	useDataFilter(

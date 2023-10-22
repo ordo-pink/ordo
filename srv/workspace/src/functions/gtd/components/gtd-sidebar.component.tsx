@@ -7,7 +7,7 @@ import { Title } from "$components/page-header"
 import { cmd, useSharedContext } from "@ordo-pink/frontend-core"
 import { BsFolder2Open, BsInbox, BsPlus, BsTag } from "react-icons/bs"
 import { HiOutlineSparkles } from "react-icons/hi"
-import { useDataFind } from "$hooks/use-data-selector"
+import { useDataFind } from "$hooks/use-data.hook"
 import { useGtdProjects } from "../hooks/use-projects"
 import { useInbox } from "../hooks/use-inbox"
 

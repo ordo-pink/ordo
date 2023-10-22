@@ -61,7 +61,7 @@ export default function NotificationComponent({ notification }: _P) {
 		return () => {
 			clearInterval(interval)
 		}
-	}, [percentage, notification.duration])
+	}, [percentage, notification])
 
 	return (
 		<div className="w-full h-full relative">

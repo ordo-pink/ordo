@@ -1,7 +1,6 @@
 import { Extensions, ComponentSpace, Functions, cmd } from "@ordo-pink/frontend-core"
 import { Switch } from "@ordo-pink/switch"
 import { PiGraph } from "react-icons/pi"
-import LinksComponent from "./components/links.component"
 import LinksSidebar from "./components/links-sidebar.component"
 import LinksWorkspace from "./components/links-workspace.component"
 

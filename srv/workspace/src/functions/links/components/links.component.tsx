@@ -1,9 +1,7 @@
-import { FSID, PlainData } from "@ordo-pink/data"
-import { Either } from "@ordo-pink/either"
+import { PlainData } from "@ordo-pink/data"
 import { cmd, useSharedContext } from "@ordo-pink/frontend-core"
-import { noop } from "@ordo-pink/tau"
 import * as d3 from "d3"
-import { useEffect, useLayoutEffect, useRef, useState } from "react"
+import { useEffect, useRef } from "react"
 
 type P = {
 	nodes: { id: string; data?: PlainData }[]
@@ -118,7 +116,7 @@ export default function Links({ nodes, links }: P) {
 			if (!wrapperRef.current) return
 			wrapperRef.current.innerHTML = ""
 		}
-	}, [data, nodes, links])
+	}, [data, nodes, links, commands])
 
 	return <svg ref={wrapperRef} className="w-full h-full overflow-none"></svg>
 }

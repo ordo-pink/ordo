@@ -65,7 +65,7 @@ export default function CommandPaletteModal({ items, onNewItem, multiple, pinned
 
 		if (!!onNewItem && inputValue.length > 0 && suggestedItems.length === 0)
 			setPointerLocation("suggested")
-	}, [inputValue, allItems, currentIndex])
+	}, [inputValue, allItems, currentIndex, onNewItem, pointerLocation, suggestedItems.length])
 
 	const handleInputChange = (event: ChangeEvent<HTMLInputElement>) => {
 		setInputValue(event.target.value)

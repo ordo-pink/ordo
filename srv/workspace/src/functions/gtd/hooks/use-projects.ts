@@ -1,4 +1,4 @@
-import { useDataSelector } from "$hooks/use-data-selector"
+import { useDataSelector } from "$hooks/use-data.hook"
 
 export const useGtdProjects = () =>
 	useDataSelector(items =>

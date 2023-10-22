@@ -9,7 +9,7 @@ import { Either } from "@ordo-pink/either"
 import { cmd, useSharedContext } from "@ordo-pink/frontend-core"
 import FileIconComponent from "$functions/file-explorer/components/file-icon.component"
 import { HiOutlineSparkles } from "react-icons/hi"
-import { useDataByFSID } from "$hooks/use-data-selector"
+import { useDataByFSID } from "$hooks/use-data.hook"
 
 type Props = { fsid: FSID }
 export default function GTDSidebarProject({ fsid }: Props) {

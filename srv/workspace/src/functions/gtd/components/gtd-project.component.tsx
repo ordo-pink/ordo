@@ -8,7 +8,7 @@ import { useAccelerator } from "$hooks/use-accelerator"
 import { cmd, useSharedContext } from "@ordo-pink/frontend-core"
 import { useRef, useState } from "react"
 import GTDList from "./gtd-list.component"
-import { useDataByLabel } from "$hooks/use-data-selector"
+import { useDataByLabel } from "$hooks/use-data.hook"
 
 type P = { project: string }
 export default function GTDProject({ project }: P) {

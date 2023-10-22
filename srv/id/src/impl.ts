@@ -12,6 +12,7 @@ import { ConsoleLogger } from "@ordo-pink/logger"
 import { getPrivateKey, getPublicKey } from "./utils/get-key"
 import { MemoryTokenRepository } from "@ordo-pink/backend-memory-token-repository"
 import { FSUserRepository } from "@ordo-pink/backend-fs-user-repository"
+import { RusenderEmailRepository } from "@ordo-pink/backend-rusender-email-repository"
 
 const {
 	ID_USER_REPOSITORY,
@@ -30,6 +31,7 @@ const {
 	ID_USER_TABLE_NAME,
 	WORKSPACE_HOST,
 	WEB_HOST,
+	ID_EMAIL_API_KEY,
 } = getc([
 	"ID_USER_REPOSITORY",
 	"ID_DYNAMODB_ENDPOINT",
@@ -51,6 +53,7 @@ const {
 	"DATA_METADATA_PATH",
 	"WORKSPACE_HOST",
 	"WEB_HOST",
+	"ID_EMAIL_API_KEY",
 ])
 
 const main = async () => {
@@ -87,10 +90,12 @@ const main = async () => {
 					tableName: ID_USER_TABLE_NAME,
 			  })
 			: FSUserRepository.of("./var/srv/id/users.json")
+	const emailRepository = RusenderEmailRepository.of(ID_EMAIL_API_KEY)
 
 	const app = await createIDServer({
 		userRepository,
 		tokenRepository,
+		emailRepository,
 		origin: [WEB_HOST, WORKSPACE_HOST],
 		accessKeys: { privateKey: accessTokenPrivateKey, publicKey: accessTokenPublicKey },
 		refreshKeys: { privateKey: refreshTokenPrivateKey, publicKey: refreshTokenPublicKey },

@@ -9,7 +9,7 @@ set -e
 PLATFORM=$(uname -ms)
 
 ESBUILD_VERSION="0.18.9"
-BUN_VERSION="0.7.3"
+BUN_VERSION="1.0.3"
 TAILWIND_VERSION="v3.1.6"
 
 # --- Internal ---
@@ -107,6 +107,11 @@ fi
 ## Create opt directory
 if [ ! -d ./opt ]; then
   mkdir ./opt
+fi
+
+## Create bin directory
+if [ ! -d ./bin ]; then
+  mkdir ./bin
 fi
 
 ## Download ESBuild

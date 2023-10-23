@@ -4,12 +4,12 @@
 import type { Oath } from "@ordo-pink/oath"
 import type { FSID, PlainData } from "./data.types"
 import type { DataError } from "./errors.types"
-import type { DataRepository } from "./data-repository.types"
-import type { ContentRepository } from "./content-repository.types"
+import type { DataPersistenceStrategy } from "./data-persistence-strategy.types"
+import type { ContentPersistenceStrategy } from "./content-persistence-strategy.types"
 
 export type TDataCommands<T> = {
-	dataRepository: DataRepository
-	contentRepository: ContentRepository<T>
+	dataRepository: DataPersistenceStrategy
+	contentRepository: ContentPersistenceStrategy<T>
 	create: (
 		params: Pick<PlainData, "name" | "parent" | "createdBy"> & {
 			fsid?: FSID

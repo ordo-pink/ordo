@@ -5,10 +5,10 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-import { createDataServer } from "@ordo-pink/backend-data-server"
+import { createDataServer } from "@ordo-pink/backend-server-data"
 import { getc } from "@ordo-pink/getc"
-import { FSContentRepository } from "@ordo-pink/backend-fs-content-repository"
-import { FSDataRepository } from "@ordo-pink/backend-fs-data-repository"
+import { ContentPersistenceStrategyFS } from "@ordo-pink/backend-content-persistence-strategy-fs"
+import { DataPersistenceStrategyFS } from "@ordo-pink/backend-data-persistence-strategy-fs"
 import { ConsoleLogger } from "@ordo-pink/logger"
 import { DataCommands } from "@ordo-pink/data"
 
@@ -31,8 +31,8 @@ const {
 ])
 
 const main = async () => {
-	const dataRepository = FSDataRepository.of({ root: DATA_METADATA_PATH })
-	const contentRepository = FSContentRepository.of({ root: DATA_DATA_PATH })
+	const dataRepository = DataPersistenceStrategyFS.of({ root: DATA_METADATA_PATH })
+	const contentRepository = ContentPersistenceStrategyFS.of({ root: DATA_DATA_PATH })
 	const dataService = DataCommands.of({ dataRepository, contentRepository })
 
 	const app = createDataServer({

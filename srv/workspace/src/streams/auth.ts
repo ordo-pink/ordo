@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: Copyright 2023, 谢尔盖||↓ and the Ordo.pink contributors
 // SPDX-License-Identifier: MIT
 
-import type { AuthResponse } from "@ordo-pink/backend-id-server"
+import type { AuthResponse } from "@ordo-pink/backend-server-id"
 import { AiOutlineLogout } from "react-icons/ai"
 import { BehaviorSubject, Observable } from "rxjs"
 import { callOnce, Unary, Nullable } from "@ordo-pink/tau"

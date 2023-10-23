@@ -3,8 +3,8 @@
 
 import { rrrToNotification } from "$utils/error-to-notification"
 import { Hosts } from "$utils/hosts"
-import { AuthResponse } from "@ordo-pink/backend-id-server"
-import { Data, DataRepository, PlainData } from "@ordo-pink/data"
+import { AuthResponse } from "@ordo-pink/backend-server-id"
+import { Data, DataPersistenceStrategy, PlainData } from "@ordo-pink/data"
 import { Commands, cmd } from "@ordo-pink/frontend-core"
 import { Oath } from "@ordo-pink/oath"
 import { BehaviorSubject } from "rxjs"
@@ -13,7 +13,7 @@ const of = (
 	data$: BehaviorSubject<PlainData[]>,
 	auth$: BehaviorSubject<AuthResponse>,
 	commands: Commands.Commands,
-): DataRepository => ({
+): DataPersistenceStrategy => ({
 	count: () => Oath.of(data$.value.length),
 	create: plain => {
 		const data = data$.value

@@ -5,14 +5,14 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-import { DynamoDBUserStorageAdapter } from "@ordo-pink/backend-dynamodb-user-repository"
-import { createIDServer } from "@ordo-pink/backend-id-server"
+import { DynamoDBUserStorageAdapter } from "@ordo-pink/backend-user-persistence-strategy-dynamodb"
+import { createIDServer } from "@ordo-pink/backend-server-id"
 import { getc } from "@ordo-pink/getc"
 import { ConsoleLogger } from "@ordo-pink/logger"
 import { getPrivateKey, getPublicKey } from "./utils/get-key"
-import { MemoryTokenRepository } from "@ordo-pink/backend-memory-token-repository"
-import { FSUserRepository } from "@ordo-pink/backend-fs-user-repository"
-import { RusenderEmailRepository } from "@ordo-pink/backend-rusender-email-repository"
+import { MemoryTokenRepository } from "@ordo-pink/backend-token-persistence-strategy-fs"
+import { FSUserRepository } from "@ordo-pink/backend-users-persistence-strategy-fs"
+import { RusenderEmailStrategy } from "@ordo-pink/backend-email-strategy-rusender"
 
 const {
 	ID_USER_REPOSITORY,
@@ -90,7 +90,7 @@ const main = async () => {
 					tableName: ID_USER_TABLE_NAME,
 			  })
 			: FSUserRepository.of("./var/srv/id/users.json")
-	const emailRepository = RusenderEmailRepository.of(ID_EMAIL_API_KEY)
+	const emailRepository = RusenderEmailStrategy.of(ID_EMAIL_API_KEY)
 
 	const app = await createIDServer({
 		userRepository,

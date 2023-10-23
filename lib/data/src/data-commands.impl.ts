@@ -4,13 +4,13 @@
 import { TDataCommands } from "./data-commands.types"
 import { Oath } from "@ordo-pink/oath"
 import { Data } from "./data.impl"
-import { DataRepository } from "./data-repository.types"
+import { DataPersistenceStrategy } from "./data-persistence-strategy.types"
 import { Errors } from "./errors.impl"
-import { ContentRepository } from "./content-repository.types"
+import { ContentPersistenceStrategy } from "./content-persistence-strategy.types"
 
 export type DataCommandsParams<T> = {
-	dataRepository: DataRepository
-	contentRepository: ContentRepository<T>
+	dataRepository: DataPersistenceStrategy
+	contentRepository: ContentPersistenceStrategy<T>
 }
 
 const of = <T>({ dataRepository, contentRepository }: DataCommandsParams<T>): TDataCommands<T> => ({

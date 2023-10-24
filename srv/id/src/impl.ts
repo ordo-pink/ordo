@@ -79,7 +79,7 @@ const main = async () => {
 		namedCurve: "P-384",
 	} as any)
 
-	const tokenRepository = await TokenPersistenceStrategyFS.create("./var/srv/id/tokens.json")
+	const tokenRepository = await TokenPersistenceStrategyFS.of("./var/srv/id/tokens.json")
 	const userRepository =
 		ID_USER_REPOSITORY === "dynamodb"
 			? UserPersistenceStrategyDynamoDB.of({
@@ -103,6 +103,8 @@ const main = async () => {
 		alg: { name: "ECDSA", namedCurve: "P-384", hash: "SHA-384" }, // TODO: Add support for switching to RSA
 		accessTokenExpireIn: Number(ID_ACCESS_TOKEN_EXPIRE_IN),
 		refreshTokenExpireIn: Number(ID_REFRESH_TOKEN_EXPIRE_IN),
+		notificationSender: { name: "Hello at Ordo.pink", email: "hello@ordo.pink" },
+		websiteHost: WEB_HOST,
 	})
 
 	ConsoleLogger.info(`ID server running on http://localhost:${ID_PORT}`)

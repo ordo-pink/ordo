@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: Copyright 2023, 谢尔盖||↓ and the Ordo.pink contributors
+// SPDX-License-Identifier: MIT
+
 import Null from "$components/null"
 import { useChildren } from "$hooks/use-children"
 import { FSID, PlainData } from "@ordo-pink/data"

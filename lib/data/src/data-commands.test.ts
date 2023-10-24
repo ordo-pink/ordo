@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: Copyright 2023, 谢尔盖||↓ and the Ordo.pink contributors
+// SPDX-License-Identifier: MIT
+
 // import { test, expect, afterEach } from "bun:test"
 // import { DataCommands } from "./data-commands.impl"
 // import { DataRepository } from "./data-repository.types"

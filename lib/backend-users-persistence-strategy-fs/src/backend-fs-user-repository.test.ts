@@ -6,7 +6,7 @@
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 import { test, expect } from "bun:test"
-import { FSUserRepository } from "./backend-fs-user-repository"
+import { FSUserRepository } from "./backend-fs-user-repository.impl"
 import { rmdir0 } from "@ordo-pink/fs"
 import { User } from "@ordo-pink/frontend-core"
 

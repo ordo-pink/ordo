@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: Copyright 2023, 谢尔盖||↓ and the Ordo.pink contributors
+// SPDX-License-Identifier: MIT
+
 import ActionListItem from "$components/action-list-item"
 import { Loading } from "$components/loading/loading"
 import { Either } from "@ordo-pink/either"

@@ -1,7 +1,4 @@
 // SPDX-FileCopyrightText: Copyright 2023, 谢尔盖||↓ and the Ordo.pink contributors
-// SPDX-License-Identifier: MIT
-
-// SPDX-FileCopyrightText: Copyright 2023, 谢尔盖||↓ and the Ordo.pink contributors
 // SPDX-License-Identifier: MPL-2.0
 
 // This Source Code Form is subject to the terms of the Mozilla Public
@@ -24,7 +21,7 @@ import { SUB } from "@ordo-pink/wjwt"
 
 // --- Public ---
 
-const repository: T.Fn = params => ({
+const strategy: T.Fn = params => ({
 	create: create(params),
 	update: update(params),
 	getById: getById(params),
@@ -33,28 +30,24 @@ const repository: T.Fn = params => ({
 	existsByEmail: existsByEmail(params),
 })
 
-export const DynamoDBUserStorageAdapter = {
-	of: ({ awsAccessKeyId, awsSecretKey, region, endpoint, tableName }: T.Config) => {
-		const db = new DynamoDB({
-			credentials: { accessKeyId: awsAccessKeyId, secretAccessKey: awsSecretKey },
-			region,
-			endpoint,
-		})
+export const UserPersistenceStrategyDynamoDB = {
+	of: ({ accessKeyId, secretAccessKey, region, endpoint, tableName }: T.Config) => {
+		const db = new DynamoDB({ credentials: { accessKeyId, secretAccessKey }, region, endpoint })
 
-		return repository({ db, table: tableName })
+		return strategy({ db, table: tableName })
 	},
 }
 
 // --- Internal ---
 
 const existsById: ExistsByIdMethod<T.Params> = params => id =>
-	repository(params)
+	strategy(params)
 		.getById(id)
 		.map(() => true)
 		.fix(() => false)
 
 const existsByEmail: ExistsByEmailMethod<T.Params> = params => email =>
-	repository(params)
+	strategy(params)
 		.getByEmail(email)
 		.map(() => true)
 		.fix(() => false)
@@ -81,7 +74,7 @@ const create: CreateMethod<T.Params> =
 const update: UpdateMethod<T.Params> =
 	({ db, table }) =>
 	(id, user) =>
-		repository({ db, table })
+		strategy({ db, table })
 			.getById(id)
 			.chain(oldUser =>
 				Oath.of({

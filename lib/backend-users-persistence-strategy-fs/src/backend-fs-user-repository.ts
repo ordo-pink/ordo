@@ -1,7 +1,11 @@
 // SPDX-FileCopyrightText: Copyright 2023, 谢尔盖||↓ and the Ordo.pink contributors
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: MPL-2.0
 
-import { UserRepository } from "@ordo-pink/backend-service-user"
+// This Source Code Form is subject to the terms of the Mozilla Public
+// License, v. 2.0. If a copy of the MPL was not distributed with this
+// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+
+import { UserPersistenceStrategy } from "@ordo-pink/backend-service-user"
 import { User } from "@ordo-pink/frontend-core"
 import { readFile0, writeFileRecursive0 } from "@ordo-pink/fs"
 import { Oath } from "@ordo-pink/oath"
@@ -14,7 +18,7 @@ const getUsers0 = (path: string): Oath<User.InternalUser[], Error> =>
 const saveUsers0 = (path: string, data: User.InternalUser[]) =>
 	Oath.try(() => JSON.stringify(data)).chain(file => writeFileRecursive0(path, file, "utf-8"))
 
-const of = (path: string): UserRepository => ({
+const of = (path: string): UserPersistenceStrategy => ({
 	create: user =>
 		getUsers0(path)
 			.chain(users => saveUsers0(path, [...users, user]))

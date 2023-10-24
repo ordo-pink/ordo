@@ -5,12 +5,12 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-import { DynamoDBUserStorageAdapter } from "@ordo-pink/backend-user-persistence-strategy-dynamodb"
+import { UserPersistenceStrategyDynamoDB } from "@ordo-pink/backend-user-persistence-strategy-dynamodb"
 import { createIDServer } from "@ordo-pink/backend-server-id"
 import { getc } from "@ordo-pink/getc"
 import { ConsoleLogger } from "@ordo-pink/logger"
 import { getPrivateKey, getPublicKey } from "./utils/get-key"
-import { MemoryTokenRepository } from "@ordo-pink/backend-token-persistence-strategy-fs"
+import { TokenPersistenceStrategyFS } from "@ordo-pink/backend-token-persistence-strategy-fs"
 import { FSUserRepository } from "@ordo-pink/backend-users-persistence-strategy-fs"
 import { RusenderEmailStrategy } from "@ordo-pink/backend-email-strategy-rusender"
 
@@ -79,14 +79,14 @@ const main = async () => {
 		namedCurve: "P-384",
 	} as any)
 
-	const tokenRepository = await MemoryTokenRepository.create("./var/srv/id/tokens.json")
+	const tokenRepository = await TokenPersistenceStrategyFS.create("./var/srv/id/tokens.json")
 	const userRepository =
 		ID_USER_REPOSITORY === "dynamodb"
-			? DynamoDBUserStorageAdapter.of({
+			? UserPersistenceStrategyDynamoDB.of({
 					region: ID_DYNAMODB_REGION,
 					endpoint: ID_DYNAMODB_ENDPOINT,
-					awsAccessKeyId: ID_DYNAMODB_ACCESS_KEY,
-					awsSecretKey: ID_DYNAMODB_SECRET_KEY,
+					accessKeyId: ID_DYNAMODB_ACCESS_KEY,
+					secretAccessKey: ID_DYNAMODB_SECRET_KEY,
 					tableName: ID_USER_TABLE_NAME,
 			  })
 			: FSUserRepository.of("./var/srv/id/users.json")
@@ -95,7 +95,7 @@ const main = async () => {
 	const app = await createIDServer({
 		userRepository,
 		tokenRepository,
-		emailRepository,
+		emailStrategy: emailRepository,
 		origin: [WEB_HOST, WORKSPACE_HOST],
 		accessKeys: { privateKey: accessTokenPrivateKey, publicKey: accessTokenPublicKey },
 		refreshKeys: { privateKey: refreshTokenPrivateKey, publicKey: refreshTokenPublicKey },

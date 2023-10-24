@@ -9,19 +9,19 @@ import { randomUUID } from "crypto"
 import { WJWT } from "@ordo-pink/wjwt"
 
 import { Oath } from "@ordo-pink/oath"
-import { TTokenService, TokenRepository, TokenServiceOptions } from "./types"
+import { TTokenService, TokenPersistenceStrategy, TokenServiceOptions } from "./types"
 import { Switch } from "@ordo-pink/switch"
 import { UUIDv4 } from "@ordo-pink/tau"
 
-type Params = { repository: TokenRepository; options: TokenServiceOptions }
+type Params = { persistenceStrategy: TokenPersistenceStrategy; options: TokenServiceOptions }
 
 /**
  * Creates a `TokenService` from given TokenStorageAdapter and `TokenService` options.
- * @see TokenRepository
+ * @see TokenPersistenceStrategy
  * @see TokenServiceOptions
  * @see of
  */
-const of = ({ repository, options }: Params): TTokenService => {
+const of = ({ persistenceStrategy, options }: Params): TTokenService => {
 	const refreshWJWT = WJWT({
 		alg: options.alg,
 		privateKey: options.keys.refresh.privateKey,
@@ -40,7 +40,7 @@ const of = ({ repository, options }: Params): TTokenService => {
 			.default(() => accessWJWT)
 
 	return {
-		repository,
+		persistenceStrategy,
 		verifyToken: (token, type) =>
 			wjwt(type)
 				.verify0(token)
@@ -57,7 +57,7 @@ const of = ({ repository, options }: Params): TTokenService => {
 				)
 				.chain(token => wjwt(type).decode0(token))
 				.map(jwt => jwt.payload as any)
-				.chain(payload => repository.getToken(payload.sub, payload.jti).map(() => payload))
+				.chain(payload => persistenceStrategy.getToken(payload.sub, payload.jti).map(() => payload))
 				.fix(() => null),
 		decode: token =>
 			wjwt("access")
@@ -86,12 +86,12 @@ const of = ({ repository, options }: Params): TTokenService => {
 					}),
 				}).chain(res =>
 					prevJti
-						? repository
+						? persistenceStrategy
 								.removeToken(sub, prevJti)
-								.chain(() => repository.setToken(sub, jti, res.tokens.refresh))
+								.chain(() => persistenceStrategy.setToken(sub, jti, res.tokens.refresh))
 								.map(() => res as any)
 						: Oath.empty()
-								.chain(() => repository.setToken(sub, jti, res.tokens.refresh))
+								.chain(() => persistenceStrategy.setToken(sub, jti, res.tokens.refresh))
 								.map(() => res),
 				),
 			),

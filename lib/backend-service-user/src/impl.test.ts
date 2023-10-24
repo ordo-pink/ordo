@@ -5,9 +5,6 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-// SPDX-FileCopyrightText: Copyright 2023, 谢尔盖||↓ and the Ordo.pink contributors
-// SPDX-License-Identifier: MIT
-
 import { test, expect } from "bun:test"
 
 test("mock", () => expect(true).toBeTrue())

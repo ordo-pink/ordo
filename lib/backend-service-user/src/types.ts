@@ -9,7 +9,7 @@ import { Method, Nullable } from "@ordo-pink/tau"
 import { Oath } from "@ordo-pink/oath"
 import { User } from "@ordo-pink/frontend-core"
 
-export type UserRepository = {
+export type UserPersistenceStrategy = {
 	existsById: (id: string) => Oath<boolean, Error>
 	existsByEmail: (email: string) => Oath<boolean, Error>
 	create(user: User.InternalUser): Oath<User.InternalUser, Error>
@@ -19,9 +19,9 @@ export type UserRepository = {
 	// remove: (id: string) => Promise<Nullable<InternalUser>>
 }
 
-export type CreateMethod<P> = Method<P, UserRepository, "create">
-export type GetByEmailMethod<P> = Method<P, UserRepository, "getByEmail">
-export type GetByIdMethod<P> = Method<P, UserRepository, "getById">
-export type ExistsByEmailMethod<P> = Method<P, UserRepository, "existsByEmail">
-export type ExistsByIdMethod<P> = Method<P, UserRepository, "existsById">
-export type UpdateMethod<P> = Method<P, UserRepository, "update">
+export type CreateMethod<P> = Method<P, UserPersistenceStrategy, "create">
+export type GetByEmailMethod<P> = Method<P, UserPersistenceStrategy, "getByEmail">
+export type GetByIdMethod<P> = Method<P, UserPersistenceStrategy, "getById">
+export type ExistsByEmailMethod<P> = Method<P, UserPersistenceStrategy, "existsByEmail">
+export type ExistsByIdMethod<P> = Method<P, UserPersistenceStrategy, "existsById">
+export type UpdateMethod<P> = Method<P, UserPersistenceStrategy, "update">

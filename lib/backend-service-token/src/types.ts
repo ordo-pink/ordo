@@ -38,14 +38,13 @@ export type JWAT = JWT<AccessTokenPayload>
 export type JWRT = JWT<RefreshTokenPayload>
 
 /**
- * Token storage adapter is used as an adapter over a database driver that provides a small set of
- * specific methods that can TokenService will use to store required data. This type defines the
- * list of methods and type-level implementation details of what TokenService provides and what it
- * expects to get back.
+ * `DataPersistenceStrategy` provides a set of methods used by the `DataService` to persist user
+ * authentication history.
  */
-export type TokenRepository = {
+export type TokenPersistenceStrategy = {
 	/**
 	 * Get token associated with given user id and token id.
+	 *
 	 * @rejects with `Error` if a database error occurs. Resolves with a token.
 	 * @resolves with `null` if no reference to given user id is persisted.
 	 * @resolves with `null` if token was not found.
@@ -55,6 +54,7 @@ export type TokenRepository = {
 
 	/**
 	 * Get an object that contains mapping of JTIs to corresponding tokens.
+	 *
 	 * @rejects with `Error` if a database error occurs.
 	 * @resolves with `null` if no reference to given user id is persisted.
 	 * @resolves with a record of JTIs to corresponding tokens.
@@ -63,6 +63,7 @@ export type TokenRepository = {
 
 	/**
 	 * Remove a token associated with given user id and token id.
+	 *
 	 * @rejects with `Error` if a database error occurs.
 	 * @resolves with "OK" if user's token record did not contain the token hence it was not removed.
 	 * @resolves with "OK".
@@ -71,6 +72,7 @@ export type TokenRepository = {
 
 	/**
 	 * Remove token record of a user under given user id.
+	 *
 	 * @rejects with `Error` if a database error occurs.
 	 * @resolves with "OK".
 	 */
@@ -78,6 +80,7 @@ export type TokenRepository = {
 
 	/**
 	 * Set a token for given user id and token id.
+	 *
 	 * @rejects with `Error` if a database error occurs.
 	 * @resolves with "OK".
 	 */
@@ -85,6 +88,7 @@ export type TokenRepository = {
 
 	/**
 	 * Set token record for a user under given user id.
+	 *
 	 * @rejects with `Error` if a database error occurs.
 	 * @resolves with "OK"
 	 */
@@ -149,5 +153,5 @@ export type TTokenService = {
 		Oath<RefreshTokenPayload & { tokens: { access: string; refresh: string } }, Error>
 	>
 
-	repository: TokenRepository
+	persistenceStrategy: TokenPersistenceStrategy
 }

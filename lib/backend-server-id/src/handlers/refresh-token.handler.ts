@@ -28,7 +28,7 @@ export const handleRefreshToken: Fn =
 				Oath.reject(HttpError.BadRequest("Missing required cookies")),
 		})
 			.chain(({ sub, prevJti }) =>
-				tokenService.repository
+				tokenService.persistenceStrategy
 					.getToken(sub, prevJti!)
 					.rejectedMap(() => HttpError.NotFound("Token not found"))
 					.chain(token =>

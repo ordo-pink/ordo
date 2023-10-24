@@ -12,7 +12,7 @@ import { sendError, parseBody0 } from "@ordo-pink/backend-utils"
 import { Oath } from "@ordo-pink/oath"
 import { prop } from "ramda"
 import { HttpError } from "@ordo-pink/rrr"
-import { TOfflineNotificationService } from "@ordo-pink/backend-service-offline-notification"
+import { TNotificationService } from "@ordo-pink/backend-service-notification"
 
 // --- Public ---
 
@@ -20,12 +20,12 @@ type Body = { email?: string; password?: string }
 type Params = {
 	userService: UserService
 	tokenService: TTokenService
-	emailService: TOfflineNotificationService
+	notificationService: TNotificationService
 }
 type Fn = (params: Params) => Middleware
 
 export const handleSignIn: Fn =
-	({ userService, tokenService, emailService }) =>
+	({ userService, tokenService, notificationService }) =>
 	ctx =>
 		parseBody0<Body>(ctx)
 			.chain(({ email, password }) =>
@@ -69,7 +69,7 @@ export const handleSignIn: Fn =
 							),
 					)
 					.tap(() =>
-						emailService.sendSuccessfulSignInNotification({
+						notificationService.sendSignInNotification({
 							email: user.email,
 							name: user.firstName ?? "",
 							ip: ctx.request.ip,

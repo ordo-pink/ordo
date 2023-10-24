@@ -5,8 +5,8 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-import { TokenRepository, TokenService } from "@ordo-pink/backend-service-token"
-import { UserRepository, UserService } from "@ordo-pink/backend-service-user"
+import { TokenPersistenceStrategy, TokenService } from "@ordo-pink/backend-service-token"
+import { UserPersistenceStrategy, UserService } from "@ordo-pink/backend-service-user"
 import { ConsoleLogger, Logger } from "@ordo-pink/logger"
 import { createServer } from "@ordo-pink/backend-utils"
 
@@ -22,14 +22,15 @@ import { handleSignIn } from "./handlers/sign-in.handler"
 import { handleSignUp } from "./handlers/sign-up.handler"
 import { Algorithm } from "@ordo-pink/wjwt"
 import {
+	EmailContact,
 	EmailStrategy,
-	OfflineNotificationService,
-} from "@ordo-pink/backend-service-offline-notification"
+	NotificationService,
+} from "@ordo-pink/backend-service-notification"
 
 export type CreateIDServerFnParams = {
-	userRepository: UserRepository
-	tokenRepository: TokenRepository
-	emailRepository: EmailStrategy
+	userRepository: UserPersistenceStrategy
+	tokenRepository: TokenPersistenceStrategy
+	emailStrategy: EmailStrategy
 	accessTokenExpireIn: number
 	refreshTokenExpireIn: number
 	saltRounds: number
@@ -38,12 +39,14 @@ export type CreateIDServerFnParams = {
 	accessKeys: CryptoKeyPair
 	refreshKeys: CryptoKeyPair
 	logger?: Logger
+	websiteHost: string
+	notificationSender: EmailContact
 }
 
 export const createIDServer = async ({
 	userRepository,
 	tokenRepository,
-	emailRepository,
+	emailStrategy,
 	origin,
 	accessTokenExpireIn,
 	refreshTokenExpireIn,
@@ -51,12 +54,19 @@ export const createIDServer = async ({
 	refreshKeys,
 	saltRounds,
 	logger = ConsoleLogger,
+	websiteHost,
+	notificationSender,
 	alg,
 }: CreateIDServerFnParams) => {
 	const userService = await UserService.of(userRepository, { saltRounds })
-	const emailService = OfflineNotificationService.of(emailRepository)
+	const notificationService = NotificationService.of({
+		emailStrategy,
+		websiteHost,
+		sender: notificationSender,
+	})
+
 	const tokenService = TokenService.of({
-		repository: tokenRepository,
+		persistenceStrategy: tokenRepository,
 		options: {
 			accessTokenExpireIn,
 			refreshTokenExpireIn,
@@ -66,7 +76,7 @@ export const createIDServer = async ({
 		},
 	})
 
-	const ctx = { userService, tokenService, emailService }
+	const ctx = { userService, tokenService, notificationService }
 
 	return createServer({
 		origin,
@@ -84,9 +94,11 @@ export const createIDServer = async ({
 				.patch("/change-email", handleChangeEmail(ctx))
 				.patch("/change-password", handleChangePassword(ctx))
 				.post("/verify-token", handleVerifyToken(ctx)),
-		// .get("/send-activation-email/:email", () => {})
-		// .get("/send-forgot-password-email/:email", () => {})
-		// .get("/activate", () => {})
-		// .get("/forgot-password", () => {})
+		// .get("/verify-email", () => {})
+		// .post("/send-activation-email/:email", () => {})
+		// .post("/send-forgot-password-email/:email", () => {})
+		// .post("/activate", () => {})
+		// .post("/restore-password", () => {})
+		// .post("/reset-password", () => {})
 	})
 }

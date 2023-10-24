@@ -5,7 +5,7 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-import type { UserRepository } from "./types"
+import type { UserPersistenceStrategy } from "./types"
 import { hash, compare, genSalt } from "bcryptjs"
 import crypto from "crypto"
 import { Oath } from "@ordo-pink/oath"
@@ -17,24 +17,24 @@ export type UserServiceOptions = {
 }
 
 export class UserService {
-	#driver: UserRepository
+	#persistenceStrategy: UserPersistenceStrategy
 	#salt: string
 
-	public static async of(driver: UserRepository, options: UserServiceOptions) {
+	public static async of(driver: UserPersistenceStrategy, options: UserServiceOptions) {
 		const salt = await genSalt(options.saltRounds)
 
 		return new UserService(driver, salt)
 	}
 
-	protected constructor(driver: UserRepository, salt: string) {
-		this.#driver = driver
+	protected constructor(driver: UserPersistenceStrategy, salt: string) {
+		this.#persistenceStrategy = driver
 		this.#salt = salt
 	}
 
 	public createUser(email: string, password: string) {
 		return Oath.from(() => hash(password, this.#salt))
 			.chain(password =>
-				this.#driver.create({
+				this.#persistenceStrategy.create({
 					id: crypto.randomUUID() as UUIDv4,
 					email,
 					password,
@@ -49,7 +49,7 @@ export class UserService {
 	}
 
 	public updateUserPassword(user: User.User, oldPassword: string, newPassword: string) {
-		return this.#driver.getById(user.id).chain(oldUser =>
+		return this.#persistenceStrategy.getById(user.id).chain(oldUser =>
 			Oath.from(() => compare(oldPassword, oldUser.password))
 				.chain(valid =>
 					Oath.fromBoolean(
@@ -67,29 +67,31 @@ export class UserService {
 							} as User.InternalUser),
 					),
 				)
-				.chain(user => this.#driver.update(oldUser.id, user).rejectedMap(() => "User not found"))
+				.chain(user =>
+					this.#persistenceStrategy.update(oldUser.id, user).rejectedMap(() => "User not found"),
+				)
 				.map(user => this.serialize(user)),
 		)
 	}
 
 	public update(id: string, user: Partial<User.User>) {
-		return this.#driver.update(id, user).map(user => this.serialize(user))
+		return this.#persistenceStrategy.update(id, user).map(user => this.serialize(user))
 	}
 
 	public getByEmail(email: string) {
-		return this.#driver.getByEmail(email).map(user => this.serialize(user))
+		return this.#persistenceStrategy.getByEmail(email).map(user => this.serialize(user))
 	}
 
 	public getUserInfo(email: string) {
-		return this.#driver.getByEmail(email).map(user => this.serializePublic(user))
+		return this.#persistenceStrategy.getByEmail(email).map(user => this.serializePublic(user))
 	}
 
 	public getById(id: string) {
-		return this.#driver.getById(id).map(user => this.serialize(user))
+		return this.#persistenceStrategy.getById(id).map(user => this.serialize(user))
 	}
 
 	public comparePassword(email: string, password: string) {
-		return this.#driver
+		return this.#persistenceStrategy
 			.getByEmail(email)
 			.chain(user => Oath.from(() => compare(password, user.password)))
 			.chain(x =>

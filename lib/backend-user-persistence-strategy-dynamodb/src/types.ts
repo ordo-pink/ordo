@@ -1,7 +1,4 @@
 // SPDX-FileCopyrightText: Copyright 2023, 谢尔盖||↓ and the Ordo.pink contributors
-// SPDX-License-Identifier: MIT
-
-// SPDX-FileCopyrightText: Copyright 2023, 谢尔盖||↓ and the Ordo.pink contributors
 // SPDX-License-Identifier: MPL-2.0
 
 // This Source Code Form is subject to the terms of the Mozilla Public
@@ -10,18 +7,18 @@
 
 import { DynamoDB } from "aws-sdk"
 import type { Unary } from "@ordo-pink/tau"
-import type { UserRepository } from "@ordo-pink/backend-service-user"
+import type { UserPersistenceStrategy } from "@ordo-pink/backend-service-user"
 import { User } from "@ordo-pink/frontend-core"
 
 // --- Public ---
 
 export type Params = { db: DynamoDB; table: string }
-export type Fn = (params: Params) => UserRepository
+export type Fn = (params: Params) => UserPersistenceStrategy
 export type Config = {
 	region: string
 	endpoint: string
-	awsAccessKeyId: string
-	awsSecretKey: string
+	accessKeyId: string
+	secretAccessKey: string
 	tableName: string
 }
 

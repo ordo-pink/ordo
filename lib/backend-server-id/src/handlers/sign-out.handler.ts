@@ -22,7 +22,7 @@ export const handleSignOut: Fn =
 			sub: Oath.fromNullable(ctx.cookies.get("sub") as SUB),
 			jti: Oath.fromNullable(ctx.cookies.get("jti") as JTI),
 		})
-			.chain(({ sub, jti }) => tokenService.repository.removeToken(sub, jti))
+			.chain(({ sub, jti }) => tokenService.persistenceStrategy.removeToken(sub, jti))
 			.fix(() => "OK")
 			.tap(expires => {
 				ctx.response.set("Set-Cookie", `jti=; Expires=Thu, 01 Jan 1970 00:00:01 GMT;`)

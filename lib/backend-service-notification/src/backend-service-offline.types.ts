@@ -1,10 +1,14 @@
 // SPDX-FileCopyrightText: Copyright 2023, 谢尔盖||↓ and the Ordo.pink contributors
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: MPL-2.0
+
+// This Source Code Form is subject to the terms of the Mozilla Public
+// License, v. 2.0. If a copy of the MPL was not distributed with this
+// file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 /**
  * From/to.
  */
-export type EmailAddressee = {
+export type EmailContact = {
 	/**
 	 * Email address.
 	 */
@@ -23,12 +27,12 @@ export type EmailHead = {
 	/**
 	 * Email addressor.
 	 */
-	from: EmailAddressee
+	from: EmailContact
 
 	/**
 	 * Email addressee.
 	 */
-	to: EmailAddressee
+	to: EmailContact
 
 	/**
 	 * Email subject.
@@ -104,14 +108,52 @@ export type EmailStrategy = {
 	send: (params: EmailParams) => void
 }
 
-export type SendSuccessfulSignInNotificationParams = EmailAddressee & {
+export type SendSignInNotificationParams = EmailContact & {
 	/**
 	 * The IP address from which the sign in happened.
 	 */
 	ip: string
 }
 
-export type TOfflineNotificationService = {
+/**
+ * `NotificationStrategy` provides a set of methods for notifying users via external means (e.g.
+ * email, SMS, etc.).
+ */
+export type TNotificationService = {
+	/**
+	 * Direct access to `EmailStrategy`.
+	 *
+	 * @see EmailStrategy
+	 */
 	emailStrategy: EmailStrategy
-	sendSuccessfulSignInNotification: (params: SendSuccessfulSignInNotificationParams) => void
+
+	/**
+	 * Send notification to the user when there is a successful sign-in to their account.
+	 *
+	 * @param params User info needed for creating a sign-in notification.
+	 * @returns void
+	 */
+	sendSignInNotification: (params: SendSignInNotificationParams) => void
+}
+
+/**
+ * `NotificationService` initialisation options.
+ */
+export type InitNotificationServiceOptions = {
+	/**
+	 * `EmailStrategy` for sending emails.
+	 *
+	 * @see EmailStrategy
+	 */
+	emailStrategy: EmailStrategy
+
+	/**
+	 * Information about the notification sender.
+	 */
+	sender: EmailContact
+
+	/**
+	 * Ordo.pink website host for creating links in email templates.
+	 */
+	websiteHost: string
 }

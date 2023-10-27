@@ -10,9 +10,12 @@ export default function Home() {
 		<main className="scroll-smooth">
 			<IndexHeroSection />
 
-			<section id="about" className="shadow-2xl shadow-black dark:shadow-white">
+			<section
+				id="about"
+				className="shadow-2xl shadow-purple-950 dark:shadow-purple-200 from-neutral-200 dark:from-neutral-900 to-neutral-200 dark:to-stone-900"
+			>
 				<CenteredPage centerX>
-					<div className="p-16">
+					<div className="w-full p-16 bg-gradient-to-b">
 						<PageHeader text="Hi, I'm ORDO" />
 					</div>
 				</CenteredPage>

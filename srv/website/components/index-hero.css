@@ -15,7 +15,7 @@
 
 .hero-layer-2 {
 	background-image: url(/index-hero-layer-1.png);
-	transform: translateZ(120px);
+	transform: translateZ(100px);
 }
 
 .hero-layer-3 {

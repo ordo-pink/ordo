@@ -4,6 +4,7 @@
 import { Jost } from "next/font/google"
 import type { Metadata } from "next"
 import "@ordo-pink/css/main.css"
+import "./index.css"
 import "../components/index-hero.css"
 import { AppProps } from "next/app"
 

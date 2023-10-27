@@ -8,20 +8,17 @@
 import type { Readable } from "stream"
 import type { Middleware } from "koa"
 import type { FSID, TDataCommands } from "@ordo-pink/data"
-import type { Nullable, Unary } from "@ordo-pink/tau"
 import { sendError, authenticate0, parseBody0 } from "@ordo-pink/backend-utils"
 import { HttpError } from "@ordo-pink/rrr"
 import { Oath } from "@ordo-pink/oath"
 
-export const handleCreate: Unary<
-	{ dataService: TDataCommands<Readable>; idHost: string },
-	Middleware
-> =
-	({ dataService, idHost }) =>
+type Params = { dataService: TDataCommands<Readable>; idHost: string }
+
+export const handleCreateData =
+	({ dataService, idHost }: Params): Middleware =>
 	ctx =>
 		authenticate0(ctx, idHost)
-			.map(({ payload }) => payload)
-			.chain(payload =>
+			.chain(({ payload }) =>
 				dataService.dataRepository
 					.count(payload.sub)
 					.rejectedMap(() => HttpError.NotFound("User not found"))
@@ -33,7 +30,7 @@ export const handleCreate: Unary<
 					.map(() => payload),
 			)
 			.chain(({ sub, lim }) =>
-				parseBody0<{ name: string; parent: Nullable<FSID>; fsid?: FSID; labels?: string[] }>(
+				parseBody0<{ name: string; parent: FSID | null; fsid?: FSID; labels?: string[] }>(
 					ctx,
 				).chain(({ name, parent, fsid, labels }) =>
 					Oath.of(ctx.params.userId).chain(() =>

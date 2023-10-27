@@ -10,26 +10,44 @@ import type { Middleware } from "koa"
 import type { FSID, TDataCommands } from "@ordo-pink/data"
 import type { Unary } from "@ordo-pink/tau"
 import type { SUB } from "@ordo-pink/wjwt"
-import { sendError, authenticate0, parseBody0 } from "@ordo-pink/backend-utils"
+import { sendError, authenticate0 } from "@ordo-pink/backend-utils"
 import { HttpError } from "@ordo-pink/rrr"
 import { Oath } from "@ordo-pink/oath"
 
-export const handleLink: Unary<
+export const handleUploadContent: Unary<
 	{ dataService: TDataCommands<Readable>; idHost: string },
 	Middleware
 > =
 	({ dataService, idHost }) =>
 	ctx =>
 		authenticate0(ctx, idHost)
-			.map(({ payload }) => payload)
-			.chain(({ sub }) =>
-				parseBody0<{ link: FSID }>(ctx).chain(body =>
-					Oath.of({ fsid: ctx.params.fsid as FSID, createdBy: ctx.params.userId as SUB }).chain(
-						({ fsid, createdBy }) =>
+			.chain(({ payload }) =>
+				Oath.fromNullable(ctx.req.headers["content-length"]).bimap(
+					() => HttpError.UnprocessableEntity("Unknown size"),
+					() => payload,
+				),
+			)
+			.chain(
+				Oath.ifElse(
+					payload => Number(ctx.req.headers["content-length"]) / 1024 / 1024 > payload.fms,
+					{ onFalse: () => HttpError.PayloadTooLarge("File too large") },
+				),
+			)
+			.chain(({ sub, lim }) =>
+				Oath.of({ name: ctx.params.name as string, createdBy: ctx.params.userId as SUB }).chain(
+					({ name, createdBy }) =>
+						Oath.of((ctx.get("ordo-parent") as FSID) || null).chain(parent =>
 							dataService
-								.link({ fsid, createdBy, updatedBy: sub, link: body.link })
+								.uploadContent({
+									name,
+									parent,
+									createdBy,
+									updatedBy: sub,
+									content: ctx.request.req,
+									fileLimit: lim,
+								})
 								.rejectedMap(HttpError.NotFound),
-					),
+						),
 				),
 			)
 			.fork(sendError(ctx), result => {

@@ -159,6 +159,7 @@ const of = (
 			.rejectedMap(rrrToNotification("Error creating file"))
 			.fork(
 				item => {
+					data$.next(data)
 					commands.emit<cmd.notification.show>("notification.show", item)
 				},
 				() => {

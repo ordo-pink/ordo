@@ -14,15 +14,14 @@ import { sendError, authenticate0 } from "@ordo-pink/backend-utils"
 import { HttpError } from "@ordo-pink/rrr"
 import { Oath } from "@ordo-pink/oath"
 
-export const handleRemove: Unary<
+export const handleRemoveData: Unary<
 	{ dataService: TDataCommands<Readable>; idHost: string },
 	Middleware
 > =
 	({ dataService, idHost }) =>
 	ctx =>
 		authenticate0(ctx, idHost)
-			.map(({ payload }) => payload)
-			.chain(({ sub }) =>
+			.chain(() =>
 				Oath.of({ fsid: ctx.params.fsid as FSID, createdBy: ctx.params.userId as SUB }).chain(
 					({ fsid, createdBy }) =>
 						dataService.remove({ fsid, createdBy }).rejectedMap(HttpError.NotFound),

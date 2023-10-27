@@ -7,14 +7,14 @@
 
 import type { Readable } from "stream"
 import type { Middleware } from "koa"
-import type { FSID, TDataCommands } from "@ordo-pink/data"
+import type { FSID, PlainData, TDataCommands } from "@ordo-pink/data"
 import type { Unary } from "@ordo-pink/tau"
 import type { SUB } from "@ordo-pink/wjwt"
 import { sendError, authenticate0, parseBody0 } from "@ordo-pink/backend-utils"
 import { HttpError } from "@ordo-pink/rrr"
 import { Oath } from "@ordo-pink/oath"
 
-export const handleRemoveLabel: Unary<
+export const handleUpdateData: Unary<
 	{ dataService: TDataCommands<Readable>; idHost: string },
 	Middleware
 > =
@@ -23,11 +23,11 @@ export const handleRemoveLabel: Unary<
 		authenticate0(ctx, idHost)
 			.map(({ payload }) => payload)
 			.chain(({ sub }) =>
-				parseBody0<{ label: string }>(ctx).chain(body =>
+				parseBody0<PlainData>(ctx).chain(data =>
 					Oath.of({ fsid: ctx.params.fsid as FSID, createdBy: ctx.params.userId as SUB }).chain(
 						({ fsid, createdBy }) =>
 							dataService
-								.removeLabel({ fsid, createdBy, updatedBy: sub, label: body.label })
+								.update({ fsid, createdBy, updatedBy: sub, data })
 								.rejectedMap(HttpError.NotFound),
 					),
 				),

@@ -8,15 +8,13 @@
 import type { Readable } from "stream"
 import type { Middleware } from "koa"
 import type { TDataCommands } from "@ordo-pink/data"
-import type { Unary } from "@ordo-pink/tau"
 import { sendError, authenticate0 } from "@ordo-pink/backend-utils"
 import { HttpError } from "@ordo-pink/rrr"
 
-export const handleFetch: Unary<
-	{ dataService: TDataCommands<Readable>; idHost: string },
-	Middleware
-> =
-	({ dataService, idHost }) =>
+type Params = { dataService: TDataCommands<Readable>; idHost: string }
+
+export const handleGetAllData =
+	({ dataService, idHost }: Params): Middleware =>
 	ctx =>
 		authenticate0(ctx, idHost)
 			.map(({ payload }) => payload)

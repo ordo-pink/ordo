@@ -21,8 +21,7 @@ export const handleSetContent: Unary<
 	({ dataService, idHost }) =>
 	ctx =>
 		authenticate0(ctx, idHost)
-			.map(({ payload }) => payload)
-			.chain(payload =>
+			.chain(({ payload }) =>
 				Oath.fromNullable(ctx.req.headers["content-length"]).bimap(
 					() => HttpError.UnprocessableEntity("Unknown size"),
 					() => payload,

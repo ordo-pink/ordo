@@ -1,20 +1,9 @@
-const TEXT_ELEMENT = "TEXT_ELEMENT"
-
-const createTextElement = (text: string | number) => ({
-	type: TEXT_ELEMENT,
-	props: { nodeValue: text, children: [] },
-})
-
-export const h = (...args: any[]) => {
-	console.log(args)
-}
-
-export const Fragment = (...args: any[]) => {
-	console.log("Fragment", args)
-}
-
-export const jsxDEV = (type: string, props: Record<string, any> | null, ...children: any[]) => {
-	console.log(type, props, children)
+export const h = (
+	type: string | Function,
+	props: Record<string, any> | null,
+	...children: any[]
+) => {
+	type = typeof type === "function" ? type().type : type
 
 	return {
 		type,
@@ -27,21 +16,79 @@ export const jsxDEV = (type: string, props: Record<string, any> | null, ...child
 	}
 }
 
-export const render = (element: any, container: any) => {
+export const Fragment = (...args: any[]) => {
+	console.log("Fragment", args)
+}
+
+export const jsxDEV = (
+	type: string | Function,
+	props: Record<string, any> | null,
+	...children: any[]
+) => {
+	type = typeof type === "function" ? type().type : type
+
+	return {
+		type,
+		props: {
+			...props,
+			children: children.map(child =>
+				typeof child === "object" ? child : createTextElement(child),
+			),
+		},
+	}
+}
+
+const TEXT_ELEMENT = "TEXT_ELEMENT"
+
+const createTextElement = (text: string | number) => ({
+	type: TEXT_ELEMENT,
+	props: { nodeValue: text, children: [] },
+})
+
+export const render = (el: Element, container: any) => {
 	const dom =
-		element.type == "TEXT_ELEMENT"
-			? document.createTextNode("")
-			: document.createElement(element.type)
+		el.type == "TEXT_ELEMENT"
+			? document.createTextNode(el.props.nodeValue)
+			: document.createElement(el.type)
 
-	element.props.children.forEach(child => render(child, dom))
+	console.log(el)
 
-	const isProperty = (key: string) => key !== "children"
+	el.props.children.forEach(child => render(child, dom))
 
-	Object.keys(element.props)
+	const isProperty = key => key !== "children"
+
+	Object.keys(el.props)
 		.filter(isProperty)
 		.forEach(name => {
-			dom[name] = element.props[name]
+			dom[name.toLowerCase()] = el.props[name]
 		})
 
 	container.appendChild(dom)
 }
+
+interface Element {
+	type: string
+	props: {
+		children: Element[]
+		[key: string]: any
+	}
+}
+
+// export const render = (element: any, container: any) => {
+// 	const dom =
+// 		element.type == "TEXT_ELEMENT"
+// 			? document.createTextNode("")
+// 			: document.createElement(element.type)
+
+// 	element.props.children.forEach(child => render(child, dom))
+
+// 	const isProperty = (key: string) => key !== "children"
+
+// 	Object.keys(element.props)
+// 		.filter(isProperty)
+// 		.forEach(name => {
+// 			dom[name] = element.props[name]
+// 		})
+
+// 	container.appendChild(dom)
+// }

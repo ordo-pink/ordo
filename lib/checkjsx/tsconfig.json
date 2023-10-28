@@ -3,8 +3,6 @@
 		"lib": ["esnext", "dom", "dom.iterable"],
 		"allowJs": true,
 		"jsx": "react",
-		"jsxFactory": "h",
-		"jsxFragmentFactory": "Fragment",
 		"jsxImportSource": "../maoka",
 		"esModuleInterop": true,
 		"allowSyntheticDefaultImports": true,

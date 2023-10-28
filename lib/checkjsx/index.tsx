@@ -1,6 +1,8 @@
 // SPDX-FileCopyrightText: Copyright 2023, 谢尔盖||↓ and the Ordo.pink contributors
 // SPDX-License-Identifier: MIT
 
+import { BehaviorSubject } from "rxjs"
+
 const TEXT_ELEMENT = "TEXT_ELEMENT"
 
 const createTextElement = (text: string | number) => ({
@@ -8,26 +10,10 @@ const createTextElement = (text: string | number) => ({
 	props: { nodeValue: text, children: [] },
 })
 
-const render = (element: any, container: any) => {
-	const dom =
-		element.type == "TEXT_ELEMENT"
-			? document.createTextNode("")
-			: document.createElement(element.type)
+const h = (type: string | Function, props: Record<string, any> | null, ...children: any[]) => {
+	if (typeof type === "function") return type()
 
-	element.props.children.forEach(child => render(child, dom))
-
-	const isProperty = key => key !== "children"
-	Object.keys(element.props)
-		.filter(isProperty)
-		.forEach(name => {
-			dom[name] = element.props[name]
-		})
-
-	container.appendChild(dom)
-}
-
-const h = (type: string, props: Record<string, any> | null, ...children: any[]) => {
-	return {
+	const result = {
 		type,
 		props: {
 			...props,
@@ -36,13 +22,50 @@ const h = (type: string, props: Record<string, any> | null, ...children: any[]) 
 			),
 		},
 	}
+
+	console.log(result)
+
+	return result
 }
 
+interface Element {
+	type: string
+	props: {
+		children: Element[]
+		[key: string]: any
+	}
+}
+
+const render = (el: Element, container: any) => {
+	const dom =
+		el.type == "TEXT_ELEMENT"
+			? document.createTextNode(el.props.nodeValue)
+			: document.createElement(el.type)
+
+	console.log(el)
+
+	el.props.children.forEach(child => render(child, dom))
+
+	const isProperty = key => key !== "children"
+
+	Object.keys(el.props)
+		.filter(isProperty)
+		.forEach(name => {
+			dom[name.toLowerCase()] = el.props[name]
+		})
+
+	container.appendChild(dom)
+}
+
+/** @jsx h */
 const Component = () => {
+	const value$ = new BehaviorSubject(0)
+
 	return (
 		<div>
-			<button onClick={console.log}>hello 1</button>
-			<div>hello 2</div>
+			<div>Counter: {value$.value}</div>
+			<button onClick={() => value$.next(value$.value - 1)}>-</button>
+			<button onClick={() => value$.next(value$.value + 1)}>+</button>
 		</div>
 	)
 }

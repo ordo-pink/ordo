@@ -5,13 +5,16 @@ import { BehaviorSubject } from "rxjs"
 
 const TEXT_ELEMENT = "TEXT_ELEMENT"
 
+// bun run.ts
+// bun build index.tsx --outfile index.js --watch
+
 const createTextElement = (text: string | number) => ({
 	type: TEXT_ELEMENT,
 	props: { nodeValue: text, children: [] },
 })
 
 const h = (type: string | Function, props: Record<string, any> | null, ...children: any[]) => {
-	if (typeof type === "function") return type()
+	if (typeof type === "function") return type(props)
 
 	const result = {
 		type,
@@ -22,8 +25,6 @@ const h = (type: string | Function, props: Record<string, any> | null, ...childr
 			),
 		},
 	}
-
-	console.log(result)
 
 	return result
 }
@@ -42,8 +43,6 @@ const render = (el: Element, container: any) => {
 			? document.createTextNode(el.props.nodeValue)
 			: document.createElement(el.type)
 
-	console.log(el)
-
 	el.props.children.forEach(child => render(child, dom))
 
 	const isProperty = key => key !== "children"
@@ -57,9 +56,9 @@ const render = (el: Element, container: any) => {
 	container.appendChild(dom)
 }
 
-/** @jsx h */
-const Component = () => {
-	const value$ = new BehaviorSubject(0)
+type P = { initialValue: number }
+const Component = ({ initialValue }: P) => {
+	const value$ = new BehaviorSubject(initialValue)
 
 	return (
 		<div>
@@ -70,4 +69,4 @@ const Component = () => {
 	)
 }
 
-render(<Component />, document.getElementById("app"))
+render(<Component initialValue={2} />, document.getElementById("app"))

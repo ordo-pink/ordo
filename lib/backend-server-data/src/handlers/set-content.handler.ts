@@ -29,7 +29,7 @@ export const handleSetContent: Unary<
 			)
 			.chain(
 				Oath.ifElse(
-					payload => Number(ctx.req.headers["content-length"]) / 1024 / 1024 > payload.fms,
+					payload => Number(ctx.req.headers["content-length"]) / 1024 / 1024 <= payload.fms,
 					{ onFalse: () => HttpError.PayloadTooLarge("File too large") },
 				),
 			)

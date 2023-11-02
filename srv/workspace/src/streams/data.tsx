@@ -14,8 +14,8 @@ import { AuthResponse } from "@ordo-pink/backend-server-id"
 import CreatePageModal from "$components/modals/create-page-modal.component"
 import UploadFilesModal from "$components/modals/upload-files-modal.component"
 import { DataCommands, PlainData } from "@ordo-pink/data"
-import { ClientDataRepository } from "../repositories/client-data-repository.impl"
-import { ClientContentRepository } from "../repositories/client-content-repository"
+import { ClientDataPersistenceStrategy } from "../strategies/client-data-persistence-strategy.impl"
+import { ClientContentPersistenceStrategy } from "../strategies/client-content-persistence-strategy.impl"
 import RemoveFileModal from "$components/modals/remove-page-modal.component"
 import RenameDirectoryModal from "$components/modals/rename-modal.component"
 import {
@@ -38,8 +38,8 @@ type Fn = Unary<Params, __Metadata$>
 export const __initData: Fn = ({ logger, auth$ }) => {
 	logger.debug("Initializing data")
 
-	const dataRepository = ClientDataRepository.of(data$, auth$ as any, commands)
-	const contentRepository = ClientContentRepository.of()
+	const dataRepository = ClientDataPersistenceStrategy.of(data$, auth$ as any, commands)
+	const contentRepository = ClientContentPersistenceStrategy.of(auth$ as any)
 
 	const dataCommands = DataCommands.of({ dataRepository, contentRepository })
 
@@ -139,23 +139,23 @@ export const __initData: Fn = ({ logger, auth$ }) => {
 			.orNothing()
 	})
 
-	commands.on<cmd.data.setChildOrder>("data.set-child-order", ({ payload }) => {
-		const auth = (auth$ as BehaviorSubject<AuthResponse>).value
-		const data = data$.value
+	// commands.on<cmd.data.setChildOrder>("data.set-child-order", ({ payload }) => {
+	// 	const auth = (auth$ as BehaviorSubject<AuthResponse>).value
+	// 	const data = data$.value
 
-		const item = data.find(d => d.fsid === payload.fsid && d.createdBy === auth.sub)
+	// 	const item = data.find(d => d.fsid === payload.fsid && d.createdBy === auth.sub)
 
-		if (!item) return
+	// 	if (!item) return
 
-		dataCommands
-			.update({
-				createdBy: auth.sub,
-				updatedBy: auth.sub,
-				fsid: payload.fsid,
-				data: { ...item, children: payload.children },
-			})
-			.orNothing()
-	})
+	// 	dataCommands
+	// 		.update({
+	// 			createdBy: auth.sub,
+	// 			updatedBy: auth.sub,
+	// 			fsid: payload.fsid,
+	// 			data: { ...item, children: payload.children },
+	// 		})
+	// 		.orNothing()
+	// })
 
 	commands.on<cmd.data.addLabel>("data.add-label", ({ payload }) => {
 		const auth = (auth$ as BehaviorSubject<AuthResponse>).value
@@ -258,6 +258,33 @@ export const __initData: Fn = ({ logger, auth$ }) => {
 		type: "update",
 	})
 
+	commands.on<cmd.data.getFileContent>("data.get-content", ({ payload: { fsid } }) => {
+		const auth = (auth$ as BehaviorSubject<AuthResponse>).value
+
+		dataCommands.getContent({ createdBy: auth.sub, fsid }).fork(
+			() => void 0,
+			value => content$.next(value),
+		)
+	})
+
+	commands.on<cmd.data.setContent>("data.set-content", ({ payload: { content, fsid } }) => {
+		const auth = (auth$ as BehaviorSubject<AuthResponse>).value
+		const data = data$.value
+
+		dataCommands.updateContent({ createdBy: auth.sub, fsid, content, updatedBy: auth.sub }).fork(
+			() => void 0,
+			size => {
+				// TODO: Cleanup and validations
+				const dataCopy = [...data]
+				const currentData = dataCopy.find(item => item.fsid === fsid)
+				const updated = { ...currentData!, updatedAt: Date.now(), size }
+				dataCopy.splice(dataCopy.indexOf(currentData!), 1, updated)
+
+				data$.next(dataCopy)
+			},
+		)
+	})
+
 	commands.on<cmd.data.refreshRoot>("data.refresh-root", () => {
 		const auth = (auth$ as BehaviorSubject<AuthResponse>).value
 
@@ -281,3 +308,4 @@ export const __initData: Fn = ({ logger, auth$ }) => {
 }
 
 const data$ = new BehaviorSubject<PlainData[]>([])
+export const content$ = new BehaviorSubject<string | null>(null)

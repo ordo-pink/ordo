@@ -4,7 +4,7 @@
 import { rrrToNotification } from "$utils/error-to-notification"
 import { Hosts } from "$utils/hosts"
 import { AuthResponse } from "@ordo-pink/backend-server-id"
-import { Data, DataPersistenceStrategy, PlainData } from "@ordo-pink/data"
+import { Data, DataCreateErrors, DataPersistenceStrategy, PlainData } from "@ordo-pink/data"
 import { Commands, cmd } from "@ordo-pink/frontend-core"
 import { Oath } from "@ordo-pink/oath"
 import { BehaviorSubject } from "rxjs"
@@ -19,7 +19,7 @@ const of = (
 		const data = data$.value
 		const auth = auth$.value
 
-		if (!data) return Oath.reject(Data.Errors.DataNotFound)
+		if (!data) return Oath.reject(Data.Errors.DataNotFound as DataCreateErrors)
 
 		data$.next([...data, plain])
 
@@ -171,4 +171,4 @@ const of = (
 	},
 })
 
-export const ClientDataRepository = { of }
+export const ClientDataPersistenceStrategy = { of }

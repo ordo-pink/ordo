@@ -37,6 +37,7 @@ const updateE =
 				size: increment.size,
 				updatedAt: Date.now(),
 				updatedBy: increment.updatedBy,
+				contentType: plain.contentType,
 			}),
 		)
 
@@ -148,7 +149,7 @@ export const Data: DataStatic = {
 	Validations: validations,
 	Errors,
 	of,
-	new: ({ name, parent, createdBy, fsid, labels = [] }) =>
+	new: ({ name, parent, createdBy, fsid, labels = [], contentType = "text/ordo" }) =>
 		validations
 			.isValidNameE(name)
 			.chain(() => validations.isValidParentE(parent))
@@ -168,6 +169,7 @@ export const Data: DataStatic = {
 					createdAt: Date.now(),
 					updatedBy: createdBy,
 					updatedAt: Date.now(),
+					contentType,
 					fsid,
 					labels,
 					links: [],

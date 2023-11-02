@@ -3,12 +3,12 @@
 
 import Head from "next/head"
 import { PageHeader } from "../components/page-header"
-import { CenteredPage } from "../components/centered-page"
+import { Centered } from "../components/centered"
 import SignInForm from "../components/sign-in-form"
 
 export default function SignInPage() {
 	return (
-		<CenteredPage centerX centerY>
+		<Centered centerX centerY>
 			<Head>
 				<title>Ordo.pink | Sign in</title>
 			</Head>
@@ -25,6 +25,6 @@ export default function SignInPage() {
 					/>
 				</section>
 			</div>
-		</CenteredPage>
+		</Centered>
 	)
 }

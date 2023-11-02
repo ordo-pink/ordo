@@ -100,3 +100,17 @@ body {
 a {
 	@apply underline text-sky-500 visited:text-purple-500 active:text-rose-500;
 }
+
+*::-webkit-scrollbar {
+	width: 5px;
+	height: 5px;
+	@apply bg-transparent transition-colors duration-300;
+}
+
+*::-webkit-scrollbar-thumb {
+	@apply invisible rounded-lg bg-neutral-300 dark:bg-neutral-600 my-2 transition-all duration-300;
+}
+
+*:hover::-webkit-scrollbar-thumb {
+	@apply visible;
+}

@@ -23,6 +23,7 @@ export type PlainData = {
 	parent: Nullable<FSID>
 	links: FSID[]
 	labels: string[]
+	contentType: string
 	createdAt: number
 	createdBy: UserID
 	updatedAt: number
@@ -49,6 +50,10 @@ export type DataStatic = {
 	Errors: typeof Errors
 	of: (plain: PlainData) => TData
 	new: (
-		params: Pick<PlainData, "name" | "parent" | "createdBy"> & { fsid?: FSID; labels?: string[] },
+		params: Pick<PlainData, "name" | "parent" | "createdBy"> & {
+			fsid?: FSID
+			labels?: string[]
+			contentType?: string
+		},
 	) => TEither<TData, DataError>
 }

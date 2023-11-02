@@ -143,7 +143,7 @@ const of = <T>({ dataRepository, contentRepository }: DataCommandsParams<T>): TD
 			contentRepository
 				.write(createdBy, plain.fsid, content)
 				.chain(size => Data.of(plain).setSize(size, updatedBy).fold(Oath.reject, Oath.resolve))
-				.chain(data => dataRepository.update(data.plain)),
+				.chain(data => dataRepository.update(data.plain).map(() => data.plain.size)),
 		),
 	// TODO: Roll back on error
 	uploadContent: ({ content, createdBy, updatedBy, name, parent, fileLimit }) =>

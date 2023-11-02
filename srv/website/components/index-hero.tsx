@@ -5,13 +5,10 @@
 
 import { useLayoutEffect } from "react"
 import { Button } from "./button"
-import Link from "next/link"
-import { useRouter } from "next/navigation"
-import { EmailInput } from "./input"
+import BetaInvitation from "./beta-invitation.component"
 
-export default function IndexHeroSection() {
-	const router = useRouter()
-
+type P = { webHost: string }
+export default function IndexHeroSection({ webHost }: P) {
 	useLayoutEffect(() => {
 		const listener = (event: MouseEvent) => {
 			Object.assign(document.documentElement, {
@@ -30,7 +27,8 @@ export default function IndexHeroSection() {
 		return () => document.removeEventListener("mousemove", listener)
 	}, [])
 
-	const handleJoinClick = () => router.push("/sign-in")
+	const handleLearnMoreClick = () =>
+		window.scrollTo({ behavior: "smooth", top: window.innerHeight })
 
 	return (
 		<section className="hero-section overflow-hidden">
@@ -57,7 +55,7 @@ export default function IndexHeroSection() {
 
 			<div className="fixed top-0 w-screen h-screen flex items-center justify-center p-4 sm:p-12">
 				<div className="flex w-full justify-between max-w-5xl">
-					<div className="flex flex-col md:flex-row space-y-12 md:space-y-0 md:space-x-24 justify-between items-center w-full px-4 py-8 md:px-24 md:py-20 max-w-5xl backdrop-blur-md bg-gradient-to-br from-sky-950/20 via-indigo-950/20 to-indigo-950/20 shadow-xl rounded-xl">
+					<div className="flex flex-col md:flex-row space-y-12 md:space-y-0 md:space-x-24 justify-between items-center w-full p-4 md:px-24 md:py-20 max-w-5xl backdrop-blur-md bg-gradient-to-br from-sky-950/20 via-indigo-950/20 to-indigo-950/20 shadow-xl rounded-xl">
 						<div className="inset-0 bg-cover bg-center flex flex-col items-center justify-center">
 							<h1 className="text-center text-xl sm:text-2xl uppercase tracking-tight">
 								Bring your thoughts to
@@ -67,27 +65,13 @@ export default function IndexHeroSection() {
 							</h1>
 							<p className="center opacity-75 mt-4">Белогривая лошадка</p>
 							<div className="mt-12 flex space-x-8 items-center">
-								{/* TODO: Transparent button */}
-								<Button onClick={handleJoinClick}>Войти</Button>
-								<Link href="#about">Подробнее</Link>
+								<Button onClick={handleLearnMoreClick}>Подробнее</Button>
+								{/* <Link href="#about">Подробнее</Link> */}
 							</div>
 						</div>
 
-						<div className="flex flex-col w-full max-w-sm space-y-4 px-8 py-4 bg-gradient-to-br from-sky-950 via-indigo-950 to-indigo-950 rounded-xl shadow-lg">
-							<h3 className="text-2xl font-bold">
-								<span className="text-orange-400">pub</span>{" "}
-								<span className="text-orange-400">fn</span> <span className="text-white">teβt</span>
-								<span className="text-purple-400">()</span>{" "}
-								<span className="text-orange-400">&rarr;</span>
-							</h3>
-							<p className="center opacity-75 mt-4">
-								Бета-тестирование <strong>ORDO</strong> вот-вот начнётся!
-							</p>
-							<EmailInput />
-							<Button>Участвовать</Button>
-							<p className="text-xs text-center">
-								Заполняя форму, вы соглашаетесь с <a href="#">политикой конфиденциальности</a>.
-							</p>
+						<div className="max-w-sm">
+							<BetaInvitation webHost={webHost} />
 						</div>
 					</div>
 				</div>

@@ -56,14 +56,15 @@ export default function ActionListItem({
 			<div
 				title={title ?? text}
 				className={`p-2 md:py-0.5 rounded-md flex space-x-8 justify-between items-center select-none ${
-					large && "p-4 md:py-2 text-lg"
+					large ? "p-4 md:py-2 text-lg" : ""
 				} ${
 					disabled
 						? "text-neutral-300 dark:text-neutral-400"
-						: "hover:bg-gradient-to-r from-slate-300/40 dark:from-slate-600 to-slate-300/40 dark:to-gray-600 cursor-pointer ring-0"
+						: "hover:bg-gradient-to-r hover:from-slate-300 hover:dark:from-slate-600 hover:to-slate-300 hover:dark:to-gray-600 cursor-pointer ring-0"
 				} ${
-					current &&
-					"bg-gradient-to-r from-rose-300 dark:from-violet-700 to-purple-300 dark:to-purple-700"
+					current
+						? "bg-gradient-to-r from-rose-300 dark:from-violet-700 to-purple-300 dark:to-purple-700 hover:from-rose-300 hover:dark:from-violet-700 hover:to-purple-300 hover:dark:to-purple-700"
+						: ""
 				}`}
 				style={style}
 				onClick={e => (disabled ? void 0 : onClick(e))}
@@ -91,7 +92,7 @@ export default function ActionListItem({
 				} ${
 					disabled
 						? "text-neutral-300 dark:text-neutral-400"
-						: "hover:bg-gradient-to-r from-rose-300/40 dark:from-slate-600 to-purple-300/40 dark:to-gray-600 cursor-pointer"
+						: "hover:bg-gradient-to-r from-rose-300 dark:from-slate-600 to-purple-300 dark:to-gray-600 cursor-pointer"
 				} ${
 					current &&
 					"bg-gradient-to-r from-rose-300 dark:from-violet-700 to-purple-300 dark:to-purple-700"

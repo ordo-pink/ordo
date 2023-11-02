@@ -16,7 +16,7 @@ export const useDataFind = (selector: (data: PlainData) => boolean) =>
 export const useDataFilter = (selector: (data: PlainData) => boolean) =>
 	useDataSelector(data => data.filter(selector)) ?? []
 
-export const useDataByFSID = (fsid: FSID | null) => useDataFind(item => item.fsid === fsid)
+export const useDataByFSID = (fsid?: FSID | null) => useDataFind(item => item.fsid === fsid)
 
 export const useDataByLabel = (labels: string[]) =>
 	useDataFilter(item => labels.every(label => item.labels.includes(label)))

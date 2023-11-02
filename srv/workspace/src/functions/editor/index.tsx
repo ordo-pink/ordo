@@ -5,6 +5,7 @@ import { Extensions, ComponentSpace, Functions, cmd } from "@ordo-pink/frontend-
 import { Switch } from "@ordo-pink/switch"
 import { BsLayoutTextSidebarReverse } from "react-icons/bs"
 import EditorSidebar from "./components/editor-sidebar.component"
+import EditorWorkspace from "./components/editor-workspace.component"
 
 export default function createEditorFunction({ commands, data$ }: Functions.CreateFunctionParams) {
 	commands.on<cmd.data.uploadContent>
@@ -21,4 +22,4 @@ export default function createEditorFunction({ commands, data$ }: Functions.Crea
 const Component = ({ space }: Extensions.ComponentProps) =>
 	Switch.of(space)
 		.case(ComponentSpace.ICON, () => <BsLayoutTextSidebarReverse />)
-		.default(() => <h1>Hello</h1>)
+		.default(() => <EditorWorkspace />)

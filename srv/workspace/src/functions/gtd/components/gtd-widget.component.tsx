@@ -14,7 +14,7 @@ import { GTDCommands } from "../types"
 import { useInbox } from "../hooks/use-inbox"
 
 export default function GTDWidget() {
-	const { commands, data } = useSharedContext()
+	const { commands } = useSharedContext()
 	const inbox = useInbox()
 	const [newItem, setNewItem] = useState("")
 

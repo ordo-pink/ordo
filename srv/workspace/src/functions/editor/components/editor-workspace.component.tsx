@@ -24,6 +24,7 @@ import {
 import { withHistory } from "slate-history"
 import { withReact, Slate, Editable, useSlateStatic, useReadOnly, ReactEditor } from "slate-react"
 import { Switch } from "@ordo-pink/switch"
+import EditableTitle from "./editable-title.component"
 
 export default function EditorWorkspace() {
 	const { fsid } = useRouteParams<{ fsid: FSID }>()
@@ -64,7 +65,7 @@ export default function EditorWorkspace() {
 			<div className="w-full h-full p-2 flex flex-col items-center py-12">
 				<div className="w-full max-w-xl flex flex-col space-y-6">
 					<div>
-						<h1 className="text-3xl font-bold">{data.name}</h1>
+						<EditableTitle data={data} />
 					</div>
 					<DataEditor data={data} />
 

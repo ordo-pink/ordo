@@ -30,7 +30,8 @@ export default function FSDataIcon({ data, isSelected, onSelect }: P) {
 			onDoubleClick={() => {
 				if (children.length)
 					return commands.emit<cmd.router.navigate>("router.navigate", `/fs/${data.fsid}`)
-				alert("TODO")
+
+				commands.emit<cmd.router.navigate>("router.navigate", `/editor/${data.fsid}`)
 			}}
 		>
 			{element}

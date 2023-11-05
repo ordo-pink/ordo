@@ -15,7 +15,7 @@ import { handleChangePassword } from "./handlers/change-password.handler"
 import { handleRefreshToken } from "./handlers/refresh-token.handler"
 import { handleVerifyToken } from "./handlers/verify-token.handler"
 import { handleChangeEmail } from "./handlers/change-email.handler"
-import { handleUserInfo } from "./handlers/user-info.handler"
+import { handleUserInfoByEmail } from "./handlers/user-info-by-email.handler"
 import { handleSignOut } from "./handlers/sign-out.handler"
 import { handleAccount } from "./handlers/account.handler"
 import { handleSignIn } from "./handlers/sign-in.handler"
@@ -26,6 +26,7 @@ import {
 	EmailStrategy,
 	NotificationService,
 } from "@ordo-pink/backend-service-notification"
+import { handleUserInfoByFSID } from "./handlers/user-info-by-fsid.handler"
 
 export type CreateIDServerFnParams = {
 	userRepository: UserPersistenceStrategy
@@ -89,7 +90,8 @@ export const createIDServer = async ({
 				.post("/sign-out", handleSignOut(ctx))
 				.post("/refresh-token", handleRefreshToken(ctx))
 				.get("/account", handleAccount(ctx))
-				.get("/users/:email", handleUserInfo(ctx))
+				// .get("/users/:email", handleUserInfoByEmail(ctx))
+				.get("/users/:fsid", handleUserInfoByFSID(ctx))
 				.patch("/change-account-info", handleChangeAccountInfo(ctx))
 				.patch("/change-email", handleChangeEmail(ctx))
 				.patch("/change-password", handleChangePassword(ctx))

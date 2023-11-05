@@ -8,21 +8,24 @@
 import type { Middleware } from "koa"
 import type { UserService } from "@ordo-pink/backend-service-user"
 import type { TTokenService } from "@ordo-pink/backend-service-token"
-import { authenticate0, sendError } from "@ordo-pink/backend-utils"
+import { sendError } from "@ordo-pink/backend-utils"
 import { HttpError } from "@ordo-pink/rrr"
+import { Oath } from "@ordo-pink/oath"
 
 // --- Public ---
 
 export type Params = { tokenService: TTokenService; userService: UserService }
 export type Fn = (params: Params) => Middleware
 
-export const handleUserInfo: Fn =
-	({ tokenService, userService }) =>
+export const handleUserInfoByFSID: Fn =
+	({ userService }) =>
 	ctx =>
-		authenticate0(ctx, tokenService)
-			.map(() => ctx.params.email)
-			.chain(e =>
-				userService.getUserInfo(e).rejectedMap(() => HttpError.NotFound("User not found")),
+		Oath.of(ctx.params.fsid)
+			.chain(fsid =>
+				userService
+					.getById(fsid)
+					.map(user => userService.serializePublic(user))
+					.rejectedMap(() => HttpError.NotFound("User not found")),
 			)
 			.fork(sendError(ctx), result => {
 				ctx.response.body = { success: true, result }

@@ -8,25 +8,41 @@ import { Either } from "@ordo-pink/either"
 import DataEditor from "./data-editor.component"
 import { useContent } from "$hooks/use-content.hook"
 import { useSharedContext, cmd } from "@ordo-pink/frontend-core"
-import { useMemo, useEffect, KeyboardEvent } from "react"
+import { useMemo, useEffect, KeyboardEvent, useCallback } from "react"
 import { BsTerminal } from "react-icons/bs"
-import { Subject, debounce, pairwise, timer } from "rxjs"
-import { createEditor, Descendant, Node } from "slate"
+import { Subject, debounce, timer } from "rxjs"
+import {
+	createEditor,
+	Descendant,
+	Editor,
+	Node,
+	Transforms,
+	Range,
+	Element as SlateElement,
+	Point,
+} from "slate"
 import { withHistory } from "slate-history"
-import { withReact, Slate, Editable } from "slate-react"
+import { withReact, Slate, Editable, useSlateStatic, useReadOnly, ReactEditor } from "slate-react"
+import { Switch } from "@ordo-pink/switch"
 
 export default function EditorWorkspace() {
 	const { fsid } = useRouteParams<{ fsid: FSID }>()
 	const { commands } = useSharedContext()
 	const data = useDataByFSID(fsid)
 	const content = useContent(fsid)
-	const editor = useMemo(() => withHistory(withReact(createEditor())), [])
+	const editor = useMemo(() => withChecklists(withHistory(withReact(createEditor()))), [])
+
+	const renderElement = useCallback((props: any) => <Element {...props} />, [])
 
 	useEffect(() => {
-		commands.on("console.log", () => console.log("here"))
+		commands.on("editor.add-checklist-item", () => {
+			editor.insertNode({
+				children: [{ text: "What the heil!" }],
+			})
+		})
 
 		commands.emit<cmd.ctxMenu.add>("context-menu.add", {
-			cmd: "console.log",
+			cmd: "editor.add-checklist-item",
 			Icon: BsTerminal,
 			readableName: "Консоль лог",
 			shouldShow: ({ payload }) => payload === "editor-quick-menu",
@@ -64,8 +80,11 @@ export default function EditorWorkspace() {
 						}}
 					>
 						<Editable
+							spellCheck
+							autoFocus
 							className="outline-none"
 							placeholder="Пора начинать..."
+							renderElement={renderElement}
 							onKeyDown={(event: KeyboardEvent<HTMLDivElement>) => {
 								if (editor.selection?.anchor.offset === 0 && event.key === "/") {
 									;(event as any).clientX = event.currentTarget.offsetLeft
@@ -96,3 +115,78 @@ const debounceSave$ = save$.pipe(debounce(() => timer(1000)))
 const serialize = (value: Descendant[]) => value.map(n => Node.string(n)).join("\n")
 const deserialize = (string: string) =>
 	string.split("\n").map(line => ({ type: "paragraph", children: [{ text: line }] }))
+
+const withChecklists = (editor: ReactEditor) => {
+	const { deleteBackward } = editor
+
+	editor.deleteBackward = (...args) => {
+		const { selection } = editor
+
+		if (selection && Range.isCollapsed(selection)) {
+			const [match] = Editor.nodes(editor, {
+				match: (n: any) =>
+					!Editor.isEditor(n) && SlateElement.isElement(n) && (n as any).type === "check-list-item",
+			}) as any
+
+			if (match) {
+				const [, path] = match
+				const start = Editor.start(editor, path)
+
+				if (Point.equals(selection.anchor, start)) {
+					const newProperties: Partial<SlateElement & { type: string }> = {
+						type: "paragraph",
+					}
+
+					Transforms.setNodes(editor, newProperties, {
+						match: (n: any) =>
+							!Editor.isEditor(n) &&
+							SlateElement.isElement(n) &&
+							(n as any).type === "check-list-item",
+					})
+
+					return editor
+				}
+			}
+		}
+
+		deleteBackward(...args)
+	}
+
+	return editor
+}
+
+const Element = (props: any) =>
+	Switch.of(props.element.type)
+		.case("check-list-item", () => <CheckListItemElement {...props} />)
+		.default(() => <p {...props.attributes}>{props.children}</p>)
+
+const CheckListItemElement = ({ attributes, children, element }: any) => {
+	const editor = useSlateStatic() as ReactEditor
+	const readOnly = useReadOnly()
+	const { checked } = element
+	return (
+		<div {...attributes} className="flex items-center">
+			<span contentEditable={false} className="mr-3">
+				<input
+					type="checkbox"
+					checked={checked}
+					onChange={event => {
+						const path = ReactEditor.findPath(editor, element)
+						const newProperties: Partial<SlateElement & { checked: boolean }> = {
+							checked: event.target.checked,
+						}
+
+						Transforms.setNodes(editor, newProperties, { at: path })
+					}}
+				/>
+			</span>
+			<span
+				contentEditable={!readOnly}
+				suppressContentEditableWarning
+				className={`flex outline-none ${checked ? "opacity-60 line-through" : "opacity-100"}`}
+			>
+				{children}
+			</span>
+		</div>
+	)
+}

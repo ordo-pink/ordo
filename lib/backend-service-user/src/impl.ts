@@ -103,7 +103,7 @@ export class UserService {
 			)
 	}
 
-	private serialize(user: User.InternalUser): User.User {
+	public serialize(user: User.InternalUser): User.User {
 		return {
 			createdAt: user.createdAt,
 			email: user.email,
@@ -118,7 +118,7 @@ export class UserService {
 		}
 	}
 
-	private serializePublic(user: User.InternalUser): User.PublicUser {
+	public serializePublic(user: User.InternalUser | User.PublicUser): User.PublicUser {
 		return {
 			createdAt: user.createdAt,
 			email: this.obfuscateEmail(user.email),

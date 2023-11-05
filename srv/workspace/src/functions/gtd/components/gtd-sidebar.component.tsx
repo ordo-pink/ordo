@@ -5,7 +5,7 @@ import ActionListItem from "$components/action-list-item"
 import { OrdoButtonSecondary } from "$components/buttons/buttons"
 import { Title } from "$components/page-header"
 import { cmd, useSharedContext } from "@ordo-pink/frontend-core"
-import { BsFolder2Open, BsInbox, BsPlus, BsTag } from "react-icons/bs"
+import { BsFolder2Open, BsInbox, BsPlus } from "react-icons/bs"
 import { HiOutlineSparkles } from "react-icons/hi"
 import { useDataFind } from "$hooks/use-data.hook"
 import { useGtdProjects } from "../hooks/use-projects"
@@ -16,7 +16,7 @@ export default function GTDSidebar() {
 	const gtd = useDataFind(item => item.name === ".gtd" && item.parent === null)
 	const inboxItems = useInbox()
 	const projects = useGtdProjects()
-	const pinned = useDataFind(item => !!gtd && item.name === ".pinned" && item.parent === gtd.fsid)
+	// const pinned = useDataFind(item => !!gtd && item.name === ".pinned" && item.parent === gtd.fsid)
 
 	return (
 		<div className="mt-8 flex flex-col space-y-8">
@@ -67,7 +67,7 @@ export default function GTDSidebar() {
 				</OrdoButtonSecondary>
 			</div>
 
-			<div className="flex flex-col space-y-2">
+			{/* <div className="flex flex-col space-y-2">
 				<Title level="5" center uppercase styledFirstLetter>
 					Pinned Labels
 				</Title>
@@ -94,7 +94,7 @@ export default function GTDSidebar() {
 				>
 					<BsPlus className="text-lg" />
 				</OrdoButtonSecondary>
-			</div>
+			</div> */}
 		</div>
 	)
 }

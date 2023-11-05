@@ -54,26 +54,14 @@ const Workspace = ({ commands, activities$ }: Pick<P, "commands" | "activities$"
 				<Card title="Announcements" className="row-span-3">
 					<p>TODO: Announcements</p>
 				</Card>
-				<Card title="Hello!">
-					<p>TODO: Welcome message</p>
-				</Card>
-
-				<Card title="Stats" className="row-span-2">
-					TODO: Stats
-				</Card>
-				<Card title="Quick actions">
-					<p>TODO: Keyboard shortcuts</p>
-				</Card>
 
 				{activities
 					.filter(activity => activity.name !== "home")
 					.map(Activity => (
-						<Card key={Activity.name} title={Activity.name}>
+						<Card key={Activity.name}>
 							<Activity.Component commands={commands} space={ComponentSpace.WIDGET} />
 						</Card>
 					))}
-
-				<Card title="Useful links">TODO: Useful links</Card>
 			</div>
 		</CenteredPage>
 	)

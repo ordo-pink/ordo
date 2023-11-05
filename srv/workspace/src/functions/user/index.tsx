@@ -295,7 +295,7 @@ const UserInfo = ({ user, auth$, commands }: _UIP) => {
 					</fieldset>
 				</Card>
 
-				<Card title="Подписка" className="md:col-span-2">
+				<Card title="Подписка">
 					<p className="text-center text-sm text-neutral-500">
 						Подключение платной подписки станет доступно совсем скоро™️!
 					</p>
@@ -305,13 +305,13 @@ const UserInfo = ({ user, auth$, commands }: _UIP) => {
 					</p>
 				</Card>
 
-				<Card title="Active sessions">
+				{/* <Card title="Active sessions">
 					<p className="text-center text-sm text-neutral-500">
 						We'll put active sessions info here in the next update. Stay active!
 					</p>
-				</Card>
+				</Card> */}
 
-				<Card title="Achievements" className="md:col-span-3">
+				<Card title="Achievements" className="md:col-span-2">
 					<p className="text-center text-sm text-neutral-500">
 						You'll find your achievements here soon. Stay tuned!
 					</p>

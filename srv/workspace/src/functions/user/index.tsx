@@ -295,9 +295,13 @@ const UserInfo = ({ user, auth$, commands }: _UIP) => {
 					</fieldset>
 				</Card>
 
-				<Card title="Subscription" className="md:col-span-2">
+				<Card title="Подписка" className="md:col-span-2">
 					<p className="text-center text-sm text-neutral-500">
-						We'll soon add paid plans for more space and integrations. Stay rich!
+						Подключение платной подписки станет доступно совсем скоро™️!
+					</p>
+
+					<p className="text-center text-xs text-neutral-500">
+						Trial-версию платной подписки можно получить за участие в программе "Пригласи друга".
 					</p>
 				</Card>
 

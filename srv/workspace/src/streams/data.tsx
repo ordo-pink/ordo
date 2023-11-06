@@ -41,7 +41,10 @@ export const __initData: Fn = ({ logger, auth$ }) => {
 	const dataRepository = ClientDataPersistenceStrategy.of(data$, auth$ as any, commands)
 	const contentRepository = ClientContentPersistenceStrategy.of(auth$ as any)
 
-	const dataCommands = DataCommands.of({ dataRepository, contentRepository })
+	const dataCommands = DataCommands.of({
+		dataPersistenceStrategy: dataRepository,
+		contentPersistenceStrategy: contentRepository,
+	})
 
 	commands.on<cmd.data.showCreateModal>("data.show-create-modal", ({ payload }) => {
 		commands.emit<cmd.modal.show>("modal.show", {

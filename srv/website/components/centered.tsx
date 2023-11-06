@@ -6,13 +6,14 @@ import { PropsWithChildren } from "react"
 type Props = PropsWithChildren<{
 	centerX?: boolean
 	centerY?: boolean
+	screenHeight?: boolean
 }>
 
-export const Centered = ({ children, centerX, centerY }: Props) => (
+export const Centered = ({ children, centerX, centerY, screenHeight }: Props) => (
 	<div
-		className={`h-full w-full flex flex-col ${centerX ? "items-center" : "items-start"} ${
+		className={`w-full flex flex-col ${centerX ? "items-center" : "items-start"} ${
 			centerY ? "justify-center" : "justify-start"
-		}`}
+		} ${screenHeight ? "h-screen" : "h-full"}`}
 	>
 		{children}
 	</div>

@@ -7,8 +7,8 @@ import { useLayoutEffect } from "react"
 import { Button } from "./button"
 import BetaInvitation from "./beta-invitation.component"
 
-type P = { webHost: string }
-export default function IndexHeroSection({ webHost }: P) {
+type P = { webHost: string; subsHost: string }
+export default function IndexHeroSection({ webHost, subsHost }: P) {
 	useLayoutEffect(() => {
 		const listener = (event: MouseEvent) => {
 			Object.assign(document.documentElement, {
@@ -71,7 +71,7 @@ export default function IndexHeroSection({ webHost }: P) {
 						</div>
 
 						<div className="max-w-sm">
-							<BetaInvitation webHost={webHost} />
+							<BetaInvitation webHost={webHost} subsHost={subsHost} />
 						</div>
 					</div>
 				</div>

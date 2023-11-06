@@ -8,7 +8,7 @@ import SignUpForm from "../components/sign-up-form"
 
 export default function SignUpPage() {
 	return (
-		<Centered centerX centerY>
+		<Centered centerX centerY screenHeight>
 			<Head>
 				<title>Ordo.pink | Sign up</title>
 			</Head>

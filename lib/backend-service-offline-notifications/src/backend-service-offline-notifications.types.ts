@@ -17,7 +17,7 @@ export type EmailContact = {
 	/**
 	 * Full name of the user associated with the email.
 	 */
-	name: string
+	name?: string
 }
 
 /**
@@ -92,7 +92,12 @@ export type EmailBody =
 			text?: string
 	  }
 
-export type EmailParams = EmailHead & EmailBody
+export type EmailTemplate = {
+	templateId: number
+	params: Record<string, string>
+}
+
+export type EmailParams = EmailHead & (EmailBody | EmailTemplate)
 
 /**
  * `EmailStrategy` provides a `send` method used by the `OfflineNotificationService` to send emails
@@ -115,6 +120,18 @@ export type SendSignInNotificationParams = EmailContact & {
 	ip: string
 }
 
+export type SendSubscriptionConfirmationEmail = {
+	/**
+	 * The email to send confirmation to.
+	 */
+	email: string
+
+	/**
+	 * URL for validating the email.
+	 */
+	confirmationUrl: string
+}
+
 /**
  * `NotificationStrategy` provides a set of methods for notifying users via external means (e.g.
  * email, SMS, etc.).
@@ -134,6 +151,14 @@ export type TNotificationService = {
 	 * @returns void
 	 */
 	sendSignInNotification: (params: SendSignInNotificationParams) => void
+
+	/**
+	 * Send a confirmation email to the user who subscribes to the email list.
+	 *
+	 * @param params User info needed for creating a subscription confirmation notification.
+	 * @returns void
+	 */
+	sendSubscriptionConfirmationEmail: (params: SendSubscriptionConfirmationEmail) => void
 }
 
 /**

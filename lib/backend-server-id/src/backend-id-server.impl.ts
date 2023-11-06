@@ -25,7 +25,7 @@ import {
 	EmailContact,
 	EmailStrategy,
 	NotificationService,
-} from "@ordo-pink/backend-service-notification"
+} from "@ordo-pink/backend-service-offline-notifications"
 import { handleUserInfoByFSID } from "./handlers/user-info-by-fsid.handler"
 
 export type CreateIDServerFnParams = {

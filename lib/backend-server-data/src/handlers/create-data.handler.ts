@@ -19,7 +19,7 @@ export const handleCreateData =
 	ctx =>
 		authenticate0(ctx, idHost)
 			.chain(({ payload }) =>
-				dataService.dataRepository
+				dataService.dataPersistenceStrategy
 					.count(payload.sub)
 					.rejectedMap(() => HttpError.NotFound("User not found"))
 					.chain(

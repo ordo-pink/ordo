@@ -6,7 +6,7 @@ import { PageHeader } from "../components/page-header"
 
 export default function ForgotPasswordPage() {
 	return (
-		<Centered centerX centerY>
+		<Centered centerX centerY screenHeight>
 			<PageHeader text="TODO" />
 			<p>See you soon.</p>
 		</Centered>

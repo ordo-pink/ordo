@@ -8,8 +8,8 @@ import type { DataPersistenceStrategy } from "./data-persistence-strategy.types"
 import type { ContentPersistenceStrategy } from "./content-persistence-strategy.types"
 
 export type TDataCommands<T> = {
-	dataRepository: DataPersistenceStrategy
-	contentRepository: ContentPersistenceStrategy<T>
+	dataPersistenceStrategy: DataPersistenceStrategy
+	contentPersistenceStrategy: ContentPersistenceStrategy<T>
 	create: (
 		params: Pick<PlainData, "name" | "parent" | "createdBy"> & {
 			fsid?: FSID

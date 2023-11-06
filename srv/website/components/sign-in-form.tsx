@@ -15,8 +15,8 @@ export default function SignInForm({ workspaceHost, idHost }: Props) {
 	const [passwordErrors, setPasswordErrors] = useState<string[]>([])
 
 	const [errors, setErrors] = useState<string[]>([])
-	const [email, setEmail] = useState<string>("")
-	const [password, setPassword] = useState<string>("")
+	const [email, setEmail] = useState("")
+	const [password, setPassword] = useState("")
 
 	const bannerOpacity = errors.length > 0 ? "opacity-100" : "opacity-0"
 	const isButtonDisabled = !email || !password || errors.length > 0

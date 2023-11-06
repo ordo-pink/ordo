@@ -33,7 +33,10 @@ const {
 const main = async () => {
 	const dataRepository = DataPersistenceStrategyFS.of({ root: DATA_METADATA_PATH })
 	const contentRepository = ContentPersistenceStrategyFS.of({ root: DATA_DATA_PATH })
-	const dataService = DataCommands.of({ dataRepository, contentRepository })
+	const dataService = DataCommands.of({
+		dataPersistenceStrategy: dataRepository,
+		contentPersistenceStrategy: contentRepository,
+	})
 
 	const app = createDataServer({
 		dataService,

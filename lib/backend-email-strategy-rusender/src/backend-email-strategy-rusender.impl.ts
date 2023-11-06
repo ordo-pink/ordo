@@ -5,7 +5,12 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-import { EmailStrategy } from "@ordo-pink/backend-service-notification"
+import {
+	EmailParams,
+	EmailStrategy,
+	EmailTemplate,
+} from "@ordo-pink/backend-service-offline-notifications"
+import { Either } from "@ordo-pink/either"
 
 /**
  * `RusenderEmailStrategy` implements `EmailStrategy` for sending emails using Rusender. To create
@@ -23,18 +28,43 @@ export const RusenderEmailStrategy = {
 	 * `RusenderEmailStrategy` factory.
 	 */
 	of: (apiKey: string): EmailStrategy => ({
-		send: message =>
-			void fetch(url, {
+		send: message => {
+			let isTemplateEmail = false
+
+			const mail = Either.fromNullable((message as EmailTemplate).templateId)
+				.map(id => {
+					isTemplateEmail = true
+
+					return {
+						from: message.from,
+						to: message.to,
+						subject: message.subject,
+						cc: message.cc,
+						bcc: message.bcc,
+						headers: message.headers,
+						params: (message as EmailTemplate).params,
+						idTemplateMailUser: id,
+					}
+				})
+				.fold(
+					() => message,
+					result => result,
+				)
+
+			fetch(isTemplateEmail ? templateUrl : url, {
 				method,
 				headers: getHeaders(apiKey),
-				body: getBody(message),
-			}),
+				body: JSON.stringify({ mail }),
+			})
+				.then(res => res.json())
+				.then(console.log)
+		},
 	}),
 }
 
 // --- Internal ---
 
-const url = "http://api.beta.rusender.ru/api/v1/external-mails/send"
+const templateUrl = "https://api.beta.rusender.ru/api/v1/external-mails/send-by-template"
+const url = "https://api.beta.rusender.ru/api/v1/external-mails/send"
 const method = "POST"
-const getHeaders = (key: string) => ({ "X-Api-Key": key })
-const getBody = JSON.stringify
+const getHeaders = (key: string) => ({ "X-Api-Key": key, "Content-Type": "application/json" })

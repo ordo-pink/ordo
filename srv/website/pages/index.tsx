@@ -9,10 +9,11 @@ import Footer from "components/footer.component"
 
 export default function Home() {
 	const webHost = process.env.NEXT_PUBLIC_WEB_HOST!
+	const subsHost = process.env.NEXT_PUBLIC_SUBS_HOST!
 
 	return (
 		<main className="scroll-smooth">
-			<IndexHeroSection webHost={webHost} />
+			<IndexHeroSection webHost={webHost} subsHost={subsHost} />
 
 			<section
 				id="core-principles"
@@ -113,7 +114,7 @@ export default function Home() {
 						<div className="w-full pt-32 backdrop-saturate-50 px-8 pt-32f">
 							<div className="w-full flex backdrop-saturate-50">
 								<div className="w-full flex justify-center">
-									<BetaInvitation webHost={webHost} wide />
+									<BetaInvitation webHost={webHost} subsHost={subsHost} wide />
 								</div>
 							</div>
 

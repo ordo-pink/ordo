@@ -9,36 +9,39 @@ import { Errors } from "./errors.impl"
 import { ContentPersistenceStrategy } from "./content-persistence-strategy.types"
 
 export type DataCommandsParams<T> = {
-	dataRepository: DataPersistenceStrategy
-	contentRepository: ContentPersistenceStrategy<T>
+	dataPersistenceStrategy: DataPersistenceStrategy
+	contentPersistenceStrategy: ContentPersistenceStrategy<T>
 }
 
-const of = <T>({ dataRepository, contentRepository }: DataCommandsParams<T>): TDataCommands<T> => ({
-	contentRepository,
-	dataRepository,
+const of = <T>({
+	dataPersistenceStrategy,
+	contentPersistenceStrategy,
+}: DataCommandsParams<T>): TDataCommands<T> => ({
+	contentPersistenceStrategy,
+	dataPersistenceStrategy,
 	// TODO: Roll back on error
 	create: params =>
 		(params.name
-			? dataRepository
+			? dataPersistenceStrategy
 					.find(params.createdBy, params.name, params.parent)
 					.fix(() => false)
 					.chain(Oath.ifElse(x => !x, { onFalse: () => Errors.DataAlreadyExists }))
 			: Oath.all({
 					child:
 						params.fsid &&
-						dataRepository
+						dataPersistenceStrategy
 							.exists(params.createdBy, params.fsid)
 							.chain(Oath.ifElse(x => !x, { onFalse: () => Errors.DataAlreadyExists })),
 					parent:
 						params.parent &&
-						dataRepository
+						dataPersistenceStrategy
 							.exists(params.createdBy, params.parent)
 							.chain(Oath.ifElse(x => !!x, { onFalse: () => Errors.DataNotFound })),
 			  })
 		)
 			.chain(() => Data.new(params).fold(Oath.reject, Oath.resolve))
 			.chain(data =>
-				dataRepository.count(data.plain.createdBy).chain(
+				dataPersistenceStrategy.count(data.plain.createdBy).chain(
 					Oath.ifElse(length => length < params.fileLimit, {
 						onTrue: () => data,
 						onFalse: () => Errors.TooMuchData,
@@ -46,61 +49,61 @@ const of = <T>({ dataRepository, contentRepository }: DataCommandsParams<T>): TD
 				),
 			)
 			.chain(child =>
-				dataRepository
+				dataPersistenceStrategy
 					.create(child.plain)
 					.chain(() =>
-						contentRepository
+						contentPersistenceStrategy
 							.create(child.plain.createdBy, child.plain.fsid)
 							.map(() => child.plain),
 					),
 			),
-	fetch: ({ createdBy }) => dataRepository.getAll(createdBy),
+	fetch: ({ createdBy }) => dataPersistenceStrategy.getAll(createdBy),
 	link: ({ createdBy, fsid, link, updatedBy }) =>
-		dataRepository
+		dataPersistenceStrategy
 			.get(createdBy, fsid)
 			.chain(plain => Data.of(plain).addLink(link, updatedBy).fold(Oath.reject, Oath.resolve))
-			.chain(data => dataRepository.update(data.plain)),
+			.chain(data => dataPersistenceStrategy.update(data.plain)),
 	unlink: ({ createdBy, fsid, link, updatedBy }) =>
-		dataRepository
+		dataPersistenceStrategy
 			.get(createdBy, fsid)
 			.chain(plain => Data.of(plain).removeLink(link, updatedBy).fold(Oath.reject, Oath.resolve))
-			.chain(data => dataRepository.update(data.plain)),
+			.chain(data => dataPersistenceStrategy.update(data.plain)),
 	addLabel: ({ createdBy, fsid, label, updatedBy }) =>
-		dataRepository
+		dataPersistenceStrategy
 			.get(createdBy, fsid)
 			.chain(plain => Data.of(plain).addLabel(label, updatedBy).fold(Oath.reject, Oath.resolve))
-			.chain(data => dataRepository.update(data.plain)),
+			.chain(data => dataPersistenceStrategy.update(data.plain)),
 	removeLabel: ({ createdBy, fsid, label, updatedBy }) =>
-		dataRepository
+		dataPersistenceStrategy
 			.get(createdBy, fsid)
 			.chain(plain => Data.of(plain).removeLabel(label, updatedBy).fold(Oath.reject, Oath.resolve))
-			.chain(data => dataRepository.update(data.plain)),
+			.chain(data => dataPersistenceStrategy.update(data.plain)),
 	update: ({ data, fsid, createdBy, updatedBy }) =>
-		dataRepository
+		dataPersistenceStrategy
 			.get(createdBy, fsid)
 			.chain(plain => Data.of(plain).update(data).fold(Oath.reject, Oath.resolve))
-			.chain(data => dataRepository.update(data.plain)),
+			.chain(data => dataPersistenceStrategy.update(data.plain)),
 	// TODO: Roll back on error
 	move: ({ createdBy, fsid, parent, updatedBy }) =>
 		Oath.all({
 			parent:
 				parent &&
-				dataRepository
+				dataPersistenceStrategy
 					.exists(createdBy, parent)
 					.chain(Oath.ifElse(x => !!x, { onFalse: () => Errors.DataNotFound })),
-			child: dataRepository
+			child: dataPersistenceStrategy
 				.exists(createdBy, fsid)
 				.chain(Oath.ifElse(x => !!x, { onFalse: () => Errors.DataNotFound })),
 		})
-			.chain(() => dataRepository.get(createdBy, fsid))
+			.chain(() => dataPersistenceStrategy.get(createdBy, fsid))
 			.chain(plain => Data.of(plain).setParent(parent, updatedBy).fold(Oath.reject, Oath.resolve))
-			.chain(data => dataRepository.update(data.plain)),
+			.chain(data => dataPersistenceStrategy.update(data.plain)),
 	// TODO: Roll back on error
 	remove: ({ createdBy, fsid }) =>
-		dataRepository
+		dataPersistenceStrategy
 			.exists(createdBy, fsid)
 			.chain(Oath.ifElse(x => !!x, { onFalse: () => Errors.DataNotFound }))
-			.chain(() => dataRepository.getAll(createdBy))
+			.chain(() => dataPersistenceStrategy.getAll(createdBy))
 			.chain(data =>
 				Oath.all(
 					data.map(async item => {
@@ -108,7 +111,10 @@ const of = <T>({ dataRepository, contentRepository }: DataCommandsParams<T>): TD
 						const hasRemovedItemInParent = item.parent === fsid
 
 						if (hasRemovedItemInParent) {
-							await DataCommands.of({ dataRepository, contentRepository })
+							await DataCommands.of({
+								dataPersistenceStrategy: dataPersistenceStrategy,
+								contentPersistenceStrategy: contentPersistenceStrategy,
+							})
 								.remove({
 									createdBy: item.createdBy,
 									fsid: item.fsid,
@@ -119,7 +125,7 @@ const of = <T>({ dataRepository, contentRepository }: DataCommandsParams<T>): TD
 						if (hasRemovedItemInLinks) {
 							if (hasRemovedItemInLinks) item.links.splice(item.links.indexOf(fsid, 1))
 
-							await dataRepository.update(item).toPromise()
+							await dataPersistenceStrategy.update(item).toPromise()
 						}
 
 						return "OK"
@@ -127,33 +133,36 @@ const of = <T>({ dataRepository, contentRepository }: DataCommandsParams<T>): TD
 				),
 			)
 			.chain(() =>
-				dataRepository
+				dataPersistenceStrategy
 					.delete(createdBy, fsid)
-					.chain(() => contentRepository.delete(createdBy, fsid))
+					.chain(() => contentPersistenceStrategy.delete(createdBy, fsid))
 					.fix(() => "OK"),
 			),
 	rename: ({ fsid, createdBy, name, updatedBy }) =>
-		dataRepository
+		dataPersistenceStrategy
 			.get(createdBy, fsid)
 			.chain(plain => Data.of(plain).setName(name, updatedBy).fold(Oath.reject, Oath.resolve))
-			.chain(data => dataRepository.update(data.plain)),
+			.chain(data => dataPersistenceStrategy.update(data.plain)),
 	// TODO: Roll back on error
 	updateContent: ({ content, createdBy, updatedBy, fsid }) =>
-		dataRepository.get(createdBy, fsid).chain(plain =>
-			contentRepository
+		dataPersistenceStrategy.get(createdBy, fsid).chain(plain =>
+			contentPersistenceStrategy
 				.write(createdBy, plain.fsid, content)
 				.chain(size => Data.of(plain).setSize(size, updatedBy).fold(Oath.reject, Oath.resolve))
-				.chain(data => dataRepository.update(data.plain).map(() => data.plain.size)),
+				.chain(data => dataPersistenceStrategy.update(data.plain).map(() => data.plain.size)),
 		),
 	// TODO: Roll back on error
 	uploadContent: ({ content, createdBy, updatedBy, name, parent, fileLimit }) =>
-		dataRepository
+		dataPersistenceStrategy
 			.find(createdBy, name, parent)
 			.fix(() => null)
 			.chain(plain =>
 				plain
 					? Oath.of(plain)
-					: of({ dataRepository, contentRepository }).create({
+					: of({
+							dataPersistenceStrategy: dataPersistenceStrategy,
+							contentPersistenceStrategy: contentPersistenceStrategy,
+					  }).create({
 							name,
 							createdBy,
 							parent,
@@ -161,12 +170,12 @@ const of = <T>({ dataRepository, contentRepository }: DataCommandsParams<T>): TD
 					  }),
 			)
 			.chain(plain =>
-				contentRepository
+				contentPersistenceStrategy
 					.write(createdBy, plain.fsid, content)
 					.chain(size => Data.of(plain).setSize(size, updatedBy).fold(Oath.reject, Oath.resolve))
-					.chain(data => dataRepository.update(data.plain)),
+					.chain(data => dataPersistenceStrategy.update(data.plain)),
 			),
-	getContent: ({ createdBy, fsid }) => contentRepository.read(createdBy, fsid),
+	getContent: ({ createdBy, fsid }) => contentPersistenceStrategy.read(createdBy, fsid),
 })
 
 export const DataCommands = { of }

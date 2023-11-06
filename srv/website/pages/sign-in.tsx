@@ -8,7 +8,7 @@ import SignInForm from "../components/sign-in-form"
 
 export default function SignInPage() {
 	return (
-		<Centered centerX centerY>
+		<Centered centerX centerY screenHeight>
 			<Head>
 				<title>Ordo.pink | Sign in</title>
 			</Head>

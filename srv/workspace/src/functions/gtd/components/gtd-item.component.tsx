@@ -32,7 +32,6 @@ export default function GTDItem({ item }: P) {
 	const doneChildren = children.filter(checkIsDone)
 
 	const onCheckboxChange = () => {
-		console.log("HERE")
 		isDone
 			? commands.emit<GTDCommands.markNotDone>("gtd.mark-not-done", item)
 			: commands.emit<GTDCommands.markDone>("gtd.mark-done", item)

@@ -10,9 +10,9 @@ import { DataPersistenceStrategyFS } from "@ordo-pink/backend-data-persistence-s
 import { ContentPersistenceStrategyFS } from "@ordo-pink/backend-content-persistence-strategy-fs"
 
 const {
-	SUBS_PORT,
 	WORKSPACE_HOST,
 	WEB_HOST,
+	SUBS_PORT,
 	SUBS_CONTENT_PATH,
 	SUBS_DATA_PATH,
 	SUBS_DATA_OWNER,

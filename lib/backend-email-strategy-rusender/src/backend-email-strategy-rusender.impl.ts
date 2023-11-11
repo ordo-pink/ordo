@@ -56,8 +56,6 @@ export const RusenderEmailStrategy = {
 				headers: getHeaders(apiKey),
 				body: JSON.stringify({ mail }),
 			})
-				.then(res => res.json())
-				.then(console.log)
 		},
 	}),
 }

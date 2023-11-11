@@ -15,6 +15,7 @@ export type SharedContextValue = {
 	user: Nullable<User.User>
 	commands: Commands.Commands
 	fileAssociations: Extensions.FileAssociation[]
+	workspaceSplitSize: [number, number]
 }
 
 export const __useSharedContextInit = (

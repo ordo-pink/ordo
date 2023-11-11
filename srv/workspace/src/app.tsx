@@ -33,7 +33,15 @@ const SharedContext = createContext<{
 	user: Nullable<User.User>
 	commands: Commands.Commands
 	fileAssociations: Extensions.FileAssociation[]
-}>({ data: null, route: null, user: null, commands, fileAssociations: [] })
+	workspaceSplitSize: [number, number]
+}>({
+	data: null,
+	route: null,
+	user: null,
+	commands,
+	fileAssociations: [],
+	workspaceSplitSize: [0, 100],
+})
 
 export default function App() {
 	const streams = useAppInit()
@@ -42,6 +50,7 @@ export default function App() {
 	const fileAssociations = useStrictSubscription(streams.fileAssociations$, [])
 	const user = useUser()
 	const currentRoute = useSubscription(streams.currentRoute$)
+	const sidebar = useSubscription(streams.sidebar$)
 	__useSharedContextInit(SharedContext, useContext)
 
 	const contextMenu = useSubscription(streams.contextMenu$)
@@ -98,6 +107,7 @@ export default function App() {
 						route: currentRoute,
 						commands,
 						fileAssociations,
+						workspaceSplitSize: sidebar && !sidebar.disabled ? sidebar.sizes : [0, 100],
 						user: user.fold(
 							() => null,
 							u => ({ ...u, email: UserUtils.obfuscateEmail(u.email) }),

@@ -34,7 +34,8 @@ export default function ContextMenu({ menu$ }: _P) {
 			return
 		}
 
-		menu.event.preventDefault()
+		// TODO: Fix the approach to handling events
+		if (menu.event.preventDefault) menu.event.preventDefault()
 
 		const readCommands = [] as TContextMenu.Item[]
 		const createCommands = [] as TContextMenu.Item[]

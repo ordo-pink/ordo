@@ -27,7 +27,7 @@ const updateE =
 	increment =>
 		validations.isValidDataE(increment).map(increment =>
 			Data.of({
-				createdAt: Date.now(),
+				createdAt: plain.createdAt,
 				createdBy: plain.createdBy,
 				fsid: plain.fsid,
 				labels: increment.labels,

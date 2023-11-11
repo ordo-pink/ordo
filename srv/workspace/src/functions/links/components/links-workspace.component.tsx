@@ -3,8 +3,9 @@
 
 import { PlainData } from "@ordo-pink/data"
 import { useSharedContext } from "@ordo-pink/frontend-core"
-import { useEffect, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import Links from "./links.component"
+import Links3D from "./3d-links.component"
 
 export default function LinksWorkspace() {
 	const { data, route } = useSharedContext()
@@ -59,7 +60,7 @@ export default function LinksWorkspace() {
 
 	return (
 		<div className="w-full h-screen">
-			<Links nodes={nodes} links={links} />
+			<Links3D nodes={nodes} links={links} />
 		</div>
 	)
 }

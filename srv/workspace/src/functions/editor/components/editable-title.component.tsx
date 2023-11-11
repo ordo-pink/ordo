@@ -27,8 +27,8 @@ export default function EditableTitle({ data }: P) {
 		<textarea
 			className="text-3xl font-mono font-bold w-full bg-transparent border-0 p-0 focus:ring-0 overflow-hidden resize-none"
 			value={title}
-			cols={31}
-			rows={Math.ceil(title.length / 31)}
+			cols={34}
+			rows={Math.ceil(title.length / 34)}
 			onChange={onInputChange}
 		/>
 	)

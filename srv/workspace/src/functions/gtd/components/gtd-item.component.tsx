@@ -7,10 +7,11 @@ import { cmd, useSharedContext } from "@ordo-pink/frontend-core"
 import { Nullable } from "@ordo-pink/tau"
 import { MouseEvent } from "react"
 import { GTDCommands } from "../types"
-import { BsCheckCircle } from "react-icons/bs"
+import { BsCheckCircle, BsLink, BsLink45Deg } from "react-icons/bs"
 import { useSortable } from "@dnd-kit/sortable"
 import { CSS } from "@dnd-kit/utilities"
 import DataLabel from "$components/data/label.component"
+import { PiGraph } from "react-icons/pi"
 
 type P = { item: PlainData }
 
@@ -62,13 +63,13 @@ export default function GTDItem({ item }: P) {
 
 			<div className="flex justify-between w-full">
 				<div className="flex flex-col w-full justify-center">
-					{children.length > 0 && item.labels.length === 0 ? (
+					{children.length > 0 && item.labels.length === 0 && item.links.length === 0 ? (
 						<div className="flex justify-between items-center">
 							<div className={isDone ? "line-through text-neutral-500" : ""}>{item.name}</div>
 							<div
 								className="flex items-center justify-center text-xs shadow-sm rounded-md px-2 py-0.5 bg-neutral-200 dark:bg-neutral-700 cursor-pointer"
 								title={`${doneChildren.length} out of ${children.length} items done. Click to open subproject.`}
-								onClick={() =>
+								onMouseDown={() =>
 									commands.emit<cmd.router.navigate>("router.navigate", `/gtd/items/${item.fsid}`)
 								}
 							>
@@ -90,9 +91,17 @@ export default function GTDItem({ item }: P) {
 						<div className={isDone ? "line-through text-neutral-500" : ""}>{item.name}</div>
 					)}
 
-					{item.labels.length > 0 ? (
+					{item.labels.length > 0 || item.links.length > 0 || children.length > 0 ? (
 						<div className="flex justify-between mt-2 md:mt-1">
-							<div className="flex flex-wrap space-x-1">
+							<div
+								className="flex flex-wrap space-x-1"
+								onMouseDown={() =>
+									commands.emit<cmd.data.showEditLabelsPalette>(
+										"data.show-edit-labels-palette",
+										item,
+									)
+								}
+							>
 								{item.labels
 									.filter(label => label !== "done")
 									.sort((a, b) => a.localeCompare(b))
@@ -102,29 +111,41 @@ export default function GTDItem({ item }: P) {
 							</div>
 
 							{children.length > 0 ? (
-								<div
-									className="flex items-center justify-center text-xs shadow-sm rounded-md px-2 py-0.5 bg-neutral-200 dark:bg-neutral-700 cursor-pointer"
-									title={`${doneChildren.length} out of ${children.length} items done. Click to open subproject.`}
-									onClick={() =>
-										commands.emit<cmd.router.navigate>("router.navigate", `/gtd/items/${item.fsid}`)
-									}
-								>
+								<DataLabel>
 									<div
 										className={`text-xs flex space-x-2 items-center ${
-											doneChildren.length === children.length
-												? "text-emerald-500"
-												: "text-neutral-600 dark:text-neutral-400"
+											doneChildren.length === children.length ? "text-emerald-500" : ""
 										}`}
+										title={`${doneChildren.length} out of ${children.length} items done. Click to open subproject.`}
+										onMouseDown={() =>
+											commands.emit<cmd.router.navigate>(
+												"router.navigate",
+												`/gtd/items/${item.fsid}`,
+											)
+										}
 									>
 										<BsCheckCircle />
 										<div>
 											{doneChildren.length}/{children.length}
 										</div>
 									</div>
+								</DataLabel>
+							) : null}
+
+							<DataLabel>
+								<div
+									className="flex space-x-1 items-center"
+									onMouseDown={() =>
+										commands.emit<cmd.data.showEditLinksPalette>(
+											"data.show-edit-links-palette",
+											item,
+										)
+									}
+								>
+									<BsLink45Deg />
+									<span>{item.links.length}</span>
 								</div>
-							) : (
-								""
-							)}
+							</DataLabel>
 						</div>
 					) : null}
 				</div>

@@ -5,7 +5,7 @@ import { PlainData } from "@ordo-pink/data"
 import DirectoryIconComponent from "./directory-icon.component"
 import { cmd, useSharedContext } from "@ordo-pink/frontend-core"
 import { MouseEvent } from "react"
-import { BsTags } from "react-icons/bs"
+import { BsLink45Deg, BsTags } from "react-icons/bs"
 import { Either } from "@ordo-pink/either"
 import Null from "$components/null"
 import DataLabel from "$components/data/label.component"
@@ -23,18 +23,34 @@ export default function DirectoryCardComponent({ plain }: P) {
 			onContextMenu={showContextMenu}
 		>
 			<DirectoryIconComponent />
-			<div className="text-sm text-center mt-1 line-clamp-1 break-all">{plain.name}</div>
-			{Either.fromBoolean(() => plain.labels.length > 0).fold(Null, () => (
+			<div className="text-sm text-center mt-1 line-clamp-2 break-words">{plain.name}</div>
+			<div className="flex space-x-1">
 				<DataLabel>
 					<div
 						className="flex items-center space-x-1 text-xs"
-						title={`Labels:\n\n- ${plain.labels.join("\n- ")}`}
+						title={`Метки:\n\n- ${plain.labels.join("\n- ")}`}
+						onClick={() =>
+							commands.emit<cmd.data.showEditLabelsPalette>("data.show-edit-labels-palette", plain)
+						}
 					>
 						<BsTags />
 						<p>{plain.labels.length}</p>
 					</div>
 				</DataLabel>
-			))}
+
+				<DataLabel>
+					<div
+						className="flex items-center space-x-1 text-xs"
+						title={`Ссылки на файлы:\n\n- ${plain.links.join("\n- ")}`}
+						onClick={() =>
+							commands.emit<cmd.data.showEditLinksPalette>("data.show-edit-links-palette", plain)
+						}
+					>
+						<BsLink45Deg />
+						<p>{plain.links.length}</p>
+					</div>
+				</DataLabel>
+			</div>
 		</div>
 	)
 }

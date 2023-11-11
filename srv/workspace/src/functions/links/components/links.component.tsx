@@ -79,7 +79,8 @@ export default function Links({ nodes, links }: P) {
 			.selectAll("line")
 			.data(links)
 			.join("line")
-			.attr("stroke", l => (l.type === "child" ? "#737373" : "#a855f7"))
+			.attr("stroke-dasharray", l => (l.type === "link" ? "5,5" : "none"))
+			.attr("stroke", l => (l.type === "label" ? "#a855f7" : "#737373"))
 
 		// Append nodes.
 		const node = svg

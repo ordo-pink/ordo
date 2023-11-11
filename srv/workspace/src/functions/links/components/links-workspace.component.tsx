@@ -31,6 +31,7 @@ export default function LinksWorkspace() {
 					const parent = data.find(n => n.fsid === item.parent)!
 					tmpNodes.push({ id: parent?.fsid, data: parent })
 				}
+
 				tmpLinks.push({ source: item.fsid, target: item.parent, type: "child" })
 			}
 
@@ -38,6 +39,16 @@ export default function LinksWorkspace() {
 				item.labels.forEach(id => {
 					if (!tmpNodes.some(node => node.id === id)) tmpNodes.push({ id })
 					tmpLinks.push({ source: item.fsid, target: id, type: "label" })
+				})
+			}
+
+			if (item.links.length > 0) {
+				item.links.forEach(id => {
+					if (!tmpNodes.some(node => node.id === id)) {
+						const item = data.find(n => n.fsid === id)
+						tmpNodes.push({ id, data: item })
+					}
+					tmpLinks.push({ source: item.fsid, target: id, type: "link" })
 				})
 			}
 		})

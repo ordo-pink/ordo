@@ -13,13 +13,14 @@ import { Unary } from "@ordo-pink/tau"
 import { AuthResponse } from "@ordo-pink/backend-server-id"
 import CreatePageModal from "$components/modals/create-page-modal.component"
 import UploadFilesModal from "$components/modals/upload-files-modal.component"
-import { DataCommands, PlainData } from "@ordo-pink/data"
+import { DataCommands, FSID, PlainData } from "@ordo-pink/data"
 import { ClientDataPersistenceStrategy } from "../strategies/client-data-persistence-strategy.impl"
 import { ClientContentPersistenceStrategy } from "../strategies/client-content-persistence-strategy.impl"
 import RemoveFileModal from "$components/modals/remove-page-modal.component"
 import RenameDirectoryModal from "$components/modals/rename-modal.component"
 import {
 	BsArrowRightSquare,
+	BsLink,
 	BsNodeMinus,
 	BsNodePlus,
 	BsPencilSquare,
@@ -28,6 +29,7 @@ import {
 	BsTags,
 } from "react-icons/bs"
 import FileIconComponent from "$functions/file-explorer/components/file-icon.component"
+import { PiGraph } from "react-icons/pi"
 
 const commands = getCommands()
 
@@ -78,6 +80,32 @@ export const __initData: Fn = ({ logger, auth$ }) => {
 					Icon: BsTag,
 					onSelect: () => {
 						commands.emit<cmd.data.addLabel>("data.add-label", { item: payload, label })
+					},
+				})),
+		})
+	})
+
+	commands.on<cmd.data.showEditLinksPalette>("data.show-edit-links-palette", ({ payload }) => {
+		const data = data$.value
+
+		commands.emit<cmd.commandPalette.show>("command-palette.show", {
+			multiple: true,
+			pinnedItems: payload.links.map(link => ({
+				id: link,
+				readableName: data.find(item => item.fsid === link)!.name,
+				Icon: BsLink,
+				onSelect: () => {
+					commands.emit<cmd.data.removeLink>("data.remove-link", { item: payload, link })
+				},
+			})),
+			items: data
+				.filter(data => !payload.links.includes(data.fsid))
+				.map(link => ({
+					id: link.fsid,
+					readableName: link.name,
+					Icon: BsLink,
+					onSelect: () => {
+						commands.emit<cmd.data.addLink>("data.add-link", { item: payload, link: link.fsid })
 					},
 				})),
 		})
@@ -186,6 +214,32 @@ export const __initData: Fn = ({ logger, auth$ }) => {
 			.orNothing()
 	})
 
+	commands.on<cmd.data.addLink>("data.add-link", ({ payload }) => {
+		const auth = (auth$ as BehaviorSubject<AuthResponse>).value
+
+		dataCommands
+			.addLink({
+				fsid: payload.item.fsid,
+				createdBy: auth.sub,
+				updatedBy: auth.sub,
+				link: payload.link,
+			})
+			.orNothing()
+	})
+
+	commands.on<cmd.data.removeLink>("data.remove-link", ({ payload }) => {
+		const auth = (auth$ as BehaviorSubject<AuthResponse>).value
+
+		dataCommands
+			.removeLink({
+				fsid: payload.item.fsid,
+				createdBy: auth.sub,
+				updatedBy: auth.sub,
+				link: payload.link,
+			})
+			.orNothing()
+	})
+
 	commands.emit<cmd.ctxMenu.add>("context-menu.add", {
 		cmd: "data.show-rename-modal",
 		Icon: BsPencilSquare,
@@ -199,6 +253,14 @@ export const __initData: Fn = ({ logger, auth$ }) => {
 		cmd: "data.show-edit-labels-palette",
 		Icon: BsTags,
 		readableName: "Edit labels",
+		shouldShow: ({ payload }) => payload && payload.fsid && payload.name,
+		type: "update",
+	})
+
+	commands.emit<cmd.ctxMenu.add>("context-menu.add", {
+		cmd: "data.show-edit-links-palette",
+		Icon: PiGraph,
+		readableName: "Edit links",
 		shouldShow: ({ payload }) => payload && payload.fsid && payload.name,
 		type: "update",
 	})

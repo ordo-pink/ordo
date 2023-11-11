@@ -4,7 +4,6 @@
 import { Extensions, ComponentSpace, Functions, cmd } from "@ordo-pink/frontend-core"
 import { Switch } from "@ordo-pink/switch"
 import GTDIcon from "./components/gtd-icon.component"
-import GDTCard from "./components/gtd-card.component"
 import GTDSidebar from "./components/gtd-sidebar.component"
 import GTD from "./components/gtd.component"
 import { BsInbox, BsLightbulb } from "react-icons/bs"
@@ -16,7 +15,7 @@ export default function createGTDFunction({ commands }: Functions.CreateFunction
 		Component,
 		Sidebar: GTDSidebar,
 		name: "gtd",
-		routes: ["/gtd", "/gtd/projects/:project", "/gtd/labels/:label"],
+		routes: ["/gtd", "/gtd/projects/:project", "/gtd/labels/:label", "/gtd/items/:fsid"],
 		background: false,
 	})
 
@@ -76,6 +75,5 @@ export default function createGTDFunction({ commands }: Functions.CreateFunction
 const Component = ({ space }: Extensions.ComponentProps) =>
 	Switch.of(space)
 		.case(ComponentSpace.ICON, GTDIcon)
-		.case(ComponentSpace.CARD, GDTCard)
 		.case(ComponentSpace.WIDGET, GTDWidget)
 		.default(GTD)

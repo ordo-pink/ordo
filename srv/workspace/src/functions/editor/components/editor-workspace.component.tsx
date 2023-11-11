@@ -83,7 +83,7 @@ export default function EditorWorkspace() {
 						<Editable
 							spellCheck
 							autoFocus
-							className="outline-none"
+							className="outline-none pb-96"
 							placeholder="Пора начинать..."
 							renderElement={renderElement}
 							onKeyDown={(event: KeyboardEvent<HTMLDivElement>) => {

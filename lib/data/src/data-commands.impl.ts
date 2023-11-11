@@ -78,6 +78,16 @@ const of = <T>({
 			.get(createdBy, fsid)
 			.chain(plain => Data.of(plain).removeLabel(label, updatedBy).fold(Oath.reject, Oath.resolve))
 			.chain(data => dataPersistenceStrategy.update(data.plain)),
+	addLink: ({ createdBy, fsid, link, updatedBy }) =>
+		dataPersistenceStrategy
+			.get(createdBy, fsid)
+			.chain(plain => Data.of(plain).addLink(link, updatedBy).fold(Oath.reject, Oath.resolve))
+			.chain(data => dataPersistenceStrategy.update(data.plain)),
+	removeLink: ({ createdBy, fsid, link, updatedBy }) =>
+		dataPersistenceStrategy
+			.get(createdBy, fsid)
+			.chain(plain => Data.of(plain).removeLink(link, updatedBy).fold(Oath.reject, Oath.resolve))
+			.chain(data => dataPersistenceStrategy.update(data.plain)),
 	update: ({ data, fsid, createdBy, updatedBy }) =>
 		dataPersistenceStrategy
 			.get(createdBy, fsid)

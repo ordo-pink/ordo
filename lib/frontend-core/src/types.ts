@@ -56,6 +56,10 @@ export namespace cmd {
 			name: "data.show-edit-labels-palette"
 			payload: PlainData
 		}
+		export type showEditLinksPalette = {
+			name: "data.show-edit-links-palette"
+			payload: PlainData
+		}
 
 		export type setContent = {
 			name: "data.set-content"
@@ -73,13 +77,15 @@ export namespace cmd {
 		export type move = { name: "data.move"; payload: { fsid: FSID; parent: Nullable<FSID> } }
 		export type rename = { name: "data.rename"; payload: { fsid: FSID; name: string } }
 		export type addLabel = { name: "data.add-label"; payload: { item: PlainData; label: string } }
-		export type setChildOrder = {
-			name: "data.set-child-order"
-			payload: { fsid: FSID; children: FSID[] }
-		}
 		export type removeLabel = {
 			name: "data.remove-label"
 			payload: { item: PlainData; label: string }
+		}
+
+		export type addLink = { name: "data.add-link"; payload: { item: PlainData; link: FSID } }
+		export type removeLink = {
+			name: "data.remove-link"
+			payload: { item: PlainData; link: FSID }
 		}
 	}
 

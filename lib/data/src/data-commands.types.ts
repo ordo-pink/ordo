@@ -36,6 +36,12 @@ export type TDataCommands<T> = {
 	removeLabel: (
 		params: Pick<PlainData, "fsid" | "createdBy" | "updatedBy"> & { label: string },
 	) => Oath<"OK", DataError>
+	addLink: (
+		params: Pick<PlainData, "fsid" | "createdBy" | "updatedBy"> & { link: FSID },
+	) => Oath<"OK", DataError>
+	removeLink: (
+		params: Pick<PlainData, "fsid" | "createdBy" | "updatedBy"> & { link: FSID },
+	) => Oath<"OK", DataError>
 	update: (
 		params: Pick<PlainData, "fsid" | "createdBy" | "updatedBy"> & { data: PlainData },
 	) => Oath<"OK", DataError>

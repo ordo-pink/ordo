@@ -3,8 +3,7 @@
 
 import { PlainData } from "@ordo-pink/data"
 import { useSharedContext } from "@ordo-pink/frontend-core"
-import { useEffect, useRef, useState } from "react"
-import Links from "./links.component"
+import { useEffect, useState } from "react"
 import Links3D from "./3d-links.component"
 import { useRouteParams } from "$hooks/use-route-params.hook"
 import { useWorkspaceWidth } from "$hooks/use-workspace-width.hook"

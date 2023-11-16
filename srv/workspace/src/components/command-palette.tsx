@@ -222,7 +222,7 @@ export default function CommandPaletteModal({ items, onNewItem, multiple, pinned
 					onKeyDown={handleKeyDown}
 					type="text"
 					autoFocus
-					className="w-full rounded-lg px-2 py-1 text-sm bg-transparent focus:outline-none border-none"
+					className="w-full outline-none ring-0 rounded-lg px-2 py-1 text-sm bg-transparent focus:outline-none focus:ring-0 border-none"
 					placeholder={tSearchPlaceholder}
 				/>
 			</div>

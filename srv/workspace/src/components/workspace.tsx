@@ -57,7 +57,7 @@ const DisabledSidebar = ({ activity }: DisabledSidebarProps) =>
 	Either.fromNullable(activity).fold(
 		() => <div>Welcome</div>,
 		({ Component }) => (
-			<div className="workspace w-full h-full overflow-auto">
+			<div className="workspace w-full h-full overflow-auto pl-12">
 				<Component commands={commands} space={ComponentSpace.WORKSPACE} />
 			</div>
 		),
@@ -113,7 +113,7 @@ const EnabledSidebar = ({ sidebar$, activity, commandPalette$ }: EnabledSidebarP
 		() => <div>Welcome</div>,
 		({ Component, Sidebar: SidebarComponent }) => (
 			<Split
-				className="flex overflow-hidden h-screen w-full"
+				className="flex overflow-hidden h-screen w-full pl-12"
 				sizes={sizes}
 				snapOffset={snapOffset}
 				onDrag={setSizes}

@@ -54,7 +54,7 @@ export default function ActivityBar({
 	return (
 		<div
 			onContextMenu={showContextMenu}
-			className={`activity-bar w-12 h-screen flex flex-col justify-between items-center py-4 text-lg sm:text-2xl z-50 bg-neutral-200 dark:bg-neutral-900`}
+			className={`activity-bar fixed w-12 h-screen flex flex-col justify-between items-center py-4 text-lg sm:text-2xl z-50 bg-neutral-200 dark:bg-neutral-900`}
 		>
 			<div>
 				<div

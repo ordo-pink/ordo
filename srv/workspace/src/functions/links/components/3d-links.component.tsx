@@ -13,7 +13,7 @@ const DarkThemeColors = {
 	LABEL_LINK: "#8b5cf6",
 	LABEL_NODE: "#2e1065",
 	CHILD_LINK: "#e5e5e5",
-	CHILD_NODE: "#fff",
+	CHILD_NODE: "#fafafa",
 	LINK: "#ea580c",
 }
 

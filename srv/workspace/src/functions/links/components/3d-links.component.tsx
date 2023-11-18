@@ -7,7 +7,11 @@ import { PlainData } from "@ordo-pink/data"
 import { cmd, useSharedContext } from "@ordo-pink/frontend-core"
 import { useRef } from "react"
 import { ForceGraph3D } from "react-force-graph"
+import { CSS2DRenderer, CSS2DObject } from "three/addons"
 import "./3d-links.component.css"
+import SpriteText from "three-spritetext"
+
+const extraRenderers = [new CSS2DRenderer()]
 
 const DarkThemeColors = {
 	LABEL_LINK: "#8b5cf6",
@@ -40,6 +44,8 @@ export default function Links3D({ nodes, links }: P) {
 	return (
 		<ForceGraph3D
 			ref={ref}
+			forceEngine="d3"
+			extraRenderers={extraRenderers as any}
 			width={workspaceWidth}
 			graphData={{ nodes, links }}
 			backgroundColor="rgba(0,0,0,0)"
@@ -67,7 +73,34 @@ export default function Links3D({ nodes, links }: P) {
 				})
 			}
 			controlType="orbit"
+			onNodeDragEnd={node => {
+				node.fx = node.x
+				node.fy = node.y
+				node.fz = node.z
+			}}
 			showNavInfo={false}
+			// onEngineTick={() => {
+			// 	console.log(ref.current.scene())
+			// 	console.log(ref.current.controls().target.distanceTo(ref.current.scene().position))
+			// }}
+			// nodeThreeObjectExtend
+			// nodeThreeObject={node => {
+			// 	const text = new SpriteText(node.data ? node.data.name : `#${node.id}`)
+			// 	text.translateY(-12)
+			// 	text.color = node.data ? colors.CHILD_NODE : colors.LABEL_NODE
+			// 	text.fontFace = "Jost"
+			// 	text.backgroundColor = "#fff"
+			// 	text.padding = 2
+			// 	text.borderRadius = 5
+			// 	return text
+			// const element = document.createElement("div")
+
+			// element.textContent = node.data ? node.data.name : node.id
+			// element.style.color = node.data ? colors.CHILD_NODE : colors.LABEL_NODE
+			// element.className = "mt-6 w-24 text-center"
+
+			// return new CSS2DObject(element)
+			// }}
 		/>
 	)
 }

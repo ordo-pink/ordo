@@ -7,16 +7,13 @@
 
 import { createDataServer } from "@ordo-pink/backend-server-data"
 import { getc } from "@ordo-pink/getc"
-import { ContentPersistenceStrategyFS } from "@ordo-pink/backend-content-persistence-strategy-fs"
-import { DataPersistenceStrategyFS } from "@ordo-pink/backend-data-persistence-strategy-fs"
 import { ConsoleLogger } from "@ordo-pink/logger"
 import { DataCommands } from "@ordo-pink/data"
 import { ContentPersistenceStrategyS3 } from "@ordo-pink/backend-content-persistence-strategy-s3"
+import { DataPersistenceStrategyS3 } from "@ordo-pink/backend-data-persistence-strategy-s3"
 
 const {
-	// DATA_DATA_PATH,
 	DATA_HOST,
-	DATA_METADATA_PATH,
 	DATA_PORT,
 	WORKSPACE_HOST,
 	WEB_HOST,
@@ -27,8 +24,6 @@ const {
 	DATA_S3_BUCKET_NAME,
 	DATA_S3_ENDPOINT,
 } = getc([
-	// "DATA_DATA_PATH",
-	"DATA_METADATA_PATH",
 	"DATA_PORT",
 	"DATA_HOST",
 	"WORKSPACE_HOST",
@@ -42,26 +37,22 @@ const {
 ])
 
 const main = async () => {
-	const dataRepository = DataPersistenceStrategyFS.of({ root: DATA_METADATA_PATH })
-	// const contentRepository = ContentPersistenceStrategyFS.of({ root: DATA_DATA_PATH })
-	const contentRepository = ContentPersistenceStrategyS3.of({
-		accessKeyId: DATA_S3_ACCESS_KEY,
-		secretAccessKey: DATA_S3_SECRET_KEY,
-		region: DATA_S3_REGION,
-		bucketName: DATA_S3_BUCKET_NAME,
-		endpoint: DATA_S3_ENDPOINT,
-	})
-	const dataService = DataCommands.of({
-		dataPersistenceStrategy: dataRepository,
-		contentPersistenceStrategy: contentRepository,
-	})
+	const idHost = ID_HOST
+	const origin = [WORKSPACE_HOST, WEB_HOST]
+	const logger = ConsoleLogger
+	const accessKeyId = DATA_S3_ACCESS_KEY
+	const secretAccessKey = DATA_S3_SECRET_KEY
+	const region = DATA_S3_REGION
+	const bucketName = DATA_S3_BUCKET_NAME
+	const endpoint = DATA_S3_ENDPOINT
 
-	const app = createDataServer({
-		dataService,
-		idHost: ID_HOST,
-		origin: [WORKSPACE_HOST, WEB_HOST],
-		logger: ConsoleLogger,
-	})
+	const awsS3Params = { accessKeyId, secretAccessKey, region, bucketName, endpoint }
+
+	const dataPersistenceStrategy = DataPersistenceStrategyS3.of(awsS3Params)
+	const contentPersistenceStrategy = ContentPersistenceStrategyS3.of(awsS3Params)
+	const dataService = DataCommands.of({ dataPersistenceStrategy, contentPersistenceStrategy })
+
+	const app = createDataServer({ dataService, idHost, origin, logger })
 
 	ConsoleLogger.info(`DATA server running on ${DATA_HOST}`)
 

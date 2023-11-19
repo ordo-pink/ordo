@@ -336,18 +336,20 @@ export const __initData: Fn = ({ logger, auth$ }) => {
 		const auth = (auth$ as BehaviorSubject<AuthResponse>).value
 		const data = data$.value
 
-		dataCommands.updateContent({ createdBy: auth.sub, fsid, content, updatedBy: auth.sub }).fork(
-			() => void 0,
-			size => {
-				// TODO: Cleanup and validations
-				const dataCopy = [...data]
-				const currentData = dataCopy.find(item => item.fsid === fsid)
-				const updated = { ...currentData!, updatedAt: Date.now(), size }
-				dataCopy.splice(dataCopy.indexOf(currentData!), 1, updated)
+		dataCommands
+			.updateContent({ createdBy: auth.sub, fsid, content, updatedBy: auth.sub, length: 0 })
+			.fork(
+				() => void 0,
+				size => {
+					// TODO: Cleanup and validations
+					const dataCopy = [...data]
+					const currentData = dataCopy.find(item => item.fsid === fsid)
+					const updated = { ...currentData!, updatedAt: Date.now(), size }
+					dataCopy.splice(dataCopy.indexOf(currentData!), 1, updated)
 
-				data$.next(dataCopy)
-			},
-		)
+					data$.next(dataCopy)
+				},
+			)
 	})
 
 	commands.on<cmd.data.refreshRoot>("data.refresh-root", () => {

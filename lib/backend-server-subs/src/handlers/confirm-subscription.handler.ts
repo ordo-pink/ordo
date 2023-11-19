@@ -59,7 +59,12 @@ export const handleConfirmSubscription: Fn =
 					.map(str => Readable.from([str]))
 					.chain(content =>
 						dataService.contentPersistenceStrategy
-							.write(constantDataOwner, email as any, content)
+							.write(
+								constantDataOwner,
+								email as any,
+								content,
+								Number(ctx.req.headers["Content-Length"]),
+							)
 							.bimap(
 								e => HttpError.from(new Error(e)),
 								() => "Subscription verified",

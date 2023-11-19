@@ -17,7 +17,7 @@ type Params = {
 	secretAccessKey: string
 	region: string
 	bucketName: string
-	endpoint: string
+	endpoint?: string
 }
 
 /**
@@ -29,6 +29,7 @@ type Params = {
  *   accessKeyId: "YOUR_ACCESS_KEY",
  *   secretAccessKey: "YOUR_SECRET_KEY",
  *   region: "us-east-1",
+ *   endpoint: "YOUR_AWS_ENDPOINT",
  *   bucketName: "content-test-bucket"
  * })
  */

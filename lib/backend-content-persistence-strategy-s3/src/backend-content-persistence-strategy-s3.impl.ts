@@ -8,16 +8,8 @@
 import { Readable, PassThrough } from "stream"
 import { ContentPersistenceStrategy, Data, FSID, UserID } from "@ordo-pink/data"
 import { Oath } from "@ordo-pink/oath"
-import {
-	DeleteObjectCommand,
-	GetObjectAttributesCommand,
-	GetObjectCommand,
-	HeadObjectCommand,
-	PutObjectCommand,
-	S3Client,
-} from "@aws-sdk/client-s3"
+import { DeleteObjectCommand, GetObjectCommand, S3Client } from "@aws-sdk/client-s3"
 import { Upload } from "@aws-sdk/lib-storage"
-import { S3ReadStream } from "./s3-read-stream"
 import { S3DownloadStream } from "./s3-download-stream"
 
 type Params = {

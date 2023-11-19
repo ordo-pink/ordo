@@ -27,7 +27,20 @@ export const handleGetContent: Unary<
 						dataService.getContent({ fsid, createdBy }).rejectedMap(HttpError.NotFound),
 				),
 			)
-			.fork(sendError(ctx), result => {
-				ctx.response.status = 200
-				ctx.response.body = result
-			})
+			.fork(
+				sendError(ctx),
+				async result =>
+					new Promise(resolve => {
+						ctx.response.status = 200
+						result.on("data", chunk => {
+							ctx.res.write(chunk)
+						})
+						result.on("error", () => {
+							ctx.res.write("")
+							ctx.res.end()
+						})
+						result.on("end", () => {
+							resolve(ctx.res.end())
+						})
+					}),
+			)

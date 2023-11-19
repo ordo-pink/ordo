@@ -45,6 +45,7 @@ export const handleUploadContent: Unary<
 									updatedBy: sub,
 									content: ctx.request.req,
 									fileLimit: lim,
+									length: Number(ctx.req.headers["content-length"]),
 								})
 								.rejectedMap(HttpError.NotFound),
 						),
@@ -52,5 +53,5 @@ export const handleUploadContent: Unary<
 			)
 			.fork(sendError(ctx), result => {
 				ctx.response.status = 200
-				ctx.response.body = { success: true, result }
+				ctx.response.body = { success: true, result: ctx.req.headers["content-length"] }
 			})

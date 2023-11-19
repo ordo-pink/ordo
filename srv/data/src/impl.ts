@@ -11,28 +11,46 @@ import { ContentPersistenceStrategyFS } from "@ordo-pink/backend-content-persist
 import { DataPersistenceStrategyFS } from "@ordo-pink/backend-data-persistence-strategy-fs"
 import { ConsoleLogger } from "@ordo-pink/logger"
 import { DataCommands } from "@ordo-pink/data"
+import { ContentPersistenceStrategyS3 } from "@ordo-pink/backend-content-persistence-strategy-s3"
 
 const {
-	DATA_DATA_PATH,
+	// DATA_DATA_PATH,
 	DATA_HOST,
 	DATA_METADATA_PATH,
 	DATA_PORT,
 	WORKSPACE_HOST,
 	WEB_HOST,
 	ID_HOST,
+	DATA_S3_ACCESS_KEY,
+	DATA_S3_SECRET_KEY,
+	DATA_S3_REGION,
+	DATA_S3_BUCKET_NAME,
+	DATA_S3_ENDPOINT,
 } = getc([
-	"DATA_DATA_PATH",
+	// "DATA_DATA_PATH",
 	"DATA_METADATA_PATH",
 	"DATA_PORT",
 	"DATA_HOST",
 	"WORKSPACE_HOST",
 	"ID_HOST",
 	"WEB_HOST",
+	"DATA_S3_ACCESS_KEY",
+	"DATA_S3_SECRET_KEY",
+	"DATA_S3_REGION",
+	"DATA_S3_BUCKET_NAME",
+	"DATA_S3_ENDPOINT",
 ])
 
 const main = async () => {
 	const dataRepository = DataPersistenceStrategyFS.of({ root: DATA_METADATA_PATH })
-	const contentRepository = ContentPersistenceStrategyFS.of({ root: DATA_DATA_PATH })
+	// const contentRepository = ContentPersistenceStrategyFS.of({ root: DATA_DATA_PATH })
+	const contentRepository = ContentPersistenceStrategyS3.of({
+		accessKeyId: DATA_S3_ACCESS_KEY,
+		secretAccessKey: DATA_S3_SECRET_KEY,
+		region: DATA_S3_REGION,
+		bucketName: DATA_S3_BUCKET_NAME,
+		endpoint: DATA_S3_ENDPOINT,
+	})
 	const dataService = DataCommands.of({
 		dataPersistenceStrategy: dataRepository,
 		contentPersistenceStrategy: contentRepository,

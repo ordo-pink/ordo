@@ -47,9 +47,15 @@ export type ContentPersistenceStrategy<Content> = {
 	 * @param uid `UserID` of the user who owns the file.
 	 * @param fsid `FSID` of the file to be updated.
 	 * @param content Content to be written to the file.
+	 * @param contentLength Expected length of provided content.
 	 * @returns Oath of the new file size in bytes or content write error.
 	 */
-	write: (uid: UserID, fsid: FSID, content: Content) => Oath<number, ContentWriteErrors>
+	write: (
+		uid: UserID,
+		fsid: FSID,
+		content: Content,
+		contentLength: number,
+	) => Oath<number, ContentWriteErrors>
 
 	/**
 	 * Delete content of the file with given `FSID` under ownership of the user with given `UserID`.

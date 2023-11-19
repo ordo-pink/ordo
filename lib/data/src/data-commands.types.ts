@@ -46,12 +46,13 @@ export type TDataCommands<T> = {
 		params: Pick<PlainData, "fsid" | "createdBy" | "updatedBy"> & { data: PlainData },
 	) => Oath<"OK", DataError>
 	updateContent: (
-		params: Pick<PlainData, "createdBy" | "updatedBy" | "fsid"> & { content: T },
+		params: Pick<PlainData, "createdBy" | "updatedBy" | "fsid"> & { content: T; length: number },
 	) => Oath<number, DataError>
 	uploadContent: (
 		params: Pick<PlainData, "createdBy" | "updatedBy" | "name" | "parent"> & {
 			content: T
 			fileLimit: number
+			length: number
 		},
 	) => Oath<"OK", DataError>
 	getContent: (params: Pick<PlainData, "fsid" | "createdBy">) => Oath<T, DataError>

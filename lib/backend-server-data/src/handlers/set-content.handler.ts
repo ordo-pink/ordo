@@ -37,7 +37,13 @@ export const handleSetContent: Unary<
 				Oath.of({ fsid: ctx.params.fsid as FSID, createdBy: ctx.params.userId as SUB }).chain(
 					({ fsid, createdBy }) =>
 						dataService
-							.updateContent({ fsid, createdBy, updatedBy: sub, content: ctx.request.req })
+							.updateContent({
+								fsid,
+								createdBy,
+								updatedBy: sub,
+								content: ctx.request.req,
+								length: Number(ctx.req.headers["content-length"]),
+							})
 							.rejectedMap(HttpError.NotFound),
 				),
 			)

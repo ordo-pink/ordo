@@ -154,15 +154,15 @@ const of = <T>({
 			.chain(plain => Data.of(plain).setName(name, updatedBy).fold(Oath.reject, Oath.resolve))
 			.chain(data => dataPersistenceStrategy.update(data.plain)),
 	// TODO: Roll back on error
-	updateContent: ({ content, createdBy, updatedBy, fsid }) =>
+	updateContent: ({ content, createdBy, updatedBy, fsid, length }) =>
 		dataPersistenceStrategy.get(createdBy, fsid).chain(plain =>
 			contentPersistenceStrategy
-				.write(createdBy, plain.fsid, content)
+				.write(createdBy, plain.fsid, content, length)
 				.chain(size => Data.of(plain).setSize(size, updatedBy).fold(Oath.reject, Oath.resolve))
 				.chain(data => dataPersistenceStrategy.update(data.plain).map(() => data.plain.size)),
 		),
 	// TODO: Roll back on error
-	uploadContent: ({ content, createdBy, updatedBy, name, parent, fileLimit }) =>
+	uploadContent: ({ content, createdBy, updatedBy, name, parent, fileLimit, length }) =>
 		dataPersistenceStrategy
 			.find(createdBy, name, parent)
 			.fix(() => null)
@@ -181,7 +181,7 @@ const of = <T>({
 			)
 			.chain(plain =>
 				contentPersistenceStrategy
-					.write(createdBy, plain.fsid, content)
+					.write(createdBy, plain.fsid, content, length)
 					.chain(size => Data.of(plain).setSize(size, updatedBy).fold(Oath.reject, Oath.resolve))
 					.chain(data => dataPersistenceStrategy.update(data.plain)),
 			),

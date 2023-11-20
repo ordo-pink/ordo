@@ -1,7 +1,6 @@
 // SPDX-FileCopyrightText: Copyright 2023, 谢尔盖||↓ and the Ordo.pink contributors
 // SPDX-License-Identifier: MIT
 
-import { rrrToNotification } from "$utils/error-to-notification"
 import { Hosts } from "$utils/hosts"
 import { AuthResponse } from "@ordo-pink/backend-server-id"
 import { ContentPersistenceStrategy, Data, UnexpectedError } from "@ordo-pink/data"

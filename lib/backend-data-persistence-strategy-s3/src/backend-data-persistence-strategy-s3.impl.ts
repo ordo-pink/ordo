@@ -94,7 +94,7 @@ export const DataPersistenceStrategyS3 = {
 /**
  * Creates a bucket object key from user id.
  */
-const getKey = (uid: UserID) => `${uid}/data.json`
+const getKey = (uid: UserID) => `${uid}.json`
 
 const write0 =
 	(s3: S3Client, uid: UserID, Bucket: string) =>

@@ -21,7 +21,8 @@ const {
 	DATA_S3_ACCESS_KEY,
 	DATA_S3_SECRET_KEY,
 	DATA_S3_REGION,
-	DATA_S3_BUCKET_NAME,
+	DATA_S3_CONTENT_BUCKET_NAME,
+	DATA_S3_DATA_BUCKET_NAME,
 	DATA_S3_ENDPOINT,
 } = getc([
 	"DATA_PORT",
@@ -32,7 +33,8 @@ const {
 	"DATA_S3_ACCESS_KEY",
 	"DATA_S3_SECRET_KEY",
 	"DATA_S3_REGION",
-	"DATA_S3_BUCKET_NAME",
+	"DATA_S3_CONTENT_BUCKET_NAME",
+	"DATA_S3_DATA_BUCKET_NAME",
 	"DATA_S3_ENDPOINT",
 ])
 
@@ -43,13 +45,15 @@ const main = async () => {
 	const accessKeyId = DATA_S3_ACCESS_KEY
 	const secretAccessKey = DATA_S3_SECRET_KEY
 	const region = DATA_S3_REGION
-	const bucketName = DATA_S3_BUCKET_NAME
+	const dataBucket = DATA_S3_DATA_BUCKET_NAME
+	const contentBucket = DATA_S3_CONTENT_BUCKET_NAME
 	const endpoint = DATA_S3_ENDPOINT
 
-	const awsS3Params = { accessKeyId, secretAccessKey, region, bucketName, endpoint }
+	const data = { accessKeyId, secretAccessKey, region, endpoint, bucketName: dataBucket }
+	const content = { accessKeyId, secretAccessKey, region, endpoint, bucketName: contentBucket }
 
-	const dataPersistenceStrategy = DataPersistenceStrategyS3.of(awsS3Params)
-	const contentPersistenceStrategy = ContentPersistenceStrategyS3.of(awsS3Params)
+	const dataPersistenceStrategy = DataPersistenceStrategyS3.of(data)
+	const contentPersistenceStrategy = ContentPersistenceStrategyS3.of(content)
 	const dataService = DataCommands.of({ dataPersistenceStrategy, contentPersistenceStrategy })
 
 	const app = createDataServer({ dataService, idHost, origin, logger })

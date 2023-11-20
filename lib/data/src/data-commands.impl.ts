@@ -169,10 +169,7 @@ const of = <T>({
 			.chain(plain =>
 				plain
 					? Oath.of(plain)
-					: of({
-							dataPersistenceStrategy: dataPersistenceStrategy,
-							contentPersistenceStrategy: contentPersistenceStrategy,
-					  }).create({
+					: of({ dataPersistenceStrategy, contentPersistenceStrategy }).create({
 							name,
 							createdBy,
 							parent,

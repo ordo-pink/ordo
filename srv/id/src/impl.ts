@@ -5,13 +5,13 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-import { UserPersistenceStrategyDynamoDB } from "@ordo-pink/backend-user-persistence-strategy-dynamodb"
+import { UserPersistenceStrategyDynamoDB } from "@ordo-pink/backend-persistence-strategy-user-dynamodb"
 import { createIDServer } from "@ordo-pink/backend-server-id"
 import { getc } from "@ordo-pink/getc"
 import { ConsoleLogger } from "@ordo-pink/logger"
 import { getPrivateKey, getPublicKey } from "./utils/get-key"
-import { TokenPersistenceStrategyFS } from "@ordo-pink/backend-token-persistence-strategy-fs"
-import { FSUserRepository } from "@ordo-pink/backend-users-persistence-strategy-fs"
+import { TokenPersistenceStrategyFS } from "@ordo-pink/backend-persistence-strategy-token-fs"
+import { FSUserRepository } from "@ordo-pink/backend-persistence-strategy-user-fs"
 import { RusenderEmailStrategy } from "@ordo-pink/backend-email-strategy-rusender"
 
 const {

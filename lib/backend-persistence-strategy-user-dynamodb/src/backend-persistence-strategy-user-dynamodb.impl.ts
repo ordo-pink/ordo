@@ -5,7 +5,7 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-import type * as T from "./types"
+import type * as T from "./backend-persistence-strategy-user-dynamodb.types"
 import { DynamoDB } from "aws-sdk"
 import { keysOf } from "@ordo-pink/tau"
 import { Oath } from "@ordo-pink/oath"

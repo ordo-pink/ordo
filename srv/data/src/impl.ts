@@ -9,8 +9,8 @@ import { createDataServer } from "@ordo-pink/backend-server-data"
 import { getc } from "@ordo-pink/getc"
 import { ConsoleLogger } from "@ordo-pink/logger"
 import { DataCommands } from "@ordo-pink/data"
-import { ContentPersistenceStrategyS3 } from "@ordo-pink/backend-content-persistence-strategy-s3"
-import { DataPersistenceStrategyS3 } from "@ordo-pink/backend-data-persistence-strategy-s3"
+import { ContentPersistenceStrategyS3 } from "@ordo-pink/backend-persistence-strategy-content-s3"
+import { DataPersistenceStrategyS3 } from "@ordo-pink/backend-persistence-strategy-data-s3"
 
 const {
 	DATA_HOST,

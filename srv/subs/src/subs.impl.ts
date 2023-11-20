@@ -6,8 +6,8 @@ import { FSID } from "@ordo-pink/data"
 import { ConsoleLogger } from "@ordo-pink/logger"
 import { createSubsServer } from "@ordo-pink/backend-server-subs"
 import { RusenderEmailStrategy } from "@ordo-pink/backend-email-strategy-rusender"
-import { DataPersistenceStrategyFS } from "@ordo-pink/backend-data-persistence-strategy-fs"
-import { ContentPersistenceStrategyFS } from "@ordo-pink/backend-content-persistence-strategy-fs"
+import { DataPersistenceStrategyFS } from "@ordo-pink/backend-persistence-strategy-data-fs"
+import { ContentPersistenceStrategyFS } from "@ordo-pink/backend-persistence-strategy-content-fs"
 
 const {
 	WORKSPACE_HOST,

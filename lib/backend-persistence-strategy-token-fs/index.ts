@@ -5,4 +5,4 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-export * from "./src/backend-content-persistence-strategy-fs.impl"
+export * from "./src/backend-persistence-strategy-token-fs.impl"

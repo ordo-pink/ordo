@@ -7,11 +7,11 @@ import { PlainData } from "@ordo-pink/data"
 import { cmd, useSharedContext } from "@ordo-pink/frontend-core"
 import { useRef } from "react"
 import { ForceGraph3D } from "react-force-graph"
-import { CSS2DRenderer, CSS2DObject } from "three/addons"
+// import { CSS2DRenderer, CSS2DObject } from "three/addons"
 import "./3d-links.component.css"
-import SpriteText from "three-spritetext"
+// import SpriteText from "three-spritetext"
 
-const extraRenderers = [new CSS2DRenderer()]
+// const extraRenderers = [new CSS2DRenderer()]
 
 const DarkThemeColors = {
 	LABEL_LINK: "#8b5cf6",
@@ -45,7 +45,7 @@ export default function Links3D({ nodes, links }: P) {
 		<ForceGraph3D
 			ref={ref}
 			forceEngine="d3"
-			extraRenderers={extraRenderers as any}
+			// extraRenderers={extraRenderers as any}
 			width={workspaceWidth}
 			graphData={{ nodes, links }}
 			backgroundColor="rgba(0,0,0,0)"

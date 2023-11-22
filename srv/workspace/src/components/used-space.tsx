@@ -27,7 +27,7 @@ export default function UsedSpace() {
 	return Either.fromNullable(user).fold(Null, user => (
 		<div className="w-full max-w-sm">
 			<div className="flex justify-between items-center w-full">
-				<div className="text-xs truncate">File limit</div>
+				<div className="text-xs truncate">Лимит файлов</div>
 				<div className="text-xs">
 					{size.toFixed(0)}
 					{"/"}

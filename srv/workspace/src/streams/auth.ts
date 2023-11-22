@@ -68,23 +68,6 @@ export const __initAuth: InitAuth = callOnce(({ logger }) => {
 			),
 	)
 
-	commands.on<cmd.user.signOut>("user.sign-out", () =>
-		commands.emit<cmd.router.openExternal>("router.open-external", {
-			url: `${Hosts.WEBSITE}/sign-out`,
-			newTab: false,
-		}),
-	)
-
-	commands.emit<cmd.commandPalette.add>("command-palette.add", {
-		id: "core.sign-out",
-		readableName: "Sign out",
-		Icon: AiOutlineLogout,
-		onSelect: () => {
-			commands.emit<cmd.commandPalette.hide>("command-palette.hide")
-			commands.emit<cmd.user.signOut>("user.sign-out")
-		},
-	})
-
 	return auth$
 })
 

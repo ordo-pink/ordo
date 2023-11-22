@@ -13,6 +13,7 @@ import { __CommandPalette$ } from "$streams/command-palette"
 import { __Sidebar$ } from "$streams/sidebar"
 import { useStrictSubscription, useSubscription } from "$hooks/use-subscription"
 import { Extensions, ComponentSpace, cmd } from "@ordo-pink/frontend-core"
+import { Loading } from "./loading/loading"
 
 // --- Public ---
 
@@ -55,7 +56,11 @@ type EnabledSidebarP = DisabledSidebarProps & {
 
 const DisabledSidebar = ({ activity }: DisabledSidebarProps) =>
 	Either.fromNullable(activity).fold(
-		() => <div>Welcome</div>,
+		() => (
+			<div className="w-screen">
+				<Loading />
+			</div>
+		),
 		({ Component }) => (
 			<div className="workspace w-full h-full overflow-auto pl-12">
 				<Component commands={commands} space={ComponentSpace.WORKSPACE} />

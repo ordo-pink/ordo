@@ -99,7 +99,7 @@ export const __initData: Fn = ({ logger, auth$ }) => {
 				},
 			})),
 			items: data
-				.filter(data => !payload.links.includes(data.fsid))
+				.filter(data => !payload.links.includes(data.fsid) && data.fsid !== payload.fsid)
 				.map(link => ({
 					id: link.fsid,
 					readableName: link.name,
@@ -243,7 +243,7 @@ export const __initData: Fn = ({ logger, auth$ }) => {
 	commands.emit<cmd.ctxMenu.add>("context-menu.add", {
 		cmd: "data.show-rename-modal",
 		Icon: BsPencilSquare,
-		readableName: "Rename",
+		readableName: "Переименовать",
 		shouldShow: ({ payload }) =>
 			payload && payload.fsid && payload.name && payload.name !== ".inbox",
 		type: "update",
@@ -252,7 +252,7 @@ export const __initData: Fn = ({ logger, auth$ }) => {
 	commands.emit<cmd.ctxMenu.add>("context-menu.add", {
 		cmd: "data.show-edit-labels-palette",
 		Icon: BsTags,
-		readableName: "Edit labels",
+		readableName: "Изменить метки",
 		shouldShow: ({ payload }) => payload && payload.fsid && payload.name,
 		type: "update",
 	})
@@ -260,7 +260,7 @@ export const __initData: Fn = ({ logger, auth$ }) => {
 	commands.emit<cmd.ctxMenu.add>("context-menu.add", {
 		cmd: "data.show-edit-links-palette",
 		Icon: PiGraph,
-		readableName: "Edit links",
+		readableName: "Изменить ссылки",
 		shouldShow: ({ payload }) => payload && payload.fsid && payload.name,
 		type: "update",
 	})
@@ -268,7 +268,7 @@ export const __initData: Fn = ({ logger, auth$ }) => {
 	commands.emit<cmd.ctxMenu.add>("context-menu.add", {
 		cmd: "data.show-create-modal",
 		Icon: BsNodePlus,
-		readableName: "Add",
+		readableName: "Добавить",
 		shouldShow: ({ payload }) => payload && (payload.fsid || payload === "root"),
 		type: "create",
 	})
@@ -276,7 +276,7 @@ export const __initData: Fn = ({ logger, auth$ }) => {
 	commands.emit<cmd.ctxMenu.add>("context-menu.add", {
 		cmd: "data.show-remove-modal",
 		Icon: BsNodeMinus,
-		readableName: "Remove",
+		readableName: "Удалить",
 		shouldShow: ({ payload }) => payload && payload.fsid,
 		type: "delete",
 	})
@@ -284,7 +284,7 @@ export const __initData: Fn = ({ logger, auth$ }) => {
 	commands.emit<cmd.ctxMenu.add>("context-menu.add", {
 		cmd: "command-palette.show",
 		Icon: BsArrowRightSquare,
-		readableName: "Move...",
+		readableName: "Переместить...",
 		shouldShow: ({ payload }) =>
 			payload && payload.fsid && payload.name && payload.name !== ".inbox",
 		payloadCreator: ({ payload }) => {
@@ -294,7 +294,7 @@ export const __initData: Fn = ({ logger, auth$ }) => {
 				items: [
 					{
 						id: "move-to-root",
-						readableName: "Move to /",
+						readableName: "Переместить в корневую папку",
 						Icon: () => <BsSlash />,
 						onSelect: () => {
 							commands.emit<cmd.data.move>("data.move", { parent: null, fsid: payload.fsid })
@@ -302,21 +302,23 @@ export const __initData: Fn = ({ logger, auth$ }) => {
 						},
 					},
 				].concat(
-					data?.map(
-						item =>
-							({
-								id: item.name,
-								readableName: item.name,
-								onSelect: () => {
-									commands.emit<cmd.data.move>("data.move", {
-										parent: item.fsid,
-										fsid: payload.fsid,
-									})
-									commands.emit<cmd.modal.hide>("modal.hide")
-								},
-								Icon: () => <FileIconComponent plain={item} />,
-							} satisfies CommandPalette.Item),
-					),
+					data
+						?.filter(item => item.fsid !== payload.parent && item.fsid !== payload.fsid)
+						.map(
+							item =>
+								({
+									id: item.name,
+									readableName: item.name,
+									onSelect: () => {
+										commands.emit<cmd.data.move>("data.move", {
+											parent: item.fsid,
+											fsid: payload.fsid,
+										})
+										commands.emit<cmd.modal.hide>("modal.hide")
+									},
+									Icon: () => <FileIconComponent plain={item} />,
+								} satisfies CommandPalette.Item),
+						),
 				),
 			}
 		},

@@ -70,7 +70,7 @@ export const __initSidebar: InitSidebar = callOnce(({ logger }) => {
 
 	commands.emit<cmd.ctxMenu.add>("context-menu.add", {
 		cmd: "sidebar.show",
-		readableName: "Show sidebar",
+		readableName: "Показать боковую панель",
 		Icon: AiOutlineRight,
 		shouldShow: ({ event }) => {
 			return (
@@ -87,7 +87,7 @@ export const __initSidebar: InitSidebar = callOnce(({ logger }) => {
 
 	commands.emit<cmd.ctxMenu.add>("context-menu.add", {
 		cmd: "sidebar.hide",
-		readableName: "Hide sidebar",
+		readableName: "Скрыть боковую панель",
 		Icon: AiOutlineLeft,
 		shouldShow: ({ event }) =>
 			(event.currentTarget.classList.contains("sidebar") ||

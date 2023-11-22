@@ -23,6 +23,7 @@ export namespace cmd {
 	export namespace user {
 		export type refreshInfo = { name: "user.refresh" }
 		export type signOut = { name: "user.sign-out" }
+		export type goToAccount = { name: "user.go-to-account" }
 	}
 
 	export namespace notification {
@@ -390,7 +391,7 @@ export namespace CtxMenu {
 	/**
 	 * Show context menu item parameters.
 	 */
-	export type ShowOptions<T = "root" | PlainData> = {
+	export type ShowOptions<T = "root" | PlainData | string> = {
 		/**
 		 * Accepted mouse event.
 		 */

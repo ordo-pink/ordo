@@ -8,6 +8,7 @@ import Null from "$components/null"
 import FileIconComponent from "$functions/file-explorer/components/file-icon.component"
 import { useChildren } from "$hooks/use-children"
 import { useRouteParams } from "$hooks/use-route-params.hook"
+import { useWorkspaceWidth } from "$hooks/use-workspace-width.hook"
 import { FSID, PlainData } from "@ordo-pink/data"
 import { Either } from "@ordo-pink/either"
 import { cmd, useSharedContext } from "@ordo-pink/frontend-core"
@@ -69,6 +70,9 @@ export default function EditorSidebar() {
 type PlainListItemP = { item: PlainData; isCurrent: boolean }
 const PlainListItem = ({ item, isCurrent }: PlainListItemP) => {
 	const { commands } = useSharedContext()
+	const { sidebarWidth } = useWorkspaceWidth()
+
+	const isDateVisible = sidebarWidth > 250
 
 	return (
 		<ActionListItem
@@ -81,7 +85,9 @@ const PlainListItem = ({ item, isCurrent }: PlainListItemP) => {
 				commands.emit<cmd.ctxMenu.show>("context-menu.show", { event, payload: item })
 			}
 		>
-			<div className="text-xs text-neutral-500">{new Date(item.updatedAt).toLocaleString()}</div>
+			<div className={`text-xs text-neutral-500 ${isDateVisible ? "block" : "hidden"}`}>
+				{new Date(item.updatedAt).toLocaleDateString()}
+			</div>
 		</ActionListItem>
 	)
 }

@@ -39,7 +39,7 @@
 }
 
 .button-primary {
-	@apply transition-all duration-300 !bg-gradient-to-br from-sky-200 dark:from-purple-600 via-violet-200 dark:via-violet-600 !to-purple-200 dark:!to-purple-600 active-ring;
+	@apply transition-all duration-300 !bg-gradient-to-br from-sky-300 dark:from-purple-600 via-violet-300 dark:via-violet-600 !to-purple-300 dark:!to-purple-600 active-ring;
 }
 
 .button-primary-inverted {

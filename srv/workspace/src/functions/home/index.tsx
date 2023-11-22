@@ -22,7 +22,7 @@ export default function createHomeFunction({ commands, activities$ }: Params) {
 
 	commands.emit<cmd.commandPalette.add>("command-palette.add", {
 		id: "home.navigate",
-		readableName: "Go to Welcome Screen",
+		readableName: "Перейти на главную",
 		accelerator: "mod+h",
 		Icon,
 		onSelect: () => {

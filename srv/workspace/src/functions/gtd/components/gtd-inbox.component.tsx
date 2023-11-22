@@ -5,7 +5,7 @@ import Card from "$components/card.component"
 import { CenteredPage } from "$components/centered-page"
 import { TextInput } from "$components/input"
 import { useAccelerator } from "$hooks/use-accelerator"
-import { cmd, useSharedContext } from "@ordo-pink/frontend-core"
+import { useSharedContext } from "@ordo-pink/frontend-core"
 import { useRef, useState } from "react"
 import GTDList from "./gtd-list.component"
 import { useInbox } from "../hooks/use-inbox"
@@ -18,13 +18,13 @@ export default function GTDInbox() {
 
 	useAccelerator("meta+n", () => createInputRef.current?.focus())
 
-	const tAddToInboxInputPlaceholder = "Sell milk..."
+	const tAddToInboxInputPlaceholder = "Что делается..."
 
 	return (
 		<CenteredPage centerX centerY>
 			<div className="px-4 py-8 w-full flex flex-col space-y-4 items-center overflow-y-hidden">
 				<div className="w-full max-w-2xl flex flex-col space-y-4">
-					<Card className="h-[90vh]" title="Inbox">
+					<Card className="h-[90vh]" title="Входящие">
 						<TextInput
 							forwardRef={createInputRef}
 							id="add-to-inbox"
@@ -36,7 +36,7 @@ export default function GTDInbox() {
 									commands.emit<cmd.data.create>("data.create", {
 										name: newItem,
 										parent: null,
-										labels: ["todo", "inbox"],
+										labels: ["gtd"],
 									})
 
 									setNewItem("")

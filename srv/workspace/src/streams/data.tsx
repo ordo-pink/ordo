@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: Copyright 2023, 谢尔盖||↓ and the Ordo.pink contributors
 // SPDX-License-Identifier: MIT
 
-import { CommandPalette, cmd } from "@ordo-pink/frontend-core"
+import { CommandPalette } from "@ordo-pink/frontend-core"
 import { getCommands } from "./commands"
 import { rrrToNotification } from "$utils/error-to-notification"
 import { Hosts } from "$utils/hosts"
@@ -12,7 +12,7 @@ import { __Auth$ } from "./auth"
 import { Unary } from "@ordo-pink/tau"
 import { AuthResponse } from "@ordo-pink/backend-server-id"
 import CreatePageModal from "$components/modals/create-page-modal.component"
-import UploadFilesModal from "$components/modals/upload-files-modal.component"
+// import UploadFilesModal from "$components/modals/upload-files-modal.component"
 import { DataCommands, FSID, PlainData } from "@ordo-pink/data"
 import { ClientDataPersistenceStrategy } from "../strategies/client-data-persistence-strategy.impl"
 import { ClientContentPersistenceStrategy } from "../strategies/client-content-persistence-strategy.impl"
@@ -27,6 +27,7 @@ import {
 	BsSlash,
 	BsTag,
 	BsTags,
+	// BsUpload,
 } from "react-icons/bs"
 import FileIconComponent from "$functions/file-explorer/components/file-icon.component"
 import { PiGraph } from "react-icons/pi"
@@ -123,11 +124,11 @@ export const __initData: Fn = ({ logger, auth$ }) => {
 		})
 	})
 
-	commands.on<cmd.data.showUploadModal>("data.show-upload-modal", ({ payload }) => {
-		commands.emit<cmd.modal.show>("modal.show", {
-			Component: () => <UploadFilesModal parent={payload} />,
-		})
-	})
+	// commands.on<cmd.data.showUploadModal>("data.show-upload-modal", ({ payload }) => {
+	// 	commands.emit<cmd.modal.show>("modal.show", {
+	// 		Component: () => <UploadFilesModal parent={payload} />,
+	// 	})
+	// })
 
 	commands.on<cmd.data.create>("data.create", ({ payload }) => {
 		const auth = (auth$ as BehaviorSubject<AuthResponse>).value
@@ -169,24 +170,6 @@ export const __initData: Fn = ({ logger, auth$ }) => {
 			})
 			.orNothing()
 	})
-
-	// commands.on<cmd.data.setChildOrder>("data.set-child-order", ({ payload }) => {
-	// 	const auth = (auth$ as BehaviorSubject<AuthResponse>).value
-	// 	const data = data$.value
-
-	// 	const item = data.find(d => d.fsid === payload.fsid && d.createdBy === auth.sub)
-
-	// 	if (!item) return
-
-	// 	dataCommands
-	// 		.update({
-	// 			createdBy: auth.sub,
-	// 			updatedBy: auth.sub,
-	// 			fsid: payload.fsid,
-	// 			data: { ...item, children: payload.children },
-	// 		})
-	// 		.orNothing()
-	// })
 
 	commands.on<cmd.data.addLabel>("data.add-label", ({ payload }) => {
 		const auth = (auth$ as BehaviorSubject<AuthResponse>).value
@@ -243,15 +226,25 @@ export const __initData: Fn = ({ logger, auth$ }) => {
 	commands.emit<cmd.ctxMenu.add>("context-menu.add", {
 		cmd: "data.show-rename-modal",
 		Icon: BsPencilSquare,
+		accelerator: "r",
 		readableName: "Переименовать",
-		shouldShow: ({ payload }) =>
-			payload && payload.fsid && payload.name && payload.name !== ".inbox",
+		shouldShow: ({ payload }) => payload && payload.fsid && payload.name,
 		type: "update",
 	})
+
+	// commands.emit<cmd.ctxMenu.add>("context-menu.add", {
+	// 	cmd: "data.show-upload-modal",
+	// 	Icon: BsUpload,
+	// 	accelerator: "mod+u",
+	// 	readableName: "Загрузить...",
+	// 	shouldShow: ({ payload }) => payload && (payload === "root" || payload.fsid),
+	// 	type: "create",
+	// })
 
 	commands.emit<cmd.ctxMenu.add>("context-menu.add", {
 		cmd: "data.show-edit-labels-palette",
 		Icon: BsTags,
+		accelerator: "l",
 		readableName: "Изменить метки",
 		shouldShow: ({ payload }) => payload && payload.fsid && payload.name,
 		type: "update",
@@ -260,6 +253,7 @@ export const __initData: Fn = ({ logger, auth$ }) => {
 	commands.emit<cmd.ctxMenu.add>("context-menu.add", {
 		cmd: "data.show-edit-links-palette",
 		Icon: PiGraph,
+		accelerator: "mod+l",
 		readableName: "Изменить ссылки",
 		shouldShow: ({ payload }) => payload && payload.fsid && payload.name,
 		type: "update",
@@ -268,6 +262,7 @@ export const __initData: Fn = ({ logger, auth$ }) => {
 	commands.emit<cmd.ctxMenu.add>("context-menu.add", {
 		cmd: "data.show-create-modal",
 		Icon: BsNodePlus,
+		accelerator: "mod+a",
 		readableName: "Добавить",
 		shouldShow: ({ payload }) => payload && (payload.fsid || payload === "root"),
 		type: "create",
@@ -284,6 +279,7 @@ export const __initData: Fn = ({ logger, auth$ }) => {
 	commands.emit<cmd.ctxMenu.add>("context-menu.add", {
 		cmd: "command-palette.show",
 		Icon: BsArrowRightSquare,
+		accelerator: "m",
 		readableName: "Переместить...",
 		shouldShow: ({ payload }) =>
 			payload && payload.fsid && payload.name && payload.name !== ".inbox",

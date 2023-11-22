@@ -34,8 +34,9 @@ export default function LinksWorkspace() {
 
 			if (item.parent) {
 				if (!tmpNodes.some(n => n.id === item.parent)) {
-					const parent = data.find(n => n.fsid === item.parent)!
-					tmpNodes.push({ id: parent?.fsid, data: parent })
+					const parent = data.find(n => n.fsid === item.parent)
+					if (!parent) return
+					tmpNodes.push({ id: parent.fsid, data: parent })
 				}
 
 				tmpLinks.push({ source: item.fsid, target: item.parent, type: "child" })
@@ -52,6 +53,7 @@ export default function LinksWorkspace() {
 				item.links.forEach(id => {
 					if (!tmpNodes.some(node => node.id === id)) {
 						const item = data.find(n => n.fsid === id)
+						if (!item) return
 						tmpNodes.push({ id, data: item })
 					}
 					tmpLinks.push({ source: item.fsid, target: id, type: "link" })

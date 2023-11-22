@@ -5,8 +5,8 @@ export const useIsDarkTheme = () => {
 
 	useEffect(() => {
 		const darkModeMediaQuery = window.matchMedia("(prefers-color-scheme: dark)")
-
 		const handleDarkModeChange = (event: MediaQueryListEvent) => setIsDarkTheme(event.matches)
+		setIsDarkTheme(darkModeMediaQuery.matches)
 
 		darkModeMediaQuery.addEventListener("change", handleDarkModeChange)
 

@@ -3,7 +3,7 @@
 
 import { OrdoButtonPrimary, OrdoButtonSecondary } from "$components/buttons/buttons"
 import { PlainData } from "@ordo-pink/data"
-import { cmd, useSharedContext } from "@ordo-pink/frontend-core"
+import { useSharedContext } from "@ordo-pink/frontend-core"
 import { isNonEmptyString } from "@ordo-pink/tau"
 import { ChangeEvent, useState } from "react"
 import { BsPencil } from "react-icons/bs"
@@ -27,11 +27,11 @@ export default function RenameDirectoryModal({ data }: Props) {
 		commands.emit<cmd.modal.hide>("modal.hide")
 	}
 
-	const tPlaceholder = "E.g. 123/123"
-	const tTitle = "Rename"
-	const tCancel = "Cancel"
-	const tCreate = "Rename"
-	const tInvalidPath = "Invalid name"
+	const tPlaceholder = "Как теперь назовём?"
+	const tTitle = "Переименовать файл"
+	const tCancel = "Отмена"
+	const tRename = "Переименовать"
+	const tInvalidPath = "Неверное имя файла"
 
 	return (
 		<div className="w-[30rem] max-w-full flex flex-col gap-8">
@@ -77,7 +77,7 @@ export default function RenameDirectoryModal({ data }: Props) {
 					hotkey="mod+enter"
 					disabled={!name || !isValidPath}
 				>
-					{tCreate}
+					{tRename}
 				</OrdoButtonPrimary>
 			</div>
 		</div>

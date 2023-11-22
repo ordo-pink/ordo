@@ -11,16 +11,16 @@ import { useRouteParams } from "$hooks/use-route-params.hook"
 import { useWorkspaceWidth } from "$hooks/use-workspace-width.hook"
 import { FSID, PlainData } from "@ordo-pink/data"
 import { Either } from "@ordo-pink/either"
-import { cmd, useSharedContext } from "@ordo-pink/frontend-core"
+import { useSharedContext } from "@ordo-pink/frontend-core"
 import { Switch } from "@ordo-pink/switch"
 import { MouseEvent, useEffect, useState } from "react"
-import { BsCalendar2, BsChevronDown, BsFileEarmark, BsListNested } from "react-icons/bs"
+import { BsCalendar2, BsChevronDown, BsListNested } from "react-icons/bs"
 
 export default function EditorSidebar() {
 	const { data, commands } = useSharedContext()
 	const { fsid } = useRouteParams<{ fsid: FSID }>()
 	const [isNestingEnabled, setIsNestingEnables] = useState(true)
-	const [visibleItems, setVisibleItems] = useState<PlainData[]>(data ?? [])
+	const [visibleItems, setVisibleItems] = useState<PlainData[]>([])
 
 	useEffect(() => {
 		Either.fromNullable(data)
@@ -41,12 +41,12 @@ export default function EditorSidebar() {
 	return Either.fromNullable(visibleItems).fold(Loading, data => (
 		<div className="h-full p-1">
 			<div className="flex items-center justify-center space-x-4 pb-4">
-				<OrdoButtonPrimary onClick={() => setIsNestingEnables(false)} inverted={isNestingEnabled}>
-					<BsCalendar2 />
-				</OrdoButtonPrimary>
-
 				<OrdoButtonPrimary onClick={() => setIsNestingEnables(true)} inverted={!isNestingEnabled}>
 					<BsListNested />
+				</OrdoButtonPrimary>
+
+				<OrdoButtonPrimary onClick={() => setIsNestingEnables(false)} inverted={isNestingEnabled}>
+					<BsCalendar2 />
 				</OrdoButtonPrimary>
 			</div>
 			<div

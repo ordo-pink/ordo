@@ -27,7 +27,7 @@ export const __initCommandPalette: InitCommandPalette = callOnce(({ logger }) =>
 	add({
 		id: "command-palette.hide",
 		onSelect: hide,
-		readableName: "Hide command palette",
+		readableName: "Скрыть панель команд",
 		Icon: BsCommand,
 		accelerator: "mod+shift+p",
 	})

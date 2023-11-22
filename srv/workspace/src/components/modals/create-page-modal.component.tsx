@@ -4,7 +4,7 @@
 import { OrdoButtonSecondary, OrdoButtonPrimary } from "$components/buttons/buttons"
 // import { PathBreadcrumbs } from "$components/path-breadcrumbs/path-breadcrumbs"
 import { PlainData } from "@ordo-pink/data"
-import { cmd, useSharedContext } from "@ordo-pink/frontend-core"
+import { useSharedContext } from "@ordo-pink/frontend-core"
 import { Nullable, isNonEmptyString } from "@ordo-pink/tau"
 
 import { ChangeEvent, useState } from "react"
@@ -28,10 +28,10 @@ export default function CreatePageModal({ parent }: Props) {
 		commands.emit<cmd.modal.hide>("modal.hide")
 	}
 
-	const tPlaceholder = "Add your page name here..."
-	const tTitle = "Add page"
-	const tCancel = "Cancel"
-	const tCreate = "Create"
+	const tPlaceholder = "Как назовём?"
+	const tTitle = "Создать файл"
+	const tCancel = "Отмена"
+	const tCreate = "Создать"
 
 	return (
 		<div className="w-[30rem] max-w-full flex flex-col gap-8">

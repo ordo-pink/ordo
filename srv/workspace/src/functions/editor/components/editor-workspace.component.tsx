@@ -7,7 +7,7 @@ import { FSID } from "@ordo-pink/data"
 import { Either } from "@ordo-pink/either"
 import DataEditor from "./data-editor.component"
 import { useContent } from "$hooks/use-content.hook"
-import { useSharedContext, cmd } from "@ordo-pink/frontend-core"
+import { useSharedContext } from "@ordo-pink/frontend-core"
 import { useMemo, useEffect, KeyboardEvent, useCallback } from "react"
 import { BsTerminal } from "react-icons/bs"
 import { Subject, debounce, timer } from "rxjs"
@@ -25,6 +25,7 @@ import { withHistory } from "slate-history"
 import { withReact, Slate, Editable, useSlateStatic, useReadOnly, ReactEditor } from "slate-react"
 import { Switch } from "@ordo-pink/switch"
 import EditableTitle from "./editable-title.component"
+import { Loading } from "$components/loading/loading"
 
 export default function EditorWorkspace() {
 	const { fsid } = useRouteParams<{ fsid: FSID }>()
@@ -34,18 +35,18 @@ export default function EditorWorkspace() {
 	const editor = useMemo(() => withChecklists(withHistory(withReact(createEditor()))), [])
 
 	const renderElement = useCallback((props: any) => <Element {...props} />, [])
+	const renderLeaf = useCallback((props: any) => <Leaf {...props} />, [])
 
 	useEffect(() => {
-		commands.on("editor.add-checklist-item", () => {
-			editor.insertNode({
-				children: [{ text: "What the heil!" }],
-			})
-		})
+		const handleTest = () =>
+			editor.insertNode({ type: "paragraph", children: [{ text: "Проверка!" }] } as any)
+
+		commands.on("editor.test", handleTest)
 
 		commands.emit<cmd.ctxMenu.add>("context-menu.add", {
-			cmd: "editor.add-checklist-item",
+			cmd: "editor.test",
 			Icon: BsTerminal,
-			readableName: "Консоль лог",
+			readableName: "Проверка",
 			shouldShow: ({ payload }) => payload === "editor-quick-menu",
 			type: "update",
 		})
@@ -55,6 +56,8 @@ export default function EditorWorkspace() {
 		})
 
 		return () => {
+			commands.emit<cmd.ctxMenu.remove>("context-menu.remove", "editor.test")
+			commands.off("editor.test", handleTest)
 			subscription.unsubscribe()
 		}
 	}, [])
@@ -85,6 +88,7 @@ export default function EditorWorkspace() {
 							autoFocus
 							className="outline-none pb-96"
 							placeholder="Пора начинать..."
+							renderLeaf={renderLeaf}
 							renderElement={renderElement}
 							onKeyDown={(event: KeyboardEvent<HTMLDivElement>) => {
 								if (editor.selection?.anchor.offset === 0 && event.key === "/") {
@@ -96,6 +100,14 @@ export default function EditorWorkspace() {
 										payload: "editor-quick-menu",
 									})
 								}
+
+								if (event.key === "Enter") {
+									event.preventDefault()
+
+									Transforms.insertNodes(editor, [
+										{ type: "paragraph", children: [{ text: "" }] } as any,
+									])
+								}
 							}}
 						/>
 					</Slate>
@@ -104,8 +116,13 @@ export default function EditorWorkspace() {
 		))
 }
 
-function EmptyEditor() {
-	return <div>TODO</div>
+const EmptyEditor = () => {
+	const { fsid } = useRouteParams<{ fsid: FSID }>()
+
+	return Either.fromNullable(fsid).fold(
+		() => <div>TODO</div>, // TODO: "/editor" template page
+		() => <Loading />,
+	)
 }
 
 // --- Internal ---
@@ -113,9 +130,28 @@ function EmptyEditor() {
 const save$ = new Subject<{ fsid: FSID; value: Descendant[] }>()
 const debounceSave$ = save$.pipe(debounce(() => timer(1000)))
 
-const serialize = (value: Descendant[]) => value.map(n => Node.string(n)).join("\n")
+const serialize = (value: Descendant[]) =>
+	value
+		.map(n =>
+			Switch.of((n as any).type)
+				.case("heading-1", () => `# ${Node.string(n)}`)
+				.case("heading-2", () => `## ${Node.string(n)}`)
+				.case("heading-3", () => `### ${Node.string(n)}`)
+				.case("heading-4", () => `#### ${Node.string(n)}`)
+				.case("heading-5", () => `##### ${Node.string(n)}`)
+				.default(() => Node.string(n)),
+		)
+		.join("\n")
+
 const deserialize = (string: string) =>
-	string.split("\n").map(line => ({ type: "paragraph", children: [{ text: line }] }))
+	string.split("\n").map(line =>
+		Switch.of(line)
+			.case(
+				line => line.startsWith("# "),
+				() => ({ type: "heading-1", children: [{ text: line.slice(2) }] }),
+			)
+			.default(() => ({ type: "paragraph", children: [{ text: line }] })),
+	)
 
 const withChecklists = (editor: ReactEditor) => {
 	const { deleteBackward } = editor
@@ -156,10 +192,56 @@ const withChecklists = (editor: ReactEditor) => {
 	return editor
 }
 
+const Leaf = ({ attributes, children, leaf }: any) => {
+	if (leaf.bold) children = <strong>{children}</strong>
+	if (leaf.code) children = <code>{children}</code>
+	if (leaf.italic) children = <em>{children}</em>
+	if (leaf.underline) children = <u>{children}</u>
+
+	return <span {...attributes}>{children}</span>
+}
+
 const Element = (props: any) =>
 	Switch.of(props.element.type)
-		.case("check-list-item", () => <CheckListItemElement {...props} />)
-		.default(() => <p {...props.attributes}>{props.children}</p>)
+		.case("blockquote", () => <blockquote {...props.attributes} />)
+		.case("unordered-list", () => <ul {...props.attributes}>{props.children}</ul>)
+		.case("ordered-list", () => <ol {...props.attributes}>{props.children}</ol>)
+		.case("list-item", () => (
+			<li className="py-2" {...props.attributes}>
+				{props.children}
+			</li>
+		))
+		.case("heading-1", () => (
+			<h1 className="text-2xl font-black leading-6" {...props.attributes}>
+				{props.children}
+			</h1>
+		))
+		.case("heading-2", () => (
+			<h2 className="py-2" {...props.attributes}>
+				{props.children}
+			</h2>
+		))
+		.case("heading-3", () => (
+			<h3 className="py-2" {...props.attributes}>
+				{props.children}
+			</h3>
+		))
+		.case("heading-4", () => (
+			<h4 className="py-2" {...props.attributes}>
+				{props.children}
+			</h4>
+		))
+		.case("heading-5", () => (
+			<h5 className="py-2" {...props.attributes}>
+				{props.children}
+			</h5>
+		))
+		.case("check-list-item", () => <CheckListItemElement {...props.attributes} />)
+		.default(() => (
+			<p className="py-2" {...props.attributes}>
+				{props.children}
+			</p>
+		))
 
 const CheckListItemElement = ({ attributes, children, element }: any) => {
 	const editor = useSlateStatic() as ReactEditor

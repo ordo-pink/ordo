@@ -3,7 +3,7 @@
 
 import { OrdoButtonSecondary, OrdoButtonPrimary } from "$components/buttons/buttons"
 import { PlainData } from "@ordo-pink/data"
-import { cmd, useSharedContext } from "@ordo-pink/frontend-core"
+import { useSharedContext } from "@ordo-pink/frontend-core"
 import { BsNodeMinus } from "react-icons/bs"
 
 type Props = {
@@ -18,10 +18,10 @@ export default function RemoveFileModal({ data }: Props) {
 		commands.emit<cmd.modal.hide>("modal.hide")
 	}
 
-	const tTitle = "Remove page"
-	const tText = `Are you sure you want to remove "${data.name}"? This action is irreversible.`
-	const tCancel = "Cancel"
-	const tRemove = "Remove"
+	const tTitle = "Удалить файл"
+	const tText = `Точно удалить "${data.name}"? Обратной дороги не будет.`
+	const tCancel = "Отмена"
+	const tRemove = "Удалить"
 
 	return (
 		<div className="w-[30rem] max-w-full flex flex-col gap-8">

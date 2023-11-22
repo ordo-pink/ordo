@@ -19,125 +19,127 @@ export namespace Functions {
 	export type CreateFunctionFn = Unary<Functions.CreateFunctionParams, void | Promise<void>>
 }
 
-export namespace cmd {
-	export namespace user {
-		export type refreshInfo = { name: "user.refresh" }
-		export type signOut = { name: "user.sign-out" }
-		export type goToAccount = { name: "user.go-to-account" }
-	}
-
-	export namespace notification {
-		export type show = { name: "notification.show"; payload: Notification.Item }
-		export type hide = { name: "notification.hide"; payload: string }
-	}
-
-	export namespace activities {
-		export type add = { name: "activities.add"; payload: Extensions.Activity }
-		export type remove = { name: "activities.remove"; payload: string }
-		export type setCurrent = { name: "activities.set-current"; payload: Extensions.Activity }
-	}
-
-	export namespace fileAssociations {
-		export type add = { name: "file-associations.add"; payload: Extensions.FileAssociation }
-		export type remove = { name: "file-associations.remove"; payload: string }
-		export type setCurrent = {
-			name: "file-associations.set-current"
-			payload: Extensions.FileAssociation
-		}
-	}
-
-	export namespace data {
-		export type refreshRoot = { name: "data.refresh-root" }
-		export type getFileContent = { name: "data.get-content"; payload: { fsid: FSID } }
-		export type showUploadModal = { name: "data.show-upload-modal"; payload: Nullable<PlainData> }
-		export type showCreateModal = { name: "data.show-create-modal"; payload: Nullable<PlainData> }
-		export type showRemoveModal = { name: "data.show-remove-modal"; payload: PlainData }
-		export type showRenameModal = { name: "data.show-rename-modal"; payload: PlainData }
-		export type showEditLabelsPalette = {
-			name: "data.show-edit-labels-palette"
-			payload: PlainData
-		}
-		export type showEditLinksPalette = {
-			name: "data.show-edit-links-palette"
-			payload: PlainData
+declare global {
+	module cmd {
+		module user {
+			type refreshInfo = { name: "user.refresh" }
+			type signOut = { name: "user.sign-out" }
+			type goToAccount = { name: "user.go-to-account" }
 		}
 
-		export type setContent = {
-			name: "data.set-content"
-			payload: { fsid: FSID; content: string | ArrayBuffer }
-		}
-		export type uploadContent = {
-			name: "data.upload-content"
-			payload: { name: string; parent: Nullable<FSID>; content: string | ArrayBuffer }
-		}
-		export type create = {
-			name: "data.create"
-			payload: { name: string; parent: Nullable<FSID>; labels?: string[] }
-		}
-		export type remove = { name: "data.remove"; payload: PlainData }
-		export type move = { name: "data.move"; payload: { fsid: FSID; parent: Nullable<FSID> } }
-		export type rename = { name: "data.rename"; payload: { fsid: FSID; name: string } }
-		export type addLabel = { name: "data.add-label"; payload: { item: PlainData; label: string } }
-		export type removeLabel = {
-			name: "data.remove-label"
-			payload: { item: PlainData; label: string }
+		module notification {
+			type show = { name: "notification.show"; payload: Notification.Item }
+			type hide = { name: "notification.hide"; payload: string }
 		}
 
-		export type addLink = { name: "data.add-link"; payload: { item: PlainData; link: FSID } }
-		export type removeLink = {
-			name: "data.remove-link"
-			payload: { item: PlainData; link: FSID }
+		module activities {
+			type add = { name: "activities.add"; payload: Extensions.Activity }
+			type remove = { name: "activities.remove"; payload: string }
+			type setCurrent = { name: "activities.set-current"; payload: Extensions.Activity }
 		}
-	}
 
-	export namespace ctxMenu {
-		export type add = { name: "context-menu.add"; payload: CtxMenu.Item }
-		export type remove = { name: "context-menu.remove"; payload: string }
-		export type show = { name: "context-menu.show"; payload: CtxMenu.ShowOptions }
-		export type hide = { name: "context-menu.hide"; payload: void }
-	}
-
-	export namespace commandPalette {
-		export type add = { name: "command-palette.add"; payload: CommandPalette.Item }
-		export type remove = { name: "command-palette.remove"; payload: string }
-		export type show = {
-			name: "command-palette.show"
-			payload: {
-				items: CommandPalette.Item[]
-				onNewItem?: (newItem: string) => any
-				multiple?: boolean
-				pinnedItems?: CommandPalette.Item[]
+		module fileAssociations {
+			type add = { name: "file-associations.add"; payload: Extensions.FileAssociation }
+			type remove = { name: "file-associations.remove"; payload: string }
+			type setCurrent = {
+				name: "file-associations.set-current"
+				payload: Extensions.FileAssociation
 			}
 		}
-		export type hide = { name: "command-palette.hide"; payload: void }
-	}
 
-	export namespace sidebar {
-		export type enable = { name: "sidebar.enable" }
-		export type disable = { name: "sidebar.disable" }
-		export type setSize = { name: "sidebar.set-size"; payload: [number, number] }
-		export type show = { name: "sidebar.show"; payload?: [number, number] }
-		export type hide = { name: "sidebar.hide" }
-		export type toggle = { name: "sidebar.toggle" }
-	}
+		module data {
+			type refreshRoot = { name: "data.refresh-root" }
+			type getFileContent = { name: "data.get-content"; payload: { fsid: FSID } }
+			type showUploadModal = { name: "data.show-upload-modal"; payload: Nullable<PlainData> }
+			type showCreateModal = { name: "data.show-create-modal"; payload: Nullable<PlainData> }
+			type showRemoveModal = { name: "data.show-remove-modal"; payload: PlainData }
+			type showRenameModal = { name: "data.show-rename-modal"; payload: PlainData }
+			type showEditLabelsPalette = {
+				name: "data.show-edit-labels-palette"
+				payload: PlainData
+			}
+			type showEditLinksPalette = {
+				name: "data.show-edit-links-palette"
+				payload: PlainData
+			}
 
-	export namespace router {
-		export type navigate = { name: "router.navigate"; payload: Router.NavigateParams | string }
-		export type openExternal = {
-			name: "router.open-external"
-			payload: Router.OpenExternalParams
-		}
-	}
+			type setContent = {
+				name: "data.set-content"
+				payload: { fsid: FSID; content: string | ArrayBuffer }
+			}
+			type uploadContent = {
+				name: "data.upload-content"
+				payload: { name: string; parent: Nullable<FSID>; content: string | ArrayBuffer }
+			}
+			type create = {
+				name: "data.create"
+				payload: { name: string; parent: Nullable<FSID>; labels?: string[] }
+			}
+			type remove = { name: "data.remove"; payload: PlainData }
+			type move = { name: "data.move"; payload: { fsid: FSID; parent: Nullable<FSID> } }
+			type rename = { name: "data.rename"; payload: { fsid: FSID; name: string } }
+			type addLabel = { name: "data.add-label"; payload: { item: PlainData; label: string } }
+			type removeLabel = {
+				name: "data.remove-label"
+				payload: { item: PlainData; label: string }
+			}
 
-	export namespace modal {
-		export type show = {
-			name: "modal.show"
-			payload: {
-				Component: ComponentType
-				options?: Modal.ShowOptions
+			type addLink = { name: "data.add-link"; payload: { item: PlainData; link: FSID } }
+			type removeLink = {
+				name: "data.remove-link"
+				payload: { item: PlainData; link: FSID }
 			}
 		}
-		export type hide = { name: "modal.hide" }
+
+		module ctxMenu {
+			type add = { name: "context-menu.add"; payload: CtxMenu.Item }
+			type remove = { name: "context-menu.remove"; payload: string }
+			type show = { name: "context-menu.show"; payload: CtxMenu.ShowOptions }
+			type hide = { name: "context-menu.hide"; payload: void }
+		}
+
+		module commandPalette {
+			type add = { name: "command-palette.add"; payload: CommandPalette.Item }
+			type remove = { name: "command-palette.remove"; payload: string }
+			type show = {
+				name: "command-palette.show"
+				payload: {
+					items: CommandPalette.Item[]
+					onNewItem?: (newItem: string) => any
+					multiple?: boolean
+					pinnedItems?: CommandPalette.Item[]
+				}
+			}
+			type hide = { name: "command-palette.hide"; payload: void }
+		}
+
+		module sidebar {
+			type enable = { name: "sidebar.enable" }
+			type disable = { name: "sidebar.disable" }
+			type setSize = { name: "sidebar.set-size"; payload: [number, number] }
+			type show = { name: "sidebar.show"; payload?: [number, number] }
+			type hide = { name: "sidebar.hide" }
+			type toggle = { name: "sidebar.toggle" }
+		}
+
+		module router {
+			type navigate = { name: "router.navigate"; payload: Router.NavigateParams | string }
+			type openExternal = {
+				name: "router.open-external"
+				payload: Router.OpenExternalParams
+			}
+		}
+
+		module modal {
+			type show = {
+				name: "modal.show"
+				payload: {
+					Component: ComponentType
+					options?: Modal.ShowOptions
+				}
+			}
+			type hide = { name: "modal.hide" }
+		}
 	}
 }
 

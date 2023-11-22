@@ -1,17 +1,12 @@
 // SPDX-FileCopyrightText: Copyright 2023, 谢尔盖||↓ and the Ordo.pink contributors
 // SPDX-License-Identifier: MIT
 
-import { useDataSelector } from "$hooks/use-data.hook"
+import { useDataByLabel } from "$hooks/use-data.hook"
+import { useInbox } from "./use-inbox"
 
-export const useGtdProjects = () =>
-	useDataSelector(items =>
-		Array.from(
-			new Set(
-				items.flatMap(item =>
-					item.labels
-						.filter(label => label.startsWith("projects/"))
-						.map(project => project.replace("projects/", "")),
-				),
-			),
-		),
-	) ?? []
+export const useGtdProjects = () => {
+	const gtd = useDataByLabel(["gtd"])
+	const inbox = useInbox()
+
+	return gtd.filter(item => !inbox.some(i => i.fsid === item.fsid))
+}

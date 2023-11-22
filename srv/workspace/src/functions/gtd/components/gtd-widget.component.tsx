@@ -5,12 +5,11 @@ import { OrdoButtonPrimary } from "$components/buttons/buttons"
 import { TextInput } from "$components/input"
 import { Loader } from "$components/loading/loader"
 import { PlainData } from "@ordo-pink/data"
-import { cmd, useSharedContext } from "@ordo-pink/frontend-core"
+import { useSharedContext } from "@ordo-pink/frontend-core"
 import { Switch } from "@ordo-pink/switch"
 import { isNonEmptyString } from "@ordo-pink/tau"
 import { useState } from "react"
 import { BsCheckCircle, BsInfoCircle, BsXCircle } from "react-icons/bs"
-import { GTDCommands } from "../types"
 import { useInbox } from "../hooks/use-inbox"
 
 export default function GTDWidget() {
@@ -26,8 +25,8 @@ export default function GTDWidget() {
 
 			<TextInput
 				id="inbox"
-				label="Add quick reminder"
-				placeholder="Sell milk..."
+				label="Добавить задачу"
+				placeholder="Вот дела..."
 				value={newItem}
 				onInput={e => setNewItem(e.target.value)}
 				onKeyDown={e => {
@@ -35,7 +34,7 @@ export default function GTDWidget() {
 						commands.emit<cmd.data.create>("data.create", {
 							name: newItem,
 							parent: null,
-							labels: ["todo", "inbox"],
+							labels: ["gtd"],
 						})
 
 						setNewItem("")
@@ -43,8 +42,8 @@ export default function GTDWidget() {
 						commands.emit<cmd.notification.show>("notification.show", {
 							message: newItem,
 							type: "success",
-							duration: 3,
-							title: "New reminder created",
+							duration: 5,
+							title: "Задача добавлена во входящие",
 						})
 					}
 				}}
@@ -52,9 +51,9 @@ export default function GTDWidget() {
 
 			<OrdoButtonPrimary
 				hotkey="mod+i"
-				onClick={() => commands.emit<GTDCommands.openInbox>("gtd.open-inbox")}
+				onClick={() => commands.emit<cmd.gtd.openInbox>("gtd.open-inbox")}
 			>
-				Go to Inbox
+				Входящие
 			</OrdoButtonPrimary>
 		</div>
 	)
@@ -69,7 +68,7 @@ const InboxStatus = ({ inboxChildren }: InboxStatusP) =>
 			() => (
 				<div className="flex items-center space-x-2">
 					<BsCheckCircle className="text-xl text-emerald-500" />
-					<div className="text-sm">Your inbox is very tidy! Did you forget something?</div>
+					<div className="text-sm">Во входящих пусто. Пора бездельничать!</div>
 				</div>
 			),
 		)
@@ -78,9 +77,7 @@ const InboxStatus = ({ inboxChildren }: InboxStatusP) =>
 			() => (
 				<div className="flex items-center space-x-2">
 					<BsInfoCircle className="text-xl text-yellow-500" />
-					<div className="text-sm">
-						{inboxChildren!.length} item in your inbox. Why wasn't it moved yet?
-					</div>
+					<div className="text-sm">Задач во входящих: {inboxChildren!.length}. А почему не 0?</div>
 				</div>
 			),
 		)
@@ -89,9 +86,7 @@ const InboxStatus = ({ inboxChildren }: InboxStatusP) =>
 			() => (
 				<div className="flex items-center space-x-2">
 					<BsInfoCircle className="text-xl text-yellow-500" />
-					<div className="text-sm">
-						{inboxChildren!.length} items in your inbox. You've been busy!
-					</div>
+					<div className="text-sm">Задач во входящих: {inboxChildren!.length}. Соболезную...</div>
 				</div>
 			),
 		)
@@ -99,7 +94,8 @@ const InboxStatus = ({ inboxChildren }: InboxStatusP) =>
 			<div className="flex items-center space-x-2">
 				<BsXCircle className="text-xl text-rose-500" />
 				<div className="text-sm">
-					{inboxChildren!.length} items in your inbox. This definitely needs a refinement!
+					Задач во входящих: {inboxChildren!.length}. Ну тут уже без бригады клинеров не
+					разобраться.
 				</div>
 			</div>
 		))

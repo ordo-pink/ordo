@@ -13,7 +13,7 @@ import { useDataByLabel } from "$hooks/use-data.hook"
 type P = { label: string }
 export default function GTDLabel({ label }: P) {
 	const { commands } = useSharedContext()
-	const items = useDataByLabel(["todo", label])
+	const items = useDataByLabel(["gtd", label])
 	const [newItem, setNewItem] = useState("")
 	const createInputRef = useRef<HTMLInputElement>(null)
 
@@ -37,7 +37,7 @@ export default function GTDLabel({ label }: P) {
 									commands.emit<cmd.data.create>("data.create", {
 										name: newItem,
 										parent: null,
-										labels: ["todo", label],
+										labels: ["gtd", label],
 									})
 
 									setNewItem("")

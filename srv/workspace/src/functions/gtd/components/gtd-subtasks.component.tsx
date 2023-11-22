@@ -5,7 +5,7 @@ import Card from "$components/card.component"
 import { CenteredPage } from "$components/centered-page"
 import { TextInput } from "$components/input"
 import { useAccelerator } from "$hooks/use-accelerator"
-import { cmd, useSharedContext } from "@ordo-pink/frontend-core"
+import { useSharedContext } from "@ordo-pink/frontend-core"
 import { useRef, useState } from "react"
 import GTDList from "./gtd-list.component"
 import { useDataByFSID } from "$hooks/use-data.hook"
@@ -24,7 +24,7 @@ export default function GTDSubtasks({ fsid }: P) {
 
 	useAccelerator("meta+n", () => createInputRef.current?.focus())
 
-	const tAddToInboxInputPlaceholder = "Cell blood..."
+	const tAddToInboxInputPlaceholder = "Что делается..."
 
 	return Either.fromNullable(data).fold(Loading, data => (
 		<CenteredPage centerX centerY>
@@ -39,12 +39,7 @@ export default function GTDSubtasks({ fsid }: P) {
 							onInput={e => setNewItem(e.target.value)}
 							onKeyDown={e => {
 								if (e.key === "Enter" && newItem) {
-									commands.emit<cmd.data.create>("data.create", {
-										name: newItem,
-										parent: fsid,
-										labels: ["todo"],
-									})
-
+									commands.emit<cmd.data.create>("data.create", { name: newItem, parent: fsid })
 									setNewItem("")
 								}
 							}}

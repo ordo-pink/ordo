@@ -59,7 +59,7 @@ export const __initSidebar: InitSidebar = callOnce(({ logger }) => {
 
 	commands.emit<cmd.commandPalette.add>("command-palette.add", {
 		id: "sidebar.toggle",
-		readableName: "Toggle sidebar",
+		readableName: "Показать/скрыть боковую панель",
 		Icon: AiOutlineLayout,
 		onSelect: () => {
 			commands.emit<cmd.commandPalette.hide>("command-palette.hide")

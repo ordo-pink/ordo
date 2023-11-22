@@ -12,7 +12,7 @@ import { getCommands } from "$streams/commands"
 import RenderFromNullable from "$components/render-from-nullable"
 import ActionListItem from "$components/action-list-item"
 import Accelerator from "$components/accelerator"
-import { CommandPalette, cmd } from "@ordo-pink/frontend-core"
+import { CommandPalette } from "@ordo-pink/frontend-core"
 import { Either } from "@ordo-pink/either"
 
 const commands = getCommands()
@@ -24,7 +24,7 @@ type Props = {
 	pinnedItems?: CommandPalette.Item[]
 }
 
-const fuse = new Fuse([] as CommandPalette.Item[], { keys: ["id"], threshold: 0.1 })
+const fuse = new Fuse([] as CommandPalette.Item[], { keys: ["readableName", "id"], threshold: 0.1 })
 
 export default function CommandPaletteModal({ items, onNewItem, multiple, pinnedItems }: Props) {
 	useHotkeys("Esc", () => commands.emit<cmd.commandPalette.hide>("command-palette.hide"))

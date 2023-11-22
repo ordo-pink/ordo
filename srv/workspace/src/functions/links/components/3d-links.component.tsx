@@ -4,7 +4,7 @@
 import { useIsDarkTheme } from "$hooks/use-is-dark-theme.hook"
 import { useWorkspaceWidth } from "$hooks/use-workspace-width.hook"
 import { PlainData } from "@ordo-pink/data"
-import { cmd, useSharedContext } from "@ordo-pink/frontend-core"
+import { useSharedContext } from "@ordo-pink/frontend-core"
 import { useRef } from "react"
 import { ForceGraph3D } from "react-force-graph"
 // import { CSS2DRenderer, CSS2DObject } from "three/addons"
@@ -73,11 +73,11 @@ export default function Links3D({ nodes, links }: P) {
 				})
 			}
 			controlType="orbit"
-			onNodeDragEnd={node => {
-				node.fx = node.x
-				node.fy = node.y
-				node.fz = node.z
-			}}
+			// onNodeDragEnd={node => {
+			// 	node.fx = node.x
+			// 	node.fy = node.y
+			// 	node.fz = node.z
+			// }}
 			showNavInfo={false}
 			// onEngineTick={() => {
 			// 	console.log(ref.current.scene())

@@ -5,7 +5,7 @@ import Card from "$components/card.component"
 import { CenteredPage } from "$components/centered-page"
 import { TextInput } from "$components/input"
 import { useAccelerator } from "$hooks/use-accelerator"
-import { cmd, useSharedContext } from "@ordo-pink/frontend-core"
+import { useSharedContext } from "@ordo-pink/frontend-core"
 import { useRef, useState } from "react"
 import GTDList from "./gtd-list.component"
 import { useDataByLabel } from "$hooks/use-data.hook"
@@ -13,13 +13,13 @@ import { useDataByLabel } from "$hooks/use-data.hook"
 type P = { project: string }
 export default function GTDProject({ project }: P) {
 	const { commands } = useSharedContext()
-	const items = useDataByLabel(["todo", `projects/${project}`])
+	const items = useDataByLabel(["gtd"])
 	const [newItem, setNewItem] = useState("")
 	const createInputRef = useRef<HTMLInputElement>(null)
 
 	useAccelerator("meta+n", () => createInputRef.current?.focus())
 
-	const tAddToInboxInputPlaceholder = "Cell blood..."
+	const tAddToInboxInputPlaceholder = "Что делается..."
 
 	return (
 		<CenteredPage centerX centerY>
@@ -37,7 +37,7 @@ export default function GTDProject({ project }: P) {
 									commands.emit<cmd.data.create>("data.create", {
 										name: newItem,
 										parent: null,
-										labels: ["todo", `projects/${project}`],
+										labels: ["gtd", `projects/${project}`],
 									})
 
 									setNewItem("")

@@ -15,7 +15,6 @@ import { __CurrentRoute$, __initRouter } from "$streams/router"
 import CommandPaletteModal from "$components/command-palette"
 import { useSubscription } from "./use-subscription"
 import { useHotkeys } from "react-hotkeys-hook"
-import { cmd } from "@ordo-pink/frontend-core"
 import { __Notification$, __initNotification } from "$streams/notification"
 import { __Metadata$, __initData } from "$streams/data"
 import { __FileAssociations$, __initFileAssociations } from "$streams/file-associations"
@@ -83,6 +82,10 @@ export const useAppInit = (): UseAppInitReturns => {
 
 				command.onSelect()
 			}
+		},
+		{
+			enableOnFormTags: true,
+			enableOnContentEditable: true,
 		},
 		[globalCommandPalette],
 	)

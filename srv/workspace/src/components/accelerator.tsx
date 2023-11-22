@@ -4,21 +4,38 @@
 import { AiOutlineEnter } from "react-icons/ai"
 import { BsBackspace } from "react-icons/bs"
 import { Switch } from "@ordo-pink/switch"
+import { PropsWithChildren } from "react"
 
 // --- Public ---
 
-type _P = { accelerator: string }
-export default function Accelerator({ accelerator }: _P) {
+type _P = { accelerator: string; inline?: boolean }
+export default function Accelerator({ accelerator, inline }: _P) {
 	const hotkeys = accelerator.split("||")
 
-	return (
-		<div className="flex space-x-2">
-			{hotkeys.map(accelerator => (
-				<Hotkey key={accelerator} accelerator={accelerator} />
-			))}
-		</div>
-	)
+	return Switch.of(inline)
+		.case(true, () => (
+			<InlineWrapper>
+				{hotkeys.map(accelerator => (
+					<Hotkey key={accelerator} accelerator={accelerator} />
+				))}
+			</InlineWrapper>
+		))
+		.default(() => (
+			<BlockWrapper>
+				{hotkeys.map(accelerator => (
+					<Hotkey key={accelerator} accelerator={accelerator} />
+				))}
+			</BlockWrapper>
+		))
 }
+
+const BlockWrapper = ({ children }: PropsWithChildren) => (
+	<div className="flex space-x-2">{children}</div>
+)
+
+const InlineWrapper = ({ children }: PropsWithChildren) => (
+	<span className="inline-flex space-x-2">{children}</span>
+)
 
 const Hotkey = ({ accelerator }: _P) => {
 	const split = accelerator.split("+")

@@ -13,13 +13,15 @@ export default function FileExplorerActivity(): ReactNode {
 	const currentData = useDataFromRouteFSID()
 	const currentDataChildren = useChildren(currentData ?? "root")
 
+	console.log(currentData)
+
 	// TODO: Extract storing selectedItems to clipboard$.
 	const [selectedItems, setSelectedItems] = useState<FSID[]>([])
 
 	return (
 		<div
-			className="h-full w-full"
-			onContextMenu={showContextMenu({ commands, payload: currentData })}
+			className="h-full min-h-screen w-full"
+			onContextMenu={showContextMenu({ commands, payload: currentData ?? "root" })}
 		>
 			<div className="file-explorer w-full flex flex-wrap p-4">
 				{currentDataChildren.map(item => (
@@ -35,7 +37,7 @@ export default function FileExplorerActivity(): ReactNode {
 	)
 }
 
-type ShowContextMenuParams = { commands: Commands.Commands; payload: PlainData | null }
+type ShowContextMenuParams = { commands: Commands.Commands; payload: "root" | PlainData | null }
 type ShowContextMenuFn = (params: ShowContextMenuParams) => MouseEventHandler<HTMLDivElement>
 const showContextMenu: ShowContextMenuFn =
 	({ commands, payload }) =>

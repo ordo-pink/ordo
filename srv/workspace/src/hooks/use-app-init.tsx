@@ -3,7 +3,7 @@
 
 import { useEffect, useState } from "react"
 import { ConsoleLogger } from "@ordo-pink/logger"
-import { Nullable } from "@ordo-pink/tau"
+import { Nullable, noop } from "@ordo-pink/tau"
 import { __Auth$, __initAuth } from "$streams/auth"
 import { __ContextMenu$, __initContextMenu } from "$streams/context-menu"
 import { __Activities$, __CurrentActivity$, __initActivities } from "$streams/activities"
@@ -19,6 +19,7 @@ import { cmd } from "@ordo-pink/frontend-core"
 import { __Notification$, __initNotification } from "$streams/notification"
 import { __Metadata$, __initData } from "$streams/data"
 import { __FileAssociations$, __initFileAssociations } from "$streams/file-associations"
+import { Either } from "@ordo-pink/either"
 
 const commands = getCommands()
 
@@ -124,24 +125,34 @@ export const useAppInit = (): UseAppInitReturns => {
 	}, [])
 
 	useEffect(() => {
-		if (!commandPalette || !commandPalette.items.length) return
-
-		commands.emit<cmd.modal.show>("modal.show", {
-			Component: () => (
-				<CommandPaletteModal
-					items={commandPalette.items}
-					onNewItem={commandPalette.onNewItem}
-					multiple={commandPalette.multiple}
-					pinnedItems={commandPalette.pinnedItems}
-				/>
-			),
-			// The onHide hook makes a redundant call for hiding modal, but helps with closing the
-			// command palette when the modal is closed with a click on the overlay or Esc key press.
-			options: {
-				showCloseButton: false,
-				onHide: () => commands.emit<cmd.commandPalette.hide>("command-palette.hide"),
-			},
-		})
+		Either.fromNullable(commandPalette)
+			.chain(cp =>
+				Either.fromBoolean(
+					() =>
+						cp.items.length > 0 ||
+						(!!cp.pinnedItems && cp.pinnedItems.length > 0) ||
+						!!cp.onNewItem,
+					() => cp,
+				),
+			)
+			.fold(noop, cp =>
+				commands.emit<cmd.modal.show>("modal.show", {
+					Component: () => (
+						<CommandPaletteModal
+							items={cp.items}
+							onNewItem={cp.onNewItem}
+							multiple={cp.multiple}
+							pinnedItems={cp.pinnedItems}
+						/>
+					),
+					// The onHide hook makes a redundant call for hiding modal, but helps with closing the
+					// command palette when the modal is closed with a click on the overlay or Esc key press.
+					options: {
+						showCloseButton: false,
+						onHide: () => commands.emit<cmd.commandPalette.hide>("command-palette.hide"),
+					},
+				}),
+			)
 	}, [commandPalette])
 
 	return {

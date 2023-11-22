@@ -269,7 +269,7 @@ export const __initData: Fn = ({ logger, auth$ }) => {
 		cmd: "data.show-create-modal",
 		Icon: BsNodePlus,
 		readableName: "Add",
-		shouldShow: ({ payload }) => payload && payload.fsid,
+		shouldShow: ({ payload }) => payload && (payload.fsid || payload === "root"),
 		type: "create",
 	})
 

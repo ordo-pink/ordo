@@ -210,7 +210,7 @@ export default function CommandPaletteModal({ items, onNewItem, multiple, pinned
 			.default(noop)
 	}
 
-	const tSearchPlaceholder = "Search"
+	const tSearchPlaceholder = "Поиск..."
 
 	return (
 		<div className="w-[35rem] max-w-full h-[35rem] max-h-screen">
@@ -262,7 +262,7 @@ export default function CommandPaletteModal({ items, onNewItem, multiple, pinned
 					<ActionListItem
 						large
 						Icon={BsPlus}
-						text={`Add new item "${inputValue}"...`}
+						text={`Добавить "${inputValue}"...`}
 						current={true}
 						onClick={() => {
 							onNewItem(inputValue)
@@ -274,7 +274,7 @@ export default function CommandPaletteModal({ items, onNewItem, multiple, pinned
 
 			{multiple ? (
 				<div className="text-center text-neutral-500 text-sm">
-					Press <strong>ESC</strong> to complete
+					Нажмите <Accelerator inline accelerator="Esc" /> для завершения
 				</div>
 			) : null}
 		</div>

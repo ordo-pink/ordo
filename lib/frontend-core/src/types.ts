@@ -390,7 +390,7 @@ export namespace CtxMenu {
 	/**
 	 * Show context menu item parameters.
 	 */
-	export type ShowOptions<T = any> = {
+	export type ShowOptions<T = "root" | PlainData> = {
 		/**
 		 * Accepted mouse event.
 		 */

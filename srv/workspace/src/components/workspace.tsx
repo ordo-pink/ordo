@@ -12,7 +12,7 @@ import Sidebar from "./sidebar"
 import { __CommandPalette$ } from "$streams/command-palette"
 import { __Sidebar$ } from "$streams/sidebar"
 import { useStrictSubscription, useSubscription } from "$hooks/use-subscription"
-import { Extensions, ComponentSpace, cmd } from "@ordo-pink/frontend-core"
+import { Extensions, ComponentSpace } from "@ordo-pink/frontend-core"
 import { Loading } from "./loading/loading"
 
 // --- Public ---

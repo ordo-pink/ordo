@@ -3,7 +3,7 @@
 
 import { PlainData } from "@ordo-pink/data"
 import FileIconComponent from "./file-icon.component"
-import { useSharedContext, cmd } from "@ordo-pink/frontend-core"
+import { useSharedContext } from "@ordo-pink/frontend-core"
 import { MouseEvent } from "react"
 import DataLabel from "$components/data/label.component"
 import { BsLink45Deg, BsTags } from "react-icons/bs"

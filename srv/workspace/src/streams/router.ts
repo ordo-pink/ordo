@@ -5,7 +5,7 @@ import { Router, operators } from "silkrouter"
 import { Nullable, Unary, callOnce } from "@ordo-pink/tau"
 import { Logger } from "@ordo-pink/logger"
 import { getCommands } from "$streams/commands"
-import { cmd, Router as TRouter } from "@ordo-pink/frontend-core"
+import { Router as TRouter } from "@ordo-pink/frontend-core"
 import { BehaviorSubject, Observable, map } from "rxjs"
 import { __Activities$ } from "./activities"
 

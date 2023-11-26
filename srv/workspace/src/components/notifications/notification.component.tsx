@@ -5,7 +5,7 @@ import { Callout } from "$components/callout"
 import Null from "$components/null"
 import { getCommands } from "$streams/commands"
 import { Either } from "@ordo-pink/either"
-import { Notification, cmd } from "@ordo-pink/frontend-core"
+import { Notification } from "@ordo-pink/frontend-core"
 import { useEffect, useState } from "react"
 import { BsX } from "react-icons/bs"
 

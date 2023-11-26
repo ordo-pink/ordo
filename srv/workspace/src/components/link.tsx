@@ -3,7 +3,6 @@
 
 import { MouseEvent, PropsWithChildren, HTMLProps } from "react"
 import { getCommands } from "$streams/commands"
-import { cmd } from "@ordo-pink/frontend-core"
 
 const commands = getCommands()
 

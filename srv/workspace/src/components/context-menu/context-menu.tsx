@@ -9,16 +9,16 @@ import { __ContextMenu$ } from "$streams/context-menu"
 import ContextMenuItemList from "$components/context-menu/context-menu-item-list"
 import Null from "$components/null"
 import { getCommands } from "$streams/commands"
-import { CtxMenu as TContextMenu, cmd } from "@ordo-pink/frontend-core"
+import { CtxMenu } from "@ordo-pink/frontend-core"
 
 const commands = getCommands()
 
 type _P = { menu$: __ContextMenu$ }
 export default function ContextMenu({ menu$ }: _P) {
-	const [readers, setReaders] = useState<TContextMenu.Item[]>([])
-	const [creators, setCreators] = useState<TContextMenu.Item[]>([])
-	const [updaters, setUpdaters] = useState<TContextMenu.Item[]>([])
-	const [removers, setRemovers] = useState<TContextMenu.Item[]>([])
+	const [readers, setReaders] = useState<CtxMenu.Item[]>([])
+	const [creators, setCreators] = useState<CtxMenu.Item[]>([])
+	const [updaters, setUpdaters] = useState<CtxMenu.Item[]>([])
+	const [removers, setRemovers] = useState<CtxMenu.Item[]>([])
 
 	const menu = useSubscription(menu$)
 
@@ -37,10 +37,10 @@ export default function ContextMenu({ menu$ }: _P) {
 		// TODO: Fix the approach to handling events
 		if (menu.event.preventDefault) menu.event.preventDefault()
 
-		const readCommands = [] as TContextMenu.Item[]
-		const createCommands = [] as TContextMenu.Item[]
-		const updateCommands = [] as TContextMenu.Item[]
-		const deleteCommands = [] as TContextMenu.Item[]
+		const readCommands = [] as CtxMenu.Item[]
+		const createCommands = [] as CtxMenu.Item[]
+		const updateCommands = [] as CtxMenu.Item[]
+		const deleteCommands = [] as CtxMenu.Item[]
 
 		menu.structure.forEach(item => {
 			if (item.type === "create") createCommands.push(item)

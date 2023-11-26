@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 import { PlainData, FSID } from "@ordo-pink/data"
-import { Commands, cmd, useSharedContext } from "@ordo-pink/frontend-core"
+import { Commands, useSharedContext } from "@ordo-pink/frontend-core"
 import { Dispatch, MouseEventHandler, ReactNode, SetStateAction, useState } from "react"
 import FSDataIcon from "./data-icon.component"
 import { useChildren } from "$hooks/use-children"

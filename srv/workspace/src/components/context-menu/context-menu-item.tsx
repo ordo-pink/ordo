@@ -8,7 +8,7 @@ import RenderFromNullable from "$components/render-from-nullable"
 import ActionListItem from "$components/action-list-item"
 import Accelerator from "$components/accelerator"
 import { MouseEvent } from "react"
-import { CtxMenu, cmd } from "@ordo-pink/frontend-core"
+import { CtxMenu } from "@ordo-pink/frontend-core"
 
 const commands = getCommands()
 

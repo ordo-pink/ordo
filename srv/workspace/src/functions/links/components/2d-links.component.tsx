@@ -4,7 +4,7 @@
 import { useIsDarkTheme } from "$hooks/use-is-dark-theme.hook"
 import { useWorkspaceWidth } from "$hooks/use-workspace-width.hook"
 import { PlainData } from "@ordo-pink/data"
-import { cmd, useSharedContext } from "@ordo-pink/frontend-core"
+import { useSharedContext } from "@ordo-pink/frontend-core"
 import { useRef } from "react"
 import { ForceGraph2D } from "react-force-graph"
 import "./2d-links.component.css"

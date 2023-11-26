@@ -3,11 +3,9 @@
 
 import { PlainData } from "@ordo-pink/data"
 import DirectoryIconComponent from "./directory-icon.component"
-import { cmd, useSharedContext } from "@ordo-pink/frontend-core"
+import { useSharedContext } from "@ordo-pink/frontend-core"
 import { MouseEvent } from "react"
 import { BsLink45Deg, BsTags } from "react-icons/bs"
-import { Either } from "@ordo-pink/either"
-import Null from "$components/null"
 import DataLabel from "$components/data/label.component"
 
 type P = { plain: PlainData }

@@ -2,10 +2,9 @@
 // SPDX-License-Identifier: MIT
 
 import type { AuthResponse } from "@ordo-pink/backend-server-id"
-import { AiOutlineLogout } from "react-icons/ai"
 import { BehaviorSubject, Observable } from "rxjs"
 import { callOnce, Unary, Nullable } from "@ordo-pink/tau"
-import { User, cmd } from "@ordo-pink/frontend-core"
+import { User } from "@ordo-pink/frontend-core"
 import { Either } from "@ordo-pink/either"
 import { Logger } from "@ordo-pink/logger"
 import { Oath } from "@ordo-pink/oath"

@@ -5,7 +5,7 @@ import { map, scan, shareReplay } from "rxjs/operators"
 import { merge, Subject, Observable } from "rxjs"
 import { Binary, Curry, Nullable, callOnce } from "@ordo-pink/tau"
 import { Logger } from "@ordo-pink/logger"
-import { Extensions, cmd } from "@ordo-pink/frontend-core"
+import { Extensions } from "@ordo-pink/frontend-core"
 import { getCommands } from "./commands"
 
 const commands = getCommands()

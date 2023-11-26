@@ -2,7 +2,7 @@ import { FSID } from "@ordo-pink/data"
 import { useEffect } from "react"
 import { useSubscription } from "./use-subscription"
 import { content$ } from "$streams/data"
-import { cmd, useSharedContext } from "@ordo-pink/frontend-core"
+import { useSharedContext } from "@ordo-pink/frontend-core"
 
 export const useContent = (fsid?: FSID) => {
 	const { commands } = useSharedContext()

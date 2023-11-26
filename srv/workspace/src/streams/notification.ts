@@ -5,7 +5,7 @@ import { map, merge, Observable, scan, shareReplay, Subject } from "rxjs"
 import { Binary, Curry, Unary, callOnce } from "@ordo-pink/tau"
 import { Logger } from "@ordo-pink/logger"
 import { getCommands } from "$streams/commands"
-import { cmd, Notification } from "@ordo-pink/frontend-core"
+import { Notification } from "@ordo-pink/frontend-core"
 
 const commands = getCommands()
 

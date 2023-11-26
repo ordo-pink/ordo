@@ -4,7 +4,7 @@
 import type { Context, useContext as UseContext } from "react"
 import type { PlainData } from "@ordo-pink/data"
 import type { Nullable } from "@ordo-pink/tau"
-import { Commands, Router, User } from "../types"
+import { Commands, Extensions, Router, User } from "../types"
 
 let SharedContext: Context<SharedContextValue>
 let useContextHook: typeof UseContext
@@ -14,6 +14,8 @@ export type SharedContextValue = {
 	route: Nullable<Router.Route>
 	user: Nullable<User.User>
 	commands: Commands.Commands
+	fileAssociations: Extensions.FileAssociation[]
+	workspaceSplitSize: [number, number]
 }
 
 export const __useSharedContextInit = (

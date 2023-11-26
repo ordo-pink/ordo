@@ -2,13 +2,13 @@
 // SPDX-License-Identifier: MIT
 
 import Head from "next/head"
-import { CenteredPage } from "../components/centered-page"
+import { Centered } from "../components/centered"
 import { PageHeader } from "../components/page-header"
 import SignUpForm from "../components/sign-up-form"
 
 export default function SignUpPage() {
 	return (
-		<CenteredPage centerX centerY>
+		<Centered centerX centerY screenHeight>
 			<Head>
 				<title>Ordo.pink | Sign up</title>
 			</Head>
@@ -25,6 +25,6 @@ export default function SignUpPage() {
 					/>
 				</section>
 			</div>
-		</CenteredPage>
+		</Centered>
 	)
 }

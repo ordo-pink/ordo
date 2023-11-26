@@ -27,7 +27,7 @@ export default function Modal({ modal$ }: _P) {
 
 	return Either.fromNullable(modalState).fold(Null, ({ Component, showCloseButton }) => (
 		<div
-			className="modal absolute z-[500] top-0 left-0 right-0 bottom-0 bg-gradient-to-tr from-neutral-900/80  to-stone-900/80  h-screen w-screen flex items-center justify-center"
+			className="modal fixed overflow-hidden z-[500] top-0 left-0 right-0 bottom-0 bg-gradient-to-tr from-neutral-900/80  to-stone-900/80  h-screen w-screen flex items-center justify-center"
 			onClick={handleHide}
 		>
 			<div

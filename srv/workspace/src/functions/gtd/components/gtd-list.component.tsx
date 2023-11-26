@@ -1,14 +1,13 @@
 // SPDX-FileCopyrightText: Copyright 2023, 谢尔盖||↓ and the Ordo.pink contributors
 // SPDX-License-Identifier: MIT
 
-import { FSID, PlainData } from "@ordo-pink/data"
+import { PlainData } from "@ordo-pink/data"
 import GTDItem from "./gtd-item.component"
 import { useEffect, useState } from "react"
 import { BsCheckCircle, BsChevronDown, BsChevronUp, BsListCheck } from "react-icons/bs"
 import { Switch } from "@ordo-pink/switch"
 import {
 	DndContext,
-	useDroppable,
 	closestCenter,
 	KeyboardSensor,
 	PointerSensor,
@@ -16,16 +15,16 @@ import {
 	useSensors,
 } from "@dnd-kit/core"
 import {
-	arrayMove,
+	// arrayMove,
 	SortableContext,
 	sortableKeyboardCoordinates,
 	verticalListSortingStrategy,
 } from "@dnd-kit/sortable"
-import { cmd, useSharedContext } from "@ordo-pink/frontend-core"
+// import { useSharedContext } from "@ordo-pink/frontend-core"
 
-type P = { items: PlainData[]; fsid: FSID }
-export default function GTDList({ items, fsid }: P) {
-	const { commands } = useSharedContext()
+type P = { items: PlainData[] }
+export default function GTDList({ items }: P) {
+	// const { commands } = useSharedContext()
 
 	const [showDone, setShowDone] = useState(false)
 	const [hasDoneItems, setHasDoneItems] = useState(false)
@@ -42,6 +41,7 @@ export default function GTDList({ items, fsid }: P) {
 	useEffect(() => {
 		const done = items.filter(item => item.labels.includes("done"))
 		const pending = items.filter(item => !item.labels.includes("done"))
+
 		setHasDoneItems(done.length > 0)
 		setDoneItems(done.sort((a, b) => (a.updatedAt < b.updatedAt ? 1 : -1)))
 		setPendingItems(pending)
@@ -95,19 +95,19 @@ export default function GTDList({ items, fsid }: P) {
 				onDragEnd={({ active, over }) => {
 					if (!active || !over || active.id === over.id) return
 
-					const fsids = pendingItems.map(data => data.fsid)
+					// const fsids = pendingItems.map(data => data.fsid)
 
-					const oldIndex = fsids.indexOf(active.id as FSID)
-					const newIndex = fsids.indexOf(over.id as FSID)
+					// const oldIndex = fsids.indexOf(active.id as FSID)
+					// const newIndex = fsids.indexOf(over.id as FSID)
 
-					const updatedChildren = arrayMove(pendingItems, oldIndex, newIndex)
+					// const updatedChildren = arrayMove(pendingItems, oldIndex, newIndex)
 
-					commands.emit<cmd.data.setChildOrder>("data.set-child-order", {
-						fsid,
-						children: updatedChildren
-							.map(child => child.fsid)
-							.concat(doneItems.map(child => child.fsid)),
-					})
+					// commands.emit<cmd.data.setChildOrder>("data.set-child-order", {
+					// 	fsid,
+					// 	children: updatedChildren
+					// 		.map(child => child.fsid)
+					// 		.concat(doneItems.map(child => child.fsid)),
+					// })
 				}}
 				sensors={sensors}
 				collisionDetection={closestCenter}

@@ -6,7 +6,7 @@
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 import { Context } from "koa"
-import { JWAT, TTokenService } from "@ordo-pink/backend-token-service"
+import { JWAT, TTokenService } from "@ordo-pink/backend-service-token"
 import { HttpError } from "@ordo-pink/rrr"
 import { Oath } from "@ordo-pink/oath"
 

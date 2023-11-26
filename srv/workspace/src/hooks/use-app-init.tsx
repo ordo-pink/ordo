@@ -3,7 +3,7 @@
 
 import { useEffect, useState } from "react"
 import { ConsoleLogger } from "@ordo-pink/logger"
-import { Nullable } from "@ordo-pink/tau"
+import { Nullable, noop } from "@ordo-pink/tau"
 import { __Auth$, __initAuth } from "$streams/auth"
 import { __ContextMenu$, __initContextMenu } from "$streams/context-menu"
 import { __Activities$, __CurrentActivity$, __initActivities } from "$streams/activities"
@@ -15,9 +15,10 @@ import { __CurrentRoute$, __initRouter } from "$streams/router"
 import CommandPaletteModal from "$components/command-palette"
 import { useSubscription } from "./use-subscription"
 import { useHotkeys } from "react-hotkeys-hook"
-import { cmd } from "@ordo-pink/frontend-core"
 import { __Notification$, __initNotification } from "$streams/notification"
 import { __Metadata$, __initData } from "$streams/data"
+import { __FileAssociations$, __initFileAssociations } from "$streams/file-associations"
+import { Either } from "@ordo-pink/either"
 
 const commands = getCommands()
 
@@ -37,6 +38,7 @@ export type UseAppInitReturns = {
 	currentActivity$: Nullable<__CurrentActivity$>
 	currentRoute$: Nullable<__CurrentRoute$>
 	data$: Nullable<__Metadata$>
+	fileAssociations$: Nullable<__FileAssociations$>
 }
 
 export const useAppInit = (): UseAppInitReturns => {
@@ -53,6 +55,7 @@ export const useAppInit = (): UseAppInitReturns => {
 	const [currentActivity$, setCurrentActivity$] = useState<Nullable<__CurrentActivity$>>(null)
 	const [currentRoute$, setCurrentRoute$] = useState<Nullable<__CurrentRoute$>>(null)
 	const [data$, setData$] = useState<Nullable<__Metadata$>>(null)
+	const [fileAssociations$, setFileAssociations$] = useState<Nullable<__FileAssociations$>>(null)
 
 	const commandPalette = useSubscription(currentCommandPalette$)
 	const globalCommandPalette = useSubscription(globalCommandPalette$)
@@ -80,6 +83,10 @@ export const useAppInit = (): UseAppInitReturns => {
 				command.onSelect()
 			}
 		},
+		{
+			enableOnFormTags: true,
+			enableOnContentEditable: true,
+		},
 		[globalCommandPalette],
 	)
 
@@ -105,6 +112,9 @@ export const useAppInit = (): UseAppInitReturns => {
 		setActivities$(activities?.activities$ ?? null)
 		setCurrentActivity$(activities?.currentActivity$ ?? null)
 
+		const fileAssociations = __initFileAssociations({ logger: ConsoleLogger })
+		setFileAssociations$(fileAssociations)
+
 		const currentRoute$ = __initRouter({ ...ctx, activities$: activities?.activities$ })
 		setCurrentRoute$(currentRoute$)
 
@@ -118,24 +128,34 @@ export const useAppInit = (): UseAppInitReturns => {
 	}, [])
 
 	useEffect(() => {
-		if (!commandPalette || !commandPalette.items.length) return
-
-		commands.emit<cmd.modal.show>("modal.show", {
-			Component: () => (
-				<CommandPaletteModal
-					items={commandPalette.items}
-					onNewItem={commandPalette.onNewItem}
-					multiple={commandPalette.multiple}
-					pinnedItems={commandPalette.pinnedItems}
-				/>
-			),
-			// The onHide hook makes a redundant call for hiding modal, but helps with closing the
-			// command palette when the modal is closed with a click on the overlay or Esc key press.
-			options: {
-				showCloseButton: false,
-				onHide: () => commands.emit<cmd.commandPalette.hide>("command-palette.hide"),
-			},
-		})
+		Either.fromNullable(commandPalette)
+			.chain(cp =>
+				Either.fromBoolean(
+					() =>
+						cp.items.length > 0 ||
+						(!!cp.pinnedItems && cp.pinnedItems.length > 0) ||
+						!!cp.onNewItem,
+					() => cp,
+				),
+			)
+			.fold(noop, cp =>
+				commands.emit<cmd.modal.show>("modal.show", {
+					Component: () => (
+						<CommandPaletteModal
+							items={cp.items}
+							onNewItem={cp.onNewItem}
+							multiple={cp.multiple}
+							pinnedItems={cp.pinnedItems}
+						/>
+					),
+					// The onHide hook makes a redundant call for hiding modal, but helps with closing the
+					// command palette when the modal is closed with a click on the overlay or Esc key press.
+					options: {
+						showCloseButton: false,
+						onHide: () => commands.emit<cmd.commandPalette.hide>("command-palette.hide"),
+					},
+				}),
+			)
 	}, [commandPalette])
 
 	return {
@@ -148,6 +168,7 @@ export const useAppInit = (): UseAppInitReturns => {
 		notification$,
 		currentRoute$,
 		currentActivity$,
+		fileAssociations$,
 		globalCommandPalette$,
 		currentCommandPalette$,
 	}

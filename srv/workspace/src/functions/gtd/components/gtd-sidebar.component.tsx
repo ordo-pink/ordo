@@ -2,112 +2,86 @@
 // SPDX-License-Identifier: MIT
 
 import ActionListItem from "$components/action-list-item"
-import { OrdoButtonSecondary } from "$components/buttons/buttons"
-import { Loading } from "$components/loading/loading"
 import { Title } from "$components/page-header"
-import { PlainData } from "@ordo-pink/data"
-import { Either } from "@ordo-pink/either"
-import { cmd, useSharedContext } from "@ordo-pink/frontend-core"
-import { Nullable } from "@ordo-pink/tau"
-import { useEffect, useState } from "react"
-import { BsInbox, BsPlus, BsTag } from "react-icons/bs"
+import { useSharedContext } from "@ordo-pink/frontend-core"
+import { BsInbox, BsListCheck } from "react-icons/bs"
 import { HiOutlineSparkles } from "react-icons/hi"
-import GTDSidebarProject from "./gtd-sidebar-project.component"
+import { useGtdProjects } from "../hooks/use-projects"
+import { useInbox } from "../hooks/use-inbox"
+import { useRouteParams } from "$hooks/use-route-params.hook"
+import { FSID } from "@ordo-pink/data"
 
 export default function GTDSidebar() {
-	const { route, data, commands } = useSharedContext()
-	const [gtd, setGtd] = useState<Nullable<PlainData>>(null)
-	const [inbox, setInbox] = useState<Nullable<PlainData>>(null)
-	const [pinned, setPinned] = useState<PlainData | null>(null)
+	const { route, commands } = useSharedContext()
+	const { fsid } = useRouteParams<{ fsid: FSID }>()
+	const inboxItems = useInbox()
+	const projects = useGtdProjects()
+	// const pinned = useDataFind(item => !!gtd && item.name === ".pinned" && item.parent === gtd.fsid)
 
-	useEffect(() => {
-		if (!data || !data.length) return
-
-		const gtdDirectory = data.find(item => item.name === ".gtd" && item.parent === null)
-
-		if (!gtdDirectory)
-			return commands.emit<cmd.data.create>("data.create", { name: ".gtd", parent: null })
-
-		setGtd(gtdDirectory)
-
-		const inboxDirectory = data.find(
-			item => item.name === ".inbox" && item.parent === gtdDirectory.fsid,
-		)
-
-		if (!inboxDirectory)
-			return commands.emit<cmd.data.create>("data.create", {
-				name: ".inbox",
-				parent: gtdDirectory.fsid,
-			})
-
-		const pinnedLabels = data.find(
-			item => item.name === ".pinned" && item.parent === gtdDirectory.fsid,
-		)
-
-		if (!pinnedLabels) {
-			return commands.emit<cmd.data.create>("data.create", {
-				name: ".pinned",
-				parent: gtdDirectory.fsid,
-			})
-		}
-
-		setPinned(pinnedLabels)
-		setInbox(inboxDirectory)
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [data])
-
-	return Either.fromNullable(inbox).fold(Loading, inbox => (
-		<div className="mt-8 flex flex-col space-y-8">
+	return (
+		<div className="mt-8 flex flex-col space-y-8 px-1">
 			<ActionListItem
 				large
-				onContextMenu={event =>
-					commands.emit<cmd.ctxMenu.show>("context-menu.show", {
-						event,
-						payload: inbox,
-						hideDeleteItems: true,
-					})
-				}
+				// onContextMenu={event =>
+				// 	commands.emit<cmd.ctxMenu.show>("context-menu.show", {
+				// 		event,
+				// 		payload: inboxItems,
+				// 		hideDeleteItems: true,
+				// 	})
+				// }
 				href="/gtd"
 				Icon={BsInbox}
 				current={route?.path === "/gtd"}
-				text="Inbox"
+				text="Входящие"
 			>
 				<div className={`text-xs flex space-x-2 items-center`}>
-					<div>{inbox.children.length > 0 ? inbox.children.length : <HiOutlineSparkles />}</div>
+					<div>{inboxItems.length > 0 ? inboxItems.length : <HiOutlineSparkles />}</div>
 				</div>
 			</ActionListItem>
 
 			<div className="flex flex-col space-y-2">
 				<Title level="5" center uppercase styledFirstLetter>
-					Projects
+					проекты
 				</Title>
 				<div>
-					{gtd!.children
-						.filter(item => item !== inbox.fsid && item !== pinned!.fsid)
-						.map(child => (
-							<GTDSidebarProject key={child} fsid={child} />
-						))}
+					{projects.map(project => (
+						<ActionListItem
+							large
+							key={project.fsid}
+							Icon={BsListCheck}
+							current={fsid === project.fsid}
+							text={project.name}
+							href={`/gtd/projects/${project.fsid}`}
+							onContextMenu={event =>
+								commands.emit<cmd.ctxMenu.show>("context-menu.show", {
+									event,
+									payload: project,
+								})
+							}
+						/>
+					))}
 				</div>
 
-				<OrdoButtonSecondary
+				{/* <OrdoButtonSecondary
 					className="text-lg"
 					center
-					title="Add Project"
+					title="Добавить проект"
 					compact
 					onClick={() => commands.emit<cmd.data.showCreateModal>("data.show-create-modal", gtd)}
 				>
 					<BsPlus className="text-lg" />
-				</OrdoButtonSecondary>
+				</OrdoButtonSecondary> */}
 			</div>
 
-			<div className="flex flex-col space-y-2">
+			{/* <div className="flex flex-col space-y-2">
 				<Title level="5" center uppercase styledFirstLetter>
 					Pinned Labels
 				</Title>
 				<div>
-					{pinned!.labels.map(label => (
+					{pinned?.labels.map(label => (
 						<ActionListItem
 							Icon={BsTag}
+							key={label}
 							current={decodeURIComponent(route?.params?.label ?? "") === label}
 							text={label}
 							href={`/gtd/labels/${label}`}
@@ -126,7 +100,7 @@ export default function GTDSidebar() {
 				>
 					<BsPlus className="text-lg" />
 				</OrdoButtonSecondary>
-			</div>
+			</div> */}
 		</div>
-	))
+	)
 }

@@ -4,14 +4,18 @@
 import type { Oath } from "@ordo-pink/oath"
 import type { FSID, PlainData } from "./data.types"
 import type { DataError } from "./errors.types"
-import type { DataRepository } from "./data-repository.types"
-import type { ContentRepository } from "./content-repository.types"
+import type { DataPersistenceStrategy } from "./data-persistence-strategy.types"
+import type { ContentPersistenceStrategy } from "./content-persistence-strategy.types"
 
 export type TDataCommands<T> = {
-	dataRepository: DataRepository
-	contentRepository: ContentRepository<T>
+	dataPersistenceStrategy: DataPersistenceStrategy
+	contentPersistenceStrategy: ContentPersistenceStrategy<T>
 	create: (
-		params: Pick<PlainData, "name" | "parent" | "createdBy"> & { fsid?: FSID; fileLimit: number },
+		params: Pick<PlainData, "name" | "parent" | "createdBy"> & {
+			fsid?: FSID
+			fileLimit: number
+			labels?: string[]
+		},
 	) => Oath<PlainData, DataError>
 	remove: (params: Pick<PlainData, "fsid" | "createdBy">) => Oath<"OK", DataError>
 	move: (
@@ -32,16 +36,23 @@ export type TDataCommands<T> = {
 	removeLabel: (
 		params: Pick<PlainData, "fsid" | "createdBy" | "updatedBy"> & { label: string },
 	) => Oath<"OK", DataError>
+	addLink: (
+		params: Pick<PlainData, "fsid" | "createdBy" | "updatedBy"> & { link: FSID },
+	) => Oath<"OK", DataError>
+	removeLink: (
+		params: Pick<PlainData, "fsid" | "createdBy" | "updatedBy"> & { link: FSID },
+	) => Oath<"OK", DataError>
 	update: (
 		params: Pick<PlainData, "fsid" | "createdBy" | "updatedBy"> & { data: PlainData },
 	) => Oath<"OK", DataError>
 	updateContent: (
-		params: Pick<PlainData, "createdBy" | "updatedBy" | "fsid"> & { content: T },
-	) => Oath<"OK", DataError>
+		params: Pick<PlainData, "createdBy" | "updatedBy" | "fsid"> & { content: T; length: number },
+	) => Oath<number, DataError>
 	uploadContent: (
 		params: Pick<PlainData, "createdBy" | "updatedBy" | "name" | "parent"> & {
 			content: T
 			fileLimit: number
+			length: number
 		},
 	) => Oath<"OK", DataError>
 	getContent: (params: Pick<PlainData, "fsid" | "createdBy">) => Oath<T, DataError>

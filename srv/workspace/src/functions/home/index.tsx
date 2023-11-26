@@ -6,7 +6,7 @@ import { CenteredPage } from "$components/centered-page"
 import { Title } from "$components/page-header"
 import { useStrictSubscription } from "$hooks/use-subscription"
 import { __Activities$ } from "$streams/activities"
-import { Activity, ComponentSpace, Functions, cmd } from "@ordo-pink/frontend-core"
+import { Extensions, ComponentSpace, Functions, cmd } from "@ordo-pink/frontend-core"
 import { Switch } from "@ordo-pink/switch"
 import { Nullable } from "@ordo-pink/tau"
 import { memo } from "react"
@@ -22,7 +22,7 @@ export default function createHomeFunction({ commands, activities$ }: Params) {
 
 	commands.emit<cmd.commandPalette.add>("command-palette.add", {
 		id: "home.navigate",
-		readableName: "Go to Welcome Screen",
+		readableName: "Перейти на главную",
 		accelerator: "mod+h",
 		Icon,
 		onSelect: () => {
@@ -32,7 +32,7 @@ export default function createHomeFunction({ commands, activities$ }: Params) {
 	})
 }
 
-type P = Activity.ComponentProps & { activities$: Nullable<__Activities$> }
+type P = Extensions.ComponentProps & { activities$: Nullable<__Activities$> }
 const WelcomePage = ({ commands, space, activities$ }: P) =>
 	Switch.of(space)
 		.case(ComponentSpace.ICON, () => <Icon />)
@@ -54,26 +54,14 @@ const Workspace = ({ commands, activities$ }: Pick<P, "commands" | "activities$"
 				<Card title="Announcements" className="row-span-3">
 					<p>TODO: Announcements</p>
 				</Card>
-				<Card title="Hello!">
-					<p>TODO: Welcome message</p>
-				</Card>
-
-				<Card title="Stats" className="row-span-2">
-					TODO: Stats
-				</Card>
-				<Card title="Quick actions">
-					<p>TODO: Keyboard shortcuts</p>
-				</Card>
 
 				{activities
 					.filter(activity => activity.name !== "home")
 					.map(Activity => (
-						<Card key={Activity.name} title={Activity.name}>
+						<Card key={Activity.name}>
 							<Activity.Component commands={commands} space={ComponentSpace.WIDGET} />
 						</Card>
 					))}
-
-				<Card title="Useful links">TODO: Useful links</Card>
 			</div>
 		</CenteredPage>
 	)

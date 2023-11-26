@@ -5,6 +5,7 @@ import { Either } from "@ordo-pink/either"
 import { validations } from "./data-validations.impl"
 import { PlainData, TData, DataStatic, FSID } from "./data.types"
 import { Errors } from "./errors.impl"
+import { DataError } from "./errors.types"
 
 const addUnique = <T>(array: T[], element: T) => Array.from(new Set([element, ...array]))
 const drop = <T>(array: T[], element: T) => array.filter(item => item !== element)
@@ -26,8 +27,7 @@ const updateE =
 	increment =>
 		validations.isValidDataE(increment).map(increment =>
 			Data.of({
-				children: increment.children,
-				createdAt: Date.now(),
+				createdAt: plain.createdAt,
 				createdBy: plain.createdBy,
 				fsid: plain.fsid,
 				labels: increment.labels,
@@ -37,6 +37,7 @@ const updateE =
 				size: increment.size,
 				updatedAt: Date.now(),
 				updatedBy: increment.updatedBy,
+				contentType: plain.contentType,
 			}),
 		)
 
@@ -62,42 +63,6 @@ const setParentE =
 					() => Data.Errors.SelfReferencingParent,
 				),
 			)
-			.map(extend(() => ({ updatedAt: Date.now() })))
-			.map(increment => Data.of({ ...plain, ...increment }))
-
-const addChildE =
-	(plain: PlainData): TData["addChild"] =>
-	(child, updatedBy) =>
-		validations
-			.isValidFsidE(child)
-			.chain(child => validations.isValidSubE(updatedBy).map(updatedBy => ({ child, updatedBy })))
-			.chain(({ child, updatedBy }) =>
-				Either.fromBoolean(
-					() => child !== plain.fsid,
-					() => ({ child, updatedBy }),
-					() => Data.Errors.SelfReferencingChild,
-				),
-			)
-			.map(({ child, updatedBy }) => ({ updatedBy, children: addUnique(plain.children, child) }))
-			.map(extend(() => ({ updatedAt: Date.now() })))
-			.map(increment => Data.of({ ...plain, ...increment }))
-
-const removeChildE =
-	(plain: PlainData): TData["removeChild"] =>
-	(child, updatedBy) =>
-		validations
-			.isValidFsidE(child)
-			.chain(child => validations.isValidSubE(updatedBy).map(updatedBy => ({ child, updatedBy })))
-			.map(({ child, updatedBy }) => ({ updatedBy, children: drop(plain.children, child) }))
-			.map(extend(() => ({ updatedAt: Date.now() })))
-			.map(increment => Data.of({ ...plain, ...increment }))
-
-const dropChildrenE =
-	(plain: PlainData): TData["dropChildren"] =>
-	updatedBy =>
-		validations
-			.isValidSubE(updatedBy)
-			.map(updatedBy => ({ updatedBy, children: [] }))
 			.map(extend(() => ({ updatedAt: Date.now() })))
 			.map(increment => Data.of({ ...plain, ...increment }))
 
@@ -171,9 +136,6 @@ const of = (plain: PlainData): TData => ({
 	setName: setNameE(plain),
 	setSize: setSizeE(plain),
 	setParent: setParentE(plain),
-	addChild: addChildE(plain),
-	removeChild: removeChildE(plain),
-	dropChildren: dropChildrenE(plain),
 	addLink: addLinkE(plain),
 	removeLink: removeLinkE(plain),
 	dropLinks: dropLinksE(plain),
@@ -187,11 +149,17 @@ export const Data: DataStatic = {
 	Validations: validations,
 	Errors,
 	of,
-	new: ({ name, parent, createdBy, fsid }) =>
+	new: ({ name, parent, createdBy, fsid, labels = [], contentType = "text/ordo" }) =>
 		validations
 			.isValidNameE(name)
 			.chain(() => validations.isValidParentE(parent))
 			.chain(() => validations.isValidSubE(createdBy))
+			.chain(() =>
+				labels.reduce(
+					(acc, v) => acc.chain(() => validations.isValidLabelE(v)),
+					Either.right<string, DataError>(""),
+				),
+			)
 			.chain(() => validations.isValidFsidE(fsid ?? (crypto.randomUUID() as FSID)))
 			.map(fsid =>
 				Data.of({
@@ -201,9 +169,9 @@ export const Data: DataStatic = {
 					createdAt: Date.now(),
 					updatedBy: createdBy,
 					updatedAt: Date.now(),
+					contentType,
 					fsid,
-					children: [],
-					labels: [],
+					labels,
 					links: [],
 					size: 0,
 				}),

@@ -8,7 +8,7 @@ import { Oath } from "@ordo-pink/oath"
 
 type _P = { coverage: boolean }
 export const test: Unary<_P, void> = async ({ coverage: cov }) => {
-	await Oath.of("bun test .")
+	await Oath.of("opt/bun test .")
 		.chain(cmd => Oath.fromBoolean(isCovOn(cov), enableCov(cmd), disableCov(cmd)))
 		.fix(identity)
 		.chain(cmd => runCommand0(cmd, { stdout: "inherit", stderr: "inherit" }))

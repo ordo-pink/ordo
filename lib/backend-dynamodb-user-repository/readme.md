@@ -1,1 +1,0 @@
-# DynamoDB User Driver

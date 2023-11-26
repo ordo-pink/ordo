@@ -12,7 +12,8 @@ import Sidebar from "./sidebar"
 import { __CommandPalette$ } from "$streams/command-palette"
 import { __Sidebar$ } from "$streams/sidebar"
 import { useStrictSubscription, useSubscription } from "$hooks/use-subscription"
-import { Activity, ComponentSpace, cmd } from "@ordo-pink/frontend-core"
+import { Extensions, ComponentSpace, cmd } from "@ordo-pink/frontend-core"
+import { Loading } from "./loading/loading"
 
 // --- Public ---
 
@@ -47,7 +48,7 @@ export default function Workspace({ commandPalette$, sidebar$, currentActivity$ 
 // --- Internal ---
 
 type OnDragEndFn = Unary<[number, number], void>
-type DisabledSidebarProps = { activity: Nullable<Activity.Activity> }
+type DisabledSidebarProps = { activity: Nullable<Extensions.Activity> }
 type EnabledSidebarP = DisabledSidebarProps & {
 	sidebar$: __Sidebar$
 	commandPalette$: Nullable<__CommandPalette$>
@@ -55,9 +56,13 @@ type EnabledSidebarP = DisabledSidebarProps & {
 
 const DisabledSidebar = ({ activity }: DisabledSidebarProps) =>
 	Either.fromNullable(activity).fold(
-		() => <div>Welcome</div>,
+		() => (
+			<div className="w-screen">
+				<Loading />
+			</div>
+		),
 		({ Component }) => (
-			<div className="workspace w-full h-full overflow-auto">
+			<div className="workspace w-full h-full overflow-auto pl-12">
 				<Component commands={commands} space={ComponentSpace.WORKSPACE} />
 			</div>
 		),
@@ -113,7 +118,7 @@ const EnabledSidebar = ({ sidebar$, activity, commandPalette$ }: EnabledSidebarP
 		() => <div>Welcome</div>,
 		({ Component, Sidebar: SidebarComponent }) => (
 			<Split
-				className="flex overflow-hidden h-screen w-full"
+				className="flex overflow-hidden h-screen w-full pl-12"
 				sizes={sizes}
 				snapOffset={snapOffset}
 				onDrag={setSizes}

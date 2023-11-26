@@ -41,7 +41,7 @@ export const writeFileRecursive0 = (...[path, data, options]: Parameters<typeof 
 		noop,
 		() => new Error("writeFileRecursive0 can only create files from string paths"),
 	)
-		.chain(() => createParentDirectory0(path as string))
+		.chain(() => createParentIfNotExists0(path as string))
 		.chain(() => writeFile0(path, data, options))
 
 export const createDirectoryIfNotExists0 = (path: string) =>
@@ -49,7 +49,7 @@ export const createDirectoryIfNotExists0 = (path: string) =>
 		.fix(() => mkdirRecursive0(path))
 		.map(noop)
 
-export const createParentDirectory0 = (path: string) =>
+export const createParentIfNotExists0 = (path: string) =>
 	Oath.of(path).map(getParentPath).chain(createDirectoryIfNotExists0)
 
 export const fileExists0 = (path: string) =>

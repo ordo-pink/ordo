@@ -3,7 +3,7 @@
 
 import { OrdoButtonPrimary, OrdoButtonSecondary } from "$components/buttons/buttons"
 import { PlainData } from "@ordo-pink/data"
-import { cmd, useSharedContext } from "@ordo-pink/frontend-core"
+import { useSharedContext } from "@ordo-pink/frontend-core"
 import { Nullable } from "@ordo-pink/tau"
 import { ChangeEvent, useState } from "react"
 import { BsFileEarmarkPlus } from "react-icons/bs"
@@ -33,10 +33,10 @@ export default function UploadFilesModal({ parent }: Props) {
 		}
 	}
 
-	const tPlaceholder = "Choose files"
-	const tTitle = "Upload files"
-	const tCancel = "Cancel"
-	const tUpload = "Upload"
+	const tPlaceholder = "Выбрать"
+	const tTitle = "Загрузить файлы"
+	const tCancel = "Отмена"
+	const tUpload = "Загрузить"
 
 	return (
 		<div className="w-[30rem] max-w-full flex flex-col gap-8">
@@ -75,7 +75,7 @@ export default function UploadFilesModal({ parent }: Props) {
 					{tCancel}
 				</OrdoButtonSecondary>
 
-				<OrdoButtonPrimary hotkey="enter" disabled={!files} onClick={handleOkButtonClick}>
+				<OrdoButtonPrimary hotkey="mod+enter" disabled={!files} onClick={handleOkButtonClick}>
 					{tUpload}
 				</OrdoButtonPrimary>
 			</div>

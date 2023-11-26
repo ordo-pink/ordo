@@ -5,12 +5,10 @@
 
 import { useLayoutEffect } from "react"
 import { Button } from "./button"
-import Link from "next/link"
-import { useRouter } from "next/navigation"
+import BetaInvitation from "./beta-invitation.component"
 
-export default function IndexHeroSection() {
-	const router = useRouter()
-
+type P = { webHost: string; subsHost: string }
+export default function IndexHeroSection({ webHost, subsHost }: P) {
 	useLayoutEffect(() => {
 		const listener = (event: MouseEvent) => {
 			Object.assign(document.documentElement, {
@@ -29,7 +27,8 @@ export default function IndexHeroSection() {
 		return () => document.removeEventListener("mousemove", listener)
 	}, [])
 
-	const handleJoinClick = () => router.push("/sign-in")
+	const handleLearnMoreClick = () =>
+		window.scrollTo({ behavior: "smooth", top: window.innerHeight })
 
 	return (
 		<section className="hero-section overflow-hidden">
@@ -52,18 +51,28 @@ export default function IndexHeroSection() {
 						backgroundImage: `url(${process.env.NEXT_PUBLIC_STATIC_HOST}/index-hero-layer-2.png)`,
 					}}
 				/>
-				<div className="hero-layer-4 absolute inset-0 bg-cover bg-center flex flex-col items-center justify-center">
-					<h1 className="text-center text-2xl uppercase tracking-tight">
-						Bring your thoughts to
-						<span className="block text-8xl font-black first-letter:bg-gradient-to-tr first-letter:from-pink-500 first-letter:to-purple-500 first-letter:bg-clip-text first-letter:text-transparent">
-							ORDO
-						</span>
-					</h1>
-					<p className="center opacity-50 mt-4">The next gen data strorage</p>
-					<div className="mt-12 flex space-x-8">
-						{/* TODO: Transparent button */}
-						<Button onClick={handleJoinClick}>Join</Button>
-						<Link href="#about">Learn more</Link>
+			</div>
+
+			<div className="fixed top-0 w-screen h-screen flex items-center justify-center p-4 sm:p-12">
+				<div className="flex w-full justify-between max-w-5xl">
+					<div className="flex flex-col md:flex-row space-y-12 md:space-y-0 md:space-x-24 justify-between items-center w-full p-4 md:px-24 md:py-20 max-w-5xl backdrop-blur-md bg-gradient-to-br from-sky-950/20 via-indigo-950/20 to-indigo-950/20 shadow-xl rounded-xl">
+						<div className="inset-0 bg-cover bg-center flex flex-col items-center justify-center">
+							<h1 className="text-center text-xl sm:text-2xl uppercase tracking-tight">
+								Bring your thoughts to
+								<span className="block text-7xl sm:text-8xl tracking-widest sm:tracking-normal font-black first-letter:bg-gradient-to-tr first-letter:from-pink-500 first-letter:to-purple-500 first-letter:bg-clip-text first-letter:text-transparent">
+									ORDO
+								</span>
+							</h1>
+							<p className="center opacity-75 mt-4">Белогривая лошадка</p>
+							<div className="mt-12 flex space-x-8 items-center">
+								<Button onClick={handleLearnMoreClick}>Подробнее</Button>
+								{/* <Link href="#about">Подробнее</Link> */}
+							</div>
+						</div>
+
+						<div className="max-w-sm">
+							<BetaInvitation webHost={webHost} subsHost={subsHost} />
+						</div>
 					</div>
 				</div>
 			</div>

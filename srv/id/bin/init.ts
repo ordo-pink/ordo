@@ -6,7 +6,7 @@
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 import { getc } from "@ordo-pink/getc"
-import { createParentDirectory0, writeFile0 } from "@ordo-pink/fs"
+import { createParentIfNotExists0, writeFile0 } from "@ordo-pink/fs"
 import { resolve } from "path"
 
 const {
@@ -58,7 +58,7 @@ const generateAuthKeys = async () => {
 	]
 
 	for (const key of keys) {
-		await createParentDirectory0(key).toPromise()
+		await createParentIfNotExists0(key).toPromise()
 	}
 
 	await generateKeyPair(

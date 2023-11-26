@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: Copyright 2023, 谢尔盖||↓ and the Ordo.pink contributors
 // SPDX-License-Identifier: MIT
 
-import { CenteredPage } from "../components/centered-page"
+import { Centered } from "../components/centered"
 import { PageHeader } from "../components/page-header"
 import { useEffect } from "react"
 
@@ -16,8 +16,8 @@ export default function ForgotPasswordPage() {
 	}, [])
 
 	return (
-		<CenteredPage centerX centerY>
+		<Centered centerX centerY screenHeight>
 			<PageHeader text="Signing out..." />
-		</CenteredPage>
+		</Centered>
 	)
 }

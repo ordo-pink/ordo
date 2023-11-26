@@ -21,9 +21,9 @@ export type PlainData = {
 	fsid: FSID
 	name: string
 	parent: Nullable<FSID>
-	children: FSID[]
 	links: FSID[]
 	labels: string[]
+	contentType: string
 	createdAt: number
 	createdBy: UserID
 	updatedAt: number
@@ -36,9 +36,6 @@ export type TData = {
 	setName: (name: string, updatedBy: UserID) => TEither<TData, DataError>
 	setSize: (size: number, updatedBy: UserID) => TEither<TData, DataError>
 	setParent: (parent: Nullable<FSID>, updatedBy: UserID) => TEither<TData, DataError>
-	addChild: (child: FSID, updatedBy: UserID) => TEither<TData, DataError>
-	removeChild: (child: FSID, updatedBy: UserID) => TEither<TData, DataError>
-	dropChildren: (updatedBy: UserID) => TEither<TData, DataError>
 	addLink: (link: FSID, updatedBy: UserID) => TEither<TData, DataError>
 	removeLink: (link: FSID, updatedBy: UserID) => TEither<TData, DataError>
 	dropLinks: (updatedBy: UserID) => TEither<TData, DataError>
@@ -53,6 +50,10 @@ export type DataStatic = {
 	Errors: typeof Errors
 	of: (plain: PlainData) => TData
 	new: (
-		params: Pick<PlainData, "name" | "parent" | "createdBy"> & { fsid?: FSID },
+		params: Pick<PlainData, "name" | "parent" | "createdBy"> & {
+			fsid?: FSID
+			labels?: string[]
+			contentType?: string
+		},
 	) => TEither<TData, DataError>
 }

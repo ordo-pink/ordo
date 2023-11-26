@@ -37,8 +37,8 @@ const createFiles0: Ternary<string, string, License, Thunk<Oath<void, Error>>> =
 		Oath.all([
 			createRepositoryFile0(`${path}/license`, getLicense(license)).tap(progress.inc),
 			createRepositoryFile0(`${path}/index.ts`, index(name, license)).tap(progress.inc),
-			createRepositoryFile0(`${path}/src/impl.ts`, impl(name, license)).tap(progress.inc),
-			createRepositoryFile0(`${path}/src/impl.test.ts`, test(name, license)).tap(progress.inc),
+			createRepositoryFile0(`${path}/src/${name}.impl.ts`, impl(name, license)).tap(progress.inc),
+			createRepositoryFile0(`${path}/src/${name}.test.ts`, test(name, license)).tap(progress.inc),
 		]).map(progress.finish)
 
 const rejectIfExists0: Curry<Binary<string, boolean, Oath<void, string>>> = name => exists =>
@@ -50,9 +50,7 @@ const rejectIfExists0: Curry<Binary<string, boolean, Oath<void, string>>> = name
 
 const createFilesIfNotExists0: Binary<string, License, Unary<string, Oath<void, string | Error>>> =
 	(name, license) => path =>
-		directoryExists0(path)
-			.chain(rejectIfExists0(name))
-			.chain(createFiles0(path, name, license))
+		directoryExists0(path).chain(rejectIfExists0(name)).chain(createFiles0(path, name, license))
 
 const impl = (name: string, license: License) => `${getSPDXRecord(license)}
 export const ${camel(name)} = () => {
@@ -65,7 +63,7 @@ export const ${camel(name)} = () => {
 
 const index = (name: string, license: License) => `${getSPDXRecord(license)}
 import { Command } from "commander"
-import { ${camel(name)} } from "./src/impl"
+import { ${camel(name)} } from "./src/${name}.impl"
 
 const program = new Command()
 
@@ -82,7 +80,7 @@ program.parse()
 
 const test = (name: string, license: License) => `${getSPDXRecord(license)}
 import { test, expect } from "bun:test"
-import { ${camel(name)} } from "./impl"
+import { ${camel(name)} } from "./${name}.impl"
 
 test("${name} should pass", () => {
 	expect(${camel(name)}).toEqual("Hello from ${name} bin!")

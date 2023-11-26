@@ -13,6 +13,8 @@ const commands = getCommands()
 export type __CommandPalette$ = Observable<{
 	items: CommandPalette.Item[]
 	onNewItem?: (newItem: string) => any
+	multiple?: boolean
+	pinnedItems?: CommandPalette.Item[]
 }>
 export const __initCommandPalette: InitCommandPalette = callOnce(({ logger }) => {
 	logger.debug("Initializing command palette")
@@ -25,7 +27,7 @@ export const __initCommandPalette: InitCommandPalette = callOnce(({ logger }) =>
 	add({
 		id: "command-palette.hide",
 		onSelect: hide,
-		readableName: "Hide command palette",
+		readableName: "Скрыть панель команд",
 		Icon: BsCommand,
 		accelerator: "mod+shift+p",
 	})

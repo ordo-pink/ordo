@@ -5,6 +5,10 @@ import { PlainData } from "@ordo-pink/data"
 import FileIconComponent from "./file-icon.component"
 import { useSharedContext, cmd } from "@ordo-pink/frontend-core"
 import { MouseEvent } from "react"
+import DataLabel from "$components/data/label.component"
+import { BsLink45Deg, BsTags } from "react-icons/bs"
+import { Either } from "@ordo-pink/either"
+import Null from "$components/null"
 
 type P = { plain: PlainData }
 export default function FileCardComponent({ plain }: P) {
@@ -14,9 +18,40 @@ export default function FileCardComponent({ plain }: P) {
 		commands.emit<cmd.ctxMenu.show>("context-menu.show", { event, payload: plain })
 
 	return (
-		<div title={plain.name} onContextMenu={showContextMenu} className="flex flex-col items-center">
+		<div
+			title={plain.name}
+			onContextMenu={showContextMenu}
+			className="flex flex-col items-center space-y-1"
+		>
 			<FileIconComponent plain={plain} />
-			<div className="text-sm mt-1 line-clamp-1 break-all">{plain.name}</div>
+			<div className="text-sm text-center mt-1 line-clamp-2 break-all">{plain.name}</div>
+			<div className="flex space-x-1">
+				<DataLabel>
+					<div
+						className="flex items-center space-x-1 text-xs"
+						title={`Метки:\n\n- ${plain.labels.join("\n- ")}`}
+						onClick={() =>
+							commands.emit<cmd.data.showEditLabelsPalette>("data.show-edit-labels-palette", plain)
+						}
+					>
+						<BsTags />
+						<p>{plain.labels.length}</p>
+					</div>
+				</DataLabel>
+
+				<DataLabel>
+					<div
+						className="flex items-center space-x-1 text-xs"
+						title={`Ссылки на файлы:\n\n- ${plain.links.join("\n- ")}`}
+						onClick={() =>
+							commands.emit<cmd.data.showEditLinksPalette>("data.show-edit-links-palette", plain)
+						}
+					>
+						<BsLink45Deg />
+						<p>{plain.links.length}</p>
+					</div>
+				</DataLabel>
+			</div>
 		</div>
 	)
 }

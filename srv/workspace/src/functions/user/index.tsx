@@ -11,15 +11,15 @@ import { useSubscription } from "$hooks/use-subscription"
 import { __Auth$, useUser } from "$streams/auth"
 import { Hosts } from "$utils/hosts"
 import { UserUtils } from "$utils/user-utils.util"
-import { User } from "@ordo-pink/backend-user-service"
-import { Activity, ComponentSpace, Functions, cmd } from "@ordo-pink/frontend-core"
+import { Extensions, ComponentSpace, Functions, cmd, User } from "@ordo-pink/frontend-core"
 import { Oath } from "@ordo-pink/oath"
 import { Switch } from "@ordo-pink/switch"
 import { Nullable, noop } from "@ordo-pink/tau"
 import { useEffect, useState } from "react"
+import { AiOutlineLogout } from "react-icons/ai"
 import { BsPersonBadge } from "react-icons/bs"
 
-type UserComponentParams = Activity.ComponentProps & { auth$: Nullable<__Auth$> }
+type UserComponentParams = Extensions.ComponentProps & { auth$: Nullable<__Auth$> }
 const UserActivity = ({ space, auth$, commands }: UserComponentParams) =>
 	Switch.of(space)
 		.case(ComponentSpace.ICON, () => <Icon />)
@@ -37,18 +37,39 @@ export default function createUserFunction({ commands, auth$ }: Params) {
 		background: true,
 	})
 
+	commands.on<cmd.user.goToAccount>("user.go-to-account", () =>
+		commands.emit<cmd.router.navigate>("router.navigate", "/user"),
+	)
+
+	commands.on<cmd.user.signOut>("user.sign-out", () =>
+		commands.emit<cmd.router.openExternal>("router.open-external", {
+			url: `${Hosts.WEBSITE}/sign-out`,
+			newTab: false,
+		}),
+	)
+
 	commands.emit<cmd.commandPalette.add>("command-palette.add", {
 		id: "user.go-to-user",
-		readableName: "Go to Account",
+		readableName: "Аккаунт",
 		Icon,
 		onSelect: () => {
 			commands.emit<cmd.commandPalette.hide>("command-palette.hide")
-			commands.emit<cmd.router.navigate>("router.navigate", "/user")
+			commands.emit<cmd.user.goToAccount>("user.go-to-account")
+		},
+	})
+
+	commands.emit<cmd.commandPalette.add>("command-palette.add", {
+		id: "core.sign-out",
+		readableName: "Выйти",
+		Icon: AiOutlineLogout,
+		onSelect: () => {
+			commands.emit<cmd.commandPalette.hide>("command-palette.hide")
+			commands.emit<cmd.user.signOut>("user.sign-out")
 		},
 	})
 }
 
-type _P = { auth$: Nullable<__Auth$> } & Pick<Activity.ComponentProps, "commands">
+type _P = { auth$: Nullable<__Auth$> } & Pick<Extensions.ComponentProps, "commands">
 const UserPage = ({ auth$, commands }: _P) => {
 	const userE = useUser()
 
@@ -60,7 +81,7 @@ const UserPage = ({ auth$, commands }: _P) => {
 	return userE.fold(Null, user => <UserInfo auth$={auth$} user={user} commands={commands} />)
 }
 
-type _UIP = _P & { user: User }
+type _UIP = _P & { user: User.User }
 const UserInfo = ({ user, auth$, commands }: _UIP) => {
 	const auth = useSubscription(auth$)
 
@@ -99,7 +120,7 @@ const UserInfo = ({ user, auth$, commands }: _UIP) => {
 			</div>
 
 			<div className="container grid grid-cols-1 md:grid-cols-3 gap-2 md:gap-4">
-				<Card title="Identification">
+				<Card title="Идентификация">
 					<fieldset className="w-full h-full justify-center flex flex-col space-y-4">
 						<div className="flex flex-col space-y-4 md:flex-row md:space-y-0 md:space-x-2">
 							{/* <TextInput
@@ -150,7 +171,7 @@ const UserInfo = ({ user, auth$, commands }: _UIP) => {
 										)
 								}
 							>
-								Change
+								Изменить
 							</Button>
 						</div>
 
@@ -160,14 +181,14 @@ const UserInfo = ({ user, auth$, commands }: _UIP) => {
 					</fieldset>
 				</Card>
 
-				<Card title="Personal info">
+				<Card title="Личная информация">
 					<fieldset className="w-full h-full justify-center flex flex-col space-y-4">
 						<TextInput
 							placeholder="E.g. Neil"
 							value={firstName}
 							id="firstName"
 							autocomplete="given-name"
-							label="First name"
+							label="Имя"
 							onInput={e => setFirstName(e.target.value)}
 						/>
 						<TextInput
@@ -175,7 +196,7 @@ const UserInfo = ({ user, auth$, commands }: _UIP) => {
 							value={lastName}
 							id="lastName"
 							autocomplete="family-name"
-							label="Last name"
+							label="Фамилия"
 							onInput={e => setLastName(e.target.value)}
 						/>
 
@@ -209,15 +230,15 @@ const UserInfo = ({ user, auth$, commands }: _UIP) => {
 									)
 							}
 						>
-							Change
+							Изменить
 						</Button>
 					</fieldset>
 				</Card>
 
-				<Card title="Password">
+				<Card title="Пароль">
 					<fieldset className="w-full h-full justify-center flex flex-col space-y-4">
 						<PasswordInput
-							label="Old password"
+							label="Текущий пароль"
 							id="currentPassword"
 							autocomplete="current-password"
 							value={oldPassword}
@@ -231,7 +252,7 @@ const UserInfo = ({ user, auth$, commands }: _UIP) => {
 						/>
 
 						<PasswordInput
-							label="New password"
+							label="Новый пароль"
 							id="newPassword"
 							autocomplete="new-password"
 							value={newPassword}
@@ -245,7 +266,7 @@ const UserInfo = ({ user, auth$, commands }: _UIP) => {
 						/>
 
 						<PasswordInput
-							label="Repeat new password"
+							label="Новый пароль ещё разок"
 							id="repeatPassword"
 							autocomplete="new-password"
 							value={repeatNewPassword}
@@ -290,27 +311,25 @@ const UserInfo = ({ user, auth$, commands }: _UIP) => {
 									)
 							}
 						>
-							Change
+							Изменить
 						</Button>
 					</fieldset>
 				</Card>
 
-				<Card title="Subscription" className="md:col-span-2">
+				<Card title="Подписка">
 					<p className="text-center text-sm text-neutral-500">
-						We'll soon add paid plans for more space and integrations. Stay rich!
+						Подключение платной подписки станет доступно совсем скоро™️!
 					</p>
 				</Card>
 
-				<Card title="Active sessions">
+				{/* <Card title="Active sessions">
 					<p className="text-center text-sm text-neutral-500">
 						We'll put active sessions info here in the next update. Stay active!
 					</p>
-				</Card>
+				</Card> */}
 
-				<Card title="Achievements" className="md:col-span-3">
-					<p className="text-center text-sm text-neutral-500">
-						You'll find your achievements here soon. Stay tuned!
-					</p>
+				<Card title="Достижения" className="md:col-span-2">
+					<p className="text-center text-sm text-neutral-500">Тут ачивочки TODO</p>
 				</Card>
 			</div>
 		</form>

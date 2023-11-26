@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: Copyright 2023, 谢尔盖||↓ and the Ordo.pink contributors
 // SPDX-License-Identifier: MIT
 
-import { CommandPalette, cmd } from "@ordo-pink/frontend-core"
+import { CommandPalette } from "@ordo-pink/frontend-core"
 import { getCommands } from "./commands"
 import { rrrToNotification } from "$utils/error-to-notification"
 import { Hosts } from "$utils/hosts"
@@ -10,25 +10,27 @@ import { BehaviorSubject, Observable } from "rxjs"
 import { Logger } from "@ordo-pink/logger"
 import { __Auth$ } from "./auth"
 import { Unary } from "@ordo-pink/tau"
-import { AuthResponse } from "@ordo-pink/backend-id-server"
+import { AuthResponse } from "@ordo-pink/backend-server-id"
 import CreatePageModal from "$components/modals/create-page-modal.component"
-import UploadFilesModal from "$components/modals/upload-files-modal.component"
-import { DataCommands, PlainData } from "@ordo-pink/data"
-import { ClientDataRepository } from "../repositories/client-data-repository.impl"
-import { ClientContentRepository } from "../repositories/client-content-repository"
+// import UploadFilesModal from "$components/modals/upload-files-modal.component"
+import { DataCommands, FSID, PlainData } from "@ordo-pink/data"
+import { ClientDataPersistenceStrategy } from "../strategies/client-data-persistence-strategy.impl"
+import { ClientContentPersistenceStrategy } from "../strategies/client-content-persistence-strategy.impl"
 import RemoveFileModal from "$components/modals/remove-page-modal.component"
 import RenameDirectoryModal from "$components/modals/rename-modal.component"
 import {
 	BsArrowRightSquare,
-	BsFillTagFill,
+	BsLink,
 	BsNodeMinus,
 	BsNodePlus,
 	BsPencilSquare,
+	BsSlash,
 	BsTag,
 	BsTags,
-	BsTagsFill,
+	// BsUpload,
 } from "react-icons/bs"
 import FileIconComponent from "$functions/file-explorer/components/file-icon.component"
+import { PiGraph } from "react-icons/pi"
 
 const commands = getCommands()
 
@@ -39,10 +41,13 @@ type Fn = Unary<Params, __Metadata$>
 export const __initData: Fn = ({ logger, auth$ }) => {
 	logger.debug("Initializing data")
 
-	const dataRepository = ClientDataRepository.of(data$, auth$ as any, commands)
-	const contentRepository = ClientContentRepository.of()
+	const dataRepository = ClientDataPersistenceStrategy.of(data$, auth$ as any, commands)
+	const contentRepository = ClientContentPersistenceStrategy.of(auth$ as any)
 
-	const dataCommands = DataCommands.of({ dataRepository, contentRepository })
+	const dataCommands = DataCommands.of({
+		dataPersistenceStrategy: dataRepository,
+		contentPersistenceStrategy: contentRepository,
+	})
 
 	commands.on<cmd.data.showCreateModal>("data.show-create-modal", ({ payload }) => {
 		commands.emit<cmd.modal.show>("modal.show", {
@@ -81,6 +86,32 @@ export const __initData: Fn = ({ logger, auth$ }) => {
 		})
 	})
 
+	commands.on<cmd.data.showEditLinksPalette>("data.show-edit-links-palette", ({ payload }) => {
+		const data = data$.value
+
+		commands.emit<cmd.commandPalette.show>("command-palette.show", {
+			multiple: true,
+			pinnedItems: payload.links.map(link => ({
+				id: link,
+				readableName: data.find(item => item.fsid === link)!.name,
+				Icon: BsLink,
+				onSelect: () => {
+					commands.emit<cmd.data.removeLink>("data.remove-link", { item: payload, link })
+				},
+			})),
+			items: data
+				.filter(data => !payload.links.includes(data.fsid) && data.fsid !== payload.fsid)
+				.map(link => ({
+					id: link.fsid,
+					readableName: link.name,
+					Icon: BsLink,
+					onSelect: () => {
+						commands.emit<cmd.data.addLink>("data.add-link", { item: payload, link: link.fsid })
+					},
+				})),
+		})
+	})
+
 	commands.on<cmd.data.showRemoveModal>("data.show-remove-modal", ({ payload }) => {
 		commands.emit<cmd.modal.show>("modal.show", {
 			Component: () => <RemoveFileModal data={payload} />,
@@ -93,18 +124,18 @@ export const __initData: Fn = ({ logger, auth$ }) => {
 		})
 	})
 
-	commands.on<cmd.data.showUploadModal>("data.show-upload-modal", ({ payload }) => {
-		commands.emit<cmd.modal.show>("modal.show", {
-			Component: () => <UploadFilesModal parent={payload} />,
-		})
-	})
+	// commands.on<cmd.data.showUploadModal>("data.show-upload-modal", ({ payload }) => {
+	// 	commands.emit<cmd.modal.show>("modal.show", {
+	// 		Component: () => <UploadFilesModal parent={payload} />,
+	// 	})
+	// })
 
 	commands.on<cmd.data.create>("data.create", ({ payload }) => {
 		const auth = (auth$ as BehaviorSubject<AuthResponse>).value
-		const { name, parent } = payload
+		const { name, parent, labels = [] } = payload
 
 		dataCommands
-			.create({ name, parent, createdBy: auth.sub, fileLimit: auth.fileLimit })
+			.create({ name, parent, createdBy: auth.sub, fileLimit: auth.fileLimit, labels })
 			.orElse(message =>
 				commands.emit<cmd.notification.show>("notification.show", {
 					message,
@@ -140,24 +171,6 @@ export const __initData: Fn = ({ logger, auth$ }) => {
 			.orNothing()
 	})
 
-	commands.on<cmd.data.setChildOrder>("data.set-child-order", ({ payload }) => {
-		const auth = (auth$ as BehaviorSubject<AuthResponse>).value
-		const data = data$.value
-
-		const item = data.find(d => d.fsid === payload.fsid && d.createdBy === auth.sub)
-
-		if (!item) return
-
-		dataCommands
-			.update({
-				createdBy: auth.sub,
-				updatedBy: auth.sub,
-				fsid: payload.fsid,
-				data: { ...item, children: payload.children },
-			})
-			.orNothing()
-	})
-
 	commands.on<cmd.data.addLabel>("data.add-label", ({ payload }) => {
 		const auth = (auth$ as BehaviorSubject<AuthResponse>).value
 
@@ -184,19 +197,64 @@ export const __initData: Fn = ({ logger, auth$ }) => {
 			.orNothing()
 	})
 
+	commands.on<cmd.data.addLink>("data.add-link", ({ payload }) => {
+		const auth = (auth$ as BehaviorSubject<AuthResponse>).value
+
+		dataCommands
+			.addLink({
+				fsid: payload.item.fsid,
+				createdBy: auth.sub,
+				updatedBy: auth.sub,
+				link: payload.link,
+			})
+			.orNothing()
+	})
+
+	commands.on<cmd.data.removeLink>("data.remove-link", ({ payload }) => {
+		const auth = (auth$ as BehaviorSubject<AuthResponse>).value
+
+		dataCommands
+			.removeLink({
+				fsid: payload.item.fsid,
+				createdBy: auth.sub,
+				updatedBy: auth.sub,
+				link: payload.link,
+			})
+			.orNothing()
+	})
+
 	commands.emit<cmd.ctxMenu.add>("context-menu.add", {
 		cmd: "data.show-rename-modal",
 		Icon: BsPencilSquare,
-		readableName: "Rename",
-		shouldShow: ({ payload }) =>
-			payload && payload.fsid && payload.name && payload.name !== ".inbox",
+		accelerator: "r",
+		readableName: "Переименовать",
+		shouldShow: ({ payload }) => payload && payload.fsid && payload.name,
 		type: "update",
 	})
+
+	// commands.emit<cmd.ctxMenu.add>("context-menu.add", {
+	// 	cmd: "data.show-upload-modal",
+	// 	Icon: BsUpload,
+	// 	accelerator: "mod+u",
+	// 	readableName: "Загрузить...",
+	// 	shouldShow: ({ payload }) => payload && (payload === "root" || payload.fsid),
+	// 	type: "create",
+	// })
 
 	commands.emit<cmd.ctxMenu.add>("context-menu.add", {
 		cmd: "data.show-edit-labels-palette",
 		Icon: BsTags,
-		readableName: "Edit labels",
+		accelerator: "l",
+		readableName: "Изменить метки",
+		shouldShow: ({ payload }) => payload && payload.fsid && payload.name,
+		type: "update",
+	})
+
+	commands.emit<cmd.ctxMenu.add>("context-menu.add", {
+		cmd: "data.show-edit-links-palette",
+		Icon: PiGraph,
+		accelerator: "mod+l",
+		readableName: "Изменить ссылки",
 		shouldShow: ({ payload }) => payload && payload.fsid && payload.name,
 		type: "update",
 	})
@@ -204,15 +262,16 @@ export const __initData: Fn = ({ logger, auth$ }) => {
 	commands.emit<cmd.ctxMenu.add>("context-menu.add", {
 		cmd: "data.show-create-modal",
 		Icon: BsNodePlus,
-		readableName: "Add",
-		shouldShow: ({ payload }) => payload && payload.fsid,
+		accelerator: "mod+a",
+		readableName: "Добавить",
+		shouldShow: ({ payload }) => payload && (payload.fsid || payload === "root"),
 		type: "create",
 	})
 
 	commands.emit<cmd.ctxMenu.add>("context-menu.add", {
 		cmd: "data.show-remove-modal",
 		Icon: BsNodeMinus,
-		readableName: "Remove",
+		readableName: "Удалить",
 		shouldShow: ({ payload }) => payload && payload.fsid,
 		type: "delete",
 	})
@@ -220,28 +279,78 @@ export const __initData: Fn = ({ logger, auth$ }) => {
 	commands.emit<cmd.ctxMenu.add>("context-menu.add", {
 		cmd: "command-palette.show",
 		Icon: BsArrowRightSquare,
-		readableName: "Move...",
+		accelerator: "m",
+		readableName: "Переместить...",
 		shouldShow: ({ payload }) =>
 			payload && payload.fsid && payload.name && payload.name !== ".inbox",
 		payloadCreator: ({ payload }) => {
 			const data = data$.value
 
 			return {
-				items: data?.map(
-					item =>
-						({
-							id: item.name,
-							readableName: item.name,
-							onSelect: () => {
-								commands.emit<cmd.data.move>("data.move", { parent: item.fsid, fsid: payload.fsid })
-								commands.emit<cmd.modal.hide>("modal.hide")
-							},
-							Icon: () => <FileIconComponent plain={item} />,
-						} satisfies CommandPalette.Item),
+				items: [
+					{
+						id: "move-to-root",
+						readableName: "Переместить в корневую папку",
+						Icon: () => <BsSlash />,
+						onSelect: () => {
+							commands.emit<cmd.data.move>("data.move", { parent: null, fsid: payload.fsid })
+							commands.emit<cmd.modal.hide>("modal.hide")
+						},
+					},
+				].concat(
+					data
+						?.filter(item => item.fsid !== payload.parent && item.fsid !== payload.fsid)
+						.map(
+							item =>
+								({
+									id: item.name,
+									readableName: item.name,
+									onSelect: () => {
+										commands.emit<cmd.data.move>("data.move", {
+											parent: item.fsid,
+											fsid: payload.fsid,
+										})
+										commands.emit<cmd.modal.hide>("modal.hide")
+									},
+									Icon: () => <FileIconComponent plain={item} />,
+								} satisfies CommandPalette.Item),
+						),
 				),
 			}
 		},
 		type: "update",
+	})
+
+	commands.on<cmd.data.getFileContent>("data.get-content", ({ payload: { fsid } }) => {
+		const auth = (auth$ as BehaviorSubject<AuthResponse>).value
+
+		dataCommands.getContent({ createdBy: auth.sub, fsid }).fork(
+			() => void 0,
+			value => content$.next(value),
+		)
+	})
+
+	commands.on<cmd.data.setContent>("data.set-content", ({ payload: { content, fsid } }) => {
+		const auth = (auth$ as BehaviorSubject<AuthResponse>).value
+		const data = data$.value
+		const length = new Blob([content]).size
+		const updatedAt = Date.now()
+		const updatedBy = auth.sub
+		const createdBy = auth.sub
+
+		dataCommands.updateContent({ createdBy, fsid, content, updatedBy, length }).fork(
+			() => void 0,
+			size => {
+				// TODO: Cleanup and validations
+				const dataCopy = [...data]
+				const currentData = dataCopy.find(item => item.fsid === fsid)
+				const updated = { ...currentData!, updatedAt, size }
+
+				dataCopy.splice(dataCopy.indexOf(currentData!), 1, updated)
+
+				data$.next(dataCopy)
+			},
+		)
 	})
 
 	commands.on<cmd.data.refreshRoot>("data.refresh-root", () => {
@@ -267,3 +376,4 @@ export const __initData: Fn = ({ logger, auth$ }) => {
 }
 
 const data$ = new BehaviorSubject<PlainData[]>([])
+export const content$ = new BehaviorSubject<string | null>(null)

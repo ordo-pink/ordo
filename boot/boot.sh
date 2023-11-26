@@ -109,6 +109,11 @@ if [ ! -d ./opt ]; then
   mkdir ./opt
 fi
 
+## Create bin directory
+if [ ! -d ./bin ]; then
+  mkdir ./bin
+fi
+
 ## Download ESBuild
 download_esbuild
 
@@ -119,7 +124,7 @@ download_tailwind
 download_bun
 
 ## Install bin dependencies
-bun i
+opt/bun i
 
 ## Build init script
 compile_init_script

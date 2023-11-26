@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: Copyright 2023, 谢尔盖||↓ and the Ordo.pink contributors
 // SPDX-License-Identifier: MIT
 
-import type { AuthResponse } from "@ordo-pink/backend-id-server"
+import type { AuthResponse } from "@ordo-pink/backend-server-id"
 import { AiOutlineLogout } from "react-icons/ai"
 import { BehaviorSubject, Observable } from "rxjs"
 import { callOnce, Unary, Nullable } from "@ordo-pink/tau"
@@ -67,23 +67,6 @@ export const __initAuth: InitAuth = callOnce(({ logger }) => {
 				result => user$.next(result),
 			),
 	)
-
-	commands.on<cmd.user.signOut>("user.sign-out", () =>
-		commands.emit<cmd.router.openExternal>("router.open-external", {
-			url: `${Hosts.WEBSITE}/sign-out`,
-			newTab: false,
-		}),
-	)
-
-	commands.emit<cmd.commandPalette.add>("command-palette.add", {
-		id: "core.sign-out",
-		readableName: "Sign out",
-		Icon: AiOutlineLogout,
-		onSelect: () => {
-			commands.emit<cmd.commandPalette.hide>("command-palette.hide")
-			commands.emit<cmd.user.signOut>("user.sign-out")
-		},
-	})
 
 	return auth$
 })

@@ -1,0 +1,4 @@
+.graph-tooltip {
+	font-family: "Jost", sans-serif !important;
+	@apply !max-w-xs !text-center !bg-neutral-200/50 dark:!bg-neutral-950/60 !backdrop-blur-sm !px-2 !rounded-md !shadow-md !text-neutral-800 dark:!text-neutral-200;
+}

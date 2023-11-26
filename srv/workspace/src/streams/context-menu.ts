@@ -61,7 +61,8 @@ const contextMenu$ = params$.pipe(
 			structure: items.filter(item => {
 				const shouldShow = item.shouldShow({ event: state.event, payload: state.payload })
 
-				if (shouldShow) state.event.stopPropagation()
+				// TODO: Fix the approach to handling events
+				if (shouldShow && state.event.stopPropagation) state.event.stopPropagation()
 
 				return shouldShow
 			}),

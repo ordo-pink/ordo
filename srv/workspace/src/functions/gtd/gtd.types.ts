@@ -7,7 +7,7 @@ declare global {
 	module cmd {
 		module gtd {
 			type openInbox = { name: "gtd.open-inbox" }
-			type openItem = { name: "gtd.open-item"; payload: FSID }
+			type openProject = { name: "gtd.open-project"; payload: FSID }
 			type showInGTD = { name: "gtd.show-in-gtd"; payload: FSID }
 			type showAddReminderModal = { name: "gtd.show-quick-reminder-modal" }
 			type addToGTD = { name: "gtd.add-to-gtd"; payload: FSID }

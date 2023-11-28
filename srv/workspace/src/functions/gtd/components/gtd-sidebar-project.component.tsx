@@ -25,7 +25,7 @@ export default function GTDSidebarProject({ fsid }: Props) {
 			}
 			large
 			key={data.fsid}
-			href={`/gtd/items/${data.fsid}`}
+			href={`/gtd/projects/${data.fsid}`}
 			Icon={() => <FileIconComponent plain={data} />}
 			current={decodeURIComponent(route?.params?.item ?? "") === data.fsid}
 			text={data.name}

@@ -33,8 +33,8 @@ export default function createGTDFunction({ commands, data$ }: Functions.CreateF
 		commands.emit<cmd.router.navigate>("router.navigate", "/gtd"),
 	)
 
-	commands.on<cmd.gtd.openItem>("gtd.open-item", ({ payload }) =>
-		commands.emit<cmd.router.navigate>("router.navigate", `/gtd/items/${payload}`),
+	commands.on<cmd.gtd.openProject>("gtd.open-project", ({ payload }) =>
+		commands.emit<cmd.router.navigate>("router.navigate", `/gtd/projects/${payload}`),
 	)
 
 	commands.on<cmd.gtd.showInGTD>("gtd.show-in-gtd", ({ payload }) => {
@@ -44,12 +44,14 @@ export default function createGTDFunction({ commands, data$ }: Functions.CreateF
 		if (!item) return
 
 		const children = data.filter(child => child.parent === item.fsid)
+		console.log(children.length)
 
 		if (children.length === 0 && !item.parent) return
 
-		console.log(children.length)
-
-		commands.emit<cmd.gtd.openItem>("gtd.open-item", children.length > 0 ? item.fsid : item.parent!)
+		commands.emit<cmd.gtd.openProject>(
+			"gtd.open-project",
+			children.length > 0 ? item.fsid : item.parent!,
+		)
 	})
 
 	commands.on<cmd.gtd.addToGTD>("gtd.add-to-gtd", ({ payload }) =>
@@ -105,9 +107,14 @@ export default function createGTDFunction({ commands, data$ }: Functions.CreateF
 		Icon: BsListCheck,
 		readableName: "Показать в задачах",
 		type: "read",
-		shouldShow: ({ payload }) => payload && payload.fsid,
+		shouldShow: ({ payload }) =>
+			payload &&
+			payload.fsid &&
+			payload.labels &&
+			Array.isArray(payload.labels) &&
+			payload.labels.includes("gtd"),
 		accelerator: "mod+g",
-		payloadCreator: ({ payload }) => payload?.fsid,
+		payloadCreator: ({ payload }) => payload.fsid,
 	})
 
 	commands.emit<cmd.ctxMenu.add>("context-menu.add", {

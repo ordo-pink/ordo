@@ -22,24 +22,96 @@ import {
 	Point,
 } from "slate"
 import { withHistory } from "slate-history"
-import { withReact, Slate, Editable, useSlateStatic, useReadOnly, ReactEditor } from "slate-react"
+import {
+	withReact,
+	Slate,
+	Editable,
+	useSlateStatic,
+	useReadOnly,
+	ReactEditor,
+	RenderElementProps,
+} from "slate-react"
 import { Switch } from "@ordo-pink/switch"
 import EditableTitle from "./editable-title.component"
 import { Loading } from "$components/loading/loading"
+import { withShortcuts } from "../editor-plugins/with-shortcuts.editor-plugin"
+import { isOrdoElement } from "../guards/is-ordo-element.guard"
+import { OrdoElement } from "../editor.types"
+
+const SHORTCUTS = {
+	"*": "list-item",
+	"-": "list-item",
+	"+": "list-item",
+	"1": "number-list-item",
+	"2": "number-list-item",
+	"3": "number-list-item",
+	"4": "number-list-item",
+	"5": "number-list-item",
+	"6": "number-list-item",
+	"7": "number-list-item",
+	"8": "number-list-item",
+	"9": "number-list-item",
+	"0": "number-list-item",
+	">": "block-quote",
+	"#": "heading-1",
+	"##": "heading-2",
+	"###": "heading-3",
+	"####": "heading-4",
+	"#####": "heading-5",
+}
 
 export default function EditorWorkspace() {
 	const { fsid } = useRouteParams<{ fsid: FSID }>()
 	const { commands } = useSharedContext()
 	const data = useDataByFSID(fsid)
 	const content = useContent(fsid)
-	const editor = useMemo(() => withChecklists(withHistory(withReact(createEditor()))), [])
+	const editor = useMemo(
+		() => withShortcuts(withChecklists(withHistory(withReact(createEditor())))),
+		[],
+	)
 
 	const renderElement = useCallback((props: any) => <Element {...props} />, [])
 	const renderLeaf = useCallback((props: any) => <Leaf {...props} />, [])
 
+	const handleDOMBeforeInput = useCallback(() => {
+		queueMicrotask(() => {
+			const pendingDiffs = ReactEditor.androidPendingDiffs(editor)
+
+			const scheduleFlush = pendingDiffs?.some(({ diff, path }) => {
+				if (!diff.text.endsWith(" ")) {
+					return false
+				}
+
+				const { text } = Node.leaf(editor, path)
+				const beforeText = text.slice(0, diff.start) + diff.text.slice(0, -1)
+				if (!(beforeText in SHORTCUTS)) {
+					return
+				}
+
+				const blockEntry = Editor.above(editor, {
+					at: path,
+					match: n => SlateElement.isElement(n) && Editor.isBlock(editor, n),
+				})
+
+				if (!blockEntry) return false
+
+				const [, blockPath] = blockEntry
+				return Editor.isStart(editor, Editor.start(editor, path), blockPath)
+			})
+
+			if (scheduleFlush) {
+				ReactEditor.androidScheduleFlush(editor)
+			}
+		})
+	}, [editor])
+
 	useEffect(() => {
 		const handleTest = () =>
-			editor.insertNode({ type: "paragraph", children: [{ text: "Проверка!" }] } as any)
+			editor.insertNode({
+				type: "check-list-item",
+				checked: false,
+				children: [{ text: "" }],
+			} as OrdoElement)
 
 		commands.on("editor.test", handleTest)
 
@@ -89,6 +161,7 @@ export default function EditorWorkspace() {
 							className="outline-none pb-96"
 							placeholder="Пора начинать..."
 							renderLeaf={renderLeaf}
+							onDOMBeforeInput={handleDOMBeforeInput}
 							renderElement={renderElement}
 							onKeyDown={(event: KeyboardEvent<HTMLDivElement>) => {
 								if (editor.selection?.anchor.offset === 0 && event.key === "/") {
@@ -130,28 +203,8 @@ const EmptyEditor = () => {
 const save$ = new Subject<{ fsid: FSID; value: Descendant[] }>()
 const debounceSave$ = save$.pipe(debounce(() => timer(1000)))
 
-const serialize = (value: Descendant[]) =>
-	value
-		.map(n =>
-			Switch.of((n as any).type)
-				.case("heading-1", () => `# ${Node.string(n)}`)
-				.case("heading-2", () => `## ${Node.string(n)}`)
-				.case("heading-3", () => `### ${Node.string(n)}`)
-				.case("heading-4", () => `#### ${Node.string(n)}`)
-				.case("heading-5", () => `##### ${Node.string(n)}`)
-				.default(() => Node.string(n)),
-		)
-		.join("\n")
-
-const deserialize = (string: string) =>
-	string.split("\n").map(line =>
-		Switch.of(line)
-			.case(
-				line => line.startsWith("# "),
-				() => ({ type: "heading-1", children: [{ text: line.slice(2) }] }),
-			)
-			.default(() => ({ type: "paragraph", children: [{ text: line }] })),
-	)
+const serialize = (value: Descendant[]) => JSON.stringify(value)
+const deserialize = (string: string) => JSON.parse(string)
 
 const withChecklists = (editor: ReactEditor) => {
 	const { deleteBackward } = editor
@@ -160,25 +213,25 @@ const withChecklists = (editor: ReactEditor) => {
 		const { selection } = editor
 
 		if (selection && Range.isCollapsed(selection)) {
-			const [match] = Editor.nodes(editor, {
-				match: (n: any) =>
-					!Editor.isEditor(n) && SlateElement.isElement(n) && (n as any).type === "check-list-item",
-			}) as any
+			const nodes = Editor.nodes(editor, {
+				match: node =>
+					!Editor.isEditor(node) && isOrdoElement(node) && node.type === "check-list-item",
+			})
+
+			const match = nodes.next().value
 
 			if (match) {
 				const [, path] = match
 				const start = Editor.start(editor, path)
 
 				if (Point.equals(selection.anchor, start)) {
-					const newProperties: Partial<SlateElement & { type: string }> = {
+					const newProperties: Partial<OrdoElement> = {
 						type: "paragraph",
 					}
 
 					Transforms.setNodes(editor, newProperties, {
-						match: (n: any) =>
-							!Editor.isEditor(n) &&
-							SlateElement.isElement(n) &&
-							(n as any).type === "check-list-item",
+						match: node =>
+							!Editor.isEditor(node) && isOrdoElement(node) && node.type === "check-list-item",
 					})
 
 					return editor
@@ -203,7 +256,7 @@ const Leaf = ({ attributes, children, leaf }: any) => {
 
 const Element = (props: any) =>
 	Switch.of(props.element.type)
-		.case("blockquote", () => <blockquote {...props.attributes} />)
+		.case("block-quote", () => <blockquote {...props.attributes}>{props.children}</blockquote>)
 		.case("unordered-list", () => <ul {...props.attributes}>{props.children}</ul>)
 		.case("ordered-list", () => <ol {...props.attributes}>{props.children}</ol>)
 		.case("list-item", () => (
@@ -217,42 +270,43 @@ const Element = (props: any) =>
 			</h1>
 		))
 		.case("heading-2", () => (
-			<h2 className="py-2" {...props.attributes}>
+			<h2 className="text-xl font-extrabold leading-6" {...props.attributes}>
 				{props.children}
 			</h2>
 		))
 		.case("heading-3", () => (
-			<h3 className="py-2" {...props.attributes}>
+			<h3 className="text-xl font-bold leading-6" {...props.attributes}>
 				{props.children}
 			</h3>
 		))
 		.case("heading-4", () => (
-			<h4 className="py-2" {...props.attributes}>
+			<h4 className="text-lg font-bold leading-6" {...props.attributes}>
 				{props.children}
 			</h4>
 		))
 		.case("heading-5", () => (
-			<h5 className="py-2" {...props.attributes}>
+			<h5 className="text-lg font-semibold leading-6" {...props.attributes}>
 				{props.children}
 			</h5>
 		))
-		.case("check-list-item", () => <CheckListItemElement {...props.attributes} />)
+		.case("check-list-item", () => <CheckListItemElement {...props} />)
 		.default(() => (
-			<p className="py-2" {...props.attributes}>
+			<p className="" {...props.attributes}>
 				{props.children}
 			</p>
 		))
 
-const CheckListItemElement = ({ attributes, children, element }: any) => {
+const CheckListItemElement = ({ attributes, children, element }: RenderElementProps) => {
 	const editor = useSlateStatic() as ReactEditor
 	const readOnly = useReadOnly()
-	const { checked } = element
+
 	return (
 		<div {...attributes} className="flex items-center">
 			<span contentEditable={false} className="mr-3">
 				<input
 					type="checkbox"
-					checked={checked}
+					className="h-6 w-6 rounded-sm focus:ring-0 text-emerald-500 bg-neutral-200 dark:bg-neutral-500 cursor-pointer"
+					checked={(element as any)?.checked}
 					onChange={event => {
 						const path = ReactEditor.findPath(editor, element)
 						const newProperties: Partial<SlateElement & { checked: boolean }> = {
@@ -266,7 +320,9 @@ const CheckListItemElement = ({ attributes, children, element }: any) => {
 			<span
 				contentEditable={!readOnly}
 				suppressContentEditableWarning
-				className={`flex outline-none ${checked ? "opacity-60 line-through" : "opacity-100"}`}
+				className={`flex outline-none ${
+					(element as any)?.checked ? "opacity-60 line-through" : "opacity-100"
+				}`}
 			>
 				{children}
 			</span>

@@ -160,7 +160,7 @@ const of = (
 			.fork(
 				item => {
 					data$.next(data)
-					commands.emit<cmd.notification.show>("notification.show", item)
+					// commands.emit<cmd.notification.show>("notification.show", item)
 				},
 				() => {
 					// commands.emit<cmd.data.refreshRoot>("data.refresh-root")

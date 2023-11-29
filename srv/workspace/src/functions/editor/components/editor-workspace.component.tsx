@@ -37,6 +37,9 @@ import { Loading } from "$components/loading/loading"
 import { withShortcuts } from "../editor-plugins/with-shortcuts.editor-plugin"
 import { isOrdoElement } from "../guards/is-ordo-element.guard"
 import { OrdoElement } from "../editor.types"
+import HoveringToolbar from "./hovering-toolbar.component"
+
+// --- TODO: Move this away from here ---
 
 const SHORTCUTS = {
 	"*": "list-item",
@@ -60,6 +63,23 @@ const SHORTCUTS = {
 	"#####": "heading-5",
 }
 
+const isMarkActive = (editor: ReactEditor, format: string) => {
+	const marks = Editor.marks(editor) as any
+	return marks ? marks[format] === true : false
+}
+
+const toggleMark = (editor: ReactEditor, format: string) => {
+	const isActive = isMarkActive(editor, format)
+
+	if (isActive) {
+		Editor.removeMark(editor, format)
+	} else {
+		Editor.addMark(editor, format, true)
+	}
+}
+
+// ---
+
 export default function EditorWorkspace() {
 	const { fsid } = useRouteParams<{ fsid: FSID }>()
 	const { commands } = useSharedContext()
@@ -73,37 +93,52 @@ export default function EditorWorkspace() {
 	const renderElement = useCallback((props: any) => <Element {...props} />, [])
 	const renderLeaf = useCallback((props: any) => <Leaf {...props} />, [])
 
-	const handleDOMBeforeInput = useCallback(() => {
-		queueMicrotask(() => {
-			const pendingDiffs = ReactEditor.androidPendingDiffs(editor)
+	const handleDOMBeforeInput = useCallback(
+		(event: InputEvent) => {
+			queueMicrotask(() => {
+				const pendingDiffs = ReactEditor.androidPendingDiffs(editor)
 
-			const scheduleFlush = pendingDiffs?.some(({ diff, path }) => {
-				if (!diff.text.endsWith(" ")) {
-					return false
-				}
+				const scheduleFlush = pendingDiffs?.some(({ diff, path }) => {
+					if (!diff.text.endsWith(" ")) {
+						return false
+					}
 
-				const { text } = Node.leaf(editor, path)
-				const beforeText = text.slice(0, diff.start) + diff.text.slice(0, -1)
-				if (!(beforeText in SHORTCUTS)) {
-					return
-				}
+					const { text } = Node.leaf(editor, path)
+					const beforeText = text.slice(0, diff.start) + diff.text.slice(0, -1)
+					if (!(beforeText in SHORTCUTS)) {
+						return
+					}
 
-				const blockEntry = Editor.above(editor, {
-					at: path,
-					match: n => SlateElement.isElement(n) && Editor.isBlock(editor, n),
+					const blockEntry = Editor.above(editor, {
+						at: path,
+						match: n => SlateElement.isElement(n) && Editor.isBlock(editor, n),
+					})
+
+					if (!blockEntry) return false
+
+					const [, blockPath] = blockEntry
+					return Editor.isStart(editor, Editor.start(editor, path), blockPath)
 				})
 
-				if (!blockEntry) return false
-
-				const [, blockPath] = blockEntry
-				return Editor.isStart(editor, Editor.start(editor, path), blockPath)
+				if (scheduleFlush) {
+					ReactEditor.androidScheduleFlush(editor)
+				}
 			})
 
-			if (scheduleFlush) {
-				ReactEditor.androidScheduleFlush(editor)
+			switch (event.inputType) {
+				case "formatBold":
+					event.preventDefault()
+					toggleMark(editor, "bold")
+				case "formatItalic":
+					event.preventDefault()
+					toggleMark(editor, "italic")
+				case "formatUnderline":
+					event.preventDefault()
+					toggleMark(editor, "underlined")
 			}
-		})
-	}, [editor])
+		},
+		[editor],
+	)
 
 	useEffect(() => {
 		const handleTest = () =>
@@ -155,6 +190,7 @@ export default function EditorWorkspace() {
 							save$.next({ fsid, value })
 						}}
 					>
+						<HoveringToolbar />
 						<Editable
 							spellCheck
 							autoFocus
@@ -204,7 +240,11 @@ const save$ = new Subject<{ fsid: FSID; value: Descendant[] }>()
 const debounceSave$ = save$.pipe(debounce(() => timer(1000)))
 
 const serialize = (value: Descendant[]) => JSON.stringify(value)
-const deserialize = (string: string) => JSON.parse(string)
+const deserialize = (string: string) =>
+	Either.try(() => JSON.parse(string)).fold(
+		() => [{ type: "paragraph", children: [{ text: "" }] }],
+		x => x,
+	)
 
 const withChecklists = (editor: ReactEditor) => {
 	const { deleteBackward } = editor

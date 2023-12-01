@@ -6,9 +6,11 @@ import { Centered } from "../components/centered"
 import IndexHeroSection from "../components/index-hero"
 import { BsArrowsMove, BsCode, BsLock, BsSafe } from "react-icons/bs"
 import Footer from "components/footer.component"
+import ScreenshotCarousel from "components/screenshot-carousel.component"
 
 export default function Home() {
 	const webHost = process.env.NEXT_PUBLIC_WEB_HOST!
+	const staticHost = process.env.NEXT_PUBLIC_STATIC_HOST!
 	const subsHost = process.env.NEXT_PUBLIC_SUBS_HOST!
 
 	return (
@@ -23,9 +25,9 @@ export default function Home() {
 					<div className="mx-auto max-w-7xl px-6 lg:px-8">
 						<div className="mx-auto max-w-2xl lg:text-center">
 							<h2 className="text-base font-semibold leading-7 text-rose-700">Основные принципы</h2>
-							<p className="mt-2 text-3xl font-bold tracking-tight sm:text-4xl">
+							<h3 className="mt-2 text-3xl font-bold tracking-tight sm:text-4xl">
 								Безопасность, прозрачность и гибкость
-							</p>
+							</h3>
 							<p className="mt-6 text-lg leading-8 text-neutral-600 dark:text-neutral-400"></p>
 						</div>
 						<div className="mx-auto mt-16 max-w-2xl sm:mt-20 lg:mt-24 lg:max-w-4xl">
@@ -81,6 +83,19 @@ export default function Home() {
 								</div>
 							</dl>
 						</div>
+					</div>
+
+					<div className="mx-auto max-w-7xl px-6 lg:px-8 mt-12">
+						<div className="text-center">
+							<h2 className="text-base font-semibold leading-7 text-rose-700">
+								Что умеет Ordo.pink
+							</h2>
+							<h3 className="mt-2 text-3xl font-bold tracking-tight sm:text-4xl">
+								Фичули и скриншотики
+							</h3>
+						</div>
+
+						<ScreenshotCarousel staticHost={staticHost} />
 					</div>
 				</div>
 			</section>

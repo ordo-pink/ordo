@@ -296,7 +296,8 @@ export default function PrivacyPolicyPage() {
 											<th>Цель обработки</th>
 											<td className="purpose-field p-2 border-spacing-2 border border-neutral-500 border-collapse">
 												<span className="mark link">
-													информирование Пользователя посредством отправки электронных писем
+													предоставление доступа Пользователю к сервисам, информации и/или
+													материалам, содержащимся на веб-сайте
 												</span>
 											</td>
 										</tr>
@@ -306,6 +307,12 @@ export default function PrivacyPolicyPage() {
 												<ul>
 													<li>
 														<span className="mark link">электронный адрес</span>
+													</li>
+													<li>
+														<span className="mark link">фотографии</span>
+													</li>
+													<li>
+														<span className="mark link">фамилия и имя</span>
 													</li>
 												</ul>
 											</td>

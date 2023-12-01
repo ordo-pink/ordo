@@ -9,7 +9,7 @@ export default function ForgotPasswordPage() {
 		<Centered centerX centerY screenHeight>
 			<h1 className="text-9xl font-black">404</h1>
 			<p>
-				The notfoundest page. <Link href="/">Go home</Link>.
+				Мы не та самая компания, у нас не всё найдётся. <Link href="/">Пойти домой</Link>.
 			</p>
 		</Centered>
 	)

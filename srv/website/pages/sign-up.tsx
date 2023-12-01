@@ -10,12 +10,12 @@ export default function SignUpPage() {
 	return (
 		<Centered centerX centerY screenHeight>
 			<Head>
-				<title>Ordo.pink | Sign up</title>
+				<title>Ordo.pink | Регистрация</title>
 			</Head>
 
 			<div className="w-full max-w-sm">
 				<section className="w-full px-4 mx-auto text-center">
-					<PageHeader text="Sign up" />
+					<PageHeader text="Регистрация" />
 				</section>
 
 				<section className="w-full px-4 py-8 mx-auto">

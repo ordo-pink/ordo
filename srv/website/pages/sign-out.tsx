@@ -17,7 +17,7 @@ export default function ForgotPasswordPage() {
 
 	return (
 		<Centered centerX centerY screenHeight>
-			<PageHeader text="Signing out..." />
+			<PageHeader text="Выходим..." />
 		</Centered>
 	)
 }

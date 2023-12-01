@@ -7,8 +7,14 @@ import { PageHeader } from "../components/page-header"
 export default function ForgotPasswordPage() {
 	return (
 		<Centered centerX centerY screenHeight>
-			<PageHeader text="TODO" />
-			<p>See you soon.</p>
+			<PageHeader text="Это пока не работает" />
+			<p>
+				Но потом заработает, конечно. А пока, можно написать{" "}
+				<a rel="noreferrer noopener" href="https://t.me/ordo_pink">
+					нам в поддержку в Telegram
+				</a>
+				, поможем в ручном порядке.
+			</p>
 		</Centered>
 	)
 }

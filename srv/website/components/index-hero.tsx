@@ -63,7 +63,6 @@ export default function IndexHeroSection({ webHost, subsHost }: P) {
 									ORDO
 								</span>
 							</h1>
-							<p className="center opacity-75 mt-4">Белогривая лошадка</p>
 							<div className="mt-12 flex space-x-8 items-center">
 								<Button onClick={handleLearnMoreClick}>Подробнее</Button>
 								{/* <Link href="#about">Подробнее</Link> */}

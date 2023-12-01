@@ -10,12 +10,12 @@ export default function SignInPage() {
 	return (
 		<Centered centerX centerY screenHeight>
 			<Head>
-				<title>Ordo.pink | Sign in</title>
+				<title>Ordo.pink | Вход</title>
 			</Head>
 
 			<div className="w-full max-w-sm">
 				<section className="w-full px-4 mx-auto text-center">
-					<PageHeader text="Sign in" />
+					<PageHeader text="Вход" />
 				</section>
 
 				<section className="w-full px-4 py-8 mx-auto">

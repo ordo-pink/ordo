@@ -11,6 +11,7 @@ type _P = { idHost: string; workspaceHost: string }
 export default function SignUpForm({ idHost, workspaceHost }: _P) {
 	const [emailErrors, setEmailErrors] = useState<string[]>([])
 	const [passwordErrors, setPasswordErrors] = useState<string[]>([])
+	const [isPrivacyPolicyConfirmed, setIsPrivacyPolicyConfirmed] = useState(false)
 
 	const [errors, setErrors] = useState<string[]>([])
 	const [email, setEmail] = useState("")
@@ -18,14 +19,14 @@ export default function SignUpForm({ idHost, workspaceHost }: _P) {
 	const [repeatPassword, setRepeatPassword] = useState("")
 
 	const bannerOpacity = errors.length > 0 ? "opacity-100" : "opacity-0"
-	const isButtonDisabled = !email || !password || errors.length > 0
+	const isButtonDisabled = !email || !password || errors.length > 0 || !isPrivacyPolicyConfirmed
 
 	useEffect(() => {
 		setErrors(emailErrors.concat(passwordErrors))
 	}, [emailErrors, passwordErrors])
 
 	useEffect(() => {
-		if (password && repeatPassword && password !== repeatPassword) {
+		if ((password || repeatPassword) && password !== repeatPassword) {
 			setErrors(errors.concat("Passwords must match."))
 		}
 	}, [errors, password, repeatPassword])
@@ -44,6 +45,7 @@ export default function SignUpForm({ idHost, workspaceHost }: _P) {
 					/>
 
 					<PasswordInput
+						label="Пароль"
 						onInput={e =>
 							e.fork(setPasswordErrors, v => {
 								setPassword(v)
@@ -53,16 +55,35 @@ export default function SignUpForm({ idHost, workspaceHost }: _P) {
 					/>
 
 					<PasswordInput
-						label="Repeat password"
+						label="И ещё раз пароль"
 						onInput={e =>
 							e.fork(setPasswordErrors, v => {
-								setPassword(v)
+								setRepeatPassword(v)
 								setPasswordErrors([])
 							})
 						}
 					/>
 				</fieldset>
 			</div>
+
+			<p className="text-xs">
+				<label className="flex space-x-2 items-center cursor-pointer">
+					<span className="block">
+						<input
+							type="checkbox"
+							checked={isPrivacyPolicyConfirmed}
+							onChange={() => setIsPrivacyPolicyConfirmed(v => !v)}
+						/>
+					</span>
+					<span className="block">
+						Нажимая на кнопку <b>"Присоединиться"</b>, вы соглашаетесь с нашей{" "}
+						<a href="/privacy-policy" target="_blank">
+							политикой конфиденциальности
+						</a>
+						.
+					</span>
+				</label>
+			</p>
 
 			<div className="w-full flex flex-col">
 				<Button
@@ -85,12 +106,12 @@ export default function SignUpForm({ idHost, workspaceHost }: _P) {
 						window.location.replace(workspaceHost)
 					}}
 				>
-					Sign up
+					Присоединиться
 				</Button>
 			</div>
 
 			<div className="flex space-x-2">
-				<a href="/sign-in">Already a member?</a>
+				<a href="/sign-in">Уже зарегистрированы?</a>
 			</div>
 
 			<div

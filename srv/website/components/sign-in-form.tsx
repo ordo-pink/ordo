@@ -38,6 +38,7 @@ export default function SignInForm({ workspaceHost, idHost }: Props) {
 						}
 					/>
 					<PasswordInput
+						label="Пароль"
 						onInput={e =>
 							e.fork(setPasswordErrors, v => {
 								setPassword(v)
@@ -68,14 +69,14 @@ export default function SignInForm({ workspaceHost, idHost }: Props) {
 							})
 					}}
 				>
-					Sign in
+					Войти
 				</Button>
 			</div>
 
 			<div className="flex space-x-2">
-				<a href="/sign-up">Not a member?</a>
+				<a href="/sign-up">Ещё не регистрировались?</a>
 				<div>|</div>
-				<a href="/forgot-password">Forgot password?</a>
+				<a href="/forgot-password">Забыли пароль?</a>
 			</div>
 
 			<div

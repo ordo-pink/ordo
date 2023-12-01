@@ -13,16 +13,19 @@ import { okpwd } from "@ordo-pink/okpwd"
 import { sendError, parseBody0 } from "@ordo-pink/backend-utils"
 import { Oath } from "@ordo-pink/oath"
 import { HttpError } from "@ordo-pink/rrr"
+import { TNotificationService } from "@ordo-pink/backend-service-offline-notifications"
 
 type Body = { email?: string; password?: string }
 type Params = {
 	userService: UserService
 	tokenService: TTokenService
+	notificationService: TNotificationService
+	websiteHost: string
 }
 type Fn = (params: Params) => Middleware
 
 export const handleSignUp: Fn =
-	({ userService, tokenService }) =>
+	({ userService, tokenService, notificationService, websiteHost }) =>
 	ctx =>
 		parseBody0<Body>(ctx)
 			.chain(body =>
@@ -88,6 +91,20 @@ export const handleSignUp: Fn =
 								maxUploadSize: tokens.fms,
 								expires,
 							})),
+					)
+					.chain(tokens =>
+						Oath.of(crypto.getRandomValues(new Uint32Array(3)).join(""))
+							.chain(code => userService.update(tokens.sub, { code }))
+							.tap(user =>
+								notificationService.sendEmailConfirmationRequestEmail({
+									email: user.email,
+									confirmationUrl: `${websiteHost}/confirm-email?code=${user.code}&email=${user.email}`,
+								}),
+							)
+							.bimap(
+								() => HttpError.NotFound("User not found"),
+								() => tokens,
+							),
 					),
 			)
 			.fork(sendError(ctx), body => {

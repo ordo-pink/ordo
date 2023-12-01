@@ -15,7 +15,7 @@ import { handleChangePassword } from "./handlers/change-password.handler"
 import { handleRefreshToken } from "./handlers/refresh-token.handler"
 import { handleVerifyToken } from "./handlers/verify-token.handler"
 import { handleChangeEmail } from "./handlers/change-email.handler"
-import { handleUserInfoByEmail } from "./handlers/user-info-by-email.handler"
+// import { handleUserInfoByEmail } from "./handlers/user-info-by-email.handler"
 import { handleSignOut } from "./handlers/sign-out.handler"
 import { handleAccount } from "./handlers/account.handler"
 import { handleSignIn } from "./handlers/sign-in.handler"
@@ -27,6 +27,7 @@ import {
 	NotificationService,
 } from "@ordo-pink/backend-service-offline-notifications"
 import { handleUserInfoByFSID } from "./handlers/user-info-by-fsid.handler"
+import { handleConfirmEmail } from "./handlers/confirm-email.handler"
 
 export type CreateIDServerFnParams = {
 	userRepository: UserPersistenceStrategy
@@ -77,7 +78,7 @@ export const createIDServer = async ({
 		},
 	})
 
-	const ctx = { userService, tokenService, notificationService }
+	const ctx = { userService, tokenService, notificationService, websiteHost }
 
 	return createServer({
 		origin,
@@ -89,6 +90,7 @@ export const createIDServer = async ({
 				.post("/sign-in", handleSignIn(ctx))
 				.post("/sign-out", handleSignOut(ctx))
 				.post("/refresh-token", handleRefreshToken(ctx))
+				.post("/confirm-email", handleConfirmEmail(ctx))
 				.get("/account", handleAccount(ctx))
 				// .get("/users/:email", handleUserInfoByEmail(ctx))
 				.get("/users/:fsid", handleUserInfoByFSID(ctx))
@@ -96,10 +98,7 @@ export const createIDServer = async ({
 				.patch("/change-email", handleChangeEmail(ctx))
 				.patch("/change-password", handleChangePassword(ctx))
 				.post("/verify-token", handleVerifyToken(ctx)),
-		// .get("/verify-email", () => {})
-		// .post("/send-activation-email/:email", () => {})
 		// .post("/send-forgot-password-email/:email", () => {})
-		// .post("/activate", () => {})
 		// .post("/restore-password", () => {})
 		// .post("/reset-password", () => {})
 	})

@@ -132,6 +132,7 @@ const serialize: T._SerializeFn = item => ({
 	subscription: item.subscription!.S!,
 	fileLimit: Number(item.fileLimit!.N!),
 	maxUploadSize: Number(item.maxUploadSize!.N!),
+	code: item.code!.S!,
 	id: item.id!.S! as SUB,
 })
 
@@ -144,11 +145,20 @@ const reduceUserToAttributeUpdates: T._ReduceUserToAttributeUpdatesFn = user =>
 			key === "firstName" ||
 			key === "lastName" ||
 			key === "password" ||
-			key === "handle"
+			key === "handle" ||
+			key === "code" ||
+			key === "subscription"
 		) {
 			AttributeUpdates[key] = {
 				Action: "PUT",
 				Value: { S: user[key] },
+			}
+		}
+
+		if (key === "fileLimit" || key === "maxUploadSize") {
+			AttributeUpdates[key] = {
+				Action: "PUT",
+				Value: { N: String(user[key]) },
 			}
 		}
 

@@ -8,14 +8,13 @@ import { BsArrowsMove, BsCode, BsLock, BsSafe } from "react-icons/bs"
 import Footer from "components/footer.component"
 import ScreenshotCarousel from "components/screenshot-carousel.component"
 
-export default function Home() {
-	const webHost = process.env.NEXT_PUBLIC_WEB_HOST!
-	const staticHost = process.env.NEXT_PUBLIC_STATIC_HOST!
-	const subsHost = process.env.NEXT_PUBLIC_SUBS_HOST!
+const webHost = process.env.NEXT_PUBLIC_WEB_HOST!
+const staticHost = process.env.NEXT_PUBLIC_STATIC_HOST!
 
+export default function Home() {
 	return (
 		<main className="scroll-smooth">
-			<IndexHeroSection webHost={webHost} subsHost={subsHost} />
+			<IndexHeroSection webHost={webHost} staticHost={staticHost} />
 
 			<section
 				id="core-principles"
@@ -129,7 +128,7 @@ export default function Home() {
 						<div className="w-full pt-32 backdrop-saturate-50 px-8 pt-32f">
 							<div className="w-full flex backdrop-saturate-50">
 								<div className="w-full flex justify-center">
-									<BetaInvitation webHost={webHost} subsHost={subsHost} wide />
+									<BetaInvitation webHost={webHost} wide />
 								</div>
 							</div>
 

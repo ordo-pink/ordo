@@ -8,7 +8,7 @@ import isEmail from "validator/lib/isEmail"
 import { Oath } from "@ordo-pink/oath"
 import { Switch } from "@ordo-pink/switch"
 
-const subsHost = process.env.NEXT_PUBLIC_SUBS_HOST!
+const websiteHost = process.env.NEXT_PUBLIC_ID_HOST!
 
 export default function ConfirmEmailPage() {
 	const { query } = useRouter()
@@ -25,7 +25,7 @@ export default function ConfirmEmailPage() {
 			)
 			.chain(query =>
 				Oath.from(() =>
-					fetch(`${subsHost}/confirm-subscription`, {
+					fetch(`${websiteHost}/confirm-email`, {
 						method: "POST",
 						headers: { "Content-Type": "application/json" },
 						body: JSON.stringify(query),

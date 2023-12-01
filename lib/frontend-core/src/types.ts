@@ -254,6 +254,7 @@ export namespace User {
 		emailConfirmed: boolean
 		fileLimit: number
 		maxUploadSize: number
+		code?: string
 	}
 
 	export type InternalUser = User.User & {

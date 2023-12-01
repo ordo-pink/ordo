@@ -115,6 +115,7 @@ export class UserService {
 			fileLimit: user.fileLimit,
 			maxUploadSize: user.maxUploadSize,
 			subscription: user.subscription,
+			code: user.code,
 		}
 	}
 

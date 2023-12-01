@@ -22,10 +22,11 @@ export const NotificationService = {
 				from,
 				to: { email, name },
 				subject: "Кто-то вошёл в ваш аккаунт Ordo.pink",
-				html: `Кто-то вошёл в ваш аккаунт с этого IP: ${ip}. Если это были не вы, немедленно перейдите по ссылке ${websiteHost}/reset-password и измените пароль, чтобы обезопасить ваши данные.`,
+				templateId: 9661,
+				params: { ip, resetPasswordUrl: `${websiteHost}/reset-password` },
 			})
 		},
-		sendSubscriptionConfirmationEmail: ({ email, confirmationUrl }) => {
+		sendEmailConfirmationRequestEmail: ({ email, confirmationUrl }) => {
 			emailStrategy.send({
 				from,
 				to: { email, name: email },

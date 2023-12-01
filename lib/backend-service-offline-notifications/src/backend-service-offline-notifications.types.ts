@@ -120,7 +120,7 @@ export type SendSignInNotificationParams = EmailContact & {
 	ip: string
 }
 
-export type SendSubscriptionConfirmationEmail = {
+export type SendEmailConfirmationRequestEmailParams = {
 	/**
 	 * The email to send confirmation to.
 	 */
@@ -158,7 +158,7 @@ export type TNotificationService = {
 	 * @param params User info needed for creating a subscription confirmation notification.
 	 * @returns void
 	 */
-	sendSubscriptionConfirmationEmail: (params: SendSubscriptionConfirmationEmail) => void
+	sendEmailConfirmationRequestEmail: (params: SendEmailConfirmationRequestEmailParams) => void
 }
 
 /**

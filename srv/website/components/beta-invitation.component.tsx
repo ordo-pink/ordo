@@ -1,7 +1,7 @@
 import { Button } from "./button"
 
-type P = { wide?: boolean; webHost: string; subsHost: string }
-export default function BetaInvitation({ wide, webHost, subsHost }: P) {
+type P = { wide?: boolean; webHost: string }
+export default function BetaInvitation({ wide, webHost }: P) {
 	return (
 		<div className="w-full space-y-8 px-8 py-4 bg-gradient-to-br max-w-2xl from-sky-200/80 dark:from-sky-950 via-indigo-200/80 dark:via-indigo-950 to-indigo-200/80 dark:to-indigo-950 rounded-lg shadow-lg">
 			<div

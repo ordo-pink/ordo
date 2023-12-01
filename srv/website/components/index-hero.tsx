@@ -7,8 +7,8 @@ import { useLayoutEffect } from "react"
 import { Button } from "./button"
 import BetaInvitation from "./beta-invitation.component"
 
-type P = { webHost: string; subsHost: string }
-export default function IndexHeroSection({ webHost, subsHost }: P) {
+type P = { webHost: string; staticHost: string }
+export default function IndexHeroSection({ webHost, staticHost }: P) {
 	useLayoutEffect(() => {
 		const listener = (event: MouseEvent) => {
 			Object.assign(document.documentElement, {
@@ -16,8 +16,8 @@ export default function IndexHeroSection({ webHost, subsHost }: P) {
         --move-x: ${(event.clientX - window.innerWidth / 2) * -0.005}deg;
         --move-y: ${(event.clientY - window.innerHeight / 2) * -0.01}deg;
 				--layer-0: ;
-				--layer-1: ${process.env.NEXT_PUBLIC_STATIC_HOST}/index-hero-layer-1.png;
-				--layer-2: ${process.env.NEXT_PUBLIC_STATIC_HOST}/index-hero-layer-2.png;
+				--layer-1: ${staticHost}/index-hero-layer-1.png;
+				--layer-2: ${staticHost}/index-hero-layer-2.png;
         `,
 			})
 		}
@@ -36,19 +36,19 @@ export default function IndexHeroSection({ webHost, subsHost }: P) {
 				<div
 					className="hero-layer-1 absolute inset-[-40vw] bg-cover bg-center flex items-center justify-center scale-125 pointer-events-none"
 					style={{
-						backgroundImage: `url(${process.env.NEXT_PUBLIC_STATIC_HOST}/index-hero-layer-0.png)`,
+						backgroundImage: `url(${staticHost}/index-hero-layer-0.png)`,
 					}}
 				/>
 				<div
 					className="hero-layer-2 absolute inset-0 bg-cover bg-center flex items-center justify-center opacity-20 pointer-events-none"
 					style={{
-						backgroundImage: `url(${process.env.NEXT_PUBLIC_STATIC_HOST}/index-hero-layer-1.png)`,
+						backgroundImage: `url(${staticHost}/index-hero-layer-1.png)`,
 					}}
 				/>
 				<div
 					className="hero-layer-3 absolute inset-0 bg-cover bg-center flex items-center justify-center opacity-30 pointer-events-none"
 					style={{
-						backgroundImage: `url(${process.env.NEXT_PUBLIC_STATIC_HOST}/index-hero-layer-2.png)`,
+						backgroundImage: `url(${staticHost}/index-hero-layer-2.png)`,
 					}}
 				/>
 			</div>
@@ -70,7 +70,7 @@ export default function IndexHeroSection({ webHost, subsHost }: P) {
 						</div>
 
 						<div className="max-w-sm">
-							<BetaInvitation webHost={webHost} subsHost={subsHost} />
+							<BetaInvitation webHost={webHost} />
 						</div>
 					</div>
 				</div>

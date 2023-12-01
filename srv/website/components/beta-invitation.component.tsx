@@ -56,7 +56,7 @@ export default function BetaInvitation({ wide, webHost }: P) {
 				</div>
 			</div>
 			<p className="text-xs text-center">
-				Нажимая на кнопку <b>"Присоединиться"</b>, вы соглашаетесь с нашей{" "}
+				Нажимая на кнопку <b>&quot;Присоединиться&quot;</b>, вы соглашаетесь с нашей{" "}
 				<a href={`${webHost}/privacy-policy`}>политикой конфиденциальности</a>.
 			</p>
 		</div>

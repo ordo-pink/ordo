@@ -7,6 +7,7 @@ import IndexHeroSection from "../components/index-hero"
 import { BsArrowsMove, BsCode, BsLock, BsSafe } from "react-icons/bs"
 import Footer from "components/footer.component"
 import ScreenshotCarousel from "components/screenshot-carousel.component"
+import Head from "next/head"
 
 const webHost = process.env.NEXT_PUBLIC_WEB_HOST!
 const staticHost = process.env.NEXT_PUBLIC_STATIC_HOST!
@@ -14,6 +15,41 @@ const staticHost = process.env.NEXT_PUBLIC_STATIC_HOST!
 export default function Home() {
 	return (
 		<main className="scroll-smooth">
+			<Head>
+				<title>Единое пространство для документов, файлов и проектов | Ordo</title>
+				<link rel="icon" href={`${process.env.NEXT_PUBLIC_STATIC_HOST}/favicon.ico`} />
+				<meta name="title" content="Единое пространство для документов, файлов и проектов | Ordo" />
+
+				<meta
+					name="description"
+					content="Новый инструмент, объединяющий все ваши повседневные рабочие приложения в одно. Это универсальное рабочее пространство для вас и вашей команды."
+				/>
+
+				<meta property="og:type" content="website" />
+				<meta property="og:url" content="https://ordo.pink" />
+				<meta
+					property="og:title"
+					content="Единое пространство для документов, файлов и проектов | Ordo"
+				/>
+				<meta
+					property="og:description"
+					content="Новый инструмент, объединяющий все ваши повседневные рабочие приложения в одно. Это универсальное рабочее пространство для вас и вашей команды."
+				/>
+				<meta property="og:image" content={`${staticHost}/og.png`} />
+
+				<meta property="twitter:card" content="summary_large_image" />
+				<meta property="twitter:url" content="https://ordo.pink" />
+				<meta
+					property="twitter:title"
+					content="Единое пространство для документов, файлов и проектов | Ordo"
+				/>
+				<meta
+					property="twitter:description"
+					content="Новый инструмент, объединяющий все ваши повседневные рабочие приложения в одно. Это универсальное рабочее пространство для вас и вашей команды."
+				/>
+				<meta property="twitter:image" content={`${staticHost}/og.png`} />
+			</Head>
+
 			<IndexHeroSection webHost={webHost} staticHost={staticHost} />
 
 			<section
@@ -132,7 +168,7 @@ export default function Home() {
 								</div>
 							</div>
 
-							<div className="mt-24 mb-4">
+							<div className="mt-24 pb-4">
 								<Footer webHost={webHost} />
 							</div>
 						</div>

@@ -11,13 +11,15 @@ import { AppProps } from "next/app"
 const jost = Jost({ preload: true, subsets: ["latin"], fallback: ["system-ui"] })
 
 export const metadata: Metadata = {
-	title: "Ordo.pink",
-	description: "Безопасное, надёжное и гибкое облачное хранилище нового поколения.",
+	title: "Единое пространство для документов, файлов и проектов | Ordo",
+	description:
+		"Новый инструмент, объединяющий все ваши повседневные рабочие приложения в одно. Это универсальное рабочее пространство для вас и вашей команды.",
+	icons: `${process.env.NEXT_PUBLIC_STATIC_HOST}/favicon.ico`,
 }
 
 export default function App({ Component, pageProps }: AppProps) {
 	return (
-		<div className={jost.className}>
+		<div className={`bg-neutral-200 dark:bg-neutral-800 ${jost.className}`}>
 			<Component {...pageProps} />
 		</div>
 	)

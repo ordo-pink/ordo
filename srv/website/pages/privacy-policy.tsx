@@ -3,7 +3,7 @@ import { Centered } from "components/centered"
 export default function PrivacyPolicyPage() {
 	return (
 		<Centered centerX>
-			<article className="max-w-xl my-16">
+			<article className="max-w-xl my-16 mx-4">
 				<div className="row mb-4">
 					<div className="col">
 						<h1 className="text-3xl font-black text-center first-letter:bg-gradient-to-tr first-letter:from-pink-500 first-letter:to-purple-500 first-letter:bg-clip-text first-letter:text-transparent">

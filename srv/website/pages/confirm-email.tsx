@@ -7,6 +7,7 @@ import { useEffect, useState } from "react"
 import isEmail from "validator/lib/isEmail"
 import { Oath } from "@ordo-pink/oath"
 import { Switch } from "@ordo-pink/switch"
+import Head from "next/head"
 
 const websiteHost = process.env.NEXT_PUBLIC_ID_HOST!
 
@@ -41,6 +42,9 @@ export default function ConfirmEmailPage() {
 	return Switch.of(isEmailVerified)
 		.case(true, () => (
 			<Centered centerX centerY screenHeight>
+				<Head>
+					<title>Ordo.pink | Почта подтверждена</title>
+				</Head>
 				<div className="flex flex-col space-y-2">
 					<h1 className="text-3xl font-black mb-12">Поздравляем!</h1>
 					<p>
@@ -56,6 +60,10 @@ export default function ConfirmEmailPage() {
 		))
 		.case(false, () => (
 			<Centered centerX centerY screenHeight>
+				<Head>
+					<title>Ordo.pink | Почта не подтверждена</title>
+				</Head>
+
 				<div className="flex flex-col space-y-2">
 					<h1 className="text-3xl font-black mb-12">Что-то пошло не так.</h1>
 					<p>Вы уверены, что перешли по ссылке, которую мы отправили на вашу почту?</p>
@@ -76,6 +84,9 @@ export default function ConfirmEmailPage() {
 		))
 		.default(() => (
 			<Centered centerX centerY screenHeight>
+				<Head>
+					<title>Ordo.pink | Подтверждение электронной почты</title>
+				</Head>
 				<h1 className="text-3xl font-black mb-12">Подтверждаем вашу почту...</h1>
 				<p>Это вам не раз-два, знаете ли! ☝️</p>
 			</Centered>

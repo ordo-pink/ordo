@@ -3,10 +3,14 @@
 
 import Link from "next/link"
 import { Centered } from "../components/centered"
+import Head from "next/head"
 
 export default function ForgotPasswordPage() {
 	return (
 		<Centered centerX centerY screenHeight>
+			<Head>
+				<title>Ordo.pink | 404</title>
+			</Head>
 			<h1 className="text-9xl font-black">404</h1>
 			<p>
 				Мы не та самая компания, у нас не всё найдётся. <Link href="/">Пойти домой</Link>.

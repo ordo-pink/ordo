@@ -25,6 +25,7 @@ export default function IndexHeroSection({ webHost, staticHost }: P) {
 		document.addEventListener("mousemove", listener)
 
 		return () => document.removeEventListener("mousemove", listener)
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [])
 
 	const handleLearnMoreClick = () =>

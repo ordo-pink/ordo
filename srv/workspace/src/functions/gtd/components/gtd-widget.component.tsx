@@ -82,20 +82,17 @@ const InboxStatus = ({ inboxChildren }: InboxStatusP) =>
 			),
 		)
 		.case(
-			data => data!.length <= 10,
+			data => data!.length <= 20,
 			() => (
 				<div className="flex items-center space-x-2">
-					<BsInfoCircle className="text-xl text-yellow-500" />
-					<div className="text-sm">Задач во входящих: {inboxChildren!.length}. Соболезную...</div>
+					<BsInfoCircle className="text-xl text-orange-500" />
+					<div className="text-sm">Задач во входящих: {inboxChildren!.length}.</div>
 				</div>
 			),
 		)
 		.default(() => (
 			<div className="flex items-center space-x-2">
 				<BsXCircle className="text-xl text-rose-500" />
-				<div className="text-sm">
-					Задач во входящих: {inboxChildren!.length}. Ну тут уже без бригады клинеров не
-					разобраться.
-				</div>
+				<div className="text-sm">Задач во входящих: {inboxChildren!.length}. F.</div>
 			</div>
 		))

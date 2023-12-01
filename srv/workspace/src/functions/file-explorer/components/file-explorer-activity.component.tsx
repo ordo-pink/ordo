@@ -13,8 +13,6 @@ export default function FileExplorerActivity(): ReactNode {
 	const currentData = useDataFromRouteFSID()
 	const currentDataChildren = useChildren(currentData ?? "root")
 
-	console.log(currentData)
-
 	// TODO: Extract storing selectedItems to clipboard$.
 	const [selectedItems, setSelectedItems] = useState<FSID[]>([])
 

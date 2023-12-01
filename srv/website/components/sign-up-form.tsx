@@ -5,6 +5,7 @@ import { useEffect, useState } from "react"
 import { Button } from "./button"
 import { Callout } from "./callout"
 import { EmailInput, PasswordInput } from "./input"
+import Link from "next/link"
 
 type _P = { idHost: string; workspaceHost: string }
 
@@ -76,10 +77,10 @@ export default function SignUpForm({ idHost, workspaceHost }: _P) {
 						/>
 					</span>
 					<span className="block">
-						Нажимая на кнопку <b>"Присоединиться"</b>, вы соглашаетесь с нашей{" "}
-						<a href="/privacy-policy" target="_blank">
+						Нажимая на кнопку <b>&quot;Присоединиться&quot;</b>, вы соглашаетесь с нашей{" "}
+						<Link href="/privacy-policy" target="_blank">
 							политикой конфиденциальности
-						</a>
+						</Link>
 						.
 					</span>
 				</label>
@@ -111,7 +112,7 @@ export default function SignUpForm({ idHost, workspaceHost }: _P) {
 			</div>
 
 			<div className="flex space-x-2">
-				<a href="/sign-in">Уже зарегистрированы?</a>
+				<Link href="/sign-in">Уже зарегистрированы?</Link>
 			</div>
 
 			<div

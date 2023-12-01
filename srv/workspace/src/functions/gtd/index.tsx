@@ -44,7 +44,6 @@ export default function createGTDFunction({ commands, data$ }: Functions.CreateF
 		if (!item) return
 
 		const children = data.filter(child => child.parent === item.fsid)
-		console.log(children.length)
 
 		if (children.length === 0 && !item.parent) return
 

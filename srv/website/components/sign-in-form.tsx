@@ -7,6 +7,7 @@ import { useEffect, useState } from "react"
 import { Button } from "./button"
 import { Callout } from "./callout"
 import { EmailInput, PasswordInput } from "./input"
+import Link from "next/link"
 
 type Props = { workspaceHost: string; idHost: string }
 
@@ -74,9 +75,9 @@ export default function SignInForm({ workspaceHost, idHost }: Props) {
 			</div>
 
 			<div className="flex space-x-2">
-				<a href="/sign-up">Ещё не регистрировались?</a>
+				<Link href="/sign-up">Ещё не регистрировались?</Link>
 				<div>|</div>
-				<a href="/forgot-password">Забыли пароль?</a>
+				<Link href="/forgot-password">Забыли пароль?</Link>
 			</div>
 
 			<div

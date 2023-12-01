@@ -57,12 +57,12 @@ type EnabledSidebarP = DisabledSidebarProps & {
 const DisabledSidebar = ({ activity }: DisabledSidebarProps) =>
 	Either.fromNullable(activity).fold(
 		() => (
-			<div className="w-screen">
+			<div className="w-screen min-h-screen">
 				<Loading />
 			</div>
 		),
 		({ Component }) => (
-			<div className="workspace w-full h-full overflow-auto pl-12">
+			<div className="workspace min-h-screen w-full h-full overflow-auto pl-12">
 				<Component commands={commands} space={ComponentSpace.WORKSPACE} />
 			</div>
 		),

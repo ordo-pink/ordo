@@ -6,7 +6,7 @@ import { Switch } from "@ordo-pink/switch"
 import { PiGraph } from "react-icons/pi"
 import LinksSidebar from "./components/links-sidebar.component"
 import LinksWorkspace from "./components/links-workspace.component"
-import Null from "$components/null"
+import LinksWidget from "./components/links-widget.component"
 
 export default function createLinksFunction({ commands, data$ }: Functions.CreateFunctionParams) {
 	commands.emit<cmd.activities.add>("activities.add", {
@@ -20,6 +20,6 @@ export default function createLinksFunction({ commands, data$ }: Functions.Creat
 
 const Component = ({ space }: Extensions.ComponentProps) =>
 	Switch.of(space)
-		.case(ComponentSpace.WIDGET, Null)
+		.case(ComponentSpace.WIDGET, () => <LinksWidget />)
 		.case(ComponentSpace.ICON, () => <PiGraph />)
 		.default(() => <LinksWorkspace />)

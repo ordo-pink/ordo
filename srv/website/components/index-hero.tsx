@@ -55,7 +55,7 @@ export default function IndexHeroSection({ webHost, staticHost }: P) {
 
 			<div className="fixed top-0 w-screen h-screen flex items-center justify-center p-4 sm:p-12">
 				<div className="flex w-full justify-between max-w-5xl">
-					<div className="flex flex-col md:flex-row space-y-12 md:space-y-0 md:space-x-24 justify-between items-center w-full p-4 md:px-24 md:py-20 max-w-5xl backdrop-blur-md bg-gradient-to-br from-sky-950/20 via-indigo-950/20 to-indigo-950/20 shadow-xl rounded-xl">
+					<div className="flex flex-col lg:flex-row space-y-12 py-12 lg:space-y-0 lg:space-x-24 justify-between items-center w-full p-4 lg:px-24 lg:py-20 max-w-5xl backdrop-blur-md bg-gradient-to-br from-sky-950/20 via-indigo-950/20 to-indigo-950/20 shadow-xl rounded-xl">
 						<div className="inset-0 bg-cover bg-center flex flex-col items-center justify-center">
 							<h1 className="text-center text-xl sm:text-2xl uppercase tracking-tight">
 								Bring your thoughts to

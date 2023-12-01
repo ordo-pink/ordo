@@ -40,7 +40,7 @@ export default function Links2D({ nodes, links }: P) {
 	return (
 		<ForceGraph2D
 			ref={ref}
-			width={workspaceWidth}
+			width={workspaceWidth + 50}
 			graphData={{ nodes, links }}
 			backgroundColor="rgba(0,0,0,0)"
 			nodeRelSize={5}

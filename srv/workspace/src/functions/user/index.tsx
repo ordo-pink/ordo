@@ -98,7 +98,7 @@ const UserInfo = ({ user, auth$, commands }: _UIP) => {
 	return (
 		<form
 			onSubmit={e => e.preventDefault()}
-			className="px-2 py-4 md:px-8 md:py-8 flex flex-col items-center space-y-4 overflow-x-auto"
+			className="px-2 min-h-screen py-4 md:px-8 md:py-8 flex flex-col items-center space-y-4 overflow-x-auto"
 		>
 			<div className="w-full max-w-lg flex space-x-4 mb-8 md:mb-4 items-center">
 				<div className="flex items-center justify-center rounded-full p-0.5 bg-gradient-to-tr from-sky-400 via-purple-400 to-rose-400 shadow-lg shrink-0 cursor-pointer">

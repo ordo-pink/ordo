@@ -46,7 +46,6 @@ export default function createFileExplorerFunction({ commands }: Functions.Creat
 		name: "file-explorer",
 		routes: ["/fs", "/fs/:fsid"],
 		background: false,
-		Sidebar: () => <div>Hello</div>,
 	})
 }
 

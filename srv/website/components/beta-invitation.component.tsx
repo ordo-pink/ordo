@@ -26,7 +26,11 @@ export default function BetaInvitation({ wide, webHost }: P) {
 
 				<div className="flex flex-col space-y-4">
 					<div
-						className={wide ? "flex flex-col space-y-2 mt-2" : "flex justify-between items-center"}
+						className={
+							wide
+								? "flex flex-col space-y-2 mt-2"
+								: "flex flex-col sm:flex-row space-y-2 sm:space-y-0 justify-between items-center"
+						}
 					>
 						<Button
 							onClick={async e => {

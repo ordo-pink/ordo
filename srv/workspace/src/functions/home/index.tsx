@@ -3,7 +3,6 @@
 
 import Card from "$components/card.component"
 import { CenteredPage } from "$components/centered-page"
-import { Title } from "$components/page-header"
 import { useStrictSubscription } from "$hooks/use-subscription"
 import { __Activities$ } from "$streams/activities"
 import { Extensions, ComponentSpace, Functions } from "@ordo-pink/frontend-core"
@@ -11,6 +10,14 @@ import { Switch } from "@ordo-pink/switch"
 import { Nullable } from "@ordo-pink/tau"
 import { memo } from "react"
 import { BsCollection } from "react-icons/bs"
+
+const announcements = [
+	{
+		title: "🎉 Ordo.pink Beta",
+		message: "Ordo.pink наконец вышел в публичную бета-версию!",
+		date: "2023-12-01",
+	},
+]
 
 type Params = Functions.CreateFunctionParams & { activities$: Nullable<__Activities$> }
 export default function createHomeFunction({ commands, activities$ }: Params) {
@@ -46,17 +53,26 @@ const Workspace = ({ commands, activities$ }: Pick<P, "commands" | "activities$"
 	const activities = useStrictSubscription(activities$, [])
 
 	return (
-		<CenteredPage centerX>
-			<div className="my-8">
-				<Title level="1">Welcome to Ordo!</Title>
-			</div>
-			<div className="container grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 px-8">
-				<Card title="Announcements" className="row-span-3">
-					<p>TODO: Announcements</p>
+		<CenteredPage centerX centerY>
+			<div className="container py-12 overflow-x-hidden grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 px-8">
+				<Card title="Новости" className="row-span-3">
+					{announcements.map(announcement => (
+						<div key={announcement.title}>
+							<div className="flex space-x-2 flex-wrap items-center justify-between mb-1">
+								<h4 className="font-bold text-xl">{announcement.title}</h4>
+								<dt className="text-neutral-500 text-xs">{announcement.date}</dt>
+							</div>
+							<p>{announcement.message}</p>
+						</div>
+					))}
 				</Card>
 
 				{activities
-					.filter(activity => activity.name !== "home")
+					.filter(
+						activity =>
+							activity.name !== "home" && activity.name !== "user" && activity.name !== "editor",
+					)
+					.sort((a, b) => a.name.localeCompare(b.name))
 					.map(Activity => (
 						<Card key={Activity.name}>
 							<Activity.Component commands={commands} space={ComponentSpace.WIDGET} />

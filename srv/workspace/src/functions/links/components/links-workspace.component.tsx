@@ -66,8 +66,11 @@ export default function LinksWorkspace() {
 	}, [data, label])
 
 	return (
-		<div className="h-[calc(100vh-1rem)] relative" style={{ width: workspaceWidth }}>
-			<div className="absolute top-4 flex justify-center space-x-2 w-full z-50">
+		<div
+			className="h-[calc(100vh-1rem)] overflow-x-hidden overflow-y-hidden relative"
+			style={{ width: workspaceWidth }}
+		>
+			<div className="absolute top-4 flex justify-center w-full space-x-2 z-50">
 				<OrdoButtonPrimary onClick={() => setIs3D(false)} inverted={is3D}>
 					2D
 				</OrdoButtonPrimary>

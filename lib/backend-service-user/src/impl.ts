@@ -6,33 +6,24 @@
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 import type { UserPersistenceStrategy } from "./types"
-import { hash, compare, genSalt } from "bcryptjs"
 import crypto from "crypto"
 import { Oath } from "@ordo-pink/oath"
 import { UUIDv4 } from "@ordo-pink/tau"
 import { User } from "@ordo-pink/frontend-core"
 
-export type UserServiceOptions = {
-	saltRounds: number
-}
-
 export class UserService {
 	#persistenceStrategy: UserPersistenceStrategy
-	#salt: string
 
-	public static async of(driver: UserPersistenceStrategy, options: UserServiceOptions) {
-		const salt = await genSalt(options.saltRounds)
-
-		return new UserService(driver, salt)
+	public static async of(driver: UserPersistenceStrategy) {
+		return new UserService(driver)
 	}
 
-	protected constructor(driver: UserPersistenceStrategy, salt: string) {
+	protected constructor(driver: UserPersistenceStrategy) {
 		this.#persistenceStrategy = driver
-		this.#salt = salt
 	}
 
 	public createUser(email: string, password: string) {
-		return Oath.from(() => hash(password, this.#salt))
+		return Oath.from(() => Bun.password.hash(password))
 			.chain(password =>
 				this.#persistenceStrategy.create({
 					id: crypto.randomUUID() as UUIDv4,
@@ -50,7 +41,7 @@ export class UserService {
 
 	public updateUserPassword(user: User.User, oldPassword: string, newPassword: string) {
 		return this.#persistenceStrategy.getById(user.id).chain(oldUser =>
-			Oath.from(() => compare(oldPassword, oldUser.password))
+			Oath.from(() => Bun.password.verify(oldPassword, oldUser.password))
 				.chain(valid =>
 					Oath.fromBoolean(
 						() => valid,
@@ -59,7 +50,7 @@ export class UserService {
 					),
 				)
 				.chain(user =>
-					Oath.from(() => hash(newPassword, this.#salt)).map(
+					Oath.from(() => Bun.password.hash(newPassword)).map(
 						password =>
 							({
 								...user,
@@ -93,7 +84,7 @@ export class UserService {
 	public comparePassword(email: string, password: string) {
 		return this.#persistenceStrategy
 			.getByEmail(email)
-			.chain(user => Oath.from(() => compare(password, user.password)))
+			.chain(user => Oath.from(() => Bun.password.verify(password, user.password)))
 			.chain(x =>
 				Oath.fromBoolean(
 					() => x,

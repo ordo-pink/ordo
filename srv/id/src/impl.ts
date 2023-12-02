@@ -23,12 +23,14 @@ const {
 	ID_PORT,
 	ID_ACCESS_TOKEN_EXPIRE_IN,
 	ID_REFRESH_TOKEN_EXPIRE_IN,
-	ID_SALT_ROUNDS,
 	ID_ACCESS_TOKEN_PRIVATE_KEY_PATH,
 	ID_ACCESS_TOKEN_PUBLIC_KEY_PATH,
 	ID_REFRESH_TOKEN_PRIVATE_KEY_PATH,
 	ID_REFRESH_TOKEN_PUBLIC_KEY_PATH,
 	ID_USER_TABLE_NAME,
+	ID_TOKENS_TABLE_NAME,
+	ID_TOKEN_FS_STRATEGY_PATH,
+	ID_USER_FS_STRATEGY_PATH,
 	WORKSPACE_HOST,
 	WEB_HOST,
 	ID_EMAIL_API_KEY,
@@ -41,19 +43,17 @@ const {
 	"ID_PORT",
 	"ID_ACCESS_TOKEN_EXPIRE_IN",
 	"ID_REFRESH_TOKEN_EXPIRE_IN",
-	"ID_SALT_ROUNDS",
-	"ID_KV_DB_PATH",
 	"ID_ACCESS_TOKEN_PRIVATE_KEY_PATH",
 	"ID_ACCESS_TOKEN_PUBLIC_KEY_PATH",
 	"ID_REFRESH_TOKEN_PRIVATE_KEY_PATH",
 	"ID_REFRESH_TOKEN_PUBLIC_KEY_PATH",
 	"ID_USER_TABLE_NAME",
 	"ID_TOKENS_TABLE_NAME",
-	"DATA_DATA_PATH",
-	"DATA_METADATA_PATH",
+	"ID_USER_FS_STRATEGY_PATH",
+	"ID_TOKEN_FS_STRATEGY_PATH",
+	"ID_EMAIL_API_KEY",
 	"WORKSPACE_HOST",
 	"WEB_HOST",
-	"ID_EMAIL_API_KEY",
 ])
 
 const main = async () => {
@@ -62,10 +62,13 @@ const main = async () => {
 	const refreshPrivateKeyPath = ID_REFRESH_TOKEN_PRIVATE_KEY_PATH
 	const refreshPublicKeyPath = ID_REFRESH_TOKEN_PUBLIC_KEY_PATH
 
+	console.log("HERE", accessPrivateKeyPath)
+
 	const accessTokenPrivateKey = await getPrivateKey(accessPrivateKeyPath, {
 		name: "ECDSA",
 		namedCurve: "P-384",
 	} as any)
+
 	const accessTokenPublicKey = await getPublicKey(accessPublicKeyPath, {
 		name: "ECDSA",
 		namedCurve: "P-384",
@@ -79,7 +82,7 @@ const main = async () => {
 		namedCurve: "P-384",
 	} as any)
 
-	const tokenRepository = await TokenPersistenceStrategyFS.of("./var/srv/id/tokens.json")
+	const tokenRepository = await TokenPersistenceStrategyFS.of(ID_TOKEN_FS_STRATEGY_PATH)
 	const userRepository =
 		ID_USER_REPOSITORY === "dynamodb"
 			? UserPersistenceStrategyDynamoDB.of({
@@ -89,7 +92,7 @@ const main = async () => {
 					secretAccessKey: ID_DYNAMODB_SECRET_KEY,
 					tableName: ID_USER_TABLE_NAME,
 			  })
-			: FSUserRepository.of("./var/srv/id/users.json")
+			: FSUserRepository.of(ID_USER_FS_STRATEGY_PATH)
 	const emailRepository = RusenderEmailStrategy.of(ID_EMAIL_API_KEY)
 
 	const app = await createIDServer({
@@ -99,7 +102,6 @@ const main = async () => {
 		origin: [WEB_HOST, WORKSPACE_HOST],
 		accessKeys: { privateKey: accessTokenPrivateKey, publicKey: accessTokenPublicKey },
 		refreshKeys: { privateKey: refreshTokenPrivateKey, publicKey: refreshTokenPublicKey },
-		saltRounds: Number(ID_SALT_ROUNDS),
 		alg: { name: "ECDSA", namedCurve: "P-384", hash: "SHA-384" }, // TODO: Add support for switching to RSA
 		accessTokenExpireIn: Number(ID_ACCESS_TOKEN_EXPIRE_IN),
 		refreshTokenExpireIn: Number(ID_REFRESH_TOKEN_EXPIRE_IN),

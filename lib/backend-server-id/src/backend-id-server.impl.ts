@@ -35,7 +35,6 @@ export type CreateIDServerFnParams = {
 	emailStrategy: EmailStrategy
 	accessTokenExpireIn: number
 	refreshTokenExpireIn: number
-	saltRounds: number
 	origin: string | string[]
 	alg: Algorithm
 	accessKeys: CryptoKeyPair
@@ -54,13 +53,12 @@ export const createIDServer = async ({
 	refreshTokenExpireIn,
 	accessKeys,
 	refreshKeys,
-	saltRounds,
 	logger = ConsoleLogger,
 	websiteHost,
 	notificationSender,
 	alg,
 }: CreateIDServerFnParams) => {
-	const userService = await UserService.of(userRepository, { saltRounds })
+	const userService = await UserService.of(userRepository)
 	const notificationService = NotificationService.of({
 		emailStrategy,
 		websiteHost,

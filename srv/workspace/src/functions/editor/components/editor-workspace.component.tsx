@@ -38,6 +38,7 @@ import { withShortcuts } from "../editor-plugins/with-shortcuts.editor-plugin"
 import { isOrdoElement } from "../guards/is-ordo-element.guard"
 import { OrdoElement } from "../editor.types"
 import HoveringToolbar from "./hovering-toolbar.component"
+import { CenteredPage } from "$components/centered-page"
 
 // --- TODO: Move this away from here ---
 
@@ -153,7 +154,7 @@ export default function EditorWorkspace() {
 		commands.emit<cmd.ctxMenu.add>("context-menu.add", {
 			cmd: "editor.test",
 			Icon: BsTerminal,
-			readableName: "Проверка",
+			readableName: "Создать чекбокс",
 			shouldShow: ({ payload }) => payload === "editor-quick-menu",
 			type: "update",
 		})
@@ -229,7 +230,13 @@ const EmptyEditor = () => {
 	const { fsid } = useRouteParams<{ fsid: FSID }>()
 
 	return Either.fromNullable(fsid).fold(
-		() => <div>TODO</div>, // TODO: "/editor" template page
+		() => (
+			<CenteredPage centerX centerY>
+				<div className="px-12">
+					Здесь будет редактор файла, если этот самый файл выбрать в сайдбаре слева.
+				</div>
+			</CenteredPage>
+		), // TODO: "/editor" template page
 		() => <Loading />,
 	)
 }

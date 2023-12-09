@@ -10,18 +10,25 @@ import { getc } from "@ordo-pink/getc"
 import { keysOf } from "@ordo-pink/tau"
 
 const env = getc([
-	"DATA_PORT",
-	"DATA_HOST",
-	"WORKSPACE_HOST",
-	"ID_HOST",
-	"WEB_HOST",
-	"DATA_INTERNAL_HOST",
-	"DATA_S3_ACCESS_KEY",
-	"DATA_S3_SECRET_KEY",
-	"DATA_S3_REGION",
-	"DATA_S3_CONTENT_BUCKET_NAME",
-	"DATA_S3_DATA_BUCKET_NAME",
-	"DATA_S3_ENDPOINT",
+	"DT_PORT",
+	"DT_INTERNAL_HOST",
+	"DT_DATA_PERSISTENCE_STRATEGY",
+	"DT_CONTENT_PERSISTENCE_STRATEGY",
+	"ID_INTERNAL_HOST",
+	"WEB_PUBLIC_HOST",
+	"WORKSPACE_PUBLIC_HOST",
+	"DT_DATA_PERSISTENCE_STRATEGY_S3_ACCESS_KEY",
+	"DT_DATA_PERSISTENCE_STRATEGY_S3_SECRET_KEY",
+	"DT_DATA_PERSISTENCE_STRATEGY_S3_REGION",
+	"DT_DATA_PERSISTENCE_STRATEGY_S3_BUCKET_NAME",
+	"DT_DATA_PERSISTENCE_STRATEGY_S3_ENDPOINT",
+	"DT_DATA_PERSISTENCE_STRATEGY_FS_PATH",
+	"DT_CONTENT_PERSISTENCE_STRATEGY_S3_ACCESS_KEY",
+	"DT_CONTENT_PERSISTENCE_STRATEGY_S3_SECRET_KEY",
+	"DT_CONTENT_PERSISTENCE_STRATEGY_S3_REGION",
+	"DT_CONTENT_PERSISTENCE_STRATEGY_S3_BUCKET_NAME",
+	"DT_CONTENT_PERSISTENCE_STRATEGY_S3_ENDPOINT",
+	"DT_CONTENT_PERSISTENCE_STRATEGY_FS_PATH",
 ])
 
 const definitions = keysOf(env).reduce(
@@ -29,10 +36,10 @@ const definitions = keysOf(env).reduce(
 	"",
 )
 
-runBunCommand0(`build srv/data/index.ts --outfile=dt.js ${definitions} --target=bun`, {
+runBunCommand0(`build srv/data/index.ts --outfile=dt --compile ${definitions} --target=bun`, {
 	stdout: "pipe",
 	stderr: "pipe",
 })
-	// .chain(() => runCommand0("mkdir -p var/out"))
-	// .chain(() => runCommand0("mv dt var/out"))
+	.chain(() => runCommand0("mkdir -p var/out"))
+	.chain(() => runCommand0("mv dt var/out"))
 	.orElse(console.error)

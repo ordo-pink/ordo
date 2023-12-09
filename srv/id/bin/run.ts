@@ -10,5 +10,5 @@ import { runAsyncCommand0 } from "@ordo-pink/binutil"
 runAsyncCommand0("opt/bun run --watch srv/id/index.ts", {
 	stdout: "pipe",
 	stderr: "pipe",
-	env: { ...process.env, FORCE_COLOR: "1" },
+	env: { ...Bun.env, FORCE_COLOR: "1" },
 }).orElse(console.error)

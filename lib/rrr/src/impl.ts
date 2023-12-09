@@ -1,6 +1,8 @@
 // SPDX-FileCopyrightText: Copyright 2023, 谢尔盖||↓ and the Ordo.pink contributors
 // SPDX-License-Identifier: MIT
 
+import { keysOf } from "@ordo-pink/tau"
+
 export class HttpError extends Error {
 	#status: number
 
@@ -57,3 +59,15 @@ export class HttpError extends Error {
 		return this.#status
 	}
 }
+
+export const Errors = <T extends Record<string, string>>(
+	supportedErrors: T,
+): { [K in keyof T]: () => T[K] } & {
+	UnexpectedError: (error: Error) => `Unexpected error: ${string}`
+} => ({
+	...keysOf(supportedErrors).reduce(
+		(acc, key) => ({ ...acc, [key]: () => supportedErrors[key] }),
+		{} as { [K in keyof T]: () => T[K] },
+	),
+	UnexpectedError: error => `Unexpected error: ${error.message}`,
+})

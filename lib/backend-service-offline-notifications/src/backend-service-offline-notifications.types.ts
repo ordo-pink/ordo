@@ -118,6 +118,11 @@ export type SendSignInNotificationParams = EmailContact & {
 	 * The IP address from which the sign in happened.
 	 */
 	ip: string
+
+	/**
+	 * URL to reset password.
+	 */
+	resetPasswordUrl: string
 }
 
 export type SendEmailConfirmationRequestEmailParams = {
@@ -130,6 +135,32 @@ export type SendEmailConfirmationRequestEmailParams = {
 	 * URL for validating the email.
 	 */
 	confirmationUrl: string
+}
+
+export type SendNewEmailConfirmationEmail = {
+	/**
+	 * The new email.
+	 */
+	email: string
+}
+
+export type SendEmailChangedNotificationEmail = {
+	/**
+	 * The old email.
+	 */
+	email: string
+}
+
+export type SendPasswordChangedEmail = {
+	/**
+	 * The email to send confirmation to.
+	 */
+	email: string
+
+	/**
+	 * URL for validating the email.
+	 */
+	resetPasswordUrl: string
 }
 
 /**
@@ -153,12 +184,21 @@ export type TNotificationService = {
 	sendSignInNotification: (params: SendSignInNotificationParams) => void
 
 	/**
-	 * Send a confirmation email to the user who subscribes to the email list.
+	 * Send a confirmation email to the user who signs up to Ordo.pink.
 	 *
-	 * @param params User info needed for creating a subscription confirmation notification.
+	 * @param params User info needed for creating a confirmation notification.
 	 * @returns void
 	 */
 	sendEmailConfirmationRequestEmail: (params: SendEmailConfirmationRequestEmailParams) => void
+
+	/**
+	 * Send a notification that user password was changed.
+	 */
+	sendPasswordChangedEmail: (params: SendPasswordChangedEmail) => void
+
+	sendNewEmailConfirmationEmail: (params: SendNewEmailConfirmationEmail) => void
+
+	sendEmailChangedNotificationEmail: (params: SendEmailChangedNotificationEmail) => void
 }
 
 /**

@@ -7,84 +7,46 @@
 
 import { UserPersistenceStrategyDynamoDB } from "@ordo-pink/backend-persistence-strategy-user-dynamodb"
 import { createIDServer } from "@ordo-pink/backend-server-id"
-import { getc } from "@ordo-pink/getc"
 import { ConsoleLogger } from "@ordo-pink/logger"
-import { getPrivateKey, getPublicKey } from "./utils/get-key"
-import { TokenPersistenceStrategyFS } from "@ordo-pink/backend-persistence-strategy-token-fs"
+import { importPrivateKey0, importPublicKey0 } from "./utils/get-key"
+import { TokenPersistenceStrategyMemory } from "@ordo-pink/backend-persistence-strategy-token-memory"
 import { FSUserRepository } from "@ordo-pink/backend-persistence-strategy-user-fs"
 import { RusenderEmailStrategy } from "@ordo-pink/backend-email-strategy-rusender"
 
-const {
-	ID_USER_REPOSITORY,
-	ID_DYNAMODB_ENDPOINT,
-	ID_DYNAMODB_ACCESS_KEY,
-	ID_DYNAMODB_SECRET_KEY,
-	ID_DYNAMODB_REGION,
-	ID_PORT,
-	ID_ACCESS_TOKEN_EXPIRE_IN,
-	ID_REFRESH_TOKEN_EXPIRE_IN,
-	ID_ACCESS_TOKEN_PRIVATE_KEY_PATH,
-	ID_ACCESS_TOKEN_PUBLIC_KEY_PATH,
-	ID_REFRESH_TOKEN_PRIVATE_KEY_PATH,
-	ID_REFRESH_TOKEN_PUBLIC_KEY_PATH,
-	ID_USER_TABLE_NAME,
-	ID_TOKENS_TABLE_NAME,
-	ID_TOKEN_FS_STRATEGY_PATH,
-	ID_USER_FS_STRATEGY_PATH,
-	WORKSPACE_HOST,
-	WEB_HOST,
-	ID_EMAIL_API_KEY,
-} = getc([
-	"ID_USER_REPOSITORY",
-	"ID_DYNAMODB_ENDPOINT",
-	"ID_DYNAMODB_ACCESS_KEY",
-	"ID_DYNAMODB_SECRET_KEY",
-	"ID_DYNAMODB_REGION",
-	"ID_PORT",
-	"ID_ACCESS_TOKEN_EXPIRE_IN",
-	"ID_REFRESH_TOKEN_EXPIRE_IN",
-	"ID_ACCESS_TOKEN_PRIVATE_KEY_PATH",
-	"ID_ACCESS_TOKEN_PUBLIC_KEY_PATH",
-	"ID_REFRESH_TOKEN_PRIVATE_KEY_PATH",
-	"ID_REFRESH_TOKEN_PUBLIC_KEY_PATH",
-	"ID_USER_TABLE_NAME",
-	"ID_TOKENS_TABLE_NAME",
-	"ID_USER_FS_STRATEGY_PATH",
-	"ID_TOKEN_FS_STRATEGY_PATH",
-	"ID_EMAIL_API_KEY",
-	"WORKSPACE_HOST",
-	"WEB_HOST",
-])
+declare const ID_USER_REPOSITORY: string
+declare const ID_DYNAMODB_ENDPOINT: string
+declare const ID_DYNAMODB_ACCESS_KEY: string
+declare const ID_DYNAMODB_SECRET_KEY: string
+declare const ID_DYNAMODB_REGION: string
+declare const ID_PORT: string
+declare const ID_ACCESS_TOKEN_EXPIRE_IN: string
+declare const ID_REFRESH_TOKEN_EXPIRE_IN: string
+declare const ID_ACCESS_TOKEN_PRIVATE_KEY: string
+declare const ID_ACCESS_TOKEN_PUBLIC_KEY: string
+declare const ID_REFRESH_TOKEN_PRIVATE_KEY: string
+declare const ID_REFRESH_TOKEN_PUBLIC_KEY: string
+declare const ID_USER_TABLE_NAME: string
+declare const ID_TOKENS_TABLE_NAME: string
+declare const ID_TOKEN_PERSISTENCE_STRATEGY_MEMORY_PATH: string
+declare const ID_USER_PERSISTENCE_STRATEGY_MEMORY_PATH: string
+declare const ID_EMAIL_API_KEY: string
+declare const WORKSPACE_HOST: string
+declare const DATA_INTERNAL_HOST: string
+declare const WEB_HOST: string
 
 const main = async () => {
-	const accessPrivateKeyPath = ID_ACCESS_TOKEN_PRIVATE_KEY_PATH
-	const accessPublicKeyPath = ID_ACCESS_TOKEN_PUBLIC_KEY_PATH
-	const refreshPrivateKeyPath = ID_REFRESH_TOKEN_PRIVATE_KEY_PATH
-	const refreshPublicKeyPath = ID_REFRESH_TOKEN_PUBLIC_KEY_PATH
+	const emailRepository = RusenderEmailStrategy.of(ID_EMAIL_API_KEY)
 
-	console.log("HERE", accessPrivateKeyPath)
+	const accessPrivateKey = await importPrivateKey0(ID_ACCESS_TOKEN_PRIVATE_KEY).orElse(dieOnError)
+	const accessPublicKey = await importPublicKey0(ID_ACCESS_TOKEN_PUBLIC_KEY).orElse(dieOnError)
+	const refreshPrivateKey = await importPrivateKey0(ID_REFRESH_TOKEN_PRIVATE_KEY).orElse(dieOnError)
+	const refreshPublicKey = await importPublicKey0(ID_REFRESH_TOKEN_PUBLIC_KEY).orElse(dieOnError)
 
-	const accessTokenPrivateKey = await getPrivateKey(accessPrivateKeyPath, {
-		name: "ECDSA",
-		namedCurve: "P-384",
-	} as any)
-
-	const accessTokenPublicKey = await getPublicKey(accessPublicKeyPath, {
-		name: "ECDSA",
-		namedCurve: "P-384",
-	} as any)
-	const refreshTokenPrivateKey = await getPrivateKey(refreshPrivateKeyPath, {
-		name: "ECDSA",
-		namedCurve: "P-384",
-	} as any)
-	const refreshTokenPublicKey = await getPublicKey(refreshPublicKeyPath, {
-		name: "ECDSA",
-		namedCurve: "P-384",
-	} as any)
-
-	const tokenRepository = await TokenPersistenceStrategyFS.of(ID_TOKEN_FS_STRATEGY_PATH)
+	const tokenRepository = await TokenPersistenceStrategyMemory.of(
+		ID_TOKEN_PERSISTENCE_STRATEGY_MEMORY_PATH,
+	)
 	const userRepository =
-		ID_USER_REPOSITORY === "dynamodb"
+		ID_USER_REPOSITORY === "ydb"
 			? UserPersistenceStrategyDynamoDB.of({
 					region: ID_DYNAMODB_REGION,
 					endpoint: ID_DYNAMODB_ENDPOINT,
@@ -92,16 +54,15 @@ const main = async () => {
 					secretAccessKey: ID_DYNAMODB_SECRET_KEY,
 					tableName: ID_USER_TABLE_NAME,
 			  })
-			: FSUserRepository.of(ID_USER_FS_STRATEGY_PATH)
-	const emailRepository = RusenderEmailStrategy.of(ID_EMAIL_API_KEY)
+			: FSUserRepository.of(ID_USER_PERSISTENCE_STRATEGY_MEMORY_PATH)
 
 	const app = await createIDServer({
 		userRepository,
 		tokenRepository,
 		emailStrategy: emailRepository,
-		origin: [WEB_HOST, WORKSPACE_HOST],
-		accessKeys: { privateKey: accessTokenPrivateKey, publicKey: accessTokenPublicKey },
-		refreshKeys: { privateKey: refreshTokenPrivateKey, publicKey: refreshTokenPublicKey },
+		origin: [WEB_HOST, WORKSPACE_HOST, DATA_INTERNAL_HOST],
+		accessKeys: { privateKey: accessPrivateKey, publicKey: accessPublicKey },
+		refreshKeys: { privateKey: refreshPrivateKey, publicKey: refreshPublicKey },
 		alg: { name: "ECDSA", namedCurve: "P-384", hash: "SHA-384" }, // TODO: Add support for switching to RSA
 		accessTokenExpireIn: Number(ID_ACCESS_TOKEN_EXPIRE_IN),
 		refreshTokenExpireIn: Number(ID_REFRESH_TOKEN_EXPIRE_IN),
@@ -115,3 +76,8 @@ const main = async () => {
 }
 
 main()
+
+const dieOnError = (error: any) => {
+	console.log(error)
+	process.exit(1)
+}

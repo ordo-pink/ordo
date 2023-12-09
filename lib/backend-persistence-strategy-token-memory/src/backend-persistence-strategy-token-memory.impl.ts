@@ -8,24 +8,28 @@
 import { TokenRecord, TokenPersistenceStrategy } from "@ordo-pink/backend-service-token"
 import { createParentIfNotExists0, fileExists0, readFile0, writeFile0 } from "@ordo-pink/fs"
 import { Oath } from "@ordo-pink/oath"
+import { SUB } from "@ordo-pink/wjwt"
 
-let storage = {} as Record<string, TokenRecord>
+let storage = {} as Record<SUB, TokenRecord>
 
-export const TokenPersistenceStrategyFS = {
+export const TokenPersistenceStrategyMemory = {
 	of: async (path: string): Promise<TokenPersistenceStrategy> => {
 		await fileExists0(path)
-			.chain(exists =>
-				exists
-					? readFile0(path, "utf-8")
-							.map(text => JSON.parse(text as string))
-							.fix(() => ({}))
-					: createParentIfNotExists0(path).chain(() =>
-							writeFile0(path, "{}", "utf-8").map(() => ({})),
-					  ),
+			.chain(
+				Oath.ifElse(x => x, {
+					// TODO: Unwrap if provided functions return Oath/Promise
+					onTrue: () =>
+						readFile0(path, "utf-8")
+							.map(text => JSON.parse(text as string) as typeof storage)
+							.fix(() => ({} as typeof storage)),
+					onFalse: () =>
+						createParentIfNotExists0(path).chain(() =>
+							writeFile0(path, "{}", "utf-8").map(() => ({} as typeof storage)),
+						),
+				}),
 			)
-			.map(strg => {
-				storage = strg
-			})
+			.chain(x => x)
+			.tap(strg => void (storage = strg))
 			.orElse(console.log)
 
 		return {

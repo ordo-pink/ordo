@@ -28,6 +28,10 @@ export const isFiniteNumber = (x: unknown): x is number => Number.isFinite(x)
 export const isInteger = (x: unknown): x is number => Number.isInteger(x)
 export const isNaN = (x: unknown): x is number => Number.isNaN(x)
 export const isInfinite = (x: unknown): x is number => isNumber(x) && !isFiniteNumber(x)
+export const isInstanceOf =
+	<T extends (...args: any[]) => any>(x: T) =>
+	(y: unknown): y is ReturnType<T> =>
+		y instanceof x
 export const isNonNegativeFiniteInteger = (x: unknown): x is number =>
 	isNonNegativeNumber(x) && isFiniteNumber(x) && isInteger(x)
 export const isUUID = (x: unknown): x is UUIDv4 => isString(x) && UUIDv4_RX.test(x)

@@ -6,74 +6,83 @@
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 import { getc } from "@ordo-pink/getc"
-import { createParentIfNotExists0, writeFile0 } from "@ordo-pink/fs"
-import { resolve } from "path"
+import { readFile0, writeFile0 } from "@ordo-pink/fs"
+import { Oath } from "@ordo-pink/oath"
+import { isString } from "@ordo-pink/tau"
 
 const {
-	ID_ACCESS_TOKEN_PRIVATE_KEY_PATH,
-	ID_ACCESS_TOKEN_PUBLIC_KEY_PATH,
-	ID_REFRESH_TOKEN_PRIVATE_KEY_PATH,
-	ID_REFRESH_TOKEN_PUBLIC_KEY_PATH,
+	ID_ACCESS_TOKEN_PRIVATE_KEY,
+	ID_ACCESS_TOKEN_PUBLIC_KEY,
+	ID_REFRESH_TOKEN_PRIVATE_KEY,
+	ID_REFRESH_TOKEN_PUBLIC_KEY,
 } = getc([
-	"ID_ACCESS_TOKEN_PRIVATE_KEY_PATH",
-	"ID_ACCESS_TOKEN_PUBLIC_KEY_PATH",
-	"ID_REFRESH_TOKEN_PRIVATE_KEY_PATH",
-	"ID_REFRESH_TOKEN_PUBLIC_KEY_PATH",
+	"ID_ACCESS_TOKEN_PRIVATE_KEY",
+	"ID_ACCESS_TOKEN_PUBLIC_KEY",
+	"ID_REFRESH_TOKEN_PRIVATE_KEY",
+	"ID_REFRESH_TOKEN_PUBLIC_KEY",
 ])
 
-const generateKeyPair = async (privatePath: string, publicPath: string) => {
-	const { privateKey, publicKey } = await crypto.subtle.generateKey(
+const main = async () => {
+	if (!ID_ACCESS_TOKEN_PRIVATE_KEY || !ID_ACCESS_TOKEN_PUBLIC_KEY) {
+		await Oath.from(() => generateKeyPair())
+			.chain(({ privateKey, publicKey }) =>
+				registerKeyPairInDotEnv0({ privateKey, publicKey, type: "ACCESS" }),
+			)
+			.orElse(console.log)
+	}
+
+	if (!ID_REFRESH_TOKEN_PRIVATE_KEY || !ID_REFRESH_TOKEN_PUBLIC_KEY) {
+		await Oath.from(() => generateKeyPair())
+			.chain(({ privateKey, publicKey }) =>
+				registerKeyPairInDotEnv0({ privateKey, publicKey, type: "REFRESH" }),
+			)
+			.orElse(console.log)
+	}
+}
+
+main()
+
+// --- Internal ---
+
+type AccessLevel = "PRIVATE" | "PUBLIC"
+type TokenType = "ACCESS" | "REFRESH"
+
+/**
+ * Generate a key pair with Web Crypto Subtle module.
+ * TODO: Allow using RSA and HSA via env variable.
+ */
+const generateKeyPair = async () => {
+	const originalKeys = await crypto.subtle.generateKey(
 		{ name: "ECDSA", namedCurve: "P-384" },
 		true,
 		["sign", "verify"],
 	)
 
-	const exportedPrivateKey = await crypto.subtle.exportKey("pkcs8", privateKey)
-	const exportedPublicKey = await crypto.subtle.exportKey("spki", publicKey)
+	const exportedPrivateKey = await crypto.subtle.exportKey("pkcs8", originalKeys.privateKey)
+	const exportedPublicKey = await crypto.subtle.exportKey("spki", originalKeys.publicKey)
 
-	const key = `-----BEGIN PRIVATE KEY-----
-${Buffer.from(exportedPrivateKey)
-	.toString("base64")
-	.match(/.{1,42}/g)
-	?.join("\n")}
------END PRIVATE KEY-----`
+	const privateKey = Buffer.from(exportedPrivateKey).toString("base64")
+	const publicKey = Buffer.from(exportedPublicKey).toString("base64")
 
-	const pub = `-----BEGIN PUBLIC KEY-----
-${Buffer.from(exportedPublicKey)
-	.toString("base64")
-	.match(/.{1,42}/g)
-	?.join("\n")}
------END PUBLIC KEY-----`
-
-	await writeFile0(privatePath, key).orElse(console.error)
-	await writeFile0(publicPath, pub).orElse(console.error)
+	return { privateKey, publicKey }
 }
 
-const generateAuthKeys = async () => {
-	const keys = [
-		ID_ACCESS_TOKEN_PRIVATE_KEY_PATH,
-		ID_ACCESS_TOKEN_PUBLIC_KEY_PATH,
-		ID_REFRESH_TOKEN_PRIVATE_KEY_PATH,
-		ID_REFRESH_TOKEN_PUBLIC_KEY_PATH,
-	]
+type RegisterKeyPairInDotEnvParams = { privateKey: string; publicKey: string; type: TokenType }
+const registerKeyPairInDotEnv0 = ({ privateKey, publicKey, type }: RegisterKeyPairInDotEnvParams) =>
+	readFile0("./.env", "utf-8")
+		.chain(Oath.ifElse(isString, { onTrue: str => (str as string).split("\n") }))
+		.chain(registerKeyInDotEnv_0({ access: "PRIVATE", key: privateKey, type }))
+		.chain(registerKeyInDotEnv_0({ access: "PUBLIC", key: publicKey, type }))
+		.chain(lines => writeFile0("./.env", lines.join("\n"), "utf-8"))
 
-	for (const key of keys) {
-		await createParentIfNotExists0(key).toPromise()
-	}
-
-	await generateKeyPair(
-		resolve(ID_ACCESS_TOKEN_PRIVATE_KEY_PATH),
-		resolve(ID_ACCESS_TOKEN_PUBLIC_KEY_PATH),
-	)
-
-	await generateKeyPair(
-		resolve(ID_REFRESH_TOKEN_PRIVATE_KEY_PATH),
-		resolve(ID_REFRESH_TOKEN_PUBLIC_KEY_PATH),
-	)
-}
-
-const main = async () => {
-	await generateAuthKeys()
-}
-
-main()
+type RegisterKeyInDotEnvParams = { access: AccessLevel; type: TokenType; key: string }
+const registerKeyInDotEnv_0 =
+	({ type, access, key }: RegisterKeyInDotEnvParams) =>
+	(lines: string[]) =>
+		Oath.of(lines.findIndex(line => line.startsWith(`ID_${type}_TOKEN_${access}_KEY=`)))
+			.tap(lineIndex =>
+				lineIndex >= 0
+					? lines.splice(lineIndex, 1, `ID_${type}_TOKEN_${access}_KEY=${key}`)
+					: lines.push(`ID_${type}_TOKEN_${access}_KEY=${key}`),
+			)
+			.map(() => lines)

@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: Copyright 2023, 谢尔盖||↓ and the Ordo.pink contributors
+// SPDX-License-Identifier: MIT
+
 import DataLabel from "$components/data/label.component"
 import Link from "$components/link"
 import Null from "$components/null"

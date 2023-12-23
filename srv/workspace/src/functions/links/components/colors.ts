@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: Copyright 2023, 谢尔盖||↓ and the Ordo.pink contributors
+// SPDX-License-Identifier: MIT
+
 export const DarkThemeColors = {
 	LABEL_LINK: "#8b5cf6",
 	LABEL_NODE: "#8b5cf6",

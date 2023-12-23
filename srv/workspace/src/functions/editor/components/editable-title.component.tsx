@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: Copyright 2023, 谢尔盖||↓ and the Ordo.pink contributors
+// SPDX-License-Identifier: MIT
+
 import { FSID, PlainData } from "@ordo-pink/data"
 import { useSharedContext } from "@ordo-pink/frontend-core"
 import { ChangeEvent, useEffect, useState } from "react"

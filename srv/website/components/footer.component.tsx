@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: Copyright 2023, 谢尔盖||↓ and the Ordo.pink contributors
+// SPDX-License-Identifier: MIT
+
 import { BsGithub, BsTelegram, BsTwitter, BsX } from "react-icons/bs"
 import { RiTwitterXLine } from "react-icons/ri"
 

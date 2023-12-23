@@ -6,10 +6,11 @@
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 import { TokenRecord, TokenPersistenceStrategy } from "@ordo-pink/backend-service-token"
+import { UserID } from "@ordo-pink/data"
 import { createParentIfNotExists0, fileExists0, readFile0, writeFile0 } from "@ordo-pink/fs"
 import { Oath } from "@ordo-pink/oath"
 
-let storage = {} as Record<string, TokenRecord>
+let storage = {} as Record<UserID, TokenRecord>
 
 export const TokenPersistenceStrategyFS = {
 	of: async (path: string): Promise<TokenPersistenceStrategy> => {
@@ -38,6 +39,9 @@ export const TokenPersistenceStrategyFS = {
 				Oath.fromNullable(storage[sub])
 					.chain(record => Oath.fromNullable(record[jti]))
 					.map(() => delete storage[sub][jti])
+					.tap(() => {
+						console.log(storage[sub][jti])
+					})
 					.chain(() => writeFile0(path, JSON.stringify(storage), "utf-8"))
 					.fix(() => null)
 					.map(() => "OK"),

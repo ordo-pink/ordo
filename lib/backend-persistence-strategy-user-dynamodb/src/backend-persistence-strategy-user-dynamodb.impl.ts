@@ -92,6 +92,7 @@ const update: UpdateMethod<T.Params> =
 					lastName: user.lastName ?? oldUser.lastName,
 					handle: user.handle ?? oldUser.handle,
 					password: user.password ?? oldUser.password,
+					code: user.code ?? oldUser.code,
 				})
 					.chain(user => Oath.of(reduceUserToAttributeUpdates(user)))
 					.chain(AttributeUpdates =>

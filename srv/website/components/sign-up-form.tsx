@@ -24,13 +24,13 @@ export default function SignUpForm({ idHost, workspaceHost }: _P) {
 
 	useEffect(() => {
 		setErrors(emailErrors.concat(passwordErrors))
-	}, [emailErrors, passwordErrors])
+	}, [emailErrors.length, passwordErrors.length])
 
 	useEffect(() => {
-		if ((password || repeatPassword) && password !== repeatPassword) {
+		if (password && repeatPassword && password !== repeatPassword) {
 			setErrors(errors.concat("Passwords must match."))
 		}
-	}, [errors, password, repeatPassword])
+	}, [password, repeatPassword])
 
 	return (
 		<form className="w-full flex flex-col items-center space-y-12">

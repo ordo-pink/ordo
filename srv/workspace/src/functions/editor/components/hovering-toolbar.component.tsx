@@ -30,6 +30,7 @@ export default function HoveringToolbar() {
 		const domSelection = window.getSelection()
 		const domRange = domSelection?.getRangeAt(0)
 		const rect = domRange?.getBoundingClientRect() ?? { top: 0, left: 0, width: 0 }
+
 		el.style.opacity = "1"
 		el.style.display = "flex"
 		el.style.top = `${rect.top + window.scrollY - el.offsetHeight}px`

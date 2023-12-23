@@ -110,7 +110,7 @@ export default function App() {
 						workspaceSplitSize: sidebar && !sidebar.disabled ? sidebar.sizes : [0, 100],
 						user: user.fold(
 							() => null,
-							u => ({ ...u, email: UserUtils.obfuscateEmail(u.email) }),
+							u => u, // TODO: Avoid adding current user to shared context
 						),
 					}}
 				>

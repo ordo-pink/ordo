@@ -55,21 +55,27 @@ const existsByEmail: ExistsByEmailMethod<T.Params> = params => email =>
 const create: CreateMethod<T.Params> =
 	({ db, table }) =>
 	user =>
-		Oath.try(() =>
-			db.putItem({
-				TableName: table,
-				Item: {
-					email: { S: user.email },
-					id: { S: user.id },
-					emailConfirmed: { N: user.emailConfirmed ? "1" : "0" },
-					handle: { S: user.handle ?? "" },
-					password: { S: user.password },
-					firstName: { S: user.firstName ?? "" },
-					lastName: { S: user.lastName ?? "" },
-					createdAt: { S: user.createdAt.toISOString() },
-				},
-			}),
-		).map(() => user)
+		Oath.try(() => {
+			return db
+				.putItem({
+					TableName: table,
+					Item: {
+						email: { S: user.email },
+						id: { S: user.id },
+						emailConfirmed: { N: user.emailConfirmed ? "1" : "0" },
+						handle: { S: user.handle ?? "" },
+						password: { S: user.password },
+						firstName: { S: user.firstName ?? "" },
+						lastName: { S: user.lastName ?? "" },
+						createdAt: { S: user.createdAt.toISOString() },
+						subscription: { S: user.subscription },
+						fileLimit: { N: String(user.fileLimit) ?? "1000" },
+						maxUploadSize: { N: String(user.maxUploadSize) ?? "1.5" },
+						code: { S: user.code ?? "" },
+					},
+				})
+				.promise()
+		}).map(() => user)
 
 const update: UpdateMethod<T.Params> =
 	({ db, table }) =>
@@ -123,16 +129,16 @@ const getByEmail: GetByEmailMethod<T.Params> =
 
 const serialize: T._SerializeFn = item => ({
 	email: item.email!.S!,
-	emailConfirmed: item.emailConfirmed!.N! === "1",
-	firstName: item.firstName!.S!,
+	emailConfirmed: item.emailConfirmed?.N! === "1",
+	firstName: item.firstName?.S!,
 	createdAt: new Date(item.createdAt!.S!),
-	lastName: item.lastName!.S!,
+	lastName: item.lastName?.S!,
 	password: item.password!.S!,
-	handle: item.handle!.S!,
-	subscription: item.subscription!.S!,
-	fileLimit: Number(item.fileLimit!.N!),
-	maxUploadSize: Number(item.maxUploadSize!.N!),
-	code: item.code!.S!,
+	handle: item.handle?.S!,
+	subscription: item.subscription?.S!,
+	fileLimit: Number(item.fileLimit?.N!),
+	maxUploadSize: Number(item.maxUploadSize?.N!),
+	code: item.code?.S!,
 	id: item.id!.S! as SUB,
 })
 

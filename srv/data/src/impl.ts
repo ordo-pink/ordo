@@ -58,7 +58,7 @@ const main = async () => {
 
 	const app = createDataServer({ dataService, idHost, origin, logger })
 
-	ConsoleLogger.info(`DATA server running on ${DATA_HOST}`)
+	ConsoleLogger.info(`DATA server running on http://localhost:${DATA_PORT}`)
 
 	app.listen({ port: Number(DATA_PORT) })
 }

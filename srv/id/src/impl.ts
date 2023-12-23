@@ -27,7 +27,7 @@ const {
 	ID_ACCESS_TOKEN_PUBLIC_KEY_PATH,
 	ID_REFRESH_TOKEN_PRIVATE_KEY_PATH,
 	ID_REFRESH_TOKEN_PUBLIC_KEY_PATH,
-	ID_USER_TABLE_NAME,
+	ID_DYNAMODB_USER_TABLE,
 	ID_TOKENS_TABLE_NAME,
 	ID_TOKEN_FS_STRATEGY_PATH,
 	ID_USER_FS_STRATEGY_PATH,
@@ -47,7 +47,7 @@ const {
 	"ID_ACCESS_TOKEN_PUBLIC_KEY_PATH",
 	"ID_REFRESH_TOKEN_PRIVATE_KEY_PATH",
 	"ID_REFRESH_TOKEN_PUBLIC_KEY_PATH",
-	"ID_USER_TABLE_NAME",
+	"ID_DYNAMODB_USER_TABLE",
 	"ID_TOKENS_TABLE_NAME",
 	"ID_USER_FS_STRATEGY_PATH",
 	"ID_TOKEN_FS_STRATEGY_PATH",
@@ -61,8 +61,6 @@ const main = async () => {
 	const accessPublicKeyPath = ID_ACCESS_TOKEN_PUBLIC_KEY_PATH
 	const refreshPrivateKeyPath = ID_REFRESH_TOKEN_PRIVATE_KEY_PATH
 	const refreshPublicKeyPath = ID_REFRESH_TOKEN_PUBLIC_KEY_PATH
-
-	console.log("HERE", accessPrivateKeyPath)
 
 	const accessTokenPrivateKey = await getPrivateKey(accessPrivateKeyPath, {
 		name: "ECDSA",
@@ -90,7 +88,7 @@ const main = async () => {
 					endpoint: ID_DYNAMODB_ENDPOINT,
 					accessKeyId: ID_DYNAMODB_ACCESS_KEY,
 					secretAccessKey: ID_DYNAMODB_SECRET_KEY,
-					tableName: ID_USER_TABLE_NAME,
+					tableName: ID_DYNAMODB_USER_TABLE,
 			  })
 			: FSUserRepository.of(ID_USER_FS_STRATEGY_PATH)
 	const emailRepository = RusenderEmailStrategy.of(ID_EMAIL_API_KEY)

@@ -89,7 +89,7 @@ export default function App() {
 		.chain(() => Either.fromNullable(streams.currentActivity$))
 		.chain(() => Either.fromNullable(streams.currentRoute$))
 		.chain(() => Either.fromNullable(streams.fileAssociations$))
-		.map(() => streams as AllKeysRequired<typeof streams>) // TODO: Extract to tau
+		.map(() => streams as AllKeysRequired<typeof streams>)
 		.fold(
 			Null,
 			({

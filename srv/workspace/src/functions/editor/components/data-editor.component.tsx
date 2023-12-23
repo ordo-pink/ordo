@@ -14,12 +14,18 @@ import { BsChevronDown, BsChevronUp } from "react-icons/bs"
 
 type P = { data: PlainData }
 export default function DataEditor({ data }: P) {
-	const { commands } = useSharedContext()
+	const { commands, user } = useSharedContext()
 	const createdBy = usePublicUserInfo(data.createdBy)
 	const updatedBy = usePublicUserInfo(data.updatedBy)
 	const readableSize = useReadableSize(data)
 	const parent = useDataByFSID(data.parent)
 	const children = useChildren(data)
+
+	const creator = user && user.id === data.createdBy ? "Вы" : UserUtils.getUserName(createdBy)
+	const createdAt = new Date(data.createdAt).toLocaleString("ru")
+
+	const updater = user && user.id === data.updatedBy ? "Вы" : UserUtils.getUserName(updatedBy)
+	const updatedAt = new Date(data.updatedAt).toLocaleString("ru")
 
 	const handleLabelsClick = () =>
 		commands.emit<cmd.data.showEditLabelsPalette>("data.show-edit-labels-palette", data)
@@ -32,10 +38,10 @@ export default function DataEditor({ data }: P) {
 			<tbody>
 				<Row title="Размер">{readableSize}</Row>
 				<Row title="Создан">
-					{UserUtils.getUserName(createdBy)} ({new Date(data.createdAt).toLocaleString()})
+					{creator} ({createdAt})
 				</Row>
 				<Row title="Последнее изменение">
-					{UserUtils.getUserName(updatedBy)} ({new Date(data.updatedAt).toLocaleString()})
+					{updater} ({updatedAt})
 				</Row>
 				{Either.fromNullable(parent).fold(Null, parent => (
 					<Row title="Родитель">

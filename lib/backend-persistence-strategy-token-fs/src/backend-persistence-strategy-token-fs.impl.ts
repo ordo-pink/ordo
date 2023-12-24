@@ -39,9 +39,6 @@ export const TokenPersistenceStrategyFS = {
 				Oath.fromNullable(storage[sub])
 					.chain(record => Oath.fromNullable(record[jti]))
 					.map(() => delete storage[sub][jti])
-					.tap(() => {
-						console.log(storage[sub][jti])
-					})
 					.chain(() => writeFile0(path, JSON.stringify(storage), "utf-8"))
 					.fix(() => null)
 					.map(() => "OK"),

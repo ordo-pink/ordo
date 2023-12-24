@@ -35,12 +35,12 @@ const env = getc([
 const defineEnv = (env: Record<string, string>) =>
 	keysOf(env).reduce((acc, key) => acc.concat(`--define Bun.env.${key}='${env[key]}' `), "")
 const createOutDirectoryIfNotExists0 = () => createDirectoryIfNotExists0("var/out")
-const moveCompiledFileTooutDirectory0 = () => mv0("dt", "var/out/dt")
+const moveCompiledFileToOutDirectory0 = () => mv0("dt", "var/out/dt")
 
 const command = `build srv/data/index.ts --outfile=dt --target=bun --minify --compile `
 const envDefinitions = defineEnv(env)
 
 runBunCommand0(command.concat(envDefinitions))
 	.chain(createOutDirectoryIfNotExists0)
-	.chain(moveCompiledFileTooutDirectory0)
+	.chain(moveCompiledFileToOutDirectory0)
 	.orElse(ConsoleLogger.error)

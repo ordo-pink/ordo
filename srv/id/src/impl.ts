@@ -33,8 +33,8 @@ const {
 	ID_USER_FS_STRATEGY_PATH,
 	WORKSPACE_HOST,
 	WEB_HOST,
-	DATA_HOST,
-	DATA_PRIVATE_HOST,
+	DT_HOST,
+	DT_PRIVATE_HOST,
 	ID_EMAIL_API_KEY,
 } = getc([
 	"ID_USER_REPOSITORY",
@@ -54,8 +54,8 @@ const {
 	"ID_USER_FS_STRATEGY_PATH",
 	"ID_TOKEN_FS_STRATEGY_PATH",
 	"ID_EMAIL_API_KEY",
-	"DATA_HOST",
-	"DATA_PRIVATE_HOST",
+	"DT_HOST",
+	"DT_PRIVATE_HOST",
 	"WORKSPACE_HOST",
 	"WEB_HOST",
 ])
@@ -101,7 +101,7 @@ const main = async () => {
 		userRepository,
 		tokenRepository,
 		emailStrategy: emailRepository,
-		origin: [WEB_HOST, WORKSPACE_HOST, DATA_HOST, DATA_PRIVATE_HOST],
+		origin: [WEB_HOST, WORKSPACE_HOST, DT_HOST, DT_PRIVATE_HOST],
 		accessKeys: { privateKey: accessTokenPrivateKey, publicKey: accessTokenPublicKey },
 		refreshKeys: { privateKey: refreshTokenPrivateKey, publicKey: refreshTokenPublicKey },
 		alg: { name: "ECDSA", namedCurve: "P-384", hash: "SHA-384" }, // TODO: Add support for switching to RSA

@@ -3,7 +3,7 @@
 
 export const Hosts = {
 	ID: process.env.REACT_APP_ID_HOST,
-	DATA: process.env.REACT_APP_DATA_HOST,
+	DATA: process.env.REACT_APP_DT_HOST,
 	STATIC: process.env.REACT_APP_STATIC_HOST,
 	WEBSITE: process.env.REACT_APP_WEBSITE_HOST,
 }

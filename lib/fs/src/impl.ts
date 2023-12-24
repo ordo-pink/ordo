@@ -30,6 +30,8 @@ export const createFile0 = oathify(promises.writeFile)
 export const writeFile0 = createFile0
 export const readFile0 = oathify(promises.readFile)
 export const removeFile0 = rmdir0
+export const mv0 = oathify(promises.rename)
+export const rename0 = mv0
 export const stat0 = (...args: Parameters<typeof promises.stat>) =>
 	Oath.from(() => promises.stat(...args).catch(() => Promise.reject(null)))
 export const readdir0 = oathify(promises.readdir)

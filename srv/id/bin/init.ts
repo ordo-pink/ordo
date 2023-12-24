@@ -6,22 +6,24 @@
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 import { getc } from "@ordo-pink/getc"
-import { createParentIfNotExists0, writeFile0 } from "@ordo-pink/fs"
-import { resolve } from "path"
+import { readFile0, writeFile0 } from "@ordo-pink/fs"
+import { Oath } from "@ordo-pink/oath"
+import { keysOf } from "@ordo-pink/tau"
+import { ConsoleLogger } from "@ordo-pink/logger"
 
 const {
-	ID_ACCESS_TOKEN_PRIVATE_KEY_PATH,
-	ID_ACCESS_TOKEN_PUBLIC_KEY_PATH,
-	ID_REFRESH_TOKEN_PRIVATE_KEY_PATH,
-	ID_REFRESH_TOKEN_PUBLIC_KEY_PATH,
+	ORDO_ID_ACCESS_TOKEN_PRIVATE_KEY,
+	ORDO_ID_ACCESS_TOKEN_PUBLIC_KEY,
+	ORDO_ID_REFRESH_TOKEN_PRIVATE_KEY,
+	ORDO_ID_REFRESH_TOKEN_PUBLIC_KEY,
 } = getc([
-	"ID_ACCESS_TOKEN_PRIVATE_KEY_PATH",
-	"ID_ACCESS_TOKEN_PUBLIC_KEY_PATH",
-	"ID_REFRESH_TOKEN_PRIVATE_KEY_PATH",
-	"ID_REFRESH_TOKEN_PUBLIC_KEY_PATH",
+	"ORDO_ID_ACCESS_TOKEN_PRIVATE_KEY",
+	"ORDO_ID_ACCESS_TOKEN_PUBLIC_KEY",
+	"ORDO_ID_REFRESH_TOKEN_PRIVATE_KEY",
+	"ORDO_ID_REFRESH_TOKEN_PUBLIC_KEY",
 ])
 
-const generateKeyPair = async (privatePath: string, publicPath: string) => {
+const generateKeyPairP = async () => {
 	const { privateKey, publicKey } = await crypto.subtle.generateKey(
 		{ name: "ECDSA", namedCurve: "P-384" },
 		true,
@@ -31,49 +33,46 @@ const generateKeyPair = async (privatePath: string, publicPath: string) => {
 	const exportedPrivateKey = await crypto.subtle.exportKey("pkcs8", privateKey)
 	const exportedPublicKey = await crypto.subtle.exportKey("spki", publicKey)
 
-	const key = `-----BEGIN PRIVATE KEY-----
-${Buffer.from(exportedPrivateKey)
-	.toString("base64")
-	.match(/.{1,42}/g)
-	?.join("\n")}
------END PRIVATE KEY-----`
+	const priv = Buffer.from(exportedPrivateKey).toString("base64")
+	const pub = Buffer.from(exportedPublicKey).toString("base64")
 
-	const pub = `-----BEGIN PUBLIC KEY-----
-${Buffer.from(exportedPublicKey)
-	.toString("base64")
-	.match(/.{1,42}/g)
-	?.join("\n")}
------END PUBLIC KEY-----`
-
-	await writeFile0(privatePath, key).orElse(console.error)
-	await writeFile0(publicPath, pub).orElse(console.error)
-}
-
-const generateAuthKeys = async () => {
-	const keys = [
-		ID_ACCESS_TOKEN_PRIVATE_KEY_PATH,
-		ID_ACCESS_TOKEN_PUBLIC_KEY_PATH,
-		ID_REFRESH_TOKEN_PRIVATE_KEY_PATH,
-		ID_REFRESH_TOKEN_PUBLIC_KEY_PATH,
-	]
-
-	for (const key of keys) {
-		await createParentIfNotExists0(key).toPromise()
-	}
-
-	await generateKeyPair(
-		resolve(ID_ACCESS_TOKEN_PRIVATE_KEY_PATH),
-		resolve(ID_ACCESS_TOKEN_PUBLIC_KEY_PATH),
-	)
-
-	await generateKeyPair(
-		resolve(ID_REFRESH_TOKEN_PRIVATE_KEY_PATH),
-		resolve(ID_REFRESH_TOKEN_PUBLIC_KEY_PATH),
-	)
+	return { priv, pub }
 }
 
 const main = async () => {
-	await generateAuthKeys()
+	if (
+		!!ORDO_ID_ACCESS_TOKEN_PRIVATE_KEY &&
+		!!ORDO_ID_ACCESS_TOKEN_PUBLIC_KEY &&
+		!!ORDO_ID_REFRESH_TOKEN_PRIVATE_KEY &&
+		!!ORDO_ID_REFRESH_TOKEN_PUBLIC_KEY
+	) {
+		return
+	}
+
+	readFile0("./.env", "utf-8")
+		.map(str => (str as string).trim().split("\n"))
+		.map(lines => lines.map(line => line.trim().split("=")))
+		.tap(console.log)
+		.map(lines =>
+			lines.reduce((acc, line) => ({ ...acc, [line[0]]: line[1] }), {} as Record<string, string>),
+		)
+		.chain(env =>
+			Oath.from(() => generateKeyPairP()).map(({ priv, pub }) => ({
+				...env,
+				ORDO_ID_ACCESS_TOKEN_PRIVATE_KEY: priv,
+				ORDO_ID_ACCESS_TOKEN_PUBLIC_KEY: pub,
+			})),
+		)
+		.chain(env =>
+			Oath.from(() => generateKeyPairP()).map(({ priv, pub }) => ({
+				...env,
+				ORDO_ID_REFRESH_TOKEN_PRIVATE_KEY: priv,
+				ORDO_ID_REFRESH_TOKEN_PUBLIC_KEY: pub,
+			})),
+		)
+		.map(env => keysOf(env).reduce((acc, key) => acc.concat(`${key}=${env[key]}\n`), ""))
+		.chain(str => writeFile0("./.env", str, "utf-8"))
+		.orElse(ConsoleLogger.error)
 }
 
 main()

@@ -9,9 +9,12 @@ import { createDirectoryIfNotExists0 } from "@ordo-pink/fs"
 import { Oath } from "@ordo-pink/oath"
 import { getc } from "@ordo-pink/getc"
 
-const { DT_DATA_PATH, DT_METADT_PATH } = getc(["DT_DATA_PATH", "DT_METADT_PATH"])
+const { ORDO_DT_DATA_PATH, ORDO_DT_METAORDO_DT_PATH } = getc([
+	"ORDO_DT_DATA_PATH",
+	"ORDO_DT_METAORDO_DT_PATH",
+])
 
 Oath.all([
-	createDirectoryIfNotExists0(DT_DATA_PATH),
-	createDirectoryIfNotExists0(DT_METADT_PATH),
+	createDirectoryIfNotExists0(ORDO_DT_DATA_PATH),
+	createDirectoryIfNotExists0(ORDO_DT_METAORDO_DT_PATH),
 ]).orElse(console.error)

@@ -14,7 +14,7 @@ export const metadata: Metadata = {
 	title: "Единое пространство для документов, файлов и проектов | Ordo",
 	description:
 		"Новый инструмент, объединяющий все ваши повседневные рабочие приложения в одно. Это универсальное рабочее пространство для вас и вашей команды.",
-	icons: `${process.env.NEXT_PUBLIC_STATIC_HOST}/favicon.ico`,
+	icons: `${process.env.NEXT_PUBLIC_ORDO_STATIC_HOST}/favicon.ico`,
 }
 
 export default function App({ Component, pageProps }: AppProps) {

@@ -2,8 +2,8 @@
 // SPDX-License-Identifier: MIT
 
 export const Hosts = {
-	ID: process.env.REACT_APP_ID_HOST,
-	DATA: process.env.REACT_APP_DT_HOST,
-	STATIC: process.env.REACT_APP_STATIC_HOST,
-	WEBSITE: process.env.REACT_APP_WEBSITE_HOST,
+	ID: process.env.REACT_APP_ORDO_ID_HOST,
+	DATA: process.env.REACT_APP_ORDO_DT_HOST,
+	STATIC: process.env.REACT_APP_ORDO_STATIC_HOST,
+	WEBSITE: process.env.REACT_APP_ORDO_WEBSITE_HOST,
 }

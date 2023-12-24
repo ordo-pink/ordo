@@ -9,15 +9,15 @@ import Footer from "components/footer.component"
 import ScreenshotCarousel from "components/screenshot-carousel.component"
 import Head from "next/head"
 
-const webHost = process.env.NEXT_PUBLIC_WEB_HOST!
-const staticHost = process.env.NEXT_PUBLIC_STATIC_HOST!
+const webHost = process.env.NEXT_PUBLIC_ORDO_WEB_HOST!
+const staticHost = process.env.NEXT_PUBLIC_ORDO_STATIC_HOST!
 
 export default function Home() {
 	return (
 		<main className="scroll-smooth">
 			<Head>
 				<title>Единое пространство для документов, файлов и проектов | Ordo</title>
-				<link rel="icon" href={`${process.env.NEXT_PUBLIC_STATIC_HOST}/favicon.ico`} />
+				<link rel="icon" href={`${process.env.NEXT_PUBLIC_ORDO_STATIC_HOST}/favicon.ico`} />
 				<meta name="title" content="Единое пространство для документов, файлов и проектов | Ordo" />
 
 				<meta

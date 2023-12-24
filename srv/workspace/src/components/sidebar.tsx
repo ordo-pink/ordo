@@ -61,7 +61,7 @@ export default function Sidebar({ children, isNarrow, commandPalette$, sidebar$ 
 						<Link href="/user">
 							<img
 								className="h-10 rounded-full"
-								src={`${process.env.REACT_APP_STATIC_HOST}/logo.png`}
+								src={`${process.env.REACT_APP_ORDO_STATIC_HOST}/logo.png`}
 								alt="avatar"
 							/>
 						</Link>

@@ -7,7 +7,7 @@ import { useEffect } from "react"
 
 export default function ForgotPasswordPage() {
 	useEffect(() => {
-		fetch(`${process.env.NEXT_PUBLIC_ID_HOST}/sign-out`, {
+		fetch(`${process.env.NEXT_PUBLIC_ORDO_ID_HOST}/sign-out`, {
 			method: "POST",
 			credentials: "include",
 		}).then(() => {

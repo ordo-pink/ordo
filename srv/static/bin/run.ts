@@ -8,7 +8,7 @@ import { ConsoleLogger } from "@ordo-pink/logger"
 import { Oath } from "@ordo-pink/oath"
 import { watch, cp } from "fs"
 
-const { STATIC_ROOT } = getc(["STATIC_ROOT"])
+const { ORDO_STATIC_ROOT } = getc(["ORDO_STATIC_ROOT"])
 Oath.of("./srv")
 	.chain(path => readdir0(path, { withFileTypes: true }))
 	.map(direntsToDirs)
@@ -24,10 +24,13 @@ Oath.of("./srv")
 				readdir0(publicPath, { withFileTypes: true }).map(dirents =>
 					dirents.map(dirent => {
 						ConsoleLogger.info(
-							`STATIC copying file ${publicPath}/${dirent.name} -> ${STATIC_ROOT}/${dirent.name}`,
+							`STATIC copying file ${publicPath}/${dirent.name} -> ${ORDO_STATIC_ROOT}/${dirent.name}`,
 						)
 
-						Bun.write(`${STATIC_ROOT}/${dirent.name}`, Bun.file(`${publicPath}/${dirent.name}`))
+						Bun.write(
+							`${ORDO_STATIC_ROOT}/${dirent.name}`,
+							Bun.file(`${publicPath}/${dirent.name}`),
+						)
 					}),
 				),
 			),
@@ -54,10 +57,10 @@ Oath.of("./srv")
 		publicPaths.map(publicPath =>
 			watch(publicPath, { recursive: true }, (event, filename) => {
 				ConsoleLogger.info(
-					`STATIC copying file ${publicPath}/${filename} -> ${STATIC_ROOT}/${filename}`,
+					`STATIC copying file ${publicPath}/${filename} -> ${ORDO_STATIC_ROOT}/${filename}`,
 				)
 
-				Bun.write(`${STATIC_ROOT}/${filename}`, Bun.file(`${publicPath}/${filename}`))
+				Bun.write(`${ORDO_STATIC_ROOT}/${filename}`, Bun.file(`${publicPath}/${filename}`))
 			}),
 		),
 	)

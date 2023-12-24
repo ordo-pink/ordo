@@ -86,13 +86,15 @@ export type WJWTVerifyFn = (params: {
 }) => (
 	token: string,
 	aud?: string,
-) => Oath<boolean, RRR<"INVALID_TOKEN"> | RRR<"INVALID_KEY"> | RRR<"ALG_KEY_MISMATCH">>
+) => Oath<boolean, RRR<"INVALORDO_ID_TOKEN"> | RRR<"INVALORDO_ID_KEY"> | RRR<"ALG_KEY_MISMATCH">>
 
 export type WJWTSignFn = <T extends R = R>(params: {
 	key: CryptoKey
 	alg: Algorithm
-}) => (payload: JWT<T>["payload"]) => Oath<string, RRR<"INVALID_PAYLOAD"> | RRR<"ALG_KEY_MISMATCH">>
+}) => (
+	payload: JWT<T>["payload"],
+) => Oath<string, RRR<"INVALORDO_ID_PAYLOAD"> | RRR<"ALG_KEY_MISMATCH">>
 
 export type WJWTDecodeFn = <T extends R = R>(
 	token: string,
-) => Oath<JWT<T>, RRR<"INVALID_TOKEN"> | RRR<"TOKEN_NOT_PROVIDED">>
+) => Oath<JWT<T>, RRR<"INVALORDO_ID_TOKEN"> | RRR<"TOKEN_NOT_PROVIDED">>

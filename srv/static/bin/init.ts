@@ -4,6 +4,6 @@
 import { createDirectoryIfNotExists0 } from "@ordo-pink/fs"
 import { getc } from "@ordo-pink/getc"
 
-const { STATIC_ROOT } = getc(["STATIC_ROOT"])
+const { ORDO_STATIC_ROOT } = getc(["ORDO_STATIC_ROOT"])
 
-createDirectoryIfNotExists0(STATIC_ROOT).orElse(console.log)
+createDirectoryIfNotExists0(ORDO_STATIC_ROOT).orElse(console.log)

@@ -8,12 +8,12 @@ import { isString } from "@ordo-pink/tau"
 
 export const decode0: WJWTDecodeFn = token =>
 	Oath.fromNullable(token)
-		.rejectedMap(() => Rrr.INVALID_TOKEN)
+		.rejectedMap(() => Rrr.INVALORDO_ID_TOKEN)
 		.chain(token =>
 			Oath.fromBoolean(
 				() => isString(token),
 				() => token,
-				() => Rrr.INVALID_TOKEN,
+				() => Rrr.INVALORDO_ID_TOKEN,
 			),
 		)
 		.map(token => token.split("."))
@@ -21,15 +21,15 @@ export const decode0: WJWTDecodeFn = token =>
 			Oath.fromBoolean(
 				() => parts.length === 3 && parts.every(part => isString(part)),
 				() => parts as [string, string, string],
-				() => Rrr.INVALID_TOKEN,
+				() => Rrr.INVALORDO_ID_TOKEN,
 			),
 		)
 
 		.map(parts => parts.map(part => Buffer.from(part, "base64url").toString("utf-8")))
 		.chain(([header, payload, signature]) =>
 			Oath.all({
-				header: Oath.try(() => JSON.parse(header)).rejectedMap(() => Rrr.INVALID_TOKEN),
-				payload: Oath.try(() => JSON.parse(payload)).rejectedMap(() => Rrr.INVALID_TOKEN),
+				header: Oath.try(() => JSON.parse(header)).rejectedMap(() => Rrr.INVALORDO_ID_TOKEN),
+				payload: Oath.try(() => JSON.parse(payload)).rejectedMap(() => Rrr.INVALORDO_ID_TOKEN),
 				signature: new Uint8Array(Buffer.from(signature)),
 			}),
 		)

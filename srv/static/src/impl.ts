@@ -12,12 +12,12 @@ import { logBunRequest } from "@ordo-pink/backend-utils"
 import { BunFile, resolve } from "bun"
 import { extend } from "@ordo-pink/tau"
 
-const { STATIC_ROOT, STATIC_PORT } = getc(["STATIC_ROOT", "STATIC_PORT"])
+const { ORDO_STATIC_ROOT, ORDO_STATIC_PORT } = getc(["ORDO_STATIC_ROOT", "ORDO_STATIC_PORT"])
 const logger = ConsoleLogger
 const serverName = "st"
 const log = logBunRequest({ logger, serverName })
 
-ConsoleLogger.info(`STATIC server running on http://localhost:${STATIC_PORT}`)
+ConsoleLogger.info(`STATIC server running on http://localhost:${ORDO_STATIC_PORT}`)
 
 const setHeader = (key: string, value: string) => (ctx: Context) => {
 	ctx.res.headers[key] = value
@@ -25,7 +25,7 @@ const setHeader = (key: string, value: string) => (ctx: Context) => {
 }
 
 Bun.serve({
-	port: Number(STATIC_PORT),
+	port: Number(ORDO_STATIC_PORT),
 	fetch: Router.create()
 		.get(/\/.*/, ctx =>
 			Oath.of(ctx)
@@ -33,7 +33,7 @@ Bun.serve({
 					Oath.of(performance.now()).chain(time =>
 						Oath.of(new URL(ctx.req.url))
 							.map(prop("pathname"))
-							.map(pathname => join(STATIC_ROOT, pathname))
+							.map(pathname => join(ORDO_STATIC_ROOT, pathname))
 							.chain(path =>
 								fileExists0(path).chain(Oath.ifElse(Boolean, { onTrue: () => Bun.file(path) })),
 							)

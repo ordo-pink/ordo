@@ -11,26 +11,7 @@ import { ConsoleLogger } from "@ordo-pink/logger"
 import { keysOf } from "@ordo-pink/tau"
 import { getc } from "@ordo-pink/getc"
 
-const env = getc([
-	"DT_PORT",
-	"WORKSPACE_HOST",
-	"WEB_HOST",
-	"ID_HOST",
-	"DT_DATA_S3_ACCESS_KEY",
-	"DT_DATA_S3_SECRET_KEY",
-	"DT_DATA_S3_REGION",
-	"DT_DATA_S3_BUCKET_NAME",
-	"DT_DATA_S3_ENDPOINT",
-	"DT_CONTENT_S3_ACCESS_KEY",
-	"DT_CONTENT_S3_SECRET_KEY",
-	"DT_CONTENT_S3_REGION",
-	"DT_CONTENT_S3_BUCKET_NAME",
-	"DT_CONTENT_S3_ENDPOINT",
-	"DT_DATA_PERSISTENCE_STRATEGY",
-	"DT_CONTENT_PERSISTENCE_STRATEGY",
-	"DT_DATA_PATH",
-	"DT_CONTENT_PATH",
-])
+const env = getc()
 
 const defineEnv = (env: Record<string, string>) =>
 	keysOf(env).reduce((acc, key) => acc.concat(`--define Bun.env.${key}='${env[key]}' `), "")

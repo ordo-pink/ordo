@@ -15,7 +15,7 @@ export const sign0: WJWTSignFn =
 			header: JSON.stringify({ alg: getAlgorithmString(alg), typ: "JWT" }),
 			payload: JSON.stringify(payload),
 		}))
-			.rejectedMap(() => Rrr.INVALID_PAYLOAD)
+			.rejectedMap(() => Rrr.INVALORDO_ID_PAYLOAD)
 			.chain(({ header, payload }) =>
 				Oath.all({
 					header: Buffer.from(encoder.encode(header)).toString("base64url"),

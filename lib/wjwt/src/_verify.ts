@@ -14,12 +14,12 @@ export const verify0: WJWTVerifyFn =
 		aud, // TODO: Check aud
 	) =>
 		Oath.fromNullable(token)
-			.rejectedMap(() => Rrr.INVALID_TOKEN)
+			.rejectedMap(() => Rrr.INVALORDO_ID_TOKEN)
 			.chain(token =>
 				Oath.fromBoolean(
 					() => isString(token),
 					() => token,
-					() => Rrr.INVALID_TOKEN,
+					() => Rrr.INVALORDO_ID_TOKEN,
 				),
 			)
 			.map(token => token.split("."))
@@ -27,7 +27,7 @@ export const verify0: WJWTVerifyFn =
 				Oath.fromBoolean(
 					() => parts.length === 3 && parts.every(part => isString(part)),
 					() => parts as [string, string, string],
-					() => Rrr.INVALID_TOKEN,
+					() => Rrr.INVALORDO_ID_TOKEN,
 				),
 			)
 			.map(([header, payload, signature]) => [`${header}.${payload}`, signature])

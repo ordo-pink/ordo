@@ -9,7 +9,7 @@ import { Oath } from "@ordo-pink/oath"
 import { Switch } from "@ordo-pink/switch"
 import Head from "next/head"
 
-const websiteHost = process.env.NEXT_PUBLIC_ID_HOST!
+const websiteHost = process.env.NEXT_PUBLIC_ORDO_ID_HOST!
 
 export default function ConfirmEmailPage() {
 	const { query } = useRouter()

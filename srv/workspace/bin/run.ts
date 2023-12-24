@@ -4,12 +4,12 @@
 import { runCommand0 } from "@ordo-pink/binutil"
 import { getc } from "@ordo-pink/getc"
 
-const { STATIC_HOST, WORKSPACE_PORT, ID_HOST, WEB_HOST, DT_HOST } = getc([
-	"WORKSPACE_PORT",
-	"STATIC_HOST",
-	"ID_HOST",
-	"WEB_HOST",
-	"DT_HOST",
+const { ORDO_STATIC_HOST, ORDO_WORKSPACE_PORT, ORDO_ID_HOST, ORDO_WEB_HOST, ORDO_DT_HOST } = getc([
+	"ORDO_WORKSPACE_PORT",
+	"ORDO_STATIC_HOST",
+	"ORDO_ID_HOST",
+	"ORDO_WEB_HOST",
+	"ORDO_DT_HOST",
 ])
 
 runCommand0("npm run dev", {
@@ -18,11 +18,11 @@ runCommand0("npm run dev", {
 	stdout: "inherit",
 	env: {
 		...process.env,
-		PORT: WORKSPACE_PORT,
-		REACT_APP_STATIC_HOST: STATIC_HOST,
-		REACT_APP_ID_HOST: ID_HOST,
-		REACT_APP_WEBSITE_HOST: WEB_HOST,
-		REACT_APP_DT_HOST: DT_HOST,
+		PORT: ORDO_WORKSPACE_PORT,
+		REACT_APP_ORDO_STATIC_HOST: ORDO_STATIC_HOST,
+		REACT_APP_ORDO_ID_HOST: ORDO_ID_HOST,
+		REACT_APP_ORDO_WEBSITE_HOST: ORDO_WEB_HOST,
+		REACT_APP_ORDO_DT_HOST: ORDO_DT_HOST,
 		FORCE_COLOR: "1",
 	},
 }).orElse(console.error)

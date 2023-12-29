@@ -1,11 +1,11 @@
 // SPDX-FileCopyrightText: Copyright 2023, 谢尔盖||↓ and the Ordo.pink contributors
 // SPDX-License-Identifier: MIT
 
-import { BsGithub, BsTelegram, BsTwitter, BsX } from "react-icons/bs"
+import { OrdoRoutes } from "@ordo-pink/ordo-routes"
+import { BsGithub, BsTelegram } from "react-icons/bs"
 import { RiTwitterXLine } from "react-icons/ri"
 
-type P = { webHost: string }
-export default function Footer({ webHost }: P) {
+export default function Footer() {
 	const currentYear = new Date(Date.now()).getFullYear()
 
 	return (
@@ -16,20 +16,20 @@ export default function Footer({ webHost }: P) {
 				</span>
 				<ul className="flex items-center gap-6 mt-3 text-2xl text-neutral-200 dark:text-neutral-200 sm:mt-0">
 					<li>
-						<a href="https://github.com/ordo-pink" target="_blank" rel="noreferrer noopener">
+						<a href={sourceCodeURL} target="_blank" rel="noreferrer noopener">
 							<BsGithub className="text-2xl text-neutral-200 hover:text-pink-500 transition-colors duration-300" />
 						</a>
 					</li>
 
 					<li>
-						<a href="https://t.me/ordo_pink_ru" target="_blank" rel="noreferrer noopener">
+						<a href={telegramSupportURL} target="_blank" rel="noreferrer noopener">
 							<BsTelegram className="text-2xl text-neutral-200 hover:text-pink-500 transition-colors duration-300" />
 						</a>
 					</li>
 
 					<li>
 						<a
-							href="https://x.com/ordo_pink"
+							href={twitterURL}
 							target="_blank"
 							rel="noreferrer noopener"
 							className="text-2xl text-neutral-200 hover:text-pink-500 transition-colors duration-300"
@@ -41,7 +41,7 @@ export default function Footer({ webHost }: P) {
 				<ul className="flex flex-wrap mt-3 text-sm text-neutral-200 sm:mt-0">
 					<li>
 						<a
-							href={`${webHost}/privacy-policy`}
+							href={privacyPolicyURL}
 							rel="noreferrer noopener"
 							className="mr-4 hover:underline md:mr-6 text-neutral-300"
 						>
@@ -50,7 +50,7 @@ export default function Footer({ webHost }: P) {
 					</li>
 					<li>
 						<a
-							href="https://github.com/ordo-pink/ordo/blob/main/root/legal/license.md"
+							href={licenseURL}
 							rel="noreferrer noopener"
 							className="mr-4 hover:underline md:mr-6 text-neutral-300"
 						>
@@ -71,3 +71,11 @@ export default function Footer({ webHost }: P) {
 		</footer>
 	)
 }
+
+// --- Internal ---
+
+const privacyPolicyURL = OrdoRoutes.Website.PrivacyPolicy.prepareRequest({ host: "" }).url
+const telegramSupportURL = OrdoRoutes.External.TelegramSupportCIS.prepareRequest({ host: "" }).url
+const twitterURL = OrdoRoutes.External.TwitterX.prepareRequest({ host: "" }).url
+const sourceCodeURL = OrdoRoutes.External.SourceCode.prepareRequest({ host: "" }).url
+const licenseURL = OrdoRoutes.External.License.prepareRequest({ host: "" }).url

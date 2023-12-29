@@ -1,7 +1,9 @@
 // SPDX-FileCopyrightText: Copyright 2023, 谢尔盖||↓ and the Ordo.pink contributors
 // SPDX-License-Identifier: MIT
 
+import { OrdoRoutes } from "@ordo-pink/ordo-routes"
 import { Centered } from "components/centered"
+import Link from "next/link"
 
 export default function PrivacyPolicyPage() {
 	return (
@@ -41,7 +43,7 @@ export default function PrivacyPolicyPage() {
 							<div className="my-2">
 								1.2. Настоящая политика Оператора в отношении обработки персональных данных (далее —
 								Политика) применяется ко всей информации, которую Оператор может получить о
-								посетителях веб-сайта <a href="https://ordo.pink">https://ordo.pink</a>.
+								посетителях веб-сайта <Link href="/">https://ordo.pink</Link>.
 							</div>
 						</div>
 					</div>
@@ -62,7 +64,7 @@ export default function PrivacyPolicyPage() {
 							<div className="my-2">
 								2.3. Веб-сайт — совокупность графических и информационных материалов, а также
 								программ для ЭВМ и баз данных, обеспечивающих их доступность в сети интернет по
-								сетевому адресу <a href="https://ordo.pink">https://ordo.pink</a>.
+								сетевому адресу <Link href="/">https://ordo.pink</Link>.
 							</div>
 							<div className="my-2">
 								2.4. Информационная система персональных данных — совокупность содержащихся в базах
@@ -92,7 +94,7 @@ export default function PrivacyPolicyPage() {
 							<div className="my-2">
 								2.8. Персональные данные — любая информация, относящаяся прямо или косвенно к
 								определенному или определяемому Пользователю веб-сайта{" "}
-								<a href="https://ordo.pink">https://ordo.pink</a>.
+								<Link href="/">https://ordo.pink</Link>.
 							</div>
 							<div className="my-2">
 								2.9. Персональные данные, разрешенные субъектом персональных данных для
@@ -104,7 +106,7 @@ export default function PrivacyPolicyPage() {
 							</div>
 							<div className="my-2">
 								2.10. Пользователь — любой посетитель веб-сайта{" "}
-								<a href="https://ordo.pink">https://ordo.pink</a>.
+								<Link href="/">https://ordo.pink</Link>.
 							</div>
 							<div className="my-2">
 								2.11. Предоставление персональных данных — действия, направленные на раскрытие
@@ -545,8 +547,7 @@ export default function PrivacyPolicyPage() {
 							</div>
 							<div className="my-2">
 								12.3. Актуальная версия Политики в свободном доступе расположена в сети Интернет по
-								адресу{" "}
-								<a href="https://ordo.pink/privacy-policy">https://ordo.pink/privacy-policy</a>.
+								адресу <a href={privacyPolicyURL}>https://ordo.pink/privacy-policy</a>.
 							</div>
 						</div>
 					</div>
@@ -555,3 +556,7 @@ export default function PrivacyPolicyPage() {
 		</Centered>
 	)
 }
+
+// --- Internal ---
+
+const privacyPolicyURL = OrdoRoutes.Website.PrivacyPolicy.prepareRequest({ host: "" }).url

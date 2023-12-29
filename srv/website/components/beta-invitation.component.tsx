@@ -1,16 +1,17 @@
 // SPDX-FileCopyrightText: Copyright 2023, 谢尔盖||↓ and the Ordo.pink contributors
 // SPDX-License-Identifier: MIT
 
+import { OrdoRoutes } from "@ordo-pink/ordo-routes"
 import { Button } from "./button"
 
-type P = { wide?: boolean; webHost: string }
-export default function BetaInvitation({ wide, webHost }: P) {
+type P = { wide?: boolean }
+export default function BetaInvitation({ wide }: P) {
 	return (
-		<div className="w-full space-y-8 px-8 py-4 bg-gradient-to-br max-w-2xl from-sky-200/80 dark:from-sky-950 via-indigo-200/80 dark:via-indigo-950 to-indigo-200/80 dark:to-indigo-950 rounded-lg shadow-lg">
+		<div className="w-full space-y-8 px-8 py-4 md:py-12 bg-gradient-to-br max-w-2xl from-sky-200/80 dark:from-sky-950 via-indigo-200/80 dark:via-indigo-950 to-indigo-200/80 dark:to-indigo-950 rounded-lg shadow-lg">
 			<div
 				className={
 					wide
-						? "flex flex-col space-y-8 w-full justify-between md:flex-row md:space-y-0"
+						? "flex flex-col space-y-8 w-full justify-between md:flex-row"
 						: "flex flex-col space-y-8"
 				}
 			>
@@ -39,7 +40,7 @@ export default function BetaInvitation({ wide, webHost }: P) {
 							onClick={async e => {
 								e.preventDefault()
 
-								window.location.href = "/sign-up"
+								window.location.href = signUpURL
 							}}
 						>
 							Присоединиться
@@ -50,7 +51,7 @@ export default function BetaInvitation({ wide, webHost }: P) {
 							onClick={async e => {
 								e.preventDefault()
 
-								window.location.href = "/sign-in"
+								window.location.href = signInURL
 							}}
 						>
 							Войти
@@ -58,10 +59,11 @@ export default function BetaInvitation({ wide, webHost }: P) {
 					</div>
 				</div>
 			</div>
-			<p className="text-xs text-center">
-				Нажимая на кнопку <b>&quot;Присоединиться&quot;</b>, вы соглашаетесь с нашей{" "}
-				<a href={`${webHost}/privacy-policy`}>политикой конфиденциальности</a>.
-			</p>
 		</div>
 	)
 }
+
+// --- Internal ---
+
+const signInURL = OrdoRoutes.Website.SignIn.prepareRequest({ host: "" }).url
+const signUpURL = OrdoRoutes.Website.SignUp.prepareRequest({ host: "" }).url

@@ -7,7 +7,7 @@ import { useEffect, useState } from "react"
 import { Button } from "./button"
 import { Callout } from "./callout"
 import { EmailInput, PasswordInput } from "./input"
-import Link from "next/link"
+import { OrdoRoutes } from "@ordo-pink/ordo-routes"
 
 type Props = { workspaceHost: string; idHost: string }
 
@@ -75,9 +75,9 @@ export default function SignInForm({ workspaceHost, idHost }: Props) {
 			</div>
 
 			<div className="flex space-x-2">
-				<Link href="/sign-up">Ещё не регистрировались?</Link>
+				<a href={signUpURL}>Ещё не регистрировались?</a>
 				<div>|</div>
-				<Link href="/forgot-password">Забыли пароль?</Link>
+				<a href={forgotPasswordURL}>Забыли пароль?</a>
 			</div>
 
 			<div
@@ -88,3 +88,8 @@ export default function SignInForm({ workspaceHost, idHost }: Props) {
 		</form>
 	)
 }
+
+// --- Internal ---
+
+const forgotPasswordURL = OrdoRoutes.Website.ForgotPassword.prepareRequest({ host: "" }).url
+const signUpURL = OrdoRoutes.Website.SignUp.prepareRequest({ host: "" }).url

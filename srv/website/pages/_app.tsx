@@ -8,7 +8,7 @@ import "./index.css"
 import "../components/index-hero.css"
 import { AppProps } from "next/app"
 
-const jost = Jost({ preload: true, subsets: ["latin"], fallback: ["system-ui"] })
+const jost = Jost({ preload: true, subsets: ["latin-ext"], fallback: ["system-ui"] })
 
 export const metadata: Metadata = {
 	title: "Единое пространство для документов, файлов и проектов | Ordo",

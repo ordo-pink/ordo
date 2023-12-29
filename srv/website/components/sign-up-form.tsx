@@ -5,7 +5,7 @@ import { useEffect, useState } from "react"
 import { Button } from "./button"
 import { Callout } from "./callout"
 import { EmailInput, PasswordInput } from "./input"
-import Link from "next/link"
+import { OrdoRoutes } from "@ordo-pink/ordo-routes"
 
 type _P = { idHost: string; workspaceHost: string }
 
@@ -78,9 +78,9 @@ export default function SignUpForm({ idHost, workspaceHost }: _P) {
 					</span>
 					<span className="block">
 						Нажимая на кнопку <b>&quot;Присоединиться&quot;</b>, вы соглашаетесь с нашей{" "}
-						<Link href="/privacy-policy" target="_blank">
+						<a href={privacyPolicyURL} target="_blank">
 							политикой конфиденциальности
-						</Link>
+						</a>
 						.
 					</span>
 				</label>
@@ -112,7 +112,7 @@ export default function SignUpForm({ idHost, workspaceHost }: _P) {
 			</div>
 
 			<div className="flex space-x-2">
-				<Link href="/sign-in">Уже зарегистрированы?</Link>
+				<a href={signInURL}>Уже зарегистрированы?</a>
 			</div>
 
 			<div
@@ -123,3 +123,8 @@ export default function SignUpForm({ idHost, workspaceHost }: _P) {
 		</form>
 	)
 }
+
+// --- Internal ---
+
+const signInURL = OrdoRoutes.Website.SignIn.prepareRequest({ host: "" }).url
+const privacyPolicyURL = OrdoRoutes.Website.PrivacyPolicy.prepareRequest({ host: "" }).url

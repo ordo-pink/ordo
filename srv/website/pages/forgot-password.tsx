@@ -4,6 +4,7 @@
 import Head from "next/head"
 import { Centered } from "../components/centered"
 import { PageHeader } from "../components/page-header"
+import { OrdoRoutes } from "@ordo-pink/ordo-routes"
 
 export default function ForgotPasswordPage() {
 	return (
@@ -15,7 +16,7 @@ export default function ForgotPasswordPage() {
 			<PageHeader text="Это пока не работает" />
 			<p>
 				Но потом заработает, конечно. А пока, можно написать{" "}
-				<a rel="noreferrer noopener" href="https://t.me/ordo_pink">
+				<a rel="noreferrer noopener" href={telegramSupportURL}>
 					нам в поддержку в Telegram
 				</a>
 				, поможем в ручном порядке.
@@ -23,3 +24,7 @@ export default function ForgotPasswordPage() {
 		</Centered>
 	)
 }
+
+// --- Internal ---
+
+const telegramSupportURL = OrdoRoutes.External.TelegramSupportCIS.prepareRequest({ host: "" }).url

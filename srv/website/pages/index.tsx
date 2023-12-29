@@ -50,7 +50,7 @@ export default function Home() {
 				<meta property="twitter:image" content={`${staticHost}/og.png`} />
 			</Head>
 
-			<IndexHeroSection webHost={webHost} staticHost={staticHost} />
+			<IndexHeroSection staticHost={staticHost} />
 
 			<section
 				id="core-principles"
@@ -164,12 +164,12 @@ export default function Home() {
 						<div className="w-full pt-32 backdrop-saturate-50 px-8 pt-32f">
 							<div className="w-full flex backdrop-saturate-50">
 								<div className="w-full flex justify-center">
-									<BetaInvitation webHost={webHost} wide />
+									<BetaInvitation wide />
 								</div>
 							</div>
 
 							<div className="mt-24 pb-4">
-								<Footer webHost={webHost} />
+								<Footer />
 							</div>
 						</div>
 					</div>

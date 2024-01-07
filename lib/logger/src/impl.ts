@@ -7,14 +7,14 @@ import type * as T from "./types"
  * An average console enjoyer.
  */
 export const ConsoleLogger: T.Logger = {
-	alert: (...args) => console.error(`🚨 [${new Date(Date.now()).toISOString()}] [ALRT]:`, ...args),
-	crit: (...args) => console.error(`🚑️ [${new Date(Date.now()).toISOString()}] [CRIT]:`, ...args),
-	debug: (...args) => console.debug(`🔨 [${new Date(Date.now()).toISOString()}] [DEBG]:`, ...args),
-	error: (...args) => console.error(`💥 [${new Date(Date.now()).toISOString()}] [ERRR]:`, ...args),
-	notice: (...args) => console.info(`📝 [${new Date(Date.now()).toISOString()}] [NOTE]:`, ...args),
-	info: (...args) => console.info(`✅ [${new Date(Date.now()).toISOString()}] [INFO]:`, ...args),
-	panic: (...args) => console.error(`🔥 [${new Date(Date.now()).toISOString()}] [PANC]:`, ...args),
-	warn: (...args) => console.warn(`⚠️ [${new Date(Date.now()).toISOString()}] [WARN]:`, ...args),
+	alert: (...args) => console.error(`🚨 [ALRT]:`, ...args),
+	crit: (...args) => console.error(`🚑️ [CRIT]:`, ...args),
+	debug: (...args) => console.debug(`🔨 [DEBG]:`, ...args),
+	error: (...args) => console.error(`💥 [ERRR]:`, ...args),
+	notice: (...args) => console.info(`📝 [NOTE]:`, ...args),
+	info: (...args) => console.info(`✅ [INFO]:`, ...args),
+	panic: (...args) => console.error(`🔥 [PANC]:`, ...args),
+	warn: (...args) => console.warn(`⚠️ [WARN]:`, ...args),
 }
 
 /**✓

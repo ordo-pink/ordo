@@ -52,7 +52,6 @@ const main = async () => {
 	readFile0("./.env", "utf-8")
 		.map(str => (str as string).trim().split("\n"))
 		.map(lines => lines.map(line => line.trim().split("=")))
-		.tap(console.log)
 		.map(lines =>
 			lines.reduce((acc, line) => ({ ...acc, [line[0]]: line[1] }), {} as Record<string, string>),
 		)

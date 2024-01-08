@@ -38,8 +38,6 @@ const userPersistenceStrategyDynamoDBParams = {
 }
 
 const main = async () => {
-	console.log("HERE")
-
 	const accessTokenPrivateKey = await getKey(Bun.env.ORDO_ID_ACCESS_TOKEN_PRIVATE_KEY!, "private")
 	const accessTokenPublicKey = await getKey(Bun.env.ORDO_ID_ACCESS_TOKEN_PUBLIC_KEY!, "public")
 	const refreshTokenPrivateKey = await getKey(Bun.env.ORDO_ID_REFRESH_TOKEN_PRIVATE_KEY!, "private")
@@ -82,7 +80,6 @@ const main = async () => {
 
 const getKey = (key: string, type: "public" | "private") =>
 	Oath.fromNullable(key)
-		.tap(console.log)
 		.map(key => Buffer.from(key, "base64"))
 		.map(buffer => new Uint8Array(buffer))
 		.chain(key =>

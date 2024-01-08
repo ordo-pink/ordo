@@ -8,7 +8,6 @@ import { __Auth$, __initAuth } from "$streams/auth"
 import { __ContextMenu$, __initContextMenu } from "$streams/context-menu"
 import { __Activities$, __CurrentActivity$, __initActivities } from "$streams/activities"
 import { __CommandPalette$, __initCommandPalette } from "$streams/command-palette"
-import { __Modal$, __initModal } from "$streams/modal"
 import { __initCommands, getCommands } from "$streams/commands"
 import { __initSidebar, __Sidebar$ } from "$streams/sidebar"
 import { __CurrentRoute$, __initRouter } from "$streams/router"
@@ -28,7 +27,6 @@ const ctx = { logger: ConsoleLogger }
 
 export type UseAppInitReturns = {
 	auth$: Nullable<__Auth$>
-	modal$: Nullable<__Modal$>
 	sidebar$: Nullable<__Sidebar$>
 	contextMenu$: Nullable<__ContextMenu$>
 	notification$: Nullable<__Notification$>
@@ -47,7 +45,6 @@ export const useAppInit = (): UseAppInitReturns => {
 	const [currentCommandPalette$, setCurrentCommandPalette$] =
 		useState<Nullable<__CommandPalette$>>(null)
 	const [contextMenu$, setContextMenu$] = useState<Nullable<__ContextMenu$>>(null)
-	const [modal$, setModal$] = useState<Nullable<__Modal$>>(null)
 	const [sidebar$, setSidebar$] = useState<Nullable<__Sidebar$>>(null)
 	const [notification$, setNotification$] = useState<Nullable<__Notification$>>(null)
 	const [auth$, setAuth$] = useState<Nullable<__Auth$>>(null)
@@ -97,9 +94,6 @@ export const useAppInit = (): UseAppInitReturns => {
 
 		const notification$ = __initNotification(ctx)
 		setNotification$(notification$)
-
-		const modal$ = __initModal(ctx)
-		setModal$(modal$)
 
 		const contextMenu$ = __initContextMenu(ctx)
 		setContextMenu$(contextMenu$)
@@ -160,7 +154,6 @@ export const useAppInit = (): UseAppInitReturns => {
 
 	return {
 		auth$,
-		modal$,
 		sidebar$,
 		data$: data$,
 		activities$,

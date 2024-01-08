@@ -346,6 +346,11 @@ export namespace Modal {
 		 */
 		onHide?: Thunk<void>
 	}
+
+	export type HandleShowPayload = {
+		options: ShowOptions
+		Component: ComponentType
+	}
 }
 
 export namespace CtxMenu {

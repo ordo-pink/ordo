@@ -17,7 +17,7 @@ import Notifications from "$components/notifications/notifications.component"
 import ActivityBar from "$components/activity-bar/activity-bar"
 import ContextMenu from "$components/context-menu/context-menu"
 import Workspace from "$components/workspace"
-import Modal from "$components/modal"
+import Modal from "$components/modal.component"
 import Null from "$components/null"
 import { AllKeysRequired, Nullable } from "@ordo-pink/tau"
 import { PlainData } from "@ordo-pink/data"
@@ -80,7 +80,6 @@ export default function App() {
 	return Either.fromNullable(streams)
 		.chain(() => Either.fromNullable(streams.contextMenu$))
 		.chain(() => Either.fromNullable(streams.data$))
-		.chain(() => Either.fromNullable(streams.modal$))
 		.chain(() => Either.fromNullable(streams.globalCommandPalette$))
 		.chain(() => Either.fromNullable(streams.sidebar$))
 		.chain(() => Either.fromNullable(streams.notification$))
@@ -93,7 +92,6 @@ export default function App() {
 			Null,
 			({
 				contextMenu$,
-				modal$,
 				globalCommandPalette$,
 				sidebar$,
 				notification$,
@@ -126,7 +124,7 @@ export default function App() {
 							currentActivity$={currentActivity$}
 						/>
 						<ContextMenu menu$={contextMenu$} />
-						<Modal modal$={modal$} />
+						<Modal />
 						<Notifications notification$={notification$} />
 						<BackgroundTaskIndicator />
 					</div>

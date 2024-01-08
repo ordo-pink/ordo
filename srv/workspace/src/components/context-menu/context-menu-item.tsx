@@ -6,7 +6,7 @@ import { useAccelerator } from "$hooks/use-accelerator.hook"
 import { getCommands } from "$streams/commands"
 import RenderFromNullable from "$components/render-from-nullable"
 import ActionListItem from "$components/action-list-item"
-import Accelerator from "$components/accelerator"
+import { Accelerator } from "@ordo-pink/frontend-core"
 import { MouseEvent } from "react"
 import { CtxMenu } from "@ordo-pink/frontend-core"
 

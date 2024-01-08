@@ -4,3 +4,4 @@
 export * from "./src/types"
 export * from "./src/constants/component-space.constants"
 export * from "./src/hooks/shared-context.hook"
+export * from "./src/components/accelerator.component"

@@ -6,10 +6,12 @@ import { BsBackspace } from "react-icons/bs"
 import { Switch } from "@ordo-pink/switch"
 import { PropsWithChildren } from "react"
 
-// --- Public ---
-
-type _P = { accelerator: string; inline?: boolean }
-export default function Accelerator({ accelerator, inline }: _P) {
+/**
+ * Accelerator is a component that renders a hotkey definition with minor visual improvements like
+ * using Mac vs other OS symbols, `⇧` for shift, etc.
+ */
+type P = { accelerator: string; inline?: boolean }
+export const Accelerator = ({ accelerator, inline }: P) => {
 	const hotkeys = accelerator.split("||")
 
 	return Switch.of(inline)
@@ -37,7 +39,7 @@ const InlineWrapper = ({ children }: PropsWithChildren) => (
 	<span className="inline-flex space-x-2">{children}</span>
 )
 
-const Hotkey = ({ accelerator }: _P) => {
+const Hotkey = ({ accelerator }: P) => {
 	const split = accelerator.split("+")
 	const meta = isDarwin ? "⌥" : "Alt"
 	const mod = isDarwin ? "⌘" : "Ctrl"
@@ -60,18 +62,36 @@ const Hotkey = ({ accelerator }: _P) => {
 
 // --- Internal ---
 
-type KeyProps = { symbol: string }
-
+// Define helper functions
 const isDarwin = navigator.appVersion.indexOf("Mac") !== -1
 
-const Key = ({ symbol }: KeyProps) =>
+/**
+ * Key renderer.
+ */
+type KeyP = { symbol: string }
+const Key = ({ symbol }: KeyP) =>
 	Switch.of(symbol)
 		.case("backspace", () => <BackspaceKey />)
 		.case("enter", () => <EnterKey />)
 		.case("escape", () => <EscKey />)
 		.default(() => <LetterKey symbol={symbol} />)
 
+/**
+ * Escape key renderer.
+ */
 const EscKey = () => <span>Esc</span>
+
+/**
+ * Backspace key renderer.
+ */
 const BackspaceKey = () => <BsBackspace />
+
+/**
+ * Enter key renderer.
+ */
 const EnterKey = () => <AiOutlineEnter />
-const LetterKey = ({ symbol }: KeyProps) => <span>{symbol.toLocaleUpperCase()}</span>
+
+/**
+ * Any other key renderer.
+ */
+const LetterKey = ({ symbol }: KeyP) => <span>{symbol.toLocaleUpperCase()}</span>

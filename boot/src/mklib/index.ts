@@ -8,7 +8,7 @@ import { mklib } from "./src/impl"
 const program = new Command()
 
 program
-	.name("mkbin")
+	.name("mklib")
 	.version("0.2.0")
 	.description(
 		`The "mklib" command creates a new directory inside "lib" with the conventional file ` +

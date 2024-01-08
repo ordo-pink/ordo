@@ -7,7 +7,7 @@ import { run } from "./src/impl"
 const program = new Command()
 
 program
-	.name("test")
+	.name("run")
 	.version("0.2.0")
 	.description("Run all server applications at once by executing their bin/run.ts scripts.")
 	.action(run)

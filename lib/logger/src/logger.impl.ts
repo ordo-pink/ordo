@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: Copyright 2023, 谢尔盖||↓ and the Ordo.pink contributors
 // SPDX-License-Identifier: MIT
 
-import type * as T from "./types"
+import type * as T from "./logger.types"
 
 /**
  * An average console enjoyer.

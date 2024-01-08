@@ -10,8 +10,8 @@ LABEL pink.ordo.description="Docker image for Ordo DT service"
 LABEL pink.ordo.env=${ORDO_DT_DOCKER_ENV}
 LABEL pink.ordo.region=${ORDO_DT_DOCKER_REGION}
 
-EXPOSE ${ORDO_DT_PORT:-3002}
+EXPOSE ${ORDO_DT_DOCKER_PORT:-3002}
 
 COPY ./var/out/dt /dt
 
-CMD /dt
+ENTRYPOINT ["/dt"]

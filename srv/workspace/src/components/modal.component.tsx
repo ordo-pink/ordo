@@ -74,6 +74,7 @@ const stopPropagation = (event: MouseEvent) => event.stopPropagation()
 // Define Observable to maintain modal state
 const modal$ = new BehaviorSubject<ModalState | null>(null)
 
+// Define command handlers
 const showModal: Commands.Handler<TModal.HandleShowPayload> = ({ payload }) => {
 	const showCloseButton = payload.options?.showCloseButton ?? true
 	const onHide = payload.options?.onHide ?? (() => void 0)

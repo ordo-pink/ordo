@@ -13,11 +13,10 @@ import { __initSidebar, __Sidebar$ } from "$streams/sidebar"
 import { __CurrentRoute$, __initRouter } from "$streams/router"
 import CommandPaletteModal from "$components/command-palette"
 import { useSubscription } from "./use-subscription"
-import { __Notification$, __initNotification } from "$streams/notification"
 import { __Metadata$, __initData } from "$streams/data"
 import { __FileAssociations$, __initFileAssociations } from "$streams/file-associations"
 import { Either } from "@ordo-pink/either"
-import { useAccelerator } from "./use-accelerator.hook"
+import { useHotkeys } from "react-hotkeys-hook"
 
 const commands = getCommands()
 
@@ -29,7 +28,6 @@ export type UseAppInitReturns = {
 	auth$: Nullable<__Auth$>
 	sidebar$: Nullable<__Sidebar$>
 	contextMenu$: Nullable<__ContextMenu$>
-	notification$: Nullable<__Notification$>
 	globalCommandPalette$: Nullable<__CommandPalette$>
 	currentCommandPalette$: Nullable<__CommandPalette$>
 	activities$: Nullable<__Activities$>
@@ -46,7 +44,6 @@ export const useAppInit = (): UseAppInitReturns => {
 		useState<Nullable<__CommandPalette$>>(null)
 	const [contextMenu$, setContextMenu$] = useState<Nullable<__ContextMenu$>>(null)
 	const [sidebar$, setSidebar$] = useState<Nullable<__Sidebar$>>(null)
-	const [notification$, setNotification$] = useState<Nullable<__Notification$>>(null)
 	const [auth$, setAuth$] = useState<Nullable<__Auth$>>(null)
 	const [activities$, setActivities$] = useState<Nullable<__Activities$>>(null)
 	const [currentActivity$, setCurrentActivity$] = useState<Nullable<__CurrentActivity$>>(null)
@@ -57,7 +54,7 @@ export const useAppInit = (): UseAppInitReturns => {
 	const commandPalette = useSubscription(currentCommandPalette$)
 	const globalCommandPalette = useSubscription(globalCommandPalette$)
 
-	useAccelerator(
+	useHotkeys(
 		"*",
 		e => {
 			if (IGNORED_KEYS.includes(e.key)) return
@@ -91,9 +88,6 @@ export const useAppInit = (): UseAppInitReturns => {
 		__initCommands(ctx)
 		const auth$ = __initAuth(ctx)
 		setAuth$(auth$)
-
-		const notification$ = __initNotification(ctx)
-		setNotification$(notification$)
 
 		const contextMenu$ = __initContextMenu(ctx)
 		setContextMenu$(contextMenu$)
@@ -158,7 +152,6 @@ export const useAppInit = (): UseAppInitReturns => {
 		data$,
 		activities$,
 		contextMenu$,
-		notification$,
 		currentRoute$,
 		currentActivity$,
 		fileAssociations$,

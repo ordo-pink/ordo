@@ -48,6 +48,7 @@ const LOADING: BackgroundTask.Status.LOADING = 2
 // Define Observable to maintain indicator state
 const saving$ = new BehaviorSubject<BackgroundTask.Status>(NONE)
 
+// Define command handlers
 const setStatus: Commands.Handler<BackgroundTask.Status> = ({ payload }) => saving$.next(payload)
 const resetStatus = () => saving$.next(NONE)
 

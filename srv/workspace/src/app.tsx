@@ -13,7 +13,7 @@ import {
 	User,
 	__useSharedContextInit,
 } from "@ordo-pink/frontend-core"
-import Notifications from "$components/notifications/notifications.component"
+import Notifications from "$components/notifications.component"
 import ActivityBar from "$components/activity-bar/activity-bar"
 import ContextMenu from "$components/context-menu/context-menu"
 import Workspace from "$components/workspace"
@@ -82,7 +82,6 @@ export default function App() {
 		.chain(() => Either.fromNullable(streams.data$))
 		.chain(() => Either.fromNullable(streams.globalCommandPalette$))
 		.chain(() => Either.fromNullable(streams.sidebar$))
-		.chain(() => Either.fromNullable(streams.notification$))
 		.chain(() => Either.fromNullable(streams.activities$))
 		.chain(() => Either.fromNullable(streams.currentActivity$))
 		.chain(() => Either.fromNullable(streams.currentRoute$))
@@ -90,14 +89,7 @@ export default function App() {
 		.map(() => streams as AllKeysRequired<typeof streams>)
 		.fold(
 			Null,
-			({
-				contextMenu$,
-				globalCommandPalette$,
-				sidebar$,
-				notification$,
-				activities$,
-				currentActivity$,
-			}) => (
+			({ contextMenu$, globalCommandPalette$, sidebar$, activities$, currentActivity$ }) => (
 				<SharedContext.Provider
 					value={{
 						data: data,
@@ -125,7 +117,7 @@ export default function App() {
 						/>
 						<ContextMenu menu$={contextMenu$} />
 						<Modal />
-						<Notifications notification$={notification$} />
+						<Notifications />
 						<BackgroundTaskIndicator />
 					</div>
 				</SharedContext.Provider>

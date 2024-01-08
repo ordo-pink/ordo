@@ -28,6 +28,24 @@ declare global {
 		}
 	}
 
+	module Notification {
+		type Type = "success" | "rrr" | "info" | "warn" | "question" | "default"
+
+		type Item<T = null> = Notification.ShowNotificationParams<T> & { id: string }
+
+		type ShowNotificationParams<T = null> = {
+			type: Type
+			persist?: boolean
+			title?: string
+			message: string
+			payload?: T
+			duration?: number
+			action?: (id: string, payload: T) => any
+			actionText?: string
+			id?: string
+		}
+	}
+
 	module cmd {
 		module background {
 			type setStatus = { name: "background-task.set-status"; payload: BackgroundTask.Status }
@@ -41,7 +59,7 @@ declare global {
 		}
 
 		module notification {
-			type show = { name: "notification.show"; payload: Notification.Item }
+			type show = { name: "notification.show"; payload: Notification.ShowNotificationParams }
 			type hide = { name: "notification.hide"; payload: string }
 		}
 
@@ -272,23 +290,6 @@ export namespace User {
 
 	export type InternalUser = User.User & {
 		password: string
-	}
-}
-
-export namespace Notification {
-	export type Type = "success" | "rrr" | "info" | "warn" | "question" | "default"
-
-	export type RegisterredItem<T = null> = Notification.Item & { id: string }
-
-	export type Item<T = null> = {
-		type: Type
-		persist?: boolean
-		title?: string
-		message: string
-		payload?: T
-		duration?: number
-		action?: (id: string, payload: T) => any
-		actionText?: string
 	}
 }
 

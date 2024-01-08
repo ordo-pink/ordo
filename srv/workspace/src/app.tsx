@@ -12,7 +12,6 @@ import {
 	Router,
 	User,
 	__useSharedContextInit,
-	cmd,
 } from "@ordo-pink/frontend-core"
 import Notifications from "$components/notifications/notifications.component"
 import ActivityBar from "$components/activity-bar/activity-bar"
@@ -23,7 +22,7 @@ import Null from "$components/null"
 import { AllKeysRequired, Nullable } from "@ordo-pink/tau"
 import { PlainData } from "@ordo-pink/data"
 import { useUser } from "$streams/auth"
-import { UserUtils } from "$utils/user-utils.util"
+import BackgroundTaskIndicator from "$components/background-task-indicator.component"
 
 // TODO: Remove useAppInit
 const commands = getCommands()
@@ -129,6 +128,7 @@ export default function App() {
 						<ContextMenu menu$={contextMenu$} />
 						<Modal modal$={modal$} />
 						<Notifications notification$={notification$} />
+						<BackgroundTaskIndicator />
 					</div>
 				</SharedContext.Provider>
 			),

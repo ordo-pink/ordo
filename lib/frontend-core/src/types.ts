@@ -20,7 +20,20 @@ export namespace Functions {
 }
 
 declare global {
+	module BackgroundTask {
+		const enum Status {
+			NONE,
+			SAVING,
+			LOADING,
+		}
+	}
+
 	module cmd {
+		module background {
+			type setStatus = { name: "background-task.set-status"; payload: BackgroundTask.Status }
+			type resetStatus = { name: "background-task.reset-status" }
+		}
+
 		module user {
 			type refreshInfo = { name: "user.refresh" }
 			type signOut = { name: "user.sign-out" }

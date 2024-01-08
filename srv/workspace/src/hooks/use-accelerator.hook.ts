@@ -4,7 +4,11 @@
 import { HotkeyCallback, useHotkeys } from "react-hotkeys-hook"
 import { Either } from "@ordo-pink/either"
 
-type UseAccelerator = (accelerator: string | undefined, callback: HotkeyCallback) => void
+type UseAccelerator = (
+	accelerator: string | undefined,
+	callback: HotkeyCallback,
+	deps?: any[],
+) => void
 
 /**
  * Registers provided keyboard accelerator that is compatible with the Ordo notation.
@@ -14,14 +18,19 @@ type UseAccelerator = (accelerator: string | undefined, callback: HotkeyCallback
  * @todo Add support for multiple accelerators
  * @todo Provide at_see link to accelerators description
  */
-export const useAccelerator: UseAccelerator = (accelerator, callback) => {
+export const useAccelerator: UseAccelerator = (accelerator, callback, deps) => {
 	const hotkeys = Either.fromNullable(accelerator).fold(() => [], renameToAppleOrNormalModifierKeys)
 
-	useHotkeys(hotkeys, callback, {
-		enableOnFormTags: true,
-		enableOnContentEditable: true,
-		preventDefault: true,
-	})
+	useHotkeys(
+		hotkeys,
+		callback,
+		{
+			enableOnFormTags: true,
+			enableOnContentEditable: true,
+			preventDefault: true,
+		},
+		deps,
+	)
 }
 
 // --- Internal ---

@@ -2,12 +2,11 @@
 // SPDX-License-Identifier: MIT
 
 import { ChangeEvent, KeyboardEvent, useEffect, useState } from "react"
-import { useHotkeys } from "react-hotkeys-hook"
 import { BsPlus, BsSearch } from "react-icons/bs"
 import Fuse from "fuse.js"
 import { Switch } from "@ordo-pink/switch"
 import { noop } from "@ordo-pink/tau"
-import { useAccelerator } from "$hooks/use-accelerator"
+import { useAccelerator } from "$hooks/use-accelerator.hook"
 import { getCommands } from "$streams/commands"
 import RenderFromNullable from "$components/render-from-nullable"
 import ActionListItem from "$components/action-list-item"
@@ -27,7 +26,7 @@ type Props = {
 const fuse = new Fuse([] as CommandPalette.Item[], { keys: ["readableName", "id"], threshold: 0.1 })
 
 export default function CommandPaletteModal({ items, onNewItem, multiple, pinnedItems }: Props) {
-	useHotkeys("Esc", () => commands.emit<cmd.commandPalette.hide>("command-palette.hide"))
+	useAccelerator("Esc", () => commands.emit<cmd.commandPalette.hide>("command-palette.hide"))
 
 	const [currentIndex, setCurrentIndex] = useState(0)
 	const [inputValue, setInputValue] = useState("")

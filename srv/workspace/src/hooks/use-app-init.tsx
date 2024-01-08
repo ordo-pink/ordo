@@ -13,11 +13,11 @@ import { __initSidebar, __Sidebar$ } from "$streams/sidebar"
 import { __CurrentRoute$, __initRouter } from "$streams/router"
 import CommandPaletteModal from "$components/command-palette"
 import { useSubscription } from "./use-subscription"
-import { useHotkeys } from "react-hotkeys-hook"
 import { __Notification$, __initNotification } from "$streams/notification"
 import { __Metadata$, __initData } from "$streams/data"
 import { __FileAssociations$, __initFileAssociations } from "$streams/file-associations"
 import { Either } from "@ordo-pink/either"
+import { useAccelerator } from "./use-accelerator.hook"
 
 const commands = getCommands()
 
@@ -57,7 +57,7 @@ export const useAppInit = (): UseAppInitReturns => {
 	const commandPalette = useSubscription(currentCommandPalette$)
 	const globalCommandPalette = useSubscription(globalCommandPalette$)
 
-	useHotkeys(
+	useAccelerator(
 		"*",
 		e => {
 			if (IGNORED_KEYS.includes(e.key)) return
@@ -155,7 +155,7 @@ export const useAppInit = (): UseAppInitReturns => {
 	return {
 		auth$,
 		sidebar$,
-		data$: data$,
+		data$,
 		activities$,
 		contextMenu$,
 		notification$,

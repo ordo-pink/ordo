@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: MIT
 
 import { useEffect, useState } from "react"
-import { useHotkeys } from "react-hotkeys-hook"
 import { Either } from "@ordo-pink/either"
 import { useSubscription } from "$hooks/use-subscription"
 import { __ContextMenu$ } from "$streams/context-menu"
@@ -10,6 +9,7 @@ import ContextMenuItemList from "$components/context-menu/context-menu-item-list
 import Null from "$components/null"
 import { getCommands } from "$streams/commands"
 import { CtxMenu } from "@ordo-pink/frontend-core"
+import { useAccelerator } from "$hooks/use-accelerator.hook"
 
 const commands = getCommands()
 
@@ -22,7 +22,7 @@ export default function ContextMenu({ menu$ }: _P) {
 
 	const menu = useSubscription(menu$)
 
-	useHotkeys("Esc", () => menu && commands.emit<cmd.ctxMenu.hide>("context-menu.hide"))
+	useAccelerator("Esc", () => menu && commands.emit<cmd.ctxMenu.hide>("context-menu.hide"))
 
 	useEffect(() => {
 		if (!menu) {

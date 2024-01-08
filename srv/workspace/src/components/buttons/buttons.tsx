@@ -6,7 +6,7 @@ import { MouseEvent, PropsWithChildren, useRef } from "react"
 import { Thunk, Unary, noop } from "@ordo-pink/tau"
 import Accelerator from "$components/accelerator"
 import "./buttons.css"
-import { useAccelerator } from "$hooks/use-accelerator"
+import { useAccelerator } from "$hooks/use-accelerator.hook"
 
 type Props = PropsWithChildren<{
 	onClick: Thunk<void> | Unary<MouseEvent<HTMLButtonElement>, void>

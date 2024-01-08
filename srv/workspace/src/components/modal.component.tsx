@@ -2,11 +2,11 @@
 // SPDX-License-Identifier: MIT
 
 import { ComponentType, MouseEvent, useEffect } from "react"
-import { useHotkeys } from "react-hotkeys-hook"
 import { BehaviorSubject } from "rxjs"
 import { BsX } from "react-icons/bs"
 import { Commands, Modal as TModal, useSharedContext } from "@ordo-pink/frontend-core"
 import { Either } from "@ordo-pink/either"
+import { useAccelerator } from "$hooks/use-accelerator.hook"
 import { useSubscription } from "$hooks/use-subscription"
 import Null from "$components/null"
 
@@ -29,7 +29,7 @@ export default function Modal() {
 		commands.emit<cmd.modal.hide>("modal.hide")
 	}
 
-	useHotkeys("Esc", handleHide, [modalState])
+	useAccelerator("Esc", handleHide, [modalState])
 
 	useEffect(() => {
 		commands.on<cmd.modal.hide>("modal.hide", hideModal)

@@ -9,7 +9,7 @@ import { getc } from "@ordo-pink/getc"
 import { readFile0, writeFile0 } from "@ordo-pink/fs"
 import { Oath } from "@ordo-pink/oath"
 import { keysOf } from "@ordo-pink/tau"
-import { ConsoleLogger } from "@ordo-pink/logger"
+import { die } from "@ordo-pink/binutil"
 
 const {
 	ORDO_ID_ACCESS_TOKEN_PRIVATE_KEY,
@@ -71,7 +71,7 @@ const main = async () => {
 		)
 		.map(env => keysOf(env).reduce((acc, key) => acc.concat(`${key}=${env[key]}\n`), ""))
 		.chain(str => writeFile0("./.env", str, "utf-8"))
-		.orElse(ConsoleLogger.error)
+		.orElse(die())
 }
 
 main()

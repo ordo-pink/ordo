@@ -6,8 +6,7 @@
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 import { createDirectoryIfNotExists0, mv0 } from "@ordo-pink/fs"
-import { runBunCommand0 } from "@ordo-pink/binutil"
-import { ConsoleLogger } from "@ordo-pink/logger"
+import { die, runBunCommand0 } from "@ordo-pink/binutil"
 import { keysOf } from "@ordo-pink/tau"
 import { getc } from "@ordo-pink/getc"
 
@@ -24,4 +23,4 @@ const envDefinitions = defineEnv(env)
 runBunCommand0(command.concat(envDefinitions))
 	.chain(createOutDirectoryIfNotExists0)
 	.chain(moveCompiledFileToOutDirectory0)
-	.orElse(ConsoleLogger.error)
+	.orElse(die())

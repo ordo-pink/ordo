@@ -1,14 +1,15 @@
 // SPDX-FileCopyrightText: Copyright 2023, 谢尔盖||↓ and the Ordo.pink contributors
 // SPDX-License-Identifier: MIT
 
-import { direntsToDirs, getNames, runAsyncCommand0 } from "@ordo-pink/binutil"
+import { die, direntsToDirs, getNames, runAsyncCommand0 } from "@ordo-pink/binutil"
 import { directoryExists0, readdir0 } from "@ordo-pink/fs"
 import { getc } from "@ordo-pink/getc"
 import { ConsoleLogger } from "@ordo-pink/logger"
 import { Oath } from "@ordo-pink/oath"
-import { watch, cp } from "fs"
+import { watch } from "fs"
 
 const { ORDO_STATIC_ROOT } = getc(["ORDO_STATIC_ROOT"])
+
 Oath.of("./srv")
 	.chain(path => readdir0(path, { withFileTypes: true }))
 	.map(direntsToDirs)
@@ -36,13 +37,13 @@ Oath.of("./srv")
 			),
 		),
 	)
-	.orElse(console.log)
+	.orElse(die())
 
 runAsyncCommand0("opt/bun run --watch srv/static/index.ts", {
 	stdout: "pipe",
 	stderr: "pipe",
 	env: { ...process.env, FORCE_COLOR: "1" },
-}).orElse(console.error)
+}).orElse(die())
 
 Oath.of("./srv")
 	.chain(path => readdir0(path, { withFileTypes: true }))
@@ -64,4 +65,4 @@ Oath.of("./srv")
 			}),
 		),
 	)
-	.orElse(console.error)
+	.orElse(die())

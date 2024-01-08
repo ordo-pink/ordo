@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: Copyright 2023, 谢尔盖||↓ and the Ordo.pink contributors
 // SPDX-License-Identifier: MIT
 
-import { runAsyncCommand0 } from "@ordo-pink/binutil"
+import { die, runAsyncCommand0 } from "@ordo-pink/binutil"
 import { getc } from "@ordo-pink/getc"
 
 const {
@@ -11,7 +11,6 @@ const {
 	ORDO_WORKSPACE_HOST,
 	ORDO_DT_HOST,
 	ORDO_WEB_HOST,
-	SUBS_HOST,
 } = getc([
 	"ORDO_WEB_PORT",
 	"ORDO_WEB_HOST",
@@ -36,4 +35,4 @@ runAsyncCommand0("npm run dev", {
 		NEXT_PUBLIC_ORDO_WEB_HOST: ORDO_WEB_HOST,
 		FORCE_COLOR: "1",
 	},
-}).orElse(console.error)
+}).orElse(die())

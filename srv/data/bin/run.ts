@@ -5,10 +5,10 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-import { runAsyncCommand0 } from "@ordo-pink/binutil"
+import { die, runAsyncCommand0 } from "@ordo-pink/binutil"
 
 runAsyncCommand0("opt/bun run --watch srv/data/index.ts", {
 	stdout: "pipe",
 	stderr: "pipe",
 	env: { ...process.env, FORCE_COLOR: "1" },
-}).orElse(console.error)
+}).orElse(die())

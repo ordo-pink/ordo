@@ -22,13 +22,17 @@ type RunCommand = (cmd: string, options?: SpawnOptions.OptionsObject) => Oath<vo
 export const runCommand0: RunCommand = (command, options) =>
 	Oath.try(() => {
 		const result = Bun.spawnSync(command.trim().split(" "), options)
-		if (!result.success && result.stderr)
-			throw new Error(
-				result.stderr
-					? result.stderr.toString("utf-8")
-					: "Something went wrong, but the output is not piped.",
-			)
+		const stderrString = result.stderr?.toString("utf8").trim()
+
+		if (!result.success || result.exitCode > 0) throw new Error(stderrString)
 	})
+
+export const die =
+	(code: number = 1) =>
+	(error: unknown) => {
+		console.error(error)
+		process.exit(code)
+	}
 
 export const runBunCommand0: RunCommand = (command, options) =>
 	runCommand0(`opt/bun ${command}`, options)
@@ -57,7 +61,7 @@ export const createProgress = () => {
 			process.stdout.write(`${chalk.red("✘")} ${currentLine}\n`)
 			currentLine = ""
 
-			console.error(error)
+			console.error((error as Error).message)
 		},
 	}
 }

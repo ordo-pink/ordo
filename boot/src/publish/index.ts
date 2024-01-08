@@ -2,16 +2,16 @@
 // SPDX-License-Identifier: MIT
 
 import { Command } from "commander"
-import { build } from "./src/build.impl"
+import { publish } from "./src/publish.impl"
 
 const program = new Command()
 
 program
-	.name("build")
+	.name("publish")
 	.version("0.1.0")
-	.description("Build srvs for deployment.")
+	.description("Build and publish srvs.")
 	.action(() => {
-		build()
+		publish()
 	})
 
 program.parse()

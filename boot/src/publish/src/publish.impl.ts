@@ -12,7 +12,7 @@ import {
 import { readdir0 } from "@ordo-pink/fs"
 import { Oath } from "@ordo-pink/oath"
 
-export const build = () =>
+export const publish = () =>
 	readdir0("./srv", { withFileTypes: true })
 		.map(direntsToDirs)
 		.map(getNames)
@@ -21,19 +21,20 @@ export const build = () =>
 		.map(getExistingPaths)
 		.tap(startProgress)
 		.chain(runCompileScripts)
-		.map(finishProgress)
-		.orElse(console.error)
+		.map(progress.finish)
+		.orNothing()
 
 // --- Internal ---
 
 const progress = createProgress()
 
-const startProgress = () => progress.start(`Building srvs for deployment`)
-const incProgress = () => progress.inc()
-const finishProgress = () => progress.finish()
+const startProgress = () => progress.start(`Building and publishing srvs`)
 
 const namesToCompileScriptPaths = (names: string[]) =>
-	names.map(name => `./srv/${name}/bin/build.ts`)
+	names.map(name => `./srv/${name}/bin/publish.ts`)
 const runCompileScript = (path: string) =>
-	runBunCommand0(`run ${path}`, { stdout: "pipe", stderr: "pipe" }).tap(incProgress)
+	runBunCommand0(`run ${path}`, { stdout: "pipe", stderr: "pipe" }).bimap(
+		progress.break,
+		progress.inc,
+	)
 const runCompileScripts = (paths: string[]) => Oath.all(paths.map(runCompileScript))

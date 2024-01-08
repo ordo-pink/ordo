@@ -1,7 +1,6 @@
-import { runBunCommand0 } from "@ordo-pink/binutil"
+import { die, runBunCommand0 } from "@ordo-pink/binutil"
 import { createDirectoryIfNotExists0, mv0 } from "@ordo-pink/fs"
 import { getc } from "@ordo-pink/getc"
-import { ConsoleLogger } from "@ordo-pink/logger"
 import { Oath } from "@ordo-pink/oath"
 import { keysOf } from "@ordo-pink/tau"
 
@@ -19,4 +18,4 @@ Oath.of(command.concat(envDefinitions))
 	.chain(runBunCommand0)
 	.chain(createOutDirectoryIfNotExists0)
 	.chain(moveCompiledFileToOutDirectory0)
-	.orElse(ConsoleLogger.error)
+	.orElse(die())

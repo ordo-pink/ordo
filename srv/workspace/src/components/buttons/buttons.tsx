@@ -4,7 +4,7 @@
 import { Either } from "@ordo-pink/either"
 import { MouseEvent, PropsWithChildren, useRef } from "react"
 import { Thunk, Unary, noop } from "@ordo-pink/tau"
-import { Accelerator } from "@ordo-pink/frontend-core"
+import Accelerator from "$components/accelerator"
 import "./buttons.css"
 import { useAccelerator } from "$hooks/use-accelerator.hook"
 

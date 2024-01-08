@@ -10,7 +10,7 @@ import { useAccelerator } from "$hooks/use-accelerator.hook"
 import { getCommands } from "$streams/commands"
 import RenderFromNullable from "$components/render-from-nullable"
 import ActionListItem from "$components/action-list-item"
-import { Accelerator } from "@ordo-pink/frontend-core"
+import Accelerator from "$components/accelerator"
 import { CommandPalette } from "@ordo-pink/frontend-core"
 import { Either } from "@ordo-pink/either"
 

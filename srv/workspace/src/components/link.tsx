@@ -2,24 +2,28 @@
 // SPDX-License-Identifier: MIT
 
 import { MouseEvent, PropsWithChildren, HTMLProps } from "react"
-import { getCommands } from "$streams/commands"
+import { useSharedContext } from "@ordo-pink/frontend-core"
 
-const commands = getCommands()
+/**
+ * Link component is used as a replacement for <a> tag to work well with Ordo router. It supports
+ * both internal and external links (just add the `external` prop).
+ */
+type P = HTMLProps<HTMLAnchorElement> &
+	PropsWithChildren<{ href: string; className?: string; external?: boolean; newTab?: boolean }>
+export default function Link({
+	href,
+	children,
+	className = "",
+	external = false,
+	newTab = false,
+}: P) {
+	const { commands } = useSharedContext()
 
-type _P = HTMLProps<HTMLAnchorElement> &
-	PropsWithChildren<{
-		href: string
-		className?: string
-		external?: boolean
-		newTab?: boolean
-	}>
-
-export default function Link({ href, children, className, external = false, newTab = false }: _P) {
 	const handleClick = (event: MouseEvent) => {
 		event.preventDefault()
 
 		external
-			? commands.emit<cmd.router.openExternal>("router.open-external", { url: href })
+			? commands.emit<cmd.router.openExternal>("router.open-external", { url: href, newTab })
 			: commands.emit<cmd.router.navigate>("router.navigate", href)
 	}
 

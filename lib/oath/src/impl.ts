@@ -221,6 +221,24 @@ export class Oath<Resolve, Reject = never> {
 		)
 	}
 
+	public bitap(
+		onRejected: (x: Reject) => any,
+		onResolved: (x: Resolve) => any,
+	): Oath<Resolve, Reject> {
+		return new Oath<Resolve, Reject>((resolve, reject) =>
+			this.fork(
+				a => {
+					onRejected(a)
+					return reject(a)
+				},
+				b => {
+					onResolved(b)
+					return resolve(b)
+				},
+			),
+		)
+	}
+
 	public map<NewResolve>(f: (x: Resolve) => NewResolve): Oath<NewResolve, Reject> {
 		return new Oath<NewResolve, Reject>((resolve, reject) =>
 			this.fork(

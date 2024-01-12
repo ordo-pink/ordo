@@ -46,7 +46,8 @@ export const logRequest: LogRequestFn = options => async (ctx, next) => {
 
 export const logBunRequest = (options: LogRequestOptions) => (ctx: Context) => {
 	const name = options.serverName
-	const url = ctx.req.url
+	const urlObject = new URL(ctx.req.url)
+	const url = urlObject.pathname.concat(urlObject.search)
 	const method = chalk.cyan(ctx.req.method.concat(" ".repeat(7 - ctx.req.method.length)))
 	const responseStatus = ctx.res.status
 	const responseTimeHeader = Math.ceil(

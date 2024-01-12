@@ -2,7 +2,7 @@ import { AiOutlineLoading3Quarters, AiOutlineSave } from "react-icons/ai"
 import { BehaviorSubject } from "rxjs"
 import { useEffect } from "react"
 import { useStrictSubscription } from "$hooks/use-subscription"
-import { Commands, useSharedContext } from "@ordo-pink/frontend-core"
+import { BackgroundTaskStatus, Commands, useSharedContext } from "@ordo-pink/frontend-core"
 import { Switch } from "@ordo-pink/switch"
 import Null from "./null"
 
@@ -19,7 +19,7 @@ import Null from "./null"
  * - `background-task.reset-status`
  */
 export default function BackgroundTaskIndicator() {
-	const status = useStrictSubscription(saving$, NONE)
+	const status = useStrictSubscription(saving$, BackgroundTaskStatus.NONE)
 	const { commands } = useSharedContext()
 
 	useEffect(() => {
@@ -30,27 +30,23 @@ export default function BackgroundTaskIndicator() {
 			commands.off<cmd.background.setStatus>("background-task.set-status", setStatus)
 			commands.off<cmd.background.resetStatus>("background-task.reset-status", resetStatus)
 		}
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [])
 
 	return Switch.of(status)
-		.case(SAVING, SavingIndicator)
-		.case(LOADING, LoadingIndicator)
+		.case(BackgroundTaskStatus.SAVING, SavingIndicator)
+		.case(BackgroundTaskStatus.LOADING, LoadingIndicator)
 		.default(Null)
 }
 
 // --- Internal ---
 
-// Define supported statuses
-const NONE: BackgroundTask.Status.NONE = 0
-const SAVING: BackgroundTask.Status.SAVING = 1
-const LOADING: BackgroundTask.Status.LOADING = 2
-
 // Define Observable to maintain indicator state
-const saving$ = new BehaviorSubject<BackgroundTask.Status>(NONE)
+const saving$ = new BehaviorSubject<BackgroundTaskStatus>(BackgroundTaskStatus.NONE)
 
 // Define command handlers
-const setStatus: Commands.Handler<BackgroundTask.Status> = ({ payload }) => saving$.next(payload)
-const resetStatus = () => saving$.next(NONE)
+const setStatus: Commands.Handler<BackgroundTaskStatus> = ({ payload }) => saving$.next(payload)
+const resetStatus = () => saving$.next(BackgroundTaskStatus.NONE)
 
 /**
  * Saving indicator component.

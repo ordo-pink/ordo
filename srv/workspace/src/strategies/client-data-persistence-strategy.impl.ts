@@ -5,7 +5,7 @@ import { rrrToNotification } from "$utils/error-to-notification"
 import { Hosts } from "$utils/hosts"
 import { AuthResponse } from "@ordo-pink/backend-server-id"
 import { Data, DataCreateErrors, DataPersistenceStrategy, PlainData } from "@ordo-pink/data"
-import { Commands } from "@ordo-pink/frontend-core"
+import { BackgroundTaskStatus, Commands } from "@ordo-pink/frontend-core"
 import { Oath } from "@ordo-pink/oath"
 import { BehaviorSubject } from "rxjs"
 
@@ -20,6 +20,11 @@ const of = (
 		const auth = auth$.value
 
 		if (!data) return Oath.reject(Data.Errors.DataNotFound as DataCreateErrors)
+
+		commands.emit<cmd.background.setStatus>(
+			"background-task.set-status",
+			BackgroundTaskStatus.SAVING,
+		)
 
 		data$.next([...data, plain])
 
@@ -41,10 +46,11 @@ const of = (
 			.fork(
 				item => {
 					commands.emit<cmd.notification.show>("notification.show", item)
+					commands.emit<cmd.background.resetStatus>("background-task.reset-status")
 					data$.next(data)
 				},
 				() => {
-					// commands.emit<cmd.data.refreshRoot>("data.refresh-root")
+					commands.emit<cmd.background.resetStatus>("background-task.reset-status")
 				},
 			)
 
@@ -55,6 +61,11 @@ const of = (
 		const auth = auth$.value
 
 		if (!data) return Oath.of("OK")
+
+		commands.emit<cmd.background.setStatus>(
+			"background-task.set-status",
+			BackgroundTaskStatus.SAVING,
+		)
 
 		Oath.fromNullable(auth)
 			.chain(auth =>
@@ -73,9 +84,10 @@ const of = (
 			.fork(
 				item => {
 					commands.emit<cmd.notification.show>("notification.show", item)
+					commands.emit<cmd.background.resetStatus>("background-task.reset-status")
 				},
 				() => {
-					// commands.emit<cmd.data.refreshRoot>("data.refresh-root")
+					commands.emit<cmd.background.resetStatus>("background-task.reset-status")
 				},
 			)
 
@@ -111,6 +123,11 @@ const of = (
 	getAll: () => {
 		const auth = auth$.value
 
+		commands.emit<cmd.background.setStatus>(
+			"background-task.set-status",
+			BackgroundTaskStatus.LOADING,
+		)
+
 		return Oath.fromNullable(auth)
 			.chain(auth =>
 				Oath.try(() =>
@@ -119,11 +136,18 @@ const of = (
 					}).then(res => res.json()),
 				),
 			)
-			.chain(body => (body.success ? Oath.of(body.result) : Oath.reject(body.error as string)))
+			.chain(body =>
+				body.success ? Oath.of(body.result as PlainData[]) : Oath.reject(body.error as string),
+			)
 			.rejectedMap(() => Data.Errors.DataNotFound)
-			.tap(
-				// item => commands.emit<cmd.notification.show>("notification.show", item),
-				result => data$.next(result),
+			.bitap(
+				() => {
+					commands.emit<cmd.background.resetStatus>("background-task.reset-status")
+				},
+				result => {
+					commands.emit<cmd.background.resetStatus>("background-task.reset-status")
+					data$.next(result)
+				},
 			)
 	},
 	update: plain => {
@@ -131,6 +155,11 @@ const of = (
 		const auth = auth$.value
 
 		if (!data) return Oath.reject(Data.Errors.DataNotFound)
+
+		commands.emit<cmd.background.setStatus>(
+			"background-task.set-status",
+			BackgroundTaskStatus.SAVING,
+		)
 
 		const updatedItem = data.findIndex(item => item.fsid === plain.fsid)
 
@@ -160,10 +189,11 @@ const of = (
 			.fork(
 				item => {
 					data$.next(data)
+					commands.emit<cmd.background.resetStatus>("background-task.reset-status")
 					// commands.emit<cmd.notification.show>("notification.show", item)
 				},
 				() => {
-					// commands.emit<cmd.data.refreshRoot>("data.refresh-root")
+					commands.emit<cmd.background.resetStatus>("background-task.reset-status")
 				},
 			)
 

@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: Copyright 2023, 谢尔盖||↓ and the Ordo.pink contributors
 // SPDX-License-Identifier: MIT
 
-import { CommandPalette } from "@ordo-pink/frontend-core"
+import { BackgroundTaskStatus, CommandPalette } from "@ordo-pink/frontend-core"
 import { getCommands } from "./commands"
 import { rrrToNotification } from "$utils/error-to-notification"
 import { Hosts } from "$utils/hosts"
@@ -42,7 +42,7 @@ export const __initData: Fn = ({ logger, auth$ }) => {
 	logger.debug("Initializing data")
 
 	const dataRepository = ClientDataPersistenceStrategy.of(data$, auth$ as any, commands)
-	const contentRepository = ClientContentPersistenceStrategy.of(auth$ as any)
+	const contentRepository = ClientContentPersistenceStrategy.of(auth$ as any, commands)
 
 	const dataCommands = DataCommands.of({
 		dataPersistenceStrategy: dataRepository,

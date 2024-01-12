@@ -8,8 +8,6 @@ import type { FSID, PlainData } from "@ordo-pink/data"
 import type { Observable } from "rxjs"
 import type { Logger } from "@ordo-pink/logger"
 import type { ComponentSpace } from "./constants/component-space.constants"
-import type { Transformer } from "@lexical/markdown"
-import type { LexicalNode } from "lexical"
 
 export namespace Functions {
 	export type CreateFunctionParams = {
@@ -19,15 +17,13 @@ export namespace Functions {
 	export type CreateFunctionFn = Unary<Functions.CreateFunctionParams, void | Promise<void>>
 }
 
-declare global {
-	module BackgroundTask {
-		const enum Status {
-			NONE,
-			SAVING,
-			LOADING,
-		}
-	}
+export const enum BackgroundTaskStatus {
+	NONE,
+	SAVING,
+	LOADING,
+}
 
+declare global {
 	module Notification {
 		type Type = "success" | "rrr" | "info" | "warn" | "question" | "default"
 
@@ -48,7 +44,7 @@ declare global {
 
 	module cmd {
 		module background {
-			type setStatus = { name: "background-task.set-status"; payload: BackgroundTask.Status }
+			type setStatus = { name: "background-task.set-status"; payload: BackgroundTaskStatus }
 			type resetStatus = { name: "background-task.reset-status" }
 		}
 
@@ -196,12 +192,12 @@ export namespace Extensions {
 		Component: ComponentType<ComponentProps>
 	}
 
-	export type EditorPlugin = {
-		name: string
-		Plugin?: ComponentType
-		transformer?: Transformer
-		nodes?: (typeof LexicalNode)[]
-	}
+	// export type EditorPlugin = {
+	// 	name: string
+	// 	Plugin?: ComponentType
+	// 	transformer?: Transformer
+	// 	nodes?: (typeof LexicalNode)[]
+	// }
 }
 
 export namespace Commands {

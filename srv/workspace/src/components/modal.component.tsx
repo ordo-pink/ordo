@@ -39,6 +39,7 @@ export default function Modal() {
 			commands.on<cmd.modal.hide>("modal.hide", hideModal)
 			commands.on<cmd.modal.show>("modal.show", showModal)
 		}
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [])
 
 	return Either.fromNullable(modalState).fold(Null, ({ Component, showCloseButton }) => (

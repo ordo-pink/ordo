@@ -13,6 +13,9 @@ import { getCommands } from "$streams/commands"
 import { rrrToNotification } from "$utils/error-to-notification"
 import { Hosts } from "$utils/hosts"
 
+// TODO: Add interval that disables the app after 15 minutes of inactivity
+// TODO: It should restart the app on clicking a button (???)
+
 const commands = getCommands()
 
 const refreshToken = () =>

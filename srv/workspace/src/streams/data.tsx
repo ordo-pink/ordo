@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: Copyright 2023, 谢尔盖||↓ and the Ordo.pink contributors
 // SPDX-License-Identifier: MIT
 
-import { BackgroundTaskStatus, CommandPalette } from "@ordo-pink/frontend-core"
+import { CommandPalette } from "@ordo-pink/frontend-core"
 import { getCommands } from "./commands"
 import { rrrToNotification } from "$utils/error-to-notification"
 import { Hosts } from "$utils/hosts"
@@ -13,7 +13,7 @@ import { Unary } from "@ordo-pink/tau"
 import { AuthResponse } from "@ordo-pink/backend-server-id"
 import CreatePageModal from "$components/modals/create-page-modal.component"
 // import UploadFilesModal from "$components/modals/upload-files-modal.component"
-import { DataCommands, FSID, PlainData } from "@ordo-pink/data"
+import { DataCommands, PlainData } from "@ordo-pink/data"
 import { ClientDataPersistenceStrategy } from "../strategies/client-data-persistence-strategy.impl"
 import { ClientContentPersistenceStrategy } from "../strategies/client-content-persistence-strategy.impl"
 import RemoveFileModal from "$components/modals/remove-page-modal.component"

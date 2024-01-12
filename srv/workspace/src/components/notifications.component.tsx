@@ -93,6 +93,7 @@ const NotificationComponent = ({ notification }: P) => {
 		return () => {
 			clearInterval(interval)
 		}
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [percentage, notification])
 
 	return (

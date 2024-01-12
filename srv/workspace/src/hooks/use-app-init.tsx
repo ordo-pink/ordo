@@ -5,7 +5,6 @@ import { useEffect, useState } from "react"
 import { ConsoleLogger } from "@ordo-pink/logger"
 import { Nullable, noop } from "@ordo-pink/tau"
 import { __Auth$, __initAuth } from "$streams/auth"
-import { __ContextMenu$, __initContextMenu } from "$streams/context-menu"
 import { __Activities$, __CurrentActivity$, __initActivities } from "$streams/activities"
 import { __CommandPalette$, __initCommandPalette } from "$streams/command-palette"
 import { __initCommands, getCommands } from "$streams/commands"
@@ -27,7 +26,6 @@ const ctx = { logger: ConsoleLogger }
 export type UseAppInitReturns = {
 	auth$: Nullable<__Auth$>
 	sidebar$: Nullable<__Sidebar$>
-	contextMenu$: Nullable<__ContextMenu$>
 	globalCommandPalette$: Nullable<__CommandPalette$>
 	currentCommandPalette$: Nullable<__CommandPalette$>
 	activities$: Nullable<__Activities$>
@@ -42,7 +40,6 @@ export const useAppInit = (): UseAppInitReturns => {
 		useState<Nullable<__CommandPalette$>>(null)
 	const [currentCommandPalette$, setCurrentCommandPalette$] =
 		useState<Nullable<__CommandPalette$>>(null)
-	const [contextMenu$, setContextMenu$] = useState<Nullable<__ContextMenu$>>(null)
 	const [sidebar$, setSidebar$] = useState<Nullable<__Sidebar$>>(null)
 	const [auth$, setAuth$] = useState<Nullable<__Auth$>>(null)
 	const [activities$, setActivities$] = useState<Nullable<__Activities$>>(null)
@@ -88,9 +85,6 @@ export const useAppInit = (): UseAppInitReturns => {
 		__initCommands(ctx)
 		const auth$ = __initAuth(ctx)
 		setAuth$(auth$)
-
-		const contextMenu$ = __initContextMenu(ctx)
-		setContextMenu$(contextMenu$)
 
 		const commandPalettes = __initCommandPalette(ctx)
 		setGlobalCommandPalette$(commandPalettes?.globalCommandPalette$ ?? null)
@@ -151,7 +145,6 @@ export const useAppInit = (): UseAppInitReturns => {
 		sidebar$,
 		data$,
 		activities$,
-		contextMenu$,
 		currentRoute$,
 		currentActivity$,
 		fileAssociations$,

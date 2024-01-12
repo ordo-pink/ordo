@@ -27,6 +27,7 @@ export default function GTDWidget() {
 				id="inbox"
 				label="Добавить задачу"
 				placeholder="Вот дела..."
+				autoFocus
 				value={newItem}
 				onInput={e => setNewItem(e.target.value)}
 				onKeyDown={e => {

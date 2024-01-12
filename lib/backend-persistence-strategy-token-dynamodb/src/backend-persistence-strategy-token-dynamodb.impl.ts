@@ -10,13 +10,14 @@ import { Oath } from "@ordo-pink/oath"
 import { DynamoDB } from "aws-sdk"
 import { AttributeMap, UpdateItemInput } from "aws-sdk/clients/dynamodb"
 
-export type Config = {
+export type DynamoDBConfig = {
 	region: string
 	endpoint: string
 	accessKeyId: string
 	secretAccessKey: string
 	tableName: string
 }
+
 export const TokenPersistenceStrategyDynamoDB = {
 	of: ({
 		accessKeyId,
@@ -24,7 +25,7 @@ export const TokenPersistenceStrategyDynamoDB = {
 		region,
 		endpoint,
 		tableName,
-	}: Config): TokenPersistenceStrategy => {
+	}: DynamoDBConfig): TokenPersistenceStrategy => {
 		const db = new DynamoDB({ credentials: { accessKeyId, secretAccessKey }, region, endpoint })
 
 		return {
@@ -53,6 +54,7 @@ const setToken0 =
 	(sub, jti, token) =>
 		Oath.of(sub)
 			.chain(getTokenRecord0(TableName, db))
+			.fix(() => ({}))
 			.map(record => ({ ...record, [jti]: token }))
 			.chain(record => Oath.of(setTokenRecord0(TableName, db)).chain(f => f(sub, record)))
 
@@ -87,7 +89,7 @@ const removeTokenRecord0 =
 	sub =>
 		Oath.try(() => db.deleteItem({ TableName, Key: { sub: { S: sub } } })).map(() => "OK")
 
-const deserialise = (item: AttributeMap): TokenRecord => JSON.parse(item.map?.S ?? "")
+const deserialise = (item: AttributeMap): TokenRecord => JSON.parse(item.record?.S ?? "")
 const serialise = (record: TokenRecord): UpdateItemInput["AttributeUpdates"] => ({
 	record: { Action: "PUT", Value: { S: JSON.stringify(record) } },
 })

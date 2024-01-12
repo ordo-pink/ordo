@@ -14,6 +14,7 @@ import { createIDServer } from "@ordo-pink/backend-server-id"
 import { ConsoleLogger } from "@ordo-pink/logger"
 import { Switch } from "@ordo-pink/switch"
 import { Oath } from "@ordo-pink/oath"
+import { TokenPersistenceStrategyDynamoDB } from "@ordo-pink/backend-persistence-strategy-token-dynamodb"
 
 const port = Bun.env.ORDO_ID_PORT!
 const accessTokenExpireIn = Number(Bun.env.ORDO_ID_ACCESS_TOKEN_EXPIRE_IN)
@@ -27,14 +28,23 @@ const origin = [
 	Bun.env.ORDO_DT_HOST!,
 ]
 
-const userPersistenceStrategyType = Bun.env.ORDO_ID_USER_REPOSITORY!
+const userPersistenceStrategyType = Bun.env.ORDO_ID_USER_PERSISTENCE_STRATEGY!
+const tokenPersistenceStrategyType = Bun.env.ORDO_ID_TOKEN_PERSISTENCE_STRATEGY!
 
-const userPersistenceStrategyDynamoDBParams = {
-	region: Bun.env.ORDO_ID_DYNAMODB_REGION!,
-	endpoint: Bun.env.ORDO_ID_DYNAMODB_ENDPOINT!,
-	accessKeyId: Bun.env.ORDO_ID_DYNAMODB_ACCESS_KEY!,
-	secretAccessKey: Bun.env.ORDO_ID_DYNAMODB_SECRET_KEY!,
-	tableName: Bun.env.ORDO_ID_DYNAMODB_USER_TABLE!,
+const userDynamoDBParams = {
+	region: Bun.env.ORDO_ID_USER_DYNAMODB_REGION!,
+	endpoint: Bun.env.ORDO_ID_USER_DYNAMODB_ENDPOINT!,
+	accessKeyId: Bun.env.ORDO_ID_USER_DYNAMODB_ACCESS_KEY!,
+	secretAccessKey: Bun.env.ORDO_ID_USER_DYNAMODB_SECRET_KEY!,
+	tableName: Bun.env.ORDO_ID_USER_DYNAMODB_USER_TABLE!,
+}
+
+const tokenDynamoDBParams = {
+	region: Bun.env.ORDO_ID_TOKEN_DYNAMODB_REGION!,
+	endpoint: Bun.env.ORDO_ID_TOKEN_DYNAMODB_ENDPOINT!,
+	accessKeyId: Bun.env.ORDO_ID_TOKEN_DYNAMODB_ACCESS_KEY!,
+	secretAccessKey: Bun.env.ORDO_ID_TOKEN_DYNAMODB_SECRET_KEY!,
+	tableName: Bun.env.ORDO_ID_TOKEN_DYNAMODB_USER_TABLE!,
 }
 
 const main = async () => {
@@ -46,14 +56,12 @@ const main = async () => {
 	const accessKeys = { privateKey: accessTokenPrivateKey, publicKey: accessTokenPublicKey }
 	const refreshKeys = { privateKey: refreshTokenPrivateKey, publicKey: refreshTokenPublicKey }
 
-	const tokenRepository = await TokenPersistenceStrategyFS.of(
-		Bun.env.ORDO_ID_TOKEN_FS_STRATEGY_PATH!,
-	)
+	const tokenRepository = await Switch.of(tokenPersistenceStrategyType)
+		.case("dynamodb", () => TokenPersistenceStrategyDynamoDB.of(tokenDynamoDBParams))
+		.default(() => TokenPersistenceStrategyFS.of(Bun.env.ORDO_ID_TOKEN_FS_STRATEGY_PATH!))
 
 	const userRepository = Switch.of(userPersistenceStrategyType)
-		.case("dynamodb", () =>
-			UserPersistenceStrategyDynamoDB.of(userPersistenceStrategyDynamoDBParams),
-		)
+		.case("dynamodb", () => UserPersistenceStrategyDynamoDB.of(userDynamoDBParams))
 		.default(() => FSUserRepository.of(Bun.env.ORDO_ID_USER_FS_STRATEGY_PATH!))
 
 	const emailStrategy = RusenderEmailStrategy.of(Bun.env.ORDO_ID_EMAIL_API_KEY!)

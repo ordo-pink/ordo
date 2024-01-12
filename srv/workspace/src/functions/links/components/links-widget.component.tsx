@@ -65,11 +65,21 @@ export default function LinksWidget() {
 		setLinks(tmpLinks)
 	}, [data, label])
 
-	return (
-		<div className="relative" style={{ width: workspaceWidth }}>
-			<Links3D nodes={nodes} links={links} />
-		</div>
-	)
+	return Either.fromNullable(data)
+		.chain(data => Either.fromBoolean(() => data.length > 0).map(() => data))
+		.fold(
+			() => (
+				<div className="text-center">
+					<p>Здесь будет карта связей всех ваших файлов.</p>
+					<p>Но пока их нет.</p>
+				</div>
+			),
+			() => (
+				<div className="relative" style={{ width: workspaceWidth }}>
+					<Links3D nodes={nodes} links={links} />
+				</div>
+			),
+		)
 }
 
 // const extraRenderers = [new CSS2DRenderer()]

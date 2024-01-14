@@ -2,11 +2,10 @@
 // SPDX-License-Identifier: MIT
 
 import { FSID, PlainData } from "@ordo-pink/data"
-import { useSharedContext } from "@ordo-pink/frontend-core"
-import { useDataByFSID } from "./use-data.hook"
+import { useData, useDataByFSID } from "./use-data.hook"
 
 export const useParentChain = (fsid: FSID) => {
-	const { data } = useSharedContext()
+	const data = useData()
 	let currentItem = useDataByFSID(fsid)
 
 	const parentChain = [] as PlainData[]

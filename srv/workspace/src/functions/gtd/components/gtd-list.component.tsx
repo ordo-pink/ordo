@@ -51,16 +51,14 @@ export default function GTDList({ items }: P) {
 		.case(pendingItems.length === 0 && doneItems.length === 0, () => (
 			<div className="flex flex-col items-center justify-center w-full h-full text-neutral-500 p-0.5">
 				<BsListCheck className="text-9xl" />
-				<div className="text-sm">
-					This list looks empty. Type something in the input to get started!
-				</div>
+				<div className="text-sm">Тут пусто. А тут что-нибудь должно быть?</div>
 			</div>
 		))
 		.case(pendingItems.length === 0 && doneItems.length > 0, () => (
 			<div className="overflow-y-auto h-full p-0.5 flex flex-col space-y-2">
 				<div className="my-8 space-y-4 flex flex-col items-center justify-center w-full text-neutral-500">
 					<BsCheckCircle className="text-6xl text-emerald-500" />
-					<div className="text-sm">Quest complete! Congratulations!</div>
+					<div className="text-sm">Миссия выполнена! Можно почиллить.</div>
 				</div>
 
 				{showDone ? (
@@ -71,7 +69,7 @@ export default function GTDList({ items }: P) {
 								onClick={() => setShowDone(v => !v)}
 							>
 								<BsChevronUp />
-								<div>Hide done items</div>
+								<div>Скрыть содеянное</div>
 							</div>
 						) : null}
 
@@ -85,7 +83,7 @@ export default function GTDList({ items }: P) {
 						onClick={() => setShowDone(v => !v)}
 					>
 						<BsChevronDown />
-						<div>See what was done</div>
+						<div>Показать выполненное</div>
 					</div>
 				) : null}
 			</div>
@@ -130,7 +128,7 @@ export default function GTDList({ items }: P) {
 									onClick={() => setShowDone(v => !v)}
 								>
 									<BsChevronUp />
-									<div>Hide done items</div>
+									<div>Скрыть содеянное</div>
 								</div>
 							) : null}
 
@@ -144,7 +142,7 @@ export default function GTDList({ items }: P) {
 							onClick={() => setShowDone(v => !v)}
 						>
 							<BsChevronDown />
-							<div>Show done items</div>
+							<div>Показать выполненное</div>
 						</div>
 					) : null}
 				</div>

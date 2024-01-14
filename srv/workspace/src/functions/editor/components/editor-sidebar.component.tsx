@@ -7,6 +7,7 @@ import { Loading } from "$components/loading/loading"
 import Null from "$components/null"
 import FileIconComponent from "$functions/file-explorer/components/file-icon.component"
 import { useChildren } from "$hooks/use-children"
+import { useData } from "$hooks/use-data.hook"
 import { useRouteParams } from "$hooks/use-route-params.hook"
 import { useWorkspaceWidth } from "$hooks/use-workspace-width.hook"
 import { FSID, PlainData } from "@ordo-pink/data"
@@ -17,8 +18,9 @@ import { MouseEvent, useEffect, useState } from "react"
 import { BsCalendar2, BsChevronDown, BsListNested } from "react-icons/bs"
 
 export default function EditorSidebar() {
-	const { data, commands } = useSharedContext()
+	const { commands } = useSharedContext()
 	const { fsid } = useRouteParams<{ fsid: FSID }>()
+	const data = useData()
 	const [isNestingEnabled, setIsNestingEnables] = useState(true)
 	const [visibleItems, setVisibleItems] = useState<PlainData[]>([])
 

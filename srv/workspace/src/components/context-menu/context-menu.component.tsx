@@ -153,7 +153,6 @@ const contextMenu$ = params$.pipe(
 			.fold(Null, state => ({
 				...state,
 				structure: items.filter(item => {
-					console.log(item)
 					const shouldShow =
 						item?.shouldShow({ event: state.event, payload: state.payload }) ?? false
 

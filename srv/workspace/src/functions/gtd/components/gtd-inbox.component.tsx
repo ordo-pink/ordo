@@ -30,9 +30,9 @@ export default function GTDInbox() {
 							id="add-to-inbox"
 							label=""
 							value={newItem}
-							onInput={e => setNewItem(e.target.value)}
-							onKeyDown={e => {
-								if (e.key === "Enter" && newItem) {
+							onInput={event => setNewItem(event.target.value)}
+							onKeyDown={event => {
+								if (event.key === "Enter" && newItem) {
 									commands.emit<cmd.data.create>("data.create", {
 										name: newItem,
 										parent: null,

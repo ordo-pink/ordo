@@ -13,13 +13,11 @@ export const useInbox = () => {
 	useEffect(() => {
 		if (!data) return
 
-		const items = [] as PlainData[]
+		const items = data.filter(item => item.labels.length === 1 && item.labels[0] === "gtd")
 
-		const potentialInboxItems = data.filter(item => item.labels.includes("gtd"))
-
-		potentialInboxItems.forEach(item => {
-			if (!data.some(i => i.parent === item.fsid)) items.push(item)
-		})
+		// potentialInboxItems.forEach(item => {
+		// 	if (!data.some(i => i.parent === item.fsid)) items.push(item)
+		// })
 
 		setInboxItems(items)
 	}, [data])

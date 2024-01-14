@@ -15,6 +15,7 @@ export type TDataCommands<T> = {
 			fsid?: FSID
 			fileLimit: number
 			labels?: string[]
+			contentType?: string
 		},
 	) => Oath<PlainData, DataError>
 	remove: (params: Pick<PlainData, "fsid" | "createdBy">) => Oath<"OK", DataError>
@@ -31,7 +32,7 @@ export type TDataCommands<T> = {
 		params: Pick<PlainData, "fsid" | "createdBy" | "updatedBy"> & { link: FSID },
 	) => Oath<"OK", DataError>
 	addLabel: (
-		params: Pick<PlainData, "fsid" | "createdBy" | "updatedBy"> & { label: string },
+		params: Pick<PlainData, "fsid" | "createdBy" | "updatedBy"> & { label: string | string[] },
 	) => Oath<"OK", DataError>
 	removeLabel: (
 		params: Pick<PlainData, "fsid" | "createdBy" | "updatedBy"> & { label: string },
@@ -46,11 +47,16 @@ export type TDataCommands<T> = {
 		params: Pick<PlainData, "fsid" | "createdBy" | "updatedBy"> & { data: PlainData },
 	) => Oath<"OK", DataError>
 	updateContent: (
-		params: Pick<PlainData, "createdBy" | "updatedBy" | "fsid"> & { content: T; length: number },
+		params: Pick<PlainData, "createdBy" | "updatedBy" | "fsid"> & {
+			content: T
+			length: number
+			contentType?: string
+		},
 	) => Oath<number, DataError>
 	uploadContent: (
 		params: Pick<PlainData, "createdBy" | "updatedBy" | "name" | "parent"> & {
 			content: T
+			contentType?: string
 			fileLimit: number
 			length: number
 		},

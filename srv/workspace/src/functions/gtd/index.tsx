@@ -4,7 +4,7 @@
 import { Extensions, ComponentSpace, Functions } from "@ordo-pink/frontend-core"
 import { Switch } from "@ordo-pink/switch"
 import GTDIcon from "./components/gtd-icon.component"
-import GTDSidebar from "./components/gtd-sidebar.component"
+import Sidebar from "./components/gtd-sidebar.component"
 import GTD from "./components/gtd.component"
 import {
 	BsCheckSquare,
@@ -20,10 +20,12 @@ import { Either } from "@ordo-pink/either"
 import { PlainData } from "@ordo-pink/data"
 import { noop } from "@ordo-pink/tau"
 
+export const name = "gtd.ordo.pink"
+
 export default function createGTDFunction({ commands, data$ }: Functions.CreateFunctionParams) {
 	commands.emit<cmd.activities.add>("activities.add", {
 		Component,
-		Sidebar: GTDSidebar,
+		Sidebar,
 		name: "gtd",
 		routes: ["/gtd", "/gtd/projects/:fsid", "/gtd/labels/:label"],
 		background: false,
@@ -61,7 +63,7 @@ export default function createGTDFunction({ commands, data$ }: Functions.CreateF
 				),
 			)
 			.fold(noop, item =>
-				commands.emit<cmd.data.addLabel>("data.add-label", { item, label: "gtd" }),
+				commands.emit<cmd.data.addLabel>("data.add-label", { item, label: ["gtd", "project"] }),
 			),
 	)
 
@@ -119,7 +121,7 @@ export default function createGTDFunction({ commands, data$ }: Functions.CreateF
 	commands.emit<cmd.ctxMenu.add>("context-menu.add", {
 		cmd: "gtd.add-to-gtd",
 		Icon: BsUiChecks,
-		readableName: "Добавить проект в задачи",
+		readableName: "Добавить проект в дела",
 		type: "create",
 		shouldShow: ({ payload }) => {
 			const data = (data$ as any).value as PlainData[]
@@ -130,7 +132,7 @@ export default function createGTDFunction({ commands, data$ }: Functions.CreateF
 				payload.fsid &&
 				payload.labels &&
 				Array.isArray(payload.labels) &&
-				!payload.labels.includes("gtd") &&
+				(!payload.labels.includes("gtd") || !payload.labels.includes("project")) &&
 				children.length > 0
 			)
 		},
@@ -141,14 +143,15 @@ export default function createGTDFunction({ commands, data$ }: Functions.CreateF
 	commands.emit<cmd.ctxMenu.add>("context-menu.add", {
 		cmd: "gtd.remove-from-gtd",
 		Icon: BsInbox,
-		readableName: "Убрать из дел",
+		readableName: "Убрать проект из дел",
 		type: "delete",
 		shouldShow: ({ payload }) =>
 			payload &&
 			payload.fsid &&
 			payload.labels &&
 			Array.isArray(payload.labels) &&
-			payload.labels.includes("gtd"),
+			payload.labels.includes("gtd") &&
+			payload.labels.includes("project"),
 		accelerator: "Backspace",
 		payloadCreator: ({ payload }) => payload.fsid,
 	})

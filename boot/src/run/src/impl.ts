@@ -7,7 +7,6 @@ import {
 	getExistingPaths,
 	getNames,
 	runAsyncCommand0,
-	runBunCommand0,
 } from "@ordo-pink/binutil"
 import { readdir0 } from "@ordo-pink/fs"
 import { Oath } from "@ordo-pink/oath"
@@ -22,7 +21,9 @@ export const run = () =>
 		.map(getExistingPaths)
 		.chain(paths =>
 			Oath.all(
-				paths.map(path => runAsyncCommand0(`opt/bun run ${path}`, { stdout: "pipe", stderr: "pipe" })),
+				paths.map(path =>
+					runAsyncCommand0(`opt/bun run ${path}`, { stdout: "pipe", stderr: "pipe" }),
+				),
 			).map(noop),
 		)
 		.orElse(console.error)

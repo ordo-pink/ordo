@@ -2,12 +2,14 @@
 // SPDX-License-Identifier: MIT
 
 import { FSID, PlainData } from "@ordo-pink/data"
-import { useSharedContext } from "@ordo-pink/frontend-core"
+import { EXTENSION_FILE_PREFIX, useSharedContext } from "@ordo-pink/frontend-core"
 
 export const useDataSelector = <T>(selector: (data: PlainData[]) => T): NonNullable<T> | null => {
 	const { data } = useSharedContext()
 
-	return data ? selector(data) ?? null : null
+	const filteredData = data?.filter(item => !item.name.startsWith(EXTENSION_FILE_PREFIX)) ?? []
+
+	return data ? selector(filteredData) ?? null : null
 }
 
 export const useDataFind = (selector: (data: PlainData) => boolean) =>
@@ -20,3 +22,5 @@ export const useDataByFSID = (fsid?: FSID | null) => useDataFind(item => item.fs
 
 export const useDataByLabel = (labels: string[]) =>
 	useDataFilter(item => labels.every(label => item.labels.includes(label)))
+
+export const useData = () => useDataSelector(x => x)

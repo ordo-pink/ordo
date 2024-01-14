@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 import { PlainData } from "@ordo-pink/data"
-import { useSharedContext } from "@ordo-pink/frontend-core"
+import { EXTENSION_FILE_PREFIX, useSharedContext } from "@ordo-pink/frontend-core"
 import { useEffect, useState } from "react"
 import Links3D from "./3d-links.component"
 import { useRouteParams } from "$hooks/use-route-params.hook"
@@ -27,7 +27,10 @@ export default function LinksWorkspace() {
 
 		const tmpNodes = [] as typeof nodes
 		const tmpLinks = [] as typeof links
-		const relevantData = label ? data.filter(d => d.labels.includes(label)) : data
+		const noInternalData = data.filter(item => !item.name.startsWith(EXTENSION_FILE_PREFIX))
+		const relevantData = label
+			? noInternalData.filter(d => d.labels.includes(label))
+			: noInternalData
 
 		relevantData.forEach(item => {
 			if (!tmpNodes.some(n => n.id === item.fsid)) tmpNodes.push({ id: item.fsid, data: item })

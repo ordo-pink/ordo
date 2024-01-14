@@ -162,7 +162,16 @@ const of = <T>({
 				.chain(data => dataPersistenceStrategy.update(data.plain).map(() => data.plain.size)),
 		),
 	// TODO: Roll back on error
-	uploadContent: ({ content, createdBy, updatedBy, name, parent, fileLimit, length }) =>
+	uploadContent: ({
+		content,
+		createdBy,
+		updatedBy,
+		name,
+		parent,
+		fileLimit,
+		length,
+		contentType = "text/ordo",
+	}) =>
 		dataPersistenceStrategy
 			.find(createdBy, name, parent)
 			.fix(() => null)
@@ -174,6 +183,7 @@ const of = <T>({
 							createdBy,
 							parent,
 							fileLimit,
+							contentType,
 					  }),
 			)
 			.chain(plain =>

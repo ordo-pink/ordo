@@ -2,8 +2,8 @@
 // SPDX-License-Identifier: MIT
 
 import type { FSID, PlainData } from "@ordo-pink/data"
-import { useSharedContext } from "@ordo-pink/frontend-core"
 import { Switch } from "@ordo-pink/switch"
+import { useData } from "./use-data.hook"
 
 type UseChildren = (item: PlainData | FSID | "root" | null) => PlainData[]
 
@@ -15,7 +15,7 @@ type UseChildren = (item: PlainData | FSID | "root" | null) => PlainData[]
  * @type {UseChildren}
  */
 export const useChildren: UseChildren = item => {
-	const { data } = useSharedContext()
+	const data = useData()
 
 	const fsid = Switch.empty()
 		.case(Boolean(item && (item as PlainData).fsid), () => (item as PlainData).fsid)

@@ -1,13 +1,13 @@
 // SPDX-FileCopyrightText: Copyright 2023, 谢尔盖||↓ and the Ordo.pink contributors
 // SPDX-License-Identifier: MIT
 
-import { Either } from "@ordo-pink/either"
+import { Either, TEither } from "@ordo-pink/either"
 import { validations } from "./data-validations.impl"
 import { PlainData, TData, DataStatic, FSID } from "./data.types"
 import { Errors } from "./errors.impl"
 import { DataError } from "./errors.types"
 
-const addUnique = <T>(array: T[], element: T) => Array.from(new Set([element, ...array]))
+const addUnique = <T>(array: T[], ...elements: T[]) => Array.from(new Set([...elements, ...array]))
 const drop = <T>(array: T[], element: T) => array.filter(item => item !== element)
 const extend =
 	<T extends Record<string, unknown>, N extends Record<string, unknown>>(f: (obj: T) => N) =>
@@ -105,10 +105,19 @@ const dropLinksE =
 const addLabelE =
 	(plain: PlainData): TData["addLabel"] =>
 	(label, updatedBy) =>
-		validations
-			.isValidLabelE(label)
-			.chain(label => validations.isValidSubE(updatedBy).map(updatedBy => ({ label, updatedBy })))
-			.map(({ label, updatedBy }) => ({ updatedBy, labels: addUnique(plain.labels, label) }))
+		Either.of<string[], DataError>(Array.isArray(label) ? label : [label])
+			.chain(labels =>
+				labels.reduce(
+					(acc, v) => acc.chain(() => validations.isValidLabelE(v)),
+					Either.right<string, DataError>(""),
+				),
+			)
+			.chain(() =>
+				validations
+					.isValidSubE(updatedBy)
+					.map(updatedBy => ({ labels: Array.isArray(label) ? label : [label], updatedBy })),
+			)
+			.map(({ labels, updatedBy }) => ({ updatedBy, labels: addUnique(plain.labels, ...labels) }))
 			.map(extend(() => ({ updatedAt: Date.now() })))
 			.map(increment => Data.of({ ...plain, ...increment }))
 

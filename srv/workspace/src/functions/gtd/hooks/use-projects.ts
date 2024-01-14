@@ -5,8 +5,8 @@ import { useDataByLabel } from "$hooks/use-data.hook"
 import { useInbox } from "./use-inbox"
 
 export const useGtdProjects = () => {
-	const gtd = useDataByLabel(["gtd"])
+	const gtd = useDataByLabel(["gtd", "project"])
 	const inbox = useInbox()
 
-	return gtd.filter(item => !inbox.some(i => i.fsid === item.fsid))
+	return gtd.filter(data => !inbox.some(item => item.fsid === data.fsid))
 }

@@ -3,12 +3,13 @@
 
 import Card from "$components/card.component"
 import { CenteredPage } from "$components/centered-page"
+import { useExtensionState } from "$hooks/use-extension-state.hook"
 import { useStrictSubscription } from "$hooks/use-subscription"
 import { __Activities$ } from "$streams/activities"
 import { Extensions, ComponentSpace, Functions } from "@ordo-pink/frontend-core"
 import { Switch } from "@ordo-pink/switch"
 import { Nullable } from "@ordo-pink/tau"
-import { memo } from "react"
+import { memo, useEffect } from "react"
 import { BsCollection } from "react-icons/bs"
 
 const announcements = [
@@ -55,7 +56,7 @@ const Workspace = ({ commands, activities$ }: Pick<P, "commands" | "activities$"
 	return (
 		<CenteredPage centerX centerY>
 			<div className="container py-12 overflow-x-hidden grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 px-8">
-				<Card title="Новости" className="row-span-3">
+				<Card title="Новости" className="row-span-2">
 					{announcements.map(announcement => (
 						<div key={announcement.title}>
 							<div className="flex space-x-2 flex-wrap items-center justify-between mb-1">

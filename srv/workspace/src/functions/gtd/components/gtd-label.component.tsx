@@ -19,13 +19,13 @@ export default function GTDLabel({ label }: P) {
 
 	useAccelerator("meta+n", () => createInputRef.current?.focus())
 
-	const tAddToInboxInputPlaceholder = "Sell milk..."
+	const tAddToInboxInputPlaceholder = "Вот бы сейчас..."
 
 	return (
 		<CenteredPage centerX centerY>
 			<div className="px-4 py-8 w-full flex flex-col space-y-4 items-center overflow-y-hidden">
 				<div className="w-full max-w-2xl flex flex-col space-y-4">
-					<Card className="h-[90vh]" title={label}>
+					<Card className="h-[90vh]" title={`Метка #${label}`}>
 						<TextInput
 							forwardRef={createInputRef}
 							id="add-to-label"

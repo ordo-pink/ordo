@@ -8,3 +8,5 @@ export enum ComponentSpace {
 	BANNER,
 	WORKSPACE,
 }
+
+export const EXTENSION_FILE_PREFIX = ".ext_"

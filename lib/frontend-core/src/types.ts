@@ -7,7 +7,7 @@ import type { Nullable, Thunk, UUIDv4, Unary } from "@ordo-pink/tau"
 import type { FSID, PlainData } from "@ordo-pink/data"
 import type { Observable } from "rxjs"
 import type { Logger } from "@ordo-pink/logger"
-import type { ComponentSpace } from "./constants/component-space.constants"
+import type { ComponentSpace } from "./constants"
 
 export namespace Functions {
 	export type CreateFunctionParams = {
@@ -46,6 +46,13 @@ declare global {
 		module background {
 			type setStatus = { name: "background-task.set-status"; payload: BackgroundTaskStatus }
 			type resetStatus = { name: "background-task.reset-status" }
+		}
+
+		module extensionState {
+			type update<T extends Record<string, unknown> = Record<string, unknown>> = {
+				name: "extension-state.update"
+				payload: { name: string; payload: T }
+			}
 		}
 
 		module user {
@@ -92,7 +99,7 @@ declare global {
 
 			type setContent = {
 				name: "data.set-content"
-				payload: { fsid: FSID; content: string | ArrayBuffer }
+				payload: { fsid: FSID; content: string | ArrayBuffer; contentType?: string }
 			}
 			type uploadContent = {
 				name: "data.upload-content"
@@ -105,7 +112,10 @@ declare global {
 			type remove = { name: "data.remove"; payload: PlainData }
 			type move = { name: "data.move"; payload: { fsid: FSID; parent: Nullable<FSID> } }
 			type rename = { name: "data.rename"; payload: { fsid: FSID; name: string } }
-			type addLabel = { name: "data.add-label"; payload: { item: PlainData; label: string } }
+			type addLabel = {
+				name: "data.add-label"
+				payload: { item: PlainData; label: string | string[] }
+			}
 			type removeLabel = {
 				name: "data.remove-label"
 				payload: { item: PlainData; label: string }

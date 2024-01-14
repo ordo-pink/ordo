@@ -4,18 +4,21 @@
 import ActionListItem from "$components/action-list-item"
 import { Title } from "$components/page-header"
 import { useSharedContext } from "@ordo-pink/frontend-core"
-import { BsInbox, BsListCheck } from "react-icons/bs"
+import { BsInbox, BsListCheck, BsPencil, BsPlus, BsTag } from "react-icons/bs"
 import { HiOutlineSparkles } from "react-icons/hi"
 import { useGtdProjects } from "../hooks/use-projects"
 import { useInbox } from "../hooks/use-inbox"
 import { useRouteParams } from "$hooks/use-route-params.hook"
 import { FSID } from "@ordo-pink/data"
+import { OrdoButtonSecondary } from "$components/buttons/buttons"
+import { useExtensionState } from "$hooks/use-extension-state.hook"
 
 export default function GTDSidebar() {
-	const { route, commands } = useSharedContext()
+	const { route, commands, data } = useSharedContext()
 	const { fsid } = useRouteParams<{ fsid: FSID }>()
 	const inboxItems = useInbox()
 	const projects = useGtdProjects()
+	const state = useExtensionState<{ pinnedLabels?: string[] }>("gtd")
 	// const pinned = useDataFind(item => !!gtd && item.name === ".pinned" && item.parent === gtd.fsid)
 
 	return (
@@ -73,12 +76,61 @@ export default function GTDSidebar() {
 				</OrdoButtonSecondary> */}
 			</div>
 
-			{/* <div className="flex flex-col space-y-2">
-				<Title level="5" center uppercase styledFirstLetter>
-					Pinned Labels
-				</Title>
+			<div className="flex flex-col space-y-2">
+				<div className="flex justify-between w-full items-center">
+					<div className="flex-grow">
+						<Title level="5" center uppercase styledFirstLetter>
+							Закреплённые метки
+						</Title>
+					</div>
+					<OrdoButtonSecondary
+						title="Изменить закреплённые метки"
+						compact
+						onClick={() => {
+							const labels = Array.from(new Set(data?.flatMap(item => item.labels)))
+							commands.emit<cmd.commandPalette.show>("command-palette.show", {
+								multiple: true,
+								pinnedItems: state.pinnedLabels?.map(label => ({
+									id: label,
+									readableName: label,
+									Icon: BsTag,
+									onSelect: () => {
+										commands.emit<cmd.extensionState.update>("extension-state.update", {
+											name: "gtd",
+											payload: {
+												...state,
+												pinnedLabels: state.pinnedLabels?.filter(l => l !== label) ?? [],
+											},
+										})
+									},
+								})),
+								items: labels
+									.filter(label => !state.pinnedLabels?.includes(label) && label !== "gtd")
+									.map(label => ({
+										id: label,
+										readableName: label,
+										Icon: BsTag,
+										onSelect: () => {
+											commands.emit<cmd.extensionState.update>("extension-state.update", {
+												name: "gtd",
+												payload: {
+													...state,
+													pinnedLabels: state.pinnedLabels
+														? state.pinnedLabels.concat([label])
+														: [label],
+												},
+											})
+										},
+									})),
+							})
+						}}
+					>
+						<BsPencil />
+					</OrdoButtonSecondary>
+				</div>
+
 				<div>
-					{pinned?.labels.map(label => (
+					{state.pinnedLabels?.map(label => (
 						<ActionListItem
 							Icon={BsTag}
 							key={label}
@@ -88,19 +140,7 @@ export default function GTDSidebar() {
 						/>
 					))}
 				</div>
-
-				<OrdoButtonSecondary
-					className="text-lg"
-					center
-					title="Add Pinned Label"
-					compact
-					onClick={() =>
-						commands.emit<cmd.data.showEditLabelsPalette>("data.show-edit-labels-palette", pinned!)
-					}
-				>
-					<BsPlus className="text-lg" />
-				</OrdoButtonSecondary>
-			</div> */}
+			</div>
 		</div>
 	)
 }

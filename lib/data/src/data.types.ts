@@ -39,8 +39,8 @@ export type TData = {
 	addLink: (link: FSID, updatedBy: UserID) => TEither<TData, DataError>
 	removeLink: (link: FSID, updatedBy: UserID) => TEither<TData, DataError>
 	dropLinks: (updatedBy: UserID) => TEither<TData, DataError>
-	addLabel: (link: string, updatedBy: UserID) => TEither<TData, DataError>
-	removeLabel: (link: string, updatedBy: UserID) => TEither<TData, DataError>
+	addLabel: (label: string | string[], updatedBy: UserID) => TEither<TData, DataError>
+	removeLabel: (label: string, updatedBy: UserID) => TEither<TData, DataError>
 	dropLabels: (updatedBy: UserID) => TEither<TData, DataError>
 	update: (plain: PlainData) => TEither<TData, DataError>
 }

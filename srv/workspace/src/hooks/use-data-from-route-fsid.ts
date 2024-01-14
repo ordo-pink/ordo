@@ -5,6 +5,7 @@ import type { FSID, PlainData } from "@ordo-pink/data"
 import { useEffect, useState } from "react"
 import { useSharedContext } from "@ordo-pink/frontend-core"
 import { Either } from "@ordo-pink/either"
+import { useData } from "./use-data.hook"
 
 type UseDataFromRouteFSID = () => PlainData | null
 
@@ -16,7 +17,8 @@ type UseDataFromRouteFSID = () => PlainData | null
  * @type {UseDataFromRouteFSID}
  */
 export const useDataFromRouteFSID: UseDataFromRouteFSID = () => {
-	const { data, route } = useSharedContext()
+	const { route } = useSharedContext()
+	const data = useData()
 	const [currentData, setCurrentData] = useState<PlainData | null>(null)
 
 	useEffect(() => {

@@ -5,7 +5,7 @@ import DataLabel from "$components/data/label.component"
 import Link from "$components/link"
 import Null from "$components/null"
 import { useChildren } from "$hooks/use-children"
-import { useDataByFSID } from "$hooks/use-data.hook"
+import { useDataByFSID, useDataFilter } from "$hooks/use-data.hook"
 import { usePublicUserInfo } from "$hooks/use-public-user-info.hook"
 import { useReadableSize } from "$hooks/use-readable-size.hook"
 import { UserUtils } from "$utils/user-utils.util"
@@ -23,6 +23,7 @@ export default function DataEditor({ data }: P) {
 	const readableSize = useReadableSize(data)
 	const parent = useDataByFSID(data.parent)
 	const children = useChildren(data)
+	const incomingLinks = useDataFilter(item => item.links.includes(data.fsid))
 
 	const creator = user && user.id === data.createdBy ? "Вы" : UserUtils.getUserName(createdBy)
 	const createdAt = new Date(data.createdAt).toLocaleString("ru")
@@ -46,13 +47,28 @@ export default function DataEditor({ data }: P) {
 				<Row title="Последнее изменение">
 					{updater} ({updatedAt})
 				</Row>
+
+				{/* TODO: Allow setting parent */}
 				{Either.fromNullable(parent).fold(Null, parent => (
 					<Row title="Родитель">
 						<Link href={`/editor/${parent.fsid}`}>{parent.name}</Link>
 					</Row>
 				))}
+
 				<ChildrenRow children={children} />
-				<Row title="Ссылки" className="cursor-pointer" onClick={handleLinksClick}>
+
+				<Row title="Входящие ссылки">
+					<div className="flex flex-wrap gap-1">
+						{Either.fromBoolean(() => incomingLinks.length > 0).fold(
+							() => (
+								<div className="italic">Нет</div>
+							),
+							() => incomingLinks.map(link => <DataLink key={link.fsid} link={link.fsid} />),
+						)}
+					</div>
+				</Row>
+
+				<Row title="Исходящие ссылки" className="cursor-pointer" onClick={handleLinksClick}>
 					<div className="flex flex-wrap gap-1">
 						{Either.fromBoolean(() => data.links.length > 0).fold(
 							() => (
@@ -62,6 +78,7 @@ export default function DataEditor({ data }: P) {
 						)}
 					</div>
 				</Row>
+
 				<Row title="Метки" className="cursor-pointer" onClick={handleLabelsClick}>
 					<div className="flex flex-wrap gap-1">
 						{Either.fromBoolean(() => data.labels.length > 0).fold(
@@ -100,7 +117,10 @@ const DataLink = ({ link }: DataLinkP) => {
 		<DataLabel>
 			<div
 				className="cursor-pointer"
-				onClick={() => commands.emit<cmd.router.navigate>("router.navigate", `/editor/${link}`)}
+				onClick={event => {
+					event.stopPropagation()
+					commands.emit<cmd.router.navigate>("router.navigate", `/editor/${link}`)
+				}}
 			>
 				{data.name}
 			</div>

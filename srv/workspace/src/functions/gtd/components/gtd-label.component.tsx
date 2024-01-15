@@ -13,7 +13,7 @@ import { useDataByLabel } from "$hooks/use-data.hook"
 type P = { label: string }
 export default function GTDLabel({ label }: P) {
 	const { commands } = useSharedContext()
-	const items = useDataByLabel(["gtd", label])
+	const items = useDataByLabel([label])
 	const [newItem, setNewItem] = useState("")
 	const createInputRef = useRef<HTMLInputElement>(null)
 

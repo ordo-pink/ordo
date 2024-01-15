@@ -4,7 +4,7 @@
 import ActionListItem from "$components/action-list-item"
 import { Title } from "$components/page-header"
 import { useSharedContext } from "@ordo-pink/frontend-core"
-import { BsInbox, BsListCheck, BsPencil, BsPlus, BsTag } from "react-icons/bs"
+import { BsInbox, BsListCheck, BsPencil, BsTag } from "react-icons/bs"
 import { HiOutlineSparkles } from "react-icons/hi"
 import { useGtdProjects } from "../hooks/use-projects"
 import { useInbox } from "../hooks/use-inbox"
@@ -12,6 +12,7 @@ import { useRouteParams } from "$hooks/use-route-params.hook"
 import { FSID } from "@ordo-pink/data"
 import { OrdoButtonSecondary } from "$components/buttons/buttons"
 import { useExtensionState } from "$hooks/use-extension-state.hook"
+import GTDSidebarProject from "./gtd-sidebar-project.component"
 
 export default function GTDSidebar() {
 	const { route, commands, data } = useSharedContext()
@@ -19,7 +20,6 @@ export default function GTDSidebar() {
 	const inboxItems = useInbox()
 	const projects = useGtdProjects()
 	const state = useExtensionState<{ pinnedLabels?: string[] }>("gtd")
-	// const pinned = useDataFind(item => !!gtd && item.name === ".pinned" && item.parent === gtd.fsid)
 
 	return (
 		<div className="mt-8 flex flex-col space-y-8 px-1">
@@ -48,20 +48,21 @@ export default function GTDSidebar() {
 				</Title>
 				<div>
 					{projects.map(project => (
-						<ActionListItem
-							large
-							key={project.fsid}
-							Icon={BsListCheck}
-							current={fsid === project.fsid}
-							text={project.name}
-							href={`/gtd/projects/${project.fsid}`}
-							onContextMenu={event =>
-								commands.emit<cmd.ctxMenu.show>("context-menu.show", {
-									event,
-									payload: project,
-								})
-							}
-						/>
+						<GTDSidebarProject fsid={project.fsid} />
+						// <ActionListItem
+						// 	large
+						// 	key={project.fsid}
+						// 	Icon={BsListCheck}
+						// 	current={fsid === project.fsid}
+						// 	text={project.name}
+						// 	href={`/gtd/projects/${project.fsid}`}
+						// 	onContextMenu={event =>
+						// 		commands.emit<cmd.ctxMenu.show>("context-menu.show", {
+						// 			event,
+						// 			payload: project,
+						// 		})
+						// 	}
+						// />
 					))}
 				</div>
 

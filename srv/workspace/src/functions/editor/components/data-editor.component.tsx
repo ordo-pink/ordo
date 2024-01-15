@@ -12,8 +12,18 @@ import { UserUtils } from "$utils/user-utils.util"
 import { FSID, PlainData } from "@ordo-pink/data"
 import { Either } from "@ordo-pink/either"
 import { useSharedContext } from "@ordo-pink/frontend-core"
-import { MouseEventHandler, PropsWithChildren, useEffect, useState } from "react"
-import { BsChevronDown, BsChevronUp } from "react-icons/bs"
+import { ComponentType, MouseEventHandler, PropsWithChildren, useEffect, useState } from "react"
+import {
+	BsBox,
+	BsChevronDown,
+	BsChevronUp,
+	BsClock,
+	BsClockHistory,
+	BsFiles,
+	BsFolder2,
+	BsTags,
+} from "react-icons/bs"
+import { PiGraph, PiTreeStructure } from "react-icons/pi"
 
 type P = { data: PlainData }
 export default function DataEditor({ data }: P) {
@@ -40,24 +50,26 @@ export default function DataEditor({ data }: P) {
 	return (
 		<table className="w-full table-fixed text-neutral-500 text-sm">
 			<tbody>
-				<Row title="Размер">{readableSize}</Row>
-				<Row title="Создан">
+				<Row title="Размер" Icon={BsBox}>
+					{readableSize}
+				</Row>
+				<Row title="Создан" Icon={BsClockHistory}>
 					{creator} ({createdAt})
 				</Row>
-				<Row title="Последнее изменение">
+				<Row title="Последнее изменение" Icon={BsClock}>
 					{updater} ({updatedAt})
 				</Row>
 
 				{/* TODO: Allow setting parent */}
 				{Either.fromNullable(parent).fold(Null, parent => (
-					<Row title="Родитель">
+					<Row title="Родитель" Icon={BsFolder2}>
 						<Link href={`/editor/${parent.fsid}`}>{parent.name}</Link>
 					</Row>
 				))}
 
 				<ChildrenRow children={children} />
 
-				<Row title="Входящие ссылки">
+				<Row title="Входящие ссылки" Icon={PiGraph}>
 					<div className="flex flex-wrap gap-1">
 						{Either.fromBoolean(() => incomingLinks.length > 0).fold(
 							() => (
@@ -68,7 +80,12 @@ export default function DataEditor({ data }: P) {
 					</div>
 				</Row>
 
-				<Row title="Исходящие ссылки" className="cursor-pointer" onClick={handleLinksClick}>
+				<Row
+					title="Исходящие ссылки"
+					className="cursor-pointer"
+					onClick={handleLinksClick}
+					Icon={PiTreeStructure}
+				>
 					<div className="flex flex-wrap gap-1">
 						{Either.fromBoolean(() => data.links.length > 0).fold(
 							() => (
@@ -79,7 +96,7 @@ export default function DataEditor({ data }: P) {
 					</div>
 				</Row>
 
-				<Row title="Метки" className="cursor-pointer" onClick={handleLabelsClick}>
+				<Row title="Метки" className="cursor-pointer" onClick={handleLabelsClick} Icon={BsTags}>
 					<div className="flex flex-wrap gap-1">
 						{Either.fromBoolean(() => data.labels.length > 0).fold(
 							() => (
@@ -96,13 +113,25 @@ export default function DataEditor({ data }: P) {
 
 type RowP = PropsWithChildren<{
 	title: string
+	Icon?: ComponentType
 	onClick?: MouseEventHandler<HTMLTableRowElement>
 	className?: string
 }>
-const Row = ({ title, children, className = "", onClick = () => void 0 }: RowP) => {
+const Row = ({
+	title,
+	children,
+	className = "",
+	onClick = () => void 0,
+	Icon = () => null,
+}: RowP) => {
 	return (
 		<tr className={`table-row ${className}`} onClick={onClick}>
-			<td className="flex py-1">{title}</td>
+			<td className="flex py-1">
+				<div className="flex items-center space-x-2">
+					<Icon />
+					<div>{title}</div>
+				</div>
+			</td>
 			<td className="py-1">{children}</td>
 		</tr>
 	)
@@ -137,7 +166,7 @@ const ChildrenRow = ({ children }: ChildrenRowP) => {
 	useEffect(() => setShouldCollapse(children.length > 2), [children])
 
 	return Either.fromBoolean(() => children.length > 0).fold(Null, () => (
-		<Row title="Вложенные файлы">
+		<Row title="Вложенные файлы" Icon={BsFiles}>
 			<div className="flex flex-wrap gap-1">
 				{(shouldCollapse && isCollapsed ? children.slice(0, 2) : children).map(child => (
 					<DataLabel key={child.fsid}>

@@ -79,7 +79,7 @@ rejected.fork(console.error, console.log) // console.error("no")
 ```
 
 The `fork` method returns a Promise of either the resolved, or the rejected value of the Oath. The
-promise itself **never** rejects!
+promise itself **always** resolves!
 
 ```typescript
 import { Oath } from "oathify"
@@ -106,7 +106,7 @@ rejected
 
 The `orNothing` method accepts no arguments. If the Oath gets resolved, it returns the Promise of
 the value from the Oath. If the Oath gets rejected, it returns a `Promise<void>` (`undefined`). The
-Promise itself **never** rejects.
+Promise itself **always** resolves.
 
 ```typescript
 import { Oath } from "oathify"
@@ -123,7 +123,7 @@ rejected.orNothing().then(console.log) // undefined
 The `orElse` method accepts one argument that has to be a function. If the Oath gets resolved, it
 returns the Promise of the value from the Oath. If the Oath gets rejected, it returns a Promise of
 the value returned by the function provided to the `orElse` as an argument. The Promise itself
-**never** rejects.
+**always** resolves.
 
 ```typescript
 import { Oath } from "oathify"
@@ -538,6 +538,57 @@ This is especially helpful if you develop a library and you want to provide prec
 kind of errors might occur when the consumers of your library use your code. You can even omit
 throwing errors and reject with specific strings, enum values, or just number, thus removing all the
 necessity of `new Error`, stack trace collection and redundant catching all over the place.
+
+### Cancellation
+
+Oath can be cancelled (YES!!). To cancel an Oath, simply call `cancel()`. It works both inside and
+outside Oath definition. Even if the Oath has internally got a pending Promise, it will abort that
+Promise as well. If the Oath internally got a fulfilled Promise, it won't be cancelled, because
+there is nothing to cancel already.
+
+If you cancel an Oath right inside the Oath itself, make use you don't do that in a `.chain()`. If
+you still need to do that in a `.chain()`, make sure you return an `Oath.of(o.cancel())` so that the
+chaining itself does not break. The same rule applies to `.rejectedChain()`. It is completely fine
+to return an `o.cancel()` in any other method.
+
+The `.cancel()` method accepts an optional **reason** argument. If it is not provided, it will be
+automatically set to _"Cancelled"_.
+
+```tsx
+import { Oath } from "oathify"
+import { useEffect, useState } from "react"
+import RenderIf from "../components/render-if"
+
+type Item = { title: string; description: string }
+type P = { id: string }
+const ItemCard = ({ id }: P) => {
+	const [item, setItem] = useState<Item | null>(null)
+
+	useEffect(() => {
+		const item0 = Oath.from(() => fetch(`/api/v1/items/${id}`).then(r$ => r$.json()))
+			// Cancel it in place if the request was not a success
+			// In this case you could also chain and reject to switch to the rejected branch
+			.tap(response => response.status !== 200 && item0.cancel("Not found"))
+			.map(setItem)
+
+		item0.orElse(() => setItem(null))
+
+		return () => {
+			// Cancel it all on component unmount
+			item0.cancel("Early rerender")
+		}
+	}, [id])
+
+	return (
+		<RenderIf condition={!!item}>
+			<div className="card">
+				<h1>{item.title}</h1>
+				<p>{item.description}</p>
+			</div>
+		</RenderIf>
+	)
+}
+```
 
 ## A benchmark of ten thousand, Mister Frisby
 

@@ -1,6 +1,6 @@
 {
 	"name": "@ordo-pink/oath",
-	"version": "0.1.0",
+	"version": "0.2.0",
 	"description": "Lazy promises with extended API and type inference for the rejected branch",
 	"main": "index.js",
 	"scripts": {

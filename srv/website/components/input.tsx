@@ -79,7 +79,9 @@ export const EmailInput = ({
 
 					onInput(
 						Oath.of(event.target.value)
-							.chain(v => new Oath<string>(resolve => setTimeout(() => resolve(v), 1000)))
+							.chain(v =>
+								Oath.from(() => new Promise<string>(resolve => setTimeout(() => resolve(v), 1000))),
+							)
 							.chain(v =>
 								Oath.fromBoolean(
 									() => validator.isEmail(v),
@@ -118,7 +120,9 @@ export const PasswordInput = ({
 
 					onInput(
 						Oath.of(event.target.value)
-							.chain(v => new Oath<string>(resolve => setTimeout(() => resolve(v), 1000)))
+							.chain(v =>
+								Oath.from(() => new Promise<string>(resolve => setTimeout(() => resolve(v), 1000))),
+							)
 							.map(validatePassword)
 							.chain(error =>
 								Oath.fromBoolean(

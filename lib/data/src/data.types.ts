@@ -17,7 +17,7 @@ export type FSID = `${string}-${string}-${string}-${string}-${string}`
  */
 export type UserID = `${string}-${string}-${string}-${string}-${string}`
 
-export type PlainData = {
+export type PlainData<Properties extends Record<string, unknown> = Record<string, unknown>> = {
 	fsid: FSID
 	name: string
 	parent: Nullable<FSID>
@@ -29,28 +29,40 @@ export type PlainData = {
 	updatedAt: number
 	updatedBy: UserID
 	size: number
+	properties?: Properties
 }
 
-export type TData = {
-	plain: PlainData
-	setName: (name: string, updatedBy: UserID) => TEither<TData, DataError>
-	setSize: (size: number, updatedBy: UserID) => TEither<TData, DataError>
-	setParent: (parent: Nullable<FSID>, updatedBy: UserID) => TEither<TData, DataError>
-	addLink: (link: FSID, updatedBy: UserID) => TEither<TData, DataError>
-	removeLink: (link: FSID, updatedBy: UserID) => TEither<TData, DataError>
-	dropLinks: (updatedBy: UserID) => TEither<TData, DataError>
-	addLabel: (label: string | string[], updatedBy: UserID) => TEither<TData, DataError>
-	removeLabel: (label: string, updatedBy: UserID) => TEither<TData, DataError>
-	dropLabels: (updatedBy: UserID) => TEither<TData, DataError>
-	update: (plain: PlainData) => TEither<TData, DataError>
+export type PlainDataWith<Properties extends Record<string, unknown> = Record<string, unknown>> =
+	PlainData<Partial<Properties>>
+
+export type TData<Properties extends Record<string, unknown> = Record<string, unknown>> = {
+	plain: PlainData<Properties>
+	setName: (name: string, updatedBy: UserID) => TEither<TData<Properties>, DataError>
+	setSize: (size: number, updatedBy: UserID) => TEither<TData<Properties>, DataError>
+	setParent: (parent: Nullable<FSID>, updatedBy: UserID) => TEither<TData<Properties>, DataError>
+	addLink: (link: FSID, updatedBy: UserID) => TEither<TData<Properties>, DataError>
+	removeLink: (link: FSID, updatedBy: UserID) => TEither<TData<Properties>, DataError>
+	dropLinks: (updatedBy: UserID) => TEither<TData<Properties>, DataError>
+	addLabel: (label: string | string[], updatedBy: UserID) => TEither<TData<Properties>, DataError>
+	removeLabel: (label: string, updatedBy: UserID) => TEither<TData<Properties>, DataError>
+	dropLabels: (updatedBy: UserID) => TEither<TData<Properties>, DataError>
+	setProperty: <K extends string, V>(
+		key: K,
+		value: V,
+		updatedBy: UserID,
+	) => TEither<TData<Record<K, V>>, DataError>
+	update: (plain: PlainData) => TEither<TData<Properties>, DataError>
 }
 
 export type DataStatic = {
 	Validations: Validations
 	Errors: typeof Errors
 	of: (plain: PlainData) => TData
+	as: <Properties extends Record<string, unknown> = Record<string, unknown>>(
+		plain: PlainData,
+	) => PlainDataWith<Properties>
 	new: (
-		params: Pick<PlainData, "name" | "parent" | "createdBy"> & {
+		params: Pick<PlainData, "name" | "parent" | "createdBy" | "properties"> & {
 			fsid?: FSID
 			labels?: string[]
 			contentType?: string

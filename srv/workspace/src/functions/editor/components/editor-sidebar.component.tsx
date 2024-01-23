@@ -38,7 +38,7 @@ export default function EditorSidebar() {
 					: data.sort((a, b) => (a.updatedAt < b.updatedAt ? 1 : -1)),
 			)
 			.fold(() => setVisibleItems([]), setVisibleItems)
-	}, [data, isNestingEnabled])
+	}, [data?.length, isNestingEnabled])
 
 	return Either.fromNullable(visibleItems).fold(Loading, data => (
 		<div className="h-full p-1">

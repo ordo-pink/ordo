@@ -46,7 +46,7 @@ const Hotkey = ({ accelerator }: _P) => {
 	const symbol = split[split.length - 1].toLowerCase()
 
 	return (
-		<div className="hidden md:flex shrink-0 items-center space-x-1 text-neutral-500 dark:text-neutral-300 text-xs">
+		<div className="hidden items-center space-x-1 text-xs md:flex shrink-0 text-neutral-500 dark:text-neutral-300">
 			{split.includes("ctrl") && <div>{ctrl} +</div>}
 			{split.includes("meta") && <div>{meta} +</div>}
 			{split.includes("option") && <div>⌥ +</div>}

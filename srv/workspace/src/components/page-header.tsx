@@ -15,8 +15,8 @@ export const Title = ({ level, center, uppercase, children, trim, styledFirstLet
 	Switch.of(level)
 		.case("2", () => (
 			<h2
-				className={`${center ? "text-center " : ""}${uppercase ? "uppercase " : ""}${
-					trim ? "text-ellipsis " : ""
+				className={`${center ? "text-center" : ""} ${uppercase ? "uppercase" : ""} ${
+					trim ? "text-ellipsis" : ""
 				}text-xl md:text-3xl font-black max-w-full break-words ${
 					styledFirstLetter
 						? "first-letter:bg-gradient-to-tr first-letter:from-pink-500 first-letter:to-purple-500 first-letter:bg-clip-text first-letter:text-transparent"
@@ -28,8 +28,8 @@ export const Title = ({ level, center, uppercase, children, trim, styledFirstLet
 		))
 		.case("3", () => (
 			<h3
-				className={`${center ? "text-center " : ""}${uppercase ? "uppercase " : ""}${
-					trim ? "text-ellipsis " : ""
+				className={`${center ? "text-center" : ""} ${uppercase ? "uppercase" : ""} ${
+					trim ? "text-ellipsis" : ""
 				}text-lg md:text-2xl font-black max-w-full break-words ${
 					styledFirstLetter
 						? "first-letter:bg-gradient-to-tr first-letter:from-pink-500 first-letter:to-purple-500 first-letter:bg-clip-text first-letter:text-transparent"
@@ -41,8 +41,8 @@ export const Title = ({ level, center, uppercase, children, trim, styledFirstLet
 		))
 		.case("4", () => (
 			<h4
-				className={`${center ? "text-center " : ""}${uppercase ? "uppercase " : ""}${
-					trim ? "text-ellipsis " : ""
+				className={`${center ? "text-center" : ""} ${uppercase ? "uppercase" : ""} ${
+					trim ? "text-ellipsis" : ""
 				}md:text-xl font-black max-w-full break-words ${
 					styledFirstLetter
 						? "first-letter:bg-gradient-to-tr first-letter:from-pink-500 first-letter:to-purple-500 first-letter:bg-clip-text first-letter:text-transparent"
@@ -54,8 +54,8 @@ export const Title = ({ level, center, uppercase, children, trim, styledFirstLet
 		))
 		.case("5", () => (
 			<h2
-				className={`${center ? "text-center " : ""}${uppercase ? "uppercase " : ""}${
-					trim ? "text-ellipsis " : ""
+				className={`${center ? "text-center" : ""} ${uppercase ? "uppercase" : ""} ${
+					trim ? "text-ellipsis" : ""
 				}md:text-lg font-bold md:font-black max-w-full break-words ${
 					styledFirstLetter
 						? "first-letter:bg-gradient-to-tr first-letter:from-pink-500 first-letter:to-purple-500 first-letter:bg-clip-text first-letter:text-transparent"
@@ -67,8 +67,8 @@ export const Title = ({ level, center, uppercase, children, trim, styledFirstLet
 		))
 		.default(() => (
 			<h1
-				className={`${center ? "text-center " : ""}${uppercase ? "uppercase " : ""}${
-					trim ? "text-ellipsis " : ""
+				className={`${center ? "text-center" : ""} ${uppercase ? "uppercase" : ""} ${
+					trim ? "text-ellipsis" : ""
 				}text-2xl md:text-4xl font-black max-w-full break-words ${
 					styledFirstLetter
 						? "first-letter:bg-gradient-to-tr first-letter:from-pink-500 first-letter:to-purple-500 first-letter:bg-clip-text first-letter:text-transparent"

@@ -40,22 +40,22 @@ export default function Sidebar({ children, isNarrow, commandPalette$, sidebar$ 
 
 	return (
 		<div
-			className="h-screen w-full flex justify-between flex-col px-4 py-3 bg-neutral-200 dark:bg-neutral-900 overflow-y-hidden"
+			className="flex overflow-y-hidden flex-col justify-between px-4 py-3 w-full h-screen bg-neutral-200 dark:bg-neutral-900"
 			onClick={onSidebarClick}
 			onContextMenu={showContextMenu}
 		>
 			<div className="flex flex-col">
-				<div className="flex items-center justify-between">
+				<div className="flex justify-between items-center">
 					<img src={`${Hosts.STATIC}/logo.png`} className="w-8" alt="Ordo.pink Logo" />
-					<div className="text-neutral-500 cursor-pointer text-2xl" onClick={openCommandPalette}>
+					<div className="text-2xl cursor-pointer text-neutral-500" onClick={openCommandPalette}>
 						<BsThreeDotsVertical />
 					</div>
 				</div>
 			</div>
 
-			<div className="h-full flex-grow overflow-y-auto my-2">{children}</div>
+			<div className="overflow-y-auto flex-grow my-2 h-full">{children}</div>
 
-			<div className="w-full flex space-x-2 items-center justify-center">
+			<div className="flex justify-center items-center space-x-2 w-full">
 				<div className="flex items-center justify-center rounded-full mt-1 p-0.5 bg-gradient-to-tr from-sky-400 via-purple-400 to-rose-400 shadow-lg shrink-0 cursor-pointer">
 					<div className="bg-white rounded-full">
 						<Link href="/user">

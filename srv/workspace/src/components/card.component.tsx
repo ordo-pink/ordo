@@ -8,7 +8,7 @@ type _P = PropsWithChildren<{ title?: string; className?: string }>
 export default function Card({ title, children, className }: _P) {
 	return (
 		<div
-			className={`w-full flex flex-col space-y-4 bg-neutral-200 dark:bg-neutral-900 p-4 md:p-8 rounded-lg shadow-md dark:shadow-inner ${className}`}
+			className={`flex flex-col p-4 space-y-4 w-full rounded-lg shadow-md bg-neutral-200 dark:bg-neutral-900 md:p-8 dark:shadow-inner ${className}`}
 		>
 			{title ? (
 				<Title level="3" uppercase center>

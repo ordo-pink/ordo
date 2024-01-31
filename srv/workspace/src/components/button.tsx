@@ -14,7 +14,7 @@ export const Button = ({ children, disabled, onClick }: PropsWithChildren<Props>
 		<button
 			disabled={disabled}
 			onClick={onClick}
-			className="cursor-pointer flex items-center disabled:ring-0 disabled:cursor-not-allowed disabled:bg-neutral-500 space-x-2 bg-stone-900 dark:bg-neutral-100 text-neutral-300 dark:text-neutral-800 max-w-xs self-end px-6 py-1 rounded-md hover:ring-2 hover:ring-pink-300 dark:hover:ring-pink-500 focus:ring-2 focus:ring-pink-300 dark:focus:ring-pink-500 transition-all duration-300"
+			className="flex items-center self-end px-6 py-1 space-x-2 max-w-xs rounded-md transition-all duration-300 cursor-pointer disabled:ring-0 disabled:cursor-not-allowed disabled:bg-neutral-500 bg-stone-900 dark:bg-neutral-100 text-neutral-300 dark:text-neutral-800 hover:ring-2 hover:ring-pink-300 dark:hover:ring-pink-500 focus:ring-2 focus:ring-pink-300 dark:focus:ring-pink-500"
 		>
 			<div>{children}</div>
 			<BsArrowRight />

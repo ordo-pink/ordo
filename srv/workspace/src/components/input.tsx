@@ -43,8 +43,8 @@ export const TextInput = ({
 	autocomplete = "off",
 	forwardRef: ref,
 }: InputProps) => (
-	<div className="w-full flex flex-col">
-		<label htmlFor="email" className="w-full text-sm font-medium leading-6 mb-2">
+	<div className="flex flex-col w-full">
+		<label htmlFor="email" className="mb-2 w-full text-sm font-medium leading-6">
 			{label}
 		</label>
 		<input
@@ -58,7 +58,7 @@ export const TextInput = ({
 			onKeyDown={onKeyDown}
 			onChange={onInput}
 			placeholder={placeholder}
-			className="w-full px-2 py-1 rounded-md border-0 shadow-inner placeholder:text-neutral-500 bg-neutral-50 dark:bg-neutral-600 focus:ring-0 sm:text-sm sm:leading-6"
+			className="px-2 py-1 w-full rounded-md border-0 shadow-inner placeholder:text-neutral-500 bg-neutral-50 dark:bg-neutral-600 focus:ring-0 sm:text-sm sm:leading-6"
 		/>
 	</div>
 )

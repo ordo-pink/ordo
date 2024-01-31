@@ -213,7 +213,7 @@ export default function CommandPaletteModal({ items, onNewItem, multiple, pinned
 
 	return (
 		<div className="w-[35rem] max-w-full h-[35rem] max-h-screen">
-			<div className="flex space-x-2 items-center mx-2 mt-2 px-2 py-1 bg-neutral-200 dark:bg-neutral-600 rounded-lg shadow-inner">
+			<div className="flex items-center px-2 py-1 mx-2 mt-2 space-x-2 rounded-lg shadow-inner bg-neutral-200 dark:bg-neutral-600">
 				<BsSearch className="shrink-0" />
 				<input
 					value={inputValue}
@@ -221,7 +221,7 @@ export default function CommandPaletteModal({ items, onNewItem, multiple, pinned
 					onKeyDown={handleKeyDown}
 					type="text"
 					autoFocus
-					className="w-full outline-none ring-0 rounded-lg px-2 py-1 text-sm bg-transparent focus:outline-none focus:ring-0 border-none"
+					className="px-2 py-1 w-full text-sm bg-transparent rounded-lg border-none ring-0 outline-none focus:outline-none focus:ring-0"
 					placeholder={tSearchPlaceholder}
 				/>
 			</div>
@@ -272,7 +272,7 @@ export default function CommandPaletteModal({ items, onNewItem, multiple, pinned
 			</div>
 
 			{multiple ? (
-				<div className="text-center text-neutral-500 text-sm">
+				<div className="text-sm text-center text-neutral-500">
 					Нажмите <Accelerator inline accelerator="Esc" /> для завершения
 				</div>
 			) : null}

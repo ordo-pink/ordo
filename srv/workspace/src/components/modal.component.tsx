@@ -48,7 +48,7 @@ export default function Modal() {
 			onClick={handleHide}
 		>
 			<div
-				className="relative bg-neutral-100 dark:bg-neutral-700 rounded-lg shadow-lg"
+				className="relative rounded-lg shadow-lg bg-neutral-100 dark:bg-neutral-700"
 				onClick={stopPropagation}
 			>
 				<CloseButton shouldShow={showCloseButton} onClick={handleHide} />
@@ -92,7 +92,7 @@ const hideModal = () => modal$.next(null)
 type CloseButtonP = { shouldShow: boolean; onClick: () => void }
 const CloseButton = ({ shouldShow, onClick }: CloseButtonP) =>
 	Either.fromBoolean(() => shouldShow).fold(Null, () => (
-		<div className="absolute right-1 top-1 text-neutral-500 p-2 cursor-pointer" onClick={onClick}>
+		<div className="absolute top-1 right-1 p-2 cursor-pointer text-neutral-500" onClick={onClick}>
 			<BsX />
 		</div>
 	))

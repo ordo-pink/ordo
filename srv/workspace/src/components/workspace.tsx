@@ -62,7 +62,7 @@ const DisabledSidebar = ({ activity }: DisabledSidebarProps) =>
 			</div>
 		),
 		({ Component }) => (
-			<div className="workspace min-h-screen w-full h-full overflow-auto pl-12">
+			<div className="overflow-auto pl-12 w-full h-full min-h-screen workspace">
 				<Component commands={commands} space={ComponentSpace.WORKSPACE} />
 			</div>
 		),
@@ -118,7 +118,7 @@ const EnabledSidebar = ({ sidebar$, activity, commandPalette$ }: EnabledSidebarP
 		() => <div>Welcome</div>,
 		({ Component, Sidebar: SidebarComponent }) => (
 			<Split
-				className="flex overflow-hidden h-screen w-full pl-12"
+				className="flex overflow-hidden pl-12 w-full h-screen"
 				sizes={sizes}
 				snapOffset={snapOffset}
 				onDrag={setSizes}

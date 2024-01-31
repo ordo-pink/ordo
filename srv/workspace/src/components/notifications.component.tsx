@@ -35,7 +35,7 @@ export default function Notifications() {
 	})
 
 	return (
-		<div className="fixed bottom-0 right-0 flex flex-col space-y-2 p-2 w-full max-w-sm">
+		<div className="flex fixed right-0 bottom-0 flex-col p-2 space-y-2 w-full max-w-sm">
 			{notifications.map(notification => (
 				<NotificationComponent key={notification.id} notification={notification} />
 			))}
@@ -97,7 +97,7 @@ const NotificationComponent = ({ notification }: P) => {
 	}, [percentage, notification])
 
 	return (
-		<div className="w-full h-full relative">
+		<div className="relative w-full h-full">
 			<Callout type={notification.type}>
 				<Title notification={notification} />
 				<Message notification={notification} />

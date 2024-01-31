@@ -4,19 +4,16 @@
 import ActionListItem from "$components/action-list-item"
 import { Title } from "$components/page-header"
 import { useSharedContext } from "@ordo-pink/frontend-core"
-import { BsInbox, BsListCheck, BsPencil, BsTag } from "react-icons/bs"
+import { BsInbox, BsPencil, BsTag } from "react-icons/bs"
 import { HiOutlineSparkles } from "react-icons/hi"
 import { useGtdProjects } from "../hooks/use-projects"
 import { useInbox } from "../hooks/use-inbox"
-import { useRouteParams } from "$hooks/use-route-params.hook"
-import { FSID } from "@ordo-pink/data"
 import { OrdoButtonSecondary } from "$components/buttons/buttons"
 import { useExtensionState } from "$hooks/use-extension-state.hook"
 import GTDSidebarProject from "./gtd-sidebar-project.component"
 
 export default function GTDSidebar() {
 	const { route, commands, data } = useSharedContext()
-	const { fsid } = useRouteParams<{ fsid: FSID }>()
 	const inboxItems = useInbox()
 	const projects = useGtdProjects()
 	const state = useExtensionState<{ pinnedLabels?: string[] }>("gtd")

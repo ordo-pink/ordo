@@ -25,6 +25,6 @@ export const __useSharedContextInit = (
 	useContextHook = useContext
 }
 
-export const useSharedContext = () => {
+export const useSharedContext = (): SharedContextValue => {
 	return useContextHook(SharedContext)
 }

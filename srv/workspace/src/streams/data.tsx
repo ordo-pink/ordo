@@ -100,7 +100,12 @@ export const __initData: Fn = ({ logger, auth$ }) => {
 				},
 			})),
 			items: data
-				.filter(data => !payload.links.includes(data.fsid) && data.fsid !== payload.fsid)
+				.filter(
+					data =>
+						!payload.links.includes(data.fsid) &&
+						data.fsid !== payload.fsid &&
+						!data.name.startsWith(".ext_"),
+				)
 				.map(link => ({
 					id: link.fsid,
 					readableName: link.name,

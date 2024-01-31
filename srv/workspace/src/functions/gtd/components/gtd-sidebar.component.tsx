@@ -22,7 +22,7 @@ export default function GTDSidebar() {
 	const state = useExtensionState<{ pinnedLabels?: string[] }>("gtd")
 
 	return (
-		<div className="mt-8 flex flex-col space-y-8 px-1">
+		<div className="flex flex-col px-1 mt-8 space-y-8">
 			<ActionListItem
 				large
 				// onContextMenu={event =>
@@ -37,7 +37,7 @@ export default function GTDSidebar() {
 				current={route?.path === "/gtd"}
 				text="Входящие"
 			>
-				<div className={`text-xs flex space-x-2 items-center`}>
+				<div className={`flex items-center space-x-2 text-xs`}>
 					<div>{inboxItems.length > 0 ? inboxItems.length : <HiOutlineSparkles />}</div>
 				</div>
 			</ActionListItem>
@@ -78,7 +78,7 @@ export default function GTDSidebar() {
 			</div>
 
 			<div className="flex flex-col space-y-2">
-				<div className="flex justify-between w-full items-center">
+				<div className="flex justify-between items-center w-full">
 					<div className="flex-grow">
 						<Title level="5" center uppercase styledFirstLetter>
 							Закреплённые метки
@@ -89,6 +89,16 @@ export default function GTDSidebar() {
 						compact
 						onClick={() => {
 							const labels = Array.from(new Set(data?.flatMap(item => item.labels)))
+
+							if (labels.length === 0 && state.pinnedLabels?.length === 0) {
+								return commands.emit<cmd.notification.show>("notification.show", {
+									type: "warn",
+									title: "Ой!",
+									message: "У вас пока нет меток, чтобы их закрепить.",
+									duration: 5,
+								})
+							}
+
 							commands.emit<cmd.commandPalette.show>("command-palette.show", {
 								multiple: true,
 								pinnedItems: state.pinnedLabels?.map(label => ({

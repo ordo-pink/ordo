@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: Copyright 2023, 谢尔盖||↓ and the Ordo.pink contributors
 // SPDX-License-Identifier: MIT
 
-import { CommandPalette } from "@ordo-pink/frontend-core"
+import { CommandPalette, EXTENSION_FILE_PREFIX } from "@ordo-pink/frontend-core"
 import { getCommands } from "./commands"
 import { rrrToNotification } from "$utils/error-to-notification"
 import { Hosts } from "$utils/hosts"
@@ -104,7 +104,7 @@ export const __initData: Fn = ({ logger, auth$ }) => {
 					data =>
 						!payload.links.includes(data.fsid) &&
 						data.fsid !== payload.fsid &&
-						!data.name.startsWith(".ext_"),
+						!data.name.startsWith(EXTENSION_FILE_PREFIX),
 				)
 				.map(link => ({
 					id: link.fsid,

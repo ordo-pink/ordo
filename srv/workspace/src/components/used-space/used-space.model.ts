@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react"
 import { Either } from "@ordo-pink/either"
-import { useSharedContext } from "@ordo-pink/frontend-core"
+import { EXTENSION_FILE_PREFIX, useSharedContext } from "@ordo-pink/frontend-core"
 import { TUsedSpaceModel } from "./used-space.types"
 
 export const useModel = (): TUsedSpaceModel => {
@@ -19,7 +19,7 @@ export const useModel = (): TUsedSpaceModel => {
 						setTotalSize(0)
 					},
 					({ data, user }) => {
-						setCurrentSize(data.length)
+						setCurrentSize(data.filter(item => !item.name.startsWith(EXTENSION_FILE_PREFIX)).length)
 						setTotalSize(user.fileLimit)
 					},
 				),

@@ -27,7 +27,7 @@ const swich = <TContext, TResult extends unknown[] = []>(
 	case: (predicate, onTrue) => {
 		const isTrue = isFunction(predicate) ? predicate(x) : predicate === x
 
-		return isTrue ? swichMatched(onTrue) : (swich(x) as any)
+		return isTrue ? swichMatched(() => onTrue(x)) : (swich(x) as any)
 	},
 	default: defaultValue => defaultValue(),
 })

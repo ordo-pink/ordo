@@ -1,8 +1,12 @@
 import { TUsedSpaceViewProps } from "./used-space.types"
 
-export const View = ({ progress, progressPercentage }: TUsedSpaceViewProps) => {
-	const progressBarStyle = { width: progressPercentage }
+export const UsedSpaceView = ({
+	progress,
+	percentage: progressPercentage,
+}: TUsedSpaceViewProps) => {
+	const progressBarStyle = { width: `${progressPercentage}%` }
 
+	// --- Translations ---
 	const tFileLimit = "Лимит файлов"
 
 	return (

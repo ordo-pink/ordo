@@ -54,3 +54,6 @@ export const callOnce = <T extends any[], R>(fn: (...args: T) => R) => {
 		return result
 	}
 }
+
+export const getPercentage = (total: number, current: number): number =>
+	Math.trunc((current / total) * 100)

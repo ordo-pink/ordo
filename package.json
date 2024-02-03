@@ -24,9 +24,9 @@
   "name": "@ordo-pink/ordo",
   "devDependencies": {
     "@types/bcryptjs": "^2.4.2",
-    "@types/koa__router": "^12.0.0",
     "@types/koa-bodyparser": "^4.3.10",
     "@types/koa-cors": "^0.0.2",
+    "@types/koa__router": "^12.0.0",
     "@types/ramda": "^0.29.3",
     "@types/validator": "^13.11.1",
     "bun-types": "latest",

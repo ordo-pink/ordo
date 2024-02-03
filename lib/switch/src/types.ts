@@ -61,7 +61,7 @@ export type TSwitch<TContext, TResult extends unknown[]> = {
 		 * thunk that is defined for the matched case. If none of the cases did
 		 * match, the `.default` argument thunk will be called.
 		 */
-		onTrue: () => TNewResult,
+		onTrue: (x: TContext) => TNewResult,
 	) => TSwitch<TContext, [Unpack<TResult>, TNewResult]>
 
 	/**

@@ -16,6 +16,20 @@ type CurryRest<T> = T extends (x: infer U) => infer V
 	? Curry<(...args: V) => W>
 	: never
 
+// @see https://stackoverflow.com/a/69413070
+export type NonNegativeInt<T extends number> = number extends T
+	? never
+	: `${T}` extends `-${string}` | `${string}.${string}`
+	? never
+	: T
+
+// @see https://stackoverflow.com/a/70307091
+export type Enumerate<N extends number, Acc extends number[] = []> = Acc["length"] extends N
+	? Acc[number]
+	: Enumerate<N, [...Acc, Acc["length"]]>
+
+export type Range<F extends number, T extends number> = Exclude<Enumerate<T>, Enumerate<F>>
+
 export type Curry<T extends (...args: any) => any> = (x: CurryFirst<T>) => CurryRest<T>
 
 export type Identity<T> = (x: T) => T

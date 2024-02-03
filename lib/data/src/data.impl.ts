@@ -108,7 +108,7 @@ const addLabelE =
 		Either.of<string[], DataError>(Array.isArray(label) ? label : [label])
 			.chain(labels =>
 				labels.reduce(
-					(acc, v) => acc.chain(() => validations.isValidLabelE(v)),
+					(acc, v) => acc.chain(() => validations.isValidStringE(v)),
 					Either.right<string, DataError>(""),
 				),
 			)
@@ -125,7 +125,7 @@ const removeLabelE =
 	(plain: PlainData): TData["removeLabel"] =>
 	(label, updatedBy) =>
 		validations
-			.isValidLabelE(label)
+			.isValidStringE(label)
 			.chain(label => validations.isValidSubE(updatedBy).map(updatedBy => ({ label, updatedBy })))
 			.map(({ label, updatedBy }) => ({ updatedBy, labels: drop(plain.labels, label) }))
 			.map(extend(() => ({ updatedAt: Date.now() })))
@@ -152,20 +152,41 @@ const of = (plain: PlainData): TData => ({
 	removeLabel: removeLabelE(plain),
 	dropLabels: dropLabelsE(plain),
 	update: updateE(plain),
+	setProperty: (key, value, updatedBy) =>
+		validations
+			.isValidSubE(updatedBy)
+			.chain(updatedBy => validations.isValidStringE(key).map(key => ({ updatedBy, key })))
+			.map(
+				extend(({ key, updatedBy }) => ({
+					updatedAt: Date.now(),
+					updatedBy,
+					properties: { ...plain.properties, ...{ [key]: value } },
+				})),
+			)
+			.map(increment => Data.of({ ...plain, ...increment })) as any,
 })
 
 export const Data: DataStatic = {
 	Validations: validations,
 	Errors,
 	of,
-	new: ({ name, parent, createdBy, fsid, labels = [], contentType = "text/ordo" }) =>
+	as: x => x as any,
+	new: ({
+		name,
+		parent,
+		createdBy,
+		fsid,
+		labels = [],
+		contentType = "text/ordo",
+		properties = {},
+	}) =>
 		validations
 			.isValidNameE(name)
 			.chain(() => validations.isValidParentE(parent))
 			.chain(() => validations.isValidSubE(createdBy))
 			.chain(() =>
 				labels.reduce(
-					(acc, v) => acc.chain(() => validations.isValidLabelE(v)),
+					(acc, v) => acc.chain(() => validations.isValidStringE(v)),
 					Either.right<string, DataError>(""),
 				),
 			)
@@ -183,6 +204,7 @@ export const Data: DataStatic = {
 					labels,
 					links: [],
 					size: 0,
+					properties,
 				}),
 			),
 }

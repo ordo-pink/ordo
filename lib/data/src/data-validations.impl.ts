@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 import type { Validations } from "./data-validations.types"
-import { isNonEmptyString, isNonNegativeFiniteInteger, isUUID } from "@ordo-pink/tau"
+import { isNonEmptyString, isNonNegativeFiniteInteger, isObject, isUUID } from "@ordo-pink/tau"
 import { Either } from "@ordo-pink/either"
 import { Errors } from "./errors.impl"
 import { DataError } from "./errors.types"
@@ -18,12 +18,13 @@ export const validations: Validations = {
 			.chain(() => validations.isValidTimestampE(x.updatedAt))
 			.chain(() => validations.isValidSubE(x.createdBy))
 			.chain(() => validations.isValidSubE(x.updatedBy))
+			.chain(() => validations.isValidPropertiesE(x.properties))
 			.chain(() =>
 				x.links.reduce((acc, v) => acc.chain(() => validations.isValidFsidE(v)), Either.right("")),
 			)
 			.chain(() =>
 				x.labels.reduce(
-					(acc, v) => acc.chain(() => validations.isValidLabelE(v)),
+					(acc, v) => acc.chain(() => validations.isValidStringE(v)),
 					Either.right(""),
 				),
 			)
@@ -65,10 +66,16 @@ export const validations: Validations = {
 			() => x,
 			() => Errors.InvalidSUB,
 		),
-	isValidLabelE: x =>
+	isValidStringE: x =>
 		Either.fromBoolean(
 			() => isNonEmptyString(x),
 			() => x,
 			() => Errors.InvalidLabel,
+		),
+	isValidPropertiesE: x =>
+		Either.fromBoolean(
+			() => typeof x === "undefined" || isObject(x),
+			() => x,
+			() => Errors.InvalidProperties,
 		),
 }

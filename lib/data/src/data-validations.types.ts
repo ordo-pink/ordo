@@ -15,6 +15,7 @@ export type Validations = {
 	isValidTimestampE: Validation<number>
 	isValidFsidE: Validation<FSID>
 	isValidSubE: Validation<UserID>
-	isValidLabelE: Validation<string>
+	isValidStringE: Validation<string>
 	isValidDataE: Validation<PlainData>
+	isValidPropertiesE: Validation<Record<string, unknown> | undefined>
 }

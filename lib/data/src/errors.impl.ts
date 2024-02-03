@@ -14,6 +14,7 @@ export const Errors = {
 	InvalidFSID: "FSID must be a valid UUIDv4",
 	InvalidSUB: "SUB must be a valid UUIDv4",
 	InvalidLabel: "Label must be a non-empty string",
+	InvalidProperties: "Properties must be an object or undefined",
 	DataAlreadyExists: "Data already exists",
 	DataNotFound: "Data not found",
 	UnexpectedError: `Unexpected error: ` as `Unexpected error: ${string}`,

@@ -45,7 +45,7 @@ export default function GTDSidebar() {
 				</Title>
 				<div>
 					{projects.map(project => (
-						<GTDSidebarProject fsid={project.fsid} />
+						<GTDSidebarProject key={project.fsid} fsid={project.fsid} />
 						// <ActionListItem
 						// 	large
 						// 	key={project.fsid}

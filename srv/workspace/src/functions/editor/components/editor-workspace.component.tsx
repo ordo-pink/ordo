@@ -88,7 +88,7 @@ export default function EditorWorkspace() {
 	const content = useContent(fsid)
 	const editor = useMemo(
 		() => withShortcuts(withChecklists(withHistory(withReact(createEditor())))),
-		[],
+		[content],
 	)
 
 	const renderElement = useCallback((props: any) => <Element {...props} />, [])
@@ -178,6 +178,7 @@ export default function EditorWorkspace() {
 					<div>
 						<EditableTitle data={data} />
 					</div>
+
 					<DataEditor data={data} />
 
 					<Slate
@@ -191,7 +192,7 @@ export default function EditorWorkspace() {
 							save$.next({ fsid, value })
 						}}
 					>
-						<HoveringToolbar />
+						{content != null && <HoveringToolbar />}
 						<Editable
 							spellCheck
 							autoFocus

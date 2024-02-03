@@ -9,7 +9,7 @@ import { ChangeEvent, useState } from "react"
 import { BsFileEarmarkPlus } from "react-icons/bs"
 
 type Props = {
-	parent: Nullable<PlainData>
+	parent: PlainData | null
 }
 
 export default function UploadFilesModal({ parent }: Props) {

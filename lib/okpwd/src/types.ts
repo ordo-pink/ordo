@@ -13,6 +13,6 @@ export type Options = {
 	skipCheckForSpecialCharacters?: boolean
 }
 
-export type Result = Nullable<string>
+export type Result = string | null
 
 export type Fn = (options?: Options) => (pwd?: string) => Result

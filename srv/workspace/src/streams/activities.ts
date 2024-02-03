@@ -14,7 +14,7 @@ type Params = { logger: Logger }
 type Result = { activities$: __Activities$; currentActivity$: __CurrentActivity$ }
 type InitActivitiesFn = (params: Params) => Result
 export type __Activities$ = Observable<Extensions.Activity[]>
-export type __CurrentActivity$ = Observable<Nullable<Extensions.Activity>>
+export type __CurrentActivity$ = Observable<Extensions.Activity | null>
 export const __initActivities: InitActivitiesFn = callOnce(({ logger }) => {
 	logger.debug("Initializing activities")
 
@@ -27,7 +27,7 @@ export const __initActivities: InitActivitiesFn = callOnce(({ logger }) => {
 	return { activities$, currentActivity$ }
 })
 
-const currentActivity$ = new BehaviorSubject<Nullable<Extensions.Activity>>(null)
+const currentActivity$ = new BehaviorSubject<Extensions.Activity | null>(null)
 
 const add$ = new Subject<Extensions.Activity>()
 const remove$ = new Subject<string>()

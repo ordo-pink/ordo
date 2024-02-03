@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: MIT
 
 import type { TEither } from "@ordo-pink/either"
-import type { Nullable } from "@ordo-pink/tau"
 import type { Validations } from "./data-validations.types"
 import type { Errors } from "./errors.impl"
 import type { DataError } from "./errors.types"
@@ -20,7 +19,7 @@ export type UserID = `${string}-${string}-${string}-${string}-${string}`
 export type PlainData<Properties extends Record<string, unknown> = Record<string, unknown>> = {
 	fsid: FSID
 	name: string
-	parent: Nullable<FSID>
+	parent: FSID | null
 	links: FSID[]
 	labels: string[]
 	contentType: string
@@ -39,7 +38,10 @@ export type TData<Properties extends Record<string, unknown> = Record<string, un
 	plain: PlainData<Properties>
 	setName: (name: string, updatedBy: UserID) => TEither<TData<Properties>, DataError>
 	setSize: (size: number, updatedBy: UserID) => TEither<TData<Properties>, DataError>
-	setParent: (parent: Nullable<FSID>, updatedBy: UserID) => TEither<TData<Properties>, DataError>
+	setParent: (
+		parent: FSID | null,
+		updatedBy: UserID,
+	) => TEither<TData<Properties>, DataError | null>
 	addLink: (link: FSID, updatedBy: UserID) => TEither<TData<Properties>, DataError>
 	removeLink: (link: FSID, updatedBy: UserID) => TEither<TData<Properties>, DataError>
 	dropLinks: (updatedBy: UserID) => TEither<TData<Properties>, DataError>

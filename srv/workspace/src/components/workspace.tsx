@@ -20,8 +20,8 @@ import { Loading } from "./loading/loading"
 const commands = getCommands()
 
 type _P = {
-	commandPalette$: Nullable<__CommandPalette$>
-	sidebar$: Nullable<__Sidebar$>
+	commandPalette$: __CommandPalette$ | null
+	sidebar$: __Sidebar$ | null
 	currentActivity$: __CurrentActivity$
 }
 export default function Workspace({ commandPalette$, sidebar$, currentActivity$ }: _P) {
@@ -48,10 +48,10 @@ export default function Workspace({ commandPalette$, sidebar$, currentActivity$ 
 // --- Internal ---
 
 type OnDragEndFn = Unary<[number, number], void>
-type DisabledSidebarProps = { activity: Nullable<Extensions.Activity> }
+type DisabledSidebarProps = { activity: Extensions.Activity | null }
 type EnabledSidebarP = DisabledSidebarProps & {
 	sidebar$: __Sidebar$
-	commandPalette$: Nullable<__CommandPalette$>
+	commandPalette$: __CommandPalette$ | null
 }
 
 const DisabledSidebar = ({ activity }: DisabledSidebarProps) =>

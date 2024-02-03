@@ -19,7 +19,7 @@ const announcements = [
 	},
 ]
 
-type Params = Functions.CreateFunctionParams & { activities$: Nullable<__Activities$> }
+type Params = Functions.CreateFunctionParams & { activities$: __Activities$ | null }
 export default function createHomeFunction({ commands, activities$ }: Params) {
 	commands.emit<cmd.activities.add>("activities.add", {
 		Component: props => <HomeActivity activities$={activities$} {...props} />,
@@ -39,7 +39,7 @@ export default function createHomeFunction({ commands, activities$ }: Params) {
 	})
 }
 
-type P = Extensions.ComponentProps & { activities$: Nullable<__Activities$> }
+type P = Extensions.ComponentProps & { activities$: __Activities$ | null }
 const WelcomePage = ({ commands, space, activities$ }: P) =>
 	Switch.of(space)
 		.case(ComponentSpace.ICON, () => <Icon />)

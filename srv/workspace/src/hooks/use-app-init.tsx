@@ -3,7 +3,7 @@
 
 import { useEffect, useState } from "react"
 import { ConsoleLogger } from "@ordo-pink/logger"
-import { Nullable, noop } from "@ordo-pink/tau"
+import { noop } from "@ordo-pink/tau"
 import { __Auth$, __initAuth } from "$streams/auth"
 import { __Activities$, __CurrentActivity$, __initActivities } from "$streams/activities"
 import { __CommandPalette$, __initCommandPalette } from "$streams/command-palette"
@@ -24,29 +24,29 @@ const IGNORED_KEYS = ["Control", "Shift", "Alt", "Control", "Meta"]
 const ctx = { logger: ConsoleLogger }
 
 export type UseAppInitReturns = {
-	auth$: Nullable<__Auth$>
-	sidebar$: Nullable<__Sidebar$>
-	globalCommandPalette$: Nullable<__CommandPalette$>
-	currentCommandPalette$: Nullable<__CommandPalette$>
-	activities$: Nullable<__Activities$>
-	currentActivity$: Nullable<__CurrentActivity$>
-	currentRoute$: Nullable<__CurrentRoute$>
-	data$: Nullable<__Metadata$>
-	fileAssociations$: Nullable<__FileAssociations$>
+	auth$: __Auth$ | null
+	sidebar$: __Sidebar$ | null
+	globalCommandPalette$: __CommandPalette$ | null
+	currentCommandPalette$: __CommandPalette$ | null
+	activities$: __Activities$ | null
+	currentActivity$: __CurrentActivity$ | null
+	currentRoute$: __CurrentRoute$ | null
+	data$: __Metadata$ | null
+	fileAssociations$: __FileAssociations$ | null
 }
 
 export const useAppInit = (): UseAppInitReturns => {
-	const [globalCommandPalette$, setGlobalCommandPalette$] =
-		useState<Nullable<__CommandPalette$>>(null)
-	const [currentCommandPalette$, setCurrentCommandPalette$] =
-		useState<Nullable<__CommandPalette$>>(null)
-	const [sidebar$, setSidebar$] = useState<Nullable<__Sidebar$>>(null)
-	const [auth$, setAuth$] = useState<Nullable<__Auth$>>(null)
-	const [activities$, setActivities$] = useState<Nullable<__Activities$>>(null)
-	const [currentActivity$, setCurrentActivity$] = useState<Nullable<__CurrentActivity$>>(null)
-	const [currentRoute$, setCurrentRoute$] = useState<Nullable<__CurrentRoute$>>(null)
-	const [data$, setData$] = useState<Nullable<__Metadata$>>(null)
-	const [fileAssociations$, setFileAssociations$] = useState<Nullable<__FileAssociations$>>(null)
+	const [globalCommandPalette$, setGlobalCommandPalette$] = useState<__CommandPalette$ | null>(null)
+	const [currentCommandPalette$, setCurrentCommandPalette$] = useState<__CommandPalette$ | null>(
+		null,
+	)
+	const [sidebar$, setSidebar$] = useState<__Sidebar$ | null>(null)
+	const [auth$, setAuth$] = useState<__Auth$ | null>(null)
+	const [activities$, setActivities$] = useState<__Activities$ | null>(null)
+	const [currentActivity$, setCurrentActivity$] = useState<__CurrentActivity$ | null>(null)
+	const [currentRoute$, setCurrentRoute$] = useState<__CurrentRoute$ | null>(null)
+	const [data$, setData$] = useState<__Metadata$ | null>(null)
+	const [fileAssociations$, setFileAssociations$] = useState<__FileAssociations$ | null>(null)
 
 	const commandPalette = useSubscription(currentCommandPalette$)
 	const globalCommandPalette = useSubscription(globalCommandPalette$)

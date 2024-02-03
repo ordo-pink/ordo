@@ -7,7 +7,7 @@ import { PathBreadcrumbsItem } from "./path-breadcrumbs-item"
 import "./path-breadcrumbs-item.css"
 
 type Props = {
-	path: Nullable<string>
+	path: string | null
 }
 
 export const PathBreadcrumbs = ({ path }: Props) => {

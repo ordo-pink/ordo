@@ -3,8 +3,6 @@
 
 // deno-lint-ignore-file no-explicit-any
 
-export type Nullable<T> = T | null
-
 export type Optional<T> = T | undefined
 
 export type Method<A, T extends object, K extends keyof T> = Unary<A, T[K]>

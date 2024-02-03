@@ -13,7 +13,7 @@ const commands = getCommands()
 
 const { route, noMatch } = operators
 
-export type __CurrentRoute$ = Observable<Nullable<TRouter.Route>>
+export type __CurrentRoute$ = Observable<TRouter.Route | null>
 export const __initRouter: InitRouter = callOnce(({ logger, activities$ }) => {
 	logger.debug("Initializing router")
 
@@ -74,4 +74,4 @@ type Params = { logger: Logger; activities$: __Activities$ }
 type InitRouter = Unary<Params, __CurrentRoute$>
 
 const router$ = new Router({ hashRouting: false, init: true })
-const currentRoute$ = new BehaviorSubject<Nullable<TRouter.Route>>(null)
+const currentRoute$ = new BehaviorSubject<TRouter.Route | null>(null)

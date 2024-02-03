@@ -60,7 +60,7 @@ export const useExtensionState = <T extends Record<string, unknown>>(name: strin
 		}
 	}, [item])
 
-	return (state[name] as T) ?? {}
+	return (state[name] as Partial<T>) ?? {}
 }
 
 const state$ = new BehaviorSubject<Record<string, Record<string, any>>>({})

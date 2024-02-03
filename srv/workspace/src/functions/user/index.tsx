@@ -11,16 +11,18 @@ import { useSubscription } from "$hooks/use-subscription"
 import { __Auth$, useUser } from "$streams/auth"
 import { Hosts } from "$utils/hosts"
 import { UserUtils } from "$utils/user-utils.util"
+import { Either } from "@ordo-pink/either"
 import { Extensions, ComponentSpace, Functions, User } from "@ordo-pink/frontend-core"
 import { Oath } from "@ordo-pink/oath"
 import { Switch } from "@ordo-pink/switch"
-import { Nullable, noop } from "@ordo-pink/tau"
-import { useEffect, useState } from "react"
+import { noop } from "@ordo-pink/tau"
+import { FC, useEffect, useState } from "react"
 import { AiOutlineLogout } from "react-icons/ai"
-import { BsPersonBadge } from "react-icons/bs"
+import { BsPatchCheckFill, BsPatchExclamation, BsPersonBadge } from "react-icons/bs"
+import Achievements from "./achievements"
 
-type UserComponentParams = Extensions.ComponentProps & { auth$: Nullable<__Auth$> }
-const UserActivity = ({ space, auth$, commands }: UserComponentParams) =>
+type UserComponentParams = Extensions.ComponentProps & { auth$: __Auth$ | null }
+const UserActivity: FC<UserComponentParams> = ({ space, auth$, commands }) =>
 	Switch.of(space)
 		.case(ComponentSpace.ICON, () => <Icon />)
 		.case(ComponentSpace.WIDGET, () => <Null />)
@@ -28,8 +30,8 @@ const UserActivity = ({ space, auth$, commands }: UserComponentParams) =>
 
 const Icon = () => <BsPersonBadge />
 
-type Params = Functions.CreateFunctionParams & { auth$: Nullable<__Auth$> }
-export default function createUserFunction({ commands, auth$ }: Params) {
+type Params = Functions.CreateFunctionParams & { auth$: __Auth$ | null }
+export default function createUserFunction({ commands, auth$, data$ }: Params) {
 	commands.emit<cmd.activities.add>("activities.add", {
 		Component: props => <UserActivity auth$={auth$} {...props} />,
 		name: "user",
@@ -69,7 +71,7 @@ export default function createUserFunction({ commands, auth$ }: Params) {
 	})
 }
 
-type _P = { auth$: Nullable<__Auth$> } & Pick<Extensions.ComponentProps, "commands">
+type _P = { auth$: __Auth$ | null } & Pick<Extensions.ComponentProps, "commands">
 const UserPage = ({ auth$, commands }: _P) => {
 	const userE = useUser()
 
@@ -98,20 +100,20 @@ const UserInfo = ({ user, auth$, commands }: _UIP) => {
 	return (
 		<form
 			onSubmit={e => e.preventDefault()}
-			className="px-2 min-h-screen py-4 md:px-8 md:py-8 flex flex-col items-center space-y-4 overflow-x-auto"
+			className="flex overflow-x-auto flex-col items-center px-2 py-4 space-y-4 min-h-screen md:px-8 md:py-8"
 		>
-			<div className="w-full max-w-lg flex space-x-4 mb-8 md:mb-4 items-center">
+			<div className="flex items-center mb-8 space-x-4 w-full max-w-lg md:mb-4">
 				<div className="flex items-center justify-center rounded-full p-0.5 bg-gradient-to-tr from-sky-400 via-purple-400 to-rose-400 shadow-lg shrink-0 cursor-pointer">
 					<img
 						src={`${Hosts.STATIC}/logo.png`}
 						alt="avatar"
-						className="h-16 md:h-20 rounded-full bg-white dark:from-stone-900 dark:via-zinc-900 dark:to-neutral-900"
+						className="h-16 bg-white rounded-full md:h-20 dark:from-stone-900 dark:via-zinc-900 dark:to-neutral-900"
 						// onClick={() =>
 						// 	showModal(() => <UploadAvatarModal onAvatarChanged={handleAvatarChanged} />)
 						// }
 					/>
 				</div>
-				<div className="w-full max-w-md flex flex-col space-y-1 md:space-y-2">
+				<div className="flex flex-col space-y-1 w-full max-w-md md:space-y-2">
 					<Title level="2" trim styledFirstLetter>
 						{UserUtils.getUserName(user)}
 					</Title>
@@ -119,9 +121,9 @@ const UserInfo = ({ user, auth$, commands }: _UIP) => {
 				</div>
 			</div>
 
-			<div className="container grid grid-cols-1 md:grid-cols-3 gap-2 md:gap-4">
+			<div className="container grid grid-cols-1 gap-2 md:grid-cols-3 md:gap-4">
 				<Card title="Идентификация">
-					<fieldset className="w-full h-full justify-center flex flex-col space-y-4">
+					<fieldset className="flex flex-col justify-center space-y-4 w-full h-full">
 						<div className="flex flex-col space-y-4 md:flex-row md:space-y-0 md:space-x-2">
 							{/* <TextInput
 							label="Public handle"
@@ -175,16 +177,16 @@ const UserInfo = ({ user, auth$, commands }: _UIP) => {
 							</Button>
 						</div>
 
-						{/* <div>
+						<div>
 							<EmailConfirmation confirmed={user.emailConfirmed} />
-						</div> */}
+						</div>
 					</fieldset>
 				</Card>
 
 				<Card title="Личная информация">
-					<fieldset className="w-full h-full justify-center flex flex-col space-y-4">
+					<fieldset className="flex flex-col justify-center space-y-4 w-full h-full">
 						<TextInput
-							placeholder="E.g. Neil"
+							placeholder="Юрий"
 							value={firstName}
 							id="firstName"
 							autocomplete="given-name"
@@ -192,7 +194,7 @@ const UserInfo = ({ user, auth$, commands }: _UIP) => {
 							onInput={e => setFirstName(e.target.value)}
 						/>
 						<TextInput
-							placeholder="E.g. Armstrong"
+							placeholder="Гагарин"
 							value={lastName}
 							id="lastName"
 							autocomplete="family-name"
@@ -236,7 +238,7 @@ const UserInfo = ({ user, auth$, commands }: _UIP) => {
 				</Card>
 
 				<Card title="Пароль">
-					<fieldset className="w-full h-full justify-center flex flex-col space-y-4">
+					<fieldset className="flex flex-col justify-center space-y-4 w-full h-full">
 						<PasswordInput
 							label="Текущий пароль"
 							id="currentPassword"
@@ -317,41 +319,39 @@ const UserInfo = ({ user, auth$, commands }: _UIP) => {
 				</Card>
 
 				<Card title="Подписка">
-					<p className="text-center text-sm text-neutral-500">
+					<p className="text-sm text-center text-neutral-500">
 						Подключение платной подписки станет доступно совсем скоро™️!
 					</p>
 				</Card>
 
 				{/* <Card title="Active sessions">
-					<p className="text-center text-sm text-neutral-500">
+					<p className="text-sm text-center text-neutral-500">
 						We'll put active sessions info here in the next update. Stay active!
 					</p>
 				</Card> */}
 
-				<Card title="Достижения" className="md:col-span-2">
-					<p className="text-center text-sm text-neutral-500">Тут ачивочки TODO</p>
-				</Card>
+				<Achievements />
 			</div>
 		</form>
 	)
 }
 
-// type _ECP = { confirmed: boolean }
-// const EmailConfirmation = ({ confirmed }: _ECP) =>
-// 	Either.fromBoolean(() => confirmed, EmailConfirmed).getOrElse(EmailNotConfirmed)
+type _ECP = { confirmed: boolean }
+const EmailConfirmation = ({ confirmed }: _ECP) =>
+	Either.fromBoolean(() => confirmed, EmailConfirmed).getOrElse(EmailNotConfirmed)
 
-// const EmailNotConfirmed = () => (
-// 	<div className="flex items-center justify-center space-x-2">
-// 		<BsPatchExclamation className="text-rose-500" />
-// 		<div>
-// 			Email not confirmed. <button className="text-sky-500">Confirm</button>.
-// 		</div>
-// 	</div>
-// )
+const EmailNotConfirmed = () => (
+	<div className="flex justify-center items-center space-x-2">
+		<BsPatchExclamation className="text-rose-500" />
+		<div>
+			Email not confirmed. <button className="text-sky-500">Confirm</button>.
+		</div>
+	</div>
+)
 
-// const EmailConfirmed = () => (
-// 	<div className="flex items-center justify-center space-x-2">
-// 		<BsPatchCheckFill className="text-emerald-500" />
-// 		<div>Email confirmed.</div>
-// 	</div>
-// )
+const EmailConfirmed = () => (
+	<div className="flex justify-center items-center space-x-2">
+		<BsPatchCheckFill className="text-emerald-500" />
+		<div>Email confirmed.</div>
+	</div>
+)

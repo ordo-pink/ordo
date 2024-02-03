@@ -3,7 +3,7 @@
 
 import type { IconType } from "react-icons"
 import type { ComponentType, MouseEvent } from "react"
-import type { Nullable, Thunk, UUIDv4, Unary } from "@ordo-pink/tau"
+import type { Nullable, Range, Thunk, UUIDv4, Unary } from "@ordo-pink/tau"
 import type { FSID, PlainData } from "@ordo-pink/data"
 import type { Observable } from "rxjs"
 import type { Logger } from "@ordo-pink/logger"
@@ -12,7 +12,7 @@ import type { ComponentSpace } from "./constants"
 export namespace Functions {
 	export type CreateFunctionParams = {
 		commands: Commands.Commands
-		data$: Nullable<Observable<PlainData[]>>
+		data$: Observable<PlainData[]> | null
 	}
 	export type CreateFunctionFn = Unary<Functions.CreateFunctionParams, void | Promise<void>>
 }
@@ -42,6 +42,35 @@ declare global {
 		}
 	}
 
+	module Achievements {
+		type AchievementSubscriber = (
+			commands: Commands.Commands,
+			actions: { update: () => void; grant: () => void },
+		) => void
+
+		type CheckboxCondition = { type: "checkbox"; done: boolean; description: string }
+		type ProgressCondition = { type: "progress"; progress: Range<0, 101>; description: string }
+		type AchievementListCondition = {
+			type: "achievement-list"
+			achievements: string[]
+			description?: string
+		}
+		type AchievementCondition = CheckboxCondition | ProgressCondition | AchievementListCondition
+
+		type AchievementDAO = {
+			id: string
+			title: string
+			description: string
+			completedAt: number | null
+			condition: AchievementCondition | AchievementCondition[]
+		}
+
+		type Achievement = AchievementDAO & {
+			Icon: ComponentType
+			subscribe: AchievementSubscriber
+		}
+	}
+
 	module cmd {
 		module background {
 			type setStatus = { name: "background-task.set-status"; payload: BackgroundTaskStatus }
@@ -53,6 +82,10 @@ declare global {
 				name: "extension-state.update"
 				payload: { name: string; payload: T }
 			}
+		}
+
+		module achievements {
+			type add = { name: "achievements.add"; payload: Achievements.Achievement[] }
 		}
 
 		module user {
@@ -84,8 +117,8 @@ declare global {
 		module data {
 			type refreshRoot = { name: "data.refresh-root" }
 			type getFileContent = { name: "data.get-content"; payload: { fsid: FSID } }
-			type showUploadModal = { name: "data.show-upload-modal"; payload: Nullable<PlainData> }
-			type showCreateModal = { name: "data.show-create-modal"; payload: Nullable<PlainData> }
+			type showUploadModal = { name: "data.show-upload-modal"; payload: PlainData | null }
+			type showCreateModal = { name: "data.show-create-modal"; payload: PlainData | null }
 			type showRemoveModal = { name: "data.show-remove-modal"; payload: PlainData }
 			type showRenameModal = { name: "data.show-rename-modal"; payload: PlainData }
 			type showEditLabelsPalette = {
@@ -103,14 +136,14 @@ declare global {
 			}
 			type uploadContent = {
 				name: "data.upload-content"
-				payload: { name: string; parent: Nullable<FSID>; content: string | ArrayBuffer }
+				payload: { name: string; parent: FSID | null; content: string | ArrayBuffer }
 			}
 			type create = {
 				name: "data.create"
-				payload: { name: string; parent: Nullable<FSID>; labels?: string[] }
+				payload: { name: string; parent: FSID | null; labels?: string[] }
 			}
 			type remove = { name: "data.remove"; payload: PlainData }
-			type move = { name: "data.move"; payload: { fsid: FSID; parent: Nullable<FSID> } }
+			type move = { name: "data.move"; payload: { fsid: FSID; parent: FSID | null } }
 			type rename = { name: "data.rename"; payload: { fsid: FSID; name: string } }
 			type addLabel = {
 				name: "data.add-label"

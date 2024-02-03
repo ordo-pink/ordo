@@ -8,7 +8,8 @@
 			"$utils/*": ["./src/utils/*"],
 			"$hooks/*": ["./src/hooks/*"],
 			"$constants/*": ["./src/constants/*"],
-			"$functions/*": ["./src/functions/*"]
+			"$functions/*": ["./src/functions/*"],
+			"react": ["./node_modules/@types/react"]
 		}
 	}
 }

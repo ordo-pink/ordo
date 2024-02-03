@@ -3,7 +3,7 @@
 
 import type { AuthResponse } from "@ordo-pink/backend-server-id"
 import { BehaviorSubject, Observable } from "rxjs"
-import { callOnce, Unary, Nullable } from "@ordo-pink/tau"
+import { callOnce, Unary } from "@ordo-pink/tau"
 import { User } from "@ordo-pink/frontend-core"
 import { Either } from "@ordo-pink/either"
 import { Logger } from "@ordo-pink/logger"
@@ -33,7 +33,7 @@ const refreshToken = () =>
 type InitAuthP = { logger: Logger }
 type InitAuth = Unary<InitAuthP, __Auth$>
 
-export type __Auth$ = Observable<Nullable<AuthResponse>>
+export type __Auth$ = Observable<AuthResponse | null>
 export const __initAuth: InitAuth = callOnce(({ logger }) => {
 	logger.debug("Initializing auth")
 
@@ -73,8 +73,8 @@ export const __initAuth: InitAuth = callOnce(({ logger }) => {
 	return auth$
 })
 
-const auth$ = new BehaviorSubject<Nullable<AuthResponse>>(null)
-const user$ = new BehaviorSubject<Nullable<User.User>>(null)
+const auth$ = new BehaviorSubject<AuthResponse | null>(null)
+const user$ = new BehaviorSubject<User.User | null>(null)
 
 export const useAuthStatus = () => {
 	const auth = useSubscription(auth$)

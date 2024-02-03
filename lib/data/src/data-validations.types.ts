@@ -11,7 +11,7 @@ export type Validation<Expected> = (x: Expected) => TEither<Expected, DataError>
 export type Validations = {
 	isValidNameE: Validation<string>
 	isValidSizeE: Validation<number>
-	isValidParentE: Validation<Nullable<FSID>>
+	isValidParentE: Validation<FSID | null>
 	isValidTimestampE: Validation<number>
 	isValidFsidE: Validation<FSID>
 	isValidSubE: Validation<UserID>

@@ -20,8 +20,8 @@ const commands = getCommands()
 
 type _P = PropsWithChildren<{
 	isNarrow: boolean
-	commandPalette$: Nullable<__CommandPalette$>
-	sidebar$: Nullable<__Sidebar$>
+	commandPalette$: __CommandPalette$ | null
+	sidebar$: __Sidebar$ | null
 }>
 export default function Sidebar({ children, isNarrow, commandPalette$, sidebar$ }: _P) {
 	const user = useUser()

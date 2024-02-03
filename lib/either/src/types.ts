@@ -1,8 +1,6 @@
 // SPDX-FileCopyrightText: Copyright 2023, 谢尔盖||↓ and the Ordo.pink contributors
 // SPDX-License-Identifier: MIT
 
-import { Nullable } from "@ordo-pink/tau"
-
 export type LeftFn = <L, R = unknown>(x: L) => TEither<R, L>
 export type RightFn = <R, L = unknown>(x: R) => TEither<R, L>
 
@@ -20,7 +18,7 @@ export type TEither<R, L> = {
 }
 
 export type EitherStatic = {
-	fromNullable: <R>(x: Nullable<R>) => TEither<NonNullable<R>, null>
+	fromNullable: <R>(x?: R | null) => TEither<NonNullable<R>, null>
 	fromBoolean: <R = undefined, L = undefined>(
 		f: () => boolean,
 		r?: () => R,

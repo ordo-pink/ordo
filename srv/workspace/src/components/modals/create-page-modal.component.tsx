@@ -11,7 +11,7 @@ import { ChangeEvent, useState } from "react"
 import { BsNodePlus } from "react-icons/bs"
 
 type Props = {
-	parent: Nullable<PlainData>
+	parent: PlainData | null
 }
 
 export default function CreatePageModal({ parent }: Props) {

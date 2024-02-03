@@ -4,7 +4,6 @@
 import { useChildren } from "$hooks/use-children"
 import { PlainData } from "@ordo-pink/data"
 import { useSharedContext } from "@ordo-pink/frontend-core"
-import { Nullable } from "@ordo-pink/tau"
 import { MouseEvent } from "react"
 import { BsCheckCircle, BsLink45Deg, BsTag, BsTextLeft } from "react-icons/bs"
 import { useSortable } from "@dnd-kit/sortable"
@@ -14,7 +13,7 @@ import { toReadableSize } from "$hooks/use-readable-size.hook"
 
 type P = { item: PlainData }
 
-const checkIsDone = (item: Nullable<PlainData>) => (item && item.labels.includes("done")) || false
+const checkIsDone = (item: PlainData | null) => (item && item.labels.includes("done")) || false
 
 export default function GTDItem({ item }: P) {
 	const { commands } = useSharedContext()
@@ -46,12 +45,12 @@ export default function GTDItem({ item }: P) {
 			{...listeners}
 			{...attributes}
 			style={style}
-			className="flex space-x-4 bg-neutral-300 dark:bg-neutral-800 hover:bg-neutral-300 dark:hover:bg-neutral-800 p-4 md:p-2 rounded-md focus:ring-1 focus:ring-purple-500 outline-none"
+			className="flex p-4 space-x-4 rounded-md outline-none bg-neutral-300 dark:bg-neutral-800 hover:bg-neutral-300 dark:hover:bg-neutral-800 md:p-2 focus:ring-1 focus:ring-purple-500"
 			onContextMenu={onContextMenu}
 			tabIndex={0}
 		>
 			<input
-				className="h-6 w-6 rounded-sm focus:ring-0 text-emerald-500 bg-neutral-200 dark:bg-neutral-500 cursor-pointer"
+				className="w-6 h-6 text-emerald-500 rounded-sm cursor-pointer focus:ring-0 bg-neutral-200 dark:bg-neutral-500"
 				type="checkbox"
 				checked={isDone}
 				id={item.fsid}
@@ -61,7 +60,7 @@ export default function GTDItem({ item }: P) {
 			/>
 
 			<div className="flex justify-between w-full">
-				<div className="flex flex-col w-full justify-center space-y-1">
+				<div className="flex flex-col justify-center space-y-1 w-full">
 					<div className={isDone ? "line-through text-neutral-500" : ""}>{item.name}</div>
 
 					{item.labels.length > 0 ? (
@@ -72,7 +71,7 @@ export default function GTDItem({ item }: P) {
 								.map(label => (
 									<DataLabel key={label}>
 										<div
-											className="flex space-x-1 items-center"
+											className="flex items-center space-x-1"
 											onMouseDown={event =>
 												event.button === 0 &&
 												commands.emit<cmd.data.showEditLabelsPalette>(
@@ -89,10 +88,10 @@ export default function GTDItem({ item }: P) {
 						</div>
 					) : null}
 
-					<div className="flex gap-1 flex-wrap">
+					<div className="flex flex-wrap gap-1">
 						{item.size > 0 ? (
 							<DataLabel>
-								<div className="flex space-x-1 items-center">
+								<div className="flex items-center space-x-1">
 									<BsTextLeft />
 									<span>{toReadableSize(item.size)}</span>
 								</div>
@@ -125,7 +124,7 @@ export default function GTDItem({ item }: P) {
 						{item.links.length > 0 ? (
 							<DataLabel>
 								<div
-									className="flex space-x-1 items-center"
+									className="flex items-center space-x-1"
 									onMouseDown={event =>
 										event.button === 0 &&
 										commands.emit<cmd.data.showEditLinksPalette>(

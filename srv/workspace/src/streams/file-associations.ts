@@ -13,7 +13,7 @@ const commands = getCommands()
 type Params = { logger: Logger }
 type InitFileAssociationsFn = (params: Params) => __FileAssociations$
 export type __FileAssociations$ = Observable<Extensions.FileAssociation[]>
-export type __CurrentFileAssociation$ = Observable<Nullable<Extensions.FileAssociation>>
+export type __CurrentFileAssociation$ = Observable<Extensions.FileAssociation | null>
 export const __initFileAssociations: InitFileAssociationsFn = callOnce(({ logger }) => {
 	logger.debug("Initializing FileAssociations")
 

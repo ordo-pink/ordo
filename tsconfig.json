@@ -22,7 +22,7 @@
 		"types": ["bun-types"],
 		"baseUrl": ".",
 		"paths": {
-			"@ordo-pink/*": ["./lib/*"]
+			"@ordo-pink/*": ["./lib/*"],
 		}
 	},
 	"include": [

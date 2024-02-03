@@ -3,10 +3,9 @@
 
 import { useState, useEffect } from "react"
 import { Observable } from "rxjs"
-import type { Nullable } from "@ordo-pink/tau"
 
-export const useSubscription = <T>(observable: Nullable<Observable<T>>) => {
-	const [state, setState] = useState<Nullable<T>>(null)
+export const useSubscription = <T>(observable: Observable<T> | null) => {
+	const [state, setState] = useState<T | null>(null)
 
 	useEffect(() => {
 		if (!observable) return
@@ -19,7 +18,7 @@ export const useSubscription = <T>(observable: Nullable<Observable<T>>) => {
 	return state
 }
 
-export const useStrictSubscription = <T>(observable: Nullable<Observable<T>>, initialState: T) => {
+export const useStrictSubscription = <T>(observable: Observable<T> | null, initialState: T) => {
 	const [state, setState] = useState(initialState)
 
 	useEffect(() => {
@@ -28,7 +27,7 @@ export const useStrictSubscription = <T>(observable: Nullable<Observable<T>>, in
 		const subscription = observable.subscribe(value => setState(value))
 
 		return () => subscription.unsubscribe()
-	}, [observable])
+	}, [observable, initialState])
 
 	return state
 }

@@ -6,6 +6,7 @@ import { useEffect } from "react"
 import { useSubscription } from "./use-subscription"
 import { content$ } from "$streams/data"
 import { useSharedContext } from "@ordo-pink/frontend-core"
+import { getCommands } from "$streams/commands"
 
 export const useContent = (fsid?: FSID) => {
 	const { commands } = useSharedContext()

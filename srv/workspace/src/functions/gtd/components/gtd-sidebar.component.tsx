@@ -11,24 +11,19 @@ import { useInbox } from "../hooks/use-inbox"
 import { OrdoButtonSecondary } from "$components/buttons/buttons"
 import { useExtensionState } from "$hooks/use-extension-state.hook"
 import GTDSidebarProject from "./gtd-sidebar-project.component"
+import { useRouteParams } from "$hooks/use-route-params.hook"
 
 export default function GTDSidebar() {
 	const { route, commands, data } = useSharedContext()
+	const { label } = useRouteParams<{ label: string }>()
 	const inboxItems = useInbox()
 	const projects = useGtdProjects()
-	const state = useExtensionState<{ pinnedLabels?: string[] }>("gtd")
+	const state = useExtensionState<{ pinnedLabels: string[] }>("gtd")
 
 	return (
 		<div className="flex flex-col px-1 mt-8 space-y-8">
 			<ActionListItem
 				large
-				// onContextMenu={event =>
-				// 	commands.emit<cmd.ctxMenu.show>("context-menu.show", {
-				// 		event,
-				// 		payload: inboxItems,
-				// 		hideDeleteItems: true,
-				// 	})
-				// }
 				href="/gtd"
 				Icon={BsInbox}
 				current={route?.path === "/gtd"}
@@ -46,32 +41,8 @@ export default function GTDSidebar() {
 				<div>
 					{projects.map(project => (
 						<GTDSidebarProject key={project.fsid} fsid={project.fsid} />
-						// <ActionListItem
-						// 	large
-						// 	key={project.fsid}
-						// 	Icon={BsListCheck}
-						// 	current={fsid === project.fsid}
-						// 	text={project.name}
-						// 	href={`/gtd/projects/${project.fsid}`}
-						// 	onContextMenu={event =>
-						// 		commands.emit<cmd.ctxMenu.show>("context-menu.show", {
-						// 			event,
-						// 			payload: project,
-						// 		})
-						// 	}
-						// />
 					))}
 				</div>
-
-				{/* <OrdoButtonSecondary
-					className="text-lg"
-					center
-					title="Добавить проект"
-					compact
-					onClick={() => commands.emit<cmd.data.showCreateModal>("data.show-create-modal", gtd)}
-				>
-					<BsPlus className="text-lg" />
-				</OrdoButtonSecondary> */}
 			</div>
 
 			<div className="flex flex-col space-y-2">
@@ -87,13 +58,16 @@ export default function GTDSidebar() {
 						onClick={() => {
 							const labels = Array.from(new Set(data?.flatMap(item => item.labels)))
 
-							if (labels.length === 0 && state.pinnedLabels?.length === 0) {
-								return commands.emit<cmd.notification.show>("notification.show", {
+							if (labels.length === 0 && !state.pinnedLabels?.length) {
+								console.log("HERE")
+								commands.emit<cmd.notification.show>("notification.show", {
 									type: "warn",
 									title: "Ой!",
 									message: "У вас пока нет меток, чтобы их закрепить.",
 									duration: 5,
 								})
+
+								return
 							}
 
 							commands.emit<cmd.commandPalette.show>("command-palette.show", {
@@ -138,13 +112,13 @@ export default function GTDSidebar() {
 				</div>
 
 				<div>
-					{state.pinnedLabels?.map(label => (
+					{state.pinnedLabels?.map(pinnedLabel => (
 						<ActionListItem
 							Icon={BsTag}
-							key={label}
-							current={decodeURIComponent(route?.params?.label ?? "") === label}
-							text={label}
-							href={`/gtd/labels/${label}`}
+							key={pinnedLabel}
+							current={decodeURIComponent(label ?? "") === pinnedLabel}
+							text={pinnedLabel}
+							href={`/gtd/labels/${pinnedLabel}`}
 						/>
 					))}
 				</div>

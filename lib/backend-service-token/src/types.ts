@@ -5,7 +5,7 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-import type { Nullable, Unary } from "@ordo-pink/tau"
+import type { Unary } from "@ordo-pink/tau"
 import type { Logger } from "@ordo-pink/logger"
 import type { Oath } from "@ordo-pink/oath"
 import { AUD, JTI, JWT, JWTPayload, SUB, Algorithm } from "@ordo-pink/wjwt"
@@ -50,7 +50,7 @@ export type TokenPersistenceStrategy = {
 	 * @resolves with `null` if token was not found.
 	 * @resolves with an Oath of the token for given sub and jti.
 	 */
-	getToken(sub: SUB, jti: JTI): Oath<Nullable<string>, Error>
+	getToken(sub: SUB, jti: JTI): Oath<string | null, Error>
 
 	/**
 	 * Get an object that contains mapping of JTIs to corresponding tokens.
@@ -59,7 +59,7 @@ export type TokenPersistenceStrategy = {
 	 * @resolves with `null` if no reference to given user id is persisted.
 	 * @resolves with a record of JTIs to corresponding tokens.
 	 */
-	getTokenRecord(sub: SUB): Oath<Nullable<TokenRecord>, Error>
+	getTokenRecord(sub: SUB): Oath<TokenRecord | null, Error>
 
 	/**
 	 * Remove a token associated with given user id and token id.
@@ -141,12 +141,12 @@ export type TTokenService = {
 	getPayload: (
 		token: string,
 		type: "access" | "refresh",
-	) => Oath<Nullable<typeof type extends "access" ? AccessTokenPayload : RefreshTokenPayload>>
+	) => Oath<typeof type extends "access" ? AccessTokenPayload : RefreshTokenPayload | null>
 
 	decode: (
 		token: string,
 		type: "access" | "refresh",
-	) => Oath<Nullable<typeof type extends "access" ? JWAT : JWRT>>
+	) => Oath<typeof type extends "access" ? JWAT : JWRT | null>
 
 	createPair: Unary<
 		{ sub: SUB; prevJti?: JTI; aud?: AUD; data?: Record<string, any> },

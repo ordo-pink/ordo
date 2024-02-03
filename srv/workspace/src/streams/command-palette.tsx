@@ -83,8 +83,8 @@ type RemoveP = Curry<
 >
 type InitCommandPaletteP = { logger: Logger }
 type InitCommandPaletteR = {
-	globalCommandPalette$: Nullable<__CommandPalette$>
-	currentCommandPalette$: Nullable<__CommandPalette$>
+	globalCommandPalette$: __CommandPalette$ | null
+	currentCommandPalette$: __CommandPalette$ | null
 }
 type InitCommandPalette = Unary<InitCommandPaletteP, InitCommandPaletteR>
 

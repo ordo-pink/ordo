@@ -19,7 +19,7 @@ import ContextMenu from "$components/context-menu/context-menu.component"
 import Workspace from "$components/workspace"
 import Modal from "$components/modal.component"
 import Null from "$components/null"
-import { AllKeysRequired, Nullable } from "@ordo-pink/tau"
+import { AllKeysRequired } from "@ordo-pink/tau"
 import { PlainData } from "@ordo-pink/data"
 import { useUser } from "$streams/auth"
 import BackgroundTaskIndicator from "$components/background-task-indicator.component"
@@ -27,9 +27,9 @@ import BackgroundTaskIndicator from "$components/background-task-indicator.compo
 // TODO: Remove useAppInit
 const commands = getCommands()
 const SharedContext = createContext<{
-	data: Nullable<PlainData[]>
-	route: Nullable<Router.Route>
-	user: Nullable<User.User>
+	data: PlainData[] | null
+	route: Router.Route | null
+	user: User.User | null
 	commands: Commands.Commands
 	fileAssociations: Extensions.FileAssociation[]
 	workspaceSplitSize: [number, number]

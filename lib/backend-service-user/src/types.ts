@@ -13,10 +13,10 @@ export type UserPersistenceStrategy = {
 	existsById: (id: string) => Oath<boolean, Error>
 	existsByEmail: (email: string) => Oath<boolean, Error>
 	create(user: User.InternalUser): Oath<User.InternalUser, Error>
-	getById(id: string): Oath<User.InternalUser, Nullable<Error>>
-	getByEmail(email: string): Oath<User.InternalUser, Nullable<Error>>
-	update(id: string, user: Partial<User.InternalUser>): Oath<User.InternalUser, Nullable<Error>>
-	// remove: (id: string) => Promise<Nullable<InternalUser>>
+	getById(id: string): Oath<User.InternalUser, Error> | null
+	getByEmail(email: string): Oath<User.InternalUser, Error> | null
+	update(id: string, user: Partial<User.InternalUser>): Oath<User.InternalUser, Error> | null
+	// remove: (id: string) => Promise<InternalUser | null>
 }
 
 export type CreateMethod<P> = Method<P, UserPersistenceStrategy, "create">

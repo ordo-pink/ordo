@@ -3,20 +3,19 @@
 
 import Card from "$components/card.component"
 import { CenteredPage } from "$components/centered-page"
-import { useExtensionState } from "$hooks/use-extension-state.hook"
 import { useStrictSubscription } from "$hooks/use-subscription"
 import { __Activities$ } from "$streams/activities"
 import { Extensions, ComponentSpace, Functions } from "@ordo-pink/frontend-core"
 import { Switch } from "@ordo-pink/switch"
 import { Nullable } from "@ordo-pink/tau"
-import { memo, useEffect } from "react"
+import { memo } from "react"
 import { BsCollection } from "react-icons/bs"
 
 const announcements = [
 	{
 		title: "🎉 Ordo.pink Beta",
 		message: "Ordo.pink наконец вышел в публичную бета-версию!",
-		date: "2024-01-12",
+		date: "2024-02-03",
 	},
 ]
 
@@ -55,13 +54,13 @@ const Workspace = ({ commands, activities$ }: Pick<P, "commands" | "activities$"
 
 	return (
 		<CenteredPage centerX centerY>
-			<div className="container py-12 overflow-x-hidden grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 px-8">
+			<div className="container grid overflow-x-hidden grid-cols-1 gap-4 px-8 py-12 sm:grid-cols-2 lg:grid-cols-3">
 				<Card title="Новости" className="row-span-2">
 					{announcements.map(announcement => (
 						<div key={announcement.title}>
-							<div className="flex space-x-2 flex-wrap items-center justify-between mb-1">
-								<h4 className="font-bold text-xl">{announcement.title}</h4>
-								<dt className="text-neutral-500 text-xs">{announcement.date}</dt>
+							<div className="flex flex-wrap justify-between items-center mb-1 space-x-2">
+								<h4 className="text-xl font-bold">{announcement.title}</h4>
+								<dt className="text-xs text-neutral-500">{announcement.date}</dt>
 							</div>
 							<p>{announcement.message}</p>
 						</div>

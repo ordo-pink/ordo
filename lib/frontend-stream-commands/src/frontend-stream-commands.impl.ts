@@ -1,18 +1,19 @@
 // SPDX-FileCopyrightText: Copyright 2023, 谢尔盖||↓ and the Ordo.pink contributors
 // SPDX-License-Identifier: MIT
 
-import type { Logger } from "@ordo-pink/logger"
-import { combineLatestWith, map, merge, scan, shareReplay, Subject } from "rxjs"
+import { Subject, combineLatestWith, map, merge, scan, shareReplay } from "rxjs"
 import { equals } from "ramda"
-import { callOnce } from "@ordo-pink/tau"
 import { nanoid } from "nanoid"
 import { useMemo } from "react"
+
+import type { Logger } from "@ordo-pink/logger"
+import { callOnce } from "@ordo-pink/tau"
 
 /**
  * Entrypoint for using commands. You can use this function outside React components.
  */
 export const getCommands = (): Client.Commands.Commands => ({
-	on: (name, handler) => add$.next([name, handler]),
+	on: (name, handler) => addAfter$.next([name, handler]),
 	off: (name, handler) => remove$.next([name, handler]),
 	emit: (name, payload?, key = nanoid()) => enqueue$.next({ name, payload, key }),
 	cancel: (name, payload?, key = nanoid()) => dequeue$.next({ name, payload, key }),
@@ -30,7 +31,9 @@ export const useCommands = () => {
 // --- Internal ---
 
 type Command = Client.Commands.Command | Client.Commands.PayloadCommand
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 type CmdHandlerState = Record<string, Client.Commands.Handler<any>[]>
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 type CmdListener<N extends Client.Commands.CommandName = Client.Commands.CommandName, P = any> = [
 	N,
 	Client.Commands.Handler<P>,
@@ -43,9 +46,10 @@ export const __initCommands = callOnce(({ logger }: InitCommandsP): void => {
 	commandQueue$
 		.pipe(
 			combineLatestWith(commandStorage$),
-			map(([commands, allListeners]) => {
-				commands.forEach(command => {
-					const { name, payload } = command as Client.Commands.PayloadCommand
+			map(async ([commands, allListeners]) => {
+				for (const command of commands) {
+					const name = command.name
+					const payload = isPayloadCommand(command) ? (command.payload as unknown) : undefined
 
 					const listeners = allListeners[name]
 
@@ -57,15 +61,15 @@ export const __initCommands = callOnce(({ logger }: InitCommandsP): void => {
 							payload,
 						)
 
-						listeners.forEach(listener => {
-							listener({ logger, payload })
-						})
+						for (const listener of listeners) {
+							await listener({ logger, payload })
+						}
 					} else {
-						logger.notice(
+						logger.warn(
 							`No handler found for the command "${name}". The command will stay pending until handler is registerred.`,
 						)
 					}
-				})
+				}
 			}),
 		)
 		.subscribe()
@@ -138,7 +142,7 @@ const remove: Remove = listener => state => {
 
 const enqueue$ = new Subject<Command>()
 const dequeue$ = new Subject<Command>()
-const add$ = new Subject<CmdListener>()
+const addAfter$ = new Subject<CmdListener>()
 const addBefore$ = new Subject<CmdListener>()
 const remove$ = new Subject<CmdListener>()
 const commandQueue$ = merge(enqueue$.pipe(map(enqueue)), dequeue$.pipe(map(dequeue))).pipe(
@@ -147,7 +151,7 @@ const commandQueue$ = merge(enqueue$.pipe(map(enqueue)), dequeue$.pipe(map(deque
 )
 
 const commandStorage$ = merge(
-	add$.pipe(map(addAfter)),
+	addAfter$.pipe(map(addAfter)),
 	addBefore$.pipe(map(addBefore)),
 	remove$.pipe(map(remove)),
 ).pipe(

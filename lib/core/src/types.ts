@@ -1,12 +1,14 @@
 // SPDX-FileCopyrightText: Copyright 2023, 谢尔盖||↓ and the Ordo.pink contributors
 // SPDX-License-Identifier: MIT
 
-import type { IconType } from "react-icons"
 import type { ComponentType, MouseEvent } from "react"
-import type { Range, Thunk, UUIDv4, Unary } from "@ordo-pink/tau"
-import type { FSID, PlainData } from "@ordo-pink/data"
+import type { IconType } from "react-icons"
 import type { Observable } from "rxjs"
+
+import type { FSID, PlainData } from "@ordo-pink/data"
+import type { Range, Thunk, UUIDv4, Unary } from "@ordo-pink/tau"
 import type { Logger } from "@ordo-pink/logger"
+
 import type { BackgroundTaskStatus, ComponentSpace } from "./constants"
 
 declare global {
@@ -152,7 +154,7 @@ declare global {
 				name: "command-palette.show"
 				payload: {
 					items: Client.CommandPalette.Item[]
-					onNewItem?: (newItem: string) => any
+					onNewItem?: (newItem: string) => unknown
 					multiple?: boolean
 					pinnedItems?: Client.CommandPalette.Item[]
 				}
@@ -247,6 +249,7 @@ declare global {
 			/**
 			 * Command with payload.
 			 */
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any
 			export type PayloadCommand<N extends CommandName = CommandName, P = any> = Command<N> & {
 				payload: P
 			}
@@ -254,24 +257,27 @@ declare global {
 			/**
 			 * Context provided to command handler.
 			 */
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any
 			export type Context<P = any> = { logger: Logger; payload: P }
 
 			/**
 			 * Command handler.
 			 */
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any
 			export type Handler<P> = Unary<Commands.Context<P>, any>
 
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any
 			export type Ctx = { name: CommandName; payload?: any; key?: string }
 
 			export type InferName<T extends Ctx> = T extends {
 				name: infer U
-				payload?: any
+				payload?: unknown
 			}
 				? U
 				: never
 
 			export type InferPayload<T extends Ctx> = T extends {
-				name: any
+				name: unknown
 				payload: infer U
 			}
 				? U
@@ -365,7 +371,7 @@ declare global {
 				message: string
 				payload?: T
 				duration?: number
-				action?: (id: string, payload: T) => any
+				action?: (id: string, payload: T) => unknown
 				actionText?: string
 				id?: string
 			}
@@ -403,6 +409,7 @@ declare global {
 			/**
 			 * Context menu item.
 			 */
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any
 			export type Item<T = any> = {
 				/**
 				 * Check whether the item needs to be shown.
@@ -458,7 +465,7 @@ declare global {
 			/**
 			 * Show context menu item parameters.
 			 */
-			export type ShowOptions<T = "root" | PlainData | string> = {
+			export type ShowOptions<T = PlainData | string> = {
 				/**
 				 * Accepted mouse event.
 				 */
@@ -502,11 +509,13 @@ declare global {
 			/**
 			 * Context menu item method parameters.
 			 */
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any
 			export type ItemMethodParams<T = any> = { event: MouseEvent; payload?: T }
 
 			/**
 			 * Context menu item method descriptor.
 			 */
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any
 			export type ItemMethod<T = any, Result = any> = Unary<ItemMethodParams<T>, Result>
 
 			/**

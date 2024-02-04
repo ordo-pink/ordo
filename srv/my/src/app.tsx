@@ -1,36 +1,20 @@
-import { useEffect, useState } from "react"
-import { useCommands } from "@ordo-pink/frontend-stream-commands"
+import CenteredPage from "@ordo-pink/frontend-react-components/centered-page"
+import Heading from "@ordo-pink/frontend-react-components/heading"
+import OrdoButton from "@ordo-pink/frontend-react-components/button"
 
-function App() {
-	const [count, setCount] = useState(0)
-	const commands = useCommands()
-
-	useEffect(() => {
-		commands.on("hello.world", () => console.log("HEY"))
-	})
-
+export default function App() {
 	return (
-		<>
-			<h1>Vite + React</h1>
-			<div className="card">
-				<button
-					onClick={() => {
-						if (count % 2 === 0) commands.emit("hello.world")
-						else commands.cancel("hello.world")
-						setCount(count => count + 1)
-					}}
-				>
-					count is {count}
-				</button>
+		<CenteredPage centerX centerY>
+			<Heading level="2" styledFirstLetter>
+				Vite + React
+			</Heading>
+			<div>
+				<OrdoButton.Primary onClick={() => console.log("HEY")}>Hey</OrdoButton.Primary>
 				<p>
 					Edit <code>src/App.tsx</code> and save to test HMR
 				</p>
 			</div>
-			<p className="read-the-docs">
-				Click on the {String(import.meta.env.VITE_ORDO_DT_HOST)} and React logos to learn more
-			</p>
-		</>
+			<p>Click on the {String(import.meta.env.VITE_ORDO_DT_HOST)} and React logos to learn more</p>
+		</CenteredPage>
 	)
 }
-
-export default App

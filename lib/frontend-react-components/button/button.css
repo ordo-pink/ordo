@@ -1,0 +1,75 @@
+.active-ring {
+	@apply ring-2 ring-transparent transition-all duration-300 hover:ring-pink-300 focus:ring-pink-300 dark:hover:ring-pink-500 dark:focus:ring-pink-500;
+}
+
+.passive-ring {
+	@apply ring-2 ring-transparent transition-all duration-300 hover:ring-neutral-500 focus:ring-neutral-500 dark:hover:ring-neutral-500 dark:focus:ring-neutral-500;
+}
+
+.button {
+	@apply shrink-0 rounded-md text-sm;
+}
+
+.button-compact {
+	@apply px-2 py-1;
+}
+
+.button-normal {
+	@apply px-6 py-2;
+}
+
+.button.button-outline {
+	@apply border-2;
+}
+
+.button-content {
+	@apply flex items-center space-x-2;
+}
+
+.button-content-center {
+	@apply justify-center;
+}
+
+.button-accelerator {
+	@apply hidden shrink-0 rounded-md border border-neutral-400 px-1 py-0.5 text-xs opacity-0 transition-all duration-300 dark:border-neutral-300 md:block;
+}
+
+.button-accelerator.visible {
+	@apply opacity-100;
+}
+
+.button-primary {
+	@apply active-ring !bg-gradient-to-br from-sky-300 via-violet-300 !to-purple-300 transition-all duration-300 dark:from-purple-600 dark:via-violet-600 dark:!to-purple-600;
+}
+
+.button-primary-inverted {
+	@apply active-ring bg-gradient-to-br from-neutral-600 via-stone-600 !to-neutral-600 text-neutral-200;
+}
+
+.button-primary-disabled {
+	@apply passive-ring bg-gradient-to-br from-slate-300 via-zinc-300 to-stone-300 dark:from-slate-900 dark:via-zinc-900 dark:!to-stone-900;
+}
+
+.button-secondary {
+	@apply passive-ring text-neutral-600 transition-all duration-300 dark:text-neutral-300;
+}
+
+.button-secondary-inverted {
+	@apply text-neutral-600 dark:text-neutral-300;
+}
+
+.button-secondary-disabled {
+	@apply passive-ring text-neutral-600 dark:text-neutral-300;
+}
+
+.button-neutral {
+	@apply active-ring bg-gradient-to-r from-neutral-300 via-stone-300 to-neutral-300 transition-all duration-300 dark:from-neutral-600 dark:via-stone-600 dark:to-neutral-600;
+}
+
+.button-neutral-inverted {
+	@apply active-ring bg-gradient-to-br from-purple-600 via-violet-600 to-purple-600 text-neutral-200;
+}
+
+.button-neutral-disabled {
+	@apply passive-ring bg-gradient-to-r from-slate-300 via-zinc-300 to-stone-300 dark:from-slate-900 dark:via-zinc-900 dark:to-stone-900;
+}

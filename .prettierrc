@@ -8,5 +8,6 @@
 	"singleQuote": false,
 	"htmlWhitespaceSensitivity": "strict",
 	"proseWrap": "always",
-	"trailingComma": "all"
+	"trailingComma": "all",
+	"plugins": ["prettier-plugin-tailwindcss"]
 }

@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: Copyright 2023, 谢尔盖||↓ and the Ordo.pink contributors
 // SPDX-License-Identifier: MIT
 
-import { Extensions, ComponentSpace, Functions, CommandPalette } from "@ordo-pink/frontend-core"
+import { ComponentSpace } from "@ordo-pink/core"
 import { Switch } from "@ordo-pink/switch"
 import { BsFileEarmark, BsLayoutTextSidebarReverse } from "react-icons/bs"
 import EditorSidebar from "./components/editor-sidebar.component"
@@ -68,7 +68,7 @@ export default function createEditorFunction({ commands, data$ }: Functions.Crea
 								commands.emit<cmd.editor.open>("editor.open", item.fsid)
 								commands.emit<cmd.commandPalette.hide>("command-palette.hide")
 							},
-						} satisfies CommandPalette.Item),
+						} satisfies Client.CommandPalette.Item),
 				),
 			})
 		},

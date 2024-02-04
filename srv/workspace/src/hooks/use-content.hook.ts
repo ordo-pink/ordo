@@ -5,8 +5,7 @@ import { FSID } from "@ordo-pink/data"
 import { useEffect } from "react"
 import { useSubscription } from "./use-subscription"
 import { content$ } from "$streams/data"
-import { useSharedContext } from "@ordo-pink/frontend-core"
-import { getCommands } from "$streams/commands"
+import { useSharedContext } from "@ordo-pink/core"
 
 export const useContent = (fsid?: FSID) => {
 	const { commands } = useSharedContext()
@@ -16,7 +15,7 @@ export const useContent = (fsid?: FSID) => {
 		fsid && commands.emit<cmd.data.getFileContent>("data.get-content", { fsid })
 
 		return () => content$.next(null)
-	}, [fsid])
+	}, [fsid, commands])
 
 	return content
 }

@@ -11,7 +11,7 @@ import { useReadableSize } from "$hooks/use-readable-size.hook"
 import { UserUtils } from "$utils/user-utils.util"
 import { FSID, PlainData } from "@ordo-pink/data"
 import { Either } from "@ordo-pink/either"
-import { useSharedContext } from "@ordo-pink/frontend-core"
+import { useSharedContext } from "@ordo-pink/core"
 import { ComponentType, MouseEventHandler, PropsWithChildren, useEffect, useState } from "react"
 import {
 	BsBox,
@@ -48,7 +48,7 @@ export default function DataEditor({ data }: P) {
 		commands.emit<cmd.data.showEditLinksPalette>("data.show-edit-links-palette", data)
 
 	return (
-		<table className="w-full table-fixed text-neutral-500 text-sm">
+		<table className="w-full text-sm table-fixed text-neutral-500">
 			<tbody>
 				<Row title="Размер" Icon={BsBox}>
 					{readableSize}
@@ -60,7 +60,6 @@ export default function DataEditor({ data }: P) {
 					{updater} ({updatedAt})
 				</Row>
 
-				{/* TODO: Allow setting parent */}
 				{Either.fromNullable(parent).fold(Null, parent => (
 					<Row title="Родитель" Icon={BsFolder2}>
 						<Link href={`/editor/${parent.fsid}`}>{parent.name}</Link>
@@ -183,7 +182,7 @@ const ChildrenRow = ({ children }: ChildrenRowP) => {
 				{shouldCollapse && isCollapsed ? (
 					<DataLabel>
 						<div
-							className="cursor-pointer flex space-x-1 items-center"
+							className="flex items-center space-x-1 cursor-pointer"
 							onClick={() => setIsCollapsed(false)}
 						>
 							<BsChevronDown />
@@ -194,7 +193,7 @@ const ChildrenRow = ({ children }: ChildrenRowP) => {
 				{shouldCollapse && !isCollapsed ? (
 					<DataLabel>
 						<div
-							className="cursor-pointer flex space-x-1 items-center"
+							className="flex items-center space-x-1 cursor-pointer"
 							onClick={() => setIsCollapsed(true)}
 						>
 							<BsChevronUp />

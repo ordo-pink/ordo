@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: Copyright 2023, 谢尔盖||↓ and the Ordo.pink contributors
 // SPDX-License-Identifier: MIT
 
-import { useSharedContext } from "@ordo-pink/frontend-core"
+import { useSharedContext } from "@ordo-pink/core"
 import { useEffect, useState } from "react"
 
 export const useWorkspaceWidth = () => {

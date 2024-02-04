@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: Copyright 2023, 谢尔盖||↓ and the Ordo.pink contributors
 // SPDX-License-Identifier: MIT
 
-import { Either, TEither } from "@ordo-pink/either"
+import { Either } from "@ordo-pink/either"
 import { validations } from "./data-validations.impl"
 import { PlainData, TData, DataStatic, FSID } from "./data.types"
 import { Errors } from "./errors.impl"

@@ -13,7 +13,7 @@ import {
 import { Switch } from "@ordo-pink/switch"
 
 type Props = {
-	type?: Notification.Type
+	type?: Client.Notification.Type
 }
 
 export const Callout = ({ type, children }: PropsWithChildren<Props>) => {

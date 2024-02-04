@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 import { PlainData } from "@ordo-pink/data"
-import { EXTENSION_FILE_PREFIX, useSharedContext } from "@ordo-pink/frontend-core"
+import { EXTENSION_FILE_PREFIX, useSharedContext } from "@ordo-pink/core"
 import { useEffect, useState } from "react"
 import { useRouteParams } from "$hooks/use-route-params.hook"
 import { useWorkspaceWidth } from "$hooks/use-workspace-width.hook"

@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: Copyright 2023, 谢尔盖||↓ and the Ordo.pink contributors
 // SPDX-License-Identifier: MIT
 
-import { Extensions, ComponentSpace, Functions } from "@ordo-pink/frontend-core"
+import { ComponentSpace } from "@ordo-pink/core"
 import { Switch } from "@ordo-pink/switch"
 import GTDIcon from "./components/gtd-icon.component"
 import Sidebar from "./components/gtd-sidebar.component"
@@ -191,7 +191,7 @@ export default function createGTDFunction({ commands, data$ }: Functions.CreateF
 	commands.on<cmd.gtd.showAddReminderModal>("gtd.show-quick-reminder-modal", () =>
 		commands.emit<cmd.modal.show>("modal.show", {
 			Component: () => (
-				<div className="w-96 max-w-lg p-8">
+				<div className="p-8 w-96 max-w-lg">
 					<GTDWidget />
 				</div>
 			),

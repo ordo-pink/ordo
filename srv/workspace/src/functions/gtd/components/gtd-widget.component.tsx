@@ -5,7 +5,7 @@ import { OrdoButtonPrimary } from "$components/buttons/buttons"
 import { TextInput } from "$components/input"
 import { Loader } from "$components/loading/loader"
 import { PlainData } from "@ordo-pink/data"
-import { useSharedContext } from "@ordo-pink/frontend-core"
+import { useSharedContext } from "@ordo-pink/core"
 import { Switch } from "@ordo-pink/switch"
 import { isNonEmptyString } from "@ordo-pink/tau"
 import { useState } from "react"
@@ -18,8 +18,8 @@ export default function GTDWidget() {
 	const [newItem, setNewItem] = useState("")
 
 	return (
-		<div className="w-full max-w-lg p-4 flex flex-col space-y-4 items-start">
-			<div className="space-y-4 pb-4 flex flex-col items-center justify-center w-full text-neutral-500">
+		<div className="flex flex-col items-start p-4 space-y-4 w-full max-w-lg">
+			<div className="flex flex-col justify-center items-center pb-4 space-y-4 w-full text-neutral-500">
 				<InboxStatus inboxChildren={inbox} />
 			</div>
 

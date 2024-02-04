@@ -4,7 +4,7 @@
 import { ComponentType, MouseEvent, useEffect } from "react"
 import { BehaviorSubject } from "rxjs"
 import { BsX } from "react-icons/bs"
-import { Commands, Modal as TModal, useSharedContext } from "@ordo-pink/frontend-core"
+import { useSharedContext } from "@ordo-pink/core"
 import { Either } from "@ordo-pink/either"
 import { useAccelerator } from "$hooks/use-accelerator.hook"
 import { useSubscription } from "$hooks/use-subscription"
@@ -76,7 +76,7 @@ const stopPropagation = (event: MouseEvent) => event.stopPropagation()
 const modal$ = new BehaviorSubject<ModalState | null>(null)
 
 // Define command handlers
-const showModal: Commands.Handler<TModal.HandleShowPayload> = ({ payload }) => {
+const showModal: Client.Commands.Handler<Client.Modal.HandleShowPayload> = ({ payload }) => {
 	const showCloseButton = payload.options?.showCloseButton ?? true
 	const onHide = payload.options?.onHide ?? (() => void 0)
 	const Component = payload.Component

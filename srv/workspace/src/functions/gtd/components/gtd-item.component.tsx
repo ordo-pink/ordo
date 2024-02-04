@@ -3,7 +3,7 @@
 
 import { useChildren } from "$hooks/use-children"
 import { PlainData } from "@ordo-pink/data"
-import { useSharedContext } from "@ordo-pink/frontend-core"
+import { useSharedContext } from "@ordo-pink/core"
 import { MouseEvent } from "react"
 import { BsCheckCircle, BsLink45Deg, BsTag, BsTextLeft } from "react-icons/bs"
 import { useSortable } from "@dnd-kit/sortable"

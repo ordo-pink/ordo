@@ -7,7 +7,7 @@ import { FSID } from "@ordo-pink/data"
 import { Either } from "@ordo-pink/either"
 import DataEditor from "./data-editor.component"
 import { useContent } from "$hooks/use-content.hook"
-import { useSharedContext } from "@ordo-pink/frontend-core"
+import { useSharedContext } from "@ordo-pink/core"
 import { useMemo, useEffect, KeyboardEvent, useCallback } from "react"
 import { BsTerminal } from "react-icons/bs"
 import { Subject, debounce, timer } from "rxjs"
@@ -39,8 +39,6 @@ import { isOrdoElement } from "../guards/is-ordo-element.guard"
 import { OrdoElement } from "../editor.types"
 import HoveringToolbar from "./hovering-toolbar.component"
 import { CenteredPage } from "$components/centered-page"
-
-// --- TODO: Move this away from here ---
 
 const SHORTCUTS = {
 	"*": "list-item",
@@ -107,7 +105,7 @@ export default function EditorWorkspace() {
 					const { text } = Node.leaf(editor, path)
 					const beforeText = text.slice(0, diff.start) + diff.text.slice(0, -1)
 					if (!(beforeText in SHORTCUTS)) {
-						return
+						return false
 					}
 
 					const blockEntry = Editor.above(editor, {
@@ -155,7 +153,7 @@ export default function EditorWorkspace() {
 			cmd: "editor.test",
 			Icon: BsTerminal,
 			readableName: "Создать чекбокс",
-			shouldShow: ({ payload }) => payload === "editor-quick-menu",
+			shouldShow: ({ payload }: { payload?: string }) => payload === "editor-quick-menu",
 			type: "update",
 		})
 
@@ -173,8 +171,8 @@ export default function EditorWorkspace() {
 	return Either.fromNullable(data)
 		.chain(data => Either.fromNullable(content).map(content => ({ data, content })))
 		.fold(EmptyEditor, ({ data, content }) => (
-			<div className="w-full h-full p-2 flex flex-col items-center py-12">
-				<div className="w-full max-w-xl flex flex-col space-y-6">
+			<div className="flex flex-col items-center p-2 py-12 w-full h-full">
+				<div className="flex flex-col space-y-6 w-full max-w-xl">
 					<div>
 						<EditableTitle data={data} />
 					</div>
@@ -196,7 +194,7 @@ export default function EditorWorkspace() {
 						<Editable
 							spellCheck
 							autoFocus
-							className="outline-none pb-96"
+							className="pb-96 outline-none"
 							placeholder="Пора начинать..."
 							renderLeaf={renderLeaf}
 							onDOMBeforeInput={handleDOMBeforeInput}
@@ -237,7 +235,7 @@ const EmptyEditor = () => {
 					Здесь будет редактор файла, если этот самый файл выбрать в сайдбаре слева.
 				</div>
 			</CenteredPage>
-		), // TODO: "/editor" template page
+		),
 		() => <Loading />,
 	)
 }
@@ -353,7 +351,7 @@ const CheckListItemElement = ({ attributes, children, element }: RenderElementPr
 			<span contentEditable={false} className="mr-3">
 				<input
 					type="checkbox"
-					className="h-6 w-6 rounded-sm focus:ring-0 text-emerald-500 bg-neutral-200 dark:bg-neutral-500 cursor-pointer"
+					className="w-6 h-6 text-emerald-500 rounded-sm cursor-pointer focus:ring-0 bg-neutral-200 dark:bg-neutral-500"
 					checked={(element as any)?.checked}
 					onChange={event => {
 						const path = ReactEditor.findPath(editor, element)

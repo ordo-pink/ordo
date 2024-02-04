@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 import { Either } from "@ordo-pink/either"
-import { useSharedContext } from "@ordo-pink/frontend-core"
+import { useSharedContext } from "@ordo-pink/core"
 import { keysOf } from "@ordo-pink/tau"
 
 export const useRouteParams = <

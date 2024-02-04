@@ -3,8 +3,8 @@
 
 import { die, runCommand0 } from "@ordo-pink/binutil"
 
-runCommand0("npm i", {
-	cwd: "./srv/workspace",
+runCommand0("bun i", {
+	cwd: "./srv/my",
 	stdin: "inherit",
 	stderr: "inherit",
 }).orElse(die())

@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 import { PlainData, FSID } from "@ordo-pink/data"
-import { Commands, useSharedContext } from "@ordo-pink/frontend-core"
+import { useSharedContext } from "@ordo-pink/core"
 import { Dispatch, MouseEventHandler, ReactNode, SetStateAction, useState } from "react"
 import FSDataIcon from "./data-icon.component"
 import { useChildren } from "$hooks/use-children"
@@ -13,15 +13,14 @@ export default function FileExplorerActivity(): ReactNode {
 	const currentData = useDataFromRouteFSID()
 	const currentDataChildren = useChildren(currentData ?? "root")
 
-	// TODO: Extract storing selectedItems to clipboard$.
 	const [selectedItems, setSelectedItems] = useState<FSID[]>([])
 
 	return (
 		<div
-			className="h-full min-h-screen w-full"
+			className="w-full h-full min-h-screen"
 			onContextMenu={showContextMenu({ commands, payload: currentData ?? "root" })}
 		>
-			<div className="file-explorer w-full flex flex-wrap p-4">
+			<div className="flex flex-wrap p-4 w-full file-explorer">
 				{currentDataChildren.map(item => (
 					<FSDataIcon
 						key={item.fsid}
@@ -35,15 +34,16 @@ export default function FileExplorerActivity(): ReactNode {
 	)
 }
 
-type ShowContextMenuParams = { commands: Commands.Commands; payload: "root" | PlainData | null }
+type ShowContextMenuParams = {
+	commands: Client.Commands.Commands
+	payload: "root" | PlainData | null
+}
 type ShowContextMenuFn = (params: ShowContextMenuParams) => MouseEventHandler<HTMLDivElement>
 const showContextMenu: ShowContextMenuFn =
 	({ commands, payload }) =>
 	event =>
-		// TODO: Show context menu for the root if (payload === null)
 		payload && commands.emit<cmd.ctxMenu.show>("context-menu.show", { event, payload })
 
-// TODO: Extract storing selectedItems to clipboard$.
 type HandleSelectDataParams = { setItems: Dispatch<SetStateAction<FSID[]>>; items: FSID[] }
 type HandleSelectData = (params: HandleSelectDataParams) => (fsid: FSID) => void
 const handleSelectData: HandleSelectData =

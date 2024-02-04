@@ -3,7 +3,7 @@
 
 import type { FSID, PlainData } from "@ordo-pink/data"
 import { useEffect, useState } from "react"
-import { useSharedContext } from "@ordo-pink/frontend-core"
+import { useSharedContext } from "@ordo-pink/core"
 import { Either } from "@ordo-pink/either"
 import { useData } from "./use-data.hook"
 

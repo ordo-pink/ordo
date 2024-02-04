@@ -5,14 +5,14 @@ import { rrrToNotification } from "$utils/error-to-notification"
 import { Hosts } from "$utils/hosts"
 import { AuthResponse } from "@ordo-pink/backend-server-id"
 import { Data, DataCreateErrors, DataPersistenceStrategy, PlainData } from "@ordo-pink/data"
-import { BackgroundTaskStatus, Commands } from "@ordo-pink/frontend-core"
+import { BackgroundTaskStatus } from "@ordo-pink/core"
 import { Oath } from "@ordo-pink/oath"
 import { BehaviorSubject } from "rxjs"
 
 const of = (
 	data$: BehaviorSubject<PlainData[]>,
 	auth$: BehaviorSubject<AuthResponse>,
-	commands: Commands.Commands,
+	commands: Client.Commands.Commands,
 ): DataPersistenceStrategy => ({
 	count: () => Oath.of(data$.value.length),
 	create: plain => {

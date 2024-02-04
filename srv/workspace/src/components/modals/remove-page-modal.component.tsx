@@ -3,7 +3,7 @@
 
 import { OrdoButtonSecondary, OrdoButtonPrimary } from "$components/buttons/buttons"
 import { PlainData } from "@ordo-pink/data"
-import { useSharedContext } from "@ordo-pink/frontend-core"
+import { useSharedContext } from "@ordo-pink/core"
 import { BsNodeMinus } from "react-icons/bs"
 
 type Props = {

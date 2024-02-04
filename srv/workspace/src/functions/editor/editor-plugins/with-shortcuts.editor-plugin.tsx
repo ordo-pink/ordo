@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: Copyright 2023, 谢尔盖||↓ and the Ordo.pink contributors
 // SPDX-License-Identifier: MIT
 
-import { Descendant, Editor, Element, Point, Range, Transforms, insertText } from "slate"
+import { Editor, Element, Point, Range, Transforms } from "slate"
 import { ReactEditor } from "slate-react"
 import { OrdoDescendant, OrdoElement } from "../editor.types"
 import { isOrdoElement } from "../guards/is-ordo-element.guard"

@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: Copyright 2023, 谢尔盖||↓ and the Ordo.pink contributors
 // SPDX-License-Identifier: MIT
 
-import { Extensions, ComponentSpace, Functions } from "@ordo-pink/frontend-core"
+import { ComponentSpace } from "@ordo-pink/core"
 import { Switch } from "@ordo-pink/switch"
 import FileExplorerActivity from "./components/file-explorer-activity.component"
 import FileExplorerIcon from "./components/file-explorer-icon.component"

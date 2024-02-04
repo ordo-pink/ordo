@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: Copyright 2023, 谢尔盖||↓ and the Ordo.pink contributors
 // SPDX-License-Identifier: MIT
 
-import type { Unary, Nullable } from "@ordo-pink/tau"
+import type { Unary } from "@ordo-pink/tau"
 import { useState, useEffect } from "react"
 import Split from "react-split"
 import { Either } from "@ordo-pink/either"
@@ -12,7 +12,7 @@ import Sidebar from "./sidebar"
 import { __CommandPalette$ } from "$streams/command-palette"
 import { __Sidebar$ } from "$streams/sidebar"
 import { useStrictSubscription, useSubscription } from "$hooks/use-subscription"
-import { Extensions, ComponentSpace } from "@ordo-pink/frontend-core"
+import { ComponentSpace } from "@ordo-pink/core"
 import { Loading } from "./loading/loading"
 
 // --- Public ---

@@ -1,4 +1,4 @@
-import { User, EXTENSION_FILE_PREFIX } from "@ordo-pink/frontend-core"
+import { EXTENSION_FILE_PREFIX } from "@ordo-pink/core"
 import { PlainData } from "@ordo-pink/data"
 import { Either } from "@ordo-pink/either"
 import { extend } from "@ordo-pink/tau"

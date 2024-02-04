@@ -3,7 +3,7 @@
 
 import ActionListItem from "$components/action-list-item"
 import { Title } from "$components/page-header"
-import { useSharedContext } from "@ordo-pink/frontend-core"
+import { useSharedContext } from "@ordo-pink/core"
 import { BsInbox, BsPencil, BsTag } from "react-icons/bs"
 import { HiOutlineSparkles } from "react-icons/hi"
 import { useGtdProjects } from "../hooks/use-projects"

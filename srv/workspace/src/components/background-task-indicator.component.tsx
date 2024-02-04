@@ -2,7 +2,7 @@ import { AiOutlineLoading3Quarters, AiOutlineSave } from "react-icons/ai"
 import { BehaviorSubject } from "rxjs"
 import { useEffect } from "react"
 import { useStrictSubscription } from "$hooks/use-subscription"
-import { BackgroundTaskStatus, Commands, useSharedContext } from "@ordo-pink/frontend-core"
+import { BackgroundTaskStatus, useSharedContext } from "@ordo-pink/core"
 import { Switch } from "@ordo-pink/switch"
 import Null from "./null"
 
@@ -45,7 +45,8 @@ export default function BackgroundTaskIndicator() {
 const saving$ = new BehaviorSubject<BackgroundTaskStatus>(BackgroundTaskStatus.NONE)
 
 // Define command handlers
-const setStatus: Commands.Handler<BackgroundTaskStatus> = ({ payload }) => saving$.next(payload)
+const setStatus: Client.Commands.Handler<BackgroundTaskStatus> = ({ payload }) =>
+	saving$.next(payload)
 const resetStatus = () => saving$.next(BackgroundTaskStatus.NONE)
 
 /**

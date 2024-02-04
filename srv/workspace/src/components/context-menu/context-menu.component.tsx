@@ -6,7 +6,7 @@ import { useCallback, useEffect, useState } from "react"
 import { BehaviorSubject } from "rxjs"
 import { Either } from "@ordo-pink/either"
 import ContextMenuItemList from "$components/context-menu/context-menu-item-list"
-import { CtxMenu, useSharedContext } from "@ordo-pink/frontend-core"
+import { useSharedContext } from "@ordo-pink/core"
 import { useAccelerator } from "$hooks/use-accelerator.hook"
 import { useSubscription } from "$hooks/use-subscription"
 import Null from "$components/null"
@@ -14,10 +14,10 @@ import Null from "$components/null"
 export default function ContextMenu() {
 	const { commands } = useSharedContext()
 
-	const [readers, setReaders] = useState<CtxMenu.Item[]>([])
-	const [creators, setCreators] = useState<CtxMenu.Item[]>([])
-	const [updaters, setUpdaters] = useState<CtxMenu.Item[]>([])
-	const [removers, setRemovers] = useState<CtxMenu.Item[]>([])
+	const [readers, setReaders] = useState<Client.CtxMenu.Item[]>([])
+	const [creators, setCreators] = useState<Client.CtxMenu.Item[]>([])
+	const [updaters, setUpdaters] = useState<Client.CtxMenu.Item[]>([])
+	const [removers, setRemovers] = useState<Client.CtxMenu.Item[]>([])
 
 	const menu = useSubscription(contextMenu$)
 
@@ -54,13 +54,12 @@ export default function ContextMenu() {
 			return
 		}
 
-		// TODO: Fix the approach to handling events
 		if (menu.event.preventDefault) menu.event.preventDefault()
 
-		const readCommands = [] as CtxMenu.Item[]
-		const createCommands = [] as CtxMenu.Item[]
-		const updateCommands = [] as CtxMenu.Item[]
-		const deleteCommands = [] as CtxMenu.Item[]
+		const readCommands = [] as Client.CtxMenu.Item[]
+		const createCommands = [] as Client.CtxMenu.Item[]
+		const updateCommands = [] as Client.CtxMenu.Item[]
+		const deleteCommands = [] as Client.CtxMenu.Item[]
 
 		menu.structure.forEach(item => {
 			if (item.type === "create") createCommands.push(item)
@@ -122,11 +121,11 @@ export default function ContextMenu() {
 
 // --- Internal ---
 
-type AddP = (i: CtxMenu.Item) => (is: CtxMenu.Item[]) => CtxMenu.Item[]
-type RemoveP = (id: string) => (is: CtxMenu.Item[]) => CtxMenu.Item[]
-type Add = (item: CtxMenu.Item) => void
+type AddP = (i: Client.CtxMenu.Item) => (is: Client.CtxMenu.Item[]) => Client.CtxMenu.Item[]
+type RemoveP = (id: string) => (is: Client.CtxMenu.Item[]) => Client.CtxMenu.Item[]
+type Add = (item: Client.CtxMenu.Item) => void
 type Remove = (id: string) => void
-type Show = (item: CtxMenu.ShowOptions) => void
+type Show = (item: Client.CtxMenu.ShowOptions) => void
 type Hide = () => void
 
 const add: Add = item => add$.next(item)
@@ -137,11 +136,11 @@ const hide: Hide = () => params$.next(null)
 const addP: AddP = item => state => state.filter(i => i.cmd !== item.cmd).concat([item])
 const removeP: RemoveP = name => state => state.filter(item => item.cmd !== name)
 
-const params$ = new BehaviorSubject<CtxMenu.ShowOptions | null>(null)
-const add$ = new Subject<CtxMenu.Item>()
+const params$ = new BehaviorSubject<Client.CtxMenu.ShowOptions | null>(null)
+const add$ = new Subject<Client.CtxMenu.Item>()
 const remove$ = new Subject<string>()
 const globalItems$ = merge(add$.pipe(map(addP)), remove$.pipe(map(removeP))).pipe(
-	scan((acc, f) => f(acc), [] as CtxMenu.Item[]),
+	scan((acc, f) => f(acc), [] as Client.CtxMenu.Item[]),
 	shareReplay(1),
 )
 
@@ -156,7 +155,6 @@ const contextMenu$ = params$.pipe(
 					const shouldShow =
 						item?.shouldShow({ event: state.event, payload: state.payload }) ?? false
 
-					// TODO: Fix the approach to handling events
 					if (shouldShow && state.event.stopPropagation) state.event.stopPropagation()
 
 					return shouldShow

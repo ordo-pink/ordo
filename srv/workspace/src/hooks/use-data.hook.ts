@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 import { FSID, PlainData } from "@ordo-pink/data"
-import { EXTENSION_FILE_PREFIX, useSharedContext } from "@ordo-pink/frontend-core"
+import { EXTENSION_FILE_PREFIX, useSharedContext } from "@ordo-pink/core"
 
 export const useDataSelector = <T>(selector: (data: PlainData[]) => T): NonNullable<T> | null => {
 	const { data } = useSharedContext()

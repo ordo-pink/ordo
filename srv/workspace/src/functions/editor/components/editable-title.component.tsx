@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 import { FSID, PlainData } from "@ordo-pink/data"
-import { useSharedContext } from "@ordo-pink/frontend-core"
+import { useSharedContext } from "@ordo-pink/core"
 import { ChangeEvent, useEffect, useState } from "react"
 import { Subject, debounce, timer } from "rxjs"
 

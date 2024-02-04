@@ -4,7 +4,6 @@
 import type { FSID, PlainData, UserID } from "./data.types"
 import type { TEither } from "@ordo-pink/either"
 import type { DataError } from "./errors.types"
-import type { Nullable } from "@ordo-pink/tau"
 
 export type Validation<Expected> = (x: Expected) => TEither<Expected, DataError>
 

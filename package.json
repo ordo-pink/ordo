@@ -10,6 +10,7 @@
     "case": "^1.6.3",
     "chalk": "4",
     "commander": "^11.0.0",
+    "craco-alias": "^3.0.1",
     "dotenv": "^16.3.1",
     "husky": "^8.0.3",
     "jsonwebtoken": "^9.0.1",
@@ -36,8 +37,10 @@
     "@types/react": "^18.2.52",
     "@types/react-dom": "^18.2.18",
     "@types/validator": "^13.11.1",
+    "@types/web": "^0.0.138",
     "bun-types": "latest",
     "nodemon": "^3.0.1",
+    "react-app-alias-ex": "^2.1.0",
     "ts-node": "^10.9.1",
     "tsconfig-paths": "^4.2.0"
   },

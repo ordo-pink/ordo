@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 import { MouseEvent, PropsWithChildren, HTMLProps } from "react"
-import { useSharedContext } from "@ordo-pink/frontend-core"
+import { useSharedContext } from "@ordo-pink/core"
 
 /**
  * Link component is used as a replacement for <a> tag to work well with Ordo router. It supports

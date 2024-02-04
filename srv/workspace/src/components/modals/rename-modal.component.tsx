@@ -3,7 +3,7 @@
 
 import { OrdoButtonPrimary, OrdoButtonSecondary } from "$components/buttons/buttons"
 import { PlainData } from "@ordo-pink/data"
-import { useSharedContext } from "@ordo-pink/frontend-core"
+import { useSharedContext } from "@ordo-pink/core"
 import { isNonEmptyString } from "@ordo-pink/tau"
 import { ChangeEvent, useState } from "react"
 import { BsPencil } from "react-icons/bs"

@@ -4,13 +4,13 @@
 import { Hosts } from "$utils/hosts"
 import { AuthResponse } from "@ordo-pink/backend-server-id"
 import { ContentPersistenceStrategy, Data, UnexpectedError } from "@ordo-pink/data"
-import { BackgroundTaskStatus, Commands } from "@ordo-pink/frontend-core"
+import { BackgroundTaskStatus } from "@ordo-pink/core"
 import { Oath } from "@ordo-pink/oath"
 import { BehaviorSubject } from "rxjs"
 
 const of = (
 	auth$: BehaviorSubject<AuthResponse>,
-	commands: Commands.Commands,
+	commands: Client.Commands.Commands,
 ): ContentPersistenceStrategy<any> => ({
 	create: () => Oath.of("OK"),
 	delete: () => Oath.of("OK"),

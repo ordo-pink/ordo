@@ -10,3 +10,9 @@ export enum ComponentSpace {
 }
 
 export const EXTENSION_FILE_PREFIX = ".ext_"
+
+export const enum BackgroundTaskStatus {
+	NONE,
+	SAVING,
+	LOADING,
+}

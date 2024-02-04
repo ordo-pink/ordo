@@ -6,7 +6,7 @@ import Null from "$components/null"
 import { useChildren } from "$hooks/use-children"
 import { FSID } from "@ordo-pink/data"
 import { Either } from "@ordo-pink/either"
-import { useSharedContext } from "@ordo-pink/frontend-core"
+import { useSharedContext } from "@ordo-pink/core"
 import { useDataByFSID } from "$hooks/use-data.hook"
 import { useRouteParams } from "$hooks/use-route-params.hook"
 import { BsCheckAll, BsListCheck } from "react-icons/bs"
@@ -32,12 +32,12 @@ export default function GTDSidebarProject({ fsid }: Props) {
 			text={data.name}
 		>
 			{children.length > 0 ? (
-				<div className={`text-xs flex space-x-2 items-center`}>
+				<div className={`flex items-center space-x-2 text-xs`}>
 					<div>
 						{doneChildren.length < children.length ? (
 							`${doneChildren.length}/${children.length}`
 						) : (
-							<BsCheckAll className="text-emerald-500 text-lg" />
+							<BsCheckAll className="text-lg text-emerald-500" />
 						)}
 					</div>
 				</div>

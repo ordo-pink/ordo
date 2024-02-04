@@ -4,7 +4,6 @@
 import type { AuthResponse } from "@ordo-pink/backend-server-id"
 import { BehaviorSubject, Observable } from "rxjs"
 import { callOnce, Unary } from "@ordo-pink/tau"
-import { User } from "@ordo-pink/frontend-core"
 import { Either } from "@ordo-pink/either"
 import { Logger } from "@ordo-pink/logger"
 import { Oath } from "@ordo-pink/oath"

@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 import { PlainData } from "@ordo-pink/data"
-import { EXTENSION_FILE_PREFIX, useSharedContext } from "@ordo-pink/frontend-core"
+import { EXTENSION_FILE_PREFIX, useSharedContext } from "@ordo-pink/core"
 import { useEffect, useState } from "react"
 import Links3D from "./3d-links.component"
 import { useRouteParams } from "$hooks/use-route-params.hook"
@@ -73,7 +73,7 @@ export default function LinksWorkspace() {
 			className="h-[calc(100vh-1rem)] overflow-x-hidden overflow-y-hidden relative"
 			style={{ width: workspaceWidth }}
 		>
-			<div className="absolute top-4 flex justify-center w-full space-x-2 z-50">
+			<div className="flex absolute top-4 z-50 justify-center space-x-2 w-full">
 				<OrdoButtonPrimary onClick={() => setIs3D(false)} inverted={is3D}>
 					2D
 				</OrdoButtonPrimary>

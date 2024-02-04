@@ -11,19 +11,21 @@ import { getCommands } from "$streams/commands"
 import RenderFromNullable from "$components/render-from-nullable"
 import ActionListItem from "$components/action-list-item"
 import Accelerator from "$components/accelerator"
-import { CommandPalette } from "@ordo-pink/frontend-core"
 import { Either } from "@ordo-pink/either"
 
 const commands = getCommands()
 
 type Props = {
-	items: CommandPalette.Item[]
+	items: Client.CommandPalette.Item[]
 	onNewItem?: (newItem: string) => any
 	multiple?: boolean
-	pinnedItems?: CommandPalette.Item[]
+	pinnedItems?: Client.CommandPalette.Item[]
 }
 
-const fuse = new Fuse([] as CommandPalette.Item[], { keys: ["readableName", "id"], threshold: 0.1 })
+const fuse = new Fuse([] as Client.CommandPalette.Item[], {
+	keys: ["readableName", "id"],
+	threshold: 0.1,
+})
 
 export default function CommandPaletteModal({ items, onNewItem, multiple, pinnedItems }: Props) {
 	useAccelerator("Esc", () => commands.emit<cmd.commandPalette.hide>("command-palette.hide"))
@@ -33,9 +35,11 @@ export default function CommandPaletteModal({ items, onNewItem, multiple, pinned
 	const [pointerLocation, setPointerLocation] = useState<"selected" | "suggested">(
 		pinnedItems && pinnedItems.length > 0 ? "selected" : "suggested",
 	)
-	const [allItems, setAllItems] = useState<CommandPalette.Item[]>(items)
-	const [selectedItems, setSelectedItems] = useState<CommandPalette.Item[]>(pinnedItems ?? [])
-	const [suggestedItems, setSuggestedItems] = useState<CommandPalette.Item[]>([])
+	const [allItems, setAllItems] = useState<Client.CommandPalette.Item[]>(items)
+	const [selectedItems, setSelectedItems] = useState<Client.CommandPalette.Item[]>(
+		pinnedItems ?? [],
+	)
+	const [suggestedItems, setSuggestedItems] = useState<Client.CommandPalette.Item[]>([])
 
 	useEffect(() => {
 		fuse.setCollection(allItems)

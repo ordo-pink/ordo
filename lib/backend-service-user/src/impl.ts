@@ -9,7 +9,6 @@ import type { UserPersistenceStrategy } from "./types"
 import crypto from "crypto"
 import { Oath } from "@ordo-pink/oath"
 import { UUIDv4 } from "@ordo-pink/tau"
-import { User } from "@ordo-pink/frontend-core"
 
 export class UserService {
 	#persistenceStrategy: UserPersistenceStrategy

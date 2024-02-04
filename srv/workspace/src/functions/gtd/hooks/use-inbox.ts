@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 import { PlainData } from "@ordo-pink/data"
-import { useSharedContext } from "@ordo-pink/frontend-core"
+import { useSharedContext } from "@ordo-pink/core"
 import { useEffect, useState } from "react"
 
 export const useInbox = () => {

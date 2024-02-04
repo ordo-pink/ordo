@@ -5,7 +5,7 @@ import { PropsWithChildren } from "react"
 import { Either } from "@ordo-pink/either"
 import Null from "$components/null"
 
-type _P<T = any> = PropsWithChildren<{ having: T | null }>
-export default function RenderFromNullable({ having: value, children }: _P) {
+type P<T = any> = PropsWithChildren<{ having: T | null }>
+export default function RenderFromNullable({ having: value, children }: P) {
 	return Either.fromNullable(value).fold(Null, () => children)
 }

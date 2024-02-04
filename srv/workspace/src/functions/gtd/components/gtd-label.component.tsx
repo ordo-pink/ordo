@@ -5,7 +5,7 @@ import Card from "$components/card.component"
 import { CenteredPage } from "$components/centered-page"
 import { TextInput } from "$components/input"
 import { useAccelerator } from "$hooks/use-accelerator.hook"
-import { useSharedContext } from "@ordo-pink/frontend-core"
+import { useSharedContext } from "@ordo-pink/core"
 import { useRef, useState } from "react"
 import GTDList from "./gtd-list.component"
 import { useDataByLabel } from "$hooks/use-data.hook"
@@ -23,8 +23,8 @@ export default function GTDLabel({ label }: P) {
 
 	return (
 		<CenteredPage centerX centerY>
-			<div className="px-4 py-8 w-full flex flex-col space-y-4 items-center overflow-y-hidden">
-				<div className="w-full max-w-2xl flex flex-col space-y-4">
+			<div className="flex overflow-y-hidden flex-col items-center px-4 py-8 space-y-4 w-full">
+				<div className="flex flex-col space-y-4 w-full max-w-2xl">
 					<Card className="h-[90vh]" title={`Метка #${label}`}>
 						<TextInput
 							forwardRef={createInputRef}

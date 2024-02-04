@@ -8,7 +8,6 @@
 import { test, expect } from "bun:test"
 import { FSUserRepository } from "./backend-persistence-strategy-user-fs.impl"
 import { rmdir0 } from "@ordo-pink/fs"
-import { User } from "@ordo-pink/frontend-core"
 
 const path = "./var/test/backend-fs-user-repository/users.json"
 const repository = FSUserRepository.of(path)

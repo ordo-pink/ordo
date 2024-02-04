@@ -6,7 +6,6 @@
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 import { UserPersistenceStrategy } from "@ordo-pink/backend-service-user"
-import { User } from "@ordo-pink/frontend-core"
 import { readFile0, writeFileRecursive0 } from "@ordo-pink/fs"
 import { Oath } from "@ordo-pink/oath"
 

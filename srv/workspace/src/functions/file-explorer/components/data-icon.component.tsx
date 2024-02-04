@@ -7,7 +7,7 @@ import { FSID, PlainData } from "@ordo-pink/data"
 import { Switch } from "@ordo-pink/switch"
 import DirectoryCardComponent from "./directory-card.component"
 import FileCardComponent from "./file-card.component"
-import { useSharedContext } from "@ordo-pink/frontend-core"
+import { useSharedContext } from "@ordo-pink/core"
 
 type P = { data: PlainData; isSelected: boolean; onSelect: (fsid: FSID) => void }
 export default function FSDataIcon({ data, isSelected, onSelect }: P) {

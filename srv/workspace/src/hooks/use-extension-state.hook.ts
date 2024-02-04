@@ -1,7 +1,7 @@
 import { BehaviorSubject } from "rxjs"
 import { useStrictSubscription } from "./use-subscription"
 import { useEffect } from "react"
-import { Commands, EXTENSION_FILE_PREFIX, useSharedContext } from "@ordo-pink/frontend-core"
+import { EXTENSION_FILE_PREFIX, useSharedContext } from "@ordo-pink/core"
 import { useContent } from "./use-content.hook"
 import { Either } from "@ordo-pink/either"
 import { noop } from "@ordo-pink/tau"
@@ -24,7 +24,7 @@ export const useExtensionState = <T extends Record<string, unknown>>(name: strin
 					parent: null,
 				})
 			})
-	}, [data, item, name])
+	}, [data, item, name, commands])
 
 	const content = useContent(item?.fsid)
 
@@ -39,7 +39,7 @@ export const useExtensionState = <T extends Record<string, unknown>>(name: strin
 	}, [content, name])
 
 	useEffect(() => {
-		const updateHandler: Commands.Handler<any> = ({ payload: { name, payload } }) => {
+		const updateHandler: Client.Commands.Handler<any> = ({ payload: { name, payload } }) => {
 			if (!item) return
 
 			const currentState = state$.value

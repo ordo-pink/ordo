@@ -8,11 +8,10 @@ import RenderFromNullable from "$components/render-from-nullable"
 import ActionListItem from "$components/action-list-item"
 import Accelerator from "$components/accelerator"
 import { MouseEvent } from "react"
-import { CtxMenu } from "@ordo-pink/frontend-core"
 
 const commands = getCommands()
 
-type _P = { event: MouseEvent; item: CtxMenu.Item; payload?: any }
+type _P = { event: MouseEvent; item: Client.CtxMenu.Item; payload?: any }
 export default function MenuItem({ item, event, payload: p }: _P) {
 	const payload = item.payloadCreator ? item.payloadCreator({ payload: p, event }) : p
 	const isDisabled = item.shouldBeDisabled && item.shouldBeDisabled({ event, payload })

@@ -6,13 +6,7 @@ import { useAppInit } from "$hooks/use-app-init"
 import { getCommands } from "$streams/commands"
 import { useStrictSubscription, useSubscription } from "$hooks/use-subscription"
 import { createContext, useContext, useEffect } from "react"
-import {
-	Commands,
-	Extensions,
-	Router,
-	User,
-	__useSharedContextInit,
-} from "@ordo-pink/frontend-core"
+import { __useSharedContextInit } from "@ordo-pink/core"
 import Notifications from "$components/notifications.component"
 import ActivityBar from "$components/activity-bar/activity-bar"
 import ContextMenu from "$components/context-menu/context-menu.component"
@@ -24,13 +18,12 @@ import { PlainData } from "@ordo-pink/data"
 import { useUser } from "$streams/auth"
 import BackgroundTaskIndicator from "$components/background-task-indicator.component"
 
-// TODO: Remove useAppInit
 const commands = getCommands()
 const SharedContext = createContext<{
 	data: PlainData[] | null
-	route: Router.Route | null
+	route: Client.Router.Route | null
 	user: User.User | null
-	commands: Commands.Commands
+	commands: Client.Commands.Commands
 	fileAssociations: Extensions.FileAssociation[]
 	workspaceSplitSize: [number, number]
 }>({
@@ -69,7 +62,6 @@ export default function App() {
 			f.default({ commands, data$: streams.data$, auth$: streams.auth$ }),
 		)
 
-		// TODO: Enable user functions
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [auth === null])
 
@@ -92,7 +84,7 @@ export default function App() {
 					workspaceSplitSize: sidebar && !sidebar.disabled ? sidebar.sizes : [0, 100],
 					user: user.fold(
 						() => null,
-						u => u, // TODO: Avoid adding current user to shared context
+						u => u,
 					),
 				}}
 			>

@@ -3,7 +3,7 @@
 
 export const rrrToNotification =
 	(title: string) =>
-	(error: string | Error | null): Notification.ShowNotificationParams => ({
+	(error: string | Error | null): Client.Notification.ShowNotificationParams => ({
 		title,
 		message: error ? (typeof error === "string" ? error : error.message) : "Unknown error",
 		type: "rrr",

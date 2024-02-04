@@ -3,7 +3,6 @@
 
 import { UserID } from "@ordo-pink/data"
 import { useEffect, useState } from "react"
-import { User } from "@ordo-pink/frontend-core"
 import { Hosts } from "$utils/hosts"
 import { Oath } from "@ordo-pink/oath"
 

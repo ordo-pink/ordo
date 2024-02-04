@@ -2,10 +2,9 @@
 // SPDX-License-Identifier: MIT
 
 import { MouseEvent } from "react"
-import { CtxMenu } from "@ordo-pink/frontend-core"
 import MenuItem from "$components/context-menu/context-menu-item"
 
-type _P = { items: CtxMenu.Item[]; event: MouseEvent; payload?: any }
+type _P = { items: Client.CtxMenu.Item[]; event: MouseEvent; payload?: any }
 export default function ContextMenuItemList({ items, event, payload }: _P) {
 	return (
 		<div className="py-2">

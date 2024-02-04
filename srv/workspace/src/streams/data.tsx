@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: Copyright 2023, 谢尔盖||↓ and the Ordo.pink contributors
 // SPDX-License-Identifier: MIT
 
-import { CommandPalette, EXTENSION_FILE_PREFIX } from "@ordo-pink/frontend-core"
+import { EXTENSION_FILE_PREFIX } from "@ordo-pink/core"
 import { getCommands } from "./commands"
 import { rrrToNotification } from "$utils/error-to-notification"
 import { Hosts } from "$utils/hosts"
@@ -292,7 +292,6 @@ export const __initData: Fn = ({ logger, auth$ }) => {
 			const data = data$.value
 
 			return {
-				// TODO: Only show "Move to root" if item is not in root
 				items: [
 					{
 						id: "move-to-root",
@@ -319,7 +318,7 @@ export const __initData: Fn = ({ logger, auth$ }) => {
 										commands.emit<cmd.modal.hide>("modal.hide")
 									},
 									Icon: () => <FileIconComponent plain={item} />,
-								} satisfies CommandPalette.Item),
+								} satisfies Client.CommandPalette.Item),
 						),
 				),
 			}
@@ -349,7 +348,6 @@ export const __initData: Fn = ({ logger, auth$ }) => {
 			dataCommands.updateContent({ createdBy, fsid, content, updatedBy, length, contentType }).fork(
 				() => void 0,
 				size => {
-					// TODO: Cleanup and validations
 					const dataCopy = [...data]
 					const currentData = dataCopy.find(item => item.fsid === fsid)
 					const updated = { ...currentData!, updatedAt, size }

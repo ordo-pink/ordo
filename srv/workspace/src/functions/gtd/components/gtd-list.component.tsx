@@ -20,7 +20,7 @@ import {
 	sortableKeyboardCoordinates,
 	verticalListSortingStrategy,
 } from "@dnd-kit/sortable"
-// import { useSharedContext } from "@ordo-pink/frontend-core"
+// import { useSharedContext } from "@ordo-pink/core"
 
 type P = { items: PlainData[] }
 export default function GTDList({ items }: P) {

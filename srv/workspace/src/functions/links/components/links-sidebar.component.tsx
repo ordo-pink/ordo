@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 import ActionListItem from "$components/action-list-item"
-import { useSharedContext } from "@ordo-pink/frontend-core"
+import { useSharedContext } from "@ordo-pink/core"
 import { BsTag, BsTags } from "react-icons/bs"
 
 export default function LinksSidebar() {

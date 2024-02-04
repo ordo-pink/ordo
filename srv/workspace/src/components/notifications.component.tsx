@@ -3,7 +3,7 @@
 
 import { Subject, map, merge, scan, shareReplay } from "rxjs"
 import { useEffect, useState } from "react"
-import { Commands, useSharedContext } from "@ordo-pink/frontend-core"
+import { useSharedContext } from "@ordo-pink/core"
 import { useStrictSubscription } from "$hooks/use-subscription"
 import { Callout } from "$components/callout"
 import { BsX } from "react-icons/bs"
@@ -21,7 +21,7 @@ import Null from "$components/null"
  * - `cmd.notifications.hide`
  */
 export default function Notifications() {
-	const notifications = useStrictSubscription(notification$, [] as Notification.Item[])
+	const notifications = useStrictSubscription(notification$, [] as Client.Notification.Item[])
 	const { commands } = useSharedContext()
 
 	useEffect(() => {
@@ -46,30 +46,31 @@ export default function Notifications() {
 // --- Internal ---
 
 // Define Observables to maintain notification state
-const addP = (i: Notification.Item) => (is: Notification.Item[]) =>
+const addP = (i: Client.Notification.Item) => (is: Client.Notification.Item[]) =>
 	is.some(({ id }) => id === i.id) ? is : [...is, i]
-const removeP = (id: string) => (is: Notification.Item[]) => is.filter(a => a.id !== id)
+const removeP = (id: string) => (is: Client.Notification.Item[]) => is.filter(a => a.id !== id)
 
-const addNotification$ = new Subject<Notification.Item>()
+const addNotification$ = new Subject<Client.Notification.Item>()
 const removeNotification$ = new Subject<string>()
 const notification$ = merge(
 	addNotification$.pipe(map(addP)),
 	removeNotification$.pipe(map(removeP)),
 ).pipe(
-	scan((acc, f) => f(acc), [] as Notification.Item[]),
+	scan((acc, f) => f(acc), [] as Client.Notification.Item[]),
 	shareReplay(1),
 )
 
 // Define command handlers
-const showNotification: Commands.Handler<Notification.ShowNotificationParams> = ({ payload }) =>
-	addNotification$.next({ ...payload, id: payload.id ?? crypto.randomUUID() })
-const hideNotification: Commands.Handler<string> = ({ payload }) =>
+const showNotification: Client.Commands.Handler<Client.Notification.ShowNotificationParams> = ({
+	payload,
+}) => addNotification$.next({ ...payload, id: payload.id ?? crypto.randomUUID() })
+const hideNotification: Client.Commands.Handler<string> = ({ payload }) =>
 	removeNotification$.next(payload)
 
 /**
  * Notification component.
  */
-type P = { notification: Notification.Item }
+type P = { notification: Client.Notification.Item }
 const NotificationComponent = ({ notification }: P) => {
 	const [percentage, setPercentage] = useState(-1)
 	const { commands } = useSharedContext()
@@ -127,7 +128,7 @@ const NotificationComponent = ({ notification }: P) => {
 
 // --- Internal ---
 
-const HoverColor: Record<Notification.Type, string> = {
+const HoverColor: Record<Client.Notification.Type, string> = {
 	default: "hover:bg-neutral-300 hover:dark:bg-neutral-900",
 	info: "hover:bg-sky-300 hover:dark:bg-sky-900",
 	question: "hover:bg-violet-300 hover:dark:bg-violet-900",
@@ -136,7 +137,7 @@ const HoverColor: Record<Notification.Type, string> = {
 	warn: "hover:bg-amber-300 hover:dark:bg-amber-900",
 }
 
-const ProgressColor: Record<Notification.Type, string> = {
+const ProgressColor: Record<Client.Notification.Type, string> = {
 	default: "bg-neutral-300 dark:bg-neutral-900",
 	info: "bg-sky-300 dark:bg-sky-900",
 	question: "bg-violet-300 dark:bg-violet-900",
@@ -145,7 +146,7 @@ const ProgressColor: Record<Notification.Type, string> = {
 	warn: "bg-amber-300 dark:bg-amber-900",
 }
 
-const CardColor: Record<Notification.Type, string> = {
+const CardColor: Record<Client.Notification.Type, string> = {
 	default: "bg-neutral-100 dark:bg-neutral-800",
 	info: "bg-sky-100 dark:bg-sky-800",
 	question: "bg-violet-100 dark:bg-violet-800",

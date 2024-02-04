@@ -4,8 +4,8 @@
 import { OrdoButtonSecondary, OrdoButtonPrimary } from "$components/buttons/buttons"
 // import { PathBreadcrumbs } from "$components/path-breadcrumbs/path-breadcrumbs"
 import { PlainData } from "@ordo-pink/data"
-import { useSharedContext } from "@ordo-pink/frontend-core"
-import { Nullable, isNonEmptyString } from "@ordo-pink/tau"
+import { useSharedContext } from "@ordo-pink/core"
+import { isNonEmptyString } from "@ordo-pink/tau"
 
 import { ChangeEvent, useState } from "react"
 import { BsNodePlus } from "react-icons/bs"
@@ -35,17 +35,17 @@ export default function CreatePageModal({ parent }: Props) {
 
 	return (
 		<div className="w-[30rem] max-w-full flex flex-col gap-8">
-			<div className="flex space-x-2 px-8 pt-8 items-center">
-				<div className="bg-gradient-to-tr from-slate-400 dark:from-slate-600 to-zinc-400 dark:to-zinc-600 rounded-full text-xl text-neutral-200 p-3 shadow-md">
+			<div className="flex items-center px-8 pt-8 space-x-2">
+				<div className="p-3 text-xl bg-gradient-to-tr rounded-full shadow-md from-slate-400 dark:from-slate-600 to-zinc-400 dark:to-zinc-600 text-neutral-200">
 					<BsNodePlus />
 				</div>
-				<div className="grow flex flex-col gap-y-4">
+				<div className="flex flex-col gap-y-4 grow">
 					<h3 className="px-8 text-lg font-bold">{tTitle}</h3>
 
 					<div className="pl-8">
 						{/* <PathBreadcrumbs path={parent?.path ?? "/"} /> */}
 						<input
-							className="w-full rounded-lg bg-neutral-200 dark:bg-neutral-600 px-4 py-2 shadow-inner outline-none"
+							className="px-4 py-2 w-full rounded-lg shadow-inner outline-none bg-neutral-200 dark:bg-neutral-600"
 							placeholder={tPlaceholder}
 							type="text"
 							autoComplete="off"
@@ -57,7 +57,7 @@ export default function CreatePageModal({ parent }: Props) {
 					</div>
 				</div>
 			</div>
-			<div className="flex items-center justify-end space-x-2 px-8 pb-4 pt-4 bg-neutral-200/50 dark:bg-neutral-800/30 rounded-b-lg">
+			<div className="flex justify-end items-center px-8 pt-4 pb-4 space-x-2 rounded-b-lg bg-neutral-200/50 dark:bg-neutral-800/30">
 				<OrdoButtonSecondary
 					onClick={() => commands.emit<cmd.modal.hide>("modal.hide")}
 					hotkey="Esc"

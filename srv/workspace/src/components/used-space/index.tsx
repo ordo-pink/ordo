@@ -3,7 +3,7 @@
 
 import { useEffect, useState } from "react"
 
-import { useSharedContext } from "@ordo-pink/frontend-core"
+import { useSharedContext } from "@ordo-pink/core"
 import { Range, getPercentage } from "@ordo-pink/tau"
 
 import { UsedSpaceModel } from "./used-space.model"

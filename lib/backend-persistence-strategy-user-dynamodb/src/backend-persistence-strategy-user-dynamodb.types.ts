@@ -8,7 +8,6 @@
 import { DynamoDB } from "aws-sdk"
 import type { Unary } from "@ordo-pink/tau"
 import type { UserPersistenceStrategy } from "@ordo-pink/backend-service-user"
-import { User } from "@ordo-pink/frontend-core"
 
 // --- Public ---
 

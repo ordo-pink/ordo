@@ -3,12 +3,10 @@
 
 import { PlainData } from "@ordo-pink/data"
 import FileIconComponent from "./file-icon.component"
-import { useSharedContext } from "@ordo-pink/frontend-core"
+import { useSharedContext } from "@ordo-pink/core"
 import { MouseEvent } from "react"
 import DataLabel from "$components/data/label.component"
 import { BsLink45Deg, BsTags } from "react-icons/bs"
-import { Either } from "@ordo-pink/either"
-import Null from "$components/null"
 
 type P = { plain: PlainData }
 export default function FileCardComponent({ plain }: P) {
@@ -24,7 +22,7 @@ export default function FileCardComponent({ plain }: P) {
 			className="flex flex-col items-center space-y-1"
 		>
 			<FileIconComponent plain={plain} />
-			<div className="text-sm text-center mt-1 line-clamp-2 break-all">{plain.name}</div>
+			<div className="mt-1 text-sm text-center break-all line-clamp-2">{plain.name}</div>
 			<div className="flex space-x-1">
 				<DataLabel>
 					<div

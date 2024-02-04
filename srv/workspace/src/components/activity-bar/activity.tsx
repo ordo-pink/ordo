@@ -4,7 +4,7 @@
 import { __CurrentActivity$ } from "$streams/activities"
 import Link from "$components/link"
 import { getCommands } from "$streams/commands"
-import { Extensions, ComponentSpace } from "@ordo-pink/frontend-core"
+import { ComponentSpace } from "@ordo-pink/core"
 import { useSubscription } from "$hooks/use-subscription"
 
 const commands = getCommands()

@@ -8,7 +8,6 @@
 import { TTokenService } from "@ordo-pink/backend-service-token"
 import { UserService } from "@ordo-pink/backend-service-user"
 import { sendError, authenticate0, parseBody0 } from "@ordo-pink/backend-utils"
-import { User } from "@ordo-pink/frontend-core"
 import { Oath } from "@ordo-pink/oath"
 import { HttpError } from "@ordo-pink/rrr"
 import { isString } from "@ordo-pink/tau"

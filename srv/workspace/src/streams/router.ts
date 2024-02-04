@@ -2,10 +2,9 @@
 // SPDX-License-Identifier: MIT
 
 import { Router, operators } from "silkrouter"
-import { Nullable, Unary, callOnce } from "@ordo-pink/tau"
+import { Unary, callOnce } from "@ordo-pink/tau"
 import { Logger } from "@ordo-pink/logger"
 import { getCommands } from "$streams/commands"
-import { Router as TRouter } from "@ordo-pink/frontend-core"
 import { BehaviorSubject, Observable, map } from "rxjs"
 import { __Activities$ } from "./activities"
 
@@ -13,7 +12,7 @@ const commands = getCommands()
 
 const { route, noMatch } = operators
 
-export type __CurrentRoute$ = Observable<TRouter.Route | null>
+export type __CurrentRoute$ = Observable<Client.Router.Route | null>
 export const __initRouter: InitRouter = callOnce(({ logger, activities$ }) => {
 	logger.debug("Initializing router")
 
@@ -40,7 +39,7 @@ export const __initRouter: InitRouter = callOnce(({ logger, activities$ }) => {
 				activities?.map(activity => {
 					return activity.routes.forEach(activityRoute => {
 						router$ &&
-							router$.pipe(route(activityRoute)).subscribe((routeData: TRouter.Route) => {
+							router$.pipe(route(activityRoute)).subscribe((routeData: Client.Router.Route) => {
 								commands.emit<cmd.activities.setCurrent>("activities.set-current", activity)
 								currentRoute$.next(routeData)
 							})
@@ -74,4 +73,4 @@ type Params = { logger: Logger; activities$: __Activities$ }
 type InitRouter = Unary<Params, __CurrentRoute$>
 
 const router$ = new Router({ hashRouting: false, init: true })
-const currentRoute$ = new BehaviorSubject<TRouter.Route | null>(null)
+const currentRoute$ = new BehaviorSubject<Client.Router.Route | null>(null)

@@ -295,6 +295,11 @@ declare global {
 				before: <T extends Ctx = Ctx>(name: InferName<T>, handler: Handler<InferPayload<T>>) => void
 
 				/**
+				 * Append a listener to a given command.
+				 */
+				after: <T extends Ctx = Ctx>(name: InferName<T>, handler: Handler<InferPayload<T>>) => void
+
+				/**
 				 * Remove given listener for a given command. Make sure you provide a reference to the same
 				 * function as you did when calling `on`.
 				 */

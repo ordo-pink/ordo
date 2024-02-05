@@ -8,40 +8,61 @@ import { useMemo } from "react"
 
 import type { Logger } from "@ordo-pink/logger"
 import { callOnce } from "@ordo-pink/tau"
+import { useSharedContext } from "@ordo-pink/frontend-react-hooks"
+import { getLogger } from "@ordo-pink/frontend-logger"
+import { Either } from "@ordo-pink/either"
 
 /**
  * Entrypoint for using commands. You can use this function outside React components.
  */
-export const getCommands = (): Client.Commands.Commands => ({
-	on: (name, handler) => addAfter$.next([name, handler]),
-	off: (name, handler) => remove$.next([name, handler]),
-	emit: (name, payload?, key = nanoid()) => enqueue$.next({ name, payload, key }),
-	cancel: (name, payload?, key = nanoid()) => dequeue$.next({ name, payload, key }),
-	before: (name, handler) => addBefore$.next([name, handler]),
-})
+export const getCommands = (fid: symbol | null): Client.Commands.Commands =>
+	Either.fromNullable(fid)
+		.leftMap(() => getLogger(fid))
+		.fold(
+			logger => ({
+				on: () => logger.alert("Registerring commands disallowed."),
+				off: () => logger.alert("Unregisterring commands disallowed."),
+				after: () => logger.alert("Registerring commands disallowed."),
+				before: () => logger.alert("Registerring commands disallowed."),
+				emit: () => logger.alert("Emitting commands disallowed."),
+				cancel: () => logger.alert("Cancelling commands disallowed."),
+			}),
+			fid => ({
+				on: (name, handler) => addAfter$.next([name, handler, fid]),
+				off: (name, handler) => remove$.next([name, handler, fid]),
+				after: (name, handler) => addAfter$.next([name, handler, fid]),
+				before: (name, handler) => addBefore$.next([name, handler, fid]),
+				emit: (name, payload?, key = nanoid()) => enqueue$.next({ name, payload, key, fid }),
+				cancel: (name, payload?, key = nanoid()) => dequeue$.next({ name, payload, key, fid }),
+			}),
+		)
 
 /**
  * A React hook for accessing commands.
+ * // TODO: Move all hooks to frontend-react-hooks
  */
 export const useCommands = () => {
-	const commands = useMemo(() => getCommands(), [])
+	const { fid: thisFunction } = useSharedContext()
+	const commands = useMemo(() => getCommands(thisFunction), [])
 	return commands
 }
 
 // --- Internal ---
 
-type Command = Client.Commands.Command | Client.Commands.PayloadCommand
+type Command = (Client.Commands.Command | Client.Commands.PayloadCommand) & { fid: symbol }
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type CmdHandlerState = Record<string, Client.Commands.Handler<any>[]>
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type CmdListener<N extends Client.Commands.CommandName = Client.Commands.CommandName, P = any> = [
 	N,
 	Client.Commands.Handler<P>,
+	symbol,
 ]
 
-type InitCommandsP = { logger: Logger }
-export const __initCommands = callOnce(({ logger }: InitCommandsP): void => {
-	logger.debug("Initializing commands")
+export const __initCommands = callOnce((fid: symbol) => {
+	const logger = getLogger(fid)
+
+	logger.debug("Initializing commands...")
 
 	commandQueue$
 		.pipe(
@@ -49,17 +70,20 @@ export const __initCommands = callOnce(({ logger }: InitCommandsP): void => {
 			map(async ([commands, allListeners]) => {
 				for (const command of commands) {
 					const name = command.name
+					const fid = command.fid
 					const payload = isPayloadCommand(command) ? (command.payload as unknown) : undefined
+
+					const logger = getLogger(fid)
 
 					const listeners = allListeners[name]
 
 					if (listeners) {
-						dequeue$.next({ name, payload })
+						dequeue$.next({ name, payload, fid })
 
 						logger.debug(
-							`Command ${name} invoked for ${listeners.length} listeners, payload: `,
-							payload,
+							`Command "${name}" invoked for ${listeners.length} ${listeners.length === 1 ? "listener" : "listeners"}. Provided payload: `,
 						)
+						logger.debug(payload)
 
 						for (const listener of listeners) {
 							await listener({ logger, payload })
@@ -73,6 +97,8 @@ export const __initCommands = callOnce(({ logger }: InitCommandsP): void => {
 			}),
 		)
 		.subscribe()
+
+	logger.debug("Initialised commands.")
 })
 
 const isPayloadCommand = (cmd: Client.Commands.Command): cmd is Client.Commands.PayloadCommand =>
@@ -146,7 +172,10 @@ const addAfter$ = new Subject<CmdListener>()
 const addBefore$ = new Subject<CmdListener>()
 const remove$ = new Subject<CmdListener>()
 const commandQueue$ = merge(enqueue$.pipe(map(enqueue)), dequeue$.pipe(map(dequeue))).pipe(
-	scan((acc, f) => f(acc), [] as (Client.Commands.Command | Client.Commands.PayloadCommand)[]),
+	scan(
+		(acc, f) => f(acc),
+		[] as ((Client.Commands.Command | Client.Commands.PayloadCommand) & { fid: symbol })[],
+	),
 	shareReplay(1),
 )
 

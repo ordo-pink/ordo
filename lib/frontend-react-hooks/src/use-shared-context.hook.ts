@@ -2,23 +2,22 @@
 // SPDX-License-Identifier: MIT
 
 import { type Context, useContext } from "react"
-import type { PlainData } from "@ordo-pink/data"
+
+import { type PlainData } from "@ordo-pink/data"
+import { callOnce } from "@ordo-pink/tau"
 
 let SharedContext: Context<SharedContextValue>
 
 export type SharedContextValue = {
+	fid: symbol | null
 	data: PlainData[] | null
+	user: User.PublicUser | null
 	route: Client.Router.Route | null
-	user: User.User | null
-	commands: Client.Commands.Commands
-	fileAssociations: Extensions.FileAssociation[]
 	workspaceSplitSize: [number, number]
 }
 
-export const __initUseSharedContext = (context: typeof SharedContext) => {
+export const __initUseSharedContext = callOnce((context: Context<SharedContextValue>): void => {
 	SharedContext = context
-}
+})
 
-export const useSharedContext = (): SharedContextValue => {
-	return useContext(SharedContext)
-}
+export const useSharedContext = (): SharedContextValue => useContext(SharedContext)

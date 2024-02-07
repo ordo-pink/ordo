@@ -4,15 +4,15 @@
 import { die, runCommand0 } from "@ordo-pink/binutil"
 import { getc } from "@ordo-pink/getc"
 
-const { ORDO_STATIC_HOST, ORDO_WORKSPACE_PORT, ORDO_ID_HOST, ORDO_WEB_HOST, ORDO_DT_HOST } = getc([
-	"ORDO_WORKSPACE_PORT",
+const { ORDO_STATIC_HOST, ORDO_ID_HOST, ORDO_WEB_HOST, ORDO_DT_HOST, ORDO_WORKSPACE_HOST } = getc([
 	"ORDO_STATIC_HOST",
 	"ORDO_ID_HOST",
 	"ORDO_WEB_HOST",
 	"ORDO_DT_HOST",
+	"ORDO_WORKSPACE_HOST",
 ])
 
-runCommand0("npm run dev", {
+void runCommand0("npm run dev", {
 	cwd: "./srv/my",
 	stdin: "inherit",
 	stdout: "inherit",
@@ -22,6 +22,7 @@ runCommand0("npm run dev", {
 		VITE_ORDO_ID_HOST: ORDO_ID_HOST,
 		VITE_ORDO_WEBSITE_HOST: ORDO_WEB_HOST,
 		VITE_ORDO_DT_HOST: ORDO_DT_HOST,
+		VITE_ORDO_WORKSPACE_HOST: ORDO_WORKSPACE_HOST,
 		FORCE_COLOR: "1",
 	},
 }).orElse(die())

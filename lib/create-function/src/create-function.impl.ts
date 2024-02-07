@@ -4,6 +4,7 @@
 import { getIsAuthenticated, getUser } from "@ordo-pink/frontend-stream-user"
 import { KnownFunctions } from "@ordo-pink/known-functions"
 import { getCommands } from "@ordo-pink/frontend-stream-commands"
+import { getHosts } from "@ordo-pink/frontend-react-hooks"
 import { getLogger } from "@ordo-pink/frontend-logger"
 
 import { type RegisterFunction } from "./create-function.types"
@@ -23,5 +24,6 @@ export const createFunction: RegisterFunction = (name, permissions, callback) =>
 		getLogger: getLoggerPatched,
 		getUser: getUserPatched,
 		getIsAuthenticated: getIsAuthenticatedPatched,
+		getHosts,
 	})
 }

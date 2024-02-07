@@ -12,6 +12,7 @@ export enum ComponentSpace {
 export const EXTENSION_FILE_PREFIX = ".ext_"
 
 export const ORDO_PINK_APP_FUNCTION = "pink.ordo.app"
+export const ORDO_PINK_USER_FUNCTION = "pink.ordo.user"
 
 export const enum BackgroundTaskStatus {
 	NONE,

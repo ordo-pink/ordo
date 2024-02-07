@@ -11,13 +11,15 @@ import { KnownFunctions } from "@ordo-pink/known-functions"
 import { type Logger } from "@ordo-pink/logger"
 import { Oath } from "@ordo-pink/oath"
 import { getFetch } from "@ordo-pink/frontend-fetch"
+import { getHosts } from "@ordo-pink/frontend-react-hooks"
 import { getLogger } from "@ordo-pink/frontend-logger"
 
-type InitUserStreamP = { fid: symbol; idHost: string; webHost: string; isDev: boolean }
-export const __initAuth$ = callOnce(({ fid, idHost, webHost, isDev }: InitUserStreamP) => {
+type InitUserStreamP = { fid: symbol; isDev: boolean }
+export const __initAuth$ = callOnce(({ fid, isDev }: InitUserStreamP) => {
+	const { idHost, websiteHost } = getHosts()
 	const fetch = getFetch(fid)
 	const logger = getLogger(fid)
-	const refreshToken = refreshToken0({ fetch, idHost, webHost, logger, isDev })
+	const refreshToken = refreshToken0({ fetch, idHost, websiteHost, logger, isDev })
 
 	logger.debug("Initialising auth...")
 
@@ -50,12 +52,12 @@ export const getCurrentUserToken = (fid: symbol | null) =>
 type RefreshTokenP = {
 	fetch: typeof window.fetch
 	idHost: string
-	webHost: string
+	websiteHost: string
 	logger: Logger
 	isDev: boolean
 }
 const refreshToken0 =
-	({ fetch, logger, idHost, webHost, isDev }: RefreshTokenP) =>
+	({ fetch, logger, idHost, websiteHost, isDev }: RefreshTokenP) =>
 	() =>
 		Oath.fromNullable(fetch)
 			.tap(logTokenRefreshStart(logger))
@@ -63,7 +65,7 @@ const refreshToken0 =
 			.chain(getJSONResponse0)
 			.chain(checkIsOperationSuccessful0)
 			.map(updateAuth(logger))
-			.orElse(signOut(logger, webHost, isDev))
+			.orElse(signOut(logger, websiteHost, isDev))
 
 const logTokenRefreshStart = (logger: Logger) => () => logger.debug("Refreshing auth token...")
 

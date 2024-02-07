@@ -24,8 +24,8 @@ export default createFunction(
 			background: false,
 			name: "test",
 			routes: ["/"],
-			Sidebar: lazy(() => import("./src/sidebar.component")),
-			Component: lazy(() => import("./src/workspace.component")),
+			Sidebar: lazy(() => import("./src/sidebar.component") as any),
+			Component: lazy(() => import("./src/workspace.component") as any),
 			Icon: BsChat,
 		})
 

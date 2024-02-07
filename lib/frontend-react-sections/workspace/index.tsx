@@ -15,8 +15,7 @@ import { sidebar$ } from "@ordo-pink/frontend-stream-sidebar"
 import WorkspaceWithSidebar from "./workspace-with-sidebar.component"
 import WorkspaceWithoutSidebar from "./workspace-without-sidebar.component"
 
-type P = { staticHost: string }
-export default function Workspace({ staticHost }: P) {
+export default function Workspace() {
 	const sidebar = useStrictSubscription(sidebar$, { disabled: true })
 	const activity = useSubscription(currentActivity$)
 	const commands = useCommands()
@@ -38,7 +37,7 @@ export default function Workspace({ staticHost }: P) {
 	return Either.fromNullable(sidebar)
 		.chain(state => Either.fromBoolean(() => !state.disabled).map(() => sidebar$))
 		.fold(
-			() => <WorkspaceWithoutSidebar activity={activity} staticHost={staticHost} />,
-			() => <WorkspaceWithSidebar activity={activity} staticHost={staticHost} />,
+			() => <WorkspaceWithoutSidebar activity={activity} />,
+			() => <WorkspaceWithSidebar activity={activity} />,
 		)
 }

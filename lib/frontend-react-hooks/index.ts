@@ -4,6 +4,7 @@
 export * from "./src/use-accelerator.hook"
 export * from "./src/use-commands.hook"
 export * from "./src/use-debounce.hook"
+export * from "./src/use-hosts.hook"
 export * from "./src/use-is-authenticated.hook"
 export * from "./src/use-is-dark-theme.hook"
 export * from "./src/use-is-pwa.hook"

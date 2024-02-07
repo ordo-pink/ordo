@@ -30,7 +30,6 @@ import Null from "@ordo-pink/frontend-react-components/null"
 import Workspace from "@ordo-pink/frontend-react-sections/workspace"
 
 import "./app.css"
-import { staticHost } from "./constants"
 
 const isDarwin = navigator.appVersion.indexOf("Mac") !== -1
 const IGNORED_KEYS = ["Control", "Shift", "Alt", "Control", "Meta"]
@@ -130,8 +129,16 @@ export default function App() {
 		})
 
 		void Oath.of(commands)
-			.chain(() => Oath.from(() => import("@ordo-pink/function-test")))
-			.chain(f => Oath.from(async () => f.default))
+			.chain(() =>
+				Oath.from(() => import("@ordo-pink/function-test")).chain(f =>
+					Oath.from(async () => f.default),
+				),
+			)
+			.chain(() =>
+				Oath.from(() => import("@ordo-pink/function-user")).chain(f =>
+					Oath.from(async () => f.default),
+				),
+			)
 			.orNothing()
 
 		return () => {
@@ -144,8 +151,8 @@ export default function App() {
 	return Either.fromNullable(currentActivity).fold(Loading, () => (
 		<ErrorBoundary logError={logError} fallback={<Fallback />}>
 			<div className="app">
-				<ActivityBar staticHost={staticHost} />
-				<Workspace staticHost={staticHost} />
+				<ActivityBar />
+				<Workspace />
 			</div>
 
 			<Notifications />

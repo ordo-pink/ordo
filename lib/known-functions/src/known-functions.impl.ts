@@ -5,7 +5,7 @@ import { F, T, identity, isEmpty, prop } from "ramda"
 
 import { Either, TEither } from "@ordo-pink/either"
 import { N, isNonEmptyString, isObject } from "@ordo-pink/tau"
-import { ORDO_PINK_APP_FUNCTION } from "@ordo-pink/core"
+import { ORDO_PINK_APP_FUNCTION, ORDO_PINK_USER_FUNCTION } from "@ordo-pink/core"
 
 export type QueryPermission =
 	| "fetch"
@@ -61,7 +61,7 @@ export const KnownFunctions = {
 const knownFunctions: KnownFunction[] = []
 
 const isOrdoPinkAppFunction = (fid: symbol | null) =>
-	KnownFunctions.exchange(fid) === ORDO_PINK_APP_FUNCTION
+	[ORDO_PINK_APP_FUNCTION, ORDO_PINK_USER_FUNCTION].includes(KnownFunctions.exchange(fid)!)
 
 const checkIsValidNameE = (name: string) =>
 	Either.fromBoolean(

@@ -1,0 +1,303 @@
+// SPDX-FileCopyrightText: Copyright 2023, 谢尔盖||↓ and the Ordo.pink contributors
+// SPDX-License-Identifier: MIT
+
+import { BsPatchCheckFill, BsPatchExclamation } from "react-icons/bs"
+import { useState } from "react"
+
+import { EmailInput, PasswordInput, TextInput } from "@ordo-pink/frontend-react-components/input"
+import {
+	useCommands,
+	useHosts,
+	useSubscription,
+	useUser,
+	useUserEmail,
+	useUserName,
+} from "@ordo-pink/frontend-react-hooks"
+import { Either } from "@ordo-pink/either"
+import { Oath } from "@ordo-pink/oath"
+import { auth$ } from "@ordo-pink/frontend-stream-user"
+import { noop } from "@ordo-pink/tau"
+
+import Button from "@ordo-pink/frontend-react-components/button"
+import Card from "@ordo-pink/frontend-react-components/card"
+
+import Achievements from "./components/achievements.component"
+import Heading from "@ordo-pink/frontend-react-components/heading"
+
+export default function UserWorkspace() {
+	const user = useUser()
+	const commands = useCommands()
+	const userName = useUserName()
+	const userEmail = useUserEmail()
+	const { staticHost, idHost } = useHosts()
+
+	const auth = useSubscription(auth$)
+
+	const [email, setEmail] = useState(user?.email)
+	// const [handle, setHandle] = useState(user.handle ?? "")
+	const [oldPassword, setOldPassword] = useState("")
+	const [newPassword, setNewPassword] = useState("")
+	const [repeatNewPassword, setRepeatNewPassword] = useState("")
+	const [firstName, setFirstName] = useState(user?.firstName ?? "")
+	const [lastName, setLastName] = useState(user?.lastName ?? "")
+	const [emailErrors, setEmailErrors] = useState<string[]>([])
+	const [passwordErrors, setPasswordErrors] = useState<string[]>([])
+
+	return (
+		<form
+			onSubmit={e => e.preventDefault()}
+			className="flex min-h-screen flex-col items-center space-y-4 overflow-x-auto px-2 py-4 md:p-8"
+		>
+			<div className="mb-8 flex w-full max-w-lg items-center space-x-4 md:mb-4">
+				<div className="flex shrink-0 cursor-pointer items-center justify-center rounded-full bg-gradient-to-tr from-sky-400 via-purple-400 to-rose-400 p-0.5 shadow-lg">
+					<img
+						src={`${staticHost}/logo.png`}
+						alt="avatar"
+						className="h-16 rounded-full bg-white md:h-20 dark:from-stone-900 dark:via-zinc-900 dark:to-neutral-900"
+						// onClick={() =>
+						// 	showModal(() => <UploadAvatarModal onAvatarChanged={handleAvatarChanged} />)
+						// }
+					/>
+				</div>
+				<div className="flex w-full max-w-md flex-col space-y-1 md:space-y-2">
+					<Heading level="2" trim styledFirstLetter>
+						{userName?.fullName || userEmail}
+					</Heading>
+					{/* <UsedSpace /> */}
+				</div>
+			</div>
+
+			<div className="container grid grid-cols-1 gap-2 md:grid-cols-3 md:gap-4">
+				<Card title="Идентификация">
+					<fieldset className="flex size-full flex-col justify-center space-y-4">
+						<div className="flex flex-col space-y-4 md:flex-row md:space-x-2 md:space-y-0">
+							{/* <TextInput
+							label="Public handle"
+							type="text"
+							placeholder="E.g. moonmarine"
+							id="publicHandle"
+							autocomplete="handle"
+							value={handle}
+							onInput={e => setHandle(e.target.value)}
+						/> */}
+
+							<EmailInput
+								value={email}
+								onInput={e => setEmail(e.target.value)}
+								onChange={emailE =>
+									emailE.fold(setEmailErrors, email => {
+										setEmail(email)
+										setEmailErrors([])
+									})
+								}
+							/>
+
+							<Button.Base
+								disabled={emailErrors.length > 0 || email === user?.email}
+								onClick={() =>
+									void Oath.try(() =>
+										fetch(`${idHost}/change-email`, {
+											method: "PATCH",
+											headers: {
+												authorization: `Bearer ${auth!.accessToken}`,
+												"content-type": "application/json",
+											},
+											body: JSON.stringify({ email }),
+										}).then(res => res.json()),
+									)
+										.rejectedMap(() => "Connection error")
+										.chain(res =>
+											Oath.fromBoolean(
+												() => res.success,
+												noop,
+												() => res.error,
+											),
+										)
+										.fork(
+											err => setEmailErrors([err ? err : "Invalid email"]),
+											() => commands.emit<cmd.user.refreshInfo>("user.refresh"),
+										)
+								}
+							>
+								Изменить
+							</Button.Base>
+						</div>
+
+						<div>
+							<EmailConfirmation confirmed={!!user?.emailConfirmed} />
+						</div>
+					</fieldset>
+				</Card>
+
+				<Card title="Личная информация">
+					<fieldset className="flex size-full flex-col justify-center space-y-4">
+						<TextInput
+							placeholder="Юрий"
+							value={firstName}
+							id="firstName"
+							autocomplete="given-name"
+							label="Имя"
+							onInput={e => setFirstName(e.target.value)}
+						/>
+						<TextInput
+							placeholder="Гагарин"
+							value={lastName}
+							id="lastName"
+							autocomplete="family-name"
+							label="Фамилия"
+							onInput={e => setLastName(e.target.value)}
+						/>
+
+						<Button.Base
+							disabled={
+								firstName === userName?.firstName && lastName === userName?.lastName
+								// && handle === user.handle
+							}
+							onClick={() =>
+								void Oath.try(() =>
+									fetch(`${idHost}/change-account-info`, {
+										method: "PATCH",
+										headers: {
+											authorization: `Bearer ${auth!.accessToken}`,
+											"content-type": "application/json",
+										},
+										body: JSON.stringify({ firstName, lastName }),
+									}).then(res => res.json()),
+								)
+									.rejectedMap(() => "Connection error")
+									.chain(res =>
+										Oath.fromBoolean(
+											() => res.success,
+											noop,
+											() => res.error,
+										),
+									)
+									.fork(
+										err => setEmailErrors([err ? err : "Invalid email"]),
+										() => commands.emit<cmd.user.refreshInfo>("user.refresh"),
+									)
+							}
+						>
+							Изменить
+						</Button.Base>
+					</fieldset>
+				</Card>
+
+				<Card title="Пароль">
+					<fieldset className="flex size-full flex-col justify-center space-y-4">
+						<PasswordInput
+							label="Текущий пароль"
+							id="currentPassword"
+							autocomplete="current-password"
+							value={oldPassword}
+							onInput={e => setOldPassword(e.target.value)}
+							onChange={response =>
+								response.fold(setPasswordErrors, pwd => {
+									setOldPassword(pwd)
+									setPasswordErrors([])
+								})
+							}
+						/>
+
+						<PasswordInput
+							label="Новый пароль"
+							id="newPassword"
+							autocomplete="new-password"
+							value={newPassword}
+							onInput={e => setNewPassword(e.target.value)}
+							onChange={response =>
+								response.fold(setPasswordErrors, pwd => {
+									setNewPassword(pwd)
+									setPasswordErrors([])
+								})
+							}
+						/>
+
+						<PasswordInput
+							label="Новый пароль ещё разок"
+							id="repeatPassword"
+							autocomplete="new-password"
+							value={repeatNewPassword}
+							onInput={e => setRepeatNewPassword(e.target.value)}
+							onChange={response =>
+								response.fold(setPasswordErrors, pwd => {
+									setRepeatNewPassword(pwd)
+									setPasswordErrors([])
+								})
+							}
+						/>
+
+						<Button.Base
+							disabled={
+								passwordErrors.length > 0 ||
+								!oldPassword ||
+								!newPassword ||
+								!repeatNewPassword ||
+								newPassword !== repeatNewPassword
+							}
+							onClick={() =>
+								void Oath.try(() =>
+									fetch(`${idHost}/change-password`, {
+										method: "PATCH",
+										credentials: "include",
+										headers: {
+											authorization: `Bearer ${auth!.accessToken}`,
+											"content-type": "application/json",
+										},
+										body: JSON.stringify({ oldPassword, newPassword, repeatNewPassword }),
+									}).then(res => res.json()),
+								)
+									.chain(res => Oath.fromBoolean(() => res.success, noop))
+									.fork(
+										err => setEmailErrors([err ? err.message : "Invalid email"]),
+										() => {
+											setOldPassword("")
+											setNewPassword("")
+											setRepeatNewPassword("")
+											commands.emit<cmd.user.refreshInfo>("user.refresh")
+										},
+									)
+							}
+						>
+							Изменить
+						</Button.Base>
+					</fieldset>
+				</Card>
+
+				<Card title="Подписка">
+					<p className="text-center text-sm text-neutral-500">
+						Подключение платной подписки станет доступно совсем скоро™️!
+					</p>
+				</Card>
+
+				{/* <Card title="Active sessions">
+					<p className="text-sm text-center text-neutral-500">
+						We'll put active sessions info here in the next update. Stay active!
+					</p>
+				</Card> */}
+
+				<Achievements />
+			</div>
+		</form>
+	)
+}
+
+type _ECP = { confirmed: boolean }
+const EmailConfirmation = ({ confirmed }: _ECP) =>
+	Either.fromBoolean(() => confirmed, EmailConfirmed).getOrElse(EmailNotConfirmed)
+
+const EmailNotConfirmed = () => (
+	<div className="flex items-center justify-center space-x-2">
+		<BsPatchExclamation className="text-rose-500" />
+		<div>
+			Email not confirmed. <button className="text-sky-500">Confirm</button>.
+		</div>
+	</div>
+)
+
+const EmailConfirmed = () => (
+	<div className="flex items-center justify-center space-x-2">
+		<BsPatchCheckFill className="text-emerald-500" />
+		<div>Email confirmed.</div>
+	</div>
+)

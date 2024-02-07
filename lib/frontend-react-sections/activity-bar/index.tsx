@@ -7,6 +7,7 @@ import { type MouseEvent } from "react"
 import {
 	useAccelerator,
 	useCommands,
+	useHosts,
 	useStrictSubscription,
 	useSubscription,
 	useUser,
@@ -21,9 +22,9 @@ import Link from "@ordo-pink/frontend-react-components/link"
 
 import ActivityItem from "./activity"
 
-type P = { staticHost: string }
-export default function ActivityBar({ staticHost }: P) {
+export default function ActivityBar() {
 	const commands = useCommands()
+	const { staticHost } = useHosts()
 
 	const user = useUser()
 	const activities = useStrictSubscription(activities$, [])

@@ -7,20 +7,27 @@ import { type MouseEvent } from "react"
 
 import {
 	useCommands,
+	useHosts,
 	useStrictSubscription,
 	useSubscription,
+	useUser,
 } from "@ordo-pink/frontend-react-hooks"
 import { globalCommandPalette$ } from "@ordo-pink/frontend-stream-command-palette"
 import { sidebar$ } from "@ordo-pink/frontend-stream-sidebar"
 
+import Heading from "@ordo-pink/frontend-react-components/heading"
+import Link from "@ordo-pink/frontend-react-components/link"
+import UsedSpace from "@ordo-pink/frontend-react-components/used-space"
+
 // import Link from "next/link"
 
-type P = PropsWithChildren<{ isNarrow: boolean; staticHost: string }>
-export default function Sidebar({ children, isNarrow, staticHost }: P) {
-	// const user = useUser()
+type P = PropsWithChildren<{ isNarrow: boolean }>
+export default function Sidebar({ children, isNarrow }: P) {
+	const user = useUser()
 	const commands = useCommands()
 	const sidebar = useStrictSubscription(sidebar$, { disabled: true })
 	const commandPalette = useSubscription(globalCommandPalette$)
+	const { staticHost } = useHosts()
 
 	const onSidebarClick = () => {
 		if (!isNarrow || sidebar.disabled || sidebar.sizes[0] === 0) return
@@ -49,31 +56,27 @@ export default function Sidebar({ children, isNarrow, staticHost }: P) {
 
 			<div className="my-2 h-full grow overflow-y-auto">{children}</div>
 
-			{/* <div className="flex justify-center items-center space-x-2 w-full">
+			<div className="flex w-full items-center justify-center space-x-2">
 				<div className="mt-1 flex shrink-0 cursor-pointer items-center justify-center rounded-full bg-gradient-to-tr from-sky-400 via-purple-400 to-rose-400 p-0.5 shadow-lg">
-					<div className="bg-white rounded-full">
+					<div className="rounded-full bg-white">
 						<Link href="/user">
-							<img
-								className="h-10 rounded-full"
-								src={`${process.env.VITE_ORDO_STATIC_HOST}/logo.png`}
-								alt="avatar"
-							/>
+							<img className="h-10 rounded-full" src={`${staticHost}/logo.png`} alt="avatar" />
 						</Link>
 					</div>
 				</div>
 				<div className="w-full max-w-md">
 					<div>
-						{user.fold(Null, u => (
-							<Title level="5" styledFirstLetter trim>
-								{UserUtils.getUserName(u)}
-							</Title>
-						))}
+						{user && (
+							<Heading level="5" styledFirstLetter trim>
+								{user.firstName}
+							</Heading>
+						)}
 					</div>
-					<div>
+					{/* <div>
 						<UsedSpace />
-					</div>
+					</div> */}
 				</div>
-			</div> */}
+			</div>
 		</div>
 	)
 }

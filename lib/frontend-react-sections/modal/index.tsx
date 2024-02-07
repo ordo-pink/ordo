@@ -6,12 +6,10 @@ import { BehaviorSubject } from "rxjs"
 import { BsX } from "react-icons/bs"
 
 import { Either } from "@ordo-pink/either"
-import { useCommands } from "@ordo-pink/frontend-stream-commands"
 
-import { useAccelerator } from "@ordo-pink/frontend-react-hooks/src/use-accelerator.hook"
-import { useSubscription } from "@ordo-pink/frontend-react-hooks/src/use-subscription.hook"
+import { useAccelerator, useCommands, useSubscription } from "@ordo-pink/frontend-react-hooks"
 
-import Null from "../null"
+import Null from "@ordo-pink/frontend-react-components/null"
 
 /**
  * Shows modals all over the place. Modals appear on setting ModalState and hide when the state is

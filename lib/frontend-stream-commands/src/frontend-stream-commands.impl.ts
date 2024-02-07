@@ -55,56 +55,60 @@ type CmdListener<N extends Client.Commands.CommandName = Client.Commands.Command
 	symbol,
 ]
 
-export const __initCommands = callOnce((fid: symbol) => {
-	const logger = getLogger(fid)
+type InitCommandsParams = { fid: symbol; showCommandsWithoutHandlers?: boolean }
+export const __initCommands = callOnce(
+	({ fid, showCommandsWithoutHandlers }: InitCommandsParams) => {
+		const logger = getLogger(fid)
 
-	logger.debug("Initializing commands...")
+		logger.debug("Initializing commands...")
 
-	commandQueue$
-		.pipe(
-			combineLatestWith(commandStorage$),
-			map(async ([commands, allListeners]) => {
-				for (const command of commands) {
-					const name = command.name
-					const fid = command.fid
-					const logger = getLogger(fid)
+		commandQueue$
+			.pipe(
+				combineLatestWith(commandStorage$),
+				map(async ([commands, allListeners]) => {
+					for (const command of commands) {
+						const name = command.name
+						const fid = command.fid
+						const logger = getLogger(fid)
 
-					if (!KnownFunctions.checkPermissions(fid, { commands: [name] })) {
-						const func = KnownFunctions.exchange(fid) ?? "unauthorized"
-						logger.alert(
-							`Function "${func}" did not request permission to execute command "${name}".`,
-						)
+						if (!KnownFunctions.checkPermissions(fid, { commands: [name] })) {
+							const func = KnownFunctions.exchange(fid) ?? "unauthorized"
+							logger.alert(
+								`Function "${func}" did not request permission to execute command "${name}".`,
+							)
 
-						return
-					}
-
-					const payload = isPayloadCommand(command) ? (command.payload as unknown) : undefined
-
-					const listeners = allListeners[name]
-
-					if (listeners) {
-						dequeue$.next({ name, payload, fid })
-
-						logger.debug(
-							`Command "${name}" invoked for ${listeners.length} ${listeners.length === 1 ? "listener" : "listeners"}. Provided payload: `,
-							payload,
-						)
-
-						for (const listener of listeners) {
-							await listener({ logger, payload })
+							return
 						}
-					} else {
-						logger.warn(
-							`No handler found for the command "${name}". The command will stay pending until handler is registerred.`,
-						)
-					}
-				}
-			}),
-		)
-		.subscribe()
 
-	logger.debug("Initialised commands.")
-})
+						const payload = isPayloadCommand(command) ? (command.payload as unknown) : undefined
+
+						const listeners = allListeners[name]
+
+						if (listeners) {
+							dequeue$.next({ name, payload, fid })
+
+							logger.debug(
+								`Command "${name}" invoked for ${listeners.length} ${listeners.length === 1 ? "listener" : "listeners"}. Provided payload: `,
+								payload,
+							)
+
+							for (const listener of listeners) {
+								await listener({ logger, payload })
+							}
+						} else {
+							showCommandsWithoutHandlers &&
+								logger.warn(
+									`No handler found for the command "${name}". The command will stay pending until handler is registerred.`,
+								)
+						}
+					}
+				}),
+			)
+			.subscribe()
+
+		logger.debug("Initialised commands.")
+	},
+)
 
 const isPayloadCommand = (cmd: Client.Commands.Command): cmd is Client.Commands.PayloadCommand =>
 	typeof cmd.name === "string" && (cmd as Client.Commands.PayloadCommand).payload !== undefined

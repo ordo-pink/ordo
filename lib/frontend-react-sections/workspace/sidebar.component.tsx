@@ -2,27 +2,33 @@
 // SPDX-License-Identifier: MIT
 
 // import { BsThreeDotsVertical } from "react-icons/bs"
+import { BsThreeDotsVertical } from "react-icons/bs"
 import { type MouseEvent } from "react"
 
-import { useCommands, useStrictSubscription } from "@ordo-pink/frontend-react-hooks"
+import {
+	useCommands,
+	useStrictSubscription,
+	useSubscription,
+} from "@ordo-pink/frontend-react-hooks"
+import { globalCommandPalette$ } from "@ordo-pink/frontend-stream-command-palette"
 import { sidebar$ } from "@ordo-pink/frontend-stream-sidebar"
 
 // import Link from "next/link"
 
-type P = PropsWithChildren<{ isNarrow: boolean }>
-export default function Sidebar({ children, isNarrow }: P) {
+type P = PropsWithChildren<{ isNarrow: boolean; staticHost: string }>
+export default function Sidebar({ children, isNarrow, staticHost }: P) {
 	// const user = useUser()
 	const commands = useCommands()
 	const sidebar = useStrictSubscription(sidebar$, { disabled: true })
-	// const commandPalette = useSubscription(commandPalette$)
+	const commandPalette = useSubscription(globalCommandPalette$)
 
 	const onSidebarClick = () => {
 		if (!isNarrow || sidebar.disabled || sidebar.sizes[0] === 0) return
 		commands.emit<cmd.sidebar.setSize>("sidebar.set-size", [0, 100])
 	}
 
-	// const openCommandPalette = () =>
-	// 	commandPalette && commands.emit<cmd.commandPalette.show>("command-palette.show", commandPalette)
+	const openCommandPalette = () =>
+		commandPalette && commands.emit<cmd.commandPalette.show>("command-palette.show", commandPalette)
 	const showContextMenu = (event: MouseEvent<HTMLDivElement>) =>
 		commands.emit<cmd.ctxMenu.show>("context-menu.show", { event })
 
@@ -32,14 +38,14 @@ export default function Sidebar({ children, isNarrow }: P) {
 			onClick={onSidebarClick}
 			onContextMenu={showContextMenu}
 		>
-			{/* <div className="flex flex-col">
-				<div className="flex justify-between items-center">
-					<img src={`${Hosts.STATIC}/logo.png`} className="w-8" alt="Ordo.pink Logo" />
-					<div className="text-2xl cursor-pointer text-neutral-500" onClick={openCommandPalette}>
+			<div className="flex flex-col">
+				<div className="flex items-center justify-between">
+					<img src={`${staticHost}/logo.png`} className="w-8" alt="Ordo.pink Logo" />
+					<div className="cursor-pointer text-2xl text-neutral-500" onClick={openCommandPalette}>
 						<BsThreeDotsVertical />
 					</div>
 				</div>
-			</div> */}
+			</div>
 
 			<div className="my-2 h-full grow overflow-y-auto">{children}</div>
 

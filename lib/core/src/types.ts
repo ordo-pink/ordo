@@ -12,7 +12,7 @@ import type { BackgroundTaskStatus } from "./constants"
 
 declare global {
 	type PropsWithChildren<T extends Record<string, unknown> = Record<string, unknown>> = T & {
-		children?: any
+		children?: any | any[]
 	}
 
 	module Achievements {
@@ -412,7 +412,7 @@ declare global {
 			/**
 			 * Context menu item.
 			 */
-			export type Item<T = any> = {
+			export type Item<T = unknown> = {
 				/**
 				 * Check whether the item needs to be shown.
 				 */

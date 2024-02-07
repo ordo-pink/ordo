@@ -1,3 +1,3 @@
 export type OnDragEndFn = (size: [number, number]) => void
 
-export type WorkspaceContentProps = { activity: Extensions.Activity | null }
+export type WorkspaceContentProps = { activity: Extensions.Activity | null; staticHost: string }

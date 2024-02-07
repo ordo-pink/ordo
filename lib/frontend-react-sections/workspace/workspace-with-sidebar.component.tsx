@@ -15,7 +15,7 @@ import { type OnDragEndFn, type WorkspaceContentProps } from "./workspace.types"
 
 import Sidebar from "./sidebar.component"
 
-export default function WorkspaceWithSidebar({ activity }: WorkspaceContentProps) {
+export default function WorkspaceWithSidebar({ activity, staticHost }: WorkspaceContentProps) {
 	const [windowWidth] = useWindowSize()
 	const sidebar = useStrictSubscription(sidebar$, { disabled: true })
 	const commands = useCommands()
@@ -81,7 +81,9 @@ export default function WorkspaceWithSidebar({ activity }: WorkspaceContentProps
 				direction="horizontal"
 			>
 				<div className={`sidebar h-full ${sizes[0] <= 5 ? "hidden" : "block"}`}>
-					<Sidebar isNarrow={isNarrow}>{SidebarComponent && <SidebarComponent />}</Sidebar>
+					<Sidebar isNarrow={isNarrow} staticHost={staticHost}>
+						{SidebarComponent && <SidebarComponent />}
+					</Sidebar>
 				</div>
 
 				<div className={`workspace size-full ${sizes[1] <= 5 ? "hidden" : "block"} overflow-auto`}>

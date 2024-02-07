@@ -35,7 +35,7 @@ module.exports = {
 	},
 	plugins: ["@typescript-eslint", "react", "tailwindcss"],
 	rules: {
-		indent: ["error", "tab"],
+		indent: "off",
 		"linebreak-style": ["error", "unix"],
 		quotes: ["error", "double"],
 		semi: ["error", "never"],
@@ -45,6 +45,7 @@ module.exports = {
 		"@typescript-eslint/no-unsafe-assignment": "off",
 		"@typescript-eslint/no-unsafe-argument": "off",
 		"@typescript-eslint/no-unsafe-return": "off",
+		"@typescript-eslint/no-unsafe-member-access": "off",
 		"@typescript-eslint/ban-ts-comment": "off",
 		"@typescript-eslint/no-explicit-any": "off",
 		"tailwindcss/no-custom-classname": "off",

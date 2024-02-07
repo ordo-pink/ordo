@@ -8,10 +8,14 @@ import { callOnce } from "@ordo-pink/tau"
 
 let SharedContext: Context<SharedContextValue>
 
+// TODO: Move data to useData
+// TODO: Move fid to useFID
+// TODO: Move route to useRoute
+// TODO: Move workspaceSplitSize to useWorkspaceSize and useSidebarSize
+// TODO: Move persistedState to usePersistedState
 export type SharedContextValue = {
 	fid: symbol | null
 	data: PlainData[] | null
-	user: User.PublicUser | null
 	route: Client.Router.Route | null
 	workspaceSplitSize: [number, number]
 }

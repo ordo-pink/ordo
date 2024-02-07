@@ -3,24 +3,14 @@
 
 import type { ComponentType, MouseEvent } from "react"
 import type { IconType } from "react-icons"
-import type { Observable } from "rxjs"
 
 import type { FSID, PlainData } from "@ordo-pink/data"
-import type { Range, Thunk, UUIDv4, Unary } from "@ordo-pink/tau"
+import type { Range, UUIDv4 } from "@ordo-pink/tau"
 import type { Logger } from "@ordo-pink/logger"
 
 import type { BackgroundTaskStatus, ComponentSpace } from "./constants"
 
 declare global {
-	module Functions {
-		type CreateFunctionParams = {
-			commands: Client.Commands.Commands
-			data$: Observable<PlainData[]> | null
-		}
-
-		type CreateFunctionFn = Unary<Functions.CreateFunctionParams, void | Promise<void>>
-	}
-
 	module Achievements {
 		type AchievementSubscriber = (
 			commands: Client.Commands.Commands,
@@ -193,6 +183,7 @@ declare global {
 
 	module Extensions {
 		type Activity = {
+			fid: symbol
 			name: string
 			routes: string[]
 			Component: ComponentType<ComponentProps>
@@ -249,7 +240,6 @@ declare global {
 			/**
 			 * Command with payload.
 			 */
-			// eslint-disable-next-line @typescript-eslint/no-explicit-any
 			export type PayloadCommand<N extends CommandName = CommandName, P = any> = Command<N> & {
 				payload: P
 			}
@@ -257,26 +247,23 @@ declare global {
 			/**
 			 * Context provided to command handler.
 			 */
-			// eslint-disable-next-line @typescript-eslint/no-explicit-any
-			export type Context<P = any> = { logger: Logger; payload: P }
+			export type HandlerParams<P = any> = { logger: Logger; payload: P }
 
 			/**
 			 * Command handler.
 			 */
-			// eslint-disable-next-line @typescript-eslint/no-explicit-any
-			export type Handler<P> = Unary<Commands.Context<P>, any>
+			export type Handler<P> = (ctx: Commands.HandlerParams<P>) => unknown
 
-			// eslint-disable-next-line @typescript-eslint/no-explicit-any
-			export type Ctx = { name: CommandName; payload?: any; key?: string }
+			export type AbstractCommand = { name: CommandName; payload?: any; key?: string }
 
-			export type InferName<T extends Ctx> = T extends {
+			export type InferName<T extends AbstractCommand> = T extends {
 				name: infer U
 				payload?: unknown
 			}
 				? U
 				: never
 
-			export type InferPayload<T extends Ctx> = T extends {
+			export type InferPayload<T extends AbstractCommand> = T extends {
 				name: unknown
 				payload: infer U
 			}
@@ -287,30 +274,42 @@ declare global {
 				/**
 				 * Append a listener to a given command.
 				 */
-				on: <T extends Ctx = Ctx>(name: InferName<T>, handler: Handler<InferPayload<T>>) => void
+				on: <T extends AbstractCommand = AbstractCommand>(
+					name: InferName<T>,
+					handler: Handler<InferPayload<T>>,
+				) => void
 
 				/**
 				 * Prepend listener to a given command.
 				 */
-				before: <T extends Ctx = Ctx>(name: InferName<T>, handler: Handler<InferPayload<T>>) => void
+				before: <T extends AbstractCommand = AbstractCommand>(
+					name: InferName<T>,
+					handler: Handler<InferPayload<T>>,
+				) => void
 
 				/**
 				 * Append a listener to a given command.
 				 */
-				after: <T extends Ctx = Ctx>(name: InferName<T>, handler: Handler<InferPayload<T>>) => void
+				after: <T extends AbstractCommand = AbstractCommand>(
+					name: InferName<T>,
+					handler: Handler<InferPayload<T>>,
+				) => void
 
 				/**
 				 * Remove given listener for a given command. Make sure you provide a reference to the same
 				 * function as you did when calling `on`.
 				 */
-				off: <T extends Ctx = Ctx>(name: InferName<T>, handler: Handler<InferPayload<T>>) => void
+				off: <T extends AbstractCommand = AbstractCommand>(
+					name: InferName<T>,
+					handler: Handler<InferPayload<T>>,
+				) => void
 
 				/**
 				 * Emit given command with given payload. You can provide an optional key that you can use
 				 * later to apply targeted cancellation for the command. Emission does not happen if there
 				 * is a command with given key already.
 				 */
-				emit: <T extends Ctx = Ctx>(
+				emit: <T extends AbstractCommand = AbstractCommand>(
 					name: InferName<T>,
 					payload?: InferPayload<T>,
 					key?: string,
@@ -320,7 +319,7 @@ declare global {
 				 * Cancel a command with given payload. If you provided a key when emitting the command,
 				 * you can provide it for targeted cancellation.
 				 */
-				cancel: <T extends Ctx = Ctx>(
+				cancel: <T extends AbstractCommand = AbstractCommand>(
 					name: InferName<T>,
 					payload?: InferPayload<T>,
 					key?: string,
@@ -401,7 +400,7 @@ declare global {
 				 * @optional
 				 * @default () => void 0
 				 */
-				onHide?: Thunk<void>
+				onHide?: () => void
 			}
 
 			export type HandleShowPayload = {
@@ -414,7 +413,6 @@ declare global {
 			/**
 			 * Context menu item.
 			 */
-			// eslint-disable-next-line @typescript-eslint/no-explicit-any
 			export type Item<T = any> = {
 				/**
 				 * Check whether the item needs to be shown.
@@ -514,14 +512,12 @@ declare global {
 			/**
 			 * Context menu item method parameters.
 			 */
-			// eslint-disable-next-line @typescript-eslint/no-explicit-any
 			export type ItemMethodParams<T = any> = { event: MouseEvent; payload?: T }
 
 			/**
 			 * Context menu item method descriptor.
 			 */
-			// eslint-disable-next-line @typescript-eslint/no-explicit-any
-			export type ItemMethod<T = any, Result = any> = Unary<ItemMethodParams<T>, Result>
+			export type ItemMethod<T = any, Result = any> = (params: ItemMethodParams<T>) => Result
 
 			/**
 			 * Context menu item type. This impacts two things:
@@ -560,14 +556,14 @@ declare global {
 				/**
 				 * Action to be executed when command palette item is used.
 				 */
-				onSelect: Thunk<void>
+				onSelect: () => void
 
 				/**
 				 * Icon to be displayed for the context menu item.
 				 *
 				 * @optional
 				 */
-				Icon?: IconType
+				Icon?: ComponentType | IconType
 
 				/**
 				 * Keyboard accelerator for the context menu item. It only works while the context menu is

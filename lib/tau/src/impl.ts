@@ -5,6 +5,8 @@ import type * as T from "./types"
 
 export const UUIDv4_RX = /^[0-9A-F]{8}-[0-9A-F]{4}-[4][0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$/i
 
+export const N = () => null
+
 export type UUIDv4 = `${string}-${string}-${string}-${string}-${string}`
 
 export type AllKeysRequired<T extends Record<string, any>> = { [K in keyof T]: NonNullable<T[K]> }

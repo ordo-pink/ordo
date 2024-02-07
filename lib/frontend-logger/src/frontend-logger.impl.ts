@@ -2,9 +2,8 @@
 // SPDX-License-Identifier: MIT
 
 import { ConsoleLogger, Logger } from "@ordo-pink/logger"
-import { callOnce } from "@ordo-pink/tau"
 import { KnownFunctions } from "@ordo-pink/known-functions"
-import { useSharedContext } from "@ordo-pink/frontend-react-hooks"
+import { callOnce } from "@ordo-pink/tau"
 
 let logger = ConsoleLogger
 
@@ -25,10 +24,4 @@ export const getLogger = (fid: symbol | null): Logger => {
 		info: (...message) => logger.info(`@${functionName} ::`, ...message),
 		debug: (...message) => logger.debug(`@${functionName} ::`, ...message),
 	}
-}
-
-export const useLogger = (): Logger => {
-	const { fid } = useSharedContext()
-
-	return getLogger(fid)
 }

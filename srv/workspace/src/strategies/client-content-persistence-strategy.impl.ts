@@ -10,7 +10,7 @@ import { BehaviorSubject } from "rxjs"
 
 const of = (
 	auth$: BehaviorSubject<AuthResponse>,
-	commands: Client.Commands.Commands,
+	commands: Client.Commands.CommandEmitter,
 ): ContentPersistenceStrategy<any> => ({
 	create: () => Oath.of("OK"),
 	delete: () => Oath.of("OK"),

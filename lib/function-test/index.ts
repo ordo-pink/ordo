@@ -3,17 +3,22 @@
 
 import { createFunction } from "@ordo-pink/create-function"
 
-export default createFunction("com.the.test", {}, ({ getCommands, getLogger }) => {
-	const commands = getCommands()
-	const logger = getLogger()
+export default createFunction(
+	"com.the.test",
+	{ queries: ["auth.is-authenticated"], commands: ["hello.world"] },
+	({ getCommands, getLogger, getIsAuthenticated }) => {
+		const commands = getCommands()
+		const logger = getLogger()
+		const isAuth = getIsAuthenticated()
 
-	const handleHelloWorld = () => logger.info("HEY")
+		const handleHelloWorld = () => logger.info("Authentication status", isAuth)
 
-	commands.on("hello.world", handleHelloWorld)
+		commands.on("hello.world", handleHelloWorld)
 
-	commands.emit("hello.world")
+		commands.emit("hello.world")
 
-	return () => {
-		commands.off("hello.world", handleHelloWorld)
-	}
-})
+		return () => {
+			commands.off("hello.world", handleHelloWorld)
+		}
+	},
+)

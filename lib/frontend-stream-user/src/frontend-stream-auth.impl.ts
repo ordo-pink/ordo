@@ -1,17 +1,17 @@
 // SPDX-FileCopyrightText: Copyright 2024, 谢尔盖||↓ and the Ordo.pink contributors
 // SPDX-License-Identifier: MIT
 
-import { getFetch } from "@ordo-pink/frontend-fetch"
-import { Oath } from "@ordo-pink/oath"
+import { F, T, identity } from "ramda"
 import { BehaviorSubject } from "rxjs/internal/BehaviorSubject"
-import { AuthResponse } from "@ordo-pink/backend-server-id"
-import { getLogger } from "@ordo-pink/frontend-logger"
-import { callOnce } from "@ordo-pink/tau"
-import { Logger } from "@ordo-pink/logger"
+
+import { N, callOnce } from "@ordo-pink/tau"
+import { type AuthResponse } from "@ordo-pink/backend-server-id"
 import { Either } from "@ordo-pink/either"
 import { KnownFunctions } from "@ordo-pink/known-functions"
-import Null from "@ordo-pink/frontend-react-components/null"
-import { useSharedContext, useSubscription } from "@ordo-pink/frontend-react-hooks"
+import { type Logger } from "@ordo-pink/logger"
+import { Oath } from "@ordo-pink/oath"
+import { getFetch } from "@ordo-pink/frontend-fetch"
+import { getLogger } from "@ordo-pink/frontend-logger"
 
 type InitUserStreamP = { fid: symbol; idHost: string; webHost: string; isDev: boolean }
 export const __initAuth$ = callOnce(({ fid, idHost, webHost, isDev }: InitUserStreamP) => {
@@ -21,14 +21,14 @@ export const __initAuth$ = callOnce(({ fid, idHost, webHost, isDev }: InitUserSt
 
 	logger.debug("Initialising auth...")
 
-	refreshToken()
+	void refreshToken()
 
 	const beforeUnloadListener = () => {
 		clearInterval(interval)
 		window.removeEventListener("beforeunload", beforeUnloadListener)
 	}
 
-	const interval = setInterval(refreshToken, 50_000) // TODO: Take from ENV
+	const interval = setInterval(() => void refreshToken(), 50_000) // TODO: Take from ENV
 
 	window.addEventListener("beforeunload", beforeUnloadListener)
 
@@ -36,42 +36,16 @@ export const __initAuth$ = callOnce(({ fid, idHost, webHost, isDev }: InitUserSt
 })
 
 export const getIsAuthenticated = (fid: symbol | null) =>
-	Either.fromBoolean(() => KnownFunctions.validate(fid))
+	Either.fromBoolean(() =>
+		KnownFunctions.checkPermissions(fid, { queries: ["auth.is-authenticated"] }),
+	)
 		.chain(() => Either.fromNullable(auth$.value?.sub))
-		.fold(
-			() => false,
-			() => true,
-		)
-
-export const useIsAuthenticated = () => {
-	const { fid } = useSharedContext()
-	const auth = useSubscription(auth$)
-
-	return Either.fromBoolean(() => KnownFunctions.validate(fid))
-		.chain(() => Either.fromNullable(auth))
-		.fold(
-			() => false,
-			() => true,
-		)
-}
-
-export const getCurrentUserSub = (fid: symbol | null) =>
-	Either.fromBoolean(() => KnownFunctions.validate(fid))
-		.chain(() => Either.fromNullable(auth$.value?.sub))
-		.fold(Null, x => x)
+		.fold(F, T)
 
 export const getCurrentUserToken = (fid: symbol | null) =>
-	Either.of(KnownFunctions.exchange(fid))
-		.chain(name => Either.fromBoolean(() => name === "pink.ordo.app"))
+	Either.of(KnownFunctions.checkPermissions(fid, { queries: [] }))
 		.chain(() => Either.fromNullable(auth$.value?.accessToken))
-		.fold(Null, x => x)
-
-export const useCurrentUserSub = () => {
-	const { fid } = useSharedContext()
-	const auth = useSubscription(auth$)
-
-	return Either.fromBoolean(() => KnownFunctions.validate(fid)).fold(Null, () => auth?.sub ?? null)
-}
+		.fold(N, identity)
 
 type RefreshTokenP = {
 	fetch: typeof window.fetch
@@ -102,7 +76,7 @@ const checkIsOperationSuccessful0 = Oath.ifElse<
 	{ success: boolean; result: AuthResponse; error: string },
 	AuthResponse,
 	string
->(res => res.success, { onTrue: res => res.result as AuthResponse, onFalse: res => res.error })
+>(res => res.success, { onTrue: res => res.result, onFalse: res => res.error })
 
 const updateAuth = (logger: Logger) => (auth: AuthResponse) => {
 	logger.debug("Auth token refreshed.")
@@ -117,7 +91,7 @@ const signOut =
 		}
 
 		logger.error("Token refresh failed. Signing out.")
-		window.location.href = `${webHost}/sign-out`
+		// window.location.href = `${webHost}/sign-out`
 	}
 
-const auth$ = new BehaviorSubject<AuthResponse | null>(null)
+export const auth$ = new BehaviorSubject<AuthResponse | null>(null)

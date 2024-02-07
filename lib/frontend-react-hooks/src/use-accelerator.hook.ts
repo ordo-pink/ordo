@@ -24,11 +24,7 @@ export const useAccelerator: UseAccelerator = (accelerator, callback, deps) => {
 	useHotkeys(
 		hotkeys,
 		callback,
-		{
-			enableOnFormTags: true,
-			enableOnContentEditable: true,
-			preventDefault: true,
-		},
+		{ enableOnFormTags: true, enableOnContentEditable: true, preventDefault: true },
 		deps,
 	)
 }

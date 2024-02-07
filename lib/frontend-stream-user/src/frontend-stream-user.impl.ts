@@ -1,14 +1,13 @@
-import { getCommands } from "@ordo-pink/frontend-stream-commands"
-import { callOnce } from "@ordo-pink/tau"
-import { BehaviorSubject } from "rxjs"
-import { getCurrentUserToken } from "./frontend-stream-auth.impl"
-import { Oath } from "@ordo-pink/oath"
-import { getFetch } from "@ordo-pink/frontend-fetch"
-import { getLogger } from "@ordo-pink/frontend-logger"
+import { BehaviorSubject } from "rxjs/internal/BehaviorSubject"
+
 import { Either } from "@ordo-pink/either"
 import { KnownFunctions } from "@ordo-pink/known-functions"
-import { useSharedContext, useSubscription } from "@ordo-pink/frontend-react-hooks"
-import Null from "@ordo-pink/frontend-react-components/null"
+import { Oath } from "@ordo-pink/oath"
+import { callOnce } from "@ordo-pink/tau"
+import { getCommands } from "@ordo-pink/frontend-stream-commands"
+import { getCurrentUserToken } from "./frontend-stream-auth.impl"
+import { getFetch } from "@ordo-pink/frontend-fetch"
+import { getLogger } from "@ordo-pink/frontend-logger"
 
 type InitUserParams = { fid: symbol; idHost: string }
 export const __initUser$ = callOnce(({ fid, idHost }: InitUserParams) => {
@@ -46,18 +45,9 @@ export const __initUser$ = callOnce(({ fid, idHost }: InitUserParams) => {
 })
 
 export const getUser = (fid: symbol | null) =>
-	Either.fromBoolean(() => KnownFunctions.validate(fid)).fold(
+	Either.fromBoolean(() => KnownFunctions.checkPermissions(fid, { queries: [] })).fold(
 		() => null,
 		() => user$.value,
 	)
 
-export const useUser = () => {
-	const { fid } = useSharedContext()
-	const user = useSubscription(user$)
-
-	return Either.fromBoolean(() => KnownFunctions.validate(fid)).fold(Null, () => user)
-}
-
-// --- Internal ---
-
-const user$ = new BehaviorSubject<User.User | null>(null)
+export const user$ = new BehaviorSubject<User.User | null>(null)

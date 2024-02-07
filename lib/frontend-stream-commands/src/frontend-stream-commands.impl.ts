@@ -1,58 +1,54 @@
 // SPDX-FileCopyrightText: Copyright 2023, 谢尔盖||↓ and the Ordo.pink contributors
 // SPDX-License-Identifier: MIT
 
-import { Subject, combineLatestWith, map, merge, scan, shareReplay } from "rxjs"
-import { equals } from "ramda"
-import { nanoid } from "nanoid"
-import { useMemo } from "react"
+import { combineLatestWith } from "rxjs/internal/operators/combineLatestWith"
+import { map } from "rxjs/internal/operators/map"
+import { scan } from "rxjs/internal/operators/scan"
+import { shareReplay } from "rxjs/internal/operators/shareReplay"
 
-import type { Logger } from "@ordo-pink/logger"
-import { callOnce } from "@ordo-pink/tau"
-import { useSharedContext } from "@ordo-pink/frontend-react-hooks"
-import { getLogger } from "@ordo-pink/frontend-logger"
+import { Subject } from "rxjs/internal/Subject"
+import { equals } from "ramda"
+import { merge } from "rxjs/internal/observable/merge"
+
 import { Either } from "@ordo-pink/either"
+import { KnownFunctions } from "@ordo-pink/known-functions"
+import { type Logger } from "@ordo-pink/logger"
+import { callOnce } from "@ordo-pink/tau"
+import { getLogger } from "@ordo-pink/frontend-logger"
 
 /**
  * Entrypoint for using commands. You can use this function outside React components.
  */
 export const getCommands = (fid: symbol | null): Client.Commands.Commands =>
 	Either.fromNullable(fid)
+		.chain(fid => Either.fromBoolean(validateFID(fid), () => fid))
 		.leftMap(() => getLogger(fid))
-		.fold(
-			logger => ({
-				on: () => logger.alert("Registerring commands disallowed."),
-				off: () => logger.alert("Unregisterring commands disallowed."),
-				after: () => logger.alert("Registerring commands disallowed."),
-				before: () => logger.alert("Registerring commands disallowed."),
-				emit: () => logger.alert("Emitting commands disallowed."),
-				cancel: () => logger.alert("Cancelling commands disallowed."),
-			}),
-			fid => ({
-				on: (name, handler) => addAfter$.next([name, handler, fid]),
-				off: (name, handler) => remove$.next([name, handler, fid]),
-				after: (name, handler) => addAfter$.next([name, handler, fid]),
-				before: (name, handler) => addBefore$.next([name, handler, fid]),
-				emit: (name, payload?, key = nanoid()) => enqueue$.next({ name, payload, key, fid }),
-				cancel: (name, payload?, key = nanoid()) => dequeue$.next({ name, payload, key, fid }),
-			}),
-		)
-
-/**
- * A React hook for accessing commands.
- * // TODO: Move all hooks to frontend-react-hooks
- */
-export const useCommands = () => {
-	const { fid: thisFunction } = useSharedContext()
-	const commands = useMemo(() => getCommands(thisFunction), [])
-	return commands
-}
+		.fold(forbiddenCommands, commands)
 
 // --- Internal ---
 
+const validateFID = (fid: symbol) => (): boolean => KnownFunctions.validate(fid)
+
+const forbiddenCommands = (logger: Logger) => ({
+	on: () => logger.alert("Invalid FID. Registerring commands is disallowed."),
+	off: () => logger.alert("Invalid FID. Unregisterring commands is disallowed."),
+	after: () => logger.alert("Invalid FID. Registerring commands is disallowed."),
+	before: () => logger.alert("Invalid FID. Registerring commands is disallowed."),
+	emit: () => logger.alert("Invalid FID. Emitting commands is disallowed."),
+	cancel: () => logger.alert("Invalid FID. Cancelling commands is disallowed."),
+})
+
+const commands = (fid: symbol): Client.Commands.Commands => ({
+	on: (name, handler) => addAfter$.next([name, handler, fid]),
+	off: (name, handler) => remove$.next([name, handler, fid]),
+	after: (name, handler) => addAfter$.next([name, handler, fid]),
+	before: (name, handler) => addBefore$.next([name, handler, fid]),
+	emit: (name, payload?, key = crypto.randomUUID()) => enqueue$.next({ name, payload, key, fid }),
+	cancel: (name, payload?, key = crypto.randomUUID()) => dequeue$.next({ name, payload, key, fid }),
+})
+
 type Command = (Client.Commands.Command | Client.Commands.PayloadCommand) & { fid: symbol }
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 type CmdHandlerState = Record<string, Client.Commands.Handler<any>[]>
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 type CmdListener<N extends Client.Commands.CommandName = Client.Commands.CommandName, P = any> = [
 	N,
 	Client.Commands.Handler<P>,
@@ -71,9 +67,18 @@ export const __initCommands = callOnce((fid: symbol) => {
 				for (const command of commands) {
 					const name = command.name
 					const fid = command.fid
-					const payload = isPayloadCommand(command) ? (command.payload as unknown) : undefined
-
 					const logger = getLogger(fid)
+
+					if (!KnownFunctions.checkPermissions(fid, { commands: [name] })) {
+						const func = KnownFunctions.exchange(fid) ?? "unauthorized"
+						logger.alert(
+							`Function "${func}" did not request permission to execute command "${name}".`,
+						)
+
+						return
+					}
+
+					const payload = isPayloadCommand(command) ? (command.payload as unknown) : undefined
 
 					const listeners = allListeners[name]
 

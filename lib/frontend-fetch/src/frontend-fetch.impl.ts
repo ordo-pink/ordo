@@ -2,11 +2,11 @@
 // SPDX-License-Identifier: MIT
 
 import { Either } from "@ordo-pink/either"
-import { getLogger } from "@ordo-pink/frontend-logger"
-import { useSharedContext } from "@ordo-pink/frontend-react-hooks"
 import { KnownFunctions } from "@ordo-pink/known-functions"
 import { Logger } from "@ordo-pink/logger"
 import { callOnce } from "@ordo-pink/tau"
+import { getLogger } from "@ordo-pink/frontend-logger"
+import { useSharedContext } from "@ordo-pink/frontend-react-hooks"
 
 const fetch = window.fetch
 
@@ -23,7 +23,7 @@ export const useFetch = () => {
 }
 
 export const getFetch = (fid: symbol | null): typeof window.fetch =>
-	Either.fromBoolean(() => KnownFunctions.validate(fid))
+	Either.fromBoolean(() => KnownFunctions.checkPermissions(fid, { queries: ["fetch"] }))
 		.leftMap(() => getLogger(fid))
 		.fold(forbiddenFetch, () => fetch)
 

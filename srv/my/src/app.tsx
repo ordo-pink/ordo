@@ -1,15 +1,20 @@
+import { useEffect } from "react"
+
+import {
+	useCommands,
+	useIsAuthenticated,
+	useLogger,
+	useUser,
+} from "@ordo-pink/frontend-react-hooks"
+import { Either } from "@ordo-pink/either"
+import { Oath } from "@ordo-pink/oath"
+
 import CenteredPage from "@ordo-pink/frontend-react-components/centered-page"
 import Heading from "@ordo-pink/frontend-react-components/heading"
-import OrdoButton from "@ordo-pink/frontend-react-components/button"
-import { useIsAuthenticated } from "@ordo-pink/frontend-stream-user"
-import { useEffect } from "react"
-import { useCommands } from "@ordo-pink/frontend-stream-commands"
-import { useUser } from "@ordo-pink/frontend-stream-user/src/frontend-stream-user.impl"
-import { Oath } from "@ordo-pink/oath"
 import Null from "@ordo-pink/frontend-react-components/null"
-import { Either } from "@ordo-pink/either"
-import { useLogger } from "@ordo-pink/frontend-logger"
+import OrdoButton from "@ordo-pink/frontend-react-components/button"
 
+// TODO: Take import source from ENV
 export default function App() {
 	const commands = useCommands()
 	const isAuthenticated = useIsAuthenticated()
@@ -20,17 +25,16 @@ export default function App() {
 		Either.fromBoolean(() => isAuthenticated).fold(Null, () =>
 			commands.emit<cmd.user.refreshInfo>("user.refresh"),
 		)
-	}, [isAuthenticated])
+	}, [isAuthenticated, commands])
 
 	useEffect(() => {
-		Oath.fromNullable(user)
-			// TODO: Move functions to user object
-			// TODO: Take import source from ENV
+		// TODO: Move functions to user object
+		void Oath.all([Oath.fromNullable(user), Oath.fromNullable(commands)])
 			.chain(() => Oath.from(() => import("@ordo-pink/function-test")))
 			.chain(f => Oath.from(async () => f.default))
 			.map(() => commands.emit("hello.world"))
 			.orNothing()
-	}, [user])
+	}, [user, commands])
 
 	return (
 		<CenteredPage centerX centerY>

@@ -2,9 +2,9 @@
 // SPDX-License-Identifier: MIT
 
 import { useEffect, useState } from "react"
-import { Observable } from "rxjs"
+import { Observable } from "rxjs/internal/Observable"
 
-export const useSubscription = <T>(observable: Observable<T> | null) => {
+export const useSubscription = <T>(observable: Observable<T> | null): T | null => {
 	const [state, setState] = useState<T | null>(null)
 
 	useEffect(() => {
@@ -14,20 +14,6 @@ export const useSubscription = <T>(observable: Observable<T> | null) => {
 
 		return () => subscription.unsubscribe()
 	}, [observable])
-
-	return state
-}
-
-export const useStrictSubscription = <T>(observable: Observable<T> | null, initialState: T) => {
-	const [state, setState] = useState(initialState)
-
-	useEffect(() => {
-		if (!observable) return
-
-		const subscription = observable.subscribe(value => setState(value))
-
-		return () => subscription.unsubscribe()
-	}, [observable, initialState])
 
 	return state
 }

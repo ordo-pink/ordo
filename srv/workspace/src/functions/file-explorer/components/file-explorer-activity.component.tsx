@@ -17,10 +17,10 @@ export default function FileExplorerActivity(): ReactNode {
 
 	return (
 		<div
-			className="w-full h-full min-h-screen"
+			className="h-full min-h-screen w-full"
 			onContextMenu={showContextMenu({ commands, payload: currentData ?? "root" })}
 		>
-			<div className="flex flex-wrap p-4 w-full file-explorer">
+			<div className="file-explorer flex w-full flex-wrap p-4">
 				{currentDataChildren.map(item => (
 					<FSDataIcon
 						key={item.fsid}
@@ -35,7 +35,7 @@ export default function FileExplorerActivity(): ReactNode {
 }
 
 type ShowContextMenuParams = {
-	commands: Client.Commands.Commands
+	commands: Client.Commands.CommandEmitter
 	payload: "root" | PlainData | null
 }
 type ShowContextMenuFn = (params: ShowContextMenuParams) => MouseEventHandler<HTMLDivElement>

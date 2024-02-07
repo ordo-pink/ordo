@@ -2,13 +2,15 @@
 // SPDX-License-Identifier: MIT
 
 import type { BunFile } from "bun"
-import type { StaticMiddlewareState } from "./static.types"
 import { join } from "path"
-import { logBunRequest } from "@ordo-pink/backend-utils"
-import { Router, Context } from "@ordo-pink/routary"
-import { fileExists0 } from "@ordo-pink/fs"
-import { Oath } from "@ordo-pink/oath"
+
+import { Context, Router } from "@ordo-pink/routary"
 import { Logger } from "@ordo-pink/logger"
+import { Oath } from "@ordo-pink/oath"
+import { fileExists0 } from "@ordo-pink/fs"
+import { logBunRequest } from "@ordo-pink/backend-utils"
+
+import type { StaticMiddlewareState } from "./static.types"
 
 type P = { root: string; logger: Logger; serverName: string }
 export const createRouter = ({ root, logger, serverName }: P) =>

@@ -3,7 +3,7 @@
 
 import { HTMLProps, MouseEvent } from "react"
 
-import { useCommands } from "@ordo-pink/frontend-stream-commands"
+import { useCommands } from "@ordo-pink/frontend-react-hooks"
 
 /**
  * Link component is used as a replacement for <a> tag to work well with Ordo router. It supports

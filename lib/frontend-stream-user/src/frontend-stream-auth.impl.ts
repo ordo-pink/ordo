@@ -91,7 +91,7 @@ const signOut =
 		}
 
 		logger.error("Token refresh failed. Signing out.")
-		// window.location.href = `${webHost}/sign-out`
+		window.location.href = `${webHost}/sign-out`
 	}
 
 export const auth$ = new BehaviorSubject<AuthResponse | null>(null)

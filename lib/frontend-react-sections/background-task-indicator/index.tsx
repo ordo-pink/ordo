@@ -2,11 +2,9 @@ import { AiOutlineLoading3Quarters, AiOutlineSave } from "react-icons/ai"
 import { BehaviorSubject } from "rxjs"
 import { useEffect } from "react"
 
+import { useCommands, useStrictSubscription } from "@ordo-pink/frontend-react-hooks"
 import { BackgroundTaskStatus } from "@ordo-pink/core"
 import { Switch } from "@ordo-pink/switch"
-import { useCommands } from "@ordo-pink/frontend-stream-commands"
-
-import { useStrictSubscription } from "@ordo-pink/frontend-react-hooks/src/use-subscription.hook"
 
 import Null from "@ordo-pink/frontend-react-components/null"
 

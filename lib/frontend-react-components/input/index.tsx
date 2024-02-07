@@ -59,7 +59,7 @@ export const TextInput = ({
 			onKeyDown={onKeyDown}
 			onChange={onInput}
 			placeholder={placeholder}
-			className="w-full rounded-md border-0 bg-neutral-50 px-2 py-1 shadow-inner placeholder:text-neutral-500 focus:ring-0 dark:bg-neutral-600 sm:text-sm sm:leading-6"
+			className="w-full rounded-md border-0 bg-neutral-50 px-2 py-1 shadow-inner placeholder:text-neutral-500 focus:ring-0 sm:text-sm sm:leading-6 dark:bg-neutral-600"
 		/>
 	</div>
 )

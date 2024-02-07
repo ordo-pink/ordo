@@ -19,7 +19,7 @@ const getParentBackground = (element: Element) => {
 	return color
 }
 
-export const Loader = () => {
+export default function Loader() {
 	const ref = useRef<HTMLDivElement>(null)
 
 	useLayoutEffect(() => {

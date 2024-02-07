@@ -1,16 +1,20 @@
 // SPDX-FileCopyrightText: Copyright 2023, 谢尔盖||↓ and the Ordo.pink contributors
 // SPDX-License-Identifier: MIT
 
-import type { ComponentType, MouseEvent } from "react"
+import type { ComponentType, LazyExoticComponent, MouseEvent } from "react"
 import type { IconType } from "react-icons"
 
 import type { FSID, PlainData } from "@ordo-pink/data"
 import type { Range, UUIDv4 } from "@ordo-pink/tau"
 import type { Logger } from "@ordo-pink/logger"
 
-import type { BackgroundTaskStatus, ComponentSpace } from "./constants"
+import type { BackgroundTaskStatus } from "./constants"
 
 declare global {
+	type PropsWithChildren<T extends Record<string, unknown> = Record<string, unknown>> = T & {
+		children?: any
+	}
+
 	module Achievements {
 		type AchievementSubscriber = (
 			commands: Client.Commands.Commands,
@@ -183,17 +187,12 @@ declare global {
 
 	module Extensions {
 		type Activity = {
-			fid: symbol
 			name: string
 			routes: string[]
-			Component: ComponentType<ComponentProps>
+			Component: ComponentType | LazyExoticComponent<ComponentType>
 			Sidebar?: ComponentType
+			Icon?: ComponentType | IconType
 			background?: boolean
-		}
-
-		type ComponentProps = {
-			commands: Client.Commands.Commands
-			space: ComponentSpace
 		}
 
 		type FileExtension = `.${string}`
@@ -201,7 +200,7 @@ declare global {
 		type FileAssociation = {
 			name: string
 			fileExtensions: FileExtension[] | "*"
-			Component: ComponentType<ComponentProps>
+			Component: ComponentType
 		}
 	}
 

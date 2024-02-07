@@ -87,8 +87,8 @@ export const __initCommands = callOnce((fid: symbol) => {
 
 						logger.debug(
 							`Command "${name}" invoked for ${listeners.length} ${listeners.length === 1 ? "listener" : "listeners"}. Provided payload: `,
+							payload,
 						)
-						logger.debug(payload)
 
 						for (const listener of listeners) {
 							await listener({ logger, payload })

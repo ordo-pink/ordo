@@ -1,25 +1,35 @@
-import { useEffect } from "react"
+import { ErrorInfo, useEffect } from "react"
 
 import {
 	useCommands,
 	useIsAuthenticated,
 	useLogger,
-	useUser,
+	useSubscription,
 } from "@ordo-pink/frontend-react-hooks"
 import { Either } from "@ordo-pink/either"
 import { Oath } from "@ordo-pink/oath"
+import { currentActivity$ } from "@ordo-pink/frontend-stream-activities"
 
-import CenteredPage from "@ordo-pink/frontend-react-components/centered-page"
-import Heading from "@ordo-pink/frontend-react-components/heading"
+import ActivityBar from "@ordo-pink/frontend-react-sections/activity-bar"
+import BackgroundTaskIndicator from "@ordo-pink/frontend-react-sections/background-task-indicator"
+import ErrorBoundary from "@ordo-pink/frontend-react-components/error-boundary"
+import Loading from "@ordo-pink/frontend-react-components/loading-page"
 import Null from "@ordo-pink/frontend-react-components/null"
-import OrdoButton from "@ordo-pink/frontend-react-components/button"
+import Workspace from "@ordo-pink/frontend-react-sections/workspace"
+
+import "./app.css"
 
 // TODO: Take import source from ENV
 export default function App() {
 	const commands = useCommands()
 	const isAuthenticated = useIsAuthenticated()
-	const user = useUser()
+	const currentActivity = useSubscription(currentActivity$)
 	const logger = useLogger()
+
+	const logError = (error: Error, info: ErrorInfo) => {
+		logger.error(error)
+		logger.error(info.componentStack)
+	}
 
 	useEffect(() => {
 		Either.fromBoolean(() => isAuthenticated).fold(Null, () =>
@@ -29,25 +39,26 @@ export default function App() {
 
 	useEffect(() => {
 		// TODO: Move functions to user object
-		void Oath.all([Oath.fromNullable(user), Oath.fromNullable(commands)])
+		void Oath.of(commands)
 			.chain(() => Oath.from(() => import("@ordo-pink/function-test")))
 			.chain(f => Oath.from(async () => f.default))
-			.map(() => commands.emit("hello.world"))
 			.orNothing()
-	}, [user, commands])
+	}, [commands])
 
-	return (
-		<CenteredPage centerX centerY>
-			<Heading level="2" styledFirstLetter>
-				Vite + React
-			</Heading>
-			<div>
-				<OrdoButton.Primary onClick={() => logger.notice("HEY")}>Hey</OrdoButton.Primary>
-				<p>
-					Edit <code>src/App.tsx</code> and save to test HMR
-				</p>
+	// TODO: Next up :: workspace, sidebar, notifications, command palette, context menu
+	// TODO: Next up :: update permissions
+	return Either.fromNullable(currentActivity).fold(Loading, () => (
+		<ErrorBoundary logError={logError} fallback={<Fallback />}>
+			<div className="app">
+				<ActivityBar />
+				<Workspace />
 			</div>
-			<p>Click on the {String(import.meta.env.VITE_ORDO_DT_HOST)} and React logos to learn more</p>
-		</CenteredPage>
-	)
+
+			<BackgroundTaskIndicator />
+		</ErrorBoundary>
+	))
 }
+
+// --- Internal ---
+
+const Fallback = () => <div>TODO</div> // TODO: Add error fallback

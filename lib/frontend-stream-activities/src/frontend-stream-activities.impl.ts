@@ -24,7 +24,9 @@ export const __initActivities = callOnce((fid: symbol) => {
 
 	logger.debug("Initializing activities...")
 
-	commands.on<cmd.activities.add>("activities.add", ({ payload }) => add$.next(payload))
+	commands.on<cmd.activities.add>("activities.add", ({ payload }) =>
+		add$.next({ ...payload, fid } as any),
+	)
 	commands.on<cmd.activities.remove>("activities.remove", ({ payload }) => remove$.next(payload))
 	commands.on<cmd.activities.setCurrent>("activities.set-current", ({ payload }) =>
 		currentActivity$.next(payload),
@@ -62,17 +64,6 @@ export const getCurrentActivity = (fid: symbol | null): Extensions.Activity | nu
 		.fold(N, () => currentActivity$.value)
 
 export const getCurrentFID = () => currentFID$.value
-
-export const getActivities$ = (fid: symbol) =>
-	Either.fromNullable(fid)
-		.chain(checkActivitiesQueryPermissionE)
-		.fold(N, () => activities$)
-
-const checkActivitiesQueryPermissionE = (fid: symbol) =>
-	Either.fromBoolean(
-		() => KnownFunctions.checkPermissions(fid, { queries: [] }),
-		() => fid,
-	)
 
 const checkCurrentActivityQueryPermissionE = (fid: symbol) =>
 	Either.fromBoolean(

@@ -5,11 +5,10 @@ import { BsPlus, BsSearch } from "react-icons/bs"
 import { ChangeEvent, KeyboardEvent, useEffect, useState } from "react"
 import Fuse from "fuse.js"
 
+import { useAccelerator, useCommands } from "@ordo-pink/frontend-react-hooks"
 import { Either } from "@ordo-pink/either"
 import { Switch } from "@ordo-pink/switch"
 import { noop } from "@ordo-pink/tau"
-import { useAccelerator } from "@ordo-pink/frontend-react-hooks"
-import { useCommands } from "@ordo-pink/frontend-stream-commands"
 
 import Accelerator from "@ordo-pink/frontend-react-components/accelerator"
 import ActionListItem from "@ordo-pink/frontend-react-components/action-list-item"

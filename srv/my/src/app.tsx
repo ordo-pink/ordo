@@ -47,7 +47,7 @@ export default function App() {
 			.orNothing()
 	}, [commands])
 
-	// TODO: Next up :: notifications, command palette, context menu
+	// TODO: Next up :: command palette
 	// TODO: Next up :: update permissions
 	return Either.fromNullable(currentActivity).fold(Loading, () => (
 		<ErrorBoundary logError={logError} fallback={<Fallback />}>

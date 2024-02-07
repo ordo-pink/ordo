@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: Copyright 2023, 谢尔盖||↓ and the Ordo.pink contributors
 // SPDX-License-Identifier: MIT
 
-import { useCallback, useEffect, useState } from "react"
+import { useCallback, useEffect, useRef, useState } from "react"
 import { BehaviorSubject } from "rxjs/internal/BehaviorSubject"
 import { Subject } from "rxjs/internal/Subject"
 import { combineLatestWith } from "rxjs/internal/operators/combineLatestWith"
@@ -12,12 +12,20 @@ import { shareReplay } from "rxjs/internal/operators/shareReplay"
 
 import { useAccelerator, useCommands, useSubscription } from "@ordo-pink/frontend-react-hooks"
 import { Either } from "@ordo-pink/either"
+import { Switch } from "@ordo-pink/switch"
 
 import Null from "@ordo-pink/frontend-react-components/null"
 
 import ContextMenuItemList from "./context-menu-item-list"
 
+const MENU_WIDTH = 320
+
+/**
+ * TODO: Rewrite this.
+ */
 export default function ContextMenu() {
+	const ref = useRef<HTMLDivElement>(null)
+
 	const commands = useCommands()
 
 	const [readers, setReaders] = useState<Client.CtxMenu.Item[]>([])
@@ -34,6 +42,62 @@ export default function ContextMenu() {
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 		[menu],
 	)
+
+	const menuHeight = 40 * readers.concat(creators).concat(updaters).concat(removers).length
+
+	const { x, y } = ref.current?.getBoundingClientRect() ?? { x: -50, y: -50 }
+
+	const windowWidth = window.innerWidth
+	const windowHeight = window.innerHeight
+
+	const willFitToBottom = windowHeight - y - menuHeight > 8
+	const willFitToRight = windowWidth - x - MENU_WIDTH > 8
+
+	const direction = Switch.empty()
+		.case(
+			() => !willFitToBottom && !willFitToRight,
+			() => "top-left",
+		)
+		.case(
+			() => !willFitToBottom,
+			() => "top-right",
+		)
+		.case(
+			() => !willFitToRight,
+			() => "bottom-left",
+		)
+		.default(() => "bottom-right")
+
+	const { top, left } = Switch.of(direction)
+		.case(
+			direction => !!menu && direction === "bottom-right",
+			() => ({
+				top: menu!.event.clientY,
+				left: menu!.event.clientX,
+			}),
+		)
+		.case(
+			direction => !!menu && direction === "bottom-left",
+			() => ({
+				top: menu!.event.clientY,
+				left: menu!.event.clientX - 320,
+			}),
+		)
+		.case(
+			direction => !!menu && direction === "top-right",
+			() => ({
+				top: menu!.event.clientY - menuHeight,
+				left: menu!.event.clientX,
+			}),
+		)
+		.case(
+			direction => !!menu && direction === "top-left",
+			() => ({
+				top: menu!.event.clientY - menuHeight,
+				left: menu!.event.clientX - 320,
+			}),
+		)
+		.default(() => ({ top: -50, left: -50 }))
 
 	useEffect(() => {
 		commands.on<cmd.ctxMenu.show>("context-menu.show", ({ payload }) => show(payload))
@@ -83,7 +147,8 @@ export default function ContextMenu() {
 
 	return (
 		<div
-			style={{ top: menu?.event.clientY ?? -50, left: menu?.event.clientX ?? -50 }}
+			ref={ref}
+			style={{ top, left }}
 			className={`absolute z-[1000] w-80 rounded-lg bg-white px-2 shadow-lg transition-opacity duration-300 dark:bg-neutral-500 ${
 				menu && menu.structure.length ? "opacity-100" : "opacity-0"
 			}`}

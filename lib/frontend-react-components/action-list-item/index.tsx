@@ -53,8 +53,8 @@ export default function ActionListItem({
 		>
 			<div
 				title={title ?? text}
-				className={`flex select-none items-center justify-between space-x-8 rounded-md p-2 md:py-0.5 ${
-					large ? "p-4 text-lg md:py-2" : ""
+				className={`flex select-none items-center justify-between space-x-8 rounded-md p-2 sm:py-1 ${
+					large ? "px-4 text-lg" : ""
 				} ${
 					disabled
 						? "text-neutral-300 dark:text-neutral-400"
@@ -86,8 +86,8 @@ export default function ActionListItem({
 	) : (
 		<div>
 			<div
-				className={`flex select-none items-center justify-between space-x-8 rounded-md p-2 md:py-0.5 ${
-					large && "p-4 text-lg"
+				className={`flex select-none items-center justify-between space-x-8 rounded-md p-2 md:py-1 ${
+					large && "px-4 text-lg"
 				} ${
 					disabled
 						? "text-neutral-300 dark:text-neutral-400"

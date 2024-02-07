@@ -217,7 +217,7 @@ export default function CommandPaletteModal({ items, onNewItem, multiple, pinned
 	const tSearchPlaceholder = "Поиск..."
 
 	return (
-		<div className="size-[35rem] max-h-screen max-w-full">
+		<div className="max-w-screen max-h-screen sm:size-[35rem]">
 			<div className="mx-2 mt-2 flex items-center space-x-2 rounded-lg bg-neutral-200 px-2 py-1 shadow-inner dark:bg-neutral-600">
 				<BsSearch className="shrink-0" />
 				<input
@@ -264,7 +264,6 @@ export default function CommandPaletteModal({ items, onNewItem, multiple, pinned
 
 				{onNewItem && inputValue.length > 0 && suggestedItems.length === 0 ? (
 					<ActionListItem
-						large
 						Icon={BsPlus}
 						text={`Добавить "${inputValue}"...`}
 						current={true}

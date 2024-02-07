@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 // import { BsThreeDotsVertical } from "react-icons/bs"
-// import { MouseEvent } from "react"
+import { type MouseEvent } from "react"
 
 import { useCommands, useStrictSubscription } from "@ordo-pink/frontend-react-hooks"
 import { sidebar$ } from "@ordo-pink/frontend-stream-sidebar"
@@ -23,14 +23,14 @@ export default function Sidebar({ children, isNarrow }: P) {
 
 	// const openCommandPalette = () =>
 	// 	commandPalette && commands.emit<cmd.commandPalette.show>("command-palette.show", commandPalette)
-	// const showContextMenu = (event: MouseEvent<HTMLDivElement>) =>
-	// 	commands.emit<cmd.ctxMenu.show>("context-menu.show", { event })
+	const showContextMenu = (event: MouseEvent<HTMLDivElement>) =>
+		commands.emit<cmd.ctxMenu.show>("context-menu.show", { event })
 
 	return (
 		<div
 			className="flex h-screen w-full flex-col justify-between overflow-y-hidden bg-neutral-200 px-4 py-3 dark:bg-neutral-900"
 			onClick={onSidebarClick}
-			// onContextMenu={showContextMenu}
+			onContextMenu={showContextMenu}
 		>
 			{/* <div className="flex flex-col">
 				<div className="flex justify-between items-center">

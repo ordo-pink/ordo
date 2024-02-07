@@ -1,13 +1,17 @@
 // SPDX-FileCopyrightText: Copyright 2023, 谢尔盖||↓ and the Ordo.pink contributors
 // SPDX-License-Identifier: MIT
 
-import { Subject, combineLatestWith, map, merge, scan, shareReplay } from "rxjs"
 import { useCallback, useEffect, useState } from "react"
-import { BehaviorSubject } from "rxjs"
+import { BehaviorSubject } from "rxjs/internal/BehaviorSubject"
+import { Subject } from "rxjs/internal/Subject"
+import { combineLatestWith } from "rxjs/internal/operators/combineLatestWith"
+import { map } from "rxjs/internal/operators/map"
+import { merge } from "rxjs/internal/observable/merge"
+import { scan } from "rxjs/internal/operators/scan"
+import { shareReplay } from "rxjs/internal/operators/shareReplay"
 
-import { useAccelerator, useSubscription } from "@ordo-pink/frontend-react-hooks"
+import { useAccelerator, useCommands, useSubscription } from "@ordo-pink/frontend-react-hooks"
 import { Either } from "@ordo-pink/either"
-import { useCommands } from "@ordo-pink/frontend-stream-commands"
 
 import Null from "@ordo-pink/frontend-react-components/null"
 
@@ -37,12 +41,6 @@ export default function ContextMenu() {
 		commands.on<cmd.ctxMenu.remove>("context-menu.remove", ({ payload }) => remove(payload))
 		commands.on<cmd.ctxMenu.hide>("context-menu.hide", hide)
 
-		return () => {
-			commands.off<cmd.ctxMenu.show>("context-menu.show", ({ payload }) => show(payload))
-			commands.off<cmd.ctxMenu.add>("context-menu.add", ({ payload }) => add(payload))
-			commands.off<cmd.ctxMenu.remove>("context-menu.remove", ({ payload }) => remove(payload))
-			commands.off<cmd.ctxMenu.hide>("context-menu.hide", hide)
-		}
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [])
 

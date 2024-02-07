@@ -1,16 +1,15 @@
 // SPDX-FileCopyrightText: Copyright 2023, 谢尔盖||↓ and the Ordo.pink contributors
 // SPDX-License-Identifier: MIT
 
-import { useStrictSubscription } from "@ordo-pink/frontend-react-hooks"
+import { type MouseEvent } from "react"
 
+import { useCommands, useStrictSubscription } from "@ordo-pink/frontend-react-hooks"
 import { activities$ } from "@ordo-pink/frontend-stream-activities"
 
 import ActivityItem from "./activity"
 
-// type ShowContextMenu = (event: MouseEvent<HTMLDivElement>) => void
-
 export default function ActivityBar() {
-	// const commands = useCommands()
+	const commands = useCommands()
 
 	// const user = useUser()
 	const activities = useStrictSubscription(activities$, [])
@@ -25,15 +24,15 @@ export default function ActivityBar() {
 	// 		commands.emit<cmd.commandPalette.show>("command-palette.show", items),
 	// 	)
 
-	// const showContextMenu: ShowContextMenu = (event: MouseEvent) =>
-	// 	commands.emit<cmd.ctxMenu.show>("context-menu.show", { event })
+	const showContextMenu = (event: MouseEvent<HTMLDivElement>) =>
+		commands.emit<cmd.ctxMenu.show>("context-menu.show", { event })
 
 	// useAccelerator("mod+shift+p", showCommandPalette)
 
 	return (
 		<div
-			// onContextMenu={showContextMenu}
 			className="activity-bar fixed z-40 flex h-screen w-12 flex-col items-center justify-between bg-neutral-200 py-4 text-lg sm:text-2xl dark:bg-neutral-900"
+			onContextMenu={showContextMenu}
 		>
 			{/* <div>
 				<div

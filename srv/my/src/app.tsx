@@ -19,6 +19,7 @@ import Null from "@ordo-pink/frontend-react-components/null"
 import Workspace from "@ordo-pink/frontend-react-sections/workspace"
 
 import "./app.css"
+import ContextMenu from "@ordo-pink/frontend-react-sections/context-menu/context-menu.component"
 
 // TODO: Take import source from ENV
 export default function App() {
@@ -56,7 +57,7 @@ export default function App() {
 			</div>
 
 			<Notifications />
-
+			<ContextMenu />
 			<BackgroundTaskIndicator />
 		</ErrorBoundary>
 	))

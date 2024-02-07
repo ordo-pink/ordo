@@ -3,9 +3,8 @@
 
 import type { MouseEvent } from "react"
 
+import { useAccelerator, useCommands } from "@ordo-pink/frontend-react-hooks"
 import { Either } from "@ordo-pink/either"
-import { useAccelerator } from "@ordo-pink/frontend-react-hooks"
-import { useCommands } from "@ordo-pink/frontend-stream-commands"
 
 import Accelerator from "@ordo-pink/frontend-react-components/accelerator"
 import ActionListItem from "@ordo-pink/frontend-react-components/action-list-item"

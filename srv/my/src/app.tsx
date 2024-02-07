@@ -14,6 +14,7 @@ import ActivityBar from "@ordo-pink/frontend-react-sections/activity-bar"
 import BackgroundTaskIndicator from "@ordo-pink/frontend-react-sections/background-task-indicator"
 import ErrorBoundary from "@ordo-pink/frontend-react-components/error-boundary"
 import Loading from "@ordo-pink/frontend-react-components/loading-page"
+import Notifications from "@ordo-pink/frontend-react-sections/notifications"
 import Null from "@ordo-pink/frontend-react-components/null"
 import Workspace from "@ordo-pink/frontend-react-sections/workspace"
 
@@ -45,7 +46,7 @@ export default function App() {
 			.orNothing()
 	}, [commands])
 
-	// TODO: Next up :: workspace, sidebar, notifications, command palette, context menu
+	// TODO: Next up :: notifications, command palette, context menu
 	// TODO: Next up :: update permissions
 	return Either.fromNullable(currentActivity).fold(Loading, () => (
 		<ErrorBoundary logError={logError} fallback={<Fallback />}>
@@ -53,6 +54,8 @@ export default function App() {
 				<ActivityBar />
 				<Workspace />
 			</div>
+
+			<Notifications />
 
 			<BackgroundTaskIndicator />
 		</ErrorBoundary>

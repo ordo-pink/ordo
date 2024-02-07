@@ -1,13 +1,16 @@
 // SPDX-FileCopyrightText: Copyright 2023, 谢尔盖||↓ and the Ordo.pink contributors
 // SPDX-License-Identifier: MIT
 
-import { Subject, map, merge, scan, shareReplay } from "rxjs"
 import { useEffect, useState } from "react"
 import { BsX } from "react-icons/bs"
+import { Subject } from "rxjs/internal/Subject"
+import { map } from "rxjs/internal/operators/map"
+import { merge } from "rxjs/internal/observable/merge"
+import { scan } from "rxjs/internal/operators/scan"
+import { shareReplay } from "rxjs/internal/operators/shareReplay"
 
+import { useCommands, useStrictSubscription } from "@ordo-pink/frontend-react-hooks"
 import { Either } from "@ordo-pink/either"
-import { useCommands } from "@ordo-pink/frontend-stream-commands"
-import { useStrictSubscription } from "@ordo-pink/frontend-react-hooks"
 
 import Callout from "@ordo-pink/frontend-react-components/callout"
 import Null from "@ordo-pink/frontend-react-components/null"
@@ -37,7 +40,7 @@ export default function Notifications() {
 	})
 
 	return (
-		<div className="fixed bottom-0 right-0 flex w-full max-w-sm flex-col space-y-2 p-2">
+		<div className="fixed bottom-0 right-0 z-50 flex w-full max-w-sm flex-col space-y-2 p-2">
 			{notifications.map(notification => (
 				<NotificationComponent key={notification.id} notification={notification} />
 			))}
@@ -100,10 +103,11 @@ const NotificationComponent = ({ notification }: P) => {
 	}, [percentage, notification])
 
 	return (
-		<div className="size-full relative">
+		<div className="relative inset-x-0 top-0 z-50 size-full">
 			<Callout type={notification.type}>
 				<Heading notification={notification} />
 				<Message notification={notification} />
+
 				<div
 					className={`absolute right-2 top-2 rounded-full p-1 ${
 						HoverColor[notification.type]

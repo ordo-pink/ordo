@@ -66,10 +66,10 @@ const notification$ = merge(
 )
 
 // Define command handlers
-const showNotification: Client.Commands.Handler<Client.Notification.ShowNotificationParams> = ({
-	payload,
-}) => addNotification$.next({ ...payload, id: payload.id ?? crypto.randomUUID() })
-const hideNotification: Client.Commands.Handler<string> = ({ payload }) =>
+const showNotification: Client.Commands.Handler<
+	Client.Notification.ShowNotificationParams
+> = payload => addNotification$.next({ ...payload, id: payload.id ?? crypto.randomUUID() })
+const hideNotification: Client.Commands.Handler<string> = payload =>
 	removeNotification$.next(payload)
 
 /**

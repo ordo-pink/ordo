@@ -131,7 +131,7 @@ export default function App() {
 
 		void Oath.of(commands)
 			.chain(() =>
-				Oath.from(() => import("@ordo-pink/function-test")).chain(f =>
+				Oath.from(() => import("@ordo-pink/function-file-explorer")).chain(f =>
 					Oath.from(async () => f.default),
 				),
 			)
@@ -148,7 +148,6 @@ export default function App() {
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [])
 
-	// TODO: Next up :: update permissions
 	return Either.fromNullable(currentActivity).fold(Loading, () => (
 		<ErrorBoundary logError={logError} fallback={<Fallback />}>
 			<div className="app">

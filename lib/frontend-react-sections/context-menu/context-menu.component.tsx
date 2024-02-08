@@ -100,9 +100,9 @@ export default function ContextMenu() {
 		.default(() => ({ top: -50, left: -50 }))
 
 	useEffect(() => {
-		commands.on<cmd.ctxMenu.show>("context-menu.show", ({ payload }) => show(payload))
-		commands.on<cmd.ctxMenu.add>("context-menu.add", ({ payload }) => add(payload))
-		commands.on<cmd.ctxMenu.remove>("context-menu.remove", ({ payload }) => remove(payload))
+		commands.on<cmd.ctxMenu.show>("context-menu.show", show)
+		commands.on<cmd.ctxMenu.add>("context-menu.add", add)
+		commands.on<cmd.ctxMenu.remove>("context-menu.remove", remove)
 		commands.on<cmd.ctxMenu.hide>("context-menu.hide", hide)
 
 		// eslint-disable-next-line react-hooks/exhaustive-deps

@@ -93,7 +93,7 @@ export const __initCommands = callOnce(
 							)
 
 							for (const listener of listeners) {
-								await listener({ logger, payload })
+								await listener(payload)
 							}
 						} else {
 							showCommandsWithoutHandlers &&

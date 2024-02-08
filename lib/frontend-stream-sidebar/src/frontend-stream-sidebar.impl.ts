@@ -29,13 +29,13 @@ export const __initSidebar = callOnce((fid: symbol) => {
 		sidebar$.next({ disabled: false, sizes: DEFAULT_WORKSPACE_SPLIT_SIZE })
 	})
 
-	commands.on<cmd.sidebar.setSize>("sidebar.set-size", ({ payload }) => {
+	commands.on<cmd.sidebar.setSize>("sidebar.set-size", payload => {
 		const sidebar = sidebar$.value
 		if (sidebar.disabled) return
 		sidebar$.next({ disabled: false, sizes: payload })
 	})
 
-	commands.on<cmd.sidebar.show>("sidebar.show", ({ payload }) => {
+	commands.on<cmd.sidebar.show>("sidebar.show", payload => {
 		const sidebar = sidebar$.value
 		if (sidebar.disabled) return
 

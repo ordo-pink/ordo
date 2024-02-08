@@ -12,18 +12,26 @@ import { type RegisterFunction } from "./create-function.types"
 export const createFunction: RegisterFunction = (name, permissions, callback) => {
 	const fid = KnownFunctions.register(name, permissions)
 
-	const getDataPatched = () => null
 	const getCommandsPatched = () => getCommands(fid)
 	const getLoggerPatched = () => getLogger(fid)
 	const getUserPatched = () => getUser(fid)
 	const getIsAuthenticatedPatched = () => getIsAuthenticated(fid)
 
 	return callback({
-		getData: getDataPatched,
 		getCommands: getCommandsPatched,
 		getLogger: getLoggerPatched,
 		getUser: getUserPatched,
 		getIsAuthenticated: getIsAuthenticatedPatched,
 		getHosts,
+		data: {
+			// TODO
+			getChildren: () => [],
+			getData: () => [],
+			getParentChain: () => [],
+			findItemByFSID: () => null,
+			findItemByName: () => null,
+			selectData: () => [],
+			selectItem: () => null,
+		},
 	})
 }

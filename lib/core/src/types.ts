@@ -6,13 +6,12 @@ import type { IconType } from "react-icons"
 
 import type { FSID, PlainData } from "@ordo-pink/data"
 import type { Range, UUIDv4 } from "@ordo-pink/tau"
-import type { Logger } from "@ordo-pink/logger"
 
 import type { BackgroundTaskStatus } from "./constants"
 
 declare global {
 	type PropsWithChildren<T extends Record<string, unknown> = Record<string, unknown>> = T & {
-		children?: any | any[]
+		children?: any
 	}
 
 	module Achievements {
@@ -77,7 +76,6 @@ declare global {
 		module activities {
 			type add = { name: "activities.add"; payload: Extensions.Activity }
 			type remove = { name: "activities.remove"; payload: string }
-			type setCurrent = { name: "activities.set-current"; payload: Extensions.Activity }
 		}
 
 		module fileAssociations {
@@ -246,14 +244,9 @@ declare global {
 			}
 
 			/**
-			 * Context provided to command handler.
-			 */
-			export type HandlerParams<P = any> = { logger: Logger; payload: P }
-
-			/**
 			 * Command handler.
 			 */
-			export type Handler<P> = (ctx: Commands.HandlerParams<P>) => unknown
+			export type Handler<P> = (payload: P) => unknown
 
 			export type AbstractCommand = { name: CommandName; payload?: any; key?: string }
 

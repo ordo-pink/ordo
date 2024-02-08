@@ -5,8 +5,9 @@ import { F, T, identity, isEmpty, prop } from "ramda"
 
 import { Either, TEither } from "@ordo-pink/either"
 import { N, isNonEmptyString, isObject } from "@ordo-pink/tau"
-import { ORDO_PINK_APP_FUNCTION, ORDO_PINK_USER_FUNCTION } from "@ordo-pink/core"
+import { internalApps } from "@ordo-pink/core"
 
+// TODO: Extend query list :: data, etc.
 export type QueryPermission =
 	| "fetch"
 	| "auth.is-authenticated"
@@ -18,6 +19,7 @@ export type QueryPermission =
 	| "achievements"
 	| "functions.current-activity"
 
+// TODO: Add support for command intellisense
 export type CommandPermission = Client.Commands.CommandName
 
 export type Permissions = {
@@ -61,7 +63,7 @@ export const KnownFunctions = {
 const knownFunctions: KnownFunction[] = []
 
 const isOrdoPinkAppFunction = (fid: symbol | null) =>
-	[ORDO_PINK_APP_FUNCTION, ORDO_PINK_USER_FUNCTION].includes(KnownFunctions.exchange(fid)!)
+	internalApps.includes(KnownFunctions.exchange(fid)!)
 
 const checkIsValidNameE = (name: string) =>
 	Either.fromBoolean(

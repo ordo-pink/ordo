@@ -5,7 +5,7 @@ import { Router, operators } from "silkrouter"
 import { BehaviorSubject } from "rxjs/internal/BehaviorSubject"
 import { map } from "rxjs/internal/operators/map"
 
-import { activities$, currentFID$ } from "@ordo-pink/frontend-stream-activities"
+import { activities$, currentActivity$, currentFID$ } from "@ordo-pink/frontend-stream-activities"
 import { callOnce } from "@ordo-pink/tau"
 import { getCommands } from "@ordo-pink/frontend-stream-commands"
 import { getLogger } from "@ordo-pink/frontend-logger"
@@ -18,7 +18,7 @@ export const __initRouter = callOnce((fid: symbol) => {
 
 	logger.debug("Initializing router...")
 
-	commands.on<cmd.router.navigate>("router.navigate", ({ payload }) => {
+	commands.on<cmd.router.navigate>("router.navigate", payload => {
 		if (Array.isArray(payload)) {
 			router$.set(...(payload as [string]))
 			return
@@ -27,13 +27,10 @@ export const __initRouter = callOnce((fid: symbol) => {
 		router$.set(payload)
 	})
 
-	commands.on<cmd.router.openExternal>(
-		"router.open-external",
-		({ payload: { url, newTab = true } }) => {
-			logger.debug("Opening external page", { url, newTab })
-			newTab ? window.open(url, "_blank")?.focus() : (window.location.href = url)
-		},
-	)
+	commands.on<cmd.router.openExternal>("router.open-external", ({ url, newTab = true }) => {
+		logger.debug("Opening external page", { url, newTab })
+		newTab ? window.open(url, "_blank")?.focus() : (window.location.href = url)
+	})
 
 	activities$
 		.pipe(
@@ -42,7 +39,7 @@ export const __initRouter = callOnce((fid: symbol) => {
 					return activity.routes.forEach(activityRoute => {
 						router$ &&
 							router$.pipe(route(activityRoute)).subscribe((routeData: Client.Router.Route) => {
-								commands.emit<cmd.activities.setCurrent>("activities.set-current", activity)
+								currentActivity$.next(activity)
 								currentRoute$.next(routeData)
 								currentFID$.next((activity as any).fid)
 							})
@@ -51,10 +48,10 @@ export const __initRouter = callOnce((fid: symbol) => {
 
 				router$ &&
 					router$.pipe(noMatch(router$)).subscribe(() => {
-						commands.emit<cmd.activities.setCurrent>(
-							"activities.set-current",
-							activities.find(activity => activity.name === "home"),
-						)
+						const homeActivity = activities.find(activity => activity.name === "home")
+						currentActivity$.next(homeActivity!)
+						currentFID$.next((homeActivity as any).fid)
+
 						currentRoute$.next({
 							data: null,
 							hash: "",

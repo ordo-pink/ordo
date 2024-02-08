@@ -15,9 +15,9 @@ export const __initCommandPalette = callOnce((fid: symbol) => {
 
 	logger.debug("Initializing command palette...")
 
-	commands.on<cmd.commandPalette.show>("command-palette.show", ({ payload }) => show(payload))
-	commands.on<cmd.commandPalette.add>("command-palette.add", ({ payload }) => add(payload))
-	commands.on<cmd.commandPalette.remove>("command-palette.remove", ({ payload }) => remove(payload))
+	commands.on<cmd.commandPalette.show>("command-palette.show", show)
+	commands.on<cmd.commandPalette.add>("command-palette.add", add)
+	commands.on<cmd.commandPalette.remove>("command-palette.remove", remove)
 	commands.on<cmd.commandPalette.hide>("command-palette.hide", () => {
 		currentCommandPalette$.next({ items: [] })
 		commands.emit<cmd.modal.hide>("modal.hide")

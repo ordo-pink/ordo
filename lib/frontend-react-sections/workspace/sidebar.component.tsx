@@ -17,7 +17,6 @@ import { sidebar$ } from "@ordo-pink/frontend-stream-sidebar"
 
 import Heading from "@ordo-pink/frontend-react-components/heading"
 import Link from "@ordo-pink/frontend-react-components/link"
-import UsedSpace from "@ordo-pink/frontend-react-components/used-space"
 
 // import Link from "next/link"
 
@@ -34,8 +33,10 @@ export default function Sidebar({ children, isNarrow }: P) {
 		commands.emit<cmd.sidebar.setSize>("sidebar.set-size", [0, 100])
 	}
 
-	const openCommandPalette = () =>
+	const openCommandPalette = (event: MouseEvent<HTMLDivElement>) => {
+		event.stopPropagation()
 		commandPalette && commands.emit<cmd.commandPalette.show>("command-palette.show", commandPalette)
+	}
 	const showContextMenu = (event: MouseEvent<HTMLDivElement>) =>
 		commands.emit<cmd.ctxMenu.show>("context-menu.show", { event })
 

@@ -53,8 +53,8 @@ const backgroundTaskIndicatorStatus$ = new BehaviorSubject<BackgroundTaskStatus>
 )
 
 // Define command handlers
-const handleSetStatus: Client.Commands.Handler<BackgroundTaskStatus> = ({ payload }) =>
-	backgroundTaskIndicatorStatus$.next(payload)
+const handleSetStatus: Client.Commands.Handler<BackgroundTaskStatus> = status =>
+	backgroundTaskIndicatorStatus$.next(status)
 const handleResetStatus = () => backgroundTaskIndicatorStatus$.next(BackgroundTaskStatus.NONE)
 const handleSaving = () => backgroundTaskIndicatorStatus$.next(BackgroundTaskStatus.SAVING)
 const handleLoading = () => backgroundTaskIndicatorStatus$.next(BackgroundTaskStatus.LOADING)

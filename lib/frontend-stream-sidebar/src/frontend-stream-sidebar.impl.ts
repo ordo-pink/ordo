@@ -2,8 +2,10 @@ import { AiOutlineLayout, AiOutlineLeft, AiOutlineRight } from "react-icons/ai"
 import { BehaviorSubject } from "rxjs/internal/BehaviorSubject"
 
 import {
-	DEFAULT_WORKSPACE_SPLIT_SIZE_WITHOUT_SIDEBAR,
-	DEFAULT_WORKSPACE_SPLIT_SIZE_WITH_SIDEBAR,
+	DEFAULT_WORKSPACE_SPLIT_SIZE,
+	DEFAULT_WORKSPACE_SPLIT_SIZE_NARROW_OPEN,
+	DEFAULT_WORKSPACE_SPLIT_SIZE_NO_SIDEBAR,
+	NARROW_WINDOW_BREAKPOINT,
 } from "./frontend-stream-sidebar.constants"
 import { callOnce } from "@ordo-pink/tau"
 import { getCommands } from "@ordo-pink/frontend-stream-commands"
@@ -24,7 +26,7 @@ export const __initSidebar = callOnce((fid: symbol) => {
 	commands.on<cmd.sidebar.enable>("sidebar.enable", () => {
 		const sidebar = sidebar$.value
 		if (!sidebar.disabled) return
-		sidebar$.next({ disabled: false, sizes: DEFAULT_WORKSPACE_SPLIT_SIZE_WITH_SIDEBAR })
+		sidebar$.next({ disabled: false, sizes: DEFAULT_WORKSPACE_SPLIT_SIZE })
 	})
 
 	commands.on<cmd.sidebar.setSize>("sidebar.set-size", ({ payload }) => {
@@ -33,30 +35,38 @@ export const __initSidebar = callOnce((fid: symbol) => {
 		sidebar$.next({ disabled: false, sizes: payload })
 	})
 
-	commands.on<cmd.sidebar.show>(
-		"sidebar.show",
-		({ payload = DEFAULT_WORKSPACE_SPLIT_SIZE_WITH_SIDEBAR }) => {
-			const sidebar = sidebar$.value
-			if (sidebar.disabled) return
-			sidebar$.next({ disabled: false, sizes: payload })
-		},
-	)
+	commands.on<cmd.sidebar.show>("sidebar.show", ({ payload }) => {
+		const sidebar = sidebar$.value
+		if (sidebar.disabled) return
+
+		const { innerWidth } = window
+		const isNarrow = innerWidth < NARROW_WINDOW_BREAKPOINT
+		const sizes = isNarrow ? DEFAULT_WORKSPACE_SPLIT_SIZE_NARROW_OPEN : DEFAULT_WORKSPACE_SPLIT_SIZE
+
+		sidebar$.next({ disabled: false, sizes: payload ?? sizes })
+	})
 
 	commands.on<cmd.sidebar.hide>("sidebar.hide", () => {
 		const sidebar = sidebar$.value
 		if (sidebar.disabled) return
-		sidebar$.next({ disabled: false, sizes: DEFAULT_WORKSPACE_SPLIT_SIZE_WITHOUT_SIDEBAR })
+		sidebar$.next({ disabled: false, sizes: DEFAULT_WORKSPACE_SPLIT_SIZE_NO_SIDEBAR })
 	})
 
 	commands.on<cmd.sidebar.toggle>("sidebar.toggle", () => {
 		const sidebar = sidebar$.value
+
 		if (sidebar.disabled) return
 
-		sidebar$.next(
-			sidebar.sizes[0] > 0
-				? { disabled: false, sizes: DEFAULT_WORKSPACE_SPLIT_SIZE_WITHOUT_SIDEBAR }
-				: { disabled: false, sizes: DEFAULT_WORKSPACE_SPLIT_SIZE_WITH_SIDEBAR },
-		)
+		console.log(sidebar)
+
+		const { innerWidth } = window
+		const isNarrow = innerWidth < NARROW_WINDOW_BREAKPOINT
+		const sizes = isNarrow ? DEFAULT_WORKSPACE_SPLIT_SIZE_NARROW_OPEN : DEFAULT_WORKSPACE_SPLIT_SIZE
+
+		sidebar$.next({
+			disabled: false,
+			sizes: sidebar.sizes[0] > 0 ? DEFAULT_WORKSPACE_SPLIT_SIZE_NO_SIDEBAR : sizes,
+		})
 	})
 
 	commands.emit<cmd.commandPalette.add>("command-palette.add", {

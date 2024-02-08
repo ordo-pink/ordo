@@ -3,8 +3,9 @@ import { Suspense, useEffect, useState } from "react"
 import Split from "react-split"
 
 import {
-	DEFAULT_WORKSPACE_SPLIT_SIZE_WITHOUT_SIDEBAR,
-	DEFAULT_WORKSPACE_SPLIT_SIZE_WITH_SIDEBAR,
+	DEFAULT_WORKSPACE_SPLIT_SIZE,
+	DEFAULT_WORKSPACE_SPLIT_SIZE_NO_SIDEBAR,
+	NARROW_WINDOW_BREAKPOINT,
 	type WorkspaceSplitSize,
 	sidebar$,
 } from "@ordo-pink/frontend-stream-sidebar"
@@ -21,15 +22,13 @@ export default function WorkspaceWithSidebar({ activity }: WorkspaceContentProps
 	const commands = useCommands()
 
 	const [isNarrow, setIsNarrow] = useState(true)
-	const [sizes, setSizes] = useState<WorkspaceSplitSize>(DEFAULT_WORKSPACE_SPLIT_SIZE_WITH_SIDEBAR)
+	const [sizes, setSizes] = useState<WorkspaceSplitSize>(DEFAULT_WORKSPACE_SPLIT_SIZE_NO_SIDEBAR)
 
 	useEffect(() => {
-		const isNarrow = windowWidth < 768
+		const isNarrow = windowWidth < NARROW_WINDOW_BREAKPOINT
 		commands.emit<cmd.sidebar.setSize>(
 			"sidebar.set-size",
-			isNarrow
-				? DEFAULT_WORKSPACE_SPLIT_SIZE_WITHOUT_SIDEBAR
-				: DEFAULT_WORKSPACE_SPLIT_SIZE_WITH_SIDEBAR,
+			isNarrow ? DEFAULT_WORKSPACE_SPLIT_SIZE_NO_SIDEBAR : DEFAULT_WORKSPACE_SPLIT_SIZE,
 		)
 
 		setIsNarrow(isNarrow)
@@ -42,7 +41,7 @@ export default function WorkspaceWithSidebar({ activity }: WorkspaceContentProps
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [sidebar])
 
-	const snapOffset = isNarrow ? windowWidth / 2 : 200
+	const snapOffset = isNarrow ? windowWidth / 2 : windowWidth / 5
 
 	const onDragEnd: OnDragEndFn = ([left, right]) => {
 		let newLeft = left

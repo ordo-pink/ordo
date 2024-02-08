@@ -47,6 +47,8 @@ declare global {
 	module cmd {
 		module background {
 			type setStatus = { name: "background-task.set-status"; payload: BackgroundTaskStatus }
+			type startSaving = { name: "background-task.start-saving" }
+			type startLoading = { name: "background-task.start-loading" }
 			type resetStatus = { name: "background-task.reset-status" }
 		}
 

@@ -6,7 +6,7 @@ import { KnownFunctions } from "@ordo-pink/known-functions"
 import { Logger } from "@ordo-pink/logger"
 import { callOnce } from "@ordo-pink/tau"
 import { getLogger } from "@ordo-pink/frontend-logger"
-import { useSharedContext } from "@ordo-pink/frontend-react-hooks"
+import { useCurrentFID } from "@ordo-pink/frontend-stream-activities"
 
 const fetch = window.fetch
 
@@ -16,7 +16,7 @@ export const __initFetch = callOnce(() => {
 })
 
 export const useFetch = () => {
-	const { fid } = useSharedContext()
+	const fid = useCurrentFID()
 	const fetch = getFetch(fid)
 
 	return fetch

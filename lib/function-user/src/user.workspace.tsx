@@ -2,9 +2,10 @@
 // SPDX-License-Identifier: MIT
 
 import { BsPatchCheckFill, BsPatchExclamation } from "react-icons/bs"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 
 import { EmailInput, PasswordInput, TextInput } from "@ordo-pink/frontend-react-components/input"
+import { N, noop } from "@ordo-pink/tau"
 import {
 	useCommands,
 	useHosts,
@@ -16,7 +17,7 @@ import {
 import { Either } from "@ordo-pink/either"
 import { Oath } from "@ordo-pink/oath"
 import { auth$ } from "@ordo-pink/frontend-stream-user"
-import { noop } from "@ordo-pink/tau"
+import { useFetch } from "@ordo-pink/frontend-fetch"
 
 import Button from "@ordo-pink/frontend-react-components/button"
 import Card from "@ordo-pink/frontend-react-components/card"
@@ -29,11 +30,12 @@ export default function UserWorkspace() {
 	const commands = useCommands()
 	const userName = useUserName()
 	const userEmail = useUserEmail()
+	const fetch = useFetch()
 	const { staticHost, idHost } = useHosts()
 
 	const auth = useSubscription(auth$)
 
-	const [email, setEmail] = useState(user?.email)
+	const [email, setEmail] = useState(user?.email ?? "")
 	// const [handle, setHandle] = useState(user.handle ?? "")
 	const [oldPassword, setOldPassword] = useState("")
 	const [newPassword, setNewPassword] = useState("")
@@ -42,6 +44,14 @@ export default function UserWorkspace() {
 	const [lastName, setLastName] = useState(user?.lastName ?? "")
 	const [emailErrors, setEmailErrors] = useState<string[]>([])
 	const [passwordErrors, setPasswordErrors] = useState<string[]>([])
+
+	useEffect(() => {
+		Either.fromNullable(user).fold(N, user => {
+			setEmail(user.email)
+			setFirstName(user.firstName ?? "")
+			setLastName(user.lastName ?? "")
+		})
+	}, [user])
 
 	return (
 		<form
@@ -92,26 +102,30 @@ export default function UserWorkspace() {
 								}
 							/>
 
-							<Button.Base
+							<Button.Primary
 								disabled={emailErrors.length > 0 || email === user?.email}
 								onClick={() =>
-									void Oath.try(() =>
-										fetch(`${idHost}/change-email`, {
-											method: "PATCH",
-											headers: {
-												authorization: `Bearer ${auth!.accessToken}`,
-												"content-type": "application/json",
-											},
-											body: JSON.stringify({ email }),
-										}).then(res => res.json()),
-									)
-										.rejectedMap(() => "Connection error")
-										.chain(res =>
-											Oath.fromBoolean(
-												() => res.success,
-												noop,
-												() => res.error,
+									void Oath.fromNullable(auth)
+										.tap(() =>
+											commands.emit<cmd.background.startSaving>("background-task.start-saving"),
+										)
+										.chain(({ accessToken }) =>
+											Oath.from(() =>
+												fetch(`${idHost}/change-email`, {
+													method: "PATCH",
+													headers: {
+														authorization: `Bearer ${accessToken}`,
+														"content-type": "application/json",
+													},
+													body: JSON.stringify({ email }),
+												}),
 											),
+										)
+										.chain(res => Oath.from(() => res.json()))
+										.rejectedMap(() => "Connection error")
+										.chain(Oath.ifElse(res => res.success, { onFalse: res => res.error }))
+										.tap(() =>
+											commands.emit<cmd.background.resetStatus>("background-task.reset-status"),
 										)
 										.fork(
 											err => setEmailErrors([err ? err : "Invalid email"]),
@@ -120,7 +134,7 @@ export default function UserWorkspace() {
 								}
 							>
 								Изменить
-							</Button.Base>
+							</Button.Primary>
 						</div>
 
 						<div>
@@ -148,29 +162,38 @@ export default function UserWorkspace() {
 							onInput={e => setLastName(e.target.value)}
 						/>
 
-						<Button.Base
+						<Button.Primary
 							disabled={
 								firstName === userName?.firstName && lastName === userName?.lastName
 								// && handle === user.handle
 							}
 							onClick={() =>
-								void Oath.try(() =>
-									fetch(`${idHost}/change-account-info`, {
-										method: "PATCH",
-										headers: {
-											authorization: `Bearer ${auth!.accessToken}`,
-											"content-type": "application/json",
-										},
-										body: JSON.stringify({ firstName, lastName }),
-									}).then(res => res.json()),
-								)
-									.rejectedMap(() => "Connection error")
-									.chain(res =>
-										Oath.fromBoolean(
-											() => res.success,
-											noop,
-											() => res.error,
-										),
+								void Oath.empty()
+									.tap(() =>
+										commands.emit<cmd.background.startSaving>("background-task.start-saving"),
+									)
+									.chain(() =>
+										Oath.try(() =>
+											fetch(`${idHost}/change-account-info`, {
+												method: "PATCH",
+												headers: {
+													authorization: `Bearer ${auth!.accessToken}`,
+													"content-type": "application/json",
+												},
+												body: JSON.stringify({ firstName, lastName }),
+											}).then(res => res.json()),
+										)
+											.rejectedMap(() => "Connection error")
+											.chain(res =>
+												Oath.fromBoolean(
+													() => res.success,
+													noop,
+													() => res.error,
+												),
+											),
+									)
+									.tap(() =>
+										commands.emit<cmd.background.resetStatus>("background-task.reset-status"),
 									)
 									.fork(
 										err => setEmailErrors([err ? err : "Invalid email"]),
@@ -179,7 +202,7 @@ export default function UserWorkspace() {
 							}
 						>
 							Изменить
-						</Button.Base>
+						</Button.Primary>
 					</fieldset>
 				</Card>
 
@@ -227,7 +250,7 @@ export default function UserWorkspace() {
 							}
 						/>
 
-						<Button.Base
+						<Button.Primary
 							disabled={
 								passwordErrors.length > 0 ||
 								!oldPassword ||
@@ -236,18 +259,26 @@ export default function UserWorkspace() {
 								newPassword !== repeatNewPassword
 							}
 							onClick={() =>
-								void Oath.try(() =>
-									fetch(`${idHost}/change-password`, {
-										method: "PATCH",
-										credentials: "include",
-										headers: {
-											authorization: `Bearer ${auth!.accessToken}`,
-											"content-type": "application/json",
-										},
-										body: JSON.stringify({ oldPassword, newPassword, repeatNewPassword }),
-									}).then(res => res.json()),
-								)
-									.chain(res => Oath.fromBoolean(() => res.success, noop))
+								void Oath.empty()
+									.tap(() =>
+										commands.emit<cmd.background.startSaving>("background-task.start-saving"),
+									)
+									.chain(() =>
+										Oath.try(() =>
+											fetch(`${idHost}/change-password`, {
+												method: "PATCH",
+												credentials: "include",
+												headers: {
+													authorization: `Bearer ${auth!.accessToken}`,
+													"content-type": "application/json",
+												},
+												body: JSON.stringify({ oldPassword, newPassword, repeatNewPassword }),
+											}).then(res => res.json()),
+										).chain(res => Oath.fromBoolean(() => res.success, noop)),
+									)
+									.tap(() =>
+										commands.emit<cmd.background.resetStatus>("background-task.reset-status"),
+									)
 									.fork(
 										err => setEmailErrors([err ? err.message : "Invalid email"]),
 										() => {
@@ -260,7 +291,7 @@ export default function UserWorkspace() {
 							}
 						>
 							Изменить
-						</Button.Base>
+						</Button.Primary>
 					</fieldset>
 				</Card>
 
@@ -281,6 +312,8 @@ export default function UserWorkspace() {
 		</form>
 	)
 }
+
+// --- Internal ---
 
 type _ECP = { confirmed: boolean }
 const EmailConfirmation = ({ confirmed }: _ECP) =>

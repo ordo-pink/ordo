@@ -84,7 +84,8 @@ export default function App() {
 		Either.fromBoolean(() => isAuthenticated).fold(Null, () =>
 			commands.emit<cmd.user.refreshInfo>("user.refresh"),
 		)
-	}, [isAuthenticated, commands])
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [isAuthenticated])
 
 	useEffect(() => {
 		Either.fromNullable(commandPalette)

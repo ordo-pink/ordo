@@ -21,16 +21,20 @@ import Null from "@ordo-pink/frontend-react-components/null"
  * - `background-task.reset-status`
  */
 export default function BackgroundTaskIndicator() {
-	const status = useStrictSubscription(saving$, BackgroundTaskStatus.NONE)
+	const status = useStrictSubscription(backgroundTaskIndicatorStatus$, BackgroundTaskStatus.NONE)
 	const commands = useCommands()
 
 	useEffect(() => {
-		commands.on<cmd.background.setStatus>("background-task.set-status", setStatus)
-		commands.on<cmd.background.resetStatus>("background-task.reset-status", resetStatus)
+		commands.on<cmd.background.setStatus>("background-task.set-status", handleSetStatus)
+		commands.on<cmd.background.resetStatus>("background-task.reset-status", handleResetStatus)
+		commands.on<cmd.background.startLoading>("background-task.start-loading", handleLoading)
+		commands.on<cmd.background.startSaving>("background-task.start-saving", handleSaving)
 
 		return () => {
-			commands.off<cmd.background.setStatus>("background-task.set-status", setStatus)
-			commands.off<cmd.background.resetStatus>("background-task.reset-status", resetStatus)
+			commands.off<cmd.background.setStatus>("background-task.set-status", handleSetStatus)
+			commands.off<cmd.background.resetStatus>("background-task.reset-status", handleResetStatus)
+			commands.off<cmd.background.startLoading>("background-task.start-loading", handleLoading)
+			commands.off<cmd.background.startSaving>("background-task.start-saving", handleSaving)
 		}
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [])
@@ -44,12 +48,16 @@ export default function BackgroundTaskIndicator() {
 // --- Internal ---
 
 // Define Observable to maintain indicator state
-const saving$ = new BehaviorSubject<BackgroundTaskStatus>(BackgroundTaskStatus.NONE)
+const backgroundTaskIndicatorStatus$ = new BehaviorSubject<BackgroundTaskStatus>(
+	BackgroundTaskStatus.NONE,
+)
 
 // Define command handlers
-const setStatus: Client.Commands.Handler<BackgroundTaskStatus> = ({ payload }) =>
-	saving$.next(payload)
-const resetStatus = () => saving$.next(BackgroundTaskStatus.NONE)
+const handleSetStatus: Client.Commands.Handler<BackgroundTaskStatus> = ({ payload }) =>
+	backgroundTaskIndicatorStatus$.next(payload)
+const handleResetStatus = () => backgroundTaskIndicatorStatus$.next(BackgroundTaskStatus.NONE)
+const handleSaving = () => backgroundTaskIndicatorStatus$.next(BackgroundTaskStatus.SAVING)
+const handleLoading = () => backgroundTaskIndicatorStatus$.next(BackgroundTaskStatus.LOADING)
 
 /**
  * Saving indicator component.

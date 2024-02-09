@@ -94,11 +94,12 @@ SPDX-License-Identifier: MIT
 }
 
 body {
-	@apply bg-gradient-to-br from-neutral-50 to-neutral-100 dark:from-neutral-800 dark:to-neutral-900 text-neutral-800 dark:text-neutral-200;
+	font-family: "Jost", sans-serif;
+	@apply h-[100svh] bg-gradient-to-br from-neutral-50 to-neutral-100 text-neutral-800 dark:from-neutral-800 dark:to-neutral-900 dark:text-neutral-200;
 }
 
 a {
-	@apply underline text-sky-500 visited:text-purple-500 active:text-rose-500;
+	@apply text-sky-500 underline visited:text-purple-500 active:text-rose-500;
 }
 
 *::-webkit-scrollbar {
@@ -108,9 +109,19 @@ a {
 }
 
 *::-webkit-scrollbar-thumb {
-	@apply invisible rounded-lg bg-neutral-300 dark:bg-neutral-600 my-2 transition-all duration-300;
+	@apply invisible my-2 rounded-lg bg-neutral-300 transition-all duration-300 dark:bg-neutral-600;
 }
 
 *:hover::-webkit-scrollbar-thumb {
 	@apply visible;
+}
+
+.gutter {
+	@apply z-40 bg-transparent pr-2;
+	background-position: 50% 50%;
+}
+
+.gutter.gutter-horizontal {
+	@apply cursor-col-resize bg-no-repeat;
+	background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAeCAYAAADkftS9AAAAIklEQVQoU2M4c+bMfxAGAgYYmwGrIIiDjrELjpo5aiZeMwF+yNnOs5KSvgAAAABJRU5ErkJggg==");
 }

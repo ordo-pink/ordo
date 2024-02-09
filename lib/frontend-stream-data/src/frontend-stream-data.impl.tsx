@@ -20,13 +20,13 @@ import { EXTENSION_FILE_PREFIX } from "@ordo-pink/core"
 import { Oath } from "@ordo-pink/oath"
 import { auth$ } from "@ordo-pink/frontend-stream-user"
 import { getCommands } from "@ordo-pink/frontend-stream-commands"
+import { getFetch } from "@ordo-pink/frontend-fetch"
 import { getHosts } from "@ordo-pink/frontend-react-hooks"
 import { getLogger } from "@ordo-pink/frontend-logger"
 
 import CreateFileModal from "./components/create-file-modal.component"
 import RemoveFileModal from "./components/remove-file-modal.component"
 import RenameModal from "./components/rename-modal.component"
-import { getFetch } from "@ordo-pink/frontend-fetch"
 
 type P = { fid: symbol; dataCommands: TDataCommands<string | ArrayBuffer> }
 export const __initData = ({ fid, dataCommands }: P) => {

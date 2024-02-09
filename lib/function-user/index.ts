@@ -5,7 +5,7 @@ import { AiOutlineLogout } from "react-icons/ai"
 import { BsPersonCircle } from "react-icons/bs"
 import { lazy } from "react"
 
-import { createFunction } from "@ordo-pink/create-function"
+import { createFunction } from "@ordo-pink/frontend-create-function"
 
 export default createFunction(
 	"pink.ordo.user",

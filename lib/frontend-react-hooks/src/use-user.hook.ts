@@ -1,4 +1,4 @@
-import { KnownFunctions, QueryPermission } from "@ordo-pink/known-functions"
+import { KnownFunctions, QueryPermission } from "@ordo-pink/frontend-known-functions"
 import { Either } from "@ordo-pink/either"
 import { N } from "@ordo-pink/tau"
 import { Switch } from "@ordo-pink/switch"

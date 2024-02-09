@@ -15,7 +15,7 @@ import { N, callOnce } from "@ordo-pink/tau"
 import { getCommands } from "@ordo-pink/frontend-stream-commands"
 
 import { Either } from "@ordo-pink/either"
-import { KnownFunctions } from "@ordo-pink/known-functions"
+import { KnownFunctions } from "@ordo-pink/frontend-known-functions"
 import { getLogger } from "@ordo-pink/frontend-logger"
 
 export const __initActivities = callOnce((fid: symbol) => {

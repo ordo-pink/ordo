@@ -12,7 +12,7 @@ export default function CenteredPage({ children, centerX, centerY }: PropsWithCh
 	return (
 		<div
 			// eslint-disable-next-line tailwindcss/no-custom-classname
-			className={`size-full flex flex-col ${centerX ? "items-center" : "items-start"} ${
+			className={`flex size-full flex-col ${centerX ? "items-center" : "items-start"} ${
 				centerY ? "justify-center" : "justify-start"
 			} min-h-screen`}
 		>

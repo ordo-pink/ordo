@@ -22,10 +22,19 @@ export const dtHost = import.meta.env.VITE_ORDO_DT_HOST
 export const myHost = import.meta.env.VITE_ORDO_WORKSPACE_HOST
 
 import { APP_FID, isDev } from "./app-fid"
+import { ClientContentPersistenceStrategy } from "./content-persistence-strategy"
+import { ClientDataPersistenceStrategy } from "./data-persistence-strategy"
 
 import App from "./app"
+import { DataCommands } from "@ordo-pink/data"
+import { __initData } from "@ordo-pink/frontend-stream-data"
 
 currentFID$.next(APP_FID)
+
+const dataPersistenceStrategy = ClientDataPersistenceStrategy.of(APP_FID)
+const contentPersistenceStrategy = ClientContentPersistenceStrategy.of(APP_FID)
+
+const dataCommands = DataCommands.of({ dataPersistenceStrategy, contentPersistenceStrategy })
 
 __initHosts({ idHost, websiteHost, staticHost, dtHost, myHost })
 __initFetch()
@@ -34,6 +43,7 @@ __initCommands({ fid: APP_FID })
 __initRouter(APP_FID)
 __initAuth$({ fid: APP_FID, isDev })
 __initUser$({ fid: APP_FID, idHost })
+__initData({ fid: APP_FID, dataCommands })
 __initCommandPalette(APP_FID)
 __initActivities(APP_FID)
 __initSidebar(APP_FID)

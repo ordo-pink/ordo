@@ -1,11 +1,12 @@
 // SPDX-FileCopyrightText: Copyright 2023, 谢尔盖||↓ and the Ordo.pink contributors
 // SPDX-License-Identifier: MIT
 
-import type { Validations } from "./data-validations.types"
 import { isNonEmptyString, isNonNegativeFiniteInteger, isObject, isUUID } from "@ordo-pink/tau"
 import { Either } from "@ordo-pink/either"
-import { Errors } from "./errors.impl"
+
 import { DataError } from "./errors.types"
+import { Errors } from "./errors.impl"
+import { type Validations } from "./data-validations.types"
 
 export const validations: Validations = {
 	isValidDataE: x =>

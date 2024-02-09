@@ -1,6 +1,6 @@
 import { BsFolder2Open } from "react-icons/bs"
 
-import { type DataProviders } from "@ordo-pink/create-function"
+import { type DataProviders } from "@ordo-pink/frontend-create-function"
 import { type FSID } from "@ordo-pink/data"
 import { Switch } from "@ordo-pink/switch"
 

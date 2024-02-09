@@ -3,4 +3,8 @@
 
 export type WorkspaceSplitSize = [number, number]
 
-export type SidebarState = { disabled: false; sizes: WorkspaceSplitSize } | { disabled: true }
+export type DisabledSidebar = { disabled: true }
+
+export type EnabledSidebar = { disabled: false; sizes: WorkspaceSplitSize }
+
+export type SidebarState = EnabledSidebar | DisabledSidebar

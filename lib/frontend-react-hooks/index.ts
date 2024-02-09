@@ -3,6 +3,7 @@
 
 export * from "./src/use-accelerator.hook"
 export * from "./src/use-commands.hook"
+export * from "./src/use-data.hook"
 export * from "./src/use-debounce.hook"
 export * from "./src/use-hosts.hook"
 export * from "./src/use-is-authenticated.hook"
@@ -13,3 +14,4 @@ export * from "./src/use-strict-subscription.hook"
 export * from "./src/use-subscription.hook"
 export * from "./src/use-user.hook"
 export * from "./src/use-window-size.hook"
+export * from "./src/use-workspace-width.hook"

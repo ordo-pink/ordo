@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 import { Either } from "@ordo-pink/either"
-import { KnownFunctions } from "@ordo-pink/known-functions"
+import { KnownFunctions } from "@ordo-pink/frontend-known-functions"
 import { Logger } from "@ordo-pink/logger"
 import { callOnce } from "@ordo-pink/tau"
 import { getLogger } from "@ordo-pink/frontend-logger"

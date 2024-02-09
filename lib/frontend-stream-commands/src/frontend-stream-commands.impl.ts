@@ -11,7 +11,7 @@ import { equals } from "ramda"
 import { merge } from "rxjs/internal/observable/merge"
 
 import { Either } from "@ordo-pink/either"
-import { KnownFunctions } from "@ordo-pink/known-functions"
+import { KnownFunctions } from "@ordo-pink/frontend-known-functions"
 import { type Logger } from "@ordo-pink/logger"
 import { callOnce } from "@ordo-pink/tau"
 import { getLogger } from "@ordo-pink/frontend-logger"

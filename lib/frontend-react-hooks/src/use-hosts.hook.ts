@@ -21,6 +21,7 @@ export const __initHosts = callOnce((hosts: Hosts) => {
 	myHost = hosts.myHost
 })
 
+// TODO: Require fid
 export const getHosts = () => ({ idHost, dtHost, staticHost, websiteHost, myHost })
 
 export const useHosts = () => ({ idHost, dtHost, staticHost, websiteHost, myHost })

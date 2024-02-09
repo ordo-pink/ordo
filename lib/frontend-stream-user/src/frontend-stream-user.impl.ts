@@ -1,7 +1,7 @@
 import { BehaviorSubject } from "rxjs/internal/BehaviorSubject"
 
 import { Either } from "@ordo-pink/either"
-import { KnownFunctions } from "@ordo-pink/known-functions"
+import { KnownFunctions } from "@ordo-pink/frontend-known-functions"
 import { Oath } from "@ordo-pink/oath"
 import { callOnce } from "@ordo-pink/tau"
 import { getCommands } from "@ordo-pink/frontend-stream-commands"

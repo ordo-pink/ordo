@@ -81,9 +81,10 @@ export default function App() {
 	}
 
 	useEffect(() => {
-		Either.fromBoolean(() => isAuthenticated).fold(Null, () =>
-			commands.emit<cmd.user.refreshInfo>("user.refresh"),
-		)
+		Either.fromBoolean(() => isAuthenticated).fold(Null, () => {
+			commands.emit<cmd.user.refreshInfo>("user.refresh")
+			commands.emit<cmd.data.refreshRoot>("data.refresh-root")
+		})
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [isAuthenticated])
 
@@ -131,13 +132,23 @@ export default function App() {
 
 		void Oath.of(commands)
 			.chain(() =>
+				Oath.from(() => import("@ordo-pink/function-home")).chain(f =>
+					Oath.from(async () => await f.default),
+				),
+			)
+			.chain(() =>
 				Oath.from(() => import("@ordo-pink/function-file-explorer")).chain(f =>
-					Oath.from(async () => f.default),
+					Oath.from(async () => await f.default),
 				),
 			)
 			.chain(() =>
 				Oath.from(() => import("@ordo-pink/function-user")).chain(f =>
-					Oath.from(async () => f.default),
+					Oath.from(async () => await f.default),
+				),
+			)
+			.chain(() =>
+				Oath.from(() => import("@ordo-pink/function-links")).chain(f =>
+					Oath.from(async () => await f.default),
 				),
 			)
 			.orNothing()

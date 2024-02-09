@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 import { ConsoleLogger, Logger } from "@ordo-pink/logger"
-import { KnownFunctions } from "@ordo-pink/known-functions"
+import { KnownFunctions } from "@ordo-pink/frontend-known-functions"
 import { callOnce } from "@ordo-pink/tau"
 
 let logger = ConsoleLogger

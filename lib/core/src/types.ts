@@ -191,6 +191,7 @@ declare global {
 			routes: string[]
 			Component: ComponentType | LazyExoticComponent<ComponentType>
 			Sidebar?: ComponentType
+			widgets?: ComponentType[]
 			Icon?: ComponentType | IconType
 			background?: boolean
 		}

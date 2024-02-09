@@ -4,7 +4,7 @@
 import type { FSID, PlainData } from "@ordo-pink/data"
 import type { Hosts } from "@ordo-pink/frontend-react-hooks"
 import type { Logger } from "@ordo-pink/logger"
-import type { Permissions } from "@ordo-pink/known-functions"
+import type { Permissions } from "@ordo-pink/frontend-known-functions"
 
 export type DataProviders = {
 	getData: () => PlainData[] | null

@@ -1,4 +1,4 @@
 // SPDX-FileCopyrightText: Copyright 2024, 谢尔盖||↓ and the Ordo.pink contributors
 // SPDX-License-Identifier: MIT
 
-export type FunctionTest = "function-test"
+export * from "./src/frontend-stream-data.impl"

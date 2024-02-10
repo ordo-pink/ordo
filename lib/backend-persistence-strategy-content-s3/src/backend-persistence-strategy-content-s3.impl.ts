@@ -5,11 +5,13 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-import { Readable, PassThrough } from "stream"
+import { DeleteObjectCommand, GetObjectCommand, S3Client } from "@aws-sdk/client-s3"
+import { PassThrough, Readable } from "stream"
+import { Upload } from "@aws-sdk/lib-storage"
+
 import { ContentPersistenceStrategy, Data, FSID, UserID } from "@ordo-pink/data"
 import { Oath } from "@ordo-pink/oath"
-import { DeleteObjectCommand, GetObjectCommand, S3Client } from "@aws-sdk/client-s3"
-import { Upload } from "@aws-sdk/lib-storage"
+
 import { S3DownloadStream } from "./s3-download-stream"
 
 type Params = {

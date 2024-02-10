@@ -18,6 +18,7 @@ export type QueryPermission =
 	| "user.name"
 	| "achievements"
 	| "functions.current-activity"
+	| "data.read"
 
 // TODO: Add support for command intellisense
 export type CommandPermission = Client.Commands.CommandName

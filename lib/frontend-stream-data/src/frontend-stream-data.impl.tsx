@@ -17,6 +17,9 @@ import { PiGraph } from "react-icons/pi"
 
 import { Data, PlainData, TDataCommands } from "@ordo-pink/data"
 import { EXTENSION_FILE_PREFIX } from "@ordo-pink/core"
+import { Either } from "@ordo-pink/either"
+import { KnownFunctions } from "@ordo-pink/frontend-known-functions"
+import { N } from "@ordo-pink/tau"
 import { Oath } from "@ordo-pink/oath"
 import { auth$ } from "@ordo-pink/frontend-stream-user"
 import { getCommands } from "@ordo-pink/frontend-stream-commands"
@@ -399,5 +402,16 @@ export const __initData = ({ fid, dataCommands }: P) => {
 	logger.debug("Initialised data.")
 }
 
+export const getData = (fid: symbol | null): PlainData[] | null =>
+	Either.fromNullable(fid)
+		.chain(checkCurrentActivityQueryPermissionE)
+		.fold(N, () => data$.value)
+
 export const data$ = new BehaviorSubject<PlainData[]>([])
 export const content$ = new BehaviorSubject<string | ArrayBuffer | null>(null)
+
+const checkCurrentActivityQueryPermissionE = (fid: symbol) =>
+	Either.fromBoolean(
+		() => KnownFunctions.checkPermissions(fid, { queries: ["data.read"] }),
+		() => fid,
+	)

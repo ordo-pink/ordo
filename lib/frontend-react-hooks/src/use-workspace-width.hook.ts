@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react"
 
+import { ACTIVITY_BAR_WIDTH, SIDEBAR_WORKSPACE_GUTTER_WIDTH } from "@ordo-pink/core"
 import { EnabledSidebar, sidebar$ } from "@ordo-pink/frontend-stream-sidebar"
 import { Either } from "@ordo-pink/either"
 
@@ -32,12 +33,16 @@ export const useWorkspaceWidth = () => {
 			.map(sidebar => sidebar.sizes)
 			.fold(
 				() => {
-					setSizes({ sidebarWidth: 0, workspaceWidth: documentWidth - 40 })
+					setSizes({ sidebarWidth: 0, workspaceWidth: documentWidth - ACTIVITY_BAR_WIDTH })
 				},
 				sizes =>
 					setSizes({
-						sidebarWidth: (documentWidth * sizes[0]) / 100 - 40,
-						workspaceWidth: (documentWidth * sizes[1]) / 100 - 40,
+						sidebarWidth:
+							((documentWidth - ACTIVITY_BAR_WIDTH - SIDEBAR_WORKSPACE_GUTTER_WIDTH) * sizes[0]) /
+							100,
+						workspaceWidth:
+							((documentWidth - ACTIVITY_BAR_WIDTH - SIDEBAR_WORKSPACE_GUTTER_WIDTH) * sizes[1]) /
+							100,
 					}),
 			)
 	}, [documentWidth, sidebar])

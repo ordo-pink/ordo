@@ -1,7 +1,9 @@
-import { type ComponentType } from "react"
+import { type ComponentType, Suspense } from "react"
+
+import { Either } from "@ordo-pink/either"
 
 import Card from "@ordo-pink/frontend-react-components/card"
-import { Either } from "@ordo-pink/either"
+import Loader from "@ordo-pink/frontend-react-components/loader"
 import Null from "@ordo-pink/frontend-react-components/null"
 
 type P = { widgets?: ComponentType[]; activityName: string }
@@ -10,9 +12,17 @@ export default function Widgets({ widgets, activityName }: P) {
 		<>
 			{widgets.map((Widget, index) => (
 				<Card key={`${activityName}-${index}`}>
-					<Widget />
+					<Suspense fallback={<WidgetFallback />}>
+						<Widget />
+					</Suspense>
 				</Card>
 			))}
 		</>
 	))
 }
+
+const WidgetFallback = () => (
+	<div className="size-full">
+		<Loader />
+	</div>
+)

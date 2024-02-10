@@ -5,15 +5,18 @@ import type { FSID, PlainData } from "@ordo-pink/data"
 import type { Hosts } from "@ordo-pink/frontend-react-hooks"
 import type { Logger } from "@ordo-pink/logger"
 import type { Permissions } from "@ordo-pink/frontend-known-functions"
+import { PlainDataNode } from "@ordo-pink/core"
 
 export type DataProviders = {
 	getData: () => PlainData[] | null
-	getChildren: (fsid: FSID) => PlainData[]
+	getChildren: (fsid: PlainData | FSID | "root" | null) => PlainData[]
 	getParentChain: (fsid: FSID) => PlainData[]
-	findItemByFSID: (fsid: FSID) => PlainData | null
-	findItemByName: (name: string, parent: FSID | null) => PlainData | null
-	selectData: (filter: (item: PlainData) => boolean) => PlainData[]
-	selectItem: (filter: (item: PlainData) => boolean) => PlainData | null
+	getDataLabels: () => string[]
+	getDataTree: () => PlainDataNode[]
+	getDataByFSID: (fsid: FSID) => PlainData | null
+	getDataByName: (name: string, parent: FSID | null) => PlainData | null
+	selectDataList: (filter: (item: PlainData) => boolean) => PlainData[]
+	selectData: (filter: (item: PlainData) => boolean) => PlainData | null
 }
 
 // TODO: Provide missing functions

@@ -5,10 +5,10 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-import { TokenRecord, TokenPersistenceStrategy } from "@ordo-pink/backend-service-token"
-import { UserID } from "@ordo-pink/data"
+import { type TokenPersistenceStrategy, type TokenRecord } from "@ordo-pink/backend-service-token"
 import { createParentIfNotExists0, fileExists0, readFile0, writeFile0 } from "@ordo-pink/fs"
 import { Oath } from "@ordo-pink/oath"
+import { type UserID } from "@ordo-pink/data"
 
 let storage = {} as Record<UserID, TokenRecord>
 
@@ -22,7 +22,7 @@ export const TokenPersistenceStrategyFS = {
 							.fix(() => ({}))
 					: createParentIfNotExists0(path).chain(() =>
 							writeFile0(path, "{}", "utf-8").map(() => ({})),
-					  ),
+						),
 			)
 			.map(strg => {
 				storage = strg

@@ -28,6 +28,12 @@ export const useData = () => {
 	return data
 }
 
+export const useDataLabels = () => {
+	const data = useData()
+
+	return Array.from(new Set(data?.flatMap(item => item.labels) ?? []))
+}
+
 export const useParentChain = (fsid: FSID) => {
 	const data = useData()
 	let currentItem = useDataByFSID(fsid)

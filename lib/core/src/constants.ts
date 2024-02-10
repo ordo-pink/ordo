@@ -4,6 +4,9 @@
 // TODO: Move extension state to /var/${extension}
 export const EXTENSION_FILE_PREFIX = ".ext_"
 
+export const ACTIVITY_BAR_WIDTH = 48
+export const SIDEBAR_WORKSPACE_GUTTER_WIDTH = 10
+
 export const ORDO_PINK_APP_FUNCTION = "pink.ordo.app"
 
 export const ORDO_PINK_USER_FUNCTION = "pink.ordo.user"

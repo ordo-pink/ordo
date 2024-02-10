@@ -6,16 +6,18 @@
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 import type { Readable } from "stream"
+
+import { ConsoleLogger, Logger } from "@ordo-pink/logger"
 import type { TDataCommands } from "@ordo-pink/data"
 import { createServer } from "@ordo-pink/backend-utils"
-import { ConsoleLogger, Logger } from "@ordo-pink/logger"
-import { handleGetContent } from "./handlers/get-content.handler"
-import { handleSetContent } from "./handlers/set-content.handler"
+
 import { handleCreateData } from "./handlers/create-data.handler"
-import { handleRemoveData } from "./handlers/remove-data.handler"
 import { handleGetAllData } from "./handlers/get-all-data.handler"
-import { handleUploadContent } from "./handlers/upload-content.handler"
+import { handleGetContent } from "./handlers/get-content.handler"
+import { handleRemoveData } from "./handlers/remove-data.handler"
+import { handleSetContent } from "./handlers/set-content.handler"
 import { handleUpdateData } from "./handlers/update-data.handler"
+import { handleUploadContent } from "./handlers/upload-content.handler"
 
 export type Params = {
 	origin: string | string[]

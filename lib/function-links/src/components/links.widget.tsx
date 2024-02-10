@@ -5,7 +5,9 @@ import { useData, useIsDarkTheme, useWorkspaceWidth } from "@ordo-pink/frontend-
 import { Either } from "@ordo-pink/either"
 import { type PlainData } from "@ordo-pink/data"
 
-import "./links.widget.css"
+import { DarkThemeColors, LightThemeColors } from "../constants"
+
+import "./graph-3d/graph-3d.css"
 
 export default function LinksWidget() {
 	const data = useData()
@@ -73,24 +75,6 @@ export default function LinksWidget() {
 				</div>
 			),
 		)
-}
-
-// const extraRenderers = [new CSS2DRenderer()]
-
-const DarkThemeColors = {
-	LABEL_LINK: "#8b5cf6",
-	LABEL_NODE: "#2e1065",
-	CHILD_LINK: "#e5e5e5",
-	CHILD_NODE: "#fafafa",
-	LINK: "#ea580c",
-}
-
-const LightThemeColors = {
-	LABEL_LINK: "#8b5cf6",
-	LABEL_NODE: "#2e1065",
-	CHILD_LINK: "#262626",
-	CHILD_NODE: "#171717",
-	LINK: "#ea580c",
 }
 
 type P = {

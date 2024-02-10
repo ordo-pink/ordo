@@ -2,8 +2,8 @@
 // SPDX-License-Identifier: MIT
 
 // import { BsThreeDotsVertical } from "react-icons/bs"
+import { type MouseEvent, Suspense } from "react"
 import { BsThreeDotsVertical } from "react-icons/bs"
-import { type MouseEvent } from "react"
 
 import {
 	useCommands,
@@ -55,7 +55,9 @@ export default function Sidebar({ children, isNarrow }: P) {
 				</div>
 			</div>
 
-			<div className="my-2 h-full grow overflow-y-auto">{children}</div>
+			<div className="my-2 h-full grow overflow-y-auto">
+				<Suspense>{children}</Suspense>
+			</div>
 
 			<div className="flex w-full items-center justify-center space-x-2">
 				<div className="mt-1 flex shrink-0 cursor-pointer items-center justify-center rounded-full bg-gradient-to-tr from-sky-400 via-purple-400 to-rose-400 p-0.5 shadow-lg">

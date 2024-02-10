@@ -5,9 +5,9 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-import { UserPersistenceStrategy } from "@ordo-pink/backend-service-user"
 import { readFile0, writeFileRecursive0 } from "@ordo-pink/fs"
 import { Oath } from "@ordo-pink/oath"
+import { type UserPersistenceStrategy } from "@ordo-pink/backend-service-user"
 
 const getUsers0 = (path: string): Oath<User.InternalUser[], Error> =>
 	readFile0(path, "utf-8")

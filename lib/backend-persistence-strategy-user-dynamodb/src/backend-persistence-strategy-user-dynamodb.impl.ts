@@ -5,19 +5,21 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-import type * as T from "./backend-persistence-strategy-user-dynamodb.types"
-import { DynamoDB } from "aws-sdk"
-import { keysOf } from "@ordo-pink/tau"
-import { Oath } from "@ordo-pink/oath"
+import DynamoDB from "aws-sdk/clients/dynamodb"
+
 import {
-	ExistsByIdMethod,
-	ExistsByEmailMethod,
-	CreateMethod,
-	UpdateMethod,
-	GetByIdMethod,
-	GetByEmailMethod,
+	type CreateMethod,
+	type ExistsByEmailMethod,
+	type ExistsByIdMethod,
+	type GetByEmailMethod,
+	type GetByIdMethod,
+	type UpdateMethod,
 } from "@ordo-pink/backend-service-user"
+import { Oath } from "@ordo-pink/oath"
 import { SUB } from "@ordo-pink/wjwt"
+import { keysOf } from "@ordo-pink/tau"
+
+import type * as T from "./backend-persistence-strategy-user-dynamodb.types"
 
 // --- Public ---
 
@@ -129,18 +131,18 @@ const getByEmail: GetByEmailMethod<T.Params> =
 			.map(serialize)
 
 const serialize: T._SerializeFn = item => ({
-	email: item.email!.S!,
+	email: item.email.S!,
 	emailConfirmed: item.emailConfirmed?.N! === "1",
 	firstName: item.firstName?.S!,
-	createdAt: new Date(item.createdAt!.S!),
+	createdAt: new Date(item.createdAt.S!),
 	lastName: item.lastName?.S!,
-	password: item.password!.S!,
+	password: item.password.S!,
 	handle: item.handle?.S!,
 	subscription: item.subscription?.S!,
 	fileLimit: Number(item.fileLimit?.N!),
 	maxUploadSize: Number(item.maxUploadSize?.N!),
 	code: item.code?.S!,
-	id: item.id!.S! as SUB,
+	id: item.id.S! as SUB,
 })
 
 const reduceUserToAttributeUpdates: T._ReduceUserToAttributeUpdatesFn = user =>

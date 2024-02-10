@@ -5,14 +5,15 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-import type { Readable } from "stream"
-import type { Middleware } from "koa"
-import type { FSID, PlainData, TDataCommands } from "@ordo-pink/data"
-import type { Unary } from "@ordo-pink/tau"
-import type { SUB } from "@ordo-pink/wjwt"
-import { sendError, authenticate0, parseBody0 } from "@ordo-pink/backend-utils"
+import { type Middleware } from "koa"
+import { type Readable } from "stream"
+
+import { type FSID, type PlainData, type TDataCommands } from "@ordo-pink/data"
+import { authenticate0, parseBody0, sendError } from "@ordo-pink/backend-utils"
 import { HttpError } from "@ordo-pink/rrr"
 import { Oath } from "@ordo-pink/oath"
+import { type SUB } from "@ordo-pink/wjwt"
+import { type Unary } from "@ordo-pink/tau"
 
 export const handleUpdateData: Unary<
 	{ dataService: TDataCommands<Readable>; idHost: string },

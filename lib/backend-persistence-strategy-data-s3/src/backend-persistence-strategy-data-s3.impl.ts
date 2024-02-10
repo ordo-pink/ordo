@@ -5,22 +5,21 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-import { resolve } from "path"
+import { GetObjectCommand, S3Client } from "@aws-sdk/client-s3"
 import { Readable } from "stream"
+import { Upload } from "@aws-sdk/lib-storage"
+
 import {
 	Data,
-	PlainData,
+	type DataNotFound,
+	type DataPersistenceStrategy,
+	type DataUnexpectedError,
+	type FSID,
+	type PlainData,
 	UnexpectedError,
-	DataPersistenceStrategy,
-	FSID,
-	DataNotFound,
-	DataUnexpectedError,
-	UserID,
+	type UserID,
 } from "@ordo-pink/data"
-import { createParentIfNotExists0, fileExists0, readFile0, writeFile0 } from "@ordo-pink/fs"
 import { Oath } from "@ordo-pink/oath"
-import { GetObjectCommand, PutObjectCommand, S3Client } from "@aws-sdk/client-s3"
-import { Upload } from "@aws-sdk/lib-storage"
 
 type Params = {
 	accessKeyId: string
@@ -70,7 +69,9 @@ export const DataPersistenceStrategyS3 = {
 					.chain(write0(s3, plain.createdBy, Bucket))
 					.map(() => plain),
 			delete: (uid, fsid) =>
-				read0(s3, uid, Bucket).map(dropByFSID(fsid)).chain(write0(s3, uid, Bucket)),
+				read0(s3, uid, Bucket)
+					.map(dropByFSID(fsid))
+					.chain(write0(s3, uid, Bucket)),
 			exists: (uid, fsid) =>
 				read0(s3, uid, Bucket)
 					.map(checkExists(fsid))

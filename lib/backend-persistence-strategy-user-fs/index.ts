@@ -6,4 +6,3 @@
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 export * from "./src/backend-persistence-strategy-user-fs.impl"
-export * from "./src/types"

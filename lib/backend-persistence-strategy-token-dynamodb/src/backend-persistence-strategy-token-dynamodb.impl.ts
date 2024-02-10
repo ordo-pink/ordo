@@ -5,10 +5,11 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-import { TokenRecord, TokenPersistenceStrategy } from "@ordo-pink/backend-service-token"
+import { type AttributeMap, type UpdateItemInput } from "aws-sdk/clients/dynamodb"
+import DynamoDB from "aws-sdk/clients/dynamodb"
+
+import { type TokenPersistenceStrategy, type TokenRecord } from "@ordo-pink/backend-service-token"
 import { Oath } from "@ordo-pink/oath"
-import { DynamoDB } from "aws-sdk"
-import { AttributeMap, UpdateItemInput } from "aws-sdk/clients/dynamodb"
 
 export type DynamoDBConfig = {
 	region: string

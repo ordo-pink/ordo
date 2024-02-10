@@ -3,7 +3,6 @@
 
 import { MouseEvent, PropsWithChildren, useRef } from "react"
 
-import { Either } from "@ordo-pink/either"
 import { noop } from "@ordo-pink/tau"
 
 import { useAccelerator } from "@ordo-pink/frontend-react-hooks/src/use-accelerator.hook"
@@ -35,11 +34,20 @@ export const Base = ({
 	outline = false,
 	center = false,
 	compact = false,
+	inverted = false,
 	title = "",
 }: Props) => {
 	const ref = useRef<HTMLButtonElement>(null)
 
 	useAccelerator(hotkey, () => void (ref.current && ref.current.click()))
+
+	const classes = ["button"]
+
+	if (outline) classes.push("outline")
+	if (center) classes.push("center")
+	if (compact) classes.push("compact")
+	if (inverted) classes.push("inverted")
+	if (className) classes.push(className)
 
 	return (
 		<button
@@ -49,12 +57,10 @@ export const Base = ({
 			onContextMenu={onClick}
 			onMouseOver={onMouseOver}
 			onFocus={onMouseOver}
-			className={`button ${outline ? "button-outline" : ""} ${className} ${
-				compact ? "button-compact" : "button-normal"
-			}`}
+			className={classes.join(" ")}
 			disabled={disabled}
 		>
-			<div className={`button-content ${center ? "button-content-center" : ""}`}>
+			<div className="flex items-center justify-center space-x-2">
 				<div className="shrink-0">{children}</div>
 
 				{hotkey ? (
@@ -80,18 +86,6 @@ export const Primary = ({
 	center,
 	compact,
 }: Props) => {
-	let buttonClassNames: string
-
-	if (disabled) {
-		buttonClassNames = "button-primary-disabled"
-	} else if (inverted) {
-		buttonClassNames = "button-primary-inverted"
-	} else {
-		buttonClassNames = ""
-	}
-
-	const classNames = `button-primary ${buttonClassNames} ${className}`
-
 	return (
 		<Base
 			onClick={onClick}
@@ -99,10 +93,11 @@ export const Primary = ({
 			disabled={disabled}
 			hotkey={hotkey}
 			title={title}
-			className={classNames}
+			className={`primary ${className}`}
 			outline={outline}
 			center={center}
 			compact={compact}
+			inverted={inverted}
 		>
 			{children}
 		</Base>
@@ -122,18 +117,6 @@ export const Secondary = ({
 	compact,
 	title,
 }: Props) => {
-	let buttonClassNames: string
-
-	if (disabled) {
-		buttonClassNames = "button-secondary-disabled"
-	} else if (inverted) {
-		buttonClassNames = "button-secondary-inverted"
-	} else {
-		buttonClassNames = ""
-	}
-
-	const buttonClass = `button-secondary ${buttonClassNames} ${className}`
-
 	return (
 		<Base
 			onClick={onClick}
@@ -141,10 +124,11 @@ export const Secondary = ({
 			disabled={disabled}
 			hotkey={hotkey}
 			title={title}
-			className={buttonClass}
+			className={`secondary ${className}`}
 			outline={outline}
 			center={center}
 			compact={compact}
+			inverted={inverted}
 		>
 			{children}
 		</Base>
@@ -160,29 +144,22 @@ export const Success = ({
 	disabled,
 	outline,
 	center,
+	inverted,
 	compact,
 	title,
 }: Props) => {
-	const buttonAppearanceClass = Either.fromBoolean(() => !!disabled).fold(
-		() =>
-			"bg-gradient-to-r from-sky-300 dark:from-cyan-600 via-teal-300 dark:via-teal-600 to-emerald-300 dark:to-emerald-600 active-ring",
-		() =>
-			"bg-gradient-to-r from-slate-300 via-zinc-300 to-stone-300 dark:from-slate-900 dark:via-zinc-900 dark:to-stone-900",
-	)
-
-	const buttonClass = `${buttonAppearanceClass} ${className}`
-
 	return (
 		<Base
 			onClick={onClick}
 			onMouseOver={onMouseOver}
 			disabled={disabled}
 			hotkey={hotkey}
-			className={buttonClass}
-			outline={outline}
 			title={title}
+			className={`success ${className}`}
+			outline={outline}
 			center={center}
 			compact={compact}
+			inverted={inverted}
 		>
 			{children}
 		</Base>
@@ -202,29 +179,18 @@ export const Neutral = ({
 	compact,
 	title,
 }: Props) => {
-	let buttonClassNames: string
-
-	if (disabled) {
-		buttonClassNames = "button-neutral-disabled"
-	} else if (inverted) {
-		buttonClassNames = "button-neutral-inverted"
-	} else {
-		buttonClassNames = ""
-	}
-
-	const buttonClass = `button-neutral ${buttonClassNames} ${className}`
-
 	return (
 		<Base
 			onClick={onClick}
 			onMouseOver={onMouseOver}
 			disabled={disabled}
 			hotkey={hotkey}
-			className={buttonClass}
-			outline={outline}
 			title={title}
+			className={`neutral ${className}`}
+			outline={outline}
 			center={center}
 			compact={compact}
+			inverted={inverted}
 		>
 			{children}
 		</Base>

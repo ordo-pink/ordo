@@ -2,10 +2,10 @@ import "@ordo-pink/css/main.css"
 
 import { createRoot } from "react-dom/client"
 
+import { __initAchievements, __initAuth$ } from "@ordo-pink/frontend-stream-user"
 import { __initActivities, currentFID$ } from "@ordo-pink/frontend-stream-activities"
 import { ConsoleLogger } from "@ordo-pink/logger"
 import { DataCommands } from "@ordo-pink/data"
-import { __initAuth$ } from "@ordo-pink/frontend-stream-user"
 import { __initCommandPalette } from "@ordo-pink/frontend-stream-command-palette"
 import { __initCommands } from "@ordo-pink/frontend-stream-commands"
 import { __initData } from "@ordo-pink/frontend-stream-data"
@@ -39,6 +39,7 @@ __initHosts({ idHost, websiteHost, staticHost, dtHost, myHost })
 __initFetch()
 __initLogger(ConsoleLogger)
 __initCommands({ fid: APP_FID })
+__initAchievements(APP_FID)
 __initRouter(APP_FID)
 __initAuth$({ fid: APP_FID, isDev })
 __initUser$({ fid: APP_FID, idHost })

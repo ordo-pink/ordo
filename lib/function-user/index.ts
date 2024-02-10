@@ -1,55 +1,70 @@
 // SPDX-FileCopyrightText: Copyright 2024, 谢尔盖||↓ and the Ordo.pink contributors
 // SPDX-License-Identifier: MIT
 
-import { AiOutlineLogout } from "react-icons/ai"
-import { BsPersonCircle } from "react-icons/bs"
-import { lazy } from "react"
-
 import { createFunction } from "@ordo-pink/frontend-create-function"
+
+import { registerGoToAccountCommand } from "./src/commands/go-to-account.command"
+import { registerSignOutCommand } from "./src/commands/sign-out.command"
+import { registerUserActivity } from "./src/activities/user.activity"
 
 export default createFunction(
 	"pink.ordo.user",
 	{ queries: [], commands: [] },
-	({ getCommands, getHosts }) => {
+	({ getCommands, getHosts, getLogger, data }) => {
 		const commands = getCommands()
-		const { websiteHost } = getHosts()
+		const logger = getLogger()
+		const { websiteHost, staticHost } = getHosts()
 
-		commands.emit<cmd.activities.add>("activities.add", {
-			Component: lazy(() => import("./src/user.workspace") as any),
-			name: "user",
-			routes: ["/user"],
-			background: true,
-		})
+		logger.debug("Intialising...")
 
-		commands.on<cmd.user.goToAccount>("user.go-to-account", () =>
-			commands.emit<cmd.router.navigate>("router.navigate", "/user"),
-		)
+		const dropUserActivity = registerUserActivity({ commands })
+		const dropGoToAccountCmd = registerGoToAccountCommand({ commands })
+		const dropSignOutCmd = registerSignOutCommand({ commands, websiteHost })
 
-		commands.on<cmd.user.signOut>("user.sign-out", () =>
-			commands.emit<cmd.router.openExternal>("router.open-external", {
-				url: `${websiteHost}/sign-out`,
-				newTab: false,
-			}),
-		)
-
-		commands.emit<cmd.commandPalette.add>("command-palette.add", {
-			id: "user.go-to-user",
-			readableName: "Аккаунт",
-			Icon: BsPersonCircle,
-			onSelect: () => {
-				commands.emit<cmd.commandPalette.hide>("command-palette.hide")
-				commands.emit<cmd.user.goToAccount>("user.go-to-account")
+		commands.emit<cmd.achievements.add>("achievements.add", {
+			descriptor: {
+				icon: `${staticHost}/beta-participation-logo.jpg`,
+				completedAt: null,
+				description: "Зарегистрируйтесь и войдите в систему во время проведения Beta-тестирования.",
+				id: "pink.ordo.user.achievements.beta-participation",
+				title: "Участие в β",
+			},
+			subscribe: ({ grant }) => {
+				grant()
 			},
 		})
 
-		commands.emit<cmd.commandPalette.add>("command-palette.add", {
-			id: "core.sign-out",
-			readableName: "Выйти",
-			Icon: AiOutlineLogout,
-			onSelect: () => {
-				commands.emit<cmd.commandPalette.hide>("command-palette.hide")
-				commands.emit<cmd.user.signOut>("user.sign-out")
+		commands.emit<cmd.achievements.add>("achievements.add", {
+			descriptor: {
+				icon: `${staticHost}/beta-participation-logo.jpg`,
+				completedAt: null,
+				description: "Создайте 3 метки.",
+				id: "pink.ordo.user.achievements.3-labels",
+				title: "Red Label",
+			},
+			subscribe: ({ grant }) => {
+				const labels = data.getDataLabels()
+
+				if (labels.length >= 3) grant()
+
+				commands.on<cmd.data.addLabel>("data.add-label", () => {
+					const labels = data.getDataLabels()
+
+					if (labels.length >= 2) grant()
+				})
 			},
 		})
+
+		logger.debug("Initialised.")
+
+		return () => {
+			logger.debug("Terminating...")
+
+			dropUserActivity()
+			dropGoToAccountCmd()
+			dropSignOutCmd()
+
+			logger.debug("Terminated.")
+		}
 	},
 )

@@ -41,12 +41,12 @@ export default function App() {
 				),
 			)
 			.chain(() =>
-				Oath.from(() => import("@ordo-pink/function-user")).chain(f =>
+				Oath.from(() => import("@ordo-pink/function-links")).chain(f =>
 					Oath.from(async () => await f.default),
 				),
 			)
 			.chain(() =>
-				Oath.from(() => import("@ordo-pink/function-links")).chain(f =>
+				Oath.from(() => import("@ordo-pink/function-user")).chain(f =>
 					Oath.from(async () => await f.default),
 				),
 			)

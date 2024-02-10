@@ -15,10 +15,10 @@ declare global {
 	}
 
 	module Achievements {
-		type AchievementSubscriber = (
-			commands: Client.Commands.Commands,
-			actions: { update: () => void; grant: () => void },
-		) => void
+		type AchievementSubscriber = (actions: {
+			update: (previousState: AchievementDAO) => void
+			grant: () => void
+		}) => void
 
 		type CheckboxCondition = { type: "checkbox"; done: boolean; description: string }
 		type ProgressCondition = { type: "progress"; progress: Range<0, 101>; description: string }
@@ -32,13 +32,14 @@ declare global {
 		type AchievementDAO = {
 			id: string
 			title: string
+			icon: string
 			description: string
-			completedAt: number | null
-			condition: AchievementCondition | AchievementCondition[]
+			completedAt: Date | null
+			// condition: AchievementCondition | AchievementCondition[]
 		}
 
-		type Achievement = AchievementDAO & {
-			Icon: ComponentType
+		type Achievement = {
+			descriptor: AchievementDAO
 			subscribe: AchievementSubscriber
 		}
 	}
@@ -59,7 +60,7 @@ declare global {
 		}
 
 		module achievements {
-			type add = { name: "achievements.add"; payload: Achievements.Achievement[] }
+			type add = { name: "achievements.add"; payload: Achievements.Achievement }
 		}
 
 		module user {

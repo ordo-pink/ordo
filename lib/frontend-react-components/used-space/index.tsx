@@ -4,8 +4,8 @@
 import { useEffect, useState } from "react"
 
 import { Range, getPercentage } from "@ordo-pink/tau"
+import { useData, useUser } from "@ordo-pink/frontend-react-hooks"
 import { Switch } from "@ordo-pink/switch"
-import { useSharedContext } from "@ordo-pink/frontend-react-hooks"
 
 import { UsedSpaceModel } from "./used-space.model"
 import { UsedSpaceView } from "./used-space.view"
@@ -33,7 +33,8 @@ export default function UsedSpace() {
 const [initialCurrentSize, initialTotalSize] = UsedSpaceModel.empty()
 
 const useUsedSpaceModel = () => {
-	const { data, user } = useSharedContext()
+	const data = useData()
+	const user = useUser()
 
 	const [currentSize, setCurrentSize] = useState(initialCurrentSize)
 	const [totalSize, setTotalSize] = useState(initialTotalSize)

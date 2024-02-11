@@ -21,9 +21,10 @@ import { useFetch } from "@ordo-pink/frontend-fetch"
 
 import Button from "@ordo-pink/frontend-react-components/button"
 import Card from "@ordo-pink/frontend-react-components/card"
+import Heading from "@ordo-pink/frontend-react-components/heading"
+import UsedSpace from "@ordo-pink/frontend-react-components/used-space"
 
 import Achievements from "./achievements.component"
-import Heading from "@ordo-pink/frontend-react-components/heading"
 
 export default function UserWorkspace() {
 	const user = useUser()
@@ -58,22 +59,24 @@ export default function UserWorkspace() {
 			onSubmit={e => e.preventDefault()}
 			className="flex flex-col items-center space-y-4 px-2 py-4"
 		>
-			<div className="flex w-full max-w-lg items-center space-x-4">
-				<div className="flex shrink-0 cursor-pointer items-center justify-center rounded-full bg-gradient-to-tr from-sky-400 via-purple-400 to-rose-400 p-0.5 shadow-lg">
-					<img
-						src={`${staticHost}/logo.png`}
-						alt="avatar"
-						className="h-16 rounded-full bg-white md:h-20 dark:from-stone-900 dark:via-zinc-900 dark:to-neutral-900"
-						// onClick={() =>
-						// 	showModal(() => <UploadAvatarModal onAvatarChanged={handleAvatarChanged} />)
-						// }
-					/>
-				</div>
-				<div className="flex w-full max-w-md flex-col space-y-1 md:space-y-2">
-					<Heading level="2" trim styledFirstLetter>
-						{userName?.fullName || userEmail}
-					</Heading>
-					{/* <UsedSpace /> */}
+			<div className="flex size-full flex-col items-center justify-center">
+				<div className="flex w-full max-w-lg flex-col items-center space-y-4">
+					<div className="flex shrink-0 items-center justify-center rounded-full bg-gradient-to-tr from-sky-400 via-purple-400 to-rose-400 p-0.5 shadow-lg">
+						<img
+							src={`${staticHost}/logo.png`}
+							alt="avatar"
+							// onClick={() =>
+							// 	showModal(() => <UploadAvatarModal onAvatarChanged={handleAvatarChanged} />)
+							// }
+							className="h-16 rounded-full bg-white md:h-20 dark:from-stone-900 dark:via-zinc-900 dark:to-neutral-900"
+						/>
+					</div>
+					<div className="flex w-full max-w-md flex-col space-y-1 md:space-y-2">
+						<Heading level="2" trim styledFirstLetter>
+							{userName?.fullName || userEmail}
+						</Heading>
+						<UsedSpace />
+					</div>
 				</div>
 			</div>
 

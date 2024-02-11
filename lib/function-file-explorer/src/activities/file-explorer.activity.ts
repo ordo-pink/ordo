@@ -6,8 +6,8 @@ export const registerFileExplorerActivity = ({ commands }: P) => {
 	commands.emit<cmd.activities.add>("activities.add", {
 		name: "pink.ordo.file-explorer.main",
 		Component: lazy(() => import("../components/file-explorer.workspace")),
-		Sidebar: lazy(() => import("../components/file-explorer.sidebar")),
 		routes: ["/fs", "/fs/:fsid"],
+		widgets: [lazy(() => import("../components/file-explorer.widget"))],
 		background: false,
 		Icon: BsFolder2Open,
 	})

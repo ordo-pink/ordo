@@ -10,7 +10,7 @@ export const UsedSpaceView = ({
 	const tFileLimit = "Лимит файлов"
 
 	return (
-		<div className="w-full max-w-sm">
+		<div className="w-full max-w-md">
 			<div className="flex w-full items-center justify-between">
 				<div className="truncate text-xs">{tFileLimit}</div>
 				<div className="text-xs">{progress}</div>

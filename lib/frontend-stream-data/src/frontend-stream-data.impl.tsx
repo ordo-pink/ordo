@@ -3,6 +3,7 @@
 
 import {
 	BsArrowRightSquare,
+	BsFileEarmark,
 	BsLink,
 	BsNodeMinus,
 	BsNodePlus,
@@ -78,6 +79,8 @@ export const __initData = ({ fid, dataCommands }: P) => {
 
 	commands.on<cmd.data.showEditLinksPalette>("data.show-edit-links-palette", payload => {
 		const data = data$.value
+
+		if (!data) return
 
 		commands.emit<cmd.commandPalette.show>("command-palette.show", {
 			multiple: true,
@@ -298,18 +301,23 @@ export const __initData = ({ fid, dataCommands }: P) => {
 			const data = data$.value
 			const payload = params.payload as PlainData
 
+			const defaultValues =
+				payload.parent === null
+					? []
+					: [
+							{
+								id: "move-to-root",
+								readableName: "Переместить в корневую папку",
+								Icon: () => <BsSlash />,
+								onSelect: () => {
+									commands.emit<cmd.data.move>("data.move", { parent: null, fsid: payload.fsid })
+									commands.emit<cmd.modal.hide>("modal.hide")
+								},
+							},
+						]
+
 			return {
-				items: [
-					{
-						id: "move-to-root",
-						readableName: "Переместить в корневую папку",
-						Icon: () => <BsSlash />,
-						onSelect: () => {
-							commands.emit<cmd.data.move>("data.move", { parent: null, fsid: payload.fsid })
-							commands.emit<cmd.modal.hide>("modal.hide")
-						},
-					},
-				].concat(
+				items: defaultValues.concat(
 					data
 						?.filter(item => item.fsid !== payload.parent && item.fsid !== payload.fsid)
 						.map(
@@ -324,8 +332,7 @@ export const __initData = ({ fid, dataCommands }: P) => {
 										})
 										commands.emit<cmd.modal.hide>("modal.hide")
 									},
-									// Icon: () => <FileIconComponent plain={item} />,
-									Icon: () => <div>TODO</div>,
+									Icon: () => <BsFileEarmark />, // TODO: Show file or directory icon
 								}) satisfies Client.CommandPalette.Item,
 						) ?? [],
 				),

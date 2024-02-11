@@ -16,7 +16,7 @@ declare global {
 
 	module Achievements {
 		type AchievementSubscriber = (actions: {
-			update: (previousState: AchievementDAO) => void
+			update: (callback: (previousState: AchievementDAO) => AchievementDAO) => void
 			grant: () => void
 		}) => void
 
@@ -34,6 +34,7 @@ declare global {
 			title: string
 			icon: string
 			description: string
+			next?: string
 			completedAt: Date | null
 			// condition: AchievementCondition | AchievementCondition[]
 		}
@@ -114,7 +115,7 @@ declare global {
 			}
 			type create = {
 				name: "data.create"
-				payload: { name: string; parent: FSID | null; labels?: string[] }
+				payload: { name: string; parent: FSID | null; labels?: string[]; contentType?: string }
 			}
 			type remove = { name: "data.remove"; payload: PlainData }
 			type move = { name: "data.move"; payload: { fsid: FSID; parent: FSID | null } }
@@ -370,6 +371,7 @@ declare global {
 				title?: string
 				message: string
 				payload?: T
+				Icon?: ComponentType | IconType
 				duration?: number
 				action?: (id: string, payload: T) => unknown
 				actionText?: string

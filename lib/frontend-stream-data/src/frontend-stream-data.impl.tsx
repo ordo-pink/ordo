@@ -15,8 +15,8 @@ import { F, T } from "ramda"
 import { BehaviorSubject } from "rxjs/internal/BehaviorSubject"
 import { PiGraph } from "react-icons/pi"
 
-import { Data, PlainData, TDataCommands } from "@ordo-pink/data"
-import { EXTENSION_FILE_PREFIX } from "@ordo-pink/core"
+import { Data, DataRepository, PlainData, TDataCommands } from "@ordo-pink/data"
+import { EXTENSION_FILE_PREFIX, LIB_DIRECTORY_FSID } from "@ordo-pink/core"
 import { Either } from "@ordo-pink/either"
 import { KnownFunctions } from "@ordo-pink/frontend-known-functions"
 import { N } from "@ordo-pink/tau"
@@ -47,7 +47,7 @@ export const __initData = ({ fid, dataCommands }: P) => {
 
 	commands.on<cmd.data.showEditLabelsPalette>("data.show-edit-labels-palette", payload => {
 		const data = data$.value
-		const labels = Array.from(new Set(data.flatMap(item => item.labels)))
+		const labels = Array.from(new Set(data?.flatMap(item => item.labels) ?? []))
 
 		commands.emit<cmd.commandPalette.show>("command-palette.show", {
 			onNewItem: label => {
@@ -327,7 +327,7 @@ export const __initData = ({ fid, dataCommands }: P) => {
 									// Icon: () => <FileIconComponent plain={item} />,
 									Icon: () => <div>TODO</div>,
 								}) satisfies Client.CommandPalette.Item,
-						),
+						) ?? [],
 				),
 			}
 		},
@@ -361,7 +361,7 @@ export const __initData = ({ fid, dataCommands }: P) => {
 				.fork(
 					() => void 0,
 					size => {
-						const dataCopy = [...data]
+						const dataCopy = [...(data ?? [])]
 						const currentData = dataCopy.find(item => item.fsid === fsid)
 						const updated = { ...currentData!, updatedAt, size }
 
@@ -376,6 +376,7 @@ export const __initData = ({ fid, dataCommands }: P) => {
 	commands.on<cmd.data.refreshRoot>("data.refresh-root", () => {
 		const auth = auth$.value
 		const fetch = getFetch(fid)
+
 		if (!auth) return
 
 		void Oath.fromNullable(auth)
@@ -387,7 +388,7 @@ export const __initData = ({ fid, dataCommands }: P) => {
 				),
 			)
 			.chain(body => (body.success ? Oath.of(body.result) : Oath.reject(body.error as string)))
-			.fork(
+			.bitap(
 				error =>
 					commands.emit<cmd.notification.show>("notification.show", {
 						title: "Ошибка",
@@ -397,6 +398,18 @@ export const __initData = ({ fid, dataCommands }: P) => {
 					}),
 				result => data$.next(result),
 			)
+			// Create lib directory for extensions
+			.chain(data => Oath.fromNullable(DataRepository.getDataByFSID(data, LIB_DIRECTORY_FSID)))
+			.rejectedChain(() =>
+				dataCommands.create({
+					fsid: LIB_DIRECTORY_FSID,
+					name: "lib",
+					parent: null,
+					createdBy: auth.sub,
+					fileLimit: auth.fileLimit,
+				}),
+			)
+			.orNothing()
 	})
 
 	logger.debug("Initialised data.")
@@ -407,7 +420,7 @@ export const getData = (fid: symbol | null): PlainData[] | null =>
 		.chain(checkCurrentActivityQueryPermissionE)
 		.fold(N, () => data$.value)
 
-export const data$ = new BehaviorSubject<PlainData[]>([])
+export const data$ = new BehaviorSubject<PlainData[] | null>(null)
 export const content$ = new BehaviorSubject<string | ArrayBuffer | null>(null)
 
 const checkCurrentActivityQueryPermissionE = (fid: symbol) =>

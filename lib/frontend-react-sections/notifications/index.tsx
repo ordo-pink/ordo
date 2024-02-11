@@ -104,7 +104,7 @@ const NotificationComponent = ({ notification }: P) => {
 
 	return (
 		<div className="relative inset-x-0 top-0 z-50 size-full">
-			<Callout type={notification.type}>
+			<Callout type={notification.type} Icon={notification.Icon}>
 				<Heading notification={notification} />
 				<Message notification={notification} />
 

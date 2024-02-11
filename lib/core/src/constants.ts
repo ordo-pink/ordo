@@ -7,6 +7,8 @@ export const EXTENSION_FILE_PREFIX = ".ext_"
 export const ACTIVITY_BAR_WIDTH = 48
 export const SIDEBAR_WORKSPACE_GUTTER_WIDTH = 10
 
+export const LIB_DIRECTORY_FSID = "1de21bf3-2277-4d3a-bbd3-d120eb8a49d0"
+
 export const ORDO_PINK_APP_FUNCTION = "pink.ordo.app"
 
 export const ORDO_PINK_USER_FUNCTION = "pink.ordo.user"

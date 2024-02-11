@@ -36,7 +36,28 @@ export default createFunction(
 
 		commands.emit<cmd.achievements.add>("achievements.add", {
 			descriptor: {
-				icon: `${staticHost}/beta-participation-logo.jpg`,
+				icon: `${staticHost}/100-files.jpg`,
+				completedAt: null,
+				description: "Создайте 100 файлов.",
+				id: "pink.ordo.user.achievements.100-files",
+				title: "Файловый менеджер",
+			},
+			subscribe: ({ grant }) => {
+				const files = data.getData()
+
+				if (files && files.length >= 100) grant()
+
+				commands.on<cmd.data.create>("data.create", () => {
+					const files = data.getData()
+
+					if (files && files.length >= 99) grant()
+				})
+			},
+		})
+
+		commands.emit<cmd.achievements.add>("achievements.add", {
+			descriptor: {
+				icon: `${staticHost}/3-labels.jpg`,
 				completedAt: null,
 				description: "Создайте 3 метки.",
 				id: "pink.ordo.user.achievements.3-labels",

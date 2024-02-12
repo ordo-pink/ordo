@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: Copyright 2023, 谢尔盖||↓ and the Ordo.pink contributors
 // SPDX-License-Identifier: MIT
 
-import { BsPatchCheckFill, BsPatchExclamation } from "react-icons/bs"
+// import { BsPatchCheckFill, BsPatchExclamation } from "react-icons/bs"
 import { useEffect, useState } from "react"
 
 import { EmailInput, PasswordInput, TextInput } from "@ordo-pink/frontend-react-components/input"
@@ -140,9 +140,9 @@ export default function UserWorkspace() {
 							</Button.Primary>
 						</div>
 
-						<div>
+						{/* <div>
 							<EmailConfirmation confirmed={!!user?.emailConfirmed} />
-						</div>
+						</div> */}
 					</fieldset>
 				</Card>
 
@@ -318,22 +318,22 @@ export default function UserWorkspace() {
 
 // --- Internal ---
 
-type _ECP = { confirmed: boolean }
-const EmailConfirmation = ({ confirmed }: _ECP) =>
-	Either.fromBoolean(() => confirmed, EmailConfirmed).getOrElse(EmailNotConfirmed)
+// type _ECP = { confirmed: boolean }
+// const EmailConfirmation = ({ confirmed }: _ECP) =>
+// 	Either.fromBoolean(() => confirmed, EmailConfirmed).getOrElse(EmailNotConfirmed)
 
-const EmailNotConfirmed = () => (
-	<div className="flex items-center justify-center space-x-2">
-		<BsPatchExclamation className="text-rose-500" />
-		<div>
-			Email not confirmed. <button className="text-sky-500">Confirm</button>.
-		</div>
-	</div>
-)
+// const EmailNotConfirmed = () => (
+// 	<div className="flex justify-center items-center space-x-2">
+// 		<BsPatchExclamation className="text-rose-500" />
+// 		<div>
+// 			Email not confirmed. <button className="text-sky-500">Confirm</button>.
+// 		</div>
+// 	</div>
+// )
 
-const EmailConfirmed = () => (
-	<div className="flex items-center justify-center space-x-2">
-		<BsPatchCheckFill className="text-emerald-500" />
-		<div>Email confirmed.</div>
-	</div>
-)
+// const EmailConfirmed = () => (
+// 	<div className="flex justify-center items-center space-x-2">
+// 		<BsPatchCheckFill className="text-emerald-500" />
+// 		<div>Email confirmed.</div>
+// 	</div>
+// )

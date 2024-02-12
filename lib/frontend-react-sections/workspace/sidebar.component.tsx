@@ -17,6 +17,7 @@ import { sidebar$ } from "@ordo-pink/frontend-stream-sidebar"
 
 import Heading from "@ordo-pink/frontend-react-components/heading"
 import Link from "@ordo-pink/frontend-react-components/link"
+import UsedSpace from "@ordo-pink/frontend-react-components/used-space"
 
 // import Link from "next/link"
 
@@ -75,9 +76,9 @@ export default function Sidebar({ children, isNarrow }: P) {
 							</Heading>
 						)}
 					</div>
-					{/* <div>
+					<div>
 						<UsedSpace />
-					</div> */}
+					</div>
 				</div>
 			</div>
 		</div>

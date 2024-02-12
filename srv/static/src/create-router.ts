@@ -59,12 +59,14 @@ const setResponseTimeHeader =
 const setResponseBody =
 	(ctx: Context) =>
 	({ file }: Pick<StaticMiddlewareState, "file">) => {
+		ctx.res.setHeader("Access-Control-Allow-Origin", "*")
 		ctx.res.setBody(file)
 		ctx.res.setStatus(200)
 		ctx.res.setHeader("content-type", file.type)
 	}
 
 const setErrorBody = (ctx: Context) => () => {
+	ctx.res.setHeader("Access-Control-Allow-Origin", "*")
 	ctx.res.setStatus(404)
 	ctx.res.setHeader("content-type", "application/json")
 	ctx.res.setBody(JSON.stringify({ success: false, message: "Not found" }))

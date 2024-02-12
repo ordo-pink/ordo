@@ -11,8 +11,7 @@ declare global {
 
 export type News = {
 	title: string
-	shortMessage: string
 	message: string
 	date: Date
-	url: string
+	link: string
 }

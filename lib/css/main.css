@@ -95,7 +95,7 @@ SPDX-License-Identifier: MIT
 
 body {
 	font-family: "Jost", sans-serif;
-	@apply h-[100svh] bg-gradient-to-br from-neutral-50 to-neutral-100 text-neutral-800 dark:from-neutral-800 dark:to-neutral-900 dark:text-neutral-200;
+	@apply min-h-[100svh] bg-gradient-to-br from-neutral-50 to-neutral-100 text-neutral-800 dark:from-neutral-800 dark:to-neutral-900 dark:text-neutral-200;
 }
 
 a {

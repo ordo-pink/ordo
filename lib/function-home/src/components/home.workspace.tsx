@@ -25,7 +25,7 @@ export default function FileExplorerSidebar() {
 	useEffect(() => {
 		commands.emit<cmd.application.setTitle>("application.set-title", "Главная")
 
-		const updates0 = Oath.try(() => fetch(`${hosts.staticHost}/updates.json`)).chain(res =>
+		const updates0 = Oath.try(() => fetch(`${hosts.staticHost}/news.json`)).chain(res =>
 			Oath.try(() => res.json() as Promise<News[]>),
 		)
 
@@ -38,7 +38,7 @@ export default function FileExplorerSidebar() {
 
 	return (
 		<CenteredPage centerX centerY>
-			<div className="container grid grid-cols-1 gap-4 overflow-x-hidden px-8 py-12 sm:grid-cols-2 lg:grid-cols-3">
+			<div className="container grid grid-cols-1 gap-4 overflow-x-hidden px-2 py-12 sm:grid-cols-2 sm:px-8 lg:grid-cols-3">
 				<Card title="Новости">
 					<NewsSection news={news} />
 				</Card>

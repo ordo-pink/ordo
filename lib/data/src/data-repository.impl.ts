@@ -23,7 +23,9 @@ export const DataRepository = {
 
 		const parentChain = [] as PlainData[]
 
-		if (!data || !currentItem || currentItem.parent === null) return parentChain
+		if (!data || !currentItem) return parentChain
+
+		parentChain.push(currentItem)
 
 		while (currentItem && currentItem.parent !== null) {
 			const parent = data?.find(x => x.fsid === currentItem?.parent) ?? null
@@ -37,6 +39,13 @@ export const DataRepository = {
 	},
 	getDataByFSID: (data: PlainData[] | null, fsid: FSID) =>
 		DataRepository.findData(data, item => item.fsid === fsid),
+	filterDataByLabel: (data: PlainData[] | null, labels: string | string[]) => {
+		if (!Array.isArray(labels)) labels = [labels]
+
+		return DataRepository.filterData(data, item =>
+			(labels as string[]).every(label => item.labels.includes(label)),
+		)
+	},
 	filterData: (data: PlainData[] | null, selector: (data: PlainData) => boolean) =>
 		data?.filter(selector) ?? [],
 	findData: (data: PlainData[] | null, selector: (data: PlainData) => boolean) =>

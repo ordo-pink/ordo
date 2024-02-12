@@ -5,9 +5,9 @@ type P = { commands: Client.Commands.Commands }
 export const registerFileExplorerActivity = ({ commands }: P) => {
 	commands.emit<cmd.activities.add>("activities.add", {
 		name: "pink.ordo.file-explorer.main",
-		Component: lazy(() => import("../components/file-explorer.workspace")),
+		Component: lazy(() => import("../views/file-explorer.workspace")),
 		routes: ["/fs", "/fs/:fsid"],
-		widgets: [lazy(() => import("../components/file-explorer.widget"))],
+		widgets: [lazy(() => import("../views/file-explorer.widget"))],
 		background: false,
 		Icon: BsFolder2Open,
 	})

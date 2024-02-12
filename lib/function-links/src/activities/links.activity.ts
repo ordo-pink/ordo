@@ -3,9 +3,9 @@ import { lazy } from "react"
 
 type P = { commands: Client.Commands.Commands }
 export const registerLinksActivity = ({ commands }: P) => {
-	const widget = lazy(() => import("../components/links.widget"))
-	const Component = lazy(() => import("../components/links.workspace"))
-	const Sidebar = lazy(() => import("../components/links.sidebar"))
+	const widget = lazy(() => import("../views/links.widget"))
+	const Component = lazy(() => import("../views/links.workspace"))
+	const Sidebar = lazy(() => import("../views/links.sidebar"))
 
 	commands.emit<cmd.activities.add>("activities.add", {
 		name: "pink.ordo.links.main",

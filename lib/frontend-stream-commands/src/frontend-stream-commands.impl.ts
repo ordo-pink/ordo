@@ -57,7 +57,7 @@ type CmdListener<N extends Client.Commands.CommandName = Client.Commands.Command
 
 type InitCommandsParams = { fid: symbol; showCommandsWithoutHandlers?: boolean }
 export const __initCommands = callOnce(
-	({ fid, showCommandsWithoutHandlers }: InitCommandsParams) => {
+	({ fid, showCommandsWithoutHandlers = true }: InitCommandsParams) => {
 		const logger = getLogger(fid)
 
 		logger.debug("Initializing commands...")
@@ -97,7 +97,7 @@ export const __initCommands = callOnce(
 							}
 						} else {
 							showCommandsWithoutHandlers &&
-								logger.warn(
+								logger.debug(
 									`No handler found for the command "${name}". The command will stay pending until handler is registerred.`,
 								)
 						}

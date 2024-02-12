@@ -10,8 +10,8 @@ import { type PlainData } from "@ordo-pink/data"
 
 import OrdoButton from "@ordo-pink/frontend-react-components/button"
 
-import Graph2D from "./graph-2d"
-import Graph3D from "./graph-3d"
+import Graph2D from "../components/graph-2d"
+import Graph3D from "../components/graph-3d"
 
 export default function LinksWorkspace() {
 	const commands = useCommands()

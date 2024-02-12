@@ -3,7 +3,7 @@ import { Dispatch, MouseEventHandler, SetStateAction, useState } from "react"
 import { FSID, PlainData } from "@ordo-pink/data"
 import { useChildren, useCommands, useDataFromRouteFSID } from "@ordo-pink/frontend-react-hooks"
 
-import FSDataIcon from "./data-icon.component"
+import FSDataIcon from "../components/data-icon.component"
 
 export default function FileExplorerActivity() {
 	const commands = useCommands()

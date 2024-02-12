@@ -11,8 +11,8 @@ import CenteredPage from "@ordo-pink/frontend-react-components/centered-page"
 
 import { News } from "../function-home.types"
 
-import NewsSection from "./news.component"
-import Widgets from "./widgets.component"
+import NewsSection from "../components/news.component"
+import Widgets from "../components/widgets.component"
 
 export default function FileExplorerSidebar() {
 	const activities = useStrictSubscription(activities$, [])

@@ -2,9 +2,10 @@
 // SPDX-License-Identifier: MIT
 
 import type { TEither } from "@ordo-pink/either"
-import type { Validations } from "./data-validations.types"
-import type { Errors } from "./errors.impl"
+
 import type { DataError } from "./errors.types"
+import type { Errors } from "./errors.impl"
+import type { Validations } from "./data-validations.types"
 
 /**
  * Unique identifier of an FS entity.
@@ -38,15 +39,15 @@ export type TData<Properties extends Record<string, unknown> = Record<string, un
 	plain: PlainData<Properties>
 	setName: (name: string, updatedBy: UserID) => TEither<TData<Properties>, DataError>
 	setSize: (size: number, updatedBy: UserID) => TEither<TData<Properties>, DataError>
-	setParent: (
-		parent: FSID | null,
-		updatedBy: UserID,
-	) => TEither<TData<Properties>, DataError | null>
+	setParent: (parent: FSID | null, updatedBy: UserID) => TEither<TData<Properties>, DataError>
 	addLink: (link: FSID, updatedBy: UserID) => TEither<TData<Properties>, DataError>
 	removeLink: (link: FSID, updatedBy: UserID) => TEither<TData<Properties>, DataError>
 	dropLinks: (updatedBy: UserID) => TEither<TData<Properties>, DataError>
 	addLabel: (label: string | string[], updatedBy: UserID) => TEither<TData<Properties>, DataError>
-	removeLabel: (label: string, updatedBy: UserID) => TEither<TData<Properties>, DataError>
+	removeLabel: (
+		label: string | string[],
+		updatedBy: UserID,
+	) => TEither<TData<Properties>, DataError>
 	dropLabels: (updatedBy: UserID) => TEither<TData<Properties>, DataError>
 	setProperty: <K extends string, V>(
 		key: K,

@@ -7,7 +7,7 @@ import { type PlainData } from "@ordo-pink/data"
 
 import { DarkThemeColors, LightThemeColors } from "../constants"
 
-import "./graph-3d/graph-3d.css"
+import "../components/graph-3d/graph-3d.css"
 
 export default function LinksWidget() {
 	const data = useData()

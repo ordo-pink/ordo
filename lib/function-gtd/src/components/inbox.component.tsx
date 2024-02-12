@@ -1,18 +1,22 @@
 // SPDX-FileCopyrightText: Copyright 2023, 谢尔盖||↓ and the Ordo.pink contributors
 // SPDX-License-Identifier: MIT
 
-import Card from "$components/card.component"
-import { CenteredPage } from "$components/centered-page"
-import { TextInput } from "$components/input"
-import { useAccelerator } from "$hooks/use-accelerator.hook"
-import { useSharedContext } from "@ordo-pink/core"
 import { useRef, useState } from "react"
-import GTDList from "./gtd-list.component"
-import { useInbox } from "../hooks/use-inbox"
+
+import { useAccelerator, useCommands } from "@ordo-pink/frontend-react-hooks"
+
+import Card from "@ordo-pink/frontend-react-components/card"
+import CenteredPage from "@ordo-pink/frontend-react-components/centered-page"
+import { TextInput } from "@ordo-pink/frontend-react-components/input"
+
+import { useInbox } from "../hooks/use-inbox.hook"
+
+import GTDList from "./list.component"
 
 export default function GTDInbox() {
-	const { commands } = useSharedContext()
+	const commands = useCommands()
 	const items = useInbox()
+
 	const [newItem, setNewItem] = useState("")
 	const createInputRef = useRef<HTMLInputElement>(null)
 
@@ -26,6 +30,7 @@ export default function GTDInbox() {
 				<div className="flex w-full max-w-2xl flex-col space-y-4">
 					<Card className="h-[90vh]" title="Входящие">
 						<TextInput
+							autoFocus
 							forwardRef={createInputRef}
 							id="add-to-inbox"
 							label=""

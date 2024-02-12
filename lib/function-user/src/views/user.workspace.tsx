@@ -24,7 +24,7 @@ import Card from "@ordo-pink/frontend-react-components/card"
 import Heading from "@ordo-pink/frontend-react-components/heading"
 import UsedSpace from "@ordo-pink/frontend-react-components/used-space"
 
-import Achievements from "./achievements.component"
+import Achievements from "../components/achievements.component"
 
 export default function UserWorkspace() {
 	const user = useUser()

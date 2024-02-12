@@ -130,7 +130,7 @@ declare global {
 			}
 			type removeLabel = {
 				name: "data.remove-label"
-				payload: { item: PlainData; label: string }
+				payload: { item: PlainData; label: string | string[] }
 			}
 
 			type addLink = { name: "data.add-link"; payload: { item: PlainData; link: FSID } }

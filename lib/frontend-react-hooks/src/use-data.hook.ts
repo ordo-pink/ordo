@@ -34,6 +34,9 @@ export const useDataLabels = () => {
 	return Array.from(new Set(data?.flatMap(item => item.labels) ?? []))
 }
 
+export const useDataByLabel = (labels: string[]) =>
+	useSelectDataList(item => labels.every(label => item.labels.includes(label)))
+
 export const useParentChain = (fsid: FSID) => {
 	const data = useData()
 	let currentItem = useDataByFSID(fsid)

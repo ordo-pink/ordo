@@ -50,6 +50,11 @@ export default function App() {
 				),
 			)
 			.chain(() =>
+				Oath.from(() => import("@ordo-pink/function-gtd")).chain(f =>
+					Oath.from(async () => await f.default),
+				),
+			)
+			.chain(() =>
 				Oath.from(() => import("@ordo-pink/function-links")).chain(f =>
 					Oath.from(async () => await f.default),
 				),

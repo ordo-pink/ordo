@@ -47,12 +47,14 @@ export default function UserWorkspace() {
 	const [passwordErrors, setPasswordErrors] = useState<string[]>([])
 
 	useEffect(() => {
+		commands.emit<cmd.application.setTitle>("application.set-title", "Аккаунт")
+
 		Either.fromNullable(user).fold(N, user => {
 			setEmail(user.email)
 			setFirstName(user.firstName ?? "")
 			setLastName(user.lastName ?? "")
 		})
-	}, [user])
+	}, [user, commands])
 
 	return (
 		<form

@@ -1,6 +1,11 @@
 import { useEffect, useState } from "react"
 
-import { useData, useRouteParams, useWorkspaceWidth } from "@ordo-pink/frontend-react-hooks"
+import {
+	useCommands,
+	useData,
+	useRouteParams,
+	useWorkspaceWidth,
+} from "@ordo-pink/frontend-react-hooks"
 import { type PlainData } from "@ordo-pink/data"
 
 import OrdoButton from "@ordo-pink/frontend-react-components/button"
@@ -9,6 +14,7 @@ import Graph2D from "./graph-2d"
 import Graph3D from "./graph-3d"
 
 export default function LinksWorkspace() {
+	const commands = useCommands()
 	const data = useData()
 	const { label } = useRouteParams<{ label: string }>()
 	const { workspaceWidth } = useWorkspaceWidth()
@@ -19,6 +25,11 @@ export default function LinksWorkspace() {
 	const [links, setLinks] = useState<
 		{ target: string; source: string; type: "child" | "label" | "link" }[]
 	>([])
+
+	useEffect(() => {
+		const title = label ? `Граф связей для метки #${label}` : "Граф связей"
+		commands.emit<cmd.application.setTitle>("application.set-title", title)
+	}, [label, commands])
 
 	useEffect(() => {
 		if (!data) return

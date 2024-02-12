@@ -46,6 +46,10 @@ declare global {
 	}
 
 	module cmd {
+		module application {
+			type setTitle = { name: "application.set-title"; payload: string }
+		}
+
 		module background {
 			type setStatus = { name: "background-task.set-status"; payload: BackgroundTaskStatus }
 			type startSaving = { name: "background-task.start-saving" }

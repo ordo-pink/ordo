@@ -1,6 +1,12 @@
 import { ErrorInfo, useEffect } from "react"
+import Helmet from "react-helmet"
 
-import { useCommands, useLogger, useSubscription } from "@ordo-pink/frontend-react-hooks"
+import {
+	useCommands,
+	useLogger,
+	useStrictSubscription,
+	useSubscription,
+} from "@ordo-pink/frontend-react-hooks"
 import { Either } from "@ordo-pink/either"
 import { Oath } from "@ordo-pink/oath"
 import { currentActivity$ } from "@ordo-pink/frontend-stream-activities"
@@ -14,12 +20,15 @@ import Loading from "@ordo-pink/frontend-react-components/loading-page"
 import Modal from "@ordo-pink/frontend-react-sections/modal"
 import Notifications from "@ordo-pink/frontend-react-sections/notifications"
 import Workspace from "@ordo-pink/frontend-react-sections/workspace"
+import { title$ } from "@ordo-pink/frontend-stream-title"
 
 // TODO: Take import source from ENV
 export default function App() {
 	const commands = useCommands()
 	const currentActivity = useSubscription(currentActivity$)
 	const logger = useLogger()
+
+	const title = useStrictSubscription(title$, "Ordo.pink")
 
 	useAppInit()
 
@@ -59,6 +68,10 @@ export default function App() {
 
 	return Either.fromNullable(currentActivity).fold(Loading, () => (
 		<ErrorBoundary logError={logError} fallback={<Fallback />}>
+			<Helmet>
+				<title>{title}</title>
+			</Helmet>
+
 			<div className="flex">
 				<ActivityBar />
 				<Workspace />

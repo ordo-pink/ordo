@@ -22,6 +22,7 @@ import { ClientContentPersistenceStrategy } from "./persistence-strategies/conte
 import { ClientDataPersistenceStrategy } from "./persistence-strategies/data.persistence-strategy"
 
 import App from "./app"
+import { __initTitle } from "@ordo-pink/frontend-stream-title"
 
 currentFID$.next(APP_FID)
 
@@ -43,6 +44,7 @@ const main = () => {
 	__initFetch()
 	__initLogger(logger)
 	__initCommands({ fid: APP_FID })
+	__initTitle(APP_FID)
 	__initAuth$({ fid: APP_FID, isDev })
 	__initUser$({ fid: APP_FID, idHost })
 	__initData({ fid: APP_FID, dataCommands })

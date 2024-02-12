@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react"
 
-import { useHosts, useStrictSubscription } from "@ordo-pink/frontend-react-hooks"
+import { useCommands, useHosts, useStrictSubscription } from "@ordo-pink/frontend-react-hooks"
 import { Oath } from "@ordo-pink/oath"
 import { activities$ } from "@ordo-pink/frontend-stream-activities"
 import { noop } from "@ordo-pink/tau"
@@ -18,10 +18,13 @@ export default function FileExplorerSidebar() {
 	const activities = useStrictSubscription(activities$, [])
 	const fetch = useFetch()
 	const hosts = useHosts()
+	const commands = useCommands()
 
 	const [news, setNews] = useState<News[] | null>(null)
 
 	useEffect(() => {
+		commands.emit<cmd.application.setTitle>("application.set-title", "Главная")
+
 		const updates0 = Oath.try(() => fetch(`${hosts.staticHost}/updates.json`)).chain(res =>
 			Oath.try(() => res.json() as Promise<News[]>),
 		)
@@ -31,7 +34,7 @@ export default function FileExplorerSidebar() {
 		return () => {
 			updates0.cancel()
 		}
-	}, [fetch, hosts.staticHost])
+	}, [fetch, hosts.staticHost, commands])
 
 	return (
 		<CenteredPage centerX centerY>

@@ -8,6 +8,7 @@ import { registerGoToHomeCommand } from "./src/commands/go-to-home.command"
 import { registerHomeActivity } from "./src/activities/home.activity"
 
 import "./src/function-home.types"
+import { registerSupportCommand } from "./src/commands/support.command"
 
 export default createFunction(
 	ORDO_PINK_HOME_FUNCTION,
@@ -19,6 +20,7 @@ export default createFunction(
 		logger.debug("Initialising...")
 
 		const dropGoToHomeCmd = registerGoToHomeCommand({ commands })
+		const dropSupportCmd = registerSupportCommand({ commands })
 		const dropHomeActivity = registerHomeActivity({ commands })
 
 		logger.debug("Initialised.")
@@ -27,6 +29,7 @@ export default createFunction(
 			logger.debug("Terminating...")
 
 			dropHomeActivity()
+			dropSupportCmd()
 			dropGoToHomeCmd()
 
 			logger.debug("Terminated.")

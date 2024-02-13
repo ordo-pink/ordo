@@ -8,7 +8,7 @@ export const DarkThemeColors = {
 
 export const LightThemeColors = {
 	LABEL_LINK: "#8b5cf6",
-	LABEL_NODE: "#2e1065",
+	LABEL_NODE: "#ec4899",
 	CHILD_LINK: "#262626",
 	CHILD_NODE: "#171717",
 	LINK: "#ea580c",

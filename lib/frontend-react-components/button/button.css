@@ -1,5 +1,5 @@
 .button {
-	@apply flex max-w-xs shrink-0 cursor-pointer items-center space-x-2 self-end rounded-md border px-6 py-[0.2rem] transition-all duration-300 hover:ring-2 hover:ring-pink-300 focus:ring-2 focus:ring-pink-300 disabled:cursor-not-allowed disabled:!border-neutral-500 disabled:bg-neutral-500 disabled:ring-0 dark:hover:ring-pink-500 dark:focus:ring-pink-500;
+	@apply flex max-w-xs shrink-0 cursor-pointer items-center space-x-2 self-end rounded-md border px-6 py-[0.2rem] transition-all duration-300 hover:ring-2 hover:ring-pink-300 focus:ring-2 focus:ring-pink-300 disabled:cursor-not-allowed disabled:!border-neutral-400 disabled:!bg-neutral-400 disabled:ring-0 dark:hover:ring-pink-500 dark:focus:ring-pink-500;
 }
 
 .button-accelerator {

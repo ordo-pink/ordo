@@ -40,7 +40,11 @@ export const __initAchievements = callOnce(({ fid, dataCommands }: P) => {
 								dataCommands
 									.getContent({ fsid: data.fsid, createdBy: user.id })
 									.chain(str =>
-										Oath.try(() => JSON.parse(str as string) as Achievements.AchievementDAO[]),
+										Oath.try(() => JSON.parse(str as string)).chain(result =>
+											result.error
+												? Oath.reject()
+												: Oath.resolve(result as Achievements.AchievementDAO[]),
+										),
 									)
 									.fix(() => [] as Achievements.AchievementDAO[])
 									.map(initialAchievements => {
@@ -65,7 +69,11 @@ export const __initAchievements = callOnce(({ fid, dataCommands }: P) => {
 												thisAchievement.completedAt = new Date()
 												achievements$.next(achievements)
 
-												const content = JSON.stringify(achievements?.filter(Boolean))
+												if (!achievements) return
+
+												const content = JSON.stringify(
+													achievements.filter(ach => !!ach.completedAt),
+												)
 
 												void dataCommands
 													.uploadContent({

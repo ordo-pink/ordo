@@ -5,7 +5,7 @@ import type { ComponentType, LazyExoticComponent, MouseEvent } from "react"
 import type { IconType } from "react-icons"
 
 import type { FSID, PlainData } from "@ordo-pink/data"
-import type { Range, UUIDv4 } from "@ordo-pink/tau"
+import type { UUIDv4 } from "@ordo-pink/tau"
 
 import type { BackgroundTaskStatus } from "./constants"
 
@@ -20,23 +20,16 @@ declare global {
 			grant: () => void
 		}) => void
 
-		type CheckboxCondition = { type: "checkbox"; done: boolean; description: string }
-		type ProgressCondition = { type: "progress"; progress: Range<0, 101>; description: string }
-		type AchievementListCondition = {
-			type: "achievement-list"
-			achievements: string[]
-			description?: string
-		}
-		type AchievementCondition = CheckboxCondition | ProgressCondition | AchievementListCondition
+		type AchievementCategory = "collection" | "challenge" | "legacy"
 
 		type AchievementDAO = {
 			id: string
 			title: string
 			icon: string
 			description: string
-			next?: string
+			previous?: string
 			completedAt: Date | null
-			// condition: AchievementCondition | AchievementCondition[]
+			category: AchievementCategory
 		}
 
 		type Achievement = {

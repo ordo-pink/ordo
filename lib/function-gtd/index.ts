@@ -4,6 +4,7 @@
 import { ORDO_PINK_GTD_FUNCTION } from "@ordo-pink/core"
 import { createFunction } from "@ordo-pink/frontend-create-function"
 
+import { registerAchievements } from "./src/achievements/gtd.achievements"
 import { registerAddToProjectsCmd } from "./src/commands/add-to-projects.command"
 import { registerGTDActivity } from "./src/activities/gtd.activity"
 import { registerMarkDoneCmd } from "./src/commands/mark-done.command"
@@ -16,9 +17,10 @@ import { registerShowQuickReminderModalCmd } from "./src/commands/show-quick-rem
 export default createFunction(
 	ORDO_PINK_GTD_FUNCTION,
 	{ queries: [], commands: [] },
-	({ getLogger, getCommands, data }) => {
+	({ getLogger, getCommands, data, getHosts }) => {
 		const commands = getCommands()
 		const logger = getLogger()
+		const { staticHost } = getHosts()
 
 		logger.debug("Initialising...")
 
@@ -30,6 +32,8 @@ export default createFunction(
 		const dropAddToProjectsCmd = registerAddToProjectsCmd({ commands, data })
 		const dropRemoveFromProjectsCmd = registerRemoveFromProjectsCmd({ commands, data })
 		const dropShowQuickReminderModalCmd = registerShowQuickReminderModalCmd({ commands })
+
+		registerAchievements({ commands, data, staticHost })
 
 		logger.debug("Initialised.")
 

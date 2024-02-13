@@ -8,15 +8,31 @@ import Achievement from "./achievement.component"
 export default function Achievements() {
 	const achievements = useStrictSubscription(achievements$, [])
 
+	const visibleAchievements = achievements
+		.filter(ach => {
+			const previous = achievements.find(item => item.id === ach.previous)
+			const next = achievements.find(item => item.previous === ach.id)
+
+			// Show achievement since it's not in an achievement chain
+			if (!next && !previous) return true
+			// Hide achievement since previous steps were not completed
+			if (previous && !previous.completedAt) return false
+			// Show achievement since it's a current achievement to be obtained in the chain
+			if (previous && previous.completedAt && !ach.completedAt) return true
+			// Show achievement since it's the most recent achievement in the chain obtained by the user
+			if (next && !next.completedAt && ach.completedAt) return true
+
+			return false
+		})
+		.sort((a, b) =>
+			!a.completedAt ? 1 : !b.completedAt ? -1 : a.completedAt > b.completedAt ? -1 : 1,
+		)
+
 	return (
 		<Card title="Достижения" className="md:col-span-2">
-			{achievements
-				.sort((a, b) =>
-					!a.completedAt ? 1 : !b.completedAt ? -1 : a.completedAt > b.completedAt ? -1 : 1,
-				)
-				.map(achievement => (
-					<Achievement key={achievement.id} achievement={achievement} />
-				))}
+			{visibleAchievements.map(achievement => (
+				<Achievement key={achievement.id} achievement={achievement} />
+			))}
 		</Card>
 	)
 }

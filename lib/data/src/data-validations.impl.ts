@@ -10,8 +10,8 @@ import { type Validations } from "./data-validations.types"
 
 export const validations: Validations = {
 	isValidDataE: x =>
-		validations
-			.isValidFsidE(x.fsid)
+		Either.fromBoolean(() => isObject(x))
+			.chain(() => validations.isValidFsidE(x.fsid))
 			.chain(() => validations.isValidParentE(x.parent))
 			.chain(() => validations.isValidNameE(x.name))
 			.chain(() => validations.isValidSizeE(x.size))

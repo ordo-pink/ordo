@@ -346,7 +346,7 @@ export const __initData = ({ fid, dataCommands }: P) => {
 		if (!auth) return
 
 		void dataCommands.getContent({ createdBy: auth.sub, fsid }).fork(
-			() => void 0,
+			() => content$.next(null),
 			value => content$.next(value),
 		)
 	})

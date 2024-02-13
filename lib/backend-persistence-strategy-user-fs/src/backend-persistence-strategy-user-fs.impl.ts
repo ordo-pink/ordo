@@ -39,4 +39,4 @@ const of = (path: string): UserPersistenceStrategy => ({
 		),
 })
 
-export const FSUserRepository = { of }
+export const PersistenceStrategyUserFS = { of }

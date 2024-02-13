@@ -11,7 +11,10 @@ import { getFetch } from "@ordo-pink/frontend-fetch"
 import { getHosts } from "@ordo-pink/frontend-react-hooks"
 
 const of = (fid: symbol): DataPersistenceStrategy => ({
-	count: () => Oath.of(data$.value.length),
+	count: () =>
+		Oath.fromNullable(data$.value)
+			.map(data => data.length)
+			.fix(() => 0),
 	create: plain => {
 		const commands = getCommands(fid)
 		const hosts = getHosts()

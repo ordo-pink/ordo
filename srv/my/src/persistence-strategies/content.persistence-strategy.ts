@@ -33,7 +33,9 @@ const of = (fid: symbol): ContentPersistenceStrategy<any> => ({
 							"content-type": "application/json",
 							authorization: `Bearer ${auth.accessToken}`,
 						},
-					}).then(res => res.text()),
+					}).then(res =>
+						res.status === 200 ? res.text() : res.json().then(res => Promise.reject(res.error)),
+					),
 				).rejectedMap(UnexpectedError),
 			)
 			.bitap(

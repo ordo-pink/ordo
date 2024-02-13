@@ -10,6 +10,8 @@ export default defineConfig({
 
 	build: {
 		outDir: "../../var/out/my",
+		cssMinify: true,
+		minify: true,
 	},
 	server: {
 		port: Number(process.env.ORDO_WORKSPACE_PORT),

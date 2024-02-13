@@ -23,5 +23,6 @@ void runCommand0("npm run build", {
 		VITE_ORDO_WEBSITE_HOST: ORDO_WEB_HOST,
 		VITE_ORDO_DT_HOST: ORDO_DT_HOST,
 		VITE_ORDO_WORKSPACE_HOST: ORDO_WORKSPACE_HOST,
+		NODE_ENV: "production",
 	},
 }).orElse(die())

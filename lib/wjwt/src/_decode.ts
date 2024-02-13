@@ -2,9 +2,10 @@
 // SPDX-License-Identifier: MIT
 
 import { Oath } from "@ordo-pink/oath"
+import { isString } from "@ordo-pink/tau"
+
 import { Rrr } from "./wjwt.constants"
 import { WJWTDecodeFn } from "./wjwt.types"
-import { isString } from "@ordo-pink/tau"
 
 export const decode0: WJWTDecodeFn = token =>
 	Oath.fromNullable(token)

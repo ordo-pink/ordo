@@ -6,11 +6,12 @@
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 import { Middleware } from "koa"
-import { Switch } from "@ordo-pink/switch"
-import { lte } from "ramda"
-import { Logger } from "@ordo-pink/logger"
 import chalk from "chalk"
-import { Context, Gear, Gear as RoutaryMiddleware } from "@ordo-pink/routary"
+import { lte } from "ramda"
+
+import { Context } from "@ordo-pink/routary"
+import { Logger } from "@ordo-pink/logger"
+import { Switch } from "@ordo-pink/switch"
 
 export type LogRequestOptions = {
 	logger: Logger

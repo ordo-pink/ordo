@@ -41,7 +41,7 @@ export default function GTDWidget() {
 	}
 
 	return (
-		<div className="flex w-full max-w-lg flex-col items-start space-y-4 p-4">
+		<div className="flex size-full max-w-lg flex-col items-center justify-center space-y-4 p-4">
 			<div className="flex w-full flex-col items-center justify-center space-y-4 pb-4 text-neutral-500">
 				<InboxStatus inboxChildren={inbox} />
 			</div>

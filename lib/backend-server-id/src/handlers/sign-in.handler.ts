@@ -5,14 +5,15 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-import type { Middleware } from "koa"
-import type { TTokenService } from "@ordo-pink/backend-service-token"
-import type { UserService } from "@ordo-pink/backend-service-user"
-import { sendError, parseBody0 } from "@ordo-pink/backend-utils"
-import { Oath } from "@ordo-pink/oath"
+import { type Middleware } from "koa"
 import { prop } from "ramda"
+
+import { parseBody0, sendError } from "@ordo-pink/backend-utils"
 import { HttpError } from "@ordo-pink/rrr"
-import { TNotificationService } from "@ordo-pink/backend-service-offline-notifications"
+import { Oath } from "@ordo-pink/oath"
+import { type TNotificationService } from "@ordo-pink/backend-service-offline-notifications"
+import { type TTokenService } from "@ordo-pink/backend-service-token"
+import { type UserService } from "@ordo-pink/backend-service-user"
 
 // --- Public ---
 
@@ -50,11 +51,11 @@ export const handleSignIn: Fn =
 									.tap(expires => {
 										ctx.response.set(
 											"Set-Cookie",
-											`jti=${tokens.jti}; Expires=${expires}; SameSite=Lax; Path=/; HttpOnly;`,
+											`jti=${tokens.jti}; Expires=${expires.toISOString()}; SameSite=Lax; Path=/; HttpOnly;`,
 										)
 										ctx.response.set(
 											"Set-Cookie",
-											`sub=${tokens.sub}; Expires=${expires}; SameSite=Lax; Path=/; HttpOnly;`,
+											`sub=${tokens.sub}; Expires=${expires.toISOString()}; SameSite=Lax; Path=/; HttpOnly;`,
 										)
 									})
 									.map(expires => ({
@@ -72,7 +73,7 @@ export const handleSignIn: Fn =
 						notificationService.sendSignInNotification({
 							email: user.email,
 							name: user.firstName ?? "",
-							ip: ctx.request.ip,
+							ip: ctx.get("x-forwarded-for") ?? ctx.request.ip,
 						}),
 					),
 			)

@@ -6,11 +6,12 @@
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 import type { Middleware } from "koa"
+import { prop } from "ramda"
+
+import { authenticate0, sendError } from "@ordo-pink/backend-utils"
+import { HttpError } from "@ordo-pink/rrr"
 import type { TTokenService } from "@ordo-pink/backend-service-token"
 import type { UserService } from "@ordo-pink/backend-service-user"
-import { prop } from "ramda"
-import { sendError, authenticate0 } from "@ordo-pink/backend-utils"
-import { HttpError } from "@ordo-pink/rrr"
 
 type Params = { tokenService: TTokenService; userService: UserService }
 type Fn = (params: Params) => Middleware
@@ -23,5 +24,5 @@ export const handleAccount: Fn =
 			.map(prop("sub"))
 			.chain(id => userService.getById(id).rejectedMap(() => HttpError.NotFound("User not found")))
 			.fork(sendError(ctx), result => {
-				ctx.response.body = { success: true, result }
+				ctx.response.body = { success: true, result: { ...result, code: undefined } }
 			})

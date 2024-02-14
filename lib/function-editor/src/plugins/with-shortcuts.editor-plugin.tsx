@@ -34,7 +34,7 @@ export type BulletedListElement = {
 	children: OrdoDescendant[]
 }
 
-export const withShortcuts = (editor: ReactEditor) => {
+export const withShortcuts = <T extends ReactEditor>(editor: T): T => {
 	const { deleteBackward, insertText } = editor
 
 	editor.insertText = text => {

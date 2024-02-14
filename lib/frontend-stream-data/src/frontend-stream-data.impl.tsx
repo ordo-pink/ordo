@@ -16,7 +16,7 @@ import { F, T } from "ramda"
 import { BehaviorSubject } from "rxjs/internal/BehaviorSubject"
 import { PiGraph } from "react-icons/pi"
 
-import { Data, DataRepository, PlainData, TDataCommands } from "@ordo-pink/data"
+import { Data, DataRepository, FSID, PlainData, TDataCommands } from "@ordo-pink/data"
 import { EXTENSION_FILE_PREFIX, LIB_DIRECTORY_FSID } from "@ordo-pink/core"
 import { Either } from "@ordo-pink/either"
 import { KnownFunctions } from "@ordo-pink/frontend-known-functions"
@@ -341,14 +341,23 @@ export const __initData = ({ fid, dataCommands }: P) => {
 		type: "update",
 	})
 
-	commands.on<cmd.data.getFileContent>("data.get-content", ({ fsid }) => {
-		const auth = auth$.value
-		if (!auth) return
+	commands.on<cmd.data.getContent>("data.get-content", fsid => {
+		void Oath.fromNullable(auth$.value)
+			.chain(({ sub }) =>
+				Oath.of(content$.value).chain(content =>
+					dataCommands
+						.getContent({ createdBy: sub, fsid })
+						.map(data => content$.next({ ...content, [fsid]: data })),
+				),
+			)
+			.orElse(() => content$.next({ ...content$.value, [fsid]: null }))
+	})
 
-		void dataCommands.getContent({ createdBy: auth.sub, fsid }).fork(
-			() => content$.next(null),
-			value => content$.next(value),
-		)
+	commands.on<cmd.data.dropContent>("data.drop-content", fsid => {
+		const contentCopy = content$.getValue()
+		contentCopy[fsid] = null
+
+		content$.next(contentCopy)
 	})
 
 	commands.on<cmd.data.setContent>(
@@ -428,7 +437,7 @@ export const getData = (fid: symbol | null): PlainData[] | null =>
 		.fold(N, () => data$.value)
 
 export const data$ = new BehaviorSubject<PlainData[] | null>(null)
-export const content$ = new BehaviorSubject<string | ArrayBuffer | null>(null)
+export const content$ = new BehaviorSubject<Record<FSID, string | ArrayBuffer | null>>({})
 
 const checkCurrentActivityQueryPermissionE = (fid: symbol) =>
 	Either.fromBoolean(

@@ -13,6 +13,10 @@ export default function EditableTitle({ data }: P) {
 	const [title, setTitle] = useState(data.name)
 
 	useEffect(() => {
+		setTitle(data.name)
+	}, [data.name])
+
+	useEffect(() => {
 		const subscription = debounceSave$.subscribe(({ fsid, value }) => {
 			commands.emit<cmd.data.rename>("data.rename", { fsid, name: value })
 		})
@@ -30,7 +34,7 @@ export default function EditableTitle({ data }: P) {
 
 	return (
 		<textarea
-			className="w-full resize-none overflow-hidden border-0 bg-transparent p-0 font-mono text-3xl font-bold focus:ring-0"
+			className="overflow-hidden p-0 w-full font-mono text-3xl font-bold bg-transparent border-0 resize-none focus:ring-0"
 			value={title}
 			cols={34}
 			rows={Math.ceil(title.length / 34)}

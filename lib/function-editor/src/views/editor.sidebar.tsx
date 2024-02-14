@@ -45,8 +45,8 @@ export default function EditorSidebar() {
 	}, [data, data.length, isNestingEnabled])
 
 	return Either.fromNullable(visibleItems).fold(Loading, data => (
-		<div className="h-full p-1">
-			<div className="flex items-center justify-center space-x-4 pb-4">
+		<div className="p-1 h-full">
+			<div className="flex justify-center items-center pb-4 space-x-4">
 				<OrdoButton.Primary onClick={() => setIsNestingEnables(true)} inverted={!isNestingEnabled}>
 					<BsListNested />
 				</OrdoButton.Primary>

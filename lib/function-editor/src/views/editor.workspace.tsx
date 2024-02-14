@@ -1,16 +1,7 @@
 // SPDX-FileCopyrightText: Copyright 2023, 谢尔盖||↓ and the Ordo.pink contributors
 // SPDX-License-Identifier: MIT
 
-import {
-	Descendant,
-	Editor,
-	Node,
-	Point,
-	Range,
-	Element as SlateElement,
-	Transforms,
-	createEditor,
-} from "slate"
+import { Descendant, Editor, Node, Element as SlateElement, Transforms, createEditor } from "slate"
 import {
 	Editable,
 	ReactEditor,
@@ -20,8 +11,10 @@ import {
 	useSlateStatic,
 	withReact,
 } from "slate-react"
-import { KeyboardEvent, useCallback, useEffect, useMemo } from "react"
-import { Subject, debounce, timer } from "rxjs"
+import { KeyboardEvent, useCallback, useEffect, useMemo, useState } from "react"
+import { Subject } from "rxjs/internal/Subject"
+import { debounce } from "rxjs/operators"
+import { timer } from "rxjs/internal/observable/timer"
 import { withHistory } from "slate-history"
 
 import {
@@ -34,69 +27,51 @@ import { Either } from "@ordo-pink/either"
 import { FSID } from "@ordo-pink/data"
 import { Switch } from "@ordo-pink/switch"
 
-import CenteredPage from "@ordo-pink/frontend-react-components/centered-page"
+import Loading from "@ordo-pink/frontend-react-components/loading-page"
 
-import { OrdoElement } from "../editor.types"
-import { isOrdoElement } from "../guards/is-ordo-element.guard"
-import { withShortcuts } from "../plugins/with-shortcuts.editor-plugin"
-
+import { EMPTY_EDITOR_CHILDREN, SHORTCUTS } from "../editor.constants"
 import DataEditor from "../components/data-editor.component"
 import EditableTitle from "../components/editable-title.component"
+import { withChecklists } from "../plugins/with-checklists.editor-plugin"
+import { withShortcuts } from "../plugins/with-shortcuts.editor-plugin"
+
 import HoveringToolbar from "../components/hovering-toolbar.component"
-
-const SHORTCUTS = {
-	"*": "list-item",
-	"-": "list-item",
-	"+": "list-item",
-	"1": "number-list-item",
-	"2": "number-list-item",
-	"3": "number-list-item",
-	"4": "number-list-item",
-	"5": "number-list-item",
-	"6": "number-list-item",
-	"7": "number-list-item",
-	"8": "number-list-item",
-	"9": "number-list-item",
-	"0": "number-list-item",
-	">": "block-quote",
-	"#": "heading-1",
-	"##": "heading-2",
-	"###": "heading-3",
-	"####": "heading-4",
-	"#####": "heading-5",
-}
-
-const isMarkActive = (editor: ReactEditor, format: string) => {
-	const marks = Editor.marks(editor) as any
-	return marks ? marks[format] === true : false
-}
-
-const toggleMark = (editor: ReactEditor, format: string) => {
-	const isActive = isMarkActive(editor, format)
-
-	if (isActive) {
-		Editor.removeMark(editor, format)
-	} else {
-		Editor.addMark(editor, format, true)
-	}
-}
 
 // ---
 
 export default function EditorWorkspace() {
 	const { fsid } = useRouteParams<{ fsid: FSID }>()
 
-	const commands = useCommands()
 	const data = useDataByFSID(fsid)
 	const content = useContent(fsid)
 
-	const editorContent = deserialize(content)
+	const [initialState, setInitialState] = useState<Descendant[] | null | "empty">(null)
+
+	useEffect(() => {
+		if (!data) return void setInitialState(null)
+		if (data.size === 0) return void setInitialState("empty")
+		if (!content) return void setInitialState(null)
+
+		setInitialState(JSON.parse(content as string))
+
+		return () => void setInitialState(null)
+	}, [data, content])
+
+	const commands = useCommands()
 
 	const editor = useMemo(
 		() => withShortcuts(withChecklists(withHistory(withReact(createEditor())))),
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-		[fsid],
+		[],
 	)
+
+	useEffect(() => {
+		if (initialState === "empty") {
+			editor.children = EMPTY_EDITOR_CHILDREN
+			const point = { path: [0, 0], offset: 0 }
+			editor.selection = { anchor: point, focus: point }
+			editor.history = { undos: [], redos: [] }
+		}
+	}, [editor, initialState])
 
 	const renderElement = useCallback((props: any) => <Element {...props} />, [])
 	const renderLeaf = useCallback((props: any) => <Leaf {...props} />, [])
@@ -180,31 +155,32 @@ export default function EditorWorkspace() {
 	}, [commands])
 
 	return Either.fromNullable(data)
-		.chain(data => Either.fromNullable(editorContent).map(content => ({ data, content })))
-		.fold(EmptyEditor, ({ data, content }) => (
-			<div className="flex size-full flex-col items-center p-2 py-12">
-				<div className="flex w-full max-w-xl flex-col space-y-6">
+		.chain(data => Either.fromNullable(initialState).map(initialState => ({ data, initialState })))
+		.fold(Loading, ({ data, initialState }) => (
+			<div className="flex flex-col items-center p-2 py-12 size-full">
+				<div className="flex flex-col space-y-6 w-full max-w-xl">
 					<div>
 						<EditableTitle data={data} />
 					</div>
 
-					<DataEditor data={data} />
+					<DataEditor key={data.fsid} data={data} />
 
 					<Slate
 						editor={editor}
-						initialValue={content}
+						initialValue={initialState === "empty" ? EMPTY_EDITOR_CHILDREN : initialState}
 						onChange={(value: Descendant[]) => {
 							const isAstChange = editor.operations.some(op => "set_selection" !== op.type)
 
-							if (!isAstChange || !fsid) return
+							if (!isAstChange || !data.fsid) return
 
-							save$.next({ fsid, value })
+							commands.emit<cmd.background.startSaving>("background-task.start-saving")
+
+							save$.next({ fsid: data.fsid, value })
 						}}
 					>
 						<HoveringToolbar />
 						<Editable
 							spellCheck
-							autoFocus
 							className="pb-96 outline-none"
 							placeholder="Пора начинать..."
 							renderLeaf={renderLeaf}
@@ -236,68 +212,12 @@ export default function EditorWorkspace() {
 		))
 }
 
-const EmptyEditor = () => {
-	return (
-		<CenteredPage centerX centerY>
-			<div className="px-12">
-				Здесь будет редактор файла, если этот самый файл выбрать в сайдбаре слева.
-			</div>
-		</CenteredPage>
-	)
-}
-
 // --- Internal ---
 
 const save$ = new Subject<{ fsid: FSID; value: Descendant[] }>()
 const debounceSave$ = save$.pipe(debounce(() => timer(1000)))
 
 const serialize = (value: Descendant[]) => JSON.stringify(value)
-const deserialize = (string: string | ArrayBuffer | null): Descendant[] | null =>
-	Either.fromNullable(string)
-		.chain(str => Either.try(() => JSON.parse(str as string)))
-		.fold(
-			() => null,
-			x => x as Descendant[],
-		)
-
-const withChecklists = (editor: ReactEditor) => {
-	const { deleteBackward } = editor
-
-	editor.deleteBackward = (...args) => {
-		const { selection } = editor
-
-		if (selection && Range.isCollapsed(selection)) {
-			const nodes = Editor.nodes(editor, {
-				match: node =>
-					!Editor.isEditor(node) && isOrdoElement(node) && node.type === "check-list-item",
-			})
-
-			const match = nodes.next().value
-
-			if (match) {
-				const [, path] = match
-				const start = Editor.start(editor, path)
-
-				if (Point.equals(selection.anchor, start)) {
-					const newProperties: Partial<OrdoElement> = {
-						type: "paragraph",
-					}
-
-					Transforms.setNodes(editor, newProperties, {
-						match: node =>
-							!Editor.isEditor(node) && isOrdoElement(node) && node.type === "check-list-item",
-					})
-
-					return editor
-				}
-			}
-		}
-
-		deleteBackward(...args)
-	}
-
-	return editor
-}
 
 const Leaf = ({ attributes, children, leaf }: any) => {
 	if (leaf.bold) children = <strong>{children}</strong>
@@ -359,7 +279,7 @@ const CheckListItemElement = ({ attributes, children, element }: RenderElementPr
 			<span contentEditable={false} className="mr-3">
 				<input
 					type="checkbox"
-					className="size-6 cursor-pointer rounded-sm bg-neutral-200 text-emerald-500 focus:ring-0 dark:bg-neutral-500"
+					className="text-emerald-500 rounded-sm cursor-pointer size-6 bg-neutral-200 focus:ring-0 dark:bg-neutral-500"
 					checked={(element as any)?.checked}
 					onChange={event => {
 						const path = ReactEditor.findPath(editor, element)
@@ -382,4 +302,19 @@ const CheckListItemElement = ({ attributes, children, element }: RenderElementPr
 			</span>
 		</div>
 	)
+}
+
+const isMarkActive = (editor: ReactEditor, format: string) => {
+	const marks = Editor.marks(editor) as any
+	return marks ? marks[format] === true : false
+}
+
+const toggleMark = (editor: ReactEditor, format: string) => {
+	const isActive = isMarkActive(editor, format)
+
+	if (isActive) {
+		Editor.removeMark(editor, format)
+	} else {
+		Editor.addMark(editor, format, true)
+	}
 }

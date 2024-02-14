@@ -88,7 +88,8 @@ declare global {
 
 		module data {
 			type refreshRoot = { name: "data.refresh-root" }
-			type getFileContent = { name: "data.get-content"; payload: { fsid: FSID } }
+			type getContent = { name: "data.get-content"; payload: FSID }
+			type dropContent = { name: "data.drop-content"; payload: FSID }
 			type showUploadModal = { name: "data.show-upload-modal"; payload: PlainData | null }
 			type showCreateModal = { name: "data.show-create-modal"; payload: PlainData | null }
 			type showRemoveModal = { name: "data.show-remove-modal"; payload: PlainData }

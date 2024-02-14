@@ -13,7 +13,7 @@ import {
 } from "slate-react"
 import { KeyboardEvent, useCallback, useEffect, useMemo, useState } from "react"
 import { Subject } from "rxjs/internal/Subject"
-import { debounce } from "rxjs/operators"
+import { debounce } from "rxjs/internal/operators/debounce"
 import { timer } from "rxjs/internal/observable/timer"
 import { withHistory } from "slate-history"
 
@@ -27,7 +27,7 @@ import { Either } from "@ordo-pink/either"
 import { FSID } from "@ordo-pink/data"
 import { Switch } from "@ordo-pink/switch"
 
-import Loading from "@ordo-pink/frontend-react-components/loading-page"
+import CenteredPage from "@ordo-pink/frontend-react-components/centered-page"
 
 import { EMPTY_EDITOR_CHILDREN, SHORTCUTS } from "../editor.constants"
 import DataEditor from "../components/data-editor.component"
@@ -156,60 +156,69 @@ export default function EditorWorkspace() {
 
 	return Either.fromNullable(data)
 		.chain(data => Either.fromNullable(initialState).map(initialState => ({ data, initialState })))
-		.fold(Loading, ({ data, initialState }) => (
-			<div className="flex flex-col items-center p-2 py-12 size-full">
-				<div className="flex flex-col space-y-6 w-full max-w-xl">
-					<div>
-						<EditableTitle data={data} />
+		.fold(
+			() => (
+				<CenteredPage centerX centerY>
+					<div className="px-12">
+						Здесь будет редактор файла, если этот самый файл выбрать в сайдбаре слева.
 					</div>
+				</CenteredPage>
+			),
+			({ data, initialState }) => (
+				<div className="flex flex-col items-center p-2 py-12 size-full">
+					<div className="flex flex-col space-y-6 w-full max-w-xl">
+						<div>
+							<EditableTitle data={data} />
+						</div>
 
-					<DataEditor key={data.fsid} data={data} />
+						<DataEditor key={data.fsid} data={data} />
 
-					<Slate
-						editor={editor}
-						initialValue={initialState === "empty" ? EMPTY_EDITOR_CHILDREN : initialState}
-						onChange={(value: Descendant[]) => {
-							const isAstChange = editor.operations.some(op => "set_selection" !== op.type)
+						<Slate
+							editor={editor}
+							initialValue={initialState === "empty" ? EMPTY_EDITOR_CHILDREN : initialState}
+							onChange={(value: Descendant[]) => {
+								const isAstChange = editor.operations.some(op => "set_selection" !== op.type)
 
-							if (!isAstChange || !data.fsid) return
+								if (!isAstChange || !data.fsid) return
 
-							commands.emit<cmd.background.startSaving>("background-task.start-saving")
+								commands.emit<cmd.background.startSaving>("background-task.start-saving")
 
-							save$.next({ fsid: data.fsid, value })
-						}}
-					>
-						<HoveringToolbar />
-						<Editable
-							spellCheck
-							className="pb-96 outline-none"
-							placeholder="Пора начинать..."
-							renderLeaf={renderLeaf}
-							onDOMBeforeInput={handleDOMBeforeInput}
-							renderElement={renderElement}
-							onKeyDown={(event: KeyboardEvent<HTMLDivElement>) => {
-								if (editor.selection?.anchor.offset === 0 && event.key === "/") {
-									;(event as any).clientX = event.currentTarget.offsetLeft
-									;(event as any).clientY = event.currentTarget.offsetTop
-
-									commands.emit<cmd.ctxMenu.show>("context-menu.show", {
-										event: event as any,
-										payload: "editor-quick-menu",
-									})
-								}
-
-								if (event.key === "Enter") {
-									event.preventDefault()
-
-									Transforms.insertNodes(editor, [
-										{ type: "paragraph", children: [{ text: "" }] } as any,
-									])
-								}
+								save$.next({ fsid: data.fsid, value })
 							}}
-						/>
-					</Slate>
+						>
+							<HoveringToolbar />
+							<Editable
+								spellCheck
+								className="pb-96 outline-none"
+								placeholder="Пора начинать..."
+								renderLeaf={renderLeaf}
+								onDOMBeforeInput={handleDOMBeforeInput}
+								renderElement={renderElement}
+								onKeyDown={(event: KeyboardEvent<HTMLDivElement>) => {
+									if (editor.selection?.anchor.offset === 0 && event.key === "/") {
+										;(event as any).clientX = event.currentTarget.offsetLeft
+										;(event as any).clientY = event.currentTarget.offsetTop
+
+										commands.emit<cmd.ctxMenu.show>("context-menu.show", {
+											event: event as any,
+											payload: "editor-quick-menu",
+										})
+									}
+
+									if (event.key === "Enter") {
+										event.preventDefault()
+
+										Transforms.insertNodes(editor, [
+											{ type: "paragraph", children: [{ text: "" }] } as any,
+										])
+									}
+								}}
+							/>
+						</Slate>
+					</div>
 				</div>
-			</div>
-		))
+			),
+		)
 }
 
 // --- Internal ---

@@ -1,4 +1,4 @@
-import { BsLayoutTextSidebarReverse } from "react-icons/bs"
+import { BsLayoutSidebar } from "react-icons/bs"
 import { lazy } from "react"
 
 import { ORDO_PINK_EDITOR_FUNCTION } from "@ordo-pink/core"
@@ -10,7 +10,7 @@ export const registerEditorActivity = ({ commands }: P) => {
 	commands.emit<cmd.activities.add>("activities.add", {
 		Component: lazy(() => import("../views/editor.workspace")),
 		Sidebar: lazy(() => import("../views/editor.sidebar")),
-		Icon: BsLayoutTextSidebarReverse,
+		Icon: BsLayoutSidebar,
 		name,
 		routes: ["/editor", "/editor/:fsid"],
 		background: false,

@@ -6,7 +6,7 @@ import { DataProviders } from "@ordo-pink/frontend-create-function"
 import { Either } from "@ordo-pink/either"
 import { noop } from "@ordo-pink/tau"
 
-import { GTD_LABEL, GTD_PROJECT_LABEL } from "../gtd.constants"
+import { GTD_INBOX_LABEL, GTD_LABEL, GTD_PROJECT_LABEL } from "../gtd.constants"
 import { GTDRepository } from "../gtd.repository"
 
 const COMMAND_NAME = "gtd.add-to-projects"
@@ -95,9 +95,16 @@ const handle =
 					() => data,
 				),
 			)
-			.fold(noop, item =>
+			.fold(noop, item => {
+				if (item.labels.includes(GTD_INBOX_LABEL)) {
+					commands.emit<cmd.data.removeLabel>("data.remove-label", {
+						item,
+						label: [GTD_INBOX_LABEL],
+					})
+				}
+
 				commands.emit<cmd.data.addLabel>("data.add-label", {
 					item,
 					label: [GTD_LABEL, GTD_PROJECT_LABEL],
-				}),
-			)
+				})
+			})

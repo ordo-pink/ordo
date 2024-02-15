@@ -8,8 +8,7 @@ export const GTDRepository = {
 	getInbox: (data: PlainData[] | null) => DataRepository.filterData(data, GTDRepository.isInbox),
 	getDone: (data: PlainData[] | null) => DataRepository.filterData(data, GTDRepository.isDone),
 	isProject: (data: PlainData) =>
-		[GTD_LABEL, GTD_PROJECT_LABEL].every(label => data.labels.includes(label)) &&
-		!data.labels.includes(GTD_INBOX_LABEL),
+		[GTD_LABEL, GTD_PROJECT_LABEL].every(label => data.labels.includes(label)),
 	isInbox: (data: PlainData) =>
 		[GTD_LABEL, GTD_INBOX_LABEL].every(label => data.labels.includes(label)) &&
 		!data.labels.includes(GTD_PROJECT_LABEL),

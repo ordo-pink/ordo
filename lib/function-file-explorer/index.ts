@@ -24,22 +24,87 @@ export default createFunction(
 
 		commands.emit<cmd.achievements.add>("achievements.add", {
 			descriptor: {
-				icon: `${staticHost}/100-files.jpg`,
-				completedAt: null,
-				description: "Создайте 100 файлов.",
-				id: ORDO_PINK_FILE_EXPLORER_FUNCTION.concat(".achievements.100-files"),
-				title: "Файловый менеджер",
+				image: `${staticHost}/create-10-files.jpg`,
+				description: "Создайте 10 файлов.",
+				id: ORDO_PINK_FILE_EXPLORER_FUNCTION.concat(".achievements.create-10-files"),
+				title: "Стая Файлы",
 				category: "collection",
 			},
 			subscribe: ({ grant }) => {
 				const files = data.getData()
 
-				if (files && files.length >= 100) grant()
+				if (files && files.length >= 10) grant()
 
 				commands.on<cmd.data.create>("data.create", () => {
 					const files = data.getData()
 
-					if (files && files.length >= 99) grant()
+					if (files && files.length >= 9) grant()
+				})
+			},
+		})
+
+		commands.emit<cmd.achievements.add>("achievements.add", {
+			descriptor: {
+				image: `${staticHost}/create-25-files.jpg`,
+				description: "Создайте 25 файлов.",
+				id: ORDO_PINK_FILE_EXPLORER_FUNCTION.concat(".achievements.create-25-files"),
+				title: "Много Файлы",
+				category: "collection",
+				previous: ORDO_PINK_FILE_EXPLORER_FUNCTION.concat(".achievements.create-10-files"),
+			},
+			subscribe: ({ grant }) => {
+				const files = data.getData()
+
+				if (files && files.length >= 25) grant()
+
+				commands.on<cmd.data.create>("data.create", () => {
+					const files = data.getData()
+
+					if (files && files.length >= 24) grant()
+				})
+			},
+		})
+
+		commands.emit<cmd.achievements.add>("achievements.add", {
+			descriptor: {
+				image: `${staticHost}/create-50-files.jpg`,
+				description: "Создайте 50 файлов.",
+				id: ORDO_PINK_FILE_EXPLORER_FUNCTION.concat(".achievements.create-50-files"),
+				title: "Ordo Файлы",
+				category: "collection",
+				previous: ORDO_PINK_FILE_EXPLORER_FUNCTION.concat(".achievements.create-25-files"),
+			},
+			subscribe: ({ grant }) => {
+				const files = data.getData()
+
+				if (files && files.length >= 50) grant()
+
+				commands.on<cmd.data.create>("data.create", () => {
+					const files = data.getData()
+
+					if (files && files.length >= 49) grant()
+				})
+			},
+		})
+
+		commands.emit<cmd.achievements.add>("achievements.add", {
+			descriptor: {
+				image: `${staticHost}/create-100-files.jpg`,
+				description: "Создайте 100 файлов.",
+				id: ORDO_PINK_FILE_EXPLORER_FUNCTION.concat(".achievements.create-100-files"),
+				title: "Толпа Файлы",
+				category: "collection",
+				previous: ORDO_PINK_FILE_EXPLORER_FUNCTION.concat(".achievements.create-50-files"),
+			},
+			subscribe: ({ grant }) => {
+				const files = data.getData()
+
+				if (files && files.length >= 50) grant()
+
+				commands.on<cmd.data.create>("data.create", () => {
+					const files = data.getData()
+
+					if (files && files.length >= 49) grant()
 				})
 			},
 		})

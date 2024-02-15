@@ -40,33 +40,33 @@ export default function App() {
 	useEffect(() => {
 		void Oath.of(commands)
 			.chain(() =>
-				Oath.from(() => import("@ordo-pink/function-home")).chain(f =>
-					Oath.from(async () => await f.default),
+				Oath.from(() => import("@ordo-pink/function-home")).chain(module =>
+					Oath.from(async () => await module.default),
 				),
 			)
 			.chain(() =>
-				Oath.from(() => import("@ordo-pink/function-file-explorer")).chain(f =>
-					Oath.from(async () => await f.default),
+				Oath.from(() => import("@ordo-pink/function-file-explorer")).chain(module =>
+					Oath.from(async () => await module.default),
 				),
 			)
 			.chain(() =>
-				Oath.from(() => import("@ordo-pink/function-gtd")).chain(f =>
-					Oath.from(async () => await f.default),
+				Oath.from(() => import("@ordo-pink/function-gtd")).chain(module =>
+					Oath.from(async () => await module.default),
 				),
 			)
 			.chain(() =>
-				Oath.from(() => import("@ordo-pink/function-links")).chain(f =>
-					Oath.from(async () => await f.default),
+				Oath.from(() => import("@ordo-pink/function-links")).chain(module =>
+					Oath.from(async () => await module.default),
 				),
 			)
 			.chain(() =>
-				Oath.from(() => import("@ordo-pink/function-editor")).chain(f =>
-					Oath.from(async () => await f.default),
+				Oath.from(() => import("@ordo-pink/function-editor")).chain(module =>
+					Oath.from(async () => await module.default),
 				),
 			)
 			.chain(() =>
-				Oath.from(() => import("@ordo-pink/function-user")).chain(f =>
-					Oath.from(async () => await f.default),
+				Oath.from(() => import("@ordo-pink/function-user")).chain(module =>
+					Oath.from(async () => await module.default),
 				),
 			)
 			.orNothing()

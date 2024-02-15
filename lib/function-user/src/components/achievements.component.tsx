@@ -19,8 +19,12 @@ export default function Achievements() {
 			if (previous && !previous.completedAt) return false
 			// Show achievement since it's a current achievement to be obtained in the chain
 			if (previous && previous.completedAt && !ach.completedAt) return true
+			// Show achievement since it is obtained and it is the last achievement in the chain
+			if (!next && ach.completedAt) return true
 			// Show achievement since it's the most recent achievement in the chain obtained by the user
 			if (next && !next.completedAt && ach.completedAt) return true
+			// Show achievement since it's the most recent achievement in the chain obtained by the user
+			if (next && !next.completedAt && !ach.completedAt) return true
 
 			return false
 		})

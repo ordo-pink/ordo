@@ -20,15 +20,15 @@ declare global {
 			grant: () => void
 		}) => void
 
-		type AchievementCategory = "collection" | "challenge" | "legacy"
+		type AchievementCategory = "collection" | "challenge" | "legacy" | "education"
 
 		type AchievementDAO = {
 			id: string
 			title: string
-			icon: string
+			image: string
 			description: string
 			previous?: string
-			completedAt: Date | null
+			completedAt?: Date | null
 			category: AchievementCategory
 		}
 

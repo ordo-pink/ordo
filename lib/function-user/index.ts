@@ -24,10 +24,9 @@ export default createFunction(
 
 		commands.emit<cmd.achievements.add>("achievements.add", {
 			descriptor: {
-				icon: `${staticHost}/beta-participation-logo.jpg`,
-				completedAt: null,
-				description: "Зарегистрируйтесь и войдите в систему во время проведения Beta-тестирования.",
 				id: ORDO_PINK_USER_FUNCTION.concat(".achievements.beta-participation"),
+				image: `${staticHost}/beta-participation-logo.jpg`,
+				description: "Зарегистрируйтесь и войдите в систему во время проведения Beta-тестирования.",
 				title: "Участие в β",
 				category: "legacy",
 			},

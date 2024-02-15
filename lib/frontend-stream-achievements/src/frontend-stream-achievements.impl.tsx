@@ -18,6 +18,8 @@ export const __initAchievements = callOnce(({ fid, dataCommands }: P) => {
 	const commands = getCommands(fid)
 	const logger = getLogger(fid)
 
+	logger.debug("Initialising achievements...")
+
 	let registerred = false
 
 	user$
@@ -62,7 +64,7 @@ export const __initAchievements = callOnce(({ fid, dataCommands }: P) => {
 													ach => ach && ach.id === achievement.descriptor.id,
 												)
 
-												if (!thisAchievement || thisAchievement.completedAt !== null) {
+												if (!thisAchievement || thisAchievement.completedAt != null) {
 													return
 												}
 
@@ -94,7 +96,7 @@ export const __initAchievements = callOnce(({ fid, dataCommands }: P) => {
 													Icon: () => (
 														<img
 															className="rounded-md"
-															src={achievement.descriptor.icon}
+															src={achievement.descriptor.image}
 															alt={achievement.descriptor.title}
 														/>
 													),
@@ -135,68 +137,6 @@ export const __initAchievements = callOnce(({ fid, dataCommands }: P) => {
 			}),
 		)
 		.subscribe()
-
-	logger.debug("Initialising achievements...")
-
-	// let commandHandlerRegisterred = false
-
-	// achievements$
-	// 	.pipe(
-	// 		combineLatestWith(data$, user$),
-	// 		pairwise(),
-	// 		map(([[prevAchievements], [achievements, data, user]]) => {
-	// 			if (!data || !user) return
-
-	// 			const persistedAchievementsData = DataRepository.findData(
-	// 				data,
-	// 				item => item.name === "achievements.json" && item.parent === LIB_DIRECTORY_FSID,
-	// 			)
-
-	// 			if (!commandHandlerRegisterred) {
-	// 				commandHandlerRegisterred = true
-	// 			}
-
-	// 			if (!persistedAchievements$.value) {
-	// 				if (!persistedAchievementsData) {
-	// 					void dataCommands
-	// 						.create({
-	// 							name: "achievements.json",
-	// 							parent: LIB_DIRECTORY_FSID,
-	// 							contentType: "application/json",
-	// 							fileLimit: user.fileLimit,
-	// 							createdBy: user.id,
-	// 						})
-	// 						.toPromise()
-	// 						.then(() => persistedAchievements$.next([]))
-	// 				} else {
-	// 					void dataCommands
-	// 						.getContent({ fsid: persistedAchievementsData.fsid, createdBy: user.id })
-	// 						.chain(str => Oath.try(() => JSON.parse(str as string)))
-	// 						.fix(() => [])
-	// 						.toPromise()
-	// 						.then(achievements => persistedAchievements$.next(achievements))
-	// 				}
-	// 			}
-
-	// 			if (!achievements) return
-
-	// 			if (equals(prevAchievements, achievements)) return
-
-	// 			const content = JSON.stringify(achievements)
-
-	// 			void dataCommands
-	// 				.updateContent({
-	// 					fsid: persistedAchievementsData!.fsid,
-	// 					createdBy: user.id,
-	// 					updatedBy: user.id,
-	// 					length: content.length,
-	// 					content,
-	// 				})
-	// 				.toPromise()
-	// 				.then(() => persistedAchievements$.next(achievements))
-	// 		}),
-	// 	)
-	// 	.subscribe()
 
 	logger.debug("Initialised achievements.")
 })

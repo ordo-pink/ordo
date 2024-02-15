@@ -12,51 +12,22 @@ import { OrdoRoutes } from "@ordo-pink/ordo-routes"
 type Props = { workspaceHost: string; idHost: string }
 
 export default function SignInForm({ workspaceHost, idHost }: Props) {
-	const [emailErrors, setEmailErrors] = useState<string[]>([])
-	const [passwordErrors, setPasswordErrors] = useState<string[]>([])
-
-	const [errors, setErrors] = useState<string[]>([])
 	const [email, setEmail] = useState("")
 	const [password, setPassword] = useState("")
 
-	const bannerOpacity = errors.length > 0 ? "opacity-100" : "opacity-0"
-	const isButtonDisabled = !email || !password || errors.length > 0
-
-	useEffect(() => {
-		setErrors(emailErrors.concat(passwordErrors))
-	}, [emailErrors, passwordErrors])
-
 	return (
-		<form className="w-full flex flex-col items-center space-y-12">
-			<div className="w-full flex flex-col space-y-6">
+		<form className="flex flex-col items-center space-y-12 w-full">
+			<div className="flex flex-col space-y-6 w-full">
 				<fieldset className="space-y-4">
-					<EmailInput
-						onInput={e =>
-							e.fork(setEmailErrors, v => {
-								setEmail(v)
-								setEmailErrors([])
-							})
-						}
-					/>
-					<PasswordInput
-						label="Пароль"
-						onInput={e =>
-							e.fork(setPasswordErrors, v => {
-								setPassword(v)
-								setPasswordErrors([])
-							})
-						}
-					/>
+					<EmailInput onChange={e => setEmail(e.target.value)} />
+					<PasswordInput label="Пароль" onChange={e => setPassword(e.target.value)} />
 				</fieldset>
 			</div>
 
-			<div className="w-full flex flex-col">
+			<div className="flex flex-col w-full">
 				<Button
-					disabled={isButtonDisabled}
 					onClick={async e => {
 						e.preventDefault()
-
-						if (isButtonDisabled) return
 
 						await fetch(`${idHost}/sign-in`, {
 							credentials: "include",
@@ -78,12 +49,6 @@ export default function SignInForm({ workspaceHost, idHost }: Props) {
 				<a href={signUpURL}>Ещё не регистрировались?</a>
 				<div>|</div>
 				<a href={forgotPasswordURL}>Забыли пароль?</a>
-			</div>
-
-			<div
-				className={`w-full max-w-xs fixed bottom-4 transition-opacity duration-300 right-4 ${bannerOpacity}`}
-			>
-				<Callout type="error">{errors[0]}</Callout>
 			</div>
 		</form>
 	)

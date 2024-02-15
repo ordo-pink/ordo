@@ -2,9 +2,10 @@
 // SPDX-License-Identifier: MIT
 
 import { Oath } from "@ordo-pink/oath"
-import { WJWTSignFn } from "./wjwt.types"
-import { Rrr } from "./wjwt.constants"
 import { Switch } from "@ordo-pink/switch"
+
+import { Rrr } from "./wjwt.constants"
+import { WJWTSignFn } from "./wjwt.types"
 
 const encoder = new TextEncoder()
 
@@ -22,7 +23,7 @@ export const sign0: WJWTSignFn =
 					payload: Buffer.from(encoder.encode(payload)).toString("base64url"),
 				}).chain(({ header, payload }) =>
 					Oath.try(() => crypto.subtle.sign(alg, key, encoder.encode(`${header}.${payload}`)))
-						.rejectedMap(e => Rrr.ALG_KEY_MISMATCH)
+						.rejectedMap(() => Rrr.ALG_KEY_MISMATCH)
 						.map(buffer => [
 							`${header}.${payload}`,
 							Buffer.from(new Uint8Array(buffer)).toString("base64url"),

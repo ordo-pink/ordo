@@ -2,13 +2,15 @@
 // SPDX-License-Identifier: MIT
 
 import type { BunFile } from "bun"
-import type { StaticMiddlewareState } from "./static.types"
 import { join } from "path"
-import { logBunRequest } from "@ordo-pink/backend-utils"
-import { Router, Context } from "@ordo-pink/routary"
-import { fileExists0 } from "@ordo-pink/fs"
-import { Oath } from "@ordo-pink/oath"
+
+import { Context, Router } from "@ordo-pink/routary"
 import { Logger } from "@ordo-pink/logger"
+import { Oath } from "@ordo-pink/oath"
+import { fileExists0 } from "@ordo-pink/fs"
+import { logBunRequest } from "@ordo-pink/backend-utils"
+
+import type { StaticMiddlewareState } from "./static.types"
 
 type P = { root: string; logger: Logger; serverName: string }
 export const createRouter = ({ root, logger, serverName }: P) =>
@@ -57,12 +59,14 @@ const setResponseTimeHeader =
 const setResponseBody =
 	(ctx: Context) =>
 	({ file }: Pick<StaticMiddlewareState, "file">) => {
+		ctx.res.setHeader("Access-Control-Allow-Origin", "*")
 		ctx.res.setBody(file)
 		ctx.res.setStatus(200)
 		ctx.res.setHeader("content-type", file.type)
 	}
 
 const setErrorBody = (ctx: Context) => () => {
+	ctx.res.setHeader("Access-Control-Allow-Origin", "*")
 	ctx.res.setStatus(404)
 	ctx.res.setHeader("content-type", "application/json")
 	ctx.res.setBody(JSON.stringify({ success: false, message: "Not found" }))

@@ -5,10 +5,10 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-import { resolve } from "path"
 import { Readable, Writable } from "stream"
 import { createReadStream, createWriteStream } from "fs"
-import { createParentIfNotExists0, removeFile0, stat0, writeFile0 } from "@ordo-pink/fs"
+import { resolve } from "path"
+
 import {
 	ContentPersistenceStrategy,
 	Data,
@@ -16,6 +16,7 @@ import {
 	DataUnexpectedError,
 	UnexpectedError,
 } from "@ordo-pink/data"
+import { createParentIfNotExists0, removeFile0, stat0, writeFile0 } from "@ordo-pink/fs"
 import { Oath } from "@ordo-pink/oath"
 
 type Params = { root: string }

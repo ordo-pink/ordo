@@ -12,7 +12,7 @@ import { BehaviorSubject } from "rxjs"
 const of = (
 	data$: BehaviorSubject<PlainData[]>,
 	auth$: BehaviorSubject<AuthResponse>,
-	commands: Client.Commands.Commands,
+	commands: Client.Commands.CommandEmitter,
 ): DataPersistenceStrategy => ({
 	count: () => Oath.of(data$.value.length),
 	create: plain => {

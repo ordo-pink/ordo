@@ -6,69 +6,124 @@ import { Button } from "./button"
 import { Callout } from "./callout"
 import { EmailInput, PasswordInput } from "./input"
 import { OrdoRoutes } from "@ordo-pink/ordo-routes"
+import { BsCheck2, BsX } from "react-icons/bs"
+import isEmail from "validator/lib/isEmail"
+import { keysOf } from "@ordo-pink/tau"
 
 type _P = { idHost: string; workspaceHost: string }
 
 export default function SignUpForm({ idHost, workspaceHost }: _P) {
-	const [emailErrors, setEmailErrors] = useState<string[]>([])
-	const [passwordErrors, setPasswordErrors] = useState<string[]>([])
 	const [isPrivacyPolicyConfirmed, setIsPrivacyPolicyConfirmed] = useState(false)
 
-	const [errors, setErrors] = useState<string[]>([])
 	const [email, setEmail] = useState("")
 	const [password, setPassword] = useState("")
 	const [repeatPassword, setRepeatPassword] = useState("")
 
-	const bannerOpacity = errors.length > 0 ? "opacity-100" : "opacity-0"
-	const isButtonDisabled = !email || !password || errors.length > 0 || !isPrivacyPolicyConfirmed
+	const [isValid, setIsValid] = useState({
+		email: false,
+		passwordLength: false,
+		passwordDigit: false,
+		passwordCapital: false,
+		passwordSymbol: false,
+		passwordsMatch: false,
+	})
+
+	const isButtonDisabled =
+		!email || !password || keysOf(isValid).some(key => !isValid[key]) || !isPrivacyPolicyConfirmed
 
 	useEffect(() => {
-		setErrors(emailErrors.concat(passwordErrors))
-	}, [emailErrors.length, passwordErrors.length])
-
-	useEffect(() => {
-		if (password && repeatPassword && password !== repeatPassword) {
-			setErrors(errors.concat("Passwords must match."))
-		}
+		setIsValid(p => ({ ...p, passwordsMatch: password === repeatPassword }))
 	}, [password, repeatPassword])
 
 	return (
-		<form className="w-full flex flex-col items-center space-y-12">
-			<div className="w-full flex flex-col space-y-6">
+		<form className="flex flex-col items-center space-y-12 w-full">
+			<div className="flex flex-col space-y-6 w-full">
 				<fieldset className="space-y-4">
 					<EmailInput
-						onInput={e =>
-							e.fork(setEmailErrors, v => {
-								setEmail(v)
-								setEmailErrors([])
-							})
-						}
+						onChange={e => {
+							setEmail(e.target.value)
+							setIsValid(s => ({ ...s, email: isEmail(e.target.value) }))
+						}}
 					/>
 
 					<PasswordInput
 						label="Пароль"
-						onInput={e =>
-							e.fork(setPasswordErrors, v => {
-								setPassword(v)
-								setPasswordErrors([])
-							})
-						}
+						onChange={e => {
+							setPassword(e.target.value)
+							setIsValid(s => ({
+								...s,
+								passwordLength: e.target.value.length >= 8 && e.target.value.length <= 50,
+								passwordCapital: /\p{L}/u.test(e.target.value),
+								passwordDigit: /\d/u.test(e.target.value),
+								passwordSymbol: /[`!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~]/.test(e.target.value),
+							}))
+						}}
 					/>
 
 					<PasswordInput
 						label="И ещё раз пароль"
-						onInput={e =>
-							e.fork(setPasswordErrors, v => {
-								setRepeatPassword(v)
-								setPasswordErrors([])
-							})
-						}
+						onChange={e => setRepeatPassword(e.target.value)}
 					/>
+
+					{(password || repeatPassword) && (
+						<Callout type={keysOf(isValid).some(key => !isValid[key]) ? "error" : "success"}>
+							<div>
+								<div className="flex items-center space-x-2">
+									{isValid.passwordLength ? (
+										<BsCheck2 className="text-lg text-emerald-500 shrink-0" />
+									) : (
+										<BsX className="text-lg text-red-500 shrink-0" />
+									)}
+									<span>Email указан верно</span>
+								</div>
+								<div className="flex items-center space-x-2">
+									{isValid.passwordLength ? (
+										<BsCheck2 className="text-lg text-emerald-500 shrink-0" />
+									) : (
+										<BsX className="text-lg text-red-500 shrink-0" />
+									)}
+									<span>Пароль от 8 до 50 символов</span>
+								</div>
+								<div className="flex items-center space-x-2">
+									{isValid.passwordCapital ? (
+										<BsCheck2 className="text-lg text-emerald-500 shrink-0" />
+									) : (
+										<BsX className="text-lg text-red-500 shrink-0" />
+									)}
+									<span>Хотя бы одна заглавная буква в пароле</span>
+								</div>
+								<div className="flex items-center space-x-2">
+									{isValid.passwordDigit ? (
+										<BsCheck2 className="text-lg text-emerald-500 shrink-0" />
+									) : (
+										<BsX className="text-lg text-red-500 shrink-0" />
+									)}
+									<span>Хотя бы одна цифра в пароле</span>
+								</div>
+								<div className="flex items-center space-x-2">
+									{isValid.passwordSymbol ? (
+										<BsCheck2 className="text-lg text-emerald-500 shrink-0" />
+									) : (
+										<BsX className="text-lg text-red-500 shrink-0" />
+									)}
+									<span>Специальный символ ({"`!@#$%^&*()_+-=[]{};':\"\\|,.<>/?~"}) в пароле</span>
+								</div>
+								<div className="flex items-center space-x-2">
+									{isValid.passwordsMatch ? (
+										<BsCheck2 className="text-lg text-emerald-500 shrink-0" />
+									) : (
+										<BsX className="text-lg text-red-500 shrink-0" />
+									)}
+									<span>Пароли совпадают</span>
+								</div>
+							</div>
+						</Callout>
+					)}
 				</fieldset>
 			</div>
 
 			<p className="text-xs">
-				<label className="flex space-x-2 items-center cursor-pointer">
+				<label className="flex items-center space-x-2 cursor-pointer">
 					<span className="block">
 						<input
 							type="checkbox"
@@ -86,7 +141,7 @@ export default function SignUpForm({ idHost, workspaceHost }: _P) {
 				</label>
 			</p>
 
-			<div className="w-full flex flex-col">
+			<div className="flex flex-col w-full">
 				<Button
 					disabled={isButtonDisabled}
 					onClick={async e => {
@@ -113,12 +168,6 @@ export default function SignUpForm({ idHost, workspaceHost }: _P) {
 
 			<div className="flex space-x-2">
 				<a href={signInURL}>Уже зарегистрированы?</a>
-			</div>
-
-			<div
-				className={`w-full max-w-xs fixed bottom-4 transition-opacity duration-300 right-4 ${bannerOpacity}`}
-			>
-				<Callout type="error">{errors[0]}</Callout>
 			</div>
 		</form>
 	)

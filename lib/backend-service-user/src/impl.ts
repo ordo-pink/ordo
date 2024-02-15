@@ -5,15 +5,16 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-import type { UserPersistenceStrategy } from "./types"
 import crypto from "crypto"
+
 import { Oath } from "@ordo-pink/oath"
-import { UUIDv4 } from "@ordo-pink/tau"
+
+import type { UserPersistenceStrategy } from "./types"
 
 export class UserService {
 	#persistenceStrategy: UserPersistenceStrategy
 
-	public static async of(driver: UserPersistenceStrategy) {
+	public static of(driver: UserPersistenceStrategy) {
 		return new UserService(driver)
 	}
 
@@ -25,7 +26,7 @@ export class UserService {
 		return Oath.from(() => Bun.password.hash(password))
 			.chain(password =>
 				this.#persistenceStrategy.create({
-					id: crypto.randomUUID() as UUIDv4,
+					id: crypto.randomUUID(),
 					email,
 					password,
 					emailConfirmed: false,
@@ -54,7 +55,7 @@ export class UserService {
 							({
 								...user,
 								password,
-							} as User.InternalUser),
+							}) as User.InternalUser,
 					),
 				)
 				.chain(user =>

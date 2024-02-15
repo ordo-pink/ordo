@@ -17,26 +17,22 @@ type InputProps = {
 	autocomplete?: string
 }
 
-type EmailInputProps = Partial<InputProps> & {
-	onInput?: (ev: Oath<string, string[]>) => any
-}
+type EmailInputProps = Partial<InputProps>
 
-type PasswordInputProps = Partial<InputProps> & {
-	onInput?: (ev: Oath<string, string[]>) => any
-}
+type PasswordInputProps = Partial<InputProps>
 
 export const TextInput = ({
 	value,
-	onChange = () => void 0,
 	id,
 	label,
+	onChange,
 	placeholder = "",
 	type = "text",
 	name = "",
 	autocomplete = "off",
 }: InputProps) => (
 	<div className="flex flex-col">
-		<label htmlFor="email" className="w-full text-sm font-medium leading-6 mb-2">
+		<label htmlFor="email" className="mb-2 w-full text-sm font-medium leading-6">
 			{label}
 		</label>
 		<input
@@ -47,14 +43,13 @@ export const TextInput = ({
 			value={value}
 			onChange={onChange}
 			placeholder={placeholder}
-			className="w-full px-2 py-1 rounded-md border-0 shadow-inner placeholder:text-neutral-500 bg-neutral-200 dark:bg-neutral-700 outline-none sm:text-sm sm:leading-6"
+			className="px-2 py-1 w-full rounded-md border-0 shadow-inner outline-none bg-neutral-100 placeholder:text-neutral-500 sm:text-sm sm:leading-6 dark:bg-neutral-700"
 		/>
 	</div>
 )
 
 export const EmailInput = ({
 	value,
-	onInput,
 	onChange,
 	autocomplete = "email",
 	id = "email",
@@ -71,34 +66,13 @@ export const EmailInput = ({
 			name={name}
 			placeholder={placeholder}
 			type="email"
-			onChange={event => {
-				if (onChange) onChange(event)
-
-				if (onInput) {
-					if (!event.target.value) return onInput(Oath.resolve(""))
-
-					onInput(
-						Oath.of(event.target.value)
-							.chain(v =>
-								Oath.from(() => new Promise<string>(resolve => setTimeout(() => resolve(v), 1000))),
-							)
-							.chain(v =>
-								Oath.fromBoolean(
-									() => validator.isEmail(v),
-									() => v,
-									() => ["Invalid email"],
-								),
-							),
-					)
-				}
-			}}
+			onChange={onChange}
 		/>
 	)
 }
 
 export const PasswordInput = ({
 	value,
-	onInput,
 	onChange,
 	autocomplete = "password",
 	id = "password",
@@ -106,34 +80,11 @@ export const PasswordInput = ({
 	name = "password",
 	placeholder = "********",
 }: PasswordInputProps) => {
-	const validatePassword = okpwd()
-
 	return (
 		<TextInput
 			value={value}
 			id={id}
-			onChange={event => {
-				if (onChange) onChange(event)
-
-				if (onInput) {
-					if (!event.target.value) return onInput(Oath.resolve(""))
-
-					onInput(
-						Oath.of(event.target.value)
-							.chain(v =>
-								Oath.from(() => new Promise<string>(resolve => setTimeout(() => resolve(v), 1000))),
-							)
-							.map(validatePassword)
-							.chain(error =>
-								Oath.fromBoolean(
-									() => !error,
-									() => event.target.value,
-									() => [error as string],
-								),
-							),
-					)
-				}
-			}}
+			onChange={onChange}
 			label={label}
 			autocomplete={autocomplete}
 			name={name}

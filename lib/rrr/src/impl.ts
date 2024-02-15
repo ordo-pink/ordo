@@ -4,52 +4,52 @@
 export class HttpError extends Error {
 	#status: number
 
-	public static BadRequest(message: string, options?: ErrorOptions) {
-		return new HttpError(400, message, options)
+	public static BadRequest(message: string) {
+		return new HttpError(400, message)
 	}
 
-	public static Unauthorized(message: string, options?: ErrorOptions) {
-		return new HttpError(401, message, options)
+	public static Unauthorized(message: string) {
+		return new HttpError(401, message)
 	}
 
-	public static PaymentRequired(message: string, options?: ErrorOptions) {
-		return new HttpError(402, message, options)
+	public static PaymentRequired(message: string) {
+		return new HttpError(402, message)
 	}
 
-	public static Forbidden(message: string, options?: ErrorOptions) {
-		return new HttpError(403, message, options)
+	public static Forbidden(message: string) {
+		return new HttpError(403, message)
 	}
 
-	public static NotFound(message: string, options?: ErrorOptions) {
-		return new HttpError(404, message, options)
+	public static NotFound(message: string) {
+		return new HttpError(404, message)
 	}
 
-	public static Conflict(message: string, options?: ErrorOptions) {
-		return new HttpError(409, message, options)
+	public static Conflict(message: string) {
+		return new HttpError(409, message)
 	}
 
-	public static LengthRequired(message: string, options?: ErrorOptions) {
-		return new HttpError(411, message, options)
+	public static LengthRequired(message: string) {
+		return new HttpError(411, message)
 	}
 
-	public static PayloadTooLarge(message: string, options?: ErrorOptions) {
-		return new HttpError(413, message, options)
+	public static PayloadTooLarge(message: string) {
+		return new HttpError(413, message)
 	}
 
-	public static UnprocessableEntity(message: string, options?: ErrorOptions) {
-		return new HttpError(422, message, options)
+	public static UnprocessableEntity(message: string) {
+		return new HttpError(422, message)
 	}
 
-	public static InternalServerError(message: string, options?: ErrorOptions) {
-		return new HttpError(500, message, options)
+	public static InternalServerError(message: string) {
+		return new HttpError(500, message)
 	}
 
-	public static from(err: Error, status = 500, options?: ErrorOptions) {
-		return new HttpError(status, err.message, options)
+	public static from(err: Error, status = 500) {
+		return new HttpError(status, err.message)
 	}
 
-	protected constructor(status: number, message: string, options?: ErrorOptions) {
-		super(message, options)
+	protected constructor(status: number, message: string) {
+		super(message)
 		this.#status = status
 	}
 

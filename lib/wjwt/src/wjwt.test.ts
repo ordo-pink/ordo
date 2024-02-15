@@ -1,9 +1,9 @@
 // SPDX-FileCopyrightText: Copyright 2023, 谢尔盖||↓ and the Ordo.pink contributors
 // SPDX-License-Identifier: MIT
 
-import { test, expect } from "bun:test"
-import { WJWT } from "./wjwt"
+import { expect, test } from "bun:test"
 import { SUB } from "./wjwt.types"
+import { WJWT } from "./wjwt"
 
 const payload = {
 	aud: ["asdf"],
@@ -87,10 +87,7 @@ test("wjwt should verify given token with RSA", async () => {
 test("wjwt should decode given token", async () => {
 	const wjwt = await getEcdsaWjwt()
 	const signed = await wjwt.sign0(payload).orElse(() => "")
-	const decoded = await wjwt.decode0(signed).fork(
-		l => l,
-		r => r,
-	)
+	const decoded = await wjwt.decode0(signed).orNothing()
 
-	expect(decoded.payload).toEqual(payload)
+	expect(decoded && decoded.payload).toEqual(payload)
 })

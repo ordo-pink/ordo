@@ -5,14 +5,15 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
+import type { Middleware } from "koa"
+
+import { authenticate0, parseBody0, sendError } from "@ordo-pink/backend-utils"
+import { HttpError } from "@ordo-pink/rrr"
+import { Oath } from "@ordo-pink/oath"
 import type { TTokenService } from "@ordo-pink/backend-service-token"
 import type { UserService } from "@ordo-pink/backend-service-user"
-import type { Middleware } from "koa"
-import { okpwd } from "@ordo-pink/okpwd"
-import { sendError, authenticate0, parseBody0 } from "@ordo-pink/backend-utils"
-import { Oath } from "@ordo-pink/oath"
-import { HttpError } from "@ordo-pink/rrr"
 import { noop } from "@ordo-pink/tau"
+import { okpwd } from "@ordo-pink/okpwd"
 
 export type Body = { oldPassword?: string; newPassword?: string; repeatNewPassword?: string }
 export type Params = { tokenService: TTokenService; userService: UserService }
@@ -73,7 +74,7 @@ export const handleChangePassword: Fn =
 									),
 							)
 							.chain(() =>
-								tokenService.repository
+								tokenService.persistenceStrategy
 									.removeTokenRecord(auth.payload.sub)
 									.rejectedMap(HttpError.from),
 							)
@@ -86,8 +87,8 @@ export const handleChangePassword: Fn =
 										Oath.of(new Date(Date.now() + tokens.exp))
 											.tap(expires => {
 												ctx.response.set("Set-Cookie", [
-													`jti=${tokens.jti}; Expires=${expires}; SameSite=Lax; Path=/; HttpOnly;`,
-													`sub=${tokens.sub}; Expires=${expires}; SameSite=Lax; Path=/; HttpOnly;`,
+													`jti=${tokens.jti}; Expires=${expires.toISOString()}; SameSite=Lax; Path=/; HttpOnly;`,
+													`sub=${tokens.sub}; Expires=${expires.toISOString()}; SameSite=Lax; Path=/; HttpOnly;`,
 												])
 											})
 											.map(expires => ({

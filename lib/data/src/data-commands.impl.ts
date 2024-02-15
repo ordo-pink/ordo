@@ -1,12 +1,13 @@
 // SPDX-FileCopyrightText: Copyright 2023, 谢尔盖||↓ and the Ordo.pink contributors
 // SPDX-License-Identifier: MIT
 
-import { TDataCommands } from "./data-commands.types"
 import { Oath } from "@ordo-pink/oath"
+
+import { ContentPersistenceStrategy } from "./content-persistence-strategy.types"
 import { Data } from "./data.impl"
 import { DataPersistenceStrategy } from "./data-persistence-strategy.types"
 import { Errors } from "./errors.impl"
-import { ContentPersistenceStrategy } from "./content-persistence-strategy.types"
+import { TDataCommands } from "./data-commands.types"
 
 export type DataCommandsParams<T> = {
 	dataPersistenceStrategy: DataPersistenceStrategy
@@ -37,7 +38,7 @@ const of = <T>({
 						dataPersistenceStrategy
 							.exists(params.createdBy, params.parent)
 							.chain(Oath.ifElse(x => !!x, { onFalse: () => Errors.DataNotFound })),
-			  })
+				})
 		)
 			.chain(() => Data.new(params).fold(Oath.reject, Oath.resolve))
 			.chain(data =>
@@ -91,7 +92,11 @@ const of = <T>({
 	update: ({ data, fsid, createdBy, updatedBy }) =>
 		dataPersistenceStrategy
 			.get(createdBy, fsid)
-			.chain(plain => Data.of(plain).update(data).fold(Oath.reject, Oath.resolve))
+			.chain(plain =>
+				Data.of(plain)
+					.update({ ...data, updatedBy })
+					.fold(Oath.reject, Oath.resolve),
+			)
 			.chain(data => dataPersistenceStrategy.update(data.plain)),
 	// TODO: Roll back on error
 	move: ({ createdBy, fsid, parent, updatedBy }) =>
@@ -184,7 +189,7 @@ const of = <T>({
 							parent,
 							fileLimit,
 							contentType,
-					  }),
+						}),
 			)
 			.chain(plain =>
 				contentPersistenceStrategy

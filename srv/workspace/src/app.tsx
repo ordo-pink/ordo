@@ -23,7 +23,7 @@ const SharedContext = createContext<{
 	data: PlainData[] | null
 	route: Client.Router.Route | null
 	user: User.User | null
-	commands: Client.Commands.Commands
+	commands: Client.Commands.CommandEmitter
 	fileAssociations: Extensions.FileAssociation[]
 	workspaceSplitSize: [number, number]
 }>({

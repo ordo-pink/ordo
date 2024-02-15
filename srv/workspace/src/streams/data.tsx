@@ -318,7 +318,7 @@ export const __initData: Fn = ({ logger, auth$ }) => {
 										commands.emit<cmd.modal.hide>("modal.hide")
 									},
 									Icon: () => <FileIconComponent plain={item} />,
-								} satisfies Client.CommandPalette.Item),
+								}) satisfies Client.CommandPalette.Item,
 						),
 				),
 			}

@@ -18,8 +18,8 @@ export default function GTDWidget() {
 	const [newItem, setNewItem] = useState("")
 
 	return (
-		<div className="flex flex-col items-start p-4 space-y-4 w-full max-w-lg">
-			<div className="flex flex-col justify-center items-center pb-4 space-y-4 w-full text-neutral-500">
+		<div className="flex w-full max-w-lg flex-col items-start space-y-4 p-4">
+			<div className="flex w-full flex-col items-center justify-center space-y-4 pb-4 text-neutral-500">
 				<InboxStatus inboxChildren={inbox} />
 			</div>
 
@@ -35,7 +35,7 @@ export default function GTDWidget() {
 						commands.emit<cmd.data.create>("data.create", {
 							name: newItem,
 							parent: null,
-							labels: ["gtd"],
+							labels: ["gtd", "inbox"],
 						})
 
 						setNewItem("")

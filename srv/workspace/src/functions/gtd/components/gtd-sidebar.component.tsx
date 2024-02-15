@@ -21,7 +21,7 @@ export default function GTDSidebar() {
 	const state = useExtensionState<{ pinnedLabels: string[] }>("gtd")
 
 	return (
-		<div className="flex flex-col px-1 mt-8 space-y-8">
+		<div className="mt-8 flex flex-col space-y-8 px-1">
 			<ActionListItem
 				large
 				href="/gtd"
@@ -46,7 +46,7 @@ export default function GTDSidebar() {
 			</div>
 
 			<div className="flex flex-col space-y-2">
-				<div className="flex justify-between items-center w-full">
+				<div className="flex w-full items-center justify-between">
 					<div className="flex-grow">
 						<Title level="5" center uppercase styledFirstLetter>
 							Закреплённые метки
@@ -59,7 +59,6 @@ export default function GTDSidebar() {
 							const labels = Array.from(new Set(data?.flatMap(item => item.labels)))
 
 							if (labels.length === 0 && !state.pinnedLabels?.length) {
-								console.log("HERE")
 								commands.emit<cmd.notification.show>("notification.show", {
 									type: "warn",
 									title: "Ой!",

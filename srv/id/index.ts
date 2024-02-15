@@ -8,7 +8,7 @@
 import chalk from "chalk"
 import { UserPersistenceStrategyDynamoDB } from "@ordo-pink/backend-persistence-strategy-user-dynamodb"
 import { TokenPersistenceStrategyFS } from "@ordo-pink/backend-persistence-strategy-token-fs"
-import { FSUserRepository } from "@ordo-pink/backend-persistence-strategy-user-fs"
+import { PersistenceStrategyUserFS } from "@ordo-pink/backend-persistence-strategy-user-fs"
 import { RusenderEmailStrategy } from "@ordo-pink/backend-email-strategy-rusender"
 import { createIDServer } from "@ordo-pink/backend-server-id"
 import { ConsoleLogger } from "@ordo-pink/logger"
@@ -62,7 +62,7 @@ const main = async () => {
 
 	const userRepository = Switch.of(userPersistenceStrategyType)
 		.case("dynamodb", () => UserPersistenceStrategyDynamoDB.of(userDynamoDBParams))
-		.default(() => FSUserRepository.of(Bun.env.ORDO_ID_USER_FS_STRATEGY_PATH!))
+		.default(() => PersistenceStrategyUserFS.of(Bun.env.ORDO_ID_USER_FS_STRATEGY_PATH!))
 
 	const emailStrategy = RusenderEmailStrategy.of(Bun.env.ORDO_ID_EMAIL_API_KEY!)
 
@@ -102,7 +102,7 @@ const getKey = (key: string, type: "public" | "private") =>
 							},
 							true,
 							["sign"],
-					  )
+						)
 					: crypto.subtle.importKey(
 							"spki",
 							key,
@@ -112,7 +112,7 @@ const getKey = (key: string, type: "public" | "private") =>
 							},
 							true,
 							["verify"],
-					  ),
+						),
 			),
 		)
 		.orElse(e => {

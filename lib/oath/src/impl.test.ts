@@ -1,7 +1,8 @@
 // SPDX-FileCopyrightText: Copyright 2023, 谢尔盖||↓ and the Ordo.pink contributors
 // SPDX-License-Identifier: MIT
 
-import { test, expect, mock } from "bun:test"
+import { expect, mock, test } from "bun:test"
+
 import { Oath, oathify } from "./impl"
 
 // --- oathify ---
@@ -188,7 +189,7 @@ test("Oath.from should create a resolved oath from provided resolved promise thu
 test("Oath.from should create a rejected oath from provided rejected promise thunk", async () => {
 	const resolved = Oath.from(() => Promise.reject(1)).fork(
 		x => x,
-		x => x + 1,
+		x => (x as any) + 1,
 	)
 
 	expect(await resolved).toEqual(1)
@@ -264,7 +265,7 @@ test("resolved oath should fork to resolved promise with oath.toPromise", async 
 	expect(await resolved).toEqual(1)
 })
 
-test("rejected oath should fork to rejected promise with oath.toPromise", async () => {
+test("rejected oath should fork to rejected promise with oath.toPromise", () => {
 	const rejected = Oath.reject("broken").toPromise()
 
 	expect(async () => await rejected).toThrow("broken")
@@ -310,7 +311,7 @@ test("resolved oath.map should return an oath of value updated by the callback",
 
 test("rejected oath.map should return an oath of unchanged value", async () => {
 	const rejected = Oath.reject(1)
-		.map(x => x + 1)
+		.map(x => (x as any) + 1)
 		.fix(x => x)
 		.toPromise()
 
@@ -321,7 +322,7 @@ test("rejected oath.map should return an oath of unchanged value", async () => {
 
 test("resolved oath.rejectedMap should return an oath of unchanged value", async () => {
 	const resolved = Oath.resolve(1)
-		.rejectedMap(x => x + 1)
+		.rejectedMap(x => (x as any) + 1)
 		.toPromise()
 
 	expect(await resolved).toEqual(1)
@@ -359,7 +360,7 @@ test("resolved oath.chain should return a rejected oath of value updated by the 
 
 test("rejected oath.chain should return an oath of unchanged value", async () => {
 	const rejected = Oath.reject(1)
-		.chain(x => Oath.of(x + 1))
+		.chain(x => Oath.of((x as any) + 1))
 		.fork(
 			x => x,
 			x => x,
@@ -372,7 +373,7 @@ test("rejected oath.chain should return an oath of unchanged value", async () =>
 
 test("resolved oath.rejectedChain should return an oath of unchanged value", async () => {
 	const resolved = Oath.resolve(1)
-		.rejectedChain(x => Oath.of(x + 1))
+		.rejectedChain(x => Oath.of((x as any) + 1))
 		.fork(
 			x => x,
 			x => x,
@@ -408,7 +409,7 @@ test("rejected oath.rejectedChain should return a rejected oath of value updated
 test("resolved oath.bimap should return a resolved oath of value updated by the second callback", async () => {
 	const resolved = Oath.resolve(1)
 		.bimap(
-			x => x + 2,
+			x => (x as any) + 2,
 			x => x + 1,
 		)
 		.toPromise()
@@ -420,7 +421,7 @@ test("rejected oath.bimap should return a rejected oath of value updated by the 
 	const rejected = Oath.reject(1)
 		.bimap(
 			x => x + 2,
-			x => x + 1,
+			x => (x as any) + 1,
 		)
 		.fix(x => x)
 		.toPromise()
@@ -431,8 +432,8 @@ test("rejected oath.bimap should return a rejected oath of value updated by the 
 // --- oath.tap ---
 
 test("resolved oath.tap should call the first function and return a resolved oath of unchanged value", async () => {
-	const onResolved = mock(x => x + 1)
-	const onRejected = mock(x => x + 2)
+	const onResolved = mock((x: number) => x + 1)
+	const onRejected = mock((x: number) => x + 2)
 
 	const resolved = Oath.resolve(1)
 		.tap(onResolved, onRejected)
@@ -447,8 +448,8 @@ test("resolved oath.tap should call the first function and return a resolved oat
 })
 
 test("rejected oath.tap should call the second function and return a rejected oath of unchanged value", async () => {
-	const onResolved = mock(x => x + 1)
-	const onRejected = mock(x => x + 2)
+	const onResolved = mock((x: number) => x + 1)
+	const onRejected = mock((x: number) => x + 2)
 
 	const rejected = Oath.reject(1)
 		.tap(onResolved, onRejected)
@@ -507,7 +508,7 @@ test("resolved oath.and should return a rejected oath of a value updated by the 
 		.and(x => Oath.reject(x + 1))
 		.fork(
 			x => x,
-			x => x + 1,
+			x => (x as any) + 1,
 		)
 
 	expect(await resolved).toEqual(2)
@@ -526,7 +527,7 @@ test("resolved oath.and should return a rejected oath of a value updated by the 
 		.and(x => Promise.reject(x + 1))
 		.fork(
 			x => x,
-			x => x + 1,
+			x => (x as any) + 1,
 		)
 
 	expect(await resolved).toEqual(2)
@@ -534,7 +535,7 @@ test("resolved oath.and should return a rejected oath of a value updated by the 
 
 test("rejected oath.and should return a rejected oath of unchanged value", async () => {
 	const rejected = Oath.reject(1)
-		.and(x => x + 1)
+		.and(x => (x as any) + 1)
 		.fork(
 			x => x,
 			x => x,

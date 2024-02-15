@@ -5,12 +5,12 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-import { test, expect } from "bun:test"
-import { FSUserRepository } from "./backend-persistence-strategy-user-fs.impl"
+import { expect, test } from "bun:test"
+import { PersistenceStrategyUserFS } from "./backend-persistence-strategy-user-fs.impl"
 import { rmdir0 } from "@ordo-pink/fs"
 
 const path = "./var/test/backend-fs-user-repository/users.json"
-const repository = FSUserRepository.of(path)
+const strategy = PersistenceStrategyUserFS.of(path)
 
 test("should get user by id", async () => {
 	const createdAt = new Date(Date.now())
@@ -27,9 +27,9 @@ test("should get user by id", async () => {
 		fileLimit: 1000,
 		maxUploadSize: 1.5,
 	} satisfies User.InternalUser
-	await repository.create(user).toPromise()
-	const persistedUserById = await repository.getById(id).toPromise()
-	const doesNotExist = await repository.getById("123-123-123-123-123").orElse(() => null)
+	await strategy.create(user).toPromise()
+	const persistedUserById = await strategy.getById(id).toPromise()
+	const doesNotExist = await strategy.getById("123-123-123-123-123").orElse(() => null)
 
 	expect(persistedUserById.email).toEqual(email)
 	expect(doesNotExist).toBeNull()
@@ -52,9 +52,9 @@ test("should get user by email", async () => {
 		fileLimit: 1000,
 		maxUploadSize: 1.5,
 	} satisfies User.InternalUser
-	await repository.create(user).toPromise()
-	const persistedUserById = await repository.getByEmail(email).toPromise()
-	const doesNotExist = await repository.getByEmail("wrong@test.com").orElse(() => null)
+	await strategy.create(user).toPromise()
+	const persistedUserById = await strategy.getByEmail(email).toPromise()
+	const doesNotExist = await strategy.getByEmail("wrong@test.com").orElse(() => null)
 
 	expect(persistedUserById.id).toEqual(id)
 	expect(doesNotExist).toBeNull()
@@ -77,9 +77,9 @@ test("should check user existence by id", async () => {
 		fileLimit: 1000,
 		maxUploadSize: 1.5,
 	} satisfies User.InternalUser
-	await repository.create(user).toPromise()
-	const persistedUserById = await repository.existsById(id).toPromise()
-	const doesNotExist = await repository.existsById("123-123-123-123-123").toPromise()
+	await strategy.create(user).toPromise()
+	const persistedUserById = await strategy.existsById(id).toPromise()
+	const doesNotExist = await strategy.existsById("123-123-123-123-123").toPromise()
 
 	expect(persistedUserById).toBeTrue()
 	expect(doesNotExist).toBeFalse()
@@ -102,9 +102,9 @@ test("should check user existence by email", async () => {
 		fileLimit: 1000,
 		maxUploadSize: 1.5,
 	} satisfies User.InternalUser
-	await repository.create(user).toPromise()
-	const persistedUserById = await repository.existsByEmail(email).toPromise()
-	const doesNotExist = await repository.existsByEmail("wrong@test.com").toPromise()
+	await strategy.create(user).toPromise()
+	const persistedUserById = await strategy.existsByEmail(email).toPromise()
+	const doesNotExist = await strategy.existsByEmail("wrong@test.com").toPromise()
 
 	expect(persistedUserById).toBeTrue()
 	expect(doesNotExist).toBeFalse()
@@ -128,10 +128,10 @@ test("should update user info", async () => {
 		fileLimit: 1000,
 		maxUploadSize: 1.5,
 	} satisfies User.InternalUser
-	await repository.create(user).toPromise()
+	await strategy.create(user).toPromise()
 
-	await repository.update(user.id, { ...user, email: newEmail }).toPromise()
-	const updatedUser = await repository.getByEmail(newEmail).toPromise()
+	await strategy.update(user.id, { ...user, email: newEmail }).toPromise()
+	const updatedUser = await strategy.getByEmail(newEmail).toPromise()
 
 	expect(updatedUser.id).toEqual(id)
 

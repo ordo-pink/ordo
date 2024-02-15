@@ -1,56 +1,52 @@
 // SPDX-FileCopyrightText: Copyright 2023, 谢尔盖||↓ and the Ordo.pink contributors
 // SPDX-License-Identifier: MIT
 
+import type { ComponentType, LazyExoticComponent, MouseEvent } from "react"
 import type { IconType } from "react-icons"
-import type { ComponentType, MouseEvent } from "react"
-import type { Range, Thunk, UUIDv4, Unary } from "@ordo-pink/tau"
+
 import type { FSID, PlainData } from "@ordo-pink/data"
-import type { Observable } from "rxjs"
-import type { Logger } from "@ordo-pink/logger"
-import type { BackgroundTaskStatus, ComponentSpace } from "./constants"
+import type { UUIDv4 } from "@ordo-pink/tau"
+
+import type { BackgroundTaskStatus } from "./constants"
 
 declare global {
-	module Functions {
-		type CreateFunctionParams = {
-			commands: Client.Commands.Commands
-			data$: Observable<PlainData[]> | null
-		}
-
-		type CreateFunctionFn = Unary<Functions.CreateFunctionParams, void | Promise<void>>
+	type PropsWithChildren<T extends Record<string, unknown> = Record<string, unknown>> = T & {
+		children?: any
 	}
 
 	module Achievements {
-		type AchievementSubscriber = (
-			commands: Client.Commands.Commands,
-			actions: { update: () => void; grant: () => void },
-		) => void
+		type AchievementSubscriber = (actions: {
+			update: (callback: (previousState: AchievementDAO) => AchievementDAO) => void
+			grant: () => void
+		}) => void
 
-		type CheckboxCondition = { type: "checkbox"; done: boolean; description: string }
-		type ProgressCondition = { type: "progress"; progress: Range<0, 101>; description: string }
-		type AchievementListCondition = {
-			type: "achievement-list"
-			achievements: string[]
-			description?: string
-		}
-		type AchievementCondition = CheckboxCondition | ProgressCondition | AchievementListCondition
+		type AchievementCategory = "collection" | "challenge" | "legacy" | "education"
 
 		type AchievementDAO = {
 			id: string
 			title: string
+			image: string
 			description: string
-			completedAt: number | null
-			condition: AchievementCondition | AchievementCondition[]
+			previous?: string
+			completedAt?: Date | null
+			category: AchievementCategory
 		}
 
-		type Achievement = AchievementDAO & {
-			Icon: ComponentType
+		type Achievement = {
+			descriptor: AchievementDAO
 			subscribe: AchievementSubscriber
 		}
 	}
 
 	module cmd {
+		module application {
+			type setTitle = { name: "application.set-title"; payload: string }
+		}
+
 		module background {
 			type setStatus = { name: "background-task.set-status"; payload: BackgroundTaskStatus }
+			type startSaving = { name: "background-task.start-saving" }
+			type startLoading = { name: "background-task.start-loading" }
 			type resetStatus = { name: "background-task.reset-status" }
 		}
 
@@ -62,7 +58,7 @@ declare global {
 		}
 
 		module achievements {
-			type add = { name: "achievements.add"; payload: Achievements.Achievement[] }
+			type add = { name: "achievements.add"; payload: Achievements.Achievement }
 		}
 
 		module user {
@@ -79,7 +75,6 @@ declare global {
 		module activities {
 			type add = { name: "activities.add"; payload: Extensions.Activity }
 			type remove = { name: "activities.remove"; payload: string }
-			type setCurrent = { name: "activities.set-current"; payload: Extensions.Activity }
 		}
 
 		module fileAssociations {
@@ -93,7 +88,8 @@ declare global {
 
 		module data {
 			type refreshRoot = { name: "data.refresh-root" }
-			type getFileContent = { name: "data.get-content"; payload: { fsid: FSID } }
+			type getContent = { name: "data.get-content"; payload: FSID }
+			type dropContent = { name: "data.drop-content"; payload: FSID }
 			type showUploadModal = { name: "data.show-upload-modal"; payload: PlainData | null }
 			type showCreateModal = { name: "data.show-create-modal"; payload: PlainData | null }
 			type showRemoveModal = { name: "data.show-remove-modal"; payload: PlainData }
@@ -117,7 +113,7 @@ declare global {
 			}
 			type create = {
 				name: "data.create"
-				payload: { name: string; parent: FSID | null; labels?: string[] }
+				payload: { name: string; parent: FSID | null; labels?: string[]; contentType?: string }
 			}
 			type remove = { name: "data.remove"; payload: PlainData }
 			type move = { name: "data.move"; payload: { fsid: FSID; parent: FSID | null } }
@@ -128,7 +124,7 @@ declare global {
 			}
 			type removeLabel = {
 				name: "data.remove-label"
-				payload: { item: PlainData; label: string }
+				payload: { item: PlainData; label: string | string[] }
 			}
 
 			type addLink = { name: "data.add-link"; payload: { item: PlainData; link: FSID } }
@@ -152,7 +148,7 @@ declare global {
 				name: "command-palette.show"
 				payload: {
 					items: Client.CommandPalette.Item[]
-					onNewItem?: (newItem: string) => any
+					onNewItem?: (newItem: string) => unknown
 					multiple?: boolean
 					pinnedItems?: Client.CommandPalette.Item[]
 				}
@@ -193,14 +189,11 @@ declare global {
 		type Activity = {
 			name: string
 			routes: string[]
-			Component: ComponentType<ComponentProps>
+			Component: ComponentType | LazyExoticComponent<ComponentType>
 			Sidebar?: ComponentType
+			widgets?: ComponentType[]
+			Icon?: ComponentType | IconType
 			background?: boolean
-		}
-
-		type ComponentProps = {
-			commands: Client.Commands.Commands
-			space: ComponentSpace
 		}
 
 		type FileExtension = `.${string}`
@@ -208,7 +201,7 @@ declare global {
 		type FileAssociation = {
 			name: string
 			fileExtensions: FileExtension[] | "*"
-			Component: ComponentType<ComponentProps>
+			Component: ComponentType
 		}
 	}
 
@@ -252,26 +245,21 @@ declare global {
 			}
 
 			/**
-			 * Context provided to command handler.
-			 */
-			export type Context<P = any> = { logger: Logger; payload: P }
-
-			/**
 			 * Command handler.
 			 */
-			export type Handler<P> = Unary<Commands.Context<P>, any>
+			export type Handler<P> = (payload: P) => unknown
 
-			export type Ctx = { name: CommandName; payload?: any; key?: string }
+			export type AbstractCommand = { name: CommandName; payload?: any; key?: string }
 
-			export type InferName<T extends Ctx> = T extends {
+			export type InferName<T extends AbstractCommand> = T extends {
 				name: infer U
-				payload?: any
+				payload?: unknown
 			}
 				? U
 				: never
 
-			export type InferPayload<T extends Ctx> = T extends {
-				name: any
+			export type InferPayload<T extends AbstractCommand> = T extends {
+				name: unknown
 				payload: infer U
 			}
 				? U
@@ -281,25 +269,42 @@ declare global {
 				/**
 				 * Append a listener to a given command.
 				 */
-				on: <T extends Ctx = Ctx>(name: InferName<T>, handler: Handler<InferPayload<T>>) => void
+				on: <T extends AbstractCommand = AbstractCommand>(
+					name: InferName<T>,
+					handler: Handler<InferPayload<T>>,
+				) => void
 
 				/**
 				 * Prepend listener to a given command.
 				 */
-				before: <T extends Ctx = Ctx>(name: InferName<T>, handler: Handler<InferPayload<T>>) => void
+				before: <T extends AbstractCommand = AbstractCommand>(
+					name: InferName<T>,
+					handler: Handler<InferPayload<T>>,
+				) => void
+
+				/**
+				 * Append a listener to a given command.
+				 */
+				after: <T extends AbstractCommand = AbstractCommand>(
+					name: InferName<T>,
+					handler: Handler<InferPayload<T>>,
+				) => void
 
 				/**
 				 * Remove given listener for a given command. Make sure you provide a reference to the same
 				 * function as you did when calling `on`.
 				 */
-				off: <T extends Ctx = Ctx>(name: InferName<T>, handler: Handler<InferPayload<T>>) => void
+				off: <T extends AbstractCommand = AbstractCommand>(
+					name: InferName<T>,
+					handler: Handler<InferPayload<T>>,
+				) => void
 
 				/**
 				 * Emit given command with given payload. You can provide an optional key that you can use
 				 * later to apply targeted cancellation for the command. Emission does not happen if there
 				 * is a command with given key already.
 				 */
-				emit: <T extends Ctx = Ctx>(
+				emit: <T extends AbstractCommand = AbstractCommand>(
 					name: InferName<T>,
 					payload?: InferPayload<T>,
 					key?: string,
@@ -309,7 +314,7 @@ declare global {
 				 * Cancel a command with given payload. If you provided a key when emitting the command,
 				 * you can provide it for targeted cancellation.
 				 */
-				cancel: <T extends Ctx = Ctx>(
+				cancel: <T extends AbstractCommand = AbstractCommand>(
 					name: InferName<T>,
 					payload?: InferPayload<T>,
 					key?: string,
@@ -364,8 +369,9 @@ declare global {
 				title?: string
 				message: string
 				payload?: T
+				Icon?: ComponentType | IconType
 				duration?: number
-				action?: (id: string, payload: T) => any
+				action?: (id: string, payload: T) => unknown
 				actionText?: string
 				id?: string
 			}
@@ -390,7 +396,7 @@ declare global {
 				 * @optional
 				 * @default () => void 0
 				 */
-				onHide?: Thunk<void>
+				onHide?: () => void
 			}
 
 			export type HandleShowPayload = {
@@ -403,7 +409,7 @@ declare global {
 			/**
 			 * Context menu item.
 			 */
-			export type Item<T = any> = {
+			export type Item<T = unknown> = {
 				/**
 				 * Check whether the item needs to be shown.
 				 */
@@ -458,7 +464,7 @@ declare global {
 			/**
 			 * Show context menu item parameters.
 			 */
-			export type ShowOptions<T = "root" | PlainData | string> = {
+			export type ShowOptions<T = PlainData | string> = {
 				/**
 				 * Accepted mouse event.
 				 */
@@ -507,7 +513,7 @@ declare global {
 			/**
 			 * Context menu item method descriptor.
 			 */
-			export type ItemMethod<T = any, Result = any> = Unary<ItemMethodParams<T>, Result>
+			export type ItemMethod<T = any, Result = any> = (params: ItemMethodParams<T>) => Result
 
 			/**
 			 * Context menu item type. This impacts two things:
@@ -546,14 +552,14 @@ declare global {
 				/**
 				 * Action to be executed when command palette item is used.
 				 */
-				onSelect: Thunk<void>
+				onSelect: () => void
 
 				/**
 				 * Icon to be displayed for the context menu item.
 				 *
 				 * @optional
 				 */
-				Icon?: IconType
+				Icon?: ComponentType | IconType
 
 				/**
 				 * Keyboard accelerator for the context menu item. It only works while the context menu is
@@ -565,4 +571,11 @@ declare global {
 			}
 		}
 	}
+}
+
+export type PlainDataNode = {
+	data: PlainData
+	id: FSID
+	parent: FSID | null
+	children: PlainData[]
 }

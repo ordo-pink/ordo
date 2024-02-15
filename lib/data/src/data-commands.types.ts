@@ -2,10 +2,11 @@
 // SPDX-License-Identifier: MIT
 
 import type { Oath } from "@ordo-pink/oath"
+
 import type { FSID, PlainData } from "./data.types"
+import type { ContentPersistenceStrategy } from "./content-persistence-strategy.types"
 import type { DataError } from "./errors.types"
 import type { DataPersistenceStrategy } from "./data-persistence-strategy.types"
-import type { ContentPersistenceStrategy } from "./content-persistence-strategy.types"
 
 export type TDataCommands<T> = {
 	dataPersistenceStrategy: DataPersistenceStrategy
@@ -35,7 +36,7 @@ export type TDataCommands<T> = {
 		params: Pick<PlainData, "fsid" | "createdBy" | "updatedBy"> & { label: string | string[] },
 	) => Oath<"OK", DataError>
 	removeLabel: (
-		params: Pick<PlainData, "fsid" | "createdBy" | "updatedBy"> & { label: string },
+		params: Pick<PlainData, "fsid" | "createdBy" | "updatedBy"> & { label: string | string[] },
 	) => Oath<"OK", DataError>
 	addLink: (
 		params: Pick<PlainData, "fsid" | "createdBy" | "updatedBy"> & { link: FSID },

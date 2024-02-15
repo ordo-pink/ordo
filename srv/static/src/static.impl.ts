@@ -2,9 +2,10 @@
 // SPDX-License-Identifier: MIT
 
 import chalk from "chalk"
+
 import { ConsoleLogger } from "@ordo-pink/logger"
-import { getc } from "@ordo-pink/getc"
 import { createRouter } from "./create-router"
+import { getc } from "@ordo-pink/getc"
 
 const { ORDO_STATIC_ROOT, ORDO_STATIC_PORT } = getc(["ORDO_STATIC_ROOT", "ORDO_STATIC_PORT"])
 const logger = ConsoleLogger

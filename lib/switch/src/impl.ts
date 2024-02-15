@@ -29,5 +29,5 @@ const swich = <TContext, TResult extends unknown[] = []>(
 
 		return isTrue ? swichMatched(() => onTrue(x)) : (swich(x) as any)
 	},
-	default: defaultValue => defaultValue(),
+	default: defaultValue => defaultValue(x),
 })

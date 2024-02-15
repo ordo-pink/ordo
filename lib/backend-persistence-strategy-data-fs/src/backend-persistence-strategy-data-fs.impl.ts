@@ -6,14 +6,15 @@
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 import { resolve } from "path"
+
 import {
 	Data,
-	PlainData,
+	type DataNotFound,
+	type DataPersistenceStrategy,
+	type DataUnexpectedError,
+	type FSID,
+	type PlainData,
 	UnexpectedError,
-	DataPersistenceStrategy,
-	FSID,
-	DataNotFound,
-	DataUnexpectedError,
 } from "@ordo-pink/data"
 import { createParentIfNotExists0, fileExists0, readFile0, writeFile0 } from "@ordo-pink/fs"
 import { Oath } from "@ordo-pink/oath"

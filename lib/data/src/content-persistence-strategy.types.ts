@@ -2,7 +2,8 @@
 // SPDX-License-Identifier: MIT
 
 import type { Oath } from "@ordo-pink/oath"
-import type { UserID, FSID } from "./data.types"
+
+import type { FSID, UserID } from "./data.types"
 import type { Errors } from "./errors.impl"
 
 export type ContentNotFound = (typeof Errors)["DataNotFound"]

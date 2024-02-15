@@ -2,13 +2,14 @@
 // SPDX-License-Identifier: MIT
 
 import { Either } from "@ordo-pink/either"
-import { validations } from "./data-validations.impl"
-import { PlainData, TData, DataStatic, FSID } from "./data.types"
-import { Errors } from "./errors.impl"
+
+import { DataStatic, FSID, PlainData, TData } from "./data.types"
 import { DataError } from "./errors.types"
+import { Errors } from "./errors.impl"
+import { validations } from "./data-validations.impl"
 
 const addUnique = <T>(array: T[], ...elements: T[]) => Array.from(new Set([...elements, ...array]))
-const drop = <T>(array: T[], element: T) => array.filter(item => item !== element)
+const drop = <T>(array: T[], ...elements: T[]) => array.filter(item => !elements.includes(item))
 const extend =
 	<T extends Record<string, unknown>, N extends Record<string, unknown>>(f: (obj: T) => N) =>
 	(obj: T) => ({ ...obj, ...f(obj) })
@@ -124,10 +125,19 @@ const addLabelE =
 const removeLabelE =
 	(plain: PlainData): TData["removeLabel"] =>
 	(label, updatedBy) =>
-		validations
-			.isValidStringE(label)
-			.chain(label => validations.isValidSubE(updatedBy).map(updatedBy => ({ label, updatedBy })))
-			.map(({ label, updatedBy }) => ({ updatedBy, labels: drop(plain.labels, label) }))
+		Either.of<string[], DataError>(Array.isArray(label) ? label : [label])
+			.chain(labels =>
+				labels.reduce(
+					(acc, v) => acc.chain(() => validations.isValidStringE(v)),
+					Either.right<string, DataError>(""),
+				),
+			)
+			.chain(() =>
+				validations
+					.isValidSubE(updatedBy)
+					.map(updatedBy => ({ labels: Array.isArray(label) ? label : [label], updatedBy })),
+			)
+			.map(({ labels, updatedBy }) => ({ updatedBy, labels: drop(plain.labels, ...labels) }))
 			.map(extend(() => ({ updatedAt: Date.now() })))
 			.map(increment => Data.of({ ...plain, ...increment }))
 

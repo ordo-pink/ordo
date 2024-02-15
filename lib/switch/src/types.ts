@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: Copyright 2023, 谢尔盖||↓ and the Ordo.pink contributors
 // SPDX-License-Identifier: MIT
 
-import type { ValidatorFn, Unpack } from "@ordo-pink/tau"
+import type { Unpack, ValidatorFn } from "@ordo-pink/tau"
 
 /**
  * Helper object that contains a pointing interface to put value
@@ -71,5 +71,7 @@ export type TSwitch<TContext, TResult extends unknown[]> = {
 	 *
 	 * @example `Switch.of(myBoolean).case(true, () => "oh, thanks!").default(() => "You WHAT?")`
 	 */
-	default: <TDefaultResult>(onAllFalse: () => TDefaultResult) => Unpack<TResult> | TDefaultResult
+	default: <TDefaultResult>(
+		onAllFalse: (x: TContext) => TDefaultResult,
+	) => Unpack<TResult> | TDefaultResult
 }

@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: Copyright 2023, 谢尔盖||↓ and the Ordo.pink contributors
 // SPDX-License-Identifier: MIT
 
-import type { WJWTSignFn, WJWTVerifyFn, TWJWT } from "./wjwt.types"
+import type { TWJWT } from "./wjwt.types"
 import { decode0 } from "./_decode"
 import { sign0 } from "./_sign"
 import { verify0 } from "./_verify"

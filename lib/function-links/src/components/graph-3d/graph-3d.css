@@ -1,0 +1,4 @@
+.scene-tooltip {
+	font-family: "Jost", sans-serif;
+	@apply max-w-xs rounded-md bg-neutral-200/60 px-2 text-center text-neutral-800 shadow-md backdrop-blur-sm dark:bg-neutral-950/60 dark:text-neutral-200;
+}

@@ -2,16 +2,17 @@
 // SPDX-License-Identifier: MIT
 
 import { Oath } from "@ordo-pink/oath"
-import { WJWTVerifyFn } from "./wjwt.types"
-import { Rrr } from "./wjwt.constants"
 import { isString } from "@ordo-pink/tau"
+
+import { Rrr } from "./wjwt.constants"
+import { WJWTVerifyFn } from "./wjwt.types"
 import { decode0 } from "./_decode"
 
 export const verify0: WJWTVerifyFn =
 	({ alg, key }) =>
 	(
 		token,
-		aud, // TODO: Check aud
+		// aud, // TODO: Check aud
 	) =>
 		Oath.fromNullable(token)
 			.rejectedMap(() => Rrr.INVALORDO_ID_TOKEN)

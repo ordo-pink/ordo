@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: Copyright 2023, 谢尔盖||↓ and the Ordo.pink contributors
 // SPDX-License-Identifier: MIT
 
-import { useRef, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 
 import { useAccelerator, useCommands } from "@ordo-pink/frontend-react-hooks"
 
@@ -22,12 +22,16 @@ export default function GTDInbox() {
 
 	useAccelerator("meta+n", () => createInputRef.current?.focus())
 
+	useEffect(() => {
+		commands.emit<cmd.application.setTitle>("application.set-title", "Входящие | GTD")
+	}, [commands])
+
 	const tAddToInboxInputPlaceholder = "Что делается..."
 
 	return (
 		<CenteredPage centerX centerY>
-			<div className="flex w-full flex-col items-center space-y-4 overflow-y-hidden px-4 py-8">
-				<div className="flex w-full max-w-2xl flex-col space-y-4">
+			<div className="flex overflow-y-hidden flex-col items-center px-4 py-8 space-y-4 w-full">
+				<div className="flex flex-col space-y-4 w-full max-w-2xl">
 					<Card className="h-[90vh]" title="Входящие">
 						<TextInput
 							autoFocus

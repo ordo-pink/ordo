@@ -15,6 +15,8 @@ export default function Achievements() {
 
 			// Show achievement since it's not in an achievement chain
 			if (!next && !previous) return true
+			// Show achievement since it's the first achievement in the chain and it is not obtained yet
+			if (!previous && !ach.completedAt) return true
 			// Hide achievement since previous steps were not completed
 			if (previous && !previous.completedAt) return false
 			// Show achievement since it's a current achievement to be obtained in the chain

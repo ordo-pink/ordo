@@ -41,7 +41,8 @@ const registerContextMenu = ({ commands }: P) => {
 		readableName: "Открыть в редакторе",
 		type: "read",
 		accelerator: "mod+e",
-		shouldShow: ({ payload }) => !!payload && !window.location.pathname.startsWith("/editor"),
+		shouldShow: ({ payload }) =>
+			!!payload && payload !== "root" && !window.location.pathname.startsWith("/editor"),
 		payloadCreator: ({ payload }) => (payload as PlainData).fsid,
 	})
 

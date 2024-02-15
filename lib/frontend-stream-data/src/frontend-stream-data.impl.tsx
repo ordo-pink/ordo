@@ -419,7 +419,7 @@ export const __initData = ({ fid, dataCommands }: P) => {
 			.rejectedChain(() =>
 				dataCommands.create({
 					fsid: LIB_DIRECTORY_FSID,
-					name: "lib",
+					name: ".lib",
 					parent: null,
 					createdBy: auth.sub,
 					fileLimit: auth.fileLimit,

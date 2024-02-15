@@ -29,15 +29,24 @@ export const __initAchievements = callOnce(({ fid, dataCommands }: P) => {
 				registerred
 					? void 0
 					: void Oath.fromNullable(data)
-							.chain(data =>
+							.chain(data => Oath.fromNullable(user).map(user => ({ data, user })))
+							.chain(({ user, data }) =>
 								Oath.fromNullable(
 									DataRepository.findData(
 										data,
 										item => item.name === "achievements.json" && item.parent === LIB_DIRECTORY_FSID,
 									),
-								),
+								)
+									.rejectedChain(() =>
+										dataCommands.create({
+											name: "achievements.json",
+											parent: LIB_DIRECTORY_FSID,
+											createdBy: user.id,
+											fileLimit: user.fileLimit,
+										}),
+									)
+									.map(data => ({ user, data })),
 							)
-							.chain(data => Oath.fromNullable(user).map(user => ({ data, user })))
 							.chain(({ data, user }) =>
 								dataCommands
 									.getContent({ fsid: data.fsid, createdBy: user.id })

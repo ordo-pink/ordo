@@ -37,7 +37,9 @@ export default function LinksWorkspace() {
 		const tmpNodes = [] as typeof nodes
 		const tmpLinks = [] as typeof links
 
-		data.forEach(item => {
+		const relevantData = label ? data.filter(d => d.labels.includes(label)) : data
+
+		relevantData.forEach(item => {
 			if (!tmpNodes.some(n => n.id === item.fsid)) tmpNodes.push({ id: item.fsid, data: item })
 
 			if (item.parent) {
@@ -75,7 +77,7 @@ export default function LinksWorkspace() {
 
 	return (
 		<div className="relative h-[calc(100vh-1px)] overflow-hidden" style={{ width: workspaceWidth }}>
-			<div className="absolute top-4 z-50 flex w-full justify-center space-x-2">
+			<div className="flex absolute top-4 z-50 justify-center space-x-2 w-full">
 				<OrdoButton.Primary onClick={() => setIs3D(false)} inverted={is3D}>
 					2D
 				</OrdoButton.Primary>

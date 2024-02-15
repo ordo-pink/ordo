@@ -19,7 +19,7 @@ export default function LinksSidebar() {
 					Icon={BsTag}
 					current={label === currentLabel}
 					text={label}
-					href={`/links/labels/${label}`}
+					href={`/links/labels/${encodeURIComponent(label)}`}
 				>
 					<div className="text-xs text-neutral-500">
 						{data?.filter(item => item.labels.includes(label)).length}

@@ -21,6 +21,9 @@ import Modal from "@ordo-pink/frontend-react-sections/modal"
 import Notifications from "@ordo-pink/frontend-react-sections/notifications"
 import Workspace from "@ordo-pink/frontend-react-sections/workspace"
 import { title$ } from "@ordo-pink/frontend-stream-title"
+import Loader from "@ordo-pink/frontend-react-components/loader"
+import CenteredPage from "@ordo-pink/frontend-react-components/centered-page"
+import Link from "@ordo-pink/frontend-react-components/link"
 
 // TODO: Take import source from ENV
 export default function App() {
@@ -97,4 +100,17 @@ export default function App() {
 
 // --- Internal ---
 
-const Fallback = () => <div>TODO</div> // TODO: Add error fallback
+const Fallback = () => (
+	<div className="bg-neutral-800">
+		<CenteredPage centerX centerY>
+			<div className="flex flex-col justify-center items-center space-y-4 w-full h-screen">
+				<Loader size="l"></Loader>
+				<p>
+					Возможно, что-то пошло не так. Может, <Link href="/">на главную</Link>?
+				</p>
+			</div>
+		</CenteredPage>
+	</div>
+)
+
+// TODO: Add error fallback

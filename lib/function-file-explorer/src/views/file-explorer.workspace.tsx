@@ -1,4 +1,4 @@
-import { Dispatch, MouseEventHandler, SetStateAction, useState } from "react"
+import { Dispatch, MouseEventHandler, SetStateAction, useEffect, useState } from "react"
 
 import { FSID, PlainData } from "@ordo-pink/data"
 import { useChildren, useCommands, useDataFromRouteFSID } from "@ordo-pink/frontend-react-hooks"
@@ -12,12 +12,19 @@ export default function FileExplorerActivity() {
 
 	const [selectedItems, setSelectedItems] = useState<FSID[]>([])
 
+	useEffect(() => {
+		commands.emit<cmd.application.setTitle>(
+			"application.set-title",
+			currentData ? `${currentData.name} | Файлы` : "Файлы",
+		)
+	}, [currentData, commands])
+
 	return (
 		<div
-			className="size-full min-h-screen"
+			className="min-h-screen size-full"
 			onContextMenu={showContextMenu({ commands, payload: currentData ?? "root" })}
 		>
-			<div className="file-explorer flex w-full flex-wrap p-4">
+			<div className="flex flex-wrap p-4 w-full file-explorer">
 				{currentDataChildren.map(item => (
 					<FSDataIcon
 						key={item.fsid}

@@ -14,12 +14,16 @@ import { useAppInit } from "@ordo-pink/frontend-app-init"
 
 import ActivityBar from "@ordo-pink/frontend-react-sections/activity-bar"
 import BackgroundTaskIndicator from "@ordo-pink/frontend-react-sections/background-task-indicator"
+import CenteredPage from "@ordo-pink/frontend-react-components/centered-page"
 import ContextMenu from "@ordo-pink/frontend-react-sections/context-menu/context-menu.component"
 import ErrorBoundary from "@ordo-pink/frontend-react-components/error-boundary"
+import Link from "@ordo-pink/frontend-react-components/link"
+import Loader from "@ordo-pink/frontend-react-components/loader"
 import Loading from "@ordo-pink/frontend-react-components/loading-page"
 import Modal from "@ordo-pink/frontend-react-sections/modal"
 import Notifications from "@ordo-pink/frontend-react-sections/notifications"
 import Workspace from "@ordo-pink/frontend-react-sections/workspace"
+
 import { title$ } from "@ordo-pink/frontend-stream-title"
 
 // TODO: Take import source from ENV
@@ -97,4 +101,15 @@ export default function App() {
 
 // --- Internal ---
 
-const Fallback = () => <div>TODO</div> // TODO: Add error fallback
+const Fallback = () => (
+	<div className="bg-neutral-800">
+		<CenteredPage centerX centerY>
+			<div className="flex flex-col justify-center items-center space-y-4 w-full h-screen">
+				<Loader size="l"></Loader>
+				<p>
+					Возможно, что-то пошло не так. Может, <Link href="/">на главную</Link>?
+				</p>
+			</div>
+		</CenteredPage>
+	</div>
+)

@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: Copyright 2023, 谢尔盖||↓ and the Ordo.pink contributors
 // SPDX-License-Identifier: MIT
 
-import { useRef, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 
 import {
 	useAccelerator,
@@ -29,12 +29,17 @@ export default function GTDSubtasks({ fsid }: P) {
 
 	useAccelerator("meta+n", () => createInputRef.current?.focus())
 
+	useEffect(() => {
+		data &&
+			commands.emit<cmd.application.setTitle>("application.set-title", `Проет ${data.name} | GTD`)
+	}, [data, commands])
+
 	const tAddToInboxInputPlaceholder = "Что делается..."
 
 	return Either.fromNullable(data).fold(Loading, data => (
 		<CenteredPage centerX centerY>
-			<div className="flex w-full flex-col items-center space-y-4 overflow-y-hidden px-4 py-8">
-				<div className="flex w-full max-w-2xl flex-col space-y-4">
+			<div className="flex overflow-y-hidden flex-col items-center px-4 py-8 space-y-4 w-full">
+				<div className="flex flex-col space-y-4 w-full max-w-2xl">
 					<Card className="h-[90vh]" title={data.name}>
 						<TextInput
 							autoFocus
@@ -44,10 +49,10 @@ export default function GTDSubtasks({ fsid }: P) {
 							value={newItem}
 							onInput={e => setNewItem(e.target.value)}
 							onKeyDown={e => {
-								if (e.key === "Enter" && newItem) {
-									commands.emit<cmd.data.create>("data.create", { name: newItem, parent: fsid })
-									setNewItem("")
-								}
+								if (e.key !== "Enter" || !newItem) return
+
+								commands.emit<cmd.data.create>("data.create", { name: newItem, parent: fsid })
+								setNewItem("")
 							}}
 							placeholder={tAddToInboxInputPlaceholder}
 						/>

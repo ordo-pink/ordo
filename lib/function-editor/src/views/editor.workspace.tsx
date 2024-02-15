@@ -42,10 +42,23 @@ import HoveringToolbar from "../components/hovering-toolbar.component"
 export default function EditorWorkspace() {
 	const { fsid } = useRouteParams<{ fsid: FSID }>()
 
+	const commands = useCommands()
 	const data = useDataByFSID(fsid)
 	const content = useContent(fsid)
 
 	const [initialState, setInitialState] = useState<Descendant[] | null | "empty">(null)
+
+	const editor = useMemo(
+		() => withShortcuts(withChecklists(withHistory(withReact(createEditor())))),
+		[],
+	)
+
+	useEffect(() => {
+		commands.emit<cmd.application.setTitle>(
+			"application.set-title",
+			data ? `${data.name} | Редактор` : "Редактор",
+		)
+	}, [data, commands])
 
 	useEffect(() => {
 		if (!data) return void setInitialState(null)
@@ -56,13 +69,6 @@ export default function EditorWorkspace() {
 
 		return () => void setInitialState(null)
 	}, [data, content])
-
-	const commands = useCommands()
-
-	const editor = useMemo(
-		() => withShortcuts(withChecklists(withHistory(withReact(createEditor())))),
-		[],
-	)
 
 	useEffect(() => {
 		if (initialState === "empty") {

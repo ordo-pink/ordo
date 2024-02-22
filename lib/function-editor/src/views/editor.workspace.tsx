@@ -1,5 +1,21 @@
-// SPDX-FileCopyrightText: Copyright 2023, 谢尔盖||↓ and the Ordo.pink contributors
-// SPDX-License-Identifier: MIT
+// SPDX-FileCopyrightText: Copyright 2024, 谢尔盖||↓ and the Ordo.pink contributors
+// SPDX-License-Identifier: AGPL-3.0-only
+
+// Ordo.pink is an all-in-one team workspace.
+// Copyright (C) 2024  谢尔盖||↓ and the Ordo.pink contributors
+
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU Affero General Public License as published
+// by the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU Affero General Public License for more details.
+
+// You should have received a copy of the GNU Affero General Public License
+// along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { Descendant, Editor, Node, Element as SlateElement, Transforms, createEditor } from "slate"
 import {
@@ -171,8 +187,8 @@ export default function EditorWorkspace() {
 				</CenteredPage>
 			),
 			({ data, initialState }) => (
-				<div className="flex flex-col items-center p-2 py-12 size-full">
-					<div className="flex flex-col space-y-6 w-full max-w-xl">
+				<div className="flex size-full flex-col items-center p-2 py-12">
+					<div className="flex w-full max-w-xl flex-col space-y-6">
 						<div>
 							<EditableTitle data={data} />
 						</div>
@@ -294,7 +310,7 @@ const CheckListItemElement = ({ attributes, children, element }: RenderElementPr
 			<span contentEditable={false} className="mr-3">
 				<input
 					type="checkbox"
-					className="text-emerald-500 rounded-sm cursor-pointer size-6 bg-neutral-200 focus:ring-0 dark:bg-neutral-500"
+					className="size-6 cursor-pointer rounded-sm bg-neutral-200 text-emerald-500 focus:ring-0 dark:bg-neutral-500"
 					checked={(element as any)?.checked}
 					onChange={event => {
 						const path = ReactEditor.findPath(editor, element)

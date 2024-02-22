@@ -1,13 +1,14 @@
-// SPDX-FileCopyrightText: Copyright 2023, 谢尔盖||↓ and the Ordo.pink contributors
-// SPDX-License-Identifier: MIT
+// SPDX-FileCopyrightText: Copyright 2024, 谢尔盖||↓ and the Ordo.pink contributors
+// SPDX-License-Identifier: Unlicense
 
-import { test, expect } from "bun:test"
+import { expect, test } from "bun:test"
 import { isDirectory0, isFile0, readFile0, rmdir0 } from "@ordo-pink/fs"
 import { getLicense } from "@ordo-pink/binutil"
+
 import { mklib } from "./impl"
 
 test("should create test lib src files", async () => {
-	await mklib("test-lib", "MIT")
+	await mklib("test-lib", "Unlicense")
 
 	expect(await isDirectory0("./lib/test-lib").toPromise()).toBeTrue()
 	expect(await isFile0("./lib/test-lib/license").toPromise()).toBeTrue()
@@ -20,24 +21,24 @@ test("should create test lib src files", async () => {
 	await rmdir0("./lib/test-lib", { recursive: true }).toPromise()
 })
 
-test("should license the files with MIT", async () => {
-	await mklib("test-lib", "MIT")
+test("should license the files with Unlicense", async () => {
+	await mklib("test-lib", "Unlicense")
 
 	const text = await readFile0("./lib/test-lib/license", { encoding: "utf-8" }).toPromise()
-	expect(text).toEqual(getLicense("MIT"))
+	expect(text).toEqual(getLicense("Unlicense"))
 
 	await rmdir0("./lib/test-lib", { recursive: true }).toPromise()
 })
 
-test("should license the files with MPL-2.0", async () => {
-	await mklib("test-lib", "MPL-2.0")
+test("should license the files with AGPL-3.0-only", async () => {
+	await mklib("test-lib", "AGPL-3.0-only")
 
 	const text = await readFile0("./lib/test-lib/license", { encoding: "utf-8" }).toPromise()
-	expect(text).toEqual(getLicense("MPL-2.0"))
+	expect(text).toEqual(getLicense("AGPL-3.0-only"))
 
 	await rmdir0("./lib/test-lib", { recursive: true }).toPromise()
 })
 
 test("should throw on attempt to create a lib that already exists", async () => {
-	expect(await mklib("oath", "MIT")).toBeFalse()
+	expect(await mklib("oath", "Unlicense")).toBeFalse()
 })

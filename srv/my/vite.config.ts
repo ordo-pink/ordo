@@ -14,7 +14,7 @@ export default defineConfig({
 		minify: true,
 	},
 	server: {
-		port: Number(process.env.ORDO_WORKSPACE_PORT),
+		port: Number(process.env.ORDO_MY_PORT),
 	},
 	resolve: {
 		alias: {

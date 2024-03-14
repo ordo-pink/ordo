@@ -23,7 +23,7 @@ const websiteHost = Bun.env.ORDO_WEB_HOST!
 const logger = ConsoleLogger
 const origin = [
 	Bun.env.ORDO_DT_PRIVATE_HOST!,
-	Bun.env.ORDO_WORKSPACE_HOST!,
+	Bun.env.ORDO_MY_HOST!,
 	Bun.env.ORDO_WEB_HOST!,
 	Bun.env.ORDO_DT_HOST!,
 ]

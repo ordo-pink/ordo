@@ -20,7 +20,7 @@ export default function SignUpPage() {
 
 				<section className="w-full px-4 py-8 mx-auto">
 					<SignUpForm
-						workspaceHost={process.env.NEXT_PUBLIC_ORDO_WORKSPACE_HOST!}
+						workspaceHost={process.env.NEXT_PUBLIC_ORDO_MY_HOST!}
 						idHost={process.env.NEXT_PUBLIC_ORDO_ID_HOST!}
 					/>
 				</section>

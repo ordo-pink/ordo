@@ -17,7 +17,7 @@ import { Switch } from "@ordo-pink/switch"
 
 const port = Bun.env.ORDO_DT_PORT!
 const idHost = Bun.env.ORDO_ID_HOST!
-const origin = [Bun.env.ORDO_WORKSPACE_HOST!, Bun.env.ORDO_WEB_HOST!]
+const origin = [Bun.env.ORDO_MY_HOST!, Bun.env.ORDO_WEB_HOST!]
 const logger = ConsoleLogger
 const contentPersistenceStrategyType = Bun.env.ORDO_DT_CONTENT_PERSISTENCE_STRATEGY!
 

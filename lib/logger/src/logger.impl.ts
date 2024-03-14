@@ -7,14 +7,14 @@ import type * as T from "./logger.types"
  * An average console enjoyer.
  */
 export const ConsoleLogger: T.Logger = {
-	alert: (...args) => console.error(`🚨 [ALRT]:`, ...args),
-	crit: (...args) => console.error(`🚑️ [CRIT]:`, ...args),
-	debug: (...args) => console.debug(`🔨 [DEBG]:`, ...args),
-	error: (...args) => console.error(`💥 [ERRR]:`, ...args),
-	notice: (...args) => console.info(`📝 [NOTE]:`, ...args),
-	info: (...args) => console.info(`✅ [INFO]:`, ...args),
-	panic: (...args) => console.error(`🔥 [PANC]:`, ...args),
-	warn: (...args) => console.warn(`⚠️ [WARN]:`, ...args),
+	alert: (...args) => console.error("🚨 [ALRT]:", ...args),
+	crit: (...args) => console.error("🚑️ [CRIT]:", ...args),
+	debug: (...args) => console.debug("🔨 [DEBG]:", ...args),
+	error: (...args) => console.error("💥 [ERRR]:", ...args),
+	notice: (...args) => console.info("📝 [NOTE]:", ...args),
+	info: (...args) => console.info("✅ [INFO]:", ...args),
+	panic: (...args) => console.error("🔥 [PANC]:", ...args),
+	warn: (...args) => console.warn("⚠️ [WARN]:", ...args),
 }
 
 /**✓

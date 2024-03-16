@@ -12,5 +12,7 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: lts/*
+      - name: Boot
+        run: boot/boot.sh
       - name: Run ESLint
         run: npx eslint .

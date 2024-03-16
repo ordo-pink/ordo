@@ -1,5 +1,21 @@
-// SPDX-FileCopyrightText: Copyright 2023, 谢尔盖||↓ and the Ordo.pink contributors
-// SPDX-License-Identifier: MIT
+// SPDX-FileCopyrightText: Copyright 2024, 谢尔盖||↓ and the Ordo.pink contributors
+// SPDX-License-Identifier: AGPL-3.0-only
+
+// Ordo.pink is an all-in-one team workspace.
+// Copyright (C) 2024  谢尔盖||↓ and the Ordo.pink contributors
+
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU Affero General Public License as published
+// by the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU Affero General Public License for more details.
+
+// You should have received a copy of the GNU Affero General Public License
+// along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { OrdoRoutes } from "@ordo-pink/ordo-routes"
 import { Centered } from "components/centered"
@@ -8,17 +24,17 @@ import Link from "next/link"
 export default function PrivacyPolicyPage() {
 	return (
 		<Centered centerX>
-			<article className="max-w-xl my-16 mx-4">
+			<article className="mx-4 my-16 max-w-xl">
 				<div className="row mb-4">
 					<div className="col">
-						<h1 className="text-3xl font-black text-center first-letter:bg-gradient-to-tr first-letter:from-pink-500 first-letter:to-purple-500 first-letter:bg-clip-text first-letter:text-transparent">
+						<h1 className="text-center text-3xl font-black first-letter:bg-gradient-to-tr first-letter:from-pink-500 first-letter:to-purple-500 first-letter:bg-clip-text first-letter:text-transparent">
 							Политика в отношении обработки персональных данных
 						</h1>
 					</div>
 				</div>
 				<div className="row mb-4">
 					<div className="col">
-						<h2 className="text-xl font-bold my-4">1. Общие положения</h2>
+						<h2 className="my-4 text-xl font-bold">1. Общие положения</h2>
 						<div className="descr my-4">
 							Настоящая политика обработки персональных данных составлена в соответствии с
 							требованиями Федерального закона от 27.07.2006. № 152-ФЗ «О персональных данных»
@@ -50,7 +66,7 @@ export default function PrivacyPolicyPage() {
 				</div>
 				<div className="row mb-4">
 					<div className="col">
-						<h2 className="text-xl font-bold my-4">2. Основные понятия, используемые в Политике</h2>
+						<h2 className="my-4 text-xl font-bold">2. Основные понятия, используемые в Политике</h2>
 						<div className="ol">
 							<div className="my-2">
 								2.1. Автоматизированная обработка персональных данных — обработка персональных
@@ -136,7 +152,7 @@ export default function PrivacyPolicyPage() {
 				</div>
 				<div className="row mb-4">
 					<div className="col">
-						<h2 className="text-xl font-bold my-4">3. Основные права и обязанности Оператора</h2>
+						<h2 className="my-4 text-xl font-bold">3. Основные права и обязанности Оператора</h2>
 						<div className="ol">
 							<div className="my-2">3.1. Оператор имеет право:</div>
 							<div className="my-2">
@@ -197,7 +213,7 @@ export default function PrivacyPolicyPage() {
 				</div>
 				<div className="row mb-4">
 					<div className="col">
-						<h2 className="text-xl font-bold my-4">
+						<h2 className="my-4 text-xl font-bold">
 							4. Основные права и обязанности субъектов персональных данных
 						</h2>
 						<div className="ol">
@@ -248,7 +264,7 @@ export default function PrivacyPolicyPage() {
 				</div>
 				<div className="row mb-4">
 					<div className="col">
-						<h2 className="text-xl font-bold my-4">5. Принципы обработки персональных данных</h2>
+						<h2 className="my-4 text-xl font-bold">5. Принципы обработки персональных данных</h2>
 						<div className="ol">
 							<div className="my-2">
 								5.1. Обработка персональных данных осуществляется на законной и справедливой основе.
@@ -292,23 +308,23 @@ export default function PrivacyPolicyPage() {
 				</div>
 				<div className="row mb-4">
 					<div className="col">
-						<h2 className="text-xl font-bold my-4">6. Цели обработки персональных данных</h2>
+						<h2 className="my-4 text-xl font-bold">6. Цели обработки персональных данных</h2>
 						<div className="ol">
 							<div className="my-2" id="Ml6Ex">
-								<table className="table-auto border-spacing-2 border border-neutral-500 border-collapse">
+								<table className="table-auto border-collapse border-spacing-2 border border-neutral-500">
 									<tbody>
 										<tr>
 											<th>Цель обработки</th>
-											<td className="purpose-field p-2 border-spacing-2 border border-neutral-500 border-collapse">
+											<td className="purpose-field border-collapse border-spacing-2 border border-neutral-500 p-2">
 												<span className="mark link">
 													предоставление доступа Пользователю к сервисам, информации и/или
 													материалам, содержащимся на веб-сайте
 												</span>
 											</td>
 										</tr>
-										<tr className="table-row border-spacing-2 border border-neutral-500 border-collapse">
+										<tr className="table-row border-collapse border-spacing-2 border border-neutral-500">
 											<th>Персональные данные</th>
-											<td className="data-field p-2 border-spacing-2 border border-neutral-500 border-collapse">
+											<td className="data-field border-collapse border-spacing-2 border border-neutral-500 p-2">
 												<ul>
 													<li>
 														<span className="mark link">электронный адрес</span>
@@ -322,10 +338,10 @@ export default function PrivacyPolicyPage() {
 												</ul>
 											</td>
 										</tr>
-										<tr className="table-row border-spacing-2 border border-neutral-500 border-collapse">
+										<tr className="table-row border-collapse border-spacing-2 border border-neutral-500">
 											<th>Правовые основания</th>
-											<td className="legal-field p-2 border border-neutral-500 border-collapse">
-												<ul className="list-disc list-inside">
+											<td className="legal-field border-collapse border border-neutral-500 p-2">
+												<ul className="list-inside list-disc">
 													<li>
 														<span className="mark link">
 															Федеральный закон «Об информации, информационных технологиях и о
@@ -337,8 +353,8 @@ export default function PrivacyPolicyPage() {
 										</tr>
 										<tr className="table-row">
 											<th>Виды обработки персональных данных</th>
-											<td className="types-field p-2 border-spacing-2 border border-neutral-500 border-collapse">
-												<ul className="list-disc list-inside">
+											<td className="types-field border-collapse border-spacing-2 border border-neutral-500 p-2">
+												<ul className="list-inside list-disc">
 													<li>
 														<span className="mark link">
 															Сбор, запись, систематизация, накопление, хранение, уничтожение и
@@ -361,7 +377,7 @@ export default function PrivacyPolicyPage() {
 				</div>
 				<div className="row mb-4">
 					<div className="col">
-						<h2 className="text-xl font-bold my-4">7. Условия обработки персональных данных</h2>
+						<h2 className="my-4 text-xl font-bold">7. Условия обработки персональных данных</h2>
 						<div className="ol">
 							<div className="my-2">
 								7.1. Обработка персональных данных осуществляется с согласия субъекта персональных
@@ -406,7 +422,7 @@ export default function PrivacyPolicyPage() {
 				</div>
 				<div className="row mb-4">
 					<div className="col">
-						<h2 className="text-xl font-bold my-4">
+						<h2 className="my-4 text-xl font-bold">
 							8. Порядок сбора, хранения, передачи и других видов обработки персональных данных
 						</h2>
 						<div className="descr">
@@ -481,7 +497,7 @@ export default function PrivacyPolicyPage() {
 				</div>
 				<div className="row mb-4">
 					<div className="col">
-						<h2 className="text-xl font-bold my-4">
+						<h2 className="my-4 text-xl font-bold">
 							9. Перечень действий, производимых Оператором с полученными персональными данными
 						</h2>
 						<div className="ol">
@@ -501,7 +517,7 @@ export default function PrivacyPolicyPage() {
 				</div>
 				<div className="row mb-4">
 					<div className="col">
-						<h2 className="text-xl font-bold my-4">
+						<h2 className="my-4 text-xl font-bold">
 							10. Трансграничная передача персональных данных
 						</h2>
 						<div className="ol">
@@ -523,7 +539,7 @@ export default function PrivacyPolicyPage() {
 				</div>
 				<div className="row mb-4">
 					<div className="col">
-						<h2 className="text-xl font-bold my-4">11. Конфиденциальность персональных данных</h2>
+						<h2 className="my-4 text-xl font-bold">11. Конфиденциальность персональных данных</h2>
 						<div className="descr">
 							Оператор и иные лица, получившие доступ к персональным данным, обязаны не раскрывать
 							третьим лицам и не распространять персональные данные без согласия субъекта
@@ -533,7 +549,7 @@ export default function PrivacyPolicyPage() {
 				</div>
 				<div className="row mb-4">
 					<div className="col">
-						<h2 className="text-xl font-bold my-4">12. Заключительные положения</h2>
+						<h2 className="my-4 text-xl font-bold">12. Заключительные положения</h2>
 						<div className="ol">
 							<div className="my-2">
 								12.1. Пользователь может получить любые разъяснения по интересующим вопросам,

@@ -1,13 +1,14 @@
-// SPDX-FileCopyrightText: Copyright 2023, 谢尔盖||↓ and the Ordo.pink contributors
-// SPDX-License-Identifier: MIT
+// SPDX-FileCopyrightText: Copyright 2024, 谢尔盖||↓ and the Ordo.pink contributors
+// SPDX-License-Identifier: Unlicense
 
-import { test, expect } from "bun:test"
+import { expect, test } from "bun:test"
 import { isDirectory0, isFile0, readFile0, rmdir0 } from "@ordo-pink/fs"
 import { getLicense } from "@ordo-pink/binutil"
+
 import { mksrv } from "./impl"
 
 test("should create test srv src files", async () => {
-	await mksrv("test-srv", "MIT")
+	await mksrv("test-srv", "Unlicense")
 
 	expect(await isDirectory0("./srv/test-srv").toPromise()).toBeTrue()
 	expect(await isFile0("./srv/test-srv/license").toPromise()).toBeTrue()
@@ -20,24 +21,24 @@ test("should create test srv src files", async () => {
 	await rmdir0("./srv/test-srv", { recursive: true }).toPromise()
 })
 
-test("should license the files with MIT", async () => {
-	await mksrv("test-srv", "MIT")
+test("should license the files with Unlicense", async () => {
+	await mksrv("test-srv", "Unlicense")
 
 	const text = await readFile0("./srv/test-srv/license", "utf-8").toPromise()
-	expect(text).toEqual(getLicense("MIT"))
+	expect(text).toEqual(getLicense("Unlicense"))
 
 	await rmdir0("./srv/test-srv", { recursive: true }).toPromise()
 })
 
-test("should license the files with MPL-2.0", async () => {
-	await mksrv("test-srv", "MPL-2.0")
+test("should license the files with AGPL-3.0-only", async () => {
+	await mksrv("test-srv", "AGPL-3.0-only")
 
 	const text = await readFile0("./srv/test-srv/license", "utf-8").toPromise()
-	expect(text).toEqual(getLicense("MPL-2.0"))
+	expect(text).toEqual(getLicense("AGPL-3.0-only"))
 
 	await rmdir0("./srv/test-srv", { recursive: true }).toPromise()
 })
 
 test("should throw on attempt to create a srv that already exists", async () => {
-	expect(await mksrv("id", "MIT")).toBeFalse()
+	expect(await mksrv("id", "Unlicense")).toBeFalse()
 })

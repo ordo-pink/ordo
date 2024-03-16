@@ -1,13 +1,14 @@
-// SPDX-FileCopyrightText: Copyright 2023, 谢尔盖||↓ and the Ordo.pink contributors
-// SPDX-License-Identifier: MIT
+// SPDX-FileCopyrightText: Copyright 2024, 谢尔盖||↓ and the Ordo.pink contributors
+// SPDX-License-Identifier: Unlicense
 
-import { test, expect } from "bun:test"
+import { expect, test } from "bun:test"
 import { isDirectory0, isFile0, readFile0, rmdir0 } from "@ordo-pink/fs"
 import { getLicense } from "@ordo-pink/binutil"
+
 import { mkbin } from "./impl"
 
 test("should create test boot src files", async () => {
-	await mkbin("test-mkbin", "MIT")
+	await mkbin("test-mkbin", "Unlicense")
 
 	expect(await isDirectory0("./boot/src/test-mkbin").orNothing()).toBeTrue()
 	expect(await isFile0("./boot/src/test-mkbin/license").orNothing()).toBeTrue()
@@ -18,24 +19,24 @@ test("should create test boot src files", async () => {
 	await rmdir0("./boot/src/test-mkbin", { recursive: true }).orNothing()
 })
 
-test("should license the files with MIT", async () => {
-	await mkbin("test-mkbin", "MIT")
+test("should license the files with Unlicense", async () => {
+	await mkbin("test-mkbin", "Unlicense")
 
 	const text = await readFile0("./boot/src/test-mkbin/license", "utf-8").orNothing()
-	expect(text).toEqual(getLicense("MIT"))
+	expect(text).toEqual(getLicense("Unlicense"))
 
 	await rmdir0("./boot/src/test-mkbin", { recursive: true }).orNothing()
 })
 
-test("should license the files with MPL-2.0", async () => {
-	await mkbin("test-mkbin", "MPL-2.0")
+test("should license the files with AGPL-3.0-only", async () => {
+	await mkbin("test-mkbin", "AGPL-3.0-only")
 
 	const text = await readFile0("./boot/src/test-mkbin/license", "utf-8").orNothing()
-	expect(text).toEqual(getLicense("MPL-2.0"))
+	expect(text).toEqual(getLicense("AGPL-3.0-only"))
 
 	await rmdir0("./boot/src/test-mkbin", { recursive: true }).orNothing()
 })
 
 test("should throw on attempt to create a bin that already exists", async () => {
-	expect(await mkbin("test", "MIT")).toBeFalse()
+	expect(await mkbin("test", "Unlicense")).toBeFalse()
 })

@@ -1,5 +1,21 @@
-// SPDX-FileCopyrightText: Copyright 2023, 谢尔盖||↓ and the Ordo.pink contributors
-// SPDX-License-Identifier: MIT
+// SPDX-FileCopyrightText: Copyright 2024, 谢尔盖||↓ and the Ordo.pink contributors
+// SPDX-License-Identifier: AGPL-3.0-only
+
+// Ordo.pink is an all-in-one team workspace.
+// Copyright (C) 2024  谢尔盖||↓ and the Ordo.pink contributors
+
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU Affero General Public License as published
+// by the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU Affero General Public License for more details.
+
+// You should have received a copy of the GNU Affero General Public License
+// along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { useEffect, useState } from "react"
 import { Button } from "./button"
@@ -36,8 +52,8 @@ export default function SignUpForm({ idHost, workspaceHost }: _P) {
 	}, [password, repeatPassword])
 
 	return (
-		<form className="flex flex-col items-center space-y-12 w-full">
-			<div className="flex flex-col space-y-6 w-full">
+		<form className="flex w-full flex-col items-center space-y-12">
+			<div className="flex w-full flex-col space-y-6">
 				<fieldset className="space-y-4">
 					<EmailInput
 						onChange={e => {
@@ -70,49 +86,49 @@ export default function SignUpForm({ idHost, workspaceHost }: _P) {
 							<div>
 								<div className="flex items-center space-x-2">
 									{isValid.passwordLength ? (
-										<BsCheck2 className="text-lg text-emerald-500 shrink-0" />
+										<BsCheck2 className="shrink-0 text-lg text-emerald-500" />
 									) : (
-										<BsX className="text-lg text-red-500 shrink-0" />
+										<BsX className="shrink-0 text-lg text-red-500" />
 									)}
 									<span>Email указан верно</span>
 								</div>
 								<div className="flex items-center space-x-2">
 									{isValid.passwordLength ? (
-										<BsCheck2 className="text-lg text-emerald-500 shrink-0" />
+										<BsCheck2 className="shrink-0 text-lg text-emerald-500" />
 									) : (
-										<BsX className="text-lg text-red-500 shrink-0" />
+										<BsX className="shrink-0 text-lg text-red-500" />
 									)}
 									<span>Пароль от 8 до 50 символов</span>
 								</div>
 								<div className="flex items-center space-x-2">
 									{isValid.passwordCapital ? (
-										<BsCheck2 className="text-lg text-emerald-500 shrink-0" />
+										<BsCheck2 className="shrink-0 text-lg text-emerald-500" />
 									) : (
-										<BsX className="text-lg text-red-500 shrink-0" />
+										<BsX className="shrink-0 text-lg text-red-500" />
 									)}
 									<span>Хотя бы одна заглавная буква в пароле</span>
 								</div>
 								<div className="flex items-center space-x-2">
 									{isValid.passwordDigit ? (
-										<BsCheck2 className="text-lg text-emerald-500 shrink-0" />
+										<BsCheck2 className="shrink-0 text-lg text-emerald-500" />
 									) : (
-										<BsX className="text-lg text-red-500 shrink-0" />
+										<BsX className="shrink-0 text-lg text-red-500" />
 									)}
 									<span>Хотя бы одна цифра в пароле</span>
 								</div>
 								<div className="flex items-center space-x-2">
 									{isValid.passwordSymbol ? (
-										<BsCheck2 className="text-lg text-emerald-500 shrink-0" />
+										<BsCheck2 className="shrink-0 text-lg text-emerald-500" />
 									) : (
-										<BsX className="text-lg text-red-500 shrink-0" />
+										<BsX className="shrink-0 text-lg text-red-500" />
 									)}
 									<span>Специальный символ ({"`!@#$%^&*()_+-=[]{};':\"\\|,.<>/?~"}) в пароле</span>
 								</div>
 								<div className="flex items-center space-x-2">
 									{isValid.passwordsMatch ? (
-										<BsCheck2 className="text-lg text-emerald-500 shrink-0" />
+										<BsCheck2 className="shrink-0 text-lg text-emerald-500" />
 									) : (
-										<BsX className="text-lg text-red-500 shrink-0" />
+										<BsX className="shrink-0 text-lg text-red-500" />
 									)}
 									<span>Пароли совпадают</span>
 								</div>
@@ -123,7 +139,7 @@ export default function SignUpForm({ idHost, workspaceHost }: _P) {
 			</div>
 
 			<p className="text-xs">
-				<label className="flex items-center space-x-2 cursor-pointer">
+				<label className="flex cursor-pointer items-center space-x-2">
 					<span className="block">
 						<input
 							type="checkbox"
@@ -141,7 +157,7 @@ export default function SignUpForm({ idHost, workspaceHost }: _P) {
 				</label>
 			</p>
 
-			<div className="flex flex-col w-full">
+			<div className="flex w-full flex-col">
 				<Button
 					disabled={isButtonDisabled}
 					onClick={async e => {

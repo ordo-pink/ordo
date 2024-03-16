@@ -1,5 +1,5 @@
-// SPDX-FileCopyrightText: Copyright 2023, 谢尔盖||↓ and the Ordo.pink contributors
-// SPDX-License-Identifier: MIT
+// SPDX-FileCopyrightText: Copyright 2024, 谢尔盖||↓ and the Ordo.pink contributors
+// SPDX-License-Identifier: Unlicense
 
 import { camel, pascal, title } from "case"
 import {
@@ -52,7 +52,9 @@ const rejectIfExists0: Curry<Binary<string, boolean, Oath<void, string>>> = name
 
 const createFilesIfNotExists0: Binary<string, License, Unary<string, Oath<void, string | Error>>> =
 	(name, license) => path =>
-		directoryExists0(path).chain(rejectIfExists0(name)).chain(createFiles0(path, name, license))
+		directoryExists0(path)
+			.chain(rejectIfExists0(name))
+			.chain(createFiles0(path, name, license))
 
 // --- Internal ---
 

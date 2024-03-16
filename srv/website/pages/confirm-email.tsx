@@ -1,5 +1,21 @@
-// SPDX-FileCopyrightText: Copyright 2023, 谢尔盖||↓ and the Ordo.pink contributors
-// SPDX-License-Identifier: MIT
+// SPDX-FileCopyrightText: Copyright 2024, 谢尔盖||↓ and the Ordo.pink contributors
+// SPDX-License-Identifier: AGPL-3.0-only
+
+// Ordo.pink is an all-in-one team workspace.
+// Copyright (C) 2024  谢尔盖||↓ and the Ordo.pink contributors
+
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU Affero General Public License as published
+// by the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU Affero General Public License for more details.
+
+// You should have received a copy of the GNU Affero General Public License
+// along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { Centered } from "../components/centered"
 import { useRouter } from "next/router"
@@ -48,7 +64,7 @@ export default function ConfirmEmailPage() {
 					<title>Ordo.pink | Почта подтверждена</title>
 				</Head>
 				<div className="flex flex-col space-y-2">
-					<h1 className="text-3xl font-black mb-12">Поздравляем!</h1>
+					<h1 className="mb-12 text-3xl font-black">Поздравляем!</h1>
 					<p>
 						Ваша почта подтверждена. Добро пожаловать в <Link href="/">Ordo.pink</Link>!
 					</p>
@@ -67,7 +83,7 @@ export default function ConfirmEmailPage() {
 				</Head>
 
 				<div className="flex flex-col space-y-2">
-					<h1 className="text-3xl font-black mb-12">Что-то пошло не так.</h1>
+					<h1 className="mb-12 text-3xl font-black">Что-то пошло не так.</h1>
 					<p>Вы уверены, что перешли по ссылке, которую мы отправили на вашу почту?</p>
 					<p>
 						Если ссылка действительно не сработала, сообщите, пожалуйста, в{" "}
@@ -89,7 +105,7 @@ export default function ConfirmEmailPage() {
 				<Head>
 					<title>Ordo.pink | Подтверждение электронной почты</title>
 				</Head>
-				<h1 className="text-3xl font-black mb-12">Подтверждаем вашу почту...</h1>
+				<h1 className="mb-12 text-3xl font-black">Подтверждаем вашу почту...</h1>
 				<p>Это вам не раз-два, знаете ли! ☝️</p>
 			</Centered>
 		))

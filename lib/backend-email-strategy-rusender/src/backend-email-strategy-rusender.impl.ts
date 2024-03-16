@@ -5,8 +5,24 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-import { EmailStrategy, EmailTemplate } from "@ordo-pink/backend-service-offline-notifications"
-import { Either } from "@ordo-pink/either"
+import {
+	type EmailParams,
+	type EmailTemplate,
+} from "@ordo-pink/backend-service-offline-notifications"
+import { Oath } from "@ordo-pink/oath"
+import { extend } from "@ordo-pink/tau"
+
+import {
+	RUSENDER_API_KEY_HEADER,
+	RUSENDER_CONTENT_TYPE_HEADER,
+	RUSENDER_SEND_HTTP_METHOD,
+	RUSENDER_SEND_URL,
+	RUSENDER_TEMPLATE_URL,
+} from "./backend-email-strategy-rusender.constants"
+import {
+	type TEmailStrategyRusenderStatic,
+	type TRusenderTemplateEmailRequestBody,
+} from "./backend-email-strategy-rusender.types"
 
 /**
  * `RusenderEmailStrategy` implements `EmailStrategy` for sending emails using Rusender. To create
@@ -17,48 +33,63 @@ import { Either } from "@ordo-pink/either"
  * @warning This strategy is recommended for use in "ru" region only.
  *
  * @example
- * const emailStrategy = RusenderEmailStrategy.of("YOUR_RUSENDER_API_KEY")
+ * const emailStrategy = RusenderEmailStrategy.of({ key: "YOUR_RUSENDER_API_KEY" })
+ * emailStrategy.send(message)
+ *
+ * TODO: #272 Support for `sendSync` that awaits the result.
+ * TODO: #273 Support for receiving `sendAsync` result and propagating it to an optional listener.
+ * TODO: #274 Drop using templates and provide markup directly.
+ * TODO: #275 Update OfflineNotificationsService types to avoid type collisions.
  */
-export const RusenderEmailStrategy = {
-	/**
-	 * `RusenderEmailStrategy` factory.
-	 */
-	of: (apiKey: string): EmailStrategy => ({
-		send: message => {
-			let isTemplateEmail = false
-
-			const mail = Either.fromNullable((message as EmailTemplate).templateId)
-				.map(id => {
-					isTemplateEmail = true
-
-					return {
-						from: message.from,
-						to: message.to,
-						subject: message.subject,
-						cc: message.cc,
-						bcc: message.bcc,
-						headers: message.headers,
-						params: (message as EmailTemplate).params,
-						idTemplateMailUser: id,
-					}
-				})
-				.fold(
-					() => message,
-					result => result,
-				)
-
-			void fetch(isTemplateEmail ? templateUrl : url, {
-				method,
-				headers: getHeaders(apiKey),
-				body: JSON.stringify({ mail }),
-			})
-		},
+export const EmailStrategyRusender: TEmailStrategyRusenderStatic = {
+	create: ({ key }) => ({
+		sendAsync: message =>
+			void Oath.fromNullable((message as EmailTemplate).templateId)
+				.map(() => ({
+					from: message.from,
+					to: message.to,
+					subject: message.subject,
+					cc: message.cc,
+					bcc: message.bcc,
+					headers: message.headers,
+					params: (message as EmailTemplate).params,
+					idTemplateMailUser: (message as EmailTemplate).templateId,
+				}))
+				.chain(mail => sendRusenderTemplateRequest(mail, key))
+				.rejectedChain(() => sendRusenderSendRequest(message, key))
+				.orNothing(),
 	}),
 }
 
-// --- Internal ---
+/**
+ * @deprecated
+ * @see #274
+ */
+const sendRusenderTemplateRequest = (mail: TRusenderTemplateEmailRequestBody, key: string) =>
+	Oath.fromNullable(key)
+		.map(initRequestParams)
+		.map(extend(addMethod))
+		.map(extend(addUrl(RUSENDER_TEMPLATE_URL)))
+		.map(extend(addBody(mail)))
+		.chain(({ method, url, headers, body }) =>
+			Oath.from(() => fetch(url, { method, headers, body })),
+		)
 
-const templateUrl = "https://api.beta.rusender.ru/api/v1/external-mails/send-by-template"
-const url = "https://api.beta.rusender.ru/api/v1/external-mails/send"
-const method = "POST"
-const getHeaders = (key: string) => ({ "X-Api-Key": key, "Content-Type": "application/json" })
+const sendRusenderSendRequest = (mail: EmailParams, key: string) =>
+	Oath.fromNullable(key)
+		.map(initRequestParams)
+		.map(extend(addMethod))
+		.map(extend(addUrl(RUSENDER_SEND_URL)))
+		.map(extend(addBody(mail)))
+		.chain(({ method, url, headers, body }) =>
+			Oath.from(() => fetch(url, { method, headers, body })),
+		)
+
+const initRequestParams = (key: string) => ({
+	headers: { ...RUSENDER_CONTENT_TYPE_HEADER, [RUSENDER_API_KEY_HEADER]: key },
+})
+const addMethod = () => ({ method: RUSENDER_SEND_HTTP_METHOD })
+const addUrl = (url: string) => () => ({ url })
+const addBody = (mail: TRusenderTemplateEmailRequestBody | EmailParams) => () => ({
+	body: JSON.stringify({ mail }),
+})

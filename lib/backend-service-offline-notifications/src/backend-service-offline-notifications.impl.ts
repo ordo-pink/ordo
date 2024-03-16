@@ -18,7 +18,7 @@ export const NotificationService = {
 	}: InitNotificationServiceOptions): TNotificationService => ({
 		emailStrategy,
 		sendSignInNotification: ({ email, ip, name }) => {
-			emailStrategy.send({
+			emailStrategy.sendAsync({
 				from,
 				to: { email, name },
 				subject: "Кто-то вошёл в ваш аккаунт Ordo.pink",
@@ -27,7 +27,7 @@ export const NotificationService = {
 			})
 		},
 		sendEmailConfirmationRequestEmail: ({ email, confirmationUrl }) => {
-			emailStrategy.send({
+			emailStrategy.sendAsync({
 				from,
 				to: { email, name: email },
 				subject: "Регистрация в Ordo.pink",

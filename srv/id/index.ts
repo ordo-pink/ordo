@@ -9,7 +9,7 @@ import chalk from "chalk"
 import { UserPersistenceStrategyDynamoDB } from "@ordo-pink/backend-persistence-strategy-user-dynamodb"
 import { TokenPersistenceStrategyFS } from "@ordo-pink/backend-persistence-strategy-token-fs"
 import { PersistenceStrategyUserFS } from "@ordo-pink/backend-persistence-strategy-user-fs"
-import { RusenderEmailStrategy } from "@ordo-pink/backend-email-strategy-rusender"
+import { EmailStrategyRusender } from "@ordo-pink/backend-email-strategy-rusender"
 import { createIDServer } from "@ordo-pink/backend-server-id"
 import { ConsoleLogger } from "@ordo-pink/logger"
 import { Switch } from "@ordo-pink/switch"
@@ -64,7 +64,7 @@ const main = async () => {
 		.case("dynamodb", () => UserPersistenceStrategyDynamoDB.of(userDynamoDBParams))
 		.default(() => PersistenceStrategyUserFS.of(Bun.env.ORDO_ID_USER_FS_STRATEGY_PATH!))
 
-	const emailStrategy = RusenderEmailStrategy.of(Bun.env.ORDO_ID_EMAIL_API_KEY!)
+	const emailStrategy = EmailStrategyRusender.create(Bun.env.ORDO_ID_EMAIL_API_KEY!)
 
 	const app = await createIDServer({
 		userRepository,

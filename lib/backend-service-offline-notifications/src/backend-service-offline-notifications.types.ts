@@ -92,8 +92,12 @@ export type EmailBody =
 			text?: string
 	  }
 
+/**
+ * @deprecated
+ */
 export type EmailTemplate = {
 	templateId: number
+	idTemplateMailUser?: number
 	params: Record<string, string>
 }
 
@@ -110,7 +114,7 @@ export type EmailStrategy = {
 	 * @param params Message to be sent.
 	 * @returns void.
 	 */
-	send: (params: EmailParams) => void
+	sendAsync: (params: EmailParams) => void
 }
 
 export type SendSignInNotificationParams = EmailContact & {

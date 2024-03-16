@@ -19,9 +19,13 @@ program
 	.argument("name", "name of the bin to be created")
 	.option("-l, --license <mit|mpl>", "license for the generated code", "mit")
 	.action(async (name, options) => {
+<<<<<<< Updated upstream
 		const license = Switch.of(options.license)
 			.case("mpl", () => "MPL-2.0" as const)
 			.default(() => "MIT" as const)
+=======
+		const license = options.unlicense ? "Unlicense" : "AGPL-3.0-only"
+>>>>>>> Stashed changes
 
 		await mkbin(name, license)
 	})

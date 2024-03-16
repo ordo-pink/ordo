@@ -1,5 +1,21 @@
-// SPDX-FileCopyrightText: Copyright 2023, 谢尔盖||↓ and the Ordo.pink contributors
-// SPDX-License-Identifier: MIT
+// SPDX-FileCopyrightText: Copyright 2024, 谢尔盖||↓ and the Ordo.pink contributors
+// SPDX-License-Identifier: AGPL-3.0-only
+
+// Ordo.pink is an all-in-one team workspace.
+// Copyright (C) 2024  谢尔盖||↓ and the Ordo.pink contributors
+
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU Affero General Public License as published
+// by the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU Affero General Public License for more details.
+
+// You should have received a copy of the GNU Affero General Public License
+// along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 export const oathify =
 	<Args extends any[], Result extends Promise<any>>(f: (...args: Args) => Result) =>
@@ -44,6 +60,7 @@ export class Oath<Resolve, Reject = never> {
 		thunk: () => Promise<Resolve>,
 		abortController = new AbortController(),
 	): Oath<Resolve, Reject> {
+		// eslint-disable-next-line @typescript-eslint/no-misused-promises
 		return new Oath((resolve, reject) => thunk().then(resolve, reject), abortController)
 	}
 
@@ -84,8 +101,10 @@ export class Oath<Resolve, Reject = never> {
 		f: () => Resolve,
 		abortController = new AbortController(),
 	): Oath<Awaited<Resolve>, Reject> {
+		// eslint-disable-next-line @typescript-eslint/no-misused-promises
 		return new Oath(async (resolve, reject) => {
 			try {
+				// eslint-disable-next-line @typescript-eslint/await-thenable
 				resolve(await f())
 			} catch (e) {
 				reject(e instanceof Error ? e : (new Error(String(e)) as any))
@@ -159,7 +178,7 @@ export class Oath<Resolve, Reject = never> {
 				if (!keys.length) return outerResolve({})
 
 				keys.forEach(key => {
-					const value = (values as any)[key] as any
+					const value = (values as any)[key]
 
 					if (value && value.isOath) {
 						value.fork(
@@ -241,6 +260,7 @@ export class Oath<Resolve, Reject = never> {
 
 	public swap(): Oath<Reject, Resolve> {
 		return new Oath<Reject, Resolve>(
+			// eslint-disable-next-line @typescript-eslint/no-misused-promises
 			(resolve, reject) =>
 				this.fork(
 					a => (this.isCancelled ? reject(this.cancellationReason as any) : resolve(a)),
@@ -255,6 +275,7 @@ export class Oath<Resolve, Reject = never> {
 		onRejected: (x: Reject) => any = () => void 0,
 	): Oath<Resolve, Reject> {
 		return new Oath<Resolve, Reject>(
+			// eslint-disable-next-line @typescript-eslint/no-misused-promises
 			(resolve, reject) =>
 				this.fork(
 					a => {
@@ -283,6 +304,7 @@ export class Oath<Resolve, Reject = never> {
 		onResolved: (x: Resolve) => any,
 	): Oath<Resolve, Reject> {
 		return new Oath<Resolve, Reject>(
+			// eslint-disable-next-line @typescript-eslint/no-misused-promises
 			(resolve, reject) =>
 				this.fork(
 					a => {
@@ -304,6 +326,7 @@ export class Oath<Resolve, Reject = never> {
 
 	public map<NewResolve>(f: (x: Resolve) => NewResolve): Oath<NewResolve, Reject> {
 		return new Oath<NewResolve, Reject>(
+			// eslint-disable-next-line @typescript-eslint/no-misused-promises
 			(resolve, reject) =>
 				this.fork(
 					a => (this.isCancelled ? reject(this.cancellationReason as any) : reject(a)),
@@ -315,6 +338,7 @@ export class Oath<Resolve, Reject = never> {
 
 	public rejectedMap<NewReject>(f: (x: Reject) => NewReject): Oath<Resolve, NewReject> {
 		return new Oath<Resolve, NewReject>(
+			// eslint-disable-next-line @typescript-eslint/no-misused-promises
 			(resolve, reject) =>
 				this.fork(
 					a => (this.isCancelled ? reject(this.cancellationReason as any) : reject(f(a))),
@@ -329,6 +353,7 @@ export class Oath<Resolve, Reject = never> {
 		g: (x: Resolve) => NewResolve,
 	): Oath<NewResolve, NewReject> {
 		return new Oath<NewResolve, NewReject>(
+			// eslint-disable-next-line @typescript-eslint/no-misused-promises
 			(resolve, reject) =>
 				this.fork(
 					a => (this.isCancelled ? reject(this.cancellationReason as any) : reject(f(a))),
@@ -342,6 +367,7 @@ export class Oath<Resolve, Reject = never> {
 		f: (x: Resolve) => Oath<NewResolve, NewReject>,
 	): Oath<NewResolve, Reject | NewReject> {
 		return new Oath(
+			// eslint-disable-next-line @typescript-eslint/no-misused-promises
 			(resolve, reject) =>
 				this.fork(
 					a => (this.isCancelled ? reject(this.cancellationReason as any) : reject(a)),
@@ -356,6 +382,7 @@ export class Oath<Resolve, Reject = never> {
 		f: (x: Reject) => Oath<Resolve, NewReject>,
 	): Oath<Resolve, NewReject> {
 		return new Oath(
+			// eslint-disable-next-line @typescript-eslint/no-misused-promises
 			(resolve, reject) =>
 				this.fork(
 					a =>
@@ -370,6 +397,7 @@ export class Oath<Resolve, Reject = never> {
 		f: (x: Resolve) => PromiseLike<NewResolve> | Oath<NewResolve, NewReject> | NewResolve,
 	): Oath<NewResolve, Reject | NewReject> {
 		return new Oath(
+			// eslint-disable-next-line @typescript-eslint/no-misused-promises
 			(resolve, reject) =>
 				this.fork(
 					a => (this.isCancelled ? reject(this.cancellationReason as any) : reject(a)),
@@ -382,7 +410,7 @@ export class Oath<Resolve, Reject = never> {
 							const forked: any = f(b)
 
 							if (!forked) return resolve(forked)
-							if (forked.isOath) return forked.fork(reject, resolve) as any
+							if (forked.isOath) return forked.fork(reject, resolve)
 							if (forked.then) return Oath.from(() => forked).fork(reject as any, resolve as any)
 							return resolve(forked)
 						} catch (e) {
@@ -398,6 +426,7 @@ export class Oath<Resolve, Reject = never> {
 		f: (x: Reject) => PromiseLike<NewResolve> | Oath<NewResolve, NewReject> | NewResolve,
 	): Oath<Resolve | NewResolve, NewReject> {
 		return new Oath(
+			// eslint-disable-next-line @typescript-eslint/no-misused-promises
 			(resolve, reject) =>
 				this.fork(
 					a => {
@@ -422,7 +451,7 @@ export class Oath<Resolve, Reject = never> {
 		)
 	}
 
-	public async fork<NewResolve, NewReject>(
+	public fork<NewResolve, NewReject>(
 		onRejected: (error: Reject) => NewReject,
 		onResolved: (value: Resolve) => NewResolve,
 	): Promise<NewResolve | NewReject> {

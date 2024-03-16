@@ -1,10 +1,10 @@
-// SPDX-FileCopyrightText: Copyright 2023, 谢尔盖||↓ and the Ordo.pink contributors
-// SPDX-License-Identifier: MIT
+// SPDX-FileCopyrightText: Copyright 2024, 谢尔盖||↓ and the Ordo.pink contributors
+// SPDX-License-Identifier: Unlicense
 
 import * as util from "@ordo-pink/binutil"
+import { Binary, Curry, Unary, noop } from "@ordo-pink/tau"
 import { isFile0, readFile0, readdir0, writeFile0 } from "@ordo-pink/fs"
 import { Oath } from "@ordo-pink/oath"
-import { Binary, Curry, Unary, noop } from "@ordo-pink/tau"
 
 // --- Public ---
 
@@ -35,24 +35,30 @@ const createSPDXRecords0: Unary<string, Oath<void[], Error>> = (path: string) =>
 				dirent.isDirectory()
 					? createSPDXRecords0(`${path}/${dirent.name}`).map(noop)
 					: dirent.name.endsWith(".ts") || dirent.name.endsWith(".tsx")
-					? createSPDXRecord0(`${path}/${dirent.name}`)
-					: Oath.empty(),
+						? createSPDXRecord0(`${path}/${dirent.name}`)
+						: Oath.empty(),
 			),
 		),
 	)
 
 const createSPDXRecord0 = (path: string) =>
-	Oath.of(path.trim().split("/").slice(0, 2).join("/")).chain(space =>
+	Oath.of(
+		path
+			.trim()
+			.split("/")
+			.slice(0, path.includes("boot/src") ? 3 : 2)
+			.join("/"),
+	).chain(space =>
 		isFile0(`${space}/license`).chain(exists =>
 			exists
 				? readFile0(`${space}/license`, "utf-8")
-						.map(license => (license === mitLicense ? ("MIT" as const) : ("MPL-2.0" as const)))
+						.map(license => (license === unlicense ? "Unlicense" : "AGPL-3.0-only"))
 						.map(license => util.getSPDXRecord(license))
 						.chain(spdx =>
 							readFile0(path, "utf-8").chain(content =>
 								(content as string).startsWith(spdx)
 									? Oath.empty()
-									: writeFile0(path, `${spdx}\n${content}`).map(spdxRecordsProgress.inc),
+									: writeFile0(path, `${spdx}\n${content as string}`).map(spdxRecordsProgress.inc),
 							),
 						)
 				: Oath.empty(),
@@ -91,7 +97,7 @@ const collectMissingLicensePaths0: Curry<Binary<string, string[], Oath<string[]>
 
 const createLicenseFiles0: Unary<string[], Oath<void[], Error>> = paths =>
 	Oath.all(
-		paths.map(path => util.createRepositoryFile0(path, mitLicense).tap(createLicensesProgress.inc)),
+		paths.map(path => util.createRepositoryFile0(path, unlicense).tap(createLicensesProgress.inc)),
 	)
 
-const mitLicense = util.getLicense("MIT")
+const unlicense = util.getLicense("Unlicense")

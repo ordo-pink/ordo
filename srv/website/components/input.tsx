@@ -1,9 +1,22 @@
-// SPDX-FileCopyrightText: Copyright 2023, 谢尔盖||↓ and the Ordo.pink contributors
-// SPDX-License-Identifier: MIT
+// SPDX-FileCopyrightText: Copyright 2024, 谢尔盖||↓ and the Ordo.pink contributors
+// SPDX-License-Identifier: AGPL-3.0-only
 
-import validator from "validator"
-import { Oath } from "@ordo-pink/oath"
-import { okpwd } from "@ordo-pink/okpwd"
+// Ordo.pink is an all-in-one team workspace.
+// Copyright (C) 2024  谢尔盖||↓ and the Ordo.pink contributors
+
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU Affero General Public License as published
+// by the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU Affero General Public License for more details.
+
+// You should have received a copy of the GNU Affero General Public License
+// along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
 import { ChangeEventHandler } from "react"
 
 type InputProps = {
@@ -43,7 +56,7 @@ export const TextInput = ({
 			value={value}
 			onChange={onChange}
 			placeholder={placeholder}
-			className="px-2 py-1 w-full rounded-md border-0 shadow-inner outline-none bg-neutral-100 placeholder:text-neutral-500 sm:text-sm sm:leading-6 dark:bg-neutral-700"
+			className="w-full rounded-md border-0 bg-neutral-100 px-2 py-1 shadow-inner outline-none placeholder:text-neutral-500 sm:text-sm sm:leading-6 dark:bg-neutral-700"
 		/>
 	</div>
 )

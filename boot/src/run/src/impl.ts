@@ -1,5 +1,5 @@
-// SPDX-FileCopyrightText: Copyright 2023, 谢尔盖||↓ and the Ordo.pink contributors
-// SPDX-License-Identifier: MIT
+// SPDX-FileCopyrightText: Copyright 2024, 谢尔盖||↓ and the Ordo.pink contributors
+// SPDX-License-Identifier: Unlicense
 
 import {
 	checkFilesExist0,
@@ -8,9 +8,9 @@ import {
 	getNames,
 	runAsyncCommand0,
 } from "@ordo-pink/binutil"
-import { readdir0 } from "@ordo-pink/fs"
 import { Oath } from "@ordo-pink/oath"
 import { noop } from "@ordo-pink/tau"
+import { readdir0 } from "@ordo-pink/fs"
 
 export const run = () =>
 	readdir0("./srv", { withFileTypes: true })

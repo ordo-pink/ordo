@@ -1,19 +1,32 @@
-// SPDX-FileCopyrightText: Copyright 2023, 谢尔盖||↓ and the Ordo.pink contributors
-// SPDX-License-Identifier: MPL-2.0
+// SPDX-FileCopyrightText: Copyright 2024, 谢尔盖||↓ and the Ordo.pink contributors
+// SPDX-License-Identifier: AGPL-3.0-only
 
-// This Source Code Form is subject to the terms of the Mozilla Public
-// License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// Ordo.pink is an all-in-one team workspace.
+// Copyright (C) 2024  谢尔盖||↓ and the Ordo.pink contributors
+
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU Affero General Public License as published
+// by the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU Affero General Public License for more details.
+
+// You should have received a copy of the GNU Affero General Public License
+// along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import chalk from "chalk"
-import { ContentPersistenceStrategyS3 } from "@ordo-pink/backend-persistence-strategy-content-s3"
+
+import { ConsoleLogger } from "@ordo-pink/logger"
 import { ContentPersistenceStrategyFS } from "@ordo-pink/backend-persistence-strategy-content-fs"
+import { ContentPersistenceStrategyS3 } from "@ordo-pink/backend-persistence-strategy-content-s3"
+import { DataCommands } from "@ordo-pink/data"
 import { DataPersistenceStrategyFS } from "@ordo-pink/backend-persistence-strategy-data-fs"
 import { DataPersistenceStrategyS3 } from "@ordo-pink/backend-persistence-strategy-data-s3"
-import { createDataServer } from "@ordo-pink/backend-server-data"
-import { ConsoleLogger } from "@ordo-pink/logger"
-import { DataCommands } from "@ordo-pink/data"
 import { Switch } from "@ordo-pink/switch"
+import { createDataServer } from "@ordo-pink/backend-server-data"
 
 const port = Bun.env.ORDO_DT_PORT!
 const idHost = Bun.env.ORDO_ID_HOST!

@@ -2,17 +2,18 @@
 // SPDX-License-Identifier: MIT
 
 import type { Binary, Curry, Ternary, Thunk, Unary } from "@ordo-pink/tau"
-import { join } from "path"
 import { camel } from "case"
-import { isDirectory0, isFile0, readFile0 } from "@ordo-pink/fs"
-import { isReservedJavaScriptKeyword } from "@ordo-pink/rkwjs"
-import { Switch } from "@ordo-pink/switch"
+import { join } from "path"
+
 import * as util from "@ordo-pink/binutil"
+import { isDirectory0, isFile0, readFile0 } from "@ordo-pink/fs"
 import { Oath } from "@ordo-pink/oath"
+import { Switch } from "@ordo-pink/switch"
+import { isReservedJavaScriptKeyword } from "@ordo-pink/rkwjs"
 
 // --- Public ---
 
-const mpl = util.getLicense("MPL-2.0")
+const mpl = util.getLicense("AGPL-3.0-only")
 
 type _P = { space: string; path: string; createTest: boolean; fileExtension: "ts" | "tsx" }
 export const mkf = ({ space, path: initialPath, createTest, fileExtension }: _P) =>
@@ -53,7 +54,7 @@ const normalizeFileName: Unary<string, string> = unverifiedName =>
 
 const initCreateFileProgress: Unary<string, void> = path =>
 	progress.start(`Creating new file "${path}"`)
-const getFileName: Unary<string, string> = path => path.split("/").reverse()[0] as string
+const getFileName: Unary<string, string> = path => path.split("/").reverse()[0]
 const getParentPathForCreatedFile: Ternary<string, string, string, string> = (
 	space,
 	initialPath,
@@ -88,7 +89,7 @@ const createFiles0: Curry<Binary<_CF0P, string, Oath<void[], Error>>> =
 				? util.createRepositoryFile0(
 						`${parentPath}/${name}.test.${fileExtension}`,
 						test(name, license as util.License),
-				  )
+					)
 				: Oath.empty(),
 		])
 
@@ -99,7 +100,7 @@ const getSpaceLicenseType0: Curry<Binary<string, boolean, Oath<string, Error>>> 
 					Switch.of(content)
 						.case(mpl, () => "MPL-2.0")
 						.default(() => "MIT"),
-			  )
+				)
 			: Oath.of("")
 
 const index = (name: string, license: util.License | "") =>

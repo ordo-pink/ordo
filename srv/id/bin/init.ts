@@ -1,15 +1,27 @@
-// SPDX-FileCopyrightText: Copyright 2023, 谢尔盖||↓ and the Ordo.pink contributors
-// SPDX-License-Identifier: MPL-2.0
+// SPDX-FileCopyrightText: Copyright 2024, 谢尔盖||↓ and the Ordo.pink contributors
+// SPDX-License-Identifier: AGPL-3.0-only
 
-// This Source Code Form is subject to the terms of the Mozilla Public
-// License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// Ordo.pink is an all-in-one team workspace.
+// Copyright (C) 2024  谢尔盖||↓ and the Ordo.pink contributors
 
-import { getc } from "@ordo-pink/getc"
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU Affero General Public License as published
+// by the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU Affero General Public License for more details.
+
+// You should have received a copy of the GNU Affero General Public License
+// along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
 import { readFile0, writeFile0 } from "@ordo-pink/fs"
 import { Oath } from "@ordo-pink/oath"
-import { keysOf } from "@ordo-pink/tau"
 import { die } from "@ordo-pink/binutil"
+import { getc } from "@ordo-pink/getc"
+import { keysOf } from "@ordo-pink/tau"
 
 const {
 	ORDO_ID_ACCESS_TOKEN_PRIVATE_KEY,
@@ -39,7 +51,7 @@ const generateKeyPairP = async () => {
 	return { priv, pub }
 }
 
-const main = async () => {
+const main = () => {
 	if (
 		!!ORDO_ID_ACCESS_TOKEN_PRIVATE_KEY &&
 		!!ORDO_ID_ACCESS_TOKEN_PUBLIC_KEY &&
@@ -49,7 +61,7 @@ const main = async () => {
 		return
 	}
 
-	readFile0("./.env", "utf-8")
+	void readFile0("./.env", "utf-8")
 		.map(str => (str as string).trim().split("\n"))
 		.map(lines => lines.map(line => line.trim().split("=")))
 		.map(lines =>

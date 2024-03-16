@@ -1,20 +1,33 @@
-// SPDX-FileCopyrightText: Copyright 2023, 谢尔盖||↓ and the Ordo.pink contributors
-// SPDX-License-Identifier: MPL-2.0
+// SPDX-FileCopyrightText: Copyright 2024, 谢尔盖||↓ and the Ordo.pink contributors
+// SPDX-License-Identifier: AGPL-3.0-only
 
-// This Source Code Form is subject to the terms of the Mozilla Public
-// License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// Ordo.pink is an all-in-one team workspace.
+// Copyright (C) 2024  谢尔盖||↓ and the Ordo.pink contributors
+
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU Affero General Public License as published
+// by the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU Affero General Public License for more details.
+
+// You should have received a copy of the GNU Affero General Public License
+// along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import chalk from "chalk"
-import { UserPersistenceStrategyDynamoDB } from "@ordo-pink/backend-persistence-strategy-user-dynamodb"
-import { TokenPersistenceStrategyFS } from "@ordo-pink/backend-persistence-strategy-token-fs"
-import { PersistenceStrategyUserFS } from "@ordo-pink/backend-persistence-strategy-user-fs"
-import { EmailStrategyRusender } from "@ordo-pink/backend-email-strategy-rusender"
-import { createIDServer } from "@ordo-pink/backend-server-id"
+
 import { ConsoleLogger } from "@ordo-pink/logger"
-import { Switch } from "@ordo-pink/switch"
+import { EmailStrategyRusender } from "@ordo-pink/backend-email-strategy-rusender"
 import { Oath } from "@ordo-pink/oath"
+import { PersistenceStrategyUserFS } from "@ordo-pink/backend-persistence-strategy-user-fs"
+import { Switch } from "@ordo-pink/switch"
 import { TokenPersistenceStrategyDynamoDB } from "@ordo-pink/backend-persistence-strategy-token-dynamodb"
+import { TokenPersistenceStrategyFS } from "@ordo-pink/backend-persistence-strategy-token-fs"
+import { UserPersistenceStrategyDynamoDB } from "@ordo-pink/backend-persistence-strategy-user-dynamodb"
+import { createIDServer } from "@ordo-pink/backend-server-id"
 
 const port = Bun.env.ORDO_ID_PORT!
 const accessTokenExpireIn = Number(Bun.env.ORDO_ID_ACCESS_TOKEN_EXPIRE_IN)
@@ -64,9 +77,9 @@ const main = async () => {
 		.case("dynamodb", () => UserPersistenceStrategyDynamoDB.of(userDynamoDBParams))
 		.default(() => PersistenceStrategyUserFS.of(Bun.env.ORDO_ID_USER_FS_STRATEGY_PATH!))
 
-	const emailStrategy = EmailStrategyRusender.create(Bun.env.ORDO_ID_EMAIL_API_KEY!)
+	const emailStrategy = EmailStrategyRusender.create({ key: Bun.env.ORDO_ID_EMAIL_API_KEY! })
 
-	const app = await createIDServer({
+	const app = createIDServer({
 		userRepository,
 		tokenRepository,
 		emailStrategy,
@@ -91,7 +104,7 @@ const getKey = (key: string, type: "public" | "private") =>
 		.map(key => Buffer.from(key, "base64"))
 		.map(buffer => new Uint8Array(buffer))
 		.chain(key =>
-			Oath.from(() =>
+			Oath.from<CryptoKey>(() =>
 				type === "private"
 					? crypto.subtle.importKey(
 							"pkcs8",
@@ -120,4 +133,4 @@ const getKey = (key: string, type: "public" | "private") =>
 			process.exit(1)
 		})
 
-main()
+void main()

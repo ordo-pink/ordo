@@ -5,9 +5,7 @@
 [![gitmoji](https://img.shields.io/badge/gitmoji-%20😜%20😍-FFDD67.svg)](https://gitmoji.carloscuesta.me/)
 [![license](https://img.shields.io/github/license/ordo-pink/ordo)](https://github.com/ordo-pink/ordo)
 
-## This page is available in other languages
-
-[🇺🇸](/root/docs/readme/en.md) | [🇷🇺](/root/docs/readme/ru.md) |
+[🇺🇸](/root/docs/readme/en.md) |
 [Add translation](/root/docs/guides/adding-readme-translations/en.md)
 
 ## Repository Structure

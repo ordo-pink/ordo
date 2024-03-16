@@ -1,7 +1,23 @@
-// SPDX-FileCopyrightText: Copyright 2023, 谢尔盖||↓ and the Ordo.pink contributors
-// SPDX-License-Identifier: MIT
+// SPDX-FileCopyrightText: Copyright 2024, 谢尔盖||↓ and the Ordo.pink contributors
+// SPDX-License-Identifier: AGPL-3.0-only
 
-import type { HttpMethod, Route, TRouter, Context, RequiredRouterState, RouteMap } from "./types"
+// Ordo.pink is an all-in-one team workspace.
+// Copyright (C) 2024  谢尔盖||↓ and the Ordo.pink contributors
+
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU Affero General Public License as published
+// by the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU Affero General Public License for more details.
+
+// You should have received a copy of the GNU Affero General Public License
+// along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+import type { Context, HttpMethod, RequiredRouterState, Route, RouteMap, TRouter } from "./types"
 import { Oath } from "@ordo-pink/oath"
 
 const checkMethod = (method: HttpMethod, request: Request) => request.method === method
@@ -33,7 +49,7 @@ const router = <T extends RequiredRouterState = RequiredRouterState>(
 		Oath.fromNullable(
 			routes.find(([m, r]) => ctx.state.checkMethod(m, req) && ctx.state.checkRoute(r, req)),
 		)
-			.chain(([_, route, gear]) =>
+			.chain(([, route, gear]) =>
 				Oath.of({ ...ctx, req, route, res: RoutaryResponse.empty() }).chain(ctx =>
 					gear(ctx)
 						.fix(onError)

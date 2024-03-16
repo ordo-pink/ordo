@@ -1,9 +1,9 @@
-// SPDX-FileCopyrightText: Copyright 2023, 谢尔盖||↓ and the Ordo.pink contributors
-// SPDX-License-Identifier: MIT
+// SPDX-FileCopyrightText: Copyright 2024, 谢尔盖||↓ and the Ordo.pink contributors
+// SPDX-License-Identifier: Unlicense
 
-import { runAsyncCommand0 } from "@ordo-pink/binutil"
-import { directoryExists0 } from "@ordo-pink/fs"
 import { Oath } from "@ordo-pink/oath"
+import { directoryExists0 } from "@ordo-pink/fs"
+import { runAsyncCommand0 } from "@ordo-pink/binutil"
 
 export const exec = (location?: string, command?: string) =>
 	Oath.fromNullable(location)

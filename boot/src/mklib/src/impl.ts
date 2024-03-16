@@ -1,7 +1,9 @@
-// SPDX-FileCopyrightText: Copyright 2023, 谢尔盖||↓ and the Ordo.pink contributors
-// SPDX-License-Identifier: MIT
+// SPDX-FileCopyrightText: Copyright 2024, 谢尔盖||↓ and the Ordo.pink contributors
+// SPDX-License-Identifier: Unlicense
 
 import { camel, pascal, title } from "case"
+
+import { Binary, Curry, Ternary, Thunk, Unary, noop } from "@ordo-pink/tau"
 import {
 	License,
 	createProgress,
@@ -9,10 +11,9 @@ import {
 	getLicense,
 	getSPDXRecord,
 } from "@ordo-pink/binutil"
-import { Binary, Curry, Ternary, Thunk, Unary, noop } from "@ordo-pink/tau"
-import { isReservedJavaScriptKeyword } from "@ordo-pink/rkwjs"
-import { directoryExists0 } from "@ordo-pink/fs"
 import { Oath } from "@ordo-pink/oath"
+import { directoryExists0 } from "@ordo-pink/fs"
+import { isReservedJavaScriptKeyword } from "@ordo-pink/rkwjs"
 
 // --- Public ---
 
@@ -52,7 +53,9 @@ const rejectIfExists0: Curry<Binary<string, boolean, Oath<void, string>>> = name
 
 const createFilesIfNotExists0: Binary<string, License, Unary<string, Oath<void, string | Error>>> =
 	(name, license) => path =>
-		directoryExists0(path).chain(rejectIfExists0(name)).chain(createFiles0(path, name, license))
+		directoryExists0(path)
+			.chain(rejectIfExists0(name))
+			.chain(createFiles0(path, name, license))
 
 // --- Internal ---
 

@@ -9,8 +9,8 @@ import {
 	getNames,
 	runBunCommand0,
 } from "@ordo-pink/binutil"
-import { readdir0 } from "@ordo-pink/fs"
 import { Oath } from "@ordo-pink/oath"
+import { readdir0 } from "@ordo-pink/fs"
 
 export const publish = () =>
 	readdir0("./srv", { withFileTypes: true })
@@ -28,7 +28,7 @@ export const publish = () =>
 
 const progress = createProgress()
 
-const startProgress = () => progress.start(`Building and publishing srvs`)
+const startProgress = () => progress.start("Building and publishing srvs")
 
 const namesToCompileScriptPaths = (names: string[]) =>
 	names.map(name => `./srv/${name}/bin/publish.ts`)

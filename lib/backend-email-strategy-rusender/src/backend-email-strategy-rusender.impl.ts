@@ -21,18 +21,23 @@ import {
 	type EmailParams,
 	type EmailTemplate,
 } from "@ordo-pink/backend-service-offline-notifications"
-import { Oath } from "@ordo-pink/oath"
+import { bichain0 } from "@ordo-pink/oath/operators/bichain"
 import { extend } from "@ordo-pink/tau"
+import { fromNullable0 } from "@ordo-pink/oath/constructors/from-nullable"
+import { fromPromise0 } from "@ordo-pink/oath/constructors/from-promise"
+import { map0 } from "@ordo-pink/oath/operators/map"
+import { orNothing } from "@ordo-pink/oath/runners/or-nothing"
 
 import {
-	RUSENDER_API_KEY_HEADER,
-	RUSENDER_CONTENT_TYPE_HEADER,
-	RUSENDER_SEND_HTTP_METHOD,
-	RUSENDER_SEND_URL,
-	RUSENDER_TEMPLATE_URL,
+	RS_APIKEY_HEADER,
+	RS_HEADERS,
+	RS_SEND_HTTP_METHOD,
+	RS_SEND_URL,
+	RS_TEMPLATE_URL,
 } from "./backend-email-strategy-rusender.constants"
 import {
 	type TEmailStrategyRusenderStatic,
+	type TRusenderSendRusenderRequestParams,
 	type TRusenderTemplateEmailRequestBody,
 } from "./backend-email-strategy-rusender.types"
 
@@ -56,52 +61,47 @@ import {
 export const EmailStrategyRusender: TEmailStrategyRusenderStatic = {
 	create: ({ key }) => ({
 		sendAsync: message =>
-			void Oath.fromNullable((message as EmailTemplate).templateId)
-				.map(() => ({
-					from: message.from,
-					to: message.to,
-					subject: message.subject,
-					cc: message.cc,
-					bcc: message.bcc,
-					headers: message.headers,
-					params: (message as EmailTemplate).params,
-					idTemplateMailUser: (message as EmailTemplate).templateId,
-				}))
-				.chain(mail => sendRusenderTemplateRequest(mail, key))
-				.rejectedChain(() => sendRusenderSendRequest(message, key))
-				.orNothing(),
+			void fromNullable0((message as EmailTemplate).templateId)
+				.pipe(map0(createTemplateEmailParams(message)))
+				.pipe(bichain0(() => createDefaultRequest0(message, key), createTemplateRequest0(key)))
+				.pipe(bichain0(fetch0, fetch0))
+				.run(orNothing),
 	}),
 }
+
+// --- Internal ---
+
+const createTemplateEmailParams = (message: EmailParams) => () => ({
+	from: message.from,
+	to: message.to,
+	subject: message.subject,
+	cc: message.cc,
+	bcc: message.bcc,
+	headers: message.headers,
+	params: (message as EmailTemplate).params,
+	idTemplateMailUser: (message as EmailTemplate).templateId,
+})
+
+const initRequestParams = (key: string) => ({ headers: { ...RS_HEADERS, [RS_APIKEY_HEADER]: key } })
+const addMethod = () => ({ method: RS_SEND_HTTP_METHOD })
+const addUrl = (url: string) => () => ({ url })
+const addBody = (mail: any) => () => ({ body: JSON.stringify({ mail }) })
+
+const fetch0 = ({ method, url, headers, body }: TRusenderSendRusenderRequestParams) =>
+	fromPromise0(() => fetch(url, { method, headers, body }))
+
+const createCommonRequest0 = (key: string, mail: TRusenderTemplateEmailRequestBody | EmailParams) =>
+	fromNullable0(key)
+		.pipe(map0(initRequestParams))
+		.pipe(map0(extend(addMethod)))
+		.pipe(map0(extend(addBody(mail))))
 
 /**
  * @deprecated
  * @see #274
  */
-const sendRusenderTemplateRequest = (mail: TRusenderTemplateEmailRequestBody, key: string) =>
-	Oath.fromNullable(key)
-		.map(initRequestParams)
-		.map(extend(addMethod))
-		.map(extend(addUrl(RUSENDER_TEMPLATE_URL)))
-		.map(extend(addBody(mail)))
-		.chain(({ method, url, headers, body }) =>
-			Oath.from(() => fetch(url, { method, headers, body })),
-		)
+const createTemplateRequest0 = (key: string) => (mail: TRusenderTemplateEmailRequestBody) =>
+	createCommonRequest0(key, mail).pipe(map0(extend(addUrl(RS_TEMPLATE_URL))))
 
-const sendRusenderSendRequest = (mail: EmailParams, key: string) =>
-	Oath.fromNullable(key)
-		.map(initRequestParams)
-		.map(extend(addMethod))
-		.map(extend(addUrl(RUSENDER_SEND_URL)))
-		.map(extend(addBody(mail)))
-		.chain(({ method, url, headers, body }) =>
-			Oath.from(() => fetch(url, { method, headers, body })),
-		)
-
-const initRequestParams = (key: string) => ({
-	headers: { ...RUSENDER_CONTENT_TYPE_HEADER, [RUSENDER_API_KEY_HEADER]: key },
-})
-const addMethod = () => ({ method: RUSENDER_SEND_HTTP_METHOD })
-const addUrl = (url: string) => () => ({ url })
-const addBody = (mail: TRusenderTemplateEmailRequestBody | EmailParams) => () => ({
-	body: JSON.stringify({ mail }),
-})
+const createDefaultRequest0 = (mail: EmailParams, key: string) =>
+	createCommonRequest0(key, mail).pipe(map0(extend(addUrl(RS_SEND_URL))))

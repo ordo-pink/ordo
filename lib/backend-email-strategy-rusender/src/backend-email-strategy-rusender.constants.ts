@@ -1,10 +1,9 @@
-export const RUSENDER_TEMPLATE_URL =
-	"https://api.beta.rusender.ru/api/v1/external-mails/send-by-template"
+export const RS_TEMPLATE_URL = "https://api.beta.rusender.ru/api/v1/external-mails/send-by-template"
 
-export const RUSENDER_SEND_URL = "https://api.beta.rusender.ru/api/v1/external-mails/send"
+export const RS_SEND_URL = "https://api.beta.rusender.ru/api/v1/external-mails/send"
 
-export const RUSENDER_SEND_HTTP_METHOD = "POST"
+export const RS_SEND_HTTP_METHOD = "POST" as const
 
-export const RUSENDER_CONTENT_TYPE_HEADER = { "Content-Type": "application/json" }
+export const RS_HEADERS = { "Content-Type": "application/json" }
 
-export const RUSENDER_API_KEY_HEADER = "X-Api-Key"
+export const RS_APIKEY_HEADER = "X-Api-Key"

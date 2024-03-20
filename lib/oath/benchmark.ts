@@ -1,23 +1,11 @@
 // SPDX-FileCopyrightText: Copyright 2024, 谢尔盖||↓ and the Ordo.pink contributors
-// SPDX-License-Identifier: AGPL-3.0-only
-
-// Ordo.pink is an all-in-one team workspace.
-// Copyright (C) 2024  谢尔盖||↓ and the Ordo.pink contributors
-
-// This program is free software: you can redistribute it and/or modify
-// it under the terms of the GNU Affero General Public License as published
-// by the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-
-// This program is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU Affero General Public License for more details.
-
-// You should have received a copy of the GNU Affero General Public License
-// along with this program.  If not, see <https://www.gnu.org/licenses/>.
+// SPDX-License-Identifier: Unlicense
 
 import { Oath } from "./src/impl"
+import { bimap0 } from "./operators/bimap"
+import { chain0 } from "./operators/chain"
+import { map0 } from "./operators/map"
+import { orNothing } from "./runners/or-nothing"
 
 const times = new Array(10_000).fill(null)
 const avg = (arr: number[]): number => arr.reduce((acc, v) => acc + v, 0) / arr.length
@@ -36,12 +24,13 @@ const testBimap = async () => {
 		const time = performance.now()
 
 		await Oath.resolve(1)
-			.bimap(
-				// eslint-disable-next-line @typescript-eslint/restrict-plus-operands
-				x => x + 1,
-				x => x + 1,
+			.pipe(
+				bimap0(
+					x => (x as any) + 1,
+					x => x + 1,
+				),
 			)
-			.orNothing()
+			.run(orNothing)
 
 		oath.push(performance.now() - time)
 	}
@@ -70,8 +59,8 @@ const testMap = async () => {
 		const time = performance.now()
 
 		await Oath.resolve(1)
-			.map(x => x + 1)
-			.orNothing()
+			.pipe(map0(x => x + 1))
+			.run(orNothing)
 
 		oath.push(performance.now() - time)
 	}
@@ -97,8 +86,8 @@ const testChain = async () => {
 		const time = performance.now()
 
 		await Oath.resolve(1)
-			.chain(x => Oath.of(x + 1))
-			.orNothing()
+			.pipe(chain0(x => Oath.resolve(x + 1)))
+			.run(orNothing)
 
 		oath.push(performance.now() - time)
 	}
@@ -125,7 +114,7 @@ const testAnd = async () => {
 
 		await Oath.resolve(1)
 			.and(x => x + 1)
-			.orNothing()
+			.run(orNothing)
 
 		oath.push(performance.now() - time)
 	}
@@ -152,7 +141,7 @@ const testFix = async () => {
 
 		await Oath.reject(1)
 			.fix(x => x + 1)
-			.orNothing()
+			.run(orNothing)
 
 		oath.push(performance.now() - time)
 	}

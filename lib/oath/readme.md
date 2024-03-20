@@ -609,7 +609,7 @@ As you can see, Oath is about 2 times slower than Promise.
 ## Pst Scrptm
 
 This package is a part of Ordo.pink monorepo. Feel free to ask for help, report bug reports,
-contribute, or suggest improvements [here on GitHub](https://github.com/ordo-pink/ordo/tree/main).
-Cheers! 🍻
+contribute, or suggest improvements
+[here on GitHub](https://github.com/ordo-pink/ordo/tree/main/lib/oath). Cheers! 🍻
 
-License: MIT
+The Unlicense

@@ -17,11 +17,15 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import { BigIntStats, Stats, promises } from "fs"
 import { cwd } from "process"
 import { join } from "path"
-import { promises } from "fs"
 
 import { Oath, oathify } from "@ordo-pink/oath"
+import { chain0 } from "@ordo-pink/oath/operators/chain"
+import { fromBoolean0 } from "@ordo-pink/oath/constructors/from-falsy"
+import { fromPromise0 } from "@ordo-pink/oath/constructors/from-promise"
+import { map0 } from "@ordo-pink/oath/operators/map"
 import { noop } from "@ordo-pink/tau"
 
 export const getParentPath = (path: string) => {
@@ -43,35 +47,35 @@ export const removeFile0 = rmdir0
 export const mv0 = oathify(promises.rename)
 export const rename0 = mv0
 export const stat0 = (...args: Parameters<typeof promises.stat>) =>
-	Oath.from(() => promises.stat(...args).catch(() => Promise.reject(null)))
+	fromPromise0<Stats | BigIntStats, Error>(() => promises.stat(...args))
 export const readdir0 = oathify(promises.readdir)
 export const mkdirRecursive0 = (path: string) => mkdir0(path, { recursive: true })
 
 export const writeFileRecursive0 = (...[path, data, options]: Parameters<typeof writeFile0>) =>
-	Oath.fromBoolean(
-		() => typeof path === "string",
+	fromBoolean0(
+		typeof path === "string",
 		noop,
 		() => new Error("writeFileRecursive0 can only create files from string paths"),
 	)
-		.chain(() => createParentIfNotExists0(path as string))
-		.chain(() => writeFile0(path, data, options))
+		.pipe(chain0(() => createParentIfNotExists0(path as string)))
+		.pipe(chain0(() => writeFile0(path, data, options)))
 
 export const createDirectoryIfNotExists0 = (path: string) =>
 	stat0(path)
 		.fix(() => mkdirRecursive0(path))
-		.map(noop)
+		.pipe(map0(noop))
 
 export const createParentIfNotExists0 = (path: string) =>
-	Oath.of(path).map(getParentPath).chain(createDirectoryIfNotExists0)
+	Oath.resolve(path).pipe(map0(getParentPath)).pipe(chain0(createDirectoryIfNotExists0))
 
 export const fileExists0 = (path: string) =>
 	stat0(path)
-		.map(stat => stat.isFile())
+		.pipe(map0(stat => stat.isFile()))
 		.fix(() => false)
 
 export const directoryExists0 = (path: string) =>
 	stat0(path)
-		.map(stat => stat.isDirectory())
+		.pipe(map0(stat => stat.isDirectory()))
 		.fix(() => false)
 
 export const isFile0 = fileExists0

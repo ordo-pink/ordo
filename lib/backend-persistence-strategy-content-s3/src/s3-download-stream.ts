@@ -50,6 +50,7 @@ export class S3DownloadStream extends Transform {
 			this.destroy(e as Error)
 			return
 		}
+
 		await this.fetchAndEmitNextRange()
 	}
 
@@ -94,6 +95,7 @@ export class S3DownloadStream extends Transform {
 				if (streamClosed) {
 					return
 				}
+
 				streamClosed = true
 				await this.fetchAndEmitNextRange()
 			})
@@ -101,7 +103,6 @@ export class S3DownloadStream extends Transform {
 			// If we encounter an error grabbing the bytes
 			// We destroy the stream, NodeJS ReadableStream will emit the 'error' event
 			this.destroy(error as Error)
-			return
 		}
 	}
 

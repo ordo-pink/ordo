@@ -21,18 +21,18 @@ import { DeleteObjectCommand, GetObjectCommand, S3Client } from "@aws-sdk/client
 import { PassThrough, Readable } from "stream"
 import { Upload } from "@aws-sdk/lib-storage"
 
-import { ContentPersistenceStrategy, Data, FSID, UserID } from "@ordo-pink/data"
+import { ContentPersistenceStrategy, Data, FSID, UnexpectedError, UserID } from "@ordo-pink/data"
 import { Oath } from "@ordo-pink/oath"
 
 import { S3DownloadStream } from "./s3-download-stream"
+import { bimap0 } from "@ordo-pink/oath/operators/bimap"
+import { chain0 } from "@ordo-pink/oath/operators/chain"
+import { fromPromise0 } from "@ordo-pink/oath/constructors/from-promise"
+import { map0 } from "@ordo-pink/oath/operators/map"
+import { rejectedMap0 } from "@ordo-pink/oath/operators/rejected-map"
+import { tap0 } from "@ordo-pink/oath/operators/tap"
 
-type Params = {
-	accessKeyId: string
-	secretAccessKey: string
-	region: string
-	bucketName: string
-	endpoint?: string
-}
+import { type TPersistenceStrategyS3Params } from "./backend-persistence-strategy-s3.types"
 
 /**
  * `ContentPersistenceStrategyS3` implements `ContentPersistenceStrategy` for storing content using
@@ -57,56 +57,51 @@ export const ContentPersistenceStrategyS3 = {
 		region,
 		endpoint,
 		bucketName,
-	}: Params): ContentPersistenceStrategy<Readable> => {
+	}: TPersistenceStrategyS3Params): ContentPersistenceStrategy<Readable> => {
 		const s3 = new S3Client({ region, endpoint, credentials: { accessKeyId, secretAccessKey } })
-		const Bucket = bucketName
 
 		return {
-			create: () => Oath.of("OK"),
+			create: () => Oath.resolve("OK"),
 
 			delete: (uid, fsid) =>
-				Oath.of(getKey(uid, fsid))
-					.chain(Key => Oath.from(() => s3.send(new DeleteObjectCommand({ Bucket, Key }))))
-					.bimap(
-						() => Data.Errors.DataNotFound,
-						() => "OK",
-					),
+				Oath.resolve(getKey(uid, fsid))
+					.pipe(chain0(s3DeleteObject0(s3, bucketName)))
+					.pipe(bimap0(dataNotFound, ok)),
 
 			read: (uid, fsid) =>
-				Oath.of(getKey(uid, fsid))
-					.map(Key => new S3DownloadStream({ Key, Bucket, s3 }))
-					.fix(() => Readable.from([""])),
+				Oath.resolve(getKey(uid, fsid))
+					.pipe(map0(s3ReadObject0(s3, bucketName)))
+					.fix(getEmptyReadableStream),
 
 			write: (uid, fsid, content, length) =>
-				Oath.of(getKey(uid, fsid))
-					.chain(Key =>
-						Oath.of(new PassThrough())
-							.tap(stream => content.pipe(stream))
-							.map(
-								Body =>
-									new Upload({
-										client: s3,
-										params: { Bucket, Key, Body },
-									}),
-							)
-							.chain(upload => Oath.from(() => upload.done()))
-							.chain(() =>
-								Oath.from(() =>
-									s3.send(
-										new GetObjectCommand({
-											Bucket,
-											Key,
-										}),
-									),
-								),
-							),
-					)
-					.map(() => length),
+				Oath.resolve(getKey(uid, fsid))
+					.pipe(chain0(s3WriteObject0(s3, bucketName, content)))
+					.pipe(map0(() => length)),
 		}
 	},
 }
 
 // --- Internal ---
+
+const ok = () => "OK" as const
+
+const dataNotFound = () => Data.Errors.DataNotFound
+
+const getEmptyReadableStream = () => Readable.from([""])
+
+const s3DeleteObject0 = (s3: S3Client, Bucket: string) => (Key: string) =>
+	fromPromise0(() => s3.send(new DeleteObjectCommand({ Bucket, Key })))
+
+const s3ReadObject0 = (s3: S3Client, Bucket: string) => (Key: string) =>
+	new S3DownloadStream({ Key, Bucket, s3 })
+
+const s3WriteObject0 = (s3: S3Client, Bucket: string, content: Readable) => (Key: string) =>
+	Oath.resolve(new PassThrough())
+		.pipe(tap0(stream => content.pipe(stream)))
+		.pipe(map0(Body => new Upload({ client: s3, params: { Bucket, Key, Body } })))
+		.pipe(chain0(upload => fromPromise0(() => upload.done())))
+		.pipe(chain0(() => fromPromise0(() => s3.send(new GetObjectCommand({ Bucket, Key })))))
+		.pipe(rejectedMap0(UnexpectedError))
 
 /**
  * Creates a bucket object key from user id and fs id.

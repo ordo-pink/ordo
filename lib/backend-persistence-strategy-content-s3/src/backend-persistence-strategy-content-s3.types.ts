@@ -1,4 +1,4 @@
-export type TPersistenceStrategyS3Params = {
+export type TPersistenceStrategyContentS3Params = {
 	accessKeyId: string
 	secretAccessKey: string
 	region: string

@@ -23,8 +23,6 @@ import { Upload } from "@aws-sdk/lib-storage"
 
 import { ContentPersistenceStrategy, Data, FSID, UnexpectedError, UserID } from "@ordo-pink/data"
 import { Oath } from "@ordo-pink/oath"
-
-import { S3DownloadStream } from "./s3-download-stream"
 import { bimap0 } from "@ordo-pink/oath/operators/bimap"
 import { chain0 } from "@ordo-pink/oath/operators/chain"
 import { fromPromise0 } from "@ordo-pink/oath/constructors/from-promise"
@@ -32,7 +30,8 @@ import { map0 } from "@ordo-pink/oath/operators/map"
 import { rejectedMap0 } from "@ordo-pink/oath/operators/rejected-map"
 import { tap0 } from "@ordo-pink/oath/operators/tap"
 
-import { type TPersistenceStrategyS3Params } from "./backend-persistence-strategy-s3.types"
+import { S3DownloadStream } from "./s3-download-stream"
+import { type TPersistenceStrategyContentS3Params } from "./backend-persistence-strategy-content-s3.types"
 
 /**
  * `ContentPersistenceStrategyS3` implements `ContentPersistenceStrategy` for storing content using
@@ -57,7 +56,7 @@ export const ContentPersistenceStrategyS3 = {
 		region,
 		endpoint,
 		bucketName,
-	}: TPersistenceStrategyS3Params): ContentPersistenceStrategy<Readable> => {
+	}: TPersistenceStrategyContentS3Params): ContentPersistenceStrategy<Readable> => {
 		const s3 = new S3Client({ region, endpoint, credentials: { accessKeyId, secretAccessKey } })
 
 		return {

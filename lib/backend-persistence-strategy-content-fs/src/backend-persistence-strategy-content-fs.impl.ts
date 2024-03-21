@@ -31,7 +31,7 @@ import { map0 } from "@ordo-pink/oath/operators/map"
 import { rejectedMap0 } from "@ordo-pink/oath/operators/rejected-map"
 import { try0 } from "@ordo-pink/oath/constructors/try"
 
-type Params = { root: string }
+import { TPersistenceStrategyContentFSParams } from "./backend-persistence-strategy-content-fs.types"
 
 /**
  * `ContentPersistenceStrategyFS` implements `ContentPersistenceStrategy` for storing content using
@@ -50,7 +50,7 @@ export const ContentPersistenceStrategyFS = {
 	/**
 	 * `ContentPersistenceStrategyFS` factory.
 	 */
-	of: ({ root }: Params): ContentPersistenceStrategy<Readable> => ({
+	of: ({ root }: TPersistenceStrategyContentFSParams): ContentPersistenceStrategy<Readable> => ({
 		create: (uid, fsid) =>
 			Oath.resolve(getPath(root, uid, fsid))
 				.pipe(chain0(createParentDirIfNotExists0))

@@ -117,8 +117,8 @@ export class Oath<Resolve, Reject = never> {
 		)
 	}
 
-	public run<NewResolve>(runner: (o: Oath<Resolve, Reject>) => Promise<NewResolve>) {
-		return runner(this)
+	public invoke<NewResolve>(invoker: (o: Oath<Resolve, Reject>) => Promise<NewResolve>) {
+		return invoker(this)
 	}
 
 	public fork<NewResolve, NewReject>(
@@ -134,7 +134,7 @@ export class Oath<Resolve, Reject = never> {
 
 	/**
 	 * @deprecated The number of Oath methods and static methods will be reduced in v1.0.0. Make sure
-	 * you migrate to using operators via `oath.pipe`, runners via `oath.run` and constructors like
+	 * you migrate to using operators via `oath.pipe`, invokers via `oath.invoke` and constructors like
 	 * `try0`, `merge0` (same as current `Oath.all`), `fromPromise0` (same as current `Oath.from`),
 	 * `fromNullable0`, etc.
 	 * @see readme.md
@@ -148,7 +148,7 @@ export class Oath<Resolve, Reject = never> {
 
 	/**
 	 * @deprecated The number of Oath methods and static methods will be reduced in v1.0.0. Make sure
-	 * you migrate to using operators via `oath.pipe`, runners via `oath.run` and constructors like
+	 * you migrate to using operators via `oath.pipe`, invokers via `oath.invoke` and constructors like
 	 * `try0`, `merge0` (same as current `Oath.all`), `fromPromise0` (same as current `Oath.from`),
 	 * `fromNullable0`, etc.
 	 * @see readme.md
@@ -159,7 +159,7 @@ export class Oath<Resolve, Reject = never> {
 
 	/**
 	 * @deprecated The number of Oath methods and static methods will be reduced in v1.0.0. Make sure
-	 * you migrate to using operators via `oath.pipe`, runners via `oath.run` and constructors like
+	 * you migrate to using operators via `oath.pipe`, invokers via `oath.invoke` and constructors like
 	 * `try0`, `merge0` (same as current `Oath.all`), `fromPromise0` (same as current `Oath.from`),
 	 * `fromNullable0`, etc.
 	 * @see readme.md
@@ -173,7 +173,7 @@ export class Oath<Resolve, Reject = never> {
 
 	/**
 	 * @deprecated The number of Oath methods and static methods will be reduced in v1.0.0. Make sure
-	 * you migrate to using operators via `oath.pipe`, runners via `oath.run` and constructors like
+	 * you migrate to using operators via `oath.pipe`, invokers via `oath.invoke` and constructors like
 	 * `try0`, `merge0` (same as current `Oath.all`), `fromPromise0` (same as current `Oath.from`),
 	 * `fromNullable0`, etc.
 	 * @see readme.md
@@ -187,7 +187,7 @@ export class Oath<Resolve, Reject = never> {
 
 	/**
 	 * @deprecated The number of Oath methods and static methods will be reduced in v1.0.0. Make sure
-	 * you migrate to using operators via `oath.pipe`, runners via `oath.run` and constructors like
+	 * you migrate to using operators via `oath.pipe`, invokers via `oath.invoke` and constructors like
 	 * `try0`, `merge0` (same as current `Oath.all`), `fromPromise0` (same as current `Oath.from`),
 	 * `fromNullable0`, etc.
 	 * @see readme.md
@@ -203,7 +203,7 @@ export class Oath<Resolve, Reject = never> {
 
 	/**
 	 * @deprecated The number of Oath methods and static methods will be reduced in v1.0.0. Make sure
-	 * you migrate to using operators via `oath.pipe`, runners via `oath.run` and constructors like
+	 * you migrate to using operators via `oath.pipe`, invokers via `oath.invoke` and constructors like
 	 * `try0`, `merge0` (same as current `Oath.all`), `fromPromise0` (same as current `Oath.from`),
 	 * `fromNullable0`, etc.
 	 * @see readme.md
@@ -227,7 +227,7 @@ export class Oath<Resolve, Reject = never> {
 
 	/**
 	 * @deprecated The number of Oath methods and static methods will be reduced in v1.0.0. Make sure
-	 * you migrate to using operators via `oath.pipe`, runners via `oath.run` and constructors like
+	 * you migrate to using operators via `oath.pipe`, invokers via `oath.invoke` and constructors like
 	 * `try0`, `merge0` (same as current `Oath.all`), `fromPromise0` (same as current `Oath.from`),
 	 * `fromNullable0`, etc.
 	 * @see readme.md
@@ -248,7 +248,7 @@ export class Oath<Resolve, Reject = never> {
 
 	/**
 	 * @deprecated The number of Oath methods and static methods will be reduced in v1.0.0. Make sure
-	 * you migrate to using operators via `oath.pipe`, runners via `oath.run` and constructors like
+	 * you migrate to using operators via `oath.pipe`, invokers via `oath.invoke` and constructors like
 	 * `try0`, `merge0` (same as current `Oath.all`), `fromPromise0` (same as current `Oath.from`),
 	 * `fromNullable0`, etc.
 	 * @see readme.md
@@ -367,7 +367,7 @@ export class Oath<Resolve, Reject = never> {
 
 	/**
 	 * @deprecated The number of Oath methods and static methods will be reduced in v1.0.0. Make sure
-	 * you migrate to using operators via `oath.pipe`, runners via `oath.run` and constructors like
+	 * you migrate to using operators via `oath.pipe`, invokers via `oath.invoke` and constructors like
 	 * `try0`, `merge0` (same as current `Oath.all`), `fromPromise0` (same as current `Oath.from`),
 	 * `fromNullable0`, etc.
 	 * @see readme.md
@@ -385,7 +385,7 @@ export class Oath<Resolve, Reject = never> {
 
 	/**
 	 * @deprecated The number of Oath methods and static methods will be reduced in v1.0.0. Make sure
-	 * you migrate to using operators via `oath.pipe`, runners via `oath.run` and constructors like
+	 * you migrate to using operators via `oath.pipe`, invokers via `oath.invoke` and constructors like
 	 * `try0`, `merge0` (same as current `Oath.all`), `fromPromise0` (same as current `Oath.from`),
 	 * `fromNullable0`, etc.
 	 * @see readme.md
@@ -420,7 +420,7 @@ export class Oath<Resolve, Reject = never> {
 
 	/**
 	 * @deprecated The number of Oath methods and static methods will be reduced in v1.0.0. Make sure
-	 * you migrate to using operators via `oath.pipe`, runners via `oath.run` and constructors like
+	 * you migrate to using operators via `oath.pipe`, invokers via `oath.invoke` and constructors like
 	 * `try0`, `merge0` (same as current `Oath.all`), `fromPromise0` (same as current `Oath.from`),
 	 * `fromNullable0`, etc.
 	 * @see readme.md
@@ -451,7 +451,7 @@ export class Oath<Resolve, Reject = never> {
 
 	/**
 	 * @deprecated The number of Oath methods and static methods will be reduced in v1.0.0. Make sure
-	 * you migrate to using operators via `oath.pipe`, runners via `oath.run` and constructors like
+	 * you migrate to using operators via `oath.pipe`, invokers via `oath.invoke` and constructors like
 	 * `try0`, `merge0` (same as current `Oath.all`), `fromPromise0` (same as current `Oath.from`),
 	 * `fromNullable0`, etc.
 	 * @see readme.md
@@ -469,7 +469,7 @@ export class Oath<Resolve, Reject = never> {
 
 	/**
 	 * @deprecated The number of Oath methods and static methods will be reduced in v1.0.0. Make sure
-	 * you migrate to using operators via `oath.pipe`, runners via `oath.run` and constructors like
+	 * you migrate to using operators via `oath.pipe`, invokers via `oath.invoke` and constructors like
 	 * `try0`, `merge0` (same as current `Oath.all`), `fromPromise0` (same as current `Oath.from`),
 	 * `fromNullable0`, etc.
 	 * @see readme.md
@@ -487,7 +487,7 @@ export class Oath<Resolve, Reject = never> {
 
 	/**
 	 * @deprecated The number of Oath methods and static methods will be reduced in v1.0.0. Make sure
-	 * you migrate to using operators via `oath.pipe`, runners via `oath.run` and constructors like
+	 * you migrate to using operators via `oath.pipe`, invokers via `oath.invoke` and constructors like
 	 * `try0`, `merge0` (same as current `Oath.all`), `fromPromise0` (same as current `Oath.from`),
 	 * `fromNullable0`, etc.
 	 * @see readme.md
@@ -508,7 +508,7 @@ export class Oath<Resolve, Reject = never> {
 
 	/**
 	 * @deprecated The number of Oath methods and static methods will be reduced in v1.0.0. Make sure
-	 * you migrate to using operators via `oath.pipe`, runners via `oath.run` and constructors like
+	 * you migrate to using operators via `oath.pipe`, invokers via `oath.invoke` and constructors like
 	 * `try0`, `merge0` (same as current `Oath.all`), `fromPromise0` (same as current `Oath.from`),
 	 * `fromNullable0`, etc.
 	 * @see readme.md
@@ -529,7 +529,7 @@ export class Oath<Resolve, Reject = never> {
 
 	/**
 	 * @deprecated The number of Oath methods and static methods will be reduced in v1.0.0. Make sure
-	 * you migrate to using operators via `oath.pipe`, runners via `oath.run` and constructors like
+	 * you migrate to using operators via `oath.pipe`, invokers via `oath.invoke` and constructors like
 	 * `try0`, `merge0` (same as current `Oath.all`), `fromPromise0` (same as current `Oath.from`),
 	 * `fromNullable0`, etc.
 	 * @see readme.md
@@ -550,7 +550,7 @@ export class Oath<Resolve, Reject = never> {
 
 	/**
 	 * @deprecated The number of Oath methods and static methods will be reduced in v1.0.0. Make sure
-	 * you migrate to using operators via `oath.pipe`, runners via `oath.run` and constructors like
+	 * you migrate to using operators via `oath.pipe`, invokers via `oath.invoke` and constructors like
 	 * `try0`, `merge0` (same as current `Oath.all`), `fromPromise0` (same as current `Oath.from`),
 	 * `fromNullable0`, etc.
 	 * @see readme.md
@@ -565,7 +565,7 @@ export class Oath<Resolve, Reject = never> {
 
 	/**
 	 * @deprecated The number of Oath methods and static methods will be reduced in v1.0.0. Make sure
-	 * you migrate to using operators via `oath.pipe`, runners via `oath.run` and constructors like
+	 * you migrate to using operators via `oath.pipe`, invokers via `oath.invoke` and constructors like
 	 * `try0`, `merge0` (same as current `Oath.all`), `fromPromise0` (same as current `Oath.from`),
 	 * `fromNullable0`, etc.
 	 * @see readme.md
@@ -580,7 +580,7 @@ export class Oath<Resolve, Reject = never> {
 
 	/**
 	 * @deprecated The number of Oath methods and static methods will be reduced in v1.0.0. Make sure
-	 * you migrate to using operators via `oath.pipe`, runners via `oath.run` and constructors like
+	 * you migrate to using operators via `oath.pipe`, invokers via `oath.invoke` and constructors like
 	 * `try0`, `merge0` (same as current `Oath.all`), `fromPromise0` (same as current `Oath.from`),
 	 * `fromNullable0`, etc.
 	 * @see readme.md

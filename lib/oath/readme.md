@@ -1,6 +1,6 @@
 # Oath (oathify)
 
-[![license](https://img.shields.io/badge/license-MIT-green)](https://github.com/ordo-pink/ordo)
+[![license](https://img.shields.io/badge/license-The%20Unlicense-green)](https://github.com/ordo-pink/ordo)
 [![license](https://img.shields.io/badge/by-ordo.pink-db2777)](https://github.com/ordo-pink/ordo)
 [![gitmoji](https://img.shields.io/badge/gitmoji-%20😜%20😍-FFDD67.svg)](https://gitmoji.carloscuesta.me/)
 

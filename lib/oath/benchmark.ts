@@ -5,7 +5,7 @@ import { Oath } from "./src/impl"
 import { bimap0 } from "./operators/bimap"
 import { chain0 } from "./operators/chain"
 import { map0 } from "./operators/map"
-import { orNothing } from "./runners/or-nothing"
+import { orNothing } from "./invokers/or-nothing"
 
 const times = new Array(10_000).fill(null)
 const avg = (arr: number[]): number => arr.reduce((acc, v) => acc + v, 0) / arr.length
@@ -30,7 +30,7 @@ const testBimap = async () => {
 					x => x + 1,
 				),
 			)
-			.run(orNothing)
+			.invoke(orNothing)
 
 		oath.push(performance.now() - time)
 	}
@@ -60,7 +60,7 @@ const testMap = async () => {
 
 		await Oath.resolve(1)
 			.pipe(map0(x => x + 1))
-			.run(orNothing)
+			.invoke(orNothing)
 
 		oath.push(performance.now() - time)
 	}
@@ -87,7 +87,7 @@ const testChain = async () => {
 
 		await Oath.resolve(1)
 			.pipe(chain0(x => Oath.resolve(x + 1)))
-			.run(orNothing)
+			.invoke(orNothing)
 
 		oath.push(performance.now() - time)
 	}
@@ -114,7 +114,7 @@ const testAnd = async () => {
 
 		await Oath.resolve(1)
 			.and(x => x + 1)
-			.run(orNothing)
+			.invoke(orNothing)
 
 		oath.push(performance.now() - time)
 	}
@@ -141,7 +141,7 @@ const testFix = async () => {
 
 		await Oath.reject(1)
 			.fix(x => x + 1)
-			.run(orNothing)
+			.invoke(orNothing)
 
 		oath.push(performance.now() - time)
 	}

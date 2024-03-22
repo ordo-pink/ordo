@@ -22,7 +22,7 @@ import { useEffect } from "react"
 import { Centered } from "../components/centered"
 import { PageHeader } from "../components/page-header"
 
-export default function ForgotPasswordPage() {
+export default function SignOutPage() {
 	useEffect(() => {
 		void fetch(`${process.env.NEXT_PUBLIC_ORDO_ID_HOST}/sign-out`, {
 			method: "POST",

@@ -1,6 +1,6 @@
 {
 	"name": "oathify",
-	"version": "0.2.1",
+	"version": "0.2.2",
 	"description": "Lazy promises with extended API and type inference for the rejected branch",
 	"main": "index.js",
 	"scripts": {

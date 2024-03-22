@@ -26,7 +26,7 @@ import { extend } from "@ordo-pink/tau"
 import { fromNullable0 } from "@ordo-pink/oath/constructors/from-nullable"
 import { fromPromise0 } from "@ordo-pink/oath/constructors/from-promise"
 import { map0 } from "@ordo-pink/oath/operators/map"
-import { orNothing } from "@ordo-pink/oath/runners/or-nothing"
+import { orNothing } from "@ordo-pink/oath/invokers/or-nothing"
 
 import {
 	RS_APIKEY_HEADER,
@@ -65,7 +65,7 @@ export const EmailStrategyRusender: TEmailStrategyRusenderStatic = {
 				.pipe(map0(createTemplateEmailParams(message)))
 				.pipe(bichain0(() => createDefaultRequest0(message, key), createTemplateRequest0(key)))
 				.pipe(bichain0(fetch0, fetch0))
-				.run(orNothing),
+				.invoke(orNothing),
 	}),
 }
 

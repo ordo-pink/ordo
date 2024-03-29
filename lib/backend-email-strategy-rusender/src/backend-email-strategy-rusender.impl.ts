@@ -17,29 +17,9 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import {
-	type EmailParams,
-	type EmailTemplate,
-} from "@ordo-pink/backend-service-offline-notifications"
-import { bichain0 } from "@ordo-pink/oath/operators/bichain"
-import { extend } from "@ordo-pink/tau"
-import { fromNullable0 } from "@ordo-pink/oath/constructors/from-nullable"
-import { fromPromise0 } from "@ordo-pink/oath/constructors/from-promise"
-import { map0 } from "@ordo-pink/oath/operators/map"
-import { orNothing } from "@ordo-pink/oath/invokers/or-nothing"
-
-import {
-	RS_APIKEY_HEADER,
-	RS_HEADERS,
-	RS_SEND_HTTP_METHOD,
-	RS_SEND_URL,
-	RS_TEMPLATE_URL,
-} from "./backend-email-strategy-rusender.constants"
-import {
-	type TEmailStrategyRusenderStatic,
-	type TRusenderSendRusenderRequestParams,
-	type TRusenderTemplateEmailRequestBody,
-} from "./backend-email-strategy-rusender.types"
+import { type TEmailStrategyRusenderStatic } from "./backend-email-strategy-rusender.types"
+import { sendAsync } from "./impl/send-async"
+import { sendTemplateAsync } from "./impl/send-template-async"
 
 /**
  * `RusenderEmailStrategy` implements `EmailStrategy` for sending emails using Rusender. To create
@@ -59,49 +39,33 @@ import {
  * TODO: #275 Update OfflineNotificationsService types to avoid type collisions.
  */
 export const EmailStrategyRusender: TEmailStrategyRusenderStatic = {
-	create: ({ key }) => ({
-		sendAsync: message =>
-			void fromNullable0((message as EmailTemplate).templateId)
-				.pipe(map0(createTemplateEmailParams(message)))
-				.pipe(bichain0(() => createDefaultRequest0(message, key), createTemplateRequest0(key)))
-				.pipe(bichain0(fetch0, fetch0))
-				.invoke(orNothing),
-	}),
+	create: params => {
+		const sendTemplate = sendTemplateAsync(params)
+
+		return {
+			sendAsync: sendAsync(params),
+			sendChangeEmailEmail: () => void 0 as any,
+			sendConfirmEmail: ({ email, supportEmail, supportTelegram, confirmationUrl }) =>
+				sendTemplate({
+					from: params.from,
+					to: { email },
+					subject: "Регистрация в Ordo.pink",
+					idTemplateMailUser: 9463,
+					params: { confirmationUrl, supportEmail, supportTelegram },
+				}),
+			sendEmailChangedEmail: () => void 0 as any,
+			sendPasswordChangedEmail: () => void 0 as any,
+			sendRecoverPasswordEmail: () => void 0 as any,
+			sendResetPasswordEmail: () => void 0 as any,
+			sendSignInEmail: ({ email, name, ip, supportEmail, supportTelegram, resetPasswordUrl }) =>
+				sendTemplate({
+					from: params.from,
+					to: { email, name },
+					subject: "Кто-то вошёл в ваш аккаунт Ordo.pink",
+					idTemplateMailUser: 9661,
+					params: { ip, resetPasswordUrl, supportEmail, supportTelegram },
+				}),
+		}
+	},
 }
-
-// --- Internal ---
-
-const createTemplateEmailParams = (message: EmailParams) => () => ({
-	from: message.from,
-	to: message.to,
-	subject: message.subject,
-	cc: message.cc,
-	bcc: message.bcc,
-	headers: message.headers,
-	params: (message as EmailTemplate).params,
-	idTemplateMailUser: (message as EmailTemplate).templateId,
-})
-
-const initRequestParams = (key: string) => ({ headers: { ...RS_HEADERS, [RS_APIKEY_HEADER]: key } })
-const addMethod = () => ({ method: RS_SEND_HTTP_METHOD })
-const addUrl = (url: string) => () => ({ url })
-const addBody = (mail: any) => () => ({ body: JSON.stringify({ mail }) })
-
-const fetch0 = ({ method, url, headers, body }: TRusenderSendRusenderRequestParams) =>
-	fromPromise0(() => fetch(url, { method, headers, body }))
-
-const createCommonRequest0 = (key: string, mail: TRusenderTemplateEmailRequestBody | EmailParams) =>
-	fromNullable0(key)
-		.pipe(map0(initRequestParams))
-		.pipe(map0(extend(addMethod)))
-		.pipe(map0(extend(addBody(mail))))
-
-/**
- * @deprecated
- * @see #274
- */
-const createTemplateRequest0 = (key: string) => (mail: TRusenderTemplateEmailRequestBody) =>
-	createCommonRequest0(key, mail).pipe(map0(extend(addUrl(RS_TEMPLATE_URL))))
-
-const createDefaultRequest0 = (mail: EmailParams, key: string) =>
-	createCommonRequest0(key, mail).pipe(map0(extend(addUrl(RS_SEND_URL))))
+9463

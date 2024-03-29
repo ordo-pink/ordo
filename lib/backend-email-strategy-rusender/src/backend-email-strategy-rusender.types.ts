@@ -1,4 +1,8 @@
-import type { EmailHead, EmailStrategy } from "@ordo-pink/backend-service-offline-notifications"
+import type {
+	EmailContact,
+	EmailParams,
+	EmailStrategy,
+} from "@ordo-pink/backend-service-offline-notifications"
 import type { UUIDv4 } from "@ordo-pink/tau"
 
 import type {
@@ -11,24 +15,13 @@ import type { EmailStrategyRusenderError } from "./backend-email-strategy-rusend
 /**
  * Email strategy Rusender params. The only required parameter is the API key.
  */
-export type TEmailStrategyRusenderParams = { key: string }
+export type TEmailStrategyRusenderParams = { key: string; from: EmailContact }
 
 /**
  * EmailStrategyRusender static methods descriptor.
  */
 export type TEmailStrategyRusenderStatic = {
 	create: (params: TEmailStrategyRusenderParams) => EmailStrategy
-}
-
-/**
- * A request object specific to Rusender template API.
- *
- * @deprecated
- * @see #274
- */
-export type TRusenderTemplateEmailRequestBody = EmailHead & {
-	idTemplateMailUser: number
-	params: Record<string, string>
 }
 
 /**
@@ -53,4 +46,13 @@ export type TRusenderSendRusenderRequestParams = {
 	url: string
 	body: string
 	headers: TRusenderRequestHeaders
+}
+
+export type TEmailStrategyRusenderMethod<K extends keyof EmailStrategy> = (
+	params: TEmailStrategyRusenderParams,
+) => EmailStrategy[K]
+
+export type TRusenderEmailTemplate = Omit<EmailParams, "body" | "html"> & {
+	idTemplateMailUser?: number
+	params: Record<string, string>
 }

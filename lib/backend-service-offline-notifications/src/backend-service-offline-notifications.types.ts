@@ -33,9 +33,16 @@ export type EmailContact = {
 }
 
 /**
- * Email head.
+ * @todo Implement support for hooks.
+ *
+ * @deprecated Not implemented!
  */
-export type EmailHead = {
+export type NotificationHooks = {
+	onSuccess?: () => void
+	onError?: (error: Error) => void
+}
+
+export type EmailParams = {
 	/**
 	 * Email addressor.
 	 */
@@ -65,87 +72,80 @@ export type EmailHead = {
 	 * Email headers.
 	 */
 	headers?: Record<string, string>
+
+	/**
+	 * HTML body. Either HTML body or text body must be provided for an email to be sent.
+	 */
+	html?: string
+
+	/**
+	 * Text body. Either HTML body or text body must be provided for an email to be sent.
+	 */
+	text?: string
 }
-
-/**
- * @todo Implement support for hooks.
- *
- * @deprecated Not implemented!
- */
-export type NotificationHooks = {
-	onSuccess?: () => void
-	onError?: (error: Error) => void
-}
-
-/**
- * Email body.
- */
-export type EmailBody =
-	| {
-			/**
-			 * HTML body. Either HTML body or text body must be provided for an email to be sent.
-			 */
-			html?: string
-
-			/**
-			 * Text body. Either HTML body or text body must be provided for an email to be sent.
-			 */
-			text: string
-	  }
-	| {
-			/**
-			 * HTML body. Either HTML body or text body must be provided for an email to be sent.
-			 */
-			html: string
-
-			/**
-			 * Text body. Either HTML body or text body must be provided for an email to be sent.
-			 */
-			text?: string
-	  }
-
-/**
- * @deprecated
- */
-export type EmailTemplate = {
-	templateId: number
-	idTemplateMailUser?: number
-	params: Record<string, string>
-}
-
-export type EmailParams = EmailHead & (EmailBody | EmailTemplate)
 
 /**
  * `EmailStrategy` provides a `send` method used by the `OfflineNotificationService` to send emails
  * to users.
  */
 export type EmailStrategy = {
-	/**
-	 * Send provided email.
-	 *
-	 * @param params Message to be sent.
-	 * @returns void.
-	 */
 	sendAsync: (params: EmailParams) => void
+
+	sendSignInEmail: (params: SendSignInNotificationParams) => void
+
+	sendConfirmEmail: (params: SendEmailConfirmationRequestEmailParams) => void
+
+	sendRecoverPasswordEmail: (params: SendPasswordRecoveryNotificationParams) => void
+
+	sendPasswordChangedEmail: (params: SendPasswordChangeNotificationParams) => void
+
+	sendChangeEmailEmail: (params: SendEmailChangeNotificationParams) => void
+
+	sendEmailChangedEmail: (params: SendEmailChangeNotificationParams) => void
+
+	sendResetPasswordEmail: (params: SendResetPasswordNotificationParams) => void
 }
 
 export type SendSignInNotificationParams = EmailContact & {
-	/**
-	 * The IP address from which the sign in happened.
-	 */
 	ip: string
+	resetPasswordUrl: string
+	supportEmail: string
+	supportTelegram: string
 }
 
 export type SendEmailConfirmationRequestEmailParams = {
-	/**
-	 * The email to send confirmation to.
-	 */
 	email: string
-
-	/**
-	 * URL for validating the email.
-	 */
 	confirmationUrl: string
+	supportEmail: string
+	supportTelegram: string
+}
+
+export type SendPasswordRecoveryNotificationParams = {
+	email: string
+	passwordRecoveryUrl: string
+	supportEmail: string
+	supportTelegram: string
+}
+
+export type SendPasswordChangeNotificationParams = {
+	email: string
+	resetPasswordUrl: string
+	supportEmail: string
+	supportTelegram: string
+}
+
+export type SendEmailChangeNotificationParams = {
+	oldEmail: string
+	newEmail: string
+	resetPasswordUrl: string
+	supportEmail: string
+	supportTelegram: string
+}
+
+export type SendResetPasswordNotificationParams = {
+	email: string
+	supportEmail: string
+	supportTelegram: string
 }
 
 /**
@@ -160,21 +160,17 @@ export type TNotificationService = {
 	 */
 	emailStrategy: EmailStrategy
 
-	/**
-	 * Send notification to the user when there is a successful sign-in to their account.
-	 *
-	 * @param params User info needed for creating a sign-in notification.
-	 * @returns void
-	 */
 	sendSignInNotification: (params: SendSignInNotificationParams) => void
 
-	/**
-	 * Send a confirmation email to the user who subscribes to the email list.
-	 *
-	 * @param params User info needed for creating a subscription confirmation notification.
-	 * @returns void
-	 */
 	sendEmailConfirmationRequestEmail: (params: SendEmailConfirmationRequestEmailParams) => void
+
+	sendPasswordRecoveryNotification: (params: SendPasswordRecoveryNotificationParams) => void
+
+	sendPasswordChangeNotification: (params: SendPasswordChangeNotificationParams) => void
+
+	sendEmailChangeNotifications: (params: SendEmailChangeNotificationParams) => void
+
+	sendResetPasswordNotification: (params: SendResetPasswordNotificationParams) => void
 }
 
 /**
@@ -192,9 +188,4 @@ export type InitNotificationServiceOptions = {
 	 * Information about the notification sender.
 	 */
 	sender: EmailContact
-
-	/**
-	 * Ordo.pink website host for creating links in email templates.
-	 */
-	websiteHost: string
 }

@@ -17,9 +17,13 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import {
+	RusenderEmailSubject,
+	RusenderTemplateId,
+} from "./backend-email-strategy-rusender.constants"
 import { type TEmailStrategyRusenderStatic } from "./backend-email-strategy-rusender.types"
-import { sendAsync } from "./impl/send-async"
-import { sendTemplateAsync } from "./impl/send-template-async"
+import { sendAsync } from "./methods/send-async"
+import { sendTemplateAsync } from "./methods/send-template-async"
 
 /**
  * `RusenderEmailStrategy` implements `EmailStrategy` for sending emails using Rusender. To create
@@ -44,28 +48,121 @@ export const EmailStrategyRusender: TEmailStrategyRusenderStatic = {
 
 		return {
 			sendAsync: sendAsync(params),
-			sendChangeEmailEmail: () => void 0 as any,
-			sendConfirmEmail: ({ email, supportEmail, supportTelegram, confirmationUrl }) =>
+			sendChangeEmailEmail: ({
+				telegramChannel,
+				from,
+				to,
+				supportEmail,
+				supportTelegram,
+				newEmail,
+				oldEmail,
+				confirmationUrl,
+			}) =>
 				sendTemplate({
-					from: params.from,
-					to: { email },
-					subject: "Регистрация в Ordo.pink",
-					idTemplateMailUser: 9463,
-					params: { confirmationUrl, supportEmail, supportTelegram },
+					from,
+					to,
+					subject: RusenderEmailSubject.sendChangeEmailEmail,
+					idTemplateMailUser: RusenderTemplateId.sendChangeEmailEmail,
+					params: {
+						telegramChannel,
+						newEmail,
+						oldEmail,
+						supportEmail,
+						supportTelegram,
+						confirmationUrl,
+					},
 				}),
-			sendEmailChangedEmail: () => void 0 as any,
-			sendPasswordChangedEmail: () => void 0 as any,
-			sendRecoverPasswordEmail: () => void 0 as any,
-			sendResetPasswordEmail: () => void 0 as any,
-			sendSignInEmail: ({ email, name, ip, supportEmail, supportTelegram, resetPasswordUrl }) =>
+			sendEmailChangeRequestedEmail: ({
+				telegramChannel,
+				from,
+				to,
+				supportEmail,
+				supportTelegram,
+				newEmail,
+			}) =>
 				sendTemplate({
-					from: params.from,
-					to: { email, name },
-					subject: "Кто-то вошёл в ваш аккаунт Ordo.pink",
-					idTemplateMailUser: 9661,
-					params: { ip, resetPasswordUrl, supportEmail, supportTelegram },
+					from,
+					to,
+					subject: RusenderEmailSubject.sendEmailChangeRequestedEmail,
+					idTemplateMailUser: RusenderTemplateId.sendEmailChangeRequestedEmail,
+					params: { telegramChannel, newEmail, supportEmail, supportTelegram },
+				}),
+			sendPasswordChangedEmail: ({
+				telegramChannel,
+				from,
+				to,
+				supportEmail,
+				supportTelegram,
+				resetPasswordUrl,
+			}) =>
+				sendTemplate({
+					from,
+					to,
+					subject: RusenderEmailSubject.sendPasswordChangedEmail,
+					idTemplateMailUser: RusenderTemplateId.sendPasswordChangedEmail,
+					params: { telegramChannel, supportEmail, supportTelegram, resetPasswordUrl },
+				}),
+			sendRecoverPasswordEmail: ({
+				telegramChannel,
+				from,
+				to,
+				supportEmail,
+				supportTelegram,
+				passwordRecoveryUrl,
+			}) =>
+				sendTemplate({
+					from,
+					to,
+					subject: RusenderEmailSubject.sendRecoverPasswordEmail,
+					idTemplateMailUser: RusenderTemplateId.sendRecoverPasswordEmail,
+					params: { telegramChannel, supportEmail, supportTelegram, passwordRecoveryUrl },
+				}),
+			sendConfirmationEmail: ({
+				telegramChannel,
+				from,
+				to,
+				supportEmail,
+				supportTelegram,
+				confirmationUrl,
+			}) =>
+				sendTemplate({
+					from,
+					to,
+					subject: RusenderEmailSubject.sendConfirmationEmail,
+					idTemplateMailUser: RusenderTemplateId.sendConfirmationEmail,
+					params: { telegramChannel, supportEmail, supportTelegram, confirmationUrl },
+				}),
+			sendSignUpEmail: ({
+				telegramChannel,
+				from,
+				to,
+				supportEmail,
+				supportTelegram,
+				confirmationUrl,
+			}) =>
+				sendTemplate({
+					from,
+					to,
+					subject: RusenderEmailSubject.sendSignUpEmail,
+					idTemplateMailUser: RusenderTemplateId.sendSignUpEmail,
+					params: { telegramChannel, confirmationUrl, supportEmail, supportTelegram },
+				}),
+			sendSignInEmail: ({
+				telegramChannel,
+				from,
+				to,
+				ip,
+				supportEmail,
+				supportTelegram,
+				resetPasswordUrl,
+			}) =>
+				sendTemplate({
+					from,
+					to,
+					subject: RusenderEmailSubject.sendSignInEmail,
+					idTemplateMailUser: RusenderTemplateId.sendSignInEmail,
+					params: { telegramChannel, ip, resetPasswordUrl, supportEmail, supportTelegram },
 				}),
 		}
 	},
 }
-9463

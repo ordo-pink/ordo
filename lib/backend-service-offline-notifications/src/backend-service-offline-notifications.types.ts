@@ -93,7 +93,7 @@ export type EmailStrategy = {
 
 	sendSignInEmail: (params: SendSignInNotificationParams) => void
 
-	sendConfirmEmail: (params: SendEmailConfirmationRequestEmailParams) => void
+	sendSignUpEmail: (params: SendEmailConfirmationRequestEmailParams) => void
 
 	sendRecoverPasswordEmail: (params: SendPasswordRecoveryNotificationParams) => void
 
@@ -101,51 +101,66 @@ export type EmailStrategy = {
 
 	sendChangeEmailEmail: (params: SendEmailChangeNotificationParams) => void
 
-	sendEmailChangedEmail: (params: SendEmailChangeNotificationParams) => void
+	sendEmailChangeRequestedEmail: (params: SendEmailChangeNotificationParams) => void
 
-	sendResetPasswordEmail: (params: SendResetPasswordNotificationParams) => void
+	sendConfirmationEmail: (params: SendResetPasswordNotificationParams) => void
 }
 
-export type SendSignInNotificationParams = EmailContact & {
+export type SendSignInNotificationParams = {
+	from: Required<EmailContact>
+	to: EmailContact
 	ip: string
 	resetPasswordUrl: string
 	supportEmail: string
 	supportTelegram: string
+	telegramChannel: string
 }
 
 export type SendEmailConfirmationRequestEmailParams = {
-	email: string
+	from: Required<EmailContact>
+	to: EmailContact
 	confirmationUrl: string
 	supportEmail: string
 	supportTelegram: string
+	telegramChannel: string
 }
 
 export type SendPasswordRecoveryNotificationParams = {
-	email: string
+	from: Required<EmailContact>
+	to: EmailContact
 	passwordRecoveryUrl: string
 	supportEmail: string
 	supportTelegram: string
+	telegramChannel: string
 }
 
 export type SendPasswordChangeNotificationParams = {
-	email: string
+	from: Required<EmailContact>
+	to: EmailContact
 	resetPasswordUrl: string
 	supportEmail: string
 	supportTelegram: string
+	telegramChannel: string
 }
 
 export type SendEmailChangeNotificationParams = {
+	from: Required<EmailContact>
+	to: EmailContact
 	oldEmail: string
 	newEmail: string
-	resetPasswordUrl: string
+	confirmationUrl: string
 	supportEmail: string
 	supportTelegram: string
+	telegramChannel: string
 }
 
 export type SendResetPasswordNotificationParams = {
-	email: string
+	from: Required<EmailContact>
+	to: EmailContact
 	supportEmail: string
 	supportTelegram: string
+	telegramChannel: string
+	confirmationUrl: string
 }
 
 /**
@@ -162,7 +177,7 @@ export type TNotificationService = {
 
 	sendSignInNotification: (params: SendSignInNotificationParams) => void
 
-	sendEmailConfirmationRequestEmail: (params: SendEmailConfirmationRequestEmailParams) => void
+	sendSignUpNotification: (params: SendEmailConfirmationRequestEmailParams) => void
 
 	sendPasswordRecoveryNotification: (params: SendPasswordRecoveryNotificationParams) => void
 
@@ -187,5 +202,5 @@ export type InitNotificationServiceOptions = {
 	/**
 	 * Information about the notification sender.
 	 */
-	sender: EmailContact
+	sender: Required<EmailContact>
 }

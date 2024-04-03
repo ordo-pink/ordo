@@ -109,7 +109,7 @@ export const handleSignUp: Fn =
 						Oath.of(crypto.getRandomValues(new Uint32Array(3)).join(""))
 							.chain(code => userService.update(tokens.sub, { code }))
 							.tap(user =>
-								notificationService.sendEmailConfirmationRequestEmail({
+								notificationService.sendSignUpNotification({
 									email: user.email,
 									confirmationUrl: `${websiteHost}/confirm-email?code=${user.code}&email=${user.email}`,
 								}),

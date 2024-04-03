@@ -16,9 +16,9 @@ import {
 
 export const sendTemplateAsync =
 	({ key }: TEmailStrategyRusenderParams) =>
-	(message: TRusenderEmailTemplate) =>
-		void of0(message)
-			.pipe(chain0(message => createDefaultRequest0(message, key)))
+	(template: TRusenderEmailTemplate) =>
+		void of0(template)
+			.pipe(chain0(template => createDefaultRequest0(template, key)))
 			.pipe(chain0(fetch0))
 			.invoke(orNothing)
 

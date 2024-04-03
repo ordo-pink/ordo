@@ -1,8 +1,4 @@
-import type {
-	EmailContact,
-	EmailParams,
-	EmailStrategy,
-} from "@ordo-pink/backend-service-offline-notifications"
+import type { EmailParams, EmailStrategy } from "@ordo-pink/backend-service-offline-notifications"
 import type { UUIDv4 } from "@ordo-pink/tau"
 
 import type {
@@ -15,7 +11,7 @@ import type { EmailStrategyRusenderError } from "./backend-email-strategy-rusend
 /**
  * Email strategy Rusender params. The only required parameter is the API key.
  */
-export type TEmailStrategyRusenderParams = { key: string; from: EmailContact }
+export type TEmailStrategyRusenderParams = { key: string }
 
 /**
  * EmailStrategyRusender static methods descriptor.

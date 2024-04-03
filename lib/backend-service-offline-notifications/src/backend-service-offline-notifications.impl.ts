@@ -23,29 +23,45 @@ import type {
 } from "./backend-service-offline-notifications.types"
 
 export const NotificationService = {
-	of: ({
+	of: ({ emailStrategy, sender: from }: InitNotificationServiceOptions): TNotificationService => ({
 		emailStrategy,
-		sender: from,
-		websiteHost,
-	}: InitNotificationServiceOptions): TNotificationService => ({
-		emailStrategy,
-		sendSignInNotification: ({ email, ip, name }) => {
-			emailStrategy.sendAsync({
-				from,
-				to: { email, name },
-				subject: "Кто-то вошёл в ваш аккаунт Ordo.pink",
-				templateId: 9661,
-				params: { ip, resetPasswordUrl: `${websiteHost}/reset-password` },
+		sendSignInNotification: ({
+			ip,
+			supportEmail,
+			supportTelegram,
+			to,
+			resetPasswordUrl,
+			telegramChannel,
+		}) => {
+			emailStrategy.sendSignInEmail({
+				from, // TODO: Separate email strategy and notification service types
+				to,
+				ip,
+				resetPasswordUrl,
+				supportEmail,
+				supportTelegram,
+				telegramChannel,
 			})
 		},
-		sendEmailConfirmationRequestEmail: ({ email, confirmationUrl }) => {
-			emailStrategy.sendAsync({
+		sendSignUpNotification: ({
+			to,
+			confirmationUrl,
+			supportEmail,
+			supportTelegram,
+			telegramChannel,
+		}) => {
+			emailStrategy.sendSignUpEmail({
 				from,
-				to: { email, name: email },
-				subject: "Регистрация в Ordo.pink",
-				params: { confirmationUrl },
-				templateId: 9463,
+				to,
+				confirmationUrl,
+				supportEmail,
+				supportTelegram,
+				telegramChannel,
 			})
 		},
+		sendEmailChangeNotifications: () => void 0 as any,
+		sendPasswordChangeNotification: () => void 0 as any,
+		sendPasswordRecoveryNotification: () => void 0 as any,
+		sendResetPasswordNotification: () => void 0 as any,
 	}),
 }

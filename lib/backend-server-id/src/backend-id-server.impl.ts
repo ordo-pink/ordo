@@ -28,18 +28,18 @@ import { UserPersistenceStrategy, UserService } from "@ordo-pink/backend-service
 import { type Algorithm } from "@ordo-pink/wjwt"
 import { createServer } from "@ordo-pink/backend-utils"
 
-import { handleAccount } from "./handlers/account.handler"
+import { handleAccount } from "./handlers/get-account.handler"
 import { handleChangeAccountInfo } from "./handlers/change-account-info.handler"
 import { handleChangeEmail } from "./handlers/change-email.handler"
 import { handleChangePassword } from "./handlers/change-password.handler"
 import { handleConfirmEmail } from "./handlers/confirm-email.handler"
 import { handleRefreshToken } from "./handlers/refresh-token.handler"
-import { handleVerifyToken } from "./handlers/verify-token.handler"
-// import { handleUserInfoByEmail } from "./handlers/user-info-by-email.handler"
 import { handleSignIn } from "./handlers/sign-in.handler"
 import { handleSignOut } from "./handlers/sign-out.handler"
 import { handleSignUp } from "./handlers/sign-up.handler"
-import { handleUserInfoByFSID } from "./handlers/user-info-by-fsid.handler"
+import { handleUserInfoByEmail } from "./handlers/get-user-info-by-email.handler"
+import { handleUserInfoByID as handleUserInfoByID } from "./handlers/get-user-info-by-fsid.handler"
+import { handleVerifyToken } from "./handlers/verify-token.handler"
 
 export type CreateIDServerFnParams = {
 	userRepository: UserPersistenceStrategy
@@ -53,7 +53,7 @@ export type CreateIDServerFnParams = {
 	refreshKeys: CryptoKeyPair
 	logger?: Logger
 	websiteHost: string
-	notificationSender: EmailContact
+	notificationSender: Required<EmailContact>
 }
 
 export const createIDServer = ({
@@ -73,7 +73,6 @@ export const createIDServer = ({
 	const userService = UserService.of(userRepository)
 	const notificationService = NotificationService.of({
 		emailStrategy,
-		websiteHost,
 		sender: notificationSender,
 	})
 
@@ -102,8 +101,8 @@ export const createIDServer = ({
 				.post("/refresh-token", handleRefreshToken(ctx))
 				.post("/confirm-email", handleConfirmEmail(ctx))
 				.get("/account", handleAccount(ctx))
-				// .get("/users/:email", handleUserInfoByEmail(ctx))
-				.get("/users/:fsid", handleUserInfoByFSID(ctx))
+				.get("/users/email/:email", handleUserInfoByEmail(ctx))
+				.get("/users/id/:id", handleUserInfoByID(ctx))
 				.patch("/change-account-info", handleChangeAccountInfo(ctx))
 				.patch("/change-email", handleChangeEmail(ctx))
 				.patch("/change-password", handleChangePassword(ctx))

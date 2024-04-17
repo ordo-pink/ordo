@@ -89,6 +89,7 @@ export const TokenService = {
 						exp: rexp,
 						sub,
 						aud,
+						...data,
 						tokens: Oath.all({
 							access: accessWJWT.sign0({ ...data, jti, iat, iss, exp: aexp, sub, aud }),
 							refresh: refreshWJWT.sign0({ ...data, jti, iat, iss, exp: rexp, sub, aud }),

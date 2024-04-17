@@ -1,8 +1,11 @@
 // SPDX-FileCopyrightText: Copyright 2024, 谢尔盖||↓ and the Ordo.pink contributors
 // SPDX-License-Identifier: Unlicense
 
+import { UnderOath, UnderOathRejected } from "../src/types"
 import { Oath } from "../src/impl"
-import { UnderOath } from "../src/types"
+
+type ArrayToUnion<T> = T extends Array<infer U> ? U : T
+type RecordToUnion<T extends Record<string, unknown>> = { [P in keyof T]: T[P] }[keyof T]
 
 // TODO: Infer rejected type
 export const merge0 = <TSomeThings extends readonly unknown[] | [] | Record<string, unknown>>(
@@ -11,7 +14,10 @@ export const merge0 = <TSomeThings extends readonly unknown[] | [] | Record<stri
 ): Oath<
 	TSomeThings extends []
 		? { -readonly [P in keyof TSomeThings]: UnderOath<TSomeThings[P]> }
-		: { [P in keyof TSomeThings]: UnderOath<TSomeThings[P]> }
+		: { [P in keyof TSomeThings]: UnderOath<TSomeThings[P]> },
+	TSomeThings extends Array<any>
+		? ArrayToUnion<{ -readonly [P in keyof TSomeThings]: UnderOathRejected<TSomeThings[P]> }>
+		: RecordToUnion<{ [P in keyof TSomeThings]: UnderOathRejected<TSomeThings[P]> }>
 > => {
 	if (!values || typeof values !== "object") throw new Error("Invalid merge values")
 

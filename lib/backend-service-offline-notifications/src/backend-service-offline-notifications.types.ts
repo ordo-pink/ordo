@@ -91,75 +91,60 @@ export type EmailParams = {
 export type EmailStrategy = {
 	sendAsync: (params: EmailParams) => void
 
-	sendSignInEmail: (params: SendSignInNotificationParams) => void
+	sendSignInEmail: (params: TSendSignInEmailParams) => void
 
-	sendSignUpEmail: (params: SendEmailConfirmationRequestEmailParams) => void
+	sendSignUpEmail: (params: TSendConfirmEmailParams) => void
 
-	sendRecoverPasswordEmail: (params: SendPasswordRecoveryNotificationParams) => void
+	sendRecoverPasswordEmail: (params: TSendRecoverPasswordEmailParams) => void
 
-	sendPasswordChangedEmail: (params: SendPasswordChangeNotificationParams) => void
+	sendPasswordChangedEmail: (params: TSendChangePasswordEmailParams) => void
 
-	sendChangeEmailEmail: (params: SendEmailChangeNotificationParams) => void
+	sendChangeEmailEmail: (params: TSendChangeEmailEmailParams) => void
 
-	sendEmailChangeRequestedEmail: (params: SendEmailChangeNotificationParams) => void
+	sendEmailChangeRequestedEmail: (params: TSendChangeEmailEmailParams) => void
 
-	sendConfirmationEmail: (params: SendResetPasswordNotificationParams) => void
+	sendEmailChangedEmail: (params: TSendEmailChangedEmailParams) => void
+
+	sendConfirmationEmail: (params: TSendResetPasswordEmailParams) => void
 }
 
-export type SendSignInNotificationParams = {
-	from: Required<EmailContact>
+export type TSharedEmailParams = {
+	supportEmail?: string
+	supportTelegram?: string
+	telegramChannel?: string
+	from?: Required<EmailContact>
 	to: EmailContact
+}
+
+export type TSendSignInEmailParams = TSharedEmailParams & {
 	ip: string
 	resetPasswordUrl: string
-	supportEmail: string
-	supportTelegram: string
-	telegramChannel: string
 }
 
-export type SendEmailConfirmationRequestEmailParams = {
-	from: Required<EmailContact>
-	to: EmailContact
+export type TSendConfirmEmailParams = TSharedEmailParams & {
 	confirmationUrl: string
-	supportEmail: string
-	supportTelegram: string
-	telegramChannel: string
 }
 
-export type SendPasswordRecoveryNotificationParams = {
-	from: Required<EmailContact>
-	to: EmailContact
+export type TSendRecoverPasswordEmailParams = TSharedEmailParams & {
 	passwordRecoveryUrl: string
-	supportEmail: string
-	supportTelegram: string
-	telegramChannel: string
 }
 
-export type SendPasswordChangeNotificationParams = {
-	from: Required<EmailContact>
-	to: EmailContact
+export type TSendChangePasswordEmailParams = TSharedEmailParams & {
 	resetPasswordUrl: string
-	supportEmail: string
-	supportTelegram: string
-	telegramChannel: string
 }
 
-export type SendEmailChangeNotificationParams = {
-	from: Required<EmailContact>
-	to: EmailContact
+export type TSendChangeEmailEmailParams = TSharedEmailParams & {
 	oldEmail: string
 	newEmail: string
 	confirmationUrl: string
-	supportEmail: string
-	supportTelegram: string
-	telegramChannel: string
 }
 
-export type SendResetPasswordNotificationParams = {
-	from: Required<EmailContact>
-	to: EmailContact
-	supportEmail: string
-	supportTelegram: string
-	telegramChannel: string
+export type TSendEmailChangedEmailParams = TSharedEmailParams & {
+	oldEmail: string
+	newEmail: string
+}
+
+export type TSendResetPasswordEmailParams = TSharedEmailParams & {
 	confirmationUrl: string
 }
 
@@ -175,17 +160,19 @@ export type TNotificationService = {
 	 */
 	emailStrategy: EmailStrategy
 
-	sendSignInNotification: (params: SendSignInNotificationParams) => void
+	sendSignInNotification: (params: TSendSignInEmailParams) => void
 
-	sendSignUpNotification: (params: SendEmailConfirmationRequestEmailParams) => void
+	sendSignUpNotification: (params: TSendConfirmEmailParams) => void
 
-	sendPasswordRecoveryNotification: (params: SendPasswordRecoveryNotificationParams) => void
+	sendPasswordRecoveryNotification: (params: TSendRecoverPasswordEmailParams) => void
 
-	sendPasswordChangeNotification: (params: SendPasswordChangeNotificationParams) => void
+	sendPasswordChangeNotification: (params: TSendChangePasswordEmailParams) => void
 
-	sendEmailChangeNotifications: (params: SendEmailChangeNotificationParams) => void
+	sendEmailChangeNotifications: (params: TSendChangeEmailEmailParams) => void
 
-	sendResetPasswordNotification: (params: SendResetPasswordNotificationParams) => void
+	sendEmailChangedNotification: (params: TSendEmailChangedEmailParams) => void
+
+	sendResetPasswordNotification: (params: TSendResetPasswordEmailParams) => void
 }
 
 /**

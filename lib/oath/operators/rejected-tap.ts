@@ -3,11 +3,10 @@
 
 import { Oath } from "../src/impl"
 
-export const bitap0 =
-	<Resolve, Reject>(onRejected: (x: Reject) => any, onResolved: (x: Resolve) => any) =>
+export const rejectedTap0 =
+	<Resolve, Reject>(onRejected: (x: Reject) => any) =>
 	(o: Oath<Resolve, Reject>): Oath<Resolve, Reject> =>
 		new Oath<Resolve, Reject>(
-			// eslint-disable-next-line @typescript-eslint/no-misused-promises
 			(resolve, reject) =>
 				o.fork(
 					a => {
@@ -23,7 +22,6 @@ export const bitap0 =
 							return reject(o.cancellationReason as any)
 						}
 
-						onResolved(b)
 						return resolve(b)
 					},
 				),

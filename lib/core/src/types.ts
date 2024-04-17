@@ -21,11 +21,90 @@ import type { ComponentType, LazyExoticComponent, MouseEvent } from "react"
 import type { IconType } from "react-icons"
 
 import type { FSID, PlainData } from "@ordo-pink/data"
+import type { JTI, SUB } from "@ordo-pink/wjwt"
 import type { UUIDv4 } from "@ordo-pink/tau"
 
 import type { BackgroundTaskStatus } from "./constants"
 
 declare global {
+	module Routes {
+		type SuccessResponse<T> = { success: true; result: T }
+		type ErrorResponse = { success: false; error: string }
+		type TokenResult = {
+			sub: SUB
+			jti: JTI
+			expires: Date
+			accessToken: string
+			fileLimit: User.User["fileLimit"]
+			subscription: User.User["subscription"]
+			maxUploadSize: User.User["maxUploadSize"]
+		}
+
+		module ID {
+			module ChangeAccountInfo {
+				type RequestBody = { firstName?: string; lastName?: string }
+				type Result = User.User
+			}
+
+			module ChangeEmail {
+				type RequestBody = { oldEmail?: string; newEmail?: string; userID?: SUB }
+				type Result = User.User
+			}
+
+			module ChangePassword {
+				type RequestBody = { oldPassword?: string; newPassword?: string }
+				type Result = TokenResult
+			}
+
+			module ConfirmEmail {
+				type RequestBody = { email?: string; code?: string }
+				type Result = User.User
+			}
+
+			module GetAccount {
+				type RequestBody = never
+				type Result = User.User
+			}
+
+			module GetUserInfoByEmail {
+				type RequestBody = never
+				type RequestParams = { email?: string }
+				type Result = User.PublicUser
+			}
+
+			module GetUserInfoByID {
+				type RequestBody = never
+				type RequestParams = { id?: string }
+				type Result = User.PublicUser
+			}
+
+			module RefreshToken {
+				type RequestBody = never
+				type Result = TokenResult
+			}
+
+			module RequestEmailChange {
+				type RequestBody = { oldEmail?: string; newEmail?: string }
+				type Result = User.PublicUser
+			}
+
+			module SignIn {
+				type RequestBody = { email?: string; password?: string }
+				type Result = TokenResult
+			}
+
+			module SignUp {
+				type RequestBody = { email?: string; password?: string }
+				type Result = TokenResult
+			}
+
+			module VerifyToken {
+				type RequestBody = never
+				type Result = { valid: false } | { valid: true; token: string }
+			}
+		}
+	}
+
 	type PropsWithChildren<T extends Record<string, unknown> = Record<string, unknown>> = T & {
 		children?: any
 	}
@@ -236,10 +315,13 @@ declare global {
 			emailConfirmed: boolean
 			fileLimit: number
 			maxUploadSize: number
+		}
+
+		export type PrivateUser = User.User & {
 			code?: string
 		}
 
-		export type InternalUser = User.User & {
+		export type InternalUser = User.PrivateUser & {
 			password: string
 		}
 	}

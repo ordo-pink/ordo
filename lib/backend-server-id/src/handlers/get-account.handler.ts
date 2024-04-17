@@ -19,27 +19,28 @@
 
 import { type Middleware } from "koa"
 
-import { HttpError } from "@ordo-pink/rrr"
-import { Oath } from "@ordo-pink/oath"
-import { type TTokenService } from "@ordo-pink/backend-service-token"
+import { type JWAT, type TTokenService } from "@ordo-pink/backend-service-token"
+import { type Oath, bimap0 } from "@ordo-pink/oath"
+import { authenticate0, sendError, sendSuccess } from "@ordo-pink/backend-utils"
+import { type HttpError } from "@ordo-pink/rrr"
 import { type UserService } from "@ordo-pink/backend-service-user"
-import { sendError } from "@ordo-pink/backend-utils"
+import { omit } from "@ordo-pink/tau"
 
-// --- Public ---
+import { toUserNotFoundError } from "../fns/to-error"
 
-export type Params = { tokenService: TTokenService; userService: UserService }
-export type Fn = (params: Params) => Middleware
-
-export const handleUserInfoByFSID: Fn =
-	({ userService }) =>
+export const handleAccount: TFn =
+	({ tokenService, userService }) =>
 	ctx =>
-		Oath.of(ctx.params.fsid)
-			.chain(fsid =>
-				userService
-					.getById(fsid)
-					.map(user => userService.serializePublic(user))
-					.rejectedMap(() => HttpError.NotFound("User not found")),
-			)
-			.fork(sendError(ctx), result => {
-				ctx.response.body = { success: true, result }
-			})
+		authenticate0(ctx, tokenService)
+			.and(getUserById0(userService))
+			.fork(sendError(ctx), sendSuccess({ ctx }))
+
+// --- Internal ---
+
+type TParams = { tokenService: TTokenService; userService: UserService }
+type TFn = (params: TParams) => Middleware
+type TResult = Routes.ID.GetAccount.Result
+
+type TGetUserByIdFn = (us: UserService) => (token: JWAT) => Oath<TResult, HttpError>
+const getUserById0: TGetUserByIdFn = userService => token =>
+	userService.getById(token.payload.sub).pipe(bimap0(toUserNotFoundError, omit("code")))

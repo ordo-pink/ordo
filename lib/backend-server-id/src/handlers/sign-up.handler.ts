@@ -18,7 +18,7 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { type Middleware } from "koa"
-import validator from "validator"
+import isEmail from "validator/lib/isEmail"
 
 import { parseBody0, sendError } from "@ordo-pink/backend-utils"
 import { HttpError } from "@ordo-pink/rrr"
@@ -28,15 +28,6 @@ import { type TTokenService } from "@ordo-pink/backend-service-token"
 import { type UserService } from "@ordo-pink/backend-service-user"
 import { okpwd } from "@ordo-pink/okpwd"
 
-type Body = { email?: string; password?: string }
-type Params = {
-	userService: UserService
-	tokenService: TTokenService
-	notificationService: TNotificationService
-	websiteHost: string
-}
-type Fn = (params: Params) => Middleware
-
 export const handleSignUp: Fn =
 	({ userService, tokenService, notificationService, websiteHost }) =>
 	ctx =>
@@ -44,7 +35,7 @@ export const handleSignUp: Fn =
 			.chain(body =>
 				Oath.all({
 					email: Oath.fromNullable(body.email)
-						.map(validator.isEmail)
+						.map(isEmail)
 						.chain(isValidEmail =>
 							Oath.fromBoolean(
 								() => isValidEmail,
@@ -110,7 +101,10 @@ export const handleSignUp: Fn =
 							.chain(code => userService.update(tokens.sub, { code }))
 							.tap(user =>
 								notificationService.sendSignUpNotification({
-									email: user.email,
+									to: {
+										email: user.email,
+										name: user.email,
+									},
 									confirmationUrl: `${websiteHost}/confirm-email?code=${user.code}&email=${user.email}`,
 								}),
 							)
@@ -124,3 +118,14 @@ export const handleSignUp: Fn =
 				ctx.response.status = 201
 				ctx.response.body = body
 			})
+
+// --- Internal ---
+
+type Body = { email?: string; password?: string }
+type Params = {
+	userService: UserService
+	tokenService: TTokenService
+	notificationService: TNotificationService
+	websiteHost: string
+}
+type Fn = (params: Params) => Middleware

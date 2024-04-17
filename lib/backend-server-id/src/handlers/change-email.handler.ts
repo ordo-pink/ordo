@@ -18,65 +18,114 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { type Middleware } from "koa"
-import validator from "validator"
+import isEmail from "validator/lib/isEmail"
 
-import { authenticate0, parseBody0 } from "@ordo-pink/backend-utils"
-import { HttpError } from "@ordo-pink/rrr"
-import { Oath } from "@ordo-pink/oath"
+import {
+	type Oath,
+	bimap0,
+	chain0,
+	empty0,
+	fromBoolean0,
+	fromNullable0,
+	merge0,
+	reject0,
+	rejectedMap0,
+	tap0,
+} from "@ordo-pink/oath"
+import { parseBody0, sendError, sendSuccess } from "@ordo-pink/backend-utils"
+import { type HttpError } from "@ordo-pink/rrr"
+import { OK } from "@ordo-pink/core"
+import { type TNotificationService } from "@ordo-pink/backend-service-offline-notifications"
 import { type TTokenService } from "@ordo-pink/backend-service-token"
 import { type UserService } from "@ordo-pink/backend-service-user"
-import { sendError } from "@ordo-pink/backend-utils"
+import { omit } from "@ordo-pink/tau"
 
-type Body = { email?: string }
-type Params = { tokenService: TTokenService; userService: UserService }
-type Fn = (params: Params) => Middleware
+import {
+	toInvalidRequestError,
+	toSameEmailError,
+	toUserAlreadyExistsError,
+	toUserNotFoundError,
+} from "../fns/to-error"
 
-export const handleChangeEmail: Fn =
-	({ tokenService, userService }) =>
+export const handleChangeEmail: TFn =
+	({ userService, notificationService }) =>
 	ctx =>
-		Oath.all({
-			token: authenticate0(ctx, tokenService),
-			body: parseBody0<Body>(ctx),
-		})
-			.chain(({ token, body }) =>
-				Oath.all({
-					user: userService.getById(token.payload.sub),
-					email: Oath.fromNullable(body.email).rejectedMap(() =>
-						HttpError.BadRequest("Email not provided"),
-					),
-				})
-					.rejectedMap(() => HttpError.NotFound("User not found"))
-					.chain(({ user, email }) =>
-						Oath.all([
-							Oath.fromBoolean(
-								() => validator.isEmail(email),
-								() => "OK" as const,
-								() => false,
-							).rejectedMap(() => HttpError.BadRequest("Invalid email")),
-							Oath.fromBoolean(
-								() => user.email !== email,
-								() => "OK" as const,
-								() => false,
-							).rejectedMap(() => HttpError.BadRequest("This is your current email")),
-							userService
-								.getByEmail(email)
-								.chain(() => Oath.reject(true))
-								.fix(userExists =>
-									Oath.fromBoolean(
-										() => !userExists,
-										() => "OK" as const,
-										() => false,
-									),
-								)
-								.rejectedMap(() => HttpError.Conflict("Email already taken")),
-						]).map(() => ({ user, email: email })),
-					),
-			)
-			.chain(({ user, email }) =>
-				userService
-					.update(user.id, { email })
-					.rejectedMap(() => HttpError.NotFound("User not found")),
-			)
-			.fork(sendError(ctx), result => {
-				ctx.response.body = { success: true, result }
-			})
+		parseBody0<TRequestBody>(ctx)
+			.and(extractCtx0(userService))
+			.and(validateCtx0(userService))
+			.and(updateUserEmail0(userService))
+			.and(sendNotification0(notificationService))
+			.fork(sendError(ctx), sendSuccess({ ctx }))
+
+// --- Internal ---
+
+type TParams = {
+	tokenService: TTokenService
+	userService: UserService
+	notificationService: TNotificationService
+}
+type TFn = (params: TParams) => Middleware
+type TRequestBody = Routes.ID.ChangeEmail.RequestBody
+type TCtx = { user: User.PrivateUser; oldEmail: string; newEmail: string }
+type TResult = Routes.ID.ChangeEmail.Result
+
+type TExtractCtxFn = (us: UserService) => (body: TRequestBody) => Oath<TCtx, HttpError>
+const extractCtx0: TExtractCtxFn = userService => body =>
+	merge0({
+		user: fromNullable0(body.userID)
+			.pipe(rejectedMap0(toInvalidRequestError))
+			.pipe(chain0(id => userService.getById(id).pipe(rejectedMap0(toUserNotFoundError)))),
+		oldEmail: fromNullable0(body.oldEmail).pipe(rejectedMap0(toInvalidRequestError)),
+		newEmail: fromNullable0(body.newEmail).pipe(rejectedMap0(toInvalidRequestError)),
+	})
+
+type TCheckEmailIsNotTheSameFn = (email: string, user: User.PublicUser) => Oath<"OK", HttpError>
+const checkEmailIsNotTheSame0: TCheckEmailIsNotTheSameFn = (email, user) =>
+	fromBoolean0(user.email !== email, OK).pipe(rejectedMap0(toSameEmailError))
+
+type TCheckUserWithNewEmailDoesNotExistFn = (
+	newEmail: string,
+	us: UserService,
+) => Oath<"OK", HttpError>
+const checkUserWithNewEmailDoesNotExist0: TCheckUserWithNewEmailDoesNotExistFn = (
+	newEmail,
+	userService,
+) =>
+	userService
+		.getByEmail(newEmail)
+		.pipe(chain0(() => reject0(true)))
+		.fix(userExists => fromBoolean0(userExists === true, OK))
+		.pipe(rejectedMap0(toUserAlreadyExistsError))
+
+type ValidateEmailFn = (email: string) => Oath<"OK", HttpError>
+const validateEmail0: ValidateEmailFn = email =>
+	fromBoolean0(isEmail(email), OK).pipe(rejectedMap0(toInvalidRequestError))
+
+type ValidateCtxFn = (us: UserService) => (ctx: TCtx) => Oath<TCtx, HttpError>
+const validateCtx0: ValidateCtxFn = userService => ctx =>
+	merge0([
+		validateEmail0(ctx.newEmail),
+		checkEmailIsNotTheSame0(ctx.newEmail, ctx.user),
+		checkUserWithNewEmailDoesNotExist0(ctx.newEmail, userService),
+	]).and(() => ctx)
+
+type UpdateUserEmailFn = (us: UserService) => (ctx: TCtx) => Oath<TCtx, HttpError>
+const updateUserEmail0: UpdateUserEmailFn = userService => ctx =>
+	userService
+		.update(ctx.user.id, { email: ctx.newEmail, emailConfirmed: true, code: undefined })
+		.pipe(bimap0(toUserNotFoundError, () => ctx))
+
+type SendNotificationFn = (ns: TNotificationService) => (ctx: TCtx) => Oath<TResult, HttpError>
+const sendNotification0: SendNotificationFn = notificationService => ctx =>
+	empty0()
+		.pipe(
+			tap0(() =>
+				notificationService.sendEmailChangedNotification({
+					to: { email: ctx.user.email, name: ctx.user.firstName }, // TODO: Drop accepting "to" in the service
+					newEmail: ctx.newEmail,
+					oldEmail: ctx.oldEmail,
+				}),
+			),
+		)
+		.and(() => ctx.user)
+		.and(omit("code"))

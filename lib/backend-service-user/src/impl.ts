@@ -48,7 +48,7 @@ export class UserService {
 					subscription: "free",
 				}),
 			)
-			.map(this.serialize)
+			.map(this.serializePrivate)
 	}
 
 	public updateUserPassword(user: User.User, oldPassword: string, newPassword: string) {
@@ -73,16 +73,16 @@ export class UserService {
 				.chain(user =>
 					this.#persistenceStrategy.update(oldUser.id, user).rejectedMap(() => "User not found"),
 				)
-				.map(user => this.serialize(user)),
+				.map(user => this.serializePrivate(user)),
 		)
 	}
 
-	public update(id: string, user: Partial<User.User>) {
-		return this.#persistenceStrategy.update(id, user).map(user => this.serialize(user))
+	public update(id: string, user: Partial<User.PrivateUser>) {
+		return this.#persistenceStrategy.update(id, user).map(user => this.serializePrivate(user))
 	}
 
 	public getByEmail(email: string) {
-		return this.#persistenceStrategy.getByEmail(email).map(user => this.serialize(user))
+		return this.#persistenceStrategy.getByEmail(email).map(user => this.serializePrivate(user))
 	}
 
 	public getUserInfo(email: string) {
@@ -90,7 +90,7 @@ export class UserService {
 	}
 
 	public getById(id: string) {
-		return this.#persistenceStrategy.getById(id).map(user => this.serialize(user))
+		return this.#persistenceStrategy.getById(id).map(user => this.serializePrivate(user))
 	}
 
 	public comparePassword(email: string, password: string) {
@@ -107,6 +107,21 @@ export class UserService {
 	}
 
 	public serialize(user: User.InternalUser): User.User {
+		return {
+			createdAt: user.createdAt,
+			email: user.email,
+			emailConfirmed: user.emailConfirmed,
+			id: user.id,
+			firstName: user.firstName,
+			lastName: user.lastName,
+			handle: user.handle,
+			fileLimit: user.fileLimit,
+			maxUploadSize: user.maxUploadSize,
+			subscription: user.subscription,
+		}
+	}
+
+	public serializePrivate(user: User.InternalUser): User.PrivateUser {
 		return {
 			createdAt: user.createdAt,
 			email: user.email,

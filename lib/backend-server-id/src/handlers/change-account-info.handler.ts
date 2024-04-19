@@ -42,13 +42,7 @@ export const handleChangeAccountInfo: TFn =
 			body: parseBody0<TRequestBody>(ctx),
 			token: authenticate0(ctx, tokenService),
 		})
-			.and(({ body: { firstName, lastName }, token }) =>
-				merge0({
-					user: userService.getById(token.payload.sub).pipe(rejectedMap0(toUserNotFoundError)),
-					firstName: fromNullable0(firstName).pipe(rejectedMap0(toInvalidBodyError)),
-					lastName: fromNullable0(lastName).pipe(rejectedMap0(toInvalidBodyError)),
-				}),
-			)
+			.and(extractCtx0(userService))
 			.and(validateCtx0)
 			.and(updateUserInfo0(userService))
 			.fork(sendError(ctx), sendSuccess({ ctx }))

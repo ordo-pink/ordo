@@ -67,7 +67,7 @@ export const DataPersistenceStrategyFS = {
 			read0(root, plain.createdBy)
 				.pipe(map0(data => [...data, plain]))
 				.pipe(map0(data => data.sort(sortByNameDesc)))
-				.pipe(map0(write0(root, plain.createdBy)))
+				.pipe(chain0(write0(root, plain.createdBy)))
 				.pipe(map0(() => plain)),
 
 		delete: (uid, fsid) =>

@@ -21,8 +21,8 @@ import { type Middleware } from "koa"
 import isEmail from "validator/lib/isEmail"
 
 import { type JWAT, type TTokenService } from "@ordo-pink/backend-service-token"
-import { authenticate0, parseBody0 } from "@ordo-pink/backend-utils"
 import {
+	type Oath,
 	bimap0,
 	chain0,
 	fromBoolean0,
@@ -32,7 +32,9 @@ import {
 	rejectedMap0,
 	tap0,
 } from "@ordo-pink/oath"
+import { authenticate0, parseBody0 } from "@ordo-pink/backend-utils"
 import { sendError, sendSuccess } from "@ordo-pink/backend-utils"
+import { type HttpError } from "@ordo-pink/rrr"
 import { OK } from "@ordo-pink/core"
 import { type TNotificationService } from "@ordo-pink/backend-service-offline-notifications"
 import { type UserService } from "@ordo-pink/backend-service-user"
@@ -45,7 +47,7 @@ import {
 } from "../fns/to-error"
 import { generateEmailCode0 } from "../fns/generate-code"
 
-export const handleRequestEmailChange: Fn =
+export const handleRequestEmailChange: TFn =
 	({ tokenService, userService, notificationService, websiteHost }) =>
 	ctx =>
 		merge0({
@@ -61,27 +63,28 @@ export const handleRequestEmailChange: Fn =
 
 // --- Internal ---
 
-type TRequestBody = Routes.ID.Req
-type Params = {
+type TRequestBody = Routes.ID.RequestEmailChange.RequestBody
+type TParams = {
 	tokenService: TTokenService
 	userService: UserService
 	notificationService: TNotificationService
 	websiteHost: string
 }
-type Fn = (params: Params) => Middleware
-type Ctx = { user: User.User; email: string; code: string }
+type TFn = (params: TParams) => Middleware
+type TCtx = { user: User.User; newEmail: string; code: string }
 
-type ExtractDataParams = { token: JWAT; body: TRequestBody; code: string }
+type TExtractDataParams = { token: JWAT; body: TRequestBody; code: string }
 const extractCtx0 =
 	(userService: UserService) =>
-	({ token, body, code }: ExtractDataParams) =>
+	({ token, body, code }: TExtractDataParams) =>
 		merge0({
 			user: userService.getById(token.payload.sub).pipe(rejectedMap0(toUserNotFoundError)),
-			email: fromNullable0(body.email).pipe(rejectedMap0(toInvalidRequestError)),
+			newEmail: fromNullable0(body.newEmail).pipe(rejectedMap0(toInvalidRequestError)),
 			code,
 		})
 
-const checkEmailIsNotTheSame0 = (email: string, user: User.PublicUser) =>
+type TCheckEmailIsNotTheSameFn = (email: string, user: User.User) => Oath<"OK", HttpError>
+const checkEmailIsNotTheSame0: TCheckEmailIsNotTheSameFn = (email, user) =>
 	fromBoolean0(user.email !== email, OK).pipe(rejectedMap0(toSameEmailError))
 
 const checkUserDoesNotExistByNewEmail0 = (email: string, userService: UserService) =>
@@ -96,26 +99,26 @@ const validateEmail0 = (email: string) =>
 
 const validateCtx0 =
 	(userService: UserService) =>
-	({ user, email, code }: Ctx) =>
+	({ user, newEmail, code }: TCtx) =>
 		merge0([
-			validateEmail0(email),
-			checkEmailIsNotTheSame0(email, user),
-			checkUserDoesNotExistByNewEmail0(email, userService),
-		]).and(() => ({ user, email, code }))
+			validateEmail0(newEmail),
+			checkEmailIsNotTheSame0(newEmail, user),
+			checkUserDoesNotExistByNewEmail0(newEmail, userService),
+		]).and(() => ({ user, newEmail, code }))
 
 const updateUserEmailConfirmationCode0 =
 	(userService: UserService) =>
-	({ user, email, code }: Ctx) =>
+	({ user, newEmail, code }: TCtx) =>
 		userService
 			.update(user.id, { code })
-			.pipe(bimap0(toUserNotFoundError, () => ({ user, email, code })))
+			.pipe(bimap0(toUserNotFoundError, () => ({ user, newEmail, code })))
 
 const sendNotification =
 	(notificationService: TNotificationService, websiteHost: string) =>
-	({ user, email, code }: Ctx) =>
+	({ user, newEmail: newEmail, code }: TCtx) =>
 		notificationService.sendEmailChangeNotifications({
 			to: { email: user.email, name: user.firstName },
-			newEmail: email,
+			newEmail,
 			oldEmail: user.email,
-			confirmationUrl: `${websiteHost}/change-email?oldEmail=${user.email}&newEmail=${email}&code=${code}`, // TODO
+			confirmationUrl: `${websiteHost}/change-email?oldEmail=${user.email}&newEmail=${newEmail}&code=${code}`, // TODO
 		})

@@ -19,26 +19,15 @@
 
 import { useLayoutEffect, useRef } from "react"
 
-import "./loader.css"
 import { Switch } from "@ordo-pink/switch"
+import { useIsDarkTheme } from "@ordo-pink/frontend-react-hooks"
 
-const getParentBackground = (element: Element) => {
-	let color = "rgba(0, 0, 0, 0)"
-
-	while (element.parentElement) {
-		color = window.getComputedStyle(element.parentElement).backgroundColor
-
-		if (color !== "rgba(0, 0, 0, 0)") break
-
-		element = element.parentElement
-	}
-
-	return color
-}
+import "./loader.css"
 
 type P = { size?: "s" | "m" | "l" }
 export default function Loader({ size }: P) {
 	const ref = useRef<HTMLDivElement>(null)
+	const isDarkTheme = useIsDarkTheme()
 	const className = Switch.of(size)
 		.case("s", () => "loader small")
 		.case("l", () => "loader large")
@@ -47,8 +36,8 @@ export default function Loader({ size }: P) {
 	useLayoutEffect(() => {
 		if (!ref.current) return
 
-		ref.current.style.setProperty("--background", getParentBackground(ref.current))
-	}, [ref])
+		ref.current.style.setProperty("--background", isDarkTheme ? "black" : "white")
+	}, [ref, isDarkTheme])
 
 	return (
 		<div ref={ref} className={className}>

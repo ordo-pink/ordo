@@ -339,7 +339,7 @@ export const __initData = ({ fid, dataCommands }: P) => {
 						.map(
 							item =>
 								({
-									id: item.name,
+									id: item.fsid,
 									readableName: item.name,
 									onSelect: () => {
 										commands.emit<cmd.data.move>("data.move", {

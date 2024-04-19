@@ -34,11 +34,19 @@ export const SHORTCUTS = {
 	"9": "number-list-item",
 	"0": "number-list-item",
 	">": "block-quote",
+	'"': "block-quote", // eslint-disable-line quotes
 	"#": "heading-1",
 	"##": "heading-2",
 	"###": "heading-3",
 	"####": "heading-4",
 	"#####": "heading-5",
+	"№": "heading-1",
+	"№№": "heading-2",
+	"№№№": "heading-3",
+	"№№№№": "heading-4",
+	"№№№№№": "heading-5",
+	"()": "check-list-item",
+	"[]": "check-list-item",
 }
 
 export const EMPTY_EDITOR_CHILDREN = [

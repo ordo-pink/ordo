@@ -21,32 +21,16 @@ import { Editor, Element, Point, Range, Transforms } from "slate"
 import { ReactEditor } from "slate-react"
 
 import { OrdoDescendant, OrdoElement } from "../editor.types"
+import { SHORTCUTS } from "../editor.constants"
 import { isOrdoElement } from "../guards/is-ordo-element.guard"
 
-const SHORTCUTS = {
-	"*": "list-item",
-	"-": "list-item",
-	"+": "list-item",
-	"1": "number-list-item",
-	"2": "number-list-item",
-	"3": "number-list-item",
-	"4": "number-list-item",
-	"5": "number-list-item",
-	"6": "number-list-item",
-	"7": "number-list-item",
-	"8": "number-list-item",
-	"9": "number-list-item",
-	"0": "number-list-item",
-	">": "block-quote",
-	"#": "heading-1",
-	"##": "heading-2",
-	"###": "heading-3",
-	"####": "heading-4",
-	"#####": "heading-5",
+export type BulletedListElement = {
+	type: "unordered-list"
+	children: OrdoDescendant[]
 }
 
-export type BulletedListElement = {
-	type: "bulleted-list"
+export type NumericListElement = {
+	type: "ordered-list"
 	children: OrdoDescendant[]
 }
 
@@ -84,12 +68,23 @@ export const withShortcuts = <T extends ReactEditor>(editor: T): T => {
 
 				if (type === "list-item") {
 					const list: BulletedListElement = {
-						type: "bulleted-list",
+						type: "unordered-list",
 						children: [],
 					}
 					Transforms.wrapNodes(editor, list, {
 						match: node =>
 							!Editor.isEditor(node) && isOrdoElement(node) && node.type === "list-item",
+					})
+				}
+
+				if (type === "number-list-item") {
+					const list: NumericListElement = {
+						type: "ordered-list",
+						children: [],
+					}
+					Transforms.wrapNodes(editor, list, {
+						match: node =>
+							!Editor.isEditor(node) && isOrdoElement(node) && node.type === "number-list-item",
 					})
 				}
 
@@ -125,7 +120,14 @@ export const withShortcuts = <T extends ReactEditor>(editor: T): T => {
 
 					if (block.type === "list-item") {
 						Transforms.unwrapNodes(editor, {
-							match: n => !Editor.isEditor(n) && isOrdoElement(n) && n.type === "bulleted-list",
+							match: n => !Editor.isEditor(n) && isOrdoElement(n) && n.type === "unordered-list",
+							split: true,
+						})
+					}
+
+					if (block.type === "number-list-item") {
+						Transforms.unwrapNodes(editor, {
+							match: n => !Editor.isEditor(n) && isOrdoElement(n) && n.type === "ordered-list",
 							split: true,
 						})
 					}

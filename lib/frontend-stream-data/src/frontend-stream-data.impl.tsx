@@ -65,32 +65,44 @@ export const __initData = ({ fid, dataCommands }: P) => {
 	commands.on<cmd.data.showEditLabelsPalette>("data.show-edit-labels-palette", payload => {
 		const data = data$.value
 		const labels = Array.from(new Set(data?.flatMap(item => item.labels) ?? []))
+		const item = data?.find(item => item.fsid === payload.fsid)
 
-		commands.emit<cmd.commandPalette.show>("command-palette.show", {
-			onNewItem: label => {
-				commands.emit<cmd.data.addLabel>("data.add-label", { item: payload, label })
-				commands.emit<cmd.commandPalette.hide>("command-palette.hide")
-			},
-			multiple: true,
-			pinnedItems: payload.labels.map(label => ({
-				id: label,
-				readableName: label,
-				Icon: BsTag,
-				onSelect: () => {
-					commands.emit<cmd.data.removeLabel>("data.remove-label", { item: payload, label })
+		if (!item) return
+
+		const handleShowEditLabels = () => {
+			commands.emit<cmd.commandPalette.show>("command-palette.show", {
+				onNewItem: label => {
+					commands.emit<cmd.data.addLabel>("data.add-label", { item, label })
+					item.labels.push(label)
+					handleShowEditLabels()
 				},
-			})),
-			items: labels
-				.filter(label => !payload.labels.includes(label))
-				.map(label => ({
+				multiple: true,
+				pinnedItems: item.labels.map(label => ({
 					id: label,
 					readableName: label,
 					Icon: BsTag,
 					onSelect: () => {
-						commands.emit<cmd.data.addLabel>("data.add-label", { item: payload, label })
+						commands.emit<cmd.data.removeLabel>("data.remove-label", { item, label })
+						item.labels.splice(item.labels.indexOf(label), 1)
+						handleShowEditLabels()
 					},
 				})),
-		})
+				items: labels
+					.filter(label => !item.labels.includes(label))
+					.map(label => ({
+						id: label,
+						readableName: label,
+						Icon: BsTag,
+						onSelect: () => {
+							commands.emit<cmd.data.addLabel>("data.add-label", { item, label })
+							item.labels.push(label)
+							handleShowEditLabels()
+						},
+					})),
+			})
+		}
+
+		handleShowEditLabels()
 	})
 
 	commands.on<cmd.data.showEditLinksPalette>("data.show-edit-links-palette", payload => {

@@ -21,7 +21,7 @@ import { BsPlus, BsSearch } from "react-icons/bs"
 import { ChangeEvent, KeyboardEvent, useEffect, useState } from "react"
 import Fuse from "fuse.js"
 
-import { useAccelerator, useCommands } from "@ordo-pink/frontend-react-hooks"
+import { useAccelerator, useCommands, useIsMobile } from "@ordo-pink/frontend-react-hooks"
 import { Either } from "@ordo-pink/either"
 import { Switch } from "@ordo-pink/switch"
 import { noop } from "@ordo-pink/tau"
@@ -44,6 +44,7 @@ const fuse = new Fuse([] as Client.CommandPalette.Item[], {
 
 export default function CommandPaletteModal({ items, onNewItem, multiple, pinnedItems }: Props) {
 	const commands = useCommands()
+	const isMobile = useIsMobile()
 
 	useAccelerator("Esc", () => commands.emit<cmd.commandPalette.hide>("command-palette.hide"))
 
@@ -97,9 +98,11 @@ export default function CommandPaletteModal({ items, onNewItem, multiple, pinned
 		).fold(
 			() => {
 				if (onNewItem) onNewItem(inputValue)
+				setInputValue("")
+
 				if (!multiple) handleEscape()
 			},
-			selectedItem => {
+			(selectedItem: Client.CommandPalette.Item) => {
 				if (onNewItem && inputValue.length > 0 && suggestedItems.length === 0) {
 					onNewItem(inputValue)
 					return
@@ -241,7 +244,7 @@ export default function CommandPaletteModal({ items, onNewItem, multiple, pinned
 					onChange={handleInputChange}
 					onKeyDown={handleKeyDown}
 					type="text"
-					autoFocus
+					autoFocus={!isMobile}
 					className="w-full rounded-lg border-none bg-transparent px-2 py-1 text-sm outline-none ring-0 focus:outline-none focus:ring-0"
 					placeholder={tSearchPlaceholder}
 				/>
@@ -285,7 +288,8 @@ export default function CommandPaletteModal({ items, onNewItem, multiple, pinned
 						current={true}
 						onClick={() => {
 							onNewItem(inputValue)
-							handleEscape()
+							setInputValue("")
+							if (!multiple) handleEscape()
 						}}
 					/>
 				) : null}

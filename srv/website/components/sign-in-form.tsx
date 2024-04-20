@@ -19,11 +19,12 @@
 
 "use client"
 
-import { useEffect, useState } from "react"
-import { Button } from "./button"
-import { Callout } from "./callout"
-import { EmailInput, PasswordInput } from "./input"
+import { useState } from "react"
+
 import { OrdoRoutes } from "@ordo-pink/ordo-routes"
+
+import { EmailInput, PasswordInput } from "./input"
+import { Button } from "./button"
 
 type Props = { workspaceHost: string; idHost: string }
 
@@ -42,10 +43,10 @@ export default function SignInForm({ workspaceHost, idHost }: Props) {
 
 			<div className="flex w-full flex-col">
 				<Button
-					onClick={async e => {
+					onClick={e => {
 						e.preventDefault()
 
-						await fetch(`${idHost}/sign-in`, {
+						void fetch(`${idHost}/sign-in`, {
 							credentials: "include",
 							headers: { "content-type": "application/json;charset=UTF-8" },
 							body: JSON.stringify({ email, password }),

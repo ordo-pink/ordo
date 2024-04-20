@@ -33,7 +33,7 @@ export const Errors = {
 	InvalidProperties: "Properties must be an object or undefined",
 	DataAlreadyExists: "Data already exists",
 	DataNotFound: "Data not found",
-	UnexpectedError: `Unexpected error: ` as `Unexpected error: ${string}`,
+	UnexpectedError: "Unexpected error: " as `Unexpected error: ${string}`,
 } as const
 
 export const UnexpectedError = (error: Error) =>

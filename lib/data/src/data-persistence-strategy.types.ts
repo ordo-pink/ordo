@@ -18,9 +18,10 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import type { Oath } from "@ordo-pink/oath"
+
 import type { PlainData, UserID } from "./data.types"
-import type { FSID } from "./data.types"
 import { Errors } from "./errors.impl"
+import type { FSID } from "./data.types"
 
 export type DataNotFound = (typeof Errors)["DataNotFound"]
 export type DataUnexpectedError = (typeof Errors)["UnexpectedError"]

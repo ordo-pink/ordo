@@ -17,6 +17,6 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { test, expect } from "bun:test"
+import { expect, test } from "bun:test"
 
 test("mock", () => expect(true).toBeTrue())

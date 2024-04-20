@@ -1,23 +1,11 @@
 // SPDX-FileCopyrightText: Copyright 2024, 谢尔盖||↓ and the Ordo.pink contributors
-// SPDX-License-Identifier: AGPL-3.0-only
-
-// Ordo.pink is an all-in-one team workspace.
-// Copyright (C) 2024  谢尔盖||↓ and the Ordo.pink contributors
-
-// This program is free software: you can redistribute it and/or modify
-// it under the terms of the GNU Affero General Public License as published
-// by the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-
-// This program is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU Affero General Public License for more details.
-
-// You should have received a copy of the GNU Affero General Public License
-// along with this program.  If not, see <https://www.gnu.org/licenses/>.
+// SPDX-License-Identifier: Unlicense
 
 import { Oath } from "./src/impl"
+import { bimap0 } from "./operators/bimap"
+import { chain0 } from "./operators/chain"
+import { map0 } from "./operators/map"
+import { orNothing } from "./invokers/or-nothing"
 
 const times = new Array(10_000).fill(null)
 const avg = (arr: number[]): number => arr.reduce((acc, v) => acc + v, 0) / arr.length
@@ -31,19 +19,23 @@ const testBimap = async () => {
 	const oath = []
 	const promise = []
 
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	for (const i of times) {
 		const time = performance.now()
 
 		await Oath.resolve(1)
-			.bimap(
-				x => x + 1,
-				x => x + 1,
+			.pipe(
+				bimap0(
+					x => (x as any) + 1,
+					x => x + 1,
+				),
 			)
-			.orNothing()
+			.invoke(orNothing)
 
 		oath.push(performance.now() - time)
 	}
 
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	for (const i of times) {
 		const time = performance.now()
 
@@ -62,16 +54,18 @@ const testMap = async () => {
 	const oath = []
 	const promise = []
 
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	for (const i of times) {
 		const time = performance.now()
 
 		await Oath.resolve(1)
-			.map(x => x + 1)
-			.orNothing()
+			.pipe(map0(x => x + 1))
+			.invoke(orNothing)
 
 		oath.push(performance.now() - time)
 	}
 
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	for (const i of times) {
 		const time = performance.now()
 
@@ -87,16 +81,18 @@ const testChain = async () => {
 	const oath = []
 	const promise = []
 
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	for (const i of times) {
 		const time = performance.now()
 
 		await Oath.resolve(1)
-			.chain(x => Oath.of(x + 1))
-			.orNothing()
+			.pipe(chain0(x => Oath.resolve(x + 1)))
+			.invoke(orNothing)
 
 		oath.push(performance.now() - time)
 	}
 
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	for (const i of times) {
 		const time = performance.now()
 
@@ -112,16 +108,18 @@ const testAnd = async () => {
 	const oath = []
 	const promise = []
 
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	for (const i of times) {
 		const time = performance.now()
 
 		await Oath.resolve(1)
 			.and(x => x + 1)
-			.orNothing()
+			.invoke(orNothing)
 
 		oath.push(performance.now() - time)
 	}
 
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	for (const i of times) {
 		const time = performance.now()
 
@@ -137,16 +135,18 @@ const testFix = async () => {
 	const oath = []
 	const promise = []
 
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	for (const i of times) {
 		const time = performance.now()
 
 		await Oath.reject(1)
 			.fix(x => x + 1)
-			.orNothing()
+			.invoke(orNothing)
 
 		oath.push(performance.now() - time)
 	}
 
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	for (const i of times) {
 		const time = performance.now()
 
@@ -158,8 +158,8 @@ const testFix = async () => {
 	log(promise, oath, "fix", "catch")
 }
 
-testMap()
-testBimap()
-testChain()
-testAnd()
-testFix()
+void testMap()
+void testBimap()
+void testChain()
+void testAnd()
+void testFix()

@@ -17,16 +17,17 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import { watch } from "fs"
+
 import { die, direntsToDirs, getNames, runAsyncCommand0 } from "@ordo-pink/binutil"
 import { directoryExists0, readdir0 } from "@ordo-pink/fs"
-import { getc } from "@ordo-pink/getc"
 import { ConsoleLogger } from "@ordo-pink/logger"
 import { Oath } from "@ordo-pink/oath"
-import { watch } from "fs"
+import { getc } from "@ordo-pink/getc"
 
 const { ORDO_STATIC_ROOT } = getc(["ORDO_STATIC_ROOT"])
 
-Oath.of("./srv")
+void Oath.of("./srv")
 	.chain(path => readdir0(path, { withFileTypes: true }))
 	.map(direntsToDirs)
 	.map(getNames)
@@ -44,7 +45,7 @@ Oath.of("./srv")
 							`STATIC copying file ${publicPath}/${dirent.name} -> ${ORDO_STATIC_ROOT}/${dirent.name}`,
 						)
 
-						Bun.write(
+						void Bun.write(
 							`${ORDO_STATIC_ROOT}/${dirent.name}`,
 							Bun.file(`${publicPath}/${dirent.name}`),
 						)
@@ -55,13 +56,13 @@ Oath.of("./srv")
 	)
 	.orElse(die())
 
-runAsyncCommand0("opt/bun run --watch srv/static/index.ts", {
+void runAsyncCommand0("opt/bun run --watch srv/static/index.ts", {
 	stdout: "pipe",
 	stderr: "pipe",
 	env: { ...process.env, FORCE_COLOR: "1" },
 }).orElse(die())
 
-Oath.of("./srv")
+void Oath.of("./srv")
 	.chain(path => readdir0(path, { withFileTypes: true }))
 	.map(direntsToDirs)
 	.map(getNames)
@@ -77,7 +78,7 @@ Oath.of("./srv")
 					`STATIC copying file ${publicPath}/${filename} -> ${ORDO_STATIC_ROOT}/${filename}`,
 				)
 
-				Bun.write(`${ORDO_STATIC_ROOT}/${filename}`, Bun.file(`${publicPath}/${filename}`))
+				void Bun.write(`${ORDO_STATIC_ROOT}/${filename}`, Bun.file(`${publicPath}/${filename}`))
 			}),
 		),
 	)

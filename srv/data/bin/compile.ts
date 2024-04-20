@@ -19,8 +19,8 @@
 
 import { createDirectoryIfNotExists0, mv0 } from "@ordo-pink/fs"
 import { die, runBunCommand0 } from "@ordo-pink/binutil"
-import { keysOf } from "@ordo-pink/tau"
 import { getc } from "@ordo-pink/getc"
+import { keysOf } from "@ordo-pink/tau"
 
 const env = getc()
 
@@ -29,10 +29,10 @@ const defineEnv = (env: Record<string, string>) =>
 const createOutDirectoryIfNotExists0 = () => createDirectoryIfNotExists0("var/out")
 const moveCompiledFileToOutDirectory0 = () => mv0("dt", "var/out/dt")
 
-const command = `build srv/data/index.ts --outfile=dt --target=bun --minify --compile `
+const command = "build srv/data/index.ts --outfile=dt --target=bun --minify --compile "
 const envDefinitions = defineEnv(env)
 
-runBunCommand0(command.concat(envDefinitions))
+void runBunCommand0(command.concat(envDefinitions))
 	.chain(createOutDirectoryIfNotExists0)
 	.chain(moveCompiledFileToOutDirectory0)
 	.orElse(die())

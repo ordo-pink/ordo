@@ -1,6 +1,6 @@
 # Oath (oathify)
 
-[![license](https://img.shields.io/badge/license-MIT-green)](https://github.com/ordo-pink/ordo)
+[![license](https://img.shields.io/badge/license-The%20Unlicense-green)](https://github.com/ordo-pink/ordo)
 [![license](https://img.shields.io/badge/by-ordo.pink-db2777)](https://github.com/ordo-pink/ordo)
 [![gitmoji](https://img.shields.io/badge/gitmoji-%20😜%20😍-FFDD67.svg)](https://gitmoji.carloscuesta.me/)
 
@@ -609,7 +609,7 @@ As you can see, Oath is about 2 times slower than Promise.
 ## Pst Scrptm
 
 This package is a part of Ordo.pink monorepo. Feel free to ask for help, report bug reports,
-contribute, or suggest improvements [here on GitHub](https://github.com/ordo-pink/ordo/tree/main).
-Cheers! 🍻
+contribute, or suggest improvements
+[here on GitHub](https://github.com/ordo-pink/ordo/tree/main/lib/oath). Cheers! 🍻
 
-License: MIT
+The Unlicense

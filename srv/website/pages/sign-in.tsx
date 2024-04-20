@@ -18,8 +18,9 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import Head from "next/head"
-import { PageHeader } from "../components/page-header"
+
 import { Centered } from "../components/centered"
+import { PageHeader } from "../components/page-header"
 import SignInForm from "../components/sign-in-form"
 
 export default function SignInPage() {

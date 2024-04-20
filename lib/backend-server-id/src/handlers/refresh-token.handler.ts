@@ -17,93 +17,125 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import type { UserService } from "@ordo-pink/backend-service-user"
-import type { TTokenService } from "@ordo-pink/backend-service-token"
-import type { Middleware } from "koa"
-import { Oath } from "@ordo-pink/oath"
+import { Context, type Middleware } from "koa"
+
+import { type JTI, type SUB } from "@ordo-pink/wjwt"
+import {
+	type Oath,
+	fromBoolean0,
+	fromNullable0,
+	merge0,
+	of0,
+	rejectedMap0,
+	rejectedTap0,
+	tap0,
+} from "@ordo-pink/oath"
+import { type UUIDv4, isUUID } from "@ordo-pink/tau"
+import { sendError, sendSuccess } from "@ordo-pink/backend-utils"
 import { HttpError } from "@ordo-pink/rrr"
-import { sendError } from "@ordo-pink/backend-utils"
-import { JTI, SUB } from "@ordo-pink/wjwt"
+import { type TTokenService } from "@ordo-pink/backend-service-token"
+import { type UserService } from "@ordo-pink/backend-service-user"
 
-export type Params = { userService: UserService; tokenService: TTokenService }
-export type Fn = (params: Params) => Middleware
+import { toInvalidRequestError, toUserNotFoundError } from "../fns/to-error"
+import { setOrdoAuthCookies } from "../fns/set-cookies"
 
-export const handleRefreshToken: Fn =
+export const handleRefreshToken: TFn =
 	({ tokenService, userService }) =>
 	async ctx =>
-		Oath.all({
-			sub:
-				(ctx.cookies.get("sub") as SUB) ??
-				Oath.reject(HttpError.BadRequest("Missing required cookies")),
-			prevJti:
-				(ctx.cookies.get("jti") as JTI) ??
-				Oath.reject(HttpError.BadRequest("Missing required cookies")),
+		merge0({
+			cookieSub: fromNullable0(ctx.cookies.get("sub")).pipe(rejectedMap0(toInvalidRequestError)),
+			cookieJti: fromNullable0(ctx.cookies.get("jti")).pipe(rejectedMap0(toInvalidRequestError)),
 		})
-			.chain(({ sub, prevJti }) =>
-				tokenService.persistenceStrategy
-					.getToken(sub, prevJti!)
-					.rejectedMap(() => HttpError.NotFound("Token not found"))
-					.chain(token =>
-						Oath.fromNullable(token).rejectedMap(() => HttpError.Unauthorized("Token not found")),
-					)
-					.chain(token =>
-						tokenService.verifyToken(token, "refresh").chain(valid =>
-							Oath.fromBoolean(
-								() => valid,
-								() => token,
-								() => HttpError.Forbidden("Invalid token"),
-							),
-						),
-					)
-					.chain(token =>
-						tokenService
-							.decode(token, "refresh")
-							.chain(Oath.fromNullable)
-							.rejectedMap(() => HttpError.Forbidden("Invalid token")),
-					)
-					.chain(() =>
-						userService.getById(sub).rejectedMap(() => HttpError.Forbidden("User not found")),
-					)
-					.chain(user =>
-						tokenService
-							.createPair({
-								sub,
-								prevJti,
-								data: {
-									fms: user.maxUploadSize,
-									lim: user.fileLimit,
-									sbs: user.subscription,
-								},
-							})
-							.rejectedMap(HttpError.from)
-							.chain(tokens =>
-								Oath.of(new Date(Date.now() + tokens.exp))
-									.tap(expires =>
-										ctx.response.set(
-											"Set-Cookie",
-											`jti=${tokens.jti}; Expires=${expires}; SameSite=Lax; Path=/; HttpOnly;`,
-										),
-									)
-									.map(expires => ({
-										accessToken: tokens.tokens.access,
-										sub: tokens.sub,
-										jti: tokens.jti,
-										fileLimit: user.fileLimit,
-										subscription: user.subscription,
-										maxUploadSize: user.maxUploadSize,
-										expires,
-									})),
-							),
-					),
-			)
-			.fork(
-				error => {
-					ctx.cookies.set("jti", null)
-					ctx.cookies.set("sub", null)
+			.and(validateCtx0)
+			.and(getUserByCookies0(userService, tokenService))
+			.and(updateUserSession0(ctx, tokenService))
+			.pipe(rejectedTap0(dropCookies(ctx)))
+			.fork(sendError(ctx), sendSuccess({ ctx }))
 
-					sendError(ctx)(error)
+// --- Internal ---
+
+type TParams = { userService: UserService; tokenService: TTokenService }
+type TFn = (params: TParams) => Middleware
+type TCtx = { cookieSub: SUB; cookieJti: JTI; user: User.User }
+type TResult = Routes.ID.RefreshToken.Result
+
+type ExtractCtxFn = (ctx: {
+	cookieSub: string
+	cookieJti: string
+}) => Oath<{ cookieSub: SUB; cookieJti: JTI }, HttpError>
+const validateCtx0: ExtractCtxFn = ({ cookieJti, cookieSub }) =>
+	merge0({
+		cookieSub: fromBoolean0(isUUID(cookieSub), cookieSub as SUB).pipe(
+			rejectedMap0(toInvalidRequestError),
+		),
+		cookieJti: fromBoolean0(isUUID(cookieJti), cookieJti as JTI).pipe(
+			rejectedMap0(toInvalidRequestError),
+		),
+	})
+
+type CheckTokenExists = (token: string | null) => Oath<string, HttpError>
+const checkTokenExists0: CheckTokenExists = token =>
+	fromNullable0(token).pipe(rejectedMap0(toUserNotFoundError))
+
+type VerifyRefreshTokenFn = (ts: TTokenService) => (token: string) => Oath<string, HttpError>
+const verifyRefreshToken0: VerifyRefreshTokenFn = tokenService => token =>
+	tokenService
+		.verifyToken(token, "refresh")
+		.and(valid => fromBoolean0(valid, token, HttpError.Unauthorized("Invalid token")))
+
+type GetUserByIdFn = (userService: UserService, id: UUIDv4) => () => Oath<User.User, HttpError>
+const getUserById0: GetUserByIdFn = (userService, id) => () =>
+	userService.getById(id).pipe(rejectedMap0(toUserNotFoundError))
+
+type GetUserByCookiesFn = (
+	us: UserService,
+	ts: TTokenService,
+) => (ctx: Pick<TCtx, "cookieJti" | "cookieSub">) => Oath<TCtx, HttpError>
+const getUserByCookies0: GetUserByCookiesFn =
+	(userService, tokenService) =>
+	({ cookieSub: cookieSub, cookieJti: cookieJti }) =>
+		tokenService.persistenceStrategy
+			.getToken(cookieSub, cookieJti)
+			.pipe(rejectedMap0(toUserNotFoundError))
+			.and(checkTokenExists0)
+			.and(verifyRefreshToken0(tokenService))
+			.and(getUserById0(userService, cookieSub))
+			.and(user => ({ cookieSub, cookieJti, user }))
+
+type UpdateUserSessionFn = (
+	ctx: Context,
+	ts: TTokenService,
+) => (ctx: TCtx) => Oath<TResult, HttpError>
+const updateUserSession0: UpdateUserSessionFn =
+	(ctx, tokenService) =>
+	({ user, cookieJti: cookieJti, cookieSub: cookieSub }) =>
+		tokenService
+			.createPair({
+				sub: cookieSub,
+				prevJti: cookieJti,
+				data: {
+					fms: user.maxUploadSize,
+					lim: user.fileLimit,
+					sbs: user.subscription,
 				},
-				result => {
-					ctx.response.body = { success: true, result }
-				},
+			})
+			.pipe(rejectedMap0(HttpError.from))
+			.and(tokens =>
+				of0(new Date(Date.now() + tokens.exp))
+					.pipe(tap0(expires => setOrdoAuthCookies(ctx.response, expires, tokens.jti, tokens.sub)))
+					.and(expires => ({
+						accessToken: tokens.tokens.access,
+						fileLimit: tokens.lim,
+						subscription: tokens.sbs,
+						maxUploadSize: tokens.fms,
+						sub: tokens.sub,
+						jti: tokens.jti,
+						expires,
+					})),
 			)
+
+type DropCookiesFn = (ctx: Context) => () => void
+const dropCookies: DropCookiesFn = ctx => () => {
+	ctx.cookies.set("jti", null)
+	ctx.cookies.set("sub", null)
+}

@@ -17,102 +17,109 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import type { Middleware } from "koa"
+import { type Middleware, type Response } from "koa"
 
-import { authenticate0, parseBody0, sendError } from "@ordo-pink/backend-utils"
+import { type JWAT, type TTokenService } from "@ordo-pink/backend-service-token"
+import {
+	type Oath,
+	bimap0,
+	fromNullable0,
+	merge0,
+	of0,
+	rejectedMap0,
+	swap0,
+	tap0,
+} from "@ordo-pink/oath"
+import { authenticate0, parseBody0, sendError, sendSuccess } from "@ordo-pink/backend-utils"
 import { HttpError } from "@ordo-pink/rrr"
-import { Oath } from "@ordo-pink/oath"
-import type { TTokenService } from "@ordo-pink/backend-service-token"
-import type { UserService } from "@ordo-pink/backend-service-user"
-import { noop } from "@ordo-pink/tau"
+import { OK } from "@ordo-pink/core"
+import { type UserService } from "@ordo-pink/backend-service-user"
 import { okpwd } from "@ordo-pink/okpwd"
 
-export type Body = { oldPassword?: string; newPassword?: string; repeatNewPassword?: string }
-export type Params = { tokenService: TTokenService; userService: UserService }
-export type Fn = (params: Params) => Middleware
+import { toInvalidBodyError, toUserNotFoundError } from "../fns/to-error"
+import { setOrdoAuthCookies } from "../fns/set-cookies"
 
-export const handleChangePassword: Fn =
+export const handleChangePassword: TFn =
 	({ tokenService, userService }) =>
 	ctx =>
-		Oath.all({
-			auth: authenticate0(ctx, tokenService),
-			body: parseBody0<Body>(ctx, "object"),
+		merge0({
+			token: authenticate0(ctx, tokenService),
+			body: parseBody0<TRequestBody>(ctx, "object"),
 		})
-			.chain(({ auth, body }) =>
-				Oath.all({
-					payload: auth.payload,
-					oldPassword: Oath.of(body.oldPassword)
-						.map(okpwd())
-						.chain(e =>
-							Oath.fromBoolean(
-								() => !e,
-								noop,
-								() => HttpError.BadRequest(e ?? "Invalid new password"),
-							),
-						),
-					newPassword: Oath.of(body.oldPassword)
-						.map(okpwd())
-						.chain(e =>
-							Oath.fromBoolean(
-								() => !e,
-								noop,
-								() => HttpError.BadRequest(e ?? "Invalid old password"),
-							),
-						)
-						.chain(() =>
-							Oath.fromBoolean(
-								() => body.newPassword === body.repeatNewPassword,
-								noop,
-								() => HttpError.BadRequest("Passwords do not match"),
-							),
-						),
-				})
-					.chain(() =>
-						userService
-							.getById(auth.payload.sub)
-							.rejectedMap(() => HttpError.NotFound("User not found")),
-					)
-					.chain(user =>
-						userService
-							.comparePassword(user.email, body.oldPassword!)
-							.rejectedMap(() => HttpError.NotFound("User not found"))
-							.chain(() =>
-								userService
-									.updateUserPassword(user, body.oldPassword!, body.newPassword!)
-									.rejectedMap(error =>
-										error && error instanceof Error
-											? HttpError.from(error)
-											: HttpError.NotFound(error ?? "User not found"),
-									),
-							)
-							.chain(() =>
-								tokenService.persistenceStrategy
-									.removeTokenRecord(auth.payload.sub)
-									.rejectedMap(HttpError.from),
-							)
-							.chain(() =>
-								tokenService
-									.createPair({ sub: auth.payload.sub })
-									.rejectedMap(HttpError.from)
-									.chain(tokens =>
-										// TODO: Drop sessions other than the current one
-										Oath.of(new Date(Date.now() + tokens.exp))
-											.tap(expires => {
-												ctx.response.set("Set-Cookie", [
-													`jti=${tokens.jti}; Expires=${expires.toISOString()}; SameSite=Lax; Path=/; HttpOnly;`,
-													`sub=${tokens.sub}; Expires=${expires.toISOString()}; SameSite=Lax; Path=/; HttpOnly;`,
-												])
-											})
-											.map(expires => ({
-												accessToken: tokens.tokens.access,
-												sub: tokens.sub,
-												jti: tokens.jti,
-												expires,
-											})),
-									),
-							),
-					),
-			)
-			.fork(sendError(ctx), result => {
-				ctx.response.body = { success: true, result }
-			})
+			.and(extractCtx0(userService))
+			.and(validateCtx0)
+			.and(updateUserPassword0(userService))
+			.and(dropActiveUserSessions0(tokenService))
+			.and(createUserSession0(tokenService, ctx.response))
+			.fork(sendError(ctx), sendSuccess({ ctx }))
+
+// --- Internal ---
+
+type TParams = { tokenService: TTokenService; userService: UserService }
+type TFn = (params: TParams) => Middleware
+type TRequestBody = Routes.ID.ChangePassword.RequestBody
+type TRequest = { token: JWAT; body: TRequestBody }
+type TCtx = { oldPassword: string; newPassword: string; user: User.User }
+type TResult = Routes.ID.ChangePassword.Result
+
+const checkPwd = okpwd()
+
+type TExtractCtxFn = (us: UserService) => (p: TRequest) => Oath<TCtx, HttpError>
+const extractCtx0: TExtractCtxFn =
+	userService =>
+	({ token, body: { oldPassword, newPassword } }) =>
+		merge0({
+			user: userService.getById(token.payload.sub).pipe(rejectedMap0(toUserNotFoundError)),
+			oldPassword: fromNullable0(oldPassword).pipe(rejectedMap0(toInvalidBodyError)),
+			newPassword: fromNullable0(newPassword).pipe(rejectedMap0(toInvalidBodyError)),
+		})
+
+type TCheckNewPasswordIsValidFn = (body: TRequestBody) => Oath<"OK", HttpError>
+const checkNewPasswordIsValid0: TCheckNewPasswordIsValidFn = body =>
+	fromNullable0(checkPwd(body.newPassword))
+		.pipe(swap0)
+		.and(() => OK)
+		.pipe(rejectedMap0(pwdErr => HttpError.BadRequest(pwdErr)))
+
+type TValidateCtxFn = (ctx: TCtx) => Oath<TCtx, HttpError>
+const validateCtx0: TValidateCtxFn = ctx => checkNewPasswordIsValid0(ctx).and(() => ctx)
+
+type TUpdateUserPasswordFn = (us: UserService) => (ctx: TCtx) => Oath<TCtx, HttpError>
+const updateUserPassword0: TUpdateUserPasswordFn = userService => ctx =>
+	userService.updateUserPassword(ctx.user, ctx.oldPassword, ctx.newPassword).pipe(
+		bimap0(
+			error =>
+				error && error instanceof Error
+					? HttpError.from(error)
+					: HttpError.NotFound(error ?? "User not found"),
+			() => ctx,
+		),
+	)
+
+type TDropActiveUserSessionsFn = (ts: TTokenService) => (ctx: TCtx) => Oath<TCtx, HttpError>
+const dropActiveUserSessions0: TDropActiveUserSessionsFn = tokenService => ctx =>
+	tokenService.persistenceStrategy
+		.removeTokenRecord(ctx.user.id)
+		.pipe(bimap0(HttpError.from, () => ctx))
+
+type TCreateUserSessionFn = (
+	ts: TTokenService,
+	r: Response,
+) => (ctx: TCtx) => Oath<TResult, HttpError>
+const createUserSession0: TCreateUserSessionFn = (tokenService, response) => ctx =>
+	tokenService
+		.createPair({ sub: ctx.user.id })
+		.pipe(rejectedMap0(HttpError.from))
+		.and(tokens =>
+			of0(new Date(Date.now() + tokens.exp))
+				.pipe(tap0(expires => setOrdoAuthCookies(response, expires, tokens.jti, tokens.sub)))
+				.and(expires => ({
+					accessToken: tokens.tokens.access,
+					fileLimit: tokens.lim,
+					subscription: tokens.sbs,
+					maxUploadSize: tokens.fms,
+					sub: tokens.sub,
+					jti: tokens.jti,
+					expires,
+				})),
+		)

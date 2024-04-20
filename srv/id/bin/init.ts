@@ -17,11 +17,11 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { getc } from "@ordo-pink/getc"
 import { readFile0, writeFile0 } from "@ordo-pink/fs"
 import { Oath } from "@ordo-pink/oath"
-import { keysOf } from "@ordo-pink/tau"
 import { die } from "@ordo-pink/binutil"
+import { getc } from "@ordo-pink/getc"
+import { keysOf } from "@ordo-pink/tau"
 
 const {
 	ORDO_ID_ACCESS_TOKEN_PRIVATE_KEY,
@@ -51,7 +51,7 @@ const generateKeyPairP = async () => {
 	return { priv, pub }
 }
 
-const main = async () => {
+const main = () => {
 	if (
 		!!ORDO_ID_ACCESS_TOKEN_PRIVATE_KEY &&
 		!!ORDO_ID_ACCESS_TOKEN_PUBLIC_KEY &&
@@ -61,7 +61,7 @@ const main = async () => {
 		return
 	}
 
-	readFile0("./.env", "utf-8")
+	void readFile0("./.env", "utf-8")
 		.map(str => (str as string).trim().split("\n"))
 		.map(lines => lines.map(line => line.trim().split("=")))
 		.map(lines =>

@@ -18,15 +18,16 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import chalk from "chalk"
-import { UserPersistenceStrategyDynamoDB } from "@ordo-pink/backend-persistence-strategy-user-dynamodb"
-import { TokenPersistenceStrategyFS } from "@ordo-pink/backend-persistence-strategy-token-fs"
-import { PersistenceStrategyUserFS } from "@ordo-pink/backend-persistence-strategy-user-fs"
-import { RusenderEmailStrategy } from "@ordo-pink/backend-email-strategy-rusender"
-import { createIDServer } from "@ordo-pink/backend-server-id"
+
 import { ConsoleLogger } from "@ordo-pink/logger"
-import { Switch } from "@ordo-pink/switch"
+import { EmailStrategyRusender } from "@ordo-pink/backend-email-strategy-rusender"
 import { Oath } from "@ordo-pink/oath"
+import { PersistenceStrategyUserFS } from "@ordo-pink/backend-persistence-strategy-user-fs"
+import { Switch } from "@ordo-pink/switch"
 import { TokenPersistenceStrategyDynamoDB } from "@ordo-pink/backend-persistence-strategy-token-dynamodb"
+import { TokenPersistenceStrategyFS } from "@ordo-pink/backend-persistence-strategy-token-fs"
+import { UserPersistenceStrategyDynamoDB } from "@ordo-pink/backend-persistence-strategy-user-dynamodb"
+import { createIDServer } from "@ordo-pink/backend-server-id"
 
 const port = Bun.env.ORDO_ID_PORT!
 const accessTokenExpireIn = Number(Bun.env.ORDO_ID_ACCESS_TOKEN_EXPIRE_IN)
@@ -76,9 +77,9 @@ const main = async () => {
 		.case("dynamodb", () => UserPersistenceStrategyDynamoDB.of(userDynamoDBParams))
 		.default(() => PersistenceStrategyUserFS.of(Bun.env.ORDO_ID_USER_FS_STRATEGY_PATH!))
 
-	const emailStrategy = RusenderEmailStrategy.of(Bun.env.ORDO_ID_EMAIL_API_KEY!)
+	const emailStrategy = EmailStrategyRusender.create({ key: Bun.env.ORDO_ID_EMAIL_API_KEY! })
 
-	const app = await createIDServer({
+	const app = createIDServer({
 		userRepository,
 		tokenRepository,
 		emailStrategy,
@@ -103,7 +104,7 @@ const getKey = (key: string, type: "public" | "private") =>
 		.map(key => Buffer.from(key, "base64"))
 		.map(buffer => new Uint8Array(buffer))
 		.chain(key =>
-			Oath.from(() =>
+			Oath.from<CryptoKey>(() =>
 				type === "private"
 					? crypto.subtle.importKey(
 							"pkcs8",
@@ -132,4 +133,4 @@ const getKey = (key: string, type: "public" | "private") =>
 			process.exit(1)
 		})
 
-main()
+void main()

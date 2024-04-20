@@ -1,18 +1,19 @@
 // SPDX-FileCopyrightText: Copyright 2024, 谢尔盖||↓ and the Ordo.pink contributors
 // SPDX-License-Identifier: Unlicense
 
-import type { License } from "@ordo-pink/binutil"
 import { camel } from "case"
+
+import { Binary, Curry, Ternary, Thunk, Unary, noop } from "@ordo-pink/tau"
 import {
 	createProgress,
 	createRepositoryFile0,
 	getLicense,
 	getSPDXRecord,
 } from "@ordo-pink/binutil"
-import { Binary, Curry, Ternary, Thunk, Unary, noop } from "@ordo-pink/tau"
-import { isReservedJavaScriptKeyword } from "@ordo-pink/rkwjs"
-import { directoryExists0 } from "@ordo-pink/fs"
+import type { License } from "@ordo-pink/binutil"
 import { Oath } from "@ordo-pink/oath"
+import { directoryExists0 } from "@ordo-pink/fs"
+import { isReservedJavaScriptKeyword } from "@ordo-pink/rkwjs"
 
 // --- Public ---
 

@@ -58,7 +58,7 @@ const createSPDXRecord0 = (path: string) =>
 							readFile0(path, "utf-8").chain(content =>
 								(content as string).startsWith(spdx)
 									? Oath.empty()
-									: writeFile0(path, `${spdx}\n${content.toString()}`).map(spdxRecordsProgress.inc),
+									: writeFile0(path, `${spdx}\n${content as string}`).map(spdxRecordsProgress.inc),
 							),
 						)
 				: Oath.empty(),

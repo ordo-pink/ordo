@@ -35,7 +35,7 @@ export const usePublicUserInfo = (userId?: UserID) => {
 		void Oath.fromNullable(userId)
 			.chain(uid =>
 				Oath.try(() =>
-					fetch(`${hosts.idHost}/users/${uid}`)
+					fetch(`${hosts.idHost}/users/id/${uid}`)
 						.then(res => res.json())
 						.then(json => setUser(json.result)),
 				),

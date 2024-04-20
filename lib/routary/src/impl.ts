@@ -17,7 +17,7 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import type { HttpMethod, Route, TRouter, Context, RequiredRouterState, RouteMap } from "./types"
+import type { Context, HttpMethod, RequiredRouterState, Route, RouteMap, TRouter } from "./types"
 import { Oath } from "@ordo-pink/oath"
 
 const checkMethod = (method: HttpMethod, request: Request) => request.method === method
@@ -49,7 +49,7 @@ const router = <T extends RequiredRouterState = RequiredRouterState>(
 		Oath.fromNullable(
 			routes.find(([m, r]) => ctx.state.checkMethod(m, req) && ctx.state.checkRoute(r, req)),
 		)
-			.chain(([_, route, gear]) =>
+			.chain(([, route, gear]) =>
 				Oath.of({ ...ctx, req, route, res: RoutaryResponse.empty() }).chain(ctx =>
 					gear(ctx)
 						.fix(onError)

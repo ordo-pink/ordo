@@ -16,7 +16,7 @@ program
 	.argument("name", "name of the lib to be created")
 	.option("-u, --unlicense", "use The Unlicense instead of GNU AGPL 3.")
 	.action(async (name, options) => {
-		const license = options.license ? "Unlicense" : "AGPL-3.0-only"
+		const license = options.unlicense ? "Unlicense" : "AGPL-3.0-only"
 
 		await mklib(name, license)
 	})

@@ -19,7 +19,7 @@
 
 import { die, runCommand0 } from "@ordo-pink/binutil"
 
-runCommand0("npm i", {
+void runCommand0("npm i", {
 	cwd: "./srv/website",
 	stdin: "inherit",
 	stderr: "inherit",

@@ -17,9 +17,6 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import validator from "validator"
-import { Oath } from "@ordo-pink/oath"
-import { okpwd } from "@ordo-pink/okpwd"
 import { ChangeEventHandler } from "react"
 
 type InputProps = {

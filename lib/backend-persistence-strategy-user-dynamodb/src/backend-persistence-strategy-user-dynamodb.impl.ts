@@ -144,15 +144,23 @@ const getByEmail: GetByEmailMethod<T.Params> =
 
 const serialize: T._SerializeFn = item => ({
 	email: item.email.S!,
+	// eslint-disable-next-line @typescript-eslint/no-non-null-asserted-optional-chain
 	emailConfirmed: item.emailConfirmed?.N! === "1",
+	// eslint-disable-next-line @typescript-eslint/no-non-null-asserted-optional-chain
 	firstName: item.firstName?.S!,
 	createdAt: new Date(item.createdAt.S!),
+	// eslint-disable-next-line @typescript-eslint/no-non-null-asserted-optional-chain
 	lastName: item.lastName?.S!,
 	password: item.password.S!,
+	// eslint-disable-next-line @typescript-eslint/no-non-null-asserted-optional-chain
 	handle: item.handle?.S!,
+	// eslint-disable-next-line @typescript-eslint/no-non-null-asserted-optional-chain
 	subscription: item.subscription?.S!,
+	// eslint-disable-next-line @typescript-eslint/no-non-null-asserted-optional-chain
 	fileLimit: Number(item.fileLimit?.N!),
+	// eslint-disable-next-line @typescript-eslint/no-non-null-asserted-optional-chain
 	maxUploadSize: Number(item.maxUploadSize?.N!),
+	// eslint-disable-next-line @typescript-eslint/no-non-null-asserted-optional-chain
 	code: item.code?.S!,
 	id: item.id.S! as SUB,
 })

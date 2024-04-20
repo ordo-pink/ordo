@@ -17,11 +17,14 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Either } from "@ordo-pink/either"
-import { useState } from "react"
-import Null from "./null"
-import { useIsDarkTheme } from "hooks/use-is-dark-theme.hook"
 import { BsChevronLeft, BsChevronRight } from "react-icons/bs"
+import { useState } from "react"
+
+import { Either } from "@ordo-pink/either"
+
+import { useIsDarkTheme } from "hooks/use-is-dark-theme.hook"
+
+import Null from "./null"
 
 type Feature = {
 	id: string
@@ -68,7 +71,7 @@ export default function ScreenshotCarousel({ staticHost }: P) {
 							target="_blank"
 						>
 							<img
-								className="h-full max-h-[42rem] w-full max-w-4xl rounded-md shadow-lg"
+								className="size-full max-h-[42rem] max-w-4xl rounded-md shadow-lg"
 								src={`${staticHost}/${feature.id}-${isDarkTheme ? "dark" : "light"}.png`}
 								alt={feature.title}
 							/>

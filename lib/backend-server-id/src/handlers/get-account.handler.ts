@@ -17,25 +17,30 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import type { Middleware } from "koa"
-import type { UserService } from "@ordo-pink/backend-service-user"
-import type { TTokenService } from "@ordo-pink/backend-service-token"
-import { authenticate0, sendError } from "@ordo-pink/backend-utils"
-import { HttpError } from "@ordo-pink/rrr"
+import { type Middleware } from "koa"
 
-// --- Public ---
+import { type JWAT, type TTokenService } from "@ordo-pink/backend-service-token"
+import { type Oath, bimap0 } from "@ordo-pink/oath"
+import { authenticate0, sendError, sendSuccess } from "@ordo-pink/backend-utils"
+import { type HttpError } from "@ordo-pink/rrr"
+import { type UserService } from "@ordo-pink/backend-service-user"
+import { omit } from "@ordo-pink/tau"
 
-export type Params = { tokenService: TTokenService; userService: UserService }
-export type Fn = (params: Params) => Middleware
+import { toUserNotFoundError } from "../fns/to-error"
 
-export const handleUserInfoByEmail: Fn =
+export const handleAccount: TFn =
 	({ tokenService, userService }) =>
 	ctx =>
 		authenticate0(ctx, tokenService)
-			.map(() => ctx.params.email)
-			.chain(e =>
-				userService.getUserInfo(e).rejectedMap(() => HttpError.NotFound("User not found")),
-			)
-			.fork(sendError(ctx), result => {
-				ctx.response.body = { success: true, result }
-			})
+			.and(getUserById0(userService))
+			.fork(sendError(ctx), sendSuccess({ ctx }))
+
+// --- Internal ---
+
+type TParams = { tokenService: TTokenService; userService: UserService }
+type TFn = (params: TParams) => Middleware
+type TResult = Routes.ID.GetAccount.Result
+
+type TGetUserByIdFn = (us: UserService) => (token: JWAT) => Oath<TResult, HttpError>
+const getUserById0: TGetUserByIdFn = userService => token =>
+	userService.getById(token.payload.sub).pipe(bimap0(toUserNotFoundError, omit("code")))

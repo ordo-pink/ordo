@@ -18,10 +18,11 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import type { Middleware } from "koa"
-import type { UserService } from "@ordo-pink/backend-service-user"
-import type { TTokenService } from "@ordo-pink/backend-service-token"
-import { authenticate0 } from "@ordo-pink/backend-utils"
+
 import { Oath } from "@ordo-pink/oath"
+import { type TTokenService } from "@ordo-pink/backend-service-token"
+import { type UserService } from "@ordo-pink/backend-service-user"
+import { authenticate0 } from "@ordo-pink/backend-utils"
 
 // --- Public ---
 

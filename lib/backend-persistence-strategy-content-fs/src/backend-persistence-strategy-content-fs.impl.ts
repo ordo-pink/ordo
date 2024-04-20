@@ -21,17 +21,17 @@ import { Readable, Writable } from "stream"
 import { createReadStream, createWriteStream } from "fs"
 import { resolve } from "path"
 
-import {
-	ContentPersistenceStrategy,
-	Data,
-	DataNotFound,
-	DataUnexpectedError,
-	UnexpectedError,
-} from "@ordo-pink/data"
+import { ContentPersistenceStrategy, Data, UnexpectedError } from "@ordo-pink/data"
 import { createParentIfNotExists0, removeFile0, stat0, writeFile0 } from "@ordo-pink/fs"
 import { Oath } from "@ordo-pink/oath"
+import { bimap0 } from "@ordo-pink/oath/operators/bimap"
+import { chain0 } from "@ordo-pink/oath/operators/chain"
+import { fromPromise0 } from "@ordo-pink/oath/constructors/from-promise"
+import { map0 } from "@ordo-pink/oath/operators/map"
+import { rejectedMap0 } from "@ordo-pink/oath/operators/rejected-map"
+import { try0 } from "@ordo-pink/oath/constructors/try"
 
-type Params = { root: string }
+import { TPersistenceStrategyContentFSParams } from "./backend-persistence-strategy-content-fs.types"
 
 /**
  * `ContentPersistenceStrategyFS` implements `ContentPersistenceStrategy` for storing content using
@@ -50,45 +50,45 @@ export const ContentPersistenceStrategyFS = {
 	/**
 	 * `ContentPersistenceStrategyFS` factory.
 	 */
-	of: ({ root }: Params): ContentPersistenceStrategy<Readable> => ({
+	of: ({ root }: TPersistenceStrategyContentFSParams): ContentPersistenceStrategy<Readable> => ({
 		create: (uid, fsid) =>
-			Oath.of(getPath(root, uid, fsid))
-				.chain(createParentDirIfNotExists0)
-				.chain(createEmptyFileContent0)
-				.map(() => "OK"),
+			Oath.resolve(getPath(root, uid, fsid))
+				.pipe(chain0(createParentDirIfNotExists0))
+				.pipe(chain0(createEmptyFileContent0))
+				.pipe(map0(ok)),
 
 		delete: (uid, fsid) =>
-			Oath.of(getPath(root, uid, fsid))
-				.chain(removeFile0)
-				.bimap(
-					() => Data.Errors.DataNotFound,
-					() => "OK",
-				),
+			Oath.resolve(getPath(root, uid, fsid))
+				.pipe(chain0(removeFile0))
+				.pipe(bimap0(() => Data.Errors.DataNotFound, ok)),
 
-		read: (uid, fsid) => Oath.of(getPath(root, uid, fsid)).chain(readFileContent0),
+		read: (uid, fsid) => Oath.resolve(getPath(root, uid, fsid)).pipe(chain0(readFileContent0)),
 
 		write: (uid, fsid, content) =>
-			Oath.of(getPath(root, uid, fsid))
-				.chain(createParentDirIfNotExists0)
-				.chain(writeFileContent0(content))
-				.chain(getFileSize0),
+			Oath.resolve(getPath(root, uid, fsid))
+				.pipe(chain0(createParentDirIfNotExists0))
+				.pipe(chain0(writeFileContent0(content)))
+				.pipe(chain0(getFileSize0)),
 	}),
 }
 
 // --- Internal ---
 
+const ok = () => "OK" as const
+
 const getPath = (root: string, uid: string, fsid: string): string =>
 	resolve(root, ...uid.split("-"), ...fsid.split("-"))
 
-const createParentDirIfNotExists0 = (path: string): Oath<string, DataUnexpectedError> =>
-	createParentIfNotExists0(path).bimap(UnexpectedError, () => path)
+const createParentDirIfNotExists0 = (path: string) =>
+	createParentIfNotExists0(path).pipe(bimap0(UnexpectedError, () => path))
 
-const getFileSize0 = (path: string): Oath<number> => stat0(path).map(stat => Number(stat.size))
+const getFileSize0 = (path: string) =>
+	stat0(path).pipe(bimap0(UnexpectedError, stat => Number(stat.size)))
 
-const createWriteStream0 = (path: string): Oath<Writable, DataUnexpectedError> =>
-	Oath.try(() => createWriteStream(path, { autoClose: true })).rejectedMap(UnexpectedError)
+const createWriteStream0 = (path: string) =>
+	try0(() => createWriteStream(path, { autoClose: true }))
 
-const awaitStreamWriteComplete = (file: Writable, content: Readable): Promise<void> =>
+const awaitStreamWriteCompleteP = (file: Writable, content: Readable) =>
 	new Promise<void>((resolve, reject) => {
 		file.on("finish", resolve)
 		file.on("error", reject)
@@ -96,15 +96,13 @@ const awaitStreamWriteComplete = (file: Writable, content: Readable): Promise<vo
 		content.pipe(file)
 	})
 
-const readFileContent0 = (path: string): Oath<Readable, DataNotFound> =>
-	Oath.try(() => createReadStream(path)).rejectedMap(() => Data.Errors.DataNotFound)
+const readFileContent0 = (path: string) =>
+	try0(() => createReadStream(path)).pipe(rejectedMap0(() => Data.Errors.DataNotFound))
 
-const writeFileContent0 =
-	(content: Readable) =>
-	(path: string): Oath<string, DataUnexpectedError> =>
-		createWriteStream0(path)
-			.chain(file => Oath.from(() => awaitStreamWriteComplete(file, content)))
-			.map(() => path)
+const writeFileContent0 = (content: Readable) => (path: string) =>
+	createWriteStream0(path)
+		.pipe(chain0(file => fromPromise0<void, Error>(() => awaitStreamWriteCompleteP(file, content))))
+		.pipe(bimap0(UnexpectedError, () => path))
 
-const createEmptyFileContent0 = (path: string): Oath<void, DataUnexpectedError> =>
-	writeFile0(path, "", "utf8").rejectedMap(UnexpectedError)
+const createEmptyFileContent0 = (path: string) =>
+	writeFile0(path, "", "utf8").pipe(rejectedMap0(UnexpectedError))

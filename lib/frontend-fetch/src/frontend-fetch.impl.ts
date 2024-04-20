@@ -27,8 +27,8 @@ import { useCurrentFID } from "@ordo-pink/frontend-stream-activities"
 const fetch = window.fetch
 
 export const __initFetch = callOnce(() => {
-	window.fetch = undefined as any
-	window.XMLHttpRequest = undefined as any
+	// window.fetch = undefined as any
+	// window.XMLHttpRequest = undefined as any
 })
 
 export const useFetch = () => {

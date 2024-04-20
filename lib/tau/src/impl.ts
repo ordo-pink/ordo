@@ -75,3 +75,11 @@ export const callOnce = <T extends any[], R>(fn: (...args: T) => R) => {
 
 export const getPercentage = (total: number, current: number): number =>
 	Math.trunc((current / total) * 100)
+
+export const omit =
+	<T extends Record<string, unknown>, K extends (keyof T)[]>(...keys: K) =>
+	(obj: T): Omit<T, T.Unpack<K>> =>
+		keysOf(obj).reduce(
+			(acc, key) => (keys.includes(key) ? acc : { ...acc, [key]: obj[key] }),
+			{} as Omit<T, T.Unpack<K>>,
+		)

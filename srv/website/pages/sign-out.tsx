@@ -17,13 +17,14 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Centered } from "../components/centered"
-import { PageHeader } from "../components/page-header"
 import { useEffect } from "react"
 
-export default function ForgotPasswordPage() {
+import { Centered } from "../components/centered"
+import { PageHeader } from "../components/page-header"
+
+export default function SignOutPage() {
 	useEffect(() => {
-		fetch(`${process.env.NEXT_PUBLIC_ORDO_ID_HOST}/sign-out`, {
+		void fetch(`${process.env.NEXT_PUBLIC_ORDO_ID_HOST}/sign-out`, {
 			method: "POST",
 			credentials: "include",
 		}).then(() => {

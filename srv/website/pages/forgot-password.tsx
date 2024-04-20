@@ -18,9 +18,11 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import Head from "next/head"
+
+import { OrdoRoutes } from "@ordo-pink/ordo-routes"
+
 import { Centered } from "../components/centered"
 import { PageHeader } from "../components/page-header"
-import { OrdoRoutes } from "@ordo-pink/ordo-routes"
 
 export default function ForgotPasswordPage() {
 	return (

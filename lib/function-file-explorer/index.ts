@@ -115,12 +115,78 @@ export default createFunction(
 			subscribe: ({ grant }) => {
 				const files = data.getData()
 
-				if (files && files.length >= 50) grant()
+				if (files && files.length >= 100) grant()
 
 				commands.on<cmd.data.create>("data.create", () => {
 					const files = data.getData()
 
-					if (files && files.length >= 49) grant()
+					if (files && files.length >= 99) grant()
+				})
+			},
+		})
+
+		commands.emit<cmd.achievements.add>("achievements.add", {
+			descriptor: {
+				image: `${staticHost}/create-250-files.jpg`,
+				description: "Создайте 250 файлов.",
+				id: ORDO_PINK_FILE_EXPLORER_FUNCTION.concat(".achievements.create-250-files"),
+				title: "Сонмище Файлы",
+				category: "collection",
+				previous: ORDO_PINK_FILE_EXPLORER_FUNCTION.concat(".achievements.create-100-files"),
+			},
+			subscribe: ({ grant }) => {
+				const files = data.getData()
+
+				if (files && files.length >= 250) grant()
+
+				commands.on<cmd.data.create>("data.create", () => {
+					const files = data.getData()
+
+					if (files && files.length >= 249) grant()
+				})
+			},
+		})
+
+		commands.emit<cmd.achievements.add>("achievements.add", {
+			descriptor: {
+				image: `${staticHost}/create-500-files.jpg`,
+				description: "Создайте 500 файлов.",
+				id: ORDO_PINK_FILE_EXPLORER_FUNCTION.concat(".achievements.create-500-files"),
+				title: "Полчище Файлы",
+				category: "collection",
+				previous: ORDO_PINK_FILE_EXPLORER_FUNCTION.concat(".achievements.create-250-files"),
+			},
+			subscribe: ({ grant }) => {
+				const files = data.getData()
+
+				if (files && files.length >= 500) grant()
+
+				commands.on<cmd.data.create>("data.create", () => {
+					const files = data.getData()
+
+					if (files && files.length >= 499) grant()
+				})
+			},
+		})
+
+		commands.emit<cmd.achievements.add>("achievements.add", {
+			descriptor: {
+				image: `${staticHost}/create-1000-files.jpg`,
+				description: "Создайте 1000 файлов.",
+				id: ORDO_PINK_FILE_EXPLORER_FUNCTION.concat(".achievements.create-1000-files"),
+				title: "Легион Файлы",
+				category: "collection",
+				previous: ORDO_PINK_FILE_EXPLORER_FUNCTION.concat(".achievements.create-500-files"),
+			},
+			subscribe: ({ grant }) => {
+				const files = data.getData()
+
+				if (files && files.length >= 1000) grant()
+
+				commands.on<cmd.data.create>("data.create", () => {
+					const files = data.getData()
+
+					if (files && files.length >= 999) grant()
 				})
 			},
 		})

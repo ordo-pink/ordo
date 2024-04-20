@@ -51,14 +51,14 @@ export const okpwd: T.Fn = options => password => {
 			Either.fromBoolean(
 				() => (o.skipCheckForAlphaCharacters ? true : /\p{L}/u.test(password)),
 				() => password,
-				() => `Password must contain contain letters.`,
+				() => "Password must contain contain letters.",
 			),
 		)
 		.chain(password =>
 			Either.fromBoolean(
 				() => (o.skipCheckForNumbers ? true : /\d/u.test(password)),
 				() => password,
-				() => `Password must contain contain numbers.`,
+				() => "Password must contain contain numbers.",
 			),
 		)
 		.chain(password =>
@@ -66,10 +66,12 @@ export const okpwd: T.Fn = options => password => {
 				() =>
 					o.skipCheckForSpecialCharacters
 						? true
-						: /[`!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~]/.test(password),
+						: // eslint-disable-next-line no-useless-escape
+							/[`!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~]/.test(password),
 				() => password,
 				() =>
-					`Password must contain contain special characters ([\`!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~]).`,
+					// eslint-disable-next-line no-useless-escape
+					"Password must contain contain special characters ([`!@#$%^&*()_+-=[]{};':\"\\|,.<>/?~]).",
 			),
 		)
 		.fold(identity, () => null)

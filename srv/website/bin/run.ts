@@ -37,7 +37,7 @@ const {
 	"SUBS_HOST",
 ])
 
-runAsyncCommand0("npm run dev", {
+void runAsyncCommand0("npm run dev", {
 	cwd: "./srv/website",
 	stdin: "pipe",
 	stdout: "pipe",

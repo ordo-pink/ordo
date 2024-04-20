@@ -91,13 +91,14 @@ export const DataPersistenceStrategyS3 = {
 			get: (uid, fsid) => read0(s3, uid, Bucket).chain(findByFSID0(fsid)),
 			getAll: uid => read0(s3, uid, Bucket).fix(() => []),
 			update: plain =>
-				read0(s3, plain.createdBy, Bucket).chain(data =>
-					Oath.of(data.findIndex(item => item.fsid === plain.fsid))
-						.chain(Oath.ifElse(x => x >= 0, { onFalse: () => Data.Errors.DataNotFound }))
-						.map(replaceByIndex(data, plain))
-						.chain(write0(s3, plain.createdBy, Bucket))
-						.map(() => "OK"),
-				),
+				read0(s3, plain.createdBy, Bucket)
+					.chain(data =>
+						Oath.of(data.findIndex(item => item.fsid === plain.fsid))
+							.chain(Oath.ifElse(x => x >= 0, { onFalse: () => Data.Errors.DataNotFound }))
+							.map(replaceByIndex(data, plain)),
+					)
+					.chain(write0(s3, plain.createdBy, Bucket))
+					.map(() => "OK"),
 		}
 	},
 }

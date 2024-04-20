@@ -19,7 +19,7 @@
 
 import { die, runCommand0 } from "@ordo-pink/binutil"
 
-void runCommand0("bun i", {
+void runCommand0("opt/bun i", {
 	cwd: "./srv/my",
 	stdin: "inherit",
 	stderr: "inherit",

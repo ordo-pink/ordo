@@ -44,7 +44,7 @@ const build = `docker build --build-arg ORDO_DT_DOCKER_PORT=${ORDO_DT_PORT} --bu
 const login = `docker login --username ${ORDO_DT_DOCKER_REGISTRY_USERNAME} --password ${ORDO_DT_DOCKER_REGISTRY_PASSWORD} ${ORDO_DT_DOCKER_REGISTRY}`
 const publish = `docker push ${ORDO_DT_DOCKER_REGISTRY}/${ORDO_DT_DOCKER_REGISTRY_SCOPE}/dt:${ORDO_DT_VERSION}`
 
-runCommand0(build)
+void runCommand0(build)
 	.chain(() => runCommand0(login))
 	.chain(() => runCommand0(publish))
 	.orElse(die())

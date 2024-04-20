@@ -19,7 +19,7 @@
 
 import { useEffect, useState } from "react"
 
-import { type FSID, type PlainData } from "@ordo-pink/data"
+import { DataRepository, type FSID, type PlainData } from "@ordo-pink/data"
 import { Either } from "@ordo-pink/either"
 import { type PlainDataNode } from "@ordo-pink/core"
 import { Switch } from "@ordo-pink/switch"
@@ -28,8 +28,8 @@ import { data$ } from "@ordo-pink/frontend-stream-data"
 import { useRouteParams } from "./use-route.hook"
 import { useStrictSubscription } from "./use-strict-subscription.hook"
 
-export const useChildren = (item: PlainData | FSID | "root" | null) => {
-	const data = useData()
+export const useChildren = (item: PlainData | FSID | "root" | null, showHidden = false) => {
+	const data = useData(showHidden)
 
 	const fsid = Switch.empty()
 		.case(Boolean(item && (item as PlainData).fsid), () => (item as PlainData).fsid)
@@ -41,14 +41,30 @@ export const useChildren = (item: PlainData | FSID | "root" | null) => {
 		.default(() => data.filter(item => item.parent === fsid))
 }
 
-export const useData = () => {
+export const useData = (showHidden = false) => {
+	const [items, setItems] = useState<PlainData[]>([])
+
 	const data = useStrictSubscription(data$, [])
 
-	return data
+	useEffect(() => {
+		setItems(
+			showHidden
+				? data
+				: data.filter(
+						item =>
+							!item.name.startsWith(".") &&
+							!DataRepository.getParentChain(data, item.fsid).some(parent =>
+								parent.name.startsWith("."),
+							),
+					),
+		)
+	}, [showHidden, data])
+
+	return items
 }
 
-export const useDataLabels = () => {
-	const data = useData()
+export const useDataLabels = (showHidden = false) => {
+	const data = useData(showHidden)
 
 	return Array.from(new Set(data?.flatMap(item => item.labels) ?? []))
 }
@@ -56,8 +72,8 @@ export const useDataLabels = () => {
 export const useDataByLabel = (labels: string[]) =>
 	useSelectDataList(item => labels.every(label => item.labels.includes(label)))
 
-export const useParentChain = (fsid: FSID) => {
-	const data = useData()
+export const useParentChain = (fsid: FSID, showHidden = false) => {
+	const data = useData(showHidden)
 	let currentItem = useDataByFSID(fsid)
 
 	const parentChain = [] as PlainData[]
@@ -87,14 +103,14 @@ export const useDataByName = (name: string, parent: FSID | null) => {
 	return data
 }
 
-export const useSelectDataList = (selector: (data: PlainData) => boolean) => {
-	const data = useData()
+export const useSelectDataList = (selector: (data: PlainData) => boolean, showHidden = false) => {
+	const data = useData(showHidden)
 
 	return data.filter(selector)
 }
 
-export const useSelectData = (selector: (data: PlainData) => boolean) => {
-	const data = useData()
+export const useSelectData = (selector: (data: PlainData) => boolean, showHidden = false) => {
+	const data = useData(showHidden)
 
 	return data.find(selector) ?? null
 }
@@ -106,8 +122,8 @@ export const useDataFromRouteFSID = () => {
 	return data
 }
 
-export const useDataTree = () => {
-	const data = useData()
+export const useDataTree = (showHidden = false) => {
+	const data = useData(showHidden)
 
 	const [tree, setTree] = useState<PlainDataNode[]>([])
 

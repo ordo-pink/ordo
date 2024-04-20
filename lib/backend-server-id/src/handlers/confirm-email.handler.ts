@@ -18,42 +18,82 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import type { Middleware } from "koa"
-import { sendError, parseBody0 } from "@ordo-pink/backend-utils"
+import isEmail from "validator/lib/isEmail"
+
+import {
+	Oath,
+	bimap0,
+	chain0,
+	fromBoolean0,
+	fromNullable0,
+	map0,
+	merge0,
+	rejectedMap0,
+} from "@ordo-pink/oath"
+import { isString, omit } from "@ordo-pink/tau"
+import { parseBody0, sendError, sendSuccess } from "@ordo-pink/backend-utils"
 import { HttpError } from "@ordo-pink/rrr"
-import { Oath } from "@ordo-pink/oath"
+import { OK } from "@ordo-pink/core"
 import { UserService } from "@ordo-pink/backend-service-user"
 
-type Body = { email?: string; code?: string }
-type Params = { userService: UserService }
-type Fn = (params: Params) => Middleware
+import {
+	toEmailAlreadyConfirmedError,
+	toInvalidBodyError,
+	toUserNotFoundError,
+} from "../fns/to-error"
 
-export const handleConfirmEmail: Fn =
+export const handleConfirmEmail: TFn =
 	({ userService }) =>
 	ctx =>
-		parseBody0<Body>(ctx, "object")
-			.chain(({ email, code }) =>
-				Oath.all({ email: Oath.fromNullable(email), code: Oath.fromNullable(code) }),
-			)
-			.chain(({ email, code }) =>
-				userService
-					.getByEmail(email)
-					.rejectedMap(() => HttpError.NotFound("User not found"))
-					.chain(
-						Oath.ifElse(usr => usr.code === code, {
-							onFalse: () => HttpError.NotFound("User not found"),
-						}),
-					)
-					.chain(
-						Oath.ifElse(usr => !usr.emailConfirmed, {
-							onFalse: () => HttpError.Conflict("Subscription already on"),
-						}),
-					)
-					.chain(usr =>
-						userService
-							.update(usr.id, { emailConfirmed: true, code: undefined })
-							.rejectedMap(() => HttpError.NotFound("User not found")),
-					),
-			)
-			.fork(sendError(ctx), result => {
-				ctx.response.body = { success: true, result }
-			})
+		parseBody0<TRequestBody>(ctx, "object")
+			.and(validateBody0)
+			.and(extractCtx0(userService))
+			.and(validateCtx0)
+			.and(updateUser0(userService))
+			.fork(sendError(ctx), sendSuccess({ ctx }))
+
+// --- Internal ---
+
+type TRequestBody = Routes.ID.ConfirmEmail.RequestBody
+type TParams = { userService: UserService }
+type TFn = (params: TParams) => Middleware
+type TCtx = { user: User.PrivateUser; code: string }
+type TResult = Routes.ID.ConfirmEmail.Result
+
+type TValidateBodyFn = (body: TRequestBody) => Oath<Required<TRequestBody>, HttpError>
+const validateBody0: TValidateBodyFn = body =>
+	merge0({
+		email: fromNullable0(body.email)
+			.pipe(chain0(email => fromBoolean0(isEmail(email), body.email!)))
+			.pipe(rejectedMap0(toInvalidBodyError)),
+		code: fromBoolean0(isString(body.code), body.code!).pipe(rejectedMap0(toInvalidBodyError)),
+	})
+
+type TExtractCtxFn = (us: UserService) => (body: TRequestBody) => Oath<TCtx, HttpError>
+const extractCtx0: TExtractCtxFn = userService => body =>
+	merge0({
+		code: fromNullable0(body.code).pipe(rejectedMap0(toInvalidBodyError)),
+		user: fromNullable0(body.email)
+			.pipe(rejectedMap0(toInvalidBodyError))
+			.pipe(chain0(email => userService.getByEmail(email).pipe(rejectedMap0(toUserNotFoundError)))),
+	})
+
+type TCheckEmailIsNotConfirmedFn = (user: User.PrivateUser) => Oath<"OK", HttpError>
+const checkEmailIsNotConfirmed0: TCheckEmailIsNotConfirmedFn = user =>
+	fromBoolean0(user.emailConfirmed, OK).pipe(rejectedMap0(toEmailAlreadyConfirmedError))
+
+type TCheckCodeIsCorrectFn = (user: User.PrivateUser, code: string) => Oath<"OK", HttpError>
+const checkCodeIsCorrect0: TCheckCodeIsCorrectFn = (user, code) =>
+	fromBoolean0(user.code === code, OK).pipe(rejectedMap0(toUserNotFoundError))
+
+type TValidateCtxFn = (ctx: TCtx) => Oath<TCtx, HttpError>
+const validateCtx0: TValidateCtxFn = ctx =>
+	merge0([checkEmailIsNotConfirmed0(ctx.user), checkCodeIsCorrect0(ctx.user, ctx.code)]).pipe(
+		map0(() => ctx),
+	)
+
+type TUpdateUser0 = (us: UserService) => (ctx: TCtx) => Oath<TResult, HttpError>
+const updateUser0: TUpdateUser0 = userService => ctx =>
+	userService
+		.update(ctx.user.id, { emailConfirmed: true, code: undefined })
+		.pipe(bimap0(toUserNotFoundError, omit("code")))

@@ -17,14 +17,16 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import { BsCheck2, BsX } from "react-icons/bs"
 import { useEffect, useState } from "react"
+import isEmail from "validator/lib/isEmail"
+
+import { OrdoRoutes } from "@ordo-pink/ordo-routes"
+import { keysOf } from "@ordo-pink/tau"
+
+import { EmailInput, PasswordInput } from "./input"
 import { Button } from "./button"
 import { Callout } from "./callout"
-import { EmailInput, PasswordInput } from "./input"
-import { OrdoRoutes } from "@ordo-pink/ordo-routes"
-import { BsCheck2, BsX } from "react-icons/bs"
-import isEmail from "validator/lib/isEmail"
-import { keysOf } from "@ordo-pink/tau"
 
 type _P = { idHost: string; workspaceHost: string }
 
@@ -71,6 +73,7 @@ export default function SignUpForm({ idHost, workspaceHost }: _P) {
 								passwordLength: e.target.value.length >= 8 && e.target.value.length <= 50,
 								passwordCapital: /\p{L}/u.test(e.target.value),
 								passwordDigit: /\d/u.test(e.target.value),
+								// eslint-disable-next-line no-useless-escape
 								passwordSymbol: /[`!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~]/.test(e.target.value),
 							}))
 						}}
@@ -149,7 +152,7 @@ export default function SignUpForm({ idHost, workspaceHost }: _P) {
 					</span>
 					<span className="block">
 						Нажимая на кнопку <b>&quot;Присоединиться&quot;</b>, вы соглашаетесь с нашей{" "}
-						<a href={privacyPolicyURL} target="_blank">
+						<a href={privacyPolicyURL} target="_blank" rel="noreferrer">
 							политикой конфиденциальности
 						</a>
 						.
@@ -160,12 +163,12 @@ export default function SignUpForm({ idHost, workspaceHost }: _P) {
 			<div className="flex w-full flex-col">
 				<Button
 					disabled={isButtonDisabled}
-					onClick={async e => {
+					onClick={e => {
 						e.preventDefault()
 
 						if (isButtonDisabled) return
 
-						await fetch(`${idHost}/sign-up`, {
+						void fetch(`${idHost}/sign-up`, {
 							credentials: "include",
 							headers: { "content-type": "application/json" },
 							body: JSON.stringify({

@@ -17,10 +17,10 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import type { Unary } from "@ordo-pink/tau"
+import type { AUD, Algorithm, JTI, JWT, JWTPayload, SUB } from "@ordo-pink/wjwt"
 import type { Logger } from "@ordo-pink/logger"
 import type { Oath } from "@ordo-pink/oath"
-import { AUD, JTI, JWT, JWTPayload, SUB, Algorithm } from "@ordo-pink/wjwt"
+import type { Unary } from "@ordo-pink/tau"
 
 // --- Public ---
 

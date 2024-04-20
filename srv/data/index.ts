@@ -18,14 +18,15 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import chalk from "chalk"
-import { ContentPersistenceStrategyS3 } from "@ordo-pink/backend-persistence-strategy-content-s3"
+
+import { ConsoleLogger } from "@ordo-pink/logger"
 import { ContentPersistenceStrategyFS } from "@ordo-pink/backend-persistence-strategy-content-fs"
+import { ContentPersistenceStrategyS3 } from "@ordo-pink/backend-persistence-strategy-content-s3"
+import { DataCommands } from "@ordo-pink/data"
 import { DataPersistenceStrategyFS } from "@ordo-pink/backend-persistence-strategy-data-fs"
 import { DataPersistenceStrategyS3 } from "@ordo-pink/backend-persistence-strategy-data-s3"
-import { createDataServer } from "@ordo-pink/backend-server-data"
-import { ConsoleLogger } from "@ordo-pink/logger"
-import { DataCommands } from "@ordo-pink/data"
 import { Switch } from "@ordo-pink/switch"
+import { createDataServer } from "@ordo-pink/backend-server-data"
 
 const port = Bun.env.ORDO_DT_PORT!
 const idHost = Bun.env.ORDO_ID_HOST!

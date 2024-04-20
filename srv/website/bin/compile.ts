@@ -37,7 +37,7 @@ const {
 	"SUBS_HOST",
 ])
 
-runCommand0("npm run build --compile", {
+void runCommand0("npm run build --compile", {
 	cwd: "./srv/website",
 	stdin: "inherit",
 	stderr: "inherit",

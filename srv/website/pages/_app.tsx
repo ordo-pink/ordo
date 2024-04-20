@@ -17,12 +17,14 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import { AppProps } from "next/app"
 import { Jost } from "next/font/google"
 import type { Metadata } from "next"
+
 import "@ordo-pink/css/main.css"
 import "./index.css"
 import "../components/index-hero.css"
-import { AppProps } from "next/app"
+
 
 const jost = Jost({ preload: true, subsets: ["latin-ext"], fallback: ["system-ui"] })
 

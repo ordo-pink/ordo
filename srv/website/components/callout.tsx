@@ -18,15 +18,16 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import {
+	BsCheckCircle,
+	BsCircle,
+	BsExclamationCircle,
 	BsInfoCircle,
 	BsQuestionCircle,
 	BsXCircle,
-	BsExclamationCircle,
-	BsCheckCircle,
-	BsCircle,
 } from "react-icons/bs"
-import { Switch } from "@ordo-pink/switch"
 import { PropsWithChildren } from "react"
+
+import { Switch } from "@ordo-pink/switch"
 
 type Props = PropsWithChildren<{
 	type?: "info" | "warn" | "error" | "success" | "question"

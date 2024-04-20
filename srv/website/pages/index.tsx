@@ -17,15 +17,15 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import BetaInvitation from "components/beta-invitation.component"
-import { Centered } from "../components/centered"
-import IndexHeroSection from "../components/index-hero"
 import { BsArrowsMove, BsCode, BsLock, BsSafe } from "react-icons/bs"
-import Footer from "components/footer.component"
-import ScreenshotCarousel from "components/screenshot-carousel.component"
 import Head from "next/head"
 
-const webHost = process.env.NEXT_PUBLIC_ORDO_WEB_HOST!
+import BetaInvitation from "components/beta-invitation.component"
+import { Centered } from "../components/centered"
+import Footer from "components/footer.component"
+import IndexHeroSection from "../components/index-hero"
+import ScreenshotCarousel from "components/screenshot-carousel.component"
+
 const staticHost = process.env.NEXT_PUBLIC_ORDO_STATIC_HOST!
 
 export default function Home() {
@@ -85,8 +85,8 @@ export default function Home() {
 							<dl className="grid max-w-xl grid-cols-1 gap-x-8 gap-y-10 lg:max-w-none lg:grid-cols-2 lg:gap-y-16">
 								<div className="relative pl-16">
 									<dt className="text-base font-semibold leading-7">
-										<div className="absolute left-0 top-0 flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-b from-rose-700 to-pink-600 shadow-md">
-											<BsLock className="h-6 w-6 text-white" />
+										<div className="absolute left-0 top-0 flex size-10 items-center justify-center rounded-lg bg-gradient-to-b from-rose-700 to-pink-600 shadow-md">
+											<BsLock className="size-6 text-white" />
 										</div>
 										Шифрование на всех уровнях
 									</dt>
@@ -97,8 +97,8 @@ export default function Home() {
 								</div>
 								<div className="relative pl-16">
 									<dt className="text-base font-semibold leading-7">
-										<div className="absolute left-0 top-0 flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-b from-rose-700 to-pink-600 shadow-md">
-											<BsSafe className="h-6 w-6 text-white" />
+										<div className="absolute left-0 top-0 flex size-10 items-center justify-center rounded-lg bg-gradient-to-b from-rose-700 to-pink-600 shadow-md">
+											<BsSafe className="size-6 text-white" />
 										</div>
 										Ваши данные принадлежат только вам
 									</dt>
@@ -110,8 +110,8 @@ export default function Home() {
 								</div>
 								<div className="relative pl-16">
 									<dt className="text-base font-semibold leading-7">
-										<div className="absolute left-0 top-0 flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-b from-rose-700 to-pink-600 shadow-md">
-											<BsCode className="h-6 w-6 text-white" />
+										<div className="absolute left-0 top-0 flex size-10 items-center justify-center rounded-lg bg-gradient-to-b from-rose-700 to-pink-600 shadow-md">
+											<BsCode className="size-6 text-white" />
 										</div>
 										Открытый исходный код
 									</dt>
@@ -122,8 +122,8 @@ export default function Home() {
 								</div>
 								<div className="relative pl-16">
 									<dt className="text-base font-semibold leading-7">
-										<div className="absolute left-0 top-0 flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-b from-rose-700 to-pink-600 shadow-md">
-											<BsArrowsMove className="h-6 w-6 text-white" />
+										<div className="absolute left-0 top-0 flex size-10 items-center justify-center rounded-lg bg-gradient-to-b from-rose-700 to-pink-600 shadow-md">
+											<BsArrowsMove className="size-6 text-white" />
 										</div>
 										Расширяемость
 									</dt>

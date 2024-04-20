@@ -17,41 +17,65 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { TTokenService } from "@ordo-pink/backend-service-token"
-import { UserService } from "@ordo-pink/backend-service-user"
-import { sendError, authenticate0, parseBody0 } from "@ordo-pink/backend-utils"
-import { Oath } from "@ordo-pink/oath"
-import { HttpError } from "@ordo-pink/rrr"
-import { isString } from "@ordo-pink/tau"
-import { Middleware } from "koa"
+import { type Middleware } from "koa"
 
-type Body = Pick<User.PublicUser, "firstName" | "lastName">
-type Params = { tokenService: TTokenService; userService: UserService }
-type Fn = (params: Params) => Middleware
+import { type JWAT, type TTokenService } from "@ordo-pink/backend-service-token"
+import {
+	type Oath,
+	bimap0,
+	fromBoolean0,
+	fromNullable0,
+	merge0,
+	rejectedMap0,
+} from "@ordo-pink/oath"
+import { authenticate0, parseBody0, sendError, sendSuccess } from "@ordo-pink/backend-utils"
+import { isString, omit } from "@ordo-pink/tau"
+import { type HttpError } from "@ordo-pink/rrr"
+import { type UserService } from "@ordo-pink/backend-service-user"
 
-export const handleChangeAccountInfo: Fn =
+import { toInvalidBodyError, toUserNotFoundError } from "../fns/to-error"
+
+export const handleChangeAccountInfo: TFn =
 	({ tokenService, userService }) =>
 	ctx =>
-		Oath.all({
-			body: parseBody0<Body>(ctx).chain(({ firstName, lastName }) =>
-				Oath.fromBoolean(
-					() => isString(firstName) || isString(lastName),
-					() => ({ firstName, lastName }),
-					() => HttpError.BadRequest("Invalid body"),
-				),
-			),
-			authorization: authenticate0(ctx, tokenService),
+		merge0({
+			body: parseBody0<TRequestBody>(ctx),
+			token: authenticate0(ctx, tokenService),
 		})
-			.chain(({ body, authorization }) =>
-				userService
-					.getById(authorization.payload.sub)
-					.rejectedMap(() => HttpError.NotFound("User not found"))
-					.chain(user =>
-						userService
-							.update(user.id, { firstName: body.firstName, lastName: body.lastName })
-							.rejectedMap(() => HttpError.NotFound("User not found")),
-					),
-			)
-			.fork(sendError(ctx), result => {
-				ctx.response.body = { success: true, result }
-			})
+			.and(extractCtx0(userService))
+			.and(validateCtx0)
+			.and(updateUserInfo0(userService))
+			.fork(sendError(ctx), sendSuccess({ ctx }))
+
+// --- Internal ---
+
+type TParams = { tokenService: TTokenService; userService: UserService }
+type TFn = (params: TParams) => Middleware
+type TRequestBody = Routes.ID.ChangeAccountInfo.RequestBody
+type TRequest = { token: JWAT; body: TRequestBody }
+type TCtx = { user: User.User; firstName: string; lastName: string }
+type TResult = Routes.ID.ChangeAccountInfo.Result
+
+type TExtractCtxFn = (us: UserService) => (p: TRequest) => Oath<TCtx, HttpError>
+const extractCtx0: TExtractCtxFn =
+	userService =>
+	({ body: { firstName, lastName }, token }) =>
+		merge0({
+			user: userService.getById(token.payload.sub).pipe(rejectedMap0(toUserNotFoundError)),
+			firstName: fromNullable0(firstName).pipe(rejectedMap0(toInvalidBodyError)),
+			lastName: fromNullable0(lastName).pipe(rejectedMap0(toInvalidBodyError)),
+		})
+
+type TValidateCtxFn = (ctx: TCtx) => Oath<TCtx, HttpError>
+const validateCtx0: TValidateCtxFn = ctx =>
+	fromBoolean0(isString(ctx.firstName) && isString(ctx.lastName), ctx).pipe(
+		rejectedMap0(toInvalidBodyError),
+	)
+
+type TUpdateUserInfoFn = (us: UserService) => (ctx: TCtx) => Oath<TResult, HttpError>
+const updateUserInfo0: TUpdateUserInfoFn =
+	userService =>
+	({ firstName, lastName, user }) =>
+		userService
+			.update(user.id, { firstName: firstName, lastName: lastName })
+			.pipe(bimap0(toUserNotFoundError, omit("code")))

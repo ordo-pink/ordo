@@ -18,6 +18,7 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { OrdoRoutes } from "@ordo-pink/ordo-routes"
+
 import { Button } from "./button"
 
 type P = { wide?: boolean }
@@ -53,7 +54,7 @@ export default function BetaInvitation({ wide }: P) {
 						}
 					>
 						<Button
-							onClick={async e => {
+							onClick={e => {
 								e.preventDefault()
 
 								window.location.href = signUpURL
@@ -64,7 +65,7 @@ export default function BetaInvitation({ wide }: P) {
 
 						<Button
 							inverted
-							onClick={async e => {
+							onClick={e => {
 								e.preventDefault()
 
 								window.location.href = signInURL

@@ -1,47 +1,10 @@
 // SPDX-FileCopyrightText: Copyright 2024, 谢尔盖||↓ and the Ordo.pink contributors
-// SPDX-License-Identifier: AGPL-3.0-only
+// SPDX-License-Identifier: Unlicense
 
-// Ordo.pink is an all-in-one team workspace.
-// Copyright (C) 2024  谢尔盖||↓ and the Ordo.pink contributors
-
-// This program is free software: you can redistribute it and/or modify
-// it under the terms of the GNU Affero General Public License as published
-// by the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-
-// This program is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU Affero General Public License for more details.
-
-// You should have received a copy of the GNU Affero General Public License
-// along with this program.  If not, see <https://www.gnu.org/licenses/>.
-
-export const oathify =
-	<Args extends any[], Result extends Promise<any>>(f: (...args: Args) => Result) =>
-	(...args: Args) =>
-		Oath.try(() => f(...args))
-
-export type UnderOath<T> = T extends object & {
-	and(onfulfilled: infer F, ...args: infer _): any
-}
-	? F extends (value: infer V, ...args: infer _) => any
-		? UnderOath<V>
-		: never
-	: Awaited<T>
+import { type UnderOath } from "./types"
+import { fromPromise0 } from "../constructors/from-promise"
 
 export class Oath<Resolve, Reject = never> {
-	public static of<Resolve, Reject = never>(
-		value: Resolve,
-		abortController = new AbortController(),
-	): Oath<Resolve, Reject> {
-		return new Oath(resolve => resolve(value), abortController)
-	}
-
-	public static empty<Reject = never>(abortController = new AbortController()): Oath<void, Reject> {
-		return new Oath(resolve => resolve(undefined), abortController)
-	}
-
 	public static resolve<Resolve, Reject = never>(
 		value: Resolve,
 		abortController = new AbortController(),
@@ -50,12 +13,157 @@ export class Oath<Resolve, Reject = never> {
 	}
 
 	public static reject<Reject, Resolve = never>(
-		error?: Reject,
+		err?: Reject,
 		abortController = new AbortController(),
 	): Oath<Resolve, Reject> {
-		return new Oath((_, reject) => reject(error), abortController)
+		return new Oath((_, reject) => reject(err), abortController)
 	}
 
+	_abortController: AbortController
+
+	_resolver: (
+		resolve: <NewResolve>(value: Resolve) => NewResolve,
+		reject: <NewReject>(err?: Reject) => NewReject,
+	) => any
+
+	public constructor(
+		resolver: (
+			resolve: <NewResolve>(value: Resolve) => NewResolve,
+			reject: <NewReject>(err?: Reject) => NewReject,
+		) => any,
+		abortController = new AbortController(),
+	) {
+		this._resolver = resolver
+		this._abortController = abortController
+	}
+
+	public get isOath() {
+		return true
+	}
+
+	public get isCancelled() {
+		return this._abortController.signal.aborted
+	}
+
+	public get cancellationReason(): string | null {
+		return this.isCancelled ? this._abortController.signal.reason : null
+	}
+
+	public cancel(reason = "Cancelled") {
+		this._abortController.abort(reason)
+	}
+
+	public pipe<NewResolve, NewReject>(
+		operator: (o: Oath<Resolve, Reject>) => Oath<NewResolve, NewReject>,
+	): Oath<NewResolve, NewReject> {
+		return operator(this)
+	}
+
+	public and<NewResolve, NewReject>(
+		onResolved: (x: Resolve) => PromiseLike<NewResolve> | Oath<NewResolve, NewReject> | NewResolve,
+	): Oath<NewResolve, NewReject extends unknown ? Reject : Reject | NewReject> {
+		return new Oath(
+			// eslint-disable-next-line @typescript-eslint/no-misused-promises
+			(resolve, reject) =>
+				this.fork(
+					a => (this.isCancelled ? reject(this.cancellationReason as any) : reject(a as any)),
+					b => {
+						if (this.isCancelled) {
+							return reject(this.cancellationReason as any)
+						}
+
+						try {
+							const forked: any = onResolved(b)
+
+							if (!forked) return resolve(forked)
+							if (forked.isOath) return forked.fork(reject, resolve)
+							if (forked.then) return fromPromise0(() => forked).fork(reject as any, resolve as any)
+							return resolve(forked)
+						} catch (e) {
+							reject(e instanceof Error ? e : (new Error(String(e)) as any))
+						}
+					},
+				),
+			this._abortController,
+		)
+	}
+
+	public fix<NewResolve, NewReject = never>(
+		onRejected: (x: Reject) => PromiseLike<NewResolve> | Oath<NewResolve, NewReject> | NewResolve,
+	): Oath<Resolve | NewResolve, NewReject> {
+		return new Oath(
+			// eslint-disable-next-line @typescript-eslint/no-misused-promises
+			(resolve, reject) =>
+				this.fork(
+					a => {
+						if (this.isCancelled) {
+							return reject(this.cancellationReason as any)
+						}
+
+						try {
+							const forked: any = onRejected(a)
+
+							if (!forked) return resolve(forked)
+							if (forked.isOath) return forked.fork(reject, resolve)
+							if (forked.then) return fromPromise0(() => forked)
+							return resolve(forked)
+						} catch (e) {
+							reject(e instanceof Error ? e : (new Error(String(e)) as any))
+						}
+					},
+					b => resolve(b),
+				),
+			this._abortController,
+		)
+	}
+
+	public invoke<NewResolve>(invoker: (o: Oath<Resolve, Reject>) => Promise<NewResolve>) {
+		return invoker(this)
+	}
+
+	public fork<NewResolve, NewReject>(
+		onRejected: (error: Reject) => NewReject,
+		onResolved: (value: Resolve) => NewResolve,
+	): Promise<NewResolve | NewReject> {
+		return new Promise<NewResolve>((resolve, reject) => {
+			this.isCancelled
+				? reject(this.cancellationReason)
+				: this._resolver(resolve as any, reject as any)
+		}).then((x: any) => onResolved(x), onRejected) as any
+	}
+
+	/**
+	 * @deprecated The number of Oath methods and static methods will be reduced in v1.0.0. Make sure
+	 * you migrate to using operators via `oath.pipe`, invokers via `oath.invoke` and constructors like
+	 * `try0`, `merge0` (same as current `Oath.all`), `fromPromise0` (same as current `Oath.from`),
+	 * `fromNullable0`, etc.
+	 * @see readme.md
+	 */
+	public static of<Resolve, Reject = never>(
+		value: Resolve,
+		abortController = new AbortController(),
+	): Oath<Resolve, Reject> {
+		return new Oath(resolve => resolve(value), abortController)
+	}
+
+	/**
+	 * @deprecated The number of Oath methods and static methods will be reduced in v1.0.0. Make sure
+	 * you migrate to using operators via `oath.pipe`, invokers via `oath.invoke` and constructors like
+	 * `try0`, `merge0` (same as current `Oath.all`), `fromPromise0` (same as current `Oath.from`),
+	 * `fromNullable0`, etc.
+	 * @see readme.md
+	 */
+	public static empty<Reject = never>(abortController = new AbortController()): Oath<void, Reject> {
+		return new Oath(resolve => resolve(undefined), abortController)
+	}
+
+	/**
+	 * @deprecated The number of Oath methods and static methods will be reduced in v1.0.0. Make sure
+	 * you migrate to using operators via `oath.pipe`, invokers via `oath.invoke` and constructors like
+	 * `try0`, `merge0` (same as current `Oath.all`), `fromPromise0` (same as current `Oath.from`),
+	 * `fromNullable0`, etc.
+	 * @see readme.md
+	 */
 	public static from<Resolve, Reject = never>(
 		thunk: () => Promise<Resolve>,
 		abortController = new AbortController(),
@@ -63,6 +171,13 @@ export class Oath<Resolve, Reject = never> {
 		return new Oath((resolve, reject) => thunk().then(resolve, reject), abortController)
 	}
 
+	/**
+	 * @deprecated The number of Oath methods and static methods will be reduced in v1.0.0. Make sure
+	 * you migrate to using operators via `oath.pipe`, invokers via `oath.invoke` and constructors like
+	 * `try0`, `merge0` (same as current `Oath.all`), `fromPromise0` (same as current `Oath.from`),
+	 * `fromNullable0`, etc.
+	 * @see readme.md
+	 */
 	public static fromNullable<Resolve>(
 		value?: Resolve | null,
 		abortController = new AbortController(),
@@ -70,6 +185,13 @@ export class Oath<Resolve, Reject = never> {
 		return value == null ? Oath.reject(null, abortController) : Oath.resolve(value, abortController)
 	}
 
+	/**
+	 * @deprecated The number of Oath methods and static methods will be reduced in v1.0.0. Make sure
+	 * you migrate to using operators via `oath.pipe`, invokers via `oath.invoke` and constructors like
+	 * `try0`, `merge0` (same as current `Oath.all`), `fromPromise0` (same as current `Oath.from`),
+	 * `fromNullable0`, etc.
+	 * @see readme.md
+	 */
 	public static fromBoolean<Resolve, Reject = null>(
 		f: () => boolean,
 		onTrue: () => Resolve,
@@ -79,6 +201,13 @@ export class Oath<Resolve, Reject = never> {
 		return f() ? Oath.resolve(onTrue(), abortController) : Oath.reject(onFalse(), abortController)
 	}
 
+	/**
+	 * @deprecated The number of Oath methods and static methods will be reduced in v1.0.0. Make sure
+	 * you migrate to using operators via `oath.pipe`, invokers via `oath.invoke` and constructors like
+	 * `try0`, `merge0` (same as current `Oath.all`), `fromPromise0` (same as current `Oath.from`),
+	 * `fromNullable0`, etc.
+	 * @see readme.md
+	 */
 	public static ifElse<Resolve, OnTrue = Resolve, OnFalse = Resolve>(
 		validate: (x: Resolve) => boolean,
 		{
@@ -96,12 +225,20 @@ export class Oath<Resolve, Reject = never> {
 				: Oath.reject(onFalse(x), abortController)
 	}
 
+	/**
+	 * @deprecated The number of Oath methods and static methods will be reduced in v1.0.0. Make sure
+	 * you migrate to using operators via `oath.pipe`, invokers via `oath.invoke` and constructors like
+	 * `try0`, `merge0` (same as current `Oath.all`), `fromPromise0` (same as current `Oath.from`),
+	 * `fromNullable0`, etc.
+	 * @see readme.md
+	 */
 	public static try<Resolve, Reject = Error>(
 		f: () => Resolve,
 		abortController = new AbortController(),
 	): Oath<Awaited<Resolve>, Reject> {
 		return new Oath(async (resolve, reject) => {
 			try {
+				// eslint-disable-next-line @typescript-eslint/await-thenable
 				resolve(await f())
 			} catch (e) {
 				reject(e instanceof Error ? e : (new Error(String(e)) as any))
@@ -109,6 +246,13 @@ export class Oath<Resolve, Reject = never> {
 		}, abortController)
 	}
 
+	/**
+	 * @deprecated The number of Oath methods and static methods will be reduced in v1.0.0. Make sure
+	 * you migrate to using operators via `oath.pipe`, invokers via `oath.invoke` and constructors like
+	 * `try0`, `merge0` (same as current `Oath.all`), `fromPromise0` (same as current `Oath.from`),
+	 * `fromNullable0`, etc.
+	 * @see readme.md
+	 */
 	public static all<TSomeThings extends readonly unknown[] | [] | Record<string, unknown>>(
 		values: TSomeThings,
 		abortController = new AbortController(),
@@ -175,7 +319,7 @@ export class Oath<Resolve, Reject = never> {
 				if (!keys.length) return outerResolve({})
 
 				keys.forEach(key => {
-					const value = (values as any)[key] as any
+					const value = (values as any)[key]
 
 					if (value && value.isOath) {
 						value.fork(
@@ -221,40 +365,13 @@ export class Oath<Resolve, Reject = never> {
 		}
 	}
 
-	#abortController: AbortController
-
-	#resolver: (
-		resolve: <NewResolve>(value: Resolve) => NewResolve,
-		reject: <NewReject>(err?: Reject) => NewReject,
-	) => void
-
-	protected constructor(
-		resolver: (
-			resolve: <NewResolve>(value: Resolve) => NewResolve,
-			reject: <NewReject>(err?: Reject) => NewReject,
-		) => void,
-		abortController = new AbortController(),
-	) {
-		this.#resolver = resolver
-		this.#abortController = abortController
-	}
-
-	public get isOath() {
-		return true
-	}
-
-	public get isCancelled() {
-		return this.#abortController.signal.aborted
-	}
-
-	public get cancellationReason(): string | null {
-		return this.isCancelled ? this.#abortController.signal.reason : null
-	}
-
-	public cancel(reason = "Cancelled") {
-		this.#abortController.abort(reason)
-	}
-
+	/**
+	 * @deprecated The number of Oath methods and static methods will be reduced in v1.0.0. Make sure
+	 * you migrate to using operators via `oath.pipe`, invokers via `oath.invoke` and constructors like
+	 * `try0`, `merge0` (same as current `Oath.all`), `fromPromise0` (same as current `Oath.from`),
+	 * `fromNullable0`, etc.
+	 * @see readme.md
+	 */
 	public swap(): Oath<Reject, Resolve> {
 		return new Oath<Reject, Resolve>(
 			(resolve, reject) =>
@@ -262,10 +379,17 @@ export class Oath<Resolve, Reject = never> {
 					a => (this.isCancelled ? reject(this.cancellationReason as any) : resolve(a)),
 					b => reject(b),
 				),
-			this.#abortController,
+			this._abortController,
 		)
 	}
 
+	/**
+	 * @deprecated The number of Oath methods and static methods will be reduced in v1.0.0. Make sure
+	 * you migrate to using operators via `oath.pipe`, invokers via `oath.invoke` and constructors like
+	 * `try0`, `merge0` (same as current `Oath.all`), `fromPromise0` (same as current `Oath.from`),
+	 * `fromNullable0`, etc.
+	 * @see readme.md
+	 */
 	public tap(
 		onResolved: (x: Resolve) => any,
 		onRejected: (x: Reject) => any = () => void 0,
@@ -290,10 +414,17 @@ export class Oath<Resolve, Reject = never> {
 						return resolve(b)
 					},
 				),
-			this.#abortController,
+			this._abortController,
 		)
 	}
 
+	/**
+	 * @deprecated The number of Oath methods and static methods will be reduced in v1.0.0. Make sure
+	 * you migrate to using operators via `oath.pipe`, invokers via `oath.invoke` and constructors like
+	 * `try0`, `merge0` (same as current `Oath.all`), `fromPromise0` (same as current `Oath.from`),
+	 * `fromNullable0`, etc.
+	 * @see readme.md
+	 */
 	public bitap(
 		onRejected: (x: Reject) => any,
 		onResolved: (x: Resolve) => any,
@@ -314,10 +445,17 @@ export class Oath<Resolve, Reject = never> {
 						return resolve(b)
 					},
 				),
-			this.#abortController,
+			this._abortController,
 		)
 	}
 
+	/**
+	 * @deprecated The number of Oath methods and static methods will be reduced in v1.0.0. Make sure
+	 * you migrate to using operators via `oath.pipe`, invokers via `oath.invoke` and constructors like
+	 * `try0`, `merge0` (same as current `Oath.all`), `fromPromise0` (same as current `Oath.from`),
+	 * `fromNullable0`, etc.
+	 * @see readme.md
+	 */
 	public map<NewResolve>(f: (x: Resolve) => NewResolve): Oath<NewResolve, Reject> {
 		return new Oath<NewResolve, Reject>(
 			(resolve, reject) =>
@@ -325,10 +463,17 @@ export class Oath<Resolve, Reject = never> {
 					a => (this.isCancelled ? reject(this.cancellationReason as any) : reject(a)),
 					b => (this.isCancelled ? reject(this.cancellationReason as any) : resolve(f(b))),
 				),
-			this.#abortController,
+			this._abortController,
 		)
 	}
 
+	/**
+	 * @deprecated The number of Oath methods and static methods will be reduced in v1.0.0. Make sure
+	 * you migrate to using operators via `oath.pipe`, invokers via `oath.invoke` and constructors like
+	 * `try0`, `merge0` (same as current `Oath.all`), `fromPromise0` (same as current `Oath.from`),
+	 * `fromNullable0`, etc.
+	 * @see readme.md
+	 */
 	public rejectedMap<NewReject>(f: (x: Reject) => NewReject): Oath<Resolve, NewReject> {
 		return new Oath<Resolve, NewReject>(
 			(resolve, reject) =>
@@ -336,10 +481,17 @@ export class Oath<Resolve, Reject = never> {
 					a => (this.isCancelled ? reject(this.cancellationReason as any) : reject(f(a))),
 					b => (this.isCancelled ? reject(this.cancellationReason as any) : resolve(b)),
 				),
-			this.#abortController,
+			this._abortController,
 		)
 	}
 
+	/**
+	 * @deprecated The number of Oath methods and static methods will be reduced in v1.0.0. Make sure
+	 * you migrate to using operators via `oath.pipe`, invokers via `oath.invoke` and constructors like
+	 * `try0`, `merge0` (same as current `Oath.all`), `fromPromise0` (same as current `Oath.from`),
+	 * `fromNullable0`, etc.
+	 * @see readme.md
+	 */
 	public bimap<NewResolve, NewReject>(
 		f: (x: Reject) => NewReject,
 		g: (x: Resolve) => NewResolve,
@@ -350,10 +502,17 @@ export class Oath<Resolve, Reject = never> {
 					a => (this.isCancelled ? reject(this.cancellationReason as any) : reject(f(a))),
 					b => (this.isCancelled ? reject(this.cancellationReason as any) : resolve(g(b))),
 				),
-			this.#abortController,
+			this._abortController,
 		)
 	}
 
+	/**
+	 * @deprecated The number of Oath methods and static methods will be reduced in v1.0.0. Make sure
+	 * you migrate to using operators via `oath.pipe`, invokers via `oath.invoke` and constructors like
+	 * `try0`, `merge0` (same as current `Oath.all`), `fromPromise0` (same as current `Oath.from`),
+	 * `fromNullable0`, etc.
+	 * @see readme.md
+	 */
 	public chain<NewResolve, NewReject>(
 		f: (x: Resolve) => Oath<NewResolve, NewReject>,
 	): Oath<NewResolve, Reject | NewReject> {
@@ -364,10 +523,17 @@ export class Oath<Resolve, Reject = never> {
 					b =>
 						this.isCancelled ? reject(this.cancellationReason as any) : f(b).fork(reject, resolve),
 				),
-			this.#abortController,
+			this._abortController,
 		)
 	}
 
+	/**
+	 * @deprecated The number of Oath methods and static methods will be reduced in v1.0.0. Make sure
+	 * you migrate to using operators via `oath.pipe`, invokers via `oath.invoke` and constructors like
+	 * `try0`, `merge0` (same as current `Oath.all`), `fromPromise0` (same as current `Oath.from`),
+	 * `fromNullable0`, etc.
+	 * @see readme.md
+	 */
 	public rejectedChain<NewReject>(
 		f: (x: Reject) => Oath<Resolve, NewReject>,
 	): Oath<Resolve, NewReject> {
@@ -378,105 +544,59 @@ export class Oath<Resolve, Reject = never> {
 						this.isCancelled ? reject(this.cancellationReason as any) : f(a).fork(reject, resolve),
 					b => (this.isCancelled ? this : resolve(b)),
 				),
-			this.#abortController,
+			this._abortController,
 		)
 	}
 
-	public and<NewResolve, NewReject>(
-		f: (x: Resolve) => PromiseLike<NewResolve> | Oath<NewResolve, NewReject> | NewResolve,
-	): Oath<NewResolve, Reject | NewReject> {
-		return new Oath(
-			(resolve, reject) =>
-				this.fork(
-					a => (this.isCancelled ? reject(this.cancellationReason as any) : reject(a)),
-					b => {
-						if (this.isCancelled) {
-							return reject(this.cancellationReason as any)
-						}
-
-						try {
-							const forked: any = f(b)
-
-							if (!forked) return resolve(forked)
-							if (forked.isOath) return forked.fork(reject, resolve) as any
-							if (forked.then) return Oath.from(() => forked).fork(reject as any, resolve as any)
-							return resolve(forked)
-						} catch (e) {
-							reject(e instanceof Error ? e : (new Error(String(e)) as any))
-						}
-					},
-				),
-			this.#abortController,
-		)
-	}
-
-	public fix<NewResolve, NewReject = never>(
-		f: (x: Reject) => PromiseLike<NewResolve> | Oath<NewResolve, NewReject> | NewResolve,
-	): Oath<Resolve | NewResolve, NewReject> {
-		return new Oath(
-			(resolve, reject) =>
-				this.fork(
-					a => {
-						if (this.isCancelled) {
-							return reject(this.cancellationReason as any)
-						}
-
-						try {
-							const forked: any = f(a)
-
-							if (!forked) return resolve(forked)
-							if (forked.isOath) return forked.fork(reject, resolve)
-							if (forked.then) return Oath.from(() => forked)
-							return resolve(forked)
-						} catch (e) {
-							reject(e instanceof Error ? e : (new Error(String(e)) as any))
-						}
-					},
-					b => resolve(b),
-				),
-			this.#abortController,
-		)
-	}
-
-	public async fork<NewResolve, NewReject>(
-		onRejected: (error: Reject) => NewReject,
-		onResolved: (value: Resolve) => NewResolve,
-	): Promise<NewResolve | NewReject> {
-		return new Promise<NewResolve>((resolve, reject) => {
-			this.isCancelled
-				? reject(this.cancellationReason)
-				: this.#resolver(resolve as any, reject as any)
-		}).then((x: any) => onResolved(x), onRejected) as any
-	}
-
+	/**
+	 * @deprecated The number of Oath methods and static methods will be reduced in v1.0.0. Make sure
+	 * you migrate to using operators via `oath.pipe`, invokers via `oath.invoke` and constructors like
+	 * `try0`, `merge0` (same as current `Oath.all`), `fromPromise0` (same as current `Oath.from`),
+	 * `fromNullable0`, etc.
+	 * @see readme.md
+	 */
 	public async toPromise() {
 		return new Promise<Resolve>((resolve, reject) => {
 			this.isCancelled
 				? reject(this.cancellationReason)
-				: this.#resolver(resolve as any, reject as any)
+				: this._resolver(resolve as any, reject as any)
 		})
 	}
 
+	/**
+	 * @deprecated The number of Oath methods and static methods will be reduced in v1.0.0. Make sure
+	 * you migrate to using operators via `oath.pipe`, invokers via `oath.invoke` and constructors like
+	 * `try0`, `merge0` (same as current `Oath.all`), `fromPromise0` (same as current `Oath.from`),
+	 * `fromNullable0`, etc.
+	 * @see readme.md
+	 */
 	public async orElse<NewReject>(onRejected: (error: Reject) => NewReject) {
 		return new Promise<Resolve>((resolve, reject) =>
 			this.isCancelled
 				? reject(this.cancellationReason)
-				: this.#resolver(resolve as any, reject as any),
+				: this._resolver(resolve as any, reject as any),
 		).catch(onRejected)
 	}
 
+	/**
+	 * @deprecated The number of Oath methods and static methods will be reduced in v1.0.0. Make sure
+	 * you migrate to using operators via `oath.pipe`, invokers via `oath.invoke` and constructors like
+	 * `try0`, `merge0` (same as current `Oath.all`), `fromPromise0` (same as current `Oath.from`),
+	 * `fromNullable0`, etc.
+	 * @see readme.md
+	 */
 	public async orNothing() {
 		return new Promise<Resolve>((resolve, reject) => {
 			const handleAbort = () => {
-				this.#abortController.signal.removeEventListener("abort", handleAbort)
+				this._abortController.signal.removeEventListener("abort", handleAbort)
 				reject(this.cancellationReason)
 			}
 
-			this.#abortController.signal.addEventListener("abort", handleAbort)
+			this._abortController.signal.addEventListener("abort", handleAbort)
 
 			this.isCancelled
 				? reject(this.cancellationReason)
-				: this.#resolver(resolve as any, reject as any)
+				: this._resolver(resolve as any, reject as any)
 		}).catch(() => void 0)
 	}
 }

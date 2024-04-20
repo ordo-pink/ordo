@@ -2,6 +2,8 @@
 // SPDX-License-Identifier: Unlicense
 
 import { camel, pascal, title } from "case"
+
+import { Binary, Curry, Ternary, Thunk, Unary, noop } from "@ordo-pink/tau"
 import {
 	License,
 	createProgress,
@@ -9,10 +11,9 @@ import {
 	getLicense,
 	getSPDXRecord,
 } from "@ordo-pink/binutil"
-import { Binary, Curry, Ternary, Thunk, Unary, noop } from "@ordo-pink/tau"
-import { isReservedJavaScriptKeyword } from "@ordo-pink/rkwjs"
-import { directoryExists0 } from "@ordo-pink/fs"
 import { Oath } from "@ordo-pink/oath"
+import { directoryExists0 } from "@ordo-pink/fs"
+import { isReservedJavaScriptKeyword } from "@ordo-pink/rkwjs"
 
 // --- Public ---
 

@@ -17,8 +17,13 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { EmailStrategy, EmailTemplate } from "@ordo-pink/backend-service-offline-notifications"
-import { Either } from "@ordo-pink/either"
+import {
+	RusenderEmailSubject,
+	RusenderTemplateId,
+} from "./backend-email-strategy-rusender.constants"
+import { type TEmailStrategyRusenderStatic } from "./backend-email-strategy-rusender.types"
+import { sendAsync } from "./methods/send-async"
+import { sendTemplateAsync } from "./methods/send-template-async"
 
 /**
  * `RusenderEmailStrategy` implements `EmailStrategy` for sending emails using Rusender. To create
@@ -29,48 +34,135 @@ import { Either } from "@ordo-pink/either"
  * @warning This strategy is recommended for use in "ru" region only.
  *
  * @example
- * const emailStrategy = RusenderEmailStrategy.of("YOUR_RUSENDER_API_KEY")
+ * const emailStrategy = RusenderEmailStrategy.of({ key: "YOUR_RUSENDER_API_KEY" })
+ * emailStrategy.send(message)
+ *
+ * TODO: #272 Support for `sendSync` that awaits the result.
+ * TODO: #273 Support for receiving `sendAsync` result and propagating it to an optional listener.
+ * TODO: #274 Drop using templates and provide markup directly.
+ * TODO: #275 Update OfflineNotificationsService types to avoid type collisions.
  */
-export const RusenderEmailStrategy = {
-	/**
-	 * `RusenderEmailStrategy` factory.
-	 */
-	of: (apiKey: string): EmailStrategy => ({
-		send: message => {
-			let isTemplateEmail = false
+export const EmailStrategyRusender: TEmailStrategyRusenderStatic = {
+	create: params => {
+		const sendTemplate = sendTemplateAsync(params)
 
-			const mail = Either.fromNullable((message as EmailTemplate).templateId)
-				.map(id => {
-					isTemplateEmail = true
-
-					return {
-						from: message.from,
-						to: message.to,
-						subject: message.subject,
-						cc: message.cc,
-						bcc: message.bcc,
-						headers: message.headers,
-						params: (message as EmailTemplate).params,
-						idTemplateMailUser: id,
-					}
-				})
-				.fold(
-					() => message,
-					result => result,
-				)
-
-			void fetch(isTemplateEmail ? templateUrl : url, {
-				method,
-				headers: getHeaders(apiKey),
-				body: JSON.stringify({ mail }),
-			})
-		},
-	}),
+		return {
+			sendAsync: sendAsync(params),
+			sendChangeEmailEmail: ({
+				telegramChannel,
+				from,
+				to,
+				supportEmail,
+				supportTelegram,
+				newEmail,
+				oldEmail,
+				confirmationUrl,
+			}) =>
+				sendTemplate({
+					from,
+					to,
+					subject: RusenderEmailSubject.sendChangeEmailEmail,
+					idTemplateMailUser: RusenderTemplateId.sendChangeEmailEmail,
+					params: {
+						telegramChannel,
+						newEmail,
+						oldEmail,
+						supportEmail,
+						supportTelegram,
+						confirmationUrl,
+					},
+				}),
+			sendEmailChangeRequestedEmail: ({
+				telegramChannel,
+				from,
+				to,
+				supportEmail,
+				supportTelegram,
+				newEmail,
+			}) =>
+				sendTemplate({
+					from,
+					to,
+					subject: RusenderEmailSubject.sendEmailChangeRequestedEmail,
+					idTemplateMailUser: RusenderTemplateId.sendEmailChangeRequestedEmail,
+					params: { telegramChannel, newEmail, supportEmail, supportTelegram },
+				}),
+			sendPasswordChangedEmail: ({
+				telegramChannel,
+				from,
+				to,
+				supportEmail,
+				supportTelegram,
+				resetPasswordUrl,
+			}) =>
+				sendTemplate({
+					from,
+					to,
+					subject: RusenderEmailSubject.sendPasswordChangedEmail,
+					idTemplateMailUser: RusenderTemplateId.sendPasswordChangedEmail,
+					params: { telegramChannel, supportEmail, supportTelegram, resetPasswordUrl },
+				}),
+			sendRecoverPasswordEmail: ({
+				telegramChannel,
+				from,
+				to,
+				supportEmail,
+				supportTelegram,
+				passwordRecoveryUrl,
+			}) =>
+				sendTemplate({
+					from,
+					to,
+					subject: RusenderEmailSubject.sendRecoverPasswordEmail,
+					idTemplateMailUser: RusenderTemplateId.sendRecoverPasswordEmail,
+					params: { telegramChannel, supportEmail, supportTelegram, passwordRecoveryUrl },
+				}),
+			sendConfirmationEmail: ({
+				telegramChannel,
+				from,
+				to,
+				supportEmail,
+				supportTelegram,
+				confirmationUrl,
+			}) =>
+				sendTemplate({
+					from,
+					to,
+					subject: RusenderEmailSubject.sendConfirmationEmail,
+					idTemplateMailUser: RusenderTemplateId.sendConfirmationEmail,
+					params: { telegramChannel, supportEmail, supportTelegram, confirmationUrl },
+				}),
+			sendSignUpEmail: ({
+				telegramChannel,
+				from,
+				to,
+				supportEmail,
+				supportTelegram,
+				confirmationUrl,
+			}) =>
+				sendTemplate({
+					from,
+					to,
+					subject: RusenderEmailSubject.sendSignUpEmail,
+					idTemplateMailUser: RusenderTemplateId.sendSignUpEmail,
+					params: { telegramChannel, confirmationUrl, supportEmail, supportTelegram },
+				}),
+			sendSignInEmail: ({
+				telegramChannel,
+				from,
+				to,
+				ip,
+				supportEmail,
+				supportTelegram,
+				resetPasswordUrl,
+			}) =>
+				sendTemplate({
+					from,
+					to,
+					subject: RusenderEmailSubject.sendSignInEmail,
+					idTemplateMailUser: RusenderTemplateId.sendSignInEmail,
+					params: { telegramChannel, ip, resetPasswordUrl, supportEmail, supportTelegram },
+				}),
+		}
+	},
 }
-
-// --- Internal ---
-
-const templateUrl = "https://api.beta.rusender.ru/api/v1/external-mails/send-by-template"
-const url = "https://api.beta.rusender.ru/api/v1/external-mails/send"
-const method = "POST"
-const getHeaders = (key: string) => ({ "X-Api-Key": key, "Content-Type": "application/json" })

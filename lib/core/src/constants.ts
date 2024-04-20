@@ -17,8 +17,10 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-// TODO: Move extension state to /var/${extension}
+// TODO: Remove
 export const EXTENSION_FILE_PREFIX = ".ext_"
+
+export const OK = "OK" as const
 
 export const ACTIVITY_BAR_WIDTH = 48
 export const SIDEBAR_WORKSPACE_GUTTER_WIDTH = 10

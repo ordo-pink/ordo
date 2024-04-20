@@ -17,17 +17,19 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import Application from "koa"
+import Router from "@koa/router"
+import bodyparser from "koa-bodyparser"
+import cors from "koa-cors"
+import { identity } from "ramda"
+
+import { ConsoleLogger, Logger } from "@ordo-pink/logger"
+import { Either } from "@ordo-pink/either/mod"
 import { Unary } from "@ordo-pink/tau"
+
+import { handleError } from "./use-error"
 import { logRequest } from "./log-request"
 import { setResponseTimeHeader } from "./set-response-time-header"
-import { handleError } from "./use-error"
-import cors from "koa-cors"
-import { ConsoleLogger, Logger } from "@ordo-pink/logger"
-import { identity } from "ramda"
-import Router from "@koa/router"
-import Application from "koa"
-import { Either } from "@ordo-pink/either/mod"
-import bodyparser from "koa-bodyparser"
 
 export type CreateServerParams = {
 	origin?: string | string[]
@@ -66,12 +68,12 @@ export const createServer: CreateServerFn = ({
 							.chain(os =>
 								Either.fromBoolean(
 									() => Array.isArray(os),
-									() => (os as string[]).includes(o as string),
+									() => (os as string[]).includes(o),
 									() => o === os,
 								),
 							)
-							.map(allowed => (allowed ? (o as string) : ""))
-							.leftMap(allowed => (allowed ? (o as string) : "")),
+							.map(allowed => (allowed ? o : ""))
+							.leftMap(allowed => (allowed ? o : "")),
 					)
 					.leftMap(result => (result === null ? "" : result))
 					.fold(identity, identity),

@@ -17,9 +17,10 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { OrdoRoutes } from "@ordo-pink/ordo-routes"
 import { BsGithub, BsTelegram } from "react-icons/bs"
 import { RiTwitterXLine } from "react-icons/ri"
+
+import { OrdoRoutes } from "@ordo-pink/ordo-routes"
 
 export default function Footer() {
 	const currentYear = new Date(Date.now()).getFullYear()

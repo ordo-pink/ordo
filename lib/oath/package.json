@@ -1,11 +1,11 @@
 {
-	"name": "@ordo-pink/oath",
-	"version": "0.2.0",
+	"name": "oathify",
+	"version": "0.2.2",
 	"description": "Lazy promises with extended API and type inference for the rejected branch",
 	"main": "index.js",
 	"scripts": {
 		"test": "bun test",
-		"build": "bun build ./index.ts --outdir=min --minify && bun build ./index.ts --outdir=. --sourcemap=inline",
+		"build": "bun build ./index.ts ./constructors/*.ts ./operators/*.ts ./invokers/*.ts --outdir=min --minify && bun build ./index.ts --outfile=./index.js --sourcemap=inline",
 		"clear": "rm -rf ./min && rm index.js"
 	},
 	"repository": {

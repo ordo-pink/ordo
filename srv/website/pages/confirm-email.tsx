@@ -17,15 +17,17 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Centered } from "../components/centered"
-import { useRouter } from "next/router"
 import { useEffect, useState } from "react"
-import isEmail from "validator/lib/isEmail"
-import { Oath } from "@ordo-pink/oath"
-import { Switch } from "@ordo-pink/switch"
 import Head from "next/head"
 import Link from "next/link"
+import isEmail from "validator/lib/isEmail"
+import { useRouter } from "next/router"
+
+import { Oath } from "@ordo-pink/oath"
 import { OrdoRoutes } from "@ordo-pink/ordo-routes"
+import { Switch } from "@ordo-pink/switch"
+
+import { Centered } from "../components/centered"
 
 const websiteHost = process.env.NEXT_PUBLIC_ORDO_ID_HOST!
 
@@ -34,7 +36,7 @@ export default function ConfirmEmailPage() {
 	const [isEmailVerified, setIsEmailVerified] = useState<boolean | null>(null)
 
 	useEffect(() => {
-		Oath.fromNullable(query)
+		void Oath.fromNullable(query)
 			.chain(query =>
 				Oath.fromNullable(query.email)
 					.chain(Oath.ifElse(email => typeof email === "string", { onTrue: x => x as string }))

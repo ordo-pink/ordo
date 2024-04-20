@@ -17,9 +17,10 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Logger } from "@ordo-pink/logger"
-import { HttpError } from "@ordo-pink/rrr"
 import { Context, Middleware } from "koa"
+
+import { HttpError } from "@ordo-pink/rrr"
+import { Logger } from "@ordo-pink/logger"
 
 export const sendError = (ctx: Context) => (err: HttpError) => {
 	// TODO: Use logger

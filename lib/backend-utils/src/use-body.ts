@@ -18,10 +18,11 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { Context } from "koa"
-import { Oath } from "@ordo-pink/oath"
-import { isObject } from "@ordo-pink/tau"
+
 import { HttpError } from "@ordo-pink/rrr"
+import { Oath } from "@ordo-pink/oath"
 import { Switch } from "@ordo-pink/switch"
+import { isObject } from "@ordo-pink/tau"
 
 export const parseBody0 = <T>(
 	ctx: Context,

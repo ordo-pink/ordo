@@ -17,24 +17,16 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import type { TTokenService } from "@ordo-pink/backend-service-token"
-import type { UserService } from "@ordo-pink/backend-service-user"
-import type { Middleware } from "koa"
-import validator from "validator"
-import { okpwd } from "@ordo-pink/okpwd"
-import { sendError, parseBody0 } from "@ordo-pink/backend-utils"
-import { Oath } from "@ordo-pink/oath"
-import { HttpError } from "@ordo-pink/rrr"
-import { TNotificationService } from "@ordo-pink/backend-service-offline-notifications"
+import { type Middleware } from "koa"
+import isEmail from "validator/lib/isEmail"
 
-type Body = { email?: string; password?: string }
-type Params = {
-	userService: UserService
-	tokenService: TTokenService
-	notificationService: TNotificationService
-	websiteHost: string
-}
-type Fn = (params: Params) => Middleware
+import { parseBody0, sendError } from "@ordo-pink/backend-utils"
+import { HttpError } from "@ordo-pink/rrr"
+import { Oath } from "@ordo-pink/oath"
+import { type TNotificationService } from "@ordo-pink/backend-service-offline-notifications"
+import { type TTokenService } from "@ordo-pink/backend-service-token"
+import { type UserService } from "@ordo-pink/backend-service-user"
+import { okpwd } from "@ordo-pink/okpwd"
 
 export const handleSignUp: Fn =
 	({ userService, tokenService, notificationService, websiteHost }) =>
@@ -43,7 +35,7 @@ export const handleSignUp: Fn =
 			.chain(body =>
 				Oath.all({
 					email: Oath.fromNullable(body.email)
-						.map(validator.isEmail)
+						.map(isEmail)
 						.chain(isValidEmail =>
 							Oath.fromBoolean(
 								() => isValidEmail,
@@ -87,11 +79,11 @@ export const handleSignUp: Fn =
 							.tap(expires => {
 								ctx.response.set(
 									"Set-Cookie",
-									`jti=${tokens.jti}; Expires=${expires}; SameSite=Lax; Path=/; HttpOnly;`,
+									`jti=${tokens.jti}; Expires=${expires.toISOString()}; SameSite=Lax; Path=/; HttpOnly;`,
 								)
 								ctx.response.set(
 									"Set-Cookie",
-									`sub=${tokens.sub}; Expires=${expires}; SameSite=Lax; Path=/; HttpOnly;`,
+									`sub=${tokens.sub}; Expires=${expires.toISOString()}; SameSite=Lax; Path=/; HttpOnly;`,
 								)
 							})
 							.map(expires => ({
@@ -108,8 +100,11 @@ export const handleSignUp: Fn =
 						Oath.of(crypto.getRandomValues(new Uint32Array(3)).join(""))
 							.chain(code => userService.update(tokens.sub, { code }))
 							.tap(user =>
-								notificationService.sendEmailConfirmationRequestEmail({
-									email: user.email,
+								notificationService.sendSignUpNotification({
+									to: {
+										email: user.email,
+										name: user.email,
+									},
 									confirmationUrl: `${websiteHost}/confirm-email?code=${user.code}&email=${user.email}`,
 								}),
 							)
@@ -123,3 +118,14 @@ export const handleSignUp: Fn =
 				ctx.response.status = 201
 				ctx.response.body = body
 			})
+
+// --- Internal ---
+
+type Body = { email?: string; password?: string }
+type Params = {
+	userService: UserService
+	tokenService: TTokenService
+	notificationService: TNotificationService
+	websiteHost: string
+}
+type Fn = (params: Params) => Middleware

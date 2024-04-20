@@ -117,7 +117,8 @@ const isMarkActive = (editor: ReactEditor, format: string) => {
 }
 
 const ButtonRef = (props: PropsWithChildren<BaseProps>, ref: Ref<HTMLSpanElement | null>) => (
-	<span {...props} active={String(props.active)} ref={ref as any} className="" />
+	// @ts-ignore
+	<span {...props} active={String(props.active)} ref={ref as any} className="" /> // eslint-disable-line react/no-unknown-property
 )
 
 const Button = forwardRef(ButtonRef)

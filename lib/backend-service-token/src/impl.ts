@@ -18,12 +18,12 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { randomUUID } from "crypto"
-import { WJWT } from "@ordo-pink/wjwt"
 
 import { Oath } from "@ordo-pink/oath"
-import { TTokenService, TokenPersistenceStrategy, TokenServiceOptions } from "./types"
 import { Switch } from "@ordo-pink/switch"
-import { UUIDv4 } from "@ordo-pink/tau"
+import { WJWT } from "@ordo-pink/wjwt"
+
+import { TTokenService, TokenPersistenceStrategy, TokenServiceOptions } from "./types"
 
 type Params = { persistenceStrategy: TokenPersistenceStrategy; options: TokenServiceOptions }
 
@@ -74,7 +74,7 @@ export const TokenService = {
 					.fix(() => null) as any,
 			createPair: ({ sub, prevJti, aud = ["https://ordo.pink"], data = {} }) =>
 				Oath.all({
-					jti: randomUUID() as UUIDv4,
+					jti: randomUUID(),
 					iat: Math.floor(Date.now() / 1000),
 					iss: "https://id.ordo.pink",
 					aexp: Math.floor(Date.now() / 1000) + options.accessTokenExpireIn,
@@ -89,6 +89,7 @@ export const TokenService = {
 						exp: rexp,
 						sub,
 						aud,
+						...data,
 						tokens: Oath.all({
 							access: accessWJWT.sign0({ ...data, jti, iat, iss, exp: aexp, sub, aud }),
 							refresh: refreshWJWT.sign0({ ...data, jti, iat, iss, exp: rexp, sub, aud }),

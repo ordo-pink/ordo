@@ -8,8 +8,7 @@ set -e
 
 PLATFORM=$(uname -ms)
 
-ESBUILD_VERSION="0.18.9"
-BUN_VERSION="0.7.3"
+BUN_VERSION="1.0.30"
 TAILWIND_VERSION="v3.1.6"
 
 # --- Internal ---
@@ -63,32 +62,8 @@ function download_bun {
   fi
 }
 
-# Download ESBuild executable
-function download_esbuild {
-  if [ ! -f ./opt/esbuild ]; then
-    dir=$(mktemp -d)
-    tgz="$dir/esbuild-$ESBUILD_VERSION.tgz"
-
-    case $PLATFORM in
-      'Darwin arm64') curl -fo "$tgz" "https://registry.npmjs.org/@esbuild/darwin-arm64/-/darwin-arm64-0.18.9.tgz";;
-      'Darwin x86_64') curl -fo "$tgz" "https://registry.npmjs.org/@esbuild/darwin-x64/-/darwin-x64-0.18.9.tgz";;
-      'Linux arm64' | 'Linux aarch64') curl -fo "$tgz" "https://registry.npmjs.org/@esbuild/linux-arm64/-/linux-arm64-0.18.9.tgz";;
-      'Linux x86_64') curl -fo "$tgz" "https://registry.npmjs.org/@esbuild/linux-x64/-/linux-x64-0.18.9.tgz";;
-      *) echo "Error: Unsupported platform: $PLATFORM"; exit 1;;
-    esac
-
-    tar -xzf "$tgz" -C "$dir" package/bin/esbuild
-    mv "$dir/package/bin/esbuild" opt
-    rm "$tgz"
-  fi
-}
-
 # Build a binary from given source with Bun and puts it to the bin directory.
 function compile_init_script {
-  if [ ! -f ./opt/esbuild ]; then
-    mkdir bin
-  fi
-
   opt/bun build boot/src/init/index.ts --compile --outfile init && mv -f init bin/init
 }
 
@@ -113,9 +88,6 @@ fi
 if [ ! -d ./bin ]; then
   mkdir ./bin
 fi
-
-## Download ESBuild
-download_esbuild
 
 ## Download TailwindCSS
 download_tailwind

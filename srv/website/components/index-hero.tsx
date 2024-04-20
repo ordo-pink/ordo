@@ -20,7 +20,9 @@
 "use client"
 
 import { useLayoutEffect } from "react"
+
 import { Button } from "./button"
+
 import BetaInvitation from "./beta-invitation.component"
 
 type P = { staticHost: string }

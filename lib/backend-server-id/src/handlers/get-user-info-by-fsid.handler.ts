@@ -25,28 +25,27 @@ import {
 	chain0,
 	fromBoolean0,
 	fromNullable0,
+	of0,
 	rejectedMap0,
 } from "@ordo-pink/oath"
 import { type UUIDv4, isUUID } from "@ordo-pink/tau"
-import { authenticate0, sendError, sendSuccess } from "@ordo-pink/backend-utils"
+import { sendError, sendSuccess } from "@ordo-pink/backend-utils"
 import { type HttpError } from "@ordo-pink/rrr"
-import { type TTokenService } from "@ordo-pink/backend-service-token"
 import { type UserService } from "@ordo-pink/backend-service-user"
 
 import { toInvalidRequestError, toUserNotFoundError } from "../fns/to-error"
 
 export const handleUserInfoByID: TFn =
-	({ tokenService, userService }) =>
+	({ userService }) =>
 	ctx =>
-		authenticate0(ctx, tokenService)
-			.and(() => ctx.params)
+		of0(ctx.params)
 			.and(validateParams0)
 			.and(getUserByID0(userService))
 			.fork(sendError(ctx), sendSuccess({ ctx }))
 
 // --- Internal ---
 
-type TParams = { tokenService: TTokenService; userService: UserService }
+type TParams = { userService: UserService }
 type TFn = (params: TParams) => Middleware
 type TResult = Routes.ID.GetUserInfoByID.Result
 
@@ -58,4 +57,6 @@ const validateParams0: TValidateParamsFn = ({ id }) =>
 
 type TGetUserByIDFn = (us: UserService) => (id: string) => Oath<TResult, HttpError>
 const getUserByID0: TGetUserByIDFn = userService => id =>
-	userService.getById(id).pipe(bimap0(toUserNotFoundError, userService.serializePublic))
+	userService
+		.getById(id)
+		.pipe(bimap0(toUserNotFoundError, userService.serializePublic.bind(userService)))

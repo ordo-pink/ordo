@@ -20,26 +20,24 @@
 import { type Middleware } from "koa"
 import isEmail from "validator/lib/isEmail"
 
-import { type Oath, chain0, fromBoolean0, fromNullable0, rejectedMap0 } from "@ordo-pink/oath"
-import { authenticate0, sendError, sendSuccess } from "@ordo-pink/backend-utils"
+import { type Oath, chain0, fromBoolean0, fromNullable0, of0, rejectedMap0 } from "@ordo-pink/oath"
+import { sendError, sendSuccess } from "@ordo-pink/backend-utils"
 import { type HttpError } from "@ordo-pink/rrr"
-import { type TTokenService } from "@ordo-pink/backend-service-token"
 import { type UserService } from "@ordo-pink/backend-service-user"
 
 import { toInvalidRequestError, toUserNotFoundError } from "../fns/to-error"
 
 export const handleUserInfoByEmail: TFn =
-	({ tokenService, userService }) =>
+	({ userService }) =>
 	ctx =>
-		authenticate0(ctx, tokenService)
-			.and(() => ctx.params)
+		of0(ctx.params)
 			.and(validateParams0)
 			.and(getUserByEmail0(userService))
 			.fork(sendError(ctx), sendSuccess({ ctx }))
 
 // --- Internal ---
 
-type TParams = { tokenService: TTokenService; userService: UserService }
+type TParams = { userService: UserService }
 type TFn = (params: TParams) => Middleware
 type TResult = Routes.ID.GetUserInfoByEmail.Result
 

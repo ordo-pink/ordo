@@ -351,8 +351,8 @@ export const __initData = ({ fid, dataCommands }: P) => {
 
 			return {
 				items: defaultValues.concat(
-					data
-						?.filter(item => item.fsid !== payload.parent && item.fsid !== payload.fsid)
+					DataRepository.dropHidden(data ?? [])
+						.filter(item => item.fsid !== payload.parent && item.fsid !== payload.fsid)
 						.map(
 							item =>
 								({

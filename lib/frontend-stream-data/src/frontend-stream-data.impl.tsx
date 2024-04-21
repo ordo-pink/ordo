@@ -106,36 +106,41 @@ export const __initData = ({ fid, dataCommands }: P) => {
 	})
 
 	commands.on<cmd.data.showEditLinksPalette>("data.show-edit-links-palette", payload => {
-		const data = data$.value
+		const data = data$.value! // TODO: Move extracting hidden items to DataRepository
+		const links = Array.from(new Set(data?.map(item => item.fsid) ?? []))
+		const item = data?.find(item => item.fsid === payload.fsid)
 
-		if (!data) return
+		if (!item) return
 
-		commands.emit<cmd.commandPalette.show>("command-palette.show", {
-			multiple: true,
-			pinnedItems: payload.links.map(link => ({
-				id: link,
-				readableName: data.find(item => item.fsid === link)!.name,
-				Icon: BsLink,
-				onSelect: () => {
-					commands.emit<cmd.data.removeLink>("data.remove-link", { item: payload, link })
-				},
-			})),
-			items: data
-				.filter(
-					data =>
-						!payload.links.includes(data.fsid) &&
-						data.fsid !== payload.fsid &&
-						!data.name.startsWith(EXTENSION_FILE_PREFIX),
-				)
-				.map(link => ({
-					id: link.fsid,
-					readableName: link.name,
+		const handleShowEditLinks = () => {
+			commands.emit<cmd.commandPalette.show>("command-palette.show", {
+				multiple: true,
+				pinnedItems: item.links.map(link => ({
+					id: link,
+					readableName: data.find(item => item.fsid === link)!.name,
 					Icon: BsLink,
 					onSelect: () => {
-						commands.emit<cmd.data.addLink>("data.add-link", { item: payload, link: link.fsid })
+						commands.emit<cmd.data.removeLink>("data.remove-link", { item, link })
+						item.links.splice(item.links.indexOf(link), 1)
+						handleShowEditLinks()
 					},
 				})),
-		})
+				items: links
+					.filter(link => !item.links.includes(link))
+					.map(link => ({
+						id: link,
+						readableName: data.find(item => item.fsid === link)!.name,
+						Icon: BsLink,
+						onSelect: () => {
+							commands.emit<cmd.data.addLink>("data.add-link", { item, link })
+							item.links.push(link)
+							handleShowEditLinks()
+						},
+					})),
+			})
+		}
+
+		handleShowEditLinks()
 	})
 
 	commands.on<cmd.data.showRemoveModal>("data.show-remove-modal", payload => {

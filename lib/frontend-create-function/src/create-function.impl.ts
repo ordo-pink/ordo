@@ -43,7 +43,6 @@ export const createFunction: RegisterFunction = (name, permissions, callback) =>
 		getIsAuthenticated: getIsAuthenticatedPatched,
 		getHosts,
 		data: {
-			// TODO
 			getChildren: item => DataRepository.getChildren(getDataPatched(), item),
 			getData: getDataPatched,
 			getParentChain: fsid => DataRepository.getParentChain(getDataPatched(), fsid),

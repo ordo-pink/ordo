@@ -33,9 +33,9 @@ import { BehaviorSubject } from "rxjs/internal/BehaviorSubject"
 import { PiGraph } from "react-icons/pi"
 
 import { Data, DataRepository, FSID, PlainData, TDataCommands } from "@ordo-pink/data"
-import { EXTENSION_FILE_PREFIX, LIB_DIRECTORY_FSID } from "@ordo-pink/core"
 import { Either } from "@ordo-pink/either"
 import { KnownFunctions } from "@ordo-pink/frontend-known-functions"
+import { LIB_DIRECTORY_FSID } from "@ordo-pink/core"
 import { N } from "@ordo-pink/tau"
 import { Oath } from "@ordo-pink/oath"
 import { auth$ } from "@ordo-pink/frontend-stream-user"
@@ -63,7 +63,7 @@ export const __initData = ({ fid, dataCommands }: P) => {
 	})
 
 	commands.on<cmd.data.showEditLabelsPalette>("data.show-edit-labels-palette", payload => {
-		const data = data$.value
+		const data = DataRepository.dropHidden(data$.value ?? [])
 		const labels = Array.from(new Set(data?.flatMap(item => item.labels) ?? []))
 		const item = data?.find(item => item.fsid === payload.fsid)
 
@@ -106,7 +106,7 @@ export const __initData = ({ fid, dataCommands }: P) => {
 	})
 
 	commands.on<cmd.data.showEditLinksPalette>("data.show-edit-links-palette", payload => {
-		const data = data$.value! // TODO: Move extracting hidden items to DataRepository
+		const data = DataRepository.dropHidden(data$.value ?? [])
 		const links = Array.from(new Set(data?.map(item => item.fsid) ?? []))
 		const item = data?.find(item => item.fsid === payload.fsid)
 

@@ -24,6 +24,11 @@ import { Switch } from "@ordo-pink/switch"
 import { FSID, PlainData } from "./data.types"
 
 export const DataRepository = {
+	dropHidden: (data: PlainData[]) =>
+		data.filter(item => {
+			const parents = DataRepository.getParentChain(data, item.fsid)
+			return !item.name.startsWith(".") && !parents.some(parent => parent.name.startsWith("."))
+		}),
 	getChildren: (data: PlainData[] | null, item: PlainData | FSID | "root" | null) => {
 		const fsid = Switch.empty()
 			.case(Boolean(item && (item as PlainData).fsid), () => (item as PlainData).fsid)

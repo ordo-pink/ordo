@@ -17,7 +17,7 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import type { EitherStatic, LeftFn, RightFn } from "./types"
+import type { EitherStatic, LeftFn, RightFn } from "./either.types"
 
 const left: LeftFn = x => ({
 	isEither: true,
@@ -29,6 +29,7 @@ const left: LeftFn = x => ({
 	getOrElse: f => f(x),
 	chain: () => left(x),
 	fix: f => right(f(x)),
+	pipe: f => f(left(x)),
 	fold: f => f(x),
 })
 
@@ -42,6 +43,7 @@ const right: RightFn = x => ({
 	getOrElse: () => x,
 	chain: f => f(x),
 	fix: () => right(x),
+	pipe: f => f(right(x)),
 	fold: (_, g) => g(x),
 })
 

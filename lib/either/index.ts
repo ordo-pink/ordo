@@ -17,5 +17,7 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-export * from "./src/impl"
-export * from "./src/types"
+export * from "./src/either.impl"
+export * from "./src/either.types"
+export * from "./src/constructors"
+export * from "./src/operators"

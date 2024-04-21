@@ -24,7 +24,7 @@ import cors from "koa-cors"
 import { identity } from "ramda"
 
 import { ConsoleLogger, Logger } from "@ordo-pink/logger"
-import { Either } from "@ordo-pink/either/mod"
+import { Either } from "@ordo-pink/either"
 import { Unary } from "@ordo-pink/tau"
 
 import { handleError } from "./use-error"

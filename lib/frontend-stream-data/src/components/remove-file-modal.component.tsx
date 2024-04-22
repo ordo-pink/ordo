@@ -39,7 +39,7 @@ export default function RemoveFileModal({ data }: P) {
 	const tRemove = "Удалить"
 
 	return (
-		<div className="flex w-[30rem] max-w-full flex-col gap-8">
+		<div className="flex w-full flex-col gap-8">
 			<div className="flex items-center space-x-2 px-8 pt-8">
 				<div className="rounded-full bg-gradient-to-tr from-red-400 to-rose-400 p-3 text-xl text-neutral-200 shadow-md dark:from-red-600 dark:to-rose-600">
 					<BsNodeMinus />

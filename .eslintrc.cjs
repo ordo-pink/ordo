@@ -4,7 +4,7 @@ module.exports = {
 		es2021: true,
 		node: true,
 	},
-	ignorePatterns: [".eslintrc.cjs", "*.config.js", "*.config.cjs"],
+	ignorePatterns: [".eslintrc.cjs", "*.config.js", "*.config.cjs", "*.js"],
 	extends: [
 		"eslint:recommended",
 		"plugin:@typescript-eslint/recommended-type-checked",
@@ -54,7 +54,7 @@ module.exports = {
 	},
 	settings: {
 		react: {
-			version: "detect"
-		}
-	}
+			version: "detect",
+		},
+	},
 }

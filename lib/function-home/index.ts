@@ -17,34 +17,45 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import { BsCollection } from "react-icons/bs"
+import { lazy } from "react"
+
 import { ORDO_PINK_HOME_FUNCTION } from "@ordo-pink/core"
 import { createFunction } from "@ordo-pink/frontend-create-function"
 
 import { registerGoToHomeCommand } from "./src/commands/go-to-home.command"
-import { registerHomeActivity } from "./src/activities/home.activity"
+
+import { registerSupportCommand } from "./src/commands/support.command"
 
 import "./src/function-home.types"
-import { registerSupportCommand } from "./src/commands/support.command"
 
 export default createFunction(
 	ORDO_PINK_HOME_FUNCTION,
 	{ queries: [], commands: [] },
-	({ getCommands, getLogger }) => {
+	({ getCommands, getLogger, registerActivity }) => {
 		const commands = getCommands()
 		const logger = getLogger()
 
 		logger.debug("Initialising...")
 
+		const unregisterActivity = registerActivity({
+			name: "pink.ordo.home.main",
+			Component: lazy(() => import("./src/views/home.workspace")),
+			routes: ["/"],
+			background: false,
+			Icon: BsCollection,
+		})
+
 		const dropGoToHomeCmd = registerGoToHomeCommand({ commands })
 		const dropSupportCmd = registerSupportCommand({ commands })
-		const dropHomeActivity = registerHomeActivity({ commands })
 
 		logger.debug("Initialised.")
 
 		return () => {
 			logger.debug("Terminating...")
 
-			dropHomeActivity()
+			unregisterActivity()
+
 			dropSupportCmd()
 			dropGoToHomeCmd()
 

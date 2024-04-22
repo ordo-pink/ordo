@@ -26,6 +26,7 @@ import { getHosts } from "@ordo-pink/frontend-react-hooks"
 import { getLogger } from "@ordo-pink/frontend-logger"
 
 import { type RegisterFunction } from "./create-function.types"
+import { registerActivity } from "@ordo-pink/frontend-stream-activities"
 
 export const createFunction: RegisterFunction = (name, permissions, callback) => {
 	const fid = KnownFunctions.register(name, permissions)
@@ -35,6 +36,7 @@ export const createFunction: RegisterFunction = (name, permissions, callback) =>
 	const getUserPatched = () => getUser(fid)
 	const getIsAuthenticatedPatched = () => getIsAuthenticated(fid)
 	const getDataPatched = () => getData(fid)
+	const registerActivityPatched = registerActivity(fid)
 
 	const data$Patched = getData$(fid)
 
@@ -46,6 +48,7 @@ export const createFunction: RegisterFunction = (name, permissions, callback) =>
 		getUser: getUserPatched,
 		getIsAuthenticated: getIsAuthenticatedPatched,
 		getHosts,
+		registerActivity: registerActivityPatched,
 		data: {
 			getChildren: item => DataRepository.getChildren(getDataPatched(), item),
 			getData: getDataPatched,

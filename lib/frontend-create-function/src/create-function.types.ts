@@ -42,6 +42,7 @@ export type RegisterFunctionCallbackParams = {
 	getUser: () => User.User | null
 	getIsAuthenticated: () => boolean
 	getHosts: () => Hosts
+	registerActivity: (activity: Extensions.Activity) => () => void
 	data: DataProviders
 	queries: {
 		dataQuery: TDataQuery

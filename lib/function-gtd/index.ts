@@ -17,12 +17,14 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import { BsUiChecks } from "react-icons/bs"
+import { lazy } from "react"
+
 import { ORDO_PINK_GTD_FUNCTION } from "@ordo-pink/core"
 import { createFunction } from "@ordo-pink/frontend-create-function"
 
 import { registerAchievements } from "./src/achievements/gtd.achievements"
 import { registerAddToProjectsCmd } from "./src/commands/add-to-projects.command"
-import { registerGTDActivity } from "./src/activities/gtd.activity"
 import { registerMarkDoneCmd } from "./src/commands/mark-done.command"
 import { registerMarkNotDoneCmd } from "./src/commands/mark-not-done.command"
 import { registerOpenInboxCmd } from "./src/commands/open-inbox.command"
@@ -33,14 +35,23 @@ import { registerShowQuickReminderModalCmd } from "./src/commands/show-quick-rem
 export default createFunction(
 	ORDO_PINK_GTD_FUNCTION,
 	{ queries: [], commands: [] },
-	({ getLogger, getCommands, data, getHosts }) => {
+	({ getLogger, getCommands, getHosts, registerActivity, data }) => {
 		const commands = getCommands()
 		const logger = getLogger()
 		const { staticHost } = getHosts()
 
 		logger.debug("Initialising...")
 
-		const dropActivity = registerGTDActivity({ commands })
+		const unregisterActivity = registerActivity({
+			Component: lazy(() => import("./src/views/gtd.workspace")),
+			Sidebar: lazy(() => import("./src/views/gtd.sidebar")),
+			widgets: [lazy(() => import("./src/views/gtd.widget"))],
+			name: "pink.ordo.gtd.main",
+			routes: ["/gtd", "/gtd/projects/:fsid", "/gtd/labels/:label"],
+			background: false,
+			Icon: BsUiChecks,
+		})
+
 		const dropOpenInboxCmd = registerOpenInboxCmd({ commands })
 		const dropMarkDoneCmd = registerMarkDoneCmd({ commands, data })
 		const dropMarkNotDoneCmd = registerMarkNotDoneCmd({ commands, data })
@@ -56,7 +67,8 @@ export default createFunction(
 		return () => {
 			logger.debug("Terminating...")
 
-			dropActivity()
+			unregisterActivity()
+
 			dropMarkDoneCmd()
 			dropOpenInboxCmd()
 			dropMarkNotDoneCmd()

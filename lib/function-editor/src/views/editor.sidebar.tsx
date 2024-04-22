@@ -21,6 +21,7 @@ import { BsCalendar2, BsChevronDown, BsListNested } from "react-icons/bs"
 import { MouseEvent, useEffect, useState } from "react"
 
 import { FSID, PlainData } from "@ordo-pink/data"
+import { chainE, fromBooleanE, fromNullableE, mapE } from "@ordo-pink/either"
 import {
 	useChildren,
 	useCommands,
@@ -28,7 +29,6 @@ import {
 	useRouteParams,
 	useWorkspaceWidth,
 } from "@ordo-pink/frontend-react-hooks"
-import { Either } from "@ordo-pink/either"
 import { Switch } from "@ordo-pink/switch"
 
 import ActionListItem from "@ordo-pink/frontend-react-components/action-list-item"
@@ -45,22 +45,19 @@ export default function EditorSidebar() {
 	const [visibleItems, setVisibleItems] = useState<PlainData[]>([])
 
 	useEffect(() => {
-		Either.fromNullable(data)
-			.chain(data =>
-				Either.fromBoolean(
-					() => data.length > 0,
-					() => data,
+		fromNullableE(data)
+			.pipe(chainE(data => fromBooleanE(data.length > 0, data)))
+			.pipe(
+				mapE(data =>
+					isNestingEnabled
+						? data.filter(item => item.parent === null)
+						: data.sort((a, b) => (a.updatedAt < b.updatedAt ? 1 : -1)),
 				),
-			)
-			.map(data =>
-				isNestingEnabled
-					? data.filter(item => item.parent === null)
-					: data.sort((a, b) => (a.updatedAt < b.updatedAt ? 1 : -1)),
 			)
 			.fold(() => setVisibleItems([]), setVisibleItems)
 	}, [data, data.length, isNestingEnabled])
 
-	return Either.fromNullable(visibleItems).fold(Loading, data => (
+	return fromNullableE(visibleItems).fold(Loading, data => (
 		<div className="h-full p-1">
 			<div className="flex items-center justify-center space-x-4 pb-4">
 				<OrdoButton.Primary onClick={() => setIsNestingEnables(true)} inverted={!isNestingEnabled}>
@@ -147,8 +144,8 @@ const NestedItem = ({ item, depth }: NestedItemP) => {
 						/>
 					))}
 			</div>
-			{Either.fromBoolean(() => !isCollapsed)
-				.chain(() => Either.fromBoolean(() => children.length > 0))
+			{fromBooleanE(!isCollapsed)
+				.pipe(chainE(() => fromBooleanE(children.length > 0)))
 				.fold(Null, () => (
 					<div>
 						{children.map(child => (

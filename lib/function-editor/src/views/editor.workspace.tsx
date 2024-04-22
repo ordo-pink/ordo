@@ -58,13 +58,14 @@ import { fromNullableE } from "@ordo-pink/either"
 import CenteredPage from "@ordo-pink/frontend-react-components/centered-page"
 
 import { EMPTY_EDITOR_CHILDREN, SHORTCUTS } from "../editor.constants"
+import { handleTransform } from "../fns/handle-transform"
+import { withChecklists } from "../plugins/with-checklists.editor-plugin"
+import { withShortcuts } from "../plugins/with-shortcuts.editor-plugin"
+
 import DataEditor from "../components/data-editor.component"
 import EditableTitle from "../components/editable-title.component"
 import HoveringToolbar from "../components/hovering-toolbar.component"
 import Loader from "@ordo-pink/frontend-react-components/loader"
-import { handleTransform } from "../fns/handle-transform"
-import { withChecklists } from "../plugins/with-checklists.editor-plugin"
-import { withShortcuts } from "../plugins/with-shortcuts.editor-plugin"
 
 export default function EditorWorkspace() {
 	const { fsid } = useRouteParams<{ fsid: FSID }>()
@@ -80,8 +81,6 @@ export default function EditorWorkspace() {
 		() => withShortcuts(withChecklists(withHistory(withReact(createEditor())))),
 		[],
 	)
-
-	useEffect(() => {}, [fsid])
 
 	useEffect(() => {
 		commands.emit<cmd.application.setTitle>(
@@ -143,13 +142,16 @@ export default function EditorWorkspace() {
 			})
 
 			switch (event.inputType) {
+				// @ts-ignore
 				case "formatBold":
 					event.preventDefault()
 					toggleMark(editor, "bold")
-				// eslint-disable-next-line no-fallthrough
-				case "formatItalic":
+
+				// @ts-ignore
+				case "formatItalic": // eslint-disable-line no-fallthrough
 					event.preventDefault()
 					toggleMark(editor, "italic")
+
 				// eslint-disable-next-line no-fallthrough
 				case "formatUnderline":
 					event.preventDefault()

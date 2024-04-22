@@ -17,24 +17,31 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import { lazy } from "react"
+
 import { ORDO_PINK_USER_FUNCTION } from "@ordo-pink/core"
 import { createFunction } from "@ordo-pink/frontend-create-function"
 
 import { registerGoToAccountCommand } from "./src/commands/go-to-account.command"
 import { registerSignOutCommand } from "./src/commands/sign-out.command"
-import { registerUserActivity } from "./src/activities/user.activity"
 
 export default createFunction(
 	ORDO_PINK_USER_FUNCTION,
 	{ queries: [], commands: [] },
-	({ getCommands, getHosts, getLogger }) => {
+	({ getCommands, getHosts, getLogger, registerActivity }) => {
 		const commands = getCommands()
 		const logger = getLogger()
 		const { websiteHost, staticHost } = getHosts()
 
 		logger.debug("Intialising...")
 
-		const dropUserActivity = registerUserActivity({ commands })
+		const unregisterActivity = registerActivity({
+			Component: lazy(() => import("./src/views/user.workspace")),
+			name: ORDO_PINK_USER_FUNCTION.concat(".activity.main"),
+			routes: ["/user"],
+			background: true,
+		})
+
 		const dropGoToAccountCmd = registerGoToAccountCommand({ commands })
 		const dropSignOutCmd = registerSignOutCommand({ commands, websiteHost })
 
@@ -56,7 +63,8 @@ export default createFunction(
 		return () => {
 			logger.debug("Terminating...")
 
-			dropUserActivity()
+			unregisterActivity()
+
 			dropGoToAccountCmd()
 			dropSignOutCmd()
 

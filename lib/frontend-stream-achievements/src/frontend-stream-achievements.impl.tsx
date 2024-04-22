@@ -151,7 +151,7 @@ export const __initAchievements = callOnce(({ fid, dataCommands }: P) => {
 												!achievements$.value ||
 												achievements$.value.some(ach => ach && ach.id === achievement.descriptor.id)
 											)
-												return
+												return null
 
 											achievements$.next([...achievements$.value, achievement.descriptor])
 											achievement.subscribe({ grant, update })

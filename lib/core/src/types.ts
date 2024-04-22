@@ -167,11 +167,6 @@ declare global {
 			type hide = { name: "notification.hide"; payload: string }
 		}
 
-		module activities {
-			type add = { name: "activities.add"; payload: Extensions.Activity }
-			type remove = { name: "activities.remove"; payload: string }
-		}
-
 		module fileAssociations {
 			type add = { name: "file-associations.add"; payload: Extensions.FileAssociation }
 			type remove = { name: "file-associations.remove"; payload: string }

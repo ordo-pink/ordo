@@ -263,7 +263,7 @@ export default function EditorWorkspace() {
 										const rect = domRange?.getBoundingClientRect() ?? { top: 0, left: 0, width: 0 }
 
 										;(event as any).clientX = rect.left
-										;(event as any).clientY = rect.top - 100
+										;(event as any).clientY = rect.top - 50
 
 										// TODO: Make a copy of context menu specifically for the editor
 										commands.emit<cmd.ctxMenu.show>("context-menu.show", {

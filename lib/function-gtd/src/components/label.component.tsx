@@ -19,7 +19,12 @@
 
 import { useRef, useState } from "react"
 
-import { useAccelerator, useCommands, useDataByLabel } from "@ordo-pink/frontend-react-hooks"
+import {
+	useAccelerator,
+	useCommands,
+	useDataByLabel,
+	useIsMobile,
+} from "@ordo-pink/frontend-react-hooks"
 import Card from "@ordo-pink/frontend-react-components/card"
 import CenteredPage from "@ordo-pink/frontend-react-components/centered-page"
 import { TextInput } from "@ordo-pink/frontend-react-components/input"
@@ -29,6 +34,7 @@ import GTDList from "./list.component"
 type P = { label: string }
 export default function GTDLabel({ label }: P) {
 	const commands = useCommands()
+	const isMobile = useIsMobile()
 	const items = useDataByLabel([label])
 	const [newItem, setNewItem] = useState("")
 	const createInputRef = useRef<HTMLInputElement>(null)
@@ -43,7 +49,7 @@ export default function GTDLabel({ label }: P) {
 				<div className="flex w-full max-w-2xl flex-col space-y-4">
 					<Card className="h-[90vh]" title={`Метка #${label}`}>
 						<TextInput
-							autoFocus
+							autoFocus={!isMobile}
 							forwardRef={createInputRef}
 							id="add-to-label"
 							label=""

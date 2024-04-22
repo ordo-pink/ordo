@@ -20,10 +20,10 @@
 import { BsCheckCircle, BsInfoCircle, BsXCircle } from "react-icons/bs"
 import { useState } from "react"
 
+import { useCommands, useIsMobile } from "@ordo-pink/frontend-react-hooks"
 import { PlainData } from "@ordo-pink/data"
 import { Switch } from "@ordo-pink/switch"
 import { isNonEmptyString } from "@ordo-pink/tau"
-import { useCommands } from "@ordo-pink/frontend-react-hooks"
 
 import Link from "@ordo-pink/frontend-react-components/link"
 import Loader from "@ordo-pink/frontend-react-components/loader"
@@ -35,6 +35,7 @@ import { useInbox } from "../hooks/use-inbox.hook"
 export default function GTDWidget() {
 	const commands = useCommands()
 	const inbox = useInbox()
+	const isMobile = useIsMobile()
 	const [newItem, setNewItem] = useState("")
 
 	const handleCreate = () => {
@@ -66,7 +67,7 @@ export default function GTDWidget() {
 				id="inbox"
 				label="Добавить задачу"
 				placeholder="Вот дела..."
-				autoFocus
+				autoFocus={!isMobile}
 				value={newItem}
 				onInput={e => setNewItem(e.target.value)}
 				onKeyDown={e => {

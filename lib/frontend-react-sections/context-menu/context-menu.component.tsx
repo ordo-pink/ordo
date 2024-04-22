@@ -39,6 +39,7 @@ import Null from "@ordo-pink/frontend-react-components/null"
 
 import ContextMenuItemList from "./context-menu-item-list"
 import { LIB_DIRECTORY_FSID } from "@ordo-pink/core"
+import { PlainData } from "@ordo-pink/data"
 
 const MENU_WIDTH = 320
 
@@ -243,7 +244,8 @@ const contextMenu$ = params$.pipe(
 				structure: items.filter(item => {
 					const shouldShow =
 						state.payload &&
-						((state.payload.fsid && state.payload.fsid === LIB_DIRECTORY_FSID) ||
+						(((state.payload as PlainData).fsid &&
+							(state.payload as PlainData).fsid === LIB_DIRECTORY_FSID) ||
 							state.payload === LIB_DIRECTORY_FSID)
 							? false
 							: item?.shouldShow({ event: state.event, payload: state.payload }) ?? false

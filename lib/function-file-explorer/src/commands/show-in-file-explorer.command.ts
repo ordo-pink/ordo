@@ -17,7 +17,7 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { BsFolder2Open } from "react-icons/bs"
+// import { BsFolder2Open } from "react-icons/bs"
 
 import { type DataProviders } from "@ordo-pink/frontend-create-function"
 import { type FSID } from "@ordo-pink/data"
@@ -26,12 +26,12 @@ import { Switch } from "@ordo-pink/switch"
 type P = { commands: Client.Commands.Commands; data: DataProviders }
 export const registerShowInFileExplorerCommand = (params: P) => {
 	const unregisterCommand = registerCommand(params)
-	const unregisterContextMenu = registerContextMenu(params)
+	// const unregisterContextMenu = registerContextMenu(params)
 	// TODO: registerCommandPalette
 
 	return () => {
 		unregisterCommand()
-		unregisterContextMenu()
+		// unregisterContextMenu()
 	}
 }
 
@@ -51,20 +51,21 @@ const registerCommand = (params: P) => {
 	}
 }
 
-const registerContextMenu = ({ commands }: P) => {
-	commands.emit<cmd.ctxMenu.add>("context-menu.add", {
-		cmd: "file-explorer.show-in-file-explorer",
-		Icon: BsFolder2Open,
-		readableName: "Открыть в менеджере файлов",
-		type: "read",
-		accelerator: "mod+shift+e",
-		shouldShow: ({ payload }) => !!payload && !window.location.pathname.startsWith("/fs"),
-	})
+// TODO: Fix showing in File Explorer
+// const registerContextMenu = ({ commands }: P) => {
+// 	commands.emit<cmd.ctxMenu.add>("context-menu.add", {
+// 		cmd: "file-explorer.show-in-file-explorer",
+// 		Icon: BsFolder2Open,
+// 		readableName: "Открыть в менеджере файлов",
+// 		type: "read",
+// 		accelerator: "mod+shift+e",
+// 		shouldShow: ({ payload }) => !!payload && !window.location.pathname.startsWith("/fs"),
+// 	})
 
-	return () => {
-		commands.emit<cmd.ctxMenu.remove>("context-menu.remove", "file-explorer.show-in-file-explorer")
-	}
-}
+// 	return () => {
+// 		commands.emit<cmd.ctxMenu.remove>("context-menu.remove", "file-explorer.show-in-file-explorer")
+// 	}
+// }
 
 const commandHandler =
 	({ data, commands }: P) =>

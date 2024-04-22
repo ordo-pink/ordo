@@ -17,11 +17,159 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Either } from "@ordo-pink/either"
+import { type BehaviorSubject } from "rxjs"
+
+import { Either, type TEither, chainE, fromNullableE, mapE, ofE } from "@ordo-pink/either"
 import { type PlainDataNode } from "@ordo-pink/core"
 import { Switch } from "@ordo-pink/switch"
+import { keysOf } from "@ordo-pink/tau"
 
-import { FSID, PlainData } from "./data.types"
+import { type FSID, type PlainData } from "./data.types"
+
+export type TDataQuery = {
+	getDataE: (showHidden?: boolean) => TEither<PlainData[], null>
+	getChildrenE: (
+		item: PlainData | FSID | "root" | null,
+		showHidden?: boolean,
+	) => TEither<PlainData[], null>
+	getChildrenRecE: (
+		item: PlainData | FSID | "root" | null,
+		showHidden?: boolean,
+	) => TEither<PlainData[], null>
+	getLabelsE: (showHidden?: boolean) => TEither<string[], null>
+	getParentChainE: (
+		fsid: PlainData | FSID | "root" | null,
+		showHidden?: boolean,
+	) => TEither<PlainData[], null>
+	getDataByFsidE: (fsid: FSID) => TEither<PlainData, null>
+	filterDataE: (
+		selector: (data: PlainData) => boolean,
+		showHidden?: boolean,
+	) => TEither<PlainData[], null>
+	findDataE: (selector: (data: PlainData) => boolean) => TEither<PlainData, null>
+	getDataTreeE: (
+		source?: PlainData | FSID | "root" | null,
+		showHidden?: boolean,
+	) => TEither<PlainDataNode[], null>
+}
+
+export const DataQuery = {
+	of: (data$: BehaviorSubject<PlainData[] | null> | null): TDataQuery => ({
+		getDataE: (showHidden = false) =>
+			fromNullableE(data$)
+				.pipe(chainE(data$ => fromNullableE(data$.value)))
+				.pipe(
+					mapE(items =>
+						showHidden
+							? items
+							: items.filter(
+									item =>
+										!item.name.startsWith(".") &&
+										!getParents(items)(item).some(i => i.name.startsWith(".")),
+								),
+					),
+				),
+		getChildrenE: (item, showHidden = false) =>
+			ofE(toFSID(item)).pipe(
+				chainE(fsid => DataQuery.of(data$).filterDataE(item => item.parent === fsid, showHidden)),
+			),
+		getChildrenRecE: (item, showHidden = false) =>
+			DataQuery.of(data$)
+				.getDataTreeE(item, showHidden)
+				.pipe(mapE(children => children.flatMap(child => flattenTree(child)))),
+		getLabelsE: showHidden =>
+			DataQuery.of(data$)
+				.getDataE(showHidden)
+				.pipe(mapE(items => Array.from(new Set(items.flatMap(item => item.labels))))),
+		getParentChainE: (item, showHidden = false) =>
+			DataQuery.of(data$)
+				.getDataE(showHidden)
+				.pipe(
+					chainE(data =>
+						fromNullableE(toFSID(item)).pipe(
+							chainE(fsid =>
+								DataQuery.of(data$)
+									.getDataByFsidE(fsid)
+									.pipe(mapE(getParents(data))),
+							),
+						),
+					),
+				),
+		getDataByFsidE: fsid => DataQuery.of(data$).findDataE(item => item.fsid === fsid),
+		filterDataE: (selector, showHidden = false) =>
+			DataQuery.of(data$)
+				.getDataE(showHidden)
+				.pipe(mapE(items => items.filter(selector))),
+		findDataE: selector =>
+			DataQuery.of(data$)
+				.getDataE(true)
+				.pipe(chainE(items => fromNullableE(items.find(selector)))),
+		getDataTreeE: (source, showHidden = false) =>
+			ofE(toFSID(source ?? "root"))
+				.pipe(
+					chainE(fsid =>
+						fsid
+							? DataQuery.of(data$).getChildrenRecE(fsid, showHidden)
+							: DataQuery.of(data$).getDataE(showHidden),
+					),
+				)
+
+				.pipe(
+					mapE(data => {
+						const tree = [] as PlainDataNode[]
+						const intermediateTree = {} as Record<FSID, PlainDataNode>
+
+						data.forEach(item => {
+							intermediateTree[item.fsid] = createDataNode(item)
+						})
+
+						console.log(intermediateTree)
+
+						keysOf(intermediateTree).forEach(key => {
+							if (
+								intermediateTree[key].parent &&
+								!intermediateTree[intermediateTree[key].parent as any]
+							) {
+								console.log(intermediateTree[key])
+							}
+
+							intermediateTree[key].parent
+								? intermediateTree[intermediateTree[key].parent as any].children.push(
+										intermediateTree[key],
+									)
+								: tree.push(intermediateTree[key])
+						})
+
+						return tree
+					}),
+				),
+	}),
+}
+
+const getParents =
+	(data: PlainData[]) =>
+	(currentItem: PlainData): PlainData[] => {
+		let i: PlainData | null = currentItem
+		const parentChain = [] as PlainData[]
+
+		parentChain.push(i)
+
+		while (i && i.parent !== null) {
+			const parent = data?.find(x => x.fsid === currentItem?.parent) ?? null
+
+			if (parent) parentChain.push(parent)
+
+			i = parent
+		}
+
+		return parentChain.reverse()
+	}
+
+const toFSID = (item: PlainData | FSID | "root" | null) =>
+	Switch.empty()
+		.case(Boolean(item && (item as PlainData).fsid), () => (item as PlainData).fsid)
+		.case(typeof item === "string" && item !== "root", () => item as FSID)
+		.default(() => null)
 
 export const DataRepository = {
 	dropHidden: (data: PlainData[]) =>
@@ -83,7 +231,7 @@ export const DataRepository = {
 				data.forEach(item => void (intermediateTree[item.fsid] = createDataNode(item)))
 				data.forEach(item =>
 					item.parent
-						? intermediateTree[item.fsid].children.push(item)
+						? intermediateTree[item.fsid].children.push(createDataNode(item))
 						: tree.push(intermediateTree[item.fsid]),
 				)
 
@@ -94,6 +242,11 @@ export const DataRepository = {
 				result => result,
 			),
 }
+
+const flattenTree = (node: PlainDataNode, data: PlainData[] = []): PlainData[] =>
+	node.children.length === 0
+		? data.concat(node.data)
+		: node.children.flatMap(child => flattenTree(child, data))
 
 const createDataNode = (data: PlainData): PlainDataNode => ({
 	data,

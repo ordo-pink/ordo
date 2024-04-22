@@ -417,6 +417,8 @@ export const __initData = ({ fid, dataCommands }: P) => {
 						dataCopy.splice(dataCopy.indexOf(currentData!), 1, updated)
 
 						data$.next(dataCopy)
+
+						return
 					},
 				)
 		},
@@ -468,6 +470,11 @@ export const getData = (fid: symbol | null): PlainData[] | null =>
 	Either.fromNullable(fid)
 		.chain(checkCurrentActivityQueryPermissionE)
 		.fold(N, () => data$.value)
+
+export const getData$ = (fid: symbol | null): BehaviorSubject<PlainData[] | null> | null =>
+	Either.fromNullable(fid)
+		.chain(checkCurrentActivityQueryPermissionE)
+		.fold(N, () => data$)
 
 export const data$ = new BehaviorSubject<PlainData[] | null>(null)
 export const content$ = new BehaviorSubject<Record<FSID, string | ArrayBuffer | null>>({})

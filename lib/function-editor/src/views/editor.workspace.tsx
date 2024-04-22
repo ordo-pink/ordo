@@ -242,7 +242,7 @@ export default function EditorWorkspace() {
 					>
 						<HoveringToolbar />
 						{isLoading ? (
-							<div className="flex size-full min-h-[50vh] flex-col items-center justify-center">
+							<div className="flex size-full min-h-[50dvh] flex-col items-center justify-center">
 								<Loader />
 							</div>
 						) : (

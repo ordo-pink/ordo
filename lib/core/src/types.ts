@@ -675,5 +675,5 @@ export type PlainDataNode = {
 	data: PlainData
 	id: FSID
 	parent: FSID | null
-	children: PlainData[]
+	children: PlainDataNode[]
 }

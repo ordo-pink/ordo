@@ -17,7 +17,7 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import type { FSID, PlainData } from "@ordo-pink/data"
+import type { FSID, PlainData, TDataQuery } from "@ordo-pink/data"
 import type { Hosts } from "@ordo-pink/frontend-react-hooks"
 import type { Logger } from "@ordo-pink/logger"
 import type { Permissions } from "@ordo-pink/frontend-known-functions"
@@ -36,13 +36,16 @@ export type DataProviders = {
 }
 
 // TODO: Provide missing functions
-export type ReigsterFunctionCallbackParams = {
+export type RegisterFunctionCallbackParams = {
 	getCommands: () => Client.Commands.Commands
 	getLogger: () => Logger
 	getUser: () => User.User | null
 	getIsAuthenticated: () => boolean
 	getHosts: () => Hosts
 	data: DataProviders
+	queries: {
+		dataQuery: TDataQuery
+	}
 }
 
 // TODO: Permissions
@@ -50,7 +53,7 @@ export type RegisterFunction = (
 	name: string,
 	permissions: Permissions,
 	callback: (
-		params: ReigsterFunctionCallbackParams,
+		params: RegisterFunctionCallbackParams,
 	) => void | Promise<void> | UnregisterFunction | Promise<UnregisterFunction>,
 ) => void | Promise<void> | UnregisterFunction | Promise<UnregisterFunction>
 

@@ -239,7 +239,7 @@ export default function CommandPaletteModal({ items, onNewItem, multiple, pinned
 	const tSearchPlaceholder = "Поиск..."
 
 	return (
-		<div className="max-w-screen max-h-screen sm:size-[35rem]">
+		<div className="max-w-screen max-h-screen w-full">
 			<div className="mx-2 mt-2 flex items-center space-x-2 rounded-lg bg-neutral-200 px-2 py-1 shadow-inner dark:bg-neutral-600">
 				<BsSearch className="shrink-0" />
 				<input
@@ -253,9 +253,9 @@ export default function CommandPaletteModal({ items, onNewItem, multiple, pinned
 				/>
 			</div>
 
-			<div className="h-[31.5rem] overflow-y-auto px-2 py-4">
+			<div className="h-[50dvh] overflow-y-auto px-2 py-4">
 				{selectedItems.length ? (
-					<div className="border-b border-neutral-500 pb-2">
+					<div className="text-ellipsis border-b border-neutral-500 pb-2">
 						{selectedItems.map((item, index) => (
 							<Item
 								key={item.id}
@@ -270,7 +270,7 @@ export default function CommandPaletteModal({ items, onNewItem, multiple, pinned
 					</div>
 				) : null}
 
-				<div className="pt-2">
+				<div className="max-w-full">
 					{suggestedItems.map((item, index) => (
 						<Item
 							key={item.id}

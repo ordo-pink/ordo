@@ -18,14 +18,18 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import {
-	Descendant,
-	Editor,
-	Node,
-	Range,
-	Element as SlateElement,
-	Transforms,
-	createEditor,
-} from "slate"
+	BsBlockquoteLeft,
+	BsListCheck,
+	BsListOl,
+	BsListUl,
+	BsTextParagraph,
+	BsTypeH1,
+	BsTypeH2,
+	BsTypeH3,
+	BsTypeH4,
+	BsTypeH5,
+} from "react-icons/bs"
+import { Descendant, Editor, Node, Element as SlateElement, Transforms, createEditor } from "slate"
 import {
 	Editable,
 	ReactEditor,
@@ -36,7 +40,6 @@ import {
 	withReact,
 } from "slate-react"
 import { KeyboardEvent, useCallback, useEffect, useMemo, useState } from "react"
-import { BsCheckSquare } from "react-icons/bs"
 import { Subject } from "rxjs/internal/Subject"
 import { debounce } from "rxjs/internal/operators/debounce"
 import { timer } from "rxjs/internal/observable/timer"
@@ -48,9 +51,9 @@ import {
 	useDataByFSID,
 	useRouteParams,
 } from "@ordo-pink/frontend-react-hooks"
-import { Either } from "@ordo-pink/either"
 import { FSID } from "@ordo-pink/data"
 import { Switch } from "@ordo-pink/switch"
+import { fromNullableE } from "@ordo-pink/either"
 
 import CenteredPage from "@ordo-pink/frontend-react-components/centered-page"
 
@@ -59,8 +62,7 @@ import DataEditor from "../components/data-editor.component"
 import EditableTitle from "../components/editable-title.component"
 import HoveringToolbar from "../components/hovering-toolbar.component"
 import Loader from "@ordo-pink/frontend-react-components/loader"
-import { OrdoElement } from "../editor.types"
-import { isOrdoElement } from "../guards/is-ordo-element.guard"
+import { handleTransform } from "../fns/handle-transform"
 import { withChecklists } from "../plugins/with-checklists.editor-plugin"
 import { withShortcuts } from "../plugins/with-shortcuts.editor-plugin"
 
@@ -89,9 +91,6 @@ export default function EditorWorkspace() {
 	}, [data, commands])
 
 	useEffect(() => {
-		// if (!data) return void setInitialState(null)
-		// if (data.size === 0) return void setInitialState("empty")
-
 		if (fsid !== prevFsid) {
 			if (content == null) {
 				setIsLoading(true)
@@ -161,40 +160,118 @@ export default function EditorWorkspace() {
 	)
 
 	useEffect(() => {
-		const handleCreateCheckListItem = () => {
-			if (!editor.selection) return
-
-			const block = Editor.above(editor, {
-				match: n => isOrdoElement(n) && Editor.isBlock(editor, n),
-			})
-			const path = block ? block[1] : []
-			const start = Editor.start(editor, path)
-			const range = { anchor: editor.selection.anchor, focus: start }
-
-			Transforms.select(editor, range)
-
-			if (!Range.isCollapsed(range)) Transforms.delete(editor)
-
-			const newProperties: Partial<OrdoElement> = { type: "check-list-item" }
-
-			Transforms.setNodes<SlateElement>(editor, newProperties, {
-				match: n => isOrdoElement(n) && Editor.isBlock(editor, n),
-			})
-
-			editor.insertText("")
-
-			// TODO: Focus checkbox text block
-		}
+		const handleCreateHeading1 = () => handleTransform(editor, "heading-1")
+		const handleCreateHeading2 = () => handleTransform(editor, "heading-2")
+		const handleCreateHeading3 = () => handleTransform(editor, "heading-3")
+		const handleCreateHeading4 = () => handleTransform(editor, "heading-4")
+		const handleCreateHeading5 = () => handleTransform(editor, "heading-5")
+		const handleCreateListItem = () => handleTransform(editor, "list-item")
+		const handleCreateNumberListItem = () => handleTransform(editor, "number-list-item")
+		const handleCreateCheckListItem = () => handleTransform(editor, "check-list-item")
+		const handleCreateBlockquote = () => handleTransform(editor, "block-quote")
+		const handleCreateParagraph = () => handleTransform(editor, "paragraph")
 
 		// TODO: Add commands to `cmd` namespace
+		commands.on("editor.add-heading-1", handleCreateHeading1)
+		commands.on("editor.add-heading-2", handleCreateHeading2)
+		commands.on("editor.add-heading-3", handleCreateHeading3)
+		commands.on("editor.add-heading-4", handleCreateHeading4)
+		commands.on("editor.add-heading-5", handleCreateHeading5)
+		commands.on("editor.add-list-item", handleCreateListItem)
+		commands.on("editor.add-list-item", handleCreateListItem)
+		commands.on("editor.add-number-list-item", handleCreateNumberListItem)
 		commands.on("editor.add-check-list-item", handleCreateCheckListItem)
-		// TODO: Support for all supported element types
+		commands.on("editor.add-blockquote", handleCreateBlockquote)
+		commands.on("editor.add-paragraph", handleCreateParagraph)
+
 		// TODO: Support for putting a link
 
 		commands.emit<cmd.ctxMenu.add>("context-menu.add", {
+			cmd: "editor.add-heading-1",
+			Icon: BsTypeH1,
+			readableName: "Заголовок 1",
+			accelerator: "1",
+			shouldShow: ({ payload }) => payload === "editor-quick-menu",
+			type: "update",
+		})
+
+		commands.emit<cmd.ctxMenu.add>("context-menu.add", {
+			cmd: "editor.add-heading-2",
+			Icon: BsTypeH2,
+			readableName: "Заголовок 2",
+			accelerator: "2",
+			shouldShow: ({ payload }) => payload === "editor-quick-menu",
+			type: "update",
+		})
+
+		commands.emit<cmd.ctxMenu.add>("context-menu.add", {
+			cmd: "editor.add-heading-3",
+			Icon: BsTypeH3,
+			readableName: "Заголовок 3",
+			accelerator: "3",
+			shouldShow: ({ payload }) => payload === "editor-quick-menu",
+			type: "update",
+		})
+
+		commands.emit<cmd.ctxMenu.add>("context-menu.add", {
+			cmd: "editor.add-heading-4",
+			Icon: BsTypeH4,
+			readableName: "Заголовок 4BsTypeH4",
+			accelerator: "4",
+			shouldShow: ({ payload }) => payload === "editor-quick-menu",
+			type: "update",
+		})
+
+		commands.emit<cmd.ctxMenu.add>("context-menu.add", {
+			cmd: "editor.add-heading-5",
+			Icon: BsTypeH5,
+			readableName: "Заголовок 5",
+			accelerator: "5",
+			shouldShow: ({ payload }) => payload === "editor-quick-menu",
+			type: "update",
+		})
+
+		commands.emit<cmd.ctxMenu.add>("context-menu.add", {
+			cmd: "editor.add-list-item",
+			Icon: BsListUl,
+			readableName: "Создать список",
+			accelerator: "shift+1",
+			shouldShow: ({ payload }) => payload === "editor-quick-menu",
+			type: "update",
+		})
+
+		commands.emit<cmd.ctxMenu.add>("context-menu.add", {
+			cmd: "editor.add-number-list-item",
+			Icon: BsListOl,
+			readableName: "Создать упорядоченный список",
+			accelerator: "shift+2",
+			shouldShow: ({ payload }) => payload === "editor-quick-menu",
+			type: "update",
+		})
+
+		commands.emit<cmd.ctxMenu.add>("context-menu.add", {
 			cmd: "editor.add-check-list-item",
-			Icon: BsCheckSquare,
+			Icon: BsListCheck,
 			readableName: "Создать чекбокс",
+			accelerator: "shift+3",
+			shouldShow: ({ payload }) => payload === "editor-quick-menu",
+			type: "update",
+		})
+
+		commands.emit<cmd.ctxMenu.add>("context-menu.add", {
+			cmd: "editor.add-blockquote",
+			Icon: BsBlockquoteLeft,
+			readableName: "Создать цитату",
+			accelerator: "b",
+			shouldShow: ({ payload }) => payload === "editor-quick-menu",
+			type: "update",
+		})
+
+		commands.emit<cmd.ctxMenu.add>("context-menu.add", {
+			cmd: "editor.add-paragraph",
+			Icon: BsTextParagraph,
+			readableName: "Создать параграф",
+			accelerator: "backspace",
 			shouldShow: ({ payload }) => payload === "editor-quick-menu",
 			type: "update",
 		})
@@ -204,13 +281,34 @@ export default function EditorWorkspace() {
 		})
 
 		return () => {
-			// commands.emit<cmd.ctxMenu.remove>("context-menu.remove", "editor.test")
-			// commands.off("editor.test", handleTest)
+			commands.emit<cmd.ctxMenu.remove>("context-menu.remove", "editor.add-heading-1")
+			commands.emit<cmd.ctxMenu.remove>("context-menu.remove", "editor.add-heading-2")
+			commands.emit<cmd.ctxMenu.remove>("context-menu.remove", "editor.add-heading-3")
+			commands.emit<cmd.ctxMenu.remove>("context-menu.remove", "editor.add-heading-4")
+			commands.emit<cmd.ctxMenu.remove>("context-menu.remove", "editor.add-heading-5")
+			commands.emit<cmd.ctxMenu.remove>("context-menu.remove", "editor.add-list-item")
+			commands.emit<cmd.ctxMenu.remove>("context-menu.remove", "editor.add-number-list-item")
+			commands.emit<cmd.ctxMenu.remove>("context-menu.remove", "editor.add-check-list-item")
+			commands.emit<cmd.ctxMenu.remove>("context-menu.remove", "editor.add-blockquote")
+			commands.emit<cmd.ctxMenu.remove>("context-menu.remove", "editor.add-paragraph")
+
+			commands.off("editor.add-heading-1", handleCreateHeading1)
+			commands.off("editor.add-heading-2", handleCreateHeading2)
+			commands.off("editor.add-heading-3", handleCreateHeading3)
+			commands.off("editor.add-heading-4", handleCreateHeading4)
+			commands.off("editor.add-heading-5", handleCreateHeading5)
+			commands.off("editor.add-list-item", handleCreateListItem)
+			commands.off("editor.add-list-item", handleCreateListItem)
+			commands.off("editor.add-number-list-item", handleCreateNumberListItem)
+			commands.off("editor.add-check-list-item", handleCreateCheckListItem)
+			commands.off("editor.add-blockquote", handleCreateBlockquote)
+			commands.off("editor.add-paragraph", handleCreateParagraph)
+
 			subscription.unsubscribe()
 		}
 	}, [commands, editor])
 
-	return Either.fromNullable(data).fold(
+	return fromNullableE(data).fold(
 		() => (
 			<CenteredPage centerX centerY>
 				<div className="px-12">

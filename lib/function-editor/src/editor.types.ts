@@ -20,6 +20,7 @@
 import { Descendant, Element } from "slate"
 
 import { FSID } from "@ordo-pink/data"
+import { TNodeType } from "./editor.constants"
 
 declare global {
 	module cmd {
@@ -30,7 +31,7 @@ declare global {
 	}
 }
 
-export type OrdoDescendant = Descendant & { type: string }
-export type OrdoElement = Element & { type: string }
+export type OrdoDescendant = Descendant & { type: TNodeType }
+export type OrdoElement = Element & { type: TNodeType }
 
 export {}

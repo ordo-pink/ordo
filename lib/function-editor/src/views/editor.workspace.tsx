@@ -20,24 +20,17 @@
 import {
 	BsBlockquoteLeft,
 	BsBox2,
-	BsCheckCircle,
-	BsCircle,
-	BsExclamationCircle,
-	BsInfoCircle,
 	BsListCheck,
 	BsListNested,
 	BsListOl,
 	BsListUl,
-	BsQuestionCircle,
 	BsTag,
 	BsTextParagraph,
-	BsThreeDotsVertical,
 	BsTypeH1,
 	BsTypeH2,
 	BsTypeH3,
 	BsTypeH4,
 	BsTypeH5,
-	BsXCircle,
 } from "react-icons/bs"
 import {
 	Descendant,
@@ -77,7 +70,6 @@ import { Switch } from "@ordo-pink/switch"
 import { fromNullableE } from "@ordo-pink/either"
 
 import ActionListItem from "@ordo-pink/frontend-react-components/action-list-item"
-import Callout from "@ordo-pink/frontend-react-components/callout"
 import CenteredPage from "@ordo-pink/frontend-react-components/centered-page"
 import Loader from "@ordo-pink/frontend-react-components/loader"
 
@@ -90,15 +82,16 @@ import { OrdoDescendant, OrdoElement } from "../editor.types"
 import { Portal } from "../components/portal.component"
 import { noop } from "@ordo-pink/tau"
 import { withLabels } from "../plugins/with-labels.editor-plugin"
+import { withLinks } from "../plugins/with-links.editor-plugin"
+import { withToC } from "../plugins/with-toc.editor-plugin"
 
+import Callout from "../components/callout.component"
 import DataEditor from "../components/data-editor.component"
 import EditableTitle from "../components/editable-title.component"
 import HoveringToolbar from "../components/hovering-toolbar.component"
 import Label from "../components/label.component"
 import Link from "../components/link.component"
 import ToC from "../components/toc.component"
-import { withLinks } from "../plugins/with-links.editor-plugin"
-import { withToC } from "../plugins/with-toc.editor-plugin"
 
 const labelFuse = new Fuse([] as string[], {
 	threshold: 0.1,
@@ -759,7 +752,7 @@ const Leaf = ({ attributes, children, leaf }: any) => {
 
 const Element = (props: any) =>
 	Switch.of(props.element.type)
-		.case("callout", () => <EditorCalloutElement {...props} />)
+		.case("callout", () => <Callout {...props} />)
 		.case("block-quote", () => (
 			<blockquote
 				className="border-l border-neutral-500 py-2 pl-2 text-sm italic"
@@ -812,104 +805,6 @@ const Element = (props: any) =>
 				{props.children}
 			</p>
 		))
-
-const EditorCalloutElement = ({ attributes, children, element }: RenderElementProps) => {
-	const editor = useSlateStatic() as ReactEditor
-	const commands = useCommands()
-
-	useEffect(() => {
-		const handleSetCalloutType = (type: Client.Notification.Type) => () => {
-			const newProperties: Partial<SlateElement & { calloutType: string }> = {
-				calloutType: type,
-			}
-
-			Transforms.setNodes(editor, newProperties)
-		}
-
-		commands.on("editor.set-callout-type-default", handleSetCalloutType("default"))
-		commands.on("editor.set-callout-type-info", handleSetCalloutType("info"))
-		commands.on("editor.set-callout-type-question", handleSetCalloutType("question"))
-		commands.on("editor.set-callout-type-success", handleSetCalloutType("success"))
-		commands.on("editor.set-callout-type-warn", handleSetCalloutType("warn"))
-		commands.on("editor.set-callout-type-rrr", handleSetCalloutType("rrr"))
-
-		commands.emit<cmd.ctxMenu.add>("context-menu.add", {
-			cmd: "editor.set-callout-type-default",
-			Icon: BsCircle,
-			readableName: "Default",
-			type: "update",
-			shouldShow: ({ payload }) => payload === "editor.callout-menu",
-		})
-
-		commands.emit<cmd.ctxMenu.add>("context-menu.add", {
-			cmd: "editor.set-callout-type-info",
-			Icon: BsInfoCircle,
-			readableName: "Info",
-			type: "update",
-			shouldShow: ({ payload }) => payload === "editor.callout-menu",
-		})
-
-		commands.emit<cmd.ctxMenu.add>("context-menu.add", {
-			cmd: "editor.set-callout-type-question",
-			Icon: BsQuestionCircle,
-			readableName: "Question",
-			type: "update",
-			shouldShow: ({ payload }) => payload === "editor.callout-menu",
-		})
-
-		commands.emit<cmd.ctxMenu.add>("context-menu.add", {
-			cmd: "editor.set-callout-type-warn",
-			Icon: BsExclamationCircle,
-			readableName: "Warning",
-			type: "update",
-			shouldShow: ({ payload }) => payload === "editor.callout-menu",
-		})
-
-		commands.emit<cmd.ctxMenu.add>("context-menu.add", {
-			cmd: "editor.set-callout-type-success",
-			Icon: BsCheckCircle,
-			readableName: "Success",
-			type: "update",
-			shouldShow: ({ payload }) => payload === "editor.callout-menu",
-		})
-
-		commands.emit<cmd.ctxMenu.add>("context-menu.add", {
-			cmd: "editor.set-callout-type-rrr",
-			Icon: BsXCircle,
-			readableName: "Error",
-			type: "update",
-			shouldShow: ({ payload }) => payload === "editor.callout-menu",
-		})
-
-		return () => {
-			commands.off("editor.set-callout-type-default", handleSetCalloutType("default"))
-			commands.off("editor.set-callout-type-info", handleSetCalloutType("info"))
-			commands.off("editor.set-callout-type-question", handleSetCalloutType("question"))
-			commands.off("editor.set-callout-type-success", handleSetCalloutType("success"))
-			commands.off("editor.set-callout-type-warn", handleSetCalloutType("warn"))
-			commands.off("editor.set-callout-type-rrr", handleSetCalloutType("rrr"))
-		}
-	}, [commands, editor, element])
-
-	return (
-		<div {...attributes} className="py-4">
-			<Callout type={(element as any).calloutType}>
-				<div className="flex w-full items-center justify-between">
-					{children}
-					<BsThreeDotsVertical
-						className="shrink-0 cursor-pointer opacity-20 transition-opacity duration-300 hover:opacity-100"
-						onClick={event =>
-							commands.emit<cmd.ctxMenu.show>("context-menu.show", {
-								event,
-								payload: "editor.callout-menu",
-							})
-						}
-					/>
-				</div>
-			</Callout>
-		</div>
-	)
-}
 
 const CheckListItemElement = ({ attributes, children, element }: RenderElementProps) => {
 	const editor = useSlateStatic() as ReactEditor

@@ -36,9 +36,10 @@ type Props = {
 	children?: any
 	Icon?: ComponentType | IconType
 	onIconClick?: () => void
+	className?: string
 }
 
-export default function Callout({ type, children, Icon, onIconClick = noop }: Props) {
+export default function Callout({ type, children, Icon, onIconClick = noop, className }: Props) {
 	const { DefaultIcon, background } = Switch.of(type)
 		.case("info", () => ({
 			background: "bg-sky-100 dark:bg-sky-800",
@@ -67,7 +68,7 @@ export default function Callout({ type, children, Icon, onIconClick = noop }: Pr
 
 	return (
 		<div
-			className={`flex w-full max-w-lg items-center space-x-4 rounded-lg px-4 py-2 shadow-sm ${background}`}
+			className={`flex w-full max-w-lg items-center space-x-4 rounded-lg px-4 py-2 shadow-sm ${background} ${className}`}
 		>
 			{Icon ? (
 				<div className="size-16 shrink-0 rounded-sm" onClick={onIconClick}>

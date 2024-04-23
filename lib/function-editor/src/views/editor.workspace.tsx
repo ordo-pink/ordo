@@ -195,6 +195,11 @@ export default function EditorWorkspace() {
 					toggleMark(editor, "bold")
 
 				// @ts-ignore
+				case "formatCode": // eslint-disable-line no-fallthrough
+					event.preventDefault()
+					toggleMark(editor, "code")
+
+				// @ts-ignore
 				case "formatItalic": // eslint-disable-line no-fallthrough
 					event.preventDefault()
 					toggleMark(editor, "italic")

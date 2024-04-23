@@ -17,7 +17,7 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { BsTypeBold, BsTypeItalic, BsTypeUnderline } from "react-icons/bs"
+import { BsCode, BsTypeBold, BsTypeItalic, BsTypeUnderline } from "react-icons/bs"
 import { Editor, Range } from "slate"
 import { ReactEditor, useFocused, useSlate } from "slate-react"
 import { Ref, forwardRef, useEffect, useRef } from "react"
@@ -70,6 +70,7 @@ export default function HoveringToolbar() {
 				<FormatButton format="bold" Icon={() => <BsTypeBold />} />
 				<FormatButton format="italic" Icon={() => <BsTypeItalic />} />
 				<FormatButton format="underlined" Icon={() => <BsTypeUnderline />} />
+				<FormatButton format="code" Icon={() => <BsCode />} />
 			</Menu>
 		</Portal>
 	)
@@ -88,6 +89,7 @@ const FormatButton = ({ format, Icon }: any) => {
 	return (
 		<Button
 			reversed
+			className="cursor-pointer active:bg-neutral-500"
 			active={isMarkActive(editor as ReactEditor, format)}
 			onClick={() => toggleMark(editor as ReactEditor, format)}
 		>

@@ -29,24 +29,24 @@ export const handleTransform = (editor: Editor, type: TNodeType): void => {
 		match: n => isOrdoElement(n) && Editor.isBlock(editor, n),
 	})
 
-	if (type === "list-item") {
-		const list: BulletedListElement = {
-			type: "unordered-list",
-			children: [],
-		}
-		Transforms.wrapNodes(editor, list, {
-			match: node => !Editor.isEditor(node) && isOrdoElement(node) && node.type === "list-item",
-		})
-	}
+	// if (type === "list-item") {
+	// 	const list: BulletedListElement = {
+	// 		type: "unordered-list",
+	// 		children: [],
+	// 	}
+	// 	Transforms.wrapNodes(editor, list, {
+	// 		match: node => !Editor.isEditor(node) && isOrdoElement(node) && node.type === "list-item",
+	// 	})
+	// }
 
-	if (type === "number-list-item") {
-		const list: NumericListElement = {
-			type: "ordered-list",
-			children: [],
-		}
-		Transforms.wrapNodes(editor, list, {
-			match: node =>
-				!Editor.isEditor(node) && isOrdoElement(node) && node.type === "number-list-item",
-		})
-	}
+	// if (type === "number-list-item") {
+	// 	const list: NumericListElement = {
+	// 		type: "ordered-list",
+	// 		children: [],
+	// 	}
+	// 	Transforms.wrapNodes(editor, list, {
+	// 		match: node =>
+	// 			!Editor.isEditor(node) && isOrdoElement(node) && node.type === "number-list-item",
+	// 	})
+	// }
 }

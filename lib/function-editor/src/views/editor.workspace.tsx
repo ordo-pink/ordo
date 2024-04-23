@@ -76,6 +76,7 @@ import { withShortcuts } from "../plugins/with-shortcuts.editor-plugin"
 import DataEditor from "../components/data-editor.component"
 import EditableTitle from "../components/editable-title.component"
 import HoveringToolbar from "../components/hovering-toolbar.component"
+import { OrdoDescendant } from "../editor.types"
 
 export default function EditorWorkspace() {
 	const { fsid } = useRouteParams<{ fsid: FSID }>()
@@ -199,7 +200,6 @@ export default function EditorWorkspace() {
 		commands.on("editor.add-callout", handleCreateCallout)
 
 		// TODO: Support for putting a link
-
 		commands.emit<cmd.ctxMenu.add>("context-menu.add", {
 			cmd: "editor.add-heading-1",
 			Icon: BsTypeH1,
@@ -398,10 +398,28 @@ export default function EditorWorkspace() {
 									}
 
 									if (event.key === "Enter") {
-										// event.preventDefault()
-										// Transforms.insertNodes(editor, [
-										// 	{ type: "paragraph", children: [{ text: "" }] } as any,
-										// ])
+										if (!editor.selection) return
+
+										const node = editor.children[editor.selection.anchor.path[0]] as OrdoDescendant
+
+										if (
+											node.type !== "check-list-item" &&
+											node.type !== "list-item" &&
+											node.type !== "number-list-item"
+										) {
+											event.preventDefault()
+
+											Transforms.insertNodes(editor, [
+												{ type: "paragraph", children: [{ text: "" }] } as any,
+											])
+										} else {
+											if ((node as any).children?.[0].text === "") {
+												event.preventDefault()
+
+												handleTransform(editor, "paragraph")
+												Transforms.delete(editor)
+											}
+										}
 									}
 								}}
 							/>
@@ -440,19 +458,19 @@ const Element = (props: any) =>
 				{props.children}
 			</blockquote>
 		))
-		.case("unordered-list", () => <ul {...props.attributes}>{props.children}</ul>)
-		.case("ordered-list", () => (
-			<ol className="list-decimal" {...props.attributes}>
-				{props.children}
-			</ol>
-		))
+		// .case("unordered-list", () => <ul {...props.attributes}>{props.children}</ul>)
+		// .case("ordered-list", () => (
+		// 	<ol className="list-decimal" {...props.attributes}>
+		// 		{props.children}
+		// 	</ol>
+		// ))
 		.case("list-item", () => (
-			<li className="py-2" {...props.attributes}>
+			<li className="list-disc" {...props.attributes}>
 				{props.children}
 			</li>
 		))
 		.case("number-list-item", () => (
-			<li className="list-decimal py-2" {...props.attributes}>
+			<li className="list-decimal" {...props.attributes}>
 				{props.children}
 			</li>
 		))

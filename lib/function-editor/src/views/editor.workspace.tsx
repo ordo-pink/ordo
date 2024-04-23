@@ -63,14 +63,15 @@ import { debounce } from "rxjs/internal/operators/debounce"
 import { timer } from "rxjs/internal/observable/timer"
 import { withHistory } from "slate-history"
 
+import { FSID, PlainData } from "@ordo-pink/data"
 import {
 	useCommands,
 	useContent,
 	useDataByFSID,
 	useDataLabels,
 	useRouteParams,
+	useSelectDataList,
 } from "@ordo-pink/frontend-react-hooks"
-import { FSID } from "@ordo-pink/data"
 import { Switch } from "@ordo-pink/switch"
 import { fromNullableE } from "@ordo-pink/either"
 
@@ -93,8 +94,15 @@ import DataEditor from "../components/data-editor.component"
 import EditableTitle from "../components/editable-title.component"
 import HoveringToolbar from "../components/hovering-toolbar.component"
 import Label from "../components/label.component"
+import Link from "../components/link.component"
+import { withLinks } from "../plugins/with-links.editor-plugin"
 
-const fuse = new Fuse([] as string[], {
+const labelFuse = new Fuse([] as string[], {
+	threshold: 0.1,
+})
+
+const linkFuse = new Fuse([] as PlainData[], {
+	keys: ["name"],
 	threshold: 0.1,
 })
 
@@ -111,21 +119,43 @@ export default function EditorWorkspace() {
 	const [isLoading, setIsLoading] = useState(true)
 	const [target, setTarget] = useState<Range | null>(null)
 	const [index, setIndex] = useState(0)
-	const [search, setSearch] = useState("")
-	const [visibleLabels, setVisibleItems] = useState<string[]>([])
+	const [labelSearch, setLabelSearch] = useState("")
+	const [linkSearch, setLinkSearch] = useState("")
+	const [visibleLabels, setVisibleLabels] = useState<string[]>([])
+	const [visibleLinks, setVisibleLinks] = useState<PlainData[]>([])
 
 	const labels = useDataLabels()
+	const links = useSelectDataList(item => item.fsid !== fsid)
 
 	useEffect(() => {
-		if (!search || !labels.length) return
+		if (!labelSearch || !labels.length) return
 
-		fuse.setCollection(labels)
+		labelFuse.setCollection(labels)
 
-		setVisibleItems(fuse.search(search).map(result => result.item))
-	}, [labels, search])
+		setVisibleLabels(
+			labelFuse
+				.search(labelSearch)
+				.map(result => result.item)
+				.slice(0, 10),
+		)
+	}, [labels.length, labelSearch])
+
+	useEffect(() => {
+		if (!linkSearch || !links.length) return
+
+		linkFuse.setCollection(links)
+
+		setVisibleLinks(
+			linkFuse
+				.search(linkSearch)
+				.map(result => result.item)
+				.slice(0, 10),
+		)
+	}, [links.length, linkSearch])
 
 	const editor = useMemo(
-		() => withLabels(withShortcuts(withChecklists(withHistory(withReact(createEditor()))))),
+		() =>
+			withLinks(withLabels(withShortcuts(withChecklists(withHistory(withReact(createEditor())))))),
 		[],
 	)
 
@@ -240,8 +270,6 @@ export default function EditorWorkspace() {
 		commands.on("editor.add-paragraph", handleCreateParagraph)
 		commands.on("editor.add-callout", handleCreateCallout)
 
-		// TODO: Support for putting a link
-		// TODO: Support for putting a label
 		// TODO: Register once
 		commands.emit<cmd.ctxMenu.add>("context-menu.add", {
 			cmd: "editor.add-heading-1",
@@ -383,7 +411,16 @@ export default function EditorWorkspace() {
 		const rect = domRange.getBoundingClientRect()
 		el.style.top = `${rect.top + window.scrollY + 24}px`
 		el.style.left = `${rect.left + window.scrollX}px`
-	}, [visibleLabels, editor, index, search, target])
+	}, [visibleLabels.length, editor, index, labelSearch, target])
+
+	useEffect(() => {
+		const el = ref.current
+		if (!el || !target) return
+		const domRange = ReactEditor.toDOMRange(editor, target)
+		const rect = domRange.getBoundingClientRect()
+		el.style.top = `${rect.top + window.scrollY + 24}px`
+		el.style.left = `${rect.left + window.scrollX}px`
+	}, [visibleLinks.length, editor, index, linkSearch, target])
 
 	return fromNullableE(data).fold(
 		() => (
@@ -414,16 +451,26 @@ export default function EditorWorkspace() {
 								const before = wordBefore && Editor.before(editor, wordBefore)
 								const beforeRange = before && Editor.range(editor, before, start)
 								const beforeText = beforeRange && Editor.string(editor, beforeRange)
-								const beforeMatch = beforeText && beforeText.match(/^[#!](\p{L}+)$/iu)
+								const labelsBeforeMatch = beforeText && beforeText.match(/^[#№](\p{L}+)$/iu)
+								const linksBeforeMatch = beforeText && beforeText.match(/^!(\p{L}+)$/iu)
 								const after = Editor.after(editor, start)
 								const afterRange = Editor.range(editor, start, after)
 								const afterText = Editor.string(editor, afterRange)
 								const afterMatch = afterText.match(/^(\s|$)/)
 
-								if (beforeMatch && afterMatch) {
+								if (linksBeforeMatch && afterMatch) {
 									setTarget(beforeRange)
-									setSearch(beforeMatch[1])
+									setLinkSearch(linksBeforeMatch[1])
 									setIndex(0)
+
+									return
+								}
+
+								if (labelsBeforeMatch && afterMatch) {
+									setTarget(beforeRange)
+									setLabelSearch(labelsBeforeMatch[1])
+									setIndex(0)
+
 									return
 								}
 							}
@@ -441,7 +488,7 @@ export default function EditorWorkspace() {
 					>
 						<HoveringToolbar />
 
-						{target && (
+						{target && (labelSearch || linkSearch) && (
 							<Portal>
 								<div
 									ref={ref}
@@ -455,7 +502,26 @@ export default function EditorWorkspace() {
 									}}
 									data-cy="labels-portal"
 								>
-									{visibleLabels.length > 0 ? (
+									{visibleLinks.length > 0 ? (
+										visibleLinks.map((link, i) => (
+											<ActionListItem
+												key={link.fsid}
+												onClick={() => {
+													Transforms.select(editor, target)
+													insertLink(editor, link.fsid)
+													setTarget(null)
+
+													commands.emit<cmd.data.addLink>("data.add-link", {
+														item: data,
+														link: link.fsid,
+													})
+												}}
+												text={link.name}
+												Icon={BsTag}
+												current={i === index}
+											/>
+										))
+									) : visibleLabels.length > 0 ? (
 										visibleLabels.map((label, i) => (
 											<ActionListItem
 												key={label}
@@ -471,23 +537,23 @@ export default function EditorWorkspace() {
 												current={i === index}
 											/>
 										))
-									) : (
+									) : labelSearch !== "" ? (
 										<ActionListItem
 											onClick={() => {
 												Transforms.select(editor, target)
-												insertLabel(editor, search)
+												insertLabel(editor, labelSearch)
 												setTarget(null)
 
 												commands.emit<cmd.data.addLabel>("data.add-label", {
 													item: data,
-													label: search,
+													label: labelSearch,
 												})
 											}}
-											text={`Создать метку "${search}"`}
+											text={`Создать метку "${labelSearch}"`}
 											Icon={BsTag}
 											current
 										/>
-									)}
+									) : null}
 								</div>
 							</Portal>
 						)}
@@ -505,7 +571,7 @@ export default function EditorWorkspace() {
 								onDOMBeforeInput={handleDOMBeforeInput}
 								renderElement={renderElement}
 								onKeyDown={(event: KeyboardEvent<HTMLDivElement>) => {
-									if (target && (visibleLabels.length > 0 || search !== "")) {
+									if (target && (visibleLabels.length > 0 || labelSearch !== "")) {
 										Switch.of(event.key)
 											.case("ArrowDown", () => {
 												event.preventDefault()
@@ -522,12 +588,48 @@ export default function EditorWorkspace() {
 												() => {
 													event.preventDefault()
 													Transforms.select(editor, target)
-													insertLabel(editor, visibleLabels[index] ?? search)
+													insertLabel(editor, visibleLabels[index] ?? labelSearch)
 													setTarget(null)
 
 													commands.emit<cmd.data.addLabel>("data.add-label", {
 														item: data,
-														label: visibleLabels[index] ?? search,
+														label: visibleLabels[index] ?? labelSearch,
+													})
+												},
+											)
+											.case("Escape", () => {
+												event.preventDefault()
+												setTarget(null)
+											})
+											.default(noop)
+
+										return
+									} else if (target && (visibleLinks.length > 0 || linkSearch !== "")) {
+										Switch.of(event.key)
+											.case("ArrowDown", () => {
+												event.preventDefault()
+												const prevIndex = index >= visibleLinks.length - 1 ? 0 : index + 1
+												setIndex(prevIndex)
+											})
+											.case("ArrowUp", () => {
+												event.preventDefault()
+												const nextIndex = index <= 0 ? visibleLinks.length - 1 : index - 1
+												setIndex(nextIndex)
+											})
+											.case(
+												key => ["Tab", "Enter"].includes(key),
+												() => {
+													if (!visibleLinks[index]) return
+
+													event.preventDefault()
+
+													Transforms.select(editor, target)
+													insertLink(editor, visibleLinks[index].fsid)
+													setTarget(null)
+
+													commands.emit<cmd.data.addLink>("data.add-link", {
+														item: data,
+														link: visibleLinks[index].fsid,
 													})
 												},
 											)
@@ -600,21 +702,31 @@ const save$ = new Subject<{ fsid: FSID; value: Descendant[] }>()
 const debounceSave$ = save$.pipe(debounce(() => timer(1000)))
 
 const insertLabel = (editor: Editor, label: string) => {
-	const mention: OrdoElement = {
+	const labelNode: OrdoElement = {
 		type: "label",
 		label,
 		children: [{ text: "" }],
 	} as any
-	Transforms.insertNodes(editor, mention)
+	Transforms.insertNodes(editor, labelNode)
+	Transforms.move(editor)
+}
+
+const insertLink = (editor: Editor, fsid: FSID) => {
+	const linkNode: OrdoElement = {
+		type: "link",
+		fsid,
+		children: [{ text: "" }],
+	} as any
+	Transforms.insertNodes(editor, linkNode)
 	Transforms.move(editor)
 }
 
 const serialize = (value: Descendant[]) => JSON.stringify(value)
 
 const Leaf = ({ attributes, children, leaf }: any) => {
-	if (leaf.bold) children = <strong>{children}</strong>
-	if (leaf.code) children = <code>{children}</code>
-	if (leaf.italic) children = <em>{children}</em>
+	if (leaf.bold) children = <strong className="inline-block">{children}</strong>
+	if (leaf.code) children = <code className="inline-block">{children}</code>
+	if (leaf.italic) children = <em className="inline-block">{children}</em>
 	if (leaf.underlined) children = <u className="underline">{children}</u>
 
 	return <span {...attributes}>{children}</span>
@@ -631,6 +743,7 @@ const Element = (props: any) =>
 				{props.children}
 			</blockquote>
 		))
+		.case("link", () => <Link {...props} />)
 		.case("label", () => <Label {...props} />)
 		.case("list-item", () => (
 			<li className="list-disc" {...props.attributes}>

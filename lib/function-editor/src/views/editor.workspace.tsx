@@ -28,6 +28,7 @@ import {
 	BsListOl,
 	BsListUl,
 	BsQuestionCircle,
+	BsTag,
 	BsTextParagraph,
 	BsThreeDotsVertical,
 	BsTypeH1,
@@ -37,7 +38,15 @@ import {
 	BsTypeH5,
 	BsXCircle,
 } from "react-icons/bs"
-import { Descendant, Editor, Node, Element as SlateElement, Transforms, createEditor } from "slate"
+import {
+	Descendant,
+	Editor,
+	Node,
+	Range,
+	Element as SlateElement,
+	Transforms,
+	createEditor,
+} from "slate"
 import {
 	Editable,
 	ReactEditor,
@@ -47,7 +56,8 @@ import {
 	useSlateStatic,
 	withReact,
 } from "slate-react"
-import { KeyboardEvent, useCallback, useEffect, useMemo, useState } from "react"
+import { KeyboardEvent, useCallback, useEffect, useMemo, useRef, useState } from "react"
+import Fuse from "fuse.js"
 import { Subject } from "rxjs/internal/Subject"
 import { debounce } from "rxjs/internal/operators/debounce"
 import { timer } from "rxjs/internal/observable/timer"
@@ -57,15 +67,16 @@ import {
 	useCommands,
 	useContent,
 	useDataByFSID,
+	useDataLabels,
 	useRouteParams,
 } from "@ordo-pink/frontend-react-hooks"
 import { FSID } from "@ordo-pink/data"
 import { Switch } from "@ordo-pink/switch"
 import { fromNullableE } from "@ordo-pink/either"
 
-import CenteredPage from "@ordo-pink/frontend-react-components/centered-page"
-
+import ActionListItem from "@ordo-pink/frontend-react-components/action-list-item"
 import Callout from "@ordo-pink/frontend-react-components/callout"
+import CenteredPage from "@ordo-pink/frontend-react-components/centered-page"
 import Loader from "@ordo-pink/frontend-react-components/loader"
 
 import { EMPTY_EDITOR_CHILDREN, SHORTCUTS } from "../editor.constants"
@@ -73,12 +84,23 @@ import { handleTransform } from "../fns/handle-transform"
 import { withChecklists } from "../plugins/with-checklists.editor-plugin"
 import { withShortcuts } from "../plugins/with-shortcuts.editor-plugin"
 
+import { OrdoDescendant, OrdoElement } from "../editor.types"
+import { Portal } from "../components/portal.component"
+import { noop } from "@ordo-pink/tau"
+import { withLabels } from "../plugins/with-labels.editor-plugin"
+
 import DataEditor from "../components/data-editor.component"
 import EditableTitle from "../components/editable-title.component"
 import HoveringToolbar from "../components/hovering-toolbar.component"
-import { OrdoDescendant } from "../editor.types"
+import Label from "../components/label.component"
+
+const fuse = new Fuse([] as string[], {
+	threshold: 0.1,
+})
 
 export default function EditorWorkspace() {
+	const ref = useRef<HTMLDivElement>(null)
+
 	const { fsid } = useRouteParams<{ fsid: FSID }>()
 
 	const commands = useCommands()
@@ -87,9 +109,23 @@ export default function EditorWorkspace() {
 
 	const [prevFsid, setPrevFsid] = useState<FSID>()
 	const [isLoading, setIsLoading] = useState(true)
+	const [target, setTarget] = useState<Range | null>(null)
+	const [index, setIndex] = useState(0)
+	const [search, setSearch] = useState("")
+	const [visibleLabels, setVisibleItems] = useState<string[]>([])
+
+	const labels = useDataLabels()
+
+	useEffect(() => {
+		if (!search || !labels.length) return
+
+		fuse.setCollection(labels)
+
+		setVisibleItems(fuse.search(search).map(result => result.item))
+	}, [labels, search])
 
 	const editor = useMemo(
-		() => withShortcuts(withChecklists(withHistory(withReact(createEditor())))),
+		() => withLabels(withShortcuts(withChecklists(withHistory(withReact(createEditor()))))),
 		[],
 	)
 
@@ -200,6 +236,8 @@ export default function EditorWorkspace() {
 		commands.on("editor.add-callout", handleCreateCallout)
 
 		// TODO: Support for putting a link
+		// TODO: Support for putting a label
+		// TODO: Register once
 		commands.emit<cmd.ctxMenu.add>("context-menu.add", {
 			cmd: "editor.add-heading-1",
 			Icon: BsTypeH1,
@@ -333,6 +371,15 @@ export default function EditorWorkspace() {
 		}
 	}, [commands, editor])
 
+	useEffect(() => {
+		const el = ref.current
+		if (!el || !target) return
+		const domRange = ReactEditor.toDOMRange(editor, target)
+		const rect = domRange.getBoundingClientRect()
+		el.style.top = `${rect.top + window.scrollY + 24}px`
+		el.style.left = `${rect.left + window.scrollX}px`
+	}, [visibleLabels, editor, index, search, target])
+
 	return fromNullableE(data).fold(
 		() => (
 			<CenteredPage centerX centerY>
@@ -354,6 +401,30 @@ export default function EditorWorkspace() {
 						editor={editor}
 						initialValue={EMPTY_EDITOR_CHILDREN}
 						onChange={(value: Descendant[]) => {
+							const { selection } = editor
+
+							if (selection && Range.isCollapsed(selection)) {
+								const [start] = Range.edges(selection)
+								const wordBefore = Editor.before(editor, start, { unit: "word" })
+								const before = wordBefore && Editor.before(editor, wordBefore)
+								const beforeRange = before && Editor.range(editor, before, start)
+								const beforeText = beforeRange && Editor.string(editor, beforeRange)
+								const beforeMatch = beforeText && beforeText.match(/^[#!](\p{L}+)$/iu)
+								const after = Editor.after(editor, start)
+								const afterRange = Editor.range(editor, start, after)
+								const afterText = Editor.string(editor, afterRange)
+								const afterMatch = afterText.match(/^(\s|$)/)
+
+								if (beforeMatch && afterMatch) {
+									setTarget(beforeRange)
+									setSearch(beforeMatch[1])
+									setIndex(0)
+									return
+								}
+							}
+
+							setTarget(null)
+
 							const isAstChange = editor.operations.some(op => "set_selection" !== op.type)
 
 							if (!isAstChange || !data.fsid) return
@@ -364,6 +435,58 @@ export default function EditorWorkspace() {
 						}}
 					>
 						<HoveringToolbar />
+
+						{target && (
+							<Portal>
+								<div
+									ref={ref}
+									className="flex w-full max-w-sm flex-col rounded-lg bg-neutral-200 px-2 py-1 shadow-md dark:bg-neutral-600"
+									style={{
+										top: "-9999px",
+										left: "-9999px",
+										position: "absolute",
+										zIndex: 1,
+										padding: "3px",
+									}}
+									data-cy="labels-portal"
+								>
+									{visibleLabels.length > 0 ? (
+										visibleLabels.map((label, i) => (
+											<ActionListItem
+												key={label}
+												onClick={() => {
+													Transforms.select(editor, target)
+													insertLabel(editor, label)
+													setTarget(null)
+
+													commands.emit<cmd.data.addLabel>("data.add-label", { item: data, label })
+												}}
+												text={label}
+												Icon={BsTag}
+												current={i === index}
+											/>
+										))
+									) : (
+										<ActionListItem
+											onClick={() => {
+												Transforms.select(editor, target)
+												insertLabel(editor, search)
+												setTarget(null)
+
+												commands.emit<cmd.data.addLabel>("data.add-label", {
+													item: data,
+													label: search,
+												})
+											}}
+											text={`Создать метку "${search}"`}
+											Icon={BsTag}
+											current
+										/>
+									)}
+								</div>
+							</Portal>
+						)}
+
 						{isLoading ? (
 							<div className="flex size-full min-h-[50dvh] flex-col items-center justify-center">
 								<Loader />
@@ -377,6 +500,41 @@ export default function EditorWorkspace() {
 								onDOMBeforeInput={handleDOMBeforeInput}
 								renderElement={renderElement}
 								onKeyDown={(event: KeyboardEvent<HTMLDivElement>) => {
+									if (target && (visibleLabels.length > 0 || search !== "")) {
+										Switch.of(event.key)
+											.case("ArrowDown", () => {
+												event.preventDefault()
+												const prevIndex = index >= visibleLabels.length - 1 ? 0 : index + 1
+												setIndex(prevIndex)
+											})
+											.case("ArrowUp", () => {
+												event.preventDefault()
+												const nextIndex = index <= 0 ? visibleLabels.length - 1 : index - 1
+												setIndex(nextIndex)
+											})
+											.case(
+												key => ["Tab", "Enter"].includes(key),
+												() => {
+													event.preventDefault()
+													Transforms.select(editor, target)
+													insertLabel(editor, visibleLabels[index] ?? search)
+													setTarget(null)
+
+													commands.emit<cmd.data.addLabel>("data.add-label", {
+														item: data,
+														label: visibleLabels[index] ?? search,
+													})
+												},
+											)
+											.case("Escape", () => {
+												event.preventDefault()
+												setTarget(null)
+											})
+											.default(noop)
+
+										return
+									}
+
 									if (
 										editor.selection?.anchor.offset === 0 &&
 										(event.key === "/" || event.key === ".")
@@ -436,6 +594,16 @@ export default function EditorWorkspace() {
 const save$ = new Subject<{ fsid: FSID; value: Descendant[] }>()
 const debounceSave$ = save$.pipe(debounce(() => timer(1000)))
 
+const insertLabel = (editor: Editor, label: string) => {
+	const mention: OrdoElement = {
+		type: "label",
+		label,
+		children: [{ text: "" }],
+	} as any
+	Transforms.insertNodes(editor, mention)
+	Transforms.move(editor)
+}
+
 const serialize = (value: Descendant[]) => JSON.stringify(value)
 
 const Leaf = ({ attributes, children, leaf }: any) => {
@@ -458,12 +626,7 @@ const Element = (props: any) =>
 				{props.children}
 			</blockquote>
 		))
-		// .case("unordered-list", () => <ul {...props.attributes}>{props.children}</ul>)
-		// .case("ordered-list", () => (
-		// 	<ol className="list-decimal" {...props.attributes}>
-		// 		{props.children}
-		// 	</ol>
-		// ))
+		.case("label", () => <Label {...props} />)
 		.case("list-item", () => (
 			<li className="list-disc" {...props.attributes}>
 				{props.children}

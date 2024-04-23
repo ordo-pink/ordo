@@ -1,6 +1,6 @@
 import { Editor, Range, Transforms } from "slate"
 
-import { BulletedListElement, NumericListElement } from "../plugins/with-shortcuts.editor-plugin"
+// import { BulletedListElement, NumericListElement } from "../plugins/with-shortcuts.editor-plugin"
 import { OrdoElement } from "../editor.types"
 import { TNodeType } from "../editor.constants"
 import { isOrdoElement } from "../guards/is-ordo-element.guard"

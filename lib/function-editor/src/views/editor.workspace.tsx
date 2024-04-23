@@ -131,6 +131,131 @@ export default function EditorWorkspace() {
 	const links = useSelectDataList(item => item.fsid !== fsid)
 
 	useEffect(() => {
+		commands.emit<cmd.ctxMenu.add>("context-menu.add", {
+			cmd: "editor.add-heading-1",
+			Icon: BsTypeH1,
+			readableName: "Заголовок 1",
+			accelerator: "1",
+			shouldShow: ({ payload }) => payload === "editor-quick-menu",
+			type: "update",
+		})
+
+		commands.emit<cmd.ctxMenu.add>("context-menu.add", {
+			cmd: "editor.add-heading-2",
+			Icon: BsTypeH2,
+			readableName: "Заголовок 2",
+			accelerator: "2",
+			shouldShow: ({ payload }) => payload === "editor-quick-menu",
+			type: "update",
+		})
+
+		commands.emit<cmd.ctxMenu.add>("context-menu.add", {
+			cmd: "editor.add-heading-3",
+			Icon: BsTypeH3,
+			readableName: "Заголовок 3",
+			accelerator: "3",
+			shouldShow: ({ payload }) => payload === "editor-quick-menu",
+			type: "update",
+		})
+
+		commands.emit<cmd.ctxMenu.add>("context-menu.add", {
+			cmd: "editor.add-heading-4",
+			Icon: BsTypeH4,
+			readableName: "Заголовок 4BsTypeH4",
+			accelerator: "4",
+			shouldShow: ({ payload }) => payload === "editor-quick-menu",
+			type: "update",
+		})
+
+		commands.emit<cmd.ctxMenu.add>("context-menu.add", {
+			cmd: "editor.add-heading-5",
+			Icon: BsTypeH5,
+			readableName: "Заголовок 5",
+			accelerator: "5",
+			shouldShow: ({ payload }) => payload === "editor-quick-menu",
+			type: "update",
+		})
+
+		commands.emit<cmd.ctxMenu.add>("context-menu.add", {
+			cmd: "editor.add-list-item",
+			Icon: BsListUl,
+			readableName: "Создать список",
+			accelerator: "shift+1",
+			shouldShow: ({ payload }) => payload === "editor-quick-menu",
+			type: "update",
+		})
+
+		commands.emit<cmd.ctxMenu.add>("context-menu.add", {
+			cmd: "editor.add-number-list-item",
+			Icon: BsListOl,
+			readableName: "Создать упорядоченный список",
+			accelerator: "shift+2",
+			shouldShow: ({ payload }) => payload === "editor-quick-menu",
+			type: "update",
+		})
+
+		commands.emit<cmd.ctxMenu.add>("context-menu.add", {
+			cmd: "editor.add-check-list-item",
+			Icon: BsListCheck,
+			readableName: "Создать чекбокс",
+			accelerator: "shift+3",
+			shouldShow: ({ payload }) => payload === "editor-quick-menu",
+			type: "update",
+		})
+
+		commands.emit<cmd.ctxMenu.add>("context-menu.add", {
+			cmd: "editor.add-blockquote",
+			Icon: BsBlockquoteLeft,
+			readableName: "Создать цитату",
+			accelerator: "b",
+			shouldShow: ({ payload }) => payload === "editor-quick-menu",
+			type: "update",
+		})
+
+		commands.emit<cmd.ctxMenu.add>("context-menu.add", {
+			cmd: "editor.add-paragraph",
+			Icon: BsTextParagraph,
+			readableName: "Создать параграф",
+			accelerator: "backspace",
+			shouldShow: ({ payload }) => payload === "editor-quick-menu",
+			type: "update",
+		})
+
+		commands.emit<cmd.ctxMenu.add>("context-menu.add", {
+			cmd: "editor.add-callout",
+			Icon: BsBox2,
+			readableName: "Создать выноску",
+			accelerator: "c",
+			shouldShow: ({ payload }) => payload === "editor-quick-menu",
+			type: "create",
+		})
+
+		commands.emit<cmd.ctxMenu.add>("context-menu.add", {
+			cmd: "editor.add-toc",
+			Icon: BsListNested,
+			readableName: "Содержание страницы",
+			accelerator: "t",
+			shouldShow: ({ payload }) => payload === "editor-quick-menu",
+			type: "create",
+		})
+
+		return () => {
+			commands.emit<cmd.ctxMenu.remove>("context-menu.remove", "editor.add-heading-1")
+			commands.emit<cmd.ctxMenu.remove>("context-menu.remove", "editor.add-heading-2")
+			commands.emit<cmd.ctxMenu.remove>("context-menu.remove", "editor.add-heading-3")
+			commands.emit<cmd.ctxMenu.remove>("context-menu.remove", "editor.add-heading-4")
+			commands.emit<cmd.ctxMenu.remove>("context-menu.remove", "editor.add-heading-5")
+			commands.emit<cmd.ctxMenu.remove>("context-menu.remove", "editor.add-list-item")
+			commands.emit<cmd.ctxMenu.remove>("context-menu.remove", "editor.add-number-list-item")
+			commands.emit<cmd.ctxMenu.remove>("context-menu.remove", "editor.add-check-list-item")
+			commands.emit<cmd.ctxMenu.remove>("context-menu.remove", "editor.add-blockquote")
+			commands.emit<cmd.ctxMenu.remove>("context-menu.remove", "editor.add-paragraph")
+			commands.emit<cmd.ctxMenu.remove>("context-menu.remove", "editor.add-callout")
+			commands.emit<cmd.ctxMenu.remove>("context-menu.remove", "editor.add-toc")
+		}
+	}, [commands])
+
+	useEffect(() => {
 		if (!labelSearch || !labels.length) return
 
 		labelFuse.setCollection(labels)
@@ -280,132 +405,12 @@ export default function EditorWorkspace() {
 		commands.on("editor.add-toc", handleCreateToC)
 
 		// TODO: Register once
-		commands.emit<cmd.ctxMenu.add>("context-menu.add", {
-			cmd: "editor.add-heading-1",
-			Icon: BsTypeH1,
-			readableName: "Заголовок 1",
-			accelerator: "1",
-			shouldShow: ({ payload }) => payload === "editor-quick-menu",
-			type: "update",
-		})
-
-		commands.emit<cmd.ctxMenu.add>("context-menu.add", {
-			cmd: "editor.add-heading-2",
-			Icon: BsTypeH2,
-			readableName: "Заголовок 2",
-			accelerator: "2",
-			shouldShow: ({ payload }) => payload === "editor-quick-menu",
-			type: "update",
-		})
-
-		commands.emit<cmd.ctxMenu.add>("context-menu.add", {
-			cmd: "editor.add-heading-3",
-			Icon: BsTypeH3,
-			readableName: "Заголовок 3",
-			accelerator: "3",
-			shouldShow: ({ payload }) => payload === "editor-quick-menu",
-			type: "update",
-		})
-
-		commands.emit<cmd.ctxMenu.add>("context-menu.add", {
-			cmd: "editor.add-heading-4",
-			Icon: BsTypeH4,
-			readableName: "Заголовок 4BsTypeH4",
-			accelerator: "4",
-			shouldShow: ({ payload }) => payload === "editor-quick-menu",
-			type: "update",
-		})
-
-		commands.emit<cmd.ctxMenu.add>("context-menu.add", {
-			cmd: "editor.add-heading-5",
-			Icon: BsTypeH5,
-			readableName: "Заголовок 5",
-			accelerator: "5",
-			shouldShow: ({ payload }) => payload === "editor-quick-menu",
-			type: "update",
-		})
-
-		commands.emit<cmd.ctxMenu.add>("context-menu.add", {
-			cmd: "editor.add-list-item",
-			Icon: BsListUl,
-			readableName: "Создать список",
-			accelerator: "shift+1",
-			shouldShow: ({ payload }) => payload === "editor-quick-menu",
-			type: "update",
-		})
-
-		commands.emit<cmd.ctxMenu.add>("context-menu.add", {
-			cmd: "editor.add-number-list-item",
-			Icon: BsListOl,
-			readableName: "Создать упорядоченный список",
-			accelerator: "shift+2",
-			shouldShow: ({ payload }) => payload === "editor-quick-menu",
-			type: "update",
-		})
-
-		commands.emit<cmd.ctxMenu.add>("context-menu.add", {
-			cmd: "editor.add-check-list-item",
-			Icon: BsListCheck,
-			readableName: "Создать чекбокс",
-			accelerator: "shift+3",
-			shouldShow: ({ payload }) => payload === "editor-quick-menu",
-			type: "update",
-		})
-
-		commands.emit<cmd.ctxMenu.add>("context-menu.add", {
-			cmd: "editor.add-blockquote",
-			Icon: BsBlockquoteLeft,
-			readableName: "Создать цитату",
-			accelerator: "b",
-			shouldShow: ({ payload }) => payload === "editor-quick-menu",
-			type: "update",
-		})
-
-		commands.emit<cmd.ctxMenu.add>("context-menu.add", {
-			cmd: "editor.add-paragraph",
-			Icon: BsTextParagraph,
-			readableName: "Создать параграф",
-			accelerator: "backspace",
-			shouldShow: ({ payload }) => payload === "editor-quick-menu",
-			type: "update",
-		})
-
-		commands.emit<cmd.ctxMenu.add>("context-menu.add", {
-			cmd: "editor.add-callout",
-			Icon: BsBox2,
-			readableName: "Создать выноску",
-			accelerator: "c",
-			shouldShow: ({ payload }) => payload === "editor-quick-menu",
-			type: "create",
-		})
-
-		commands.emit<cmd.ctxMenu.add>("context-menu.add", {
-			cmd: "editor.add-toc",
-			Icon: BsListNested,
-			readableName: "Содержание страницы",
-			accelerator: "t",
-			shouldShow: ({ payload }) => payload === "editor-quick-menu",
-			type: "create",
-		})
 
 		const subscription = debounceSave$.subscribe(({ fsid, value }) => {
 			commands.emit<cmd.data.setContent>("data.set-content", { fsid, content: serialize(value) })
 		})
 
 		return () => {
-			commands.emit<cmd.ctxMenu.remove>("context-menu.remove", "editor.add-heading-1")
-			commands.emit<cmd.ctxMenu.remove>("context-menu.remove", "editor.add-heading-2")
-			commands.emit<cmd.ctxMenu.remove>("context-menu.remove", "editor.add-heading-3")
-			commands.emit<cmd.ctxMenu.remove>("context-menu.remove", "editor.add-heading-4")
-			commands.emit<cmd.ctxMenu.remove>("context-menu.remove", "editor.add-heading-5")
-			commands.emit<cmd.ctxMenu.remove>("context-menu.remove", "editor.add-list-item")
-			commands.emit<cmd.ctxMenu.remove>("context-menu.remove", "editor.add-number-list-item")
-			commands.emit<cmd.ctxMenu.remove>("context-menu.remove", "editor.add-check-list-item")
-			commands.emit<cmd.ctxMenu.remove>("context-menu.remove", "editor.add-blockquote")
-			commands.emit<cmd.ctxMenu.remove>("context-menu.remove", "editor.add-paragraph")
-			commands.emit<cmd.ctxMenu.remove>("context-menu.remove", "editor.add-callout")
-			commands.emit<cmd.ctxMenu.remove>("context-menu.remove", "editor.add-toc")
-
 			commands.off("editor.add-heading-1", handleCreateHeading1)
 			commands.off("editor.add-heading-2", handleCreateHeading2)
 			commands.off("editor.add-heading-3", handleCreateHeading3)

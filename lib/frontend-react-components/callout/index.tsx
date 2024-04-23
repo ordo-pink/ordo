@@ -29,14 +29,16 @@ import { ComponentType } from "react"
 import { IconType } from "react-icons"
 
 import { Switch } from "@ordo-pink/switch"
+import { noop } from "@ordo-pink/tau"
 
 type Props = {
 	type?: Client.Notification.Type
 	children?: any
 	Icon?: ComponentType | IconType
+	onIconClick?: () => void
 }
 
-export default function Callout({ type, children, Icon }: Props) {
+export default function Callout({ type, children, Icon, onIconClick = noop }: Props) {
 	const { DefaultIcon, background } = Switch.of(type)
 		.case("info", () => ({
 			background: "bg-sky-100 dark:bg-sky-800",
@@ -68,13 +70,13 @@ export default function Callout({ type, children, Icon }: Props) {
 			className={`flex w-full max-w-lg items-center space-x-4 rounded-lg px-4 py-2 shadow-sm ${background}`}
 		>
 			{Icon ? (
-				<div className="size-16 shrink-0 rounded-sm">
+				<div className="size-16 shrink-0 rounded-sm" onClick={onIconClick}>
 					<Icon />
 				</div>
 			) : (
 				<DefaultIcon />
 			)}
-			<div className="text-sm">{children}</div>
+			<div className="w-full text-sm">{children}</div>
 		</div>
 	)
 }

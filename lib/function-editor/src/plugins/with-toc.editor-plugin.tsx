@@ -21,8 +21,6 @@ import { Editor, Point, Range, Transforms } from "slate"
 import { ReactEditor } from "slate-react"
 
 import { OrdoDescendant, OrdoElement } from "../editor.types"
-import { SHORTCUTS } from "../editor.constants"
-import { handleTransform } from "../fns/handle-transform"
 import { isOrdoElement } from "../guards/is-ordo-element.guard"
 
 export type BulletedListElement = {
@@ -35,30 +33,8 @@ export type NumericListElement = {
 	children: OrdoDescendant[]
 }
 
-export const withShortcuts = <T extends ReactEditor>(editor: T): T => {
-	const { deleteBackward, insertText } = editor
-
-	editor.insertText = text => {
-		const { selection } = editor
-
-		if (text.endsWith(" ") && selection && Range.isCollapsed(selection)) {
-			const { anchor } = selection
-			const block = Editor.above(editor, {
-				match: n => isOrdoElement(n) && Editor.isBlock(editor, n),
-			})
-			const path = block ? block[1] : []
-			const start = Editor.start(editor, path)
-			const range = { anchor, focus: start }
-			const beforeText = (Editor.string(editor, range) +
-				text.slice(0, -1)) as keyof typeof SHORTCUTS
-
-			const type = SHORTCUTS[beforeText]
-
-			if (type) return handleTransform(editor, type)
-		}
-
-		insertText(text)
-	}
+export const withToC = <T extends ReactEditor>(editor: T): T => {
+	const { deleteBackward } = editor
 
 	editor.deleteBackward = (...args) => {
 		const { selection } = editor
@@ -75,7 +51,7 @@ export const withShortcuts = <T extends ReactEditor>(editor: T): T => {
 				if (
 					!Editor.isEditor(block) &&
 					isOrdoElement(block) &&
-					block.type !== "paragraph" &&
+					block.type === "toc" &&
 					Point.equals(selection.anchor, start)
 				) {
 					const newProperties: Partial<OrdoElement> = {
@@ -87,9 +63,9 @@ export const withShortcuts = <T extends ReactEditor>(editor: T): T => {
 					return
 				}
 			}
-
-			deleteBackward(...args)
 		}
+
+		deleteBackward(...args)
 	}
 
 	return editor

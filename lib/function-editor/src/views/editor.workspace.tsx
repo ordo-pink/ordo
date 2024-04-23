@@ -25,6 +25,7 @@ import {
 	BsExclamationCircle,
 	BsInfoCircle,
 	BsListCheck,
+	BsListNested,
 	BsListOl,
 	BsListUl,
 	BsQuestionCircle,
@@ -95,7 +96,9 @@ import EditableTitle from "../components/editable-title.component"
 import HoveringToolbar from "../components/hovering-toolbar.component"
 import Label from "../components/label.component"
 import Link from "../components/link.component"
+import ToC from "../components/toc.component"
 import { withLinks } from "../plugins/with-links.editor-plugin"
+import { withToC } from "../plugins/with-toc.editor-plugin"
 
 const labelFuse = new Fuse([] as string[], {
 	threshold: 0.1,
@@ -155,7 +158,11 @@ export default function EditorWorkspace() {
 
 	const editor = useMemo(
 		() =>
-			withLinks(withLabels(withShortcuts(withChecklists(withHistory(withReact(createEditor())))))),
+			withToC(
+				withLinks(
+					withLabels(withShortcuts(withChecklists(withHistory(withReact(createEditor()))))),
+				),
+			),
 		[],
 	)
 
@@ -255,6 +262,7 @@ export default function EditorWorkspace() {
 		const handleCreateBlockquote = () => handleTransform(editor, "block-quote")
 		const handleCreateParagraph = () => handleTransform(editor, "paragraph")
 		const handleCreateCallout = () => handleTransform(editor, "callout")
+		const handleCreateToC = () => handleTransform(editor, "toc")
 
 		// TODO: Add commands to `cmd` namespace
 		commands.on("editor.add-heading-1", handleCreateHeading1)
@@ -269,6 +277,7 @@ export default function EditorWorkspace() {
 		commands.on("editor.add-blockquote", handleCreateBlockquote)
 		commands.on("editor.add-paragraph", handleCreateParagraph)
 		commands.on("editor.add-callout", handleCreateCallout)
+		commands.on("editor.add-toc", handleCreateToC)
 
 		// TODO: Register once
 		commands.emit<cmd.ctxMenu.add>("context-menu.add", {
@@ -367,7 +376,16 @@ export default function EditorWorkspace() {
 			readableName: "Создать выноску",
 			accelerator: "c",
 			shouldShow: ({ payload }) => payload === "editor-quick-menu",
-			type: "update",
+			type: "create",
+		})
+
+		commands.emit<cmd.ctxMenu.add>("context-menu.add", {
+			cmd: "editor.add-toc",
+			Icon: BsListNested,
+			readableName: "Содержание страницы",
+			accelerator: "t",
+			shouldShow: ({ payload }) => payload === "editor-quick-menu",
+			type: "create",
 		})
 
 		const subscription = debounceSave$.subscribe(({ fsid, value }) => {
@@ -386,6 +404,7 @@ export default function EditorWorkspace() {
 			commands.emit<cmd.ctxMenu.remove>("context-menu.remove", "editor.add-blockquote")
 			commands.emit<cmd.ctxMenu.remove>("context-menu.remove", "editor.add-paragraph")
 			commands.emit<cmd.ctxMenu.remove>("context-menu.remove", "editor.add-callout")
+			commands.emit<cmd.ctxMenu.remove>("context-menu.remove", "editor.add-toc")
 
 			commands.off("editor.add-heading-1", handleCreateHeading1)
 			commands.off("editor.add-heading-2", handleCreateHeading2)
@@ -399,6 +418,7 @@ export default function EditorWorkspace() {
 			commands.off("editor.add-blockquote", handleCreateBlockquote)
 			commands.off("editor.add-paragraph", handleCreateParagraph)
 			commands.off("editor.add-callout", handleCreateCallout)
+			commands.off("editor.add-toc", handleCreateToC)
 
 			subscription.unsubscribe()
 		}
@@ -745,6 +765,7 @@ const Element = (props: any) =>
 		))
 		.case("link", () => <Link {...props} />)
 		.case("label", () => <Label {...props} />)
+		.case("toc", () => <ToC {...props} />)
 		.case("list-item", () => (
 			<li className="list-disc" {...props.attributes}>
 				{props.children}

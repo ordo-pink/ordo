@@ -49,7 +49,14 @@ export const SHORTCUTS = {
 	"[]": "check-list-item",
 } as const
 
-type TDefaultNodes = "ordered-list" | "unordered-list" | "paragraph" | "callout" | "label" | "link"
+type TDefaultNodes =
+	| "ordered-list"
+	| "unordered-list"
+	| "paragraph"
+	| "callout"
+	| "label"
+	| "link"
+	| "toc"
 
 export type TNodeType =
 	| (typeof SHORTCUTS extends { [key: string]: infer U } ? U : never)

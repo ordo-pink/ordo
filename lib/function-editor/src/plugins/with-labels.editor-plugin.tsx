@@ -1,5 +1,6 @@
 import { ReactEditor } from "slate-react"
 
+// TODO: Remove label from data
 export const withLabels = <T extends ReactEditor>(editor: T): T => {
 	const { isInline, isVoid, markableVoid } = editor
 

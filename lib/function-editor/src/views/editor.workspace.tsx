@@ -20,6 +20,7 @@
 import {
 	BsBlockquoteLeft,
 	BsBox2,
+	BsLink45Deg,
 	BsListCheck,
 	BsListNested,
 	BsListOl,
@@ -469,8 +470,8 @@ export default function EditorWorkspace() {
 								const before = wordBefore && Editor.before(editor, wordBefore)
 								const beforeRange = before && Editor.range(editor, before, start)
 								const beforeText = beforeRange && Editor.string(editor, beforeRange)
-								const labelsBeforeMatch = beforeText && beforeText.match(/^[#№](\p{L}+)$/iu)
-								const linksBeforeMatch = beforeText && beforeText.match(/^!(\p{L}+)$/iu)
+								const labelsBeforeMatch = beforeText && beforeText.match(/^[#№]([\d\p{L}+])$/iu)
+								const linksBeforeMatch = beforeText && beforeText.match(/^!([\d\p{L}]+)$/iu)
 								const after = Editor.after(editor, start)
 								const afterRange = Editor.range(editor, start, after)
 								const afterText = Editor.string(editor, afterRange)
@@ -479,6 +480,7 @@ export default function EditorWorkspace() {
 								if (linksBeforeMatch && afterMatch) {
 									setTarget(beforeRange)
 									setLinkSearch(linksBeforeMatch[1])
+									setLabelSearch("")
 									setIndex(0)
 
 									return
@@ -487,6 +489,7 @@ export default function EditorWorkspace() {
 								if (labelsBeforeMatch && afterMatch) {
 									setTarget(beforeRange)
 									setLabelSearch(labelsBeforeMatch[1])
+									setLinkSearch("")
 									setIndex(0)
 
 									return
@@ -520,7 +523,7 @@ export default function EditorWorkspace() {
 									}}
 									data-cy="labels-portal"
 								>
-									{visibleLinks.length > 0 ? (
+									{linkSearch !== "" && visibleLinks.length > 0 ? (
 										visibleLinks.map((link, i) => (
 											<ActionListItem
 												key={link.fsid}
@@ -535,11 +538,11 @@ export default function EditorWorkspace() {
 													})
 												}}
 												text={link.name}
-												Icon={BsTag}
+												Icon={BsLink45Deg}
 												current={i === index}
 											/>
 										))
-									) : visibleLabels.length > 0 ? (
+									) : labelSearch !== "" && visibleLabels.length > 0 ? (
 										visibleLabels.map((label, i) => (
 											<ActionListItem
 												key={label}
@@ -555,7 +558,7 @@ export default function EditorWorkspace() {
 												current={i === index}
 											/>
 										))
-									) : labelSearch !== "" ? (
+									) : labelSearch !== "" && visibleLabels.length === 0 ? (
 										<ActionListItem
 											onClick={() => {
 												Transforms.select(editor, target)

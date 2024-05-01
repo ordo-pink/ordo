@@ -1,5 +1,6 @@
 import { ReactEditor } from "slate-react"
 
+// TODO: Remove link from data
 export const withLinks = <T extends ReactEditor>(editor: T): T => {
 	const { isInline, isVoid, markableVoid } = editor
 

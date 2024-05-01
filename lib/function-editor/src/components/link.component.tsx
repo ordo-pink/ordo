@@ -1,3 +1,4 @@
+import { BsLink45Deg } from "react-icons/bs"
 import { RenderElementProps } from "slate-react"
 
 import { DataLabelInline } from "@ordo-pink/frontend-react-components/data-label"
@@ -9,8 +10,11 @@ export default function Link({ children, element }: RenderElementProps) {
 	return (
 		<span contentEditable={false} className="cursor-pointer pr-1">
 			<DataLabelInline>
-				{item?.name}
-				{children}
+				<span className="flex items-center space-x-1">
+					<BsLink45Deg />
+					<span>{item?.name}</span>
+					<span>{children}</span>
+				</span>
 			</DataLabelInline>
 		</span>
 	)

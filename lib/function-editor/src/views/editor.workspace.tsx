@@ -509,7 +509,7 @@ export default function EditorWorkspace() {
 					>
 						<HoveringToolbar />
 
-						{target && (labelSearch || linkSearch) && (
+						{target && (labelSearch || (linkSearch && visibleLinks.length > 0)) && (
 							<Portal>
 								<div
 									ref={ref}

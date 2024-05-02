@@ -260,6 +260,7 @@ export default function EditorWorkspace() {
 				.map(result => result.item)
 				.slice(0, 10),
 		)
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [labels.length, labelSearch])
 
 	useEffect(() => {
@@ -273,6 +274,7 @@ export default function EditorWorkspace() {
 				.map(result => result.item)
 				.slice(0, 10),
 		)
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [links.length, linkSearch])
 
 	const editor = useMemo(

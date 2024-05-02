@@ -19,7 +19,7 @@
 
 import { BsArrowUpRight } from "react-icons/bs"
 
-import { Either } from "@ordo-pink/either"
+import { fromNullableE } from "@ordo-pink/either"
 
 import Link from "@ordo-pink/frontend-react-components/link"
 import Loader from "@ordo-pink/frontend-react-components/loader"
@@ -28,7 +28,7 @@ import { type News } from "../function-home.types"
 
 type P = { news: News[] | null }
 export default function NewsSection({ news }: P) {
-	return Either.fromNullable(news).fold(
+	return fromNullableE(news).fold(
 		() => (
 			<div className="flex size-full items-center justify-center">
 				<Loader size="l" />
@@ -36,7 +36,7 @@ export default function NewsSection({ news }: P) {
 		),
 		news => (
 			<>
-				{news.map(article => (
+				{news.slice(0, 2).map(article => (
 					<div key={article.title} className="flex flex-col space-y-2">
 						<div className="mb-1 flex flex-wrap items-center justify-between space-x-2">
 							<h4 className="text-xl font-bold">{article.title}</h4>

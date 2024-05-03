@@ -109,6 +109,11 @@ export default function Home() {
 						списка). Для того, чтобы принудить редактор создать <strong>параграф</strong>, повторно
 						нажмите <code>Enter</code>.
 					</li>
+
+					<li>
+						Добавлены достижения за создание 250 файлов (<strong>Туча Файлы</strong>), 500 файлов (
+						<strong>Тьма Файлы</strong>) и 1000 файлов (<strong>Легион Файлы</strong>).
+					</li>
 				</ul>
 
 				<h2 className="text-xl font-extrabold">Исправления</h2>

@@ -29,7 +29,10 @@ export default function Footer() {
 		<footer className="w-full rounded-lg bg-neutral-900 text-neutral-200 shadow-xl">
 			<div className="container mx-auto flex w-full flex-col items-center gap-6 p-4 md:flex-row md:justify-between md:p-6">
 				<span className="text-sm text-neutral-200 sm:text-center dark:text-neutral-200">
-					© {currentYear} Ordo.pink
+					© {currentYear}{" "}
+					<a href="/" className="!text-current no-underline">
+						Ordo.pink
+					</a>
 				</span>
 				<ul className="mt-3 flex items-center gap-6 text-2xl text-neutral-200 sm:mt-0 dark:text-neutral-200">
 					<li>

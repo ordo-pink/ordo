@@ -18,12 +18,13 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { KnownFunctions, QueryPermission } from "@ordo-pink/frontend-known-functions"
-import { Either } from "@ordo-pink/either"
 import { N } from "@ordo-pink/tau"
 import { Switch } from "@ordo-pink/switch"
+import { achievements$ } from "@ordo-pink/frontend-stream-achievements"
+import { fromBooleanE } from "@ordo-pink/either"
+import { useCurrentFID } from "@ordo-pink/frontend-stream-activities"
 import { user$ } from "@ordo-pink/frontend-stream-user"
 
-import { useCurrentFID } from "@ordo-pink/frontend-stream-activities"
 import { useStrictSubscription } from "./use-strict-subscription.hook"
 import { useSubscription } from "./use-subscription.hook"
 
@@ -31,28 +32,28 @@ export const useUser = () => {
 	const fid = useCurrentFID()
 	const user = useSubscription(user$)
 
-	return Either.fromBoolean(checkPermission(fid, [])).fold(N, () => user)
+	return fromBooleanE(checkPermission(fid, [])).fold(N, () => user)
 }
 
 export const useUserID = () => {
 	const fid = useCurrentFID()
 	const { id } = useStrictSubscription(user$, { id: null } as unknown as User.User)
 
-	return Either.fromBoolean(checkPermission(fid, ["user.id"])).fold(N, () => id)
+	return fromBooleanE(checkPermission(fid, ["user.id"])).fold(N, () => id)
 }
 
 export const useUserEmail = () => {
 	const fid = useCurrentFID()
 	const { email } = useStrictSubscription(user$, { email: null } as unknown as User.User)
 
-	return Either.fromBoolean(checkPermission(fid, ["user.email"])).fold(N, () => email)
+	return fromBooleanE(checkPermission(fid, ["user.email"])).fold(N, () => email)
 }
 
 export const useUserCreationDate = () => {
 	const fid = useCurrentFID()
 	const { createdAt } = useStrictSubscription(user$, { createdAt: null } as unknown as User.User)
 
-	return Either.fromBoolean(checkPermission(fid, ["user.createdAt"])).fold(N, () => createdAt)
+	return fromBooleanE(checkPermission(fid, ["user.createdAt"])).fold(N, () => createdAt)
 }
 
 export const useUserSubscriptionStatus = () => {
@@ -61,7 +62,7 @@ export const useUserSubscriptionStatus = () => {
 		subscription: null,
 	} as unknown as User.User)
 
-	return Either.fromBoolean(checkPermission(fid, ["user.subscription"])).fold(N, () => subscription)
+	return fromBooleanE(checkPermission(fid, ["user.subscription"])).fold(N, () => subscription)
 }
 
 export const useUserName = () => {
@@ -71,7 +72,7 @@ export const useUserName = () => {
 		lastName: null,
 	} as unknown as User.User)
 
-	return Either.fromBoolean(checkPermission(fid, ["user.name"])).fold(N, () => ({
+	return fromBooleanE(checkPermission(fid, ["user.name"])).fold(N, () => ({
 		firstName: user.firstName ?? "",
 		lastName: user.lastName ?? "",
 		fullName: Switch.of(user)
@@ -82,10 +83,20 @@ export const useUserName = () => {
 	}))
 }
 
+export const useUserAchievements = () => {
+	const fid = useCurrentFID()
+	const achievements = useStrictSubscription(achievements$, [])
+
+	return fromBooleanE(checkPermission(fid, ["user.achievements"])).fold(
+		() => [] as Achievements.AchievementDAO[],
+		() => achievements,
+	)
+}
+
 // --- Internal ---
 
 const hasFirstName = (user: User.User) => !!user.firstName
 const hasLastName = (user: User.User) => !!user.lastName
 const hasFirstNameAndLastName = (user: User.User) => hasFirstName(user) && hasLastName(user)
-const checkPermission = (fid: symbol | null, queries: QueryPermission[]) => () =>
+const checkPermission = (fid: symbol | null, queries: QueryPermission[]) =>
 	KnownFunctions.checkPermissions(fid, { queries })

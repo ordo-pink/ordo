@@ -17,10 +17,16 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { useHosts, useUser, useUserName } from "@ordo-pink/frontend-react-hooks"
+import {
+	useHosts,
+	useUser,
+	useUserAchievements,
+	useUserName,
+} from "@ordo-pink/frontend-react-hooks"
 import { Either } from "@ordo-pink/either"
 
 import Heading from "@ordo-pink/frontend-react-components/heading"
+import Link from "@ordo-pink/frontend-react-components/link"
 import Null from "@ordo-pink/frontend-react-components/null"
 import UsedSpace from "@ordo-pink/frontend-react-components/used-space"
 
@@ -28,6 +34,7 @@ export default function FileExplorerCardComponent() {
 	const user = useUser()
 	const name = useUserName()!
 	const hosts = useHosts()
+	const achievements = useUserAchievements()
 
 	return Either.fromNullable(user).fold(Null, user => (
 		<div className="flex size-full flex-col items-center justify-center">
@@ -44,6 +51,28 @@ export default function FileExplorerCardComponent() {
 						{name.fullName || user.email}
 					</Heading>
 					<UsedSpace />
+				</div>
+
+				<h2 className="py-4 text-xl font-bold">Достижения</h2>
+
+				<div className="flex flex-nowrap items-center space-x-2">
+					{achievements
+						.sort((a, b) =>
+							!a.completedAt ? 1 : !b.completedAt ? -1 : a.completedAt > b.completedAt ? -1 : 1,
+						)
+						.slice(0, 5)
+						.map(achievement => (
+							<div key={achievement.id}>
+								<Link href="/user">
+									<img
+										className="size-12 rounded-md"
+										src={achievement.image}
+										alt={achievement.title}
+										title={`${achievement.title}\n\n${achievement.description}`}
+									/>
+								</Link>
+							</div>
+						))}
 				</div>
 			</div>
 		</div>

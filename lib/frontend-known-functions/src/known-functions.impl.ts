@@ -32,6 +32,7 @@ export type QueryPermission =
 	| "user.createdAt"
 	| "user.subscription"
 	| "user.name"
+	| "user.achievements"
 	| "achievements"
 	| "functions.current-activity"
 	| "data.read"

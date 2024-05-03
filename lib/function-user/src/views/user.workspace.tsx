@@ -40,8 +40,6 @@ import Card from "@ordo-pink/frontend-react-components/card"
 import Heading from "@ordo-pink/frontend-react-components/heading"
 import UsedSpace from "@ordo-pink/frontend-react-components/used-space"
 
-import Achievements from "../components/achievements.component"
-
 export default function UserWorkspace() {
 	const user = useUser()
 	const commands = useCommands()
@@ -316,6 +314,8 @@ export default function UserWorkspace() {
 					</fieldset>
 				</Card>
 
+				<div></div>
+
 				<Card title="Подписка">
 					<p className="text-center text-sm text-neutral-500">
 						Подключение платной подписки станет доступно совсем скоро™️!
@@ -327,8 +327,6 @@ export default function UserWorkspace() {
 						We'll put active sessions info here in the next update. Stay active!
 					</p>
 				</Card> */}
-
-				<Achievements />
 			</div>
 		</form>
 	)

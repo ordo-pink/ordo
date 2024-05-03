@@ -464,6 +464,7 @@ declare global {
 				payload?: T
 				Icon?: ComponentType | IconType
 				duration?: number
+				onClick?: () => void
 				action?: (id: string, payload: T) => unknown
 				actionText?: string
 				id?: string

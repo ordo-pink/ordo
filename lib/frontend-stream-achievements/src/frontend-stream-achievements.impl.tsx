@@ -121,6 +121,11 @@ export const __initAchievements = callOnce(({ fid, dataCommands }: P) => {
 												commands.emit<cmd.notification.show>("notification.show", {
 													type: "success",
 													title: "Получено достижение!",
+													onClick: () =>
+														commands.emit<cmd.router.navigate>(
+															"router.navigate",
+															`/achievements/${achievement.descriptor.category}`,
+														),
 													Icon: () => (
 														<img
 															className="rounded-md"

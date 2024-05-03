@@ -17,16 +17,12 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { achievements$ } from "@ordo-pink/frontend-stream-achievements"
-import { useStrictSubscription } from "@ordo-pink/frontend-react-hooks"
-
 import Card from "@ordo-pink/frontend-react-components/card"
 
 import Achievement from "./achievement.component"
 
-export default function Achievements() {
-	const achievements = useStrictSubscription(achievements$, [])
-
+type P = { achievements: Achievements.AchievementDAO[]; max?: number; title?: string }
+export default function Achievements({ achievements, max, title }: P) {
 	const visibleAchievements = achievements
 		.filter(ach => {
 			const previous = achievements.find(item => item.id === ach.previous)
@@ -52,9 +48,10 @@ export default function Achievements() {
 		.sort((a, b) =>
 			!a.completedAt ? 1 : !b.completedAt ? -1 : a.completedAt > b.completedAt ? -1 : 1,
 		)
+		.slice(0, max)
 
 	return (
-		<Card title="Достижения" className="md:col-span-2">
+		<Card title={title} className=" md:col-span-2">
 			{visibleAchievements.map(achievement => (
 				<Achievement key={achievement.id} achievement={achievement} />
 			))}

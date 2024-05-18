@@ -22,7 +22,9 @@ import { Oath } from "@ordo-pink/oath"
 
 const checkMethod = (method: HttpMethod, request: Request) => request.method === method
 const checkRoute = (route: Route, request: Request) =>
-	route instanceof RegExp ? route.test(request.url) : new URL(request.url).pathname === route
+	route instanceof RegExp
+		? route.test(new URL(request.url).pathname)
+		: new URL(request.url).pathname === route
 
 const createNativeResponse = (ctx: Context) =>
 	new Response(ctx.res.body, { headers: ctx.res.headers, status: ctx.res.status })
@@ -56,6 +58,12 @@ const router = <T extends RequiredRouterState = RequiredRouterState>(
 						.map(() => ctx),
 				),
 			)
+			.fix(() => {
+				const context = { ...ctx, res: RoutaryResponse.empty() }
+				onError(context)
+
+				return context
+			})
 			.fork(() => void 0, createNativeResponse),
 })
 

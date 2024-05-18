@@ -63,7 +63,7 @@ export default function FileExplorerCardComponent() {
 						.slice(0, 5)
 						.map(achievement => (
 							<div key={achievement.id}>
-								<Link href="/user">
+								<Link href={`/achievements/${achievement.category}`}>
 									<img
 										className="size-12 rounded-md"
 										src={achievement.image}

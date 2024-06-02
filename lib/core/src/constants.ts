@@ -36,6 +36,7 @@ export const ORDO_PINK_LINKS_FUNCTION = "pink.ordo.links"
 export const ORDO_PINK_HOME_FUNCTION = "pink.ordo.home"
 export const ORDO_PINK_EDITOR_FUNCTION = "pink.ordo.editor"
 export const ORDO_PINK_GTD_FUNCTION = "pink.ordo.gtd"
+export const ORDO_PINK_EXCALIDRAW_FUNCTION = "pink.ordo.excalidraw"
 // export const ORDO_PINK_MEDIA_FUNCTION = "pink.ordo.media"
 // export const ORDO_PINK_BOARDS_FUNCTION = "pink.ordo.boards"
 // export const ORDO_PINK_DATABASES_FUNCTION = "pink.ordo.databases"
@@ -51,6 +52,7 @@ export const internalApps = [
 	ORDO_PINK_EDITOR_FUNCTION,
 	ORDO_PINK_GTD_FUNCTION,
 	ORDO_PINK_ACHIEVEMENTS_FUNCTION,
+	ORDO_PINK_EXCALIDRAW_FUNCTION,
 ]
 
 export const enum BackgroundTaskStatus {

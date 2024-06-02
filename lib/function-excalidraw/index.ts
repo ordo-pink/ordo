@@ -1,6 +1,12 @@
 // SPDX-FileCopyrightText: Copyright 2024, 谢尔盖||↓ and the Ordo.pink contributors
 // SPDX-License-Identifier: AGPL-3.0-only
 
+import { BsFileEarmarkCode } from "react-icons/bs"
+import { lazy } from "react"
+
+import { ORDO_PINK_EXCALIDRAW_FUNCTION } from "@ordo-pink/core"
+import { createFunction } from "@ordo-pink/frontend-create-function"
+
 // Ordo.pink is an all-in-one team workspace.
 // Copyright (C) 2024  谢尔盖||↓ and the Ordo.pink contributors
 
@@ -17,35 +23,24 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { resolve } from "path"
+export default createFunction(
+	ORDO_PINK_EXCALIDRAW_FUNCTION,
+	{ queries: [], commands: [] },
+	({ getCommands, getLogger }) => {
+		const logger = getLogger()
+		const commands = getCommands()
 
-import { defineConfig } from "vite"
-import react from "@vitejs/plugin-react-swc"
-import tsconfigPaths from "vite-tsconfig-paths"
+		logger.debug("Initialising...")
 
-// https://vitejs.dev/config/
-export default defineConfig({
-	plugins: [react(), tsconfigPaths()],
+		// TODO: Move from editor to extensions
+		// TODO: Rename extensions to functions
+		commands.emit<cmd.editor.registerFileAssociation>("editor.register-file-association", {
+			contentType: "application/excalidraw",
+			name: ORDO_PINK_EXCALIDRAW_FUNCTION.concat(".excalidraw-editor"),
+			Icon: BsFileEarmarkCode,
+			Component: lazy(() => import("./src/components/excalidraw.component")),
+		})
 
-	define: {
-		"process.env.IS_PREACT": JSON.stringify("false"),
+		logger.debug("Initialised.")
 	},
-
-	build: {
-		outDir: "../../var/out/my",
-		cssMinify: true,
-		minify: true,
-	},
-	server: {
-		port: Number(process.env.ORDO_WORKSPACE_PORT),
-	},
-	resolve: {
-		alias: {
-			"@ordo-pink": resolve(__dirname, "../../lib"),
-			react: resolve(__dirname, "../../node_modules/react"),
-			"@types/react": resolve(__dirname, "../../node_modules/@types/react"),
-			"react-dom": resolve(__dirname, "../../node_modules/react-dom"),
-		},
-	},
-	clearScreen: false,
-})
+)

@@ -100,7 +100,7 @@ export default function EditorWorkspace() {
 		),
 		data => (
 			<div className="flex size-full flex-col items-center p-2 py-12">
-				<div className="flex w-full max-w-xl flex-col space-y-6">
+				<div className="flex size-full flex-col space-y-6">
 					<div>
 						<EditableTitle data={data} />
 					</div>

@@ -17,29 +17,4 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Descendant, Element } from "slate"
-
-import { FSID } from "@ordo-pink/data"
-import { TNodeType } from "./editor.constants"
-
-declare global {
-	module cmd {
-		module editor {
-			type goToEditor = { name: "editor.go-to-editor" }
-			type open = { name: "editor.open"; payload: FSID }
-			type registerFileAssociation = {
-				name: "editor.register-file-association"
-				payload: Extensions.FileAssociation
-			}
-			type unregisterFileAssociation = {
-				name: "editor.unregister-file-association"
-				payload: Extensions.FileAssociation["name"]
-			}
-		}
-	}
-}
-
-export type OrdoDescendant = Descendant & { type: TNodeType }
-export type OrdoElement = Element & { type: TNodeType }
-
-export {}
+export * from "./src/frontend-stream-file-associations.impl"

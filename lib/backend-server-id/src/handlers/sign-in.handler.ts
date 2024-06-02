@@ -61,14 +61,10 @@ export const handleSignIn: Fn =
 							.chain(tokens =>
 								Oath.of(new Date(Date.now() + tokens.exp))
 									.tap(expires => {
-										ctx.response.set(
-											"Set-Cookie",
+										ctx.response.set("Set-Cookie", [
 											`jti=${tokens.jti}; Expires=${expires.toISOString()}; SameSite=Lax; Path=/; HttpOnly;`,
-										)
-										ctx.response.set(
-											"Set-Cookie",
 											`sub=${tokens.sub}; Expires=${expires.toISOString()}; SameSite=Lax; Path=/; HttpOnly;`,
-										)
+										])
 									})
 									.map(expires => ({
 										accessToken: tokens.tokens.access,
@@ -83,8 +79,7 @@ export const handleSignIn: Fn =
 					)
 					.tap(() =>
 						notificationService.sendSignInNotification({
-							email: user.email,
-							name: user.firstName ?? "",
+							to: { email: user.email, name: user.firstName },
 							ip: ctx.get("x-forwarded-for") ?? ctx.request.ip,
 						}),
 					),

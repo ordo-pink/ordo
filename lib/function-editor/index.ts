@@ -17,7 +17,7 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { BsLayoutSidebar } from "react-icons/bs"
+import { BsFileEarmark, BsLayoutSidebar } from "react-icons/bs"
 import { lazy } from "react"
 
 import { ORDO_PINK_EDITOR_FUNCTION } from "@ordo-pink/core"
@@ -46,6 +46,13 @@ export default createFunction(
 
 		const dropGoToEditorCmd = registerGoToEditorCommand({ commands })
 		const dropOpenInEditorCmd = registerOpenInEditorCommand({ commands, data })
+
+		commands.emit<cmd.editor.registerFileAssociation>("editor.register-file-association", {
+			Component: lazy(() => import("./src/components/editor.component")),
+			Icon: BsFileEarmark,
+			contentType: "text/ordo",
+			name: ORDO_PINK_EDITOR_FUNCTION.concat(".ordo-editor"),
+		})
 
 		logger.debug("Initialised.")
 

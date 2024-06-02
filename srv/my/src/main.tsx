@@ -42,6 +42,7 @@ import { ClientDataPersistenceStrategy } from "./persistence-strategies/data.per
 
 import App from "./app"
 import { __initTitle } from "@ordo-pink/frontend-stream-title"
+import { __initFileAssociations } from "@ordo-pink/frontend-stream-file-associations"
 
 currentFID$.next(APP_FID)
 
@@ -71,6 +72,7 @@ const main = () => {
 	__initRouter(APP_FID)
 	__initCommandPalette(APP_FID)
 	__initActivities(APP_FID)
+	__initFileAssociations(APP_FID)
 	__initSidebar(APP_FID)
 
 	const container = document.getElementById("root")!

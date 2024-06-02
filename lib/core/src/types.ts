@@ -288,10 +288,18 @@ declare global {
 
 		type FileExtension = `.${string}`
 
+		type FileAssociationComponentProps = {
+			content: string | ArrayBuffer | null
+			fsid?: FSID
+			isLoading: boolean
+			data: PlainData
+		}
+
 		type FileAssociation = {
 			name: string
-			fileExtensions: FileExtension[] | "*"
-			Component: ComponentType
+			contentType: string
+			Icon?: ComponentType
+			Component: ComponentType<FileAssociationComponentProps>
 		}
 	}
 

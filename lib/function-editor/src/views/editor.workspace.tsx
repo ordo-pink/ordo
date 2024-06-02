@@ -99,13 +99,15 @@ export default function EditorWorkspace() {
 			</CenteredPage>
 		),
 		data => (
-			<div className="flex size-full flex-col items-center p-2 py-12">
-				<div className="flex size-full flex-col space-y-6">
-					<div>
-						<EditableTitle data={data} />
-					</div>
+			<div className="flex size-full flex-col items-center p-2 pb-12">
+				<div className="flex size-full flex-col space-y-3">
+					<div className="mb-8 lg:pl-12">
+						<DataEditor key={data.fsid} data={data} />
 
-					<DataEditor key={data.fsid} data={data} />
+						<div>
+							<EditableTitle data={data} />
+						</div>
+					</div>
 
 					<Editor content={content} fsid={fsid} isLoading={isLoading} data={data} />
 				</div>

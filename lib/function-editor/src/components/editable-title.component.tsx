@@ -43,17 +43,15 @@ export default function EditableTitle({ data }: P) {
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [])
 
-	const onInputChange = (event: ChangeEvent<HTMLTextAreaElement>) => {
+	const onInputChange = (event: ChangeEvent<HTMLInputElement>) => {
 		setTitle(event.target.value)
 		save$.next({ fsid: data.fsid, value: event.target.value })
 	}
 
 	return (
-		<textarea
-			className="w-full resize-none overflow-hidden border-0 bg-transparent p-0 font-mono text-3xl font-bold focus:ring-0"
+		<input
+			className="w-full resize-none overflow-hidden border-0 bg-transparent p-0 text-3xl font-bold focus:ring-0"
 			value={title}
-			cols={34}
-			rows={Math.ceil(title.length / 34)}
 			onChange={onInputChange}
 		/>
 	)

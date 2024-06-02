@@ -424,256 +424,263 @@ export default function OrdoEditor({
 	}, [visibleLinks.length, editor, index, linkSearch, target])
 
 	return (
-		<Slate
-			editor={editor}
-			initialValue={EMPTY_EDITOR_CHILDREN}
-			onChange={(value: Descendant[]) => {
-				const { selection } = editor
+		<div className="flex w-full flex-col items-center justify-center">
+			<div className="w-full max-w-3xl">
+				<Slate
+					editor={editor}
+					initialValue={EMPTY_EDITOR_CHILDREN}
+					onChange={(value: Descendant[]) => {
+						const { selection } = editor
 
-				if (selection && Range.isCollapsed(selection)) {
-					const [start] = Range.edges(selection)
-					const wordBefore = Editor.before(editor, start, { unit: "word" })
-					const before = wordBefore && Editor.before(editor, wordBefore)
-					const beforeRange = before && Editor.range(editor, before, start)
-					const beforeText = beforeRange && Editor.string(editor, beforeRange)
-					const labelsBeforeMatch = beforeText && beforeText.match(/^[#№]([\d\p{L}+])$/iu)
-					const linksBeforeMatch = beforeText && beforeText.match(/^!([\d\p{L}]+)$/iu)
-					const after = Editor.after(editor, start)
-					const afterRange = Editor.range(editor, start, after)
-					const afterText = Editor.string(editor, afterRange)
-					const afterMatch = afterText.match(/^(\s|$)/)
+						if (selection && Range.isCollapsed(selection)) {
+							const [start] = Range.edges(selection)
+							const wordBefore = Editor.before(editor, start, { unit: "word" })
+							const before = wordBefore && Editor.before(editor, wordBefore)
+							const beforeRange = before && Editor.range(editor, before, start)
+							const beforeText = beforeRange && Editor.string(editor, beforeRange)
+							const labelsBeforeMatch = beforeText && beforeText.match(/^[#№]([\d\p{L}+])$/iu)
+							const linksBeforeMatch = beforeText && beforeText.match(/^!([\d\p{L}]+)$/iu)
+							const after = Editor.after(editor, start)
+							const afterRange = Editor.range(editor, start, after)
+							const afterText = Editor.string(editor, afterRange)
+							const afterMatch = afterText.match(/^(\s|$)/)
 
-					if (linksBeforeMatch && afterMatch) {
-						setTarget(beforeRange)
-						setLinkSearch(linksBeforeMatch[1])
-						setLabelSearch("")
-						setIndex(0)
+							if (linksBeforeMatch && afterMatch) {
+								setTarget(beforeRange)
+								setLinkSearch(linksBeforeMatch[1])
+								setLabelSearch("")
+								setIndex(0)
 
-						return
-					}
+								return
+							}
 
-					if (labelsBeforeMatch && afterMatch) {
-						setTarget(beforeRange)
-						setLabelSearch(labelsBeforeMatch[1])
-						setLinkSearch("")
-						setIndex(0)
+							if (labelsBeforeMatch && afterMatch) {
+								setTarget(beforeRange)
+								setLabelSearch(labelsBeforeMatch[1])
+								setLinkSearch("")
+								setIndex(0)
 
-						return
-					}
-				}
-
-				setTarget(null)
-
-				const isAstChange = editor.operations.some(op => "set_selection" !== op.type)
-
-				if (!isAstChange || !data.fsid) return
-
-				commands.emit<cmd.background.startSaving>("background-task.start-saving")
-
-				save$.next({ fsid: data.fsid, value })
-			}}
-		>
-			<HoveringToolbar />
-
-			{target && (labelSearch || (linkSearch && visibleLinks.length > 0)) && (
-				<Portal>
-					<div
-						ref={ref}
-						className="flex w-full max-w-sm flex-col rounded-lg bg-neutral-200 px-2 py-1 shadow-md dark:bg-neutral-600"
-						style={{
-							top: "-9999px",
-							left: "-9999px",
-							position: "absolute",
-							zIndex: 1,
-							padding: "3px",
-						}}
-						data-cy="labels-portal"
-					>
-						{linkSearch !== "" && visibleLinks.length > 0 ? (
-							visibleLinks.map((link, i) => (
-								<ActionListItem
-									key={link.fsid}
-									onClick={() => {
-										Transforms.select(editor, target)
-										insertLink(editor, link.fsid)
-										setTarget(null)
-
-										commands.emit<cmd.data.addLink>("data.add-link", {
-											item: data,
-											link: link.fsid,
-										})
-									}}
-									text={link.name}
-									Icon={BsLink45Deg}
-									current={i === index}
-								/>
-							))
-						) : labelSearch !== "" && visibleLabels.length > 0 ? (
-							visibleLabels.map((label, i) => (
-								<ActionListItem
-									key={label}
-									onClick={() => {
-										Transforms.select(editor, target)
-										insertLabel(editor, label)
-										setTarget(null)
-
-										commands.emit<cmd.data.addLabel>("data.add-label", { item: data, label })
-									}}
-									text={label}
-									Icon={BsTag}
-									current={i === index}
-								/>
-							))
-						) : labelSearch !== "" && visibleLabels.length === 0 ? (
-							<ActionListItem
-								onClick={() => {
-									Transforms.select(editor, target)
-									insertLabel(editor, labelSearch)
-									setTarget(null)
-
-									commands.emit<cmd.data.addLabel>("data.add-label", {
-										item: data,
-										label: labelSearch,
-									})
-								}}
-								text={`Создать метку "${labelSearch}"`}
-								Icon={BsTag}
-								current
-							/>
-						) : null}
-					</div>
-				</Portal>
-			)}
-
-			{isLoading ? (
-				<div className="flex size-full min-h-[50dvh] flex-col items-center justify-center">
-					<Loader />
-				</div>
-			) : (
-				<Editable
-					spellCheck
-					className="pb-96 outline-none"
-					placeholder="Пора начинать..."
-					renderLeaf={renderLeaf}
-					onDOMBeforeInput={handleDOMBeforeInput}
-					renderElement={renderElement}
-					onKeyDown={(event: KeyboardEvent<HTMLDivElement>) => {
-						if (target && (visibleLabels.length > 0 || labelSearch !== "")) {
-							Switch.of(event.key)
-								.case("ArrowDown", () => {
-									event.preventDefault()
-									const prevIndex = index >= visibleLabels.length - 1 ? 0 : index + 1
-									setIndex(prevIndex)
-								})
-								.case("ArrowUp", () => {
-									event.preventDefault()
-									const nextIndex = index <= 0 ? visibleLabels.length - 1 : index - 1
-									setIndex(nextIndex)
-								})
-								.case(
-									key => ["Tab", "Enter"].includes(key),
-									() => {
-										event.preventDefault()
-										Transforms.select(editor, target)
-										insertLabel(editor, visibleLabels[index] ?? labelSearch)
-										setTarget(null)
-
-										commands.emit<cmd.data.addLabel>("data.add-label", {
-											item: data,
-											label: visibleLabels[index] ?? labelSearch,
-										})
-									},
-								)
-								.case("Escape", () => {
-									event.preventDefault()
-									setTarget(null)
-								})
-								.default(noop)
-
-							return
-						} else if (target && (visibleLinks.length > 0 || linkSearch !== "")) {
-							Switch.of(event.key)
-								.case("ArrowDown", () => {
-									event.preventDefault()
-									const prevIndex = index >= visibleLinks.length - 1 ? 0 : index + 1
-									setIndex(prevIndex)
-								})
-								.case("ArrowUp", () => {
-									event.preventDefault()
-									const nextIndex = index <= 0 ? visibleLinks.length - 1 : index - 1
-									setIndex(nextIndex)
-								})
-								.case(
-									key => ["Tab", "Enter"].includes(key),
-									() => {
-										if (!visibleLinks[index]) return
-
-										event.preventDefault()
-
-										Transforms.select(editor, target)
-										insertLink(editor, visibleLinks[index].fsid)
-										setTarget(null)
-
-										commands.emit<cmd.data.addLink>("data.add-link", {
-											item: data,
-											link: visibleLinks[index].fsid,
-										})
-									},
-								)
-								.case("Escape", () => {
-									event.preventDefault()
-									setTarget(null)
-								})
-								.default(noop)
-
-							return
-						}
-
-						if (editor.selection?.anchor.offset === 0 && (event.key === "/" || event.key === ".")) {
-							const domSelection = window.getSelection()
-							const domRange = domSelection?.getRangeAt(0)
-							const rect = domRange?.getBoundingClientRect() ?? { top: 0, left: 0, width: 0 }
-
-							;(event as any).clientX = rect.left
-							;(event as any).clientY = rect.top - 50
-
-							// TODO: Make a copy of context menu specifically for the editor
-							commands.emit<cmd.ctxMenu.show>("context-menu.show", {
-								event: event as any,
-								payload: "editor-quick-menu",
-							})
-
-							return
-						}
-
-						if (event.key === "Enter") {
-							if (!editor.selection) return
-
-							const node = editor.children[editor.selection.anchor.path[0]] as OrdoDescendant
-
-							if (
-								node.type !== "check-list-item" &&
-								node.type !== "list-item" &&
-								node.type !== "number-list-item"
-							) {
-								event.preventDefault()
-
-								Transforms.insertNodes(editor, [
-									{ type: "paragraph", children: [{ text: "" }] } as any,
-								])
-							} else {
-								if ((node as any).children?.[0].text === "") {
-									event.preventDefault()
-
-									handleTransform(editor, "paragraph")
-									Transforms.delete(editor)
-								}
+								return
 							}
 						}
+
+						setTarget(null)
+
+						const isAstChange = editor.operations.some(op => "set_selection" !== op.type)
+
+						if (!isAstChange || !data.fsid) return
+
+						commands.emit<cmd.background.startSaving>("background-task.start-saving")
+
+						save$.next({ fsid: data.fsid, value })
 					}}
-				/>
-			)}
-		</Slate>
+				>
+					<HoveringToolbar />
+
+					{target && (labelSearch || (linkSearch && visibleLinks.length > 0)) && (
+						<Portal>
+							<div
+								ref={ref}
+								className="flex w-full max-w-sm flex-col rounded-lg bg-neutral-200 px-2 py-1 shadow-md dark:bg-neutral-600"
+								style={{
+									top: "-9999px",
+									left: "-9999px",
+									position: "absolute",
+									zIndex: 1,
+									padding: "3px",
+								}}
+								data-cy="labels-portal"
+							>
+								{linkSearch !== "" && visibleLinks.length > 0 ? (
+									visibleLinks.map((link, i) => (
+										<ActionListItem
+											key={link.fsid}
+											onClick={() => {
+												Transforms.select(editor, target)
+												insertLink(editor, link.fsid)
+												setTarget(null)
+
+												commands.emit<cmd.data.addLink>("data.add-link", {
+													item: data,
+													link: link.fsid,
+												})
+											}}
+											text={link.name}
+											Icon={BsLink45Deg}
+											current={i === index}
+										/>
+									))
+								) : labelSearch !== "" && visibleLabels.length > 0 ? (
+									visibleLabels.map((label, i) => (
+										<ActionListItem
+											key={label}
+											onClick={() => {
+												Transforms.select(editor, target)
+												insertLabel(editor, label)
+												setTarget(null)
+
+												commands.emit<cmd.data.addLabel>("data.add-label", { item: data, label })
+											}}
+											text={label}
+											Icon={BsTag}
+											current={i === index}
+										/>
+									))
+								) : labelSearch !== "" && visibleLabels.length === 0 ? (
+									<ActionListItem
+										onClick={() => {
+											Transforms.select(editor, target)
+											insertLabel(editor, labelSearch)
+											setTarget(null)
+
+											commands.emit<cmd.data.addLabel>("data.add-label", {
+												item: data,
+												label: labelSearch,
+											})
+										}}
+										text={`Создать метку "${labelSearch}"`}
+										Icon={BsTag}
+										current
+									/>
+								) : null}
+							</div>
+						</Portal>
+					)}
+
+					{isLoading ? (
+						<div className="flex size-full min-h-[50dvh] flex-col items-center justify-center">
+							<Loader />
+						</div>
+					) : (
+						<Editable
+							spellCheck
+							className="pb-96 outline-none"
+							placeholder="Пора начинать..."
+							renderLeaf={renderLeaf}
+							onDOMBeforeInput={handleDOMBeforeInput}
+							renderElement={renderElement}
+							onKeyDown={(event: KeyboardEvent<HTMLDivElement>) => {
+								if (target && (visibleLabels.length > 0 || labelSearch !== "")) {
+									Switch.of(event.key)
+										.case("ArrowDown", () => {
+											event.preventDefault()
+											const prevIndex = index >= visibleLabels.length - 1 ? 0 : index + 1
+											setIndex(prevIndex)
+										})
+										.case("ArrowUp", () => {
+											event.preventDefault()
+											const nextIndex = index <= 0 ? visibleLabels.length - 1 : index - 1
+											setIndex(nextIndex)
+										})
+										.case(
+											key => ["Tab", "Enter"].includes(key),
+											() => {
+												event.preventDefault()
+												Transforms.select(editor, target)
+												insertLabel(editor, visibleLabels[index] ?? labelSearch)
+												setTarget(null)
+
+												commands.emit<cmd.data.addLabel>("data.add-label", {
+													item: data,
+													label: visibleLabels[index] ?? labelSearch,
+												})
+											},
+										)
+										.case("Escape", () => {
+											event.preventDefault()
+											setTarget(null)
+										})
+										.default(noop)
+
+									return
+								} else if (target && (visibleLinks.length > 0 || linkSearch !== "")) {
+									Switch.of(event.key)
+										.case("ArrowDown", () => {
+											event.preventDefault()
+											const prevIndex = index >= visibleLinks.length - 1 ? 0 : index + 1
+											setIndex(prevIndex)
+										})
+										.case("ArrowUp", () => {
+											event.preventDefault()
+											const nextIndex = index <= 0 ? visibleLinks.length - 1 : index - 1
+											setIndex(nextIndex)
+										})
+										.case(
+											key => ["Tab", "Enter"].includes(key),
+											() => {
+												if (!visibleLinks[index]) return
+
+												event.preventDefault()
+
+												Transforms.select(editor, target)
+												insertLink(editor, visibleLinks[index].fsid)
+												setTarget(null)
+
+												commands.emit<cmd.data.addLink>("data.add-link", {
+													item: data,
+													link: visibleLinks[index].fsid,
+												})
+											},
+										)
+										.case("Escape", () => {
+											event.preventDefault()
+											setTarget(null)
+										})
+										.default(noop)
+
+									return
+								}
+
+								if (
+									editor.selection?.anchor.offset === 0 &&
+									(event.key === "/" || event.key === ".")
+								) {
+									const domSelection = window.getSelection()
+									const domRange = domSelection?.getRangeAt(0)
+									const rect = domRange?.getBoundingClientRect() ?? { top: 0, left: 0, width: 0 }
+
+									;(event as any).clientX = rect.left
+									;(event as any).clientY = rect.top - 50
+
+									// TODO: Make a copy of context menu specifically for the editor
+									commands.emit<cmd.ctxMenu.show>("context-menu.show", {
+										event: event as any,
+										payload: "editor-quick-menu",
+									})
+
+									return
+								}
+
+								if (event.key === "Enter") {
+									if (!editor.selection) return
+
+									const node = editor.children[editor.selection.anchor.path[0]] as OrdoDescendant
+
+									if (
+										node.type !== "check-list-item" &&
+										node.type !== "list-item" &&
+										node.type !== "number-list-item"
+									) {
+										event.preventDefault()
+
+										Transforms.insertNodes(editor, [
+											{ type: "paragraph", children: [{ text: "" }] } as any,
+										])
+									} else {
+										if ((node as any).children?.[0].text === "") {
+											event.preventDefault()
+
+											handleTransform(editor, "paragraph")
+											Transforms.delete(editor)
+										}
+									}
+								}
+							}}
+						/>
+					)}
+				</Slate>
+			</div>
+		</div>
 	)
 }
 

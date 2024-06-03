@@ -57,6 +57,7 @@ type TDefaultNodes =
 	| "label"
 	| "link"
 	| "toc"
+	| "file-embed"
 
 export type TNodeType =
 	| (typeof SHORTCUTS extends { [key: string]: infer U } ? U : never)

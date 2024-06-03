@@ -20,6 +20,8 @@
 import {
 	BsBlockquoteLeft,
 	BsBox2,
+	BsFileEarmark,
+	BsFileEarmarkPlus,
 	BsLink45Deg,
 	BsListCheck,
 	BsListNested,
@@ -51,7 +53,7 @@ import {
 	useSlateStatic,
 	withReact,
 } from "slate-react"
-import { KeyboardEvent, useCallback, useEffect, useMemo, useRef, useState } from "react"
+import { KeyboardEvent, memo, useCallback, useEffect, useMemo, useRef, useState } from "react"
 import Fuse from "fuse.js"
 import { Subject } from "rxjs/internal/Subject"
 import { debounce } from "rxjs/internal/operators/debounce"
@@ -60,8 +62,15 @@ import { withHistory } from "slate-history"
 
 import { FSID, PlainData } from "@ordo-pink/data"
 import { chainE, fixE, fromBooleanE, fromNullableE, mapE, tryE } from "@ordo-pink/either"
-import { useCommands, useDataLabels, useSelectDataList } from "@ordo-pink/frontend-react-hooks"
+import {
+	useCommands,
+	useData,
+	useDataLabels,
+	useSelectDataList,
+	useStrictSubscription,
+} from "@ordo-pink/frontend-react-hooks"
 import { Switch } from "@ordo-pink/switch"
+import { fileAssociations$ } from "@ordo-pink/frontend-stream-file-associations"
 
 import ActionListItem from "@ordo-pink/frontend-react-components/action-list-item"
 import Loader from "@ordo-pink/frontend-react-components/loader"
@@ -80,9 +89,11 @@ import { withToC } from "../plugins/with-toc.editor-plugin"
 
 import Callout from "../components/callout.component"
 import HoveringToolbar from "../components/hovering-toolbar.component"
+import InternalEmbedder from "./internal-embedder.component"
 import Label from "../components/label.component"
 import Link from "../components/link.component"
 import ToC from "../components/toc.component"
+import { isOrdoElement } from "../guards/is-ordo-element.guard"
 
 const labelFuse = new Fuse([] as string[], {
 	threshold: 0.1,
@@ -93,7 +104,7 @@ const linkFuse = new Fuse([] as PlainData[], {
 	threshold: 0.1,
 })
 
-export default function OrdoEditor({
+function OrdoEditor({
 	content,
 	editable,
 	isLoading,
@@ -109,6 +120,8 @@ export default function OrdoEditor({
 	const [visibleLinks, setVisibleLinks] = useState<PlainData[]>([])
 
 	const commands = useCommands()
+	const allData = useData()
+	const fileAssociations = useStrictSubscription(fileAssociations$, [])
 
 	const editor = useMemo(
 		() =>
@@ -245,6 +258,15 @@ export default function OrdoEditor({
 			accelerator: "t",
 			shouldShow: ({ payload }) => payload === "editor-quick-menu",
 			type: "create",
+		})
+
+		commands.emit<cmd.ctxMenu.add>("context-menu.add", {
+			cmd: "editor.add-file-embed",
+			Icon: BsFileEarmarkPlus,
+			readableName: "Встроить файл...",
+			accelerator: "e",
+			shouldShow: ({ payload }) => payload === "editor-quick-menu",
+			type: "delete",
 		})
 
 		return () => {
@@ -406,6 +428,53 @@ export default function OrdoEditor({
 	}, [commands, editor])
 
 	useEffect(() => {
+		const handleAddFileEmbed = () => {
+			commands.emit<cmd.commandPalette.show>("command-palette.show", {
+				multiple: false,
+				items: allData.map(item => ({
+					id: item.fsid,
+					readableName: item.name,
+					Icon:
+						fileAssociations.find(assoc => assoc.contentType === item.contentType)?.Icon ||
+						BsFileEarmark,
+					onSelect: () => {
+						commands.emit<cmd.commandPalette.hide>("command-palette.hide")
+
+						if (!editor.selection) return
+
+						const block = Editor.above(editor, {
+							match: n => isOrdoElement(n) && Editor.isBlock(editor, n),
+						})
+						const path = block ? block[1] : []
+						const start = Editor.start(editor, path)
+						const range = { anchor: editor.selection.anchor, focus: start }
+
+						Transforms.select(editor, range)
+
+						if (!Range.isCollapsed(range)) {
+							Transforms.delete(editor)
+						}
+
+						const newProperties: Partial<OrdoElement & { fsid: FSID }> = {
+							type: "file-embed",
+							fsid: item.fsid,
+						}
+
+						Transforms.setNodes<OrdoElement>(editor, newProperties, {
+							match: n => isOrdoElement(n) && Editor.isBlock(editor, n),
+						})
+					},
+				})),
+			})
+		}
+		commands.on("editor.add-file-embed", handleAddFileEmbed)
+
+		return () => {
+			commands.off("editor.add-file-embed", handleAddFileEmbed)
+		}
+	}, [commands, editor, allData, fileAssociations])
+
+	useEffect(() => {
 		const el = ref.current
 		if (!el || !target) return
 		const domRange = ReactEditor.toDOMRange(editor, target)
@@ -554,10 +623,10 @@ export default function OrdoEditor({
 					) : (
 						<Editable
 							spellCheck
-							className="pb-96 outline-none"
+							className="px-2 outline-none"
 							placeholder="Пора начинать..."
 							renderLeaf={renderLeaf}
-							contentEditable={editable}
+							readOnly={!editable}
 							onDOMBeforeInput={handleDOMBeforeInput}
 							renderElement={renderElement}
 							onKeyDown={(event: KeyboardEvent<HTMLDivElement>) => {
@@ -771,6 +840,7 @@ const Element = (props: any) =>
 			</h5>
 		))
 		.case("check-list-item", () => <CheckListItemElement {...props} />)
+		.case("file-embed", () => <InternalEmbedder {...props} />)
 		.default(() => (
 			<p className="py-2 " {...props.attributes}>
 				{props.children}
@@ -825,3 +895,9 @@ const toggleMark = (editor: ReactEditor, format: string) => {
 		Editor.addMark(editor, format, true)
 	}
 }
+
+export default memo(
+	OrdoEditor,
+	(prev, next) =>
+		prev.data.fsid === next.data.fsid && prev.isLoading === next.isLoading && prev.content != null,
+)

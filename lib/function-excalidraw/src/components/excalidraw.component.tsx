@@ -1,6 +1,8 @@
 import { Excalidraw, MainMenu } from "@excalidraw/excalidraw"
 import { Subject, debounce, timer } from "rxjs"
 import { useEffect, useState } from "react"
+import { ExcalidrawImperativeAPI } from "@excalidraw/excalidraw/types/types"
+import { equals } from "ramda"
 
 import { useCommands, useIsDarkTheme } from "@ordo-pink/frontend-react-hooks"
 
@@ -18,7 +20,8 @@ export default function ExcalidrawEditor({
 	const isDark = useIsDarkTheme()
 	const commands = useCommands()
 
-	const [items, setItems] = useState<readonly ExcalidrawElement[] | null>(null)
+	const [items, setItems] = useState<readonly ExcalidrawElement[]>([])
+	const [excalidrawAPI, setExcalidrawAPI] = useState<ExcalidrawImperativeAPI | null>(null)
 
 	useEffect(() => {
 		const subscription = debounceSave$.subscribe(({ fsid, value }) => {
@@ -34,20 +37,31 @@ export default function ExcalidrawEditor({
 	}, [commands])
 
 	useEffect(() => {
-		if (!content || isLoading) return setItems(null)
-	}, [content, isLoading])
+		if (!content || isLoading) {
+			setItems([])
+			return
+		}
+
+		const items = JSON.parse(content as string)
+		setItems(items)
+
+		// excalidrawAPI?.updateScene({ elements: items })
+		// excalidrawAPI?.scrollToContent()
+	}, [content, isLoading, excalidrawAPI])
 
 	useEffect(() => {
 		if (!data || !items) return
 
-		save$.next({ fsid: data.fsid, value: items })
-	}, [items, data])
+		editable && save$.next({ fsid: data.fsid, value: items })
+	}, [items, data.fsid, editable])
 
 	return (
 		<div className="h-full rounded-lg">
 			<Excalidraw
 				theme={isDark ? "dark" : "light"}
 				viewModeEnabled={!editable}
+				langCode="ru-RU"
+				excalidrawAPI={api => setExcalidrawAPI(api)}
 				UIOptions={{
 					tools: { image: false },
 					canvasActions: {
@@ -58,10 +72,14 @@ export default function ExcalidrawEditor({
 						toggleTheme: false,
 					},
 				}}
-				initialData={{ elements: content ? JSON.parse(content as string) : [] }}
+				initialData={{ elements: items }}
 				gridModeEnabled
 				objectsSnapModeEnabled
-				onChange={elements => setItems(elements)}
+				onChange={elements => {
+					if (!equals(items, elements)) {
+						setItems(elements)
+					}
+				}}
 			>
 				<MainMenu>
 					<MainMenu.DefaultItems.SaveAsImage />

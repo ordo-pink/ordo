@@ -109,7 +109,7 @@ export default function EditorWorkspace() {
 						</div>
 					</div>
 
-					<Editor content={content} fsid={fsid} isLoading={isLoading} data={data} />
+					<Editor content={content} isLoading={isLoading} data={data} editable={true} />
 				</div>
 			</div>
 		),

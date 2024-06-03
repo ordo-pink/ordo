@@ -95,7 +95,7 @@ const linkFuse = new Fuse([] as PlainData[], {
 
 export default function OrdoEditor({
 	content,
-	fsid,
+	editable,
 	isLoading,
 	data,
 }: Extensions.FileAssociationComponentProps) {
@@ -136,7 +136,7 @@ export default function OrdoEditor({
 	}, [isLoading, content, editor])
 
 	const labels = useDataLabels()
-	const links = useSelectDataList(item => item.fsid !== fsid)
+	const links = useSelectDataList(item => item.fsid !== data.fsid)
 
 	useEffect(() => {
 		commands.emit<cmd.ctxMenu.add>("context-menu.add", {
@@ -557,6 +557,7 @@ export default function OrdoEditor({
 							className="pb-96 outline-none"
 							placeholder="Пора начинать..."
 							renderLeaf={renderLeaf}
+							contentEditable={editable}
 							onDOMBeforeInput={handleDOMBeforeInput}
 							renderElement={renderElement}
 							onKeyDown={(event: KeyboardEvent<HTMLDivElement>) => {

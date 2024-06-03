@@ -290,9 +290,9 @@ declare global {
 
 		type FileAssociationComponentProps = {
 			content: string | ArrayBuffer | null
-			fsid?: FSID
 			isLoading: boolean
 			data: PlainData
+			editable: boolean
 		}
 
 		type FileAssociation = {

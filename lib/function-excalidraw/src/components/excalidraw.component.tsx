@@ -11,7 +11,8 @@ import "../../static/excalidraw.css"
 
 export default function ExcalidrawEditor({
 	content,
-	fsid,
+	editable,
+	data,
 	isLoading,
 }: Extensions.FileAssociationComponentProps) {
 	const isDark = useIsDarkTheme()
@@ -37,15 +38,16 @@ export default function ExcalidrawEditor({
 	}, [content, isLoading])
 
 	useEffect(() => {
-		if (!fsid || !items) return
+		if (!data || !items) return
 
-		save$.next({ fsid, value: items })
-	}, [items, fsid, commands])
+		save$.next({ fsid: data.fsid, value: items })
+	}, [items, data])
 
 	return (
 		<div className="h-full rounded-lg">
 			<Excalidraw
 				theme={isDark ? "dark" : "light"}
+				viewModeEnabled={!editable}
 				UIOptions={{
 					tools: { image: false },
 					canvasActions: {

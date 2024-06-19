@@ -33,11 +33,11 @@ import { BehaviorSubject } from "rxjs/internal/BehaviorSubject"
 import { PiGraph } from "react-icons/pi"
 
 import { Data, DataRepository, FSID, PlainData, TDataCommands } from "@ordo-pink/data"
+import { Oath, chain0, fromNullable0, map0, orElse } from "@ordo-pink/oath"
 import { Either } from "@ordo-pink/either"
 import { KnownFunctions } from "@ordo-pink/frontend-known-functions"
 import { LIB_DIRECTORY_FSID } from "@ordo-pink/core"
 import { N } from "@ordo-pink/tau"
-import { Oath } from "@ordo-pink/oath"
 import { auth$ } from "@ordo-pink/frontend-stream-user"
 import { getCommands } from "@ordo-pink/frontend-stream-commands"
 import { getFetch } from "@ordo-pink/frontend-fetch"
@@ -374,17 +374,12 @@ export const __initData = ({ fid, dataCommands }: P) => {
 		type: "update",
 	})
 
-	commands.on<cmd.data.getContent>("data.get-content", fsid => {
-		void Oath.fromNullable(auth$.value)
-			.chain(({ sub }) =>
-				Oath.of(content$.value).chain(content =>
-					dataCommands
-						.getContent({ createdBy: sub, fsid })
-						.map(data => content$.next({ ...content, [fsid]: data })),
-				),
-			)
-			.orElse(() => content$.next({ ...content$.value, [fsid]: null }))
-	})
+	commands.on<cmd.data.getContent>("data.get-content", fsid =>
+		fromNullable0(auth$.getValue())
+			.pipe(chain0(({ sub }) => dataCommands.getContent({ createdBy: sub, fsid })))
+			.pipe(map0(result => content$.next({ ...content$.getValue(), [fsid]: result })))
+			.invoke(orElse(() => content$.next({ ...content$.getValue(), [fsid]: null }))),
+	)
 
 	commands.on<cmd.data.dropContent>("data.drop-content", fsid => {
 		const contentCopy = content$.getValue()

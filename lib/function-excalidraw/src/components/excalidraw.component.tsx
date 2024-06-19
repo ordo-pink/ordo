@@ -1,85 +1,99 @@
+import { type Dispatch, type SetStateAction, useEffect, useState } from "react"
 import { Excalidraw, MainMenu } from "@excalidraw/excalidraw"
+import {
+	type ExcalidrawImperativeAPI,
+	type ExcalidrawInitialDataState,
+	type UIOptions,
+} from "@excalidraw/excalidraw/types/types"
 import { Subject, debounce, timer } from "rxjs"
-import { useEffect, useState } from "react"
-import { ExcalidrawImperativeAPI } from "@excalidraw/excalidraw/types/types"
+import { type ExcalidrawElement } from "@excalidraw/excalidraw/types/element/types"
 import { equals } from "ramda"
 
 import { useCommands, useIsDarkTheme } from "@ordo-pink/frontend-react-hooks"
 
-import { ExcalidrawElement } from "@excalidraw/excalidraw/types/element/types"
-import { FSID } from "@ordo-pink/data"
+import { chainE, fromBooleanE, fromNullableE, mapE, tapE } from "@ordo-pink/either"
+import { extend, noop, omit } from "@ordo-pink/tau"
+import { type FSID } from "@ordo-pink/data"
 
 import "../../static/excalidraw.css"
 
 export default function ExcalidrawEditor({
-	content,
-	editable,
 	data,
+	content,
 	isLoading,
+	isEditable,
+	isEmbedded,
 }: Extensions.FileAssociationComponentProps) {
 	const isDark = useIsDarkTheme()
 	const commands = useCommands()
 
+	// --- State ---
+
 	const [items, setItems] = useState<readonly ExcalidrawElement[]>([])
+	const [isInitiallyRendered, setIsInitiallyRendered] = useState(false)
 	const [excalidrawAPI, setExcalidrawAPI] = useState<ExcalidrawImperativeAPI | null>(null)
 
-	useEffect(() => {
-		const subscription = debounceSave$.subscribe(({ fsid, value }) => {
-			commands.emit<cmd.data.setContent>("data.set-content", {
-				fsid,
-				content: JSON.stringify(value),
-			})
-		})
+	// --- Effects ---
 
-		return () => {
-			subscription.unsubscribe()
-		}
+	useEffect(() => {
+		const sub = debounceSave$.subscribe(({ fsid, content }) =>
+			commands.emit<cmd.data.setContent>("data.set-content", { fsid, content }),
+		)
+
+		return () => sub.unsubscribe()
 	}, [commands])
 
-	useEffect(() => {
-		if (!content || isLoading) {
-			setItems([])
-			return
-		}
+	useEffect(
+		() =>
+			fromNullableE(excalidrawAPI)
+				.pipe(chainE(api => fromBooleanE(!isLoading, api)))
+				.pipe(chainE(api => fromNullableE(content).pipe(mapE(content => ({ content, api })))))
+				.pipe(mapE(({ content, api }) => ({ api, elements: JSON.parse(content as string) })))
+				.pipe(tapE(({ elements }) => setItems(elements)))
+				.pipe(chainE(params => fromBooleanE(!isInitiallyRendered, params)))
+				.fold(noop, ({ api, elements }) => {
+					api.updateScene({ elements })
+					api.scrollToContent()
 
-		const items = JSON.parse(content as string)
-		setItems(items)
+					setIsInitiallyRendered(true)
+				}),
+		[content, isLoading, excalidrawAPI, isInitiallyRendered],
+	)
 
-		// excalidrawAPI?.updateScene({ elements: items })
-		// excalidrawAPI?.scrollToContent()
-	}, [content, isLoading, excalidrawAPI])
+	// TODO: Handle shapes with `isDeleted: true`
+	useEffect(
+		() =>
+			fromBooleanE(isEditable && !isEmbedded)
+				.pipe(chainE(() => fromNullableE(data.fsid)))
+				.pipe(chainE(fsid => fromBooleanE(!!items.length, { items, fsid })))
+				.pipe(mapE(extend(({ items }) => ({ content: JSON.stringify(items) }))))
+				.pipe(mapE(omit("items")))
+				.fold(noop, payload => save$.next(payload)),
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+		[items, data.fsid, isEditable, isEmbedded],
+	)
 
-	useEffect(() => {
-		if (!data || !items) return
+	// --- Values ---
 
-		editable && save$.next({ fsid: data.fsid, value: items })
-	}, [items, data.fsid, editable])
+	const theme = isDark ? "dark" : "light"
+	const langCode = "ru-RU" // TODO: i18n
+
+	const handleCanvasChange = handleCanvasChangeUsing(items, setItems)
+
+	const handleExcalidrawAPI = setExcalidrawAPI
 
 	return (
 		<div className="h-full rounded-lg">
 			<Excalidraw
-				theme={isDark ? "dark" : "light"}
-				viewModeEnabled={!editable}
-				langCode="ru-RU"
-				excalidrawAPI={api => setExcalidrawAPI(api)}
-				UIOptions={{
-					tools: { image: false },
-					canvasActions: {
-						changeViewBackgroundColor: false,
-						export: false,
-						loadScene: true,
-						saveToActiveFile: false,
-						toggleTheme: false,
-					},
-				}}
-				initialData={{ elements: items }}
+				theme={theme}
+				viewModeEnabled={!isEditable}
+				langCode={langCode}
+				excalidrawAPI={handleExcalidrawAPI}
+				UIOptions={uiOptions}
+				initialData={initialData}
 				gridModeEnabled
 				objectsSnapModeEnabled
-				onChange={elements => {
-					if (!equals(items, elements)) {
-						setItems(elements)
-					}
-				}}
+				onChange={handleCanvasChange}
 			>
 				<MainMenu>
 					<MainMenu.DefaultItems.SaveAsImage />
@@ -93,5 +107,26 @@ export default function ExcalidrawEditor({
 
 // --- Internal ---
 
-const save$ = new Subject<{ fsid: FSID; value: any }>()
+type THandleCanvasChangeUsing = (
+	is: readonly ExcalidrawElement[],
+	setIs: Dispatch<SetStateAction<readonly ExcalidrawElement[]>>,
+) => (es: readonly ExcalidrawElement[]) => void
+const handleCanvasChangeUsing: THandleCanvasChangeUsing = (is, setIs) => es =>
+	fromNullableE(es)
+		.pipe(chainE(es => fromBooleanE(!equals(is, es), es)))
+		.fold(noop, setIs)
+
+const save$ = new Subject<{ fsid: FSID; content: string }>()
 const debounceSave$ = save$.pipe(debounce(() => timer(1000)))
+
+const initialData: Partial<ExcalidrawInitialDataState> = { elements: [] }
+const uiOptions: Partial<UIOptions> = {
+	tools: { image: false },
+	canvasActions: {
+		changeViewBackgroundColor: false,
+		export: false,
+		loadScene: true,
+		saveToActiveFile: false,
+		toggleTheme: false,
+	},
+}

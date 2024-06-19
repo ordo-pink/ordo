@@ -289,10 +289,11 @@ declare global {
 		type FileExtension = `.${string}`
 
 		type FileAssociationComponentProps = {
-			content: string | ArrayBuffer | null
 			isLoading: boolean
+			isEditable: boolean
+			isEmbedded: boolean
+			content: string | ArrayBuffer | null
 			data: PlainData
-			editable: boolean
 		}
 
 		type FileAssociation = {

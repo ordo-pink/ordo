@@ -53,7 +53,7 @@ import {
 	useSlateStatic,
 	withReact,
 } from "slate-react"
-import { KeyboardEvent, memo, useCallback, useEffect, useMemo, useRef, useState } from "react"
+import { type KeyboardEvent, useCallback, useEffect, useMemo, useRef, useState } from "react"
 import Fuse from "fuse.js"
 import { Subject } from "rxjs/internal/Subject"
 import { debounce } from "rxjs/internal/operators/debounce"
@@ -104,9 +104,9 @@ const linkFuse = new Fuse([] as PlainData[], {
 	threshold: 0.1,
 })
 
-function OrdoEditor({
+export default function OrdoEditor({
 	content,
-	editable,
+	isEditable,
 	isLoading,
 	data,
 }: Extensions.FileAssociationComponentProps) {
@@ -133,20 +133,20 @@ function OrdoEditor({
 		[],
 	)
 
-	useEffect(() => {
-		if (isLoading) return
-
-		fromBooleanE(content !== "", content as string)
-			.pipe(chainE(content => tryE(() => JSON.parse(content))))
-			.pipe(chainE(fromNullableE))
-			.pipe(fixE(() => EMPTY_EDITOR_CHILDREN))
-			.pipe(mapE(content => ({ content, resetPoint: { path: [0, 0], offset: 0 } })))
-			.fold(noop, ({ content, resetPoint }) => {
-				editor.children = content
-				editor.selection = { anchor: resetPoint, focus: resetPoint }
-				editor.history = { undos: [], redos: [] }
-			})
-	}, [isLoading, content, editor])
+	useEffect(
+		() =>
+			fromBooleanE(content !== "" && !isLoading, content as string)
+				.pipe(chainE(content => tryE(() => JSON.parse(content))))
+				.pipe(chainE(fromNullableE))
+				.pipe(fixE(() => EMPTY_EDITOR_CHILDREN))
+				.pipe(mapE(content => ({ content, resetPoint: { path: [0, 0], offset: 0 } })))
+				.fold(noop, ({ content, resetPoint }) => {
+					editor.selection = { anchor: resetPoint, focus: resetPoint }
+					editor.history = { undos: [], redos: [] }
+					editor.children = content
+				}),
+		[isLoading, content, editor],
+	)
 
 	const labels = useDataLabels()
 	const links = useSelectDataList(item => item.fsid !== data.fsid)
@@ -626,7 +626,7 @@ function OrdoEditor({
 							className="px-2 outline-none"
 							placeholder="Пора начинать..."
 							renderLeaf={renderLeaf}
-							readOnly={!editable}
+							readOnly={!isEditable}
 							onDOMBeforeInput={handleDOMBeforeInput}
 							renderElement={renderElement}
 							onKeyDown={(event: KeyboardEvent<HTMLDivElement>) => {
@@ -895,9 +895,3 @@ const toggleMark = (editor: ReactEditor, format: string) => {
 		Editor.addMark(editor, format, true)
 	}
 }
-
-export default memo(
-	OrdoEditor,
-	(prev, next) =>
-		prev.data.fsid === next.data.fsid && prev.isLoading === next.isLoading && prev.content != null,
-)

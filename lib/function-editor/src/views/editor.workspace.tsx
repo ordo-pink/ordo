@@ -46,12 +46,12 @@ export default function EditorWorkspace() {
 
 	const { fsid } = useRouteParams<{ fsid: FSID }>()
 
-	const [Editor, setEditor] = useState<ComponentType<Extensions.FileAssociationComponentProps>>(
-		() => EditorLoader,
-	)
+	const [Component, setComponent] = useState<
+		ComponentType<Extensions.FileAssociationComponentProps>
+	>(() => EditorLoader)
 
-	const data = useDataByFSID(fsid)
-	const content = useContent(fsid)
+	const currentData = useDataByFSID(fsid)
+	const currentContent = useContent(fsid)
 
 	const [prevFsid, setPrevFsid] = useState<FSID>()
 	const fileAssociations = useStrictSubscription(fileAssociations$, [])
@@ -59,10 +59,10 @@ export default function EditorWorkspace() {
 	useEffect(() => {
 		commands.emit<cmd.application.setTitle>(
 			"application.set-title",
-			data ? `${data.name} | Редактор` : "Редактор",
+			currentData ? `${currentData.name} | Редактор` : "Редактор",
 		)
 
-		fromNullableE(data)
+		fromNullableE(currentData)
 			.pipe(
 				chainE(data =>
 					fromNullableE(
@@ -75,12 +75,12 @@ export default function EditorWorkspace() {
 			)
 			.pipe(mapE(({ Component }) => Component))
 			.pipe(fixE(() => () => Null))
-			.fold(noop, x => setEditor(x))
-	}, [data, commands, fileAssociations])
+			.fold(noop, x => setComponent(x))
+	}, [currentData, commands, fileAssociations])
 
 	useEffect(() => {
 		if (fsid !== prevFsid) {
-			if (content == null) {
+			if (currentContent == null) {
 				setIsLoading(true)
 				return
 			}
@@ -88,9 +88,9 @@ export default function EditorWorkspace() {
 			setPrevFsid(fsid)
 			setIsLoading(false)
 		}
-	}, [fsid, prevFsid, content])
+	}, [fsid, prevFsid, currentContent])
 
-	return fromNullableE(data).fold(
+	return fromNullableE(currentData).fold(
 		() => (
 			<CenteredPage centerX centerY>
 				<div className="px-12">
@@ -109,7 +109,13 @@ export default function EditorWorkspace() {
 						</div>
 					</div>
 
-					<Editor content={content} isLoading={isLoading} data={data} editable={true} />
+					<Component
+						content={currentContent}
+						isLoading={isLoading}
+						data={data}
+						isEditable={true}
+						isEmbedded={false}
+					/>
 				</div>
 			</div>
 		),

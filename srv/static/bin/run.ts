@@ -20,7 +20,7 @@
 import { watch } from "fs"
 
 import { die, direntsToDirs, getNames, runAsyncCommand0 } from "@ordo-pink/binutil"
-import { directoryExists0, readdir0 } from "@ordo-pink/fs"
+import { directoryExists0, isFile0, readdir0 } from "@ordo-pink/fs"
 import { ConsoleLogger } from "@ordo-pink/logger"
 import { Oath } from "@ordo-pink/oath"
 import { getc } from "@ordo-pink/getc"
@@ -39,17 +39,24 @@ void Oath.of("./srv")
 	.chain(publicPaths =>
 		Oath.all(
 			publicPaths.map(publicPath =>
-				readdir0(publicPath, { withFileTypes: true }).map(dirents =>
-					dirents.map(dirent => {
-						ConsoleLogger.info(
-							`STATIC copying file ${publicPath}/${dirent.name} -> ${ORDO_STATIC_ROOT}/${dirent.name}`,
-						)
+				readdir0(publicPath, { withFileTypes: true }).chain(dirents =>
+					Oath.all(
+						dirents.map(dirent => {
+							ConsoleLogger.info(
+								`STATIC copying file ${publicPath}/${dirent.name} -> ${ORDO_STATIC_ROOT}/${dirent.name}`,
+							)
 
-						void Bun.write(
-							`${ORDO_STATIC_ROOT}/${dirent.name}`,
-							Bun.file(`${publicPath}/${dirent.name}`),
-						)
-					}),
+							return isFile0(`${publicPath}/${dirent.name}`).map(isFile => {
+								isFile &&
+									void Bun.write(
+										`${ORDO_STATIC_ROOT}/${dirent.name}`,
+										Bun.file(`${publicPath}/${dirent.name}`),
+									)
+
+								// TODO: Copy directories
+							})
+						}),
+					),
 				),
 			),
 		),

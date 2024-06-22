@@ -313,7 +313,7 @@ export default function OrdoEditor({
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [links.length, linkSearch])
 
-	const renderElement = useCallback((props: any) => <Element {...props} />, [])
+	const renderElement = useCallback((props: any) => <Element {...props} fsid={data.fsid} />, [])
 	const renderLeaf = useCallback((props: any) => <Leaf {...props} />, [])
 
 	const handleDOMBeforeInput = useCallback(
@@ -460,6 +460,11 @@ export default function OrdoEditor({
 							fsid: item.fsid,
 						}
 
+						commands.emit<cmd.data.addLink>("data.add-link", {
+							item: data,
+							link: item.fsid,
+						})
+
 						Transforms.setNodes<OrdoElement>(editor, newProperties, {
 							match: n => isOrdoElement(n) && Editor.isBlock(editor, n),
 						})
@@ -472,7 +477,7 @@ export default function OrdoEditor({
 		return () => {
 			commands.off("editor.add-file-embed", handleAddFileEmbed)
 		}
-	}, [commands, editor, allData, fileAssociations])
+	}, [commands, editor, allData, fileAssociations, data])
 
 	useEffect(() => {
 		const el = ref.current

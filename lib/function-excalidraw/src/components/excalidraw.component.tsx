@@ -16,6 +16,7 @@ import { extend, noop, omit } from "@ordo-pink/tau"
 import { type FSID } from "@ordo-pink/data"
 
 import "../../static/excalidraw.css"
+import Null from "@ordo-pink/frontend-react-components/null"
 
 export default function ExcalidrawEditor({
 	data,
@@ -82,24 +83,29 @@ export default function ExcalidrawEditor({
 
 	const handleExcalidrawAPI = setExcalidrawAPI
 
+	// TODO: Disallow embedding the same file
 	return (
 		<div className="h-full rounded-lg">
 			<Excalidraw
 				theme={theme}
-				viewModeEnabled={!isEditable}
+				viewModeEnabled={!isEditable || isEmbedded}
 				langCode={langCode}
 				excalidrawAPI={handleExcalidrawAPI}
 				UIOptions={uiOptions}
 				initialData={initialData}
-				gridModeEnabled
 				objectsSnapModeEnabled
+				autoFocus={isEditable && !isEmbedded}
 				onChange={handleCanvasChange}
+				validateEmbeddable={() => true}
 			>
-				<MainMenu>
-					<MainMenu.DefaultItems.SaveAsImage />
-					<MainMenu.DefaultItems.Help />
-					<MainMenu.DefaultItems.ClearCanvas />
-				</MainMenu>
+				{fromBooleanE(!isEmbedded).fold(Null, () => (
+					<MainMenu>
+						<MainMenu.DefaultItems.SaveAsImage />
+						<MainMenu.DefaultItems.ClearCanvas />
+						<MainMenu.Separator />
+						<MainMenu.DefaultItems.Help />
+					</MainMenu>
+				))}
 			</Excalidraw>
 		</div>
 	)
@@ -119,14 +125,38 @@ const handleCanvasChangeUsing: THandleCanvasChangeUsing = (is, setIs) => es =>
 const save$ = new Subject<{ fsid: FSID; content: string }>()
 const debounceSave$ = save$.pipe(debounce(() => timer(1000)))
 
-const initialData: Partial<ExcalidrawInitialDataState> = { elements: [] }
+const initialData: Partial<ExcalidrawInitialDataState> = {
+	elements: [],
+	appState: { viewBackgroundColor: "transparent" },
+}
 const uiOptions: Partial<UIOptions> = {
 	tools: { image: false },
 	canvasActions: {
 		changeViewBackgroundColor: false,
 		export: false,
-		loadScene: true,
+		loadScene: false,
 		saveToActiveFile: false,
 		toggleTheme: false,
+		clearCanvas: false,
+		saveAsImage: true,
 	},
 }
+
+/* <button
+				onClick={e => {
+					function downloadURI(uri, name) {
+						let link = document.createElement("a")
+						link.download = name
+						link.href = uri
+						document.body.appendChild(link)
+						link.click()
+						document.body.removeChild(link)
+						link = null
+					}
+
+					const url = document.querySelector("canvas")?.toDataURL("image/png", 0.9)
+					downloadURI(url, `${data.name}.png`)
+				}}
+			>
+				HIT ME
+			</button> */

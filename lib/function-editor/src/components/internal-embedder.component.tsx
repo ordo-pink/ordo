@@ -1,5 +1,6 @@
-import { BsFileEarmark, BsPencilSquare } from "react-icons/bs"
+import { BsFileEarmark, BsLayoutSidebar, BsThreeDots } from "react-icons/bs"
 import { type RenderElementProps } from "slate-react"
+import { useEffect } from "react"
 
 import { chainE, fromNullableE, mapE } from "@ordo-pink/either"
 import {
@@ -18,6 +19,26 @@ export default function InternalEmbedder({ children, element, attributes }: Rend
 	const content = useContent((element as any).fsid)
 
 	const Assoc = fileAssociations.find(association => association.contentType === data?.contentType)
+
+	useEffect(() => {
+		if (!data) return
+
+		commands.on(`editor-embedder.open-${data.fsid}`, () =>
+			commands.emit<cmd.editor.open>("editor.open", data.fsid),
+		)
+
+		commands.emit<cmd.ctxMenu.add>("context-menu.add", {
+			cmd: `editor-embedder.open-${data.fsid}`,
+			Icon: BsLayoutSidebar,
+			readableName: "Открыть в редакторе",
+			shouldShow: ({ payload }) => payload === `editor-embedder-${data.fsid}`,
+			type: "read",
+		})
+
+		return () => {
+			commands.emit<cmd.ctxMenu.remove>("context-menu.remove", `editor-embedder.open-${data.fsid}`)
+		}
+	}, [element, commands, data])
 
 	return fromNullableE(data)
 		.pipe(chainE(data => fromNullableE(Assoc).pipe(mapE(({ Component }) => ({ data, Component })))))
@@ -38,14 +59,17 @@ export default function InternalEmbedder({ children, element, attributes }: Rend
 
 						<div>{children}</div>
 
-						<div>
-							<BsPencilSquare
-								className="cursor-pointer"
-								title={`Редактировать "${data.name}"`}
-								onClick={() => {
-									commands.emit<cmd.editor.open>("editor.open", data.fsid)
-								}}
-							/>
+						<div
+							className="cursor-pointer px-2"
+							title={`Управлять вложением "${data.name}"`}
+							onClick={event => {
+								commands.emit<cmd.ctxMenu.show>("context-menu.show", {
+									event,
+									payload: `editor-embedder-${data.fsid}`,
+								})
+							}}
+						>
+							<BsThreeDots />
 						</div>
 					</div>
 

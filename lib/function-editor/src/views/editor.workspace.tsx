@@ -54,6 +54,7 @@ export default function EditorWorkspace() {
 	const currentContent = useContent(fsid)
 
 	const [prevFsid, setPrevFsid] = useState<FSID>()
+	const [content, setContent] = useState<string | ArrayBuffer | null>(null)
 	const fileAssociations = useStrictSubscription(fileAssociations$, [])
 
 	useEffect(() => {
@@ -82,10 +83,12 @@ export default function EditorWorkspace() {
 		if (fsid !== prevFsid) {
 			if (currentContent == null) {
 				setIsLoading(true)
+				setContent(null)
 				return
 			}
 
 			setPrevFsid(fsid)
+			setContent(currentContent)
 			setIsLoading(false)
 		}
 	}, [fsid, prevFsid, currentContent])
@@ -110,7 +113,7 @@ export default function EditorWorkspace() {
 					</div>
 
 					<Component
-						content={currentContent}
+						content={content}
 						isLoading={isLoading}
 						data={data}
 						isEditable={true}

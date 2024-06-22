@@ -2,14 +2,13 @@ import { BsLink45Deg } from "react-icons/bs"
 import { RenderElementProps } from "slate-react"
 
 import { FSID, PlainData } from "@ordo-pink/data"
-import { useChildren, useDataByFSID, useRouteParams } from "@ordo-pink/frontend-react-hooks"
+import { useChildren, useDataByFSID } from "@ordo-pink/frontend-react-hooks"
 
 import { fromNullableE } from "@ordo-pink/either"
 
 import Link from "@ordo-pink/frontend-react-components/link"
 
-export default function ToC({ children, attributes }: RenderElementProps) {
-	const { fsid } = useRouteParams<{ fsid: FSID }>()
+export default function ToC({ children, attributes, fsid }: RenderElementProps & { fsid: FSID }) {
 	const data = useDataByFSID(fsid)
 
 	return fromNullableE(data).fold(

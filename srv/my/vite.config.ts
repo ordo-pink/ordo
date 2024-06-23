@@ -27,6 +27,10 @@ import tsconfigPaths from "vite-tsconfig-paths"
 export default defineConfig({
 	plugins: [react(), tsconfigPaths()],
 
+	define: {
+		"process.env.IS_PREACT": JSON.stringify("false"),
+	},
+
 	build: {
 		outDir: "../../var/out/my",
 		cssMinify: true,

@@ -121,6 +121,11 @@ export const __initAchievements = callOnce(({ fid, dataCommands }: P) => {
 												commands.emit<cmd.notification.show>("notification.show", {
 													type: "success",
 													title: "Получено достижение!",
+													onClick: () =>
+														commands.emit<cmd.router.navigate>(
+															"router.navigate",
+															`/achievements/${achievement.descriptor.category}`,
+														),
 													Icon: () => (
 														<img
 															className="rounded-md"
@@ -151,7 +156,7 @@ export const __initAchievements = callOnce(({ fid, dataCommands }: P) => {
 												!achievements$.value ||
 												achievements$.value.some(ach => ach && ach.id === achievement.descriptor.id)
 											)
-												return
+												return null
 
 											achievements$.next([...achievements$.value, achievement.descriptor])
 											achievement.subscribe({ grant, update })

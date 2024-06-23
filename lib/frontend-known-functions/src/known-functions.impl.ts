@@ -32,8 +32,10 @@ export type QueryPermission =
 	| "user.createdAt"
 	| "user.subscription"
 	| "user.name"
+	| "user.achievements"
 	| "achievements"
 	| "functions.current-activity"
+	| "functions.current-file-association"
 	| "data.read"
 
 // TODO: Add support for command intellisense

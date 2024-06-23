@@ -40,10 +40,10 @@ export default function FileExplorerActivity() {
 
 	return (
 		<div
-			className="min-h-screen size-full"
+			className="size-full min-h-[100dvh]"
 			onContextMenu={showContextMenu({ commands, payload: currentData ?? "root" })}
 		>
-			<div className="flex flex-wrap p-4 w-full file-explorer">
+			<div className="file-explorer flex w-full flex-wrap p-4">
 				{currentDataChildren.map(item => (
 					<FSDataIcon
 						key={item.fsid}

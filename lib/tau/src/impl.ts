@@ -17,11 +17,14 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import type * as T from "./types"
+import type * as Types from "./types"
 
 export const UUIDv4_RX = /^[0-9A-F]{8}-[0-9A-F]{4}-[4][0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$/i
 
 export const N = () => null
+
+export const T = () => true
+export const F = () => false
 
 export type UUIDv4 = `${string}-${string}-${string}-${string}-${string}`
 
@@ -50,7 +53,7 @@ export const isNonNegativeFiniteInteger = (x: unknown): x is number =>
 	isNonNegativeNumber(x) && isFiniteNumber(x) && isInteger(x)
 export const isUUID = (x: unknown): x is UUIDv4 => isString(x) && UUIDv4_RX.test(x)
 
-export const keysOf: T._KeysOfFn = o => {
+export const keysOf: Types._KeysOfFn = o => {
 	return Object.keys(o) as any
 }
 
@@ -78,8 +81,8 @@ export const getPercentage = (total: number, current: number): number =>
 
 export const omit =
 	<T extends Record<string, unknown>, K extends (keyof T)[]>(...keys: K) =>
-	(obj: T): Omit<T, T.Unpack<K>> =>
+	(obj: T): Omit<T, Types.Unpack<K>> =>
 		keysOf(obj).reduce(
 			(acc, key) => (keys.includes(key) ? acc : { ...acc, [key]: obj[key] }),
-			{} as Omit<T, T.Unpack<K>>,
+			{} as Omit<T, Types.Unpack<K>>,
 		)

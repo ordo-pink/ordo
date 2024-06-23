@@ -118,7 +118,7 @@ export type TSharedEmailParams = {
 
 export type TSendSignInEmailParams = TSharedEmailParams & {
 	ip: string
-	resetPasswordUrl: string
+	resetPasswordUrl?: string
 }
 
 export type TSendConfirmEmailParams = TSharedEmailParams & {

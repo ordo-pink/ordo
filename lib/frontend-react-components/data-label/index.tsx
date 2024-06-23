@@ -17,10 +17,20 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import { type PropsWithChildren } from "react"
+
 export default function DataLabel({ children }: PropsWithChildren) {
 	return (
 		<div className="whitespace-nowrap rounded-md bg-neutral-200 px-1 py-0.5 text-xs text-neutral-500 shadow-sm transition-all duration-300 hover:ring-1 hover:ring-purple-500 dark:bg-neutral-900">
 			{children}
 		</div>
+	)
+}
+
+export const DataLabelInline = ({ children }: PropsWithChildren) => {
+	return (
+		<span className="inline-block whitespace-nowrap rounded-md bg-neutral-200 px-1 py-0.5 text-xs text-neutral-500 shadow-sm transition-all duration-300 hover:ring-1 hover:ring-purple-500 dark:bg-neutral-900">
+			{children}
+		</span>
 	)
 }

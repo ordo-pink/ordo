@@ -61,11 +61,11 @@ export default function Modal() {
 
 	return Either.fromNullable(modalState).fold(Null, ({ Component, showCloseButton }) => (
 		<div
-			className="fixed inset-0 z-[500] flex h-screen w-screen items-center justify-center overflow-hidden  bg-gradient-to-tr  from-neutral-900/80 to-stone-900/80"
+			className="fixed inset-0 z-[500] flex h-screen w-screen items-center justify-center overflow-hidden bg-gradient-to-tr  from-neutral-900/80  to-stone-900/80 p-4"
 			onClick={handleHide}
 		>
 			<div
-				className="relative rounded-lg bg-neutral-100 shadow-lg dark:bg-neutral-700"
+				className="relative w-full max-w-3xl rounded-lg bg-neutral-100 shadow-lg dark:bg-neutral-700"
 				onClick={stopPropagation}
 			>
 				<CloseButton shouldShow={showCloseButton} onClick={handleHide} />

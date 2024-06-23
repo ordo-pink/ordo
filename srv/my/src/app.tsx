@@ -92,6 +92,16 @@ export default function App() {
 					Oath.from(async () => await module.default),
 				),
 			)
+			.chain(() =>
+				Oath.from(() => import("@ordo-pink/function-achievements")).chain(module =>
+					Oath.from(async () => await module.default),
+				),
+			)
+			.chain(() =>
+				Oath.from(() => import("@ordo-pink/function-excalidraw")).chain(module =>
+					Oath.from(async () => await module.default),
+				),
+			)
 			.orNothing()
 
 		return () => {

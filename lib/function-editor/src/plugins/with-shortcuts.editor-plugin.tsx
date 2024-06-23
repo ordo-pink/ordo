@@ -17,11 +17,12 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Editor, Element, Point, Range, Transforms } from "slate"
+import { Editor, Point, Range, Transforms } from "slate"
 import { ReactEditor } from "slate-react"
 
 import { OrdoDescendant, OrdoElement } from "../editor.types"
 import { SHORTCUTS } from "../editor.constants"
+import { handleTransform } from "../fns/handle-transform"
 import { isOrdoElement } from "../guards/is-ordo-element.guard"
 
 export type BulletedListElement = {
@@ -50,46 +51,10 @@ export const withShortcuts = <T extends ReactEditor>(editor: T): T => {
 			const range = { anchor, focus: start }
 			const beforeText = (Editor.string(editor, range) +
 				text.slice(0, -1)) as keyof typeof SHORTCUTS
+
 			const type = SHORTCUTS[beforeText]
 
-			if (type) {
-				Transforms.select(editor, range)
-
-				if (!Range.isCollapsed(range)) {
-					Transforms.delete(editor)
-				}
-
-				const newProperties: Partial<OrdoElement> = {
-					type,
-				}
-				Transforms.setNodes<Element>(editor, newProperties, {
-					match: n => isOrdoElement(n) && Editor.isBlock(editor, n),
-				})
-
-				if (type === "list-item") {
-					const list: BulletedListElement = {
-						type: "unordered-list",
-						children: [],
-					}
-					Transforms.wrapNodes(editor, list, {
-						match: node =>
-							!Editor.isEditor(node) && isOrdoElement(node) && node.type === "list-item",
-					})
-				}
-
-				if (type === "number-list-item") {
-					const list: NumericListElement = {
-						type: "ordered-list",
-						children: [],
-					}
-					Transforms.wrapNodes(editor, list, {
-						match: node =>
-							!Editor.isEditor(node) && isOrdoElement(node) && node.type === "number-list-item",
-					})
-				}
-
-				return
-			}
+			if (type) return handleTransform(editor, type)
 		}
 
 		insertText(text)
@@ -116,21 +81,8 @@ export const withShortcuts = <T extends ReactEditor>(editor: T): T => {
 					const newProperties: Partial<OrdoElement> = {
 						type: "paragraph",
 					}
+
 					Transforms.setNodes(editor, newProperties)
-
-					if (block.type === "list-item") {
-						Transforms.unwrapNodes(editor, {
-							match: n => !Editor.isEditor(n) && isOrdoElement(n) && n.type === "unordered-list",
-							split: true,
-						})
-					}
-
-					if (block.type === "number-list-item") {
-						Transforms.unwrapNodes(editor, {
-							match: n => !Editor.isEditor(n) && isOrdoElement(n) && n.type === "ordered-list",
-							split: true,
-						})
-					}
 
 					return
 				}

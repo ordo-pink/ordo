@@ -17,15 +17,16 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import { DataQuery, DataRepository } from "@ordo-pink/data"
+import { getData, getData$ } from "@ordo-pink/frontend-stream-data"
 import { getIsAuthenticated, getUser } from "@ordo-pink/frontend-stream-user"
-import { DataRepository } from "@ordo-pink/data"
 import { KnownFunctions } from "@ordo-pink/frontend-known-functions"
 import { getCommands } from "@ordo-pink/frontend-stream-commands"
 import { getHosts } from "@ordo-pink/frontend-react-hooks"
 import { getLogger } from "@ordo-pink/frontend-logger"
 
 import { type RegisterFunction } from "./create-function.types"
-import { getData } from "@ordo-pink/frontend-stream-data"
+import { registerActivity } from "@ordo-pink/frontend-stream-activities"
 
 export const createFunction: RegisterFunction = (name, permissions, callback) => {
 	const fid = KnownFunctions.register(name, permissions)
@@ -35,6 +36,11 @@ export const createFunction: RegisterFunction = (name, permissions, callback) =>
 	const getUserPatched = () => getUser(fid)
 	const getIsAuthenticatedPatched = () => getIsAuthenticated(fid)
 	const getDataPatched = () => getData(fid)
+	const registerActivityPatched = registerActivity(fid)
+
+	const data$Patched = getData$(fid)
+
+	const dataQuery = DataQuery.of(data$Patched)
 
 	return callback({
 		getCommands: getCommandsPatched,
@@ -42,8 +48,8 @@ export const createFunction: RegisterFunction = (name, permissions, callback) =>
 		getUser: getUserPatched,
 		getIsAuthenticated: getIsAuthenticatedPatched,
 		getHosts,
+		registerActivity: registerActivityPatched,
 		data: {
-			// TODO
 			getChildren: item => DataRepository.getChildren(getDataPatched(), item),
 			getData: getDataPatched,
 			getParentChain: fsid => DataRepository.getParentChain(getDataPatched(), fsid),
@@ -58,5 +64,6 @@ export const createFunction: RegisterFunction = (name, permissions, callback) =>
 			getDataLabels: () => DataRepository.getAllLabels(getDataPatched()),
 			getDataTree: () => DataRepository.getDataTree(getDataPatched()),
 		},
+		queries: { dataQuery },
 	})
 }

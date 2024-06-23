@@ -20,17 +20,26 @@
 import { Descendant, Element } from "slate"
 
 import { FSID } from "@ordo-pink/data"
+import { TNodeType } from "./editor.constants"
 
 declare global {
 	module cmd {
 		module editor {
 			type goToEditor = { name: "editor.go-to-editor" }
 			type open = { name: "editor.open"; payload: FSID }
+			type registerFileAssociation = {
+				name: "editor.register-file-association"
+				payload: Extensions.FileAssociation
+			}
+			type unregisterFileAssociation = {
+				name: "editor.unregister-file-association"
+				payload: Extensions.FileAssociation["name"]
+			}
 		}
 	}
 }
 
-export type OrdoDescendant = Descendant & { type: string }
-export type OrdoElement = Element & { type: string }
+export type OrdoDescendant = Descendant & { type: TNodeType }
+export type OrdoElement = Element & { type: TNodeType }
 
 export {}

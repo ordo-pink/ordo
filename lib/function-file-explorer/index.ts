@@ -17,26 +17,36 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import { BsFolder2Open } from "react-icons/bs"
+import { lazy } from "react"
+
 import { ORDO_PINK_FILE_EXPLORER_FUNCTION } from "@ordo-pink/core"
 import { createFunction } from "@ordo-pink/frontend-create-function"
 
-import { registerFileExplorerActivity } from "./src/activities/file-explorer.activity"
 import { registerGoToFileExplorerCommand } from "./src/commands/go-to-file-explorer.command"
 import { registerShowInFileExplorerCommand } from "./src/commands/show-in-file-explorer.command"
 
 export default createFunction(
 	ORDO_PINK_FILE_EXPLORER_FUNCTION,
 	{ queries: [], commands: [] },
-	({ getCommands, getLogger, getHosts, data }) => {
+	({ getCommands, getLogger, getHosts, registerActivity, data }) => {
 		const commands = getCommands()
 		const logger = getLogger()
 		const { staticHost } = getHosts()
 
 		logger.debug("Initialising...")
 
+		const unregisterActivity = registerActivity({
+			name: "pink.ordo.file-explorer.main",
+			Component: lazy(() => import("./src/views/file-explorer.workspace")),
+			routes: ["/fs", "/fs/:fsid"],
+			widgets: [lazy(() => import("./src/views/file-explorer.widget"))],
+			background: false,
+			Icon: BsFolder2Open,
+		})
+
 		const dropGoToFileExplorerCmd = registerGoToFileExplorerCommand({ commands })
 		const dropShowInFileExplorerCmd = registerShowInFileExplorerCommand({ commands, data })
-		const dropFileExplorerActivity = registerFileExplorerActivity({ commands })
 
 		commands.emit<cmd.achievements.add>("achievements.add", {
 			descriptor: {
@@ -64,7 +74,7 @@ export default createFunction(
 				image: `${staticHost}/create-25-files.jpg`,
 				description: "Создайте 25 файлов.",
 				id: ORDO_PINK_FILE_EXPLORER_FUNCTION.concat(".achievements.create-25-files"),
-				title: "Много Файлы",
+				title: "Толпа Файлы",
 				category: "collection",
 				previous: ORDO_PINK_FILE_EXPLORER_FUNCTION.concat(".achievements.create-10-files"),
 			},
@@ -108,7 +118,7 @@ export default createFunction(
 				image: `${staticHost}/create-100-files.jpg`,
 				description: "Создайте 100 файлов.",
 				id: ORDO_PINK_FILE_EXPLORER_FUNCTION.concat(".achievements.create-100-files"),
-				title: "Толпа Файлы",
+				title: "Сотня Файлы",
 				category: "collection",
 				previous: ORDO_PINK_FILE_EXPLORER_FUNCTION.concat(".achievements.create-50-files"),
 			},
@@ -130,7 +140,7 @@ export default createFunction(
 				image: `${staticHost}/create-250-files.jpg`,
 				description: "Создайте 250 файлов.",
 				id: ORDO_PINK_FILE_EXPLORER_FUNCTION.concat(".achievements.create-250-files"),
-				title: "Сонмище Файлы",
+				title: "Туча Файлы",
 				category: "collection",
 				previous: ORDO_PINK_FILE_EXPLORER_FUNCTION.concat(".achievements.create-100-files"),
 			},
@@ -152,7 +162,7 @@ export default createFunction(
 				image: `${staticHost}/create-500-files.jpg`,
 				description: "Создайте 500 файлов.",
 				id: ORDO_PINK_FILE_EXPLORER_FUNCTION.concat(".achievements.create-500-files"),
-				title: "Полчище Файлы",
+				title: "Тьма Файлы",
 				category: "collection",
 				previous: ORDO_PINK_FILE_EXPLORER_FUNCTION.concat(".achievements.create-250-files"),
 			},
@@ -196,9 +206,10 @@ export default createFunction(
 		return () => {
 			logger.debug("Terminating...")
 
+			unregisterActivity()
+
 			dropGoToFileExplorerCmd()
 			dropShowInFileExplorerCmd()
-			dropFileExplorerActivity()
 
 			logger.debug("Terminated.")
 		}

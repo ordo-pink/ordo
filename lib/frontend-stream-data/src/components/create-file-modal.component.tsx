@@ -20,23 +20,27 @@
 import { ChangeEvent, useState } from "react"
 import { BsNodePlus } from "react-icons/bs"
 
+import { useCommands, useStrictSubscription } from "@ordo-pink/frontend-react-hooks"
 import { type PlainData } from "@ordo-pink/data"
 import { isNonEmptyString } from "@ordo-pink/tau"
-import { useCommands } from "@ordo-pink/frontend-react-hooks"
 
 import OrdoButton from "@ordo-pink/frontend-react-components/button"
+import { fileAssociations$ } from "@ordo-pink/frontend-stream-file-associations"
 
 type P = { parent: PlainData | null }
 export default function CreateFileModal({ parent }: P) {
 	const commands = useCommands()
 	const [name, setName] = useState("")
+	const [contentType, setContentType] = useState("text/ordo")
 
 	const handleInputChange = (event: ChangeEvent<HTMLInputElement>) => setName(event.target.value)
+	const fileAssociations = useStrictSubscription(fileAssociations$, [])
 
 	const handleCreateFile = () => {
 		commands.emit<cmd.data.create>("data.create", {
 			name,
 			parent: parent?.fsid ?? null,
+			contentType,
 		})
 		commands.emit<cmd.modal.hide>("modal.hide")
 	}
@@ -47,7 +51,7 @@ export default function CreateFileModal({ parent }: P) {
 	const tCreate = "Создать"
 
 	return (
-		<div className="flex w-[30rem] max-w-full flex-col gap-8">
+		<div className="flex w-full flex-col gap-8">
 			<div className="flex items-center space-x-2 px-8 pt-8">
 				<div className="rounded-full bg-gradient-to-tr from-slate-400 to-zinc-400 p-3 text-xl text-neutral-200 shadow-md dark:from-slate-600 dark:to-zinc-600">
 					<BsNodePlus />
@@ -55,7 +59,7 @@ export default function CreateFileModal({ parent }: P) {
 				<div className="flex grow flex-col gap-y-4">
 					<h3 className="px-8 text-lg font-bold">{tTitle}</h3>
 
-					<div className="pl-8">
+					<div className="flex flex-col gap-y-2 pl-8">
 						{/* <PathBreadcrumbs path={parent?.path ?? "/"} /> */}
 						<input
 							className="w-full rounded-lg bg-neutral-200 px-4 py-2 shadow-inner outline-none dark:bg-neutral-600"
@@ -67,6 +71,19 @@ export default function CreateFileModal({ parent }: P) {
 							value={name}
 							onChange={handleInputChange}
 						/>
+
+						<select
+							className="w-full rounded-lg bg-neutral-200 px-4 py-2 shadow-inner outline-none dark:bg-neutral-600"
+							onChange={e => {
+								setContentType(e.target.value)
+							}}
+						>
+							{fileAssociations.map(fileAssociation => (
+								<option key={fileAssociation.name} value={fileAssociation.contentType}>
+									{fileAssociation.contentType}
+								</option>
+							))}
+						</select>
 					</div>
 				</div>
 			</div>

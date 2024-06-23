@@ -167,11 +167,6 @@ declare global {
 			type hide = { name: "notification.hide"; payload: string }
 		}
 
-		module activities {
-			type add = { name: "activities.add"; payload: Extensions.Activity }
-			type remove = { name: "activities.remove"; payload: string }
-		}
-
 		module fileAssociations {
 			type add = { name: "file-associations.add"; payload: Extensions.FileAssociation }
 			type remove = { name: "file-associations.remove"; payload: string }
@@ -293,10 +288,19 @@ declare global {
 
 		type FileExtension = `.${string}`
 
+		type FileAssociationComponentProps = {
+			isLoading: boolean
+			isEditable: boolean
+			isEmbedded: boolean
+			content: string | ArrayBuffer | null
+			data: PlainData
+		}
+
 		type FileAssociation = {
 			name: string
-			fileExtensions: FileExtension[] | "*"
-			Component: ComponentType
+			contentType: string
+			Icon?: ComponentType
+			Component: ComponentType<FileAssociationComponentProps>
 		}
 	}
 
@@ -469,6 +473,7 @@ declare global {
 				payload?: T
 				Icon?: ComponentType | IconType
 				duration?: number
+				onClick?: () => void
 				action?: (id: string, payload: T) => unknown
 				actionText?: string
 				id?: string
@@ -675,5 +680,5 @@ export type PlainDataNode = {
 	data: PlainData
 	id: FSID
 	parent: FSID | null
-	children: PlainData[]
+	children: PlainDataNode[]
 }

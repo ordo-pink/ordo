@@ -19,7 +19,7 @@
 
 import { useEffect, useRef, useState } from "react"
 
-import { useAccelerator, useCommands } from "@ordo-pink/frontend-react-hooks"
+import { useAccelerator, useCommands, useIsMobile } from "@ordo-pink/frontend-react-hooks"
 
 import Card from "@ordo-pink/frontend-react-components/card"
 import CenteredPage from "@ordo-pink/frontend-react-components/centered-page"
@@ -32,6 +32,7 @@ import GTDList from "./list.component"
 export default function GTDInbox() {
 	const commands = useCommands()
 	const items = useInbox()
+	const isMobile = useIsMobile()
 
 	const [newItem, setNewItem] = useState("")
 	const createInputRef = useRef<HTMLInputElement>(null)
@@ -50,7 +51,7 @@ export default function GTDInbox() {
 				<div className="flex w-full max-w-2xl flex-col space-y-4">
 					<Card className="h-[90vh]" title="Входящие">
 						<TextInput
-							autoFocus
+							autoFocus={!isMobile}
 							forwardRef={createInputRef}
 							id="add-to-inbox"
 							label=""

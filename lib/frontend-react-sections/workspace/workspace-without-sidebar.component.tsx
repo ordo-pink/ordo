@@ -28,12 +28,12 @@ import { type WorkspaceContentProps } from "./workspace.types"
 export default function WorkspaceWithoutSidebar({ activity }: WorkspaceContentProps) {
 	return Either.fromNullable(activity).fold(
 		() => (
-			<div className="min-h-screen w-screen">
+			<div className="min-h-[100dvh] w-screen">
 				<Loading />
 			</div>
 		),
 		({ Component }) => (
-			<div className="workspace size-full min-h-screen overflow-auto pl-12">
+			<div className="workspace size-full min-h-[100dvh] overflow-auto pl-12">
 				<Suspense>
 					<Component />
 				</Suspense>

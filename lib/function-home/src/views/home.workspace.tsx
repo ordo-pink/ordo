@@ -19,10 +19,10 @@
 
 import { useEffect, useState } from "react"
 
+import { Oath, chain0, fromBoolean0, fromPromise0 } from "@ordo-pink/oath"
+import { isObject, isString, noop } from "@ordo-pink/tau"
 import { useCommands, useHosts, useStrictSubscription } from "@ordo-pink/frontend-react-hooks"
-import { Oath } from "@ordo-pink/oath"
 import { activities$ } from "@ordo-pink/frontend-stream-activities"
-import { noop } from "@ordo-pink/tau"
 import { useFetch } from "@ordo-pink/frontend-fetch"
 
 import Card from "@ordo-pink/frontend-react-components/card"
@@ -44,15 +44,15 @@ export default function FileExplorerSidebar() {
 	useEffect(() => {
 		commands.emit<cmd.application.setTitle>("application.set-title", "Главная")
 
-		const updates0 = Oath.try(() => fetch(`${hosts.staticHost}/news.json`)).chain(res =>
-			Oath.try(() => res.json() as Promise<News[]>),
-		)
+		const ordoNews0 = fromPromise0(() => fetch(`${hosts.staticHost}/news.json`))
+			.pipe(chain0(responseToJson0))
+			.pipe(chain0(checkIsArray0))
+			.pipe(chain0(checkItemsAreNewsItems))
 
-		void updates0.fork(noop, news => setNews(news))
+		// TODO: Log error on reject
+		void ordoNews0.fork(noop, news => setNews(news))
 
-		return () => {
-			updates0.cancel()
-		}
+		return () => void ordoNews0.cancel()
 	}, [fetch, hosts.staticHost, commands])
 
 	return (
@@ -71,3 +71,22 @@ export default function FileExplorerSidebar() {
 		</CenteredPage>
 	)
 }
+
+// --- Internal ---
+
+const isNewsItem = (item: unknown): item is News =>
+	isObject(item) &&
+	["title", "message", "title"].reduce((acc, key) => acc && isString(item[key]), true)
+
+const areNewsItems = (items: unknown[]): items is News[] =>
+	!!items.reduce((acc, item) => acc && isNewsItem(item), true)
+
+type TResponseToJsonFn = (r: Response) => Oath<unknown, Error>
+const responseToJson0: TResponseToJsonFn = res => fromPromise0(() => res.json())
+
+type TCheckIsArrayFn = (r: unknown) => Oath<unknown[], Error>
+const checkIsArray0: TCheckIsArrayFn = news => fromBoolean0(Array.isArray(news), news as unknown[])
+
+type TCheckItemsAreNewsItemsFn = (r: unknown[]) => Oath<News[], Error>
+const checkItemsAreNewsItems: TCheckItemsAreNewsItemsFn = news =>
+	fromBoolean0(areNewsItems(news), news as News[])

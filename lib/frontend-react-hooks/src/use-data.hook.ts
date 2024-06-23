@@ -19,7 +19,7 @@
 
 import { useEffect, useState } from "react"
 
-import { DataRepository, type FSID, type PlainData } from "@ordo-pink/data"
+import { DataQuery, DataRepository, type FSID, type PlainData } from "@ordo-pink/data"
 import { Either } from "@ordo-pink/either"
 import { type PlainDataNode } from "@ordo-pink/core"
 import { Switch } from "@ordo-pink/switch"
@@ -61,6 +61,10 @@ export const useData = (showHidden = false) => {
 	}, [showHidden, data])
 
 	return items
+}
+
+export const useChildTree = (source?: PlainData | FSID | null | "root") => {
+	return DataQuery.of(data$).getDataTreeE(source)
 }
 
 export const useDataLabels = (showHidden = false) => {

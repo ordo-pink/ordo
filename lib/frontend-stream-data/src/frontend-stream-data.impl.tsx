@@ -33,11 +33,11 @@ import { BehaviorSubject } from "rxjs/internal/BehaviorSubject"
 import { PiGraph } from "react-icons/pi"
 
 import { Data, DataRepository, FSID, PlainData, TDataCommands } from "@ordo-pink/data"
-import { EXTENSION_FILE_PREFIX, LIB_DIRECTORY_FSID } from "@ordo-pink/core"
+import { Oath, chain0, fromNullable0, map0, orElse } from "@ordo-pink/oath"
 import { Either } from "@ordo-pink/either"
 import { KnownFunctions } from "@ordo-pink/frontend-known-functions"
+import { LIB_DIRECTORY_FSID } from "@ordo-pink/core"
 import { N } from "@ordo-pink/tau"
-import { Oath } from "@ordo-pink/oath"
 import { auth$ } from "@ordo-pink/frontend-stream-user"
 import { getCommands } from "@ordo-pink/frontend-stream-commands"
 import { getFetch } from "@ordo-pink/frontend-fetch"
@@ -63,67 +63,84 @@ export const __initData = ({ fid, dataCommands }: P) => {
 	})
 
 	commands.on<cmd.data.showEditLabelsPalette>("data.show-edit-labels-palette", payload => {
-		const data = data$.value
+		const data = DataRepository.dropHidden(data$.value ?? [])
 		const labels = Array.from(new Set(data?.flatMap(item => item.labels) ?? []))
+		const item = data?.find(item => item.fsid === payload.fsid)
 
-		commands.emit<cmd.commandPalette.show>("command-palette.show", {
-			onNewItem: label => {
-				commands.emit<cmd.data.addLabel>("data.add-label", { item: payload, label })
-				commands.emit<cmd.commandPalette.hide>("command-palette.hide")
-			},
-			multiple: true,
-			pinnedItems: payload.labels.map(label => ({
-				id: label,
-				readableName: label,
-				Icon: BsTag,
-				onSelect: () => {
-					commands.emit<cmd.data.removeLabel>("data.remove-label", { item: payload, label })
+		if (!item) return
+
+		const handleShowEditLabels = () => {
+			commands.emit<cmd.commandPalette.show>("command-palette.show", {
+				onNewItem: label => {
+					commands.emit<cmd.data.addLabel>("data.add-label", { item, label })
+					item.labels.push(label)
+					handleShowEditLabels()
 				},
-			})),
-			items: labels
-				.filter(label => !payload.labels.includes(label))
-				.map(label => ({
+				multiple: true,
+				pinnedItems: item.labels.map(label => ({
 					id: label,
 					readableName: label,
 					Icon: BsTag,
 					onSelect: () => {
-						commands.emit<cmd.data.addLabel>("data.add-label", { item: payload, label })
+						commands.emit<cmd.data.removeLabel>("data.remove-label", { item, label })
+						item.labels.splice(item.labels.indexOf(label), 1)
+						handleShowEditLabels()
 					},
 				})),
-		})
+				items: labels
+					.filter(label => !item.labels.includes(label))
+					.map(label => ({
+						id: label,
+						readableName: label,
+						Icon: BsTag,
+						onSelect: () => {
+							commands.emit<cmd.data.addLabel>("data.add-label", { item, label })
+							item.labels.push(label)
+							handleShowEditLabels()
+						},
+					})),
+			})
+		}
+
+		handleShowEditLabels()
 	})
 
 	commands.on<cmd.data.showEditLinksPalette>("data.show-edit-links-palette", payload => {
-		const data = data$.value
+		const data = DataRepository.dropHidden(data$.value ?? [])
+		const links = Array.from(new Set(data?.map(item => item.fsid) ?? []))
+		const item = data?.find(item => item.fsid === payload.fsid)
 
-		if (!data) return
+		if (!item) return
 
-		commands.emit<cmd.commandPalette.show>("command-palette.show", {
-			multiple: true,
-			pinnedItems: payload.links.map(link => ({
-				id: link,
-				readableName: data.find(item => item.fsid === link)!.name,
-				Icon: BsLink,
-				onSelect: () => {
-					commands.emit<cmd.data.removeLink>("data.remove-link", { item: payload, link })
-				},
-			})),
-			items: data
-				.filter(
-					data =>
-						!payload.links.includes(data.fsid) &&
-						data.fsid !== payload.fsid &&
-						!data.name.startsWith(EXTENSION_FILE_PREFIX),
-				)
-				.map(link => ({
-					id: link.fsid,
-					readableName: link.name,
+		const handleShowEditLinks = () => {
+			commands.emit<cmd.commandPalette.show>("command-palette.show", {
+				multiple: true,
+				pinnedItems: item.links.map(link => ({
+					id: link,
+					readableName: data.find(item => item.fsid === link)!.name,
 					Icon: BsLink,
 					onSelect: () => {
-						commands.emit<cmd.data.addLink>("data.add-link", { item: payload, link: link.fsid })
+						commands.emit<cmd.data.removeLink>("data.remove-link", { item, link })
+						item.links.splice(item.links.indexOf(link), 1)
+						handleShowEditLinks()
 					},
 				})),
-		})
+				items: links
+					.filter(link => !item.links.includes(link))
+					.map(link => ({
+						id: link,
+						readableName: data.find(item => item.fsid === link)!.name,
+						Icon: BsLink,
+						onSelect: () => {
+							commands.emit<cmd.data.addLink>("data.add-link", { item, link })
+							item.links.push(link)
+							handleShowEditLinks()
+						},
+					})),
+			})
+		}
+
+		handleShowEditLinks()
 	})
 
 	commands.on<cmd.data.showRemoveModal>("data.show-remove-modal", payload => {
@@ -334,8 +351,8 @@ export const __initData = ({ fid, dataCommands }: P) => {
 
 			return {
 				items: defaultValues.concat(
-					data
-						?.filter(item => item.fsid !== payload.parent && item.fsid !== payload.fsid)
+					DataRepository.dropHidden(data ?? [])
+						.filter(item => item.fsid !== payload.parent && item.fsid !== payload.fsid)
 						.map(
 							item =>
 								({
@@ -357,17 +374,12 @@ export const __initData = ({ fid, dataCommands }: P) => {
 		type: "update",
 	})
 
-	commands.on<cmd.data.getContent>("data.get-content", fsid => {
-		void Oath.fromNullable(auth$.value)
-			.chain(({ sub }) =>
-				Oath.of(content$.value).chain(content =>
-					dataCommands
-						.getContent({ createdBy: sub, fsid })
-						.map(data => content$.next({ ...content, [fsid]: data })),
-				),
-			)
-			.orElse(() => content$.next({ ...content$.value, [fsid]: null }))
-	})
+	commands.on<cmd.data.getContent>("data.get-content", fsid =>
+		fromNullable0(auth$.getValue())
+			.pipe(chain0(({ sub }) => dataCommands.getContent({ createdBy: sub, fsid })))
+			.pipe(map0(result => content$.next({ ...content$.getValue(), [fsid]: result })))
+			.invoke(orElse(() => content$.next({ ...content$.getValue(), [fsid]: null }))),
+	)
 
 	commands.on<cmd.data.dropContent>("data.drop-content", fsid => {
 		const contentCopy = content$.getValue()
@@ -400,6 +412,8 @@ export const __initData = ({ fid, dataCommands }: P) => {
 						dataCopy.splice(dataCopy.indexOf(currentData!), 1, updated)
 
 						data$.next(dataCopy)
+
+						return
 					},
 				)
 		},
@@ -451,6 +465,11 @@ export const getData = (fid: symbol | null): PlainData[] | null =>
 	Either.fromNullable(fid)
 		.chain(checkCurrentActivityQueryPermissionE)
 		.fold(N, () => data$.value)
+
+export const getData$ = (fid: symbol | null): BehaviorSubject<PlainData[] | null> | null =>
+	Either.fromNullable(fid)
+		.chain(checkCurrentActivityQueryPermissionE)
+		.fold(N, () => data$)
 
 export const data$ = new BehaviorSubject<PlainData[] | null>(null)
 export const content$ = new BehaviorSubject<Record<FSID, string | ArrayBuffer | null>>({})

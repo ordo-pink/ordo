@@ -47,7 +47,21 @@ export const SHORTCUTS = {
 	"№№№№№": "heading-5",
 	"()": "check-list-item",
 	"[]": "check-list-item",
-}
+} as const
+
+type TDefaultNodes =
+	| "ordered-list"
+	| "unordered-list"
+	| "paragraph"
+	| "callout"
+	| "label"
+	| "link"
+	| "toc"
+	| "file-embed"
+
+export type TNodeType =
+	| (typeof SHORTCUTS extends { [key: string]: infer U } ? U : never)
+	| TDefaultNodes
 
 export const EMPTY_EDITOR_CHILDREN = [
 	{ type: "paragraph", children: [{ text: "" }] },

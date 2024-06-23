@@ -24,23 +24,16 @@ import { merge } from "rxjs/internal/observable/merge"
 import { scan } from "rxjs/internal/operators/scan"
 import { shareReplay } from "rxjs/internal/operators/shareReplay"
 
-import { N, callOnce } from "@ordo-pink/tau"
-import { getCommands } from "@ordo-pink/frontend-stream-commands"
+import { N, callOnce, noop } from "@ordo-pink/tau"
 
-import { Either } from "@ordo-pink/either"
+import { Either, fromNullableE } from "@ordo-pink/either"
 import { KnownFunctions } from "@ordo-pink/frontend-known-functions"
 import { getLogger } from "@ordo-pink/frontend-logger"
 
 export const __initActivities = callOnce((fid: symbol) => {
 	const logger = getLogger(fid)
-	const commands = getCommands(fid)
 
 	logger.debug("Initializing activities...")
-
-	commands.on<cmd.activities.add>("activities.add", payload =>
-		add$.next({ ...payload, fid } as any),
-	)
-	commands.on<cmd.activities.remove>("activities.remove", payload => remove$.next(payload))
 
 	activities$.subscribe()
 
@@ -65,6 +58,20 @@ export const activities$ = merge(add$.pipe(map(add)), remove$.pipe(map(remove)))
 	scan((acc, f) => f(acc), [] as Extensions.Activity[]),
 	shareReplay(1),
 )
+
+export const registerActivity =
+	(fid: symbol | null) =>
+	(activity: Extensions.Activity): (() => void) =>
+		fromNullableE(fid).fold(
+			() => noop,
+			fid => {
+				add$.next({ ...activity, fid } as any)
+
+				return () => {
+					remove$.next(activity.name)
+				}
+			},
+		)
 
 export const useCurrentFID = () => getCurrentFID()
 

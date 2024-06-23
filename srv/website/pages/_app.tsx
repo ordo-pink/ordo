@@ -25,7 +25,6 @@ import "@ordo-pink/css/main.css"
 import "./index.css"
 import "../components/index-hero.css"
 
-
 const jost = Jost({ preload: true, subsets: ["latin-ext"], fallback: ["system-ui"] })
 
 export const metadata: Metadata = {

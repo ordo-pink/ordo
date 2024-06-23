@@ -30,11 +30,13 @@ export const LIB_DIRECTORY_FSID = "1de21bf3-2277-4d3a-bbd3-d120eb8a49d0"
 export const ORDO_PINK_APP_FUNCTION = "pink.ordo.app"
 
 export const ORDO_PINK_USER_FUNCTION = "pink.ordo.user"
+export const ORDO_PINK_ACHIEVEMENTS_FUNCTION = "pink.ordo.achievements"
 export const ORDO_PINK_FILE_EXPLORER_FUNCTION = "pink.ordo.file-explorer"
 export const ORDO_PINK_LINKS_FUNCTION = "pink.ordo.links"
 export const ORDO_PINK_HOME_FUNCTION = "pink.ordo.home"
 export const ORDO_PINK_EDITOR_FUNCTION = "pink.ordo.editor"
 export const ORDO_PINK_GTD_FUNCTION = "pink.ordo.gtd"
+export const ORDO_PINK_EXCALIDRAW_FUNCTION = "pink.ordo.excalidraw"
 // export const ORDO_PINK_MEDIA_FUNCTION = "pink.ordo.media"
 // export const ORDO_PINK_BOARDS_FUNCTION = "pink.ordo.boards"
 // export const ORDO_PINK_DATABASES_FUNCTION = "pink.ordo.databases"
@@ -49,6 +51,8 @@ export const internalApps = [
 	ORDO_PINK_HOME_FUNCTION,
 	ORDO_PINK_EDITOR_FUNCTION,
 	ORDO_PINK_GTD_FUNCTION,
+	ORDO_PINK_ACHIEVEMENTS_FUNCTION,
+	ORDO_PINK_EXCALIDRAW_FUNCTION,
 ]
 
 export const enum BackgroundTaskStatus {

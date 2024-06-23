@@ -19,15 +19,24 @@
 
 import { BsFileEarmark, BsFolder2 } from "react-icons/bs"
 
+import { useChildren, useStrictSubscription } from "@ordo-pink/frontend-react-hooks"
 import { PlainData } from "@ordo-pink/data"
-import { useChildren } from "@ordo-pink/frontend-react-hooks"
+import { Switch } from "@ordo-pink/switch"
+import { fileAssociations$ } from "@ordo-pink/frontend-stream-file-associations"
 
 type P = { plain: PlainData }
 export default function DataIcon({ plain }: P) {
 	const children = useChildren(plain)
-	return children.length > 0 ? (
-		<BsFolder2 className="size-full" />
-	) : (
-		<BsFileEarmark className="size-full" />
-	)
+	const fileAssociations = useStrictSubscription(fileAssociations$, [])
+	const Association = fileAssociations.find(
+		fileAssociation => fileAssociation.contentType === plain.contentType,
+	)!
+
+	return Switch.empty()
+		.case(
+			() => children.length > 0,
+			() => <BsFolder2 className="size-full" />,
+		)
+		.case(!!Association, () => Association && Association.Icon && <Association.Icon />)
+		.default(() => <BsFileEarmark className="size-full shrink-0" />)
 }

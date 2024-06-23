@@ -91,30 +91,35 @@ export default function CommandPaletteModal({ items, onNewItem, multiple, pinned
 		setInputValue(event.target.value)
 	}
 
-	const handleEnter = (index: number) => {
+	const handleEnter = (index: number, clickLocation?: "selected" | "suggested") => {
+		const location = clickLocation ?? pointerLocation
+
 		Either.fromNullable(
-			pointerLocation === "selected" ? selectedItems[index] : suggestedItems[index],
+			location === "selected" ? selectedItems[index] : suggestedItems[index],
 		).fold(
 			() => {
 				if (onNewItem) onNewItem(inputValue)
+				setInputValue("")
+
 				if (!multiple) handleEscape()
 			},
-			selectedItem => {
+			(selectedItem: Client.CommandPalette.Item) => {
 				if (onNewItem && inputValue.length > 0 && suggestedItems.length === 0) {
 					onNewItem(inputValue)
+					setInputValue("")
 					return
 				}
 
 				selectedItem.onSelect()
 
-				if (pointerLocation === "selected") {
+				if (location === "selected") {
 					const selectedItemsCopy = [...selectedItems]
 					selectedItemsCopy.splice(index, 1)
 					setSelectedItems(selectedItemsCopy)
 					setAllItems([selectedItem, ...suggestedItems])
 				}
 
-				if (pointerLocation === "suggested") {
+				if (location === "suggested") {
 					const allItemsCopy = [...allItems]
 					allItemsCopy.splice(
 						allItems.findIndex(v => v.id === selectedItem.id),
@@ -233,7 +238,7 @@ export default function CommandPaletteModal({ items, onNewItem, multiple, pinned
 	const tSearchPlaceholder = "Поиск..."
 
 	return (
-		<div className="max-w-screen max-h-screen sm:size-[35rem]">
+		<div className="max-w-screen max-h-screen w-full">
 			<div className="mx-2 mt-2 flex items-center space-x-2 rounded-lg bg-neutral-200 px-2 py-1 shadow-inner dark:bg-neutral-600">
 				<BsSearch className="shrink-0" />
 				<input
@@ -247,9 +252,9 @@ export default function CommandPaletteModal({ items, onNewItem, multiple, pinned
 				/>
 			</div>
 
-			<div className="h-[31.5rem] overflow-y-auto px-2 py-4">
+			<div className="h-[50dvh] overflow-y-auto px-2 py-4">
 				{selectedItems.length ? (
-					<div className="border-b border-neutral-500 pb-2">
+					<div className="text-ellipsis border-b border-neutral-500 pb-2">
 						{selectedItems.map((item, index) => (
 							<Item
 								key={item.id}
@@ -258,13 +263,13 @@ export default function CommandPaletteModal({ items, onNewItem, multiple, pinned
 								Icon={item.Icon}
 								accelerator={item.accelerator}
 								isCurrent={currentIndex === index && pointerLocation === "selected"}
-								onSelect={() => handleEnter(index)}
+								onSelect={() => handleEnter(index, "selected")}
 							/>
 						))}
 					</div>
 				) : null}
 
-				<div className="pt-2">
+				<div className="max-w-full">
 					{suggestedItems.map((item, index) => (
 						<Item
 							key={item.id}
@@ -273,7 +278,7 @@ export default function CommandPaletteModal({ items, onNewItem, multiple, pinned
 							Icon={item.Icon}
 							accelerator={item.accelerator}
 							isCurrent={currentIndex === index && pointerLocation === "suggested"}
-							onSelect={() => handleEnter(index)}
+							onSelect={() => handleEnter(index, "suggested")}
 						/>
 					))}
 				</div>
@@ -285,7 +290,8 @@ export default function CommandPaletteModal({ items, onNewItem, multiple, pinned
 						current={true}
 						onClick={() => {
 							onNewItem(inputValue)
-							handleEscape()
+							setInputValue("")
+							if (!multiple) handleEscape()
 						}}
 					/>
 				) : null}

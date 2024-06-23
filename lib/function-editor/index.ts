@@ -17,31 +17,50 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import { BsFileEarmarkRichtext, BsLayoutSidebar } from "react-icons/bs"
+import { lazy } from "react"
+
 import { ORDO_PINK_EDITOR_FUNCTION } from "@ordo-pink/core"
 import { createFunction } from "@ordo-pink/frontend-create-function"
-import { registerEditorActivity } from "./src/activities/editor.activity"
+
 import { registerGoToEditorCommand } from "./src/commands/go-to-editor.command"
 import { registerOpenInEditorCommand } from "./src/commands/open-in-editor.command"
 
 export default createFunction(
 	ORDO_PINK_EDITOR_FUNCTION,
 	{ commands: [], queries: [] },
-	({ getCommands, getLogger, data }) => {
+	({ getCommands, getLogger, registerActivity, data }) => {
 		const commands = getCommands()
 		const logger = getLogger()
 
 		logger.debug("Initialising...")
 
-		const dropEditorActivity = registerEditorActivity({ commands })
+		const unregisterActivity = registerActivity({
+			Component: lazy(() => import("./src/views/editor.workspace")),
+			Sidebar: lazy(() => import("./src/views/editor.sidebar")),
+			Icon: BsLayoutSidebar,
+			name: ORDO_PINK_EDITOR_FUNCTION.concat(".activities.editor"),
+			routes: ["/editor", "/editor/:fsid"],
+			background: false,
+		})
+
 		const dropGoToEditorCmd = registerGoToEditorCommand({ commands })
 		const dropOpenInEditorCmd = registerOpenInEditorCommand({ commands, data })
+
+		commands.emit<cmd.editor.registerFileAssociation>("editor.register-file-association", {
+			Component: lazy(() => import("./src/components/editor.component")),
+			Icon: BsFileEarmarkRichtext,
+			contentType: "text/ordo",
+			name: ORDO_PINK_EDITOR_FUNCTION.concat(".ordo-editor"),
+		})
 
 		logger.debug("Initialised.")
 
 		return () => {
 			logger.debug("Terminating...")
 
-			dropEditorActivity()
+			unregisterActivity()
+
 			dropGoToEditorCmd()
 			dropOpenInEditorCmd()
 

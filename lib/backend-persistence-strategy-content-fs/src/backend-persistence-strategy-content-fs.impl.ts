@@ -97,7 +97,13 @@ const awaitStreamWriteCompleteP = (file: Writable, content: Readable) =>
 	})
 
 const readFileContent0 = (path: string) =>
-	try0(() => createReadStream(path)).pipe(rejectedMap0(() => Data.Errors.DataNotFound))
+	try0(() => createReadStream(path)).fix(() => {
+		const stream = new Readable()
+		stream.push("")
+		stream.push(null)
+
+		return stream
+	})
 
 const writeFileContent0 = (content: Readable) => (path: string) =>
 	createWriteStream0(path)

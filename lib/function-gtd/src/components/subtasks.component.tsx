@@ -24,6 +24,7 @@ import {
 	useChildren,
 	useCommands,
 	useDataByFSID,
+	useIsMobile,
 } from "@ordo-pink/frontend-react-hooks"
 import { Either } from "@ordo-pink/either"
 import { FSID } from "@ordo-pink/data"
@@ -40,6 +41,7 @@ export default function GTDSubtasks({ fsid }: P) {
 	const commands = useCommands()
 	const data = useDataByFSID(fsid)
 	const children = useChildren(data)
+	const isMobile = useIsMobile()
 	const [newItem, setNewItem] = useState("")
 	const createInputRef = useRef<HTMLInputElement>(null)
 
@@ -47,7 +49,7 @@ export default function GTDSubtasks({ fsid }: P) {
 
 	useEffect(() => {
 		data &&
-			commands.emit<cmd.application.setTitle>("application.set-title", `Проет ${data.name} | GTD`)
+			commands.emit<cmd.application.setTitle>("application.set-title", `Проект ${data.name} | GTD`)
 	}, [data, commands])
 
 	const tAddToInboxInputPlaceholder = "Что делается..."
@@ -58,7 +60,7 @@ export default function GTDSubtasks({ fsid }: P) {
 				<div className="flex w-full max-w-2xl flex-col space-y-4">
 					<Card className="h-[90vh]" title={data.name}>
 						<TextInput
-							autoFocus
+							autoFocus={!isMobile}
 							forwardRef={createInputRef}
 							id="add-to-inbox"
 							label=""

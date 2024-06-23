@@ -17,7 +17,7 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { BigIntStats, Stats, promises } from "fs"
+import { BigIntStats, Stats, promises, watch } from "fs"
 import { cwd } from "process"
 import { join } from "path"
 
@@ -80,3 +80,15 @@ export const directoryExists0 = (path: string) =>
 
 export const isFile0 = fileExists0
 export const isDirectory0 = directoryExists0
+
+export const watchDeep = async (dir: string, callback: () => void) => {
+	const children = await promises.readdir(dir)
+
+	for (const child of children) {
+		if ((await promises.stat(`${dir}/${child}`)).isDirectory())
+			void watchDeep(`${dir}/${child}`, callback)
+		else watch(dir, callback)
+	}
+}
+
+export const watchDeep0 = oathify(watchDeep)

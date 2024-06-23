@@ -35,10 +35,6 @@ export const useContent = (fsid?: FSID) => {
 		if (!data) return
 
 		commands.emit<cmd.data.getContent>("data.get-content", data.fsid)
-
-		return () => {
-			commands.emit<cmd.data.dropContent>("data.drop-content", data.fsid)
-		}
 	}, [commands, data])
 
 	return fsid ? content[fsid] : null

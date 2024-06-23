@@ -56,7 +56,7 @@ export default function UploadFilesModal({ parent }: Props) {
 	const tUpload = "Загрузить"
 
 	return (
-		<div className="flex w-[30rem] max-w-full flex-col gap-8">
+		<div className="flex w-full flex-col gap-8">
 			<div className="flex items-center space-x-2 px-8 pt-8">
 				<div className="rounded-full bg-gradient-to-tr from-slate-400 to-zinc-400 p-3 text-xl text-neutral-200 shadow-md dark:from-slate-600 dark:to-zinc-600">
 					<BsFileEarmarkPlus />

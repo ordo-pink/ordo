@@ -17,62 +17,44 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import { type ComponentType, useEffect } from "react"
+import { type HotkeyCallback, useHotkeys } from "react-hotkeys-hook"
 import { BsCommand } from "react-icons/bs"
-import { useEffect } from "react"
-import { useHotkeys } from "react-hotkeys-hook"
 
 import {
+	type TCommandPaletteState,
 	currentCommandPalette$,
 	globalCommandPalette$,
 } from "@ordo-pink/frontend-stream-command-palette"
-import { useCommands, useIsAuthenticated, useSubscription } from "@ordo-pink/frontend-react-hooks"
-import { Either } from "@ordo-pink/either"
+import { type TEither, chainE, fromBooleanE, fromNullableE, mapE } from "@ordo-pink/either"
+import {
+	useCommands,
+	useIsApple,
+	useIsAuthenticated,
+	useSubscription,
+} from "@ordo-pink/frontend-react-hooks"
 import { noop } from "@ordo-pink/tau"
 
 import CommandPaletteModal from "@ordo-pink/frontend-react-sections/command-palette"
-import Null from "@ordo-pink/frontend-react-components/null"
-
-// TODO: Move to hooks
-const isDarwin = navigator.appVersion.indexOf("Mac") !== -1
-const IGNORED_KEYS = ["Control", "Shift", "Alt", "Control", "Meta"]
 
 export const useAppInit = () => {
 	const commands = useCommands()
-	const isAuthenticated = useIsAuthenticated()
-	const commandPalette = useSubscription(currentCommandPalette$)
 
+	const isApple = useIsApple()
+	const isAuthenticated = useIsAuthenticated()
+
+	const customCommandPalette = useSubscription(currentCommandPalette$)
 	const globalCommandPalette = useSubscription(globalCommandPalette$)
 
+	// Register global hotkeys registerred via CommandPalette.
 	useHotkeys(
 		"*",
-		e => {
-			if (IGNORED_KEYS.includes(e.key)) return
-
-			let hotkey = ""
-
-			if (e.altKey) hotkey += "meta+"
-			if (e.ctrlKey) hotkey += isDarwin ? "ctrl+" : "mod+"
-			if (e.metaKey) hotkey += "mod+"
-			if (e.shiftKey) hotkey += "shift+"
-
-			hotkey += e.code.replace("Key", "").toLocaleLowerCase()
-
-			const command = globalCommandPalette?.items.find(c => c.accelerator === hotkey)
-
-			if (command) {
-				e.preventDefault()
-				e.stopPropagation()
-
-				command.onSelect()
-			}
-		},
-		{
-			enableOnFormTags: true,
-			enableOnContentEditable: true,
-		},
-		[globalCommandPalette],
+		handleHotkey({ commandPalette: globalCommandPalette, isApple }),
+		{ enableOnFormTags: true, enableOnContentEditable: true },
+		[globalCommandPalette, isApple],
 	)
 
+	// Register global hotkey for hiding CommandPalette.
 	useEffect(() => {
 		commands.emit<cmd.commandPalette.add>("command-palette.add", {
 			id: "command-palette.hide",
@@ -81,44 +63,113 @@ export const useAppInit = () => {
 			Icon: BsCommand,
 			accelerator: "mod+shift+p",
 		})
+
+		return () =>
+			void commands.emit<cmd.commandPalette.remove>(
+				"command-palette.remove",
+				"command-palette.hide",
+			)
 	}, [commands])
 
+	// Refresh application state upon after the user is authenticated.
 	useEffect(() => {
-		Either.fromBoolean(() => isAuthenticated).fold(Null, () => {
+		fromBooleanE(isAuthenticated).fold(noop, () => {
 			commands.emit<cmd.user.refreshInfo>("user.refresh")
 			commands.emit<cmd.data.refreshRoot>("data.refresh-root")
 		})
 	}, [commands, isAuthenticated])
 
+	// Register showing custom CommandPalette.
 	useEffect(() => {
-		Either.fromNullable(commandPalette)
-			.chain(cp =>
-				Either.fromBoolean(
-					() =>
-						cp.items.length > 0 ||
-						(!!cp.pinnedItems && cp.pinnedItems.length > 0) ||
-						!!cp.onNewItem,
-					() => cp,
-				),
-			)
-			.fold(noop, cp =>
-				commands.emit<cmd.modal.show>("modal.show", {
-					Component: () =>
-						(
-							<CommandPaletteModal
-								items={cp.items}
-								onNewItem={cp.onNewItem}
-								multiple={cp.multiple}
-								pinnedItems={cp.pinnedItems}
-							/>
-						) as any,
-					// The onHide hook makes a redundant call for hiding modal, but helps with closing the
-					// command palette when the modal is closed with a click on the overlay or Esc key press.
-					options: {
-						showCloseButton: false,
-						onHide: () => commands.emit<cmd.commandPalette.hide>("command-palette.hide"),
-					},
-				}),
-			)
-	}, [commandPalette, commands])
+		fromNullableE(customCommandPalette)
+			.pipe(chainE(checkHasPinnedItemsE))
+			.fold(noop, showCustomCommandPalette(commands))
+	}, [customCommandPalette, commands])
 }
+
+// --- Internal ---
+
+const IGNORED_KEYS = ["Control", "Shift", "Alt", "Meta"]
+
+type TCreateHotkeyStringFn = (event: KeyboardEvent, isApple: boolean) => string
+const createHotkeyString: TCreateHotkeyStringFn = (event, isApple) => {
+	let hotkey = ""
+
+	if (event.altKey) hotkey += "meta+"
+	if (event.ctrlKey) hotkey += isApple ? "ctrl+" : "mod+"
+	if (event.metaKey) hotkey += "mod+"
+	if (event.shiftKey) hotkey += "shift+"
+
+	hotkey += event.code.replace("Key", "").toLocaleLowerCase()
+
+	return hotkey
+}
+
+type TFindCommandByHotkeyIfCommandPaletteExistsFn = (
+	cp: TCommandPaletteState | null,
+) => (hotkey: string) => TEither<Client.CommandPalette.Item, null>
+const findCommandByHotkeyIfCommandPaletteExistsE: TFindCommandByHotkeyIfCommandPaletteExistsFn =
+	commandPalette => hotkey =>
+		fromNullableE(commandPalette).pipe(
+			chainE(globalCommandPaletteState =>
+				fromNullableE(globalCommandPaletteState.items.find(c => c.accelerator === hotkey)),
+			),
+		)
+
+type TExecuteCommandFn = (event: KeyboardEvent) => (cmd: Client.CommandPalette.Item) => void
+const executeCommand: TExecuteCommandFn = event => command => {
+	event.preventDefault()
+	event.stopPropagation()
+
+	command.onSelect()
+}
+
+type THandleHotkeyFn = (params: {
+	commandPalette: TCommandPaletteState | null
+	isApple: boolean
+}) => HotkeyCallback
+const handleHotkey: THandleHotkeyFn =
+	({ commandPalette, isApple }) =>
+	event => {
+		fromBooleanE(!IGNORED_KEYS.includes(event.key))
+			.pipe(mapE(() => createHotkeyString(event, isApple)))
+			.pipe(chainE(findCommandByHotkeyIfCommandPaletteExistsE(commandPalette)))
+			.fold(noop, executeCommand(event))
+	}
+
+type TCheckHasPinnedItemsFn = (cp: TCommandPaletteState) => TEither<TCommandPaletteState, void>
+const checkHasPinnedItemsE: TCheckHasPinnedItemsFn = cp =>
+	fromBooleanE(
+		cp.items.length > 0 || (!!cp.pinnedItems && cp.pinnedItems.length > 0) || !!cp.onNewItem,
+		cp,
+	)
+
+type TShowCustomCommandPaletteFn = (
+	commands: Client.Commands.Commands,
+) => (cps: TCommandPaletteState) => void
+const showCustomCommandPalette: TShowCustomCommandPaletteFn = commands => commandPaletteState =>
+	commands.emit<cmd.modal.show>("modal.show", {
+		Component: createCustomCommandPaletteComponent(commandPaletteState),
+		// The onHide hook makes a redundant call for hiding modal, but helps with closing the
+		// command palette when the modal is closed with a click on the overlay or Esc key press.
+		options: {
+			showCloseButton: false,
+			onHide: () => commands.emit<cmd.commandPalette.hide>("command-palette.hide"),
+		},
+	})
+
+type TCreateCustomCommandPaletteComponentFn = (cps: TCommandPaletteState) => ComponentType
+const createCustomCommandPaletteComponent: TCreateCustomCommandPaletteComponentFn =
+	commandPaletteState => {
+		// Providing custom name to the component for transparency.
+		return function CustomCommandPalette() {
+			return (
+				<CommandPaletteModal
+					items={commandPaletteState.items}
+					onNewItem={commandPaletteState.onNewItem}
+					multiple={commandPaletteState.multiple}
+					pinnedItems={commandPaletteState.pinnedItems}
+				/>
+			)
+		}
+	}

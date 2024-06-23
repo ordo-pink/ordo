@@ -45,7 +45,7 @@ export const __initCommandPalette = callOnce((fid: symbol) => {
 	logger.debug("Initialized command palette.")
 })
 
-type CommandPaletteState = {
+export type TCommandPaletteState = {
 	items: Client.CommandPalette.Item[]
 	onNewItem?: (newItem: string) => any
 	multiple?: boolean
@@ -54,13 +54,13 @@ type CommandPaletteState = {
 
 type Add = (item: Client.CommandPalette.Item) => void
 type Remove = (id: string) => void
-type Show = (state: CommandPaletteState) => void
+type Show = (state: TCommandPaletteState) => void
 type AddP = (
 	item: Client.CommandPalette.Item,
-) => (state: CommandPaletteState) => CommandPaletteState
-type RemoveP = (item: string) => (state: CommandPaletteState) => CommandPaletteState
+) => (state: TCommandPaletteState) => TCommandPaletteState
+type RemoveP = (item: string) => (state: TCommandPaletteState) => TCommandPaletteState
 
-export const currentCommandPalette$ = new BehaviorSubject<CommandPaletteState>({ items: [] })
+export const currentCommandPalette$ = new BehaviorSubject<TCommandPaletteState>({ items: [] })
 
 export const add: Add = item => add$.next(item)
 export const remove: Remove = id => remove$.next(id)

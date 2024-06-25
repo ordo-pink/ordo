@@ -1,5 +1,16 @@
-import { type TEither, fromNullableE, mapE } from "@ordo-pink/either"
-import { type UUIDv4 } from "@ordo-pink/tau"
+import { BehaviorSubject } from "rxjs"
+
+import {
+	type TEither,
+	chainE,
+	fromBooleanE,
+	fromNullableE,
+	leftMapE,
+	mapE,
+	ofE,
+} from "@ordo-pink/either"
+import { type UUIDv4, isNonEmptyString, isUUID, isObject } from "@ordo-pink/tau"
+import { UserID } from "@ordo-pink/data"
 
 type FSID = UUIDv4
 type TUserID = string
@@ -26,7 +37,8 @@ export type TMetadataDTO<_TProps extends TMetadataProps = TMetadataProps> = Read
 	properties?: _TProps
 }>
 
-export enum MetadataError {
+export enum RRR {
+	METADATA_NOT_LOADED,
 	METADATA_NOT_FOUND,
 	INVALID_FSID,
 	FSID_ALREADY_TAKEN,
@@ -34,21 +46,21 @@ export enum MetadataError {
 	INVALID_NAME,
 	NAME_ALREADY_TAKEN_UNDER_GIVEN_PARENT,
 	INVALID_PARENT,
-	PARENT_DOES_NOT_EXIST,
-	ANCESTOR_DOES_NOT_EXIST,
-	CHILD_DOES_NOT_EXIST,
-	DESCENDENT_DOES_NOT_EXIST,
+	INVALID_ANCESTOR,
+	INVALID_DESCENDENT,
+	INVALID_CHILD,
+	PARENT_NOT_FOUND,
 	LINK_DOES_NOT_EXIST,
 	CIRCULAR_PARENT_REFERENCE,
 	INVALID_LINK,
 	INVALID_LABEL,
 	INVALID_SIZE,
-	INVALID_CONTENT_TYPE,
-}
+	INVALID_CTYPE,
+	INVALID_PROPERTIES,
 
-export type TMetadataDTOConstructor = <_TProps extends TMetadataProps = TMetadataProps>(
-	p: Partial<TMetadataDTO<_TProps>>,
-) => TEither<TMetadataDTO<_TProps>, MetadataError>
+	// TODO: Extract
+	USERS_NOT_LOADED,
+}
 
 export type TMetadata<_TProps extends TMetadataProps = TMetadataProps> = {
 	getFSID: () => FSID
@@ -70,64 +82,56 @@ export type TMetadata<_TProps extends TMetadataProps = TMetadataProps> = {
 	getSize: () => number
 	getReadableSize: () => string
 	getProperty: <_TKey_ extends keyof _TProps>(key: _TKey_) => TEither<_TProps[_TKey_], null>
+	toDTO: () => TMetadataDTO<_TProps>
 }
 
 export type TMetadataQueryOptions = { showHidden?: boolean }
 
 export type TMetadataQuery = {
+	metadata$: BehaviorSubject<TMetadata[] | null>
+
+	get: (options?: TMetadataQueryOptions) => TEither<TMetadata[], RRR.METADATA_NOT_LOADED>
+
 	getByFSID: (
 		fsid: FSID,
 		options?: TMetadataQueryOptions,
-	) => TEither<TMetadata, MetadataError.INVALID_FSID | MetadataError.METADATA_NOT_FOUND>
+	) => TEither<TMetadata | null, RRR.METADATA_NOT_LOADED | RRR.INVALID_FSID>
 
-	total: (options?: TMetadataQueryOptions) => TEither<number, never>
+	total: (options?: TMetadataQueryOptions) => TEither<number, RRR.METADATA_NOT_LOADED>
 
 	getByNameAndParent: (
 		name: string,
 		parent: FSID | null,
 		options?: TMetadataQueryOptions,
-	) => TEither<TMetadata | null, MetadataError.INVALID_NAME | MetadataError.INVALID_PARENT>
+	) => TEither<TMetadata | null, RRR.METADATA_NOT_LOADED | RRR.INVALID_NAME | RRR.INVALID_PARENT>
 
 	getByLabels: (
 		labels: string[],
 		options?: TMetadataQueryOptions,
-	) => TEither<TMetadata[], MetadataError.INVALID_LABEL>
+	) => TEither<TMetadata[], RRR.METADATA_NOT_LOADED | RRR.INVALID_LABEL>
 
 	hasIncomingLinks: (
 		fsid: FSID,
 		options?: TMetadataQueryOptions,
-	) => TEither<boolean, MetadataError.INVALID_FSID | MetadataError.METADATA_NOT_FOUND>
+	) => TEither<boolean, RRR.METADATA_NOT_LOADED | RRR.INVALID_FSID | RRR.METADATA_NOT_FOUND>
 
 	getIncomingLinks: (
 		fsid: FSID,
 		options?: TMetadataQueryOptions,
-	) => TEither<TMetadata[], MetadataError.INVALID_FSID | MetadataError.METADATA_NOT_FOUND>
+	) => TEither<TMetadata[], RRR.METADATA_NOT_LOADED | RRR.INVALID_FSID | RRR.METADATA_NOT_FOUND>
 
 	getParent: (
 		fsid: FSID,
 		options?: TMetadataQueryOptions,
 	) => TEither<
 		TMetadata | null,
-		| MetadataError.INVALID_FSID
-		| MetadataError.METADATA_NOT_FOUND
-		| MetadataError.PARENT_DOES_NOT_EXIST
-	>
-
-	hasParent: (
-		fsid: FSID,
-		parent: FSID,
-		options?: TMetadataQueryOptions,
-	) => TEither<
-		boolean,
-		| MetadataError.INVALID_FSID
-		| MetadataError.METADATA_NOT_FOUND
-		| MetadataError.PARENT_DOES_NOT_EXIST
+		RRR.METADATA_NOT_LOADED | RRR.INVALID_FSID | RRR.METADATA_NOT_FOUND | RRR.PARENT_NOT_FOUND
 	>
 
 	getAncestors: (
 		fsid: FSID,
 		options?: TMetadataQueryOptions,
-	) => TEither<TMetadata[], MetadataError.INVALID_FSID | MetadataError.METADATA_NOT_FOUND>
+	) => TEither<TMetadata[], RRR.INVALID_FSID | RRR.METADATA_NOT_FOUND>
 
 	hasAncestor: (
 		fsid: FSID,
@@ -135,9 +139,7 @@ export type TMetadataQuery = {
 		options?: TMetadataQueryOptions,
 	) => TEither<
 		boolean,
-		| MetadataError.INVALID_FSID
-		| MetadataError.METADATA_NOT_FOUND
-		| MetadataError.ANCESTOR_DOES_NOT_EXIST
+		RRR.METADATA_NOT_LOADED | RRR.INVALID_FSID | RRR.METADATA_NOT_FOUND | RRR.INVALID_ANCESTOR
 	>
 
 	hasChild: (
@@ -146,20 +148,18 @@ export type TMetadataQuery = {
 		options?: TMetadataQueryOptions,
 	) => TEither<
 		boolean,
-		| MetadataError.INVALID_FSID
-		| MetadataError.METADATA_NOT_FOUND
-		| MetadataError.CHILD_DOES_NOT_EXIST
+		RRR.METADATA_NOT_LOADED | RRR.INVALID_FSID | RRR.METADATA_NOT_FOUND | RRR.INVALID_CHILD
 	>
 
 	hasChildren: (
 		fsid: FSID,
 		options?: TMetadataQueryOptions,
-	) => TEither<boolean, MetadataError.INVALID_FSID | MetadataError.METADATA_NOT_FOUND>
+	) => TEither<boolean, RRR.METADATA_NOT_LOADED | RRR.INVALID_FSID | RRR.METADATA_NOT_FOUND>
 
 	getChildren: (
 		fsid: FSID,
 		options?: TMetadataQueryOptions,
-	) => TEither<TMetadata[], MetadataError.INVALID_FSID | MetadataError.METADATA_NOT_FOUND>
+	) => TEither<TMetadata[], RRR.METADATA_NOT_LOADED | RRR.INVALID_FSID | RRR.METADATA_NOT_FOUND>
 
 	hasDescendent: (
 		fsid: FSID,
@@ -167,20 +167,18 @@ export type TMetadataQuery = {
 		options?: TMetadataQueryOptions,
 	) => TEither<
 		boolean,
-		| MetadataError.INVALID_FSID
-		| MetadataError.METADATA_NOT_FOUND
-		| MetadataError.DESCENDENT_DOES_NOT_EXIST
+		RRR.METADATA_NOT_LOADED | RRR.INVALID_FSID | RRR.METADATA_NOT_FOUND | RRR.INVALID_DESCENDENT
 	>
 
 	hasDescendents: (
 		fsid: FSID,
 		options?: TMetadataQueryOptions,
-	) => TEither<boolean, MetadataError.INVALID_FSID | MetadataError.METADATA_NOT_FOUND>
+	) => TEither<boolean, RRR.METADATA_NOT_LOADED | RRR.INVALID_FSID | RRR.METADATA_NOT_FOUND>
 
 	getDescendents: (
 		fsid: FSID,
 		options?: TMetadataQueryOptions,
-	) => TEither<boolean, MetadataError.INVALID_FSID | MetadataError.METADATA_NOT_FOUND>
+	) => TEither<TMetadata[], RRR.METADATA_NOT_LOADED | RRR.INVALID_FSID | RRR.METADATA_NOT_FOUND>
 
 	// TODO: toTree: (source: TFSID | null) => typeof source extends null ? TMetadataBranch[] : TMetadataBranch
 
@@ -238,7 +236,7 @@ export type TMetadataRepository = {
 // TODO:
 export type TUserRepository = {
 	getUser: (userId: TUserID) => any
-	getCurrentUser: () => any
+	getCurrentUserID: () => TEither<UserID, RRR.USERS_NOT_LOADED>
 }
 
 export type TMetadataDataMapper = {
@@ -253,52 +251,51 @@ export type TMetadataDataMapper = {
 	) => TMetadataDTO<_TProps_>
 }
 
-export type TMetadataService = {
-	get metadataRepository(): TMetadataRepository
-	get userRepository(): TUserRepository
+export type TMetadataCommand = {
+	write: (metadata: TMetadata[]) => void
 
 	create: (
-		p: TCreateMetadataParams,
+		params: TCreateMetadataParams,
 	) => TEither<
 		void,
-		| MetadataError.INVALID_NAME
-		| MetadataError.INVALID_PARENT
-		| MetadataError.NAME_ALREADY_TAKEN_UNDER_GIVEN_PARENT
-		| MetadataError.INVALID_LABEL
-		| MetadataError.INVALID_LINK
-		| MetadataError.PARENT_DOES_NOT_EXIST
-		| MetadataError.INVALID_CONTENT_TYPE
+		| RRR.METADATA_NOT_LOADED
+		| RRR.INVALID_NAME
+		| RRR.INVALID_PARENT
+		| RRR.NAME_ALREADY_TAKEN_UNDER_GIVEN_PARENT
+		| RRR.INVALID_LABEL
+		| RRR.INVALID_LINK
+		| RRR.PARENT_NOT_FOUND
+		| RRR.INVALID_CTYPE
 	>
 
-	duplicate: (metadata: FSID | TMetadata) => TEither<void, never>
-
 	remove: (
-		metadata: FSID | TMetadata,
-	) => TEither<void, MetadataError.INVALID_FSID | MetadataError.METADATA_NOT_FOUND>
+		fsid: FSID,
+	) => TEither<void, RRR.METADATA_NOT_LOADED | RRR.INVALID_FSID | RRR.METADATA_NOT_FOUND>
 
 	appendChildren: (
-		metadata: FSID | TMetadata,
-		...children: (FSID | TMetadata)[]
+		fsid: FSID,
+		...children: FSID[]
 	) => TEither<
 		void,
-		| MetadataError.INVALID_FSID
-		| MetadataError.METADATA_NOT_FOUND
-		| MetadataError.FSID_NOT_FOUND[]
-		| MetadataError.INVALID_PARENT
-		| MetadataError.CIRCULAR_PARENT_REFERENCE
+		| RRR.METADATA_NOT_LOADED
+		| RRR.INVALID_FSID
+		| RRR.METADATA_NOT_FOUND
+		| RRR.FSID_NOT_FOUND[]
+		| RRR.INVALID_PARENT
+		| RRR.CIRCULAR_PARENT_REFERENCE
 	>
 
 	removeChildren: (
 		fsid: FSID,
 		...children: FSID[]
-	) => TEither<void, MetadataError.INVALID_FSID | MetadataError.METADATA_NOT_FOUND>
+	) => TEither<void, RRR.METADATA_NOT_LOADED | RRR.INVALID_FSID | RRR.METADATA_NOT_FOUND>
 
 	addLabels: (
 		fsid: FSID,
 		...labels: string[]
 	) => TEither<
 		void,
-		MetadataError.INVALID_FSID | MetadataError.METADATA_NOT_FOUND | MetadataError.INVALID_LABEL[]
+		RRR.METADATA_NOT_LOADED | RRR.INVALID_FSID | RRR.METADATA_NOT_FOUND | RRR.INVALID_LABEL[]
 	>
 
 	removeLabels: (
@@ -306,7 +303,7 @@ export type TMetadataService = {
 		...labels: string[]
 	) => TEither<
 		void,
-		MetadataError.INVALID_FSID | MetadataError.METADATA_NOT_FOUND | MetadataError.INVALID_LABEL[]
+		RRR.METADATA_NOT_LOADED | RRR.INVALID_FSID | RRR.METADATA_NOT_FOUND | RRR.INVALID_LABEL[]
 	>
 
 	replaceLabels: (
@@ -314,7 +311,7 @@ export type TMetadataService = {
 		labels: string[],
 	) => TEither<
 		void,
-		MetadataError.INVALID_FSID | MetadataError.METADATA_NOT_FOUND | MetadataError.INVALID_LABEL[]
+		RRR.METADATA_NOT_LOADED | RRR.INVALID_FSID | RRR.METADATA_NOT_FOUND | RRR.INVALID_LABEL[]
 	>
 
 	setSize: (
@@ -322,7 +319,7 @@ export type TMetadataService = {
 		size: number,
 	) => TEither<
 		void,
-		MetadataError.INVALID_FSID | MetadataError.METADATA_NOT_FOUND | MetadataError.INVALID_SIZE
+		RRR.METADATA_NOT_LOADED | RRR.INVALID_FSID | RRR.METADATA_NOT_FOUND | RRR.INVALID_SIZE
 	>
 
 	addLinks: (
@@ -330,23 +327,23 @@ export type TMetadataService = {
 		...links: FSID[]
 	) => TEither<
 		void,
-		MetadataError.INVALID_FSID | MetadataError.METADATA_NOT_FOUND | MetadataError.INVALID_LINK[]
+		RRR.METADATA_NOT_LOADED | RRR.INVALID_FSID | RRR.METADATA_NOT_FOUND | RRR.INVALID_LINK[]
 	>
 
 	removeLinks: (
-		metadata: TMetadata,
+		fsid: FSID,
 		...links: FSID[]
 	) => TEither<
 		void,
-		MetadataError.INVALID_FSID | MetadataError.METADATA_NOT_FOUND | MetadataError.INVALID_LINK[]
+		RRR.METADATA_NOT_LOADED | RRR.INVALID_FSID | RRR.METADATA_NOT_FOUND | RRR.INVALID_LINK[]
 	>
 
 	replaceLinks: (
-		metadata: TMetadata,
+		fsid: FSID,
 		links: FSID[],
 	) => TEither<
 		void,
-		MetadataError.INVALID_FSID | MetadataError.METADATA_NOT_FOUND | MetadataError.INVALID_LINK[]
+		RRR.METADATA_NOT_LOADED | RRR.INVALID_FSID | RRR.METADATA_NOT_FOUND | RRR.INVALID_LINK[]
 	>
 
 	setParent: (
@@ -354,7 +351,7 @@ export type TMetadataService = {
 		parent: FSID | null,
 	) => TEither<
 		void,
-		MetadataError.INVALID_FSID | MetadataError.METADATA_NOT_FOUND | MetadataError.INVALID_PARENT
+		RRR.METADATA_NOT_LOADED | RRR.INVALID_FSID | RRR.METADATA_NOT_FOUND | RRR.INVALID_PARENT
 	>
 
 	setName: (
@@ -362,22 +359,23 @@ export type TMetadataService = {
 		name: string,
 	) => TEither<
 		void,
-		| MetadataError.INVALID_FSID
-		| MetadataError.METADATA_NOT_FOUND
-		| MetadataError.INVALID_NAME
-		| MetadataError.NAME_ALREADY_TAKEN_UNDER_GIVEN_PARENT
+		| RRR.METADATA_NOT_LOADED
+		| RRR.INVALID_FSID
+		| RRR.METADATA_NOT_FOUND
+		| RRR.INVALID_NAME
+		| RRR.NAME_ALREADY_TAKEN_UNDER_GIVEN_PARENT
 	>
 
 	setProperty: <_TProps_ extends TMetadataProps, __TKey__ extends keyof _TProps_>(
 		fsid: FSID,
 		key: __TKey__,
 		value: _TProps_[__TKey__],
-	) => TEither<void, MetadataError.INVALID_FSID | MetadataError.METADATA_NOT_FOUND>
+	) => TEither<void, RRR.METADATA_NOT_LOADED | RRR.INVALID_FSID | RRR.METADATA_NOT_FOUND>
 
 	removeProperty: <_TProps_ extends TMetadataProps, __TKey__ extends keyof _TProps_>(
 		fsid: FSID,
 		key: __TKey__,
-	) => TEither<void, MetadataError.INVALID_FSID | MetadataError.METADATA_NOT_FOUND>
+	) => TEither<void, RRR.METADATA_NOT_LOADED | RRR.INVALID_FSID | RRR.METADATA_NOT_FOUND>
 }
 
 export const Metadata = <_TProps_ extends TMetadataProps = TMetadataProps>(
@@ -402,12 +400,173 @@ export const Metadata = <_TProps_ extends TMetadataProps = TMetadataProps>(
 	hasLinkTo: fsid => dto.links.includes(fsid),
 	isChildOf: fsid => dto.parent === fsid,
 	isRootChild: () => dto.parent === null,
+	toDTO: () => dto,
+})
+
+export const MetadataQuery = (metadata$: BehaviorSubject<TMetadata[] | null>): TMetadataQuery => ({
+	metadata$,
+
+	get: ({ showHidden } = { showHidden: false }) =>
+		fromNullableE(metadata$.getValue())
+			.pipe(mapE(metadata => (showHidden ? metadata : metadata.filter(negate(isHidden)))))
+			.pipe(leftMapE(() => RRR.METADATA_NOT_LOADED)),
+
+	getByFSID: (fsid, options) =>
+		fromBooleanE(isUUID(fsid), null, RRR.INVALID_FSID as const)
+			.pipe(chainE(() => MetadataQuery(metadata$).get(options)))
+			.pipe(mapE(m => m.find(i => i.getFSID() === fsid) ?? null)),
+
+	getByLabels: (labels, options) =>
+		fromBooleanE(checkAll(isNonEmptyString, labels), null, RRR.INVALID_LABEL as const)
+			.pipe(chainE(() => MetadataQuery(metadata$).get(options)))
+			.pipe(mapE(metadata => metadata.filter(hasAllLabels(labels)))),
+
+	getByNameAndParent: (name, parent, options) =>
+		fromBooleanE(isNonEmptyString(name), null, RRR.INVALID_NAME as const)
+			.pipe(chainE(() => fromBooleanE(isValidParent(parent), null, RRR.INVALID_PARENT as const)))
+			.pipe(chainE(() => MetadataQuery(metadata$).get(options)))
+			.pipe(mapE(m => m.find(i => i.getName() === name && i.getParent() === parent) ?? null)),
+
+	getChildren: (fsid, options) =>
+		fromBooleanE(isUUID(fsid), null, RRR.INVALID_FSID as const)
+			.pipe(chainE(() => MetadataQuery(metadata$).get(options)))
+			.pipe(mapE(metadata => metadata.filter(item => item.getParent() === fsid))),
+
+	getParent: (fsid, options) =>
+		MetadataQuery(metadata$)
+			.getByFSID(fsid, options)
+			.pipe(mapE(item => item?.getParent()))
+			.pipe(chainE(fsid => (fsid ? MetadataQuery(metadata$).getByFSID(fsid) : ofE(null)))),
+
+	hasChild: (fsid, child, options) =>
+		fromBooleanE(isUUID(child), null, RRR.INVALID_CHILD as const)
+			.pipe(chainE(() => MetadataQuery(metadata$).getChildren(fsid, options)))
+			.pipe(mapE(children => children.some(item => item.getFSID() === child))),
+
+	getIncomingLinks: (fsid, options) =>
+		fromBooleanE(isUUID(fsid), null, RRR.INVALID_FSID as const)
+			.pipe(chainE(() => MetadataQuery(metadata$).get(options)))
+			.pipe(mapE(metadata => metadata.filter(item => item.getLinks().includes(fsid)))),
+
+	hasIncomingLinks: (fsid, options) =>
+		MetadataQuery(metadata$)
+			.getIncomingLinks(fsid, options)
+			.pipe(mapE(items => items.length > 0)),
+
+	hasChildren: (fsid, options) =>
+		MetadataQuery(metadata$)
+			.getChildren(fsid, options)
+			.pipe(mapE(items => items.length > 0)),
+
+	getAncestors: () => null as any,
+
+	hasAncestor: (fsid, ancestor, options) =>
+		fromBooleanE(isUUID(ancestor), null, RRR.INVALID_ANCESTOR as const)
+			.pipe(chainE(() => MetadataQuery(metadata$).getAncestors(fsid, options)))
+			.pipe(mapE(ancestors => ancestors.some(item => item.getFSID() === ancestor))),
+
+	getDescendents: () => null as any,
+
+	hasDescendent: (fsid, descendent, options) =>
+		fromBooleanE(isUUID(descendent), null, RRR.INVALID_DESCENDENT as const)
+			.pipe(chainE(() => MetadataQuery(metadata$).getDescendents(fsid, options)))
+			.pipe(mapE(items => items.some(item => item.getFSID() === descendent))),
+
+	hasDescendents: (fsid, options) =>
+		MetadataQuery(metadata$)
+			.getDescendents(fsid, options)
+			.pipe(mapE(items => items.length > 0)),
+
+	total: options =>
+		MetadataQuery(metadata$)
+			.get(options)
+			.pipe(mapE(items => items.length)),
+})
+
+export const MetadataCommand = (
+	query: TMetadataQuery,
+	user: TUserRepository,
+): TMetadataCommand => ({
+	create: ({
+		name,
+		parent,
+		contentType = "text/ordo",
+		fsid = crypto.randomUUID(),
+		labels = [],
+		links = [],
+		properties = {},
+	}) =>
+		fromBooleanE(isNonEmptyString(name), null, RRR.INVALID_NAME as const)
+			.pipe(chainE(() => fromBooleanE(isValidParent(parent), null, RRR.INVALID_PARENT)))
+			.pipe(chainE(() => fromBooleanE(isUUID(fsid), null, RRR.INVALID_FSID)))
+			.pipe(chainE(() => fromBooleanE(checkAll(isNonEmptyString, labels), null, RRR.INVALID_LABEL)))
+			.pipe(chainE(() => fromBooleanE(checkAll(isUUID, links), null, RRR.INVALID_LINK)))
+			.pipe(chainE(() => fromBooleanE(isNonEmptyString(contentType), null, RRR.INVALID_CTYPE)))
+			.pipe(chainE(() => fromBooleanE(isObject(properties), null, RRR.INVALID_PROPERTIES)))
+			.pipe(chainE(() => query.getByFSID(fsid)))
+			.pipe(chainE(item => fromBooleanE(!item, null, RRR.FSID_ALREADY_TAKEN as)))
+			.pipe(chainE(() => query.getByNameAndParent(name, parent)))
+			.pipe(chainE(item => fromBooleanE(!item, null, RRR.NAME_ALREADY_TAKEN_UNDER_GIVEN_PARENT)))
+			.pipe(chainE(() => user.getCurrentUserID()))
+			.pipe(mapE(author => ({ time: Date.now(), author })))
+			.pipe(
+				mapE(({ time, author }) =>
+					Metadata({
+						fsid,
+						name,
+						parent,
+						contentType,
+						labels,
+						links,
+						properties,
+						createdAt: time,
+						createdBy: author,
+						updatedAt: time,
+						updatedBy: author,
+						size: 0,
+					}),
+				),
+			)
+			.pipe(chainE(metadata => query.get().pipe(mapE(items => items.concat(metadata)))))
+			.pipe(mapE(MetadataCommand(query, user).write)),
+
+	write: value => query.metadata$.next(value),
+
+	remove: fsid =>
+		fromBooleanE(isUUID(fsid), null, RRR.INVALID_FSID as const)
+			.pipe(chainE(() => query.getByFSID(fsid)))
+			.pipe(item => fromNullableE(item).pipe(leftMapE(() => RRR.METADATA_NOT_FOUND as const)))
+			.pipe(chainE(() => query.get()))
+			.pipe(mapE(items => items.filter(item => item.getFSID() === fsid)))
+			.pipe(mapE(MetadataCommand(query, user).write)),
+
+	setName: () => null as any,
+
+	setParent: () => null as any,
+
+	setSize: () => null as any,
+
+	addLabels: () => null as any,
+	removeLabels: () => null as any,
+	replaceLabels: () => null as any,
+
+	addLinks: () => null as any,
+	removeLinks: () => null as any,
+	replaceLinks: () => null as any,
+
+	appendChildren: () => null as any,
+	removeChildren: () => null as any,
+	removeProperty: () => null as any,
+
+	setProperty: () => null as any,
 })
 
 // --- Internal ---
 
+const U = undefined
+
 const getReadableSize = (size: number, decimals = 2) => {
-	if (!size) return "0B"
+	if (size <= 0) return "0B"
 
 	const k = 1024
 	const dm = decimals < 0 ? 0 : decimals
@@ -417,3 +576,19 @@ const getReadableSize = (size: number, decimals = 2) => {
 
 	return `${parseFloat((size / Math.pow(k, i)).toFixed(dm))}${sizes[i]}`
 }
+
+const isHidden = (item: TMetadata) => item.getName().startsWith(".")
+
+const hasAllLabels = (labels: string[]) => (item: TMetadata) =>
+	labels.every(label => item.getLabels().includes(label))
+
+const isValidParent = (parent: FSID | null) => parent === null || isUUID(parent)
+
+// TODO: Move to tau
+const checkAll = <_TParam>(validator: (x: _TParam) => boolean, items: _TParam[]) =>
+	items.reduce((acc, item) => acc && validator(item), true)
+
+const negate =
+	<_TParam, __TResult>(f: (x: _TParam) => __TResult) =>
+	(x: _TParam) =>
+		!f(x)

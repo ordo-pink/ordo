@@ -496,7 +496,7 @@ export const MetadataCommand = (
 		links = [],
 		properties = {},
 	}) =>
-		fromBooleanE(isNonEmptyString(name), null, RRR.INVALID_NAME as const)
+		fromBooleanE(isNonEmptyString(name), null, RRR.INVALID_NAME)
 			.pipe(chainE(() => fromBooleanE(isValidParent(parent), null, RRR.INVALID_PARENT)))
 			.pipe(chainE(() => fromBooleanE(isUUID(fsid), null, RRR.INVALID_FSID)))
 			.pipe(chainE(() => fromBooleanE(checkAll(isNonEmptyString, labels), null, RRR.INVALID_LABEL)))

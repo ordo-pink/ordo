@@ -86,3 +86,27 @@ export const omit =
 			(acc, key) => (keys.includes(key) ? acc : { ...acc, [key]: obj[key] }),
 			{} as Omit<T, Types.Unpack<K>>,
 		)
+
+export const checkAll = <_TParam>(validator: (x: _TParam) => boolean, items: _TParam[]) =>
+	items.reduce((acc, item) => acc && validator(item), true)
+
+export const negate =
+	<_TParam, __TResult>(f: (x: _TParam) => __TResult) =>
+	(x: _TParam) =>
+		!f(x)
+
+export const concat = <T>(xs: T[], ys: T[]) => Array.from(new Set([...xs, ...ys]))
+
+export const alphaSort =
+	(direction: "ASC" | "DESC" = "ASC") =>
+	(a: string, b: string) =>
+		direction === "ASC" ? a.localeCompare(b) : b.localeCompare(a)
+
+export const override =
+	<
+		_Object extends Record<string, unknown> = Record<string, unknown>,
+		__Increment extends Partial<_Object> = Partial<_Object>,
+	>(
+		increment: __Increment,
+	) =>
+	(obj: _Object): _Object => ({ ...obj, increment })

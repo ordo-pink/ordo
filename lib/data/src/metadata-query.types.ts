@@ -1,50 +1,54 @@
 import type { BehaviorSubject } from "rxjs"
 
-import type { TEither } from "@ordo-pink/either"
+import type { TResult } from "@ordo-pink/result"
 
 import type { FSID } from "./data.types"
 import type { RRR } from "./metadata.errors"
 import type { TMetadata } from "./metadata.types"
+import { TEither } from "@ordo-pink/either"
 
 export type TMetadataQueryOptions = { showHidden?: boolean }
 
 export type TMetadataQuery = {
 	metadata$: BehaviorSubject<TMetadata[] | null>
 
-	get: (options?: TMetadataQueryOptions) => TEither<TMetadata[], RRR.METADATA_NOT_LOADED>
+	get: (options?: TMetadataQueryOptions) => TResult<TMetadata[], RRR.METADATA_NOT_LOADED>
 
 	getByFSIDE: (
 		fsid: FSID,
 		options?: TMetadataQueryOptions,
-	) => TEither<TMetadata | null, RRR.METADATA_NOT_LOADED | RRR.INVALID_FSID>
+	) => TResult<TEither<TMetadata, null>, RRR.METADATA_NOT_LOADED | RRR.INVALID_FSID>
 
-	total: (options?: TMetadataQueryOptions) => TEither<number, RRR.METADATA_NOT_LOADED>
+	total: (options?: TMetadataQueryOptions) => TResult<number, RRR.METADATA_NOT_LOADED>
 
 	getByNameAndParentE: (
 		name: string,
 		parent: FSID | null,
 		options?: TMetadataQueryOptions,
-	) => TEither<TMetadata | null, RRR.METADATA_NOT_LOADED | RRR.INVALID_NAME | RRR.INVALID_PARENT>
+	) => TResult<
+		TEither<TMetadata, null>,
+		RRR.METADATA_NOT_LOADED | RRR.INVALID_NAME | RRR.INVALID_PARENT
+	>
 
 	getByLabelsE: (
 		labels: string[],
 		options?: TMetadataQueryOptions,
-	) => TEither<TMetadata[], RRR.METADATA_NOT_LOADED | RRR.INVALID_LABEL>
+	) => TResult<TMetadata[], RRR.METADATA_NOT_LOADED | RRR.INVALID_LABEL>
 
 	hasIncomingLinksE: (
 		fsid: FSID,
 		options?: TMetadataQueryOptions,
-	) => TEither<boolean, RRR.METADATA_NOT_LOADED | RRR.INVALID_FSID | RRR.METADATA_NOT_FOUND>
+	) => TResult<boolean, RRR.METADATA_NOT_LOADED | RRR.INVALID_FSID | RRR.METADATA_NOT_FOUND>
 
 	getIncomingLinksE: (
 		fsid: FSID,
 		options?: TMetadataQueryOptions,
-	) => TEither<TMetadata[], RRR.METADATA_NOT_LOADED | RRR.INVALID_FSID | RRR.METADATA_NOT_FOUND>
+	) => TResult<TMetadata[], RRR.METADATA_NOT_LOADED | RRR.INVALID_FSID | RRR.METADATA_NOT_FOUND>
 
 	getParentE: (
 		fsid: FSID,
 		options?: TMetadataQueryOptions,
-	) => TEither<
+	) => TResult<
 		TMetadata | null,
 		RRR.METADATA_NOT_LOADED | RRR.INVALID_FSID | RRR.METADATA_NOT_FOUND | RRR.PARENT_NOT_FOUND
 	>
@@ -52,13 +56,13 @@ export type TMetadataQuery = {
 	getAncestorsE: (
 		fsid: FSID,
 		options?: TMetadataQueryOptions,
-	) => TEither<TMetadata[], RRR.INVALID_FSID | RRR.METADATA_NOT_FOUND>
+	) => TResult<TMetadata[], RRR.INVALID_FSID | RRR.METADATA_NOT_FOUND>
 
 	hasAncestorE: (
 		fsid: FSID,
 		ancestor: FSID,
 		options?: TMetadataQueryOptions,
-	) => TEither<
+	) => TResult<
 		boolean,
 		RRR.METADATA_NOT_LOADED | RRR.INVALID_FSID | RRR.METADATA_NOT_FOUND | RRR.INVALID_ANCESTOR
 	>
@@ -67,7 +71,7 @@ export type TMetadataQuery = {
 		fsid: FSID,
 		child: FSID,
 		options?: TMetadataQueryOptions,
-	) => TEither<
+	) => TResult<
 		boolean,
 		RRR.METADATA_NOT_LOADED | RRR.INVALID_FSID | RRR.METADATA_NOT_FOUND | RRR.INVALID_CHILD
 	>
@@ -75,18 +79,18 @@ export type TMetadataQuery = {
 	hasChildrenE: (
 		fsid: FSID,
 		options?: TMetadataQueryOptions,
-	) => TEither<boolean, RRR.METADATA_NOT_LOADED | RRR.INVALID_FSID | RRR.METADATA_NOT_FOUND>
+	) => TResult<boolean, RRR.METADATA_NOT_LOADED | RRR.INVALID_FSID | RRR.METADATA_NOT_FOUND>
 
 	getChildrenE: (
 		fsid: FSID,
 		options?: TMetadataQueryOptions,
-	) => TEither<TMetadata[], RRR.METADATA_NOT_LOADED | RRR.INVALID_FSID | RRR.METADATA_NOT_FOUND>
+	) => TResult<TMetadata[], RRR.METADATA_NOT_LOADED | RRR.INVALID_FSID | RRR.METADATA_NOT_FOUND>
 
 	hasDescendentE: (
 		fsid: FSID,
 		descendent: FSID,
 		options?: TMetadataQueryOptions,
-	) => TEither<
+	) => TResult<
 		boolean,
 		RRR.METADATA_NOT_LOADED | RRR.INVALID_FSID | RRR.METADATA_NOT_FOUND | RRR.INVALID_DESCENDENT
 	>
@@ -94,12 +98,12 @@ export type TMetadataQuery = {
 	hasDescendentsE: (
 		fsid: FSID,
 		options?: TMetadataQueryOptions,
-	) => TEither<boolean, RRR.METADATA_NOT_LOADED | RRR.INVALID_FSID | RRR.METADATA_NOT_FOUND>
+	) => TResult<boolean, RRR.METADATA_NOT_LOADED | RRR.INVALID_FSID | RRR.METADATA_NOT_FOUND>
 
 	getDescendentsE: (
 		fsid: FSID,
 		options?: TMetadataQueryOptions,
-	) => TEither<TMetadata[], RRR.METADATA_NOT_LOADED | RRR.INVALID_FSID | RRR.METADATA_NOT_FOUND>
+	) => TResult<TMetadata[], RRR.METADATA_NOT_LOADED | RRR.INVALID_FSID | RRR.METADATA_NOT_FOUND>
 
 	// TODO: toTree: (source: TFSID | null) => typeof source extends null ? TMetadataBranch[] : TMetadataBranch
 

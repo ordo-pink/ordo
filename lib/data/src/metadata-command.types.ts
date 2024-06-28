@@ -1,9 +1,8 @@
-import type { TEither } from "@ordo-pink/either"
-
 import type { TCreateMetadataParams, TMetadata, TMetadataProps } from "./metadata.types"
 import type { FSID } from "./data.types"
 import type { RRR } from "./metadata.errors"
 import type { TMetadataQuery } from "./metadata-query.types"
+import type { TResult } from "@ordo-pink/result"
 import type { TUserQuery } from "./metadata-repository.types"
 
 export type TMetadatCommandConstructor = (
@@ -17,11 +16,10 @@ export type TMetadataCommand = {
 
 	create: (
 		params: TCreateMetadataParams,
-	) => TEither<
+	) => TResult<
 		void,
-		| RRR.METADATA_NOT_LOADED
 		| RRR.USERS_NOT_LOADED
-		| RRR.INVALID_FSID
+		| RRR.METADATA_NOT_LOADED
 		| RRR.FSID_ALREADY_TAKEN
 		| RRR.INVALID_NAME
 		| RRR.INVALID_PARENT
@@ -33,115 +31,164 @@ export type TMetadataCommand = {
 		| RRR.INVALID_PROPS
 	>
 
-	replace: (value: TMetadata) => TEither<void, RRR.METADATA_NOT_LOADED | RRR.METADATA_NOT_FOUND>
+	replace: (
+		value: TMetadata,
+	) => TResult<void, RRR.METADATA_NOT_LOADED | RRR.METADATA_NOT_FOUND | RRR.USERS_NOT_LOADED>
 
 	remove: (
 		fsid: FSID,
-	) => TEither<void, RRR.METADATA_NOT_LOADED | RRR.INVALID_FSID | RRR.METADATA_NOT_FOUND>
+	) => TResult<
+		void,
+		RRR.METADATA_NOT_LOADED | RRR.INVALID_FSID | RRR.METADATA_NOT_FOUND | RRR.USERS_NOT_LOADED
+	>
 
 	appendChild: (
 		fsid: FSID,
 		child: FSID,
-	) => TEither<
+	) => TResult<
 		void,
 		| RRR.METADATA_NOT_LOADED
 		| RRR.INVALID_FSID
 		| RRR.METADATA_NOT_FOUND
-		| RRR.FSID_NOT_FOUND[]
+		| RRR.FSID_NOT_FOUND
+		| RRR.NAME_PARENT_TAKEN
 		| RRR.INVALID_PARENT
 		| RRR.CIRCULAR_PARENT_REFERENCE
+		| RRR.USERS_NOT_LOADED
 	>
 
 	addLabels: (
 		fsid: FSID,
 		...labels: string[]
-	) => TEither<
+	) => TResult<
 		void,
-		RRR.METADATA_NOT_LOADED | RRR.INVALID_FSID | RRR.METADATA_NOT_FOUND | RRR.INVALID_LABEL
+		| RRR.METADATA_NOT_LOADED
+		| RRR.INVALID_FSID
+		| RRR.METADATA_NOT_FOUND
+		| RRR.INVALID_LABEL
+		| RRR.USERS_NOT_LOADED
 	>
 
 	removeLabels: (
 		fsid: FSID,
 		...labels: string[]
-	) => TEither<
+	) => TResult<
 		void,
-		RRR.METADATA_NOT_LOADED | RRR.INVALID_FSID | RRR.METADATA_NOT_FOUND | RRR.INVALID_LABEL
+		| RRR.METADATA_NOT_LOADED
+		| RRR.INVALID_FSID
+		| RRR.METADATA_NOT_FOUND
+		| RRR.INVALID_LABEL
+		| RRR.USERS_NOT_LOADED
 	>
 
 	replaceLabels: (
 		fsid: FSID,
 		labels: string[],
-	) => TEither<
+	) => TResult<
 		void,
-		RRR.METADATA_NOT_LOADED | RRR.INVALID_FSID | RRR.METADATA_NOT_FOUND | RRR.INVALID_LABEL
+		| RRR.METADATA_NOT_LOADED
+		| RRR.INVALID_FSID
+		| RRR.METADATA_NOT_FOUND
+		| RRR.INVALID_LABEL
+		| RRR.USERS_NOT_LOADED
 	>
 
 	setSize: (
 		fsid: FSID,
 		size: number,
-	) => TEither<
+	) => TResult<
 		void,
-		RRR.METADATA_NOT_LOADED | RRR.INVALID_FSID | RRR.METADATA_NOT_FOUND | RRR.INVALID_SIZE
+		| RRR.METADATA_NOT_LOADED
+		| RRR.INVALID_FSID
+		| RRR.METADATA_NOT_FOUND
+		| RRR.INVALID_SIZE
+		| RRR.USERS_NOT_LOADED
 	>
 
 	addLinks: (
 		fsid: FSID,
 		...links: FSID[]
-	) => TEither<
+	) => TResult<
 		void,
-		RRR.METADATA_NOT_LOADED | RRR.INVALID_FSID | RRR.METADATA_NOT_FOUND | RRR.INVALID_LINK
+		| RRR.METADATA_NOT_LOADED
+		| RRR.INVALID_FSID
+		| RRR.METADATA_NOT_FOUND
+		| RRR.INVALID_LINK
+		| RRR.USERS_NOT_LOADED
 	>
 
 	removeLinks: (
 		fsid: FSID,
 		...links: FSID[]
-	) => TEither<
+	) => TResult<
 		void,
-		RRR.METADATA_NOT_LOADED | RRR.INVALID_FSID | RRR.METADATA_NOT_FOUND | RRR.INVALID_LINK
+		| RRR.METADATA_NOT_LOADED
+		| RRR.INVALID_FSID
+		| RRR.METADATA_NOT_FOUND
+		| RRR.INVALID_LINK
+		| RRR.USERS_NOT_LOADED
 	>
 
 	replaceLinks: (
 		fsid: FSID,
 		links: FSID[],
-	) => TEither<
+	) => TResult<
 		void,
-		RRR.METADATA_NOT_LOADED | RRR.INVALID_FSID | RRR.METADATA_NOT_FOUND | RRR.INVALID_LINK
+		| RRR.METADATA_NOT_LOADED
+		| RRR.INVALID_FSID
+		| RRR.METADATA_NOT_FOUND
+		| RRR.INVALID_LINK
+		| RRR.USERS_NOT_LOADED
 	>
 
 	setParent: (
 		fsid: FSID,
 		parent: FSID | null,
-	) => TEither<
+	) => TResult<
 		void,
-		RRR.METADATA_NOT_LOADED | RRR.INVALID_FSID | RRR.METADATA_NOT_FOUND | RRR.INVALID_PARENT
+		| RRR.METADATA_NOT_LOADED
+		| RRR.INVALID_FSID
+		| RRR.METADATA_NOT_FOUND
+		| RRR.NAME_PARENT_TAKEN
+		| RRR.INVALID_PARENT
+		| RRR.USERS_NOT_LOADED
 	>
 
 	setName: (
 		fsid: FSID,
 		name: string,
-	) => TEither<
+	) => TResult<
 		void,
 		| RRR.METADATA_NOT_LOADED
 		| RRR.INVALID_FSID
 		| RRR.METADATA_NOT_FOUND
 		| RRR.INVALID_NAME
 		| RRR.NAME_PARENT_TAKEN
+		| RRR.USERS_NOT_LOADED
 	>
 
 	setProperty: <_TProps_ extends TMetadataProps, __TKey__ extends keyof _TProps_>(
 		fsid: FSID,
 		key: __TKey__,
 		value: _TProps_[__TKey__],
-	) => TEither<
+	) => TResult<
 		void,
-		RRR.METADATA_NOT_LOADED | RRR.INVALID_FSID | RRR.INVALID_PROPS | RRR.METADATA_NOT_FOUND
+		| RRR.METADATA_NOT_LOADED
+		| RRR.INVALID_FSID
+		| RRR.INVALID_PROPS
+		| RRR.METADATA_NOT_FOUND
+		| RRR.USERS_NOT_LOADED
 	>
 
 	removeProperty: <_TProps_ extends TMetadataProps, __TKey__ extends keyof _TProps_>(
 		fsid: FSID,
 		key: __TKey__,
-	) => TEither<
+	) => TResult<
 		void,
-		RRR.METADATA_NOT_LOADED | RRR.INVALID_FSID | RRR.INVALID_PROPS | RRR.METADATA_NOT_FOUND
+		| RRR.METADATA_NOT_LOADED
+		| RRR.INVALID_FSID
+		| RRR.INVALID_PROPS
+		| RRR.METADATA_NOT_FOUND
+		| RRR.USERS_NOT_LOADED
 	>
 }

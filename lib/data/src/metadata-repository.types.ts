@@ -1,8 +1,7 @@
-import type { TEither } from "@ordo-pink/either"
-
 import type { TMetadata, TMetadataDTO, TMetadataProps } from "./metadata.types"
 import type { RRR } from "./metadata.errors"
 import type { UserID } from "./data.types"
+import { TResult } from "@ordo-pink/result"
 
 export type TMetadataRepository = {
 	create: () => any
@@ -14,7 +13,7 @@ export type TMetadataRepository = {
 // TODO:
 export type TUserQuery = {
 	getUser: (userId: UserID) => any
-	getCurrentUserID: () => TEither<UserID, RRR.USERS_NOT_LOADED>
+	getCurrentUserID: () => TResult<UserID, RRR.USERS_NOT_LOADED>
 }
 
 export type TMetadataDataMapper = {

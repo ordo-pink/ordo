@@ -5,7 +5,10 @@ import type { FSID, UserID } from "./data.types"
 export type TMetadataProps = Readonly<Record<string, any>>
 
 export type TCreateMetadataParams<_TProps extends TMetadataProps = TMetadataProps> = Partial<
-	Omit<TMetadataDTO<_TProps>, "createdBy" | "createdAt" | "size" | "updatedAt" | "updatedBy">
+	Omit<
+		TMetadataDTO<_TProps>,
+		"createdBy" | "createdAt" | "size" | "updatedAt" | "updatedBy" | "fsid"
+	>
 > &
 	Pick<TMetadataDTO<_TProps>, "name" | "parent"> & { user: UserID }
 

@@ -1,4 +1,4 @@
-import { fromNullableE, mapE } from "@ordo-pink/either"
+import { chainE, fromNullableE } from "@ordo-pink/either"
 
 import {
 	type TCreateMetadataParams,
@@ -13,7 +13,6 @@ export const Metadata = {
 		parent,
 		user,
 		type = "text/ordo",
-		fsid = crypto.randomUUID(),
 		labels = [],
 		links = [],
 		props = {} as _TProps,
@@ -22,7 +21,7 @@ export const Metadata = {
 			name,
 			parent,
 			type,
-			fsid,
+			fsid: crypto.randomUUID(),
 			labels,
 			links,
 			props,
@@ -45,7 +44,7 @@ export const Metadata = {
 		getLabels: () => dto.labels,
 		getLinks: () => [...dto.links],
 		getParent: () => dto.parent,
-		getProperty: key => fromNullableE(dto.props).pipe(mapE(props => props[key])),
+		getProperty: key => fromNullableE(dto.props).pipe(chainE(props => fromNullableE(props[key]))),
 		getReadableSize: () => getReadableSize(dto.size),
 		getSize: () => dto.size,
 		hasLabel: label => dto.labels.includes(label),

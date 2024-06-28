@@ -69,7 +69,7 @@ export type TSwitch<TContext, TResult extends unknown[]> = {
 		 * A value to compare with, or a validator function that accepts the value
 		 * held inside Switch and returns a boolean.
 		 */
-		predicate: TContext | ValidatorFn<TContext>,
+		predicate: TContext | ValidatorFn<TContext> | TContext[],
 
 		/**
 		 * A thunk containing the value the Switch is to return when you fold the
@@ -88,6 +88,10 @@ export type TSwitch<TContext, TResult extends unknown[]> = {
 	 * @example `Switch.of(myBoolean).case(true, () => "oh, thanks!").default(() => "You WHAT?")`
 	 */
 	default: <TDefaultResult>(
-		onAllFalse: (x: TContext) => TDefaultResult,
+		onNoneMatched: (x: TContext) => TDefaultResult,
+	) => Unpack<TResult> | TDefaultResult
+
+	_: <TDefaultResult>(
+		onNoneMatched: (x: TContext) => TDefaultResult,
 	) => Unpack<TResult> | TDefaultResult
 }

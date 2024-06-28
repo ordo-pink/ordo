@@ -21,3 +21,8 @@ export enum RRR {
 	INVALID_PROPS,
 	USERS_NOT_LOADED,
 }
+
+export const toRRR =
+	<_TKey extends keyof typeof RRR>(key: _TKey) =>
+	() =>
+		RRR[key] as const

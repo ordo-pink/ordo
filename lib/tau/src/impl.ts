@@ -87,6 +87,12 @@ export const omit =
 			{} as Omit<T, Types.Unpack<K>>,
 		)
 
+export const contra =
+	<_TArg1, __TArg2, ___TResult>(f: (arg1: _TArg1) => (arg2: __TArg2) => ___TResult) =>
+	(arg2: __TArg2) =>
+	(arg1: _TArg1): ___TResult =>
+		f(arg1)(arg2)
+
 export const checkAll = <_TParam>(validator: (x: _TParam) => boolean, items: _TParam[]) =>
 	items.reduce((acc, item) => acc && validator(item), true)
 

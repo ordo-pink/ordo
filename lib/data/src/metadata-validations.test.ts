@@ -1,29 +1,29 @@
 import { describe, expect, it } from "bun:test"
 
 import {
-	areValidLabels,
-	areValidLinks,
+	areLabels,
+	areLinks,
 	hasAllLabels,
 	isHidden,
 	isName,
 	isType,
 	isValidParent,
-	isValidSize,
+	isSize,
 } from "./metadata-validations"
 import { Metadata } from "./metadata.impl"
 
 describe("metadata-validations", () => {
 	describe("isValidSize", () => {
 		it("should return true if provided value is a valid non-negative integer", () => {
-			expect(isValidSize(0)).toBe(true)
-			expect(isValidSize(1)).toBe(true)
+			expect(isSize(0)).toBe(true)
+			expect(isSize(1)).toBe(true)
 		})
 
 		it("should return false if provided value is not a valid size", () => {
-			expect(isValidSize(1.1)).toBe(false)
-			expect(isValidSize(-2)).toBe(false)
-			expect(isValidSize("hey" as any)).toBe(false)
-			expect(isValidSize(undefined as any)).toBe(false)
+			expect(isSize(1.1)).toBe(false)
+			expect(isSize(-2)).toBe(false)
+			expect(isSize("hey" as any)).toBe(false)
+			expect(isSize(undefined as any)).toBe(false)
 		})
 	})
 
@@ -129,28 +129,28 @@ describe("metadata-validations", () => {
 
 	describe("areValidLabels", () => {
 		it("should return true if provided labels are valid", () => {
-			expect(areValidLabels(["asdf", "123123"])).toBe(true)
-			expect(areValidLabels([])).toBe(true)
+			expect(areLabels(["asdf", "123123"])).toBe(true)
+			expect(areLabels([])).toBe(true)
 		})
 
 		it("should return false if at least one label is invalid", () => {
-			expect(areValidLabels([""])).toBe(false)
-			expect(areValidLabels(["asdf", ""])).toBe(false)
-			expect(areValidLabels([123 as any])).toBe(false)
+			expect(areLabels([""])).toBe(false)
+			expect(areLabels(["asdf", ""])).toBe(false)
+			expect(areLabels([123 as any])).toBe(false)
 		})
 	})
 
 	describe("areValidLinks", () => {
 		it("should return true if provided links are valid", () => {
-			expect(areValidLinks([crypto.randomUUID(), crypto.randomUUID()])).toBe(true)
-			expect(areValidLinks([])).toBe(true)
+			expect(areLinks([crypto.randomUUID(), crypto.randomUUID()])).toBe(true)
+			expect(areLinks([])).toBe(true)
 		})
 
 		it("should return false if at least one link is invalid", () => {
-			expect(areValidLinks(["" as any])).toBe(false)
-			expect(areValidLinks([crypto.randomUUID(), "" as any])).toBe(false)
-			expect(areValidLinks([undefined as any])).toBe(false)
-			expect(areValidLinks([123 as any, undefined])).toBe(false)
+			expect(areLinks(["" as any])).toBe(false)
+			expect(areLinks([crypto.randomUUID(), "" as any])).toBe(false)
+			expect(areLinks([undefined as any])).toBe(false)
+			expect(areLinks([123 as any, undefined])).toBe(false)
 		})
 	})
 })

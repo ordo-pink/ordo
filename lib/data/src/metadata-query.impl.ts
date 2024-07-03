@@ -1,91 +1,103 @@
-import { type BehaviorSubject } from "rxjs"
-
-import { chainE, fromNullableE, ifE, leftMapE, mapE, ofE } from "@ordo-pink/either"
 import { checkAll, isNonEmptyString, isUUID, negate } from "@ordo-pink/tau"
+import { fromNullableE, leftE } from "@ordo-pink/either"
+import { R } from "@ordo-pink/result"
 
+import { RRR, rrrThunk } from "./metadata.errors"
 import { hasAllLabels, isHidden, isValidParent } from "./metadata-validations"
+import { type FSID } from "./data.types"
 import { type TMetadata } from "./metadata.types"
-import { type TMetadataQuery } from "./metadata-query.types"
-import { toRRR } from "./metadata.errors"
+import { type TMetadataQueryStatic } from "./metadata-query.types"
 
-export const MetadataQuery = {
-	of: (metadata$: BehaviorSubject<TMetadata[] | null>): TMetadataQuery => ({
-		metadata$,
+// TODO: Repository contains stream
+export const MetadataQuery: TMetadataQueryStatic = {
+	of: repo => ({
+		metadataRepository: repo,
 
 		get: ({ showHidden } = { showHidden: false }) =>
-			fromNullableE(metadata$.getValue())
-				.pipe(mapE(metadata => (showHidden ? metadata : metadata.filter(negate(isHidden)))))
-				.pipe(leftMapE(toRRR("METADATA_NOT_LOADED"))),
+			repo
+				.get()
+				.pipe(R.ops.chain(R.fromNullable))
+				.pipe(R.ops.map(items => (showHidden ? items : items.filter(negate(isHidden)))))
+				.pipe(R.ops.rrrMap(rrrThunk("MR_EAGAIN"))),
 
-		getByFSIDE: (fsid, options) =>
-			ifE(isUUID(fsid), { onF: toRRR("INVALID_FSID") })
-				.pipe(chainE(() => MetadataQuery.of(metadata$).get(options)))
-				.pipe(mapE(m => m.find(i => i.getFSID() === fsid) ?? null)),
+		getByFSID: (fsid, options) =>
+			R.if(isUUID(fsid), { onF: rrrThunk("MV_EINVAL_FSID") })
+				.pipe(R.ops.chain(() => MetadataQuery.of(repo).get(options)))
+				.pipe(R.ops.map(items => fromNullableE(items.find(item => item.getFSID() === fsid)))),
 
-		getByLabelsE: (labels, options) =>
-			ifE(checkAll(isNonEmptyString, labels), { onF: toRRR("INVALID_LABEL") })
-				.pipe(chainE(() => MetadataQuery.of(metadata$).get(options)))
-				.pipe(mapE(metadata => metadata.filter(hasAllLabels(labels)))),
+		getByLabels: (labels, options) =>
+			R.if(checkAll(isNonEmptyString, labels), { onF: rrrThunk("MQ_INVALID_LABEL") })
+				.pipe(R.ops.chain(() => MetadataQuery.of(repo).get(options)))
+				.pipe(R.ops.map(items => items.filter(hasAllLabels(labels)))),
 
-		getByNameAndParentE: (name, parent, options) =>
-			ifE(isNonEmptyString(name), { onF: toRRR("INVALID_NAME") })
-				.pipe(chainE(() => ifE(isValidParent(parent), { onF: toRRR("INVALID_PARENT") })))
-				.pipe(chainE(() => MetadataQuery.of(metadata$).get(options)))
-				.pipe(mapE(m => m.find(i => i.getName() === name && i.getParent() === parent) ?? null)),
+		getByNameAndParent: (name, parent, options) =>
+			R.if(isNonEmptyString(name), { onF: rrrThunk("MV_EINVAL_NAME") })
+				.pipe(R.ops.chain(() => R.if(isValidParent(parent), { onF: rrrThunk("MV_EINVAL_PARENT") })))
+				.pipe(R.ops.chain(() => MetadataQuery.of(repo).get(options)))
+				.pipe(R.ops.map(items => fromNullableE(items.find(_hasGivenNameAndParent(name, parent))))),
 
-		getChildrenE: (fsid, options) =>
-			ifE(isUUID(fsid), { onF: toRRR("INVALID_FSID") })
-				.pipe(chainE(() => MetadataQuery.of(metadata$).get(options)))
-				.pipe(mapE(metadata => metadata.filter(item => item.getParent() === fsid))),
+		getChildren: (fsid, options) =>
+			R.if(isUUID(fsid), { onF: rrrThunk("MV_EINVAL_FSID") })
+				.pipe(R.ops.chain(() => MetadataQuery.of(repo).get(options)))
+				.pipe(R.ops.map(items => items.filter(item => item.getParent() === fsid))),
 
-		getParentE: (fsid, options) =>
-			MetadataQuery.of(metadata$)
-				.getByFSIDE(fsid, options)
-				.pipe(mapE(item => item?.getParent()))
-				.pipe(chainE(fsid => (fsid ? MetadataQuery.of(metadata$).getByFSIDE(fsid) : ofE(null)))),
+		getParent: (fsid, options) =>
+			MetadataQuery.of(repo)
+				.getByFSID(fsid, options)
+				.pipe(R.ops.chain(itemE => itemE.fold(() => R.rrr(RRR.MQ_ENOENT as const), R.ok)))
+				.pipe(R.ops.map(item => item.getParent()))
+				.pipe(R.ops.chain(i => (i ? MetadataQuery.of(repo).getByFSID(i) : R.ok(leftE(null))))),
 
-		hasChildE: (fsid, child, options) =>
-			ifE(isUUID(child), { onF: toRRR("INVALID_CHILD") })
-				.pipe(chainE(() => MetadataQuery.of(metadata$).getChildrenE(fsid, options)))
-				.pipe(mapE(children => children.some(item => item.getFSID() === child))),
+		hasChild: (fsid, child, options) =>
+			R.if(isUUID(child), { onF: rrrThunk("MQ_INVALID_CHILD") })
+				.pipe(R.ops.chain(() => MetadataQuery.of(repo).getChildren(fsid, options)))
+				.pipe(R.ops.map(items => items.some(item => item.getFSID() === child))),
 
-		getIncomingLinksE: (fsid, options) =>
-			ifE(isUUID(fsid), { onF: toRRR("INVALID_FSID") })
-				.pipe(chainE(() => MetadataQuery.of(metadata$).get(options)))
-				.pipe(mapE(metadata => metadata.filter(item => item.getLinks().includes(fsid)))),
+		getIncomingLinks: (fsid, options) =>
+			R.if(isUUID(fsid), { onF: rrrThunk("MV_EINVAL_FSID") })
+				.pipe(R.ops.chain(() => MetadataQuery.of(repo).get(options)))
+				.pipe(R.ops.map(items => items.filter(item => item.getLinks().includes(fsid)))),
 
-		hasIncomingLinksE: (fsid, options) =>
-			MetadataQuery.of(metadata$)
-				.getIncomingLinksE(fsid, options)
-				.pipe(mapE(items => items.length > 0)),
+		hasIncomingLinks: (fsid, options) =>
+			MetadataQuery.of(repo)
+				.getIncomingLinks(fsid, options)
+				.pipe(R.ops.map(items => items.length > 0)),
 
-		hasChildrenE: (fsid, options) =>
-			MetadataQuery.of(metadata$)
-				.getChildrenE(fsid, options)
-				.pipe(mapE(items => items.length > 0)),
+		hasChildren: (fsid, options) =>
+			MetadataQuery.of(repo)
+				.getChildren(fsid, options)
+				.pipe(R.ops.map(items => items.length > 0)),
 
-		getAncestorsE: () => null as any,
+		// TODO:
+		getAncestors: () => null as any,
 
-		hasAncestorE: (fsid, ancestor, options) =>
-			ifE(isUUID(ancestor), { onF: toRRR("INVALID_ANCESTOR") })
-				.pipe(chainE(() => MetadataQuery.of(metadata$).getAncestorsE(fsid, options)))
-				.pipe(mapE(ancestors => ancestors.some(item => item.getFSID() === ancestor))),
+		hasAncestor: (fsid, ancestor, options) =>
+			R.if(isUUID(ancestor), { onF: rrrThunk("MV_EINVAL_ANCESTOR") })
+				.pipe(R.ops.chain(() => MetadataQuery.of(repo).getAncestors(fsid, options)))
+				.pipe(R.ops.map(items => items.some(item => item.getFSID() === ancestor))),
 
-		getDescendentsE: () => null as any,
+		// TODO:
+		getDescendents: () => null as any,
 
-		hasDescendentE: (fsid, descendent, options) =>
-			ifE(isUUID(descendent), { onF: toRRR("INVALID_DESCENDENT") })
-				.pipe(chainE(() => MetadataQuery.of(metadata$).getDescendentsE(fsid, options)))
-				.pipe(mapE(items => items.some(item => item.getFSID() === descendent))),
+		hasDescendent: (fsid, descendent, options) =>
+			R.if(isUUID(descendent), { onF: rrrThunk("MQ_INVALID_DESCENDENT") })
+				.pipe(R.ops.chain(() => MetadataQuery.of(repo).getDescendents(fsid, options)))
+				.pipe(R.ops.map(items => items.some(item => item.getFSID() === descendent))),
 
-		hasDescendentsE: (fsid, options) =>
-			MetadataQuery.of(metadata$)
-				.getDescendentsE(fsid, options)
-				.pipe(mapE(items => items.length > 0)),
+		hasDescendents: (fsid, options) =>
+			MetadataQuery.of(repo)
+				.getDescendents(fsid, options)
+				.pipe(R.ops.map(items => items.length > 0)),
 
 		total: options =>
-			MetadataQuery.of(metadata$)
+			MetadataQuery.of(repo)
 				.get(options)
-				.pipe(mapE(items => items.length)),
+				.pipe(R.ops.map(items => items.length)),
 	}),
 }
+
+// --- Internal ---
+
+type THasGivenNameAndParentFn = (name: string, parent: FSID | null) => (item: TMetadata) => boolean
+const _hasGivenNameAndParent: THasGivenNameAndParentFn = (name, parent) => item =>
+	item.getName() === name && item.getParent() === parent

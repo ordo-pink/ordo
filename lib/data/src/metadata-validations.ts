@@ -3,13 +3,13 @@ import { checkAll, isNonEmptyString, isNonNegativeFiniteInteger, isUUID } from "
 import { type FSID } from "./data.types"
 import { type TMetadata } from "./metadata.types"
 
-export const areValidLabels = (labels: string[]) => checkAll(isNonEmptyString, labels)
+export const areLabels = (labels: string[]) => checkAll(isNonEmptyString, labels)
 
-export const areValidLinks = (links: FSID[]) => checkAll(isUUID, links)
+export const areLinks = (links: FSID[]) => checkAll(isUUID, links)
 
 export const isName = (name: string) => isNonEmptyString(name)
 
-export const isValidSize = (size: number) => isNonNegativeFiniteInteger(size)
+export const isSize = (size: number) => isNonNegativeFiniteInteger(size)
 
 export const isType = (type: string) => isNonEmptyString(type) // TODO: MIME-TYPE
 

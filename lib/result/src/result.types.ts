@@ -7,14 +7,19 @@ export type TMatchResultFn = <_TOk, __TRrr>(
 	result: TResult<_TOk, __TRrr>,
 ) => TSwitch<_TOk | __TRrr, []>
 
-export type TOkResultConstructorFn = <_TOk, _TRrr>(x: _TOk) => TResult<_TOk, _TRrr>
+export type TOkResultConstructorFn = <_TOk, _TRrr = never>(x: _TOk) => TResult<_TOk, _TRrr>
 
-export type TRrrResultConstructorFn = <_TRrr, _TOk>(x: _TRrr) => TResult<_TOk, _TRrr>
+export type TRrrResultConstructorFn = <_TRrr, _TOk = never>(x: _TRrr) => TResult<_TOk, _TRrr>
 
 export type TTryResultConstructorFn = <_TOk, _TRrr = unknown>(
 	trier: () => _TOk,
 	catcher?: (error: unknown) => _TRrr,
 ) => TResult<_TOk, _TRrr>
+
+export type TFromNullableResultConstructorFn = <_TOk, _TRrr = null>(
+	x?: _TOk | null,
+	onNull?: () => _TRrr,
+) => TResult<NonNullable<_TOk>, _TRrr>
 
 export type TIfResultConstructorFn = <_TOk = undefined, _TRrr = undefined>(
 	predicate: boolean,
@@ -69,7 +74,8 @@ export type TResultStatic = {
 	rrr: TRrrResultConstructorFn
 	try: TTryResultConstructorFn
 	if: TIfResultConstructorFn
-	operators: {
+	fromNullable: TFromNullableResultConstructorFn
+	ops: {
 		map: TMapResultOperatorFn
 		rrrMap: TRrrMapResultOperatorFn
 		bimap: TBiMapResultOperatorFn

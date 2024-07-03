@@ -1,222 +1,201 @@
+import { R, type TResult } from "@ordo-pink/result"
 import { alphaSort, concat, isNonEmptyString, isObject, isUUID, override } from "@ordo-pink/tau"
-import { swapE } from "@ordo-pink/either"
 
-import { R, TResult, chainR, ifR, mapR, okR } from "@ordo-pink/result"
+import { RRR, rrrThunk } from "./metadata.errors"
 import { type TMetadata, type TMetadataDTO, type TMetadataProps } from "./metadata.types"
-import {
-	areValidLabels,
-	areValidLinks,
-	isName,
-	isType,
-	isValidParent,
-	isValidSize,
-} from "./metadata-validations"
+import { areLabels, areLinks, isName, isSize, isType, isValidParent } from "./metadata-validations"
 import { type FSID } from "./data.types"
 import { Metadata } from "./metadata.impl"
 import { type TMetadataCommandStatic } from "./metadata-command.types"
 import { type TMetadataQuery } from "./metadata-query.types"
 import { type TUserQuery } from "./metadata-repository.types"
-import { RRR, toRRR } from "./metadata.errors"
 
 // TODO: Check permissions
 // TODO: Audit
+// TODO: Repository for accessing metadata$
 export const MetadataCommand: TMetadataCommandStatic = {
-	of: (metadataQuery, userQuery) => ({
+	of: (mQuery, uQuery) => ({
 		create: ({ name, parent, type = "text/ordo", labels = [], links = [], props = {} }) =>
-			R.if(isName(name), { onF: toRRR("INVALID_NAME") })
-				.pipe(chainR(() => ifR(isValidParent(parent), { onF: toRRR("INVALID_PARENT") })))
-				.pipe(chainR(() => ifR(areValidLabels(labels), { onF: toRRR("INVALID_LABEL") })))
-				.pipe(chainR(() => ifR(areValidLinks(links), { onF: toRRR("INVALID_LINK") })))
-				.pipe(chainR(() => ifR(isType(type), { onF: toRRR("INVALID_TYPE") })))
-				.pipe(chainR(() => ifR(isObject(props), { onF: toRRR("INVALID_PROPS") })))
-				.pipe(chainR(() => metadataQuery.getByNameAndParentE(name, parent)))
-				.pipe(chainR(item => ifR(!item, { onF: toRRR("NAME_PARENT_TAKEN") })))
-				.pipe(chainR(() => userQuery.getCurrentUserID()))
-				.pipe(mapR(user => Metadata.from({ name, parent, user, type, labels, links, props })))
-				.pipe(chainR(metadata => metadataQuery.get().pipe(mapR(items => items.concat(metadata)))))
-				.pipe(mapR(MetadataCommand.of(metadataQuery, userQuery).write)),
+			R.if(isName(name), { onF: rrrThunk("MV_EINVAL_NAME") })
+				.pipe(R.ops.chain(() => R.if(isValidParent(parent), { onF: rrrThunk("MV_EINVAL_PARENT") })))
+				.pipe(R.ops.chain(() => R.if(areLabels(labels), { onF: rrrThunk("MQ_INVALID_LABEL") })))
+				.pipe(R.ops.chain(() => R.if(areLinks(links), { onF: rrrThunk("MQ_INVALID_LINK") })))
+				.pipe(R.ops.chain(() => R.if(isType(type), { onF: rrrThunk("MQ_INVALID_TYPE") })))
+				.pipe(R.ops.chain(() => R.if(isObject(props), { onF: rrrThunk("MQ_INVALID_PROPS") })))
+				.pipe(R.ops.chain(() => mQuery.getByNameAndParent(name, parent)))
+				.pipe(R.ops.chain(item => R.if(!item, { onF: rrrThunk("MC_NAME_CONFLICT") })))
+				.pipe(R.ops.chain(() => uQuery.getCurrentUserID()))
+				.pipe(R.ops.map(user => Metadata.from({ name, parent, user, type, labels, links, props })))
+				.pipe(R.ops.chain(item => mQuery.get().pipe(R.ops.map(items => items.concat(item)))))
+				.pipe(R.ops.chain(mQuery.metadataRepository.put)),
 
 		// TODO: Move add/remove to metadata$
 		remove: fsid =>
-			R.if(isUUID(fsid), { onT: () => fsid, onF: toRRR("INVALID_FSID") })
-				.pipe(chainR(_getMetadataIfExistsR(metadataQuery)))
-				.pipe(chainR(() => metadataQuery.get()))
-				.pipe(mapR(items => items.filter(item => item.getFSID() === fsid)))
-				.pipe(mapR(MetadataCommand.of(metadataQuery, userQuery).write)),
+			R.if(isUUID(fsid), { onT: () => fsid, onF: rrrThunk("MV_EINVAL_FSID") })
+				.pipe(R.ops.chain(_getMetadataIfExistsR(mQuery)))
+				.pipe(R.ops.chain(() => mQuery.get()))
+				.pipe(R.ops.map(items => items.filter(item => item.getFSID() === fsid)))
+				.pipe(R.ops.chain(mQuery.metadataRepository.put)),
 
 		setName: (fsid, name) =>
-			R.if(isName(name), { onT: () => fsid, onF: toRRR("INVALID_NAME") })
-				.pipe(chainR(_getMetadataIfExistsR(metadataQuery)))
-				.pipe(chainR(_rejectIfMetadataExistsByNameParentR(metadataQuery)))
-				.pipe(mapR(_toMetadataDTO))
-				.pipe(chainR(_resetUpdatedByR(userQuery)))
-				.pipe(mapR(override({ name })))
-				.pipe(mapR(_resetUpdatedAt))
-				.pipe(mapR(Metadata.of))
-				.pipe(chainR(MetadataCommand.of(metadataQuery, userQuery).replace)),
+			R.if(isName(name), { onT: () => fsid, onF: rrrThunk("MV_EINVAL_NAME") })
+				.pipe(R.ops.chain(_getMetadataIfExistsR(mQuery)))
+				.pipe(R.ops.chain(_rejectIfMetadataExistsByNameParentR(mQuery)))
+				.pipe(R.ops.map(_toMetadataDTO))
+				.pipe(R.ops.chain(_resetUpdatedByR(uQuery)))
+				.pipe(R.ops.map(override({ name })))
+				.pipe(R.ops.map(_resetUpdatedAt))
+				.pipe(R.ops.map(Metadata.of))
+				.pipe(R.ops.chain(MetadataCommand.of(mQuery, uQuery).replace)),
 
 		setParent: (fsid, parent) =>
-			R.ok(_getMetadataIfExistsR(metadataQuery))
-				.pipe(chainR(checkExistsE => (parent === null ? okR(null) : checkExistsE(parent))))
-				.pipe(mapR(() => fsid))
-				.pipe(chainR(_getMetadataIfExistsR(metadataQuery)))
-				.pipe(chainR(_rejectIfMetadataExistsByNameParentR(metadataQuery)))
-				.pipe(mapR(_toMetadataDTO))
-				.pipe(chainR(_resetUpdatedByR(userQuery)))
-				.pipe(mapR(override({ parent })))
-				.pipe(mapR(_resetUpdatedAt))
-				.pipe(mapR(Metadata.of))
-				.pipe(chainR(MetadataCommand.of(metadataQuery, userQuery).replace)),
+			(parent === null ? R.ok<any, any>(null) : _getMetadataIfExistsR(mQuery)(parent))
+				.pipe(R.ops.map(() => fsid))
+				.pipe(R.ops.chain(_getMetadataIfExistsR(mQuery)))
+				.pipe(R.ops.chain(_rejectIfMetadataExistsByNameParentR(mQuery)))
+				.pipe(R.ops.map(_toMetadataDTO))
+				.pipe(R.ops.chain(_resetUpdatedByR(uQuery)))
+				.pipe(R.ops.map(override({ parent })))
+				.pipe(R.ops.map(_resetUpdatedAt))
+				.pipe(R.ops.map(Metadata.of))
+				.pipe(R.ops.chain(MetadataCommand.of(mQuery, uQuery).replace)),
 
 		setSize: (fsid, size) =>
-			R.if(isValidSize(size), { onT: () => fsid, onF: toRRR("INVALID_SIZE") })
-				.pipe(chainR(_getMetadataIfExistsR(metadataQuery)))
-				.pipe(mapR(_toMetadataDTO))
-				.pipe(chainR(_resetUpdatedByR(userQuery)))
-				.pipe(mapR(override({ size })))
-				.pipe(mapR(_resetUpdatedAt))
-				.pipe(mapR(Metadata.of))
-				.pipe(chainR(MetadataCommand.of(metadataQuery, userQuery).replace)),
+			R.if(isSize(size), { onT: () => fsid, onF: rrrThunk("MQ_INVALID_SIZE") })
+				.pipe(R.ops.chain(_getMetadataIfExistsR(mQuery)))
+				.pipe(R.ops.map(_toMetadataDTO))
+				.pipe(R.ops.chain(_resetUpdatedByR(uQuery)))
+				.pipe(R.ops.map(override({ size })))
+				.pipe(R.ops.map(_resetUpdatedAt))
+				.pipe(R.ops.map(Metadata.of))
+				.pipe(R.ops.chain(MetadataCommand.of(mQuery, uQuery).replace)),
 
 		addLabels: (fsid, ...labels) =>
-			R.if(areValidLabels(labels), { onT: () => fsid, onF: toRRR("INVALID_LABEL") })
-				.pipe(chainR(_getMetadataIfExistsR(metadataQuery)))
-				.pipe(mapR(_toMetadataDTO))
-				.pipe(chainR(_resetUpdatedByR(userQuery)))
-				.pipe(mapR(item => ({ ...item, labels: concat(item.labels, labels).sort(alphaSort()) })))
-				.pipe(mapR(_resetUpdatedAt))
-				.pipe(mapR(Metadata.of))
-				.pipe(chainR(MetadataCommand.of(metadataQuery, userQuery).replace)),
+			_getMetadataIfExistsR(mQuery)(fsid)
+				.pipe(R.ops.map(item => item.getLabels()))
+				.pipe(R.ops.map(lbls => concat(lbls, labels).sort(alphaSort("ASC"))))
+				.pipe(R.ops.chain(lbls => MetadataCommand.of(mQuery, uQuery).replaceLabels(fsid, lbls))),
 
 		removeLabels: (fsid, ...labels) =>
-			R.if(areValidLabels(labels), { onT: () => fsid, onF: toRRR("INVALID_LABEL") })
-				.pipe(chainR(_getMetadataIfExistsR(metadataQuery)))
-				.pipe(mapR(_toMetadataDTO))
-				.pipe(chainR(_resetUpdatedByR(userQuery)))
-				.pipe(mapR(item => ({ ...item, labels: item.labels.filter(lbl => !labels.includes(lbl)) })))
-				.pipe(mapR(_resetUpdatedAt))
-				.pipe(mapR(Metadata.of))
-				.pipe(chainR(MetadataCommand.of(metadataQuery, userQuery).replace)),
+			_getMetadataIfExistsR(mQuery)(fsid)
+				.pipe(R.ops.map(item => item.getLabels()))
+				.pipe(R.ops.map(lbls => lbls.filter(label => !labels.includes(label))))
+				.pipe(R.ops.chain(lbls => MetadataCommand.of(mQuery, uQuery).replaceLabels(fsid, lbls))),
 
 		replaceLabels: (fsid, labels) =>
-			R.if(areValidLabels(labels), { onT: () => fsid, onF: toRRR("INVALID_LABEL") })
-				.pipe(chainR(_getMetadataIfExistsR(metadataQuery)))
-				.pipe(mapR(_toMetadataDTO))
-				.pipe(chainR(_resetUpdatedByR(userQuery)))
-				.pipe(mapR(override({ labels })))
-				.pipe(mapR(_resetUpdatedAt))
-				.pipe(mapR(Metadata.of))
-				.pipe(chainR(MetadataCommand.of(metadataQuery, userQuery).replace)),
+			R.if(areLabels(labels), { onT: () => fsid, onF: rrrThunk("MQ_INVALID_LABEL") })
+				.pipe(R.ops.chain(_getMetadataIfExistsR(mQuery)))
+				.pipe(R.ops.map(_toMetadataDTO))
+				.pipe(R.ops.chain(_resetUpdatedByR(uQuery)))
+				.pipe(R.ops.map(override({ labels })))
+				.pipe(R.ops.map(_resetUpdatedAt))
+				.pipe(R.ops.map(Metadata.of))
+				.pipe(R.ops.chain(MetadataCommand.of(mQuery, uQuery).replace)),
 
 		addLinks: (fsid, ...links) =>
-			R.if(areValidLinks(links), { onT: () => fsid, onF: toRRR("INVALID_LINK") })
-				.pipe(chainR(_getMetadataIfExistsR(metadataQuery)))
-				.pipe(mapR(_toMetadataDTO))
-				.pipe(chainR(_resetUpdatedByR(userQuery)))
-				.pipe(mapR(item => ({ ...item, links: concat(item.links, links).sort(alphaSort()) })))
-				.pipe(mapR(_resetUpdatedAt))
-				.pipe(mapR(Metadata.of))
-				.pipe(chainR(MetadataCommand.of(metadataQuery, userQuery).replace)),
+			_getMetadataIfExistsR(mQuery)(fsid)
+				.pipe(R.ops.map(item => item.getLinks()))
+				.pipe(R.ops.map(lnks => concat(lnks, links).sort(alphaSort())))
+				.pipe(R.ops.chain(links => MetadataCommand.of(mQuery, uQuery).replaceLinks(fsid, links))),
 
 		removeLinks: (fsid, ...links) =>
-			R.if(areValidLinks(links), { onT: () => fsid, onF: toRRR("INVALID_LINK") })
-				.pipe(chainR(_getMetadataIfExistsR(metadataQuery)))
-				.pipe(mapR(_toMetadataDTO))
-				.pipe(chainR(_resetUpdatedByR(userQuery)))
-				.pipe(mapR(item => ({ ...item, links: item.links.filter(lbl => !links.includes(lbl)) })))
-				.pipe(mapR(_resetUpdatedAt))
-				.pipe(mapR(Metadata.of))
-				.pipe(chainR(MetadataCommand.of(metadataQuery, userQuery).replace)),
+			_getMetadataIfExistsR(mQuery)(fsid)
+				.pipe(R.ops.map(item => item.getLinks()))
+				.pipe(R.ops.map(lnks => lnks.filter(link => !links.includes(link))))
+				.pipe(R.ops.chain(links => MetadataCommand.of(mQuery, uQuery).replaceLinks(fsid, links))),
 
 		replaceLinks: (fsid, links) =>
-			R.if(areValidLinks(links), { onT: () => fsid, onF: toRRR("INVALID_LINK") })
-				.pipe(chainR(_getMetadataIfExistsR(metadataQuery)))
-				.pipe(mapR(_toMetadataDTO))
-				.pipe(chainR(_resetUpdatedByR(userQuery)))
-				.pipe(mapR(override({ links })))
-				.pipe(mapR(_resetUpdatedAt))
-				.pipe(mapR(Metadata.of))
-				.pipe(chainR(MetadataCommand.of(metadataQuery, userQuery).replace)),
+			R.if(areLinks(links), { onT: () => fsid, onF: rrrThunk("MQ_INVALID_LINK") })
+				.pipe(R.ops.chain(_getMetadataIfExistsR(mQuery)))
+				.pipe(R.ops.map(_toMetadataDTO))
+				.pipe(R.ops.chain(_resetUpdatedByR(uQuery)))
+				.pipe(R.ops.map(override({ links })))
+				.pipe(R.ops.map(_resetUpdatedAt))
+				.pipe(R.ops.map(Metadata.of))
+				.pipe(R.ops.chain(MetadataCommand.of(mQuery, uQuery).replace)),
 
-		appendChild: (fsid, child) =>
-			MetadataCommand.of(metadataQuery, userQuery).setParent(child, fsid),
+		appendChild: (fsid, child) => MetadataCommand.of(mQuery, uQuery).setParent(child, fsid),
 
 		setProperty: (fsid, key, value) =>
-			R.if(isNonEmptyString(key), { onT: () => fsid, onF: toRRR("INVALID_PROPS") })
-				.pipe(chainR(_getMetadataIfExistsR(metadataQuery)))
-				.pipe(mapR(_toMetadataDTO))
-				.pipe(chainR(_resetUpdatedByR(userQuery)))
-				.pipe(mapR(item => ({ ...item, props: { ...(item.props ?? {}), [key]: value } })))
-				.pipe(mapR(_resetUpdatedAt))
-				.pipe(mapR(Metadata.of))
-				.pipe(chainR(MetadataCommand.of(metadataQuery, userQuery).replace)),
+			R.if(isNonEmptyString(key), { onT: () => fsid, onF: rrrThunk("MQ_INVALID_PROPS") })
+				.pipe(R.ops.chain(_getMetadataIfExistsR(mQuery)))
+				.pipe(R.ops.map(_toMetadataDTO))
+				.pipe(R.ops.chain(_resetUpdatedByR(uQuery)))
+				.pipe(R.ops.map(item => ({ ...item, props: { ...(item.props ?? {}), [key]: value } })))
+				.pipe(R.ops.map(_resetUpdatedAt))
+				.pipe(R.ops.map(Metadata.of))
+				.pipe(R.ops.chain(MetadataCommand.of(mQuery, uQuery).replace)),
 
 		removeProperty: (fsid, key) =>
-			R.if(isNonEmptyString(key), { onT: () => fsid, onF: toRRR("INVALID_PROPS") })
-				.pipe(chainR(_getMetadataIfExistsR(metadataQuery)))
-				.pipe(mapR(_toMetadataDTO))
-				.pipe(chainR(_resetUpdatedByR(userQuery)))
-				.pipe(mapR(item => ({ ...item, props: { ...(item.props ?? {}), [key]: undefined } })))
-				.pipe(mapR(_resetUpdatedAt))
-				.pipe(mapR(Metadata.of))
-				.pipe(chainR(MetadataCommand.of(metadataQuery, userQuery).replace)),
-
-		write: value => metadataQuery.metadata$.next(value),
+			R.if(isNonEmptyString(key), { onT: () => fsid, onF: rrrThunk("MQ_INVALID_PROPS") })
+				.pipe(R.ops.chain(_getMetadataIfExistsR(mQuery)))
+				.pipe(R.ops.map(_toMetadataDTO))
+				.pipe(R.ops.chain(_resetUpdatedByR(uQuery)))
+				.pipe(R.ops.map(item => ({ ...item, props: { ...(item.props ?? {}), [key]: undefined } })))
+				.pipe(R.ops.map(_resetUpdatedAt))
+				.pipe(R.ops.map(Metadata.of))
+				.pipe(R.ops.chain(MetadataCommand.of(mQuery, uQuery).replace)),
 
 		replace: value =>
-			metadataQuery
+			mQuery
 				.get()
-				.pipe(
-					chainR(items =>
-						okR(items.findIndex(item => item.getFSID() === value.getFSID())).pipe(
-							chainR(index =>
-								ifR(index >= 0, {
-									onT: () => ({ items, index }),
-									onF: toRRR("METADATA_NOT_FOUND"),
-								}),
-							),
-						),
-					),
-				)
-				.pipe(
-					mapR(({ items, index }) =>
-						items
-							.slice(0, index)
-							.concat(value)
-							.concat(items.slice(index + 1)),
-					),
-				)
-				.pipe(mapR(MetadataCommand.of(metadataQuery, userQuery).write)),
+				.pipe(R.ops.chain(_replaceMetadataR(value)))
+				.pipe(R.ops.chain(mQuery.metadataRepository.put)),
 	}),
 }
 
 // --- Internal ---
 
 const _getMetadataIfExistsR =
-	(query: TMetadataQuery) =>
-	(
-		fsid: FSID,
-	): TResult<TMetadata, RRR.METADATA_NOT_FOUND | RRR.METADATA_NOT_LOADED | RRR.INVALID_FSID> =>
-		query.getByFSIDE(fsid).pipe(
-			chainR(item =>
+	(metadataQuery: TMetadataQuery) =>
+	(fsid: FSID): TResult<TMetadata, RRR.MQ_ENOENT | RRR.MR_EAGAIN | RRR.MV_EINVAL_FSID> =>
+		metadataQuery.getByFSID(fsid).pipe(
+			R.ops.chain(item =>
 				item.fold(
-					() => R.rrr(toRRR("METADATA_NOT_FOUND")()),
+					() => R.rrr(rrrThunk("MQ_ENOENT")()),
 					x => R.ok(x),
 				),
 			),
 		)
 
-const _resetUpdatedByR = (user: TUserQuery) => (item: TMetadataDTO) =>
-	user.getCurrentUserID().pipe(mapR(updatedBy => ({ ...item, updatedBy })))
+const _resetUpdatedByR = (userQuery: TUserQuery) => (item: TMetadataDTO) =>
+	userQuery.getCurrentUserID().pipe(R.ops.map(updatedBy => ({ ...item, updatedBy })))
 
-const _rejectIfMetadataExistsByNameParentR = (metadataQuery: TMetadataQuery) => (item: TMetadata) =>
-	metadataQuery
-		.getByNameAndParentE(item.getName(), item.getParent())
-		.pipe(R.operators.swap())
-		.pipe(R.operators.bimap(toRRR("NAME_PARENT_TAKEN"), () => item))
+type TRejectIfMetadataExistsByNameParentRFn = (
+	metadataQuery: TMetadataQuery,
+) => (metadata: TMetadata) => TResult<TMetadata, RRR.MC_NAME_CONFLICT>
+const _rejectIfMetadataExistsByNameParentR: TRejectIfMetadataExistsByNameParentRFn = q => m =>
+	q
+		.getByNameAndParent(m.getName(), m.getParent())
+		.pipe(R.ops.swap())
+		.pipe(R.ops.bimap(rrrThunk("MC_NAME_CONFLICT"), () => m))
 
-const _toMetadataDTO = <_TProps extends TMetadataProps = TMetadataProps>(
-	item: TMetadata<_TProps>,
-) => item.toDTO()
+type TToMetadataDTOFn = <_TProps extends TMetadataProps = TMetadataProps>(
+	metadata: TMetadata<_TProps>,
+) => TMetadataDTO<_TProps>
+const _toMetadataDTO: TToMetadataDTOFn = x => x.toDTO()
 
-const _resetUpdatedAt = override({ updatedAt: Date.now() }) as (item: TMetadataDTO) => TMetadataDTO
+type TResetUpdatedAtFn = (metadata: TMetadataDTO) => TMetadataDTO
+const _resetUpdatedAt: TResetUpdatedAtFn = override({ updatedAt: Date.now() })
+
+type TReplaceMetadataRFn = (
+	newValue: TMetadata,
+) => (items: TMetadata[]) => TResult<TMetadata[], RRR.MQ_ENOENT>
+const _replaceMetadataR: TReplaceMetadataRFn = x => xs =>
+	R.ok(xs.findIndex(item => item.getFSID() === x.getFSID()))
+		.pipe(
+			R.ops.chain(index =>
+				R.if(index >= 0, {
+					onT: () => ({ items: xs, index: index }),
+					onF: rrrThunk("MQ_ENOENT"),
+				}),
+			),
+		)
+		.pipe(
+			R.ops.map(({ items, index }) =>
+				items
+					.slice(0, index)
+					.concat(x)
+					.concat(items.slice(index + 1)),
+			),
+		)

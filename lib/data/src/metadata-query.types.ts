@@ -1,109 +1,103 @@
-import type { BehaviorSubject } from "rxjs"
-
+import type { TEither } from "@ordo-pink/either"
 import type { TResult } from "@ordo-pink/result"
 
 import type { FSID } from "./data.types"
 import type { RRR } from "./metadata.errors"
 import type { TMetadata } from "./metadata.types"
-import { TEither } from "@ordo-pink/either"
+import type { TMetadataRepository } from "./metadata-repository.types"
 
 export type TMetadataQueryOptions = { showHidden?: boolean }
 
+export type TMetadataQueryStatic = {
+	of: (metadataRepository: TMetadataRepository) => TMetadataQuery
+}
+
 export type TMetadataQuery = {
-	metadata$: BehaviorSubject<TMetadata[] | null>
+	metadataRepository: TMetadataRepository
 
-	get: (options?: TMetadataQueryOptions) => TResult<TMetadata[], RRR.METADATA_NOT_LOADED>
+	get: (options?: TMetadataQueryOptions) => TResult<TMetadata[], RRR.MR_EAGAIN>
 
-	getByFSIDE: (
+	getByFSID: (
 		fsid: FSID,
 		options?: TMetadataQueryOptions,
-	) => TResult<TEither<TMetadata, null>, RRR.METADATA_NOT_LOADED | RRR.INVALID_FSID>
+	) => TResult<TEither<TMetadata, null>, RRR.MR_EAGAIN | RRR.MV_EINVAL_FSID>
 
-	total: (options?: TMetadataQueryOptions) => TResult<number, RRR.METADATA_NOT_LOADED>
+	total: (options?: TMetadataQueryOptions) => TResult<number, RRR.MR_EAGAIN>
 
-	getByNameAndParentE: (
+	getByNameAndParent: (
 		name: string,
 		parent: FSID | null,
 		options?: TMetadataQueryOptions,
-	) => TResult<
-		TEither<TMetadata, null>,
-		RRR.METADATA_NOT_LOADED | RRR.INVALID_NAME | RRR.INVALID_PARENT
-	>
+	) => TResult<TEither<TMetadata, null>, RRR.MR_EAGAIN | RRR.MV_EINVAL_NAME | RRR.MV_EINVAL_PARENT>
 
-	getByLabelsE: (
+	getByLabels: (
 		labels: string[],
 		options?: TMetadataQueryOptions,
-	) => TResult<TMetadata[], RRR.METADATA_NOT_LOADED | RRR.INVALID_LABEL>
+	) => TResult<TMetadata[], RRR.MR_EAGAIN | RRR.MQ_INVALID_LABEL>
 
-	hasIncomingLinksE: (
+	hasIncomingLinks: (
 		fsid: FSID,
 		options?: TMetadataQueryOptions,
-	) => TResult<boolean, RRR.METADATA_NOT_LOADED | RRR.INVALID_FSID | RRR.METADATA_NOT_FOUND>
+	) => TResult<boolean, RRR.MR_EAGAIN | RRR.MV_EINVAL_FSID | RRR.MQ_ENOENT>
 
-	getIncomingLinksE: (
+	getIncomingLinks: (
 		fsid: FSID,
 		options?: TMetadataQueryOptions,
-	) => TResult<TMetadata[], RRR.METADATA_NOT_LOADED | RRR.INVALID_FSID | RRR.METADATA_NOT_FOUND>
+	) => TResult<TMetadata[], RRR.MR_EAGAIN | RRR.MV_EINVAL_FSID | RRR.MQ_ENOENT>
 
-	getParentE: (
+	getParent: (
 		fsid: FSID,
 		options?: TMetadataQueryOptions,
 	) => TResult<
-		TMetadata | null,
-		RRR.METADATA_NOT_LOADED | RRR.INVALID_FSID | RRR.METADATA_NOT_FOUND | RRR.PARENT_NOT_FOUND
+		TEither<TMetadata, null>,
+		RRR.MR_EAGAIN | RRR.MV_EINVAL_FSID | RRR.MQ_ENOENT | RRR.MC_ENOENT_PARENT
 	>
 
-	getAncestorsE: (
+	getAncestors: (
 		fsid: FSID,
 		options?: TMetadataQueryOptions,
-	) => TResult<TMetadata[], RRR.INVALID_FSID | RRR.METADATA_NOT_FOUND>
+	) => TResult<TMetadata[], RRR.MV_EINVAL_FSID | RRR.MQ_ENOENT>
 
-	hasAncestorE: (
+	hasAncestor: (
 		fsid: FSID,
 		ancestor: FSID,
 		options?: TMetadataQueryOptions,
-	) => TResult<
-		boolean,
-		RRR.METADATA_NOT_LOADED | RRR.INVALID_FSID | RRR.METADATA_NOT_FOUND | RRR.INVALID_ANCESTOR
-	>
+	) => TResult<boolean, RRR.MR_EAGAIN | RRR.MV_EINVAL_FSID | RRR.MQ_ENOENT | RRR.MV_EINVAL_ANCESTOR>
 
-	hasChildE: (
+	hasChild: (
 		fsid: FSID,
 		child: FSID,
 		options?: TMetadataQueryOptions,
-	) => TResult<
-		boolean,
-		RRR.METADATA_NOT_LOADED | RRR.INVALID_FSID | RRR.METADATA_NOT_FOUND | RRR.INVALID_CHILD
-	>
+	) => TResult<boolean, RRR.MR_EAGAIN | RRR.MV_EINVAL_FSID | RRR.MQ_ENOENT | RRR.MQ_INVALID_CHILD>
 
-	hasChildrenE: (
+	hasChildren: (
 		fsid: FSID,
 		options?: TMetadataQueryOptions,
-	) => TResult<boolean, RRR.METADATA_NOT_LOADED | RRR.INVALID_FSID | RRR.METADATA_NOT_FOUND>
+	) => TResult<boolean, RRR.MR_EAGAIN | RRR.MV_EINVAL_FSID | RRR.MQ_ENOENT>
 
-	getChildrenE: (
+	getChildren: (
 		fsid: FSID,
 		options?: TMetadataQueryOptions,
-	) => TResult<TMetadata[], RRR.METADATA_NOT_LOADED | RRR.INVALID_FSID | RRR.METADATA_NOT_FOUND>
+	) => TResult<TMetadata[], RRR.MR_EAGAIN | RRR.MV_EINVAL_FSID | RRR.MQ_ENOENT>
 
-	hasDescendentE: (
+	hasDescendent: (
 		fsid: FSID,
 		descendent: FSID,
 		options?: TMetadataQueryOptions,
 	) => TResult<
 		boolean,
-		RRR.METADATA_NOT_LOADED | RRR.INVALID_FSID | RRR.METADATA_NOT_FOUND | RRR.INVALID_DESCENDENT
+		RRR.MR_EAGAIN | RRR.MV_EINVAL_FSID | RRR.MQ_ENOENT | RRR.MQ_INVALID_DESCENDENT
 	>
 
-	hasDescendentsE: (
+	hasDescendents: (
 		fsid: FSID,
 		options?: TMetadataQueryOptions,
-	) => TResult<boolean, RRR.METADATA_NOT_LOADED | RRR.INVALID_FSID | RRR.METADATA_NOT_FOUND>
+	) => TResult<boolean, RRR.MR_EAGAIN | RRR.MV_EINVAL_FSID | RRR.MQ_ENOENT>
 
-	getDescendentsE: (
+	getDescendents: (
 		fsid: FSID,
 		options?: TMetadataQueryOptions,
-	) => TResult<TMetadata[], RRR.METADATA_NOT_LOADED | RRR.INVALID_FSID | RRR.METADATA_NOT_FOUND>
+	) => TResult<TMetadata[], RRR.MR_EAGAIN | RRR.MV_EINVAL_FSID | RRR.MQ_ENOENT>
 
 	// TODO: toTree: (source: TFSID | null) => typeof source extends null ? TMetadataBranch[] : TMetadataBranch
 

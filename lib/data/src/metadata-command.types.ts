@@ -1,45 +1,45 @@
+import type { TResult } from "@ordo-pink/result"
+
 import type { TCreateMetadataParams, TMetadata, TMetadataProps } from "./metadata.types"
 import type { FSID } from "./data.types"
 import type { RRR } from "./metadata.errors"
 import type { TMetadataQuery } from "./metadata-query.types"
-import type { TResult } from "@ordo-pink/result"
 import type { TUserQuery } from "./metadata-repository.types"
 
 export type TMetadatCommandConstructor = (
-	query: TMetadataQuery,
-	user: TUserQuery,
+	metadataQuery: TMetadataQuery,
+	userQuery: TUserQuery,
 ) => TMetadataCommand
 export type TMetadataCommandStatic = { of: TMetadatCommandConstructor }
 
 export type TMetadataCommand = {
-	write: (metadata: TMetadata[]) => void
-
 	create: (
 		params: TCreateMetadataParams,
 	) => TResult<
 		void,
-		| RRR.USERS_NOT_LOADED
-		| RRR.METADATA_NOT_LOADED
-		| RRR.FSID_ALREADY_TAKEN
-		| RRR.INVALID_NAME
-		| RRR.INVALID_PARENT
-		| RRR.NAME_PARENT_TAKEN
-		| RRR.INVALID_LABEL
-		| RRR.INVALID_LINK
-		| RRR.PARENT_NOT_FOUND
-		| RRR.INVALID_TYPE
-		| RRR.INVALID_PROPS
+		| RRR.UR_EAGAIN
+		| RRR.MR_EAGAIN
+		| RRR.MR_EPERM
+		| RRR.MC_FSID_CONFLICT
+		| RRR.MV_EINVAL_NAME
+		| RRR.MV_EINVAL_PARENT
+		| RRR.MC_NAME_CONFLICT
+		| RRR.MQ_INVALID_LABEL
+		| RRR.MQ_INVALID_LINK
+		| RRR.MC_ENOENT_PARENT
+		| RRR.MQ_INVALID_TYPE
+		| RRR.MQ_INVALID_PROPS
 	>
 
 	replace: (
 		value: TMetadata,
-	) => TResult<void, RRR.METADATA_NOT_LOADED | RRR.METADATA_NOT_FOUND | RRR.USERS_NOT_LOADED>
+	) => TResult<void, RRR.MR_EAGAIN | RRR.MQ_ENOENT | RRR.UR_EAGAIN | RRR.MR_EPERM>
 
 	remove: (
 		fsid: FSID,
 	) => TResult<
 		void,
-		RRR.METADATA_NOT_LOADED | RRR.INVALID_FSID | RRR.METADATA_NOT_FOUND | RRR.USERS_NOT_LOADED
+		RRR.MR_EAGAIN | RRR.MV_EINVAL_FSID | RRR.MQ_ENOENT | RRR.UR_EAGAIN | RRR.MR_EPERM
 	>
 
 	appendChild: (
@@ -47,14 +47,15 @@ export type TMetadataCommand = {
 		child: FSID,
 	) => TResult<
 		void,
-		| RRR.METADATA_NOT_LOADED
-		| RRR.INVALID_FSID
-		| RRR.METADATA_NOT_FOUND
-		| RRR.FSID_NOT_FOUND
-		| RRR.NAME_PARENT_TAKEN
-		| RRR.INVALID_PARENT
-		| RRR.CIRCULAR_PARENT_REFERENCE
-		| RRR.USERS_NOT_LOADED
+		| RRR.MR_EAGAIN
+		| RRR.MV_EINVAL_FSID
+		| RRR.MQ_ENOENT
+		| RRR.MQ_ENOENT_FSID
+		| RRR.MC_NAME_CONFLICT
+		| RRR.MV_EINVAL_PARENT
+		| RRR.MQ_CIRCULAR_PARENT_REFERENCE
+		| RRR.UR_EAGAIN
+		| RRR.MR_EPERM
 	>
 
 	addLabels: (
@@ -62,11 +63,12 @@ export type TMetadataCommand = {
 		...labels: string[]
 	) => TResult<
 		void,
-		| RRR.METADATA_NOT_LOADED
-		| RRR.INVALID_FSID
-		| RRR.METADATA_NOT_FOUND
-		| RRR.INVALID_LABEL
-		| RRR.USERS_NOT_LOADED
+		| RRR.MR_EAGAIN
+		| RRR.MV_EINVAL_FSID
+		| RRR.MQ_ENOENT
+		| RRR.MQ_INVALID_LABEL
+		| RRR.UR_EAGAIN
+		| RRR.MR_EPERM
 	>
 
 	removeLabels: (
@@ -74,11 +76,12 @@ export type TMetadataCommand = {
 		...labels: string[]
 	) => TResult<
 		void,
-		| RRR.METADATA_NOT_LOADED
-		| RRR.INVALID_FSID
-		| RRR.METADATA_NOT_FOUND
-		| RRR.INVALID_LABEL
-		| RRR.USERS_NOT_LOADED
+		| RRR.MR_EAGAIN
+		| RRR.MV_EINVAL_FSID
+		| RRR.MQ_ENOENT
+		| RRR.MQ_INVALID_LABEL
+		| RRR.UR_EAGAIN
+		| RRR.MR_EPERM
 	>
 
 	replaceLabels: (
@@ -86,11 +89,12 @@ export type TMetadataCommand = {
 		labels: string[],
 	) => TResult<
 		void,
-		| RRR.METADATA_NOT_LOADED
-		| RRR.INVALID_FSID
-		| RRR.METADATA_NOT_FOUND
-		| RRR.INVALID_LABEL
-		| RRR.USERS_NOT_LOADED
+		| RRR.MR_EAGAIN
+		| RRR.MV_EINVAL_FSID
+		| RRR.MQ_ENOENT
+		| RRR.MQ_INVALID_LABEL
+		| RRR.UR_EAGAIN
+		| RRR.MR_EPERM
 	>
 
 	setSize: (
@@ -98,11 +102,12 @@ export type TMetadataCommand = {
 		size: number,
 	) => TResult<
 		void,
-		| RRR.METADATA_NOT_LOADED
-		| RRR.INVALID_FSID
-		| RRR.METADATA_NOT_FOUND
-		| RRR.INVALID_SIZE
-		| RRR.USERS_NOT_LOADED
+		| RRR.MR_EAGAIN
+		| RRR.MV_EINVAL_FSID
+		| RRR.MQ_ENOENT
+		| RRR.MQ_INVALID_SIZE
+		| RRR.UR_EAGAIN
+		| RRR.MR_EPERM
 	>
 
 	addLinks: (
@@ -110,11 +115,12 @@ export type TMetadataCommand = {
 		...links: FSID[]
 	) => TResult<
 		void,
-		| RRR.METADATA_NOT_LOADED
-		| RRR.INVALID_FSID
-		| RRR.METADATA_NOT_FOUND
-		| RRR.INVALID_LINK
-		| RRR.USERS_NOT_LOADED
+		| RRR.MR_EAGAIN
+		| RRR.MV_EINVAL_FSID
+		| RRR.MQ_ENOENT
+		| RRR.MQ_INVALID_LINK
+		| RRR.UR_EAGAIN
+		| RRR.MR_EPERM
 	>
 
 	removeLinks: (
@@ -122,11 +128,12 @@ export type TMetadataCommand = {
 		...links: FSID[]
 	) => TResult<
 		void,
-		| RRR.METADATA_NOT_LOADED
-		| RRR.INVALID_FSID
-		| RRR.METADATA_NOT_FOUND
-		| RRR.INVALID_LINK
-		| RRR.USERS_NOT_LOADED
+		| RRR.MR_EAGAIN
+		| RRR.MV_EINVAL_FSID
+		| RRR.MQ_ENOENT
+		| RRR.MQ_INVALID_LINK
+		| RRR.UR_EAGAIN
+		| RRR.MR_EPERM
 	>
 
 	replaceLinks: (
@@ -134,11 +141,12 @@ export type TMetadataCommand = {
 		links: FSID[],
 	) => TResult<
 		void,
-		| RRR.METADATA_NOT_LOADED
-		| RRR.INVALID_FSID
-		| RRR.METADATA_NOT_FOUND
-		| RRR.INVALID_LINK
-		| RRR.USERS_NOT_LOADED
+		| RRR.MR_EAGAIN
+		| RRR.MV_EINVAL_FSID
+		| RRR.MQ_ENOENT
+		| RRR.MQ_INVALID_LINK
+		| RRR.UR_EAGAIN
+		| RRR.MR_EPERM
 	>
 
 	setParent: (
@@ -146,12 +154,13 @@ export type TMetadataCommand = {
 		parent: FSID | null,
 	) => TResult<
 		void,
-		| RRR.METADATA_NOT_LOADED
-		| RRR.INVALID_FSID
-		| RRR.METADATA_NOT_FOUND
-		| RRR.NAME_PARENT_TAKEN
-		| RRR.INVALID_PARENT
-		| RRR.USERS_NOT_LOADED
+		| RRR.MR_EAGAIN
+		| RRR.MV_EINVAL_FSID
+		| RRR.MQ_ENOENT
+		| RRR.MC_NAME_CONFLICT
+		| RRR.MV_EINVAL_PARENT
+		| RRR.UR_EAGAIN
+		| RRR.MR_EPERM
 	>
 
 	setName: (
@@ -159,12 +168,13 @@ export type TMetadataCommand = {
 		name: string,
 	) => TResult<
 		void,
-		| RRR.METADATA_NOT_LOADED
-		| RRR.INVALID_FSID
-		| RRR.METADATA_NOT_FOUND
-		| RRR.INVALID_NAME
-		| RRR.NAME_PARENT_TAKEN
-		| RRR.USERS_NOT_LOADED
+		| RRR.MR_EAGAIN
+		| RRR.MV_EINVAL_FSID
+		| RRR.MQ_ENOENT
+		| RRR.MV_EINVAL_NAME
+		| RRR.MC_NAME_CONFLICT
+		| RRR.UR_EAGAIN
+		| RRR.MR_EPERM
 	>
 
 	setProperty: <_TProps_ extends TMetadataProps, __TKey__ extends keyof _TProps_>(
@@ -173,11 +183,12 @@ export type TMetadataCommand = {
 		value: _TProps_[__TKey__],
 	) => TResult<
 		void,
-		| RRR.METADATA_NOT_LOADED
-		| RRR.INVALID_FSID
-		| RRR.INVALID_PROPS
-		| RRR.METADATA_NOT_FOUND
-		| RRR.USERS_NOT_LOADED
+		| RRR.MR_EAGAIN
+		| RRR.MV_EINVAL_FSID
+		| RRR.MQ_INVALID_PROPS
+		| RRR.MQ_ENOENT
+		| RRR.UR_EAGAIN
+		| RRR.MR_EPERM
 	>
 
 	removeProperty: <_TProps_ extends TMetadataProps, __TKey__ extends keyof _TProps_>(
@@ -185,10 +196,11 @@ export type TMetadataCommand = {
 		key: __TKey__,
 	) => TResult<
 		void,
-		| RRR.METADATA_NOT_LOADED
-		| RRR.INVALID_FSID
-		| RRR.INVALID_PROPS
-		| RRR.METADATA_NOT_FOUND
-		| RRR.USERS_NOT_LOADED
+		| RRR.MR_EAGAIN
+		| RRR.MV_EINVAL_FSID
+		| RRR.MQ_INVALID_PROPS
+		| RRR.MQ_ENOENT
+		| RRR.UR_EAGAIN
+		| RRR.MR_EPERM
 	>
 }

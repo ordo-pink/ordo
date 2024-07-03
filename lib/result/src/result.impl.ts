@@ -4,6 +4,7 @@
 import { match } from "@ordo-pink/switch"
 
 import {
+	TFromNullableResultConstructorFn,
 	type TBiChainResultOperatorFn,
 	type TBiMapResultOperatorFn,
 	type TBiTapResultOperatorFn,
@@ -49,6 +50,9 @@ export const tryR: TTryResultConstructorFn = (t, c = x => x as any) => {
 		return rrrR(c(e))
 	}
 }
+
+export const fromNullableR: TFromNullableResultConstructorFn = (x, onNull = () => null as any) =>
+	x != null ? okR(x) : rrrR(onNull())
 
 export const mapR: TMapResultOperatorFn = f => r =>
 	r.cata({ ok: x => okR(f(x)), rrr: x => rrrR(x) })
@@ -98,7 +102,8 @@ export const R: TResultStatic = {
 	rrr: rrrR,
 	try: tryR,
 	if: ifR,
-	operators: {
+	fromNullable: fromNullableR,
+	ops: {
 		map: mapR,
 		rrrMap: rrrMapR,
 		bimap: bimapR,

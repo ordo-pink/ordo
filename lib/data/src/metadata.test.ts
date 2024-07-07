@@ -1,6 +1,9 @@
 import { describe, expect, it } from "bun:test"
-import { Metadata } from "./metadata.impl"
+
+import { O } from "@ordo-pink/option"
 import { isUUID } from "@ordo-pink/tau"
+
+import { Metadata } from "./metadata.impl"
 
 const fsid = crypto.randomUUID()
 const link = crypto.randomUUID()
@@ -95,25 +98,15 @@ describe("Metadata", () => {
 		})
 	})
 
-	describe("getFSID", () => {
-		it("should return right of DTO property if it exists", () => {
+	describe("getProperty", () => {
+		it("should return Some(property) if it exists", () => {
 			expect(test2.getProperty("hello")).toBeDefined()
-			expect(
-				test2.getProperty("hello").fold(
-					x => x,
-					x => x,
-				),
-			).toEqual("world")
+			expect(test2.getProperty("hello").unwrap()).toEqual("world")
 		})
 
-		it("should return left of null if property does not exist", () => {
+		it("should return None() if property does not exist", () => {
 			expect(test1.getProperty("hello")).toBeDefined()
-			expect(
-				test1.getProperty("hello").fold(
-					() => "not found",
-					() => "found",
-				),
-			).toEqual("not found")
+			expect(test1.getProperty("hello")).toEqual(O.none())
 		})
 	})
 

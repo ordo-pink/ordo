@@ -1,4 +1,4 @@
-import type { TEither } from "@ordo-pink/either"
+import type { TOption } from "@ordo-pink/option"
 
 import type { FSID, UserID } from "./data.types"
 
@@ -11,6 +11,15 @@ export type TCreateMetadataParams<_TProps extends TMetadataProps = TMetadataProp
 	>
 > &
 	Pick<TMetadataDTO<_TProps>, "name" | "parent"> & { user: UserID }
+
+export type TMetadataStatic = {
+	from: <_TProps extends TMetadataProps = TMetadataProps>(
+		params: TCreateMetadataParams<_TProps>,
+	) => TMetadata<_TProps>
+	of: <_TProps extends TMetadataProps = TMetadataProps>(
+		dto: TMetadataDTO<_TProps>,
+	) => TMetadata<_TProps>
+}
 
 export type TMetadataDTO<_TProps extends TMetadataProps = TMetadataProps> = Readonly<{
 	fsid: FSID
@@ -46,6 +55,6 @@ export type TMetadata<_TProps extends TMetadataProps = TMetadataProps> = {
 	getUpdatedBy: () => UserID
 	getSize: () => number
 	getReadableSize: () => string
-	getProperty: <_TKey_ extends keyof _TProps>(key: _TKey_) => TEither<_TProps[_TKey_], null>
+	getProperty: <_TKey_ extends keyof _TProps>(key: _TKey_) => TOption<NonNullable<_TProps[_TKey_]>>
 	toDTO: () => TMetadataDTO<_TProps>
 }

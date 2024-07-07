@@ -1,22 +1,9 @@
-import { chainE, fromNullableE } from "@ordo-pink/either"
+import { O } from "@ordo-pink/option"
 
-import {
-	type TCreateMetadataParams,
-	type TMetadata,
-	type TMetadataDTO,
-	type TMetadataProps,
-} from "./metadata.types"
+import { type TMetadataStatic } from "./metadata.types"
 
-export const Metadata = {
-	from: <_TProps extends TMetadataProps = TMetadataProps>({
-		name,
-		parent,
-		user,
-		type = "text/ordo",
-		labels = [],
-		links = [],
-		props = {} as _TProps,
-	}: TCreateMetadataParams<_TProps>): TMetadata<_TProps> =>
+export const Metadata: TMetadataStatic = {
+	from: ({ name, parent, user, type = "text/ordo", labels = [], links = [], props = {} as any }) =>
 		Metadata.of({
 			name,
 			parent,
@@ -31,9 +18,7 @@ export const Metadata = {
 			updatedBy: user,
 			size: 0,
 		}),
-	of: <_TProps_ extends TMetadataProps = TMetadataProps>(
-		dto: TMetadataDTO<_TProps_>,
-	): TMetadata<_TProps_> => ({
+	of: dto => ({
 		getFSID: () => dto.fsid,
 		getName: () => dto.name,
 		getType: () => dto.type,
@@ -44,7 +29,11 @@ export const Metadata = {
 		getLabels: () => dto.labels,
 		getLinks: () => [...dto.links],
 		getParent: () => dto.parent,
-		getProperty: key => fromNullableE(dto.props).pipe(chainE(props => fromNullableE(props[key]))),
+		getProperty: key =>
+			O.fromNullable(dto.props).cata({
+				Some: props => (key in props ? O.some(props[key]) : O.none()),
+				None: () => O.none(),
+			}),
 		getReadableSize: () => getReadableSize(dto.size),
 		getSize: () => dto.size,
 		hasLabel: label => dto.labels.includes(label),

@@ -16,7 +16,7 @@ describe("MetadataQuery", () => {
 
 	describe("get", () => {
 		it("should return left of RRR if metadata was not loaded", () => {
-			query.metadataRepository.put(null as any)
+			metadata$.next(null)
 
 			const result = query.get().unwrap()
 

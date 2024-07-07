@@ -29,6 +29,8 @@ import { useInbox } from "../hooks/use-inbox.hook"
 
 import GTDList from "./list.component"
 
+import ru from "../i18n/inbox.components.ru.json"
+
 export default function GTDInbox() {
 	const commands = useCommands()
 	const items = useInbox()
@@ -39,16 +41,14 @@ export default function GTDInbox() {
 	useAccelerator("meta+n", () => createInputRef.current?.focus())
 
 	useEffect(() => {
-		commands.emit<cmd.application.setTitle>("application.set-title", "Входящие | GTD")
+		commands.emit<cmd.application.setTitle>("application.set-title", ru["cmd.application.set.title"])
 	}, [commands])
-
-	const tAddToInboxInputPlaceholder = "Что делается..."
 
 	return (
 		<CenteredPage centerX centerY>
 			<div className="flex w-full flex-col items-center space-y-4 overflow-y-hidden px-4 py-8">
 				<div className="flex w-full max-w-2xl flex-col space-y-4">
-					<Card className="h-[90vh]" title="Входящие">
+					<Card className="h-[90vh]" title={ru["inbox.components.title"]}>
 						<TextInput
 							autoFocus
 							forwardRef={createInputRef}
@@ -67,7 +67,7 @@ export default function GTDInbox() {
 									setNewItem("")
 								}
 							}}
-							placeholder={tAddToInboxInputPlaceholder}
+							placeholder={ru["inbox.components.input.placeholder"]}
 						/>
 
 						<GTDList items={items} />

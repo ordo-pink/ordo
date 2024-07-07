@@ -1,0 +1,7 @@
+{
+    "list.components.readable.placeholder.case.empty": "Тут пусто. А тут что-нибудь должно быть?",
+    "list.components.readable.placeholder.case.done": "Миссия выполнена! Можно почиллить.",
+    "list.components.readable.placeholder.case.show": "Показать выполненное",
+    "list.components.readable.placeholder.case.hide": "Скрыть содеянное",
+    "list.components.readable.placeholder.case.default": "Тут пусто. А тут что-нибудь должно быть?"
+}

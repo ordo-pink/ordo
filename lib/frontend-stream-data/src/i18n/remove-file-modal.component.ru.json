@@ -1,0 +1,7 @@
+{
+    "remove.file.modal.component.title": "Удалить файл",
+    "remove.file.modal.component.text1": "Точно удалить '",
+    "remove.file.modal.component.text2": "'? Обратной дороги не будет.",
+    "remove.file.modal.component.cancel": "Отмена",
+    "remove.file.modal.component.remove": "Удалить"
+}

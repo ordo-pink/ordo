@@ -106,10 +106,10 @@ const getPath = (root: string, uid: string): string => resolve(root, `${uid}.jso
 
 const findDataByNameAndParent0 =
 	(name: string, parent: FSID | null) =>
-	(data: PlainData[]): Oath<PlainData, DataNotFound> =>
-		fromNullable0(data.find(item => item.name === name && item.parent === parent)).pipe(
-			rejectedMap0(() => Data.Errors.DataNotFound),
-		)
+		(data: PlainData[]): Oath<PlainData, DataNotFound> =>
+			fromNullable0(data.find(item => item.name === name && item.parent === parent)).pipe(
+				rejectedMap0(() => Data.Errors.DataNotFound),
+			)
 
 const readDataFile0 = (path: string): Oath<PlainData[], Error> =>
 	readFile0(path, "utf8").pipe(chain0(content => try0(() => JSON.parse(content as string))))
@@ -130,8 +130,8 @@ const findByFSID0 = (fsid: FSID) => (data: PlainData[]) =>
 
 const writeDataFile0 =
 	(content: PlainData[]) =>
-	(path: string): Oath<void, Error> =>
-		writeFile0(path, JSON.stringify(content, null, 2), "utf-8")
+		(path: string): Oath<void, Error> =>
+			writeFile0(path, JSON.stringify(content, null, 2), "utf-8")
 
 const createParentDirIfNotExists0 = (path: string): Oath<string, Error> =>
 	createParentIfNotExists0(path).pipe(map0(() => path))
@@ -152,12 +152,12 @@ const read0 = (root: string, uid: string): Oath<PlainData[], DataUnexpectedError
 
 const write0 =
 	(root: string, uid: string) =>
-	(content: PlainData[]): Oath<"OK", DataUnexpectedError> =>
-		Oath.resolve(getPath(root, uid))
-			.pipe(chain0(createParentDirIfNotExists0))
-			.pipe(chain0(createDataFileIfNotExists0))
-			.pipe(chain0(writeDataFile0(content)))
-			.pipe(bimap0(UnexpectedError, ok))
+		(content: PlainData[]): Oath<"OK", DataUnexpectedError> =>
+			Oath.resolve(getPath(root, uid))
+				.pipe(chain0(createParentDirIfNotExists0))
+				.pipe(chain0(createDataFileIfNotExists0))
+				.pipe(chain0(writeDataFile0(content)))
+				.pipe(bimap0(UnexpectedError, ok))
 
 const sortByNameDesc = (a: PlainData, b: PlainData) =>
 	a.name < b.name ? -1 : a.name > b.name ? 1 : 0

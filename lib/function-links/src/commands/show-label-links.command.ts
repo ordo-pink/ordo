@@ -21,6 +21,8 @@ import { BsTag } from "react-icons/bs"
 
 import { DataProviders } from "@ordo-pink/frontend-create-function"
 
+import ru from "../i18n/show-label-links.command.ru.json"
+
 type P = { commands: Client.Commands.Commands; data: DataProviders }
 export const registerShowLabelInLinksCommand = (params: P) => {
 	const unregisterCommand = registerCommand(params)
@@ -51,7 +53,7 @@ const registerCommandPalette = ({ commands }: P) => {
 		onSelect: () => {
 			commands.emit<cmd.links.showLabelLinks>("links.show-label-links")
 		},
-		readableName: "Показать связи с меткой...",
+		readableName: ru["readableName"],
 	})
 
 	return () => {
@@ -61,18 +63,18 @@ const registerCommandPalette = ({ commands }: P) => {
 
 const commandHandler =
 	({ commands, data }: P) =>
-	() => {
-		const labels = data.getDataLabels()
+		() => {
+			const labels = data.getDataLabels()
 
-		commands.emit<cmd.commandPalette.show>("command-palette.show", {
-			items: labels.map(label => ({
-				id: label,
-				readableName: label,
-				Icon: BsTag,
-				onSelect: () => {
-					commands.emit<cmd.router.navigate>("router.navigate", `/links/labels/${label}`)
-					commands.emit<cmd.commandPalette.hide>("command-palette.hide")
-				},
-			})),
-		})
-	}
+			commands.emit<cmd.commandPalette.show>("command-palette.show", {
+				items: labels.map(label => ({
+					id: label,
+					readableName: label,
+					Icon: BsTag,
+					onSelect: () => {
+						commands.emit<cmd.router.navigate>("router.navigate", `/links/labels/${label}`)
+						commands.emit<cmd.commandPalette.hide>("command-palette.hide")
+					},
+				})),
+			})
+		}

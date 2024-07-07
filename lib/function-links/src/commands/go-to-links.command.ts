@@ -18,6 +18,7 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { PiGraph } from "react-icons/pi"
+import ru from "../i18n/go-to-linjs.command.ru.json"
 
 type P = { commands: Client.Commands.Commands }
 export const registerGoToLinksCommand = (params: P) => {
@@ -50,7 +51,7 @@ const registerCommandPalette = ({ commands }: P) => {
 			commands.emit<cmd.links.goToLinks>("links.go-to-links")
 			commands.emit<cmd.commandPalette.hide>("command-palette.hide")
 		},
-		readableName: "Открыть связи",
+		readableName: ru["readableName"],
 		accelerator: "mod+shift+l",
 	})
 
@@ -61,5 +62,5 @@ const registerCommandPalette = ({ commands }: P) => {
 
 const commandHandler =
 	({ commands }: P) =>
-	() =>
-		commands.emit<cmd.router.navigate>("router.navigate", "/links")
+		() =>
+			commands.emit<cmd.router.navigate>("router.navigate", "/links")

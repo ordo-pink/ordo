@@ -1,0 +1,10 @@
+{
+    "gtd.widget.inbox.title": "Задача добавлена во входящие",
+    "gtd.widget.inbox.label": "Добавить задачу",
+    "gtd.widget.inbox.placeholder": "Вот дела...",
+    "gtd.widget.text.input.button": "Создать",
+    "gtd.widget.inbox.status": "Во входящих пусто. Пора бездельничать!",
+    "gtd.widget.inbox.status.info": "Задач во",
+    "gtd.widget.inbox.status.info.name": "входящих",
+    "gtd.widget.inbox.status.info.name.alt": "А почему не 0?"
+}

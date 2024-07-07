@@ -32,6 +32,8 @@ import { TextInput } from "@ordo-pink/frontend-react-components/input"
 
 import { useInbox } from "../hooks/use-inbox.hook"
 
+import ru from "../i18n/gtd.widget.ru.json"
+
 export default function GTDWidget() {
 	const commands = useCommands()
 	const inbox = useInbox()
@@ -52,7 +54,7 @@ export default function GTDWidget() {
 			message: newItem,
 			type: "success",
 			duration: 5,
-			title: "Задача добавлена во входящие",
+			title: ru["gtd.widget.inbox.title"],
 		})
 	}
 
@@ -64,8 +66,8 @@ export default function GTDWidget() {
 
 			<TextInput
 				id="inbox"
-				label="Добавить задачу"
-				placeholder="Вот дела..."
+				label={ru["gtd.widget.inbox.label"]}
+				placeholder={ru["gtd.widget.inbox.placeholder"]}
 				autoFocus
 				value={newItem}
 				onInput={e => setNewItem(e.target.value)}
@@ -74,7 +76,7 @@ export default function GTDWidget() {
 				}}
 			/>
 
-			<OrdoButton.Primary onClick={handleCreate}>Создать</OrdoButton.Primary>
+			<OrdoButton.Primary onClick={handleCreate}>{ru["gtd.widget.text.input.button"]}</OrdoButton.Primary>
 		</div>
 	)
 }
@@ -88,7 +90,7 @@ const InboxStatus = ({ inboxChildren }: InboxStatusP) =>
 			() => (
 				<div className="flex items-center space-x-2">
 					<BsCheckCircle className="text-xl text-emerald-500" />
-					<div className="text-sm">Во входящих пусто. Пора бездельничать!</div>
+					<div className="text-sm">{ru["gtd.widget.inbox.status"]}</div>
 				</div>
 			),
 		)
@@ -98,11 +100,11 @@ const InboxStatus = ({ inboxChildren }: InboxStatusP) =>
 				<div className="flex items-center space-x-2">
 					<BsInfoCircle className="text-xl text-yellow-500" />
 					<div className="text-sm">
-						Задач во{" "}
+						{ru["gtd.widget.inbox.status.info"]}{" "}
 						<Link href="/gtd" className="text-sm">
-							входящих
+							{ru["gtd.widget.inbox.status.info.name"]}
 						</Link>
-						: {inboxChildren!.length}. А почему не 0?
+						: {inboxChildren!.length}. {ru["gtd.widget.inbox.status.info.name.alt"]}
 					</div>
 				</div>
 			),
@@ -113,9 +115,9 @@ const InboxStatus = ({ inboxChildren }: InboxStatusP) =>
 				<div className="flex items-center space-x-2">
 					<BsInfoCircle className="text-xl text-orange-500" />
 					<div className="text-sm">
-						Задач во{" "}
+						{ru["gtd.widget.inbox.status.info"]}{" "}
 						<Link href="/gtd" className="text-sm">
-							входящих
+							{ru["gtd.widget.inbox.status.info.name"]}
 						</Link>
 						: {inboxChildren!.length}.
 					</div>
@@ -126,9 +128,9 @@ const InboxStatus = ({ inboxChildren }: InboxStatusP) =>
 			<div className="flex items-center space-x-2">
 				<BsXCircle className="text-xl text-rose-500" />
 				<div className="text-sm">
-					Задач во{" "}
+					{ru["gtd.widget.inbox.status.info"]}{" "}
 					<Link href="/gtd" className="text-sm">
-						входящих
+						{ru["gtd.widget.inbox.status.info.name"]}
 					</Link>
 					: {inboxChildren!.length}. F.
 				</div>

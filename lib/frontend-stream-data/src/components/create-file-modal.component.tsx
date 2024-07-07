@@ -26,6 +26,8 @@ import { useCommands } from "@ordo-pink/frontend-react-hooks"
 
 import OrdoButton from "@ordo-pink/frontend-react-components/button"
 
+import ru from "../i18n/create-file-modal.component.ru.json"
+
 type P = { parent: PlainData | null }
 export default function CreateFileModal({ parent }: P) {
 	const commands = useCommands()
@@ -41,11 +43,6 @@ export default function CreateFileModal({ parent }: P) {
 		commands.emit<cmd.modal.hide>("modal.hide")
 	}
 
-	const tPlaceholder = "Как назовём?"
-	const tTitle = "Создать файл"
-	const tCancel = "Отмена"
-	const tCreate = "Создать"
-
 	return (
 		<div className="flex w-[30rem] max-w-full flex-col gap-8">
 			<div className="flex items-center space-x-2 px-8 pt-8">
@@ -53,13 +50,13 @@ export default function CreateFileModal({ parent }: P) {
 					<BsNodePlus />
 				</div>
 				<div className="flex grow flex-col gap-y-4">
-					<h3 className="px-8 text-lg font-bold">{tTitle}</h3>
+					<h3 className="px-8 text-lg font-bold">{ru['create.file.modal.component.title']}</h3>
 
 					<div className="pl-8">
 						{/* <PathBreadcrumbs path={parent?.path ?? "/"} /> */}
 						<input
 							className="w-full rounded-lg bg-neutral-200 px-4 py-2 shadow-inner outline-none dark:bg-neutral-600"
-							placeholder={tPlaceholder}
+							placeholder={ru["create.file.modal.component.placeholder"]}
 							type="text"
 							autoComplete="off"
 							aria-autocomplete="none"
@@ -75,7 +72,7 @@ export default function CreateFileModal({ parent }: P) {
 					onClick={() => commands.emit<cmd.modal.hide>("modal.hide")}
 					hotkey="Esc"
 				>
-					{tCancel}
+					{ru["create.file.modal.component.cancel"]}
 				</OrdoButton.Secondary>
 
 				<OrdoButton.Primary
@@ -83,7 +80,7 @@ export default function CreateFileModal({ parent }: P) {
 					onClick={handleCreateFile}
 					hotkey="mod+enter"
 				>
-					{tCreate}
+					{ru["create.file.modal.component.create"]}
 				</OrdoButton.Primary>
 			</div>
 		</div>

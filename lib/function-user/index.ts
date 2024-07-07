@@ -24,6 +24,8 @@ import { registerGoToAccountCommand } from "./src/commands/go-to-account.command
 import { registerSignOutCommand } from "./src/commands/sign-out.command"
 import { registerUserActivity } from "./src/activities/user.activity"
 
+import ru from "./src/i18n/function-user.ru.json"
+
 export default createFunction(
 	ORDO_PINK_USER_FUNCTION,
 	{ queries: [], commands: [] },
@@ -42,8 +44,8 @@ export default createFunction(
 			descriptor: {
 				id: ORDO_PINK_USER_FUNCTION.concat(".achievements.beta-participation"),
 				image: `${staticHost}/beta-participation-logo.jpg`,
-				description: "Зарегистрируйтесь и войдите в систему во время проведения Beta-тестирования.",
-				title: "Участие в β",
+				description: ru["function-user.achievments.beta-participation.description"],
+				title: ru["function-user.achievments.beta-participation.title"],
 				category: "legacy",
 			},
 			subscribe: ({ grant }) => {

@@ -24,6 +24,8 @@ import { DataProviders } from "@ordo-pink/frontend-create-function"
 
 import DataIcon from "@ordo-pink/frontend-react-components/data-icon/data-icon.component"
 
+import ru from "../i18n/open-in-editor.commands.ru.json"
+
 const COMMAND_NAME = "editor.open"
 
 type P = { commands: Client.Commands.Commands; data: DataProviders }
@@ -57,7 +59,7 @@ const registerContextMenu = ({ commands }: P) => {
 	commands.emit<cmd.ctxMenu.add>("context-menu.add", {
 		cmd: COMMAND_NAME,
 		Icon: BsLayoutTextSidebarReverse,
-		readableName: "Открыть в редакторе",
+		readableName: ru["readableName"],
 		type: "read",
 		accelerator: "mod+e",
 		shouldShow: ({ payload }) =>
@@ -74,7 +76,7 @@ const registerCommandPalette = ({ commands, data }: P) => {
 	commands.emit<cmd.commandPalette.add>("command-palette.add", {
 		id: COMMAND_NAME,
 		accelerator: "mod+meta+e",
-		readableName: "Открыть в редакторе...",
+		readableName: ru["readableName"] + "...",
 		Icon: BsLayoutTextSidebarReverse,
 		onSelect: () => {
 			const files = data.getData()

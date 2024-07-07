@@ -46,6 +46,8 @@ import DataLabel from "@ordo-pink/frontend-react-components/data-label"
 import Link from "@ordo-pink/frontend-react-components/link"
 import Null from "@ordo-pink/frontend-react-components/null"
 
+import ru from "../i18n/data-editor.component.ru.json"
+
 type P = { data: PlainData }
 export default function DataEditor({ data }: P) {
 	const commands = useCommands()
@@ -57,10 +59,10 @@ export default function DataEditor({ data }: P) {
 	const children = useChildren(data)
 	const incomingLinks = useSelectDataList(item => item.links.includes(data.fsid))
 
-	const creator = user && user.id === data.createdBy ? "Вы" : createdBy?.email ?? ""
+	const creator = user && user.id === data.createdBy ? ru["you"] : createdBy?.email ?? ""
 	const createdAt = new Date(data.createdAt).toLocaleString("ru")
 
-	const updater = user && user.id === data.updatedBy ? "Вы" : updatedBy?.email ?? ""
+	const updater = user && user.id === data.updatedBy ? ru["you"] : updatedBy?.email ?? ""
 	const updatedAt = new Date(data.updatedAt).toLocaleString("ru")
 
 	const handleLabelsClick = () =>
@@ -72,29 +74,29 @@ export default function DataEditor({ data }: P) {
 	return (
 		<table className="w-full table-fixed text-sm text-neutral-500">
 			<tbody>
-				<Row title="Размер" Icon={BsBox}>
+				<Row title={ru["readableSize"]} Icon={BsBox}>
 					{readableSize}
 				</Row>
-				<Row title="Создан" Icon={BsClockHistory}>
+				<Row title={ru["creator.created.at"]} Icon={BsClockHistory}>
 					{creator} ({createdAt})
 				</Row>
-				<Row title="Последнее изменение" Icon={BsClock}>
+				<Row title={ru["updater.updated.at"]} Icon={BsClock}>
 					{updater} ({updatedAt})
 				</Row>
 
 				{Either.fromNullable(parent).fold(Null, parent => (
-					<Row title="Родитель" Icon={BsFolder2}>
+					<Row title={ru["parent"]} Icon={BsFolder2}>
 						<Link href={`/editor/${parent.fsid}`}>{parent.name}</Link>
 					</Row>
 				))}
 
 				<ChildrenRow items={children} />
 
-				<Row title="Входящие ссылки" Icon={PiGraph}>
+				<Row title={ru["incomingLinks"]} Icon={PiGraph}>
 					<div className="flex flex-wrap gap-1">
 						{Either.fromBoolean(() => incomingLinks.length > 0).fold(
 							() => (
-								<div className="italic">Нет</div>
+								<div className="italic">{ru["no"]}</div>
 							),
 							() => incomingLinks.map(link => <DataLink key={link.fsid} link={link.fsid} />),
 						)}
@@ -102,7 +104,7 @@ export default function DataEditor({ data }: P) {
 				</Row>
 
 				<Row
-					title="Исходящие ссылки"
+					title={ru["outgoingLinks"]}
 					className="cursor-pointer"
 					onClick={handleLinksClick}
 					Icon={PiTreeStructure}
@@ -110,18 +112,18 @@ export default function DataEditor({ data }: P) {
 					<div className="flex flex-wrap gap-1">
 						{Either.fromBoolean(() => data.links.length > 0).fold(
 							() => (
-								<div className="italic">Добавить...</div>
+								<div className="italic">{ru["add"]}</div>
 							),
 							() => data.links.map(link => <DataLink key={link} link={link} />),
 						)}
 					</div>
 				</Row>
 
-				<Row title="Метки" className="cursor-pointer" onClick={handleLabelsClick} Icon={BsTags}>
+				<Row title={ru["marks"]} className="cursor-pointer" onClick={handleLabelsClick} Icon={BsTags}>
 					<div className="flex flex-wrap gap-1">
 						{Either.fromBoolean(() => data.labels.length > 0).fold(
 							() => (
-								<div className="italic">Добавить...</div>
+								<div className="italic">{ru["add"]}</div>
 							),
 							() => data.labels.map(label => <DataLabel key={label}>{label}</DataLabel>),
 						)}
@@ -208,7 +210,7 @@ const ChildrenRow = ({ items }: ChildrenRowP) => {
 							onClick={() => setIsCollapsed(false)}
 						>
 							<BsChevronDown />
-							<span>Показать ещё {items.length - 2}</span>
+							<span>{ru["show.more"]} {items.length - 2}</span>
 						</div>
 					</DataLabel>
 				) : null}
@@ -219,7 +221,7 @@ const ChildrenRow = ({ items }: ChildrenRowP) => {
 							onClick={() => setIsCollapsed(true)}
 						>
 							<BsChevronUp />
-							<span>Свернуть</span>
+							<span>{ru["rollup"]}</span>
 						</div>
 					</DataLabel>
 				) : null}

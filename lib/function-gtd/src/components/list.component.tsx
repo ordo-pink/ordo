@@ -40,6 +40,9 @@ import { PlainData } from "@ordo-pink/data"
 
 import GTDItem from "./item.component"
 
+import ru from "../i18n/list.components.ru.json"
+
+
 type P = { items: PlainData[] }
 export default function GTDList({ items }: P) {
 	// const commands = useCommands()
@@ -69,14 +72,14 @@ export default function GTDList({ items }: P) {
 		.case(pendingItems.length === 0 && doneItems.length === 0, () => (
 			<div className="flex size-full flex-col items-center justify-center p-0.5 text-neutral-500">
 				<BsListCheck className="text-9xl" />
-				<div className="text-sm">Тут пусто. А тут что-нибудь должно быть?</div>
+				<div className="text-sm">{ru["list.components.readable.placeholder.case.empty"]}</div>
 			</div>
 		))
 		.case(pendingItems.length === 0 && doneItems.length > 0, () => (
 			<div className="flex h-full flex-col space-y-2 overflow-y-auto p-0.5">
 				<div className="my-8 flex w-full flex-col items-center justify-center space-y-4 text-neutral-500">
 					<BsCheckCircle className="text-6xl text-emerald-500" />
-					<div className="text-sm">Миссия выполнена! Можно почиллить.</div>
+					<div className="text-sm">{ru["list.components.readable.placeholder.case.done"]}</div>
 				</div>
 
 				{showDone ? (
@@ -87,7 +90,7 @@ export default function GTDList({ items }: P) {
 								onClick={() => setShowDone(v => !v)}
 							>
 								<BsChevronUp />
-								<div>Скрыть содеянное</div>
+								<div>{ru["list.components.readable.placeholder.case.hide"]}</div>
 							</div>
 						) : null}
 
@@ -101,7 +104,7 @@ export default function GTDList({ items }: P) {
 						onClick={() => setShowDone(v => !v)}
 					>
 						<BsChevronDown />
-						<div>Показать выполненное</div>
+						<div>{ru["list.components.readable.placeholder.case.show"]}</div>
 					</div>
 				) : null}
 			</div>
@@ -146,7 +149,7 @@ export default function GTDList({ items }: P) {
 									onClick={() => setShowDone(v => !v)}
 								>
 									<BsChevronUp />
-									<div>Скрыть содеянное</div>
+									<div>{ru["list.components.readable.placeholder.case.hide"]}</div>
 								</div>
 							) : null}
 
@@ -160,7 +163,7 @@ export default function GTDList({ items }: P) {
 							onClick={() => setShowDone(v => !v)}
 						>
 							<BsChevronDown />
-							<div>Показать выполненное</div>
+							<div>{ru["list.components.readable.placeholder.case.show"]}</div>
 						</div>
 					) : null}
 				</div>

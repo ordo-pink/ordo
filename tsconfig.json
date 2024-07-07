@@ -1,7 +1,10 @@
 {
 	"compilerOptions": {
+		"resolveJsonModule": true,
 		"outDir": "./var/dist",
-		"lib": ["ESNext"],
+		"lib": [
+			"ESNext"
+		],
 		"allowJs": true,
 		"jsx": "preserve",
 		"esModuleInterop": true,
@@ -19,10 +22,15 @@
 		"isolatedModules": true,
 		"target": "ESNext",
 		"module": "CommonJS",
-		"types": ["bun-types", "@types/web"],
+		"types": [
+			"bun-types",
+			"@types/web"
+		],
 		"baseUrl": ".",
 		"paths": {
-			"@ordo-pink/*": ["./lib/*"]
+			"@ordo-pink/*": [
+				"./lib/*"
+			]
 		}
 	},
 	"include": [
@@ -32,5 +40,7 @@
 		"./lib/**/*.ts",
 		"./lib/**/*.tsx"
 	],
-	"exclude": ["node_modules"]
+	"exclude": [
+		"node_modules"
+	]
 }

@@ -31,6 +31,8 @@ import { getCommands } from "@ordo-pink/frontend-stream-commands"
 
 import { type SidebarState } from "./frontend-stream-sidebar.types"
 
+import ru from "./i18n/frontend-stream-sidebar.impl.ru.json"
+
 export const sidebar$ = new BehaviorSubject<SidebarState>({ disabled: true })
 
 export const __initSidebar = callOnce((fid: symbol) => {
@@ -90,7 +92,7 @@ export const __initSidebar = callOnce((fid: symbol) => {
 
 	commands.emit<cmd.commandPalette.add>("command-palette.add", {
 		id: "sidebar.toggle",
-		readableName: "Показать/скрыть боковую панель",
+		readableName: ru["frontend-stream-sidebar.impl.sidbar.toggle"],
 		Icon: AiOutlineLayout,
 		onSelect: () => {
 			commands.emit<cmd.commandPalette.hide>("command-palette.hide")
@@ -101,7 +103,7 @@ export const __initSidebar = callOnce((fid: symbol) => {
 
 	commands.emit<cmd.ctxMenu.add>("context-menu.add", {
 		cmd: "sidebar.show",
-		readableName: "Показать боковую панель",
+		readableName: ru["frontend-stream-sidebar.impl.sidbar.show"],
 		Icon: AiOutlineRight,
 		shouldShow: ({ event }) => {
 			return (
@@ -118,7 +120,7 @@ export const __initSidebar = callOnce((fid: symbol) => {
 
 	commands.emit<cmd.ctxMenu.add>("context-menu.add", {
 		cmd: "sidebar.hide",
-		readableName: "Скрыть боковую панель",
+		readableName: ru["frontend-stream-sidebar.impl.sidbar.hide"],
 		Icon: AiOutlineLeft,
 		shouldShow: ({ event }) =>
 			(event.currentTarget.classList.contains("sidebar") ||

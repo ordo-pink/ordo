@@ -1,0 +1,7 @@
+{
+    "rename.file.modal.component.placeholder": "Как теперь назовём?",
+    "rename.file.modal.component.title": "Переименовать файл",
+    "rename.file.modal.component.cancel": "Отмена",
+    "rename.file.modal.component.rename": "Переименовать",
+    "rename.file.modal.component.invalid.path": "Неверное имя файла"
+}

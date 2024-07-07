@@ -19,6 +19,8 @@
 
 import { BsCollection } from "react-icons/bs"
 
+import ru from "../i18n/go-to-home.command.ru.json"
+
 type P = { commands: Client.Commands.Commands }
 export const registerGoToHomeCommand = (params: P) => {
 	const unregisterCommand = registerCommand(params)
@@ -48,7 +50,7 @@ const registerCommandPalette = ({ commands }: P) => {
 			commands.emit<cmd.home.goToHome>("home.go-to-home")
 			commands.emit<cmd.commandPalette.hide>("command-palette.hide")
 		},
-		readableName: "Открыть главную страницу",
+		readableName: ru["go.to.home.command.readable.name"],
 		accelerator: "mod+h",
 	})
 
@@ -59,5 +61,5 @@ const registerCommandPalette = ({ commands }: P) => {
 
 const commandHandler =
 	({ commands }: P) =>
-	() =>
-		commands.emit<cmd.router.navigate>("router.navigate", "/")
+		() =>
+			commands.emit<cmd.router.navigate>("router.navigate", "/")

@@ -24,6 +24,8 @@ import { useCommands } from "@ordo-pink/frontend-react-hooks"
 
 import OrdoButton from "@ordo-pink/frontend-react-components/button"
 
+import ru from "../i18n/remove-file-modal.component.ru.json"
+
 type P = { data: PlainData }
 export default function RemoveFileModal({ data }: P) {
 	const commands = useCommands()
@@ -33,10 +35,6 @@ export default function RemoveFileModal({ data }: P) {
 		commands.emit<cmd.modal.hide>("modal.hide")
 	}
 
-	const tTitle = "Удалить файл"
-	const tText = `Точно удалить "${data.name}"? Обратной дороги не будет.`
-	const tCancel = "Отмена"
-	const tRemove = "Удалить"
 
 	return (
 		<div className="flex w-[30rem] max-w-full flex-col gap-8">
@@ -45,9 +43,9 @@ export default function RemoveFileModal({ data }: P) {
 					<BsNodeMinus />
 				</div>
 				<div className="flex grow flex-col gap-y-4">
-					<h3 className="px-8 text-lg font-bold">{tTitle}</h3>
+					<h3 className="px-8 text-lg font-bold">{ru["remove.file.modal.component.title"]}</h3>
 
-					<div className="pl-8">{tText}</div>
+					<div className="pl-8">{ru["remove.file.modal.component.text1"] + data.name + ru["remove.file.modal.component.text2"]}</div>
 				</div>
 			</div>
 			<div className="flex items-center justify-end space-x-2 rounded-b-lg bg-neutral-200/50 px-8 py-4 dark:bg-neutral-800/30">
@@ -55,11 +53,11 @@ export default function RemoveFileModal({ data }: P) {
 					onClick={() => commands.emit<cmd.modal.hide>("modal.hide")}
 					hotkey="Esc"
 				>
-					{tCancel}
+					{ru["remove.file.modal.component.cancel"]}
 				</OrdoButton.Secondary>
 
 				<OrdoButton.Primary onClick={handleRemoveFile} hotkey="mod+enter">
-					{tRemove}
+					{ru["remove.file.modal.component.remove"]}
 				</OrdoButton.Primary>
 			</div>
 		</div>

@@ -26,6 +26,8 @@ import { TextInput } from "@ordo-pink/frontend-react-components/input"
 
 import GTDList from "./list.component"
 
+import ru from "../i18n/inbox.components.ru.json"
+
 type P = { label: string }
 export default function GTDLabel({ label }: P) {
 	const commands = useCommands()
@@ -35,13 +37,11 @@ export default function GTDLabel({ label }: P) {
 
 	useAccelerator("meta+n", () => createInputRef.current?.focus())
 
-	const tAddToInboxInputPlaceholder = "Вот бы сейчас..."
-
 	return (
 		<CenteredPage centerX centerY>
 			<div className="flex w-full flex-col items-center space-y-4 overflow-y-hidden px-4 py-8">
 				<div className="flex w-full max-w-2xl flex-col space-y-4">
-					<Card className="h-[90vh]" title={`Метка #${label}`}>
+					<Card className="h-[90vh]" title={`Метка #${label}`}> {/*TODO TRANSLATE*/}
 						<TextInput
 							autoFocus
 							forwardRef={createInputRef}
@@ -60,7 +60,7 @@ export default function GTDLabel({ label }: P) {
 									setNewItem("")
 								}
 							}}
-							placeholder={tAddToInboxInputPlaceholder}
+							placeholder={ru["inbox.components.input.placeholder"]}
 						/>
 
 						<GTDList items={items} />

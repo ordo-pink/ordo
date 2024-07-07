@@ -23,6 +23,8 @@ import { type DataProviders } from "@ordo-pink/frontend-create-function"
 import { type FSID } from "@ordo-pink/data"
 import { Switch } from "@ordo-pink/switch"
 
+import ru from "../i18n/show-in-file-explorer.commands.ru.json"
+
 type P = { commands: Client.Commands.Commands; data: DataProviders }
 export const registerShowInFileExplorerCommand = (params: P) => {
 	const unregisterCommand = registerCommand(params)
@@ -55,7 +57,7 @@ const registerContextMenu = ({ commands }: P) => {
 	commands.emit<cmd.ctxMenu.add>("context-menu.add", {
 		cmd: "file-explorer.show-in-file-explorer",
 		Icon: BsFolder2Open,
-		readableName: "Открыть в менеджере файлов",
+		readableName: ru["readableName"],
 		type: "read",
 		accelerator: "mod+shift+e",
 		shouldShow: ({ payload }) => !!payload && !window.location.pathname.startsWith("/fs"),
@@ -68,15 +70,15 @@ const registerContextMenu = ({ commands }: P) => {
 
 const commandHandler =
 	({ data, commands }: P) =>
-	(fsid: FSID) => {
-		const children = data.getChildren(fsid)
-		const item = data.getDataByFSID(fsid)
+		(fsid: FSID) => {
+			const children = data.getChildren(fsid)
+			const item = data.getDataByFSID(fsid)
 
-		const route = Switch.empty()
-			.case(children.length > 0, () => `/fs/${fsid}`)
-			.case(!!item && !item.parent, () => `/fs/${item!.parent}?selected=${fsid}`)
-			.case(!!item && !!item.parent, () => `/fs?selected=${fsid}`)
-			.default(() => void 0)
+			const route = Switch.empty()
+				.case(children.length > 0, () => `/fs/${fsid}`)
+				.case(!!item && !item.parent, () => `/fs/${item!.parent}?selected=${fsid}`)
+				.case(!!item && !!item.parent, () => `/fs?selected=${fsid}`)
+				.default(() => void 0)
 
-		commands.emit<cmd.router.navigate>("router.navigate", route)
-	}
+			commands.emit<cmd.router.navigate>("router.navigate", route)
+		}

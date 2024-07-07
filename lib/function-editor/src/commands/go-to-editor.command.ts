@@ -19,6 +19,8 @@
 
 import { BsLayoutSidebar } from "react-icons/bs"
 
+import ru from "../i18n/go-to-editor.commands.ru.json"
+
 const COMMAND_NAME = "editor.go-to-editor"
 
 type P = { commands: Client.Commands.Commands }
@@ -52,7 +54,7 @@ const registerCommandPalette = ({ commands }: P) => {
 			commands.emit<cmd.editor.goToEditor>(COMMAND_NAME)
 			commands.emit<cmd.commandPalette.hide>("command-palette.hide")
 		},
-		readableName: "Открыть редактор",
+		readableName: ru["readableName"],
 		accelerator: "mod+e",
 	})
 

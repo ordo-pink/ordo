@@ -30,6 +30,8 @@ import { useProjects } from "../hooks/use-projects.hook"
 
 import GTDSidebarProject from "../components/sidebar-project.component"
 
+import ru from "../i18n/gtd.sidebar.ru.json"
+
 export default function GTDSidebar() {
 	const route = useCurrentRoute()
 	// const commands = useCommands()
@@ -46,7 +48,7 @@ export default function GTDSidebar() {
 				href="/gtd"
 				Icon={BsInbox}
 				current={route?.path === "/gtd"}
-				text="Входящие"
+				text={ru["gtd.sidebar.action.list.text"]}
 			>
 				<div className="flex items-center space-x-2 text-xs">
 					<div>{inboxItems.length > 0 ? inboxItems.length : <HiOutlineSparkles />}</div>
@@ -55,7 +57,7 @@ export default function GTDSidebar() {
 
 			<div className="flex flex-col space-y-2">
 				<Heading level="5" center uppercase styledFirstLetter>
-					проекты
+					{ru["gtd.sidebar.projects.list"]}
 				</Heading>
 				<div>
 					{projects.map(project => (

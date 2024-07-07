@@ -28,6 +28,8 @@ import { getCurrentUserToken } from "./frontend-stream-auth.impl"
 import { getFetch } from "@ordo-pink/frontend-fetch"
 import { getLogger } from "@ordo-pink/frontend-logger"
 
+import ru from "../src/i18n/frontend-stream-user.impl.ru.json"
+
 type InitUserParams = { fid: symbol; idHost: string }
 export const __initUser$ = callOnce(({ fid, idHost }: InitUserParams) => {
 	const commands = getCommands(fid)
@@ -54,8 +56,8 @@ export const __initUser$ = callOnce(({ fid, idHost }: InitUserParams) => {
 			.orElse(error =>
 				commands.emit<cmd.notification.show>("notification.show", {
 					type: "rrr",
-					title: "Ошибка получения данных о пользователе", // TODO: Move to i18n
-					message: error instanceof Error ? error.message : error ?? "Неизвестная ошибка", // TODO: Move to i18n
+					title: ru["notification.show.title"],
+					message: error instanceof Error ? error.message : error ?? ru["notification.show.message"],
 				}),
 			),
 	)

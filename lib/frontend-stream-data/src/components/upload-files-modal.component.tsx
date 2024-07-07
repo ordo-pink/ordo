@@ -25,6 +25,8 @@ import { useCommands } from "@ordo-pink/frontend-react-hooks"
 
 import OrdoButton from "@ordo-pink/frontend-react-components/button"
 
+import ru from "../i18n/upload-files-modal.component.ru.json"
+
 type Props = {
 	parent: PlainData | null
 }
@@ -50,10 +52,10 @@ export default function UploadFilesModal({ parent }: Props) {
 		}
 	}
 
-	const tPlaceholder = "Выбрать"
-	const tTitle = "Загрузить файлы"
-	const tCancel = "Отмена"
-	const tUpload = "Загрузить"
+	const tPlaceholder = ru["upload.file.modal.component.placeholder"]
+	const tTitle = ru["upload.file.modal.component.title"]
+	const tCancel = ru["upload.file.modal.component.cancel"]
+	const tUpload = ru["upload.file.modal.component.upload"]
 
 	return (
 		<div className="flex w-[30rem] max-w-full flex-col gap-8">

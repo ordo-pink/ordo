@@ -19,6 +19,8 @@
 
 import { BsFolder2Open } from "react-icons/bs"
 
+import ru from "../i18n/go-to-file-explorer.commands.ru.json"
+
 type P = { commands: Client.Commands.Commands }
 export const registerGoToFileExplorerCommand = (params: P) => {
 	const unregisterCommand = registerCommand(params)
@@ -54,7 +56,7 @@ const registerCommandPalette = ({ commands }: P) => {
 			commands.emit<cmd.fileExplorer.goToFileExplorer>("file-explorer.go-to-file-explorer")
 			commands.emit<cmd.commandPalette.hide>("command-palette.hide")
 		},
-		readableName: "Открыть файловый менеджер",
+		readableName: ru["readableName"],
 		accelerator: "mod+shift+e",
 	})
 
@@ -68,5 +70,5 @@ const registerCommandPalette = ({ commands }: P) => {
 
 const commandHandler =
 	({ commands }: P) =>
-	() =>
-		commands.emit<cmd.router.navigate>("router.navigate", "/fs")
+		() =>
+			commands.emit<cmd.router.navigate>("router.navigate", "/fs")

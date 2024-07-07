@@ -24,6 +24,8 @@ import { Either } from "@ordo-pink/either"
 import Link from "@ordo-pink/frontend-react-components/link"
 import Loader from "@ordo-pink/frontend-react-components/loader"
 
+import ru from "../i18n/news.component.ru.json"
+
 import { type News } from "../function-home.types"
 
 type P = { news: News[] | null }
@@ -48,7 +50,7 @@ export default function NewsSection({ news }: P) {
 						{article.link ? (
 							<Link href={article.link} external newTab>
 								<span className="flex items-center space-x-2">
-									<span>Подробнее</span>
+									<span>{ru["news.compontent.more.info"]}</span>
 									<BsArrowUpRight />
 								</span>
 							</Link>

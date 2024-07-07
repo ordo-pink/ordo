@@ -26,6 +26,8 @@ import { useCommands } from "@ordo-pink/frontend-react-hooks"
 
 import OrdoButton from "@ordo-pink/frontend-react-components/button"
 
+import ru from "../i18n/rename-modal.component.ru.json"
+
 type Props = {
 	data: PlainData
 }
@@ -45,11 +47,11 @@ export default function RenameModal({ data }: Props) {
 		commands.emit<cmd.modal.hide>("modal.hide")
 	}
 
-	const tPlaceholder = "Как теперь назовём?"
-	const tTitle = "Переименовать файл"
-	const tCancel = "Отмена"
-	const tRename = "Переименовать"
-	const tInvalidPath = "Неверное имя файла"
+	const tPlaceholder = ru['rename.file.modal.component.placeholder']
+	const tTitle = ru['rename.file.modal.component.title']
+	const tCancel = ru['rename.file.modal.component.cancel']
+	const tRename = ru['rename.file.modal.component.rename']
+	const tInvalidPath = ru['rename.file.modal.component.invalid.path']
 
 	return (
 		<div className="flex w-[30rem] max-w-full flex-col gap-8">
@@ -73,9 +75,8 @@ export default function RenameModal({ data }: Props) {
 							onChange={handleInputChange}
 						/>
 						<div
-							className={`mt-1 text-center text-sm text-rose-500 transition-opacity duration-100 ${
-								isValidPath ? "opacity-0" : "opacity-100"
-							}`}
+							className={`mt-1 text-center text-sm text-rose-500 transition-opacity duration-100 ${isValidPath ? "opacity-0" : "opacity-100"
+								}`}
 						>
 							{tInvalidPath}
 						</div>

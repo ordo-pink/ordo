@@ -35,6 +35,8 @@ import { TextInput } from "@ordo-pink/frontend-react-components/input"
 
 import GTDList from "./list.component"
 
+import ru from "../i18n/subtasks.component.ru.json"
+
 type P = { fsid: FSID }
 export default function GTDSubtasks({ fsid }: P) {
 	const commands = useCommands()
@@ -47,10 +49,8 @@ export default function GTDSubtasks({ fsid }: P) {
 
 	useEffect(() => {
 		data &&
-			commands.emit<cmd.application.setTitle>("application.set-title", `Проет ${data.name} | GTD`)
+			commands.emit<cmd.application.setTitle>("application.set-title", `${ru["cmd.application.set.title"]} ${data.name} | GTD`)
 	}, [data, commands])
-
-	const tAddToInboxInputPlaceholder = "Что делается..."
 
 	return Either.fromNullable(data).fold(Loading, data => (
 		<CenteredPage centerX centerY>
@@ -70,7 +70,7 @@ export default function GTDSubtasks({ fsid }: P) {
 								commands.emit<cmd.data.create>("data.create", { name: newItem, parent: fsid })
 								setNewItem("")
 							}}
-							placeholder={tAddToInboxInputPlaceholder}
+							placeholder={ru["inbox.components.input.placeholder"]}
 						/>
 
 						<GTDList items={children} />

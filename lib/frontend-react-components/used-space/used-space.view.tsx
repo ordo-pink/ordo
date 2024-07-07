@@ -19,6 +19,8 @@
 
 import { TUsedSpaceViewProps } from "./used-space.types"
 
+import ru from "./i18n/used-space.ru.json"
+
 export const UsedSpaceView = ({
 	progress,
 	percentage: progressPercentage,
@@ -26,7 +28,7 @@ export const UsedSpaceView = ({
 	const progressBarStyle = { width: `${progressPercentage}%` }
 
 	// --- Translations ---
-	const tFileLimit = "Лимит файлов"
+	const tFileLimit = ru["used.space.title"]
 
 	return (
 		<div className="w-full max-w-md">

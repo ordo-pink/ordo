@@ -19,6 +19,8 @@
 
 import { BsEnvelope, BsLifePreserver, BsTelegram } from "react-icons/bs"
 
+import ru from "../i18n/support.command.ru.json"
+
 type P = { commands: Client.Commands.Commands }
 export const registerSupportCommand = (params: P) => {
 	const unregisterCommand = registerCommand(params)
@@ -55,7 +57,7 @@ const registerCommandPalette = ({ commands }: P) => {
 		onSelect: () => {
 			commands.emit<cmd.home.openSupport>("home.open-support")
 		},
-		readableName: "Обратиться в поддержку...",
+		readableName: ru["support.command.readable.name"],
 		accelerator: "mod+f1",
 	})
 
@@ -66,44 +68,44 @@ const registerCommandPalette = ({ commands }: P) => {
 
 const emailHandler =
 	({ commands }: P) =>
-	() =>
-		commands.emit<cmd.router.openExternal>("router.open-external", {
-			newTab: true,
-			url: "mailto:support@ordo.pink",
-		})
+		() =>
+			commands.emit<cmd.router.openExternal>("router.open-external", {
+				newTab: true,
+				url: "mailto:support@ordo.pink",
+			})
 
 const telegramHandler =
 	({ commands }: P) =>
-	() =>
-		commands.emit<cmd.router.openExternal>("router.open-external", {
-			newTab: true,
-			url: "https://t.me/ordo_pink_ru/190",
-		})
+		() =>
+			commands.emit<cmd.router.openExternal>("router.open-external", {
+				newTab: true,
+				url: "https://t.me/ordo_pink_ru/190",
+			})
 
 const supportHandler =
 	({ commands }: P) =>
-	() =>
-		commands.emit<cmd.commandPalette.show>("command-palette.show", {
-			items: [
-				{
-					id: "home.open-telegram-support",
-					Icon: BsTelegram,
-					readableName: "Telegram",
-					accelerator: "t",
-					onSelect: () => {
-						commands.emit<cmd.commandPalette.hide>("command-palette.hide")
-						commands.emit<cmd.home.openTelegramSupport>("home.open-telegram-support")
+		() =>
+			commands.emit<cmd.commandPalette.show>("command-palette.show", {
+				items: [
+					{
+						id: "home.open-telegram-support",
+						Icon: BsTelegram,
+						readableName: "Telegram",
+						accelerator: "t",
+						onSelect: () => {
+							commands.emit<cmd.commandPalette.hide>("command-palette.hide")
+							commands.emit<cmd.home.openTelegramSupport>("home.open-telegram-support")
+						},
 					},
-				},
-				{
-					id: "home.open-email-support",
-					Icon: BsEnvelope,
-					readableName: "Email",
-					accelerator: "e",
-					onSelect: () => {
-						commands.emit<cmd.commandPalette.hide>("command-palette.hide")
-						commands.emit<cmd.home.openEmailSupport>("home.open-email-support")
+					{
+						id: "home.open-email-support",
+						Icon: BsEnvelope,
+						readableName: "Email",
+						accelerator: "e",
+						onSelect: () => {
+							commands.emit<cmd.commandPalette.hide>("command-palette.hide")
+							commands.emit<cmd.home.openEmailSupport>("home.open-email-support")
+						},
 					},
-				},
-			],
-		})
+				],
+			})

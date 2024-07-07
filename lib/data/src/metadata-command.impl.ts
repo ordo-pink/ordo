@@ -1,7 +1,7 @@
 import { R, type TResult } from "@ordo-pink/result"
 import { alphaSort, concat, isNonEmptyString, isObject, isUUID, override } from "@ordo-pink/tau"
 
-import { RRR, TRrr } from "./metadata.errors"
+import { RRR, TRrr, enxio } from "./metadata.errors"
 import { type TMetadata, type TMetadataDTO, type TMetadataProps } from "./metadata.types"
 import { areLabels, areLinks, isName, isSize, isType, isParent } from "./metadata-validations"
 import { type FSID } from "./data.types"
@@ -14,9 +14,7 @@ const LOCATION = "MetadataCommand"
 
 const einval = RRR.codes.einval(LOCATION)
 const eexist = RRR.codes.eexist(LOCATION)
-const eagain = RRR.codes.eagain(LOCATION)
 const enoent = RRR.codes.enoent(LOCATION)
-const enxio = RRR.codes.enxio(LOCATION)
 
 // TODO: Check permissions
 // TODO: Audit
@@ -104,6 +102,27 @@ export const MetadataCommand: TMetadataCommandStatic = {
 				.pipe(R.ops.map(() => fsid))
 				.pipe(R.ops.chain(_getMetadataIfExistsR(mQuery)))
 				.pipe(R.ops.chain(_rejectIfMetadataExistsByNameParentR(mQuery)))
+				.pipe(
+					R.ops.chain(item =>
+						mQuery
+							.getDescendents(fsid)
+							.pipe(
+								R.ops.chain(option =>
+									option.cata({
+										Some: descendents =>
+											descendents.some(descendent => descendent.getFSID() === parent)
+												? R.rrr(
+														enxio(
+															`.setParent circular reference: ${parent} is in children of ${fsid}`,
+														),
+													)
+												: R.ok(item),
+										None: () => R.ok(item),
+									}),
+								),
+							),
+					),
+				)
 				.pipe(R.ops.map(_toMetadataDTO))
 				.pipe(R.ops.chain(_resetUpdatedByR(uQuery)))
 				.pipe(R.ops.map(override({ parent })))

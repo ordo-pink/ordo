@@ -79,7 +79,7 @@ describe("Metadata", () => {
 			const updatedAt = test1.getUpdatedAt()
 
 			expect(updatedAt).toBeDefined()
-			expect(updatedAt).toBeValidDate()
+			expect(updatedAt).toBeInstanceOf(Date)
 			expect(updatedAt <= new Date(Date.now())).toBeTrue()
 		})
 	})
@@ -106,7 +106,7 @@ describe("Metadata", () => {
 
 		it("should return None() if property does not exist", () => {
 			expect(test1.getProperty("hello")).toBeDefined()
-			expect(test1.getProperty("hello")).toEqual(O.none())
+			expect(test1.getProperty("hello").unwrap()).toEqual(O.none().unwrap()) //TODO
 		})
 	})
 

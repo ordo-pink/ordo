@@ -3,7 +3,7 @@
 
 import * as Types from "./option.types"
 
-const someO: Types.TSomeOptionConstructorFn = value => ({
+export const someO: Types.TSomeOptionConstructorFn = value => ({
 	isOption: true,
 	isSome: true,
 	isNone: false,
@@ -11,31 +11,26 @@ const someO: Types.TSomeOptionConstructorFn = value => ({
 	cata: ({ Some }) => Some(value) as any,
 })
 
-const noneO: Types.TNoneOptionConstructorFn = () => ({
-	isOption: true,
-	isSome: false,
-	isNone: true,
-	unwrap: () => void 0,
-	cata: ({ None }) => None(),
-})
+export const noneO: Types.TNoneOptionConstructorFn = () => NONE
 
-const fromNullableO: Types.TFromNullableOptionConstructorFn = value =>
+export const fromNullableO: Types.TFromNullableOptionConstructorFn = value =>
 	value != null ? someO(value) : noneO()
-
-const tryO: Types.TTryOptionConstructorFn = f => {
-	try {
-		return someO(f())
-	} catch (_) {
-		return noneO()
-	}
-}
 
 export const Option: Types.TOptionStatic = {
 	some: someO,
 	none: noneO,
 	of: someO,
 	fromNullable: fromNullableO,
-	try: tryO,
 }
 
 export const O = Option
+
+// --- Internal ---
+
+const NONE: Types.TOption<never> = {
+	isOption: true,
+	isSome: false,
+	isNone: true,
+	unwrap: () => void 0,
+	cata: ({ None }) => None(),
+}

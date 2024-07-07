@@ -38,7 +38,20 @@ export const MetadataQuery: TMetadataQueryStatic = {
 
 		getChildren: (fsid, options) =>
 			R.if(isUUID(fsid), { onF: rrrThunk("MV_EINVAL_FSID") })
-				.pipe(R.ops.chain(() => MetadataQuery.of(repo).getByFSID(fsid, options).pipe(R.ops.chain(option => option.cata({ Some: (metadata) => R.ok(metadata), None: () => R.rrr(RRR.MQ_ENOENT as const) })))))
+				.pipe(
+					R.ops.chain(() =>
+						MetadataQuery.of(repo)
+							.getByFSID(fsid, options)
+							.pipe(
+								R.ops.chain(option =>
+									option.cata({
+										Some: metadata => R.ok(metadata),
+										None: () => R.rrr(RRR.MQ_ENOENT as const),
+									}),
+								),
+							),
+					),
+				)
 				.pipe(R.ops.chain(() => MetadataQuery.of(repo).get(options)))
 				.pipe(R.ops.map(items => items.filter(item => item.getParent() === fsid))),
 

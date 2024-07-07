@@ -121,42 +121,28 @@ describe("MetadataQuery", () => {
 					name: "123",
 					parent: null,
 					user: "asdfg-asdf-asdf-asdfa-asdfas",
-					labels: [
-						"asdf"
-					]
+					labels: ["asdf"],
 				}),
 				Metadata.from({
 					name: "12312",
 					parent: null,
 					user: "asdfg-asdf-asdf-asdfa-asdfas",
-					labels: [
-						"asfg",
-					]
+					labels: ["asfg"],
 				}),
 				Metadata.from({
 					name: "423432",
 					parent: null,
 					user: "asdfg-asdf-asdf-asdfa-asdfas",
-					labels: [
-						"asfg",
-						"asdf"
-					]
-				})
+					labels: ["asfg", "asdf"],
+				}),
 			])
 
-			const result = query.getByLabels([
-				"asfg",
-				"asdf"
-			]).unwrap() as TMetadata[]
+			const result = query.getByLabels(["asfg", "asdf"]).unwrap() as TMetadata[]
 			expect(result.length).toEqual(1)
-
 		})
 		it("should return EAGAIN if metadata is null", () => {
 			metadata$.next(null)
-			const result = query.getByLabels([
-				"asfg",
-				"asdf"
-			]).unwrap() as number
+			const result = query.getByLabels(["asfg", "asdf"]).unwrap() as number
 			expect(result).toEqual(RRR.MR_EAGAIN)
 		})
 
@@ -167,13 +153,10 @@ describe("MetadataQuery", () => {
 					name: "123",
 					parent: null,
 					user: "asdfg-asdf-asdf-asdfa-asdfas",
-					labels: [
-						"asdf"
-					]
-				})])
-			const result = query.getByLabels([
-				" ",
-			]).unwrap() as number
+					labels: ["asdf"],
+				}),
+			])
+			const result = query.getByLabels([" "]).unwrap() as number
 			expect(result).toEqual(RRR.MQ_INVALID_LABEL)
 		})
 	})
@@ -249,23 +232,22 @@ describe("MetadataQuery", () => {
 					type: "text",
 					updatedAt: Date.now(),
 					updatedBy: "asdf-asdf-asdasd-asfas-asfasf-asdasd",
-
 				}),
 				Metadata.from({
 					name: "323-2343-23423-4324-23434",
 					parent: fsid,
-					user: "asdf-asdf-asdasd-asfas-asfasf-asdasd"
+					user: "asdf-asdf-asdasd-asfas-asfasf-asdasd",
 				}),
 				Metadata.from({
 					name: "44422-2343-23423-4324-23434",
 					parent: fsid,
-					user: "asdf-asdf-asdasd-asfas-asfasf-asdasd"
+					user: "asdf-asdf-asdasd-asfas-asfasf-asdasd",
 				}),
 				Metadata.from({
 					name: "444-2343-23423-4324-23434",
 					parent: fsid,
-					user: "asdf-asdf-asdasd-asfas-asfasf-asdasd"
-				})
+					user: "asdf-asdf-asdasd-asfas-asfasf-asdasd",
+				}),
 			]
 			repo.put(metadata)
 

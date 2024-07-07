@@ -15,178 +15,58 @@ export type TMetadataCommandStatic = { of: TMetadatCommandConstructor }
 export type TMetadataCommand = {
 	create: (
 		params: TCreateMetadataParams,
-	) => TResult<void, TRrr<"EAGAIN" | "EPERM" | "EEXIST" | "EINVAL" | "ENOENT">>
+	) => TResult<void, TRrr<"EAGAIN" | "EEXIST" | "EINVAL" | "ENOENT">>
 
-	replace: (
-		value: TMetadata,
-	) => TResult<void, RRR.MR_EAGAIN | RRR.MQ_ENOENT | RRR.UR_EAGAIN | RRR.MR_EPERM>
+	replace: (value: TMetadata) => TResult<void, TRrr<"EAGAIN" | "ENOENT" | "EINVAL">>
 
-	remove: (
-		fsid: FSID,
-	) => TResult<
-		void,
-		RRR.MR_EAGAIN | RRR.MV_EINVAL_FSID | RRR.MQ_ENOENT | RRR.UR_EAGAIN | RRR.MR_EPERM
-	>
+	remove: (fsid: FSID) => TResult<void, TRrr<"EAGAIN" | "EINVAL" | "ENOENT">>
 
 	appendChild: (
 		fsid: FSID,
 		child: FSID,
-	) => TResult<
-		void,
-		| RRR.MR_EAGAIN
-		| RRR.MV_EINVAL_FSID
-		| RRR.MQ_ENOENT
-		| RRR.MQ_ENOENT_FSID
-		| RRR.MC_NAME_CONFLICT
-		| RRR.MV_EINVAL_PARENT
-		| RRR.MQ_CIRCULAR_PARENT_REFERENCE
-		| RRR.UR_EAGAIN
-		| RRR.MR_EPERM
-	>
+	) => TResult<void, TRrr<"EAGAIN" | "EINVAL" | "ENOENT" | "EEXIST" | "ENXIO">>
 
 	addLabels: (
 		fsid: FSID,
 		...labels: string[]
-	) => TResult<
-		void,
-		| RRR.MR_EAGAIN
-		| RRR.MV_EINVAL_FSID
-		| RRR.MQ_ENOENT
-		| RRR.MQ_INVALID_LABEL
-		| RRR.UR_EAGAIN
-		| RRR.MR_EPERM
-	>
+	) => TResult<void, TRrr<"EAGAIN" | "EINVAL" | "ENOENT">>
 
 	removeLabels: (
 		fsid: FSID,
 		...labels: string[]
-	) => TResult<
-		void,
-		| RRR.MR_EAGAIN
-		| RRR.MV_EINVAL_FSID
-		| RRR.MQ_ENOENT
-		| RRR.MQ_INVALID_LABEL
-		| RRR.UR_EAGAIN
-		| RRR.MR_EPERM
-	>
+	) => TResult<void, TRrr<"EAGAIN" | "EINVAL" | "ENOENT">>
 
 	replaceLabels: (
 		fsid: FSID,
 		labels: string[],
-	) => TResult<
-		void,
-		| RRR.MR_EAGAIN
-		| RRR.MV_EINVAL_FSID
-		| RRR.MQ_ENOENT
-		| RRR.MQ_INVALID_LABEL
-		| RRR.UR_EAGAIN
-		| RRR.MR_EPERM
-	>
+	) => TResult<void, TRrr<"EAGAIN" | "EINVAL" | "ENOENT">>
 
-	setSize: (
-		fsid: FSID,
-		size: number,
-	) => TResult<
-		void,
-		| RRR.MR_EAGAIN
-		| RRR.MV_EINVAL_FSID
-		| RRR.MQ_ENOENT
-		| RRR.MQ_INVALID_SIZE
-		| RRR.UR_EAGAIN
-		| RRR.MR_EPERM
-	>
+	setSize: (fsid: FSID, size: number) => TResult<void, TRrr<"EAGAIN" | "EINVAL" | "ENOENT">>
 
-	addLinks: (
-		fsid: FSID,
-		...links: FSID[]
-	) => TResult<
-		void,
-		| RRR.MR_EAGAIN
-		| RRR.MV_EINVAL_FSID
-		| RRR.MQ_ENOENT
-		| RRR.MQ_INVALID_LINK
-		| RRR.UR_EAGAIN
-		| RRR.MR_EPERM
-	>
+	addLinks: (fsid: FSID, ...links: FSID[]) => TResult<void, TRrr<"EAGAIN" | "EINVAL" | "ENOENT">>
 
-	removeLinks: (
-		fsid: FSID,
-		...links: FSID[]
-	) => TResult<
-		void,
-		| RRR.MR_EAGAIN
-		| RRR.MV_EINVAL_FSID
-		| RRR.MQ_ENOENT
-		| RRR.MQ_INVALID_LINK
-		| RRR.UR_EAGAIN
-		| RRR.MR_EPERM
-	>
+	removeLinks: (fsid: FSID, ...links: FSID[]) => TResult<void, TRrr<"EAGAIN" | "EINVAL" | "ENOENT">>
 
-	replaceLinks: (
-		fsid: FSID,
-		links: FSID[],
-	) => TResult<
-		void,
-		| RRR.MR_EAGAIN
-		| RRR.MV_EINVAL_FSID
-		| RRR.MQ_ENOENT
-		| RRR.MQ_INVALID_LINK
-		| RRR.UR_EAGAIN
-		| RRR.MR_EPERM
-	>
+	replaceLinks: (fsid: FSID, links: FSID[]) => TResult<void, TRrr<"EAGAIN" | "EINVAL" | "ENOENT">>
 
 	setParent: (
 		fsid: FSID,
 		parent: FSID | null,
-	) => TResult<
-		void,
-		| RRR.MR_EAGAIN
-		| RRR.MV_EINVAL_FSID
-		| RRR.MQ_ENOENT
-		| RRR.MC_NAME_CONFLICT
-		| RRR.MV_EINVAL_PARENT
-		| RRR.UR_EAGAIN
-		| RRR.MR_EPERM
-	>
+	) => TResult<void, TRrr<"EAGAIN" | "EINVAL" | "ENOENT" | "ENXIO" | "EEXIST">>
 
 	setName: (
 		fsid: FSID,
 		name: string,
-	) => TResult<
-		void,
-		| RRR.MR_EAGAIN
-		| RRR.MV_EINVAL_FSID
-		| RRR.MQ_ENOENT
-		| RRR.MV_EINVAL_NAME
-		| RRR.MC_NAME_CONFLICT
-		| RRR.UR_EAGAIN
-		| RRR.MR_EPERM
-	>
+	) => TResult<void, TRrr<"EAGAIN" | "EINVAL" | "ENOENT" | "EEXIST">>
 
 	setProperty: <_TProps_ extends TMetadataProps, __TKey__ extends keyof _TProps_>(
 		fsid: FSID,
 		key: __TKey__,
 		value: _TProps_[__TKey__],
-	) => TResult<
-		void,
-		| RRR.MR_EAGAIN
-		| RRR.MV_EINVAL_FSID
-		| RRR.MQ_INVALID_PROPS
-		| RRR.MQ_ENOENT
-		| RRR.UR_EAGAIN
-		| RRR.MR_EPERM
-	>
+	) => TResult<void, TRrr<"EAGAIN" | "EINVAL" | "ENOENT">>
 
 	removeProperty: <_TProps_ extends TMetadataProps, __TKey__ extends keyof _TProps_>(
 		fsid: FSID,
 		key: __TKey__,
-	) => TResult<
-		void,
-		| RRR.MR_EAGAIN
-		| RRR.MV_EINVAL_FSID
-		| RRR.MQ_INVALID_PROPS
-		| RRR.MQ_ENOENT
-		| RRR.UR_EAGAIN
-		| RRR.MR_EPERM
-	>
+	) => TResult<void, TRrr<"EAGAIN" | "EINVAL" | "ENOENT">>
 }

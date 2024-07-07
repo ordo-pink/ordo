@@ -20,4 +20,4 @@ export const isHidden = (item: TMetadata) =>
 export const hasAllLabels = (labels: string[]) => (item: TMetadata) =>
 	labels.every(label => item.getLabels().includes(label))
 
-export const isValidParent = (parent: FSID | null) => parent === null || isUUID(parent)
+export const isParent = (parent: FSID | null) => parent === null || isUUID(parent)

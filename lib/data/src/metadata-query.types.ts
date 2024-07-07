@@ -22,13 +22,13 @@ export type TMetadataQuery = {
 		options?: TMetadataQueryOptions,
 	) => TResult<TOption<TMetadata>, TRrr<"EAGAIN" | "EINVAL">>
 
-	total: (options?: TMetadataQueryOptions) => TResult<number, RRR.MR_EAGAIN>
+	total: (options?: TMetadataQueryOptions) => TResult<number, TRrr<"EAGAIN">>
 
 	getByNameAndParent: (
 		name: string,
 		parent: FSID | null,
 		options?: TMetadataQueryOptions,
-	) => TResult<TOption<TMetadata>, RRR.MR_EAGAIN | RRR.MV_EINVAL_NAME | RRR.MV_EINVAL_PARENT>
+	) => TResult<TOption<TMetadata>, TRrr<"EAGAIN" | "EINVAL">>
 
 	getByLabels: (
 		labels: string[],
@@ -38,12 +38,12 @@ export type TMetadataQuery = {
 	hasIncomingLinks: (
 		fsid: FSID,
 		options?: TMetadataQueryOptions,
-	) => TResult<boolean, RRR.MR_EAGAIN | RRR.MV_EINVAL_FSID | RRR.MQ_ENOENT>
+	) => TResult<boolean, TRrr<"EAGAIN" | "EINVAL" | "ENOENT">>
 
 	getIncomingLinks: (
 		fsid: FSID,
 		options?: TMetadataQueryOptions,
-	) => TResult<TMetadata[], RRR.MR_EAGAIN | RRR.MV_EINVAL_FSID | RRR.MQ_ENOENT>
+	) => TResult<TOption<TMetadata[]>, TRrr<"EAGAIN" | "EINVAL" | "ENOENT">>
 
 	getParent: (
 		fsid: FSID,
@@ -53,48 +53,45 @@ export type TMetadataQuery = {
 	getAncestors: (
 		fsid: FSID,
 		options?: TMetadataQueryOptions,
-	) => TResult<TMetadata[], RRR.MV_EINVAL_FSID | RRR.MQ_ENOENT>
+	) => TResult<TOption<TMetadata[]>, TRrr<"EAGAIN" | "EINVAL" | "ENOENT">>
 
 	hasAncestor: (
 		fsid: FSID,
 		ancestor: FSID,
 		options?: TMetadataQueryOptions,
-	) => TResult<boolean, RRR.MR_EAGAIN | RRR.MV_EINVAL_FSID | RRR.MQ_ENOENT | RRR.MV_EINVAL_ANCESTOR>
+	) => TResult<boolean, TRrr<"EAGAIN" | "EINVAL" | "ENOENT">>
 
 	hasChild: (
 		fsid: FSID,
 		child: FSID,
 		options?: TMetadataQueryOptions,
-	) => TResult<boolean, RRR.MR_EAGAIN | RRR.MV_EINVAL_FSID | RRR.MQ_ENOENT | RRR.MQ_INVALID_CHILD>
+	) => TResult<boolean, TRrr<"EAGAIN" | "EINVAL" | "ENOENT">>
 
 	hasChildren: (
 		fsid: FSID,
 		options?: TMetadataQueryOptions,
-	) => TResult<boolean, RRR.MR_EAGAIN | RRR.MV_EINVAL_FSID | RRR.MQ_ENOENT>
+	) => TResult<boolean, TRrr<"EAGAIN" | "EINVAL" | "ENOENT">>
 
 	getChildren: (
 		fsid: FSID,
 		options?: TMetadataQueryOptions,
-	) => TResult<TMetadata[], RRR.MR_EAGAIN | RRR.MV_EINVAL_FSID | RRR.MQ_ENOENT>
+	) => TResult<TOption<TMetadata[]>, TRrr<"EAGAIN" | "EINVAL" | "ENOENT">>
 
 	hasDescendent: (
 		fsid: FSID,
 		descendent: FSID,
 		options?: TMetadataQueryOptions,
-	) => TResult<
-		boolean,
-		RRR.MR_EAGAIN | RRR.MV_EINVAL_FSID | RRR.MQ_ENOENT | RRR.MQ_INVALID_DESCENDENT
-	>
+	) => TResult<boolean, TRrr<"EAGAIN" | "EINVAL" | "ENOENT">>
 
 	hasDescendents: (
 		fsid: FSID,
 		options?: TMetadataQueryOptions,
-	) => TResult<boolean, RRR.MR_EAGAIN | RRR.MV_EINVAL_FSID | RRR.MQ_ENOENT>
+	) => TResult<boolean, TRrr<"EAGAIN" | "EINVAL" | "ENOENT">>
 
 	getDescendents: (
 		fsid: FSID,
 		options?: TMetadataQueryOptions,
-	) => TResult<TMetadata[], RRR.MR_EAGAIN | RRR.MV_EINVAL_FSID | RRR.MQ_ENOENT>
+	) => TResult<TOption<TMetadata[]>, TRrr<"EAGAIN" | "EINVAL" | "ENOENT">>
 
 	// TODO: toTree: (source: TFSID | null) => typeof source extends null ? TMetadataBranch[] : TMetadataBranch
 
@@ -103,40 +100,40 @@ export type TMetadataQuery = {
 	// ) => typeof source extends null ? TMetadataBranchWithLinks[] : TMetadataBranchWithLinks
 }
 
-export type TMetadataNode = TMetadataBranch | TMetadataLeaf
+// export type TMetadataNode = TMetadataBranch | TMetadataLeaf
 
-export type TMetadataWithLinksNode = TMetadataBranchWithLinks | TMetadataLeafWithLinks
+// export type TMetadataWithLinksNode = TMetadataBranchWithLinks | TMetadataLeafWithLinks
 
-export type TMetadataBranch = {
-	isBranch: true
-	isLeaf: false
-	hasLinks: false
-	depth: number
-	parent: TMetadataBranch | null
-	path: string
-	data: TMetadata
-	children: TMetadataNode[]
-}
+// export type TMetadataBranch = {
+// 	isBranch: true
+// 	isLeaf: false
+// 	hasLinks: false
+// 	depth: number
+// 	parent: TMetadataBranch | null
+// 	path: string
+// 	data: TMetadata
+// 	children: TMetadataNode[]
+// }
 
-export type TMetadataBranchWithLinks = TMetadataBranch & {
-	hasLinks: true
-	links: TMetadata[]
-	parent: TMetadataBranchWithLinks
-	children: TMetadataWithLinksNode[]
-}
+// export type TMetadataBranchWithLinks = TMetadataBranch & {
+// 	hasLinks: true
+// 	links: TMetadata[]
+// 	parent: TMetadataBranchWithLinks
+// 	children: TMetadataWithLinksNode[]
+// }
 
-export type TMetadataLeaf = {
-	isBranch: false
-	isLeaf: true
-	hasLinks: false
-	depth: number
-	parent: TMetadataBranch | null
-	path: string
-	data: TMetadata
-}
+// export type TMetadataLeaf = {
+// 	isBranch: false
+// 	isLeaf: true
+// 	hasLinks: false
+// 	depth: number
+// 	parent: TMetadataBranch | null
+// 	path: string
+// 	data: TMetadata
+// }
 
-export type TMetadataLeafWithLinks = TMetadataLeaf & {
-	hasLinks: true
-	links: TMetadata[]
-	parent: TMetadataBranchWithLinks | null
-}
+// export type TMetadataLeafWithLinks = TMetadataLeaf & {
+// 	hasLinks: true
+// 	links: TMetadata[]
+// 	parent: TMetadataBranchWithLinks | null
+// }

@@ -8,7 +8,7 @@ import {
 	isName,
 	isSize,
 	isType,
-	isValidParent,
+	isParent,
 } from "./metadata-validations"
 import { Metadata } from "./metadata.impl"
 
@@ -29,17 +29,17 @@ describe("metadata-validations", () => {
 
 	describe("isValidParent", () => {
 		it("should return true if provided value is null", () => {
-			expect(isValidParent(null)).toBe(true)
+			expect(isParent(null)).toBe(true)
 		})
 
 		it("should return true if provided value is a valid UUIDv4", () => {
-			expect(isValidParent(crypto.randomUUID())).toBe(true)
+			expect(isParent(crypto.randomUUID())).toBe(true)
 		})
 
 		it("should return false if provided value is not a valid parent", () => {
-			expect(isValidParent("" as any)).toBe(false)
-			expect(isValidParent("asdf-asdf-asdf-asdf-asdf")).toBe(false)
-			expect(isValidParent(undefined as any)).toBe(false)
+			expect(isParent("" as any)).toBe(false)
+			expect(isParent("asdf-asdf-asdf-asdf-asdf")).toBe(false)
+			expect(isParent(undefined as any)).toBe(false)
 		})
 	})
 

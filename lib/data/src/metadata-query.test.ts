@@ -25,7 +25,7 @@ describe("MetadataQuery", () => {
 		})
 
 		it("should return all items if showHidden is on", () => {
-			query.metadataRepository.put([
+			repo.put([
 				Metadata.from({ name: ".asdf", parent: null, user: "asdf-asdf-asdf-asdf-asdf" }),
 				Metadata.from({ name: "asdf", parent: null, user: "asdf-asdf-asdf-asdf-asdf" }),
 			])
@@ -36,7 +36,7 @@ describe("MetadataQuery", () => {
 		})
 
 		it("should filter out hidden items if showHidden is off", () => {
-			query.metadataRepository.put([
+			repo.put([
 				Metadata.from({ name: ".asdf", parent: null, user: "asdf-asdf-asdf-asdf-asdf" }),
 				Metadata.from({ name: "asdf", parent: null, user: "asdf-asdf-asdf-asdf-asdf" }),
 			])
@@ -47,11 +47,38 @@ describe("MetadataQuery", () => {
 		})
 
 		it("should return None if there are no items", () => {
-			query.metadataRepository.put([])
+			repo.put([])
 
 			const result = query.get().unwrap() as TOption<TMetadata[]>
 
 			expect(result).toEqual(O.none())
+		})
+
+		describe("total", () => {
+			it("should return EAGAIN if metadata was not loaded", () => {
+				metadata$.next(null)
+
+				const { key, location } = query.total().unwrap() as TRrr
+
+				expect(location).toEqual("MetadataRepository")
+				expect(key).toEqual("EAGAIN")
+			})
+
+			it("should return 0 if there is no metadata", () => {
+				repo.put([])
+
+				const result = query.total().unwrap() as number
+
+				expect(result).toEqual(0)
+			})
+
+			it("should return total number of metadata items", () => {
+				repo.put([Metadata.from({ name: "a", parent: null, user: "a-a-a-a-a" })])
+
+				const result = query.total().unwrap() as number
+
+				expect(result).toEqual(1)
+			})
 		})
 
 		describe("getByFSID", () => {
@@ -67,7 +94,7 @@ describe("MetadataQuery", () => {
 			})
 
 			it("should return EINVAL if provided fsid is invalid", () => {
-				metadata$.next([])
+				repo.put([])
 
 				const { location, key } = query.getByFSID("asdf" as any).unwrap() as TRrr
 
@@ -76,7 +103,7 @@ describe("MetadataQuery", () => {
 			})
 
 			it("should return None if no metadata was found with given FSID", () => {
-				query.metadataRepository.put([])
+				repo.put([])
 
 				const result = query.getByFSID(fsid).unwrap() as unknown as TOption<TMetadata>
 
@@ -86,31 +113,29 @@ describe("MetadataQuery", () => {
 			it("should return Some(Metadata) if metadata was found with given FSID", () => {
 				const dto: TMetadataDTO = {
 					createdAt: Date.now(),
-					createdBy: "asdf-asdf-asdf-asdf-asdf",
+					createdBy: "a-a-a-a-a",
 					fsid,
 					labels: [],
 					links: [],
-					name: "asdf",
+					name: "a",
 					parent: null,
 					size: 0,
 					type: "text/ordo",
 					updatedAt: Date.now(),
-					updatedBy: "asdf-asdf-asdf-asdf-asdf",
+					updatedBy: "a-a-a-a-a",
 				}
 
-				query.metadataRepository.put([Metadata.of(dto)])
+				repo.put([Metadata.of(dto)])
 
 				const result = query.getByFSID(fsid).unwrap() as unknown as TOption<TMetadata>
 
 				expect(result.isOption && result.isSome).toBeTrue()
-				expect((result.unwrap() as TMetadata).toDTO()).toEqual(dto)
+				expect(result.unwrap()!.toDTO()).toEqual(dto)
 			})
 		})
 
 		describe("getByLabels", () => {
 			it("should return metadata with given labels", () => {
-				metadata$.next(null)
-
 				repo.put([
 					Metadata.from({ name: "a", parent: null, user: "a-a-a-a-a", labels: ["a"] }),
 					Metadata.from({ name: "b", parent: null, user: "a-a-a-a-a", labels: ["b"] }),
@@ -118,139 +143,145 @@ describe("MetadataQuery", () => {
 				])
 
 				const result = query.getByLabels(["a", "b"]).unwrap() as TOption<TMetadata[]>
+
 				expect(result.unwrap()!.length).toEqual(1)
 			})
 
-			// 	it("should return EAGAIN if metadata is null", () => {
-			// 		metadata$.next(null)
-			// 		const result = query.getByLabels(["asfg", "asdf"]).unwrap() as number
-			// 		expect(result).toEqual(RRR.MR_EAGAIN)
-			// 	})
+			it("should return EAGAIN if metadata was not loaded", () => {
+				metadata$.next(null)
 
-			// 	it("should return MQ_INVALID_LABEL if label is invalid", () => {
-			// 		metadata$.next(null)
-			// 		repo.put([
-			// 			Metadata.from({
-			// 				name: "123",
-			// 				parent: null,
-			// 				user: "asdfg-asdf-asdf-asdfa-asdfas",
-			// 				labels: ["asdf"],
-			// 			}),
-			// 		])
-			// 		const result = query.getByLabels([" "]).unwrap() as number
-			// 		expect(result).toEqual(RRR.MQ_INVALID_LABEL)
-			// 	})
+				const { key, location } = query.getByLabels(["a"]).unwrap() as TRrr
+
+				expect(location).toEqual("MetadataRepository")
+				expect(key).toEqual("EAGAIN")
+			})
+
+			it("should return MQ_INVALID_LABEL if label is invalid", () => {
+				repo.put([Metadata.from({ name: "123", parent: null, user: "a-a-a-a-a", labels: ["a"] })])
+
+				const { location, key } = query.getByLabels([" "]).unwrap() as TRrr
+
+				expect(location).toEqual("MetadataQuery")
+				expect(key).toEqual("EINVAL")
+			})
 		})
 
-		// describe("getByNameAndParent", () => {
-		// 	it("should return metadata if it exists", () => {
-		// 		const metadata = Metadata.from({
-		// 			name: "123",
-		// 			parent: null,
-		// 			user: "asdfg-asdf-asdf-asdfa-asdfas",
-		// 		})
-		// 		metadata$.next(null)
-		// 		repo.put([metadata])
+		describe("getByNameAndParent", () => {
+			it("should return metadata if it exists", () => {
+				const metadata = Metadata.from({ name: "123", parent: null, user: "a-a-a-a-a" })
 
-		// 		const option = query.getByNameAndParent("123", null).unwrap() as TOption<TMetadata>
-		// 		const result = option.unwrap()
-		// 		expect(result).toEqual(metadata)
-		// 	})
-		// 	it("should return none if metadata doesnt exist", () => {
-		// 		const metadata = Metadata.from({
-		// 			name: "123",
-		// 			parent: null,
-		// 			user: "asdfg-asdf-asdf-asdfa-asdfas",
-		// 		})
-		// 		metadata$.next(null)
-		// 		repo.put([metadata])
+				repo.put([metadata])
 
-		// 		const option = query.getByNameAndParent("12345", null).unwrap() as TOption<TMetadata>
-		// 		expect(option.unwrap()).toEqual(O.none().unwrap() as any) // TODO
-		// 	})
-		// 	it("should return EAGAIN if metadata is null", () => {
-		// 		metadata$.next(null)
-		// 		const result = query.getByNameAndParent("1111", null).unwrap() as number
-		// 		expect(result).toEqual(RRR.MR_EAGAIN)
-		// 	})
-		// 	it("should return EINVAL if name is invalid", () => {
-		// 		const metadata = Metadata.from({
-		// 			name: "123",
-		// 			parent: null,
-		// 			user: "asdfg-asdf-asdf-asdfa-asdfas",
-		// 		})
-		// 		metadata$.next(null)
-		// 		repo.put([metadata])
-		// 		const result = query.getByNameAndParent("", null).unwrap() as number
-		// 		expect(result).toEqual(RRR.MV_EINVAL_NAME)
-		// 	})
-		// 	it("should return EINVAL if parent is invalid", () => {
-		// 		const metadata = Metadata.from({
-		// 			name: "123",
-		// 			parent: null,
-		// 			user: "asdfg-asdf-asdf-asdfa-asdfas",
-		// 		})
-		// 		metadata$.next(null)
-		// 		repo.put([metadata])
-		// 		const result = query.getByNameAndParent("123", "" as any).unwrap() as number
-		// 		expect(result).toEqual(RRR.MV_EINVAL_PARENT)
-		// 	})
-		// })
+				const option = query.getByNameAndParent("123", null).unwrap() as TOption<TMetadata>
+				const result = option.unwrap()
 
-		// describe("getChildren", () => {
-		// 	it("should return item children", () => {
-		// 		const fsid = crypto.randomUUID()
-		// 		const metadata = [
-		// 			Metadata.of({
-		// 				createdAt: Date.now(),
-		// 				createdBy: "asdf-asdf-asdasd-asfas-asfasf-asdasd",
-		// 				fsid,
-		// 				labels: [],
-		// 				links: [],
-		// 				name: "1223",
-		// 				parent: null,
-		// 				size: 0,
-		// 				type: "text",
-		// 				updatedAt: Date.now(),
-		// 				updatedBy: "asdf-asdf-asdasd-asfas-asfasf-asdasd",
-		// 			}),
-		// 			Metadata.from({
-		// 				name: "323-2343-23423-4324-23434",
-		// 				parent: fsid,
-		// 				user: "asdf-asdf-asdasd-asfas-asfasf-asdasd",
-		// 			}),
-		// 			Metadata.from({
-		// 				name: "44422-2343-23423-4324-23434",
-		// 				parent: fsid,
-		// 				user: "asdf-asdf-asdasd-asfas-asfasf-asdasd",
-		// 			}),
-		// 			Metadata.from({
-		// 				name: "444-2343-23423-4324-23434",
-		// 				parent: fsid,
-		// 				user: "asdf-asdf-asdasd-asfas-asfasf-asdasd",
-		// 			}),
-		// 		]
-		// 		repo.put(metadata)
+				expect(result).toEqual(metadata)
+			})
 
-		// 		const result = query.getChildren(fsid).unwrap() as TMetadata[]
-		// 		expect(result.length).toEqual(3)
-		// 	})
-		// 	it("should return EAGAIN if metadata is null", () => {
-		// 		const fsid = crypto.randomUUID()
-		// 		metadata$.next(null)
-		// 		const result = query.getChildren(fsid).unwrap() as number
-		// 		expect(result).toEqual(RRR.MR_EAGAIN)
-		// 	})
-		// 	it("should return ENOENT if metadata with this fsid doesnt exist", () => {
-		// 		const fsid = crypto.randomUUID()
-		// 		repo.put([])
-		// 		const result = query.getChildren(fsid).unwrap() as number
-		// 		expect(result).toEqual(RRR.MQ_ENOENT)
-		// 	})
-		// 	it("should return EINVAL if fsid is invalid", () => {
-		// 		repo.put([])
-		// 		const result = query.getChildren("a" as any).unwrap() as number
-		// 		expect(result).toEqual(RRR.MV_EINVAL_FSID)
-		// 	})
+			it("should return none if metadata doesnt exist", () => {
+				repo.put([Metadata.from({ name: "a", parent: null, user: "a-a-a-a-a" })])
+
+				const option = query.getByNameAndParent("b", null).unwrap() as TOption<TMetadata>
+
+				expect(option.unwrap()).toEqual(O.none().unwrap() as any) // TODO
+			})
+
+			it("should return EAGAIN if metadata was not loaded", () => {
+				metadata$.next(null)
+
+				const { key, location } = query.getByNameAndParent("a", null).unwrap() as TRrr
+
+				expect(location).toEqual("MetadataRepository")
+				expect(key).toEqual("EAGAIN")
+			})
+
+			it("should return EINVAL if name is invalid", () => {
+				repo.put([Metadata.from({ name: "a", parent: null, user: "a-a-a-a-a" })])
+
+				const { location, key } = query.getByNameAndParent("", null).unwrap() as TRrr
+
+				expect(location).toEqual("MetadataQuery")
+				expect(key).toEqual("EINVAL")
+			})
+
+			it("should return EINVAL if parent is invalid", () => {
+				repo.put([Metadata.from({ name: "a", parent: null, user: "a-a-a-a-a" })])
+
+				const { location, key } = query.getByNameAndParent("a", "" as any).unwrap() as TRrr
+
+				expect(location).toEqual("MetadataQuery")
+				expect(key).toEqual("EINVAL")
+			})
+		})
+
+		describe("getChildren", () => {
+			it("should return EAGAIN if metadata was not loaded", () => {
+				metadata$.next(null)
+
+				const { key, location } = query.getChildren(crypto.randomUUID()).unwrap() as TRrr
+
+				expect(location).toEqual("MetadataRepository")
+				expect(key).toEqual("EAGAIN")
+			})
+
+			it("should return item children", () => {
+				const fsid = crypto.randomUUID()
+
+				repo.put([
+					Metadata.of({
+						createdAt: Date.now(),
+						createdBy: "asdf-asdf-asdasd-asfas-asfasf-asdasd",
+						fsid,
+						labels: [],
+						links: [],
+						name: "1223",
+						parent: null,
+						size: 0,
+						type: "text",
+						updatedAt: Date.now(),
+						updatedBy: "asdf-asdf-asdasd-asfas-asfasf-asdasd",
+					}),
+					Metadata.from({
+						name: "323-2343-23423-4324-23434",
+						parent: fsid,
+						user: "asdf-asdf-asdasd-asfas-asfasf-asdasd",
+					}),
+					Metadata.from({
+						name: "44422-2343-23423-4324-23434",
+						parent: fsid,
+						user: "asdf-asdf-asdasd-asfas-asfasf-asdasd",
+					}),
+					Metadata.from({
+						name: "444-2343-23423-4324-23434",
+						parent: fsid,
+						user: "asdf-asdf-asdasd-asfas-asfasf-asdasd",
+					}),
+				])
+
+				const result = query.getChildren(fsid).unwrap() as TOption<TMetadata[]>
+
+				expect(result.unwrap()!.length).toEqual(3)
+			})
+
+			it("should return ENOENT if metadata with this fsid does not exist", () => {
+				const fsid = crypto.randomUUID()
+
+				repo.put([])
+
+				const { location, key } = query.getChildren(fsid).unwrap() as TRrr
+
+				expect(location).toEqual("MetadataQuery")
+				expect(key).toEqual("ENOENT")
+			})
+
+			it("should return EINVAL if fsid is invalid", () => {
+				repo.put([])
+
+				const { location, key } = query.getChildren("a" as any).unwrap() as TRrr
+
+				expect(location).toEqual("MetadataQuery")
+				expect(key).toEqual("EINVAL")
+			})
+		})
 	})
 })

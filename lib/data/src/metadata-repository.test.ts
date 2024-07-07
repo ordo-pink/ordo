@@ -17,35 +17,27 @@ describe("metadata-repository", () => {
 			const { key, code, debug: spec, location } = metadataRepository.get().unwrap() as TRrr
 
 			expect(key).toEqual("EAGAIN")
-			expect(spec).toEqual(".get Metadata[] not initialised")
-			expect(code).toEqual(RRR.EAGAIN)
+			expect(spec).toEqual(".get: Metadata[] not initialised")
+			expect(code).toEqual(RRR.enum.EAGAIN)
 			expect(location).toEqual("MetadataRepository")
 		})
 
 		it("should return metadata", () => {
-			const metadata = [
-				Metadata.from({
-					name: "123",
-					parent: null,
-					user: "asdf-asdf-asdf-asdf-asdf",
-				}),
-			]
-			metadata$.next(metadata)
+			const metadata = [Metadata.from({ name: "a", parent: null, user: "a-a-a-a-a" })]
+
+			metadataRepository.put(metadata)
+
 			const result = metadataRepository.get().unwrap()
+
 			expect(result).toEqual(metadata)
 		})
 	})
+
 	describe("put", () => {
 		it("should return void if metadata is correct", () => {
-			metadata$.next(null)
-			const metadata = [
-				Metadata.from({
-					name: "123",
-					parent: null,
-					user: "asdf-asdf-asdf-asdf-asdf",
-				}),
-			]
+			const metadata = [Metadata.from({ name: "a", parent: null, user: "a-a-a-a-a" })]
 			const result = metadataRepository.put(metadata).unwrap()
+
 			expect(result).toEqual(undefined)
 		})
 
@@ -58,8 +50,8 @@ describe("metadata-repository", () => {
 				location,
 			} = metadataRepository.put(null as any).unwrap() as TRrr
 			expect(key).toEqual("EINVAL")
-			expect(spec).toEqual(".put expected Metadata[], got null")
-			expect(code).toEqual(RRR.EINVAL)
+			expect(spec).toEqual(".put: null")
+			expect(code).toEqual(RRR.enum.EINVAL)
 			expect(location).toEqual("MetadataRepository")
 		})
 	})

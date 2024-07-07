@@ -4,11 +4,11 @@
 import { match } from "@ordo-pink/switch"
 
 import {
-	TFromNullableResultConstructorFn,
 	type TBiChainResultOperatorFn,
 	type TBiMapResultOperatorFn,
 	type TBiTapResultOperatorFn,
 	type TChainResultOperatorFn,
+	type TFromNullableResultConstructorFn,
 	type TIfResultConstructorFn,
 	type TMapResultOperatorFn,
 	type TMatchResultFn,

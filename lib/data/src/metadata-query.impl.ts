@@ -1,5 +1,5 @@
 import { checkAll, isNonEmptyString, isUUID, negate } from "@ordo-pink/tau"
-import { fromNullableE, leftE } from "@ordo-pink/either"
+import { O } from "@ordo-pink/option"
 import { R } from "@ordo-pink/result"
 
 import { RRR, rrrThunk } from "./metadata.errors"
@@ -23,7 +23,7 @@ export const MetadataQuery: TMetadataQueryStatic = {
 		getByFSID: (fsid, options) =>
 			R.if(isUUID(fsid), { onF: rrrThunk("MV_EINVAL_FSID") })
 				.pipe(R.ops.chain(() => MetadataQuery.of(repo).get(options)))
-				.pipe(R.ops.map(items => fromNullableE(items.find(item => item.getFSID() === fsid)))),
+				.pipe(R.ops.map(items => O.fromNullable(items.find(item => item.getFSID() === fsid)))),
 
 		getByLabels: (labels, options) =>
 			R.if(checkAll(isNonEmptyString, labels), { onF: rrrThunk("MQ_INVALID_LABEL") })
@@ -34,7 +34,7 @@ export const MetadataQuery: TMetadataQueryStatic = {
 			R.if(isNonEmptyString(name), { onF: rrrThunk("MV_EINVAL_NAME") })
 				.pipe(R.ops.chain(() => R.if(isValidParent(parent), { onF: rrrThunk("MV_EINVAL_PARENT") })))
 				.pipe(R.ops.chain(() => MetadataQuery.of(repo).get(options)))
-				.pipe(R.ops.map(items => fromNullableE(items.find(_hasGivenNameAndParent(name, parent))))),
+				.pipe(R.ops.map(items => O.fromNullable(items.find(_hasGivenNameAndParent(name, parent))))),
 
 		getChildren: (fsid, options) =>
 			R.if(isUUID(fsid), { onF: rrrThunk("MV_EINVAL_FSID") })
@@ -44,9 +44,9 @@ export const MetadataQuery: TMetadataQueryStatic = {
 		getParent: (fsid, options) =>
 			MetadataQuery.of(repo)
 				.getByFSID(fsid, options)
-				.pipe(R.ops.chain(itemE => itemE.fold(() => R.rrr(RRR.MQ_ENOENT as const), R.ok)))
+				.pipe(R.ops.chain(o => o.cata({ Some: R.ok, None: () => R.rrr(RRR.MQ_ENOENT as const) })))
 				.pipe(R.ops.map(item => item.getParent()))
-				.pipe(R.ops.chain(i => (i ? MetadataQuery.of(repo).getByFSID(i) : R.ok(leftE(null))))),
+				.pipe(R.ops.chain(i => (i ? MetadataQuery.of(repo).getByFSID(i) : R.ok(O.none())))),
 
 		hasChild: (fsid, child, options) =>
 			R.if(isUUID(child), { onF: rrrThunk("MQ_INVALID_CHILD") })

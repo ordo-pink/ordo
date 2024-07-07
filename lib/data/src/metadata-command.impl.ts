@@ -1,7 +1,7 @@
 import { R, type TResult } from "@ordo-pink/result"
 import { alphaSort, concat, isNonEmptyString, isObject, isUUID, override } from "@ordo-pink/tau"
 
-import { RRR, rrrThunk } from "./metadata.errors"
+import { RRR, rrr, rrrThunk } from "./metadata.errors"
 import { type TMetadata, type TMetadataDTO, type TMetadataProps } from "./metadata.types"
 import { areLabels, areLinks, isName, isSize, isType, isValidParent } from "./metadata-validations"
 import { type FSID } from "./data.types"
@@ -149,14 +149,9 @@ export const MetadataCommand: TMetadataCommandStatic = {
 const _getMetadataIfExistsR =
 	(metadataQuery: TMetadataQuery) =>
 	(fsid: FSID): TResult<TMetadata, RRR.MQ_ENOENT | RRR.MR_EAGAIN | RRR.MV_EINVAL_FSID> =>
-		metadataQuery.getByFSID(fsid).pipe(
-			R.ops.chain(item =>
-				item.fold(
-					() => R.rrr(rrrThunk("MQ_ENOENT")()),
-					x => R.ok(x),
-				),
-			),
-		)
+		metadataQuery
+			.getByFSID(fsid)
+			.pipe(R.ops.chain(item => item.cata({ Some: R.ok, None: () => R.rrr(rrr("MQ_ENOENT")) })))
 
 const _resetUpdatedByR = (userQuery: TUserQuery) => (item: TMetadataDTO) =>
 	userQuery.getCurrentUserID().pipe(R.ops.map(updatedBy => ({ ...item, updatedBy })))

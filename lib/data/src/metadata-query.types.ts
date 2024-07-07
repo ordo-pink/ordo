@@ -1,10 +1,10 @@
-import type { TEither } from "@ordo-pink/either"
 import type { TResult } from "@ordo-pink/result"
 
 import type { FSID } from "./data.types"
 import type { RRR } from "./metadata.errors"
 import type { TMetadata } from "./metadata.types"
 import type { TMetadataRepository } from "./metadata-repository.types"
+import { TOption } from "@ordo-pink/option"
 
 export type TMetadataQueryOptions = { showHidden?: boolean }
 
@@ -20,7 +20,7 @@ export type TMetadataQuery = {
 	getByFSID: (
 		fsid: FSID,
 		options?: TMetadataQueryOptions,
-	) => TResult<TEither<TMetadata, null>, RRR.MR_EAGAIN | RRR.MV_EINVAL_FSID>
+	) => TResult<TOption<TMetadata>, RRR.MR_EAGAIN | RRR.MV_EINVAL_FSID>
 
 	total: (options?: TMetadataQueryOptions) => TResult<number, RRR.MR_EAGAIN>
 
@@ -28,7 +28,7 @@ export type TMetadataQuery = {
 		name: string,
 		parent: FSID | null,
 		options?: TMetadataQueryOptions,
-	) => TResult<TEither<TMetadata, null>, RRR.MR_EAGAIN | RRR.MV_EINVAL_NAME | RRR.MV_EINVAL_PARENT>
+	) => TResult<TOption<TMetadata>, RRR.MR_EAGAIN | RRR.MV_EINVAL_NAME | RRR.MV_EINVAL_PARENT>
 
 	getByLabels: (
 		labels: string[],
@@ -49,7 +49,7 @@ export type TMetadataQuery = {
 		fsid: FSID,
 		options?: TMetadataQueryOptions,
 	) => TResult<
-		TEither<TMetadata, null>,
+		TOption<TMetadata>,
 		RRR.MR_EAGAIN | RRR.MV_EINVAL_FSID | RRR.MQ_ENOENT | RRR.MC_ENOENT_PARENT
 	>
 

@@ -2,11 +2,14 @@ import { checkAll, isNonEmptyString, isUUID, negate } from "@ordo-pink/tau"
 import { O } from "@ordo-pink/option"
 import { R } from "@ordo-pink/result"
 
-import { RRR, rrrThunk } from "./metadata.errors"
+import { RRR, composeRrr, composeRrrThunk } from "./metadata.errors"
 import { hasAllLabels, isHidden, isValidParent } from "./metadata-validations"
 import { type FSID } from "./data.types"
 import { type TMetadata } from "./metadata.types"
 import { type TMetadataQueryStatic } from "./metadata-query.types"
+
+const rrr = composeRrr("MetadataQuery")
+const rrrThunk = composeRrrThunk("MetadataQuery")
 
 // TODO: Repository contains stream
 export const MetadataQuery: TMetadataQueryStatic = {
@@ -16,19 +19,36 @@ export const MetadataQuery: TMetadataQueryStatic = {
 		get: ({ showHidden } = { showHidden: false }) =>
 			repo
 				.get()
-				.pipe(R.ops.chain(R.fromNullable))
 				.pipe(R.ops.map(items => (showHidden ? items : items.filter(negate(isHidden)))))
-				.pipe(R.ops.rrrMap(rrrThunk("MR_EAGAIN"))),
+				.pipe(R.ops.map(items => (items.length > 0 ? O.some(items) : O.none()))),
 
 		getByFSID: (fsid, options) =>
-			R.if(isUUID(fsid), { onF: rrrThunk("MV_EINVAL_FSID") })
+			R.if(isUUID(fsid), { onF: rrrThunk("EINVAL", `Invalid FSID: ${fsid}`) })
 				.pipe(R.ops.chain(() => MetadataQuery.of(repo).get(options)))
-				.pipe(R.ops.map(items => O.fromNullable(items.find(item => item.getFSID() === fsid)))),
+				.pipe(
+					// TODO: o.pipe(O.ops.chain)
+					R.ops.chain(option =>
+						option.cata({
+							Some: metadata =>
+								R.ok(O.fromNullable(metadata.find(item => item.getFSID() === fsid))),
+							None: () => R.ok(O.none()),
+						}),
+					),
+				),
 
 		getByLabels: (labels, options) =>
-			R.if(checkAll(isNonEmptyString, labels), { onF: rrrThunk("MQ_INVALID_LABEL") })
+			R.if(checkAll(isNonEmptyString, labels), {
+				onF: () => rrr("EINVAL", `Invalid label: ${labels.find(l => !isNonEmptyString(l))}`),
+			})
 				.pipe(R.ops.chain(() => MetadataQuery.of(repo).get(options)))
-				.pipe(R.ops.map(items => items.filter(hasAllLabels(labels)))),
+				.pipe(
+					R.ops.chain(option =>
+						option.cata({
+							Some: metadata => R.ok(O.fromNullable(metadata.filter(hasAllLabels(labels)))),
+							None: () => R.ok(O.none()),
+						}),
+					),
+				),
 
 		getByNameAndParent: (name, parent, options) =>
 			R.if(isNonEmptyString(name), { onF: rrrThunk("MV_EINVAL_NAME") })
@@ -58,7 +78,14 @@ export const MetadataQuery: TMetadataQueryStatic = {
 		getParent: (fsid, options) =>
 			MetadataQuery.of(repo)
 				.getByFSID(fsid, options)
-				.pipe(R.ops.chain(o => o.cata({ Some: R.ok, None: () => R.rrr(RRR.MQ_ENOENT as const) })))
+				.pipe(
+					R.ops.chain(o =>
+						o.cata({
+							Some: R.ok,
+							None: () => R.rrr(rrr("ENOENT", `.getParent child ${fsid} not found`)),
+						}),
+					),
+				)
 				.pipe(R.ops.map(item => item.getParent()))
 				.pipe(R.ops.chain(i => (i ? MetadataQuery.of(repo).getByFSID(i) : R.ok(O.none())))),
 

@@ -1,10 +1,10 @@
+import type { TOption } from "@ordo-pink/option"
 import type { TResult } from "@ordo-pink/result"
 
+import type { RRR, TRrr } from "./metadata.errors"
 import type { FSID } from "./data.types"
-import type { RRR } from "./metadata.errors"
 import type { TMetadata } from "./metadata.types"
 import type { TMetadataRepository } from "./metadata-repository.types"
-import { TOption } from "@ordo-pink/option"
 
 export type TMetadataQueryOptions = { showHidden?: boolean }
 
@@ -15,12 +15,12 @@ export type TMetadataQueryStatic = {
 export type TMetadataQuery = {
 	metadataRepository: TMetadataRepository
 
-	get: (options?: TMetadataQueryOptions) => TResult<TMetadata[], RRR.MR_EAGAIN>
+	get: (options?: TMetadataQueryOptions) => TResult<TOption<TMetadata[]>, TRrr<"EAGAIN">>
 
 	getByFSID: (
 		fsid: FSID,
 		options?: TMetadataQueryOptions,
-	) => TResult<TOption<TMetadata>, RRR.MR_EAGAIN | RRR.MV_EINVAL_FSID>
+	) => TResult<TOption<TMetadata>, TRrr<"EAGAIN" | "EINVAL">>
 
 	total: (options?: TMetadataQueryOptions) => TResult<number, RRR.MR_EAGAIN>
 
@@ -33,7 +33,7 @@ export type TMetadataQuery = {
 	getByLabels: (
 		labels: string[],
 		options?: TMetadataQueryOptions,
-	) => TResult<TMetadata[], RRR.MR_EAGAIN | RRR.MQ_INVALID_LABEL>
+	) => TResult<TOption<TMetadata[]>, TRrr<"EAGAIN" | "EINVAL">>
 
 	hasIncomingLinks: (
 		fsid: FSID,
@@ -48,10 +48,7 @@ export type TMetadataQuery = {
 	getParent: (
 		fsid: FSID,
 		options?: TMetadataQueryOptions,
-	) => TResult<
-		TOption<TMetadata>,
-		RRR.MR_EAGAIN | RRR.MV_EINVAL_FSID | RRR.MQ_ENOENT | RRR.MC_ENOENT_PARENT
-	>
+	) => TResult<TOption<TMetadata>, TRrr<"EAGAIN" | "EINVAL" | "ENOENT">>
 
 	getAncestors: (
 		fsid: FSID,

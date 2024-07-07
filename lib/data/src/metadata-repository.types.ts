@@ -3,12 +3,12 @@ import type { BehaviorSubject } from "rxjs"
 import type { TResult } from "@ordo-pink/result"
 
 import type { TMetadata, TMetadataDTO, TMetadataProps } from "./metadata.types"
-import type { RRR } from "./metadata.errors"
+import type { TRrr } from "./metadata.errors"
 import type { UserID } from "./data.types"
 
 export type TMetadataRepository = {
-	get: () => TResult<TMetadata[], RRR.MR_EAGAIN>
-	put: (metadata: TMetadata[]) => TResult<void, RRR.MR_EPERM>
+	get: () => TResult<TMetadata[], TRrr<"EAGAIN">>
+	put: (metadata: TMetadata[]) => TResult<void, TRrr<"EINVAL">>
 }
 
 export type TMetadataRepositoryStatic = {
@@ -17,7 +17,7 @@ export type TMetadataRepositoryStatic = {
 
 // TODO:
 export type TUserQuery = {
-	getCurrentUserID: () => TResult<UserID, RRR.UR_EAGAIN>
+	getCurrentUserID: () => TResult<UserID, TRrr<"EAGAIN">>
 }
 
 export type TMetadataDataMapper = {

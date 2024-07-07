@@ -1,18 +1,20 @@
 import { R } from "@ordo-pink/result"
 
 import { TMetadataRepositoryStatic } from "./metadata-repository.types"
-import { rrrThunk } from "./metadata.errors"
+import { composeRrrThunk } from "./metadata.errors"
+
+const toRrr = composeRrrThunk("MetadataRepository")
 
 export const MetadataRepository: TMetadataRepositoryStatic = {
 	of: metadata$ => ({
 		get: () =>
 			R.try(() => metadata$.getValue())
 				.pipe(R.ops.chain(R.fromNullable))
-				.pipe(R.ops.rrrMap(rrrThunk("MR_EAGAIN"))),
-		put: ms =>
-			R.fromNullable(ms)
-				.pipe(R.ops.chain(() => R.if(Array.isArray(ms))))
-				.pipe(R.ops.chain(() => R.try(() => metadata$.next(ms))))
-				.pipe(R.ops.rrrMap(rrrThunk("MR_EPERM"))),
+				.pipe(R.ops.rrrMap(toRrr("EAGAIN", ".get Metadata[] not initialised"))),
+		put: metadata =>
+			R.fromNullable(metadata)
+				.pipe(R.ops.chain(() => R.if(Array.isArray(metadata))))
+				.pipe(R.ops.chain(() => R.try(() => metadata$.next(metadata))))
+				.pipe(R.ops.rrrMap(toRrr("EINVAL", `.put expected Metadata[], got ${metadata as any}`))),
 	}),
 }

@@ -2,7 +2,7 @@ import type { TResult } from "@ordo-pink/result"
 
 import type { TCreateMetadataParams, TMetadata, TMetadataProps } from "./metadata.types"
 import type { FSID } from "./data.types"
-import type { RRR } from "./metadata.errors"
+import type { RRR, TRrr } from "./metadata.errors"
 import type { TMetadataQuery } from "./metadata-query.types"
 import type { TUserQuery } from "./metadata-repository.types"
 
@@ -15,21 +15,7 @@ export type TMetadataCommandStatic = { of: TMetadatCommandConstructor }
 export type TMetadataCommand = {
 	create: (
 		params: TCreateMetadataParams,
-	) => TResult<
-		void,
-		| RRR.UR_EAGAIN
-		| RRR.MR_EAGAIN
-		| RRR.MR_EPERM
-		| RRR.MC_FSID_CONFLICT
-		| RRR.MV_EINVAL_NAME
-		| RRR.MV_EINVAL_PARENT
-		| RRR.MC_NAME_CONFLICT
-		| RRR.MQ_INVALID_LABEL
-		| RRR.MQ_INVALID_LINK
-		| RRR.MC_ENOENT_PARENT
-		| RRR.MQ_INVALID_TYPE
-		| RRR.MQ_INVALID_PROPS
-	>
+	) => TResult<void, TRrr<"EAGAIN" | "EPERM" | "EEXIST" | "EINVAL" | "ENOENT">>
 
 	replace: (
 		value: TMetadata,

@@ -3,11 +3,11 @@ import { BehaviorSubject } from "rxjs"
 
 import { O, type TOption } from "@ordo-pink/option"
 
-import { RRR, type TRrr } from "./metadata.errors"
 import { type TMetadata, type TMetadataDTO } from "./metadata.types"
 import { Metadata } from "./metadata.impl"
 import { MetadataQuery } from "./metadata-query.impl"
 import { MetadataRepository } from "./metadata-repository.impl"
+import { type TRrr } from "./metadata.errors"
 
 describe("MetadataQuery", () => {
 	const metadata$ = new BehaviorSubject<TMetadata[] | null>(null)

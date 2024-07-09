@@ -21,14 +21,17 @@ import { ErrorInfo, useEffect } from "react"
 import Helmet from "react-helmet"
 
 import {
+	getQueryContextProvider,
 	useCommands,
 	useLogger,
 	useStrictSubscription,
 	useSubscription,
 } from "@ordo-pink/frontend-react-hooks"
-import { Either } from "@ordo-pink/either"
 import { Oath } from "@ordo-pink/oath"
+import { type TMetadataQuery } from "@ordo-pink/data"
 import { currentActivity$ } from "@ordo-pink/frontend-stream-activities"
+import { fromNullableE } from "@ordo-pink/either"
+import { title$ } from "@ordo-pink/frontend-stream-title"
 import { useAppInit } from "@ordo-pink/frontend-app-init"
 
 import ActivityBar from "@ordo-pink/frontend-react-sections/activity-bar"
@@ -43,10 +46,12 @@ import Modal from "@ordo-pink/frontend-react-sections/modal"
 import Notifications from "@ordo-pink/frontend-react-sections/notifications"
 import Workspace from "@ordo-pink/frontend-react-sections/workspace"
 
-import { title$ } from "@ordo-pink/frontend-stream-title"
+const QueryContextProvider = getQueryContextProvider()
 
 // TODO: Take import source from ENV
-export default function App() {
+// TODO: Remove $ imports
+type P = { metadataQuery: TMetadataQuery }
+export default function App({ metadataQuery }: P) {
 	const commands = useCommands()
 	const currentActivity = useSubscription(currentActivity$)
 	const logger = useLogger()
@@ -109,21 +114,23 @@ export default function App() {
 		}
 	}, [commands])
 
-	return Either.fromNullable(currentActivity).fold(Loading, () => (
+	return fromNullableE(currentActivity).fold(Loading, () => (
 		<ErrorBoundary logError={logError} fallback={<Fallback />}>
-			<Helmet>
-				<title>{title}</title>
-			</Helmet>
+			<QueryContextProvider value={{ metadataQuery, userQuery: null as any }}>
+				<Helmet>
+					<title>{title}</title>
+				</Helmet>
 
-			<div className="flex">
-				<ActivityBar />
-				<Workspace />
-			</div>
+				<div className="flex">
+					<ActivityBar />
+					<Workspace />
+				</div>
 
-			<Notifications />
-			<ContextMenu />
-			<BackgroundTaskIndicator />
-			<Modal />
+				<Notifications />
+				<ContextMenu />
+				<BackgroundTaskIndicator />
+				<Modal />
+			</QueryContextProvider>
 		</ErrorBoundary>
 	))
 }

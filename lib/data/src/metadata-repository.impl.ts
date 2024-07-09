@@ -13,12 +13,12 @@ export const MetadataRepository: TMetadataRepositoryStatic = {
 		get: () =>
 			R.try(() => metadata$.getValue())
 				.pipe(R.ops.chain(R.fromNullable))
-				.pipe(R.ops.rrrMap(() => eagain(".get: Metadata[] not initialised"))),
+				.pipe(R.ops.errMap(() => eagain(".get: Metadata[] not initialised"))),
 
 		put: metadata =>
 			R.fromNullable(metadata)
 				.pipe(R.ops.chain(() => R.if(Array.isArray(metadata))))
 				.pipe(R.ops.chain(() => R.try(() => metadata$.next(metadata))))
-				.pipe(R.ops.rrrMap(() => einval(`.put: ${metadata as any}`))),
+				.pipe(R.ops.errMap(() => einval(`.put: ${metadata as any}`))),
 	}),
 }

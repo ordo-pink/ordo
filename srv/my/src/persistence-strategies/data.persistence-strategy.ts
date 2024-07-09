@@ -69,7 +69,7 @@ const of = (fid: symbol): DataPersistenceStrategy => ({
 						type: "rrr",
 					})
 					commands.emit<cmd.background.resetStatus>("background-task.reset-status")
-					data$.next(data)
+					return data$.next(data)
 				},
 				() => {
 					commands.emit<cmd.background.resetStatus>("background-task.reset-status")

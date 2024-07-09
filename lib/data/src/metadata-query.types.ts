@@ -1,10 +1,10 @@
 import type { TOption } from "@ordo-pink/option"
 import type { TResult } from "@ordo-pink/result"
 
-import type { RRR, TRrr } from "./metadata.errors"
 import type { FSID } from "./data.types"
 import type { TMetadata } from "./metadata.types"
 import type { TMetadataRepository } from "./metadata-repository.types"
+import type { TRrr } from "./metadata.errors"
 
 export type TMetadataQueryOptions = { showHidden?: boolean }
 
@@ -15,7 +15,7 @@ export type TMetadataQueryStatic = {
 export type TMetadataQuery = {
 	metadataRepository: TMetadataRepository
 
-	get: (options?: TMetadataQueryOptions) => TResult<TOption<TMetadata[]>, TRrr<"EAGAIN">>
+	get: (options?: TMetadataQueryOptions) => TResult<TMetadata[], TRrr<"EAGAIN">>
 
 	getByFSID: (
 		fsid: FSID,
@@ -33,7 +33,7 @@ export type TMetadataQuery = {
 	getByLabels: (
 		labels: string[],
 		options?: TMetadataQueryOptions,
-	) => TResult<TOption<TMetadata[]>, TRrr<"EAGAIN" | "EINVAL">>
+	) => TResult<TMetadata[], TRrr<"EAGAIN" | "EINVAL">>
 
 	hasIncomingLinks: (
 		fsid: FSID,
@@ -43,7 +43,7 @@ export type TMetadataQuery = {
 	getIncomingLinks: (
 		fsid: FSID,
 		options?: TMetadataQueryOptions,
-	) => TResult<TOption<TMetadata[]>, TRrr<"EAGAIN" | "EINVAL" | "ENOENT">>
+	) => TResult<TMetadata[], TRrr<"EAGAIN" | "EINVAL" | "ENOENT">>
 
 	getParent: (
 		fsid: FSID,
@@ -53,7 +53,7 @@ export type TMetadataQuery = {
 	getAncestors: (
 		fsid: FSID,
 		options?: TMetadataQueryOptions,
-	) => TResult<TOption<TMetadata[]>, TRrr<"EAGAIN" | "EINVAL" | "ENOENT">>
+	) => TResult<TMetadata[], TRrr<"EAGAIN" | "EINVAL" | "ENOENT">>
 
 	hasAncestor: (
 		fsid: FSID,
@@ -75,7 +75,7 @@ export type TMetadataQuery = {
 	getChildren: (
 		fsid: FSID,
 		options?: TMetadataQueryOptions,
-	) => TResult<TOption<TMetadata[]>, TRrr<"EAGAIN" | "EINVAL" | "ENOENT">>
+	) => TResult<TMetadata[], TRrr<"EAGAIN" | "EINVAL" | "ENOENT">>
 
 	hasDescendent: (
 		fsid: FSID,
@@ -91,7 +91,8 @@ export type TMetadataQuery = {
 	getDescendents: (
 		fsid: FSID,
 		options?: TMetadataQueryOptions,
-	) => TResult<TOption<TMetadata[]>, TRrr<"EAGAIN" | "EINVAL" | "ENOENT">>
+		accumulator?: TMetadata[],
+	) => TResult<TMetadata[], TRrr<"EAGAIN" | "EINVAL" | "ENOENT">>
 
 	// TODO: toTree: (source: TFSID | null) => typeof source extends null ? TMetadataBranch[] : TMetadataBranch
 

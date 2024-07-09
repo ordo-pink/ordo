@@ -28,16 +28,15 @@ import {
 	useStrictSubscription,
 } from "@ordo-pink/frontend-react-hooks"
 import { FSID } from "@ordo-pink/data"
+import { fileAssociations$ } from "@ordo-pink/frontend-stream-file-associations"
+import { noop } from "@ordo-pink/tau"
 
 import CenteredPage from "@ordo-pink/frontend-react-components/centered-page"
-
+import Loader from "@ordo-pink/frontend-react-components/loader"
 import Null from "@ordo-pink/frontend-react-components/null"
-import { noop } from "@ordo-pink/tau"
 
 import DataEditor from "../components/data-editor.component"
 import EditableTitle from "../components/editable-title.component"
-import Loader from "@ordo-pink/frontend-react-components/loader"
-import { fileAssociations$ } from "@ordo-pink/frontend-stream-file-associations"
 
 export default function EditorWorkspace() {
 	const [isLoading, setIsLoading] = useState(true)

@@ -30,10 +30,13 @@ import { __initCommandPalette } from "@ordo-pink/frontend-stream-command-palette
 import { __initCommands } from "@ordo-pink/frontend-stream-commands"
 import { __initData } from "@ordo-pink/frontend-stream-data"
 import { __initFetch } from "@ordo-pink/frontend-fetch"
+import { __initFileAssociations } from "@ordo-pink/frontend-stream-file-associations"
 import { __initHosts } from "@ordo-pink/frontend-react-hooks"
 import { __initLogger } from "@ordo-pink/frontend-logger"
+import { __initMetadata } from "@ordo-pink/frontend-stream-data/src/frontend-stream-metadata.impl"
 import { __initRouter } from "@ordo-pink/frontend-stream-router"
 import { __initSidebar } from "@ordo-pink/frontend-stream-sidebar"
+import { __initTitle } from "@ordo-pink/frontend-stream-title"
 import { __initUser$ } from "@ordo-pink/frontend-stream-user"
 
 import { APP_FID, isDev } from "./constants"
@@ -41,8 +44,6 @@ import { ClientContentPersistenceStrategy } from "./persistence-strategies/conte
 import { ClientDataPersistenceStrategy } from "./persistence-strategies/data.persistence-strategy"
 
 import App from "./app"
-import { __initTitle } from "@ordo-pink/frontend-stream-title"
-import { __initFileAssociations } from "@ordo-pink/frontend-stream-file-associations"
 
 currentFID$.next(APP_FID)
 
@@ -68,6 +69,7 @@ const main = () => {
 	__initAuth$({ fid: APP_FID, isDev })
 	__initUser$({ fid: APP_FID, idHost })
 	__initData({ fid: APP_FID, dataCommands })
+	const metadataQuery = __initMetadata({ fid: APP_FID }) // TODO: userQuery
 	__initAchievements({ fid: APP_FID, dataCommands })
 	__initRouter(APP_FID)
 	__initCommandPalette(APP_FID)
@@ -78,7 +80,7 @@ const main = () => {
 	const container = document.getElementById("root")!
 	const root = createRoot(container)
 
-	root.render(<App />)
+	root.render(<App metadataQuery={metadataQuery} />)
 }
 
 main()

@@ -3,105 +3,138 @@
 
 import type { TSwitch } from "@ordo-pink/switch"
 
-export type TMatchResultFn = <_TOk, __TRrr>(
-	result: TResult<_TOk, __TRrr>,
-) => TSwitch<_TOk | __TRrr, []>
+export type TMatchResultFn = <$TOk, $TErr>(
+	result: TResult<$TOk, $TErr>,
+) => TSwitch<$TOk | $TErr, []>
 
-export type TOkResultConstructorFn = <_TOk, _TRrr = never>(x: _TOk) => TResult<_TOk, _TRrr>
+type ArrayToUnion<$T> = $T extends Array<infer U> ? U : $T
+type RecordToUnion<$T extends Record<string, unknown>> = { [P in keyof $T]: $T[P] }[keyof $T]
 
-export type TRrrResultConstructorFn = <_TRrr, _TOk = never>(x: _TRrr) => TResult<_TOk, _TRrr>
+export type DoubtfulButOkay<$T> = $T extends object & {
+	pipe(f: infer F): any
+}
+	? F extends (x: TResult<infer V, infer _>) => any
+		? V
+		: never
+	: $T
 
-export type TTryResultConstructorFn = <_TOk, _TRrr = unknown>(
-	trier: () => _TOk,
-	catcher?: (error: unknown) => _TRrr,
-) => TResult<_TOk, _TRrr>
+export type ErrWhat<$T> = $T extends object & {
+	pipe(f: infer F): any
+}
+	? F extends (x: TResult<infer _, infer V>) => any
+		? ErrWhat<V>
+		: never
+	: $T
 
-export type TFromNullableResultConstructorFn = <_TOk, _TRrr = null>(
-	x?: _TOk | null,
-	onNull?: () => _TRrr,
-) => TResult<NonNullable<_TOk>, _TRrr>
+export type TOkResultConstructorFn = <$TOk, $TErr = never>(x: $TOk) => TResult<$TOk, $TErr>
 
-export type TIfResultConstructorFn = <_TOk = undefined, _TRrr = undefined>(
+export type TErrResultConstructorFn = <$TErr, $TOk = never>(x: $TErr) => TResult<$TOk, $TErr>
+
+export type TMergeResultConstructorFn = <
+	TSomeThings extends readonly unknown[] | [] | Record<string, unknown>,
+>(
+	results: TSomeThings,
+) => TResult<
+	TSomeThings extends []
+		? { -readonly [P in keyof TSomeThings]: DoubtfulButOkay<TSomeThings[P]> }
+		: { [P in keyof TSomeThings]: DoubtfulButOkay<TSomeThings[P]> },
+	TSomeThings extends Array<any>
+		? ArrayToUnion<{ -readonly [P in keyof TSomeThings]: ErrWhat<TSomeThings[P]> }>
+		: RecordToUnion<{ [P in keyof TSomeThings]: ErrWhat<TSomeThings[P]> }>
+>
+
+export type TTryResultConstructorFn = <$TOk, $TErr = unknown>(
+	trier: () => $TOk,
+	catcher?: (error: unknown) => $TErr,
+) => TResult<$TOk, $TErr>
+
+export type TFromNullableResultConstructorFn = <$TOk, $TErr = null>(
+	x?: $TOk | null,
+	onNull?: () => $TErr,
+) => TResult<NonNullable<$TOk>, $TErr>
+
+export type TIfResultConstructorFn = <$TOk = undefined, $TErr = undefined>(
 	predicate: boolean,
-	returns?: { onT?: () => _TOk; onF?: () => _TRrr },
-) => TResult<_TOk, _TRrr>
+	returns?: { onT?: () => $TOk; onF?: () => $TErr },
+) => TResult<$TOk, $TErr>
 
-export type TMapResultOperatorFn = <_TOk, _TRrr, _TNewOk>(
-	onOk: (x: _TOk) => _TNewOk,
-) => (result: TResult<_TOk, _TRrr>) => TResult<_TNewOk, _TRrr>
+export type TMapResultOperatorFn = <$TOk, $TErr, $TNewOk>(
+	onOk: (x: $TOk) => $TNewOk,
+) => (result: TResult<$TOk, $TErr>) => TResult<$TNewOk, $TErr>
 
-export type TRrrMapResultOperatorFn = <_TOk, _TRrr, _TNewRrr>(
-	onRrr: (x: _TRrr) => _TNewRrr,
-) => (result: TResult<_TOk, _TRrr>) => TResult<_TOk, _TNewRrr>
+export type TErrMapResultOperatorFn = <$TOk, $TErr, $TNewRrr>(
+	onErr: (x: $TErr) => $TNewRrr,
+) => (result: TResult<$TOk, $TErr>) => TResult<$TOk, $TNewRrr>
 
-export type TBiMapResultOperatorFn = <_TOk, _TRrr, _TNewOk, _TNewRrr>(
-	onRrr: (x: _TRrr) => _TNewRrr,
-	onOk: (x: _TOk) => _TNewOk,
-) => (result: TResult<_TOk, _TRrr>) => TResult<_TNewOk, _TNewRrr>
+export type TBiMapResultOperatorFn = <$TOk, $TErr, $TNewOk, $TNewRrr>(
+	onErr: (x: $TErr) => $TNewRrr,
+	onOk: (x: $TOk) => $TNewOk,
+) => (result: TResult<$TOk, $TErr>) => TResult<$TNewOk, $TNewRrr>
 
-export type TChainResultOperatorFn = <_TOk, _TRrr, _TNewOk, _TNewRrr>(
-	onOk: (x: _TOk) => TResult<_TNewOk, _TNewRrr>,
-) => (result: TResult<_TOk, _TRrr>) => TResult<_TNewOk, _TRrr | _TNewRrr>
+export type TChainResultOperatorFn = <$TOk, $TErr, $TNewOk, $TNewRrr>(
+	onOk: (x: $TOk) => TResult<$TNewOk, $TNewRrr>,
+) => (result: TResult<$TOk, $TErr>) => TResult<$TNewOk, $TErr | $TNewRrr>
 
-export type TRrrChainResultOperatorFn = <_TOk, _TRrr, _TNewOk, _TNewRrr>(
-	onRrr: (x: _TRrr) => TResult<_TNewOk, _TNewRrr>,
-) => (result: TResult<_TOk, _TRrr>) => TResult<_TOk, _TNewRrr>
+export type TErrChainResultOperatorFn = <$TOk, $TErr, $TNewOk, $TNewRrr>(
+	onErr: (x: $TErr) => TResult<$TNewOk, $TNewRrr>,
+) => (result: TResult<$TOk, $TErr>) => TResult<$TOk, $TNewRrr>
 
-export type TBiChainResultOperatorFn = <_TOk, _TRrr, _TNewOk, _TNewRrr>(
-	onRrr: (x: _TRrr) => TResult<_TNewOk, _TNewRrr>,
-	onOk: (x: _TOk) => TResult<_TNewOk, _TNewRrr>,
-) => (result: TResult<_TOk, _TRrr>) => TResult<_TNewOk, _TNewRrr>
+export type TBiChainResultOperatorFn = <$TOk, $TErr, $TNewOk, $TNewRrr>(
+	onErr: (x: $TErr) => TResult<$TNewOk, $TNewRrr>,
+	onOk: (x: $TOk) => TResult<$TNewOk, $TNewRrr>,
+) => (result: TResult<$TOk, $TErr>) => TResult<$TNewOk, $TNewRrr>
 
-export type TTapResultOperatorFn = <_TOk, _TRrr>(
-	onOk: (x: _TOk) => any,
-) => (result: TResult<_TOk, _TRrr>) => TResult<_TOk, _TRrr>
+export type TTapResultOperatorFn = <$TOk, $TErr>(
+	onOk: (x: $TOk) => any,
+) => (result: TResult<$TOk, $TErr>) => TResult<$TOk, $TErr>
 
-export type TRrrTapResultOperatorFn = <_TOk, _TRrr>(
-	onRrr: (x: _TRrr) => any,
-) => (result: TResult<_TOk, _TRrr>) => TResult<_TOk, _TRrr>
+export type TErrTapResultOperatorFn = <$TOk, $TErr>(
+	onErr: (x: $TErr) => any,
+) => (result: TResult<$TOk, $TErr>) => TResult<$TOk, $TErr>
 
-export type TBiTapResultOperatorFn = <_TOk, _TRrr>(
-	onRrr: (x: _TRrr) => any,
-	onOk: (x: _TOk) => any,
-) => (result: TResult<_TOk, _TRrr>) => TResult<_TOk, _TRrr>
+export type TBiTapResultOperatorFn = <$TOk, $TErr>(
+	onErr: (x: $TErr) => any,
+	onOk: (x: $TOk) => any,
+) => (result: TResult<$TOk, $TErr>) => TResult<$TOk, $TErr>
 
-export type TSwapResultOperatorFn = <_TOk, _TRrr>() => (
-	result: TResult<_TOk, _TRrr>,
-) => TResult<_TRrr, _TOk>
+export type TSwapResultOperatorFn = <$TOk, $TErr>() => (
+	result: TResult<$TOk, $TErr>,
+) => TResult<$TErr, $TOk>
 
 export type TResultStatic = {
-	ok: TOkResultConstructorFn
-	rrr: TRrrResultConstructorFn
+	Ok: TOkResultConstructorFn
+	Err: TErrResultConstructorFn
 	try: TTryResultConstructorFn
 	if: TIfResultConstructorFn
 	fromNullable: TFromNullableResultConstructorFn
+	merge: TMergeResultConstructorFn
 	ops: {
 		map: TMapResultOperatorFn
-		rrrMap: TRrrMapResultOperatorFn
+		errMap: TErrMapResultOperatorFn
 		bimap: TBiMapResultOperatorFn
 		chain: TChainResultOperatorFn
-		rrrChain: TRrrChainResultOperatorFn
+		errChain: TErrChainResultOperatorFn
 		bichain: TBiChainResultOperatorFn
 		tap: TTapResultOperatorFn
-		rrrTap: TRrrTapResultOperatorFn
+		errTap: TErrTapResultOperatorFn
 		bitap: TBiTapResultOperatorFn
 		swap: TSwapResultOperatorFn
 	}
 }
 
-export type TResult<_TOk, _TRrr> = {
+export type TResult<$TOk, $TErr> = {
 	isOk: boolean
-	isRrr: boolean
+	isErr: boolean
 	isResult: boolean
 	/**
-	 * @deprecated UNSAFE. Use `result.match` or `match(result)` instead.
+	 * @deprecated UNSAFE. Use `result.cata` instead.
 	 */
-	unwrap: () => _TOk | _TRrr
-	pipe: <_TOk_, _TRrr_>(
-		operator: (result: TResult<_TOk, _TRrr>) => TResult<_TOk_, _TRrr_>,
-	) => TResult<_TOk_, _TRrr_>
-	cata: <_TOk_, _TRrr_>(explosion: {
-		ok: (ok: _TOk) => _TOk_
-		rrr: (rrr: _TRrr) => _TRrr_
-	}) => _TOk_ | _TRrr_
+	unwrap: () => $TOk | $TErr
+	pipe: <_TOk, _TErr>(
+		operator: (result: TResult<$TOk, $TErr>) => TResult<_TOk, _TErr>,
+	) => TResult<_TOk, _TErr>
+	cata: <_TOk, _TErr>(explosion: {
+		Ok: (ok: $TOk) => _TOk
+		Err: (err: $TErr) => _TErr
+	}) => _TOk | _TErr
 }

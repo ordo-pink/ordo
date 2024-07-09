@@ -6,9 +6,9 @@ import {
 	hasAllLabels,
 	isHidden,
 	isName,
+	isParent,
 	isSize,
 	isType,
-	isParent,
 } from "./metadata-validations"
 import { Metadata } from "./metadata.impl"
 

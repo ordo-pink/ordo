@@ -1,6 +1,8 @@
 // SPDX-FileCopyrightText: Copyright 2024, 谢尔盖||↓ and the Ordo.pink contributors
 // SPDX-License-Identifier: Unlicense
 
+import { TResult } from "@ordo-pink/result"
+
 /**
  * A constructor for `Some`.
  *
@@ -17,9 +19,13 @@ export type TSomeOptionConstructorFn = <_TSome>(value: _TSome) => TOption<_TSome
  */
 export type TNoneOptionConstructorFn = () => TOption<never>
 
-export type TFromNullableOptionConstructorFn = <_TSome>(
-	value?: _TSome | null,
-) => TOption<NonNullable<_TSome>>
+export type TFromNullableOptionConstructorFn = <$TSome>(
+	value?: $TSome | null,
+) => TOption<NonNullable<$TSome>>
+
+export type TFromResultOptionConstructorFn = <$TSome>(
+	result: TResult<$TSome, any>,
+) => TOption<$TSome>
 
 /**
  * Type `Option` represents an optional value. Every `Option` is either `Some`
@@ -56,9 +62,24 @@ export type TOptionStatic = {
 	 * @returns `Some<Type> | None`
 	 */
 	fromNullable: TFromNullableOptionConstructorFn
+
+	fromResult: TFromResultOptionConstructorFn
+
+	ops: {
+		map: TOptionMapOperatorFn
+		chain: TOptionChainOperatorFn
+	}
 }
 
-export type TOption<TSome> = {
+export type TOptionMapOperatorFn = <$TSome, $TNewSome>(
+	onSome: (onSome: $TSome) => $TNewSome,
+) => (option: TOption<$TSome>) => TOption<$TNewSome>
+
+export type TOptionChainOperatorFn = <$TSome, $TNewSome>(
+	onSome: (option: $TSome) => TOption<$TNewSome>,
+) => (option: TOption<$TSome>) => TOption<$TNewSome>
+
+export type TOption<_TSome> = {
 	/**
 	 * `Option`s are marked with `isOption` -> `true`.
 	 *
@@ -93,7 +114,7 @@ export type TOption<TSome> = {
 	 *
 	 * @returns `TSome | undefined`
 	 */
-	unwrap: () => TSome | undefined
+	unwrap: () => _TSome | undefined
 
 	/**
 	 * Safely extract the contained value by providing handlers for cases when it
@@ -103,7 +124,11 @@ export type TOption<TSome> = {
 	 * @returns Union of return types of the handlers.
 	 */
 	cata: <TNewSome, TNewNone>(explosion: {
-		Some: (some: TSome) => TNewSome
+		Some: (some: _TSome) => TNewSome
 		None: () => TNewNone
 	}) => TNewSome | TNewNone
+
+	pipe: <_TNewSome_>(
+		operator: (option: TOption<_TSome>) => TOption<_TNewSome_>,
+	) => TOption<_TNewSome_>
 }

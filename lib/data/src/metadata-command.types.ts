@@ -2,9 +2,9 @@ import type { TResult } from "@ordo-pink/result"
 
 import type { TCreateMetadataParams, TMetadata, TMetadataProps } from "./metadata.types"
 import type { FSID } from "./data.types"
-import type { RRR, TRrr } from "./metadata.errors"
 import type { TMetadataQuery } from "./metadata-query.types"
-import type { TUserQuery } from "./metadata-repository.types"
+import type { TRrr } from "./metadata.errors"
+import type { TUserQuery } from "./user-query.types"
 
 export type TMetadatCommandConstructor = (
 	metadataQuery: TMetadataQuery,

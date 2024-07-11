@@ -23,7 +23,7 @@ describe("metadata-repository", () => {
 		})
 
 		it("should return metadata", () => {
-			const metadata = [Metadata.from({ name: "a", parent: null, user: "a-a-a-a-a" })]
+			const metadata = [Metadata.from({ name: "a", parent: null, author_id: "a-a-a-a-a" })]
 
 			metadataRepository.put(metadata)
 
@@ -35,7 +35,7 @@ describe("metadata-repository", () => {
 
 	describe("put", () => {
 		it("should return void if metadata is correct", () => {
-			const metadata = [Metadata.from({ name: "a", parent: null, user: "a-a-a-a-a" })]
+			const metadata = [Metadata.from({ name: "a", parent: null, author_id: "a-a-a-a-a" })]
 			const result = metadataRepository.put(metadata).unwrap()
 
 			expect(result).toEqual(undefined)

@@ -116,3 +116,8 @@ export const override =
 		increment: __Increment,
 	) =>
 	(obj: _Object): _Object => ({ ...obj, increment })
+
+export const firstMatched =
+	<T>(f: (x: T) => boolean) =>
+	(xs: T[]) =>
+		xs.find(i => f(i))

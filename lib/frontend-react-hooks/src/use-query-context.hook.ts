@@ -3,7 +3,7 @@ import { createContext, useContext } from "react"
 import { type TMetadataQuery, type TUserQuery } from "@ordo-pink/data"
 import { callOnce } from "@ordo-pink/tau"
 
-const QueryContext = createContext<{ metadataQuery: TMetadataQuery; userQuery: TUserQuery }>(
+const QueryContext = createContext<{ metadata_query: TMetadataQuery; user_query: TUserQuery }>(
 	{} as any,
 )
 

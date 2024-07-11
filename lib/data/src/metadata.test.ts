@@ -8,12 +8,12 @@ import { Metadata } from "./metadata.impl"
 const fsid = crypto.randomUUID()
 const link = crypto.randomUUID()
 
-const test1 = Metadata.from({ name: "test", parent: null, user: "test-test-test-test-test" })
+const test1 = Metadata.from({ name: "test", parent: null, author_id: "test-test-test-test-test" })
 
 const test2 = Metadata.from({
 	name: "test",
 	parent: null,
-	user: "test-test-test-test-test",
+	author: "test-test-test-test-test",
 	labels: ["test1", "test2"],
 	links: [link],
 	props: { hello: "world" },
@@ -23,10 +23,10 @@ const test2 = Metadata.from({
 const dto = {
 	name: "test",
 	parent: link,
-	createdBy: "asdf-asdf-asdf-asdf-asdf" as const,
-	updatedBy: "asdf-asdf-asdf-asdf-asdf" as const,
-	createdAt: Date.now(),
-	updatedAt: Date.now(),
+	created_by: "asdf-asdf-asdf-asdf-asdf" as const,
+	updated_by: "asdf-asdf-asdf-asdf-asdf" as const,
+	created_at: Date.now(),
+	updated_at: Date.now(),
 	fsid,
 	labels: ["hey", "there"],
 	links: [link],
@@ -38,35 +38,35 @@ const test3 = Metadata.of(dto)
 describe("Metadata", () => {
 	describe("`Metadata.from` required properties", () => {
 		it("getName should return DTO name", () => {
-			expect(test1.getName()).toEqual("test")
+			expect(test1.get_name()).toEqual("test")
 		})
 
 		it("getParent should return DTO parent", () => {
-			expect(test1.getParent()).toEqual(null)
+			expect(test1.get_parent()).toEqual(null)
 		})
 
 		it("getCreatedBy should return DTO createdBy", () => {
-			expect(test1.getCreatedBy()).toEqual("test-test-test-test-test")
+			expect(test1.get_created_by()).toEqual("test-test-test-test-test")
 		})
 
 		it("getUpdatedBy should return DTO createdBy", () => {
-			expect(test1.getUpdatedBy()).toEqual("test-test-test-test-test")
+			expect(test1.get_updated_by()).toEqual("test-test-test-test-test")
 		})
 	})
 
 	describe("getType", () => {
 		it("should return standard DTO type if it was not provided", () => {
-			expect(test1.getType()).toEqual("text/ordo")
+			expect(test1.get_type()).toEqual("text/ordo")
 		})
 
 		it("should return provided DTO type", () => {
-			expect(test2.getType()).toEqual("application/test")
+			expect(test2.get_type()).toEqual("application/test")
 		})
 	})
 
 	describe("getCreatedAt", () => {
 		it("should return DTO createdAt as a date", () => {
-			const createdAt = test1.getCreatedAt()
+			const createdAt = test1.get_created_at()
 
 			expect(createdAt).toBeDefined()
 			expect(createdAt).toBeInstanceOf(Date)
@@ -76,7 +76,7 @@ describe("Metadata", () => {
 
 	describe("getUpdatedAt", () => {
 		it("should return DTO updatedAt as a date", () => {
-			const updatedAt = test1.getUpdatedAt()
+			const updatedAt = test1.get_updated_at()
 
 			expect(updatedAt).toBeDefined()
 			expect(updatedAt).toBeInstanceOf(Date)
@@ -86,96 +86,96 @@ describe("Metadata", () => {
 
 	describe("getLinks", () => {
 		it("should return DTO links", () => {
-			expect(test1.getLinks()).toEqual([])
-			expect(test2.getLinks()).toEqual([link])
+			expect(test1.get_links()).toEqual([])
+			expect(test2.get_links()).toEqual([link])
 		})
 	})
 
 	describe("getLabels", () => {
 		it("should return DTO labels", () => {
-			expect(test1.getLabels()).toEqual([])
-			expect(test2.getLabels()).toEqual(["test1", "test2"])
+			expect(test1.get_labels()).toEqual([])
+			expect(test2.get_labels()).toEqual(["test1", "test2"])
 		})
 	})
 
 	describe("getProperty", () => {
 		it("should return Some(property) if it exists", () => {
-			expect(test2.getProperty("hello")).toBeDefined()
-			expect(test2.getProperty("hello").unwrap()).toEqual("world")
+			expect(test2.get_property("hello")).toBeDefined()
+			expect(test2.get_property("hello").unwrap()).toEqual("world")
 		})
 
 		it("should return None() if property does not exist", () => {
-			expect(test1.getProperty("hello")).toBeDefined()
-			expect(test1.getProperty("hello").unwrap()).toEqual(O.none().unwrap()) //TODO
+			expect(test1.get_property("hello")).toBeDefined()
+			expect(test1.get_property("hello").unwrap()).toEqual(O.None().unwrap()) //TODO
 		})
 	})
 
 	describe("size", () => {
 		it("getSize should return item size", () => {
-			expect(test1.getSize()).toEqual(0)
-			expect(test2.getSize()).toEqual(0)
-			expect(test3.getSize()).toEqual(1280)
+			expect(test1.get_size()).toEqual(0)
+			expect(test2.get_size()).toEqual(0)
+			expect(test3.get_size()).toEqual(1280)
 		})
 
 		it("getReadableSize should return valid readable size", () => {
-			expect(test1.getReadableSize()).toEqual("0B")
-			expect(test3.getReadableSize()).toEqual("1.25KB")
+			expect(test1.get_readable_size()).toEqual("0B")
+			expect(test3.get_readable_size()).toEqual("1.25KB")
 		})
 	})
 
 	describe("getFSID", () => {
 		it("should return DTO FSID", () => {
-			expect(test1.getFSID()).toBeDefined()
-			expect(isUUID(test1.getFSID())).toBeTrue()
-			expect(test3.getFSID()).toEqual(fsid)
+			expect(test1.get_fsid()).toBeDefined()
+			expect(isUUID(test1.get_fsid())).toBeTrue()
+			expect(test3.get_fsid()).toEqual(fsid)
 		})
 	})
 
 	describe("toDTO", () => {
 		it("should return DTO stored enclosed in Metadata", () => {
-			expect(test3.toDTO()).toEqual(dto)
+			expect(test3.to_dto()).toEqual(dto)
 		})
 	})
 
 	describe("hasLabel", () => {
 		it("should return a boolean reflecting whether the DTO includes a label", () => {
-			expect(test2.hasLabel("test1")).toBeTrue()
-			expect(test2.hasLabel("asdf")).toBeFalse()
+			expect(test2.has_label("test1")).toBeTrue()
+			expect(test2.has_label("asdf")).toBeFalse()
 		})
 	})
 
 	describe("hasLabels", () => {
 		it("should return a boolean reflecting whether the DTO has labels", () => {
-			expect(test2.hasLabels()).toBeTrue()
-			expect(test1.hasLabels()).toBeFalse()
+			expect(test2.has_labels()).toBeTrue()
+			expect(test1.has_labels()).toBeFalse()
 		})
 	})
 
 	describe("hasLinkTo", () => {
 		it("should return a boolean reflecting whether the DTO includes a link to", () => {
-			expect(test2.hasLinkTo(link)).toBeTrue()
-			expect(test1.hasLinkTo(link)).toBeFalse()
+			expect(test2.has_link_to(link)).toBeTrue()
+			expect(test1.has_link_to(link)).toBeFalse()
 		})
 	})
 
 	describe("hasLinks", () => {
 		it("should return a boolean reflecting whether the DTO has links", () => {
-			expect(test2.hasLinks()).toBeTrue()
-			expect(test1.hasLinks()).toBeFalse()
+			expect(test2.has_links()).toBeTrue()
+			expect(test1.has_links()).toBeFalse()
 		})
 	})
 
 	describe("isRootChild", () => {
 		it("should return a boolean reflecting whether the DTO parent is null", () => {
-			expect(test1.isRootChild()).toBeTrue()
-			expect(test3.isRootChild()).toBeFalse()
+			expect(test1.is_root_child()).toBeTrue()
+			expect(test3.is_root_child()).toBeFalse()
 		})
 	})
 
 	describe("isChildOf", () => {
 		it("should return a boolean reflecting whether the DTO parent is given FSID", () => {
-			expect(test3.isChildOf(link)).toBeTrue()
-			expect(test1.isChildOf(link)).toBeFalse()
+			expect(test3.is_child_of(link)).toBeTrue()
+			expect(test1.is_child_of(link)).toBeFalse()
 		})
 	})
 })

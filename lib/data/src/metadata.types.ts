@@ -7,10 +7,10 @@ export type TMetadataProps = Readonly<Record<string, any>>
 export type TCreateMetadataParams<_TProps extends TMetadataProps = TMetadataProps> = Partial<
 	Omit<
 		TMetadataDTO<_TProps>,
-		"createdBy" | "createdAt" | "size" | "updatedAt" | "updatedBy" | "fsid"
+		"created_by" | "created_at" | "size" | "updated_at" | "updated_by" | "fsid"
 	>
 > &
-	Pick<TMetadataDTO<_TProps>, "name" | "parent"> & { user: UserID }
+	Pick<TMetadataDTO<_TProps>, "name" | "parent"> & { author_id: UserID }
 
 export type TMetadataStatic = {
 	from: <_TProps extends TMetadataProps = TMetadataProps>(
@@ -28,33 +28,33 @@ export type TMetadataDTO<_TProps extends TMetadataProps = TMetadataProps> = Read
 	links: FSID[]
 	labels: string[]
 	type: string
-	createdAt: number
-	createdBy: UserID
-	updatedAt: number
-	updatedBy: UserID
+	created_at: number
+	created_by: UserID
+	updated_at: number
+	updated_by: UserID
 	size: number
 	props?: _TProps
 }>
 
 export type TMetadata<_TProps extends TMetadataProps = TMetadataProps> = {
-	getFSID: () => FSID
-	getName: () => string
-	getParent: () => FSID | null
-	isRootChild: () => boolean
-	isChildOf: (parent: FSID) => boolean
-	getLinks: () => FSID[]
-	hasLinks: () => boolean
-	hasLinkTo: (link: FSID) => boolean
-	getLabels: () => string[]
-	hasLabels: () => boolean
-	hasLabel: (label: string) => boolean
-	getType: () => string
-	getCreatedAt: () => Date
-	getCreatedBy: () => UserID
-	getUpdatedAt: () => Date
-	getUpdatedBy: () => UserID
-	getSize: () => number
-	getReadableSize: () => string
-	getProperty: <_TKey_ extends keyof _TProps>(key: _TKey_) => TOption<NonNullable<_TProps[_TKey_]>>
-	toDTO: () => TMetadataDTO<_TProps>
+	get_fsid: () => FSID
+	get_name: () => string
+	get_parent: () => FSID | null
+	is_root_child: () => boolean
+	is_child_of: (parent: FSID) => boolean
+	get_links: () => FSID[]
+	has_links: () => boolean
+	has_link_to: (link: FSID) => boolean
+	get_labels: () => string[]
+	has_labels: () => boolean
+	has_label: (label: string) => boolean
+	get_type: () => string
+	get_created_at: () => Date
+	get_created_by: () => UserID
+	get_updated_at: () => Date
+	get_updated_by: () => UserID
+	get_size: () => number
+	get_readable_size: () => string
+	get_property: <_TKey_ extends keyof _TProps>(key: _TKey_) => TOption<NonNullable<_TProps[_TKey_]>>
+	to_dto: () => TMetadataDTO<_TProps>
 }

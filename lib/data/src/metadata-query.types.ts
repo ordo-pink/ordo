@@ -6,89 +6,87 @@ import type { TMetadata } from "./metadata.types"
 import type { TMetadataRepository } from "./metadata-repository.types"
 import type { TRrr } from "./metadata.errors"
 
-export type TMetadataQueryOptions = { showHidden?: boolean }
+export type TMetadataQueryOptions = { show_hidden?: boolean }
 
 export type TMetadataQueryStatic = {
 	of: (metadataRepository: TMetadataRepository) => TMetadataQuery
 }
 
 export type TMetadataQuery = {
-	metadataRepository: TMetadataRepository
-
 	get: (options?: TMetadataQueryOptions) => TResult<TMetadata[], TRrr<"EAGAIN">>
 
-	getByFSID: (
+	get_by_fsid: (
 		fsid: FSID,
 		options?: TMetadataQueryOptions,
 	) => TResult<TOption<TMetadata>, TRrr<"EAGAIN" | "EINVAL">>
 
 	total: (options?: TMetadataQueryOptions) => TResult<number, TRrr<"EAGAIN">>
 
-	getByNameAndParent: (
+	get_by_name_and_parent: (
 		name: string,
 		parent: FSID | null,
 		options?: TMetadataQueryOptions,
 	) => TResult<TOption<TMetadata>, TRrr<"EAGAIN" | "EINVAL">>
 
-	getByLabels: (
+	get_by_labels: (
 		labels: string[],
 		options?: TMetadataQueryOptions,
 	) => TResult<TMetadata[], TRrr<"EAGAIN" | "EINVAL">>
 
-	hasIncomingLinks: (
+	has_incoming_links: (
 		fsid: FSID,
 		options?: TMetadataQueryOptions,
 	) => TResult<boolean, TRrr<"EAGAIN" | "EINVAL" | "ENOENT">>
 
-	getIncomingLinks: (
+	get_incoming_links: (
 		fsid: FSID,
 		options?: TMetadataQueryOptions,
 	) => TResult<TMetadata[], TRrr<"EAGAIN" | "EINVAL" | "ENOENT">>
 
-	getParent: (
+	get_parent: (
 		fsid: FSID,
 		options?: TMetadataQueryOptions,
 	) => TResult<TOption<TMetadata>, TRrr<"EAGAIN" | "EINVAL" | "ENOENT">>
 
-	getAncestors: (
+	get_ancestors: (
 		fsid: FSID,
 		options?: TMetadataQueryOptions,
 	) => TResult<TMetadata[], TRrr<"EAGAIN" | "EINVAL" | "ENOENT">>
 
-	hasAncestor: (
+	has_ancestor: (
 		fsid: FSID,
 		ancestor: FSID,
 		options?: TMetadataQueryOptions,
 	) => TResult<boolean, TRrr<"EAGAIN" | "EINVAL" | "ENOENT">>
 
-	hasChild: (
+	has_child: (
 		fsid: FSID,
 		child: FSID,
 		options?: TMetadataQueryOptions,
 	) => TResult<boolean, TRrr<"EAGAIN" | "EINVAL" | "ENOENT">>
 
-	hasChildren: (
+	has_children: (
 		fsid: FSID,
 		options?: TMetadataQueryOptions,
 	) => TResult<boolean, TRrr<"EAGAIN" | "EINVAL" | "ENOENT">>
 
-	getChildren: (
+	get_children: (
 		fsid: FSID,
 		options?: TMetadataQueryOptions,
 	) => TResult<TMetadata[], TRrr<"EAGAIN" | "EINVAL" | "ENOENT">>
 
-	hasDescendent: (
+	has_descendent: (
 		fsid: FSID,
 		descendent: FSID,
 		options?: TMetadataQueryOptions,
 	) => TResult<boolean, TRrr<"EAGAIN" | "EINVAL" | "ENOENT">>
 
-	hasDescendents: (
+	has_descendents: (
 		fsid: FSID,
 		options?: TMetadataQueryOptions,
 	) => TResult<boolean, TRrr<"EAGAIN" | "EINVAL" | "ENOENT">>
 
-	getDescendents: (
+	get_descendents: (
 		fsid: FSID,
 		options?: TMetadataQueryOptions,
 		accumulator?: TMetadata[],

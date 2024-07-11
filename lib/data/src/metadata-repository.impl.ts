@@ -1,7 +1,7 @@
-import { R } from "@ordo-pink/result"
+import { Result } from "@ordo-pink/result"
 
-import { type TMetadataRepositoryStatic } from "./metadata-repository.types"
 import { RRR } from "./metadata.errors"
+import { type TMetadataRepositoryStatic } from "./metadata-repository.types"
 
 const LOCATION = "MetadataRepository"
 
@@ -11,14 +11,16 @@ const einval = RRR.codes.einval(LOCATION)
 export const MetadataRepository: TMetadataRepositoryStatic = {
 	of: metadata$ => ({
 		get: () =>
-			R.try(() => metadata$.getValue())
-				.pipe(R.ops.chain(R.fromNullable))
-				.pipe(R.ops.errMap(() => eagain(".get: Metadata[] not initialised"))),
+			Result.Try(() => metadata$.getValue())
+				.pipe(Result.ops.chain(Result.FromNullable))
+				.pipe(Result.ops.err_map(() => eagain())),
 
 		put: metadata =>
-			R.fromNullable(metadata)
-				.pipe(R.ops.chain(() => R.if(Array.isArray(metadata))))
-				.pipe(R.ops.chain(() => R.try(() => metadata$.next(metadata))))
-				.pipe(R.ops.errMap(() => einval(`.put: ${metadata as any}`))),
+			Result.FromNullable(metadata)
+				.pipe(Result.ops.chain(() => Result.If(Array.isArray(metadata)))) // TODO: Add validations
+				.pipe(Result.ops.chain(() => Result.Try(() => metadata$.next(metadata))))
+				.pipe(Result.ops.err_map(() => einval(`.put: ${JSON.stringify(metadata)}`))),
 	}),
 }
+
+export const MR = MetadataRepository

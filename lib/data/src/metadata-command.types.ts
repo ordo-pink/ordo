@@ -3,12 +3,14 @@ import type { TResult } from "@ordo-pink/result"
 import type { TCreateMetadataParams, TMetadata, TMetadataProps } from "./metadata.types"
 import type { FSID } from "./data.types"
 import type { TMetadataQuery } from "./metadata-query.types"
+import type { TMetadataRepository } from "./metadata-repository.types"
 import type { TRrr } from "./metadata.errors"
 import type { TUserQuery } from "./user-query.types"
 
 export type TMetadatCommandConstructor = (
-	metadataQuery: TMetadataQuery,
-	userQuery: TUserQuery,
+	metadata_repository: TMetadataRepository,
+	metadata_query: TMetadataQuery,
+	user_query: TUserQuery,
 ) => TMetadataCommand
 export type TMetadataCommandStatic = { of: TMetadatCommandConstructor }
 
@@ -21,51 +23,54 @@ export type TMetadataCommand = {
 
 	remove: (fsid: FSID) => TResult<void, TRrr<"EAGAIN" | "EINVAL" | "ENOENT">>
 
-	appendChild: (
+	append_child: (
 		fsid: FSID,
 		child: FSID,
 	) => TResult<void, TRrr<"EAGAIN" | "EINVAL" | "ENOENT" | "EEXIST" | "ENXIO">>
 
-	addLabels: (
+	add_labels: (
 		fsid: FSID,
 		...labels: string[]
 	) => TResult<void, TRrr<"EAGAIN" | "EINVAL" | "ENOENT">>
 
-	removeLabels: (
+	remove_labels: (
 		fsid: FSID,
 		...labels: string[]
 	) => TResult<void, TRrr<"EAGAIN" | "EINVAL" | "ENOENT">>
 
-	replaceLabels: (
+	replace_labels: (
 		fsid: FSID,
 		labels: string[],
 	) => TResult<void, TRrr<"EAGAIN" | "EINVAL" | "ENOENT">>
 
-	setSize: (fsid: FSID, size: number) => TResult<void, TRrr<"EAGAIN" | "EINVAL" | "ENOENT">>
+	set_size: (fsid: FSID, size: number) => TResult<void, TRrr<"EAGAIN" | "EINVAL" | "ENOENT">>
 
-	addLinks: (fsid: FSID, ...links: FSID[]) => TResult<void, TRrr<"EAGAIN" | "EINVAL" | "ENOENT">>
+	add_links: (fsid: FSID, ...links: FSID[]) => TResult<void, TRrr<"EAGAIN" | "EINVAL" | "ENOENT">>
 
-	removeLinks: (fsid: FSID, ...links: FSID[]) => TResult<void, TRrr<"EAGAIN" | "EINVAL" | "ENOENT">>
+	remove_links: (
+		fsid: FSID,
+		...links: FSID[]
+	) => TResult<void, TRrr<"EAGAIN" | "EINVAL" | "ENOENT">>
 
-	replaceLinks: (fsid: FSID, links: FSID[]) => TResult<void, TRrr<"EAGAIN" | "EINVAL" | "ENOENT">>
+	replace_links: (fsid: FSID, links: FSID[]) => TResult<void, TRrr<"EAGAIN" | "EINVAL" | "ENOENT">>
 
-	setParent: (
+	set_parent: (
 		fsid: FSID,
 		parent: FSID | null,
 	) => TResult<void, TRrr<"EAGAIN" | "EINVAL" | "ENOENT" | "ENXIO" | "EEXIST">>
 
-	setName: (
+	set_name: (
 		fsid: FSID,
 		name: string,
 	) => TResult<void, TRrr<"EAGAIN" | "EINVAL" | "ENOENT" | "EEXIST">>
 
-	setProperty: <_TProps_ extends TMetadataProps, __TKey__ extends keyof _TProps_>(
+	set_property: <_TProps_ extends TMetadataProps, __TKey__ extends keyof _TProps_>(
 		fsid: FSID,
 		key: __TKey__,
 		value: _TProps_[__TKey__],
 	) => TResult<void, TRrr<"EAGAIN" | "EINVAL" | "ENOENT">>
 
-	removeProperty: <_TProps_ extends TMetadataProps, __TKey__ extends keyof _TProps_>(
+	remove_property: <_TProps_ extends TMetadataProps, __TKey__ extends keyof _TProps_>(
 		fsid: FSID,
 		key: __TKey__,
 	) => TResult<void, TRrr<"EAGAIN" | "EINVAL" | "ENOENT">>

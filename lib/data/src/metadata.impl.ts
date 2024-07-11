@@ -3,7 +3,15 @@ import { O } from "@ordo-pink/option"
 import { type TMetadataStatic } from "./metadata.types"
 
 export const Metadata: TMetadataStatic = {
-	from: ({ name, parent, user, type = "text/ordo", labels = [], links = [], props = {} as any }) =>
+	from: ({
+		name,
+		parent,
+		author_id: user,
+		type = "text/ordo",
+		labels = [],
+		links = [],
+		props = {} as any,
+	}) =>
 		Metadata.of({
 			name,
 			parent,
@@ -12,43 +20,45 @@ export const Metadata: TMetadataStatic = {
 			labels,
 			links,
 			props,
-			createdAt: Date.now(),
-			updatedAt: Date.now(),
-			createdBy: user,
-			updatedBy: user,
+			created_at: Date.now(),
+			updated_at: Date.now(),
+			created_by: user,
+			updated_by: user,
 			size: 0,
 		}),
 	of: dto => ({
-		getFSID: () => dto.fsid,
-		getName: () => dto.name,
-		getType: () => dto.type,
-		getCreatedAt: () => new Date(dto.createdAt),
-		getCreatedBy: () => dto.createdBy,
-		getUpdatedAt: () => new Date(dto.updatedAt),
-		getUpdatedBy: () => dto.updatedBy,
-		getLabels: () => dto.labels,
-		getLinks: () => [...dto.links],
-		getParent: () => dto.parent,
-		getProperty: key =>
-			O.fromNullable(dto.props).cata({
-				Some: props => (key in props ? O.some(props[key]) : O.none()),
-				None: () => O.none(),
+		get_fsid: () => dto.fsid,
+		get_name: () => dto.name,
+		get_type: () => dto.type,
+		get_created_at: () => new Date(dto.created_at),
+		get_created_by: () => dto.created_by,
+		get_updated_at: () => new Date(dto.updated_at),
+		get_updated_by: () => dto.updated_by,
+		get_labels: () => dto.labels,
+		get_links: () => [...dto.links],
+		get_parent: () => dto.parent,
+		get_property: key =>
+			O.FromNullable(dto.props).cata({
+				Some: props => (key in props ? O.Some(props[key]) : O.None()),
+				None: () => O.None(),
 			}),
-		getReadableSize: () => getReadableSize(dto.size),
-		getSize: () => dto.size,
-		hasLabel: label => dto.labels.includes(label),
-		hasLabels: () => dto.labels.length > 0,
-		hasLinks: () => dto.links.length > 0,
-		hasLinkTo: fsid => dto.links.includes(fsid),
-		isChildOf: fsid => dto.parent === fsid,
-		isRootChild: () => dto.parent === null,
-		toDTO: () => dto,
+		get_readable_size: () => get_readable_size(dto.size),
+		get_size: () => dto.size,
+		has_label: label => dto.labels.includes(label),
+		has_labels: () => dto.labels.length > 0,
+		has_links: () => dto.links.length > 0,
+		has_link_to: fsid => dto.links.includes(fsid),
+		is_child_of: fsid => dto.parent === fsid,
+		is_root_child: () => dto.parent === null,
+		to_dto: () => dto,
 	}),
 }
 
+export const M = Metadata
+
 // --- Internal ---
 
-const getReadableSize = (size: number, decimals = 2) => {
+const get_readable_size = (size: number, decimals = 2) => {
 	if (size <= 0) return "0B"
 
 	const k = 1024

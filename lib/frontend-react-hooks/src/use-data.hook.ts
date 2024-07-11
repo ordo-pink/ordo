@@ -26,7 +26,7 @@ import {
 	type PlainData,
 	type TMetadata,
 } from "@ordo-pink/data"
-import { O, TOption } from "@ordo-pink/option"
+import { Option, TOption } from "@ordo-pink/option"
 import { Switch } from "@ordo-pink/switch"
 import { data$ } from "@ordo-pink/frontend-stream-data"
 
@@ -36,24 +36,82 @@ import { useStrictSubscription } from "./use-strict-subscription.hook"
 
 type TItemToFSIDParam = TMetadata | FSID | null
 
-const itemToFSID = (item?: TItemToFSIDParam): TOption<FSID> =>
+const item_to_fsid = (item?: TItemToFSIDParam): TOption<FSID> =>
 	Switch.empty()
-		.case(Boolean(item && (item as TMetadata).getFSID), () => O.some((item as TMetadata).getFSID()))
-		.case(typeof item === "string", () => O.some(item as FSID))
-		.default(() => O.none())
+		.case(Boolean(item && (item as TMetadata).get_fsid), () =>
+			Option.Some((item as TMetadata).get_fsid()),
+		)
+		.case(typeof item === "string", () => Option.Some(item as FSID))
+		.default(() => Option.None())
 
-export const useChildren_m = (
+export const useMetadataQuery = () => {
+	const { metadata_query } = useQueryContext()
+
+	return metadata_query
+}
+
+export const useChildrenO = (
 	item?: TItemToFSIDParam,
-	showHidden = false,
+	show_hidden = false,
 ): TOption<TMetadata[]> => {
-	const { metadataQuery } = useQueryContext()
+	const { metadata_query } = useQueryContext()
 
-	return itemToFSID(item).cata({
+	return item_to_fsid(item).cata({
 		Some: fsid =>
-			metadataQuery.getChildren(fsid, { showHidden }).cata({ Ok: x => x, Err: () => O.none() }),
-		None: () => O.none(),
+			metadata_query
+				.get_children(fsid, { show_hidden })
+				.cata({ Ok: Option.Some, Err: () => Option.None() }),
+		None: () => Option.None(),
 	})
 }
+
+export const useDataO = (show_hidden?: boolean): TOption<TMetadata[]> => {
+	const { metadata_query } = useQueryContext()
+
+	return metadata_query.get({ show_hidden }).cata({ Ok: Option.Some, Err: Option.None })
+}
+
+export const useLabelsO = (show_hidden?: boolean): TOption<string[]> => {
+	const data_option = useDataO(show_hidden)
+
+	return data_option.cata({
+		Some: data => Option.Some(Array.from(new Set(data.flatMap(item => item.get_labels()) ?? []))),
+		None: () => Option.None(),
+	})
+}
+
+export const useDataByLabelsO = (labels: string[], show_hidden?: boolean): TOption<TMetadata[]> => {
+	const { metadata_query } = useQueryContext()
+
+	return metadata_query
+		.get_by_labels(labels, { show_hidden })
+		.cata({ Err: () => Option.None(), Ok: Option.Some })
+}
+
+export const useAncestorsO = (
+	item: TItemToFSIDParam,
+	show_hidden?: boolean,
+): TOption<TMetadata[]> => {
+	const { metadata_query } = useQueryContext()
+
+	return item_to_fsid(item)
+		.pipe(Option.ops.map(fsid => metadata_query.get_ancestors(fsid, { show_hidden })))
+		.pipe(Option.ops.chain(Option.FromResult))
+}
+
+export const useDataByFsidO = (fsid?: FSID | null, show_hidden?: boolean): TOption<TMetadata> => {
+	const { metadata_query } = useQueryContext()
+
+	return Option.FromNullable(fsid).cata({
+		Some: fsid =>
+			metadata_query
+				.get_by_fsid(fsid, { show_hidden })
+				.cata({ Ok: x => x, Err: () => Option.None() }),
+		None: () => Option.None(),
+	})
+}
+
+// --- Deprecated ---
 
 export const useChildren = (item: PlainData | FSID | "root" | null, showHidden = false) => {
 	const data = useData(showHidden)
@@ -66,12 +124,6 @@ export const useChildren = (item: PlainData | FSID | "root" | null, showHidden =
 	return Switch.empty()
 		.case(!data || !item, () => [])
 		.default(() => data.filter(item => item.parent === fsid))
-}
-
-export const useDataO = (showHidden?: boolean): TOption<TMetadata[]> => {
-	const { metadataQuery } = useQueryContext()
-
-	return metadataQuery.get({ showHidden }).cata({ Ok: x => x, Err: O.none })
 }
 
 export const useData = (showHidden = false) => {
@@ -100,40 +152,14 @@ export const useChildTree = (source?: PlainData | FSID | null | "root") => {
 	return DataQuery.of(data$).getDataTreeE(source)
 }
 
-export const useLabelsO = (showHidden?: boolean): TOption<string[]> => {
-	const dataOption = useDataO(showHidden)
-
-	return dataOption.cata({
-		Some: data => O.some(Array.from(new Set(data.flatMap(item => item.getLabels()) ?? []))),
-		None: () => O.none(),
-	})
-}
-
 export const useDataLabels = (showHidden = false) => {
 	const data = useData(showHidden)
 
 	return Array.from(new Set(data?.flatMap(item => item.labels) ?? []))
 }
 
-export const useDataByLabelsO = (labels: string[], showHidden?: boolean): TOption<TMetadata[]> => {
-	const { metadataQuery } = useQueryContext()
-
-	return metadataQuery.getByLabels(labels, { showHidden }).cata({ Err: () => O.none(), Ok: x => x })
-}
-
 export const useDataByLabel = (labels: string[]) =>
 	useSelectDataList(item => labels.every(label => item.labels.includes(label)))
-
-export const useAncestorsO = (
-	item: TItemToFSIDParam,
-	showHidden?: boolean,
-): TOption<TMetadata[]> => {
-	const { metadataQuery } = useQueryContext()
-
-	return itemToFSID(item)
-		.pipe(O.ops.map(fsid => metadataQuery.getAncestors(fsid, { showHidden })))
-		.pipe(O.ops.chain(O.fromResult))
-}
 
 export const useParentChain = (fsid: FSID, showHidden = false) => {
 	const data = useData(showHidden)
@@ -158,16 +184,6 @@ export const useDataByFSID = (fsid?: FSID | null) => {
 	const data = useSelectData(item => item.fsid === fsid)
 
 	return data
-}
-
-export const useDataByFSIDO = (fsid?: FSID | null, showHidden?: boolean): TOption<TMetadata> => {
-	const { metadataQuery } = useQueryContext()
-
-	return O.fromNullable(fsid).cata({
-		Some: fsid =>
-			metadataQuery.getByFSID(fsid, { showHidden }).cata({ Ok: x => x, Err: () => O.none() }),
-		None: () => O.none(),
-	})
 }
 
 export const useDataByName = (name: string, parent: FSID | null) => {

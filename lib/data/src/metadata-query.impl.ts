@@ -1,19 +1,13 @@
-import { F, T, isUUID, negate } from "@ordo-pink/tau"
+import { isUUID, negate } from "@ordo-pink/tau"
 import { O } from "@ordo-pink/option"
 import { R } from "@ordo-pink/result"
 
-import {
-	areLabels,
-	hasAllLabels,
-	isHidden,
-	isLabel,
-	isName,
-	isParent,
-} from "./metadata-validations"
+import { are_lbls, has_all_lbls, is_hidden, is_name, is_parent } from "./metadata-validations"
 import { type FSID } from "./data.types"
 import { RRR } from "./metadata.errors"
 import { type TMetadata } from "./metadata.types"
 import { type TMetadataQueryStatic } from "./metadata-query.types"
+import { get_wrong_label } from "./metadata.utils"
 
 const LOCATION = "MetadataQuery"
 
@@ -22,171 +16,120 @@ const enoent = RRR.codes.enoent(LOCATION)
 
 export const MetadataQuery: TMetadataQueryStatic = {
 	of: repo => ({
-		metadataRepository: repo,
+		get: ({ show_hidden } = { show_hidden: false }) =>
+			repo.get().pipe(R.ops.map(items => (show_hidden ? items : items.filter(negate(is_hidden))))),
 
-		get: ({ showHidden } = { showHidden: false }) =>
-			repo.get().pipe(R.ops.map(items => (showHidden ? items : items.filter(negate(isHidden))))),
-
-		getByFSID: (fsid, options) =>
-			R.if(isUUID(fsid), { onF: () => einval(`.getByFSID -> fsid: ${fsid}`) })
+		get_by_fsid: (fsid, options) =>
+			R.If(isUUID(fsid), { F: () => einval(`.getByFSID -> fsid: ${fsid}`) })
 				.pipe(R.ops.chain(() => MQ.of(repo).get(options)))
-				.pipe(R.ops.map(m => O.fromNullable(m.find(i => i.getFSID() === fsid)))),
+				.pipe(R.ops.map(m => O.FromNullable(m.find(i => i.get_fsid() === fsid)))),
 
-		getByLabels: (labels, options) =>
-			R.if(areLabels(labels), {
-				onF: () => einval(`.getByLabels -> label: ${_first(negate(isLabel), labels)}`),
-			})
+		get_by_labels: (ls, options) =>
+			R.If(are_lbls(ls), { F: () => einval(`.getByLabels -> label: ${get_wrong_label(ls)}`) })
 				.pipe(R.ops.chain(() => MQ.of(repo).get(options)))
-				.pipe(R.ops.map(metadata => metadata.filter(hasAllLabels(labels)))),
+				.pipe(R.ops.map(metadata => metadata.filter(has_all_lbls(ls)))),
 
-		getByNameAndParent: (name, parent, options) =>
-			R.merge([
-				R.if(isName(name), { onF: () => einval(`.getByNameAndParent -> name: ${name}`) }),
-				R.if(isParent(parent), { onF: () => einval(`.getByNameAndParent -> parent: ${parent}`) }),
+		get_by_name_and_parent: (name, parent, options) =>
+			R.Merge([
+				R.If(is_name(name), { F: () => einval(`.getByNameAndParent -> name: ${name}`) }),
+				R.If(is_parent(parent), { F: () => einval(`.getByNameAndParent -> parent: ${parent}`) }),
 			])
 				.pipe(R.ops.chain(() => MQ.of(repo).get(options)))
-				.pipe(R.ops.map(m => O.fromNullable(m.find(_hasGivenNameAndParent(name, parent))))),
+				.pipe(R.ops.map(m => O.FromNullable(m.find(_has_name_and_parent(name, parent))))),
 
-		getChildren: (fsid, options) =>
-			R.if(isUUID(fsid), { onF: () => einval(`.getChildren -> fsid: ${fsid}`) })
-				.pipe(R.ops.chain(() => MQ.of(repo).getByFSID(fsid, options)))
-				.pipe(
-					R.ops.chain(o =>
-						o.cata({
-							Some: m => R.Ok(m),
-							None: () => R.Err(enoent(`.getChildren -> fsid: ${fsid}`)),
-						}),
-					),
-				)
+		get_children: (fsid, options) =>
+			R.If(isUUID(fsid), { F: () => einval(`.getChildren -> fsid: ${fsid}`) })
+				.pipe(R.ops.chain(() => MQ.of(repo).get_by_fsid(fsid, options)))
+				.pipe(R.ops.chain(o => R.FromOption(o, () => enoent(`.getChildren -> fsid: ${fsid}`))))
 				.pipe(R.ops.chain(() => MQ.of(repo).get(options)))
-				.pipe(R.ops.map(metadata => metadata.filter(item => item.getParent() === fsid))),
+				.pipe(R.ops.map(metadata => metadata.filter(item => item.get_parent() === fsid))),
 
-		getParent: (fsid, options) =>
+		get_parent: (fsid, options) =>
 			MQ.of(repo)
-				.getByFSID(fsid, options)
-				.pipe(
-					R.ops.chain(o =>
-						o.cata({
-							Some: R.Ok,
-							None: () => R.Err(enoent(`.getParent -> fsid: ${fsid}`)),
-						}),
-					),
-				)
-				.pipe(R.ops.map(item => item.getParent()))
-				.pipe(R.ops.chain(i => (i ? MQ.of(repo).getByFSID(i) : R.Ok(O.none())))),
+				.get_by_fsid(fsid, options)
+				.pipe(R.ops.chain(o => R.FromOption(o, () => enoent(`.getParent -> fsid: ${fsid}`))))
+				.pipe(R.ops.map(item => item.get_parent()))
+				.pipe(R.ops.chain(i => (i ? MQ.of(repo).get_by_fsid(i) : R.Ok(O.None())))),
 
-		hasChild: (fsid, child, options) =>
-			R.if(isUUID(child), { onF: () => einval(`.hasChild -> child: ${child}`) })
-				.pipe(R.ops.chain(() => MQ.of(repo).getChildren(fsid, options)))
-				.pipe(
-					R.ops.map(option =>
-						option.cata({
-							Some: metadata => metadata.some(item => item.getFSID() === child),
-							None: () => false,
-						}),
-					),
-				),
+		has_child: (fsid, child, options) =>
+			R.If(isUUID(child), { F: () => einval(`.hasChild -> child: ${child}`) })
+				.pipe(R.ops.chain(() => MQ.of(repo).get_children(fsid, options)))
+				.pipe(R.ops.map(metadata => metadata.some(item => item.get_fsid() === child))),
 
-		getIncomingLinks: (fsid, options) =>
-			R.if(isUUID(fsid), { onF: () => einval(`.getIncomingLinks -> fsid: ${fsid}`) })
+		get_incoming_links: (fsid, options) =>
+			R.If(isUUID(fsid), { F: () => einval(`.getIncomingLinks -> fsid: ${fsid}`) })
 				.pipe(R.ops.chain(() => MQ.of(repo).get(options)))
-				.pipe(
-					R.ops.chain(option =>
-						option.cata({
-							Some: metadata =>
-								R.Ok(O.fromNullable(metadata.filter(item => item.getLinks().includes(fsid)))),
-							None: () => R.Ok(O.none()),
-						}),
-					),
-				),
+				.pipe(R.ops.map(metadata => metadata.filter(item => item.get_links().includes(fsid)))),
 
-		hasIncomingLinks: (fsid, options) =>
+		has_incoming_links: (fsid, options) =>
 			MQ.of(repo)
-				.getIncomingLinks(fsid, options)
-				.pipe(R.ops.map(option => option.cata({ Some: T, None: F }))),
+				.get_incoming_links(fsid, options)
+				.pipe(R.ops.map(metadata => metadata.length > 0)),
 
-		hasChildren: (fsid, options) =>
+		has_children: (fsid, options) =>
 			MQ.of(repo)
-				.getChildren(fsid, options)
-				.pipe(R.ops.map(option => option.cata({ Some: T, None: F }))),
+				.get_children(fsid, options)
+				.pipe(R.ops.map(metadata => metadata.length > 0)),
 
-		getAncestors: (fsid, options) =>
+		has_ancestor: (fsid, ancestor, options) =>
+			R.If(isUUID(ancestor), { F: () => einval(`.hasAncestor -> ancestor: ${ancestor}`) })
+				.pipe(R.ops.chain(() => MQ.of(repo).get_ancestors(fsid, options)))
+				.pipe(R.ops.map(metadata => metadata.some(item => item.get_fsid() === ancestor))),
+
+		has_descendent: (fsid, descendent, options) =>
+			R.If(isUUID(descendent), { F: () => einval(`.hasDescendent -> descendent: ${descendent}`) })
+				.pipe(R.ops.chain(() => MQ.of(repo).get_descendents(fsid, options)))
+				.pipe(R.ops.map(metadata => metadata.some(item => item.get_fsid() === descendent))),
+
+		has_descendents: (fsid, options) =>
 			MQ.of(repo)
-				.getParent(fsid, options)
-				.pipe(
-					R.ops.chain(option => {
-						const ancestors: TMetadata[] = []
-
-						let parent = option
-
-						while (parent !== O.none()) {
-							ancestors.push(parent.unwrap()!)
-
-							MQ.of(repo)
-								.getParent(parent.unwrap()!.getFSID())
-								.pipe(
-									R.ops.tap(option => {
-										parent = option
-									}),
-								)
-						}
-
-						return ancestors.length > 0 ? R.Ok(O.some(ancestors)) : R.Ok(O.none())
-					}),
-				),
-
-		hasAncestor: (fsid, ancestor, options) =>
-			R.if(isUUID(ancestor), { onF: () => einval(`.hasAncestor -> ancestor: ${ancestor}`) })
-				.pipe(R.ops.chain(() => MQ.of(repo).getAncestors(fsid, options)))
-				.pipe(
-					R.ops.map(option =>
-						option.cata({
-							Some: metadata => metadata.some(item => item.getFSID() === ancestor),
-							None: () => false,
-						}),
-					),
-				),
-
-		// TODO:
-		getDescendents: (fsid, options, accumulator = []) =>
-			MQ.of(repo)
-				.getChildren(fsid, options)
-				.pipe(
-					R.ops.chain(option => {
-						if (option !== O.none()) {
-							const children = option.unwrap()!
-
-							accumulator.push(...children)
-
-							for (const child of children) {
-								MQ.of(repo).getDescendents(child.getFSID(), options, accumulator)
-							}
-						}
-
-						return accumulator.length > 0 ? R.Ok(O.some(accumulator)) : R.Ok(O.none())
-					}),
-				),
-		hasDescendent: (fsid, descendent, options) =>
-			R.if(isUUID(descendent), { onF: () => einval(`.hasDescendent -> descendent: ${descendent}`) })
-				.pipe(R.ops.chain(() => MQ.of(repo).getDescendents(fsid, options)))
-				.pipe(
-					R.ops.map(option =>
-						option.cata({
-							Some: metadata => metadata.some(item => item.getFSID() === descendent),
-							None: () => false,
-						}),
-					),
-				),
-
-		hasDescendents: (fsid, options) =>
-			MQ.of(repo)
-				.getDescendents(fsid, options)
-				.pipe(R.ops.map(option => option.cata({ Some: T, None: F }))),
+				.get_descendents(fsid, options)
+				.pipe(R.ops.map(metadata => metadata.length > 0)),
 
 		total: options =>
 			MQ.of(repo)
 				.get(options)
-				.pipe(R.ops.map(option => option.cata({ Some: x => x.length, None: () => 0 }))),
+				.pipe(R.ops.map(metadata => metadata.length)),
+
+		get_ancestors: (fsid, options) =>
+			MQ.of(repo)
+				.get_parent(fsid, options)
+				.pipe(
+					R.ops.map(option => {
+						const ancestors: TMetadata[] = []
+
+						let parentOption = option
+
+						while (parentOption !== O.None()) {
+							const parent = parentOption.unwrap()!
+
+							ancestors.push(parent)
+
+							MQ.of(repo)
+								.get_parent(parent.get_fsid())
+								.pipe(
+									R.ops.tap(option => {
+										parentOption = option
+									}),
+								)
+						}
+
+						return ancestors
+					}),
+				),
+
+		get_descendents: (fsid, options, accumulator = []) =>
+			MQ.of(repo)
+				.get_children(fsid, options)
+				.pipe(
+					R.ops.map(children => {
+						for (const child of children) {
+							MQ.of(repo).get_descendents(child.get_fsid(), options, accumulator)
+						}
+
+						return accumulator
+					}),
+				),
 	}),
 }
 
@@ -195,7 +138,5 @@ export const MQ = MetadataQuery
 // --- Internal ---
 
 type THasGivenNameAndParentFn = (name: string, parent: FSID | null) => (item: TMetadata) => boolean
-const _hasGivenNameAndParent: THasGivenNameAndParentFn = (name, parent) => item =>
-	item.getName() === name && item.getParent() === parent
-
-const _first = <T>(f: (x: T) => boolean, items: T[]) => items.find(item => !f(item))
+const _has_name_and_parent: THasGivenNameAndParentFn = (name, parent) => item =>
+	item.get_name() === name && item.get_parent() === parent

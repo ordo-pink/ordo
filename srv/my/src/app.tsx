@@ -116,7 +116,9 @@ export default function App({ metadataQuery }: P) {
 
 	return fromNullableE(currentActivity).fold(Loading, () => (
 		<ErrorBoundary logError={logError} fallback={<Fallback />}>
-			<QueryContextProvider value={{ metadataQuery, userQuery: null as any }}>
+			<QueryContextProvider
+				value={{ metadata_query: metadataQuery, current_user_query: null as any }}
+			>
 				<Helmet>
 					<title>{title}</title>
 				</Helmet>

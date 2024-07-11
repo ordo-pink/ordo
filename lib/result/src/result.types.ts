@@ -1,6 +1,7 @@
 // SPDX-FileCopyrightText: Copyright 2024, 谢尔盖||↓ and the Ordo.pink contributors
 // SPDX-License-Identifier: Unlicense
 
+import { TOption } from "@ordo-pink/option"
 import type { TSwitch } from "@ordo-pink/switch"
 
 export type TMatchResultFn = <$TOk, $TErr>(
@@ -26,9 +27,14 @@ export type ErrWhat<$T> = $T extends object & {
 		: never
 	: $T
 
-export type TOkResultConstructorFn = <$TOk, $TErr = never>(x: $TOk) => TResult<$TOk, $TErr>
+export type TOkResultConstructorFn = <$TOk, $TErr = never>(ok: $TOk) => TResult<$TOk, $TErr>
 
-export type TErrResultConstructorFn = <$TErr, $TOk = never>(x: $TErr) => TResult<$TOk, $TErr>
+export type TErrResultConstructorFn = <$TErr, $TOk = never>(err: $TErr) => TResult<$TOk, $TErr>
+
+export type TFromOptionConstructorFn = <$TOk, $TErr = void>(
+	option: TOption<$TOk>,
+	on_none?: () => $TErr,
+) => TResult<$TOk, $TErr>
 
 export type TMergeResultConstructorFn = <
 	TSomeThings extends readonly unknown[] | [] | Record<string, unknown>,
@@ -50,51 +56,51 @@ export type TTryResultConstructorFn = <$TOk, $TErr = unknown>(
 
 export type TFromNullableResultConstructorFn = <$TOk, $TErr = null>(
 	x?: $TOk | null,
-	onNull?: () => $TErr,
+	on_null?: () => $TErr,
 ) => TResult<NonNullable<$TOk>, $TErr>
 
 export type TIfResultConstructorFn = <$TOk = undefined, $TErr = undefined>(
 	predicate: boolean,
-	returns?: { onT?: () => $TOk; onF?: () => $TErr },
+	returns?: { T?: () => $TOk; F?: () => $TErr },
 ) => TResult<$TOk, $TErr>
 
 export type TMapResultOperatorFn = <$TOk, $TErr, $TNewOk>(
-	onOk: (x: $TOk) => $TNewOk,
+	on_ok: (x: $TOk) => $TNewOk,
 ) => (result: TResult<$TOk, $TErr>) => TResult<$TNewOk, $TErr>
 
 export type TErrMapResultOperatorFn = <$TOk, $TErr, $TNewRrr>(
-	onErr: (x: $TErr) => $TNewRrr,
+	on_err: (x: $TErr) => $TNewRrr,
 ) => (result: TResult<$TOk, $TErr>) => TResult<$TOk, $TNewRrr>
 
 export type TBiMapResultOperatorFn = <$TOk, $TErr, $TNewOk, $TNewRrr>(
-	onErr: (x: $TErr) => $TNewRrr,
-	onOk: (x: $TOk) => $TNewOk,
+	on_err: (x: $TErr) => $TNewRrr,
+	on_ok: (x: $TOk) => $TNewOk,
 ) => (result: TResult<$TOk, $TErr>) => TResult<$TNewOk, $TNewRrr>
 
 export type TChainResultOperatorFn = <$TOk, $TErr, $TNewOk, $TNewRrr>(
-	onOk: (x: $TOk) => TResult<$TNewOk, $TNewRrr>,
+	on_ok: (x: $TOk) => TResult<$TNewOk, $TNewRrr>,
 ) => (result: TResult<$TOk, $TErr>) => TResult<$TNewOk, $TErr | $TNewRrr>
 
 export type TErrChainResultOperatorFn = <$TOk, $TErr, $TNewOk, $TNewRrr>(
-	onErr: (x: $TErr) => TResult<$TNewOk, $TNewRrr>,
+	on_err: (x: $TErr) => TResult<$TNewOk, $TNewRrr>,
 ) => (result: TResult<$TOk, $TErr>) => TResult<$TOk, $TNewRrr>
 
 export type TBiChainResultOperatorFn = <$TOk, $TErr, $TNewOk, $TNewRrr>(
-	onErr: (x: $TErr) => TResult<$TNewOk, $TNewRrr>,
-	onOk: (x: $TOk) => TResult<$TNewOk, $TNewRrr>,
+	on_err: (x: $TErr) => TResult<$TNewOk, $TNewRrr>,
+	on_ok: (x: $TOk) => TResult<$TNewOk, $TNewRrr>,
 ) => (result: TResult<$TOk, $TErr>) => TResult<$TNewOk, $TNewRrr>
 
 export type TTapResultOperatorFn = <$TOk, $TErr>(
-	onOk: (x: $TOk) => any,
+	on_ok: (x: $TOk) => any,
 ) => (result: TResult<$TOk, $TErr>) => TResult<$TOk, $TErr>
 
 export type TErrTapResultOperatorFn = <$TOk, $TErr>(
-	onErr: (x: $TErr) => any,
+	on_err: (x: $TErr) => any,
 ) => (result: TResult<$TOk, $TErr>) => TResult<$TOk, $TErr>
 
 export type TBiTapResultOperatorFn = <$TOk, $TErr>(
-	onErr: (x: $TErr) => any,
-	onOk: (x: $TOk) => any,
+	on_err: (x: $TErr) => any,
+	on_ok: (x: $TOk) => any,
 ) => (result: TResult<$TOk, $TErr>) => TResult<$TOk, $TErr>
 
 export type TSwapResultOperatorFn = <$TOk, $TErr>() => (
@@ -102,30 +108,32 @@ export type TSwapResultOperatorFn = <$TOk, $TErr>() => (
 ) => TResult<$TErr, $TOk>
 
 export type TResultStatic = {
+	of: TOkResultConstructorFn
 	Ok: TOkResultConstructorFn
 	Err: TErrResultConstructorFn
-	try: TTryResultConstructorFn
-	if: TIfResultConstructorFn
-	fromNullable: TFromNullableResultConstructorFn
-	merge: TMergeResultConstructorFn
+	Try: TTryResultConstructorFn
+	If: TIfResultConstructorFn
+	FromNullable: TFromNullableResultConstructorFn
+	FromOption: TFromOptionConstructorFn
+	Merge: TMergeResultConstructorFn
 	ops: {
 		map: TMapResultOperatorFn
-		errMap: TErrMapResultOperatorFn
+		err_map: TErrMapResultOperatorFn
 		bimap: TBiMapResultOperatorFn
 		chain: TChainResultOperatorFn
-		errChain: TErrChainResultOperatorFn
+		err_chain: TErrChainResultOperatorFn
 		bichain: TBiChainResultOperatorFn
 		tap: TTapResultOperatorFn
-		errTap: TErrTapResultOperatorFn
+		err_tap: TErrTapResultOperatorFn
 		bitap: TBiTapResultOperatorFn
 		swap: TSwapResultOperatorFn
 	}
 }
 
 export type TResult<$TOk, $TErr> = {
-	isOk: boolean
-	isErr: boolean
-	isResult: boolean
+	get is_ok(): boolean
+	get is_err(): boolean
+	get is_result(): true
 	/**
 	 * @deprecated UNSAFE. Use `result.cata` instead.
 	 */

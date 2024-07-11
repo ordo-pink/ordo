@@ -1,86 +1,65 @@
 // SPDX-FileCopyrightText: Copyright 2024, 谢尔盖||↓ and the Ordo.pink contributors
 // SPDX-License-Identifier: Unlicense
 
-import {
-	type TBiChainResultOperatorFn,
-	type TBiMapResultOperatorFn,
-	type TBiTapResultOperatorFn,
-	type TChainResultOperatorFn,
-	type TErrChainResultOperatorFn,
-	type TErrMapResultOperatorFn,
-	type TErrResultConstructorFn,
-	type TErrTapResultOperatorFn,
-	type TFromNullableResultConstructorFn,
-	type TIfResultConstructorFn,
-	type TMapResultOperatorFn,
-	type TMergeResultConstructorFn,
-	type TOkResultConstructorFn,
-	type TResult,
-	type TResultStatic,
-	type TSwapResultOperatorFn,
-	type TTapResultOperatorFn,
-	type TTryResultConstructorFn,
-} from "./result.types"
+import type * as Types from "./result.types"
 
-export const okR: TOkResultConstructorFn = x => ({
-	isOk: true,
-	isErr: false,
-	isResult: true,
+export const ResultOk: Types.TOkResultConstructorFn = x => ({
+	get is_ok() {
+		return true
+	},
+	get is_err() {
+		return false
+	},
+	get is_result() {
+		return true as const
+	},
 	unwrap: () => x,
-	pipe: f => f(okR(x)),
+	pipe: f => f(ResultOk(x)),
 	cata: e => e.Ok(x),
 })
 
-export const rrrR: TErrResultConstructorFn = x => ({
-	isOk: false,
-	isErr: true,
-	isResult: true,
+export const ResultErr: Types.TErrResultConstructorFn = x => ({
+	get is_ok() {
+		return false
+	},
+	get is_err() {
+		return true
+	},
+	get is_result() {
+		return true as const
+	},
 	unwrap: () => x,
-	pipe: f => f(rrrR(x)),
+	pipe: f => f(ResultErr(x)),
 	cata: e => e.Err(x),
 })
 
-export const tryR: TTryResultConstructorFn = (t, c = x => x as any) => {
+export const ResultTry: Types.TTryResultConstructorFn = (t, c = x => x as any) => {
 	try {
-		return okR(t())
+		return ResultOk(t())
 	} catch (e) {
-		return rrrR(c(e))
+		return ResultErr(c(e))
 	}
 }
 
-export const fromNullableR: TFromNullableResultConstructorFn = (x, onNull = () => null as any) =>
-	x != null ? okR(x) : rrrR(onNull())
+export const ResultFromOption: Types.TFromOptionConstructorFn = (o, onNone = () => void 0 as any) =>
+	o.cata({ Some: ResultOk, None: () => ResultErr(onNone()) })
 
-export const mapR: TMapResultOperatorFn = f => r =>
-	r.cata({ Ok: x => okR(f(x)), Err: x => rrrR(x) })
+export const ResultFromNullable: Types.TFromNullableResultConstructorFn = (
+	x,
+	onNull = () => null as any,
+) => (x != null ? ResultOk(x) : ResultErr(onNull()))
 
-export const errMapR: TErrMapResultOperatorFn = f => r =>
-	r.cata({ Ok: x => okR(x), Err: x => rrrR(f(x)) })
-
-export const bimapR: TBiMapResultOperatorFn = (f, g) => r =>
-	r.cata({ Ok: x => okR(g(x)), Err: x => rrrR(f(x)) as any })
-
-export const chainR: TChainResultOperatorFn = f => r => r.cata({ Ok: x => f(x), Err: x => rrrR(x) })
-
-export const errChainR: TErrChainResultOperatorFn = f => r =>
-	r.cata({ Ok: x => okR(x), Err: x => f(x) as any })
-
-export const bichainR: TBiChainResultOperatorFn = (f, g) => r =>
-	r.cata({ Ok: x => g(x), Err: x => f(x) })
-
-export const tapR: TTapResultOperatorFn = f => r => {
-	r.cata({ Ok: x => f(x), Err: () => void 0 })
-	return r
-}
-
-export const mergeR: TMergeResultConstructorFn = rs => {
+export const ResultMerge: Types.TMergeResultConstructorFn = rs => {
 	if (Array.isArray(rs)) {
 		return rs.reduce(
-			(acc: TResult<any[], any>, r) =>
+			(acc: Types.TResult<any[], any>, r) =>
 				acc.pipe(
 					R.ops.chain(results =>
-						r && (r as TResult<any, any>).isResult
-							? (r as TResult<any, any>).cata({ Ok: v => R.Ok(results.concat(v)), Err: R.Err })
+						r && (r as Types.TResult<any, any>).is_result
+							? (r as Types.TResult<any, any>).cata({
+									Ok: v => R.Ok(results.concat(v)),
+									Err: R.Err,
+								})
 							: R.Ok(r),
 					),
 				),
@@ -91,11 +70,11 @@ export const mergeR: TMergeResultConstructorFn = rs => {
 	const keys = Object.keys(rs)
 
 	return keys.reduce(
-		(acc: TResult<any[], any>, key) =>
+		(acc: Types.TResult<any[], any>, key) =>
 			acc.pipe(
 				R.ops.chain(results =>
-					(rs as any)[key] && ((rs as any)[key] as TResult<any, any>).isResult
-						? ((rs as any)[key] as TResult<any, any>).cata({
+					(rs as any)[key] && ((rs as any)[key] as Types.TResult<any, any>).is_result
+						? ((rs as any)[key] as Types.TResult<any, any>).cata({
 								Ok: v => R.Ok({ ...results, [key]: v }),
 								Err: R.Err,
 							})
@@ -106,44 +85,71 @@ export const mergeR: TMergeResultConstructorFn = rs => {
 	) as any
 }
 
-export const errTapR: TErrTapResultOperatorFn = f => r => {
+export const map_result: Types.TMapResultOperatorFn = f => r =>
+	r.cata({ Ok: x => ResultOk(f(x)), Err: x => ResultErr(x) })
+
+export const err_map_result: Types.TErrMapResultOperatorFn = f => r =>
+	r.cata({ Ok: x => ResultOk(x), Err: x => ResultErr(f(x)) })
+
+export const bimap_result: Types.TBiMapResultOperatorFn = (f, g) => r =>
+	r.cata({ Ok: x => ResultOk(g(x)), Err: x => ResultErr(f(x)) as any })
+
+export const chain_result: Types.TChainResultOperatorFn = f => r =>
+	r.cata({ Ok: x => f(x), Err: x => ResultErr(x) })
+
+export const err_chain_result: Types.TErrChainResultOperatorFn = f => r =>
+	r.cata({ Ok: x => ResultOk(x), Err: x => f(x) as any })
+
+export const bichain_result: Types.TBiChainResultOperatorFn = (f, g) => r =>
+	r.cata({ Ok: x => g(x), Err: x => f(x) })
+
+export const tap_result: Types.TTapResultOperatorFn = f => r => {
+	r.cata({ Ok: x => f(x), Err: () => void 0 })
+	return r
+}
+
+export const err_tap_result: Types.TErrTapResultOperatorFn = f => r => {
 	r.cata({ Ok: () => void 0, Err: x => f(x) })
 	return r
 }
 
-export const bitapR: TBiTapResultOperatorFn = (f, g) => r => {
+export const bitap_result: Types.TBiTapResultOperatorFn = (f, g) => r => {
 	r.cata({ Ok: x => g(x), Err: x => f(x) })
 	return r
 }
 
-export const swapE: TSwapResultOperatorFn = () => r =>
-	r.cata({ Ok: x => rrrR(x), Err: x => okR(x) })
+export const swap_result: Types.TSwapResultOperatorFn = () => r =>
+	r.cata({ Ok: x => ResultErr(x), Err: x => ResultOk(x) })
 
-export const ifR: TIfResultConstructorFn = (
+export const ResultIf: Types.TIfResultConstructorFn = (
 	orly: boolean,
-	{ onT = () => undefined as any, onF = () => undefined as any } = {
-		onT: () => undefined as any,
-		onF: () => undefined as any,
+	{ T = () => undefined as any, F = () => undefined as any } = {
+		T: () => undefined as any,
+		F: () => undefined as any,
 	},
-) => (orly ? okR(onT()) : rrrR(onF()))
+) => (orly ? R.Ok(T()) : R.Err(F()))
 
-export const R: TResultStatic = {
-	Ok: okR,
-	Err: rrrR,
-	try: tryR,
-	if: ifR,
-	fromNullable: fromNullableR,
-	merge: mergeR,
+export const R: Types.TResultStatic = {
+	of: ResultOk,
+	Ok: ResultOk,
+	Err: ResultErr,
+	Try: ResultTry,
+	If: ResultIf,
+	FromNullable: ResultFromNullable,
+	FromOption: ResultFromOption,
+	Merge: ResultMerge,
 	ops: {
-		map: mapR,
-		errMap: errMapR,
-		bimap: bimapR,
-		chain: chainR,
-		errChain: errChainR,
-		bichain: bichainR,
-		tap: tapR,
-		errTap: errTapR,
-		bitap: bitapR,
-		swap: swapE,
+		map: map_result,
+		err_map: err_map_result,
+		bimap: bimap_result,
+		chain: chain_result,
+		err_chain: err_chain_result,
+		bichain: bichain_result,
+		tap: tap_result,
+		err_tap: err_tap_result,
+		bitap: bitap_result,
+		swap: swap_result,
 	},
 }
+
+export const Result = R

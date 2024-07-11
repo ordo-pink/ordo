@@ -33,7 +33,7 @@ export type TFromResultOptionConstructorFn = <$TSome>(
  */
 export type TOptionStatic = {
 	/**
-	 * @see TOptionStatic.some
+	 * @see TOptionStatic.Some
 	 */
 	of: TSomeOptionConstructorFn
 
@@ -43,7 +43,7 @@ export type TOptionStatic = {
 	 * @param value - Generic Option input.
 	 * @returns `TOption` - Option of `Type`.
 	 */
-	some: TSomeOptionConstructorFn
+	Some: TSomeOptionConstructorFn
 
 	/**
 	 * A constructor for `None`. Does not accept a value. `None` is always the
@@ -51,7 +51,7 @@ export type TOptionStatic = {
 	 *
 	 * @returns `TOption` - Option of `never`.
 	 */
-	none: TNoneOptionConstructorFn
+	None: TNoneOptionConstructorFn
 
 	/**
 	 * Creates an `Option` from a nullable value. Creates a `None`, if the value
@@ -61,9 +61,9 @@ export type TOptionStatic = {
 	 * @param Type value - Option input.
 	 * @returns `Some<Type> | None`
 	 */
-	fromNullable: TFromNullableOptionConstructorFn
+	FromNullable: TFromNullableOptionConstructorFn
 
-	fromResult: TFromResultOptionConstructorFn
+	FromResult: TFromResultOptionConstructorFn
 
 	ops: {
 		map: TOptionMapOperatorFn
@@ -72,11 +72,11 @@ export type TOptionStatic = {
 }
 
 export type TOptionMapOperatorFn = <$TSome, $TNewSome>(
-	onSome: (onSome: $TSome) => $TNewSome,
+	on_some: (on_some: $TSome) => $TNewSome,
 ) => (option: TOption<$TSome>) => TOption<$TNewSome>
 
 export type TOptionChainOperatorFn = <$TSome, $TNewSome>(
-	onSome: (option: $TSome) => TOption<$TNewSome>,
+	on_some: (option: $TSome) => TOption<$TNewSome>,
 ) => (option: TOption<$TSome>) => TOption<$TNewSome>
 
 export type TOption<_TSome> = {
@@ -86,7 +86,7 @@ export type TOption<_TSome> = {
 	 * @readonly Cannot be changed.
 	 * @type `true`
 	 */
-	get isOption(): true
+	get is_option(): true
 
 	/**
 	 * `Some`s are marked with `isSome` -> `true`.
@@ -95,7 +95,7 @@ export type TOption<_TSome> = {
 	 * @readonly Cannot be changed.
 	 * @type `boolean`
 	 */
-	get isSome(): boolean
+	get is_some(): boolean
 
 	/**
 	 * `Some`s are marked with `isNone` -> `false`.
@@ -104,7 +104,7 @@ export type TOption<_TSome> = {
 	 * @readonly Cannot be changed.
 	 * @type `boolean`
 	 */
-	get isNone(): boolean
+	get is_none(): boolean
 
 	/**
 	 * Unsafely extract the contained value when it is a `Some`. If it is `None`,

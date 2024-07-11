@@ -22,7 +22,7 @@ import { BsNodePlus } from "react-icons/bs"
 
 import { useCommands, useStrictSubscription } from "@ordo-pink/frontend-react-hooks"
 import { type PlainData } from "@ordo-pink/data"
-import { isNonEmptyString } from "@ordo-pink/tau"
+import { is_non_empty_string } from "@ordo-pink/tau"
 
 import OrdoButton from "@ordo-pink/frontend-react-components/button"
 import { fileAssociations$ } from "@ordo-pink/frontend-stream-file-associations"
@@ -96,7 +96,7 @@ export default function CreateFileModal({ parent }: P) {
 				</OrdoButton.Secondary>
 
 				<OrdoButton.Primary
-					disabled={!isNonEmptyString(name)}
+					disabled={!is_non_empty_string(name)}
 					onClick={handleCreateFile}
 					hotkey="mod+enter"
 				>

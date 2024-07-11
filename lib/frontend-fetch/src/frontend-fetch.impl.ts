@@ -20,13 +20,13 @@
 import { Either } from "@ordo-pink/either"
 import { KnownFunctions } from "@ordo-pink/frontend-known-functions"
 import { Logger } from "@ordo-pink/logger"
-import { callOnce } from "@ordo-pink/tau"
+import { call_once } from "@ordo-pink/tau"
 import { getLogger } from "@ordo-pink/frontend-logger"
 import { useCurrentFID } from "@ordo-pink/frontend-stream-activities"
 
 const fetch = window.fetch
 
-export const __initFetch = callOnce(() => {
+export const __initFetch = call_once(() => {
 	// window.fetch = undefined as any
 	// window.XMLHttpRequest = undefined as any
 })

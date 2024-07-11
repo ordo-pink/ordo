@@ -9,22 +9,21 @@ export type TGetCurrentUserFn = () => TResult<User.User, TRrr<"EAGAIN">>
 
 export type TGetPublicUserByIDFn = (
 	id: User.User["id"],
-) => Oath<TOption<User.PublicUser>, TRrr<"EINVAL" | "EIO">>
+) => Oath<TOption<User.PublicUser>, TRrr<"EAGAIN" | "EINVAL" | "EIO">>
 
 export type TGetPublicUserByEmailFn = (
 	email: User.User["email"],
-) => Oath<TOption<User.PublicUser>, TRrr<"EINVAL" | "EIO">>
+) => Oath<TOption<User.PublicUser>, TRrr<"EAGAIN" | "EINVAL" | "EIO">>
 
 export type TGetPublicUserByHandleFn = (
 	handle: User.User["handle"],
-) => Oath<TOption<User.PublicUser>, TRrr<"EINVAL" | "EIO">>
+) => Oath<TOption<User.PublicUser>, TRrr<"EAGAIN" | "EINVAL" | "EIO">>
 
 export type TUserQuery = {
 	get_current: TGetCurrentUserFn
-	get_by_id: TGetPublicUserByIDFn
+	// get_by_id: TGetPublicUserByIDFn
 	get_by_email: TGetPublicUserByEmailFn
-	get_by_handle: TGetPublicUserByHandleFn
-	// TODO: getPublicUserByHandle: (email: User.User["email"]) => Oath<TOption<User.PublicUser>, TRrr<"EINVAL" | "EIO">>
+	// get_by_handle: TGetPublicUserByHandleFn
 }
 
 export type TUserQueryStatic = {

@@ -1,5 +1,6 @@
 import { O } from "@ordo-pink/option"
 
+import { MetadataGuards } from "./metadata-validations"
 import { type TMetadataStatic } from "./metadata.types"
 
 export const Metadata: TMetadataStatic = {
@@ -51,7 +52,9 @@ export const Metadata: TMetadataStatic = {
 		is_child_of: fsid => dto.parent === fsid,
 		is_root_child: () => dto.parent === null,
 		to_dto: () => dto,
+		is_hidden: () => dto.name.startsWith("."),
 	}),
+	guards: MetadataGuards,
 }
 
 export const M = Metadata

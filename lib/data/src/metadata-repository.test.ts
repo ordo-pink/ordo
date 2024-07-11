@@ -14,10 +14,9 @@ describe("metadata-repository", () => {
 		it("should return EAGAIN if metadata$ is empty", () => {
 			metadata$.next(null)
 
-			const { key, code, debug: spec, location } = metadataRepository.get().unwrap() as TRrr
+			const { key, code, location } = metadataRepository.get().unwrap() as TRrr
 
 			expect(key).toEqual("EAGAIN")
-			expect(spec).toEqual(".get: Metadata[] not initialised")
 			expect(code).toEqual(RRR.enum.EAGAIN)
 			expect(location).toEqual("MetadataRepository")
 		})

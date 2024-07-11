@@ -47,6 +47,7 @@ export const __initMetadata = ({ fid }: P) => {
 	const query = MetadataQuery.of(repo)
 	// const command = MetadataCommand.of(query, userQuery)
 
+	// TODO:
 	const metadataManager = {
 		fetchRemoteState: () => {
 			const sub = auth$.subscribe(auth => {

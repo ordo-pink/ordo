@@ -29,7 +29,7 @@ import { merge } from "rxjs/internal/observable/merge"
 import { Either } from "@ordo-pink/either"
 import { KnownFunctions } from "@ordo-pink/frontend-known-functions"
 import { type Logger } from "@ordo-pink/logger"
-import { callOnce } from "@ordo-pink/tau"
+import { call_once } from "@ordo-pink/tau"
 import { getLogger } from "@ordo-pink/frontend-logger"
 
 /**
@@ -72,7 +72,7 @@ type CmdListener<N extends Client.Commands.CommandName = Client.Commands.Command
 ]
 
 type InitCommandsParams = { fid: symbol; showCommandsWithoutHandlers?: boolean }
-export const __initCommands = callOnce(
+export const __initCommands = call_once(
 	({ fid, showCommandsWithoutHandlers = true }: InitCommandsParams) => {
 		const logger = getLogger(fid)
 

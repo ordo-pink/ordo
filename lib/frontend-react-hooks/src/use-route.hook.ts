@@ -19,7 +19,7 @@
 
 import { Either } from "@ordo-pink/either"
 import { currentRoute$ } from "@ordo-pink/frontend-stream-router"
-import { keysOf } from "@ordo-pink/tau"
+import { keys_of } from "@ordo-pink/tau"
 
 import { useSubscription } from "./use-subscription.hook"
 
@@ -39,7 +39,7 @@ export const useRouteParams = <
 		.fold(
 			() => ({}),
 			params =>
-				keysOf(params).reduce(
+				keys_of(params).reduce(
 					(acc, key) => ({ ...acc, [key]: decodeURIComponent(params[key]) }),
 					{},
 				),

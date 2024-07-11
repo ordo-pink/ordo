@@ -21,7 +21,7 @@ import { type ChangeEvent, useState } from "react"
 import { BsPencil } from "react-icons/bs"
 
 import { type PlainData } from "@ordo-pink/data"
-import { isNonEmptyString } from "@ordo-pink/tau"
+import { is_non_empty_string } from "@ordo-pink/tau"
 import { useCommands } from "@ordo-pink/frontend-react-hooks"
 
 import OrdoButton from "@ordo-pink/frontend-react-components/button"
@@ -37,7 +37,7 @@ export default function RenameModal({ data }: Props) {
 
 	const handleInputChange = (event: ChangeEvent<HTMLInputElement>) => {
 		setName(event.target.value)
-		setIsValidPath(isNonEmptyString(event.target.value))
+		setIsValidPath(is_non_empty_string(event.target.value))
 	}
 
 	const rename = () => {

@@ -26,14 +26,14 @@ import {
 	DEFAULT_WORKSPACE_SPLIT_SIZE_NO_SIDEBAR,
 	NARROW_WINDOW_BREAKPOINT,
 } from "./frontend-stream-sidebar.constants"
-import { callOnce } from "@ordo-pink/tau"
+import { call_once } from "@ordo-pink/tau"
 import { getCommands } from "@ordo-pink/frontend-stream-commands"
 
 import { type SidebarState } from "./frontend-stream-sidebar.types"
 
 export const sidebar$ = new BehaviorSubject<SidebarState>({ disabled: true })
 
-export const __initSidebar = callOnce((fid: symbol) => {
+export const __initSidebar = call_once((fid: symbol) => {
 	const commands = getCommands(fid)
 
 	commands.on<cmd.sidebar.disable>("sidebar.disable", () => {

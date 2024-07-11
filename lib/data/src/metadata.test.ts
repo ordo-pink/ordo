@@ -1,7 +1,7 @@
 import { describe, expect, it } from "bun:test"
 
 import { O } from "@ordo-pink/option"
-import { isUUID } from "@ordo-pink/tau"
+import { is_uuid } from "@ordo-pink/tau"
 
 import { Metadata } from "./metadata.impl"
 
@@ -126,7 +126,7 @@ describe("Metadata", () => {
 	describe("getFSID", () => {
 		it("should return DTO FSID", () => {
 			expect(test1.get_fsid()).toBeDefined()
-			expect(isUUID(test1.get_fsid())).toBeTrue()
+			expect(is_uuid(test1.get_fsid())).toBeTrue()
 			expect(test3.get_fsid()).toEqual(fsid)
 		})
 	})

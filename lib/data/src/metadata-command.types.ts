@@ -64,14 +64,14 @@ export type TMetadataCommand = {
 		name: string,
 	) => TResult<void, TRrr<"EAGAIN" | "EINVAL" | "ENOENT" | "EEXIST">>
 
-	set_property: <_TProps_ extends TMetadataProps, __TKey__ extends keyof _TProps_>(
+	set_property: <$TProps extends TMetadataProps, $TKey extends keyof $TProps>(
 		fsid: FSID,
-		key: __TKey__,
-		value: _TProps_[__TKey__],
+		key: $TKey,
+		value: $TProps[$TKey],
 	) => TResult<void, TRrr<"EAGAIN" | "EINVAL" | "ENOENT">>
 
-	remove_property: <_TProps_ extends TMetadataProps, __TKey__ extends keyof _TProps_>(
+	remove_property: <$TProps extends TMetadataProps, $TKey extends keyof $TProps>(
 		fsid: FSID,
-		key: __TKey__,
+		key: $TKey,
 	) => TResult<void, TRrr<"EAGAIN" | "EINVAL" | "ENOENT">>
 }

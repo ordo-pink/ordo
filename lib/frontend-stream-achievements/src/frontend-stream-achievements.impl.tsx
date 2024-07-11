@@ -26,14 +26,14 @@ import { Either } from "@ordo-pink/either"
 import { KnownFunctions } from "@ordo-pink/frontend-known-functions"
 import { LIB_DIRECTORY_FSID } from "@ordo-pink/core"
 import { Oath } from "@ordo-pink/oath"
-import { callOnce } from "@ordo-pink/tau"
+import { call_once } from "@ordo-pink/tau"
 import { data$ } from "@ordo-pink/frontend-stream-data"
 import { getCommands } from "@ordo-pink/frontend-stream-commands"
 import { getLogger } from "@ordo-pink/frontend-logger"
 import { user$ } from "@ordo-pink/frontend-stream-user"
 
 type P = { fid: symbol; dataCommands: TDataCommands<string | ArrayBuffer> }
-export const __initAchievements = callOnce(({ fid, dataCommands }: P) => {
+export const __initAchievements = call_once(({ fid, dataCommands }: P) => {
 	const commands = getCommands(fid)
 	const logger = getLogger(fid)
 

@@ -19,7 +19,7 @@
 
 import { useEffect, useState } from "react"
 
-import { Range, getPercentage } from "@ordo-pink/tau"
+import { Range, get_percentage } from "@ordo-pink/tau"
 import { useData, useUser } from "@ordo-pink/frontend-react-hooks"
 import { Switch } from "@ordo-pink/switch"
 
@@ -34,7 +34,7 @@ export default function UsedSpace() {
 	const [current, total] = useUsedSpaceModel()
 
 	const progress = `${current} / ${total}` as const
-	const percentage = Switch.of(getPercentage(total, current))
+	const percentage = Switch.of(get_percentage(total, current))
 		.case(
 			v => v <= 100,
 			v => v as Range<0, 101>,

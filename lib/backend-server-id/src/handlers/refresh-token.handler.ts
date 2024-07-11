@@ -30,7 +30,7 @@ import {
 	rejectedTap0,
 	tap0,
 } from "@ordo-pink/oath"
-import { type UUIDv4, isUUID } from "@ordo-pink/tau"
+import { type UUIDv4, is_uuid } from "@ordo-pink/tau"
 import { sendError, sendSuccess } from "@ordo-pink/backend-utils"
 import { HttpError } from "@ordo-pink/rrr"
 import { type TTokenService } from "@ordo-pink/backend-service-token"
@@ -65,10 +65,10 @@ type ExtractCtxFn = (ctx: {
 }) => Oath<{ cookieSub: SUB; cookieJti: JTI }, HttpError>
 const validateCtx0: ExtractCtxFn = ({ cookieJti, cookieSub }) =>
 	merge0({
-		cookieSub: fromBoolean0(isUUID(cookieSub), cookieSub as SUB).pipe(
+		cookieSub: fromBoolean0(is_uuid(cookieSub), cookieSub as SUB).pipe(
 			rejectedMap0(toInvalidRequestError),
 		),
-		cookieJti: fromBoolean0(isUUID(cookieJti), cookieJti as JTI).pipe(
+		cookieJti: fromBoolean0(is_uuid(cookieJti), cookieJti as JTI).pipe(
 			rejectedMap0(toInvalidRequestError),
 		),
 	})

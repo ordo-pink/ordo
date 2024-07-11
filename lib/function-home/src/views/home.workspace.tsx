@@ -20,7 +20,7 @@
 import { useEffect, useState } from "react"
 
 import { Oath, chain0, fromBoolean0, fromPromise0 } from "@ordo-pink/oath"
-import { isObject, isString, noop } from "@ordo-pink/tau"
+import { is_object, is_string, noop } from "@ordo-pink/tau"
 import { useCommands, useHosts, useStrictSubscription } from "@ordo-pink/frontend-react-hooks"
 import { activities$ } from "@ordo-pink/frontend-stream-activities"
 import { useFetch } from "@ordo-pink/frontend-fetch"
@@ -75,8 +75,8 @@ export default function FileExplorerSidebar() {
 // --- Internal ---
 
 const isNewsItem = (item: unknown): item is News =>
-	isObject(item) &&
-	["title", "message", "title"].reduce((acc, key) => acc && isString(item[key]), true)
+	is_object(item) &&
+	["title", "message", "title"].reduce((acc, key) => acc && is_string(item[key]), true)
 
 const areNewsItems = (items: unknown[]): items is News[] =>
 	!!items.reduce((acc, item) => acc && isNewsItem(item), true)

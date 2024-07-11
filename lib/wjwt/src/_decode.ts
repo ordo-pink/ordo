@@ -18,7 +18,7 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { Oath } from "@ordo-pink/oath"
-import { isString } from "@ordo-pink/tau"
+import { is_string } from "@ordo-pink/tau"
 
 import { Rrr } from "./wjwt.constants"
 import { WJWTDecodeFn } from "./wjwt.types"
@@ -28,7 +28,7 @@ export const decode0: WJWTDecodeFn = token =>
 		.rejectedMap(() => Rrr.INVALORDO_ID_TOKEN)
 		.chain(token =>
 			Oath.fromBoolean(
-				() => isString(token),
+				() => is_string(token),
 				() => token,
 				() => Rrr.INVALORDO_ID_TOKEN,
 			),
@@ -36,7 +36,7 @@ export const decode0: WJWTDecodeFn = token =>
 		.map(token => token.split("."))
 		.chain(parts =>
 			Oath.fromBoolean(
-				() => parts.length === 3 && parts.every(part => isString(part)),
+				() => parts.length === 3 && parts.every(part => is_string(part)),
 				() => parts as [string, string, string],
 				() => Rrr.INVALORDO_ID_TOKEN,
 			),

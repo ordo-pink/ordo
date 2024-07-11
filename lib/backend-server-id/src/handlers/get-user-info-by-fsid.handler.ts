@@ -28,7 +28,7 @@ import {
 	of0,
 	rejectedMap0,
 } from "@ordo-pink/oath"
-import { type UUIDv4, isUUID } from "@ordo-pink/tau"
+import { type UUIDv4, is_uuid } from "@ordo-pink/tau"
 import { sendError, sendSuccess } from "@ordo-pink/backend-utils"
 import { type HttpError } from "@ordo-pink/rrr"
 import { type UserService } from "@ordo-pink/backend-service-user"
@@ -52,7 +52,7 @@ type TResult = Routes.ID.GetUserInfoByID.Result
 type TValidateParamsFn = (p: Routes.ID.GetUserInfoByID.RequestParams) => Oath<UUIDv4, HttpError>
 const validateParams0: TValidateParamsFn = ({ id }) =>
 	fromNullable0(id)
-		.pipe(chain0(id => fromBoolean0(isUUID(id), id as UUIDv4)))
+		.pipe(chain0(id => fromBoolean0(is_uuid(id), id as UUIDv4)))
 		.pipe(rejectedMap0(toInvalidRequestError))
 
 type TGetUserByIDFn = (us: UserService) => (id: string) => Oath<TResult, HttpError>

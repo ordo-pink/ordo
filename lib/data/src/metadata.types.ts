@@ -1,6 +1,7 @@
 import type { TOption } from "@ordo-pink/option"
 
 import type { FSID, UserID } from "./data.types"
+import { MetadataGuards } from "./metadata-validations"
 
 export type TMetadataProps = Readonly<Record<string, any>>
 
@@ -19,6 +20,7 @@ export type TMetadataStatic = {
 	of: <_TProps extends TMetadataProps = TMetadataProps>(
 		dto: TMetadataDTO<_TProps>,
 	) => TMetadata<_TProps>
+	guards: typeof MetadataGuards
 }
 
 export type TMetadataDTO<_TProps extends TMetadataProps = TMetadataProps> = Readonly<{
@@ -57,4 +59,5 @@ export type TMetadata<_TProps extends TMetadataProps = TMetadataProps> = {
 	get_readable_size: () => string
 	get_property: <_TKey_ extends keyof _TProps>(key: _TKey_) => TOption<NonNullable<_TProps[_TKey_]>>
 	to_dto: () => TMetadataDTO<_TProps>
+	is_hidden: () => boolean
 }

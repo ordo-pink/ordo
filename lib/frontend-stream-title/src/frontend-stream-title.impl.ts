@@ -19,11 +19,11 @@
 
 import { BehaviorSubject } from "rxjs/internal/BehaviorSubject"
 
-import { callOnce } from "@ordo-pink/tau"
+import { call_once } from "@ordo-pink/tau"
 import { getCommands } from "@ordo-pink/frontend-stream-commands"
 import { getLogger } from "@ordo-pink/frontend-logger"
 
-export const __initTitle = callOnce((fid: symbol) => {
+export const __initTitle = call_once((fid: symbol) => {
 	const commands = getCommands(fid)
 	const logger = getLogger(fid)
 

@@ -24,13 +24,13 @@ import { merge } from "rxjs/internal/observable/merge"
 import { scan } from "rxjs/internal/operators/scan"
 import { shareReplay } from "rxjs/internal/operators/shareReplay"
 
-import { N, callOnce } from "@ordo-pink/tau"
+import { N, call_once } from "@ordo-pink/tau"
 import { chainE, fromBooleanE, fromNullableE } from "@ordo-pink/either"
 import { KnownFunctions } from "@ordo-pink/frontend-known-functions"
 import { getCommands } from "@ordo-pink/frontend-stream-commands"
 import { getLogger } from "@ordo-pink/frontend-logger"
 
-export const __initFileAssociations = callOnce((fid: symbol) => {
+export const __initFileAssociations = call_once((fid: symbol) => {
 	const logger = getLogger(fid)
 	const commands = getCommands(fid)
 

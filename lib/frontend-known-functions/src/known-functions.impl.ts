@@ -20,7 +20,7 @@
 import { F, T, identity, isEmpty, prop } from "ramda"
 
 import { Either, TEither } from "@ordo-pink/either"
-import { N, isNonEmptyString, isObject } from "@ordo-pink/tau"
+import { N, is_non_empty_string, is_object } from "@ordo-pink/tau"
 import { internalApps } from "@ordo-pink/core"
 
 // TODO: Extend query list :: data, etc.
@@ -86,14 +86,14 @@ const isOrdoPinkAppFunction = (fid: symbol | null) =>
 
 const checkIsValidNameE = (name: string) =>
 	Either.fromBoolean(
-		() => isNonEmptyString(name),
+		() => is_non_empty_string(name),
 		() => name,
 	)
 
 const checkIsValidPermissionsE = (permissions: Permissions) => (name: string) =>
 	Either.fromBoolean(
 		() =>
-			isObject(permissions) &&
+			is_object(permissions) &&
 			Array.isArray(permissions.commands) &&
 			Array.isArray(permissions.queries),
 		() => name,
@@ -148,7 +148,7 @@ const validateCheckedPermissionsE =
 	(permissions: Partial<Permissions>) => (grantedPermissions: Permissions) =>
 		Either.fromBoolean(
 			() =>
-				isObject(permissions) &&
+				is_object(permissions) &&
 				((Array.isArray(permissions.commands) && !isEmpty(permissions.commands)) ||
 					(Array.isArray(permissions.queries) && !isEmpty(permissions.queries))),
 			() => grantedPermissions,

@@ -22,7 +22,7 @@ import { Context } from "koa"
 import { HttpError } from "@ordo-pink/rrr"
 import { Oath } from "@ordo-pink/oath"
 import { Switch } from "@ordo-pink/switch"
-import { isObject } from "@ordo-pink/tau"
+import { is_object } from "@ordo-pink/tau"
 
 export const parseBody0 = <T>(
 	ctx: Context,
@@ -33,7 +33,7 @@ export const parseBody0 = <T>(
 		.map(body =>
 			Switch.of(expect)
 				.case(
-					expect => expect === "object" && !isObject(body),
+					expect => expect === "object" && !is_object(body),
 					() => HttpError.BadRequest("Request body must be an object"),
 				)
 				.case(

@@ -22,7 +22,7 @@ import { type BehaviorSubject } from "rxjs"
 import { Either, type TEither, chainE, fromNullableE, mapE, ofE } from "@ordo-pink/either"
 import { type PlainDataNode } from "@ordo-pink/core"
 import { Switch } from "@ordo-pink/switch"
-import { keysOf } from "@ordo-pink/tau"
+import { keys_of } from "@ordo-pink/tau"
 
 import { type FSID, type PlainData } from "./data.types"
 
@@ -125,7 +125,7 @@ export const DataQuery = {
 
 						console.log(intermediateTree)
 
-						keysOf(intermediateTree).forEach(key => {
+						keys_of(intermediateTree).forEach(key => {
 							if (
 								intermediateTree[key].parent &&
 								!intermediateTree[intermediateTree[key].parent as any]

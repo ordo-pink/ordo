@@ -3,6 +3,7 @@ import { Result } from "@ordo-pink/result"
 
 import type * as Types from "./user-repository.types"
 import { RRR } from "./metadata.errors"
+import { map } from "rxjs"
 
 const CURRENT_USER_REPOSITORY = "CurrentUserRepository"
 const KNOWN_USER_REPOSITORY = "KnownUserRepository"
@@ -16,7 +17,11 @@ const einval_known_user = RRR.codes.einval(KNOWN_USER_REPOSITORY)
 export const CurrentUserRepository: Types.TCurrentUserRepositoryStatic = {
 	of: $ => ({
 		get: () => Result.FromOption($.getValue(), () => eagain_current_user()),
-		put: () => Result.Err(einval_current_user("NOT IMPLEMENTED")), // TODO: Validations
+		put: () => Result.Err(einval_current_user("NOT IMPLEMENTED")), // TODO:
+		get sub() {
+			let i = 0
+			return $.pipe(map(() => ++i))
+		},
 	}),
 }
 
@@ -25,8 +30,12 @@ export const KnownUserRepository: Types.TKnownUserRepositoryStatic = {
 		get: () =>
 			$.getValue().cata({
 				Some: Oath.resolve,
-				None: () => Oath.reject(eagain_known_user()),
+				None: () => Oath.reject(eagain_known_user("NOT_IMPLEMENTED")), // TODO:
 			}),
-		put: () => Oath.reject(einval_known_user("NOT IMPLEMENTED")), // TODO: Validations
+		put: () => Oath.reject(einval_known_user("NOT IMPLEMENTED")), // TODO:
+		get sub() {
+			let i = 0
+			return $.pipe(map(() => ++i))
+		},
 	}),
 }

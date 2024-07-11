@@ -24,13 +24,13 @@ import { merge } from "rxjs/internal/observable/merge"
 import { scan } from "rxjs/internal/operators/scan"
 import { shareReplay } from "rxjs/internal/operators/shareReplay"
 
-import { N, callOnce, noop } from "@ordo-pink/tau"
+import { N, call_once, noop } from "@ordo-pink/tau"
 
 import { Either, fromNullableE } from "@ordo-pink/either"
 import { KnownFunctions } from "@ordo-pink/frontend-known-functions"
 import { getLogger } from "@ordo-pink/frontend-logger"
 
-export const __initActivities = callOnce((fid: symbol) => {
+export const __initActivities = call_once((fid: symbol) => {
 	const logger = getLogger(fid)
 
 	logger.debug("Initializing activities...")

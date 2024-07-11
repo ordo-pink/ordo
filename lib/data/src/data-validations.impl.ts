@@ -17,7 +17,7 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { isNonEmptyString, isNonNegativeFiniteInteger, isObject, isUUID } from "@ordo-pink/tau"
+import { is_finite_non_negative_int, is_non_empty_string, is_object, is_uuid } from "@ordo-pink/tau"
 import { Either } from "@ordo-pink/either"
 
 import { DataError } from "./errors.types"
@@ -26,7 +26,7 @@ import { type Validations } from "./data-validations.types"
 
 export const validations: Validations = {
 	isValidDataE: x =>
-		Either.fromBoolean(() => isObject(x))
+		Either.fromBoolean(() => is_object(x))
 			.chain(() => validations.isValidFsidE(x.fsid))
 			.chain(() => validations.isValidParentE(x.parent))
 			.chain(() => validations.isValidNameE(x.name))
@@ -49,49 +49,49 @@ export const validations: Validations = {
 			.leftMap(e => e as DataError),
 	isValidNameE: x =>
 		Either.fromBoolean(
-			() => isNonEmptyString(x),
+			() => is_non_empty_string(x),
 			() => x,
 			() => Errors.InvalidName,
 		),
 	isValidSizeE: x =>
 		Either.fromBoolean(
-			() => isNonNegativeFiniteInteger(x),
+			() => is_finite_non_negative_int(x),
 			() => x,
 			() => Errors.InvalidSize,
 		),
 	isValidTimestampE: x =>
 		Either.fromBoolean(
-			() => isNonNegativeFiniteInteger(x),
+			() => is_finite_non_negative_int(x),
 			() => x,
 			() => Errors.InvalidTimestamp,
 		),
 	isValidFsidE: x =>
 		Either.fromBoolean(
-			() => isUUID(x),
+			() => is_uuid(x),
 			() => x,
 			() => Errors.InvalidFSID,
 		),
 	isValidParentE: x =>
 		Either.fromBoolean(
-			() => x === null || isUUID(x),
+			() => x === null || is_uuid(x),
 			() => x,
 			() => Errors.InvalidFSID,
 		),
 	isValidSubE: x =>
 		Either.fromBoolean(
-			() => isUUID(x),
+			() => is_uuid(x),
 			() => x,
 			() => Errors.InvalidSUB,
 		),
 	isValidStringE: x =>
 		Either.fromBoolean(
-			() => isNonEmptyString(x),
+			() => is_non_empty_string(x),
 			() => x,
 			() => Errors.InvalidLabel,
 		),
 	isValidPropertiesE: x =>
 		Either.fromBoolean(
-			() => typeof x === "undefined" || isObject(x),
+			() => typeof x === "undefined" || is_object(x),
 			() => x,
 			() => Errors.InvalidProperties,
 		),

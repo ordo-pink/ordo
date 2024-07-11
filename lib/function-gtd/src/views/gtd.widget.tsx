@@ -23,7 +23,7 @@ import { useState } from "react"
 import { useCommands, useIsMobile } from "@ordo-pink/frontend-react-hooks"
 import { PlainData } from "@ordo-pink/data"
 import { Switch } from "@ordo-pink/switch"
-import { isNonEmptyString } from "@ordo-pink/tau"
+import { is_non_empty_string } from "@ordo-pink/tau"
 
 import Link from "@ordo-pink/frontend-react-components/link"
 import Loader from "@ordo-pink/frontend-react-components/loader"
@@ -71,7 +71,7 @@ export default function GTDWidget() {
 				value={newItem}
 				onInput={e => setNewItem(e.target.value)}
 				onKeyDown={e => {
-					if (e.key === "Enter" && isNonEmptyString(newItem)) handleCreate()
+					if (e.key === "Enter" && is_non_empty_string(newItem)) handleCreate()
 				}}
 			/>
 

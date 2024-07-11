@@ -22,7 +22,7 @@ import { useEffect, useState } from "react"
 import isEmail from "validator/lib/isEmail"
 
 import { OrdoRoutes } from "@ordo-pink/ordo-routes"
-import { keysOf } from "@ordo-pink/tau"
+import { keys_of } from "@ordo-pink/tau"
 
 import { EmailInput, PasswordInput } from "./input"
 import { Button } from "./button"
@@ -47,7 +47,7 @@ export default function SignUpForm({ idHost, workspaceHost }: _P) {
 	})
 
 	const isButtonDisabled =
-		!email || !password || keysOf(isValid).some(key => !isValid[key]) || !isPrivacyPolicyConfirmed
+		!email || !password || keys_of(isValid).some(key => !isValid[key]) || !isPrivacyPolicyConfirmed
 
 	useEffect(() => {
 		setIsValid(p => ({ ...p, passwordsMatch: password === repeatPassword }))
@@ -85,7 +85,7 @@ export default function SignUpForm({ idHost, workspaceHost }: _P) {
 					/>
 
 					{(password || repeatPassword) && (
-						<Callout type={keysOf(isValid).some(key => !isValid[key]) ? "error" : "success"}>
+						<Callout type={keys_of(isValid).some(key => !isValid[key]) ? "error" : "success"}>
 							<div>
 								<div className="flex items-center space-x-2">
 									{isValid.passwordLength ? (

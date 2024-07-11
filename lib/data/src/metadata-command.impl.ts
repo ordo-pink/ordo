@@ -1,17 +1,8 @@
 import { R, type TResult } from "@ordo-pink/result"
-import { alphaSort, concat, isObject, isUUID, override } from "@ordo-pink/tau"
+import { alpha_sort, concat, override, prop, thunk } from "@ordo-pink/tau"
 
-import { RRR, TRrr } from "./metadata.errors"
+import { RRR, type TRrr } from "./metadata.errors"
 import { type TMetadata, type TMetadataDTO, type TMetadataProps } from "./metadata.types"
-import {
-	are_lbls,
-	are_lnks,
-	is_name,
-	is_parent,
-	is_prop_key,
-	is_size,
-	is_type,
-} from "./metadata-validations"
 import { get_wrong_label, get_wrong_link } from "./metadata.utils"
 import { type FSID } from "./data.types"
 import { M } from "./metadata.impl"
@@ -21,154 +12,175 @@ import { type TUserQuery } from "./user-query.types"
 
 const LOCATION = "MetadataCommand"
 
-const einval = RRR.codes.einval(LOCATION)
-const eexist = RRR.codes.eexist(LOCATION)
-const enoent = RRR.codes.enoent(LOCATION)
+const inval = RRR.codes.einval(LOCATION)
+const exist = RRR.codes.eexist(LOCATION)
+const noent = RRR.codes.enoent(LOCATION)
 const enxio = RRR.codes.enxio(LOCATION)
 
 export const MetadataCommand: TMetadataCommandStatic = {
 	of: (m_repo, m_query, u_query) => ({
-		create: ({ name, parent, type = "text/ordo", labels = [], links = [], props = {} }) =>
-			R.Merge([
-				R.If(is_name(name), { F: () => einval(`.create name: ${name}`) }),
-				R.If(is_parent(parent), { F: () => einval(`.create -> parent: ${parent}`) }),
-				R.If(are_lbls(labels), { F: () => einval(`.create -> lbl: ${get_wrong_label(labels)}`) }),
-				R.If(are_lnks(links), { F: () => einval(`.create -> link: ${get_wrong_link(links)}`) }),
-				R.If(is_type(type), { F: () => einval(`.create -> type: ${type}`) }),
-				R.If(isObject(props), { F: () => einval(`.create -> props: ${JSON.stringify(props)}`) }),
-			])
-				.pipe(R.ops.chain(() => m_query.get_by_name_and_parent(name, parent)))
+		set_name: (fsid, name) =>
+			_check_name_r("set name", name)
+				.pipe(R.ops.map(thunk(fsid)))
+				.pipe(R.ops.chain(_get_metadata_by_fsid_r("set name", m_query)))
 				.pipe(
-					R.ops.chain(option =>
-						option.cata({
-							Some: () => R.Err(eexist(`.create -> ${parent}/${name}`)),
-							None: () => R.Ok(null),
-						}),
+					R.ops.chain(m =>
+						_check_not_exists_by_name_r("set name", m_query, name, m.get_parent()).pipe(
+							R.ops.map(thunk(m)),
+						),
 					),
 				)
-				.pipe(R.ops.chain(() => u_query.get_current()))
-				.pipe(R.ops.map(user => user.id))
-				.pipe(R.ops.map(id => M.from({ name, parent, author_id: id, type, labels, links, props })))
-				.pipe(R.ops.chain(item => m_query.get().pipe(R.ops.map(items => items.concat(item)))))
-				.pipe(R.ops.chain(m_repo.put)),
-
-		remove: fsid =>
-			R.If(isUUID(fsid), { T: () => fsid, F: () => einval(`.remove -> fsid: ${fsid}`) })
-				.pipe(R.ops.chain(_getMetadataIfExistsR(m_query)))
-				.pipe(R.ops.chain(() => m_query.get()))
-				.pipe(R.ops.map(items => items.filter(item => item.get_fsid() === fsid)))
-				.pipe(R.ops.chain(m_repo.put)),
-
-		set_name: (fsid, name) =>
-			R.If(is_name(name), { T: () => fsid, F: () => einval(`.setName -> name: ${name}`) })
-				.pipe(R.ops.chain(_getMetadataIfExistsR(m_query)))
-				.pipe(R.ops.chain(_rejectIfMetadataExistsByNameParentR(m_query)))
-				.pipe(R.ops.map(_toMetadataDTO))
-				.pipe(R.ops.chain(_resetUpdatedByR(u_query)))
+				.pipe(R.ops.map(_metadata_to_dto))
+				.pipe(R.ops.chain(_reset_updated_by_r(u_query)))
 				.pipe(R.ops.map(override({ name })))
-				.pipe(R.ops.map(_resetUpdatedAt))
-				.pipe(R.ops.map(M.of))
+				.pipe(R.ops.map(_reset_updated_at))
+				.pipe(R.ops.map(_dto_to_metadata))
 				.pipe(R.ops.chain(MC.of(m_repo, m_query, u_query).replace)),
 
 		set_parent: (fsid, parent) =>
-			(parent === null ? R.Ok<any, any>(null) : _getMetadataIfExistsR(m_query)(parent))
-				.pipe(R.ops.map(() => fsid))
-				.pipe(R.ops.chain(_getMetadataIfExistsR(m_query)))
-				.pipe(R.ops.chain(_rejectIfMetadataExistsByNameParentR(m_query)))
-				.pipe(R.ops.chain(_checkCircularReferenceR(m_query, fsid, parent)))
-				.pipe(R.ops.map(_toMetadataDTO))
-				.pipe(R.ops.chain(_resetUpdatedByR(u_query)))
+			(parent === null
+				? R.Ok<any, any>(null)
+				: _get_metadata_by_fsid_r("set parent", m_query)(parent)
+			)
+				.pipe(R.ops.map(thunk(fsid)))
+				.pipe(R.ops.chain(_get_metadata_by_fsid_r("set parent", m_query)))
+				.pipe(
+					R.ops.chain(m =>
+						_check_not_exists_by_name_r("set parent", m_query, m.get_name(), parent).pipe(
+							R.ops.map(thunk(m)),
+						),
+					),
+				)
+				.pipe(R.ops.chain(_err_on_circular_reference_r(m_query, fsid, parent)))
+				.pipe(R.ops.map(_metadata_to_dto))
+				.pipe(R.ops.chain(_reset_updated_by_r(u_query)))
 				.pipe(R.ops.map(override({ parent })))
-				.pipe(R.ops.map(_resetUpdatedAt))
-				.pipe(R.ops.map(M.of))
+				.pipe(R.ops.map(_reset_updated_at))
+				.pipe(R.ops.map(_dto_to_metadata))
 				.pipe(R.ops.chain(MC.of(m_repo, m_query, u_query).replace)),
 
 		set_size: (fsid, size) =>
-			R.If(is_size(size), { T: () => fsid, F: () => einval(`.setSize -> size: ${size}`) })
-				.pipe(R.ops.chain(_getMetadataIfExistsR(m_query)))
-				.pipe(R.ops.map(_toMetadataDTO))
-				.pipe(R.ops.chain(_resetUpdatedByR(u_query)))
+			_check_size_r("set size", size)
+				.pipe(R.ops.map(thunk(fsid)))
+				.pipe(R.ops.chain(_get_metadata_by_fsid_r("set size", m_query)))
+				.pipe(R.ops.map(_metadata_to_dto))
+				.pipe(R.ops.chain(_reset_updated_by_r(u_query)))
 				.pipe(R.ops.map(override({ size })))
-				.pipe(R.ops.map(_resetUpdatedAt))
-				.pipe(R.ops.map(M.of))
+				.pipe(R.ops.map(_reset_updated_at))
+				.pipe(R.ops.map(_dto_to_metadata))
 				.pipe(R.ops.chain(MC.of(m_repo, m_query, u_query).replace)),
 
 		add_labels: (fsid, ...labels) =>
-			_getMetadataIfExistsR(m_query)(fsid)
+			_get_metadata_by_fsid_r(
+				"add labels",
+				m_query,
+			)(fsid)
 				.pipe(R.ops.map(item => item.get_labels()))
-				.pipe(R.ops.map(lbls => concat(lbls, labels).sort(alphaSort("ASC"))))
+				.pipe(R.ops.map(lbls => concat(lbls, labels).sort(alpha_sort("ASC"))))
 				.pipe(R.ops.chain(lbls => MC.of(m_repo, m_query, u_query).replace_labels(fsid, lbls))),
 
 		remove_labels: (fsid, ...labels) =>
-			_getMetadataIfExistsR(m_query)(fsid)
+			_get_metadata_by_fsid_r(
+				"remove labels",
+				m_query,
+			)(fsid)
 				.pipe(R.ops.map(item => item.get_labels()))
 				.pipe(R.ops.map(lbls => lbls.filter(label => !labels.includes(label))))
 				.pipe(R.ops.chain(lbls => MC.of(m_repo, m_query, u_query).replace_labels(fsid, lbls))),
 
 		replace_labels: (fsid, labels) =>
-			R.If(are_lbls(labels))
-				.pipe(R.ops.err_map(() => einval(`.replaceLabels -> label: ${get_wrong_label(labels)}`)))
-				.pipe(R.ops.map(() => fsid))
-				.pipe(R.ops.chain(_getMetadataIfExistsR(m_query)))
-				.pipe(R.ops.map(_toMetadataDTO))
-				.pipe(R.ops.chain(_resetUpdatedByR(u_query)))
+			_check_labels_r("replace labels", labels)
+				.pipe(R.ops.map(thunk(fsid)))
+				.pipe(R.ops.chain(_get_metadata_by_fsid_r("replace labels", m_query)))
+				.pipe(R.ops.map(_metadata_to_dto))
+				.pipe(R.ops.chain(_reset_updated_by_r(u_query)))
 				.pipe(R.ops.map(override({ labels })))
-				.pipe(R.ops.map(_resetUpdatedAt))
-				.pipe(R.ops.map(M.of))
+				.pipe(R.ops.map(_reset_updated_at))
+				.pipe(R.ops.map(_dto_to_metadata))
 				.pipe(R.ops.chain(MC.of(m_repo, m_query, u_query).replace)),
 
 		add_links: (fsid, ...links) =>
-			_getMetadataIfExistsR(m_query)(fsid)
+			_get_metadata_by_fsid_r(
+				"add links",
+				m_query,
+			)(fsid)
 				.pipe(R.ops.map(item => item.get_links()))
-				.pipe(R.ops.map(lnks => concat(lnks, links).sort(alphaSort())))
+				.pipe(R.ops.map(lnks => concat(lnks, links).sort(alpha_sort())))
 				.pipe(R.ops.chain(links => MC.of(m_repo, m_query, u_query).replace_links(fsid, links))),
 
 		remove_links: (fsid, ...links) =>
-			_getMetadataIfExistsR(m_query)(fsid)
+			_get_metadata_by_fsid_r(
+				"remove links",
+				m_query,
+			)(fsid)
 				.pipe(R.ops.map(item => item.get_links()))
 				.pipe(R.ops.map(lnks => lnks.filter(link => !links.includes(link))))
 				.pipe(R.ops.chain(links => MC.of(m_repo, m_query, u_query).replace_links(fsid, links))),
 
 		replace_links: (fsid, links) =>
-			R.If(are_lnks(links))
-				.pipe(R.ops.err_map(() => einval(`.replaceLinks -> link: ${links.find(l => !isUUID(l))}`)))
-				.pipe(R.ops.map(() => fsid))
-				.pipe(R.ops.chain(_getMetadataIfExistsR(m_query)))
-				.pipe(R.ops.map(_toMetadataDTO))
-				.pipe(R.ops.chain(_resetUpdatedByR(u_query)))
+			_check_links_r("replace links", links)
+				.pipe(R.ops.map(thunk(fsid)))
+				.pipe(R.ops.chain(_get_metadata_by_fsid_r("replace links", m_query)))
+				.pipe(R.ops.map(_metadata_to_dto))
+				.pipe(R.ops.chain(_reset_updated_by_r(u_query)))
 				.pipe(R.ops.map(override({ links })))
-				.pipe(R.ops.map(_resetUpdatedAt))
-				.pipe(R.ops.map(M.of))
+				.pipe(R.ops.map(_reset_updated_at))
+				.pipe(R.ops.map(_dto_to_metadata))
 				.pipe(R.ops.chain(MC.of(m_repo, m_query, u_query).replace)),
 
 		append_child: (fsid, child) => MC.of(m_repo, m_query, u_query).set_parent(child, fsid),
 
 		set_property: (fsid, key, value) =>
-			R.If(is_prop_key(key), { F: () => einval(`.setProperty -> key: ${key.toString()}`) })
-				.pipe(R.ops.map(() => fsid))
-				.pipe(R.ops.chain(_getMetadataIfExistsR(m_query)))
-				.pipe(R.ops.map(_toMetadataDTO))
-				.pipe(R.ops.chain(_resetUpdatedByR(u_query)))
+			_check_prop_key_r("set property", key)
+				.pipe(R.ops.map(thunk(fsid)))
+				.pipe(R.ops.chain(_get_metadata_by_fsid_r("set property", m_query)))
+				.pipe(R.ops.map(_metadata_to_dto))
+				.pipe(R.ops.chain(_reset_updated_by_r(u_query)))
 				.pipe(R.ops.map(item => ({ ...item, props: { ...(item.props ?? {}), [key]: value } })))
-				.pipe(R.ops.map(_resetUpdatedAt))
-				.pipe(R.ops.map(M.of))
+				.pipe(R.ops.map(_reset_updated_at))
+				.pipe(R.ops.map(_dto_to_metadata))
 				.pipe(R.ops.chain(MC.of(m_repo, m_query, u_query).replace)),
 
 		remove_property: (fsid, key) =>
-			R.If(is_prop_key(key), { F: () => einval(`.removeProperty -> key: ${key.toString()}`) })
-				.pipe(R.ops.map(() => fsid))
-				.pipe(R.ops.chain(_getMetadataIfExistsR(m_query)))
-				.pipe(R.ops.map(_toMetadataDTO))
-				.pipe(R.ops.chain(_resetUpdatedByR(u_query)))
+			_check_prop_key_r("remove property", key)
+				.pipe(R.ops.map(thunk(fsid)))
+				.pipe(R.ops.chain(_get_metadata_by_fsid_r("remove property", m_query)))
+				.pipe(R.ops.map(_metadata_to_dto))
+				.pipe(R.ops.chain(_reset_updated_by_r(u_query)))
 				.pipe(R.ops.map(item => ({ ...item, props: { ...(item.props ?? {}), [key]: undefined } })))
-				.pipe(R.ops.map(_resetUpdatedAt))
-				.pipe(R.ops.map(M.of))
+				.pipe(R.ops.map(_reset_updated_at))
+				.pipe(R.ops.map(_dto_to_metadata))
 				.pipe(R.ops.chain(MC.of(m_repo, m_query, u_query).replace)),
+
+		create: ({ name, parent, type = "text/ordo", labels = [], links = [], props = {} }) =>
+			R.Merge([
+				_check_name_r("create", name),
+				_check_parent_r("create", parent),
+				_check_labels_r("create", labels),
+				_check_links_r("create", links),
+				_check_type_r("create", type),
+				_check_props_r("create", props),
+				_check_not_exists_by_name_r("create", m_query, name, parent),
+			])
+				.pipe(R.ops.chain(u_query.get_current))
+				.pipe(R.ops.map(prop("id")))
+				.pipe(R.ops.map(id => M.from({ name, parent, author_id: id, type, labels, links, props })))
+				.pipe(R.ops.chain(item => m_query.get().pipe(R.ops.map(items => items.concat(item)))))
+				.pipe(R.ops.chain(m_repo.put)),
+
+		remove: fsid =>
+			_check_fsid_r("remove", fsid)
+				.pipe(R.ops.map(thunk(fsid)))
+				.pipe(R.ops.chain(_get_metadata_by_fsid_r("remove", m_query)))
+				.pipe(R.ops.map(thunk(void 0)))
+				.pipe(R.ops.chain(m_query.get))
+				.pipe(R.ops.map(items => items.filter(item => item.get_fsid() === fsid)))
+				.pipe(R.ops.chain(m_repo.put)),
 
 		replace: value =>
 			m_query
 				.get()
-				.pipe(R.ops.chain(_replaceMetadataR(value)))
+				.pipe(R.ops.chain(_replace_metadata_r(value)))
 				.pipe(R.ops.chain(m_repo.put)),
 	}),
 }
@@ -177,55 +189,106 @@ export const MC = MetadataCommand
 
 // --- Internal ---
 
-const _getMetadataIfExistsR =
-	(metadataQuery: TMetadataQuery) =>
-	(fsid: FSID): TResult<TMetadata, TRrr<"ENOENT" | "EAGAIN" | "EINVAL">> =>
-		metadataQuery
-			.get_by_fsid(fsid)
-			.pipe(
-				R.ops.chain(item =>
-					item.cata({ Some: R.Ok, None: () => R.Err(einval(`_getMetadataIfExistsR: ${fsid}`)) }),
-				),
-			)
+type TInputValidatorFn<$TInput> = (
+	location: string,
+	input: $TInput,
+) => TResult<boolean, TRrr<"EINVAL">>
 
-const _resetUpdatedByR = (userQuery: TUserQuery) => (item: TMetadataDTO) =>
-	userQuery
-		.get_current()
-		.pipe(R.ops.map(user => user.id))
-		.pipe(R.ops.map(updatedBy => ({ ...item, updatedBy })))
+const _check_fsid_r: TInputValidatorFn<FSID> = (location, fsid) =>
+	R.If(M.guards.is_fsid(fsid), { F: () => inval(`${location} -> fsid: ${fsid}`) })
 
-type TRejectIfMetadataExistsByNameParentRFn = (
-	metadataQuery: TMetadataQuery,
-) => (metadata: TMetadata) => TResult<TMetadata, TRrr<"EEXIST">>
-const _rejectIfMetadataExistsByNameParentR: TRejectIfMetadataExistsByNameParentRFn = q => m =>
-	q
-		.get_by_name_and_parent(m.get_name(), m.get_parent())
-		.pipe(R.ops.swap())
+const _check_size_r: TInputValidatorFn<number> = (location, size) =>
+	R.If(M.guards.is_size(size), { F: () => inval(`${location} -> size: ${size}`) })
+
+const _check_parent_r: TInputValidatorFn<FSID | null> = (location, parent) =>
+	R.If(M.guards.is_parent(parent), { F: () => inval(`${location} -> parent: ${parent}`) })
+
+const _check_labels_r: TInputValidatorFn<string[]> = (location, labels) =>
+	R.If(M.guards.are_labels(labels), {
+		F: () => inval(`${location} -> label: ${get_wrong_label(labels)}`),
+	})
+
+const _check_name_r: TInputValidatorFn<string> = (location, name) =>
+	R.If(M.guards.is_name(name), { F: () => inval(`${location} -> name: ${name}`) })
+
+const _check_links_r: TInputValidatorFn<FSID[]> = (location, links) =>
+	R.If(M.guards.are_links(links), {
+		F: () => inval(`${location} -> link: ${get_wrong_link(links)}`),
+	})
+
+const _check_type_r: TInputValidatorFn<any> = (location, type) =>
+	R.If(M.guards.is_type(type), { F: () => inval(`${location} -> type: ${type}`) })
+
+const _check_props_r: TInputValidatorFn<TMetadataProps> = (location, props) =>
+	R.If(M.guards.is_props(props), {
+		F: () => inval(`${location} -> props: ${JSON.stringify(props)}`),
+	})
+
+const _check_prop_key_r: TInputValidatorFn<string | number | symbol> = (location, key) =>
+	R.If(M.guards.is_prop_key(key), { F: () => inval(`${location} -> key: ${String(key)}`) })
+
+type TCheckExistsByNameAndParentRFn = (
+	location: string,
+	metadata_query: TMetadataQuery,
+	name: string,
+	parent: FSID | null,
+) => TResult<void, TRrr<"EEXIST" | "EINVAL" | "EAGAIN">>
+const _check_not_exists_by_name_r: TCheckExistsByNameAndParentRFn = (
+	location,
+	query,
+	name,
+	parent,
+) =>
+	query.get_by_name_and_parent(name, parent).pipe(
+		R.ops.chain(option =>
+			option.cata({
+				Some: () => R.Err(exist(`${location} -> ${parent}/${name} exists`)),
+				None: () => R.Ok(undefined),
+			}),
+		),
+	)
+
+type TGetMetadataByFSIDRFn = (
+	location: string,
+	metadata_query: TMetadataQuery,
+) => (fsid: FSID) => TResult<TMetadata, TRrr<"ENOENT" | "EAGAIN" | "EINVAL">>
+const _get_metadata_by_fsid_r: TGetMetadataByFSIDRFn = (location, query) => fsid =>
+	query
+		.get_by_fsid(fsid)
 		.pipe(
-			R.ops.bimap(
-				() => eexist(`_rejectIfMetadataExistsByNameParentR: ${m.get_name()}, ${m.get_parent()}`),
-				() => m,
+			R.ops.chain(item =>
+				item.cata({ Some: R.Ok, None: () => R.Err(inval(`${location} -> fsid: ${fsid}`)) }),
 			),
 		)
 
-type TToMetadataDTOFn = <_TProps extends TMetadataProps = TMetadataProps>(
-	metadata: TMetadata<_TProps>,
-) => TMetadataDTO<_TProps>
-const _toMetadataDTO: TToMetadataDTOFn = x => x.to_dto()
+type TResetUpdatedByRFn = (
+	user_query: TUserQuery,
+) => (dto: TMetadataDTO) => TResult<TMetadataDTO, TRrr<"EAGAIN">>
+const _reset_updated_by_r: TResetUpdatedByRFn = query => metadata =>
+	query
+		.get_current()
+		.pipe(R.ops.map(user => user.id))
+		.pipe(R.ops.map(updatedBy => ({ ...metadata, updatedBy })))
+
+type TMetadataDTOToTMetadataFn = (dto: TMetadataDTO) => TMetadata
+const _dto_to_metadata: TMetadataDTOToTMetadataFn = d => M.of(d)
+
+type TMetadataToTMetadataDTOFn = (metadata: TMetadata) => TMetadataDTO
+const _metadata_to_dto: TMetadataToTMetadataDTOFn = m => m.to_dto()
 
 type TResetUpdatedAtFn = (metadata: TMetadataDTO) => TMetadataDTO
-const _resetUpdatedAt: TResetUpdatedAtFn = override({ updated_at: Date.now() })
+const _reset_updated_at: TResetUpdatedAtFn = override({ updated_at: Date.now() })
 
 type TReplaceMetadataRFn = (
 	newValue: TMetadata,
 ) => (items: TMetadata[]) => TResult<TMetadata[], TRrr<"ENOENT">>
-const _replaceMetadataR: TReplaceMetadataRFn = x => xs =>
+const _replace_metadata_r: TReplaceMetadataRFn = x => xs =>
 	R.Ok(xs.findIndex(item => item.get_fsid() === x.get_fsid()))
 		.pipe(
 			R.ops.chain(index =>
 				R.If(index >= 0, {
 					T: () => ({ items: xs, index: index }),
-					F: () => enoent(`_replaceMetadataR: ${x.get_fsid()} not in metadata`),
+					F: () => noent(`replace: ${x.get_fsid()} not found`),
 				}),
 			),
 		)
@@ -238,18 +301,19 @@ const _replaceMetadataR: TReplaceMetadataRFn = x => xs =>
 			),
 		)
 
-export type TCheckCircularReferenceRFn = (
-	mQuery: TMetadataQuery,
+type TCheckCircularReferenceRFn = (
+	metadata_query: TMetadataQuery,
 	fsid: FSID,
 	parent: FSID | null,
 ) => (item: TMetadata) => TResult<TMetadata, TRrr<"ENXIO" | "EAGAIN" | "EINVAL" | "ENOENT">>
-export const _checkCircularReferenceR: TCheckCircularReferenceRFn = (mQuery, id, p) => i =>
-	mQuery
-		.get_descendents(id)
-		.pipe(
-			R.ops.chain(ds =>
-				ds.some(d => d.get_fsid() === p)
-					? R.Err(enxio(`.setParent circular reference: ${p} is in children of ${id}`))
-					: R.Ok(i),
-			),
-		)
+const _err_on_circular_reference_r: TCheckCircularReferenceRFn =
+	(query, fsid, parent) => metadata =>
+		query
+			.get_descendents(fsid)
+			.pipe(
+				R.ops.chain(descendents =>
+					descendents.some(descendent => descendent.get_fsid() === parent)
+						? R.Err(enxio(`circular reference: ${parent} is descendent of ${fsid}`))
+						: R.Ok(metadata),
+				),
+			)

@@ -29,7 +29,7 @@ import {
 } from "@ordo-pink/backend-service-user"
 import { Oath } from "@ordo-pink/oath"
 import { SUB } from "@ordo-pink/wjwt"
-import { keysOf } from "@ordo-pink/tau"
+import { keys_of } from "@ordo-pink/tau"
 
 import type * as T from "./backend-persistence-strategy-user-dynamodb.types"
 
@@ -166,7 +166,7 @@ const serialize: T._SerializeFn = item => ({
 })
 
 const reduceUserToAttributeUpdates: T._ReduceUserToAttributeUpdatesFn = user =>
-	keysOf(user).reduce((AttributeUpdates, key) => {
+	keys_of(user).reduce((AttributeUpdates, key) => {
 		if (key === "id" || key === "createdAt") return AttributeUpdates
 
 		if (

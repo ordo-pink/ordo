@@ -1,8 +1,8 @@
-import { getPercentage } from "@ordo-pink/tau"
+import { get_percentage } from "@ordo-pink/tau"
 
 type P = { total: number; current: number; text?: string }
 export default function ProgressBar({ total, current, text }: P) {
-	const progressPercentage = getPercentage(total, current)
+	const progressPercentage = get_percentage(total, current)
 	const progressBarStyle = { width: `${progressPercentage}%` }
 	const progress = `${current} / ${total}`
 

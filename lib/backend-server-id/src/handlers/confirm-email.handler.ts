@@ -30,7 +30,7 @@ import {
 	merge0,
 	rejectedMap0,
 } from "@ordo-pink/oath"
-import { isString, omit } from "@ordo-pink/tau"
+import { is_string, omit } from "@ordo-pink/tau"
 import { parseBody0, sendError, sendSuccess } from "@ordo-pink/backend-utils"
 import { HttpError } from "@ordo-pink/rrr"
 import { OK } from "@ordo-pink/core"
@@ -66,7 +66,7 @@ const validateBody0: TValidateBodyFn = body =>
 		email: fromNullable0(body.email)
 			.pipe(chain0(email => fromBoolean0(isEmail(email), body.email!)))
 			.pipe(rejectedMap0(toInvalidBodyError)),
-		code: fromBoolean0(isString(body.code), body.code!).pipe(rejectedMap0(toInvalidBodyError)),
+		code: fromBoolean0(is_string(body.code), body.code!).pipe(rejectedMap0(toInvalidBodyError)),
 	})
 
 type TExtractCtxFn = (us: UserService) => (body: TRequestBody) => Oath<TCtx, HttpError>

@@ -18,7 +18,7 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import type * as T from "./types"
-import { isFunction } from "@ordo-pink/tau"
+import { is_f } from "@ordo-pink/tau"
 
 // --- Public ---
 
@@ -44,7 +44,7 @@ const swich = <TContext, TResult extends unknown[] = []>(
 	x: TContext,
 ): T.TSwitch<TContext, TResult> => ({
 	case: (predicate, onTrue) => {
-		const isTrue = isFunction(predicate)
+		const isTrue = is_f(predicate)
 			? predicate(x)
 			: Array.isArray(predicate)
 				? predicate.includes(x)

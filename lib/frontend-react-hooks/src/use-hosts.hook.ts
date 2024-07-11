@@ -17,7 +17,7 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { callOnce } from "@ordo-pink/tau"
+import { call_once } from "@ordo-pink/tau"
 
 let idHost: string
 let dtHost: string
@@ -32,7 +32,7 @@ export type Hosts = {
 	websiteHost: string
 	myHost: string
 }
-export const __initHosts = callOnce((hosts: Hosts) => {
+export const __initHosts = call_once((hosts: Hosts) => {
 	idHost = hosts.idHost
 	dtHost = hosts.dtHost
 	staticHost = hosts.staticHost

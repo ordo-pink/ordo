@@ -20,12 +20,12 @@
 import { createDirectoryIfNotExists0, mv0 } from "@ordo-pink/fs"
 import { die, runBunCommand0 } from "@ordo-pink/binutil"
 import { getc } from "@ordo-pink/getc"
-import { keysOf } from "@ordo-pink/tau"
+import { keys_of } from "@ordo-pink/tau"
 
 const env = getc()
 
 const defineEnv = (env: Record<string, string>) =>
-	keysOf(env).reduce((acc, key) => acc.concat(`--define Bun.env.${key}='${env[key]}' `), "")
+	keys_of(env).reduce((acc, key) => acc.concat(`--define Bun.env.${key}='${env[key]}' `), "")
 const createOutDirectoryIfNotExists0 = () => createDirectoryIfNotExists0("var/out")
 const moveCompiledFileToOutDirectory0 = () => mv0("dt", "var/out/dt")
 

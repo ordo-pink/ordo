@@ -22,13 +22,13 @@ import { BehaviorSubject } from "rxjs/internal/BehaviorSubject"
 import { map } from "rxjs/internal/operators/map"
 
 import { activities$, currentActivity$, currentFID$ } from "@ordo-pink/frontend-stream-activities"
-import { callOnce } from "@ordo-pink/tau"
+import { call_once } from "@ordo-pink/tau"
 import { getCommands } from "@ordo-pink/frontend-stream-commands"
 import { getLogger } from "@ordo-pink/frontend-logger"
 
 const { route, noMatch } = operators
 
-export const __initRouter = callOnce((fid: symbol) => {
+export const __initRouter = call_once((fid: symbol) => {
 	const commands = getCommands(fid)
 	const logger = getLogger(fid)
 

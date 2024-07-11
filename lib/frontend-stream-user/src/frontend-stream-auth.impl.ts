@@ -20,7 +20,7 @@
 import { F, T, identity } from "ramda"
 import { BehaviorSubject } from "rxjs/internal/BehaviorSubject"
 
-import { N, callOnce } from "@ordo-pink/tau"
+import { N, call_once } from "@ordo-pink/tau"
 import { type AuthResponse } from "@ordo-pink/backend-server-id"
 import { Either } from "@ordo-pink/either"
 import { KnownFunctions } from "@ordo-pink/frontend-known-functions"
@@ -31,7 +31,7 @@ import { getHosts } from "@ordo-pink/frontend-react-hooks"
 import { getLogger } from "@ordo-pink/frontend-logger"
 
 type InitUserStreamP = { fid: symbol; isDev: boolean }
-export const __initAuth$ = callOnce(({ fid, isDev }: InitUserStreamP) => {
+export const __initAuth$ = call_once(({ fid, isDev }: InitUserStreamP) => {
 	const { idHost, websiteHost } = getHosts()
 	const fetch = getFetch(fid)
 	const logger = getLogger(fid)

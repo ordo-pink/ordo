@@ -29,7 +29,7 @@ import {
 	rejectedMap0,
 } from "@ordo-pink/oath"
 import { authenticate0, parseBody0, sendError, sendSuccess } from "@ordo-pink/backend-utils"
-import { isString, omit } from "@ordo-pink/tau"
+import { is_string, omit } from "@ordo-pink/tau"
 import { type HttpError } from "@ordo-pink/rrr"
 import { type UserService } from "@ordo-pink/backend-service-user"
 
@@ -68,7 +68,7 @@ const extractCtx0: TExtractCtxFn =
 
 type TValidateCtxFn = (ctx: TCtx) => Oath<TCtx, HttpError>
 const validateCtx0: TValidateCtxFn = ctx =>
-	fromBoolean0(isString(ctx.firstName) && isString(ctx.lastName), ctx).pipe(
+	fromBoolean0(is_string(ctx.firstName) && is_string(ctx.lastName), ctx).pipe(
 		rejectedMap0(toInvalidBodyError),
 	)
 

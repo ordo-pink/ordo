@@ -25,6 +25,8 @@ import {
 	type FSID,
 	type PlainData,
 	type TMetadata,
+	is_fsid,
+	is_metadata,
 } from "@ordo-pink/data"
 import { Option, TOption } from "@ordo-pink/option"
 import { Switch } from "@ordo-pink/switch"
@@ -38,10 +40,8 @@ type TItemToFSIDParam = TMetadata | FSID | null
 
 const item_to_fsid = (item?: TItemToFSIDParam): TOption<FSID> =>
 	Switch.empty()
-		.case(Boolean(item && (item as TMetadata).get_fsid), () =>
-			Option.Some((item as TMetadata).get_fsid()),
-		)
-		.case(typeof item === "string", () => Option.Some(item as FSID))
+		.case(is_metadata(item), () => Option.Some((item as TMetadata).get_fsid()))
+		.case(is_fsid(item), () => Option.Some(item as FSID))
 		.default(() => Option.None())
 
 export const useMetadataQuery = () => {

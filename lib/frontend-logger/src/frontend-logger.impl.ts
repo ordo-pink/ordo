@@ -19,11 +19,11 @@
 
 import { ConsoleLogger, Logger } from "@ordo-pink/logger"
 import { KnownFunctions } from "@ordo-pink/frontend-known-functions"
-import { callOnce } from "@ordo-pink/tau"
+import { call_once } from "@ordo-pink/tau"
 
 let logger = ConsoleLogger
 
-export const __initLogger = callOnce((customLogger: Logger) => {
+export const __initLogger = call_once((customLogger: Logger) => {
 	logger = customLogger
 })
 

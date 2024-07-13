@@ -1,7 +1,4 @@
-import type { Oath } from "@ordo-pink/oath"
-
 import type { TAsyncMetadataRepository, TMetadataRepository } from "./metadata-repository.types"
-import type { TRrr } from "./metadata.errors"
 
 export type TMetadataManagerStatic = {
 	of: (
@@ -10,6 +7,12 @@ export type TMetadataManagerStatic = {
 	) => TMetadataManager
 }
 
+export type TMetadataManagerStateChange =
+	| "get-remote"
+	| "get-remote-complete"
+	| "put-remote"
+	| "put-remote-complete"
+
 export type TMetadataManager = {
-	synchronise_state: () => Oath<void, TRrr<"EIO" | "EINVAL">>
+	start: (on_state_change: (change: TMetadataManagerStateChange) => void) => void
 }

@@ -22,10 +22,10 @@ import { cwd } from "process"
 import { join } from "path"
 
 import { Oath, oathify } from "@ordo-pink/oath"
-import { chain0 } from "@ordo-pink/oath/operators/chain"
-import { fromBoolean0 } from "@ordo-pink/oath/constructors/from-falsy"
-import { fromPromise0 } from "@ordo-pink/oath/constructors/from-promise"
-import { map0 } from "@ordo-pink/oath/operators/map"
+import { chain_oath } from "@ordo-pink/oath/operators/chain"
+import { from_boolean_oath } from "@ordo-pink/oath/constructors/from-falsy"
+import { from_promise_oath } from "@ordo-pink/oath/constructors/from-promise"
+import { map_oath } from "@ordo-pink/oath/operators/map"
 import { noop } from "@ordo-pink/tau"
 
 export const getParentPath = (path: string) => {
@@ -47,35 +47,35 @@ export const removeFile0 = rmdir0
 export const mv0 = oathify(promises.rename)
 export const rename0 = mv0
 export const stat0 = (...args: Parameters<typeof promises.stat>) =>
-	fromPromise0<Stats | BigIntStats, Error>(() => promises.stat(...args))
+	from_promise_oath<Stats | BigIntStats, Error>(() => promises.stat(...args))
 export const readdir0 = oathify(promises.readdir)
 export const mkdirRecursive0 = (path: string) => mkdir0(path, { recursive: true })
 
 export const writeFileRecursive0 = (...[path, data, options]: Parameters<typeof writeFile0>) =>
-	fromBoolean0(
+	from_boolean_oath(
 		typeof path === "string",
 		noop,
 		() => new Error("writeFileRecursive0 can only create files from string paths"),
 	)
-		.pipe(chain0(() => createParentIfNotExists0(path as string)))
-		.pipe(chain0(() => writeFile0(path, data, options)))
+		.pipe(chain_oath(() => createParentIfNotExists0(path as string)))
+		.pipe(chain_oath(() => writeFile0(path, data, options)))
 
 export const createDirectoryIfNotExists0 = (path: string) =>
 	stat0(path)
 		.fix(() => mkdirRecursive0(path))
-		.pipe(map0(noop))
+		.pipe(map_oath(noop))
 
 export const createParentIfNotExists0 = (path: string) =>
-	Oath.resolve(path).pipe(map0(getParentPath)).pipe(chain0(createDirectoryIfNotExists0))
+	Oath.Resolve(path).pipe(map_oath(getParentPath)).pipe(chain_oath(createDirectoryIfNotExists0))
 
 export const fileExists0 = (path: string) =>
 	stat0(path)
-		.pipe(map0(stat => stat.isFile()))
+		.pipe(map_oath(stat => stat.isFile()))
 		.fix(() => false)
 
 export const directoryExists0 = (path: string) =>
 	stat0(path)
-		.pipe(map0(stat => stat.isDirectory()))
+		.pipe(map_oath(stat => stat.isDirectory()))
 		.fix(() => false)
 
 export const isFile0 = fileExists0

@@ -19,13 +19,14 @@
 
 import { useMemo } from "react"
 
-import { type Logger } from "@ordo-pink/logger"
-import { getLogger } from "@ordo-pink/frontend-logger"
+import { type TLogger } from "@ordo-pink/logger"
 import { useCurrentFID } from "@ordo-pink/frontend-stream-activities"
+import { useOrdoContext } from "./use-ordo-context.hook"
 
-export const useLogger = (): Logger => {
+export const useLogger = (): TLogger => {
 	const fid = useCurrentFID()
-	const logger = useMemo(() => getLogger(fid), [fid])
+	const { get_logger } = useOrdoContext()
+	const logger = useMemo(() => get_logger(fid), [fid, get_logger])
 
 	return logger
 }

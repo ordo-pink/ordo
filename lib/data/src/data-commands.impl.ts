@@ -56,7 +56,7 @@ const of = <T>({
 							.chain(Oath.ifElse(x => !!x, { onFalse: () => Errors.DataNotFound })),
 				})
 		)
-			.chain(() => Data.new(params).fold(Oath.reject, Oath.resolve))
+			.chain(() => Data.new(params).fold(Oath.Reject, Oath.Resolve))
 			.chain(data =>
 				dataPersistenceStrategy.count(data.plain.createdBy).chain(
 					Oath.ifElse(length => length < params.fileLimit, {
@@ -78,32 +78,32 @@ const of = <T>({
 	link: ({ createdBy, fsid, link, updatedBy }) =>
 		dataPersistenceStrategy
 			.get(createdBy, fsid)
-			.chain(plain => Data.of(plain).addLink(link, updatedBy).fold(Oath.reject, Oath.resolve))
+			.chain(plain => Data.of(plain).addLink(link, updatedBy).fold(Oath.Reject, Oath.Resolve))
 			.chain(data => dataPersistenceStrategy.update(data.plain)),
 	unlink: ({ createdBy, fsid, link, updatedBy }) =>
 		dataPersistenceStrategy
 			.get(createdBy, fsid)
-			.chain(plain => Data.of(plain).removeLink(link, updatedBy).fold(Oath.reject, Oath.resolve))
+			.chain(plain => Data.of(plain).removeLink(link, updatedBy).fold(Oath.Reject, Oath.Resolve))
 			.chain(data => dataPersistenceStrategy.update(data.plain)),
 	addLabel: ({ createdBy, fsid, label, updatedBy }) =>
 		dataPersistenceStrategy
 			.get(createdBy, fsid)
-			.chain(plain => Data.of(plain).addLabel(label, updatedBy).fold(Oath.reject, Oath.resolve))
+			.chain(plain => Data.of(plain).addLabel(label, updatedBy).fold(Oath.Reject, Oath.Resolve))
 			.chain(data => dataPersistenceStrategy.update(data.plain)),
 	removeLabel: ({ createdBy, fsid, label, updatedBy }) =>
 		dataPersistenceStrategy
 			.get(createdBy, fsid)
-			.chain(plain => Data.of(plain).removeLabel(label, updatedBy).fold(Oath.reject, Oath.resolve))
+			.chain(plain => Data.of(plain).removeLabel(label, updatedBy).fold(Oath.Reject, Oath.Resolve))
 			.chain(data => dataPersistenceStrategy.update(data.plain)),
 	addLink: ({ createdBy, fsid, link, updatedBy }) =>
 		dataPersistenceStrategy
 			.get(createdBy, fsid)
-			.chain(plain => Data.of(plain).addLink(link, updatedBy).fold(Oath.reject, Oath.resolve))
+			.chain(plain => Data.of(plain).addLink(link, updatedBy).fold(Oath.Reject, Oath.Resolve))
 			.chain(data => dataPersistenceStrategy.update(data.plain)),
 	removeLink: ({ createdBy, fsid, link, updatedBy }) =>
 		dataPersistenceStrategy
 			.get(createdBy, fsid)
-			.chain(plain => Data.of(plain).removeLink(link, updatedBy).fold(Oath.reject, Oath.resolve))
+			.chain(plain => Data.of(plain).removeLink(link, updatedBy).fold(Oath.Reject, Oath.Resolve))
 			.chain(data => dataPersistenceStrategy.update(data.plain)),
 	update: ({ data, fsid, createdBy, updatedBy }) =>
 		dataPersistenceStrategy
@@ -111,7 +111,7 @@ const of = <T>({
 			.chain(plain =>
 				Data.of(plain)
 					.update({ ...data, updatedBy })
-					.fold(Oath.reject, Oath.resolve),
+					.fold(Oath.Reject, Oath.Resolve),
 			)
 			.chain(data => dataPersistenceStrategy.update(data.plain)),
 	// TODO: Roll back on error
@@ -127,7 +127,7 @@ const of = <T>({
 				.chain(Oath.ifElse(x => !!x, { onFalse: () => Errors.DataNotFound })),
 		})
 			.chain(() => dataPersistenceStrategy.get(createdBy, fsid))
-			.chain(plain => Data.of(plain).setParent(parent, updatedBy).fold(Oath.reject, Oath.resolve))
+			.chain(plain => Data.of(plain).setParent(parent, updatedBy).fold(Oath.Reject, Oath.Resolve))
 			.chain(data => dataPersistenceStrategy.update(data.plain)),
 	// TODO: Roll back on error
 	remove: ({ createdBy, fsid }) =>
@@ -172,14 +172,14 @@ const of = <T>({
 	rename: ({ fsid, createdBy, name, updatedBy }) =>
 		dataPersistenceStrategy
 			.get(createdBy, fsid)
-			.chain(plain => Data.of(plain).setName(name, updatedBy).fold(Oath.reject, Oath.resolve))
+			.chain(plain => Data.of(plain).setName(name, updatedBy).fold(Oath.Reject, Oath.Resolve))
 			.chain(data => dataPersistenceStrategy.update(data.plain)),
 	// TODO: Roll back on error
 	updateContent: ({ content, createdBy, updatedBy, fsid, length }) =>
 		dataPersistenceStrategy.get(createdBy, fsid).chain(plain =>
 			contentPersistenceStrategy
 				.write(createdBy, plain.fsid, content, length)
-				.chain(size => Data.of(plain).setSize(size, updatedBy).fold(Oath.reject, Oath.resolve))
+				.chain(size => Data.of(plain).setSize(size, updatedBy).fold(Oath.Reject, Oath.Resolve))
 				.chain(data => dataPersistenceStrategy.update(data.plain).map(() => data.plain.size)),
 		),
 	// TODO: Roll back on error
@@ -210,7 +210,7 @@ const of = <T>({
 			.chain(plain =>
 				contentPersistenceStrategy
 					.write(createdBy, plain.fsid, content, length)
-					.chain(size => Data.of(plain).setSize(size, updatedBy).fold(Oath.reject, Oath.resolve))
+					.chain(size => Data.of(plain).setSize(size, updatedBy).fold(Oath.Reject, Oath.Resolve))
 					.chain(data => dataPersistenceStrategy.update(data.plain)),
 			),
 	getContent: ({ createdBy, fsid }) => contentPersistenceStrategy.read(createdBy, fsid),

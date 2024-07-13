@@ -28,10 +28,10 @@ import { N, call_once, noop } from "@ordo-pink/tau"
 
 import { Either, fromNullableE } from "@ordo-pink/either"
 import { KnownFunctions } from "@ordo-pink/frontend-known-functions"
-import { getLogger } from "@ordo-pink/frontend-logger"
+import { _get_logger } from "@ordo-pink/frontend-logger"
 
-export const __initActivities = call_once((fid: symbol) => {
-	const logger = getLogger(fid)
+export const __init_activities$ = call_once((fid: symbol) => {
+	const logger = _get_logger(fid)
 
 	logger.debug("Initializing activities...")
 
@@ -53,7 +53,7 @@ const remove =
 		state.filter(activity => activity.name === activityName)
 
 export const currentActivity$ = new BehaviorSubject<Extensions.Activity | null>(null)
-export const currentFID$ = new BehaviorSubject<symbol | null>(null)
+export const current_fid$ = new BehaviorSubject<symbol | null>(null)
 export const activities$ = merge(add$.pipe(map(add)), remove$.pipe(map(remove))).pipe(
 	scan((acc, f) => f(acc), [] as Extensions.Activity[]),
 	shareReplay(1),
@@ -80,7 +80,7 @@ export const getCurrentActivity = (fid: symbol | null): Extensions.Activity | nu
 		.chain(checkCurrentActivityQueryPermissionE)
 		.fold(N, () => currentActivity$.value)
 
-export const getCurrentFID = () => currentFID$.value
+export const getCurrentFID = () => current_fid$.value
 
 const checkCurrentActivityQueryPermissionE = (fid: symbol) =>
 	Either.fromBoolean(

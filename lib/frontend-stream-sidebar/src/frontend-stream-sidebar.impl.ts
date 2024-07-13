@@ -27,14 +27,14 @@ import {
 	NARROW_WINDOW_BREAKPOINT,
 } from "./frontend-stream-sidebar.constants"
 import { call_once } from "@ordo-pink/tau"
-import { getCommands } from "@ordo-pink/frontend-stream-commands"
+import { _get_commands } from "@ordo-pink/frontend-stream-commands"
 
 import { type SidebarState } from "./frontend-stream-sidebar.types"
 
 export const sidebar$ = new BehaviorSubject<SidebarState>({ disabled: true })
 
-export const __initSidebar = call_once((fid: symbol) => {
-	const commands = getCommands(fid)
+export const __init_sidebar$ = call_once((fid: symbol) => {
+	const commands = _get_commands(fid)
 
 	commands.on<cmd.sidebar.disable>("sidebar.disable", () => {
 		const sidebar = sidebar$.value

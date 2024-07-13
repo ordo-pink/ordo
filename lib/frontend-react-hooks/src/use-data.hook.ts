@@ -32,20 +32,20 @@ import { Option, TOption } from "@ordo-pink/option"
 import { Switch } from "@ordo-pink/switch"
 import { data$ } from "@ordo-pink/frontend-stream-data"
 
-import { useQueryContext } from "./use-query-context.hook"
+import { useOrdoContext } from "./use-ordo-context.hook"
 import { useRouteParams } from "./use-route.hook"
 import { useStrictSubscription } from "./use-strict-subscription.hook"
 
 type TItemToFSIDParam = TMetadata | FSID | null
 
 const item_to_fsid = (item?: TItemToFSIDParam): TOption<FSID> =>
-	Switch.empty()
+	Switch.OfTrue()
 		.case(is_metadata(item), () => Option.Some((item as TMetadata).get_fsid()))
 		.case(is_fsid(item), () => Option.Some(item as FSID))
 		.default(() => Option.None())
 
 export const useMetadataQuery = () => {
-	const { metadata_query } = useQueryContext()
+	const { metadata_query } = useOrdoContext()
 
 	return metadata_query
 }
@@ -54,7 +54,7 @@ export const useChildrenO = (
 	item?: TItemToFSIDParam,
 	show_hidden = false,
 ): TOption<TMetadata[]> => {
-	const { metadata_query } = useQueryContext()
+	const { metadata_query } = useOrdoContext()
 
 	return item_to_fsid(item).cata({
 		Some: fsid =>
@@ -66,7 +66,7 @@ export const useChildrenO = (
 }
 
 export const useDataO = (show_hidden?: boolean): TOption<TMetadata[]> => {
-	const { metadata_query } = useQueryContext()
+	const { metadata_query } = useOrdoContext()
 
 	return metadata_query.get({ show_hidden }).cata({ Ok: Option.Some, Err: Option.None })
 }
@@ -81,7 +81,7 @@ export const useLabelsO = (show_hidden?: boolean): TOption<string[]> => {
 }
 
 export const useDataByLabelsO = (labels: string[], show_hidden?: boolean): TOption<TMetadata[]> => {
-	const { metadata_query } = useQueryContext()
+	const { metadata_query } = useOrdoContext()
 
 	return metadata_query
 		.get_by_labels(labels, { show_hidden })
@@ -92,7 +92,7 @@ export const useAncestorsO = (
 	item: TItemToFSIDParam,
 	show_hidden?: boolean,
 ): TOption<TMetadata[]> => {
-	const { metadata_query } = useQueryContext()
+	const { metadata_query } = useOrdoContext()
 
 	return item_to_fsid(item)
 		.pipe(Option.ops.map(fsid => metadata_query.get_ancestors(fsid, { show_hidden })))
@@ -100,7 +100,7 @@ export const useAncestorsO = (
 }
 
 export const useDataByFsidO = (fsid?: FSID | null, show_hidden?: boolean): TOption<TMetadata> => {
-	const { metadata_query } = useQueryContext()
+	const { metadata_query } = useOrdoContext()
 
 	return Option.FromNullable(fsid).cata({
 		Some: fsid =>
@@ -116,12 +116,12 @@ export const useDataByFsidO = (fsid?: FSID | null, show_hidden?: boolean): TOpti
 export const useChildren = (item: PlainData | FSID | "root" | null, showHidden = false) => {
 	const data = useData(showHidden)
 
-	const fsid = Switch.empty()
+	const fsid = Switch.OfTrue()
 		.case(Boolean(item && (item as PlainData).fsid), () => (item as PlainData).fsid)
 		.case(typeof item === "string" && item !== "root", () => item as FSID)
 		.default(() => null)
 
-	return Switch.empty()
+	return Switch.OfTrue()
 		.case(!data || !item, () => [])
 		.default(() => data.filter(item => item.parent === fsid))
 }

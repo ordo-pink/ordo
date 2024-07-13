@@ -28,14 +28,14 @@ import { LIB_DIRECTORY_FSID } from "@ordo-pink/core"
 import { Oath } from "@ordo-pink/oath"
 import { call_once } from "@ordo-pink/tau"
 import { data$ } from "@ordo-pink/frontend-stream-data"
-import { getCommands } from "@ordo-pink/frontend-stream-commands"
-import { getLogger } from "@ordo-pink/frontend-logger"
+import { _get_commands } from "@ordo-pink/frontend-stream-commands"
+import { _get_logger } from "@ordo-pink/frontend-logger"
 import { user$ } from "@ordo-pink/frontend-stream-user"
 
 type P = { fid: symbol; dataCommands: TDataCommands<string | ArrayBuffer> }
-export const __initAchievements = call_once(({ fid, dataCommands }: P) => {
-	const commands = getCommands(fid)
-	const logger = getLogger(fid)
+export const __init_achievements$ = call_once(({ fid, dataCommands }: P) => {
+	const commands = _get_commands(fid)
+	const logger = _get_logger(fid)
 
 	logger.debug("Initialising achievements...")
 
@@ -72,8 +72,8 @@ export const __initAchievements = call_once(({ fid, dataCommands }: P) => {
 									.chain(str =>
 										Oath.try(() => JSON.parse(str as string)).chain(result =>
 											result.error
-												? Oath.reject()
-												: Oath.resolve(result as Achievements.AchievementDAO[]),
+												? Oath.Reject()
+												: Oath.Resolve(result as Achievements.AchievementDAO[]),
 										),
 									)
 									.fix(() => [] as Achievements.AchievementDAO[])

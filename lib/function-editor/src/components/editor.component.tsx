@@ -544,7 +544,8 @@ export default function OrdoEditor({
 
 						if (!isAstChange || !data.fsid) return
 
-						commands.emit<cmd.background.startSaving>("background-task.start-saving")
+						commands.emit<cmd.application.background_task.start_saving>
+						;("application.background_task.start_saving")
 
 						save$.next({ fsid: data.fsid, value })
 					}}

@@ -21,16 +21,16 @@ import { Router, operators } from "silkrouter"
 import { BehaviorSubject } from "rxjs/internal/BehaviorSubject"
 import { map } from "rxjs/internal/operators/map"
 
-import { activities$, currentActivity$, currentFID$ } from "@ordo-pink/frontend-stream-activities"
+import { activities$, currentActivity$, current_fid$ } from "@ordo-pink/frontend-stream-activities"
 import { call_once } from "@ordo-pink/tau"
-import { getCommands } from "@ordo-pink/frontend-stream-commands"
-import { getLogger } from "@ordo-pink/frontend-logger"
+import { _get_commands } from "@ordo-pink/frontend-stream-commands"
+import { _get_logger } from "@ordo-pink/frontend-logger"
 
 const { route, noMatch } = operators
 
-export const __initRouter = call_once((fid: symbol) => {
-	const commands = getCommands(fid)
-	const logger = getLogger(fid)
+export const __init_router$ = call_once((fid: symbol) => {
+	const commands = _get_commands(fid)
+	const logger = _get_logger(fid)
 
 	logger.debug("Initializing router...")
 
@@ -57,7 +57,7 @@ export const __initRouter = call_once((fid: symbol) => {
 							router$.pipe(route(activityRoute)).subscribe((routeData: Client.Router.Route) => {
 								currentActivity$.next(activity)
 								currentRoute$.next(routeData)
-								currentFID$.next((activity as any).fid)
+								current_fid$.next((activity as any).fid)
 							})
 					})
 				})
@@ -66,7 +66,7 @@ export const __initRouter = call_once((fid: symbol) => {
 					router$.pipe(noMatch(router$)).subscribe(() => {
 						const homeActivity = activities.find(activity => activity.name === "home")
 						currentActivity$.next(homeActivity!)
-						currentFID$.next((homeActivity as any).fid)
+						current_fid$.next((homeActivity as any).fid)
 
 						currentRoute$.next({
 							data: null,

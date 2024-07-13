@@ -17,81 +17,61 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { BehaviorSubject } from "rxjs"
+import { BehaviorSubject, type Observable } from "rxjs"
 
 import {
-	Metadata,
+	MetadataManager,
 	MetadataQuery,
 	MetadataRepository,
-	RRR,
+	RemoteMetadataRepository,
 	type TMetadata,
-	TMetadataDTO,
+	type TMetadataQuery,
 } from "@ordo-pink/data"
-import { chain0, fromNullable0, reject0, rejectedMap0, resolve0, tap0, try0 } from "@ordo-pink/oath"
-import { auth$ } from "@ordo-pink/frontend-stream-user"
-import { getCommands } from "@ordo-pink/frontend-stream-commands"
-import { getHosts } from "@ordo-pink/frontend-react-hooks"
-import { getLogger } from "@ordo-pink/frontend-logger"
+import { type AuthResponse } from "@ordo-pink/backend-server-id"
+import { Switch } from "@ordo-pink/switch"
+import { type THosts } from "@ordo-pink/core"
+import { type TLogger } from "@ordo-pink/logger"
+import { noop } from "@ordo-pink/tau"
 
-type P = { fid: symbol }
-export const __initMetadata = ({ fid }: P) => {
-	const logger = getLogger(fid)
-	const commands = getCommands(fid)
-	const hosts = getHosts()
-
+type TInitMetadataStreamFn = (params: {
+	logger: TLogger
+	commands: Client.Commands.Commands
+	hosts: THosts
+	auth$: Observable<AuthResponse | null>
+}) => { metadata_query: TMetadataQuery }
+export const __init_metadata$: TInitMetadataStreamFn = ({ logger, commands, hosts, auth$ }) => {
 	logger.debug("Initialising metadata...")
 
 	const metadata$ = new BehaviorSubject<TMetadata[] | null>(null)
-	metadata$.subscribe()
-	const repo = MetadataRepository.of(metadata$)
-	const query = MetadataQuery.of(repo)
-	// const command = MetadataCommand.of(query, userQuery)
+	// metadata$.subscribe()
 
-	// TODO:
-	const metadataManager = {
-		fetchRemoteState: () => {
-			const sub = auth$.subscribe(auth => {
-				if (!auth) return
+	const l_repo = MetadataRepository.of(metadata$)
+	const r_repo = RemoteMetadataRepository.of(auth$, hosts.dt)
 
-				const enoent = RRR.codes.enoent("MetadataManager")
+	const metadata_query = MetadataQuery.of(l_repo)
+	// const command = MetadataCommand.of(m_query, u_query)
 
-				void fromNullable0(auth)
-					.pipe(
-						chain0(auth =>
-							try0(() =>
-								fetch(`${hosts.dtHost}`, {
-									headers: { Authorization: `Bearer ${auth.accessToken}` },
-								}).then(res => res.json()),
-							),
-						),
-					)
-					.pipe(tap0(logger.info, logger.error))
-					.pipe(
-						chain0(body =>
-							body.success
-								? resolve0(body.result as TMetadataDTO[])
-								: reject0(body.error as string),
-						),
-					)
-					.pipe(rejectedMap0(() => enoent(".fetchRemoteState")))
-					.fork(
-						() => {
-							commands.emit<cmd.background.resetStatus>("background-task.reset-status")
-						},
-						result => {
-							commands.emit<cmd.background.resetStatus>("background-task.reset-status")
-							metadata$.next(result.map(item => Metadata.of(item)))
-							logger.notice(metadata$.getValue())
-							return sub.unsubscribe()
-						},
-					)
-			})
-		},
-	}
-
-	metadataManager.fetchRemoteState()
+	MetadataManager.of(l_repo, r_repo).start(state_change =>
+		Switch.Match(state_change)
+			.case("get-remote", () =>
+				commands.emit<cmd.application.background_task.start_loading>(
+					"application.background_task.start_loading",
+				),
+			)
+			.case("put-remote", () =>
+				commands.emit<cmd.application.background_task.start_saving>(
+					"application.background_task.start_saving",
+				),
+			)
+			.case(["get-remote-complete", "put-remote-complete"], () =>
+				commands.emit<cmd.application.background_task.reset_status>(
+					"application.background_task.reset_status",
+				),
+			)
+			.default(noop),
+	)
 
 	logger.debug("Initialised metadata.")
 
-	return query
+	return { metadata_query }
 }

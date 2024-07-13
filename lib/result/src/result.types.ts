@@ -107,6 +107,14 @@ export type TSwapResultOperatorFn = <$TOk, $TErr>() => (
 	result: TResult<$TOk, $TErr>,
 ) => TResult<$TErr, $TOk>
 
+export type TIsResultGuardFn<$TOk = unknown, $TErr = unknown> = (
+	x: unknown,
+) => x is TResult<$TOk, $TErr>
+
+export type TIsOkGuardFn = <_TOk, _TErr>(x: TResult<_TOk, _TErr>) => x is TResult<_TOk, never>
+
+export type TIsErrGuardFn = <_TOk, _TErr>(x: TResult<_TOk, _TErr>) => x is TResult<never, _TErr>
+
 export type TResultStatic = {
 	of: TOkResultConstructorFn
 	Ok: TOkResultConstructorFn
@@ -116,6 +124,11 @@ export type TResultStatic = {
 	FromNullable: TFromNullableResultConstructorFn
 	FromOption: TFromOptionConstructorFn
 	Merge: TMergeResultConstructorFn
+	guards: {
+		is_result: TIsResultGuardFn
+		is_ok: TIsOkGuardFn
+		is_err: TIsErrGuardFn
+	}
 	ops: {
 		map: TMapResultOperatorFn
 		err_map: TErrMapResultOperatorFn

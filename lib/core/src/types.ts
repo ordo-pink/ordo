@@ -20,11 +20,50 @@
 import type { ComponentType, LazyExoticComponent, MouseEvent } from "react"
 import type { IconType } from "react-icons"
 
-import type { FSID, PlainData } from "@ordo-pink/data"
+import type { FSID, PlainData, TMetadataQuery, TUserQuery } from "@ordo-pink/data"
 import type { JTI, SUB } from "@ordo-pink/wjwt"
+import type { TLogger } from "@ordo-pink/logger"
+import type { TOption } from "@ordo-pink/option"
 import type { UUIDv4 } from "@ordo-pink/tau"
 
 import type { BackgroundTaskStatus } from "./constants"
+import { Observable } from "rxjs"
+
+export type TFetch = typeof window.fetch
+
+export type THosts = {
+	id: string
+	dt: string
+	static: string
+	website: string
+	my: string
+}
+
+export type TGetHostsFn = (fid: symbol | null) => TOption<THosts>
+export type TGetFetchFn = (fid: symbol | null) => TFetch
+export type TGetLoggerFn = (fid: symbol | null) => TLogger
+export type TGetCommandsFn = (fid: symbol | null) => Client.Commands.Commands
+
+export type TOrdoContext = {
+	queries: {
+		metadata_query: TMetadataQuery
+		user_query?: TUserQuery
+		// TODO: TContentQuery
+		// TODO: TApplicationQuery
+	}
+	streams: {
+		title$: Observable<string>
+	}
+	commands: {
+		// TODO: TMetadataCommand
+		// TODO: TUserCommand
+		// TODO: TContentCommand
+	}
+	get_hosts: TGetHostsFn
+	get_fetch: TGetFetchFn
+	get_logger: TGetLoggerFn
+	get_commands: TGetCommandsFn
+}
 
 declare global {
 	module Routes {
@@ -135,14 +174,17 @@ declare global {
 
 	module cmd {
 		module application {
-			type setTitle = { name: "application.set-title"; payload: string }
-		}
+			type set_title = { name: "application.set_title"; payload: string }
 
-		module background {
-			type setStatus = { name: "background-task.set-status"; payload: BackgroundTaskStatus }
-			type startSaving = { name: "background-task.start-saving" }
-			type startLoading = { name: "background-task.start-loading" }
-			type resetStatus = { name: "background-task.reset-status" }
+			module background_task {
+				type set_status = {
+					name: "application.background_task.set_status"
+					payload: BackgroundTaskStatus
+				}
+				type start_saving = { name: "application.background_task.start_saving" }
+				type start_loading = { name: "application.background_task.start_loading" }
+				type reset_status = { name: "application.background_task.reset_status" }
+			}
 		}
 
 		module extensionState {

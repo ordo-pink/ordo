@@ -21,17 +21,16 @@ import { ErrorInfo, useEffect } from "react"
 import Helmet from "react-helmet"
 
 import {
-	getQueryContextProvider,
+	__init_ordo_context,
 	useCommands,
 	useLogger,
 	useStrictSubscription,
 	useSubscription,
 } from "@ordo-pink/frontend-react-hooks"
 import { Oath } from "@ordo-pink/oath"
-import { type TMetadataQuery } from "@ordo-pink/data"
+import { TOrdoContext } from "@ordo-pink/core"
 import { currentActivity$ } from "@ordo-pink/frontend-stream-activities"
 import { fromNullableE } from "@ordo-pink/either"
-import { title$ } from "@ordo-pink/frontend-stream-title"
 import { useAppInit } from "@ordo-pink/frontend-app-init"
 
 import ActivityBar from "@ordo-pink/frontend-react-sections/activity-bar"
@@ -46,68 +45,68 @@ import Modal from "@ordo-pink/frontend-react-sections/modal"
 import Notifications from "@ordo-pink/frontend-react-sections/notifications"
 import Workspace from "@ordo-pink/frontend-react-sections/workspace"
 
-const QueryContextProvider = getQueryContextProvider()
+const QueryContextProvider = __init_ordo_context()
 
 // TODO: Take import source from ENV
 // TODO: Remove $ imports
-type P = { metadataQuery: TMetadataQuery }
-export default function App({ metadataQuery }: P) {
+type P = { app_context: TOrdoContext }
+export default function App({ app_context }: P) {
 	const commands = useCommands()
 	const currentActivity = useSubscription(currentActivity$)
 	const logger = useLogger()
 
-	const title = useStrictSubscription(title$, "Ordo.pink")
+	const title = useStrictSubscription(app_context.streams.title$, "Ordo.pink")
 
-	useAppInit()
+	useAppInit() // TODO: Put useAppInit contents back to the App component
 
-	const logError = (error: Error, info: ErrorInfo) => {
+	const log_error = (error: Error, info: ErrorInfo) => {
 		logger.error(error)
 		logger.error(info.componentStack)
 	}
 
 	useEffect(() => {
-		void Oath.of(commands)
+		void Oath.Resolve(commands)
 			.chain(() =>
-				Oath.from(() => import("@ordo-pink/function-home")).chain(module =>
-					Oath.from(async () => await module.default),
+				Oath.FromPromise(() => import("@ordo-pink/function-home")).chain(module =>
+					Oath.FromPromise(async () => await module.default),
 				),
 			)
 			.chain(() =>
-				Oath.from(() => import("@ordo-pink/function-file-explorer")).chain(module =>
-					Oath.from(async () => await module.default),
+				Oath.FromPromise(() => import("@ordo-pink/function-file-explorer")).chain(module =>
+					Oath.FromPromise(async () => await module.default),
 				),
 			)
 			.chain(() =>
-				Oath.from(() => import("@ordo-pink/function-gtd")).chain(module =>
-					Oath.from(async () => await module.default),
+				Oath.FromPromise(() => import("@ordo-pink/function-gtd")).chain(module =>
+					Oath.FromPromise(async () => await module.default),
 				),
 			)
 			.chain(() =>
-				Oath.from(() => import("@ordo-pink/function-links")).chain(module =>
-					Oath.from(async () => await module.default),
+				Oath.FromPromise(() => import("@ordo-pink/function-links")).chain(module =>
+					Oath.FromPromise(async () => await module.default),
 				),
 			)
 			.chain(() =>
-				Oath.from(() => import("@ordo-pink/function-editor")).chain(module =>
-					Oath.from(async () => await module.default),
+				Oath.FromPromise(() => import("@ordo-pink/function-editor")).chain(module =>
+					Oath.FromPromise(async () => await module.default),
 				),
 			)
 			.chain(() =>
-				Oath.from(() => import("@ordo-pink/function-user")).chain(module =>
-					Oath.from(async () => await module.default),
+				Oath.FromPromise(() => import("@ordo-pink/function-user")).chain(module =>
+					Oath.FromPromise(async () => await module.default),
 				),
 			)
 			.chain(() =>
-				Oath.from(() => import("@ordo-pink/function-achievements")).chain(module =>
-					Oath.from(async () => await module.default),
+				Oath.FromPromise(() => import("@ordo-pink/function-achievements")).chain(module =>
+					Oath.FromPromise(async () => await module.default),
 				),
 			)
 			.chain(() =>
-				Oath.from(() => import("@ordo-pink/function-excalidraw")).chain(module =>
-					Oath.from(async () => await module.default),
+				Oath.FromPromise(() => import("@ordo-pink/function-excalidraw")).chain(module =>
+					Oath.FromPromise(async () => await module.default),
 				),
 			)
-			.orNothing()
+			.invoke(Oath.invokers.or_nothing)
 
 		return () => {
 			commands.emit<cmd.commandPalette.remove>("command-palette.remove", "command-palette.hide")
@@ -115,10 +114,8 @@ export default function App({ metadataQuery }: P) {
 	}, [commands])
 
 	return fromNullableE(currentActivity).fold(Loading, () => (
-		<ErrorBoundary logError={logError} fallback={<Fallback />}>
-			<QueryContextProvider
-				value={{ metadata_query: metadataQuery, current_user_query: null as any }}
-			>
+		<ErrorBoundary logError={log_error} fallback={<Fallback />}>
+			<QueryContextProvider value={app_context}>
 				<Helmet>
 					<title>{title}</title>
 				</Helmet>

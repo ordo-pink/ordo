@@ -23,7 +23,7 @@ import { BsThreeDotsVertical } from "react-icons/bs"
 
 import {
 	useCommands,
-	useHosts,
+	useHostsUnsafe,
 	useStrictSubscription,
 	useSubscription,
 	useUser,
@@ -43,7 +43,7 @@ export default function Sidebar({ children, isNarrow }: P) {
 	const commands = useCommands()
 	const sidebar = useStrictSubscription(sidebar$, { disabled: true })
 	const commandPalette = useSubscription(globalCommandPalette$)
-	const { staticHost } = useHosts()
+	const { static_host: staticHost } = useHostsUnsafe()
 
 	const onSidebarClick = () => {
 		if (!isNarrow || sidebar.disabled || sidebar.sizes[0] === 0) return

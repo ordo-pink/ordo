@@ -19,7 +19,7 @@
 
 import type { Readable } from "stream"
 
-import { ConsoleLogger, Logger } from "@ordo-pink/logger"
+import { ConsoleLogger, TLogger } from "@ordo-pink/logger"
 import type { TDataCommands } from "@ordo-pink/data"
 import { createServer } from "@ordo-pink/backend-utils"
 
@@ -35,7 +35,7 @@ export type Params = {
 	origin: string | string[]
 	dataService: TDataCommands<Readable>
 	idHost: string
-	logger?: Logger
+	logger?: TLogger
 }
 
 export const createDataServer = ({

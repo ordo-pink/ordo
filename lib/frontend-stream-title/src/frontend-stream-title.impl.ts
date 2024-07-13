@@ -17,23 +17,27 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { BehaviorSubject } from "rxjs/internal/BehaviorSubject"
+import { BehaviorSubject, Observable, map } from "rxjs"
 
+import { type TLogger } from "@ordo-pink/logger"
 import { call_once } from "@ordo-pink/tau"
-import { getCommands } from "@ordo-pink/frontend-stream-commands"
-import { getLogger } from "@ordo-pink/frontend-logger"
 
-export const __initTitle = call_once((fid: symbol) => {
-	const commands = getCommands(fid)
-	const logger = getLogger(fid)
+type TInitTitleStreamFn = (
+	logger: TLogger,
+	commands: Client.Commands.Commands,
+) => { title$: Observable<string> }
+export const __init_title$: TInitTitleStreamFn = call_once((logger, commands) => {
+	logger.debug("Initialising title stream...")
 
-	logger.debug("Initialising title...")
-
-	commands.on<cmd.application.setTitle>("application.set-title", title =>
+	commands.on<cmd.application.set_title>("application.set_title", title =>
 		title$.next(`${title} | Ordo.pink`),
 	)
 
 	logger.debug("Initialised title.")
+
+	return { title$: title$.pipe(map(value => value)) }
 })
 
-export const title$ = new BehaviorSubject<string>("Ordo.pink")
+// --- Internal ---
+
+const title$ = new BehaviorSubject<string>("Ordo.pink")

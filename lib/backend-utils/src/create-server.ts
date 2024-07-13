@@ -23,7 +23,7 @@ import bodyparser from "koa-bodyparser"
 import cors from "koa-cors"
 import { identity } from "ramda"
 
-import { ConsoleLogger, Logger } from "@ordo-pink/logger"
+import { ConsoleLogger, TLogger } from "@ordo-pink/logger"
 import { Either } from "@ordo-pink/either"
 import { Unary } from "@ordo-pink/tau"
 
@@ -33,7 +33,7 @@ import { setResponseTimeHeader } from "./set-response-time-header"
 
 export type CreateServerParams = {
 	origin?: string | string[]
-	logger?: Logger
+	logger?: TLogger
 	serverName: string
 	extendRouter?: Unary<Router, Router>
 }

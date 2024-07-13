@@ -57,7 +57,7 @@ export default function EditorWorkspace() {
 	const fileAssociations = useStrictSubscription(fileAssociations$, [])
 
 	useEffect(() => {
-		commands.emit<cmd.application.setTitle>(
+		commands.emit<cmd.application.set_title>(
 			"application.set-title",
 			currentData ? `${currentData.name} | Редактор` : "Редактор",
 		)

@@ -19,7 +19,7 @@
 
 import type { FSID, PlainData, TDataQuery } from "@ordo-pink/data"
 import type { Hosts } from "@ordo-pink/frontend-react-hooks"
-import type { Logger } from "@ordo-pink/logger"
+import type { TLogger } from "@ordo-pink/logger"
 import type { Permissions } from "@ordo-pink/frontend-known-functions"
 import { PlainDataNode } from "@ordo-pink/core"
 
@@ -38,7 +38,7 @@ export type DataProviders = {
 // TODO: Provide missing functions
 export type RegisterFunctionCallbackParams = {
 	getCommands: () => Client.Commands.Commands
-	getLogger: () => Logger
+	getLogger: () => TLogger
 	getUser: () => User.User | null
 	getIsAuthenticated: () => boolean
 	getHosts: () => Hosts

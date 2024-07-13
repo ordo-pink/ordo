@@ -33,8 +33,11 @@ export type AllKeysRequired<T extends Record<string, any>> = { [K in keyof T]: N
 export const is_object = (x: unknown): x is Record<string, unknown> =>
 	x != null && typeof x === "object" && !Array.isArray(x)
 
-export const is_f = <T = unknown, K = T>(x: unknown): x is (x: T) => K => typeof x == "function"
+export const is_fn = <T = unknown, K = T>(x: unknown): x is (x: T) => K => typeof x == "function"
 
+export const is_true = (x: unknown): x is true => x === true
+export const is_false = (x: unknown): x is false => x === false
+export const is_bool = (x: unknown): x is boolean => is_true(x) || is_false(x)
 export const is_array = Array.isArray
 export const is_date = (x: unknown): x is Date => !!x && x instanceof Date
 export const is_string = (x: unknown): x is string => !!x && typeof x === "string"

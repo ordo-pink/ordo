@@ -3,6 +3,6 @@
 
 import { Oath } from "../src/impl"
 
-export const empty0 = <Reject = never>(
-	abortController = new AbortController(),
-): Oath<void, Reject> => new Oath(resolve => resolve(undefined), abortController)
+export const empty_oath = <$TReject = never>(
+	abort_controller = new AbortController(),
+): Oath<void, $TReject> => new Oath(resolve => resolve(undefined), abort_controller)

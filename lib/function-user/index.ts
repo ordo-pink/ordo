@@ -31,7 +31,7 @@ export default createFunction(
 	({ getCommands, getHosts, getLogger, registerActivity }) => {
 		const commands = getCommands()
 		const logger = getLogger()
-		const { websiteHost, staticHost } = getHosts()
+		const { website_host: websiteHost, static_host: staticHost } = getHosts()
 
 		logger.debug("Intialising...")
 

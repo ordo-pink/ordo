@@ -23,21 +23,21 @@ import { Either } from "@ordo-pink/either"
 import { KnownFunctions } from "@ordo-pink/frontend-known-functions"
 import { Oath } from "@ordo-pink/oath"
 import { call_once } from "@ordo-pink/tau"
-import { getCommands } from "@ordo-pink/frontend-stream-commands"
-import { getCurrentUserToken } from "./frontend-stream-auth.impl"
-import { getFetch } from "@ordo-pink/frontend-fetch"
-import { getLogger } from "@ordo-pink/frontend-logger"
+import { _get_commands } from "@ordo-pink/frontend-stream-commands"
+import { get_fetch } from "@ordo-pink/frontend-fetch"
+import { _get_logger } from "@ordo-pink/frontend-logger"
+import { _get_current_user_token } from "./frontend-stream-auth.impl"
 
-type InitUserParams = { fid: symbol; idHost: string }
-export const __initUser$ = call_once(({ fid, idHost }: InitUserParams) => {
-	const commands = getCommands(fid)
-	const fetch = getFetch(fid)
-	const logger = getLogger(fid)
+type InitUserParams = { fid: symbol; id_host: string }
+export const __init_user$ = call_once(({ fid, id_host: idHost }: InitUserParams) => {
+	const commands = _get_commands(fid)
+	const fetch = get_fetch(fid)
+	const logger = _get_logger(fid)
 
 	logger.debug("Initialising user...")
 
 	commands.on<cmd.user.refreshInfo>("user.refresh", () =>
-		Oath.fromNullable(getCurrentUserToken(fid))
+		Oath.fromNullable(_get_current_user_token(fid))
 			.chain(token =>
 				Oath.try(() =>
 					fetch(`${idHost}/account`, { headers: { Authorization: `Bearer ${token}` } }),

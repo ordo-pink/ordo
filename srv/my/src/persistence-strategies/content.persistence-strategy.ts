@@ -21,29 +21,29 @@ import { ContentPersistenceStrategy, Data, UnexpectedError } from "@ordo-pink/da
 import { BackgroundTaskStatus } from "@ordo-pink/core"
 import { Oath } from "@ordo-pink/oath"
 import { auth$ } from "@ordo-pink/frontend-stream-user"
-import { getCommands } from "@ordo-pink/frontend-stream-commands"
-import { getFetch } from "@ordo-pink/frontend-fetch"
-import { getHosts } from "@ordo-pink/frontend-react-hooks"
+import { _get_commands } from "@ordo-pink/frontend-stream-commands"
+import { get_fetch } from "@ordo-pink/frontend-fetch"
+import { get_hosts_unsafe } from "@ordo-pink/frontend-react-hooks"
 
 const of = (fid: symbol): ContentPersistenceStrategy<any> => ({
 	create: () => Oath.of("OK"),
 	delete: () => Oath.of("OK"),
 	read: (uid, fsid) => {
-		const commands = getCommands(fid)
-		const hosts = getHosts()
-		const fetch = getFetch(fid)
+		const commands = _get_commands(fid)
+		const hosts = get_hosts_unsafe()
+		const fetch = get_fetch(fid)
 
 		return Oath.fromNullable(auth$.value)
 			.tap(() => {
-				commands.emit<cmd.background.setStatus>(
-					"background-task.set-status",
+				commands.emit<cmd.application.background_task.set_status>(
+					"application.background_task.set_status",
 					BackgroundTaskStatus.LOADING,
 				)
 			})
 			.rejectedMap(() => Data.Errors.DataNotFound)
 			.chain(auth =>
 				Oath.try(() =>
-					fetch(`${hosts.dtHost}/${uid}/${fsid}`, {
+					fetch(`${hosts.dt_host}/${uid}/${fsid}`, {
 						method: "GET",
 						headers: {
 							"content-type": "application/json",
@@ -55,26 +55,32 @@ const of = (fid: symbol): ContentPersistenceStrategy<any> => ({
 				).rejectedMap(UnexpectedError),
 			)
 			.bitap(
-				() => commands.emit<cmd.background.resetStatus>("background-task.reset-status"),
-				() => commands.emit<cmd.background.resetStatus>("background-task.reset-status"),
+				() =>
+					commands.emit<cmd.application.background_task.reset_status>(
+						"application.background_task.reset_status",
+					),
+				() =>
+					commands.emit<cmd.application.background_task.reset_status>(
+						"application.background_task.reset_status",
+					),
 			)
 	},
 	write: (uid, fsid, content) => {
-		const commands = getCommands(fid)
-		const hosts = getHosts()
-		const fetch = getFetch(fid)
+		const commands = _get_commands(fid)
+		const hosts = get_hosts_unsafe()
+		const fetch = get_fetch(fid)
 
 		return Oath.fromNullable(auth$.value)
 			.tap(() => {
-				commands.emit<cmd.background.setStatus>(
-					"background-task.set-status",
+				commands.emit<cmd.application.background_task.set_status>(
+					"application.background_task.set_status",
 					BackgroundTaskStatus.SAVING,
 				)
 			})
 			.rejectedMap(() => UnexpectedError(new Error("Something went wrong")))
 			.chain(auth =>
 				Oath.try(() =>
-					fetch(`${hosts.dtHost}/${uid}/${fsid}/update`, {
+					fetch(`${hosts.dt_host}/${uid}/${fsid}/update`, {
 						method: "PUT",
 						headers: {
 							authorization: `Bearer ${auth.accessToken}`,
@@ -86,8 +92,14 @@ const of = (fid: symbol): ContentPersistenceStrategy<any> => ({
 				).rejectedMap(UnexpectedError),
 			)
 			.bitap(
-				() => commands.emit<cmd.background.resetStatus>("background-task.reset-status"),
-				() => commands.emit<cmd.background.resetStatus>("background-task.reset-status"),
+				() =>
+					commands.emit<cmd.application.background_task.reset_status>(
+						"application.background_task.reset_status",
+					),
+				() =>
+					commands.emit<cmd.application.background_task.reset_status>(
+						"application.background_task.reset_status",
+					),
 			)
 	},
 })

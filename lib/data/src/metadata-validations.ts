@@ -53,26 +53,26 @@ export const is_metadata = (x: unknown): x is TMetadata => {
 	const y = x as TMetadata
 
 	return (
-		TAU.is_f(y.get_created_at) &&
-		TAU.is_f(y.get_created_by) &&
-		TAU.is_f(y.get_fsid) &&
-		TAU.is_f(y.get_labels) &&
-		TAU.is_f(y.get_links) &&
-		TAU.is_f(y.get_name) &&
-		TAU.is_f(y.get_parent) &&
-		TAU.is_f(y.get_property) &&
-		TAU.is_f(y.get_readable_size) &&
-		TAU.is_f(y.get_size) &&
-		TAU.is_f(y.get_type) &&
-		TAU.is_f(y.get_updated_at) &&
-		TAU.is_f(y.get_updated_by) &&
-		TAU.is_f(y.has_label) &&
-		TAU.is_f(y.has_labels) &&
-		TAU.is_f(y.has_link_to) &&
-		TAU.is_f(y.has_links) &&
-		TAU.is_f(y.is_child_of) &&
-		TAU.is_f(y.is_root_child) &&
-		TAU.is_f(y.to_dto) &&
+		TAU.is_fn(y.get_created_at) &&
+		TAU.is_fn(y.get_created_by) &&
+		TAU.is_fn(y.get_fsid) &&
+		TAU.is_fn(y.get_labels) &&
+		TAU.is_fn(y.get_links) &&
+		TAU.is_fn(y.get_name) &&
+		TAU.is_fn(y.get_parent) &&
+		TAU.is_fn(y.get_property) &&
+		TAU.is_fn(y.get_readable_size) &&
+		TAU.is_fn(y.get_size) &&
+		TAU.is_fn(y.get_type) &&
+		TAU.is_fn(y.get_updated_at) &&
+		TAU.is_fn(y.get_updated_by) &&
+		TAU.is_fn(y.has_label) &&
+		TAU.is_fn(y.has_labels) &&
+		TAU.is_fn(y.has_link_to) &&
+		TAU.is_fn(y.has_links) &&
+		TAU.is_fn(y.is_child_of) &&
+		TAU.is_fn(y.is_root_child) &&
+		TAU.is_fn(y.to_dto) &&
 		is_metadata_dto(y.to_dto())
 	)
 }

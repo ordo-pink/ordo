@@ -22,15 +22,15 @@ import isEmail from "validator/lib/isEmail"
 
 import {
 	type Oath,
-	bimap0,
-	chain0,
-	empty0,
-	fromBoolean0,
-	fromNullable0,
-	merge0,
-	reject0,
-	rejectedMap0,
-	tap0,
+	bimap_oath,
+	chain_oath,
+	empty_oath,
+	from_boolean_oath,
+	from_nullable_oath,
+	merge_oath,
+	reject_oath,
+	rejected_map_oath,
+	tap_oath,
 } from "@ordo-pink/oath"
 import { parseBody0, sendError, sendSuccess } from "@ordo-pink/backend-utils"
 import { type HttpError } from "@ordo-pink/rrr"
@@ -71,17 +71,17 @@ type TResult = Routes.ID.ChangeEmail.Result
 
 type TExtractCtxFn = (us: UserService) => (body: TRequestBody) => Oath<TCtx, HttpError>
 const extractCtx0: TExtractCtxFn = userService => body =>
-	merge0({
-		user: fromNullable0(body.userID)
-			.pipe(rejectedMap0(toInvalidRequestError))
-			.pipe(chain0(id => userService.getById(id).pipe(rejectedMap0(toUserNotFoundError)))),
-		oldEmail: fromNullable0(body.oldEmail).pipe(rejectedMap0(toInvalidRequestError)),
-		newEmail: fromNullable0(body.newEmail).pipe(rejectedMap0(toInvalidRequestError)),
+	merge_oath({
+		user: from_nullable_oath(body.userID)
+			.pipe(rejected_map_oath(toInvalidRequestError))
+			.pipe(chain_oath(id => userService.getById(id).pipe(rejected_map_oath(toUserNotFoundError)))),
+		oldEmail: from_nullable_oath(body.oldEmail).pipe(rejected_map_oath(toInvalidRequestError)),
+		newEmail: from_nullable_oath(body.newEmail).pipe(rejected_map_oath(toInvalidRequestError)),
 	})
 
 type TCheckEmailIsNotTheSameFn = (email: string, user: User.PublicUser) => Oath<"OK", HttpError>
 const checkEmailIsNotTheSame0: TCheckEmailIsNotTheSameFn = (email, user) =>
-	fromBoolean0(user.email !== email, OK).pipe(rejectedMap0(toSameEmailError))
+	from_boolean_oath(user.email !== email, OK).pipe(rejected_map_oath(toSameEmailError))
 
 type TCheckUserWithNewEmailDoesNotExistFn = (
 	newEmail: string,
@@ -93,17 +93,17 @@ const checkUserWithNewEmailDoesNotExist0: TCheckUserWithNewEmailDoesNotExistFn =
 ) =>
 	userService
 		.getByEmail(newEmail)
-		.pipe(chain0(() => reject0(true)))
-		.fix(userExists => fromBoolean0(userExists === true, OK))
-		.pipe(rejectedMap0(toUserAlreadyExistsError))
+		.pipe(chain_oath(() => reject_oath(true)))
+		.fix(userExists => from_boolean_oath(userExists === true, OK))
+		.pipe(rejected_map_oath(toUserAlreadyExistsError))
 
 type ValidateEmailFn = (email: string) => Oath<"OK", HttpError>
 const validateEmail0: ValidateEmailFn = email =>
-	fromBoolean0(isEmail(email), OK).pipe(rejectedMap0(toInvalidRequestError))
+	from_boolean_oath(isEmail(email), OK).pipe(rejected_map_oath(toInvalidRequestError))
 
 type ValidateCtxFn = (us: UserService) => (ctx: TCtx) => Oath<TCtx, HttpError>
 const validateCtx0: ValidateCtxFn = userService => ctx =>
-	merge0([
+	merge_oath([
 		validateEmail0(ctx.newEmail),
 		checkEmailIsNotTheSame0(ctx.newEmail, ctx.user),
 		checkUserWithNewEmailDoesNotExist0(ctx.newEmail, userService),
@@ -113,13 +113,13 @@ type UpdateUserEmailFn = (us: UserService) => (ctx: TCtx) => Oath<TCtx, HttpErro
 const updateUserEmail0: UpdateUserEmailFn = userService => ctx =>
 	userService
 		.update(ctx.user.id, { email: ctx.newEmail, emailConfirmed: true, code: undefined })
-		.pipe(bimap0(toUserNotFoundError, () => ctx))
+		.pipe(bimap_oath(toUserNotFoundError, () => ctx))
 
 type SendNotificationFn = (ns: TNotificationService) => (ctx: TCtx) => Oath<TResult, HttpError>
 const sendNotification0: SendNotificationFn = notificationService => ctx =>
-	empty0()
+	empty_oath()
 		.pipe(
-			tap0(() =>
+			tap_oath(() =>
 				notificationService.sendEmailChangedNotification({
 					to: { email: ctx.user.email, name: ctx.user.firstName }, // TODO: Drop accepting "to" in the service
 					newEmail: ctx.newEmail,

@@ -22,9 +22,9 @@ import { BackgroundTaskStatus } from "@ordo-pink/core"
 import { Oath } from "@ordo-pink/oath"
 import { auth$ } from "@ordo-pink/frontend-stream-user"
 import { data$ } from "@ordo-pink/frontend-stream-data"
-import { getCommands } from "@ordo-pink/frontend-stream-commands"
-import { getFetch } from "@ordo-pink/frontend-fetch"
-import { getHosts } from "@ordo-pink/frontend-react-hooks"
+import { _get_commands } from "@ordo-pink/frontend-stream-commands"
+import { get_fetch } from "@ordo-pink/frontend-fetch"
+import { get_hosts_unsafe } from "@ordo-pink/frontend-react-hooks"
 
 const of = (fid: symbol): DataPersistenceStrategy => ({
 	count: () =>
@@ -32,16 +32,16 @@ const of = (fid: symbol): DataPersistenceStrategy => ({
 			.map(data => data.length)
 			.fix(() => 0),
 	create: plain => {
-		const commands = getCommands(fid)
-		const hosts = getHosts()
-		const fetch = getFetch(fid)
+		const commands = _get_commands(fid)
+		const hosts = get_hosts_unsafe()
+		const fetch = get_fetch(fid)
 		const data = data$.value
 		const auth = auth$.value
 
-		if (!data) return Oath.reject(Data.Errors.DataNotFound as DataCreateErrors)
+		if (!data) return Oath.Reject(Data.Errors.DataNotFound as DataCreateErrors)
 
-		commands.emit<cmd.background.setStatus>(
-			"background-task.set-status",
+		commands.emit<cmd.application.background_task.set_status>(
+			"application.background_task.set_status",
 			BackgroundTaskStatus.SAVING,
 		)
 
@@ -50,7 +50,7 @@ const of = (fid: symbol): DataPersistenceStrategy => ({
 		void Oath.fromNullable(auth)
 			.chain(auth =>
 				Oath.try(() =>
-					fetch(`${hosts.dtHost}/${auth.sub}`, {
+					fetch(`${hosts.dt_host}/${auth.sub}`, {
 						method: "POST",
 						body: JSON.stringify(plain),
 						headers: {
@@ -60,7 +60,7 @@ const of = (fid: symbol): DataPersistenceStrategy => ({
 					}).then(res => res.json()),
 				),
 			)
-			.chain(body => (body.success ? Oath.of(body.result) : Oath.reject(body.error as string)))
+			.chain(body => (body.success ? Oath.of(body.result) : Oath.Reject(body.error as string)))
 			.fork(
 				error => {
 					commands.emit<cmd.notification.show>("notification.show", {
@@ -68,34 +68,38 @@ const of = (fid: symbol): DataPersistenceStrategy => ({
 						message: error instanceof Error ? error.message : error ?? "Не удалось создать файл.",
 						type: "rrr",
 					})
-					commands.emit<cmd.background.resetStatus>("background-task.reset-status")
+					commands.emit<cmd.application.background_task.reset_status>(
+						"application.background_task.reset_status",
+					)
 					return data$.next(data)
 				},
 				() => {
-					commands.emit<cmd.background.resetStatus>("background-task.reset-status")
+					commands.emit<cmd.application.background_task.reset_status>(
+						"application.background_task.reset_status",
+					)
 				},
 			)
 
 		return Oath.of(plain)
 	},
 	delete: (_, fsid) => {
-		const commands = getCommands(fid)
-		const hosts = getHosts()
-		const fetch = getFetch(fid)
+		const commands = _get_commands(fid)
+		const hosts = get_hosts_unsafe()
+		const fetch = get_fetch(fid)
 		const data = data$.value
 		const auth = auth$.value
 
 		if (!data) return Oath.of("OK")
 
-		commands.emit<cmd.background.setStatus>(
-			"background-task.set-status",
+		commands.emit<cmd.application.background_task.set_status>(
+			"application.background_task.set_status",
 			BackgroundTaskStatus.SAVING,
 		)
 
 		void Oath.fromNullable(auth)
 			.chain(auth =>
 				Oath.try(() =>
-					fetch(`${hosts.dtHost}/${auth.sub}/${fsid}`, {
+					fetch(`${hosts.dt_host}/${auth.sub}/${fsid}`, {
 						method: "DELETE",
 						headers: {
 							"content-type": "application/json",
@@ -104,7 +108,7 @@ const of = (fid: symbol): DataPersistenceStrategy => ({
 					}).then(res => res.json()),
 				),
 			)
-			.chain(body => (body.success ? Oath.of(body.result) : Oath.reject(body.error as string)))
+			.chain(body => (body.success ? Oath.of(body.result) : Oath.Reject(body.error as string)))
 			.fork(
 				error => {
 					commands.emit<cmd.notification.show>("notification.show", {
@@ -112,10 +116,14 @@ const of = (fid: symbol): DataPersistenceStrategy => ({
 						message: error instanceof Error ? error.message : error ?? "Не удалось удалить данные.",
 						type: "rrr",
 					})
-					commands.emit<cmd.background.resetStatus>("background-task.reset-status")
+					commands.emit<cmd.application.background_task.reset_status>(
+						"application.background_task.reset_status",
+					)
 				},
 				() => {
-					commands.emit<cmd.background.resetStatus>("background-task.reset-status")
+					commands.emit<cmd.application.background_task.reset_status>(
+						"application.background_task.reset_status",
+					)
 				},
 			)
 
@@ -133,7 +141,7 @@ const of = (fid: symbol): DataPersistenceStrategy => ({
 	find: (_, name, parent) => {
 		const data = data$.value
 
-		if (!data) return Oath.reject(Data.Errors.DataNotFound)
+		if (!data) return Oath.Reject(Data.Errors.DataNotFound)
 
 		return Oath.of(data.find(item => item.name === name && item.parent === parent))
 			.chain(Oath.fromNullable)
@@ -142,62 +150,66 @@ const of = (fid: symbol): DataPersistenceStrategy => ({
 	get: (_, fsid) => {
 		const data = data$.value
 
-		if (!data) return Oath.reject(Data.Errors.DataNotFound)
+		if (!data) return Oath.Reject(Data.Errors.DataNotFound)
 
 		return Oath.of(data.find(item => item.fsid === fsid))
 			.chain(Oath.fromNullable)
 			.rejectedMap(() => Data.Errors.DataNotFound)
 	},
 	getAll: () => {
-		const commands = getCommands(fid)
-		const hosts = getHosts()
-		const fetch = getFetch(fid)
+		const commands = _get_commands(fid)
+		const hosts = get_hosts_unsafe()
+		const fetch = get_fetch(fid)
 		const auth = auth$.value
 
-		commands.emit<cmd.background.setStatus>(
-			"background-task.set-status",
+		commands.emit<cmd.application.background_task.set_status>(
+			"application.background_task.set_status",
 			BackgroundTaskStatus.LOADING,
 		)
 
 		return Oath.fromNullable(auth)
 			.chain(auth =>
 				Oath.try(() =>
-					fetch(`${hosts.dtHost}`, {
+					fetch(`${hosts.dt_host}`, {
 						headers: { Authorization: `Bearer ${auth.accessToken}` },
 					}).then(res => res.json()),
 				),
 			)
 			.chain(body =>
-				body.success ? Oath.of(body.result as PlainData[]) : Oath.reject(body.error as string),
+				body.success ? Oath.of(body.result as PlainData[]) : Oath.Reject(body.error as string),
 			)
 			.rejectedMap(() => Data.Errors.DataNotFound)
 			.bitap(
 				() => {
-					commands.emit<cmd.background.resetStatus>("background-task.reset-status")
+					commands.emit<cmd.application.background_task.reset_status>(
+						"application.background_task.reset_status",
+					)
 				},
 				result => {
-					commands.emit<cmd.background.resetStatus>("background-task.reset-status")
+					commands.emit<cmd.application.background_task.reset_status>(
+						"application.background_task.reset_status",
+					)
 					data$.next(result)
 				},
 			)
 	},
 	update: plain => {
-		const commands = getCommands(fid)
-		const hosts = getHosts()
-		const fetch = getFetch(fid)
+		const commands = _get_commands(fid)
+		const hosts = get_hosts_unsafe()
+		const fetch = get_fetch(fid)
 		const data = data$.value
 		const auth = auth$.value
 
-		if (!data) return Oath.reject(Data.Errors.DataNotFound)
+		if (!data) return Oath.Reject(Data.Errors.DataNotFound)
 
-		commands.emit<cmd.background.setStatus>(
-			"background-task.set-status",
+		commands.emit<cmd.application.background_task.set_status>(
+			"application.background_task.set_status",
 			BackgroundTaskStatus.SAVING,
 		)
 
 		const updatedItem = data.findIndex(item => item.fsid === plain.fsid)
 
-		if (updatedItem < 0) return Oath.reject(Data.Errors.DataNotFound)
+		if (updatedItem < 0) return Oath.Reject(Data.Errors.DataNotFound)
 
 		const dataCopy = [...data]
 
@@ -208,7 +220,7 @@ const of = (fid: symbol): DataPersistenceStrategy => ({
 		void Oath.fromNullable(auth)
 			.chain(auth =>
 				Oath.try(() =>
-					fetch(`${hosts.dtHost}/${auth.sub}/${plain.fsid}`, {
+					fetch(`${hosts.dt_host}/${auth.sub}/${plain.fsid}`, {
 						method: "PUT",
 						body: JSON.stringify(plain),
 						headers: {
@@ -218,15 +230,19 @@ const of = (fid: symbol): DataPersistenceStrategy => ({
 					}).then(res => res.json()),
 				),
 			)
-			.chain(body => (body.success ? Oath.of(body.result) : Oath.reject(body.error as string)))
+			.chain(body => (body.success ? Oath.of(body.result) : Oath.Reject(body.error as string)))
 			.fork(
 				() => {
 					data$.next(data)
-					commands.emit<cmd.background.resetStatus>("background-task.reset-status")
+					commands.emit<cmd.application.background_task.reset_status>(
+						"application.background_task.reset_status",
+					)
 					// commands.emit<cmd.notification.show>("notification.show", item)
 				},
 				() => {
-					commands.emit<cmd.background.resetStatus>("background-task.reset-status")
+					commands.emit<cmd.application.background_task.reset_status>(
+						"application.background_task.reset_status",
+					)
 				},
 			)
 

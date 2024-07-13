@@ -17,30 +17,53 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import { type TGetHostsFn, type THosts } from "@ordo-pink/core"
+import { KnownFunctions } from "@ordo-pink/frontend-known-functions"
+import { O } from "@ordo-pink/option"
+import { Result } from "@ordo-pink/result"
 import { call_once } from "@ordo-pink/tau"
+import { useCurrentFID } from "@ordo-pink/frontend-stream-activities"
 
-let idHost: string
-let dtHost: string
-let staticHost: string
-let websiteHost: string
-let myHost: string
+import { useOrdoContext } from "./use-ordo-context.hook"
 
-export type Hosts = {
-	idHost: string
-	dtHost: string
-	staticHost: string
-	websiteHost: string
-	myHost: string
-}
-export const __initHosts = call_once((hosts: Hosts) => {
-	idHost = hosts.idHost
-	dtHost = hosts.dtHost
-	staticHost = hosts.staticHost
-	websiteHost = hosts.websiteHost
-	myHost = hosts.myHost
+let _id: string
+let _dt: string
+let _static: string
+let _website: string
+let _my: string
+
+type TInitHostsFn = (hosts: THosts) => { hosts: THosts; get_hosts: TGetHostsFn }
+export const __init_hosts: TInitHostsFn = call_once(hosts => {
+	_id = hosts.id
+	_dt = hosts.dt
+	_static = hosts.static
+	_website = hosts.website
+	_my = hosts.my
+
+	return { hosts, get_hosts: _get_hosts }
 })
 
-// TODO: Require fid
-export const getHosts = () => ({ idHost, dtHost, staticHost, websiteHost, myHost })
+const _get_hosts: TGetHostsFn = fid =>
+	Result.If(KnownFunctions.checkPermissions(fid, { queries: ["hosts.access"] })).cata({
+		Ok: () => O.Some(gets_unsafe()),
+		Err: () => O.None(),
+	})
 
-export const useHosts = () => ({ idHost, dtHost, staticHost, websiteHost, myHost })
+// TODO: Remove
+export const gets_unsafe = () => ({ id: _id, dt: _dt, static: _static, website: _website, my: _my })
+
+// TODO: Remove
+export const useHostsUnsafe = () => ({
+	id: _id,
+	dt: _dt,
+	static: _static,
+	website: _website,
+	my: _my,
+})
+
+export const useHosts = () => {
+	const fid = useCurrentFID()
+	const { get_hosts } = useOrdoContext()
+
+	return get_hosts(fid)
+}

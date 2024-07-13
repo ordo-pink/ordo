@@ -3,14 +3,14 @@
 
 import { Oath } from "../src/impl"
 
-export const of0 = <Resolve, Reject = never>(
-	value: Resolve,
-	abortController = new AbortController(),
-): Oath<Resolve, Reject> => new Oath(resolve => resolve(value), abortController)
+export const of_oath = <$TResolve, $TReject = never>(
+	value: $TResolve,
+	abort_controller = new AbortController(),
+): Oath<$TResolve, $TReject> => new Oath(resolve => resolve(value), abort_controller)
 
-export const resolve0 = of0
+export const resolve_oath = of_oath
 
-export const reject0 = <Reject, Resolve = never>(
-	error?: Reject,
-	abortController = new AbortController(),
-): Oath<Resolve, Reject> => new Oath((_, reject) => reject(error), abortController)
+export const reject_oath = <$TReject, $TResolve = never>(
+	value?: $TReject,
+	abort_controller = new AbortController(),
+): Oath<$TResolve, $TReject> => new Oath((_, reject) => reject(value), abort_controller)

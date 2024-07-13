@@ -19,11 +19,11 @@
 
 import { DataQuery, DataRepository } from "@ordo-pink/data"
 import { getData, getData$ } from "@ordo-pink/frontend-stream-data"
-import { getIsAuthenticated, getUser } from "@ordo-pink/frontend-stream-user"
+import { getUser, _get_is_authenticated } from "@ordo-pink/frontend-stream-user"
 import { KnownFunctions } from "@ordo-pink/frontend-known-functions"
-import { getCommands } from "@ordo-pink/frontend-stream-commands"
-import { getHosts } from "@ordo-pink/frontend-react-hooks"
-import { getLogger } from "@ordo-pink/frontend-logger"
+import { _get_commands } from "@ordo-pink/frontend-stream-commands"
+import { get_hosts_unsafe } from "@ordo-pink/frontend-react-hooks"
+import { _get_logger } from "@ordo-pink/frontend-logger"
 
 import { type RegisterFunction } from "./create-function.types"
 import { registerActivity } from "@ordo-pink/frontend-stream-activities"
@@ -31,10 +31,10 @@ import { registerActivity } from "@ordo-pink/frontend-stream-activities"
 export const createFunction: RegisterFunction = (name, permissions, callback) => {
 	const fid = KnownFunctions.register(name, permissions)
 
-	const getCommandsPatched = () => getCommands(fid)
-	const getLoggerPatched = () => getLogger(fid)
+	const getCommandsPatched = () => _get_commands(fid)
+	const getLoggerPatched = () => _get_logger(fid)
 	const getUserPatched = () => getUser(fid)
-	const getIsAuthenticatedPatched = () => getIsAuthenticated(fid)
+	const getIsAuthenticatedPatched = () => _get_is_authenticated(fid)
 	const getDataPatched = () => getData(fid)
 	const registerActivityPatched = registerActivity(fid)
 
@@ -47,7 +47,7 @@ export const createFunction: RegisterFunction = (name, permissions, callback) =>
 		getLogger: getLoggerPatched,
 		getUser: getUserPatched,
 		getIsAuthenticated: getIsAuthenticatedPatched,
-		getHosts,
+		getHosts: get_hosts_unsafe,
 		registerActivity: registerActivityPatched,
 		data: {
 			getChildren: item => DataRepository.getChildren(getDataPatched(), item),

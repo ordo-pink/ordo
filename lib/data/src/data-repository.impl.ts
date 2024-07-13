@@ -166,7 +166,7 @@ const getParents =
 	}
 
 const toFSID = (item: PlainData | FSID | "root" | null) =>
-	Switch.empty()
+	Switch.OfTrue()
 		.case(Boolean(item && (item as PlainData).fsid), () => (item as PlainData).fsid)
 		.case(typeof item === "string" && item !== "root", () => item as FSID)
 		.default(() => null)
@@ -178,12 +178,12 @@ export const DataRepository = {
 			return !item.name.startsWith(".") && !parents.some(parent => parent.name.startsWith("."))
 		}),
 	getChildren: (data: PlainData[] | null, item: PlainData | FSID | "root" | null) => {
-		const fsid = Switch.empty()
+		const fsid = Switch.OfTrue()
 			.case(Boolean(item && (item as PlainData).fsid), () => (item as PlainData).fsid)
 			.case(typeof item === "string" && item !== "root", () => item as FSID)
 			.default(() => null)
 
-		return Switch.empty()
+		return Switch.OfTrue()
 			.case(!data || !item, () => [])
 			.default(() => data!.filter(item => item.parent === fsid))
 	},

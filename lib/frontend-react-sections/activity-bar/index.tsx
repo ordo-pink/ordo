@@ -23,7 +23,7 @@ import { type MouseEvent } from "react"
 import {
 	useAccelerator,
 	useCommands,
-	useHosts,
+	useHostsUnsafe,
 	useStrictSubscription,
 	useSubscription,
 	useUser,
@@ -40,7 +40,7 @@ import ActivityItem from "./activity"
 
 export default function ActivityBar() {
 	const commands = useCommands()
-	const { staticHost } = useHosts()
+	const { static_host: staticHost } = useHostsUnsafe()
 
 	const user = useUser()
 	const activities = useStrictSubscription(activities$, [])

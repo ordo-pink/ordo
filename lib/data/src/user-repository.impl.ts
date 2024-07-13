@@ -29,10 +29,10 @@ export const KnownUserRepository: Types.TKnownUserRepositoryStatic = {
 	of: $ => ({
 		get: () =>
 			$.getValue().cata({
-				Some: Oath.resolve,
-				None: () => Oath.reject(eagain_known_user("NOT_IMPLEMENTED")), // TODO:
+				Some: Oath.Resolve,
+				None: () => Oath.Reject(eagain_known_user("NOT_IMPLEMENTED")), // TODO:
 			}),
-		put: () => Oath.reject(einval_known_user("NOT IMPLEMENTED")), // TODO:
+		put: () => Oath.Reject(einval_known_user("NOT IMPLEMENTED")), // TODO:
 		get sub() {
 			let i = 0
 			return $.pipe(map(() => ++i))

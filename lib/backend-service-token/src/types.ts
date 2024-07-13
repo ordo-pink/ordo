@@ -18,7 +18,7 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import type { AUD, Algorithm, JTI, JWT, JWTPayload, SUB } from "@ordo-pink/wjwt"
-import type { Logger } from "@ordo-pink/logger"
+import type { TLogger } from "@ordo-pink/logger"
 import type { Oath } from "@ordo-pink/oath"
 import type { Unary } from "@ordo-pink/tau"
 
@@ -144,7 +144,7 @@ export type TokenServiceOptions = {
 	/**
 	 * Dedicated logger.
 	 */
-	readonly logger: Logger
+	readonly logger: TLogger
 }
 
 export type TTokenService = {

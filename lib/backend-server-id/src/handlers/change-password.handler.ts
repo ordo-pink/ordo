@@ -22,13 +22,13 @@ import { type Middleware, type Response } from "koa"
 import { type JWAT, type TTokenService } from "@ordo-pink/backend-service-token"
 import {
 	type Oath,
-	bimap0,
-	fromNullable0,
-	merge0,
-	of0,
-	rejectedMap0,
-	swap0,
-	tap0,
+	bimap_oath,
+	from_nullable_oath,
+	merge_oath,
+	of_oath,
+	rejected_map_oath,
+	swap_oath,
+	tap_oath,
 } from "@ordo-pink/oath"
 import { authenticate0, parseBody0, sendError, sendSuccess } from "@ordo-pink/backend-utils"
 import { HttpError } from "@ordo-pink/rrr"
@@ -42,7 +42,7 @@ import { setOrdoAuthCookies } from "../fns/set-cookies"
 export const handleChangePassword: TFn =
 	({ tokenService, userService }) =>
 	ctx =>
-		merge0({
+		merge_oath({
 			token: authenticate0(ctx, tokenService),
 			body: parseBody0<TRequestBody>(ctx, "object"),
 		})
@@ -68,18 +68,18 @@ type TExtractCtxFn = (us: UserService) => (p: TRequest) => Oath<TCtx, HttpError>
 const extractCtx0: TExtractCtxFn =
 	userService =>
 	({ token, body: { oldPassword, newPassword } }) =>
-		merge0({
-			user: userService.getById(token.payload.sub).pipe(rejectedMap0(toUserNotFoundError)),
-			oldPassword: fromNullable0(oldPassword).pipe(rejectedMap0(toInvalidBodyError)),
-			newPassword: fromNullable0(newPassword).pipe(rejectedMap0(toInvalidBodyError)),
+		merge_oath({
+			user: userService.getById(token.payload.sub).pipe(rejected_map_oath(toUserNotFoundError)),
+			oldPassword: from_nullable_oath(oldPassword).pipe(rejected_map_oath(toInvalidBodyError)),
+			newPassword: from_nullable_oath(newPassword).pipe(rejected_map_oath(toInvalidBodyError)),
 		})
 
 type TCheckNewPasswordIsValidFn = (body: TRequestBody) => Oath<"OK", HttpError>
 const checkNewPasswordIsValid0: TCheckNewPasswordIsValidFn = body =>
-	fromNullable0(checkPwd(body.newPassword))
-		.pipe(swap0)
+	from_nullable_oath(checkPwd(body.newPassword))
+		.pipe(swap_oath)
 		.and(() => OK)
-		.pipe(rejectedMap0(pwdErr => HttpError.BadRequest(pwdErr)))
+		.pipe(rejected_map_oath(pwdErr => HttpError.BadRequest(pwdErr)))
 
 type TValidateCtxFn = (ctx: TCtx) => Oath<TCtx, HttpError>
 const validateCtx0: TValidateCtxFn = ctx => checkNewPasswordIsValid0(ctx).and(() => ctx)
@@ -87,7 +87,7 @@ const validateCtx0: TValidateCtxFn = ctx => checkNewPasswordIsValid0(ctx).and(()
 type TUpdateUserPasswordFn = (us: UserService) => (ctx: TCtx) => Oath<TCtx, HttpError>
 const updateUserPassword0: TUpdateUserPasswordFn = userService => ctx =>
 	userService.updateUserPassword(ctx.user, ctx.oldPassword, ctx.newPassword).pipe(
-		bimap0(
+		bimap_oath(
 			error =>
 				error && error instanceof Error
 					? HttpError.from(error)
@@ -100,7 +100,7 @@ type TDropActiveUserSessionsFn = (ts: TTokenService) => (ctx: TCtx) => Oath<TCtx
 const dropActiveUserSessions0: TDropActiveUserSessionsFn = tokenService => ctx =>
 	tokenService.persistenceStrategy
 		.removeTokenRecord(ctx.user.id)
-		.pipe(bimap0(HttpError.from, () => ctx))
+		.pipe(bimap_oath(HttpError.from, () => ctx))
 
 type TCreateUserSessionFn = (
 	ts: TTokenService,
@@ -109,10 +109,10 @@ type TCreateUserSessionFn = (
 const createUserSession0: TCreateUserSessionFn = (tokenService, response) => ctx =>
 	tokenService
 		.createPair({ sub: ctx.user.id })
-		.pipe(rejectedMap0(HttpError.from))
+		.pipe(rejected_map_oath(HttpError.from))
 		.and(tokens =>
-			of0(new Date(Date.now() + tokens.exp))
-				.pipe(tap0(expires => setOrdoAuthCookies(response, expires, tokens.jti, tokens.sub)))
+			of_oath(new Date(Date.now() + tokens.exp))
+				.pipe(tap_oath(expires => setOrdoAuthCookies(response, expires, tokens.jti, tokens.sub)))
 				.and(expires => ({
 					accessToken: tokens.tokens.access,
 					fileLimit: tokens.lim,

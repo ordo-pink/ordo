@@ -25,12 +25,12 @@ import { scan } from "rxjs/internal/operators/scan"
 import { shareReplay } from "rxjs/internal/operators/shareReplay"
 
 import { call_once } from "@ordo-pink/tau"
-import { getCommands } from "@ordo-pink/frontend-stream-commands"
-import { getLogger } from "@ordo-pink/frontend-logger"
+import { _get_commands } from "@ordo-pink/frontend-stream-commands"
+import { _get_logger } from "@ordo-pink/frontend-logger"
 
-export const __initCommandPalette = call_once((fid: symbol) => {
-	const commands = getCommands(fid)
-	const logger = getLogger(fid)
+export const __init_command_palette$ = call_once((fid: symbol) => {
+	const commands = _get_commands(fid)
+	const logger = _get_logger(fid)
 
 	logger.debug("Initializing command palette...")
 

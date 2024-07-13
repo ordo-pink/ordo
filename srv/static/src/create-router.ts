@@ -21,14 +21,14 @@ import type { BunFile } from "bun"
 import { join } from "path"
 
 import { Context, Router } from "@ordo-pink/routary"
-import { Logger } from "@ordo-pink/logger"
+import { TLogger } from "@ordo-pink/logger"
 import { Oath } from "@ordo-pink/oath"
 import { fileExists0 } from "@ordo-pink/fs"
 import { logBunRequest } from "@ordo-pink/backend-utils"
 
 import type { StaticMiddlewareState } from "./static.types"
 
-type P = { root: string; logger: Logger; serverName: string }
+type P = { root: string; logger: TLogger; serverName: string }
 export const createRouter = ({ root, logger, serverName }: P) =>
 	Router.create()
 		.get(/\/.*/, ctx =>
@@ -61,7 +61,7 @@ const createErrorMiddlewareContext = (time: number) => () => ({ time })
 
 const createFullFilePath = (root: string) => (pathname: string) => join(root, pathname)
 
-const logRequestThunk = (logger: Logger, serverName: string, ctx: Context) => () =>
+const logRequestThunk = (logger: TLogger, serverName: string, ctx: Context) => () =>
 	logBunRequest({ logger, serverName })(ctx)
 
 const openFileIfExists0 = (path: string) =>

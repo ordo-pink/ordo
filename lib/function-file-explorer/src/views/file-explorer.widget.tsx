@@ -18,7 +18,7 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import {
-	useHosts,
+	useHostsUnsafe,
 	useUser,
 	useUserAchievements,
 	useUserName,
@@ -33,7 +33,7 @@ import UsedSpace from "@ordo-pink/frontend-react-components/used-space"
 export default function FileExplorerCardComponent() {
 	const user = useUser()
 	const name = useUserName()!
-	const hosts = useHosts()
+	const hosts = useHostsUnsafe()
 	const achievements = useUserAchievements()
 
 	return Either.fromNullable(user).fold(Null, user => (
@@ -41,7 +41,7 @@ export default function FileExplorerCardComponent() {
 			<div className="flex w-full max-w-lg flex-col items-center space-y-4">
 				<div className="flex shrink-0 items-center justify-center rounded-full bg-gradient-to-tr from-sky-400 via-purple-400 to-rose-400 p-0.5 shadow-lg">
 					<img
-						src={`${hosts.staticHost}/logo.png`}
+						src={`${hosts.static_host}/logo.png`}
 						alt="avatar"
 						className="h-16 rounded-full bg-white md:h-20 dark:from-stone-900 dark:via-zinc-900 dark:to-neutral-900"
 					/>

@@ -20,7 +20,14 @@
 import { type Middleware } from "koa"
 import isEmail from "validator/lib/isEmail"
 
-import { type Oath, chain0, fromBoolean0, fromNullable0, of0, rejectedMap0 } from "@ordo-pink/oath"
+import {
+	type Oath,
+	chain_oath,
+	from_boolean_oath,
+	from_nullable_oath,
+	of_oath,
+	rejected_map_oath,
+} from "@ordo-pink/oath"
 import { sendError, sendSuccess } from "@ordo-pink/backend-utils"
 import { type HttpError } from "@ordo-pink/rrr"
 import { type UserService } from "@ordo-pink/backend-service-user"
@@ -30,7 +37,7 @@ import { toInvalidRequestError, toUserNotFoundError } from "../fns/to-error"
 export const handleUserInfoByEmail: TFn =
 	({ userService }) =>
 	ctx =>
-		of0(ctx.params)
+		of_oath(ctx.params)
 			.and(validateParams0)
 			.and(getUserByEmail0(userService))
 			.fork(sendError(ctx), sendSuccess({ ctx }))
@@ -43,10 +50,10 @@ type TResult = Routes.ID.GetUserInfoByEmail.Result
 
 type TValidateParamsFn = (p: Routes.ID.GetUserInfoByEmail.RequestParams) => Oath<string, HttpError>
 const validateParams0: TValidateParamsFn = ({ email }) =>
-	fromNullable0(email)
-		.pipe(chain0(email => fromBoolean0(isEmail(email), email)))
-		.pipe(rejectedMap0(toInvalidRequestError))
+	from_nullable_oath(email)
+		.pipe(chain_oath(email => from_boolean_oath(isEmail(email), email)))
+		.pipe(rejected_map_oath(toInvalidRequestError))
 
 type TGetUserByEmailFn = (us: UserService) => (email: string) => Oath<TResult, HttpError>
 const getUserByEmail0: TGetUserByEmailFn = userService => email =>
-	userService.getUserInfo(email).pipe(rejectedMap0(toUserNotFoundError))
+	userService.getUserInfo(email).pipe(rejected_map_oath(toUserNotFoundError))

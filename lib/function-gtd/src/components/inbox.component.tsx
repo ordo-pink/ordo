@@ -40,7 +40,7 @@ export default function GTDInbox() {
 	useAccelerator("meta+n", () => createInputRef.current?.focus())
 
 	useEffect(() => {
-		commands.emit<cmd.application.setTitle>("application.set-title", "Входящие | GTD")
+		commands.emit<cmd.application.set_title>("application.set-title", "Входящие | GTD")
 	}, [commands])
 
 	const tAddToInboxInputPlaceholder = "Что делается..."

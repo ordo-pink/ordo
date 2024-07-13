@@ -22,13 +22,13 @@ import { Context, type Middleware } from "koa"
 import { type JTI, type SUB } from "@ordo-pink/wjwt"
 import {
 	type Oath,
-	fromBoolean0,
-	fromNullable0,
-	merge0,
-	of0,
-	rejectedMap0,
-	rejectedTap0,
-	tap0,
+	from_boolean_oath,
+	from_nullable_oath,
+	merge_oath,
+	of_oath,
+	rejected_map_oath,
+	rejected_tap_oath,
+	tap_oath,
 } from "@ordo-pink/oath"
 import { type UUIDv4, is_uuid } from "@ordo-pink/tau"
 import { sendError, sendSuccess } from "@ordo-pink/backend-utils"
@@ -42,14 +42,18 @@ import { setOrdoAuthCookies } from "../fns/set-cookies"
 export const handleRefreshToken: TFn =
 	({ tokenService, userService }) =>
 	async ctx =>
-		merge0({
-			cookieSub: fromNullable0(ctx.cookies.get("sub")).pipe(rejectedMap0(toInvalidRequestError)),
-			cookieJti: fromNullable0(ctx.cookies.get("jti")).pipe(rejectedMap0(toInvalidRequestError)),
+		merge_oath({
+			cookieSub: from_nullable_oath(ctx.cookies.get("sub")).pipe(
+				rejected_map_oath(toInvalidRequestError),
+			),
+			cookieJti: from_nullable_oath(ctx.cookies.get("jti")).pipe(
+				rejected_map_oath(toInvalidRequestError),
+			),
 		})
 			.and(validateCtx0)
 			.and(getUserByCookies0(userService, tokenService))
 			.and(updateUserSession0(ctx, tokenService))
-			.pipe(rejectedTap0(dropCookies(ctx)))
+			.pipe(rejected_tap_oath(dropCookies(ctx)))
 			.fork(sendError(ctx), sendSuccess({ ctx }))
 
 // --- Internal ---
@@ -64,28 +68,28 @@ type ExtractCtxFn = (ctx: {
 	cookieJti: string
 }) => Oath<{ cookieSub: SUB; cookieJti: JTI }, HttpError>
 const validateCtx0: ExtractCtxFn = ({ cookieJti, cookieSub }) =>
-	merge0({
-		cookieSub: fromBoolean0(is_uuid(cookieSub), cookieSub as SUB).pipe(
-			rejectedMap0(toInvalidRequestError),
+	merge_oath({
+		cookieSub: from_boolean_oath(is_uuid(cookieSub), cookieSub as SUB).pipe(
+			rejected_map_oath(toInvalidRequestError),
 		),
-		cookieJti: fromBoolean0(is_uuid(cookieJti), cookieJti as JTI).pipe(
-			rejectedMap0(toInvalidRequestError),
+		cookieJti: from_boolean_oath(is_uuid(cookieJti), cookieJti as JTI).pipe(
+			rejected_map_oath(toInvalidRequestError),
 		),
 	})
 
 type CheckTokenExists = (token: string | null) => Oath<string, HttpError>
 const checkTokenExists0: CheckTokenExists = token =>
-	fromNullable0(token).pipe(rejectedMap0(toUserNotFoundError))
+	from_nullable_oath(token).pipe(rejected_map_oath(toUserNotFoundError))
 
 type VerifyRefreshTokenFn = (ts: TTokenService) => (token: string) => Oath<string, HttpError>
 const verifyRefreshToken0: VerifyRefreshTokenFn = tokenService => token =>
 	tokenService
 		.verifyToken(token, "refresh")
-		.and(valid => fromBoolean0(valid, token, HttpError.Unauthorized("Invalid token")))
+		.and(valid => from_boolean_oath(valid, token, HttpError.Unauthorized("Invalid token")))
 
 type GetUserByIdFn = (userService: UserService, id: UUIDv4) => () => Oath<User.User, HttpError>
 const getUserById0: GetUserByIdFn = (userService, id) => () =>
-	userService.getById(id).pipe(rejectedMap0(toUserNotFoundError))
+	userService.getById(id).pipe(rejected_map_oath(toUserNotFoundError))
 
 type GetUserByCookiesFn = (
 	us: UserService,
@@ -96,7 +100,7 @@ const getUserByCookies0: GetUserByCookiesFn =
 	({ cookieSub: cookieSub, cookieJti: cookieJti }) =>
 		tokenService.persistenceStrategy
 			.getToken(cookieSub, cookieJti)
-			.pipe(rejectedMap0(toUserNotFoundError))
+			.pipe(rejected_map_oath(toUserNotFoundError))
 			.and(checkTokenExists0)
 			.and(verifyRefreshToken0(tokenService))
 			.and(getUserById0(userService, cookieSub))
@@ -119,10 +123,12 @@ const updateUserSession0: UpdateUserSessionFn =
 					sbs: user.subscription,
 				},
 			})
-			.pipe(rejectedMap0(HttpError.from))
+			.pipe(rejected_map_oath(HttpError.from))
 			.and(tokens =>
-				of0(new Date(Date.now() + tokens.exp))
-					.pipe(tap0(expires => setOrdoAuthCookies(ctx.response, expires, tokens.jti, tokens.sub)))
+				of_oath(new Date(Date.now() + tokens.exp))
+					.pipe(
+						tap_oath(expires => setOrdoAuthCookies(ctx.response, expires, tokens.jti, tokens.sub)),
+					)
 					.and(expires => ({
 						accessToken: tokens.tokens.access,
 						fileLimit: tokens.lim,

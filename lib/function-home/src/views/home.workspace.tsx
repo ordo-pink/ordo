@@ -19,9 +19,9 @@
 
 import { useEffect, useState } from "react"
 
-import { Oath, chain0, fromBoolean0, fromPromise0 } from "@ordo-pink/oath"
+import { Oath, chain_oath, from_boolean_oath, from_promise_oath } from "@ordo-pink/oath"
 import { is_object, is_string, noop } from "@ordo-pink/tau"
-import { useCommands, useHosts, useStrictSubscription } from "@ordo-pink/frontend-react-hooks"
+import { useCommands, useHostsUnsafe, useStrictSubscription } from "@ordo-pink/frontend-react-hooks"
 import { activities$ } from "@ordo-pink/frontend-stream-activities"
 import { useFetch } from "@ordo-pink/frontend-fetch"
 
@@ -36,24 +36,24 @@ import Widgets from "../components/widgets.component"
 export default function FileExplorerSidebar() {
 	const activities = useStrictSubscription(activities$, [])
 	const fetch = useFetch()
-	const hosts = useHosts()
+	const hosts = useHostsUnsafe()
 	const commands = useCommands()
 
 	const [news, setNews] = useState<News[] | null>(null)
 
 	useEffect(() => {
-		commands.emit<cmd.application.setTitle>("application.set-title", "Главная")
+		commands.emit<cmd.application.set_title>("application.set-title", "Главная")
 
-		const ordoNews0 = fromPromise0(() => fetch(`${hosts.staticHost}/news.json`))
-			.pipe(chain0(responseToJson0))
-			.pipe(chain0(checkIsArray0))
-			.pipe(chain0(checkItemsAreNewsItems))
+		const ordoNews0 = from_promise_oath(() => fetch(`${hosts.static_host}/news.json`))
+			.pipe(chain_oath(responseToJson0))
+			.pipe(chain_oath(checkIsArray0))
+			.pipe(chain_oath(checkItemsAreNewsItems))
 
 		// TODO: Log error on reject
 		void ordoNews0.fork(noop, news => setNews(news))
 
 		return () => void ordoNews0.cancel()
-	}, [fetch, hosts.staticHost, commands])
+	}, [fetch, hosts.static_host, commands])
 
 	return (
 		<CenteredPage centerX centerY>
@@ -82,11 +82,12 @@ const areNewsItems = (items: unknown[]): items is News[] =>
 	!!items.reduce((acc, item) => acc && isNewsItem(item), true)
 
 type TResponseToJsonFn = (r: Response) => Oath<unknown, Error>
-const responseToJson0: TResponseToJsonFn = res => fromPromise0(() => res.json())
+const responseToJson0: TResponseToJsonFn = res => from_promise_oath(() => res.json())
 
 type TCheckIsArrayFn = (r: unknown) => Oath<unknown[], Error>
-const checkIsArray0: TCheckIsArrayFn = news => fromBoolean0(Array.isArray(news), news as unknown[])
+const checkIsArray0: TCheckIsArrayFn = news =>
+	from_boolean_oath(Array.isArray(news), news as unknown[])
 
 type TCheckItemsAreNewsItemsFn = (r: unknown[]) => Oath<News[], Error>
 const checkItemsAreNewsItems: TCheckItemsAreNewsItemsFn = news =>
-	fromBoolean0(areNewsItems(news), news as News[])
+	from_boolean_oath(areNewsItems(news), news as News[])

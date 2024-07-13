@@ -32,7 +32,7 @@ export default function FileExplorerActivity() {
 	const [selectedItems, setSelectedItems] = useState<FSID[]>([])
 
 	useEffect(() => {
-		commands.emit<cmd.application.setTitle>(
+		commands.emit<cmd.application.set_title>(
 			"application.set-title",
 			currentData ? `${currentData.name} | Файлы` : "Файлы",
 		)

@@ -3,14 +3,7 @@
 
 import { Oath } from "../src/impl"
 
-export const orNothing = <Resolve, Reject>(o: Oath<Resolve, Reject>) =>
-	new Promise<Resolve>((resolve, reject) => {
-		const handleAbort = () => {
-			o._abortController.signal.removeEventListener("abort", handleAbort)
-			reject(o.cancellationReason)
-		}
-
-		o._abortController.signal.addEventListener("abort", handleAbort)
-
-		o.isCancelled ? reject(o.cancellationReason) : o._resolver(resolve as any, reject as any)
+export const or_nothing_oath = <$TResolve, $TReject>(o: Oath<$TResolve, $TReject>) =>
+	new Promise<$TResolve>((resolve, reject) => {
+		o.is_cancelled ? reject(o.cancellation_reason) : o.cata(resolve as any, reject as any)
 	}).catch(() => void 0)

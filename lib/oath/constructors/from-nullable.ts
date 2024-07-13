@@ -3,8 +3,9 @@
 
 import { Oath } from "../src/impl"
 
-export const fromNullable0 = <Resolve>(
-	value?: Resolve | null,
-	abortController = new AbortController(),
-): Oath<NonNullable<Resolve>, null> =>
-	value == null ? Oath.reject(null, abortController) : Oath.resolve(value, abortController)
+export const from_nullable_oath = <$TResolve, $TReject = null>(
+	value?: $TResolve | null,
+	on_null = () => null as any,
+	abort_controller = new AbortController(),
+): Oath<NonNullable<$TResolve>, $TReject> =>
+	value == null ? Oath.Reject(on_null(), abort_controller) : Oath.Resolve(value, abort_controller)

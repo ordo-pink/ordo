@@ -49,7 +49,7 @@ export default function GTDSubtasks({ fsid }: P) {
 
 	useEffect(() => {
 		data &&
-			commands.emit<cmd.application.setTitle>("application.set-title", `Проект ${data.name} | GTD`)
+			commands.emit<cmd.application.set_title>("application.set-title", `Проект ${data.name} | GTD`)
 	}, [data, commands])
 
 	const tAddToInboxInputPlaceholder = "Что делается..."

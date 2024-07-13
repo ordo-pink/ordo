@@ -27,12 +27,12 @@ import { shareReplay } from "rxjs/internal/operators/shareReplay"
 import { N, call_once } from "@ordo-pink/tau"
 import { chainE, fromBooleanE, fromNullableE } from "@ordo-pink/either"
 import { KnownFunctions } from "@ordo-pink/frontend-known-functions"
-import { getCommands } from "@ordo-pink/frontend-stream-commands"
-import { getLogger } from "@ordo-pink/frontend-logger"
+import { _get_commands } from "@ordo-pink/frontend-stream-commands"
+import { _get_logger } from "@ordo-pink/frontend-logger"
 
-export const __initFileAssociations = call_once((fid: symbol) => {
-	const logger = getLogger(fid)
-	const commands = getCommands(fid)
+export const __init_file_associations$ = call_once((fid: symbol) => {
+	const logger = _get_logger(fid)
+	const commands = _get_commands(fid)
 
 	logger.debug("Initializing file associations...")
 

@@ -1,6 +1,8 @@
 // SPDX-FileCopyrightText: Copyright 2024, 谢尔盖||↓ and the Ordo.pink contributors
 // SPDX-License-Identifier: Unlicense
 
+import { is_bool, is_false, is_fn, is_object, is_true } from "@ordo-pink/tau"
+
 import type * as Types from "./result.types"
 
 export const ResultOk: Types.TOkResultConstructorFn = x => ({
@@ -129,6 +131,31 @@ export const ResultIf: Types.TIfResultConstructorFn = (
 	},
 ) => (orly ? R.Ok(T()) : R.Err(F()))
 
+export const is_result_guard = <$TOk = unknown, $TErr = unknown>(
+	x: unknown,
+): x is Types.TResult<$TOk, $TErr> => {
+	if (!is_object(x)) return false
+
+	const y = x as Types.TResult<any, any>
+
+	return (
+		is_true(y.is_result) &&
+		is_bool(y.is_err) &&
+		is_bool(y.is_ok) &&
+		is_fn(y.cata) &&
+		is_fn(y.pipe) &&
+		is_fn(y.unwrap)
+	)
+}
+
+export const is_ok_guard = <_TOk, _TErr>(
+	x: Types.TResult<_TOk, _TErr>,
+): x is Types.TResult<_TOk, never> => is_result_guard(x) && is_true(x.is_ok) && is_false(x.is_err)
+
+export const is_err_guard = <_TOk, _TErr>(
+	x: Types.TResult<_TOk, _TErr>,
+): x is Types.TResult<never, _TErr> => is_result_guard(x) && is_false(x.is_ok) && is_true(x.is_err)
+
 export const R: Types.TResultStatic = {
 	of: ResultOk,
 	Ok: ResultOk,
@@ -138,6 +165,11 @@ export const R: Types.TResultStatic = {
 	FromNullable: ResultFromNullable,
 	FromOption: ResultFromOption,
 	Merge: ResultMerge,
+	guards: {
+		is_result: is_result_guard,
+		is_ok: is_ok_guard,
+		is_err: is_err_guard,
+	},
 	ops: {
 		map: map_result,
 		err_map: err_map_result,

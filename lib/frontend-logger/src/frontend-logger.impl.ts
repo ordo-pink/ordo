@@ -17,17 +17,22 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { ConsoleLogger, Logger } from "@ordo-pink/logger"
 import { KnownFunctions } from "@ordo-pink/frontend-known-functions"
+import { type TGetLoggerFn } from "@ordo-pink/core"
+import { type TLogger } from "@ordo-pink/logger"
 import { call_once } from "@ordo-pink/tau"
 
-let logger = ConsoleLogger
+let logger: TLogger
 
-export const __initLogger = call_once((customLogger: Logger) => {
-	logger = customLogger
+type TInitLoggerFn = (logger: TLogger) => { logger: TLogger; get_logger: TGetLoggerFn }
+export const __init_logger: TInitLoggerFn = call_once(x => {
+	logger = x
+
+	return { logger, get_logger: _get_logger }
 })
 
-export const getLogger = (fid: symbol | null): Logger => {
+// TODO: Make non-exported
+export const _get_logger = (fid: symbol | null): TLogger => {
 	const functionName = KnownFunctions.exchange(fid) ?? "unauthorized"
 
 	return {

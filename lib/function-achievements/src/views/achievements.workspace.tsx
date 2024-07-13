@@ -37,7 +37,7 @@ export default function AchievementsWorkspace() {
 	const achievements = useUserAchievements()
 
 	useEffect(() => {
-		commands.emit<cmd.application.setTitle>("application.set-title", "Достижения")
+		commands.emit<cmd.application.set_title>("application.set-title", "Достижения")
 	}, [commands])
 
 	const visibleAchievements = category

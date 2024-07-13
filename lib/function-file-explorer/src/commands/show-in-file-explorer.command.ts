@@ -73,7 +73,7 @@ const commandHandler =
 		const children = data.getChildren(fsid)
 		const item = data.getDataByFSID(fsid)
 
-		const route = Switch.empty()
+		const route = Switch.OfTrue()
 			.case(children.length > 0, () => `/fs/${fsid}`)
 			.case(!!item && !item.parent, () => `/fs/${item!.parent}?selected=${fsid}`)
 			.case(!!item && !!item.parent, () => `/fs?selected=${fsid}`)

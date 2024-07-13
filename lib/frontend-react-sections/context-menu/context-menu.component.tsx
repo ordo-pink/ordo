@@ -78,7 +78,7 @@ export default function ContextMenu() {
 	const willFitToBottom = windowHeight - y - menuHeight > 8
 	const willFitToRight = windowWidth - x - MENU_WIDTH > 8
 
-	const direction = Switch.empty()
+	const direction = Switch.OfTrue()
 		.case(
 			() => !willFitToBottom && !willFitToRight,
 			() => "top-left",

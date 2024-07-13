@@ -33,7 +33,7 @@ export default function GTD() {
 	const { fsid, label } = useRouteParams<{ fsid: FSID; label: string }>()
 
 	return Either.fromNullable(route).fold(Loading, () =>
-		Switch.empty()
+		Switch.OfTrue()
 			.case(!!label, () => <GTDLabel label={label!} />)
 			.case(!!fsid, () => <GTDSubtasks fsid={fsid!} />)
 			.default(() => <GTDInbox />),

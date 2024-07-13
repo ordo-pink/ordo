@@ -17,99 +17,89 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { F, T, identity } from "ramda"
-import { BehaviorSubject } from "rxjs/internal/BehaviorSubject"
+import { BehaviorSubject, type Observable, map } from "rxjs"
 
-import { N, call_once } from "@ordo-pink/tau"
+import { F, N, T, call_once } from "@ordo-pink/tau"
+import { Oath, if_else_oath } from "@ordo-pink/oath"
+import { type TFetch, type THosts } from "@ordo-pink/core"
 import { type AuthResponse } from "@ordo-pink/backend-server-id"
-import { Either } from "@ordo-pink/either"
 import { KnownFunctions } from "@ordo-pink/frontend-known-functions"
-import { type Logger } from "@ordo-pink/logger"
-import { Oath } from "@ordo-pink/oath"
-import { getFetch } from "@ordo-pink/frontend-fetch"
-import { getHosts } from "@ordo-pink/frontend-react-hooks"
-import { getLogger } from "@ordo-pink/frontend-logger"
+import { Result } from "@ordo-pink/result"
+import { type TLogger } from "@ordo-pink/logger"
 
-type InitUserStreamP = { fid: symbol; isDev: boolean }
-export const __initAuth$ = call_once(({ fid, isDev }: InitUserStreamP) => {
-	const { idHost, websiteHost } = getHosts()
-	const fetch = getFetch(fid)
-	const logger = getLogger(fid)
-	const refreshToken = refreshToken0({ fetch, idHost, websiteHost, logger, isDev })
+type TInitUserStreamParams = (params: {
+	hosts: THosts
+	fetch: TFetch
+	logger: TLogger
+	is_dev: boolean
+}) => { auth$: Observable<AuthResponse | null> }
+export const __init_auth$: TInitUserStreamParams = call_once(({ hosts, fetch, logger, is_dev }) => {
+	const refresh_token = Oath.FromNullable(fetch)
+		.pipe(Oath.ops.tap(log_token_refresh_start(logger)))
+		.pipe(Oath.ops.chain(fetch_refresh_token0(fetch, hosts.id)))
+		.pipe(Oath.ops.chain(get_json_response0))
+		.pipe(Oath.ops.chain(check_fetch_succeeded0))
+		.pipe(Oath.ops.map(update_auth(logger)))
 
 	logger.debug("Initialising auth...")
 
-	void refreshToken()
+	void refresh_token.invoke(Oath.invokers.or_else(sign_out(logger, hosts.website, is_dev)))
 
-	const beforeUnloadListener = () => {
+	const interval = setInterval(
+		() => void refresh_token.invoke(Oath.invokers.or_else(sign_out(logger, hosts.website, is_dev))),
+		50_000,
+	) // TODO: Move to ENV
+	const drop_interval = () => {
 		clearInterval(interval)
-		window.removeEventListener("beforeunload", beforeUnloadListener)
+		window.removeEventListener("beforeunload", drop_interval)
 	}
 
-	const interval = setInterval(() => void refreshToken(), 50_000) // TODO: Take from ENV
-
-	window.addEventListener("beforeunload", beforeUnloadListener)
+	window.addEventListener("beforeunload", drop_interval)
 
 	logger.debug("Initialised auth.")
+
+	return { auth$: auth$.pipe(map(value => value)) }
 })
 
-export const getIsAuthenticated = (fid: symbol | null) =>
-	Either.fromBoolean(() =>
-		KnownFunctions.checkPermissions(fid, { queries: ["auth.is-authenticated"] }),
-	)
-		.chain(() => Either.fromNullable(auth$.value?.sub))
-		.fold(F, T)
+export const _get_is_authenticated = (fid: symbol | null) =>
+	Result.If(KnownFunctions.checkPermissions(fid, { queries: ["auth.is-authenticated"] }))
+		.pipe(Result.ops.chain(() => Result.FromNullable(auth$.value?.sub)))
+		.cata({ Ok: T, Err: F })
 
-export const getCurrentUserToken = (fid: symbol | null) =>
-	Either.of(KnownFunctions.checkPermissions(fid, { queries: [] }))
-		.chain(() => Either.fromNullable(auth$.value?.accessToken))
-		.fold(N, identity)
+// TODO: Remove
+export const _get_current_user_token = (fid: symbol | null) =>
+	Result.If(KnownFunctions.checkPermissions(fid, { queries: [] }))
+		.pipe(Result.ops.chain(() => Result.FromNullable(auth$.value?.accessToken)))
+		.cata({ Ok: x => x, Err: N })
 
-type RefreshTokenP = {
-	fetch: typeof window.fetch
-	idHost: string
-	websiteHost: string
-	logger: Logger
-	isDev: boolean
-}
-const refreshToken0 =
-	({ fetch, logger, idHost, websiteHost, isDev }: RefreshTokenP) =>
-	() =>
-		Oath.fromNullable(fetch)
-			.tap(logTokenRefreshStart(logger))
-			.chain(fetchRefreshToken0(fetch, idHost))
-			.chain(getJSONResponse0)
-			.chain(checkIsOperationSuccessful0)
-			.map(updateAuth(logger))
-			.orElse(signOut(logger, websiteHost, isDev))
+const log_token_refresh_start = (logger: TLogger) => () => logger.debug("Refreshing auth token...")
 
-const logTokenRefreshStart = (logger: Logger) => () => logger.debug("Refreshing auth token...")
+const fetch_refresh_token0 = (fetch: typeof window.fetch, id_host: string) => () =>
+	Oath.Try(() => fetch(`${id_host}/refresh-token`, { method: "POST", credentials: "include" }))
 
-const fetchRefreshToken0 = (fetch: typeof window.fetch, idHost: string) => () =>
-	Oath.try(() => fetch(`${idHost}/refresh-token`, { method: "POST", credentials: "include" }))
+const get_json_response0 = (res: Response) => Oath.FromPromise(res.json.bind(res))
 
-const getJSONResponse0 = (res: Response) => Oath.from(res.json.bind(res))
-
-const checkIsOperationSuccessful0 = Oath.ifElse<
+const check_fetch_succeeded0 = if_else_oath<
 	{ success: boolean; result: AuthResponse; error: string },
 	AuthResponse,
 	string
->(res => res.success, { onTrue: res => res.result, onFalse: res => res.error })
+>(res => res.success, { on_true: res => res.result, on_false: res => res.error })
 
-const updateAuth = (logger: Logger) => (auth: AuthResponse) => {
+const update_auth = (logger: TLogger) => (auth: AuthResponse) => {
 	logger.debug("Auth token refreshed.")
 	return auth$.next(auth)
 }
 
-const signOut =
-	(logger: Logger, webHost: string, isDev: boolean) => (res: string | Error | null) => {
+const sign_out =
+	(logger: TLogger, web_host: string, is_dev: boolean) => (res: string | Error | null) => {
 		// Treat an error caused by HMR in dev mode when commands do not get restarted
-		if (res instanceof Error && res.message === "Forbidden" && isDev) {
+		if (res instanceof Error && res.message === "Forbidden" && is_dev) {
 			return window.location.reload()
 		}
 
 		logger.error("Token refresh failed. Signing out.")
-		window.location.href = `${webHost}/sign-out`
+		window.location.href = `${web_host}/sign-out`
 	}
 
+// TODO: Do not export
 export const auth$ = new BehaviorSubject<AuthResponse | null>(null)

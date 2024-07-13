@@ -31,7 +31,7 @@ export default function FSDataIcon({ data, isSelected, onSelect }: P) {
 	const commands = useCommands()
 	const children = useChildren(data)
 
-	const element = Switch.empty()
+	const element = Switch.OfTrue()
 		.case(children.length > 0, () => <DirectoryCardComponent plain={data} />)
 		.case(children.length === 0, () => <FileCardComponent plain={data} />)
 		.default(Null)

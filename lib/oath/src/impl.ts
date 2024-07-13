@@ -2,110 +2,136 @@
 // SPDX-License-Identifier: Unlicense
 
 import { type UnderOath } from "./types"
-import { fromPromise0 } from "../constructors/from-promise"
 
-export class Oath<Resolve, Reject = never> {
-	public static resolve<Resolve, Reject = never>(
-		value: Resolve,
-		abortController = new AbortController(),
-	): Oath<Resolve, Reject> {
-		return new Oath(resolve => resolve(value), abortController)
-	}
+import {
+	empty_oath,
+	from_nullable_oath,
+	from_promise_oath,
+	if_oath,
+	merge_oath,
+	reject_oath,
+	resolve_oath,
+	try_oath,
+} from "../constructors/index"
+import { invokers } from "../invokers/index"
+import { ops } from "../operators/index"
 
-	public static reject<Reject, Resolve = never>(
-		err?: Reject,
-		abortController = new AbortController(),
-	): Oath<Resolve, Reject> {
-		return new Oath((_, reject) => reject(err), abortController)
-	}
+// TODO: Replace never in $TReject with unknown
+export class Oath<$TResolve, $TReject = never> {
+	public static Resolve = resolve_oath
 
-	_abortController: AbortController
+	public static Reject = reject_oath
 
-	_resolver: (
-		resolve: <NewResolve>(value: Resolve) => NewResolve,
-		reject: <NewReject>(err?: Reject) => NewReject,
+	public static If = if_oath
+
+	public static Empty = empty_oath
+
+	public static FromNullable = from_nullable_oath
+
+	public static FromPromise = from_promise_oath
+
+	public static Try = try_oath
+
+	public static Merge = merge_oath
+
+	public static invokers = invokers
+
+	public static ops = ops
+
+	_abort_controller: AbortController
+
+	// TODO: Define cata return type
+	cata: (
+		Resolve: <_TNewResolve>(value: $TResolve) => _TNewResolve,
+		Reject: <_TNewReject>(err?: $TReject) => _TNewReject,
 	) => any
 
 	public constructor(
-		resolver: (
-			resolve: <NewResolve>(value: Resolve) => NewResolve,
-			reject: <NewReject>(err?: Reject) => NewReject,
+		// TODO: Define cata return type
+		cata: (
+			resolve: <_TNewResolve>(value: $TResolve) => _TNewResolve,
+			reject: <_TNewReject>(err?: $TReject) => _TNewReject,
 		) => any,
 		abortController = new AbortController(),
 	) {
-		this._resolver = resolver
-		this._abortController = abortController
+		this.cata = cata
+		this._abort_controller = abortController
 	}
 
-	public get isOath() {
+	public get is_oath() {
 		return true
 	}
 
-	public get isCancelled() {
-		return this._abortController.signal.aborted
+	public get is_cancelled() {
+		return this._abort_controller.signal.aborted
 	}
 
-	public get cancellationReason(): string | null {
-		return this.isCancelled ? this._abortController.signal.reason : null
+	public get cancellation_reason(): string | undefined {
+		return this.is_cancelled ? this._abort_controller.signal.reason : undefined
 	}
 
 	public cancel(reason = "Cancelled") {
-		this._abortController.abort(reason)
+		this._abort_controller.abort(reason)
 	}
 
 	public pipe<NewResolve, NewReject>(
-		operator: (o: Oath<Resolve, Reject>) => Oath<NewResolve, NewReject>,
+		operator: (o: Oath<$TResolve, $TReject>) => Oath<NewResolve, NewReject>,
 	): Oath<NewResolve, NewReject> {
 		return operator(this)
 	}
 
 	public and<NewResolve, NewReject>(
-		onResolved: (x: Resolve) => PromiseLike<NewResolve> | Oath<NewResolve, NewReject> | NewResolve,
-	): Oath<NewResolve, NewReject extends unknown ? Reject : Reject | NewReject> {
+		on_resolve: (
+			x: $TResolve,
+		) => PromiseLike<NewResolve> | Oath<NewResolve, NewReject> | NewResolve,
+	): Oath<NewResolve, NewReject extends unknown ? $TReject : $TReject | NewReject> {
 		return new Oath(
 			// eslint-disable-next-line @typescript-eslint/no-misused-promises
 			(resolve, reject) =>
 				this.fork(
-					a => (this.isCancelled ? reject(this.cancellationReason as any) : reject(a as any)),
+					a => (this.is_cancelled ? reject(this.cancellation_reason as any) : reject(a as any)),
 					b => {
-						if (this.isCancelled) {
-							return reject(this.cancellationReason as any)
+						if (this.is_cancelled) {
+							return reject(this.cancellation_reason as any)
 						}
 
 						try {
-							const forked: any = onResolved(b)
+							const forked: any = on_resolve(b)
 
 							if (!forked) return resolve(forked)
-							if (forked.isOath) return forked.fork(reject, resolve)
-							if (forked.then) return fromPromise0(() => forked).fork(reject as any, resolve as any)
+							if (forked.is_oath) return forked.fork(reject, resolve)
+							if (forked.then)
+								return from_promise_oath(() => forked).fork(reject as any, resolve as any)
 							return resolve(forked)
 						} catch (e) {
 							reject(e instanceof Error ? e : (new Error(String(e)) as any))
 						}
 					},
 				),
-			this._abortController,
+			this._abort_controller,
 		)
 	}
 
-	public fix<NewResolve, NewReject = never>(
-		onRejected: (x: Reject) => PromiseLike<NewResolve> | Oath<NewResolve, NewReject> | NewResolve,
-	): Oath<Resolve | NewResolve, NewReject> {
+	public fix<_TNewResolve, _TNewReject = never>(
+		on_reject: (
+			x: $TReject,
+		) => PromiseLike<_TNewResolve> | Oath<_TNewResolve, _TNewReject> | _TNewResolve,
+	): Oath<$TResolve | _TNewResolve, _TNewReject> {
 		return new Oath(
 			// eslint-disable-next-line @typescript-eslint/no-misused-promises
 			(resolve, reject) =>
 				this.fork(
 					a => {
-						if (this.isCancelled) {
-							return reject(this.cancellationReason as any)
+						if (this.is_cancelled) {
+							return reject(this.cancellation_reason as any)
 						}
 
 						try {
-							const forked: any = onRejected(a)
+							const forked: any = on_reject(a)
 
 							if (!forked) return resolve(forked)
-							if (forked.isOath) return forked.fork(reject, resolve)
-							if (forked.then) return fromPromise0(() => forked)
+							if (forked.is_oath) return forked.fork(reject, resolve)
+							if (forked.then) return from_promise_oath(() => forked)
 							return resolve(forked)
 						} catch (e) {
 							reject(e instanceof Error ? e : (new Error(String(e)) as any))
@@ -113,24 +139,30 @@ export class Oath<Resolve, Reject = never> {
 					},
 					b => resolve(b),
 				),
-			this._abortController,
+			this._abort_controller,
 		)
 	}
 
-	public invoke<NewResolve>(invoker: (o: Oath<Resolve, Reject>) => Promise<NewResolve>) {
+	// TODO: Use .cata
+	public invoke<NewResolve>(invoker: (o: Oath<$TResolve, $TReject>) => Promise<NewResolve>) {
 		return invoker(this)
 	}
 
-	public fork<NewResolve, NewReject>(
-		onRejected: (error: Reject) => NewReject,
-		onResolved: (value: Resolve) => NewResolve,
-	): Promise<NewResolve | NewReject> {
-		return new Promise<NewResolve>((resolve, reject) => {
-			this.isCancelled
-				? reject(this.cancellationReason)
-				: this._resolver(resolve as any, reject as any)
-		}).then((x: any) => onResolved(x), onRejected) as any
+	public fork<_TNewResolve, _TNewReject>(
+		on_reject: (error: $TReject) => _TNewReject,
+		on_resolve: (value: $TResolve) => _TNewResolve,
+	): Promise<_TNewResolve | _TNewReject> {
+		return new Promise<_TNewResolve>((resolve, reject) => {
+			this.is_cancelled
+				? reject(this.cancellation_reason)
+				: this.cata(resolve as any, reject as any)
+		}).then((x: any) => on_resolve(x), on_reject) as any
 	}
+
+	// TODO: Drop deprecated methods
+	// TODO: Add ops
+	// TODO: Add invokers
+	// TODO: Add constructors
 
 	/**
 	 * @deprecated The number of Oath methods and static methods will be reduced in v1.0.0. Make sure
@@ -182,7 +214,7 @@ export class Oath<Resolve, Reject = never> {
 		value?: Resolve | null,
 		abortController = new AbortController(),
 	): Oath<NonNullable<Resolve>, null> {
-		return value == null ? Oath.reject(null, abortController) : Oath.resolve(value, abortController)
+		return value == null ? Oath.Reject(null, abortController) : Oath.Resolve(value, abortController)
 	}
 
 	/**
@@ -198,7 +230,7 @@ export class Oath<Resolve, Reject = never> {
 		onFalse: () => Reject = () => null as any,
 		abortController = new AbortController(),
 	): Oath<Resolve, Reject> {
-		return f() ? Oath.resolve(onTrue(), abortController) : Oath.reject(onFalse(), abortController)
+		return f() ? Oath.Resolve(onTrue(), abortController) : Oath.Reject(onFalse(), abortController)
 	}
 
 	/**
@@ -221,8 +253,8 @@ export class Oath<Resolve, Reject = never> {
 	) {
 		return (x: Resolve) =>
 			validate(x)
-				? Oath.resolve(onTrue(x), abortController)
-				: Oath.reject(onFalse(x), abortController)
+				? Oath.Resolve(onTrue(x), abortController)
+				: Oath.Reject(onFalse(x), abortController)
 	}
 
 	/**
@@ -271,7 +303,7 @@ export class Oath<Resolve, Reject = never> {
 				if (!values.length) return outerResolve([])
 
 				values.forEach(value => {
-					if (value.isOath) {
+					if (value.is_oath) {
 						value.fork(
 							(e: any) => {
 								if (!rejected) {
@@ -321,7 +353,7 @@ export class Oath<Resolve, Reject = never> {
 				keys.forEach(key => {
 					const value = (values as any)[key]
 
-					if (value && value.isOath) {
+					if (value && value.is_oath) {
 						value.fork(
 							(e: any) => {
 								if (!rejected) {
@@ -372,14 +404,14 @@ export class Oath<Resolve, Reject = never> {
 	 * `fromNullable0`, etc.
 	 * @see readme.md
 	 */
-	public swap(): Oath<Reject, Resolve> {
-		return new Oath<Reject, Resolve>(
+	public swap(): Oath<$TReject, $TResolve> {
+		return new Oath<$TReject, $TResolve>(
 			(resolve, reject) =>
 				this.fork(
-					a => (this.isCancelled ? reject(this.cancellationReason as any) : resolve(a)),
+					a => (this.is_cancelled ? reject(this.cancellation_reason as any) : resolve(a)),
 					b => reject(b),
 				),
-			this._abortController,
+			this._abort_controller,
 		)
 	}
 
@@ -391,30 +423,30 @@ export class Oath<Resolve, Reject = never> {
 	 * @see readme.md
 	 */
 	public tap(
-		onResolved: (x: Resolve) => any,
-		onRejected: (x: Reject) => any = () => void 0,
-	): Oath<Resolve, Reject> {
-		return new Oath<Resolve, Reject>(
+		onResolved: (x: $TResolve) => any,
+		onRejected: (x: $TReject) => any = () => void 0,
+	): Oath<$TResolve, $TReject> {
+		return new Oath<$TResolve, $TReject>(
 			(resolve, reject) =>
 				this.fork(
 					a => {
-						if (this.isCancelled) {
-							return reject(this.cancellationReason as any)
+						if (this.is_cancelled) {
+							return reject(this.cancellation_reason as any)
 						}
 
 						onRejected(a)
 						return reject(a)
 					},
 					b => {
-						if (this.isCancelled) {
-							return reject(this.cancellationReason as any)
+						if (this.is_cancelled) {
+							return reject(this.cancellation_reason as any)
 						}
 
 						onResolved(b)
 						return resolve(b)
 					},
 				),
-			this._abortController,
+			this._abort_controller,
 		)
 	}
 
@@ -426,10 +458,10 @@ export class Oath<Resolve, Reject = never> {
 	 * @see readme.md
 	 */
 	public bitap(
-		onRejected: (x: Reject) => any,
-		onResolved: (x: Resolve) => any,
-	): Oath<Resolve, Reject> {
-		return new Oath<Resolve, Reject>(
+		onRejected: (x: $TReject) => any,
+		onResolved: (x: $TResolve) => any,
+	): Oath<$TResolve, $TReject> {
+		return new Oath<$TResolve, $TReject>(
 			(resolve, reject) =>
 				this.fork(
 					a => {
@@ -437,15 +469,15 @@ export class Oath<Resolve, Reject = never> {
 						return reject(a)
 					},
 					b => {
-						if (this.isCancelled) {
-							return reject(this.cancellationReason as any)
+						if (this.is_cancelled) {
+							return reject(this.cancellation_reason as any)
 						}
 
 						onResolved(b)
 						return resolve(b)
 					},
 				),
-			this._abortController,
+			this._abort_controller,
 		)
 	}
 
@@ -456,14 +488,14 @@ export class Oath<Resolve, Reject = never> {
 	 * `fromNullable0`, etc.
 	 * @see readme.md
 	 */
-	public map<NewResolve>(f: (x: Resolve) => NewResolve): Oath<NewResolve, Reject> {
-		return new Oath<NewResolve, Reject>(
+	public map<NewResolve>(f: (x: $TResolve) => NewResolve): Oath<NewResolve, $TReject> {
+		return new Oath<NewResolve, $TReject>(
 			(resolve, reject) =>
 				this.fork(
-					a => (this.isCancelled ? reject(this.cancellationReason as any) : reject(a)),
-					b => (this.isCancelled ? reject(this.cancellationReason as any) : resolve(f(b))),
+					a => (this.is_cancelled ? reject(this.cancellation_reason as any) : reject(a)),
+					b => (this.is_cancelled ? reject(this.cancellation_reason as any) : resolve(f(b))),
 				),
-			this._abortController,
+			this._abort_controller,
 		)
 	}
 
@@ -474,14 +506,14 @@ export class Oath<Resolve, Reject = never> {
 	 * `fromNullable0`, etc.
 	 * @see readme.md
 	 */
-	public rejectedMap<NewReject>(f: (x: Reject) => NewReject): Oath<Resolve, NewReject> {
-		return new Oath<Resolve, NewReject>(
+	public rejectedMap<NewReject>(f: (x: $TReject) => NewReject): Oath<$TResolve, NewReject> {
+		return new Oath<$TResolve, NewReject>(
 			(resolve, reject) =>
 				this.fork(
-					a => (this.isCancelled ? reject(this.cancellationReason as any) : reject(f(a))),
-					b => (this.isCancelled ? reject(this.cancellationReason as any) : resolve(b)),
+					a => (this.is_cancelled ? reject(this.cancellation_reason as any) : reject(f(a))),
+					b => (this.is_cancelled ? reject(this.cancellation_reason as any) : resolve(b)),
 				),
-			this._abortController,
+			this._abort_controller,
 		)
 	}
 
@@ -493,16 +525,16 @@ export class Oath<Resolve, Reject = never> {
 	 * @see readme.md
 	 */
 	public bimap<NewResolve, NewReject>(
-		f: (x: Reject) => NewReject,
-		g: (x: Resolve) => NewResolve,
+		f: (x: $TReject) => NewReject,
+		g: (x: $TResolve) => NewResolve,
 	): Oath<NewResolve, NewReject> {
 		return new Oath<NewResolve, NewReject>(
 			(resolve, reject) =>
 				this.fork(
-					a => (this.isCancelled ? reject(this.cancellationReason as any) : reject(f(a))),
-					b => (this.isCancelled ? reject(this.cancellationReason as any) : resolve(g(b))),
+					a => (this.is_cancelled ? reject(this.cancellation_reason as any) : reject(f(a))),
+					b => (this.is_cancelled ? reject(this.cancellation_reason as any) : resolve(g(b))),
 				),
-			this._abortController,
+			this._abort_controller,
 		)
 	}
 
@@ -514,16 +546,18 @@ export class Oath<Resolve, Reject = never> {
 	 * @see readme.md
 	 */
 	public chain<NewResolve, NewReject>(
-		f: (x: Resolve) => Oath<NewResolve, NewReject>,
-	): Oath<NewResolve, Reject | NewReject> {
+		f: (x: $TResolve) => Oath<NewResolve, NewReject>,
+	): Oath<NewResolve, $TReject | NewReject> {
 		return new Oath(
 			(resolve, reject) =>
 				this.fork(
-					a => (this.isCancelled ? reject(this.cancellationReason as any) : reject(a)),
+					a => (this.is_cancelled ? reject(this.cancellation_reason as any) : reject(a)),
 					b =>
-						this.isCancelled ? reject(this.cancellationReason as any) : f(b).fork(reject, resolve),
+						this.is_cancelled
+							? reject(this.cancellation_reason as any)
+							: f(b).fork(reject, resolve),
 				),
-			this._abortController,
+			this._abort_controller,
 		)
 	}
 
@@ -535,16 +569,18 @@ export class Oath<Resolve, Reject = never> {
 	 * @see readme.md
 	 */
 	public rejectedChain<NewReject>(
-		f: (x: Reject) => Oath<Resolve, NewReject>,
-	): Oath<Resolve, NewReject> {
+		f: (x: $TReject) => Oath<$TResolve, NewReject>,
+	): Oath<$TResolve, NewReject> {
 		return new Oath(
 			(resolve, reject) =>
 				this.fork(
 					a =>
-						this.isCancelled ? reject(this.cancellationReason as any) : f(a).fork(reject, resolve),
-					b => (this.isCancelled ? this : resolve(b)),
+						this.is_cancelled
+							? reject(this.cancellation_reason as any)
+							: f(a).fork(reject, resolve),
+					b => (this.is_cancelled ? this : resolve(b)),
 				),
-			this._abortController,
+			this._abort_controller,
 		)
 	}
 
@@ -556,10 +592,10 @@ export class Oath<Resolve, Reject = never> {
 	 * @see readme.md
 	 */
 	public async toPromise() {
-		return new Promise<Resolve>((resolve, reject) => {
-			this.isCancelled
-				? reject(this.cancellationReason)
-				: this._resolver(resolve as any, reject as any)
+		return new Promise<$TResolve>((resolve, reject) => {
+			this.is_cancelled
+				? reject(this.cancellation_reason)
+				: this.cata(resolve as any, reject as any)
 		})
 	}
 
@@ -570,11 +606,11 @@ export class Oath<Resolve, Reject = never> {
 	 * `fromNullable0`, etc.
 	 * @see readme.md
 	 */
-	public async orElse<NewReject>(onRejected: (error: Reject) => NewReject) {
-		return new Promise<Resolve>((resolve, reject) =>
-			this.isCancelled
-				? reject(this.cancellationReason)
-				: this._resolver(resolve as any, reject as any),
+	public async orElse<NewReject>(onRejected: (error: $TReject) => NewReject) {
+		return new Promise<$TResolve>((resolve, reject) =>
+			this.is_cancelled
+				? reject(this.cancellation_reason)
+				: this.cata(resolve as any, reject as any),
 		).catch(onRejected)
 	}
 
@@ -586,17 +622,10 @@ export class Oath<Resolve, Reject = never> {
 	 * @see readme.md
 	 */
 	public async orNothing() {
-		return new Promise<Resolve>((resolve, reject) => {
-			const handleAbort = () => {
-				this._abortController.signal.removeEventListener("abort", handleAbort)
-				reject(this.cancellationReason)
-			}
-
-			this._abortController.signal.addEventListener("abort", handleAbort)
-
-			this.isCancelled
-				? reject(this.cancellationReason)
-				: this._resolver(resolve as any, reject as any)
+		return new Promise<$TResolve>((resolve, reject) => {
+			this.is_cancelled
+				? reject(this.cancellation_reason)
+				: this.cata(resolve as any, reject as any)
 		}).catch(() => void 0)
 	}
 }

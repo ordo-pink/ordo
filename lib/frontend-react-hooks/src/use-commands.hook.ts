@@ -19,7 +19,7 @@
 
 import { useMemo } from "react"
 
-import { getCommands } from "@ordo-pink/frontend-stream-commands"
+import { _get_commands } from "@ordo-pink/frontend-stream-commands"
 import { useCurrentFID } from "@ordo-pink/frontend-stream-activities"
 
 /**
@@ -28,7 +28,7 @@ import { useCurrentFID } from "@ordo-pink/frontend-stream-activities"
  */
 export const useCommands = () => {
 	const fid = useCurrentFID()
-	const commands = useMemo(() => getCommands(fid), [fid])
+	const commands = useMemo(() => _get_commands(fid), [fid])
 
 	return commands
 }

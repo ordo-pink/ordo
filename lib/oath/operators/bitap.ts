@@ -3,29 +3,29 @@
 
 import { Oath } from "../src/impl"
 
-export const bitap0 =
-	<Resolve, Reject>(onRejected: (x: Reject) => any, onResolved: (x: Resolve) => any) =>
-	(o: Oath<Resolve, Reject>): Oath<Resolve, Reject> =>
-		new Oath<Resolve, Reject>(
+export const bitap_oath =
+	<$TResolve, $TReject>(on_reject: (x: $TReject) => any, on_resolve: (x: $TResolve) => any) =>
+	(o: Oath<$TResolve, $TReject>): Oath<$TResolve, $TReject> =>
+		new Oath<$TResolve, $TReject>(
 			// eslint-disable-next-line @typescript-eslint/no-misused-promises
 			(resolve, reject) =>
 				o.fork(
 					a => {
-						if (o.isCancelled) {
-							return reject(o.cancellationReason as any)
+						if (o.is_cancelled) {
+							return reject(o.cancellation_reason as any)
 						}
 
-						onRejected(a)
+						on_reject(a)
 						return reject(a)
 					},
 					b => {
-						if (o.isCancelled) {
-							return reject(o.cancellationReason as any)
+						if (o.is_cancelled) {
+							return reject(o.cancellation_reason as any)
 						}
 
-						onResolved(b)
+						on_resolve(b)
 						return resolve(b)
 					},
 				),
-			o._abortController,
+			o._abort_controller,
 		)

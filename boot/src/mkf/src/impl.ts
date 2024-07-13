@@ -46,7 +46,7 @@ export const mkf = ({ space, path: initialPath, createTest, fileExtension }: _P)
 const progress = util.createProgress()
 
 const rejectIfSpaceDoesNotExist0: Curry<Binary<string, boolean, Oath<string, string>>> =
-	space => exists => (exists ? Oath.of(space) : Oath.reject(`"${space}" does not exist`))
+	space => exists => (exists ? Oath.of(space) : Oath.Reject(`"${space}" does not exist`))
 const normalizeProvidedSpace: Unary<string, Thunk<string>> = space => () =>
 	space.startsWith("./") ? space : `./${space}`
 const normalizeFileName: Unary<string, string> = unverifiedName =>

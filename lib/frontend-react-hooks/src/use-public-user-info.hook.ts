@@ -23,11 +23,11 @@ import { Oath } from "@ordo-pink/oath"
 import { type UserID } from "@ordo-pink/data"
 import { useFetch } from "@ordo-pink/frontend-fetch"
 
-import { useHosts } from "./use-hosts.hook"
+import { useHostsUnsafe } from "./use-hosts.hook"
 
 export const usePublicUserInfo = (userId?: UserID) => {
 	const fetch = useFetch()
-	const hosts = useHosts()
+	const hosts = useHostsUnsafe()
 
 	const [user, setUser] = useState<User.PublicUser | null>(null)
 
@@ -35,13 +35,13 @@ export const usePublicUserInfo = (userId?: UserID) => {
 		void Oath.fromNullable(userId)
 			.chain(uid =>
 				Oath.try(() =>
-					fetch(`${hosts.idHost}/users/id/${uid}`)
+					fetch(`${hosts.id_host}/users/id/${uid}`)
 						.then(res => res.json())
 						.then(json => setUser(json.result)),
 				),
 			)
 			.orElse(() => setUser(null))
-	}, [fetch, hosts.idHost, userId])
+	}, [fetch, hosts.id_host, userId])
 
 	return user
 }

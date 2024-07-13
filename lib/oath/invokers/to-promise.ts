@@ -3,7 +3,7 @@
 
 import { Oath } from "../src/impl"
 
-export const toPromise = <Resolve, Reject>(o: Oath<Resolve, Reject>) =>
-	new Promise<Resolve>((resolve, reject) => {
-		o.isCancelled ? reject(o.cancellationReason) : o._resolver(resolve as any, reject as any)
+export const to_promise_oath = <$TResolve, $TReject>(o: Oath<$TResolve, $TReject>) =>
+	new Promise<$TResolve>((resolve, reject) => {
+		o.is_cancelled ? reject(o.cancellation_reason) : o.cata(resolve as any, reject as any)
 	})

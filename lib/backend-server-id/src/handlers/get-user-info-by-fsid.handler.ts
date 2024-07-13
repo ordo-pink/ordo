@@ -21,12 +21,12 @@ import { type Middleware } from "koa"
 
 import {
 	type Oath,
-	bimap0,
-	chain0,
-	fromBoolean0,
-	fromNullable0,
-	of0,
-	rejectedMap0,
+	bimap_oath,
+	chain_oath,
+	from_boolean_oath,
+	from_nullable_oath,
+	of_oath,
+	rejected_map_oath,
 } from "@ordo-pink/oath"
 import { type UUIDv4, is_uuid } from "@ordo-pink/tau"
 import { sendError, sendSuccess } from "@ordo-pink/backend-utils"
@@ -38,7 +38,7 @@ import { toInvalidRequestError, toUserNotFoundError } from "../fns/to-error"
 export const handleUserInfoByID: TFn =
 	({ userService }) =>
 	ctx =>
-		of0(ctx.params)
+		of_oath(ctx.params)
 			.and(validateParams0)
 			.and(getUserByID0(userService))
 			.fork(sendError(ctx), sendSuccess({ ctx }))
@@ -51,12 +51,12 @@ type TResult = Routes.ID.GetUserInfoByID.Result
 
 type TValidateParamsFn = (p: Routes.ID.GetUserInfoByID.RequestParams) => Oath<UUIDv4, HttpError>
 const validateParams0: TValidateParamsFn = ({ id }) =>
-	fromNullable0(id)
-		.pipe(chain0(id => fromBoolean0(is_uuid(id), id as UUIDv4)))
-		.pipe(rejectedMap0(toInvalidRequestError))
+	from_nullable_oath(id)
+		.pipe(chain_oath(id => from_boolean_oath(is_uuid(id), id as UUIDv4)))
+		.pipe(rejected_map_oath(toInvalidRequestError))
 
 type TGetUserByIDFn = (us: UserService) => (id: string) => Oath<TResult, HttpError>
 const getUserByID0: TGetUserByIDFn = userService => id =>
 	userService
 		.getById(id)
-		.pipe(bimap0(toUserNotFoundError, userService.serializePublic.bind(userService)))
+		.pipe(bimap_oath(toUserNotFoundError, userService.serializePublic.bind(userService)))

@@ -32,7 +32,7 @@ export default function DataIcon({ plain }: P) {
 		fileAssociation => fileAssociation.contentType === plain.contentType,
 	)!
 
-	return Switch.empty()
+	return Switch.OfTrue()
 		.case(
 			() => children.length > 0,
 			() => <BsFolder2 className="size-full" />,

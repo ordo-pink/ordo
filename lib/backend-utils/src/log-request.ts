@@ -22,11 +22,11 @@ import chalk from "chalk"
 import { lte } from "ramda"
 
 import { Context } from "@ordo-pink/routary"
-import { Logger } from "@ordo-pink/logger"
 import { Switch } from "@ordo-pink/switch"
+import { TLogger } from "@ordo-pink/logger"
 
 export type LogRequestOptions = {
-	logger: Logger
+	logger: TLogger
 	serverName: string
 }
 
@@ -41,14 +41,14 @@ export const logRequest: LogRequestFn = options => async (ctx, next) => {
 	const responseStatus = ctx.response.status
 	const responseTimeHeader = Number(ctx.get("X-Response-Time"))
 
-	const status = Switch.of(responseStatus)
+	const status = Switch.Match(responseStatus)
 		.case(lte(500), () => chalk.red(responseStatus.toString()))
 		.case(lte(400), () => chalk.yellow(responseStatus.toString()))
 		.case(lte(300), () => chalk.cyan(responseStatus.toString()))
 		.case(lte(200), () => chalk.green(responseStatus.toString()))
 		.default(() => responseStatus.toString())
 
-	const rt = Switch.of(responseTimeHeader)
+	const rt = Switch.Match(responseTimeHeader)
 		.case(lte(300), () => chalk.red(`${responseTimeHeader}ms`))
 		.case(lte(200), () => chalk.yellow(`${responseTimeHeader}ms`))
 		.case(lte(100), () => chalk.cyan(`${responseTimeHeader}ms`))
@@ -67,14 +67,14 @@ export const logBunRequest = (options: LogRequestOptions) => (ctx: Context) => {
 		Number(ctx.res.headers["x-response-time"].slice(0, -2)) / 1000,
 	)
 
-	const status = Switch.of(responseStatus)
+	const status = Switch.Match(responseStatus)
 		.case(lte(500), () => chalk.red(responseStatus.toString()))
 		.case(lte(400), () => chalk.yellow(responseStatus.toString()))
 		.case(lte(300), () => chalk.cyan(responseStatus.toString()))
 		.case(lte(200), () => chalk.green(responseStatus.toString()))
 		.default(() => responseStatus.toString())
 
-	const rt = Switch.of(responseTimeHeader)
+	const rt = Switch.Match(responseTimeHeader)
 		.case(lte(300), () => chalk.red(`${responseTimeHeader}ms`))
 		.case(lte(200), () => chalk.yellow(`${responseTimeHeader}ms`))
 		.case(lte(100), () => chalk.cyan(`${responseTimeHeader}ms`))

@@ -47,7 +47,7 @@ export default function LinksWorkspace() {
 
 	useEffect(() => {
 		const title = label ? `Граф связей для метки #${label}` : "Граф связей"
-		commands.emit<cmd.application.setTitle>("application.set-title", title)
+		commands.emit<cmd.application.set_title>("application.set-title", title)
 	}, [label, commands])
 
 	useEffect(() => {
@@ -96,7 +96,7 @@ export default function LinksWorkspace() {
 
 	return (
 		<div className="relative h-[calc(100vh-1px)] overflow-hidden" style={{ width: workspaceWidth }}>
-			<div className="flex absolute top-4 z-50 justify-center space-x-2 w-full">
+			<div className="absolute top-4 z-50 flex w-full justify-center space-x-2">
 				<OrdoButton.Primary onClick={() => setIs3D(false)} inverted={is3D}>
 					2D
 				</OrdoButton.Primary>

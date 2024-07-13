@@ -22,11 +22,11 @@ import { type Middleware } from "koa"
 import { type JWAT, type TTokenService } from "@ordo-pink/backend-service-token"
 import {
 	type Oath,
-	bimap0,
-	fromBoolean0,
-	fromNullable0,
-	merge0,
-	rejectedMap0,
+	bimap_oath,
+	from_boolean_oath,
+	from_nullable_oath,
+	merge_oath,
+	rejected_map_oath,
 } from "@ordo-pink/oath"
 import { authenticate0, parseBody0, sendError, sendSuccess } from "@ordo-pink/backend-utils"
 import { is_string, omit } from "@ordo-pink/tau"
@@ -38,7 +38,7 @@ import { toInvalidBodyError, toUserNotFoundError } from "../fns/to-error"
 export const handleChangeAccountInfo: TFn =
 	({ tokenService, userService }) =>
 	ctx =>
-		merge0({
+		merge_oath({
 			body: parseBody0<TRequestBody>(ctx),
 			token: authenticate0(ctx, tokenService),
 		})
@@ -60,16 +60,16 @@ type TExtractCtxFn = (us: UserService) => (p: TRequest) => Oath<TCtx, HttpError>
 const extractCtx0: TExtractCtxFn =
 	userService =>
 	({ body: { firstName, lastName }, token }) =>
-		merge0({
-			user: userService.getById(token.payload.sub).pipe(rejectedMap0(toUserNotFoundError)),
-			firstName: fromNullable0(firstName).pipe(rejectedMap0(toInvalidBodyError)),
-			lastName: fromNullable0(lastName).pipe(rejectedMap0(toInvalidBodyError)),
+		merge_oath({
+			user: userService.getById(token.payload.sub).pipe(rejected_map_oath(toUserNotFoundError)),
+			firstName: from_nullable_oath(firstName).pipe(rejected_map_oath(toInvalidBodyError)),
+			lastName: from_nullable_oath(lastName).pipe(rejected_map_oath(toInvalidBodyError)),
 		})
 
 type TValidateCtxFn = (ctx: TCtx) => Oath<TCtx, HttpError>
 const validateCtx0: TValidateCtxFn = ctx =>
-	fromBoolean0(is_string(ctx.firstName) && is_string(ctx.lastName), ctx).pipe(
-		rejectedMap0(toInvalidBodyError),
+	from_boolean_oath(is_string(ctx.firstName) && is_string(ctx.lastName), ctx).pipe(
+		rejected_map_oath(toInvalidBodyError),
 	)
 
 type TUpdateUserInfoFn = (us: UserService) => (ctx: TCtx) => Oath<TResult, HttpError>
@@ -78,4 +78,4 @@ const updateUserInfo0: TUpdateUserInfoFn =
 	({ firstName, lastName, user }) =>
 		userService
 			.update(user.id, { firstName: firstName, lastName: lastName })
-			.pipe(bimap0(toUserNotFoundError, omit("code")))
+			.pipe(bimap_oath(toUserNotFoundError, omit("code")))

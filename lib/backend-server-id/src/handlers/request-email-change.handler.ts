@@ -23,14 +23,14 @@ import isEmail from "validator/lib/isEmail"
 import { type JWAT, type TTokenService } from "@ordo-pink/backend-service-token"
 import {
 	type Oath,
-	bimap0,
-	chain0,
-	fromBoolean0,
-	fromNullable0,
-	merge0,
-	reject0,
-	rejectedMap0,
-	tap0,
+	bimap_oath,
+	chain_oath,
+	from_boolean_oath,
+	from_nullable_oath,
+	merge_oath,
+	reject_oath,
+	rejected_map_oath,
+	tap_oath,
 } from "@ordo-pink/oath"
 import { authenticate0, parseBody0 } from "@ordo-pink/backend-utils"
 import { sendError, sendSuccess } from "@ordo-pink/backend-utils"
@@ -50,7 +50,7 @@ import { generateEmailCode0 } from "../fns/generate-code"
 export const handleRequestEmailChange: TFn =
 	({ tokenService, userService, notificationService, websiteHost }) =>
 	ctx =>
-		merge0({
+		merge_oath({
 			token: authenticate0(ctx, tokenService),
 			body: parseBody0<TRequestBody>(ctx),
 			code: generateEmailCode0(),
@@ -58,7 +58,7 @@ export const handleRequestEmailChange: TFn =
 			.and(extractCtx0(userService))
 			.and(validateCtx0(userService))
 			.and(updateUserEmailConfirmationCode0(userService))
-			.pipe(tap0(sendNotification(notificationService, websiteHost)))
+			.pipe(tap_oath(sendNotification(notificationService, websiteHost)))
 			.fork(sendError(ctx), sendSuccess({ ctx }))
 
 // --- Internal ---
@@ -77,30 +77,30 @@ type TExtractDataParams = { token: JWAT; body: TRequestBody; code: string }
 const extractCtx0 =
 	(userService: UserService) =>
 	({ token, body, code }: TExtractDataParams) =>
-		merge0({
-			user: userService.getById(token.payload.sub).pipe(rejectedMap0(toUserNotFoundError)),
-			newEmail: fromNullable0(body.newEmail).pipe(rejectedMap0(toInvalidRequestError)),
+		merge_oath({
+			user: userService.getById(token.payload.sub).pipe(rejected_map_oath(toUserNotFoundError)),
+			newEmail: from_nullable_oath(body.newEmail).pipe(rejected_map_oath(toInvalidRequestError)),
 			code,
 		})
 
 type TCheckEmailIsNotTheSameFn = (email: string, user: User.User) => Oath<"OK", HttpError>
 const checkEmailIsNotTheSame0: TCheckEmailIsNotTheSameFn = (email, user) =>
-	fromBoolean0(user.email !== email, OK).pipe(rejectedMap0(toSameEmailError))
+	from_boolean_oath(user.email !== email, OK).pipe(rejected_map_oath(toSameEmailError))
 
 const checkUserDoesNotExistByNewEmail0 = (email: string, userService: UserService) =>
 	userService
 		.getByEmail(email)
-		.pipe(chain0(() => reject0(true)))
-		.fix(userExists => fromBoolean0(userExists === true, OK))
-		.pipe(rejectedMap0(toUserAlreadyExistsError))
+		.pipe(chain_oath(() => reject_oath(true)))
+		.fix(userExists => from_boolean_oath(userExists === true, OK))
+		.pipe(rejected_map_oath(toUserAlreadyExistsError))
 
 const validateEmail0 = (email: string) =>
-	fromBoolean0(isEmail(email), OK).pipe(rejectedMap0(toInvalidRequestError))
+	from_boolean_oath(isEmail(email), OK).pipe(rejected_map_oath(toInvalidRequestError))
 
 const validateCtx0 =
 	(userService: UserService) =>
 	({ user, newEmail, code }: TCtx) =>
-		merge0([
+		merge_oath([
 			validateEmail0(newEmail),
 			checkEmailIsNotTheSame0(newEmail, user),
 			checkUserDoesNotExistByNewEmail0(newEmail, userService),
@@ -111,7 +111,7 @@ const updateUserEmailConfirmationCode0 =
 	({ user, newEmail, code }: TCtx) =>
 		userService
 			.update(user.id, { code })
-			.pipe(bimap0(toUserNotFoundError, () => ({ user, newEmail, code })))
+			.pipe(bimap_oath(toUserNotFoundError, () => ({ user, newEmail, code })))
 
 const sendNotification =
 	(notificationService: TNotificationService, websiteHost: string) =>

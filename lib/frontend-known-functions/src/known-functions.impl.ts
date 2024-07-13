@@ -37,6 +37,7 @@ export type QueryPermission =
 	| "functions.current-activity"
 	| "functions.current-file-association"
 	| "data.read"
+	| "hosts.access"
 
 // TODO: Add support for command intellisense
 export type CommandPermission = Client.Commands.CommandName

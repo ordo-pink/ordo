@@ -1,6 +1,7 @@
 import type { BehaviorSubject, Observable } from "rxjs"
 
-import { Oath } from "@ordo-pink/oath"
+import type { AuthResponse } from "@ordo-pink/backend-server-id"
+import type { Oath } from "@ordo-pink/oath"
 import type { TResult } from "@ordo-pink/result"
 
 import type { TMetadata } from "./metadata.types"
@@ -19,4 +20,8 @@ export type TAsyncMetadataRepository = {
 
 export type TMetadataRepositoryStatic = {
 	of: (metadata$: BehaviorSubject<TMetadata[] | null>) => TMetadataRepository
+}
+
+export type TRemoteMetadataRepositoryStatic = {
+	of: (auth$: Observable<AuthResponse | null>, data_host: string) => TAsyncMetadataRepository
 }

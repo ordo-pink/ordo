@@ -24,7 +24,7 @@ import { EmailInput, PasswordInput, TextInput } from "@ordo-pink/frontend-react-
 import { N, noop } from "@ordo-pink/tau"
 import {
 	useCommands,
-	useHosts,
+	useHostsUnsafe,
 	useSubscription,
 	useUser,
 	useUserEmail,
@@ -46,7 +46,7 @@ export default function UserWorkspace() {
 	const userName = useUserName()
 	const userEmail = useUserEmail()
 	const fetch = useFetch()
-	const { staticHost, idHost } = useHosts()
+	const { static_host: staticHost, id_host: idHost } = useHostsUnsafe()
 
 	const auth = useSubscription(auth$)
 
@@ -61,7 +61,7 @@ export default function UserWorkspace() {
 	const [passwordErrors, setPasswordErrors] = useState<string[]>([])
 
 	useEffect(() => {
-		commands.emit<cmd.application.setTitle>("application.set-title", "Аккаунт")
+		commands.emit<cmd.application.set_title>("application.set-title", "Аккаунт")
 
 		Either.fromNullable(user).fold(N, user => {
 			setEmail(user.email)
@@ -126,7 +126,9 @@ export default function UserWorkspace() {
 								onClick={() =>
 									void Oath.fromNullable(auth)
 										.tap(() =>
-											commands.emit<cmd.background.startSaving>("background-task.start-saving"),
+											commands.emit<cmd.application.background_task.start_saving>(
+												"application.background_task.start_saving",
+											),
 										)
 										.chain(({ accessToken }) =>
 											Oath.from(() =>
@@ -144,7 +146,9 @@ export default function UserWorkspace() {
 										.rejectedMap(() => "Connection error")
 										.chain(Oath.ifElse(res => res.success, { onFalse: res => res.error }))
 										.tap(() =>
-											commands.emit<cmd.background.resetStatus>("background-task.reset-status"),
+											commands.emit<cmd.application.background_task.reset_status>(
+												"application.background_task.reset_status",
+											),
 										)
 										.fork(
 											err => setEmailErrors([err ? err : "Invalid email"]),
@@ -189,7 +193,9 @@ export default function UserWorkspace() {
 							onClick={() =>
 								void Oath.empty()
 									.tap(() =>
-										commands.emit<cmd.background.startSaving>("background-task.start-saving"),
+										commands.emit<cmd.application.background_task.start_saving>(
+											"application.background_task.start_saving",
+										),
 									)
 									.chain(() =>
 										Oath.try(() =>
@@ -212,7 +218,9 @@ export default function UserWorkspace() {
 											),
 									)
 									.tap(() =>
-										commands.emit<cmd.background.resetStatus>("background-task.reset-status"),
+										commands.emit<cmd.application.background_task.reset_status>(
+											"application.background_task.reset_status",
+										),
 									)
 									.fork(
 										err => setEmailErrors([err ? err : "Invalid email"]),
@@ -280,7 +288,9 @@ export default function UserWorkspace() {
 							onClick={() =>
 								void Oath.empty()
 									.tap(() =>
-										commands.emit<cmd.background.startSaving>("background-task.start-saving"),
+										commands.emit<cmd.application.background_task.start_saving>(
+											"application.background_task.start_saving",
+										),
 									)
 									.chain(() =>
 										Oath.try(() =>
@@ -296,7 +306,9 @@ export default function UserWorkspace() {
 										).chain(res => Oath.fromBoolean(() => res.success, noop)),
 									)
 									.tap(() =>
-										commands.emit<cmd.background.resetStatus>("background-task.reset-status"),
+										commands.emit<cmd.application.background_task.reset_status>(
+											"application.background_task.reset_status",
+										),
 									)
 									.fork(
 										err => setEmailErrors([err ? err.message : "Invalid email"]),

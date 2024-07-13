@@ -33,16 +33,16 @@ import { BehaviorSubject } from "rxjs/internal/BehaviorSubject"
 import { PiGraph } from "react-icons/pi"
 
 import { Data, DataRepository, FSID, PlainData, TDataCommands } from "@ordo-pink/data"
-import { Oath, chain0, fromNullable0, map0, orElse } from "@ordo-pink/oath"
+import { Oath, chain_oath, from_nullable_oath, map_oath, or_else_oath } from "@ordo-pink/oath"
 import { Either } from "@ordo-pink/either"
 import { KnownFunctions } from "@ordo-pink/frontend-known-functions"
 import { LIB_DIRECTORY_FSID } from "@ordo-pink/core"
 import { N } from "@ordo-pink/tau"
 import { auth$ } from "@ordo-pink/frontend-stream-user"
-import { getCommands } from "@ordo-pink/frontend-stream-commands"
-import { getFetch } from "@ordo-pink/frontend-fetch"
-import { getHosts } from "@ordo-pink/frontend-react-hooks"
-import { getLogger } from "@ordo-pink/frontend-logger"
+import { _get_commands } from "@ordo-pink/frontend-stream-commands"
+import { get_fetch } from "@ordo-pink/frontend-fetch"
+import { get_hosts_unsafe } from "@ordo-pink/frontend-react-hooks"
+import { _get_logger } from "@ordo-pink/frontend-logger"
 
 import CreateFileModal from "./components/create-file-modal.component"
 import RemoveFileModal from "./components/remove-file-modal.component"
@@ -50,9 +50,9 @@ import RenameModal from "./components/rename-modal.component"
 
 type P = { fid: symbol; dataCommands: TDataCommands<string | ArrayBuffer> }
 export const __initData = ({ fid, dataCommands }: P) => {
-	const logger = getLogger(fid)
-	const commands = getCommands(fid)
-	const hosts = getHosts()
+	const logger = _get_logger(fid)
+	const commands = _get_commands(fid)
+	const hosts = get_hosts_unsafe()
 
 	logger.debug("Initialising data...")
 
@@ -375,10 +375,10 @@ export const __initData = ({ fid, dataCommands }: P) => {
 	})
 
 	commands.on<cmd.data.getContent>("data.get-content", fsid =>
-		fromNullable0(auth$.getValue())
-			.pipe(chain0(({ sub }) => dataCommands.getContent({ createdBy: sub, fsid })))
-			.pipe(map0(result => content$.next({ ...content$.getValue(), [fsid]: result })))
-			.invoke(orElse(() => content$.next({ ...content$.getValue(), [fsid]: null }))),
+		from_nullable_oath(auth$.getValue())
+			.pipe(chain_oath(({ sub }) => dataCommands.getContent({ createdBy: sub, fsid })))
+			.pipe(map_oath(result => content$.next({ ...content$.getValue(), [fsid]: result })))
+			.invoke(or_else_oath(() => content$.next({ ...content$.getValue(), [fsid]: null }))),
 	)
 
 	commands.on<cmd.data.dropContent>("data.drop-content", fsid => {
@@ -421,19 +421,19 @@ export const __initData = ({ fid, dataCommands }: P) => {
 
 	commands.on<cmd.data.refreshRoot>("data.refresh-root", () => {
 		const auth = auth$.value
-		const fetch = getFetch(fid)
+		const fetch = get_fetch(fid)
 
 		if (!auth) return
 
 		void Oath.fromNullable(auth)
 			.chain(auth =>
 				Oath.try(() =>
-					fetch(`${hosts.dtHost}`, {
+					fetch(`${hosts.dt_host}`, {
 						headers: { Authorization: `Bearer ${auth.accessToken}` },
 					}).then(res => res.json()),
 				),
 			)
-			.chain(body => (body.success ? Oath.of(body.result) : Oath.reject(body.error as string)))
+			.chain(body => (body.success ? Oath.of(body.result) : Oath.Reject(body.error as string)))
 			.bitap(
 				error =>
 					commands.emit<cmd.notification.show>("notification.show", {

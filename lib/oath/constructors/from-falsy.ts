@@ -3,17 +3,32 @@
 
 import { Oath } from "../src/impl"
 
-export const fromFalsy0 = <Resolve, Reject = null>(
-	value: Resolve,
-	onFalse: Reject = null as any,
-	abortController = new AbortController(),
-): Oath<Resolve, Reject> =>
-	value ? Oath.resolve(value, abortController) : Oath.reject(onFalse, abortController)
+export const from_falsy_oath = <$TResolve, $TReject = null>(
+	value: $TResolve,
+	on_false: $TReject = null as any,
+	abort_controller = new AbortController(),
+): Oath<$TResolve, $TReject> =>
+	value ? Oath.Resolve(value, abort_controller) : Oath.Reject(on_false, abort_controller)
 
-export const fromBoolean0 = <Resolve, Reject = null>(
+export const from_boolean_oath = <$TResolve, $TReject = null>(
 	value: boolean,
-	onTrue: Resolve,
-	onFalse: Reject = null as any,
-	abortController = new AbortController(),
-): Oath<Resolve, Reject> =>
-	value ? Oath.resolve(onTrue, abortController) : Oath.reject(onFalse, abortController)
+	on_true: $TResolve,
+	on_false: $TReject = null as any,
+	abort_controller = new AbortController(),
+): Oath<$TResolve, $TReject> =>
+	value ? Oath.Resolve(on_true, abort_controller) : Oath.Reject(on_false, abort_controller)
+
+export type TIfOathConstructorFn = <$TResolve = undefined, $TReject = undefined>(
+	predicate: boolean,
+	returns?: { T?: () => $TResolve; F?: () => $TReject },
+	abort_controller?: AbortController,
+) => Oath<$TResolve, $TReject>
+
+export const if_oath: TIfOathConstructorFn = (
+	predicate: boolean,
+	{ T = () => undefined as any, F = () => undefined as any } = {
+		T: () => undefined as any,
+		F: () => undefined as any,
+	},
+	abort_controller = new AbortController(),
+) => (predicate ? Oath.Resolve(T(), abort_controller) : Oath.Reject(F(), abort_controller))

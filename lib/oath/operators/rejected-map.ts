@@ -3,15 +3,15 @@
 
 import { Oath } from "../src/impl"
 
-export const rejectedMap0 =
-	<Resolve, Reject, NewReject>(onRejected: (x: Reject) => NewReject) =>
-	(o: Oath<Resolve, Reject>): Oath<Resolve, NewReject> =>
-		new Oath<Resolve, NewReject>(
+export const rejected_map_oath =
+	<$TResolve, $TReject, $TNewReject>(on_reject: (x: $TReject) => $TNewReject) =>
+	(o: Oath<$TResolve, $TReject>): Oath<$TResolve, $TNewReject> =>
+		new Oath<$TResolve, $TNewReject>(
 			// eslint-disable-next-line @typescript-eslint/no-misused-promises
 			(resolve, reject) =>
 				o.fork(
-					a => (o.isCancelled ? reject(o.cancellationReason as any) : reject(onRejected(a))),
-					b => (o.isCancelled ? reject(o.cancellationReason as any) : resolve(b)),
+					a => (o.is_cancelled ? reject(o.cancellation_reason as any) : reject(on_reject(a))),
+					b => (o.is_cancelled ? reject(o.cancellation_reason as any) : resolve(b)),
 				),
-			o._abortController,
+			o._abort_controller,
 		)

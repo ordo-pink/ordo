@@ -3,18 +3,18 @@
 
 import { Oath } from "../src/impl"
 
-export const bimap0 =
-	<Resolve, Reject, NewResolve, NewReject>(
-		onRejected: (x: Reject) => NewReject,
-		onResolved: (x: Resolve) => NewResolve,
+export const bimap_oath =
+	<$TResolve, $TReject, $TNewResolve, $TNewReject>(
+		on_reject: (x: $TReject) => $TNewReject,
+		on_resolve: (x: $TResolve) => $TNewResolve,
 	) =>
-	(o: Oath<Resolve, Reject>): Oath<NewResolve, NewReject> =>
-		new Oath<NewResolve, NewReject>(
+	(o: Oath<$TResolve, $TReject>): Oath<$TNewResolve, $TNewReject> =>
+		new Oath<$TNewResolve, $TNewReject>(
 			// eslint-disable-next-line @typescript-eslint/no-misused-promises
 			(resolve, reject) =>
 				o.fork(
-					a => (o.isCancelled ? reject(o.cancellationReason as any) : reject(onRejected(a))),
-					b => (o.isCancelled ? reject(o.cancellationReason as any) : resolve(onResolved(b))),
+					a => (o.is_cancelled ? reject(o.cancellation_reason as any) : reject(on_reject(a))),
+					b => (o.is_cancelled ? reject(o.cancellation_reason as any) : resolve(on_resolve(b))),
 				),
-			o._abortController,
+			o._abort_controller,
 		)

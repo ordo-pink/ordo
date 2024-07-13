@@ -20,7 +20,7 @@
 import { type Middleware } from "koa"
 
 import { type JWAT, type TTokenService } from "@ordo-pink/backend-service-token"
-import { type Oath, bimap0 } from "@ordo-pink/oath"
+import { type Oath, bimap_oath } from "@ordo-pink/oath"
 import { authenticate0, sendError, sendSuccess } from "@ordo-pink/backend-utils"
 import { type HttpError } from "@ordo-pink/rrr"
 import { type UserService } from "@ordo-pink/backend-service-user"
@@ -43,4 +43,4 @@ type TResult = Routes.ID.GetAccount.Result
 
 type TGetUserByIdFn = (us: UserService) => (token: JWAT) => Oath<TResult, HttpError>
 const getUserById0: TGetUserByIdFn = userService => token =>
-	userService.getById(token.payload.sub).pipe(bimap0(toUserNotFoundError, omit("code")))
+	userService.getById(token.payload.sub).pipe(bimap_oath(toUserNotFoundError, omit("code")))

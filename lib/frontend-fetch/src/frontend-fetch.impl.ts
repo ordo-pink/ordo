@@ -17,36 +17,35 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Either } from "@ordo-pink/either"
 import { KnownFunctions } from "@ordo-pink/frontend-known-functions"
-import { Logger } from "@ordo-pink/logger"
+import { Result } from "@ordo-pink/result"
 import { call_once } from "@ordo-pink/tau"
-import { getLogger } from "@ordo-pink/frontend-logger"
 import { useCurrentFID } from "@ordo-pink/frontend-stream-activities"
 
 const fetch = window.fetch
 
-export const __initFetch = call_once(() => {
-	// window.fetch = undefined as any
-	// window.XMLHttpRequest = undefined as any
+export const __init_fetch = call_once(() => {
+	window.fetch = undefined as any
+	window.XMLHttpRequest = undefined as any
+
+	return { fetch, get_fetch }
 })
 
+// TODO: Remove references
 export const useFetch = () => {
 	const fid = useCurrentFID()
-	const fetch = getFetch(fid)
+	const fetch = get_fetch(fid)
 
 	return fetch
 }
 
-export const getFetch = (fid: symbol | null): typeof window.fetch =>
-	Either.fromBoolean(() => KnownFunctions.checkPermissions(fid, { queries: ["fetch"] }))
-		.leftMap(() => getLogger(fid))
-		.fold(forbiddenFetch, () => fetch)
+export const get_fetch = (fid: symbol | null): typeof window.fetch =>
+	Result.If(KnownFunctions.checkPermissions(fid, { queries: ["fetch"] })).cata({
+		Ok: () => fetch,
+		Err: () => forbidden_fetch,
+	})
 
 // --- Internal ---
 
-const forbiddenFetch = (logger: Logger) =>
-	(() => {
-		logger.alert("You are not authorised to execute fetch calls.")
-		return Promise.reject("Forbidden")
-	}) as unknown as typeof window.fetch
+const forbidden_fetch = (() =>
+	Promise.reject("Using fetch is forbidden by the user.")) as unknown as typeof window.fetch

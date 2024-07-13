@@ -20,7 +20,7 @@
 import { Context, Middleware } from "koa"
 
 import { HttpError } from "@ordo-pink/rrr"
-import { Logger } from "@ordo-pink/logger"
+import { TLogger } from "@ordo-pink/logger"
 
 export const sendError = (ctx: Context) => (err: HttpError) => {
 	// TODO: Use logger
@@ -29,7 +29,7 @@ export const sendError = (ctx: Context) => (err: HttpError) => {
 	ctx.response.body = { success: false, error: err.message }
 }
 
-export type HandleErrorParams = { logger: Logger }
+export type HandleErrorParams = { logger: TLogger }
 
 export const handleError =
 	(options: HandleErrorParams): Middleware =>

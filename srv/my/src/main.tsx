@@ -21,66 +21,87 @@ import "@ordo-pink/css/main.css"
 
 import { createRoot } from "react-dom/client"
 
-import { __initActivities, currentFID$ } from "@ordo-pink/frontend-stream-activities"
+import { type THosts, type TOrdoContext } from "@ordo-pink/core"
+import { __init_activities$, current_fid$ } from "@ordo-pink/frontend-stream-activities"
 import { ConsoleLogger } from "@ordo-pink/logger"
 import { DataCommands } from "@ordo-pink/data"
-import { __initAchievements } from "@ordo-pink/frontend-stream-achievements"
-import { __initAuth$ } from "@ordo-pink/frontend-stream-user"
-import { __initCommandPalette } from "@ordo-pink/frontend-stream-command-palette"
-import { __initCommands } from "@ordo-pink/frontend-stream-commands"
 import { __initData } from "@ordo-pink/frontend-stream-data"
-import { __initFetch } from "@ordo-pink/frontend-fetch"
-import { __initFileAssociations } from "@ordo-pink/frontend-stream-file-associations"
-import { __initHosts } from "@ordo-pink/frontend-react-hooks"
-import { __initLogger } from "@ordo-pink/frontend-logger"
-import { __initMetadata } from "@ordo-pink/frontend-stream-data/src/frontend-stream-metadata.impl"
-import { __initRouter } from "@ordo-pink/frontend-stream-router"
-import { __initSidebar } from "@ordo-pink/frontend-stream-sidebar"
-import { __initTitle } from "@ordo-pink/frontend-stream-title"
-import { __initUser$ } from "@ordo-pink/frontend-stream-user"
+import { __init_achievements$ } from "@ordo-pink/frontend-stream-achievements"
+import { __init_auth$ } from "@ordo-pink/frontend-stream-user"
+import { __init_command_palette$ } from "@ordo-pink/frontend-stream-command-palette"
+import { __init_commands } from "@ordo-pink/frontend-stream-commands"
+import { __init_fetch } from "@ordo-pink/frontend-fetch"
+import { __init_file_associations$ } from "@ordo-pink/frontend-stream-file-associations"
+import { __init_hosts } from "@ordo-pink/frontend-react-hooks"
+import { __init_logger } from "@ordo-pink/frontend-logger"
+import { __init_metadata$ } from "@ordo-pink/frontend-stream-data/src/frontend-stream-metadata.impl"
+import { __init_router$ } from "@ordo-pink/frontend-stream-router"
+import { __init_sidebar$ } from "@ordo-pink/frontend-stream-sidebar"
+import { __init_title$ } from "@ordo-pink/frontend-stream-title"
+import { __init_user$ } from "@ordo-pink/frontend-stream-user"
 
-import { APP_FID, isDev } from "./constants"
+import { APP_FID, isDev as is_dev } from "./constants"
 import { ClientContentPersistenceStrategy } from "./persistence-strategies/content.persistence-strategy"
 import { ClientDataPersistenceStrategy } from "./persistence-strategies/data.persistence-strategy"
 
 import App from "./app"
 
-currentFID$.next(APP_FID)
+current_fid$.next(APP_FID) // TODO: __init_current_fid$
 
-const logger = ConsoleLogger
+const LOGGER = ConsoleLogger
 
 const dataPersistenceStrategy = ClientDataPersistenceStrategy.of(APP_FID)
 const contentPersistenceStrategy = ClientContentPersistenceStrategy.of(APP_FID)
 
 const dataCommands = DataCommands.of({ dataPersistenceStrategy, contentPersistenceStrategy })
 
-const idHost = import.meta.env.VITE_ORDO_ID_HOST
-const websiteHost = import.meta.env.VITE_ORDO_WEBSITE_HOST
-const staticHost = import.meta.env.VITE_ORDO_STATIC_HOST
-const dtHost = import.meta.env.VITE_ORDO_DT_HOST
-const myHost = import.meta.env.VITE_ORDO_WORKSPACE_HOST
+const HOSTS: THosts = {
+	id: import.meta.env.VITE_ORDO_ID_HOST,
+	website: import.meta.env.VITE_ORDO_WEBSITE_HOST,
+	static: import.meta.env.VITE_ORDO_STATIC_HOST,
+	dt: import.meta.env.VITE_ORDO_DT_HOST,
+	my: import.meta.env.VITE_ORDO_WORKSPACE_HOST,
+}
 
 const main = () => {
-	__initHosts({ idHost, websiteHost, staticHost, dtHost, myHost })
-	__initFetch()
-	__initLogger(logger)
-	__initCommands({ fid: APP_FID })
-	__initTitle(APP_FID)
-	__initAuth$({ fid: APP_FID, isDev })
-	__initUser$({ fid: APP_FID, idHost })
-	__initData({ fid: APP_FID, dataCommands })
-	const metadataQuery = __initMetadata({ fid: APP_FID }) // TODO: userQuery
-	__initAchievements({ fid: APP_FID, dataCommands })
-	__initRouter(APP_FID)
-	__initCommandPalette(APP_FID)
-	__initActivities(APP_FID)
-	__initFileAssociations(APP_FID)
-	__initSidebar(APP_FID)
+	const { fetch, get_fetch } = __init_fetch()
+	const { hosts, get_hosts } = __init_hosts(HOSTS)
+	const { logger, get_logger } = __init_logger(LOGGER)
+	const { commands, get_commands } = __init_commands(APP_FID, logger)
+
+	const { auth$ } = __init_auth$({ fetch, hosts, logger, is_dev })
+	__init_user$({ fid: APP_FID, id_host: hosts.id }) // TODO: user repos, user query, user commands
+
+	__initData({ fid: APP_FID, dataCommands }) // TODO: Remove
+	const { metadata_query } = __init_metadata$({ auth$, commands, hosts, logger }) // TODO: metadata commands
+
+	__init_router$(APP_FID)
+	__init_command_palette$(APP_FID)
+	__init_sidebar$(APP_FID)
+	const { title$ } = __init_title$(logger, commands)
+
+	__init_achievements$({ fid: APP_FID, dataCommands })
+	__init_activities$(APP_FID)
+	__init_file_associations$(APP_FID)
+
+	const app_context: TOrdoContext = {
+		queries: {
+			metadata_query,
+		},
+		streams: {
+			title$,
+		},
+		commands: {},
+		get_fetch,
+		get_hosts,
+		get_logger,
+		get_commands,
+	}
 
 	const container = document.getElementById("root")!
 	const root = createRoot(container)
 
-	root.render(<App metadataQuery={metadataQuery} />)
+	root.render(<App app_context={app_context} />)
 }
 
 main()

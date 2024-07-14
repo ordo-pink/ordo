@@ -67,43 +67,43 @@ export default function App({ app_context }: P) {
 	useEffect(() => {
 		void Oath.Resolve(commands)
 			.chain(() =>
-				Oath.FromPromise(() => import("@ordo-pink/function-home")).chain(module =>
-					Oath.FromPromise(async () => await module.default),
+				Oath.Try(() => import("@ordo-pink/function-home")).chain(module =>
+					Oath.Try(async () => await module.default),
 				),
 			)
 			.chain(() =>
-				Oath.FromPromise(() => import("@ordo-pink/function-file-explorer")).chain(module =>
-					Oath.FromPromise(async () => await module.default),
+				Oath.Try(() => import("@ordo-pink/function-file-explorer")).chain(module =>
+					Oath.Try(async () => await module.default),
 				),
 			)
 			.chain(() =>
-				Oath.FromPromise(() => import("@ordo-pink/function-gtd")).chain(module =>
-					Oath.FromPromise(async () => await module.default),
+				Oath.Try(() => import("@ordo-pink/function-gtd")).chain(module =>
+					Oath.Try(async () => await module.default),
 				),
 			)
 			.chain(() =>
-				Oath.FromPromise(() => import("@ordo-pink/function-links")).chain(module =>
-					Oath.FromPromise(async () => await module.default),
+				Oath.Try(() => import("@ordo-pink/function-links")).chain(module =>
+					Oath.Try(async () => await module.default),
 				),
 			)
 			.chain(() =>
-				Oath.FromPromise(() => import("@ordo-pink/function-editor")).chain(module =>
-					Oath.FromPromise(async () => await module.default),
+				Oath.Try(() => import("@ordo-pink/function-editor")).chain(module =>
+					Oath.Try(async () => await module.default),
 				),
 			)
 			.chain(() =>
-				Oath.FromPromise(() => import("@ordo-pink/function-user")).chain(module =>
-					Oath.FromPromise(async () => await module.default),
+				Oath.Try(() => import("@ordo-pink/function-user")).chain(module =>
+					Oath.Try(async () => await module.default),
 				),
 			)
 			.chain(() =>
-				Oath.FromPromise(() => import("@ordo-pink/function-achievements")).chain(module =>
-					Oath.FromPromise(async () => await module.default),
+				Oath.Try(() => import("@ordo-pink/function-achievements")).chain(module =>
+					Oath.Try(async () => await module.default),
 				),
 			)
 			.chain(() =>
-				Oath.FromPromise(() => import("@ordo-pink/function-excalidraw")).chain(module =>
-					Oath.FromPromise(async () => await module.default),
+				Oath.Try(() => import("@ordo-pink/function-excalidraw")).chain(module =>
+					Oath.Try(async () => await module.default),
 				),
 			)
 			.invoke(Oath.invokers.or_nothing)

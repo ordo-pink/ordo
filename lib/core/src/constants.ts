@@ -43,7 +43,7 @@ export const ORDO_PINK_EXCALIDRAW_FUNCTION = "pink.ordo.excalidraw"
 // export const ORDO_PINK_DEV_TOOLS_FUNCTION = "pink.ordo.dev-tools"
 // export const ORDO_PINK_CALENDAR_FUNCTION = "pink.ordo.calendar"
 
-export const internalApps = [
+export const internal_apps = [
 	ORDO_PINK_APP_FUNCTION,
 	ORDO_PINK_USER_FUNCTION,
 	ORDO_PINK_FILE_EXPLORER_FUNCTION,

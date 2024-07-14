@@ -74,7 +74,7 @@ export const useAppInit = () => {
 	// Refresh application state upon after the user is authenticated.
 	useEffect(() => {
 		fromBooleanE(isAuthenticated).fold(noop, () => {
-			commands.emit<cmd.user.refreshInfo>("user.refresh")
+			commands.emit<cmd.user.refresh_info>("user.refresh")
 			commands.emit<cmd.data.refreshRoot>("data.refresh-root")
 		})
 	}, [commands, isAuthenticated])

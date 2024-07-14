@@ -20,7 +20,7 @@
 import type { FSID, PlainData, TDataQuery } from "@ordo-pink/data"
 import type { Hosts } from "@ordo-pink/frontend-react-hooks"
 import type { TLogger } from "@ordo-pink/logger"
-import type { Permissions } from "@ordo-pink/frontend-known-functions"
+import type { TPermissions } from "@ordo-pink/frontend-known-functions"
 import { PlainDataNode } from "@ordo-pink/core"
 
 export type DataProviders = {
@@ -42,7 +42,7 @@ export type RegisterFunctionCallbackParams = {
 	getUser: () => User.User | null
 	getIsAuthenticated: () => boolean
 	getHosts: () => Hosts
-	registerActivity: (activity: Extensions.Activity) => () => void
+	registerActivity: (activity: Functions.Activity) => () => void
 	data: DataProviders
 	queries: {
 		dataQuery: TDataQuery
@@ -52,7 +52,7 @@ export type RegisterFunctionCallbackParams = {
 // TODO: Permissions
 export type RegisterFunction = (
 	name: string,
-	permissions: Permissions,
+	permissions: TPermissions,
 	callback: (
 		params: RegisterFunctionCallbackParams,
 	) => void | Promise<void> | UnregisterFunction | Promise<UnregisterFunction>,

@@ -35,26 +35,26 @@ export const registerGoToAccountCommand = (params: P) => {
 const registerCommand = (params: P) => {
 	const handler = commandHandler(params)
 
-	params.commands.on<cmd.user.goToAccount>("user.go-to-account", handler)
+	params.commands.on<cmd.user.go_to_account>("user.go_to_account", handler)
 
 	return () => {
-		params.commands.off<cmd.user.goToAccount>("user.go-to-account", handler)
+		params.commands.off<cmd.user.go_to_account>("user.go_to_account", handler)
 	}
 }
 
 const registerCommandPalette = ({ commands }: P) => {
 	commands.emit<cmd.commandPalette.add>("command-palette.add", {
-		id: "user.go-to-account",
+		id: "user.go_to_account",
 		readableName: "Открыть аккаунт",
 		Icon: BsPersonCircle,
 		onSelect: () => {
 			commands.emit<cmd.commandPalette.hide>("command-palette.hide")
-			commands.emit<cmd.user.goToAccount>("user.go-to-account")
+			commands.emit<cmd.user.go_to_account>("user.go_to_account")
 		},
 	})
 
 	return () => {
-		commands.emit<cmd.commandPalette.remove>("command-palette.remove", "user.go-to-account")
+		commands.emit<cmd.commandPalette.remove>("command-palette.remove", "user.go_to_account")
 	}
 }
 

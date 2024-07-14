@@ -19,7 +19,7 @@
 
 import { DataQuery, DataRepository } from "@ordo-pink/data"
 import { getData, getData$ } from "@ordo-pink/frontend-stream-data"
-import { getUser, _get_is_authenticated } from "@ordo-pink/frontend-stream-user"
+import { get_user, _get_is_authenticated } from "@ordo-pink/frontend-stream-user"
 import { KnownFunctions } from "@ordo-pink/frontend-known-functions"
 import { _get_commands } from "@ordo-pink/frontend-stream-commands"
 import { get_hosts_unsafe } from "@ordo-pink/frontend-react-hooks"
@@ -33,7 +33,7 @@ export const createFunction: RegisterFunction = (name, permissions, callback) =>
 
 	const getCommandsPatched = () => _get_commands(fid)
 	const getLoggerPatched = () => _get_logger(fid)
-	const getUserPatched = () => getUser(fid)
+	const getUserPatched = () => get_user(fid)
 	const getIsAuthenticatedPatched = () => _get_is_authenticated(fid)
 	const getDataPatched = () => getData(fid)
 	const registerActivityPatched = registerActivity(fid)

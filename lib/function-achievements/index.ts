@@ -36,7 +36,7 @@ export default createFunction(
 			name: `${ORDO_PINK_ACHIEVEMENTS_FUNCTION}.activities.main`,
 			routes: ["/achievements", "/achievements/:category"],
 			Sidebar: lazy(() => import("./src/views/achievements.sidebar")),
-			background: false,
+			is_background: false,
 			Icon: BsAward,
 		})
 

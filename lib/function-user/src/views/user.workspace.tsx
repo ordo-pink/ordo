@@ -152,7 +152,7 @@ export default function UserWorkspace() {
 										)
 										.fork(
 											err => setEmailErrors([err ? err : "Invalid email"]),
-											() => commands.emit<cmd.user.refreshInfo>("user.refresh"),
+											() => commands.emit<cmd.user.refresh_info>("user.refresh"),
 										)
 								}
 							>
@@ -224,7 +224,7 @@ export default function UserWorkspace() {
 									)
 									.fork(
 										err => setEmailErrors([err ? err : "Invalid email"]),
-										() => commands.emit<cmd.user.refreshInfo>("user.refresh"),
+										() => commands.emit<cmd.user.refresh_info>("user.refresh"),
 									)
 							}
 						>
@@ -316,7 +316,7 @@ export default function UserWorkspace() {
 											setOldPassword("")
 											setNewPassword("")
 											setRepeatNewPassword("")
-											commands.emit<cmd.user.refreshInfo>("user.refresh")
+											commands.emit<cmd.user.refresh_info>("user.refresh")
 										},
 									)
 							}

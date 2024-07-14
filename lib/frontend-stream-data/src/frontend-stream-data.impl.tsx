@@ -476,6 +476,6 @@ export const content$ = new BehaviorSubject<Record<FSID, string | ArrayBuffer | 
 
 const checkCurrentActivityQueryPermissionE = (fid: symbol) =>
 	Either.fromBoolean(
-		() => KnownFunctions.checkPermissions(fid, { queries: ["data.read"] }),
+		() => KnownFunctions.check_permissions(fid, { queries: ["data.read"] }),
 		() => fid,
 	)

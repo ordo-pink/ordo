@@ -40,7 +40,7 @@ export default function Link({
 		event.preventDefault()
 
 		external
-			? commands.emit<cmd.router.openExternal>("router.open-external", { url: href, newTab })
+			? commands.emit<cmd.router.open_external>("router.open_external", { url: href, newTab })
 			: commands.emit<cmd.router.navigate>("router.navigate", href)
 	}
 

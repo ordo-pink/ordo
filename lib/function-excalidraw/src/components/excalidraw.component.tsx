@@ -24,7 +24,7 @@ export default function ExcalidrawEditor({
 	isLoading,
 	isEditable,
 	isEmbedded,
-}: Extensions.FileAssociationComponentProps) {
+}: Functions.FileAssociationComponentProps) {
 	const isDark = useIsDarkTheme()
 	const commands = useCommands()
 

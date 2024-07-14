@@ -41,7 +41,7 @@ export default createFunction(
 			Component: lazy(() => import("./src/views/links.workspace")),
 			routes: ["/links", "/links/labels/:label"],
 			widgets: [lazy(() => import("./src/views/links.widget"))],
-			background: false,
+			is_background: false,
 			Icon: PiGraph,
 		})
 

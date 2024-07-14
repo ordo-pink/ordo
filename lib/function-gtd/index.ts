@@ -48,7 +48,7 @@ export default createFunction(
 			widgets: [lazy(() => import("./src/views/gtd.widget"))],
 			name: "pink.ordo.gtd.main",
 			routes: ["/gtd", "/gtd/projects/:fsid", "/gtd/labels/:label"],
-			background: false,
+			is_background: false,
 			Icon: BsUiChecks,
 		})
 

@@ -19,11 +19,13 @@
 
 import { BehaviorSubject, type Observable, map } from "rxjs"
 
-import { F, N, T, call_once } from "@ordo-pink/tau"
-import { Oath, if_else_oath } from "@ordo-pink/oath"
-import { type TFetch, type THosts } from "@ordo-pink/core"
+import { O, type TOption } from "@ordo-pink/option"
+import { T, call_once } from "@ordo-pink/tau"
+import { type TFetch, type TGetIsAuthenticatedFn, type THosts } from "@ordo-pink/core"
 import { type AuthResponse } from "@ordo-pink/backend-server-id"
 import { KnownFunctions } from "@ordo-pink/frontend-known-functions"
+import { Oath } from "@ordo-pink/oath"
+import { RRR } from "@ordo-pink/data"
 import { Result } from "@ordo-pink/result"
 import { type TLogger } from "@ordo-pink/logger"
 
@@ -32,23 +34,24 @@ type TInitUserStreamParams = (params: {
 	fetch: TFetch
 	logger: TLogger
 	is_dev: boolean
-}) => { auth$: Observable<AuthResponse | null> }
+}) => { auth$: Observable<TOption<AuthResponse>>; get_is_authenticated: TGetIsAuthenticatedFn }
 export const __init_auth$: TInitUserStreamParams = call_once(({ hosts, fetch, logger, is_dev }) => {
-	const refresh_token = Oath.FromNullable(fetch)
-		.pipe(Oath.ops.tap(log_token_refresh_start(logger)))
-		.pipe(Oath.ops.chain(fetch_refresh_token0(fetch, hosts.id)))
-		.pipe(Oath.ops.chain(get_json_response0))
-		.pipe(Oath.ops.chain(check_fetch_succeeded0))
-		.pipe(Oath.ops.map(update_auth(logger)))
+	const refresh_token = Oath.Empty()
+		.pipe(Oath.ops.tap(() => logger.debug("Refreshing auth token...")))
+		.pipe(Oath.ops.chain(() => Oath.Try(() => fetch(`${hosts.id}/refresh-token`, get_req_init()))))
+		.pipe(Oath.ops.chain(response => Oath.Try(() => response.json())))
+		.pipe(Oath.ops.chain(res => Oath.If(res.success, { T: () => res.result, F: () => res.error })))
+		.pipe(Oath.ops.tap(() => logger.debug("Auth token refreshed.")))
+		.pipe(Oath.ops.map(auth => auth$.next(auth)))
+
+	const invoker = Oath.invokers.or_else(sign_out(logger, hosts.website, is_dev))
 
 	logger.debug("Initialising auth...")
 
-	void refresh_token.invoke(Oath.invokers.or_else(sign_out(logger, hosts.website, is_dev)))
+	void refresh_token.invoke(invoker)
 
-	const interval = setInterval(
-		() => void refresh_token.invoke(Oath.invokers.or_else(sign_out(logger, hosts.website, is_dev))),
-		50_000,
-	) // TODO: Move to ENV
+	const interval = setInterval(() => void refresh_token.invoke(invoker), 50_000) // TODO: Move ms to ENV
+
 	const drop_interval = () => {
 		clearInterval(interval)
 		window.removeEventListener("beforeunload", drop_interval)
@@ -58,37 +61,21 @@ export const __init_auth$: TInitUserStreamParams = call_once(({ hosts, fetch, lo
 
 	logger.debug("Initialised auth.")
 
-	return { auth$: auth$.pipe(map(value => value)) }
+	return { auth$: auth$.pipe(map(value => value)), get_is_authenticated: _get_is_authenticated }
 })
 
-export const _get_is_authenticated = (fid: symbol | null) =>
-	Result.If(KnownFunctions.checkPermissions(fid, { queries: ["auth.is-authenticated"] }))
-		.pipe(Result.ops.chain(() => Result.FromNullable(auth$.value?.sub)))
-		.cata({ Ok: T, Err: F })
+// --- Internal ---
 
-// TODO: Remove
-export const _get_current_user_token = (fid: symbol | null) =>
-	Result.If(KnownFunctions.checkPermissions(fid, { queries: [] }))
-		.pipe(Result.ops.chain(() => Result.FromNullable(auth$.value?.accessToken)))
-		.cata({ Ok: x => x, Err: N })
+const LOCATION = "__init_auth$"
 
-const log_token_refresh_start = (logger: TLogger) => () => logger.debug("Refreshing auth token...")
+const eperm = RRR.codes.eperm(LOCATION)
 
-const fetch_refresh_token0 = (fetch: typeof window.fetch, id_host: string) => () =>
-	Oath.Try(() => fetch(`${id_host}/refresh-token`, { method: "POST", credentials: "include" }))
+const _get_is_authenticated: TGetIsAuthenticatedFn = (fid: symbol | null) =>
+	Result.If(KnownFunctions.check_permissions(fid, { queries: ["auth.is-authenticated"] }))
+		.pipe(Result.ops.chain(() => Result.FromOption(auth$.getValue())))
+		.pipe(Result.ops.bimap(() => eperm(`get_is_authenticated -> fid: ${String(fid)}`), T))
 
-const get_json_response0 = (res: Response) => Oath.FromPromise(res.json.bind(res))
-
-const check_fetch_succeeded0 = if_else_oath<
-	{ success: boolean; result: AuthResponse; error: string },
-	AuthResponse,
-	string
->(res => res.success, { on_true: res => res.result, on_false: res => res.error })
-
-const update_auth = (logger: TLogger) => (auth: AuthResponse) => {
-	logger.debug("Auth token refreshed.")
-	return auth$.next(auth)
-}
+const get_req_init = (): RequestInit => ({ method: "POST", credentials: "include" })
 
 const sign_out =
 	(logger: TLogger, web_host: string, is_dev: boolean) => (res: string | Error | null) => {
@@ -101,5 +88,4 @@ const sign_out =
 		window.location.href = `${web_host}/sign-out`
 	}
 
-// TODO: Do not export
-export const auth$ = new BehaviorSubject<AuthResponse | null>(null)
+const auth$ = new BehaviorSubject<TOption<AuthResponse>>(O.None())

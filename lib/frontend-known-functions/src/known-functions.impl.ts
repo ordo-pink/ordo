@@ -17,14 +17,23 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { F, T, identity, isEmpty, prop } from "ramda"
-
 import { Either, TEither } from "@ordo-pink/either"
-import { N, is_non_empty_string, is_object } from "@ordo-pink/tau"
-import { internalApps } from "@ordo-pink/core"
+import {
+	F,
+	N,
+	T,
+	is_array,
+	is_empty_array,
+	is_non_empty_string,
+	is_object,
+	prop,
+} from "@ordo-pink/tau"
+import { internal_apps } from "@ordo-pink/core"
 
 // TODO: Extend query list :: data, etc.
-export type QueryPermission =
+// TODO: Move to core
+export type TQueryPermission =
+	| "application.title"
 	| "fetch"
 	| "auth.is-authenticated"
 	| "user.id"
@@ -36,121 +45,121 @@ export type QueryPermission =
 	| "achievements"
 	| "functions.current-activity"
 	| "functions.current-file-association"
+	| "functions.current-fid"
 	| "data.read"
 	| "hosts.access"
 
 // TODO: Add support for command intellisense
-export type CommandPermission = Client.Commands.CommandName
+export type TCommandPermission = Client.Commands.CommandName
 
-export type Permissions = {
-	queries: QueryPermission[]
-	commands: CommandPermission[]
+export type TPermissions = {
+	queries: TQueryPermission[]
+	commands: TCommandPermission[]
 }
 
-type KnownFunction = {
+type TKnownFunction = {
 	name: string
 	fid: symbol
-	permissions: Permissions
+	permissions: TPermissions
 }
 
+// TODO: Return Optionals
 export const KnownFunctions = {
-	validate: (fid: symbol | null) => findKnownFunctionByFIDE(fid).fold(F, T),
-	exchange: (fid: symbol | null) => findKnownFunctionByFIDE(fid).fold(N, pickKnownFunctionName),
-	checkPermissions: (fid: symbol | null, permissions: Partial<Permissions>) =>
-		isOrdoPinkAppFunction(fid) ||
-		findKnownFunctionByFIDE(fid)
+	validate: (fid: symbol | null) => find_known_function_by_fid(fid).fold(F, T),
+	exchange: (fid: symbol | null) => find_known_function_by_fid(fid).fold(N, pickKnownFunctionName),
+	check_is_internal: (fid: symbol | null) => is_ordo_pink_app_function(fid),
+	check_permissions: (fid: symbol | null, permissions: Partial<TPermissions>) =>
+		is_ordo_pink_app_function(fid) ||
+		find_known_function_by_fid(fid)
 			.map(prop("permissions"))
-			.chain(validateCheckedPermissionsE(permissions))
-			.map(checkPermissions(permissions))
-			.fold(F, identity),
-	register: (name: string | null, permissions: Permissions) =>
+			.chain(validate_checked_permissions(permissions))
+			.map(check_permissions(permissions))
+			.fold(F, x => x),
+	register: (name: string | null, permissions: TPermissions) =>
 		Either.fromNullable(name)
-			.chain(checkIsValidPermissionsE(permissions))
-			.chain(checkIsValidNameE)
-			.chain(checkNameIsNotTakenE)
-			.map(createKnownFunctionFromName(permissions))
-			.chain(tapSaveKnownFunctionE)
-			.fold(N, pickKnownFunctionId),
+			.chain(check_is_valid_permissions(permissions))
+			.chain(check_is_valid_name)
+			.chain(check_name_is_not_taken)
+			.map(create_known_function_from_name(permissions))
+			.chain(tap_save_known_function)
+			.fold(N, pick_known_function_id),
 	unregister: (name: string | null) =>
-		findKnownFunctionByNameE(name)
-			.map(getKnownFunctionIndex)
-			.map(removeKnownFunctionByIndex)
+		find_known_function_by_name(name)
+			.map(get_known_function_index)
+			.map(remove_known_function_by_index)
 			.fold(F, T),
 }
 
 // --- Internal ---
 
-const knownFunctions: KnownFunction[] = []
+const known_functions: TKnownFunction[] = []
 
-const isOrdoPinkAppFunction = (fid: symbol | null) =>
-	internalApps.includes(KnownFunctions.exchange(fid)!)
+const is_ordo_pink_app_function = (fid: symbol | null) =>
+	internal_apps.includes(KnownFunctions.exchange(fid)!)
 
-const checkIsValidNameE = (name: string) =>
+const check_is_valid_name = (name: string) =>
 	Either.fromBoolean(
 		() => is_non_empty_string(name),
 		() => name,
 	)
 
-const checkIsValidPermissionsE = (permissions: Permissions) => (name: string) =>
+const check_is_valid_permissions = (permissions: TPermissions) => (name: string) =>
 	Either.fromBoolean(
-		() =>
-			is_object(permissions) &&
-			Array.isArray(permissions.commands) &&
-			Array.isArray(permissions.queries),
+		() => is_object(permissions) && is_array(permissions.commands) && is_array(permissions.queries),
 		() => name,
 	)
 
-const findKnownFunctionByFIDE = (fid: symbol | null) =>
-	Either.fromNullable(knownFunctions.find(f => f.fid === fid))
+const find_known_function_by_fid = (fid: symbol | null) =>
+	Either.fromNullable(known_functions.find(f => f.fid === fid))
 
-const findKnownFunctionByNameE = (name: string | null) =>
-	Either.fromNullable(knownFunctions.find(f => f.name === name))
+const find_known_function_by_name = (name: string | null) =>
+	Either.fromNullable(known_functions.find(f => f.name === name))
 
-const checkNameIsNotTakenE = (name: string): TEither<string, false> =>
+const check_name_is_not_taken = (name: string): TEither<string, false> =>
 	Either.fromBoolean(
-		() => !knownFunctions.some(hasName(name)),
+		() => !known_functions.some(hasName(name)),
 		() => name,
 	)
 
-const tapSaveKnownFunctionE = (func: KnownFunction): TEither<KnownFunction, unknown> =>
+const tap_save_known_function = (func: TKnownFunction): TEither<TKnownFunction, unknown> =>
 	Either.of(func)
-		.map(() => knownFunctions.push(func))
+		.map(() => known_functions.push(func))
 		.map(() => func)
 
-const getKnownFunctionIndex = (func: KnownFunction) => knownFunctions.indexOf(func)
+const get_known_function_index = (func: TKnownFunction) => known_functions.indexOf(func)
 
-const removeKnownFunctionByIndex = (index: number) => knownFunctions.splice(index, 1)
+const remove_known_function_by_index = (index: number) => known_functions.splice(index, 1)
 
 const hasName =
 	(name: string) =>
-	(func: KnownFunction): boolean =>
+	(func: TKnownFunction): boolean =>
 		func.name === name
 
-const createKnownFunctionFromName =
-	(permissions: Permissions) =>
-	(name: string): KnownFunction => ({
+const create_known_function_from_name =
+	(permissions: TPermissions) =>
+	(name: string): TKnownFunction => ({
 		name,
 		fid: Symbol(name),
 		permissions,
 	})
 
-const pickKnownFunctionId = (f: KnownFunction) => f.fid
+const pick_known_function_id = (f: TKnownFunction) => f.fid
 
-const pickKnownFunctionName = (f: KnownFunction) => f.name
+const pickKnownFunctionName = (f: TKnownFunction) => f.name
 
-const checkPermissions =
-	(checkedPermissions: Partial<Permissions>) => (grantedPermissions: Permissions) =>
-		(!!checkedPermissions.commands &&
-			checkedPermissions.commands.every(p => grantedPermissions.commands.includes(p))) ||
-		(!!checkedPermissions.queries &&
-			checkedPermissions.queries.every(p => grantedPermissions.queries.includes(p)))
+const check_permissions =
+	(checked_permissions: Partial<TPermissions>) => (granted_permissions: TPermissions) =>
+		(!!checked_permissions.commands &&
+			checked_permissions.commands.every(p => granted_permissions.commands.includes(p))) ||
+		(!!checked_permissions.queries &&
+			checked_permissions.queries.every(p => granted_permissions.queries.includes(p)))
 
-const validateCheckedPermissionsE =
-	(permissions: Partial<Permissions>) => (grantedPermissions: Permissions) =>
+const validate_checked_permissions =
+	(permissions: Partial<TPermissions>) => (granted_permissions: TPermissions) =>
 		Either.fromBoolean(
 			() =>
 				is_object(permissions) &&
-				((Array.isArray(permissions.commands) && !isEmpty(permissions.commands)) ||
-					(Array.isArray(permissions.queries) && !isEmpty(permissions.queries))),
-			() => grantedPermissions,
+				((Array.isArray(permissions.commands) && !is_empty_array(permissions.commands)) ||
+					(Array.isArray(permissions.queries) && !is_empty_array(permissions.queries))),
+			() => granted_permissions,
 		)

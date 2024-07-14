@@ -46,7 +46,7 @@ export default function EditorWorkspace() {
 	const { fsid } = useRouteParams<{ fsid: FSID }>()
 
 	const [Component, setComponent] = useState<
-		ComponentType<Extensions.FileAssociationComponentProps>
+		ComponentType<Functions.FileAssociationComponentProps>
 	>(() => EditorLoader)
 
 	const currentData = useDataByFSID(fsid)

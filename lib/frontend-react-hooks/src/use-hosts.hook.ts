@@ -44,7 +44,7 @@ export const __init_hosts: TInitHostsFn = call_once(hosts => {
 })
 
 const _get_hosts: TGetHostsFn = fid =>
-	Result.If(KnownFunctions.checkPermissions(fid, { queries: ["hosts.access"] })).cata({
+	Result.If(KnownFunctions.check_permissions(fid, { queries: ["hosts.access"] })).cata({
 		Ok: () => O.Some(gets_unsafe()),
 		Err: () => O.None(),
 	})

@@ -29,11 +29,11 @@ declare global {
 			type open = { name: "editor.open"; payload: FSID }
 			type registerFileAssociation = {
 				name: "editor.register-file-association"
-				payload: Extensions.FileAssociation
+				payload: Functions.FileAssociation
 			}
 			type unregisterFileAssociation = {
 				name: "editor.unregister-file-association"
-				payload: Extensions.FileAssociation["name"]
+				payload: Functions.FileAssociation["name"]
 			}
 		}
 	}

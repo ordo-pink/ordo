@@ -109,7 +109,7 @@ export default function OrdoEditor({
 	isEditable,
 	isLoading,
 	data,
-}: Extensions.FileAssociationComponentProps) {
+}: Functions.FileAssociationComponentProps) {
 	const ref = useRef<HTMLDivElement>(null)
 
 	const [target, setTarget] = useState<Range | null>(null)

@@ -67,7 +67,7 @@ const registerCommandPalette = ({ commands }: P) => {
 const emailHandler =
 	({ commands }: P) =>
 	() =>
-		commands.emit<cmd.router.openExternal>("router.open-external", {
+		commands.emit<cmd.router.open_external>("router.open_external", {
 			newTab: true,
 			url: "mailto:support@ordo.pink",
 		})
@@ -75,7 +75,7 @@ const emailHandler =
 const telegramHandler =
 	({ commands }: P) =>
 	() =>
-		commands.emit<cmd.router.openExternal>("router.open-external", {
+		commands.emit<cmd.router.open_external>("router.open_external", {
 			newTab: true,
 			url: "https://t.me/ordo_pink_ru/190",
 		})

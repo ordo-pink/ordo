@@ -30,7 +30,7 @@ export const useIsAuthenticated = () => {
 	const fid = useCurrentFID()
 	const auth = useSubscription(auth$)
 
-	return Either.fromBoolean(() => KnownFunctions.checkPermissions(fid, { queries: [] }))
+	return Either.fromBoolean(() => KnownFunctions.check_permissions(fid, { queries: [] }))
 		.chain(() => Either.fromNullable(auth))
 		.fold(F, T)
 }

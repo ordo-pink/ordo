@@ -83,13 +83,13 @@ type TCmdListener<N extends Client.Commands.CommandName = Client.Commands.Comman
 ]
 
 // TODO: Only put debug info in dev mode
-type TInitCommandsFn = (
-	app_fid: symbol,
-	logger: TLogger,
-	highlight_commands_without_handlers?: boolean,
-) => { commands: Client.Commands.Commands; get_commands: TGetCommandsFn }
+type TInitCommandsFn = (params: {
+	app_fid: symbol
+	logger: TLogger
+	highlight_commands_without_handlers?: boolean
+}) => { commands: Client.Commands.Commands; get_commands: TGetCommandsFn }
 export const __init_commands: TInitCommandsFn = call_once(
-	(app_fid, logger, highlight_commands_without_handlers = true) => {
+	({ app_fid, logger, highlight_commands_without_handlers = true }) => {
 		logger.debug("Initializing commands...")
 
 		command_queue$
@@ -100,7 +100,7 @@ export const __init_commands: TInitCommandsFn = call_once(
 						const name = command.name
 						const fid = command.fid
 
-						if (!KnownFunctions.checkPermissions(fid, { commands: [name] })) {
+						if (!KnownFunctions.check_permissions(fid, { commands: [name] })) {
 							const func = KnownFunctions.exchange(fid) ?? "unauthorized"
 							logger.alert(
 								`Function "${func}" did not request permission to execute command "${name}".`,

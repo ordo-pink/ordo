@@ -17,27 +17,39 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { BehaviorSubject, Observable, map } from "rxjs"
+import { BehaviorSubject } from "rxjs"
 
+import { call_once, is_non_empty_string } from "@ordo-pink/tau"
+import { KnownFunctions } from "@ordo-pink/frontend-known-functions"
+import { RRR } from "@ordo-pink/data"
+import { Result } from "@ordo-pink/result"
+import { type TGetTitleFn } from "@ordo-pink/core"
 import { type TLogger } from "@ordo-pink/logger"
-import { call_once } from "@ordo-pink/tau"
 
 type TInitTitleStreamFn = (
 	logger: TLogger,
 	commands: Client.Commands.Commands,
-) => { title$: Observable<string> }
+) => { get_title: TGetTitleFn }
 export const __init_title$: TInitTitleStreamFn = call_once((logger, commands) => {
 	logger.debug("Initialising title stream...")
 
-	commands.on<cmd.application.set_title>("application.set_title", title =>
-		title$.next(`${title} | Ordo.pink`),
+	commands.on<cmd.application.set_title>(
+		"application.set_title",
+		title => is_non_empty_string(title) && title$.next(title),
 	)
 
 	logger.debug("Initialised title.")
 
-	return { title$: title$.pipe(map(value => value)) }
+	return {
+		get_title: fid => () =>
+			Result.If(KnownFunctions.check_permissions(fid, { queries: ["application.title"] }))
+				.pipe(Result.ops.err_map(() => eperm(`get_title -> fid: ${String(fid)}`)))
+				.pipe(Result.ops.map(() => title$.asObservable())),
+	}
 })
 
 // --- Internal ---
 
 const title$ = new BehaviorSubject<string>("Ordo.pink")
+
+const eperm = RRR.codes.eperm("Init title")

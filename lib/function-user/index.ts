@@ -39,7 +39,7 @@ export default createFunction(
 			Component: lazy(() => import("./src/views/user.workspace")),
 			name: ORDO_PINK_USER_FUNCTION.concat(".activity.main"),
 			routes: ["/user"],
-			background: true,
+			is_background: true,
 		})
 
 		const dropGoToAccountCmd = registerGoToAccountCommand({ commands })

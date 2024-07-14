@@ -34,7 +34,6 @@ export const is_object = (x: unknown): x is Record<string, unknown> =>
 	x != null && typeof x === "object" && !Array.isArray(x)
 
 export const is_fn = <T = unknown, K = T>(x: unknown): x is (x: T) => K => typeof x == "function"
-
 export const is_true = (x: unknown): x is true => x === true
 export const is_false = (x: unknown): x is false => x === false
 export const is_bool = (x: unknown): x is boolean => is_true(x) || is_false(x)
@@ -54,6 +53,7 @@ export const is_infinite = (x: unknown): x is number => is_number(x) && !is_fini
 export const is_finite_non_negative_int = (x: unknown): x is number =>
 	is_non_negative_number(x) && is_finite(x) && is_int(x)
 export const is_uuid = (x: unknown): x is UUIDv4 => is_string(x) && UUIDv4_RX.test(x)
+export const is_empty_array = (x: unknown): boolean => is_array(x) && is_0(x.length)
 
 export const keys_of: Types._KeysOfFn = o => {
 	return Object.keys(o) as any

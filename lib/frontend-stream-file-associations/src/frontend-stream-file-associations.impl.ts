@@ -48,34 +48,34 @@ export const __init_file_associations$ = call_once((fid: symbol) => {
 	logger.debug("Initialized file associations.")
 })
 
-const add$ = new Subject<Extensions.FileAssociation>()
+const add$ = new Subject<Functions.FileAssociation>()
 const remove$ = new Subject<string>()
 
 const add =
-	(newFileAssociation: Extensions.FileAssociation) =>
-	(state: Extensions.FileAssociation[]): Extensions.FileAssociation[] => [
+	(newFileAssociation: Functions.FileAssociation) =>
+	(state: Functions.FileAssociation[]): Functions.FileAssociation[] => [
 		...state,
 		newFileAssociation,
 	]
 
 const remove =
 	(activityName: string) =>
-	(state: Extensions.FileAssociation[]): Extensions.FileAssociation[] =>
+	(state: Functions.FileAssociation[]): Functions.FileAssociation[] =>
 		state.filter(activity => activity.name === activityName)
 
-export const currentFileAssociation$ = new BehaviorSubject<Extensions.FileAssociation | null>(null)
+export const currentFileAssociation$ = new BehaviorSubject<Functions.FileAssociation | null>(null)
 export const fileAssociations$ = merge(add$.pipe(map(add)), remove$.pipe(map(remove))).pipe(
-	scan((acc, f) => f(acc), [] as Extensions.FileAssociation[]),
+	scan((acc, f) => f(acc), [] as Functions.FileAssociation[]),
 	shareReplay(1),
 )
 
-export const getCurrentFileAssociation = (fid: symbol | null): Extensions.FileAssociation | null =>
+export const getCurrentFileAssociation = (fid: symbol | null): Functions.FileAssociation | null =>
 	fromNullableE(fid)
 		.pipe(chainE(checkCurrentFileAssociationQueryPermissionE))
 		.fold(N, () => currentFileAssociation$.value)
 
 const checkCurrentFileAssociationQueryPermissionE = (fid: symbol) =>
 	fromBooleanE(
-		KnownFunctions.checkPermissions(fid, { queries: ["functions.current-file-association"] }),
+		KnownFunctions.check_permissions(fid, { queries: ["functions.current-file-association"] }),
 		fid,
 	)

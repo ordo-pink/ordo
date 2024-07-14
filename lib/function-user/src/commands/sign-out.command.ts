@@ -35,33 +35,33 @@ export const registerSignOutCommand = (params: P) => {
 const registerCommand = (params: P) => {
 	const handler = commandHandler(params)
 
-	params.commands.on<cmd.user.signOut>("user.sign-out", handler)
+	params.commands.on<cmd.user.sign_out>("user.sign_out", handler)
 
 	return () => {
-		params.commands.off<cmd.user.signOut>("user.sign-out", handler)
+		params.commands.off<cmd.user.sign_out>("user.sign_out", handler)
 	}
 }
 
 const registerCommandPalette = ({ commands }: P) => {
 	commands.emit<cmd.commandPalette.add>("command-palette.add", {
-		id: "user.sign-out",
+		id: "user.sign_out",
 		readableName: "Выйти из аккаунта",
 		Icon: AiOutlineLogout,
 		onSelect: () => {
 			commands.emit<cmd.commandPalette.hide>("command-palette.hide")
-			commands.emit<cmd.user.signOut>("user.sign-out")
+			commands.emit<cmd.user.sign_out>("user.sign_out")
 		},
 	})
 
 	return () => {
-		commands.emit<cmd.commandPalette.remove>("command-palette.remove", "user.sign-out")
+		commands.emit<cmd.commandPalette.remove>("command-palette.remove", "user.sign_out")
 	}
 }
 
 const commandHandler =
 	({ commands, websiteHost }: P) =>
 	() =>
-		commands.emit<cmd.router.openExternal>("router.open-external", {
+		commands.emit<cmd.router.open_external>("router.open_external", {
 			url: `${websiteHost}/sign-out`,
 			newTab: false,
 		})

@@ -175,7 +175,7 @@ export const __init_achievements$ = call_once(({ fid, dataCommands }: P) => {
 })
 
 export const getAchievements = (fid: symbol | null) =>
-	Either.fromBoolean(() => KnownFunctions.checkPermissions(fid, { queries: [] })).fold(
+	Either.fromBoolean(() => KnownFunctions.check_permissions(fid, { queries: [] })).fold(
 		() => null,
 		() => achievements$.value,
 	)

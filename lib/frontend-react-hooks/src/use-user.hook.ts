@@ -17,7 +17,7 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { KnownFunctions, QueryPermission } from "@ordo-pink/frontend-known-functions"
+import { KnownFunctions, TQueryPermission } from "@ordo-pink/frontend-known-functions"
 import { N } from "@ordo-pink/tau"
 import { Switch } from "@ordo-pink/switch"
 import { achievements$ } from "@ordo-pink/frontend-stream-achievements"
@@ -98,5 +98,5 @@ export const useUserAchievements = () => {
 const hasFirstName = (user: User.User) => !!user.firstName
 const hasLastName = (user: User.User) => !!user.lastName
 const hasFirstNameAndLastName = (user: User.User) => hasFirstName(user) && hasLastName(user)
-const checkPermission = (fid: symbol | null, queries: QueryPermission[]) =>
-	KnownFunctions.checkPermissions(fid, { queries })
+const checkPermission = (fid: symbol | null, queries: TQueryPermission[]) =>
+	KnownFunctions.check_permissions(fid, { queries })

@@ -40,7 +40,7 @@ export const useFetch = () => {
 }
 
 export const get_fetch = (fid: symbol | null): typeof window.fetch =>
-	Result.If(KnownFunctions.checkPermissions(fid, { queries: ["fetch"] })).cata({
+	Result.If(KnownFunctions.check_permissions(fid, { queries: ["fetch"] })).cata({
 		Ok: () => fetch,
 		Err: () => forbidden_fetch,
 	})

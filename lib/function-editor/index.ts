@@ -41,7 +41,7 @@ export default createFunction(
 			Icon: BsLayoutSidebar,
 			name: ORDO_PINK_EDITOR_FUNCTION.concat(".activities.editor"),
 			routes: ["/editor", "/editor/:fsid"],
-			background: false,
+			is_background: false,
 		})
 
 		const dropGoToEditorCmd = registerGoToEditorCommand({ commands })

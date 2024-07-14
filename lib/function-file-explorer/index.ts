@@ -41,7 +41,7 @@ export default createFunction(
 			Component: lazy(() => import("./src/views/file-explorer.workspace")),
 			routes: ["/fs", "/fs/:fsid"],
 			widgets: [lazy(() => import("./src/views/file-explorer.widget"))],
-			background: false,
+			is_background: false,
 			Icon: BsFolder2Open,
 		})
 

@@ -42,7 +42,7 @@ export default createFunction(
 			name: "pink.ordo.home.main",
 			Component: lazy(() => import("./src/views/home.workspace")),
 			routes: ["/"],
-			background: false,
+			is_background: false,
 			Icon: BsCollection,
 		})
 

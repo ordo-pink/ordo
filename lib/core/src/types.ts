@@ -20,7 +20,14 @@
 import type { ComponentType, LazyExoticComponent, MouseEvent } from "react"
 import type { IconType } from "react-icons"
 
-import type { FSID, PlainData, TMetadataQuery, TUserQuery } from "@ordo-pink/data"
+import type {
+	FSID,
+	PlainData,
+	TMetadataCommand,
+	TMetadataQuery,
+	TRrr,
+	TUserQuery,
+} from "@ordo-pink/data"
 import type { JTI, SUB } from "@ordo-pink/wjwt"
 import type { TLogger } from "@ordo-pink/logger"
 import type { TOption } from "@ordo-pink/option"
@@ -28,6 +35,7 @@ import type { UUIDv4 } from "@ordo-pink/tau"
 
 import type { BackgroundTaskStatus } from "./constants"
 import { Observable } from "rxjs"
+import { TResult } from "@ordo-pink/result"
 
 export type TFetch = typeof window.fetch
 
@@ -39,15 +47,42 @@ export type THosts = {
 	my: string
 }
 
-export type TGetHostsFn = (fid: symbol | null) => TOption<THosts>
-export type TGetFetchFn = (fid: symbol | null) => TFetch
-export type TGetLoggerFn = (fid: symbol | null) => TLogger
-export type TGetCommandsFn = (fid: symbol | null) => Client.Commands.Commands
+// TODO: Move away all internal types
+
+export type TFIDAwareActivity = Functions.Activity & { fid: symbol }
+
+export type TRequireFID<$TReturn> = (fid: symbol | null) => $TReturn
+
+export type TGetCurrentFIDFn = TRequireFID<
+	() => TResult<Observable<TOption<symbol>>, TRrr<"EPERM">>
+>
+export type TGetTitleFn = TRequireFID<() => TResult<Observable<string>, TRrr<"EPERM">>>
+export type TGetHostsFn = TRequireFID<() => TResult<THosts, TRrr<"EPERM">>>
+export type TGetFetchFn = TRequireFID<() => TFetch>
+export type TGetLoggerFn = TRequireFID<() => TLogger>
+export type TGetCommandsFn = TRequireFID<() => Client.Commands.Commands>
+export type TGetIsAuthenticatedFn = TRequireFID<() => TResult<boolean, TRrr<"EPERM">>>
+export type TSetCurrentFIDFn = TRequireFID<(new_fid: symbol) => TResult<void, TRrr<"EPERM">>>
+export type TRegisterActivityFn = TRequireFID<
+	(activity: Functions.Activity) => TResult<void, TRrr<"EPERM" | "EEXIST">>
+>
+export type TUnregisterActivityFn = TRequireFID<
+	(name: string) => TResult<void, TRrr<"EPERM" | "ENOENT">>
+>
+export type TGetActivitiesFn = TRequireFID<
+	() => TResult<Observable<TFIDAwareActivity[]>, TRrr<"EPERM">>
+>
+export type TSetCurrentActivityFn = TRequireFID<
+	(name: string) => TResult<void, TRrr<"EPERM" | "ENOENT">>
+>
+export type TGetCurrentActivityFn = TRequireFID<
+	() => TResult<Observable<TOption<Functions.Activity>>, TRrr<"EPERM" | "ENOENT">>
+>
 
 export type TOrdoContext = {
 	queries: {
 		metadata_query: TMetadataQuery
-		user_query?: TUserQuery
+		user_query: TUserQuery
 		// TODO: TContentQuery
 		// TODO: TApplicationQuery
 	}
@@ -55,14 +90,15 @@ export type TOrdoContext = {
 		title$: Observable<string>
 	}
 	commands: {
-		// TODO: TMetadataCommand
-		// TODO: TUserCommand
-		// TODO: TContentCommand
+		metadata_command: TMetadataCommand
+		// user_command: TUserCommand
+		// content_command: TContentCommand
 	}
 	get_hosts: TGetHostsFn
 	get_fetch: TGetFetchFn
 	get_logger: TGetLoggerFn
 	get_commands: TGetCommandsFn
+	get_is_authenticated: TGetIsAuthenticatedFn
 }
 
 declare global {
@@ -199,9 +235,9 @@ declare global {
 		}
 
 		module user {
-			type refreshInfo = { name: "user.refresh" }
-			type signOut = { name: "user.sign-out" }
-			type goToAccount = { name: "user.go-to-account" }
+			type refresh_info = { name: "user.refresh" }
+			type sign_out = { name: "user.sign_out" }
+			type go_to_account = { name: "user.go_to_account" }
 		}
 
 		module notification {
@@ -210,11 +246,11 @@ declare global {
 		}
 
 		module fileAssociations {
-			type add = { name: "file-associations.add"; payload: Extensions.FileAssociation }
+			type add = { name: "file-associations.add"; payload: Functions.FileAssociation }
 			type remove = { name: "file-associations.remove"; payload: string }
 			type setCurrent = {
 				name: "file-associations.set-current"
-				payload: Extensions.FileAssociation
+				payload: Functions.FileAssociation
 			}
 		}
 
@@ -299,8 +335,8 @@ declare global {
 
 		module router {
 			type navigate = { name: "router.navigate"; payload: Client.Router.NavigateParams | string }
-			type openExternal = {
-				name: "router.open-external"
+			type open_external = {
+				name: "router.open_external"
 				payload: Client.Router.OpenExternalParams
 			}
 		}
@@ -317,15 +353,19 @@ declare global {
 		}
 	}
 
-	module Extensions {
+	module Functions {
 		type Activity = {
 			name: string
 			routes: string[]
-			Component: ComponentType | LazyExoticComponent<ComponentType>
+			render_workspace?: (div: HTMLDivElement) => void
+			render_sidebar?: (div: HTMLDivElement) => void
+			render_icon?: (div: HTMLSpanElement) => void
+			Component?: ComponentType | LazyExoticComponent<ComponentType>
 			Sidebar?: ComponentType
 			widgets?: ComponentType[]
 			Icon?: ComponentType | IconType
-			background?: boolean
+			is_background?: boolean
+			is_fullscreen?: boolean
 		}
 
 		type FileExtension = `.${string}`

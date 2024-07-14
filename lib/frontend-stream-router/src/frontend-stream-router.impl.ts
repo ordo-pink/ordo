@@ -23,67 +23,74 @@ import { map } from "rxjs/internal/operators/map"
 
 import { activities$, currentActivity$, current_fid$ } from "@ordo-pink/frontend-stream-activities"
 import { call_once } from "@ordo-pink/tau"
-import { _get_commands } from "@ordo-pink/frontend-stream-commands"
-import { _get_logger } from "@ordo-pink/frontend-logger"
+import { TLogger } from "@ordo-pink/logger"
+import { Observable } from "rxjs"
+import { TOption } from "@ordo-pink/option"
 
 const { route, noMatch } = operators
 
-export const __init_router$ = call_once((fid: symbol) => {
-	const commands = _get_commands(fid)
-	const logger = _get_logger(fid)
+type TInitRouterStreamFn = (params: {
+	logger: TLogger
+	commands: Client.Commands.Commands
+	activities$: Observable<TOption<Functions.Activity[]>>
+	set_current_activity: (activity: Functions.Activity) => void
+	set_current_fid$: 
+}) => void
+export const __init_router$: TInitRouterStreamFn = call_once(
+	({ logger, commands, activities$ }) => {
+		logger.debug("Initializing router...")
 
-	logger.debug("Initializing router...")
+		commands.on<cmd.router.navigate>("router.navigate", payload => {
+			if (Array.isArray(payload)) {
+				router$.set(...(payload as [string]))
+				return
+			}
 
-	commands.on<cmd.router.navigate>("router.navigate", payload => {
-		if (Array.isArray(payload)) {
-			router$.set(...(payload as [string]))
-			return
-		}
+			router$.set(payload)
+		})
 
-		router$.set(payload)
-	})
+		commands.on<cmd.router.open_external>("router.open_external", ({ url, newTab = true }) => {
+			logger.debug("Opening external page", { url, newTab })
+			newTab ? window.open(url, "_blank")?.focus() : (window.location.href = url)
+		})
 
-	commands.on<cmd.router.openExternal>("router.open-external", ({ url, newTab = true }) => {
-		logger.debug("Opening external page", { url, newTab })
-		newTab ? window.open(url, "_blank")?.focus() : (window.location.href = url)
-	})
-
-	activities$
-		.pipe(
-			map(activities => {
-				activities?.map(activity => {
-					return activity.routes.forEach(activityRoute => {
-						router$ &&
-							router$.pipe(route(activityRoute)).subscribe((routeData: Client.Router.Route) => {
-								currentActivity$.next(activity)
-								currentRoute$.next(routeData)
-								current_fid$.next((activity as any).fid)
-							})
-					})
-				})
-
-				router$ &&
-					router$.pipe(noMatch(router$)).subscribe(() => {
-						const homeActivity = activities.find(activity => activity.name === "home")
-						currentActivity$.next(homeActivity!)
-						current_fid$.next((homeActivity as any).fid)
-
-						currentRoute$.next({
-							data: null,
-							hash: "",
-							hashRouting: false,
-							params: {},
-							path: "/",
-							route: "/",
-							search: "",
+		activities$
+			.pipe(
+				map(activities => {
+					activities?.map(activity => {
+						return activity.routes.forEach(activityRoute => {
+							router$ &&
+								router$.pipe(route(activityRoute)).subscribe((routeData: Client.Router.Route) => {
+									currentActivity$.next(activity)
+									currentRoute$.next(routeData)
+									current_fid$.next((activity as any).fid)
+								})
 						})
 					})
-			}),
-		)
-		.subscribe()
 
-	logger.debug("Initialized router.")
-})
+					router$ &&
+						router$.pipe(noMatch(router$)).subscribe(() => {
+							const homeActivity = activities.find(activity => activity.name === "home")
+							currentActivity$.next(homeActivity!)
+							current_fid$.next((homeActivity as any).fid)
+
+							currentRoute$.next({
+								data: null,
+								hash: "",
+								hashRouting: false,
+								params: {},
+								path: "/",
+								route: "/",
+								search: "",
+							})
+						})
+				}),
+			)
+			.subscribe()
+
+		logger.debug("Initialized router.")
+	},
+)
 
 export const router$ = new Router({ hashRouting: false, init: true })
 export const currentRoute$ = new BehaviorSubject<Client.Router.Route | null>(null)

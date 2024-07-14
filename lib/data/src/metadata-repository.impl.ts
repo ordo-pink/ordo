@@ -1,7 +1,7 @@
 import { map } from "rxjs"
 
+import { Oath } from "@ordo-pink/oath"
 import { Result } from "@ordo-pink/result"
-import { Oath, reject_oath } from "@ordo-pink/oath"
 
 import {
 	type TMetadataRepositoryStatic,
@@ -12,7 +12,6 @@ import { RRR } from "./metadata.errors"
 const LOCATION = "MetadataRepository"
 
 const eagain = RRR.codes.eagain(LOCATION)
-const enoent = RRR.codes.enoent(LOCATION)
 const einval = RRR.codes.einval(LOCATION)
 const eio = RRR.codes.eio(LOCATION)
 
@@ -38,26 +37,12 @@ export const MetadataRepository: TMetadataRepositoryStatic = {
 export const MR = MetadataRepository
 
 export const RemoteMetadataRepository: TRemoteMetadataRepositoryStatic = {
-	of: (auth$, dtHost) => ({
-		get: () => Oath.Resolve("OK") as any,
-		// Oath.FromNullable(auth$.getValue())
-		// .pipe(
-		// 	Oath.ops.chain(auth =>
-		// 		Oath.Try(() =>
-		// 			fetch(`${dtHost}`, {
-		// 				headers: { Authorization: `Bearer ${auth.accessToken}` },
-		// 			}).then(res => res.json()),
-		// 		),
-		// 	),
-		// )
-		// .pipe(
-		// 	chain0(body =>
-		// 		body.success
-		// 			? resolve0(body.result as TMetadataDTO[])
-		// 			: reject_oath(body.error as string),
-		// 	),
-		// )
-		// .pipe(Oath.ops.rejected_map(() => enoent(".fetchRemoteState"))),
-		put: () => reject_oath(eio("TODO: UNIMPLEMENTED")),
+	of: data_host => ({
+		get: token =>
+			Oath.Try(() => fetch(`${data_host}`, { headers: { Authorization: `Bearer ${token}` } }))
+				.pipe(Oath.ops.chain(response => Oath.FromPromise(() => response.json())))
+				.pipe(Oath.ops.chain(r => Oath.If(r.success, { T: () => r.result, F: () => r.error })))
+				.pipe(Oath.ops.rejected_map(error => eio(error))),
+		put: () => Oath.Reject(eio("TODO: UNIMPLEMENTED")),
 	}),
 }

@@ -29,7 +29,7 @@ import { BsX } from "react-icons/bs"
 /**
  * ActivityBarActivity is the Icon user can click to get to the activity.
  */
-type P = { activity: Extensions.Activity }
+type P = { activity: Functions.Activity }
 export default function ActivityBarActivity({ activity }: P) {
 	const currentActivity = useSubscription(currentActivity$)
 
@@ -49,5 +49,5 @@ export default function ActivityBarActivity({ activity }: P) {
 // --- Internal ---
 
 const isCurrentActivity =
-	(activity: Extensions.Activity) => (currentActivity: Extensions.Activity | null) =>
+	(activity: Functions.Activity) => (currentActivity: Functions.Activity | null) =>
 		!!currentActivity && currentActivity.name === activity.name

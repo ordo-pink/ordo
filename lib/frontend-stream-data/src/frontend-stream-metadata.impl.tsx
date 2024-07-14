@@ -20,38 +20,48 @@
 import { BehaviorSubject, type Observable } from "rxjs"
 
 import {
+	MetadataCommand,
 	MetadataManager,
 	MetadataQuery,
 	MetadataRepository,
 	RemoteMetadataRepository,
 	type TMetadata,
+	type TMetadataCommand,
 	type TMetadataQuery,
+	type TUserQuery,
 } from "@ordo-pink/data"
 import { type AuthResponse } from "@ordo-pink/backend-server-id"
 import { Switch } from "@ordo-pink/switch"
 import { type THosts } from "@ordo-pink/core"
 import { type TLogger } from "@ordo-pink/logger"
+import { type TOption } from "@ordo-pink/option"
 import { noop } from "@ordo-pink/tau"
 
 type TInitMetadataStreamFn = (params: {
 	logger: TLogger
 	commands: Client.Commands.Commands
+	user_query: TUserQuery
 	hosts: THosts
-	auth$: Observable<AuthResponse | null>
-}) => { metadata_query: TMetadataQuery }
-export const __init_metadata$: TInitMetadataStreamFn = ({ logger, commands, hosts, auth$ }) => {
+	auth$: Observable<TOption<AuthResponse>>
+}) => { metadata_query: TMetadataQuery; metadata_command: TMetadataCommand }
+export const __init_metadata$: TInitMetadataStreamFn = ({
+	auth$,
+	logger,
+	commands,
+	hosts,
+	user_query,
+}) => {
 	logger.debug("Initialising metadata...")
 
-	const metadata$ = new BehaviorSubject<TMetadata[] | null>(null)
 	// metadata$.subscribe()
 
-	const l_repo = MetadataRepository.of(metadata$)
-	const r_repo = RemoteMetadataRepository.of(auth$, hosts.dt)
+	const metadata_repository = MetadataRepository.of(metadata$)
+	const remote_metadata_repository = RemoteMetadataRepository.of(hosts.dt)
 
-	const metadata_query = MetadataQuery.of(l_repo)
-	// const command = MetadataCommand.of(m_query, u_query)
+	const metadata_query = MetadataQuery.of(metadata_repository)
+	const metadata_command = MetadataCommand.of(metadata_repository, metadata_query, user_query)
 
-	MetadataManager.of(l_repo, r_repo).start(state_change =>
+	MetadataManager.of(metadata_repository, remote_metadata_repository, auth$).start(state_change =>
 		Switch.Match(state_change)
 			.case("get-remote", () =>
 				commands.emit<cmd.application.background_task.start_loading>(
@@ -73,5 +83,7 @@ export const __init_metadata$: TInitMetadataStreamFn = ({ logger, commands, host
 
 	logger.debug("Initialised metadata.")
 
-	return { metadata_query }
+	return { metadata_query, metadata_command }
 }
+
+const metadata$ = new BehaviorSubject<TMetadata[] | null>(null)

@@ -79,7 +79,7 @@ export const handleSignIn: Fn =
 					)
 					.tap(() =>
 						notificationService.sendSignInNotification({
-							to: { email: user.email, name: user.firstName },
+							to: { email: user.email, name: user.first_name },
 							ip: ctx.get("x-forwarded-for") ?? ctx.request.ip,
 						}),
 					),

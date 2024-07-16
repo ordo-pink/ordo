@@ -29,7 +29,7 @@ export default function RemoveFileModal({ data }: P) {
 	const commands = useCommands()
 
 	const handleRemoveFile = () => {
-		commands.emit<cmd.data.remove>("data.remove", data)
+		commands.emit<cmd.data.metadata.remove>("data.metadata.remove", data)
 		commands.emit<cmd.modal.hide>("modal.hide")
 	}
 

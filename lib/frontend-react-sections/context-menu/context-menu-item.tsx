@@ -30,12 +30,12 @@ type _P = { event: MouseEvent; item: Client.CtxMenu.Item; payload?: any }
 export default function MenuItem({ item, event, payload: p }: _P) {
 	const commands = useCommands()
 
-	const payload = item.payloadCreator ? item.payloadCreator({ payload: p, event }) : p
-	const isDisabled = item.shouldBeDisabled && item.shouldBeDisabled({ event, payload })
+	const payload = item.payload_creator ? item.payload_creator({ payload: p, event }) : p
+	const isDisabled = item.should_be_disabled && item.should_be_disabled({ event, payload })
 	const emitContextMenuItemCommand = () =>
 		Either.fromBoolean(() => !isDisabled)
 			.map(() => commands.emit(item.cmd, payload))
-			.map(() => commands.emit<cmd.ctxMenu.hide>("context-menu.hide"))
+			.map(() => commands.emit<cmd.ctx_menu.hide>("context-menu.hide"))
 
 	useAccelerator(item.accelerator, emitContextMenuItemCommand)
 
@@ -45,7 +45,7 @@ export default function MenuItem({ item, event, payload: p }: _P) {
 			Icon={item.Icon}
 			current={false}
 			onClick={emitContextMenuItemCommand}
-			text={item.readableName}
+			text={item.readable_name}
 			disabled={isDisabled}
 		>
 			<RenderFromNullable having={item.accelerator}>

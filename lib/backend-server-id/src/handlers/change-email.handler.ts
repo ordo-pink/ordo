@@ -112,7 +112,7 @@ const validateCtx0: ValidateCtxFn = userService => ctx =>
 type UpdateUserEmailFn = (us: UserService) => (ctx: TCtx) => Oath<TCtx, HttpError>
 const updateUserEmail0: UpdateUserEmailFn = userService => ctx =>
 	userService
-		.update(ctx.user.id, { email: ctx.newEmail, emailConfirmed: true, code: undefined })
+		.update(ctx.user.id, { email: ctx.newEmail, email_confirmed: true, email_code: undefined })
 		.pipe(bimap_oath(toUserNotFoundError, () => ctx))
 
 type SendNotificationFn = (ns: TNotificationService) => (ctx: TCtx) => Oath<TResult, HttpError>
@@ -121,7 +121,7 @@ const sendNotification0: SendNotificationFn = notificationService => ctx =>
 		.pipe(
 			tap_oath(() =>
 				notificationService.sendEmailChangedNotification({
-					to: { email: ctx.user.email, name: ctx.user.firstName }, // TODO: Drop accepting "to" in the service
+					to: { email: ctx.user.email, name: ctx.user.first_name }, // TODO: Drop accepting "to" in the service
 					newEmail: ctx.newEmail,
 					oldEmail: ctx.oldEmail,
 				}),

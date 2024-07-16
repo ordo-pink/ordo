@@ -19,23 +19,26 @@
 
 import { BehaviorSubject } from "rxjs"
 
-import { call_once, is_non_empty_string } from "@ordo-pink/tau"
+import { type TGetTitleFn, type TTitleState } from "@ordo-pink/core"
+import { call_once, is_non_empty_string, is_undefined } from "@ordo-pink/tau"
 import { KnownFunctions } from "@ordo-pink/frontend-known-functions"
 import { RRR } from "@ordo-pink/data"
 import { Result } from "@ordo-pink/result"
-import { type TGetTitleFn } from "@ordo-pink/core"
 import { type TLogger } from "@ordo-pink/logger"
 
 type TInitTitleStreamFn = (
 	logger: TLogger,
 	commands: Client.Commands.Commands,
 ) => { get_title: TGetTitleFn }
-export const __init_title$: TInitTitleStreamFn = call_once((logger, commands) => {
+export const init_title: TInitTitleStreamFn = call_once((logger, commands) => {
 	logger.debug("Initialising title stream...")
 
 	commands.on<cmd.application.set_title>(
 		"application.set_title",
-		title => is_non_empty_string(title) && title$.next(title),
+		state =>
+			is_non_empty_string(state.window_title) &&
+			(is_undefined(state.status_bar_title) || is_non_empty_string(state.status_bar_title)) &&
+			title$.next(state),
 	)
 
 	logger.debug("Initialised title.")
@@ -50,6 +53,8 @@ export const __init_title$: TInitTitleStreamFn = call_once((logger, commands) =>
 
 // --- Internal ---
 
-const title$ = new BehaviorSubject<string>("Ordo.pink")
+const title$ = new BehaviorSubject<TTitleState>({
+	window_title: "Loading...",
+})
 
 const eperm = RRR.codes.eperm("Init title")

@@ -4,6 +4,7 @@ import { O } from "@ordo-pink/option"
 import { Oath } from "@ordo-pink/oath"
 import { noop } from "@ordo-pink/tau"
 
+import { Metadata } from "./metadata.impl"
 import { type TMetadataManagerStatic } from "./metadata-manager.types"
 
 export const MetadataManager: TMetadataManagerStatic = {
@@ -20,6 +21,7 @@ export const MetadataManager: TMetadataManagerStatic = {
 								.pipe(Oath.ops.tap(() => on_state_change("get-remote")))
 								.pipe(Oath.ops.chain(r_repo.get))
 								.pipe(Oath.ops.tap(() => on_state_change("get-remote-complete")))
+								.pipe(Oath.ops.map(metadata => metadata.map(item => Metadata.of(item))))
 								.pipe(Oath.ops.map(metadata => l_repo.put(metadata)))
 								.pipe(Oath.ops.chain(res => res.cata({ Ok: Oath.Resolve, Err: Oath.Reject })))
 								.invoke(
@@ -37,6 +39,7 @@ export const MetadataManager: TMetadataManagerStatic = {
 							Some: token =>
 								void Oath.Resolve(l_repo.get())
 									.pipe(Oath.ops.chain(res => res.cata({ Ok: Oath.Resolve, Err: Oath.Reject })))
+									.pipe(Oath.ops.map(metadata => metadata.map(item => item.to_dto())))
 									.pipe(Oath.ops.tap(() => on_state_change("put-remote")))
 									.pipe(Oath.ops.chain(metadata => r_repo.put(token, metadata)))
 									.invoke(
@@ -48,6 +51,7 @@ export const MetadataManager: TMetadataManagerStatic = {
 							None: noop,
 						})
 					}),
-				),
+				)
+				.subscribe(),
 	}),
 }

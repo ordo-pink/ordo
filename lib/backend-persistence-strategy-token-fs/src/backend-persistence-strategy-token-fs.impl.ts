@@ -18,7 +18,7 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { type TokenPersistenceStrategy, type TokenRecord } from "@ordo-pink/backend-service-token"
-import { createParentIfNotExists0, fileExists0, readFile0, writeFile0 } from "@ordo-pink/fs"
+import { create_parent_if_not_exists0, file_exists0, read_file0, write_file0 } from "@ordo-pink/fs"
 import { Oath } from "@ordo-pink/oath"
 import { type UserID } from "@ordo-pink/data"
 
@@ -26,14 +26,14 @@ let storage = {} as Record<UserID, TokenRecord>
 
 export const TokenPersistenceStrategyFS = {
 	of: async (path: string): Promise<TokenPersistenceStrategy> => {
-		await fileExists0(path)
+		await file_exists0(path)
 			.chain(exists =>
 				exists
-					? readFile0(path, "utf-8")
+					? read_file0(path, "utf-8")
 							.map(text => JSON.parse(text as string))
 							.fix(() => ({}))
-					: createParentIfNotExists0(path).chain(() =>
-							writeFile0(path, "{}", "utf-8").map(() => ({})),
+					: create_parent_if_not_exists0(path).chain(() =>
+							write_file0(path, "{}", "utf-8").map(() => ({})),
 						),
 			)
 			.map(strg => {
@@ -51,25 +51,25 @@ export const TokenPersistenceStrategyFS = {
 				Oath.fromNullable(storage[sub])
 					.chain(record => Oath.fromNullable(record[jti]))
 					.map(() => delete storage[sub][jti])
-					.chain(() => writeFile0(path, JSON.stringify(storage), "utf-8"))
+					.chain(() => write_file0(path, JSON.stringify(storage), "utf-8"))
 					.fix(() => null)
 					.map(() => "OK"),
 			removeTokenRecord: sub =>
 				Oath.fromNullable(storage[sub])
 					.fix(() => null)
 					.map(() => delete storage[sub])
-					.chain(() => writeFile0(path, JSON.stringify(storage), "utf-8"))
+					.chain(() => write_file0(path, JSON.stringify(storage), "utf-8"))
 					.map(() => "OK"),
 			setToken: (sub, jti, token) =>
 				Oath.fromNullable(storage[sub])
 					.fix(() => void (storage[sub] = {}))
 					.map(() => void (storage[sub][jti] = token))
-					.chain(() => writeFile0(path, JSON.stringify(storage), "utf-8"))
+					.chain(() => write_file0(path, JSON.stringify(storage), "utf-8"))
 					.map(() => "OK"),
 			setTokenRecord: (sub, record) =>
 				Oath.empty()
 					.map(() => void (storage[sub] = record))
-					.chain(() => writeFile0(path, JSON.stringify(storage), "utf-8"))
+					.chain(() => write_file0(path, JSON.stringify(storage), "utf-8"))
 					.map(() => "OK"),
 		}
 	},

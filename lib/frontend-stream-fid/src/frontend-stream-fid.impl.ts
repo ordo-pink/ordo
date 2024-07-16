@@ -30,7 +30,7 @@ type TInitFIDFn = () => {
 	set_current_fid: TSetCurrentFIDFn
 	get_current_fid: TGetCurrentFIDFn
 }
-export const __init_fid: TInitFIDFn = call_once(() => {
+export const init_fid: TInitFIDFn = call_once(() => {
 	current_fid$.subscribe()
 
 	return {
@@ -48,7 +48,7 @@ export const __init_fid: TInitFIDFn = call_once(() => {
 
 // --- Internal ---
 
-const eperm = RRR.codes.eperm("Init FID")
+const eperm = RRR.codes.eperm("init_fid")
 
 const current_fid$ = new BehaviorSubject<TOption<symbol>>(O.None())
 

@@ -94,8 +94,8 @@ const modal$ = new BehaviorSubject<ModalState | null>(null)
 
 // Define command handlers
 const showModal: Client.Commands.Handler<Client.Modal.HandleShowPayload> = payload => {
-	const showCloseButton = payload.options?.showCloseButton ?? true
-	const onHide = payload.options?.onHide ?? (() => void 0)
+	const showCloseButton = payload.options?.show_close_button ?? true
+	const onHide = payload.options?.on_hide ?? (() => void 0)
 	const Component = payload.Component
 
 	modal$.next({ Component, showCloseButton, onHide })

@@ -43,32 +43,32 @@ export const registerOpenProjectCmd = ({ commands, data }: P) => {
 }
 
 const registerContextMenu = ({ commands, data }: P) => {
-	commands.emit<cmd.ctxMenu.add>("context-menu.add", {
+	commands.emit<cmd.ctx_menu.add>("context-menu.add", {
 		cmd: COMMAND_NAME,
 		Icon: BsUiChecks,
-		readableName: "Октрыть в задачах",
+		readable_name: "Октрыть в задачах",
 		type: "read",
-		shouldShow: ({ payload }) =>
+		should_show: ({ payload }) =>
 			Either.fromNullable(payload as PlainData | null)
 				.chain(Data.Validations.isValidDataE)
 				.chain(({ fsid }) => GTDRepository.getClosestProjectE(data.getData(), fsid))
 				.fold(F, T),
 		accelerator: "mod+i",
-		payloadCreator: ({ payload }) => (payload as PlainData)?.fsid,
+		payload_creator: ({ payload }) => (payload as PlainData)?.fsid,
 	})
 
 	return () => {
-		commands.emit<cmd.ctxMenu.remove>("context-menu.remove", COMMAND_NAME)
+		commands.emit<cmd.ctx_menu.remove>("context-menu.remove", COMMAND_NAME)
 	}
 }
 
 const registerCommandPalette = ({ commands, data }: P) => {
-	commands.emit<cmd.commandPalette.add>("command-palette.add", {
+	commands.emit<cmd.command_palette.add>("command-palette.add", {
 		id: COMMAND_NAME,
 		Icon: BsUiChecks,
-		readableName: "Открыть проект в задачах...",
+		readable_name: "Открыть проект в задачах...",
 		accelerator: "meta+i",
-		onSelect: () => {
+		on_select: () => {
 			const allData = data.getData()
 			const projects = GTDRepository.getProjects(allData)
 			const items = projects.map(project => ({
@@ -76,17 +76,17 @@ const registerCommandPalette = ({ commands, data }: P) => {
 				readableName: project.name,
 				Icon: BsUiChecks,
 				onSelect: () => {
-					commands.emit<cmd.commandPalette.hide>("command-palette.hide")
+					commands.emit<cmd.command_palette.hide>("command-palette.hide")
 					commands.emit<cmd.gtd.openProject>("gtd.open-project", project.fsid)
 				},
 			}))
 
-			commands.emit<cmd.commandPalette.show>("command-palette.show", { items, multiple: false })
+			commands.emit<cmd.command_palette.show>("command-palette.show", { items, multiple: false })
 		},
 	})
 
 	return () => {
-		commands.emit<cmd.commandPalette.remove>("command-palette.remove", COMMAND_NAME)
+		commands.emit<cmd.command_palette.remove>("command-palette.remove", COMMAND_NAME)
 	}
 }
 

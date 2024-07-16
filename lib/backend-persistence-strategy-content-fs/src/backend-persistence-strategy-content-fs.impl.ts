@@ -22,7 +22,7 @@ import { createReadStream, createWriteStream } from "fs"
 import { resolve } from "path"
 
 import { ContentPersistenceStrategy, Data, UnexpectedError } from "@ordo-pink/data"
-import { createParentIfNotExists0, removeFile0, stat0, writeFile0 } from "@ordo-pink/fs"
+import { create_parent_if_not_exists0, removeFile0, stat0, write_file0 } from "@ordo-pink/fs"
 import { Oath } from "@ordo-pink/oath"
 import { bimap_oath } from "@ordo-pink/oath/operators/bimap"
 import { chain_oath } from "@ordo-pink/oath/operators/chain"
@@ -80,7 +80,7 @@ const getPath = (root: string, uid: string, fsid: string): string =>
 	resolve(root, ...uid.split("-"), ...fsid.split("-"))
 
 const createParentDirIfNotExists0 = (path: string) =>
-	createParentIfNotExists0(path).pipe(bimap_oath(UnexpectedError, () => path))
+	create_parent_if_not_exists0(path).pipe(bimap_oath(UnexpectedError, () => path))
 
 const getFileSize0 = (path: string) =>
 	stat0(path).pipe(bimap_oath(UnexpectedError, stat => Number(stat.size)))
@@ -115,4 +115,4 @@ const writeFileContent0 = (content: Readable) => (path: string) =>
 		.pipe(bimap_oath(UnexpectedError, () => path))
 
 const createEmptyFileContent0 = (path: string) =>
-	writeFile0(path, "", "utf8").pipe(rejected_map_oath(UnexpectedError))
+	write_file0(path, "", "utf8").pipe(rejected_map_oath(UnexpectedError))

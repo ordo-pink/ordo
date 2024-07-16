@@ -23,7 +23,7 @@ import { get_user, _get_is_authenticated } from "@ordo-pink/frontend-stream-user
 import { KnownFunctions } from "@ordo-pink/frontend-known-functions"
 import { _get_commands } from "@ordo-pink/frontend-stream-commands"
 import { get_hosts_unsafe } from "@ordo-pink/frontend-react-hooks"
-import { _get_logger } from "@ordo-pink/frontend-logger"
+import { get_logger } from "@ordo-pink/frontend-logger"
 
 import { type RegisterFunction } from "./create-function.types"
 import { registerActivity } from "@ordo-pink/frontend-stream-activities"
@@ -32,7 +32,7 @@ export const createFunction: RegisterFunction = (name, permissions, callback) =>
 	const fid = KnownFunctions.register(name, permissions)
 
 	const getCommandsPatched = () => _get_commands(fid)
-	const getLoggerPatched = () => _get_logger(fid)
+	const getLoggerPatched = () => get_logger(fid)
 	const getUserPatched = () => get_user(fid)
 	const getIsAuthenticatedPatched = () => _get_is_authenticated(fid)
 	const getDataPatched = () => getData(fid)

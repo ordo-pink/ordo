@@ -1,3 +1,5 @@
+import type { Observable } from "rxjs"
+
 import type { TOption } from "@ordo-pink/option"
 import type { TResult } from "@ordo-pink/result"
 
@@ -13,6 +15,8 @@ export type TMetadataQueryStatic = {
 }
 
 export type TMetadataQuery = {
+	get version$(): Observable<number>
+
 	get: (options?: TMetadataQueryOptions) => TResult<TMetadata[], TRrr<"EAGAIN">>
 
 	get_by_fsid: (

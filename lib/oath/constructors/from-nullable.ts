@@ -3,9 +3,14 @@
 
 import { Oath } from "../src/impl"
 
-export const from_nullable_oath = <$TResolve, $TReject = null>(
+type TFromNullable0Fn = <$TResolve, $TReject = null>(
 	value?: $TResolve | null,
+	on_null?: () => $TReject,
+	abort_controller?: AbortController,
+) => Oath<NonNullable<$TResolve>, $TReject>
+export const from_nullable_oath: TFromNullable0Fn = (
+	value,
 	on_null = () => null as any,
 	abort_controller = new AbortController(),
-): Oath<NonNullable<$TResolve>, $TReject> =>
+) =>
 	value == null ? Oath.Reject(on_null(), abort_controller) : Oath.Resolve(value, abort_controller)

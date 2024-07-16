@@ -29,7 +29,7 @@ export default function FileCardComponent({ plain }: P) {
 	const commands = useCommands()
 
 	const showContextMenu = (event: MouseEvent<HTMLDivElement>) =>
-		commands.emit<cmd.ctxMenu.show>("context-menu.show", { event, payload: plain })
+		commands.emit<cmd.ctx_menu.show>("context-menu.show", { event, payload: plain })
 
 	return (
 		<div
@@ -45,7 +45,10 @@ export default function FileCardComponent({ plain }: P) {
 						className="flex items-center space-x-1 text-xs"
 						title={`Метки:\n\n- ${plain.labels.join("\n- ")}`}
 						onClick={() =>
-							commands.emit<cmd.data.showEditLabelsPalette>("data.show-edit-labels-palette", plain)
+							commands.emit<cmd.data.show_edit_labels_palette>(
+								"data.show-edit-labels-palette",
+								plain,
+							)
 						}
 					>
 						<BsTags />
@@ -58,7 +61,7 @@ export default function FileCardComponent({ plain }: P) {
 						className="flex items-center space-x-1 text-xs"
 						title={`Ссылки на файлы:\n\n- ${plain.links.join("\n- ")}`}
 						onClick={() =>
-							commands.emit<cmd.data.showEditLinksPalette>("data.show-edit-links-palette", plain)
+							commands.emit<cmd.data.show_edit_links_palette>("data.show-edit-links-palette", plain)
 						}
 					>
 						<BsLink45Deg />

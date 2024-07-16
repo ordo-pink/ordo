@@ -17,8 +17,7 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { KnownFunctions } from "@ordo-pink/frontend-known-functions"
-import { ORDO_PINK_APP_FUNCTION } from "@ordo-pink/core"
+import { KnownFunctions, ORDO_PINK_APP_FUNCTION } from "@ordo-pink/frontend-known-functions"
 
 export const APP_FID = KnownFunctions.register(ORDO_PINK_APP_FUNCTION, {
 	commands: [],

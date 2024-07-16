@@ -69,7 +69,10 @@ export default function GTDSubtasks({ fsid }: P) {
 							onKeyDown={e => {
 								if (e.key !== "Enter" || !newItem) return
 
-								commands.emit<cmd.data.create>("data.create", { name: newItem, parent: fsid })
+								commands.emit<cmd.data.create>("data.metadata.create", {
+									name: newItem,
+									parent: fsid,
+								})
 								setNewItem("")
 							}}
 							placeholder={tAddToInboxInputPlaceholder}

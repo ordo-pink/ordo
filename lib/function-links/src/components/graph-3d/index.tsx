@@ -60,7 +60,7 @@ export default function Graph3D({ nodes, links }: P) {
 			nodeLabel={node => (!node.data ? `#${node.id}` : node.data.name)}
 			onNodeRightClick={(node, event) =>
 				!!node.data &&
-				commands.emit<cmd.ctxMenu.show>("context-menu.show", {
+				commands.emit<cmd.ctx_menu.show>("context-menu.show", {
 					event: {
 						...event,
 						currentTarget: event.target as any,

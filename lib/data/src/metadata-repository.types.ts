@@ -1,9 +1,10 @@
 import type { BehaviorSubject, Observable } from "rxjs"
 
 import type { Oath } from "@ordo-pink/oath"
+import type { TFetch } from "@ordo-pink/core"
 import type { TResult } from "@ordo-pink/result"
 
-import type { TMetadata } from "./metadata.types"
+import type { TMetadata, TMetadataDTO } from "./metadata.types"
 import type { TRrr } from "./metadata.errors"
 
 export type TMetadataRepository = {
@@ -13,8 +14,8 @@ export type TMetadataRepository = {
 }
 
 export type TAsyncMetadataRepository = {
-	get: (token: string) => Oath<TMetadata[], TRrr<"EIO">>
-	put: (token: string, metadata: TMetadata[]) => Oath<void, TRrr<"EINVAL" | "EIO">>
+	get: (token: string) => Oath<TMetadataDTO[], TRrr<"EIO">>
+	put: (token: string, metadata: TMetadataDTO[]) => Oath<void, TRrr<"EINVAL" | "EIO">>
 }
 
 export type TMetadataRepositoryStatic = {
@@ -22,5 +23,5 @@ export type TMetadataRepositoryStatic = {
 }
 
 export type TRemoteMetadataRepositoryStatic = {
-	of: (data_host: string) => TAsyncMetadataRepository
+	of: (data_host: string, fetch: TFetch) => TAsyncMetadataRepository
 }

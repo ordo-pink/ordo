@@ -25,23 +25,58 @@ import {
 	type TFIDAwareActivity,
 	type TGetActivitiesFn,
 	type TGetCurrentActivityFn,
-	type TRegisterActivityFn,
 	type TSetCurrentActivityFn,
-	type TUnregisterActivityFn,
 } from "@ordo-pink/core"
 import { call_once, omit } from "@ordo-pink/tau"
 import { KnownFunctions } from "@ordo-pink/frontend-known-functions"
 import { R } from "@ordo-pink/result"
+import { type TLogger } from "@ordo-pink/logger"
 
-type TInitActivitiesFn = () => {
-	register_activity: TRegisterActivityFn
-	unregister_activity: TUnregisterActivityFn
+type TInitActivitiesFn = (params: { logger: TLogger; commands: Client.Commands.Commands }) => {
 	get_activities: TGetActivitiesFn
 	get_current_activity: TGetCurrentActivityFn
 	set_current_activity: TSetCurrentActivityFn
 }
-export const __init_activities: TInitActivitiesFn = call_once(() => {
-	aggregated_activities$.subscribe({ next: value => activities$.next(value) })
+export const init_activities: TInitActivitiesFn = call_once(({ logger, commands }) => {
+	logger.debug("Initialising activities...")
+
+	aggregated_activities$.subscribe(value => activities$.next(value))
+
+	commands.on<cmd.activities.register>("activities.register", ({ activity, fid }) =>
+		R.If(KnownFunctions.check_permissions(fid, { commands: ["activities.register"] }))
+			.pipe(R.ops.err_map(_log_invalid_fid(fid, "register_activity")))
+			.pipe(
+				R.ops.chain(fid =>
+					R.If(!activities$.getValue().some(a => a.name === activity.name), {
+						T: () => fid,
+						F: _log_already_exists(activity.name),
+					}),
+				),
+			)
+			.pipe(R.ops.map(fid => add$.next({ ...activity, fid: fid! }))),
+	)
+
+	commands.on<cmd.activities.unregister>("activities.unregister", ({ name, fid }) =>
+		R.FromNullable(fid)
+			.pipe(R.ops.err_map(_log_invalid_fid(fid, "unregister_activity")))
+			.pipe(
+				R.ops.chain(fid =>
+					R.FromNullable(
+						activities$.getValue().find(activity => activity.name === name),
+						_log_activity_not_found(name),
+					).pipe(
+						R.ops.chain(activity =>
+							R.If(activity.fid === fid || KnownFunctions.check_is_internal(fid), {
+								F: _log_different_fid(fid),
+							}),
+						),
+					),
+				),
+			)
+			.pipe(R.ops.map(() => remove$.next(name))),
+	)
+
+	logger.debug("Initialised activities.")
 
 	return {
 		current_activity$,
@@ -52,7 +87,7 @@ export const __init_activities: TInitActivitiesFn = call_once(() => {
 				.pipe(R.ops.map(() => activities$)),
 
 		get_current_activity: fid => () =>
-			R.If(KnownFunctions.check_permissions(fid, { queries: ["functions.current-activity"] }))
+			R.If(KnownFunctions.check_permissions(fid, { queries: ["application.current_activity"] }))
 				.pipe(R.ops.err_map(_log_invalid_fid(fid, "get_current_activity")))
 				.pipe(R.ops.map(() => current_activity$.asObservable())),
 
@@ -68,39 +103,6 @@ export const __init_activities: TInitActivitiesFn = call_once(() => {
 				)
 				.pipe(R.ops.map(omit("fid")))
 				.pipe(R.ops.map(activity => current_activity$.next(O.Some(activity)))),
-
-		register_activity: fid => new_activity =>
-			R.FromNullable(fid)
-
-				.pipe(R.ops.err_map(_log_invalid_fid(fid, "register_activity")))
-				.pipe(
-					R.ops.chain(fid =>
-						R.If(!activities$.getValue().some(activity => activity.name === new_activity.name), {
-							T: () => fid,
-							F: _log_already_exists(new_activity.name),
-						}),
-					),
-				)
-				.pipe(R.ops.map(fid => add$.next({ ...new_activity, fid }))),
-
-		unregister_activity: fid => name =>
-			R.FromNullable(fid)
-				.pipe(R.ops.err_map(_log_invalid_fid(fid, "unregister_activity")))
-				.pipe(
-					R.ops.chain(fid =>
-						R.FromNullable(
-							activities$.getValue().find(activity => activity.name === name),
-							_log_activity_not_found(name),
-						).pipe(
-							R.ops.chain(activity =>
-								R.If(activity.fid === fid || KnownFunctions.check_is_internal(fid), {
-									F: _log_different_fid(fid),
-								}),
-							),
-						),
-					),
-				)
-				.pipe(R.ops.map(() => remove$.next(name))),
 	}
 })
 

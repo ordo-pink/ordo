@@ -17,26 +17,24 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { DynamoDB } from "aws-sdk"
-import type { Unary } from "@ordo-pink/tau"
-import type { UserPersistenceStrategy } from "@ordo-pink/backend-service-user"
+import type { DynamoDB } from "aws-sdk"
 
-// --- Public ---
+import type { TUserPersistenceStrategy } from "@ordo-pink/backend-service-user"
 
-export type Params = { db: DynamoDB; table: string }
-export type Fn = (params: Params) => UserPersistenceStrategy
-export type Config = {
+export type TDynamoDBConfig = {
 	region: string
 	endpoint: string
-	accessKeyId: string
-	secretAccessKey: string
-	tableName: string
+	access_key: string
+	secret_key: string
+	table_name: string
 }
 
-// --- Internal ---
+export type TPersistenceStrategyDynamoDBStatic = {
+	of: (config: TDynamoDBConfig) => TUserPersistenceStrategy
+}
 
-export type _SerializeFn = Unary<NonNullable<DynamoDB.GetItemOutput["Item"]>, User.InternalUser>
-export type _ReduceUserToAttributeUpdatesFn = Unary<
-	Partial<User.InternalUser>,
-	NonNullable<DynamoDB.UpdateItemInput["AttributeUpdates"]>
->
+export type TDeserialiseFn = (
+	item: DynamoDB.GetItemOutput["Item"] | DynamoDB.AttributeMap,
+) => User.InternalUser
+
+export type TSerialiseFn = (user: User.InternalUser) => DynamoDB.PutItemInput["Item"]

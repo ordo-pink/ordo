@@ -37,7 +37,7 @@ export default function CreateFileModal({ parent }: P) {
 	const fileAssociations = useStrictSubscription(fileAssociations$, [])
 
 	const handleCreateFile = () => {
-		commands.emit<cmd.data.create>("data.create", {
+		commands.emit<cmd.data.create>("data.metadata.create", {
 			name,
 			parent: parent?.fsid ?? null,
 			contentType,
@@ -79,8 +79,8 @@ export default function CreateFileModal({ parent }: P) {
 							}}
 						>
 							{fileAssociations.map(fileAssociation => (
-								<option key={fileAssociation.name} value={fileAssociation.contentType}>
-									{fileAssociation.contentType}
+								<option key={fileAssociation.name} value={fileAssociation.content_type}>
+									{fileAssociation.content_type}
 								</option>
 							))}
 						</select>

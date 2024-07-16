@@ -31,7 +31,7 @@ export const usePersistedState = () => {
 
 	useEffect(() => {
 		fromNullableE(extensionFsid).pipe(
-			mapE(fsid => commands.emit<cmd.data.getContent>("data.get-content", fsid)),
+			mapE(fsid => commands.emit<cmd.data.get_content>("data.content.get_content", fsid)),
 		)
 	}, [extensionFsid, commands])
 

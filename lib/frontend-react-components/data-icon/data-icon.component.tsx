@@ -29,7 +29,7 @@ export default function DataIcon({ plain }: P) {
 	const children = useChildren(plain)
 	const fileAssociations = useStrictSubscription(fileAssociations$, [])
 	const Association = fileAssociations.find(
-		fileAssociation => fileAssociation.contentType === plain.contentType,
+		fileAssociation => fileAssociation.content_type === plain.contentType,
 	)!
 
 	return Switch.OfTrue()

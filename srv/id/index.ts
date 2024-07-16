@@ -26,7 +26,7 @@ import { PersistenceStrategyUserFS } from "@ordo-pink/backend-persistence-strate
 import { Switch } from "@ordo-pink/switch"
 import { TokenPersistenceStrategyDynamoDB } from "@ordo-pink/backend-persistence-strategy-token-dynamodb"
 import { TokenPersistenceStrategyFS } from "@ordo-pink/backend-persistence-strategy-token-fs"
-import { UserPersistenceStrategyDynamoDB } from "@ordo-pink/backend-persistence-strategy-user-dynamodb"
+import { PersistenceStrategyUserDynamoDB } from "@ordo-pink/backend-persistence-strategy-user-dynamodb"
 import { createIDServer } from "@ordo-pink/backend-server-id"
 
 const port = Bun.env.ORDO_ID_PORT!
@@ -74,7 +74,7 @@ const main = async () => {
 		.default(() => TokenPersistenceStrategyFS.of(Bun.env.ORDO_ID_TOKEN_FS_STRATEGY_PATH!))
 
 	const userRepository = Switch.of(userPersistenceStrategyType)
-		.case("dynamodb", () => UserPersistenceStrategyDynamoDB.of(userDynamoDBParams))
+		.case("dynamodb", () => PersistenceStrategyUserDynamoDB.of(userDynamoDBParams))
 		.default(() => PersistenceStrategyUserFS.of(Bun.env.ORDO_ID_USER_FS_STRATEGY_PATH!))
 
 	const emailStrategy = EmailStrategyRusender.create({ key: Bun.env.ORDO_ID_EMAIL_API_KEY! })

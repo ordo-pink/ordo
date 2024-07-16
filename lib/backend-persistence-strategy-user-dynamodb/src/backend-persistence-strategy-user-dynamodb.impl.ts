@@ -19,184 +19,191 @@
 
 import DynamoDB from "aws-sdk/clients/dynamodb"
 
-import {
-	type CreateMethod,
-	type ExistsByEmailMethod,
-	type ExistsByIdMethod,
-	type GetByEmailMethod,
-	type GetByIdMethod,
-	type UpdateMethod,
-} from "@ordo-pink/backend-service-user"
 import { Oath } from "@ordo-pink/oath"
-import { SUB } from "@ordo-pink/wjwt"
-import { keys_of } from "@ordo-pink/tau"
+import { RRR } from "@ordo-pink/data"
+import { type SUB } from "@ordo-pink/wjwt"
+import { noop } from "@ordo-pink/tau"
 
-import type * as T from "./backend-persistence-strategy-user-dynamodb.types"
+import type * as Types from "./backend-persistence-strategy-user-dynamodb.types"
+import { O } from "@ordo-pink/option"
 
-// --- Public ---
+let dynamo_db: DynamoDB
 
-const strategy: T.Fn = params => ({
-	create: create(params),
-	update: update(params),
-	getById: getById(params),
-	getByEmail: getByEmail(params),
-	existsById: existsById(params),
-	existsByEmail: existsByEmail(params),
-})
+export const PersistenceStrategyUserDynamoDB: Types.TPersistenceStrategyDynamoDBStatic = {
+	of: (params: Types.TDynamoDBConfig) => {
+		const {
+			access_key: accessKeyId,
+			secret_key: secretAccessKey,
+			region,
+			endpoint,
+			table_name: tableName,
+		} = params
+		const TableName = tableName
+		const credentials = { accessKeyId, secretAccessKey }
 
-export const UserPersistenceStrategyDynamoDB = {
-	of: ({ accessKeyId, secretAccessKey, region, endpoint, tableName }: T.Config) => {
-		const db = new DynamoDB({ credentials: { accessKeyId, secretAccessKey }, region, endpoint })
+		if (!dynamo_db) dynamo_db = new DynamoDB({ region, endpoint, credentials })
 
-		return strategy({ db, table: tableName })
+		return {
+			create: user =>
+				Oath.Merge([
+					_check_exists_by_email0(params, user.email),
+					_check_exists_by_id0(params, user.id),
+					_check_exists_by_handle0(params, user.handle),
+				])
+					.pipe(Oath.ops.map(() => _serialise(user)))
+					.pipe(
+						Oath.ops.chain(Item =>
+							Oath.Try(() => dynamo_db.putItem({ TableName, Item }))
+								.pipe(Oath.ops.chain(req => Oath.FromPromise(() => req.promise())))
+								.pipe(Oath.ops.rejected_map(e => eio(`create -> error: ${e.message}`))),
+						),
+					)
+					.pipe(Oath.ops.map(noop)),
+
+			update: (id, user) =>
+				PersistenceStrategyUserDynamoDB.of(params)
+					.get_by_id(id)
+					.pipe(
+						Oath.ops.chain(option =>
+							option.cata({
+								Some: Oath.Resolve,
+								None: () => Oath.Reject(enoent(`update -> id: ${id}`)),
+							}),
+						),
+					)
+					.pipe(Oath.ops.map(() => ({ Key: { id: { S: id } }, Item: _serialise(user) })))
+					.pipe(
+						Oath.ops.chain(params =>
+							Oath.Try(() => dynamo_db.putItem({ TableName, ...params }))
+								.pipe(Oath.ops.chain(req => Oath.FromPromise(() => req.promise())))
+								.pipe(Oath.ops.rejected_map(e => eio(`update -> error: ${e.message}`))),
+						),
+					)
+					.pipe(Oath.ops.map(noop)),
+
+			get_by_id: id =>
+				Oath.Resolve({ id: { S: id } })
+					.pipe(
+						Oath.ops.chain(Key =>
+							Oath.Try(() => dynamo_db.getItem({ TableName, Key }))
+								.pipe(Oath.ops.chain(req => Oath.FromPromise(() => req.promise())))
+								.pipe(Oath.ops.rejected_map(e => eio(`get_by_id -> error: ${e.message}`))),
+						),
+					)
+					.pipe(Oath.ops.map(({ Item }) => O.FromNullable(Item).pipe(O.ops.map(_deserialize)))),
+
+			get_by_email: email =>
+				Oath.Resolve({
+					FilterExpression: "email = :e",
+					ExpressionAttributeValues: { ":e": { S: email } },
+				})
+					.pipe(
+						Oath.ops.chain(params =>
+							Oath.Try(() => dynamo_db.scan({ TableName, ...params }))
+								.pipe(Oath.ops.chain(req => Oath.FromPromise(() => req.promise())))
+								.pipe(Oath.ops.rejected_map(e => eio(`get_by_email -> error: ${e.message}`))),
+						),
+					)
+					.pipe(Oath.ops.map(out => O.FromNullable(out.Items?.[0]).pipe(O.ops.map(_deserialize)))),
+
+			get_by_handle: handle =>
+				Oath.Resolve({
+					FilterExpression: "handle = :e",
+					ExpressionAttributeValues: { ":e": { S: handle } },
+				})
+					.pipe(
+						Oath.ops.chain(params =>
+							Oath.Try(() => dynamo_db.scan({ TableName, ...params }))
+								.pipe(Oath.ops.chain(req => Oath.FromPromise(() => req.promise())))
+								.pipe(Oath.ops.rejected_map(e => eio(`get_by_handle -> error: ${e.message}`))),
+						),
+					)
+					.pipe(Oath.ops.map(out => O.FromNullable(out.Items?.[0]).pipe(O.ops.map(_deserialize)))),
+
+			exists_by_id: id =>
+				PersistenceStrategyUserDynamoDB.of(params)
+					.get_by_id(id)
+					.pipe(Oath.ops.map(() => true))
+					.fix(() => false),
+
+			exists_by_email: email =>
+				PersistenceStrategyUserDynamoDB.of(params)
+					.get_by_email(email)
+					.pipe(Oath.ops.map(() => true))
+					.fix(() => false),
+
+			exists_by_handle: handle =>
+				PersistenceStrategyUserDynamoDB.of(params)
+					.get_by_handle(handle)
+					.pipe(Oath.ops.map(() => true))
+					.fix(() => false),
+		}
 	},
 }
 
 // --- Internal ---
 
-const existsById: ExistsByIdMethod<T.Params> = params => id =>
-	strategy(params)
-		.getById(id)
-		.map(() => true)
-		.fix(() => false)
+const LOCATION = "PersistenceStrategyUserDynamoDB"
+const eio = RRR.codes.eio(LOCATION)
+const eexist = RRR.codes.eexist(LOCATION)
+const enoent = RRR.codes.enoent(LOCATION)
 
-const existsByEmail: ExistsByEmailMethod<T.Params> = params => email =>
-	strategy(params)
-		.getByEmail(email)
-		.map(() => true)
-		.fix(() => false)
-
-const create: CreateMethod<T.Params> =
-	({ db, table }) =>
-	user =>
-		Oath.try(() => {
-			return db
-				.putItem({
-					TableName: table,
-					Item: {
-						email: { S: user.email },
-						id: { S: user.id },
-						emailConfirmed: { N: user.emailConfirmed ? "1" : "0" },
-						handle: { S: user.handle ?? "" },
-						password: { S: user.password },
-						firstName: { S: user.firstName ?? "" },
-						lastName: { S: user.lastName ?? "" },
-						createdAt: { S: user.createdAt.toISOString() },
-						subscription: { S: user.subscription },
-						fileLimit: { N: String(user.fileLimit) ?? "1000" },
-						maxUploadSize: { N: String(user.maxUploadSize) ?? "1.5" },
-						code: { S: user.code ?? "" },
-					},
-				})
-				.promise()
-		}).map(() => user)
-
-const update: UpdateMethod<T.Params> =
-	({ db, table }) =>
-	(id, user) =>
-		strategy({ db, table })
-			.getById(id)
-			.chain(oldUser =>
-				Oath.of({
-					...oldUser,
-					firstName: user.firstName ?? oldUser.firstName,
-					email: user.email ?? oldUser.email,
-					emailConfirmed:
-						user.emailConfirmed != null ? user.emailConfirmed : oldUser.emailConfirmed,
-					lastName: user.lastName ?? oldUser.lastName,
-					handle: user.handle ?? oldUser.handle,
-					password: user.password ?? oldUser.password,
-					code: user.code ?? oldUser.code,
-				})
-					.chain(user => Oath.of(reduceUserToAttributeUpdates(user)))
-					.chain(AttributeUpdates =>
-						Oath.from(() =>
-							db
-								.updateItem({ TableName: table, Key: { id: { S: id } }, AttributeUpdates })
-								.promise(),
-						),
-					)
-					.map(() => ({ ...oldUser, ...user })),
+const _check_exists_by_handle0 =
+	(params: Types.TDynamoDBConfig, handle: User.User["handle"]) => () =>
+		PersistenceStrategyUserDynamoDB.of(params)
+			.exists_by_handle(handle)
+			.pipe(
+				Oath.ops.chain(exists =>
+					Oath.If(!exists, { F: () => eexist(`create -> handle: ${handle}`) }),
+				),
 			)
 
-const getById: GetByIdMethod<T.Params> =
-	({ db, table }) =>
-	id =>
-		Oath.try(() => db.getItem({ TableName: table, Key: { id: { S: id } } }).promise())
-			.chain(({ Item }) => Oath.fromNullable(Item).rejectedMap(() => new Error("User not found")))
-			.map(serialize)
+const _check_exists_by_id0 = (params: Types.TDynamoDBConfig, id: User.User["id"]) => () =>
+	PersistenceStrategyUserDynamoDB.of(params)
+		.exists_by_id(id)
+		.pipe(Oath.ops.chain(exists => Oath.If(!exists)))
 
-const getByEmail: GetByEmailMethod<T.Params> =
-	({ db, table }) =>
-	email =>
-		Oath.try(() =>
-			db
-				.scan({
-					TableName: table,
-					FilterExpression: "email = :e",
-					ExpressionAttributeValues: { ":e": { S: email } },
-				})
-				.promise(),
+const _check_exists_by_email0 = (params: Types.TDynamoDBConfig, email: User.User["email"]) =>
+	PersistenceStrategyUserDynamoDB.of(params)
+		.exists_by_email(email)
+		.pipe(
+			Oath.ops.chain(exists => Oath.If(!exists, { F: () => eexist(`create -> email: ${email}`) })),
 		)
-			.chain(output => Oath.fromNullable(output.Items))
-			.chain(items => Oath.fromNullable(items[0]))
-			.map(serialize)
 
-const serialize: T._SerializeFn = item => ({
+const _serialise: Types.TSerialiseFn = user => ({
+	email: { S: user.email },
+	id: { S: user.id },
+	emailConfirmed: { N: user.email_confirmed ? "1" : "0" },
+	handle: { S: user.handle ?? "" },
+	password: { S: user.password },
+	firstName: { S: user.first_name ?? "" },
+	lastName: { S: user.last_name ?? "" },
+	createdAt: { S: user.created_at.toISOString() },
+	subscription: { S: user.subscription },
+	fileLimit: { N: String(user.file_limit) ?? "1000" },
+	maxUploadSize: { N: String(user.max_upload_size) ?? "1.5" },
+	code: { S: user.email_code ?? "" },
+})
+
+const _deserialize: Types.TDeserialiseFn = item => ({
 	email: item.email.S!,
 	// eslint-disable-next-line @typescript-eslint/no-non-null-asserted-optional-chain
-	emailConfirmed: item.emailConfirmed?.N! === "1",
+	email_confirmed: item.emailConfirmed?.N! === "1",
 	// eslint-disable-next-line @typescript-eslint/no-non-null-asserted-optional-chain
-	firstName: item.firstName?.S!,
-	createdAt: new Date(item.createdAt.S!),
+	first_name: item.firstName?.S!,
+	created_at: new Date(item.createdAt.S!),
 	// eslint-disable-next-line @typescript-eslint/no-non-null-asserted-optional-chain
-	lastName: item.lastName?.S!,
+	last_name: item.lastName?.S!,
 	password: item.password.S!,
 	// eslint-disable-next-line @typescript-eslint/no-non-null-asserted-optional-chain
 	handle: item.handle?.S!,
 	// eslint-disable-next-line @typescript-eslint/no-non-null-asserted-optional-chain
 	subscription: item.subscription?.S!,
 	// eslint-disable-next-line @typescript-eslint/no-non-null-asserted-optional-chain
-	fileLimit: Number(item.fileLimit?.N!),
+	file_limit: Number(item.fileLimit?.N!),
 	// eslint-disable-next-line @typescript-eslint/no-non-null-asserted-optional-chain
-	maxUploadSize: Number(item.maxUploadSize?.N!),
+	max_upload_size: Number(item.maxUploadSize?.N!),
 	// eslint-disable-next-line @typescript-eslint/no-non-null-asserted-optional-chain
-	code: item.code?.S!,
+	email_code: item.code?.S!,
 	id: item.id.S! as SUB,
 })
-
-const reduceUserToAttributeUpdates: T._ReduceUserToAttributeUpdatesFn = user =>
-	keys_of(user).reduce((AttributeUpdates, key) => {
-		if (key === "id" || key === "createdAt") return AttributeUpdates
-
-		if (
-			key === "email" ||
-			key === "firstName" ||
-			key === "lastName" ||
-			key === "password" ||
-			key === "handle" ||
-			key === "code" ||
-			key === "subscription"
-		) {
-			AttributeUpdates[key] = {
-				Action: "PUT",
-				Value: { S: user[key] },
-			}
-		}
-
-		if (key === "fileLimit" || key === "maxUploadSize") {
-			AttributeUpdates[key] = {
-				Action: "PUT",
-				Value: { N: String(user[key]) },
-			}
-		}
-
-		if (key === "emailConfirmed") {
-			AttributeUpdates[key] = {
-				Action: "PUT",
-				Value: { N: user[key] ? "1" : "0" },
-			}
-		}
-
-		return AttributeUpdates
-	}, {} as ReturnType<T._ReduceUserToAttributeUpdatesFn>)

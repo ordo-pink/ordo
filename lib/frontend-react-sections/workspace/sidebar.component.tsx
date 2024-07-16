@@ -47,15 +47,16 @@ export default function Sidebar({ children, isNarrow }: P) {
 
 	const onSidebarClick = () => {
 		if (!isNarrow || sidebar.disabled || sidebar.sizes[0] === 0) return
-		commands.emit<cmd.sidebar.setSize>("sidebar.set-size", [0, 100])
+		commands.emit<cmd.sidebar.set_size>("sidebar.set-size", [0, 100])
 	}
 
 	const openCommandPalette = (event: MouseEvent<HTMLDivElement>) => {
 		event.stopPropagation()
-		commandPalette && commands.emit<cmd.commandPalette.show>("command-palette.show", commandPalette)
+		commandPalette &&
+			commands.emit<cmd.command_palette.show>("command-palette.show", commandPalette)
 	}
 	const showContextMenu = (event: MouseEvent<HTMLDivElement>) =>
-		commands.emit<cmd.ctxMenu.show>("context-menu.show", { event })
+		commands.emit<cmd.ctx_menu.show>("context-menu.show", { event })
 
 	return (
 		<div

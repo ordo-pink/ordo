@@ -54,42 +54,42 @@ const registerCommand = ({ commands }: P) => {
 }
 
 const registerContextMenu = ({ commands }: P) => {
-	commands.emit<cmd.ctxMenu.add>("context-menu.add", {
+	commands.emit<cmd.ctx_menu.add>("context-menu.add", {
 		cmd: COMMAND_NAME,
 		Icon: BsLayoutTextSidebarReverse,
-		readableName: "Открыть в редакторе",
+		readable_name: "Открыть в редакторе",
 		type: "read",
 		accelerator: "mod+e",
-		shouldShow: ({ payload }) =>
+		should_show: ({ payload }) =>
 			!!payload && payload !== "root" && !window.location.pathname.startsWith("/editor"),
-		payloadCreator: ({ payload }) => (payload as PlainData).fsid,
+		payload_creator: ({ payload }) => (payload as PlainData).fsid,
 	})
 
 	return () => {
-		commands.emit<cmd.ctxMenu.remove>("context-menu.remove", COMMAND_NAME)
+		commands.emit<cmd.ctx_menu.remove>("context-menu.remove", COMMAND_NAME)
 	}
 }
 
 const registerCommandPalette = ({ commands, data }: P) => {
-	commands.emit<cmd.commandPalette.add>("command-palette.add", {
+	commands.emit<cmd.command_palette.add>("command-palette.add", {
 		id: COMMAND_NAME,
 		accelerator: "mod+meta+e",
-		readableName: "Открыть в редакторе...",
+		readable_name: "Открыть в редакторе...",
 		Icon: BsLayoutTextSidebarReverse,
-		onSelect: () => {
+		on_select: () => {
 			const files = data.getData()
 
 			if (!files) return
 
-			commands.emit<cmd.commandPalette.show>("command-palette.show", {
+			commands.emit<cmd.command_palette.show>("command-palette.show", {
 				items: files.map(
 					file =>
 						({
 							Icon: () => <DataIcon plain={file} />,
 							id: file.fsid,
-							readableName: file.name,
-							onSelect: () => {
-								commands.emit<cmd.commandPalette.hide>("command-palette.hide")
+							readable_name: file.name,
+							on_select: () => {
+								commands.emit<cmd.command_palette.hide>("command-palette.hide")
 								commands.emit<cmd.editor.open>("editor.open", file.fsid)
 							},
 						}) satisfies Client.CommandPalette.Item,
@@ -99,6 +99,6 @@ const registerCommandPalette = ({ commands, data }: P) => {
 	})
 
 	return () => {
-		commands.emit<cmd.commandPalette.remove>("command-palette.remove", COMMAND_NAME)
+		commands.emit<cmd.command_palette.remove>("command-palette.remove", COMMAND_NAME)
 	}
 }

@@ -32,7 +32,7 @@ export const UsedSpaceModel = {
 			.map(extend(({ data }) => ({ data: filterOutInternalFiles(data) })))
 			.fold(
 				() => UsedSpaceModel.empty(),
-				({ data, user }) => [data.length, user.fileLimit] as const,
+				({ data, user }) => [data.length, user.file_limit] as const,
 			),
 }
 

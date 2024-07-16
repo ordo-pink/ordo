@@ -51,7 +51,9 @@ export const useUserEmail = () => {
 
 export const useUserCreationDate = () => {
 	const fid = useCurrentFID()
-	const { createdAt } = useStrictSubscription(user$, { createdAt: null } as unknown as User.User)
+	const { created_at: createdAt } = useStrictSubscription(user$, {
+		createdAt: null,
+	} as unknown as User.User)
 
 	return fromBooleanE(checkPermission(fid, ["user.createdAt"])).fold(N, () => createdAt)
 }
@@ -73,12 +75,12 @@ export const useUserName = () => {
 	} as unknown as User.User)
 
 	return fromBooleanE(checkPermission(fid, ["user.name"])).fold(N, () => ({
-		firstName: user.firstName ?? "",
-		lastName: user.lastName ?? "",
+		firstName: user.first_name ?? "",
+		lastName: user.last_name ?? "",
 		fullName: Switch.of(user)
-			.case(hasFirstNameAndLastName, user => `${user.firstName} ${user.lastName}`)
-			.case(hasFirstName, user => user.firstName!)
-			.case(hasLastName, user => user.lastName!)
+			.case(hasFirstNameAndLastName, user => `${user.first_name} ${user.last_name}`)
+			.case(hasFirstName, user => user.first_name!)
+			.case(hasLastName, user => user.last_name!)
 			.default(() => ""),
 	}))
 }
@@ -95,8 +97,8 @@ export const useUserAchievements = () => {
 
 // --- Internal ---
 
-const hasFirstName = (user: User.User) => !!user.firstName
-const hasLastName = (user: User.User) => !!user.lastName
+const hasFirstName = (user: User.User) => !!user.first_name
+const hasLastName = (user: User.User) => !!user.last_name
 const hasFirstNameAndLastName = (user: User.User) => hasFirstName(user) && hasLastName(user)
 const checkPermission = (fid: symbol | null, queries: TQueryPermission[]) =>
 	KnownFunctions.check_permissions(fid, { queries })

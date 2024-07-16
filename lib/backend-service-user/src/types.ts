@@ -17,22 +17,18 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Method } from "@ordo-pink/tau"
 import { Oath } from "@ordo-pink/oath"
+import { TOption } from "@ordo-pink/option"
+import { TRrr } from "@ordo-pink/data"
 
-export type UserPersistenceStrategy = {
-	existsById: (id: string) => Oath<boolean, Error>
-	existsByEmail: (email: string) => Oath<boolean, Error>
-	create(user: User.InternalUser): Oath<User.InternalUser, Error>
-	getById(id: string): Oath<User.InternalUser, Error | null>
-	getByEmail(email: string): Oath<User.InternalUser, Error | null>
-	update(id: string, user: Partial<User.InternalUser>): Oath<User.InternalUser, Error | null>
+export type TUserPersistenceStrategy = {
+	exists_by_id: (id: User.User["id"]) => Oath<boolean, TRrr<"EIO">>
+	exists_by_email: (email: string) => Oath<boolean, TRrr<"EIO">>
+	exists_by_handle: (handle: string) => Oath<boolean, TRrr<"EIO">>
+	create: (user: User.InternalUser) => Oath<void, TRrr<"EIO" | "EEXIST">>
+	get_by_id: (id: User.User["id"]) => Oath<TOption<User.InternalUser>, TRrr<"EIO">>
+	get_by_email: (email: string) => Oath<TOption<User.InternalUser>, TRrr<"EIO">>
+	get_by_handle: (handle: string) => Oath<TOption<User.InternalUser>, TRrr<"EIO">>
+	update: (id: User.User["id"], user: User.InternalUser) => Oath<void, TRrr<"EIO" | "ENOENT">>
 	// remove: (id: string) => Promise<InternalUser | null>
 }
-
-export type CreateMethod<P> = Method<P, UserPersistenceStrategy, "create">
-export type GetByEmailMethod<P> = Method<P, UserPersistenceStrategy, "getByEmail">
-export type GetByIdMethod<P> = Method<P, UserPersistenceStrategy, "getById">
-export type ExistsByEmailMethod<P> = Method<P, UserPersistenceStrategy, "existsByEmail">
-export type ExistsByIdMethod<P> = Method<P, UserPersistenceStrategy, "existsById">
-export type UpdateMethod<P> = Method<P, UserPersistenceStrategy, "update">

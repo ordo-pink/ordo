@@ -106,8 +106,8 @@ const linkFuse = new Fuse([] as PlainData[], {
 
 export default function OrdoEditor({
 	content,
-	isEditable,
-	isLoading,
+	is_editable: isEditable,
+	is_loading: isLoading,
 	data,
 }: Functions.FileAssociationComponentProps) {
 	const ref = useRef<HTMLDivElement>(null)
@@ -152,7 +152,7 @@ export default function OrdoEditor({
 	const links = useSelectDataList(item => item.fsid !== data.fsid)
 
 	useEffect(() => {
-		commands.emit<cmd.ctxMenu.add>("context-menu.add", {
+		commands.emit<cmd.ctx_menu.add>("context-menu.add", {
 			cmd: "editor.add-heading-1",
 			Icon: BsTypeH1,
 			readableName: "Заголовок 1",
@@ -161,7 +161,7 @@ export default function OrdoEditor({
 			type: "update",
 		})
 
-		commands.emit<cmd.ctxMenu.add>("context-menu.add", {
+		commands.emit<cmd.ctx_menu.add>("context-menu.add", {
 			cmd: "editor.add-heading-2",
 			Icon: BsTypeH2,
 			readableName: "Заголовок 2",
@@ -170,7 +170,7 @@ export default function OrdoEditor({
 			type: "update",
 		})
 
-		commands.emit<cmd.ctxMenu.add>("context-menu.add", {
+		commands.emit<cmd.ctx_menu.add>("context-menu.add", {
 			cmd: "editor.add-heading-3",
 			Icon: BsTypeH3,
 			readableName: "Заголовок 3",
@@ -179,7 +179,7 @@ export default function OrdoEditor({
 			type: "update",
 		})
 
-		commands.emit<cmd.ctxMenu.add>("context-menu.add", {
+		commands.emit<cmd.ctx_menu.add>("context-menu.add", {
 			cmd: "editor.add-heading-4",
 			Icon: BsTypeH4,
 			readableName: "Заголовок 4BsTypeH4",
@@ -188,7 +188,7 @@ export default function OrdoEditor({
 			type: "update",
 		})
 
-		commands.emit<cmd.ctxMenu.add>("context-menu.add", {
+		commands.emit<cmd.ctx_menu.add>("context-menu.add", {
 			cmd: "editor.add-heading-5",
 			Icon: BsTypeH5,
 			readableName: "Заголовок 5",
@@ -197,7 +197,7 @@ export default function OrdoEditor({
 			type: "update",
 		})
 
-		commands.emit<cmd.ctxMenu.add>("context-menu.add", {
+		commands.emit<cmd.ctx_menu.add>("context-menu.add", {
 			cmd: "editor.add-list-item",
 			Icon: BsListUl,
 			readableName: "Создать список",
@@ -206,7 +206,7 @@ export default function OrdoEditor({
 			type: "update",
 		})
 
-		commands.emit<cmd.ctxMenu.add>("context-menu.add", {
+		commands.emit<cmd.ctx_menu.add>("context-menu.add", {
 			cmd: "editor.add-number-list-item",
 			Icon: BsListOl,
 			readableName: "Создать упорядоченный список",
@@ -215,7 +215,7 @@ export default function OrdoEditor({
 			type: "update",
 		})
 
-		commands.emit<cmd.ctxMenu.add>("context-menu.add", {
+		commands.emit<cmd.ctx_menu.add>("context-menu.add", {
 			cmd: "editor.add-check-list-item",
 			Icon: BsListCheck,
 			readableName: "Создать чекбокс",
@@ -224,7 +224,7 @@ export default function OrdoEditor({
 			type: "update",
 		})
 
-		commands.emit<cmd.ctxMenu.add>("context-menu.add", {
+		commands.emit<cmd.ctx_menu.add>("context-menu.add", {
 			cmd: "editor.add-blockquote",
 			Icon: BsBlockquoteLeft,
 			readableName: "Создать цитату",
@@ -233,7 +233,7 @@ export default function OrdoEditor({
 			type: "update",
 		})
 
-		commands.emit<cmd.ctxMenu.add>("context-menu.add", {
+		commands.emit<cmd.ctx_menu.add>("context-menu.add", {
 			cmd: "editor.add-paragraph",
 			Icon: BsTextParagraph,
 			readableName: "Создать параграф",
@@ -242,7 +242,7 @@ export default function OrdoEditor({
 			type: "update",
 		})
 
-		commands.emit<cmd.ctxMenu.add>("context-menu.add", {
+		commands.emit<cmd.ctx_menu.add>("context-menu.add", {
 			cmd: "editor.add-callout",
 			Icon: BsBox2,
 			readableName: "Создать выноску",
@@ -251,7 +251,7 @@ export default function OrdoEditor({
 			type: "create",
 		})
 
-		commands.emit<cmd.ctxMenu.add>("context-menu.add", {
+		commands.emit<cmd.ctx_menu.add>("context-menu.add", {
 			cmd: "editor.add-toc",
 			Icon: BsListNested,
 			readableName: "Содержание страницы",
@@ -260,7 +260,7 @@ export default function OrdoEditor({
 			type: "create",
 		})
 
-		commands.emit<cmd.ctxMenu.add>("context-menu.add", {
+		commands.emit<cmd.ctx_menu.add>("context-menu.add", {
 			cmd: "editor.add-file-embed",
 			Icon: BsFileEarmarkPlus,
 			readableName: "Встроить файл...",
@@ -270,18 +270,18 @@ export default function OrdoEditor({
 		})
 
 		return () => {
-			commands.emit<cmd.ctxMenu.remove>("context-menu.remove", "editor.add-heading-1")
-			commands.emit<cmd.ctxMenu.remove>("context-menu.remove", "editor.add-heading-2")
-			commands.emit<cmd.ctxMenu.remove>("context-menu.remove", "editor.add-heading-3")
-			commands.emit<cmd.ctxMenu.remove>("context-menu.remove", "editor.add-heading-4")
-			commands.emit<cmd.ctxMenu.remove>("context-menu.remove", "editor.add-heading-5")
-			commands.emit<cmd.ctxMenu.remove>("context-menu.remove", "editor.add-list-item")
-			commands.emit<cmd.ctxMenu.remove>("context-menu.remove", "editor.add-number-list-item")
-			commands.emit<cmd.ctxMenu.remove>("context-menu.remove", "editor.add-check-list-item")
-			commands.emit<cmd.ctxMenu.remove>("context-menu.remove", "editor.add-blockquote")
-			commands.emit<cmd.ctxMenu.remove>("context-menu.remove", "editor.add-paragraph")
-			commands.emit<cmd.ctxMenu.remove>("context-menu.remove", "editor.add-callout")
-			commands.emit<cmd.ctxMenu.remove>("context-menu.remove", "editor.add-toc")
+			commands.emit<cmd.ctx_menu.remove>("context-menu.remove", "editor.add-heading-1")
+			commands.emit<cmd.ctx_menu.remove>("context-menu.remove", "editor.add-heading-2")
+			commands.emit<cmd.ctx_menu.remove>("context-menu.remove", "editor.add-heading-3")
+			commands.emit<cmd.ctx_menu.remove>("context-menu.remove", "editor.add-heading-4")
+			commands.emit<cmd.ctx_menu.remove>("context-menu.remove", "editor.add-heading-5")
+			commands.emit<cmd.ctx_menu.remove>("context-menu.remove", "editor.add-list-item")
+			commands.emit<cmd.ctx_menu.remove>("context-menu.remove", "editor.add-number-list-item")
+			commands.emit<cmd.ctx_menu.remove>("context-menu.remove", "editor.add-check-list-item")
+			commands.emit<cmd.ctx_menu.remove>("context-menu.remove", "editor.add-blockquote")
+			commands.emit<cmd.ctx_menu.remove>("context-menu.remove", "editor.add-paragraph")
+			commands.emit<cmd.ctx_menu.remove>("context-menu.remove", "editor.add-callout")
+			commands.emit<cmd.ctx_menu.remove>("context-menu.remove", "editor.add-toc")
 		}
 	}, [commands])
 
@@ -405,7 +405,10 @@ export default function OrdoEditor({
 		// TODO: Register once
 
 		const subscription = debounceSave$.subscribe(({ fsid, value }) => {
-			commands.emit<cmd.data.setContent>("data.set-content", { fsid, content: serialize(value) })
+			commands.emit<cmd.data.set_content>("data.content.set_content", {
+				fsid,
+				content: serialize(value),
+			})
 		})
 
 		return () => {
@@ -429,16 +432,16 @@ export default function OrdoEditor({
 
 	useEffect(() => {
 		const handleAddFileEmbed = () => {
-			commands.emit<cmd.commandPalette.show>("command-palette.show", {
+			commands.emit<cmd.command_palette.show>("command-palette.show", {
 				multiple: false,
 				items: allData.map(item => ({
 					id: item.fsid,
 					readableName: item.name,
 					Icon:
-						fileAssociations.find(assoc => assoc.contentType === item.contentType)?.Icon ||
+						fileAssociations.find(assoc => assoc.content_type === item.contentType)?.Icon ||
 						BsFileEarmark,
 					onSelect: () => {
-						commands.emit<cmd.commandPalette.hide>("command-palette.hide")
+						commands.emit<cmd.command_palette.hide>("command-palette.hide")
 
 						if (!editor.selection) return
 
@@ -460,7 +463,7 @@ export default function OrdoEditor({
 							fsid: item.fsid,
 						}
 
-						commands.emit<cmd.data.addLink>("data.add-link", {
+						commands.emit<cmd.data.add_links>("data.add_links", {
 							item: data,
 							link: item.fsid,
 						})
@@ -575,7 +578,7 @@ export default function OrdoEditor({
 												insertLink(editor, link.fsid)
 												setTarget(null)
 
-												commands.emit<cmd.data.addLink>("data.add-link", {
+												commands.emit<cmd.data.add_links>("data.add_links", {
 													item: data,
 													link: link.fsid,
 												})
@@ -594,7 +597,10 @@ export default function OrdoEditor({
 												insertLabel(editor, label)
 												setTarget(null)
 
-												commands.emit<cmd.data.addLabel>("data.add-label", { item: data, label })
+												commands.emit<cmd.data.add_labels>("data.metadata.add_label", {
+													item: data,
+													label,
+												})
 											}}
 											text={label}
 											Icon={BsTag}
@@ -608,7 +614,7 @@ export default function OrdoEditor({
 											insertLabel(editor, labelSearch)
 											setTarget(null)
 
-											commands.emit<cmd.data.addLabel>("data.add-label", {
+											commands.emit<cmd.data.add_labels>("data.metadata.add_label", {
 												item: data,
 												label: labelSearch,
 											})
@@ -656,7 +662,7 @@ export default function OrdoEditor({
 												insertLabel(editor, visibleLabels[index] ?? labelSearch)
 												setTarget(null)
 
-												commands.emit<cmd.data.addLabel>("data.add-label", {
+												commands.emit<cmd.data.add_labels>("data.metadata.add_label", {
 													item: data,
 													label: visibleLabels[index] ?? labelSearch,
 												})
@@ -692,7 +698,7 @@ export default function OrdoEditor({
 												insertLink(editor, visibleLinks[index].fsid)
 												setTarget(null)
 
-												commands.emit<cmd.data.addLink>("data.add-link", {
+												commands.emit<cmd.data.add_links>("data.add_links", {
 													item: data,
 													link: visibleLinks[index].fsid,
 												})
@@ -719,7 +725,7 @@ export default function OrdoEditor({
 									;(event as any).clientY = rect.top - 50
 
 									// TODO: Make a copy of context menu specifically for the editor
-									commands.emit<cmd.ctxMenu.show>("context-menu.show", {
+									commands.emit<cmd.ctx_menu.show>("context-menu.show", {
 										event: event as any,
 										payload: "editor-quick-menu",
 									})

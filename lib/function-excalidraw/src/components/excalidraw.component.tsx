@@ -21,9 +21,9 @@ import Null from "@ordo-pink/frontend-react-components/null"
 export default function ExcalidrawEditor({
 	data,
 	content,
-	isLoading,
-	isEditable,
-	isEmbedded,
+	is_loading: isLoading,
+	is_editable: isEditable,
+	is_embedded: isEmbedded,
 }: Functions.FileAssociationComponentProps) {
 	const isDark = useIsDarkTheme()
 	const commands = useCommands()
@@ -38,7 +38,7 @@ export default function ExcalidrawEditor({
 
 	useEffect(() => {
 		const sub = debounceSave$.subscribe(({ fsid, content }) =>
-			commands.emit<cmd.data.setContent>("data.set-content", { fsid, content }),
+			commands.emit<cmd.data.set_content>("data.content.set_content", { fsid, content }),
 		)
 
 		return () => sub.unsubscribe()

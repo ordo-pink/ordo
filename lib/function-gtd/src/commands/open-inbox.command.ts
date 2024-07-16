@@ -33,19 +33,19 @@ export const registerOpenInboxCmd = ({ commands }: P) => {
 }
 
 const registerCommandPalette = ({ commands }: P) => {
-	commands.emit<cmd.commandPalette.add>("command-palette.add", {
+	commands.emit<cmd.command_palette.add>("command-palette.add", {
 		id: COMMAND_NAME,
 		Icon: BsInbox,
-		readableName: "Открыть задачи",
+		readable_name: "Открыть задачи",
 		accelerator: "meta+shift+i",
-		onSelect: () => {
-			commands.emit<cmd.commandPalette.hide>("command-palette.hide")
+		on_select: () => {
+			commands.emit<cmd.command_palette.hide>("command-palette.hide")
 			commands.emit<cmd.gtd.openInbox>(COMMAND_NAME)
 		},
 	})
 
 	return () => {
-		commands.emit<cmd.commandPalette.remove>("command-palette.remove", COMMAND_NAME)
+		commands.emit<cmd.command_palette.remove>("command-palette.remove", COMMAND_NAME)
 	}
 }
 

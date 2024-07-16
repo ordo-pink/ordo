@@ -50,7 +50,7 @@ export default createFunction(
 		commands.emit<cmd.editor.registerFileAssociation>("editor.register-file-association", {
 			Component: lazy(() => import("./src/components/editor.component")),
 			Icon: BsFileEarmarkRichtext,
-			contentType: "text/ordo",
+			content_type: "text/ordo",
 			name: ORDO_PINK_EDITOR_FUNCTION.concat(".ordo-editor"),
 		})
 

@@ -17,9 +17,9 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { WorkspaceSplitSize } from "./frontend-stream-sidebar.types"
+import { TWorkspaceSplitSize } from "@ordo-pink/core"
 
 export const NARROW_WINDOW_BREAKPOINT = 768
-export const DEFAULT_WORKSPACE_SPLIT_SIZE = [25, 75] as WorkspaceSplitSize
-export const DEFAULT_WORKSPACE_SPLIT_SIZE_NARROW_OPEN = [100, 0] as WorkspaceSplitSize
-export const DEFAULT_WORKSPACE_SPLIT_SIZE_NO_SIDEBAR = [0, 100] as WorkspaceSplitSize
+export const DEFAULT_WORKSPACE_SPLIT_SIZE = [80, 20] as TWorkspaceSplitSize
+export const DEFAULT_WORKSPACE_SPLIT_SIZE_NARROW_OPEN = [0, 100] as TWorkspaceSplitSize
+export const DEFAULT_WORKSPACE_SPLIT_SIZE_NO_SIDEBAR = [100, 0] as TWorkspaceSplitSize

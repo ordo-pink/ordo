@@ -47,19 +47,19 @@ const registerCommand = (params: P) => {
 }
 
 const registerCommandPalette = ({ commands }: P) => {
-	commands.emit<cmd.commandPalette.add>("command-palette.add", {
+	commands.emit<cmd.command_palette.add>("command-palette.add", {
 		id: "file-explorer.go-to-file-explorer",
 		Icon: BsFolder2Open,
-		onSelect: () => {
+		on_select: () => {
 			commands.emit<cmd.fileExplorer.goToFileExplorer>("file-explorer.go-to-file-explorer")
-			commands.emit<cmd.commandPalette.hide>("command-palette.hide")
+			commands.emit<cmd.command_palette.hide>("command-palette.hide")
 		},
-		readableName: "Открыть файловый менеджер",
+		readable_name: "Открыть файловый менеджер",
 		accelerator: "mod+shift+e",
 	})
 
 	return () => {
-		commands.emit<cmd.commandPalette.remove>(
+		commands.emit<cmd.command_palette.remove>(
 			"command-palette.remove",
 			"file-explorer.go-to-file-explorer",
 		)

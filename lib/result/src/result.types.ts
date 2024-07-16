@@ -143,6 +143,9 @@ export type TResultStatic = {
 	}
 }
 
+export type TUnwrapOk<$TResult> = $TResult extends TResult<infer _TOk, any> ? _TOk : never
+export type TUnwrapErr<$TResult> = $TResult extends TResult<any, infer _TErr> ? _TErr : never
+
 export type TResult<$TOk, $TErr> = {
 	get is_ok(): boolean
 	get is_err(): boolean

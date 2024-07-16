@@ -110,14 +110,14 @@ const updateUserEmailConfirmationCode0 =
 	(userService: UserService) =>
 	({ user, newEmail, code }: TCtx) =>
 		userService
-			.update(user.id, { code })
+			.update(user.id, { email_code: code })
 			.pipe(bimap_oath(toUserNotFoundError, () => ({ user, newEmail, code })))
 
 const sendNotification =
 	(notificationService: TNotificationService, websiteHost: string) =>
 	({ user, newEmail: newEmail, code }: TCtx) =>
 		notificationService.sendEmailChangeNotifications({
-			to: { email: user.email, name: user.firstName },
+			to: { email: user.email, name: user.first_name },
 			newEmail,
 			oldEmail: user.email,
 			confirmationUrl: `${websiteHost}/change-email?oldEmail=${user.email}&newEmail=${newEmail}&code=${code}`, // TODO

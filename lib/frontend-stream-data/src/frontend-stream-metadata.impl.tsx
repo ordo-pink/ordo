@@ -26,59 +26,89 @@ import {
 	MetadataRepository,
 	RemoteMetadataRepository,
 	type TMetadata,
-	type TMetadataCommand,
 	type TMetadataQuery,
 	type TUserQuery,
 } from "@ordo-pink/data"
+import { type TFetch, type THosts } from "@ordo-pink/core"
 import { type AuthResponse } from "@ordo-pink/backend-server-id"
 import { Switch } from "@ordo-pink/switch"
-import { type THosts } from "@ordo-pink/core"
 import { type TLogger } from "@ordo-pink/logger"
 import { type TOption } from "@ordo-pink/option"
 import { noop } from "@ordo-pink/tau"
 
-type TInitMetadataStreamFn = (params: {
+type TInitMetadataFn = (params: {
 	logger: TLogger
 	commands: Client.Commands.Commands
 	user_query: TUserQuery
 	hosts: THosts
 	auth$: Observable<TOption<AuthResponse>>
-}) => { metadata_query: TMetadataQuery; metadata_command: TMetadataCommand }
-export const __init_metadata$: TInitMetadataStreamFn = ({
+	fetch: TFetch
+}) => { metadata_query: TMetadataQuery }
+export const init_metadata: TInitMetadataFn = ({
 	auth$,
 	logger,
 	commands,
 	hosts,
 	user_query,
+	fetch,
 }) => {
 	logger.debug("Initialising metadata...")
 
-	// metadata$.subscribe()
+	metadata$.subscribe()
 
 	const metadata_repository = MetadataRepository.of(metadata$)
-	const remote_metadata_repository = RemoteMetadataRepository.of(hosts.dt)
+	const remote_metadata_repository = RemoteMetadataRepository.of(hosts.dt, fetch)
 
 	const metadata_query = MetadataQuery.of(metadata_repository)
 	const metadata_command = MetadataCommand.of(metadata_repository, metadata_query, user_query)
 
-	MetadataManager.of(metadata_repository, remote_metadata_repository, auth$).start(state_change =>
-		Switch.Match(state_change)
-			.case("get-remote", () =>
-				commands.emit<cmd.application.background_task.start_loading>(
-					"application.background_task.start_loading",
-				),
-			)
-			.case("put-remote", () =>
-				commands.emit<cmd.application.background_task.start_saving>(
-					"application.background_task.start_saving",
-				),
-			)
-			.case(["get-remote-complete", "put-remote-complete"], () =>
-				commands.emit<cmd.application.background_task.reset_status>(
-					"application.background_task.reset_status",
-				),
-			)
-			.default(noop),
+	commands.on<cmd.data.add_labels>("data.metadata.add_label", ({ fsid, labels }) =>
+		metadata_command.add_labels(fsid, ...labels),
+	)
+
+	commands.on<cmd.data.remove_labels>("data.metadata.remove_label", ({ fsid, labels }) =>
+		metadata_command.remove_labels(fsid, ...labels),
+	)
+
+	commands.on<cmd.data.create>("data.metadata.create", metadata_command.create)
+
+	commands.on<cmd.data.move>("data.metadata.move", ({ fsid, parent }) =>
+		metadata_command.set_parent(fsid, parent),
+	)
+
+	commands.on<cmd.data.remove>("data.metadata.remove", fsid => metadata_command.remove(fsid))
+
+	commands.on<cmd.data.add_links>("data.add_links", ({ fsid, links }) =>
+		metadata_command.add_links(fsid, ...links),
+	)
+
+	commands.on<cmd.data.remove_links>("data.metadata.remove_links", ({ fsid, links }) =>
+		metadata_command.remove_links(fsid, ...links),
+	)
+
+	commands.on<cmd.data.rename>("data.metadata.rename", ({ fsid, name }) =>
+		metadata_command.set_name(fsid, name),
+	)
+
+	MetadataManager.of(metadata_repository, remote_metadata_repository, auth$, fetch).start(
+		state_change =>
+			Switch.Match(state_change)
+				.case("get-remote", () =>
+					commands.emit<cmd.application.background_task.start_loading>(
+						"application.background_task.start_loading",
+					),
+				)
+				.case("put-remote", () =>
+					commands.emit<cmd.application.background_task.start_saving>(
+						"application.background_task.start_saving",
+					),
+				)
+				.case(["get-remote-complete", "put-remote-complete"], () =>
+					commands.emit<cmd.application.background_task.reset_status>(
+						"application.background_task.reset_status",
+					),
+				)
+				.default(noop),
 	)
 
 	logger.debug("Initialised metadata.")

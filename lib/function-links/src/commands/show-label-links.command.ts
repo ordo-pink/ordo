@@ -45,17 +45,17 @@ const registerCommand = (params: P) => {
 }
 
 const registerCommandPalette = ({ commands }: P) => {
-	commands.emit<cmd.commandPalette.add>("command-palette.add", {
+	commands.emit<cmd.command_palette.add>("command-palette.add", {
 		id: "links.show-label-links",
 		Icon: BsTag,
-		onSelect: () => {
+		on_select: () => {
 			commands.emit<cmd.links.showLabelLinks>("links.show-label-links")
 		},
-		readableName: "Показать связи с меткой...",
+		readable_name: "Показать связи с меткой...",
 	})
 
 	return () => {
-		commands.emit<cmd.commandPalette.remove>("command-palette.remove", "links.show-label-links")
+		commands.emit<cmd.command_palette.remove>("command-palette.remove", "links.show-label-links")
 	}
 }
 
@@ -64,14 +64,14 @@ const commandHandler =
 	() => {
 		const labels = data.getDataLabels()
 
-		commands.emit<cmd.commandPalette.show>("command-palette.show", {
+		commands.emit<cmd.command_palette.show>("command-palette.show", {
 			items: labels.map(label => ({
 				id: label,
 				readableName: label,
 				Icon: BsTag,
 				onSelect: () => {
 					commands.emit<cmd.router.navigate>("router.navigate", `/links/labels/${label}`)
-					commands.emit<cmd.commandPalette.hide>("command-palette.hide")
+					commands.emit<cmd.command_palette.hide>("command-palette.hide")
 				},
 			})),
 		})

@@ -41,7 +41,7 @@ export default function RenameModal({ data }: Props) {
 	}
 
 	const rename = () => {
-		commands.emit<cmd.data.rename>("data.rename", { fsid: data.fsid, name })
+		commands.emit<cmd.data.metadata.rename>("data.metadata.rename", { fsid: data.fsid, name })
 		commands.emit<cmd.modal.hide>("modal.hide")
 	}
 

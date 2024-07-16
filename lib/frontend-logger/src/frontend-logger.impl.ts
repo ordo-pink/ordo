@@ -22,27 +22,20 @@ import { type TGetLoggerFn } from "@ordo-pink/core"
 import { type TLogger } from "@ordo-pink/logger"
 import { call_once } from "@ordo-pink/tau"
 
-let logger: TLogger
+type TInitLoggerFn = (logger: TLogger) => { get_logger: TGetLoggerFn }
+export const init_logger: TInitLoggerFn = call_once(logger => ({
+	get_logger: fid => () => {
+		const functionName = KnownFunctions.exchange(fid) ?? "unauthorized"
 
-type TInitLoggerFn = (logger: TLogger) => { logger: TLogger; get_logger: TGetLoggerFn }
-export const __init_logger: TInitLoggerFn = call_once(x => {
-	logger = x
-
-	return { logger, get_logger: _get_logger }
-})
-
-// TODO: Make non-exported
-export const _get_logger = (fid: symbol | null): TLogger => {
-	const functionName = KnownFunctions.exchange(fid) ?? "unauthorized"
-
-	return {
-		panic: (...message) => logger.panic(`@${functionName} ::`, ...message),
-		alert: (...message) => logger.alert(`@${functionName} ::`, ...message),
-		crit: (...message) => logger.crit(`@${functionName} ::`, ...message),
-		error: (...message) => logger.error(`@${functionName} ::`, ...message),
-		warn: (...message) => logger.warn(`@${functionName} ::`, ...message),
-		notice: (...message) => logger.notice(`@${functionName} ::`, ...message),
-		info: (...message) => logger.info(`@${functionName} ::`, ...message),
-		debug: (...message) => logger.debug(`@${functionName} ::`, ...message),
-	}
-}
+		return {
+			panic: (...message) => logger.panic(`@${functionName} ::`, ...message),
+			alert: (...message) => logger.alert(`@${functionName} ::`, ...message),
+			crit: (...message) => logger.crit(`@${functionName} ::`, ...message),
+			error: (...message) => logger.error(`@${functionName} ::`, ...message),
+			warn: (...message) => logger.warn(`@${functionName} ::`, ...message),
+			notice: (...message) => logger.notice(`@${functionName} ::`, ...message),
+			info: (...message) => logger.info(`@${functionName} ::`, ...message),
+			debug: (...message) => logger.debug(`@${functionName} ::`, ...message),
+		}
+	},
+}))

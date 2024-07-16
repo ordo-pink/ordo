@@ -34,7 +34,7 @@ export default function EditableTitle({ data }: P) {
 
 	useEffect(() => {
 		const subscription = debounceSave$.subscribe(({ fsid, value }) => {
-			commands.emit<cmd.data.rename>("data.rename", { fsid, name: value })
+			commands.emit<cmd.data.metadata.rename>("data.metadata.rename", { fsid, name: value })
 		})
 
 		return () => {

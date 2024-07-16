@@ -17,7 +17,7 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { readFile0, writeFile0 } from "@ordo-pink/fs"
+import { read_file0, write_file0 } from "@ordo-pink/fs"
 import { Oath } from "@ordo-pink/oath"
 import { die } from "@ordo-pink/binutil"
 import { getc } from "@ordo-pink/getc"
@@ -61,7 +61,7 @@ const main = () => {
 		return
 	}
 
-	void readFile0("./.env", "utf-8")
+	void read_file0("./.env", "utf-8")
 		.map(str => (str as string).trim().split("\n"))
 		.map(lines => lines.map(line => line.trim().split("=")))
 		.map(lines =>
@@ -82,7 +82,7 @@ const main = () => {
 			})),
 		)
 		.map(env => keys_of(env).reduce((acc, key) => acc.concat(`${key}=${env[key]}\n`), ""))
-		.chain(str => writeFile0("./.env", str, "utf-8"))
+		.chain(str => write_file0("./.env", str, "utf-8"))
 		.orElse(die())
 }
 

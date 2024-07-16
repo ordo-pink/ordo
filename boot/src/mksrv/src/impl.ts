@@ -10,7 +10,7 @@ import {
 	getLicense,
 	getSPDXRecord,
 } from "@ordo-pink/binutil"
-import { directoryExists0, getAbsolutePath } from "@ordo-pink/fs"
+import { dir_exists0, get_absolute_path } from "@ordo-pink/fs"
 import type { License } from "@ordo-pink/binutil"
 import { Oath } from "@ordo-pink/oath"
 import { isReservedJavaScriptKeyword } from "@ordo-pink/rkwjs"
@@ -21,7 +21,7 @@ export const mksrv = (name: string, license: License) =>
 	Oath.of(isReservedJavaScriptKeyword(name) ? `${name}-srv` : name)
 		.tap(initProgress)
 		.chain(name =>
-			Oath.of(getAbsolutePath(`./srv/${name}`)).chain(createFilesIfNotExists0(name, license)),
+			Oath.of(get_absolute_path(`./srv/${name}`)).chain(createFilesIfNotExists0(name, license)),
 		)
 		.orElse(e => {
 			progress.break(e)
@@ -56,7 +56,7 @@ const rejectIfExists0: Curry<Binary<string, boolean, Oath<void, string>>> = name
 
 const createFilesIfNotExists0: Binary<string, License, Unary<string, Oath<void, string | Error>>> =
 	(name, license) => path =>
-		directoryExists0(path)
+		dir_exists0(path)
 			.chain(rejectIfExists0(name))
 			.chain(createFiles0(path, name, license))
 

@@ -29,7 +29,7 @@ export const MetadataRepository: TMetadataRepositoryStatic = {
 				.pipe(Result.ops.err_map(() => einval(`.put: ${JSON.stringify(metadata)}`))),
 		get sub() {
 			let i = 0
-			return metadata$.pipe(map(() => ++i))
+			return metadata$.pipe(map(() => i++))
 		},
 	}),
 }
@@ -37,7 +37,7 @@ export const MetadataRepository: TMetadataRepositoryStatic = {
 export const MR = MetadataRepository
 
 export const RemoteMetadataRepository: TRemoteMetadataRepositoryStatic = {
-	of: data_host => ({
+	of: (data_host, fetch) => ({
 		get: token =>
 			Oath.Try(() => fetch(`${data_host}`, { headers: { Authorization: `Bearer ${token}` } }))
 				.pipe(Oath.ops.chain(response => Oath.FromPromise(() => response.json())))

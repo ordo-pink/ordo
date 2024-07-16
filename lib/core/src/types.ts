@@ -17,12 +17,13 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import type { ComponentType, LazyExoticComponent, MouseEvent } from "react"
+import type { ComponentType, MouseEvent } from "react"
 import type { IconType } from "react-icons"
 
 import type {
 	FSID,
 	PlainData,
+	TCreateMetadataParams,
 	TMetadataCommand,
 	TMetadataQuery,
 	TRrr,
@@ -37,15 +38,47 @@ import type { BackgroundTaskStatus } from "./constants"
 import { Observable } from "rxjs"
 import { TResult } from "@ordo-pink/result"
 
+export type TQueryPermission =
+	| "application.title"
+	| "application.sidebar"
+	| "application.fetch"
+	| "application.hosts"
+	| "application.logger"
+	| "application.commands"
+	| "application.current_fid"
+	| "application.global_command_palette"
+	| "application.current_command_palette"
+	| "application.context_menu"
+	| "application.notifications"
+	| "application.device_specs"
+	| "application.current_route"
+	| "application.current_activity"
+	| "application.current_file_association"
+	| "users.current_user.is_authenticated"
+	| "users.current_user.public_info" // User.PublicUser
+	| "users.current_user.internal_info" // User.User
+	| "users.public_info"
+	| "achievements"
+	| "functions.activities"
+	| "functions.file_associations"
+	| "functions.editor_plugins"
+	| "functions.persisted_state"
+	| "data.metadata_hash"
+	| "data.metadata"
+	| "data.content_hash"
+	| "data.content"
+
+// TODO: Add support for command intellisense
+export type TCommandPermission = Client.Commands.CommandName
+
+export type TPermissions = {
+	queries: TQueryPermission[]
+	commands: TCommandPermission[]
+}
+
 export type TFetch = typeof window.fetch
 
-export type THosts = {
-	id: string
-	dt: string
-	static: string
-	website: string
-	my: string
-}
+export type THosts = { id: string; dt: string; static: string; website: string; my: string }
 
 // TODO: Move away all internal types
 
@@ -53,22 +86,30 @@ export type TFIDAwareActivity = Functions.Activity & { fid: symbol }
 
 export type TRequireFID<$TReturn> = (fid: symbol | null) => $TReturn
 
+export type TGetCurrentRouteFn = TRequireFID<
+	() => TResult<Observable<TOption<Client.Router.Route>>, TRrr<"EPERM">>
+>
+
+export type TWorkspaceSplitSize = [number, number]
+
+export type TDisabledSidebar = { disabled: true }
+
+export type TEnabledSidebar = { disabled: false; sizes: TWorkspaceSplitSize }
+
+export type TSidebarState = TEnabledSidebar | TDisabledSidebar
+
+export type TGetSidebarFn = TRequireFID<() => TResult<Observable<TSidebarState>, TRrr<"EPERM">>>
 export type TGetCurrentFIDFn = TRequireFID<
 	() => TResult<Observable<TOption<symbol>>, TRrr<"EPERM">>
 >
-export type TGetTitleFn = TRequireFID<() => TResult<Observable<string>, TRrr<"EPERM">>>
+export type TTitleState = { window_title: string; status_bar_title?: string }
+export type TGetTitleFn = TRequireFID<() => TResult<Observable<TTitleState>, TRrr<"EPERM">>>
 export type TGetHostsFn = TRequireFID<() => TResult<THosts, TRrr<"EPERM">>>
 export type TGetFetchFn = TRequireFID<() => TFetch>
 export type TGetLoggerFn = TRequireFID<() => TLogger>
 export type TGetCommandsFn = TRequireFID<() => Client.Commands.Commands>
 export type TGetIsAuthenticatedFn = TRequireFID<() => TResult<boolean, TRrr<"EPERM">>>
 export type TSetCurrentFIDFn = TRequireFID<(new_fid: symbol) => TResult<void, TRrr<"EPERM">>>
-export type TRegisterActivityFn = TRequireFID<
-	(activity: Functions.Activity) => TResult<void, TRrr<"EPERM" | "EEXIST">>
->
-export type TUnregisterActivityFn = TRequireFID<
-	(name: string) => TResult<void, TRrr<"EPERM" | "ENOENT">>
->
 export type TGetActivitiesFn = TRequireFID<
 	() => TResult<Observable<TFIDAwareActivity[]>, TRrr<"EPERM">>
 >
@@ -78,6 +119,34 @@ export type TSetCurrentActivityFn = TRequireFID<
 export type TGetCurrentActivityFn = TRequireFID<
 	() => TResult<Observable<TOption<Functions.Activity>>, TRrr<"EPERM" | "ENOENT">>
 >
+
+export type TCreateFunctionInternalContext = {
+	get_commands: TGetCommandsFn
+	get_logger: TGetLoggerFn
+	get_current_route: TGetCurrentRouteFn
+	get_hosts: TGetHostsFn
+	get_is_authenticated: TGetIsAuthenticatedFn
+	metadata_query: TMetadataQuery
+	user_query: TUserQuery
+}
+
+export type TCreateFunctionContext = {
+	fid: symbol
+	get_commands: ReturnType<TGetCommandsFn>
+	get_logger: ReturnType<TGetLoggerFn>
+	get_current_route: ReturnType<TGetCurrentRouteFn>
+	get_hosts: ReturnType<TGetHostsFn>
+	get_is_authenticated: ReturnType<TGetIsAuthenticatedFn>
+	metadata_query: TMetadataQuery
+	user_query: TUserQuery
+	// content_query: TContentQuery
+}
+
+export type TCreateFunctionFn = (
+	name: string,
+	permissions: TPermissions,
+	callback: (context: TCreateFunctionContext) => void | Promise<void>,
+) => (params: TCreateFunctionInternalContext) => void | Promise<void>
 
 export type TOrdoContext = {
 	queries: {
@@ -110,9 +179,9 @@ declare global {
 			jti: JTI
 			expires: Date
 			accessToken: string
-			fileLimit: User.User["fileLimit"]
+			fileLimit: User.User["file_limit"]
 			subscription: User.User["subscription"]
-			maxUploadSize: User.User["maxUploadSize"]
+			maxUploadSize: User.User["max_upload_size"]
 		}
 
 		module ID {
@@ -210,7 +279,10 @@ declare global {
 
 	module cmd {
 		module application {
-			type set_title = { name: "application.set_title"; payload: string }
+			type set_title = {
+				name: "application.set_title"
+				payload: { window_title: string; status_bar_title?: string }
+			}
 
 			module background_task {
 				type set_status = {
@@ -255,70 +327,69 @@ declare global {
 		}
 
 		module data {
-			type refreshRoot = { name: "data.refresh-root" }
-			type getContent = { name: "data.get-content"; payload: FSID }
-			type dropContent = { name: "data.drop-content"; payload: FSID }
-			type showUploadModal = { name: "data.show-upload-modal"; payload: PlainData | null }
-			type showCreateModal = { name: "data.show-create-modal"; payload: PlainData | null }
-			type showRemoveModal = { name: "data.show-remove-modal"; payload: PlainData }
-			type showRenameModal = { name: "data.show-rename-modal"; payload: PlainData }
-			type showEditLabelsPalette = {
+			type get_content = { name: "data.content.get_content"; payload: FSID }
+			type drop_content = { name: "data.content.drop_content"; payload: FSID }
+			type show_upload_modal = { name: "data.show-upload-modal"; payload: FSID | null }
+			type show_create_modal = { name: "data.show-create-modal"; payload: FSID | null }
+			type show_remove_modal = { name: "data.show-remove-modal"; payload: FSID }
+			type show_rename_modal = { name: "data.show-rename-modal"; payload: FSID }
+			type show_edit_labels_palette = {
 				name: "data.show-edit-labels-palette"
-				payload: PlainData
+				payload: FSID
 			}
-			type showEditLinksPalette = {
+			type show_edit_links_palette = {
 				name: "data.show-edit-links-palette"
-				payload: PlainData
+				payload: FSID
 			}
 
-			type setContent = {
-				name: "data.set-content"
-				payload: { fsid: FSID; content: string | ArrayBuffer; contentType?: string }
+			type set_content = {
+				name: "data.content.set_content"
+				payload: { fsid: FSID; content: string | ArrayBuffer; content_type: string }
 			}
-			type uploadContent = {
-				name: "data.upload-content"
+			type upload_content = {
+				name: "data.content.upload_content"
 				payload: { name: string; parent: FSID | null; content: string | ArrayBuffer }
 			}
 			type create = {
-				name: "data.create"
-				payload: { name: string; parent: FSID | null; labels?: string[]; contentType?: string }
+				name: "data.metadata.create"
+				payload: TCreateMetadataParams
 			}
-			type remove = { name: "data.remove"; payload: PlainData }
-			type move = { name: "data.move"; payload: { fsid: FSID; parent: FSID | null } }
-			type rename = { name: "data.rename"; payload: { fsid: FSID; name: string } }
-			type addLabel = {
-				name: "data.add-label"
-				payload: { item: PlainData; label: string | string[] }
+			type remove = { name: "data.metadata.remove"; payload: FSID }
+			type move = { name: "data.metadata.move"; payload: { fsid: FSID; parent: FSID | null } }
+			type rename = { name: "data.metadata.rename"; payload: { fsid: FSID; name: string } }
+			type add_labels = {
+				name: "data.metadata.add_label"
+				payload: { fsid: FSID; labels: string[] }
 			}
-			type removeLabel = {
-				name: "data.remove-label"
-				payload: { item: PlainData; label: string | string[] }
+			type remove_labels = {
+				name: "data.metadata.remove_label"
+				payload: { fsid: FSID; labels: string[] }
 			}
 
-			type addLink = { name: "data.add-link"; payload: { item: PlainData; link: FSID } }
-			type removeLink = {
-				name: "data.remove-link"
-				payload: { item: PlainData; link: FSID }
+			type add_links = { name: "data.add_links"; payload: { fsid: FSID; links: FSID[] } }
+			type remove_links = {
+				name: "data.metadata.remove_links"
+				payload: { fsid: FSID; links: FSID[] }
 			}
 		}
 
-		module ctxMenu {
+		module ctx_menu {
 			type add = { name: "context-menu.add"; payload: Client.CtxMenu.Item }
 			type remove = { name: "context-menu.remove"; payload: string }
 			type show = { name: "context-menu.show"; payload: Client.CtxMenu.ShowOptions }
 			type hide = { name: "context-menu.hide"; payload: void }
 		}
 
-		module commandPalette {
+		module command_palette {
 			type add = { name: "command-palette.add"; payload: Client.CommandPalette.Item }
 			type remove = { name: "command-palette.remove"; payload: string }
 			type show = {
 				name: "command-palette.show"
 				payload: {
 					items: Client.CommandPalette.Item[]
-					onNewItem?: (newItem: string) => unknown
+					on_new_item?: (new_item: string) => unknown
 					multiple?: boolean
-					pinnedItems?: Client.CommandPalette.Item[]
+					pinned_items?: Client.CommandPalette.Item[]
 				}
 			}
 			type hide = { name: "command-palette.hide"; payload: void }
@@ -327,7 +398,7 @@ declare global {
 		module sidebar {
 			type enable = { name: "sidebar.enable" }
 			type disable = { name: "sidebar.disable" }
-			type setSize = { name: "sidebar.set-size"; payload: [number, number] }
+			type set_size = { name: "sidebar.set-size"; payload: [number, number] }
 			type show = { name: "sidebar.show"; payload?: [number, number] }
 			type hide = { name: "sidebar.hide" }
 			type toggle = { name: "sidebar.toggle" }
@@ -360,10 +431,6 @@ declare global {
 			render_workspace?: (div: HTMLDivElement) => void
 			render_sidebar?: (div: HTMLDivElement) => void
 			render_icon?: (div: HTMLSpanElement) => void
-			Component?: ComponentType | LazyExoticComponent<ComponentType>
-			Sidebar?: ComponentType
-			widgets?: ComponentType[]
-			Icon?: ComponentType | IconType
 			is_background?: boolean
 			is_fullscreen?: boolean
 		}
@@ -371,16 +438,16 @@ declare global {
 		type FileExtension = `.${string}`
 
 		type FileAssociationComponentProps = {
-			isLoading: boolean
-			isEditable: boolean
-			isEmbedded: boolean
+			is_loading: boolean
+			is_editable: boolean
+			is_embedded: boolean
 			content: string | ArrayBuffer | null
 			data: PlainData
 		}
 
 		type FileAssociation = {
 			name: string
-			contentType: string
+			content_type: string
 			Icon?: ComponentType
 			Component: ComponentType<FileAssociationComponentProps>
 		}
@@ -389,22 +456,22 @@ declare global {
 	module User {
 		export type PublicUser = {
 			email: string
-			createdAt: Date
+			created_at: Date
 			subscription: string
-			handle?: string
-			firstName?: string
-			lastName?: string
+			handle: string
+			first_name?: string
+			last_name?: string
 		}
 
 		export type User = User.PublicUser & {
 			id: UUIDv4
-			emailConfirmed: boolean
-			fileLimit: number
-			maxUploadSize: number
+			email_confirmed: boolean
+			file_limit: number
+			max_upload_size: number
 		}
 
 		export type PrivateUser = User.User & {
-			code?: string
+			email_code?: string
 		}
 
 		export type InternalUser = User.PrivateUser & {
@@ -526,7 +593,7 @@ declare global {
 				exec?: boolean,
 			]
 
-			export type OpenExternalParams = { url: string; newTab?: boolean }
+			export type OpenExternalParams = { url: string; new_tab?: boolean }
 
 			export type Route<
 				Params extends Record<string, string> = Record<string, string>,
@@ -573,7 +640,7 @@ declare global {
 				 * @optional
 				 * @default true
 				 */
-				showCloseButton?: boolean
+				show_close_button?: boolean
 
 				/**
 				 * Function to run before the modal is hidden.
@@ -581,7 +648,7 @@ declare global {
 				 * @optional
 				 * @default () => void 0
 				 */
-				onHide?: () => void
+				on_hide?: () => void
 			}
 
 			export type HandleShowPayload = {
@@ -598,7 +665,7 @@ declare global {
 				/**
 				 * Check whether the item needs to be shown.
 				 */
-				shouldShow: ItemMethod<T, boolean>
+				should_show: ItemMethod<T, boolean>
 
 				/**
 				 * @see ItemType
@@ -613,7 +680,7 @@ declare global {
 				/**
 				 * Readable name of the context menu item. Put a translated value here.
 				 */
-				readableName: string
+				readable_name: string
 
 				/**
 				 * Icon to be displayed for the context menu item.
@@ -634,7 +701,7 @@ declare global {
 				 * @optional
 				 * @default () => false
 				 */
-				shouldBeDisabled?: ItemMethod<T, boolean>
+				should_be_disabled?: ItemMethod<T, boolean>
 
 				/**
 				 * This function allows you to override the incoming payload that will be passed to the command
@@ -643,7 +710,7 @@ declare global {
 				 * @optional
 				 * @default () => payload
 				 */
-				payloadCreator?: ItemMethod<T>
+				payload_creator?: ItemMethod<T>
 			}
 
 			/**
@@ -666,28 +733,28 @@ declare global {
 				 * @optional
 				 * @default false
 				 */
-				hideCreateItems?: boolean
+				hide_create_items?: boolean
 
 				/**
 				 * Avoid showing read items.
 				 * @optional
 				 * @default false
 				 */
-				hideReadItems?: boolean
+				hide_read_items?: boolean
 
 				/**
 				 * Avoid showing update items.
 				 * @optional
 				 * @default false
 				 */
-				hideUpdateItems?: boolean
+				hide_update_items?: boolean
 
 				/**
 				 * Avoid showing delete items.
 				 * @optional
 				 * @default false
 				 */
-				hideDeleteItems?: boolean
+				hide_delete_items?: boolean
 			}
 
 			/**
@@ -732,12 +799,12 @@ declare global {
 				/**
 				 * Readable name of the command palette item. Put a translated value here.
 				 */
-				readableName: string
+				readable_name: string
 
 				/**
 				 * Action to be executed when command palette item is used.
 				 */
-				onSelect: () => void
+				on_select: () => void
 
 				/**
 				 * Icon to be displayed for the context menu item.
@@ -756,11 +823,4 @@ declare global {
 			}
 		}
 	}
-}
-
-export type PlainDataNode = {
-	data: PlainData
-	id: FSID
-	parent: FSID | null
-	children: PlainDataNode[]
 }

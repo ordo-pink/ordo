@@ -42,7 +42,7 @@ import { auth$ } from "@ordo-pink/frontend-stream-user"
 import { _get_commands } from "@ordo-pink/frontend-stream-commands"
 import { get_fetch } from "@ordo-pink/frontend-fetch"
 import { get_hosts_unsafe } from "@ordo-pink/frontend-react-hooks"
-import { _get_logger } from "@ordo-pink/frontend-logger"
+import { get_logger } from "@ordo-pink/frontend-logger"
 
 import CreateFileModal from "./components/create-file-modal.component"
 import RemoveFileModal from "./components/remove-file-modal.component"
@@ -50,19 +50,19 @@ import RenameModal from "./components/rename-modal.component"
 
 type P = { fid: symbol; dataCommands: TDataCommands<string | ArrayBuffer> }
 export const __initData = ({ fid, dataCommands }: P) => {
-	const logger = _get_logger(fid)
+	const logger = get_logger(fid)
 	const commands = _get_commands(fid)
 	const hosts = get_hosts_unsafe()
 
 	logger.debug("Initialising data...")
 
-	commands.on<cmd.data.showCreateModal>("data.show-create-modal", payload => {
+	commands.on<cmd.data.show_create_modal>("data.show-create-modal", payload => {
 		commands.emit<cmd.modal.show>("modal.show", {
 			Component: () => <CreateFileModal parent={payload} />,
 		})
 	})
 
-	commands.on<cmd.data.showEditLabelsPalette>("data.show-edit-labels-palette", payload => {
+	commands.on<cmd.data.show_edit_labels_palette>("data.show-edit-labels-palette", payload => {
 		const data = DataRepository.dropHidden(data$.value ?? [])
 		const labels = Array.from(new Set(data?.flatMap(item => item.labels) ?? []))
 		const item = data?.find(item => item.fsid === payload.fsid)
@@ -70,9 +70,9 @@ export const __initData = ({ fid, dataCommands }: P) => {
 		if (!item) return
 
 		const handleShowEditLabels = () => {
-			commands.emit<cmd.commandPalette.show>("command-palette.show", {
+			commands.emit<cmd.command_palette.show>("command-palette.show", {
 				onNewItem: label => {
-					commands.emit<cmd.data.addLabel>("data.add-label", { item, label })
+					commands.emit<cmd.data.add_labels>("data.metadata.add_label", { item, label })
 					item.labels.push(label)
 					handleShowEditLabels()
 				},
@@ -82,7 +82,10 @@ export const __initData = ({ fid, dataCommands }: P) => {
 					readableName: label,
 					Icon: BsTag,
 					onSelect: () => {
-						commands.emit<cmd.data.removeLabel>("data.remove-label", { item, label })
+						commands.emit<cmd.data.metadata.remove_labels>("data.metadata.remove_label", {
+							item,
+							label,
+						})
 						item.labels.splice(item.labels.indexOf(label), 1)
 						handleShowEditLabels()
 					},
@@ -94,7 +97,7 @@ export const __initData = ({ fid, dataCommands }: P) => {
 						readableName: label,
 						Icon: BsTag,
 						onSelect: () => {
-							commands.emit<cmd.data.addLabel>("data.add-label", { item, label })
+							commands.emit<cmd.data.add_labels>("data.metadata.add_label", { item, label })
 							item.labels.push(label)
 							handleShowEditLabels()
 						},
@@ -105,7 +108,7 @@ export const __initData = ({ fid, dataCommands }: P) => {
 		handleShowEditLabels()
 	})
 
-	commands.on<cmd.data.showEditLinksPalette>("data.show-edit-links-palette", payload => {
+	commands.on<cmd.data.show_edit_links_palette>("data.show-edit-links-palette", payload => {
 		const data = DataRepository.dropHidden(data$.value ?? [])
 		const links = Array.from(new Set(data?.map(item => item.fsid) ?? []))
 		const item = data?.find(item => item.fsid === payload.fsid)
@@ -113,14 +116,17 @@ export const __initData = ({ fid, dataCommands }: P) => {
 		if (!item) return
 
 		const handleShowEditLinks = () => {
-			commands.emit<cmd.commandPalette.show>("command-palette.show", {
+			commands.emit<cmd.command_palette.show>("command-palette.show", {
 				multiple: true,
 				pinnedItems: item.links.map(link => ({
 					id: link,
 					readableName: data.find(item => item.fsid === link)!.name,
 					Icon: BsLink,
 					onSelect: () => {
-						commands.emit<cmd.data.removeLink>("data.remove-link", { item, link })
+						commands.emit<cmd.data.metadata.remove_links>("data.metadata.remove_links", {
+							item,
+							link,
+						})
 						item.links.splice(item.links.indexOf(link), 1)
 						handleShowEditLinks()
 					},
@@ -132,7 +138,7 @@ export const __initData = ({ fid, dataCommands }: P) => {
 						readableName: data.find(item => item.fsid === link)!.name,
 						Icon: BsLink,
 						onSelect: () => {
-							commands.emit<cmd.data.addLink>("data.add-link", { item, link })
+							commands.emit<cmd.data.add_links>("data.add_links", { item, link })
 							item.links.push(link)
 							handleShowEditLinks()
 						},
@@ -143,13 +149,13 @@ export const __initData = ({ fid, dataCommands }: P) => {
 		handleShowEditLinks()
 	})
 
-	commands.on<cmd.data.showRemoveModal>("data.show-remove-modal", payload => {
+	commands.on<cmd.data.show_remove_modal>("data.show-remove-modal", payload => {
 		commands.emit<cmd.modal.show>("modal.show", {
 			Component: () => <RemoveFileModal data={payload} />,
 		})
 	})
 
-	commands.on<cmd.data.showRenameModal>("data.show-rename-modal", payload => {
+	commands.on<cmd.data.show_rename_modal>("data.show-rename-modal", payload => {
 		commands.emit<cmd.modal.show>("modal.show", {
 			Component: () => <RenameModal data={payload} />,
 		})
@@ -161,7 +167,7 @@ export const __initData = ({ fid, dataCommands }: P) => {
 	// 	})
 	// })
 
-	commands.on<cmd.data.create>("data.create", payload => {
+	commands.on<cmd.data.create>("data.metadata.create", payload => {
 		const auth = auth$.value
 		const { name, parent, labels = [] } = payload
 
@@ -178,14 +184,14 @@ export const __initData = ({ fid, dataCommands }: P) => {
 			)
 	})
 
-	commands.on<cmd.data.remove>("data.remove", payload => {
+	commands.on<cmd.data.metadata.remove>("data.metadata.remove", payload => {
 		const auth = auth$.value
 		if (!auth) return
 
 		void dataCommands.remove({ fsid: payload.fsid, createdBy: auth.sub }).orNothing()
 	})
 
-	commands.on<cmd.data.rename>("data.rename", payload => {
+	commands.on<cmd.data.metadata.rename>("data.metadata.rename", payload => {
 		const auth = auth$.value
 		if (!auth) return
 
@@ -194,7 +200,7 @@ export const __initData = ({ fid, dataCommands }: P) => {
 			.orNothing()
 	})
 
-	commands.on<cmd.data.move>("data.move", payload => {
+	commands.on<cmd.data.metadata.move>("data.metadata.move", payload => {
 		const auth = auth$.value
 		if (!auth) return
 
@@ -208,7 +214,7 @@ export const __initData = ({ fid, dataCommands }: P) => {
 			.orNothing()
 	})
 
-	commands.on<cmd.data.addLabel>("data.add-label", payload => {
+	commands.on<cmd.data.add_labels>("data.metadata.add_label", payload => {
 		const auth = auth$.value
 		if (!auth) return
 
@@ -222,7 +228,7 @@ export const __initData = ({ fid, dataCommands }: P) => {
 			.orNothing()
 	})
 
-	commands.on<cmd.data.removeLabel>("data.remove-label", payload => {
+	commands.on<cmd.data.metadata.remove_labels>("data.metadata.remove_label", payload => {
 		const auth = auth$.value
 		if (!auth) return
 
@@ -236,7 +242,7 @@ export const __initData = ({ fid, dataCommands }: P) => {
 			.orNothing()
 	})
 
-	commands.on<cmd.data.addLink>("data.add-link", payload => {
+	commands.on<cmd.data.add_links>("data.add_links", payload => {
 		const auth = auth$.value
 		if (!auth) return
 
@@ -250,7 +256,7 @@ export const __initData = ({ fid, dataCommands }: P) => {
 			.orNothing()
 	})
 
-	commands.on<cmd.data.removeLink>("data.remove-link", payload => {
+	commands.on<cmd.data.metadata.remove_links>("data.metadata.remove_links", payload => {
 		const auth = auth$.value
 		if (!auth) return
 
@@ -264,7 +270,7 @@ export const __initData = ({ fid, dataCommands }: P) => {
 			.orNothing()
 	})
 
-	commands.emit<cmd.ctxMenu.add>("context-menu.add", {
+	commands.emit<cmd.ctx_menu.add>("context-menu.add", {
 		cmd: "data.show-rename-modal",
 		Icon: BsPencilSquare,
 		accelerator: "r",
@@ -283,7 +289,7 @@ export const __initData = ({ fid, dataCommands }: P) => {
 	// 	type: "create",
 	// })
 
-	commands.emit<cmd.ctxMenu.add>("context-menu.add", {
+	commands.emit<cmd.ctx_menu.add>("context-menu.add", {
 		cmd: "data.show-edit-labels-palette",
 		Icon: BsTags,
 		accelerator: "l",
@@ -293,7 +299,7 @@ export const __initData = ({ fid, dataCommands }: P) => {
 		type: "update",
 	})
 
-	commands.emit<cmd.ctxMenu.add>("context-menu.add", {
+	commands.emit<cmd.ctx_menu.add>("context-menu.add", {
 		cmd: "data.show-edit-links-palette",
 		Icon: PiGraph,
 		accelerator: "mod+l",
@@ -303,7 +309,7 @@ export const __initData = ({ fid, dataCommands }: P) => {
 		type: "update",
 	})
 
-	commands.emit<cmd.ctxMenu.add>("context-menu.add", {
+	commands.emit<cmd.ctx_menu.add>("context-menu.add", {
 		cmd: "data.show-create-modal",
 		Icon: BsNodePlus,
 		accelerator: "mod+a",
@@ -314,7 +320,7 @@ export const __initData = ({ fid, dataCommands }: P) => {
 		type: "create",
 	})
 
-	commands.emit<cmd.ctxMenu.add>("context-menu.add", {
+	commands.emit<cmd.ctx_menu.add>("context-menu.add", {
 		cmd: "data.show-remove-modal",
 		Icon: BsNodeMinus,
 		readableName: "Удалить",
@@ -323,7 +329,7 @@ export const __initData = ({ fid, dataCommands }: P) => {
 		type: "delete",
 	})
 
-	commands.emit<cmd.ctxMenu.add>("context-menu.add", {
+	commands.emit<cmd.ctx_menu.add>("context-menu.add", {
 		cmd: "command-palette.show",
 		Icon: BsArrowRightSquare,
 		accelerator: "m",
@@ -343,7 +349,10 @@ export const __initData = ({ fid, dataCommands }: P) => {
 								readableName: "Переместить в корневую папку",
 								Icon: () => <BsSlash />,
 								onSelect: () => {
-									commands.emit<cmd.data.move>("data.move", { parent: null, fsid: payload.fsid })
+									commands.emit<cmd.data.metadata.move>("data.metadata.move", {
+										parent: null,
+										fsid: payload.fsid,
+									})
 									commands.emit<cmd.modal.hide>("modal.hide")
 								},
 							},
@@ -357,9 +366,9 @@ export const __initData = ({ fid, dataCommands }: P) => {
 							item =>
 								({
 									id: item.fsid,
-									readableName: item.name,
-									onSelect: () => {
-										commands.emit<cmd.data.move>("data.move", {
+									readable_name: item.name,
+									on_select: () => {
+										commands.emit<cmd.data.metadata.move>("data.metadata.move", {
 											parent: item.fsid,
 											fsid: payload.fsid,
 										})
@@ -374,22 +383,22 @@ export const __initData = ({ fid, dataCommands }: P) => {
 		type: "update",
 	})
 
-	commands.on<cmd.data.getContent>("data.get-content", fsid =>
+	commands.on<cmd.data.get_content>("data.content.get_content", fsid =>
 		from_nullable_oath(auth$.getValue())
 			.pipe(chain_oath(({ sub }) => dataCommands.getContent({ createdBy: sub, fsid })))
 			.pipe(map_oath(result => content$.next({ ...content$.getValue(), [fsid]: result })))
 			.invoke(or_else_oath(() => content$.next({ ...content$.getValue(), [fsid]: null }))),
 	)
 
-	commands.on<cmd.data.dropContent>("data.drop-content", fsid => {
+	commands.on<cmd.data.drop_content>("data.content.drop_content", fsid => {
 		const contentCopy = content$.getValue()
 		contentCopy[fsid] = null
 
 		content$.next(contentCopy)
 	})
 
-	commands.on<cmd.data.setContent>(
-		"data.set-content",
+	commands.on<cmd.data.set_content>(
+		"data.content.set_content",
 		({ content, fsid, contentType = "text/ordo" }) => {
 			const auth = auth$.value
 			if (!auth) return

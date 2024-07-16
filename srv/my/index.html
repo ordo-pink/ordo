@@ -2,7 +2,6 @@
 <html lang="en">
 	<head>
 		<meta charset="UTF-8" />
-		<link rel="icon" type="image/svg+xml" href="/vite.svg" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		<title>Ordo.pink</title>
 		<link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -20,33 +19,30 @@
 					class="flex h-5 w-full items-center justify-between bg-neutral-300 px-1 py-0.5 text-xs dark:bg-neutral-900"
 				>
 					<div id="status-bar_account" class="w-2/12"></div>
-					<div id="status-bar_history-buttons" class="w-1/12"></div>
+					<div class="w-1/12"></div>
 					<div id="status-bar_title" class="w-4/12 text-center font-bold"></div>
 					<div id="status-bar_quick-search" class="w-1/12"></div>
 					<div id="status-bar_tray" class="flex w-2/12 justify-end gap-x-4">
-						<div id="status-bar_tray_activities" class="gapx-1 flex items-center"></div>
+						<div id="status-bar_tray_activities" class="flex items-center gap-x-1"></div>
 						<div id="status-bar_tray_time" class="text-neutral-600 dark:text-neutral-400"></div>
 					</div>
 				</div>
 				<div class="flex size-full">
-					<div class="split flex size-full">
-						<div id="workspace" class="opacity-100"></div>
-						<div
-							id="sidebar"
-							class="size-full bg-neutral-200 opacity-100 dark:bg-neutral-900"
-						></div>
-					</div>
+					<main class="split flex size-full">
+						<div id="workspace" class="w-full overflow-auto opacity-100" />
+						<div id="sidebar" class="size-full bg-neutral-300 opacity-100 dark:bg-neutral-900" />
+					</main>
 					<div
 						id="activity-bar"
-						class="-mr-px flex w-12 flex-col items-center justify-center bg-neutral-200 dark:bg-neutral-900"
-					></div>
+						class="-mr-px flex w-12 flex-col items-center justify-center bg-neutral-300 dark:bg-neutral-900"
+					/>
 				</div>
 			</div>
 
-			<div id="context-menu"></div>
-			<div id="modal"></div>
-			<div id="notifications"></div>
+			<div id="context-menu" />
+			<div id="modal" />
+			<div id="notifications" />
 		</div>
-		<script type="module" src="/src/main.tsx"></script>
+		<script type="module" src="/src/main.ts"></script>
 	</body>
 </html>

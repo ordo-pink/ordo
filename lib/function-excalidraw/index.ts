@@ -35,7 +35,7 @@ export default createFunction(
 		// TODO: Move from editor to extensions
 		// TODO: Rename extensions to functions
 		commands.emit<cmd.editor.registerFileAssociation>("editor.register-file-association", {
-			contentType: "application/excalidraw",
+			content_type: "application/excalidraw",
 			name: ORDO_PINK_EXCALIDRAW_FUNCTION.concat(".excalidraw-editor"),
 			Icon: BsFileEarmarkCode,
 			Component: lazy(() => import("./src/components/excalidraw.component")),

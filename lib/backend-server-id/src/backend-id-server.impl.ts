@@ -24,7 +24,7 @@ import {
 	NotificationService,
 } from "@ordo-pink/backend-service-offline-notifications"
 import { TokenPersistenceStrategy, TokenService } from "@ordo-pink/backend-service-token"
-import { UserPersistenceStrategy, UserService } from "@ordo-pink/backend-service-user"
+import { TUserPersistenceStrategy, UserService } from "@ordo-pink/backend-service-user"
 import { type Algorithm } from "@ordo-pink/wjwt"
 import { createServer } from "@ordo-pink/backend-utils"
 
@@ -42,7 +42,7 @@ import { handleUserInfoByID as handleUserInfoByID } from "./handlers/get-user-in
 import { handleVerifyToken } from "./handlers/verify-token.handler"
 
 export type CreateIDServerFnParams = {
-	userRepository: UserPersistenceStrategy
+	userRepository: TUserPersistenceStrategy
 	tokenRepository: TokenPersistenceStrategy
 	emailStrategy: EmailStrategy
 	accessTokenExpireIn: number

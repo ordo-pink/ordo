@@ -23,7 +23,7 @@ import { join } from "path"
 import { Context, Router } from "@ordo-pink/routary"
 import { TLogger } from "@ordo-pink/logger"
 import { Oath } from "@ordo-pink/oath"
-import { fileExists0 } from "@ordo-pink/fs"
+import { file_exists0 } from "@ordo-pink/fs"
 import { logBunRequest } from "@ordo-pink/backend-utils"
 
 import type { StaticMiddlewareState } from "./static.types"
@@ -65,7 +65,7 @@ const logRequestThunk = (logger: TLogger, serverName: string, ctx: Context) => (
 	logBunRequest({ logger, serverName })(ctx)
 
 const openFileIfExists0 = (path: string) =>
-	fileExists0(path).chain(Oath.ifElse(Boolean, { onTrue: () => Bun.file(path) }))
+	file_exists0(path).chain(Oath.ifElse(Boolean, { onTrue: () => Bun.file(path) }))
 
 const setResponseTimeHeader =
 	(ctx: Context) =>

@@ -109,7 +109,7 @@ export default function App({ app_context }: P) {
 			.invoke(Oath.invokers.or_nothing)
 
 		return () => {
-			commands.emit<cmd.commandPalette.remove>("command-palette.remove", "command-palette.hide")
+			commands.emit<cmd.command_palette.remove>("command-palette.remove", "command-palette.hide")
 		}
 	}, [commands])
 

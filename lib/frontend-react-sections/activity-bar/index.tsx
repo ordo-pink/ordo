@@ -52,11 +52,11 @@ export default function ActivityBar() {
 
 	const showCommandPalette = () =>
 		Either.fromNullable(commandPalette).map(items =>
-			commands.emit<cmd.commandPalette.show>("command-palette.show", items),
+			commands.emit<cmd.command_palette.show>("command-palette.show", items),
 		)
 
 	const showContextMenu = (event: MouseEvent<HTMLDivElement>) =>
-		commands.emit<cmd.ctxMenu.show>("context-menu.show", { event })
+		commands.emit<cmd.ctx_menu.show>("context-menu.show", { event })
 
 	useAccelerator("mod+shift+p", showCommandPalette)
 

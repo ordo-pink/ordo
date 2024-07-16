@@ -49,18 +49,18 @@ const registerCommand = (params: P) => {
 }
 
 const registerCommandPalette = ({ commands }: P) => {
-	commands.emit<cmd.commandPalette.add>("command-palette.add", {
+	commands.emit<cmd.command_palette.add>("command-palette.add", {
 		id: "home.open-support",
 		Icon: BsLifePreserver,
-		onSelect: () => {
+		on_select: () => {
 			commands.emit<cmd.home.openSupport>("home.open-support")
 		},
-		readableName: "Обратиться в поддержку...",
+		readable_name: "Обратиться в поддержку...",
 		accelerator: "mod+f1",
 	})
 
 	return () => {
-		commands.emit<cmd.commandPalette.remove>("command-palette.remove", "home.open-support")
+		commands.emit<cmd.command_palette.remove>("command-palette.remove", "home.open-support")
 	}
 }
 
@@ -68,7 +68,7 @@ const emailHandler =
 	({ commands }: P) =>
 	() =>
 		commands.emit<cmd.router.open_external>("router.open_external", {
-			newTab: true,
+			new_tab: true,
 			url: "mailto:support@ordo.pink",
 		})
 
@@ -76,32 +76,32 @@ const telegramHandler =
 	({ commands }: P) =>
 	() =>
 		commands.emit<cmd.router.open_external>("router.open_external", {
-			newTab: true,
+			new_tab: true,
 			url: "https://t.me/ordo_pink_ru/190",
 		})
 
 const supportHandler =
 	({ commands }: P) =>
 	() =>
-		commands.emit<cmd.commandPalette.show>("command-palette.show", {
+		commands.emit<cmd.command_palette.show>("command-palette.show", {
 			items: [
 				{
 					id: "home.open-telegram-support",
 					Icon: BsTelegram,
-					readableName: "Telegram",
+					readable_name: "Telegram",
 					accelerator: "t",
-					onSelect: () => {
-						commands.emit<cmd.commandPalette.hide>("command-palette.hide")
+					on_select: () => {
+						commands.emit<cmd.command_palette.hide>("command-palette.hide")
 						commands.emit<cmd.home.openTelegramSupport>("home.open-telegram-support")
 					},
 				},
 				{
 					id: "home.open-email-support",
 					Icon: BsEnvelope,
-					readableName: "Email",
+					readable_name: "Email",
 					accelerator: "e",
-					onSelect: () => {
-						commands.emit<cmd.commandPalette.hide>("command-palette.hide")
+					on_select: () => {
+						commands.emit<cmd.command_palette.hide>("command-palette.hide")
 						commands.emit<cmd.home.openEmailSupport>("home.open-email-support")
 					},
 				},

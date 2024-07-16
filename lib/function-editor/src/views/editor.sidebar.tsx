@@ -71,7 +71,7 @@ export default function EditorSidebar() {
 			<div
 				className="h-full"
 				onContextMenu={event =>
-					commands.emit<cmd.ctxMenu.show>("context-menu.show", { event, payload: "root" })
+					commands.emit<cmd.ctx_menu.show>("context-menu.show", { event, payload: "root" })
 				}
 			>
 				{data.map(item =>
@@ -101,7 +101,7 @@ const PlainListItem = ({ item, isCurrent }: PlainListItemP) => {
 			current={isCurrent}
 			text={item.name}
 			onContextMenu={event =>
-				commands.emit<cmd.ctxMenu.show>("context-menu.show", { event, payload: item })
+				commands.emit<cmd.ctx_menu.show>("context-menu.show", { event, payload: item })
 			}
 		>
 			<div className={`text-xs text-neutral-500 ${isDateVisible ? "block" : "hidden"}`}>
@@ -127,7 +127,7 @@ const NestedItem = ({ item, depth }: NestedItemP) => {
 			style={style}
 			text={item.name}
 			onContextMenu={event =>
-				commands.emit<cmd.ctxMenu.show>("context-menu.show", { event, payload: item })
+				commands.emit<cmd.ctx_menu.show>("context-menu.show", { event, payload: item })
 			}
 		>
 			<div className="text-xs text-neutral-500">

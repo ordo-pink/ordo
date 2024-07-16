@@ -44,39 +44,39 @@ export const registerRemoveFromProjectsCmd = ({ commands, data }: P) => {
 }
 
 const registerCommandPalette = ({ commands, data }: P) => {
-	commands.emit<cmd.commandPalette.add>("command-palette.add", {
+	commands.emit<cmd.command_palette.add>("command-palette.add", {
 		id: COMMAND_NAME,
 		Icon: BsJournalMinus,
-		readableName: "Убрать из проектов в задачах...",
+		readable_name: "Убрать из проектов в задачах...",
 		accelerator: "mod+meta+g",
-		onSelect: () => {
+		on_select: () => {
 			const nonProjects = data.selectDataList(GTDRepository.isProject)
 			const items = nonProjects.map(project => ({
 				id: project.fsid,
 				readableName: project.name,
 				Icon: BsJournalMinus,
 				onSelect: () => {
-					commands.emit<cmd.commandPalette.hide>("command-palette.hide")
+					commands.emit<cmd.command_palette.hide>("command-palette.hide")
 					commands.emit<cmd.gtd.removeFromProjects>(COMMAND_NAME, project.fsid)
 				},
 			}))
 
-			commands.emit<cmd.commandPalette.show>("command-palette.show", { items, multiple: false })
+			commands.emit<cmd.command_palette.show>("command-palette.show", { items, multiple: false })
 		},
 	})
 
 	return () => {
-		commands.emit<cmd.commandPalette.remove>("command-palette.remove", COMMAND_NAME)
+		commands.emit<cmd.command_palette.remove>("command-palette.remove", COMMAND_NAME)
 	}
 }
 
 const registerContextMenu = ({ commands }: P) => {
-	commands.emit<cmd.ctxMenu.add>("context-menu.add", {
+	commands.emit<cmd.ctx_menu.add>("context-menu.add", {
 		cmd: COMMAND_NAME,
 		Icon: BsJournalMinus,
-		readableName: "Удалить из проектов в задачах",
+		readable_name: "Удалить из проектов в задачах",
 		type: "delete",
-		shouldShow: ({ payload }) =>
+		should_show: ({ payload }) =>
 			Data.Validations.isValidDataE(payload as PlainData)
 				.chain(plain =>
 					Either.fromBoolean(
@@ -86,11 +86,11 @@ const registerContextMenu = ({ commands }: P) => {
 				)
 				.fold(F, T),
 		accelerator: "mod+g",
-		payloadCreator: ({ payload }) => (payload as PlainData).fsid,
+		payload_creator: ({ payload }) => (payload as PlainData).fsid,
 	})
 
 	return () => {
-		commands.emit<cmd.ctxMenu.remove>("context-menu.remove", COMMAND_NAME)
+		commands.emit<cmd.ctx_menu.remove>("context-menu.remove", COMMAND_NAME)
 	}
 }
 
@@ -115,8 +115,8 @@ const handle =
 				),
 			)
 			.fold(noop, item =>
-				commands.emit<cmd.data.removeLabel>("data.remove-label", {
+				commands.emit<cmd.data.metadata.remove_labels>("data.metadata.remove_label", {
 					item,
-					label: [GTD_LABEL, GTD_PROJECT_LABEL],
+					labels: [GTD_LABEL, GTD_PROJECT_LABEL],
 				}),
 			)

@@ -65,7 +65,7 @@ type ShowContextMenuFn = (params: ShowContextMenuParams) => MouseEventHandler<HT
 const showContextMenu: ShowContextMenuFn =
 	({ commands, payload }) =>
 	event =>
-		payload && commands.emit<cmd.ctxMenu.show>("context-menu.show", { event, payload })
+		payload && commands.emit<cmd.ctx_menu.show>("context-menu.show", { event, payload })
 
 type HandleSelectDataParams = { setItems: Dispatch<SetStateAction<FSID[]>>; items: FSID[] }
 type HandleSelectData = (params: HandleSelectDataParams) => (fsid: FSID) => void

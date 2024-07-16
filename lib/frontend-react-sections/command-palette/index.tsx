@@ -45,7 +45,7 @@ const fuse = new Fuse([] as Client.CommandPalette.Item[], {
 export default function CommandPaletteModal({ items, onNewItem, multiple, pinnedItems }: Props) {
 	const commands = useCommands()
 
-	useAccelerator("Esc", () => commands.emit<cmd.commandPalette.hide>("command-palette.hide"))
+	useAccelerator("Esc", () => commands.emit<cmd.command_palette.hide>("command-palette.hide"))
 
 	const [currentIndex, setCurrentIndex] = useState(0)
 	const [inputValue, setInputValue] = useState("")
@@ -110,7 +110,7 @@ export default function CommandPaletteModal({ items, onNewItem, multiple, pinned
 					return
 				}
 
-				selectedItem.onSelect()
+				selectedItem.on_select()
 
 				if (location === "selected") {
 					const selectedItemsCopy = [...selectedItems]
@@ -223,7 +223,7 @@ export default function CommandPaletteModal({ items, onNewItem, multiple, pinned
 		setCurrentIndex(0)
 		setPointerLocation(selectedItems.length ? "selected" : "suggested")
 
-		commands.emit<cmd.commandPalette.hide>("command-palette.hide")
+		commands.emit<cmd.command_palette.hide>("command-palette.hide")
 	}
 
 	const handleKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
@@ -258,7 +258,7 @@ export default function CommandPaletteModal({ items, onNewItem, multiple, pinned
 						{selectedItems.map((item, index) => (
 							<Item
 								key={item.id}
-								readableName={item.readableName}
+								readableName={item.readable_name}
 								commandName={item.id}
 								Icon={item.Icon}
 								accelerator={item.accelerator}
@@ -273,7 +273,7 @@ export default function CommandPaletteModal({ items, onNewItem, multiple, pinned
 					{suggestedItems.map((item, index) => (
 						<Item
 							key={item.id}
-							readableName={item.readableName}
+							readableName={item.readable_name}
 							commandName={item.id}
 							Icon={item.Icon}
 							accelerator={item.accelerator}

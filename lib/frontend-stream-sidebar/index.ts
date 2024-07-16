@@ -18,5 +18,4 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 export * from "./src/frontend-stream-sidebar.impl"
-export * from "./src/frontend-stream-sidebar.types"
 export * from "./src/frontend-stream-sidebar.constants"

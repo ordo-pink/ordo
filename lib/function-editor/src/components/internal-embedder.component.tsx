@@ -18,7 +18,7 @@ export default function InternalEmbedder({ children, element, attributes }: Rend
 	const fileAssociations = useStrictSubscription(fileAssociations$, [])
 	const content = useContent((element as any).fsid)
 
-	const Assoc = fileAssociations.find(association => association.contentType === data?.contentType)
+	const Assoc = fileAssociations.find(association => association.content_type === data?.contentType)
 
 	useEffect(() => {
 		if (!data) return
@@ -27,7 +27,7 @@ export default function InternalEmbedder({ children, element, attributes }: Rend
 			commands.emit<cmd.editor.open>("editor.open", data.fsid),
 		)
 
-		commands.emit<cmd.ctxMenu.add>("context-menu.add", {
+		commands.emit<cmd.ctx_menu.add>("context-menu.add", {
 			cmd: `editor-embedder.open-${data.fsid}`,
 			Icon: BsLayoutSidebar,
 			readableName: "Открыть в редакторе",
@@ -36,7 +36,7 @@ export default function InternalEmbedder({ children, element, attributes }: Rend
 		})
 
 		return () => {
-			commands.emit<cmd.ctxMenu.remove>("context-menu.remove", `editor-embedder.open-${data.fsid}`)
+			commands.emit<cmd.ctx_menu.remove>("context-menu.remove", `editor-embedder.open-${data.fsid}`)
 		}
 	}, [element, commands, data])
 
@@ -63,7 +63,7 @@ export default function InternalEmbedder({ children, element, attributes }: Rend
 							className="cursor-pointer px-2"
 							title={`Управлять вложением "${data.name}"`}
 							onClick={event => {
-								commands.emit<cmd.ctxMenu.show>("context-menu.show", {
+								commands.emit<cmd.ctx_menu.show>("context-menu.show", {
 									event,
 									payload: `editor-embedder-${data.fsid}`,
 								})
@@ -75,10 +75,10 @@ export default function InternalEmbedder({ children, element, attributes }: Rend
 
 					<Component
 						data={data}
-						isEditable={false}
+						is_editable={false}
 						content={content}
-						isLoading={content === null}
-						isEmbedded={true}
+						is_loading={content === null}
+						is_embedded={true}
 					/>
 				</div>
 			),

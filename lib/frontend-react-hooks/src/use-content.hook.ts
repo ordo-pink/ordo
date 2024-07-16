@@ -34,7 +34,7 @@ export const useContent = (fsid?: FSID) => {
 	useEffect(() => {
 		if (!data) return
 
-		commands.emit<cmd.data.getContent>("data.get-content", data.fsid)
+		commands.emit<cmd.data.get_content>("data.content.get_content", data.fsid)
 	}, [commands, data])
 
 	return fsid ? content[fsid] : null

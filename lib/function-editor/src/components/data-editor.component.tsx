@@ -31,10 +31,10 @@ export default function DataEditor({ data }: P) {
 	const incomingLinks = useSelectDataList(item => item.links.includes(data.fsid))
 
 	const handleLabelsClick = () =>
-		commands.emit<cmd.data.showEditLabelsPalette>("data.show-edit-labels-palette", data)
+		commands.emit<cmd.data.show_edit_labels_palette>("data.show-edit-labels-palette", data)
 
 	const handleLinksClick = () =>
-		commands.emit<cmd.data.showEditLinksPalette>("data.show-edit-links-palette", data)
+		commands.emit<cmd.data.show_edit_links_palette>("data.show-edit-links-palette", data)
 
 	return (
 		<div className="flex flex-col gap-2 py-2">

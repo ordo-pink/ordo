@@ -22,7 +22,7 @@ import { Dirent } from "fs"
 import { SpawnOptions } from "bun"
 import chalk from "chalk"
 
-import { createParentIfNotExists0, fileExists0, isFile0, writeFile0 } from "@ordo-pink/fs"
+import { create_parent_if_not_exists0, file_exists0, is_file0, write_file0 } from "@ordo-pink/fs"
 import { Oath } from "@ordo-pink/oath"
 import { Unary } from "@ordo-pink/tau"
 import { try_oath } from "@ordo-pink/oath/constructors/try"
@@ -102,7 +102,7 @@ const _getName: Unary<Dirent, string> = prop("name")
 export const getNames: Unary<Dirent[], string[]> = map(_getName)
 
 const _checkFileExists0: Unary<string, Oath<string | boolean>> = path =>
-	isFile0(path).pipe(map_oath(e => (e ? path : e)))
+	is_file0(path).pipe(map_oath(e => (e ? path : e)))
 export const checkFilesExist0: Unary<string[], Oath<(string | boolean)[]>> = pipe(
 	map(_checkFileExists0),
 	merge_oath,
@@ -114,9 +114,9 @@ export const getExistingPaths: Unary<(string | boolean)[], string[]> = paths =>
 export const getCurrentYear = () => new Date(Date.now()).getFullYear()
 
 export const createRepositoryFile0 = (path: string, content: string) =>
-	createParentIfNotExists0(path)
-		.pipe(chain_oath(() => fileExists0(path)))
-		.pipe(chain_oath(exists => (exists ? empty_oath() : writeFile0(path, content, "utf-8"))))
+	create_parent_if_not_exists0(path)
+		.pipe(chain_oath(() => file_exists0(path)))
+		.pipe(chain_oath(exists => (exists ? empty_oath() : write_file0(path, content, "utf-8"))))
 
 export const COPYRIGHT_OWNERS = "谢尔盖||↓ and the Ordo.pink contributors"
 

@@ -28,10 +28,10 @@ import { N, call_once } from "@ordo-pink/tau"
 import { chainE, fromBooleanE, fromNullableE } from "@ordo-pink/either"
 import { KnownFunctions } from "@ordo-pink/frontend-known-functions"
 import { _get_commands } from "@ordo-pink/frontend-stream-commands"
-import { _get_logger } from "@ordo-pink/frontend-logger"
+import { get_logger } from "@ordo-pink/frontend-logger"
 
 export const __init_file_associations$ = call_once((fid: symbol) => {
-	const logger = _get_logger(fid)
+	const logger = get_logger(fid)
 	const commands = _get_commands(fid)
 
 	logger.debug("Initializing file associations...")

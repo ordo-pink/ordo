@@ -45,18 +45,18 @@ const registerCommand = ({ commands }: P) => {
 }
 
 const registerCommandPalette = ({ commands }: P) => {
-	commands.emit<cmd.commandPalette.add>("command-palette.add", {
+	commands.emit<cmd.command_palette.add>("command-palette.add", {
 		id: COMMAND_NAME,
 		Icon: BsLayoutSidebar,
-		onSelect: () => {
+		on_select: () => {
 			commands.emit<cmd.editor.goToEditor>(COMMAND_NAME)
-			commands.emit<cmd.commandPalette.hide>("command-palette.hide")
+			commands.emit<cmd.command_palette.hide>("command-palette.hide")
 		},
-		readableName: "Открыть редактор",
+		readable_name: "Открыть редактор",
 		accelerator: "mod+e",
 	})
 
 	return () => {
-		commands.emit<cmd.commandPalette.remove>("command-palette.remove", COMMAND_NAME)
+		commands.emit<cmd.command_palette.remove>("command-palette.remove", COMMAND_NAME)
 	}
 }

@@ -56,16 +56,16 @@ export const useAppInit = () => {
 
 	// Register global hotkey for hiding CommandPalette.
 	useEffect(() => {
-		commands.emit<cmd.commandPalette.add>("command-palette.add", {
+		commands.emit<cmd.command_palette.add>("command-palette.add", {
 			id: "command-palette.hide",
-			onSelect: () => commands.emit<cmd.commandPalette.hide>("command-palette.hide"),
+			onSelect: () => commands.emit<cmd.command_palette.hide>("command-palette.hide"),
 			readableName: "Скрыть панель команд",
 			Icon: BsCommand,
 			accelerator: "mod+shift+p",
 		})
 
 		return () =>
-			void commands.emit<cmd.commandPalette.remove>(
+			void commands.emit<cmd.command_palette.remove>(
 				"command-palette.remove",
 				"command-palette.hide",
 			)
@@ -121,7 +121,7 @@ const executeCommand: TExecuteCommandFn = event => command => {
 	event.preventDefault()
 	event.stopPropagation()
 
-	command.onSelect()
+	command.on_select()
 }
 
 type THandleHotkeyFn = (params: {
@@ -153,8 +153,8 @@ const showCustomCommandPalette: TShowCustomCommandPaletteFn = commands => comman
 		// The onHide hook makes a redundant call for hiding modal, but helps with closing the
 		// command palette when the modal is closed with a click on the overlay or Esc key press.
 		options: {
-			showCloseButton: false,
-			onHide: () => commands.emit<cmd.commandPalette.hide>("command-palette.hide"),
+			show_close_button: false,
+			on_hide: () => commands.emit<cmd.command_palette.hide>("command-palette.hide"),
 		},
 	})
 

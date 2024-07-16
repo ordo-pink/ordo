@@ -28,7 +28,7 @@ import {
 	type PlainData,
 	UnexpectedError,
 } from "@ordo-pink/data"
-import { createParentIfNotExists0, fileExists0, readFile0, writeFile0 } from "@ordo-pink/fs"
+import { create_parent_if_not_exists0, file_exists0, read_file0, write_file0 } from "@ordo-pink/fs"
 import { Oath } from "@ordo-pink/oath"
 import { bimap_oath } from "@ordo-pink/oath/operators/bimap"
 import { chain_oath } from "@ordo-pink/oath/operators/chain"
@@ -114,7 +114,9 @@ const findDataByNameAndParent0 =
 		)
 
 const readDataFile0 = (path: string): Oath<PlainData[], Error> =>
-	readFile0(path, "utf8").pipe(chain_oath(content => try_oath(() => JSON.parse(content as string))))
+	read_file0(path, "utf8").pipe(
+		chain_oath(content => try_oath(() => JSON.parse(content as string))),
+	)
 
 const replaceByIndex = (data: PlainData[], newItem: PlainData) => (index: number) => {
 	data.splice(index, 1, newItem)
@@ -133,15 +135,15 @@ const findByFSID0 = (fsid: FSID) => (data: PlainData[]) =>
 const writeDataFile0 =
 	(content: PlainData[]) =>
 	(path: string): Oath<void, Error> =>
-		writeFile0(path, JSON.stringify(content, null, 2), "utf-8")
+		write_file0(path, JSON.stringify(content, null, 2), "utf-8")
 
 const createParentDirIfNotExists0 = (path: string): Oath<string, Error> =>
-	createParentIfNotExists0(path).pipe(map_oath(() => path))
+	create_parent_if_not_exists0(path).pipe(map_oath(() => path))
 
 const createDataFileIfNotExists0 = (path: string): Oath<string, Error> =>
-	fileExists0(path).pipe(
+	file_exists0(path).pipe(
 		chain_oath(exists =>
-			exists ? Oath.Resolve(path) : writeFile0(path, "[]", "utf-8").pipe(map_oath(() => path)),
+			exists ? Oath.Resolve(path) : write_file0(path, "[]", "utf-8").pipe(map_oath(() => path)),
 		),
 	)
 

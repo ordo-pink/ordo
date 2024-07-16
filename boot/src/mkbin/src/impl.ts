@@ -12,7 +12,7 @@ import {
 } from "@ordo-pink/binutil"
 import type { License } from "@ordo-pink/binutil"
 import { Oath } from "@ordo-pink/oath"
-import { directoryExists0 } from "@ordo-pink/fs"
+import { dir_exists0 } from "@ordo-pink/fs"
 import { isReservedJavaScriptKeyword } from "@ordo-pink/rkwjs"
 
 // --- Public ---
@@ -51,7 +51,7 @@ const rejectIfExists0: Curry<Binary<string, boolean, Oath<void, string>>> = name
 
 const createFilesIfNotExists0: Binary<string, License, Unary<string, Oath<void, string | Error>>> =
 	(name, license) => path =>
-		directoryExists0(path)
+		dir_exists0(path)
 			.chain(rejectIfExists0(name))
 			.chain(createFiles0(path, name, license))
 

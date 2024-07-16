@@ -42,12 +42,12 @@ export const registerMarkDoneCmd = ({ commands, data }: P) => {
 }
 
 const registerContextMenu = ({ commands, data }: P) => {
-	commands.emit<cmd.ctxMenu.add>("context-menu.add", {
+	commands.emit<cmd.ctx_menu.add>("context-menu.add", {
 		cmd: COMMAND_NAME,
 		Icon: BsCheckSquare,
-		readableName: "Отметить как выполненное",
+		readable_name: "Отметить как выполненное",
 		type: "update",
-		shouldShow: ({ payload }) =>
+		should_show: ({ payload }) =>
 			Data.Validations.isValidDataE(payload as PlainData)
 				.chain(plain =>
 					GTDRepository.getClosestProjectE(data.getData(), plain.fsid)
@@ -62,11 +62,11 @@ const registerContextMenu = ({ commands, data }: P) => {
 
 				.fold(F, T),
 		accelerator: "mod+1",
-		payloadCreator: ({ payload }) => (payload as PlainData).fsid,
+		payload_creator: ({ payload }) => (payload as PlainData).fsid,
 	})
 
 	return () => {
-		commands.emit<cmd.ctxMenu.remove>("context-menu.remove", COMMAND_NAME)
+		commands.emit<cmd.ctx_menu.remove>("context-menu.remove", COMMAND_NAME)
 	}
 }
 
@@ -91,8 +91,8 @@ const handle =
 				),
 			)
 			.fold(noop, item =>
-				commands.emit<cmd.data.addLabel>("data.add-label", {
+				commands.emit<cmd.data.add_labels>("data.metadata.add_label", {
 					item,
-					label: [GTD_DONE_LABEL],
+					labels: [GTD_DONE_LABEL],
 				}),
 			)

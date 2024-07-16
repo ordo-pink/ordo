@@ -57,7 +57,7 @@ export default function GTDLabel({ label }: P) {
 							onInput={e => setNewItem(e.target.value)}
 							onKeyDown={e => {
 								if (e.key === "Enter" && newItem) {
-									commands.emit<cmd.data.create>("data.create", {
+									commands.emit<cmd.data.create>("data.metadata.create", {
 										name: newItem,
 										parent: null,
 										labels: ["gtd", label],

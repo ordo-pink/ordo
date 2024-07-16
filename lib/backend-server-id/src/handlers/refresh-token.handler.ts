@@ -118,8 +118,8 @@ const updateUserSession0: UpdateUserSessionFn =
 				sub: cookieSub,
 				prevJti: cookieJti,
 				data: {
-					fms: user.maxUploadSize,
-					lim: user.fileLimit,
+					fms: user.max_upload_size,
+					lim: user.file_limit,
 					sbs: user.subscription,
 				},
 			})

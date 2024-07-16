@@ -16,6 +16,10 @@ const noent = RRR.codes.enoent(LOCATION)
 
 export const MetadataQuery: TMetadataQueryStatic = {
 	of: repo => ({
+		get version$() {
+			return repo.sub
+		},
+
 		get: ({ show_hidden } = { show_hidden: false }) =>
 			repo.get().pipe(R.ops.map(is => (show_hidden ? is : is.filter(negate(i => i.is_hidden()))))),
 

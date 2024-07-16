@@ -17,34 +17,35 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { BehaviorSubject, type Observable, map } from "rxjs"
+import { BehaviorSubject, type Observable } from "rxjs"
 
 import { O, type TOption } from "@ordo-pink/option"
-import { T, call_once } from "@ordo-pink/tau"
+import { RRR, type TRrr } from "@ordo-pink/data"
+import { Result, type TResult } from "@ordo-pink/result"
 import { type TFetch, type TGetIsAuthenticatedFn, type THosts } from "@ordo-pink/core"
 import { type AuthResponse } from "@ordo-pink/backend-server-id"
 import { KnownFunctions } from "@ordo-pink/frontend-known-functions"
 import { Oath } from "@ordo-pink/oath"
-import { RRR } from "@ordo-pink/data"
-import { Result } from "@ordo-pink/result"
 import { type TLogger } from "@ordo-pink/logger"
+import { call_once } from "@ordo-pink/tau"
 
-type TInitUserStreamParams = (params: {
-	hosts: THosts
-	fetch: TFetch
-	logger: TLogger
-	is_dev: boolean
-}) => { auth$: Observable<TOption<AuthResponse>>; get_is_authenticated: TGetIsAuthenticatedFn }
-export const __init_auth$: TInitUserStreamParams = call_once(({ hosts, fetch, logger, is_dev }) => {
+type TInitAuthParams = (params: { hosts: THosts; fetch: TFetch; logger: TLogger }) => {
+	get_auth: (fid: symbol | null) => () => TResult<Observable<TOption<AuthResponse>>, TRrr<"EPERM">>
+	get_is_authenticated: TGetIsAuthenticatedFn
+}
+export const init_auth: TInitAuthParams = call_once(({ hosts, fetch, logger }) => {
 	const refresh_token = Oath.Empty()
 		.pipe(Oath.ops.tap(() => logger.debug("Refreshing auth token...")))
 		.pipe(Oath.ops.chain(() => Oath.Try(() => fetch(`${hosts.id}/refresh-token`, get_req_init()))))
 		.pipe(Oath.ops.chain(response => Oath.Try(() => response.json())))
 		.pipe(Oath.ops.chain(res => Oath.If(res.success, { T: () => res.result, F: () => res.error })))
 		.pipe(Oath.ops.tap(() => logger.debug("Auth token refreshed.")))
-		.pipe(Oath.ops.map(auth => auth$.next(auth)))
+		.pipe(Oath.ops.map(auth => auth$.next(O.Some(auth))))
 
-	const invoker = Oath.invokers.or_else(sign_out(logger, hosts.website, is_dev))
+	const invoker = Oath.invokers.or_else(() => {
+		auth$.next(O.None())
+		drop_interval()
+	})
 
 	logger.debug("Initialising auth...")
 
@@ -61,7 +62,18 @@ export const __init_auth$: TInitUserStreamParams = call_once(({ hosts, fetch, lo
 
 	logger.debug("Initialised auth.")
 
-	return { auth$: auth$.pipe(map(value => value)), get_is_authenticated: _get_is_authenticated }
+	return {
+		get_auth: (fid: symbol | null) => () =>
+			Result.If(KnownFunctions.check_is_internal(fid))
+				.pipe(Result.ops.map(() => auth$.asObservable()))
+				.pipe(Result.ops.err_map(() => eperm(`get_auth -> fid: ${String(fid)}`))),
+		get_is_authenticated: (fid: symbol | null) => () =>
+			Result.If(
+				KnownFunctions.check_permissions(fid, { queries: ["users.current_user.is_authenticated"] }),
+			)
+				.pipe(Result.ops.map(() => auth$.getValue().is_some))
+				.pipe(Result.ops.err_map(() => eperm(`get_is_authenticated -> fid: ${String(fid)}`))),
+	}
 })
 
 // --- Internal ---
@@ -70,22 +82,16 @@ const LOCATION = "__init_auth$"
 
 const eperm = RRR.codes.eperm(LOCATION)
 
-const _get_is_authenticated: TGetIsAuthenticatedFn = (fid: symbol | null) =>
-	Result.If(KnownFunctions.check_permissions(fid, { queries: ["auth.is-authenticated"] }))
-		.pipe(Result.ops.chain(() => Result.FromOption(auth$.getValue())))
-		.pipe(Result.ops.bimap(() => eperm(`get_is_authenticated -> fid: ${String(fid)}`), T))
-
 const get_req_init = (): RequestInit => ({ method: "POST", credentials: "include" })
 
-const sign_out =
-	(logger: TLogger, web_host: string, is_dev: boolean) => (res: string | Error | null) => {
-		// Treat an error caused by HMR in dev mode when commands do not get restarted
-		if (res instanceof Error && res.message === "Forbidden" && is_dev) {
-			return window.location.reload()
-		}
-
-		logger.error("Token refresh failed. Signing out.")
-		window.location.href = `${web_host}/sign-out`
-	}
+// const sign_out =
+// 	(logger: TLogger, web_host: string, is_dev: boolean) => (res: string | Error | null) => {
+// Treat an error caused by HMR in dev mode when commands do not get restarted
+// if (res instanceof Error && res.message === "Forbidden" && is_dev) {
+// 	return window.location.reload()
+// }
+// logger.error("Token refresh failed. Signing out.")
+// window.location.href = `${web_host}/sign-out`
+// 	}
 
 const auth$ = new BehaviorSubject<TOption<AuthResponse>>(O.None())

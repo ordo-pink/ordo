@@ -41,7 +41,7 @@ export default function GTDWidget() {
 	const handleCreate = () => {
 		if (!newItem) return
 
-		commands.emit<cmd.data.create>("data.create", {
+		commands.emit<cmd.data.create>("data.metadata.create", {
 			name: newItem,
 			parent: null,
 			labels: ["gtd", "inbox"],

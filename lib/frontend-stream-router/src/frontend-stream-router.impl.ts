@@ -17,28 +17,40 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import { BehaviorSubject, Observable, map } from "rxjs"
 import { Router, operators } from "silkrouter"
-import { BehaviorSubject } from "rxjs/internal/BehaviorSubject"
-import { map } from "rxjs/internal/operators/map"
 
-import { activities$, currentActivity$, current_fid$ } from "@ordo-pink/frontend-stream-activities"
+import { O, type TOption } from "@ordo-pink/option"
+import {
+	type TFIDAwareActivity,
+	type TGetCurrentRouteFn,
+	type TSetCurrentActivityFn,
+	type TSetCurrentFIDFn,
+} from "@ordo-pink/core"
+import { KnownFunctions } from "@ordo-pink/frontend-known-functions"
+import { RRR } from "@ordo-pink/data"
+import { Result } from "@ordo-pink/result"
+import { type TLogger } from "@ordo-pink/logger"
 import { call_once } from "@ordo-pink/tau"
-import { TLogger } from "@ordo-pink/logger"
-import { Observable } from "rxjs"
-import { TOption } from "@ordo-pink/option"
 
 const { route, noMatch } = operators
 
 type TInitRouterStreamFn = (params: {
+	app_fid: symbol
 	logger: TLogger
 	commands: Client.Commands.Commands
-	activities$: Observable<TOption<Functions.Activity[]>>
-	set_current_activity: (activity: Functions.Activity) => void
-	set_current_fid$: 
-}) => void
-export const __init_router$: TInitRouterStreamFn = call_once(
-	({ logger, commands, activities$ }) => {
+	activities$: Observable<TFIDAwareActivity[]>
+	set_current_activity: TSetCurrentActivityFn
+	set_current_fid: TSetCurrentFIDFn
+}) => { get_current_route: TGetCurrentRouteFn }
+export const init_router: TInitRouterStreamFn = call_once(
+	({ app_fid, logger, commands, activities$, set_current_activity, set_current_fid }) => {
 		logger.debug("Initializing router...")
+
+		const set_fid = set_current_fid(app_fid)
+		const set_activity = set_current_activity(app_fid)
+
+		const eperm = RRR.codes.eperm("init_router")
 
 		commands.on<cmd.router.navigate>("router.navigate", payload => {
 			if (Array.isArray(payload)) {
@@ -49,48 +61,57 @@ export const __init_router$: TInitRouterStreamFn = call_once(
 			router$.set(payload)
 		})
 
-		commands.on<cmd.router.open_external>("router.open_external", ({ url, newTab = true }) => {
-			logger.debug("Opening external page", { url, newTab })
-			newTab ? window.open(url, "_blank")?.focus() : (window.location.href = url)
+		commands.on<cmd.router.open_external>("router.open_external", ({ url, new_tab = true }) => {
+			logger.debug("Opening external page", { url, new_tab })
+			new_tab ? window.open(url, "_blank")?.focus() : (window.location.href = url)
 		})
 
 		activities$
 			.pipe(
 				map(activities => {
 					activities?.map(activity => {
-						return activity.routes.forEach(activityRoute => {
+						return activity.routes.forEach(activity_route => {
 							router$ &&
-								router$.pipe(route(activityRoute)).subscribe((routeData: Client.Router.Route) => {
-									currentActivity$.next(activity)
-									currentRoute$.next(routeData)
-									current_fid$.next((activity as any).fid)
+								router$.pipe(route(activity_route)).subscribe((route_data: Client.Router.Route) => {
+									set_activity(activity.name)
+									set_fid(activity.fid)
+									current_route$.next(O.FromNullable(route_data))
 								})
 						})
 					})
 
 					router$ &&
 						router$.pipe(noMatch(router$)).subscribe(() => {
-							const homeActivity = activities.find(activity => activity.name === "home")
-							currentActivity$.next(homeActivity!)
-							current_fid$.next((homeActivity as any).fid)
+							const home_activity = activities.find(activity => activity.name === "home")!
+							set_activity(home_activity.name)
+							set_fid(home_activity.fid)
 
-							currentRoute$.next({
-								data: null,
-								hash: "",
-								hashRouting: false,
-								params: {},
-								path: "/",
-								route: "/",
-								search: "",
-							})
+							current_route$.next(
+								O.Some({
+									data: null,
+									hash: "",
+									hashRouting: false,
+									params: {},
+									path: "/",
+									route: "/",
+									search: "",
+								}),
+							)
 						})
 				}),
 			)
 			.subscribe()
 
 		logger.debug("Initialized router.")
+
+		return {
+			get_current_route: fid => () =>
+				Result.If(KnownFunctions.check_permissions(fid, { queries: ["application.current_route"] }))
+					.pipe(Result.ops.err_map(() => eperm(`get_current_route -> fid: ${String(fid)}`)))
+					.pipe(Result.ops.map(() => current_route$.asObservable())),
+		}
 	},
 )
 
 export const router$ = new Router({ hashRouting: false, init: true })
-export const currentRoute$ = new BehaviorSubject<Client.Router.Route | null>(null)
+export const current_route$ = new BehaviorSubject<TOption<Client.Router.Route>>(O.None())

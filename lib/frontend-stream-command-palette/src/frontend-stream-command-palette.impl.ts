@@ -26,18 +26,18 @@ import { shareReplay } from "rxjs/internal/operators/shareReplay"
 
 import { call_once } from "@ordo-pink/tau"
 import { _get_commands } from "@ordo-pink/frontend-stream-commands"
-import { _get_logger } from "@ordo-pink/frontend-logger"
+import { get_logger } from "@ordo-pink/frontend-logger"
 
 export const __init_command_palette$ = call_once((fid: symbol) => {
 	const commands = _get_commands(fid)
-	const logger = _get_logger(fid)
+	const logger = get_logger(fid)
 
 	logger.debug("Initializing command palette...")
 
-	commands.on<cmd.commandPalette.show>("command-palette.show", show)
-	commands.on<cmd.commandPalette.add>("command-palette.add", add)
-	commands.on<cmd.commandPalette.remove>("command-palette.remove", remove)
-	commands.on<cmd.commandPalette.hide>("command-palette.hide", () => {
+	commands.on<cmd.command_palette.show>("command-palette.show", show)
+	commands.on<cmd.command_palette.add>("command-palette.add", add)
+	commands.on<cmd.command_palette.remove>("command-palette.remove", remove)
+	commands.on<cmd.command_palette.hide>("command-palette.hide", () => {
 		currentCommandPalette$.next({ items: [] })
 		commands.emit<cmd.modal.hide>("modal.hide")
 	})

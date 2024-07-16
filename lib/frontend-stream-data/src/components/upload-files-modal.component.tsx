@@ -42,7 +42,7 @@ export default function UploadFilesModal({ parent }: Props) {
 		for (const file of files) {
 			const name = file.name
 
-			commands.emit<cmd.data.uploadContent>("data.upload-content", {
+			commands.emit<cmd.data.upload_content>("data.content.upload_content", {
 				name,
 				parent: parent?.fsid ?? null,
 				content: await file.arrayBuffer(),

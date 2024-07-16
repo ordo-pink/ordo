@@ -21,16 +21,16 @@ import crypto from "crypto"
 
 import { Oath } from "@ordo-pink/oath"
 
-import type { UserPersistenceStrategy } from "./types"
+import type { TUserPersistenceStrategy } from "./types"
 
 export class UserService {
-	#persistenceStrategy: UserPersistenceStrategy
+	#persistenceStrategy: TUserPersistenceStrategy
 
-	public static of(driver: UserPersistenceStrategy) {
+	public static of(driver: TUserPersistenceStrategy) {
 		return new UserService(driver)
 	}
 
-	protected constructor(driver: UserPersistenceStrategy) {
+	protected constructor(driver: TUserPersistenceStrategy) {
 		this.#persistenceStrategy = driver
 	}
 
@@ -41,10 +41,10 @@ export class UserService {
 					id: crypto.randomUUID(),
 					email,
 					password,
-					emailConfirmed: false,
-					createdAt: new Date(Date.now()),
-					fileLimit: 1000,
-					maxUploadSize: 1.5,
+					email_confirmed: false,
+					created_at: new Date(Date.now()),
+					file_limit: 1000,
+					max_upload_size: 1.5,
 					subscription: "free",
 				}),
 			)
@@ -52,7 +52,7 @@ export class UserService {
 	}
 
 	public updateUserPassword(user: User.User, oldPassword: string, newPassword: string) {
-		return this.#persistenceStrategy.getById(user.id).chain(oldUser =>
+		return this.#persistenceStrategy.get_by_id(user.id).chain(oldUser =>
 			Oath.from(() => Bun.password.verify(oldPassword, oldUser.password))
 				.chain(valid =>
 					Oath.fromBoolean(
@@ -82,20 +82,20 @@ export class UserService {
 	}
 
 	public getByEmail(email: string) {
-		return this.#persistenceStrategy.getByEmail(email).map(user => this.serializePrivate(user))
+		return this.#persistenceStrategy.get_by_email(email).map(user => this.serializePrivate(user))
 	}
 
 	public getUserInfo(email: string) {
-		return this.#persistenceStrategy.getByEmail(email).map(user => this.serializePublic(user))
+		return this.#persistenceStrategy.get_by_email(email).map(user => this.serializePublic(user))
 	}
 
 	public getById(id: string) {
-		return this.#persistenceStrategy.getById(id).map(user => this.serializePrivate(user))
+		return this.#persistenceStrategy.get_by_id(id).map(user => this.serializePrivate(user))
 	}
 
 	public comparePassword(email: string, password: string) {
 		return this.#persistenceStrategy
-			.getByEmail(email)
+			.get_by_email(email)
 			.chain(user => Oath.from(() => Bun.password.verify(password, user.password)))
 			.chain(x =>
 				Oath.fromBoolean(
@@ -108,41 +108,41 @@ export class UserService {
 
 	public serialize(user: User.InternalUser): User.User {
 		return {
-			createdAt: user.createdAt,
+			created_at: user.created_at,
 			email: user.email,
-			emailConfirmed: user.emailConfirmed,
+			email_confirmed: user.email_confirmed,
 			id: user.id,
-			firstName: user.firstName,
-			lastName: user.lastName,
+			first_name: user.first_name,
+			last_name: user.last_name,
 			handle: user.handle,
-			fileLimit: user.fileLimit,
-			maxUploadSize: user.maxUploadSize,
+			file_limit: user.file_limit,
+			max_upload_size: user.max_upload_size,
 			subscription: user.subscription,
 		}
 	}
 
 	public serializePrivate(user: User.InternalUser): User.PrivateUser {
 		return {
-			createdAt: user.createdAt,
+			created_at: user.created_at,
 			email: user.email,
-			emailConfirmed: user.emailConfirmed,
+			email_confirmed: user.email_confirmed,
 			id: user.id,
-			firstName: user.firstName,
-			lastName: user.lastName,
+			first_name: user.first_name,
+			last_name: user.last_name,
 			handle: user.handle,
-			fileLimit: user.fileLimit,
-			maxUploadSize: user.maxUploadSize,
+			file_limit: user.file_limit,
+			max_upload_size: user.max_upload_size,
 			subscription: user.subscription,
-			code: user.code,
+			email_code: user.email_code,
 		}
 	}
 
 	public serializePublic(user: User.InternalUser | User.PublicUser): User.PublicUser {
 		return {
-			createdAt: user.createdAt,
+			created_at: user.created_at,
 			email: this.obfuscateEmail(user.email),
-			firstName: user.firstName,
-			lastName: user.lastName,
+			first_name: user.first_name,
+			last_name: user.last_name,
 			handle: user.handle,
 			subscription: user.subscription,
 		}

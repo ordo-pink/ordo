@@ -98,14 +98,14 @@ export const handleSignUp: Fn =
 					)
 					.chain(tokens =>
 						Oath.of(crypto.getRandomValues(new Uint32Array(3)).join(""))
-							.chain(code => userService.update(tokens.sub, { code }))
+							.chain(code => userService.update(tokens.sub, { email_code: code }))
 							.tap(user =>
 								notificationService.sendSignUpNotification({
 									to: {
 										email: user.email,
 										name: user.email,
 									},
-									confirmationUrl: `${websiteHost}/confirm-email?code=${user.code}&email=${user.email}`,
+									confirmationUrl: `${websiteHost}/confirm-email?code=${user.email_code}&email=${user.email}`,
 								}),
 							)
 							.bimap(

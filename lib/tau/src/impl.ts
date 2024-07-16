@@ -41,6 +41,7 @@ export const is_array = Array.isArray
 export const is_date = (x: unknown): x is Date => !!x && x instanceof Date
 export const is_string = (x: unknown): x is string => !!x && typeof x === "string"
 export const is_non_empty_string = (x: unknown): x is string => is_string(x) && x.trim() !== ""
+export const is_undefined = (x: unknown): x is undefined => x === undefined
 export const is_number = (x: unknown): x is number => typeof x === "number"
 export const is_negative_number = (x: unknown): x is number => is_number(x) && x < 0
 export const is_0 = (x: unknown): x is 0 => x === 0

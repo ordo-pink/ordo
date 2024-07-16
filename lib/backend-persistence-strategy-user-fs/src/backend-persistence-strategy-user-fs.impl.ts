@@ -17,38 +17,89 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { readFile0, writeFileRecursive0 } from "@ordo-pink/fs"
+import { read_file0, write_file_rec0 } from "@ordo-pink/fs"
+import { O } from "@ordo-pink/option"
 import { Oath } from "@ordo-pink/oath"
-import { type UserPersistenceStrategy } from "@ordo-pink/backend-service-user"
+import { RRR } from "@ordo-pink/data"
+import { type TUserPersistenceStrategy } from "@ordo-pink/backend-service-user"
 
-const getUsers0 = (path: string): Oath<User.InternalUser[], Error> =>
-	readFile0(path, "utf-8")
-		.fix(() => writeFileRecursive0(path, "[]", "utf-8").map(() => "[]"))
-		.chain(file => Oath.try(() => JSON.parse(file as string)))
+export const PersistenceStrategyUserFS = {
+	of: (path: string): TUserPersistenceStrategy => ({
+		create: user =>
+			_get_users0(path)
+				.pipe(Oath.ops.chain(_check_user_does_not_exist0("id", user)))
+				.pipe(Oath.ops.chain(_check_user_does_not_exist0("email", user)))
+				.pipe(Oath.ops.chain(_check_user_does_not_exist0("handle", user)))
+				.pipe(Oath.ops.chain(users => _save_users0(path, [...users, user]))),
 
-const saveUsers0 = (path: string, data: User.InternalUser[]) =>
-	Oath.try(() => JSON.stringify(data)).chain(file => writeFileRecursive0(path, file, "utf-8"))
+		exists_by_email: e => _get_users0(path).pipe(Oath.ops.map(_check_exists("email", e))),
 
-const of = (path: string): UserPersistenceStrategy => ({
-	create: user =>
-		getUsers0(path)
-			.chain(users => saveUsers0(path, [...users, user]))
-			.map(() => user),
-	existsByEmail: email => getUsers0(path).map(users => users.some(user => user.email === email)),
-	existsById: id => getUsers0(path).map(users => users.some(user => user.id === id)),
-	getByEmail: email =>
-		getUsers0(path).chain(users => Oath.fromNullable(users.find(user => user.email === email))),
-	getById: id =>
-		getUsers0(path).chain(users => Oath.fromNullable(users.find(user => user.id === id))),
-	update: (id, user) =>
-		getUsers0(path).chain(users =>
-			Oath.fromNullable(users.find(user => user.id === id)).chain(oldUser => {
-				users.splice(users.indexOf(oldUser), 1, { ...oldUser, ...user })
-				return Oath.of(users)
-					.chain(updatedUsers => saveUsers0(path, updatedUsers))
-					.map(() => ({ ...oldUser, ...user }))
-			}),
-		),
-})
+		exists_by_id: i => _get_users0(path).pipe(Oath.ops.map(_check_exists("id", i))),
 
-export const PersistenceStrategyUserFS = { of }
+		exists_by_handle: h => _get_users0(path).pipe(Oath.ops.map(_check_exists("handle", h))),
+
+		get_by_email: email =>
+			_get_users0(path).pipe(
+				Oath.ops.map(users => O.FromNullable(users.find(user => user.email === email))),
+			),
+
+		get_by_id: id =>
+			_get_users0(path).pipe(
+				Oath.ops.map(users => O.FromNullable(users.find(user => user.id === id))),
+			),
+
+		get_by_handle: handle =>
+			_get_users0(path).pipe(
+				Oath.ops.map(users => O.FromNullable(users.find(user => user.handle === handle))),
+			),
+
+		update: (id, updated_user) =>
+			_get_users0(path)
+				.pipe(Oath.ops.chain(_replace_user0(id, updated_user)))
+				.pipe(Oath.ops.chain(users => _save_users0(path, users))),
+	}),
+}
+
+// --- Internal ---
+
+const LOCATION = "PersistenceStrategyUserFS"
+
+const eexist = RRR.codes.eexist(LOCATION)
+const enoent = RRR.codes.enoent(LOCATION)
+const eio = RRR.codes.eio(LOCATION)
+
+const _check_user_does_not_exist0 =
+	(key: "id" | "email" | "handle", user: User.InternalUser) => (users: User.InternalUser[]) =>
+		Oath.If(!users.some(u => u[key] === user[key]), {
+			T: () => users,
+			F: () => eexist(`create -> id: ${user.id}`),
+		})
+
+const _get_users0 = (path: string) =>
+	read_file0(path, "utf-8")
+		.fix(() => write_file_rec0(path, "[]", "utf-8").pipe(Oath.ops.map(() => "[]")))
+		.pipe(Oath.ops.chain(file => Oath.Try(() => JSON.parse(file as string) as User.InternalUser[])))
+		.pipe(Oath.ops.rejected_map(error => eio(`get_users -> error: ${error.message}`)))
+
+const _save_users0 = (path: string, data: User.InternalUser[]) =>
+	Oath.Try(() => JSON.stringify(data))
+		.pipe(Oath.ops.chain(file => write_file_rec0(path, file, "utf-8")))
+		.pipe(Oath.ops.rejected_map(error => eio(`save_users -> error: ${error.message}`)))
+
+const _replace_user0 =
+	(id: User.InternalUser["id"], updated_user: User.InternalUser) => (users: User.InternalUser[]) =>
+		Oath.FromNullable(
+			users.find(user => user.id === id),
+			() => enoent(`update -> id: ${id}`),
+		).pipe(
+			Oath.ops.map(existing_user =>
+				users
+					.slice(0, users.indexOf(existing_user))
+					.concat(updated_user)
+					.concat(users.slice(users.indexOf(existing_user))),
+			),
+		)
+
+const _check_exists =
+	(key: "id" | "email" | "handle", value: string) => (users: User.InternalUser[]) =>
+		users.some(user => user[key] === value)

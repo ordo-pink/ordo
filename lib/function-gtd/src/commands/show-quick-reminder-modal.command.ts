@@ -35,19 +35,19 @@ export const registerShowQuickReminderModalCmd = ({ commands }: P) => {
 }
 
 const registerCommandPalette = ({ commands }: P) => {
-	commands.emit<cmd.commandPalette.add>("command-palette.add", {
+	commands.emit<cmd.command_palette.add>("command-palette.add", {
 		id: COMMAND_NAME,
 		Icon: BsInbox,
-		readableName: "Создать задачу во Входящих",
+		readable_name: "Создать задачу во Входящих",
 		accelerator: "meta+shift+n",
-		onSelect: () => {
-			commands.emit<cmd.commandPalette.hide>("command-palette.hide")
+		on_select: () => {
+			commands.emit<cmd.command_palette.hide>("command-palette.hide")
 			commands.emit<cmd.gtd.showQuickReminderModal>(COMMAND_NAME)
 		},
 	})
 
 	return () => {
-		commands.emit<cmd.commandPalette.remove>("command-palette.remove", COMMAND_NAME)
+		commands.emit<cmd.command_palette.remove>("command-palette.remove", COMMAND_NAME)
 	}
 }
 

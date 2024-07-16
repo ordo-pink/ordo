@@ -41,19 +41,19 @@ const registerCommand = (params: P) => {
 }
 
 const registerCommandPalette = ({ commands }: P) => {
-	commands.emit<cmd.commandPalette.add>("command-palette.add", {
+	commands.emit<cmd.command_palette.add>("command-palette.add", {
 		id: "home.go-to-home",
 		Icon: BsCollection,
-		onSelect: () => {
+		on_select: () => {
 			commands.emit<cmd.home.goToHome>("home.go-to-home")
-			commands.emit<cmd.commandPalette.hide>("command-palette.hide")
+			commands.emit<cmd.command_palette.hide>("command-palette.hide")
 		},
-		readableName: "Открыть главную страницу",
+		readable_name: "Открыть главную страницу",
 		accelerator: "mod+h",
 	})
 
 	return () => {
-		commands.emit<cmd.commandPalette.remove>("command-palette.remove", "home.go-to-home")
+		commands.emit<cmd.command_palette.remove>("command-palette.remove", "home.go-to-home")
 	}
 }
 

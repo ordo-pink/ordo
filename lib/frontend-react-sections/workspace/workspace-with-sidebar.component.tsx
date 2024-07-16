@@ -45,7 +45,7 @@ export default function WorkspaceWithSidebar({ activity }: WorkspaceContentProps
 
 	useEffect(() => {
 		const isNarrow = windowWidth < NARROW_WINDOW_BREAKPOINT
-		commands.emit<cmd.sidebar.setSize>(
+		commands.emit<cmd.sidebar.set_size>(
 			"sidebar.set-size",
 			isNarrow ? DEFAULT_WORKSPACE_SPLIT_SIZE_NO_SIDEBAR : DEFAULT_WORKSPACE_SPLIT_SIZE,
 		)
@@ -83,7 +83,7 @@ export default function WorkspaceWithSidebar({ activity }: WorkspaceContentProps
 			newRight = 0
 		}
 
-		commands.emit<cmd.sidebar.setSize>("sidebar.set-size", [newLeft, newRight])
+		commands.emit<cmd.sidebar.set_size>("sidebar.set-size", [newLeft, newRight])
 	}
 
 	return Either.fromNullable(activity).fold(

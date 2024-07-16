@@ -39,7 +39,7 @@ export const registerAchievements = ({ commands, data, staticHost }: P) => {
 
 			if (labels.length >= 3) grant()
 
-			commands.on<cmd.data.addLabel>("data.add-label", () => {
+			commands.on<cmd.data.add_labels>("data.metadata.add_label", () => {
 				const labels = data.getDataLabels()
 
 				if (labels.length >= 2) grant()
@@ -72,7 +72,7 @@ export const registerAchievements = ({ commands, data, staticHost }: P) => {
 			previous: ORDO_PINK_GTD_FUNCTION.concat(".achievements.create-a-project"),
 		},
 		subscribe: ({ grant }) => {
-			commands.on<cmd.data.create>("data.create", ({ parent }) => {
+			commands.on<cmd.data.create>("data.metadata.create", ({ parent }) => {
 				if (!parent) return
 
 				const allData = data.getData()
@@ -96,7 +96,7 @@ export const registerAchievements = ({ commands, data, staticHost }: P) => {
 
 			if (labels.length >= 10) grant()
 
-			commands.on<cmd.data.addLabel>("data.add-label", () => {
+			commands.on<cmd.data.add_labels>("data.metadata.add_label", () => {
 				const labels = data.getDataLabels()
 
 				if (labels.length >= 9) grant()
@@ -118,7 +118,7 @@ export const registerAchievements = ({ commands, data, staticHost }: P) => {
 
 			if (labels.length >= 25) grant()
 
-			commands.on<cmd.data.addLabel>("data.add-label", () => {
+			commands.on<cmd.data.add_labels>("data.metadata.add_label", () => {
 				const labels = data.getDataLabels()
 
 				if (labels.length >= 24) grant()
@@ -142,7 +142,7 @@ export const registerAchievements = ({ commands, data, staticHost }: P) => {
 
 			if (files && files.length >= 50) grant()
 
-			commands.on<cmd.data.create>("data.create", () => {
+			commands.on<cmd.data.create>("data.metadata.create", () => {
 				const files = data.selectDataList(
 					item => GTDRepository.isInbox(item) && !GTDRepository.isDone(item),
 				)

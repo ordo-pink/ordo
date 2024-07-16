@@ -35,23 +35,26 @@ export default function DirectoryCardComponent({ plain }: P) {
 			event.preventDefault()
 			return
 		}
-		commands.emit<cmd.ctxMenu.show>("context-menu.show", { event, payload: plain })
+		commands.emit<cmd.ctx_menu.show>("context-menu.show", { event, payload: plain })
 	}
 
 	return (
 		<div
-			className="flex flex-col items-center space-y-1 directory-card"
+			className="directory-card flex flex-col items-center space-y-1"
 			onContextMenu={showContextMenu}
 		>
 			<BsFolder2 className="size-full" />
-			<div className="mt-1 text-sm text-center break-words line-clamp-2">{plain.name}</div>
+			<div className="mt-1 line-clamp-2 break-words text-center text-sm">{plain.name}</div>
 			<div className="flex space-x-1">
 				<DataLabel>
 					<div
 						className="flex items-center space-x-1 text-xs"
 						title={`Метки:\n\n- ${plain.labels.join("\n- ")}`}
 						onClick={() =>
-							commands.emit<cmd.data.showEditLabelsPalette>("data.show-edit-labels-palette", plain)
+							commands.emit<cmd.data.show_edit_labels_palette>(
+								"data.show-edit-labels-palette",
+								plain,
+							)
 						}
 					>
 						<BsTags />
@@ -64,7 +67,7 @@ export default function DirectoryCardComponent({ plain }: P) {
 						className="flex items-center space-x-1 text-xs"
 						title={`Ссылки на файлы:\n\n- ${plain.links.join("\n- ")}`}
 						onClick={() =>
-							commands.emit<cmd.data.showEditLinksPalette>("data.show-edit-links-palette", plain)
+							commands.emit<cmd.data.show_edit_links_palette>("data.show-edit-links-palette", plain)
 						}
 					>
 						<BsLink45Deg />

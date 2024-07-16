@@ -43,18 +43,18 @@ const registerCommand = (params: P) => {
 }
 
 const registerCommandPalette = ({ commands }: P) => {
-	commands.emit<cmd.commandPalette.add>("command-palette.add", {
+	commands.emit<cmd.command_palette.add>("command-palette.add", {
 		id: "user.go_to_account",
-		readableName: "Открыть аккаунт",
+		readable_name: "Открыть аккаунт",
 		Icon: BsPersonCircle,
-		onSelect: () => {
-			commands.emit<cmd.commandPalette.hide>("command-palette.hide")
+		on_select: () => {
+			commands.emit<cmd.command_palette.hide>("command-palette.hide")
 			commands.emit<cmd.user.go_to_account>("user.go_to_account")
 		},
 	})
 
 	return () => {
-		commands.emit<cmd.commandPalette.remove>("command-palette.remove", "user.go_to_account")
+		commands.emit<cmd.command_palette.remove>("command-palette.remove", "user.go_to_account")
 	}
 }
 

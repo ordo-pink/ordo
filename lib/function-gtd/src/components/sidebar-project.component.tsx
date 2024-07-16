@@ -42,7 +42,7 @@ export default function GTDSidebarProject({ fsid }: Props) {
 	return Either.fromNullable(data).fold(Null, data => (
 		<ActionListItem
 			onContextMenu={event =>
-				commands.emit<cmd.ctxMenu.show>("context-menu.show", { event, payload: data })
+				commands.emit<cmd.ctx_menu.show>("context-menu.show", { event, payload: data })
 			}
 			large
 			key={data.fsid}

@@ -35,7 +35,7 @@ export default function Callout({ attributes, children, element }: RenderElement
 		commands.on("editor.set-callout-type-warn", handleSetCalloutType("warn"))
 		commands.on("editor.set-callout-type-rrr", handleSetCalloutType("rrr"))
 
-		commands.emit<cmd.ctxMenu.add>("context-menu.add", {
+		commands.emit<cmd.ctx_menu.add>("context-menu.add", {
 			cmd: "editor.set-callout-type-default",
 			Icon: BsCircle,
 			readableName: "Default",
@@ -43,7 +43,7 @@ export default function Callout({ attributes, children, element }: RenderElement
 			shouldShow: ({ payload }) => payload === "editor.callout-menu",
 		})
 
-		commands.emit<cmd.ctxMenu.add>("context-menu.add", {
+		commands.emit<cmd.ctx_menu.add>("context-menu.add", {
 			cmd: "editor.set-callout-type-info",
 			Icon: BsInfoCircle,
 			readableName: "Info",
@@ -51,7 +51,7 @@ export default function Callout({ attributes, children, element }: RenderElement
 			shouldShow: ({ payload }) => payload === "editor.callout-menu",
 		})
 
-		commands.emit<cmd.ctxMenu.add>("context-menu.add", {
+		commands.emit<cmd.ctx_menu.add>("context-menu.add", {
 			cmd: "editor.set-callout-type-question",
 			Icon: BsQuestionCircle,
 			readableName: "Question",
@@ -59,7 +59,7 @@ export default function Callout({ attributes, children, element }: RenderElement
 			shouldShow: ({ payload }) => payload === "editor.callout-menu",
 		})
 
-		commands.emit<cmd.ctxMenu.add>("context-menu.add", {
+		commands.emit<cmd.ctx_menu.add>("context-menu.add", {
 			cmd: "editor.set-callout-type-warn",
 			Icon: BsExclamationCircle,
 			readableName: "Warning",
@@ -67,7 +67,7 @@ export default function Callout({ attributes, children, element }: RenderElement
 			shouldShow: ({ payload }) => payload === "editor.callout-menu",
 		})
 
-		commands.emit<cmd.ctxMenu.add>("context-menu.add", {
+		commands.emit<cmd.ctx_menu.add>("context-menu.add", {
 			cmd: "editor.set-callout-type-success",
 			Icon: BsCheckCircle,
 			readableName: "Success",
@@ -75,7 +75,7 @@ export default function Callout({ attributes, children, element }: RenderElement
 			shouldShow: ({ payload }) => payload === "editor.callout-menu",
 		})
 
-		commands.emit<cmd.ctxMenu.add>("context-menu.add", {
+		commands.emit<cmd.ctx_menu.add>("context-menu.add", {
 			cmd: "editor.set-callout-type-rrr",
 			Icon: BsXCircle,
 			readableName: "Error",
@@ -101,7 +101,7 @@ export default function Callout({ attributes, children, element }: RenderElement
 					<BsThreeDotsVertical
 						className="shrink-0 cursor-pointer opacity-20 transition-opacity duration-300 hover:opacity-100"
 						onClick={event =>
-							commands.emit<cmd.ctxMenu.show>("context-menu.show", {
+							commands.emit<cmd.ctx_menu.show>("context-menu.show", {
 								event,
 								payload: "editor.callout-menu",
 							})

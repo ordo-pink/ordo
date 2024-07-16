@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Unlicense
 
 import { expect, test } from "bun:test"
-import { isDirectory0, isFile0, readFile0, rmdir0 } from "@ordo-pink/fs"
+import { is_dir0, is_file0, read_file0, rmdir0 } from "@ordo-pink/fs"
 import { getLicense } from "@ordo-pink/binutil"
 
 import { mksrv } from "./impl"
@@ -10,13 +10,13 @@ import { mksrv } from "./impl"
 test("should create test srv src files", async () => {
 	await mksrv("test-srv", "Unlicense")
 
-	expect(await isDirectory0("./srv/test-srv").toPromise()).toBeTrue()
-	expect(await isFile0("./srv/test-srv/license").toPromise()).toBeTrue()
-	expect(await isFile0("./srv/test-srv/index.ts").toPromise()).toBeTrue()
-	expect(await isFile0("./srv/test-srv/readme.md").toPromise()).toBeTrue()
-	expect(await isFile0("./srv/test-srv/src/impl.ts").toPromise()).toBeTrue()
-	expect(await isFile0("./srv/test-srv/src/types.ts").toPromise()).toBeTrue()
-	expect(await isFile0("./srv/test-srv/src/impl.test.ts").toPromise()).toBeTrue()
+	expect(await is_dir0("./srv/test-srv").toPromise()).toBeTrue()
+	expect(await is_file0("./srv/test-srv/license").toPromise()).toBeTrue()
+	expect(await is_file0("./srv/test-srv/index.ts").toPromise()).toBeTrue()
+	expect(await is_file0("./srv/test-srv/readme.md").toPromise()).toBeTrue()
+	expect(await is_file0("./srv/test-srv/src/impl.ts").toPromise()).toBeTrue()
+	expect(await is_file0("./srv/test-srv/src/types.ts").toPromise()).toBeTrue()
+	expect(await is_file0("./srv/test-srv/src/impl.test.ts").toPromise()).toBeTrue()
 
 	await rmdir0("./srv/test-srv", { recursive: true }).toPromise()
 })
@@ -24,7 +24,7 @@ test("should create test srv src files", async () => {
 test("should license the files with Unlicense", async () => {
 	await mksrv("test-srv", "Unlicense")
 
-	const text = await readFile0("./srv/test-srv/license", "utf-8").toPromise()
+	const text = await read_file0("./srv/test-srv/license", "utf-8").toPromise()
 	expect(text).toEqual(getLicense("Unlicense"))
 
 	await rmdir0("./srv/test-srv", { recursive: true }).toPromise()
@@ -33,7 +33,7 @@ test("should license the files with Unlicense", async () => {
 test("should license the files with AGPL-3.0-only", async () => {
 	await mksrv("test-srv", "AGPL-3.0-only")
 
-	const text = await readFile0("./srv/test-srv/license", "utf-8").toPromise()
+	const text = await read_file0("./srv/test-srv/license", "utf-8").toPromise()
 	expect(text).toEqual(getLicense("AGPL-3.0-only"))
 
 	await rmdir0("./srv/test-srv", { recursive: true }).toPromise()

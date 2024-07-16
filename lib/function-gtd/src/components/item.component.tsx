@@ -54,7 +54,7 @@ export default function GTDItem({ item }: P) {
 	}
 
 	const onContextMenu = (event: MouseEvent<HTMLDivElement>) =>
-		commands.emit<cmd.ctxMenu.show>("context-menu.show", { event, payload: item })
+		commands.emit<cmd.ctx_menu.show>("context-menu.show", { event, payload: item })
 
 	return (
 		<div
@@ -91,7 +91,7 @@ export default function GTDItem({ item }: P) {
 											className="flex items-center space-x-1"
 											onMouseDown={event =>
 												event.button === 0 &&
-												commands.emit<cmd.data.showEditLabelsPalette>(
+												commands.emit<cmd.data.show_edit_labels_palette>(
 													"data.show-edit-labels-palette",
 													item,
 												)
@@ -144,7 +144,7 @@ export default function GTDItem({ item }: P) {
 									className="flex items-center space-x-1"
 									onMouseDown={event =>
 										event.button === 0 &&
-										commands.emit<cmd.data.showEditLinksPalette>(
+										commands.emit<cmd.data.show_edit_links_palette>(
 											"data.show-edit-links-palette",
 											item,
 										)

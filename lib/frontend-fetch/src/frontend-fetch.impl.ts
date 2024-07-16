@@ -19,31 +19,29 @@
 
 import { KnownFunctions } from "@ordo-pink/frontend-known-functions"
 import { Result } from "@ordo-pink/result"
+import { type TGetFetchFn } from "@ordo-pink/core"
+import { type TLogger } from "@ordo-pink/logger"
 import { call_once } from "@ordo-pink/tau"
-import { useCurrentFID } from "@ordo-pink/frontend-stream-activities"
 
 const fetch = window.fetch
 
-export const __init_fetch = call_once(() => {
+type TInitFetchFn = (params: { logger: TLogger }) => { get_fetch: TGetFetchFn }
+export const init_fetch: TInitFetchFn = call_once(({ logger }) => {
+	logger.debug("Initialising fetch...")
+
 	window.fetch = undefined as any
 	window.XMLHttpRequest = undefined as any
 
-	return { fetch, get_fetch }
+	logger.debug("Initialised fetch.")
+
+	return {
+		get_fetch: fid => () =>
+			Result.If(KnownFunctions.check_permissions(fid, { queries: ["application.fetch"] })).cata({
+				Ok: () => fetch,
+				Err: () => forbidden_fetch,
+			}),
+	}
 })
-
-// TODO: Remove references
-export const useFetch = () => {
-	const fid = useCurrentFID()
-	const fetch = get_fetch(fid)
-
-	return fetch
-}
-
-export const get_fetch = (fid: symbol | null): typeof window.fetch =>
-	Result.If(KnownFunctions.check_permissions(fid, { queries: ["fetch"] })).cata({
-		Ok: () => fetch,
-		Err: () => forbidden_fetch,
-	})
 
 // --- Internal ---
 

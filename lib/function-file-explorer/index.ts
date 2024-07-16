@@ -61,7 +61,7 @@ export default createFunction(
 
 				if (files && files.length >= 10) grant()
 
-				commands.on<cmd.data.create>("data.create", () => {
+				commands.on<cmd.data.create>("data.metadata.create", () => {
 					const files = data.getData()
 
 					if (files && files.length >= 9) grant()
@@ -83,7 +83,7 @@ export default createFunction(
 
 				if (files && files.length >= 25) grant()
 
-				commands.on<cmd.data.create>("data.create", () => {
+				commands.on<cmd.data.create>("data.metadata.create", () => {
 					const files = data.getData()
 
 					if (files && files.length >= 24) grant()
@@ -105,7 +105,7 @@ export default createFunction(
 
 				if (files && files.length >= 50) grant()
 
-				commands.on<cmd.data.create>("data.create", () => {
+				commands.on<cmd.data.create>("data.metadata.create", () => {
 					const files = data.getData()
 
 					if (files && files.length >= 49) grant()
@@ -127,7 +127,7 @@ export default createFunction(
 
 				if (files && files.length >= 100) grant()
 
-				commands.on<cmd.data.create>("data.create", () => {
+				commands.on<cmd.data.create>("data.metadata.create", () => {
 					const files = data.getData()
 
 					if (files && files.length >= 99) grant()
@@ -149,7 +149,7 @@ export default createFunction(
 
 				if (files && files.length >= 250) grant()
 
-				commands.on<cmd.data.create>("data.create", () => {
+				commands.on<cmd.data.create>("data.metadata.create", () => {
 					const files = data.getData()
 
 					if (files && files.length >= 249) grant()
@@ -171,7 +171,7 @@ export default createFunction(
 
 				if (files && files.length >= 500) grant()
 
-				commands.on<cmd.data.create>("data.create", () => {
+				commands.on<cmd.data.create>("data.metadata.create", () => {
 					const files = data.getData()
 
 					if (files && files.length >= 499) grant()
@@ -193,7 +193,7 @@ export default createFunction(
 
 				if (files && files.length >= 1000) grant()
 
-				commands.on<cmd.data.create>("data.create", () => {
+				commands.on<cmd.data.create>("data.metadata.create", () => {
 					const files = data.getData()
 
 					if (files && files.length >= 999) grant()

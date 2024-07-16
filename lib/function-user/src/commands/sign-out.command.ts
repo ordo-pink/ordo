@@ -43,18 +43,18 @@ const registerCommand = (params: P) => {
 }
 
 const registerCommandPalette = ({ commands }: P) => {
-	commands.emit<cmd.commandPalette.add>("command-palette.add", {
+	commands.emit<cmd.command_palette.add>("command-palette.add", {
 		id: "user.sign_out",
-		readableName: "Выйти из аккаунта",
+		readable_name: "Выйти из аккаунта",
 		Icon: AiOutlineLogout,
-		onSelect: () => {
-			commands.emit<cmd.commandPalette.hide>("command-palette.hide")
+		on_select: () => {
+			commands.emit<cmd.command_palette.hide>("command-palette.hide")
 			commands.emit<cmd.user.sign_out>("user.sign_out")
 		},
 	})
 
 	return () => {
-		commands.emit<cmd.commandPalette.remove>("command-palette.remove", "user.sign_out")
+		commands.emit<cmd.command_palette.remove>("command-palette.remove", "user.sign_out")
 	}
 }
 
@@ -63,5 +63,5 @@ const commandHandler =
 	() =>
 		commands.emit<cmd.router.open_external>("router.open_external", {
 			url: `${websiteHost}/sign-out`,
-			newTab: false,
+			new_tab: false,
 		})

@@ -68,7 +68,7 @@ export default function EditorWorkspace() {
 					fromNullableE(
 						fileAssociations.find(
 							fileAssociation =>
-								fileAssociation.contentType === data.contentType || !data.contentType,
+								fileAssociation.content_type === data.contentType || !data.contentType,
 						),
 					),
 				),
@@ -113,10 +113,10 @@ export default function EditorWorkspace() {
 
 					<Component
 						content={content}
-						isLoading={isLoading}
+						is_loading={isLoading}
 						data={data}
-						isEditable={true}
-						isEmbedded={false}
+						is_editable={true}
+						is_embedded={false}
 					/>
 				</div>
 			</div>

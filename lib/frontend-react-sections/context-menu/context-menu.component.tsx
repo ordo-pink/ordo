@@ -60,10 +60,10 @@ export default function ContextMenu() {
 
 	const menu = useSubscription(contextMenu$)
 
-	useAccelerator("Esc", () => menu && commands.emit<cmd.ctxMenu.hide>("context-menu.hide"), [menu])
+	useAccelerator("Esc", () => menu && commands.emit<cmd.ctx_menu.hide>("context-menu.hide"), [menu])
 
 	const hideContextMenu = useCallback(
-		() => menu && commands.emit<cmd.ctxMenu.hide>("context-menu.hide"),
+		() => menu && commands.emit<cmd.ctx_menu.hide>("context-menu.hide"),
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 		[menu],
 	)
@@ -125,10 +125,10 @@ export default function ContextMenu() {
 		.default(() => ({ top: -50, left: -50 }))
 
 	useEffect(() => {
-		commands.on<cmd.ctxMenu.show>("context-menu.show", show)
-		commands.on<cmd.ctxMenu.add>("context-menu.add", add)
-		commands.on<cmd.ctxMenu.remove>("context-menu.remove", remove)
-		commands.on<cmd.ctxMenu.hide>("context-menu.hide", hide)
+		commands.on<cmd.ctx_menu.show>("context-menu.show", show)
+		commands.on<cmd.ctx_menu.add>("context-menu.add", add)
+		commands.on<cmd.ctx_menu.remove>("context-menu.remove", remove)
+		commands.on<cmd.ctx_menu.hide>("context-menu.hide", hide)
 
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [])
@@ -181,25 +181,25 @@ export default function ContextMenu() {
 			{Either.fromNullable(menu).fold(Null, menu => (
 				<div className="flex flex-col divide-y">
 					{Either.fromBoolean(() => creators.length > 0)
-						.chain(() => Either.fromBoolean(() => !menu.hideCreateItems))
+						.chain(() => Either.fromBoolean(() => !menu.hide_create_items))
 						.fold(Null, () => (
 							<ContextMenuItemList items={creators} event={menu.event} payload={menu.payload} />
 						))}
 
 					{Either.fromBoolean(() => readers.length > 0)
-						.chain(() => Either.fromBoolean(() => !menu.hideReadItems))
+						.chain(() => Either.fromBoolean(() => !menu.hide_read_items))
 						.fold(Null, () => (
 							<ContextMenuItemList items={readers} event={menu.event} payload={menu.payload} />
 						))}
 
 					{Either.fromBoolean(() => updaters.length > 0)
-						.chain(() => Either.fromBoolean(() => !menu.hideUpdateItems))
+						.chain(() => Either.fromBoolean(() => !menu.hide_update_items))
 						.fold(Null, () => (
 							<ContextMenuItemList items={updaters} event={menu.event} payload={menu.payload} />
 						))}
 
 					{Either.fromBoolean(() => removers.length > 0)
-						.chain(() => Either.fromBoolean(() => !menu.hideDeleteItems))
+						.chain(() => Either.fromBoolean(() => !menu.hide_delete_items))
 						.fold(Null, () => (
 							<ContextMenuItemList items={removers} event={menu.event} payload={menu.payload} />
 						))}
@@ -248,7 +248,7 @@ const contextMenu$ = params$.pipe(
 							(state.payload as PlainData).fsid === LIB_DIRECTORY_FSID) ||
 							state.payload === LIB_DIRECTORY_FSID)
 							? false
-							: item?.shouldShow({ event: state.event, payload: state.payload }) ?? false
+							: item?.should_show({ event: state.event, payload: state.payload }) ?? false
 
 					if (shouldShow && state.event.stopPropagation) state.event.stopPropagation()
 

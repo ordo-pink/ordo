@@ -86,11 +86,11 @@ const extractCtx0: TExtractCtxFn = userService => body =>
 
 type TCheckEmailIsNotConfirmedFn = (user: User.PrivateUser) => Oath<"OK", HttpError>
 const checkEmailIsNotConfirmed0: TCheckEmailIsNotConfirmedFn = user =>
-	from_boolean_oath(user.emailConfirmed, OK).pipe(rejected_map_oath(toEmailAlreadyConfirmedError))
+	from_boolean_oath(user.email_confirmed, OK).pipe(rejected_map_oath(toEmailAlreadyConfirmedError))
 
 type TCheckCodeIsCorrectFn = (user: User.PrivateUser, code: string) => Oath<"OK", HttpError>
 const checkCodeIsCorrect0: TCheckCodeIsCorrectFn = (user, code) =>
-	from_boolean_oath(user.code === code, OK).pipe(rejected_map_oath(toUserNotFoundError))
+	from_boolean_oath(user.email_code === code, OK).pipe(rejected_map_oath(toUserNotFoundError))
 
 type TValidateCtxFn = (ctx: TCtx) => Oath<TCtx, HttpError>
 const validateCtx0: TValidateCtxFn = ctx =>
@@ -101,5 +101,5 @@ const validateCtx0: TValidateCtxFn = ctx =>
 type TUpdateUser0 = (us: UserService) => (ctx: TCtx) => Oath<TResult, HttpError>
 const updateUser0: TUpdateUser0 = userService => ctx =>
 	userService
-		.update(ctx.user.id, { emailConfirmed: true, code: undefined })
+		.update(ctx.user.id, { email_confirmed: true, email_code: undefined })
 		.pipe(bimap_oath(toUserNotFoundError, omit("code")))

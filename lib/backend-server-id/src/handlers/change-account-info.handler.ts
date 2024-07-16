@@ -77,5 +77,5 @@ const updateUserInfo0: TUpdateUserInfoFn =
 	userService =>
 	({ firstName, lastName, user }) =>
 		userService
-			.update(user.id, { firstName: firstName, lastName: lastName })
+			.update(user.id, { first_name: firstName, last_name: lastName })
 			.pipe(bimap_oath(toUserNotFoundError, omit("code")))

@@ -32,16 +32,6 @@ import { type TGetCommandsFn } from "@ordo-pink/core"
 import { type TLogger } from "@ordo-pink/logger"
 import { call_once } from "@ordo-pink/tau"
 
-/**
- * Entrypoint for using commands. You can use this function outside React components.
- * TODO: Do not export
- */
-export const _get_commands = (fid: symbol | null): Client.Commands.Commands =>
-	Result.FromNullable(fid)
-		.pipe(Result.ops.chain(fid => Result.If(KnownFunctions.validate(fid))))
-		.pipe(Result.ops.map(() => fid as symbol))
-		.cata({ Ok: commands, Err: forbidden_commands })
-
 // --- Internal ---
 
 const forbidden_commands = () => ({
@@ -83,13 +73,11 @@ type TCmdListener<N extends Client.Commands.CommandName = Client.Commands.Comman
 ]
 
 // TODO: Only put debug info in dev mode
-type TInitCommandsFn = (params: {
-	app_fid: symbol
-	logger: TLogger
-	highlight_commands_without_handlers?: boolean
-}) => { commands: Client.Commands.Commands; get_commands: TGetCommandsFn }
-export const __init_commands: TInitCommandsFn = call_once(
-	({ app_fid, logger, highlight_commands_without_handlers = true }) => {
+type TInitCommandsFn = (params: { logger: TLogger; log_commands_without_handlers?: boolean }) => {
+	get_commands: TGetCommandsFn
+}
+export const init_commands: TInitCommandsFn = call_once(
+	({ logger, log_commands_without_handlers = true }) => {
 		logger.debug("Initializing commands...")
 
 		command_queue$
@@ -99,9 +87,9 @@ export const __init_commands: TInitCommandsFn = call_once(
 					for (const command of commands) {
 						const name = command.name
 						const fid = command.fid
+						const func = KnownFunctions.exchange(fid) ?? "unauthorized"
 
 						if (!KnownFunctions.check_permissions(fid, { commands: [name] })) {
-							const func = KnownFunctions.exchange(fid) ?? "unauthorized"
 							logger.alert(
 								`Function "${func}" did not request permission to execute command "${name}".`,
 							)
@@ -119,7 +107,7 @@ export const __init_commands: TInitCommandsFn = call_once(
 							dequeue$.next({ name, payload, fid })
 
 							logger.debug(
-								`Command "${name}" invoked for ${listeners.length} ${listeners.length === 1 ? "listener" : "listeners"}. Provided payload: `,
+								`Command "${name}" invoked by "${func}" for ${listeners.length} ${listeners.length === 1 ? "listener" : "listeners"}. Provided payload: `,
 								payload,
 							)
 
@@ -127,7 +115,7 @@ export const __init_commands: TInitCommandsFn = call_once(
 								await listener(payload)
 							}
 						} else {
-							highlight_commands_without_handlers &&
+							log_commands_without_handlers &&
 								logger.debug(
 									`No handler found for the command "${name}". The command will stay pending until handler is registerred.`,
 								)
@@ -139,7 +127,13 @@ export const __init_commands: TInitCommandsFn = call_once(
 
 		logger.debug("Initialised commands.")
 
-		return { commands: commands(app_fid), get_commands: _get_commands }
+		return {
+			get_commands: fid => () =>
+				Result.FromNullable(fid)
+					.pipe(Result.ops.chain(fid => Result.If(KnownFunctions.validate(fid))))
+					.pipe(Result.ops.map(() => fid as symbol))
+					.cata({ Ok: commands, Err: forbidden_commands }),
+		}
 	},
 )
 

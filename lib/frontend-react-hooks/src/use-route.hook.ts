@@ -18,13 +18,13 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { Either } from "@ordo-pink/either"
-import { currentRoute$ } from "@ordo-pink/frontend-stream-router"
+import { current_route$ } from "@ordo-pink/frontend-stream-router"
 import { keys_of } from "@ordo-pink/tau"
 
 import { useSubscription } from "./use-subscription.hook"
 
 export const useCurrentRoute = () => {
-	const route = useSubscription(currentRoute$)
+	const route = useSubscription(current_route$)
 
 	return route
 }

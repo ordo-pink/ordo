@@ -43,19 +43,19 @@ const registerCommand = (params: P) => {
 }
 
 const registerCommandPalette = ({ commands }: P) => {
-	commands.emit<cmd.commandPalette.add>("command-palette.add", {
+	commands.emit<cmd.command_palette.add>("command-palette.add", {
 		id: "links.go-to-links",
 		Icon: PiGraph,
-		onSelect: () => {
+		on_select: () => {
 			commands.emit<cmd.links.goToLinks>("links.go-to-links")
-			commands.emit<cmd.commandPalette.hide>("command-palette.hide")
+			commands.emit<cmd.command_palette.hide>("command-palette.hide")
 		},
-		readableName: "Открыть связи",
+		readable_name: "Открыть связи",
 		accelerator: "mod+shift+l",
 	})
 
 	return () => {
-		commands.emit<cmd.commandPalette.remove>("command-palette.remove", "links.go-to-links")
+		commands.emit<cmd.command_palette.remove>("command-palette.remove", "links.go-to-links")
 	}
 }
 

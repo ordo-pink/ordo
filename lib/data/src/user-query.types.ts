@@ -1,3 +1,5 @@
+import type { Observable } from "rxjs"
+
 import type { Oath } from "@ordo-pink/oath"
 import type { TOption } from "@ordo-pink/option"
 import type { TResult } from "@ordo-pink/result"
@@ -7,9 +9,9 @@ import type { TRrr } from "./metadata.errors"
 
 export type TGetCurrentUserFn = () => TResult<User.User, TRrr<"EAGAIN">>
 
-export type TGetPublicUserByIDFn = (
+export type TGetCurrentUserByIDFn = (
 	id: User.User["id"],
-) => Oath<TOption<User.PublicUser>, TRrr<"EAGAIN" | "EINVAL" | "EIO">>
+) => Oath<TOption<User.User>, TRrr<"EAGAIN" | "EINVAL" | "EIO">>
 
 export type TGetPublicUserByEmailFn = (
 	email: User.User["email"],
@@ -21,9 +23,10 @@ export type TGetPublicUserByHandleFn = (
 
 export type TUserQuery = {
 	get_current: TGetCurrentUserFn
-	// get_by_id: TGetPublicUserByIDFn
+	// get_current_by_id: TGetCurrentUserByIDFn
 	get_by_email: TGetPublicUserByEmailFn
 	// get_by_handle: TGetPublicUserByHandleFn
+	get version$(): Observable<number>
 }
 
 export type TUserQueryStatic = {

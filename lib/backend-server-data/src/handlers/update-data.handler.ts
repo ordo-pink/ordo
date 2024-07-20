@@ -21,7 +21,7 @@ import { type Middleware } from "koa"
 import { type Readable } from "stream"
 
 import { type FSID, type PlainData, type TDataCommands } from "@ordo-pink/data"
-import { authenticate0, parseBody0, sendError } from "@ordo-pink/backend-utils"
+import { authenticate0, parse_body0, send_error } from "@ordo-pink/backend-utils"
 import { HttpError } from "@ordo-pink/rrr"
 import { Oath } from "@ordo-pink/oath"
 import { type SUB } from "@ordo-pink/wjwt"
@@ -36,7 +36,7 @@ export const handleUpdateData: Unary<
 		authenticate0(ctx, idHost)
 			.map(({ payload }) => payload)
 			.chain(({ sub }) =>
-				parseBody0<PlainData>(ctx).chain(data =>
+				parse_body0<PlainData>(ctx).chain(data =>
 					Oath.of({ fsid: ctx.params.fsid as FSID, createdBy: ctx.params.userId as SUB }).chain(
 						({ fsid, createdBy }) =>
 							dataService
@@ -45,7 +45,7 @@ export const handleUpdateData: Unary<
 					),
 				),
 			)
-			.fork(sendError(ctx), result => {
+			.fork(send_error(ctx), result => {
 				ctx.response.status = 200
 				ctx.response.body = { success: true, result }
 			})

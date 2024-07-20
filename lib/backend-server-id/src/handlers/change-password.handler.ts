@@ -19,7 +19,7 @@
 
 import { type Middleware, type Response } from "koa"
 
-import { type JWAT, type TTokenService } from "@ordo-pink/backend-service-token"
+import { type TAccessJWT, type TTokenService } from "@ordo-pink/backend-service-token"
 import {
 	type Oath,
 	bimap_oath,
@@ -30,13 +30,13 @@ import {
 	swap_oath,
 	tap_oath,
 } from "@ordo-pink/oath"
-import { authenticate0, parseBody0, sendError, sendSuccess } from "@ordo-pink/backend-utils"
+import { authenticate0, parse_body0, send_error, send_success } from "@ordo-pink/backend-utils"
 import { HttpError } from "@ordo-pink/rrr"
 import { OK } from "@ordo-pink/core"
 import { type UserService } from "@ordo-pink/backend-service-user"
 import { okpwd } from "@ordo-pink/okpwd"
 
-import { toInvalidBodyError, toUserNotFoundError } from "../fns/to-error"
+import { to_invalid_body_error, to_user_not_found_error } from "../fns/to-error"
 import { setOrdoAuthCookies } from "../fns/set-cookies"
 
 export const handleChangePassword: TFn =
@@ -44,39 +44,39 @@ export const handleChangePassword: TFn =
 	ctx =>
 		merge_oath({
 			token: authenticate0(ctx, tokenService),
-			body: parseBody0<TRequestBody>(ctx, "object"),
+			body: parse_body0<TRequestBody>(ctx, "object"),
 		})
 			.and(extractCtx0(userService))
 			.and(validateCtx0)
 			.and(updateUserPassword0(userService))
 			.and(dropActiveUserSessions0(tokenService))
 			.and(createUserSession0(tokenService, ctx.response))
-			.fork(sendError(ctx), sendSuccess({ ctx }))
+			.fork(send_error(ctx), send_success({ ctx }))
 
 // --- Internal ---
 
 type TParams = { tokenService: TTokenService; userService: UserService }
 type TFn = (params: TParams) => Middleware
-type TRequestBody = Routes.ID.ChangePassword.RequestBody
-type TRequest = { token: JWAT; body: TRequestBody }
+type TRequestBody = Routes.ID.UpdatePassword.RequestBody
+type TRequest = { token: TAccessJWT; body: TRequestBody }
 type TCtx = { oldPassword: string; newPassword: string; user: User.User }
-type TResult = Routes.ID.ChangePassword.Result
+type TResult = Routes.ID.UpdatePassword.ResponseBody
 
 const checkPwd = okpwd()
 
 type TExtractCtxFn = (us: UserService) => (p: TRequest) => Oath<TCtx, HttpError>
 const extractCtx0: TExtractCtxFn =
 	userService =>
-	({ token, body: { oldPassword, newPassword } }) =>
+	({ token, body: { old_password: oldPassword, new_password: newPassword } }) =>
 		merge_oath({
-			user: userService.getById(token.payload.sub).pipe(rejected_map_oath(toUserNotFoundError)),
-			oldPassword: from_nullable_oath(oldPassword).pipe(rejected_map_oath(toInvalidBodyError)),
-			newPassword: from_nullable_oath(newPassword).pipe(rejected_map_oath(toInvalidBodyError)),
+			user: userService.getById(token.payload.sub).pipe(rejected_map_oath(to_user_not_found_error)),
+			oldPassword: from_nullable_oath(oldPassword).pipe(rejected_map_oath(to_invalid_body_error)),
+			newPassword: from_nullable_oath(newPassword).pipe(rejected_map_oath(to_invalid_body_error)),
 		})
 
 type TCheckNewPasswordIsValidFn = (body: TRequestBody) => Oath<"OK", HttpError>
 const checkNewPasswordIsValid0: TCheckNewPasswordIsValidFn = body =>
-	from_nullable_oath(checkPwd(body.newPassword))
+	from_nullable_oath(checkPwd(body.new_password))
 		.pipe(swap_oath)
 		.and(() => OK)
 		.pipe(rejected_map_oath(pwdErr => HttpError.BadRequest(pwdErr)))
@@ -98,9 +98,7 @@ const updateUserPassword0: TUpdateUserPasswordFn = userService => ctx =>
 
 type TDropActiveUserSessionsFn = (ts: TTokenService) => (ctx: TCtx) => Oath<TCtx, HttpError>
 const dropActiveUserSessions0: TDropActiveUserSessionsFn = tokenService => ctx =>
-	tokenService.persistenceStrategy
-		.removeTokenRecord(ctx.user.id)
-		.pipe(bimap_oath(HttpError.from, () => ctx))
+	tokenService.strategy.remove_tokens(ctx.user.id).pipe(bimap_oath(HttpError.from, () => ctx))
 
 type TCreateUserSessionFn = (
 	ts: TTokenService,
@@ -108,7 +106,7 @@ type TCreateUserSessionFn = (
 ) => (ctx: TCtx) => Oath<TResult, HttpError>
 const createUserSession0: TCreateUserSessionFn = (tokenService, response) => ctx =>
 	tokenService
-		.createPair({ sub: ctx.user.id })
+		.create({ sub: ctx.user.id })
 		.pipe(rejected_map_oath(HttpError.from))
 		.and(tokens =>
 			of_oath(new Date(Date.now() + tokens.exp))

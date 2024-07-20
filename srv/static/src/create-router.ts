@@ -24,7 +24,7 @@ import { Context, Router } from "@ordo-pink/routary"
 import { TLogger } from "@ordo-pink/logger"
 import { Oath } from "@ordo-pink/oath"
 import { file_exists0 } from "@ordo-pink/fs"
-import { logBunRequest } from "@ordo-pink/backend-utils"
+import { log_bun_request } from "@ordo-pink/backend-utils"
 
 import type { StaticMiddlewareState } from "./static.types"
 
@@ -62,7 +62,7 @@ const createErrorMiddlewareContext = (time: number) => () => ({ time })
 const createFullFilePath = (root: string) => (pathname: string) => join(root, pathname)
 
 const logRequestThunk = (logger: TLogger, serverName: string, ctx: Context) => () =>
-	logBunRequest({ logger, serverName })(ctx)
+	log_bun_request({ logger, server_name: serverName })(ctx)
 
 const openFileIfExists0 = (path: string) =>
 	file_exists0(path).chain(Oath.ifElse(Boolean, { onTrue: () => Bun.file(path) }))

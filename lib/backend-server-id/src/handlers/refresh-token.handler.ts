@@ -17,131 +17,69 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Context, type Middleware } from "koa"
+import { Context } from "koa"
 
 import { type JTI, type SUB } from "@ordo-pink/wjwt"
-import {
-	type Oath,
-	from_boolean_oath,
-	from_nullable_oath,
-	merge_oath,
-	of_oath,
-	rejected_map_oath,
-	rejected_tap_oath,
-	tap_oath,
-} from "@ordo-pink/oath"
-import { type UUIDv4, is_uuid } from "@ordo-pink/tau"
-import { sendError, sendSuccess } from "@ordo-pink/backend-utils"
-import { HttpError } from "@ordo-pink/rrr"
+import { RRR, type TRrr } from "@ordo-pink/data"
+import { type UUIDv4, from_option0 } from "@ordo-pink/tau"
+import { Oath } from "@ordo-pink/oath"
 import { type TTokenService } from "@ordo-pink/backend-service-token"
-import { type UserService } from "@ordo-pink/backend-service-user"
+import { type TUserService } from "@ordo-pink/backend-service-user"
 
-import { toInvalidRequestError, toUserNotFoundError } from "../fns/to-error"
-import { setOrdoAuthCookies } from "../fns/set-cookies"
+import { type TCreateAuthTokenResult, create_auth_token0 } from "../fns/create-auth-token.fn"
+import { get_auth_cookies0, remove_auth_cookie, set_auth_cookie } from "../fns/auth-cookie.fn"
+import { token_result_to_response_body } from "../fns/token-result-to-response-body.fn"
 
-export const handleRefreshToken: TFn =
-	({ tokenService, userService }) =>
-	async ctx =>
-		merge_oath({
-			cookieSub: from_nullable_oath(ctx.cookies.get("sub")).pipe(
-				rejected_map_oath(toInvalidRequestError),
-			),
-			cookieJti: from_nullable_oath(ctx.cookies.get("jti")).pipe(
-				rejected_map_oath(toInvalidRequestError),
-			),
-		})
-			.and(validateCtx0)
-			.and(getUserByCookies0(userService, tokenService))
-			.and(updateUserSession0(ctx, tokenService))
-			.pipe(rejected_tap_oath(dropCookies(ctx)))
-			.fork(sendError(ctx), sendSuccess({ ctx }))
+export const refresh_token0: TFn = (ctx, { token_service, user_service }) =>
+	get_auth_cookies0(ctx.cookies.get("sub"), ctx.cookies.get("jti"))
+		.pipe(Oath.ops.chain(get_user_token0({ user_service, token_service })))
+		.pipe(Oath.ops.chain(create_auth_token0(token_service)))
+		.pipe(Oath.ops.bitap(remove_auth_cookie(ctx), update_auth_cookie(ctx)))
+		.pipe(Oath.ops.map(token_result_to_response_body))
+		.pipe(Oath.ops.map(body => ({ status: 200, body })))
 
 // --- Internal ---
 
-type TParams = { userService: UserService; tokenService: TTokenService }
-type TFn = (params: TParams) => Middleware
-type TCtx = { cookieSub: SUB; cookieJti: JTI; user: User.User }
-type TResult = Routes.ID.RefreshToken.Result
-
-type ExtractCtxFn = (ctx: {
-	cookieSub: string
-	cookieJti: string
-}) => Oath<{ cookieSub: SUB; cookieJti: JTI }, HttpError>
-const validateCtx0: ExtractCtxFn = ({ cookieJti, cookieSub }) =>
-	merge_oath({
-		cookieSub: from_boolean_oath(is_uuid(cookieSub), cookieSub as SUB).pipe(
-			rejected_map_oath(toInvalidRequestError),
-		),
-		cookieJti: from_boolean_oath(is_uuid(cookieJti), cookieJti as JTI).pipe(
-			rejected_map_oath(toInvalidRequestError),
-		),
-	})
-
-type CheckTokenExists = (token: string | null) => Oath<string, HttpError>
-const checkTokenExists0: CheckTokenExists = token =>
-	from_nullable_oath(token).pipe(rejected_map_oath(toUserNotFoundError))
-
-type VerifyRefreshTokenFn = (ts: TTokenService) => (token: string) => Oath<string, HttpError>
-const verifyRefreshToken0: VerifyRefreshTokenFn = tokenService => token =>
-	tokenService
-		.verifyToken(token, "refresh")
-		.and(valid => from_boolean_oath(valid, token, HttpError.Unauthorized("Invalid token")))
-
-type GetUserByIdFn = (userService: UserService, id: UUIDv4) => () => Oath<User.User, HttpError>
-const getUserById0: GetUserByIdFn = (userService, id) => () =>
-	userService.getById(id).pipe(rejected_map_oath(toUserNotFoundError))
-
-type GetUserByCookiesFn = (
-	us: UserService,
-	ts: TTokenService,
-) => (ctx: Pick<TCtx, "cookieJti" | "cookieSub">) => Oath<TCtx, HttpError>
-const getUserByCookies0: GetUserByCookiesFn =
-	(userService, tokenService) =>
-	({ cookieSub: cookieSub, cookieJti: cookieJti }) =>
-		tokenService.persistenceStrategy
-			.getToken(cookieSub, cookieJti)
-			.pipe(rejected_map_oath(toUserNotFoundError))
-			.and(checkTokenExists0)
-			.and(verifyRefreshToken0(tokenService))
-			.and(getUserById0(userService, cookieSub))
-			.and(user => ({ cookieSub, cookieJti, user }))
-
-type UpdateUserSessionFn = (
+type TParams = { user_service: TUserService; token_service: TTokenService }
+type TFn = (
 	ctx: Context,
-	ts: TTokenService,
-) => (ctx: TCtx) => Oath<TResult, HttpError>
-const updateUserSession0: UpdateUserSessionFn =
-	(ctx, tokenService) =>
-	({ user, cookieJti: cookieJti, cookieSub: cookieSub }) =>
-		tokenService
-			.createPair({
-				sub: cookieSub,
-				prevJti: cookieJti,
-				data: {
-					fms: user.max_upload_size,
-					lim: user.file_limit,
-					sbs: user.subscription,
-				},
-			})
-			.pipe(rejected_map_oath(HttpError.from))
-			.and(tokens =>
-				of_oath(new Date(Date.now() + tokens.exp))
-					.pipe(
-						tap_oath(expires => setOrdoAuthCookies(ctx.response, expires, tokens.jti, tokens.sub)),
-					)
-					.and(expires => ({
-						accessToken: tokens.tokens.access,
-						fileLimit: tokens.lim,
-						subscription: tokens.sbs,
-						maxUploadSize: tokens.fms,
-						sub: tokens.sub,
-						jti: tokens.jti,
-						expires,
-					})),
-			)
+	params: TParams,
+) => Oath<Routes.ID.RefreshToken.Response, TRrr<"EINVAL" | "EIO" | "EACCES" | "ENOENT">>
+type TCtx = { sub: SUB; jti: JTI }
 
-type DropCookiesFn = (ctx: Context) => () => void
-const dropCookies: DropCookiesFn = ctx => () => {
-	ctx.cookies.set("jti", null)
-	ctx.cookies.set("sub", null)
-}
+const LOCATION = "handle_refresh_token"
+
+const eacces = RRR.codes.eacces(LOCATION)
+const einval = RRR.codes.einval(LOCATION)
+const enoent = RRR.codes.enoent(LOCATION)
+
+const verify_token0 = (token_service: TTokenService) => (token: string) =>
+	token_service.verify(token, "refresh").pipe(
+		Oath.ops.chain(is_valid =>
+			Oath.If(is_valid, {
+				T: () => token,
+				F: () => einval("verify_token -> token invalid"),
+			}),
+		),
+	)
+
+const update_auth_cookie =
+	(ctx: Context) =>
+	({ expires, jti, user }: TCreateAuthTokenResult) =>
+		set_auth_cookie(ctx, user.id, jti, expires)
+
+const get_user_by_id0 = (user_service: TUserService, id: UUIDv4) => () =>
+	user_service
+		.get_by_id(id)
+		.pipe(Oath.ops.chain(from_option0(() => enoent(`get_user_by_id -> id: ${id}`))))
+
+const get_user_token0 =
+	({ user_service, token_service }: TParams) =>
+	({ sub, jti }: TCtx) =>
+		token_service.strategy
+			.get_token(sub, jti)
+			.pipe(
+				Oath.ops.chain(from_option0(() => eacces(`get_user_token -> sub: ${sub}, jti: ${jti}`))),
+			)
+			.and(verify_token0(token_service))
+			.and(get_user_by_id0(user_service, sub))

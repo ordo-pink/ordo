@@ -38,7 +38,7 @@ test("should get user by id", async () => {
 		subscription: "free",
 		file_limit: 1000,
 		max_upload_size: 1.5,
-	} satisfies User.InternalUser
+	} satisfies User.P
 	await strategy.create(user).toPromise()
 	const persistedUserById = await strategy.get_by_id(id).toPromise()
 	const doesNotExist = await strategy.get_by_id("123-123-123-123-123").orElse(() => null)
@@ -63,7 +63,7 @@ test("should get user by email", async () => {
 		subscription: "free",
 		file_limit: 1000,
 		max_upload_size: 1.5,
-	} satisfies User.InternalUser
+	} satisfies User.P
 	await strategy.create(user).toPromise()
 	const persistedUserById = await strategy.get_by_email(email).toPromise()
 	const doesNotExist = await strategy.get_by_email("wrong@test.com").orElse(() => null)
@@ -88,7 +88,7 @@ test("should check user existence by id", async () => {
 		subscription: "free",
 		file_limit: 1000,
 		max_upload_size: 1.5,
-	} satisfies User.InternalUser
+	} satisfies User.P
 	await strategy.create(user).toPromise()
 	const persistedUserById = await strategy.exists_by_id(id).toPromise()
 	const doesNotExist = await strategy.exists_by_id("123-123-123-123-123").toPromise()
@@ -113,7 +113,7 @@ test("should check user existence by email", async () => {
 		subscription: "free",
 		file_limit: 1000,
 		max_upload_size: 1.5,
-	} satisfies User.InternalUser
+	} satisfies User.P
 	await strategy.create(user).toPromise()
 	const persistedUserById = await strategy.exists_by_email(email).toPromise()
 	const doesNotExist = await strategy.exists_by_email("wrong@test.com").toPromise()
@@ -139,7 +139,7 @@ test("should update user info", async () => {
 		subscription: "free",
 		file_limit: 1000,
 		max_upload_size: 1.5,
-	} satisfies User.InternalUser
+	} satisfies User.P
 	await strategy.create(user).toPromise()
 
 	await strategy.update(user.id, { ...user, email: newEmail }).toPromise()

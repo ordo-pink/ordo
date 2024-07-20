@@ -20,7 +20,7 @@
 import { type Middleware } from "koa"
 import isEmail from "validator/lib/isEmail"
 
-import { type JWAT, type TTokenService } from "@ordo-pink/backend-service-token"
+import { type TAccessJWT, type TTokenService } from "@ordo-pink/backend-service-token"
 import {
 	type Oath,
 	bimap_oath,
@@ -32,18 +32,18 @@ import {
 	rejected_map_oath,
 	tap_oath,
 } from "@ordo-pink/oath"
-import { authenticate0, parseBody0 } from "@ordo-pink/backend-utils"
-import { sendError, sendSuccess } from "@ordo-pink/backend-utils"
+import { authenticate0, parse_body0 } from "@ordo-pink/backend-utils"
+import { send_error, send_success } from "@ordo-pink/backend-utils"
 import { type HttpError } from "@ordo-pink/rrr"
 import { OK } from "@ordo-pink/core"
 import { type TNotificationService } from "@ordo-pink/backend-service-offline-notifications"
 import { type UserService } from "@ordo-pink/backend-service-user"
 
 import {
-	toInvalidRequestError,
-	toSameEmailError,
-	toUserAlreadyExistsError,
-	toUserNotFoundError,
+	to_invalid_request_error,
+	to_same_email_error,
+	to_user_already_exists_error,
+	to_user_not_found_error,
 } from "../fns/to-error"
 import { generateEmailCode0 } from "../fns/generate-code"
 
@@ -52,14 +52,14 @@ export const handleRequestEmailChange: TFn =
 	ctx =>
 		merge_oath({
 			token: authenticate0(ctx, tokenService),
-			body: parseBody0<TRequestBody>(ctx),
+			body: parse_body0<TRequestBody>(ctx),
 			code: generateEmailCode0(),
 		})
 			.and(extractCtx0(userService))
 			.and(validateCtx0(userService))
 			.and(updateUserEmailConfirmationCode0(userService))
 			.pipe(tap_oath(sendNotification(notificationService, websiteHost)))
-			.fork(sendError(ctx), sendSuccess({ ctx }))
+			.fork(send_error(ctx), send_success({ ctx }))
 
 // --- Internal ---
 
@@ -73,29 +73,31 @@ type TParams = {
 type TFn = (params: TParams) => Middleware
 type TCtx = { user: User.User; newEmail: string; code: string }
 
-type TExtractDataParams = { token: JWAT; body: TRequestBody; code: string }
+type TExtractDataParams = { token: TAccessJWT; body: TRequestBody; code: string }
 const extractCtx0 =
 	(userService: UserService) =>
 	({ token, body, code }: TExtractDataParams) =>
 		merge_oath({
-			user: userService.getById(token.payload.sub).pipe(rejected_map_oath(toUserNotFoundError)),
-			newEmail: from_nullable_oath(body.newEmail).pipe(rejected_map_oath(toInvalidRequestError)),
+			user: userService.getById(token.payload.sub).pipe(rejected_map_oath(to_user_not_found_error)),
+			newEmail: from_nullable_oath(body.new_email).pipe(
+				rejected_map_oath(to_invalid_request_error),
+			),
 			code,
 		})
 
 type TCheckEmailIsNotTheSameFn = (email: string, user: User.User) => Oath<"OK", HttpError>
 const checkEmailIsNotTheSame0: TCheckEmailIsNotTheSameFn = (email, user) =>
-	from_boolean_oath(user.email !== email, OK).pipe(rejected_map_oath(toSameEmailError))
+	from_boolean_oath(user.email !== email, OK).pipe(rejected_map_oath(to_same_email_error))
 
 const checkUserDoesNotExistByNewEmail0 = (email: string, userService: UserService) =>
 	userService
 		.getByEmail(email)
 		.pipe(chain_oath(() => reject_oath(true)))
 		.fix(userExists => from_boolean_oath(userExists === true, OK))
-		.pipe(rejected_map_oath(toUserAlreadyExistsError))
+		.pipe(rejected_map_oath(to_user_already_exists_error))
 
 const validateEmail0 = (email: string) =>
-	from_boolean_oath(isEmail(email), OK).pipe(rejected_map_oath(toInvalidRequestError))
+	from_boolean_oath(isEmail(email), OK).pipe(rejected_map_oath(to_invalid_request_error))
 
 const validateCtx0 =
 	(userService: UserService) =>
@@ -111,14 +113,14 @@ const updateUserEmailConfirmationCode0 =
 	({ user, newEmail, code }: TCtx) =>
 		userService
 			.update(user.id, { email_code: code })
-			.pipe(bimap_oath(toUserNotFoundError, () => ({ user, newEmail, code })))
+			.pipe(bimap_oath(to_user_not_found_error, () => ({ user, newEmail, code })))
 
 const sendNotification =
 	(notificationService: TNotificationService, websiteHost: string) =>
 	({ user, newEmail: newEmail, code }: TCtx) =>
-		notificationService.sendEmailChangeNotifications({
+		notificationService.change_email({
 			to: { email: user.email, name: user.first_name },
-			newEmail,
-			oldEmail: user.email,
-			confirmationUrl: `${websiteHost}/change-email?oldEmail=${user.email}&newEmail=${newEmail}&code=${code}`, // TODO
+			new_email: newEmail,
+			old_email: user.email,
+			confirmation_url: `${websiteHost}/change-email?oldEmail=${user.email}&newEmail=${newEmail}&code=${code}`, // TODO
 		})

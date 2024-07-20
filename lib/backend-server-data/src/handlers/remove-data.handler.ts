@@ -21,7 +21,7 @@ import { type Middleware } from "koa"
 import { type Readable } from "stream"
 
 import { type FSID, type TDataCommands } from "@ordo-pink/data"
-import { authenticate0, sendError } from "@ordo-pink/backend-utils"
+import { authenticate0, send_error } from "@ordo-pink/backend-utils"
 import { HttpError } from "@ordo-pink/rrr"
 import { Oath } from "@ordo-pink/oath"
 import { type SUB } from "@ordo-pink/wjwt"
@@ -40,6 +40,6 @@ export const handleRemoveData: Unary<
 						dataService.remove({ fsid, createdBy }).rejectedMap(HttpError.NotFound),
 				),
 			)
-			.fork(sendError(ctx), result => {
+			.fork(send_error(ctx), result => {
 				ctx.response.body = { success: true, result }
 			})

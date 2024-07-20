@@ -19,7 +19,7 @@
 
 import type { DynamoDB } from "aws-sdk"
 
-import type { TUserPersistenceStrategy } from "@ordo-pink/backend-service-user"
+import type { TPersistenceStrategyUser } from "@ordo-pink/backend-service-user"
 
 export type TDynamoDBConfig = {
 	region: string
@@ -30,11 +30,9 @@ export type TDynamoDBConfig = {
 }
 
 export type TPersistenceStrategyDynamoDBStatic = {
-	of: (config: TDynamoDBConfig) => TUserPersistenceStrategy
+	of: (config: TDynamoDBConfig) => TPersistenceStrategyUser
 }
 
-export type TDeserialiseFn = (
-	item: DynamoDB.GetItemOutput["Item"] | DynamoDB.AttributeMap,
-) => User.InternalUser
+export type TDeserialiseFn = (item: DynamoDB.AttributeMap) => User.PrivateUser
 
-export type TSerialiseFn = (user: User.InternalUser) => DynamoDB.PutItemInput["Item"]
+export type TSerialiseFn = (user: User.PrivateUser) => DynamoDB.PutItemInputAttributeMap

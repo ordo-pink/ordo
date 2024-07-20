@@ -31,66 +31,68 @@ import {
 	rejected_map_oath,
 } from "@ordo-pink/oath"
 import { is_string, omit } from "@ordo-pink/tau"
-import { parseBody0, sendError, sendSuccess } from "@ordo-pink/backend-utils"
+import { parse_body0, send_error, send_success } from "@ordo-pink/backend-utils"
 import { HttpError } from "@ordo-pink/rrr"
 import { OK } from "@ordo-pink/core"
 import { UserService } from "@ordo-pink/backend-service-user"
 
 import {
-	toEmailAlreadyConfirmedError,
-	toInvalidBodyError,
-	toUserNotFoundError,
+	to_email_already_confirmed_error,
+	to_invalid_body_error,
+	to_user_not_found_error,
 } from "../fns/to-error"
 
 export const handleConfirmEmail: TFn =
 	({ userService }) =>
 	ctx =>
-		parseBody0<TRequestBody>(ctx, "object")
+		parse_body0<TRequestBody>(ctx, "object")
 			.and(validateBody0)
 			.and(extractCtx0(userService))
 			.and(validateCtx0)
 			.and(updateUser0(userService))
-			.fork(sendError(ctx), sendSuccess({ ctx }))
+			.fork(send_error(ctx), send_success({ ctx }))
 
 // --- Internal ---
 
 type TRequestBody = Routes.ID.ConfirmEmail.RequestBody
 type TParams = { userService: UserService }
 type TFn = (params: TParams) => Middleware
-type TCtx = { user: User.PrivateUser; code: string }
-type TResult = Routes.ID.ConfirmEmail.Result
+type TCtx = { user: User.InternalUser; code: string }
+type TResult = Routes.ID.ConfirmEmail.ResponseBody
 
 type TValidateBodyFn = (body: TRequestBody) => Oath<Required<TRequestBody>, HttpError>
 const validateBody0: TValidateBodyFn = body =>
 	merge_oath({
 		email: from_nullable_oath(body.email)
 			.pipe(chain_oath(email => from_boolean_oath(isEmail(email), body.email!)))
-			.pipe(rejected_map_oath(toInvalidBodyError)),
+			.pipe(rejected_map_oath(to_invalid_body_error)),
 		code: from_boolean_oath(is_string(body.code), body.code!).pipe(
-			rejected_map_oath(toInvalidBodyError),
+			rejected_map_oath(to_invalid_body_error),
 		),
 	})
 
 type TExtractCtxFn = (us: UserService) => (body: TRequestBody) => Oath<TCtx, HttpError>
 const extractCtx0: TExtractCtxFn = userService => body =>
 	merge_oath({
-		code: from_nullable_oath(body.code).pipe(rejected_map_oath(toInvalidBodyError)),
+		code: from_nullable_oath(body.code).pipe(rejected_map_oath(to_invalid_body_error)),
 		user: from_nullable_oath(body.email)
-			.pipe(rejected_map_oath(toInvalidBodyError))
+			.pipe(rejected_map_oath(to_invalid_body_error))
 			.pipe(
 				chain_oath(email =>
-					userService.getByEmail(email).pipe(rejected_map_oath(toUserNotFoundError)),
+					userService.getByEmail(email).pipe(rejected_map_oath(to_user_not_found_error)),
 				),
 			),
 	})
 
-type TCheckEmailIsNotConfirmedFn = (user: User.PrivateUser) => Oath<"OK", HttpError>
+type TCheckEmailIsNotConfirmedFn = (user: User.InternalUser) => Oath<"OK", HttpError>
 const checkEmailIsNotConfirmed0: TCheckEmailIsNotConfirmedFn = user =>
-	from_boolean_oath(user.email_confirmed, OK).pipe(rejected_map_oath(toEmailAlreadyConfirmedError))
+	from_boolean_oath(user.email_confirmed, OK).pipe(
+		rejected_map_oath(to_email_already_confirmed_error),
+	)
 
-type TCheckCodeIsCorrectFn = (user: User.PrivateUser, code: string) => Oath<"OK", HttpError>
+type TCheckCodeIsCorrectFn = (user: User.InternalUser, code: string) => Oath<"OK", HttpError>
 const checkCodeIsCorrect0: TCheckCodeIsCorrectFn = (user, code) =>
-	from_boolean_oath(user.email_code === code, OK).pipe(rejected_map_oath(toUserNotFoundError))
+	from_boolean_oath(user.email_code === code, OK).pipe(rejected_map_oath(to_user_not_found_error))
 
 type TValidateCtxFn = (ctx: TCtx) => Oath<TCtx, HttpError>
 const validateCtx0: TValidateCtxFn = ctx =>
@@ -102,4 +104,4 @@ type TUpdateUser0 = (us: UserService) => (ctx: TCtx) => Oath<TResult, HttpError>
 const updateUser0: TUpdateUser0 = userService => ctx =>
 	userService
 		.update(ctx.user.id, { email_confirmed: true, email_code: undefined })
-		.pipe(bimap_oath(toUserNotFoundError, omit("code")))
+		.pipe(bimap_oath(to_user_not_found_error, omit("code")))

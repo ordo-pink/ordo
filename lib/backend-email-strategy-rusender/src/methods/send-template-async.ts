@@ -6,7 +6,7 @@ import {
 	of_oath,
 	or_nothing_oath,
 } from "@ordo-pink/oath"
-import { type EmailParams } from "@ordo-pink/backend-service-offline-notifications"
+import { type TEmailParams } from "@ordo-pink/backend-service-offline-notifications"
 import { extend } from "@ordo-pink/tau"
 
 import {
@@ -39,11 +39,11 @@ const addBody = (mail: any) => () => ({ body: JSON.stringify({ mail }) })
 const fetch0 = ({ method, url, headers, body }: TRusenderSendRusenderRequestParams) =>
 	from_promise_oath(() => fetch(url, { method, headers, body }))
 
-const createCommonRequest0 = (key: string, mail: EmailParams) =>
+const createCommonRequest0 = (key: string, mail: TEmailParams) =>
 	from_nullable_oath(key)
 		.pipe(map_oath(initRequestParams))
 		.pipe(map_oath(extend(addMethod)))
 		.pipe(map_oath(extend(addBody(mail))))
 
-const createDefaultRequest0 = (mail: EmailParams, key: string) =>
+const createDefaultRequest0 = (mail: TEmailParams, key: string) =>
 	createCommonRequest0(key, mail).pipe(map_oath(extend(addUrl(RS_TEMPLATE_URL))))

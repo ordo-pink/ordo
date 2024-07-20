@@ -30,14 +30,14 @@ import { O } from "@ordo-pink/option"
 let dynamo_db: DynamoDB
 
 export const PersistenceStrategyUserDynamoDB: Types.TPersistenceStrategyDynamoDBStatic = {
-	of: (params: Types.TDynamoDBConfig) => {
+	of: (dynamo_db_config: Types.TDynamoDBConfig) => {
 		const {
 			access_key: accessKeyId,
 			secret_key: secretAccessKey,
 			region,
 			endpoint,
 			table_name: tableName,
-		} = params
+		} = dynamo_db_config
 		const TableName = tableName
 		const credentials = { accessKeyId, secretAccessKey }
 
@@ -46,9 +46,9 @@ export const PersistenceStrategyUserDynamoDB: Types.TPersistenceStrategyDynamoDB
 		return {
 			create: user =>
 				Oath.Merge([
-					_check_exists_by_email0(params, user.email),
-					_check_exists_by_id0(params, user.id),
-					_check_exists_by_handle0(params, user.handle),
+					_check_not_exists_by_email0(dynamo_db_config, user.email),
+					_check_not_exists_by_id0(dynamo_db_config, user.id),
+					_check_not_exists_by_handle0(dynamo_db_config, user.handle),
 				])
 					.pipe(Oath.ops.map(() => _serialise(user)))
 					.pipe(
@@ -61,7 +61,7 @@ export const PersistenceStrategyUserDynamoDB: Types.TPersistenceStrategyDynamoDB
 					.pipe(Oath.ops.map(noop)),
 
 			update: (id, user) =>
-				PersistenceStrategyUserDynamoDB.of(params)
+				PersistenceStrategyUserDynamoDB.of(dynamo_db_config)
 					.get_by_id(id)
 					.pipe(
 						Oath.ops.chain(option =>
@@ -79,7 +79,7 @@ export const PersistenceStrategyUserDynamoDB: Types.TPersistenceStrategyDynamoDB
 								.pipe(Oath.ops.rejected_map(e => eio(`update -> error: ${e.message}`))),
 						),
 					)
-					.pipe(Oath.ops.map(noop)),
+					.pipe(Oath.ops.map(() => user)),
 
 			get_by_id: id =>
 				Oath.Resolve({ id: { S: id } })
@@ -121,19 +121,19 @@ export const PersistenceStrategyUserDynamoDB: Types.TPersistenceStrategyDynamoDB
 					.pipe(Oath.ops.map(out => O.FromNullable(out.Items?.[0]).pipe(O.ops.map(_deserialize)))),
 
 			exists_by_id: id =>
-				PersistenceStrategyUserDynamoDB.of(params)
+				PersistenceStrategyUserDynamoDB.of(dynamo_db_config)
 					.get_by_id(id)
 					.pipe(Oath.ops.map(() => true))
 					.fix(() => false),
 
 			exists_by_email: email =>
-				PersistenceStrategyUserDynamoDB.of(params)
+				PersistenceStrategyUserDynamoDB.of(dynamo_db_config)
 					.get_by_email(email)
 					.pipe(Oath.ops.map(() => true))
 					.fix(() => false),
 
 			exists_by_handle: handle =>
-				PersistenceStrategyUserDynamoDB.of(params)
+				PersistenceStrategyUserDynamoDB.of(dynamo_db_config)
 					.get_by_handle(handle)
 					.pipe(Oath.ops.map(() => true))
 					.fix(() => false),
@@ -148,22 +148,21 @@ const eio = RRR.codes.eio(LOCATION)
 const eexist = RRR.codes.eexist(LOCATION)
 const enoent = RRR.codes.enoent(LOCATION)
 
-const _check_exists_by_handle0 =
-	(params: Types.TDynamoDBConfig, handle: User.User["handle"]) => () =>
-		PersistenceStrategyUserDynamoDB.of(params)
-			.exists_by_handle(handle)
-			.pipe(
-				Oath.ops.chain(exists =>
-					Oath.If(!exists, { F: () => eexist(`create -> handle: ${handle}`) }),
-				),
-			)
+const _check_not_exists_by_handle0 = (params: Types.TDynamoDBConfig, handle: User.User["handle"]) =>
+	PersistenceStrategyUserDynamoDB.of(params)
+		.exists_by_handle(handle)
+		.pipe(
+			Oath.ops.chain(exists =>
+				Oath.If(!exists, { F: () => eexist(`create -> handle: ${handle}`) }),
+			),
+		)
 
-const _check_exists_by_id0 = (params: Types.TDynamoDBConfig, id: User.User["id"]) => () =>
+const _check_not_exists_by_id0 = (params: Types.TDynamoDBConfig, id: User.User["id"]) =>
 	PersistenceStrategyUserDynamoDB.of(params)
 		.exists_by_id(id)
-		.pipe(Oath.ops.chain(exists => Oath.If(!exists)))
+		.pipe(Oath.ops.chain(exists => Oath.If(!exists, { F: () => eexist(`create -> id: ${id}`) })))
 
-const _check_exists_by_email0 = (params: Types.TDynamoDBConfig, email: User.User["email"]) =>
+const _check_not_exists_by_email0 = (params: Types.TDynamoDBConfig, email: User.User["email"]) =>
 	PersistenceStrategyUserDynamoDB.of(params)
 		.exists_by_email(email)
 		.pipe(
@@ -173,37 +172,43 @@ const _check_exists_by_email0 = (params: Types.TDynamoDBConfig, email: User.User
 const _serialise: Types.TSerialiseFn = user => ({
 	email: { S: user.email },
 	id: { S: user.id },
-	emailConfirmed: { N: user.email_confirmed ? "1" : "0" },
+	email_confirmed: { N: user.email_confirmed ? "1" : "0" },
 	handle: { S: user.handle ?? "" },
 	password: { S: user.password },
-	firstName: { S: user.first_name ?? "" },
-	lastName: { S: user.last_name ?? "" },
-	createdAt: { S: user.created_at.toISOString() },
+	first_name: { S: user.first_name ?? "" },
+	last_name: { S: user.last_name ?? "" },
+	created_at: { S: user.created_at.toISOString() },
 	subscription: { S: user.subscription },
-	fileLimit: { N: String(user.file_limit) ?? "1000" },
-	maxUploadSize: { N: String(user.max_upload_size) ?? "1.5" },
+	file_limit: { N: String(user.file_limit) ?? "1000" },
+	max_upload_size: { N: String(user.max_upload_size) ?? "1.5" },
+	max_functions: { N: String(user.max_upload_size) ?? "5" },
 	code: { S: user.email_code ?? "" },
 })
 
 const _deserialize: Types.TDeserialiseFn = item => ({
 	email: item.email.S!,
 	// eslint-disable-next-line @typescript-eslint/no-non-null-asserted-optional-chain
-	email_confirmed: item.emailConfirmed?.N! === "1",
+	email_confirmed: item.email_confirmed?.N! === "1",
 	// eslint-disable-next-line @typescript-eslint/no-non-null-asserted-optional-chain
-	first_name: item.firstName?.S!,
-	created_at: new Date(item.createdAt.S!),
+	first_name: item.first_name?.S!,
 	// eslint-disable-next-line @typescript-eslint/no-non-null-asserted-optional-chain
-	last_name: item.lastName?.S!,
-	password: item.password.S!,
+	created_at: new Date(item.created_at?.S!),
+	// eslint-disable-next-line @typescript-eslint/no-non-null-asserted-optional-chain
+	last_name: item.last_name?.S!,
+	// eslint-disable-next-line @typescript-eslint/no-non-null-asserted-optional-chain
+	password: item.password?.S!,
 	// eslint-disable-next-line @typescript-eslint/no-non-null-asserted-optional-chain
 	handle: item.handle?.S!,
 	// eslint-disable-next-line @typescript-eslint/no-non-null-asserted-optional-chain
 	subscription: item.subscription?.S!,
 	// eslint-disable-next-line @typescript-eslint/no-non-null-asserted-optional-chain
-	file_limit: Number(item.fileLimit?.N!),
+	file_limit: Number(item.file_limit?.N!),
 	// eslint-disable-next-line @typescript-eslint/no-non-null-asserted-optional-chain
-	max_upload_size: Number(item.maxUploadSize?.N!),
+	max_upload_size: Number(item.max_upload_size?.N!),
 	// eslint-disable-next-line @typescript-eslint/no-non-null-asserted-optional-chain
-	email_code: item.code?.S!,
+	max_functions: Number(item.max_functions?.N!),
+	// eslint-disable-next-line @typescript-eslint/no-non-null-asserted-optional-chain
+	email_code: item.email_code?.S!,
+	// eslint-disable-next-line @typescript-eslint/no-non-null-asserted-optional-chain
 	id: item.id.S! as SUB,
 })

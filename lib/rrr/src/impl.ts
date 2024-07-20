@@ -17,8 +17,9 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-export class HttpError extends Error {
-	#status: number
+export class HttpError {
+	public status: number
+	public message: string
 
 	public static BadRequest(message: string) {
 		return new HttpError(400, message)
@@ -65,11 +66,7 @@ export class HttpError extends Error {
 	}
 
 	protected constructor(status: number, message: string) {
-		super(message)
-		this.#status = status
-	}
-
-	public get status() {
-		return this.#status
+		this.status = status
+		this.message = message
 	}
 }

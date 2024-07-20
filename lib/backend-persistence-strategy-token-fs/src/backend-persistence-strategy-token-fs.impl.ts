@@ -17,60 +17,101 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { type TokenPersistenceStrategy, type TokenRecord } from "@ordo-pink/backend-service-token"
-import { create_parent_if_not_exists0, file_exists0, read_file0, write_file0 } from "@ordo-pink/fs"
+import { create_parent_if_not_exists0, read_file0, write_file0 } from "@ordo-pink/fs"
+import { O } from "@ordo-pink/option"
 import { Oath } from "@ordo-pink/oath"
-import { type UserID } from "@ordo-pink/data"
+import { RRR } from "@ordo-pink/data"
+import { type TTokenRecord } from "@ordo-pink/backend-service-token"
+import { override } from "@ordo-pink/tau"
 
-let storage = {} as Record<UserID, TokenRecord>
+import { type TPersistenceStrategyTokenFSStatic } from "./backend-persistence-strategy-token-fs.types"
 
-export const TokenPersistenceStrategyFS = {
-	of: async (path: string): Promise<TokenPersistenceStrategy> => {
-		await file_exists0(path)
-			.chain(exists =>
-				exists
-					? read_file0(path, "utf-8")
-							.map(text => JSON.parse(text as string))
-							.fix(() => ({}))
-					: create_parent_if_not_exists0(path).chain(() =>
-							write_file0(path, "{}", "utf-8").map(() => ({})),
-						),
-			)
-			.map(strg => {
-				storage = strg
-			})
-			.orElse(console.log)
+export const PersistenceStrategyTokenFS: TPersistenceStrategyTokenFSStatic = {
+	of: (path: string) => ({
+		get_token: (sub, jti) =>
+			get_tokens0(path)
+				.pipe(Oath.ops.map(storage => storage[sub]?.[jti]))
+				.pipe(Oath.ops.map(token => O.FromNullable(token))),
 
-		return {
-			getToken: (sub, jti) =>
-				Oath.fromNullable(storage[sub])
-					.chain(record => Oath.fromNullable(record[jti]))
-					.fix(() => null),
-			getTokenRecord: sub => Oath.fromNullable(storage[sub]).fix(() => null),
-			removeToken: (sub, jti) =>
-				Oath.fromNullable(storage[sub])
-					.chain(record => Oath.fromNullable(record[jti]))
-					.map(() => delete storage[sub][jti])
-					.chain(() => write_file0(path, JSON.stringify(storage), "utf-8"))
-					.fix(() => null)
-					.map(() => "OK"),
-			removeTokenRecord: sub =>
-				Oath.fromNullable(storage[sub])
-					.fix(() => null)
-					.map(() => delete storage[sub])
-					.chain(() => write_file0(path, JSON.stringify(storage), "utf-8"))
-					.map(() => "OK"),
-			setToken: (sub, jti, token) =>
-				Oath.fromNullable(storage[sub])
-					.fix(() => void (storage[sub] = {}))
-					.map(() => void (storage[sub][jti] = token))
-					.chain(() => write_file0(path, JSON.stringify(storage), "utf-8"))
-					.map(() => "OK"),
-			setTokenRecord: (sub, record) =>
-				Oath.empty()
-					.map(() => void (storage[sub] = record))
-					.chain(() => write_file0(path, JSON.stringify(storage), "utf-8"))
-					.map(() => "OK"),
-		}
-	},
+		get_tokens: sub =>
+			get_tokens0(path)
+				.pipe(Oath.ops.map(storage => storage[sub]))
+				.pipe(Oath.ops.map(token => O.FromNullable(token))),
+
+		remove_token: (sub, jti) =>
+			get_tokens0(path)
+				.pipe(
+					Oath.ops.chain(storage =>
+						Oath.FromNullable(storage[sub])
+							.pipe(Oath.ops.map(() => storage))
+							.pipe(Oath.ops.rejected_map(() => enoent(`remove_token -> sub: ${sub}`))),
+					),
+				)
+				.pipe(
+					Oath.ops.map(storage => ({
+						...storage,
+						[sub]: override<TTokenRecord>({ [jti]: undefined })(storage[sub]),
+					})),
+				)
+				.pipe(Oath.ops.chain(write_tokens0(path))),
+
+		remove_tokens: sub =>
+			get_tokens0(path)
+				.pipe(
+					Oath.ops.chain(storage =>
+						Oath.FromNullable(storage[sub])
+							.pipe(Oath.ops.map(() => storage))
+							.pipe(Oath.ops.rejected_map(() => enoent(`remove_tokens -> sub: ${sub}`))),
+					),
+				)
+				.pipe(Oath.ops.map(override({ [sub]: undefined })))
+				.pipe(Oath.ops.chain(write_tokens0(path))),
+
+		set_token: (sub, jti, token) =>
+			get_tokens0(path)
+				.pipe(
+					Oath.ops.chain(storage =>
+						Oath.FromNullable(storage[sub])
+							.pipe(Oath.ops.map(() => storage))
+							.pipe(Oath.ops.rejected_map(() => enoent(`remove_token -> sub: ${sub}`))),
+					),
+				)
+				.pipe(
+					Oath.ops.map(storage => ({
+						...storage,
+						[sub]: override<TTokenRecord>({ [jti]: token })(storage[sub]),
+					})),
+				)
+				.pipe(Oath.ops.chain(write_tokens0(path))),
+
+		set_tokens: (sub, record) =>
+			get_tokens0(path)
+				.pipe(
+					Oath.ops.chain(storage =>
+						Oath.FromNullable(storage[sub])
+							.pipe(Oath.ops.map(() => storage))
+							.pipe(Oath.ops.rejected_map(() => enoent(`remove_tokens -> sub: ${sub}`))),
+					),
+				)
+				.pipe(Oath.ops.map(override({ [sub]: record })))
+				.pipe(Oath.ops.chain(write_tokens0(path))),
+	}),
 }
+
+// --- Internal ---
+
+const LOCATION = "PersistenceStrategyTokenFS"
+
+const eio = RRR.codes.eio(LOCATION)
+const enoent = RRR.codes.enoent(LOCATION)
+
+const get_tokens0 = (path: string) =>
+	read_file0(path, "utf-8")
+		.pipe(Oath.ops.map(text => JSON.parse(text as string) as Record<string, TTokenRecord>))
+		.fix(() => ({}) as Record<string, TTokenRecord>)
+
+const write_tokens0 = (path: string) => (tokens: Record<string, TTokenRecord>) =>
+	create_parent_if_not_exists0(path)
+		.pipe(Oath.ops.chain(() => Oath.Try(() => JSON.stringify(tokens, null, 2))))
+		.pipe(Oath.ops.chain(data => write_file0(path, data, "utf-8")))
+		.pipe(Oath.ops.rejected_map(e => eio(`write_tokens -> error: ${e.message}`)))

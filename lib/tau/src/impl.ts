@@ -17,6 +17,9 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import { Oath } from "@ordo-pink/oath"
+import { TOption } from "@ordo-pink/option"
+
 import type * as Types from "./types"
 
 export const UUIDv4_RX = /^[0-9A-F]{8}-[0-9A-F]{4}-[4][0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$/i
@@ -86,7 +89,8 @@ export const omit =
 	<T extends Record<string, unknown>, K extends (keyof T)[]>(...keys: K) =>
 	(obj: T): Omit<T, Types.Unpack<K>> =>
 		keys_of(obj).reduce(
-			(acc, key) => (keys.includes(key) ? acc : { ...acc, [key]: obj[key] }),
+			(acc, key) =>
+				keys.includes(key) ? acc : ({ ...acc, [key]: obj[key] } as Omit<T, Types.Unpack<K>>),
 			{} as Omit<T, Types.Unpack<K>>,
 		)
 
@@ -137,4 +141,11 @@ export const thunk =
 
 export const gt = (min: number) => (val: number) => val > min
 export const lt = (max: number) => (val: number) => val < max
-export const eq = (target: number) => (value: number) => target === value
+export const eq = (target: number) => (val: number) => target === val
+export const gte = (min: number) => (val: number) => eq(min)(val) || gt(min)(val)
+export const lte = (max: number) => (val: number) => eq(max)(val) || lt(max)(val)
+
+export const from_option0 =
+	<U>(on_none: () => U) =>
+	<T>(option: TOption<T>): Oath<T, U> =>
+		option.cata({ Some: value => Oath.Resolve(value), None: () => Oath.Reject(on_none()) })

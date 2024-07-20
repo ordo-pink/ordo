@@ -17,100 +17,62 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import type { AUD, Algorithm, JTI, JWT, JWTPayload, SUB } from "@ordo-pink/wjwt"
-import type { TLogger } from "@ordo-pink/logger"
+import type { AUD, Algorithm, EXP, ISS, JTI, JWT, JWTPayload, SUB } from "@ordo-pink/wjwt"
 import type { Oath } from "@ordo-pink/oath"
-import type { Unary } from "@ordo-pink/tau"
+import type { TLogger } from "@ordo-pink/logger"
+import type { TOption } from "@ordo-pink/option"
+import type { TRrr } from "@ordo-pink/data"
 
 // --- Public ---
 
 /**
  * A record of refresh token ids and tokens.
  */
-export type TokenRecord = Record<JTI, string>
+export type TTokenRecord = Record<JTI, string>
 
 /**
  * Payload of the access JWT.
+ *
+ * lim: file_limit
+ * mfs: max_file_size
+ * sbs: subscription
+ * mxf: max_functions
  */
-export type AccessTokenPayload = JWTPayload & { lim: number; fms: number; sbs: string }
+export type TAccessTokenPayload = JWTPayload & {
+	lim: number
+	mfs: number
+	sbs: string
+	mxf: number
+}
 
 /**
  * Payload of the refresh JWT.
  */
-export type RefreshTokenPayload = AccessTokenPayload
+export type TRefreshTokenPayload = TAccessTokenPayload
 
 /**
  * Parsed access token content.
  */
-export type JWAT = JWT<AccessTokenPayload>
+export type TAccessJWT = JWT<TAccessTokenPayload>
 
 /**
  * Parsed refresh token content.
  */
-export type JWRT = JWT<RefreshTokenPayload>
+export type TRefreshJWT = JWT<TRefreshTokenPayload>
 
-/**
- * `DataPersistenceStrategy` provides a set of methods used by the `DataService` to persist user
- * authentication history.
- */
-export type TokenPersistenceStrategy = {
-	/**
-	 * Get token associated with given user id and token id.
-	 *
-	 * @rejects with `Error` if a database error occurs. Resolves with a token.
-	 * @resolves with `null` if no reference to given user id is persisted.
-	 * @resolves with `null` if token was not found.
-	 * @resolves with an Oath of the token for given sub and jti.
-	 */
-	getToken(sub: SUB, jti: JTI): Oath<string | null, Error>
-
-	/**
-	 * Get an object that contains mapping of JTIs to corresponding tokens.
-	 *
-	 * @rejects with `Error` if a database error occurs.
-	 * @resolves with `null` if no reference to given user id is persisted.
-	 * @resolves with a record of JTIs to corresponding tokens.
-	 */
-	getTokenRecord(sub: SUB): Oath<TokenRecord | null, Error>
-
-	/**
-	 * Remove a token associated with given user id and token id.
-	 *
-	 * @rejects with `Error` if a database error occurs.
-	 * @resolves with "OK" if user's token record did not contain the token hence it was not removed.
-	 * @resolves with "OK".
-	 */
-	removeToken(sub: SUB, jti: JTI): Oath<"OK", Error>
-
-	/**
-	 * Remove token record of a user under given user id.
-	 *
-	 * @rejects with `Error` if a database error occurs.
-	 * @resolves with "OK".
-	 */
-	removeTokenRecord(sub: SUB): Oath<"OK", Error>
-
-	/**
-	 * Set a token for given user id and token id.
-	 *
-	 * @rejects with `Error` if a database error occurs.
-	 * @resolves with "OK".
-	 */
-	setToken(sub: SUB, jti: JTI, token: string): Oath<"OK", Error>
-
-	/**
-	 * Set token record for a user under given user id.
-	 *
-	 * @rejects with `Error` if a database error occurs.
-	 * @resolves with "OK"
-	 */
-	setTokenRecord(sub: SUB, map: TokenRecord): Oath<"OK", Error>
+export type TPersistenceStrategyToken = {
+	get_token: (sub: SUB, jti: JTI) => Oath<TOption<string>, TRrr<"EIO">>
+	get_tokens: (sub: SUB) => Oath<TOption<TTokenRecord>, TRrr<"EIO">>
+	remove_token: (sub: SUB, jti: JTI) => Oath<void, TRrr<"EIO" | "ENOENT">>
+	remove_tokens: (sub: SUB) => Oath<void, TRrr<"EIO" | "ENOENT">>
+	set_token: (sub: SUB, jti: JTI, token: string) => Oath<void, TRrr<"ENOENT" | "EIO">>
+	set_tokens: (sub: SUB, map: TTokenRecord) => Oath<void, TRrr<"ENOENT" | "EIO">>
 }
 
 /**
  * Options for configuring TokenService on creation.
  */
-export type TokenServiceOptions = {
+export type TTokenServiceOptions = {
 	/**
 	 * A chain of CryptoKeys for signing and verifying tokens.
 	 */
@@ -126,6 +88,10 @@ export type TokenServiceOptions = {
 		readonly refresh: CryptoKeyPair
 	}
 
+	readonly audience: AUD
+
+	readonly issuer: ISS
+
 	/**
 	 * @see Algorithm
 	 */
@@ -134,12 +100,12 @@ export type TokenServiceOptions = {
 	/**
 	 * Lifetime of an access token in seconds.
 	 */
-	readonly accessTokenExpireIn: number
+	readonly at_expire_in: number
 
 	/**
 	 * Lifetime of a refresh token in seconds.
 	 */
-	readonly refreshTokenExpireIn: number
+	readonly rt_expire_in: number
 
 	/**
 	 * Dedicated logger.
@@ -147,23 +113,35 @@ export type TokenServiceOptions = {
 	readonly logger: TLogger
 }
 
+export type TTokenServiceStatic = {
+	of: (strategy: TPersistenceStrategyToken, options: TTokenServiceOptions) => TTokenService
+}
+
 export type TTokenService = {
-	verifyToken: (token: string, type: "access" | "refresh") => Oath<boolean>
-
-	getPayload: (
+	verify: <$TType extends "access" | "refresh">(
 		token: string,
-		type: "access" | "refresh",
-	) => Oath<typeof type extends "access" ? AccessTokenPayload : RefreshTokenPayload | null>
+		type: $TType,
+	) => Oath<boolean, TRrr<"EINVAL">>
 
-	decode: (
+	get_payload: <$TType extends "access" | "refresh">(
 		token: string,
-		type: "access" | "refresh",
-	) => Oath<typeof type extends "access" ? JWAT : JWRT | null>
-
-	createPair: Unary<
-		{ sub: SUB; prevJti?: JTI; aud?: AUD; data?: Record<string, any> },
-		Oath<RefreshTokenPayload & { tokens: { access: string; refresh: string } }, Error>
+		type: $TType,
+	) => Oath<
+		TOption<$TType extends "access" ? TAccessTokenPayload : TRefreshTokenPayload>,
+		TRrr<"EINVAL" | "EIO">
 	>
 
-	persistenceStrategy: TokenPersistenceStrategy
+	decode: <$TType extends "access" | "refresh">(
+		token: string,
+		type: $TType,
+	) => Oath<TOption<$TType extends "access" ? TAccessJWT : TRefreshJWT>, TRrr<"EINVAL">>
+
+	create: (params: {
+		sub: SUB
+		data: { lim: number; mfs: number; sbs: string; mxf: number }
+		prevJti?: JTI
+		aud?: AUD
+	}) => Oath<TAccessTokenPayload & { token: string }, TRrr<"EINVAL" | "ENOENT" | "EIO">>
+
+	strategy: TPersistenceStrategyToken
 }

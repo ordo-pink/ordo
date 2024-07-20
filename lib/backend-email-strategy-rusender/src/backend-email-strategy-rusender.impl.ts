@@ -47,16 +47,16 @@ export const EmailStrategyRusender: TEmailStrategyRusenderStatic = {
 		const sendTemplate = sendTemplateAsync(params)
 
 		return {
-			sendAsync: sendAsync(params),
-			sendChangeEmailEmail: ({
+			send_async: sendAsync(params),
+			send_change_email: ({
 				telegramChannel,
 				from,
 				to,
-				supportEmail,
-				supportTelegram,
-				newEmail,
-				oldEmail,
-				confirmationUrl,
+				support_email: supportEmail,
+				support_channels: supportTelegram,
+				new_email: newEmail,
+				old_email: oldEmail,
+				confirmation_url: confirmationUrl,
 			}) =>
 				sendTemplate({
 					from,
@@ -72,13 +72,13 @@ export const EmailStrategyRusender: TEmailStrategyRusenderStatic = {
 						confirmationUrl,
 					},
 				}),
-			sendEmailChangeRequestedEmail: ({
+			send_email_change_requested: ({
 				telegramChannel,
 				from,
 				to,
-				supportEmail,
-				supportTelegram,
-				newEmail,
+				support_email: supportEmail,
+				support_channels: supportTelegram,
+				new_email: newEmail,
 			}) =>
 				sendTemplate({
 					from,
@@ -87,13 +87,13 @@ export const EmailStrategyRusender: TEmailStrategyRusenderStatic = {
 					idTemplateMailUser: RusenderTemplateId.sendEmailChangeRequestedEmail,
 					params: { telegramChannel, newEmail, supportEmail, supportTelegram },
 				}),
-			sendPasswordChangedEmail: ({
+			send_password_changed: ({
 				telegramChannel,
 				from,
 				to,
-				supportEmail,
-				supportTelegram,
-				resetPasswordUrl,
+				support_email: supportEmail,
+				support_channels: supportTelegram,
+				reset_password_url: resetPasswordUrl,
 			}) =>
 				sendTemplate({
 					from,
@@ -102,13 +102,13 @@ export const EmailStrategyRusender: TEmailStrategyRusenderStatic = {
 					idTemplateMailUser: RusenderTemplateId.sendPasswordChangedEmail,
 					params: { telegramChannel, supportEmail, supportTelegram, resetPasswordUrl },
 				}),
-			sendRecoverPasswordEmail: ({
+			send_recover_password: ({
 				telegramChannel,
 				from,
 				to,
-				supportEmail,
-				supportTelegram,
-				passwordRecoveryUrl,
+				support_email: supportEmail,
+				support_channels: supportTelegram,
+				password_recovery_url: passwordRecoveryUrl,
 			}) =>
 				sendTemplate({
 					from,
@@ -117,13 +117,13 @@ export const EmailStrategyRusender: TEmailStrategyRusenderStatic = {
 					idTemplateMailUser: RusenderTemplateId.sendRecoverPasswordEmail,
 					params: { telegramChannel, supportEmail, supportTelegram, passwordRecoveryUrl },
 				}),
-			sendConfirmationEmail: ({
+			send_email_confirmation: ({
 				telegramChannel,
 				from,
 				to,
-				supportEmail,
-				supportTelegram,
-				confirmationUrl,
+				support_email: supportEmail,
+				support_channels: supportTelegram,
+				confirmation_url: confirmationUrl,
 			}) =>
 				sendTemplate({
 					from,
@@ -132,13 +132,13 @@ export const EmailStrategyRusender: TEmailStrategyRusenderStatic = {
 					idTemplateMailUser: RusenderTemplateId.sendConfirmationEmail,
 					params: { telegramChannel, supportEmail, supportTelegram, confirmationUrl },
 				}),
-			sendSignUpEmail: ({
+			send_sign_up: ({
 				telegramChannel,
 				from,
 				to,
-				supportEmail,
-				supportTelegram,
-				confirmationUrl,
+				support_email: supportEmail,
+				support_channels: supportTelegram,
+				confirmation_url: confirmationUrl,
 			}) =>
 				sendTemplate({
 					from,
@@ -147,14 +147,14 @@ export const EmailStrategyRusender: TEmailStrategyRusenderStatic = {
 					idTemplateMailUser: RusenderTemplateId.sendSignUpEmail,
 					params: { telegramChannel, confirmationUrl, supportEmail, supportTelegram },
 				}),
-			sendSignInEmail: ({
+			send_sign_in: ({
 				telegramChannel,
 				from,
 				to,
 				ip,
-				supportEmail,
-				supportTelegram,
-				resetPasswordUrl,
+				support_email: supportEmail,
+				support_channels: supportTelegram,
+				reset_password_url: resetPasswordUrl,
 			}) =>
 				sendTemplate({
 					from,

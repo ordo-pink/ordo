@@ -172,79 +172,299 @@ export type TOrdoContext = {
 
 declare global {
 	module Routes {
-		type SuccessResponse<T> = { success: true; result: T }
-		type ErrorResponse = { success: false; error: string }
-		type TokenResult = {
+		type TSuccessResponse<T> = { success: true; result: T }
+		type TErrorResponse = { success: false; error: string }
+		type TTokenResult = {
 			sub: SUB
 			jti: JTI
 			expires: Date
-			accessToken: string
-			fileLimit: User.User["file_limit"]
+			token: string
+			file_limit: User.User["file_limit"]
 			subscription: User.User["subscription"]
-			maxUploadSize: User.User["max_upload_size"]
+			max_upload_size: User.User["max_upload_size"]
+			max_functions: User.User["max_functions"]
 		}
 
 		module ID {
-			module ChangeAccountInfo {
-				type RequestBody = { firstName?: string; lastName?: string }
-				type Result = User.User
+			module UpdateInfo {
+				type Path = "/account/update-info"
+				type Method = "PATCH"
+				type Cookies = never
+				type Params = never
+				type RequestBody = {
+					first_name?: User.User["first_name"]
+					last_name?: User.User["last_name"]
+				}
+				type StatusCode = 200
+				type ResponseBody = User.User
+
+				type Request = {
+					path: Path
+					method: Method
+					cookies: Cookies
+					params: Params
+					body: RequestBody
+				}
+				type Response = { status: StatusCode; body: ResponseBody }
 			}
 
-			module ChangeEmail {
-				type RequestBody = { oldEmail?: string; newEmail?: string; userID?: SUB }
-				type Result = User.User
+			module UpdateEmail {
+				type Path = "/account/update-email"
+				type Method = "PATCH"
+				type Cookies = never
+				type Params = never
+				type StatusCode = 200
+				type RequestBody = { new_email?: User.User["email"] }
+				type ResponseBody = User.User
+
+				type Request = {
+					path: Path
+					method: Method
+					cookies: Cookies
+					params: Params
+					body: RequestBody
+				}
+				type Response = { status: StatusCode; body: ResponseBody }
 			}
 
-			module ChangePassword {
-				type RequestBody = { oldPassword?: string; newPassword?: string }
-				type Result = TokenResult
+			module UpdateHandle {
+				type Path = "/account/update-handle"
+				type Method = "PATCH"
+				type Cookies = never
+				type Params = never
+				type StatusCode = 200
+				type RequestBody = { new_handle?: User.User["handle"] }
+				type ResponseBody = User.User
+
+				type Request = {
+					path: Path
+					method: Method
+					cookies: Cookies
+					params: Params
+					body: RequestBody
+				}
+				type Response = { status: StatusCode; body: ResponseBody }
+			}
+
+			module UpdatePassword {
+				type Path = "/account/update-password"
+				type Method = "PATCH"
+				type Cookies = never
+				type Params = never
+				type StatusCode = 200
+				type RequestBody = {
+					old_password?: User.PrivateUser["password"]
+					new_password?: User.PrivateUser["password"]
+				}
+				type ResponseBody = TTokenResult
+
+				type Request = {
+					path: Path
+					method: Method
+					cookies: Cookies
+					params: Params
+					body: RequestBody
+				}
+				type Response = { status: StatusCode; body: ResponseBody }
 			}
 
 			module ConfirmEmail {
-				type RequestBody = { email?: string; code?: string }
-				type Result = User.User
+				type Path = "/account/confirm-email"
+				type Url = `${string}${Path}?email=${string}&code=${string}` // TODO: Define host
+				type Method = "POST"
+				type Cookies = never
+				type Params = never
+				type StatusCode = 200
+				type RequestBody = { email?: User.User["email"]; code?: User.InternalUser["email_code"] }
+				type ResponseBody = User.User
+
+				type Request = {
+					path: Path
+					method: Method
+					cookies: Cookies
+					params: Params
+					body: RequestBody
+				}
+				type Response = { status: StatusCode; body: ResponseBody }
 			}
 
 			module GetAccount {
+				type Path = "/account"
+				type Method = "GET"
+				type Cookies = never
+				type Params = never
 				type RequestBody = never
-				type Result = User.User
+				type StatusCode = 200
+				type ResponseBody = User.User
+
+				type Request = {
+					path: Path
+					method: Method
+					cookies: Cookies
+					params: Params
+					body: RequestBody
+				}
+				type Response = { status: StatusCode; body: ResponseBody }
 			}
 
-			module GetUserInfoByEmail {
+			module GetUserByEmail {
+				type Path = `/users/email/${string}`
+				type Method = "GET"
+				type Cookies = never
+				type Params = { email?: User.User["email"] }
 				type RequestBody = never
-				type RequestParams = { email?: string }
-				type Result = User.PublicUser
+				type StatusCode = 200
+				type ResponseBody = User.PublicUser
+
+				type Request = {
+					path: Path
+					method: Method
+					cookies: Cookies
+					params: Params
+					body: RequestBody
+				}
+				type Response = { status: StatusCode; body: ResponseBody }
 			}
 
-			module GetUserInfoByID {
+			module GetUserByHandle {
+				type Path = `/users/handle/${string}`
+				type Method = "GET"
+				type Cookies = never
+				type Params = { handle?: User.User["handle"] }
 				type RequestBody = never
-				type RequestParams = { id?: string }
-				type Result = User.PublicUser
+				type StatusCode = 200
+				type ResponseBody = User.PublicUser
+
+				type Request = {
+					path: Path
+					method: Method
+					cookies: Cookies
+					params: Params
+					body: RequestBody
+				}
+				type Response = { status: StatusCode; body: ResponseBody }
+			}
+
+			module GetUserByID {
+				type Path = `/users/id/${string}`
+				type Method = "GET"
+				type Cookies = never
+				type Params = { id?: User.User["id"] }
+				type RequestBody = never
+				type StatusCode = 200
+				type ResponseBody = User.PublicUser
+
+				type Request = {
+					path: Path
+					method: Method
+					cookies: Cookies
+					params: Params
+					body: RequestBody
+				}
+				type Response = { status: StatusCode; body: ResponseBody }
 			}
 
 			module RefreshToken {
+				type Path = "/account/refresh-token"
+				type Method = "POST"
+				type Cookies = { sub: SUB; jti: JTI }
+				type Params = never
 				type RequestBody = never
-				type Result = TokenResult
-			}
+				type StatusCode = 200
+				type ResponseBody = TTokenResult
 
-			module RequestEmailChange {
-				type RequestBody = { oldEmail?: string; newEmail?: string }
-				type Result = User.PublicUser
+				type Request = {
+					path: Path
+					method: Method
+					cookies: Cookies
+					params: Params
+					body: RequestBody
+				}
+				type Response = { status: StatusCode; body: ResponseBody }
 			}
 
 			module SignIn {
-				type RequestBody = { email?: string; password?: string }
-				type Result = TokenResult
+				type Path = "/account/sign-in"
+				type Method = "POST"
+				type Cookies = never
+				type Params = never
+				type StatusCode = 200
+				type RequestBody = {
+					email?: User.User["email"]
+					handle?: User.User["handle"]
+					password?: User.PrivateUser["password"]
+				}
+				type ResponseBody = TTokenResult
+
+				type Request = {
+					path: Path
+					method: Method
+					cookies: Cookies
+					params: Params
+					body: RequestBody
+				}
+				type Response = { status: StatusCode; body: ResponseBody }
 			}
 
 			module SignUp {
-				type RequestBody = { email?: string; password?: string }
-				type Result = TokenResult
+				type Path = "/account/sign-up"
+				type Method = "POST"
+				type Cookies = never
+				type Params = never
+				type RequestBody = {
+					email?: User.User["email"]
+					handle?: User.User["handle"]
+					password?: User.PrivateUser["password"]
+				}
+				type StatusCode = 201
+				type ResponseBody = TTokenResult
+
+				type Request = {
+					path: Path
+					method: Method
+					cookies: Cookies
+					params: Params
+					body: RequestBody
+				}
+				type Response = { status: StatusCode; body: ResponseBody }
+			}
+
+			module SignOut {
+				type Path = "/account/sign-out"
+				type Method = "POST"
+				type Cookies = { sub: SUB; jti: JTI }
+				type Params = void
+				type RequestBody = void
+				type StatusCode = 204
+				type ResponseBody = void
+
+				type Request = {
+					path: Path
+					method: Method
+					cookies: Cookies
+					params: Params
+					body: RequestBody
+				}
+				type Response = { status: StatusCode }
 			}
 
 			module VerifyToken {
-				type RequestBody = never
-				type Result = { valid: false } | { valid: true; token: string }
+				type Path = "/account/verify-token"
+				type Method = "POST"
+				type Cookies = void
+				type Params = void
+				type RequestBody = void
+				type StatusCode = 200
+				type ResponseBody = void
+
+				type Request = {
+					path: Path
+					method: Method
+					cookies: Cookies
+					params: Params
+					body: RequestBody
+				}
+				type Response = { status: StatusCode }
 			}
 		}
 	}
@@ -455,12 +675,12 @@ declare global {
 
 	module User {
 		export type PublicUser = {
-			email: string
+			email: `${string}@${string}`
 			created_at: Date
 			subscription: string
-			handle: string
-			first_name?: string
-			last_name?: string
+			handle: `@${string}`
+			first_name: string
+			last_name: string
 		}
 
 		export type User = User.PublicUser & {
@@ -468,13 +688,14 @@ declare global {
 			email_confirmed: boolean
 			file_limit: number
 			max_upload_size: number
+			max_functions: number
 		}
 
-		export type PrivateUser = User.User & {
-			email_code?: string
+		export type InternalUser = User.User & {
+			email_code: string
 		}
 
-		export type InternalUser = User.PrivateUser & {
+		export type PrivateUser = User.InternalUser & {
 			password: string
 		}
 	}

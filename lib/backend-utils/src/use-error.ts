@@ -17,21 +17,40 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Context, Middleware } from "koa"
+import { type Context, type Middleware } from "koa"
+import chalk from "chalk"
 
+import { RRR, type TRrr } from "@ordo-pink/data"
 import { HttpError } from "@ordo-pink/rrr"
-import { TLogger } from "@ordo-pink/logger"
+import { Switch } from "@ordo-pink/switch"
+import { type TLogger } from "@ordo-pink/logger"
 
-export const sendError = (ctx: Context) => (err: HttpError) => {
-	// TODO: Use logger
-	console.log(err)
-	ctx.response.status = typeof err.status === "number" ? err.status : 500
-	ctx.response.body = { success: false, error: err.message }
+type TSendErrorParams = { ctx: Context; logger: TLogger }
+export const send_error = (params: TSendErrorParams) => (err: TRrr) => {
+	const { ctx, logger } = params
+
+	logger.debug(
+		`[${chalk.red(err.key)}] ${err.location} :: ${err.debug ?? "No debug info provided"}`,
+	)
+
+	const status = Switch.Match(err.code)
+		.case(RRR.enum.EACCES, () => 401)
+		.case(RRR.enum.EEXIST, () => 409)
+		.case(RRR.enum.EFBIG, () => 413)
+		.case(RRR.enum.EINVAL, () => 400)
+		.case(RRR.enum.EIO, () => 500)
+		.case(RRR.enum.ENOENT, () => 404)
+		.case(RRR.enum.ENOSPC, () => 507)
+		.case(RRR.enum.EPERM, () => 403)
+		.default(() => 500)
+
+	ctx.response.status = status
+	ctx.response.body = { success: false, error: `${err.code} ${err.key} ${err.location}` }
 }
 
 export type HandleErrorParams = { logger: TLogger }
 
-export const handleError =
+export const handle_error =
 	(options: HandleErrorParams): Middleware =>
 	async (ctx, next) => {
 		try {

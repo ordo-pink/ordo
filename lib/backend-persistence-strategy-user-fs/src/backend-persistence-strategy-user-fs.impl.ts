@@ -21,10 +21,10 @@ import { read_file0, write_file_rec0 } from "@ordo-pink/fs"
 import { O } from "@ordo-pink/option"
 import { Oath } from "@ordo-pink/oath"
 import { RRR } from "@ordo-pink/data"
-import { type TUserPersistenceStrategy } from "@ordo-pink/backend-service-user"
+import { type TPersistenceStrategyUser } from "@ordo-pink/backend-service-user"
 
 export const PersistenceStrategyUserFS = {
-	of: (path: string): TUserPersistenceStrategy => ({
+	of: (path: string): TPersistenceStrategyUser => ({
 		create: user =>
 			_get_users0(path)
 				.pipe(Oath.ops.chain(_check_user_does_not_exist0("id", user)))
@@ -55,8 +55,9 @@ export const PersistenceStrategyUserFS = {
 
 		update: (id, updated_user) =>
 			_get_users0(path)
-				.pipe(Oath.ops.chain(_replace_user0(id, updated_user)))
-				.pipe(Oath.ops.chain(users => _save_users0(path, users))),
+				.pipe(Oath.ops.chain(_replace_in_user_array0(id, updated_user)))
+				.pipe(Oath.ops.chain(users => _save_users0(path, users)))
+				.pipe(Oath.ops.map(() => updated_user)),
 	}),
 }
 
@@ -64,12 +65,12 @@ export const PersistenceStrategyUserFS = {
 
 const LOCATION = "PersistenceStrategyUserFS"
 
+const eio = RRR.codes.eio(LOCATION)
 const eexist = RRR.codes.eexist(LOCATION)
 const enoent = RRR.codes.enoent(LOCATION)
-const eio = RRR.codes.eio(LOCATION)
 
 const _check_user_does_not_exist0 =
-	(key: "id" | "email" | "handle", user: User.InternalUser) => (users: User.InternalUser[]) =>
+	(key: "id" | "email" | "handle", user: User.PrivateUser) => (users: User.PrivateUser[]) =>
 		Oath.If(!users.some(u => u[key] === user[key]), {
 			T: () => users,
 			F: () => eexist(`create -> id: ${user.id}`),
@@ -78,16 +79,16 @@ const _check_user_does_not_exist0 =
 const _get_users0 = (path: string) =>
 	read_file0(path, "utf-8")
 		.fix(() => write_file_rec0(path, "[]", "utf-8").pipe(Oath.ops.map(() => "[]")))
-		.pipe(Oath.ops.chain(file => Oath.Try(() => JSON.parse(file as string) as User.InternalUser[])))
+		.pipe(Oath.ops.chain(file => Oath.Try(() => JSON.parse(file as string) as User.PrivateUser[])))
 		.pipe(Oath.ops.rejected_map(error => eio(`get_users -> error: ${error.message}`)))
 
-const _save_users0 = (path: string, data: User.InternalUser[]) =>
+const _save_users0 = (path: string, data: User.PrivateUser[]) =>
 	Oath.Try(() => JSON.stringify(data))
 		.pipe(Oath.ops.chain(file => write_file_rec0(path, file, "utf-8")))
 		.pipe(Oath.ops.rejected_map(error => eio(`save_users -> error: ${error.message}`)))
 
-const _replace_user0 =
-	(id: User.InternalUser["id"], updated_user: User.InternalUser) => (users: User.InternalUser[]) =>
+const _replace_in_user_array0 =
+	(id: User.PrivateUser["id"], updated_user: User.PrivateUser) => (users: User.PrivateUser[]) =>
 		Oath.FromNullable(
 			users.find(user => user.id === id),
 			() => enoent(`update -> id: ${id}`),
@@ -101,5 +102,5 @@ const _replace_user0 =
 		)
 
 const _check_exists =
-	(key: "id" | "email" | "handle", value: string) => (users: User.InternalUser[]) =>
+	(key: "id" | "email" | "handle", value: string) => (users: User.PrivateUser[]) =>
 		users.some(user => user[key] === value)

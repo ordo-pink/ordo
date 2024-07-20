@@ -1,4 +1,4 @@
-import type { EmailParams, EmailStrategy } from "@ordo-pink/backend-service-offline-notifications"
+import type { TEmailParams, TEmailStrategy } from "@ordo-pink/backend-service-offline-notifications"
 import type { UUIDv4 } from "@ordo-pink/tau"
 
 import type {
@@ -17,7 +17,7 @@ export type TEmailStrategyRusenderParams = { key: string }
  * EmailStrategyRusender static methods descriptor.
  */
 export type TEmailStrategyRusenderStatic = {
-	create: (params: TEmailStrategyRusenderParams) => EmailStrategy
+	create: (params: TEmailStrategyRusenderParams) => TEmailStrategy
 }
 
 /**
@@ -44,11 +44,11 @@ export type TRusenderSendRusenderRequestParams = {
 	headers: TRusenderRequestHeaders
 }
 
-export type TEmailStrategyRusenderMethod<K extends keyof EmailStrategy> = (
+export type TEmailStrategyRusenderMethod<K extends keyof TEmailStrategy> = (
 	params: TEmailStrategyRusenderParams,
-) => EmailStrategy[K]
+) => TEmailStrategy[K]
 
-export type TRusenderEmailTemplate = Omit<EmailParams, "body" | "html"> & {
+export type TRusenderEmailTemplate = Omit<TEmailParams, "body" | "html"> & {
 	idTemplateMailUser?: number
 	params: Record<string, string>
 }

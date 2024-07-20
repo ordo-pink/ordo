@@ -23,45 +23,48 @@ import type {
 } from "./backend-service-offline-notifications.types"
 
 export const NotificationService = {
-	of: ({ emailStrategy, sender: from }: InitNotificationServiceOptions): TNotificationService => ({
-		emailStrategy,
-		sendSignInNotification: ({
+	of: ({
+		email_strategy: emailStrategy,
+		sender: from,
+	}: InitNotificationServiceOptions): TNotificationService => ({
+		email_strategy: emailStrategy,
+		sign_in: ({
 			ip,
-			supportEmail,
-			supportTelegram,
+			support_email: supportEmail,
+			support_channels: supportTelegram,
 			to,
-			resetPasswordUrl,
+			reset_password_url: resetPasswordUrl,
 			telegramChannel,
 		}) => {
-			emailStrategy.sendSignInEmail({
+			emailStrategy.send_sign_in({
 				from, // TODO: Separate email strategy and notification service types
 				to,
 				ip,
-				resetPasswordUrl,
-				supportEmail,
-				supportTelegram,
+				reset_password_url: resetPasswordUrl,
+				support_email: supportEmail,
+				support_channels: supportTelegram,
 				telegramChannel,
 			})
 		},
-		sendSignUpNotification: ({
+		sign_up: ({
 			to,
-			confirmationUrl,
-			supportEmail,
-			supportTelegram,
+			confirmation_url: confirmationUrl,
+			support_email: supportEmail,
+			support_channels: supportTelegram,
 			telegramChannel,
 		}) => {
-			emailStrategy.sendSignUpEmail({
+			emailStrategy.send_sign_up({
 				from,
 				to,
-				confirmationUrl,
-				supportEmail,
-				supportTelegram,
+				confirmation_url: confirmationUrl,
+				support_email: supportEmail,
+				support_channels: supportTelegram,
 				telegramChannel,
 			})
 		},
-		sendEmailChangeNotifications: () => void 0 as any,
-		sendPasswordChangeNotification: () => void 0 as any,
-		sendPasswordRecoveryNotification: () => void 0 as any,
-		sendResetPasswordNotification: () => void 0 as any,
+		change_email: () => void 0 as any,
+		change_password: () => void 0 as any,
+		recover_password: () => void 0 as any,
+		reset_password: () => void 0 as any,
 	}),
 }

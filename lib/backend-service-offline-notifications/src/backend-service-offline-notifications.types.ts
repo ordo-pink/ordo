@@ -20,7 +20,7 @@
 /**
  * From/to.
  */
-export type EmailContact = {
+export type TEmailContact = {
 	/**
 	 * Email address.
 	 */
@@ -37,21 +37,21 @@ export type EmailContact = {
  *
  * @deprecated Not implemented!
  */
-export type NotificationHooks = {
-	onSuccess?: () => void
-	onError?: (error: Error) => void
+export type TNotificationHooks = {
+	on_success?: () => void
+	on_error?: (error: Error) => void
 }
 
-export type EmailParams = {
+export type TEmailParams = {
 	/**
 	 * Email addressor.
 	 */
-	from: EmailContact
+	from: TEmailContact
 
 	/**
 	 * Email addressee.
 	 */
-	to: EmailContact
+	to: TEmailContact
 
 	/**
 	 * Email subject.
@@ -88,64 +88,60 @@ export type EmailParams = {
  * `EmailStrategy` provides a `send` method used by the `OfflineNotificationService` to send emails
  * to users.
  */
-export type EmailStrategy = {
-	sendAsync: (params: EmailParams) => void
+export type TEmailStrategy = {
+	send_async: (params: TEmailParams) => void
 
-	sendSignInEmail: (params: TSendSignInEmailParams) => void
+	send_sign_in: (params: TSendSignInEmailParams) => void
 
-	sendSignUpEmail: (params: TSendConfirmEmailParams) => void
+	send_sign_up: (params: TSendConfirmEmailParams) => void
 
-	sendRecoverPasswordEmail: (params: TSendRecoverPasswordEmailParams) => void
+	send_recover_password: (params: TSendRecoverPasswordEmailParams) => void
 
-	sendPasswordChangedEmail: (params: TSendChangePasswordEmailParams) => void
+	send_password_changed: (params: TSendChangePasswordEmailParams) => void
 
-	sendChangeEmailEmail: (params: TSendChangeEmailEmailParams) => void
+	send_change_email: (params: TSendChangeEmailEmailParams) => void
 
-	sendEmailChangeRequestedEmail: (params: TSendChangeEmailEmailParams) => void
+	send_email_change_requested: (params: TSendChangeEmailEmailParams) => void
 
-	sendEmailChangedEmail: (params: TSendEmailChangedEmailParams) => void
+	send_email_changed: (params: TSendEmailChangedEmailParams) => void
 
-	sendConfirmationEmail: (params: TSendResetPasswordEmailParams) => void
+	send_email_confirmation: (params: TSendResetPasswordEmailParams) => void
 }
 
 export type TSharedEmailParams = {
-	supportEmail?: string
-	supportTelegram?: string
-	telegramChannel?: string
-	from?: Required<EmailContact>
-	to: EmailContact
+	to: TEmailContact
 }
 
 export type TSendSignInEmailParams = TSharedEmailParams & {
 	ip: string
-	resetPasswordUrl?: string
+	reset_password_url?: string
 }
 
 export type TSendConfirmEmailParams = TSharedEmailParams & {
-	confirmationUrl: string
+	confirmation_url: string
 }
 
 export type TSendRecoverPasswordEmailParams = TSharedEmailParams & {
-	passwordRecoveryUrl: string
+	password_recovery_url: string
 }
 
 export type TSendChangePasswordEmailParams = TSharedEmailParams & {
-	resetPasswordUrl: string
+	reset_password_url: string
 }
 
 export type TSendChangeEmailEmailParams = TSharedEmailParams & {
-	oldEmail: string
-	newEmail: string
-	confirmationUrl: string
+	old_email: string
+	new_email: string
+	confirmation_url: string
 }
 
 export type TSendEmailChangedEmailParams = TSharedEmailParams & {
-	oldEmail: string
-	newEmail: string
+	old_email: string
+	new_email: string
 }
 
 export type TSendResetPasswordEmailParams = TSharedEmailParams & {
-	confirmationUrl: string
+	confirmation_url: string
 }
 
 /**
@@ -156,23 +152,23 @@ export type TNotificationService = {
 	/**
 	 * Direct access to `EmailStrategy`.
 	 *
-	 * @see EmailStrategy
+	 * @see TEmailStrategy
 	 */
-	emailStrategy: EmailStrategy
+	email_strategy: TEmailStrategy
 
-	sendSignInNotification: (params: TSendSignInEmailParams) => void
+	sign_in: (params: TSendSignInEmailParams) => void
 
-	sendSignUpNotification: (params: TSendConfirmEmailParams) => void
+	sign_up: (params: TSendConfirmEmailParams) => void
 
-	sendPasswordRecoveryNotification: (params: TSendRecoverPasswordEmailParams) => void
+	recover_password: (params: TSendRecoverPasswordEmailParams) => void
 
-	sendPasswordChangeNotification: (params: TSendChangePasswordEmailParams) => void
+	change_password: (params: TSendChangePasswordEmailParams) => void
 
-	sendEmailChangeNotifications: (params: TSendChangeEmailEmailParams) => void
+	change_email: (params: TSendChangeEmailEmailParams) => void
 
-	sendEmailChangedNotification: (params: TSendEmailChangedEmailParams) => void
+	email_changed: (params: TSendEmailChangedEmailParams) => void
 
-	sendResetPasswordNotification: (params: TSendResetPasswordEmailParams) => void
+	reset_password: (params: TSendResetPasswordEmailParams) => void
 }
 
 /**
@@ -182,12 +178,18 @@ export type InitNotificationServiceOptions = {
 	/**
 	 * `EmailStrategy` for sending emails.
 	 *
-	 * @see EmailStrategy
+	 * @see TEmailStrategy
 	 */
-	emailStrategy: EmailStrategy
+	email_strategy: TEmailStrategy
 
 	/**
 	 * Information about the notification sender.
 	 */
-	sender: Required<EmailContact>
+	sender: Required<TEmailContact>
+
+	support_channels: Record<string, string>
+
+	social_links: Record<string, string>
+
+	from: Required<TEmailContact>
 }

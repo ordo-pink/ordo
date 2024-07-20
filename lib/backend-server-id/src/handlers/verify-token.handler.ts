@@ -17,24 +17,20 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import type { Middleware } from "koa"
+import { Context } from "koa"
 
 import { Oath } from "@ordo-pink/oath"
+import { type TRrr } from "@ordo-pink/data"
 import { type TTokenService } from "@ordo-pink/backend-service-token"
-import { type UserService } from "@ordo-pink/backend-service-user"
 import { authenticate0 } from "@ordo-pink/backend-utils"
 
 // --- Public ---
 
-export type Params = { tokenService: TTokenService; userService: UserService }
-export type Fn = (params: Params) => Middleware
+export type Params = { token_service: TTokenService }
+export type Fn = (
+	ctx: Context,
+	params: Params,
+) => Oath<Routes.ID.VerifyToken.Response, TRrr<"EACCES" | "EINVAL" | "EIO">>
 
-export const handleVerifyToken: Fn =
-	({ tokenService }) =>
-	ctx =>
-		authenticate0(ctx, tokenService)
-			.chain(Oath.fromNullable)
-			.fork(
-				() => void (ctx.response.body = { success: true, result: { valid: false } }),
-				token => void (ctx.response.body = { success: true, result: { valid: true, token } }),
-			)
+export const verify_token0: Fn = (ctx, { token_service }) =>
+	authenticate0(ctx, token_service).pipe(Oath.ops.map(() => ({ status: 200 })))

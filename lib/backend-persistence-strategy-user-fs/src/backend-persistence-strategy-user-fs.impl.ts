@@ -58,6 +58,17 @@ export const PersistenceStrategyUserFS = {
 				.pipe(Oath.ops.chain(_replace_in_user_array0(id, updated_user)))
 				.pipe(Oath.ops.chain(users => _save_users0(path, users)))
 				.pipe(Oath.ops.map(() => updated_user)),
+
+		get_outdated: current_entity_version =>
+			_get_users0(path).pipe(
+				Oath.ops.map(users =>
+					users.filter(
+						user => !user.entity_version || user.entity_version < current_entity_version,
+					),
+				),
+			),
+
+		migrate: () => Oath.Resolve(void 0),
 	}),
 }
 
@@ -97,7 +108,7 @@ const _replace_in_user_array0 =
 				users
 					.slice(0, users.indexOf(existing_user))
 					.concat(updated_user)
-					.concat(users.slice(users.indexOf(existing_user))),
+					.concat(users.slice(users.indexOf(existing_user) + 1)),
 			),
 		)
 

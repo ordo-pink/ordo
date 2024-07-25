@@ -18,7 +18,6 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { type Context } from "koa"
-import isEmail from "validator/lib/isEmail"
 
 import { RRR, type TRrr } from "@ordo-pink/data"
 import { type TUserService, UserService } from "@ordo-pink/backend-service-user"
@@ -36,7 +35,7 @@ export const get_by_email0: TFn = (ctx, { user_service, token_service }) =>
 
 // --- Internal ---
 
-const LOCATION = "handle_get_public_by_email"
+const LOCATION = "get_public_by_email"
 
 const einval = RRR.codes.einval(LOCATION)
 const enoent = RRR.codes.enoent(LOCATION)
@@ -48,17 +47,13 @@ type TFn = (
 	params: TParams,
 ) => Oath<Routes.ID.GetUserByEmail.Response, TRrr<"EACCES" | "ENOENT" | "EIO" | "EINVAL">>
 
-const validate_ctx0 = ({ email }: TCtx): Oath<User.User["email"], TRrr<"EINVAL">> =>
-	Oath.FromNullable(email)
-		.pipe(Oath.ops.chain(email => Oath.If(isEmail(email), { T: () => email })))
-		.pipe(Oath.ops.rejected_map(() => einval(`validate_ctx -> email: ${email}`)))
+const validate_ctx0 = ({ email }: TCtx) =>
+	Oath.FromNullable(email).pipe(
+		Oath.ops.rejected_map(() => einval(`validate_ctx -> email: ${email}`)),
+	)
 
-const get_user_by_email0 =
-	(user_service: TUserService) =>
-	(
-		email: User.User["email"],
-	): Oath<Routes.ID.GetUserByEmail.ResponseBody, TRrr<"EIO" | "ENOENT">> =>
-		user_service
-			.get_by_email(email)
-			.pipe(Oath.ops.chain(from_option0(() => enoent(`get_by_email -> email: ${email}`))))
-			.pipe(Oath.ops.map(UserService.serialise_public))
+const get_user_by_email0 = (user_service: TUserService) => (email: string) =>
+	user_service
+		.get_by_email(email)
+		.pipe(Oath.ops.chain(from_option0(() => enoent(`get_by_email -> email: ${email}`))))
+		.pipe(Oath.ops.map(UserService.serialise_public))

@@ -28,7 +28,6 @@ import { from_option0 } from "@ordo-pink/tau"
 import { parse_body0 } from "@ordo-pink/backend-utils"
 
 import { type TCreateAuthTokenResult, create_auth_token0 } from "../fns/create-auth-token.fn"
-import { get_body_email0, get_body_handle0, get_body_password0 } from "../fns/getters.fn"
 import { set_auth_cookie } from "../fns/auth-cookie.fn"
 import { token_result_to_response_body } from "../fns/token-result-to-response-body.fn"
 
@@ -56,20 +55,13 @@ type TFn = (
 	params: TParams,
 ) => Oath<Routes.ID.SignIn.Response, TRrr<"ENOENT" | "EIO" | "EINVAL">>
 type TCtx =
-	| {
-			email: User.User["email"]
-			handle?: User.User["handle"]
-			password: User.PrivateUser["password"]
-	  }
-	| {
-			email?: User.User["email"]
-			handle: User.User["handle"]
-			password: User.PrivateUser["password"]
-	  }
+	| { email: string; handle?: string; password: string }
+	| { email?: string; handle: string; password: string }
 
 const LOCATION = "handle_sign_in"
 
 const enoent = RRR.codes.enoent(LOCATION)
+const einval = RRR.codes.einval(LOCATION)
 
 const send_notification =
 	(ctx: Context, notification_service: TNotificationService) =>
@@ -79,27 +71,23 @@ const send_notification =
 			ip: ctx.get("x-forwarded-for") ?? ctx.request.ip,
 		})
 
-const extract_ctx0 = ({
-	email,
-	handle,
-	password,
-}: Routes.ID.SignIn.RequestBody): Oath<TCtx, TRrr<"EINVAL">> =>
+const extract_ctx0 = ({ email, handle, password }: Routes.ID.SignIn.RequestBody) =>
 	Oath.Merge({
-		email: get_body_email0(email),
-		password: get_body_password0(password),
+		email: Oath.FromNullable(email, () => einval("extract_ctx -> email: null")),
+		password: Oath.FromNullable(password, () => einval("extract_ctx -> password: null")),
 	}).fix(() =>
 		Oath.Merge({
-			handle: get_body_handle0(handle),
-			password: get_body_password0(password),
+			handle: Oath.FromNullable(handle, () => einval("extract_ctx -> handle: null")),
+			password: Oath.FromNullable(password, () => einval("extract_ctx -> password: null")),
 		}),
 	)
 
 const validate_ctx0 =
 	(user_service: TUserService) =>
-	({ email, handle, password }: TCtx): Oath<User.InternalUser, TRrr<"EIO" | "ENOENT">> =>
+	({ email, handle, password }: TCtx) =>
 		Oath.Merge([
-			email ? user_service.get_by_email(email) : user_service.get_by_handle(handle),
-			user_service.compare_password(email ? email : handle, password),
+			email ? user_service.get_by_email(email) : user_service.get_by_handle(handle!),
+			user_service.compare_password(email ? email : handle!, password),
 		])
 			.pipe(Oath.ops.map(([option]) => option))
 			.pipe(

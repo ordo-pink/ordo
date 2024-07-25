@@ -19,7 +19,7 @@ export const UserQuery: TUserQueryStatic = {
 						}
 					}),
 				),
-		get version$() {
+		get current_user_version$() {
 			let i = 0
 			return c_repo.version$.pipe(combineLatestWith(k_repo.version$)).pipe(map(() => ++i))
 		},

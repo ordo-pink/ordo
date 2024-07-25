@@ -21,6 +21,7 @@ import { Oath } from "@ordo-pink/oath"
 import { TOption } from "@ordo-pink/option"
 
 import type * as Types from "./types"
+import { TResult } from "@ordo-pink/result"
 
 export const UUIDv4_RX = /^[0-9A-F]{8}-[0-9A-F]{4}-[4][0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$/i
 
@@ -146,6 +147,9 @@ export const gte = (min: number) => (val: number) => eq(min)(val) || gt(min)(val
 export const lte = (max: number) => (val: number) => eq(max)(val) || lt(max)(val)
 
 export const from_option0 =
-	<U>(on_none: () => U) =>
-	<T>(option: TOption<T>): Oath<T, U> =>
+	<$TOnNone>(on_none: () => $TOnNone) =>
+	<$TSome>(option: TOption<$TSome>): Oath<$TSome, $TOnNone> =>
 		option.cata({ Some: value => Oath.Resolve(value), None: () => Oath.Reject(on_none()) })
+
+export const from_result0 = <$TOk, $TErr>(result: TResult<$TOk, $TErr>): Oath<$TOk, $TErr> =>
+	result.cata({ Ok: Oath.Resolve, Err: Oath.Reject })

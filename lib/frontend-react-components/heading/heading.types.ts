@@ -26,7 +26,7 @@ export type THeadingProps = PropsWithChildren<{
 	uppercase?: boolean
 	center?: boolean
 	trim?: boolean
-	styledFirstLetter?: boolean
+	styled_first_letter?: boolean
 }>
 
 export type THeadingViewProps = PropsWithChildren<{

@@ -22,7 +22,6 @@ import { Context } from "koa"
 import { RRR, type TRrr } from "@ordo-pink/data"
 import { type TUserService, UserService } from "@ordo-pink/backend-service-user"
 import { Oath } from "@ordo-pink/oath"
-import { type SUB } from "@ordo-pink/wjwt"
 import { type TLogger } from "@ordo-pink/logger"
 import { type TTokenService } from "@ordo-pink/backend-service-token"
 import { authenticate0 } from "@ordo-pink/backend-utils"
@@ -36,7 +35,7 @@ export const get_account0: TFn = (ctx, { token_service, user_service }) =>
 
 // --- Internal ---
 
-const LOCATION = "handle_get_account"
+const LOCATION = "get_account"
 
 const enoent = RRR.codes.enoent(LOCATION)
 
@@ -46,10 +45,8 @@ type TFn = (
 	params: TParams,
 ) => Oath<Routes.ID.GetAccount.Response, TRrr<"EIO" | "ENOENT" | "EINVAL" | "EACCES">>
 
-const get_user_by_id0 =
-	(user_service: TUserService) =>
-	(sub: SUB): Oath<Routes.ID.GetAccount.ResponseBody, TRrr<"EIO" | "ENOENT">> =>
-		user_service
-			.get_by_id(sub)
-			.pipe(Oath.ops.chain(from_option0(() => enoent(`get_user_by_id -> id: ${sub}`))))
-			.pipe(Oath.ops.map(UserService.serialise))
+const get_user_by_id0 = (user_service: TUserService) => (sub: string) =>
+	user_service
+		.get_by_id(sub)
+		.pipe(Oath.ops.chain(from_option0(() => enoent(`get_user_by_id -> id: ${sub}`))))
+		.pipe(Oath.ops.map(UserService.serialise))

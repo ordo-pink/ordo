@@ -17,13 +17,13 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import { JTI, WJWT } from "@ordo-pink/wjwt"
 import { O } from "@ordo-pink/option"
 import { Oath } from "@ordo-pink/oath"
 import { RRR } from "@ordo-pink/data"
 import { Switch } from "@ordo-pink/switch"
-import { WJWT } from "@ordo-pink/wjwt"
 
-import { TRefreshJWT, type TTokenServiceStatic } from "./types"
+import { type TAuthJWT, type TTokenServiceStatic } from "./types"
 
 export const TokenService: TTokenServiceStatic = {
 	of: (strategy, { alg, audience, at_expire_in, issuer, keys, rt_expire_in }) => {
@@ -70,44 +70,68 @@ export const TokenService: TTokenServiceStatic = {
 			decode: token =>
 				wjwt("access")
 					.decode0(token)
-					.pipe(Oath.ops.map(jwt => O.Some(jwt as TRefreshJWT)))
+					.pipe(Oath.ops.map(jwt => O.Some(jwt as TAuthJWT)))
 					.pipe(Oath.ops.rejected_map(error => einval(`decode -> error: ${error}`))),
 
 			create: ({ sub, prevJti, aud = audience, data }) =>
-				Oath.Merge({
-					jti: crypto.randomUUID(),
+				Oath.Resolve({
+					jti: crypto.randomUUID() as JTI,
 					iat: Math.floor(Date.now() / 1000),
 					iss: issuer,
 					aexp: Math.floor(Date.now() / 1000) + at_expire_in,
 					rexp: Math.floor(Date.now() / 1000) + rt_expire_in,
 					sub,
 					aud,
-				}).pipe(
-					Oath.ops.chain(({ jti, iat, iss, aexp, rexp, sub, aud }) =>
-						Oath.Merge({
-							...data,
-							jti,
-							iat,
-							iss,
-							exp: rexp,
-							sub,
-							aud,
-							tokens: Oath.Merge({
-								access: access_wjwt.sign0({ ...data, jti, iat, iss, exp: aexp, sub, aud }),
-								refresh: refresh_wjwt.sign0({ ...data, jti, iat, iss, exp: rexp, sub, aud }),
-							}),
-						}).pipe(
-							Oath.ops.chain(res =>
-								prevJti
-									? strategy
-											.remove_token(sub, prevJti)
-											.pipe(Oath.ops.chain(() => strategy.set_token(sub, jti, res.tokens.refresh)))
-											.pipe(Oath.ops.map(() => res))
-									: strategy.set_token(sub, jti, res.tokens.refresh).pipe(Oath.ops.map(() => res)),
+				})
+					.pipe(
+						Oath.ops.chain(({ jti, iat, iss, aexp, rexp, sub, aud }) =>
+							Oath.Merge({
+								...data,
+								jti,
+								iat,
+								iss,
+								exp: rexp,
+								sub,
+								aud,
+								tokens: Oath.Merge({
+									access: access_wjwt
+										.sign0({ ...data, jti, iat, iss, exp: aexp, sub, aud })
+										.pipe(Oath.ops.rejected_map(e => einval(e))),
+									refresh: refresh_wjwt
+										.sign0({ ...data, jti, iat, iss, exp: rexp, sub, aud })
+										.pipe(Oath.ops.rejected_map(e => einval(e))),
+								}),
+							}).pipe(
+								Oath.ops.chain(res =>
+									prevJti
+										? strategy
+												.remove_token(sub, prevJti)
+												.pipe(
+													Oath.ops.chain(() => strategy.set_token(sub, jti, res.tokens.refresh)),
+												)
+												.pipe(Oath.ops.map(() => res))
+										: strategy
+												.set_token(sub, jti, res.tokens.refresh)
+												.pipe(Oath.ops.map(() => res)),
+								),
 							),
 						),
+					)
+					.pipe(
+						Oath.ops.map(({ aud, exp, iat, iss, jti, lim, mfs, mxf, sbs, sub, tokens }) => ({
+							aud,
+							exp,
+							iat,
+							iss,
+							jti,
+							lim,
+							mfs,
+							mxf,
+							sbs,
+							sub,
+							token: tokens.access,
+						})),
 					),
-				),
 		}
 	},
 }

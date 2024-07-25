@@ -88,7 +88,7 @@ export default function Sidebar({ children, isNarrow }: P) {
 				<div className="w-full max-w-md">
 					<div>
 						{user && (
-							<Heading level="5" styledFirstLetter trim>
+							<Heading level="5" styled_first_letter trim>
 								{user.firstName}
 							</Heading>
 						)}

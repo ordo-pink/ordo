@@ -36,8 +36,22 @@ type TInitAuthParams = (params: { hosts: THosts; fetch: TFetch; logger: TLogger 
 export const init_auth: TInitAuthParams = call_once(({ hosts, fetch, logger }) => {
 	const refresh_token = Oath.Empty()
 		.pipe(Oath.ops.tap(() => logger.debug("Refreshing auth token...")))
-		.pipe(Oath.ops.chain(() => Oath.Try(() => fetch(`${hosts.id}/refresh-token`, get_req_init()))))
-		.pipe(Oath.ops.chain(response => Oath.Try(() => response.json())))
+		.pipe(
+			Oath.ops.chain(() =>
+				Oath.Try(
+					() => fetch(`${hosts.id}/refresh-token`, get_req_init()),
+					error => einval(`refresh_token -> error: ${String(error)}`),
+				),
+			),
+		)
+		.pipe(
+			Oath.ops.chain(response =>
+				Oath.Try(
+					() => response.json(),
+					error => einval(`refresh_token -> error: ${String(error)}`),
+				),
+			),
+		)
 		.pipe(Oath.ops.chain(res => Oath.If(res.success, { T: () => res.result, F: () => res.error })))
 		.pipe(Oath.ops.tap(() => logger.debug("Auth token refreshed.")))
 		.pipe(Oath.ops.map(auth => auth$.next(O.Some(auth))))
@@ -78,9 +92,10 @@ export const init_auth: TInitAuthParams = call_once(({ hosts, fetch, logger }) =
 
 // --- Internal ---
 
-const LOCATION = "__init_auth$"
+const LOCATION = "init_auth"
 
 const eperm = RRR.codes.eperm(LOCATION)
+const einval = RRR.codes.einval(LOCATION)
 
 const get_req_init = (): RequestInit => ({ method: "POST", credentials: "include" })
 

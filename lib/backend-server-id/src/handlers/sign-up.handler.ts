@@ -27,7 +27,6 @@ import { type TUserService } from "@ordo-pink/backend-service-user"
 import { parse_body0 } from "@ordo-pink/backend-utils"
 
 import { type TCreateAuthTokenResult, create_auth_token0 } from "../fns/create-auth-token.fn"
-import { get_body_email0, get_body_handle0, get_body_password0 } from "../fns/getters.fn"
 import { create_confirmation_url } from "../fns/create-confirmation-url.fn"
 import { set_auth_cookie } from "../fns/auth-cookie.fn"
 import { token_result_to_response_body } from "../fns/token-result-to-response-body.fn"
@@ -38,7 +37,6 @@ export const sign_up0: TFn = (
 ) =>
 	parse_body0<Routes.ID.SignUp.RequestBody>(ctx)
 		.pipe(Oath.ops.chain(extract_ctx0))
-		.pipe(Oath.ops.chain(validate_ctx0(user_service)))
 		.pipe(Oath.ops.chain(create_user0(user_service)))
 		.pipe(Oath.ops.chain(create_auth_token0(token_service)))
 		.pipe(Oath.ops.tap(({ user, expires, jti }) => set_auth_cookie(ctx, user.id, jti, expires)))
@@ -58,44 +56,24 @@ type TFn = (
 	ctx: Context,
 	params: Params,
 ) => Oath<Routes.ID.SignUp.Response, TRrr<"EINVAL" | "EIO" | "EEXIST" | "ENOENT">>
-type TCtx = {
-	email: User.User["email"]
-	handle: User.User["handle"]
-	password: User.PrivateUser["password"]
-}
+type TCtx = { email: string; handle: string; password: string }
 
 const LOCATION = "sign_up"
 
-const eexist = RRR.codes.eexist(LOCATION)
+const einval = RRR.codes.einval(LOCATION)
 
 // TODO: Move to utils
 
-const extract_ctx0 = (body: Routes.ID.SignUp.RequestBody): Oath<TCtx, TRrr<"EINVAL">> =>
+const extract_ctx0 = ({
+	email,
+	handle,
+	password,
+}: Routes.ID.SignUp.RequestBody): Oath<TCtx, TRrr<"EINVAL">> =>
 	Oath.Merge({
-		email: get_body_email0(body.email),
-		handle: get_body_handle0(body.handle),
-		password: get_body_password0(body.password),
+		email: Oath.FromNullable(email, () => einval("extract_ctx -> email: null")),
+		handle: Oath.FromNullable(handle, () => einval("extract_ctx -> handle: null")),
+		password: Oath.FromNullable(password, () => einval("extract_ctx -> password: null")),
 	})
-
-const validate_ctx0 =
-	(user_service: TUserService) =>
-	(ctx: TCtx): Oath<TCtx, TRrr<"EEXIST" | "EIO">> =>
-		Oath.Merge([
-			user_service.strategy
-				.exists_by_email(ctx.email)
-				.pipe(
-					Oath.ops.chain(exists =>
-						Oath.If(!exists, { F: () => eexist(`validate_ctx -> email: ${ctx.email}`) }),
-					),
-				),
-			user_service.strategy
-				.exists_by_handle(ctx.handle)
-				.pipe(
-					Oath.ops.chain(exists =>
-						Oath.If(!exists, { F: () => eexist(`validate_ctx -> handle: ${ctx.handle}`) }),
-					),
-				),
-		]).pipe(Oath.ops.map(() => ctx))
 
 const create_user0 =
 	(user_service: TUserService) =>

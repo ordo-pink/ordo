@@ -29,7 +29,7 @@ export default function Heading({
 	uppercase,
 	children,
 	trim,
-	styledFirstLetter,
+	styled_first_letter: styledFirstLetter,
 }: THeadingProps): JSX.Element {
 	const headingLevel = level ?? "1"
 	const className = `heading heading-${headingLevel}`

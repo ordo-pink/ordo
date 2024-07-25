@@ -17,31 +17,39 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Either } from "@ordo-pink/either"
-import { current_route$ } from "@ordo-pink/frontend-stream-router"
+import { Result } from "@ordo-pink/result"
 import { keys_of } from "@ordo-pink/tau"
 
+import { useOrdoContext } from "./use-ordo-context.hook"
 import { useSubscription } from "./use-subscription.hook"
 
-export const useCurrentRoute = () => {
+export const useRouteParams = <
+	$TExpectedRouteParams extends Record<string, string | undefined> = Record<
+		string,
+		string | undefined
+	>,
+>(): Partial<$TExpectedRouteParams> => {
+	const { get_current_route } = useOrdoContext()
+
+	const current_route$ = get_current_route().cata({
+		Ok: x => x,
+		Err: () => null, // TODO: Show permission error
+	})
+
 	const route = useSubscription(current_route$)
 
-	return route
-}
-
-export const useRouteParams = <
-	ExpectedRouteParams extends Record<string, string> = Record<string, string>,
->(): Partial<ExpectedRouteParams> => {
-	const route = useCurrentRoute()
-
-	return Either.fromNullable(route)
-		.chain(route => Either.fromNullable(route.params))
-		.fold(
-			() => ({}),
-			params =>
+	return Result.FromNullable(route)
+		.pipe(Result.ops.chain(Result.FromOption))
+		.pipe(Result.ops.chain(route => Result.FromNullable(route.params)))
+		.cata({
+			Err: () => ({}),
+			Ok: params =>
 				keys_of(params).reduce(
-					(acc, key) => ({ ...acc, [key]: decodeURIComponent(params[key]) }),
+					(acc, key) => ({
+						...acc,
+						[key]: params[key] ? decodeURIComponent((params as any)[key]) : void 0,
+					}),
 					{},
 				),
-		)
+		})
 }

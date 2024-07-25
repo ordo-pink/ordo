@@ -17,9 +17,11 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Oath } from "@ordo-pink/oath"
-import { TOption } from "@ordo-pink/option"
-import { TRrr } from "@ordo-pink/data"
+import type { Oath } from "@ordo-pink/oath"
+import type { TOption } from "@ordo-pink/option"
+import type { TResult } from "@ordo-pink/result"
+import type { TRrr } from "@ordo-pink/data"
+import { TValidations } from "@ordo-pink/tau"
 
 export type TPersistenceStrategyUser = {
 	create: (user: User.PrivateUser) => Oath<void, TRrr<"EIO" | "EEXIST">>
@@ -33,14 +35,32 @@ export type TPersistenceStrategyUser = {
 	get_by_id: (id: User.User["id"]) => Oath<TOption<User.PrivateUser>, TRrr<"EIO">>
 	get_by_email: (email: User.User["email"]) => Oath<TOption<User.PrivateUser>, TRrr<"EIO">>
 	get_by_handle: (handle: User.User["handle"]) => Oath<TOption<User.PrivateUser>, TRrr<"EIO">>
+	migrate: (entity_version: User.PrivateUser["entity_version"]) => Oath<void, TRrr<"EIO">>
+	get_outdated: (
+		version: User.PrivateUser["entity_version"],
+	) => Oath<User.PrivateUser[], TRrr<"EIO">>
 	// remove: (id: string) => Promise<PrivateUser | null>
 }
 
+export type TUserValidation<$TKey extends keyof User.PrivateUser> = (
+	x: unknown,
+) => TResult<User.PrivateUser[$TKey], TRrr<"EINVAL">>
+
+// export type TValidations = { [K in keyof User.PrivateUser]: TUserValidation<K> }
+// export type TUserValidations<$TKey extends keyof TValidations = keyof TValidations> = Record<
+// 	`is_${$TKey}`,
+// 	TValidations[$TKey]
+// >
+
+export type TUserValidations = TValidations<User.PrivateUser>
+
 export type TUserServiceStatic = {
+	get ENTITY_VERSION(): number
+	Validations: TUserValidations
 	of: (persistence_strategy: TPersistenceStrategyUser) => TUserService
-	serialise_public: (user: User.PublicUser) => User.PublicUser
-	serialise_internal: (user: User.InternalUser) => User.InternalUser
-	serialise: (user: User.User) => User.User
+	serialise: <$TUser extends User.User>(user: $TUser) => User.User
+	serialise_public: <$TUser extends User.PublicUser>(user: $TUser) => User.PublicUser
+	serialise_internal: <$TUser extends User.InternalUser>(user: $TUser) => User.InternalUser
 	create_email_code: () => string
 	obfuscate_email: (email: User.User["email"]) => string
 	create_id: () => User.User["id"]
@@ -50,45 +70,48 @@ export type TUserService = {
 	strategy: TPersistenceStrategyUser
 
 	create: (
-		email: User.User["email"],
-		handle: User.User["handle"],
-		password: User.PrivateUser["password"],
-	) => Oath<User.InternalUser, TRrr<"EIO" | "EEXIST">>
+		email: string,
+		handle: string,
+		password: string,
+	) => Oath<User.InternalUser, TRrr<"EIO" | "EEXIST" | "EINVAL">>
+
+	migrate: () => Oath<void, TRrr<"EIO" | "EEXIST" | "EINVAL" | "ENOENT">>
 
 	update_email: (
-		id: User.User["id"],
-		email: User.User["email"],
-	) => Oath<User.InternalUser["email_code"], TRrr<"EIO" | "ENOENT" | "EEXIST">>
+		id: string,
+		email: string,
+	) => Oath<User.InternalUser["email_code"], TRrr<"EIO" | "ENOENT" | "EEXIST" | "EINVAL">>
 
 	update_handle: (
-		id: User.User["id"],
-		handle: User.User["handle"],
-	) => Oath<void, TRrr<"EIO" | "ENOENT" | "EEXIST">>
+		id: string,
+		handle: string,
+	) => Oath<void, TRrr<"EIO" | "ENOENT" | "EEXIST" | "EINVAL">>
 
 	update_password: (
-		id: User.User["id"],
-		old_password: User.PrivateUser["password"],
-		new_password: User.PrivateUser["password"],
-	) => Oath<void, TRrr<"EIO" | "ENOENT">>
+		id: string,
+		new_password: string,
+	) => Oath<void, TRrr<"EIO" | "ENOENT" | "EINVAL">>
 
 	update_info: (
-		id: User.User["id"],
+		id: string,
 		increment: Pick<User.User, "last_name" | "first_name">,
-	) => Oath<void, TRrr<"EIO" | "ENOENT">>
+	) => Oath<void, TRrr<"EIO" | "ENOENT" | "EINVAL">>
 
 	update_subscription: (
-		id: User.User["id"],
+		id: string,
 		increment: Pick<User.User, "subscription" | "max_upload_size" | "file_limit" | "max_functions">,
-	) => Oath<void, TRrr<"EIO" | "ENOENT">>
+	) => Oath<void, TRrr<"EIO" | "ENOENT" | "EINVAL">>
+
+	confirm_email: (id: string, code: string) => Oath<void, TRrr<"EIO" | "ENOENT" | "EINVAL">>
 
 	compare_password: (
-		email_or_handle: User.User["email"] | User.User["handle"],
-		password: User.PrivateUser["password"],
-	) => Oath<boolean, TRrr<"ENOENT" | "EIO">>
+		email_or_handle: string,
+		password: string,
+	) => Oath<boolean, TRrr<"ENOENT" | "EIO" | "EINVAL">>
 
-	get_by_id: (id: User.User["id"]) => Oath<TOption<User.InternalUser>, TRrr<"EIO">>
+	get_by_id: (id: string) => Oath<TOption<User.InternalUser>, TRrr<"EIO" | "EINVAL">>
 
-	get_by_email: (email: User.User["email"]) => Oath<TOption<User.InternalUser>, TRrr<"EIO">>
+	get_by_email: (email: string) => Oath<TOption<User.InternalUser>, TRrr<"EIO" | "EINVAL">>
 
-	get_by_handle: (handle: User.User["handle"]) => Oath<TOption<User.InternalUser>, TRrr<"EIO">>
+	get_by_handle: (handle: string) => Oath<TOption<User.InternalUser>, TRrr<"EIO" | "EINVAL">>
 }

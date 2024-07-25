@@ -21,14 +21,14 @@ import { Context } from "koa"
 
 import { O, type TOption } from "@ordo-pink/option"
 import { RRR, type TRrr } from "@ordo-pink/data"
-import { type TAccessJWT, type TTokenService } from "@ordo-pink/backend-service-token"
+import { type TAuthJWT, type TTokenService } from "@ordo-pink/backend-service-token"
 import { from_option0, is_non_empty_string, is_string } from "@ordo-pink/tau"
 import { Oath } from "@ordo-pink/oath"
 
 export const authenticate0 = (
 	ctx: Context,
 	token_service_or_id_host: TTokenService | string,
-): Oath<TAccessJWT, TRrr<"EINVAL" | "EIO" | "EACCES">> =>
+): Oath<TAuthJWT, TRrr<"EINVAL" | "EIO" | "EACCES">> =>
 	Oath.If(
 		is_non_empty_string(ctx.header.authorization) && ctx.header.authorization.startsWith("Bearer "),
 		{
@@ -55,18 +55,18 @@ const eio = RRR.codes.eio(LOCATION)
 const verify_with_id_server0 = (
 	id_host: string,
 	authorization: string,
-): Oath<TOption<TAccessJWT>, TRrr<"EINVAL" | "EIO">> =>
+): Oath<TOption<TAuthJWT>, TRrr<"EINVAL" | "EIO">> =>
 	Oath.FromPromise(() =>
 		fetch(`${id_host}/verify-token`, { method: "POST", headers: { authorization } }),
 	)
 		.pipe(Oath.ops.chain(res => Oath.FromPromise(() => res.json())))
 		.pipe(Oath.ops.rejected_map(e => eio(`verify_with_id_server -> error: ${e.message}`)))
-		.pipe(Oath.ops.map(res => (res.success ? O.Some(res.result as TAccessJWT) : O.None())))
+		.pipe(Oath.ops.map(res => (res.success ? O.Some(res.result as TAuthJWT) : O.None())))
 
 const verify_with_token_service0 = (
 	token_service: TTokenService,
 	token: string,
-): Oath<TOption<TAccessJWT>, TRrr<"EINVAL" | "EIO">> =>
+): Oath<TOption<TAuthJWT>, TRrr<"EINVAL" | "EIO">> =>
 	token_service
 		.verify(token, "access")
 		.pipe(Oath.ops.chain(is_valid => Oath.If(is_valid, { F: () => einval("Invalid token") })))

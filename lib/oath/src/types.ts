@@ -15,7 +15,7 @@ export type UnderOathRejected<T> = T extends object & {
 	? F extends (value: infer V) => any
 		? UnderOathRejected<V>
 		: never
-	: Awaited<T>
+	: never
 
 export type TOathStatic = {
 	Resolve: <$TResolve, $TReject = never>(value: $TResolve) => TOath<$TResolve, $TReject>

@@ -18,7 +18,7 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { useEffect, useState } from "react"
-import { Observable } from "rxjs/internal/Observable"
+import { Observable } from "rxjs"
 
 export const useStrictSubscription = <T>(
 	observable: Observable<T | null> | null,

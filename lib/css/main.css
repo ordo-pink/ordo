@@ -105,7 +105,7 @@ a {
 *::-webkit-scrollbar {
 	width: 5px;
 	height: 5px;
-	@apply bg-neutral-300 transition-colors duration-300 dark:bg-transparent;
+	@apply bg-neutral-300 transition-colors duration-300 dark:bg-neutral-900;
 }
 
 *::-webkit-scrollbar-thumb {

@@ -23,11 +23,11 @@ import { ConsoleLogger } from "@ordo-pink/logger"
 import { EmailStrategyRusender } from "@ordo-pink/backend-email-strategy-rusender"
 import { Oath } from "@ordo-pink/oath"
 import { PersistenceStrategyTokenFS } from "@ordo-pink/backend-persistence-strategy-token-fs"
-import { PersistenceStrategyUserDynamoDB } from "@ordo-pink/backend-persistence-strategy-user-dynamodb"
+// import { PersistenceStrategyUserDynamoDB } from "@ordo-pink/backend-persistence-strategy-user-dynamodb"
 import { PersistenceStrategyUserFS } from "@ordo-pink/backend-persistence-strategy-user-fs"
 import { Switch } from "@ordo-pink/switch"
-import { TokenPersistenceStrategyDynamoDB } from "@ordo-pink/backend-persistence-strategy-token-dynamodb"
-import { createIDServer } from "@ordo-pink/backend-server-id"
+// import { TokenPersistenceStrategyDynamoDB } from "@ordo-pink/backend-persistence-strategy-token-dynamodb"
+import { create_id_server } from "@ordo-pink/backend-server-id"
 
 const port = Number(Bun.env.ORDO_ID_PORT!)
 const at_expire_in = Number(Bun.env.ORDO_ID_ACCESS_TOKEN_EXPIRE_IN)
@@ -44,21 +44,21 @@ const origin = [
 const user_strategy_type = Bun.env.ORDO_ID_USER_PERSISTENCE_STRATEGY!
 const token_strategy_type = Bun.env.ORDO_ID_TOKEN_PERSISTENCE_STRATEGY!
 
-const user_dynamo_db_config = {
-	region: Bun.env.ORDO_ID_USER_DYNAMODB_REGION!,
-	endpoint: Bun.env.ORDO_ID_USER_DYNAMODB_ENDPOINT!,
-	access_key: Bun.env.ORDO_ID_USER_DYNAMODB_ACCESS_KEY!,
-	secret_key: Bun.env.ORDO_ID_USER_DYNAMODB_SECRET_KEY!,
-	table_name: Bun.env.ORDO_ID_USER_DYNAMODB_USER_TABLE!,
-}
+// const user_dynamo_db_config = {
+// 	region: Bun.env.ORDO_ID_USER_DYNAMODB_REGION!,
+// 	endpoint: Bun.env.ORDO_ID_USER_DYNAMODB_ENDPOINT!,
+// 	access_key: Bun.env.ORDO_ID_USER_DYNAMODB_ACCESS_KEY!,
+// 	secret_key: Bun.env.ORDO_ID_USER_DYNAMODB_SECRET_KEY!,
+// 	table_name: Bun.env.ORDO_ID_USER_DYNAMODB_USER_TABLE!,
+// }
 
-const token_dynamo_db_config = {
-	region: Bun.env.ORDO_ID_TOKEN_DYNAMODB_REGION!,
-	endpoint: Bun.env.ORDO_ID_TOKEN_DYNAMODB_ENDPOINT!,
-	access_key: Bun.env.ORDO_ID_TOKEN_DYNAMODB_ACCESS_KEY!,
-	secret_key: Bun.env.ORDO_ID_TOKEN_DYNAMODB_SECRET_KEY!,
-	table_name: Bun.env.ORDO_ID_TOKEN_DYNAMODB_USER_TABLE!,
-}
+// const token_dynamo_db_config = {
+// 	region: Bun.env.ORDO_ID_TOKEN_DYNAMODB_REGION!,
+// 	endpoint: Bun.env.ORDO_ID_TOKEN_DYNAMODB_ENDPOINT!,
+// 	access_key: Bun.env.ORDO_ID_TOKEN_DYNAMODB_ACCESS_KEY!,
+// 	secret_key: Bun.env.ORDO_ID_TOKEN_DYNAMODB_SECRET_KEY!,
+// 	table_name: Bun.env.ORDO_ID_TOKEN_DYNAMODB_USER_TABLE!,
+// }
 
 const alg = { name: "ECDSA", namedCurve: "P-384", hash: "SHA-384" } as const
 
@@ -79,16 +79,16 @@ const main = async () => {
 	const issuer = "https://id.ordo.pink"
 
 	const token_persistence_strategy = Switch.Match(token_strategy_type)
-		.case("dynamodb", () => TokenPersistenceStrategyDynamoDB.of(token_dynamo_db_config))
+		// 	.case("dynamodb", () => TokenPersistenceStrategyDynamoDB.of(token_dynamo_db_config))
 		.default(() => PersistenceStrategyTokenFS.of(Bun.env.ORDO_ID_TOKEN_FS_STRATEGY_PATH!))
 
 	const user_persistence_strategy = Switch.Match(user_strategy_type)
-		.case("dynamodb", () => PersistenceStrategyUserDynamoDB.of(user_dynamo_db_config))
+		// .case("dynamodb", () => PersistenceStrategyUserDynamoDB.of(user_dynamo_db_config))
 		.default(() => PersistenceStrategyUserFS.of(Bun.env.ORDO_ID_USER_FS_STRATEGY_PATH!))
 
 	const email_strategy = EmailStrategyRusender.create({ key: Bun.env.ORDO_ID_EMAIL_API_KEY! })
 
-	const app = createIDServer({
+	const app = await create_id_server({
 		user_persistence_strategy,
 		token_persistence_strategy,
 		email_strategy,
@@ -108,7 +108,7 @@ const main = async () => {
 	})
 
 	app.listen({ port: Number(port) }, () =>
-		ConsoleLogger.info(`ID running on http://localhost:${chalk.blue(port)}`),
+		logger.info(`ID running on http://localhost:${chalk.blue(port)}`),
 	)
 }
 

@@ -17,56 +17,36 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import {
-	type TEmailContact,
-	type TEmailStrategy,
-	NotificationService,
-} from "@ordo-pink/backend-service-offline-notifications"
-import {
-	type TPersistenceStrategyToken,
-	type TTokenServiceOptions,
-	TokenService,
-} from "@ordo-pink/backend-service-token"
-import { type TPersistenceStrategyUser, UserService } from "@ordo-pink/backend-service-user"
-import { type TLogger } from "@ordo-pink/logger"
-import { create_koa_server, send_error, send_success } from "@ordo-pink/backend-utils"
+import { type Context } from "koa"
 
+import { create_koa_server, send_error, send_success } from "@ordo-pink/backend-utils"
+import { NotificationService } from "@ordo-pink/backend-service-offline-notifications"
+import { Oath } from "@ordo-pink/oath"
+import { type TRrr } from "@ordo-pink/data"
+import { TokenService } from "@ordo-pink/backend-service-token"
+import { UserService } from "@ordo-pink/backend-service-user"
+
+import type * as Types from "./types"
+import { confirm_email0 } from "./handlers/confirm-email.handler"
 import { get_account0 } from "./handlers/get-account.handler"
-import { update_info0 } from "./handlers/update-info.handler"
-import { handleChangeEmail } from "./handlers/change-email.handler"
-import { handleChangePassword } from "./handlers/change-password.handler"
-import { handleConfirmEmail } from "./handlers/confirm-email.handler"
-import { refresh_token0 } from "./handlers/refresh-token.handler"
+import { get_by_email0 } from "./handlers/get-public-by-email.handler"
+import { get_by_handle0 } from "./handlers/get-public-by-handle.handler"
+import { get_by_id0 } from "./handlers/get-public-by-id.handler"
 import { sign_in0 } from "./handlers/sign-in.handler"
 import { sign_out0 } from "./handlers/sign-out.handler"
 import { sign_up0 } from "./handlers/sign-up.handler"
-import { get_by_email0 } from "./handlers/get-public-by-email.handler"
-import {
-	handleUserInfoByID as handleUserInfoByID,
-	get_by_id0,
-} from "./handlers/get-public-by-id.handler"
-import { verify_token0 } from "./handlers/verify-token.handler"
-import { handle_get_public_by_handle0 as get_by_handle0 } from "./handlers/get-public-by-handle.handler"
-import { Oath } from "@ordo-pink/oath"
-import { TRrr } from "@ordo-pink/data"
-import { Context } from "koa"
-
-export type CreateIDServerFnParams = {
-	user_persistence_strategy: TPersistenceStrategyUser
-	token_persistence_strategy: TPersistenceStrategyToken
-	email_strategy: TEmailStrategy
-	origin: string | string[]
-	logger: TLogger
-	website_host: string
-	notification_sender: Required<TEmailContact>
-	token_service_options: TTokenServiceOptions
-}
+import { token_refresh0 } from "./handlers/token-refresh.handler"
+import { token_verify0 } from "./handlers/token-verify.handler"
+import { update_email0 } from "./handlers/update-email.handler"
+import { update_handle0 } from "./handlers/update-handle.handler"
+import { update_info0 } from "./handlers/update-info.handler"
+import { update_password0 } from "./handlers/update-password.handler"
 
 // TODO: Move to env
 const social_links = {} as Record<string, string>
 const support_channels = {} as Record<string, string>
 
-export const createIDServer = ({
+export const create_id_server = async ({
 	user_persistence_strategy,
 	token_persistence_strategy,
 	email_strategy,
@@ -75,19 +55,17 @@ export const createIDServer = ({
 	website_host,
 	notification_sender,
 	token_service_options,
-}: CreateIDServerFnParams) => {
+}: Types.TCreateIDServerFnParams) => {
+	const token_service = TokenService.of(token_persistence_strategy, token_service_options)
 	const user_service = UserService.of(user_persistence_strategy)
 	const notification_service = NotificationService.of({
-		email_strategy: email_strategy,
+		email_strategy,
 		sender: notification_sender,
-		from: notification_sender,
 		social_links,
 		support_channels,
 	})
 
-	const token_service = TokenService.of(token_persistence_strategy, token_service_options)
-
-	const Params = {
+	const params: Types.THandlerParams = {
 		user_service,
 		token_service,
 		notification_service,
@@ -95,10 +73,19 @@ export const createIDServer = ({
 		logger,
 	}
 
+	await user_service.migrate().invoke(
+		Oath.invokers.or_else(() => {
+			logger.error(`Failed to migrate users to v${UserService.ENTITY_VERSION}`)
+			process.exit(1)
+		}),
+	)
+
 	const exec =
-		(f: (ctx: Context, params: typeof Params) => Oath<{ status: number; body?: any }, TRrr>) =>
+		(
+			f: (ctx: Context, params: Types.THandlerParams) => Oath<{ status: number; body?: any }, TRrr>,
+		) =>
 		(ctx: Context) =>
-			f(ctx, Params).invoke(o => o.fork(send_error({ ctx, logger }), send_success({ ctx })))
+			f(ctx, params).invoke(o => o.fork(send_error({ ctx, logger }), send_success({ ctx })))
 
 	return create_koa_server({
 		origin,
@@ -114,25 +101,14 @@ export const createIDServer = ({
 				.post("/account/sign-up" satisfies Routes.ID.SignUp.Path, exec(sign_up0))
 				.post("/account/sign-in" satisfies Routes.ID.SignIn.Path, exec(sign_in0))
 				.post("/account/sign-out" satisfies Routes.ID.SignOut.Path, exec(sign_out0))
-				.post("/account/refresh-token" satisfies Routes.ID.RefreshToken.Path, exec(refresh_token0))
-				.post("/account/verify-token" satisfies Routes.ID.VerifyToken.Path, exec(verify_token0))
-				.patch("/account/update-info" satisfies Routes.ID.UpdateInfo.Path, exec(update_info0))
-				.patch(
-					"/account/confirm-email" satisfies Routes.ID.ConfirmEmail.Path,
-					handleConfirmEmail(Params),
-				)
-				.patch(
-					"/account/update-email" satisfies Routes.ID.UpdateEmail.Path,
-					handleChangeEmail(Params),
-				)
-				// .patch("/account/update-handle", handleChangeEmail(ctx))
-				.patch(
-					"/account/update-password" satisfies Routes.ID.UpdatePassword.Path,
-					handleChangePassword(Params),
-				),
+				.post("/account/refresh-token" satisfies Routes.ID.RefreshToken.Path, exec(token_refresh0))
+				.post("/account/verify-token" satisfies Routes.ID.VerifyToken.Path, exec(token_verify0))
+				.patch("/account/confirm-email" satisfies Routes.ID.ConfirmEmail.Path, exec(confirm_email0))
+				.patch("/account/info" satisfies Routes.ID.UpdateInfo.Path, exec(update_info0))
+				.patch("/account/email" satisfies Routes.ID.UpdateEmail.Path, exec(update_email0))
+				.patch("/account/handle" satisfies Routes.ID.UpdateHandle.Path, exec(update_handle0))
+				.patch("/account/password" satisfies Routes.ID.UpdatePassword.Path, exec(update_password0)),
 
-		// .post("/send-forgot-password-email/:email", () => {})
-		// .post("/restore-password", () => {})
-		// .post("/reset-password", () => {})
+		// TODO: Forgot password
 	})
 }

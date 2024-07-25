@@ -13,7 +13,9 @@ export const create_function: TCreateFunctionFn =
 		metadata_query,
 		user_query,
 	}) => {
-		const fid = KnownFunctions.register(name, permissions)!
+		const fid = KnownFunctions.register(name, permissions)
+
+		if (!fid) return
 
 		const context = {
 			fid,

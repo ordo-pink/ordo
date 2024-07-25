@@ -2,8 +2,7 @@ import { BsArrowsMove, BsCode, BsLock, BsSafe } from "react-icons/bs"
 
 import ScreenshotCarousel from "../components/screenshot-carousel.component"
 
-type P = { static_host: string }
-export default function CorePrinciples({ static_host }: P) {
+export default function CorePrinciples() {
 	return (
 		<section
 			id="core-principles"
@@ -81,7 +80,7 @@ export default function CorePrinciples({ static_host }: P) {
 						</h3>
 					</div>
 
-					<ScreenshotCarousel static_host={static_host} />
+					<ScreenshotCarousel />
 				</div>
 			</div>
 		</section>

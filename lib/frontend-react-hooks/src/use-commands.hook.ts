@@ -19,16 +19,16 @@
 
 import { useMemo } from "react"
 
-import { _get_commands } from "@ordo-pink/frontend-stream-commands"
-import { useCurrentFID } from "@ordo-pink/frontend-stream-activities"
+import { useOrdoContext } from "./use-ordo-context.hook"
 
 /**
  * A React hook for accessing commands.
  * // TODO: Move all hooks to frontend-react-hooks
  */
 export const useCommands = () => {
-	const fid = useCurrentFID()
-	const commands = useMemo(() => _get_commands(fid), [fid])
+	const { get_commands } = useOrdoContext()
+
+	const commands = useMemo(() => get_commands(), [])
 
 	return commands
 }

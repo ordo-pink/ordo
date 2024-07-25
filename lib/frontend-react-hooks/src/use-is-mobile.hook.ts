@@ -1,13 +1,13 @@
 import { useEffect, useState } from "react"
 
 export const useIsMobile = () => {
-	const [isMobile, setIsMobile] = useState<boolean>(false)
+	const [is_mobile, set_is_mobile] = useState(false)
 
 	useEffect(() => {
-		setIsMobile(
+		set_is_mobile(
 			/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent),
 		)
 	}, [])
 
-	return isMobile
+	return is_mobile
 }

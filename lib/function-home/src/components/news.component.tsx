@@ -46,7 +46,7 @@ export default function NewsSection({ news }: P) {
 						</div>
 						<p>{article.message}</p>
 						{article.link ? (
-							<Link href={article.link} external newTab>
+							<Link href={article.link} external new_tab>
 								<span className="flex items-center space-x-2">
 									<span>Подробнее</span>
 									<BsArrowUpRight />

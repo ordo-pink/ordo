@@ -47,15 +47,13 @@ type TFn = (
 	params: TParams,
 ) => Oath<Routes.ID.GetUserByID.Response, TRrr<"EACCES" | "ENOENT" | "EIO" | "EINVAL">>
 
-const extract_ctx0 = ({ id }: TCtx): Oath<User.User["id"], TRrr<"EINVAL">> =>
+const extract_ctx0 = ({ id }: TCtx) =>
 	Oath.FromNullable(id)
 		.pipe(Oath.ops.chain(id => Oath.If(is_uuid(id), { T: () => id })))
 		.pipe(Oath.ops.rejected_map(() => einval(`validate_ctx -> id: ${id}`)))
 
-const get_user_by_id0 =
-	(user_service: TUserService) =>
-	(id: User.User["id"]): Oath<Routes.ID.GetUserByID.ResponseBody, TRrr<"EIO" | "ENOENT">> =>
-		user_service
-			.get_by_id(id)
-			.pipe(Oath.ops.chain(from_option0(() => enoent(`get_by_id -> id: ${id}`))))
-			.pipe(Oath.ops.map(UserService.serialise_public))
+const get_user_by_id0 = (user_service: TUserService) => (id: string) =>
+	user_service
+		.get_by_id(id)
+		.pipe(Oath.ops.chain(from_option0(() => enoent(`get_by_id -> id: ${id}`))))
+		.pipe(Oath.ops.map(UserService.serialise_public))

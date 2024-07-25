@@ -1,6 +1,9 @@
 // SPDX-FileCopyrightText: Copyright 2024, 谢尔盖||↓ and the Ordo.pink contributors
 // SPDX-License-Identifier: AGPL-3.0-only
 
+import { TRrr } from "@ordo-pink/data"
+import { TResult } from "@ordo-pink/result"
+
 // Ordo.pink is an all-in-one team workspace.
 // Copyright (C) 2024  谢尔盖||↓ and the Ordo.pink contributors
 
@@ -103,3 +106,20 @@ export type ForbidCharacters<
 	Chars extends string,
 	Str extends string,
 > = Str extends `${string}${Chars}${string}` ? never : Str
+
+export type TSnakeToPascal<S extends string> = S extends `${infer A}_${infer B}`
+	? `${Capitalize<A>}${TSnakeToPascal<B>}`
+	: Capitalize<S>
+
+export type TDropIsPrefix<T extends string> = T extends `is_${infer U}` ? U : never
+
+export type TValidation<TEntity extends Record<string, unknown>, TKey extends keyof TEntity> = (
+	x: unknown,
+) => TResult<TEntity[TKey], TRrr<"EINVAL">>
+
+export type TValidations<TEntity extends Record<string, unknown>> = {
+	[K in keyof TEntity extends string ? `is_${keyof TEntity}` : never]: TValidation<
+		TEntity,
+		TDropIsPrefix<K>
+	>
+}

@@ -20,67 +20,78 @@
 import { BsChevronLeft, BsChevronRight } from "react-icons/bs"
 import { useState } from "react"
 
-import { Either } from "@ordo-pink/either"
-import { useIsDarkTheme } from "@ordo-pink/frontend-react-hooks"
+import { useHosts, useIsDarkTheme } from "@ordo-pink/frontend-react-hooks"
 
 import Null from "@ordo-pink/frontend-react-components/null"
+import { Result } from "@ordo-pink/result"
 
-type Feature = { id: string; title: string; description: string }
+type TFeature = { id: string; title: string; description: string }
 
-type P = { static_host: string }
-export default function ScreenshotCarousel({ static_host }: P) {
-	const isDarkTheme = useIsDarkTheme()
+export default function ScreenshotCarousel() {
+	const is_dark_theme = useIsDarkTheme()
+	const hosts_result = useHosts()
 
-	const [currentIndex, setCurrentIndex] = useState(0)
+	const [current_index, set_current_index] = useState(0)
 
-	return Either.fromNullable(features[currentIndex]).fold(Null, feature => (
-		<div className="mt-12 rounded-lg bg-gradient-to-br from-rose-300 via-pink-300 to-fuchsia-300 p-8 shadow-xl dark:from-rose-700 dark:via-pink-500 dark:to-fuchsia-600">
-			<div className="flex h-full flex-col items-center md:flex-row md:justify-between">
-				<div className="w-full space-y-8 px-8 text-center">
-					<div className="mt-8 flex items-center justify-center space-x-2">
-						<button
-							className="rounded-md border border-neutral-700 p-2 dark:border-neutral-300"
-							onClick={() => {
-								setCurrentIndex(index => (index <= 0 ? features.length - 1 : index - 1))
-							}}
-						>
-							<BsChevronLeft />
-						</button>
-						<button
-							className="rounded-md border border-neutral-700 p-2 dark:border-neutral-300"
-							onClick={() => {
-								setCurrentIndex(index => (index >= features.length - 1 ? 0 : index + 1))
-							}}
-						>
-							<BsChevronRight />
-						</button>
-					</div>
+	return hosts_result
+		.pipe(
+			Result.ops.chain(hosts =>
+				Result.FromNullable(FEATURES[current_index]).pipe(
+					Result.ops.map(feature => ({ feature, static_host: hosts.static })),
+				),
+			),
+		)
+		.cata({
+			Err: Null,
+			Ok: ({ feature, static_host }) => (
+				<div className="mt-12 rounded-lg bg-gradient-to-br from-rose-300 via-pink-300 to-fuchsia-300 p-8 shadow-xl dark:from-rose-700 dark:via-pink-500 dark:to-fuchsia-600">
+					<div className="flex h-full flex-col items-center md:flex-row md:justify-between">
+						<div className="w-full space-y-8 px-8 text-center">
+							<div className="mt-8 flex items-center justify-center space-x-2">
+								<button
+									className="rounded-md border border-neutral-700 p-2 dark:border-neutral-300"
+									onClick={() => {
+										set_current_index(index => (index <= 0 ? FEATURES.length - 1 : index - 1))
+									}}
+								>
+									<BsChevronLeft />
+								</button>
+								<button
+									className="rounded-md border border-neutral-700 p-2 dark:border-neutral-300"
+									onClick={() => {
+										set_current_index(index => (index >= FEATURES.length - 1 ? 0 : index + 1))
+									}}
+								>
+									<BsChevronRight />
+								</button>
+							</div>
 
-					<h3 className="text-2xl font-black">{feature.title}</h3>
-					<h4>{feature.description}</h4>
+							<h3 className="text-2xl font-black">{feature.title}</h3>
+							<h4>{feature.description}</h4>
 
-					<div className="flex w-full justify-center pb-8">
-						<a
-							href={`${static_host}/${feature.id}-${isDarkTheme ? "dark" : "light"}.png`}
-							rel="noreferrer noopener"
-							target="_blank"
-						>
-							<img
-								className="size-full max-h-[42rem] max-w-4xl rounded-md shadow-lg"
-								src={`${static_host}/${feature.id}-${isDarkTheme ? "dark" : "light"}.png`}
-								alt={feature.title}
-							/>
-						</a>
+							<div className="flex w-full justify-center pb-8">
+								<a
+									href={`${static_host}/${feature.id}-${is_dark_theme ? "dark" : "light"}.png`}
+									rel="noreferrer noopener"
+									target="_blank"
+								>
+									<img
+										className="size-full max-h-[42rem] max-w-4xl rounded-md shadow-lg"
+										src={`${static_host}/${feature.id}-${is_dark_theme ? "dark" : "light"}.png`}
+										alt={feature.title}
+									/>
+								</a>
+							</div>
+						</div>
 					</div>
 				</div>
-			</div>
-		</div>
-	))
+			),
+		})
 }
 
 // --- Internal ---
 
-const features: Feature[] = [
+const FEATURES: TFeature[] = [
 	{
 		id: "editor",
 		title: "Редактор",

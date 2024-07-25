@@ -32,5 +32,5 @@ export type Fn = (
 	params: Params,
 ) => Oath<Routes.ID.VerifyToken.Response, TRrr<"EACCES" | "EINVAL" | "EIO">>
 
-export const verify_token0: Fn = (ctx, { token_service }) =>
+export const token_verify0: Fn = (ctx, { token_service }) =>
 	authenticate0(ctx, token_service).pipe(Oath.ops.map(() => ({ status: 200 })))

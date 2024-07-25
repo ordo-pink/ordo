@@ -26,14 +26,14 @@ export const get_auth_cookies0 = (sub?: string, jti?: string) =>
 	Oath.Merge({
 		sub: Oath.FromNullable(sub)
 			.pipe(Oath.ops.chain(sub => Oath.If(is_uuid(sub), { T: () => sub as SUB, F: () => sub })))
-			.pipe(Oath.ops.rejected_map(sub => eacces(`get_auth_cookies -> sub: ${sub}`))),
+			.pipe(Oath.ops.rejected_map(sub => einval(`get_auth_cookies -> sub: ${sub}`))),
 		jti: Oath.FromNullable(jti)
 			.pipe(Oath.ops.chain(jti => Oath.If(is_uuid(jti), { T: () => jti as JTI, F: () => jti })))
-			.pipe(Oath.ops.rejected_map(jti => eacces(`get_auth_cookies -> jti: ${jti}`))),
+			.pipe(Oath.ops.rejected_map(jti => einval(`get_auth_cookies -> jti: ${jti}`))),
 	})
 
 // --- Internal ---
 
 const LOCATION = "cookies"
 
-const eacces = RRR.codes.eacces(LOCATION)
+const einval = RRR.codes.einval(LOCATION)

@@ -17,7 +17,7 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import type { AUD, Algorithm, EXP, ISS, JTI, JWT, JWTPayload, SUB } from "@ordo-pink/wjwt"
+import type { AUD, Algorithm, ISS, JTI, JWT, JWTPayload, SUB } from "@ordo-pink/wjwt"
 import type { Oath } from "@ordo-pink/oath"
 import type { TLogger } from "@ordo-pink/logger"
 import type { TOption } from "@ordo-pink/option"
@@ -31,42 +31,75 @@ import type { TRrr } from "@ordo-pink/data"
 export type TTokenRecord = Record<JTI, string>
 
 /**
- * Payload of the access JWT.
- *
- * lim: file_limit
- * mfs: max_file_size
- * sbs: subscription
- * mxf: max_functions
+ * Payload of the auth JWT.
  */
-export type TAccessTokenPayload = JWTPayload & {
+export type TAuthTokenPayload = JWTPayload & {
+	/**
+	 * @alias lim `user.file_limit`
+	 */
 	lim: number
+
+	/**
+	 * @alias mfs `user.max_file_size`
+	 */
 	mfs: number
+
+	/**
+	 * @alias sbs `user.subscription`
+	 */
 	sbs: string
+
+	/**
+	 * @alias mxf `user.max_functions`
+	 */
 	mxf: number
 }
 
 /**
- * Payload of the refresh JWT.
- */
-export type TRefreshTokenPayload = TAccessTokenPayload
-
-/**
  * Parsed access token content.
  */
-export type TAccessJWT = JWT<TAccessTokenPayload>
+export type TAuthJWT = JWT<TAuthTokenPayload>
 
 /**
- * Parsed refresh token content.
+ * Token persistence strategy implements approach to storing user tokens in the backend. Token
+ * persistence strategy is provided to `ID` service at start time and is then used for server side
+ * validation of incoming request authorisation tokens (JWT access tokens).
  */
-export type TRefreshJWT = JWT<TRefreshTokenPayload>
-
 export type TPersistenceStrategyToken = {
+	/**
+	 * Returns refresh token of given `SUB` associated with given `JTI`.
+	 *
+	 * @param SUB - token subject
+	 * @param JTI - token id
+	 *
+	 * @returns an Oath resolving into an option of the token or rejecting with `EIO`
+	 */
 	get_token: (sub: SUB, jti: JTI) => Oath<TOption<string>, TRrr<"EIO">>
+
+	/**
+	 * Returns a record of all refresh tokens associated with given `SUB`.
+	 */
 	get_tokens: (sub: SUB) => Oath<TOption<TTokenRecord>, TRrr<"EIO">>
+
+	/**
+	 * Removes refresh token of given `SUB` associated with given `JTI`.
+	 */
 	remove_token: (sub: SUB, jti: JTI) => Oath<void, TRrr<"EIO" | "ENOENT">>
+
+	/**
+	 * Removes a record of all refresh tokens associated with given `SUB`.
+	 */
 	remove_tokens: (sub: SUB) => Oath<void, TRrr<"EIO" | "ENOENT">>
+
+	/**
+	 * Assigns refresh token of given `SUB` associated with given `JTI`.
+	 */
 	set_token: (sub: SUB, jti: JTI, token: string) => Oath<void, TRrr<"ENOENT" | "EIO">>
-	set_tokens: (sub: SUB, map: TTokenRecord) => Oath<void, TRrr<"ENOENT" | "EIO">>
+
+	/**
+	 * Assigns a record of all refresh tokens associated with given `SUB`.
+	 */
+	set_tokens: (sub: SUB, record: TTokenRecord) => Oath<void, TRrr<"ENOENT" | "EIO">>
 }
 
 /**
@@ -88,8 +121,14 @@ export type TTokenServiceOptions = {
 		readonly refresh: CryptoKeyPair
 	}
 
+	/**
+	 * Recipients that the JWT is intended for.
+	 */
 	readonly audience: AUD
 
+	/**
+	 * JWT issuer claim.
+	 */
 	readonly issuer: ISS
 
 	/**
@@ -126,22 +165,19 @@ export type TTokenService = {
 	get_payload: <$TType extends "access" | "refresh">(
 		token: string,
 		type: $TType,
-	) => Oath<
-		TOption<$TType extends "access" ? TAccessTokenPayload : TRefreshTokenPayload>,
-		TRrr<"EINVAL" | "EIO">
-	>
+	) => Oath<TOption<TAuthTokenPayload>, TRrr<"EINVAL" | "EIO">>
 
 	decode: <$TType extends "access" | "refresh">(
 		token: string,
 		type: $TType,
-	) => Oath<TOption<$TType extends "access" ? TAccessJWT : TRefreshJWT>, TRrr<"EINVAL">>
+	) => Oath<TOption<TAuthJWT>, TRrr<"EINVAL">>
 
 	create: (params: {
 		sub: SUB
 		data: { lim: number; mfs: number; sbs: string; mxf: number }
 		prevJti?: JTI
 		aud?: AUD
-	}) => Oath<TAccessTokenPayload & { token: string }, TRrr<"EINVAL" | "ENOENT" | "EIO">>
+	}) => Oath<TAuthTokenPayload & { token: string }, TRrr<"EINVAL" | "ENOENT" | "EIO">>
 
 	strategy: TPersistenceStrategyToken
 }

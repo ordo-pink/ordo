@@ -27,7 +27,7 @@ import { type TLogger } from "@ordo-pink/logger"
 import { type TTokenService } from "@ordo-pink/backend-service-token"
 import { authenticate0 } from "@ordo-pink/backend-utils"
 
-export const handle_get_public_by_handle0: TFn = (ctx, { user_service, token_service }) =>
+export const get_by_handle0: TFn = (ctx, { user_service, token_service }) =>
 	authenticate0(ctx, token_service)
 		.pipe(Oath.ops.chain(() => extract_ctx0(ctx.params)))
 		.pipe(Oath.ops.chain(get_user_by_handle0(user_service)))
@@ -47,17 +47,13 @@ type TFn = (
 	params: TParams,
 ) => Oath<Routes.ID.GetUserByHandle.Response, TRrr<"EACCES" | "ENOENT" | "EIO" | "EINVAL">>
 
-const extract_ctx0 = ({ handle }: TCtx): Oath<User.User["handle"], TRrr<"EINVAL">> =>
+const extract_ctx0 = ({ handle }: TCtx) =>
 	Oath.FromNullable(handle)
 		.pipe(Oath.ops.chain(handle => Oath.If(is_string(handle), { T: () => handle })))
 		.pipe(Oath.ops.rejected_map(() => einval(`validate_ctx -> handle: ${handle}`)))
 
-const get_user_by_handle0 =
-	(user_service: TUserService) =>
-	(
-		handle: User.User["handle"],
-	): Oath<Routes.ID.GetUserByHandle.ResponseBody, TRrr<"EIO" | "ENOENT">> =>
-		user_service
-			.get_by_handle(handle)
-			.pipe(Oath.ops.chain(from_option0(() => enoent(`get_by_handle -> handle: ${handle}`))))
-			.pipe(Oath.ops.map(UserService.serialise_public))
+const get_user_by_handle0 = (user_service: TUserService) => (handle: string) =>
+	user_service
+		.get_by_handle(handle)
+		.pipe(Oath.ops.chain(from_option0(() => enoent(`get_by_handle -> handle: ${handle}`))))
+		.pipe(Oath.ops.map(UserService.serialise_public))

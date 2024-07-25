@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react"
 
 export const useIsApple = () => {
-	const [isApple, setIsApple] = useState(false)
+	const [is_apple, set_is_apple] = useState(false)
 
 	useEffect(() => {
-		setIsApple(navigator.appVersion.indexOf("Mac") !== -1)
+		set_is_apple(navigator.appVersion.indexOf("Mac") !== -1)
 	}, [])
 
-	return isApple
+	return is_apple
 }

@@ -54,7 +54,7 @@ export default function GTDSidebar() {
 			</ActionListItem>
 
 			<div className="flex flex-col space-y-2">
-				<Heading level="5" center uppercase styledFirstLetter>
+				<Heading level="5" center uppercase styled_first_letter>
 					проекты
 				</Heading>
 				<div>

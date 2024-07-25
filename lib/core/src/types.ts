@@ -24,7 +24,6 @@ import type {
 	FSID,
 	PlainData,
 	TCreateMetadataParams,
-	TMetadataCommand,
 	TMetadataQuery,
 	TRrr,
 	TUserQuery,
@@ -148,27 +147,7 @@ export type TCreateFunctionFn = (
 	callback: (context: TCreateFunctionContext) => void | Promise<void>,
 ) => (params: TCreateFunctionInternalContext) => void | Promise<void>
 
-export type TOrdoContext = {
-	queries: {
-		metadata_query: TMetadataQuery
-		user_query: TUserQuery
-		// TODO: TContentQuery
-		// TODO: TApplicationQuery
-	}
-	streams: {
-		title$: Observable<string>
-	}
-	commands: {
-		metadata_command: TMetadataCommand
-		// user_command: TUserCommand
-		// content_command: TContentCommand
-	}
-	get_hosts: TGetHostsFn
-	get_fetch: TGetFetchFn
-	get_logger: TGetLoggerFn
-	get_commands: TGetCommandsFn
-	get_is_authenticated: TGetIsAuthenticatedFn
-}
+export type TOrdoContext = TCreateFunctionContext
 
 declare global {
 	module Routes {
@@ -187,14 +166,11 @@ declare global {
 
 		module ID {
 			module UpdateInfo {
-				type Path = "/account/update-info"
+				type Path = "/account/info"
 				type Method = "PATCH"
-				type Cookies = never
-				type Params = never
-				type RequestBody = {
-					first_name?: User.User["first_name"]
-					last_name?: User.User["last_name"]
-				}
+				type Cookies = void
+				type Params = void
+				type RequestBody = { first_name?: string; last_name?: string }
 				type StatusCode = 200
 				type ResponseBody = User.User
 
@@ -209,12 +185,12 @@ declare global {
 			}
 
 			module UpdateEmail {
-				type Path = "/account/update-email"
+				type Path = "/account/email"
 				type Method = "PATCH"
-				type Cookies = never
-				type Params = never
+				type Cookies = void
+				type Params = void
 				type StatusCode = 200
-				type RequestBody = { new_email?: User.User["email"] }
+				type RequestBody = { email?: string }
 				type ResponseBody = User.User
 
 				type Request = {
@@ -228,12 +204,12 @@ declare global {
 			}
 
 			module UpdateHandle {
-				type Path = "/account/update-handle"
+				type Path = "/account/handle"
 				type Method = "PATCH"
-				type Cookies = never
-				type Params = never
+				type Cookies = void
+				type Params = void
 				type StatusCode = 200
-				type RequestBody = { new_handle?: User.User["handle"] }
+				type RequestBody = { handle?: string }
 				type ResponseBody = User.User
 
 				type Request = {
@@ -247,15 +223,12 @@ declare global {
 			}
 
 			module UpdatePassword {
-				type Path = "/account/update-password"
+				type Path = "/account/password"
 				type Method = "PATCH"
-				type Cookies = never
-				type Params = never
+				type Cookies = void
+				type Params = void
 				type StatusCode = 200
-				type RequestBody = {
-					old_password?: User.PrivateUser["password"]
-					new_password?: User.PrivateUser["password"]
-				}
+				type RequestBody = { old_password?: string; new_password?: string }
 				type ResponseBody = TTokenResult
 
 				type Request = {
@@ -272,10 +245,10 @@ declare global {
 				type Path = "/account/confirm-email"
 				type Url = `${string}${Path}?email=${string}&code=${string}` // TODO: Define host
 				type Method = "POST"
-				type Cookies = never
-				type Params = never
+				type Cookies = void
+				type Params = void
 				type StatusCode = 200
-				type RequestBody = { email?: User.User["email"]; code?: User.InternalUser["email_code"] }
+				type RequestBody = { email?: string; code?: string }
 				type ResponseBody = User.User
 
 				type Request = {
@@ -291,9 +264,9 @@ declare global {
 			module GetAccount {
 				type Path = "/account"
 				type Method = "GET"
-				type Cookies = never
-				type Params = never
-				type RequestBody = never
+				type Cookies = void
+				type Params = void
+				type RequestBody = void
 				type StatusCode = 200
 				type ResponseBody = User.User
 
@@ -310,9 +283,9 @@ declare global {
 			module GetUserByEmail {
 				type Path = `/users/email/${string}`
 				type Method = "GET"
-				type Cookies = never
-				type Params = { email?: User.User["email"] }
-				type RequestBody = never
+				type Cookies = void
+				type Params = { email?: string }
+				type RequestBody = void
 				type StatusCode = 200
 				type ResponseBody = User.PublicUser
 
@@ -329,9 +302,9 @@ declare global {
 			module GetUserByHandle {
 				type Path = `/users/handle/${string}`
 				type Method = "GET"
-				type Cookies = never
-				type Params = { handle?: User.User["handle"] }
-				type RequestBody = never
+				type Cookies = void
+				type Params = { handle?: string }
+				type RequestBody = void
 				type StatusCode = 200
 				type ResponseBody = User.PublicUser
 
@@ -348,9 +321,9 @@ declare global {
 			module GetUserByID {
 				type Path = `/users/id/${string}`
 				type Method = "GET"
-				type Cookies = never
-				type Params = { id?: User.User["id"] }
-				type RequestBody = never
+				type Cookies = void
+				type Params = { id?: string }
+				type RequestBody = void
 				type StatusCode = 200
 				type ResponseBody = User.PublicUser
 
@@ -367,9 +340,9 @@ declare global {
 			module RefreshToken {
 				type Path = "/account/refresh-token"
 				type Method = "POST"
-				type Cookies = { sub: SUB; jti: JTI }
-				type Params = never
-				type RequestBody = never
+				type Cookies = { sub?: string; jti?: string }
+				type Params = void
+				type RequestBody = void
 				type StatusCode = 200
 				type ResponseBody = TTokenResult
 
@@ -386,14 +359,10 @@ declare global {
 			module SignIn {
 				type Path = "/account/sign-in"
 				type Method = "POST"
-				type Cookies = never
-				type Params = never
+				type Cookies = void
+				type Params = void
 				type StatusCode = 200
-				type RequestBody = {
-					email?: User.User["email"]
-					handle?: User.User["handle"]
-					password?: User.PrivateUser["password"]
-				}
+				type RequestBody = { email?: string; handle?: string; password?: string }
 				type ResponseBody = TTokenResult
 
 				type Request = {
@@ -409,13 +378,9 @@ declare global {
 			module SignUp {
 				type Path = "/account/sign-up"
 				type Method = "POST"
-				type Cookies = never
-				type Params = never
-				type RequestBody = {
-					email?: User.User["email"]
-					handle?: User.User["handle"]
-					password?: User.PrivateUser["password"]
-				}
+				type Cookies = void
+				type Params = void
+				type RequestBody = { email?: string; handle?: string; password?: string }
 				type StatusCode = 201
 				type ResponseBody = TTokenResult
 
@@ -432,7 +397,7 @@ declare global {
 			module SignOut {
 				type Path = "/account/sign-out"
 				type Method = "POST"
-				type Cookies = { sub: SUB; jti: JTI }
+				type Cookies = { sub?: SUB; jti?: JTI }
 				type Params = void
 				type RequestBody = void
 				type StatusCode = 204
@@ -651,6 +616,7 @@ declare global {
 			render_workspace?: (div: HTMLDivElement) => void
 			render_sidebar?: (div: HTMLDivElement) => void
 			render_icon?: (div: HTMLSpanElement) => void
+			on_unmount?: (params: { workspace: HTMLDivElement; sidebar: HTMLDivElement }) => void
 			is_background?: boolean
 			is_fullscreen?: boolean
 		}
@@ -696,6 +662,21 @@ declare global {
 		}
 
 		export type PrivateUser = User.InternalUser & {
+			password: string
+			entity_version: number
+		}
+
+		export type UserV0 = {
+			email: string
+			createdAt: Date
+			subscription: string
+			firstName: string
+			lastName: string
+			id: UUIDv4
+			emailConfirmed: boolean
+			fileLimit: number
+			maxUploadSize: number
+			code: string
 			password: string
 		}
 	}
@@ -817,10 +798,10 @@ declare global {
 			export type OpenExternalParams = { url: string; new_tab?: boolean }
 
 			export type Route<
-				Params extends Record<string, string> = Record<string, string>,
+				Params extends Record<string, string | undefined> = Record<string, string | undefined>,
 				Data = null,
 			> = {
-				params: Params
+				params?: Params
 				data: Data
 				hash: string
 				hashRouting: boolean

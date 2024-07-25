@@ -27,8 +27,8 @@ import "./loader.css"
 type P = { size?: "s" | "m" | "l" }
 export default function Loader({ size }: P) {
 	const ref = useRef<HTMLDivElement>(null)
-	const isDarkTheme = useIsDarkTheme()
-	const className = Switch.of(size)
+	const is_dark_theme = useIsDarkTheme()
+	const class_name = Switch.Match(size)
 		.case("s", () => "loader small")
 		.case("l", () => "loader large")
 		.default(() => "loader")
@@ -36,11 +36,11 @@ export default function Loader({ size }: P) {
 	useLayoutEffect(() => {
 		if (!ref.current) return
 
-		ref.current.style.setProperty("--background", isDarkTheme ? "black" : "white")
-	}, [ref, isDarkTheme])
+		ref.current.style.setProperty("--background", is_dark_theme ? "black" : "white")
+	}, [ref, is_dark_theme])
 
 	return (
-		<div ref={ref} className={className}>
+		<div ref={ref} className={class_name}>
 			<span></span>
 			<span></span>
 			<span></span>

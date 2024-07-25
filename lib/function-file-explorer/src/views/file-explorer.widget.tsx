@@ -47,7 +47,7 @@ export default function FileExplorerCardComponent() {
 					/>
 				</div>
 				<div className="flex w-full max-w-md flex-col space-y-1 md:space-y-2">
-					<Heading level="2" trim styledFirstLetter>
+					<Heading level="2" trim styled_first_letter>
 						{name.fullName || user.email}
 					</Heading>
 					<UsedSpace />

@@ -138,6 +138,7 @@ export type TSendChangeEmailEmailParams = TSharedEmailParams & {
 export type TSendEmailChangedEmailParams = TSharedEmailParams & {
 	old_email: string
 	new_email: string
+	confirmation_url: string
 }
 
 export type TSendResetPasswordEmailParams = TSharedEmailParams & {
@@ -190,6 +191,4 @@ export type InitNotificationServiceOptions = {
 	support_channels: Record<string, string>
 
 	social_links: Record<string, string>
-
-	from: Required<TEmailContact>
 }

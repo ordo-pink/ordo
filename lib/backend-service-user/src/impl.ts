@@ -19,11 +19,12 @@
 
 import isEmail from "validator/lib/isEmail"
 
-import { O, type TOption } from "@ordo-pink/option"
 import {
-	UUIDv4,
+	type UUIDv4,
 	from_option0,
-	is_int,
+	from_result0,
+	is_bool,
+	is_finite_non_negative_int,
 	is_non_empty_string,
 	is_positive_number,
 	is_string,
@@ -31,11 +32,93 @@ import {
 	noop,
 	override,
 } from "@ordo-pink/tau"
+import { O } from "@ordo-pink/option"
 import { Oath } from "@ordo-pink/oath"
 import { RRR } from "@ordo-pink/data"
 import { okpwd } from "@ordo-pink/okpwd"
 
-import { type TUserServiceStatic } from "./types"
+import { type TUserServiceStatic, type TUserValidations } from "./types"
+import { Result } from "@ordo-pink/result"
+import { Switch } from "@ordo-pink/switch"
+
+const check_password = okpwd()
+
+export const Validations: TUserValidations = {
+	is_email: email =>
+		Result.If(is_non_empty_string(email) && isEmail(email))
+			.pipe(Result.ops.map(() => email as User.PrivateUser["email"]))
+			.pipe(Result.ops.err_map(() => einval(`is_em email: ${String(email)}`))),
+
+	is_id: id =>
+		Result.If(is_uuid(id))
+			.pipe(Result.ops.map(() => id as User.PrivateUser["id"]))
+			.pipe(Result.ops.err_map(() => einval(`is_id: ${String(id)}`))),
+
+	/**
+	 * @todo Limit special chars (/[`!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~]/ - after "@")
+	 */
+	is_handle: handle =>
+		Result.If(is_non_empty_string(handle) && handle.startsWith("@") && handle.length > 1)
+			.pipe(Result.ops.map(() => handle as User.PrivateUser["handle"]))
+			.pipe(Result.ops.err_map(() => einval(`is_handle: ${String(handle)}`))),
+
+	is_password: password =>
+		Result.If(is_string(password), { F: () => "Password must be a string." })
+			.pipe(Result.ops.map(() => check_password(password as string)))
+			.pipe(Result.ops.chain(error => Result.If(!error, { F: () => error })))
+			.pipe(Result.ops.map(() => password as User.PrivateUser["password"]))
+			.pipe(Result.ops.err_map(error => einval(`is_password: ${error}`))),
+
+	is_created_at: created_at =>
+		Result.If(created_at instanceof Date)
+			.pipe(Result.ops.map(() => created_at as User.PrivateUser["created_at"]))
+			.pipe(Result.ops.err_map(() => einval(`is_created_at: ${String(created_at)}`))),
+
+	is_email_code: email_code =>
+		Result.If(is_non_empty_string(email_code))
+			.pipe(Result.ops.map(() => email_code as User.PrivateUser["email_code"]))
+			.pipe(Result.ops.err_map(() => einval(`is_email_code: ${String(email_code)}`))),
+
+	is_email_confirmed: email_confirmed =>
+		Result.If(is_bool(email_confirmed))
+			.pipe(Result.ops.map(() => email_confirmed as User.PrivateUser["email_confirmed"]))
+			.pipe(Result.ops.err_map(() => einval(`is_email_confirmed: ${String(email_confirmed)}`))),
+
+	is_file_limit: file_limit =>
+		Result.If(is_finite_non_negative_int(file_limit))
+			.pipe(Result.ops.map(() => file_limit as User.PrivateUser["file_limit"]))
+			.pipe(Result.ops.err_map(() => einval(`is_file_limit: ${String(file_limit)}`))),
+
+	is_first_name: first_name =>
+		Result.If(is_string(first_name))
+			.pipe(Result.ops.map(() => first_name as User.PrivateUser["first_name"]))
+			.pipe(Result.ops.err_map(() => einval(`is_first_name: ${String(first_name)}`))),
+
+	is_last_name: last_name =>
+		Result.If(is_string(last_name))
+			.pipe(Result.ops.map(() => last_name as User.PrivateUser["last_name"]))
+			.pipe(Result.ops.err_map(() => einval(`is_last_name: ${String(last_name)}`))),
+
+	is_max_functions: max_functions =>
+		Result.If(is_finite_non_negative_int(max_functions))
+			.pipe(Result.ops.map(() => max_functions as User.PrivateUser["max_functions"]))
+			.pipe(Result.ops.err_map(() => einval(`is_max_functions: ${String(max_functions)}`))),
+
+	is_max_upload_size: max_upload_size =>
+		Result.If(is_positive_number(max_upload_size))
+			.pipe(Result.ops.map(() => max_upload_size as User.PrivateUser["max_upload_size"]))
+			.pipe(Result.ops.err_map(() => einval(`is_max_upload_size: ${String(max_upload_size)}`))),
+
+	is_subscription: subscription =>
+		Result.If(is_non_empty_string(subscription))
+			.pipe(Result.ops.map(() => subscription as User.PrivateUser["subscription"]))
+			.pipe(Result.ops.err_map(() => einval(`is_subscription: ${String(subscription)}`))),
+
+	is_entity_version: entity_version =>
+		Result.If(is_finite_non_negative_int(entity_version))
+			.pipe(Result.ops.map(() => entity_version as User.PrivateUser["entity_version"]))
+			.pipe(Result.ops.err_map(() => einval(`is_entity_version: ${String(entity_version)}`))),
+}
 
 export const serialise_public = ({
 	created_at,
@@ -134,7 +217,30 @@ const obfuscate_email = (email: User.User["email"]): string => {
 		.concat(top_level_domain)
 }
 
+const migrate_0_to_1 = (user: User.UserV0): User.PrivateUser => ({
+	created_at: user.createdAt,
+	email: user.email as User.User["email"],
+	email_code: user.code,
+	email_confirmed: user.emailConfirmed,
+	entity_version: 1,
+	file_limit: user.fileLimit,
+	first_name: user.firstName,
+	handle: `@${user.id.split("-").join("")}`,
+	id: user.id,
+	last_name: user.lastName,
+	max_functions: 5,
+	max_upload_size: user.maxUploadSize,
+	password: user.password,
+	subscription: user.subscription,
+})
+
 export const UserService: TUserServiceStatic = {
+	get ENTITY_VERSION() {
+		return 1
+	},
+
+	Validations,
+
 	serialise,
 	serialise_internal,
 	serialise_public,
@@ -145,141 +251,223 @@ export const UserService: TUserServiceStatic = {
 	of: strategy => ({
 		strategy,
 
+		migrate: () =>
+			strategy
+				.migrate(UserService.ENTITY_VERSION)
+				.pipe(Oath.ops.chain(() => strategy.get_outdated(UserService.ENTITY_VERSION)))
+				.pipe(
+					Oath.ops.map(users =>
+						users.map(user =>
+							Switch.Match(user.entity_version)
+								.case(UserService.ENTITY_VERSION, () => user)
+								.default(() => migrate_0_to_1(user as unknown as User.UserV0)),
+						),
+					),
+				)
+				.pipe(Oath.ops.chain(users => Oath.Merge(users.map(u => strategy.update(u.id, u)))))
+				.pipe(Oath.ops.map(noop)),
+
 		compare_password: (email, password) =>
-			Oath.Merge([_check_email0(email), _check_password0(password)])
-				.pipe(Oath.ops.chain(() => strategy.get_by_email(email)))
-				.pipe(Oath.ops.chain(from_option(() => enoent(`compare_password -> email: ${email}`))))
-				.pipe(Oath.ops.chain(_verify_password0(password))),
+			Oath.Merge({
+				email: from_result0(UserService.Validations.is_email(email)),
+				password: from_result0(UserService.Validations.is_password(password)),
+			}).pipe(
+				Oath.ops.chain(({ email, password }) =>
+					strategy
+						.get_by_email(email)
+						.pipe(Oath.ops.chain(from_option0(() => enoent(`compare_password -> email: ${email}`))))
+						.pipe(Oath.ops.chain(_verify_password0(password))),
+				),
+			),
 
 		create: (email, handle, password) =>
-			Oath.Merge([_check_email0(email), _check_password0(password), _check_handle0(handle)])
-				.pipe(Oath.ops.chain(_hash_password0(password)))
+			Oath.Merge({
+				email: from_result0(UserService.Validations.is_email(email)),
+				handle: from_result0(UserService.Validations.is_handle(handle)),
+				password: from_result0(UserService.Validations.is_password(password)).pipe(
+					Oath.ops.chain(_hash_password0),
+				),
+			})
 				.pipe(
-					Oath.ops.map(
-						password =>
-							({
-								id: UserService.create_id(),
-								email,
-								handle,
-								password,
-								email_confirmed: false,
-								created_at: new Date(Date.now()),
-								file_limit: 1000,
-								max_upload_size: 1.5,
-								subscription: "free",
-								max_functions: 5,
-								email_code: UserService.create_email_code(),
-								first_name: "",
-								last_name: "",
-							}) satisfies User.PrivateUser,
+					Oath.ops.chain(params =>
+						Oath.Merge([
+							strategy
+								.exists_by_email(params.email)
+								.pipe(Oath.ops.chain(exists => Oath.If(!exists)))
+								.pipe(Oath.ops.rejected_map(() => eexist(`create -> email: ${params.email}`))),
+							strategy
+								.exists_by_handle(params.handle)
+								.pipe(Oath.ops.chain(exists => Oath.If(!exists)))
+								.pipe(Oath.ops.rejected_map(() => eexist(`create -> handle: ${params.handle}`))),
+						]).pipe(Oath.ops.map(() => params)),
 					),
+				)
+				.pipe(
+					Oath.ops.map(({ email, handle, password }) => ({
+						email,
+						handle,
+						password,
+						id: UserService.create_id(),
+						email_confirmed: false,
+						created_at: new Date(Date.now()),
+						file_limit: 1000,
+						max_upload_size: 1.5,
+						subscription: "free",
+						max_functions: 5,
+						email_code: UserService.create_email_code(),
+						first_name: "",
+						last_name: "",
+						entity_version: UserService.ENTITY_VERSION,
+					})),
 				)
 				.pipe(Oath.ops.chain(user => strategy.create(user).pipe(Oath.ops.map(() => user))))
 				.pipe(Oath.ops.map(UserService.serialise_internal)),
 
 		get_by_email: email =>
-			_check_email0(email)
-				.pipe(() => strategy.get_by_email(email))
-				.pipe(Oath.ops.map(option => option.pipe(O.ops.map(serialise_public)))),
+			from_result0(UserService.Validations.is_email(email))
+				.pipe(Oath.ops.chain(strategy.get_by_email))
+				.pipe(Oath.ops.map(option => option.pipe(O.ops.map(UserService.serialise_internal)))),
 
 		get_by_handle: handle =>
-			_check_handle0(handle)
-				.pipe(() => strategy.get_by_handle(handle))
-				.pipe(Oath.ops.map(option => option.pipe(O.ops.map(serialise_public)))),
+			from_result0(UserService.Validations.is_handle(handle))
+				.pipe(Oath.ops.chain(strategy.get_by_handle))
+				.pipe(Oath.ops.map(option => option.pipe(O.ops.map(UserService.serialise_internal)))),
 
 		get_by_id: id =>
-			_check_id0(id)
-				.pipe(() => strategy.get_by_id(id))
-				.pipe(Oath.ops.map(option => option.pipe(O.ops.map(serialise_internal)))),
+			from_result0(UserService.Validations.is_id(id))
+				.pipe(Oath.ops.chain(strategy.get_by_id))
+				.pipe(Oath.ops.map(option => option.pipe(O.ops.map(UserService.serialise_internal)))),
 
 		update_email: (id, email) =>
-			Oath.Merge([
-				_check_id0(id),
-				_check_email0(email),
-				strategy
-					.exists_by_email(email)
-					.pipe(
-						Oath.ops.chain(exists =>
-							Oath.If(exists, { F: () => eexist(`update_email -> email: ${email}`) }),
+			Oath.Merge({
+				email: from_result0(UserService.Validations.is_email(email)),
+				id: from_result0(UserService.Validations.is_id(id)),
+			})
+				.pipe(
+					Oath.ops.chain(params =>
+						strategy.exists_by_email(params.email).pipe(
+							Oath.ops.chain(exists =>
+								Oath.If(!exists)
+									.pipe(Oath.ops.map(() => params))
+									.pipe(Oath.ops.rejected_map(() => eexist(`update_email: ${email}`))),
+							),
 						),
 					),
-			])
-				.pipe(Oath.ops.chain(() => strategy.get_by_id(id)))
-				.pipe(Oath.ops.chain(from_option(() => enoent(`update_email -> id: ${id}`))))
-				.pipe(
-					Oath.ops.map(
-						override({
-							email,
-							email_code: UserService.create_email_code(),
-							email_confirmed: false,
-						}),
-					),
 				)
-				.pipe(Oath.ops.chain(user => strategy.update(id, user)))
-				.pipe(Oath.ops.map(user => user.email_code)),
+				.pipe(
+					Oath.ops.chain(({ id, email }) =>
+						strategy
+							.get_by_id(id)
+							.pipe(Oath.ops.chain(from_option0(() => enoent(`update_email -> id: ${id}`))))
+							.pipe(Oath.ops.map(override({ email })))
+							.pipe(Oath.ops.map(override({ email_code: create_email_code() })))
+							.pipe(Oath.ops.map(override({ email_confirmed: false })))
+							.pipe(Oath.ops.chain(user => strategy.update(id, user)))
+							.pipe(Oath.ops.map(user => user.email_code)),
+					),
+				),
 
 		update_handle: (id, handle) =>
-			Oath.Merge([
-				_check_id0(id),
-				_check_handle0(handle),
-				strategy
-					.exists_by_handle(handle)
-					.pipe(
-						Oath.ops.chain(exists =>
-							Oath.If(exists, { F: () => eexist(`update_handle -> handle: ${handle}`) }),
-						),
+			Oath.Merge({
+				id: from_result0(UserService.Validations.is_id(id)),
+				handle: from_result0(UserService.Validations.is_handle(handle)),
+			})
+				.pipe(
+					Oath.ops.chain(params =>
+						strategy
+							.exists_by_handle(params.handle)
+							.pipe(Oath.ops.chain(exists => Oath.If(!exists)))
+							.pipe(Oath.ops.map(() => params))
+							.pipe(Oath.ops.rejected_map(() => eexist(`update_handle: ${params.handle}`))),
 					),
-			])
-				.pipe(Oath.ops.chain(() => strategy.get_by_id(id)))
-				.pipe(Oath.ops.chain(from_option(() => enoent(`update_handle -> id: ${id}`))))
-				.pipe(Oath.ops.map(override({ handle })))
-				.pipe(Oath.ops.chain(user => strategy.update(id, user)))
-				.pipe(Oath.ops.map(noop)),
+				)
+				.pipe(
+					Oath.ops.chain(({ id, handle }) =>
+						strategy
+							.get_by_id(id)
+							.pipe(Oath.ops.chain(from_option0(() => enoent(`update_handle -> id: ${id}`))))
+							.pipe(Oath.ops.map(override({ handle })))
+							.pipe(Oath.ops.chain(user => strategy.update(id, user)))
+							.pipe(Oath.ops.map(noop)),
+					),
+				),
 
 		update_info: (id, { first_name, last_name }) =>
-			Oath.Merge([_check_id0(id), _check_first_name0(first_name), _check_last_name0(last_name)])
-				.pipe(Oath.ops.chain(() => strategy.get_by_id(id)))
-				.pipe(Oath.ops.chain(from_option(() => enoent(`update_info -> id: ${id}`))))
-				.pipe(Oath.ops.map(override({ first_name, last_name })))
-				.pipe(Oath.ops.chain(user => strategy.update(id, user)))
-				.pipe(Oath.ops.map(noop)),
+			Oath.Merge({
+				id: from_result0(UserService.Validations.is_id(id)),
+				first_name: from_result0(UserService.Validations.is_first_name(first_name)),
+				last_name: from_result0(UserService.Validations.is_last_name(last_name)),
+			}).pipe(
+				Oath.ops.chain(({ id, first_name, last_name }) =>
+					strategy
+						.get_by_id(id)
+						.pipe(Oath.ops.chain(from_option0(() => enoent(`update_info -> id: ${id}`))))
+						.pipe(Oath.ops.map(override({ first_name, last_name })))
+						.pipe(Oath.ops.chain(user => strategy.update(id, user)))
+						.pipe(Oath.ops.map(noop)),
+				),
+			),
 
-		update_password: (id, old_password, new_password) =>
-			Oath.Merge([_check_id0(id), _check_password0(old_password), _check_password0(new_password)])
-				.pipe(Oath.ops.chain(() => strategy.get_by_id(id)))
-				.pipe(Oath.ops.chain(from_option(() => enoent(`update_password -> id: ${id}`))))
-				.pipe(
-					Oath.ops.chain(user =>
-						Oath.Resolve(user)
-							.pipe(Oath.ops.chain(_verify_password0(old_password)))
-							.pipe(
-								Oath.ops.chain(is_valid =>
-									Oath.If(is_valid, { T: () => user, F: () => enoent("update_password") }),
-								),
+		confirm_email: (id, code) =>
+			Oath.Merge({
+				id: from_result0(UserService.Validations.is_id(id)),
+				code: from_result0(UserService.Validations.is_email_code(code)),
+			}).pipe(
+				Oath.ops.chain(({ id, code }) =>
+					strategy
+						.get_by_id(id)
+						.pipe(Oath.ops.chain(from_option0(() => enoent(`confirm_email -> id: ${id}`))))
+						.pipe(
+							Oath.ops.chain(user =>
+								Oath.If(user.email_code === code)
+									.pipe(Oath.ops.map(() => user))
+									.pipe(Oath.ops.rejected_map(() => einval(`confirm_email -> code: ${code}`))),
 							),
-					),
-				)
-				.pipe(
-					Oath.ops.chain(user =>
-						_hash_password0(new_password)().pipe(Oath.ops.map(password => ({ ...user, password }))),
-					),
-				)
-				.pipe(Oath.ops.chain(user => strategy.update(id, user)))
-				.pipe(Oath.ops.map(noop)),
+						)
+						.pipe(Oath.ops.map(override({ email_confirmed: true, email_code: "" })))
+						.pipe(Oath.ops.chain(user => strategy.update(id, user)))
+						.pipe(Oath.ops.map(noop)),
+				),
+			),
+
+		update_password: (id, new_password) =>
+			Oath.Merge({
+				id: from_result0(UserService.Validations.is_id(id)),
+				password: from_result0(UserService.Validations.is_password(new_password)),
+			}).pipe(
+				Oath.ops.chain(({ id, password }) =>
+					strategy
+						.get_by_id(id)
+						.pipe(Oath.ops.chain(from_option0(() => enoent(`update_password -> id: ${id}`))))
+						.pipe(
+							Oath.ops.chain(user =>
+								_hash_password0(password).pipe(Oath.ops.map(password => ({ ...user, password }))),
+							),
+						)
+						.pipe(Oath.ops.chain(user => strategy.update(id, user)))
+						.pipe(Oath.ops.map(noop)),
+				),
+			),
 
 		update_subscription: (id, { file_limit, max_functions, max_upload_size, subscription }) =>
-			Oath.Merge([
-				_check_id0(id),
-				_check_file_limit0(file_limit),
-				_check_max_functions0(max_functions),
-				_check_max_upload_size0(max_upload_size),
-				_check_subscription0(subscription),
-			])
-				.pipe(Oath.ops.chain(() => strategy.get_by_id(id)))
-				.pipe(Oath.ops.chain(from_option0(() => enoent(`update_info -> id: ${id}`))))
-				.pipe(Oath.ops.map(override({ file_limit, max_functions, max_upload_size, subscription })))
-				.pipe(Oath.ops.chain(user => strategy.update(id, user)))
-				.pipe(Oath.ops.map(noop)),
+			Oath.Merge({
+				id: from_result0(UserService.Validations.is_id(id)),
+				file_limit: from_result0(UserService.Validations.is_file_limit(file_limit)),
+				max_functions: from_result0(UserService.Validations.is_max_functions(max_functions)),
+				max_upload_size: from_result0(UserService.Validations.is_max_upload_size(max_upload_size)),
+				subscription: from_result0(UserService.Validations.is_subscription(subscription)),
+			}).pipe(
+				Oath.ops.chain(({ id, file_limit, max_functions, subscription }) =>
+					strategy
+						.get_by_id(id)
+						.pipe(Oath.ops.chain(from_option0(() => enoent(`update_info -> id: ${id}`))))
+						.pipe(
+							Oath.ops.map(override({ file_limit, max_functions, max_upload_size, subscription })),
+						)
+						.pipe(Oath.ops.chain(user => strategy.update(id, user)))
+						.pipe(Oath.ops.map(noop)),
+				),
+			),
 	}),
 }
 
@@ -287,58 +475,12 @@ export const UserService: TUserServiceStatic = {
 
 const LOCATION = "UserService"
 
+const eio = RRR.codes.eio(LOCATION)
 const enoent = RRR.codes.enoent(LOCATION)
 const einval = RRR.codes.einval(LOCATION)
 const eexist = RRR.codes.einval(LOCATION)
-const eio = RRR.codes.eio(LOCATION)
 
-const _check_id0 = (id: User.User["id"]) =>
-	Oath.If(is_uuid(id), { F: () => einval(`check_id -> id: ${id}`) })
-
-const _check_email0 = (email: User.User["email"]) =>
-	Oath.If(isEmail(email), { F: () => einval(`check_email -> email: ${email}`) })
-
-const _check_handle0 = (handle: User.User["handle"]) =>
-	Oath.If(is_non_empty_string(handle), { F: () => einval(`check_handle -> handle: ${handle}`) })
-
-const _check_first_name0 = (first_name: User.User["first_name"]) =>
-	Oath.If(is_string(first_name), {
-		F: () => einval(`check_first_name -> first_name: ${first_name}`),
-	})
-
-const _check_last_name0 = (last_name: User.User["last_name"]) =>
-	Oath.If(is_string(last_name), { F: () => einval(`check_last_name -> last_name: ${last_name}`) })
-
-const _check_file_limit0 = (file_limit: User.User["file_limit"]) =>
-	Oath.If(is_positive_number(file_limit) && is_int(file_limit), {
-		F: () => einval(`check_file_limit -> file_limit: ${file_limit}`),
-	})
-
-const _check_max_functions0 = (max_functions: User.User["max_functions"]) =>
-	Oath.If(is_positive_number(max_functions) && is_int(max_functions), {
-		F: () => einval(`check_max_functions -> max_functions: ${max_functions}`),
-	})
-
-const _check_max_upload_size0 = (max_upload_size: User.User["max_upload_size"]) =>
-	Oath.If(is_positive_number(max_upload_size), {
-		F: () => einval(`check_max_upload_size -> max_upload_size: ${max_upload_size}`),
-	})
-
-const _check_subscription0 = (subscription: User.User["subscription"]) =>
-	Oath.If(is_non_empty_string(subscription), {
-		F: () => einval(`check_subscription -> subscription: ${subscription}`),
-	})
-
-const _check_password0 = (password: User.PrivateUser["password"]) =>
-	Oath.Resolve(okpwd())
-		.pipe(Oath.ops.map(check => check(password)))
-		.pipe(
-			Oath.ops.chain(error =>
-				Oath.If(!error, { F: () => einval(`check_password -> error: ${error}`) }),
-			),
-		)
-
-const _hash_password0 = (password: User.PrivateUser["password"]) => () =>
+const _hash_password0 = (password: User.PrivateUser["password"]) =>
 	Oath.FromPromise(() => Bun.password.hash(password)).pipe(
 		Oath.ops.rejected_map(e => eio(`create -> error: ${e.message}`)),
 	)

@@ -30,7 +30,7 @@ import { type TCreateAuthTokenResult, create_auth_token0 } from "../fns/create-a
 import { get_auth_cookies0, remove_auth_cookie, set_auth_cookie } from "../fns/auth-cookie.fn"
 import { token_result_to_response_body } from "../fns/token-result-to-response-body.fn"
 
-export const refresh_token0: TFn = (ctx, { token_service, user_service }) =>
+export const token_refresh0: TFn = (ctx, { token_service, user_service }) =>
 	get_auth_cookies0(ctx.cookies.get("sub"), ctx.cookies.get("jti"))
 		.pipe(Oath.ops.chain(get_user_token0({ user_service, token_service })))
 		.pipe(Oath.ops.chain(create_auth_token0(token_service)))
@@ -81,5 +81,5 @@ const get_user_token0 =
 			.pipe(
 				Oath.ops.chain(from_option0(() => eacces(`get_user_token -> sub: ${sub}, jti: ${jti}`))),
 			)
-			.and(verify_token0(token_service))
-			.and(get_user_by_id0(user_service, sub))
+			.pipe(Oath.ops.chain(verify_token0(token_service)))
+			.pipe(Oath.ops.chain(get_user_by_id0(user_service, sub)))

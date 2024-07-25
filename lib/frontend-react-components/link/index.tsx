@@ -19,28 +19,34 @@
 
 import { HTMLProps, MouseEvent } from "react"
 
-import { useCommands } from "@ordo-pink/frontend-react-hooks"
-
 /**
  * Link component is used as a replacement for <a> tag to work well with Ordo router. It supports
  * both internal and external links (just add the `external` prop).
  */
 type P = HTMLProps<HTMLAnchorElement> &
-	PropsWithChildren<{ href: string; className?: string; external?: boolean; newTab?: boolean }>
+	PropsWithChildren<{
+		href: string
+		className?: string
+		external?: boolean
+		new_tab?: boolean
+		commands: Client.Commands.Commands
+	}>
 export default function Link({
 	href,
 	children,
 	className = "",
 	external = false,
-	newTab = false,
+	new_tab = false,
+	commands,
 }: P) {
-	const commands = useCommands()
-
 	const handleClick = (event: MouseEvent) => {
 		event.preventDefault()
 
 		external
-			? commands.emit<cmd.router.open_external>("router.open_external", { url: href, newTab })
+			? commands.emit<cmd.router.open_external>("router.open_external", {
+					url: href,
+					newTab: new_tab,
+				})
 			: commands.emit<cmd.router.navigate>("router.navigate", href)
 	}
 

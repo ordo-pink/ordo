@@ -17,7 +17,7 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { type Observable, combineLatestWith, interval, map } from "rxjs"
+import { type Observable, combineLatestWith, interval, map, pairwise } from "rxjs"
 import Split from "split.js"
 
 import { Result, type TUnwrapOk } from "@ordo-pink/result"
@@ -101,7 +101,7 @@ const main = () => {
 	const auth_result = get_auth(APP_FID)()
 	const auth$ = auth_result.unwrap() as TUnwrapOk<typeof auth_result>
 
-	auth$.subscribe(auth_option =>
+	auth$.subscribe(auth_option => {
 		auth_option.cata({
 			Some: noop,
 			None: () => {
@@ -119,13 +119,28 @@ const main = () => {
 						}),
 					)
 			},
-		}),
-	)
+		})
+	})
+
+	void import("./functions/auth")
+		.then(module => module.default)
+		.then(f =>
+			f({
+				get_commands,
+				get_current_route,
+				get_hosts,
+				get_is_authenticated,
+				get_logger,
+				metadata_query,
+				user_query,
+			}),
+		)
+		.catch(logger.alert)
 
 	const { user_query } = init_user({ auth$, commands, fetch, hosts, logger })
 	const { metadata_query } = init_metadata({ logger, commands, user_query, auth$, hosts, fetch })
 
-	user_query.version$.subscribe(() => {
+	user_query.current_user_version$.subscribe(() => {
 		user_query.get_current().cata({
 			Ok: logger.info,
 			Err: noop,
@@ -154,6 +169,7 @@ const main = () => {
 
 			span.classList.add("cursor-pointer")
 			span.setAttribute("title", activity.name)
+			span.innerHTML = ""
 
 			activity.render_icon!(span)
 
@@ -161,9 +177,15 @@ const main = () => {
 		}
 	})
 
-	current_activity$.subscribe(activity_option => {
-		activity_option.cata({
+	current_activity$.pipe(pairwise()).subscribe(([prev, next]) => {
+		if (!prev.is_none)
+			prev.unwrap()!.on_unmount?.({ workspace: workspace_element, sidebar: sidebar_element })
+
+		next.cata({
 			Some: activity => {
+				workspace_element.innerHTML = ""
+				sidebar_element.innerHTML = ""
+
 				activity.render_workspace!(workspace_element)
 
 				if (activity.render_sidebar) {
@@ -190,6 +212,10 @@ const main = () => {
 
 				a.classList.add("decoration-none", "no-underline")
 				a.href = activity.routes[0]
+				a.onclick = event => {
+					event.preventDefault()
+					commands.emit<cmd.router.navigate>("router.navigate", activity.routes[0])
+				}
 				a.appendChild(span)
 				a.setAttribute("title", activity.name)
 

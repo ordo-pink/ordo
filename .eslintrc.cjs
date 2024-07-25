@@ -51,6 +51,7 @@ module.exports = {
 		"@typescript-eslint/no-explicit-any": "off",
 		"tailwindcss/no-custom-classname": "off",
 		"tailwindcss/classnames-order": "off",
+		"react/prop-types": "off",
 	},
 	settings: {
 		react: {

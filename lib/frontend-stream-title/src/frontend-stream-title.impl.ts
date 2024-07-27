@@ -20,7 +20,7 @@
 import { BehaviorSubject } from "rxjs"
 
 import { type TGetTitleFn, type TTitleState } from "@ordo-pink/core"
-import { call_once, is_non_empty_string, is_undefined } from "@ordo-pink/tau"
+import { call_once, is_non_empty_string, is_string, is_undefined } from "@ordo-pink/tau"
 import { KnownFunctions } from "@ordo-pink/frontend-known-functions"
 import { RRR } from "@ordo-pink/data"
 import { Result } from "@ordo-pink/result"
@@ -37,7 +37,7 @@ export const init_title: TInitTitleStreamFn = call_once((logger, commands) => {
 		"application.set_title",
 		state =>
 			is_non_empty_string(state.window_title) &&
-			(is_undefined(state.status_bar_title) || is_non_empty_string(state.status_bar_title)) &&
+			(is_undefined(state.status_bar_title) || is_string(state.status_bar_title)) &&
 			title$.next(state),
 	)
 

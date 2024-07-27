@@ -20,27 +20,20 @@
 import { BsChevronLeft, BsChevronRight } from "react-icons/bs"
 import { useState } from "react"
 
-import { useHosts, useIsDarkTheme } from "@ordo-pink/frontend-react-hooks"
-
 import Null from "@ordo-pink/frontend-react-components/null"
 import { Result } from "@ordo-pink/result"
+import { use$ } from "@ordo-pink/frontend-react-hooks"
 
 type TFeature = { id: string; title: string; description: string }
 
 export default function ScreenshotCarousel() {
-	const is_dark_theme = useIsDarkTheme()
-	const hosts_result = useHosts()
+	const is_dark_theme = use$.is_dark_theme()
+	const hosts = use$.hosts()
 
 	const [current_index, set_current_index] = useState(0)
 
-	return hosts_result
-		.pipe(
-			Result.ops.chain(hosts =>
-				Result.FromNullable(FEATURES[current_index]).pipe(
-					Result.ops.map(feature => ({ feature, static_host: hosts.static })),
-				),
-			),
-		)
+	return Result.FromNullable(FEATURES[current_index])
+		.pipe(Result.ops.map(feature => ({ feature, static_host: hosts.static })))
 		.cata({
 			Err: Null,
 			Ok: ({ feature, static_host }) => (

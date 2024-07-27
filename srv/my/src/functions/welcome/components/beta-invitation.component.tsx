@@ -18,29 +18,35 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import Button from "@ordo-pink/frontend-react-components/button"
-import { OrdoRoutes } from "@ordo-pink/ordo-routes"
+import { use$ } from "@ordo-pink/frontend-react-hooks"
 
 type P = { wide?: boolean }
 export default function BetaInvitation({ wide }: P) {
+	const commands = use$.commands()
+	const translate_auth = use$.scoped_translation("pink.ordo.auth")
+	const translate_welcome = use$.scoped_translation("pink.ordo.welcome")
+
+	const t_sign_up = translate_auth("sign_up_title")
+	const t_sign_in = translate_auth("sign_in_title")
+	const t_beta_started = translate_welcome("beta_started_announcement")
+
 	return (
 		<div className="w-full max-w-2xl space-y-8 rounded-lg bg-gradient-to-br from-sky-200/80 via-indigo-200/80 to-indigo-200/80 px-8 py-4 shadow-lg md:py-12 dark:from-sky-950 dark:via-indigo-950 dark:to-indigo-950">
 			<div
 				className={
-					wide
-						? "flex w-full flex-col justify-between space-y-8 md:flex-row"
-						: "flex flex-col space-y-8"
+					wide ? "flex w-full items-center justify-between md:flex-row" : "flex flex-col space-y-8"
 				}
 			>
 				<div>
 					<h3 className="text-2xl font-bold">
-						<span className="text-purple-600 dark:text-orange-400">pub</span>{" "}
-						<span className="text-purple-600 dark:text-orange-400">fn</span>{" "}
-						<span className="text-neutral-700 dark:text-white">teβt</span>
+						<span className="text-purple-600 dark:text-orange-400">const</span>{" "}
+						<span className="text-neutral-700 dark:text-white">teβt</span>{" "}
+						<span className="text-purple-600 dark:text-orange-400">=</span>{" "}
 						<span className="text-orange-600 dark:text-purple-400">()</span>{" "}
-						<span className="text-purple-600 dark:text-orange-400">&rarr;</span>
+						<span className="align-middle text-purple-600 dark:text-orange-400">⇒</span>
 					</h3>
 					<p className="center ml-4 opacity-75">
-						Бета-тестирование <strong>ORDO</strong> началось!
+						<strong>ORDO</strong> {t_beta_started}
 					</p>
 				</div>
 
@@ -56,21 +62,20 @@ export default function BetaInvitation({ wide }: P) {
 							onClick={e => {
 								e.preventDefault()
 
-								window.location.href = signUpURL
+								commands.emit<cmd.auth.open_sign_up>("auth.open_sign_up")
 							}}
 						>
-							Присоединиться
+							{t_sign_up}
 						</Button.Primary>
 
 						<Button.Secondary
-							inverted
 							onClick={e => {
 								e.preventDefault()
 
-								window.location.href = signInURL
+								commands.emit<cmd.auth.open_sign_in>("auth.open_sign_in")
 							}}
 						>
-							Войти
+							{t_sign_in}
 						</Button.Secondary>
 					</div>
 				</div>
@@ -78,8 +83,3 @@ export default function BetaInvitation({ wide }: P) {
 		</div>
 	)
 }
-
-// --- Internal ---
-
-const signInURL = OrdoRoutes.Website.SignIn.prepareRequest({ host: "" }).url
-const signUpURL = OrdoRoutes.Website.SignUp.prepareRequest({ host: "" }).url

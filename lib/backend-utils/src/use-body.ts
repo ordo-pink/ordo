@@ -32,9 +32,15 @@ export const parse_body0 = <T>(
 		.pipe(
 			Oath.ops.chain(body =>
 				Oath.Merge([
-					Oath.If(expect === "object" && is_object(body), { F: () => einval("Expected object") }),
-					Oath.If(expect === "array" && is_array(body), { F: () => einval("Expected array") }),
-					Oath.If(expect === "string" && is_string(body), { F: () => einval("Expected string") }),
+					Oath.If(expect === "object" && !is_object(body))
+						.pipe(Oath.ops.swap)
+						.pipe(Oath.ops.rejected_map(() => einval("Expected object"))),
+					Oath.If(expect === "array" && !is_array(body))
+						.pipe(Oath.ops.swap)
+						.pipe(Oath.ops.rejected_map(() => einval("Expected array"))),
+					Oath.If(expect === "string" && !is_string(body))
+						.pipe(Oath.ops.swap)
+						.pipe(Oath.ops.rejected_map(() => einval("Expected string"))),
 				]).pipe(Oath.ops.map(() => body)),
 			),
 		)

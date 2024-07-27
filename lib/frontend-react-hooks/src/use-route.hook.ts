@@ -23,20 +23,24 @@ import { keys_of } from "@ordo-pink/tau"
 import { useOrdoContext } from "./use-ordo-context.hook"
 import { useSubscription } from "./use-subscription.hook"
 
+export const useCurrentRoute = () => {
+	const { get_current_route } = useOrdoContext()
+
+	// TODO: Show permission error
+	const current_route$ = get_current_route().cata({ Ok: x => x, Err: () => null })
+
+	const route = useSubscription(current_route$)
+
+	return route
+}
+
 export const useRouteParams = <
 	$TExpectedRouteParams extends Record<string, string | undefined> = Record<
 		string,
 		string | undefined
 	>,
 >(): Partial<$TExpectedRouteParams> => {
-	const { get_current_route } = useOrdoContext()
-
-	const current_route$ = get_current_route().cata({
-		Ok: x => x,
-		Err: () => null, // TODO: Show permission error
-	})
-
-	const route = useSubscription(current_route$)
+	const route = useCurrentRoute()
 
 	return Result.FromNullable(route)
 		.pipe(Result.ops.chain(Result.FromOption))

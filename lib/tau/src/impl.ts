@@ -43,7 +43,7 @@ export const is_false = (x: unknown): x is false => x === false
 export const is_bool = (x: unknown): x is boolean => is_true(x) || is_false(x)
 export const is_array = Array.isArray
 export const is_date = (x: unknown): x is Date => !!x && x instanceof Date
-export const is_string = (x: unknown): x is string => !!x && typeof x === "string"
+export const is_string = (x: unknown): x is string => typeof x === "string"
 export const is_non_empty_string = (x: unknown): x is string => is_string(x) && x.trim() !== ""
 export const is_undefined = (x: unknown): x is undefined => x === undefined
 export const is_number = (x: unknown): x is number => typeof x === "number"

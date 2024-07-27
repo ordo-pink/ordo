@@ -17,7 +17,9 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { HTMLProps, MouseEvent } from "react"
+import { type HTMLProps, type MouseEvent } from "react"
+
+import { use$ } from "@ordo-pink/frontend-react-hooks"
 
 /**
  * Link component is used as a replacement for <a> tag to work well with Ordo router. It supports
@@ -26,32 +28,32 @@ import { HTMLProps, MouseEvent } from "react"
 type P = HTMLProps<HTMLAnchorElement> &
 	PropsWithChildren<{
 		href: string
-		className?: string
+		class_name?: string
 		external?: boolean
 		new_tab?: boolean
-		commands: Client.Commands.Commands
 	}>
 export default function Link({
 	href,
 	children,
-	className = "",
+	class_name = "",
 	external = false,
 	new_tab = false,
-	commands,
 }: P) {
-	const handleClick = (event: MouseEvent) => {
+	const commands = use$.commands()
+
+	const on_click = (event: MouseEvent) => {
 		event.preventDefault()
 
 		external
 			? commands.emit<cmd.router.open_external>("router.open_external", {
 					url: href,
-					newTab: new_tab,
+					new_tab,
 				})
 			: commands.emit<cmd.router.navigate>("router.navigate", href)
 	}
 
 	return (
-		<a href={href} className={className} onClick={handleClick}>
+		<a href={href} className={class_name} onClick={on_click}>
 			{children}
 		</a>
 	)

@@ -19,16 +19,16 @@
 
 import { useMemo } from "react"
 
-import { useOrdoContext } from "./use-ordo-context.hook"
+import { use$ } from ".."
 
 /**
  * A React hook for accessing commands.
  * // TODO: Move all hooks to frontend-react-hooks
  */
 export const useCommands = () => {
-	const { get_commands } = useOrdoContext()
+	const { get_commands } = use$.ordo_context()
 
-	const commands = useMemo(() => get_commands(), [])
+	const commands = useMemo(() => get_commands(), [get_commands])
 
 	return commands
 }

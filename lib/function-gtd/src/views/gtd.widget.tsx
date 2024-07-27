@@ -100,7 +100,7 @@ const InboxStatus = ({ inboxChildren }: InboxStatusP) =>
 					<BsInfoCircle className="text-xl text-yellow-500" />
 					<div className="text-sm">
 						Задач во{" "}
-						<Link href="/gtd" className="text-sm">
+						<Link href="/gtd" class_name="text-sm">
 							входящих
 						</Link>
 						: {inboxChildren!.length}. А почему не 0?
@@ -115,7 +115,7 @@ const InboxStatus = ({ inboxChildren }: InboxStatusP) =>
 					<BsInfoCircle className="text-xl text-orange-500" />
 					<div className="text-sm">
 						Задач во{" "}
-						<Link href="/gtd" className="text-sm">
+						<Link href="/gtd" class_name="text-sm">
 							входящих
 						</Link>
 						: {inboxChildren!.length}.
@@ -128,7 +128,7 @@ const InboxStatus = ({ inboxChildren }: InboxStatusP) =>
 				<BsXCircle className="text-xl text-rose-500" />
 				<div className="text-sm">
 					Задач во{" "}
-					<Link href="/gtd" className="text-sm">
+					<Link href="/gtd" class_name="text-sm">
 						входящих
 					</Link>
 					: {inboxChildren!.length}. F.

@@ -26,11 +26,11 @@ declare global {
 }
 
 export const useIsPWA = () => {
-	const [isPWA, setIsPWA] = useState(false)
+	const [is_pwa, set_is_pwa] = useState(false)
 
 	useEffect(() => {
-		setIsPWA(navigator.standalone || window.matchMedia("(display-mode: standalone)").matches)
+		set_is_pwa(navigator.standalone || window.matchMedia("(display-mode: standalone)").matches)
 	}, [])
 
-	return isPWA
+	return is_pwa
 }

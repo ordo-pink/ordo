@@ -75,14 +75,15 @@ export const PersistenceStrategyTokenFS: TPersistenceStrategyTokenFSStatic = {
 				.pipe(
 					Oath.ops.chain(storage =>
 						Oath.FromNullable(storage[sub])
+							.fix(() => {})
 							.pipe(Oath.ops.map(() => storage))
-							.pipe(Oath.ops.rejected_map(() => enoent(`remove_token -> sub: ${sub}`))),
+							.pipe(Oath.ops.rejected_map(() => enoent(`set_token -> sub: ${sub}`))),
 					),
 				)
 				.pipe(
 					Oath.ops.map(storage => ({
 						...storage,
-						[sub]: override<TTokenRecord>({ [jti]: token })(storage[sub]),
+						[sub]: { ...(storage[sub] ?? {}), [jti]: token },
 					})),
 				)
 				.pipe(Oath.ops.chain(write_tokens0(path))),
@@ -92,8 +93,9 @@ export const PersistenceStrategyTokenFS: TPersistenceStrategyTokenFSStatic = {
 				.pipe(
 					Oath.ops.chain(storage =>
 						Oath.FromNullable(storage[sub])
+							.fix(() => {})
 							.pipe(Oath.ops.map(() => storage))
-							.pipe(Oath.ops.rejected_map(() => enoent(`remove_tokens -> sub: ${sub}`))),
+							.pipe(Oath.ops.rejected_map(() => enoent(`set_tokens -> sub: ${sub}`))),
 					),
 				)
 				.pipe(Oath.ops.map(override({ [sub]: record })))

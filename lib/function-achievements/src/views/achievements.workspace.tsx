@@ -61,7 +61,7 @@ export default function AchievementsWorkspace() {
 								{categories.map(category => (
 									<div key={category}>
 										<Link
-											className="!text-inherit !no-underline"
+											class_name="!text-inherit !no-underline"
 											href={`/achievements/${category}`}
 										>
 											<ProgressBar

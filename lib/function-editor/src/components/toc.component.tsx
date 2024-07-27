@@ -33,7 +33,7 @@ const Node = ({ node }: { node: PlainData }) => {
 	return (
 		<div>
 			<Link
-				className="cursor-pointer text-sm text-neutral-700 no-underline visited:text-neutral-700 hover:!text-rose-500 dark:text-neutral-300 dark:visited:text-neutral-300"
+				class_name="cursor-pointer text-sm text-neutral-700 no-underline visited:text-neutral-700 hover:!text-rose-500 dark:text-neutral-300 dark:visited:text-neutral-300"
 				href={`/editor/${node.fsid}`}
 			>
 				{node.name}

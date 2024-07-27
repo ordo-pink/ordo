@@ -48,10 +48,13 @@ import { noop } from "@ordo-pink/tau"
 import { APP_FID } from "./constants"
 
 import "@ordo-pink/css/main.css"
+import { init_i18n } from "@ordo-pink/frontend-stream-i18n"
 
 const main = () => {
 	const logger = ConsoleLogger
 	const { get_logger } = init_logger(logger)
+
+	const is_dev = import.meta.env.DEV
 
 	const hosts = {
 		id: import.meta.env.VITE_ORDO_ID_HOST,
@@ -79,8 +82,12 @@ const main = () => {
 	type TCurrentActivity$ = Observable<TOption<Functions.Activity>>
 	const activities$ = get_activities(APP_FID)().unwrap() as TActivities$
 	const current_activity$ = get_current_activity(APP_FID)().unwrap() as TCurrentActivity$
-	const tray_activities$ = activities$.pipe(map(as => as.filter(a => a.is_background)))
-	const activity_bar_activities$ = activities$.pipe(map(as => as.filter(a => !a.is_background)))
+	const tray_activities$ = activities$.pipe(
+		map(as => as.filter(a => a.is_background && !!a.render_icon)),
+	)
+	const activity_bar_activities$ = activities$.pipe(
+		map(as => as.filter(a => !a.is_background && !!a.render_icon)),
+	)
 
 	const { get_fetch } = init_fetch({ logger })
 	const fetch = get_fetch(APP_FID)()
@@ -96,10 +103,47 @@ const main = () => {
 
 	const { get_title } = init_title(logger, commands)
 
-	const { get_auth, get_is_authenticated } = init_auth({ fetch, hosts: hosts, logger })
+	const { get_auth, get_is_authenticated } = init_auth({ fetch, hosts, logger })
+	const { get_translations } = init_i18n({ logger, commands })
 
 	const auth_result = get_auth(APP_FID)()
 	const auth$ = auth_result.unwrap() as TUnwrapOk<typeof auth_result>
+
+	const EN_TRANSLATIONS: Record<keyof t.common, string> = {
+		email: "Email",
+		handle: "Handle",
+		password: "Password",
+		privacy_policy: "Privacy Policy",
+		repeat_password: "Repeat Password",
+		twitter_url: "https://x.com/ordo_pink",
+		telegram_support_url: "https://t.me/ordo_pink",
+		license: "License",
+		contact_us: "Contact Us",
+	}
+
+	const RU_TRANSLATIONS: Record<keyof t.common, string> = {
+		email: "Email",
+		handle: "Имя пользователя",
+		password: "Пароль",
+		privacy_policy: "Политика конфиденциальности",
+		repeat_password: "И ещё раз пароль",
+		twitter_url: "https://x.com/ordo_pink",
+		telegram_support_url: "https://t.me/ordo_pink_ru",
+		license: "Лицензия",
+		contact_us: "Написать нам",
+	}
+
+	commands.emit<cmd.application.add_translations>("application.add_translations", {
+		lang: "en",
+		prefix: "common",
+		translations: EN_TRANSLATIONS,
+	})
+
+	commands.emit<cmd.application.add_translations>("application.add_translations", {
+		lang: "ru",
+		prefix: "common",
+		translations: RU_TRANSLATIONS,
+	})
 
 	auth$.subscribe(auth_option => {
 		auth_option.cata({
@@ -114,8 +158,11 @@ const main = () => {
 							get_hosts,
 							get_is_authenticated,
 							get_logger,
+							get_translations,
+							get_fetch,
 							metadata_query,
 							user_query,
+							is_dev,
 						}),
 					)
 			},
@@ -131,8 +178,11 @@ const main = () => {
 				get_hosts,
 				get_is_authenticated,
 				get_logger,
+				get_translations,
+				get_fetch,
 				metadata_query,
 				user_query,
+				is_dev,
 			}),
 		)
 		.catch(logger.alert)
@@ -211,10 +261,13 @@ const main = () => {
 				const current_activity = current_activity_option.unwrap()
 
 				a.classList.add("decoration-none", "no-underline")
-				a.href = activity.routes[0]
+				a.href = activity.default_route ?? activity.routes[0]
 				a.onclick = event => {
 					event.preventDefault()
-					commands.emit<cmd.router.navigate>("router.navigate", activity.routes[0])
+					commands.emit<cmd.router.navigate>(
+						"router.navigate",
+						activity.default_route ?? activity.routes[0],
+					)
 				}
 				a.appendChild(span)
 				a.setAttribute("title", activity.name)

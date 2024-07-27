@@ -192,7 +192,7 @@ export const serialise_internal = ({
 
 const create_id = (): UUIDv4 => crypto.randomUUID()
 
-const create_email_code = (): string => crypto.getRandomValues(new Uint16Array(3)).join("")
+const create_email_code = (): string => crypto.getRandomValues(new Uint8Array(16)).join("")
 
 const obfuscate_email = (email: User.User["email"]): string => {
 	const [local_part, domain_part] = email.split("@")

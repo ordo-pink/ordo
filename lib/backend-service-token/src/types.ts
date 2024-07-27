@@ -175,7 +175,6 @@ export type TTokenService = {
 	create: (params: {
 		sub: SUB
 		data: { lim: number; mfs: number; sbs: string; mxf: number }
-		prevJti?: JTI
 		aud?: AUD
 	}) => Oath<TAuthTokenPayload & { token: string }, TRrr<"EINVAL" | "ENOENT" | "EIO">>
 

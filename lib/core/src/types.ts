@@ -19,6 +19,7 @@
 
 import type { ComponentType, MouseEvent } from "react"
 import type { IconType } from "react-icons"
+import type { Observable } from "rxjs"
 
 import type {
 	FSID,
@@ -29,13 +30,13 @@ import type {
 	TUserQuery,
 } from "@ordo-pink/data"
 import type { JTI, SUB } from "@ordo-pink/wjwt"
+import type { ISO_639_1_Locale } from "@ordo-pink/locale"
 import type { TLogger } from "@ordo-pink/logger"
 import type { TOption } from "@ordo-pink/option"
+import type { TResult } from "@ordo-pink/result"
 import type { UUIDv4 } from "@ordo-pink/tau"
 
 import type { BackgroundTaskStatus } from "./constants"
-import { Observable } from "rxjs"
-import { TResult } from "@ordo-pink/result"
 
 export type TQueryPermission =
 	| "application.title"
@@ -107,11 +108,12 @@ export type TGetHostsFn = TRequireFID<() => TResult<THosts, TRrr<"EPERM">>>
 export type TGetFetchFn = TRequireFID<() => TFetch>
 export type TGetLoggerFn = TRequireFID<() => TLogger>
 export type TGetCommandsFn = TRequireFID<() => Client.Commands.Commands>
-export type TGetIsAuthenticatedFn = TRequireFID<() => TResult<boolean, TRrr<"EPERM">>>
+export type TGetIsAuthenticatedFn = TRequireFID<() => TResult<Observable<boolean>, TRrr<"EPERM">>>
 export type TSetCurrentFIDFn = TRequireFID<(new_fid: symbol) => TResult<void, TRrr<"EPERM">>>
 export type TGetActivitiesFn = TRequireFID<
 	() => TResult<Observable<TFIDAwareActivity[]>, TRrr<"EPERM">>
 >
+export type TGetTranslationsFn = () => Observable<TOption<Record<string, Record<string, string>>>>
 export type TSetCurrentActivityFn = TRequireFID<
 	(name: string) => TResult<void, TRrr<"EPERM" | "ENOENT">>
 >
@@ -120,22 +122,28 @@ export type TGetCurrentActivityFn = TRequireFID<
 >
 
 export type TCreateFunctionInternalContext = {
+	is_dev: boolean
 	get_commands: TGetCommandsFn
 	get_logger: TGetLoggerFn
 	get_current_route: TGetCurrentRouteFn
 	get_hosts: TGetHostsFn
 	get_is_authenticated: TGetIsAuthenticatedFn
+	get_fetch: TGetFetchFn
+	get_translations: TGetTranslationsFn
 	metadata_query: TMetadataQuery
 	user_query: TUserQuery
 }
 
 export type TCreateFunctionContext = {
 	fid: symbol
+	is_dev: boolean
 	get_commands: ReturnType<TGetCommandsFn>
 	get_logger: ReturnType<TGetLoggerFn>
 	get_current_route: ReturnType<TGetCurrentRouteFn>
 	get_hosts: ReturnType<TGetHostsFn>
 	get_is_authenticated: ReturnType<TGetIsAuthenticatedFn>
+	get_fetch: ReturnType<TGetFetchFn>
+	get_translations: TGetTranslationsFn
 	metadata_query: TMetadataQuery
 	user_query: TUserQuery
 	// content_query: TContentQuery
@@ -150,6 +158,27 @@ export type TCreateFunctionFn = (
 export type TOrdoContext = TCreateFunctionContext
 
 declare global {
+	module i18n {
+		type TWrapKeys<$TKeys extends string, $TPrefix extends string> = {
+			[K in $TKeys]: `${$TPrefix}.${K}`
+		}
+
+		type TCommonKeys =
+			| "email"
+			| "handle"
+			| "password"
+			| "repeat_password"
+			| "privacy_policy"
+			| "twitter_url"
+			| "telegram_support_url"
+			| "license"
+			| "contact_us"
+	}
+
+	module t {
+		type common = i18n.TWrapKeys<i18n.TCommonKeys, "common">
+	}
+
 	module Routes {
 		type TSuccessResponse<T> = { success: true; result: T }
 		type TErrorResponse = { success: false; error: string }
@@ -463,10 +492,26 @@ declare global {
 	}
 
 	module cmd {
+		module activities {
+			type register = {
+				name: "activities.register"
+				payload: { fid: symbol; activity: Functions.Activity }
+			}
+			type unregister = {
+				name: "activities.unregister"
+				payload: { fid: symbol; name: string }
+			}
+		}
+
 		module application {
 			type set_title = {
 				name: "application.set_title"
 				payload: { window_title: string; status_bar_title?: string }
+			}
+
+			type add_translations = {
+				name: "application.add_translations"
+				payload: { lang: ISO_639_1_Locale; prefix: string; translations: Record<string, string> }
 			}
 
 			module background_task {
@@ -613,6 +658,7 @@ declare global {
 		type Activity = {
 			name: string
 			routes: string[]
+			default_route?: string
 			render_workspace?: (div: HTMLDivElement) => void
 			render_sidebar?: (div: HTMLDivElement) => void
 			render_icon?: (div: HTMLSpanElement) => void

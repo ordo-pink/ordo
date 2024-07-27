@@ -24,17 +24,6 @@ import { TNodeType } from "./editor.constants"
 
 declare global {
 	module cmd {
-		module activities {
-			type register = {
-				name: "activities.register"
-				payload: { fid: symbol; activity: Functions.Activity }
-			}
-			type unregister = {
-				name: "activities.unregister"
-				payload: { fid: symbol; name: string }
-			}
-		}
-
 		module editor {
 			type goToEditor = { name: "editor.go-to-editor" }
 			type open = { name: "editor.open"; payload: FSID }

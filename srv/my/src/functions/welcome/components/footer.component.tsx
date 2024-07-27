@@ -20,9 +20,18 @@
 import { BsGithub, BsTelegram } from "react-icons/bs"
 import { RiTwitterXLine } from "react-icons/ri"
 
-import { OrdoRoutes } from "@ordo-pink/ordo-routes"
+import { use$ } from "@ordo-pink/frontend-react-hooks"
+
+import Link from "@ordo-pink/frontend-react-components/link"
 
 export default function Footer() {
+	const translate_common = use$.scoped_translation("common")
+
+	const t_twitter_url = translate_common("twitter_url")
+	const t_telegram_support_url = translate_common("telegram_support_url")
+	const t_license = translate_common("license")
+	const t_contact_us = translate_common("contact_us")
+
 	const currentYear = new Date(Date.now()).getFullYear()
 
 	return (
@@ -30,72 +39,74 @@ export default function Footer() {
 			<div className="container mx-auto flex w-full flex-col items-center gap-6 p-4 md:flex-row md:justify-between md:p-6">
 				<span className="text-sm text-neutral-200 sm:text-center dark:text-neutral-200">
 					© {currentYear}{" "}
-					<a href="/" className="!text-current no-underline">
+					<Link href="/" className="!text-current no-underline">
 						Ordo.pink
-					</a>
+					</Link>
 				</span>
 				<ul className="mt-3 flex items-center gap-6 text-2xl text-neutral-200 sm:mt-0 dark:text-neutral-200">
 					<li>
-						<a href={sourceCodeURL} target="_blank" rel="noreferrer noopener">
+						<Link
+							href="https://github.com/ordo-pink/ordo"
+							external
+							new_tab
+							rel="noreferrer noopener"
+						>
 							<BsGithub className="text-2xl text-neutral-200 transition-colors duration-300 hover:text-pink-500" />
-						</a>
+						</Link>
 					</li>
 
 					<li>
-						<a href={telegramSupportURL} target="_blank" rel="noreferrer noopener">
+						<Link href={t_telegram_support_url} external new_tab rel="noreferrer noopener">
 							<BsTelegram className="text-2xl text-neutral-200 transition-colors duration-300 hover:text-pink-500" />
-						</a>
+						</Link>
 					</li>
 
 					<li>
-						<a
-							href={twitterURL}
-							target="_blank"
+						<Link
+							href={t_twitter_url}
+							external
+							new_tab
 							rel="noreferrer noopener"
 							className="text-2xl text-neutral-200 transition-colors duration-300 hover:text-pink-500"
 						>
 							<RiTwitterXLine />
-						</a>
+						</Link>
 					</li>
 				</ul>
-				<ul className="mt-3 flex flex-wrap text-sm text-neutral-200 sm:mt-0">
+				<ul className="mt-3 flex flex-wrap gap-x-2 text-sm text-neutral-200 sm:mt-0">
 					{/* <li>
-						<a
+						<Link
 							href={privacyPolicyURL}
 							rel="noreferrer noopener"
 							className="mr-4 text-neutral-300 hover:underline md:mr-6"
 						>
-							Политика конфиденциальности
-						</a>
+							{t_privacy_policy}
+						</Link>
 					</li> */}
 					<li>
-						<a
-							href={licenseURL}
-							rel="noreferrer noopener"
+						<Link
+							href="https://github.com/ordo-pink/ordo/blob/main/license.md"
 							className="mr-4 text-neutral-300 hover:underline md:mr-6"
+							rel="noreferrer noopener"
+							new_tab
+							external
 						>
-							Лицензия
-						</a>
+							{t_license}
+						</Link>
 					</li>
 					<li>
-						<a
+						<Link
 							href="mailto:hello@ordo.pink"
+							external
+							new_tab
 							rel="noreferrer noopener"
 							className="text-neutral-300 hover:underline"
 						>
-							Написать нам
-						</a>
+							{t_contact_us}
+						</Link>
 					</li>
 				</ul>
 			</div>
 		</footer>
 	)
 }
-
-// --- Internal ---
-
-// const privacyPolicyURL = OrdoRoutes.Website.PrivacyPolicy.prepareRequest({ host: "" }).url
-const telegramSupportURL = OrdoRoutes.External.TelegramSupportCIS.prepareRequest({ host: "" }).url
-const twitterURL = OrdoRoutes.External.TwitterX.prepareRequest({ host: "" }).url
-const sourceCodeURL = OrdoRoutes.External.SourceCode.prepareRequest({ host: "" }).url
-const licenseURL = OrdoRoutes.External.License.prepareRequest({ host: "" }).url

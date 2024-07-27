@@ -34,7 +34,7 @@ import { token_result_to_response_body } from "../fns/token-result-to-response-b
 // --- Public ---
 
 export const sign_in0: TFn = (ctx, { user_service, token_service, notification_service }) =>
-	parse_body0<Routes.ID.SignIn.RequestBody>(ctx)
+	parse_body0<Routes.ID.SignIn.RequestBody>(ctx, "object")
 		.pipe(Oath.ops.chain(extract_ctx0))
 		.pipe(Oath.ops.chain(validate_ctx0(user_service)))
 		.pipe(Oath.ops.chain(create_auth_token0(token_service)))

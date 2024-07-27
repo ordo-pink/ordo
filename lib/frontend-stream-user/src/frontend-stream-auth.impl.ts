@@ -17,7 +17,7 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { BehaviorSubject, type Observable } from "rxjs"
+import { BehaviorSubject, type Observable, map } from "rxjs"
 
 import { O, type TOption } from "@ordo-pink/option"
 import { RRR, type TRrr } from "@ordo-pink/data"
@@ -34,12 +34,16 @@ type TInitAuthParams = (params: { hosts: THosts; fetch: TFetch; logger: TLogger 
 	get_is_authenticated: TGetIsAuthenticatedFn
 }
 export const init_auth: TInitAuthParams = call_once(({ hosts, fetch, logger }) => {
+	// TODO: Move to auth fn
+	const path: Routes.ID.RefreshToken.Path = "/account/refresh-token"
+	const method: Routes.ID.RefreshToken.Method = "POST"
+
 	const refresh_token = Oath.Empty()
 		.pipe(Oath.ops.tap(() => logger.debug("Refreshing auth token...")))
 		.pipe(
 			Oath.ops.chain(() =>
 				Oath.Try(
-					() => fetch(`${hosts.id}/refresh-token`, get_req_init()),
+					() => fetch(hosts.id.concat(path), { method, credentials: "include" }),
 					error => einval(`refresh_token -> error: ${String(error)}`),
 				),
 			),
@@ -85,7 +89,7 @@ export const init_auth: TInitAuthParams = call_once(({ hosts, fetch, logger }) =
 			Result.If(
 				KnownFunctions.check_permissions(fid, { queries: ["users.current_user.is_authenticated"] }),
 			)
-				.pipe(Result.ops.map(() => auth$.getValue().is_some))
+				.pipe(Result.ops.map(() => auth$.pipe(map(option => option.is_some))))
 				.pipe(Result.ops.err_map(() => eperm(`get_is_authenticated -> fid: ${String(fid)}`))),
 	}
 })
@@ -96,8 +100,6 @@ const LOCATION = "init_auth"
 
 const eperm = RRR.codes.eperm(LOCATION)
 const einval = RRR.codes.einval(LOCATION)
-
-const get_req_init = (): RequestInit => ({ method: "POST", credentials: "include" })
 
 // const sign_out =
 // 	(logger: TLogger, web_host: string, is_dev: boolean) => (res: string | Error | null) => {

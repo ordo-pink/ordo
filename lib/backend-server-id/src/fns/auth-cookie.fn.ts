@@ -6,15 +6,10 @@ import { RRR } from "@ordo-pink/data"
 import { is_uuid } from "@ordo-pink/tau"
 
 export const set_auth_cookie = (ctx: Context, sub: SUB, jti: JTI, expires: Date): void => {
-	ctx.response.set(
-		"Set-Cookie",
+	ctx.response.set("Set-Cookie", [
 		`jti=${jti}; Expires=${expires.toISOString()}; SameSite=Lax; Path=/; HttpOnly;`,
-	)
-
-	ctx.response.set(
-		"Set-Cookie",
 		`sub=${sub}; Expires=${expires.toISOString()}; SameSite=Lax; Path=/; HttpOnly;`,
-	)
+	])
 }
 
 export const remove_auth_cookie = (ctx: Context) => () => {

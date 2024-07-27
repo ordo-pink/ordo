@@ -17,8 +17,11 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { HotkeyCallback, useHotkeys } from "react-hotkeys-hook"
-import { Either } from "@ordo-pink/either"
+import { HotkeyCallback, useHotkeys } from "react-hotkeys-hook" // TODO: Make custom
+
+import { O } from "@ordo-pink/option"
+
+import { use$ } from ".."
 
 type UseAccelerator = (
 	accelerator: string | undefined,
@@ -35,7 +38,11 @@ type UseAccelerator = (
  * @todo Provide at_see link to accelerators description
  */
 export const useAccelerator: UseAccelerator = (accelerator, callback, deps) => {
-	const hotkeys = Either.fromNullable(accelerator).fold(() => [], renameToAppleOrNormalModifierKeys)
+	const is_darwin = use$.is_apple()
+	const hotkeys = O.FromNullable(accelerator).cata({
+		None: () => [],
+		Some: renameToAppleOrNormalModifierKeys(is_darwin),
+	})
 
 	useHotkeys(
 		hotkeys,
@@ -47,16 +54,13 @@ export const useAccelerator: UseAccelerator = (accelerator, callback, deps) => {
 
 // --- Internal ---
 
-const isDarwin: boolean = navigator.appVersion.indexOf("Mac") !== -1
-
-type RenameToAppleOrNormalModifierKeys = (accelerator: string) => string
-const renameToAppleOrNormalModifierKeys: RenameToAppleOrNormalModifierKeys = accelerator => {
+const renameToAppleOrNormalModifierKeys = (is_darwin: boolean) => (accelerator: string) => {
 	const keys: string[] = accelerator.split("+")
 	const newKeys: string[] = []
 
-	if (keys.includes("mod")) newKeys.push(isDarwin ? "cmd" : "ctrl")
-	if (keys.includes("meta")) newKeys.push(isDarwin ? "option" : "alt")
-	if (keys.includes("ctrl") && isDarwin) newKeys.push("ctrl")
+	if (keys.includes("mod")) newKeys.push(is_darwin ? "cmd" : "ctrl")
+	if (keys.includes("meta")) newKeys.push(is_darwin ? "option" : "alt")
+	if (keys.includes("ctrl") && is_darwin) newKeys.push("ctrl")
 	if (keys.includes("shift")) newKeys.push("shift")
 
 	newKeys.push(keys.at(-1)!)

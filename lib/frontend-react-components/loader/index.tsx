@@ -20,14 +20,14 @@
 import { useLayoutEffect, useRef } from "react"
 
 import { Switch } from "@ordo-pink/switch"
-import { useIsDarkTheme } from "@ordo-pink/frontend-react-hooks"
+import { use$ } from "@ordo-pink/frontend-react-hooks"
 
 import "./loader.css"
 
 type P = { size?: "s" | "m" | "l" }
 export default function Loader({ size }: P) {
 	const ref = useRef<HTMLDivElement>(null)
-	const is_dark_theme = useIsDarkTheme()
+	const is_dark_theme = use$.is_dark_theme()
 	const class_name = Switch.Match(size)
 		.case("s", () => "loader small")
 		.case("l", () => "loader large")

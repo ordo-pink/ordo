@@ -64,7 +64,7 @@ export default function ActionListItem({
 
 	return href ? (
 		<Link
-			className={`!text-neutral-800 no-underline dark:!text-neutral-200 ${className}`}
+			class_name={`!text-neutral-800 no-underline dark:!text-neutral-200 ${className}`}
 			href={href}
 		>
 			<div

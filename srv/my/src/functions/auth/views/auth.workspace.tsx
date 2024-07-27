@@ -1,8 +1,8 @@
 import { useEffect } from "react"
 
-import { useCommands, useRouteParams } from "@ordo-pink/frontend-react-hooks"
 import { Oath } from "@ordo-pink/oath"
 import { Switch } from "@ordo-pink/switch"
+import { use$ } from "@ordo-pink/frontend-react-hooks"
 
 import Loading from "@ordo-pink/frontend-react-components/loading-page"
 
@@ -10,16 +10,16 @@ import SignIn from "../components/sign-in.component"
 import SignUp from "../components/sign-up.component"
 
 export default function Auth() {
-	const commands = useCommands()
+	const commands = use$.commands()
 
-	const { action } = useRouteParams<{ action: TAction }>()
+	const { action } = use$.route_params<{ action: TAction }>()
 
 	useEffect(() => {
 		void Oath.FromNullable(action)
 			.pipe(
 				Oath.ops.chain(action =>
 					Oath.If(SUPPORTED_ACTIONS.includes(action), {
-						F: () => commands.emit("auth.open-sign-in"),
+						F: () => commands.emit<cmd.auth.open_sign_in>("auth.open_sign_in"),
 					}),
 				),
 			)
@@ -30,6 +30,8 @@ export default function Auth() {
 		.case("sign-in", () => SignIn)
 		.case("sign-up", () => SignUp)
 		.case("sign-out", () => Loading)
+		.case("confirm-email", () => Loading) // TODO: Confirm email
+		.case("forgot-password", () => Loading) // TODO: Forgot password
 		.default(() => Loading)
 
 	return (
@@ -41,6 +43,12 @@ export default function Auth() {
 
 // --- Internal ---
 
-const SUPPORTED_ACTIONS = ["sign-up", "sign-in", "sign-out"] as const
+const SUPPORTED_ACTIONS = [
+	"sign-up",
+	"sign-in",
+	"sign-out",
+	"confirm-email",
+	"forgot-password",
+] as const
 
 type TAction = (typeof SUPPORTED_ACTIONS)[number]

@@ -35,7 +35,7 @@ export const sign_up0: TFn = (
 	ctx,
 	{ user_service, token_service, notification_service, website_host },
 ) =>
-	parse_body0<Routes.ID.SignUp.RequestBody>(ctx)
+	parse_body0<Routes.ID.SignUp.RequestBody>(ctx, "object")
 		.pipe(Oath.ops.chain(extract_ctx0))
 		.pipe(Oath.ops.chain(create_user0(user_service)))
 		.pipe(Oath.ops.chain(create_auth_token0(token_service)))

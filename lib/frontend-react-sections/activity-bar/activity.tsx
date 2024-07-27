@@ -40,7 +40,7 @@ export default function ActivityBarActivity({ activity }: P) {
 		.default(() => "activity")
 
 	return (
-		<Link className={className} href={activityRoute}>
+		<Link class_name={className} href={activityRoute}>
 			<Icon />
 		</Link>
 	)

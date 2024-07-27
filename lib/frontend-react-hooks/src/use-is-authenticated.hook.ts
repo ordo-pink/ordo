@@ -17,20 +17,26 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { F, T } from "ramda"
+import { use$ } from ".."
 
-import { Either } from "@ordo-pink/either"
-import { KnownFunctions } from "@ordo-pink/frontend-known-functions"
-import { auth$ } from "@ordo-pink/frontend-stream-user"
-
-import { useCurrentFID } from "@ordo-pink/frontend-stream-activities"
-import { useSubscription } from "./use-subscription.hook"
+const or_else = <N, B, T>(on_err: (x: B) => N) => ({
+	Ok: (x: T) => x,
+	Err: on_err,
+})
 
 export const useIsAuthenticated = () => {
-	const fid = useCurrentFID()
-	const auth = useSubscription(auth$)
+	const { get_is_authenticated } = use$.ordo_context()
+	const logger = use$.logger()
 
-	return Either.fromBoolean(() => KnownFunctions.check_permissions(fid, { queries: [] }))
-		.chain(() => Either.fromNullable(auth))
-		.fold(F, T)
+	const is_authenticated$ = get_is_authenticated().cata(
+		or_else(() => {
+			// TODO: Only show in is_dev mode
+			logger.alert("Permission for checking if the user is authenticated is not requested.")
+			return null
+		}),
+	)
+
+	const is_authenticated = use$.strict_subscription(is_authenticated$, false)
+
+	return is_authenticated
 }

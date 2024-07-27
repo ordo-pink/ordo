@@ -73,7 +73,7 @@ export const TokenService: TTokenServiceStatic = {
 					.pipe(Oath.ops.map(jwt => O.Some(jwt as TAuthJWT)))
 					.pipe(Oath.ops.rejected_map(error => einval(`decode -> error: ${error}`))),
 
-			create: ({ sub, prevJti, aud = audience, data }) =>
+			create: ({ sub, aud = audience, data }) =>
 				Oath.Resolve({
 					jti: crypto.randomUUID() as JTI,
 					iat: Math.floor(Date.now() / 1000),
@@ -103,16 +103,7 @@ export const TokenService: TTokenServiceStatic = {
 								}),
 							}).pipe(
 								Oath.ops.chain(res =>
-									prevJti
-										? strategy
-												.remove_token(sub, prevJti)
-												.pipe(
-													Oath.ops.chain(() => strategy.set_token(sub, jti, res.tokens.refresh)),
-												)
-												.pipe(Oath.ops.map(() => res))
-										: strategy
-												.set_token(sub, jti, res.tokens.refresh)
-												.pipe(Oath.ops.map(() => res)),
+									strategy.set_token(sub, jti, res.tokens.refresh).pipe(Oath.ops.map(() => res)),
 								),
 							),
 						),

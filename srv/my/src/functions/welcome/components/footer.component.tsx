@@ -28,7 +28,7 @@ export default function Footer() {
 	const translate_common = use$.scoped_translation("common")
 
 	const t_twitter_url = translate_common("twitter_url")
-	const t_telegram_support_url = translate_common("telegram_support_url")
+	const t_messenger_support_url = translate_common("messenger_support_url")
 	const t_license = translate_common("license")
 	const t_contact_us = translate_common("contact_us")
 
@@ -56,7 +56,7 @@ export default function Footer() {
 					</li>
 
 					<li>
-						<Link href={t_telegram_support_url} external new_tab rel="noreferrer noopener">
+						<Link href={t_messenger_support_url} external new_tab rel="noreferrer noopener">
 							<BsTelegram className="text-2xl text-neutral-200 transition-colors duration-300 hover:text-pink-500" />
 						</Link>
 					</li>

@@ -21,9 +21,9 @@ import { AiOutlineLoading3Quarters, AiOutlineSave } from "react-icons/ai"
 import { BehaviorSubject } from "rxjs"
 import { useEffect } from "react"
 
-import { useCommands, useStrictSubscription } from "@ordo-pink/frontend-react-hooks"
 import { BackgroundTaskStatus } from "@ordo-pink/core"
 import { Switch } from "@ordo-pink/switch"
+import { use$ } from "@ordo-pink/frontend-react-hooks"
 
 import Null from "@ordo-pink/frontend-react-components/null"
 
@@ -40,43 +40,46 @@ import Null from "@ordo-pink/frontend-react-components/null"
  * - `application.background_task.reset_status`
  */
 export default function BackgroundTaskIndicator() {
-	const status = useStrictSubscription(backgroundTaskIndicatorStatus$, BackgroundTaskStatus.NONE)
-	const commands = useCommands()
+	const status = use$.strict_subscription(
+		background_task_indicator_status$,
+		BackgroundTaskStatus.NONE,
+	)
+	const commands = use$.commands()
 
 	useEffect(() => {
 		commands.on<cmd.application.background_task.set_status>(
 			"application.background_task.set_status",
-			handleSetStatus,
+			on_set_status,
 		)
 		commands.on<cmd.application.background_task.reset_status>(
 			"application.background_task.reset_status",
-			handleResetStatus,
+			on_reset_status,
 		)
 		commands.on<cmd.application.background_task.start_loading>(
 			"application.background_task.start_loading",
-			handleLoading,
+			on_loading,
 		)
 		commands.on<cmd.application.background_task.start_saving>(
 			"application.background_task.start_saving",
-			handleSaving,
+			on_saving,
 		)
 
 		return () => {
 			commands.off<cmd.application.background_task.set_status>(
 				"application.background_task.set_status",
-				handleSetStatus,
+				on_set_status,
 			)
 			commands.off<cmd.application.background_task.reset_status>(
 				"application.background_task.reset_status",
-				handleResetStatus,
+				on_reset_status,
 			)
 			commands.off<cmd.application.background_task.start_loading>(
 				"application.background_task.start_loading",
-				handleLoading,
+				on_loading,
 			)
 			commands.off<cmd.application.background_task.start_saving>(
 				"application.background_task.start_saving",
-				handleSaving,
+				on_saving,
 			)
 		}
 		// eslint-disable-next-line react-hooks/exhaustive-deps
@@ -91,16 +94,16 @@ export default function BackgroundTaskIndicator() {
 // --- Internal ---
 
 // Define Observable to maintain indicator state
-const backgroundTaskIndicatorStatus$ = new BehaviorSubject<BackgroundTaskStatus>(
+const background_task_indicator_status$ = new BehaviorSubject<BackgroundTaskStatus>(
 	BackgroundTaskStatus.NONE,
 )
 
 // Define command handlers
-const handleSetStatus: Client.Commands.Handler<BackgroundTaskStatus> = status =>
-	backgroundTaskIndicatorStatus$.next(status)
-const handleResetStatus = () => backgroundTaskIndicatorStatus$.next(BackgroundTaskStatus.NONE)
-const handleSaving = () => backgroundTaskIndicatorStatus$.next(BackgroundTaskStatus.SAVING)
-const handleLoading = () => backgroundTaskIndicatorStatus$.next(BackgroundTaskStatus.LOADING)
+const on_set_status: Client.Commands.Handler<BackgroundTaskStatus> = status =>
+	background_task_indicator_status$.next(status)
+const on_reset_status = () => background_task_indicator_status$.next(BackgroundTaskStatus.NONE)
+const on_saving = () => background_task_indicator_status$.next(BackgroundTaskStatus.SAVING)
+const on_loading = () => background_task_indicator_status$.next(BackgroundTaskStatus.LOADING)
 
 /**
  * Saving indicator component.

@@ -106,10 +106,16 @@ export const init_commands: TInitCommandsFn = call_once(
 						if (listeners) {
 							dequeue$.next({ name, payload, fid })
 
-							logger.debug(
-								`Command "${name}" invoked by "${func}" for ${listeners.length} ${listeners.length === 1 ? "listener" : "listeners"}. Provided payload: `,
-								payload,
-							)
+							if (payload !== undefined) {
+								logger.debug(
+									`Command "${name}" invoked by "${func}" for ${listeners.length} ${listeners.length === 1 ? "listener" : "listeners"}. Provided payload: `,
+									payload,
+								)
+							} else {
+								logger.debug(
+									`Command "${name}" invoked by "${func}" for ${listeners.length} ${listeners.length === 1 ? "listener" : "listeners"}.`,
+								)
+							}
 
 							for (const listener of listeners) {
 								await listener(payload)

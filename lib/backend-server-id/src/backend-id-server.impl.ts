@@ -90,7 +90,7 @@ export const create_id_server = async ({
 	return create_koa_server({
 		origin,
 		logger,
-		server_name: "id",
+		server_name: "ID",
 		extend_router: router =>
 			// TODO: Check if method satisfies required type
 			router

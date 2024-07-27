@@ -2,18 +2,21 @@ import { type Root, createRoot } from "react-dom/client"
 import { BsCollection } from "react-icons/bs"
 
 import { O, type TOption } from "@ordo-pink/option"
+import { Result } from "@ordo-pink/result"
+import { TwoLetterLocale } from "@ordo-pink/locale"
 import { create_function } from "@ordo-pink/core"
+import { create_ordo_context } from "@ordo-pink/frontend-react-hooks/src/use-ordo-context.hook"
+import { noop } from "@ordo-pink/tau"
 
 import LandingWorkspace from "./views/landing.workspace"
-import { create_ordo_context } from "@ordo-pink/frontend-react-hooks/src/use-ordo-context.hook"
 
 declare global {
 	module cmd {
 		module welcome {
-			type to_welcome_page = { name: "welcome.go-to-welcome" }
-			type open_telegram_support = { name: "welcome.open-telegram-support" }
-			type open_email_support = { name: "welcome.open-email-support" }
-			type open_support = { name: "welcome.open-support" }
+			type to_welcome_page = { name: "welcome.to_welcome_page" }
+			type messenger_support = { name: "welcome.messenger_support" }
+			type email_support = { name: "welcome.email_support" }
+			type open_support = { name: "welcome.open_support" }
 		}
 	}
 }
@@ -35,13 +38,74 @@ export default create_function(
 			"application.add_translations",
 			"router.navigate",
 			"router.open_external",
+			"application.background_task.start_loading",
+			"application.background_task.reset_status",
 		],
 	},
 	ctx => {
 		const Provider = create_ordo_context()
 		const commands = ctx.get_commands()
+		const translations$ = ctx.get_translations()
+		const current_language = TwoLetterLocale.ENGLISH // TODO: Move locale management to main -> user settings
+
+		translations$.subscribe(option => {
+			const on_messenger_support = (url: string) => () => {
+				commands.emit<cmd.router.open_external>("router.open_external", {
+					url,
+					new_tab: true,
+				})
+			}
+
+			const on_email_support = (url: string) => () => {
+				{
+					commands.emit<cmd.router.open_external>("router.open_external", {
+						url,
+						new_tab: true,
+					})
+				}
+			}
+
+			Result.FromOption(option)
+				.pipe(Result.ops.chain(ts => Result.FromNullable(ts[current_language])))
+				.pipe(
+					Result.ops.chain(ts =>
+						Result.Merge({
+							messenger_support: Result.FromNullable(ts["common.messenger_support_url"]),
+							email_support: Result.FromNullable(ts["common.email_support"]),
+						}),
+					),
+				)
+				.cata({
+					Err: noop,
+					Ok: ({ messenger_support, email_support }) => {
+						commands.off<cmd.welcome.messenger_support>(
+							"welcome.messenger_support",
+							on_messenger_support(messenger_support),
+						)
+
+						commands.off<cmd.welcome.email_support>(
+							"welcome.email_support",
+							on_email_support(email_support),
+						)
+
+						commands.on<cmd.welcome.messenger_support>(
+							"welcome.messenger_support",
+							on_messenger_support(messenger_support),
+						)
+
+						commands.on<cmd.welcome.email_support>(
+							"welcome.email_support",
+							on_email_support(email_support),
+						)
+					},
+				})
+		})
 
 		let workspace_root_option: TOption<Root>
+
+		commands.on<cmd.welcome.to_welcome_page>("welcome.to_welcome_page", () =>
+			commands.emit<cmd.router.navigate>("router.navigate", "/"),
+		)
 
 		commands.emit<cmd.application.add_translations>("application.add_translations", {
 			lang: "en",
@@ -78,4 +142,5 @@ const EN_TRANSLATIONS: Record<string, string> = {
 	cookies_warning: "We don't use cookies! Wait, what?",
 	title: "One space for docs, files and projects",
 	auth_title: "Welcome back!",
+	news_widget_title: "News",
 }

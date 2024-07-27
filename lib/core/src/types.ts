@@ -170,7 +170,8 @@ declare global {
 			| "repeat_password"
 			| "privacy_policy"
 			| "twitter_url"
-			| "telegram_support_url"
+			| "email_support"
+			| "messenger_support_url"
 			| "license"
 			| "contact_us"
 	}

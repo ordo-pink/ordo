@@ -29,17 +29,29 @@ import { Oath } from "@ordo-pink/oath"
 import { type TLogger } from "@ordo-pink/logger"
 import { call_once } from "@ordo-pink/tau"
 
-type TInitAuthParams = (params: { hosts: THosts; fetch: TFetch; logger: TLogger }) => {
+type TInitAuthParams = (params: {
+	hosts: THosts
+	fetch: TFetch
+	logger: TLogger
+	commands: Client.Commands.Commands
+}) => {
 	get_auth: (fid: symbol | null) => () => TResult<Observable<TOption<AuthResponse>>, TRrr<"EPERM">>
 	get_is_authenticated: TGetIsAuthenticatedFn
 }
-export const init_auth: TInitAuthParams = call_once(({ hosts, fetch, logger }) => {
+export const init_auth: TInitAuthParams = call_once(({ hosts, fetch, logger, commands }) => {
 	// TODO: Move to auth fn
 	const path: Routes.ID.RefreshToken.Path = "/account/refresh-token"
 	const method: Routes.ID.RefreshToken.Method = "POST"
 
 	const refresh_token = Oath.Empty()
-		.pipe(Oath.ops.tap(() => logger.debug("Refreshing auth token...")))
+		.pipe(
+			Oath.ops.tap(() => {
+				logger.debug("Refreshing auth token...")
+				commands.emit<cmd.application.background_task.start_loading>(
+					"application.background_task.start_loading",
+				)
+			}),
+		)
 		.pipe(
 			Oath.ops.chain(() =>
 				Oath.Try(
@@ -58,9 +70,19 @@ export const init_auth: TInitAuthParams = call_once(({ hosts, fetch, logger }) =
 		)
 		.pipe(Oath.ops.chain(res => Oath.If(res.success, { T: () => res.result, F: () => res.error })))
 		.pipe(Oath.ops.tap(() => logger.debug("Auth token refreshed.")))
-		.pipe(Oath.ops.map(auth => auth$.next(O.Some(auth))))
+		.pipe(
+			Oath.ops.map(auth => {
+				commands.emit<cmd.application.background_task.reset_status>(
+					"application.background_task.reset_status",
+				)
+				auth$.next(O.Some(auth))
+			}),
+		)
 
 	const invoker = Oath.invokers.or_else(() => {
+		commands.emit<cmd.application.background_task.reset_status>(
+			"application.background_task.reset_status",
+		)
 		auth$.next(O.None())
 		drop_interval()
 	})

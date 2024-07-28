@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react"
 
 import { EmailInput, PasswordInput } from "@ordo-pink/frontend-react-components/input"
-import { type TUnwrapOk } from "@ordo-pink/result"
 import { use$ } from "@ordo-pink/frontend-react-hooks"
 
 import Button from "@ordo-pink/frontend-react-components/button"
@@ -10,8 +9,7 @@ import Link from "@ordo-pink/frontend-react-components/link"
 
 export default function SignIn() {
 	const commands = use$.commands()
-	const hosts_result = use$.hosts()
-	const hosts = hosts_result.unwrap() as TUnwrapOk<typeof hosts_result>
+	const hosts = use$.hosts()
 	const fetch = use$.fetch()
 
 	const translate = use$.scoped_translation("pink.ordo.auth")

@@ -7,8 +7,8 @@ import { is_uuid } from "@ordo-pink/tau"
 
 export const set_auth_cookie = (ctx: Context, sub: SUB, jti: JTI, expires: Date): void => {
 	ctx.response.set("Set-Cookie", [
-		`jti=${jti}; Expires=${expires.toISOString()}; SameSite=Lax; Path=/; HttpOnly;`,
-		`sub=${sub}; Expires=${expires.toISOString()}; SameSite=Lax; Path=/; HttpOnly;`,
+		`jti=${jti}; Expires=${expires.toUTCString()}; SameSite=Lax; Path=/; HttpOnly;`,
+		`sub=${sub}; Expires=${expires.toUTCString()}; SameSite=Lax; Path=/; HttpOnly;`,
 	])
 }
 

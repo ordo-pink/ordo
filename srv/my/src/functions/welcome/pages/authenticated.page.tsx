@@ -80,20 +80,19 @@ export default function AuthenticatedPage() {
 
 				<Card title="TODO!">
 					<ul className="list-decimal">
-						<li>Move sign out to auth</li>
-						<li>Handle confirm email</li>
-						<li>User info in status bar</li>
+						<li>Bring back modal / ctx menu / command palette</li>
 						<li>Update metadata/content backend</li>
 						<li>Share public files (+ add links)</li>
-						<li>Bring back modal / ctx menu / command palette</li>
 						<li>Bring back achievements</li>
 						<li>Bring back editor</li>
 						<li>Bring back user page</li>
+						<li>Handle confirm email</li>
 						<li>Cache in indexeddb</li>
 						<li>Remove redundant stuff</li>
 					</ul>
 
 					<ul className="list-decimal">
+						<li>User info in status bar</li>
 						<li>Widgets on welcome page</li>
 						<li>Editor unauthenticated demo</li>
 						<li>User settings support (theme, language)</li>

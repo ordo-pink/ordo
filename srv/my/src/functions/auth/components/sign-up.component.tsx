@@ -242,7 +242,7 @@ export default function SignUp() {
 									method,
 								})
 									.then(res => res.json())
-									.then(() => window.location.replace(hosts.my))
+									.then(() => window.location.replace("/"))
 							}}
 						>
 							{t_title}

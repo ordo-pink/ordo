@@ -61,7 +61,7 @@ export default function SignIn() {
 								})
 									.then(res => res.json())
 									.then(res => {
-										if (res.success) commands.emit<cmd.router.navigate>("router.navigate", "/")
+										if (res.success) window.location.replace("/")
 										// TODO: Show sign in error
 									})
 							}}

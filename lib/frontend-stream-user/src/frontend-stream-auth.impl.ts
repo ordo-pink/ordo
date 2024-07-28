@@ -39,11 +39,15 @@ type TInitAuthParams = (params: {
 	get_is_authenticated: TGetIsAuthenticatedFn
 }
 export const init_auth: TInitAuthParams = call_once(({ hosts, fetch, logger, commands }) => {
+	logger.debug("Initialising auth...")
+
+	let timeout: number
+
 	// TODO: Move to auth fn
 	const path: Routes.ID.RefreshToken.Path = "/account/refresh-token"
 	const method: Routes.ID.RefreshToken.Method = "POST"
 
-	const refresh_token = Oath.Empty()
+	const refresh_token = Oath.Resolve({ path, method })
 		.pipe(
 			Oath.ops.tap(() => {
 				logger.debug("Refreshing auth token...")
@@ -53,7 +57,7 @@ export const init_auth: TInitAuthParams = call_once(({ hosts, fetch, logger, com
 			}),
 		)
 		.pipe(
-			Oath.ops.chain(() =>
+			Oath.ops.chain(({ path, method }) =>
 				Oath.Try(
 					() => fetch(hosts.id.concat(path), { method, credentials: "include" }),
 					error => einval(`refresh_token -> error: ${String(error)}`),
@@ -75,30 +79,41 @@ export const init_auth: TInitAuthParams = call_once(({ hosts, fetch, logger, com
 				commands.emit<cmd.application.background_task.reset_status>(
 					"application.background_task.reset_status",
 				)
+
 				auth$.next(O.Some(auth))
+
+				create_timeout()
 			}),
 		)
 
-	const invoker = Oath.invokers.or_else(() => {
+	const or_cancel_state_changes = Oath.invokers.or_else(() => {
 		commands.emit<cmd.application.background_task.reset_status>(
 			"application.background_task.reset_status",
 		)
 		auth$.next(O.None())
-		drop_interval()
+		drop_timeout()
 	})
 
-	logger.debug("Initialising auth...")
+	void refresh_token.invoke(or_cancel_state_changes)
 
-	void refresh_token.invoke(invoker)
+	const create_timeout = () => {
+		if (timeout) drop_timeout()
 
-	const interval = setInterval(() => void refresh_token.invoke(invoker), 50_000) // TODO: Move ms to ENV
+		logger.debug("Creating next refresh token tick...")
 
-	const drop_interval = () => {
-		clearInterval(interval)
-		window.removeEventListener("beforeunload", drop_interval)
+		window.addEventListener("beforeunload", drop_timeout)
+		timeout = setTimeout(
+			() => void refresh_token.invoke(or_cancel_state_changes),
+			50_000,
+		) as unknown as number // TODO: Move ms to ENV
 	}
 
-	window.addEventListener("beforeunload", drop_interval)
+	const drop_timeout = () => {
+		logger.debug("Clearing next refresh token tick...")
+
+		clearTimeout(timeout)
+		window.removeEventListener("beforeunload", drop_timeout)
+	}
 
 	logger.debug("Initialised auth.")
 
@@ -107,6 +122,7 @@ export const init_auth: TInitAuthParams = call_once(({ hosts, fetch, logger, com
 			Result.If(KnownFunctions.check_is_internal(fid))
 				.pipe(Result.ops.map(() => auth$.asObservable()))
 				.pipe(Result.ops.err_map(() => eperm(`get_auth -> fid: ${String(fid)}`))),
+
 		get_is_authenticated: (fid: symbol | null) => () =>
 			Result.If(
 				KnownFunctions.check_permissions(fid, { queries: ["users.current_user.is_authenticated"] }),

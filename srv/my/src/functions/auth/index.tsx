@@ -1,10 +1,11 @@
 import { type Root, createRoot } from "react-dom/client"
 
 import { O, type TOption } from "@ordo-pink/option"
+import { type TUnwrapOk } from "@ordo-pink/result"
 import { create_function } from "@ordo-pink/core"
+import { create_ordo_context } from "@ordo-pink/frontend-react-hooks"
 
 import Auth from "./views/auth.workspace"
-import { create_ordo_context } from "@ordo-pink/frontend-react-hooks/src/use-ordo-context.hook"
 
 declare global {
 	module t {
@@ -15,7 +16,7 @@ declare global {
 		module auth {
 			type open_sign_in = { name: "auth.open_sign_in" }
 			type open_sign_up = { name: "auth.open_sign_up" }
-			type open_sign_out = { name: "auth.open_sign_out" }
+			type sign_out = { name: "auth.sign_out" }
 		}
 	}
 }
@@ -81,15 +82,31 @@ export default create_function(
 	ctx => {
 		const Provider = create_ordo_context()
 		const commands = ctx.get_commands()
+		const fetch = ctx.get_fetch()
+		const hosts_result = ctx.get_hosts()
+		const hosts = hosts_result.unwrap() as TUnwrapOk<typeof hosts_result>
 
 		let workspace_root_option: TOption<Root> = O.None()
 
 		commands.on<cmd.auth.open_sign_in>("auth.open_sign_in", () =>
 			commands.emit<cmd.router.navigate>("router.navigate", "/auth/sign-in"),
 		)
+
 		commands.on<cmd.auth.open_sign_up>("auth.open_sign_up", () =>
 			commands.emit<cmd.router.navigate>("router.navigate", "/auth/sign-up"),
 		)
+
+		commands.on<cmd.auth.sign_out>("auth.sign_out", () => {
+			const path: Routes.ID.SignOut.Path = "/account/sign-out"
+			const method: Routes.ID.SignOut.Method = "POST"
+			const credentials = "include"
+			const url = hosts.id.concat(path)
+
+			void fetch(url, { method, credentials }).then(() => {
+				window.history.replaceState(null, "")
+				window.location.replace("/")
+			})
+		})
 
 		commands.emit<cmd.application.add_translations>("application.add_translations", {
 			lang: "en",

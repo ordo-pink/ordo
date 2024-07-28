@@ -39,6 +39,8 @@ import { useStrictSubscription } from "./src/use-strict-subscription.hook"
 import { useSubscription } from "./src/use-subscription.hook"
 import { useWindowSize } from "./src/use-window-size.hook"
 
+export { create_ordo_context } from "./src/use-ordo-context.hook"
+
 // export * from "./src/use-accelerator.hook"
 // export * from "./src/use-content.hook"
 // export * from "./src/use-data.hook"

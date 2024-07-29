@@ -647,7 +647,7 @@ declare global {
 			type show = {
 				name: "modal.show"
 				payload: {
-					Component: ComponentType
+					render: (div: HTMLDivElement) => void
 					options?: Client.Modal.ShowOptions
 				}
 			}
@@ -897,12 +897,12 @@ declare global {
 				 * @optional
 				 * @default () => void 0
 				 */
-				on_hide?: () => void
+				on_unmount?: () => void
 			}
 
 			export type HandleShowPayload = {
 				options?: ShowOptions
-				Component: ComponentType
+				render: (div: HTMLDivElement) => void
 			}
 		}
 

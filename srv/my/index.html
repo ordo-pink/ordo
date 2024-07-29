@@ -41,7 +41,17 @@
 			</div>
 
 			<div id="context-menu"></div>
-			<div id="modal"></div>
+
+			<div
+				id="modal-overlay"
+				class="fixed inset-0 z-[500] hidden h-screen w-screen items-center justify-center overflow-hidden bg-gradient-to-tr from-neutral-900/80 to-stone-900/80 p-4"
+			>
+				<div
+					id="modal"
+					class="relative min-h-8 w-full max-w-3xl rounded-lg bg-neutral-100 shadow-lg dark:bg-neutral-700"
+				></div>
+			</div>
+
 			<div id="notifications"></div>
 		</div>
 		<script type="module" src="/src/main.ts"></script>

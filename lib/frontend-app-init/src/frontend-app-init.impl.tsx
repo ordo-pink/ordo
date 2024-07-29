@@ -154,7 +154,7 @@ const showCustomCommandPalette: TShowCustomCommandPaletteFn = commands => comman
 		// command palette when the modal is closed with a click on the overlay or Esc key press.
 		options: {
 			show_close_button: false,
-			on_hide: () => commands.emit<cmd.command_palette.hide>("command-palette.hide"),
+			on_unmount: () => commands.emit<cmd.command_palette.hide>("command-palette.hide"),
 		},
 	})
 

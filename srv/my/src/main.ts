@@ -50,6 +50,7 @@ import { APP_FID } from "./constants"
 
 import "@ordo-pink/css/main.css"
 import { init_i18n } from "@ordo-pink/frontend-stream-i18n"
+import { init_modal } from "./sections/modal.section"
 
 const main = () => {
 	const logger = ConsoleLogger
@@ -68,6 +69,8 @@ const main = () => {
 
 	const { get_commands } = init_commands({ logger })
 	const commands = get_commands(APP_FID)()
+
+	init_modal({ commands, logger })
 
 	const { set_current_fid } = init_fid()
 	set_current_fid(APP_FID)(APP_FID)

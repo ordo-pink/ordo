@@ -61,7 +61,7 @@ export default function AuthenticatedPage() {
 				"application.background_task.reset_status",
 			)
 
-			ordo_news0.cancel()
+			return ordo_news0.cancel()
 		}
 	}, [fetch, hosts, commands, current_language, logger, is_dev])
 
@@ -99,6 +99,19 @@ export default function AuthenticatedPage() {
 						<li>Media files support</li>
 						<li>User avatar</li>
 					</ul>
+
+					<button
+						onClick={() =>
+							commands.emit<cmd.modal.show>("modal.show", {
+								render: div => {
+									div.innerHTML = "HELLO"
+								},
+								options: { show_close_button: true, on_unmount: () => console.log("123") },
+							})
+						}
+					>
+						Click me
+					</button>
 				</Card>
 
 				{/* {activities

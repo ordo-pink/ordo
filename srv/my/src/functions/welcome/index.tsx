@@ -40,6 +40,8 @@ export default create_function(
 			"router.open_external",
 			"application.background_task.start_loading",
 			"application.background_task.reset_status",
+			"modal.show",
+			"modal.hide",
 		],
 	},
 	ctx => {

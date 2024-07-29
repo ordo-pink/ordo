@@ -34,6 +34,8 @@ export const init_modal = ({ commands, logger }: P) => {
 	const modal_overlay_element = document.querySelector("#modal-overlay") as HTMLDivElement
 	const modal_element = document.querySelector("#modal") as HTMLDivElement
 
+	let on_esc_key_press: (event: KeyboardEvent) => void
+
 	const unmount = (on_unmount = noop) => {
 		on_unmount()
 
@@ -41,6 +43,8 @@ export const init_modal = ({ commands, logger }: P) => {
 		modal_element.onclick = noop
 		modal_overlay_element.classList.replace("flex", "hidden")
 		modal_overlay_element.onclick = noop
+
+		document.removeEventListener("keydown", on_esc_key_press)
 	}
 
 	modal$.pipe(pairwise()).subscribe(([prev_state_option, state_option]) => {
@@ -55,6 +59,13 @@ export const init_modal = ({ commands, logger }: P) => {
 			)
 			.default(() => {
 				const state = state_option.unwrap()!
+
+				on_esc_key_press = event =>
+					void Switch.Match(event.key)
+						.case("Escape", () => unmount(state.on_unmount))
+						.default(noop)
+
+				document.addEventListener("keydown", on_esc_key_press)
 
 				modal_overlay_element.onclick = () => commands.emit<cmd.modal.hide>("modal.hide")
 				modal_element.onclick = event => event.stopPropagation()

@@ -32,6 +32,7 @@ import { noop } from "@ordo-pink/tau"
 import { init_activities } from "./components/activities"
 import { init_activity_bar } from "./sections/activity-bar.section"
 import { init_background_task_display } from "./sections/background-task-display.section"
+import { init_command_palette } from "./sections/command-palette.section"
 import { init_commands } from "./components/commands"
 import { init_fetch } from "./components/fetch"
 import { init_fid } from "./components/fid"
@@ -140,8 +141,23 @@ export const create_client = ({ logger, is_dev, hosts }: P) => {
 		})
 	})
 
+	const context = {
+		fid: APP_FID,
+		is_dev,
+		get_commands: get_commands(APP_FID),
+		get_logger: get_logger(APP_FID),
+		get_current_route: get_current_route(APP_FID),
+		get_hosts: get_hosts(APP_FID),
+		get_is_authenticated: get_is_authenticated(APP_FID),
+		get_fetch: get_fetch(APP_FID),
+		get_translations,
+		metadata_query,
+		user_query,
+	}
+
 	register_common_translations(logger, commands)
 	init_background_task_display(logger, commands)
+	init_command_palette(logger, commands, context)
 	init_timer_display(logger)
 	init_title_display(logger, commands)
 	init_activity_bar(logger, commands, activities$, current_activity$)

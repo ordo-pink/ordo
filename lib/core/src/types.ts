@@ -612,10 +612,10 @@ declare global {
 		}
 
 		module command_palette {
-			type add = { name: "command-palette.add"; payload: Client.CommandPalette.Item }
-			type remove = { name: "command-palette.remove"; payload: string }
+			type add = { name: "command_palette.add"; payload: Client.CommandPalette.Item }
+			type remove = { name: "command_palette.remove"; payload: string }
 			type show = {
-				name: "command-palette.show"
+				name: "command_palette.show"
 				payload: {
 					items: Client.CommandPalette.Item[]
 					on_new_item?: (new_item: string) => unknown
@@ -623,7 +623,7 @@ declare global {
 					pinned_items?: Client.CommandPalette.Item[]
 				}
 			}
-			type hide = { name: "command-palette.hide"; payload: void }
+			type hide = { name: "command_palette.hide"; payload: void }
 		}
 
 		module sidebar {

@@ -21,40 +21,33 @@ import { BsPlus, BsSearch } from "react-icons/bs"
 import { ChangeEvent, KeyboardEvent, useEffect, useState } from "react"
 import Fuse from "fuse.js"
 
-import { useAccelerator, useCommands } from "@ordo-pink/frontend-react-hooks"
 import { Either } from "@ordo-pink/either"
 import { Switch } from "@ordo-pink/switch"
 import { noop } from "@ordo-pink/tau"
+import { use$ } from "@ordo-pink/frontend-react-hooks"
 
 import Accelerator from "@ordo-pink/frontend-react-components/accelerator"
 import ActionListItem from "@ordo-pink/frontend-react-components/action-list-item"
 import RenderFromNullable from "@ordo-pink/frontend-react-components/render-from-nullable"
 
-type Props = {
+type P = {
 	items: Client.CommandPalette.Item[]
-	onNewItem?: (newItem: string) => any
+	on_new_item?: (newItem: string) => any
 	multiple?: boolean
-	pinnedItems?: Client.CommandPalette.Item[]
+	pinned_items?: Client.CommandPalette.Item[]
 }
 
-const fuse = new Fuse([] as Client.CommandPalette.Item[], {
-	keys: ["readableName", "id"],
-	threshold: 0.1,
-})
-
-export default function CommandPaletteModal({ items, onNewItem, multiple, pinnedItems }: Props) {
-	const commands = useCommands()
-
-	useAccelerator("Esc", () => commands.emit<cmd.command_palette.hide>("command-palette.hide"))
+export default function CommandPaletteModal({ items, on_new_item, multiple, pinned_items }: P) {
+	const commands = use$.commands()
 
 	const [currentIndex, setCurrentIndex] = useState(0)
 	const [inputValue, setInputValue] = useState("")
 	const [pointerLocation, setPointerLocation] = useState<"selected" | "suggested">(
-		pinnedItems && pinnedItems.length > 0 ? "selected" : "suggested",
+		pinned_items && pinned_items.length > 0 ? "selected" : "suggested",
 	)
 	const [allItems, setAllItems] = useState<Client.CommandPalette.Item[]>(items)
 	const [selectedItems, setSelectedItems] = useState<Client.CommandPalette.Item[]>(
-		pinnedItems ?? [],
+		pinned_items ?? [],
 	)
 	const [suggestedItems, setSuggestedItems] = useState<Client.CommandPalette.Item[]>([])
 
@@ -83,9 +76,9 @@ export default function CommandPaletteModal({ items, onNewItem, multiple, pinned
 			setCurrentIndex(fusedItems.length > 0 ? fusedItems.length - 1 : 0)
 		}
 
-		if (!!onNewItem && inputValue.length > 0 && suggestedItems.length === 0)
+		if (!!on_new_item && inputValue.length > 0 && suggestedItems.length === 0)
 			setPointerLocation("suggested")
-	}, [inputValue, allItems, currentIndex, onNewItem, pointerLocation, suggestedItems.length])
+	}, [inputValue, allItems, currentIndex, on_new_item, pointerLocation, suggestedItems.length])
 
 	const handleInputChange = (event: ChangeEvent<HTMLInputElement>) => {
 		setInputValue(event.target.value)
@@ -98,14 +91,14 @@ export default function CommandPaletteModal({ items, onNewItem, multiple, pinned
 			location === "selected" ? selectedItems[index] : suggestedItems[index],
 		).fold(
 			() => {
-				if (onNewItem) onNewItem(inputValue)
+				if (on_new_item) on_new_item(inputValue)
 				setInputValue("")
 
 				if (!multiple) handleEscape()
 			},
 			(selectedItem: Client.CommandPalette.Item) => {
-				if (onNewItem && inputValue.length > 0 && suggestedItems.length === 0) {
-					onNewItem(inputValue)
+				if (on_new_item && inputValue.length > 0 && suggestedItems.length === 0) {
+					on_new_item(inputValue)
 					setInputValue("")
 					return
 				}
@@ -137,7 +130,7 @@ export default function CommandPaletteModal({ items, onNewItem, multiple, pinned
 
 		Switch.of(true)
 			.case(
-				() => !!onNewItem && inputValue.length > 0 && suggestedItems.length === 0,
+				() => !!on_new_item && inputValue.length > 0 && suggestedItems.length === 0,
 				() => setPointerLocation("suggested"),
 			)
 			.case(
@@ -223,7 +216,7 @@ export default function CommandPaletteModal({ items, onNewItem, multiple, pinned
 		setCurrentIndex(0)
 		setPointerLocation(selectedItems.length ? "selected" : "suggested")
 
-		commands.emit<cmd.command_palette.hide>("command-palette.hide")
+		commands.emit<cmd.command_palette.hide>("command_palette.hide")
 	}
 
 	const handleKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
@@ -283,13 +276,13 @@ export default function CommandPaletteModal({ items, onNewItem, multiple, pinned
 					))}
 				</div>
 
-				{onNewItem && inputValue.length > 0 && suggestedItems.length === 0 ? (
+				{on_new_item && inputValue.length > 0 && suggestedItems.length === 0 ? (
 					<ActionListItem
 						Icon={BsPlus}
 						text={`Добавить "${inputValue}"...`}
 						current={true}
 						onClick={() => {
-							onNewItem(inputValue)
+							on_new_item(inputValue)
 							setInputValue("")
 							if (!multiple) handleEscape()
 						}}
@@ -307,7 +300,7 @@ export default function CommandPaletteModal({ items, onNewItem, multiple, pinned
 }
 
 const Item = ({ commandName, readableName, Icon, accelerator, isCurrent, onSelect }: any) => {
-	useAccelerator(accelerator, onSelect)
+	use$.accelerator(accelerator, onSelect)
 
 	return (
 		<ActionListItem
@@ -324,3 +317,8 @@ const Item = ({ commandName, readableName, Icon, accelerator, isCurrent, onSelec
 		</ActionListItem>
 	)
 }
+
+const fuse = new Fuse([] as Client.CommandPalette.Item[], {
+	keys: ["readableName", "id"],
+	threshold: 0.1,
+})

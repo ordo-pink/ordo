@@ -166,9 +166,9 @@ const createCustomCommandPaletteComponent: TCreateCustomCommandPaletteComponentF
 			return (
 				<CommandPaletteModal
 					items={commandPaletteState.items}
-					onNewItem={commandPaletteState.onNewItem}
+					on_new_item={commandPaletteState.onNewItem}
 					multiple={commandPaletteState.multiple}
-					pinnedItems={commandPaletteState.pinnedItems}
+					pinned_items={commandPaletteState.pinnedItems}
 				/>
 			)
 		}

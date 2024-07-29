@@ -23,6 +23,7 @@ import {
 	useTranslation,
 } from "./src/use-translations.hook"
 import { useCurrentRoute, useRouteParams } from "./src/use-route.hook"
+import { useAccelerator } from "./src/use-accelerator.hook"
 import { useCommands } from "./src/use-commands.hook"
 import { useDebouncedValue } from "./src/use-debounce.hook"
 import { useFetch } from "./src/use-fetch.hook"
@@ -54,6 +55,7 @@ export { create_ordo_context } from "./src/use-ordo-context.hook"
 // export * from "./src/use-workspace-width.hook"
 
 export const use$ = {
+	accelerator: useAccelerator,
 	commands: useCommands,
 	debounce: useDebouncedValue,
 	is_apple: useIsApple,

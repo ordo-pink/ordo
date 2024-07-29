@@ -174,6 +174,10 @@ declare global {
 			| "messenger_support_url"
 			| "license"
 			| "contact_us"
+			| "command_palette_search_placeholder"
+			| "command_palette_hide"
+			| "command_palette_press_to_exit"
+			| "sidebar_toggle"
 	}
 
 	module t {
@@ -1023,7 +1027,7 @@ declare global {
 				id: string
 
 				/**
-				 * Readable name of the command palette item. Put a translated value here.
+				 * Readable name of the command palette item. Put a translation key here, if you use i18n.
 				 */
 				readable_name: string
 

@@ -18,7 +18,7 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { BsPlus, BsSearch } from "react-icons/bs"
-import { ChangeEvent, KeyboardEvent, useEffect, useState } from "react"
+import { ChangeEvent, KeyboardEvent, useCallback, useEffect, useState } from "react"
 import Fuse from "fuse.js"
 
 import { Either } from "@ordo-pink/either"
@@ -39,27 +39,38 @@ type P = {
 export default function CommandPaletteModal({ items, on_new_item, multiple, pinned_items }: P) {
 	const commands = use$.commands()
 	const translate = use$.scoped_translation("common")
+	const global_translate = use$.translation()
+
+	const to_translated_item = useCallback(
+		(item: Client.CommandPalette.Item) => ({
+			...item,
+			readable_name: global_translate(item.readable_name),
+		}),
+		[global_translate],
+	)
 
 	const [current_index, set_current_index] = useState(0)
 	const [input_value, set_input_value] = useState("")
 	const [pointer_location, set_pointer_location] = useState<"selected" | "suggested">(
 		pinned_items && pinned_items.length > 0 ? "selected" : "suggested",
 	)
-	const [all_items, set_all_items] = useState<Client.CommandPalette.Item[]>(items)
+	const [all_items, set_all_items] = useState<Client.CommandPalette.Item[]>(
+		items.map(to_translated_item),
+	)
 	const [selected_items, set_selected_items] = useState<Client.CommandPalette.Item[]>(
 		pinned_items ?? [],
 	)
 	const [suggested_items, set_suggested_items] = useState<Client.CommandPalette.Item[]>([])
 
 	useEffect(() => {
-		fuse.setCollection(all_items)
-	}, [all_items])
+		fuse.setCollection(all_items.map(to_translated_item))
+	}, [all_items, to_translated_item])
 
 	useEffect(() => {
 		if (!all_items) return
 
 		if (input_value === "") {
-			set_suggested_items(all_items)
+			set_suggested_items(all_items.map(to_translated_item))
 
 			if (all_items.length - 1 < current_index && pointer_location === "suggested") {
 				set_current_index(all_items.length > 0 ? all_items.length - 1 : 0)
@@ -68,17 +79,25 @@ export default function CommandPaletteModal({ items, on_new_item, multiple, pinn
 			return
 		}
 
-		const fusedItems = fuse.search(input_value)
+		const fused_items = fuse.search(input_value)
 
-		set_suggested_items(fusedItems.map(({ item }) => item))
+		set_suggested_items(fused_items.map(({ item }) => item))
 
-		if (fusedItems.length - 1 < current_index && pointer_location === "suggested") {
-			set_current_index(fusedItems.length > 0 ? fusedItems.length - 1 : 0)
+		if (fused_items.length - 1 < current_index && pointer_location === "suggested") {
+			set_current_index(fused_items.length > 0 ? fused_items.length - 1 : 0)
 		}
 
 		if (!!on_new_item && input_value.length > 0 && suggested_items.length === 0)
 			set_pointer_location("suggested")
-	}, [input_value, all_items, current_index, on_new_item, pointer_location, suggested_items.length])
+	}, [
+		input_value,
+		all_items,
+		current_index,
+		on_new_item,
+		pointer_location,
+		suggested_items.length,
+		to_translated_item,
+	])
 
 	const on_input_change = (event: ChangeEvent<HTMLInputElement>) =>
 		set_input_value(event.target.value)
@@ -116,7 +135,7 @@ export default function CommandPaletteModal({ items, on_new_item, multiple, pinn
 					selected_items_copy.splice(index, 1)
 
 					set_selected_items(selected_items_copy)
-					set_all_items([selected_item, ...suggested_items])
+					set_all_items([selected_item, ...suggested_items].map(to_translated_item))
 				}
 
 				if (location === "suggested") {
@@ -127,7 +146,7 @@ export default function CommandPaletteModal({ items, on_new_item, multiple, pinn
 					)
 
 					set_all_items(all_items_copy)
-					set_selected_items([...selected_items, selected_item])
+					set_selected_items([...selected_items, selected_item].map(to_translated_item))
 				}
 			},
 		)
@@ -237,7 +256,8 @@ export default function CommandPaletteModal({ items, on_new_item, multiple, pinn
 			.case("ArrowDown", () => on_arrow_down(event))
 			.default(noop)
 
-	const t_search_placeholder = translate("search_placeholder")
+	const t_search_placeholder = translate("command_palette_search_placeholder")
+	const t_command_palette_press_to_exit = translate("command_palette_press_to_exit")
 
 	return (
 		<div className="max-w-screen max-h-screen w-full">
@@ -301,7 +321,7 @@ export default function CommandPaletteModal({ items, on_new_item, multiple, pinn
 
 			{multiple ? (
 				<div className="text-center text-sm text-neutral-500">
-					Нажмите <Accelerator inline accelerator="Esc" /> для завершения
+					<Accelerator inline accelerator="Esc" /> {t_command_palette_press_to_exit}
 				</div>
 			) : null}
 		</div>
@@ -330,6 +350,6 @@ const Item = ({ commandName, readableName, Icon, accelerator, isCurrent, onSelec
 // --- Internal ---
 
 const fuse = new Fuse([] as Client.CommandPalette.Item[], {
-	keys: ["readableName", "id"],
+	keys: ["readable_name"],
 	threshold: 0.1,
 })

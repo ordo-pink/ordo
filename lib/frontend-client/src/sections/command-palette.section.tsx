@@ -19,6 +19,7 @@
 
 import { BehaviorSubject, Subject, map, merge, scan, shareReplay } from "rxjs"
 import { Root, createRoot } from "react-dom/client"
+import { BsCommand } from "react-icons/bs"
 
 import { type TLogger } from "@ordo-pink/logger"
 import { call_once } from "@ordo-pink/tau"
@@ -36,10 +37,13 @@ export const init_command_palette = call_once(
 		commands.on<cmd.command_palette.add>("command_palette.add", on_add_global_item)
 		commands.on<cmd.command_palette.remove>("command_palette.remove", on_remove_global_item)
 
+		// TODO: Register all keybindings globally
 		commands.emit<cmd.command_palette.add>("command_palette.add", {
-			id: "hello",
-			on_select: () => console.log("TRIGGERED"),
-			readable_name: "HELLO",
+			id: "command_palette.hide",
+			on_select: () => commands.emit<cmd.command_palette.hide>("command_palette.hide"),
+			readable_name: "common.command_palette_hide",
+			Icon: BsCommand,
+			accelerator: "mod+shift+p",
 		})
 
 		document.addEventListener("keydown", event => {
@@ -48,8 +52,10 @@ export const init_command_palette = call_once(
 				event.stopPropagation()
 
 				global_command_palette$.subscribe(global_command_palette => {
-					console.log(global_command_palette)
-					commands.emit<cmd.command_palette.show>("command_palette.show", global_command_palette)
+					if (custom_command_palette$.getValue().items.length > 0)
+						commands.emit<cmd.command_palette.hide>("command_palette.hide")
+					else
+						commands.emit<cmd.command_palette.show>("command_palette.show", global_command_palette)
 				})
 			}
 		})

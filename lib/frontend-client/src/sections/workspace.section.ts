@@ -18,6 +18,7 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { BehaviorSubject, Observable, noop, pairwise } from "rxjs"
+import { BsToggle2Off } from "react-icons/bs"
 import Split from "split.js"
 
 import { type TEnabledSidebar, type TSidebarState } from "@ordo-pink/core"
@@ -46,15 +47,17 @@ export const init_workspace = (
 	commands.on<cmd.sidebar.toggle>("sidebar.toggle", handle_sidebar_toggle)
 
 	// TODO:
-	// commands.emit<cmd.command_palette.add>("command-palette.add", {
-	// 	id: "sidebar.toggle",
-	// 	readable_name: "Показать/скрыть боковую панель",
-	// 	on_select: () => {
-	// 		commands.emit<cmd.command_palette.hide>("command-palette.hide")
-	// 		commands.emit<cmd.sidebar.toggle>("sidebar.toggle")
-	// 	},
-	// 	accelerator: "mod+b",
-	// })
+	commands.emit<cmd.command_palette.add>("command_palette.add", {
+		id: "sidebar.toggle",
+		readable_name: "common.sidebar_toggle",
+		Icon: BsToggle2Off,
+		on_select: () => {
+			commands.emit<cmd.command_palette.hide>("command_palette.hide")
+			commands.emit<cmd.sidebar.toggle>("sidebar.toggle")
+		},
+		accelerator: "mod+b",
+	})
+
 	// commands.emit<cmd.ctx_menu.add>("context-menu.add", {
 	// 	cmd: "sidebar.show",
 	// 	readable_name: "Показать боковую панель",

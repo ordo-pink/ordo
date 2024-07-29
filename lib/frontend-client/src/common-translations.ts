@@ -32,6 +32,10 @@ const EN_TRANSLATIONS: Record<keyof t.common, string> = {
 	email_support: "support@ordo.pink",
 	license: "License",
 	contact_us: "Contact Us",
+	command_palette_search_placeholder: "Search...",
+	command_palette_hide: "Hide Command Palette",
+	command_palette_press_to_exit: "to exit",
+	sidebar_toggle: "Toggle Sidebar",
 }
 
 const RU_TRANSLATIONS: Record<keyof t.common, string> = {
@@ -45,4 +49,8 @@ const RU_TRANSLATIONS: Record<keyof t.common, string> = {
 	email_support: "support@ordo.pink",
 	license: "Лицензия",
 	contact_us: "Написать нам",
+	command_palette_search_placeholder: "Поиск...",
+	command_palette_hide: "Скрыть панель команд",
+	command_palette_press_to_exit: "для завершения",
+	sidebar_toggle: "Показать/скрыть боковую панель",
 }

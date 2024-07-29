@@ -646,10 +646,7 @@ declare global {
 		module modal {
 			type show = {
 				name: "modal.show"
-				payload: {
-					render: (div: HTMLDivElement) => void
-					options?: Client.Modal.ShowOptions
-				}
+				payload: Client.Modal.ModalPayload
 			}
 			type hide = { name: "modal.hide" }
 		}
@@ -879,29 +876,9 @@ declare global {
 		}
 
 		module Modal {
-			/**
-			 * Options for showing the modal.
-			 */
-			export type ShowOptions = {
-				/**
-				 * Show close button.
-				 *
-				 * @optional
-				 * @default true
-				 */
+			export type ModalPayload = {
 				show_close_button?: boolean
-
-				/**
-				 * Function to run before the modal is hidden.
-				 *
-				 * @optional
-				 * @default () => void 0
-				 */
 				on_unmount?: () => void
-			}
-
-			export type HandleShowPayload = {
-				options?: ShowOptions
 				render: (div: HTMLDivElement) => void
 			}
 		}

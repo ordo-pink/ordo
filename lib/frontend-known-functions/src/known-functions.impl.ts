@@ -69,7 +69,8 @@ type TKnownFunction = {
 	permissions: TPermissions
 }
 
-// TODO: Return Optionals
+// TODO: Return Options
+// TODO: call_once
 export const KnownFunctions = {
 	validate: (fid: symbol | null) => find_known_function_by_fid(fid).fold(F, T),
 	exchange: (fid: symbol | null) => find_known_function_by_fid(fid).fold(N, pickKnownFunctionName),

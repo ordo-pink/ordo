@@ -64,7 +64,7 @@ export default function CommandPaletteModal({ items, on_new_item, multiple, pinn
 
 	useEffect(() => {
 		fuse.setCollection(all_items.map(to_translated_item))
-	}, [all_items, to_translated_item])
+	}, [all_items])
 
 	useEffect(() => {
 		if (!all_items) return
@@ -89,15 +89,7 @@ export default function CommandPaletteModal({ items, on_new_item, multiple, pinn
 
 		if (!!on_new_item && input_value.length > 0 && suggested_items.length === 0)
 			set_pointer_location("suggested")
-	}, [
-		input_value,
-		all_items,
-		current_index,
-		on_new_item,
-		pointer_location,
-		suggested_items.length,
-		to_translated_item,
-	])
+	}, [input_value, all_items, current_index, on_new_item, pointer_location, suggested_items.length])
 
 	const on_input_change = (event: ChangeEvent<HTMLInputElement>) =>
 		set_input_value(event.target.value)

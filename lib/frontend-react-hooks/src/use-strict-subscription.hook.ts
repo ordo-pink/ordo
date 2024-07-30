@@ -22,17 +22,17 @@ import { Observable } from "rxjs"
 
 export const useStrictSubscription = <T>(
 	observable: Observable<T | null> | null,
-	initialState: T,
+	initial_state: T,
 ): T => {
-	const [state, setState] = useState<T>(initialState)
+	const [state, set_state] = useState<T>(initial_state)
 
 	useEffect(() => {
 		if (!observable) return
 
-		const subscription = observable.subscribe(value => setState(value ?? initialState))
+		const subscription = observable.subscribe(value => set_state(value ?? initial_state))
 
 		return () => subscription.unsubscribe()
-	}, [observable, initialState])
+	}, [observable, initial_state])
 
 	return state
 }

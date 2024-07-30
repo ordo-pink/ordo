@@ -4,10 +4,11 @@ import { TwoLetterLocale } from "@ordo-pink/locale"
 import { use$ } from ".."
 
 export const useTranslation = () => {
+	const { get_translations } = use$.ordo_context()
 	const current_language = useCurrentLanguage()
 
-	const { get_translations } = use$.ordo_context()
 	const translations$ = get_translations()
+
 	const translations_option = use$.strict_subscription(translations$, O.None())
 
 	return (key: string) => {

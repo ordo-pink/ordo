@@ -29,8 +29,8 @@ import type {
 	TRrr,
 	TUserQuery,
 } from "@ordo-pink/data"
+import type { ISO_639_1_Locale, TwoLetterLocale } from "@ordo-pink/locale"
 import type { JTI, SUB } from "@ordo-pink/wjwt"
-import type { ISO_639_1_Locale } from "@ordo-pink/locale"
 import type { TLogger } from "@ordo-pink/logger"
 import type { TOption } from "@ordo-pink/option"
 import type { TResult } from "@ordo-pink/result"
@@ -113,7 +113,9 @@ export type TSetCurrentFIDFn = TRequireFID<(new_fid: symbol) => TResult<void, TR
 export type TGetActivitiesFn = TRequireFID<
 	() => TResult<Observable<TFIDAwareActivity[]>, TRrr<"EPERM">>
 >
-export type TGetTranslationsFn = () => Observable<TOption<Record<string, Record<string, string>>>>
+export type TTranslations = Record<TwoLetterLocale, Record<string, string>>
+
+export type TGetTranslationsFn = () => Observable<TOption<TTranslations>>
 export type TSetCurrentActivityFn = TRequireFID<
 	(name: string) => TResult<void, TRrr<"EPERM" | "ENOENT">>
 >

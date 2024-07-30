@@ -180,6 +180,8 @@ declare global {
 			| "command_palette_hide"
 			| "command_palette_press_to_exit"
 			| "sidebar_toggle"
+			| "sidebar_hide"
+			| "sidebar_show"
 	}
 
 	module t {

@@ -11,6 +11,10 @@ export const init_activity_bar = (
 ) => {
 	logger.debug("🟡 Initialising activity bar...")
 
+	const activity_bar_element = document.querySelector("#activity-bar") as HTMLDivElement
+	activity_bar_element.oncontextmenu = event =>
+		commands.emit<cmd.ctx_menu.show>("context-menu.show", { event: event as any })
+
 	const activity_bar_activities$ = activities$.pipe(
 		map(as => as.filter(a => !a.is_background && !!a.render_icon)),
 	)
@@ -18,7 +22,6 @@ export const init_activity_bar = (
 	activity_bar_activities$
 		.pipe(combineLatestWith(current_activity$))
 		.subscribe(([activities, current_activity_option]) => {
-			const activity_bar_element = document.querySelector("#activity-bar") as HTMLDivElement
 			activity_bar_element.innerHTML = ""
 
 			for (const activity of activities) {

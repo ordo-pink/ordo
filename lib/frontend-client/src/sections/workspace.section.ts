@@ -18,7 +18,7 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { BehaviorSubject, Observable, noop, pairwise } from "rxjs"
-import { BsToggle2Off } from "react-icons/bs"
+import { BsToggle2Off, BsToggle2On } from "react-icons/bs"
 import Split from "split.js"
 
 import { type TEnabledSidebar, type TSidebarState } from "@ordo-pink/core"
@@ -59,38 +59,39 @@ export const init_workspace = (
 
 	commands.emit<cmd.ctx_menu.add>("context-menu.add", {
 		cmd: "sidebar.show",
-		readable_name: "Показать боковую панель",
-		Icon: BsToggle2Off,
-		should_show: ({ event }) => {
-			return (
-				event.currentTarget &&
-				(event.currentTarget.classList.contains("activity-bar") ||
-					Boolean(event.currentTarget.closest(".activity-bar"))) &&
-				!sidebar$.value.disabled &&
-				sidebar$.value.sizes[0] === 0
-			)
-		},
+		readable_name: "common.sidebar_show",
+		Icon: BsToggle2On,
+		should_show: ({ event }) =>
+			Boolean(event.currentTarget) &&
+			(event.currentTarget.classList.contains("activity-bar") ||
+				Boolean(event.currentTarget.closest(".activity-bar"))) &&
+			!sidebar$.value.disabled &&
+			sidebar$.value.sizes[1] === 0,
 		type: "update",
 		accelerator: "mod+b",
 	})
 
 	commands.emit<cmd.ctx_menu.add>("context-menu.add", {
 		cmd: "sidebar.hide",
-		readable_name: "Скрыть боковую панель",
+		readable_name: "common.sidebar_hide",
 		Icon: BsToggle2Off,
-		should_show: ({ event }) =>
-			(event.currentTarget.classList.contains("sidebar") ||
-				event.currentTarget.classList.contains("activity-bar") ||
-				Boolean(event.currentTarget.closest(".sidebar")) ||
-				Boolean(event.currentTarget.closest(".activity-bar"))) &&
-			!sidebar$.value.disabled &&
-			sidebar$.value.sizes[0] !== 0,
+		should_show: ({ event }) => {
+			return (
+				(event.currentTarget.classList.contains("sidebar") ||
+					event.currentTarget.classList.contains("activity-bar") ||
+					Boolean(event.currentTarget.closest(".sidebar")) ||
+					Boolean(event.currentTarget.closest(".activity-bar"))) &&
+				!sidebar$.value.disabled &&
+				sidebar$.value.sizes[1] !== 0
+			)
+		},
 		type: "update",
 		accelerator: "mod+b",
 	})
 
 	let split: any
 
+	const main_element = document.querySelector("main") as HTMLDivElement
 	const sidebar_element = document.querySelector("#sidebar") as HTMLDivElement
 	const workspace_element = document.querySelector("#workspace") as HTMLDivElement
 
@@ -123,6 +124,10 @@ export const init_workspace = (
 				sidebar_element.innerHTML = ""
 			})
 			.case(!sidebar.disabled && !split, () => {
+				if (!document.getElementById("#sidebar")) {
+					main_element.appendChild(sidebar_element)
+				}
+
 				split = Split(["#workspace", "#sidebar"], {
 					minSize: 0,
 					maxSize: window.innerWidth,

@@ -36,6 +36,8 @@ const EN_TRANSLATIONS: Record<keyof t.common, string> = {
 	command_palette_hide: "Hide Command Palette",
 	command_palette_press_to_exit: "to exit",
 	sidebar_toggle: "Toggle Sidebar",
+	sidebar_hide: "Hide Sidebar",
+	sidebar_show: "Show Sidebar",
 }
 
 const RU_TRANSLATIONS: Record<keyof t.common, string> = {
@@ -53,4 +55,6 @@ const RU_TRANSLATIONS: Record<keyof t.common, string> = {
 	command_palette_hide: "Скрыть панель команд",
 	command_palette_press_to_exit: "для завершения",
 	sidebar_toggle: "Показать/скрыть боковую панель",
+	sidebar_hide: "Скрыть боковую панель",
+	sidebar_show: "Показать боковую панель",
 }

@@ -18,7 +18,7 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { BehaviorSubject, Subject, combineLatestWith, map, merge, scan, shareReplay } from "rxjs"
-import { type MouseEvent, useCallback, useEffect, useRef, useState } from "react"
+import { useCallback, useEffect, useRef, useState } from "react"
 import { createRoot } from "react-dom/client"
 
 import { LIB_DIRECTORY_FSID, type TOrdoContext } from "@ordo-pink/core"
@@ -41,9 +41,12 @@ export const init_context_menu = (
 ) => {
 	logger.debug("🟡 Initialising context menu...")
 
-	commands.on<cmd.ctx_menu.show>("context-menu.show", params => custom_context_menu$.next(params))
+	custom_context_menu$.subscribe()
+	global_context_menu$.subscribe()
+
+	commands.on<cmd.ctx_menu.show>("context-menu.show", menu => custom_context_menu$.next(menu))
 	commands.on<cmd.ctx_menu.add>("context-menu.add", item => add$.next(item))
-	commands.on<cmd.ctx_menu.remove>("context-menu.remove", commandName => remove$.next(commandName))
+	commands.on<cmd.ctx_menu.remove>("context-menu.remove", name => remove$.next(name))
 	commands.on<cmd.ctx_menu.hide>("context-menu.hide", () => custom_context_menu$.next(null))
 
 	const context_menu_element = document.querySelector("#context-menu") as HTMLDivElement
@@ -78,7 +81,7 @@ function ContextMenu() {
 	const [updaters, set_updaters] = useState<Client.CtxMenu.Item[]>([])
 	const [removers, set_removers] = useState<Client.CtxMenu.Item[]>([])
 
-	const menu = use$.subscription(contextMenu$)
+	const menu = use$.subscription(context_menu$)
 
 	use$.accelerator("Esc", () => menu && commands.emit<cmd.ctx_menu.hide>("context-menu.hide"), [
 		menu,
@@ -197,25 +200,25 @@ function ContextMenu() {
 					{Either.fromBoolean(() => creators.length > 0)
 						.chain(() => Either.fromBoolean(() => !menu.hide_create_items))
 						.fold(Null, () => (
-							<List items={creators} event={menu.event} payload={menu.payload} />
+							<List items={creators} event={menu.event as any} payload={menu.payload} />
 						))}
 
 					{Either.fromBoolean(() => readers.length > 0)
 						.chain(() => Either.fromBoolean(() => !menu.hide_read_items))
 						.fold(Null, () => (
-							<List items={readers} event={menu.event} payload={menu.payload} />
+							<List items={readers} event={menu.event as any} payload={menu.payload} />
 						))}
 
 					{Either.fromBoolean(() => updaters.length > 0)
 						.chain(() => Either.fromBoolean(() => !menu.hide_update_items))
 						.fold(Null, () => (
-							<List items={updaters} event={menu.event} payload={menu.payload} />
+							<List items={updaters} event={menu.event as any} payload={menu.payload} />
 						))}
 
 					{Either.fromBoolean(() => removers.length > 0)
 						.chain(() => Either.fromBoolean(() => !menu.hide_delete_items))
 						.fold(Null, () => (
-							<List items={removers} event={menu.event} payload={menu.payload} />
+							<List items={removers} event={menu.event as any} payload={menu.payload} />
 						))}
 				</div>
 			))}
@@ -239,7 +242,7 @@ const global_context_menu$ = merge(add$.pipe(map(addP)), remove$.pipe(map(remove
 	shareReplay(1),
 )
 
-const contextMenu$ = custom_context_menu$.pipe(
+const context_menu$ = custom_context_menu$.pipe(
 	combineLatestWith(global_context_menu$),
 	map(([state, items]) =>
 		Either.fromNullable(state)
@@ -274,14 +277,15 @@ function List({ items, event, payload }: TListP) {
 	)
 }
 
-type TItemP = { event: MouseEvent; item: Client.CtxMenu.Item; payload?: any }
+type TItemP = { event: any; item: Client.CtxMenu.Item; payload?: any }
 function Item({ item, event, payload: p }: TItemP) {
 	const commands = use$.commands()
 
 	const payload = item.payload_creator ? item.payload_creator({ payload: p, event }) : p
-	const is_disabled = item.should_be_disabled && item.should_be_disabled({ event, payload })
+	const is_disabled = !!item.should_be_disabled && item.should_be_disabled({ event, payload })
+
 	const on_accelerator_used = () =>
-		Result.If(!is_disabled).cata({
+		Result.If(is_disabled).cata({
 			Ok: () => commands.emit<cmd.ctx_menu.hide>("context-menu.hide"),
 			Err: () => commands.emit(item.cmd, payload),
 		})

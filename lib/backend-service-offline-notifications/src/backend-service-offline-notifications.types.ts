@@ -33,7 +33,7 @@ export type TEmailContact = {
 }
 
 /**
- * @todo Implement support for hooks.
+ * TODO: Implement support for hooks.
  *
  * @deprecated Not implemented!
  */

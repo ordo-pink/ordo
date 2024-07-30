@@ -34,8 +34,8 @@ type UseAccelerator = (
  *
  * @type {UseAccelerator}
  *
- * @todo Add support for multiple accelerators
- * @todo Provide at_see link to accelerators description
+ * TODO: Add support for multiple accelerators
+ * TODO: Provide at_see link to accelerators description
  */
 export const useAccelerator: UseAccelerator = (accelerator, callback, deps) => {
 	const is_darwin = use$.is_apple()

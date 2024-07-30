@@ -55,7 +55,7 @@ export const Validations: TUserValidations = {
 			.pipe(Result.ops.err_map(() => einval(`is_id: ${String(id)}`))),
 
 	/**
-	 * @todo Limit special chars (/[`!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~]/ - after "@")
+	 * TODO: Limit special chars (/[`!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~]/ - after "@")
 	 */
 	is_handle: handle =>
 		Result.If(is_non_empty_string(handle) && handle.startsWith("@") && handle.length > 1)

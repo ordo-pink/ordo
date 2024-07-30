@@ -66,7 +66,7 @@ export type DataPersistenceStrategy = {
 	/**
 	 * Create given `PlainData` owned by the user with given `UserID`.
 	 *
-	 * @todo Add `UserID` to specify data owner.
+	 * TODO: Add `UserID` to specify data owner.
 	 *
 	 * @rejects with `DataAlreadyExists` if data with given `FSID` or `name`+`parent` pair already exists.
 	 * @rejects with `DataUnexpectedError` if an error occurs while creating a file.
@@ -109,7 +109,7 @@ export type DataPersistenceStrategy = {
 	/**
 	 * Update data with given `fsid` that is owned by the user with given `UserID`.
 	 *
-	 * @todo Add `UserID` to specify data owner.
+	 * TODO: Add `UserID` to specify data owner.
 	 *
 	 * @rejects with `DataAlreadyExists` if data with given `name` already exists under given `parent`.
 	 * @rejects with `DataNotFound` if the owner does not exist or they do not own a file with given `fsid`.
@@ -122,7 +122,7 @@ export type DataPersistenceStrategy = {
 	/**
 	 * Create given `PlainData` owned by the user with given `UserID`.
 	 *
-	 * @todo Add `UserID` to specify data owner.
+	 * TODO: Add `UserID` to specify data owner.
 	 *
 	 * @rejects with `DataNotFound` if the owner does not exist or they do not own a file with given `fsid`.
 	 * @rejects with `DataUnexpectedError` if an error occurs while deleting the file.

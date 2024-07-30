@@ -18,12 +18,6 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { DataQuery, DataRepository } from "@ordo-pink/data"
-import { getData, getData$ } from "@ordo-pink/frontend-stream-data"
-import { get_user, _get_is_authenticated } from "@ordo-pink/frontend-stream-user"
-import { KnownFunctions } from "@ordo-pink/frontend-known-functions"
-import { _get_commands } from "@ordo-pink/frontend-stream-commands"
-import { get_hosts_unsafe } from "@ordo-pink/frontend-react-hooks"
-import { get_logger } from "@ordo-pink/frontend-logger"
 
 import { type RegisterFunction } from "./create-function.types"
 import { registerActivity } from "@ordo-pink/frontend-stream-activities"

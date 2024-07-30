@@ -19,7 +19,7 @@
 
 import { use$ } from ".."
 
-// TODO:
+// TODO: Move to Result
 const or_else = <N, B, T>(on_err: (x: B) => N) => ({
 	Ok: (x: T) => x,
 	Err: on_err,

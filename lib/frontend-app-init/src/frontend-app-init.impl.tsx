@@ -21,18 +21,7 @@ import { type ComponentType, useEffect } from "react"
 import { type HotkeyCallback, useHotkeys } from "react-hotkeys-hook"
 import { BsCommand } from "react-icons/bs"
 
-import {
-	type TCommandPaletteState,
-	currentCommandPalette$,
-	globalCommandPalette$,
-} from "@ordo-pink/frontend-stream-command-palette"
 import { type TEither, chainE, fromBooleanE, fromNullableE, mapE } from "@ordo-pink/either"
-import {
-	useCommands,
-	useIsApple,
-	useIsAuthenticated,
-	useSubscription,
-} from "@ordo-pink/frontend-react-hooks"
 import { noop } from "@ordo-pink/tau"
 
 import CommandPaletteModal from "@ordo-pink/frontend-react-sections/command-palette"
@@ -106,7 +95,7 @@ const createHotkeyString: TCreateHotkeyStringFn = (event, isApple) => {
 }
 
 type TFindCommandByHotkeyIfCommandPaletteExistsFn = (
-	cp: TCommandPaletteState | null,
+	cp: TCommandPaletteState,
 ) => (hotkey: string) => TEither<Client.CommandPalette.Item, null>
 const findCommandByHotkeyIfCommandPaletteExistsE: TFindCommandByHotkeyIfCommandPaletteExistsFn =
 	commandPalette => hotkey =>
@@ -125,7 +114,7 @@ const executeCommand: TExecuteCommandFn = event => command => {
 }
 
 type THandleHotkeyFn = (params: {
-	commandPalette: TCommandPaletteState | null
+	commandPalette: TCommandPaletteState
 	isApple: boolean
 }) => HotkeyCallback
 const handleHotkey: THandleHotkeyFn =

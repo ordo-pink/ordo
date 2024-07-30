@@ -24,7 +24,6 @@ import type { TOption } from "@ordo-pink/option"
 import type { TResult } from "@ordo-pink/result"
 
 import type { TRrr } from "./metadata.errors"
-import { TFetch } from "@ordo-pink/core"
 
 export type TCurrentUserRepository = {
 	get: () => TResult<User.User, TRrr<"EAGAIN">>

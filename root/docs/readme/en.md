@@ -4,21 +4,10 @@ An open source
 
 [![Lint](https://github.com/ordo-pink/ordo/actions/workflows/lint.yml/badge.svg)](https://github.com/ordo-pink/ordo/actions/workflows/lint.yml)
 
-[![gitmoji](https://img.shields.io/badge/gitmoji-%20😜%20😍-FFDD67.svg)](https://gitmoji.carloscuesta.me/)
 [![license](https://img.shields.io/github/license/ordo-pink/ordo)](https://github.com/ordo-pink/ordo)
 
 [🇺🇸](/root/docs/readme/en.md) |
 [Add translation](/root/docs/guides/adding-readme-translations/en.md)
-
-## About
-
-Ordo.pink
-
-## Features
-
-#### Horizontal references
-
-- Ordo.pink
 
 ## License
 

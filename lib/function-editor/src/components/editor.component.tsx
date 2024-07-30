@@ -62,13 +62,6 @@ import { withHistory } from "slate-history"
 
 import { FSID, PlainData } from "@ordo-pink/data"
 import { chainE, fixE, fromBooleanE, fromNullableE, mapE, tryE } from "@ordo-pink/either"
-import {
-	useCommands,
-	useData,
-	useDataLabels,
-	useSelectDataList,
-	useStrictSubscription,
-} from "@ordo-pink/frontend-react-hooks"
 import { Switch } from "@ordo-pink/switch"
 import { fileAssociations$ } from "@ordo-pink/frontend-stream-file-associations"
 
@@ -313,6 +306,7 @@ export default function OrdoEditor({
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [links.length, linkSearch])
 
+	// eslint-disable-next-line react-hooks/exhaustive-deps
 	const renderElement = useCallback((props: any) => <Element {...props} fsid={data.fsid} />, [])
 	const renderLeaf = useCallback((props: any) => <Leaf {...props} />, [])
 

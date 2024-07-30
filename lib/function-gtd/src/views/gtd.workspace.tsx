@@ -17,7 +17,6 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { useCurrentRoute, useRouteParams } from "@ordo-pink/frontend-react-hooks"
 import { Either } from "@ordo-pink/either"
 import { FSID } from "@ordo-pink/data"
 import { Switch } from "@ordo-pink/switch"
@@ -27,10 +26,11 @@ import Loading from "@ordo-pink/frontend-react-components/loading-page"
 import GTDInbox from "../components/inbox.component"
 import GTDLabel from "../components/label.component"
 import GTDSubtasks from "../components/subtasks.component"
+import { use$ } from "@ordo-pink/frontend-react-hooks"
 
 export default function GTD() {
-	const route = useCurrentRoute()
-	const { fsid, label } = useRouteParams<{ fsid: FSID; label: string }>()
+	const route = use$.current_route()
+	const { fsid, label } = use$.route_params<{ fsid: FSID; label: string }>()
 
 	return Either.fromNullable(route).fold(Loading, () =>
 		Switch.OfTrue()

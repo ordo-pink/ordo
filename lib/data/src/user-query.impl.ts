@@ -19,8 +19,8 @@
 
 import { combineLatestWith, map } from "rxjs"
 
-import { Oath, map_oath, tap_oath } from "@ordo-pink/oath"
 import { O } from "@ordo-pink/option"
+import { Oath } from "@ordo-pink/oath"
 
 import { TUserQueryStatic } from "./user-query.types"
 

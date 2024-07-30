@@ -17,13 +17,10 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { KnownFunctions, TQueryPermission } from "@ordo-pink/frontend-known-functions"
 import { N } from "@ordo-pink/tau"
 import { Switch } from "@ordo-pink/switch"
 import { achievements$ } from "@ordo-pink/frontend-stream-achievements"
 import { fromBooleanE } from "@ordo-pink/either"
-import { useCurrentFID } from "@ordo-pink/frontend-stream-activities"
-import { user$ } from "@ordo-pink/frontend-stream-user"
 
 import { useStrictSubscription } from "./use-strict-subscription.hook"
 import { useSubscription } from "./use-subscription.hook"
@@ -79,8 +76,8 @@ export const useUserName = () => {
 		lastName: user.last_name ?? "",
 		fullName: Switch.of(user)
 			.case(hasFirstNameAndLastName, user => `${user.first_name} ${user.last_name}`)
-			.case(hasFirstName, user => user.first_name!)
-			.case(hasLastName, user => user.last_name!)
+			.case(hasFirstName, user => user.first_name)
+			.case(hasLastName, user => user.last_name)
 			.default(() => ""),
 	}))
 }

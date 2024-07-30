@@ -19,23 +19,29 @@
 
 import { useEffect, useState } from "react"
 
-import { ACTIVITY_BAR_WIDTH, SIDEBAR_WORKSPACE_GUTTER_WIDTH } from "@ordo-pink/core"
-import { EnabledSidebar, sidebar$ } from "@ordo-pink/frontend-stream-sidebar"
-import { Either } from "@ordo-pink/either"
+import {
+	ACTIVITY_BAR_WIDTH,
+	SIDEBAR_WORKSPACE_GUTTER_WIDTH,
+	TEnabledSidebar,
+} from "@ordo-pink/core"
+import { Result } from "@ordo-pink/result"
 
-import { useStrictSubscription } from "./use-strict-subscription.hook"
+import { use$ } from ".."
 
 export const useWorkspaceWidth = () => {
-	const sidebar = useStrictSubscription(sidebar$, { disabled: true })
+	const { get_sidebar } = use$.ordo_context()
+	const sidebar$ = get_sidebar().cata({ Ok: x => x, Err: () => null })
 
-	const [documentWidth, setDocumentWidth] = useState(0)
-	const [sizes, setSizes] = useState<{ sidebarWidth: number; workspaceWidth: number }>({
-		sidebarWidth: 0,
-		workspaceWidth: 0,
+	const sidebar = use$.strict_subscription(sidebar$, { disabled: true })
+
+	const [document_width, set_document_width] = useState(0)
+	const [sizes, set_sizes] = useState<{ sidebar: number; workspace: number }>({
+		sidebar: 0,
+		workspace: 0,
 	})
 
 	useEffect(() => {
-		const setTotalWidth = () => setDocumentWidth(window.innerWidth)
+		const setTotalWidth = () => set_document_width(window.innerWidth)
 
 		document.addEventListener("resize", setTotalWidth)
 
@@ -45,26 +51,23 @@ export const useWorkspaceWidth = () => {
 	}, [])
 
 	useEffect(() => {
-		Either.fromBoolean(
-			() => !sidebar.disabled,
-			() => sidebar as EnabledSidebar,
-		)
-			.map(sidebar => sidebar.sizes)
-			.fold(
-				() => {
-					setSizes({ sidebarWidth: 0, workspaceWidth: documentWidth - ACTIVITY_BAR_WIDTH })
+		Result.If(!sidebar.disabled, { T: () => sidebar as TEnabledSidebar })
+			.pipe(Result.ops.map(sidebar => sidebar.sizes))
+			.cata({
+				Err: () => {
+					set_sizes({ sidebar: 0, workspace: document_width - ACTIVITY_BAR_WIDTH })
 				},
-				sizes =>
-					setSizes({
-						sidebarWidth:
-							((documentWidth - ACTIVITY_BAR_WIDTH - SIDEBAR_WORKSPACE_GUTTER_WIDTH) * sizes[0]) /
+				Ok: sizes =>
+					set_sizes({
+						sidebar:
+							((document_width - ACTIVITY_BAR_WIDTH - SIDEBAR_WORKSPACE_GUTTER_WIDTH) * sizes[0]) /
 							100,
-						workspaceWidth:
-							((documentWidth - ACTIVITY_BAR_WIDTH - SIDEBAR_WORKSPACE_GUTTER_WIDTH) * sizes[1]) /
+						workspace:
+							((document_width - ACTIVITY_BAR_WIDTH - SIDEBAR_WORKSPACE_GUTTER_WIDTH) * sizes[1]) /
 							100,
 					}),
-			)
-	}, [documentWidth, sidebar])
+			})
+	}, [document_width, sidebar])
 
 	return sizes
 }

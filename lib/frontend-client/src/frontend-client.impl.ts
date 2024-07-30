@@ -60,6 +60,8 @@ export const create_client = ({ logger, is_dev, hosts }: P) => {
 		is_dev,
 	})
 	const { get_translations } = init_i18n({ logger, commands })
+	register_common_translations(logger, commands)
+
 	const { activities$, current_activity$, set_current_activity } = init_activities({
 		logger,
 		known_functions,
@@ -83,6 +85,14 @@ export const create_client = ({ logger, is_dev, hosts }: P) => {
 
 	const { metadata_query } = init_metadata({ logger, commands, user_query, auth$, hosts, fetch })
 
+	const { get_sidebar } = init_workspace(logger, known_functions, commands, current_activity$)
+	init_modal({ commands, logger })
+	init_background_task_display(logger, commands)
+	init_timer_display(logger)
+	init_title_display(logger, commands)
+	init_activity_bar(logger, commands, activities$, current_activity$)
+	init_tray(logger, activities$)
+
 	const context = {
 		fid: APP_FID,
 		is_dev,
@@ -93,21 +103,13 @@ export const create_client = ({ logger, is_dev, hosts }: P) => {
 		get_is_authenticated: get_is_authenticated(APP_FID),
 		get_fetch: get_fetch(APP_FID),
 		get_translations,
+		get_sidebar: get_sidebar(APP_FID),
 		metadata_query,
 		user_query,
 	}
 
-	register_common_translations(logger, commands)
-
-	init_modal({ commands, logger })
-	init_background_task_display(logger, commands)
 	init_command_palette(logger, commands, context)
 	init_context_menu(logger, commands, context)
-	init_timer_display(logger)
-	init_title_display(logger, commands)
-	init_activity_bar(logger, commands, activities$, current_activity$)
-	init_tray(logger, activities$)
-	init_workspace(logger, commands, current_activity$)
 
 	void import("@ordo-pink/function-welcome")
 		.then(module => module.default)
@@ -119,6 +121,7 @@ export const create_client = ({ logger, is_dev, hosts }: P) => {
 				get_is_authenticated,
 				get_logger,
 				get_translations,
+				get_sidebar,
 				get_fetch,
 				metadata_query,
 				user_query,
@@ -136,6 +139,7 @@ export const create_client = ({ logger, is_dev, hosts }: P) => {
 				get_hosts,
 				get_is_authenticated,
 				get_logger,
+				get_sidebar,
 				get_translations,
 				get_fetch,
 				metadata_query,

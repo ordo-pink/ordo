@@ -125,6 +125,7 @@ export type TCreateFunctionInternalContext = {
 	get_commands: TGetCommandsFn
 	get_logger: TGetLoggerFn
 	get_current_route: TGetCurrentRouteFn
+	get_sidebar: TGetSidebarFn
 	get_hosts: TGetHostsFn
 	get_is_authenticated: TGetIsAuthenticatedFn
 	get_fetch: TGetFetchFn
@@ -138,6 +139,7 @@ export type TCreateFunctionContext = {
 	fid: symbol
 	is_dev: boolean
 	get_commands: ReturnType<TGetCommandsFn>
+	get_sidebar: ReturnType<TGetSidebarFn>
 	get_logger: ReturnType<TGetLoggerFn>
 	get_current_route: ReturnType<TGetCurrentRouteFn>
 	get_hosts: ReturnType<TGetHostsFn>

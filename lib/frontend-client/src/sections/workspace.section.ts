@@ -21,7 +21,9 @@ import { BehaviorSubject, Observable, noop, pairwise } from "rxjs"
 import { BsToggle2Off, BsToggle2On } from "react-icons/bs"
 import Split from "split.js"
 
-import { type TEnabledSidebar, type TSidebarState } from "@ordo-pink/core"
+import { type TEnabledSidebar, type TKnownFunctions, type TSidebarState } from "@ordo-pink/core"
+import { RRR } from "@ordo-pink/data"
+import { Result } from "@ordo-pink/result"
 import { Switch } from "@ordo-pink/switch"
 import { type TLogger } from "@ordo-pink/logger"
 import { type TOption } from "@ordo-pink/option"
@@ -34,6 +36,7 @@ export const DEFAULT_WORKSPACE_SPLIT_SIZE_NO_SIDEBAR = [100, 0] as TWorkspaceSpl
 
 export const init_workspace = (
 	logger: TLogger,
+	known_functions: TKnownFunctions,
 	commands: Client.Commands.Commands,
 	current_activity$: Observable<TOption<Functions.Activity>>,
 ) => {
@@ -167,9 +170,18 @@ export const init_workspace = (
 	})
 
 	logger.debug("🟢 Initialised sidebar.")
+
+	return {
+		get_sidebar: (fid: symbol | null) => () =>
+			Result.If(known_functions.has_permissions(fid, { queries: ["application.sidebar"] }))
+				.pipe(Result.ops.map(() => sidebar$.asObservable()))
+				.pipe(Result.ops.err_map(() => eperm(`get_sidebar -> fid: ${String(fid)}`))),
+	}
 }
 
 // --- Internal ---
+
+const eperm = RRR.codes.eperm("init_sidebar")
 
 const sidebar$ = new BehaviorSubject<TSidebarState>({ disabled: true })
 

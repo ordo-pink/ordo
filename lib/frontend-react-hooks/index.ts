@@ -39,17 +39,14 @@ import { useOrdoContext } from "./src/use-ordo-context.hook"
 import { useStrictSubscription } from "./src/use-strict-subscription.hook"
 import { useSubscription } from "./src/use-subscription.hook"
 import { useWindowSize } from "./src/use-window-size.hook"
+import { useWorkspaceWidth } from "./src/use-workspace-width.hook"
 
 export { create_ordo_context } from "./src/use-ordo-context.hook"
 
-// export * from "./src/use-accelerator.hook"
 // export * from "./src/use-content.hook"
 // export * from "./src/use-data.hook"
 // export * from "./src/use-persisted-state.hook"
-// export * from "./src/use-is-authenticated.hook"
-// export * from "./src/use-logger.hook"
 // export * from "./src/use-public-user-info.hook"
-// export * from "./src/use-readable-size.hook"
 // export * from "./src/use-strict-subscription.hook"
 // export * from "./src/use-user.hook"
 // export * from "./src/use-workspace-width.hook"
@@ -76,4 +73,5 @@ export const use$ = {
 	current_language: useCurrentLanguage,
 	window_size: useWindowSize,
 	fetch: useFetch,
+	workspace_width: useWorkspaceWidth,
 }

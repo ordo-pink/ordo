@@ -25,9 +25,8 @@ import { KnownFunctions, ORDO_PINK_APP_FUNCTION } from "@ordo-pink/frontend-know
 import { type TFIDAwareActivity, type TGetHostsFn, type THosts } from "@ordo-pink/core"
 import { RRR } from "@ordo-pink/data"
 import { Result } from "@ordo-pink/result"
-import { TLogger } from "@ordo-pink/logger"
+import { type TLogger } from "@ordo-pink/logger"
 import { type TOption } from "@ordo-pink/option"
-import { noop } from "@ordo-pink/tau"
 
 import { init_activities } from "./components/activities"
 import { init_activity_bar } from "./sections/activity-bar.section"
@@ -64,8 +63,6 @@ export const create_client = ({ logger, is_dev, hosts }: P) => {
 	const { get_hosts } = init_hosts(hosts)
 	const { get_commands } = init_commands({ logger })
 	const commands = get_commands(APP_FID)()
-
-	init_modal({ commands, logger })
 
 	const { set_current_fid } = init_fid(logger)
 	set_current_fid(APP_FID)(APP_FID)
@@ -116,6 +113,8 @@ export const create_client = ({ logger, is_dev, hosts }: P) => {
 	}
 
 	register_common_translations(logger, commands)
+
+	init_modal({ commands, logger })
 	init_background_task_display(logger, commands)
 	init_command_palette(logger, commands, context)
 	init_context_menu(logger, commands, context)
@@ -125,7 +124,7 @@ export const create_client = ({ logger, is_dev, hosts }: P) => {
 	init_tray(logger, activities$)
 	init_workspace(logger, commands, current_activity$)
 
-	void import("./functions/welcome")
+	void import("@ordo-pink/function-welcome")
 		.then(module => module.default)
 		.then(f =>
 			f({
@@ -142,7 +141,7 @@ export const create_client = ({ logger, is_dev, hosts }: P) => {
 			}),
 		)
 
-	void import("./functions/auth")
+	void import("@ordo-pink/function-auth")
 		.then(module => module.default)
 		.then(f =>
 			f({
@@ -158,13 +157,6 @@ export const create_client = ({ logger, is_dev, hosts }: P) => {
 				is_dev,
 			}),
 		)
-
-	metadata_query.version$.subscribe(() => {
-		metadata_query.get().cata({
-			Ok: console.log,
-			Err: noop,
-		})
-	})
 }
 
 // --- Internal ---
@@ -178,92 +170,3 @@ export const init_hosts: TInitHostsFn = hosts => ({
 })
 
 const eperm = RRR.codes.eperm("Init hosts")
-
-// --- Deprecated ---
-
-// import { createRoot } from "react-dom/client"
-
-// import { type THosts, type TOrdoContext } from "@ordo-pink/core"
-// import { __init_activities$, current_fid$ } from "@ordo-pink/frontend-stream-activities"
-// import { ConsoleLogger } from "@ordo-pink/logger"
-// import { __init_achievements$ } from "@ordo-pink/frontend-stream-achievements"
-// import { __init_auth$ } from "@ordo-pink/frontend-stream-user"
-// import { __init_command_palette$ } from "@ordo-pink/frontend-stream-command-palette"
-// import { __init_commands } from "@ordo-pink/frontend-stream-commands"
-// import { __init_fetch } from "@ordo-pink/frontend-fetch"
-// import { __init_file_associations$ } from "@ordo-pink/frontend-stream-file-associations"
-// import { __init_hosts } from "@ordo-pink/frontend-react-hooks"
-// import { __init_logger } from "@ordo-pink/frontend-logger"
-// import { __init_metadata$ } from "@ordo-pink/frontend-stream-data/src/frontend-stream-metadata.impl"
-// import { __init_router$ } from "@ordo-pink/frontend-stream-router"
-// import { __init_sidebar$ } from "@ordo-pink/frontend-stream-sidebar"
-// import { __init_title$ } from "@ordo-pink/frontend-stream-title"
-// import { __init_user$ } from "@ordo-pink/frontend-stream-user"
-
-// import { APP_FID, isDev as is_dev } from "./constants"
-
-// import App from "./app"
-
-// current_fid$.next(APP_FID) // TODO: __init_current_fid$
-
-// const LOGGER = ConsoleLogger
-
-// const HOSTS: THosts = {
-// 	id: import.meta.env.VITE_ORDO_ID_HOST,
-// 	website: import.meta.env.VITE_ORDO_WEBSITE_HOST,
-// 	static: import.meta.env.VITE_ORDO_STATIC_HOST,
-// 	dt: import.meta.env.VITE_ORDO_DT_HOST,
-// 	my: import.meta.env.VITE_ORDO_WORKSPACE_HOST,
-// }
-
-// const main = () => {
-// 	const { fetch, get_fetch } = __init_fetch()
-// 	const { hosts, get_hosts } = __init_hosts(HOSTS)
-// 	const { logger, get_logger } = __init_logger(LOGGER)
-// 	const { commands, get_commands } = __init_commands(APP_FID, logger)
-
-// 	const { auth$, get_is_authenticated } = __init_auth$({ fetch, hosts, logger, is_dev })
-// 	const { user_query } = __init_user$({ auth$, commands, fetch, hosts, logger })
-
-// 	const { metadata_query, metadata_command } = __init_metadata$({
-// 		auth$,
-// 		commands,
-// 		hosts,
-// 		logger,
-// 		user_query,
-// 	})
-
-// 	__init_router$(APP_FID)
-// 	__init_command_palette$(APP_FID)
-// 	__init_sidebar$(APP_FID)
-// 	const { title$ } = __init_title$(logger, commands)
-
-// 	__init_achievements$({ fid: APP_FID, dataCommands })
-// 	__init_activities$(APP_FID)
-// 	__init_file_associations$(APP_FID)
-
-// 	const app_context: TOrdoContext = {
-// 		queries: {
-// 			metadata_query,
-// 			user_query,
-// 		},
-// 		streams: {
-// 			title$,
-// 		},
-// 		commands: {
-// 			metadata_command,
-// 		},
-// 		get_fetch,
-// 		get_hosts,
-// 		get_logger,
-// 		get_commands,
-// 		get_is_authenticated,
-// 	}
-
-// 	const container = document.getElementById("root")!
-// 	const root = createRoot(container)
-
-// 	root.render(<App app_context={app_context} />)
-// }
-
-// main()

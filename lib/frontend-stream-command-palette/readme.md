@@ -1,1 +1,0 @@
-# Frontend Stream Command Palette

@@ -1,7 +1,7 @@
 import type { TOption } from "@ordo-pink/option"
 
 import type { FSID, UserID } from "./data.types"
-import { MetadataGuards } from "./metadata-validations"
+import { MetadataValidations } from "./metadata-validations"
 
 export type TMetadataProps = Readonly<Record<string, any>>
 
@@ -20,7 +20,7 @@ export type TMetadataStatic = {
 	of: <_TProps extends TMetadataProps = TMetadataProps>(
 		dto: TMetadataDTO<_TProps>,
 	) => TMetadata<_TProps>
-	guards: typeof MetadataGuards
+	Validations: typeof MetadataValidations
 }
 
 export type TMetadataDTO<_TProps extends TMetadataProps = TMetadataProps> = Readonly<{

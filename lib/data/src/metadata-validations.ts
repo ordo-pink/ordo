@@ -98,7 +98,7 @@ export const is_metadata_dto = (x: unknown): x is TMetadataDTO => {
 	)
 }
 
-export const MetadataGuards = {
+export const MetadataValidations = {
 	is_metadata,
 	is_metadata_dto,
 	is_created_at,

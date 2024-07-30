@@ -195,37 +195,37 @@ type TInputValidatorFn<$TInput> = (
 ) => TResult<boolean, TRrr<"EINVAL">>
 
 const _check_fsid_r: TInputValidatorFn<FSID> = (location, fsid) =>
-	R.If(M.guards.is_fsid(fsid), { F: () => inval(`${location} -> fsid: ${fsid}`) })
+	R.If(M.Validations.is_fsid(fsid), { F: () => inval(`${location} -> fsid: ${fsid}`) })
 
 const _check_size_r: TInputValidatorFn<number> = (location, size) =>
-	R.If(M.guards.is_size(size), { F: () => inval(`${location} -> size: ${size}`) })
+	R.If(M.Validations.is_size(size), { F: () => inval(`${location} -> size: ${size}`) })
 
 const _check_parent_r: TInputValidatorFn<FSID | null> = (location, parent) =>
-	R.If(M.guards.is_parent(parent), { F: () => inval(`${location} -> parent: ${parent}`) })
+	R.If(M.Validations.is_parent(parent), { F: () => inval(`${location} -> parent: ${parent}`) })
 
 const _check_labels_r: TInputValidatorFn<string[]> = (location, labels) =>
-	R.If(M.guards.are_labels(labels), {
+	R.If(M.Validations.are_labels(labels), {
 		F: () => inval(`${location} -> label: ${get_wrong_label(labels)}`),
 	})
 
 const _check_name_r: TInputValidatorFn<string> = (location, name) =>
-	R.If(M.guards.is_name(name), { F: () => inval(`${location} -> name: ${name}`) })
+	R.If(M.Validations.is_name(name), { F: () => inval(`${location} -> name: ${name}`) })
 
 const _check_links_r: TInputValidatorFn<FSID[]> = (location, links) =>
-	R.If(M.guards.are_links(links), {
+	R.If(M.Validations.are_links(links), {
 		F: () => inval(`${location} -> link: ${get_wrong_link(links)}`),
 	})
 
 const _check_type_r: TInputValidatorFn<any> = (location, type) =>
-	R.If(M.guards.is_type(type), { F: () => inval(`${location} -> type: ${type}`) })
+	R.If(M.Validations.is_type(type), { F: () => inval(`${location} -> type: ${type}`) })
 
 const _check_props_r: TInputValidatorFn<TMetadataProps> = (location, props) =>
-	R.If(M.guards.is_props(props), {
+	R.If(M.Validations.is_props(props), {
 		F: () => inval(`${location} -> props: ${JSON.stringify(props)}`),
 	})
 
 const _check_prop_key_r: TInputValidatorFn<string | number | symbol> = (location, key) =>
-	R.If(M.guards.is_prop_key(key), { F: () => inval(`${location} -> key: ${String(key)}`) })
+	R.If(M.Validations.is_prop_key(key), { F: () => inval(`${location} -> key: ${String(key)}`) })
 
 type TCheckExistsByNameAndParentRFn = (
 	location: string,

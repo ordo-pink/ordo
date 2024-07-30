@@ -46,7 +46,6 @@ export const init_workspace = (
 	commands.on<cmd.sidebar.hide>("sidebar.hide", handle_sidebar_hide)
 	commands.on<cmd.sidebar.toggle>("sidebar.toggle", handle_sidebar_toggle)
 
-	// TODO:
 	commands.emit<cmd.command_palette.add>("command_palette.add", {
 		id: "sidebar.toggle",
 		readable_name: "common.sidebar_toggle",
@@ -58,34 +57,37 @@ export const init_workspace = (
 		accelerator: "mod+b",
 	})
 
-	// commands.emit<cmd.ctx_menu.add>("context-menu.add", {
-	// 	cmd: "sidebar.show",
-	// 	readable_name: "Показать боковую панель",
-	// 	should_show: ({ event }) => {
-	// 		return (
-	// 			event.currentTarget &&
-	// 			(event.currentTarget.classList.contains("activity-bar") ||
-	// 				Boolean(event.currentTarget.closest(".activity-bar"))) &&
-	// 			!sidebar$.value.disabled &&
-	// 			sidebar$.value.sizes[0] === 0
-	// 		)
-	// 	},
-	// 	type: "update",
-	// 	accelerator: "mod+b",
-	// })
-	// commands.emit<cmd.ctx_menu.add>("context-menu.add", {
-	// 	cmd: "sidebar.hide",
-	// 	readable_name: "Скрыть боковую панель",
-	// 	should_show: ({ event }) =>
-	// 		(event.currentTarget.classList.contains("sidebar") ||
-	// 			event.currentTarget.classList.contains("activity-bar") ||
-	// 			Boolean(event.currentTarget.closest(".sidebar")) ||
-	// 			Boolean(event.currentTarget.closest(".activity-bar"))) &&
-	// 		!sidebar$.value.disabled &&
-	// 		sidebar$.value.sizes[0] !== 0,
-	// 	type: "update",
-	// 	accelerator: "mod+b",
-	// })
+	commands.emit<cmd.ctx_menu.add>("context-menu.add", {
+		cmd: "sidebar.show",
+		readable_name: "Показать боковую панель",
+		Icon: BsToggle2Off,
+		should_show: ({ event }) => {
+			return (
+				event.currentTarget &&
+				(event.currentTarget.classList.contains("activity-bar") ||
+					Boolean(event.currentTarget.closest(".activity-bar"))) &&
+				!sidebar$.value.disabled &&
+				sidebar$.value.sizes[0] === 0
+			)
+		},
+		type: "update",
+		accelerator: "mod+b",
+	})
+
+	commands.emit<cmd.ctx_menu.add>("context-menu.add", {
+		cmd: "sidebar.hide",
+		readable_name: "Скрыть боковую панель",
+		Icon: BsToggle2Off,
+		should_show: ({ event }) =>
+			(event.currentTarget.classList.contains("sidebar") ||
+				event.currentTarget.classList.contains("activity-bar") ||
+				Boolean(event.currentTarget.closest(".sidebar")) ||
+				Boolean(event.currentTarget.closest(".activity-bar"))) &&
+			!sidebar$.value.disabled &&
+			sidebar$.value.sizes[0] !== 0,
+		type: "update",
+		accelerator: "mod+b",
+	})
 
 	let split: any
 

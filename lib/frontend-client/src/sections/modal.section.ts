@@ -101,54 +101,6 @@ export const init_modal = ({ commands, logger }: P) => {
 	logger.debug("🟢 Initialised modal.")
 }
 
-/**
- * Shows modals all over the place. Modals appear on setting ModalState and hide when the state is
- * set to `null`.
- *
- * @commands
- * - `cmd.modal.show`
- * - `cmd.modal.hide`
- */
-// export default function Modal() {
-// 	const modalState = useSubscription(modal$)
-// 	const commands = useCommands()
-
-// 	const handleHide = () => {
-// 		if (!modalState) return
-
-// 		modalState.onHide()
-// 		commands.emit<cmd.modal.hide>("modal.hide")
-// 	}
-
-// 	useAccelerator("Esc", handleHide, [modalState])
-
-// 	useEffect(() => {
-// 		commands.on<cmd.modal.hide>("modal.hide", on_modal_hide)
-// 		commands.on<cmd.modal.show>("modal.show", on_modal_show)
-
-// 		return () => {
-// 			commands.on<cmd.modal.hide>("modal.hide", on_modal_hide)
-// 			commands.on<cmd.modal.show>("modal.show", on_modal_show)
-// 		}
-// 		// eslint-disable-next-line react-hooks/exhaustive-deps
-// 	}, [])
-
-// 	return Either.fromNullable(modalState).fold(Null, ({ Component, showCloseButton }) => (
-// 		<div
-// 			className="fixed inset-0 z-[500] flex h-screen w-screen items-center justify-center overflow-hidden bg-gradient-to-tr  from-neutral-900/80  to-stone-900/80 p-4"
-// 			onClick={handleHide}
-// 		>
-// 			<div
-// 				className="relative w-full max-w-3xl rounded-lg bg-neutral-100 shadow-lg dark:bg-neutral-700"
-// 				onClick={stopPropagation}
-// 			>
-// 				<CloseButton shouldShow={showCloseButton} onClick={handleHide} />
-// 				<Component />
-// 			</div>
-// 		</div>
-// 	))
-// }
-
 // --- Internal ---
 
 /**
@@ -160,9 +112,6 @@ type ModalState = {
 	on_unmount?: () => void
 	render: (div: HTMLDivElement) => void
 }
-
-// Define helper functions
-// const stopPropagation = (event: MouseEvent) => event.stopPropagation()
 
 // Define Observable to maintain modal state
 const modal$ = new BehaviorSubject<TOption<ModalState>>(O.None())
@@ -177,14 +126,3 @@ const on_modal_show: Client.Commands.Handler<Client.Modal.ModalPayload> = payloa
 }
 
 const on_modal_hide = () => modal$.next(O.None())
-
-/**
- * Close button component.
- */
-// type CloseButtonP = { shouldShow: boolean; onClick: () => void }
-// const CloseButton = ({ shouldShow, onClick }: CloseButtonP) =>
-// 	Either.fromBoolean(() => shouldShow).fold(Null, () => (
-// 		<div className="absolute right-1 top-1 cursor-pointer p-2 text-neutral-500" onClick={onClick}>
-// 			<BsX />
-// 		</div>
-// 	))

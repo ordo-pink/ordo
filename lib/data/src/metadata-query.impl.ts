@@ -24,27 +24,29 @@ export const MetadataQuery: TMetadataQueryStatic = {
 			repo.get().pipe(R.ops.map(is => (show_hidden ? is : is.filter(negate(i => i.is_hidden()))))),
 
 		get_by_fsid: (fsid, options) =>
-			R.If(M.guards.is_fsid(fsid))
+			R.If(M.Validations.is_fsid(fsid))
 				.pipe(R.ops.err_map(() => inval(`by fsid -> fsid: ${fsid}`)))
 				.pipe(R.ops.chain(() => MQ.of(repo).get(options)))
 				.pipe(R.ops.map(m => O.FromNullable(m.find(i => i.get_fsid() === fsid)))),
 
 		get_by_labels: (ls, options) =>
-			R.If(M.guards.are_labels(ls))
+			R.If(M.Validations.are_labels(ls))
 				.pipe(R.ops.err_map(() => inval(`by labels -> label: ${get_wrong_label(ls)}`)))
 				.pipe(R.ops.chain(() => MQ.of(repo).get(options)))
 				.pipe(R.ops.map(is => is.filter(has_all_labels(ls)))),
 
 		get_by_name_and_parent: (name, parent, options) =>
 			R.Merge([
-				R.If(M.guards.is_name(name), { F: () => inval(`by name & parent -> name: ${name}`) }),
-				R.If(M.guards.is_parent(parent), { F: () => inval(`name & parent -> parent: ${parent}`) }),
+				R.If(M.Validations.is_name(name), { F: () => inval(`by name & parent -> name: ${name}`) }),
+				R.If(M.Validations.is_parent(parent), {
+					F: () => inval(`name & parent -> parent: ${parent}`),
+				}),
 			])
 				.pipe(R.ops.chain(() => MQ.of(repo).get(options)))
 				.pipe(R.ops.map(m => O.FromNullable(m.find(_has_name_and_parent(name, parent))))),
 
 		get_children: (fsid, options) =>
-			R.If(M.guards.is_fsid(fsid))
+			R.If(M.Validations.is_fsid(fsid))
 				.pipe(R.ops.err_map(() => inval(`children -> fsid: ${fsid}`)))
 				.pipe(R.ops.chain(() => MQ.of(repo).get_by_fsid(fsid, options)))
 				.pipe(R.ops.chain(o => R.FromOption(o, () => noent(`.getChildren -> fsid: ${fsid}`))))
@@ -59,13 +61,13 @@ export const MetadataQuery: TMetadataQueryStatic = {
 				.pipe(R.ops.chain(i => (i ? MQ.of(repo).get_by_fsid(i) : R.Ok(O.None())))),
 
 		has_child: (fsid, child, options) =>
-			R.If(M.guards.is_fsid(child))
+			R.If(M.Validations.is_fsid(child))
 				.pipe(R.ops.err_map(() => inval(`has -> child: ${child}`)))
 				.pipe(R.ops.chain(() => MQ.of(repo).get_children(fsid, options)))
 				.pipe(R.ops.map(is => is.some(i => i.is_child_of(fsid)))),
 
 		get_incoming_links: (fsid, options) =>
-			R.If(M.guards.is_fsid(fsid))
+			R.If(M.Validations.is_fsid(fsid))
 				.pipe(R.ops.err_map(() => inval(`incoming links -> fsid: ${fsid}`)))
 				.pipe(R.ops.chain(() => MQ.of(repo).get(options)))
 				.pipe(R.ops.map(is => is.filter(i => i.has_link_to(fsid)))),
@@ -83,13 +85,13 @@ export const MetadataQuery: TMetadataQueryStatic = {
 				.pipe(R.ops.map(gt(0))),
 
 		has_ancestor: (fsid, ancestor, options) =>
-			R.If(M.guards.is_fsid(ancestor))
+			R.If(M.Validations.is_fsid(ancestor))
 				.pipe(R.ops.err_map(() => inval(`has -> ancestor: ${ancestor}`)))
 				.pipe(R.ops.chain(() => MQ.of(repo).get_ancestors(fsid, options)))
 				.pipe(R.ops.map(is => is.some(i => i.get_fsid() === ancestor))),
 
 		has_descendent: (fsid, descendent, options) =>
-			R.If(M.guards.is_fsid(descendent))
+			R.If(M.Validations.is_fsid(descendent))
 				.pipe(R.ops.err_map(() => inval(`has -> descendent: ${descendent}`)))
 				.pipe(R.ops.chain(() => MQ.of(repo).get_descendents(fsid, options)))
 				.pipe(R.ops.map(is => is.some(i => i.get_fsid() === descendent))),

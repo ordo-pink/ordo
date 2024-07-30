@@ -19,6 +19,7 @@
 
 import { use$ } from ".."
 
+// TODO:
 const or_else = <N, B, T>(on_err: (x: B) => N) => ({
 	Ok: (x: T) => x,
 	Err: on_err,
@@ -26,17 +27,17 @@ const or_else = <N, B, T>(on_err: (x: B) => N) => ({
 
 export const useIsAuthenticated = () => {
 	const { get_is_authenticated } = use$.ordo_context()
+	const is_dev = use$.is_dev()
 	const logger = use$.logger()
 
 	const is_authenticated$ = get_is_authenticated().cata(
 		or_else(() => {
 			// TODO: Only show in is_dev mode
-			logger.alert("Permission for checking if the user is authenticated is not requested.")
+			is_dev &&
+				logger.alert("Permission for checking if the user is authenticated is not requested.")
 			return null
 		}),
 	)
 
-	const is_authenticated = use$.strict_subscription(is_authenticated$, false)
-
-	return is_authenticated
+	return use$.strict_subscription(is_authenticated$, false)
 }

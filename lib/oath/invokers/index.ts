@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: Copyright 2024, 谢尔盖||↓ and the Ordo.pink contributors
+// SPDX-License-Identifier: Unlicense
+
 import { or_else_oath } from "./or-else"
 import { or_nothing_oath } from "./or-nothing"
 import { to_promise_oath } from "./to-promise"

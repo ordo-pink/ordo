@@ -1,4 +1,7 @@
 // SPDX-FileCopyrightText: Copyright 2024, 谢尔盖||↓ and the Ordo.pink contributors
+// SPDX-License-Identifier: Unlicense
+
+// SPDX-FileCopyrightText: Copyright 2024, 谢尔盖||↓ and the Ordo.pink contributors
 // SPDX-License-Identifier: AGPL-3.0-only
 
 // Ordo.pink is an all-in-one team workspace.

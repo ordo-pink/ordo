@@ -17,16 +17,19 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { KnownFunctions } from "@ordo-pink/frontend-known-functions"
+import { type TFetch, type TGetFetchFn } from "@ordo-pink/core"
 import { Result } from "@ordo-pink/result"
-import { type TGetFetchFn } from "@ordo-pink/core"
-import { type TLogger } from "@ordo-pink/logger"
 import { call_once } from "@ordo-pink/tau"
+
+import { type TInitCtx } from "../frontend-client.types"
 
 const fetch = window.fetch
 
-type TInitFetchFn = (params: { logger: TLogger }) => { get_fetch: TGetFetchFn }
-export const init_fetch: TInitFetchFn = call_once(({ logger }) => {
+type TInitFetchFn = (params: Pick<TInitCtx, "logger" | "known_functions" | "APP_FID">) => {
+	fetch: TFetch
+	get_fetch: TGetFetchFn
+}
+export const init_fetch: TInitFetchFn = call_once(({ logger, known_functions, APP_FID }) => {
 	logger.debug("🟡 Initialising fetch...")
 
 	window.fetch = undefined as any
@@ -34,12 +37,15 @@ export const init_fetch: TInitFetchFn = call_once(({ logger }) => {
 
 	logger.debug("🟢 Initialised fetch.")
 
+	const get_fetch = (fid: symbol | null) =>
+		Result.If(known_functions.has_permissions(fid, { queries: ["application.fetch"] })).cata({
+			Ok: () => fetch,
+			Err: () => forbidden_fetch,
+		})
+
 	return {
-		get_fetch: fid => () =>
-			Result.If(KnownFunctions.check_permissions(fid, { queries: ["application.fetch"] })).cata({
-				Ok: () => fetch,
-				Err: () => forbidden_fetch,
-			}),
+		fetch: get_fetch(APP_FID),
+		get_fetch: fid => () => get_fetch(fid),
 	}
 })
 

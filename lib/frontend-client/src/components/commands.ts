@@ -17,20 +17,14 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { combineLatestWith } from "rxjs/internal/operators/combineLatestWith"
-import { map } from "rxjs/internal/operators/map"
-import { scan } from "rxjs/internal/operators/scan"
-import { shareReplay } from "rxjs/internal/operators/shareReplay"
-
-import { Subject } from "rxjs/internal/Subject"
+import { Subject, combineLatestWith, map, merge, scan, shareReplay } from "rxjs"
 import { equals } from "ramda"
-import { merge } from "rxjs/internal/observable/merge"
 
-import { KnownFunctions } from "@ordo-pink/frontend-known-functions"
 import { Result } from "@ordo-pink/result"
 import { type TGetCommandsFn } from "@ordo-pink/core"
-import { type TLogger } from "@ordo-pink/logger"
 import { call_once } from "@ordo-pink/tau"
+
+import { type TInitCtx } from "../frontend-client.types"
 
 // --- Internal ---
 
@@ -45,11 +39,14 @@ type TCmdListener<N extends Client.Commands.CommandName = Client.Commands.Comman
 	symbol,
 ]
 
-type TInitCommandsFn = (params: { logger: TLogger; log_commands_without_handlers?: boolean }) => {
+type TInitCommandsFn = (
+	params: Pick<TInitCtx, "logger" | "is_dev" | "known_functions" | "APP_FID">,
+) => {
+	commands: Client.Commands.Commands
 	get_commands: TGetCommandsFn
 }
 export const init_commands: TInitCommandsFn = call_once(
-	({ logger, log_commands_without_handlers = true }) => {
+	({ logger, is_dev, known_functions, APP_FID }) => {
 		logger.debug("🟡 Initializing commands...")
 
 		const forbidden_commands = (fid: symbol | null): Client.Commands.Commands => ({
@@ -74,7 +71,7 @@ export const init_commands: TInitCommandsFn = call_once(
 		})
 
 		const commands = (fid: symbol): Client.Commands.Commands => {
-			const func = KnownFunctions.exchange(fid) ?? "unauthorized"
+			const func = known_functions.exchange(fid).cata({ Some: x => x, None: () => "unauthorized" })
 
 			return {
 				on: (name, handler) => {
@@ -110,9 +107,11 @@ export const init_commands: TInitCommandsFn = call_once(
 					for (const command of commands) {
 						const name = command.name
 						const fid = command.fid
-						const func = KnownFunctions.exchange(fid) ?? "unauthorized"
+						const func = known_functions
+							.exchange(fid)
+							.cata({ Some: x => x, None: () => "unauthorized" })
 
-						if (!KnownFunctions.check_permissions(fid, { commands: [name] })) {
+						if (!known_functions.has_permissions(fid, { commands: [name] })) {
 							logger.alert(
 								`🔴 Function "${func}" did not request permission to execute command "${name}".`,
 							)
@@ -142,7 +141,7 @@ export const init_commands: TInitCommandsFn = call_once(
 								await listener(payload)
 							}
 						} else {
-							log_commands_without_handlers &&
+							is_dev &&
 								logger.debug(
 									`🟡 No handler found for the command "${name}". The command will stay pending until handler is registerred.`,
 								)
@@ -155,9 +154,11 @@ export const init_commands: TInitCommandsFn = call_once(
 		logger.debug("🟢 Initialised commands.")
 
 		return {
+			commands: commands(APP_FID),
+
 			get_commands: fid => () =>
 				Result.FromNullable(fid)
-					.pipe(Result.ops.chain(fid => Result.If(KnownFunctions.validate(fid))))
+					.pipe(Result.ops.chain(fid => Result.If(known_functions.validate(fid))))
 					.pipe(Result.ops.map(() => fid as symbol))
 					.cata({ Ok: commands, Err: () => forbidden_commands(fid) }),
 		}

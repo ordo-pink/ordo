@@ -17,7 +17,7 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { BehaviorSubject, type Observable } from "rxjs"
+import { BehaviorSubject } from "rxjs"
 
 import {
 	MetadataCommand,
@@ -27,23 +27,15 @@ import {
 	RemoteMetadataRepository,
 	type TMetadata,
 	type TMetadataQuery,
-	type TUserQuery,
 } from "@ordo-pink/data"
-import { type TFetch, type THosts } from "@ordo-pink/core"
-import { type AuthResponse } from "@ordo-pink/backend-server-id"
 import { Switch } from "@ordo-pink/switch"
-import { type TLogger } from "@ordo-pink/logger"
-import { type TOption } from "@ordo-pink/option"
 import { noop } from "@ordo-pink/tau"
 
-type TInitMetadataFn = (params: {
-	logger: TLogger
-	commands: Client.Commands.Commands
-	user_query: TUserQuery
-	hosts: THosts
-	auth$: Observable<TOption<AuthResponse>>
-	fetch: TFetch
-}) => { metadata_query: TMetadataQuery }
+import { type TInitCtx } from "../frontend-client.types"
+
+type TInitMetadataFn = (
+	params: Pick<TInitCtx, "auth$" | "logger" | "commands" | "hosts" | "user_query" | "fetch">,
+) => { metadata_query: TMetadataQuery }
 export const init_metadata: TInitMetadataFn = ({
 	auth$,
 	logger,

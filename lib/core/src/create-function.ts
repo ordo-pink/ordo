@@ -1,6 +1,4 @@
-import { KnownFunctions } from "@ordo-pink/frontend-known-functions"
-
-import { TCreateFunctionFn } from "./types"
+import { type TCreateFunctionFn } from "./types"
 
 export const create_function: TCreateFunctionFn =
 	(name, permissions, callback) =>
@@ -15,8 +13,9 @@ export const create_function: TCreateFunctionFn =
 		is_dev,
 		metadata_query,
 		user_query,
+		known_functions,
 	}) => {
-		const fid = KnownFunctions.register(name, permissions)
+		const fid = known_functions.register(name, permissions)
 
 		if (!fid) return
 

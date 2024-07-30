@@ -46,26 +46,19 @@ export type TQueryPermission =
 	| "application.logger"
 	| "application.commands"
 	| "application.current_fid"
-	| "application.global_command_palette"
-	| "application.current_command_palette"
-	| "application.context_menu"
-	| "application.notifications"
-	| "application.device_specs"
 	| "application.current_route"
 	| "application.current_activity"
 	| "application.current_file_association"
+	| "users.current_user.achievements"
 	| "users.current_user.is_authenticated"
 	| "users.current_user.public_info" // User.PublicUser
 	| "users.current_user.internal_info" // User.User
 	| "users.public_info"
-	| "achievements"
 	| "functions.activities"
 	| "functions.file_associations"
 	| "functions.editor_plugins"
 	| "functions.persisted_state"
-	| "data.metadata_hash"
 	| "data.metadata"
-	| "data.content_hash"
 	| "data.content"
 
 // TODO: Add support for command intellisense
@@ -99,9 +92,7 @@ export type TEnabledSidebar = { disabled: false; sizes: TWorkspaceSplitSize }
 export type TSidebarState = TEnabledSidebar | TDisabledSidebar
 
 export type TGetSidebarFn = TRequireFID<() => TResult<Observable<TSidebarState>, TRrr<"EPERM">>>
-export type TGetCurrentFIDFn = TRequireFID<
-	() => TResult<Observable<TOption<symbol>>, TRrr<"EPERM">>
->
+
 export type TTitleState = { window_title: string; status_bar_title?: string }
 export type TGetTitleFn = TRequireFID<() => TResult<Observable<TTitleState>, TRrr<"EPERM">>>
 export type TGetHostsFn = TRequireFID<() => TResult<THosts, TRrr<"EPERM">>>
@@ -109,10 +100,7 @@ export type TGetFetchFn = TRequireFID<() => TFetch>
 export type TGetLoggerFn = TRequireFID<() => TLogger>
 export type TGetCommandsFn = TRequireFID<() => Client.Commands.Commands>
 export type TGetIsAuthenticatedFn = TRequireFID<() => TResult<Observable<boolean>, TRrr<"EPERM">>>
-export type TSetCurrentFIDFn = TRequireFID<(new_fid: symbol) => TResult<void, TRrr<"EPERM">>>
-export type TGetActivitiesFn = TRequireFID<
-	() => TResult<Observable<TFIDAwareActivity[]>, TRrr<"EPERM">>
->
+
 export type TTranslations = Record<TwoLetterLocale, Record<string, string>>
 
 export type TGetTranslationsFn = () => Observable<TOption<TTranslations>>
@@ -122,6 +110,15 @@ export type TSetCurrentActivityFn = TRequireFID<
 export type TGetCurrentActivityFn = TRequireFID<
 	() => TResult<Observable<TOption<Functions.Activity>>, TRrr<"EPERM" | "ENOENT">>
 >
+
+export type TKnownFunctions = {
+	validate: (fid: symbol | null) => boolean
+	exchange: (fid: symbol | null) => TOption<string>
+	is_internal: (fid: symbol | null) => boolean
+	has_permissions: (fid: symbol | null, permissions: Partial<TPermissions>) => boolean
+	register: (name: string | null, permissions: TPermissions) => symbol | null
+	unregister: (name: string | null) => boolean
+}
 
 export type TCreateFunctionInternalContext = {
 	is_dev: boolean
@@ -134,6 +131,7 @@ export type TCreateFunctionInternalContext = {
 	get_translations: TGetTranslationsFn
 	metadata_query: TMetadataQuery
 	user_query: TUserQuery
+	known_functions: TKnownFunctions
 }
 
 export type TCreateFunctionContext = {

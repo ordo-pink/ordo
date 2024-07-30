@@ -17,38 +17,30 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { BehaviorSubject, Observable, map } from "rxjs"
+import { BehaviorSubject, map } from "rxjs"
 import { Router, operators } from "silkrouter"
 
 import { O, type TOption } from "@ordo-pink/option"
-import {
-	type TFIDAwareActivity,
-	type TGetCurrentRouteFn,
-	type TSetCurrentActivityFn,
-	type TSetCurrentFIDFn,
-} from "@ordo-pink/core"
-import { KnownFunctions } from "@ordo-pink/frontend-known-functions"
 import { RRR } from "@ordo-pink/data"
 import { Result } from "@ordo-pink/result"
-import { type TLogger } from "@ordo-pink/logger"
+import { type TGetCurrentRouteFn } from "@ordo-pink/core"
 import { call_once } from "@ordo-pink/tau"
+
+import { type TInitCtx } from "../frontend-client.types"
 
 const { route, noMatch } = operators
 
-type TInitRouterStreamFn = (params: {
-	app_fid: symbol
-	logger: TLogger
-	commands: Client.Commands.Commands
-	activities$: Observable<TFIDAwareActivity[]>
-	set_current_activity: TSetCurrentActivityFn
-	set_current_fid: TSetCurrentFIDFn
-}) => { get_current_route: TGetCurrentRouteFn }
+type TInitRouterStreamFn = (
+	params: Pick<
+		TInitCtx,
+		"APP_FID" | "logger" | "commands" | "activities$" | "set_current_activity" | "known_functions"
+	>,
+) => { get_current_route: TGetCurrentRouteFn }
 export const init_router: TInitRouterStreamFn = call_once(
-	({ app_fid, logger, commands, activities$, set_current_activity, set_current_fid }) => {
+	({ APP_FID, logger, commands, activities$, set_current_activity, known_functions }) => {
 		logger.debug("🟡 Initializing router...")
 
-		const set_fid = set_current_fid(app_fid)
-		const set_activity = set_current_activity(app_fid)
+		const set_activity = set_current_activity(APP_FID)
 
 		commands.on<cmd.router.navigate>("router.navigate", payload => {
 			if (Array.isArray(payload)) {
@@ -71,7 +63,6 @@ export const init_router: TInitRouterStreamFn = call_once(
 							router$ &&
 								router$.pipe(route(activity_route)).subscribe((route_data: Client.Router.Route) => {
 									set_activity(activity.name)
-									set_fid(activity.fid)
 									current_route$.next(O.FromNullable(route_data))
 								})
 						})
@@ -81,8 +72,6 @@ export const init_router: TInitRouterStreamFn = call_once(
 						router$.pipe(noMatch(router$)).subscribe(() => {
 							const home_activity = activities.find(activity => activity.name === "home")!
 							set_activity(home_activity.name)
-							set_fid(home_activity.fid)
-
 							current_route$.next(
 								O.Some({
 									data: null,
@@ -103,7 +92,7 @@ export const init_router: TInitRouterStreamFn = call_once(
 
 		return {
 			get_current_route: fid => () =>
-				Result.If(KnownFunctions.check_permissions(fid, { queries: ["application.current_route"] }))
+				Result.If(known_functions.has_permissions(fid, { queries: ["application.current_route"] }))
 					.pipe(Result.ops.err_map(() => eperm(`get_current_route -> fid: ${String(fid)}`)))
 					.pipe(Result.ops.map(() => current_route$.asObservable())),
 		}

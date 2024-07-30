@@ -20,11 +20,12 @@
 import { BehaviorSubject } from "rxjs"
 
 import { O, type TOption } from "@ordo-pink/option"
+import { type TGetTranslationsFn, type TTranslations } from "@ordo-pink/core"
 import { call_once, keys_of } from "@ordo-pink/tau"
-import { TGetTranslationsFn } from "@ordo-pink/core"
-import { type TLogger } from "@ordo-pink/logger"
 
-type TInitI18nFn = (params: { logger: TLogger; commands: Client.Commands.Commands }) => {
+import { type TInitCtx } from "../frontend-client.types"
+
+type TInitI18nFn = (params: Pick<TInitCtx, "logger" | "commands">) => {
 	get_translations: TGetTranslationsFn
 }
 
@@ -34,7 +35,7 @@ export const init_i18n: TInitI18nFn = call_once(({ logger, commands }) => {
 	commands.on<cmd.application.add_translations>(
 		"application.add_translations",
 		({ translations, lang, prefix }) => {
-			const known_translations = translations$.getValue().unwrap() ?? {}
+			const known_translations = translations$.getValue().unwrap() ?? ({} as TTranslations)
 			const prefixed_translations = keys_of(translations).reduce(
 				(acc, key) => ({ ...acc, [`${prefix}.${key}`]: translations[key] }),
 				{},
@@ -55,4 +56,4 @@ export const init_i18n: TInitI18nFn = call_once(({ logger, commands }) => {
 
 // --- Internal ---
 
-const translations$ = new BehaviorSubject<TOption<Record<string, Record<string, string>>>>(O.None())
+const translations$ = new BehaviorSubject<TOption<TTranslations>>(O.None())

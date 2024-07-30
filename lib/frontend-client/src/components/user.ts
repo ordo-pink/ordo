@@ -25,179 +25,176 @@ import {
 	KnownUserRepository,
 	RRR,
 	RemoteCurrentUserRepository,
-	type TRrr,
 	type TUserQuery,
 	UserQuery,
 } from "@ordo-pink/data"
 import { O, type TOption } from "@ordo-pink/option"
-import { Result, type TResult } from "@ordo-pink/result"
-import { type TFetch, type TGetIsAuthenticatedFn, type THosts } from "@ordo-pink/core"
 import { call_once, noop } from "@ordo-pink/tau"
 import { type AuthResponse } from "@ordo-pink/backend-server-id"
-import { KnownFunctions } from "@ordo-pink/frontend-known-functions"
 import { Oath } from "@ordo-pink/oath"
+import { Result } from "@ordo-pink/result"
 import { Switch } from "@ordo-pink/switch"
-import { type TLogger } from "@ordo-pink/logger"
+import { type TGetIsAuthenticatedFn } from "@ordo-pink/core"
 
-type TInitUserParams = (params: {
-	hosts: THosts
-	fetch: TFetch
-	logger: TLogger
-	commands: Client.Commands.Commands
-}) => {
-	get_auth: (fid: symbol | null) => () => TResult<Observable<TOption<AuthResponse>>, TRrr<"EPERM">>
+import { type TInitCtx } from "../frontend-client.types"
+
+type TInitUserParams = (
+	params: Pick<TInitCtx, "hosts" | "fetch" | "logger" | "commands" | "known_functions">,
+) => {
 	get_is_authenticated: TGetIsAuthenticatedFn
 	user_query: TUserQuery
 	auth$: Observable<TOption<AuthResponse>>
 }
-export const init_user: TInitUserParams = call_once(({ hosts, fetch, logger, commands }) => {
-	logger.debug("Initialising auth...")
+export const init_user: TInitUserParams = call_once(
+	({ hosts, fetch, logger, commands, known_functions }) => {
+		logger.debug("Initialising auth...")
 
-	let timeout: number
+		let timeout: number
 
-	// TODO: Move to auth fn
-	const path: Routes.ID.RefreshToken.Path = "/account/refresh-token"
-	const method: Routes.ID.RefreshToken.Method = "POST"
+		// TODO: Move to auth fn
+		const path: Routes.ID.RefreshToken.Path = "/account/refresh-token"
+		const method: Routes.ID.RefreshToken.Method = "POST"
 
-	const refresh_token = Oath.Resolve({ path, method })
-		.pipe(
-			Oath.ops.tap(() => {
-				logger.debug("Refreshing auth token...")
-				commands.emit<cmd.application.background_task.start_loading>(
-					"application.background_task.start_loading",
-				)
-			}),
-		)
-		.pipe(
-			Oath.ops.chain(({ path, method }) =>
-				Oath.Try(
-					() => fetch(hosts.id.concat(path), { method, credentials: "include" }),
-					error => einval(`refresh_token -> error: ${String(error)}`),
-				),
-			),
-		)
-		.pipe(
-			Oath.ops.chain(response =>
-				Oath.Try(
-					() => response.json(),
-					error => einval(`refresh_token -> error: ${String(error)}`),
-				),
-			),
-		)
-		.pipe(Oath.ops.chain(res => Oath.If(res.success, { T: () => res.result, F: () => res.error })))
-		.pipe(Oath.ops.tap(() => logger.debug("Auth token refreshed.")))
-		.pipe(
-			Oath.ops.map(auth => {
-				commands.emit<cmd.application.background_task.reset_status>(
-					"application.background_task.reset_status",
-				)
-
-				auth$.next(O.Some(auth))
-
-				create_timeout()
-			}),
-		)
-
-	const or_cancel_state_changes = Oath.invokers.or_else(() => {
-		commands.emit<cmd.application.background_task.reset_status>(
-			"application.background_task.reset_status",
-		)
-		auth$.next(O.None())
-		drop_timeout()
-	})
-
-	void refresh_token.invoke(or_cancel_state_changes)
-
-	const create_timeout = () => {
-		if (timeout) drop_timeout()
-
-		logger.debug("Creating next refresh token tick...")
-
-		window.addEventListener("beforeunload", drop_timeout)
-		timeout = setTimeout(
-			() => void refresh_token.invoke(or_cancel_state_changes),
-			50_000,
-		) as unknown as number // TODO: Move ms to ENV
-	}
-
-	const drop_timeout = () => {
-		logger.debug("Clearing next refresh token tick...")
-
-		clearTimeout(timeout)
-		window.removeEventListener("beforeunload", drop_timeout)
-	}
-
-	logger.debug("Initialised auth.")
-
-	const current_user_repository = CurrentUserRepository.of(current_user$)
-	const current_user_remote_repository = RemoteCurrentUserRepository.of(hosts.id, fetch)
-
-	const known_users_repository = KnownUserRepository.of(known_users$)
-
-	const user_query = UserQuery.of(current_user_repository, known_users_repository)
-	// TODO: const user_command = UserCommand.of(user_query, current_user_repository, known_users_repository)
-
-	CurrentUserManager.of(current_user_repository, current_user_remote_repository, auth$).start(
-		state_change =>
-			Switch.Match(state_change)
-				.case("get-remote", () =>
+		const refresh_token = Oath.Resolve({ path, method })
+			.pipe(
+				Oath.ops.tap(() => {
+					logger.debug("Refreshing auth token...")
 					commands.emit<cmd.application.background_task.start_loading>(
 						"application.background_task.start_loading",
+					)
+				}),
+			)
+			.pipe(
+				Oath.ops.chain(({ path, method }) =>
+					Oath.Try(
+						() => fetch(hosts.id.concat(path), { method, credentials: "include" }),
+						error => einval(`refresh_token -> error: ${String(error)}`),
 					),
-				)
-				.case("put-remote", () =>
-					commands.emit<cmd.application.background_task.start_saving>(
-						"application.background_task.start_saving",
+				),
+			)
+			.pipe(
+				Oath.ops.chain(response =>
+					Oath.Try(
+						() => response.json(),
+						error => einval(`refresh_token -> error: ${String(error)}`),
 					),
-				)
-				.case(["get-remote-complete", "put-remote-complete"], () =>
+				),
+			)
+			.pipe(
+				Oath.ops.chain(res => Oath.If(res.success, { T: () => res.result, F: () => res.error })),
+			)
+			.pipe(Oath.ops.tap(() => logger.debug("Auth token refreshed.")))
+			.pipe(
+				Oath.ops.map(auth => {
 					commands.emit<cmd.application.background_task.reset_status>(
 						"application.background_task.reset_status",
-					),
-				)
-				.default(noop),
-	)
+					)
 
-	// TODO: Move to user_command
-	// commands.on<cmd.user.refresh_info>("user.refresh", () => {
-	// 	const subscription = auth$.subscribe(auth => {
-	// 		void Oath.If(auth.is_some)
-	// 			.pipe(Oath.ops.map(() => auth))
-	// 			.pipe(Oath.ops.chain(auth => Oath.FromNullable(auth.unwrap()!.accessToken)))
-	// 			.pipe(Oath.ops.chain(at => Oath.Try(() => fetch(`${hosts.id}/account`, req_init(at)))))
-	// 			.pipe(Oath.ops.chain(response => Oath.FromPromise(() => response.json())))
-	// 			.pipe(Oath.ops.chain(r => Oath.If(r.success, { T: () => r.result, F: () => r.error })))
-	// 			.pipe(Oath.ops.map(user => current_user$.next(O.Some(user))))
-	// 			.pipe(Oath.ops.bitap(...unsubscribe(subscription)))
-	// 			.invoke(
-	// 				// TODO: Better error handling
-	// 				Oath.invokers.or_else(error =>
-	// 					commands.emit<cmd.notification.show>("notification.show", {
-	// 						type: "rrr",
-	// 						title: "Ошибка получения данных о пользователе", // TODO: Move to i18n
-	// 						message: error instanceof Error ? error.message : error ?? "Неизвестная ошибка", // TODO: Move to i18n
-	// 					}),
-	// 				),
-	// 			)
-	// 	})
-	// })
+					auth$.next(O.Some(auth))
 
-	return {
-		auth$,
-		user_query,
-		get_auth: (fid: symbol | null) => () =>
-			Result.If(KnownFunctions.check_is_internal(fid))
-				.pipe(Result.ops.map(() => auth$.asObservable()))
-				.pipe(Result.ops.err_map(() => eperm(`get_auth -> fid: ${String(fid)}`))),
-
-		get_is_authenticated: (fid: symbol | null) => () =>
-			Result.If(
-				KnownFunctions.check_permissions(fid, { queries: ["users.current_user.is_authenticated"] }),
+					create_timeout()
+				}),
 			)
-				.pipe(Result.ops.map(() => auth$.pipe(map(option => option.is_some))))
-				.pipe(Result.ops.err_map(() => eperm(`get_is_authenticated -> fid: ${String(fid)}`))),
-	}
-})
+
+		const or_cancel_state_changes = Oath.invokers.or_else(() => {
+			commands.emit<cmd.application.background_task.reset_status>(
+				"application.background_task.reset_status",
+			)
+			auth$.next(O.None())
+			drop_timeout()
+		})
+
+		void refresh_token.invoke(or_cancel_state_changes)
+
+		const create_timeout = () => {
+			if (timeout) drop_timeout()
+
+			logger.debug("Creating next refresh token tick...")
+
+			window.addEventListener("beforeunload", drop_timeout)
+			timeout = setTimeout(
+				() => void refresh_token.invoke(or_cancel_state_changes),
+				50_000,
+			) as unknown as number // TODO: Move ms to ENV
+		}
+
+		const drop_timeout = () => {
+			logger.debug("Clearing next refresh token tick...")
+
+			clearTimeout(timeout)
+			window.removeEventListener("beforeunload", drop_timeout)
+		}
+
+		logger.debug("Initialised auth.")
+
+		const current_user_repository = CurrentUserRepository.of(current_user$)
+		const current_user_remote_repository = RemoteCurrentUserRepository.of(hosts.id, fetch)
+
+		const known_users_repository = KnownUserRepository.of(known_users$)
+
+		const user_query = UserQuery.of(current_user_repository, known_users_repository)
+		// TODO: const user_command = UserCommand.of(user_query, current_user_repository, known_users_repository)
+
+		CurrentUserManager.of(current_user_repository, current_user_remote_repository, auth$).start(
+			state_change =>
+				Switch.Match(state_change)
+					.case("get-remote", () =>
+						commands.emit<cmd.application.background_task.start_loading>(
+							"application.background_task.start_loading",
+						),
+					)
+					.case("put-remote", () =>
+						commands.emit<cmd.application.background_task.start_saving>(
+							"application.background_task.start_saving",
+						),
+					)
+					.case(["get-remote-complete", "put-remote-complete"], () =>
+						commands.emit<cmd.application.background_task.reset_status>(
+							"application.background_task.reset_status",
+						),
+					)
+					.default(noop),
+		)
+
+		// TODO: Move to user_command
+		// commands.on<cmd.user.refresh_info>("user.refresh", () => {
+		// 	const subscription = auth$.subscribe(auth => {
+		// 		void Oath.If(auth.is_some)
+		// 			.pipe(Oath.ops.map(() => auth))
+		// 			.pipe(Oath.ops.chain(auth => Oath.FromNullable(auth.unwrap()!.accessToken)))
+		// 			.pipe(Oath.ops.chain(at => Oath.Try(() => fetch(`${hosts.id}/account`, req_init(at)))))
+		// 			.pipe(Oath.ops.chain(response => Oath.FromPromise(() => response.json())))
+		// 			.pipe(Oath.ops.chain(r => Oath.If(r.success, { T: () => r.result, F: () => r.error })))
+		// 			.pipe(Oath.ops.map(user => current_user$.next(O.Some(user))))
+		// 			.pipe(Oath.ops.bitap(...unsubscribe(subscription)))
+		// 			.invoke(
+		// 				// TODO: Better error handling
+		// 				Oath.invokers.or_else(error =>
+		// 					commands.emit<cmd.notification.show>("notification.show", {
+		// 						type: "rrr",
+		// 						title: "Ошибка получения данных о пользователе", // TODO: Move to i18n
+		// 						message: error instanceof Error ? error.message : error ?? "Неизвестная ошибка", // TODO: Move to i18n
+		// 					}),
+		// 				),
+		// 			)
+		// 	})
+		// })
+
+		return {
+			auth$,
+			user_query,
+
+			get_is_authenticated: (fid: symbol | null) => () =>
+				Result.If(
+					known_functions.has_permissions(fid, {
+						queries: ["users.current_user.is_authenticated"],
+					}),
+				)
+					.pipe(Result.ops.map(() => auth$.pipe(map(option => option.is_some))))
+					.pipe(Result.ops.err_map(() => eperm(`get_is_authenticated -> fid: ${String(fid)}`))),
+		}
+	},
+)
 
 // --- Internal ---
 

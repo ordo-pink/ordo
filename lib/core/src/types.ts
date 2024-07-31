@@ -504,86 +504,83 @@ declare global {
 		}
 	}
 
+	interface ICommands {
+		// TODO: cmd
+		application: {
+			set_title: () => { window_title: string; status_bar_title: string }
+			add_translations: () => {
+				lang: ISO_639_1_Locale
+				prefix: string
+				translations: Record<string, string>
+			}
+			background_task: {
+				set_status: () => BackgroundTaskStatus
+				start_saving: () => void
+				start_loading: () => void
+				reset_status: () => void
+			}
+			notification: {
+				show: () => Client.Notification.ShowNotificationParams
+				hide: () => string
+			}
+		}
+		functions: {
+			activities: {
+				register: () => { fid: symbol; activity: Functions.Activity }
+				unregister: () => { fid: symbol; name: Functions.Activity["name"] }
+			}
+			persisted_state: {
+				update: () => { key: string; value: any }
+			}
+			file_associations: {
+				add: () => Functions.FileAssociation
+				remove: () => Functions.FileAssociation["name"]
+			}
+		}
+		user: {
+			achievement: {
+				add: () => Achievements.Achievement
+			}
+		}
+		data: {
+			metadata: {
+				show_upload_modal: () => FSID | null
+				show_create_modal: () => FSID | null
+				show_remove_modal: () => FSID
+				show_rename_modal: () => FSID
+				show_edit_labels_palette: () => FSID
+				show_edit_links_palette: () => FSID
+			}
+			content: {
+				get: FSID
+				set: { fsid: FSID; content: string | ArrayBuffer; content_type: string }
+				drop: FSID
+			}
+		}
+	}
+
+	type TRecordToKV<
+		$TRecord extends object,
+		$TKey extends keyof $TRecord = keyof $TRecord,
+		$TPrefix extends string = "cmd",
+	> = $TKey extends string
+		? $TRecord[$TKey] extends () => infer V
+			? { key: `${$TPrefix}.${$TKey}`; value: V }
+			: $TRecord[$TKey] extends object
+				? TRecordToKV<$TRecord[$TKey], keyof $TRecord[$TKey], `${$TPrefix}.${$TKey}`>
+				: never
+		: null
+
+	type TFlatterRecord<T extends { key: string; value: any }> = {
+		[K in T["key"]]: Extract<T, { key: K }>["value"]
+	}
+
+	type TFlatCommands = TFlatterRecord<TRecordToKV<ICommands>>
+
 	module cmd {
-		module activities {
-			type register = {
-				name: "activities.register"
-				payload: { fid: symbol; activity: Functions.Activity }
-			}
-			type unregister = {
-				name: "activities.unregister"
-				payload: { fid: symbol; name: string }
-			}
-		}
-
-		module application {
-			type set_title = {
-				name: "application.set_title"
-				payload: { window_title: string; status_bar_title?: string }
-			}
-
-			type add_translations = {
-				name: "application.add_translations"
-				payload: { lang: ISO_639_1_Locale; prefix: string; translations: Record<string, string> }
-			}
-
-			module background_task {
-				type set_status = {
-					name: "application.background_task.set_status"
-					payload: BackgroundTaskStatus
-				}
-				type start_saving = { name: "application.background_task.start_saving" }
-				type start_loading = { name: "application.background_task.start_loading" }
-				type reset_status = { name: "application.background_task.reset_status" }
-			}
-		}
-
-		module extensionState {
-			type update<T extends Record<string, unknown> = Record<string, unknown>> = {
-				name: "extension-state.update"
-				payload: { name: string; payload: T }
-			}
-		}
-
-		module achievements {
-			type add = { name: "achievements.add"; payload: Achievements.Achievement }
-		}
-
-		module user {
-			type refresh_info = { name: "user.refresh" }
-			type sign_out = { name: "user.sign_out" }
-			type go_to_account = { name: "user.go_to_account" }
-		}
-
-		module notification {
-			type show = { name: "notification.show"; payload: Client.Notification.ShowNotificationParams }
-			type hide = { name: "notification.hide"; payload: string }
-		}
-
-		module fileAssociations {
-			type add = { name: "file-associations.add"; payload: Functions.FileAssociation }
-			type remove = { name: "file-associations.remove"; payload: string }
-			type setCurrent = {
-				name: "file-associations.set-current"
-				payload: Functions.FileAssociation
-			}
-		}
-
 		module data {
 			type get_content = { name: "data.content.get_content"; payload: FSID }
 			type drop_content = { name: "data.content.drop_content"; payload: FSID }
-			type show_upload_modal = { name: "data.show-upload-modal"; payload: FSID | null }
-			type show_create_modal = { name: "data.show-create-modal"; payload: FSID | null }
-			type show_remove_modal = { name: "data.show-remove-modal"; payload: FSID }
-			type show_rename_modal = { name: "data.show-rename-modal"; payload: FSID }
-			type show_edit_labels_palette = {
-				name: "data.show-edit-labels-palette"
-				payload: FSID
-			}
-			type show_edit_links_palette = {
-				name: "data.show-edit-links-palette"
-				payload: FSID
-			}
 
 			type set_content = {
 				name: "data.content.set_content"

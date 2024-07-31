@@ -47,7 +47,7 @@ export const init_activities: TInitActivitiesFn = call_once(
 			Result.If(!activities$.getValue().some(a => a.name === activity.name), {
 				T: () => fid,
 				F: _log_already_exists(activity.name),
-			}).pipe(Result.ops.map(fid => add$.next({ ...activity, fid: fid! }))),
+			}).pipe(Result.ops.map(fid => add$.next({ ...activity, fid }))),
 		)
 
 		commands.on("cmd.functions.activities.unregister", ({ name, fid }) =>

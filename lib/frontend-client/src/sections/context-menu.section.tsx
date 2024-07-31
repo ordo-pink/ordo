@@ -85,7 +85,7 @@ function ContextMenu() {
 
 	const hide_context_menu = useCallback(
 		() => menu && commands.emit("cmd.application.context_menu.hide"),
-		[menu],
+		[menu, commands],
 	)
 
 	use$.accelerator("Esc", hide_context_menu, [menu])

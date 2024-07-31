@@ -28,14 +28,14 @@ import { Subject, debounce, timer } from "rxjs"
 import { type ExcalidrawElement } from "@excalidraw/excalidraw/types/element/types"
 import { equals } from "ramda"
 
-import { useCommands, useIsDarkTheme } from "@ordo-pink/frontend-react-hooks"
-
 import { chainE, fromBooleanE, fromNullableE, mapE, tapE } from "@ordo-pink/either"
 import { extend, noop, omit } from "@ordo-pink/tau"
 import { type FSID } from "@ordo-pink/data"
+import { use$ } from "@ordo-pink/frontend-react-hooks"
+
+import Null from "@ordo-pink/frontend-react-components/null"
 
 import "../../static/excalidraw.css"
-import Null from "@ordo-pink/frontend-react-components/null"
 
 export default function ExcalidrawEditor({
 	data,
@@ -44,20 +44,25 @@ export default function ExcalidrawEditor({
 	is_editable: isEditable,
 	is_embedded: isEmbedded,
 }: Functions.FileAssociationComponentProps) {
-	const isDark = useIsDarkTheme()
-	const commands = useCommands()
+	const isDark = use$.is_dark_theme()
+	const commands = use$.commands()
 
 	// --- State ---
 
 	const [items, setItems] = useState<readonly ExcalidrawElement[]>([])
 	const [isInitiallyRendered, setIsInitiallyRendered] = useState(false)
+	// eslint-disable-next-line @typescript-eslint/no-redundant-type-constituents
 	const [excalidrawAPI, setExcalidrawAPI] = useState<ExcalidrawImperativeAPI | null>(null)
 
 	// --- Effects ---
 
 	useEffect(() => {
 		const sub = debounceSave$.subscribe(({ fsid, content }) =>
-			commands.emit<cmd.data.set_content>("data.content.set_content", { fsid, content }),
+			commands.emit("cmd.data.content.set", {
+				fsid,
+				content,
+				content_type: "application/excalidraw",
+			}),
 		)
 
 		return () => sub.unsubscribe()

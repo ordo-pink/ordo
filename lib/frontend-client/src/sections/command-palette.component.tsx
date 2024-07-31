@@ -18,8 +18,9 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { BsPlus, BsSearch } from "react-icons/bs"
-import { ChangeEvent, ComponentType, KeyboardEvent, useCallback, useEffect, useState } from "react"
+import { ChangeEvent, ComponentType, KeyboardEvent, useEffect, useState } from "react"
 import Fuse from "fuse.js"
+import { IconType } from "react-icons"
 
 import { Either } from "@ordo-pink/either"
 import { Switch } from "@ordo-pink/switch"
@@ -28,8 +29,6 @@ import { use$ } from "@ordo-pink/frontend-react-hooks"
 
 import Accelerator from "@ordo-pink/frontend-react-components/accelerator"
 import ActionListItem from "@ordo-pink/frontend-react-components/action-list-item"
-import RenderFromNullable from "@ordo-pink/frontend-react-components/render-from-nullable"
-import { IconType } from "react-icons"
 
 type P = {
 	items: Client.CommandPalette.Item[]

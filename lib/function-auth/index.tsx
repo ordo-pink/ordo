@@ -17,6 +17,7 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import { BsBoxArrowInDown, BsBoxArrowInRight, BsBoxArrowUp } from "react-icons/bs"
 import { type Root, createRoot } from "react-dom/client"
 
 import { O, type TOption } from "@ordo-pink/option"
@@ -70,6 +71,9 @@ declare global {
 					label: () => string
 					already_signed_up: () => string
 				}
+				sign_out: {
+					label: () => string
+				}
 			}
 		}
 	}
@@ -108,6 +112,7 @@ const EN_TRANSLATIONS: TScopedTranslations<"auth"> = {
 	"legal.privacy_policy.label": "Privacy Policy",
 	"pages.sign_in.label": "Sign In",
 	"pages.sign_in.status_bar_title": "",
+	"pages.sign_out.label": "Sign Out",
 	"pages.sign_up.already_signed_up": "Already signed up?",
 	"pages.sign_up.label": "Sign Up",
 	"pages.sign_up.status_bar_title": "",
@@ -125,6 +130,8 @@ export default create_function(
 		],
 		commands: [
 			"cmd.application.add_translations",
+			"cmd.application.command_palette.add",
+			"cmd.application.command_palette.remove",
 			"cmd.application.router.navigate",
 			"cmd.application.set_title",
 			"cmd.auth.open_sign_in",
@@ -140,27 +147,63 @@ export default create_function(
 		const hosts_result = ctx.get_hosts()
 		const hosts = hosts_result.unwrap() as TUnwrapOk<typeof hosts_result>
 
-		let workspace_root_option: TOption<Root> = O.None()
+		const auth_result = ctx.get_is_authenticated()
+		const auth$ = auth_result.unwrap() as TUnwrapOk<typeof auth_result>
 
-		commands.on("cmd.auth.open_sign_in", () =>
-			commands.emit("cmd.application.router.navigate", "/auth/sign-in"),
-		)
+		auth$.subscribe(is_authenticated => {
+			const on_open_sign_in = () =>
+				commands.emit("cmd.application.router.navigate", "/auth/sign-in")
+			const on_open_sign_up = () =>
+				commands.emit("cmd.application.router.navigate", "/auth/sign-up")
+			const on_sign_out = () => {
+				const path: Routes.ID.SignOut.Path = "/account/sign-out"
+				const method: Routes.ID.SignOut.Method = "POST"
+				const credentials = "include"
+				const url = hosts.id.concat(path)
 
-		commands.on("cmd.auth.open_sign_up", () =>
-			commands.emit("cmd.application.router.navigate", "/auth/sign-up"),
-		)
+				void fetch(url, { method, credentials }).then(() => {
+					window.history.replaceState(null, "")
+					window.location.replace("/")
+				})
+			}
 
-		commands.on("cmd.auth.sign_out", () => {
-			const path: Routes.ID.SignOut.Path = "/account/sign-out"
-			const method: Routes.ID.SignOut.Method = "POST"
-			const credentials = "include"
-			const url = hosts.id.concat(path)
+			if (is_authenticated) {
+				commands.off("cmd.auth.open_sign_in", on_open_sign_in)
+				commands.off("cmd.auth.open_sign_up", on_open_sign_up)
+				commands.emit("cmd.application.command_palette.remove", "cmd.auth.open_sign_in")
+				commands.emit("cmd.application.command_palette.remove", "cmd.auth.open_sign_up")
 
-			void fetch(url, { method, credentials }).then(() => {
-				window.history.replaceState(null, "")
-				window.location.replace("/")
-			})
+				commands.on("cmd.auth.sign_out", on_sign_out)
+				commands.emit("cmd.application.command_palette.add", {
+					id: "cmd.auth.sign_out",
+					readable_name: "t.auth.pages.sign_out.label",
+					Icon: BsBoxArrowInDown,
+					on_select: () => commands.emit("cmd.auth.sign_out"),
+				})
+			} else {
+				commands.off("cmd.auth.sign_out", on_sign_out)
+				commands.emit("cmd.application.command_palette.remove", "cmd.auth.sign_out")
+
+				commands.on("cmd.auth.open_sign_in", on_open_sign_in)
+				commands.on("cmd.auth.open_sign_up", on_open_sign_up)
+
+				commands.emit("cmd.application.command_palette.add", {
+					id: "cmd.auth.open_sign_in",
+					readable_name: "t.auth.pages.sign_in.label",
+					Icon: BsBoxArrowInRight,
+					on_select: () => commands.emit("cmd.auth.open_sign_in"),
+				})
+
+				commands.emit("cmd.application.command_palette.add", {
+					id: "cmd.auth.open_sign_up",
+					readable_name: "t.auth.pages.sign_up.label",
+					Icon: BsBoxArrowUp,
+					on_select: () => commands.emit("cmd.auth.open_sign_up"),
+				})
+			}
 		})
+
+		let workspace_root_option: TOption<Root> = O.None()
 
 		commands.emit("cmd.application.add_translations", {
 			lang: "en",

@@ -41,7 +41,7 @@ export const init_command_palette = call_once(
 		commands.emit("cmd.application.command_palette.add", {
 			id: "command_palette.hide",
 			on_select: () => commands.emit("cmd.application.command_palette.hide"),
-			readable_name: "common.command_palette_hide",
+			readable_name: "t.common.components.command_palette.hide",
 			Icon: BsCommand,
 			accelerator: "mod+shift+p",
 		})
@@ -54,8 +54,7 @@ export const init_command_palette = call_once(
 				global_command_palette$.subscribe(global_command_palette => {
 					if (custom_command_palette$.getValue().items.length > 0)
 						commands.emit("cmd.application.command_palette.hide")
-					else
-						commands.emit("cmd.application.command_palette.show", global_command_palette)
+					else commands.emit("cmd.application.command_palette.show", global_command_palette)
 				})
 			}
 		})

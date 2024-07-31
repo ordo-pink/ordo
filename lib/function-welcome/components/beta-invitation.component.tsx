@@ -23,12 +23,11 @@ import { use$ } from "@ordo-pink/frontend-react-hooks"
 type P = { wide?: boolean }
 export default function BetaInvitation({ wide }: P) {
 	const commands = use$.commands()
-	const translate_auth = use$.scoped_translation("pink.ordo.auth")
-	const translate_welcome = use$.scoped_translation("pink.ordo.welcome")
+	const translate = use$.translation()
 
-	const t_sign_up = translate_auth("sign_up_title")
-	const t_sign_in = translate_auth("sign_in_title")
-	const t_beta_started = translate_welcome("beta_started_announcement")
+	const t_sign_up = translate("t.auth.pages.sign_up.label")
+	const t_sign_in = translate("t.auth.pages.sign_in.label")
+	const t_beta_started = translate("t.welcome.beta_started_announcement")
 
 	return (
 		<div className="w-full max-w-2xl space-y-8 rounded-lg bg-gradient-to-br from-sky-200/80 via-indigo-200/80 to-indigo-200/80 px-8 py-4 shadow-lg md:py-12 dark:from-sky-950 dark:via-indigo-950 dark:to-indigo-950">

@@ -17,11 +17,7 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import {
-	useCurrentLanguage,
-	useScopedTranslation,
-	useTranslation,
-} from "./src/use-translations.hook"
+import { useCurrentLanguage, useTranslation } from "./src/use-translations.hook"
 import { useCurrentRoute, useRouteParams } from "./src/use-route.hook"
 import { useAccelerator } from "./src/use-accelerator.hook"
 import { useCommands } from "./src/use-commands.hook"
@@ -69,7 +65,6 @@ export const use$ = {
 	subscription: useSubscription,
 	strict_subscription: useStrictSubscription,
 	translation: useTranslation,
-	scoped_translation: useScopedTranslation,
 	current_language: useCurrentLanguage,
 	window_size: useWindowSize,
 	fetch: useFetch,

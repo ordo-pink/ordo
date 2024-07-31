@@ -30,11 +30,21 @@ import { noop } from "@ordo-pink/tau"
 import LandingWorkspace from "./views/landing.workspace"
 
 declare global {
+	interface t {
+		welcome: {
+			authenticated_page_title: () => string
+			beta_started_announcement: () => string
+			cookies_warning: () => string
+			news_widget_title: () => string
+			unauthenticated_page_title: () => string
+		}
+	}
+
 	interface cmd {
 		welcome: {
-			go_to_welcome_page: () => void
-			go_to_messenger_support: () => void
 			go_to_email_support: () => void
+			go_to_messenger_support: () => void
+			go_to_welcome_page: () => void
 			open_support_palette: () => void
 		}
 	}
@@ -124,7 +134,7 @@ export default create_function(
 
 		commands.emit("cmd.application.add_translations", {
 			lang: "en",
-			prefix: "pink.ordo.welcome",
+			prefix: "welcome",
 			translations: EN_TRANSLATIONS,
 		})
 
@@ -152,10 +162,10 @@ export default create_function(
 	},
 )
 
-const EN_TRANSLATIONS: Record<string, string> = {
+const EN_TRANSLATIONS: TScopedTranslations<"welcome"> = {
+	authenticated_page_title: "Welcome back!",
 	beta_started_announcement: "public beta is live!",
 	cookies_warning: "We don't use cookies! Wait, what?",
-	title: "One space for docs, files and projects",
-	auth_title: "Welcome back!",
 	news_widget_title: "News",
+	unauthenticated_page_title: "One space for docs, files and projects",
 }

@@ -28,10 +28,10 @@ import RequestAccess from "../sections/request-access.section"
 export default function UnauthenticatedPage() {
 	const commands = use$.commands()
 
-	const translate = use$.scoped_translation("pink.ordo.welcome")
+	const translate = use$.translation()
 
-	const t_title = translate("title")
-	const t_cookies_warning = translate("cookies_warning")
+	const t_title = translate("t.welcome.unauthenticated_page_title")
+	const t_cookies_warning = translate("t.welcome.cookies_warning")
 
 	useEffect(() => {
 		commands.emit("cmd.application.set_title", {

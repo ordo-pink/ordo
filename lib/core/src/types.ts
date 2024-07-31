@@ -164,35 +164,6 @@ export type TCreateFunctionFn = (
 export type TOrdoContext = TCreateFunctionContext
 
 declare global {
-	module i18n {
-		type TWrapKeys<$TKeys extends string, $TPrefix extends string> = {
-			[K in $TKeys]: `${$TPrefix}.${K}`
-		}
-
-		type TCommonKeys =
-			| "email"
-			| "handle"
-			| "password"
-			| "repeat_password"
-			| "privacy_policy"
-			| "twitter_url"
-			| "email_support"
-			| "messenger_support_url"
-			| "license"
-			| "contact_us"
-			| "command_palette_search_placeholder"
-			| "command_palette_hide"
-			| "command_palette_press_to_exit"
-			| "sidebar_toggle"
-			| "sidebar_hide"
-			| "sidebar_show"
-	}
-
-	module t {
-		// TODO: Use the same approach as with commands
-		type common = i18n.TWrapKeys<i18n.TCommonKeys, "common">
-	}
-
 	module Routes {
 		type TSuccessResponse<T> = { success: true; result: T }
 		type TErrorResponse = { success: false; error: string }
@@ -508,13 +479,13 @@ declare global {
 
 	type TRecordToKVUnion<
 		$TRecord extends object,
+		$TPrefix extends string = "root",
 		$TKey extends keyof $TRecord = keyof $TRecord,
-		$TPrefix extends string = "cmd",
 	> = $TKey extends string
 		? $TRecord[$TKey] extends () => infer V
 			? { key: `${$TPrefix}.${$TKey}`; value: V }
 			: $TRecord[$TKey] extends object
-				? TRecordToKVUnion<$TRecord[$TKey], keyof $TRecord[$TKey], `${$TPrefix}.${$TKey}`>
+				? TRecordToKVUnion<$TRecord[$TKey], `${$TPrefix}.${$TKey}`, keyof $TRecord[$TKey]>
 				: never
 		: null
 
@@ -522,15 +493,49 @@ declare global {
 		[K in T["key"]]: Extract<T, { key: K }>["value"]
 	}
 
-	type TFlatCommands = TFlattenRecord<TRecordToKVUnion<cmd>>
+	type TFlatCommands = TFlattenRecord<TRecordToKVUnion<cmd, "cmd">>
+	type TFlatTranslations = TFlattenRecord<TRecordToKVUnion<t, "t">>
+
+	interface t {
+		common: {
+			urls: {
+				twitter_x: () => string
+				support_email: () => string
+				support_messenger: () => string
+				contact_us: () => string
+			}
+			components: {
+				command_palette: {
+					search_placeholder: () => string
+					hide: () => string
+					exit_key_hint: () => string
+				}
+				sidebar: {
+					toggle: () => string
+					hide: () => string
+					show: () => string
+				}
+			}
+		}
+	}
+
+	type TDropPrefix<
+		$TStr extends string,
+		$TPrefix extends string,
+	> = $TStr extends `${$TPrefix}.${infer $TRest}` ? $TRest : never
+
+	type TScopedTranslations<$TScope extends string> = Record<
+		TDropPrefix<keyof TFlatTranslations, `t.${$TScope}`>,
+		string
+	>
 
 	interface cmd {
 		application: {
 			set_title: () => { window_title: string; status_bar_title?: string }
-			add_translations: () => {
+			add_translations: <$TPrefix extends string>() => {
 				lang: ISO_639_1_Locale
-				prefix: string
-				translations: Record<string, string>
+				prefix: $TPrefix
+				translations: Partial<TScopedTranslations<$TPrefix>>
 			}
 			background_task: {
 				set_status: () => BackgroundTaskStatus
@@ -983,7 +988,7 @@ declare global {
 				/**
 				 * Readable name of the command palette item. Put a translation key here, if you use i18n.
 				 */
-				readable_name: string
+				readable_name: keyof TFlatTranslations
 
 				/**
 				 * Action to be executed when command palette item is used.

@@ -31,26 +31,26 @@ export default function SignIn() {
 	const hosts = use$.hosts()
 	const fetch = use$.fetch()
 
-	const translate = use$.scoped_translation("pink.ordo.auth")
+	const translate = use$.translation()
 
-	const t_title = translate("sign_in_title")
-	const t_hint = translate("sign_in_hint")
+	const t_window_title = translate("t.auth.pages.sign_in.label")
+	const t_status_bar_title = translate("t.auth.pages.sign_in.status_bar_title")
 
 	const [email, set_email] = useState("")
 	const [password, set_password] = useState("")
 
 	useEffect(() => {
-		commands.emit<cmd.application.set_title>("application.set_title", {
-			window_title: t_title,
-			status_bar_title: t_hint,
+		commands.emit("cmd.application.set_title", {
+			window_title: t_window_title,
+			status_bar_title: t_status_bar_title,
 		})
-	}, [commands, t_title, t_hint])
+	}, [commands, t_window_title, t_status_bar_title])
 
 	return (
 		<div className="w-full max-w-sm">
 			<section className="mx-auto w-full px-4 text-center">
 				<Heading level="1" uppercase styled_first_letter>
-					{t_title}
+					{t_window_title}
 				</Heading>
 			</section>
 

@@ -25,12 +25,12 @@ import { use$ } from "@ordo-pink/frontend-react-hooks"
 import Link from "@ordo-pink/frontend-react-components/link"
 
 export default function Footer() {
-	const translate_common = use$.scoped_translation("common")
+	const translate = use$.translation()
 
-	const t_twitter_url = translate_common("twitter_url")
-	const t_messenger_support_url = translate_common("messenger_support_url")
-	const t_license = translate_common("license")
-	const t_contact_us = translate_common("contact_us")
+	const t_twitter_url = translate("t.common.urls.twitter_x")
+	const t_messenger_support_url = translate("t.common.urls.support_messenger")
+	const t_license = translate("t.auth.legal.license.label")
+	const t_contact_us = translate("t.common.urls.contact_us")
 
 	const currentYear = new Date(Date.now()).getFullYear()
 

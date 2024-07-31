@@ -27,8 +27,51 @@ import { create_ordo_context } from "@ordo-pink/frontend-react-hooks"
 import Auth from "./views/auth.workspace"
 
 declare global {
-	module t {
-		type auth = i18n.TWrapKeys<TAuthTranslationKey, "pink.ordo.auth">
+	interface t {
+		auth: {
+			inputs: {
+				email: {
+					label: () => string
+					placeholder: () => string
+					is_valid: () => string
+				}
+				handle: {
+					label: () => string
+					placeholder: () => string
+					is_valid: () => string
+				}
+				password: {
+					label: () => string
+					placeholder: () => string
+					repeat_password_label: () => string
+					has_capital_letter: () => string
+					has_digit: () => string
+					length_valid: () => string
+					passwords_match: () => string
+					has_special_char: () => string
+				}
+			}
+			legal: {
+				privacy_policy: {
+					label: () => string
+					consent: () => string
+				}
+				license: {
+					label: () => string
+				}
+			}
+			pages: {
+				sign_in: {
+					status_bar_title: () => string
+					label: () => string
+				}
+				sign_up: {
+					status_bar_title: () => string
+					label: () => string
+					already_signed_up: () => string
+				}
+			}
+		}
 	}
 
 	interface cmd {
@@ -40,62 +83,54 @@ declare global {
 	}
 }
 
-const AUTH_KEYS = [
-	"sign_up_title",
-	"sign_up_hint",
-	"sign_in_title",
-	"sign_in_hint",
-	"email_placeholder",
-	"handle_placeholder",
-	"already_signed_up",
-	"privacy_policy_confirm_lbl",
-	"password_has_capital",
-	"password_has_digit",
-	"password_length_valid",
-	"passwords_match",
-	"password_has_special_char",
-	"handle_is_valid",
-	"email_is_valid",
-] as const
+const AUTH_KEYS = [] as const
 
 export type TAuthTranslationKey = (typeof AUTH_KEYS)[number]
 
-const EN_TRANSLATIONS: Record<TAuthTranslationKey, string> = {
-	already_signed_up: "Already signed up?",
-	email_is_valid: "Email is valid",
-	email_placeholder: "hey@ordo.pink",
-	handle_is_valid: "Handle is valid",
-	handle_placeholder: "armstrong",
-	password_has_capital: "Password contains a capital letter",
-	password_has_digit: "Password contains a digit",
-	password_has_special_char: "Password contains a special char",
-	password_length_valid: "Password is 8 to 50 chars long",
-	passwords_match: "Passwords match",
-	privacy_policy_confirm_lbl: "I agree to ",
-	sign_in_hint: "",
-	sign_in_title: "Sign In",
-	sign_up_hint: "",
-	sign_up_title: "Sign Up",
+// TODO: Lazy translations installation
+const EN_TRANSLATIONS: TScopedTranslations<"auth"> = {
+	"inputs.email.is_valid": "Email is valid",
+	"inputs.email.label": "Email",
+	"inputs.email.placeholder": "hey@ordo.pink",
+	"inputs.handle.is_valid": "Handle is valid",
+	"inputs.handle.label": "Handle",
+	"inputs.handle.placeholder": "armstrong",
+	"inputs.password.has_capital_letter": "Password contains a capital letter",
+	"inputs.password.has_digit": "Password contains a digit",
+	"inputs.password.has_special_char": "Password contains a special char",
+	"inputs.password.label": "Password",
+	"inputs.password.length_valid": "Password is 8 to 50 chars long",
+	"inputs.password.passwords_match": "Passwords match",
+	"inputs.password.placeholder": "*********",
+	"inputs.password.repeat_password_label": "Repeat password",
+	"legal.license.label": "License",
+	"legal.privacy_policy.consent": "I agree to ",
+	"legal.privacy_policy.label": "Privacy Policy",
+	"pages.sign_in.label": "Sign In",
+	"pages.sign_in.status_bar_title": "",
+	"pages.sign_up.already_signed_up": "Already signed up?",
+	"pages.sign_up.label": "Sign Up",
+	"pages.sign_up.status_bar_title": "",
 }
 
 export default create_function(
 	"pink.ordo.auth",
 	{
 		queries: [
-			"users.current_user.is_authenticated",
 			"application.commands",
 			"application.current_route",
-			"application.hosts",
 			"application.fetch",
+			"application.hosts",
+			"users.current_user.is_authenticated",
 		],
 		commands: [
+			"cmd.application.add_translations",
+			"cmd.application.router.navigate",
 			"cmd.application.set_title",
-			"cmd.functions.activities.register",
-			"cmd.functions.activities.unregister",
 			"cmd.auth.open_sign_in",
 			"cmd.auth.open_sign_up",
-			"cmd.application.router.navigate",
-			"cmd.application.add_translations",
+			"cmd.functions.activities.register",
+			"cmd.functions.activities.unregister",
 		],
 	},
 	ctx => {
@@ -129,8 +164,8 @@ export default create_function(
 
 		commands.emit("cmd.application.add_translations", {
 			lang: "en",
+			prefix: "auth",
 			translations: EN_TRANSLATIONS,
-			prefix: "pink.ordo.auth",
 		})
 
 		commands.emit("cmd.functions.activities.register", {

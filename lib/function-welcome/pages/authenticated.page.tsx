@@ -37,10 +37,10 @@ export default function AuthenticatedPage() {
 	const current_language = use$.current_language()
 
 	const fetch = use$.fetch()
-	const translate = use$.scoped_translation("pink.ordo.welcome")
+	const translate = use$.translation()
 
-	const t_title = translate("auth_title")
-	const t_news = translate("news_widget_title")
+	const t_title = translate("t.welcome.authenticated_page_title")
+	const t_news = translate("t.welcome.news_widget_title")
 
 	const [news, set_news] = useState<TNews[] | null>(null)
 

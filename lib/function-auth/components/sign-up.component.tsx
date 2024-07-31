@@ -35,11 +35,10 @@ import Link from "@ordo-pink/frontend-react-components/link"
  */
 export default function SignUp() {
 	const commands = use$.commands()
-	const hosts = use$.hosts()
-	const translate = use$.scoped_translation("pink.ordo.auth")
-	const translate_common = use$.scoped_translation("common")
 	const current_language = use$.current_language()
 	const fetch = use$.fetch()
+	const hosts = use$.hosts()
+	const translate = use$.translation()
 
 	const [is_privacy_policy_confirmed, set_is_privacy_policy_confirmed] = useState(false)
 
@@ -60,33 +59,33 @@ export default function SignUp() {
 	const has_input_errors = keys_of(is_valid).some(key => !is_valid[key])
 	const is_button_disabled = has_input_errors || !is_privacy_policy_confirmed
 
-	const t_email = translate_common("email")
-	const t_handle = translate_common("handle")
-	const t_password = translate_common("password")
-	const t_repeat_password = translate_common("repeat_password")
-	const t_privacy_policy = translate_common("privacy_policy")
-	const t_title = translate("sign_up_title")
-	const t_hint = translate("sign_up_hint")
-	const t_email_placeholder = translate("email_placeholder")
-	const t_handle_placeholder = translate("handle_placeholder")
-	const t_already_signed_up = translate("already_signed_up")
-	const t_privacy_policy_confirmation_text = translate("privacy_policy_confirm_lbl")
-	const t_pwd_capital_valid = translate("password_has_capital")
-	const t_pwd_digit_valid = translate("password_has_digit")
-	const t_pwd_length_is_valid = translate("password_length_valid")
-	const t_pwd_passwords_match = translate("passwords_match")
-	const t_pwd_special_char_valid = translate("password_has_special_char")
-	const t_handle_is_valid = translate("handle_is_valid")
-	const t_email_is_valid = translate("email_is_valid")
+	const t_already_signed_up = translate("t.auth.pages.sign_up.already_signed_up")
+	const t_email = translate("t.auth.inputs.email.label")
+	const t_email_is_valid = translate("t.auth.inputs.email.is_valid")
+	const t_email_placeholder = translate("t.auth.inputs.email.placeholder")
+	const t_handle = translate("t.auth.inputs.handle.label")
+	const t_handle_is_valid = translate("t.auth.inputs.handle.is_valid")
+	const t_handle_placeholder = translate("t.auth.inputs.handle.placeholder")
+	const t_privacy_policy = translate("t.auth.legal.privacy_policy.label")
+	const t_privacy_policy_confirmation_text = translate("t.auth.legal.privacy_policy.consent")
+	const t_pwd_capital_valid = translate("t.auth.inputs.password.has_capital_letter")
+	const t_pwd_digit_valid = translate("t.auth.inputs.password.has_digit")
+	const t_pwd_label = translate("t.auth.inputs.password.label")
+	const t_pwd_length_is_valid = translate("t.auth.inputs.password.length_valid")
+	const t_pwd_passwords_match = translate("t.auth.inputs.password.passwords_match")
+	const t_pwd_repeat = translate("t.auth.inputs.password.repeat_password_label")
+	const t_pwd_special_char_valid = translate("t.auth.inputs.password.has_special_char")
+	const t_status_bar_title = translate("t.auth.pages.sign_up.status_bar_title")
+	const t_window_title = translate("t.auth.pages.sign_up.label")
 
 	console.log(is_valid)
 
 	useEffect(() => {
-		commands.emit<cmd.application.set_title>("application.set_title", {
-			window_title: t_title,
-			status_bar_title: t_hint,
+		commands.emit("cmd.application.set_title", {
+			window_title: t_window_title,
+			status_bar_title: t_status_bar_title,
 		})
-	}, [commands, t_title, t_hint])
+	}, [commands, t_window_title, t_status_bar_title])
 
 	useEffect(() => {
 		set_is_valid(p => ({ ...p, passwords_match: password === repeat_password }))
@@ -96,7 +95,7 @@ export default function SignUp() {
 		<div className="w-full max-w-sm">
 			<section className="mx-auto w-full px-4 text-center">
 				<Heading level="1" uppercase styled_first_letter>
-					{t_title}
+					{t_window_title}
 				</Heading>
 			</section>
 
@@ -130,7 +129,7 @@ export default function SignUp() {
 							/>
 
 							<PasswordInput
-								label={t_password}
+								label={t_pwd_label}
 								onInput={e => {
 									set_password(e.target.value)
 									set_is_valid(p => ({
@@ -146,7 +145,7 @@ export default function SignUp() {
 
 							<PasswordInput
 								id="repeat-password"
-								label={t_repeat_password}
+								label={t_pwd_repeat}
 								onInput={e => set_repeat_password(e.target.value)}
 							/>
 
@@ -264,7 +263,7 @@ export default function SignUp() {
 									.then(() => window.location.replace("/"))
 							}}
 						>
-							{t_title}
+							{t_window_title}
 						</Button.Primary>
 					</div>
 

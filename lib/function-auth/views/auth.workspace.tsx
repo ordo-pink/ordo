@@ -38,7 +38,7 @@ export default function Auth() {
 			.pipe(
 				Oath.ops.chain(action =>
 					Oath.If(SUPPORTED_ACTIONS.includes(action), {
-						F: () => commands.emit<cmd.auth.open_sign_in>("auth.open_sign_in"),
+						F: () => commands.emit("cmd.auth.open_sign_in"),
 					}),
 				),
 			)

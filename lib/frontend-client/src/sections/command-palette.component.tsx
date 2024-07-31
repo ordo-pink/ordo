@@ -38,15 +38,14 @@ type P = {
 }
 export default function CommandPaletteModal({ items, on_new_item, multiple, pinned_items }: P) {
 	const commands = use$.commands()
-	const translate = use$.scoped_translation("common")
-	const global_translate = use$.translation()
+	const translate = use$.translation()
 
 	const to_translated_item = useCallback(
 		(item: Client.CommandPalette.Item) => ({
 			...item,
-			readable_name: global_translate(item.readable_name),
+			readable_name: translate(item.readable_name) as Client.CommandPalette.Item["readable_name"],
 		}),
-		[global_translate],
+		[translate],
 	)
 
 	const [current_index, set_current_index] = useState(0)
@@ -250,8 +249,10 @@ export default function CommandPaletteModal({ items, on_new_item, multiple, pinn
 			.case("ArrowDown", () => on_arrow_down(event))
 			.default(noop)
 
-	const t_search_placeholder = translate("command_palette_search_placeholder")
-	const t_command_palette_press_to_exit = translate("command_palette_press_to_exit")
+	const t_search_placeholder = translate("t.common.components.command_palette.search_placeholder")
+	const t_command_palette_press_to_exit = translate(
+		"t.common.components.command_palette.exit_key_hint",
+	)
 
 	return (
 		<div className="max-w-screen max-h-screen w-full">

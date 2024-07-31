@@ -30,34 +30,14 @@ export const useTranslation = () => {
 
 	const translations_option = use$.strict_subscription(translations$, O.None())
 
-	return (key: string) => {
+	return (key: keyof TFlatTranslations) => {
 		const translations = translations_option
-			.pipe(O.ops.map(ts => ts[current_language] ?? ({} as Record<string, string>)))
-			.cata({ Some: ts => ts, None: () => ({}) as Record<string, string> })
+			.pipe(O.ops.map(ts => ts[current_language] ?? ({} as TFlatTranslations)))
+			.cata({ Some: ts => ts, None: () => ({}) as TFlatTranslations })
 
 		const result = translations[key]
 
-		return result != null ? result : key
-	}
-}
-
-export const useScopedTranslation = (prefix = "common") => {
-	const current_language = useCurrentLanguage()
-
-	const { get_translations } = use$.ordo_context()
-	const translations$ = get_translations()
-	const translations_option = use$.strict_subscription(translations$, O.None())
-
-	return (key: string) => {
-		const translations = translations_option
-			.pipe(O.ops.map(ts => ts[current_language] ?? ({} as Record<string, string>)))
-			.cata({ Some: ts => ts, None: () => ({}) as Record<string, string> })
-
-		const scoped_key = `${prefix}.${key}`
-
-		const result = translations[scoped_key]
-
-		return result != null ? result : scoped_key
+		return result != null ? result : "↺"
 	}
 }
 

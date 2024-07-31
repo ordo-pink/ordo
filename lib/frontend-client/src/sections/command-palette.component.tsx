@@ -18,7 +18,7 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { BsPlus, BsSearch } from "react-icons/bs"
-import { ChangeEvent, KeyboardEvent, useCallback, useEffect, useState } from "react"
+import { ChangeEvent, ComponentType, KeyboardEvent, useCallback, useEffect, useState } from "react"
 import Fuse from "fuse.js"
 
 import { Either } from "@ordo-pink/either"
@@ -29,6 +29,7 @@ import { use$ } from "@ordo-pink/frontend-react-hooks"
 import Accelerator from "@ordo-pink/frontend-react-components/accelerator"
 import ActionListItem from "@ordo-pink/frontend-react-components/action-list-item"
 import RenderFromNullable from "@ordo-pink/frontend-react-components/render-from-nullable"
+import { IconType } from "react-icons"
 
 type P = {
 	items: Client.CommandPalette.Item[]
@@ -40,37 +41,29 @@ export default function CommandPaletteModal({ items, on_new_item, multiple, pinn
 	const commands = use$.commands()
 	const translate = use$.translation()
 
-	const to_translated_item = useCallback(
-		(item: Client.CommandPalette.Item) => ({
-			...item,
-			readable_name: translate(item.readable_name) as Client.CommandPalette.Item["readable_name"],
-		}),
-		[translate],
-	)
-
 	const [current_index, set_current_index] = useState(0)
 	const [input_value, set_input_value] = useState("")
 	const [pointer_location, set_pointer_location] = useState<"selected" | "suggested">(
 		pinned_items && pinned_items.length > 0 ? "selected" : "suggested",
 	)
-	const [all_items, set_all_items] = useState<Client.CommandPalette.Item[]>(
-		items.map(to_translated_item),
-	)
+	const [all_items, set_all_items] = useState<Client.CommandPalette.Item[]>(items)
 	const [selected_items, set_selected_items] = useState<Client.CommandPalette.Item[]>(
-		pinned_items ?? [],
+		pinned_items ? pinned_items : [],
 	)
 	const [suggested_items, set_suggested_items] = useState<Client.CommandPalette.Item[]>([])
 
 	useEffect(() => {
-		fuse.setCollection(all_items.map(to_translated_item))
+		fuse.setCollection(
+			all_items.map(item => ({ ...item, translation: translate(item.readable_name) })),
+		)
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [all_items])
+	}, [all_items, translate])
 
 	useEffect(() => {
 		if (!all_items) return
 
 		if (input_value === "") {
-			set_suggested_items(all_items.map(to_translated_item))
+			set_suggested_items(all_items)
 
 			if (all_items.length - 1 < current_index && pointer_location === "suggested") {
 				set_current_index(all_items.length > 0 ? all_items.length - 1 : 0)
@@ -128,7 +121,7 @@ export default function CommandPaletteModal({ items, on_new_item, multiple, pinn
 					selected_items_copy.splice(index, 1)
 
 					set_selected_items(selected_items_copy)
-					set_all_items([selected_item, ...suggested_items].map(to_translated_item))
+					set_all_items([selected_item, ...suggested_items])
 				}
 
 				if (location === "suggested") {
@@ -139,7 +132,7 @@ export default function CommandPaletteModal({ items, on_new_item, multiple, pinn
 					)
 
 					set_all_items(all_items_copy)
-					set_selected_items([...selected_items, selected_item].map(to_translated_item))
+					set_selected_items([...selected_items, selected_item])
 				}
 			},
 		)
@@ -275,12 +268,12 @@ export default function CommandPaletteModal({ items, on_new_item, multiple, pinn
 						{selected_items.map((item, index) => (
 							<Item
 								key={item.id}
-								readableName={item.readable_name}
-								commandName={item.id}
+								readable_name={item.readable_name}
+								command_name={item.id}
 								Icon={item.Icon}
 								accelerator={item.accelerator}
-								isCurrent={current_index === index && pointer_location === "selected"}
-								onSelect={() => on_enter(index, "selected")}
+								is_current={current_index === index && pointer_location === "selected"}
+								on_select={() => on_enter(index, "selected")}
 							/>
 						))}
 					</div>
@@ -290,12 +283,12 @@ export default function CommandPaletteModal({ items, on_new_item, multiple, pinn
 					{suggested_items.map((item, index) => (
 						<Item
 							key={item.id}
-							readableName={item.readable_name}
-							commandName={item.id}
+							readable_name={item.readable_name}
+							command_name={item.id}
 							Icon={item.Icon}
 							accelerator={item.accelerator}
-							isCurrent={current_index === index && pointer_location === "suggested"}
-							onSelect={() => on_enter(index, "suggested")}
+							is_current={current_index === index && pointer_location === "suggested"}
+							on_select={() => on_enter(index, "suggested")}
 						/>
 					))}
 				</div>
@@ -323,21 +316,37 @@ export default function CommandPaletteModal({ items, on_new_item, multiple, pinn
 	)
 }
 
-const Item = ({ commandName, readableName, Icon, accelerator, isCurrent, onSelect }: any) => {
-	use$.accelerator(accelerator, onSelect)
+type TItemP = {
+	command_name: string
+	readable_name: keyof TFlatTranslations
+	Icon?: ComponentType | IconType
+	accelerator?: string
+	is_current: boolean
+	on_select: () => void
+}
+const Item = ({
+	command_name,
+	readable_name,
+	Icon,
+	accelerator,
+	is_current,
+	on_select,
+}: TItemP) => {
+	use$.accelerator(accelerator, on_select)
+	const translate = use$.translation()
+
+	const t_readable_name = translate(readable_name)
 
 	return (
 		<ActionListItem
 			large
-			key={commandName}
-			text={readableName}
+			key={command_name}
+			text={t_readable_name}
 			Icon={Icon || (() => null)}
-			current={isCurrent}
-			onClick={onSelect}
+			current={is_current}
+			onClick={on_select}
 		>
-			<RenderFromNullable having={accelerator}>
-				<Accelerator accelerator={accelerator} />
-			</RenderFromNullable>
+			{accelerator ? <Accelerator accelerator={accelerator} /> : null}
 		</ActionListItem>
 	)
 }
@@ -345,6 +354,6 @@ const Item = ({ commandName, readableName, Icon, accelerator, isCurrent, onSelec
 // --- Internal ---
 
 const fuse = new Fuse([] as Client.CommandPalette.Item[], {
-	keys: ["readable_name"],
-	threshold: 0.1,
+	keys: ["translation"],
+	threshold: 0.3,
 })

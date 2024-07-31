@@ -32,15 +32,15 @@ export const init_command_palette = call_once(
 	(logger: TLogger, commands: Client.Commands.Commands, ctx: TOrdoContext) => {
 		logger.debug("🟡 Initialising command palette...")
 
-		commands.on<cmd.command_palette.show>("command_palette.show", on_show_custom_cp(commands, ctx))
-		commands.on<cmd.command_palette.hide>("command_palette.hide", on_hide_custom_cp(commands))
-		commands.on<cmd.command_palette.add>("command_palette.add", on_add_global_item)
-		commands.on<cmd.command_palette.remove>("command_palette.remove", on_remove_global_item)
+		commands.on("cmd.application.command_palette.show", on_show_custom_cp(commands, ctx))
+		commands.on("cmd.application.command_palette.hide", on_hide_custom_cp(commands))
+		commands.on("cmd.application.command_palette.add", on_add_global_item)
+		commands.on("cmd.application.command_palette.remove", on_remove_global_item)
 
 		// TODO: Register all keybindings globally
-		commands.emit<cmd.command_palette.add>("command_palette.add", {
+		commands.emit("cmd.application.command_palette.add", {
 			id: "command_palette.hide",
-			on_select: () => commands.emit<cmd.command_palette.hide>("command_palette.hide"),
+			on_select: () => commands.emit("cmd.application.command_palette.hide"),
 			readable_name: "common.command_palette_hide",
 			Icon: BsCommand,
 			accelerator: "mod+shift+p",
@@ -53,9 +53,9 @@ export const init_command_palette = call_once(
 
 				global_command_palette$.subscribe(global_command_palette => {
 					if (custom_command_palette$.getValue().items.length > 0)
-						commands.emit<cmd.command_palette.hide>("command_palette.hide")
+						commands.emit("cmd.application.command_palette.hide")
 					else
-						commands.emit<cmd.command_palette.show>("command_palette.show", global_command_palette)
+						commands.emit("cmd.application.command_palette.show", global_command_palette)
 				})
 			}
 		})
@@ -82,7 +82,7 @@ const on_show_custom_cp =
 		let root: Root
 
 		custom_command_palette$.next(state)
-		commands.emit<cmd.modal.show>("modal.show", {
+		commands.emit("cmd.application.modal.show", {
 			on_unmount: () => {
 				root.unmount()
 				custom_command_palette$.next({ items: [] })
@@ -106,7 +106,7 @@ const on_show_custom_cp =
 		})
 	}
 const on_hide_custom_cp = (commands: Client.Commands.Commands) => () => {
-	commands.emit<cmd.modal.hide>("modal.hide")
+	commands.emit("cmd.application.modal.hide")
 }
 
 type AddP = (

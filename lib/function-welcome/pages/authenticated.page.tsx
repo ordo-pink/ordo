@@ -46,9 +46,7 @@ export default function AuthenticatedPage() {
 
 	useEffect(() => {
 		// TODO: Take file from public ordo files
-		commands.emit<cmd.application.background_task.start_loading>(
-			"application.background_task.start_loading",
-		)
+		commands.emit("cmd.application.background_task.start_loading")
 
 		const ordo_news0 = Oath.FromPromise(() =>
 			fetch(`${hosts.static}/news.${current_language}.json`),
@@ -60,34 +58,24 @@ export default function AuthenticatedPage() {
 		// TODO: Log error on reject
 		void ordo_news0.fork(
 			error => {
-				commands.emit<cmd.application.background_task.reset_status>(
-					"application.background_task.reset_status",
-				)
-
+				commands.emit("cmd.application.background_task.reset_status")
 				is_dev && logger.alert(error)
 			},
 			news => {
-				commands.emit<cmd.application.background_task.reset_status>(
-					"application.background_task.reset_status",
-				)
-
+				commands.emit("cmd.application.background_task.reset_status")
 				set_news(news)
 			},
 		)
 
 		return () => {
-			commands.emit<cmd.application.background_task.reset_status>(
-				"application.background_task.reset_status",
-			)
+			commands.emit("cmd.application.background_task.reset_status")
 
 			return ordo_news0.cancel()
 		}
 	}, [fetch, hosts, commands, current_language, logger, is_dev])
 
 	useEffect(() => {
-		commands.emit<cmd.application.set_title>("application.set_title", {
-			window_title: t_title,
-		})
+		commands.emit("cmd.application.set_title", { window_title: t_title })
 	}, [commands, t_title])
 
 	return (
@@ -121,7 +109,7 @@ export default function AuthenticatedPage() {
 
 					<button
 						onClick={() =>
-							commands.emit<cmd.modal.show>("modal.show", {
+							commands.emit("cmd.application.modal.show", {
 								render: div => {
 									div.innerHTML = "HELLO"
 								},

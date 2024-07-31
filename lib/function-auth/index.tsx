@@ -31,11 +31,11 @@ declare global {
 		type auth = i18n.TWrapKeys<TAuthTranslationKey, "pink.ordo.auth">
 	}
 
-	module cmd {
-		module auth {
-			type open_sign_in = { name: "auth.open_sign_in" }
-			type open_sign_up = { name: "auth.open_sign_up" }
-			type sign_out = { name: "auth.sign_out" }
+	interface cmd {
+		auth: {
+			open_sign_in: () => void
+			open_sign_up: () => void
+			sign_out: () => void
 		}
 	}
 }
@@ -89,13 +89,13 @@ export default create_function(
 			"application.fetch",
 		],
 		commands: [
-			"application.set_title",
-			"activities.register",
-			"activities.unregister",
-			"auth.open_sign_in",
-			"auth.open_sign_up",
-			"router.navigate",
-			"application.add_translations",
+			"cmd.application.set_title",
+			"cmd.functions.activities.register",
+			"cmd.functions.activities.unregister",
+			"cmd.auth.open_sign_in",
+			"cmd.auth.open_sign_up",
+			"cmd.application.router.navigate",
+			"cmd.application.add_translations",
 		],
 	},
 	ctx => {
@@ -107,15 +107,15 @@ export default create_function(
 
 		let workspace_root_option: TOption<Root> = O.None()
 
-		commands.on<cmd.auth.open_sign_in>("auth.open_sign_in", () =>
-			commands.emit<cmd.router.navigate>("router.navigate", "/auth/sign-in"),
+		commands.on("cmd.auth.open_sign_in", () =>
+			commands.emit("cmd.application.router.navigate", "/auth/sign-in"),
 		)
 
-		commands.on<cmd.auth.open_sign_up>("auth.open_sign_up", () =>
-			commands.emit<cmd.router.navigate>("router.navigate", "/auth/sign-up"),
+		commands.on("cmd.auth.open_sign_up", () =>
+			commands.emit("cmd.application.router.navigate", "/auth/sign-up"),
 		)
 
-		commands.on<cmd.auth.sign_out>("auth.sign_out", () => {
+		commands.on("cmd.auth.sign_out", () => {
 			const path: Routes.ID.SignOut.Path = "/account/sign-out"
 			const method: Routes.ID.SignOut.Method = "POST"
 			const credentials = "include"
@@ -127,13 +127,13 @@ export default create_function(
 			})
 		})
 
-		commands.emit<cmd.application.add_translations>("application.add_translations", {
+		commands.emit("cmd.application.add_translations", {
 			lang: "en",
 			translations: EN_TRANSLATIONS,
 			prefix: "pink.ordo.auth",
 		})
 
-		commands.emit<cmd.activities.register>("activities.register", {
+		commands.emit("cmd.functions.activities.register", {
 			fid: ctx.fid,
 			activity: {
 				name: "pink.ordo.auth.authentication",

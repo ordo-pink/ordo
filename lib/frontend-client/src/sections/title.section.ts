@@ -27,8 +27,8 @@ type TInitTitleStreamFn = (logger: TLogger, commands: Client.Commands.Commands) 
 export const init_title_display: TInitTitleStreamFn = call_once((logger, commands) => {
 	logger.debug("🟡 Initialising title stream...")
 
-	commands.on<cmd.application.set_title>(
-		"application.set_title",
+	commands.on(
+		"cmd.application.set_title",
 		state =>
 			is_non_empty_string(state.window_title) &&
 			(is_undefined(state.status_bar_title) || is_string(state.status_bar_title)) &&

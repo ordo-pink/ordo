@@ -62,7 +62,7 @@ export default function BetaInvitation({ wide }: P) {
 							onClick={e => {
 								e.preventDefault()
 
-								commands.emit<cmd.auth.open_sign_up>("auth.open_sign_up")
+								commands.emit("cmd.auth.open_sign_up")
 							}}
 						>
 							{t_sign_up}
@@ -72,7 +72,7 @@ export default function BetaInvitation({ wide }: P) {
 							onClick={e => {
 								e.preventDefault()
 
-								commands.emit<cmd.auth.open_sign_in>("auth.open_sign_in")
+								commands.emit("cmd.auth.open_sign_in")
 							}}
 						>
 							{t_sign_in}

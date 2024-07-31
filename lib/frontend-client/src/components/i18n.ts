@@ -32,22 +32,19 @@ type TInitI18nFn = (params: Pick<TInitCtx, "logger" | "commands">) => {
 export const init_i18n: TInitI18nFn = call_once(({ logger, commands }) => {
 	logger.debug("🟡 Initialising i18n...")
 
-	commands.on<cmd.application.add_translations>(
-		"application.add_translations",
-		({ translations, lang, prefix }) => {
-			const known_translations = translations$.getValue().unwrap() ?? ({} as TTranslations)
-			const prefixed_translations = keys_of(translations).reduce(
-				(acc, key) => ({ ...acc, [`${prefix}.${key}`]: translations[key] }),
-				{},
-			)
+	commands.on("cmd.application.add_translations", ({ translations, lang, prefix }) => {
+		const known_translations = translations$.getValue().unwrap() ?? ({} as TTranslations)
+		const prefixed_translations = keys_of(translations).reduce(
+			(acc, key) => ({ ...acc, [`${prefix}.${key}`]: translations[key] }),
+			{},
+		)
 
-			if (!known_translations[lang]) known_translations[lang] = {}
+		if (!known_translations[lang]) known_translations[lang] = {}
 
-			known_translations[lang] = { ...known_translations[lang], ...prefixed_translations }
+		known_translations[lang] = { ...known_translations[lang], ...prefixed_translations }
 
-			translations$.next(O.Some(known_translations))
-		},
-	)
+		translations$.next(O.Some(known_translations))
+	})
 
 	logger.debug("🟢 Initialised i18n.")
 

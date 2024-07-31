@@ -25,13 +25,13 @@ export const register_common_translations = (
 ) => {
 	logger.debug("🟡 Registerring common translations...")
 
-	commands.emit<cmd.application.add_translations>("application.add_translations", {
+	commands.emit("cmd.application.add_translations", {
 		lang: "en",
 		prefix: "common",
 		translations: EN_TRANSLATIONS,
 	})
 
-	commands.emit<cmd.application.add_translations>("application.add_translations", {
+	commands.emit("cmd.application.add_translations", {
 		lang: "ru",
 		prefix: "common",
 		translations: RU_TRANSLATIONS,

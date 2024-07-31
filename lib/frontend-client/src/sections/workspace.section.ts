@@ -42,26 +42,80 @@ export const init_workspace = (
 ) => {
 	logger.debug("🟡 Initialising sidebar...")
 
-	commands.on<cmd.sidebar.disable>("sidebar.disable", handle_disable_sidebar)
-	commands.on<cmd.sidebar.enable>("sidebar.enable", handle_enable_sidebar)
-	commands.on<cmd.sidebar.set_size>("sidebar.set-size", handle_set_sidebar_size)
-	commands.on<cmd.sidebar.show>("sidebar.show", handle_sidebar_show)
-	commands.on<cmd.sidebar.hide>("sidebar.hide", handle_sidebar_hide)
-	commands.on<cmd.sidebar.toggle>("sidebar.toggle", handle_sidebar_toggle)
+	commands.on("cmd.application.sidebar.disable", () => {
+		const sidebar = sidebar$.getValue()
 
-	commands.emit<cmd.command_palette.add>("command_palette.add", {
+		if (sidebar.disabled) return
+
+		sidebar$.next({ disabled: true })
+	})
+
+	commands.on("cmd.application.sidebar.enable", () => {
+		const sidebar = sidebar$.getValue()
+
+		if (!sidebar.disabled) return
+
+		sidebar$.next({ disabled: false, sizes: DEFAULT_WORKSPACE_SPLIT_SIZE })
+	})
+
+	commands.on("cmd.application.sidebar.set_size", sizes => {
+		const sidebar = sidebar$.getValue()
+
+		if (sidebar.disabled) return
+
+		sidebar$.next({ disabled: false, sizes })
+	})
+
+	commands.on("cmd.application.sidebar.show", payload => {
+		const sidebar = sidebar$.getValue()
+
+		if (sidebar.disabled) return
+
+		const window_width = window.innerWidth
+		const isNarrow = window_width < NARROW_WINDOW_BREAKPOINT
+		const sizes = isNarrow ? DEFAULT_WORKSPACE_SPLIT_SIZE_NARROW_OPEN : DEFAULT_WORKSPACE_SPLIT_SIZE
+
+		sidebar$.next({ disabled: false, sizes: payload ?? sizes })
+	})
+
+	commands.on("cmd.application.sidebar.hide", () => {
+		const sidebar = sidebar$.getValue()
+
+		if (sidebar.disabled) return
+
+		sidebar$.next({ disabled: false, sizes: DEFAULT_WORKSPACE_SPLIT_SIZE_NO_SIDEBAR })
+	})
+
+	commands.on("cmd.application.sidebar.toggle", () => {
+		const sidebar = sidebar$.getValue()
+
+		if (sidebar.disabled) return
+
+		const window_width = window.innerWidth
+		const is_narrow = window_width < NARROW_WINDOW_BREAKPOINT
+		const sizes = is_narrow
+			? DEFAULT_WORKSPACE_SPLIT_SIZE_NARROW_OPEN
+			: DEFAULT_WORKSPACE_SPLIT_SIZE
+
+		sidebar$.next({
+			disabled: false,
+			sizes: sidebar.sizes[0] > 0 ? DEFAULT_WORKSPACE_SPLIT_SIZE_NO_SIDEBAR : sizes,
+		})
+	})
+
+	commands.emit("cmd.application.command_palette.add", {
 		id: "sidebar.toggle",
 		readable_name: "common.sidebar_toggle",
 		Icon: BsToggle2Off,
 		on_select: () => {
-			commands.emit<cmd.command_palette.hide>("command_palette.hide")
-			commands.emit<cmd.sidebar.toggle>("sidebar.toggle")
+			commands.emit("cmd.application.command_palette.hide")
+			commands.emit("cmd.application.sidebar.toggle")
 		},
 		accelerator: "mod+b",
 	})
 
-	commands.emit<cmd.ctx_menu.add>("context-menu.add", {
-		cmd: "sidebar.show",
+	commands.emit("cmd.application.context_menu.add", {
+		cmd: "cmd.application.sidebar.show",
 		readable_name: "common.sidebar_show",
 		Icon: BsToggle2On,
 		should_show: ({ event }) =>
@@ -74,8 +128,8 @@ export const init_workspace = (
 		accelerator: "mod+b",
 	})
 
-	commands.emit<cmd.ctx_menu.add>("context-menu.add", {
-		cmd: "sidebar.hide",
+	commands.emit("cmd.application.context_menu.add", {
+		cmd: "cmd.application.sidebar.hide",
 		readable_name: "common.sidebar_hide",
 		Icon: BsToggle2Off,
 		should_show: ({ event }) => {
@@ -110,10 +164,10 @@ export const init_workspace = (
 				activity.render_workspace!(workspace_element)
 
 				if (activity.render_sidebar) {
-					commands.emit<cmd.sidebar.enable>("sidebar.enable")
+					commands.emit("cmd.application.sidebar.enable")
 					activity.render_sidebar(sidebar_element)
 				} else {
-					commands.emit<cmd.sidebar.disable>("sidebar.disable")
+					commands.emit("cmd.application.sidebar.disable")
 				}
 			},
 			None: noop,
@@ -157,7 +211,7 @@ export const init_workspace = (
 							.default(noop)
 					},
 					onDragEnd: sizes =>
-						commands.emit<cmd.sidebar.set_size>("sidebar.set-size", [
+						commands.emit("cmd.application.sidebar.set_size", [
 							Math.round(sizes[0]),
 							Math.round(sizes[1]),
 						]),
@@ -184,62 +238,3 @@ export const init_workspace = (
 const eperm = RRR.codes.eperm("init_sidebar")
 
 const sidebar$ = new BehaviorSubject<TSidebarState>({ disabled: true })
-
-const handle_disable_sidebar = () => {
-	const sidebar = sidebar$.getValue()
-
-	if (sidebar.disabled) return
-
-	sidebar$.next({ disabled: true })
-}
-
-const handle_enable_sidebar = () => {
-	const sidebar = sidebar$.getValue()
-
-	if (!sidebar.disabled) return
-
-	sidebar$.next({ disabled: false, sizes: DEFAULT_WORKSPACE_SPLIT_SIZE })
-}
-
-const handle_set_sidebar_size = (payload: cmd.sidebar.set_size["payload"]) => {
-	const sidebar = sidebar$.getValue()
-
-	if (sidebar.disabled) return
-
-	sidebar$.next({ disabled: false, sizes: payload })
-}
-
-const handle_sidebar_show = (payload: cmd.sidebar.show["payload"]) => {
-	const sidebar = sidebar$.getValue()
-
-	if (sidebar.disabled) return
-
-	const window_width = window.innerWidth
-	const isNarrow = window_width < NARROW_WINDOW_BREAKPOINT
-	const sizes = isNarrow ? DEFAULT_WORKSPACE_SPLIT_SIZE_NARROW_OPEN : DEFAULT_WORKSPACE_SPLIT_SIZE
-
-	sidebar$.next({ disabled: false, sizes: payload ?? sizes })
-}
-
-const handle_sidebar_hide = () => {
-	const sidebar = sidebar$.getValue()
-
-	if (sidebar.disabled) return
-
-	sidebar$.next({ disabled: false, sizes: DEFAULT_WORKSPACE_SPLIT_SIZE_NO_SIDEBAR })
-}
-
-const handle_sidebar_toggle = () => {
-	const sidebar = sidebar$.getValue()
-
-	if (sidebar.disabled) return
-
-	const window_width = window.innerWidth
-	const is_narrow = window_width < NARROW_WINDOW_BREAKPOINT
-	const sizes = is_narrow ? DEFAULT_WORKSPACE_SPLIT_SIZE_NARROW_OPEN : DEFAULT_WORKSPACE_SPLIT_SIZE
-
-	sidebar$.next({
-		disabled: false,
-		sizes: sidebar.sizes[0] > 0 ? DEFAULT_WORKSPACE_SPLIT_SIZE_NO_SIDEBAR : sizes,
-	})
-}

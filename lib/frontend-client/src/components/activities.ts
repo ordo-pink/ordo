@@ -43,35 +43,23 @@ export const init_activities: TInitActivitiesFn = call_once(
 
 		aggregated_activities$.subscribe(value => activities$.next(value))
 
-		commands.on<cmd.activities.register>("activities.register", ({ activity, fid }) =>
-			Result.If(known_functions.has_permissions(fid, { commands: ["activities.register"] }))
-				.pipe(Result.ops.err_map(_log_invalid_fid(fid, "register_activity")))
-				.pipe(
-					Result.ops.chain(fid =>
-						Result.If(!activities$.getValue().some(a => a.name === activity.name), {
-							T: () => fid,
-							F: _log_already_exists(activity.name),
-						}),
-					),
-				)
-				.pipe(Result.ops.map(fid => add$.next({ ...activity, fid: fid! }))),
+		commands.on("cmd.functions.activities.register", ({ activity, fid }) =>
+			Result.If(!activities$.getValue().some(a => a.name === activity.name), {
+				T: () => fid,
+				F: _log_already_exists(activity.name),
+			}).pipe(Result.ops.map(fid => add$.next({ ...activity, fid: fid! }))),
 		)
 
-		commands.on<cmd.activities.unregister>("activities.unregister", ({ name, fid }) =>
-			Result.FromNullable(fid)
-				.pipe(Result.ops.err_map(_log_invalid_fid(fid, "unregister_activity")))
+		commands.on("cmd.functions.activities.unregister", ({ name, fid }) =>
+			Result.FromNullable(
+				activities$.getValue().find(activity => activity.name === name),
+				_log_activity_not_found(name),
+			)
 				.pipe(
-					Result.ops.chain(fid =>
-						Result.FromNullable(
-							activities$.getValue().find(activity => activity.name === name),
-							_log_activity_not_found(name),
-						).pipe(
-							Result.ops.chain(activity =>
-								Result.If(activity.fid === fid || known_functions.is_internal(fid), {
-									F: _log_different_fid(fid),
-								}),
-							),
-						),
+					Result.ops.chain(activity =>
+						Result.If(activity.fid === fid || known_functions.is_internal(fid), {
+							F: _log_different_fid(fid),
+						}),
 					),
 				)
 				.pipe(Result.ops.map(() => remove$.next(name))),

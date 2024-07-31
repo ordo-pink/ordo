@@ -28,8 +28,8 @@ type P = { commands: Client.Commands.Commands; logger: TLogger }
 export const init_modal = ({ commands, logger }: P) => {
 	logger.debug("🟡 Initialising modal...")
 
-	commands.on<cmd.modal.show>("modal.show", on_modal_show)
-	commands.on<cmd.modal.hide>("modal.hide", on_modal_hide)
+	commands.on("cmd.application.modal.show", on_modal_show)
+	commands.on("cmd.application.modal.hide", on_modal_hide)
 
 	const modal_overlay_element = document.querySelector("#modal-overlay") as HTMLDivElement
 	const modal_element = document.querySelector("#modal") as HTMLDivElement
@@ -67,7 +67,7 @@ export const init_modal = ({ commands, logger }: P) => {
 
 				document.addEventListener("keydown", on_esc_key_press)
 
-				modal_overlay_element.onclick = () => commands.emit<cmd.modal.hide>("modal.hide")
+				modal_overlay_element.onclick = () => commands.emit("cmd.application.modal.hide")
 				modal_element.onclick = event => event.stopPropagation()
 
 				state.render(modal_element)
@@ -86,7 +86,7 @@ export const init_modal = ({ commands, logger }: P) => {
 						"transition-colors",
 						"duration-300",
 					)
-					close_button.onclick = () => commands.emit<cmd.modal.hide>("modal.hide")
+					close_button.onclick = () => commands.emit("cmd.application.modal.hide")
 					close_button.innerHTML = `<svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 16 16" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg">
 					<path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"></path>
 					</svg>`
@@ -117,7 +117,7 @@ type ModalState = {
 const modal$ = new BehaviorSubject<TOption<ModalState>>(O.None())
 
 // Define command handlers
-const on_modal_show: Client.Commands.Handler<Client.Modal.ModalPayload> = payload => {
+const on_modal_show: Client.Commands.TCommandHandler<Client.Modal.ModalPayload> = payload => {
 	const show_close_button = payload.show_close_button ?? true
 	const on_unmount = payload.on_unmount ?? (() => void 0)
 	const render = payload.render

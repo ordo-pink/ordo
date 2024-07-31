@@ -32,7 +32,7 @@ export const init_activity_bar = (
 
 	const activity_bar_element = document.querySelector("#activity-bar") as HTMLDivElement
 	activity_bar_element.oncontextmenu = event =>
-		commands.emit<cmd.ctx_menu.show>("context-menu.show", { event: event as any })
+		commands.emit("cmd.application.context_menu.show", { event: event as any })
 
 	const activity_bar_activities$ = activities$.pipe(
 		map(as => as.filter(a => !a.is_background && !!a.render_icon)),
@@ -52,8 +52,8 @@ export const init_activity_bar = (
 				a.href = activity.default_route ?? activity.routes[0]
 				a.onclick = event => {
 					event.preventDefault()
-					commands.emit<cmd.router.navigate>(
-						"router.navigate",
+					commands.emit(
+						"cmd.application.router.navigate",
 						activity.default_route ?? activity.routes[0],
 					)
 				}

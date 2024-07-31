@@ -61,51 +61,41 @@ export const init_metadata: TInitMetadataFn = ({
 	const metadata_query = MetadataQuery.of(metadata_repository)
 	const metadata_command = MetadataCommand.of(metadata_repository, metadata_query, user_query)
 
-	commands.on<cmd.data.add_labels>("data.metadata.add_labels", ({ fsid, labels }) =>
+	commands.on("cmd.data.metadata.add_labels", ({ fsid, labels }) =>
 		metadata_command.add_labels(fsid, ...labels),
 	)
 
-	commands.on<cmd.data.remove_labels>("data.metadata.remove_labels", ({ fsid, labels }) =>
+	commands.on("cmd.data.metadata.remove_labels", ({ fsid, labels }) =>
 		metadata_command.remove_labels(fsid, ...labels),
 	)
 
-	commands.on<cmd.data.create>("data.metadata.create", metadata_command.create)
+	commands.on("cmd.data.metadata.create", metadata_command.create)
 
-	commands.on<cmd.data.move>("data.metadata.move", ({ fsid, parent }) =>
-		metadata_command.set_parent(fsid, parent),
+	commands.on("cmd.data.metadata.move", ({ fsid, new_parent }) =>
+		metadata_command.set_parent(fsid, new_parent),
 	)
 
-	commands.on<cmd.data.remove>("data.metadata.remove", fsid => metadata_command.remove(fsid))
+	commands.on("cmd.data.metadata.remove", fsid => metadata_command.remove(fsid))
 
-	commands.on<cmd.data.add_links>("data.add_links", ({ fsid, links }) =>
+	commands.on("cmd.data.metadata.add_links", ({ fsid, links }) =>
 		metadata_command.add_links(fsid, ...links),
 	)
 
-	commands.on<cmd.data.remove_links>("data.metadata.remove_links", ({ fsid, links }) =>
+	commands.on("cmd.data.metadata.remove_links", ({ fsid, links }) =>
 		metadata_command.remove_links(fsid, ...links),
 	)
 
-	commands.on<cmd.data.rename>("data.metadata.rename", ({ fsid, name }) =>
-		metadata_command.set_name(fsid, name),
+	commands.on("cmd.data.metadata.rename", ({ fsid, new_name }) =>
+		metadata_command.set_name(fsid, new_name),
 	)
 
 	MetadataManager.of(metadata_repository, remote_metadata_repository, auth$, fetch).start(
 		state_change =>
 			Switch.Match(state_change)
-				.case("get-remote", () =>
-					commands.emit<cmd.application.background_task.start_loading>(
-						"application.background_task.start_loading",
-					),
-				)
-				.case("put-remote", () =>
-					commands.emit<cmd.application.background_task.start_saving>(
-						"application.background_task.start_saving",
-					),
-				)
+				.case("get-remote", () => commands.emit("cmd.application.background_task.start_loading"))
+				.case("put-remote", () => commands.emit("cmd.application.background_task.start_saving"))
 				.case(["get-remote-complete", "put-remote-complete"], () =>
-					commands.emit<cmd.application.background_task.reset_status>(
-						"application.background_task.reset_status",
-					),
+					commands.emit("cmd.application.background_task.reset_status"),
 				)
 				.default(noop),
 	)

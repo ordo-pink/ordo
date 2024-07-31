@@ -32,10 +32,10 @@ const create_forbidden_commands_message = (fid: symbol | null) =>
 	`🔴 FID "${String(fid)}" did not request permission to use commands.`
 
 type TCommand = (Client.Commands.Command | Client.Commands.PayloadCommand) & { fid: symbol }
-type TCmdHandlerState = Record<string, Client.Commands.Handler<any>[]>
+type TCmdHandlerState = Record<string, Client.Commands.TCommandHandler<any>[]>
 type TCmdListener<N extends Client.Commands.CommandName = Client.Commands.CommandName, P = any> = [
 	N,
-	Client.Commands.Handler<P>,
+	Client.Commands.TCommandHandler<P>,
 	symbol,
 ]
 

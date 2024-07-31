@@ -189,6 +189,7 @@ declare global {
 	}
 
 	module t {
+		// TODO: Use the same approach as with commands
 		type common = i18n.TWrapKeys<i18n.TCommonKeys, "common">
 	}
 
@@ -476,6 +477,7 @@ declare global {
 		}
 	}
 
+	// TODO: Remove
 	type PropsWithChildren<T extends Record<string, unknown> = Record<string, unknown>> = T & {
 		children?: any
 	}
@@ -504,10 +506,27 @@ declare global {
 		}
 	}
 
-	interface ICommands {
-		// TODO: cmd
+	type TRecordToKVUnion<
+		$TRecord extends object,
+		$TKey extends keyof $TRecord = keyof $TRecord,
+		$TPrefix extends string = "cmd",
+	> = $TKey extends string
+		? $TRecord[$TKey] extends () => infer V
+			? { key: `${$TPrefix}.${$TKey}`; value: V }
+			: $TRecord[$TKey] extends object
+				? TRecordToKVUnion<$TRecord[$TKey], keyof $TRecord[$TKey], `${$TPrefix}.${$TKey}`>
+				: never
+		: null
+
+	type TFlattenRecord<T extends { key: string; value: any }> = {
+		[K in T["key"]]: Extract<T, { key: K }>["value"]
+	}
+
+	type TFlatCommands = TFlattenRecord<TRecordToKVUnion<cmd>>
+
+	interface cmd {
 		application: {
-			set_title: () => { window_title: string; status_bar_title: string }
+			set_title: () => { window_title: string; status_bar_title?: string }
 			add_translations: () => {
 				lang: ISO_639_1_Locale
 				prefix: string
@@ -522,6 +541,39 @@ declare global {
 			notification: {
 				show: () => Client.Notification.ShowNotificationParams
 				hide: () => string
+			}
+			context_menu: {
+				add: () => Client.CtxMenu.Item
+				remove: () => string
+				show: () => Client.CtxMenu.ShowOptions
+				hide: () => void
+			}
+			command_palette: {
+				add: () => Client.CommandPalette.Item
+				remove: () => string
+				show: () => {
+					items: Client.CommandPalette.Item[]
+					on_new_item?: (new_item: string) => unknown
+					multiple?: boolean
+					pinned_items?: Client.CommandPalette.Item[]
+				}
+				hide: () => void
+			}
+			sidebar: {
+				enable: () => void
+				disable: () => void
+				set_size: () => [number, number]
+				show: () => [number, number] | undefined
+				hide: () => void
+				toggle: () => void
+			}
+			router: {
+				navigate: () => Client.Router.NavigateParams | string
+				open_external: () => Client.Router.OpenExternalParams
+			}
+			modal: {
+				show: () => Client.Modal.ModalPayload
+				hide: () => void
 			}
 		}
 		functions: {
@@ -550,114 +602,26 @@ declare global {
 				show_rename_modal: () => FSID
 				show_edit_labels_palette: () => FSID
 				show_edit_links_palette: () => FSID
+				create: () => TCreateMetadataParams
+				remove: () => FSID
+				rename: () => { fsid: FSID; new_name: string }
+				move: () => { fsid: FSID; new_parent: FSID | null }
+				add_labels: () => { fsid: FSID; labels: string[] }
+				remove_labels: () => { fsid: FSID; labels: string[] }
+				add_links: () => { fsid: FSID; links: FSID[] }
+				remove_links: () => { fsid: FSID; links: FSID[] }
 			}
 			content: {
-				get: FSID
-				set: { fsid: FSID; content: string | ArrayBuffer; content_type: string }
-				drop: FSID
-			}
-		}
-	}
-
-	type TRecordToKV<
-		$TRecord extends object,
-		$TKey extends keyof $TRecord = keyof $TRecord,
-		$TPrefix extends string = "cmd",
-	> = $TKey extends string
-		? $TRecord[$TKey] extends () => infer V
-			? { key: `${$TPrefix}.${$TKey}`; value: V }
-			: $TRecord[$TKey] extends object
-				? TRecordToKV<$TRecord[$TKey], keyof $TRecord[$TKey], `${$TPrefix}.${$TKey}`>
-				: never
-		: null
-
-	type TFlatterRecord<T extends { key: string; value: any }> = {
-		[K in T["key"]]: Extract<T, { key: K }>["value"]
-	}
-
-	type TFlatCommands = TFlatterRecord<TRecordToKV<ICommands>>
-
-	module cmd {
-		module data {
-			type get_content = { name: "data.content.get_content"; payload: FSID }
-			type drop_content = { name: "data.content.drop_content"; payload: FSID }
-
-			type set_content = {
-				name: "data.content.set_content"
-				payload: { fsid: FSID; content: string | ArrayBuffer; content_type: string }
-			}
-			type upload_content = {
-				name: "data.content.upload_content"
-				payload: { name: string; parent: FSID | null; content: string | ArrayBuffer }
-			}
-			type create = {
-				name: "data.metadata.create"
-				payload: TCreateMetadataParams
-			}
-			type remove = { name: "data.metadata.remove"; payload: FSID }
-			type move = { name: "data.metadata.move"; payload: { fsid: FSID; parent: FSID | null } }
-			type rename = { name: "data.metadata.rename"; payload: { fsid: FSID; name: string } }
-			type add_labels = {
-				name: "data.metadata.add_labels"
-				payload: { fsid: FSID; labels: string[] }
-			}
-			type remove_labels = {
-				name: "data.metadata.remove_labels"
-				payload: { fsid: FSID; labels: string[] }
-			}
-
-			type add_links = { name: "data.add_links"; payload: { fsid: FSID; links: FSID[] } }
-			type remove_links = {
-				name: "data.metadata.remove_links"
-				payload: { fsid: FSID; links: FSID[] }
-			}
-		}
-
-		module ctx_menu {
-			type add = { name: "context-menu.add"; payload: Client.CtxMenu.Item }
-			type remove = { name: "context-menu.remove"; payload: string }
-			type show = { name: "context-menu.show"; payload: Client.CtxMenu.ShowOptions }
-			type hide = { name: "context-menu.hide"; payload: void }
-		}
-
-		module command_palette {
-			type add = { name: "command_palette.add"; payload: Client.CommandPalette.Item }
-			type remove = { name: "command_palette.remove"; payload: string }
-			type show = {
-				name: "command_palette.show"
-				payload: {
-					items: Client.CommandPalette.Item[]
-					on_new_item?: (new_item: string) => unknown
-					multiple?: boolean
-					pinned_items?: Client.CommandPalette.Item[]
+				get: () => FSID
+				set: () => { fsid: FSID; content: string | ArrayBuffer; content_type: string }
+				upload: () => {
+					name: string
+					parent: FSID | null
+					content: string | ArrayBuffer
+					content_type: string
 				}
+				drop: () => FSID
 			}
-			type hide = { name: "command_palette.hide"; payload: void }
-		}
-
-		module sidebar {
-			type enable = { name: "sidebar.enable" }
-			type disable = { name: "sidebar.disable" }
-			type set_size = { name: "sidebar.set-size"; payload: [number, number] }
-			type show = { name: "sidebar.show"; payload?: [number, number] }
-			type hide = { name: "sidebar.hide" }
-			type toggle = { name: "sidebar.toggle" }
-		}
-
-		module router {
-			type navigate = { name: "router.navigate"; payload: Client.Router.NavigateParams | string }
-			type open_external = {
-				name: "router.open_external"
-				payload: Client.Router.OpenExternalParams
-			}
-		}
-
-		module modal {
-			type show = {
-				name: "modal.show"
-				payload: Client.Modal.ModalPayload
-			}
-			type hide = { name: "modal.hide" }
 		}
 	}
 
@@ -736,7 +700,7 @@ declare global {
 
 	module Client {
 		module Commands {
-			type CommandName = `${string}.${string}`
+			type CommandName = keyof TFlatCommands
 
 			/**
 			 * Command without payload.
@@ -753,56 +717,40 @@ declare global {
 			/**
 			 * Command handler.
 			 */
-			export type Handler<P> = (payload: P) => unknown
-
-			export type AbstractCommand = { name: CommandName; payload?: any; key?: string }
-
-			export type InferName<T extends AbstractCommand> = T extends {
-				name: infer U
-				payload?: unknown
-			}
-				? U
-				: never
-
-			export type InferPayload<T extends AbstractCommand> = T extends {
-				name: unknown
-				payload: infer U
-			}
-				? U
-				: never
+			export type TCommandHandler<P> = (payload: P) => unknown
 
 			export type Commands = {
 				/**
 				 * Append a listener to a given command.
 				 */
-				on: <T extends AbstractCommand = AbstractCommand>(
-					name: InferName<T>,
-					handler: Handler<InferPayload<T>>,
+				on: <$TKey extends keyof TFlatCommands>(
+					name: $TKey,
+					handler: TCommandHandler<TFlatCommands[$TKey]>,
 				) => void
 
 				/**
 				 * Prepend listener to a given command.
 				 */
-				before: <T extends AbstractCommand = AbstractCommand>(
-					name: InferName<T>,
-					handler: Handler<InferPayload<T>>,
+				before: <$TKey extends keyof TFlatCommands>(
+					name: $TKey,
+					handler: TCommandHandler<TFlatCommands[$TKey]>,
 				) => void
 
 				/**
 				 * Append a listener to a given command.
 				 */
-				after: <T extends AbstractCommand = AbstractCommand>(
-					name: InferName<T>,
-					handler: Handler<InferPayload<T>>,
+				after: <$TKey extends keyof TFlatCommands>(
+					name: $TKey,
+					handler: TCommandHandler<TFlatCommands[$TKey]>,
 				) => void
 
 				/**
 				 * Remove given listener for a given command. Make sure you provide a reference to the same
 				 * function as you did when calling `on`.
 				 */
-				off: <T extends AbstractCommand = AbstractCommand>(
-					name: InferName<T>,
-					handler: Handler<InferPayload<T>>,
+				off: <$TKey extends keyof TFlatCommands>(
+					name: $TKey,
+					handler: TCommandHandler<TFlatCommands[$TKey]>,
 				) => void
 
 				/**
@@ -810,19 +758,20 @@ declare global {
 				 * later to apply targeted cancellation for the command. Emission does not happen if there
 				 * is a command with given key already.
 				 */
-				emit: <T extends AbstractCommand = AbstractCommand>(
-					name: InferName<T>,
-					payload?: InferPayload<T>,
-					key?: string,
+				emit: <$TKey extends keyof TFlatCommands>(
+					name: $TKey,
+					...rest: TFlatCommands[$TKey] extends void
+						? [key?: string]
+						: [payload: TFlatCommands[$TKey], key?: string]
 				) => void
 
 				/**
 				 * Cancel a command with given payload. If you provided a key when emitting the command,
 				 * you can provide it for targeted cancellation.
 				 */
-				cancel: <T extends AbstractCommand = AbstractCommand>(
-					name: InferName<T>,
-					payload?: InferPayload<T>,
+				cancel: <$TKey extends keyof TFlatCommands>(
+					name: $TKey,
+					payload?: TFlatCommands[$TKey],
 					key?: string,
 				) => void
 			}

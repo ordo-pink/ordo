@@ -93,7 +93,7 @@ const stopPropagation = (event: MouseEvent) => event.stopPropagation()
 const modal$ = new BehaviorSubject<ModalState | null>(null)
 
 // Define command handlers
-const showModal: Client.Commands.Handler<Client.Modal.ModalPayload> = payload => {
+const showModal: Client.Commands.TCommandHandler<Client.Modal.ModalPayload> = payload => {
 	const showCloseButton = payload.options?.show_close_button ?? true
 	const onHide = payload.options?.on_unmount ?? (() => void 0)
 	const Component = payload.Component

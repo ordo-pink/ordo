@@ -60,9 +60,7 @@ export const init_user: TInitUserParams = call_once(
 			.pipe(
 				Oath.ops.tap(() => {
 					logger.debug("Refreshing auth token...")
-					commands.emit<cmd.application.background_task.start_loading>(
-						"application.background_task.start_loading",
-					)
+					commands.emit("cmd.application.background_task.start_loading")
 				}),
 			)
 			.pipe(
@@ -87,9 +85,7 @@ export const init_user: TInitUserParams = call_once(
 			.pipe(Oath.ops.tap(() => logger.debug("Auth token refreshed.")))
 			.pipe(
 				Oath.ops.map(auth => {
-					commands.emit<cmd.application.background_task.reset_status>(
-						"application.background_task.reset_status",
-					)
+					commands.emit("cmd.application.background_task.reset_status")
 
 					auth$.next(O.Some(auth))
 
@@ -98,9 +94,7 @@ export const init_user: TInitUserParams = call_once(
 			)
 
 		const or_cancel_state_changes = Oath.invokers.or_else(() => {
-			commands.emit<cmd.application.background_task.reset_status>(
-				"application.background_task.reset_status",
-			)
+			commands.emit("cmd.application.background_task.reset_status")
 			auth$.next(O.None())
 			drop_timeout()
 		})
@@ -139,20 +133,10 @@ export const init_user: TInitUserParams = call_once(
 		CurrentUserManager.of(current_user_repository, current_user_remote_repository, auth$).start(
 			state_change =>
 				Switch.Match(state_change)
-					.case("get-remote", () =>
-						commands.emit<cmd.application.background_task.start_loading>(
-							"application.background_task.start_loading",
-						),
-					)
-					.case("put-remote", () =>
-						commands.emit<cmd.application.background_task.start_saving>(
-							"application.background_task.start_saving",
-						),
-					)
+					.case("get-remote", () => commands.emit("cmd.application.background_task.start_loading"))
+					.case("put-remote", () => commands.emit("cmd.application.background_task.start_saving"))
 					.case(["get-remote-complete", "put-remote-complete"], () =>
-						commands.emit<cmd.application.background_task.reset_status>(
-							"application.background_task.reset_status",
-						),
+						commands.emit("cmd.application.background_task.reset_status"),
 					)
 					.default(noop),
 		)

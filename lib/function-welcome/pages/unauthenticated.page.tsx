@@ -34,7 +34,7 @@ export default function UnauthenticatedPage() {
 	const t_cookies_warning = translate("cookies_warning")
 
 	useEffect(() => {
-		commands.emit<cmd.application.set_title>("application.set_title", {
+		commands.emit("cmd.application.set_title", {
 			window_title: t_title,
 			status_bar_title: t_cookies_warning,
 		})

@@ -42,7 +42,7 @@ export const init_router: TInitRouterStreamFn = call_once(
 
 		const set_activity = set_current_activity(APP_FID)
 
-		commands.on<cmd.router.navigate>("router.navigate", payload => {
+		commands.on("cmd.application.router.navigate", payload => {
 			if (Array.isArray(payload)) {
 				router$.set(...(payload as [string]))
 				return
@@ -51,7 +51,7 @@ export const init_router: TInitRouterStreamFn = call_once(
 			router$.set(payload)
 		})
 
-		commands.on<cmd.router.open_external>("router.open_external", ({ url, new_tab = true }) => {
+		commands.on("cmd.application.router.open_external", ({ url, new_tab = true }) => {
 			new_tab ? window.open(url, "_blank")?.focus() : (window.location.href = url)
 		})
 

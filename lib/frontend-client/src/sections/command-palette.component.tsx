@@ -239,7 +239,7 @@ export default function CommandPaletteModal({ items, on_new_item, multiple, pinn
 		set_current_index(0)
 		set_pointer_location(selected_items.length ? "selected" : "suggested")
 
-		commands.emit<cmd.command_palette.hide>("command_palette.hide")
+		commands.emit("cmd.application.command_palette.hide")
 	}
 
 	const on_key_down = (event: KeyboardEvent<HTMLInputElement>) =>

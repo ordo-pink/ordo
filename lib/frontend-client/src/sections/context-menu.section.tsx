@@ -44,10 +44,10 @@ export const init_context_menu = (
 	custom_context_menu$.subscribe()
 	global_context_menu$.subscribe()
 
-	commands.on<cmd.ctx_menu.show>("context-menu.show", menu => custom_context_menu$.next(menu))
-	commands.on<cmd.ctx_menu.add>("context-menu.add", item => add$.next(item))
-	commands.on<cmd.ctx_menu.remove>("context-menu.remove", name => remove$.next(name))
-	commands.on<cmd.ctx_menu.hide>("context-menu.hide", () => custom_context_menu$.next(null))
+	commands.on("cmd.application.context_menu.show", menu => custom_context_menu$.next(menu))
+	commands.on("cmd.application.context_menu.hide", () => custom_context_menu$.next(null))
+	commands.on("cmd.application.context_menu.add", item => add$.next(item))
+	commands.on("cmd.application.context_menu.remove", name => remove$.next(name))
 
 	const context_menu_element = document.querySelector("#context-menu") as HTMLDivElement
 	const root = createRoot(context_menu_element)
@@ -83,15 +83,12 @@ function ContextMenu() {
 
 	const menu = use$.subscription(context_menu$)
 
-	use$.accelerator("Esc", () => menu && commands.emit<cmd.ctx_menu.hide>("context-menu.hide"), [
-		menu,
-	])
-
 	const hide_context_menu = useCallback(
-		() => menu && commands.emit<cmd.ctx_menu.hide>("context-menu.hide"),
-		// eslint-disable-next-line react-hooks/exhaustive-deps
+		() => menu && commands.emit("cmd.application.context_menu.hide"),
 		[menu],
 	)
+
+	use$.accelerator("Esc", hide_context_menu, [menu])
 
 	const menu_height = 40 * readers.concat(creators).concat(updaters).concat(removers).length
 
@@ -286,7 +283,7 @@ function Item({ item, event, payload: p }: TItemP) {
 
 	const on_accelerator_used = () =>
 		Result.If(is_disabled).cata({
-			Ok: () => commands.emit<cmd.ctx_menu.hide>("context-menu.hide"),
+			Ok: () => commands.emit("cmd.application.context_menu.hide"),
 			Err: () => commands.emit(item.cmd, payload),
 		})
 

@@ -31,21 +31,15 @@ export const init_background_task_display = (
 
 	const bg_task_element = document.querySelector("#background-task-indicator") as HTMLDivElement
 
-	commands.on<cmd.application.background_task.set_status>(
-		"application.background_task.set_status",
-		status => bg_task$.next(status),
+	commands.on("cmd.application.background_task.set_status", status => bg_task$.next(status))
+	commands.on("cmd.application.background_task.reset_status", () =>
+		bg_task$.next(BackgroundTaskStatus.NONE),
 	)
-	commands.on<cmd.application.background_task.reset_status>(
-		"application.background_task.reset_status",
-		() => bg_task$.next(BackgroundTaskStatus.NONE),
+	commands.on("cmd.application.background_task.start_loading", () =>
+		bg_task$.next(BackgroundTaskStatus.LOADING),
 	)
-	commands.on<cmd.application.background_task.start_loading>(
-		"application.background_task.start_loading",
-		() => bg_task$.next(BackgroundTaskStatus.LOADING),
-	)
-	commands.on<cmd.application.background_task.start_saving>(
-		"application.background_task.start_saving",
-		() => bg_task$.next(BackgroundTaskStatus.SAVING),
+	commands.on("cmd.application.background_task.start_saving", () =>
+		bg_task$.next(BackgroundTaskStatus.SAVING),
 	)
 
 	bg_task$.subscribe(status =>

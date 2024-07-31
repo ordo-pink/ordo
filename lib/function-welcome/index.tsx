@@ -30,12 +30,12 @@ import { noop } from "@ordo-pink/tau"
 import LandingWorkspace from "./views/landing.workspace"
 
 declare global {
-	module cmd {
-		module welcome {
-			type to_welcome_page = { name: "welcome.to_welcome_page" }
-			type messenger_support = { name: "welcome.messenger_support" }
-			type email_support = { name: "welcome.email_support" }
-			type open_support = { name: "welcome.open_support" }
+	interface cmd {
+		welcome: {
+			go_to_welcome_page: () => void
+			go_to_messenger_support: () => void
+			go_to_email_support: () => void
+			open_support_palette: () => void
 		}
 	}
 }
@@ -50,17 +50,17 @@ export default create_function(
 			"application.fetch",
 		],
 		commands: [
-			"application.set_title",
-			"activities.register",
-			"auth.open_sign_up",
-			"auth.open_sign_in",
-			"application.add_translations",
-			"router.navigate",
-			"router.open_external",
-			"application.background_task.start_loading",
-			"application.background_task.reset_status",
-			"modal.show",
-			"modal.hide",
+			"cmd.application.set_title",
+			"cmd.functions.activities.register",
+			"cmd.auth.open_sign_in",
+			"cmd.auth.open_sign_up",
+			"cmd.application.add_translations",
+			"cmd.application.router.navigate",
+			"cmd.application.router.open_external",
+			"cmd.application.background_task.start_loading",
+			"cmd.application.background_task.reset_status",
+			"cmd.application.modal.show",
+			"cmd.application.modal.hide",
 		],
 	},
 	ctx => {
@@ -71,7 +71,7 @@ export default create_function(
 
 		translations$.subscribe(option => {
 			const on_messenger_support = (url: string) => () => {
-				commands.emit<cmd.router.open_external>("router.open_external", {
+				commands.emit("cmd.application.router.open_external", {
 					url,
 					new_tab: true,
 				})
@@ -79,7 +79,7 @@ export default create_function(
 
 			const on_email_support = (url: string) => () => {
 				{
-					commands.emit<cmd.router.open_external>("router.open_external", {
+					commands.emit("cmd.application.router.open_external", {
 						url,
 						new_tab: true,
 					})
@@ -99,42 +99,36 @@ export default create_function(
 				.cata({
 					Err: noop,
 					Ok: ({ messenger_support, email_support }) => {
-						commands.off<cmd.welcome.messenger_support>(
-							"welcome.messenger_support",
+						commands.off(
+							"cmd.welcome.go_to_messenger_support",
 							on_messenger_support(messenger_support),
 						)
 
-						commands.off<cmd.welcome.email_support>(
-							"welcome.email_support",
-							on_email_support(email_support),
-						)
+						commands.off("cmd.welcome.go_to_email_support", on_email_support(email_support))
 
-						commands.on<cmd.welcome.messenger_support>(
-							"welcome.messenger_support",
+						commands.on(
+							"cmd.welcome.go_to_messenger_support",
 							on_messenger_support(messenger_support),
 						)
 
-						commands.on<cmd.welcome.email_support>(
-							"welcome.email_support",
-							on_email_support(email_support),
-						)
+						commands.on("cmd.welcome.go_to_email_support", on_email_support(email_support))
 					},
 				})
 		})
 
 		let workspace_root_option: TOption<Root>
 
-		commands.on<cmd.welcome.to_welcome_page>("welcome.to_welcome_page", () =>
-			commands.emit<cmd.router.navigate>("router.navigate", "/"),
+		commands.on("cmd.welcome.go_to_welcome_page", () =>
+			commands.emit("cmd.application.router.navigate", "/"),
 		)
 
-		commands.emit<cmd.application.add_translations>("application.add_translations", {
+		commands.emit("cmd.application.add_translations", {
 			lang: "en",
 			prefix: "pink.ordo.welcome",
 			translations: EN_TRANSLATIONS,
 		})
 
-		commands.emit<cmd.activities.register>("activities.register", {
+		commands.emit("cmd.functions.activities.register", {
 			fid: ctx.fid,
 			activity: {
 				name: "pink.ordo.welcome.landing-page",

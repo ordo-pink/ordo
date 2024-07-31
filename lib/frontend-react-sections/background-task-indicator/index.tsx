@@ -72,7 +72,7 @@ export default function BackgroundTaskIndicator() {
 			commands.off<cmd.application.background_task.reset_status>(
 				"application.background_task.reset_status",
 				on_reset_status,
-			)
+			)CommandHandler
 			commands.off<cmd.application.background_task.start_loading>(
 				"application.background_task.start_loading",
 				on_loading,

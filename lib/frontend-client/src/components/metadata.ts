@@ -24,21 +24,28 @@ import {
 	MetadataManager,
 	MetadataQuery,
 	MetadataRepository,
+	RRR,
 	RemoteMetadataRepository,
 	type TMetadata,
 	type TMetadataQuery,
 } from "@ordo-pink/data"
+import { Result } from "@ordo-pink/result"
 import { Switch } from "@ordo-pink/switch"
+import { type TGetMetadataQueryFn } from "@ordo-pink/core"
 import { noop } from "@ordo-pink/tau"
 
 import { type TInitCtx } from "../frontend-client.types"
 
 type TInitMetadataFn = (
-	params: Pick<TInitCtx, "auth$" | "logger" | "commands" | "hosts" | "user_query" | "fetch">,
-) => { metadata_query: TMetadataQuery }
+	params: Pick<
+		TInitCtx,
+		"auth$" | "logger" | "commands" | "hosts" | "user_query" | "fetch" | "known_functions"
+	>,
+) => { metadata_query: TMetadataQuery; get_metadata_query: TGetMetadataQueryFn }
 export const init_metadata: TInitMetadataFn = ({
 	auth$,
 	logger,
+	known_functions,
 	commands,
 	hosts,
 	user_query,
@@ -54,11 +61,11 @@ export const init_metadata: TInitMetadataFn = ({
 	const metadata_query = MetadataQuery.of(metadata_repository)
 	const metadata_command = MetadataCommand.of(metadata_repository, metadata_query, user_query)
 
-	commands.on<cmd.data.add_labels>("data.metadata.add_label", ({ fsid, labels }) =>
+	commands.on<cmd.data.add_labels>("data.metadata.add_labels", ({ fsid, labels }) =>
 		metadata_command.add_labels(fsid, ...labels),
 	)
 
-	commands.on<cmd.data.remove_labels>("data.metadata.remove_label", ({ fsid, labels }) =>
+	commands.on<cmd.data.remove_labels>("data.metadata.remove_labels", ({ fsid, labels }) =>
 		metadata_command.remove_labels(fsid, ...labels),
 	)
 
@@ -105,7 +112,17 @@ export const init_metadata: TInitMetadataFn = ({
 
 	logger.debug("Initialised metadata.")
 
-	return { metadata_query, metadata_command }
+	return {
+		metadata_query,
+		get_metadata_query: fid => () =>
+			Result.If(known_functions.has_permissions(fid, { queries: ["data.metadata_query"] }))
+				.pipe(Result.ops.err_map(() => eperm(`get_metadata_query -> fid: ${String(fid)}`)))
+				.pipe(Result.ops.map(() => metadata_query)),
+	}
 }
+
+// --- Internal ---
+
+const eperm = RRR.codes.eperm("init_metadata")
 
 const metadata$ = new BehaviorSubject<TMetadata[] | null>(null)

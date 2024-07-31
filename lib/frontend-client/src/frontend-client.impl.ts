@@ -19,7 +19,7 @@
 
 import "@ordo-pink/css/main.css"
 
-import { type THosts } from "@ordo-pink/core"
+import { TCreateFunctionContext, type THosts } from "@ordo-pink/core"
 import { type TLogger } from "@ordo-pink/logger"
 
 import { init_activities } from "./components/activities"
@@ -67,7 +67,7 @@ export const create_client = ({ logger, is_dev, hosts }: P) => {
 		known_functions,
 		commands,
 	})
-	const { auth$, user_query, get_is_authenticated } = init_user({
+	const { auth$, user_query, get_is_authenticated, get_user_query } = init_user({
 		logger,
 		known_functions,
 		commands,
@@ -83,7 +83,15 @@ export const create_client = ({ logger, is_dev, hosts }: P) => {
 		set_current_activity,
 	})
 
-	const { metadata_query } = init_metadata({ logger, commands, user_query, auth$, hosts, fetch })
+	const { get_metadata_query } = init_metadata({
+		logger,
+		known_functions,
+		commands,
+		user_query,
+		auth$,
+		hosts,
+		fetch,
+	})
 
 	const { get_sidebar } = init_workspace(logger, known_functions, commands, current_activity$)
 	init_modal({ commands, logger })
@@ -93,23 +101,23 @@ export const create_client = ({ logger, is_dev, hosts }: P) => {
 	init_activity_bar(logger, commands, activities$, current_activity$)
 	init_tray(logger, activities$)
 
-	const context = {
+	const internal_context: TCreateFunctionContext = {
 		fid: APP_FID,
 		is_dev,
+		get_translations,
 		get_commands: get_commands(APP_FID),
 		get_logger: get_logger(APP_FID),
 		get_current_route: get_current_route(APP_FID),
 		get_hosts: get_hosts(APP_FID),
 		get_is_authenticated: get_is_authenticated(APP_FID),
 		get_fetch: get_fetch(APP_FID),
-		get_translations,
 		get_sidebar: get_sidebar(APP_FID),
-		metadata_query,
-		user_query,
+		get_metadata_query: get_metadata_query(APP_FID),
+		get_user_query: get_user_query(APP_FID),
 	}
 
-	init_command_palette(logger, commands, context)
-	init_context_menu(logger, commands, context)
+	init_command_palette(logger, commands, internal_context)
+	init_context_menu(logger, commands, internal_context)
 
 	void import("@ordo-pink/function-welcome")
 		.then(module => module.default)
@@ -123,8 +131,8 @@ export const create_client = ({ logger, is_dev, hosts }: P) => {
 				get_translations,
 				get_sidebar,
 				get_fetch,
-				metadata_query,
-				user_query,
+				get_metadata_query,
+				get_user_query,
 				is_dev,
 				known_functions,
 			}),
@@ -142,8 +150,8 @@ export const create_client = ({ logger, is_dev, hosts }: P) => {
 				get_sidebar,
 				get_translations,
 				get_fetch,
-				metadata_query,
-				user_query,
+				get_metadata_query,
+				get_user_query,
 				is_dev,
 				known_functions,
 			}),

@@ -29,12 +29,12 @@ import {
 	UserQuery,
 } from "@ordo-pink/data"
 import { O, type TOption } from "@ordo-pink/option"
+import { type TGetIsAuthenticatedFn, type TGetUserQueryFn } from "@ordo-pink/core"
 import { call_once, noop } from "@ordo-pink/tau"
 import { type AuthResponse } from "@ordo-pink/backend-server-id"
 import { Oath } from "@ordo-pink/oath"
 import { Result } from "@ordo-pink/result"
 import { Switch } from "@ordo-pink/switch"
-import { type TGetIsAuthenticatedFn } from "@ordo-pink/core"
 
 import { type TInitCtx } from "../frontend-client.types"
 
@@ -42,6 +42,7 @@ type TInitUserParams = (
 	params: Pick<TInitCtx, "hosts" | "fetch" | "logger" | "commands" | "known_functions">,
 ) => {
 	get_is_authenticated: TGetIsAuthenticatedFn
+	get_user_query: TGetUserQueryFn
 	user_query: TUserQuery
 	auth$: Observable<TOption<AuthResponse>>
 }
@@ -183,6 +184,11 @@ export const init_user: TInitUserParams = call_once(
 		return {
 			auth$,
 			user_query,
+
+			get_user_query: fid => () =>
+				Result.If(known_functions.has_permissions(fid, { queries: ["users.users_query"] }))
+					.pipe(Result.ops.err_map(() => eperm(`get_user_query -> fid: ${String(fid)}`)))
+					.pipe(Result.ops.map(() => user_query)),
 
 			get_is_authenticated: (fid: symbol | null) => () =>
 				Result.If(

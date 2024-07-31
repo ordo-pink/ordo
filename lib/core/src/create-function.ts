@@ -17,7 +17,7 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { type TCreateFunctionFn } from "./types"
+import { TCreateFunctionContext, type TCreateFunctionFn } from "./types"
 
 export const create_function: TCreateFunctionFn =
 	(name, permissions, callback) =>
@@ -29,16 +29,17 @@ export const create_function: TCreateFunctionFn =
 		get_logger,
 		get_translations,
 		get_fetch,
+		get_metadata_query,
+		get_user_query,
+		get_sidebar,
 		is_dev,
-		metadata_query,
-		user_query,
 		known_functions,
 	}) => {
 		const fid = known_functions.register(name, permissions)
 
 		if (!fid) return
 
-		const context = {
+		const context: TCreateFunctionContext = {
 			fid,
 			is_dev,
 			get_commands: get_commands(fid),
@@ -48,8 +49,9 @@ export const create_function: TCreateFunctionFn =
 			get_is_authenticated: get_is_authenticated(fid),
 			get_fetch: get_fetch(fid),
 			get_translations,
-			metadata_query,
-			user_query,
+			get_metadata_query: get_metadata_query(fid),
+			get_user_query: get_user_query(fid),
+			get_sidebar: get_sidebar(fid),
 		}
 
 		return callback(context)

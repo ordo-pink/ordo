@@ -53,13 +53,13 @@ export type TQueryPermission =
 	| "users.current_user.is_authenticated"
 	| "users.current_user.public_info" // User.PublicUser
 	| "users.current_user.internal_info" // User.User
-	| "users.public_info"
+	| "users.users_query"
 	| "functions.activities"
 	| "functions.file_associations"
 	| "functions.editor_plugins"
 	| "functions.persisted_state"
-	| "data.metadata"
-	| "data.content"
+	| "data.metadata_query"
+	| "data.content_query"
 
 // TODO: Add support for command intellisense
 export type TCommandPermission = Client.Commands.CommandName
@@ -100,6 +100,9 @@ export type TGetFetchFn = TRequireFID<() => TFetch>
 export type TGetLoggerFn = TRequireFID<() => TLogger>
 export type TGetCommandsFn = TRequireFID<() => Client.Commands.Commands>
 export type TGetIsAuthenticatedFn = TRequireFID<() => TResult<Observable<boolean>, TRrr<"EPERM">>>
+export type TGetMetadataQueryFn = TRequireFID<() => TResult<TMetadataQuery, TRrr<"EPERM">>>
+export type TGetUserQueryFn = TRequireFID<() => TResult<TUserQuery, TRrr<"EPERM">>>
+// export type TGetContentQueryFn = TRequireFID<() => TResult<TContentQuery, TRrr<"EPERM">>>
 
 export type TTranslations = Record<TwoLetterLocale, Record<string, string>>
 
@@ -130,8 +133,9 @@ export type TCreateFunctionInternalContext = {
 	get_is_authenticated: TGetIsAuthenticatedFn
 	get_fetch: TGetFetchFn
 	get_translations: TGetTranslationsFn
-	metadata_query: TMetadataQuery
-	user_query: TUserQuery
+	get_metadata_query: TGetMetadataQueryFn
+	get_user_query: TGetUserQueryFn
+	// get_content_query: TGetContentQueryFn
 	known_functions: TKnownFunctions
 }
 
@@ -146,9 +150,9 @@ export type TCreateFunctionContext = {
 	get_is_authenticated: ReturnType<TGetIsAuthenticatedFn>
 	get_fetch: ReturnType<TGetFetchFn>
 	get_translations: TGetTranslationsFn
-	metadata_query: TMetadataQuery
-	user_query: TUserQuery
-	// content_query: TContentQuery
+	get_metadata_query: ReturnType<TGetMetadataQueryFn>
+	get_user_query: ReturnType<TGetUserQueryFn>
+	// get_content_query: TGetContentQueryFn
 }
 
 export type TCreateFunctionFn = (
@@ -597,11 +601,11 @@ declare global {
 			type move = { name: "data.metadata.move"; payload: { fsid: FSID; parent: FSID | null } }
 			type rename = { name: "data.metadata.rename"; payload: { fsid: FSID; name: string } }
 			type add_labels = {
-				name: "data.metadata.add_label"
+				name: "data.metadata.add_labels"
 				payload: { fsid: FSID; labels: string[] }
 			}
 			type remove_labels = {
-				name: "data.metadata.remove_label"
+				name: "data.metadata.remove_labels"
 				payload: { fsid: FSID; labels: string[] }
 			}
 

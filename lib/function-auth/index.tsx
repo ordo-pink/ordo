@@ -136,6 +136,7 @@ export default create_function(
 			"cmd.application.set_title",
 			"cmd.auth.open_sign_in",
 			"cmd.auth.open_sign_up",
+			"cmd.auth.sign_out",
 			"cmd.functions.activities.register",
 			"cmd.functions.activities.unregister",
 		],
@@ -162,7 +163,6 @@ export default create_function(
 				const url = hosts.id.concat(path)
 
 				void fetch(url, { method, credentials }).then(() => {
-					window.history.replaceState(null, "")
 					window.location.replace("/")
 				})
 			}

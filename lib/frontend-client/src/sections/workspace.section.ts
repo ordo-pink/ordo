@@ -108,7 +108,6 @@ export const init_workspace = (
 		readable_name: "t.common.components.sidebar.toggle",
 		Icon: BsToggle2Off,
 		on_select: () => {
-			commands.emit("cmd.application.command_palette.hide")
 			commands.emit("cmd.application.sidebar.toggle")
 		},
 		accelerator: "mod+b",

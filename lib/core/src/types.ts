@@ -508,6 +508,7 @@ declare global {
 				command_palette: {
 					search_placeholder: () => string
 					hide: () => string
+					toggle: () => string
 					exit_key_hint: () => string
 				}
 				sidebar: {
@@ -556,6 +557,7 @@ declare global {
 			command_palette: {
 				add: () => Client.CommandPalette.Item
 				remove: () => string
+				toggle: () => void
 				show: () => {
 					items: Client.CommandPalette.Item[]
 					on_new_item?: (new_item: string) => unknown

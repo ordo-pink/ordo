@@ -35,14 +35,15 @@ export const register_common_translations = (
 }
 
 const EN_TRANSLATIONS: TScopedTranslations<"common"> = {
-	"urls.twitter_x": "https://x.com/ordo_pink",
-	"urls.support_messenger": "https://t.me/ordo_pink",
-	"urls.support_email": "support@ordo.pink",
-	"urls.contact_us": "Contact Us",
-	"components.command_palette.search_placeholder": "Search...",
-	"components.command_palette.hide": "Hide Command Palette",
 	"components.command_palette.exit_key_hint": "to exit",
-	"components.sidebar.toggle": "Toggle Sidebar",
+	"components.command_palette.hide": "Hide Command Palette",
+	"components.command_palette.search_placeholder": "Search...",
+	"components.command_palette.toggle": "Toggle Command Palette",
 	"components.sidebar.hide": "Hide Sidebar",
 	"components.sidebar.show": "Show Sidebar",
+	"components.sidebar.toggle": "Toggle Sidebar",
+	"urls.contact_us": "Contact Us",
+	"urls.support_email": "support@ordo.pink",
+	"urls.support_messenger": "https://t.me/ordo_pink",
+	"urls.twitter_x": "https://x.com/ordo_pink",
 }

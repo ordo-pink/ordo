@@ -17,7 +17,7 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { BehaviorSubject, Subject, map, merge, scan, shareReplay } from "rxjs"
+import { BehaviorSubject, Subject, combineLatestWith, map, merge, scan, shareReplay } from "rxjs"
 import { Root, createRoot } from "react-dom/client"
 import { BsCommand } from "react-icons/bs"
 
@@ -37,26 +37,46 @@ export const init_command_palette = call_once(
 		commands.on("cmd.application.command_palette.add", on_add_global_item)
 		commands.on("cmd.application.command_palette.remove", on_remove_global_item)
 
-		// TODO: Register all keybindings globally
+		let on_toggle_cp = () => {
+			console.log("HERE")
+			on_show_custom_cp(commands, ctx)
+		}
+
+		custom_command_palette$
+			.pipe(combineLatestWith(global_command_palette$))
+			.subscribe(([state, global]) => {
+				if (state.items.length > 0) {
+					commands.off("cmd.application.command_palette.toggle", on_toggle_cp)
+					on_toggle_cp = () => {
+						console.log("THERE")
+						on_hide_custom_cp(commands)()
+					}
+					commands.on("cmd.application.command_palette.toggle", on_toggle_cp)
+				} else {
+					commands.off("cmd.application.command_palette.toggle", on_toggle_cp)
+					on_toggle_cp = () => {
+						console.log("THEN")
+						on_show_custom_cp(commands, ctx)(global)
+					}
+					commands.on("cmd.application.command_palette.toggle", on_toggle_cp)
+				}
+			})
+
 		commands.emit("cmd.application.command_palette.add", {
 			id: "command_palette.hide",
-			on_select: () => commands.emit("cmd.application.command_palette.hide"),
-			readable_name: "t.common.components.command_palette.hide",
+			on_select: () => commands.emit("cmd.application.command_palette.toggle"),
+			readable_name: "t.common.components.command_palette.toggle",
 			Icon: BsCommand,
 			accelerator: "mod+shift+p",
 		})
 
-		document.addEventListener("keydown", event => {
-			if (event.key === "P" && event.shiftKey && event.ctrlKey) {
-				event.preventDefault()
-				event.stopPropagation()
+		let on_keydown: (event: KeyboardEvent) => void
 
-				global_command_palette$.subscribe(global_command_palette => {
-					if (custom_command_palette$.getValue().items.length > 0)
-						commands.emit("cmd.application.command_palette.hide")
-					else commands.emit("cmd.application.command_palette.show", global_command_palette)
-				})
-			}
+		global_command_palette$.subscribe(global_command_palette => {
+			if (on_keydown) document.removeEventListener("keydown", on_keydown)
+			on_keydown = on_input(global_command_palette)
+
+			document.addEventListener("keydown", on_keydown)
 		})
 
 		logger.debug("🟢 Initialised command palette.")
@@ -133,3 +153,35 @@ const global_command_palette$ = merge(add$.pipe(map(addP)), remove$.pipe(map(rem
 )
 
 global_command_palette$.subscribe()
+
+const IGNORED_KEYS = ["Control", "Shift", "Alt", "Meta"]
+
+const create_hotkey_string = (event: KeyboardEvent, isApple: boolean) => {
+	let hotkey = ""
+
+	if (event.altKey) hotkey += "meta+"
+	if (event.ctrlKey) hotkey += isApple ? "ctrl+" : "mod+"
+	if (event.metaKey) hotkey += "mod+"
+	if (event.shiftKey) hotkey += "shift+"
+
+	hotkey += event.code.replace("Key", "").toLocaleLowerCase()
+
+	return hotkey
+}
+
+const on_input = (global_command_palette: TCommandPaletteState) => (event: KeyboardEvent) => {
+	if (IGNORED_KEYS.includes(event.key)) return
+
+	const hotkey = create_hotkey_string(event, false)
+
+	const command = global_command_palette.items.find(
+		item => item.accelerator && item.accelerator === hotkey,
+	)
+
+	if (command) {
+		event.preventDefault()
+		event.stopPropagation()
+
+		command.on_select()
+	}
+}

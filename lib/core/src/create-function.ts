@@ -34,6 +34,8 @@ export const create_function: TCreateFunctionFn =
 		get_sidebar,
 		is_dev,
 		known_functions,
+		translate,
+		get_current_language,
 	}) => {
 		const fid = known_functions.register(name, permissions)
 
@@ -49,6 +51,8 @@ export const create_function: TCreateFunctionFn =
 			get_is_authenticated: get_is_authenticated(fid),
 			get_fetch: get_fetch(fid),
 			get_translations,
+			get_current_language: get_current_language(fid),
+			translate,
 			get_metadata_query: get_metadata_query(fid),
 			get_user_query: get_user_query(fid),
 			get_sidebar: get_sidebar(fid),

@@ -21,11 +21,8 @@ import { type Root, createRoot } from "react-dom/client"
 import { BsCollection } from "react-icons/bs"
 
 import { O, type TOption } from "@ordo-pink/option"
-import { Result } from "@ordo-pink/result"
-import { TwoLetterLocale } from "@ordo-pink/locale"
 import { create_function } from "@ordo-pink/core"
-import { create_ordo_context } from "@ordo-pink/frontend-react-hooks/src/use-ordo-context.hook"
-import { noop } from "@ordo-pink/tau"
+import { create_ordo_context } from "@ordo-pink/frontend-react-hooks"
 
 import LandingWorkspace from "./views/landing.workspace"
 
@@ -55,75 +52,44 @@ export default create_function(
 	{
 		queries: [
 			"application.commands",
+			"application.current_language",
+			"application.fetch",
 			"application.hosts",
 			"users.current_user.is_authenticated",
-			"application.fetch",
 		],
 		commands: [
-			"cmd.application.set_title",
-			"cmd.functions.activities.register",
-			"cmd.auth.open_sign_in",
-			"cmd.auth.open_sign_up",
 			"cmd.application.add_translations",
+			"cmd.application.background_task.reset_status",
+			"cmd.application.background_task.start_loading",
+			"cmd.application.modal.hide",
+			"cmd.application.modal.show",
 			"cmd.application.router.navigate",
 			"cmd.application.router.open_external",
-			"cmd.application.background_task.start_loading",
-			"cmd.application.background_task.reset_status",
-			"cmd.application.modal.show",
-			"cmd.application.modal.hide",
+			"cmd.application.set_title",
+			"cmd.auth.open_sign_in",
+			"cmd.auth.open_sign_up",
+			"cmd.functions.activities.register",
 		],
 	},
 	ctx => {
 		const Provider = create_ordo_context()
 		const commands = ctx.get_commands()
-		const translations$ = ctx.get_translations()
-		const current_language = TwoLetterLocale.ENGLISH // TODO: Move locale management to main -> user settings
 
-		translations$.subscribe(option => {
-			const on_messenger_support = (url: string) => () => {
-				commands.emit("cmd.application.router.open_external", {
-					url,
-					new_tab: true,
-				})
-			}
+		ctx.translate.$.subscribe(() => {
+			const on_messenger_support = (url: string) => () =>
+				commands.emit("cmd.application.router.open_external", { url, new_tab: true })
 
-			const on_email_support = (url: string) => () => {
-				{
-					commands.emit("cmd.application.router.open_external", {
-						url,
-						new_tab: true,
-					})
-				}
-			}
+			const on_email_support = (url: string) => () =>
+				commands.emit("cmd.application.router.open_external", { url, new_tab: true })
 
-			Result.FromOption(option)
-				.pipe(Result.ops.chain(ts => Result.FromNullable(ts[current_language])))
-				.pipe(
-					Result.ops.chain(ts =>
-						Result.Merge({
-							messenger_support: Result.FromNullable(ts["common.messenger_support_url"]),
-							email_support: Result.FromNullable(ts["common.email_support"]),
-						}),
-					),
-				)
-				.cata({
-					Err: noop,
-					Ok: ({ messenger_support, email_support }) => {
-						commands.off(
-							"cmd.welcome.go_to_messenger_support",
-							on_messenger_support(messenger_support),
-						)
+			const messenger_support = ctx.translate("t.common.urls.support_messenger")
+			const email_support = ctx.translate("t.common.urls.support_email")
 
-						commands.off("cmd.welcome.go_to_email_support", on_email_support(email_support))
+			commands.off("cmd.welcome.go_to_messenger_support", on_messenger_support(messenger_support))
+			commands.off("cmd.welcome.go_to_email_support", on_email_support(email_support))
 
-						commands.on(
-							"cmd.welcome.go_to_messenger_support",
-							on_messenger_support(messenger_support),
-						)
-
-						commands.on("cmd.welcome.go_to_email_support", on_email_support(email_support))
-					},
-				})
+			commands.on("cmd.welcome.go_to_messenger_support", on_messenger_support(messenger_support))
+			commands.on("cmd.welcome.go_to_email_support", on_email_support(email_support))
 		})
 
 		let workspace_root_option: TOption<Root>

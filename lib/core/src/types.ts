@@ -25,6 +25,7 @@ import type {
 	FSID,
 	PlainData,
 	TCreateMetadataParams,
+	TMetadataDTO,
 	TMetadataQuery,
 	TRrr,
 	TUserQuery,
@@ -46,6 +47,7 @@ export type TQueryPermission =
 	| "application.logger"
 	| "application.commands"
 	| "application.current_fid"
+	| "application.current_language"
 	| "application.current_route"
 	| "application.current_activity"
 	| "application.current_file_association"
@@ -113,6 +115,13 @@ export type TSetCurrentActivityFn = TRequireFID<
 export type TGetCurrentActivityFn = TRequireFID<
 	() => TResult<Observable<TOption<Functions.Activity>>, TRrr<"EPERM" | "ENOENT">>
 >
+export type TTranslateFn = {
+	$: Observable<number>
+	(key: keyof TFlatTranslations, default_value?: string): string
+}
+export type TGetCurrentLanguageFn = TRequireFID<
+	() => TResult<Observable<TwoLetterLocale>, TRrr<"EPERM">>
+>
 
 export type TKnownFunctions = {
 	validate: (fid: symbol | null) => boolean
@@ -133,6 +142,8 @@ export type TCreateFunctionInternalContext = {
 	get_is_authenticated: TGetIsAuthenticatedFn
 	get_fetch: TGetFetchFn
 	get_translations: TGetTranslationsFn
+	translate: TTranslateFn
+	get_current_language: TGetCurrentLanguageFn
 	get_metadata_query: TGetMetadataQueryFn
 	get_user_query: TGetUserQueryFn
 	// get_content_query: TGetContentQueryFn
@@ -150,6 +161,8 @@ export type TCreateFunctionContext = {
 	get_is_authenticated: ReturnType<TGetIsAuthenticatedFn>
 	get_fetch: ReturnType<TGetFetchFn>
 	get_translations: TGetTranslationsFn
+	translate: TTranslateFn
+	get_current_language: ReturnType<TGetCurrentLanguageFn>
 	get_metadata_query: ReturnType<TGetMetadataQueryFn>
 	get_user_query: ReturnType<TGetUserQueryFn>
 	// get_content_query: TGetContentQueryFn
@@ -176,6 +189,50 @@ declare global {
 			subscription: User.User["subscription"]
 			max_upload_size: User.User["max_upload_size"]
 			max_functions: User.User["max_functions"]
+		}
+
+		module DT {
+			module SyncMetadata {
+				type Path = `/${User.User["id"]}`
+				type Method = "POST"
+				type Cookies = void
+				type Params = void
+				type RequestBody = TMetadataDTO[] // TODO: Replace with array of atomic changes
+				type StatusCode = 200
+				type ResponseBody = string
+			}
+
+			module GetContent {
+				type Path = `/${User.User["id"]}/${TMetadataDTO["fsid"]}`
+				type Method = "GET"
+				type Cookies = void
+				type Params = { user_id?: string; fsid?: string }
+				type RequestBody = void
+				type StatusCode = 200
+				type ResponseBody = string | ArrayBuffer
+			}
+
+			module SetContent {
+				type Path = `/${User.User["id"]}/${TMetadataDTO["fsid"]}/${TMetadataDTO["type"]}`
+				type Method = "PUT"
+				type Cookies = void
+				type Params = { user_id?: string; fsid?: string }
+				type RequestBody = string | ArrayBuffer
+				type StatusCode = 204
+				type ResponseBody = void
+			}
+
+			module CreateContent {
+				type Path = `/${User.User["id"]}`
+				type Url =
+					`${string}${Path}?name=${string}&parent=${TMetadataDTO["parent"]}&content_type=${TMetadataDTO["type"]}`
+				type Method = "POST"
+				type Cookies = void
+				type Params = { user_id?: string; name?: string; parent?: string }
+				type RequestBody = string | ArrayBuffer
+				type StatusCode = 201
+				type ResponseBody = void
+			}
 		}
 
 		module ID {
@@ -495,6 +552,8 @@ declare global {
 
 	type TFlatCommands = TFlattenRecord<TRecordToKVUnion<cmd, "cmd">>
 	type TFlatTranslations = TFlattenRecord<TRecordToKVUnion<t, "t">>
+	type TCommand = keyof TFlatCommands
+	type TTranslationKey = keyof TFlatTranslations
 
 	interface t {
 		common: {
@@ -821,20 +880,20 @@ declare global {
 		module Notification {
 			type Type = "success" | "rrr" | "info" | "warn" | "question" | "default"
 
-			type Item<T = null> = Notification.ShowNotificationParams<T> & { id: string }
+			type Item = Notification.ShowNotificationParams & { id: string }
 
-			type ShowNotificationParams<T = null> = {
-				type: Type
-				persist?: boolean
+			type ShowNotificationParams = {
+				id?: string
+				type?: Type
 				title?: string
 				message: string
-				payload?: T
-				Icon?: ComponentType | IconType
+				icon?: string
 				duration?: number
-				onClick?: () => void
-				action?: (id: string, payload: T) => unknown
-				actionText?: string
-				id?: string
+				on_click?: () => void
+				// persist?: boolean
+				// payload?: T
+				// action?: (id: string, payload: T) => unknown
+				// actionText?: string
 			}
 		}
 

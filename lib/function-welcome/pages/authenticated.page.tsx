@@ -87,7 +87,6 @@ export default function AuthenticatedPage() {
 
 				<Card title="TODO!">
 					<ul className="list-decimal">
-						<li>Bring back modal / ctx menu / command palette</li>
 						<li>Update metadata/content backend</li>
 						<li>Share public files (+ add links)</li>
 						<li>Bring back achievements</li>
@@ -106,20 +105,6 @@ export default function AuthenticatedPage() {
 						<li>Media files support</li>
 						<li>User avatar</li>
 					</ul>
-
-					<button
-						onClick={() =>
-							commands.emit("cmd.application.modal.show", {
-								render: div => {
-									div.innerHTML = "HELLO"
-								},
-								show_close_button: true,
-								on_unmount: () => console.log("123"),
-							})
-						}
-					>
-						Click me
-					</button>
 				</Card>
 
 				{/* {activities

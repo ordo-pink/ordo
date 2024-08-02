@@ -65,18 +65,9 @@ export const init_user: TInitUserParams = call_once(
 			)
 			.pipe(
 				Oath.ops.chain(({ path, method }) =>
-					Oath.Try(
-						() => fetch(hosts.id.concat(path), { method, credentials: "include" }),
-						error => einval(`refresh_token -> error: ${String(error)}`),
-					),
-				),
-			)
-			.pipe(
-				Oath.ops.chain(response =>
-					Oath.Try(
-						() => response.json(),
-						error => einval(`refresh_token -> error: ${String(error)}`),
-					),
+					Oath.Try(() => fetch(hosts.id.concat(path), { method, credentials: "include" }))
+						.pipe(Oath.ops.chain(response => Oath.Try(() => response.json())))
+						.pipe(Oath.ops.rejected_map(e => einval(`refresh_token -> error: ${String(e)}`))),
 				),
 			)
 			.pipe(

@@ -55,7 +55,7 @@ type Params = {
 type TFn = (
 	ctx: Context,
 	params: Params,
-) => Oath<Routes.ID.SignUp.Response, TRrr<"EINVAL" | "EIO" | "EEXIST" | "ENOENT">>
+) => Oath<Routes.ID.SignUp.Response, TRrr<"EINVAL" | "EIO" | "EEXIST">>
 type TCtx = { email: string; handle: string; password: string }
 
 const LOCATION = "sign_up"

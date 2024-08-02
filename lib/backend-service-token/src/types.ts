@@ -94,12 +94,12 @@ export type TPersistenceStrategyToken = {
 	/**
 	 * Assigns refresh token of given `SUB` associated with given `JTI`.
 	 */
-	set_token: (sub: SUB, jti: JTI, token: string) => Oath<void, TRrr<"ENOENT" | "EIO">>
+	set_token: (sub: SUB, jti: JTI, token: string) => Oath<void, TRrr<"EIO">>
 
 	/**
 	 * Assigns a record of all refresh tokens associated with given `SUB`.
 	 */
-	set_tokens: (sub: SUB, record: TTokenRecord) => Oath<void, TRrr<"ENOENT" | "EIO">>
+	set_tokens: (sub: SUB, record: TTokenRecord) => Oath<void, TRrr<"EIO">>
 }
 
 /**
@@ -176,7 +176,7 @@ export type TTokenService = {
 		sub: SUB
 		data: { lim: number; mfs: number; sbs: string; mxf: number }
 		aud?: AUD
-	}) => Oath<TAuthTokenPayload & { token: string }, TRrr<"EINVAL" | "ENOENT" | "EIO">>
+	}) => Oath<TAuthTokenPayload & { token: string }, TRrr<"EINVAL" | "EIO">>
 
 	strategy: TPersistenceStrategyToken
 }

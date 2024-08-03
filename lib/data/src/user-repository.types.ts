@@ -20,6 +20,7 @@
 import type { BehaviorSubject, Observable } from "rxjs"
 
 import type { Oath } from "@ordo-pink/oath"
+import type { TFetch } from "@ordo-pink/core"
 import type { TOption } from "@ordo-pink/option"
 import type { TResult } from "@ordo-pink/result"
 

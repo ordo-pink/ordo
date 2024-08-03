@@ -46,12 +46,6 @@ export type TUserValidation<$TKey extends keyof User.PrivateUser> = (
 	x: unknown,
 ) => TResult<User.PrivateUser[$TKey], TRrr<"EINVAL">>
 
-// export type TValidations = { [K in keyof User.PrivateUser]: TUserValidation<K> }
-// export type TUserValidations<$TKey extends keyof TValidations = keyof TValidations> = Record<
-// 	`is_${$TKey}`,
-// 	TValidations[$TKey]
-// >
-
 export type TUserValidations = TValidations<User.PrivateUser>
 
 export type TUserServiceStatic = {

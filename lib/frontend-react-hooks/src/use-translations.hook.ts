@@ -17,28 +17,14 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { O } from "@ordo-pink/option"
 import { TwoLetterLocale } from "@ordo-pink/locale"
 
 import { use$ } from ".."
 
 export const useTranslation = () => {
-	const { get_translations } = use$.ordo_context()
-	const current_language = useCurrentLanguage()
+	const { translate } = use$.ordo_context()
 
-	const translations$ = get_translations()
-
-	const translations_option = use$.strict_subscription(translations$, O.None())
-
-	return (key: keyof TFlatTranslations) => {
-		const translations = translations_option
-			.pipe(O.ops.map(ts => ts[current_language] ?? ({} as TFlatTranslations)))
-			.cata({ Some: ts => ts, None: () => ({}) as TFlatTranslations })
-
-		const result = translations[key]
-
-		return result != null ? result : "↺"
-	}
+	return translate
 }
 
 /**

@@ -45,11 +45,11 @@ export default function Link({
 		event.preventDefault()
 
 		external
-			? commands.emit<cmd.router.open_external>("router.open_external", {
+			? commands.emit("cmd.application.router.open_external", {
 					url: href,
 					new_tab,
 				})
-			: commands.emit<cmd.router.navigate>("router.navigate", href)
+			: commands.emit("cmd.application.router.navigate", href)
 	}
 
 	return (

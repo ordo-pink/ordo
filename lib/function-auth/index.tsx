@@ -52,6 +52,19 @@ declare global {
 					has_special_char: () => string
 				}
 			}
+			errors: {
+				sign_in: {
+					enoent: () => string
+					eio: () => string
+					einval: () => string
+				}
+				sign_up: {
+					eexist: () => string
+					eio: () => string
+					einval: () => string
+				}
+				unexpected_error: () => string
+			}
 			legal: {
 				privacy_policy: {
 					label: () => string
@@ -65,6 +78,7 @@ declare global {
 				sign_in: {
 					status_bar_title: () => string
 					label: () => string
+					not_signed_up: () => string
 				}
 				sign_up: {
 					status_bar_title: () => string
@@ -93,6 +107,13 @@ export type TAuthTranslationKey = (typeof AUTH_KEYS)[number]
 
 // TODO: Lazy translations installation
 const EN_TRANSLATIONS: TScopedTranslations<"auth"> = {
+	"errors.sign_in.einval": "Provided input is invalid",
+	"errors.sign_in.eio": "Error connecting to the server",
+	"errors.sign_in.enoent": "User with provided credentials does not exist",
+	"errors.sign_up.eexist": "User with this email or handle already exists",
+	"errors.sign_up.einval": "Provided inputs are invalid",
+	"errors.sign_up.eio": "Error connecting to the server",
+	"errors.unexpected_error": "Unexpected error",
 	"inputs.email.is_valid": "Email is valid",
 	"inputs.email.label": "Email",
 	"inputs.email.placeholder": "hey@ordo.pink",
@@ -111,6 +132,7 @@ const EN_TRANSLATIONS: TScopedTranslations<"auth"> = {
 	"legal.privacy_policy.consent": "I agree to ",
 	"legal.privacy_policy.label": "Privacy Policy",
 	"pages.sign_in.label": "Sign In",
+	"pages.sign_in.not_signed_up": "Not a member?",
 	"pages.sign_in.status_bar_title": "",
 	"pages.sign_out.label": "Sign Out",
 	"pages.sign_up.already_signed_up": "Already signed up?",
@@ -132,10 +154,12 @@ export default create_function(
 			"cmd.application.add_translations",
 			"cmd.application.command_palette.add",
 			"cmd.application.command_palette.remove",
+			"cmd.application.notification.show",
 			"cmd.application.router.navigate",
 			"cmd.application.set_title",
 			"cmd.auth.open_sign_in",
 			"cmd.auth.open_sign_up",
+			"cmd.auth.sign_out",
 			"cmd.functions.activities.register",
 			"cmd.functions.activities.unregister",
 		],
@@ -161,10 +185,7 @@ export default create_function(
 				const credentials = "include"
 				const url = hosts.id.concat(path)
 
-				void fetch(url, { method, credentials }).then(() => {
-					window.history.replaceState(null, "")
-					window.location.replace("/")
-				})
+				void fetch(url, { method, credentials }).then(() => window.location.replace("/"))
 			}
 
 			if (is_authenticated) {

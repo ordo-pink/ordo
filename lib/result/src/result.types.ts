@@ -25,7 +25,7 @@ export type ErrWhat<$T> = $T extends object & {
 	? F extends (x: TResult<infer _, infer V>) => any
 		? ErrWhat<V>
 		: never
-	: $T
+	: never
 
 export type TOkResultConstructorFn = <$TOk, $TErr = never>(ok: $TOk) => TResult<$TOk, $TErr>
 

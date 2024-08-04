@@ -32,8 +32,10 @@ export const set_auth_cookie = (ctx: Context, sub: SUB, jti: JTI, expires: Date)
 }
 
 export const remove_auth_cookie = (ctx: Context) => () => {
-	ctx.response.set("Set-Cookie", "jti=; Expires=Thu, 01 Jan 1970 00:00:01 GMT;")
-	ctx.response.set("Set-Cookie", "sub=; Expires=Thu, 01 Jan 1970 00:00:01 GMT;")
+	ctx.response.set("Set-Cookie", [
+		"jti=removed; Expires=Thu, 01 Jan 1970 00:00:01 GMT; SameSite=Lax; Path=/; HttpOnly;",
+		"sub=removed; Expires=Thu, 01 Jan 1970 00:00:01 GMT; SameSite=Lax; Path=/; HttpOnly;",
+	])
 }
 
 export const get_auth_cookies0 = (sub?: string, jti?: string) =>

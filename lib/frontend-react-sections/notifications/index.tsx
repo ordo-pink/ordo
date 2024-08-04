@@ -120,8 +120,8 @@ const NotificationComponent = ({ notification }: P) => {
 
 	return (
 		<div
-			className={`relative inset-x-0 top-0 z-50 size-full ${notification.onClick ? "cursor-pointer" : ""}`}
-			onClick={notification.onClick}
+			className={`relative inset-x-0 top-0 z-50 size-full ${notification.on_click ? "cursor-pointer" : ""}`}
+			onClick={notification.on_click}
 		>
 			<Callout type={notification.type} Icon={notification.Icon}>
 				<Heading notification={notification} />

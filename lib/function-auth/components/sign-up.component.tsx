@@ -29,6 +29,8 @@ import Button from "@ordo-pink/frontend-react-components/button"
 import Callout from "@ordo-pink/frontend-react-components/callout"
 import Heading from "@ordo-pink/frontend-react-components/heading"
 import Link from "@ordo-pink/frontend-react-components/link"
+import { RRR } from "@ordo-pink/data"
+import { Switch } from "@ordo-pink/switch"
 
 /**
  * TODO: Replace validations with user validations
@@ -260,7 +262,34 @@ export default function SignUp() {
 									method,
 								})
 									.then(res => res.json())
-									.then(() => window.location.replace("/"))
+									.then(res => {
+										if (res.success) return window.location.replace("/")
+
+										const { message, title } = Switch.Match(Number(res.error[0]))
+											.case(RRR.enum.ENOENT, () => ({
+												message: "t.auth.errors.sign_up.eexist" satisfies TTranslationKey,
+												title: "ENOENT",
+											}))
+											.case(RRR.enum.EIO, () => ({
+												message: "t.auth.errors.sign_up.eio" satisfies TTranslationKey,
+												title: "EIO",
+											}))
+											.case(RRR.enum.EINVAL, () => ({
+												message: "t.auth.errors.sign_up.einval" satisfies TTranslationKey,
+												title: "EINVAL",
+											}))
+											.default(() => ({
+												message: "t.auth.errors.unexpected_error" satisfies TTranslationKey,
+												title: "EWTF",
+											})) as { message: TTranslationKey; title: string }
+
+										commands.emit("cmd.application.notification.show", {
+											title,
+											message: translate(message),
+											type: "rrr",
+											duration: 15,
+										})
+									})
 							}}
 						>
 							{t_window_title}

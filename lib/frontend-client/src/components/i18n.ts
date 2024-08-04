@@ -17,19 +17,29 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { BehaviorSubject } from "rxjs"
+import { BehaviorSubject, combineLatestWith, map } from "rxjs"
 
 import { O, type TOption } from "@ordo-pink/option"
-import { type TGetTranslationsFn, type TTranslations } from "@ordo-pink/core"
+import {
+	type TGetCurrentLanguageFn,
+	type TGetTranslationsFn,
+	type TTranslateFn,
+	type TTranslations,
+} from "@ordo-pink/core"
 import { call_once, keys_of } from "@ordo-pink/tau"
+import { RRR } from "@ordo-pink/data"
+import { Result } from "@ordo-pink/result"
+import { TwoLetterLocale } from "@ordo-pink/locale"
 
 import { type TInitCtx } from "../frontend-client.types"
 
-type TInitI18nFn = (params: Pick<TInitCtx, "logger" | "commands">) => {
+type TInitI18nFn = (params: Pick<TInitCtx, "logger" | "commands" | "known_functions">) => {
 	get_translations: TGetTranslationsFn
+	get_current_language: TGetCurrentLanguageFn
+	translate: TTranslateFn
 }
 
-export const init_i18n: TInitI18nFn = call_once(({ logger, commands }) => {
+export const init_i18n: TInitI18nFn = call_once(({ logger, commands, known_functions }) => {
 	logger.debug("🟡 Initialising i18n...")
 
 	commands.on("cmd.application.add_translations", ({ translations, lang, prefix }) => {
@@ -48,9 +58,31 @@ export const init_i18n: TInitI18nFn = call_once(({ logger, commands }) => {
 
 	logger.debug("🟢 Initialised i18n.")
 
-	return { get_translations: () => translations$.asObservable() }
+	const translate: TTranslateFn = key =>
+		translations$.getValue().cata({
+			Some: translations => translations[current_language$.getValue()][key],
+			None: () => "↺",
+		})
+
+	translate.$ = translations$
+		.pipe(combineLatestWith(current_language$))
+		.pipe(map((_, index) => index))
+
+	return {
+		translate,
+
+		get_translations: () => translations$.asObservable(),
+
+		get_current_language: fid => () =>
+			Result.If(known_functions.has_permissions(fid, { queries: ["application.current_language"] }))
+				.pipe(Result.ops.err_map(() => eperm(`get_current_language -> fid: ${String(fid)}`)))
+				.pipe(Result.ops.map(() => current_language$.asObservable())),
+	}
 })
 
 // --- Internal ---
 
 const translations$ = new BehaviorSubject<TOption<TTranslations>>(O.None())
+const current_language$ = new BehaviorSubject<TwoLetterLocale>(TwoLetterLocale.ENGLISH)
+
+const eperm = RRR.codes.eperm("init_i18n")

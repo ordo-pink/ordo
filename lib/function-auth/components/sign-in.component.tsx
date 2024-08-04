@@ -20,6 +20,8 @@
 import { useEffect, useState } from "react"
 
 import { EmailInput, PasswordInput } from "@ordo-pink/frontend-react-components/input"
+import { RRR } from "@ordo-pink/data"
+import { Switch } from "@ordo-pink/switch"
 import { use$ } from "@ordo-pink/frontend-react-hooks"
 
 import Button from "@ordo-pink/frontend-react-components/button"
@@ -35,6 +37,7 @@ export default function SignIn() {
 
 	const t_window_title = translate("t.auth.pages.sign_in.label")
 	const t_status_bar_title = translate("t.auth.pages.sign_in.status_bar_title")
+	const t_not_signed_up = translate("t.auth.pages.sign_in.not_signed_up")
 
 	const [email, set_email] = useState("")
 	const [password, set_password] = useState("")
@@ -80,17 +83,41 @@ export default function SignIn() {
 								})
 									.then(res => res.json())
 									.then(res => {
-										if (res.success) window.location.replace("/")
-										// TODO: Show sign in error
+										if (res.success) return window.location.replace("/")
+
+										const { message, title } = Switch.Match(Number(res.error[0]))
+											.case(RRR.enum.ENOENT, () => ({
+												message: "t.auth.errors.sign_in.enoent" satisfies TTranslationKey,
+												title: "ENOENT",
+											}))
+											.case(RRR.enum.EIO, () => ({
+												message: "t.auth.errors.sign_in.eio" satisfies TTranslationKey,
+												title: "EIO",
+											}))
+											.case(RRR.enum.EINVAL, () => ({
+												message: "t.auth.errors.sign_in.einval" satisfies TTranslationKey,
+												title: "EINVAL",
+											}))
+											.default(() => ({
+												message: "t.auth.errors.unexpected_error" satisfies TTranslationKey,
+												title: "EWTF",
+											})) as { message: TTranslationKey; title: string }
+
+										commands.emit("cmd.application.notification.show", {
+											title,
+											message: translate(message),
+											type: "rrr",
+											duration: 15,
+										})
 									})
 							}}
 						>
-							Войти
+							{t_window_title}
 						</Button.Primary>
 					</div>
 
 					<div className="flex space-x-2">
-						<Link href="/auth/sign-up">Ещё не регистрировались?</Link>
+						<Link href="/auth/sign-up">{t_not_signed_up}</Link>
 						{/* <div>|</div>
 						<Link href={forgotPasswordURL}>Забыли пароль?</Link> */}
 					</div>

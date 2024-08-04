@@ -35,6 +35,7 @@ import { init_known_functions } from "./components/known-functions"
 import { init_logger } from "./components/logger"
 import { init_metadata } from "./components/metadata"
 import { init_modal } from "./sections/modal.section"
+import { init_notifications } from "./sections/notifications.section"
 import { init_router } from "./components/router"
 import { init_timer_display } from "./sections/timer.section"
 import { init_title_display } from "./sections/title.section"
@@ -54,25 +55,29 @@ export const create_client = ({ logger, is_dev, hosts }: P) => {
 	const { get_hosts } = init_hosts({ logger, hosts, known_functions })
 	const { fetch, get_fetch } = init_fetch({ logger, known_functions, APP_FID })
 	const { commands, get_commands } = init_commands({
-		logger,
-		known_functions,
 		APP_FID,
 		is_dev,
+		known_functions,
+		logger,
 	})
-	const { get_translations } = init_i18n({ logger, commands })
+	const { translate, get_translations, get_current_language } = init_i18n({
+		commands,
+		known_functions,
+		logger,
+	})
 	register_common_translations(logger, commands)
 
 	const { activities$, current_activity$, set_current_activity } = init_activities({
-		logger,
-		known_functions,
 		commands,
+		known_functions,
+		logger,
 	})
 	const { auth$, user_query, get_is_authenticated, get_user_query } = init_user({
-		logger,
-		known_functions,
 		commands,
 		fetch,
 		hosts,
+		known_functions,
+		logger,
 	})
 	const { get_current_route } = init_router({
 		activities$,
@@ -84,17 +89,18 @@ export const create_client = ({ logger, is_dev, hosts }: P) => {
 	})
 
 	const { get_metadata_query } = init_metadata({
-		logger,
-		known_functions,
-		commands,
-		user_query,
 		auth$,
-		hosts,
+		commands,
 		fetch,
+		hosts,
+		known_functions,
+		logger,
+		user_query,
 	})
 
 	const { get_sidebar } = init_workspace(logger, known_functions, commands, current_activity$)
 	init_modal({ commands, logger })
+	init_notifications({ logger, commands })
 	init_background_task_display(logger, commands)
 	init_timer_display(logger)
 	init_title_display(logger, commands)
@@ -103,17 +109,19 @@ export const create_client = ({ logger, is_dev, hosts }: P) => {
 
 	const internal_context: TCreateFunctionContext = {
 		fid: APP_FID,
-		is_dev,
-		get_translations,
 		get_commands: get_commands(APP_FID),
-		get_logger: get_logger(APP_FID),
+		get_current_language: get_current_language(APP_FID),
 		get_current_route: get_current_route(APP_FID),
+		get_fetch: get_fetch(APP_FID),
 		get_hosts: get_hosts(APP_FID),
 		get_is_authenticated: get_is_authenticated(APP_FID),
-		get_fetch: get_fetch(APP_FID),
-		get_sidebar: get_sidebar(APP_FID),
+		get_logger: get_logger(APP_FID),
 		get_metadata_query: get_metadata_query(APP_FID),
+		get_sidebar: get_sidebar(APP_FID),
+		get_translations,
 		get_user_query: get_user_query(APP_FID),
+		is_dev,
+		translate,
 	}
 
 	init_command_palette(logger, commands, internal_context)
@@ -124,17 +132,19 @@ export const create_client = ({ logger, is_dev, hosts }: P) => {
 		.then(f =>
 			f({
 				get_commands,
+				get_current_language,
 				get_current_route,
+				get_fetch,
 				get_hosts,
 				get_is_authenticated,
 				get_logger,
-				get_translations,
-				get_sidebar,
-				get_fetch,
 				get_metadata_query,
+				get_sidebar,
+				get_translations,
 				get_user_query,
 				is_dev,
 				known_functions,
+				translate,
 			}),
 		)
 
@@ -143,17 +153,19 @@ export const create_client = ({ logger, is_dev, hosts }: P) => {
 		.then(f =>
 			f({
 				get_commands,
+				get_current_language,
 				get_current_route,
+				get_fetch,
 				get_hosts,
 				get_is_authenticated,
 				get_logger,
+				get_metadata_query,
 				get_sidebar,
 				get_translations,
-				get_fetch,
-				get_metadata_query,
 				get_user_query,
 				is_dev,
 				known_functions,
+				translate,
 			}),
 		)
 }

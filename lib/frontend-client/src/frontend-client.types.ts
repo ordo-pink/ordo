@@ -19,7 +19,14 @@
 
 import type { Observable } from "rxjs"
 
-import type { TFetch, THosts, TKnownFunctions, TPermissions, TRequireFID } from "@ordo-pink/core"
+import type {
+	TFetch,
+	THosts,
+	TKnownFunctions,
+	TPermissions,
+	TRequireFID,
+	TTranslateFn,
+} from "@ordo-pink/core"
 import type { TRrr, TUserQuery } from "@ordo-pink/data"
 import type { AuthResponse } from "@ordo-pink/backend-server-id"
 import type { TLogger } from "@ordo-pink/logger"
@@ -45,4 +52,5 @@ export type TInitCtx = {
 	fetch: TFetch
 	auth$: Observable<TOption<AuthResponse>>
 	user_query: TUserQuery
+	translate: TTranslateFn
 }

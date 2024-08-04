@@ -20,9 +20,6 @@
 // SPDX-FileCopyrightText: Copyright 2024, 谢尔盖||↓ and the Ordo.pink contributors
 // SPDX-License-Identifier: AGPL-3.0-only
 
-import { TResult } from "@ordo-pink/result"
-import { TRrr } from "@ordo-pink/data"
-
 export type Optional<T> = T | undefined
 
 export type Method<A, T extends object, K extends keyof T> = Unary<A, T[K]>
@@ -114,13 +111,13 @@ export type TSnakeToPascal<S extends string> = S extends `${infer A}_${infer B}`
 
 export type TDropIsPrefix<T extends string> = T extends `is_${infer U}` ? U : never
 
-export type TValidation<TEntity extends Record<string, unknown>, TKey extends keyof TEntity> = (
+export type TValidation<$TEntity extends Record<string, unknown>, $TKey extends keyof $TEntity> = (
 	x: unknown,
-) => TResult<TEntity[TKey], TRrr<"EINVAL">>
+) => x is $TEntity[$TKey]
 
-export type TValidations<TEntity extends Record<string, unknown>> = {
-	[K in keyof TEntity extends string ? `is_${keyof TEntity}` : never]: TValidation<
-		TEntity,
-		TDropIsPrefix<K>
+export type TValidations<$TEntity extends Record<string, unknown>> = {
+	[$TKey in keyof $TEntity extends string ? `is_${keyof $TEntity}` : never]: TValidation<
+		$TEntity,
+		TDropIsPrefix<$TKey>
 	>
 }

@@ -31,7 +31,7 @@ export type TCreateAuthTokenResult = {
 
 export const create_auth_token0 =
 	(token_service: TTokenService) =>
-	(user: User.InternalUser): Oath<TCreateAuthTokenResult, TRrr<"EIO" | "EINVAL" | "ENOENT">> =>
+	(user: User.InternalUser): Oath<TCreateAuthTokenResult, TRrr<"EIO" | "EINVAL">> =>
 		token_service
 			.create({
 				sub: user.id,

@@ -80,8 +80,6 @@ export default function SignUp() {
 	const t_status_bar_title = translate("t.auth.pages.sign_up.status_bar_title")
 	const t_window_title = translate("t.auth.pages.sign_up.label")
 
-	console.log(is_valid)
-
 	useEffect(() => {
 		commands.emit("cmd.application.set_title", {
 			window_title: t_window_title,

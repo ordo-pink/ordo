@@ -38,7 +38,6 @@ export const init_command_palette = call_once(
 		commands.on("cmd.application.command_palette.remove", on_remove_global_item)
 
 		let on_toggle_cp = () => {
-			console.log("HERE")
 			on_show_custom_cp(commands, ctx)
 		}
 
@@ -48,14 +47,12 @@ export const init_command_palette = call_once(
 				if (state.items.length > 0) {
 					commands.off("cmd.application.command_palette.toggle", on_toggle_cp)
 					on_toggle_cp = () => {
-						console.log("THERE")
 						on_hide_custom_cp(commands)()
 					}
 					commands.on("cmd.application.command_palette.toggle", on_toggle_cp)
 				} else {
 					commands.off("cmd.application.command_palette.toggle", on_toggle_cp)
 					on_toggle_cp = () => {
-						console.log("THEN")
 						on_show_custom_cp(commands, ctx)(global)
 					}
 					commands.on("cmd.application.command_palette.toggle", on_toggle_cp)

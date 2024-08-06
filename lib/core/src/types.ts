@@ -622,6 +622,7 @@ declare global {
 					on_new_item?: (new_item: string) => unknown
 					multiple?: boolean
 					pinned_items?: Client.CommandPalette.Item[]
+					shows_next_palette?: boolean
 				}
 				hide: () => void
 			}
@@ -1070,6 +1071,11 @@ declare global {
 				 * @optional
 				 */
 				accelerator?: string
+
+				/**
+				 * If set to true, recycles the current command palette frame to show provided items.
+				 */
+				shows_next_palette?: boolean
 			}
 		}
 	}

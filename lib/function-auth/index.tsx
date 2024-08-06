@@ -213,6 +213,7 @@ export default create_function(
 					readable_name: "t.auth.pages.sign_in.label",
 					Icon: BsBoxArrowInRight,
 					on_select: () => commands.emit("cmd.auth.open_sign_in"),
+					accelerator: "mod+shift+l",
 				})
 
 				commands.emit("cmd.application.command_palette.add", {
@@ -220,6 +221,7 @@ export default create_function(
 					readable_name: "t.auth.pages.sign_up.label",
 					Icon: BsBoxArrowUp,
 					on_select: () => commands.emit("cmd.auth.open_sign_up"),
+					accelerator: "mod+shift+r",
 				})
 			}
 		})

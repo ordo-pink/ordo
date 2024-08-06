@@ -42,7 +42,7 @@ export const is_true = (x: unknown): x is true => x === true
 export const is_false = (x: unknown): x is false => x === false
 export const is_bool = (x: unknown): x is boolean => is_true(x) || is_false(x)
 export const is_array = Array.isArray
-export const is_date = (x: unknown): x is Date => !!x && x instanceof Date
+export const is_date = (x: unknown): x is Date => is_instance_of(Date, x)
 export const is_string = (x: unknown): x is string => typeof x === "string"
 export const is_non_empty_string = (x: unknown): x is string => is_string(x) && x.trim() !== ""
 export const is_undefined = (x: unknown): x is undefined => x === undefined
@@ -59,25 +59,33 @@ export const is_finite_non_negative_int = (x: unknown): x is number =>
 	is_non_negative_number(x) && is_finite(x) && is_int(x)
 export const is_uuid = (x: unknown): x is UUIDv4 => is_string(x) && UUIDv4_RX.test(x)
 export const is_empty_array = (x: unknown): boolean => is_array(x) && is_0(x.length)
+// eslint-disable-next-line @typescript-eslint/ban-types
+export const is_instance_of = <T extends Function>(type: T, x: unknown): x is T => x instanceof type
+
+export const gt = (min: number) => (val: number) => val > min
+export const lt = (max: number) => (val: number) => val < max
+export const eq = (target: number) => (val: number) => target === val
+export const gte = (min: number) => (val: number) => eq(min)(val) || gt(min)(val)
+export const lte = (max: number) => (val: number) => eq(max)(val) || lt(max)(val)
+export const noop = (): void => {}
 
 export const keys_of: Types._KeysOfFn = o => {
 	return Object.keys(o) as any
 }
 
-export const noop = () => {}
 export const extend =
 	<T extends Record<string, unknown>, N extends Record<string, unknown>>(f: (obj: T) => N) =>
 	(obj: T) => ({ ...obj, ...f(obj) })
 
 export const call_once = <T extends any[], R>(fn: (...args: T) => R) => {
-	let wasCalled = false
+	let was_called = false
 
 	return (...args: T): R => {
-		if (wasCalled) return void 0 as unknown as R
+		if (was_called) return void 0 as unknown as R
 
 		const result = fn(...args)
 
-		wasCalled = true
+		was_called = true
 
 		return result
 	}
@@ -139,12 +147,6 @@ export const thunk =
 	<$T>(value: $T) =>
 	() =>
 		value
-
-export const gt = (min: number) => (val: number) => val > min
-export const lt = (max: number) => (val: number) => val < max
-export const eq = (target: number) => (val: number) => target === val
-export const gte = (min: number) => (val: number) => eq(min)(val) || gt(min)(val)
-export const lte = (max: number) => (val: number) => eq(max)(val) || lt(max)(val)
 
 export const from_option0 =
 	<$TOnNone>(on_none: () => $TOnNone) =>

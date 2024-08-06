@@ -37,24 +37,18 @@ export const init_command_palette = call_once(
 		commands.on("cmd.application.command_palette.add", on_add_global_item)
 		commands.on("cmd.application.command_palette.remove", on_remove_global_item)
 
-		let on_toggle_cp = () => {
-			on_show_custom_cp(commands, ctx)
-		}
+		let on_toggle_cp = () => on_show_custom_cp(commands, ctx)({ items: [] })
 
 		custom_command_palette$
 			.pipe(combineLatestWith(global_command_palette$))
 			.subscribe(([state, global]) => {
+				commands.off("cmd.application.command_palette.toggle", on_toggle_cp)
+
 				if (state.items.length > 0) {
-					commands.off("cmd.application.command_palette.toggle", on_toggle_cp)
-					on_toggle_cp = () => {
-						on_hide_custom_cp(commands)()
-					}
+					on_toggle_cp = on_hide_custom_cp(commands)
 					commands.on("cmd.application.command_palette.toggle", on_toggle_cp)
 				} else {
-					commands.off("cmd.application.command_palette.toggle", on_toggle_cp)
-					on_toggle_cp = () => {
-						on_show_custom_cp(commands, ctx)(global)
-					}
+					on_toggle_cp = () => on_show_custom_cp(commands, ctx)(global)
 					commands.on("cmd.application.command_palette.toggle", on_toggle_cp)
 				}
 			})
@@ -85,6 +79,7 @@ export type TCommandPaletteState = {
 	on_new_item?: (new_item: string) => any
 	multiple?: boolean
 	pinned_items?: Client.CommandPalette.Item[]
+	shows_next_palette?: boolean
 }
 
 const custom_command_palette$ = new BehaviorSubject<TCommandPaletteState>({ items: [] })
@@ -97,7 +92,10 @@ const on_show_custom_cp =
 	(commands: Client.Commands.Commands, ctx: TOrdoContext) => (state: TCommandPaletteState) => {
 		let root: Root
 
+		commands.emit("cmd.application.modal.hide")
+
 		custom_command_palette$.next(state)
+
 		commands.emit("cmd.application.modal.show", {
 			on_unmount: () => {
 				root.unmount()
@@ -115,6 +113,7 @@ const on_show_custom_cp =
 							multiple={state.multiple}
 							on_new_item={state.on_new_item}
 							pinned_items={state.pinned_items}
+							shows_next_palette={true}
 						/>
 					</Provider>,
 				)
@@ -161,7 +160,7 @@ const create_hotkey_string = (event: KeyboardEvent, isApple: boolean) => {
 	if (event.metaKey) hotkey += "mod+"
 	if (event.shiftKey) hotkey += "shift+"
 
-	hotkey += event.code.replace("Key", "").toLocaleLowerCase()
+	hotkey += event.code?.replace("Key", "").toLocaleLowerCase()
 
 	return hotkey
 }

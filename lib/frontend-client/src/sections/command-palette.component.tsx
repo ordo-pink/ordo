@@ -35,8 +35,15 @@ type P = {
 	on_new_item?: (newItem: string) => any
 	multiple?: boolean
 	pinned_items?: Client.CommandPalette.Item[]
+	shows_next_palette?: boolean
 }
-export default function CommandPaletteModal({ items, on_new_item, multiple, pinned_items }: P) {
+export default function CommandPaletteModal({
+	items,
+	on_new_item,
+	multiple,
+	pinned_items,
+	shows_next_palette,
+}: P) {
 	const commands = use$.commands()
 	const translate = use$.translation()
 
@@ -98,6 +105,7 @@ export default function CommandPaletteModal({ items, on_new_item, multiple, pinn
 				set_input_value("")
 
 				if (!multiple) on_escape()
+				if (!shows_next_palette) commands.emit("cmd.application.command_palette.hide")
 			},
 			(selected_item: Client.CommandPalette.Item) => {
 				if (on_new_item && input_value.length > 0 && suggested_items.length === 0) {
@@ -110,7 +118,9 @@ export default function CommandPaletteModal({ items, on_new_item, multiple, pinn
 				if (!multiple) {
 					selected_item.on_select()
 
-					return on_escape()
+					on_escape()
+					if (!shows_next_palette) commands.emit("cmd.application.command_palette.hide")
+					return
 				}
 
 				selected_item.on_select()
@@ -226,11 +236,12 @@ export default function CommandPaletteModal({ items, on_new_item, multiple, pinn
 	}
 
 	const on_escape = () => {
+		if (!suggested_items[current_index].shows_next_palette)
+			commands.emit("cmd.application.command_palette.hide")
+
 		set_input_value("")
 		set_current_index(0)
 		set_pointer_location(selected_items.length ? "selected" : "suggested")
-
-		commands.emit("cmd.application.command_palette.hide")
 	}
 
 	const on_key_down = (event: KeyboardEvent<HTMLInputElement>) =>

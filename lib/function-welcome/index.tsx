@@ -98,7 +98,10 @@ export default create_function(
 
 		ctx.translate.$.subscribe(() => {
 			const on_email_support = (url: string) => () =>
-				commands.emit("cmd.application.router.open_external", { url, new_tab: true })
+				commands.emit("cmd.application.router.open_external", {
+					url: `mailto:${url}`,
+					new_tab: true,
+				})
 			const on_messenger_support = (url: string) => () =>
 				commands.emit("cmd.application.router.open_external", { url, new_tab: true })
 

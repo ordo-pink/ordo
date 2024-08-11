@@ -13,8 +13,6 @@ const for_each_key = <T extends Record<string, unknown>>(
 	callback: (key: keyof T) => void,
 ) => Object.keys(obj).forEach(key => callback(key))
 
-const hooks = {} as Record<string, unknown>
-
 export const init_create_component =
 	<$TCustomHooks extends Record<string, unknown> = Record<string, unknown>>({
 		create_element,

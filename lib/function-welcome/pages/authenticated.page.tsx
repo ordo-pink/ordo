@@ -35,7 +35,6 @@ export default function AuthenticatedPage() {
 	const hosts = use$.hosts()
 	const logger = use$.logger()
 	const current_language = use$.current_language()
-
 	const fetch = use$.fetch()
 	const translate = use$.translation()
 

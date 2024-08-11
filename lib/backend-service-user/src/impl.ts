@@ -486,6 +486,6 @@ const _hash_password0 = (password: User.PrivateUser["password"]) =>
 	)
 
 const _verify_password0 = (password: User.PrivateUser["password"]) => (user: User.PrivateUser) =>
-	Oath.FromPromise(() => Bun.password.verify(password, user.password)).pipe(
-		Oath.ops.rejected_map(() => enoent("validate_password -> passwords do not match")),
-	)
+	Oath.FromPromise(() => Bun.password.verify(password, user.password))
+		.pipe(Oath.ops.chain(is_valid_password => Oath.If(is_valid_password)))
+		.pipe(Oath.ops.rejected_map(() => enoent("validate_password -> passwords do not match")))

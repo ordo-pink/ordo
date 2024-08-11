@@ -179,6 +179,7 @@ export default create_function(
 				commands.emit("cmd.application.router.navigate", "/auth/sign-in")
 			const on_open_sign_up = () =>
 				commands.emit("cmd.application.router.navigate", "/auth/sign-up")
+
 			const on_sign_out = () => {
 				const path: Routes.ID.SignOut.Path = "/account/sign-out"
 				const method: Routes.ID.SignOut.Method = "POST"

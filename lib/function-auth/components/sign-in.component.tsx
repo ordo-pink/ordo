@@ -28,6 +28,7 @@ import Button from "@ordo-pink/frontend-react-components/button"
 import Heading from "@ordo-pink/frontend-react-components/heading"
 import Link from "@ordo-pink/frontend-react-components/link"
 
+// TODO: Disallow sigining in with invalid password lol
 export default function SignIn() {
 	const commands = use$.commands()
 	const hosts = use$.hosts()

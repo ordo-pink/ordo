@@ -37,15 +37,17 @@ const create = init_create_component({
 	create_text: document.createTextNode.bind(document),
 })
 
+// TODO: Default notification progress bar color is invalid
+// TODO: Fix spacing between notifications
 type P = Pick<TInitCtx, "logger" | "commands">
 export const init_notifications = ({ logger, commands }: P) => {
 	logger.debug("🟡 Initialising notifications...")
 
 	const notification_list_element = document.querySelector("#notifications") as HTMLDivElement
 
-	const Notifications = div(use => {
-		let notifications = [] as Client.Notification.Item[]
+	let notifications = [] as Client.Notification.Item[]
 
+	const Notifications = div(use => {
 		use.on_mount(() =>
 			notification$.subscribe(ns => {
 				notifications = ns
@@ -159,7 +161,7 @@ const NotificationProgress = ({
 				const class_str = `h-1 rounded-full ${ProgressClass[type ?? "default"].join(" ")}`
 				const style = `width: ${counters[id].toFixed(0).concat("%")}`
 
-				const interval =
+				const timeout =
 					counters[id] != null &&
 					counters[id] > 0 &&
 					setTimeout(() => {
@@ -168,7 +170,7 @@ const NotificationProgress = ({
 					}, duration * 10)
 
 				use.on_refresh(() => {
-					interval && clearTimeout(interval)
+					timeout && clearTimeout(timeout)
 					if (counters[id] === 0) {
 						commands.emit("cmd.application.notification.hide", id)
 						counters = { ...counters, [id]: -1 }

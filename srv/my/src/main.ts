@@ -31,8 +31,4 @@ const hosts = {
 	my: import.meta.env.VITE_ORDO_WORKSPACE_HOST,
 }
 
-create_client({
-	logger,
-	hosts,
-	is_dev,
-})
+create_client({ logger, hosts, is_dev })

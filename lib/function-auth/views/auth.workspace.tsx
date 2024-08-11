@@ -48,7 +48,6 @@ export default function Auth() {
 	const Component = Switch.Match(action)
 		.case("sign-in", () => SignIn)
 		.case("sign-up", () => SignUp)
-		.case("sign-out", () => Loading)
 		.case("confirm-email", () => Loading) // TODO: Confirm email
 		.case("forgot-password", () => Loading) // TODO: Forgot password
 		.default(() => Loading)

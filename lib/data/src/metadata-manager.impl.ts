@@ -31,7 +31,7 @@ export const MetadataManager: TMetadataManagerStatic = {
 		start: on_state_change =>
 			// TODO: Cache/offline repo
 			auth$
-				.pipe(map(auth_option => O.FromNullable(auth_option.unwrap()?.accessToken)))
+				.pipe(map(auth_option => O.FromNullable(auth_option.unwrap()?.token)))
 				.pipe(combineLatestWith(l_repo.sub))
 				.pipe(
 					map(([token_option, iteration]) => {

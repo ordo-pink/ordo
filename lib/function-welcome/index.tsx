@@ -129,14 +129,6 @@ export default create_function(
 			Icon: BsCollection,
 		})
 
-		commands.emit("cmd.application.command_palette.add", {
-			id: "cmd.welcome.open_support_palette",
-			readable_name: "t.welcome.command_palette.support.open_support_palette",
-			on_select: () => commands.emit("cmd.welcome.open_support_palette"),
-			Icon: BsQuestionOctagon,
-			shows_next_palette: true,
-		})
-
 		commands.on("cmd.welcome.open_support_palette", () => {
 			commands.emit("cmd.application.command_palette.show", {
 				items: [
@@ -158,6 +150,15 @@ export default create_function(
 			})
 		})
 
+		commands.emit("cmd.application.command_palette.add", {
+			id: "cmd.welcome.open_support_palette",
+			readable_name: "t.welcome.command_palette.support.open_support_palette",
+			on_select: () => commands.emit("cmd.welcome.open_support_palette"),
+			accelerator: "mod+h", // TODO: Should work with mod+/
+			Icon: BsQuestionOctagon,
+			shows_next_palette: true,
+		})
+
 		commands.emit("cmd.functions.activities.register", {
 			fid: ctx.fid,
 			activity: {
@@ -171,7 +172,7 @@ export default create_function(
 					)
 				},
 				render_icon: span => {
-					createRoot(span).render(<BsCollection />)
+					createRoot(span).render(<BsCollection />) // TODO: Render svg directly
 				},
 				routes: ["/"],
 				on_unmount: () => {

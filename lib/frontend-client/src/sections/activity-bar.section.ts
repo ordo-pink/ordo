@@ -19,8 +19,9 @@
 
 import { Observable, combineLatestWith, map } from "rxjs"
 
+import { O, TOption } from "@ordo-pink/option"
 import { TLogger } from "@ordo-pink/logger"
-import { TOption } from "@ordo-pink/option"
+import { init_create_component } from "@ordo-pink/maoka"
 
 export const init_activity_bar = (
 	logger: TLogger,
@@ -31,42 +32,75 @@ export const init_activity_bar = (
 	logger.debug("🟡 Initialising activity bar...")
 
 	const activity_bar_element = document.querySelector("#activity-bar") as HTMLDivElement
-	activity_bar_element.oncontextmenu = event =>
-		commands.emit("cmd.application.context_menu.show", { event: event as any })
+	const ActivityBar = init_view(commands, activities$, current_activity$)
+
+	activity_bar_element.appendChild(ActivityBar())
+
+	logger.debug("🟢 Initialised activity bar.")
+}
+
+// --- View ---
+
+const init_view = (
+	commands: Client.Commands.Commands,
+	activities$: Observable<Functions.Activity[]>,
+	current_activity$: Observable<TOption<Functions.Activity>>,
+) => {
+	const create = init_create_component({
+		create_element: document.createElement.bind(document),
+		create_text: document.createTextNode.bind(document),
+	})
+
+	const div = create("div")
+	const a = create("a")
+
+	let activities = [] as Functions.Activity[]
+	let current_activity_option: TOption<Functions.Activity> = O.None()
 
 	const activity_bar_activities$ = activities$.pipe(
 		map(as => as.filter(a => !a.is_background && !!a.render_icon)),
 	)
 
-	activity_bar_activities$
-		.pipe(combineLatestWith(current_activity$))
-		.subscribe(([activities, current_activity_option]) => {
-			activity_bar_element.innerHTML = ""
+	const ActivityLink = (activity: Functions.Activity) => {
+		const href = activity.default_route ?? activity.routes[0]
 
-			for (const activity of activities) {
-				const a = document.createElement("a")
-				const span = document.createElement("span")
-				const current_activity = current_activity_option.unwrap()
+		return a(use => {
+			const element = use.current_element()
 
-				a.classList.add("decoration-none", "no-underline")
-				a.href = activity.default_route ?? activity.routes[0]
-				a.onclick = event => {
-					event.preventDefault()
-					commands.emit(
-						"cmd.application.router.navigate",
-						activity.default_route ?? activity.routes[0],
-					)
-				}
-				a.appendChild(span)
-				a.setAttribute("title", activity.name)
+			element.setAttribute("class", "decoration-none no-underline")
+			element.setAttribute("href", href)
 
-				if (activity.name === current_activity?.name) span.classList.add("text-pink-500")
-
-				activity.render_icon!(span)
-
-				activity_bar_element.appendChild(a)
+			element.onclick = event => {
+				event.preventDefault()
+				commands.emit("cmd.application.router.navigate", href)
 			}
+
+			const span = document.createElement("span")
+
+			if (activity.name === current_activity_option.unwrap()?.name)
+				span.setAttribute("class", "text-pink-500")
+
+			activity.render_icon!(span)
+
+			return span
+		})
+	}
+
+	return div(use => {
+		const element = use.current_element()
+		use.on_mount(() => {
+			activity_bar_activities$.pipe(combineLatestWith(current_activity$)).subscribe(([as, cao]) => {
+				activities = as
+				current_activity_option = cao
+
+				use.refresh()
+			})
 		})
 
-	logger.debug("🟢 Initialised activity bar.")
+		element.setAttribute("class", "h-full flex flex-col space-y-4 items-center justify-center")
+		element.oncontextmenu = event =>
+			commands.emit("cmd.application.context_menu.show", { event: event as any })
+
+		return activities.map(activity => ActivityLink(activity))
+	})
 }

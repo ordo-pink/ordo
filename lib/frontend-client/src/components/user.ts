@@ -100,8 +100,8 @@ export const init_user: TInitUserParams = call_once(
 			window.addEventListener("beforeunload", drop_timeout)
 			timeout = setTimeout(
 				() => void refresh_token.invoke(or_cancel_state_changes),
-				50_000,
-			) as unknown as number // TODO: Move ms to ENV
+				50_000, // TODO: Move ms to ENV
+			) as unknown as number
 		}
 
 		const drop_timeout = () => {
@@ -119,7 +119,6 @@ export const init_user: TInitUserParams = call_once(
 		const known_users_repository = KnownUserRepository.of(known_users$)
 
 		const user_query = UserQuery.of(current_user_repository, known_users_repository)
-		// TODO: const user_command = UserCommand.of(user_query, current_user_repository, known_users_repository)
 
 		CurrentUserManager.of(current_user_repository, current_user_remote_repository, auth$).start(
 			state_change =>
@@ -183,16 +182,6 @@ const LOCATION = "init_auth"
 
 const eperm = RRR.codes.eperm(LOCATION)
 const einval = RRR.codes.einval(LOCATION)
-
-// const sign_out =
-// 	(logger: TLogger, web_host: string, is_dev: boolean) => (res: string | Error | null) => {
-// Treat an error caused by HMR in dev mode when commands do not get restarted
-// if (res instanceof Error && res.message === "Forbidden" && is_dev) {
-// 	return window.location.reload()
-// }
-// logger.error("Token refresh failed. Signing out.")
-// window.location.href = `${web_host}/sign-out`
-// 	}
 
 const auth$ = new BehaviorSubject<TOption<AuthResponse>>(O.None())
 const current_user$ = new BehaviorSubject<TOption<User.User>>(O.None())

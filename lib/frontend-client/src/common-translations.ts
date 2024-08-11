@@ -46,4 +46,5 @@ const EN_TRANSLATIONS: TScopedTranslations<"common"> = {
 	"urls.support_email": "support@ordo.pink",
 	"urls.support_messenger": "https://t.me/ordo_pink",
 	"urls.twitter_x": "https://x.com/ordo_pink",
+	"state.loading": "Loading...",
 }

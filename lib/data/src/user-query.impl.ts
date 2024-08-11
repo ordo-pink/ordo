@@ -38,7 +38,7 @@ export const UserQuery: TUserQueryStatic = {
 						}
 					}),
 				),
-		get current_user_version$() {
+		get $() {
 			let i = 0
 			return c_repo.version$.pipe(combineLatestWith(k_repo.version$)).pipe(map(() => ++i))
 		},

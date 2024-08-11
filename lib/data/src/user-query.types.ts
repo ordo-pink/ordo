@@ -45,7 +45,7 @@ export type TUserQuery = {
 	// get_current_by_id: TGetCurrentUserByIDFn
 	get_by_email: TGetPublicUserByEmailFn
 	// get_by_handle: TGetPublicUserByHandleFn
-	get current_user_version$(): Observable<number>
+	get $(): Observable<number>
 }
 
 export type TUserQueryStatic = {

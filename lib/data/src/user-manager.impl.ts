@@ -26,20 +26,20 @@ import { noop } from "@ordo-pink/tau"
 import { TCurrentUserManagerStatic } from "./user-manager.types"
 
 export const CurrentUserManager: TCurrentUserManagerStatic = {
-	of: (l_repo, r_repo, auth$) => ({
+	of: (local_repo, remote_repo, auth$) => ({
 		start: on_state_change =>
 			// TODO: Cache/offline repo
 			auth$
-				.pipe(map(auth_option => O.FromNullable(auth_option.unwrap()?.accessToken)))
-				.pipe(combineLatestWith(l_repo.version$))
+				.pipe(map(auth_option => O.FromNullable(auth_option.unwrap()?.token)))
+				.pipe(combineLatestWith(local_repo.version$))
 				.pipe(
 					map(([token_option, iteration]) => {
 						if (iteration === 0) {
 							void Oath.FromNullable(token_option.unwrap())
 								.pipe(Oath.ops.tap(() => on_state_change("get-remote")))
-								.pipe(Oath.ops.chain(r_repo.get))
+								.pipe(Oath.ops.chain(remote_repo.get))
 								.pipe(Oath.ops.tap(() => on_state_change("get-remote-complete")))
-								.pipe(Oath.ops.map(user => l_repo.put(user)))
+								.pipe(Oath.ops.map(user => local_repo.put(user)))
 								.pipe(Oath.ops.chain(res => res.cata({ Ok: Oath.Resolve, Err: Oath.Reject })))
 								.invoke(
 									Oath.invokers.or_else(() => {
@@ -54,10 +54,10 @@ export const CurrentUserManager: TCurrentUserManagerStatic = {
 						// TODO: Patch changes
 						token_option.cata({
 							Some: token =>
-								void Oath.Resolve(l_repo.get())
+								void Oath.Resolve(local_repo.get())
 									.pipe(Oath.ops.chain(res => res.cata({ Ok: Oath.Resolve, Err: Oath.Reject })))
 									.pipe(Oath.ops.tap(() => on_state_change("put-remote")))
-									.pipe(Oath.ops.chain(metadata => r_repo.put(token, metadata)))
+									.pipe(Oath.ops.chain(metadata => remote_repo.put(token, metadata)))
 									.invoke(
 										Oath.invokers.or_else(() => {
 											// TODO: Handle errors

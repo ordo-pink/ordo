@@ -60,11 +60,14 @@ export const KnownUserRepository: Types.TKnownUserRepositoryStatic = {
 
 export const RemoteCurrentUserRepository: TRemoteCurrentUserRepositoryStatic = {
 	of: (id_host, fetch) => ({
-		get: token =>
-			Oath.Try(() => fetch(`${id_host}/account`, req_init(token)))
+		get: token => {
+			const path: Routes.ID.GetAccount.Path = "/account"
+
+			return Oath.Try(() => fetch(id_host.concat(path), req_init(token)))
 				.pipe(Oath.ops.chain(response => Oath.FromPromise(() => response.json())))
 				.pipe(Oath.ops.chain(r => Oath.If(r.success, { T: () => r.result, F: () => r.error })))
-				.pipe(Oath.ops.rejected_map(error => eio(error))),
+				.pipe(Oath.ops.rejected_map(error => eio(error)))
+		},
 		put: () => Oath.Reject(eio("TODO: UNIMPLEMENTED")),
 	}),
 }

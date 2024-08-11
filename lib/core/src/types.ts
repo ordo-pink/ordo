@@ -557,6 +557,9 @@ declare global {
 
 	interface t {
 		common: {
+			state: {
+				loading: () => string
+			}
 			urls: {
 				twitter_x: () => string
 				support_email: () => string

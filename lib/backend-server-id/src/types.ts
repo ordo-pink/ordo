@@ -32,7 +32,7 @@ import type { TPersistenceStrategyUser, TUserService } from "@ordo-pink/backend-
 import type { TLogger } from "@ordo-pink/logger"
 
 export type AuthResponse = {
-	accessToken: string
+	token: string
 	jti: JTI
 	sub: SUB
 	fileLimit: number

@@ -24,6 +24,7 @@ import { type TLogger } from "@ordo-pink/logger"
 
 import { init_activities } from "./components/activities"
 import { init_activity_bar } from "./sections/activity-bar.section"
+import { init_auth_section } from "./sections/auth.section"
 import { init_background_task_display } from "./sections/background-task-display.section"
 import { init_command_palette } from "./sections/command-palette.section"
 import { init_commands } from "./components/commands"
@@ -124,6 +125,7 @@ export const create_client = ({ logger, is_dev, hosts }: P) => {
 		translate,
 	}
 
+	init_auth_section({ logger, commands, user_query, auth$, ctx: internal_context })
 	init_command_palette(logger, commands, internal_context)
 	init_context_menu(logger, commands, internal_context)
 
@@ -169,5 +171,3 @@ export const create_client = ({ logger, is_dev, hosts }: P) => {
 			}),
 		)
 }
-
-// --- Internal ---

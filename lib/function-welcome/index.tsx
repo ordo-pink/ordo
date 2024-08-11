@@ -170,6 +170,7 @@ export default create_function(
 						</Provider>,
 					)
 				},
+				render_sidebar: div => div.appendChild(document.createTextNode("HI")),
 				render_icon: span => {
 					createRoot(span).render(<BsCollection />)
 				},

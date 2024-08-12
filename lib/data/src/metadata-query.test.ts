@@ -27,6 +27,7 @@ import { M } from "./metadata.impl"
 import { MQ } from "./metadata-query.impl"
 import { MR } from "./metadata-repository.impl"
 import { type TRrr } from "./metadata.errors"
+import { TResult } from "@ordo-pink/result"
 
 describe("MetadataQuery", () => {
 	const metadata$ = new BehaviorSubject<TMetadata[] | null>(null)
@@ -300,6 +301,62 @@ describe("MetadataQuery", () => {
 
 				expect(location).toEqual("MetadataQuery")
 				expect(key).toEqual("EINVAL")
+			})
+		})
+		describe("getParent", () => {
+			it("should return EAGAIN if metadata was not loaded", () => {
+				metadata$.next(null)
+
+				const { key, location } = m_query.get_parent(crypto.randomUUID()).unwrap() as TRrr
+
+				expect(location).toEqual("MetadataRepository")
+				expect(key).toEqual("EAGAIN")
+			})
+			it("should return ENOENT if metadata with this fsid does not exist", () => {
+				const fsid = crypto.randomUUID()
+
+				m_repo.put([])
+
+				const { location, key } = m_query.get_parent(fsid).unwrap() as TRrr
+
+				expect(location).toEqual("MetadataQuery")
+				expect(key).toEqual("ENOENT")
+			})
+
+			it("should return EINVAL if fsid is invalid", () => {
+				m_repo.put([])
+
+				const { location, key } = m_query.get_parent("a" as any).unwrap() as TRrr
+
+				expect(location).toEqual("MetadataQuery")
+				expect(key).toEqual("EINVAL")
+			})
+			it("should return item parent", () => {
+				const fsid = crypto.randomUUID()
+				const child = M.from({
+					name: "323-2343-23423-4324-23434",
+					parent: fsid,
+					author_id: "asdf-asdf-asdasd-asfas-asfasf-asdasd",
+				})
+				m_repo.put([
+					M.of({
+						created_at: Date.now(),
+						created_by: "asdf-asdf-asdasd-asfas-asfasf-asdasd",
+						fsid,
+						labels: [],
+						links: [],
+						name: "1223",
+						parent: null,
+						size: 0,
+						type: "text",
+						updated_at: Date.now(),
+						updated_by: "asdf-asdf-asdasd-asfas-asfasf-asdasd",
+					}),
+					child
+				])
+
+				const result = m_query.get_parent(child.get_fsid()).unwrap() as TOption<TMetadata>
+				expect(result.unwrap()?.get_fsid()).toEqual(fsid)
 			})
 		})
 	})

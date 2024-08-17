@@ -32,6 +32,11 @@ export const chain_option: Types.TOptionChainOperatorFn = f => o =>
 export const map_option: Types.TOptionMapOperatorFn = f => o =>
 	o.cata({ Some: v => O.Some(f(v)), None: () => O.None() })
 
+export const or_else_option: Types.TOrElseOptionFn = <$TSome, $TNone>(f: () => $TNone) => ({
+	Some: (x: $TSome) => x,
+	None: f,
+})
+
 export const O: Types.TOptionStatic = {
 	Some: OptionSome,
 	None: OptionNone,
@@ -41,6 +46,9 @@ export const O: Types.TOptionStatic = {
 	ops: {
 		map: map_option,
 		chain: chain_option,
+	},
+	catas: {
+		or_else: or_else_option,
 	},
 }
 

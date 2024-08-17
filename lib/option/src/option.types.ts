@@ -19,6 +19,13 @@ export type TSomeOptionConstructorFn = <_TSome>(value: _TSome) => TOption<_TSome
  */
 export type TNoneOptionConstructorFn = () => TOption<never>
 
+export type TOrElseOptionFn = <$TSome, $TNone>(
+	on_none: () => $TNone,
+) => {
+	Some: () => $TSome
+	None: () => $TNone
+}
+
 export type TFromNullableOptionConstructorFn = <$TSome>(
 	value?: $TSome | null,
 ) => TOption<NonNullable<$TSome>>
@@ -68,6 +75,10 @@ export type TOptionStatic = {
 	ops: {
 		map: TOptionMapOperatorFn
 		chain: TOptionChainOperatorFn
+	}
+
+	catas: {
+		or_else: TOrElseOptionFn
 	}
 }
 

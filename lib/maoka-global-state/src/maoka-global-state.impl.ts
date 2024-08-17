@@ -12,7 +12,7 @@ export const init_global_state = (): TInitHook<{ state: T.TStateHook }> => {
 
 	return {
 		state: use => (key, initial_value, options) => {
-			const internal_id = use.id()
+			const internal_id = use.get_internal_id()
 			const refresh = use.refresh
 
 			if (global_state[key] == null) global_state[key] = initial_value

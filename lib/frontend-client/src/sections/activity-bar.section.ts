@@ -17,90 +17,42 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Observable, combineLatestWith, map } from "rxjs"
+import { type Observable } from "rxjs"
 
-import { O, TOption } from "@ordo-pink/option"
-import { TLogger } from "@ordo-pink/logger"
-import { init_create_component } from "@ordo-pink/maoka"
+import { O, type TOption } from "@ordo-pink/option"
+import { type TCreateFunctionContext } from "@ordo-pink/core"
+import { type TLogger } from "@ordo-pink/logger"
+import { extend } from "@ordo-pink/tau"
+import { init_ordo_hooks } from "@ordo-pink/maoka-ordo-hooks"
+import { render_dom } from "@ordo-pink/maoka"
 
-export const init_activity_bar = (
-	logger: TLogger,
-	commands: Client.Commands.Commands,
-	activities$: Observable<Functions.Activity[]>,
-	current_activity$: Observable<TOption<Functions.Activity>>,
-) => {
+import { ActivityBar } from "../components/activity-bar/activity-bar.component"
+import { init_activities_hook } from "../hooks/use-activities.hook"
+
+type P = {
+	logger: TLogger
+	activities$: Observable<Functions.Activity[]>
+	current_activity$: Observable<TOption<Functions.Activity>>
+	ctx: TCreateFunctionContext
+}
+export const init_activity_bar = ({ logger, activities$, current_activity$, ctx }: P) => {
 	logger.debug("🟡 Initialising activity bar...")
 
-	const activity_bar_element = document.querySelector("#activity-bar") as HTMLDivElement
-	const ActivityBar = init_view(commands, activities$, current_activity$)
-
-	activity_bar_element.appendChild(ActivityBar())
+	O.FromNullable(document.querySelector("#activity-bar"))
+		.pipe(O.ops.chain(root => (root instanceof HTMLDivElement ? O.Some(root) : O.None())))
+		.pipe(O.ops.map(root => ({ root, component: ActivityBar })))
+		.pipe(O.ops.map(extend(() => ({ hooks: init_hooks(activities$, current_activity$, ctx) }))))
+		.pipe(O.ops.map(render_dom))
+		.cata(O.catas.or_else(() => logger.error("#activity-bar div not found.")))
 
 	logger.debug("🟢 Initialised activity bar.")
 }
 
-// --- View ---
-
-const init_view = (
-	commands: Client.Commands.Commands,
+const init_hooks = (
 	activities$: Observable<Functions.Activity[]>,
 	current_activity$: Observable<TOption<Functions.Activity>>,
-) => {
-	const create = init_create_component({
-		create_element: document.createElement.bind(document),
-		create_text: document.createTextNode.bind(document),
-	})
-
-	const div = create("div")
-	const a = create("a")
-
-	let activities = [] as Functions.Activity[]
-	let current_activity_option: TOption<Functions.Activity> = O.None()
-
-	const activity_bar_activities$ = activities$.pipe(
-		map(as => as.filter(a => !a.is_background && !!a.render_icon)),
-	)
-
-	const ActivityLink = (activity: Functions.Activity) => {
-		const href = activity.default_route ?? activity.routes[0]
-
-		return a(use => {
-			const element = use.current_element()
-
-			element.setAttribute("class", "decoration-none no-underline")
-			element.setAttribute("href", href)
-
-			element.onclick = event => {
-				event.preventDefault()
-				commands.emit("cmd.application.router.navigate", href)
-			}
-
-			const span = document.createElement("span")
-
-			if (activity.name === current_activity_option.unwrap()?.name)
-				span.setAttribute("class", "text-pink-500")
-
-			activity.render_icon!(span)
-
-			return span
-		})
-	}
-
-	return div(use => {
-		const element = use.current_element()
-		use.on_mount(() => {
-			activity_bar_activities$.pipe(combineLatestWith(current_activity$)).subscribe(([as, cao]) => {
-				activities = as
-				current_activity_option = cao
-
-				use.refresh()
-			})
-		})
-
-		element.setAttribute("class", "h-full flex flex-col space-y-4 items-center justify-center")
-		element.oncontextmenu = event =>
-			commands.emit("cmd.application.context_menu.show", { event: event as any })
-
-		return activities.map(activity => ActivityLink(activity))
-	})
-}
+	ctx: TCreateFunctionContext,
+) => ({
+	...init_ordo_hooks(ctx),
+	...init_activities_hook({ activities$, current_activity$ }),
+})

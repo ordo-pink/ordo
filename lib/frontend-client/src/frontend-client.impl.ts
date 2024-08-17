@@ -101,11 +101,9 @@ export const create_client = ({ logger, is_dev, hosts }: P) => {
 
 	const { get_sidebar } = init_workspace(logger, known_functions, commands, current_activity$)
 	init_modal({ commands, logger })
-	init_notifications({ logger, commands })
 	init_background_task_display(logger, commands)
 	init_timer_display(logger)
 	init_title_display(logger, commands)
-	init_activity_bar(logger, commands, activities$, current_activity$)
 	init_tray(logger, activities$)
 
 	const internal_context: TCreateFunctionContext = {
@@ -125,6 +123,8 @@ export const create_client = ({ logger, is_dev, hosts }: P) => {
 		translate,
 	}
 
+	init_notifications({ logger, commands, ctx: internal_context })
+	init_activity_bar({ ctx: internal_context, logger, activities$, current_activity$ })
 	init_auth_section({ logger, commands, user_query, auth$, ctx: internal_context })
 	init_command_palette(logger, commands, internal_context)
 	init_context_menu(logger, commands, internal_context)
@@ -151,6 +151,28 @@ export const create_client = ({ logger, is_dev, hosts }: P) => {
 		)
 
 	void import("@ordo-pink/function-auth")
+		.then(module => module.default)
+		.then(f =>
+			f({
+				get_commands,
+				get_current_language,
+				get_current_route,
+				get_fetch,
+				get_hosts,
+				get_is_authenticated,
+				get_logger,
+				get_metadata_query,
+				get_sidebar,
+				get_translations,
+				get_user_query,
+				is_dev,
+				known_functions,
+				translate,
+			}),
+		)
+
+	// TODO: Fix positioning of activity bar content when achivity is changed
+	void import("@ordo-pink/function-fe")
 		.then(module => module.default)
 		.then(f =>
 			f({

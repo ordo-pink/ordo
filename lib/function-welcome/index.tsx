@@ -21,6 +21,7 @@ import { BsCollection, BsEnvelope, BsQuestionOctagon, BsSendCheck } from "react-
 import { type Root, createRoot } from "react-dom/client"
 
 import { O, type TOption } from "@ordo-pink/option"
+import { BS_COLLECTION } from "@ordo-pink/frontend-icons"
 import { create_function } from "@ordo-pink/core"
 import { create_ordo_context } from "@ordo-pink/frontend-react-hooks"
 
@@ -172,7 +173,7 @@ export default create_function(
 					)
 				},
 				render_icon: span => {
-					createRoot(span).render(<BsCollection />) // TODO: Render svg directly
+					span.innerHTML = BS_COLLECTION
 				},
 				routes: ["/"],
 				on_unmount: () => {

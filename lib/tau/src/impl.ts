@@ -59,6 +59,7 @@ export const is_finite_non_negative_int = (x: unknown): x is number =>
 	is_non_negative_number(x) && is_finite(x) && is_int(x)
 export const is_uuid = (x: unknown): x is UUIDv4 => is_string(x) && UUIDv4_RX.test(x)
 export const is_empty_array = (x: unknown): boolean => is_array(x) && is_0(x.length)
+// TODO: Properly assign guard type
 // eslint-disable-next-line @typescript-eslint/ban-types
 export const is_instance_of = <T extends Function>(type: T, x: unknown): x is T => x instanceof type
 

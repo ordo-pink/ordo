@@ -64,12 +64,18 @@ const CreateFileModalInput = (on_change: (event: Event) => void) =>
 
 				return t_label_text
 			}),
-			create("input", ({ use }) => {
+			create("input", ({ use, get_current_element, on_refresh }) => {
 				const translate = use(get_translations)
 				const t_placeholder = translate("t.file_explorer.modals.create_file.input_placeholder")
 
+				on_refresh(() => {
+					const element = get_current_element()
+					element.focus()
+				})
+
 				use(listen("oninput", on_change))
 				use(set_attribute("placeholder", t_placeholder))
+
 				use(
 					set_class(
 						"w-full rounded-md border-0 px-2 py-1 shadow-inner focus:ring-0 sm:text-sm sm:leading-6",

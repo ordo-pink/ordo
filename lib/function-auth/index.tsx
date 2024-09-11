@@ -17,7 +17,14 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { BsBoxArrowInDown, BsBoxArrowInRight, BsBoxArrowUp } from "react-icons/bs"
+import {
+	BsAward,
+	BsBoxArrowInDown,
+	BsBoxArrowInRight,
+	BsBoxArrowUp,
+	BsGear,
+	BsPersonCircle,
+} from "react-icons/bs"
 import { type Root, createRoot } from "react-dom/client"
 
 import { O, type TOption } from "@ordo-pink/option"
@@ -89,6 +96,11 @@ declare global {
 					label: () => string
 				}
 			}
+			user: {
+				open_current_user_profile: () => string
+				open_settings: () => string
+				open_achievements: () => string
+			}
 		}
 	}
 
@@ -138,8 +150,12 @@ const EN_TRANSLATIONS: TScopedTranslations<"auth"> = {
 	"pages.sign_up.already_signed_up": "Already signed up?",
 	"pages.sign_up.label": "Sign Up",
 	"pages.sign_up.status_bar_title": "",
+	"user.open_current_user_profile": "Open user page",
+	"user.open_achievements": "Open achievements",
+	"user.open_settings": "Open settings",
 }
 
+// TODO: Move to core
 export default create_function(
 	"pink.ordo.auth",
 	{
@@ -162,6 +178,9 @@ export default create_function(
 			"cmd.auth.sign_out",
 			"cmd.functions.activities.register",
 			"cmd.functions.activities.unregister",
+			"cmd.user.open_achievements",
+			"cmd.user.open_current_user_profile",
+			"cmd.user.open_settings",
 		],
 	},
 	ctx => {
@@ -179,6 +198,11 @@ export default create_function(
 				commands.emit("cmd.application.router.navigate", "/auth/sign-in")
 			const on_open_sign_up = () =>
 				commands.emit("cmd.application.router.navigate", "/auth/sign-up")
+			const on_open_user_profile = () => commands.emit("cmd.application.router.navigate", "/user")
+			const on_open_achievements = () =>
+				commands.emit("cmd.application.router.navigate", "/user/achievements")
+			const on_open_settings = () =>
+				commands.emit("cmd.application.router.navigate", "/user/settings")
 
 			const on_sign_out = () => {
 				const path: Routes.ID.SignOut.Path = "/account/sign-out"
@@ -196,15 +220,51 @@ export default create_function(
 				commands.emit("cmd.application.command_palette.remove", "cmd.auth.open_sign_up")
 
 				commands.on("cmd.auth.sign_out", on_sign_out)
+				commands.on("cmd.user.open_current_user_profile", on_open_user_profile)
+				commands.on("cmd.user.open_achievements", on_open_achievements)
+				commands.on("cmd.user.open_settings", on_open_settings)
+
 				commands.emit("cmd.application.command_palette.add", {
 					id: "cmd.auth.sign_out",
 					readable_name: "t.auth.pages.sign_out.label",
 					Icon: BsBoxArrowInDown,
 					on_select: () => commands.emit("cmd.auth.sign_out"),
 				})
+
+				commands.emit("cmd.application.command_palette.add", {
+					id: "cmd.user.open_current_user_profile",
+					readable_name: "t.auth.user.open_current_user_profile",
+					Icon: BsPersonCircle,
+					on_select: () => commands.emit("cmd.user.open_current_user_profile"),
+				})
+
+				commands.emit("cmd.application.command_palette.add", {
+					id: "cmd.user.open_settings",
+					readable_name: "t.auth.user.open_settings",
+					Icon: BsGear,
+					on_select: () => commands.emit("cmd.user.open_settings"),
+					accelerator: "mod+,", // TODO: Fix using symbols
+				})
+
+				commands.emit("cmd.application.command_palette.add", {
+					id: "cmd.user.open_achievements",
+					readable_name: "t.auth.user.open_achievements",
+					Icon: BsAward,
+					on_select: () => commands.emit("cmd.user.open_achievements"),
+					accelerator: "mod+y",
+				})
 			} else {
 				commands.off("cmd.auth.sign_out", on_sign_out)
+				commands.off("cmd.user.open_achievements", on_open_achievements)
+				commands.off("cmd.user.open_current_user_profile", on_open_user_profile)
+				commands.off("cmd.user.open_settings", on_open_settings)
 				commands.emit("cmd.application.command_palette.remove", "cmd.auth.sign_out")
+				commands.emit("cmd.application.command_palette.remove", "cmd.user.open_achievements")
+				commands.emit(
+					"cmd.application.command_palette.remove",
+					"cmd.user.open_current_user_profile",
+				)
+				commands.emit("cmd.application.command_palette.remove", "cmd.user.open_settings")
 
 				commands.on("cmd.auth.open_sign_in", on_open_sign_in)
 				commands.on("cmd.auth.open_sign_up", on_open_sign_up)

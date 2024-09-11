@@ -1,15 +1,20 @@
-import { type TOrdoHooks } from "@ordo-pink/maoka-ordo-hooks"
-import { create } from "@ordo-pink/maoka"
+import { type Observable } from "rxjs"
+
+import { create, set_class } from "@ordo-pink/maoka"
+import { ordo_context, rx_subscription } from "@ordo-pink/maoka-ordo-hooks"
+import { type TCreateFunctionContext } from "@ordo-pink/core"
 
 import { Notification } from "./notification.component"
-import { TNotificationsHook } from "../../hooks/use-notifications.hook"
 
-const div = create<TOrdoHooks & TNotificationsHook>("div")
+export const Notifications = (
+	ctx: TCreateFunctionContext,
+	notification$: Observable<Client.Notification.Item[]>,
+) =>
+	create("div", ({ use }) => {
+		use(ordo_context.provide(ctx))
+		use(set_class("flex flex-col gap-y-1"))
 
-export const Notifications = div(use => {
-	use.set_class("flex flex-col gap-y-1")
+		const notifications = use(rx_subscription(notification$, "notifications", []))
 
-	const notifications = use.get_notifications()
-
-	return notifications.map(Notification)
-})
+		return notifications.map(item => Notification(item))
+	})

@@ -192,8 +192,21 @@ export const MetadataCommand: TMetadataCommandStatic = {
 				.pipe(R.ops.map(thunk(fsid)))
 				.pipe(R.ops.chain(_get_metadata_by_fsid_r("remove", m_query)))
 				.pipe(R.ops.map(thunk(void 0)))
-				.pipe(R.ops.chain(m_query.get))
-				.pipe(R.ops.map(items => items.filter(item => item.get_fsid() === fsid)))
+				.pipe(R.ops.chain(() => m_query.get_descendents(fsid, { show_hidden: true })))
+				.pipe(
+					R.ops.chain(descendents =>
+						m_query.get({ show_hidden: true }).pipe(R.ops.map(all => ({ all, descendents }))),
+					),
+				)
+				.pipe(
+					R.ops.map(({ all, descendents }) =>
+						all.filter(
+							item =>
+								item.get_fsid() !== fsid &&
+								!descendents.some(d => d.get_fsid() === item.get_fsid()),
+						),
+					),
+				)
 				.pipe(R.ops.chain(m_repo.put)),
 
 		replace: value =>

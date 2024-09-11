@@ -258,7 +258,7 @@ export default function CommandPaletteModal({
 	)
 
 	return (
-		<div className="max-w-screen max-h-screen w-full">
+		<div className="max-w-screen max-h-screen w-[45rem]">
 			<div className="mx-2 mt-2 flex items-center space-x-2 rounded-lg bg-neutral-200 px-2 py-1 shadow-inner dark:bg-neutral-600">
 				<BsSearch className="shrink-0" />
 				<input
@@ -272,7 +272,7 @@ export default function CommandPaletteModal({
 				/>
 			</div>
 
-			<div className="h-[50dvh] overflow-y-auto px-2 py-4">
+			<div className="h-[50dvh] w-full overflow-y-auto px-2 py-4">
 				{selected_items.length ? (
 					<div className="text-ellipsis border-b border-neutral-500 pb-2">
 						{selected_items.map((item, index) => (

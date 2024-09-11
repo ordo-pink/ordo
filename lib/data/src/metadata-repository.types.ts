@@ -29,7 +29,7 @@ import type { TRrr } from "./metadata.errors"
 export type TMetadataRepository = {
 	get: () => TResult<TMetadata[], TRrr<"EAGAIN">>
 	put: (metadata: TMetadata[]) => TResult<void, TRrr<"EINVAL">>
-	get sub(): Observable<number>
+	get $(): Observable<number>
 }
 
 export type TAsyncMetadataRepository = {

@@ -3,188 +3,117 @@
 
 import type * as T from "./maoka.types"
 
-const is_undefined = (x: unknown): x is undefined | null => x == null
 const is_fn = (x: unknown): x is (...args: any[]) => any => typeof x === "function"
 const is_string = (x: unknown): x is string => typeof x === "string"
 const is_array = Array.isArray
-const for_each_key = <T extends Record<string, unknown>>(
-	obj: T,
-	callback: (key: keyof T) => void,
-) => Object.keys(obj).forEach(key => callback(key))
 
-type TMaokaRenderParams<$TCustomHooks extends Record<string, unknown> = Record<string, unknown>> = {
-	root: HTMLElement
-	component: (
-		create_element: (name: string) => HTMLElement,
-		create_text: (text: string) => Text,
-		custom_hooks: T.TInitHook<$TCustomHooks>,
-	) => HTMLElement
-	hooks: T.TInitHook<$TCustomHooks>
-}
-
-// TODO: empty()
 // TODO: Refactor
-// TODO: A simpler way to pass children
+// TODO: Extract helper hooks
 // TODO: render_string
 export const create =
-	<$TCustomHooks extends Record<string, unknown> = Record<string, unknown>>(name: string) =>
-	(attrs_or_cb: T.TAttributes | T.TCallback<$TCustomHooks>, cb?: T.TCallback<$TCustomHooks>) =>
+	<$TElement extends T.TMaokaElement = T.TMaokaElement, $TText extends T.TMaokaText = T.TMaokaText>(
+		name: string,
+		callback?: T.TCallback,
+	) =>
 	(
-		create_element: (name: string) => HTMLElement,
-		create_text: (text: string) => Text,
-		custom_hooks: T.TInitHook<$TCustomHooks>,
+		create_element: (name: string) => $TElement,
+		create_text: (text: string) => $TText,
+		root_id: string,
 	) => {
 		const internal_id = crypto.randomUUID()
 		const on = {
-			mount: [] as ((() => void) | (() => () => void))[],
-			refresh: [] as (() => void)[],
+			mount: [] as ((() => void | Promise<void>) | (() => () => void | Promise<void>))[],
+			refresh: [] as ((() => void | Promise<void>) | (() => () => void | Promise<void>))[],
 			unmount: [] as (() => void)[],
 		}
 
-		const attrs_is_attrs = !is_fn(attrs_or_cb)
-
-		const attributes = attrs_is_attrs ? attrs_or_cb : {}
-		const callback = attrs_is_attrs ? cb : attrs_or_cb
-
-		const use: T.THooks<$TCustomHooks> = {
+		const props: T.TMaokaProps = {
 			get_internal_id: () => internal_id,
 			get_current_element: () => element,
-			set_attribute: (key, value) => {
-				const old_value = element.getAttribute(key)
-
-				if (value === old_value) return
-
-				element.setAttribute(key, value)
-			},
-			set_class: (...cls) => element.setAttribute("class", cls.join(" ")),
-			add_class: (...cls) => {
-				cls.forEach(c => element.classList.add(...c.split(" ")))
-			},
-			remove_class: (...cls) => {
-				cls.forEach(c => element.classList.remove(...c.split(" ")))
-			},
-			replace_class: (p, n) => {
-				element.classList.replace(p, n)
-			},
-			set_style: style => {
-				for_each_key(style, key => {
-					;(element.style as any)[key] = style[key]!
-				})
-			},
-			set_listener: (event, handler) => {
-				;(element as any)[event] = handler
-			},
-			set_inner_html: html => {
-				element.innerHTML = html
-			},
-			remove: () => {
-				requestAnimationFrame(() => {
-					element.parentElement?.removeChild(element)
-				})
+			use: f => f(props),
+			get root_id() {
+				return root_id
 			},
 			refresh: () => {
 				requestAnimationFrame(() => {
 					const after_refresh = on.refresh.map(f => f())
 
 					if (callback) {
-						let children = callback(use)
+						let children = callback(props)
 
 						if (children) {
-							if (!is_array(children))
+							if (!is_array(children)) {
 								children = [
-									is_fn(children) ? children(create_element, create_text, custom_hooks) : children,
+									is_fn(children) ? children(create_element, create_text, root_id) : children,
 								]
+							}
 
-							const nodes = [] as (HTMLElement | Text)[]
-
-							children.forEach(child => {
-								const node =
-									typeof child === "function"
-										? child(create_element, create_text, custom_hooks)
-										: child
-								if (is_string(node)) nodes.push(create_text(node))
-								else if (node) nodes.push(node)
-							})
+							const nodes = children.reduce(
+								(acc, child) => {
+									const node = is_fn(child) ? child(create_element, create_text, root_id) : child
+									return node ? acc.concat(node) : acc
+								},
+								[] as (SVGSVGElement | HTMLElement | string)[],
+							)
 
 							element.replaceChildren(...nodes)
 						}
 					}
 
-					is_fn(after_refresh) && after_refresh()
+					void after_refresh.map(f => is_fn(f) && f())
 				})
 			},
 			on_mount: f => void on.mount.push(f),
 			on_refresh: f => void on.refresh.push(f),
-		} as T.THooks<$TCustomHooks>
-
-		if (custom_hooks)
-			for_each_key(
-				custom_hooks,
-				(key: keyof typeof custom_hooks) => ((use as any)[key] = custom_hooks[key](use)),
-			)
+		} as T.TMaokaProps
 
 		const element = create_element(name)
 
-		for_each_key(attributes, attribute => {
-			if (!attribute || !is_string(attribute) || is_undefined(attributes[attribute])) return
-
-			if (attribute.startsWith("on")) {
-				// TODO: Validate listeners
-				;(element as any)[attribute] = attributes[attribute]
-			} else if (attribute === "unsafe_inner_html") {
-				element.innerHTML = attributes[attribute] as any
-			} else {
-				element.setAttribute(attribute, String(attributes[attribute]))
-			}
-		})
-
 		if (callback) {
-			let children = callback(use)
+			let children = callback(props)
 
 			if (children) {
 				if (!is_array(children))
-					children = [
-						is_fn(children) ? children(create_element, create_text, custom_hooks) : children,
-					]
+					children = [is_fn(children) ? children(create_element, create_text, root_id) : children]
 
 				children.forEach(child => {
-					const node = is_fn(child) ? child(create_element, create_text, custom_hooks) : child
-					if (is_string(node)) element.appendChild(create_text(node))
-					else if (node) element.appendChild(node)
+					const node = is_fn(child) ? child(create_element, create_text, root_id) : child
+
+					if (!node) return
+
+					element.appendChild(is_string(node) ? (create_text(node) as Text) : node)
 				})
 			}
 		}
 
-		const mounted = on.mount.map(f => f())
+		const on_unmount = on.mount.map(f => f()).filter(f => is_fn(f)) as (() => void)[]
 
-		if (is_fn(mounted)) on.unmount.push(mounted)
-
-		// TODO: Move outside
-		const observer = new MutationObserver(records => {
-			records.forEach(record => {
-				if (Array.from(record.removedNodes).includes(element)) {
-					on.unmount.forEach(f => f())
-				}
-			})
-		})
-
-		observer.observe(document, { childList: true, subtree: true })
+		if (on_unmount.length) {
+			element.onunmount = on_unmount
+		}
 
 		return element
 	}
 
-export const render_dom = <
-	$TCustomHooks extends Record<string, unknown> = Record<string, unknown>,
->({
-	component,
-	hooks,
-	root,
-}: TMaokaRenderParams<$TCustomHooks>) => {
+export const render_dom: T.TMaokaRenderDOMFn = (root, component) => {
+	const root_id: string = crypto.randomUUID()
+
 	const Component = component(
 		document.createElement.bind(document),
 		document.createTextNode.bind(document),
-		hooks,
+		root_id,
 	)
 
+	const observer = new MutationObserver(records => {
+		for (const record of records) {
+			const removed_nodes = record.removedNodes as unknown as T.TMaokaElement[]
+
+			for (const element of removed_nodes) {
+				if (is_array(element.onunmount)) element.onunmount.forEach(f => f())
+			}
+		}
+	})
+
 	root.appendChild(Component)
+	observer.observe(root, { childList: true, subtree: true })
 }

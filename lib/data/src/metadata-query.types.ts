@@ -34,7 +34,7 @@ export type TMetadataQueryStatic = {
 }
 
 export type TMetadataQuery = {
-	get version$(): Observable<number>
+	get $(): Observable<number>
 
 	get: (options?: TMetadataQueryOptions) => TResult<TMetadata[], TRrr<"EAGAIN">>
 
@@ -94,7 +94,7 @@ export type TMetadataQuery = {
 	) => TResult<boolean, TRrr<"EAGAIN" | "EINVAL" | "ENOENT">>
 
 	get_children: (
-		fsid: FSID,
+		fsid: FSID | null,
 		options?: TMetadataQueryOptions,
 	) => TResult<TMetadata[], TRrr<"EAGAIN" | "EINVAL" | "ENOENT">>
 

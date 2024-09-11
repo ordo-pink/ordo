@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: Copyright 2024, 谢尔盖||↓ and the Ordo.pink contributors
 // SPDX-License-Identifier: Unlicense
 
-import { is_bool, is_false, is_fn, is_object, is_true } from "@ordo-pink/tau"
+import { is_bool, is_false, is_fn, is_object, is_true, noop } from "@ordo-pink/tau"
 
 import type * as Types from "./result.types"
 
@@ -87,6 +87,12 @@ export const ResultMerge: Types.TMergeResultConstructorFn = rs => {
 	) as any
 }
 
+export const cata_result_or_nothing: Types.TOrNothingCata = { Ok: x => x, Err: noop }
+
+export const cata_result_or_else: Types.TOrElseCataFn = f => ({ Ok: x => x, Err: x => f(x) })
+
+export const cata_result_if_ok: Types.TIfOkCataFn = f => ({ Ok: x => f(x), Err: noop })
+
 export const map_result: Types.TMapResultOperatorFn = f => r =>
 	r.cata({ Ok: x => ResultOk(f(x)), Err: x => ResultErr(x) })
 
@@ -165,6 +171,11 @@ export const R: Types.TResultStatic = {
 	FromNullable: ResultFromNullable,
 	FromOption: ResultFromOption,
 	Merge: ResultMerge,
+	catas: {
+		if_ok: cata_result_if_ok,
+		or_else: cata_result_or_else,
+		or_nothing: cata_result_or_nothing,
+	},
 	guards: {
 		is_result: is_result_guard,
 		is_ok: is_ok_guard,

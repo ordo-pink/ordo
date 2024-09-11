@@ -32,7 +32,9 @@ export const init_timer_display = (logger: TLogger) => {
 		const hours = String(date.getHours())
 		const minutes = String(date.getMinutes())
 
-		time.innerText = `${hours}:${minutes.length === 1 ? `0${minutes}` : minutes}`
+		const current_time = `${hours}:${minutes.length === 1 ? `0${minutes}` : minutes}`
+
+		if (time.innerText !== current_time) time.innerText = current_time
 	}
 
 	render_time()

@@ -34,6 +34,8 @@ const eagain = RRR.codes.eagain(LOCATION)
 const einval = RRR.codes.einval(LOCATION)
 const eio = RRR.codes.eio(LOCATION)
 
+let i = -1
+
 export const MetadataRepository: TMetadataRepositoryStatic = {
 	of: metadata$ => ({
 		get: () =>
@@ -43,17 +45,69 @@ export const MetadataRepository: TMetadataRepositoryStatic = {
 
 		put: metadata =>
 			Result.FromNullable(metadata)
-				.pipe(Result.ops.chain(() => Result.If(Array.isArray(metadata)))) // TODO: Add validations
+				.pipe(Result.ops.chain(() => Result.If(Array.isArray(metadata), { T: () => metadata }))) // TODO: Add validations
 				.pipe(Result.ops.chain(() => Result.Try(() => metadata$.next(metadata))))
 				.pipe(Result.ops.err_map(() => einval(`.put: ${JSON.stringify(metadata)}`))),
-		get sub() {
-			let i = 0
-			return metadata$.pipe(map(() => i++))
+
+		get $() {
+			return metadata$.pipe(map(() => ++i))
 		},
 	}),
 }
 
 export const MR = MetadataRepository
+
+// TODO: Add types
+// TODO: Add hash and last update
+// TODO: Use all three in Manager
+export const CacheMetadataRepository: TRemoteMetadataRepositoryStatic = {
+	of: () => {
+		const indexed_db = indexedDB.open("ordo.pink", 1)
+
+		// TODO: Upgrade before allowing access to repository
+		indexed_db.onupgradeneeded = () => {
+			const db = indexed_db.result
+			if (!db.objectStoreNames.contains("metadata")) {
+				db.createObjectStore("metadata")
+			}
+		}
+
+		return {
+			get: () =>
+				Oath.Try(() => indexed_db.result)
+					.pipe(Oath.ops.chain(db => Oath.FromNullable(db)))
+					.pipe(Oath.ops.rejected_map(() => eio("Failed to access cache inside IndexedDB")))
+					.pipe(Oath.ops.map(db => db.transaction("metadata", "readonly")))
+					.pipe(Oath.ops.map(transaction => transaction.objectStore("metadata")))
+					.pipe(Oath.ops.map(storage => storage.get("items")))
+					.pipe(
+						Oath.ops.chain(
+							result =>
+								new Oath((resolve, reject) => {
+									result.onsuccess = event => resolve((event.target as any)?.result ?? [])
+									result.onerror = () => reject(eio("Failed to access cache inside IndexedDB"))
+								}),
+						),
+					),
+			put: (_, metadata) =>
+				Oath.Try(() => indexed_db.result)
+					.pipe(Oath.ops.chain(db => Oath.FromNullable(db)))
+					.pipe(Oath.ops.rejected_map(() => eio("Failed to access cache inside IndexedDB")))
+					.pipe(Oath.ops.map(db => db.transaction("metadata", "readwrite")))
+					.pipe(Oath.ops.map(transaction => transaction.objectStore("metadata")))
+					.pipe(Oath.ops.map(storage => storage.put(metadata, "items")))
+					.pipe(
+						Oath.ops.chain(
+							result =>
+								new Oath((resolve, reject) => {
+									result.onsuccess = () => resolve(void 0)
+									result.onerror = () => reject(eio("Failed to access cache inside IndexedDB"))
+								}),
+						),
+					),
+		}
+	},
+}
 
 export const RemoteMetadataRepository: TRemoteMetadataRepositoryStatic = {
 	of: (data_host, fetch) => ({
@@ -62,6 +116,7 @@ export const RemoteMetadataRepository: TRemoteMetadataRepositoryStatic = {
 				.pipe(Oath.ops.chain(response => Oath.FromPromise(() => response.json())))
 				.pipe(Oath.ops.chain(r => Oath.If(r.success, { T: () => r.result, F: () => r.error })))
 				.pipe(Oath.ops.rejected_map(error => eio(error))),
+
 		put: () => Oath.Reject(eio("TODO: UNIMPLEMENTED")),
 	}),
 }

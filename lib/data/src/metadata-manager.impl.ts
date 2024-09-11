@@ -32,7 +32,7 @@ export const MetadataManager: TMetadataManagerStatic = {
 			// TODO: Cache/offline repo
 			auth$
 				.pipe(map(auth_option => O.FromNullable(auth_option.unwrap()?.token)))
-				.pipe(combineLatestWith(l_repo.sub))
+				.pipe(combineLatestWith(l_repo.$))
 				.pipe(
 					map(([token_option, iteration]) => {
 						if (iteration === 0) {
@@ -61,6 +61,7 @@ export const MetadataManager: TMetadataManagerStatic = {
 									.pipe(Oath.ops.map(metadata => metadata.map(item => item.to_dto())))
 									.pipe(Oath.ops.tap(() => on_state_change("put-remote")))
 									.pipe(Oath.ops.chain(metadata => r_repo.put(token, metadata)))
+									.pipe(Oath.ops.tap(() => on_state_change("put-remote-complete")))
 									.invoke(
 										Oath.invokers.or_else(() => {
 											// TODO: Handle errors

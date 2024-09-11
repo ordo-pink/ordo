@@ -173,13 +173,16 @@ export const init_workspace = (
 		})
 	})
 
+	// TODO: Move classes away from HTML
 	sidebar$.subscribe(sidebar => {
 		Switch.OfTrue()
-			.case(sidebar.disabled && split, () => {
+			.case(sidebar.disabled && !!split, () => {
 				split = split?.destroy?.()
 				sidebar_element.innerHTML = ""
+				;(sidebar_element as any).classList.replace("visible", "hidden")
 			})
 			.case(!sidebar.disabled && !split, () => {
+				;(sidebar_element as any).classList.replace("hidden", "visible")
 				if (!document.getElementById("#sidebar")) {
 					main_element.appendChild(sidebar_element)
 				}

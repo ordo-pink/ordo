@@ -31,7 +31,10 @@
 				<div class="flex size-full">
 					<main class="split flex size-full">
 						<div id="workspace" class="w-full overflow-auto opacity-100" />
-						<div id="sidebar" class="size-full bg-neutral-300 opacity-100 dark:bg-neutral-900" />
+						<div
+							id="sidebar"
+							class="hidden size-full bg-neutral-300 opacity-100 dark:bg-neutral-900"
+						/>
 					</main>
 					<div
 						id="activity-bar"
@@ -48,11 +51,16 @@
 			>
 				<div
 					id="modal"
-					class="relative min-h-8 w-full max-w-3xl rounded-lg bg-neutral-100 shadow-lg dark:bg-neutral-700"
+					class="relative min-h-8 max-w-3xl rounded-lg bg-neutral-100 shadow-lg dark:bg-neutral-700"
 				></div>
 			</div>
 
-			<div id="notifications" class="fixed bottom-0 right-0 z-50 flex w-full max-w-sm flex-col space-y-2 p-2"></div>
+			<!--<div id="modal"></div>-->
+
+			<div
+				id="notifications"
+				class="fixed bottom-0 right-0 z-50 flex w-full max-w-sm flex-col space-y-2 p-2"
+			></div>
 		</div>
 		<script type="module" src="/src/main.ts"></script>
 	</body>

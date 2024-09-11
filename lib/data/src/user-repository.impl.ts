@@ -36,13 +36,14 @@ const eagain_current_user = RRR.codes.eagain(CURRENT_USER_REPOSITORY)
 // const eagain_known_user = RRR.codes.eagain(KNOWN_USER_REPOSITORY)
 const einval_known_user = RRR.codes.einval(KNOWN_USER_REPOSITORY)
 
+let i = -1
+
 export const CurrentUserRepository: Types.TCurrentUserRepositoryStatic = {
 	of: $ => ({
 		get: () => Result.FromOption($.getValue(), () => eagain_current_user()),
 		put: user => Result.Try(() => $.next(O.Some(user))), // TODO:
 		get version$() {
-			let i = 0
-			return $.pipe(map(() => i++))
+			return $.pipe(map(() => ++i))
 		},
 	}),
 }

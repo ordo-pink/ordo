@@ -1,19 +1,17 @@
+import { create, listen, set_class, set_inner_html } from "@ordo-pink/maoka"
 import { BS_X } from "@ordo-pink/frontend-icons"
 import { Switch } from "@ordo-pink/switch"
-import { type TOrdoHooks } from "@ordo-pink/maoka-ordo-hooks"
-import { create } from "@ordo-pink/maoka"
-
-const button = create<TOrdoHooks>("button")
+import { get_commands } from "@ordo-pink/maoka-ordo-hooks"
 
 type P = Pick<Client.Notification.Item, "id" | "type">
 export const NotificationHideButton = ({ id, type }: P) =>
-	button(use => {
-		const commands = use.get_commands()
+	create("button", ({ use }) => {
+		const commands = use(get_commands)
 
-		use.set_class("absolute right-2 top-2 rounded-full p-1", get_hover_close_button_class(type))
-		use.set_listener("onclick", handle_hide_notification_click(commands, id))
+		use(set_class("absolute right-2 top-2 rounded-full p-1", get_hover_close_button_class(type)))
+		use(listen("onclick", handle_hide_notification_click(commands, id)))
 
-		use.set_inner_html(BS_X)
+		use(set_inner_html(BS_X))
 	})
 
 // --- Internal ---

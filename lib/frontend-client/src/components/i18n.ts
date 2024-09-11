@@ -45,7 +45,7 @@ export const init_i18n: TInitI18nFn = call_once(({ logger, commands, known_funct
 	commands.on("cmd.application.add_translations", ({ translations, lang, prefix }) => {
 		const known_translations = translations$.getValue().unwrap() ?? ({} as TTranslations)
 		const prefixed_translations = keys_of(translations).reduce(
-			(acc, key) => ({ ...acc, [`t.${prefix}.${key}`]: translations[key] }),
+			(acc, key) => ({ ...acc, [prefix ? `t.${prefix}.${key}` : key]: translations[key] }),
 			{},
 		)
 

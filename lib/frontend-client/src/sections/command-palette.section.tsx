@@ -160,7 +160,7 @@ const create_hotkey_string = (event: KeyboardEvent, isApple: boolean) => {
 	if (event.metaKey) hotkey += "mod+"
 	if (event.shiftKey) hotkey += "shift+"
 
-	hotkey += event.code?.replace("Key", "").toLocaleLowerCase()
+	hotkey += event.key.toLocaleLowerCase()
 
 	return hotkey
 }

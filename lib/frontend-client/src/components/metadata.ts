@@ -20,14 +20,16 @@
 import { BehaviorSubject } from "rxjs"
 
 import {
+	CacheMetadataRepository,
 	MetadataCommand,
 	MetadataManager,
 	MetadataQuery,
 	MetadataRepository,
 	RRR,
-	RemoteMetadataRepository,
+	// RemoteMetadataRepository, TODO: Bring back remote metadata
 	type TMetadata,
 	type TMetadataQuery,
+	type TRrr,
 } from "@ordo-pink/data"
 import { Result } from "@ordo-pink/result"
 import { Switch } from "@ordo-pink/switch"
@@ -53,40 +55,50 @@ export const init_metadata: TInitMetadataFn = ({
 }) => {
 	logger.debug("Initialising metadata...")
 
-	metadata$.subscribe()
-
 	const metadata_repository = MetadataRepository.of(metadata$)
-	const remote_metadata_repository = RemoteMetadataRepository.of(hosts.dt, fetch)
+	const remote_metadata_repository = CacheMetadataRepository.of(hosts.dt, fetch)
 
 	const metadata_query = MetadataQuery.of(metadata_repository)
 	const metadata_command = MetadataCommand.of(metadata_repository, metadata_query, user_query)
 
+	const Err = (rrr: TRrr) =>
+		commands.emit("cmd.application.notification.show", {
+			message: rrr.debug ?? "",
+			duration: 15,
+			title: rrr.key,
+			type: "rrr",
+		})
+
 	commands.on("cmd.data.metadata.add_labels", ({ fsid, labels }) =>
-		metadata_command.add_labels(fsid, ...labels),
+		metadata_command.add_labels(fsid, ...labels).cata({ Ok: noop, Err }),
 	)
 
 	commands.on("cmd.data.metadata.remove_labels", ({ fsid, labels }) =>
-		metadata_command.remove_labels(fsid, ...labels),
+		metadata_command.remove_labels(fsid, ...labels).cata({ Ok: noop, Err }),
 	)
 
-	commands.on("cmd.data.metadata.create", metadata_command.create)
+	commands.on("cmd.data.metadata.create", params => {
+		metadata_command.create(params).cata({ Ok: noop, Err })
+	})
 
 	commands.on("cmd.data.metadata.move", ({ fsid, new_parent }) =>
-		metadata_command.set_parent(fsid, new_parent),
+		metadata_command.set_parent(fsid, new_parent).cata({ Ok: noop, Err }),
 	)
 
-	commands.on("cmd.data.metadata.remove", fsid => metadata_command.remove(fsid))
+	commands.on("cmd.data.metadata.remove", fsid =>
+		metadata_command.remove(fsid).cata({ Ok: noop, Err }),
+	)
 
 	commands.on("cmd.data.metadata.add_links", ({ fsid, links }) =>
-		metadata_command.add_links(fsid, ...links),
+		metadata_command.add_links(fsid, ...links).cata({ Ok: noop, Err }),
 	)
 
 	commands.on("cmd.data.metadata.remove_links", ({ fsid, links }) =>
-		metadata_command.remove_links(fsid, ...links),
+		metadata_command.remove_links(fsid, ...links).cata({ Ok: noop, Err }),
 	)
 
 	commands.on("cmd.data.metadata.rename", ({ fsid, new_name }) =>
-		metadata_command.set_name(fsid, new_name),
+		metadata_command.set_name(fsid, new_name).cata({ Ok: noop, Err }),
 	)
 
 	MetadataManager.of(metadata_repository, remote_metadata_repository, auth$, fetch).start(
@@ -115,4 +127,4 @@ export const init_metadata: TInitMetadataFn = ({
 
 const eperm = RRR.codes.eperm("init_metadata")
 
-const metadata$ = new BehaviorSubject<TMetadata[] | null>(null)
+const metadata$ = new BehaviorSubject<TMetadata[] | null>([])

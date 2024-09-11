@@ -17,17 +17,14 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Observable, Subject, map, merge, scan, shareReplay } from "rxjs"
+import { Subject, map, merge, scan, shareReplay } from "rxjs"
 
 import { O } from "@ordo-pink/option"
 import { TCreateFunctionContext } from "@ordo-pink/core"
 import { TLogger } from "@ordo-pink/logger"
-import { extend } from "@ordo-pink/tau"
-import { init_ordo_hooks } from "@ordo-pink/maoka-ordo-hooks"
 import { render_dom } from "@ordo-pink/maoka"
 
 import { Notifications } from "../components/notifications"
-import { init_notifications_hook } from "../hooks/use-notifications.hook"
 
 declare global {
 	interface MaokaState {
@@ -48,9 +45,8 @@ export const init_notifications = ({ logger, commands, ctx }: P) => {
 
 	O.FromNullable(document.querySelector("#notifications"))
 		.pipe(O.ops.chain(root => (root instanceof HTMLDivElement ? O.Some(root) : O.None())))
-		.pipe(O.ops.map(root => ({ root, component: Notifications })))
-		.pipe(O.ops.map(extend(() => ({ hooks: init_hooks(ctx, notification$) }))))
-		.pipe(O.ops.map(render_dom))
+		.pipe(O.ops.map(root => ({ root, component: Notifications(ctx, notification$) })))
+		.pipe(O.ops.map(({ root, component }) => render_dom(root, component)))
 		.cata(O.catas.or_else(log_div_not_found(logger)))
 
 	logger.debug("🟢 Initialised notifications.")
@@ -68,10 +64,5 @@ const notification$ = merge(add$.pipe(map(addP)), remove$.pipe(map(removeP))).pi
 	scan((acc, f) => f(acc), [] as Client.Notification.Item[]),
 	shareReplay(1),
 )
-
-const init_hooks = (
-	ctx: TCreateFunctionContext,
-	notification$: Observable<Client.Notification.Item[]>,
-) => ({ ...init_ordo_hooks(ctx), ...init_notifications_hook(notification$) })
 
 const log_div_not_found = (logger: TLogger) => () => logger.error("#notifications div not found.")

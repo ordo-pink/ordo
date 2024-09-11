@@ -1,12 +1,10 @@
 import * as Icons from "@ordo-pink/frontend-icons"
+import { create, set_inner_html } from "@ordo-pink/maoka"
 import { Switch } from "@ordo-pink/switch"
-import { create } from "@ordo-pink/maoka"
-
-const div = create("div")
 
 type P = Pick<Client.Notification.Item, "icon" | "type">
 export const NotificationIcon = ({ icon, type }: P) =>
-	div(use => use.set_inner_html(icon ? icon : get_default_icon(type)))
+	create("div", ({ use }) => use(set_inner_html(icon ? icon : get_default_icon(type))))
 
 const get_default_icon = (type: Client.Notification.Item["type"]) =>
 	Switch.Match(type)

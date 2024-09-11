@@ -1,19 +1,15 @@
-import { type TOrdoHooks } from "@ordo-pink/maoka-ordo-hooks"
-import { create } from "@ordo-pink/maoka"
+import { create, set_attribute } from "@ordo-pink/maoka"
 
-import { type TActivityHook } from "../../hooks/use-activities.hook"
+type P = Required<Pick<Functions.Activity, "name" | "render_icon">> & {
+	current_activity?: Functions.Activity["name"]
+}
+export const ActivityBarIcon = ({ name, render_icon, current_activity }: P) =>
+	create("span", ({ use, get_current_element }) => {
+		const element = get_current_element()
 
-const span = create<TActivityHook & TOrdoHooks>("span")
+		const is_current = !!current_activity && current_activity === name
 
-type P = Required<Pick<Functions.Activity, "name" | "render_icon">>
-export const ActivityBarIcon = ({ name, render_icon }: P) =>
-	span(use => {
-		const element = use.get_current_element()
-		const current_activity = use.current_activity().unwrap()
-
-		const is_current = current_activity && current_activity.name === name
-
-		use.set_attribute("class", is_current ? "text-pink-500" : "text-inherit")
+		use(set_attribute("class", is_current ? "text-pink-500" : "text-inherit"))
 
 		render_icon(element)
 	})

@@ -137,7 +137,7 @@ export const override =
 	>(
 		increment: __Increment,
 	) =>
-	(obj: _Object): _Object => ({ ...obj, increment })
+	(obj: _Object): _Object => ({ ...obj, ...increment })
 
 export const first_matched =
 	<T>(f: (x: T) => boolean) =>

@@ -25,6 +25,7 @@ import type {
 	FSID,
 	PlainData,
 	TCreateMetadataParams,
+	TMetadata,
 	TMetadataDTO,
 	TMetadataQuery,
 	TRrr,
@@ -597,8 +598,8 @@ declare global {
 			set_title: () => { window_title: string; status_bar_title?: string }
 			add_translations: <$TPrefix extends string>() => {
 				lang: ISO_639_1_Locale
-				prefix: $TPrefix
-				translations: Partial<TScopedTranslations<$TPrefix>>
+				prefix?: $TPrefix
+				translations: Partial<Record<keyof TFlatTranslations, string>>
 			}
 			background_task: {
 				set_status: () => BackgroundTaskStatus
@@ -663,6 +664,9 @@ declare global {
 			achievement: {
 				add: () => Achievements.Achievement
 			}
+			open_current_user_profile: () => void
+			open_settings: () => void
+			open_achievements: () => void
 		}
 		data: {
 			metadata: {
@@ -970,7 +974,7 @@ declare global {
 			/**
 			 * Show context menu item parameters.
 			 */
-			export type ShowOptions<T = PlainData | string> = {
+			export type ShowOptions<T = TMetadata | string> = {
 				/**
 				 * Accepted mouse event.
 				 */

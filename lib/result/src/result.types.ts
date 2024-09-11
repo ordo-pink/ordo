@@ -115,6 +115,16 @@ export type TIsOkGuardFn = <_TOk, _TErr>(x: TResult<_TOk, _TErr>) => x is TResul
 
 export type TIsErrGuardFn = <_TOk, _TErr>(x: TResult<_TOk, _TErr>) => x is TResult<never, _TErr>
 
+export type TOrElseCataFn = <_TOk, _TErr, _TNewErr>(
+	on_err: (err: _TErr) => _TNewErr,
+) => { Ok: (on_ok: _TOk) => _TOk; Err: (err: _TErr) => _TNewErr }
+
+export type TIfOkCataFn = <_TOk, _TNewOk>(
+	on_ok: (ok: _TOk) => _TNewOk,
+) => { Ok: (on_ok: _TOk) => _TNewOk; Err: () => void }
+
+export type TOrNothingCata = { Ok: <_TOk>(ok: _TOk) => _TOk; Err: () => void }
+
 export type TResultStatic = {
 	of: TOkResultConstructorFn
 	Ok: TOkResultConstructorFn
@@ -128,6 +138,11 @@ export type TResultStatic = {
 		is_result: TIsResultGuardFn
 		is_ok: TIsOkGuardFn
 		is_err: TIsErrGuardFn
+	}
+	catas: {
+		or_nothing: TOrNothingCata
+		or_else: TOrElseCataFn
+		if_ok: TIfOkCataFn
 	}
 	ops: {
 		map: TMapResultOperatorFn

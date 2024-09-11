@@ -31,12 +31,12 @@ import { get_wrong_label } from "./metadata.utils"
 const LOCATION = "MetadataQuery"
 
 const inval = RRR.codes.einval(LOCATION)
-const noent = RRR.codes.enoent(LOCATION)
+const enoent = RRR.codes.enoent(LOCATION)
 
 export const MetadataQuery: TMetadataQueryStatic = {
 	of: repo => ({
-		get version$() {
-			return repo.sub
+		get $() {
+			return repo.$
 		},
 
 		get: ({ show_hidden } = { show_hidden: false }) =>
@@ -65,17 +65,21 @@ export const MetadataQuery: TMetadataQueryStatic = {
 				.pipe(R.ops.map(m => O.FromNullable(m.find(_has_name_and_parent(name, parent))))),
 
 		get_children: (fsid, options) =>
-			R.If(M.Validations.is_fsid(fsid))
-				.pipe(R.ops.err_map(() => inval(`children -> fsid: ${fsid}`)))
-				.pipe(R.ops.chain(() => MQ.of(repo).get_by_fsid(fsid, options)))
-				.pipe(R.ops.chain(o => R.FromOption(o, () => noent(`.getChildren -> fsid: ${fsid}`))))
-				.pipe(R.ops.chain(() => MQ.of(repo).get(options)))
-				.pipe(R.ops.map(is => is.filter(i => i.is_child_of(fsid)))),
+			fsid
+				? R.If(M.Validations.is_fsid(fsid))
+						.pipe(R.ops.err_map(() => inval(`children -> fsid: ${fsid}`)))
+						.pipe(R.ops.chain(() => MQ.of(repo).get_by_fsid(fsid, options)))
+						.pipe(R.ops.chain(o => R.FromOption(o, () => enoent(`.getChildren -> fsid: ${fsid}`))))
+						.pipe(R.ops.chain(() => MQ.of(repo).get(options)))
+						.pipe(R.ops.map(is => is.filter(i => i.is_child_of(fsid))))
+				: MQ.of(repo)
+						.get(options)
+						.pipe(R.ops.map(is => is.filter(i => i.is_root_child()))),
 
 		get_parent: (fsid, options) =>
 			MQ.of(repo)
 				.get_by_fsid(fsid, options)
-				.pipe(R.ops.chain(o => R.FromOption(o, () => noent(`.getParent -> fsid: ${fsid}`))))
+				.pipe(R.ops.chain(o => R.FromOption(o, () => enoent(`.getParent -> fsid: ${fsid}`))))
 				.pipe(R.ops.map(i => i.get_parent()))
 				.pipe(R.ops.chain(i => (i ? MQ.of(repo).get_by_fsid(i) : R.Ok(O.None())))),
 
@@ -133,10 +137,10 @@ export const MetadataQuery: TMetadataQueryStatic = {
 					R.ops.map(option => {
 						const ancestors: TMetadata[] = []
 
-						let parentOption = option
+						let parent_option = option
 
-						while (parentOption !== O.None()) {
-							const parent = parentOption.unwrap()!
+						while (parent_option !== O.None()) {
+							const parent = parent_option.unwrap()!
 
 							ancestors.push(parent)
 
@@ -144,12 +148,12 @@ export const MetadataQuery: TMetadataQueryStatic = {
 								.get_parent(parent.get_fsid())
 								.pipe(
 									R.ops.tap(option => {
-										parentOption = option
+										parent_option = option
 									}),
 								)
 						}
 
-						return ancestors
+						return ancestors.toReversed()
 					}),
 				),
 
@@ -159,6 +163,7 @@ export const MetadataQuery: TMetadataQueryStatic = {
 				.pipe(
 					R.ops.map(children => {
 						for (const child of children) {
+							accumulator.push(child)
 							MQ.of(repo).get_descendents(child.get_fsid(), options, accumulator)
 						}
 

@@ -52,6 +52,7 @@ export type TQueryPermission =
 	| "application.current_route"
 	| "application.current_activity"
 	| "application.current_file_association"
+	| "application.file_associations"
 	| "users.current_user.achievements"
 	| "users.current_user.is_authenticated"
 	| "users.current_user.public_info" // User.PublicUser
@@ -123,6 +124,12 @@ export type TTranslateFn = {
 export type TGetCurrentLanguageFn = TRequireFID<
 	() => TResult<Observable<TwoLetterLocale>, TRrr<"EPERM">>
 >
+export type TGetCurrentFileAssociationFn = TRequireFID<
+	() => TResult<Observable<TOption<Functions.FileAssociation>>, TRrr<"EPERM">>
+>
+export type TGetFileAssociationsFn = TRequireFID<
+	() => TResult<Observable<Functions.FileAssociation[]>, TRrr<"EPERM">>
+>
 
 export type TKnownFunctions = {
 	validate: (fid: symbol | null) => boolean
@@ -147,6 +154,8 @@ export type TCreateFunctionInternalContext = {
 	get_current_language: TGetCurrentLanguageFn
 	get_metadata_query: TGetMetadataQueryFn
 	get_user_query: TGetUserQueryFn
+	get_file_associations: TGetFileAssociationsFn
+	get_current_file_association: TGetCurrentFileAssociationFn
 	// get_content_query: TGetContentQueryFn
 	known_functions: TKnownFunctions
 }
@@ -166,6 +175,8 @@ export type TCreateFunctionContext = {
 	get_current_language: ReturnType<TGetCurrentLanguageFn>
 	get_metadata_query: ReturnType<TGetMetadataQueryFn>
 	get_user_query: ReturnType<TGetUserQueryFn>
+	get_file_associations: ReturnType<TGetFileAssociationsFn>
+	get_current_file_association: ReturnType<TGetCurrentFileAssociationFn>
 	// get_content_query: TGetContentQueryFn
 }
 

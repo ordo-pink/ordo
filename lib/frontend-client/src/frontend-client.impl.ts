@@ -30,6 +30,7 @@ import { init_command_palette } from "./sections/command-palette.section"
 import { init_commands } from "./components/commands"
 import { init_context_menu } from "./sections/context-menu.section"
 import { init_fetch } from "./components/fetch"
+import { init_file_associations } from "./components/file-associations"
 import { init_hosts } from "./components/hosts"
 import { init_i18n } from "./components/i18n"
 import { init_known_functions } from "./components/known-functions"
@@ -66,6 +67,7 @@ export const create_client = ({ logger, is_dev, hosts }: P) => {
 		known_functions,
 		logger,
 	})
+
 	register_common_translations(logger, commands)
 
 	const { activities$, current_activity$, set_current_activity } = init_activities({
@@ -73,6 +75,12 @@ export const create_client = ({ logger, is_dev, hosts }: P) => {
 		known_functions,
 		logger,
 	})
+
+	const { get_current_file_association, get_file_associations } = init_file_associations({
+		commands,
+		known_functions,
+	})
+
 	const { auth$, user_query, get_is_authenticated, get_user_query } = init_user({
 		commands,
 		fetch,
@@ -80,6 +88,7 @@ export const create_client = ({ logger, is_dev, hosts }: P) => {
 		known_functions,
 		logger,
 	})
+
 	const { get_current_route } = init_router({
 		activities$,
 		APP_FID,
@@ -118,6 +127,8 @@ export const create_client = ({ logger, is_dev, hosts }: P) => {
 		get_sidebar: get_sidebar(APP_FID),
 		get_translations,
 		get_user_query: get_user_query(APP_FID),
+		get_current_file_association: get_current_file_association(APP_FID),
+		get_file_associations: get_file_associations(APP_FID),
 		is_dev,
 		translate,
 	}
@@ -147,6 +158,8 @@ export const create_client = ({ logger, is_dev, hosts }: P) => {
 				is_dev,
 				known_functions,
 				translate,
+				get_current_file_association,
+				get_file_associations,
 			}),
 		)
 
@@ -168,6 +181,8 @@ export const create_client = ({ logger, is_dev, hosts }: P) => {
 				is_dev,
 				known_functions,
 				translate,
+				get_current_file_association,
+				get_file_associations,
 			}),
 		)
 
@@ -190,6 +205,8 @@ export const create_client = ({ logger, is_dev, hosts }: P) => {
 				is_dev,
 				known_functions,
 				translate,
+				get_current_file_association,
+				get_file_associations,
 			}),
 		)
 
@@ -211,6 +228,8 @@ export const create_client = ({ logger, is_dev, hosts }: P) => {
 				is_dev,
 				known_functions,
 				translate,
+				get_current_file_association,
+				get_file_associations,
 			}),
 		)
 }

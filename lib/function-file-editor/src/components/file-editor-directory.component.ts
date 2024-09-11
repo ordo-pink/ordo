@@ -57,7 +57,6 @@ const FileEditorDirectoryName = (
 
 		const file_editor_directory_name_class = Maoka.hooks.set_class(
 			"flex justify-between items-center w-full rounded-sm",
-			"text-ellipsis line-clamp-1",
 			"hover:bg-gradient-to-r hover:from-neutral-700 hover:to-stone-700",
 			"file_editor_directory_name",
 		)
@@ -86,7 +85,10 @@ const FileEditorDirectoryNameText = (metadata: TMetadata) =>
 
 		return [
 			Maoka.create("div", () => BsFolderOpen("size-4")),
-			Maoka.create("div", () => metadata.get_name()),
+			Maoka.create("div", ({ use }) => {
+				use(Maoka.hooks.set_class("text-ellipsis line-clamp-1"))
+				return metadata.get_name()
+			}),
 		]
 	})
 

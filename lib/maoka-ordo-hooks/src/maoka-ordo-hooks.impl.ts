@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Unlicense
 
 import { type Observable } from "rxjs"
+import { equals } from "ramda"
 
 import { Maoka, type TMaokaProps } from "@ordo-pink/maoka"
 import { type TMetadata, type TMetadataDTO } from "@ordo-pink/data"
@@ -9,7 +10,6 @@ import { is_undefined, keys_of } from "@ordo-pink/tau"
 import { O } from "@ordo-pink/option"
 import { R } from "@ordo-pink/result"
 import { type TCreateFunctionContext } from "@ordo-pink/core"
-import { equals } from "ramda"
 
 export const ordo_context = Maoka.hooks.create_context<TCreateFunctionContext>()
 
@@ -48,7 +48,41 @@ export const get_user_query = ({ use }: TMaokaProps) => {
 	return get_user_query()
 		.pipe(R.ops.tap(({ $ }) => use(rx_subscription($, "uq_version", 0, (a, b) => a < b))))
 		.pipe(R.ops.err_tap(logger.alert))
-		.cata({ Ok: x => x, Err: () => null as never })
+		.cata(R.catas.or_else(() => null as never))
+}
+
+export const get_file_associations = ({ use }: TMaokaProps) => {
+	const { get_file_associations } = use(ordo_context.consume)
+	const logger = use(get_logger)
+
+	return get_file_associations()
+		.pipe(R.ops.map($ => use(rx_subscription($, "file_associations", []))))
+		.pipe(R.ops.err_tap(logger.alert))
+		.cata(R.catas.or_else(() => [] as Functions.FileAssociation[]))
+}
+
+export const get_current_file_association = ({ use }: TMaokaProps) => {
+	const { get_current_file_association } = use(ordo_context.consume)
+	const logger = use(get_logger)
+
+	return get_current_file_association()
+		.pipe(
+			R.ops.map($ =>
+				use(
+					rx_subscription($, "file_associations", O.None(), (a, b) => {
+						if (a.is_none && b.is_none) return false
+						if ((a.is_none && b.is_some) || (a.is_some && b.is_none)) return true
+
+						const ua = a.unwrap()!
+						const ub = b.unwrap()!
+
+						return ua.name !== ub.name
+					}),
+				),
+			),
+		)
+		.pipe(R.ops.err_tap(logger.alert))
+		.cata(R.catas.or_else(() => null as never))
 }
 
 export const get_is_authenticated = ({ use }: TMaokaProps) => {
@@ -70,7 +104,7 @@ export const get_metadata_query = ({ use }: TMaokaProps) => {
 	return get_metadata_query()
 		.pipe(R.ops.tap(({ $ }) => use(rx_subscription($, "mq_version", -1, (a, b) => a < b))))
 		.pipe(R.ops.err_tap(logger.alert))
-		.cata({ Ok: x => x, Err: () => null as never })
+		.cata(R.catas.or_else(() => null as never))
 }
 
 export const get_metadata_by_fsid =

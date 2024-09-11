@@ -717,7 +717,7 @@ declare global {
 			default_route?: string
 			render_workspace?: (div: HTMLDivElement) => void
 			render_sidebar?: (div: HTMLDivElement) => void
-			render_icon?: (div: HTMLSpanElement) => void
+			render_icon?: (span: HTMLSpanElement) => void
 			on_unmount?: (params: { workspace: HTMLDivElement; sidebar: HTMLDivElement }) => void
 			is_background?: boolean
 			is_fullscreen?: boolean
@@ -735,7 +735,9 @@ declare global {
 
 		type FileAssociation = {
 			name: string
-			content_type: string
+			content_type: string[]
+			render_icon?: (span: HTMLSpanElement) => void
+			render?: (div: HTMLDivElement) => void
 			Icon?: ComponentType
 			Component: ComponentType<FileAssociationComponentProps>
 		}

@@ -58,6 +58,7 @@ export default create_function(
 			"cmd.file_editor.open",
 			"cmd.file_editor.open_file",
 			"cmd.data.metadata.rename",
+			"cmd.application.context_menu.show",
 		],
 		queries: ["data.metadata_query", "application.current_route", "users.users_query"],
 	},

@@ -65,15 +65,16 @@ export default create_function(
 
 		commands.emit("cmd.application.add_translations", {
 			lang: "en",
-			prefix: "file_explorer",
 			translations: {
-				"modals.create_file.input_placeholder": "Ordo Together Strong",
-				"modals.create_file.title": "Create File",
-				"modals.create_file.input_label": "File name",
-				"modals.remove_file.title": "Remove File",
-				"modals.remove_file.message": "Are you sure? Removing files is irreversible.",
-				"modals.rename_file.title": "Rename File",
-				"modals.rename_file.input_label": "New name",
+				"t.file_explorer.modals.create_file.input_placeholder": "Ordo Together Strong",
+
+				"t.file_explorer.modals.create_file.title": "Create File",
+				"t.file_explorer.modals.create_file.input_label": "File name",
+				"t.file_explorer.modals.remove_file.title": "Remove File",
+				"t.file_explorer.modals.remove_file.message":
+					"Are you sure? Removing files is irreversible.",
+				"t.file_explorer.modals.rename_file.title": "Rename File",
+				"t.file_explorer.modals.rename_file.input_label": "New name",
 			},
 		})
 

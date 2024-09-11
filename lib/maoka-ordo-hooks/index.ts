@@ -4,8 +4,10 @@
 export * from "./src/maoka-ordo-hooks.impl"
 import {
 	get_commands,
+	get_current_file_association,
 	get_current_route,
 	get_fetch,
+	get_file_associations,
 	get_hosts,
 	get_is_authenticated,
 	get_is_dev,
@@ -30,4 +32,6 @@ export const OrdoHooks = {
 	translations: get_translations,
 	user_query: get_user_query,
 	rx_subscription,
+	current_file_association: get_current_file_association,
+	file_associations: get_file_associations,
 }

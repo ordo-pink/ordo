@@ -1,7 +1,7 @@
-import { BsCaretRight, BsFileEarmark, BsPlus } from "@ordo-pink/frontend-icons"
+import { BsCaretRight, BsPlus } from "@ordo-pink/frontend-icons"
+import { Link, MetadataIcon } from "@ordo-pink/maoka-components"
 import { Maoka, type TChildren } from "@ordo-pink/maoka"
 import { Metadata, type TMetadata } from "@ordo-pink/data"
-import { Link } from "@ordo-pink/maoka-components"
 import { OrdoHooks } from "@ordo-pink/maoka-ordo-hooks"
 import { R } from "@ordo-pink/result"
 
@@ -28,6 +28,7 @@ export const Database = Maoka.create("div", ({ use }) => {
 				use(Maoka.hooks.set_class(`w-full table-auto border-t ${BORDER_COLOR_CLASS}`))
 
 				// TODO: Move to translations
+				// TODO: Add icons
 				const keys = [
 					"Name",
 					"Created At",
@@ -121,7 +122,17 @@ const Cell = (value: TChildren, on_click?: (event: MouseEvent) => void) =>
 
 const FileNameCell = (metadata: TMetadata) =>
 	Maoka.create("td", ({ use }) => {
+		const { emit } = use(OrdoHooks.commands)
+
 		use(Maoka.hooks.set_class(cell_class))
+		use(
+			Maoka.hooks.listen("oncontextmenu", event =>
+				emit("cmd.application.context_menu.show", {
+					event: event as any,
+					payload: metadata,
+				}),
+			),
+		)
 
 		return Maoka.create("div", ({ use, get_current_element }) => {
 			const fsid = metadata.get_fsid()
@@ -149,7 +160,7 @@ const FileNameCell = (metadata: TMetadata) =>
 			)
 
 			return [
-				BsFileEarmark(),
+				MetadataIcon({ metadata }),
 				Link({
 					href: `/editor/${metadata.get_fsid()}`,
 					children: name,

@@ -54,10 +54,12 @@ export default create_function(
 			"cmd.application.router.navigate",
 			"cmd.application.set_title",
 			"cmd.application.command_palette.add",
+			"cmd.data.metadata.show_create_modal",
 			"cmd.file_editor.open",
 			"cmd.file_editor.open_file",
+			"cmd.data.metadata.rename",
 		],
-		queries: ["data.metadata_query", "application.current_route"],
+		queries: ["data.metadata_query", "application.current_route", "users.users_query"],
 	},
 	ctx => {
 		const { on, emit } = ctx.get_commands()

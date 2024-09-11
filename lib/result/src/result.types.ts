@@ -123,7 +123,7 @@ export type TIfOkCataFn = <_TOk, _TNewOk>(
 	on_ok: (ok: _TOk) => _TNewOk,
 ) => { Ok: (on_ok: _TOk) => _TNewOk; Err: () => void }
 
-export type TOrNothingCata = { Ok: <_TOk>(ok: _TOk) => _TOk; Err: () => void }
+export type TOrNothingCata = <_TOk>() => { Ok: (ok: _TOk) => _TOk; Err: () => undefined }
 
 export type TResultStatic = {
 	of: TOkResultConstructorFn

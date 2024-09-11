@@ -87,7 +87,7 @@ export const ResultMerge: Types.TMergeResultConstructorFn = rs => {
 	) as any
 }
 
-export const cata_result_or_nothing: Types.TOrNothingCata = { Ok: x => x, Err: noop }
+export const cata_result_or_nothing: Types.TOrNothingCata = () => ({ Ok: x => x, Err: noop })
 
 export const cata_result_or_else: Types.TOrElseCataFn = f => ({ Ok: x => x, Err: x => f(x) })
 

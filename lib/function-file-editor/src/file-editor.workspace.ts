@@ -5,6 +5,8 @@ import { Switch } from "@ordo-pink/switch"
 import { type TCreateFunctionContext } from "@ordo-pink/core"
 import { create } from "@ordo-pink/maoka"
 
+import { Database } from "./components/database.component"
+
 export const FileEditorWorkspace = (ctx: TCreateFunctionContext) => {
 	return create("div", ({ use, on_mount }) => {
 		use(ordo_context.provide(ctx))
@@ -24,7 +26,7 @@ export const FileEditorWorkspace = (ctx: TCreateFunctionContext) => {
 				.pipe(R.ops.map(payload => emit("cmd.application.set_title", payload)))
 		})
 
-		return "HELLO"
+		return Database
 	})
 }
 

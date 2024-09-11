@@ -17,5 +17,4 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-export * from "./src/maoka-components.impl"
-export * from "./src/maoka-components.types"
+export * from "./src/link/link.component"

@@ -50,6 +50,7 @@ const APP_NAME = "pink.ordo.app"
 const APP_FID = Symbol.for(APP_NAME)
 const APP_FN = { fid: APP_FID, name: APP_NAME, permissions: { commands: [], queries: [] } }
 
+// TODO: Move all HTML elements in index.html to `create_client`
 type P = { logger: TLogger; is_dev: boolean; hosts: THosts }
 export const create_client = ({ logger, is_dev, hosts }: P) => {
 	const known_functions = init_known_functions(APP_FN)

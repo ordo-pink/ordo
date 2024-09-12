@@ -63,27 +63,28 @@ export const init_router: TInitRouterStreamFn = call_once(
 							router$ &&
 								router$.pipe(route(activity_route)).subscribe((route_data: Client.Router.Route) => {
 									set_activity(activity.name)
+
 									current_route$.next(O.FromNullable(route_data))
 								})
 						})
 					})
 
-					router$ &&
-						router$.pipe(noMatch(router$)).subscribe(() => {
-							const home_activity = activities.find(activity => activity.name === "home")!
-							set_activity(home_activity.name)
-							current_route$.next(
-								O.Some({
-									data: null,
-									hash: "",
-									hashRouting: false,
-									params: {},
-									path: "/",
-									route: "/",
-									search: "",
-								}),
-							)
-						})
+					router$.pipe(noMatch(router$)).subscribe(() => {
+						const home_activity = activities.find(activity => activity.name === "home")!
+						set_activity(home_activity.name)
+
+						current_route$.next(
+							O.Some({
+								data: null,
+								hash: "",
+								hashRouting: false,
+								params: {},
+								path: "/",
+								route: "/",
+								search: "",
+							}),
+						)
+					})
 				}),
 			)
 			.subscribe()

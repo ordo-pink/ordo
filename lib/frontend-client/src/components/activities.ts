@@ -89,7 +89,12 @@ export const init_activities: TInitActivitiesFn = call_once(
 						),
 					)
 					.pipe(Result.ops.map(omit("fid")))
-					.pipe(Result.ops.map(activity => current_activity$.next(O.Some(activity)))),
+					.pipe(
+						Result.ops.map(activity => {
+							if (current_activity$.getValue().unwrap()?.name !== activity.name)
+								current_activity$.next(O.Some(activity))
+						}),
+					),
 		}
 	},
 )

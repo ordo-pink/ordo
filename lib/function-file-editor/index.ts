@@ -92,14 +92,8 @@ export default create_function(
 				render_icon: div => {
 					div.innerHTML = BS_LAYOUT_TEXT_WINDOW
 				},
-				render_workspace: div => {
-					console.log("HERE")
-					void render_dom(div, FileEditorWorkspace(ctx))
-				},
-				render_sidebar: div => {
-					console.log("HERE2")
-					void render_dom(div, FileEditorSidebar(ctx))
-				},
+				render_workspace: div => render_dom(div, FileEditorWorkspace(ctx)),
+				render_sidebar: div => render_dom(div, FileEditorSidebar(ctx)),
 			},
 		})
 	},

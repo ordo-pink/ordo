@@ -34,8 +34,6 @@ const eagain = RRR.codes.eagain(LOCATION)
 const einval = RRR.codes.einval(LOCATION)
 const eio = RRR.codes.eio(LOCATION)
 
-let i = -1
-
 export const MetadataRepository: TMetadataRepositoryStatic = {
 	of: metadata$ => ({
 		get: () =>
@@ -50,6 +48,8 @@ export const MetadataRepository: TMetadataRepositoryStatic = {
 				.pipe(Result.ops.err_map(() => einval(`.put: ${JSON.stringify(metadata)}`))),
 
 		get $() {
+			let i = -1
+
 			return metadata$.pipe(map(() => ++i))
 		},
 	}),

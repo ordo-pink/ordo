@@ -35,33 +35,31 @@ export const create =
 				return root_id
 			},
 			refresh: () => {
-				requestAnimationFrame(() => {
-					const after_refresh = on.refresh.map(f => f())
+				const after_refresh = on.refresh.map(f => f())
 
-					if (callback) {
-						let children = callback(props)
+				if (callback) {
+					let children = callback(props)
 
-						if (children) {
-							if (!is_array(children)) {
-								children = [
-									is_fn(children) ? children(create_element, create_text, root_id) : children,
-								]
-							}
-
-							const nodes = children.reduce(
-								(acc, child) => {
-									const node = is_fn(child) ? child(create_element, create_text, root_id) : child
-									return node ? acc.concat(node) : acc
-								},
-								[] as (SVGSVGElement | HTMLElement | string)[],
-							)
-
-							element.replaceChildren(...nodes)
+					if (children) {
+						if (!is_array(children)) {
+							children = [
+								is_fn(children) ? children(create_element, create_text, root_id) : children,
+							]
 						}
-					}
 
-					void after_refresh.map(f => is_fn(f) && f())
-				})
+						const nodes = children.reduce(
+							(acc, child) => {
+								const node = is_fn(child) ? child(create_element, create_text, root_id) : child
+								return node ? acc.concat(node) : acc
+							},
+							[] as (SVGSVGElement | HTMLElement | string)[],
+						)
+
+						requestAnimationFrame(() => element.replaceChildren(...nodes))
+					}
+				}
+
+				void after_refresh.map(f => is_fn(f) && f())
 			},
 			on_mount: f => void on.mount.push(f),
 			on_refresh: f => void on.refresh.push(f),
@@ -76,12 +74,14 @@ export const create =
 				if (!is_array(children))
 					children = [is_fn(children) ? children(create_element, create_text, root_id) : children]
 
-				children.forEach(child => {
-					const node = is_fn(child) ? child(create_element, create_text, root_id) : child
+				requestAnimationFrame(() => {
+					;(children as T.TChild[]).forEach(child => {
+						const node = is_fn(child) ? child(create_element, create_text, root_id) : child
 
-					if (!node) return
+						if (!node) return
 
-					element.appendChild(is_string(node) ? (create_text(node) as Text) : node)
+						element.appendChild(is_string(node) ? (create_text(node) as Text) : node)
+					})
 				})
 			}
 		}

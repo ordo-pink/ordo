@@ -3,6 +3,7 @@
 
 export * from "./src/maoka-ordo-hooks.impl"
 import {
+	computed,
 	get_commands,
 	get_current_file_association,
 	get_current_route,
@@ -17,6 +18,7 @@ import {
 	get_translations,
 	get_user_query,
 	rx_subscription,
+	state,
 } from "./src/maoka-ordo-hooks.impl"
 
 export const OrdoHooks = {
@@ -34,4 +36,6 @@ export const OrdoHooks = {
 	rx_subscription,
 	current_file_association: get_current_file_association,
 	file_associations: get_file_associations,
+	computed,
+	state,
 }

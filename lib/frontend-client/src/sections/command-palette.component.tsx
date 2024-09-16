@@ -60,7 +60,10 @@ export default function CommandPaletteModal({
 
 	useEffect(() => {
 		fuse.setCollection(
-			all_items.map(item => ({ ...item, translation: translate(item.readable_name) })),
+			all_items.map(item => ({
+				...item,
+				translation: translate(item.readable_name) ?? item.readable_name,
+			})),
 		)
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [all_items, translate])
@@ -345,7 +348,7 @@ const Item = ({
 	use$.accelerator(accelerator, on_select)
 	const translate = use$.translation()
 
-	const t_readable_name = translate(readable_name)
+	const t_readable_name = translate(readable_name) ?? readable_name
 
 	return (
 		<ActionListItem

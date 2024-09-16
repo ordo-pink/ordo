@@ -6,7 +6,7 @@ import { equals } from "ramda"
 
 import { F, T, keys_of } from "@ordo-pink/tau"
 import { Maoka, type TMaokaProps } from "@ordo-pink/maoka"
-import { type TMetadata, type TMetadataDTO } from "@ordo-pink/data"
+import { type TMetadata, type TMetadataDTO, TMetadataQuery } from "@ordo-pink/data"
 import { O } from "@ordo-pink/option"
 import { R } from "@ordo-pink/result"
 import { Switch } from "@ordo-pink/switch"
@@ -132,7 +132,7 @@ export const get_is_authenticated = ({ use }: TMaokaProps) => {
 		})
 }
 
-export const get_metadata_query = ({ use }: TMaokaProps) => {
+export const get_metadata_query = ({ use }: TMaokaProps): TMetadataQuery => {
 	const { get_metadata_query } = use(ordo_context.consume)
 	const logger = use(get_logger)
 
@@ -142,7 +142,7 @@ export const get_metadata_query = ({ use }: TMaokaProps) => {
 			.cata(R.catas.or_else(() => null as never))
 
 	const metadata_query = use(computed("metadata_query", get_metadata_query_unwrapped))
-	// use(rx_subscription(metadata_query.$, "metadata_query_version", 0, (prev, next) => prev < next))
+	use(rx_subscription(metadata_query.$, "metadata_query_version", 0, (prev, next) => prev < next))
 
 	return metadata_query
 }
@@ -277,7 +277,7 @@ export const state =
 			value,
 			(new_value_creator: (old_value: $TValue) => $TValue) => {
 				const increment = new_value_creator(value)
-				if (increment === value) return
+				if (equals(increment, value)) return
 
 				component_state.get(id)?.set(key, increment)
 				refresh()

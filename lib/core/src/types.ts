@@ -695,6 +695,7 @@ declare global {
 				remove_labels: () => { fsid: FSID; labels: string[] }
 				add_links: () => { fsid: FSID; links: FSID[] }
 				remove_links: () => { fsid: FSID; links: FSID[] }
+				set_property: () => { fsid: FSID; key: string; value: any }
 			}
 			content: {
 				get: () => FSID

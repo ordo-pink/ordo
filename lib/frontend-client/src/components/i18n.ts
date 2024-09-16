@@ -61,7 +61,7 @@ export const init_i18n: TInitI18nFn = call_once(({ logger, commands, known_funct
 	const translate: TTranslateFn = key =>
 		translations$.getValue().cata({
 			Some: translations => translations[current_language$.getValue()][key],
-			None: () => "↺",
+			None: () => key,
 		})
 
 	translate.$ = translations$

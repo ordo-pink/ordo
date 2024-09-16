@@ -12,7 +12,7 @@ export const MetadataIcon = ({ metadata, custom_class = "" }: P) =>
 
 		if (emoji_icon.is_some)
 			return Maoka.create("div", ({ use }) => {
-				use(Maoka.hooks.set_class(custom_class))
+				use(Maoka.hooks.set_class("text-sm", custom_class))
 				return emoji_icon.unwrap()
 			})
 

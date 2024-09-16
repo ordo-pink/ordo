@@ -4,6 +4,9 @@ import { Maoka, type TChildren } from "@ordo-pink/maoka"
 import { Metadata, type TMetadata } from "@ordo-pink/data"
 import { OrdoHooks } from "@ordo-pink/maoka-ordo-hooks"
 import { R } from "@ordo-pink/result"
+import { emojis } from "@ordo-pink/emojis"
+
+// TODO: Avoid unnecessary rerenders by narrowing down hooks
 
 const BORDER_COLOR_CLASS = "border-neutral-300 dark:border-neutral-700"
 
@@ -121,10 +124,10 @@ const Cell = (value: TChildren, on_click?: (event: MouseEvent) => void) =>
 	})
 
 const FileNameCell = (metadata: TMetadata) =>
-	Maoka.create("td", ({ use }) => {
+	Maoka.create("td", ({ use, refresh }) => {
 		const { emit } = use(OrdoHooks.commands)
 
-		use(Maoka.hooks.set_class(cell_class))
+		use(Maoka.hooks.set_class(cell_class, "font-semibold"))
 		use(
 			Maoka.hooks.listen("oncontextmenu", event =>
 				emit("cmd.application.context_menu.show", {
@@ -134,37 +137,77 @@ const FileNameCell = (metadata: TMetadata) =>
 			),
 		)
 
-		return Maoka.create("div", ({ use, get_current_element }) => {
+		return Maoka.create("div", ({ use }) => {
 			const fsid = metadata.get_fsid()
 			const name = metadata.get_name()
-			const { emit } = use(OrdoHooks.commands)
 
-			use(Maoka.hooks.set_attribute("contenteditable", "true"))
-			use(Maoka.hooks.set_class("flex gap-x-1 items-center outline-none"))
-			use(
-				Maoka.hooks.listen("onkeydown", event => {
-					if (event.key !== "Enter") return
-					const element = get_current_element()
-					element.blur()
-				}),
-			)
-
-			use(
-				Maoka.hooks.listen("onblur", event => {
-					R.FromNullable(event.target as unknown as HTMLDivElement)
-						.pipe(R.ops.chain(e => R.FromNullable(e.children.item(1) as HTMLAnchorElement)))
-						.pipe(R.ops.map(e => e.innerText))
-						.pipe(R.ops.chain(new_name => R.If(name !== new_name, { T: () => new_name })))
-						.cata(R.catas.if_ok(new_name => emit("cmd.data.metadata.rename", { fsid, new_name })))
-				}),
-			)
+			use(Maoka.hooks.set_class("flex gap-x-1 items-center"))
 
 			return [
-				MetadataIcon({ metadata }),
-				Link({
-					href: `/editor/${metadata.get_fsid()}`,
-					children: name,
-					custom_class: "text-inherit visited:text-inherit",
+				Maoka.create("div", ({ use }) => {
+					const commands = use(OrdoHooks.commands)
+
+					use(Maoka.hooks.set_class("cursor-pointer"))
+
+					use(
+						Maoka.hooks.listen("onclick", event => {
+							event.stopPropagation()
+
+							commands.emit("cmd.application.command_palette.show", {
+								items: emojis.map(
+									emoji =>
+										({
+											id: emoji.code_point,
+											on_select: () => {
+												commands.emit("cmd.data.metadata.set_property", {
+													fsid,
+													key: "emoji_icon",
+													value: emoji.icon,
+												})
+
+												commands.emit("cmd.application.command_palette.hide")
+												refresh()
+											},
+											readable_name: `${emoji.icon} ${emoji.description}` as any,
+											shows_next_palette: false,
+										}) satisfies Client.CommandPalette.Item,
+								),
+							})
+						}),
+					)
+
+					return MetadataIcon({ metadata })
+				}),
+
+				Maoka.create("div", ({ use, get_current_element }) => {
+					const { emit } = use(OrdoHooks.commands)
+
+					use(Maoka.hooks.set_attribute("contenteditable", "true"))
+					use(Maoka.hooks.set_class("w-full outline-none"))
+
+					use(
+						Maoka.hooks.listen("onkeydown", event => {
+							if (event.key !== "Enter") return
+
+							event.preventDefault()
+
+							const element = get_current_element()
+							element.blur()
+						}),
+					)
+
+					use(
+						Maoka.hooks.listen("onblur", event => {
+							R.FromNullable(event.target as unknown as HTMLDivElement)
+								.pipe(R.ops.map(e => e.innerText))
+								.pipe(R.ops.chain(new_name => R.If(name !== new_name, { T: () => new_name })))
+								.cata(
+									R.catas.if_ok(new_name => emit("cmd.data.metadata.rename", { fsid, new_name })),
+								)
+						}),
+					)
+
+					return Link({ href: `/editor/${metadata.get_fsid()}`, children: name })
 				}),
 			]
 		})
@@ -176,21 +219,14 @@ const FileNameCell = (metadata: TMetadata) =>
 const UserReference = () =>
 	Maoka.create("div", ({ use }) => {
 		use(Maoka.hooks.set_class("flex gap-x-2 items-center"))
-
 		const user_query = use(OrdoHooks.user_query)
-		const UserNameComponent = user_query
+
+		const UserName = user_query
 			.get_current()
-			.pipe(R.ops.map(user => UserName(user)))
+			.pipe(R.ops.map(user => Link({ href: "/user", children: user.handle.slice(1) })))
 			.cata(R.catas.or_nothing())
 
-		return [UserAvatar, UserNameComponent]
-	})
-
-const UserName = (user: User.User) =>
-	Maoka.create("div", ({ use }) => {
-		use(Maoka.hooks.set_class("underline cursor-pointer"))
-
-		return user.handle.slice(1) // TODO: Use readable name
+		return [UserAvatar, UserName]
 	})
 
 const user_avatar_class = [

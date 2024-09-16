@@ -77,6 +77,10 @@ export const init_metadata: TInitMetadataFn = ({
 		metadata_command.remove_labels(fsid, ...labels).cata({ Ok: noop, Err }),
 	)
 
+	commands.on("cmd.data.metadata.set_property", ({ fsid, key, value }) =>
+		metadata_command.set_property(fsid, key, value),
+	)
+
 	commands.on("cmd.data.metadata.create", params => {
 		metadata_command.create(params).cata({ Ok: noop, Err })
 	})

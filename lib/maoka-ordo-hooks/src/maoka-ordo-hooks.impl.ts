@@ -5,8 +5,8 @@ import { type Observable } from "rxjs"
 import { equals } from "ramda"
 
 import { F, T, keys_of } from "@ordo-pink/tau"
+import { type FSID, Metadata, type TMetadata, type TMetadataQuery } from "@ordo-pink/data"
 import { Maoka, type TMaokaProps } from "@ordo-pink/maoka"
-import { type TMetadata, type TMetadataDTO, TMetadataQuery } from "@ordo-pink/data"
 import { O } from "@ordo-pink/option"
 import { R } from "@ordo-pink/result"
 import { Switch } from "@ordo-pink/switch"
@@ -136,44 +136,100 @@ export const get_metadata_query = ({ use }: TMaokaProps): TMetadataQuery => {
 	const { get_metadata_query } = use(ordo_context.consume)
 	const logger = use(get_logger)
 
-	const get_metadata_query_unwrapped = () =>
-		get_metadata_query()
-			.pipe(R.ops.err_tap(logger.alert))
-			.cata(R.catas.or_else(() => null as never))
-
-	const metadata_query = use(computed("metadata_query", get_metadata_query_unwrapped))
-	use(rx_subscription(metadata_query.$, "metadata_query_version", 0, (prev, next) => prev < next))
-
-	return metadata_query
+	return use(
+		computed("metadata_query", () =>
+			get_metadata_query()
+				.pipe(R.ops.err_tap(logger.alert))
+				.cata(R.catas.or_else(() => null as never)),
+		),
+	)
 }
 
 export const get_metadata_by_fsid =
-	(fsid?: TMetadataDTO["fsid"]) =>
-	({ use }: TMaokaProps) => {
+	(fsid?: string) =>
+	({ use, on_mount, refresh }: TMaokaProps) => {
 		const query = use(get_metadata_query)
+		const [metadata, set_metadata] = use(state<TMetadata | null>("metadata_by_fsid", null))
 
-		return R.FromNullable(fsid)
-			.pipe(R.ops.chain(fsid => query.get_by_fsid(fsid)))
-			.pipe(R.ops.chain(metadata => R.FromNullable(metadata.unwrap())))
-			.cata({ Ok: x => x, Err: () => void 0 })
+		on_mount(() => {
+			const subscription = query.$.subscribe(() => {
+				const new_metadata = R.FromNullable(fsid)
+					.pipe(R.ops.chain(str => R.If(is_fsid(str), { T: () => str as FSID })))
+					.pipe(R.ops.chain(fsid => query.get_by_fsid(fsid)))
+					.pipe(R.ops.chain(metadata => R.FromNullable(metadata.unwrap())))
+					.cata(R.catas.or_else(() => null))
+
+				if (metadata && new_metadata && metadata.equals(new_metadata))
+					return () => subscription.unsubscribe()
+
+				set_metadata(() => new_metadata)
+				refresh()
+			})
+
+			return () => subscription.unsubscribe()
+		})
+
+		return metadata
 	}
 
 export const get_metadata_children =
-	(fsid?: TMetadataDTO["fsid"]) =>
-	({ use }: TMaokaProps) => {
+	(fsid?: string) =>
+	({ use, on_mount }: TMaokaProps) => {
 		const query = use(get_metadata_query)
+		const [children, set_children] = use(state<TMetadata[]>("metadata_children", []))
 
-		return query.get_children(fsid ?? null).cata({ Ok: x => x, Err: () => [] as TMetadata[] })
+		on_mount(() => {
+			const subscription = query.$.subscribe(() => {
+				const new_children = R.FromNullable(fsid)
+					.pipe(R.ops.chain(str => R.If(is_fsid(str), { T: () => str as FSID })))
+					.pipe(R.ops.chain(fsid => query.get_children(fsid)))
+					.cata(R.catas.or_else(() => [] as TMetadata[]))
+
+				if (
+					!!children &&
+					!!new_children &&
+					children.length === new_children.length &&
+					children.reduce((acc, child, index) => acc && child.equals(new_children[index]), true)
+				)
+					return () => subscription.unsubscribe()
+
+				set_children(() => new_children)
+			})
+
+			return () => subscription.unsubscribe()
+		})
+
+		return children
 	}
 
 export const get_metadata_ancestors =
-	(fsid?: TMetadataDTO["fsid"]) =>
-	({ use }: TMaokaProps) => {
+	(fsid?: string) =>
+	({ use, on_mount }: TMaokaProps) => {
 		const query = use(get_metadata_query)
+		const [ancestors, set_ancestors] = use(state<TMetadata[]>("metadata_ancestors", []))
 
-		return R.FromNullable(fsid)
-			.pipe(R.ops.chain(fsid => query.get_ancestors(fsid)))
-			.cata({ Ok: x => x, Err: () => [] as TMetadata[] })
+		on_mount(() => {
+			const subscription = query.$.subscribe(() => {
+				const new_children = R.FromNullable(fsid)
+					.pipe(R.ops.chain(str => R.If(is_fsid(str), { T: () => str as FSID })))
+					.pipe(R.ops.chain(fsid => query.get_ancestors(fsid)))
+					.cata(R.catas.or_else(() => [] as TMetadata[]))
+
+				if (
+					!!ancestors &&
+					!!new_children &&
+					ancestors.length === new_children.length &&
+					ancestors.reduce((acc, child, index) => acc && child.equals(new_children[index]), true)
+				)
+					return () => subscription.unsubscribe()
+
+				set_ancestors(() => new_children)
+			})
+
+			return () => subscription.unsubscribe()
+		})
+
+		return ancestors
 	}
 
 export const get_translations = ({ use }: TMaokaProps) => {
@@ -258,7 +314,10 @@ const component_state = new Map<string, Map<string, any>>()
 
 export const state =
 	<$TValue>(key: string, initial_value?: $TValue) =>
-	({ refresh, get_internal_id, on_mount }: TMaokaProps) => {
+	({
+		get_internal_id,
+		on_mount,
+	}: TMaokaProps): [$TValue, (callback: (previous_value: $TValue) => $TValue) => void] => {
 		const id = get_internal_id()
 
 		on_mount(() => {
@@ -280,7 +339,6 @@ export const state =
 				if (equals(increment, value)) return
 
 				component_state.get(id)?.set(key, increment)
-				refresh()
 			},
 		]
 	}
@@ -326,9 +384,15 @@ export const rx_subscription = <$TValue>(
 				set_value(() => new_value)
 			})
 
-			return () => subscription.unsubscribe()
+			return () => {
+				subscription.unsubscribe()
+			}
 		})
 
 		return value
 	}
 }
+
+// --- Internal ---
+
+const is_fsid = Metadata.Validations.is_fsid

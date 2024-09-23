@@ -78,5 +78,6 @@ export type TMetadata<_TProps extends TMetadataProps = TMetadataProps> = {
 	get_readable_size: () => string
 	get_property: <_TKey_ extends keyof _TProps>(key: _TKey_) => TOption<NonNullable<_TProps[_TKey_]>>
 	to_dto: () => TMetadataDTO<_TProps>
+	equals: (other_metadata?: TMetadata) => boolean
 	is_hidden: () => boolean
 }

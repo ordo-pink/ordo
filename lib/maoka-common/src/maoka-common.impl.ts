@@ -3,7 +3,7 @@
 
 import {
 	type TAttributes,
-	type TCallback,
+	type TMaokaCallback,
 	type TCreateComponentFn,
 	type TExtractCallbackHooks,
 } from "@ordo-pink/maoka/src/maoka.types"
@@ -15,15 +15,15 @@ export const to_chainable_component =
 	) =>
 	(name: string) =>
 	(
-		attrs_or_cb: TAttributes | TCallback<TExtractCallbackHooks<typeof create_component>>,
-		callback?: TCallback<TExtractCallbackHooks<typeof create_component>>,
+		attrs_or_cb: TAttributes | TMaokaCallback<TExtractCallbackHooks<typeof create_component>>,
+		callback?: TMaokaCallback<TExtractCallbackHooks<typeof create_component>>,
 	) => {
 		const attrs_is_attrs = !is_fn(attrs_or_cb)
 
 		const attrs = attrs_is_attrs ? (attrs_or_cb as TAttributes) : {}
 		const cb = attrs_is_attrs
 			? callback
-			: (attrs_or_cb as TCallback<TExtractCallbackHooks<typeof create_component>>)
+			: (attrs_or_cb as TMaokaCallback<TExtractCallbackHooks<typeof create_component>>)
 
 		return create_component(name, attrs, cb)
 	}

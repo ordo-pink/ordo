@@ -13,7 +13,7 @@ const is_array = Array.isArray
 export const create =
 	<$TElement extends T.TMaokaElement = T.TMaokaElement, $TText extends T.TMaokaText = T.TMaokaText>(
 		name: string,
-		callback?: T.TCallback,
+		callback?: T.TMaokaCallback,
 	) =>
 	(
 		create_element: (name: string) => $TElement,
@@ -22,41 +22,44 @@ export const create =
 	) => {
 		const internal_id = crypto.randomUUID()
 		const on = {
-			mount: [] as ((() => void | Promise<void>) | (() => () => void | Promise<void>))[],
-			refresh: [] as ((() => void | Promise<void>) | (() => () => void | Promise<void>))[],
-			unmount: [] as (() => void)[],
+			mount: [] as Parameters<T.TMaokaOnMountFn>[0][],
+			refresh: [] as Parameters<T.TMaokaOnRefreshFn>[0][],
 		}
 
 		const props: T.TMaokaProps = {
-			get_internal_id: () => internal_id,
-			get_current_element: () => element,
-			use: f => f(props),
+			get internal_id() {
+				return internal_id
+			},
+			get current_element() {
+				return element
+			},
 			get root_id() {
 				return root_id
 			},
+			use: f => f(props),
 			refresh: () => {
 				const after_refresh = on.refresh.map(f => f())
 
 				if (callback) {
-					let children = callback(props)
+					const children_fn = callback(props)
+					if (!children_fn) return
 
-					if (children) {
-						if (!is_array(children)) {
-							children = [
-								is_fn(children) ? children(create_element, create_text, root_id) : children,
-							]
-						}
+					let children = children_fn()
 
-						const nodes = children.reduce(
-							(acc, child) => {
-								const node = is_fn(child) ? child(create_element, create_text, root_id) : child
-								return node ? acc.concat(node) : acc
-							},
-							[] as (SVGSVGElement | HTMLElement | string)[],
-						)
-
-						requestAnimationFrame(() => element.replaceChildren(...nodes))
+					if (!is_array(children)) {
+						children = [is_fn(children) ? children(create_element, create_text, root_id) : children]
 					}
+
+					const nodes = children.reduce(
+						(acc, child) => {
+							const node = is_fn(child) ? child(create_element, create_text, root_id) : child
+							return node ? acc.concat(node) : acc
+						},
+						[] as (SVGSVGElement | HTMLElement | string)[],
+					)
+
+					// requestAnimationFrame
+					element.replaceChildren(...nodes)
 				}
 
 				void after_refresh.map(f => is_fn(f) && f())

@@ -13,6 +13,9 @@ import {
 	get_is_authenticated,
 	get_is_dev,
 	get_logger,
+	get_metadata_ancestors,
+	get_metadata_by_fsid,
+	get_metadata_children,
 	get_metadata_query,
 	get_route_params,
 	get_translations,
@@ -38,4 +41,9 @@ export const OrdoHooks = {
 	file_associations: get_file_associations,
 	computed,
 	state,
+	metadata: {
+		by_fsid: get_metadata_by_fsid,
+		ancestors: get_metadata_ancestors,
+		children: get_metadata_children,
+	},
 }

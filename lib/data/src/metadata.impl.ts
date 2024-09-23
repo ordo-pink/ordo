@@ -21,6 +21,9 @@ import { O } from "@ordo-pink/option"
 
 import { MetadataValidations } from "./metadata-validations"
 import { type TMetadataStatic } from "./metadata.types"
+import { Switch } from "@ordo-pink/switch"
+import { F } from "@ordo-pink/tau"
+import { equals } from "ramda"
 
 export const Metadata: TMetadataStatic = {
 	from: ({
@@ -72,6 +75,15 @@ export const Metadata: TMetadataStatic = {
 		is_root_child: () => dto.parent === null,
 		to_dto: () => dto,
 		is_hidden: () => dto.name.startsWith("."),
+		equals: o => {
+			if (!Metadata.Validations.is_metadata(o)) return false
+
+			const o_dto = o.to_dto()
+
+			return Switch.OfTrue()
+				.case(o_dto.fsid !== dto.fsid, F)
+				.default(() => equals(o_dto, dto))
+		},
 	}),
 	Validations: MetadataValidations,
 }

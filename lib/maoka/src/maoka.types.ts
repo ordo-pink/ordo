@@ -16,7 +16,7 @@ export type TMaokaElement = { [$TKey in keyof HTMLElement]: HTMLElement[$TKey] }
 
 export type TMaokaText = Partial<{ [$TKey in keyof Text]: Text[$TKey] }> | string
 
-export type TMaokaCreateComponentFn = (callback?: TCallback) => TMaokaCreateComponentImplFn
+export type TMaokaCreateComponentFn = (callback?: TMaokaCallback) => TMaokaCreateComponentImplFn
 
 export type TMaokaCreateFn = (tag: string) => TMaokaCreateComponentFn
 
@@ -55,7 +55,21 @@ export type TNoSpace<$TStr extends string> = $TStr extends `${string} ${string}`
 /**
  * A record of hooks that are provided by Maoka directly.
  */
-export type TMaokaProps = {
+export type TMaokaProps<$TElement extends TMaokaElement = TMaokaElement> = {
+	/**
+	 * Get UUID of current Maoka component. This would probably only be useful for creating custom
+	 * hooks that accumulate a set of components to apply batch refresh calls. You would hardly ever
+	 * need this in your application code.
+	 */
+	get internal_id(): string
+
+	/**
+	 * Returns reference to the current element.
+	 */
+	get current_element(): $TElement
+
+	get root_id(): string
+
 	/**
 	 * Trigger refreshing current Maoka component. Technically, calling refresh is basically calling
 	 * the Maoka component callback function in which this `refresh` function is available inside
@@ -64,42 +78,24 @@ export type TMaokaProps = {
 	refresh: () => void
 
 	/**
-	 * Get UUID of current Maoka component. This would probably only be useful for creating custom
-	 * hooks that accumulate a set of components to apply batch refresh calls. You would hardly ever
-	 * need this in your application code.
-	 */
-	get_internal_id: () => string
-
-	/**
 	 * Registers a function that should be executed when the component is mounted into the DOM. If
 	 * provided function returns a function - the returned function will be executed when the
 	 * component is unmounted from the DOM. Maoka components may have multiple functions registerred
 	 * with `on_mount`. The functions registerred via `on_mount` may be sync or async, but Maoka does
 	 * not await for the result to be completed.
 	 */
-	on_mount: (callback: (() => void | Promise<void>) | (() => () => void | Promise<void>)) => void
+	on_mount: TMaokaOnMountFn
 
-	/**
-	 * Registers a function that should be executed when the component is getting refreshed with
-	 * `use.refresh`. The function is called right before the refresh. If the provided function
-	 * returns a function - the returned function will be executed right after the refresh has
-	 * completed. Maoka components may have multiple functions registerred with `on_refresh`. The
-	 * functions registerred via `on_refresh` may be sync or async, but Maoka does not await for the
-	 * result to be completed. Avoid calling `use.refresh` from within `use.on_refresh` callback if
-	 * possible, BTW. The main difference between **before** and **after** here is that **before**
-	 * happens before requesting animation frame.
-	 */
-	on_refresh: (callback: (() => () => void) | (() => void)) => void
-
-	/**
-	 * Returns reference to the current element.
-	 */
-	get_current_element: <_TElement extends HTMLElement = HTMLElement>() => _TElement
+	on_refresh: TMaokaOnRefreshFn
 
 	use: <_TResult>(hook: (ctx: TMaokaProps) => _TResult) => _TResult
-
-	get root_id(): string
 }
+
+export type TMaokaOnMountFn = (
+	f: (() => void | Promise<void>) | (() => () => void | Promise<void>),
+) => void
+
+export type TMaokaOnRefreshFn = (f: () => boolean | void) => void
 
 /**
  * A callback function that returns children of the current Maoka component. It accepts a record of
@@ -108,6 +104,6 @@ export type TMaokaProps = {
  *
  * @see TChildren
  */
-export type TCallback = (props: TMaokaProps) => TChildren
+export type TMaokaCallback = (props: TMaokaProps) => (() => TChildren) | undefined
 
 export type TMaokaRenderDOMFn = (root: HTMLElement, component: TMaokaCreateComponentImplFn) => void

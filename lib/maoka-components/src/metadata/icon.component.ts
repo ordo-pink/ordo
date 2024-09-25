@@ -60,7 +60,7 @@ export const MetadataIcon = ({ metadata, custom_class = "" }: P) =>
 		return () => {
 			if (emoji.is_some)
 				return Maoka.create("div", ({ use }) => {
-					use(Maoka.hooks.set_class("text-sm", custom_class))
+					use(Maoka.hooks.set_class(custom_class))
 					return () => emoji.unwrap()
 				})
 
@@ -81,8 +81,8 @@ const Icon = ({ metadata, custom_class, has_children }: P2) =>
 
 		return () =>
 			Switch.OfTrue()
-				.case(has_children, () => BsFolderOpen(custom_class))
-				.case(metadata.get_size() === 0, () => BsFileEarmark(custom_class))
+				.case(has_children, () => BsFolderOpen(`ml-1 shrink-0 ${custom_class}`))
+				.case(metadata.get_size() === 0, () => BsFileEarmark(`ml-1 shrink-0 ${custom_class}`))
 				// TODO:  Render FileAssociation icon :: .case(!!metadata_file_association, () => )
-				.default(() => BsFileEarmarkBinary(custom_class))
+				.default(() => BsFileEarmarkBinary(`ml-1 shrink-0 ${custom_class}`))
 	})

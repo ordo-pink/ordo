@@ -1,9 +1,9 @@
 import { Maoka, type TMaokaCreateComponentImplFn } from "@ordo-pink/maoka"
 import { is_false, is_true, noop } from "@ordo-pink/tau"
+import { Ordo } from "@ordo-pink/maoka-ordo-hooks"
 import { R } from "@ordo-pink/result"
 import { Switch } from "@ordo-pink/switch"
 import { type TMetadata } from "@ordo-pink/data"
-import { get_metadata_query } from "@ordo-pink/maoka-ordo-hooks"
 
 import { FileEditorSidebarDirectory } from "./file-editor-sidebar-directory.component"
 import { FileEditorSidebarFile } from "./file-editor-sidebar-file.component"
@@ -15,7 +15,8 @@ export const FileEditorSidebarItem = (
 	Maoka.create("div", ({ use, refresh, on_unmount }) => {
 		let metadata = initial_metadata
 
-		const metadata_query = use(get_metadata_query)
+		const commands = use(Ordo.Hooks.commands)
+		const metadata_query = use(Ordo.Hooks.metadata_query)
 
 		const subscription = metadata_query.$.subscribe(() => {
 			metadata_query
@@ -25,6 +26,18 @@ export const FileEditorSidebarItem = (
 				.pipe(R.ops.map(x => void (metadata = x)))
 				.cata(R.catas.if_ok(refresh))
 		})
+
+		use(
+			Maoka.hooks.listen("oncontextmenu", event => {
+				event.preventDefault()
+				event.stopPropagation()
+
+				commands.emit("cmd.application.context_menu.show", {
+					event: event as any,
+					payload: metadata,
+				})
+			}),
+		)
 
 		on_unmount(() => subscription.unsubscribe())
 

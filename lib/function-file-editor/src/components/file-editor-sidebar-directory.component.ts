@@ -34,6 +34,24 @@ export const FileEditorSidebarDirectory = (metadata: TMetadata, depth = 0) =>
 
 			return metadata_query
 				.get_children(fsid)
+				.pipe(
+					R.ops.map(is =>
+						is.sort((a, b) => {
+							const a_dir = metadata_query
+								.has_children(a.get_fsid())
+								.cata(R.catas.or_else(() => false))
+
+							const b_dir = metadata_query
+								.has_children(b.get_fsid())
+								.cata(R.catas.or_else(() => false))
+
+							if (a_dir && !b_dir) return -1
+							if (b_dir && !a_dir) return 1
+
+							return a.get_name().localeCompare(b.get_name())
+						}),
+					),
+				)
 				.cata(
 					R.catas.if_ok(is => [
 						FileEditorDirectoryName(metadata, depth, on_caret_click),

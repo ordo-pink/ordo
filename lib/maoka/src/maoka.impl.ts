@@ -103,6 +103,14 @@ export const render_dom: T.TMaokaRenderDOMFn = (root, component) => {
 		document.createTextNode.bind(document),
 		root_id,
 	)
+	root.appendChild(Component)
+
+	const unmount_element = (element: T.TMaokaElement) => {
+		if (is_array(element.onunmount) && element.onunmount.length > 0)
+			element.onunmount.forEach(f => f())
+
+		element.childNodes.forEach(child => unmount_element(child as any))
+	}
 
 	const observer = new MutationObserver(records => {
 		for (const record of records) {
@@ -110,11 +118,10 @@ export const render_dom: T.TMaokaRenderDOMFn = (root, component) => {
 
 			for (let i = 0; i < removed_nodes.length; i++) {
 				const element = removed_nodes[i]
-				if (is_array(element.onunmount)) element.onunmount.forEach(f => f())
+				unmount_element(element)
 			}
 		}
 	})
 
-	root.appendChild(Component)
 	observer.observe(root, { childList: true, subtree: true })
 }

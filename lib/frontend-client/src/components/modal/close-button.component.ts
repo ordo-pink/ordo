@@ -1,27 +1,27 @@
 import { BS_X } from "@ordo-pink/frontend-icons"
-import { type TOrdoHooks } from "@ordo-pink/maoka-ordo-hooks"
-import { create } from "@ordo-pink/maoka"
+import { Maoka } from "@ordo-pink/maoka"
+import { Ordo } from "@ordo-pink/maoka-ordo-hooks"
 
-import { type TModalHook } from "../../hooks/use-modal.hook"
+export const ModalCloseButton = (should_show = false) => {
+	if (!should_show) return
 
-const button = create<TModalHook & TOrdoHooks>("button")
+	return Maoka.create("button", ({ use }) => {
+		const commands = use(Ordo.Hooks.commands)
 
-export const ModalCloseButton = button(use => {
-	const { modal } = use.get_modal_state()
+		use(
+			Maoka.hooks.set_class(
+				"absolute right-0 top-0 cursor-pointer p-2",
+				"text-neutral-500 hover:text-pink-500 transition-colors duration-300",
+			),
+		)
 
-	if (modal.is_none) return
+		use(
+			Maoka.hooks.listen("onclick", event => {
+				event.preventDefault()
+				commands.emit("cmd.application.modal.hide")
+			}),
+		)
 
-	const commands = use.commands()
-
-	use.set_class(
-		"absolute right-0 top-0 cursor-pointer p-2",
-		"text-neutral-500 hover:text-pink-500 transition-colors duration-300",
-	)
-
-	use.event_listener("onclick", event => {
-		event.preventDefault()
-		commands.emit("cmd.application.modal.hide")
+		use(Maoka.hooks.set_inner_html(BS_X))
 	})
-
-	use.set_inner_html(BS_X)
-})
+}

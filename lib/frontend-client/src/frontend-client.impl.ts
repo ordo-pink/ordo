@@ -134,7 +134,7 @@ export const create_client = ({ logger, is_dev, hosts }: P) => {
 		translate,
 	}
 
-	init_modal({ commands, logger })
+	init_modal({ commands, logger, ctx: internal_context })
 	init_notifications({ logger, commands, ctx: internal_context })
 	init_activity_bar({ ctx: internal_context, logger, activities$, current_activity$ })
 	init_auth_section({ logger, commands, user_query, auth$, ctx: internal_context })

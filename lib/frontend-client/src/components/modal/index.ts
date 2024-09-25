@@ -1,29 +1,39 @@
-import { type TOrdoHooks } from "@ordo-pink/maoka-ordo-hooks"
-import { create } from "@ordo-pink/maoka"
+import { type Observable, pairwise } from "rxjs"
+
+import { Ordo, ordo_context } from "@ordo-pink/maoka-ordo-hooks"
+import { Maoka } from "@ordo-pink/maoka"
+import { type TCreateFunctionContext } from "@ordo-pink/core"
+import { type TOption } from "@ordo-pink/option"
 
 import { Modal } from "./modal.component"
-import { type TModalHook } from "../../hooks/use-modal.hook"
 
-const div = create<TModalHook & TOrdoHooks>("div")
+export const ModalOverlay = (
+	$: Observable<TOption<Client.Modal.ModalPayload>>,
+	ctx: TCreateFunctionContext,
+) =>
+	Maoka.create("div", ({ use, refresh, on_unmount }) => {
+		use(ordo_context.provide(ctx))
 
-export const ModalOverlay = div(use => {
-	const commands = use.commands()
+		let modal_state: Client.Modal.ModalPayload | null = null
+		let unmount_prev_state: () => void = () => void 0
 
-	const { modal, prev_modal } = use.get_modal_state()
+		const commands = use(Ordo.Hooks.commands)
 
-	modal.unwrap()?.on_unmount?.()
+		const subscription = $.pipe(pairwise()).subscribe(([prev_state, state]) => {
+			modal_state = state.unwrap() ?? null
+			unmount_prev_state = prev_state.unwrap()?.on_unmount ?? (() => void 0)
+			refresh()
+		})
 
-	use.set_class(get_overlay_class(modal.is_some))
+		use(
+			Maoka.hooks.listen("onclick", event => {
+				if (!modal_state) return
+				event.stopPropagation()
+				unmount_prev_state()
+				commands.emit("cmd.application.modal.hide")
+			}),
+		)
 
-	use.event_listener("onclick", event => {
-		if (modal.is_none) return
-
-		event.stopPropagation()
-		prev_modal.unwrap()?.on_unmount?.()
-		commands.emit("cmd.application.modal.hide")
-	})
-
-	use.on_mount(() => {
 		const on_esc_key_press = (event: KeyboardEvent) => {
 			if (event.key !== "Escape") return
 
@@ -33,15 +43,19 @@ export const ModalOverlay = div(use => {
 
 		document.addEventListener("keydown", on_esc_key_press)
 
-		return () => {
+		on_unmount(() => {
+			subscription.unsubscribe()
 			document.removeEventListener("keydown", on_esc_key_press)
+		})
+
+		return () => {
+			use(Maoka.hooks.set_class(get_overlay_class(!!modal_state)))
+
+			return Modal(modal_state)
 		}
 	})
 
-	return Modal
-})
-
 const get_overlay_class = (is_visible: boolean) =>
 	is_visible
-		? "flex items-center justify-center h-[100dvh] w-[100dvw] fixed inset-0 z-[500] overflow-hidden p-4 bg-gradient-to-tr from-neutral-900/80 to-stone-900/80"
+		? "fixed inset-0 z-[500] backdrop-blur-sm flex h-screen w-screen items-center justify-center overflow-hidden bg-gradient-to-tr from-neutral-900/50 to-stone-900/50 p-4"
 		: "hidden"

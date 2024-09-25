@@ -13,7 +13,7 @@ export const SignIn = create("div", ({ use }) => {
 		),
 	)
 
-	return [SignInIcon, SignInText]
+	return () => [SignInIcon, SignInText]
 })
 
 const SignInIcon = create("div", ({ use }) => {
@@ -21,7 +21,7 @@ const SignInIcon = create("div", ({ use }) => {
 })
 
 const SignInText = create("div", ({ use }) => {
-	const translate = use(get_translations)
+	const { t } = use(get_translations)
 
-	return translate("t.auth.pages.sign_in.label")
+	return () => t("t.auth.pages.sign_in.label")
 })

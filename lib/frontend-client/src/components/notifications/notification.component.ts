@@ -16,20 +16,21 @@ export const Notification = ({ on_click, id, message, duration, icon, title, typ
 			use(listen("onclick", on_click))
 		}
 
-		return create("div", ({ use }) => {
-			use(
-				set_class(
-					"flex w-full max-w-lg items-center gap-x-4 rounded-lg px-4 py-2 shadow-sm",
-					get_card_class(type),
-				),
-			)
+		return () =>
+			create("div", ({ use }) => {
+				use(
+					set_class(
+						"flex w-full max-w-lg items-center gap-x-4 rounded-lg px-4 py-2 shadow-sm",
+						get_card_class(type),
+					),
+				)
 
-			return [
-				NotificationIcon({ icon, type }),
-				NotificationContent({ title, message }),
-				NotificationProgress({ id, duration, type }),
-				NotificationHideButton({ id, type }),
-			]
-		})
+				return () => [
+					NotificationIcon({ icon, type }),
+					NotificationContent({ title, message }),
+					NotificationProgress({ id, duration, type }),
+					NotificationHideButton({ id, type }),
+				]
+			})
 	})
 }

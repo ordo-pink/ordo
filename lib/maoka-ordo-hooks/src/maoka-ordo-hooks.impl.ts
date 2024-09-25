@@ -44,9 +44,7 @@ export const get_is_dev = ({ use }: TMaokaProps) => {
 
 export const get_logger = ({ use }: TMaokaProps) => {
 	const { get_logger } = use(ordo_context.consume)
-	const logger = use(computed("logger", get_logger))
-
-	return logger
+	return get_logger()
 }
 
 export const get_fetch = ({ use }: TMaokaProps) => {
@@ -126,10 +124,7 @@ export const get_is_authenticated = ({ use }: TMaokaProps) => {
 
 	return get_is_authenticated()
 		.pipe(R.ops.err_tap(logger.alert))
-		.cata({
-			Ok: $ => !!use(rx_subscription($, "is_authenticated", false, (a, b) => a !== b)),
-			Err: () => false,
-		})
+		.cata(R.catas.or_else(() => null as never))
 }
 
 export const get_metadata_query = ({ use }: TMaokaProps): TMetadataQuery => {
@@ -147,26 +142,22 @@ export const get_metadata_query = ({ use }: TMaokaProps): TMetadataQuery => {
 
 export const get_metadata_by_fsid =
 	(fsid?: string) =>
-	({ use, on_mount, refresh }: TMaokaProps) => {
+	({ use, refresh }: TMaokaProps) => {
 		const query = use(get_metadata_query)
 		const [metadata, set_metadata] = use(state<TMetadata | null>("metadata_by_fsid", null))
 
-		on_mount(() => {
-			const subscription = query.$.subscribe(() => {
-				const new_metadata = R.FromNullable(fsid)
-					.pipe(R.ops.chain(str => R.If(is_fsid(str), { T: () => str as FSID })))
-					.pipe(R.ops.chain(fsid => query.get_by_fsid(fsid)))
-					.pipe(R.ops.chain(metadata => R.FromNullable(metadata.unwrap())))
-					.cata(R.catas.or_else(() => null))
+		const subscription = query.$.subscribe(() => {
+			const new_metadata = R.FromNullable(fsid)
+				.pipe(R.ops.chain(str => R.If(is_fsid(str), { T: () => str as FSID })))
+				.pipe(R.ops.chain(fsid => query.get_by_fsid(fsid)))
+				.pipe(R.ops.chain(metadata => R.FromNullable(metadata.unwrap())))
+				.cata(R.catas.or_else(() => null))
 
-				if (metadata && new_metadata && metadata.equals(new_metadata))
-					return () => subscription.unsubscribe()
+			if (metadata && new_metadata && metadata.equals(new_metadata))
+				return () => subscription.unsubscribe()
 
-				set_metadata(() => new_metadata)
-				refresh()
-			})
-
-			return () => subscription.unsubscribe()
+			set_metadata(() => new_metadata)
+			refresh()
 		})
 
 		return metadata
@@ -174,29 +165,25 @@ export const get_metadata_by_fsid =
 
 export const get_metadata_children =
 	(fsid?: string) =>
-	({ use, on_mount }: TMaokaProps) => {
+	({ use }: TMaokaProps) => {
 		const query = use(get_metadata_query)
 		const [children, set_children] = use(state<TMetadata[]>("metadata_children", []))
 
-		on_mount(() => {
-			const subscription = query.$.subscribe(() => {
-				const new_children = R.FromNullable(fsid)
-					.pipe(R.ops.chain(str => R.If(is_fsid(str), { T: () => str as FSID })))
-					.pipe(R.ops.chain(fsid => query.get_children(fsid)))
-					.cata(R.catas.or_else(() => [] as TMetadata[]))
+		const subscription = query.$.subscribe(() => {
+			const new_children = R.FromNullable(fsid)
+				.pipe(R.ops.chain(str => R.If(is_fsid(str), { T: () => str as FSID })))
+				.pipe(R.ops.chain(fsid => query.get_children(fsid)))
+				.cata(R.catas.or_else(() => [] as TMetadata[]))
 
-				if (
-					!!children &&
-					!!new_children &&
-					children.length === new_children.length &&
-					children.reduce((acc, child, index) => acc && child.equals(new_children[index]), true)
-				)
-					return () => subscription.unsubscribe()
+			if (
+				!!children &&
+				!!new_children &&
+				children.length === new_children.length &&
+				children.reduce((acc, child, index) => acc && child.equals(new_children[index]), true)
+			)
+				return () => subscription.unsubscribe()
 
-				set_children(() => new_children)
-			})
-
-			return () => subscription.unsubscribe()
+			set_children(() => new_children)
 		})
 
 		return children
@@ -204,110 +191,102 @@ export const get_metadata_children =
 
 export const get_metadata_ancestors =
 	(fsid?: string) =>
-	({ use, on_mount }: TMaokaProps) => {
+	({ use }: TMaokaProps) => {
 		const query = use(get_metadata_query)
 		const [ancestors, set_ancestors] = use(state<TMetadata[]>("metadata_ancestors", []))
 
-		on_mount(() => {
-			const subscription = query.$.subscribe(() => {
-				const new_children = R.FromNullable(fsid)
-					.pipe(R.ops.chain(str => R.If(is_fsid(str), { T: () => str as FSID })))
-					.pipe(R.ops.chain(fsid => query.get_ancestors(fsid)))
-					.cata(R.catas.or_else(() => [] as TMetadata[]))
+		const subscription = query.$.subscribe(() => {
+			const new_children = R.FromNullable(fsid)
+				.pipe(R.ops.chain(str => R.If(is_fsid(str), { T: () => str as FSID })))
+				.pipe(R.ops.chain(fsid => query.get_ancestors(fsid)))
+				.cata(R.catas.or_else(() => [] as TMetadata[]))
 
-				if (
-					!!ancestors &&
-					!!new_children &&
-					ancestors.length === new_children.length &&
-					ancestors.reduce((acc, child, index) => acc && child.equals(new_children[index]), true)
-				)
-					return () => subscription.unsubscribe()
+			if (
+				!!ancestors &&
+				!!new_children &&
+				ancestors.length === new_children.length &&
+				ancestors.reduce((acc, child, index) => acc && child.equals(new_children[index]), true)
+			)
+				return () => subscription.unsubscribe()
 
-				set_ancestors(() => new_children)
-			})
-
-			return () => subscription.unsubscribe()
+			set_ancestors(() => new_children)
 		})
 
 		return ancestors
 	}
 
-export const get_translations = ({ use }: TMaokaProps) => {
+export const get_translations = ({ use, refresh }: TMaokaProps) => {
 	const { get_translations, translate } = use(ordo_context.consume)
-	const translations$ = use(computed("translations", get_translations))
+	const $ = get_translations()
 
-	const translations_subscription = rx_subscription(
-		translations$,
-		"translations_version",
-		O.None(),
-		(prev, next) =>
-			Switch.OfTrue()
-				.case(prev.is_none && next.is_none, F)
-				.case(prev.is_none && next.is_some, T)
-				.case(prev.is_some && next.is_none, T)
-				.default(() => equals(prev.unwrap(), next.unwrap())),
-	)
+	use(subscription($, refresh))
 
-	use(translations_subscription)
-
-	return translate
+	return { t: translate }
 }
 
 export const get_current_route = ({ use }: TMaokaProps) => {
 	const { get_current_route } = use(ordo_context.consume)
 	const logger = use(get_logger)
 
-	const get_current_route_unwrapped = () =>
-		get_current_route()
-			.pipe(R.ops.err_tap(logger.alert))
-			.cata(R.catas.or_else(() => null as never))
+	const state: Record<"route", Client.Router.Route | null> = { route: null }
 
-	const current_route$ = use(computed("current_route$", get_current_route_unwrapped))
+	const $ = get_current_route()
+		.pipe(R.ops.err_tap(logger.alert))
+		.cata(R.catas.or_else(() => null as never))
 
-	const current_route_subscription = rx_subscription(
-		current_route$,
-		"current_route",
-		O.None(),
-		(prev, next) =>
-			Switch.OfTrue()
-				.case(prev.is_none && next.is_none, F)
-				.case(prev.is_none && next.is_some, T)
-				.case(prev.is_some && next.is_none, T)
-				.default(() => {
-					const prev_unwrapped = prev.unwrap()
-					const next_unwrapped = next.unwrap()
+	return use(
+		subscription($, new_route => {
+			const new_route_unwrapped = new_route.unwrap()
 
-					return (
-						prev_unwrapped?.path !== next_unwrapped?.path ||
-						!equals(prev_unwrapped?.params, next_unwrapped?.params)
-					)
-				}),
+			const should_update = Switch.OfTrue()
+				.case(!!state.route && new_route.is_none, F)
+				.case(!!state.route && new_route.is_some, T)
+				.case(!!state.route && new_route.is_none, T)
+				.default(
+					() =>
+						state.route?.path !== new_route_unwrapped?.path ||
+						!equals(state.route?.params, new_route_unwrapped?.params),
+				)
+
+			if (should_update) {
+				state.route = new_route_unwrapped ?? null
+			}
+
+			return state.route
+		}),
 	)
-
-	const current_route = use(current_route_subscription)
-
-	return current_route.unwrap()
 }
 
 // TODO: Drop usage of silkrouter
-export const get_route_params = <$TExpectedParams extends string>({
-	use,
-}: TMaokaProps): Record<$TExpectedParams, string | undefined> => {
-	const route = use(get_current_route)
+export const get_route_params = ({ use, refresh }: TMaokaProps) => {
+	const { get_current_route } = use(ordo_context.consume)
+	const logger = use(get_logger)
 
-	return R.FromNullable(route)
-		.pipe(R.ops.chain(route => R.FromNullable(route.params)))
-		.cata({
-			Err: () => ({}) as Record<$TExpectedParams, string | undefined>,
-			Ok: params =>
-				keys_of(params).reduce(
+	const state: Record<"value", Record<string, string | undefined>> = { value: {} }
+
+	const $ = get_current_route()
+		.pipe(R.ops.err_tap(logger.alert))
+		.cata(R.catas.or_else(() => null as never))
+
+	use(
+		subscription($, new_route => {
+			const new_route_unwrapped = new_route.unwrap()
+
+			if (!equals(state.value, new_route_unwrapped?.params ?? {})) {
+				const params = new_route_unwrapped?.params ?? {}
+				state.value = keys_of(params).reduce(
 					(acc, key) => ({
 						...acc,
 						[key]: params[key] ? decodeURIComponent((params as any)[key]) : void 0,
 					}),
-					{} as Record<$TExpectedParams, string | undefined>,
-				),
-		})
+					{} as Record<string, string | undefined>,
+				)
+				refresh()
+			}
+		}),
+	)
+
+	return state
 }
 
 const component_state = new Map<string, Map<string, any>>()
@@ -315,22 +294,17 @@ const component_state = new Map<string, Map<string, any>>()
 export const state =
 	<$TValue>(key: string, initial_value?: $TValue) =>
 	({
-		get_internal_id,
-		on_mount,
+		internal_id,
+		on_unmount,
+		refresh,
 	}: TMaokaProps): [$TValue, (callback: (previous_value: $TValue) => $TValue) => void] => {
-		const id = get_internal_id()
+		if (!component_state.has(internal_id)) component_state.set(internal_id, new Map())
+		const cs = component_state.get(internal_id)!
+		if (!cs.has(key)) cs.set(key, initial_value)
 
-		on_mount(() => {
-			if (!component_state.has(id)) component_state.set(id, new Map())
-			const cs = component_state.get(id)!
-			if (!cs.has(key)) cs.set(key, initial_value)
+		on_unmount(() => component_state.delete(internal_id))
 
-			return () => {
-				component_state.delete(id)
-			}
-		})
-
-		const value = component_state.get(id)?.get(key) ?? initial_value
+		const value = component_state.get(internal_id)?.get(key) ?? initial_value
 
 		return [
 			value,
@@ -338,7 +312,8 @@ export const state =
 				const increment = new_value_creator(value)
 				if (equals(increment, value)) return
 
-				component_state.get(id)?.set(key, increment)
+				component_state.get(internal_id)?.set(key, increment)
+				refresh()
 			},
 		]
 	}
@@ -368,26 +343,44 @@ export const computed =
 		return value
 	}
 
+export const subscription =
+	<$TValue, $TTransformedValue>(
+		$: Observable<$TValue>,
+		f: (value: $TValue) => $TTransformedValue,
+		initial_value = void 0,
+	) =>
+	({ on_unmount, refresh }: TMaokaProps) => {
+		const state: Record<"value", $TTransformedValue | undefined> = { value: initial_value }
+
+		const subscription = $.subscribe(x => {
+			const new_value = f(x)
+
+			if (!equals(state.value, new_value)) {
+				state.value = new_value
+				refresh()
+			}
+		})
+
+		on_unmount(() => subscription.unsubscribe())
+
+		return state
+	}
+
 export const rx_subscription = <$TValue>(
 	$: Observable<$TValue>,
 	key: string, // TODO: Drop key
 	initial_value?: $TValue,
 	should_update: (prev: $TValue, next: $TValue) => boolean = () => true,
 ) => {
-	return ({ on_mount, use }: TMaokaProps): $TValue => {
+	return ({ on_unmount, use }: TMaokaProps): $TValue => {
 		const [value, set_value] = use(state(key, initial_value))
 
-		on_mount(() => {
-			const subscription = $.subscribe(new_value => {
-				if (!should_update(value, new_value)) return () => subscription.unsubscribe()
-
-				set_value(() => new_value)
-			})
-
-			return () => {
-				subscription.unsubscribe()
-			}
+		const subscription = $.subscribe(new_value => {
+			if (!should_update(value, new_value)) return () => subscription.unsubscribe()
+			set_value(() => new_value)
 		})
+
+		on_unmount(() => subscription.unsubscribe())
 
 		return value
 	}

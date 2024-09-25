@@ -62,6 +62,7 @@ export default create_function(
 			"cmd.application.command_palette.show",
 			"cmd.application.command_palette.hide",
 			"cmd.data.metadata.set_property",
+			"cmd.application.notification.show",
 		],
 		queries: ["data.metadata_query", "application.current_route", "users.users_query"],
 	},

@@ -1,4 +1,4 @@
-import { type TChildren, create, listen, set_class, set_inner_html } from "@ordo-pink/maoka"
+import { type TMaokaChildren, create, listen, set_class, set_inner_html } from "@ordo-pink/maoka"
 import { get_commands, get_translations, ordo_context } from "@ordo-pink/maoka-ordo-hooks"
 import { BS_FILE_EARMARK_X } from "@ordo-pink/frontend-icons"
 import { type FSID } from "@ordo-pink/data"
@@ -28,7 +28,7 @@ export const RemoveFileModal = (ctx: TCreateFunctionContext, fsid: FSID) =>
 		]
 	})
 
-const Header = (children: TChildren) =>
+const Header = (children: TMaokaChildren) =>
 	create("div", ({ use }) => {
 		use(set_class("flex gap-x-2 items-center"))
 		return children
@@ -36,15 +36,15 @@ const Header = (children: TChildren) =>
 
 const TitleIcon = create("div", ({ use }) => use(set_inner_html(BS_FILE_EARMARK_X)))
 
-const Title = (children: TChildren) =>
+const Title = (children: TMaokaChildren) =>
 	create("h2", ({ use }) => {
 		use(set_class("text-lg"))
 		return children
 	})
 
-const Body = (children: TChildren) => create("div", () => children)
+const Body = (children: TMaokaChildren) => create("div", () => children)
 
-const Footer = (children: TChildren) =>
+const Footer = (children: TMaokaChildren) =>
 	create("div", ({ use }) => {
 		use(set_class("flex justify-end items-center gap-x-2"))
 

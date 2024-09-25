@@ -1,5 +1,5 @@
 import {
-	type TChildren,
+	type TMaokaChildren,
 	create,
 	listen,
 	set_attribute,
@@ -44,7 +44,7 @@ export const RenameFileModal = (ctx: TCreateFunctionContext, fsid: FSID) =>
 		]
 	})
 
-const Header = (children: TChildren) =>
+const Header = (children: TMaokaChildren) =>
 	create("div", ({ use }) => {
 		use(set_class("flex gap-x-2 items-center"))
 		return children
@@ -52,13 +52,13 @@ const Header = (children: TChildren) =>
 
 const TitleIcon = create("div", ({ use }) => use(set_inner_html(BS_FILE_EARMARK_RICHTEXT)))
 
-const Title = (children: TChildren) =>
+const Title = (children: TMaokaChildren) =>
 	create("h2", ({ use }) => {
 		use(set_class("text-lg"))
 		return children
 	})
 
-const Body = (children: TChildren) => create("div", () => children)
+const Body = (children: TMaokaChildren) => create("div", () => children)
 
 const CreateFileModalInput = (initial_value: string, on_change: (event: Event) => void) =>
 	create("label", () => {
@@ -84,7 +84,7 @@ const CreateFileModalInput = (initial_value: string, on_change: (event: Event) =
 		]
 	})
 
-const Footer = (children: TChildren) =>
+const Footer = (children: TMaokaChildren) =>
 	create("div", ({ use }) => {
 		use(set_class("flex justify-end items-center gap-x-2"))
 

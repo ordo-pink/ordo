@@ -28,4 +28,5 @@ export const enum BackgroundTaskStatus {
 	NONE,
 	SAVING,
 	LOADING,
+	length,
 }

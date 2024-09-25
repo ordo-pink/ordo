@@ -2,12 +2,7 @@
 // SPDX-License-Identifier: Unlicense
 
 // TODO: Comments
-// TODO: Intermediate types for HTMLElement and Text
 // TODO: Full types
-export type TMaokaAttributes<
-	$TCustomAttributes extends Record<string, unknown> = Record<string, unknown>,
-> = $TCustomAttributes & Partial<TMaokaElement> & { inner_html?: string }
-
 export type TMaokaElement = { [$TKey in keyof HTMLElement]: HTMLElement[$TKey] } & {
 	setAttribute: (...params: Parameters<HTMLElement["setAttribute"]>) => void
 	appendChild: (child: TMaokaElement | string) => void
@@ -17,8 +12,6 @@ export type TMaokaElement = { [$TKey in keyof HTMLElement]: HTMLElement[$TKey] }
 export type TMaokaText = Partial<{ [$TKey in keyof Text]: Text[$TKey] }> | string
 
 export type TMaokaCreateComponentFn = (callback?: TMaokaCallback) => TMaokaCreateComponentImplFn
-
-export type TMaokaCreateFn = (tag: string) => TMaokaCreateComponentFn
 
 export type TMaokaCreateComponentImplFn<
 	$TElement extends TMaokaElement = TMaokaElement,
@@ -38,14 +31,20 @@ export type TMaokaHook<T = void> = (props: TMaokaProps) => T
  * the child is undefined, it will not be rendered as a child but the changes made with the hooks
  * will be applied.
  */
-export type TChild = SVGSVGElement | HTMLElement | string | void | TMaokaCreateComponentImplFn
+export type TMaokaChild =
+	| SVGSVGElement
+	| HTMLElement
+	| string
+	| undefined
+	| void
+	| TMaokaCreateComponentImplFn
 
 /**
  * TChildren is an expected return type of a Maoka callback.
  *
- * @see TChild
+ * @see TMaokaChild
  */
-export type TChildren = TChild | TChild[]
+export type TMaokaChildren = TMaokaChild | TMaokaChild[]
 
 /**
  * Supplementary type that checks whether provided string does not contain spaces.
@@ -77,23 +76,14 @@ export type TMaokaProps<$TElement extends TMaokaElement = TMaokaElement> = {
 	 */
 	refresh: () => void
 
-	/**
-	 * Registers a function that should be executed when the component is mounted into the DOM. If
-	 * provided function returns a function - the returned function will be executed when the
-	 * component is unmounted from the DOM. Maoka components may have multiple functions registerred
-	 * with `on_mount`. The functions registerred via `on_mount` may be sync or async, but Maoka does
-	 * not await for the result to be completed.
-	 */
-	on_mount: TMaokaOnMountFn
+	on_unmount: TMaokaOnUnountFn
 
 	on_refresh: TMaokaOnRefreshFn
 
 	use: <_TResult>(hook: (ctx: TMaokaProps) => _TResult) => _TResult
 }
 
-export type TMaokaOnMountFn = (
-	f: (() => void | Promise<void>) | (() => () => void | Promise<void>),
-) => void
+export type TMaokaOnUnountFn = (f: () => void) => void
 
 export type TMaokaOnRefreshFn = (f: () => boolean | void) => void
 
@@ -102,8 +92,8 @@ export type TMaokaOnRefreshFn = (f: () => boolean | void) => void
  * hooks available within the execution context of current Maoka root. If the callback does not
  * return, the Maoka component will be rendered without children.
  *
- * @see TChildren
+ * @see TMaokaChildren
  */
-export type TMaokaCallback = (props: TMaokaProps) => (() => TChildren) | undefined
+export type TMaokaCallback = (props: TMaokaProps) => (() => TMaokaChildren) | undefined | void
 
 export type TMaokaRenderDOMFn = (root: HTMLElement, component: TMaokaCreateComponentImplFn) => void

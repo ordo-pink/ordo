@@ -1,14 +1,25 @@
-import { get_is_authenticated, ordo_context } from "@ordo-pink/maoka-ordo-hooks"
+import { OrdoHooks, ordo_context } from "@ordo-pink/maoka-ordo-hooks"
+import { Maoka } from "@ordo-pink/maoka"
 import { type TCreateFunctionContext } from "@ordo-pink/core"
-import { create } from "@ordo-pink/maoka"
 
 import { SignIn } from "./status-bar-sign-in.component"
 import { User } from "./status-bar-user.component"
 
 export const StatusBarAuth = (ctx: TCreateFunctionContext) =>
-	create("div", ({ use }) => {
-		use(ordo_context.provide(ctx))
-		const is_authenticated = use(get_is_authenticated)
+	Maoka.create("div", ({ use, refresh, on_unmount }) => {
+		let is_authenticated = false
 
-		return is_authenticated ? User : SignIn
+		use(ordo_context.provide(ctx))
+		const is_autheticated$ = use(OrdoHooks.is_authenticated)
+
+		const sub = is_autheticated$.subscribe(value => {
+			if (is_authenticated === value) return
+
+			is_authenticated = value
+			refresh()
+		})
+
+		on_unmount(() => sub.unsubscribe())
+
+		return () => (is_authenticated ? User : SignIn)
 	})

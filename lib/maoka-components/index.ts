@@ -17,5 +17,7 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-export * from "./src/link/link.component"
+export * from "./src/common/link.component"
 export * from "./src/metadata/icon.component"
+export * from "./src/common/loading-text.component"
+export * from "./src/user/user-reference.component"

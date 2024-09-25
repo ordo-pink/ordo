@@ -1,10 +1,9 @@
-import { Observable } from "rxjs"
-import { equals } from "ramda"
+import { type Observable } from "rxjs"
 
-import { O, type TOption } from "@ordo-pink/option"
-import { create, listen, set_class } from "@ordo-pink/maoka"
-import { get_commands, ordo_context, rx_subscription } from "@ordo-pink/maoka-ordo-hooks"
+import { OrdoHooks, ordo_context } from "@ordo-pink/maoka-ordo-hooks"
+import { Maoka } from "@ordo-pink/maoka"
 import { type TCreateFunctionContext } from "@ordo-pink/core"
+import { type TOption } from "@ordo-pink/option"
 
 import { ActivityBarLink } from "./activity-bar-link.component"
 
@@ -13,36 +12,54 @@ export const ActivityBar = (
 	current_activity$: Observable<TOption<Functions.Activity>>,
 	activities$: Observable<Functions.Activity[]>,
 ) =>
-	create("div", ({ use }) => {
+	Maoka.create("div", ({ use, refresh }) => {
+		let current_activity: Functions.Activity | null = null
+		let activities: Functions.Activity[] = []
+
 		use(ordo_context.provide(ctx))
-		use(set_class("h-full flex flex-col space-y-4 items-center justify-center"))
-		use(
-			listen("oncontextmenu", event => {
-				event.preventDefault()
-				commands.emit("cmd.application.context_menu.show", { event: event as any })
-			}),
-		)
 
-		const activities = use(rx_subscription(activities$, "activities", [], (a, b) => !equals(a, b)))
-		const current_activity = use(
-			rx_subscription(
-				current_activity$,
-				"current_activity",
-				O.None(),
-				(a, b) => a.is_none !== b.is_none || a.unwrap()?.name !== b.unwrap()?.name,
-			),
-		).unwrap()
-		const commands = use(get_commands)
+		const { emit } = use(OrdoHooks.commands)
 
-		return activities.map(
-			({ name, routes, default_route, render_icon }) =>
-				render_icon &&
-				ActivityBarLink({
-					name,
-					routes,
-					default_route,
-					render_icon,
-					current_activity: current_activity?.name,
-				}),
-		)
+		const handle_activities_update = (new_activities: Functions.Activity[]) => {
+			if (new_activities.length !== activities.length) {
+				activities = new_activities
+				refresh()
+			}
+		}
+
+		const handle_current_activity_update = (new_activity_option: TOption<Functions.Activity>) => {
+			const new_activity = new_activity_option.unwrap() ?? null
+
+			if (current_activity?.name !== new_activity?.name) {
+				current_activity = new_activity
+				refresh()
+			}
+		}
+
+		use(Maoka.hooks.set_class(activity_bar_class))
+		use(Maoka.hooks.listen("oncontextmenu", handle_context_menu(emit)))
+		use(OrdoHooks.subscription(activities$, handle_activities_update))
+		use(OrdoHooks.subscription(current_activity$, handle_current_activity_update))
+
+		return () =>
+			activities.map(
+				({ name, routes, default_route, render_icon }) =>
+					render_icon &&
+					ActivityBarLink({
+						name,
+						routes,
+						default_route,
+						render_icon,
+						current_activity: current_activity?.name,
+					}),
+			)
 	})
+
+// --- Internal ---
+
+const activity_bar_class = "h-full flex flex-col space-y-4 items-center justify-center"
+
+const handle_context_menu = (emit: Client.Commands.Commands["emit"]) => (event: MouseEvent) => {
+	event.preventDefault()
+	emit("cmd.application.context_menu.show", { event: event as any })
+}

@@ -19,11 +19,10 @@
 
 import { O } from "@ordo-pink/option"
 
-import { MetadataValidations } from "./metadata-validations"
-import { type TMetadataStatic } from "./metadata.types"
-import { Switch } from "@ordo-pink/switch"
 import { F } from "@ordo-pink/tau"
-import { equals } from "ramda"
+import { MetadataValidations } from "./metadata-validations"
+import { Switch } from "@ordo-pink/switch"
+import { type TMetadataStatic } from "./metadata.types"
 
 export const Metadata: TMetadataStatic = {
 	from: ({
@@ -82,7 +81,9 @@ export const Metadata: TMetadataStatic = {
 
 			return Switch.OfTrue()
 				.case(o_dto.fsid !== dto.fsid, F)
-				.default(() => equals(o_dto, dto))
+				.case(o_dto.updated_at !== dto.updated_at, F)
+				.case(o_dto.updated_by !== dto.updated_by, F)
+				.default(() => o_dto === dto)
 		},
 	}),
 	Validations: MetadataValidations,

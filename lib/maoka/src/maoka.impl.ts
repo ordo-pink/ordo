@@ -14,7 +14,7 @@ export const create =
 	<$TElement extends T.TMaokaElement = T.TMaokaElement, $TText extends T.TMaokaText = T.TMaokaText>(
 		name: string,
 		callback?: T.TMaokaCallback,
-	) =>
+	): T.TMaokaCreateComponentImplFn<$TElement, $TText> =>
 	(
 		create_element: (name: string) => $TElement,
 		create_text: (text: string) => $TText,
@@ -22,9 +22,12 @@ export const create =
 	) => {
 		const internal_id = crypto.randomUUID()
 		const on = {
-			mount: [] as Parameters<T.TMaokaOnMountFn>[0][],
+			unmount: [] as Parameters<T.TMaokaOnUnountFn>[0][],
 			refresh: [] as Parameters<T.TMaokaOnRefreshFn>[0][],
 		}
+
+		// eslint-disable-next-line
+		let children_fn: ReturnType<T.TMaokaCallback>
 
 		const props: T.TMaokaProps = {
 			get internal_id() {
@@ -38,62 +41,56 @@ export const create =
 			},
 			use: f => f(props),
 			refresh: () => {
-				const after_refresh = on.refresh.map(f => f())
-
-				if (callback) {
-					const children_fn = callback(props)
-					if (!children_fn) return
-
-					let children = children_fn()
-
-					if (!is_array(children)) {
-						children = [is_fn(children) ? children(create_element, create_text, root_id) : children]
-					}
-
-					const nodes = children.reduce(
-						(acc, child) => {
-							const node = is_fn(child) ? child(create_element, create_text, root_id) : child
-							return node ? acc.concat(node) : acc
-						},
-						[] as (SVGSVGElement | HTMLElement | string)[],
-					)
-
-					// requestAnimationFrame
-					element.replaceChildren(...nodes)
+				// TODO: Check intersection
+				for (let i = 0; i < on.refresh.length; i++) {
+					on.refresh[i]()
 				}
 
-				void after_refresh.map(f => is_fn(f) && f())
+				if (!callback || !children_fn) {
+					return
+				}
+
+				let children = children_fn()
+
+				if (!is_array(children))
+					children = [is_fn(children) ? children(create_element, create_text, root_id) : children]
+
+				const nodes = children.reduce(
+					(acc, child) => {
+						const node = is_fn(child) ? child(create_element, create_text, root_id) : child
+						return node ? acc.concat(node) : acc
+					},
+					[] as (SVGSVGElement | HTMLElement | string)[],
+				)
+
+				// requestAnimationFrame
+				element.replaceChildren(...nodes)
 			},
-			on_mount: f => void on.mount.push(f),
+			on_unmount: f => void on.unmount.push(f),
 			on_refresh: f => void on.refresh.push(f),
 		} as T.TMaokaProps
 
 		const element = create_element(name)
+		element.onunmount = on.unmount
 
-		if (callback) {
-			let children = callback(props)
+		if (!callback) return element
 
-			if (children) {
-				if (!is_array(children))
-					children = [is_fn(children) ? children(create_element, create_text, root_id) : children]
+		children_fn = callback(props)
+		if (!children_fn) return element
 
-				requestAnimationFrame(() => {
-					;(children as T.TChild[]).forEach(child => {
-						const node = is_fn(child) ? child(create_element, create_text, root_id) : child
+		let children = children_fn()
+		if (!children) return element
 
-						if (!node) return
+		if (!is_array(children))
+			children = [is_fn(children) ? children(create_element, create_text, root_id) : children]
 
-						element.appendChild(is_string(node) ? (create_text(node) as Text) : node)
-					})
-				})
-			}
-		}
+		children.forEach(child => {
+			const node = is_fn(child) ? child(create_element, create_text, root_id) : child
 
-		const on_unmount = on.mount.map(f => f()).filter(f => is_fn(f)) as (() => void)[]
+			if (!node) return
 
-		if (on_unmount.length) {
-			element.onunmount = on_unmount
-		}
+			element.appendChild(is_string(node) ? (create_text(node) as Text) : node)
+		})
 
 		return element
 	}
@@ -111,7 +108,8 @@ export const render_dom: T.TMaokaRenderDOMFn = (root, component) => {
 		for (const record of records) {
 			const removed_nodes = record.removedNodes as unknown as T.TMaokaElement[]
 
-			for (const element of removed_nodes) {
+			for (let i = 0; i < removed_nodes.length; i++) {
+				const element = removed_nodes[i]
 				if (is_array(element.onunmount)) element.onunmount.forEach(f => f())
 			}
 		}

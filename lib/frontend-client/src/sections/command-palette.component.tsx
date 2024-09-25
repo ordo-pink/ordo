@@ -59,12 +59,7 @@ export default function CommandPaletteModal({
 	const [suggested_items, set_suggested_items] = useState<Client.CommandPalette.Item[]>([])
 
 	useEffect(() => {
-		fuse.setCollection(
-			all_items.map(item => ({
-				...item,
-				translation: translate(item.readable_name) ?? item.readable_name,
-			})),
-		)
+		fuse.setCollection(all_items.map(item => ({ ...item })))
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [all_items, translate])
 
@@ -72,7 +67,7 @@ export default function CommandPaletteModal({
 		if (!all_items) return
 
 		if (input_value === "") {
-			set_suggested_items(all_items)
+			set_suggested_items(all_items.slice(0, 20))
 
 			if (all_items.length - 1 < current_index && pointer_location === "suggested") {
 				set_current_index(all_items.length > 0 ? all_items.length - 1 : 0)
@@ -81,7 +76,7 @@ export default function CommandPaletteModal({
 			return
 		}
 
-		const fused_items = fuse.search(input_value)
+		const fused_items = fuse.search(input_value).slice(0, 20)
 
 		set_suggested_items(fused_items.map(({ item }) => item))
 
@@ -347,7 +342,6 @@ const Item = ({
 }: TItemP) => {
 	use$.accelerator(accelerator, on_select)
 	const translate = use$.translation()
-
 	const t_readable_name = translate(readable_name) ?? readable_name
 
 	return (
@@ -367,6 +361,6 @@ const Item = ({
 // --- Internal ---
 
 const fuse = new Fuse([] as Client.CommandPalette.Item[], {
-	keys: ["translation"],
+	keys: ["readable_name"],
 	threshold: 0.3,
 })

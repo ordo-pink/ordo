@@ -22,7 +22,10 @@ import {
 	get_user_query,
 	rx_subscription,
 	state,
+	subscription,
 } from "./src/maoka-ordo-hooks.impl"
+import { Result } from "@ordo-pink/result"
+import { keys_of } from "@ordo-pink/tau"
 
 export const OrdoHooks = {
 	commands: get_commands,
@@ -37,6 +40,7 @@ export const OrdoHooks = {
 	translations: get_translations,
 	user_query: get_user_query,
 	rx_subscription,
+	subscription,
 	current_file_association: get_current_file_association,
 	file_associations: get_file_associations,
 	computed,
@@ -45,5 +49,25 @@ export const OrdoHooks = {
 		by_fsid: get_metadata_by_fsid,
 		ancestors: get_metadata_ancestors,
 		children: get_metadata_children,
+	},
+}
+
+export const Ordo = {
+	Hooks: OrdoHooks,
+	Ops: {
+		get_route_params: (route: Client.Router.Route | null) =>
+			Result.FromNullable(route)
+				.pipe(Result.ops.chain(route => Result.FromNullable(route.params)))
+				.pipe(
+					Result.ops.map(params =>
+						keys_of(params).reduce(
+							(acc, key) => ({
+								...acc,
+								[key]: params[key] ? decodeURIComponent((params as any)[key]) : void 0,
+							}),
+							{} as Record<string, string | undefined>,
+						),
+					),
+				),
 	},
 }

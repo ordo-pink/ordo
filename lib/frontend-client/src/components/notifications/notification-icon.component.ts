@@ -1,10 +1,14 @@
 import * as Icons from "@ordo-pink/frontend-icons"
-import { create, set_inner_html } from "@ordo-pink/maoka"
+import { Maoka } from "@ordo-pink/maoka"
 import { Switch } from "@ordo-pink/switch"
 
 type P = Pick<Client.Notification.Item, "icon" | "type">
 export const NotificationIcon = ({ icon, type }: P) =>
-	create("div", ({ use }) => use(set_inner_html(icon ? icon : get_default_icon(type))))
+	Maoka.create("div", ({ use }) => {
+		const Icon = icon ? icon : get_default_icon(type)
+
+		use(Maoka.hooks.set_inner_html(Icon))
+	})
 
 const get_default_icon = (type: Client.Notification.Item["type"]) =>
 	Switch.Match(type)

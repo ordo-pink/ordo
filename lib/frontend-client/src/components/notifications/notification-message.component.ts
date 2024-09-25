@@ -1,4 +1,4 @@
-import { create } from "@ordo-pink/maoka"
+import { Maoka } from "@ordo-pink/maoka"
 
 type P = Pick<Client.Notification.Item, "message">
-export const NotificationMessage = ({ message }: P) => create("p", () => message)
+export const NotificationMessage = ({ message }: P) => Maoka.create("p", () => () => message)

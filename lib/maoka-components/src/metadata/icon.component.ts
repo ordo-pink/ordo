@@ -1,6 +1,6 @@
 import { BsFileEarmark, BsFileEarmarkBinary, BsFolderOpen } from "@ordo-pink/frontend-icons"
+import { Ordo, OrdoHooks } from "@ordo-pink/maoka-ordo-hooks"
 import { Maoka } from "@ordo-pink/maoka"
-import { OrdoHooks } from "@ordo-pink/maoka-ordo-hooks"
 import { R } from "@ordo-pink/result"
 import { Switch } from "@ordo-pink/switch"
 import { type TMetadata } from "@ordo-pink/data"
@@ -73,14 +73,26 @@ export const MetadataIcon = ({ metadata, custom_class = "" }: P) =>
 
 type P2 = P & { has_children: boolean }
 const Icon = ({ metadata, custom_class, has_children }: P2) =>
-	Maoka.create("div", () => {
-		// const file_associations = use(OrdoHooks.file_associations)
-		// const metadata_file_association = file_associations.find(association =>
-		// 	association.content_type.includes(metadata.get_type()),
-		// )
+	Maoka.create("div", ({ use, refresh, on_unmount, current_element }) => {
+		let file_associations: Functions.FileAssociation[] = []
+
+		const file_associations$ = use(Ordo.Hooks.file_associations)
+
+		const subscription = file_associations$.subscribe(value => {
+			file_associations = value
+			refresh()
+		})
+
+		on_unmount(() => subscription.unsubscribe())
+
+		const metadata_content_type = metadata.get_type()
+		const fa = file_associations.find(association =>
+			association.types.some(type => metadata_content_type === type.name),
+		)
 
 		return () =>
 			Switch.OfTrue()
+				.case(!!fa && !!fa.render_icon, () => fa!.render_icon!(current_element))
 				.case(has_children, () => BsFolderOpen(`ml-1 shrink-0 ${custom_class}`))
 				.case(metadata.get_size() === 0, () => BsFileEarmark(`ml-1 shrink-0 ${custom_class}`))
 				// TODO:  Render FileAssociation icon :: .case(!!metadata_file_association, () => )

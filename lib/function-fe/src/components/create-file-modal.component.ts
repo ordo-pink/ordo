@@ -1,6 +1,7 @@
 import { Maoka, type TMaokaChildren } from "@ordo-pink/maoka"
-import { get_commands, get_translations, ordo_context } from "@ordo-pink/maoka-ordo-hooks"
+import { Ordo, ordo_context } from "@ordo-pink/maoka-ordo-hooks"
 import { BS_FILE_EARMARK_PLUS } from "@ordo-pink/frontend-icons"
+import { BsFileEarmarkPlus } from "@ordo-pink/frontend-icons"
 import { type FSID } from "@ordo-pink/data"
 import { Result } from "@ordo-pink/result"
 import { Switch } from "@ordo-pink/switch"
@@ -8,11 +9,13 @@ import { type TCreateFunctionContext } from "@ordo-pink/core"
 
 export const CreateFileModal = (ctx: TCreateFunctionContext, parent: FSID | null = null) =>
 	Maoka.create("div", ({ use }) => {
+		let type = "text/ordo"
+
 		use(ordo_context.provide(ctx))
 		use(Maoka.hooks.set_class("p-4 w-96 flex flex-col gap-y-2"))
 
-		const { t } = use(get_translations)
-		const commands = use(get_commands)
+		const { t } = use(Ordo.Hooks.translations)
+		const commands = use(Ordo.Hooks.commands)
 
 		// TODO: Drop requirement for author_id when creating a file
 		const author_id = "asdf-adsf-asdf-asdf-asdf"
@@ -22,12 +25,17 @@ export const CreateFileModal = (ctx: TCreateFunctionContext, parent: FSID | null
 
 		return () => [
 			Header([TitleIcon, Title(t_title)]),
-			Body([CreateFileModalInput(event => void (state.name = (event.target as any).value))]),
+			Body([
+				CreateFileModalInput(event => void (state.name = (event.target as any).value)),
+				FileAssociationSelector((fa, selected_type) => {
+					type = selected_type
+				}),
+			]),
 			Footer([
 				CancelBtn,
 				OkBtn(() => {
 					commands.emit("cmd.application.modal.hide")
-					commands.emit("cmd.data.metadata.create", { name: state.name, author_id, parent })
+					commands.emit("cmd.data.metadata.create", { name: state.name, author_id, parent, type })
 				}),
 			]),
 		]
@@ -51,17 +59,133 @@ const Title = (children: TMaokaChildren) =>
 
 const Body = (children: TMaokaChildren) => Maoka.create("div", () => () => children)
 
+// TODO Extract select
+// TODO Add caret showing expanded-contracted status
+const FileAssociationSelector = (
+	on_select_type: (file_association: Functions.FileAssociation, type: string) => void,
+) =>
+	Maoka.create("div", ({ use, refresh, on_unmount }) => {
+		const select_class =
+			"relative bg-neutral-200 dark:bg-neutral-600 rounded-md mt-2 cursor-pointer"
+
+		let current_file_association: Functions.FileAssociation | null = null
+		let current_type_index = 0
+		let file_associations: Functions.FileAssociation[] = []
+		let is_expanded = false
+
+		use(Maoka.hooks.set_class(select_class))
+
+		const file_associations$ = use(Ordo.Hooks.file_associations)
+
+		const handle_item_click = (fa: Functions.FileAssociation, type: string) => {
+			is_expanded = !is_expanded
+			current_file_association = fa
+			current_type_index = fa.types.findIndex(t => t.name === type)
+			on_select_type(fa, type)
+			refresh()
+		}
+
+		const subscription = file_associations$.subscribe(value => {
+			file_associations = value
+			refresh()
+		})
+
+		on_unmount(() => subscription.unsubscribe())
+
+		return () => [
+			SelectItem(
+				current_file_association
+					? current_file_association.types[current_type_index]
+					: file_associations[0].types[0],
+				current_file_association ? current_file_association : file_associations[0],
+				handle_item_click,
+			),
+
+			is_expanded
+				? Maoka.create("div", ({ use }) => {
+						use(
+							Maoka.hooks.set_class(
+								"absolute top-0 left-0 right-0 bg-neutral-200 dark:bg-neutral-600 rounded-md",
+							),
+						)
+
+						return () =>
+							file_associations.flatMap(file_association =>
+								file_association.types.map(type =>
+									SelectItem(type, file_association, handle_item_click, true),
+								),
+							)
+					})
+				: void 0,
+		]
+	})
+
+const SelectItem = (
+	type: Functions.FileAssociationType,
+	file_association: Functions.FileAssociation,
+	on_click: (file_association: Functions.FileAssociation, type: string) => void,
+	is_select_active = false,
+) =>
+	Maoka.create("div", ({ use }) => {
+		use(Maoka.hooks.set_class("flex gap-x-4"))
+		use(Maoka.hooks.listen("onclick", () => on_click(file_association, type.name)))
+
+		const Icon = Switch.OfTrue()
+			.case(!!file_association.render_icon, () =>
+				Maoka.create("span", ({ current_element }) =>
+					file_association.render_icon!(current_element),
+				),
+			)
+			.default(() => BsFileEarmarkPlus())
+
+		return () => [
+			Maoka.create("div", ({ use }) => {
+				use(
+					Maoka.hooks.set_class(
+						"p-2 rounded-none first-of-type:rounded-t-md last-of-type:rounded-b-md",
+					),
+				)
+
+				return () => {
+					if (is_select_active)
+						use(Maoka.hooks.add_class("hover:bg-neutral-300 hover:dark:bg-neutral-800"))
+
+					return [
+						Maoka.create("div", ({ use }) => {
+							use(Maoka.hooks.set_class("flex gap-x-1 items-center"))
+
+							return () => [
+								Icon,
+								Maoka.create("div", ({ use }) => {
+									const { t } = use(Ordo.Hooks.translations)
+									return () => t(type.readable_name)
+								}),
+							]
+						}),
+
+						Maoka.create("div", ({ use }) => {
+							use(Maoka.hooks.set_class("text-xs text-neutral-600 dark:text-neutral-400"))
+							const { t } = use(Ordo.Hooks.translations)
+							return () => t(type.description)
+						}),
+					]
+				}
+			}),
+		]
+	})
+
 const CreateFileModalInput = (handle_change: (event: Event) => void) =>
 	Maoka.create("label", () => {
 		return () => [
 			Maoka.create("div", ({ use }) => {
 				use(Maoka.hooks.set_class("font-bold text-sm"))
-				const { t } = use(get_translations)
+				const { t } = use(Ordo.Hooks.translations)
 
 				return () => t("t.file_explorer.modals.create_file.input_label")
 			}),
+
 			Maoka.create("input", ({ use, current_element }) => {
-				const { t } = use(get_translations)
+				const { t } = use(Ordo.Hooks.translations)
 
 				use(Maoka.hooks.listen("oninput", handle_change))
 				use(Maoka.hooks.set_attribute("autofocus", "autofocus"))
@@ -80,10 +204,6 @@ const CreateFileModalInput = (handle_change: (event: Event) => void) =>
 				)
 
 				current_element.focus()
-
-				return () => {
-					current_element.focus()
-				}
 			}),
 		]
 	})
@@ -108,7 +228,7 @@ const OkBtn = (on_click: (event: MouseEvent) => void) =>
 	})
 
 const CancelBtn = Maoka.create("button", ({ use }) => {
-	const commands = use(get_commands)
+	const commands = use(Ordo.Hooks.commands)
 
 	use(Maoka.hooks.set_class("px-4 py-1 text-sm flex items-center space-x-2"))
 	use(Maoka.hooks.listen("onclick", () => commands.emit("cmd.application.modal.hide")))

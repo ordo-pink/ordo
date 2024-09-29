@@ -39,6 +39,7 @@ export default create_function(
 			"application.hosts",
 			"application.fetch",
 			"data.metadata_query",
+			"functions.file_associations",
 		],
 		commands: [
 			"cmd.functions.activities.register",
@@ -67,7 +68,6 @@ export default create_function(
 			lang: "en",
 			translations: {
 				"t.file_explorer.modals.create_file.input_placeholder": "Ordo Together Strong",
-
 				"t.file_explorer.modals.create_file.title": "Create File",
 				"t.file_explorer.modals.create_file.input_label": "File name",
 				"t.file_explorer.modals.remove_file.title": "Remove File",

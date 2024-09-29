@@ -13,17 +13,21 @@ type TInitFileAssociationsFn = (params: TInitFileAssociationsParams) => {
 	get_file_associations: TGetFileAssociationsFn
 }
 export const init_file_associations: TInitFileAssociationsFn = ({ known_functions, commands }) => {
+	file_associations$.subscribe()
+
 	commands.on("cmd.functions.file_associations.add", assoc => add$.next(assoc))
 	commands.on("cmd.functions.file_associations.remove", name => remove$.next(name))
 
 	return {
 		get_current_file_association: fid => () =>
-			R.If(known_functions.has_permissions(fid, { queries: ["application.current_activity"] }))
+			R.If(
+				known_functions.has_permissions(fid, { queries: ["functions.current_file_association"] }),
+			)
 				.pipe(R.ops.err_map(() => eperm(`get_current_file_association -> fid: ${String(fid)}`)))
 				.pipe(R.ops.map(() => current_file_association$.asObservable())),
 
 		get_file_associations: fid => () =>
-			R.If(known_functions.has_permissions(fid, { queries: ["application.file_associations"] }))
+			R.If(known_functions.has_permissions(fid, { queries: ["functions.file_associations"] }))
 				.pipe(R.ops.err_map(() => eperm(`get_file_associations -> fid: ${String(fid)}`)))
 				.pipe(R.ops.map(() => file_associations$)),
 	}
@@ -34,16 +38,16 @@ const add$ = new Subject<Functions.FileAssociation>()
 const remove$ = new Subject<string>()
 
 const add =
-	(newFileAssociation: Functions.FileAssociation) =>
+	(new_file_association: Functions.FileAssociation) =>
 	(state: Functions.FileAssociation[]): Functions.FileAssociation[] => [
 		...state,
-		newFileAssociation,
+		new_file_association,
 	]
 
 const remove =
-	(activityName: string) =>
+	(name: string) =>
 	(state: Functions.FileAssociation[]): Functions.FileAssociation[] =>
-		state.filter(activity => activity.name === activityName)
+		state.filter(fa => fa.name === name)
 
 export const current_file_association$ = new BehaviorSubject<TOption<Functions.FileAssociation>>(
 	O.None(),

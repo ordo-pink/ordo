@@ -64,7 +64,12 @@ export default create_function(
 			"cmd.data.metadata.set_property",
 			"cmd.application.notification.show",
 		],
-		queries: ["data.metadata_query", "application.current_route", "users.users_query"],
+		queries: [
+			"data.metadata_query",
+			"application.current_route",
+			"users.users_query",
+			"functions.file_associations",
+		],
 	},
 	ctx => {
 		const { on, emit } = ctx.get_commands()

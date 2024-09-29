@@ -51,14 +51,13 @@ export type TQueryPermission =
 	| "application.current_language"
 	| "application.current_route"
 	| "application.current_activity"
-	| "application.current_file_association"
-	| "application.file_associations"
 	| "users.current_user.achievements"
 	| "users.current_user.is_authenticated"
 	| "users.current_user.public_info" // User.PublicUser
 	| "users.current_user.internal_info" // User.User
 	| "users.users_query"
 	| "functions.activities"
+	| "functions.current_file_association"
 	| "functions.file_associations"
 	| "functions.editor_plugins"
 	| "functions.persisted_state"
@@ -734,13 +733,17 @@ declare global {
 			data: PlainData
 		}
 
+		type FileAssociationType = {
+			name: string
+			readable_name: keyof TFlatTranslations
+			description: keyof TFlatTranslations
+		}
+
 		type FileAssociation = {
 			name: string
-			content_type: string[]
+			types: FileAssociationType[]
 			render_icon?: (span: HTMLSpanElement) => void
-			render?: (div: HTMLDivElement) => void
-			Icon?: ComponentType
-			Component: ComponentType<FileAssociationComponentProps>
+			render?: (div: HTMLDivElement, metadata: TMetadata) => void
 		}
 	}
 

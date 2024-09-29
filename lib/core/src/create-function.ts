@@ -36,6 +36,8 @@ export const create_function: TCreateFunctionFn =
 		known_functions,
 		translate,
 		get_current_language,
+		get_current_file_association,
+		get_file_associations,
 	}) => {
 		const fid = known_functions.register(name, permissions)
 
@@ -56,6 +58,8 @@ export const create_function: TCreateFunctionFn =
 			get_metadata_query: get_metadata_query(fid),
 			get_user_query: get_user_query(fid),
 			get_sidebar: get_sidebar(fid),
+			get_current_file_association: get_current_file_association(fid),
+			get_file_associations: get_file_associations(fid),
 		}
 
 		return callback(context)

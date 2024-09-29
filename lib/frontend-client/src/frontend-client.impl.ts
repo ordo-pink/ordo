@@ -141,96 +141,43 @@ export const create_client = ({ logger, is_dev, hosts }: P) => {
 	init_command_palette(logger, commands, internal_context)
 	init_context_menu(logger, commands, internal_context)
 
+	const shared_function_context = {
+		get_commands,
+		get_current_language,
+		get_current_route,
+		get_fetch,
+		get_hosts,
+		get_is_authenticated,
+		get_logger,
+		get_metadata_query,
+		get_sidebar,
+		get_translations,
+		get_user_query,
+		is_dev,
+		known_functions,
+		translate,
+		get_current_file_association,
+		get_file_associations,
+	}
+
 	void import("@ordo-pink/function-welcome")
 		.then(module => module.default)
-		.then(f =>
-			f({
-				get_commands,
-				get_current_language,
-				get_current_route,
-				get_fetch,
-				get_hosts,
-				get_is_authenticated,
-				get_logger,
-				get_metadata_query,
-				get_sidebar,
-				get_translations,
-				get_user_query,
-				is_dev,
-				known_functions,
-				translate,
-				get_current_file_association,
-				get_file_associations,
-			}),
-		)
+		.then(f => f(shared_function_context))
 
 	void import("@ordo-pink/function-auth")
 		.then(module => module.default)
-		.then(f =>
-			f({
-				get_commands,
-				get_current_language,
-				get_current_route,
-				get_fetch,
-				get_hosts,
-				get_is_authenticated,
-				get_logger,
-				get_metadata_query,
-				get_sidebar,
-				get_translations,
-				get_user_query,
-				is_dev,
-				known_functions,
-				translate,
-				get_current_file_association,
-				get_file_associations,
-			}),
-		)
+		.then(f => f(shared_function_context))
 
 	// TODO: Fix positioning of activity bar content when achivity is changed
 	void import("@ordo-pink/function-fe")
 		.then(module => module.default)
-		.then(f =>
-			f({
-				get_commands,
-				get_current_language,
-				get_current_route,
-				get_fetch,
-				get_hosts,
-				get_is_authenticated,
-				get_logger,
-				get_metadata_query,
-				get_sidebar,
-				get_translations,
-				get_user_query,
-				is_dev,
-				known_functions,
-				translate,
-				get_current_file_association,
-				get_file_associations,
-			}),
-		)
+		.then(f => f(shared_function_context))
 
 	void import("@ordo-pink/function-file-editor")
 		.then(module => module.default)
-		.then(f =>
-			f({
-				get_commands,
-				get_current_language,
-				get_current_route,
-				get_fetch,
-				get_hosts,
-				get_is_authenticated,
-				get_logger,
-				get_metadata_query,
-				get_sidebar,
-				get_translations,
-				get_user_query,
-				is_dev,
-				known_functions,
-				translate,
-				get_current_file_association,
-				get_file_associations,
-			}),
-		)
+		.then(f => f(shared_function_context))
+
+	void import("@ordo-pink/function-database")
+		.then(module => module.default)
+		.then(f => f(shared_function_context))
 }

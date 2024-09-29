@@ -78,17 +78,7 @@ export const get_file_associations = ({ use }: TMaokaProps) => {
 			.pipe(R.ops.err_tap(logger.alert))
 			.cata(R.catas.or_else(() => null as never))
 
-	const file_associations$ = use(computed("file_associations", get_file_associations_unwrapped))
-	const file_associations = use(
-		rx_subscription(
-			file_associations$,
-			"file_associations_version",
-			[],
-			(a, b) => a.length !== b.length,
-		),
-	)
-
-	return file_associations
+	return get_file_associations_unwrapped()
 }
 
 export const get_current_file_association = ({ use }: TMaokaProps) => {

@@ -42,12 +42,18 @@ export type TMetadataStatic = {
 	Validations: typeof MetadataValidations
 }
 
+export type TMetadataLabel = {
+	name: string
+	readable_name: string
+	color: string
+}
+
 export type TMetadataDTO<_TProps extends TMetadataProps = TMetadataProps> = Readonly<{
 	fsid: FSID
 	name: string
 	parent: FSID | null
 	links: FSID[]
-	labels: string[]
+	labels: (TMetadataLabel | string)[]
 	type: string
 	created_at: number
 	created_by: UserID
@@ -66,7 +72,7 @@ export type TMetadata<_TProps extends TMetadataProps = TMetadataProps> = {
 	get_links: () => FSID[]
 	has_links: () => boolean
 	has_link_to: (link: FSID) => boolean
-	get_labels: () => string[]
+	get_labels: () => (TMetadataLabel | string)[]
 	has_labels: () => boolean
 	has_label: (label: string) => boolean
 	get_type: () => string

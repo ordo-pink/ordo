@@ -19,7 +19,12 @@
 
 import type { TResult } from "@ordo-pink/result"
 
-import type { TCreateMetadataParams, TMetadata, TMetadataProps } from "./metadata.types"
+import type {
+	TCreateMetadataParams,
+	TMetadata,
+	TMetadataLabel,
+	TMetadataProps,
+} from "./metadata.types"
 import type { FSID } from "./data.types"
 import type { TMetadataQuery } from "./metadata-query.types"
 import type { TMetadataRepository } from "./metadata-repository.types"
@@ -49,7 +54,7 @@ export type TMetadataCommand = {
 
 	add_labels: (
 		fsid: FSID,
-		...labels: string[]
+		...labels: (TMetadataLabel | string)[]
 	) => TResult<void, TRrr<"EAGAIN" | "EINVAL" | "ENOENT">>
 
 	remove_labels: (
@@ -59,7 +64,7 @@ export type TMetadataCommand = {
 
 	replace_labels: (
 		fsid: FSID,
-		labels: string[],
+		labels: (TMetadataLabel | string)[],
 	) => TResult<void, TRrr<"EAGAIN" | "EINVAL" | "ENOENT">>
 
 	set_size: (fsid: FSID, size: number) => TResult<void, TRrr<"EAGAIN" | "EINVAL" | "ENOENT">>

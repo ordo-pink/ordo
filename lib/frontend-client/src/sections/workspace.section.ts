@@ -107,15 +107,13 @@ export const init_workspace = (
 		id: "sidebar.toggle",
 		readable_name: "t.common.components.sidebar.toggle",
 		Icon: BsToggle2Off,
-		on_select: () => {
-			commands.emit("cmd.application.sidebar.toggle")
-		},
+		on_select: () => commands.emit("cmd.application.sidebar.toggle"),
 		accelerator: "mod+b",
 	})
 
 	commands.emit("cmd.application.context_menu.add", {
 		cmd: "cmd.application.sidebar.show",
-		readable_name: "common.sidebar_show",
+		readable_name: "t.common.components.sidebar.show",
 		Icon: BsToggle2On,
 		should_show: ({ event }) =>
 			Boolean(event.currentTarget) &&
@@ -129,7 +127,7 @@ export const init_workspace = (
 
 	commands.emit("cmd.application.context_menu.add", {
 		cmd: "cmd.application.sidebar.hide",
-		readable_name: "common.sidebar_hide",
+		readable_name: "t.common.components.sidebar.hide",
 		Icon: BsToggle2Off,
 		should_show: ({ event }) => {
 			return (

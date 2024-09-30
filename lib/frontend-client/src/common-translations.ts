@@ -27,24 +27,21 @@ export const register_common_translations = (
 
 	commands.emit("cmd.application.add_translations", {
 		lang: "en",
-		prefix: "common",
-		translations: EN_TRANSLATIONS,
+		translations: {
+			"t.common.components.command_palette.exit_key_hint": "to exit",
+			"t.common.components.command_palette.hide": "Hide Command Palette",
+			"t.common.components.command_palette.search_placeholder": "Search...",
+			"t.common.components.command_palette.toggle": "Toggle Command Palette",
+			"t.common.components.sidebar.hide": "Hide Sidebar",
+			"t.common.components.sidebar.show": "Show Sidebar",
+			"t.common.components.sidebar.toggle": "Toggle Sidebar",
+			"t.common.urls.contact_us": "Contact Us",
+			"t.common.urls.support_email": "support@ordo.pink",
+			"t.common.urls.support_messenger": "https://t.me/ordo_pink",
+			"t.common.urls.twitter_x": "https://x.com/ordo_pink",
+			"t.common.state.loading": "Loading...",
+		},
 	})
 
 	logger.debug("🟢 Registerred common translations.")
-}
-
-const EN_TRANSLATIONS: TScopedTranslations<"common"> = {
-	"components.command_palette.exit_key_hint": "to exit",
-	"components.command_palette.hide": "Hide Command Palette",
-	"components.command_palette.search_placeholder": "Search...",
-	"components.command_palette.toggle": "Toggle Command Palette",
-	"components.sidebar.hide": "Hide Sidebar",
-	"components.sidebar.show": "Show Sidebar",
-	"components.sidebar.toggle": "Toggle Sidebar",
-	"urls.contact_us": "Contact Us",
-	"urls.support_email": "support@ordo.pink",
-	"urls.support_messenger": "https://t.me/ordo_pink",
-	"urls.twitter_x": "https://x.com/ordo_pink",
-	"state.loading": "Loading...",
 }

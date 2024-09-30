@@ -95,6 +95,5 @@ const Icon = ({ metadata, custom_class, has_children }: P2) =>
 				.case(!!fa && !!fa.render_icon, () => fa!.render_icon!(current_element))
 				.case(has_children, () => BsFolderOpen(`ml-1 shrink-0 ${custom_class}`))
 				.case(metadata.get_size() === 0, () => BsFileEarmark(`ml-1 shrink-0 ${custom_class}`))
-				// TODO:  Render FileAssociation icon :: .case(!!metadata_file_association, () => )
 				.default(() => BsFileEarmarkBinary(`ml-1 shrink-0 ${custom_class}`))
 	})

@@ -90,7 +90,23 @@ const FileAssociationSelector = (
 			refresh()
 		})
 
-		on_unmount(() => subscription.unsubscribe())
+		const handle_escape_press = (event: KeyboardEvent) => {
+			if (is_expanded && event.key === "Escape") {
+				event.preventDefault()
+				event.stopPropagation()
+
+				is_expanded = false
+
+				refresh()
+			}
+		}
+
+		document.addEventListener("keydown", handle_escape_press)
+
+		on_unmount(() => {
+			subscription.unsubscribe()
+			document.removeEventListener("keydown", handle_escape_press)
+		})
 
 		return () => [
 			SelectItem(

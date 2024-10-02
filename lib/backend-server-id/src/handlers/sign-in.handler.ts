@@ -17,73 +17,83 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { type Middleware } from "koa"
-import { prop } from "ramda"
+import { type Context } from "koa"
 
-import { parseBody0, sendError } from "@ordo-pink/backend-utils"
-import { HttpError } from "@ordo-pink/rrr"
+import { RRR, type TRrr } from "@ordo-pink/managers"
 import { Oath } from "@ordo-pink/oath"
 import { type TNotificationService } from "@ordo-pink/backend-service-offline-notifications"
 import { type TTokenService } from "@ordo-pink/backend-service-token"
-import { type UserService } from "@ordo-pink/backend-service-user"
+import { type TUserService } from "@ordo-pink/backend-service-user"
+import { from_option0 } from "@ordo-pink/tau"
+import { parse_body0 } from "@ordo-pink/backend-utils"
+
+import { type TCreateAuthTokenResult, create_auth_token0 } from "../fns/create-auth-token.fn"
+import { set_auth_cookie } from "../fns/auth-cookie.fn"
+import { token_result_to_response_body } from "../fns/token-result-to-response-body.fn"
 
 // --- Public ---
 
-type Body = { email?: string; password?: string }
-type Params = {
-	userService: UserService
-	tokenService: TTokenService
-	notificationService: TNotificationService
-}
-type Fn = (params: Params) => Middleware
+export const sign_in0: TFn = (ctx, { user_service, token_service, notification_service }) =>
+	parse_body0<Routes.ID.SignIn.RequestBody>(ctx, "object")
+		.pipe(Oath.ops.chain(extract_ctx0))
+		.pipe(Oath.ops.chain(validate_ctx0(user_service)))
+		.pipe(Oath.ops.chain(create_auth_token0(token_service)))
+		.pipe(Oath.ops.tap(({ user, jti, expires }) => set_auth_cookie(ctx, user.id, jti, expires)))
+		.pipe(Oath.ops.tap(send_notification(ctx, notification_service)))
+		.pipe(Oath.ops.map(token_result_to_response_body))
+		.pipe(Oath.ops.map(body => ({ status: 200, body })))
 
-export const handleSignIn: Fn =
-	({ userService, tokenService, notificationService }) =>
-	ctx =>
-		parseBody0<Body>(ctx)
-			.chain(({ email, password }) =>
-				Oath.all({ email: Oath.fromNullable(email), password: Oath.fromNullable(password) })
-					.rejectedMap(() => HttpError.BadRequest("Invalid body content"))
-					.chain(({ email, password }) =>
-						Oath.all({
-							user: userService.getByEmail(email),
-							ok: userService.comparePassword(email, password),
-						}),
-					)
-					.bimap(() => HttpError.NotFound("User not found"), prop("user")),
-			)
-			.chain(user =>
-				Oath.of({ sub: user.id })
-					.chain(({ sub }) =>
-						tokenService
-							.createPair({ sub })
-							.rejectedMap(HttpError.from)
-							.chain(tokens =>
-								Oath.of(new Date(Date.now() + tokens.exp))
-									.tap(expires => {
-										ctx.response.set("Set-Cookie", [
-											`jti=${tokens.jti}; Expires=${expires.toISOString()}; SameSite=Lax; Path=/; HttpOnly;`,
-											`sub=${tokens.sub}; Expires=${expires.toISOString()}; SameSite=Lax; Path=/; HttpOnly;`,
-										])
-									})
-									.map(expires => ({
-										accessToken: tokens.tokens.access,
-										sub: tokens.sub,
-										jti: tokens.jti,
-										fileLimit: tokens.lim,
-										subscription: tokens.sbs,
-										maxUploadSize: tokens.fms,
-										expires,
-									})),
-							),
-					)
-					.tap(() =>
-						notificationService.sendSignInNotification({
-							to: { email: user.email, name: user.firstName },
-							ip: ctx.get("x-forwarded-for") ?? ctx.request.ip,
-						}),
+// --- Internal ---
+
+type TParams = {
+	user_service: TUserService
+	token_service: TTokenService
+	notification_service: TNotificationService
+}
+type TFn = (
+	ctx: Context,
+	params: TParams,
+) => Oath<Routes.ID.SignIn.Response, TRrr<"ENOENT" | "EIO" | "EINVAL">>
+type TCtx =
+	| { email: string; handle?: string; password: string }
+	| { email?: string; handle: string; password: string }
+
+const LOCATION = "handle_sign_in"
+
+const enoent = RRR.codes.enoent(LOCATION)
+const einval = RRR.codes.einval(LOCATION)
+
+const send_notification =
+	(ctx: Context, notification_service: TNotificationService) =>
+	({ user }: TCreateAuthTokenResult) =>
+		notification_service.sign_in({
+			to: { email: user.email, name: user.first_name },
+			ip: ctx.get("x-forwarded-for") ?? ctx.request.ip,
+		})
+
+const extract_ctx0 = ({ email, handle, password }: Routes.ID.SignIn.RequestBody) =>
+	Oath.Merge({
+		email: Oath.FromNullable(email, () => einval("extract_ctx -> email: null")),
+		password: Oath.FromNullable(password, () => einval("extract_ctx -> password: null")),
+	}).fix(() =>
+		Oath.Merge({
+			handle: Oath.FromNullable(handle, () => einval("extract_ctx -> handle: null")),
+			password: Oath.FromNullable(password, () => einval("extract_ctx -> password: null")),
+		}),
+	)
+
+const validate_ctx0 =
+	(user_service: TUserService) =>
+	({ email, handle, password }: TCtx) =>
+		Oath.Merge([
+			email ? user_service.get_by_email(email) : user_service.get_by_handle(handle!),
+			user_service.compare_password(email ? email : handle!, password),
+		])
+			.pipe(Oath.ops.map(([option]) => option))
+			.pipe(
+				Oath.ops.chain(
+					from_option0(() =>
+						enoent(`validate_ctx -> ${email ? "email" : "handle"}: ${email ?? handle}`),
 					),
+				),
 			)
-			.fork(sendError(ctx), result => {
-				ctx.response.body = { success: true, result }
-			})

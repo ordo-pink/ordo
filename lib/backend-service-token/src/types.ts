@@ -17,100 +17,95 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import type { AUD, Algorithm, JTI, JWT, JWTPayload, SUB } from "@ordo-pink/wjwt"
-import type { Logger } from "@ordo-pink/logger"
+import type { AUD, Algorithm, ISS, JTI, JWT, JWTPayload, SUB } from "@ordo-pink/wjwt"
 import type { Oath } from "@ordo-pink/oath"
-import type { Unary } from "@ordo-pink/tau"
+import type { TLogger } from "@ordo-pink/logger"
+import type { TOption } from "@ordo-pink/option"
+import type { TRrr } from "@ordo-pink/managers"
 
 // --- Public ---
 
 /**
  * A record of refresh token ids and tokens.
  */
-export type TokenRecord = Record<JTI, string>
+export type TTokenRecord = Record<JTI, string>
 
 /**
- * Payload of the access JWT.
+ * Payload of the auth JWT.
  */
-export type AccessTokenPayload = JWTPayload & { lim: number; fms: number; sbs: string }
+export type TAuthTokenPayload = JWTPayload & {
+	/**
+	 * @alias lim `user.file_limit`
+	 */
+	lim: number
 
-/**
- * Payload of the refresh JWT.
- */
-export type RefreshTokenPayload = AccessTokenPayload
+	/**
+	 * @alias mfs `user.max_file_size`
+	 */
+	mfs: number
+
+	/**
+	 * @alias sbs `user.subscription`
+	 */
+	sbs: string
+
+	/**
+	 * @alias mxf `user.max_functions`
+	 */
+	mxf: number
+}
 
 /**
  * Parsed access token content.
  */
-export type JWAT = JWT<AccessTokenPayload>
+export type TAuthJWT = JWT<TAuthTokenPayload>
 
 /**
- * Parsed refresh token content.
+ * Token persistence strategy implements approach to storing user tokens in the backend. Token
+ * persistence strategy is provided to `ID` service at start time and is then used for server side
+ * validation of incoming request authorisation tokens (JWT access tokens).
  */
-export type JWRT = JWT<RefreshTokenPayload>
-
-/**
- * `DataPersistenceStrategy` provides a set of methods used by the `DataService` to persist user
- * authentication history.
- */
-export type TokenPersistenceStrategy = {
+export type TPersistenceStrategyToken = {
 	/**
-	 * Get token associated with given user id and token id.
+	 * Returns refresh token of given `SUB` associated with given `JTI`.
 	 *
-	 * @rejects with `Error` if a database error occurs. Resolves with a token.
-	 * @resolves with `null` if no reference to given user id is persisted.
-	 * @resolves with `null` if token was not found.
-	 * @resolves with an Oath of the token for given sub and jti.
+	 * @param SUB - token subject
+	 * @param JTI - token id
+	 *
+	 * @returns an Oath resolving into an option of the token or rejecting with `EIO`
 	 */
-	getToken(sub: SUB, jti: JTI): Oath<string | null, Error>
+	get_token: (sub: SUB, jti: JTI) => Oath<TOption<string>, TRrr<"EIO">>
 
 	/**
-	 * Get an object that contains mapping of JTIs to corresponding tokens.
-	 *
-	 * @rejects with `Error` if a database error occurs.
-	 * @resolves with `null` if no reference to given user id is persisted.
-	 * @resolves with a record of JTIs to corresponding tokens.
+	 * Returns a record of all refresh tokens associated with given `SUB`.
 	 */
-	getTokenRecord(sub: SUB): Oath<TokenRecord | null, Error>
+	get_tokens: (sub: SUB) => Oath<TOption<TTokenRecord>, TRrr<"EIO">>
 
 	/**
-	 * Remove a token associated with given user id and token id.
-	 *
-	 * @rejects with `Error` if a database error occurs.
-	 * @resolves with "OK" if user's token record did not contain the token hence it was not removed.
-	 * @resolves with "OK".
+	 * Removes refresh token of given `SUB` associated with given `JTI`.
 	 */
-	removeToken(sub: SUB, jti: JTI): Oath<"OK", Error>
+	remove_token: (sub: SUB, jti: JTI) => Oath<void, TRrr<"EIO" | "ENOENT">>
 
 	/**
-	 * Remove token record of a user under given user id.
-	 *
-	 * @rejects with `Error` if a database error occurs.
-	 * @resolves with "OK".
+	 * Removes a record of all refresh tokens associated with given `SUB`.
 	 */
-	removeTokenRecord(sub: SUB): Oath<"OK", Error>
+	remove_tokens: (sub: SUB) => Oath<void, TRrr<"EIO" | "ENOENT">>
 
 	/**
-	 * Set a token for given user id and token id.
-	 *
-	 * @rejects with `Error` if a database error occurs.
-	 * @resolves with "OK".
+	 * Assigns refresh token of given `SUB` associated with given `JTI`.
 	 */
-	setToken(sub: SUB, jti: JTI, token: string): Oath<"OK", Error>
+	set_token: (sub: SUB, jti: JTI, token: string) => Oath<void, TRrr<"EIO">>
 
 	/**
-	 * Set token record for a user under given user id.
-	 *
-	 * @rejects with `Error` if a database error occurs.
-	 * @resolves with "OK"
+	 * Assigns a record of all refresh tokens associated with given `SUB`.
 	 */
-	setTokenRecord(sub: SUB, map: TokenRecord): Oath<"OK", Error>
+	set_tokens: (sub: SUB, record: TTokenRecord) => Oath<void, TRrr<"EIO">>
 }
 
 /**
  * Options for configuring TokenService on creation.
  */
-export type TokenServiceOptions = {
+export type TTokenServiceOptions = {
 	/**
 	 * A chain of CryptoKeys for signing and verifying tokens.
 	 */
@@ -127,6 +122,16 @@ export type TokenServiceOptions = {
 	}
 
 	/**
+	 * Recipients that the JWT is intended for.
+	 */
+	readonly audience: AUD
+
+	/**
+	 * JWT issuer claim.
+	 */
+	readonly issuer: ISS
+
+	/**
 	 * @see Algorithm
 	 */
 	readonly alg: Algorithm
@@ -134,36 +139,44 @@ export type TokenServiceOptions = {
 	/**
 	 * Lifetime of an access token in seconds.
 	 */
-	readonly accessTokenExpireIn: number
+	readonly at_expire_in: number
 
 	/**
 	 * Lifetime of a refresh token in seconds.
 	 */
-	readonly refreshTokenExpireIn: number
+	readonly rt_expire_in: number
 
 	/**
 	 * Dedicated logger.
 	 */
-	readonly logger: Logger
+	readonly logger: TLogger
+}
+
+export type TTokenServiceStatic = {
+	of: (strategy: TPersistenceStrategyToken, options: TTokenServiceOptions) => TTokenService
 }
 
 export type TTokenService = {
-	verifyToken: (token: string, type: "access" | "refresh") => Oath<boolean>
-
-	getPayload: (
+	verify: <$TType extends "access" | "refresh">(
 		token: string,
-		type: "access" | "refresh",
-	) => Oath<typeof type extends "access" ? AccessTokenPayload : RefreshTokenPayload | null>
+		type: $TType,
+	) => Oath<boolean, TRrr<"EINVAL">>
 
-	decode: (
+	get_payload: <$TType extends "access" | "refresh">(
 		token: string,
-		type: "access" | "refresh",
-	) => Oath<typeof type extends "access" ? JWAT : JWRT | null>
+		type: $TType,
+	) => Oath<TOption<TAuthTokenPayload>, TRrr<"EINVAL" | "EIO">>
 
-	createPair: Unary<
-		{ sub: SUB; prevJti?: JTI; aud?: AUD; data?: Record<string, any> },
-		Oath<RefreshTokenPayload & { tokens: { access: string; refresh: string } }, Error>
-	>
+	decode: <$TType extends "access" | "refresh">(
+		token: string,
+		type: $TType,
+	) => Oath<TOption<TAuthJWT>, TRrr<"EINVAL">>
 
-	persistenceStrategy: TokenPersistenceStrategy
+	create: (params: {
+		sub: SUB
+		data: { lim: number; mfs: number; sbs: string; mxf: number }
+		aud?: AUD
+	}) => Oath<TAuthTokenPayload & { token: string }, TRrr<"EINVAL" | "EIO">>
+
+	strategy: TPersistenceStrategyToken
 }

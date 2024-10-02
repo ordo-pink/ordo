@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Unlicense
 
 import { Oath } from "@ordo-pink/oath"
-import { directoryExists0 } from "@ordo-pink/fs"
+import { dir_exists0 } from "@ordo-pink/fs"
 import { runAsyncCommand0 } from "@ordo-pink/binutil"
 
 export const exec = (location?: string, command?: string) =>
@@ -21,7 +21,7 @@ export const exec = (location?: string, command?: string) =>
 			Oath.fromNullable(command)
 				.rejectedMap(() => "Command not provided")
 				.chain(command =>
-					directoryExists0(location).chain(exists =>
+					dir_exists0(location).chain(exists =>
 						Oath.fromBoolean(
 							() => exists,
 							() => ({ location, command }),

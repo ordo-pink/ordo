@@ -17,30 +17,22 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import type { Middleware } from "koa"
+import { type Context } from "koa"
 
-import { JTI, SUB } from "@ordo-pink/wjwt"
 import { Oath } from "@ordo-pink/oath"
-import type { TTokenService } from "@ordo-pink/backend-service-token"
-import type { UserService } from "@ordo-pink/backend-service-user"
-import { sendError } from "@ordo-pink/backend-utils"
+import { type TRrr } from "@ordo-pink/managers"
+import { type TTokenService } from "@ordo-pink/backend-service-token"
 
-type Params = { userService: UserService; tokenService: TTokenService }
-type Fn = (params: Params) => Middleware
+import { get_auth_cookies0, remove_auth_cookie } from "../fns/auth-cookie.fn"
 
-export const handleSignOut: Fn =
-	({ tokenService }) =>
-	async ctx =>
-		Oath.all({
-			sub: Oath.fromNullable(ctx.cookies.get("sub") as SUB),
-			jti: Oath.fromNullable(ctx.cookies.get("jti") as JTI),
-		})
-			.chain(({ sub, jti }) => tokenService.persistenceStrategy.removeToken(sub, jti))
-			.fix(() => "OK")
-			.tap(() => {
-				ctx.response.set("Set-Cookie", "jti=; Expires=Thu, 01 Jan 1970 00:00:01 GMT;")
-				ctx.response.set("Set-Cookie", "sub=; Expires=Thu, 01 Jan 1970 00:00:01 GMT;")
-			})
-			.fork(sendError(ctx), () => {
-				ctx.response.status = 204
-			})
+type Params = { token_service: TTokenService }
+type Fn = (
+	ctx: Context,
+	params: Params,
+) => Oath<Routes.ID.SignOut.Response, TRrr<"ENOENT" | "EIO" | "EINVAL" | "EACCES">>
+
+export const sign_out0: Fn = (ctx, { token_service }) =>
+	get_auth_cookies0(ctx.cookies.get("sub"), ctx.cookies.get("jti"))
+		.pipe(Oath.ops.chain(({ sub, jti }) => token_service.strategy.remove_token(sub, jti)))
+		.pipe(Oath.ops.tap(remove_auth_cookie(ctx)))
+		.pipe(Oath.ops.map(() => ({ status: 204 })))

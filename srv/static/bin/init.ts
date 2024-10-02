@@ -17,10 +17,10 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { createDirectoryIfNotExists0 } from "@ordo-pink/fs"
+import { create_dir_if_not_exists0 } from "@ordo-pink/fs"
 import { die } from "@ordo-pink/binutil"
 import { getc } from "@ordo-pink/getc"
 
 const { ORDO_STATIC_ROOT } = getc(["ORDO_STATIC_ROOT"])
 
-void createDirectoryIfNotExists0(ORDO_STATIC_ROOT).orElse(die())
+void create_dir_if_not_exists0(ORDO_STATIC_ROOT).orElse(die())

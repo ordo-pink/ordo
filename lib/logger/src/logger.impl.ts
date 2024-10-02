@@ -22,7 +22,7 @@ import type * as T from "./logger.types"
 /**
  * An average console enjoyer.
  */
-export const ConsoleLogger: T.Logger = {
+export const ConsoleLogger: T.TLogger = {
 	alert: (...args) => console.error("🚨 [ALRT]:", ...args),
 	crit: (...args) => console.error("🚑️ [CRIT]:", ...args),
 	debug: (...args) => console.debug("🔨 [DEBG]:", ...args),
@@ -36,7 +36,7 @@ export const ConsoleLogger: T.Logger = {
 /**✓
  * An average silence fan.
  */
-export const IgnoreLogger: T.Logger = {
+export const IgnoreLogger: T.TLogger = {
 	alert: () => void 0,
 	crit: () => void 0,
 	debug: () => void 0,

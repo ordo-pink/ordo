@@ -3,7 +3,7 @@
 
 import * as util from "@ordo-pink/binutil"
 import { Binary, Curry, Unary, noop } from "@ordo-pink/tau"
-import { isFile0, readFile0, readdir0, writeFile0 } from "@ordo-pink/fs"
+import { is_file0, read_file0, readdir0, write_file0 } from "@ordo-pink/fs"
 import { Oath } from "@ordo-pink/oath"
 
 // --- Public ---
@@ -49,16 +49,16 @@ const createSPDXRecord0 = (path: string) =>
 			.slice(0, path.includes("boot/src") ? 3 : 2)
 			.join("/"),
 	).chain(space =>
-		isFile0(`${space}/license`).chain(exists =>
+		is_file0(`${space}/license`).chain(exists =>
 			exists
-				? readFile0(`${space}/license`, "utf-8")
+				? read_file0(`${space}/license`, "utf-8")
 						.map(license => (license === unlicense ? "Unlicense" : "AGPL-3.0-only"))
 						.map(license => util.getSPDXRecord(license))
 						.chain(spdx =>
-							readFile0(path, "utf-8").chain(content =>
+							read_file0(path, "utf-8").chain(content =>
 								(content as string).startsWith(spdx)
 									? Oath.empty()
-									: writeFile0(path, `${spdx}\n${content as string}`).map(spdxRecordsProgress.inc),
+									: write_file0(path, `${spdx}\n${content as string}`).map(spdxRecordsProgress.inc),
 							),
 						)
 				: Oath.empty(),
@@ -89,7 +89,7 @@ const collectMissingLicensePaths0: Curry<Binary<string, string[], Oath<string[]>
 	space => dirs =>
 		Oath.all(
 			dirs.map(dir =>
-				isFile0(`${space}/${dir}/license`).map(exists =>
+				is_file0(`${space}/${dir}/license`).map(exists =>
 					exists ? null : `${space}/${dir}/license`,
 				),
 			),

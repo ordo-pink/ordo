@@ -17,83 +17,50 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import type { Middleware } from "koa"
-import isEmail from "validator/lib/isEmail"
+import type { Context } from "koa"
 
-import {
-	Oath,
-	bimap0,
-	chain0,
-	fromBoolean0,
-	fromNullable0,
-	map0,
-	merge0,
-	rejectedMap0,
-} from "@ordo-pink/oath"
-import { isString, omit } from "@ordo-pink/tau"
-import { parseBody0, sendError, sendSuccess } from "@ordo-pink/backend-utils"
-import { HttpError } from "@ordo-pink/rrr"
-import { OK } from "@ordo-pink/core"
-import { UserService } from "@ordo-pink/backend-service-user"
+import { type TUserService, UserService } from "@ordo-pink/backend-service-user"
+import { Oath } from "@ordo-pink/oath"
+import { RRR } from "@ordo-pink/core"
+import { from_option0 } from "@ordo-pink/tau"
+import { parse_body0 } from "@ordo-pink/backend-utils"
 
-import {
-	toEmailAlreadyConfirmedError,
-	toInvalidBodyError,
-	toUserNotFoundError,
-} from "../fns/to-error"
-
-export const handleConfirmEmail: TFn =
-	({ userService }) =>
-	ctx =>
-		parseBody0<TRequestBody>(ctx, "object")
-			.and(validateBody0)
-			.and(extractCtx0(userService))
-			.and(validateCtx0)
-			.and(updateUser0(userService))
-			.fork(sendError(ctx), sendSuccess({ ctx }))
+export const confirm_email0: TFn = (ctx, { user_service }) =>
+	parse_body0<Ordo.Routes.ID.ConfirmEmail.RequestBody>(ctx, "object")
+		.pipe(Oath.ops.chain(extract_ctx0(user_service)))
+		.pipe(Oath.ops.chain(update_user0(user_service)))
+		.pipe(Oath.ops.map(UserService.serialise))
+		.pipe(Oath.ops.map(body => ({ status: 200, body })))
 
 // --- Internal ---
 
-type TRequestBody = Routes.ID.ConfirmEmail.RequestBody
-type TParams = { userService: UserService }
-type TFn = (params: TParams) => Middleware
-type TCtx = { user: User.PrivateUser; code: string }
-type TResult = Routes.ID.ConfirmEmail.Result
+type TParams = { user_service: TUserService }
+type TFn = (
+	ctx: Context,
+	params: TParams,
+) => Oath<Ordo.Routes.ID.ConfirmEmail.Response, Ordo.Rrr<"EINVAL" | "EIO" | "ENOENT">>
+type TCtx = { user: User.InternalUser; code: string }
 
-type TValidateBodyFn = (body: TRequestBody) => Oath<Required<TRequestBody>, HttpError>
-const validateBody0: TValidateBodyFn = body =>
-	merge0({
-		email: fromNullable0(body.email)
-			.pipe(chain0(email => fromBoolean0(isEmail(email), body.email!)))
-			.pipe(rejectedMap0(toInvalidBodyError)),
-		code: fromBoolean0(isString(body.code), body.code!).pipe(rejectedMap0(toInvalidBodyError)),
-	})
+const LOCATION = "confirm_email"
 
-type TExtractCtxFn = (us: UserService) => (body: TRequestBody) => Oath<TCtx, HttpError>
-const extractCtx0: TExtractCtxFn = userService => body =>
-	merge0({
-		code: fromNullable0(body.code).pipe(rejectedMap0(toInvalidBodyError)),
-		user: fromNullable0(body.email)
-			.pipe(rejectedMap0(toInvalidBodyError))
-			.pipe(chain0(email => userService.getByEmail(email).pipe(rejectedMap0(toUserNotFoundError)))),
-	})
+const einval = RRR.codes.einval(LOCATION)
+const enoent = RRR.codes.enoent(LOCATION)
 
-type TCheckEmailIsNotConfirmedFn = (user: User.PrivateUser) => Oath<"OK", HttpError>
-const checkEmailIsNotConfirmed0: TCheckEmailIsNotConfirmedFn = user =>
-	fromBoolean0(user.emailConfirmed, OK).pipe(rejectedMap0(toEmailAlreadyConfirmedError))
+const extract_ctx0 =
+	(user_service: TUserService) =>
+	({ email, code }: Ordo.Routes.ID.ConfirmEmail.RequestBody) =>
+		Oath.Merge({
+			code: Oath.FromNullable(code, () => einval(`extract_ctx -> code: ${code}`)),
+			user: Oath.FromNullable(email)
+				.pipe(Oath.ops.rejected_map(() => einval(`extract_ctx -> email: ${email}`)))
+				.pipe(
+					Oath.ops.chain(email =>
+						user_service
+							.get_by_email(email)
+							.pipe(Oath.ops.chain(from_option0(() => enoent(`extract_ctx -> email: ${email}`)))),
+					),
+				),
+		})
 
-type TCheckCodeIsCorrectFn = (user: User.PrivateUser, code: string) => Oath<"OK", HttpError>
-const checkCodeIsCorrect0: TCheckCodeIsCorrectFn = (user, code) =>
-	fromBoolean0(user.code === code, OK).pipe(rejectedMap0(toUserNotFoundError))
-
-type TValidateCtxFn = (ctx: TCtx) => Oath<TCtx, HttpError>
-const validateCtx0: TValidateCtxFn = ctx =>
-	merge0([checkEmailIsNotConfirmed0(ctx.user), checkCodeIsCorrect0(ctx.user, ctx.code)]).pipe(
-		map0(() => ctx),
-	)
-
-type TUpdateUser0 = (us: UserService) => (ctx: TCtx) => Oath<TResult, HttpError>
-const updateUser0: TUpdateUser0 = userService => ctx =>
-	userService
-		.update(ctx.user.id, { emailConfirmed: true, code: undefined })
-		.pipe(bimap0(toUserNotFoundError, omit("code")))
+const update_user0 = (user_service: TUserService) => (ctx: TCtx) =>
+	user_service.confirm_email(ctx.user.id).pipe(Oath.ops.map(() => ctx.user))

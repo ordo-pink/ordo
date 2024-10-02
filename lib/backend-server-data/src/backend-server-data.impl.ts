@@ -19,9 +19,9 @@
 
 import type { Readable } from "stream"
 
-import { ConsoleLogger, Logger } from "@ordo-pink/logger"
-import type { TDataCommands } from "@ordo-pink/data"
-import { createServer } from "@ordo-pink/backend-utils"
+import { ConsoleLogger, TLogger } from "@ordo-pink/logger"
+import type { TDataCommands } from "@ordo-pink/managers"
+import { create_koa_server } from "@ordo-pink/backend-utils"
 
 import { handleCreateData } from "./handlers/create-data.handler"
 import { handleGetAllData } from "./handlers/get-all-data.handler"
@@ -35,7 +35,7 @@ export type Params = {
 	origin: string | string[]
 	dataService: TDataCommands<Readable>
 	idHost: string
-	logger?: Logger
+	logger?: TLogger
 }
 
 export const createDataServer = ({
@@ -44,11 +44,11 @@ export const createDataServer = ({
 	idHost,
 	logger = ConsoleLogger,
 }: Params) => {
-	return createServer({
+	return create_koa_server({
 		origin,
 		logger,
-		serverName: "dt",
-		extendRouter: router =>
+		server_name: "dt",
+		extend_router: router =>
 			router
 				.get("/", handleGetAllData({ dataService, idHost }))
 				.post("/:userId", handleCreateData({ dataService, idHost }))

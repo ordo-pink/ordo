@@ -20,9 +20,9 @@
 import { type Middleware } from "koa"
 import { type Readable } from "stream"
 
-import { authenticate0, sendError } from "@ordo-pink/backend-utils"
+import { authenticate0, send_error } from "@ordo-pink/backend-utils"
 import { HttpError } from "@ordo-pink/rrr"
-import { type TDataCommands } from "@ordo-pink/data"
+import { type TDataCommands } from "@ordo-pink/managers"
 
 type Params = { dataService: TDataCommands<Readable>; idHost: string }
 
@@ -32,7 +32,7 @@ export const handleGetAllData =
 		authenticate0(ctx, idHost)
 			.map(({ payload }) => payload)
 			.chain(({ sub }) => dataService.fetch({ createdBy: sub }).rejectedMap(HttpError.NotFound))
-			.fork(sendError(ctx), result => {
+			.fork(send_error(ctx), result => {
 				ctx.response.status = 200
 				ctx.response.body = { success: true, result }
 			})

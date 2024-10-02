@@ -17,115 +17,73 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { type Middleware } from "koa"
-import isEmail from "validator/lib/isEmail"
+import { Context } from "koa"
 
-import { parseBody0, sendError } from "@ordo-pink/backend-utils"
-import { HttpError } from "@ordo-pink/rrr"
+import { RRR, type TRrr } from "@ordo-pink/managers"
 import { Oath } from "@ordo-pink/oath"
 import { type TNotificationService } from "@ordo-pink/backend-service-offline-notifications"
 import { type TTokenService } from "@ordo-pink/backend-service-token"
-import { type UserService } from "@ordo-pink/backend-service-user"
-import { okpwd } from "@ordo-pink/okpwd"
+import { type TUserService } from "@ordo-pink/backend-service-user"
+import { parse_body0 } from "@ordo-pink/backend-utils"
 
-export const handleSignUp: Fn =
-	({ userService, tokenService, notificationService, websiteHost }) =>
-	ctx =>
-		parseBody0<Body>(ctx)
-			.chain(body =>
-				Oath.all({
-					email: Oath.fromNullable(body.email)
-						.map(isEmail)
-						.chain(isValidEmail =>
-							Oath.fromBoolean(
-								() => isValidEmail,
-								() => body.email!,
-								() => HttpError.BadRequest("Invalid email"),
-							),
-						),
-					password: Oath.fromNullable(body.password)
-						.map(okpwd())
-						.chain(error =>
-							Oath.fromBoolean(
-								() => !error,
-								() => body.password!,
-								() => HttpError.BadRequest(error!),
-							),
-						),
-				}),
-			)
-			.chain(({ email, password }) =>
-				userService
-					.getByEmail(email)
-					.fix(() => null)
-					.chain(user =>
-						Oath.fromBoolean(
-							() => !user,
-							() => ({ email, password }),
-							() => HttpError.Conflict("User with given email already exists"),
-						),
-					),
-			)
-			.chain(({ email, password }) =>
-				userService.createUser(email, password).rejectedMap(HttpError.from),
-			)
-			.chain(user =>
-				tokenService
-					.createPair({ sub: user.id })
-					.rejectedMap(HttpError.from)
-					.chain(tokens =>
-						Oath.of(tokens)
-							.map(() => new Date(Date.now() + tokens.exp))
-							.tap(expires => {
-								ctx.response.set(
-									"Set-Cookie",
-									`jti=${tokens.jti}; Expires=${expires.toISOString()}; SameSite=Lax; Path=/; HttpOnly;`,
-								)
-								ctx.response.set(
-									"Set-Cookie",
-									`sub=${tokens.sub}; Expires=${expires.toISOString()}; SameSite=Lax; Path=/; HttpOnly;`,
-								)
-							})
-							.map(expires => ({
-								accessToken: tokens.tokens.access,
-								sub: tokens.sub,
-								jti: tokens.jti,
-								fileLimit: tokens.lim,
-								subscription: tokens.sbs,
-								maxUploadSize: tokens.fms,
-								expires,
-							})),
-					)
-					.chain(tokens =>
-						Oath.of(crypto.getRandomValues(new Uint32Array(3)).join(""))
-							.chain(code => userService.update(tokens.sub, { code }))
-							.tap(user =>
-								notificationService.sendSignUpNotification({
-									to: {
-										email: user.email,
-										name: user.email,
-									},
-									confirmationUrl: `${websiteHost}/confirm-email?code=${user.code}&email=${user.email}`,
-								}),
-							)
-							.bimap(
-								() => HttpError.NotFound("User not found"),
-								() => tokens,
-							),
-					),
-			)
-			.fork(sendError(ctx), body => {
-				ctx.response.status = 201
-				ctx.response.body = body
-			})
+import { type TCreateAuthTokenResult, create_auth_token0 } from "../fns/create-auth-token.fn"
+import { create_confirmation_url } from "../fns/create-confirmation-url.fn"
+import { set_auth_cookie } from "../fns/auth-cookie.fn"
+import { token_result_to_response_body } from "../fns/token-result-to-response-body.fn"
+
+export const sign_up0: TFn = (
+	ctx,
+	{ user_service, token_service, notification_service, website_host },
+) =>
+	parse_body0<Routes.ID.SignUp.RequestBody>(ctx, "object")
+		.pipe(Oath.ops.chain(extract_ctx0))
+		.pipe(Oath.ops.chain(create_user0(user_service)))
+		.pipe(Oath.ops.chain(create_auth_token0(token_service)))
+		.pipe(Oath.ops.tap(({ user, expires, jti }) => set_auth_cookie(ctx, user.id, jti, expires)))
+		.pipe(Oath.ops.tap(send_notification(notification_service, website_host)))
+		.pipe(Oath.ops.map(token_result_to_response_body))
+		.pipe(Oath.ops.map(body => ({ status: 201, body })))
 
 // --- Internal ---
 
-type Body = { email?: string; password?: string }
 type Params = {
-	userService: UserService
-	tokenService: TTokenService
-	notificationService: TNotificationService
-	websiteHost: string
+	user_service: TUserService
+	token_service: TTokenService
+	notification_service: TNotificationService
+	website_host: string
 }
-type Fn = (params: Params) => Middleware
+type TFn = (
+	ctx: Context,
+	params: Params,
+) => Oath<Routes.ID.SignUp.Response, TRrr<"EINVAL" | "EIO" | "EEXIST">>
+type TCtx = { email: string; handle: string; password: string }
+
+const LOCATION = "sign_up"
+
+const einval = RRR.codes.einval(LOCATION)
+
+// TODO: Move to utils
+
+const extract_ctx0 = ({
+	email,
+	handle,
+	password,
+}: Routes.ID.SignUp.RequestBody): Oath<TCtx, TRrr<"EINVAL">> =>
+	Oath.Merge({
+		email: Oath.FromNullable(email, () => einval("extract_ctx -> email: null")),
+		handle: Oath.FromNullable(handle, () => einval("extract_ctx -> handle: null")),
+		password: Oath.FromNullable(password, () => einval("extract_ctx -> password: null")),
+	})
+
+const create_user0 =
+	(user_service: TUserService) =>
+	({ email, password, handle }: TCtx) =>
+		user_service.create(email, handle, password)
+
+const send_notification =
+	(notification_service: TNotificationService, website_host: string) =>
+	({ user }: TCreateAuthTokenResult) =>
+		notification_service.sign_up({
+			to: { email: user.email },
+			confirmation_url: create_confirmation_url(website_host, user.email, user.email_code),
+		})

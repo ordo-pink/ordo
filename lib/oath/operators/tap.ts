@@ -3,28 +3,28 @@
 
 import { Oath } from "../src/impl"
 
-export const tap0 =
-	<Resolve, Reject>(
-		onResolved: (x: Resolve) => any,
-		onRejected: (x: Reject) => any = () => void 0,
+export const tap_oath =
+	<$TResolve, $TReject>(
+		on_resolve: (x: $TResolve) => any,
+		on_reject: (x: $TReject) => any = () => void 0,
 	) =>
-	(o: Oath<Resolve, Reject>): Oath<Resolve, Reject> =>
-		new Oath<Resolve, Reject>(
+	(o: Oath<$TResolve, $TReject>): Oath<$TResolve, $TReject> =>
+		new Oath<$TResolve, $TReject>(
 			// eslint-disable-next-line @typescript-eslint/no-misused-promises
 			(resolve, reject) =>
 				o.fork(
 					a => {
-						if (o.isCancelled) return reject(o.cancellationReason as any)
+						if (o.is_cancelled) return reject(o.cancellation_reason as any)
 
-						onRejected(a)
+						on_reject(a)
 						return reject(a)
 					},
 					b => {
-						if (o.isCancelled) return reject(o.cancellationReason as any)
+						if (o.is_cancelled) return reject(o.cancellation_reason as any)
 
-						onResolved(b)
+						on_resolve(b)
 						return resolve(b)
 					},
 				),
-			o._abortController,
+			o._abort_controller,
 		)

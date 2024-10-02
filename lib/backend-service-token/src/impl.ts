@@ -17,94 +17,116 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { randomUUID } from "crypto"
-
+import { JTI, WJWT } from "@ordo-pink/wjwt"
+import { O } from "@ordo-pink/option"
 import { Oath } from "@ordo-pink/oath"
+import { RRR } from "@ordo-pink/managers"
 import { Switch } from "@ordo-pink/switch"
-import { WJWT } from "@ordo-pink/wjwt"
 
-import { TTokenService, TokenPersistenceStrategy, TokenServiceOptions } from "./types"
+import { type TAuthJWT, type TTokenServiceStatic } from "./types"
 
-type Params = { persistenceStrategy: TokenPersistenceStrategy; options: TokenServiceOptions }
-
-export const TokenService = {
-	of: ({ persistenceStrategy, options }: Params): TTokenService => {
-		const refreshWJWT = WJWT({
-			alg: options.alg,
-			privateKey: options.keys.refresh.privateKey,
-			publicKey: options.keys.refresh.publicKey,
+export const TokenService: TTokenServiceStatic = {
+	of: (strategy, { alg, audience, at_expire_in, issuer, keys, rt_expire_in }) => {
+		const refresh_wjwt = WJWT({
+			alg,
+			privateKey: keys.refresh.privateKey,
+			publicKey: keys.refresh.publicKey,
 		})
 
-		const accessWJWT = WJWT({
-			alg: options.alg,
-			privateKey: options.keys.access.privateKey,
-			publicKey: options.keys.access.publicKey,
+		const access_wjwt = WJWT({
+			alg: alg,
+			privateKey: keys.access.privateKey,
+			publicKey: keys.access.publicKey,
 		})
 
 		const wjwt = (type: "access" | "refresh") =>
 			Switch.of(type)
-				.case("refresh", () => refreshWJWT)
-				.default(() => accessWJWT)
+				.case("refresh", () => refresh_wjwt)
+				.default(() => access_wjwt)
 
 		return {
-			persistenceStrategy,
-			verifyToken: (token, type) =>
+			strategy,
+
+			verify: (token, type) =>
 				wjwt(type)
 					.verify0(token)
-					.fix(() => false),
-			getPayload: (token, type) =>
+					.pipe(Oath.ops.rejected_map(error => einval(`verify -> error: ${error}`))),
+
+			get_payload: (token, type) =>
 				wjwt(type)
 					.verify0(token)
-					.chain(valid =>
-						Oath.fromBoolean(
-							() => valid,
-							() => token,
-							() => null,
+					.pipe(Oath.ops.chain(valid => Oath.If(valid, { T: () => token })))
+					.pipe(Oath.ops.chain(token => wjwt(type).decode0(token)))
+					.pipe(Oath.ops.rejected_map(error => einval(`get_payload -> error: ${error}`)))
+					.pipe(Oath.ops.map(jwt => jwt.payload as any))
+					.pipe(
+						Oath.ops.chain(payload =>
+							strategy
+								.get_token(payload.sub, payload.jti)
+								.pipe(Oath.ops.map(() => O.Some(payload))),
 						),
-					)
-					.chain(token => wjwt(type).decode0(token))
-					.map(jwt => jwt.payload as any)
-					.chain(payload =>
-						persistenceStrategy.getToken(payload.sub, payload.jti).map(() => payload),
-					)
-					.fix(() => null),
+					),
+
 			decode: token =>
 				wjwt("access")
 					.decode0(token)
-					.fix(() => null) as any,
-			createPair: ({ sub, prevJti, aud = ["https://ordo.pink"], data = {} }) =>
-				Oath.all({
-					jti: randomUUID(),
+					.pipe(Oath.ops.map(jwt => O.Some(jwt as TAuthJWT)))
+					.pipe(Oath.ops.rejected_map(error => einval(`decode -> error: ${error}`))),
+
+			create: ({ sub, aud = audience, data }) =>
+				Oath.Resolve({
+					jti: crypto.randomUUID() as JTI,
 					iat: Math.floor(Date.now() / 1000),
-					iss: "https://id.ordo.pink",
-					aexp: Math.floor(Date.now() / 1000) + options.accessTokenExpireIn,
-					rexp: Math.floor(Date.now() / 1000) + options.refreshTokenExpireIn,
+					iss: issuer,
+					aexp: Math.floor(Date.now() / 1000) + at_expire_in,
+					rexp: Math.floor(Date.now() / 1000) + rt_expire_in,
 					sub,
 					aud,
-				}).chain(({ jti, iat, iss, aexp, rexp, sub, aud }) =>
-					Oath.all({
-						jti,
-						iat,
-						iss,
-						exp: rexp,
-						sub,
-						aud,
-						...data,
-						tokens: Oath.all({
-							access: accessWJWT.sign0({ ...data, jti, iat, iss, exp: aexp, sub, aud }),
-							refresh: refreshWJWT.sign0({ ...data, jti, iat, iss, exp: rexp, sub, aud }),
-						}),
-					}).chain(res =>
-						prevJti
-							? persistenceStrategy
-									.removeToken(sub, prevJti)
-									.chain(() => persistenceStrategy.setToken(sub, jti, res.tokens.refresh))
-									.map(() => res as any)
-							: Oath.empty()
-									.chain(() => persistenceStrategy.setToken(sub, jti, res.tokens.refresh))
-									.map(() => res),
+				})
+					.pipe(
+						Oath.ops.chain(({ jti, iat, iss, aexp, rexp, sub, aud }) =>
+							Oath.Merge({
+								...data,
+								jti,
+								iat,
+								iss,
+								exp: rexp,
+								sub,
+								aud,
+								tokens: Oath.Merge({
+									access: access_wjwt
+										.sign0({ ...data, jti, iat, iss, exp: aexp, sub, aud })
+										.pipe(Oath.ops.rejected_map(e => einval(e))),
+									refresh: refresh_wjwt
+										.sign0({ ...data, jti, iat, iss, exp: rexp, sub, aud })
+										.pipe(Oath.ops.rejected_map(e => einval(e))),
+								}),
+							}).pipe(
+								Oath.ops.chain(res =>
+									strategy.set_token(sub, jti, res.tokens.refresh).pipe(Oath.ops.map(() => res)),
+								),
+							),
+						),
+					)
+					.pipe(
+						Oath.ops.map(({ aud, exp, iat, iss, jti, lim, mfs, mxf, sbs, sub, tokens }) => ({
+							aud,
+							exp,
+							iat,
+							iss,
+							jti,
+							lim,
+							mfs,
+							mxf,
+							sbs,
+							sub,
+							token: tokens.access,
+						})),
 					),
-				),
 		}
 	},
 }
+
+// --- Internal ---
+
+const einval = RRR.codes.einval("TokenService")

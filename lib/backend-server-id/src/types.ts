@@ -17,12 +17,43 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { JTI, SUB } from "@ordo-pink/wjwt"
+import type { JTI, SUB } from "@ordo-pink/wjwt"
+import type {
+	TEmailContact,
+	TEmailStrategy,
+	TNotificationService,
+} from "@ordo-pink/backend-service-offline-notifications"
+import type {
+	TPersistenceStrategyToken,
+	TTokenService,
+	TTokenServiceOptions,
+} from "@ordo-pink/backend-service-token"
+import type { TPersistenceStrategyUser, TUserService } from "@ordo-pink/backend-service-user"
+import type { TLogger } from "@ordo-pink/logger"
 
 export type AuthResponse = {
-	accessToken: string
+	token: string
 	jti: JTI
 	sub: SUB
 	fileLimit: number
 	maxUploadSize: number
+}
+
+export type TCreateIDServerFnParams = {
+	user_persistence_strategy: TPersistenceStrategyUser
+	token_persistence_strategy: TPersistenceStrategyToken
+	email_strategy: TEmailStrategy
+	origin: string | string[]
+	logger: TLogger
+	website_host: string
+	notification_sender: Required<TEmailContact>
+	token_service_options: TTokenServiceOptions
+}
+
+export type THandlerParams = {
+	user_service: TUserService
+	token_service: TTokenService
+	notification_service: TNotificationService
+	website_host: string
+	logger: TLogger
 }

@@ -20,7 +20,7 @@
 import { type AttributeMap, type UpdateItemInput } from "aws-sdk/clients/dynamodb"
 import DynamoDB from "aws-sdk/clients/dynamodb"
 
-import { type TokenPersistenceStrategy, type TokenRecord } from "@ordo-pink/backend-service-token"
+import { type TPersistenceStrategyToken, type TTokenRecord } from "@ordo-pink/backend-service-token"
 import { Oath } from "@ordo-pink/oath"
 
 export type DynamoDBConfig = {
@@ -38,16 +38,16 @@ export const TokenPersistenceStrategyDynamoDB = {
 		region,
 		endpoint,
 		tableName,
-	}: DynamoDBConfig): TokenPersistenceStrategy => {
+	}: DynamoDBConfig): TPersistenceStrategyToken => {
 		const db = new DynamoDB({ credentials: { accessKeyId, secretAccessKey }, region, endpoint })
 
 		return {
-			getToken: getToken0(tableName, db),
-			setToken: setToken0(tableName, db),
-			removeToken: removeToken0(tableName, db),
-			getTokenRecord: getTokenRecord0(tableName, db),
-			setTokenRecord: setTokenRecord0(tableName, db),
-			removeTokenRecord: removeTokenRecord0(tableName, db),
+			get_token: getToken0(tableName, db),
+			set_token: setToken0(tableName, db),
+			remove_token: removeToken0(tableName, db),
+			get_tokens: getTokenRecord0(tableName, db),
+			set_tokens: setTokenRecord0(tableName, db),
+			remove_tokens: removeTokenRecord0(tableName, db),
 		}
 	},
 }
@@ -55,7 +55,7 @@ export const TokenPersistenceStrategyDynamoDB = {
 // --- Internal ---
 
 const getToken0 =
-	(TableName: string, db: DynamoDB): TokenPersistenceStrategy["getToken"] =>
+	(TableName: string, db: DynamoDB): TPersistenceStrategyToken["get_token"] =>
 	(sub, jti) =>
 		Oath.of(sub)
 			.chain(getTokenRecord0(TableName, db))
@@ -63,7 +63,7 @@ const getToken0 =
 			.map(record => record[jti])
 
 const setToken0 =
-	(TableName: string, db: DynamoDB): TokenPersistenceStrategy["setToken"] =>
+	(TableName: string, db: DynamoDB): TPersistenceStrategyToken["set_token"] =>
 	(sub, jti, token) =>
 		Oath.of(sub)
 			.chain(getTokenRecord0(TableName, db))
@@ -72,7 +72,7 @@ const setToken0 =
 			.chain(record => Oath.of(setTokenRecord0(TableName, db)).chain(f => f(sub, record)))
 
 const removeToken0 =
-	(TableName: string, db: DynamoDB): TokenPersistenceStrategy["removeToken"] =>
+	(TableName: string, db: DynamoDB): TPersistenceStrategyToken["remove_token"] =>
 	(sub, jti) =>
 		Oath.of(sub)
 			.chain(getTokenRecord0(TableName, db))
@@ -80,14 +80,14 @@ const removeToken0 =
 			.chain(record => Oath.of(setTokenRecord0(TableName, db)).chain(f => f(sub, record)))
 
 const getTokenRecord0 =
-	(TableName: string, db: DynamoDB): TokenPersistenceStrategy["getTokenRecord"] =>
+	(TableName: string, db: DynamoDB): TPersistenceStrategyToken["get_tokens"] =>
 	sub =>
 		Oath.try(() => db.getItem({ TableName, Key: { sub: { S: sub } } }).promise())
 			.chain(({ Item }) => Oath.fromNullable(Item).rejectedMap(() => new Error("Token not found")))
 			.map(deserialise)
 
 const setTokenRecord0 =
-	(TableName: string, db: DynamoDB): TokenPersistenceStrategy["setTokenRecord"] =>
+	(TableName: string, db: DynamoDB): TPersistenceStrategyToken["set_tokens"] =>
 	(sub, record) =>
 		Oath.of(serialise(record))
 			.chain(AttributeUpdates =>
@@ -98,11 +98,11 @@ const setTokenRecord0 =
 			.map(() => "OK")
 
 const removeTokenRecord0 =
-	(TableName: string, db: DynamoDB): TokenPersistenceStrategy["removeTokenRecord"] =>
+	(TableName: string, db: DynamoDB): TPersistenceStrategyToken["remove_tokens"] =>
 	sub =>
 		Oath.try(() => db.deleteItem({ TableName, Key: { sub: { S: sub } } })).map(() => "OK")
 
-const deserialise = (item: AttributeMap): TokenRecord => JSON.parse(item.record?.S ?? "")
-const serialise = (record: TokenRecord): UpdateItemInput["AttributeUpdates"] => ({
+const deserialise = (item: AttributeMap): TTokenRecord => JSON.parse(item.record?.S ?? "")
+const serialise = (record: TTokenRecord): UpdateItemInput["AttributeUpdates"] => ({
 	record: { Action: "PUT", Value: { S: JSON.stringify(record) } },
 })

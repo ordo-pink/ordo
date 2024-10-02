@@ -19,66 +19,68 @@
 
 import { Middleware } from "koa"
 import chalk from "chalk"
-import { lte } from "ramda"
 
 import { Context } from "@ordo-pink/routary"
-import { Logger } from "@ordo-pink/logger"
 import { Switch } from "@ordo-pink/switch"
+import { TLogger } from "@ordo-pink/logger"
+import { lte } from "@ordo-pink/tau"
 
-export type LogRequestOptions = {
-	logger: Logger
-	serverName: string
+export type TLogRequestOptions = {
+	logger: TLogger
+	server_name: string
 }
 
-export type LogRequestFn = (options: LogRequestOptions) => Middleware
+export type TLogRequestFn = (options: TLogRequestOptions) => Middleware
 
-export const logRequest: LogRequestFn = options => async (ctx, next) => {
-	await next()
+export const log_request: TLogRequestFn =
+	({ logger, server_name }) =>
+	async (ctx, next) => {
+		await next()
 
-	const name = options.serverName
-	const url = ctx.request.url.toString()
-	const method = chalk.cyan(ctx.request.method.concat(" ".repeat(7 - ctx.request.method.length)))
-	const responseStatus = ctx.response.status
-	const responseTimeHeader = Number(ctx.get("X-Response-Time"))
+		const url = ctx.request.url.toString()
+		const method = chalk.cyan(ctx.request.method.concat(" ".repeat(7 - ctx.request.method.length)))
+		const response_status = ctx.response.status
+		const response_time_header = Number(ctx.get("X-Response-Time"))
 
-	const status = Switch.of(responseStatus)
-		.case(lte(500), () => chalk.red(responseStatus.toString()))
-		.case(lte(400), () => chalk.yellow(responseStatus.toString()))
-		.case(lte(300), () => chalk.cyan(responseStatus.toString()))
-		.case(lte(200), () => chalk.green(responseStatus.toString()))
-		.default(() => responseStatus.toString())
+		const status = Switch.Match(response_status)
+			.case(lte(500), () => chalk.red(response_status.toString()))
+			.case(lte(400), () => chalk.yellow(response_status.toString()))
+			.case(lte(300), () => chalk.cyan(response_status.toString()))
+			.case(lte(200), () => chalk.green(response_status.toString()))
+			.default(() => response_status.toString())
 
-	const rt = Switch.of(responseTimeHeader)
-		.case(lte(300), () => chalk.red(`${responseTimeHeader}ms`))
-		.case(lte(200), () => chalk.yellow(`${responseTimeHeader}ms`))
-		.case(lte(100), () => chalk.cyan(`${responseTimeHeader}ms`))
-		.default(() => chalk.green(`${responseTimeHeader}ms`))
+		const rt = Switch.Match(response_time_header)
+			.case(lte(300), () => chalk.red(`${response_time_header}ms`))
+			.case(lte(200), () => chalk.yellow(`${response_time_header}ms`))
+			.case(lte(100), () => chalk.cyan(`${response_time_header}ms`))
+			.default(() => chalk.green(`${response_time_header}ms`))
 
-	options?.logger.info(`${name} - ${rt} - ${status} ${method} ${url}`)
-}
+		logger.info(`${server_name} - ${rt} - ${status} ${method} ${url}`)
+	}
 
-export const logBunRequest = (options: LogRequestOptions) => (ctx: Context) => {
-	const name = options.serverName
-	const urlObject = new URL(ctx.req.url)
-	const url = urlObject.pathname.concat(urlObject.search)
-	const method = chalk.cyan(ctx.req.method.concat(" ".repeat(7 - ctx.req.method.length)))
-	const responseStatus = ctx.res.status
-	const responseTimeHeader = Math.ceil(
-		Number(ctx.res.headers["x-response-time"].slice(0, -2)) / 1000,
-	)
+export const log_bun_request =
+	({ logger, server_name }: TLogRequestOptions) =>
+	(ctx: Context) => {
+		const url_object = new URL(ctx.req.url)
+		const url = url_object.pathname.concat(url_object.search)
+		const method = chalk.cyan(ctx.req.method.concat(" ".repeat(7 - ctx.req.method.length)))
+		const response_status = ctx.res.status
+		const response_time_header = Math.ceil(
+			Number(ctx.res.headers["x-response-time"].slice(0, -2)) / 1000,
+		)
 
-	const status = Switch.of(responseStatus)
-		.case(lte(500), () => chalk.red(responseStatus.toString()))
-		.case(lte(400), () => chalk.yellow(responseStatus.toString()))
-		.case(lte(300), () => chalk.cyan(responseStatus.toString()))
-		.case(lte(200), () => chalk.green(responseStatus.toString()))
-		.default(() => responseStatus.toString())
+		const status = Switch.Match(response_status)
+			.case(lte(500), () => chalk.red(response_status.toString()))
+			.case(lte(400), () => chalk.yellow(response_status.toString()))
+			.case(lte(300), () => chalk.cyan(response_status.toString()))
+			.case(lte(200), () => chalk.green(response_status.toString()))
+			.default(() => response_status.toString())
 
-	const rt = Switch.of(responseTimeHeader)
-		.case(lte(300), () => chalk.red(`${responseTimeHeader}ms`))
-		.case(lte(200), () => chalk.yellow(`${responseTimeHeader}ms`))
-		.case(lte(100), () => chalk.cyan(`${responseTimeHeader}ms`))
-		.default(() => chalk.green(`${responseTimeHeader}ms`))
+		const rt = Switch.Match(response_time_header)
+			.case(lte(300), () => chalk.red(`${response_time_header}ms`))
+			.case(lte(200), () => chalk.yellow(`${response_time_header}ms`))
+			.case(lte(100), () => chalk.cyan(`${response_time_header}ms`))
+			.default(() => chalk.green(`${response_time_header}ms`))
 
-	options?.logger.info(`${name} - ${rt} - ${status} ${method} ${url}`)
-}
+		logger.info(`${server_name} - ${rt} - ${status} ${method} ${url}`)
+	}

@@ -1,7 +1,0 @@
-.activity {
-	@apply rounded-lg text-2xl leading-[0] !text-neutral-700 transition-all duration-300 hover:!text-purple-600 dark:!text-neutral-300 dark:hover:!text-purple-400;
-}
-
-.activity.active {
-	@apply !text-pink-700 hover:!text-purple-600 dark:!text-pink-500 dark:hover:!text-purple-400;
-}

@@ -21,31 +21,29 @@ import Application from "koa"
 import Router from "@koa/router"
 import bodyparser from "koa-bodyparser"
 import cors from "koa-cors"
-import { identity } from "ramda"
 
-import { ConsoleLogger, Logger } from "@ordo-pink/logger"
-import { Either } from "@ordo-pink/either"
-import { Unary } from "@ordo-pink/tau"
+import { Result } from "@ordo-pink/result"
+import { type TLogger } from "@ordo-pink/logger"
 
-import { handleError } from "./use-error"
-import { logRequest } from "./log-request"
-import { setResponseTimeHeader } from "./set-response-time-header"
+import { handle_error } from "./use-error"
+import { log_request as log_request } from "./log-request"
+import { set_response_time_header as set_response_time_header } from "./set-response-time-header"
 
-export type CreateServerParams = {
-	origin?: string | string[]
-	logger?: Logger
-	serverName: string
-	extendRouter?: Unary<Router, Router>
+export type TCreateServerParams = {
+	origin: string | string[]
+	logger: TLogger
+	server_name: string
+	extend_router: (router: Router) => Router
 }
-export type CreateServerFn = Unary<CreateServerParams, Application>
+export type TCreateServerFn = (params: TCreateServerParams) => Application
 
-export const createServer: CreateServerFn = ({
+export const create_koa_server: TCreateServerFn = ({
 	origin,
-	serverName,
-	extendRouter = identity,
-	logger = ConsoleLogger,
+	extend_router,
+	server_name,
+	logger,
 }) => {
-	const router = extendRouter(new Router())
+	const router = extend_router(new Router())
 
 	router.get("/healthcheck", ctx => {
 		ctx.response.body = "OK"
@@ -54,29 +52,17 @@ export const createServer: CreateServerFn = ({
 
 	const app = new Application()
 
-	app.use(setResponseTimeHeader)
+	app.use(set_response_time_header)
 	app.use(bodyparser())
-	app.use(handleError({ logger }))
-	app.use(logRequest({ logger, serverName }))
+	app.use(handle_error({ logger }))
+	app.use(log_request({ logger, server_name }))
 	app.use(
 		cors({
-			methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+			methods: ["GET", "HEAD", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
 			origin: ctx =>
-				Either.fromNullable(ctx.get("Origin"))
-					.chain(o =>
-						Either.fromNullable(origin)
-							.chain(os =>
-								Either.fromBoolean(
-									() => Array.isArray(os),
-									() => (os as string[]).includes(o),
-									() => o === os,
-								),
-							)
-							.map(allowed => (allowed ? o : ""))
-							.leftMap(allowed => (allowed ? o : "")),
-					)
-					.leftMap(result => (result === null ? "" : result))
-					.fold(identity, identity),
+				Result.FromNullable(ctx.get("Origin"))
+					.pipe(Result.ops.chain(o => Result.If(origin.includes(o), { T: () => o })))
+					.cata({ Ok: x => x, Err: () => "" }),
 			credentials: true,
 		}),
 	)

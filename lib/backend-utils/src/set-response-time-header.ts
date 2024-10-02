@@ -19,7 +19,7 @@
 
 import { Middleware } from "koa"
 
-export const setResponseTimeHeader: Middleware = async (ctx, next) => {
+export const set_response_time_header: Middleware = async (ctx, next) => {
 	const start = Date.now()
 	await next()
 	const ms = Date.now() - start

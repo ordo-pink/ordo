@@ -1,24 +1,73 @@
 # Ordo.pink
 
-An open source
+> Bring Your Thoughts to ORDO
 
 [![Lint](https://github.com/ordo-pink/ordo/actions/workflows/lint.yml/badge.svg)](https://github.com/ordo-pink/ordo/actions/workflows/lint.yml)
-
-[![gitmoji](https://img.shields.io/badge/gitmoji-%20😜%20😍-FFDD67.svg)](https://gitmoji.carloscuesta.me/)
 [![license](https://img.shields.io/github/license/ordo-pink/ordo)](https://github.com/ordo-pink/ordo)
 
-[🇺🇸](/root/docs/readme/en.md) |
-[Add translation](/root/docs/guides/adding-readme-translations/en.md)
-
-## About
-
-Ordo.pink
+Ordo is an extensible engine for data storage.
 
 ## Features
 
-#### Horizontal references
+- Local first (even sign-up is optional!)
+- Rich text editor for text files
+- Good old file explorer view
+- Labels (a.k.a. tags) are first-class citizens here
+- File linking for horizontal relations
+- Embedding files into other files as if directories never existed (in Ordo, every directory is also
+  a file!)
+- Support for custom file properties
+- User achievements for your leisure!
+- Support for Notion-like databases, file/label relation graphs, kanban boards (~~SOON!~~),
+  Excalidraw whiteboards, images, videos (~~SOON!~~), and what not (~~NOT VERY SOON!~~)!
+- Custom extensions support and extension store (~~SOON!~~)
+- Public sharing (~~SOON!~~)
 
-- Ordo.pink
+## Core Principles
+
+There are four principles that lay a foundation of what Ordo is striving to be:
+
+### 1. Open Source
+
+Ordo.pink is completely open sourced, most of the code is available under **GNU AGPL 3.0** with some
+libraries inside the `lib` directory licensed under **The Unlicense**. Don't use any of this code in
+production, btw.
+
+### 2. Local First
+
+You probably didn't know that but "local first" is a fancy way to say "we don't want to pay for
+storing your data, dude". And yeah, we don't want to, really. But, anyways, here's the deal:
+
+- `FREE` without limits on space and upload size if you are not signed up (because we only store it
+  on your current computer lol)
+- `FREE` for **1000 files** of up to **1.5Mb** if signed up (we store it on your current computer
+  and in the cloud so that you can get the info from your other computers if you sign in there).
+  What goes beyond the limit is only stored on your current computer
+- `PAID` if you want to store your belongings of bigger sizes and amounts (pricing section to be
+  defined)
+- `PAID` for team access because you can share the bill you know
+- `PAID` for enterprises because the proletarians told us to show you Kuzkina Mat'
+
+### 3. Security
+
+The data you store on our end is encrypted both in transit and at rest. Finding content is also
+obfuscated since files are never persisted by their name or path and bad guys would need to find
+keys first, and the keys are stored discretely. As for local content - security is not an issue,
+just don't leave your laptop at computer shops too much.
+
+### 4. Extensibility
+
+Ordo works as an engine that allows providing custom extensions - functions - that can bring new
+features to Ordo, including support for new content types, dynamic editor components and views,
+smart-contract/AI/LLM/blockchain/KGB/USSR commands for automation, and even full-featured apps
+inside Ordo! Don't run Doom in the browser, run Doom in Ordo in the browser!
+
+#### The state of extensibility
+
+- As of now, you can add functions via pull requests here on GitHub (yes, meh)
+- We are planning to add DevTools function and support for bringing in custom functions as files in
+  your Ordo storage **shortly**
+- We are planning to function store for publishing custom functions **longly?**
 
 ## License
 
@@ -34,76 +83,36 @@ required binaries, compile `bin/*` files, link all the necessary files, and what
 boot/boot.sh
 ```
 
-> Ordo lives in a handmade monorepo created from scratch just for Ordo. No reusability in mind. You
-> can find out more about the structure of the project in **Repository Structure** section below.
-
-After the script has finished, you can `bin/run` the whole `ordo` ecosystem locally and start
-editing. By default, the app will start in **local** mode which means that your users, auth tokens,
-data and content will be stored locally in files. You can find all that info in `var/*` directory
-that will be created and prepopulated after you run `boot/boot.sh`.
+You can then make it all up and running with
 
 ```sh
 bin/run
 ```
 
-## Repository Structure
+## Contribution Guide
 
-### BOOT
+Not yet established. Sincerely yours, lunch club.
 
-The `/boot` directory contains repo source code and initialisation scripts that are intended to be
-executed when you fetch the repository. The `/bin` apps are created from here.
+## Roadmap
 
-After you fetch the repository, run the `boot/boot.sh` script.
+Coming soon.
 
-```sh
-boot/boot.sh
-```
+## Points of Interest
 
-### BIN
+- `lib/oath` - dependency free promise extension that brings laziness, error branch type
+  definitions, simple cancellation and extended API
+- `lib/result` - a sane alternative to try/catch in synchronous code flows
+- `lib/option` - a nice way to say something is undefined
+- `lib/switch` - switch operator gone wild
+- `lib/maoka` - a 900-ish-byte renderer Ordo front-end is built with (imagine a world where React is
+  900-ish bytes)
 
-The `/bin` directory contains executables improve the developer experience while working with Ordo
-monorepo. After you initialise the repository with a **boot** script, check out the commands in the
-`/bin` directory with the _--help_ option.
+## How to Get Started with Creating Functions
 
-```sh
-bin/run --help
-```
+The best place to start is `lib/core` where all types reside. Those types are available globally, so
+you can `Ordo.Metadata.Query` go brrr. We'll add some guides as soon as custom function development
+becomes possible.
 
-#### Creating a new bin
+## Cheers?
 
-```sh
-bin/mkbin NAME [options]
-```
-
-### LIB
-
-The `/lib` directory contains library code. Put the source code of publishable and non-publishable
-libraries here.
-
-#### Creating a new lib
-
-```sh
-bin/mklib NAME [options]
-```
-
-### OPT
-
-The `/opt` directory contains third-party applications.
-
-### ROOT
-
-The `/root` directory contains root owned things like repo assets and docs.
-
-### SRV
-
-The `/srv` directory contains application code. Client apps and backend services live here.
-
-#### Creating a new srv
-
-```sh
-bin/mksrv NAME [options]
-```
-
-### VAR
-
-The `/var` directory contains variable data such as build results, cache, backups, etc.
+Cheers 🍻

@@ -19,51 +19,55 @@
 
 import { Context } from "koa"
 
-import { JWAT, TTokenService } from "@ordo-pink/backend-service-token"
-import { HttpError } from "@ordo-pink/rrr"
+import { O, type TOption } from "@ordo-pink/option"
+import { type TAuthJWT, type TTokenService } from "@ordo-pink/backend-service-token"
+import { from_option0, is_non_empty_string, is_string } from "@ordo-pink/tau"
 import { Oath } from "@ordo-pink/oath"
+import { RRR } from "@ordo-pink/core"
 
 export const authenticate0 = (
 	ctx: Context,
-	tokenServiceOrIDHost: TTokenService | string,
-): Oath<JWAT, HttpError> =>
-	Oath.of(ctx.header.authorization)
-		.chain(authorization =>
-			Oath.fromBoolean(
-				() =>
-					Boolean(authorization) &&
-					typeof authorization === "string" &&
-					authorization.startsWith("Bearer "),
-				() => authorization as string,
-				() => HttpError.Unauthorized("Authorization token not provided"),
-			),
-		)
-		.chain(token =>
-			typeof tokenServiceOrIDHost === "string"
-				? verifyWithIdServer0(tokenServiceOrIDHost, token)
-				: verifyWithTokenService0(tokenServiceOrIDHost, token.slice(7)),
-		)
-
-const verifyWithIdServer0 = (idHost: string, authorization: string) =>
-	Oath.from(() =>
-		fetch(`${idHost}/verify-token`, {
-			method: "POST",
-			headers: { authorization },
-		})
-			.then(res => res.json())
-			.then(res => (res.success ? res.result : { valid: false })),
-	).chain(res =>
-		res.valid ? Oath.of(res.token) : Oath.reject(HttpError.Forbidden("Invalid token")),
+	token_service_or_id_host: TTokenService | string,
+): Oath<TAuthJWT, Ordo.Rrr<"EINVAL" | "EIO" | "EACCES">> =>
+	Oath.If(
+		is_non_empty_string(ctx.header.authorization) && ctx.header.authorization.startsWith("Bearer "),
+		{
+			T: () => ctx.header.authorization as string,
+			F: () => einval("Authentication token not provided"),
+		},
+	).pipe(
+		Oath.ops.chain(token =>
+			(is_string(token_service_or_id_host)
+				? verify_with_id_server0(token_service_or_id_host, token)
+				: verify_with_token_service0(token_service_or_id_host, token.slice(7))
+			).pipe(Oath.ops.chain(from_option0(() => eacces("User not authenticated")))),
+		),
 	)
 
-const verifyWithTokenService0 = (tokenService: TTokenService, token: string) =>
-	tokenService
-		.verifyToken(token, "access")
-		.chain(isValid =>
-			Oath.fromBoolean(
-				() => isValid,
-				() => "OK",
-				() => HttpError.Forbidden("Invalid token"),
-			),
-		)
-		.chain(() => tokenService.decode(token, "access"))
+// --- Internal ---
+
+const LOCATION = "authenticate"
+
+const einval = RRR.codes.einval(LOCATION)
+const eacces = RRR.codes.eacces(LOCATION)
+const eio = RRR.codes.eio(LOCATION)
+
+const verify_with_id_server0 = (
+	id_host: string,
+	authorization: string,
+): Oath<TOption<TAuthJWT>, Ordo.Rrr<"EINVAL" | "EIO">> =>
+	Oath.FromPromise(() =>
+		fetch(`${id_host}/verify-token`, { method: "POST", headers: { authorization } }),
+	)
+		.pipe(Oath.ops.chain(res => Oath.FromPromise(() => res.json())))
+		.pipe(Oath.ops.rejected_map(e => eio(`verify_with_id_server -> error: ${e.message}`)))
+		.pipe(Oath.ops.map(res => (res.success ? O.Some(res.result as TAuthJWT) : O.None())))
+
+const verify_with_token_service0 = (
+	token_service: TTokenService,
+	token: string,
+): Oath<TOption<TAuthJWT>, Ordo.Rrr<"EINVAL" | "EIO">> =>
+	token_service
+		.verify(token, "access")
+		.pipe(Oath.ops.chain(is_valid => Oath.If(is_valid, { F: () => einval("Invalid token") })))
+		.pipe(Oath.ops.chain(() => token_service.decode(token, "access")))

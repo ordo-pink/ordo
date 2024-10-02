@@ -17,30 +17,36 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { type Middleware } from "koa"
+import { Context } from "koa"
 
-import { type JWAT, type TTokenService } from "@ordo-pink/backend-service-token"
-import { type Oath, bimap0 } from "@ordo-pink/oath"
-import { authenticate0, sendError, sendSuccess } from "@ordo-pink/backend-utils"
-import { type HttpError } from "@ordo-pink/rrr"
-import { type UserService } from "@ordo-pink/backend-service-user"
-import { omit } from "@ordo-pink/tau"
+import { RRR, type TRrr } from "@ordo-pink/managers"
+import { type TUserService, UserService } from "@ordo-pink/backend-service-user"
+import { Oath } from "@ordo-pink/oath"
+import { type TLogger } from "@ordo-pink/logger"
+import { type TTokenService } from "@ordo-pink/backend-service-token"
+import { authenticate0 } from "@ordo-pink/backend-utils"
+import { from_option0 } from "@ordo-pink/tau"
 
-import { toUserNotFoundError } from "../fns/to-error"
-
-export const handleAccount: TFn =
-	({ tokenService, userService }) =>
-	ctx =>
-		authenticate0(ctx, tokenService)
-			.and(getUserById0(userService))
-			.fork(sendError(ctx), sendSuccess({ ctx }))
+export const get_account0: TFn = (ctx, { token_service, user_service }) =>
+	authenticate0(ctx, token_service)
+		.pipe(Oath.ops.map(token => token.payload.sub))
+		.pipe(Oath.ops.chain(get_user_by_id0(user_service)))
+		.pipe(Oath.ops.map(body => ({ status: 200, body })))
 
 // --- Internal ---
 
-type TParams = { tokenService: TTokenService; userService: UserService }
-type TFn = (params: TParams) => Middleware
-type TResult = Routes.ID.GetAccount.Result
+const LOCATION = "get_account"
 
-type TGetUserByIdFn = (us: UserService) => (token: JWAT) => Oath<TResult, HttpError>
-const getUserById0: TGetUserByIdFn = userService => token =>
-	userService.getById(token.payload.sub).pipe(bimap0(toUserNotFoundError, omit("code")))
+const enoent = RRR.codes.enoent(LOCATION)
+
+type TParams = { token_service: TTokenService; user_service: TUserService; logger: TLogger }
+type TFn = (
+	ctx: Context,
+	params: TParams,
+) => Oath<Routes.ID.GetAccount.Response, TRrr<"EIO" | "ENOENT" | "EINVAL" | "EACCES">>
+
+const get_user_by_id0 = (user_service: TUserService) => (sub: string) =>
+	user_service
+		.get_by_id(sub)
+		.pipe(Oath.ops.chain(from_option0(() => enoent(`get_user_by_id -> id: ${sub}`))))
+		.pipe(Oath.ops.map(UserService.serialise))

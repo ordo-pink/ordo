@@ -17,7 +17,8 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-// deno-lint-ignore-file no-explicit-any
+// SPDX-FileCopyrightText: Copyright 2024, 谢尔盖||↓ and the Ordo.pink contributors
+// SPDX-License-Identifier: AGPL-3.0-only
 
 export type Optional<T> = T | undefined
 
@@ -103,3 +104,7 @@ export type ForbidCharacters<
 	Chars extends string,
 	Str extends string,
 > = Str extends `${string}${Chars}${string}` ? never : Str
+
+export type TSnakeToPascal<S extends string> = S extends `${infer A}_${infer B}`
+	? `${Capitalize<A>}${TSnakeToPascal<B>}`
+	: Capitalize<S>

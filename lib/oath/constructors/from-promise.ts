@@ -3,8 +3,8 @@
 
 import { Oath } from "../src/impl"
 
-export const fromPromise0 = <Resolve, Reject = Error>(
-	thunk: () => Promise<Resolve>,
-	abortController = new AbortController(),
-): Oath<Resolve, Reject> =>
-	new Oath((resolve, reject) => thunk().then(resolve, reject), abortController)
+export const from_promise_oath = <$TResolve, $TReject = Error>(
+	thunk: () => Promise<$TResolve>,
+	abort_controller = new AbortController(),
+): Oath<$TResolve, $TReject> =>
+	new Oath((resolve, reject) => thunk().then(resolve, reject), abort_controller)

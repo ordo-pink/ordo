@@ -3,20 +3,20 @@
 
 import { Oath } from "../src/impl"
 
-export const chain0 =
-	<Resolve, Reject, NewResolve, NewReject>(
-		onResolved: (x: Resolve) => Oath<NewResolve, NewReject>,
+export const chain_oath =
+	<$TResolve, $TReject, $TNewResolve, $TNewReject>(
+		on_resolve: (x: $TResolve) => Oath<$TNewResolve, $TNewReject>,
 	) =>
-	(o: Oath<Resolve, Reject>): Oath<NewResolve, Reject | NewReject> =>
+	(o: Oath<$TResolve, $TReject>): Oath<$TNewResolve, $TReject | $TNewReject> =>
 		new Oath(
 			// eslint-disable-next-line @typescript-eslint/no-misused-promises
 			(resolve, reject) =>
 				o.fork(
-					a => (o.isCancelled ? reject(o.cancellationReason as any) : reject(a)),
+					a => (o.is_cancelled ? reject(o.cancellation_reason as any) : reject(a)),
 					b =>
-						o.isCancelled
-							? reject(o.cancellationReason as any)
-							: onResolved(b).fork(reject, resolve),
+						o.is_cancelled
+							? reject(o.cancellation_reason as any)
+							: on_resolve(b).fork(reject, resolve),
 				),
-			o._abortController,
+			o._abort_controller,
 		)

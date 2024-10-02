@@ -1,4 +1,7 @@
 // SPDX-FileCopyrightText: Copyright 2024, 谢尔盖||↓ and the Ordo.pink contributors
+// SPDX-License-Identifier: Unlicense
+
+// SPDX-FileCopyrightText: Copyright 2024, 谢尔盖||↓ and the Ordo.pink contributors
 // SPDX-License-Identifier: AGPL-3.0-only
 
 // Ordo.pink is an all-in-one team workspace.
@@ -17,33 +20,42 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import type * as T from "./types"
-import { isFunction } from "@ordo-pink/tau"
+import type * as Types from "./types"
+import { is_fn } from "@ordo-pink/tau"
 
 // --- Public ---
 
-export const Switch: T.TSwitchStatic = {
+export const Switch: Types.TSwitchStatic = {
 	of: x => swich(x),
-	empty: () => swich(true),
-	negate: () => swich(false),
+	Match: x => swich(x),
+	OfTrue: () => swich(true),
+	OfFalse: () => swich(false),
 }
+
+export const match = <T>(e: T): Types.TSwitch<T, []> => Switch.of(e)
 
 // --- Internal ---
 
-const swichMatched = <TContext, TResult extends unknown[] = []>(
-	x: TContext,
-): T.TSwitch<TContext, TResult> => ({
-	case: () => swichMatched(x),
+const switch_matched = <$TContext, $TResult extends unknown[] = []>(
+	x: $TContext,
+): Types.TSwitch<$TContext, $TResult> => ({
+	case: () => switch_matched(x),
 	default: () => (x as any)(),
+	_: () => (x as any)(),
 })
 
-const swich = <TContext, TResult extends unknown[] = []>(
-	x: TContext,
-): T.TSwitch<TContext, TResult> => ({
-	case: (predicate, onTrue) => {
-		const isTrue = isFunction(predicate) ? predicate(x) : predicate === x
+const swich = <$TContext, $TResult extends unknown[] = []>(
+	x: $TContext,
+): Types.TSwitch<$TContext, $TResult> => ({
+	case: (predicate, on_true) => {
+		const isTrue = is_fn(predicate)
+			? predicate(x)
+			: Array.isArray(predicate)
+				? predicate.includes(x)
+				: predicate === x
 
-		return isTrue ? swichMatched(() => onTrue(x)) : (swich(x) as any)
+		return isTrue ? switch_matched(() => on_true(x)) : (swich(x) as any)
 	},
-	default: defaultValue => defaultValue(x),
+	default: default_value => default_value(x),
+	_: default_value => default_value(x),
 })

@@ -3,9 +3,9 @@
 
 import { Oath } from "../src/impl"
 
-export const orElse =
-	<Resolve, Reject, NewReject>(onRejected: (error: Reject) => NewReject) =>
-	(o: Oath<Resolve, Reject>) =>
-		new Promise<Resolve>((resolve, reject) =>
-			o.isCancelled ? reject(o.cancellationReason) : o._resolver(resolve as any, reject as any),
-		).catch(onRejected)
+export const or_else_oath =
+	<$TResolve, $TReject, $TNewReject>(on_reject: (error: $TReject) => $TNewReject) =>
+	(o: Oath<$TResolve, $TReject>) =>
+		new Promise<$TResolve>((resolve, reject) =>
+			o.is_cancelled ? reject(o.cancellation_reason) : o.cata(resolve as any, reject as any),
+		).catch(on_reject)

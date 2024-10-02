@@ -18,7 +18,7 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { Oath } from "@ordo-pink/oath"
-import { createDirectoryIfNotExists0 } from "@ordo-pink/fs"
+import { create_dir_if_not_exists0 } from "@ordo-pink/fs"
 import { die } from "@ordo-pink/binutil"
 import { getc } from "@ordo-pink/getc"
 
@@ -28,6 +28,6 @@ const { ORDO_DT_DATA_PATH, ORDO_DT_CONTENT_PATH } = getc([
 ])
 
 void Oath.all([
-	createDirectoryIfNotExists0(ORDO_DT_DATA_PATH),
-	createDirectoryIfNotExists0(ORDO_DT_CONTENT_PATH),
+	create_dir_if_not_exists0(ORDO_DT_DATA_PATH),
+	create_dir_if_not_exists0(ORDO_DT_CONTENT_PATH),
 ]).orElse(die())

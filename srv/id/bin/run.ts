@@ -18,10 +18,10 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { die, runAsyncCommand0 } from "@ordo-pink/binutil"
-import { orElse } from "@ordo-pink/oath"
+import { or_else_oath } from "@ordo-pink/oath"
 
 void runAsyncCommand0("opt/bun run --watch srv/id/index.ts", {
 	stdout: "pipe",
 	stderr: "pipe",
 	env: { ...process.env, FORCE_COLOR: "1" },
-}).invoke(orElse(die()))
+}).invoke(or_else_oath(die()))

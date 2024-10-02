@@ -105,11 +105,11 @@ a {
 *::-webkit-scrollbar {
 	width: 5px;
 	height: 5px;
-	@apply bg-transparent transition-colors duration-300;
+	@apply bg-neutral-300 transition-colors duration-300 dark:bg-neutral-900;
 }
 
 *::-webkit-scrollbar-thumb {
-	@apply invisible my-2 rounded-lg bg-neutral-300 transition-all duration-300 dark:bg-neutral-600;
+	@apply invisible my-2 rounded-lg bg-neutral-100  dark:bg-neutral-700;
 }
 
 *:hover::-webkit-scrollbar-thumb {
@@ -117,7 +117,7 @@ a {
 }
 
 .gutter {
-	@apply z-40 bg-transparent pr-2;
+	@apply z-40 bg-transparent pl-2;
 	background-position: 50% 50%;
 }
 

@@ -3,13 +3,15 @@
 
 import { Oath } from "../src/impl"
 
-export const swap0 = <Resolve, Reject>(o: Oath<Resolve, Reject>): Oath<Reject, Resolve> =>
-	new Oath<Reject, Resolve>(
+export const swap_oath = <$TResolve, $TReject>(
+	oath: Oath<$TResolve, $TReject>,
+): Oath<$TReject, $TResolve> =>
+	new Oath<$TReject, $TResolve>(
 		// eslint-disable-next-line @typescript-eslint/no-misused-promises
 		(resolve, reject) =>
-			o.fork(
-				a => (o.isCancelled ? reject(o.cancellationReason as any) : resolve(a)),
+			oath.fork(
+				a => (oath.is_cancelled ? reject(oath.cancellation_reason as any) : resolve(a)),
 				b => reject(b),
 			),
-		o._abortController,
+		oath._abort_controller,
 	)

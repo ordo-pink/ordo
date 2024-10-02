@@ -17,201 +17,166 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { BsFolder2Open } from "react-icons/bs"
-import { lazy } from "react"
+// import { BsFileEarmarkMinus, BsFileEarmarkPlus, BsPencil } from "react-icons/bs"
 
-import { ORDO_PINK_FILE_EXPLORER_FUNCTION } from "@ordo-pink/core"
-import { createFunction } from "@ordo-pink/frontend-create-function"
+import { BS_FOLDER_2_OPEN } from "@ordo-pink/frontend-icons"
+import { create_function } from "@ordo-pink/core"
+import { render_dom } from "@ordo-pink/maoka"
 
-import { registerGoToFileExplorerCommand } from "./src/commands/go-to-file-explorer.command"
-import { registerShowInFileExplorerCommand } from "./src/commands/show-in-file-explorer.command"
+import { CreateFileModal } from "./src/components/create-file-modal.component"
+import { FileExplorer } from "./src/components/fe.component"
+import { RemoveFileModal } from "./src/components/remove-file-modal.component"
+import { RenameFileModal } from "./src/components/rename-file-modal.component"
 
-export default createFunction(
-	ORDO_PINK_FILE_EXPLORER_FUNCTION,
-	{ queries: [], commands: [] },
-	({ getCommands, getLogger, getHosts, registerActivity, data }) => {
-		const commands = getCommands()
-		const logger = getLogger()
-		const { staticHost } = getHosts()
+export default create_function(
+	"pink.ordo.file-explorer",
+	{
+		queries: [
+			"application.commands",
+			"application.current_route",
+			"data.content_query",
+			"application.hosts",
+			"application.fetch",
+			"data.metadata_query",
+			"functions.file_associations",
+		],
+		commands: [
+			"cmd.functions.activities.register",
+			"cmd.application.context_menu.show",
+			"cmd.application.set_title",
+			"cmd.application.context_menu.add",
+			"cmd.application.modal.show",
+			"cmd.application.modal.hide",
+			"cmd.application.add_translations",
+			"cmd.metadata.create",
+			"cmd.metadata.remove",
+			"cmd.metadata.rename",
+			"cmd.application.router.navigate",
+			"cmd.file_explorer.go_to_file",
+			"cmd.file_explorer.open_file_explorer",
+		],
+	},
+	ctx => {
+		const logger = ctx.get_logger()
 
-		logger.debug("Initialising...")
+		logger.debug("🟡 Initialising file-explorer function...")
 
-		const unregisterActivity = registerActivity({
-			name: "pink.ordo.file-explorer.main",
-			Component: lazy(() => import("./src/views/file-explorer.workspace")),
-			routes: ["/fs", "/fs/:fsid"],
-			widgets: [lazy(() => import("./src/views/file-explorer.widget"))],
-			background: false,
-			Icon: BsFolder2Open,
-		})
+		const commands = ctx.get_commands()
 
-		const dropGoToFileExplorerCmd = registerGoToFileExplorerCommand({ commands })
-		const dropShowInFileExplorerCmd = registerShowInFileExplorerCommand({ commands, data })
-
-		commands.emit<cmd.achievements.add>("achievements.add", {
-			descriptor: {
-				image: `${staticHost}/create-10-files.jpg`,
-				description: "Создайте 10 файлов.",
-				id: ORDO_PINK_FILE_EXPLORER_FUNCTION.concat(".achievements.create-10-files"),
-				title: "Стая Файлы",
-				category: "collection",
-			},
-			subscribe: ({ grant }) => {
-				const files = data.getData()
-
-				if (files && files.length >= 10) grant()
-
-				commands.on<cmd.data.create>("data.create", () => {
-					const files = data.getData()
-
-					if (files && files.length >= 9) grant()
-				})
-			},
-		})
-
-		commands.emit<cmd.achievements.add>("achievements.add", {
-			descriptor: {
-				image: `${staticHost}/create-25-files.jpg`,
-				description: "Создайте 25 файлов.",
-				id: ORDO_PINK_FILE_EXPLORER_FUNCTION.concat(".achievements.create-25-files"),
-				title: "Толпа Файлы",
-				category: "collection",
-				previous: ORDO_PINK_FILE_EXPLORER_FUNCTION.concat(".achievements.create-10-files"),
-			},
-			subscribe: ({ grant }) => {
-				const files = data.getData()
-
-				if (files && files.length >= 25) grant()
-
-				commands.on<cmd.data.create>("data.create", () => {
-					const files = data.getData()
-
-					if (files && files.length >= 24) grant()
-				})
+		commands.emit("cmd.application.add_translations", {
+			lang: "en",
+			translations: {
+				"t.file_explorer.modals.create_file.input_placeholder": "Ordo Together Strong",
+				"t.file_explorer.modals.create_file.title": "Create File",
+				"t.file_explorer.modals.create_file.input_label": "File name",
+				"t.file_explorer.modals.remove_file.title": "Remove File",
+				"t.file_explorer.modals.remove_file.message":
+					"Are you sure? Removing files is irreversible.",
+				"t.file_explorer.modals.rename_file.title": "Rename File",
+				"t.file_explorer.modals.rename_file.input_label": "New name",
 			},
 		})
 
-		commands.emit<cmd.achievements.add>("achievements.add", {
-			descriptor: {
-				image: `${staticHost}/create-50-files.jpg`,
-				description: "Создайте 50 файлов.",
-				id: ORDO_PINK_FILE_EXPLORER_FUNCTION.concat(".achievements.create-50-files"),
-				title: "Ordo Файлы",
-				category: "collection",
-				previous: ORDO_PINK_FILE_EXPLORER_FUNCTION.concat(".achievements.create-25-files"),
-			},
-			subscribe: ({ grant }) => {
-				const files = data.getData()
+		// TODO: Move to metadata
+		commands.on("cmd.metadata.show_remove_modal", fsid =>
+			commands.emit("cmd.application.modal.show", {
+				render: div => render_dom(div, RemoveFileModal(ctx, fsid)),
+			}),
+		)
 
-				if (files && files.length >= 50) grant()
+		commands.on("cmd.metadata.show_rename_modal", fsid =>
+			commands.emit("cmd.application.modal.show", {
+				render: div => render_dom(div, RenameFileModal(ctx, fsid)),
+			}),
+		)
 
-				commands.on<cmd.data.create>("data.create", () => {
-					const files = data.getData()
+		commands.on("cmd.metadata.show_create_modal", fsid =>
+			commands.emit("cmd.application.modal.show", {
+				render: div => render_dom(div, CreateFileModal(ctx, fsid)),
+			}),
+		)
 
-					if (files && files.length >= 49) grant()
-				})
-			},
-		})
+		commands.on("cmd.file_explorer.go_to_file", fsid =>
+			commands.emit("cmd.application.router.navigate", `/files/${fsid}`),
+		)
 
-		commands.emit<cmd.achievements.add>("achievements.add", {
-			descriptor: {
-				image: `${staticHost}/create-100-files.jpg`,
-				description: "Создайте 100 файлов.",
-				id: ORDO_PINK_FILE_EXPLORER_FUNCTION.concat(".achievements.create-100-files"),
-				title: "Сотня Файлы",
-				category: "collection",
-				previous: ORDO_PINK_FILE_EXPLORER_FUNCTION.concat(".achievements.create-50-files"),
-			},
-			subscribe: ({ grant }) => {
-				const files = data.getData()
+		commands.on("cmd.file_explorer.open_file_explorer", () =>
+			commands.emit("cmd.application.router.navigate", "/files"),
+		)
 
-				if (files && files.length >= 100) grant()
+		// commands.emit("cmd.application.context_menu.add", {
+		// 	cmd: "cmd.metadata.show_create_modal",
+		// 	Icon: BsFileEarmarkPlus, // TODO: Move to icons
+		// 	readable_name: "Create File", // TODO: Translations
+		// 	should_show: ({ payload }) => Metadata.Validations.is_metadata(payload) || payload === "root",
+		// 	payload_creator: ({ payload }) =>
+		// 		Metadata.Validations.is_metadata(payload) ? payload.get_fsid() : null,
+		// 	type: "create",
+		// })
 
-				commands.on<cmd.data.create>("data.create", () => {
-					const files = data.getData()
+		// commands.emit("cmd.application.context_menu.add", {
+		// 	cmd: "cmd.metadata.show_rename_modal",
+		// 	Icon: BsPencil, // TODO: Move to icons
+		// 	readable_name: "Rename File", // TODO: Translations
+		// 	should_show: ({ payload }) => Metadata.Validations.is_metadata(payload),
+		// 	payload_creator: ({ payload }) =>
+		// 		Metadata.Validations.is_metadata(payload) && payload.get_fsid(),
+		// 	type: "update",
+		// })
 
-					if (files && files.length >= 99) grant()
-				})
-			},
-		})
+		// commands.emit("cmd.application.context_menu.add", {
+		// 	cmd: "cmd.metadata.show_remove_modal",
+		// 	Icon: BsFileEarmarkMinus, // TODO: Move to icons
+		// 	readable_name: "Remove File", // TODO: Translations
+		// 	should_show: ({ payload }) => Metadata.Validations.is_metadata(payload),
+		// 	payload_creator: ({ payload }) =>
+		// 		Metadata.Validations.is_metadata(payload) && payload.get_fsid(),
+		// 	type: "delete",
+		// })
 
-		commands.emit<cmd.achievements.add>("achievements.add", {
-			descriptor: {
-				image: `${staticHost}/create-250-files.jpg`,
-				description: "Создайте 250 файлов.",
-				id: ORDO_PINK_FILE_EXPLORER_FUNCTION.concat(".achievements.create-250-files"),
-				title: "Туча Файлы",
-				category: "collection",
-				previous: ORDO_PINK_FILE_EXPLORER_FUNCTION.concat(".achievements.create-100-files"),
-			},
-			subscribe: ({ grant }) => {
-				const files = data.getData()
-
-				if (files && files.length >= 250) grant()
-
-				commands.on<cmd.data.create>("data.create", () => {
-					const files = data.getData()
-
-					if (files && files.length >= 249) grant()
-				})
-			},
-		})
-
-		commands.emit<cmd.achievements.add>("achievements.add", {
-			descriptor: {
-				image: `${staticHost}/create-500-files.jpg`,
-				description: "Создайте 500 файлов.",
-				id: ORDO_PINK_FILE_EXPLORER_FUNCTION.concat(".achievements.create-500-files"),
-				title: "Тьма Файлы",
-				category: "collection",
-				previous: ORDO_PINK_FILE_EXPLORER_FUNCTION.concat(".achievements.create-250-files"),
-			},
-			subscribe: ({ grant }) => {
-				const files = data.getData()
-
-				if (files && files.length >= 500) grant()
-
-				commands.on<cmd.data.create>("data.create", () => {
-					const files = data.getData()
-
-					if (files && files.length >= 499) grant()
-				})
+		commands.emit("cmd.functions.activities.register", {
+			fid: ctx.fid,
+			activity: {
+				name: "pink.ordo.file-explorer.activity",
+				routes: ["/files", "/files/:fsid"],
+				render_workspace: div => {
+					render_dom(div, FileExplorer(ctx))
+				},
+				render_icon: span => {
+					span.innerHTML = BS_FOLDER_2_OPEN
+				},
 			},
 		})
 
-		commands.emit<cmd.achievements.add>("achievements.add", {
-			descriptor: {
-				image: `${staticHost}/create-1000-files.jpg`,
-				description: "Создайте 1000 файлов.",
-				id: ORDO_PINK_FILE_EXPLORER_FUNCTION.concat(".achievements.create-1000-files"),
-				title: "Легион Файлы",
-				category: "collection",
-				previous: ORDO_PINK_FILE_EXPLORER_FUNCTION.concat(".achievements.create-500-files"),
-			},
-			subscribe: ({ grant }) => {
-				const files = data.getData()
-
-				if (files && files.length >= 1000) grant()
-
-				commands.on<cmd.data.create>("data.create", () => {
-					const files = data.getData()
-
-					if (files && files.length >= 999) grant()
-				})
-			},
-		})
-
-		logger.debug("Initialised.")
-
-		return () => {
-			logger.debug("Terminating...")
-
-			unregisterActivity()
-
-			dropGoToFileExplorerCmd()
-			dropShowInFileExplorerCmd()
-
-			logger.debug("Terminated.")
-		}
+		logger.debug("🟢 Initialised file-explorer function.")
 	},
 )
+
+declare global {
+	interface cmd {
+		file_explorer: {
+			open_file_explorer: () => void
+			go_to_file: () => Ordo.Metadata.FSID | null
+		}
+	}
+
+	interface t {
+		file_explorer: {
+			modals: {
+				create_file: {
+					title: () => string
+					input_placeholder: () => string
+					input_label: () => string
+				}
+				remove_file: {
+					title: () => string
+					message: () => string
+				}
+				rename_file: {
+					title: () => string
+					input_label: () => string
+				}
+			}
+		}
+	}
+}

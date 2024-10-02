@@ -1,4 +1,7 @@
 // SPDX-FileCopyrightText: Copyright 2024, 谢尔盖||↓ and the Ordo.pink contributors
+// SPDX-License-Identifier: Unlicense
+
+// SPDX-FileCopyrightText: Copyright 2024, 谢尔盖||↓ and the Ordo.pink contributors
 // SPDX-License-Identifier: AGPL-3.0-only
 
 // Ordo.pink is an all-in-one team workspace.
@@ -18,7 +21,7 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { Oath } from "@ordo-pink/oath"
-import { isString } from "@ordo-pink/tau"
+import { is_string } from "@ordo-pink/tau"
 
 import { Rrr } from "./wjwt.constants"
 import { WJWTVerifyFn } from "./wjwt.types"
@@ -34,7 +37,7 @@ export const verify0: WJWTVerifyFn =
 			.rejectedMap(() => Rrr.INVALORDO_ID_TOKEN)
 			.chain(token =>
 				Oath.fromBoolean(
-					() => isString(token),
+					() => is_string(token),
 					() => token,
 					() => Rrr.INVALORDO_ID_TOKEN,
 				),
@@ -42,7 +45,7 @@ export const verify0: WJWTVerifyFn =
 			.map(token => token.split("."))
 			.chain(parts =>
 				Oath.fromBoolean(
-					() => parts.length === 3 && parts.every(part => isString(part)),
+					() => parts.length === 3 && parts.every(part => is_string(part)),
 					() => parts as [string, string, string],
 					() => Rrr.INVALORDO_ID_TOKEN,
 				),

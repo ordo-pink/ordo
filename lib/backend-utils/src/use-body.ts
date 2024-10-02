@@ -19,36 +19,34 @@
 
 import { Context } from "koa"
 
-import { HttpError } from "@ordo-pink/rrr"
+import { is_array, is_object, is_string } from "@ordo-pink/tau"
 import { Oath } from "@ordo-pink/oath"
-import { Switch } from "@ordo-pink/switch"
-import { isObject } from "@ordo-pink/tau"
+import { RRR } from "@ordo-pink/core"
 
-export const parseBody0 = <T>(
+export const parse_body0 = <T>(
 	ctx: Context,
 	expect: "string" | "array" | "object" = "object",
-): Oath<T, HttpError> =>
-	Oath.try(async () => (await ctx.request.body) as T)
-		.rejectedMap(HttpError.from)
-		.map(body =>
-			Switch.of(expect)
-				.case(
-					expect => expect === "object" && !isObject(body),
-					() => HttpError.BadRequest("Request body must be an object"),
-				)
-				.case(
-					expect => expect === "string" && typeof body !== "string",
-					() => HttpError.BadRequest("Request body must be a string"),
-				)
-				.case(
-					expect => expect === "array" && !Array.isArray(body),
-					() => HttpError.BadRequest("Request body must be an array"),
-				)
-				.default(() => body),
+): Oath<T, Ordo.Rrr<"EINVAL">> =>
+	Oath.Try(async () => (await ctx.request.body) as T)
+		.pipe(Oath.ops.rejected_map(error => einval(`body parser error: ${error.message}`)))
+		.pipe(
+			Oath.ops.chain(body =>
+				Oath.Merge([
+					Oath.If(expect === "object" && !is_object(body))
+						.pipe(Oath.ops.swap)
+						.pipe(Oath.ops.rejected_map(() => einval("Expected object"))),
+					Oath.If(expect === "array" && !is_array(body))
+						.pipe(Oath.ops.swap)
+						.pipe(Oath.ops.rejected_map(() => einval("Expected array"))),
+					Oath.If(expect === "string" && !is_string(body))
+						.pipe(Oath.ops.swap)
+						.pipe(Oath.ops.rejected_map(() => einval("Expected string"))),
+				]).pipe(Oath.ops.map(() => body)),
+			),
 		)
-		.chain(result =>
-			Oath.try(() => {
-				if (result instanceof HttpError) throw result
-				return result
-			}),
-		)
+
+// --- Internal ---
+
+const LOCATION = "parse_body"
+
+const einval = RRR.codes.einval(LOCATION)

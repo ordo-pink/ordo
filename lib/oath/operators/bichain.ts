@@ -3,24 +3,24 @@
 
 import { Oath } from "../src/impl"
 
-export const bichain0 =
-	<Resolve, Reject, NewResolve, NewReject>(
-		onRejected: (x: Reject) => Oath<NewReject, any>,
-		onResolved: (x: Resolve) => Oath<NewResolve, any>,
+export const bichain_oath =
+	<$TResolve, $TReject, $TNewResolve, $TNewReject>(
+		on_reject: (x: $TReject) => Oath<$TNewReject, any>,
+		on_resolve: (x: $TResolve) => Oath<$TNewResolve, any>,
 	) =>
-	(o: Oath<Resolve, Reject>): Oath<NewResolve, NewReject> =>
-		new Oath<NewResolve, NewReject>(
+	(o: Oath<$TResolve, $TReject>): Oath<$TNewResolve, $TNewReject> =>
+		new Oath<$TNewResolve, $TNewReject>(
 			// eslint-disable-next-line @typescript-eslint/no-misused-promises
 			(resolve, reject) =>
 				o.fork(
 					a =>
-						o.isCancelled
-							? reject(o.cancellationReason as any)
-							: onRejected(a).fork(reject, resolve as any),
+						o.is_cancelled
+							? reject(o.cancellation_reason as any)
+							: on_reject(a).fork(reject, resolve as any),
 					b =>
-						o.isCancelled
-							? reject(o.cancellationReason as any)
-							: onResolved(b).fork(reject, resolve),
+						o.is_cancelled
+							? reject(o.cancellation_reason as any)
+							: on_resolve(b).fork(reject, resolve),
 				),
-			o._abortController,
+			o._abort_controller,
 		)

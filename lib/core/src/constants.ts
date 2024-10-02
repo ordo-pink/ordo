@@ -17,46 +17,73 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-// TODO: Remove
-export const EXTENSION_FILE_PREFIX = ".ext_"
-
 export const OK = "OK" as const
-
-export const ACTIVITY_BAR_WIDTH = 48
-export const SIDEBAR_WORKSPACE_GUTTER_WIDTH = 10
 
 export const LIB_DIRECTORY_FSID = "1de21bf3-2277-4d3a-bbd3-d120eb8a49d0"
 
-export const ORDO_PINK_APP_FUNCTION = "pink.ordo.app"
-
-export const ORDO_PINK_USER_FUNCTION = "pink.ordo.user"
-export const ORDO_PINK_ACHIEVEMENTS_FUNCTION = "pink.ordo.achievements"
-export const ORDO_PINK_FILE_EXPLORER_FUNCTION = "pink.ordo.file-explorer"
-export const ORDO_PINK_LINKS_FUNCTION = "pink.ordo.links"
-export const ORDO_PINK_HOME_FUNCTION = "pink.ordo.home"
-export const ORDO_PINK_EDITOR_FUNCTION = "pink.ordo.editor"
-export const ORDO_PINK_GTD_FUNCTION = "pink.ordo.gtd"
-export const ORDO_PINK_EXCALIDRAW_FUNCTION = "pink.ordo.excalidraw"
-// export const ORDO_PINK_MEDIA_FUNCTION = "pink.ordo.media"
-// export const ORDO_PINK_BOARDS_FUNCTION = "pink.ordo.boards"
-// export const ORDO_PINK_DATABASES_FUNCTION = "pink.ordo.databases"
-// export const ORDO_PINK_DEV_TOOLS_FUNCTION = "pink.ordo.dev-tools"
-// export const ORDO_PINK_CALENDAR_FUNCTION = "pink.ordo.calendar"
-
-export const internalApps = [
-	ORDO_PINK_APP_FUNCTION,
-	ORDO_PINK_USER_FUNCTION,
-	ORDO_PINK_FILE_EXPLORER_FUNCTION,
-	ORDO_PINK_LINKS_FUNCTION,
-	ORDO_PINK_HOME_FUNCTION,
-	ORDO_PINK_EDITOR_FUNCTION,
-	ORDO_PINK_GTD_FUNCTION,
-	ORDO_PINK_ACHIEVEMENTS_FUNCTION,
-	ORDO_PINK_EXCALIDRAW_FUNCTION,
-]
+export const ACTIVITY_BAR_WIDTH = 48
+export const SIDEBAR_WORKSPACE_GUTTER_WIDTH = 10
 
 export const enum BackgroundTaskStatus {
 	NONE,
 	SAVING,
 	LOADING,
+	length,
+}
+
+export enum AchievementCategory {
+	EDUCATION,
+	COLLECTION,
+	CHALLENGE,
+	LEGACY,
+	length,
+}
+
+export enum UserSubscription {
+	FREE,
+	PERSONAL,
+	TEAM,
+	ENTERPRISE,
+	CUSTOM,
+	length,
+}
+
+export enum NotificationType {
+	DEFAULT,
+	SUCCESS,
+	INFO,
+	WARN,
+	QUESTION,
+	RRR,
+	length,
+}
+
+/**
+ * Context menu item type. This impacts two things:
+ *
+ * 1. Grouping items in the context menu.
+ * 2. Given type can be hidden when showing context menu.
+ */
+export enum ContextMenuItemType {
+	CREATE,
+	READ,
+	UPDATE,
+	DELETE,
+	length,
+}
+
+export enum ErrorType {
+	EPERM = 1, // Permission denied
+	ENOENT, // Not found
+	EINTR, // Interrupted
+	EIO, // I/O error
+	ENXIO, // Invalid address
+	EAGAIN, // Loading
+	EACCES, // Access denied
+	EEXIST, // Already exists
+	EINVAL, // Invalid
+	EMFILE, // Too many open files
+	EFBIG, // File too big
+	ENOSPC, // Out of memory
+	length,
 }

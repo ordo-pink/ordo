@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: Copyright 2024, 谢尔盖||↓ and the Ordo.pink contributors
+// SPDX-License-Identifier: Unlicense
+
 // SPDX-FileCopyrightText: Copyright 2023, 谢尔盖||↓ and the Ordo.pink contributors
 // SPDX-License-Identifier: MIT
 
@@ -6,7 +9,7 @@ import { camel } from "case"
 import { join } from "path"
 
 import * as util from "@ordo-pink/binutil"
-import { isDirectory0, isFile0, readFile0 } from "@ordo-pink/fs"
+import { is_dir0, is_file0, read_file0 } from "@ordo-pink/fs"
 import { Oath } from "@ordo-pink/oath"
 import { Switch } from "@ordo-pink/switch"
 import { isReservedJavaScriptKeyword } from "@ordo-pink/rkwjs"
@@ -28,7 +31,7 @@ export const mkf = ({ space, path: initialPath, createTest, fileExtension }: _P)
 					Oath.of(getParentPathForCreatedFile(space, initialPath, unverifiedName))
 						.map(trimTrailingSlashIfExists)
 						.chain(parentPath =>
-							isFile0(`${space}/license`)
+							is_file0(`${space}/license`)
 								.chain(getSpaceLicenseType0(space))
 								.chain(createFiles0({ parentPath, fileExtension, createTest, name })),
 						),
@@ -46,7 +49,7 @@ export const mkf = ({ space, path: initialPath, createTest, fileExtension }: _P)
 const progress = util.createProgress()
 
 const rejectIfSpaceDoesNotExist0: Curry<Binary<string, boolean, Oath<string, string>>> =
-	space => exists => (exists ? Oath.of(space) : Oath.reject(`"${space}" does not exist`))
+	space => exists => (exists ? Oath.of(space) : Oath.Reject(`"${space}" does not exist`))
 const normalizeProvidedSpace: Unary<string, Thunk<string>> = space => () =>
 	space.startsWith("./") ? space : `./${space}`
 const normalizeFileName: Unary<string, string> = unverifiedName =>
@@ -74,7 +77,7 @@ const verifyProvidedSpaceIsValid0: Unary<string, Oath<string, string>> = unverif
 	)
 
 const checkIfSpaceExists0: Unary<string, Oath<string, string>> = space =>
-	isDirectory0(space).chain(rejectIfSpaceDoesNotExist0(space))
+	is_dir0(space).chain(rejectIfSpaceDoesNotExist0(space))
 
 type _CF0P = { parentPath: string; fileExtension: "ts" | "tsx"; createTest: boolean; name: string }
 const createFiles0: Curry<Binary<_CF0P, string, Oath<void[], Error>>> =
@@ -96,7 +99,7 @@ const createFiles0: Curry<Binary<_CF0P, string, Oath<void[], Error>>> =
 const getSpaceLicenseType0: Curry<Binary<string, boolean, Oath<string, Error>>> =
 	space => exists =>
 		exists
-			? readFile0(`${space}/license`, "utf-8").map(content =>
+			? read_file0(`${space}/license`, "utf-8").map(content =>
 					Switch.of(content)
 						.case(mpl, () => "MPL-2.0")
 						.default(() => "MIT"),

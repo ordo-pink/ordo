@@ -2,10 +2,10 @@
 // SPDX-License-Identifier: Unlicense
 
 import { Oath } from "./src/impl"
-import { bimap0 } from "./operators/bimap"
-import { chain0 } from "./operators/chain"
-import { map0 } from "./operators/map"
-import { orNothing } from "./invokers/or-nothing"
+import { bimap_oath } from "./operators/bimap"
+import { chain_oath } from "./operators/chain"
+import { map_oath } from "./operators/map"
+import { or_nothing_oath } from "./invokers/or-nothing"
 
 const times = new Array(10_000).fill(null)
 const avg = (arr: number[]): number => arr.reduce((acc, v) => acc + v, 0) / arr.length
@@ -23,14 +23,14 @@ const testBimap = async () => {
 	for (const i of times) {
 		const time = performance.now()
 
-		await Oath.resolve(1)
+		await Oath.Resolve(1)
 			.pipe(
-				bimap0(
+				bimap_oath(
 					x => (x as any) + 1,
 					x => x + 1,
 				),
 			)
-			.invoke(orNothing)
+			.invoke(or_nothing_oath)
 
 		oath.push(performance.now() - time)
 	}
@@ -58,9 +58,9 @@ const testMap = async () => {
 	for (const i of times) {
 		const time = performance.now()
 
-		await Oath.resolve(1)
-			.pipe(map0(x => x + 1))
-			.invoke(orNothing)
+		await Oath.Resolve(1)
+			.pipe(map_oath(x => x + 1))
+			.invoke(or_nothing_oath)
 
 		oath.push(performance.now() - time)
 	}
@@ -85,9 +85,9 @@ const testChain = async () => {
 	for (const i of times) {
 		const time = performance.now()
 
-		await Oath.resolve(1)
-			.pipe(chain0(x => Oath.resolve(x + 1)))
-			.invoke(orNothing)
+		await Oath.Resolve(1)
+			.pipe(chain_oath(x => Oath.Resolve(x + 1)))
+			.invoke(or_nothing_oath)
 
 		oath.push(performance.now() - time)
 	}
@@ -112,9 +112,9 @@ const testAnd = async () => {
 	for (const i of times) {
 		const time = performance.now()
 
-		await Oath.resolve(1)
+		await Oath.Resolve(1)
 			.and(x => x + 1)
-			.invoke(orNothing)
+			.invoke(or_nothing_oath)
 
 		oath.push(performance.now() - time)
 	}
@@ -139,9 +139,9 @@ const testFix = async () => {
 	for (const i of times) {
 		const time = performance.now()
 
-		await Oath.reject(1)
+		await Oath.Reject(1)
 			.fix(x => x + 1)
-			.invoke(orNothing)
+			.invoke(or_nothing_oath)
 
 		oath.push(performance.now() - time)
 	}

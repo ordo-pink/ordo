@@ -3,19 +3,19 @@
 
 import { Oath } from "../src/impl"
 
-export const ifElse0 =
-	<Resolve, OnTrue = Resolve, OnFalse = Resolve>(
-		validate: (x: Resolve) => boolean,
+export const if_else_oath =
+	<$TResolve, $TOnTrue = $TResolve, $TOnFalse = $TResolve>(
+		validate: (x: $TResolve) => boolean,
 		{
-			onTrue = x => x as any,
-			onFalse = x => x as any,
+			on_true = x => x as any,
+			on_false = x => x as any,
 		}: {
-			onTrue?: (x: Resolve) => OnTrue
-			onFalse?: (x: Resolve) => OnFalse
+			on_true?: (x: $TResolve) => $TOnTrue
+			on_false?: (x: $TResolve) => $TOnFalse
 		},
-		abortController = new AbortController(),
+		abort_controller = new AbortController(),
 	) =>
-	(x: Resolve) =>
+	(x: $TResolve) =>
 		validate(x)
-			? Oath.resolve(onTrue(x), abortController)
-			: Oath.reject(onFalse(x), abortController)
+			? Oath.Resolve(on_true(x), abort_controller)
+			: Oath.Reject(on_false(x), abort_controller)

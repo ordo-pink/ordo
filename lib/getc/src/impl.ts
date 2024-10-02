@@ -17,11 +17,11 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { keysOf } from "@ordo-pink/tau"
+import { keys_of } from "@ordo-pink/tau"
 
 export const getc = <K extends string>(variables?: K[]): { [Key in K]: string } => {
 	if (!variables) {
-		return keysOf(Bun.env as Record<string, string>).reduce(
+		return keys_of(Bun.env as Record<string, string>).reduce(
 			(acc, key) => (key.startsWith("ORDO_") ? { ...acc, [key]: Bun.env[key] } : acc),
 			{} as { [Key in K]: string },
 		)

@@ -20,7 +20,7 @@
 import { watch } from "fs"
 
 import { die, direntsToDirs, getNames, runAsyncCommand0 } from "@ordo-pink/binutil"
-import { directoryExists0, isFile0, readdir0 } from "@ordo-pink/fs"
+import { dir_exists0, is_file0, readdir0 } from "@ordo-pink/fs"
 import { ConsoleLogger } from "@ordo-pink/logger"
 import { Oath } from "@ordo-pink/oath"
 import { getc } from "@ordo-pink/getc"
@@ -33,7 +33,7 @@ void Oath.of("./srv")
 	.map(getNames)
 	.map(names => names.map(name => `./srv/${name}/static`))
 	.chain(paths =>
-		Oath.all(paths.map(path => directoryExists0(path).map(exists => (exists ? path : false)))),
+		Oath.all(paths.map(path => dir_exists0(path).map(exists => (exists ? path : false)))),
 	)
 	.map(items => items.filter(Boolean) as string[])
 	.chain(publicPaths =>
@@ -46,7 +46,7 @@ void Oath.of("./srv")
 								`STATIC copying file ${publicPath}/${dirent.name} -> ${ORDO_STATIC_ROOT}/${dirent.name}`,
 							)
 
-							return isFile0(`${publicPath}/${dirent.name}`).map(isFile => {
+							return is_file0(`${publicPath}/${dirent.name}`).map(isFile => {
 								isFile &&
 									void Bun.write(
 										`${ORDO_STATIC_ROOT}/${dirent.name}`,
@@ -75,7 +75,7 @@ void Oath.of("./srv")
 	.map(getNames)
 	.map(names => names.map(name => `./srv/${name}/static`))
 	.chain(paths =>
-		Oath.all(paths.map(path => directoryExists0(path).map(exists => (exists ? path : false)))),
+		Oath.all(paths.map(path => dir_exists0(path).map(exists => (exists ? path : false)))),
 	)
 	.map(items => items.filter(Boolean) as string[])
 	.map(publicPaths =>

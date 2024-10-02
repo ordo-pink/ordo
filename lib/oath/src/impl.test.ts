@@ -4,24 +4,24 @@
 import { expect, mock, test } from "bun:test"
 
 import { Oath } from "./impl"
-import { bimap0 } from "../operators/bimap"
-import { chain0 } from "../operators/chain"
-import { empty0 } from "../constructors/empty"
-import { fromFalsy0 } from "../constructors/from-falsy"
-import { fromNullable0 } from "../constructors/from-nullable"
-import { fromPromise0 } from "../constructors/from-promise"
-import { ifElse0 } from "../constructors/if-else"
-import { map0 } from "../operators/map"
-import { merge0 } from "../constructors/merge"
+import { bimap_oath } from "../operators/bimap"
+import { chain_oath } from "../operators/chain"
+import { empty_oath } from "../constructors/empty"
+import { from_falsy_oath } from "../constructors/from-falsy"
+import { from_nullable_oath } from "../constructors/from-nullable"
+import { from_promise_oath } from "../constructors/from-promise"
+import { if_else_oath } from "../constructors/if-else"
+import { map_oath } from "../operators/map"
+import { merge_oath } from "../constructors/merge"
 import { oathify } from "./oathify"
-import { orElse } from "../invokers/or-else"
-import { orNothing } from "../invokers/or-nothing"
-import { rejectedChain0 } from "../operators/rejected-chain"
-import { rejectedMap0 } from "../operators/rejected-map"
-import { swap0 } from "../operators/swap"
-import { tap0 } from "../operators/tap"
-import { toPromise } from "../invokers/to-promise"
-import { try0 } from "../constructors/try"
+import { or_else_oath } from "../invokers/or-else"
+import { or_nothing_oath } from "../invokers/or-nothing"
+import { rejected_chain_oath } from "../operators/rejected-chain"
+import { rejected_map_oath } from "../operators/rejected-map"
+import { swap_oath } from "../operators/swap"
+import { tap_oath } from "../operators/tap"
+import { to_promise_oath } from "../invokers/to-promise"
+import { try_oath } from "../constructors/try"
 
 // --- oathify ---
 
@@ -29,14 +29,14 @@ test("oathify should properly wrap a function that returns a promise into a func
 	const givePromise = () => new Promise<number>(resolve => setTimeout(() => resolve(1), 100))
 	const giveOath = oathify(givePromise)
 	const givenResult = giveOath()
-		.pipe(map0(x => x + 1))
-		.invoke(toPromise)
+		.pipe(map_oath(x => x + 1))
+		.invoke(to_promise_oath)
 
 	const takePromise = () => new Promise<number>((_, reject) => setTimeout(() => reject(1), 100))
 	const takeOath = oathify(takePromise)
 	const takenResult = takeOath()
-		.pipe(map0(x => x + 1))
-		.invoke(orElse(() => 3))
+		.pipe(map_oath(x => x + 1))
+		.invoke(or_else_oath(() => 3))
 
 	expect(await givenResult).toEqual(2)
 	expect(await takenResult).toEqual(3)
@@ -45,7 +45,7 @@ test("oathify should properly wrap a function that returns a promise into a func
 // --- Oath.resolve ---
 
 test("Oath.resolve should create a resolved oath of provided value", async () => {
-	const resolved = Oath.resolve(1).invoke(orNothing)
+	const resolved = Oath.Resolve(1).invoke(or_nothing_oath)
 
 	expect(await resolved).toEqual(1)
 })
@@ -53,7 +53,7 @@ test("Oath.resolve should create a resolved oath of provided value", async () =>
 // --- Oath.resolve ---
 
 test("Oath.resolve should create a resolved oath of provided value", async () => {
-	const resolved = Oath.resolve(1).invoke(orNothing)
+	const resolved = Oath.Resolve(1).invoke(or_nothing_oath)
 
 	expect(await resolved).toEqual(1)
 })
@@ -61,7 +61,7 @@ test("Oath.resolve should create a resolved oath of provided value", async () =>
 // --- empty0 ---
 
 test("empty0 should create a resolved oath of undefined", async () => {
-	const resolved = empty0().invoke(orNothing)
+	const resolved = empty_oath().invoke(or_nothing_oath)
 
 	expect(await resolved).toBeUndefined()
 })
@@ -69,7 +69,7 @@ test("empty0 should create a resolved oath of undefined", async () => {
 // --- Oath.reject ---
 
 test("Oath.reject should create a rejected oath of provided value", async () => {
-	const resolved = Oath.reject(1).fork(
+	const resolved = Oath.Reject(1).fork(
 		x => x,
 		x => x,
 	)
@@ -80,7 +80,7 @@ test("Oath.reject should create a rejected oath of provided value", async () => 
 // --- fromNullable0 ---
 
 test("fromNullable0 should create a rejected oath of null if provided value is nullish (null or undefined)", async () => {
-	const rejected = fromNullable0(null).fork(
+	const rejected = from_nullable_oath(null).fork(
 		x => x,
 		x => x,
 	)
@@ -89,7 +89,7 @@ test("fromNullable0 should create a rejected oath of null if provided value is n
 })
 
 test("fromNullable0 should create a resolved oath of provided value if the value is not nullish (null or undefined", async () => {
-	const resolved = fromNullable0(0).fork(
+	const resolved = from_nullable_oath(0).fork(
 		x => x,
 		x => x,
 	)
@@ -100,7 +100,7 @@ test("fromNullable0 should create a resolved oath of provided value if the value
 // --- fromFalsy0 ---
 
 test("fromFalsy0 should create a resolved oath if provided predicate returns true", async () => {
-	const resolved = fromFalsy0(1, 2).fork(
+	const resolved = from_falsy_oath(1, 2).fork(
 		x => x,
 		x => x,
 	)
@@ -109,7 +109,7 @@ test("fromFalsy0 should create a resolved oath if provided predicate returns tru
 })
 
 test("fromFalsy0 should create a rejected oath of null if provided predicate returns false and no onFalse callback is provided", async () => {
-	const resolved = fromFalsy0(0).fork(
+	const resolved = from_falsy_oath(0).fork(
 		x => x,
 		x => x,
 	)
@@ -118,7 +118,7 @@ test("fromFalsy0 should create a rejected oath of null if provided predicate ret
 })
 
 test("fromFalsy0 should create a rejected oath of value returned by onFalse callback if provided predicate returns false", async () => {
-	const resolved = fromFalsy0(0, 1).fork(
+	const resolved = from_falsy_oath(0, 1).fork(
 		x => x,
 		x => x,
 	)
@@ -129,7 +129,7 @@ test("fromFalsy0 should create a rejected oath of value returned by onFalse call
 // --- try0 ---
 
 test("try0 should create a resolved oath of value returned by the provided callback if it does not throw", async () => {
-	const resolved = try0(() => 1).fork(
+	const resolved = try_oath(() => 1).fork(
 		x => x,
 		x => x,
 	)
@@ -138,7 +138,7 @@ test("try0 should create a resolved oath of value returned by the provided callb
 })
 
 test("try0 should created a rejected oath of error thrown by the provided callback", async () => {
-	const rejected = try0(() => {
+	const rejected = try_oath(() => {
 		throw new Error("Oops")
 	}).fork(
 		x => x,
@@ -151,8 +151,8 @@ test("try0 should created a rejected oath of error thrown by the provided callba
 // --- ifElse0 ---
 
 test("ifElse0 should create a resolved oath if provided predicate returns true", async () => {
-	const resolved = Oath.resolve(1)
-		.pipe(chain0(ifElse0(() => true, { onTrue: x => x + 1 })))
+	const resolved = Oath.Resolve(1)
+		.pipe(chain_oath(if_else_oath(() => true, { on_true: x => x + 1 })))
 		.fork(
 			x => x,
 			x => x,
@@ -162,8 +162,8 @@ test("ifElse0 should create a resolved oath if provided predicate returns true",
 })
 
 test("ifElse0 should create a rejected oath of null if provided predicate returns false and no onFalse callback is provided", async () => {
-	const resolved = Oath.resolve(1)
-		.pipe(chain0(ifElse0(() => false, { onTrue: x => x + 1 })))
+	const resolved = Oath.Resolve(1)
+		.pipe(chain_oath(if_else_oath(() => false, { on_true: x => x + 1 })))
 		.fork(
 			x => x,
 			x => x,
@@ -173,8 +173,8 @@ test("ifElse0 should create a rejected oath of null if provided predicate return
 })
 
 test("ifElse0 should create a rejected oath of value returned by onFalse callback if provided predicate returns false", async () => {
-	const resolved = Oath.resolve(1)
-		.pipe(chain0(ifElse0(() => false, { onTrue: () => 1, onFalse: x => x + 2 })))
+	const resolved = Oath.Resolve(1)
+		.pipe(chain_oath(if_else_oath(() => false, { on_true: () => 1, on_false: x => x + 2 })))
 		.fork(
 			x => x,
 			x => x,
@@ -186,7 +186,7 @@ test("ifElse0 should create a rejected oath of value returned by onFalse callbac
 // --- fromPromise0 ---
 
 test("fromPromise0 should create a resolved oath from provided resolved promise thunk", async () => {
-	const resolved = fromPromise0(() => Promise.resolve(1)).fork(
+	const resolved = from_promise_oath(() => Promise.resolve(1)).fork(
 		x => x,
 		x => x,
 	)
@@ -195,7 +195,7 @@ test("fromPromise0 should create a resolved oath from provided resolved promise 
 })
 
 test("fromPromise0 should create a rejected oath from provided rejected promise thunk", async () => {
-	const resolved = fromPromise0(() => Promise.reject(1)).fork(
+	const resolved = from_promise_oath(() => Promise.reject(1)).fork(
 		x => x,
 		x => (x as any) + 1,
 	)
@@ -206,7 +206,7 @@ test("fromPromise0 should create a rejected oath from provided rejected promise 
 // --- merge0 ---
 
 test("merge0 should create a resolved oath of array of resolved provided values", async () => {
-	const resolved = await merge0([0, Promise.resolve(1), Oath.resolve(2)]).fork(
+	const resolved = await merge_oath([0, Promise.resolve(1), Oath.Resolve(2)]).fork(
 		x => x,
 		x => x,
 	)
@@ -217,7 +217,7 @@ test("merge0 should create a resolved oath of array of resolved provided values"
 })
 
 test("merge0 should create a rejected oath of the first rejected value if at least one of the provided values rejects on resolution", async () => {
-	const resolved = await merge0([0, Promise.reject("fails"), Oath.resolve(2)]).fork(
+	const resolved = await merge_oath([0, Promise.reject("fails"), Oath.Resolve(2)]).fork(
 		x => x,
 		x => x,
 	)
@@ -226,7 +226,7 @@ test("merge0 should create a rejected oath of the first rejected value if at lea
 })
 
 test("merge0 should create a resolved oath of record of resolved provided values", async () => {
-	const resolved = await merge0({ a: 0, b: Promise.resolve(1), c: Oath.resolve(2) }).fork(
+	const resolved = await merge_oath({ a: 0, b: Promise.resolve(1), c: Oath.Resolve(2) }).fork(
 		x => x,
 		x => x,
 	)
@@ -237,7 +237,7 @@ test("merge0 should create a resolved oath of record of resolved provided values
 })
 
 test("merge0 should create a rejected oath of the first rejected value if at least one of the provided values rejects on resolution", async () => {
-	const resolved = await merge0({ a: 0, b: Promise.reject("fails"), c: Oath.resolve(2) }).fork(
+	const resolved = await merge_oath({ a: 0, b: Promise.reject("fails"), c: Oath.Resolve(2) }).fork(
 		x => x,
 		x => x,
 	)
@@ -248,7 +248,7 @@ test("merge0 should create a rejected oath of the first rejected value if at lea
 // --- oath.fork ---
 
 test("resolved oath should fork to resolved promise with oath.fork", async () => {
-	const resolved = Oath.resolve(1).fork(
+	const resolved = Oath.Resolve(1).fork(
 		x => x,
 		x => x,
 	)
@@ -257,7 +257,7 @@ test("resolved oath should fork to resolved promise with oath.fork", async () =>
 })
 
 test("rejected oath should fork to resolved promise with oath.fork", async () => {
-	const rejected = Oath.reject(1).fork(
+	const rejected = Oath.Reject(1).fork(
 		x => x,
 		x => x,
 	)
@@ -268,13 +268,13 @@ test("rejected oath should fork to resolved promise with oath.fork", async () =>
 // --- toPromise ---
 
 test("resolved oath should fork to resolved promise with oath.toPromise", async () => {
-	const resolved = Oath.resolve(1).invoke(toPromise)
+	const resolved = Oath.Resolve(1).invoke(to_promise_oath)
 
 	expect(await resolved).toEqual(1)
 })
 
 test("rejected oath should fork to rejected promise with oath.toPromise", () => {
-	const rejected = Oath.reject("broken").invoke(toPromise)
+	const rejected = Oath.Reject("broken").invoke(to_promise_oath)
 
 	rejected.catch(v => expect(v).toEqual("broken"))
 })
@@ -282,13 +282,13 @@ test("rejected oath should fork to rejected promise with oath.toPromise", () => 
 // --- orNothing ---
 
 test("resolved oath should fork to resolved promise of value with oath.orNothing", async () => {
-	const resolved = Oath.resolve(1).invoke(orNothing)
+	const resolved = Oath.Resolve(1).invoke(or_nothing_oath)
 
 	expect(await resolved).toEqual(1)
 })
 
 test("rejected oath should fork to resolved promise of undefined with oath.orNothing", async () => {
-	const rejected = Oath.reject(1).invoke(orNothing)
+	const rejected = Oath.Reject(1).invoke(or_nothing_oath)
 
 	expect(await rejected).toBeUndefined()
 })
@@ -296,13 +296,13 @@ test("rejected oath should fork to resolved promise of undefined with oath.orNot
 // --- orElse ---
 
 test("resolved oath should fork to resolved promise of value with oath.orElse", async () => {
-	const resolved = Oath.resolve(1).invoke(orElse(() => 2))
+	const resolved = Oath.Resolve(1).invoke(or_else_oath(() => 2))
 
 	expect(await resolved).toEqual(1)
 })
 
 test("rejected oath should fork to resolved promise of callback return value with oath.orElse", async () => {
-	const rejected = Oath.reject(1).invoke(orElse(() => 2))
+	const rejected = Oath.Reject(1).invoke(or_else_oath(() => 2))
 
 	expect(await rejected).toEqual(2)
 })
@@ -310,8 +310,8 @@ test("rejected oath should fork to resolved promise of callback return value wit
 // --- oath.pipe
 
 test("pipe should apply provided function over given Oath", async () => {
-	const addOne0 = map0((x: number) => x + 1)
-	const resolved = Oath.resolve(1).pipe(addOne0).pipe(addOne0).pipe(addOne0).invoke(toPromise)
+	const addOne0 = map_oath((x: number) => x + 1)
+	const resolved = Oath.Resolve(1).pipe(addOne0).pipe(addOne0).pipe(addOne0).invoke(to_promise_oath)
 
 	expect(await resolved).toEqual(4)
 })
@@ -319,18 +319,18 @@ test("pipe should apply provided function over given Oath", async () => {
 // --- map0 ---
 
 test("resolved oath.map should return an oath of value updated by the callback", async () => {
-	const resolved = Oath.resolve(1)
-		.pipe(map0(x => x + 1))
-		.invoke(toPromise)
+	const resolved = Oath.Resolve(1)
+		.pipe(map_oath(x => x + 1))
+		.invoke(to_promise_oath)
 
 	expect(await resolved).toEqual(2)
 })
 
 test("rejected oath.map should return an oath of unchanged value", async () => {
-	const rejected = Oath.reject(1)
-		.pipe(map0(x => (x as any) + 1))
+	const rejected = Oath.Reject(1)
+		.pipe(map_oath(x => (x as any) + 1))
 		.fix(x => x)
-		.invoke(toPromise)
+		.invoke(to_promise_oath)
 
 	expect(await rejected).toEqual(1)
 })
@@ -338,18 +338,18 @@ test("rejected oath.map should return an oath of unchanged value", async () => {
 // --- rejectedMap0 ---
 
 test("resolved oath.rejectedMap should return an oath of unchanged value", async () => {
-	const resolved = Oath.resolve(1)
-		.pipe(rejectedMap0(x => (x as any) + 1))
-		.invoke(toPromise)
+	const resolved = Oath.Resolve(1)
+		.pipe(rejected_map_oath(x => (x as any) + 1))
+		.invoke(to_promise_oath)
 
 	expect(await resolved).toEqual(1)
 })
 
 test("rejected oath.rejectedMap should return an oath of value updated by the callback", async () => {
-	const rejected = Oath.reject(1)
-		.pipe(rejectedMap0(x => x + 1))
+	const rejected = Oath.Reject(1)
+		.pipe(rejected_map_oath(x => x + 1))
 		.fix(x => x)
-		.invoke(toPromise)
+		.invoke(to_promise_oath)
 
 	expect(await rejected).toEqual(2)
 })
@@ -357,16 +357,16 @@ test("rejected oath.rejectedMap should return an oath of value updated by the ca
 // --- chain0 ---
 
 test("resolved oath.chain should return a resolved oath of value updated by the callback returning a resolved oath", async () => {
-	const resolved = Oath.resolve(1)
-		.pipe(chain0(x => Oath.resolve(x + 1)))
-		.invoke(toPromise)
+	const resolved = Oath.Resolve(1)
+		.pipe(chain_oath(x => Oath.Resolve(x + 1)))
+		.invoke(to_promise_oath)
 
 	expect(await resolved).toEqual(2)
 })
 
 test("resolved oath.chain should return a rejected oath of value updated by the callback returning a rejected oath", async () => {
-	const rejected = Oath.resolve(1)
-		.pipe(chain0(x => Oath.reject(x + 1)))
+	const rejected = Oath.Resolve(1)
+		.pipe(chain_oath(x => Oath.Reject(x + 1)))
 		.fork(
 			x => x,
 			x => x,
@@ -376,8 +376,8 @@ test("resolved oath.chain should return a rejected oath of value updated by the 
 })
 
 test("rejected oath.chain should return an oath of unchanged value", async () => {
-	const rejected = Oath.reject(1)
-		.pipe(chain0(x => Oath.resolve((x as any) + 1)))
+	const rejected = Oath.Reject(1)
+		.pipe(chain_oath(x => Oath.Resolve((x as any) + 1)))
 		.fork(
 			x => x,
 			x => x,
@@ -389,8 +389,8 @@ test("rejected oath.chain should return an oath of unchanged value", async () =>
 // --- rejectedChain0 ---
 
 test("resolved oath.rejectedChain should return an oath of unchanged value", async () => {
-	const resolved = Oath.resolve(1)
-		.pipe(rejectedChain0(x => Oath.resolve((x as any) + 1)))
+	const resolved = Oath.Resolve(1)
+		.pipe(rejected_chain_oath(x => Oath.Resolve((x as any) + 1)))
 		.fork(
 			x => x,
 			x => x,
@@ -400,8 +400,8 @@ test("resolved oath.rejectedChain should return an oath of unchanged value", asy
 })
 
 test("rejected oath.rejectedChain should return a rejected oath of value updated by the callback returning a resolved oath", async () => {
-	const rejected = Oath.reject<number, number>(1)
-		.pipe(rejectedChain0(x => Oath.resolve(x + 1)))
+	const rejected = Oath.Reject<number, number>(1)
+		.pipe(rejected_chain_oath(x => Oath.Resolve(x + 1)))
 		.fork(
 			x => x,
 			x => x,
@@ -411,8 +411,8 @@ test("rejected oath.rejectedChain should return a rejected oath of value updated
 })
 
 test("rejected oath.rejectedChain should return a rejected oath of value updated by the callback returning a rejected oath", async () => {
-	const rejected = Oath.reject(1)
-		.pipe(rejectedChain0(x => Oath.reject(x + 1)))
+	const rejected = Oath.Reject(1)
+		.pipe(rejected_chain_oath(x => Oath.Reject(x + 1)))
 		.fork(
 			x => x,
 			x => x,
@@ -424,28 +424,28 @@ test("rejected oath.rejectedChain should return a rejected oath of value updated
 // --- bimap0 ---
 
 test("resolved oath.bimap should return a resolved oath of value updated by the second callback", async () => {
-	const resolved = Oath.resolve(1)
+	const resolved = Oath.Resolve(1)
 		.pipe(
-			bimap0(
+			bimap_oath(
 				x => (x as any) + 2,
 				x => x + 1,
 			),
 		)
-		.invoke(toPromise)
+		.invoke(to_promise_oath)
 
 	expect(await resolved).toEqual(2)
 })
 
 test("rejected oath.bimap should return a rejected oath of value updated by the first callback", async () => {
-	const rejected = Oath.reject(1)
+	const rejected = Oath.Reject(1)
 		.pipe(
-			bimap0(
+			bimap_oath(
 				x => x + 2,
 				x => (x as any) + 1,
 			),
 		)
 		.fix(x => x)
-		.invoke(toPromise)
+		.invoke(to_promise_oath)
 
 	expect(await rejected).toEqual(3)
 })
@@ -456,8 +456,8 @@ test("resolved oath.tap should call the first function and return a resolved oat
 	const onResolved = mock((x: number) => x + 1)
 	const onRejected = mock((x: number) => x + 2)
 
-	const resolved = Oath.resolve(1)
-		.pipe(tap0(onResolved, onRejected))
+	const resolved = Oath.Resolve(1)
+		.pipe(tap_oath(onResolved, onRejected))
 		.fork(
 			x => x,
 			x => x,
@@ -472,8 +472,8 @@ test("rejected oath.tap should call the second function and return a rejected oa
 	const onResolved = mock((x: number) => x + 1)
 	const onRejected = mock((x: number) => x + 2)
 
-	const rejected = Oath.reject(1)
-		.pipe(tap0(onResolved, onRejected))
+	const rejected = Oath.Reject(1)
+		.pipe(tap_oath(onResolved, onRejected))
 		.fork(
 			x => x,
 			x => x,
@@ -487,10 +487,10 @@ test("rejected oath.tap should call the second function and return a rejected oa
 // --- swap0 ---
 
 test("resolved oath.swap should return a rejected oath of unchanged values", async () => {
-	const resolved = Oath.resolve(1).pipe(swap0).invoke(orNothing)
-	const resolved2 = Oath.resolve(1)
-		.pipe(chain0(() => Oath.reject(2)))
-		.pipe(swap0)
+	const resolved = Oath.Resolve(1).pipe(swap_oath).invoke(or_nothing_oath)
+	const resolved2 = Oath.Resolve(1)
+		.pipe(chain_oath(() => Oath.Reject(2)))
+		.pipe(swap_oath)
 		.fork(
 			x => x,
 			x => x,
@@ -501,7 +501,7 @@ test("resolved oath.swap should return a rejected oath of unchanged values", asy
 })
 
 test("rejected oath.swap should return a resolved oath of unchanged value", async () => {
-	const rejected = Oath.reject(1).pipe(swap0).invoke(orNothing)
+	const rejected = Oath.Reject(1).pipe(swap_oath).invoke(or_nothing_oath)
 
 	expect(await rejected).toEqual(1)
 })
@@ -509,24 +509,24 @@ test("rejected oath.swap should return a resolved oath of unchanged value", asyn
 // --- oath.and ---
 
 test("resolved oath.and should return a resolved oath of a value updated by the callback if the callback is neither oath nor promise", async () => {
-	const resolved = Oath.resolve(1)
+	const resolved = Oath.Resolve(1)
 		.and(x => x + 1)
-		.invoke(orNothing)
+		.invoke(or_nothing_oath)
 
 	expect(await resolved).toEqual(2)
 })
 
 test("resolved oath.and should return a resolved oath of a value updated by the value of the callback returning a resolved oath", async () => {
-	const resolved = Oath.resolve(1)
-		.and(x => Oath.resolve(x + 1))
-		.invoke(orNothing)
+	const resolved = Oath.Resolve(1)
+		.and(x => Oath.Resolve(x + 1))
+		.invoke(or_nothing_oath)
 
 	expect(await resolved).toEqual(2)
 })
 
 test("resolved oath.and should return a rejected oath of a value updated by the value of the callback returning a rejected oath", async () => {
-	const resolved = Oath.resolve(1)
-		.and(x => Oath.reject(x + 1))
+	const resolved = Oath.Resolve(1)
+		.and(x => Oath.Reject(x + 1))
 		.fork(
 			x => x,
 			x => (x as any) + 1,
@@ -536,15 +536,15 @@ test("resolved oath.and should return a rejected oath of a value updated by the 
 })
 
 test("resolved oath.and should return a resolved oath of a value updated by the value of the callback returng a resoved promise", async () => {
-	const resolved = Oath.resolve(1)
+	const resolved = Oath.Resolve(1)
 		.and(x => Promise.resolve(x + 1))
-		.invoke(orNothing)
+		.invoke(or_nothing_oath)
 
 	expect(await resolved).toEqual(2)
 })
 
 test("resolved oath.and should return a rejected oath of a value updated by the value of the callback returng a rejected promise", async () => {
-	const resolved = Oath.resolve(1)
+	const resolved = Oath.Resolve(1)
 		.and(x => Promise.reject(x + 1))
 		.fork(
 			x => x,
@@ -555,7 +555,7 @@ test("resolved oath.and should return a rejected oath of a value updated by the 
 })
 
 test("rejected oath.and should return a rejected oath of unchanged value", async () => {
-	const rejected = Oath.reject(1)
+	const rejected = Oath.Reject(1)
 		.and(x => (x as any) + 1)
 		.fork(
 			x => x,
@@ -568,7 +568,7 @@ test("rejected oath.and should return a rejected oath of unchanged value", async
 // --- oath.fix ---
 
 test("resolved oath.fix should return a resolved oath of unchanged value", async () => {
-	const resolved = Oath.resolve(1)
+	const resolved = Oath.Resolve(1)
 		.fix(() => 2)
 		.fork(
 			x => x,
@@ -579,7 +579,7 @@ test("resolved oath.fix should return a resolved oath of unchanged value", async
 })
 
 test("rejected oath.fix should return a resolved oath of value returned by the callback", async () => {
-	const rejected = Oath.reject(1)
+	const rejected = Oath.Reject(1)
 		.fix(x => x + 1)
 		.fork(
 			x => x,

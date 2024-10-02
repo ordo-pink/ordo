@@ -19,10 +19,7 @@
 
 import { TLogger } from "@ordo-pink/logger"
 
-export const register_common_translations = (
-	logger: TLogger,
-	commands: Client.Commands.Commands,
-) => {
+export const register_common_translations = (logger: TLogger, commands: Ordo.Command.Commands) => {
 	logger.debug("🟡 Registerring common translations...")
 
 	commands.emit("cmd.application.add_translations", {

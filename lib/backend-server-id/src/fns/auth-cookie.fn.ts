@@ -21,7 +21,7 @@ import { type Context } from "koa"
 
 import { type JTI, type SUB } from "@ordo-pink/wjwt"
 import { Oath } from "@ordo-pink/oath"
-import { RRR } from "@ordo-pink/data"
+import { RRR } from "@ordo-pink/managers"
 import { is_uuid } from "@ordo-pink/tau"
 
 export const set_auth_cookie = (ctx: Context, sub: SUB, jti: JTI, expires: Date): void => {

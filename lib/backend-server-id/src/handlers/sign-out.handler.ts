@@ -20,7 +20,7 @@
 import { type Context } from "koa"
 
 import { Oath } from "@ordo-pink/oath"
-import { type TRrr } from "@ordo-pink/data"
+import { type TRrr } from "@ordo-pink/managers"
 import { type TTokenService } from "@ordo-pink/backend-service-token"
 
 import { get_auth_cookies0, remove_auth_cookie } from "../fns/auth-cookie.fn"

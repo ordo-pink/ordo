@@ -21,7 +21,7 @@ export const Link = ({ href, children, custom_class, show_visited }: P) =>
 // --- Internal ---
 
 const click_listener =
-	(emit: Client.Commands.Commands["emit"], href: string) => (event: MouseEvent) => {
+	(emit: Ordo.Command.Commands["emit"], href: string) => (event: MouseEvent) => {
 		event.preventDefault()
 		event.stopPropagation()
 

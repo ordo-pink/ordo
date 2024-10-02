@@ -17,14 +17,13 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { RRR } from "@ordo-pink/data"
+import { RRR } from "@ordo-pink/core"
 import { Result } from "@ordo-pink/result"
-import { type TGetHostsFn } from "@ordo-pink/core"
 
 import { type TInitCtx } from "../frontend-client.types"
 
 type TInitHostsFn = (params: Pick<TInitCtx, "logger" | "hosts" | "known_functions">) => {
-	get_hosts: TGetHostsFn
+	get_hosts: (fid: symbol) => Ordo.CreateFunction.GetHostsFn
 }
 export const init_hosts: TInitHostsFn = ({ logger, hosts, known_functions }) => {
 	logger.debug("🟢 Initialised hosts.")

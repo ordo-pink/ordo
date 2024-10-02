@@ -8,7 +8,7 @@ import { R } from "@ordo-pink/result"
 import { UserName } from "./status-bar-username.component"
 
 export const User = Maoka.create("div", ({ use, refresh }) => {
-	let user: User.User | null = null
+	let user: Ordo.User.Current.Instance | null = null
 
 	use(Maoka.hooks.set_class(...user_classes))
 

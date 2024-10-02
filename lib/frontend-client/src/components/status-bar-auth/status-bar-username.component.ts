@@ -2,7 +2,7 @@ import { Maoka } from "@ordo-pink/maoka"
 import { OrdoHooks } from "@ordo-pink/maoka-ordo-hooks"
 import { Switch } from "@ordo-pink/switch"
 
-export const UserName = (user: User.User) =>
+export const UserName = (user: Ordo.User.Current.Instance) =>
 	Maoka.create("div", ({ use }) => {
 		const { emit } = use(OrdoHooks.commands)
 
@@ -19,11 +19,11 @@ export const UserName = (user: User.User) =>
 
 // --- Internal ---
 
-const handle_click = (emit: Client.Commands.Commands["emit"]) => (event: MouseEvent) =>
+const handle_click = (emit: Ordo.Command.Commands["emit"]) => (event: MouseEvent) =>
 	emit("cmd.application.context_menu.show", { event: event as any, payload: "status-bar-user" })
 
 const highlight_first_letter_class =
 	"first-letter:bg-gradient-to-tr first-letter:from-pink-500 first-letter:to-purple-500 first-letter:bg-clip-text first-letter:text-transparent"
 
 // TODO: Move to user model
-const get_full_name = (user: User.User) => `${user.first_name} ${user.last_name}`
+const get_full_name = (user: Ordo.User.Current.Instance) => `${user.first_name} ${user.last_name}`

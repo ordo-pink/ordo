@@ -20,18 +20,16 @@
 import { BehaviorSubject, type Observable, map } from "rxjs"
 
 import {
-	CurrentUserManager,
 	CurrentUserRepository,
-	KnownUserRepository,
+	CurrentUserRepositoryAsync,
+	PublicUserRepository,
 	RRR,
-	RemoteCurrentUserRepository,
-	type TUserQuery,
 	UserQuery,
-} from "@ordo-pink/data"
+} from "@ordo-pink/core"
 import { O, type TOption } from "@ordo-pink/option"
-import { type TGetIsAuthenticatedFn, type TGetUserQueryFn } from "@ordo-pink/core"
 import { call_once, noop } from "@ordo-pink/tau"
 import { type AuthResponse } from "@ordo-pink/backend-server-id"
+import { CurrentUserManager } from "@ordo-pink/managers"
 import { Oath } from "@ordo-pink/oath"
 import { Result } from "@ordo-pink/result"
 import { Switch } from "@ordo-pink/switch"
@@ -41,9 +39,9 @@ import { type TInitCtx } from "../frontend-client.types"
 type TInitUserParams = (
 	params: Pick<TInitCtx, "hosts" | "fetch" | "logger" | "commands" | "known_functions">,
 ) => {
-	get_is_authenticated: TGetIsAuthenticatedFn
-	get_user_query: TGetUserQueryFn
-	user_query: TUserQuery
+	get_is_authenticated: (fid: symbol) => Ordo.CreateFunction.GetIsAuthenticatedFn
+	get_user_query: (fid: symbol) => Ordo.CreateFunction.GetUserQueryFn
+	user_query: Ordo.User.Query
 	auth$: Observable<TOption<AuthResponse>>
 }
 export const init_user: TInitUserParams = call_once(
@@ -53,8 +51,8 @@ export const init_user: TInitUserParams = call_once(
 		let timeout: number
 
 		// TODO: Move to auth fn
-		const path: Routes.ID.RefreshToken.Path = "/account/refresh-token"
-		const method: Routes.ID.RefreshToken.Method = "POST"
+		const path: Ordo.Routes.ID.RefreshToken.Path = "/account/refresh-token"
+		const method: Ordo.Routes.ID.RefreshToken.Method = "POST"
 
 		const refresh_token = Oath.Resolve({ path, method })
 			.pipe(
@@ -113,12 +111,12 @@ export const init_user: TInitUserParams = call_once(
 
 		logger.debug("Initialised auth.")
 
-		const current_user_repository = CurrentUserRepository.of(current_user$)
-		const current_user_remote_repository = RemoteCurrentUserRepository.of(hosts.id, fetch)
+		const current_user_repository = CurrentUserRepository.Of(current_user$)
+		const current_user_remote_repository = CurrentUserRepositoryAsync.Of(hosts.id, fetch)
 
-		const known_users_repository = KnownUserRepository.of(known_users$)
+		const known_users_repository = PublicUserRepository.Of(known_users$)
 
-		const user_query = UserQuery.of(current_user_repository, known_users_repository)
+		const user_query = UserQuery.Of(current_user_repository, known_users_repository)
 
 		CurrentUserManager.of(current_user_repository, current_user_remote_repository, auth$).start(
 			state_change =>
@@ -184,5 +182,5 @@ const eperm = RRR.codes.eperm(LOCATION)
 const einval = RRR.codes.einval(LOCATION)
 
 const auth$ = new BehaviorSubject<TOption<AuthResponse>>(O.None())
-const current_user$ = new BehaviorSubject<TOption<User.User>>(O.None())
-const known_users$ = new BehaviorSubject<User.PublicUser[]>([])
+const current_user$ = new BehaviorSubject<TOption<Ordo.User.Current.Instance>>(O.None())
+const known_users$ = new BehaviorSubject<Ordo.User.Public.Instance[]>([])

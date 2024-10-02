@@ -30,7 +30,7 @@ import {
 	type PlainData,
 	UnexpectedError,
 	type UserID,
-} from "@ordo-pink/data"
+} from "@ordo-pink/managers"
 import { Oath } from "@ordo-pink/oath"
 
 type Params = {

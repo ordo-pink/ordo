@@ -3,16 +3,14 @@ import { Maoka, type TMaokaChildren } from "@ordo-pink/maoka"
 import { OrdoHooks, ordo_context } from "@ordo-pink/maoka-ordo-hooks"
 import { BsPlus } from "@ordo-pink/frontend-icons"
 import { R } from "@ordo-pink/result"
-import { type TCreateFunctionContext } from "@ordo-pink/core"
-import { type TMetadata } from "@ordo-pink/data"
 
 // TODO: Avoid unnecessary rerenders by narrowing down hooks
 
 const BORDER_COLOR_CLASS = "border-neutral-300 dark:border-neutral-700"
 
-export const Database = (metadata: TMetadata, ctx: TCreateFunctionContext) =>
+export const Database = (metadata: Ordo.Metadata.Instance, ctx: Ordo.CreateFunction.Params) =>
 	Maoka.create("div", ({ use, refresh, on_unmount }) => {
-		let descendents: TMetadata[] = []
+		let descendents: Ordo.Metadata.Instance[] = []
 
 		use(ordo_context.provide(ctx))
 		use(Maoka.hooks.set_class("p-4"))
@@ -104,7 +102,7 @@ export const Database = (metadata: TMetadata, ctx: TCreateFunctionContext) =>
 
 										use(
 											Maoka.hooks.listen("onclick", () => {
-												emit("cmd.data.metadata.show_create_modal", metadata.get_fsid())
+												emit("cmd.metadata.show_create_modal", metadata.get_fsid())
 											}),
 										)
 
@@ -131,7 +129,7 @@ const Cell = (value: TMaokaChildren, on_click?: (event: MouseEvent) => void) =>
 		return () => value
 	})
 
-const FileNameCell = (metadata: TMetadata) =>
+const FileNameCell = (metadata: Ordo.Metadata.Instance) =>
 	Maoka.create("td", ({ use }) => {
 		const { emit } = use(OrdoHooks.commands)
 
@@ -168,9 +166,7 @@ const FileNameCell = (metadata: TMetadata) =>
 							R.FromNullable(event.target as unknown as HTMLDivElement)
 								.pipe(R.ops.map(e => e.innerText))
 								.pipe(R.ops.chain(new_name => R.If(name !== new_name, { T: () => new_name })))
-								.cata(
-									R.catas.if_ok(new_name => emit("cmd.data.metadata.rename", { fsid, new_name })),
-								)
+								.cata(R.catas.if_ok(new_name => emit("cmd.metadata.rename", { fsid, new_name })))
 						})
 
 						use(Maoka.hooks.set_attribute("contenteditable", "true"))

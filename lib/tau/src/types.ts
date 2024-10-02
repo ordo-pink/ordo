@@ -108,16 +108,3 @@ export type ForbidCharacters<
 export type TSnakeToPascal<S extends string> = S extends `${infer A}_${infer B}`
 	? `${Capitalize<A>}${TSnakeToPascal<B>}`
 	: Capitalize<S>
-
-export type TDropIsPrefix<T extends string> = T extends `is_${infer U}` ? U : never
-
-export type TValidation<$TEntity extends Record<string, unknown>, $TKey extends keyof $TEntity> = (
-	x: unknown,
-) => x is $TEntity[$TKey]
-
-export type TValidations<$TEntity extends Record<string, unknown>> = {
-	[$TKey in keyof $TEntity extends string ? `is_${keyof $TEntity}` : never]: TValidation<
-		$TEntity,
-		TDropIsPrefix<$TKey>
-	>
-}

@@ -21,45 +21,36 @@ import { Subject, combineLatestWith, map, merge, scan, shareReplay } from "rxjs"
 import { equals } from "ramda"
 
 import { Result } from "@ordo-pink/result"
-import { type TGetCommandsFn } from "@ordo-pink/core"
 import { call_once } from "@ordo-pink/tau"
 
 import { type TInitCtx } from "../frontend-client.types"
 
-// --- Internal ---
-
 const create_forbidden_commands_message = (fid: symbol | null) =>
 	`🔴 FID "${String(fid)}" did not request permission to use commands.`
 
-type TCommand = (Client.Commands.Command | Client.Commands.PayloadCommand) & { fid: symbol }
-type TCmdHandlerState = Record<string, Client.Commands.TCommandHandler<any>[]>
-type TCmdListener<N extends Client.Commands.CommandName = Client.Commands.CommandName, P = any> = [
+type TCommand = (Ordo.Command.Command | Ordo.Command.PayloadCommand) & { fid: symbol }
+type TCmdHandlerState = Record<string, Ordo.Command.TCommandHandler<any>[]>
+type TCmdListener<N extends Ordo.Command.Name = Ordo.Command.Name, P = any> = [
 	N,
-	Client.Commands.TCommandHandler<P>,
+	Ordo.Command.TCommandHandler<P>,
 	symbol,
 ]
 
 type TInitCommandsFn = (
 	params: Pick<TInitCtx, "logger" | "is_dev" | "known_functions" | "APP_FID">,
 ) => {
-	commands: Client.Commands.Commands
-	get_commands: TGetCommandsFn
+	commands: Ordo.Command.Commands
+	get_commands: (fid: symbol) => Ordo.CreateFunction.GetCommandsFn
 }
 export const init_commands: TInitCommandsFn = call_once(
 	({ logger, is_dev, known_functions, APP_FID }) => {
 		logger.debug("🟡 Initializing commands...")
 
-		const forbidden_commands = (fid: symbol | null): Client.Commands.Commands => ({
+		const forbidden_commands = (fid: symbol | null): Ordo.Command.Commands => ({
 			on: () => {
 				logger.alert(create_forbidden_commands_message(fid))
 			},
 			off: () => {
-				logger.alert(create_forbidden_commands_message(fid))
-			},
-			after: () => {
-				logger.alert(create_forbidden_commands_message(fid))
-			},
-			before: () => {
 				logger.alert(create_forbidden_commands_message(fid))
 			},
 			emit: () => {
@@ -70,7 +61,7 @@ export const init_commands: TInitCommandsFn = call_once(
 			},
 		})
 
-		const commands = (fid: symbol): Client.Commands.Commands => {
+		const commands = (fid: symbol): Ordo.Command.Commands => {
 			const func = known_functions.exchange(fid).cata({ Some: x => x, None: () => "unauthorized" })
 
 			return {
@@ -81,14 +72,6 @@ export const init_commands: TInitCommandsFn = call_once(
 				off: (name, handler) => {
 					logger.debug(`⚫ Function "${func}" removed handler for command "${name}"`)
 					remove$.next([name, handler, fid])
-				},
-				after: (name, handler) => {
-					logger.debug(`🟣 Function "${func}" appended handler for command "${name}"`)
-					add_after$.next([name, handler, fid])
-				},
-				before: (name, handler) => {
-					logger.debug(`🟣 Function "${func}" prepended handler for command "${name}"`)
-					add_before$.next([name, handler, fid])
 				},
 				emit: (name, payload?, key = crypto.randomUUID()) => {
 					enqueue$.next({ name, payload, key, fid })
@@ -159,14 +142,14 @@ export const init_commands: TInitCommandsFn = call_once(
 			get_commands: fid => () =>
 				Result.FromNullable(fid)
 					.pipe(Result.ops.chain(fid => Result.If(known_functions.validate(fid))))
-					.pipe(Result.ops.map(() => fid as symbol))
+					.pipe(Result.ops.map(() => fid))
 					.cata({ Ok: commands, Err: () => forbidden_commands(fid) }),
 		}
 	},
 )
 
-const is_payload_command = (cmd: Client.Commands.Command): cmd is Client.Commands.PayloadCommand =>
-	typeof cmd.name === "string" && (cmd as Client.Commands.PayloadCommand).payload !== undefined
+const is_payload_command = (cmd: Ordo.Command.Command): cmd is Ordo.Command.PayloadCommand =>
+	typeof cmd.name === "string" && (cmd as Ordo.Command.PayloadCommand).payload !== undefined
 
 type TEnqueue = (cmd: TCommand) => (state: TCommand[]) => TCommand[]
 const enqueue: TEnqueue = new_command => state =>
@@ -240,7 +223,7 @@ const remove$ = new Subject<TCmdListener>()
 const command_queue$ = merge(enqueue$.pipe(map(enqueue)), dequeue$.pipe(map(dequeue))).pipe(
 	scan(
 		(acc, f) => f(acc),
-		[] as ((Client.Commands.Command | Client.Commands.PayloadCommand) & { fid: symbol })[],
+		[] as ((Ordo.Command.Command | Ordo.Command.PayloadCommand) & { fid: symbol })[],
 	),
 	shareReplay(1),
 )

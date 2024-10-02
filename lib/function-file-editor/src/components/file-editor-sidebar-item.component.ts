@@ -1,22 +1,21 @@
 import { Maoka, type TMaokaCreateComponentImplFn } from "@ordo-pink/maoka"
 import { is_false, is_true, noop } from "@ordo-pink/tau"
-import { Ordo } from "@ordo-pink/maoka-ordo-hooks"
+import { MaokaOrdo } from "@ordo-pink/maoka-ordo-hooks"
 import { R } from "@ordo-pink/result"
 import { Switch } from "@ordo-pink/switch"
-import { type TMetadata } from "@ordo-pink/data"
 
 import { FileEditorSidebarDirectory } from "./file-editor-sidebar-directory.component"
 import { FileEditorSidebarFile } from "./file-editor-sidebar-file.component"
 
 export const FileEditorSidebarItem = (
-	initial_metadata: TMetadata,
+	initial_metadata: Ordo.Metadata.Instance,
 	depth = 0,
 ): TMaokaCreateComponentImplFn =>
 	Maoka.create("div", ({ use, refresh, on_unmount }) => {
 		let metadata = initial_metadata
 
-		const commands = use(Ordo.Hooks.commands)
-		const metadata_query = use(Ordo.Hooks.metadata_query)
+		const commands = use(MaokaOrdo.Hooks.commands)
+		const metadata_query = use(MaokaOrdo.Hooks.metadata_query)
 
 		const subscription = metadata_query.$.subscribe(() => {
 			metadata_query

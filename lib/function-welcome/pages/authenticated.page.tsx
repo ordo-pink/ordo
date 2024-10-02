@@ -21,7 +21,7 @@ import { useEffect, useState } from "react"
 
 import { is_object, is_string } from "@ordo-pink/tau"
 import { Oath } from "@ordo-pink/oath"
-import { RRR } from "@ordo-pink/data"
+import { RRR } from "@ordo-pink/managers"
 import { use$ } from "@ordo-pink/frontend-react-hooks"
 
 import Card from "@ordo-pink/frontend-react-components/card"

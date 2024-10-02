@@ -2,7 +2,7 @@ import { Maoka } from "@ordo-pink/maoka"
 
 import { ModalCloseButton } from "./close-button.component"
 
-export const Modal = (modal: Client.Modal.ModalPayload | null) =>
+export const Modal = (modal: Ordo.Modal.Instance | null) =>
 	Maoka.create("div", ({ use, current_element }) => {
 		use(
 			Maoka.hooks.listen("onclick", event => {

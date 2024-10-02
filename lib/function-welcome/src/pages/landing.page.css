@@ -1,0 +1,53 @@
+.hero-section {
+	perspective: 1000px;
+	@apply overflow-hidden;
+}
+
+.hero-layers {
+	transform-style: preserve-3d;
+	transform: rotateX(var(--move-y)) rotateY(var(--move-x));
+	transition: var(--transition);
+	@apply h-screen transition-transform will-change-transform;
+}
+
+.hero-layer {
+	@apply pointer-events-none absolute flex items-center justify-center bg-cover bg-center;
+}
+
+.hero-layer_0 {
+	background-image: url(/index-hero-layer-0.png);
+	transform: translateZ(-250px);
+	@apply inset-[-40vw] scale-125;
+}
+
+.hero-layer_1 {
+	background-image: url(/index-hero-layer-1.png);
+	transform: translateZ(100px);
+	@apply inset-0 opacity-20;
+}
+
+.hero-layer_2 {
+	background-image: url(/index-hero-layer-2.png);
+	transform: translateZ(500px);
+	@apply inset-0 opacity-30;
+}
+
+.card-container {
+	@apply fixed top-0 flex h-dvh w-screen items-center justify-center p-4 sm:p-12;
+}
+
+.card {
+	@apply flex w-full max-w-5xl flex-col items-center justify-between space-y-12 rounded-xl bg-gradient-to-br from-sky-950/20 via-indigo-950/20 to-indigo-950/20 p-4 py-12 shadow-xl backdrop-blur-md lg:flex-row lg:space-x-24 lg:space-y-0 lg:px-24 lg:py-20;
+}
+
+.logo-section {
+	@apply inset-0 flex flex-col items-center justify-center bg-cover bg-center;
+}
+
+.logo {
+	@apply text-center text-xl uppercase tracking-tight sm:text-2xl;
+}
+
+.logo_ordo-text {
+	@apply block text-7xl font-black tracking-widest first-letter:bg-gradient-to-tr first-letter:from-pink-500 first-letter:to-purple-500 first-letter:bg-clip-text first-letter:text-transparent sm:text-8xl sm:tracking-normal;
+}

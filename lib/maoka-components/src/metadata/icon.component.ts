@@ -1,9 +1,9 @@
 import { BsFileEarmark, BsFileEarmarkBinary, BsFolderOpen } from "@ordo-pink/frontend-icons"
-import { Ordo, OrdoHooks } from "@ordo-pink/maoka-ordo-hooks"
+import { MaokaOrdo, OrdoHooks } from "@ordo-pink/maoka-ordo-hooks"
 import { Maoka } from "@ordo-pink/maoka"
 import { R } from "@ordo-pink/result"
 import { Switch } from "@ordo-pink/switch"
-import { type TMetadata } from "@ordo-pink/data"
+import { type TMetadata } from "@ordo-pink/managers"
 import { emojis } from "@ordo-pink/emojis"
 
 type P = { metadata: TMetadata; custom_class?: string }
@@ -41,7 +41,7 @@ export const MetadataIcon = ({ metadata, custom_class = "" }: P) =>
 							({
 								id: emoji.code_point,
 								on_select: () => {
-									commands.emit("cmd.data.metadata.set_property", {
+									commands.emit("cmd.metadata.set_property", {
 										fsid: metadata.get_fsid(),
 										key: "emoji_icon",
 										value: emoji.icon,
@@ -74,9 +74,9 @@ export const MetadataIcon = ({ metadata, custom_class = "" }: P) =>
 type P2 = P & { has_children: boolean }
 const Icon = ({ metadata, custom_class, has_children }: P2) =>
 	Maoka.create("div", ({ use, refresh, on_unmount, current_element }) => {
-		let file_associations: Functions.FileAssociation[] = []
+		let file_associations: Ordo.FileAssociation.Instance[] = []
 
-		const file_associations$ = use(Ordo.Hooks.file_associations)
+		const file_associations$ = use(MaokaOrdo.Hooks.file_associations)
 
 		const subscription = file_associations$.subscribe(value => {
 			file_associations = value

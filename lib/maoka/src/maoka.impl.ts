@@ -95,6 +95,12 @@ export const create =
 		return element
 	}
 
+export const styled = (tag: string, classes: string, children_thunk: () => T.TMaokaChildren) =>
+	create(tag, ({ current_element }) => {
+		current_element.setAttribute("class", classes)
+		return children_thunk
+	})
+
 export const render_dom: T.TMaokaRenderDOMFn = (root, component) => {
 	const root_id: string = crypto.randomUUID()
 

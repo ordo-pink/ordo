@@ -17,7 +17,6 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { type TFetch, type TGetFetchFn } from "@ordo-pink/core"
 import { Result } from "@ordo-pink/result"
 import { call_once } from "@ordo-pink/tau"
 
@@ -26,8 +25,8 @@ import { type TInitCtx } from "../frontend-client.types"
 const fetch = window.fetch
 
 type TInitFetchFn = (params: Pick<TInitCtx, "logger" | "known_functions" | "APP_FID">) => {
-	fetch: TFetch
-	get_fetch: TGetFetchFn
+	fetch: Ordo.Fetch
+	get_fetch: (fid: symbol) => Ordo.CreateFunction.GetFetchFn
 }
 export const init_fetch: TInitFetchFn = call_once(({ logger, known_functions, APP_FID }) => {
 	logger.debug("🟡 Initialising fetch...")

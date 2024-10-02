@@ -19,14 +19,14 @@
 
 import type { Context } from "koa"
 
-import { RRR, type TRrr } from "@ordo-pink/data"
 import { type TUserService, UserService } from "@ordo-pink/backend-service-user"
 import { Oath } from "@ordo-pink/oath"
+import { RRR } from "@ordo-pink/core"
 import { from_option0 } from "@ordo-pink/tau"
 import { parse_body0 } from "@ordo-pink/backend-utils"
 
 export const confirm_email0: TFn = (ctx, { user_service }) =>
-	parse_body0<Routes.ID.ConfirmEmail.RequestBody>(ctx, "object")
+	parse_body0<Ordo.Routes.ID.ConfirmEmail.RequestBody>(ctx, "object")
 		.pipe(Oath.ops.chain(extract_ctx0(user_service)))
 		.pipe(Oath.ops.chain(update_user0(user_service)))
 		.pipe(Oath.ops.map(UserService.serialise))
@@ -38,7 +38,7 @@ type TParams = { user_service: TUserService }
 type TFn = (
 	ctx: Context,
 	params: TParams,
-) => Oath<Routes.ID.ConfirmEmail.Response, TRrr<"EINVAL" | "EIO" | "ENOENT">>
+) => Oath<Ordo.Routes.ID.ConfirmEmail.Response, Ordo.Rrr<"EINVAL" | "EIO" | "ENOENT">>
 type TCtx = { user: User.InternalUser; code: string }
 
 const LOCATION = "confirm_email"
@@ -48,7 +48,7 @@ const enoent = RRR.codes.enoent(LOCATION)
 
 const extract_ctx0 =
 	(user_service: TUserService) =>
-	({ email, code }: Routes.ID.ConfirmEmail.RequestBody) =>
+	({ email, code }: Ordo.Routes.ID.ConfirmEmail.RequestBody) =>
 		Oath.Merge({
 			code: Oath.FromNullable(code, () => einval(`extract_ctx -> code: ${code}`)),
 			user: Oath.FromNullable(email)

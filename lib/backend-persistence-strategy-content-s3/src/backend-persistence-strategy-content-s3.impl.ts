@@ -21,7 +21,13 @@ import { DeleteObjectCommand, GetObjectCommand, S3Client } from "@aws-sdk/client
 import { PassThrough, Readable } from "stream"
 import { Upload } from "@aws-sdk/lib-storage"
 
-import { ContentPersistenceStrategy, Data, FSID, UnexpectedError, UserID } from "@ordo-pink/data"
+import {
+	ContentPersistenceStrategy,
+	Data,
+	FSID,
+	UnexpectedError,
+	UserID,
+} from "@ordo-pink/managers"
 import { Oath } from "@ordo-pink/oath"
 import { bimap_oath } from "@ordo-pink/oath/operators/bimap"
 import { chain_oath } from "@ordo-pink/oath/operators/chain"

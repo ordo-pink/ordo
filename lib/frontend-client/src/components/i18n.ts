@@ -20,32 +20,26 @@
 import { BehaviorSubject, combineLatestWith, map } from "rxjs"
 
 import { O, type TOption } from "@ordo-pink/option"
-import {
-	type TGetCurrentLanguageFn,
-	type TGetTranslationsFn,
-	type TTranslateFn,
-	type TTranslations,
-} from "@ordo-pink/core"
 import { call_once, keys_of } from "@ordo-pink/tau"
-import { RRR } from "@ordo-pink/data"
+import { RRR } from "@ordo-pink/core"
 import { Result } from "@ordo-pink/result"
 import { TwoLetterLocale } from "@ordo-pink/locale"
 
 import { type TInitCtx } from "../frontend-client.types"
 
 type TInitI18nFn = (params: Pick<TInitCtx, "logger" | "commands" | "known_functions">) => {
-	get_translations: TGetTranslationsFn
-	get_current_language: TGetCurrentLanguageFn
-	translate: TTranslateFn
+	get_translations: Ordo.CreateFunction.GetTranslationsFn
+	get_current_language: (fid: symbol) => Ordo.CreateFunction.GetCurrentLanguageFn
+	translate: Ordo.I18N.TranslateFn
 }
 
 export const init_i18n: TInitI18nFn = call_once(({ logger, commands, known_functions }) => {
 	logger.debug("🟡 Initialising i18n...")
 
-	commands.on("cmd.application.add_translations", ({ translations, lang, prefix }) => {
-		const known_translations = translations$.getValue().unwrap() ?? ({} as TTranslations)
+	commands.on("cmd.application.add_translations", ({ translations, lang }) => {
+		const known_translations = translations$.getValue().unwrap() ?? ({} as Ordo.I18N.Translations)
 		const prefixed_translations = keys_of(translations).reduce(
-			(acc, key) => ({ ...acc, [prefix ? `t.${prefix}.${key}` : key]: translations[key] }),
+			(acc, key) => ({ ...acc, [key]: translations[key] }),
 			{},
 		)
 
@@ -58,7 +52,7 @@ export const init_i18n: TInitI18nFn = call_once(({ logger, commands, known_funct
 
 	logger.debug("🟢 Initialised i18n.")
 
-	const translate: TTranslateFn = key =>
+	const translate: Ordo.I18N.TranslateFn = key =>
 		translations$.getValue().cata({
 			Some: translations => translations[current_language$.getValue()][key],
 			None: () => key,
@@ -82,7 +76,7 @@ export const init_i18n: TInitI18nFn = call_once(({ logger, commands, known_funct
 
 // --- Internal ---
 
-const translations$ = new BehaviorSubject<TOption<TTranslations>>(O.None())
+const translations$ = new BehaviorSubject<TOption<Ordo.I18N.Translations>>(O.None())
 const current_language$ = new BehaviorSubject<TwoLetterLocale>(TwoLetterLocale.ENGLISH)
 
 const eperm = RRR.codes.eperm("init_i18n")

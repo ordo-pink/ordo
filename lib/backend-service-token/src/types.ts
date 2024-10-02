@@ -21,7 +21,7 @@ import type { AUD, Algorithm, ISS, JTI, JWT, JWTPayload, SUB } from "@ordo-pink/
 import type { Oath } from "@ordo-pink/oath"
 import type { TLogger } from "@ordo-pink/logger"
 import type { TOption } from "@ordo-pink/option"
-import type { TRrr } from "@ordo-pink/data"
+import type { TRrr } from "@ordo-pink/managers"
 
 // --- Public ---
 

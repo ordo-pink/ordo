@@ -2,32 +2,33 @@ import { type Observable } from "rxjs"
 
 import { OrdoHooks, ordo_context } from "@ordo-pink/maoka-ordo-hooks"
 import { Maoka } from "@ordo-pink/maoka"
-import { type TCreateFunctionContext } from "@ordo-pink/core"
 import { type TOption } from "@ordo-pink/option"
 
 import { ActivityBarLink } from "./activity-bar-link.component"
 
 export const ActivityBar = (
-	ctx: TCreateFunctionContext,
-	current_activity$: Observable<TOption<Functions.Activity>>,
-	activities$: Observable<Functions.Activity[]>,
+	ctx: Ordo.CreateFunction.Params,
+	current_activity$: Observable<TOption<Ordo.Activity.Instance>>,
+	activities$: Observable<Ordo.Activity.Instance[]>,
 ) =>
 	Maoka.create("div", ({ use, refresh }) => {
-		let current_activity: Functions.Activity | null = null
-		let activities: Functions.Activity[] = []
+		let current_activity: Ordo.Activity.Instance | null = null
+		let activities: Ordo.Activity.Instance[] = []
 
 		use(ordo_context.provide(ctx))
 
 		const { emit } = use(OrdoHooks.commands)
 
-		const handle_activities_update = (new_activities: Functions.Activity[]) => {
+		const handle_activities_update = (new_activities: Ordo.Activity.Instance[]) => {
 			if (new_activities.length !== activities.length) {
 				activities = new_activities
 				refresh()
 			}
 		}
 
-		const handle_current_activity_update = (new_activity_option: TOption<Functions.Activity>) => {
+		const handle_current_activity_update = (
+			new_activity_option: TOption<Ordo.Activity.Instance>,
+		) => {
 			const new_activity = new_activity_option.unwrap() ?? null
 
 			if (current_activity?.name !== new_activity?.name) {
@@ -59,7 +60,7 @@ export const ActivityBar = (
 
 const activity_bar_class = "h-full flex flex-col space-y-4 items-center justify-center"
 
-const handle_context_menu = (emit: Client.Commands.Commands["emit"]) => (event: MouseEvent) => {
+const handle_context_menu = (emit: Ordo.Command.Commands["emit"]) => (event: MouseEvent) => {
 	event.preventDefault()
 	emit("cmd.application.context_menu.show", { event: event as any })
 }

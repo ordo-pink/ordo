@@ -17,13 +17,12 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { type TGetLoggerFn } from "@ordo-pink/core"
 import { call_once } from "@ordo-pink/tau"
 
 import { type TInitCtx } from "../frontend-client.types"
 
 type TInitLoggerFn = (params: Pick<TInitCtx, "logger" | "known_functions">) => {
-	get_logger: TGetLoggerFn
+	get_logger: (fid: symbol) => Ordo.CreateFunction.GetLoggerFn
 }
 export const init_logger: TInitLoggerFn = call_once(({ logger, known_functions }) => {
 	logger.debug("🟢 Initialised logger.")

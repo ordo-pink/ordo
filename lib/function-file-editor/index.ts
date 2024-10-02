@@ -17,10 +17,9 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { BsLayoutTextWindow } from "react-icons/bs"
+// import { BsLayoutTextWindow } from "react-icons/bs"
 
 import { BS_LAYOUT_TEXT_WINDOW } from "@ordo-pink/frontend-icons"
-import { type FSID } from "@ordo-pink/data"
 import { create_function } from "@ordo-pink/core"
 import { render_dom } from "@ordo-pink/maoka"
 
@@ -31,7 +30,7 @@ declare global {
 	interface cmd {
 		file_editor: {
 			open: () => void
-			open_file: () => FSID
+			open_file: () => Ordo.Metadata.FSID
 		}
 	}
 
@@ -54,14 +53,14 @@ export default create_function(
 			"cmd.application.router.navigate",
 			"cmd.application.set_title",
 			"cmd.application.command_palette.add",
-			"cmd.data.metadata.show_create_modal",
+			"cmd.metadata.show_create_modal",
 			"cmd.file_editor.open",
 			"cmd.file_editor.open_file",
-			"cmd.data.metadata.rename",
+			"cmd.metadata.rename",
 			"cmd.application.context_menu.show",
 			"cmd.application.command_palette.show",
 			"cmd.application.command_palette.hide",
-			"cmd.data.metadata.set_property",
+			"cmd.metadata.set_property",
 			"cmd.application.notification.show",
 		],
 		queries: [
@@ -85,13 +84,13 @@ export default create_function(
 			},
 		})
 
-		emit("cmd.application.command_palette.add", {
-			id: "cmd.file_editor.open",
-			on_select: () => emit("cmd.file_editor.open"),
-			readable_name: "t.file_editor.command_palette.open",
-			accelerator: "mod+e",
-			Icon: BsLayoutTextWindow,
-		})
+		// emit("cmd.application.command_palette.add", {
+		// 	id: "cmd.file_editor.open",
+		// 	on_select: () => emit("cmd.file_editor.open"),
+		// 	readable_name: "t.file_editor.command_palette.open",
+		// 	accelerator: "mod+e",
+		// 	Icon: BsLayoutTextWindow,
+		// })
 
 		emit("cmd.functions.activities.register", {
 			fid: ctx.fid,

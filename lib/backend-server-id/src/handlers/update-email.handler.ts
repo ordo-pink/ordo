@@ -19,7 +19,7 @@
 
 import { Context } from "koa"
 
-import { RRR, type TRrr } from "@ordo-pink/data"
+import { RRR, type TRrr } from "@ordo-pink/managers"
 import { type TAuthJWT, type TTokenService } from "@ordo-pink/backend-service-token"
 import { type TUserService, UserService } from "@ordo-pink/backend-service-user"
 import { authenticate0, parse_body0 } from "@ordo-pink/backend-utils"
@@ -86,7 +86,7 @@ const send_notification =
 			old_email: ctx.user.email,
 			confirmation_url: create_confirmation_url(
 				website_host,
-				ctx.email as User.User["email"],
+				ctx.email as Ordo.User.Current.Instance["email"],
 				ctx.code,
 			),
 		})

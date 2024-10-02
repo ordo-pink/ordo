@@ -1,23 +1,22 @@
 import { type Observable, pairwise } from "rxjs"
 
-import { Ordo, ordo_context } from "@ordo-pink/maoka-ordo-hooks"
+import { MaokaOrdo, ordo_context } from "@ordo-pink/maoka-ordo-hooks"
 import { Maoka } from "@ordo-pink/maoka"
-import { type TCreateFunctionContext } from "@ordo-pink/core"
 import { type TOption } from "@ordo-pink/option"
 
 import { Modal } from "./modal.component"
 
 export const ModalOverlay = (
-	$: Observable<TOption<Client.Modal.ModalPayload>>,
-	ctx: TCreateFunctionContext,
+	$: Observable<TOption<Ordo.Modal.Instance>>,
+	ctx: Ordo.CreateFunction.Params,
 ) =>
 	Maoka.create("div", ({ use, refresh, on_unmount }) => {
 		use(ordo_context.provide(ctx))
 
-		let modal_state: Client.Modal.ModalPayload | null = null
+		let modal_state: Ordo.Modal.Instance | null = null
 		let unmount_prev_state: () => void = () => void 0
 
-		const commands = use(Ordo.Hooks.commands)
+		const commands = use(MaokaOrdo.Hooks.commands)
 
 		const subscription = $.pipe(pairwise()).subscribe(([prev_state, state]) => {
 			modal_state = state.unwrap() ?? null

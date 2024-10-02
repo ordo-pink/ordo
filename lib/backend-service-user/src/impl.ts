@@ -34,7 +34,7 @@ import {
 } from "@ordo-pink/tau"
 import { O } from "@ordo-pink/option"
 import { Oath } from "@ordo-pink/oath"
-import { RRR } from "@ordo-pink/data"
+import { RRR } from "@ordo-pink/managers"
 import { okpwd } from "@ordo-pink/okpwd"
 
 import { type TUserServiceStatic, type TUserValidations } from "./types"
@@ -127,7 +127,7 @@ export const serialise_public = ({
 	subscription,
 	first_name,
 	last_name,
-}: User.PublicUser): User.PublicUser => ({
+}: Ordo.User.Public.Instance): Ordo.User.Public.Instance => ({
 	created_at,
 	email,
 	handle,
@@ -148,7 +148,7 @@ const serialise = ({
 	subscription,
 	first_name,
 	last_name,
-}: User.User): User.User => ({
+}: Ordo.User.Current.Instance): Ordo.User.Current.Instance => ({
 	created_at,
 	email,
 	email_confirmed,
@@ -194,7 +194,7 @@ const create_id = (): UUIDv4 => crypto.randomUUID()
 
 const create_email_code = (): string => crypto.getRandomValues(new Uint8Array(16)).join("")
 
-const obfuscate_email = (email: User.User["email"]): string => {
+const obfuscate_email = (email: Ordo.User.Current.Instance["email"]): string => {
 	const [local_part, domain_part] = email.split("@")
 
 	const top_level_domain_start_index = domain_part.lastIndexOf(".")
@@ -219,7 +219,7 @@ const obfuscate_email = (email: User.User["email"]): string => {
 
 const migrate_0_to_1 = (user: User.UserV0): User.PrivateUser => ({
 	created_at: user.createdAt,
-	email: user.email as User.User["email"],
+	email: user.email as Ordo.User.Current.Instance["email"],
 	email_code: user.code,
 	email_confirmed: user.emailConfirmed,
 	entity_version: 1,

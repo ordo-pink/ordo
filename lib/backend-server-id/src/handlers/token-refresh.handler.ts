@@ -20,7 +20,7 @@
 import { Context } from "koa"
 
 import { type JTI, type SUB } from "@ordo-pink/wjwt"
-import { RRR, type TRrr } from "@ordo-pink/data"
+import { RRR, type TRrr } from "@ordo-pink/managers"
 import { type UUIDv4, from_option0 } from "@ordo-pink/tau"
 import { Oath } from "@ordo-pink/oath"
 import { type TTokenService } from "@ordo-pink/backend-service-token"

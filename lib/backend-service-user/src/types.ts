@@ -20,21 +20,25 @@
 import type { Oath } from "@ordo-pink/oath"
 import type { TOption } from "@ordo-pink/option"
 import type { TResult } from "@ordo-pink/result"
-import type { TRrr } from "@ordo-pink/data"
+import type { TRrr } from "@ordo-pink/managers"
 import { TValidations } from "@ordo-pink/tau"
 
 export type TPersistenceStrategyUser = {
 	create: (user: User.PrivateUser) => Oath<void, TRrr<"EIO" | "EEXIST">>
 	update: (
-		id: User.User["id"],
+		id: Ordo.User.Current.Instance["id"],
 		user: User.PrivateUser,
 	) => Oath<User.PrivateUser, TRrr<"EIO" | "ENOENT">>
-	exists_by_id: (id: User.User["id"]) => Oath<boolean, TRrr<"EIO">>
-	exists_by_email: (email: User.User["email"]) => Oath<boolean, TRrr<"EIO">>
-	exists_by_handle: (handle: User.User["handle"]) => Oath<boolean, TRrr<"EIO">>
-	get_by_id: (id: User.User["id"]) => Oath<TOption<User.PrivateUser>, TRrr<"EIO">>
-	get_by_email: (email: User.User["email"]) => Oath<TOption<User.PrivateUser>, TRrr<"EIO">>
-	get_by_handle: (handle: User.User["handle"]) => Oath<TOption<User.PrivateUser>, TRrr<"EIO">>
+	exists_by_id: (id: Ordo.User.Current.Instance["id"]) => Oath<boolean, TRrr<"EIO">>
+	exists_by_email: (email: Ordo.User.Current.Instance["email"]) => Oath<boolean, TRrr<"EIO">>
+	exists_by_handle: (handle: Ordo.User.Current.Instance["handle"]) => Oath<boolean, TRrr<"EIO">>
+	get_by_id: (id: Ordo.User.Current.Instance["id"]) => Oath<TOption<User.PrivateUser>, TRrr<"EIO">>
+	get_by_email: (
+		email: Ordo.User.Current.Instance["email"],
+	) => Oath<TOption<User.PrivateUser>, TRrr<"EIO">>
+	get_by_handle: (
+		handle: Ordo.User.Current.Instance["handle"],
+	) => Oath<TOption<User.PrivateUser>, TRrr<"EIO">>
 	migrate: (entity_version: User.PrivateUser["entity_version"]) => Oath<void, TRrr<"EIO">>
 	get_outdated: (
 		version: User.PrivateUser["entity_version"],
@@ -52,12 +56,14 @@ export type TUserServiceStatic = {
 	get ENTITY_VERSION(): number
 	Validations: TUserValidations
 	of: (persistence_strategy: TPersistenceStrategyUser) => TUserService
-	serialise: <$TUser extends User.User>(user: $TUser) => User.User
-	serialise_public: <$TUser extends User.PublicUser>(user: $TUser) => User.PublicUser
+	serialise: <$TUser extends Ordo.User.Current.Instance>(user: $TUser) => Ordo.User.Current.Instance
+	serialise_public: <$TUser extends Ordo.User.Public.Instance>(
+		user: $TUser,
+	) => Ordo.User.Public.Instance
 	serialise_internal: <$TUser extends User.InternalUser>(user: $TUser) => User.InternalUser
 	create_email_code: () => string
-	obfuscate_email: (email: User.User["email"]) => string
-	create_id: () => User.User["id"]
+	obfuscate_email: (email: Ordo.User.Current.Instance["email"]) => string
+	create_id: () => Ordo.User.Current.Instance["id"]
 }
 
 export type TUserService = {
@@ -88,12 +94,15 @@ export type TUserService = {
 
 	update_info: (
 		id: string,
-		increment: Pick<User.User, "last_name" | "first_name">,
+		increment: Pick<Ordo.User.Current.Instance, "last_name" | "first_name">,
 	) => Oath<void, TRrr<"EIO" | "ENOENT" | "EINVAL">>
 
 	update_subscription: (
 		id: string,
-		increment: Pick<User.User, "subscription" | "max_upload_size" | "file_limit" | "max_functions">,
+		increment: Pick<
+			Ordo.User.Current.Instance,
+			"subscription" | "max_upload_size" | "file_limit" | "max_functions"
+		>,
 	) => Oath<void, TRrr<"EIO" | "ENOENT" | "EINVAL">>
 
 	confirm_email: (id: string, code: string) => Oath<void, TRrr<"EIO" | "ENOENT" | "EINVAL">>

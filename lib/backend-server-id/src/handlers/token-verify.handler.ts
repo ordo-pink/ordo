@@ -20,7 +20,7 @@
 import { Context } from "koa"
 
 import { Oath } from "@ordo-pink/oath"
-import { type TRrr } from "@ordo-pink/data"
+import { type TRrr } from "@ordo-pink/managers"
 import { type TTokenService } from "@ordo-pink/backend-service-token"
 import { authenticate0 } from "@ordo-pink/backend-utils"
 

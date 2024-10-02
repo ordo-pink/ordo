@@ -1,16 +1,15 @@
 import { BehaviorSubject, Subject, map, merge, scan, shareReplay } from "rxjs"
 
 import { O, type TOption } from "@ordo-pink/option"
-import { type TGetCurrentFileAssociationFn, type TGetFileAssociationsFn } from "@ordo-pink/core"
 import { R } from "@ordo-pink/result"
-import { RRR } from "@ordo-pink/data"
+import { RRR } from "@ordo-pink/core"
 
 import { type TInitCtx } from "../frontend-client.types"
 
 type TInitFileAssociationsParams = Pick<TInitCtx, "known_functions" | "commands">
 type TInitFileAssociationsFn = (params: TInitFileAssociationsParams) => {
-	get_current_file_association: TGetCurrentFileAssociationFn
-	get_file_associations: TGetFileAssociationsFn
+	get_current_file_association: (fid: symbol) => Ordo.CreateFunction.GetCurrentFileAssociationFn
+	get_file_associations: (fid: symbol) => Ordo.CreateFunction.GetFileAssociationsFn
 }
 export const init_file_associations: TInitFileAssociationsFn = ({ known_functions, commands }) => {
 	file_associations$.subscribe()
@@ -34,25 +33,25 @@ export const init_file_associations: TInitFileAssociationsFn = ({ known_function
 }
 
 const eperm = RRR.codes.eperm("init_file_associations")
-const add$ = new Subject<Functions.FileAssociation>()
+const add$ = new Subject<Ordo.FileAssociation.Instance>()
 const remove$ = new Subject<string>()
 
 const add =
-	(new_file_association: Functions.FileAssociation) =>
-	(state: Functions.FileAssociation[]): Functions.FileAssociation[] => [
+	(new_file_association: Ordo.FileAssociation.Instance) =>
+	(state: Ordo.FileAssociation.Instance[]): Ordo.FileAssociation.Instance[] => [
 		...state,
 		new_file_association,
 	]
 
 const remove =
 	(name: string) =>
-	(state: Functions.FileAssociation[]): Functions.FileAssociation[] =>
+	(state: Ordo.FileAssociation.Instance[]): Ordo.FileAssociation.Instance[] =>
 		state.filter(fa => fa.name === name)
 
-export const current_file_association$ = new BehaviorSubject<TOption<Functions.FileAssociation>>(
-	O.None(),
-)
+export const current_file_association$ = new BehaviorSubject<
+	TOption<Ordo.FileAssociation.Instance>
+>(O.None())
 export const file_associations$ = merge(add$.pipe(map(add)), remove$.pipe(map(remove))).pipe(
-	scan((acc, f) => f(acc), [] as Functions.FileAssociation[]),
+	scan((acc, f) => f(acc), [] as Ordo.FileAssociation.Instance[]),
 	shareReplay(1),
 )

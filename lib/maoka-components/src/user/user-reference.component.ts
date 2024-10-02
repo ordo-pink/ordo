@@ -25,7 +25,7 @@ export const CurrentUserReference = Maoka.create("div", ({ use, refresh, on_unmo
 	return () => [UserAvatar, UserName(name)]
 })
 
-const get_user_name = (user: User.PublicUser) =>
+const get_user_name = (user: Ordo.User.Public.Instance) =>
 	Switch.OfTrue()
 		.case(!!user.first_name && !!user.last_name, () => get_full_name(user))
 		.case(!!user.last_name, () => user.first_name)
@@ -68,4 +68,4 @@ const highlight_first_letter_class =
 	"first-letter:bg-gradient-to-tr first-letter:from-pink-500 first-letter:to-purple-500 first-letter:bg-clip-text first-letter:text-transparent"
 
 // TODO: Move to user model
-const get_full_name = (user: User.PublicUser) => `${user.first_name} ${user.last_name}`
+const get_full_name = (user: Ordo.User.Public.Instance) => `${user.first_name} ${user.last_name}`

@@ -19,7 +19,7 @@
 
 import { type JTI } from "@ordo-pink/wjwt"
 import { Oath } from "@ordo-pink/oath"
-import { type TRrr } from "@ordo-pink/data"
+import { type TRrr } from "@ordo-pink/managers"
 import { type TTokenService } from "@ordo-pink/backend-service-token"
 
 export type TCreateAuthTokenResult = {

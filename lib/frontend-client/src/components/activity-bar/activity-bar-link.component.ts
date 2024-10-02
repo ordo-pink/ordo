@@ -3,9 +3,9 @@ import { get_commands } from "@ordo-pink/maoka-ordo-hooks"
 
 import { ActivityBarIcon } from "./activity-bar-icon.component"
 
-type P = Pick<Functions.Activity, "default_route"> &
-	Required<Pick<Functions.Activity, "render_icon" | "routes" | "name">> & {
-		current_activity?: Functions.Activity["name"]
+type P = Pick<Ordo.Activity.Instance, "default_route"> &
+	Required<Pick<Ordo.Activity.Instance, "render_icon" | "routes" | "name">> & {
+		current_activity?: Ordo.Activity.Instance["name"]
 	}
 export const ActivityBarLink = ({
 	render_icon,
@@ -23,11 +23,11 @@ export const ActivityBarLink = ({
 		use(Maoka.hooks.set_attribute("href", activity_link))
 		use(click_listener(emit, activity_link))
 
-		return () => ActivityBarIcon({ name, render_icon, current_activity })
+		return () => ActivityBarIcon({ name, render_icon, current_activity_name: current_activity })
 	})
 }
 
-const click_listener = (emit: Client.Commands.Commands["emit"], activity_link: string) =>
+const click_listener = (emit: Ordo.Command.Commands["emit"], activity_link: string) =>
 	Maoka.hooks.listen("onclick", event => {
 		event.preventDefault()
 		emit("cmd.application.router.navigate", activity_link)

@@ -19,14 +19,14 @@
 
 import { Context } from "koa"
 
-import { RRR, type TRrr } from "@ordo-pink/data"
 import { is_array, is_object, is_string } from "@ordo-pink/tau"
 import { Oath } from "@ordo-pink/oath"
+import { RRR } from "@ordo-pink/core"
 
 export const parse_body0 = <T>(
 	ctx: Context,
 	expect: "string" | "array" | "object" = "object",
-): Oath<T, TRrr<"EINVAL">> =>
+): Oath<T, Ordo.Rrr<"EINVAL">> =>
 	Oath.Try(async () => (await ctx.request.body) as T)
 		.pipe(Oath.ops.rejected_map(error => einval(`body parser error: ${error.message}`)))
 		.pipe(

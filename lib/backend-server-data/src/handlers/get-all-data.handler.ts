@@ -22,7 +22,7 @@ import { type Readable } from "stream"
 
 import { authenticate0, send_error } from "@ordo-pink/backend-utils"
 import { HttpError } from "@ordo-pink/rrr"
-import { type TDataCommands } from "@ordo-pink/data"
+import { type TDataCommands } from "@ordo-pink/managers"
 
 type Params = { dataService: TDataCommands<Readable>; idHost: string }
 

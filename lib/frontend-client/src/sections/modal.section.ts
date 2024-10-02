@@ -24,9 +24,8 @@ import { Maoka } from "@ordo-pink/maoka"
 import { type TLogger } from "@ordo-pink/logger"
 
 import { ModalOverlay } from "../components/modal"
-import { TCreateFunctionContext } from "@ordo-pink/core"
 
-type P = { commands: Client.Commands.Commands; logger: TLogger; ctx: TCreateFunctionContext }
+type P = { commands: Ordo.Command.Commands; logger: TLogger; ctx: Ordo.CreateFunction.Params }
 export const init_modal = ({ commands, logger, ctx }: P) => {
 	logger.debug("🟡 Initialising modal...")
 
@@ -43,10 +42,10 @@ export const init_modal = ({ commands, logger, ctx }: P) => {
 // --- Internal ---
 
 // Define Observable to maintain modal state
-const modal$ = new BehaviorSubject<TOption<Client.Modal.ModalPayload>>(O.None())
+const modal$ = new BehaviorSubject<TOption<Ordo.Modal.Instance>>(O.None())
 
 // Define command handlers
-const on_modal_show: Client.Commands.TCommandHandler<Client.Modal.ModalPayload> = payload => {
+const on_modal_show: Ordo.Command.TCommandHandler<Ordo.Modal.Instance> = payload => {
 	const show_close_button = payload.show_close_button ?? true
 	const on_unmount = payload.on_unmount ?? (() => void 0)
 	const render = payload.render
@@ -79,7 +78,7 @@ const on_modal_hide = () => modal$.next(O.None())
 import { BehaviorSubject } from "rxjs"
 
 import { O, type TOption } from "@ordo-pink/option"
-import { type TCreateFunctionContext } from "@ordo-pink/core"
+import { type Ordo.CreateFunction.Params } from "@ordo-pink/core"
 import { type TLogger } from "@ordo-pink/logger"
 import { extend } from "@ordo-pink/tau"
 import { init_ordo_hooks } from "@ordo-pink/maoka-ordo-hooks"
@@ -88,7 +87,7 @@ import { render_dom } from "@ordo-pink/maoka"
 import { ModalOverlay } from "../components/modal"
 import { init_modal_hook } from "../hooks/use-modal.hook"
 
-type P = { commands: Client.Commands.Commands; logger: TLogger; ctx: TCreateFunctionContext }
+type P = { commands: Ordo.Command.Commands; logger: TLogger; ctx: Ordo.CreateFunction.Params }
 export const init_modal = ({ commands, logger, ctx }: P) => {
 	logger.debug("🟡 Initialising modal...")
 
@@ -125,7 +124,7 @@ const log_div_not_found = (logger: TLogger) => () => logger.error("#modal div no
 // const modal$ = new BehaviorSubject<TOption<ModalState>>(O.None())
 
 // // Define command handlers
-// const on_modal_show: Client.Commands.TCommandHandler<Client.Modal.ModalPayload> = payload => {
+// const on_modal_show: Ordo.Command.TCommandHandler<Ordo.Modal.Instance> = payload => {
 // 	const show_close_button = payload.show_close_button ?? true
 // 	const on_unmount = payload.on_unmount ?? (() => void 0)
 // 	const render = payload.render

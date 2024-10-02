@@ -22,18 +22,14 @@ import { BehaviorSubject } from "rxjs"
 import {
 	CacheMetadataRepository,
 	MetadataCommand,
-	MetadataManager,
 	MetadataQuery,
 	MetadataRepository,
+	NotificationType,
 	RRR,
-	// RemoteMetadataRepository, TODO: Bring back remote metadata
-	type TMetadata,
-	type TMetadataQuery,
-	type TRrr,
-} from "@ordo-pink/data"
+} from "@ordo-pink/core"
+import { MetadataManager } from "@ordo-pink/managers"
 import { Result } from "@ordo-pink/result"
 import { Switch } from "@ordo-pink/switch"
-import { type TGetMetadataQueryFn } from "@ordo-pink/core"
 import { noop } from "@ordo-pink/tau"
 
 import { type TInitCtx } from "../frontend-client.types"
@@ -43,7 +39,10 @@ type TInitMetadataFn = (
 		TInitCtx,
 		"auth$" | "logger" | "commands" | "hosts" | "user_query" | "fetch" | "known_functions"
 	>,
-) => { metadata_query: TMetadataQuery; get_metadata_query: TGetMetadataQueryFn }
+) => {
+	metadata_query: Ordo.Metadata.Query
+	get_metadata_query: (fid: symbol) => Ordo.CreateFunction.GetMetadataQueryFn
+}
 export const init_metadata: TInitMetadataFn = ({
 	auth$,
 	logger,
@@ -55,53 +54,51 @@ export const init_metadata: TInitMetadataFn = ({
 }) => {
 	logger.debug("Initialising metadata...")
 
-	const metadata_repository = MetadataRepository.of(metadata$)
-	const remote_metadata_repository = CacheMetadataRepository.of(hosts.dt, fetch)
+	const metadata_repository = MetadataRepository.Of(metadata$)
+	const remote_metadata_repository = CacheMetadataRepository.Of(hosts.dt, fetch)
 
-	const metadata_query = MetadataQuery.of(metadata_repository)
-	const metadata_command = MetadataCommand.of(metadata_repository, metadata_query, user_query)
+	const metadata_query = MetadataQuery.Of(metadata_repository)
+	const metadata_command = MetadataCommand.Of(metadata_repository, metadata_query, user_query)
 
-	const Err = (rrr: TRrr) =>
+	const Err = (rrr: Ordo.Rrr) =>
 		commands.emit("cmd.application.notification.show", {
-			message: rrr.debug ?? "",
+			message: (String(rrr.debug) as any) ?? "",
 			duration: 15,
-			title: rrr.key,
-			type: "rrr",
+			title: `t.common.error.${rrr.key.toLocaleLowerCase()}` as any,
+			type: NotificationType.RRR,
 		})
 
-	commands.on("cmd.data.metadata.add_labels", ({ fsid, labels }) =>
+	commands.on("cmd.metadata.add_labels", ({ fsid, labels }) =>
 		metadata_command.add_labels(fsid, ...labels).cata({ Ok: noop, Err }),
 	)
 
-	commands.on("cmd.data.metadata.remove_labels", ({ fsid, labels }) =>
+	commands.on("cmd.metadata.remove_labels", ({ fsid, labels }) =>
 		metadata_command.remove_labels(fsid, ...labels).cata({ Ok: noop, Err }),
 	)
 
-	commands.on("cmd.data.metadata.set_property", ({ fsid, key, value }) =>
+	commands.on("cmd.metadata.set_property", ({ fsid, key, value }) =>
 		metadata_command.set_property(fsid, key, value),
 	)
 
-	commands.on("cmd.data.metadata.create", params => {
+	commands.on("cmd.metadata.create", params => {
 		metadata_command.create(params).cata({ Ok: noop, Err })
 	})
 
-	commands.on("cmd.data.metadata.move", ({ fsid, new_parent }) =>
+	commands.on("cmd.metadata.move", ({ fsid, new_parent }) =>
 		metadata_command.set_parent(fsid, new_parent).cata({ Ok: noop, Err }),
 	)
 
-	commands.on("cmd.data.metadata.remove", fsid =>
-		metadata_command.remove(fsid).cata({ Ok: noop, Err }),
-	)
+	commands.on("cmd.metadata.remove", fsid => metadata_command.remove(fsid).cata({ Ok: noop, Err }))
 
-	commands.on("cmd.data.metadata.add_links", ({ fsid, links }) =>
+	commands.on("cmd.metadata.add_links", ({ fsid, links }) =>
 		metadata_command.add_links(fsid, ...links).cata({ Ok: noop, Err }),
 	)
 
-	commands.on("cmd.data.metadata.remove_links", ({ fsid, links }) =>
+	commands.on("cmd.metadata.remove_links", ({ fsid, links }) =>
 		metadata_command.remove_links(fsid, ...links).cata({ Ok: noop, Err }),
 	)
 
-	commands.on("cmd.data.metadata.rename", ({ fsid, new_name }) =>
+	commands.on("cmd.metadata.rename", ({ fsid, new_name }) =>
 		metadata_command.set_name(fsid, new_name).cata({ Ok: noop, Err }),
 	)
 
@@ -131,4 +128,4 @@ export const init_metadata: TInitMetadataFn = ({
 
 const eperm = RRR.codes.eperm("init_metadata")
 
-const metadata$ = new BehaviorSubject<TMetadata[] | null>([])
+const metadata$ = new BehaviorSubject<Ordo.Metadata.Instance[] | null>([])

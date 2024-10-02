@@ -1,22 +1,20 @@
-import { Ordo, ordo_context } from "@ordo-pink/maoka-ordo-hooks"
+import { MaokaOrdo, ordo_context } from "@ordo-pink/maoka-ordo-hooks"
 import { Maoka } from "@ordo-pink/maoka"
 import { R } from "@ordo-pink/result"
-import { type TCreateFunctionContext } from "@ordo-pink/core"
 
 import { FileEditorSidebarItem } from "./components/file-editor-sidebar-item.component"
-import { TMetadata } from "@ordo-pink/data"
 
-export const FileEditorSidebar = (ctx: TCreateFunctionContext) =>
+export const FileEditorSidebar = (ctx: Ordo.CreateFunction.Params) =>
 	Maoka.create("div", ({ use, refresh, on_unmount }) => {
 		use(ordo_context.provide(ctx))
 
-		let metadata: TMetadata[] = []
+		let metadata: Ordo.Metadata.Instance[] = []
 
 		// TODO Detect
 		use(Maoka.hooks.set_class("flex flex-col px-2 h-full", "file_editor_sidebar"))
 
-		const commands = use(Ordo.Hooks.commands)
-		const metadata_query = use(Ordo.Hooks.metadata_query)
+		const commands = use(MaokaOrdo.Hooks.commands)
+		const metadata_query = use(MaokaOrdo.Hooks.metadata_query)
 
 		const subscription = metadata_query.$.subscribe(() => {
 			metadata_query

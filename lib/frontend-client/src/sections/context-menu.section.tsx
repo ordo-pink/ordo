@@ -24,7 +24,7 @@ import { createRoot } from "react-dom/client"
 import { LIB_DIRECTORY_FSID, type TOrdoContext } from "@ordo-pink/core"
 import { create_ordo_context, use$ } from "@ordo-pink/frontend-react-hooks"
 import { Either } from "@ordo-pink/either"
-import { Metadata } from "@ordo-pink/data"
+import { Metadata } from "@ordo-pink/managers"
 import { Result } from "@ordo-pink/result"
 import { Switch } from "@ordo-pink/switch"
 import { type TLogger } from "@ordo-pink/logger"
@@ -36,7 +36,7 @@ import RenderFromNullable from "@ordo-pink/frontend-react-components/render-from
 
 export const init_context_menu = (
 	logger: TLogger,
-	commands: Client.Commands.Commands,
+	commands: Ordo.Command.Commands,
 	ctx: TOrdoContext,
 ) => {
 	logger.debug("🟡 Initialising context menu...")

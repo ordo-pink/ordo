@@ -20,15 +20,15 @@
 import { Context } from "koa"
 
 import { O, type TOption } from "@ordo-pink/option"
-import { RRR, type TRrr } from "@ordo-pink/data"
 import { type TAuthJWT, type TTokenService } from "@ordo-pink/backend-service-token"
 import { from_option0, is_non_empty_string, is_string } from "@ordo-pink/tau"
 import { Oath } from "@ordo-pink/oath"
+import { RRR } from "@ordo-pink/core"
 
 export const authenticate0 = (
 	ctx: Context,
 	token_service_or_id_host: TTokenService | string,
-): Oath<TAuthJWT, TRrr<"EINVAL" | "EIO" | "EACCES">> =>
+): Oath<TAuthJWT, Ordo.Rrr<"EINVAL" | "EIO" | "EACCES">> =>
 	Oath.If(
 		is_non_empty_string(ctx.header.authorization) && ctx.header.authorization.startsWith("Bearer "),
 		{
@@ -55,7 +55,7 @@ const eio = RRR.codes.eio(LOCATION)
 const verify_with_id_server0 = (
 	id_host: string,
 	authorization: string,
-): Oath<TOption<TAuthJWT>, TRrr<"EINVAL" | "EIO">> =>
+): Oath<TOption<TAuthJWT>, Ordo.Rrr<"EINVAL" | "EIO">> =>
 	Oath.FromPromise(() =>
 		fetch(`${id_host}/verify-token`, { method: "POST", headers: { authorization } }),
 	)
@@ -66,7 +66,7 @@ const verify_with_id_server0 = (
 const verify_with_token_service0 = (
 	token_service: TTokenService,
 	token: string,
-): Oath<TOption<TAuthJWT>, TRrr<"EINVAL" | "EIO">> =>
+): Oath<TOption<TAuthJWT>, Ordo.Rrr<"EINVAL" | "EIO">> =>
 	token_service
 		.verify(token, "access")
 		.pipe(Oath.ops.chain(is_valid => Oath.If(is_valid, { F: () => einval("Invalid token") })))

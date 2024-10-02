@@ -20,7 +20,7 @@
 import { read_file0, write_file_rec0 } from "@ordo-pink/fs"
 import { O } from "@ordo-pink/option"
 import { Oath } from "@ordo-pink/oath"
-import { RRR } from "@ordo-pink/data"
+import { RRR } from "@ordo-pink/managers"
 import { type TPersistenceStrategyUser } from "@ordo-pink/backend-service-user"
 
 export const PersistenceStrategyUserFS = {

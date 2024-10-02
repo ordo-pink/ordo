@@ -3,19 +3,17 @@ import { type Observable } from "rxjs"
 
 import { O, type TOption } from "@ordo-pink/option"
 import { type AuthResponse } from "@ordo-pink/backend-server-id"
-import { type TCreateFunctionContext } from "@ordo-pink/core"
 import { type TLogger } from "@ordo-pink/logger"
-import { type TUserQuery } from "@ordo-pink/data"
 import { render_dom } from "@ordo-pink/maoka"
 
 import { StatusBarAuth } from "../components/status-bar-auth/status-bar-auth.component"
 
 type P = {
 	logger: TLogger
-	commands: Client.Commands.Commands
-	user_query: TUserQuery
+	commands: Ordo.Command.Commands
+	user_query: Ordo.User.Query
 	auth$: Observable<TOption<AuthResponse>>
-	ctx: TCreateFunctionContext
+	ctx: Ordo.CreateFunction.Params
 }
 export const init_auth_section = ({ logger, ctx }: P) => {
 	logger.debug("🟡 Initialising status bar auth...")

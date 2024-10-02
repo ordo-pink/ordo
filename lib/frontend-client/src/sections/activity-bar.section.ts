@@ -20,7 +20,6 @@
 import { type Observable } from "rxjs"
 
 import { O, type TOption } from "@ordo-pink/option"
-import { type TCreateFunctionContext } from "@ordo-pink/core"
 import { type TLogger } from "@ordo-pink/logger"
 import { render_dom } from "@ordo-pink/maoka"
 
@@ -28,9 +27,9 @@ import { ActivityBar } from "../components/activity-bar/activity-bar.component"
 
 type P = {
 	logger: TLogger
-	activities$: Observable<Functions.Activity[]>
-	current_activity$: Observable<TOption<Functions.Activity>>
-	ctx: TCreateFunctionContext
+	activities$: Observable<Ordo.Activity.Instance[]>
+	current_activity$: Observable<TOption<Ordo.Activity.Instance>>
+	ctx: Ordo.CreateFunction.Params
 }
 export const init_activity_bar = ({ logger, activities$, current_activity$, ctx }: P) => {
 	logger.debug("🟡 Initialising activity bar...")

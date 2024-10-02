@@ -19,16 +19,15 @@
 
 import "@ordo-pink/css/main.css"
 
-import { TCreateFunctionContext, type THosts } from "@ordo-pink/core"
 import { type TLogger } from "@ordo-pink/logger"
 
 import { init_activities } from "./components/activities"
 import { init_activity_bar } from "./sections/activity-bar.section"
 import { init_auth_section } from "./sections/auth.section"
 import { init_background_task_display } from "./sections/background-task-display.section"
-import { init_command_palette } from "./sections/command-palette.section"
+// import { init_command_palette } from "./sections/command-palette.section"
 import { init_commands } from "./components/commands"
-import { init_context_menu } from "./sections/context-menu.section"
+// import { init_context_menu } from "./sections/context-menu.section"
 import { init_fetch } from "./components/fetch"
 import { init_file_associations } from "./components/file-associations"
 import { init_hosts } from "./components/hosts"
@@ -51,7 +50,7 @@ const APP_FID = Symbol.for(APP_NAME)
 const APP_FN = { fid: APP_FID, name: APP_NAME, permissions: { commands: [], queries: [] } }
 
 // TODO: Move all HTML elements in index.html to `create_client`
-type P = { logger: TLogger; is_dev: boolean; hosts: THosts }
+type P = { logger: TLogger; is_dev: boolean; hosts: Ordo.Hosts }
 export const create_client = ({ logger, is_dev, hosts }: P) => {
 	const known_functions = init_known_functions(APP_FN)
 	const { get_logger } = init_logger({ logger, known_functions })
@@ -115,7 +114,7 @@ export const create_client = ({ logger, is_dev, hosts }: P) => {
 	init_title_display(logger, commands)
 	init_tray(logger, activities$)
 
-	const internal_context: TCreateFunctionContext = {
+	const internal_context: Ordo.CreateFunction.Params = {
 		fid: APP_FID,
 		get_commands: get_commands(APP_FID),
 		get_current_language: get_current_language(APP_FID),
@@ -138,8 +137,8 @@ export const create_client = ({ logger, is_dev, hosts }: P) => {
 	init_notifications({ logger, commands, ctx: internal_context })
 	init_activity_bar({ ctx: internal_context, logger, activities$, current_activity$ })
 	init_auth_section({ logger, commands, user_query, auth$, ctx: internal_context })
-	init_command_palette(logger, commands, internal_context)
-	init_context_menu(logger, commands, internal_context)
+	// init_command_palette(logger, commands, internal_context)
+	// init_context_menu(logger, commands, internal_context)
 
 	const shared_function_context = {
 		get_commands,
@@ -164,14 +163,14 @@ export const create_client = ({ logger, is_dev, hosts }: P) => {
 		.then(module => module.default)
 		.then(f => f(shared_function_context))
 
-	void import("@ordo-pink/function-auth")
-		.then(module => module.default)
-		.then(f => f(shared_function_context))
+	// void import("@ordo-pink/function-auth")
+	// 	.then(module => module.default)
+	// 	.then(f => f(shared_function_context))
 
 	// TODO: Fix positioning of activity bar content when achivity is changed
-	void import("@ordo-pink/function-fe")
-		.then(module => module.default)
-		.then(f => f(shared_function_context))
+	// void import("@ordo-pink/function-file-explorer")
+	// 	.then(module => module.default)
+	// 	.then(f => f(shared_function_context))
 
 	void import("@ordo-pink/function-file-editor")
 		.then(module => module.default)

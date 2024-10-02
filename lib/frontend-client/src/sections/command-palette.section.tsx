@@ -29,7 +29,7 @@ import { TOrdoContext } from "@ordo-pink/core"
 import { create_ordo_context } from "@ordo-pink/frontend-react-hooks"
 
 export const init_command_palette = call_once(
-	(logger: TLogger, commands: Client.Commands.Commands, ctx: TOrdoContext) => {
+	(logger: TLogger, commands: Ordo.Command.Commands, ctx: TOrdoContext) => {
 		logger.debug("🟡 Initialising command palette...")
 
 		commands.on("cmd.application.command_palette.show", on_show_custom_cp(commands, ctx))
@@ -89,7 +89,7 @@ const Provider = create_ordo_context()
 const on_add_global_item = (item: Client.CommandPalette.Item) => add$.next(item)
 const on_remove_global_item = (id: string) => remove$.next(id)
 const on_show_custom_cp =
-	(commands: Client.Commands.Commands, ctx: TOrdoContext) => (state: TCommandPaletteState) => {
+	(commands: Ordo.Command.Commands, ctx: TOrdoContext) => (state: TCommandPaletteState) => {
 		let root: Root
 
 		commands.emit("cmd.application.modal.hide")
@@ -120,7 +120,7 @@ const on_show_custom_cp =
 			},
 		})
 	}
-const on_hide_custom_cp = (commands: Client.Commands.Commands) => () => {
+const on_hide_custom_cp = (commands: Ordo.Command.Commands) => () => {
 	commands.emit("cmd.application.modal.hide")
 }
 

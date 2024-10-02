@@ -13,13 +13,11 @@ import {
 	get_is_authenticated,
 	get_is_dev,
 	get_logger,
-	get_metadata_ancestors,
-	get_metadata_by_fsid,
-	get_metadata_children,
 	get_metadata_query,
 	get_route_params,
 	get_translations,
 	get_user_query,
+	ordo_context,
 	rx_subscription,
 	state,
 	subscription,
@@ -45,17 +43,12 @@ export const OrdoHooks = {
 	file_associations: get_file_associations,
 	computed,
 	state,
-	metadata: {
-		by_fsid: get_metadata_by_fsid,
-		ancestors: get_metadata_ancestors,
-		children: get_metadata_children,
-	},
 }
 
-export const Ordo = {
+export const MaokaOrdo = {
 	Hooks: OrdoHooks,
 	Ops: {
-		get_route_params: (route: Client.Router.Route | null) =>
+		get_route_params: (route: Ordo.Router.Route | null) =>
 			Result.FromNullable(route)
 				.pipe(Result.ops.chain(route => Result.FromNullable(route.params)))
 				.pipe(
@@ -70,4 +63,5 @@ export const Ordo = {
 					),
 				),
 	},
+	Context: ordo_context,
 }

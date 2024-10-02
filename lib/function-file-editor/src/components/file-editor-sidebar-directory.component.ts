@@ -1,15 +1,15 @@
 import { BsCaretDown, BsCaretRight } from "@ordo-pink/frontend-icons"
-import { FSID, Metadata, TMetadata } from "@ordo-pink/data"
 import { Maoka, type TMaokaHook } from "@ordo-pink/maoka"
 import { MetadataIcon } from "@ordo-pink/maoka-components"
 import { OrdoHooks } from "@ordo-pink/maoka-ordo-hooks"
 import { R } from "@ordo-pink/result"
 
 import { FileEditorSidebarItem } from "./file-editor-sidebar-item.component"
+import { Metadata } from "@ordo-pink/core"
 
-const expanded_state = {} as Record<FSID, boolean>
+const expanded_state = {} as Record<Ordo.Metadata.FSID, boolean>
 
-export const FileEditorSidebarDirectory = (metadata: TMetadata, depth = 0) =>
+export const FileEditorSidebarDirectory = (metadata: Ordo.Metadata.Instance, depth = 0) =>
 	Maoka.create("div", ({ use, refresh }) => {
 		const fsid = metadata.get_fsid()
 
@@ -28,7 +28,11 @@ export const FileEditorSidebarDirectory = (metadata: TMetadata, depth = 0) =>
 			// cases when user navigates to another file with a link.
 			// TODO check if it actually expands directories when navigating via a link.
 			R.FromNullable(route_params.value.fsid)
-				.pipe(R.ops.chain(i => R.If(Metadata.Validations.is_fsid(i), { T: () => i as FSID })))
+				.pipe(
+					R.ops.chain(i =>
+						R.If(Metadata.Validations.is_fsid(i), { T: () => i as Ordo.Metadata.FSID }),
+					),
+				)
 				.pipe(R.ops.chain(fsid => metadata_query.get_ancestors(fsid)))
 				.cata(R.catas.if_ok(as => as.forEach(a => void (expanded_state[a.get_fsid()] = true))))
 
@@ -63,14 +67,18 @@ export const FileEditorSidebarDirectory = (metadata: TMetadata, depth = 0) =>
 
 // --- Internal ---
 
-const FileEditorDirectoryChildren = (metadata: TMetadata, children: TMetadata[], depth: number) =>
+const FileEditorDirectoryChildren = (
+	metadata: Ordo.Metadata.Instance,
+	children: Ordo.Metadata.Instance[],
+	depth: number,
+) =>
 	R.If(expanded_state[metadata.get_fsid()])
 		.pipe(R.ops.map(() => depth + 1))
 		.pipe(R.ops.map(depth => () => children.map(i => FileEditorSidebarItem(i, depth))))
 		.cata(R.catas.if_ok(children => Maoka.create("div", () => children)))
 
 const FileEditorDirectoryName = (
-	metadata: TMetadata,
+	metadata: Ordo.Metadata.Instance,
 	depth: number,
 	on_caret_click: (event: MouseEvent) => void,
 ) =>
@@ -110,7 +118,7 @@ const file_editor_sidebar_directory_name_text_classes = [
 	"file_editor_sidebar_directory_name_text",
 ]
 
-const FileEditorDirectoryNameText = (metadata: TMetadata) =>
+const FileEditorDirectoryNameText = (metadata: Ordo.Metadata.Instance) =>
 	Maoka.create("div", ({ use }) => {
 		use(Maoka.hooks.set_class(...file_editor_sidebar_directory_name_text_classes))
 
@@ -123,7 +131,7 @@ const FileEditorDirectoryNameText = (metadata: TMetadata) =>
 		]
 	})
 
-const FileEditorDirectoryNameCaret = (fsid: FSID, click_listener: TMaokaHook) =>
+const FileEditorDirectoryNameCaret = (fsid: Ordo.Metadata.FSID, click_listener: TMaokaHook) =>
 	Maoka.create("div", ({ use }) => {
 		use(click_listener)
 		use(Maoka.hooks.set_class("cursor-pointer"))

@@ -21,9 +21,8 @@ import { BehaviorSubject, map } from "rxjs"
 import { Router, operators } from "silkrouter"
 
 import { O, type TOption } from "@ordo-pink/option"
-import { RRR } from "@ordo-pink/data"
+import { RRR } from "@ordo-pink/core"
 import { Result } from "@ordo-pink/result"
-import { type TGetCurrentRouteFn } from "@ordo-pink/core"
 import { call_once } from "@ordo-pink/tau"
 
 import { type TInitCtx } from "../frontend-client.types"
@@ -35,7 +34,7 @@ type TInitRouterStreamFn = (
 		TInitCtx,
 		"APP_FID" | "logger" | "commands" | "activities$" | "set_current_activity" | "known_functions"
 	>,
-) => { get_current_route: TGetCurrentRouteFn }
+) => { get_current_route: (fid: symbol) => Ordo.CreateFunction.GetCurrentRouteFn }
 export const init_router: TInitRouterStreamFn = call_once(
 	({ APP_FID, logger, commands, activities$, set_current_activity, known_functions }) => {
 		logger.debug("🟡 Initializing router...")
@@ -61,7 +60,7 @@ export const init_router: TInitRouterStreamFn = call_once(
 					activities?.map(activity => {
 						return activity.routes.forEach(activity_route => {
 							router$ &&
-								router$.pipe(route(activity_route)).subscribe((route_data: Client.Router.Route) => {
+								router$.pipe(route(activity_route)).subscribe((route_data: Ordo.Router.Route) => {
 									set_activity(activity.name)
 
 									current_route$.next(O.FromNullable(route_data))
@@ -103,4 +102,4 @@ export const init_router: TInitRouterStreamFn = call_once(
 const eperm = RRR.codes.eperm("init_router")
 
 const router$ = new Router({ hashRouting: false, init: true })
-const current_route$ = new BehaviorSubject<TOption<Client.Router.Route>>(O.None())
+const current_route$ = new BehaviorSubject<TOption<Ordo.Router.Route>>(O.None())

@@ -22,7 +22,6 @@ import { type Context } from "koa"
 import { create_koa_server, send_error, send_success } from "@ordo-pink/backend-utils"
 import { NotificationService } from "@ordo-pink/backend-service-offline-notifications"
 import { Oath } from "@ordo-pink/oath"
-import { type TRrr } from "@ordo-pink/data"
 import { TokenService } from "@ordo-pink/backend-service-token"
 import { UserService } from "@ordo-pink/backend-service-user"
 
@@ -80,9 +79,12 @@ export const create_id_server = async ({
 		}),
 	)
 
-	const exec =
+	const execute_handler =
 		(
-			f: (ctx: Context, params: Types.THandlerParams) => Oath<{ status: number; body?: any }, TRrr>,
+			f: (
+				ctx: Context,
+				params: Types.THandlerParams,
+			) => Oath<{ status: number; body?: any }, Ordo.Rrr>,
 		) =>
 		(ctx: Context) =>
 			f(ctx, params).invoke(o => o.fork(send_error({ ctx, logger }), send_success({ ctx })))
@@ -94,20 +96,47 @@ export const create_id_server = async ({
 		extend_router: router =>
 			// TODO: Check if method satisfies required type
 			router
-				.get("/users/handle/:handle" satisfies Routes.ID.GetUserByHandle.Path, exec(get_by_handle0))
-				.get("/users/email/:email" satisfies Routes.ID.GetUserByEmail.Path, exec(get_by_email0))
-				.get("/users/id/:id" satisfies Routes.ID.GetUserByID.Path, exec(get_by_id0))
-				.get("/account" satisfies Routes.ID.GetAccount.Path, exec(get_account0))
-				.post("/account/sign-up" satisfies Routes.ID.SignUp.Path, exec(sign_up0))
-				.post("/account/sign-in" satisfies Routes.ID.SignIn.Path, exec(sign_in0))
-				.post("/account/sign-out" satisfies Routes.ID.SignOut.Path, exec(sign_out0))
-				.post("/account/refresh-token" satisfies Routes.ID.RefreshToken.Path, exec(token_refresh0))
-				.post("/account/verify-token" satisfies Routes.ID.VerifyToken.Path, exec(token_verify0))
-				.patch("/account/confirm-email" satisfies Routes.ID.ConfirmEmail.Path, exec(confirm_email0))
-				.patch("/account/info" satisfies Routes.ID.UpdateInfo.Path, exec(update_info0))
-				.patch("/account/email" satisfies Routes.ID.UpdateEmail.Path, exec(update_email0))
-				.patch("/account/handle" satisfies Routes.ID.UpdateHandle.Path, exec(update_handle0))
-				.patch("/account/password" satisfies Routes.ID.UpdatePassword.Path, exec(update_password0)),
+				.get(
+					"/users/handle/:handle" satisfies Ordo.Routes.ID.GetUserByHandle.Path,
+					execute_handler(get_by_handle0),
+				)
+				.get(
+					"/users/email/:email" satisfies Ordo.Routes.ID.GetUserByEmail.Path,
+					execute_handler(get_by_email0),
+				)
+				.get("/users/id/:id" satisfies Ordo.Routes.ID.GetUserByID.Path, execute_handler(get_by_id0))
+				.get("/account" satisfies Ordo.Routes.ID.GetAccount.Path, execute_handler(get_account0))
+				.post("/account/sign-up" satisfies Ordo.Routes.ID.SignUp.Path, execute_handler(sign_up0))
+				.post("/account/sign-in" satisfies Ordo.Routes.ID.SignIn.Path, execute_handler(sign_in0))
+				.post("/account/sign-out" satisfies Ordo.Routes.ID.SignOut.Path, execute_handler(sign_out0))
+				.post(
+					"/account/refresh-token" satisfies Ordo.Routes.ID.RefreshToken.Path,
+					execute_handler(token_refresh0),
+				)
+				.post(
+					"/account/verify-token" satisfies Ordo.Routes.ID.VerifyToken.Path,
+					execute_handler(token_verify0),
+				)
+				.patch(
+					"/account/confirm-email" satisfies Ordo.Routes.ID.ConfirmEmail.Path,
+					execute_handler(confirm_email0),
+				)
+				.patch(
+					"/account/info" satisfies Ordo.Routes.ID.UpdateInfo.Path,
+					execute_handler(update_info0),
+				)
+				.patch(
+					"/account/email" satisfies Ordo.Routes.ID.UpdateEmail.Path,
+					execute_handler(update_email0),
+				)
+				.patch(
+					"/account/handle" satisfies Ordo.Routes.ID.UpdateHandle.Path,
+					execute_handler(update_handle0),
+				)
+				.patch(
+					"/account/password" satisfies Ordo.Routes.ID.UpdatePassword.Path,
+					execute_handler(update_password0),
+				),
 
 		// TODO: Forgot password
 	})

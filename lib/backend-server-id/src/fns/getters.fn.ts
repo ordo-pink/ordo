@@ -20,7 +20,7 @@
 import { isEmail } from "validator"
 
 import { Oath } from "@ordo-pink/oath"
-import { RRR } from "@ordo-pink/data"
+import { RRR } from "@ordo-pink/managers"
 import { is_string } from "@ordo-pink/tau"
 import { okpwd } from "@ordo-pink/okpwd"
 

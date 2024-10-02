@@ -18,27 +18,25 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { BehaviorSubject, Observable, noop, pairwise } from "rxjs"
-import { BsToggle2Off, BsToggle2On } from "react-icons/bs"
+// import { BsToggle2Off, BsToggle2On } from "react-icons/bs"
 import Split from "split.js"
 
-import { type TEnabledSidebar, type TKnownFunctions, type TSidebarState } from "@ordo-pink/core"
-import { RRR } from "@ordo-pink/data"
+import { RRR } from "@ordo-pink/core"
 import { Result } from "@ordo-pink/result"
 import { Switch } from "@ordo-pink/switch"
 import { type TLogger } from "@ordo-pink/logger"
 import { type TOption } from "@ordo-pink/option"
-import { type TWorkspaceSplitSize } from "@ordo-pink/core"
 
 export const NARROW_WINDOW_BREAKPOINT = 768
-export const DEFAULT_WORKSPACE_SPLIT_SIZE = [80, 20] as TWorkspaceSplitSize
-export const DEFAULT_WORKSPACE_SPLIT_SIZE_NARROW_OPEN = [0, 100] as TWorkspaceSplitSize
-export const DEFAULT_WORKSPACE_SPLIT_SIZE_NO_SIDEBAR = [100, 0] as TWorkspaceSplitSize
+export const DEFAULT_WORKSPACE_SPLIT_SIZE = [80, 20] as Ordo.Workspace.WorkspaceSplitSize
+export const DEFAULT_WORKSPACE_SPLIT_NARROW_OPEN = [0, 100] as Ordo.Workspace.WorkspaceSplitSize
+export const DEFAULT_WORKSPACE_SPLIT_SIZE_NO_SIDEBAR = [100, 0] as Ordo.Workspace.WorkspaceSplitSize
 
 export const init_workspace = (
 	logger: TLogger,
-	known_functions: TKnownFunctions,
-	commands: Client.Commands.Commands,
-	current_activity$: Observable<TOption<Functions.Activity>>,
+	known_functions: OrdoInternal.KnownFunctions,
+	commands: Ordo.Command.Commands,
+	current_activity$: Observable<TOption<Ordo.Activity.Instance>>,
 ) => {
 	logger.debug("🟡 Initialising sidebar...")
 
@@ -73,7 +71,7 @@ export const init_workspace = (
 
 		const window_width = window.innerWidth
 		const isNarrow = window_width < NARROW_WINDOW_BREAKPOINT
-		const sizes = isNarrow ? DEFAULT_WORKSPACE_SPLIT_SIZE_NARROW_OPEN : DEFAULT_WORKSPACE_SPLIT_SIZE
+		const sizes = isNarrow ? DEFAULT_WORKSPACE_SPLIT_NARROW_OPEN : DEFAULT_WORKSPACE_SPLIT_SIZE
 
 		sidebar$.next({ disabled: false, sizes: payload ?? sizes })
 	})
@@ -93,9 +91,7 @@ export const init_workspace = (
 
 		const window_width = window.innerWidth
 		const is_narrow = window_width < NARROW_WINDOW_BREAKPOINT
-		const sizes = is_narrow
-			? DEFAULT_WORKSPACE_SPLIT_SIZE_NARROW_OPEN
-			: DEFAULT_WORKSPACE_SPLIT_SIZE
+		const sizes = is_narrow ? DEFAULT_WORKSPACE_SPLIT_NARROW_OPEN : DEFAULT_WORKSPACE_SPLIT_SIZE
 
 		sidebar$.next({
 			disabled: false,
@@ -103,45 +99,44 @@ export const init_workspace = (
 		})
 	})
 
-	commands.emit("cmd.application.command_palette.add", {
-		id: "sidebar.toggle",
-		readable_name: "t.common.components.sidebar.toggle",
-		Icon: BsToggle2Off,
-		on_select: () => commands.emit("cmd.application.sidebar.toggle"),
-		accelerator: "mod+b",
-	})
+	// commands.emit("cmd.application.command_palette.add", {
+	// 	readable_name: "t.common.components.sidebar.toggle",
+	// 	Icon: BsToggle2Off,
+	// 	on_select: () => commands.emit("cmd.application.sidebar.toggle"),
+	// 	accelerator: "mod+b",
+	// })
 
-	commands.emit("cmd.application.context_menu.add", {
-		cmd: "cmd.application.sidebar.show",
-		readable_name: "t.common.components.sidebar.show",
-		Icon: BsToggle2On,
-		should_show: ({ event }) =>
-			Boolean(event.currentTarget) &&
-			(event.currentTarget.classList.contains("activity-bar") ||
-				Boolean(event.currentTarget.closest(".activity-bar"))) &&
-			!sidebar$.value.disabled &&
-			sidebar$.value.sizes[1] === 0,
-		type: "update",
-		accelerator: "mod+b",
-	})
+	// commands.emit("cmd.application.context_menu.add", {
+	// 	cmd: "cmd.application.sidebar.show",
+	// 	readable_name: "t.common.components.sidebar.show",
+	// 	Icon: BsToggle2On,
+	// 	should_show: ({ event }) =>
+	// 		Boolean(event.currentTarget) &&
+	// 		(event.currentTarget.classList.contains("activity-bar") ||
+	// 			Boolean(event.currentTarget.closest(".activity-bar"))) &&
+	// 		!sidebar$.value.disabled &&
+	// 		sidebar$.value.sizes[1] === 0,
+	// 	type: "update",
+	// 	accelerator: "mod+b",
+	// })
 
-	commands.emit("cmd.application.context_menu.add", {
-		cmd: "cmd.application.sidebar.hide",
-		readable_name: "t.common.components.sidebar.hide",
-		Icon: BsToggle2Off,
-		should_show: ({ event }) => {
-			return (
-				(event.currentTarget.classList.contains("sidebar") ||
-					event.currentTarget.classList.contains("activity-bar") ||
-					Boolean(event.currentTarget.closest(".sidebar")) ||
-					Boolean(event.currentTarget.closest(".activity-bar"))) &&
-				!sidebar$.value.disabled &&
-				sidebar$.value.sizes[1] !== 0
-			)
-		},
-		type: "update",
-		accelerator: "mod+b",
-	})
+	// commands.emit("cmd.application.context_menu.add", {
+	// 	cmd: "cmd.application.sidebar.hide",
+	// 	readable_name: "t.common.components.sidebar.hide",
+	// 	Icon: BsToggle2Off,
+	// 	should_show: ({ event }) => {
+	// 		return (
+	// 			(event.currentTarget.classList.contains("sidebar") ||
+	// 				event.currentTarget.classList.contains("activity-bar") ||
+	// 				Boolean(event.currentTarget.closest(".sidebar")) ||
+	// 				Boolean(event.currentTarget.closest(".activity-bar"))) &&
+	// 			!sidebar$.value.disabled &&
+	// 			sidebar$.value.sizes[1] !== 0
+	// 		)
+	// 	},
+	// 	type: "update",
+	// 	accelerator: "mod+b",
+	// })
 
 	let split: any
 
@@ -188,7 +183,7 @@ export const init_workspace = (
 				split = Split(["#workspace", "#sidebar"], {
 					minSize: 0,
 					maxSize: window.innerWidth,
-					sizes: (sidebar as TEnabledSidebar).sizes,
+					sizes: (sidebar as Ordo.Workspace.EnabledSidebar).sizes,
 					snapOffset: window.innerWidth * 0.2,
 					dragInterval: window.innerWidth * 0.05,
 					onDrag: sizes => {
@@ -218,7 +213,7 @@ export const init_workspace = (
 				})
 			})
 			.case(!sidebar.disabled && !!split, () => {
-				split.setSizes((sidebar as TEnabledSidebar).sizes)
+				split.setSizes((sidebar as Ordo.Workspace.EnabledSidebar).sizes)
 			})
 			.default(noop)
 	})
@@ -237,4 +232,4 @@ export const init_workspace = (
 
 const eperm = RRR.codes.eperm("init_sidebar")
 
-const sidebar$ = new BehaviorSubject<TSidebarState>({ disabled: true })
+const sidebar$ = new BehaviorSubject<Ordo.Workspace.SidebarState>({ disabled: true })

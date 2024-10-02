@@ -1,20 +1,20 @@
 import * as Icons from "@ordo-pink/frontend-icons"
 import { Maoka } from "@ordo-pink/maoka"
+import { NotificationType } from "@ordo-pink/core"
 import { Switch } from "@ordo-pink/switch"
 
-type P = Pick<Client.Notification.Item, "icon" | "type">
-export const NotificationIcon = ({ icon, type }: P) =>
-	Maoka.create("div", ({ use }) => {
-		const Icon = icon ? icon : get_default_icon(type)
-
-		use(Maoka.hooks.set_inner_html(Icon))
+type P = Pick<Ordo.Notification.Instance, "render_icon" | "type">
+export const NotificationIcon = ({ render_icon, type }: P) =>
+	Maoka.create("div", ({ use, current_element }) => {
+		if (render_icon) render_icon(current_element as unknown as HTMLDivElement)
+		else use(Maoka.hooks.set_inner_html(get_default_icon(type)))
 	})
 
-const get_default_icon = (type: Client.Notification.Item["type"]) =>
+const get_default_icon = (type: Ordo.Notification.Instance["type"]) =>
 	Switch.Match(type)
-		.case("info", () => Icons.BS_INFO_CIRCLE)
-		.case("question", () => Icons.BS_QUESTION_CIRCLE)
-		.case("rrr", () => Icons.BS_ERROR_CIRCLE)
-		.case("success", () => Icons.BS_CHECK_CIRCLE)
-		.case("warn", () => Icons.BS_EXCLAMATION_CIRCLE)
+		.case(NotificationType.INFO, () => Icons.BS_INFO_CIRCLE)
+		.case(NotificationType.QUESTION, () => Icons.BS_QUESTION_CIRCLE)
+		.case(NotificationType.RRR, () => Icons.BS_ERROR_CIRCLE)
+		.case(NotificationType.SUCCESS, () => Icons.BS_CHECK_CIRCLE)
+		.case(NotificationType.WARN, () => Icons.BS_EXCLAMATION_CIRCLE)
 		.default(() => Icons.BS_CIRCLE)

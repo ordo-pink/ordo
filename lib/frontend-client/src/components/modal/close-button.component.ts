@@ -1,12 +1,12 @@
 import { BS_X } from "@ordo-pink/frontend-icons"
 import { Maoka } from "@ordo-pink/maoka"
-import { Ordo } from "@ordo-pink/maoka-ordo-hooks"
+import { MaokaOrdo } from "@ordo-pink/maoka-ordo-hooks"
 
 export const ModalCloseButton = (should_show = false) => {
 	if (!should_show) return
 
 	return Maoka.create("button", ({ use }) => {
-		const commands = use(Ordo.Hooks.commands)
+		const commands = use(MaokaOrdo.Hooks.commands)
 
 		use(
 			Maoka.hooks.set_class(

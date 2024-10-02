@@ -26,10 +26,7 @@ import { render_dom } from "@ordo-pink/maoka"
 
 import { BackgroundTaskStatusIndicator } from "../components/background-task-status"
 
-export const init_background_task_display = (
-	logger: TLogger,
-	commands: Client.Commands.Commands,
-) => {
+export const init_background_task_display = (logger: TLogger, commands: Ordo.Command.Commands) => {
 	logger.debug("🟡 Initialising background task indicator...")
 
 	commands.on("cmd.application.background_task.set_status", status => bg_task$.next(status))

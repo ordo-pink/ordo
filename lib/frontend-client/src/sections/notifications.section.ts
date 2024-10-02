@@ -20,7 +20,6 @@
 import { Subject, map, merge, scan, shareReplay } from "rxjs"
 
 import { O } from "@ordo-pink/option"
-import { TCreateFunctionContext } from "@ordo-pink/core"
 import { TLogger } from "@ordo-pink/logger"
 import { render_dom } from "@ordo-pink/maoka"
 
@@ -28,13 +27,13 @@ import { Notifications } from "../components/notifications"
 
 declare global {
 	interface MaokaState {
-		notifications: Client.Notification.Item[]
-		notification_counters: Record<Client.Notification.Item["id"], number>
+		notifications: Ordo.Notification.Instance[]
+		notification_counters: Record<Ordo.Notification.Instance["id"], number>
 	}
 }
 
 // TODO: Fix spacing between notifications
-type P = { logger: TLogger; commands: Client.Commands.Commands; ctx: TCreateFunctionContext }
+type P = { logger: TLogger; commands: Ordo.Command.Commands; ctx: Ordo.CreateFunction.Params }
 export const init_notifications = ({ logger, commands, ctx }: P) => {
 	logger.debug("🟡 Initialising notifications...")
 
@@ -54,14 +53,14 @@ export const init_notifications = ({ logger, commands, ctx }: P) => {
 
 // --- Internal ---
 
-const addP = (i: Client.Notification.Item) => (is: Client.Notification.Item[]) =>
+const addP = (i: Ordo.Notification.Instance) => (is: Ordo.Notification.Instance[]) =>
 	is.some(({ id }) => id === i.id) ? is : [...is, i]
-const removeP = (id: string) => (is: Client.Notification.Item[]) => is.filter(a => a.id !== id)
+const removeP = (id: string) => (is: Ordo.Notification.Instance[]) => is.filter(a => a.id !== id)
 
-const add$ = new Subject<Client.Notification.Item>()
+const add$ = new Subject<Ordo.Notification.Instance>()
 const remove$ = new Subject<string>()
 const notification$ = merge(add$.pipe(map(addP)), remove$.pipe(map(removeP))).pipe(
-	scan((acc, f) => f(acc), [] as Client.Notification.Item[]),
+	scan((acc, f) => f(acc), [] as Ordo.Notification.Instance[]),
 	shareReplay(1),
 )
 

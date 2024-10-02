@@ -1,20 +1,19 @@
-import { type FSID, Metadata, type TMetadata, type TMetadataQuery } from "@ordo-pink/data"
-import { Ordo, ordo_context } from "@ordo-pink/maoka-ordo-hooks"
+import { MaokaOrdo, ordo_context } from "@ordo-pink/maoka-ordo-hooks"
 import { Maoka } from "@ordo-pink/maoka"
+import { Metadata } from "@ordo-pink/core"
 import { Result } from "@ordo-pink/result"
 import { Switch } from "@ordo-pink/switch"
-import { type TCreateFunctionContext } from "@ordo-pink/core"
 
-export const FileEditorWorkspace = (ctx: TCreateFunctionContext) => {
+export const FileEditorWorkspace = (ctx: Ordo.CreateFunction.Params) => {
 	return Maoka.create("div", ({ use }) => {
 		use(ordo_context.provide(ctx))
 
-		const route = use(Ordo.Hooks.current_route)
-		const metadata_query = use(Ordo.Hooks.metadata_query)
+		const route = use(MaokaOrdo.Hooks.current_route)
+		const metadata_query = use(MaokaOrdo.Hooks.metadata_query)
 
 		return () =>
 			Result.FromNullable(route.value)
-				.pipe(Result.ops.chain(Ordo.Ops.get_route_params))
+				.pipe(Result.ops.chain(MaokaOrdo.Ops.get_route_params))
 				.pipe(Result.ops.chain(({ fsid }) => Result.FromNullable(fsid)))
 				.pipe(Result.ops.chain(check_is_fsid_valid))
 				.pipe(Result.ops.chain(metadata_query.get_by_fsid))
@@ -28,12 +27,12 @@ export const FileEditorWorkspace = (ctx: TCreateFunctionContext) => {
 
 // --- Internal ---
 
-const RenderPicker = (metadata: TMetadata) =>
+const RenderPicker = (metadata: Ordo.Metadata.Instance) =>
 	Maoka.create("div", ({ use, refresh, on_unmount, current_element }) => {
-		let file_associations: Functions.FileAssociation[] = []
+		let file_associations: Ordo.FileAssociation.Instance[] = []
 		const metadata_type = metadata.get_type()
 
-		const file_associations$ = use(Ordo.Hooks.file_associations)
+		const file_associations$ = use(MaokaOrdo.Hooks.file_associations)
 
 		const subscription = file_associations$.subscribe(value => {
 			if (file_associations.length !== value.length) {
@@ -49,7 +48,14 @@ const RenderPicker = (metadata: TMetadata) =>
 		)
 
 		if (file_association && file_association.render) {
-			file_association.render(current_element as unknown as HTMLDivElement, metadata)
+			file_association.render({
+				div: current_element as unknown as HTMLDivElement,
+				metadata,
+				content: null,
+				is_editable: true,
+				is_embedded: false,
+				is_loading: false,
+			})
 			return
 		}
 
@@ -57,10 +63,10 @@ const RenderPicker = (metadata: TMetadata) =>
 		return () => "WOOPS"
 	})
 
-const TitleSetter = (metadata: TMetadata | null) =>
+const TitleSetter = (metadata: Ordo.Metadata.Instance | null) =>
 	Maoka.create("div", ({ use }) => {
-		const metadata_query = use(Ordo.Hooks.metadata_query)
-		const { emit } = use(Ordo.Hooks.commands)
+		const metadata_query = use(MaokaOrdo.Hooks.metadata_query)
+		const { emit } = use(MaokaOrdo.Hooks.commands)
 
 		return () =>
 			get_metadata_with_ancestors(metadata, metadata_query)
@@ -72,21 +78,24 @@ const TitleSetter = (metadata: TMetadata | null) =>
 	})
 
 const check_is_fsid_valid = (str: string) =>
-	Result.If(Metadata.Validations.is_fsid(str), { T: () => str as FSID })
+	Result.If(Metadata.Validations.is_fsid(str), { T: () => str as Ordo.Metadata.FSID })
 
-const get_metadata_with_ancestors = (metadata: TMetadata | null, metadata_query: TMetadataQuery) =>
+const get_metadata_with_ancestors = (
+	metadata: Ordo.Metadata.Instance | null,
+	metadata_query: Ordo.Metadata.Query,
+) =>
 	Result.FromNullable(metadata)
 		.pipe(Result.ops.chain(metadata => metadata_query.get_ancestors(metadata.get_fsid())))
 		.pipe(Result.ops.map(ancestors => ({ metadata: metadata!, ancestors })))
 
-const set_title = (emit: Client.Commands.Commands["emit"], title: string) =>
+const set_title = (emit: Ordo.Command.Commands["emit"], title: string) =>
 	emit("cmd.application.set_title", {
 		status_bar_title: title,
 		window_title: `${title} | File Editor`,
 	})
 
 // TODO: Move to metadata utils
-const get_path = (ancestors: TMetadata[], metadata: TMetadata) =>
+const get_path = (ancestors: Ordo.Metadata.Instance[], metadata: Ordo.Metadata.Instance) =>
 	Switch.OfTrue()
 		.case(ancestors.length > 0, () =>
 			ancestors

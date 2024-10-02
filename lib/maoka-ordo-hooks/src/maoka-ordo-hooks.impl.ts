@@ -5,14 +5,12 @@ import { type Observable } from "rxjs"
 import { equals } from "ramda"
 
 import { F, T, keys_of } from "@ordo-pink/tau"
-import { type FSID, Metadata, type TMetadata, type TMetadataQuery } from "@ordo-pink/data"
 import { Maoka, type TMaokaProps } from "@ordo-pink/maoka"
 import { O } from "@ordo-pink/option"
 import { R } from "@ordo-pink/result"
 import { Switch } from "@ordo-pink/switch"
-import { type TCreateFunctionContext } from "@ordo-pink/core"
 
-export const ordo_context = Maoka.hooks.create_context<TCreateFunctionContext>()
+export const ordo_context = Maoka.hooks.create_context<Ordo.CreateFunction.Params>()
 
 export const get_commands = ({ use }: TMaokaProps) => {
 	const { get_commands } = use(ordo_context.consume)
@@ -117,7 +115,7 @@ export const get_is_authenticated = ({ use }: TMaokaProps) => {
 		.cata(R.catas.or_else(() => null as never))
 }
 
-export const get_metadata_query = ({ use }: TMaokaProps): TMetadataQuery => {
+export const get_metadata_query = ({ use }: TMaokaProps): Ordo.Metadata.Query => {
 	const { get_metadata_query } = use(ordo_context.consume)
 	const logger = use(get_logger)
 
@@ -129,81 +127,6 @@ export const get_metadata_query = ({ use }: TMaokaProps): TMetadataQuery => {
 		),
 	)
 }
-
-export const get_metadata_by_fsid =
-	(fsid?: string) =>
-	({ use, refresh }: TMaokaProps) => {
-		const query = use(get_metadata_query)
-		const [metadata, set_metadata] = use(state<TMetadata | null>("metadata_by_fsid", null))
-
-		const subscription = query.$.subscribe(() => {
-			const new_metadata = R.FromNullable(fsid)
-				.pipe(R.ops.chain(str => R.If(is_fsid(str), { T: () => str as FSID })))
-				.pipe(R.ops.chain(fsid => query.get_by_fsid(fsid)))
-				.pipe(R.ops.chain(metadata => R.FromNullable(metadata.unwrap())))
-				.cata(R.catas.or_else(() => null))
-
-			if (metadata && new_metadata && metadata.equals(new_metadata))
-				return () => subscription.unsubscribe()
-
-			set_metadata(() => new_metadata)
-			refresh()
-		})
-
-		return metadata
-	}
-
-export const get_metadata_children =
-	(fsid?: string) =>
-	({ use }: TMaokaProps) => {
-		const query = use(get_metadata_query)
-		const [children, set_children] = use(state<TMetadata[]>("metadata_children", []))
-
-		const subscription = query.$.subscribe(() => {
-			const new_children = R.FromNullable(fsid)
-				.pipe(R.ops.chain(str => R.If(is_fsid(str), { T: () => str as FSID })))
-				.pipe(R.ops.chain(fsid => query.get_children(fsid)))
-				.cata(R.catas.or_else(() => [] as TMetadata[]))
-
-			if (
-				!!children &&
-				!!new_children &&
-				children.length === new_children.length &&
-				children.reduce((acc, child, index) => acc && child.equals(new_children[index]), true)
-			)
-				return () => subscription.unsubscribe()
-
-			set_children(() => new_children)
-		})
-
-		return children
-	}
-
-export const get_metadata_ancestors =
-	(fsid?: string) =>
-	({ use }: TMaokaProps) => {
-		const query = use(get_metadata_query)
-		const [ancestors, set_ancestors] = use(state<TMetadata[]>("metadata_ancestors", []))
-
-		const subscription = query.$.subscribe(() => {
-			const new_children = R.FromNullable(fsid)
-				.pipe(R.ops.chain(str => R.If(is_fsid(str), { T: () => str as FSID })))
-				.pipe(R.ops.chain(fsid => query.get_ancestors(fsid)))
-				.cata(R.catas.or_else(() => [] as TMetadata[]))
-
-			if (
-				!!ancestors &&
-				!!new_children &&
-				ancestors.length === new_children.length &&
-				ancestors.reduce((acc, child, index) => acc && child.equals(new_children[index]), true)
-			)
-				return () => subscription.unsubscribe()
-
-			set_ancestors(() => new_children)
-		})
-
-		return ancestors
-	}
 
 export const get_translations = ({ use, refresh }: TMaokaProps) => {
 	const { get_translations, translate } = use(ordo_context.consume)
@@ -218,7 +141,7 @@ export const get_current_route = ({ use }: TMaokaProps) => {
 	const { get_current_route } = use(ordo_context.consume)
 	const logger = use(get_logger)
 
-	const state: Record<"route", Client.Router.Route | null> = { route: null }
+	const state: Record<"route", Ordo.Router.Route | null> = { route: null }
 
 	const $ = get_current_route()
 		.pipe(R.ops.err_tap(logger.alert))
@@ -334,13 +257,13 @@ export const computed =
 	}
 
 export const subscription =
-	<$TValue, $TTransformedValue>(
+	<$TValue, $TTransformedValue = $TValue>(
 		$: Observable<$TValue>,
 		f: (value: $TValue) => $TTransformedValue,
-		initial_value = void 0,
+		initial_value: $TValue = void 0 as any,
 	) =>
 	({ on_unmount, refresh }: TMaokaProps) => {
-		const state: Record<"value", $TTransformedValue | undefined> = { value: initial_value }
+		const state: Record<"value", $TTransformedValue> = { value: initial_value as any }
 
 		const subscription = $.subscribe(x => {
 			const new_value = f(x)
@@ -375,7 +298,3 @@ export const rx_subscription = <$TValue>(
 		return value
 	}
 }
-
-// --- Internal ---
-
-const is_fsid = Metadata.Validations.is_fsid

@@ -21,9 +21,8 @@ import { BehaviorSubject } from "rxjs"
 
 import { call_once, is_non_empty_string, is_string, is_undefined } from "@ordo-pink/tau"
 import { type TLogger } from "@ordo-pink/logger"
-import { type TTitleState } from "@ordo-pink/core"
 
-type TInitTitleStreamFn = (logger: TLogger, commands: Client.Commands.Commands) => void
+type TInitTitleStreamFn = (logger: TLogger, commands: Ordo.Command.Commands) => void
 export const init_title_display: TInitTitleStreamFn = call_once((logger, commands) => {
 	logger.debug("🟡 Initialising title stream...")
 
@@ -48,6 +47,6 @@ export const init_title_display: TInitTitleStreamFn = call_once((logger, command
 
 // --- Internal ---
 
-const title$ = new BehaviorSubject<TTitleState>({
+const title$ = new BehaviorSubject<Ordo.Title.State>({
 	window_title: "Loading...",
 })

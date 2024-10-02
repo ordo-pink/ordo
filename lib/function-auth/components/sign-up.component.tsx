@@ -29,7 +29,7 @@ import Button from "@ordo-pink/frontend-react-components/button"
 import Callout from "@ordo-pink/frontend-react-components/callout"
 import Heading from "@ordo-pink/frontend-react-components/heading"
 import Link from "@ordo-pink/frontend-react-components/link"
-import { RRR } from "@ordo-pink/data"
+import { RRR } from "@ordo-pink/managers"
 import { Switch } from "@ordo-pink/switch"
 
 /**

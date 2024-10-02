@@ -6,8 +6,8 @@ import { NotificationIcon } from "./notification-icon.component"
 import { NotificationProgress } from "./notification-progress.component"
 import { get_card_class } from "./common"
 
-type P = Client.Notification.Item
-export const Notification = ({ on_click, id, message, duration, icon, title, type }: P) => {
+type P = Ordo.Notification.Instance
+export const Notification = ({ on_click, id, message, duration, render_icon, title, type }: P) => {
 	return create("div", ({ use }) => {
 		use(set_class("relative inset-x-0 z-50 size-full"))
 
@@ -26,7 +26,7 @@ export const Notification = ({ on_click, id, message, duration, icon, title, typ
 				)
 
 				return () => [
-					NotificationIcon({ icon, type }),
+					NotificationIcon({ render_icon, type }),
 					NotificationContent({ title, message }),
 					NotificationProgress({ id, duration, type }),
 					NotificationHideButton({ id, type }),

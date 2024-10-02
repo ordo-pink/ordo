@@ -20,13 +20,8 @@
 import { BehaviorSubject, Subject, map, merge, scan, shareReplay } from "rxjs"
 
 import { O, type TOption } from "@ordo-pink/option"
-import { RRR, type TRrr } from "@ordo-pink/data"
-import {
-	type TFIDAwareActivity,
-	type TGetCurrentActivityFn,
-	type TSetCurrentActivityFn,
-} from "@ordo-pink/core"
 import { call_once, omit } from "@ordo-pink/tau"
+import { RRR } from "@ordo-pink/core"
 import { Result } from "@ordo-pink/result"
 
 import { type TInitCtx } from "../frontend-client.types"
@@ -34,8 +29,8 @@ import { type TInitCtx } from "../frontend-client.types"
 type TInitActivitiesFn = (params: Pick<TInitCtx, "logger" | "commands" | "known_functions">) => {
 	current_activity$: typeof current_activity$
 	activities$: typeof activities$
-	get_current_activity: TGetCurrentActivityFn
-	set_current_activity: TSetCurrentActivityFn
+	get_current_activity: (fid: symbol) => Ordo.CreateFunction.GetCurrentActivityFn
+	set_current_activity: (fid: symbol) => Ordo.CreateFunction.SetCurrentActivityFn
 }
 export const init_activities: TInitActivitiesFn = call_once(
 	({ logger, commands, known_functions }) => {
@@ -107,37 +102,40 @@ const eperm = RRR.codes.eperm(LOCATION)
 const eexist = RRR.codes.eexist(LOCATION)
 const enoent = RRR.codes.enoent(LOCATION)
 
-type TLogInvalidFIDFn = (fid: symbol | null, fn: string) => () => TRrr<"EPERM">
+type TLogInvalidFIDFn = (fid: symbol | null, fn: string) => () => Ordo.Rrr<"EPERM">
 const _log_invalid_fid: TLogInvalidFIDFn = (fid, fn) => () => eperm(`${fn} -> fid: ${String(fid)}`)
 
-type TLogAlreadyExistsFn = (name: string) => () => TRrr<"EEXIST">
+type TLogAlreadyExistsFn = (name: string) => () => Ordo.Rrr<"EEXIST">
 const _log_already_exists: TLogAlreadyExistsFn = name => () =>
 	eexist(`Activity "${name}" already registered`)
 
-type TLogDifferentFIDFn = (fid: symbol | null) => () => TRrr<"EPERM">
+type TLogDifferentFIDFn = (fid: symbol | null) => () => Ordo.Rrr<"EPERM">
 const _log_different_fid: TLogDifferentFIDFn = fid => () =>
 	eperm(`Only the activity itself can unregister: ${String(fid)}`)
 
-type TLogActivityNotFoundFn = (name: string) => () => TRrr<"ENOENT">
+type TLogActivityNotFoundFn = (name: string) => () => Ordo.Rrr<"ENOENT">
 const _log_activity_not_found: TLogActivityNotFoundFn = name => () =>
 	enoent(`Activity with name "${name}" is not registerred`)
 
-const add$ = new Subject<TFIDAwareActivity>()
+const add$ = new Subject<OrdoInternal.TFIDAwareActivity>()
 const remove$ = new Subject<string>()
 
 const add =
-	(new_activity: TFIDAwareActivity) =>
-	(state: TFIDAwareActivity[]): TFIDAwareActivity[] => [...state, new_activity]
+	(new_activity: OrdoInternal.TFIDAwareActivity) =>
+	(state: OrdoInternal.TFIDAwareActivity[]): OrdoInternal.TFIDAwareActivity[] => [
+		...state,
+		new_activity,
+	]
 
 const remove =
 	(name: string) =>
-	(state: TFIDAwareActivity[]): TFIDAwareActivity[] =>
+	(state: OrdoInternal.TFIDAwareActivity[]): OrdoInternal.TFIDAwareActivity[] =>
 		state.filter(activity => activity.name === name)
 
-const current_activity$ = new BehaviorSubject<TOption<Functions.Activity>>(O.None())
-const activities$ = new BehaviorSubject<TFIDAwareActivity[]>([])
+const current_activity$ = new BehaviorSubject<TOption<Ordo.Activity.Instance>>(O.None())
+const activities$ = new BehaviorSubject<OrdoInternal.TFIDAwareActivity[]>([])
 
 const aggregated_activities$ = merge(add$.pipe(map(add)), remove$.pipe(map(remove))).pipe(
-	scan((acc, f) => f(acc), [] as TFIDAwareActivity[]),
+	scan((acc, f) => f(acc), [] as OrdoInternal.TFIDAwareActivity[]),
 	shareReplay(1),
 )

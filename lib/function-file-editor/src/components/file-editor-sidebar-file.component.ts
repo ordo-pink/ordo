@@ -1,9 +1,8 @@
 import { Maoka } from "@ordo-pink/maoka"
 import { MetadataIcon } from "@ordo-pink/maoka-components"
 import { OrdoHooks } from "@ordo-pink/maoka-ordo-hooks"
-import { type TMetadata } from "@ordo-pink/data"
 
-export const FileEditorSidebarFile = (metadata: TMetadata, depth = 0) =>
+export const FileEditorSidebarFile = (metadata: Ordo.Metadata.Instance, depth = 0) =>
 	Maoka.create("div", ({ use }) => {
 		const fsid = metadata.get_fsid()
 		const { emit } = use(OrdoHooks.commands)

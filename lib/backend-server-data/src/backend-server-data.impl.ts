@@ -20,7 +20,7 @@
 import type { Readable } from "stream"
 
 import { ConsoleLogger, TLogger } from "@ordo-pink/logger"
-import type { TDataCommands } from "@ordo-pink/data"
+import type { TDataCommands } from "@ordo-pink/managers"
 import { create_koa_server } from "@ordo-pink/backend-utils"
 
 import { handleCreateData } from "./handlers/create-data.handler"

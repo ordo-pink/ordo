@@ -17,7 +17,7 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { ContentPersistenceStrategy, Data, UnexpectedError } from "@ordo-pink/data"
+import { ContentPersistenceStrategy, Data, UnexpectedError } from "@ordo-pink/managers"
 import { BackgroundTaskStatus } from "@ordo-pink/core"
 import { Oath } from "@ordo-pink/oath"
 

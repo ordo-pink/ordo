@@ -21,7 +21,7 @@ import { Observable, map } from "rxjs"
 
 import { type TLogger } from "@ordo-pink/logger"
 
-export const init_tray = (logger: TLogger, activities$: Observable<Functions.Activity[]>) => {
+export const init_tray = (logger: TLogger, activities$: Observable<Ordo.Activity.Instance[]>) => {
 	logger.debug("🟡 Initialising tray...")
 
 	const tray_activities$ = activities$.pipe(

@@ -20,13 +20,12 @@
 import { type Context, type Middleware } from "koa"
 import chalk from "chalk"
 
-import { RRR, type TRrr } from "@ordo-pink/data"
-import { HttpError } from "@ordo-pink/rrr"
+import { RRR } from "@ordo-pink/core"
 import { Switch } from "@ordo-pink/switch"
 import { type TLogger } from "@ordo-pink/logger"
 
 type TSendErrorParams = { ctx: Context; logger: TLogger }
-export const send_error = (params: TSendErrorParams) => (err: TRrr) => {
+export const send_error = (params: TSendErrorParams) => (err: Ordo.Rrr) => {
 	const { ctx, logger } = params
 
 	logger.debug(
@@ -56,13 +55,14 @@ export const handle_error =
 		try {
 			await next()
 		} catch (e) {
-			if (e instanceof HttpError) {
-				ctx.response.status = e.status
-				ctx.response.body = { success: false, message: e.message }
-			} else {
-				ctx.response.status = 500
-				options.logger.alert(e)
-				ctx.response.body = { success: false, message: "Internal error" }
-			}
+			console.log(e)
+			// if (e instanceof HttpError) {
+			// 	ctx.response.status = e.status
+			// 	ctx.response.body = { success: false, message: e.message }
+			// } else {
+			ctx.response.status = 500
+			options.logger.alert(e)
+			ctx.response.body = { success: false, message: "Internal error" }
+			// }
 		}
 	}

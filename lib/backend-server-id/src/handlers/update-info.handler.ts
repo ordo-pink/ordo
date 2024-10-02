@@ -19,7 +19,7 @@
 
 import { Context } from "koa"
 
-import { RRR, type TRrr } from "@ordo-pink/data"
+import { RRR, type TRrr } from "@ordo-pink/managers"
 import { type TAuthJWT, type TTokenService } from "@ordo-pink/backend-service-token"
 import { type TUserService, UserService } from "@ordo-pink/backend-service-user"
 import { authenticate0, parse_body0 } from "@ordo-pink/backend-utils"
@@ -49,7 +49,7 @@ type TFn = (
 	params: TParams,
 ) => Oath<Routes.ID.UpdateInfo.Response, TRrr<"EINVAL" | "ENOENT" | "EIO" | "EACCES">>
 type TRequest = { token: TAuthJWT; body: Routes.ID.UpdateInfo.RequestBody }
-type TCtx = { user: User.User; first_name: string; last_name: string }
+type TCtx = { user: Ordo.User.Current.Instance; first_name: string; last_name: string }
 
 const extract_ctx0 =
 	(user_service: TUserService) =>

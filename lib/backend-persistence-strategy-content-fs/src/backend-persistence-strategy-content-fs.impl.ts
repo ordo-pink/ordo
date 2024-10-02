@@ -21,7 +21,7 @@ import { Readable, Writable } from "stream"
 import { createReadStream, createWriteStream } from "fs"
 import { resolve } from "path"
 
-import { ContentPersistenceStrategy, Data, UnexpectedError } from "@ordo-pink/data"
+import { ContentPersistenceStrategy, Data, UnexpectedError } from "@ordo-pink/managers"
 import { create_parent_if_not_exists0, removeFile0, stat0, write_file0 } from "@ordo-pink/fs"
 import { Oath } from "@ordo-pink/oath"
 import { bimap_oath } from "@ordo-pink/oath/operators/bimap"

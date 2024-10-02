@@ -17,7 +17,33 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { TCreateFunctionContext, type TCreateFunctionFn } from "./types"
+type CurryFIDFn<$TFn extends (...args: any) => any> = (fid: symbol) => $TFn
+
+export type TCreateFunctionFn = (
+	name: string,
+	permissions: Ordo.CreateFunction.Permissions,
+	callback: (context: Ordo.CreateFunction.Params) => void | Promise<void>,
+) => (params: TCreateFunctionInternalContext) => void | Promise<void>
+
+type TCreateFunctionInternalContext = {
+	is_dev: boolean
+	get_commands: CurryFIDFn<Ordo.CreateFunction.GetCommandsFn>
+	get_logger: CurryFIDFn<Ordo.CreateFunction.GetLoggerFn>
+	get_current_route: CurryFIDFn<Ordo.CreateFunction.GetCurrentRouteFn>
+	get_sidebar: CurryFIDFn<Ordo.CreateFunction.GetSidebarFn>
+	get_hosts: CurryFIDFn<Ordo.CreateFunction.GetHostsFn>
+	get_is_authenticated: CurryFIDFn<Ordo.CreateFunction.GetIsAuthenticatedFn>
+	get_fetch: CurryFIDFn<Ordo.CreateFunction.GetFetchFn>
+	get_translations: Ordo.CreateFunction.GetTranslationsFn
+	translate: Ordo.I18N.TranslateFn
+	get_current_language: CurryFIDFn<Ordo.CreateFunction.GetCurrentLanguageFn>
+	get_metadata_query: CurryFIDFn<Ordo.CreateFunction.GetMetadataQueryFn>
+	get_user_query: CurryFIDFn<Ordo.CreateFunction.GetUserQueryFn>
+	get_file_associations: CurryFIDFn<Ordo.CreateFunction.GetFileAssociationsFn>
+	get_current_file_association: CurryFIDFn<Ordo.CreateFunction.GetCurrentFileAssociationFn>
+	// get_content_query: TGetContentQueryFn
+	known_functions: OrdoInternal.KnownFunctions
+}
 
 export const create_function: TCreateFunctionFn =
 	(name, permissions, callback) =>
@@ -43,7 +69,7 @@ export const create_function: TCreateFunctionFn =
 
 		if (!fid) return
 
-		const context: TCreateFunctionContext = {
+		const context: Ordo.CreateFunction.Params = {
 			fid,
 			is_dev,
 			get_commands: get_commands(fid),

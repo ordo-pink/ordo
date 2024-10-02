@@ -20,7 +20,7 @@
 import { useEffect, useState } from "react"
 
 import { EmailInput, PasswordInput } from "@ordo-pink/frontend-react-components/input"
-import { RRR } from "@ordo-pink/data"
+import { RRR } from "@ordo-pink/managers"
 import { Switch } from "@ordo-pink/switch"
 import { use$ } from "@ordo-pink/frontend-react-hooks"
 

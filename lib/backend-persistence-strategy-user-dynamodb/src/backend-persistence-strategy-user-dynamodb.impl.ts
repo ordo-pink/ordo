@@ -20,7 +20,7 @@
 import DynamoDB from "aws-sdk/clients/dynamodb"
 
 import { Oath } from "@ordo-pink/oath"
-import { RRR } from "@ordo-pink/data"
+import { RRR } from "@ordo-pink/managers"
 import { type SUB } from "@ordo-pink/wjwt"
 import { noop } from "@ordo-pink/tau"
 
@@ -148,7 +148,10 @@ const eio = RRR.codes.eio(LOCATION)
 const eexist = RRR.codes.eexist(LOCATION)
 const enoent = RRR.codes.enoent(LOCATION)
 
-const _check_not_exists_by_handle0 = (params: Types.TDynamoDBConfig, handle: User.User["handle"]) =>
+const _check_not_exists_by_handle0 = (
+	params: Types.TDynamoDBConfig,
+	handle: Ordo.User.Current.Instance["handle"],
+) =>
 	PersistenceStrategyUserDynamoDB.of(params)
 		.exists_by_handle(handle)
 		.pipe(
@@ -157,12 +160,18 @@ const _check_not_exists_by_handle0 = (params: Types.TDynamoDBConfig, handle: Use
 			),
 		)
 
-const _check_not_exists_by_id0 = (params: Types.TDynamoDBConfig, id: User.User["id"]) =>
+const _check_not_exists_by_id0 = (
+	params: Types.TDynamoDBConfig,
+	id: Ordo.User.Current.Instance["id"],
+) =>
 	PersistenceStrategyUserDynamoDB.of(params)
 		.exists_by_id(id)
 		.pipe(Oath.ops.chain(exists => Oath.If(!exists, { F: () => eexist(`create -> id: ${id}`) })))
 
-const _check_not_exists_by_email0 = (params: Types.TDynamoDBConfig, email: User.User["email"]) =>
+const _check_not_exists_by_email0 = (
+	params: Types.TDynamoDBConfig,
+	email: Ordo.User.Current.Instance["email"],
+) =>
 	PersistenceStrategyUserDynamoDB.of(params)
 		.exists_by_email(email)
 		.pipe(

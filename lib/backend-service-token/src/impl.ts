@@ -20,7 +20,7 @@
 import { JTI, WJWT } from "@ordo-pink/wjwt"
 import { O } from "@ordo-pink/option"
 import { Oath } from "@ordo-pink/oath"
-import { RRR } from "@ordo-pink/data"
+import { RRR } from "@ordo-pink/managers"
 import { Switch } from "@ordo-pink/switch"
 
 import { type TAuthJWT, type TTokenServiceStatic } from "./types"

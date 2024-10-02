@@ -30,3 +30,60 @@ export const enum BackgroundTaskStatus {
 	LOADING,
 	length,
 }
+
+export enum AchievementCategory {
+	EDUCATION,
+	COLLECTION,
+	CHALLENGE,
+	LEGACY,
+	length,
+}
+
+export enum UserSubscription {
+	FREE,
+	PERSONAL,
+	TEAM,
+	ENTERPRISE,
+	CUSTOM,
+	length,
+}
+
+export enum NotificationType {
+	DEFAULT,
+	SUCCESS,
+	INFO,
+	WARN,
+	QUESTION,
+	RRR,
+	length,
+}
+
+/**
+ * Context menu item type. This impacts two things:
+ *
+ * 1. Grouping items in the context menu.
+ * 2. Given type can be hidden when showing context menu.
+ */
+export enum ContextMenuItemType {
+	CREATE,
+	READ,
+	UPDATE,
+	DELETE,
+	length,
+}
+
+export enum ErrorType {
+	EPERM = 1, // Permission denied
+	ENOENT, // Not found
+	EINTR, // Interrupted
+	EIO, // I/O error
+	ENXIO, // Invalid address
+	EAGAIN, // Loading
+	EACCES, // Access denied
+	EEXIST, // Already exists
+	EINVAL, // Invalid
+	EMFILE, // Too many open files
+	EFBIG, // File too big
+	ENOSPC, // Out of memory
+	length,
+}

@@ -19,15 +19,6 @@
 
 import type { Observable } from "rxjs"
 
-import type {
-	TFetch,
-	THosts,
-	TKnownFunctions,
-	TPermissions,
-	TRequireFID,
-	TTranslateFn,
-} from "@ordo-pink/core"
-import type { TRrr, TUserQuery } from "@ordo-pink/data"
 import type { AuthResponse } from "@ordo-pink/backend-server-id"
 import type { TLogger } from "@ordo-pink/logger"
 import type { TOption } from "@ordo-pink/option"
@@ -36,21 +27,23 @@ import type { TResult } from "@ordo-pink/result"
 export type TKnownFunction = {
 	name: string
 	fid: symbol
-	permissions: TPermissions
+	permissions: Ordo.CreateFunction.Permissions
 }
 
 export type TInitCtx = {
-	commands: Client.Commands.Commands
+	commands: Ordo.Command.Commands
 	logger: TLogger
-	known_functions: TKnownFunctions
+	known_functions: OrdoInternal.KnownFunctions
 	APP_FID: symbol
 	is_dev: boolean
-	hosts: THosts
-	activities$: Observable<Functions.Activity[]>
-	current_activity$: Observable<TOption<Functions.Activity>>
-	set_current_activity: TRequireFID<(name: string) => TResult<void, TRrr<"EPERM" | "ENOENT">>>
-	fetch: TFetch
+	hosts: Ordo.Hosts
+	activities$: Observable<Ordo.Activity.Instance[]>
+	current_activity$: Observable<TOption<Ordo.Activity.Instance>>
+	set_current_activity: (
+		fid: symbol,
+	) => (name: string) => TResult<void, Ordo.Rrr<"EPERM" | "ENOENT">>
+	fetch: Ordo.Fetch
 	auth$: Observable<TOption<AuthResponse>>
-	user_query: TUserQuery
-	translate: TTranslateFn
+	user_query: Ordo.User.Query
+	translate: Ordo.I18N.TranslateFn
 }

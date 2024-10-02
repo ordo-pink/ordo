@@ -47,7 +47,7 @@ export default create_function(
 		commands: [
 			"cmd.functions.file_associations.add",
 			"cmd.application.add_translations",
-			"cmd.data.metadata.show_create_modal",
+			"cmd.metadata.show_create_modal",
 			"cmd.application.router.navigate",
 			"cmd.application.command_palette.show",
 		],
@@ -85,7 +85,7 @@ export default create_function(
 					description: "t.text.file_association.description",
 				},
 			],
-			render: div => {
+			render: ({ div }) => {
 				// TODO Replace with text editor
 				Maoka.render_dom(
 					div,
@@ -106,7 +106,7 @@ export default create_function(
 					description: "t.database.file_association.description",
 				},
 			],
-			render: (div, metadata) => {
+			render: ({ div, metadata }) => {
 				Maoka.render_dom(div, Database(metadata, ctx))
 			},
 			render_icon: span => {

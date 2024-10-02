@@ -19,7 +19,7 @@
 
 import { Context } from "koa"
 
-import { RRR, type TRrr } from "@ordo-pink/data"
+import { RRR, type TRrr } from "@ordo-pink/managers"
 import { type TUserService, UserService } from "@ordo-pink/backend-service-user"
 import { Oath } from "@ordo-pink/oath"
 import { type TLogger } from "@ordo-pink/logger"

@@ -18,8 +18,6 @@ import {
 	get_translations,
 	get_user_query,
 	ordo_context,
-	rx_subscription,
-	state,
 	subscription,
 } from "./src/maoka-ordo-hooks.impl"
 import { Result } from "@ordo-pink/result"
@@ -37,12 +35,10 @@ export const OrdoHooks = {
 	route_params: get_route_params,
 	translations: get_translations,
 	user_query: get_user_query,
-	rx_subscription,
 	subscription,
 	current_file_association: get_current_file_association,
 	file_associations: get_file_associations,
 	computed,
-	state,
 }
 
 export const MaokaOrdo = {

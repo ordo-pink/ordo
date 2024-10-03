@@ -20,9 +20,9 @@
 import { BehaviorSubject } from "rxjs"
 
 import { BackgroundTaskStatus } from "@ordo-pink/core"
+import { Maoka } from "@ordo-pink/maoka"
 import { O } from "@ordo-pink/option"
 import { type TLogger } from "@ordo-pink/logger"
-import { render_dom } from "@ordo-pink/maoka"
 
 import { BackgroundTaskStatusIndicator } from "../components/background-task-status"
 
@@ -43,7 +43,7 @@ export const init_background_task_display = (logger: TLogger, commands: Ordo.Com
 	O.FromNullable(document.querySelector("#background-task-indicator"))
 		.pipe(O.ops.chain(root => (root instanceof HTMLDivElement ? O.Some(root) : O.None())))
 		.pipe(O.ops.map(root => ({ root, component: BackgroundTaskStatusIndicator(bg_task$) })))
-		.pipe(O.ops.map(({ root, component }) => render_dom(root, component)))
+		.pipe(O.ops.map(({ root, component }) => Maoka.render_dom(root, component)))
 		.cata(O.catas.or_else(log_div_not_found(logger)))
 
 	logger.debug("🟢 Initialised background task indicator.")

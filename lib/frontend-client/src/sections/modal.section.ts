@@ -34,7 +34,7 @@ export const init_modal = ({ commands, logger, ctx }: P) => {
 
 	const root = document.getElementById("modal") as HTMLDivElement
 
-	Maoka.render_dom(root, ModalOverlay(modal$, ctx))
+	void Maoka.render_dom(root, ModalOverlay(modal$, ctx))
 
 	logger.debug("🟢 Initialised modal.")
 }

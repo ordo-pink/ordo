@@ -3,26 +3,30 @@
 
 // TODO: Comments
 // TODO: Full types
-export type TMaokaElement = { [$TKey in keyof HTMLElement]: HTMLElement[$TKey] } & {
-	setAttribute: (...params: Parameters<HTMLElement["setAttribute"]>) => void
-	appendChild: (child: TMaokaElement | string) => void
+export type TMaokaElement = { [$TKey in keyof HTMLElement]: HTMLElement[$TKey] | undefined } & {
+	setAttribute: (qualified_name: string, value: string) => void
+	getAttribute: (qualified_name: string) => string
+	appendChild: (child: TMaokaChild) => TMaokaChild
+	replaceChildren: (...children: TMaokaChild[]) => void
+	childNodes: HTMLElement["childNodes"]
 	onunmount: (() => void)[] | undefined
 }
 
-export type TMaokaText = Partial<{ [$TKey in keyof Text]: Text[$TKey] }> | string
+export type TMaokaTextElement = Partial<{ [$TKey in keyof Text]: Text[$TKey] }> | string
 
-export type TMaokaCreateComponentFn = (callback?: TMaokaCallback) => TMaokaCreateComponentImplFn
+export type TMaokaCreateMaokaElementFn<$TElement extends TMaokaElement = TMaokaElement> = (
+	name: string,
+) => $TElement
 
-export type TMaokaCreateComponentImplFn<
-	$TElement extends TMaokaElement = TMaokaElement,
-	$TText extends TMaokaText = TMaokaText,
-> = (
-	create_element: (name: string) => $TElement,
-	create_text: (text: string) => $TText,
+export type TMaokaCreateComponentFn = (name: string, callback: TMaokaCallback) => TMaokaComponent
+
+export type TMaokaComponent<$TElement extends TMaokaElement = TMaokaElement> = (
+	create_element: TMaokaCreateMaokaElementFn<$TElement>,
+	root_element: TMaokaElement,
 	root_id: string,
-) => HTMLElement
+) => Promise<TMaokaElement>
 
-export type TMaokaHook<T = void> = (props: TMaokaProps) => T
+export type TMaokaHook<$TReturn = void> = (props: TMaokaProps) => $TReturn
 
 /**
  * A Maoka component child. If the child is a Maoka component function, it will be called using the
@@ -32,12 +36,13 @@ export type TMaokaHook<T = void> = (props: TMaokaProps) => T
  * will be applied.
  */
 export type TMaokaChild =
-	| SVGSVGElement
-	| HTMLElement
+	| TMaokaElement
+	| TMaokaComponent
 	| string
+	| number
 	| undefined
+	| null
 	| void
-	| TMaokaCreateComponentImplFn
 
 /**
  * TChildren is an expected return type of a Maoka callback.
@@ -45,11 +50,6 @@ export type TMaokaChild =
  * @see TMaokaChild
  */
 export type TMaokaChildren = TMaokaChild | TMaokaChild[]
-
-/**
- * Supplementary type that checks whether provided string does not contain spaces.
- */
-export type TNoSpace<$TStr extends string> = $TStr extends `${string} ${string}` ? never : $TStr
 
 /**
  * A record of hooks that are provided by Maoka directly.
@@ -60,32 +60,33 @@ export type TMaokaProps<$TElement extends TMaokaElement = TMaokaElement> = {
 	 * hooks that accumulate a set of components to apply batch refresh calls. You would hardly ever
 	 * need this in your application code.
 	 */
-	get internal_id(): string
+	get id(): string
 
 	/**
 	 * Returns reference to the current element.
 	 */
-	get current_element(): $TElement
+	get element(): $TElement
 
+	/**
+	 * Root id.
+	 */
 	get root_id(): string
+
+	get root_element(): TMaokaElement
 
 	/**
 	 * Trigger refreshing current Maoka component. Technically, calling refresh is basically calling
 	 * the Maoka component callback function in which this `refresh` function is available inside
 	 * `use` parameter.
 	 */
-	refresh: () => void
+	refresh: () => Promise<void>
 
-	on_unmount: TMaokaOnUnountFn
+	on_unmount: TMaokaOnUnmountFn
 
-	on_refresh: TMaokaOnRefreshFn
-
-	use: <_TResult>(hook: (ctx: TMaokaProps) => _TResult) => _TResult
+	use: <_TResult>(hook: TMaokaHook<_TResult>) => _TResult
 }
 
-export type TMaokaOnUnountFn = (f: () => void) => void
-
-export type TMaokaOnRefreshFn = (f: () => boolean | void) => void
+export type TMaokaOnUnmountFn = (f: () => void) => void
 
 /**
  * A callback function that returns children of the current Maoka component. It accepts a record of
@@ -94,6 +95,15 @@ export type TMaokaOnRefreshFn = (f: () => boolean | void) => void
  *
  * @see TMaokaChildren
  */
-export type TMaokaCallback = (props: TMaokaProps) => (() => TMaokaChildren) | undefined | void
+export type TMaokaCallback = (
+	props: TMaokaProps,
+) =>
+	| ((() => TMaokaChildren) | undefined | void)
+	| ((() => Promise<TMaokaChildren>) | undefined | void)
+	| Promise<(() => TMaokaChildren) | undefined | void>
+	| Promise<(() => Promise<TMaokaChildren>) | undefined | void>
 
-export type TMaokaRenderDOMFn = (root: HTMLElement, component: TMaokaCreateComponentImplFn) => void
+export type TMaokaRenderDOMFn = <$TElement extends HTMLElement = HTMLElement>(
+	root: $TElement,
+	component: TMaokaComponent,
+) => Promise<void>

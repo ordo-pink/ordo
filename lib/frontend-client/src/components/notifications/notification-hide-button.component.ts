@@ -1,5 +1,6 @@
 import { BS_X } from "@ordo-pink/frontend-icons"
 import { Maoka } from "@ordo-pink/maoka"
+import { MaokaHooks } from "@ordo-pink/maoka-hooks"
 import { NotificationType } from "@ordo-pink/core"
 import { Switch } from "@ordo-pink/switch"
 import { get_commands } from "@ordo-pink/maoka-ordo-hooks"
@@ -10,9 +11,9 @@ export const NotificationHideButton = ({ id, type }: P) =>
 		const { emit } = use(get_commands)
 		const hover_class = get_hover_close_button_class(type)
 
-		use(Maoka.hooks.set_class("absolute right-2 top-2 rounded-full p-1", hover_class))
-		use(Maoka.hooks.listen("onclick", handle_hide_notification_click(emit, id)))
-		use(Maoka.hooks.set_inner_html(BS_X))
+		use(MaokaHooks.set_class("absolute right-2 top-2 rounded-full p-1", hover_class))
+		use(MaokaHooks.listen("onclick", handle_hide_notification_click(emit, id)))
+		use(MaokaHooks.set_inner_html(BS_X))
 	})
 
 // --- Internal ---

@@ -2,6 +2,7 @@ import { CurrentUserReference, Link, MetadataIcon } from "@ordo-pink/maoka-compo
 import { Maoka, type TMaokaChildren } from "@ordo-pink/maoka"
 import { OrdoHooks, ordo_context } from "@ordo-pink/maoka-ordo-hooks"
 import { BsPlus } from "@ordo-pink/frontend-icons"
+import { MaokaHooks } from "@ordo-pink/maoka-hooks"
 import { R } from "@ordo-pink/result"
 
 // TODO: Avoid unnecessary rerenders by narrowing down hooks
@@ -13,7 +14,7 @@ export const Database = (metadata: Ordo.Metadata.Instance, ctx: Ordo.CreateFunct
 		let descendents: Ordo.Metadata.Instance[] = []
 
 		use(ordo_context.provide(ctx))
-		use(Maoka.hooks.set_class("p-4"))
+		use(MaokaHooks.set_class("p-4"))
 
 		const metadata_query = use(OrdoHooks.metadata_query)
 
@@ -24,7 +25,7 @@ export const Database = (metadata: Ordo.Metadata.Instance, ctx: Ordo.CreateFunct
 
 			if (descendents.length !== metadata_descendents.length) {
 				descendents = metadata_descendents
-				refresh()
+				void refresh()
 			}
 		})
 
@@ -32,7 +33,7 @@ export const Database = (metadata: Ordo.Metadata.Instance, ctx: Ordo.CreateFunct
 
 		return () => {
 			return Maoka.create("table", ({ use }) => {
-				use(Maoka.hooks.set_class(`w-full table-auto border-t ${BORDER_COLOR_CLASS}`))
+				use(MaokaHooks.set_class(`w-full table-auto border-t ${BORDER_COLOR_CLASS}`))
 
 				// TODO: Move to translations
 				// TODO: Add icons
@@ -51,13 +52,13 @@ export const Database = (metadata: Ordo.Metadata.Instance, ctx: Ordo.CreateFunct
 					Maoka.create("thead", () => {
 						return () =>
 							Maoka.create("tr", ({ use }) => {
-								use(Maoka.hooks.set_class("text-left"))
+								use(MaokaHooks.set_class("text-left"))
 
 								return () =>
 									keys.map(key =>
 										Maoka.create("th", ({ use }) => {
 											use(
-												Maoka.hooks.set_class(
+												MaokaHooks.set_class(
 													`border-r text-sm last-of-type:border-r-0 last-of-type:border-l ${BORDER_COLOR_CLASS} px-2 py-1 font-normal text-neutral-500`,
 												),
 											)
@@ -71,7 +72,7 @@ export const Database = (metadata: Ordo.Metadata.Instance, ctx: Ordo.CreateFunct
 						return () => [
 							...descendents.map(child =>
 								Maoka.create("tr", ({ use }) => {
-									use(Maoka.hooks.set_class(`border-y ${BORDER_COLOR_CLASS}`))
+									use(MaokaHooks.set_class(`border-y ${BORDER_COLOR_CLASS}`))
 
 									return () => [
 										FileNameCell(child),
@@ -90,18 +91,18 @@ export const Database = (metadata: Ordo.Metadata.Instance, ctx: Ordo.CreateFunct
 
 							Maoka.create("tr", ({ use }) => {
 								const { emit } = use(OrdoHooks.commands)
-								use(Maoka.hooks.set_class(`border-y ${BORDER_COLOR_CLASS}`))
+								use(MaokaHooks.set_class(`border-y ${BORDER_COLOR_CLASS}`))
 
 								return () =>
 									Maoka.create("td", ({ use }) => {
 										use(
-											Maoka.hooks.set_class(
+											MaokaHooks.set_class(
 												"px-2 py-1 text-neutral-500 text-sm flex items-center gap-x-1 cursor-pointer",
 											),
 										)
 
 										use(
-											Maoka.hooks.listen("onclick", () => {
+											MaokaHooks.listen("onclick", () => {
 												emit("cmd.metadata.show_create_modal", metadata.get_fsid())
 											}),
 										)
@@ -123,8 +124,8 @@ const cell_class = `break-all border-r last-of-type:border-r-0 last-of-type:bord
 
 const Cell = (value: TMaokaChildren, on_click?: (event: MouseEvent) => void) =>
 	Maoka.create("td", ({ use }) => {
-		use(Maoka.hooks.set_class(cell_class))
-		if (on_click) use(Maoka.hooks.listen("onclick", on_click))
+		use(MaokaHooks.set_class(cell_class))
+		if (on_click) use(MaokaHooks.listen("onclick", on_click))
 
 		return () => value
 	})
@@ -133,9 +134,9 @@ const FileNameCell = (metadata: Ordo.Metadata.Instance) =>
 	Maoka.create("td", ({ use }) => {
 		const { emit } = use(OrdoHooks.commands)
 
-		use(Maoka.hooks.set_class(cell_class, "font-semibold"))
+		use(MaokaHooks.set_class(cell_class, "font-semibold"))
 		use(
-			Maoka.hooks.listen("oncontextmenu", event =>
+			MaokaHooks.listen("oncontextmenu", event =>
 				emit("cmd.application.context_menu.show", {
 					event: event as any,
 					payload: metadata,
@@ -148,29 +149,29 @@ const FileNameCell = (metadata: Ordo.Metadata.Instance) =>
 				const fsid = metadata.get_fsid()
 				const name = metadata.get_name()
 
-				use(Maoka.hooks.set_class("flex gap-x-1 items-center"))
+				use(MaokaHooks.set_class("flex gap-x-1 items-center"))
 
 				return () => [
 					MetadataIcon({ metadata }),
 
-					Maoka.create("div", ({ use, current_element }) => {
+					Maoka.create("div", ({ use, element }) => {
 						const { emit } = use(OrdoHooks.commands)
-						const keydown_listener = Maoka.hooks.listen("onkeydown", event => {
+						const keydown_listener = MaokaHooks.listen("onkeydown", event => {
 							if (event.key !== "Enter" && event.key !== "Escape") return
 
 							event.preventDefault()
-							current_element.blur()
+							if (element instanceof HTMLElement) element.blur()
 						})
 
-						const blur_listener = Maoka.hooks.listen("onblur", event => {
+						const blur_listener = MaokaHooks.listen("onblur", event => {
 							R.FromNullable(event.target as unknown as HTMLDivElement)
 								.pipe(R.ops.map(e => e.innerText))
 								.pipe(R.ops.chain(new_name => R.If(name !== new_name, { T: () => new_name })))
 								.cata(R.catas.if_ok(new_name => emit("cmd.metadata.rename", { fsid, new_name })))
 						})
 
-						use(Maoka.hooks.set_attribute("contenteditable", "true"))
-						use(Maoka.hooks.set_class("w-full outline-none"))
+						use(MaokaHooks.set_attribute("contenteditable", "true"))
+						use(MaokaHooks.set_class("w-full outline-none"))
 						use(keydown_listener)
 						use(blur_listener)
 

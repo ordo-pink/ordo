@@ -3,6 +3,7 @@ import { Observable } from "rxjs"
 import { BS_CLOUD_DOWNLOAD, BS_CLOUD_UPLOAD } from "@ordo-pink/frontend-icons"
 import { BackgroundTaskStatus } from "@ordo-pink/core"
 import { Maoka } from "@ordo-pink/maoka"
+import { MaokaHooks } from "@ordo-pink/maoka-hooks"
 import { OrdoHooks } from "@ordo-pink/maoka-ordo-hooks"
 import { Switch } from "@ordo-pink/switch"
 import { noop } from "@ordo-pink/tau"
@@ -14,7 +15,7 @@ export const BackgroundTaskStatusIndicator = ($: Observable<BackgroundTaskStatus
 		const handle_status_update = (new_status: BackgroundTaskStatus) => {
 			if (new_status < BackgroundTaskStatus.length && status !== new_status) {
 				status = new_status
-				refresh()
+				void refresh()
 			}
 		}
 
@@ -30,11 +31,11 @@ export const BackgroundTaskStatusIndicator = ($: Observable<BackgroundTaskStatus
 // --- Internal ---
 
 const LoadingIcon = Maoka.create("span", ({ use }) => {
-	use(Maoka.hooks.set_inner_html(BS_CLOUD_DOWNLOAD))
+	use(MaokaHooks.set_inner_html(BS_CLOUD_DOWNLOAD))
 })
 
 const SavingIcon = Maoka.create("span", ({ use }) => {
-	use(Maoka.hooks.set_inner_html(BS_CLOUD_UPLOAD))
+	use(MaokaHooks.set_inner_html(BS_CLOUD_UPLOAD))
 })
 
 const NoIcon = Maoka.create("span", noop)

@@ -1,4 +1,5 @@
 import { Maoka } from "@ordo-pink/maoka"
+import { MaokaHooks } from "@ordo-pink/maoka-hooks"
 import { NotificationType } from "@ordo-pink/core"
 import { Switch } from "@ordo-pink/switch"
 import { get_commands } from "@ordo-pink/maoka-ordo-hooks"
@@ -13,10 +14,10 @@ export const NotificationProgress = ({ id, type, duration }: P) => {
 		const { emit } = use(get_commands)
 		const interval = setInterval(() => {
 			counter = counter > 0 ? counter - 1 : 0
-			refresh()
+			void refresh()
 		}, duration * 10)
 
-		use(Maoka.hooks.set_class("absolute inset-x-1.5 bottom-0 rounded-full shadow-inner"))
+		use(MaokaHooks.set_class("absolute inset-x-1.5 bottom-0 rounded-full shadow-inner"))
 
 		on_unmount(() => clearInterval(interval))
 
@@ -33,8 +34,8 @@ export const NotificationProgress = ({ id, type, duration }: P) => {
 type P1 = Pick<Ordo.Notification.Instance, "type"> & { progress: number }
 const ProgressBarForeground = ({ progress, type }: P1) =>
 	Maoka.create("div", ({ use }) => {
-		use(Maoka.hooks.set_class("h-1 rounded-full", get_progress_foreground_class(type)))
-		use(Maoka.hooks.set_style({ width: progress.toFixed(0).concat("%") }))
+		use(MaokaHooks.set_class("h-1 rounded-full", get_progress_foreground_class(type)))
+		use(MaokaHooks.set_style({ width: progress.toFixed(0).concat("%") }))
 	})
 
 const get_progress_foreground_class = (type: Ordo.Notification.Instance["type"]) =>

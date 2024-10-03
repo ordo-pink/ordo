@@ -1,5 +1,6 @@
-import { Maoka, type TMaokaCreateComponentImplFn } from "@ordo-pink/maoka"
+import { Maoka, type TMaokaComponent } from "@ordo-pink/maoka"
 import { is_false, is_true, noop } from "@ordo-pink/tau"
+import { MaokaHooks } from "@ordo-pink/maoka-hooks"
 import { MaokaOrdo } from "@ordo-pink/maoka-ordo-hooks"
 import { R } from "@ordo-pink/result"
 import { Switch } from "@ordo-pink/switch"
@@ -10,7 +11,7 @@ import { FileEditorSidebarFile } from "./file-editor-sidebar-file.component"
 export const FileEditorSidebarItem = (
 	initial_metadata: Ordo.Metadata.Instance,
 	depth = 0,
-): TMaokaCreateComponentImplFn =>
+): TMaokaComponent =>
 	Maoka.create("div", ({ use, refresh, on_unmount }) => {
 		let metadata = initial_metadata
 
@@ -23,11 +24,11 @@ export const FileEditorSidebarItem = (
 				.pipe(R.ops.chain(R.FromOption))
 				.pipe(R.ops.chain(x => R.If(!initial_metadata.equals(x), { T: () => x })))
 				.pipe(R.ops.map(x => void (metadata = x)))
-				.cata(R.catas.if_ok(refresh))
+				.cata(R.catas.if_ok(() => void refresh()))
 		})
 
 		use(
-			Maoka.hooks.listen("oncontextmenu", event => {
+			MaokaHooks.listen("oncontextmenu", event => {
 				event.preventDefault()
 				event.stopPropagation()
 

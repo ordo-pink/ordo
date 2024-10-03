@@ -20,8 +20,8 @@
 // import { BsFileEarmarkMinus, BsFileEarmarkPlus, BsPencil } from "react-icons/bs"
 
 import { BS_FOLDER_2_OPEN } from "@ordo-pink/frontend-icons"
+import { Maoka } from "@ordo-pink/maoka"
 import { create_function } from "@ordo-pink/core"
-import { render_dom } from "@ordo-pink/maoka"
 
 import { CreateFileModal } from "./src/components/create-file-modal.component"
 import { FileExplorer } from "./src/components/fe.component"
@@ -80,19 +80,19 @@ export default create_function(
 		// TODO: Move to metadata
 		commands.on("cmd.metadata.show_remove_modal", fsid =>
 			commands.emit("cmd.application.modal.show", {
-				render: div => render_dom(div, RemoveFileModal(ctx, fsid)),
+				render: div => void Maoka.render_dom(div, RemoveFileModal(ctx, fsid)),
 			}),
 		)
 
 		commands.on("cmd.metadata.show_rename_modal", fsid =>
 			commands.emit("cmd.application.modal.show", {
-				render: div => render_dom(div, RenameFileModal(ctx, fsid)),
+				render: div => void Maoka.render_dom(div, RenameFileModal(ctx, fsid)),
 			}),
 		)
 
 		commands.on("cmd.metadata.show_create_modal", fsid =>
 			commands.emit("cmd.application.modal.show", {
-				render: div => render_dom(div, CreateFileModal(ctx, fsid)),
+				render: div => void Maoka.render_dom(div, CreateFileModal(ctx, fsid)),
 			}),
 		)
 
@@ -140,7 +140,7 @@ export default create_function(
 				name: "pink.ordo.file-explorer.activity",
 				routes: ["/files", "/files/:fsid"],
 				render_workspace: div => {
-					render_dom(div, FileExplorer(ctx))
+					void Maoka.render_dom(div, FileExplorer(ctx))
 				},
 				render_icon: span => {
 					span.innerHTML = BS_FOLDER_2_OPEN

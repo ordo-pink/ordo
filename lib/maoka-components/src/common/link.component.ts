@@ -1,4 +1,5 @@
 import { Maoka, TMaokaChildren } from "@ordo-pink/maoka"
+import { MaokaHooks } from "@ordo-pink/maoka-hooks"
 import { OrdoHooks } from "@ordo-pink/maoka-ordo-hooks"
 import { is_string } from "@ordo-pink/tau"
 
@@ -7,13 +8,13 @@ export const Link = ({ href, children, custom_class, show_visited }: P) =>
 	Maoka.create("a", ({ use }) => {
 		const { emit } = use(OrdoHooks.commands)
 
-		use(Maoka.hooks.listen("onclick", click_listener(emit, href)))
-		use(Maoka.hooks.set_attribute("href", href))
-		use(Maoka.hooks.set_class(default_class))
+		use(MaokaHooks.listen("onclick", click_listener(emit, href)))
+		use(MaokaHooks.set_attribute("href", href))
+		use(MaokaHooks.set_class(default_class))
 
-		if (custom_class) use(Maoka.hooks.add_class(custom_class))
-		if (!show_visited) use(Maoka.hooks.add_class(ignore_history_highlighting_class))
-		if (is_string(children)) use(Maoka.hooks.set_attribute("title", children))
+		if (custom_class) use(MaokaHooks.add_class(custom_class))
+		if (!show_visited) use(MaokaHooks.add_class(ignore_history_highlighting_class))
+		if (is_string(children)) use(MaokaHooks.set_attribute("title", children))
 
 		return () => children
 	})

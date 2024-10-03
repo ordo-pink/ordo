@@ -85,15 +85,15 @@ export default create_function(
 					description: "t.text.file_association.description",
 				},
 			],
-			render: ({ div }) => {
+			render: ({ div }) =>
 				// TODO Replace with text editor
 				Maoka.render_dom(
 					div,
 					Maoka.create("div", () => () => "TODO"),
-				)
-			},
+				),
 			render_icon: span => {
-				span.appendChild(BsFileEarmarkRichText())
+				span.appendChild(BsFileEarmarkRichText() as any)
+				return Promise.resolve()
 			},
 		})
 
@@ -106,12 +106,8 @@ export default create_function(
 					description: "t.database.file_association.description",
 				},
 			],
-			render: ({ div, metadata }) => {
-				Maoka.render_dom(div, Database(metadata, ctx))
-			},
-			render_icon: span => {
-				span.appendChild(BsFileEarmarkRuled())
-			},
+			render: ({ div, metadata }) => Maoka.render_dom(div, Database(metadata, ctx)),
+			render_icon: span => span.replaceChildren(BsFileEarmarkRuled() as any),
 		})
 	},
 )

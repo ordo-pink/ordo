@@ -1,7 +1,6 @@
 import { Maoka } from "@ordo-pink/maoka"
 import { MaokaOrdo } from "@ordo-pink/maoka-ordo-hooks"
 import { Result } from "@ordo-pink/result"
-import { WelcomeLandingPage } from "./pages/landing.page"
 
 export const WelcomeWorkspace = (ctx: Ordo.CreateFunction.Params) =>
 	Maoka.create("div", ({ use, refresh }) => {
@@ -19,6 +18,6 @@ export const WelcomeWorkspace = (ctx: Ordo.CreateFunction.Params) =>
 
 		return () => {
 			// TODO Render home if user is authenticated
-			return WelcomeLandingPage
+			return Maoka.lazy(() => import("./pages/landing.page"))
 		}
 	})

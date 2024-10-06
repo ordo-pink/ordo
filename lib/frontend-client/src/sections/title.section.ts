@@ -35,11 +35,9 @@ export const init_title_display: TInitTitleStreamFn = call_once((logger, command
 	)
 
 	const title_element = document.querySelector("title") as HTMLTitleElement
-	const status_bar_title_element = document.querySelector("#status-bar_title") as HTMLDivElement
 
-	title$.subscribe(({ window_title, status_bar_title = window_title }) => {
+	title$.subscribe(({ window_title }) => {
 		title_element.innerText = `${window_title} | Ordo.pink`
-		status_bar_title_element.innerText = status_bar_title
 	})
 
 	logger.debug("🟢 Initialised title.")

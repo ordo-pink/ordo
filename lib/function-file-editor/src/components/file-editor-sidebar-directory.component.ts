@@ -1,11 +1,14 @@
 import { BsCaretDown, BsCaretRight } from "@ordo-pink/frontend-icons"
-import { Maoka, type TMaokaHook } from "@ordo-pink/maoka"
+import { Maoka, type TMaokaJab } from "@ordo-pink/maoka"
+import { MaokaHooks } from "@ordo-pink/maoka-hooks"
+import { MaokaOrdo } from "@ordo-pink/maoka-ordo-hooks"
+import { Metadata } from "@ordo-pink/core"
 import { MetadataIcon } from "@ordo-pink/maoka-components"
-import { OrdoHooks } from "@ordo-pink/maoka-ordo-hooks"
 import { R } from "@ordo-pink/result"
+import { type TOption } from "@ordo-pink/option"
 
 import { FileEditorSidebarItem } from "./file-editor-sidebar-item.component"
-import { Metadata } from "@ordo-pink/core"
+import { equals } from "ramda"
 
 const expanded_state = {} as Record<Ordo.Metadata.FSID, boolean>
 
@@ -13,13 +16,34 @@ export const FileEditorSidebarDirectory = (metadata: Ordo.Metadata.Instance, dep
 	Maoka.create("div", ({ use, refresh }) => {
 		const fsid = metadata.get_fsid()
 
-		const route_params = use(OrdoHooks.route_params)
-		const metadata_query = use(OrdoHooks.metadata_query)
+		const metadata_query = use(MaokaOrdo.Hooks.metadata_query)
+
+		let route: Ordo.Router.Route | null = null
+		const $ = use(MaokaOrdo.Hooks.current_route)
+		const handle_current_route_change = (value: TOption<Ordo.Router.Route>) =>
+			R.FromOption(value, () => null)
+				.pipe(R.ops.chain(r => R.If(r.path !== route?.path, { T: () => r, F: () => r })))
+				.pipe(R.ops.chain(r => R.If(!equals(r, route), { T: () => r, F: () => r })))
+				.cata({
+					Ok: async updated_route => {
+						route = updated_route
+						await refresh()
+					},
+					Err: async null_or_same_route => {
+						// Skip since routes are equal
+						if (null_or_same_route || !route) return
+
+						route = null_or_same_route
+						await refresh()
+					},
+				})
+
+		use(MaokaOrdo.Hooks.subscription($, handle_current_route_change))
 
 		const on_caret_click = (event: MouseEvent) => {
 			event.stopPropagation()
 			expanded_state[fsid] = !expanded_state[fsid]
-			refresh()
+			void refresh()
 		}
 
 		return () => {
@@ -27,10 +51,11 @@ export const FileEditorSidebarDirectory = (metadata: Ordo.Metadata.Instance, dep
 			// provided in route params (opened in the FileEditor workspace). It should also cover
 			// cases when user navigates to another file with a link.
 			// TODO check if it actually expands directories when navigating via a link.
-			R.FromNullable(route_params.value.fsid)
+			R.FromNullable(route)
+				.pipe(R.ops.chain(MaokaOrdo.Ops.get_route_params))
 				.pipe(
-					R.ops.chain(i =>
-						R.If(Metadata.Validations.is_fsid(i), { T: () => i as Ordo.Metadata.FSID }),
+					R.ops.chain(({ fsid }) =>
+						R.If(Metadata.Validations.is_fsid(fsid), { T: () => fsid as Ordo.Metadata.FSID }),
 					),
 				)
 				.pipe(R.ops.chain(fsid => metadata_query.get_ancestors(fsid)))
@@ -82,30 +107,49 @@ const FileEditorDirectoryName = (
 	depth: number,
 	on_caret_click: (event: MouseEvent) => void,
 ) =>
-	Maoka.create("div", ({ use }) => {
+	Maoka.create("div", ({ use, refresh }) => {
 		const fsid = metadata.get_fsid()
 
-		const route_params = use(OrdoHooks.route_params)
-		const commands = use(OrdoHooks.commands)
+		let route: Ordo.Router.Route | null = null
+		const $ = use(MaokaOrdo.Hooks.current_route)
+		const handle_current_route_change = (value: TOption<Ordo.Router.Route>) =>
+			R.FromOption(value, () => null)
+				.pipe(R.ops.chain(r => R.If(r.path !== route?.path, { T: () => r, F: () => r })))
+				.pipe(R.ops.chain(r => R.If(!equals(r, route), { T: () => r, F: () => r })))
+				.cata({
+					Ok: updated_route => {
+						route = updated_route
+						void refresh()
+					},
+					Err: null_or_same_route => {
+						// Skip since routes are equal
+						if (null_or_same_route || !route) return
 
-		use(Maoka.hooks.listen("onclick", () => commands.emit("cmd.file_editor.open_file", fsid)))
-		use(Maoka.hooks.set_style({ paddingLeft: `${depth + 0.5}rem`, paddingRight: "0.5rem" }))
-		use(Maoka.hooks.set_class(...file_editor_sidebar_directory_name_classes))
+						route = null_or_same_route
+						void refresh()
+					},
+				})
+
+		use(MaokaOrdo.Hooks.subscription($, handle_current_route_change))
+
+		const commands = use(MaokaOrdo.Hooks.commands)
+
+		use(MaokaHooks.listen("onclick", () => commands.emit("cmd.file_editor.open_file", fsid)))
+		use(MaokaHooks.set_style({ paddingLeft: `${depth + 0.5}rem`, paddingRight: "0.5rem" }))
+		use(MaokaHooks.set_class(...file_editor_sidebar_directory_name_classes))
 
 		return () => {
-			if (route_params.value.fsid === fsid)
-				use(Maoka.hooks.add_class(file_editor_sidebar_directory_name_active_class))
-			else use(Maoka.hooks.remove_class(file_editor_sidebar_directory_name_active_class))
+			if (route?.params?.fsid === fsid) use(MaokaHooks.add_class(directory_active))
+			else use(MaokaHooks.remove_class(...directory_active.split(" ")))
 
 			return [
 				FileEditorDirectoryNameText(metadata),
-				FileEditorDirectoryNameCaret(fsid, Maoka.hooks.listen("onclick", on_caret_click)),
+				FileEditorDirectoryNameCaret(fsid, MaokaHooks.listen("onclick", on_caret_click)),
 			]
 		}
 	})
 
-const file_editor_sidebar_directory_name_active_class =
-	"bg-gradient-to-tr from-pink-900 to-rose-900"
+const directory_active = "bg-gradient-to-tr from-pink-900 to-rose-900"
 
 const file_editor_sidebar_directory_name_classes = [
 	"flex justify-between items-center w-full rounded-sm",
@@ -120,21 +164,21 @@ const file_editor_sidebar_directory_name_text_classes = [
 
 const FileEditorDirectoryNameText = (metadata: Ordo.Metadata.Instance) =>
 	Maoka.create("div", ({ use }) => {
-		use(Maoka.hooks.set_class(...file_editor_sidebar_directory_name_text_classes))
+		use(MaokaHooks.set_class(...file_editor_sidebar_directory_name_text_classes))
 
 		return () => [
 			Maoka.create("div", () => () => MetadataIcon({ metadata })),
 			Maoka.create("div", ({ use }) => {
-				use(Maoka.hooks.set_class("text-ellipsis line-clamp-1"))
+				use(MaokaHooks.set_class("text-ellipsis line-clamp-1"))
 				return () => metadata.get_name()
 			}),
 		]
 	})
 
-const FileEditorDirectoryNameCaret = (fsid: Ordo.Metadata.FSID, click_listener: TMaokaHook) =>
+const FileEditorDirectoryNameCaret = (fsid: Ordo.Metadata.FSID, click_listener: TMaokaJab) =>
 	Maoka.create("div", ({ use }) => {
 		use(click_listener)
-		use(Maoka.hooks.set_class("cursor-pointer"))
+		use(MaokaHooks.set_class("cursor-pointer"))
 
 		return () =>
 			expanded_state[fsid]

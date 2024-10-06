@@ -1,5 +1,6 @@
 import { MaokaOrdo, ordo_context } from "@ordo-pink/maoka-ordo-hooks"
 import { Maoka } from "@ordo-pink/maoka"
+import { MaokaHooks } from "@ordo-pink/maoka-hooks"
 import { R } from "@ordo-pink/result"
 
 import { FileEditorSidebarItem } from "./components/file-editor-sidebar-item.component"
@@ -11,7 +12,7 @@ export const FileEditorSidebar = (ctx: Ordo.CreateFunction.Params) =>
 		let metadata: Ordo.Metadata.Instance[] = []
 
 		// TODO Detect
-		use(Maoka.hooks.set_class("flex flex-col px-2 h-full", "file_editor_sidebar"))
+		use(MaokaHooks.set_class("flex flex-col px-2 h-full", "file_editor_sidebar"))
 
 		const commands = use(MaokaOrdo.Hooks.commands)
 		const metadata_query = use(MaokaOrdo.Hooks.metadata_query)
@@ -23,7 +24,7 @@ export const FileEditorSidebar = (ctx: Ordo.CreateFunction.Params) =>
 				.cata(
 					R.catas.if_ok(updated => {
 						metadata = updated
-						refresh()
+						void refresh()
 					}),
 				)
 		})
@@ -31,7 +32,7 @@ export const FileEditorSidebar = (ctx: Ordo.CreateFunction.Params) =>
 		on_unmount(() => subscription.unsubscribe())
 
 		use(
-			Maoka.hooks.listen("oncontextmenu", event => {
+			MaokaHooks.listen("oncontextmenu", event => {
 				event.preventDefault()
 				event.stopPropagation()
 

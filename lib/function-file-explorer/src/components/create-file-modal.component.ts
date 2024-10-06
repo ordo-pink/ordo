@@ -2,6 +2,7 @@ import { Maoka, type TMaokaChildren } from "@ordo-pink/maoka"
 import { MaokaOrdo, ordo_context } from "@ordo-pink/maoka-ordo-hooks"
 import { BS_FILE_EARMARK_PLUS } from "@ordo-pink/frontend-icons"
 import { BsFileEarmarkPlus } from "@ordo-pink/frontend-icons"
+import { MaokaHooks } from "@ordo-pink/maoka-hooks"
 import { Result } from "@ordo-pink/result"
 import { Switch } from "@ordo-pink/switch"
 
@@ -13,7 +14,7 @@ export const CreateFileModal = (
 		let type = "text/ordo"
 
 		use(ordo_context.provide(ctx))
-		use(Maoka.hooks.set_class("p-4 w-96 flex flex-col gap-y-2"))
+		use(MaokaHooks.set_class("p-4 w-96 flex flex-col gap-y-2"))
 
 		const { t } = use(MaokaOrdo.Hooks.translations)
 		const commands = use(MaokaOrdo.Hooks.commands)
@@ -41,17 +42,17 @@ export const CreateFileModal = (
 
 const Header = (children: TMaokaChildren) =>
 	Maoka.create("div", ({ use }) => {
-		use(Maoka.hooks.set_class("flex gap-x-2 items-center"))
+		use(MaokaHooks.set_class("flex gap-x-2 items-center"))
 		return () => children
 	})
 
 const TitleIcon = Maoka.create("div", ({ use }) =>
-	use(Maoka.hooks.set_inner_html(BS_FILE_EARMARK_PLUS)),
+	use(MaokaHooks.set_inner_html(BS_FILE_EARMARK_PLUS)),
 )
 
 const Title = (children: TMaokaChildren) =>
 	Maoka.create("h2", ({ use }) => {
-		use(Maoka.hooks.set_class("text-lg"))
+		use(MaokaHooks.set_class("text-lg"))
 		return () => children
 	})
 
@@ -71,7 +72,7 @@ const FileAssociationSelector = (
 		let file_associations: Ordo.FileAssociation.Instance[] = []
 		let is_expanded = false
 
-		use(Maoka.hooks.set_class(select_class))
+		use(MaokaHooks.set_class(select_class))
 
 		const file_associations$ = use(MaokaOrdo.Hooks.file_associations)
 
@@ -80,12 +81,12 @@ const FileAssociationSelector = (
 			current_file_association = fa
 			current_type_index = fa.types.findIndex(t => t.name === type)
 			on_select_type(fa, type)
-			refresh()
+			void refresh()
 		}
 
 		const subscription = file_associations$.subscribe(value => {
 			file_associations = value
-			refresh()
+			void refresh()
 		})
 
 		const handle_escape_press = (event: KeyboardEvent) => {
@@ -95,7 +96,7 @@ const FileAssociationSelector = (
 
 				is_expanded = false
 
-				refresh()
+				void refresh()
 			}
 		}
 
@@ -118,7 +119,7 @@ const FileAssociationSelector = (
 			is_expanded
 				? Maoka.create("div", ({ use }) => {
 						use(
-							Maoka.hooks.set_class(
+							MaokaHooks.set_class(
 								"absolute top-0 left-0 right-0 bg-neutral-200 dark:bg-neutral-600 rounded-md",
 							),
 						)
@@ -141,13 +142,13 @@ const SelectItem = (
 	is_select_active = false,
 ) =>
 	Maoka.create("div", ({ use }) => {
-		use(Maoka.hooks.set_class("flex gap-x-4"))
-		use(Maoka.hooks.listen("onclick", () => on_click(file_association, type.name)))
+		use(MaokaHooks.set_class("flex gap-x-4"))
+		use(MaokaHooks.listen("onclick", () => on_click(file_association, type.name)))
 
 		const Icon = Switch.OfTrue()
 			.case(!!file_association.render_icon, () =>
-				Maoka.create("span", ({ current_element }) =>
-					file_association.render_icon!(current_element),
+				Maoka.create("span", ({ element }) =>
+					file_association.render_icon!(element as HTMLElement),
 				),
 			)
 			.default(() => BsFileEarmarkPlus())
@@ -155,18 +156,18 @@ const SelectItem = (
 		return () => [
 			Maoka.create("div", ({ use }) => {
 				use(
-					Maoka.hooks.set_class(
+					MaokaHooks.set_class(
 						"p-2 rounded-none first-of-type:rounded-t-md last-of-type:rounded-b-md",
 					),
 				)
 
 				return () => {
 					if (is_select_active)
-						use(Maoka.hooks.add_class("hover:bg-neutral-300 hover:dark:bg-neutral-800"))
+						use(MaokaHooks.add_class("hover:bg-neutral-300 hover:dark:bg-neutral-800"))
 
 					return [
 						Maoka.create("div", ({ use }) => {
-							use(Maoka.hooks.set_class("flex gap-x-1 items-center"))
+							use(MaokaHooks.set_class("flex gap-x-1 items-center"))
 
 							return () => [
 								Icon,
@@ -178,7 +179,7 @@ const SelectItem = (
 						}),
 
 						Maoka.create("div", ({ use }) => {
-							use(Maoka.hooks.set_class("text-xs text-neutral-600 dark:text-neutral-400"))
+							use(MaokaHooks.set_class("text-xs text-neutral-600 dark:text-neutral-400"))
 							const { t } = use(MaokaOrdo.Hooks.translations)
 							return () => t(type.description)
 						}),
@@ -192,39 +193,39 @@ const CreateFileModalInput = (handle_change: (event: Event) => void) =>
 	Maoka.create("label", () => {
 		return () => [
 			Maoka.create("div", ({ use }) => {
-				use(Maoka.hooks.set_class("font-bold text-sm"))
+				use(MaokaHooks.set_class("font-bold text-sm"))
 				const { t } = use(MaokaOrdo.Hooks.translations)
 
 				return () => t("t.file_explorer.modals.create_file.input_label")
 			}),
 
-			Maoka.create("input", ({ use, current_element }) => {
+			Maoka.create("input", ({ use, element }) => {
 				const { t } = use(MaokaOrdo.Hooks.translations)
 
-				use(Maoka.hooks.listen("oninput", handle_change))
-				use(Maoka.hooks.set_attribute("autofocus", "autofocus"))
+				use(MaokaHooks.listen("oninput", handle_change))
+				use(MaokaHooks.set_attribute("autofocus", "autofocus"))
 				use(
-					Maoka.hooks.set_attribute(
+					MaokaHooks.set_attribute(
 						"placeholder",
 						t("t.file_explorer.modals.create_file.input_placeholder"),
 					),
 				)
 
 				use(
-					Maoka.hooks.set_class(
+					MaokaHooks.set_class(
 						"w-full rounded-md border-0 px-2 py-1 shadow-inner focus:ring-0 sm:text-sm sm:leading-6",
 						"bg-neutral-50 dark:bg-neutral-600 placeholder:text-neutral-500",
 					),
 				)
 
-				current_element.focus()
+				if (element instanceof HTMLElement) element.focus()
 			}),
 		]
 	})
 
 const Footer = (children: TMaokaChildren) =>
 	Maoka.create("div", ({ use }) => {
-		use(Maoka.hooks.set_class("flex justify-end items-center gap-x-2"))
+		use(MaokaHooks.set_class("flex justify-end items-center gap-x-2"))
 
 		return () => children
 	})
@@ -232,11 +233,11 @@ const Footer = (children: TMaokaChildren) =>
 const OkBtn = (on_click: (event: MouseEvent) => void) =>
 	Maoka.create("button", ({ use }) => {
 		use(
-			Maoka.hooks.set_class(
+			MaokaHooks.set_class(
 				"bg-emerald-700 shadow-md rounded-md px-4 py-1 text-sm flex items-center space-x-2 hover:shadow-lg hover:scale-110 transition-all duration-300",
 			),
 		)
-		use(Maoka.hooks.listen("onclick", on_click))
+		use(MaokaHooks.listen("onclick", on_click))
 
 		return () => [Maoka.create("div", () => () => "OK"), Hotkey("enter")]
 	})
@@ -244,8 +245,8 @@ const OkBtn = (on_click: (event: MouseEvent) => void) =>
 const CancelBtn = Maoka.create("button", ({ use }) => {
 	const commands = use(MaokaOrdo.Hooks.commands)
 
-	use(Maoka.hooks.set_class("px-4 py-1 text-sm flex items-center space-x-2"))
-	use(Maoka.hooks.listen("onclick", () => commands.emit("cmd.application.modal.hide")))
+	use(MaokaHooks.set_class("px-4 py-1 text-sm flex items-center space-x-2"))
+	use(MaokaHooks.listen("onclick", () => commands.emit("cmd.application.modal.hide")))
 
 	return () => [Maoka.create("div", () => () => "Cancel"), Hotkey("escape")]
 })
@@ -257,7 +258,7 @@ const hotkey_class =
 const isDarwin = navigator.appVersion.indexOf("Mac") !== -1
 
 const Hotkey = (accelerator: string) =>
-	Maoka.create("div", ({ use, on_unmount, current_element }) => {
+	Maoka.create("div", ({ use, on_unmount, element }) => {
 		const split = accelerator.split("+")
 		const meta = isDarwin ? "⌥" : "Alt"
 		const mod = isDarwin ? "⌘" : "Ctrl"
@@ -267,7 +268,7 @@ const Hotkey = (accelerator: string) =>
 
 		const symbol = split[split.length - 1].toLowerCase()
 
-		use(Maoka.hooks.set_class(hotkey_class))
+		use(MaokaHooks.set_class(hotkey_class))
 
 		const handle_keydown = (event: KeyboardEvent) => {
 			if (IGNORED_KEYS.includes(event.key)) return
@@ -278,7 +279,7 @@ const Hotkey = (accelerator: string) =>
 				event.preventDefault()
 				event.stopPropagation()
 
-				current_element.click()
+				if (element instanceof HTMLElement) element.click()
 			}
 		}
 

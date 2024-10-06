@@ -148,16 +148,16 @@ export const init_workspace = (
 		if (!prev.is_none)
 			prev.unwrap()!.on_unmount?.({ workspace: workspace_element, sidebar: sidebar_element })
 
-		next.cata({
-			Some: activity => {
+		void next.cata({
+			Some: async activity => {
 				workspace_element.innerHTML = ""
 				sidebar_element.innerHTML = ""
 
-				activity.render_workspace!(workspace_element)
+				await activity.render_workspace!(workspace_element)
 
 				if (activity.render_sidebar) {
 					commands.emit("cmd.application.sidebar.enable")
-					activity.render_sidebar(sidebar_element)
+					await activity.render_sidebar(sidebar_element)
 				} else {
 					commands.emit("cmd.application.sidebar.disable")
 				}

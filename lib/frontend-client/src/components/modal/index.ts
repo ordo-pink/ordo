@@ -2,6 +2,7 @@ import { type Observable, pairwise } from "rxjs"
 
 import { MaokaOrdo, ordo_context } from "@ordo-pink/maoka-ordo-hooks"
 import { Maoka } from "@ordo-pink/maoka"
+import { MaokaHooks } from "@ordo-pink/maoka-hooks"
 import { type TOption } from "@ordo-pink/option"
 
 import { Modal } from "./modal.component"
@@ -21,11 +22,11 @@ export const ModalOverlay = (
 		const subscription = $.pipe(pairwise()).subscribe(([prev_state, state]) => {
 			modal_state = state.unwrap() ?? null
 			unmount_prev_state = prev_state.unwrap()?.on_unmount ?? (() => void 0)
-			refresh()
+			void refresh()
 		})
 
 		use(
-			Maoka.hooks.listen("onclick", event => {
+			MaokaHooks.listen("onclick", event => {
 				if (!modal_state) return
 				event.stopPropagation()
 				unmount_prev_state()
@@ -48,7 +49,7 @@ export const ModalOverlay = (
 		})
 
 		return () => {
-			use(Maoka.hooks.set_class(get_overlay_class(!!modal_state)))
+			use(MaokaHooks.set_class(get_overlay_class(!!modal_state)))
 
 			return Modal(modal_state)
 		}

@@ -20,8 +20,8 @@
 // import { BsLayoutTextWindow } from "react-icons/bs"
 
 import { BS_LAYOUT_TEXT_WINDOW } from "@ordo-pink/frontend-icons"
+import { Maoka } from "@ordo-pink/maoka"
 import { create_function } from "@ordo-pink/core"
-import { render_dom } from "@ordo-pink/maoka"
 
 import { FileEditorSidebar } from "./src/file-editor.sidebar"
 import { FileEditorWorkspace } from "./src/file-editor.workspace"
@@ -99,9 +99,10 @@ export default create_function(
 				routes: ["/editor", "/editor/:fsid"],
 				render_icon: div => {
 					div.innerHTML = BS_LAYOUT_TEXT_WINDOW
+					return Promise.resolve()
 				},
-				render_workspace: div => render_dom(div, FileEditorWorkspace(ctx)),
-				render_sidebar: div => render_dom(div, FileEditorSidebar(ctx)),
+				render_workspace: div => Maoka.render_dom(div, FileEditorWorkspace(ctx)),
+				render_sidebar: div => Maoka.render_dom(div, FileEditorSidebar(ctx)),
 			},
 		})
 	},

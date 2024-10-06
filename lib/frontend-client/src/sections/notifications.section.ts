@@ -19,9 +19,10 @@
 
 import { Subject, map, merge, scan, shareReplay } from "rxjs"
 
+import { Maoka } from "@ordo-pink/maoka"
+import { NotificationType } from "@ordo-pink/core"
 import { O } from "@ordo-pink/option"
 import { TLogger } from "@ordo-pink/logger"
-import { render_dom } from "@ordo-pink/maoka"
 
 import { Notifications } from "../components/notifications"
 
@@ -39,13 +40,20 @@ export const init_notifications = ({ logger, commands, ctx }: P) => {
 
 	commands.on("cmd.application.notification.hide", payload => remove$.next(payload))
 	commands.on("cmd.application.notification.show", payload =>
-		add$.next({ ...payload, id: payload.id ?? crypto.randomUUID() }),
+		add$.next({
+			id: payload.id ?? crypto.randomUUID(),
+			type: payload.type ?? NotificationType.DEFAULT,
+			duration: payload.duration ?? 0,
+			message: payload.message ?? "",
+			on_click: payload.on_click ?? (() => void 0),
+			render_icon: payload.render_icon ?? (null as any),
+		}),
 	)
 
 	O.FromNullable(document.querySelector("#notifications"))
 		.pipe(O.ops.chain(root => (root instanceof HTMLDivElement ? O.Some(root) : O.None())))
 		.pipe(O.ops.map(root => ({ root, component: Notifications(ctx, notification$) })))
-		.pipe(O.ops.map(({ root, component }) => render_dom(root, component)))
+		.pipe(O.ops.map(({ root, component }) => Maoka.render_dom(root, component)))
 		.cata(O.catas.or_else(log_div_not_found(logger)))
 
 	logger.debug("🟢 Initialised notifications.")

@@ -2,6 +2,7 @@ import { type Observable } from "rxjs"
 
 import { OrdoHooks, ordo_context } from "@ordo-pink/maoka-ordo-hooks"
 import { Maoka } from "@ordo-pink/maoka"
+import { MaokaHooks } from "@ordo-pink/maoka-hooks"
 import { type TOption } from "@ordo-pink/option"
 
 import { ActivityBarLink } from "./activity-bar-link.component"
@@ -22,7 +23,7 @@ export const ActivityBar = (
 		const handle_activities_update = (new_activities: Ordo.Activity.Instance[]) => {
 			if (new_activities.length !== activities.length) {
 				activities = new_activities
-				refresh()
+				void refresh()
 			}
 		}
 
@@ -33,12 +34,12 @@ export const ActivityBar = (
 
 			if (current_activity?.name !== new_activity?.name) {
 				current_activity = new_activity
-				refresh()
+				void refresh()
 			}
 		}
 
-		use(Maoka.hooks.set_class(activity_bar_class))
-		use(Maoka.hooks.listen("oncontextmenu", handle_context_menu(emit)))
+		use(MaokaHooks.set_class(activity_bar_class))
+		use(MaokaHooks.listen("oncontextmenu", handle_context_menu(emit)))
 		use(OrdoHooks.subscription(activities$, handle_activities_update))
 		use(OrdoHooks.subscription(current_activity$, handle_current_activity_update))
 

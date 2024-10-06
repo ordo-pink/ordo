@@ -23,7 +23,6 @@ import { type TLogger } from "@ordo-pink/logger"
 
 import { init_activities } from "./components/activities"
 import { init_activity_bar } from "./sections/activity-bar.section"
-import { init_auth_section } from "./sections/auth.section"
 import { init_background_task_display } from "./sections/background-task-display.section"
 // import { init_command_palette } from "./sections/command-palette.section"
 import { init_commands } from "./components/commands"
@@ -38,9 +37,7 @@ import { init_metadata } from "./components/metadata"
 import { init_modal } from "./sections/modal.section"
 import { init_notifications } from "./sections/notifications.section"
 import { init_router } from "./components/router"
-import { init_timer_display } from "./sections/timer.section"
 import { init_title_display } from "./sections/title.section"
-import { init_tray } from "./sections/tray.section"
 import { init_user } from "./components/user"
 import { init_workspace } from "./sections/workspace.section"
 import { register_common_translations } from "./common-translations"
@@ -51,7 +48,7 @@ const APP_FN = { fid: APP_FID, name: APP_NAME, permissions: { commands: [], quer
 
 // TODO: Move all HTML elements in index.html to `create_client`
 type P = { logger: TLogger; is_dev: boolean; hosts: Ordo.Hosts }
-export const create_client = ({ logger, is_dev, hosts }: P) => {
+export const create_client = async ({ logger, is_dev, hosts }: P) => {
 	const known_functions = init_known_functions(APP_FN)
 	const { get_logger } = init_logger({ logger, known_functions })
 	const { get_hosts } = init_hosts({ logger, hosts, known_functions })
@@ -110,9 +107,7 @@ export const create_client = ({ logger, is_dev, hosts }: P) => {
 
 	const { get_sidebar } = init_workspace(logger, known_functions, commands, current_activity$)
 	init_background_task_display(logger, commands)
-	init_timer_display(logger)
 	init_title_display(logger, commands)
-	init_tray(logger, activities$)
 
 	const internal_context: Ordo.CreateFunction.Params = {
 		fid: APP_FID,
@@ -136,7 +131,6 @@ export const create_client = ({ logger, is_dev, hosts }: P) => {
 	init_modal({ commands, logger, ctx: internal_context })
 	init_notifications({ logger, commands, ctx: internal_context })
 	init_activity_bar({ ctx: internal_context, logger, activities$, current_activity$ })
-	init_auth_section({ logger, commands, user_query, auth$, ctx: internal_context })
 	// init_command_palette(logger, commands, internal_context)
 	// init_context_menu(logger, commands, internal_context)
 
@@ -159,7 +153,7 @@ export const create_client = ({ logger, is_dev, hosts }: P) => {
 		get_file_associations,
 	}
 
-	void import("@ordo-pink/function-welcome")
+	await import("@ordo-pink/function-welcome")
 		.then(module => module.default)
 		.then(f => f(shared_function_context))
 
@@ -167,16 +161,16 @@ export const create_client = ({ logger, is_dev, hosts }: P) => {
 	// 	.then(module => module.default)
 	// 	.then(f => f(shared_function_context))
 
-	// TODO: Fix positioning of activity bar content when achivity is changed
-	// void import("@ordo-pink/function-file-explorer")
-	// 	.then(module => module.default)
-	// 	.then(f => f(shared_function_context))
-
-	void import("@ordo-pink/function-file-editor")
+	// TODO: Fix positioning of activity bar content when activity is changed
+	await import("@ordo-pink/function-file-explorer")
 		.then(module => module.default)
 		.then(f => f(shared_function_context))
 
-	void import("@ordo-pink/function-database")
+	await import("@ordo-pink/function-file-editor")
+		.then(module => module.default)
+		.then(f => f(shared_function_context))
+
+	await import("@ordo-pink/function-database")
 		.then(module => module.default)
 		.then(f => f(shared_function_context))
 }

@@ -17,18 +17,9 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { ConsoleLogger } from "@ordo-pink/logger"
-import { create_client } from "@ordo-pink/frontend-client"
+import { test, expect } from "bun:test"
+import { maokaHooks } from "./maoka-hooks.impl"
 
-const logger = ConsoleLogger
-const is_dev = import.meta.env.DEV
-
-const hosts = {
-	id: import.meta.env.VITE_ORDO_ID_HOST,
-	website: import.meta.env.VITE_ORDO_WEBSITE_HOST,
-	static: import.meta.env.VITE_ORDO_STATIC_HOST,
-	dt: import.meta.env.VITE_ORDO_DT_HOST,
-	my: import.meta.env.VITE_ORDO_WORKSPACE_HOST,
-}
-
-void create_client({ logger, hosts, is_dev })
+test("maoka-hooks should pass", () => {
+	expect(maokaHooks).toEqual("maoka-hooks")
+})

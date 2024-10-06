@@ -508,9 +508,9 @@ declare global {
 				name: string
 				routes: string[]
 				default_route?: string
-				render_workspace?: (div: HTMLDivElement) => void
-				render_sidebar?: (div: HTMLDivElement) => void
-				render_icon?: (span: HTMLSpanElement) => void
+				render_workspace?: (div: HTMLDivElement) => Promise<void>
+				render_sidebar?: (div: HTMLDivElement) => Promise<void>
+				render_icon?: (span: HTMLSpanElement) => Promise<void>
 				on_unmount?: (params: Ordo.Activity.OnUnmountParams) => void
 				is_background?: boolean
 				is_fullscreen?: boolean
@@ -518,9 +518,9 @@ declare global {
 		}
 
 		module FileAssociation {
-			type RenderFn = (params: Ordo.FileAssociation.RenderParams) => void
+			type RenderFn = (params: Ordo.FileAssociation.RenderParams) => void | Promise<void>
 
-			type RenderIconFn = (span: HTMLSpanElement) => void
+			type RenderIconFn = (span: HTMLSpanElement) => void | Promise<void>
 
 			type Type = {
 				name: string

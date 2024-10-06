@@ -2,10 +2,10 @@ import { Maoka } from "@ordo-pink/maoka"
 import { MaokaOrdo } from "@ordo-pink/maoka-ordo-hooks"
 
 import "./landing.page.css"
+import { MaokaHooks } from "@ordo-pink/maoka-hooks"
 
 // TODO Translations
-export const WelcomeLandingPage = Maoka.create("div", ({ use, on_unmount }) => {
-	const hosts = use(MaokaOrdo.Hooks.hosts)
+export default Maoka.create("div", ({ use, on_unmount }) => {
 	const commands = use(MaokaOrdo.Hooks.commands)
 
 	commands.emit("cmd.application.set_title", {
@@ -14,15 +14,11 @@ export const WelcomeLandingPage = Maoka.create("div", ({ use, on_unmount }) => {
 	})
 
 	const handle_mouse_move = (event: MouseEvent) => {
-		Object.assign(document.documentElement, {
-			style: `
-  --move-x: ${(event.clientX - window.innerWidth / 2) * -0.005}deg;
-  --move-y: ${(event.clientY - window.innerHeight / 2) * -0.01}deg;
-  --layer-0: ;
-  --layer-1: ${hosts.static}/index-hero-layer-1.png;
-  --layer-2: ${hosts.static}/index-hero-layer-2.png;
-  `,
-		})
+		const nx = (event.clientX - window.innerWidth / 2) * -0.005
+		const ny = (event.clientY - window.innerHeight / 2) * -0.01
+		const style = `--move-x: ${nx}deg; --move-y: ${ny}deg;`
+
+		Object.assign(document.documentElement, { style })
 	}
 
 	document.addEventListener("mousemove", handle_mouse_move)
@@ -33,43 +29,38 @@ export const WelcomeLandingPage = Maoka.create("div", ({ use, on_unmount }) => {
 	})
 
 	return () =>
-		Maoka.styled("section", "hero-section", () => [
-			HeroLayers,
-			Maoka.styled("div", "card-container", () =>
-				Maoka.styled("div", "card", () => [LogoSection, CallToActionSection]),
+		Section(() => [
+			Layers(() => [Layer(0), Layer(1), Layer(2)]),
+			Card(() =>
+				CardContent(() => [
+					LogoSection(() => [
+						LogoWrapper(() => ["Bring your thoughts to", Logo(() => "ORDO")]),
+						LogoAction(() => Maoka.styled("button", {})(() => "TODO")),
+					]),
+					CallToActionSection(() => "TODO"),
+				]),
 			),
 		])
 })
 
 // --- Internal ---
 
-const HeroLayer = (index: number) =>
+const Layer = (index: number) =>
 	Maoka.create("div", ({ use }) => {
 		const hosts = use(MaokaOrdo.Hooks.hosts)
 
 		const background_image = `url(${hosts.static}/index-hero-layer-${index}.png)`
 
-		use(Maoka.hooks.set_class(`hero-layer hero-layer_${index}`))
-		use(Maoka.hooks.set_style({ backgroundImage: background_image }))
+		use(MaokaHooks.set_class(`hero-layer hero-layer_${index}`))
+		use(MaokaHooks.set_style({ backgroundImage: background_image }))
 	})
 
-const HeroLayers = Maoka.styled("div", "hero-layers", () => [
-	HeroLayer(0),
-	HeroLayer(1),
-	HeroLayer(2),
-])
-
-const BringYourThoughtsToORDO = Maoka.styled("h1", "logo", () => [
-	"Bring your thoughts to",
-	Maoka.styled("span", "logo_ordo-text", () => "ORDO"),
-])
-
-const LogoSection = Maoka.styled("div", "logo-section", () => [
-	BringYourThoughtsToORDO,
-	// TODO Use button
-	Maoka.styled("div", "mt-12 flex items-center space-x-8", () =>
-		Maoka.styled("button", "", () => "learn more"),
-	),
-])
-
-const CallToActionSection = Maoka.styled("div", "w-full max-w-md", () => "HEY")
+const Section = Maoka.styled("section", { class: "hero-section" })
+const Card = Maoka.styled("div", { class: "card-container" })
+const CardContent = Maoka.styled("div", { class: "card" })
+const Logo = Maoka.styled("span", { class: "logo_ordo-text" })
+const Layers = Maoka.styled("div", { class: "hero-layers" })
+const LogoWrapper = Maoka.styled("h1", { class: "logo" })
+const LogoSection = Maoka.styled("div", { class: "logo-section" })
+const CallToActionSection = Maoka.styled("div", { class: "w-full max-w-md" })
+const LogoAction = Maoka.styled("div", { class: "mt-12 flex items-center space-x-8" })

@@ -164,11 +164,10 @@ export default create_function(
 			fid: ctx.fid,
 			activity: {
 				name: "pink.ordo.welcome.landing-page",
-				render_workspace: div => {
-					Maoka.render_dom(div, WelcomeWorkspace(ctx))
-				},
+				render_workspace: div => Maoka.render_dom(div, WelcomeWorkspace(ctx)),
 				render_icon: span => {
 					span.innerHTML = BS_COLLECTION
+					return Promise.resolve()
 				},
 				routes: ["/"],
 			},

@@ -62,7 +62,6 @@ export const init_router: TInitRouterStreamFn = call_once(
 							router$ &&
 								router$.pipe(route(activity_route)).subscribe((route_data: Ordo.Router.Route) => {
 									set_activity(activity.name)
-
 									current_route$.next(O.FromNullable(route_data))
 								})
 						})

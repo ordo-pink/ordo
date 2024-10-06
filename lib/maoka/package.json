@@ -1,0 +1,28 @@
+{
+	"name": "maoka",
+	"version": "0.1.2",
+	"description": "Maoka is a 1.5Kb library for rendering user interfaces (and annoying JavaScript devs).",
+	"main": "index.js",
+	"scripts": {
+		"test": "bun test",
+		"build": "bunx tsc index.ts && bun build ./lib/maoka/index.ts --outfile lib/maoka/dist/index.min.js --target=browser --minify && bun build ./lib/maoka/index.ts --outdir lib/maoka/dist --target=browser --source-map=inline",
+		"clear": "rm -rf ./min && rm index.js"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/ordo-pink/ordo.git#main"
+	},
+	"author": {
+		"email": "sergei_orlov@ordo.pink",
+		"name": "谢尔盖 ||↓"
+	},
+	"license": "Unlicense",
+	"bugs": {
+		"url": "https://github.com/ordo-pink/ordo/issues"
+	},
+	"homepage": "https://github.com/ordo-pink/ordo/blob/main/lib/maoka/readme.md",
+	"readme": "# Oath\n\n📝 Docs: https://github.com/ordo-pink/ordo/blob/main/lib/maoka/readme.md",
+	"devDependencies": {
+		"typescript": "^5.2.2"
+	}
+}

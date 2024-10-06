@@ -1,67 +1,68 @@
-import { type TMaokaChildren, create, listen, set_class, set_inner_html } from "@ordo-pink/maoka"
 import { get_commands, get_translations, ordo_context } from "@ordo-pink/maoka-ordo-hooks"
 import { BS_FILE_EARMARK_X } from "@ordo-pink/frontend-icons"
+import { Maoka } from "@ordo-pink/maoka"
 
-export const RemoveFileModal = (ctx: TCreateFunctionContext, fsid: FSID) =>
-	create("div", ({ use }) => {
-		use(ordo_context.provide(ctx))
-		use(set_class("p-4 w-96 flex flex-col gap-y-2"))
+export const RemoveFileModal = (ctx: Ordo.CreateFunction.Params, fsid: Ordo.Metadata.FSID) =>
+	Maoka.styled("div", {})(() => "YAY")
+// 	Maoka.create("div", ({ use }) => {
+// 		use(ordo_context.provide(ctx))
+// 		use(set_class("p-4 w-96 flex flex-col gap-y-2"))
 
-		const { t } = use(get_translations)
-		const commands = use(get_commands)
+// 		const { t } = use(get_translations)
+// 		const commands = use(get_commands)
 
-		const t_title = t("t.file_explorer.modals.remove_file.title")
-		const t_message = t("t.file_explorer.modals.remove_file.message")
+// 		const t_title = t("t.file_explorer.modals.remove_file.title")
+// 		const t_message = t("t.file_explorer.modals.remove_file.message")
 
-		return () => [
-			Header([TitleIcon, Title(t_title)]),
-			Body(t_message),
-			Footer([
-				CancelBtn,
-				OkBtn(() => {
-					commands.emit("cmd.data.metadata.remove", fsid)
-					commands.emit("cmd.application.modal.hide")
-				}),
-			]),
-		]
-	})
+// 		return () => [
+// 			Header([TitleIcon, Title(t_title)]),
+// 			Body(t_message),
+// 			Footer([
+// 				CancelBtn,
+// 				OkBtn(() => {
+// 					commands.emit("cmd.data.metadata.remove", fsid)
+// 					commands.emit("cmd.application.modal.hide")
+// 				}),
+// 			]),
+// 		]
+// 	})
 
-const Header = (children: TMaokaChildren) =>
-	create("div", ({ use }) => {
-		use(set_class("flex gap-x-2 items-center"))
-		return () => children
-	})
+// const Header = (children: TMaokaChildren) =>
+// 	create("div", ({ use }) => {
+// 		use(set_class("flex gap-x-2 items-center"))
+// 		return () => children
+// 	})
 
-const TitleIcon = create("div", ({ use }) => use(set_inner_html(BS_FILE_EARMARK_X)))
+// const TitleIcon = create("div", ({ use }) => use(set_inner_html(BS_FILE_EARMARK_X)))
 
-const Title = (children: TMaokaChildren) =>
-	create("h2", ({ use }) => {
-		use(set_class("text-lg"))
-		return () => children
-	})
+// const Title = (children: TMaokaChildren) =>
+// 	create("h2", ({ use }) => {
+// 		use(set_class("text-lg"))
+// 		return () => children
+// 	})
 
-const Body = (children: TMaokaChildren) => create("div", () => () => children)
+// const Body = (children: TMaokaChildren) => create("div", () => () => children)
 
-const Footer = (children: TMaokaChildren) =>
-	create("div", ({ use }) => {
-		use(set_class("flex justify-end items-center gap-x-2"))
+// const Footer = (children: TMaokaChildren) =>
+// 	create("div", ({ use }) => {
+// 		use(set_class("flex justify-end items-center gap-x-2"))
 
-		return () => children
-	})
+// 		return () => children
+// 	})
 
-const OkBtn = (on_click: (event: MouseEvent) => void) =>
-	create("button", ({ use }) => {
-		use(set_class("border rounded-md px-4 py-1 text-sm"))
-		use(listen("onclick", on_click))
+// const OkBtn = (on_click: (event: MouseEvent) => void) =>
+// 	create("button", ({ use }) => {
+// 		use(set_class("border rounded-md px-4 py-1 text-sm"))
+// 		use(listen("onclick", on_click))
 
-		return () => "OK"
-	})
+// 		return () => "OK"
+// 	})
 
-const CancelBtn = create("button", ({ use }) => {
-	const commands = use(get_commands)
+// const CancelBtn = create("button", ({ use }) => {
+// 	const commands = use(get_commands)
 
-	use(set_class("px-4 py-1 text-sm"))
-	use(listen("onclick", () => commands.emit("cmd.application.modal.hide")))
+// 	use(set_class("px-4 py-1 text-sm"))
+// 	use(listen("onclick", () => commands.emit("cmd.application.modal.hide")))
 
-	return () => "Cancel"
-})
+// 	return () => "Cancel"
+// })

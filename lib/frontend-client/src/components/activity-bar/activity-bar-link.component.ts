@@ -1,7 +1,8 @@
 import { Maoka } from "@ordo-pink/maoka"
-import { get_commands } from "@ordo-pink/maoka-ordo-hooks"
+import { MaokaHooks } from "@ordo-pink/maoka-hooks"
 
 import { ActivityBarIcon } from "./activity-bar-icon.component"
+import { OrdoHooks } from "@ordo-pink/maoka-ordo-hooks"
 
 type P = Pick<Ordo.Activity.Instance, "default_route"> &
 	Required<Pick<Ordo.Activity.Instance, "render_icon" | "routes" | "name">> & {
@@ -17,10 +18,10 @@ export const ActivityBarLink = ({
 	const activity_link = default_route ?? routes[0]
 
 	return Maoka.create("a", ({ use }) => {
-		const { emit } = use(get_commands)
+		const { emit } = use(OrdoHooks.commands)
 
-		use(Maoka.hooks.set_class("decoration-none no-underline !text-800 dark:!text-neutral-200"))
-		use(Maoka.hooks.set_attribute("href", activity_link))
+		use(MaokaHooks.set_class("decoration-none no-underline !text-800 dark:!text-neutral-200"))
+		use(MaokaHooks.set_attribute("href", activity_link))
 		use(click_listener(emit, activity_link))
 
 		return () => ActivityBarIcon({ name, render_icon, current_activity_name: current_activity })
@@ -28,7 +29,7 @@ export const ActivityBarLink = ({
 }
 
 const click_listener = (emit: Ordo.Command.Commands["emit"], activity_link: string) =>
-	Maoka.hooks.listen("onclick", event => {
+	MaokaHooks.listen("onclick", event => {
 		event.preventDefault()
 		emit("cmd.application.router.navigate", activity_link)
 	})

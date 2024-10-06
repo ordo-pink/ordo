@@ -19,7 +19,6 @@
 		"isolatedModules": true,
 		"target": "ESNext",
 		"module": "CommonJS",
-		"types": ["bun-types", "@types/web"],
 		"baseUrl": ".",
 		"paths": {
 			"@ordo-pink/*": ["./lib/*"]

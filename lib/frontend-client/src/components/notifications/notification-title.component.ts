@@ -8,4 +8,4 @@ export const NotificationTitle = ({ title }: P) =>
 
 const render_title = (title: Ordo.Notification.Instance["title"]) => Title(() => title)
 
-const Title = Maoka.pure("h4", { class: "font-bold" })
+const Title = Maoka.styled("h4", { class: "font-bold" })

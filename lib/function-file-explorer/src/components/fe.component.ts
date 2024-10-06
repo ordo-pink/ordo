@@ -6,7 +6,7 @@ import { is_nan } from "@ordo-pink/tau"
 import { FileExplorerFile } from "./file-explorer-file.component"
 import { ordo_context, OrdoHooks } from "@ordo-pink/maoka-ordo-hooks"
 
-export const FileExplorer = (ctx: Ordo.CreateFunction.Params) => Maoka.pure("div", {})(() => "")
+export const FileExplorer = (ctx: Ordo.CreateFunction.Params) => Maoka.styled("div", {})(() => "")
 // Maoka.create("div", ({ use, on_unmount }) => {
 // 	use(ordo_context.provide(ctx))
 

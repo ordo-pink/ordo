@@ -7,7 +7,7 @@ import {
 import { Maoka } from "@ordo-pink/maoka"
 import { Switch } from "@ordo-pink/switch"
 
-export const FileExplorerFile = (metadata: TMetadata) => Maoka.pure("div", {}, () => "")
+export const FileExplorerFile = (metadata: TMetadata) => Maoka.styled("div", {}, () => "")
 // 	create("div", ({ use }) => {
 // 		const commands = use(get_commands)
 

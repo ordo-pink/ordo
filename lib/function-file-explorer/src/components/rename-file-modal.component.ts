@@ -11,7 +11,7 @@ import { get_commands, get_translations, ordo_context } from "@ordo-pink/maoka-o
 import { BS_FILE_EARMARK_RICHTEXT } from "@ordo-pink/frontend-icons"
 
 export const RenameFileModal = (ctx: TCreateFunctionContext, fsid: FSID) =>
-	Maoka.pure("div", {})(() => "A")
+	Maoka.styled("div", {})(() => "A")
 // 	create("div", ({ use }) => {
 // 		use(ordo_context.provide(ctx))
 // 		use(set_class("p-4 w-96 flex flex-col gap-y-2"))

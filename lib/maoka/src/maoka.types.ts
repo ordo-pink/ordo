@@ -26,7 +26,7 @@ export type TMaokaComponent<$TElement extends TMaokaElement = TMaokaElement> = (
 	root_id: string,
 ) => Promise<TMaokaElement>
 
-export type TMaokaHook<$TReturn = void> = (props: TMaokaProps) => $TReturn
+export type TMaokaJab<$TReturn = void> = (props: TMaokaProps) => $TReturn
 
 /**
  * A Maoka component child. If the child is a Maoka component function, it will be called using the
@@ -83,7 +83,7 @@ export type TMaokaProps<$TElement extends TMaokaElement = TMaokaElement> = {
 
 	on_unmount: TMaokaOnUnmountFn
 
-	use: <_TResult>(hook: TMaokaHook<_TResult>) => _TResult
+	use: <_TResult>(hook: TMaokaJab<_TResult>) => _TResult
 }
 
 export type TMaokaOnUnmountFn = (f: () => void) => void

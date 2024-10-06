@@ -3,7 +3,7 @@ import { BS_FILE_EARMARK_X } from "@ordo-pink/frontend-icons"
 import { Maoka } from "@ordo-pink/maoka"
 
 export const RemoveFileModal = (ctx: Ordo.CreateFunction.Params, fsid: Ordo.Metadata.FSID) =>
-	Maoka.pure("div", {})(() => "YAY")
+	Maoka.styled("div", {})(() => "YAY")
 // 	Maoka.create("div", ({ use }) => {
 // 		use(ordo_context.provide(ctx))
 // 		use(set_class("p-4 w-96 flex flex-col gap-y-2"))

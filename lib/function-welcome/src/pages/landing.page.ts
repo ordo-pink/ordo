@@ -35,7 +35,7 @@ export default Maoka.create("div", ({ use, on_unmount }) => {
 				CardContent(() => [
 					LogoSection(() => [
 						LogoWrapper(() => ["Bring your thoughts to", Logo(() => "ORDO")]),
-						LogoAction(() => Maoka.pure("button", {})(() => "TODO")),
+						LogoAction(() => Maoka.styled("button", {})(() => "TODO")),
 					]),
 					CallToActionSection(() => "TODO"),
 				]),
@@ -55,12 +55,12 @@ const Layer = (index: number) =>
 		use(MaokaHooks.set_style({ backgroundImage: background_image }))
 	})
 
-const Section = Maoka.pure("section", { class: "hero-section" })
-const Card = Maoka.pure("div", { class: "card-container" })
-const CardContent = Maoka.pure("div", { class: "card" })
-const Logo = Maoka.pure("span", { class: "logo_ordo-text" })
-const Layers = Maoka.pure("div", { class: "hero-layers" })
-const LogoWrapper = Maoka.pure("h1", { class: "logo" })
-const LogoSection = Maoka.pure("div", { class: "logo-section" })
-const CallToActionSection = Maoka.pure("div", { class: "w-full max-w-md" })
-const LogoAction = Maoka.pure("div", { class: "mt-12 flex items-center space-x-8" })
+const Section = Maoka.styled("section", { class: "hero-section" })
+const Card = Maoka.styled("div", { class: "card-container" })
+const CardContent = Maoka.styled("div", { class: "card" })
+const Logo = Maoka.styled("span", { class: "logo_ordo-text" })
+const Layers = Maoka.styled("div", { class: "hero-layers" })
+const LogoWrapper = Maoka.styled("h1", { class: "logo" })
+const LogoSection = Maoka.styled("div", { class: "logo-section" })
+const CallToActionSection = Maoka.styled("div", { class: "w-full max-w-md" })
+const LogoAction = Maoka.styled("div", { class: "mt-12 flex items-center space-x-8" })

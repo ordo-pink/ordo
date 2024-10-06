@@ -1,5 +1,5 @@
 import { BsCaretDown, BsCaretRight } from "@ordo-pink/frontend-icons"
-import { Maoka, type TMaokaHook } from "@ordo-pink/maoka"
+import { Maoka, type TMaokaJab } from "@ordo-pink/maoka"
 import { MaokaHooks } from "@ordo-pink/maoka-hooks"
 import { MaokaOrdo } from "@ordo-pink/maoka-ordo-hooks"
 import { Metadata } from "@ordo-pink/core"
@@ -175,7 +175,7 @@ const FileEditorDirectoryNameText = (metadata: Ordo.Metadata.Instance) =>
 		]
 	})
 
-const FileEditorDirectoryNameCaret = (fsid: Ordo.Metadata.FSID, click_listener: TMaokaHook) =>
+const FileEditorDirectoryNameCaret = (fsid: Ordo.Metadata.FSID, click_listener: TMaokaJab) =>
 	Maoka.create("div", ({ use }) => {
 		use(click_listener)
 		use(MaokaHooks.set_class("cursor-pointer"))

@@ -47,8 +47,8 @@ export const create: T.TMaokaCreateComponentFn =
 export const lazy = (callback: () => Promise<{ default: T.TMaokaComponent }>) =>
 	callback().then(result => result.default)
 
-export const pure =
-	(tag: string, attributes: Record<string, string>) =>
+export const styled =
+	(tag: string, attributes: Record<string, string> = {}) =>
 	(children_thunk: ReturnType<T.TMaokaCallback>) =>
 		create(tag, ({ element: current_element }) => {
 			Object.keys(attributes).forEach(key => current_element.setAttribute(key, attributes[key]))

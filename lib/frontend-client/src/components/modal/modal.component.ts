@@ -1,12 +1,12 @@
 import { Maoka } from "@ordo-pink/maoka"
-import { MaokaHooks } from "@ordo-pink/maoka-hooks"
+import { MaokaJabs } from "@ordo-pink/maoka-jabs"
 
 import { ModalCloseButton } from "./close-button.component"
 
 export const Modal = (modal: Ordo.Modal.Instance | null) =>
 	Maoka.create("div", ({ use, element: current_element }) => {
 		use(
-			MaokaHooks.listen("onclick", event => {
+			MaokaJabs.listen("onclick", event => {
 				if (!modal) return
 
 				event.stopPropagation()
@@ -17,7 +17,7 @@ export const Modal = (modal: Ordo.Modal.Instance | null) =>
 
 		return () => {
 			use(
-				MaokaHooks.set_class(
+				MaokaJabs.set_class(
 					modal
 						? "relative min-h-8 max-w-3xl rounded-lg bg-neutral-100 shadow-xl dark:bg-neutral-700"
 						: "hidden",

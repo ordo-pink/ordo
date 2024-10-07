@@ -17,5 +17,5 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-export * as MaokaHooks from "./src/maoka-hooks.impl"
-export * from "./src/maoka-hooks.types"
+export * as MaokaJabs from "./src/maoka-jabs.impl"
+export * from "./src/maoka-jabs.types"

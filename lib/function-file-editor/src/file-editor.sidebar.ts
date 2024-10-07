@@ -1,21 +1,21 @@
-import { MaokaOrdo, ordo_context } from "@ordo-pink/maoka-ordo-hooks"
 import { Maoka } from "@ordo-pink/maoka"
-import { MaokaHooks } from "@ordo-pink/maoka-hooks"
+import { MaokaJabs } from "@ordo-pink/maoka-jabs"
+import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
 import { R } from "@ordo-pink/result"
 
 import { FileEditorSidebarItem } from "./components/file-editor-sidebar-item.component"
 
 export const FileEditorSidebar = (ctx: Ordo.CreateFunction.Params) =>
 	Maoka.create("div", ({ use, refresh, on_unmount }) => {
-		use(ordo_context.provide(ctx))
+		use(MaokaOrdo.Context.provide(ctx))
 
 		let metadata: Ordo.Metadata.Instance[] = []
 
 		// TODO Detect
-		use(MaokaHooks.set_class("flex flex-col px-2 h-full", "file_editor_sidebar"))
+		use(MaokaJabs.set_class("flex flex-col px-2 h-full", "file_editor_sidebar"))
 
-		const commands = use(MaokaOrdo.Hooks.commands)
-		const metadata_query = use(MaokaOrdo.Hooks.metadata_query)
+		const commands = use(MaokaOrdo.Jabs.Commands)
+		const metadata_query = use(MaokaOrdo.Jabs.MetadataQuery)
 
 		const subscription = metadata_query.$.subscribe(() => {
 			metadata_query
@@ -32,15 +32,13 @@ export const FileEditorSidebar = (ctx: Ordo.CreateFunction.Params) =>
 		on_unmount(() => subscription.unsubscribe())
 
 		use(
-			MaokaHooks.listen("oncontextmenu", event => {
+			MaokaJabs.listen("oncontextmenu", event => {
 				event.preventDefault()
 				event.stopPropagation()
 
-				commands.emit("cmd.application.context_menu.show", {
-					event: event as any,
-					payload: "root",
-					hide_delete_items: true,
-				})
+				const payload = { event, payload: "root", hide_delete_items: true }
+
+				commands.emit("cmd.application.context_menu.show", payload)
 			}),
 		)
 

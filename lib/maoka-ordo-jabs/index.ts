@@ -1,7 +1,6 @@
 // SPDX-FileCopyrightText: Copyright 2024, 谢尔盖||↓ and the Ordo.pink contributors
 // SPDX-License-Identifier: Unlicense
 
-export * from "./src/maoka-ordo-hooks.impl"
 import {
 	computed,
 	get_commands,
@@ -14,35 +13,31 @@ import {
 	get_is_dev,
 	get_logger,
 	get_metadata_query,
-	get_route_params,
 	get_translations,
 	get_user_query,
 	ordo_context,
 	subscription,
-} from "./src/maoka-ordo-hooks.impl"
+} from "./src/maoka-ordo-jabs.impl"
 import { Result } from "@ordo-pink/result"
 import { keys_of } from "@ordo-pink/tau"
 
-export const OrdoHooks = {
-	commands: get_commands,
-	current_route: get_current_route,
-	fetch: get_fetch,
-	hosts: get_hosts,
-	is_authenticated: get_is_authenticated,
-	is_dev: get_is_dev,
-	logger: get_logger,
-	metadata_query: get_metadata_query,
-	route_params: get_route_params,
-	translations: get_translations,
-	user_query: get_user_query,
-	subscription,
-	current_file_association: get_current_file_association,
-	file_associations: get_file_associations,
-	computed,
-}
-
 export const MaokaOrdo = {
-	Hooks: OrdoHooks,
+	Jabs: {
+		Commands: get_commands,
+		CurrentRoute$: get_current_route,
+		Fetch: get_fetch,
+		Hosts: get_hosts,
+		IsAuthenticated$: get_is_authenticated,
+		IsDev: get_is_dev,
+		Logger: get_logger,
+		MetadataQuery: get_metadata_query,
+		Translations: get_translations,
+		UserQuery: get_user_query,
+		subscribe: subscription,
+		CurrentFileAssociation$: get_current_file_association,
+		FileAssociations$: get_file_associations,
+		computed,
+	},
 	Ops: {
 		get_route_params: (route: Ordo.Router.Route | null) =>
 			Result.FromNullable(route)

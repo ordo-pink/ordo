@@ -1,8 +1,8 @@
 import { Maoka } from "@ordo-pink/maoka"
-import { OrdoHooks } from "@ordo-pink/maoka-ordo-hooks"
+import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
 
 export const LoadingText = Maoka.create("span", ({ use }) => {
-	const { t } = use(OrdoHooks.translations)
+	const { t } = use(MaokaOrdo.Jabs.Translations)
 
 	return () => t("t.common.state.loading")
 })

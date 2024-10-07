@@ -1,8 +1,8 @@
 import { type Observable } from "rxjs"
 
-import { OrdoHooks, ordo_context } from "@ordo-pink/maoka-ordo-hooks"
 import { Maoka } from "@ordo-pink/maoka"
-import { MaokaHooks } from "@ordo-pink/maoka-hooks"
+import { MaokaJabs } from "@ordo-pink/maoka-jabs"
+import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
 import { type TOption } from "@ordo-pink/option"
 
 import { ActivityBarLink } from "./activity-bar-link.component"
@@ -13,12 +13,12 @@ export const ActivityBar = (
 	activities$: Observable<Ordo.Activity.Instance[]>,
 ) =>
 	Maoka.create("div", ({ use, refresh }) => {
+		use(MaokaOrdo.Context.provide(ctx))
+
 		let current_activity: Ordo.Activity.Instance | null = null
 		let activities: Ordo.Activity.Instance[] = []
 
-		use(ordo_context.provide(ctx))
-
-		const { emit } = use(OrdoHooks.commands)
+		const { emit } = use(MaokaOrdo.Jabs.Commands)
 
 		const handle_activities_update = (new_activities: Ordo.Activity.Instance[]) => {
 			if (new_activities.length !== activities.length) {
@@ -38,10 +38,10 @@ export const ActivityBar = (
 			}
 		}
 
-		use(MaokaHooks.set_class(activity_bar_class))
-		use(MaokaHooks.listen("oncontextmenu", handle_context_menu(emit)))
-		use(OrdoHooks.subscription(activities$, handle_activities_update))
-		use(OrdoHooks.subscription(current_activity$, handle_current_activity_update))
+		use(MaokaJabs.set_class(activity_bar_class))
+		use(MaokaJabs.listen("oncontextmenu", handle_context_menu(emit)))
+		use(MaokaOrdo.Jabs.subscribe(activities$, handle_activities_update))
+		use(MaokaOrdo.Jabs.subscribe(current_activity$, handle_current_activity_update))
 
 		return () =>
 			activities.map(

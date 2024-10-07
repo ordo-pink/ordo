@@ -1,7 +1,7 @@
 import { Maoka, type TMaokaComponent } from "@ordo-pink/maoka"
 import { is_false, is_true, noop } from "@ordo-pink/tau"
-import { MaokaHooks } from "@ordo-pink/maoka-hooks"
-import { MaokaOrdo } from "@ordo-pink/maoka-ordo-hooks"
+import { MaokaJabs } from "@ordo-pink/maoka-jabs"
+import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
 import { R } from "@ordo-pink/result"
 import { Switch } from "@ordo-pink/switch"
 
@@ -15,8 +15,8 @@ export const FileEditorSidebarItem = (
 	Maoka.create("div", ({ use, refresh, on_unmount }) => {
 		let metadata = initial_metadata
 
-		const commands = use(MaokaOrdo.Hooks.commands)
-		const metadata_query = use(MaokaOrdo.Hooks.metadata_query)
+		const commands = use(MaokaOrdo.Jabs.Commands)
+		const metadata_query = use(MaokaOrdo.Jabs.MetadataQuery)
 
 		const subscription = metadata_query.$.subscribe(() => {
 			metadata_query
@@ -28,7 +28,7 @@ export const FileEditorSidebarItem = (
 		})
 
 		use(
-			MaokaHooks.listen("oncontextmenu", event => {
+			MaokaJabs.listen("oncontextmenu", event => {
 				event.preventDefault()
 				event.stopPropagation()
 

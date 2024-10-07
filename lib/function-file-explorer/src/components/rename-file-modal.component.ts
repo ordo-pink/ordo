@@ -7,7 +7,7 @@ import {
 	set_class,
 	set_inner_html,
 } from "@ordo-pink/maoka"
-import { get_commands, get_translations, ordo_context } from "@ordo-pink/maoka-ordo-hooks"
+import { get_commands, get_translations, ordo_context } from "@ordo-pink/maoka-ordo-jabs"
 import { BS_FILE_EARMARK_RICHTEXT } from "@ordo-pink/frontend-icons"
 
 export const RenameFileModal = (ctx: TCreateFunctionContext, fsid: FSID) =>

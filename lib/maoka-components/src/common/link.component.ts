@@ -1,20 +1,20 @@
 import { Maoka, TMaokaChildren } from "@ordo-pink/maoka"
-import { MaokaHooks } from "@ordo-pink/maoka-hooks"
-import { OrdoHooks } from "@ordo-pink/maoka-ordo-hooks"
+import { MaokaJabs } from "@ordo-pink/maoka-jabs"
+import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
 import { is_string } from "@ordo-pink/tau"
 
 type P = { href: string; children?: TMaokaChildren; custom_class?: string; show_visited?: boolean }
 export const Link = ({ href, children, custom_class, show_visited }: P) =>
 	Maoka.create("a", ({ use }) => {
-		const { emit } = use(OrdoHooks.commands)
+		const { emit } = use(MaokaOrdo.Jabs.Commands)
 
-		use(MaokaHooks.listen("onclick", click_listener(emit, href)))
-		use(MaokaHooks.set_attribute("href", href))
-		use(MaokaHooks.set_class(default_class))
+		use(MaokaJabs.listen("onclick", click_listener(emit, href)))
+		use(MaokaJabs.set_attribute("href", href))
+		use(MaokaJabs.set_class(default_class))
 
-		if (custom_class) use(MaokaHooks.add_class(custom_class))
-		if (!show_visited) use(MaokaHooks.add_class(ignore_history_highlighting_class))
-		if (is_string(children)) use(MaokaHooks.set_attribute("title", children))
+		if (custom_class) use(MaokaJabs.add_class(custom_class))
+		if (!show_visited) use(MaokaJabs.add_class(ignore_history_highlighting_class))
+		if (is_string(children)) use(MaokaJabs.set_attribute("title", children))
 
 		return () => children
 	})

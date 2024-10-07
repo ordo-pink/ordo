@@ -1,6 +1,6 @@
 import * as Icons from "@ordo-pink/frontend-icons"
 import { Maoka } from "@ordo-pink/maoka"
-import { MaokaHooks } from "@ordo-pink/maoka-hooks"
+import { MaokaJabs } from "@ordo-pink/maoka-jabs"
 import { NotificationType } from "@ordo-pink/core"
 import { Switch } from "@ordo-pink/switch"
 
@@ -8,7 +8,7 @@ type P = Pick<Ordo.Notification.Instance, "render_icon" | "type">
 export const NotificationIcon = ({ render_icon, type }: P) =>
 	Maoka.create("div", ({ use, element: current_element }) => {
 		if (render_icon) render_icon(current_element as unknown as HTMLDivElement)
-		else use(MaokaHooks.set_inner_html(get_default_icon(type)))
+		else use(MaokaJabs.set_inner_html(get_default_icon(type)))
 	})
 
 const get_default_icon = (type: Ordo.Notification.Instance["type"]) =>

@@ -16,10 +16,3 @@
 
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
-
-import { test, expect } from "bun:test"
-import { maokaHooks } from "./maoka-hooks.impl"
-
-test("maoka-hooks should pass", () => {
-	expect(maokaHooks).toEqual("maoka-hooks")
-})

@@ -1,8 +1,8 @@
-import { Maoka, type TMaokaChildren } from "@ordo-pink/maoka"
-import { MaokaOrdo, ordo_context } from "@ordo-pink/maoka-ordo-hooks"
 import { BS_FILE_EARMARK_PLUS } from "@ordo-pink/frontend-icons"
 import { BsFileEarmarkPlus } from "@ordo-pink/frontend-icons"
-import { MaokaHooks } from "@ordo-pink/maoka-hooks"
+import { Maoka } from "@ordo-pink/maoka"
+import { MaokaJabs } from "@ordo-pink/maoka-jabs"
+import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
 import { Result } from "@ordo-pink/result"
 import { Switch } from "@ordo-pink/switch"
 
@@ -11,52 +11,46 @@ export const CreateFileModal = (
 	parent: Ordo.Metadata.FSID | null = null,
 ) =>
 	Maoka.create("div", ({ use }) => {
+		use(MaokaOrdo.Context.provide(ctx))
+		use(MaokaJabs.set_class("p-4 w-96 flex flex-col gap-y-2"))
+
 		let type = "text/ordo"
 
-		use(ordo_context.provide(ctx))
-		use(MaokaHooks.set_class("p-4 w-96 flex flex-col gap-y-2"))
-
-		const { t } = use(MaokaOrdo.Hooks.translations)
-		const commands = use(MaokaOrdo.Hooks.commands)
+		const { t } = use(MaokaOrdo.Jabs.Translations)
+		const { emit } = use(MaokaOrdo.Jabs.Commands)
 
 		const t_title = t("t.file_explorer.modals.create_file.title")
 		const state = { name: "" }
 
 		return () => [
-			Header([TitleIcon, Title(t_title)]),
-			Body([
+			Header(() => [TitleIcon, Title(() => t_title)]),
+			Body(() => [
 				CreateFileModalInput(event => void (state.name = (event.target as any).value)),
 				FileAssociationSelector((fa, selected_type) => {
 					type = selected_type
 				}),
 			]),
-			Footer([
+			Footer(() => [
 				CancelBtn,
 				OkBtn(() => {
-					commands.emit("cmd.application.modal.hide")
-					commands.emit("cmd.metadata.create", { name: state.name, parent, type })
+					emit("cmd.application.modal.hide")
+					emit("cmd.metadata.create", { name: state.name, parent, type })
 				}),
 			]),
 		]
 	})
 
-const Header = (children: TMaokaChildren) =>
-	Maoka.create("div", ({ use }) => {
-		use(MaokaHooks.set_class("flex gap-x-2 items-center"))
-		return () => children
-	})
+const Header = Maoka.styled("div", { class: "flex gap-x-2 items-center" })
+
+const Title = Maoka.styled("h2", { class: "text-lg" })
+
+const Body = Maoka.styled("div")
+
+const Footer = Maoka.styled("div", { class: "flex justify-end items-center gap-x-2" })
 
 const TitleIcon = Maoka.create("div", ({ use }) =>
-	use(MaokaHooks.set_inner_html(BS_FILE_EARMARK_PLUS)),
+	use(MaokaJabs.set_inner_html(BS_FILE_EARMARK_PLUS)),
 )
-
-const Title = (children: TMaokaChildren) =>
-	Maoka.create("h2", ({ use }) => {
-		use(MaokaHooks.set_class("text-lg"))
-		return () => children
-	})
-
-const Body = (children: TMaokaChildren) => Maoka.create("div", () => () => children)
 
 // TODO Extract select
 // TODO Add caret showing expanded-contracted status
@@ -72,9 +66,9 @@ const FileAssociationSelector = (
 		let file_associations: Ordo.FileAssociation.Instance[] = []
 		let is_expanded = false
 
-		use(MaokaHooks.set_class(select_class))
+		use(MaokaJabs.set_class(select_class))
 
-		const file_associations$ = use(MaokaOrdo.Hooks.file_associations)
+		const file_associations$ = use(MaokaOrdo.Jabs.FileAssociations$)
 
 		const handle_item_click = (fa: Ordo.FileAssociation.Instance, type: string) => {
 			is_expanded = !is_expanded
@@ -119,7 +113,7 @@ const FileAssociationSelector = (
 			is_expanded
 				? Maoka.create("div", ({ use }) => {
 						use(
-							MaokaHooks.set_class(
+							MaokaJabs.set_class(
 								"absolute top-0 left-0 right-0 bg-neutral-200 dark:bg-neutral-600 rounded-md",
 							),
 						)
@@ -142,8 +136,8 @@ const SelectItem = (
 	is_select_active = false,
 ) =>
 	Maoka.create("div", ({ use }) => {
-		use(MaokaHooks.set_class("flex gap-x-4"))
-		use(MaokaHooks.listen("onclick", () => on_click(file_association, type.name)))
+		use(MaokaJabs.set_class("flex gap-x-4"))
+		use(MaokaJabs.listen("onclick", () => on_click(file_association, type.name)))
 
 		const Icon = Switch.OfTrue()
 			.case(!!file_association.render_icon, () =>
@@ -156,31 +150,31 @@ const SelectItem = (
 		return () => [
 			Maoka.create("div", ({ use }) => {
 				use(
-					MaokaHooks.set_class(
+					MaokaJabs.set_class(
 						"p-2 rounded-none first-of-type:rounded-t-md last-of-type:rounded-b-md",
 					),
 				)
 
 				return () => {
 					if (is_select_active)
-						use(MaokaHooks.add_class("hover:bg-neutral-300 hover:dark:bg-neutral-800"))
+						use(MaokaJabs.add_class("hover:bg-neutral-300 hover:dark:bg-neutral-800"))
 
 					return [
 						Maoka.create("div", ({ use }) => {
-							use(MaokaHooks.set_class("flex gap-x-1 items-center"))
+							use(MaokaJabs.set_class("flex gap-x-1 items-center"))
 
 							return () => [
 								Icon,
 								Maoka.create("div", ({ use }) => {
-									const { t } = use(MaokaOrdo.Hooks.translations)
+									const { t } = use(MaokaOrdo.Jabs.Translations)
 									return () => t(type.readable_name)
 								}),
 							]
 						}),
 
 						Maoka.create("div", ({ use }) => {
-							use(MaokaHooks.set_class("text-xs text-neutral-600 dark:text-neutral-400"))
-							const { t } = use(MaokaOrdo.Hooks.translations)
+							use(MaokaJabs.set_class("text-xs text-neutral-600 dark:text-neutral-400"))
+							const { t } = use(MaokaOrdo.Jabs.Translations)
 							return () => t(type.description)
 						}),
 					]
@@ -193,26 +187,26 @@ const CreateFileModalInput = (handle_change: (event: Event) => void) =>
 	Maoka.create("label", () => {
 		return () => [
 			Maoka.create("div", ({ use }) => {
-				use(MaokaHooks.set_class("font-bold text-sm"))
-				const { t } = use(MaokaOrdo.Hooks.translations)
+				use(MaokaJabs.set_class("font-bold text-sm"))
+				const { t } = use(MaokaOrdo.Jabs.Translations)
 
 				return () => t("t.file_explorer.modals.create_file.input_label")
 			}),
 
 			Maoka.create("input", ({ use, element }) => {
-				const { t } = use(MaokaOrdo.Hooks.translations)
+				const { t } = use(MaokaOrdo.Jabs.Translations)
 
-				use(MaokaHooks.listen("oninput", handle_change))
-				use(MaokaHooks.set_attribute("autofocus", "autofocus"))
+				use(MaokaJabs.listen("oninput", handle_change))
+				use(MaokaJabs.set_attribute("autofocus", "autofocus"))
 				use(
-					MaokaHooks.set_attribute(
+					MaokaJabs.set_attribute(
 						"placeholder",
 						t("t.file_explorer.modals.create_file.input_placeholder"),
 					),
 				)
 
 				use(
-					MaokaHooks.set_class(
+					MaokaJabs.set_class(
 						"w-full rounded-md border-0 px-2 py-1 shadow-inner focus:ring-0 sm:text-sm sm:leading-6",
 						"bg-neutral-50 dark:bg-neutral-600 placeholder:text-neutral-500",
 					),
@@ -223,30 +217,23 @@ const CreateFileModalInput = (handle_change: (event: Event) => void) =>
 		]
 	})
 
-const Footer = (children: TMaokaChildren) =>
-	Maoka.create("div", ({ use }) => {
-		use(MaokaHooks.set_class("flex justify-end items-center gap-x-2"))
-
-		return () => children
-	})
-
 const OkBtn = (on_click: (event: MouseEvent) => void) =>
 	Maoka.create("button", ({ use }) => {
 		use(
-			MaokaHooks.set_class(
+			MaokaJabs.set_class(
 				"bg-emerald-700 shadow-md rounded-md px-4 py-1 text-sm flex items-center space-x-2 hover:shadow-lg hover:scale-110 transition-all duration-300",
 			),
 		)
-		use(MaokaHooks.listen("onclick", on_click))
+		use(MaokaJabs.listen("onclick", on_click))
 
 		return () => [Maoka.create("div", () => () => "OK"), Hotkey("enter")]
 	})
 
 const CancelBtn = Maoka.create("button", ({ use }) => {
-	const commands = use(MaokaOrdo.Hooks.commands)
+	const commands = use(MaokaOrdo.Jabs.Commands)
 
-	use(MaokaHooks.set_class("px-4 py-1 text-sm flex items-center space-x-2"))
-	use(MaokaHooks.listen("onclick", () => commands.emit("cmd.application.modal.hide")))
+	use(MaokaJabs.set_class("px-4 py-1 text-sm flex items-center space-x-2"))
+	use(MaokaJabs.listen("onclick", () => commands.emit("cmd.application.modal.hide")))
 
 	return () => [Maoka.create("div", () => () => "Cancel"), Hotkey("escape")]
 })
@@ -254,7 +241,7 @@ const CancelBtn = Maoka.create("button", ({ use }) => {
 const hotkey_class =
 	"hidden shrink-0 rounded-md px-2 py-0.5 items-center justify-center space-x-1 text-xs text-neutral-500 md:flex dark:text-neutral-300"
 
-// TODO Move to hooks
+// TODO Move to jabs
 const isDarwin = navigator.appVersion.indexOf("Mac") !== -1
 
 const Hotkey = (accelerator: string) =>
@@ -268,7 +255,7 @@ const Hotkey = (accelerator: string) =>
 
 		const symbol = split[split.length - 1].toLowerCase()
 
-		use(MaokaHooks.set_class(hotkey_class))
+		use(MaokaJabs.set_class(hotkey_class))
 
 		const handle_keydown = (event: KeyboardEvent) => {
 			if (IGNORED_KEYS.includes(event.key)) return

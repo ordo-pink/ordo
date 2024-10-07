@@ -1,7 +1,7 @@
 import { BsFileEarmark, BsFileEarmarkBinary, BsFolderOpen } from "@ordo-pink/frontend-icons"
-import { MaokaOrdo, OrdoHooks } from "@ordo-pink/maoka-ordo-hooks"
 import { Maoka } from "@ordo-pink/maoka"
-import { MaokaHooks } from "@ordo-pink/maoka-hooks"
+import { MaokaJabs } from "@ordo-pink/maoka-jabs"
+import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
 import { R } from "@ordo-pink/result"
 import { Switch } from "@ordo-pink/switch"
 import { emojis } from "@ordo-pink/emojis"
@@ -11,8 +11,8 @@ export const MetadataIcon = ({ metadata, custom_class = "" }: P) =>
 	Maoka.create("div", ({ use, refresh, on_unmount }) => {
 		let emoji = metadata.get_property("emoji_icon")
 
-		const commands = use(OrdoHooks.commands)
-		const metadata_query = use(OrdoHooks.metadata_query)
+		const commands = use(MaokaOrdo.Jabs.Commands)
+		const metadata_query = use(MaokaOrdo.Jabs.MetadataQuery)
 
 		const subscription = metadata_query.$.subscribe(() => {
 			metadata_query
@@ -29,10 +29,10 @@ export const MetadataIcon = ({ metadata, custom_class = "" }: P) =>
 
 		on_unmount(() => subscription.unsubscribe())
 
-		use(MaokaHooks.set_class("cursor-pointer"))
+		use(MaokaJabs.set_class("cursor-pointer"))
 
 		use(
-			MaokaHooks.listen("onclick", event => {
+			MaokaJabs.listen("onclick", event => {
 				event.stopPropagation()
 
 				commands.emit("cmd.application.command_palette.show", {
@@ -58,7 +58,7 @@ export const MetadataIcon = ({ metadata, custom_class = "" }: P) =>
 		return () => {
 			if (emoji.is_some)
 				return Maoka.create("div", ({ use }) => {
-					use(MaokaHooks.set_class(custom_class))
+					use(MaokaJabs.set_class(custom_class))
 					return () => emoji.unwrap()
 				})
 
@@ -76,13 +76,13 @@ const Icon = ({ metadata, custom_class, has_children }: P2) =>
 
 		const metadata_content_type = metadata.get_type()
 
-		const $ = use(MaokaOrdo.Hooks.file_associations)
+		const $ = use(MaokaOrdo.Jabs.FileAssociations$)
 		const handle_file_associations_update = (value: Ordo.FileAssociation.Instance[]) => {
 			file_associations = value
 			void refresh()
 		}
 
-		use(MaokaOrdo.Hooks.subscription($, handle_file_associations_update))
+		use(MaokaOrdo.Jabs.subscribe($, handle_file_associations_update))
 
 		return async () => {
 			const fa = file_associations.find(association =>

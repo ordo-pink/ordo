@@ -1,5 +1,5 @@
-import { MaokaOrdo, ordo_context } from "@ordo-pink/maoka-ordo-hooks"
 import { Maoka } from "@ordo-pink/maoka"
+import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
 import { Metadata } from "@ordo-pink/core"
 import { R } from "@ordo-pink/result"
 import { Switch } from "@ordo-pink/switch"
@@ -8,10 +8,10 @@ import { equals } from "ramda"
 
 export const FileEditorWorkspace = (ctx: Ordo.CreateFunction.Params) => {
 	return Maoka.create("div", ({ use, refresh }) => {
-		use(ordo_context.provide(ctx))
+		use(MaokaOrdo.Context.provide(ctx))
 
 		let route: Ordo.Router.Route | null = null
-		const $ = use(MaokaOrdo.Hooks.current_route)
+		const $ = use(MaokaOrdo.Jabs.CurrentRoute$)
 		const handle_current_route_change = (value: TOption<Ordo.Router.Route>) =>
 			R.FromOption(value, () => null)
 				.pipe(R.ops.chain(r => R.If(r.path !== route?.path, { T: () => r, F: () => r })))
@@ -30,8 +30,8 @@ export const FileEditorWorkspace = (ctx: Ordo.CreateFunction.Params) => {
 					},
 				})
 
-		use(MaokaOrdo.Hooks.subscription($, handle_current_route_change))
-		const metadata_query = use(MaokaOrdo.Hooks.metadata_query)
+		use(MaokaOrdo.Jabs.subscribe($, handle_current_route_change))
+		const metadata_query = use(MaokaOrdo.Jabs.MetadataQuery)
 
 		return () =>
 			R.FromNullable(route)
@@ -55,7 +55,7 @@ const RenderPicker = (metadata: Ordo.Metadata.Instance) =>
 
 		const metadata_type = metadata.get_type()
 
-		const $ = use(MaokaOrdo.Hooks.file_associations)
+		const $ = use(MaokaOrdo.Jabs.FileAssociations$)
 		const handle_update = (value: Ordo.FileAssociation.Instance[]) => {
 			if (file_associations.length !== value.length) {
 				file_associations = value
@@ -63,7 +63,7 @@ const RenderPicker = (metadata: Ordo.Metadata.Instance) =>
 			}
 		}
 
-		use(MaokaOrdo.Hooks.subscription($, handle_update))
+		use(MaokaOrdo.Jabs.subscribe($, handle_update))
 
 		// TODO Unsupported file component
 		// TODO Avoid glitches with double rendering
@@ -87,8 +87,8 @@ const RenderPicker = (metadata: Ordo.Metadata.Instance) =>
 
 const TitleSetter = (metadata: Ordo.Metadata.Instance | null) =>
 	Maoka.create("div", ({ use }) => {
-		const metadata_query = use(MaokaOrdo.Hooks.metadata_query)
-		const { emit } = use(MaokaOrdo.Hooks.commands)
+		const metadata_query = use(MaokaOrdo.Jabs.MetadataQuery)
+		const { emit } = use(MaokaOrdo.Jabs.Commands)
 
 		return () =>
 			get_metadata_with_ancestors(metadata, metadata_query)

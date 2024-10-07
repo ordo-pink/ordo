@@ -3,11 +3,11 @@
 
 import { type Observable } from "rxjs"
 
-import { MaokaHooks } from "@ordo-pink/maoka-hooks"
+import { MaokaJabs } from "@ordo-pink/maoka-jabs"
 import { R } from "@ordo-pink/result"
 import { type TMaokaProps } from "@ordo-pink/maoka"
 
-export const ordo_context = MaokaHooks.create_context<Ordo.CreateFunction.Params>()
+export const ordo_context = MaokaJabs.create_context<Ordo.CreateFunction.Params>()
 
 export const get_commands = ({ use }: TMaokaProps) => {
 	const { get_commands } = use(ordo_context.consume)

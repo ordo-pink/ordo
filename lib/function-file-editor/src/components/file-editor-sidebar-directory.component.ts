@@ -1,7 +1,7 @@
 import { BsCaretDown, BsCaretRight } from "@ordo-pink/frontend-icons"
 import { Maoka, type TMaokaJab } from "@ordo-pink/maoka"
-import { MaokaHooks } from "@ordo-pink/maoka-hooks"
-import { MaokaOrdo } from "@ordo-pink/maoka-ordo-hooks"
+import { MaokaJabs } from "@ordo-pink/maoka-jabs"
+import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
 import { Metadata } from "@ordo-pink/core"
 import { MetadataIcon } from "@ordo-pink/maoka-components"
 import { R } from "@ordo-pink/result"
@@ -16,10 +16,10 @@ export const FileEditorSidebarDirectory = (metadata: Ordo.Metadata.Instance, dep
 	Maoka.create("div", ({ use, refresh }) => {
 		const fsid = metadata.get_fsid()
 
-		const metadata_query = use(MaokaOrdo.Hooks.metadata_query)
+		const metadata_query = use(MaokaOrdo.Jabs.MetadataQuery)
 
 		let route: Ordo.Router.Route | null = null
-		const $ = use(MaokaOrdo.Hooks.current_route)
+		const $ = use(MaokaOrdo.Jabs.CurrentRoute$)
 		const handle_current_route_change = (value: TOption<Ordo.Router.Route>) =>
 			R.FromOption(value, () => null)
 				.pipe(R.ops.chain(r => R.If(r.path !== route?.path, { T: () => r, F: () => r })))
@@ -38,7 +38,7 @@ export const FileEditorSidebarDirectory = (metadata: Ordo.Metadata.Instance, dep
 					},
 				})
 
-		use(MaokaOrdo.Hooks.subscription($, handle_current_route_change))
+		use(MaokaOrdo.Jabs.subscribe($, handle_current_route_change))
 
 		const on_caret_click = (event: MouseEvent) => {
 			event.stopPropagation()
@@ -111,7 +111,7 @@ const FileEditorDirectoryName = (
 		const fsid = metadata.get_fsid()
 
 		let route: Ordo.Router.Route | null = null
-		const $ = use(MaokaOrdo.Hooks.current_route)
+		const $ = use(MaokaOrdo.Jabs.CurrentRoute$)
 		const handle_current_route_change = (value: TOption<Ordo.Router.Route>) =>
 			R.FromOption(value, () => null)
 				.pipe(R.ops.chain(r => R.If(r.path !== route?.path, { T: () => r, F: () => r })))
@@ -130,21 +130,21 @@ const FileEditorDirectoryName = (
 					},
 				})
 
-		use(MaokaOrdo.Hooks.subscription($, handle_current_route_change))
+		use(MaokaOrdo.Jabs.subscribe($, handle_current_route_change))
 
-		const commands = use(MaokaOrdo.Hooks.commands)
+		const commands = use(MaokaOrdo.Jabs.Commands)
 
-		use(MaokaHooks.listen("onclick", () => commands.emit("cmd.file_editor.open_file", fsid)))
-		use(MaokaHooks.set_style({ paddingLeft: `${depth + 0.5}rem`, paddingRight: "0.5rem" }))
-		use(MaokaHooks.set_class(...file_editor_sidebar_directory_name_classes))
+		use(MaokaJabs.listen("onclick", () => commands.emit("cmd.file_editor.open_file", fsid)))
+		use(MaokaJabs.set_style({ paddingLeft: `${depth + 0.5}rem`, paddingRight: "0.5rem" }))
+		use(MaokaJabs.set_class(...file_editor_sidebar_directory_name_classes))
 
 		return () => {
-			if (route?.params?.fsid === fsid) use(MaokaHooks.add_class(directory_active))
-			else use(MaokaHooks.remove_class(...directory_active.split(" ")))
+			if (route?.params?.fsid === fsid) use(MaokaJabs.add_class(directory_active))
+			else use(MaokaJabs.remove_class(...directory_active.split(" ")))
 
 			return [
 				FileEditorDirectoryNameText(metadata),
-				FileEditorDirectoryNameCaret(fsid, MaokaHooks.listen("onclick", on_caret_click)),
+				FileEditorDirectoryNameCaret(fsid, MaokaJabs.listen("onclick", on_caret_click)),
 			]
 		}
 	})
@@ -164,12 +164,12 @@ const file_editor_sidebar_directory_name_text_classes = [
 
 const FileEditorDirectoryNameText = (metadata: Ordo.Metadata.Instance) =>
 	Maoka.create("div", ({ use }) => {
-		use(MaokaHooks.set_class(...file_editor_sidebar_directory_name_text_classes))
+		use(MaokaJabs.set_class(...file_editor_sidebar_directory_name_text_classes))
 
 		return () => [
 			Maoka.create("div", () => () => MetadataIcon({ metadata })),
 			Maoka.create("div", ({ use }) => {
-				use(MaokaHooks.set_class("text-ellipsis line-clamp-1"))
+				use(MaokaJabs.set_class("text-ellipsis line-clamp-1"))
 				return () => metadata.get_name()
 			}),
 		]
@@ -178,7 +178,7 @@ const FileEditorDirectoryNameText = (metadata: Ordo.Metadata.Instance) =>
 const FileEditorDirectoryNameCaret = (fsid: Ordo.Metadata.FSID, click_listener: TMaokaJab) =>
 	Maoka.create("div", ({ use }) => {
 		use(click_listener)
-		use(MaokaHooks.set_class("cursor-pointer"))
+		use(MaokaJabs.set_class("cursor-pointer"))
 
 		return () =>
 			expanded_state[fsid]

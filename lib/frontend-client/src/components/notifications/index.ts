@@ -1,8 +1,8 @@
 import { type Observable } from "rxjs"
 
-import { OrdoHooks, ordo_context } from "@ordo-pink/maoka-ordo-hooks"
 import { Maoka } from "@ordo-pink/maoka"
-import { MaokaHooks } from "@ordo-pink/maoka-hooks"
+import { MaokaJabs } from "@ordo-pink/maoka-jabs"
+import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
 
 import { Notification } from "./notification.component"
 
@@ -11,6 +11,9 @@ export const Notifications = (
 	notification$: Observable<Ordo.Notification.Instance[]>,
 ) =>
 	Maoka.create("div", ({ use, refresh }) => {
+		use(MaokaOrdo.Context.provide(ctx))
+		use(MaokaJabs.set_class("flex flex-col gap-y-1"))
+
 		let notifications: Ordo.Notification.Instance[] = []
 
 		const handle_notification_updates = (new_notifications: Ordo.Notification.Instance[]) => {
@@ -18,9 +21,7 @@ export const Notifications = (
 			void refresh()
 		}
 
-		use(ordo_context.provide(ctx))
-		use(MaokaHooks.set_class("flex flex-col gap-y-1"))
-		use(OrdoHooks.subscription(notification$, handle_notification_updates))
+		use(MaokaOrdo.Jabs.subscribe(notification$, handle_notification_updates))
 
 		return () => notifications.map(item => Notification(item))
 	})

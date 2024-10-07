@@ -1,22 +1,19 @@
 import { Maoka } from "@ordo-pink/maoka"
-import { MaokaOrdo } from "@ordo-pink/maoka-ordo-hooks"
+import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
 
 import "./landing.page.css"
-import { MaokaHooks } from "@ordo-pink/maoka-hooks"
+import { MaokaJabs } from "@ordo-pink/maoka-jabs"
 
 // TODO Translations
 export default Maoka.create("div", ({ use, on_unmount }) => {
-	const commands = use(MaokaOrdo.Hooks.commands)
+	const commands = use(MaokaOrdo.Jabs.Commands)
 
-	commands.emit("cmd.application.set_title", {
-		window_title: "Welcome to ORDO!",
-		status_bar_title: "We don't use cookies. Wait, what?!",
-	})
+	commands.emit("cmd.application.set_title", { window_title: "Welcome to ORDO!" })
 
 	const handle_mouse_move = (event: MouseEvent) => {
-		const nx = (event.clientX - window.innerWidth / 2) * -0.005
-		const ny = (event.clientY - window.innerHeight / 2) * -0.01
-		const style = `--move-x: ${nx}deg; --move-y: ${ny}deg;`
+		const dx = (event.clientX - window.innerWidth / 2) * -0.005
+		const dy = (event.clientY - window.innerHeight / 2) * -0.01
+		const style = `--move-x: ${dx}deg; --move-y: ${dy}deg;`
 
 		Object.assign(document.documentElement, { style })
 	}
@@ -34,8 +31,8 @@ export default Maoka.create("div", ({ use, on_unmount }) => {
 			Card(() =>
 				CardContent(() => [
 					LogoSection(() => [
-						LogoWrapper(() => ["Bring your thoughts to", Logo(() => "ORDO")]),
-						LogoAction(() => Maoka.styled("button", {})(() => "TODO")),
+						LogoWrapper(() => ["Bring your thoughts to", LogoText(() => "ORDO")]),
+						LogoAction(() => LearnMoreButton(() => "Learn more")),
 					]),
 					CallToActionSection(() => "TODO"),
 				]),
@@ -45,20 +42,22 @@ export default Maoka.create("div", ({ use, on_unmount }) => {
 
 // --- Internal ---
 
+const LearnMoreButton = Maoka.styled("button")
+
 const Layer = (index: number) =>
 	Maoka.create("div", ({ use }) => {
-		const hosts = use(MaokaOrdo.Hooks.hosts)
+		const hosts = use(MaokaOrdo.Jabs.Hosts)
 
 		const background_image = `url(${hosts.static}/index-hero-layer-${index}.png)`
 
-		use(MaokaHooks.set_class(`hero-layer hero-layer_${index}`))
-		use(MaokaHooks.set_style({ backgroundImage: background_image }))
+		use(MaokaJabs.set_class(`hero-layer hero-layer_${index}`))
+		use(MaokaJabs.set_style({ backgroundImage: background_image }))
 	})
 
 const Section = Maoka.styled("section", { class: "hero-section" })
 const Card = Maoka.styled("div", { class: "card-container" })
 const CardContent = Maoka.styled("div", { class: "card" })
-const Logo = Maoka.styled("span", { class: "logo_ordo-text" })
+const LogoText = Maoka.styled("span", { class: "logo_ordo-text" })
 const Layers = Maoka.styled("div", { class: "hero-layers" })
 const LogoWrapper = Maoka.styled("h1", { class: "logo" })
 const LogoSection = Maoka.styled("div", { class: "logo-section" })

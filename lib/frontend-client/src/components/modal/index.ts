@@ -1,8 +1,8 @@
 import { type Observable, pairwise } from "rxjs"
 
-import { MaokaOrdo, ordo_context } from "@ordo-pink/maoka-ordo-hooks"
 import { Maoka } from "@ordo-pink/maoka"
-import { MaokaHooks } from "@ordo-pink/maoka-hooks"
+import { MaokaJabs } from "@ordo-pink/maoka-jabs"
+import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
 import { type TOption } from "@ordo-pink/option"
 
 import { Modal } from "./modal.component"
@@ -12,12 +12,12 @@ export const ModalOverlay = (
 	ctx: Ordo.CreateFunction.Params,
 ) =>
 	Maoka.create("div", ({ use, refresh, on_unmount }) => {
-		use(ordo_context.provide(ctx))
+		use(MaokaOrdo.Context.provide(ctx))
 
 		let modal_state: Ordo.Modal.Instance | null = null
 		let unmount_prev_state: () => void = () => void 0
 
-		const commands = use(MaokaOrdo.Hooks.commands)
+		const commands = use(MaokaOrdo.Jabs.Commands)
 
 		const subscription = $.pipe(pairwise()).subscribe(([prev_state, state]) => {
 			modal_state = state.unwrap() ?? null
@@ -26,7 +26,7 @@ export const ModalOverlay = (
 		})
 
 		use(
-			MaokaHooks.listen("onclick", event => {
+			MaokaJabs.listen("onclick", event => {
 				if (!modal_state) return
 				event.stopPropagation()
 				unmount_prev_state()
@@ -49,7 +49,7 @@ export const ModalOverlay = (
 		})
 
 		return () => {
-			use(MaokaHooks.set_class(get_overlay_class(!!modal_state)))
+			use(MaokaJabs.set_class(get_overlay_class(!!modal_state)))
 
 			return Modal(modal_state)
 		}

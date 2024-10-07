@@ -1,8 +1,8 @@
-import { get_commands, get_translations, ordo_context } from "@ordo-pink/maoka-ordo-hooks"
-import { BS_FILE_EARMARK_X } from "@ordo-pink/frontend-icons"
+// import { get_commands, get_translations, ordo_context } from "@ordo-pink/maoka-ordo-jabs"
+// import { BS_FILE_EARMARK_X } from "@ordo-pink/frontend-icons"
 import { Maoka } from "@ordo-pink/maoka"
 
-export const RemoveFileModal = (ctx: Ordo.CreateFunction.Params, fsid: Ordo.Metadata.FSID) =>
+export const RemoveFileModal = (/*ctx: Ordo.CreateFunction.Params, fsid: Ordo.Metadata.FSID*/) =>
 	Maoka.styled("div", {})(() => "YAY")
 // 	Maoka.create("div", ({ use }) => {
 // 		use(ordo_context.provide(ctx))

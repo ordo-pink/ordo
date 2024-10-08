@@ -50,6 +50,8 @@ export default create_function(
 			"cmd.metadata.show_create_modal",
 			"cmd.application.router.navigate",
 			"cmd.application.command_palette.show",
+			"cmd.application.context_menu.show",
+			"cmd.metadata.rename",
 		],
 		queries: [
 			"application.commands",

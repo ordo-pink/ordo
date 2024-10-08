@@ -1,5 +1,5 @@
 import { BsFileEarmark, BsFileEarmarkBinary, BsFolderOpen } from "@ordo-pink/frontend-icons"
-import { Maoka } from "@ordo-pink/maoka"
+import { Maoka, type TMaokaElement } from "@ordo-pink/maoka"
 import { MaokaJabs } from "@ordo-pink/maoka-jabs"
 import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
 import { R } from "@ordo-pink/result"
@@ -74,6 +74,7 @@ const Icon = ({ metadata, custom_class, has_children }: P2) =>
 	Maoka.create("div", ({ use, refresh, element }) => {
 		let file_associations: Ordo.FileAssociation.Instance[] = []
 
+		const icon_class = `ml-1 shrink-0 ${custom_class}`
 		const metadata_content_type = metadata.get_type()
 
 		const $ = use(MaokaOrdo.Jabs.FileAssociations$)
@@ -96,8 +97,8 @@ const Icon = ({ metadata, custom_class, has_children }: P2) =>
 			}
 
 			return Switch.OfTrue()
-				.case(has_children, () => BsFolderOpen(`ml-1 shrink-0 ${custom_class}`))
-				.case(metadata.get_size() === 0, () => BsFileEarmark(`ml-1 shrink-0 ${custom_class}`))
-				.default(() => BsFileEarmarkBinary(`ml-1 shrink-0 ${custom_class}`))
+				.case(has_children, () => BsFolderOpen(icon_class) as TMaokaElement)
+				.case(metadata.get_size() === 0, () => BsFileEarmark(icon_class) as TMaokaElement)
+				.default(() => BsFileEarmarkBinary(icon_class) as TMaokaElement)
 		}
 	})

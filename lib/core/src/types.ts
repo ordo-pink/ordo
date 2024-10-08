@@ -139,7 +139,7 @@ declare global {
 	 */
 	interface cmd {
 		application: {
-			set_title: () => { window_title: string; status_bar_title?: string }
+			set_title: () => Ordo.I18N.TranslationKey
 			add_translations: () => {
 				lang: ISO_639_1_Locale
 				translations: Partial<Record<Ordo.I18N.TranslationKey, string>>
@@ -252,7 +252,7 @@ declare global {
 	 * type TFoo = Ordo.<whatever_you_need_from_here>
 	 * ```
 	 */
-	module Ordo {
+	namespace Ordo {
 		type Rrr<$TKey extends keyof typeof C.ErrorType = keyof typeof C.ErrorType> = {
 			key: $TKey
 			code: (typeof C.ErrorType)[$TKey]
@@ -285,12 +285,12 @@ declare global {
 		 * - **else**
 		 * 	- current achievement is displayed depending on its completion status
 		 */
-		module Achievement {
+		namespace Achievement {
 			/**
 			 * Achievement subscriber is designed to track user progress in terms of the achievement
 			 * as well as update/grant the achievement based of what the user has achieved.
 			 */
-			module Subscriber {
+			namespace Subscriber {
 				/**
 				 * Subscribe function params.
 				 *
@@ -392,18 +392,14 @@ declare global {
 			}
 		}
 
-		module Workspace {
+		namespace Workspace {
 			type WorkspaceSplitSize = [number, number]
 			type DisabledSidebar = { disabled: true }
 			type EnabledSidebar = { disabled: false; sizes: WorkspaceSplitSize }
 			type SidebarState = EnabledSidebar | DisabledSidebar
 		}
 
-		module Title {
-			type State = { window_title: string; status_bar_title?: string }
-		}
-
-		module CreateFunction {
+		namespace CreateFunction {
 			type QueryPermission =
 				| "application.title"
 				| "application.sidebar"
@@ -437,7 +433,7 @@ declare global {
 
 			// TODO Extract redundant types
 			type GetSidebarFn = () => TResult<Observable<Ordo.Workspace.SidebarState>, Ordo.Rrr<"EPERM">>
-			type GetTitleFn = () => TResult<Observable<Ordo.Title.State>, Ordo.Rrr<"EPERM">>
+			type GetTitleFn = () => TResult<Observable<string>, Ordo.Rrr<"EPERM">>
 			type GetHostsFn = () => TResult<Ordo.Hosts, Ordo.Rrr<"EPERM">>
 			type GetFetchFn = () => Ordo.Fetch
 			type GetLoggerFn = () => TLogger
@@ -491,7 +487,7 @@ declare global {
 			}
 		}
 
-		module I18N {
+		namespace I18N {
 			type TranslationKeys = TFlattenRecord<TRecordToKVUnion<t, "t">>
 			type TranslationKey = keyof TranslationKeys
 			type Translations = Record<TwoLetterLocale, Record<string, string>>
@@ -501,23 +497,23 @@ declare global {
 			}
 		}
 
-		module Activity {
+		namespace Activity {
 			type OnUnmountParams = { workspace: HTMLDivElement; sidebar: HTMLDivElement }
 
 			type Instance = {
 				name: string
 				routes: string[]
 				default_route?: string
-				render_workspace?: (div: HTMLDivElement) => Promise<void>
-				render_sidebar?: (div: HTMLDivElement) => Promise<void>
-				render_icon?: (span: HTMLSpanElement) => Promise<void>
+				render_workspace?: (div: HTMLDivElement) => void | Promise<void>
+				render_sidebar?: (div: HTMLDivElement) => void | Promise<void>
+				render_icon?: (span: HTMLSpanElement) => void | Promise<void>
 				on_unmount?: (params: Ordo.Activity.OnUnmountParams) => void
 				is_background?: boolean
 				is_fullscreen?: boolean
 			}
 		}
 
-		module FileAssociation {
+		namespace FileAssociation {
 			type RenderFn = (params: Ordo.FileAssociation.RenderParams) => void | Promise<void>
 
 			type RenderIconFn = (span: HTMLSpanElement) => void | Promise<void>
@@ -545,12 +541,12 @@ declare global {
 			}
 		}
 
-		module User {
+		namespace User {
 			type Handle = `@${string}` // TODO Disallow forbidden chars
 			type ID = `${string}-${string}-${string}-${string}-${string}` // TODO Strict type
 			type Email = `${string}@${string}` // TODO Strict type
 
-			module Current {
+			namespace Current {
 				type DTO = Ordo.User.Public.DTO & {
 					email: Ordo.User.Email
 					email_confirmed: boolean
@@ -607,7 +603,7 @@ declare global {
 				}
 			}
 
-			module Public {
+			namespace Public {
 				type DTO = {
 					id: Ordo.User.ID
 					created_at: Date
@@ -675,7 +671,7 @@ declare global {
 			}
 		}
 
-		module Metadata {
+		namespace Metadata {
 			type FSID = `${string}-${string}-${string}-${string}-${string}`
 			type Props = Readonly<Record<string, any>>
 
@@ -969,7 +965,7 @@ declare global {
 			}
 		}
 
-		module Command {
+		namespace Command {
 			type Record = TFlattenRecord<TRecordToKVUnion<cmd, "cmd">>
 			type Name = keyof Record
 
@@ -1036,7 +1032,7 @@ declare global {
 			}
 		}
 
-		module Modal {
+		namespace Modal {
 			type Instance = {
 				show_close_button?: boolean
 				on_unmount?: () => void
@@ -1044,7 +1040,7 @@ declare global {
 			}
 		}
 
-		module Router {
+		namespace Router {
 			/**
 			 * Route descriptor to be passed for navigating.
 			 */
@@ -1076,15 +1072,15 @@ declare global {
 			}
 		}
 
-		module Notification {
+		namespace Notification {
 			type Instance = {
 				id: string
 				type: C.NotificationType
 				title?: Ordo.I18N.TranslationKey
 				message: Ordo.I18N.TranslationKey
-				render_icon: (div: HTMLDivElement) => void
-				duration: number
-				on_click: () => void
+				render_icon?: (div: HTMLDivElement) => void
+				duration?: number
+				on_click?: () => void
 				// persist?: boolean
 				// payload?: T
 				// action?: (id: string, payload: T) => void
@@ -1092,7 +1088,7 @@ declare global {
 			}
 		}
 
-		module ContextMenu {
+		namespace ContextMenu {
 			/**
 			 * Context menu item.
 			 */
@@ -1196,7 +1192,7 @@ declare global {
 			}
 		}
 
-		module CommandPalette {
+		namespace CommandPalette {
 			/**
 			 * Command palette item.
 			 */
@@ -1230,7 +1226,7 @@ declare global {
 			}
 		}
 
-		module Routes {
+		namespace Routes {
 			type TSuccessResponse<T> = { success: true; result: T }
 			type TErrorResponse = { success: false; error: string }
 			type TTokenResult = {
@@ -1244,8 +1240,8 @@ declare global {
 				max_functions: Ordo.User.Current.DTO["max_functions"]
 			}
 
-			module DT {
-				module SyncMetadata {
+			namespace DT {
+				namespace SyncMetadata {
 					type Path = `/${Ordo.User.Current.DTO["id"]}`
 					type Method = "POST"
 					type Cookies = void
@@ -1255,7 +1251,7 @@ declare global {
 					type ResponseBody = string
 				}
 
-				module GetContent {
+				namespace GetContent {
 					type Path = `/${Ordo.User.Current.DTO["id"]}/${Ordo.Metadata.FSID}`
 					type Method = "GET"
 					type Cookies = void
@@ -1265,7 +1261,7 @@ declare global {
 					type ResponseBody = string | ArrayBuffer
 				}
 
-				module SetContent {
+				namespace SetContent {
 					type Path =
 						`/${Ordo.User.Current.DTO["id"]}/${Ordo.Metadata.FSID}/${Ordo.Metadata.DTO["type"]}`
 					type Method = "PUT"
@@ -1276,7 +1272,7 @@ declare global {
 					type ResponseBody = void
 				}
 
-				module CreateContent {
+				namespace CreateContent {
 					type Path = `/${Ordo.User.Current.DTO["id"]}`
 					type Url =
 						`${string}${Path}?name=${string}&parent=${Ordo.Metadata.DTO["parent"]}&content_type=${Ordo.Metadata.DTO["type"]}`
@@ -1289,8 +1285,8 @@ declare global {
 				}
 			}
 
-			module ID {
-				module UpdateInfo {
+			namespace ID {
+				namespace UpdateInfo {
 					type Path = "/account/info"
 					type Method = "PATCH"
 					type Cookies = void
@@ -1309,7 +1305,7 @@ declare global {
 					type Response = { status: StatusCode; body: ResponseBody }
 				}
 
-				module UpdateEmail {
+				namespace UpdateEmail {
 					type Path = "/account/email"
 					type Method = "PATCH"
 					type Cookies = void
@@ -1328,7 +1324,7 @@ declare global {
 					type Response = { status: StatusCode; body: ResponseBody }
 				}
 
-				module UpdateHandle {
+				namespace UpdateHandle {
 					type Path = "/account/handle"
 					type Method = "PATCH"
 					type Cookies = void
@@ -1347,7 +1343,7 @@ declare global {
 					type Response = { status: StatusCode; body: ResponseBody }
 				}
 
-				module UpdatePassword {
+				namespace UpdatePassword {
 					type Path = "/account/password"
 					type Method = "PATCH"
 					type Cookies = void
@@ -1366,7 +1362,7 @@ declare global {
 					type Response = { status: StatusCode; body: ResponseBody }
 				}
 
-				module ConfirmEmail {
+				namespace ConfirmEmail {
 					type Path = "/account/confirm-email"
 					type Url = `${string}${Path}?email=${string}&code=${string}` // TODO: Define host
 					type Method = "POST"
@@ -1386,7 +1382,7 @@ declare global {
 					type Response = { status: StatusCode; body: ResponseBody }
 				}
 
-				module GetAccount {
+				namespace GetAccount {
 					type Path = "/account"
 					type Method = "GET"
 					type Cookies = void
@@ -1405,7 +1401,7 @@ declare global {
 					type Response = { status: StatusCode; body: ResponseBody }
 				}
 
-				module GetUserByEmail {
+				namespace GetUserByEmail {
 					type Path = `/users/email/${string}`
 					type Method = "GET"
 					type Cookies = void
@@ -1424,7 +1420,7 @@ declare global {
 					type Response = { status: StatusCode; body: ResponseBody }
 				}
 
-				module GetUserByHandle {
+				namespace GetUserByHandle {
 					type Path = `/users/handle/${string}`
 					type Method = "GET"
 					type Cookies = void
@@ -1443,7 +1439,7 @@ declare global {
 					type Response = { status: StatusCode; body: ResponseBody }
 				}
 
-				module GetUserByID {
+				namespace GetUserByID {
 					type Path = `/users/id/${string}`
 					type Method = "GET"
 					type Cookies = void
@@ -1462,7 +1458,7 @@ declare global {
 					type Response = { status: StatusCode; body: ResponseBody }
 				}
 
-				module RefreshToken {
+				namespace RefreshToken {
 					type Path = "/account/refresh-token"
 					type Method = "POST"
 					type Cookies = { sub?: string; jti?: string }
@@ -1481,7 +1477,7 @@ declare global {
 					type Response = { status: StatusCode; body: ResponseBody }
 				}
 
-				module SignIn {
+				namespace SignIn {
 					type Path = "/account/sign-in"
 					type Method = "POST"
 					type Cookies = void
@@ -1500,7 +1496,7 @@ declare global {
 					type Response = { status: StatusCode; body: ResponseBody }
 				}
 
-				module SignUp {
+				namespace SignUp {
 					type Path = "/account/sign-up"
 					type Method = "POST"
 					type Cookies = void
@@ -1519,7 +1515,7 @@ declare global {
 					type Response = { status: StatusCode; body: ResponseBody }
 				}
 
-				module SignOut {
+				namespace SignOut {
 					type Path = "/account/sign-out"
 					type Method = "POST"
 					type Cookies = { sub?: SUB; jti?: JTI }
@@ -1538,7 +1534,7 @@ declare global {
 					type Response = { status: StatusCode }
 				}
 
-				module VerifyToken {
+				namespace VerifyToken {
 					type Path = "/account/verify-token"
 					type Method = "POST"
 					type Cookies = void

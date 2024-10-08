@@ -3,6 +3,6 @@
 
 export type * from "./src/maoka.types"
 
-import { create, lazy, render_dom, styled } from "./src/maoka.impl"
+import { create, html, lazy, render_dom, styled } from "./src/maoka.impl"
 
-export const Maoka = { create, lazy, styled, render_dom }
+export const Maoka = { create, html, lazy, styled, render_dom }

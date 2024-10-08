@@ -56,6 +56,11 @@ export const styled =
 			return children_thunk
 		})
 
+export const html = (tag: string, html: string) =>
+	create(tag, ({ element }) => {
+		element.innerHTML = html
+	})
+
 export const render_dom: T.TMaokaRenderDOMFn = async (root, component) => {
 	const root_id: string = crypto.randomUUID()
 

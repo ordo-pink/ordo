@@ -1,5 +1,5 @@
 import { CurrentUserReference, Link, MetadataIcon } from "@ordo-pink/maoka-components"
-import { Maoka, type TMaokaChildren } from "@ordo-pink/maoka"
+import { Maoka, type TMaokaChildren, type TMaokaElement } from "@ordo-pink/maoka"
 import { BsPlus } from "@ordo-pink/frontend-icons"
 import { MaokaJabs } from "@ordo-pink/maoka-jabs"
 import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
@@ -108,7 +108,7 @@ export const Database = (metadata: Ordo.Metadata.Instance, ctx: Ordo.CreateFunct
 										)
 
 										return () => [
-											BsPlus(),
+											BsPlus() as TMaokaElement,
 											Maoka.create("div", () => () => "New"), // TODO: i18n
 										]
 									})

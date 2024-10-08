@@ -32,10 +32,7 @@ export const FileEditorSidebarItem = (
 				event.preventDefault()
 				event.stopPropagation()
 
-				commands.emit("cmd.application.context_menu.show", {
-					event: event as any,
-					payload: metadata,
-				})
+				commands.emit("cmd.application.context_menu.show", { event, payload: metadata })
 			}),
 		)
 

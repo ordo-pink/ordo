@@ -78,9 +78,9 @@ export default create_function(
 		})
 
 		// TODO: Move to metadata
-		commands.on("cmd.metadata.show_remove_modal", fsid =>
+		commands.on("cmd.metadata.show_remove_modal", () =>
 			commands.emit("cmd.application.modal.show", {
-				render: div => void Maoka.render_dom(div, RemoveFileModal(ctx, fsid)),
+				render: div => void Maoka.render_dom(div, RemoveFileModal(/*ctx, fsid*/)),
 			}),
 		)
 
@@ -139,8 +139,8 @@ export default create_function(
 			activity: {
 				name: "pink.ordo.file-explorer.activity",
 				routes: ["/files", "/files/:fsid"],
-				render_workspace: div => {
-					void Maoka.render_dom(div, FileExplorer(ctx))
+				render_workspace: async div => {
+					await Maoka.render_dom(div, FileExplorer(/*ctx*/))
 				},
 				render_icon: span => {
 					span.innerHTML = BS_FOLDER_2_OPEN

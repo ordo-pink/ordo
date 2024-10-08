@@ -1,5 +1,5 @@
 import { BsCaretDown, BsCaretRight } from "@ordo-pink/frontend-icons"
-import { Maoka, type TMaokaJab } from "@ordo-pink/maoka"
+import { Maoka, TMaokaElement, type TMaokaJab } from "@ordo-pink/maoka"
 import { MaokaJabs } from "@ordo-pink/maoka-jabs"
 import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
 import { Metadata } from "@ordo-pink/core"
@@ -149,11 +149,13 @@ const FileEditorDirectoryName = (
 		}
 	})
 
-const directory_active = "bg-gradient-to-tr from-pink-900 to-rose-900"
+const directory_active =
+	"bg-gradient-to-tr from-pink-300 to-rose-300 dark:from-pink-900 from-pink-300 to-rose-300 dark:to-rose-900"
 
 const file_editor_sidebar_directory_name_classes = [
 	"flex justify-between items-center w-full rounded-sm",
-	"hover:bg-gradient-to-r hover:from-neutral-700 hover:to-stone-700",
+	"hover:bg-gradient-to-r hover:from-neutral-300 hover:to-stone-300",
+	"hover:dark:bg-gradient-to-r hover:dark:from-neutral-700 hover:dark:to-stone-700",
 	"file_editor_sidebar_directory_name",
 ]
 
@@ -182,6 +184,6 @@ const FileEditorDirectoryNameCaret = (fsid: Ordo.Metadata.FSID, click_listener: 
 
 		return () =>
 			expanded_state[fsid]
-				? BsCaretDown("p-1 shrink-0 size-5")
-				: BsCaretRight("p-1 shrink-0 size-5 rotate-180")
+				? (BsCaretDown("p-1 shrink-0 size-5") as TMaokaElement)
+				: (BsCaretRight("p-1 shrink-0 size-5 rotate-180") as TMaokaElement)
 	})

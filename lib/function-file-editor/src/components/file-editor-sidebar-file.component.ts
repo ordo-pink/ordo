@@ -14,7 +14,8 @@ export const FileEditorSidebarFile = (metadata: Ordo.Metadata.Instance, depth = 
 
 		const file_editor_file_class = MaokaJabs.set_class(
 			"flex space-x-2 items-center rounded-sm",
-			"hover:bg-gradient-to-r hover:from-neutral-700 hover:to-stone-700",
+			"hover:bg-gradient-to-r hover:from-neutral-300 hover:to-stone-300",
+			"hover:dark:bg-gradient-to-r hover:dark:from-neutral-700 hover:dark:to-stone-700",
 			"file_editor_file",
 		)
 
@@ -46,8 +47,21 @@ export const FileEditorSidebarFile = (metadata: Ordo.Metadata.Instance, depth = 
 
 		return () => {
 			if (route?.params?.fsid === fsid)
-				use(MaokaJabs.add_class("bg-gradient-to-tr from-pink-900 to-rose-900"))
-			else use(MaokaJabs.remove_class("bg-gradient-to-tr", "from-pink-900", "to-rose-900"))
+				use(
+					MaokaJabs.add_class(
+						"bg-gradient-to-tr from-pink-300 to-rose-300 dark:from-pink-900 from-pink-300 to-rose-300 dark:to-rose-900",
+					),
+				)
+			else
+				use(
+					MaokaJabs.remove_class(
+						"bg-gradient-to-tr",
+						"to-rose-300",
+						"to-rose-300",
+						"dark:from-pink-900",
+						"dark:to-rose-900",
+					),
+				)
 
 			return [MetadataIcon({ metadata }), FileEditorFileName(metadata.get_name())]
 		}

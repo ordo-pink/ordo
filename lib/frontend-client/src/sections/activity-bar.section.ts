@@ -23,7 +23,7 @@ import { O, type TOption } from "@ordo-pink/option"
 import { Maoka } from "@ordo-pink/maoka"
 import { type TLogger } from "@ordo-pink/logger"
 
-import { ActivityBar } from "../components/activity-bar/activity-bar.component"
+import { ActivityBar } from "../components/activity-bar"
 
 type P = {
 	logger: TLogger
@@ -31,14 +31,12 @@ type P = {
 	current_activity$: Observable<TOption<Ordo.Activity.Instance>>
 	ctx: Ordo.CreateFunction.Params
 }
-export const init_activity_bar = ({ logger, activities$, current_activity$, ctx }: P) => {
+export const init_activity_bar = ({ logger, activities$, current_activity$: current$, ctx }: P) => {
 	logger.debug("🟡 Initialising activity bar...")
 
 	O.FromNullable(document.querySelector("#activity-bar"))
 		.pipe(O.ops.chain(root => (root instanceof HTMLDivElement ? O.Some(root) : O.None())))
-		.pipe(
-			O.ops.map(root => ({ root, component: ActivityBar(ctx, current_activity$, activities$) })),
-		)
+		.pipe(O.ops.map(root => ({ root, component: ActivityBar(ctx, current$, activities$) })))
 		.pipe(O.ops.map(({ root, component }) => Maoka.render_dom(root, component)))
 		.cata(O.catas.or_else(() => logger.error("#activity-bar div not found.")))
 

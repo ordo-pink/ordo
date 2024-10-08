@@ -54,7 +54,7 @@ export const init_i18n: TInitI18nFn = call_once(({ logger, commands, known_funct
 
 	const translate: Ordo.I18N.TranslateFn = key =>
 		translations$.getValue().cata({
-			Some: translations => translations[current_language$.getValue()][key],
+			Some: translations => translations[current_language$.getValue()][key] ?? key,
 			None: () => key,
 		})
 

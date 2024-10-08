@@ -41,12 +41,13 @@ export const init_notifications = ({ logger, commands, ctx }: P) => {
 	commands.on("cmd.application.notification.hide", payload => remove$.next(payload))
 	commands.on("cmd.application.notification.show", payload =>
 		add$.next({
+			title: payload.title,
 			id: payload.id ?? crypto.randomUUID(),
 			type: payload.type ?? NotificationType.DEFAULT,
-			duration: payload.duration ?? 0,
-			message: payload.message ?? "",
-			on_click: payload.on_click ?? (() => void 0),
-			render_icon: payload.render_icon ?? (null as any),
+			duration: payload.duration,
+			message: payload.message,
+			on_click: payload.on_click,
+			render_icon: payload.render_icon,
 		}),
 	)
 

@@ -107,7 +107,7 @@ export const create_client = async ({ logger, is_dev, hosts }: P) => {
 
 	const { get_sidebar } = init_workspace(logger, known_functions, commands, current_activity$)
 	init_background_task_display(logger, commands)
-	init_title_display(logger, commands)
+	init_title_display(logger, commands, translate)
 
 	const internal_context: Ordo.CreateFunction.Params = {
 		fid: APP_FID,

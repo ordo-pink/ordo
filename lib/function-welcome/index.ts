@@ -20,26 +20,46 @@
 // import { BsCollection, BsEnvelope, BsQuestionOctagon, BsSendCheck } from "react-icons/bs"
 
 import { BS_COLLECTION } from "@ordo-pink/frontend-icons"
+import { Maoka } from "@ordo-pink/maoka"
 import { create_function } from "@ordo-pink/core"
 
-import { Maoka } from "@ordo-pink/maoka"
-import { WelcomeWorkspace } from "./src/welcome.workspace"
+import { create_welcome_workspace } from "./src/welcome.workspace"
 
 declare global {
 	interface t {
 		welcome: {
-			authenticated_page_title: () => string
-			beta_started_announcement: () => string
-			cookies_warning: () => string
-			news_widget_title: () => string
-			unauthenticated_page_title: () => string
+			go_to_welcome_page: () => string
 			command_palette: {
 				support: {
 					open_support_palette: () => string
 					email: () => string
 					messenger: () => string
 				}
-				go_to_welcome_page: () => string
+			}
+			start_page: {
+				title: () => string
+				news_widget: {
+					title: () => string
+				}
+			}
+			landing_page: {
+				title: () => string
+				cookie_banner: {
+					title: () => string
+					message: () => string
+				}
+				rrr_sign_up_unavailable: {
+					title: () => string
+					message: () => string
+				}
+				sections: {
+					hero: {
+						beta_started_announcement: () => string
+						learn_more: () => string
+						try_now_button: () => string
+						sign_up: () => string
+					}
+				}
 			}
 		}
 	}
@@ -73,16 +93,18 @@ export default create_function(
 			"cmd.application.command_palette.show",
 			"cmd.application.modal.hide",
 			"cmd.application.modal.show",
+			"cmd.application.notification.show",
 			"cmd.application.router.navigate",
 			"cmd.application.router.open_external",
 			"cmd.application.set_title",
 			"cmd.auth.open_sign_in",
 			"cmd.auth.open_sign_up",
 			"cmd.functions.activities.register",
-			"cmd.welcome.open_support_palette",
-			"cmd.welcome.go_to_welcome_page",
 			"cmd.welcome.go_to_email_support",
 			"cmd.welcome.go_to_messenger_support",
+			"cmd.welcome.go_to_welcome_page",
+			"cmd.welcome.open_support_palette",
+			"cmd.file_editor.open",
 		],
 	},
 	ctx => {
@@ -91,15 +113,22 @@ export default create_function(
 		commands.emit("cmd.application.add_translations", {
 			lang: "en",
 			translations: {
-				"t.welcome.authenticated_page_title": "Welcome back!",
-				"t.welcome.beta_started_announcement": "public beta is live!",
-				"t.welcome.cookies_warning": "We don't use cookies! Wait, what?",
-				"t.welcome.news_widget_title": "News",
-				"t.welcome.unauthenticated_page_title": "One space for docs, files and projects",
-				"t.welcome.command_palette.go_to_welcome_page": "Go to homepage",
+				"t.welcome.go_to_welcome_page": "Open welcome page",
+				"t.welcome.landing_page.cookie_banner.message": "Wait, what?!",
+				"t.welcome.landing_page.cookie_banner.title": "We don't use cookies",
+				"t.welcome.landing_page.sections.hero.beta_started_announcement": "public beta is live!",
+				"t.welcome.landing_page.title": "One space for docs, files and projects",
+				"t.welcome.start_page.news_widget.title": "News",
+				"t.welcome.start_page.title": "Welcome back!",
 				"t.welcome.command_palette.support.email": "Contact via email",
 				"t.welcome.command_palette.support.messenger": "Contact via messenger",
 				"t.welcome.command_palette.support.open_support_palette": "Support...",
+				"t.welcome.landing_page.sections.hero.learn_more": "Learn More",
+				"t.welcome.landing_page.sections.hero.try_now_button": "Try Now",
+				"t.welcome.landing_page.sections.hero.sign_up": "Sign Up",
+				"t.welcome.landing_page.rrr_sign_up_unavailable.message":
+					"Signing up is not available right now. You can use ORDO without credentials, tho!",
+				"t.welcome.landing_page.rrr_sign_up_unavailable.title": "Wrong button!",
 			},
 		})
 
@@ -164,7 +193,7 @@ export default create_function(
 			fid: ctx.fid,
 			activity: {
 				name: "pink.ordo.welcome.landing-page",
-				render_workspace: div => Maoka.render_dom(div, WelcomeWorkspace(ctx)),
+				render_workspace: div => Maoka.render_dom(div, create_welcome_workspace(ctx)),
 				render_icon: span => {
 					span.innerHTML = BS_COLLECTION
 					return Promise.resolve()

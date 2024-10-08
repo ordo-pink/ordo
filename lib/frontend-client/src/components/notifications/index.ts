@@ -6,22 +6,21 @@ import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
 
 import { Notification } from "./notification.component"
 
+import "./notifications.css"
+
 export const Notifications = (
 	ctx: Ordo.CreateFunction.Params,
-	notification$: Observable<Ordo.Notification.Instance[]>,
+	$: Observable<Ordo.Notification.Instance[]>,
 ) =>
-	Maoka.create("div", ({ use, refresh }) => {
+	Maoka.create("div", ({ use }) => {
 		use(MaokaOrdo.Context.provide(ctx))
-		use(MaokaJabs.set_class("flex flex-col gap-y-1"))
+		use(MaokaJabs.set_class("notification-list"))
 
-		let notifications: Ordo.Notification.Instance[] = []
+		const get_list = use(MaokaOrdo.Jabs.from$($, [] as Ordo.Notification.Instance[]))
 
-		const handle_notification_updates = (new_notifications: Ordo.Notification.Instance[]) => {
-			notifications = new_notifications
-			void refresh()
+		return () => {
+			const notifications = get_list()
+
+			return notifications.map(item => Notification(item))
 		}
-
-		use(MaokaOrdo.Jabs.subscribe(notification$, handle_notification_updates))
-
-		return () => notifications.map(item => Notification(item))
 	})

@@ -30,7 +30,6 @@ import { type Root, createRoot } from "react-dom/client"
 import { O, type TOption } from "@ordo-pink/option"
 import { type TUnwrapOk } from "@ordo-pink/result"
 import { create_function } from "@ordo-pink/core"
-import { create_ordo_context } from "@ordo-pink/frontend-react-hooks"
 
 import Auth from "./views/auth.workspace"
 
@@ -118,41 +117,41 @@ const AUTH_KEYS = [] as const
 export type TAuthTranslationKey = (typeof AUTH_KEYS)[number]
 
 // TODO: Lazy translations installation
-const EN_TRANSLATIONS: TScopedTranslations<"auth"> = {
-	"errors.sign_in.einval": "Provided input is invalid",
-	"errors.sign_in.eio": "Error connecting to the server",
-	"errors.sign_in.enoent": "User with provided credentials does not exist",
-	"errors.sign_up.eexist": "User with this email or handle already exists",
-	"errors.sign_up.einval": "Provided inputs are invalid",
-	"errors.sign_up.eio": "Error connecting to the server",
-	"errors.unexpected_error": "Unexpected error",
-	"inputs.email.is_valid": "Email is valid",
-	"inputs.email.label": "Email",
-	"inputs.email.placeholder": "hey@ordo.pink",
-	"inputs.handle.is_valid": "Handle is valid",
-	"inputs.handle.label": "Handle",
-	"inputs.handle.placeholder": "armstrong",
-	"inputs.password.has_capital_letter": "Password contains a capital letter",
-	"inputs.password.has_digit": "Password contains a digit",
-	"inputs.password.has_special_char": "Password contains a special char",
-	"inputs.password.label": "Password",
-	"inputs.password.length_valid": "Password is 8 to 50 chars long",
-	"inputs.password.passwords_match": "Passwords match",
-	"inputs.password.placeholder": "*********",
-	"inputs.password.repeat_password_label": "Repeat password",
-	"legal.license.label": "License",
-	"legal.privacy_policy.consent": "I agree to ",
-	"legal.privacy_policy.label": "Privacy Policy",
-	"pages.sign_in.label": "Sign In",
-	"pages.sign_in.not_signed_up": "Not a member?",
-	"pages.sign_in.status_bar_title": "",
-	"pages.sign_out.label": "Sign Out",
-	"pages.sign_up.already_signed_up": "Already signed up?",
-	"pages.sign_up.label": "Sign Up",
-	"pages.sign_up.status_bar_title": "",
-	"user.open_current_user_profile": "Open user page",
-	"user.open_achievements": "Open achievements",
-	"user.open_settings": "Open settings",
+const EN_TRANSLATIONS: Partial<Ordo.I18N.Translations> = {
+	"t.auth.errors.sign_in.einval": "Provided input is invalid",
+	"t.auth.errors.sign_in.eio": "Error connecting to the server",
+	"t.auth.errors.sign_in.enoent": "User with provided credentials does not exist",
+	"t.auth.errors.sign_up.eexist": "User with this email or handle already exists",
+	"t.auth.errors.sign_up.einval": "Provided inputs are invalid",
+	"t.auth.errors.sign_up.eio": "Error connecting to the server",
+	"t.auth.errors.unexpected_error": "Unexpected error",
+	"t.auth.inputs.email.is_valid": "Email is valid",
+	"t.auth.inputs.email.label": "Email",
+	"t.auth.inputs.email.placeholder": "hey@ordo.pink",
+	"t.auth.inputs.handle.is_valid": "Handle is valid",
+	"t.auth.inputs.handle.label": "Handle",
+	"t.auth.inputs.handle.placeholder": "armstrong",
+	"t.auth.inputs.password.has_capital_letter": "Password contains a capital letter",
+	"t.auth.inputs.password.has_digit": "Password contains a digit",
+	"t.auth.inputs.password.has_special_char": "Password contains a special char",
+	"t.auth.inputs.password.label": "Password",
+	"t.auth.inputs.password.length_valid": "Password is 8 to 50 chars long",
+	"t.auth.inputs.password.passwords_match": "Passwords match",
+	"t.auth.inputs.password.placeholder": "*********",
+	"t.auth.inputs.password.repeat_password_label": "Repeat password",
+	"t.auth.legal.license.label": "License",
+	"t.auth.legal.privacy_policy.consent": "I agree to ",
+	"t.auth.legal.privacy_policy.label": "Privacy Policy",
+	"t.auth.pages.sign_in.label": "Sign In",
+	"t.auth.pages.sign_in.not_signed_up": "Not a member?",
+	"t.auth.pages.sign_in.status_bar_title": "",
+	"t.auth.pages.sign_out.label": "Sign Out",
+	"t.auth.pages.sign_up.already_signed_up": "Already signed up?",
+	"t.auth.pages.sign_up.label": "Sign Up",
+	"t.auth.pages.sign_up.status_bar_title": "",
+	"t.auth.user.open_current_user_profile": "Open user page",
+	"t.auth.user.open_achievements": "Open achievements",
+	"t.auth.user.open_settings": "Open settings",
 }
 
 // TODO: Move to core
@@ -205,8 +204,8 @@ export default create_function(
 				commands.emit("cmd.application.router.navigate", "/user/settings")
 
 			const on_sign_out = () => {
-				const path: Routes.ID.SignOut.Path = "/account/sign-out"
-				const method: Routes.ID.SignOut.Method = "POST"
+				const path: Ordo.Routes.ID.SignOut.Path = "/account/sign-out"
+				const method: Ordo.Routes.ID.SignOut.Method = "POST"
 				const credentials = "include"
 				const url = hosts.id.concat(path)
 

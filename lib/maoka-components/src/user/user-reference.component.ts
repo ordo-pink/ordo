@@ -1,5 +1,5 @@
+import { Maoka, type TMaokaElement } from "@ordo-pink/maoka"
 import { BsCaretRight } from "@ordo-pink/frontend-icons"
-import { Maoka } from "@ordo-pink/maoka"
 import { MaokaJabs } from "@ordo-pink/maoka-jabs"
 import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
 import { Result } from "@ordo-pink/result"
@@ -45,7 +45,7 @@ const UserAvatarIcon = Maoka.create("div", ({ use }) => {
 	use(MaokaJabs.set_class("size-3 rounded-full text-xs"))
 
 	// TODO: User icon
-	return () => BsCaretRight("size-3 white")
+	return () => BsCaretRight("size-3 white") as TMaokaElement
 })
 
 export const UserName = (name: string) =>

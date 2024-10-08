@@ -3,39 +3,16 @@ import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
 import { Metadata } from "@ordo-pink/core"
 import { R } from "@ordo-pink/result"
 import { Switch } from "@ordo-pink/switch"
-import { TOption } from "@ordo-pink/option"
-import { equals } from "ramda"
 
 export const FileEditorWorkspace = (ctx: Ordo.CreateFunction.Params) => {
-	return Maoka.create("div", ({ use, refresh }) => {
+	return Maoka.create("div", ({ use }) => {
 		use(MaokaOrdo.Context.provide(ctx))
 
-		let route: Ordo.Router.Route | null = null
-		const $ = use(MaokaOrdo.Jabs.CurrentRoute$)
-		const handle_current_route_change = (value: TOption<Ordo.Router.Route>) =>
-			R.FromOption(value, () => null)
-				.pipe(R.ops.chain(r => R.If(r.path !== route?.path, { T: () => r, F: () => r })))
-				.pipe(R.ops.chain(r => R.If(!equals(r, route), { T: () => r, F: () => r })))
-				.cata({
-					Ok: async updated_route => {
-						route = updated_route
-						await refresh()
-					},
-					Err: async null_or_same_route => {
-						// Skip since routes are equal
-						if (null_or_same_route || !route) return
-
-						route = null_or_same_route
-						await refresh()
-					},
-				})
-
-		use(MaokaOrdo.Jabs.subscribe($, handle_current_route_change))
+		const get_route_params = use(MaokaOrdo.Jabs.RouteParams)
 		const metadata_query = use(MaokaOrdo.Jabs.MetadataQuery)
 
 		return () =>
-			R.FromNullable(route)
-				.pipe(R.ops.chain(MaokaOrdo.Ops.get_route_params))
+			R.FromNullable(get_route_params())
 				.pipe(R.ops.chain(({ fsid }) => R.FromNullable(fsid)))
 				.pipe(R.ops.chain(check_is_fsid_valid))
 				.pipe(R.ops.chain(metadata_query.get_by_fsid))
@@ -111,10 +88,7 @@ const get_metadata_with_ancestors = (
 		.pipe(R.ops.map(ancestors => ({ metadata: metadata!, ancestors })))
 
 const set_title = (emit: Ordo.Command.Commands["emit"], title: string) =>
-	emit("cmd.application.set_title", {
-		status_bar_title: title,
-		window_title: `${title} | File Editor`,
-	})
+	emit("cmd.application.set_title", `${title} | File Editor` as any)
 
 // TODO: Move to metadata utils
 const get_path = (ancestors: Ordo.Metadata.Instance[], metadata: Ordo.Metadata.Instance) =>

@@ -42,7 +42,7 @@
 	@apply hover:bg-emerald-300 hover:dark:bg-emerald-900;
 }
 
-.notification-card_close.default {
+.notification-card_close.warn {
 	@apply hover:bg-amber-300 hover:dark:bg-amber-900;
 }
 
@@ -74,7 +74,7 @@
 	@apply bg-emerald-300 dark:bg-emerald-900;
 }
 
-.notification-card_progress_foreground.default {
+.notification-card_progress_foreground.warn {
 	@apply bg-amber-300 dark:bg-amber-900;
 }
 

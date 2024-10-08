@@ -16,21 +16,22 @@ export default Maoka.create("div", ({ use, on_unmount }) => {
 
 	document.addEventListener("mousemove", event => handle_mouse_move(event))
 
+	on_unmount(() => {
+		document.removeEventListener("mousemove", event => handle_mouse_move(event))
+		Object.assign(document.documentElement, { style: "" })
+	})
+
 	if (!modal_shown) {
 		commands.emit("cmd.application.notification.show", {
 			title: "t.welcome.landing_page.cookie_banner.title",
 			message: "t.welcome.landing_page.cookie_banner.message",
 			type: NotificationType.WARN,
+			duration: 15,
 			render_icon: span => span.appendChild(BsCookie("size-5") as SVGSVGElement),
 		})
 
 		modal_shown = true
 	}
-
-	on_unmount(() => {
-		document.removeEventListener("mousemove", event => handle_mouse_move(event))
-		Object.assign(document.documentElement, { style: "" })
-	})
 
 	const handle_mouse_move = (event: MouseEvent) => {
 		const dx = (event.clientX - window.innerWidth / 2) * -0.005

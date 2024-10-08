@@ -8,6 +8,8 @@ import { Notification } from "./notification.component"
 
 import "./notifications.css"
 
+// BUG Notification duration gets reset when rerendering
+// TODO Notification stack when there are more than 5 notifications
 export const Notifications = (
 	ctx: Ordo.CreateFunction.Params,
 	$: Observable<Ordo.Notification.Instance[]>,

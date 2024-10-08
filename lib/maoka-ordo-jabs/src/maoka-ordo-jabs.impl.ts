@@ -148,11 +148,15 @@ export const get_route_params: TMaokaJab<() => Record<string, string | undefined
 			{} as RouteParams,
 		)
 
-	const handle_current_route_update = (new_value: TOption<Ordo.Router.Route>) =>
-		R.FromOption(new_value)
-			.pipe(R.ops.chain(route => R.FromNullable(route.params)))
-			.pipe(R.ops.map(url_decode_params))
-			.cata(R.catas.or_else(() => ({}) as RouteParams))
+	const handle_current_route_update = (value: TOption<Ordo.Router.Route>): RouteParams => {
+		const new_route = value.unwrap() ?? null
+
+		if (!new_route) {
+			return {} as RouteParams
+		}
+
+		return url_decode_params(new_route.params ?? {})
+	}
 
 	return use(from$($, initial_state, handle_current_route_update))
 }

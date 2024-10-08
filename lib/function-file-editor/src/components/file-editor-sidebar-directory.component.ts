@@ -12,33 +12,14 @@ import { equals } from "ramda"
 
 const expanded_state = {} as Record<Ordo.Metadata.FSID, boolean>
 
+const is_fsid = Metadata.Validations.is_fsid
+
 export const FileEditorSidebarDirectory = (metadata: Ordo.Metadata.Instance, depth = 0) =>
 	Maoka.create("div", ({ use, refresh }) => {
 		const fsid = metadata.get_fsid()
 
 		const metadata_query = use(MaokaOrdo.Jabs.MetadataQuery)
-
-		let route: Ordo.Router.Route | null = null
-		const $ = use(MaokaOrdo.Jabs.CurrentRoute$)
-		const handle_current_route_change = (value: TOption<Ordo.Router.Route>) =>
-			R.FromOption(value, () => null)
-				.pipe(R.ops.chain(r => R.If(r.path !== route?.path, { T: () => r, F: () => r })))
-				.pipe(R.ops.chain(r => R.If(!equals(r, route), { T: () => r, F: () => r })))
-				.cata({
-					Ok: async updated_route => {
-						route = updated_route
-						await refresh()
-					},
-					Err: async null_or_same_route => {
-						// Skip since routes are equal
-						if (null_or_same_route || !route) return
-
-						route = null_or_same_route
-						await refresh()
-					},
-				})
-
-		use(MaokaOrdo.Jabs.subscribe($, handle_current_route_change))
+		const get_route_params = use(MaokaOrdo.Jabs.RouteParams)
 
 		const on_caret_click = (event: MouseEvent) => {
 			event.stopPropagation()
@@ -51,19 +32,16 @@ export const FileEditorSidebarDirectory = (metadata: Ordo.Metadata.Instance, dep
 			// provided in route params (opened in the FileEditor workspace). It should also cover
 			// cases when user navigates to another file with a link.
 			// TODO check if it actually expands directories when navigating via a link.
-			R.FromNullable(route)
-				.pipe(R.ops.chain(MaokaOrdo.Ops.get_route_params))
-				.pipe(
-					R.ops.chain(({ fsid }) =>
-						R.If(Metadata.Validations.is_fsid(fsid), { T: () => fsid as Ordo.Metadata.FSID }),
-					),
-				)
+			R.Try(get_route_params)
+				.pipe(R.ops.chain(({ fsid }) => R.FromNullable(fsid)))
+				.pipe(R.ops.chain(x => R.If(is_fsid(x), { T: () => x as Ordo.Metadata.FSID })))
 				.pipe(R.ops.chain(fsid => metadata_query.get_ancestors(fsid)))
 				.cata(R.catas.if_ok(as => as.forEach(a => void (expanded_state[a.get_fsid()] = true))))
 
 			return metadata_query
 				.get_children(fsid)
 				.pipe(
+					// TODO Move to Metadata + add sorting from File Explorer (by name with numbers)
 					R.ops.map(is =>
 						is.sort((a, b) => {
 							const a_dir = metadata_query

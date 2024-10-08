@@ -114,6 +114,18 @@ export const get_metadata_query: TMaokaJab<Ordo.Metadata.Query> = ({ use }) => {
 	return use(computed("metadata_query", unwrap_metadata_query))
 }
 
+export const get_content_query: TMaokaJab<Ordo.Content.Query> = ({ use }) => {
+	const { get_content_query } = use(ordo_context.consume)
+	const logger = use(get_logger)
+
+	const unwrap_content_query = () =>
+		get_content_query()
+			.pipe(R.ops.err_tap(logger.alert))
+			.cata(R.catas.or_else(() => null as never))
+
+	return use(computed("content_query", unwrap_content_query))
+}
+
 export const get_translations: TMaokaJab<{ t: Ordo.I18N.TranslateFn }> = ({ use, refresh }) => {
 	const { get_translations, translate } = use(ordo_context.consume)
 	const $ = get_translations()

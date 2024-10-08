@@ -228,6 +228,7 @@ declare global {
 			add_links: () => { fsid: Ordo.Metadata.FSID; links: Ordo.Metadata.FSID[] }
 			remove_links: () => { fsid: Ordo.Metadata.FSID; links: Ordo.Metadata.FSID[] }
 			set_property: () => { fsid: Ordo.Metadata.FSID; key: string; value: any }
+			set_size: () => { fsid: Ordo.Metadata.FSID; size: number }
 		}
 		content: {
 			get: () => Ordo.Metadata.FSID
@@ -236,9 +237,8 @@ declare global {
 				name: string
 				parent: Ordo.Metadata.FSID | null
 				content: string | ArrayBuffer
-				content_type: string
+				type: string
 			}
-			drop: () => Ordo.Metadata.FSID
 		}
 	}
 
@@ -440,11 +440,11 @@ declare global {
 			type GetCommandsFn = () => Ordo.Command.Commands
 			type GetIsAuthenticatedFn = () => TResult<Observable<boolean>, Ordo.Rrr<"EPERM">>
 			type GetMetadataQueryFn = () => TResult<Ordo.Metadata.Query, Ordo.Rrr<"EPERM">>
+			type GetContentQueryFn = () => TResult<Ordo.Content.Query, Ordo.Rrr<"EPERM">>
 			type GetUserQueryFn = () => TResult<Ordo.User.Query, Ordo.Rrr<"EPERM">>
 			type GetCurrentLanguageFn = () => TResult<Observable<TwoLetterLocale>, Ordo.Rrr<"EPERM">>
 			type GetTranslationsFn = () => Observable<TOption<Ordo.I18N.Translations>>
 			type SetCurrentActivityFn = (name: string) => TResult<void, Ordo.Rrr<"EPERM" | "ENOENT">>
-			// type TGetContentQueryFn = () => TResult<TContentQuery, Ordo.Rrr<"EPERM">>>
 
 			type GetCurrentActivityFn = () => TResult<
 				Observable<TOption<Ordo.Activity.Instance>>,
@@ -483,7 +483,7 @@ declare global {
 				get_user_query: GetUserQueryFn
 				get_file_associations: GetFileAssociationsFn
 				get_current_file_association: GetCurrentFileAssociationFn
-				// get_content_query: TGetContentQueryFn
+				get_content_query: GetContentQueryFn
 			}
 		}
 
@@ -536,7 +536,7 @@ declare global {
 				is_loading: boolean
 				is_editable: boolean
 				is_embedded: boolean
-				content: string | ArrayBuffer | null
+				content: Ordo.Content.Instance
 				metadata: Ordo.Metadata.Instance
 			}
 		}
@@ -671,6 +671,48 @@ declare global {
 			}
 		}
 
+		namespace Content {
+			type Instance = string | ArrayBuffer | null
+
+			type Storage = Record<Ordo.Metadata.FSID, Ordo.Content.Instance>
+
+			type RepositoryStatic = {
+				Of: (content$: BehaviorSubject<Ordo.Content.Storage>) => Repository
+			}
+
+			type Repository = {
+				get: () => TResult<Ordo.Content.Storage, Ordo.Rrr<"EAGAIN">>
+				put: (content: Ordo.Content.Storage) => TResult<void, Ordo.Rrr<"EINVAL">>
+				get $(): Observable<number>
+			}
+
+			type RepositoryAsyncStatic = {
+				Of: (data_host: string, fetch: Ordo.Fetch) => RepositoryAsync
+			}
+
+			type RepositoryAsync = {
+				get: (
+					fsid: Ordo.Metadata.FSID,
+					token: string,
+				) => Oath<Ordo.Content.Instance, Ordo.Rrr<"EIO" | "EACCES" | "EINVAL" | "ENOENT">>
+				put: (
+					fsid: Ordo.Metadata.FSID,
+					content: Ordo.Content.Instance,
+					token: string,
+				) => Oath<void, Ordo.Rrr<"EINVAL" | "EACCES" | "EIO">>
+			}
+
+			type QueryStatic = {
+				Of: (repository: Ordo.Content.RepositoryAsync) => Ordo.Content.Query
+			}
+
+			type Query = {
+				get: (
+					fsid: Ordo.Metadata.FSID,
+				) => Oath<Ordo.Content.Instance, Ordo.Rrr<"EIO" | "EACCES" | "EINVAL" | "ENOENT">>
+			}
+		}
+
 		namespace Metadata {
 			type FSID = `${string}-${string}-${string}-${string}-${string}`
 			type Props = Readonly<Record<string, any>>
@@ -789,7 +831,7 @@ declare global {
 			type QueryOptions = { show_hidden?: boolean }
 
 			type QueryStatic = {
-				Of: (metadataRepository: Ordo.Metadata.Repository) => Query
+				Of: (repository: Ordo.Metadata.Repository) => Query
 			}
 
 			type Query = {

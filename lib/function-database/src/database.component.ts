@@ -1,4 +1,4 @@
-import { CurrentUserReference, Link, MetadataIcon } from "@ordo-pink/maoka-components"
+import { Button, CurrentUserReference, Link, MetadataIcon } from "@ordo-pink/maoka-components"
 import { Maoka, type TMaokaChildren, type TMaokaElement } from "@ordo-pink/maoka"
 import { BsPlus } from "@ordo-pink/frontend-icons"
 import { MaokaJabs } from "@ordo-pink/maoka-jabs"
@@ -9,14 +9,25 @@ import { R } from "@ordo-pink/result"
 
 const BORDER_COLOR_CLASS = "border-neutral-300 dark:border-neutral-700"
 
-export const Database = (metadata: Ordo.Metadata.Instance, ctx: Ordo.CreateFunction.Params) =>
+type TDatabaseState = {
+	it_works?: boolean
+}
+
+export const Database = (
+	metadata: Ordo.Metadata.Instance,
+	content: Ordo.Content.Instance,
+	ctx: Ordo.CreateFunction.Params,
+) =>
 	Maoka.create("div", ({ use, refresh, on_unmount }) => {
 		let descendents: Ordo.Metadata.Instance[] = []
+		const fsid = metadata.get_fsid()
+		const database_state: TDatabaseState = content ? JSON.parse(content as string) : {}
 
 		use(MaokaOrdo.Context.provide(ctx))
 		use(MaokaJabs.set_class("p-4"))
 
 		const metadata_query = use(MaokaOrdo.Jabs.MetadataQuery)
+		const commands = use(MaokaOrdo.Jabs.Commands)
 
 		const subscription = metadata_query.$.subscribe(() => {
 			const metadata_descendents = metadata_query
@@ -49,6 +60,20 @@ export const Database = (metadata: Ordo.Metadata.Instance, ctx: Ordo.CreateFunct
 				]
 
 				return () => [
+					Button.Success({
+						on_click: () => {
+							database_state.it_works = !database_state.it_works
+							commands.emit("cmd.content.set", {
+								fsid,
+								content_type: "database/ordo",
+								content: JSON.stringify(database_state),
+							})
+
+							void refresh()
+						},
+						text: "click me",
+					}),
+					Maoka.create("div", () => () => String(database_state.it_works)),
 					Maoka.create("thead", () => {
 						return () =>
 							Maoka.create("tr", ({ use }) => {

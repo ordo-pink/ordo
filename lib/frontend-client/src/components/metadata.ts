@@ -52,7 +52,7 @@ export const init_metadata: TInitMetadataFn = ({
 	user_query,
 	fetch,
 }) => {
-	logger.debug("Initialising metadata...")
+	logger.debug("🟡 Initialising metadata...")
 
 	const metadata_repository = MetadataRepository.Of(metadata$)
 	const remote_metadata_repository = CacheMetadataRepository.Of(hosts.dt, fetch)
@@ -70,6 +70,14 @@ export const init_metadata: TInitMetadataFn = ({
 
 	commands.on("cmd.metadata.add_labels", ({ fsid, labels }) =>
 		metadata_command.add_labels(fsid, ...labels).cata({ Ok: noop, Err }),
+	)
+
+	// TODO Use metadata_commands directly for changing size
+	commands.on("cmd.metadata.set_size", ({ fsid, size }) =>
+		metadata_command.set_size(fsid, size).cata({
+			Ok: noop,
+			Err,
+		}),
 	)
 
 	commands.on("cmd.metadata.remove_labels", ({ fsid, labels }) =>
@@ -113,7 +121,7 @@ export const init_metadata: TInitMetadataFn = ({
 				.default(noop),
 	)
 
-	logger.debug("Initialised metadata.")
+	logger.debug("🟢 Initialised metadata.")
 
 	return {
 		metadata_query,

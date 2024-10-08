@@ -67,6 +67,7 @@ export default create_function(
 			"data.metadata_query",
 			"application.current_route",
 			"users.users_query",
+			"data.content_query",
 			"functions.file_associations",
 		],
 	},

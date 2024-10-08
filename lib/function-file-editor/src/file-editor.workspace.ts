@@ -1,6 +1,7 @@
 import { Maoka } from "@ordo-pink/maoka"
 import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
 import { Metadata } from "@ordo-pink/core"
+import { Oath } from "@ordo-pink/oath"
 import { R } from "@ordo-pink/result"
 import { Switch } from "@ordo-pink/switch"
 
@@ -27,10 +28,16 @@ export const FileEditorWorkspace = (ctx: Ordo.CreateFunction.Params) => {
 // --- Internal ---
 
 const RenderPicker = (metadata: Ordo.Metadata.Instance) =>
-	Maoka.create("div", ({ use, refresh, element }) => {
+	Maoka.create("div", async ({ use, refresh, element, on_unmount }) => {
 		let file_associations: Ordo.FileAssociation.Instance[] = []
 
+		const metadata_fsid = metadata.get_fsid()
 		const metadata_type = metadata.get_type()
+
+		const content_query = use(MaokaOrdo.Jabs.ContentQuery)
+
+		const content0 = content_query.get(metadata_fsid)
+		const content = await content0.invoke(Oath.invokers.or_else(() => null))
 
 		const $ = use(MaokaOrdo.Jabs.FileAssociations$)
 		const handle_update = (value: Ordo.FileAssociation.Instance[]) => {
@@ -39,6 +46,8 @@ const RenderPicker = (metadata: Ordo.Metadata.Instance) =>
 				void refresh()
 			}
 		}
+
+		on_unmount(() => content0.cancel())
 
 		use(MaokaOrdo.Jabs.subscribe($, handle_update))
 
@@ -53,7 +62,7 @@ const RenderPicker = (metadata: Ordo.Metadata.Instance) =>
 				await file_association.render({
 					div: element as unknown as HTMLDivElement,
 					metadata,
-					content: null,
+					content,
 					is_editable: true,
 					is_embedded: false,
 					is_loading: false,

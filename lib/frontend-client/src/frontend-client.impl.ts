@@ -27,6 +27,7 @@ import { init_background_task_display } from "./sections/background-task-display
 // import { init_command_palette } from "./sections/command-palette.section"
 import { init_commands } from "./components/commands"
 // import { init_context_menu } from "./sections/context-menu.section"
+import { init_content } from "./components/content"
 import { init_fetch } from "./components/fetch"
 import { init_file_associations } from "./components/file-associations"
 import { init_hosts } from "./components/hosts"
@@ -95,13 +96,24 @@ export const create_client = async ({ logger, is_dev, hosts }: P) => {
 		set_current_activity,
 	})
 
-	const { get_metadata_query } = init_metadata({
+	const { metadata_query, get_metadata_query } = init_metadata({
 		auth$,
 		commands,
 		fetch,
 		hosts,
 		known_functions,
 		logger,
+		user_query,
+	})
+
+	const { get_content_query } = init_content({
+		auth$,
+		commands,
+		fetch,
+		hosts,
+		known_functions,
+		logger,
+		metadata_query,
 		user_query,
 	})
 
@@ -124,6 +136,7 @@ export const create_client = async ({ logger, is_dev, hosts }: P) => {
 		get_user_query: get_user_query(APP_FID),
 		get_current_file_association: get_current_file_association(APP_FID),
 		get_file_associations: get_file_associations(APP_FID),
+		get_content_query: get_content_query(APP_FID),
 		is_dev,
 		translate,
 	}
@@ -151,6 +164,7 @@ export const create_client = async ({ logger, is_dev, hosts }: P) => {
 		translate,
 		get_current_file_association,
 		get_file_associations,
+		get_content_query,
 	}
 
 	await import("@ordo-pink/function-welcome")
@@ -167,6 +181,10 @@ export const create_client = async ({ logger, is_dev, hosts }: P) => {
 		.then(f => f(shared_function_context))
 
 	await import("@ordo-pink/function-file-editor")
+		.then(module => module.default)
+		.then(f => f(shared_function_context))
+
+	await import("@ordo-pink/function-rich-text")
 		.then(module => module.default)
 		.then(f => f(shared_function_context))
 

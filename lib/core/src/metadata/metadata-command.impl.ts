@@ -174,7 +174,7 @@ export const MetadataCommand: Ordo.Metadata.CommandStatic = {
 				.pipe(R.ops.map(_dto_to_metadata))
 				.pipe(R.ops.chain(MC.Of(m_repo, m_query, u_query).replace)),
 
-		create: ({ name, parent, type = "text/ordo", labels = [], links = [], props = {} }) =>
+		create: ({ name, parent, size, type = "text/ordo", labels = [], links = [], props = {} }) =>
 			R.Merge([
 				_check_name_r("create", name),
 				_check_parent_r("create", parent),
@@ -182,11 +182,16 @@ export const MetadataCommand: Ordo.Metadata.CommandStatic = {
 				_check_links_r("create", links),
 				_check_type_r("create", type),
 				_check_props_r("create", props),
+				_check_size_r("create", size ?? 0),
 				_check_not_exists_by_name_r("create", m_query, name, parent),
 			])
 				.pipe(R.ops.chain(u_query.get_current))
 				.pipe(R.ops.map(user => user.get_id()))
-				.pipe(R.ops.map(id => M.Of({ name, parent, author_id: id, type, labels, links, props })))
+				.pipe(
+					R.ops.map(id =>
+						M.Of({ name, parent, author_id: id, type, labels, links, props, size: size ?? 0 }),
+					),
+				)
 				.pipe(R.ops.chain(item => m_query.get().pipe(R.ops.map(items => items.concat(item)))))
 				.pipe(R.ops.chain(m_repo.put)),
 

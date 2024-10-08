@@ -58,7 +58,7 @@ export const MR = MetadataRepository
 // TODO: Use all three in Manager
 export const CacheMetadataRepository: Ordo.Metadata.RepositoryAsyncStatic = {
 	Of: () => {
-		const indexed_db = indexedDB.open("ordo.pink", 1)
+		const indexed_db = indexedDB.open("ordo.pink", 2)
 
 		const result_p = new Promise<IDBDatabase>((resolve, reject) => {
 			indexed_db.onupgradeneeded = () => {

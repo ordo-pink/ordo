@@ -27,58 +27,68 @@ import { getc } from "@ordo-pink/getc"
 
 const { ORDO_STATIC_ROOT } = getc(["ORDO_STATIC_ROOT"])
 
-void Oath.of("./srv")
-	.chain(path => readdir0(path, { withFileTypes: true }))
-	.map(direntsToDirs)
-	.map(getNames)
-	.map(names => names.map(name => `./srv/${name}/static`))
-	.chain(paths =>
-		Oath.all(paths.map(path => dir_exists0(path).map(exists => (exists ? path : false)))),
+void Oath.Resolve("./srv")
+	.pipe(Oath.ops.chain(path => readdir0(path, { withFileTypes: true })))
+	.pipe(Oath.ops.map(direntsToDirs))
+	.pipe(Oath.ops.map(getNames))
+	.pipe(Oath.ops.map(names => names.map(name => `./srv/${name}/static`)))
+	.pipe(
+		Oath.ops.chain(paths =>
+			Oath.Merge(
+				paths.map(path => dir_exists0(path).pipe(Oath.ops.map(exists => (exists ? path : false)))),
+			),
+		),
 	)
-	.map(items => items.filter(Boolean) as string[])
-	.chain(publicPaths =>
-		Oath.all(
+	.pipe(Oath.ops.map(items => items.filter(Boolean) as string[]))
+	.and(publicPaths =>
+		Oath.Merge(
 			publicPaths.map(publicPath =>
-				readdir0(publicPath, { withFileTypes: true }).chain(dirents =>
-					Oath.all(
-						dirents.map(dirent => {
-							ConsoleLogger.info(
-								`STATIC copying file ${publicPath}/${dirent.name} -> ${ORDO_STATIC_ROOT}/${dirent.name}`,
-							)
+				readdir0(publicPath, { withFileTypes: true }).pipe(
+					Oath.ops.chain(dirents =>
+						Oath.Merge(
+							dirents.map(dirent => {
+								ConsoleLogger.info(
+									`STATIC copying file ${publicPath}/${dirent.name} -> ${ORDO_STATIC_ROOT}/${dirent.name}`,
+								)
 
-							return is_file0(`${publicPath}/${dirent.name}`).map(isFile => {
-								isFile &&
-									void Bun.write(
-										`${ORDO_STATIC_ROOT}/${dirent.name}`,
-										Bun.file(`${publicPath}/${dirent.name}`),
-									)
+								return is_file0(`${publicPath}/${dirent.name}`).pipe(
+									Oath.ops.map(isFile => {
+										isFile &&
+											void Bun.write(
+												`${ORDO_STATIC_ROOT}/${dirent.name}`,
+												Bun.file(`${publicPath}/${dirent.name}`),
+											)
 
-								// TODO: Copy directories
-							})
-						}),
+										// TODO: Copy directories
+									}),
+								)
+							}),
+						),
 					),
 				),
 			),
 		),
 	)
-	.orElse(die())
+	.invoke(Oath.invokers.or_else(die()))
 
 void runAsyncCommand0("opt/bun run --watch srv/static/index.ts", {
 	stdout: "pipe",
 	stderr: "pipe",
 	env: { ...process.env, FORCE_COLOR: "1" },
-}).orElse(die())
+}).invoke(Oath.invokers.or_else(die()))
 
-void Oath.of("./srv")
-	.chain(path => readdir0(path, { withFileTypes: true }))
-	.map(direntsToDirs)
-	.map(getNames)
-	.map(names => names.map(name => `./srv/${name}/static`))
-	.chain(paths =>
-		Oath.all(paths.map(path => dir_exists0(path).map(exists => (exists ? path : false)))),
+void Oath.Resolve("./srv")
+	.pipe(Oath.ops.chain(path => readdir0(path, { withFileTypes: true })))
+	.pipe(Oath.ops.map(direntsToDirs))
+	.pipe(Oath.ops.map(getNames))
+	.pipe(Oath.ops.map(names => names.map(name => `./srv/${name}/static`)))
+	.pipe(
+		Oath.ops.chain(paths =>
+			Oath.Merge(paths.map(path => dir_exists0(path).and(exists => (exists ? path : false)))),
+		),
 	)
-	.map(items => items.filter(Boolean) as string[])
-	.map(publicPaths =>
+	.and(items => items.filter(Boolean) as string[])
+	.and(publicPaths =>
 		publicPaths.map(publicPath =>
 			watch(publicPath, { recursive: true }, (event, filename) => {
 				ConsoleLogger.info(
@@ -89,4 +99,4 @@ void Oath.of("./srv")
 			}),
 		),
 	)
-	.orElse(die())
+	.invoke(Oath.invokers.or_else(die()))

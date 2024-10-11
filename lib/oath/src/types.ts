@@ -1,6 +1,8 @@
 // SPDX-FileCopyrightText: Copyright 2024, 谢尔盖||↓ and the Ordo.pink contributors
 // SPDX-License-Identifier: Unlicense
 
+// deno-lint-ignore-file no-explicit-any
+
 export type UnderOath<T> = T extends object & {
 	and(on_resolve: infer F, ...args: infer _): any
 }

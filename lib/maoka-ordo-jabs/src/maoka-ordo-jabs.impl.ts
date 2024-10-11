@@ -218,14 +218,14 @@ export const from$ =
 	<$TValue, $TTransformedValue = $TValue>(
 		$: Observable<$TValue>,
 		initial_value: $TTransformedValue,
-		transformer_fn: (new_value: $TValue) => $TTransformedValue = x =>
+		transformer_fn: (new_value: $TValue, old_value: $TTransformedValue) => $TTransformedValue = x =>
 			x as unknown as $TTransformedValue,
 	): TMaokaJab<() => $TTransformedValue> =>
 	({ use, refresh }) => {
 		let value = initial_value
 
 		const handle_stream_update = (new_value: $TValue) => {
-			const transformed_new_value = transformer_fn(new_value)
+			const transformed_new_value = transformer_fn(new_value, value)
 			if (value !== transformed_new_value) {
 				value = transformed_new_value
 				void refresh()

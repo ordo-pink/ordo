@@ -1,6 +1,9 @@
 // SPDX-FileCopyrightText: Copyright 2024, 谢尔盖||↓ and the Ordo.pink contributors
 // SPDX-License-Identifier: Unlicense
 
+import { Result } from "@ordo-pink/result"
+import { keys_of } from "@ordo-pink/tau"
+
 import {
 	computed,
 	from$,
@@ -21,8 +24,7 @@ import {
 	ordo_context,
 	subscription,
 } from "./src/maoka-ordo-jabs.impl"
-import { Result } from "@ordo-pink/result"
-import { keys_of } from "@ordo-pink/tau"
+import { get_descendents } from "./src/metadata-jabs.impl"
 
 export const MaokaOrdo = {
 	Jabs: {
@@ -43,6 +45,9 @@ export const MaokaOrdo = {
 		RouteParams: get_route_params,
 		from$,
 		computed,
+		Metadata: {
+			get_descendents,
+		},
 	},
 	Ops: {
 		get_route_params: (route: Ordo.Router.Route | null) =>

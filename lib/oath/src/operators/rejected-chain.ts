@@ -1,7 +1,9 @@
 // SPDX-FileCopyrightText: Copyright 2024, 谢尔盖||↓ and the Ordo.pink contributors
 // SPDX-License-Identifier: Unlicense
 
-import { Oath } from "../src/impl"
+// deno-lint-ignore-file no-explicit-any
+
+import { Oath } from "../impl.ts"
 
 export const rejected_chain_oath =
 	<$TResolve, $TReject, $TNewReject>(on_reject: (x: $TReject) => Oath<$TResolve, $TNewReject>) =>

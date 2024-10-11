@@ -1,21 +1,17 @@
 // SPDX-FileCopyrightText: Copyright 2024, 谢尔盖||↓ and the Ordo.pink contributors
 // SPDX-License-Identifier: Unlicense
 
-import { Oath } from "./src/impl"
-import { bimap_oath } from "./operators/bimap"
-import { chain_oath } from "./operators/chain"
-import { map_oath } from "./operators/map"
-import { or_nothing_oath } from "./invokers/or-nothing"
+import { Oath } from "./src/impl.ts"
 
-const times = new Array(10_000).fill(null)
+const times = new Array(100_000).fill(null)
 const avg = (arr: number[]): number => arr.reduce((acc, v) => acc + v, 0) / arr.length
 const log = (promise: number[], oath: number[], oathMethod: string, promiseMethod = "then") => {
-	console.log(`Oath.${oathMethod}: ${avg(oath).toPrecision(2)}`)
-	console.log(`Promise.${promiseMethod}: ${avg(promise).toPrecision(2)}`)
+	console.log(`Oath.${oathMethod}: ${avg(oath).toFixed(3)}`)
+	console.log(`Promise.${promiseMethod}: ${avg(promise).toFixed(3)}`)
 	console.log("")
 }
 
-const testBimap = async () => {
+const test_bimap = async () => {
 	const oath = []
 	const promise = []
 
@@ -25,12 +21,12 @@ const testBimap = async () => {
 
 		await Oath.Resolve(1)
 			.pipe(
-				bimap_oath(
+				Oath.ops.bimap(
 					x => (x as any) + 1,
 					x => x + 1,
 				),
 			)
-			.invoke(or_nothing_oath)
+			.invoke(Oath.invokers.or_nothing)
 
 		oath.push(performance.now() - time)
 	}
@@ -50,7 +46,7 @@ const testBimap = async () => {
 	log(promise, oath, "bimap")
 }
 
-const testMap = async () => {
+const test_map = async () => {
 	const oath = []
 	const promise = []
 
@@ -59,8 +55,8 @@ const testMap = async () => {
 		const time = performance.now()
 
 		await Oath.Resolve(1)
-			.pipe(map_oath(x => x + 1))
-			.invoke(or_nothing_oath)
+			.pipe(Oath.ops.map(x => x + 1))
+			.invoke(Oath.invokers.or_nothing)
 
 		oath.push(performance.now() - time)
 	}
@@ -77,7 +73,7 @@ const testMap = async () => {
 	log(promise, oath, "map")
 }
 
-const testChain = async () => {
+const test_chain = async () => {
 	const oath = []
 	const promise = []
 
@@ -86,8 +82,8 @@ const testChain = async () => {
 		const time = performance.now()
 
 		await Oath.Resolve(1)
-			.pipe(chain_oath(x => Oath.Resolve(x + 1)))
-			.invoke(or_nothing_oath)
+			.pipe(Oath.ops.chain(x => Oath.Resolve(x + 1)))
+			.invoke(Oath.invokers.or_nothing)
 
 		oath.push(performance.now() - time)
 	}
@@ -104,7 +100,7 @@ const testChain = async () => {
 	log(promise, oath, "chain")
 }
 
-const testAnd = async () => {
+const test_and = async () => {
 	const oath = []
 	const promise = []
 
@@ -114,7 +110,7 @@ const testAnd = async () => {
 
 		await Oath.Resolve(1)
 			.and(x => x + 1)
-			.invoke(or_nothing_oath)
+			.invoke(Oath.invokers.or_nothing)
 
 		oath.push(performance.now() - time)
 	}
@@ -131,7 +127,7 @@ const testAnd = async () => {
 	log(promise, oath, "and")
 }
 
-const testFix = async () => {
+const test_fix = async () => {
 	const oath = []
 	const promise = []
 
@@ -141,7 +137,7 @@ const testFix = async () => {
 
 		await Oath.Reject(1)
 			.fix(x => x + 1)
-			.invoke(or_nothing_oath)
+			.invoke(Oath.invokers.or_nothing)
 
 		oath.push(performance.now() - time)
 	}
@@ -158,8 +154,8 @@ const testFix = async () => {
 	log(promise, oath, "fix", "catch")
 }
 
-void testMap()
-void testBimap()
-void testChain()
-void testAnd()
-void testFix()
+void test_map()
+void test_bimap()
+void test_chain()
+void test_and()
+void test_fix()

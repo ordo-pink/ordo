@@ -22,6 +22,7 @@ import { combineLatestWith, map } from "rxjs"
 import { O } from "@ordo-pink/option"
 import { Oath } from "@ordo-pink/oath"
 import { Result } from "@ordo-pink/result"
+
 import { CurrentUser } from "./user.impl"
 import { UserSubscription } from "../constants"
 

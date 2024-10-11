@@ -100,7 +100,6 @@ export default create_function(
 				routes: ["/editor", "/editor/:fsid"],
 				render_icon: div => {
 					div.innerHTML = BS_LAYOUT_TEXT_WINDOW
-					return Promise.resolve()
 				},
 				render_workspace: div => Maoka.render_dom(div, FileEditorWorkspace(ctx)),
 				render_sidebar: div => Maoka.render_dom(div, FileEditorSidebar(ctx)),

@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: Copyright 2024, 谢尔盖||↓ and the Ordo.pink contributors
 // SPDX-License-Identifier: Unlicense
 
-import { expect, mock, test } from "bun:test"
+import { expect, mock, test } from "jsr:@deno/test"
 
 import { Oath } from "./impl"
 import { bimap_oath } from "../operators/bimap"

@@ -43,6 +43,23 @@ export const MetadataManager: TMetadataManagerStatic = {
 					}),
 				)
 			// TODO: Cache/offline repo
+
+			l_repo.$.subscribe(i => {
+				if (i < 1) return
+
+				void Oath.Resolve(l_repo.get())
+					.pipe(Oath.ops.chain(res => res.cata({ Ok: Oath.Resolve, Err: Oath.Reject })))
+					.pipe(Oath.ops.map(metadata => metadata.map(item => item.to_dto())))
+					.pipe(Oath.ops.tap(() => on_state_change("put-remote")))
+					.pipe(Oath.ops.chain(metadata => r_repo.put("", metadata)))
+					.pipe(Oath.ops.tap(() => on_state_change("put-remote-complete")))
+					.invoke(
+						Oath.invokers.or_else(() => {
+							// TODO: Handle errors
+							on_state_change("put-remote-complete")
+						}),
+					)
+			})
 		},
 	}),
 	// 		auth$

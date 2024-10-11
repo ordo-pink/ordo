@@ -1,8 +1,10 @@
 // SPDX-FileCopyrightText: Copyright 2024, 谢尔盖||↓ and the Ordo.pink contributors
 // SPDX-License-Identifier: Unlicense
 
-import { UnderOath, UnderOathRejected } from "../src/types"
-import { Oath } from "../src/impl"
+// deno-lint-ignore-file no-explicit-any
+
+import type { UnderOath, UnderOathRejected } from "../types.ts"
+import { Oath } from "../impl.ts"
 
 type TArrayToUnion<T> = T extends Array<infer U> ? U : T
 type TRecordToUnion<T extends Record<string, unknown>> = { [P in keyof T]: T[P] }[keyof T]
@@ -10,7 +12,7 @@ type TRecordToUnion<T extends Record<string, unknown>> = { [P in keyof T]: T[P] 
 // TODO: Infer rejected type
 export const merge_oath = <$TSomeThings extends readonly unknown[] | [] | Record<string, unknown>>(
 	values: $TSomeThings,
-	abort_controller = new AbortController(),
+	abort_controller: AbortController = new AbortController(),
 ): Oath<
 	$TSomeThings extends []
 		? { -readonly [P in keyof $TSomeThings]: UnderOath<$TSomeThings[P]> }

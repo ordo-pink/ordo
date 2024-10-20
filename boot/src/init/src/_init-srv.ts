@@ -14,17 +14,17 @@ type _F = Thunk<Oath<void, void>>
 export const initSrv: _F = () =>
 	readdir0("./srv", { withFileTypes: true })
 		.tap(startInitSrvProgress)
-		.map(util.direntsToDirs)
-		.map(util.getNames)
+		.map(util.dirents_to_dirs)
+		.map(util.get_dirent_names)
 		.map(dirsToInitFilePaths)
-		.chain(util.checkFilesExist0)
-		.map(util.getExistingPaths)
+		.chain(util.check_files_exist)
+		.map(util.get_existing_paths)
 		.chain(runInitCommands0)
 		.bimap(breakInitSrvProgress, finishInitSrvProgress)
 
 // --- Internal ---
 
-const _intSrvProgress = util.createProgress()
+const _intSrvProgress = util.create_progress()
 const startInitSrvProgress = () => _intSrvProgress.start("Initializing server applications")
 const incInitSrvProgress = _intSrvProgress.inc
 const finishInitSrvProgress = _intSrvProgress.finish
@@ -34,5 +34,5 @@ const _dirToInitFilePath: Unary<string, string> = dir => `./srv/${dir}/bin/init.
 const dirsToInitFilePaths: Unary<string[], string[]> = map(_dirToInitFilePath)
 
 const _runInitCommand0: Unary<string, Oath<void, Error>> = path =>
-	util.runBunCommand0(`run ${path}`).tap(incInitSrvProgress)
+	util.run_bun_command(`run ${path}`).tap(incInitSrvProgress)
 const runInitCommands0: Unary<string[], Oath<void[], Error>> = pipe(map(_runInitCommand0), Oath.all)

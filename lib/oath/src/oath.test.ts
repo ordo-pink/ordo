@@ -1,27 +1,9 @@
 // SPDX-FileCopyrightText: Copyright 2024, 谢尔盖||↓ and the Ordo.pink contributors
 // SPDX-License-Identifier: Unlicense
 
-import { expect, mock, test } from "jsr:@deno/test"
+import { expect, mock, test } from "bun:test"
 
 import { Oath } from "./impl"
-import { bimap_oath } from "../operators/bimap"
-import { chain_oath } from "../operators/chain"
-import { empty_oath } from "../constructors/empty"
-import { from_falsy_oath } from "../constructors/from-falsy"
-import { from_nullable_oath } from "../constructors/from-nullable"
-import { from_promise_oath } from "../constructors/from-promise"
-import { if_else_oath } from "../constructors/if-else"
-import { map_oath } from "../operators/map"
-import { merge_oath } from "../constructors/merge"
-import { oathify } from "./oathify"
-import { or_else_oath } from "../invokers/or-else"
-import { or_nothing_oath } from "../invokers/or-nothing"
-import { rejected_chain_oath } from "../operators/rejected-chain"
-import { rejected_map_oath } from "../operators/rejected-map"
-import { swap_oath } from "../operators/swap"
-import { tap_oath } from "../operators/tap"
-import { to_promise_oath } from "../invokers/to-promise"
-import { try_oath } from "../constructors/try"
 
 // --- oathify ---
 
@@ -197,7 +179,7 @@ test("fromPromise0 should create a resolved oath from provided resolved promise 
 test("fromPromise0 should create a rejected oath from provided rejected promise thunk", async () => {
 	const resolved = from_promise_oath(() => Promise.reject(1)).fork(
 		x => x,
-		x => (x as any) + 1,
+		x => x + 1,
 	)
 
 	expect(await resolved).toEqual(1)
@@ -328,7 +310,7 @@ test("resolved oath.map should return an oath of value updated by the callback",
 
 test("rejected oath.map should return an oath of unchanged value", async () => {
 	const rejected = Oath.Reject(1)
-		.pipe(map_oath(x => (x as any) + 1))
+		.pipe(map_oath(x => x + 1))
 		.fix(x => x)
 		.invoke(to_promise_oath)
 
@@ -339,7 +321,7 @@ test("rejected oath.map should return an oath of unchanged value", async () => {
 
 test("resolved oath.rejectedMap should return an oath of unchanged value", async () => {
 	const resolved = Oath.Resolve(1)
-		.pipe(rejected_map_oath(x => (x as any) + 1))
+		.pipe(rejected_map_oath(x => x + 1))
 		.invoke(to_promise_oath)
 
 	expect(await resolved).toEqual(1)
@@ -377,7 +359,7 @@ test("resolved oath.chain should return a rejected oath of value updated by the 
 
 test("rejected oath.chain should return an oath of unchanged value", async () => {
 	const rejected = Oath.Reject(1)
-		.pipe(chain_oath(x => Oath.Resolve((x as any) + 1)))
+		.pipe(chain_oath(x => Oath.Resolve(x + 1)))
 		.fork(
 			x => x,
 			x => x,
@@ -390,7 +372,7 @@ test("rejected oath.chain should return an oath of unchanged value", async () =>
 
 test("resolved oath.rejectedChain should return an oath of unchanged value", async () => {
 	const resolved = Oath.Resolve(1)
-		.pipe(rejected_chain_oath(x => Oath.Resolve((x as any) + 1)))
+		.pipe(rejected_chain_oath(x => Oath.Resolve(x + 1)))
 		.fork(
 			x => x,
 			x => x,
@@ -427,7 +409,7 @@ test("resolved oath.bimap should return a resolved oath of value updated by the 
 	const resolved = Oath.Resolve(1)
 		.pipe(
 			bimap_oath(
-				x => (x as any) + 2,
+				x => x + 2,
 				x => x + 1,
 			),
 		)
@@ -441,7 +423,7 @@ test("rejected oath.bimap should return a rejected oath of value updated by the 
 		.pipe(
 			bimap_oath(
 				x => x + 2,
-				x => (x as any) + 1,
+				x => x + 1,
 			),
 		)
 		.fix(x => x)

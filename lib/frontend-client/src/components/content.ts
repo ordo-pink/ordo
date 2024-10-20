@@ -24,8 +24,8 @@ import {
 	NotificationType,
 	RRR,
 } from "@ordo-pink/core"
+import { invokers0, ops0 } from "@ordo-pink/oath"
 import { is_instance_of, is_string } from "@ordo-pink/tau"
-import { Oath } from "@ordo-pink/oath"
 import { R } from "@ordo-pink/result"
 import { Switch } from "@ordo-pink/switch"
 
@@ -81,8 +81,8 @@ export const init_content: TInitMetadataFn = ({
 				R.catas.if_ok(() =>
 					remote_content_repository
 						.put(fsid, content, "")
-						.pipe(Oath.ops.tap(() => commands.emit("cmd.metadata.set_size", { fsid, size })))
-						.invoke(Oath.invokers.or_else(Err)),
+						.pipe(ops0.tap(() => commands.emit("cmd.metadata.set_size", { fsid, size })))
+						.invoke(invokers0.or_else(Err)),
 				),
 			)
 		}
@@ -108,8 +108,8 @@ export const init_content: TInitMetadataFn = ({
 
 		void remote_content_repository
 			.put(metadata?.get_fsid(), content, "")
-			.pipe(Oath.ops.tap(() => commands.emit("cmd.metadata.set_size", { fsid, size })))
-			.invoke(Oath.invokers.or_else(Err))
+			.pipe(ops0.tap(() => commands.emit("cmd.metadata.set_size", { fsid, size })))
+			.invoke(invokers0.or_else(Err))
 	})
 
 	logger.debug("🟢 Initialised metadata.")

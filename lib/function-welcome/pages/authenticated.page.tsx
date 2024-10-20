@@ -19,8 +19,8 @@
 
 import { useEffect, useState } from "react"
 
+import { Oath, ops0 } from "@ordo-pink/oath"
 import { is_object, is_string } from "@ordo-pink/tau"
-import { Oath } from "@ordo-pink/oath"
 import { RRR } from "@ordo-pink/managers"
 import { use$ } from "@ordo-pink/frontend-react-hooks"
 
@@ -50,9 +50,9 @@ export default function AuthenticatedPage() {
 		const ordo_news0 = Oath.FromPromise(() =>
 			fetch(`${hosts.static}/news.${current_language}.json`),
 		)
-			.pipe(Oath.ops.chain(check_response_status_0))
-			.pipe(Oath.ops.chain(response_to_json_0))
-			.pipe(Oath.ops.chain(are_new_items_0))
+			.pipe(ops0.chain(check_response_status_0))
+			.pipe(ops0.chain(response_to_json_0))
+			.pipe(ops0.chain(are_new_items_0))
 
 		// TODO: Log error on reject
 		void ordo_news0.fork(
@@ -131,8 +131,8 @@ const are_new_items = (items: unknown[]): items is TNews[] =>
 
 const check_response_status_0 = (res: Response) =>
 	Oath.If(res.status === 200)
-		.pipe(Oath.ops.map(() => res))
-		.pipe(Oath.ops.rejected_map(() => einval(`check_response_status -> status: ${res.status}`)))
+		.pipe(ops0.map(() => res))
+		.pipe(ops0.rejected_map(() => einval(`check_response_status -> status: ${res.status}`)))
 
 const response_to_json_0 = (res: Response) =>
 	Oath.Try(
@@ -142,5 +142,5 @@ const response_to_json_0 = (res: Response) =>
 
 const are_new_items_0 = (news: unknown) =>
 	Oath.If(Array.isArray(news) && are_new_items(news))
-		.pipe(Oath.ops.map(() => news as TNews[]))
-		.pipe(Oath.ops.rejected_map(() => einval("are_new_items -> items are not TNews")))
+		.pipe(ops0.map(() => news as TNews[]))
+		.pipe(ops0.rejected_map(() => einval("are_new_items -> items are not TNews")))

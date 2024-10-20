@@ -33,6 +33,7 @@
 	"name": "@ordo-pink/ordo",
 	"devDependencies": {
 		"@types/bcryptjs": "^2.4.2",
+		"@types/bun": "^1.1.11",
 		"@types/eslint": "^8.56.2",
 		"@types/koa-bodyparser": "^4.3.10",
 		"@types/koa-cors": "^0.0.2",

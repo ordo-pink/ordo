@@ -17,9 +17,9 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { die, runAsyncCommand0 } from "@ordo-pink/binutil"
+import { die, run_async_command } from "@ordo-pink/binutil"
 
-void runAsyncCommand0("opt/bun run --watch srv/data/index.ts", {
+void run_async_command("opt/bun run --watch srv/data/index.ts", {
 	stdout: "pipe",
 	stderr: "pipe",
 	env: { ...process.env, FORCE_COLOR: "1" },

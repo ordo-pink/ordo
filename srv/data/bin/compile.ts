@@ -18,7 +18,7 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { create_dir_if_not_exists0, mv0 } from "@ordo-pink/fs"
-import { die, runBunCommand0 } from "@ordo-pink/binutil"
+import { die, run_bun_command } from "@ordo-pink/binutil"
 import { getc } from "@ordo-pink/getc"
 import { keys_of } from "@ordo-pink/tau"
 
@@ -32,7 +32,7 @@ const moveCompiledFileToOutDirectory0 = () => mv0("dt", "var/out/dt")
 const command = "build srv/data/index.ts --outfile=dt --target=bun --minify --compile "
 const envDefinitions = defineEnv(env)
 
-void runBunCommand0(command.concat(envDefinitions))
+void run_bun_command(command.concat(envDefinitions))
 	.chain(createOutDirectoryIfNotExists0)
 	.chain(moveCompiledFileToOutDirectory0)
 	.orElse(die())

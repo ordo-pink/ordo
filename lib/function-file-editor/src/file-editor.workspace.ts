@@ -1,9 +1,9 @@
 import { Maoka } from "@ordo-pink/maoka"
 import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
 import { Metadata } from "@ordo-pink/core"
-import { Oath } from "@ordo-pink/oath"
 import { R } from "@ordo-pink/result"
 import { Switch } from "@ordo-pink/switch"
+import { invokers0 } from "@ordo-pink/oath"
 
 export const FileEditorWorkspace = (ctx: Ordo.CreateFunction.Params) => {
 	return Maoka.create("div", ({ use }) => {
@@ -37,7 +37,7 @@ const RenderPicker = (metadata: Ordo.Metadata.Instance) =>
 		const content_query = use(MaokaOrdo.Jabs.ContentQuery)
 
 		const content0 = content_query.get(metadata_fsid)
-		const content = await content0.invoke(Oath.invokers.or_else(() => null))
+		const content = await content0.invoke(invokers0.or_else(() => null))
 
 		const $ = use(MaokaOrdo.Jabs.FileAssociations$)
 		const handle_update = (value: Ordo.FileAssociation.Instance[]) => {

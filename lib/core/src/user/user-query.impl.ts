@@ -20,8 +20,8 @@
 import { combineLatestWith, map } from "rxjs"
 
 import { O } from "@ordo-pink/option"
-import { Oath } from "@ordo-pink/oath"
 import { Result } from "@ordo-pink/result"
+import { ops0 } from "@ordo-pink/oath"
 
 import { CurrentUser } from "./user.impl"
 import { UserSubscription } from "../constants"
@@ -47,9 +47,9 @@ export const UserQuery: Ordo.User.QueryStatic = {
 		get_by_id: id =>
 			k_repo
 				.get()
-				.pipe(Oath.ops.map(users => O.FromNullable(users.find(u => u.get_id() === id))))
+				.pipe(ops0.map(users => O.FromNullable(users.find(u => u.get_id() === id))))
 				.pipe(
-					Oath.ops.tap(o => {
+					ops0.tap(o => {
 						if (o === O.None()) {
 							// TODO: Go get remote
 						}

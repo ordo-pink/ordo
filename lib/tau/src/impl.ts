@@ -19,9 +19,9 @@
 
 import { Oath } from "@ordo-pink/oath"
 import { TOption } from "@ordo-pink/option"
-
-import type * as Types from "./types"
 import { TResult } from "@ordo-pink/result"
+
+import type * as Types from "./types.ts"
 
 export const UUIDv4_RX = /^[0-9A-F]{8}-[0-9A-F]{4}-[4][0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$/i
 

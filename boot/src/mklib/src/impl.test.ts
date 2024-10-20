@@ -3,7 +3,7 @@
 
 import { expect, test } from "bun:test"
 import { is_dir0, is_file0, read_file0, rmdir0 } from "@ordo-pink/fs"
-import { getLicense } from "@ordo-pink/binutil"
+import { get_license } from "@ordo-pink/binutil"
 
 import { mklib } from "./impl"
 
@@ -25,7 +25,7 @@ test("should license the files with Unlicense", async () => {
 	await mklib("test-lib", "Unlicense")
 
 	const text = await read_file0("./lib/test-lib/license", { encoding: "utf-8" }).toPromise()
-	expect(text).toEqual(getLicense("Unlicense"))
+	expect(text).toEqual(get_license("Unlicense"))
 
 	await rmdir0("./lib/test-lib", { recursive: true }).toPromise()
 })
@@ -34,7 +34,7 @@ test("should license the files with AGPL-3.0-only", async () => {
 	await mklib("test-lib", "AGPL-3.0-only")
 
 	const text = await read_file0("./lib/test-lib/license", { encoding: "utf-8" }).toPromise()
-	expect(text).toEqual(getLicense("AGPL-3.0-only"))
+	expect(text).toEqual(get_license("AGPL-3.0-only"))
 
 	await rmdir0("./lib/test-lib", { recursive: true }).toPromise()
 })

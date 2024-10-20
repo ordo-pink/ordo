@@ -10,8 +10,15 @@ import type {
 	TUnderOath,
 	TUnderOathRejected,
 } from "./oath.types.ts"
+// deno-lint-ignore no-unused-vars
+import type { invokers0 } from "./invokers.ts" // eslint-disable-line @typescript-eslint/no-unused-vars
+// deno-lint-ignore no-unused-vars
+import type { ops0 } from "./operators/mod.ts" // eslint-disable-line @typescript-eslint/no-unused-vars
 
-// TODO: Replace never in $TReject with unknown
+/**
+ * Oath is a dependency free package that introduces laziness, cancellation and
+ * rejected branch types to your asynchronous code.
+ */
 export class Oath<$TResolve, $TReject = never> {
 	/**
 	 * Create an Oath that will resolve with provided value.
@@ -26,7 +33,17 @@ export class Oath<$TResolve, $TReject = never> {
 	 * ```
 	 */
 	public static Resolve = <$TResolve, $TReject = never>(
+		/**
+		 * Value to resolve with.
+		 */
 		value: $TResolve,
+
+		/**
+		 * Optional abort controller for cases when Oath was cancelled when it already
+		 * turned into a Promise.
+		 *
+		 * @optional
+		 */
 		abort_controller: AbortController = new AbortController(),
 	): Oath<$TResolve, $TReject> => new Oath(resolve => resolve(value), abort_controller)
 
@@ -43,13 +60,63 @@ export class Oath<$TResolve, $TReject = never> {
 	 * ```
 	 */
 	public static Reject = <$TReject, $TResolve = never>(
+		/**
+		 * Value to reject with.
+		 *
+		 * @optional
+		 * @default undefined
+		 */
 		value?: $TReject,
+
+		/**
+		 * Optional abort controller for cases when Oath was cancelled when it already
+		 * turned into a Promise.
+		 *
+		 * @optional
+		 */
 		abort_controller: AbortController = new AbortController(),
 	): Oath<$TResolve, $TReject> => new Oath((_, reject) => reject(value), abort_controller)
 
+	/**
+	 * Create an Oath that will resolve if provided `predicate` is true and reject otherwise.
+	 * Accepts optional `explosion` parameter which allows to define values to be resolved
+	 * (`T`) or rejected (`F`). If the explosion does not provide corresponding value, the
+	 * Oath will resolve/reject with `undefined`.
+	 *
+	 * @example
+	 * ```typescript
+	 * const maybe0 = Oath.If(Math.random() > 0.5, { T: () => "yes", F: () => "no"})
+	 *
+	 * maybe0
+	 * 	.invoke(invokers0.force_resolve)
+	 * 	.then(console.log) // Sometimes "yes", sometimes "no"
+	 * ```
+	 */
 	public static If = <$TResolve = undefined, $TReject = undefined>(
+		/**
+		 * Predicate that defines whether the Oath should resolve or reject (`true` - resolve,
+		 * `false` - reject).
+		 */
 		predicate: boolean,
+
+		/**
+		 * An "explosion" provided to the `Oath.If` as a second parameter to specify a value that
+		 * should be resolved or rejected.
+		 *
+		 * @optional
+		 * @default
+		 * ```typescript
+		 * { T: () => void, F: () => void }
+		 * ```
+		 */
 		explosion?: TOathIfExplosion<$TResolve, $TReject>,
+
+		/**
+		 * Optional abort controller for cases when Oath was cancelled when it already
+		 * turned into a Promise.
+		 *
+		 * @optional
+		 */
 		abort_controller: AbortController = new AbortController(),
 	): Oath<$TResolve, $TReject> => {
 		const T = explosion?.T ?? (() => void 0 as $TResolve)
@@ -68,6 +135,12 @@ export class Oath<$TResolve, $TReject = never> {
 	 * ```
 	 */
 	public static Empty = <$TReject = never>(
+		/**
+		 * Optional abort controller for cases when Oath was cancelled when it already
+		 * turned into a Promise.
+		 *
+		 * @optional
+		 */
 		abort_controller: AbortController = new AbortController(),
 	): Oath<void, $TReject> => new Oath(resolve => resolve(undefined), abort_controller)
 
@@ -89,7 +162,21 @@ export class Oath<$TResolve, $TReject = never> {
 	 */
 	public static FromNullable = <$TResolve, $TReject = null>(
 		value: $TResolve | null,
+
+		/**
+		 * Define a value to be rejected with if the value provided to `Oath.FromNullable`
+		 * was nullable.
+		 *
+		 * @optional
+		 */
 		on_null: () => $TReject = () => null as unknown as $TReject,
+
+		/**
+		 * Optional abort controller for cases when Oath was cancelled when it already
+		 * turned into a Promise.
+		 *
+		 * @optional
+		 */
 		abort_controller: AbortController = new AbortController(),
 	): Oath<NonNullable<$TResolve>, $TReject> =>
 		value == null ? Oath.Reject(on_null(), abort_controller) : Oath.Resolve(value, abort_controller)
@@ -109,15 +196,69 @@ export class Oath<$TResolve, $TReject = never> {
 	 * ```
 	 */
 	public static FromPromise = <$TResolve, $TReject = Error>(
+		/**
+		 * A thunk of Promise that allows to lazily trigger the Promise only when Oath is invoked
+		 * or forked.
+		 */
 		thunk: () => Promise<$TResolve>,
+
+		/**
+		 * Optional abort controller for cases when Oath was cancelled when it already
+		 * turned into a Promise.
+		 *
+		 * @optional
+		 */
 		abort_controller: AbortController = new AbortController(),
 	): Oath<$TResolve, $TReject> =>
 		new Oath((resolve, reject) => thunk().then(resolve, reject), abort_controller)
 
+	/**
+	 * Create an Oath that will lazily try to execute provided function and resolve
+	 * with the returned value if it succeeds, or reject with the caught error. It
+	 * also works with Promises - if the Promise returned by the function resolves,
+	 * the Oath resolves as well. If the Promise rejects, the Oath also rejects.
+	 *
+	 * @example
+	 * ```typescript
+	 * import { promises } from "node:fs"
+	 *
+	 * const package0 = Oath.Try(() => promises.readFile("./package.json", "utf8"))
+	 * 	.and(str => Oath.Try(() => JSON.parse(str)))
+	 * 	.invoke(invokers0.or_else(() => null))
+	 *
+	 * package0
+	 * 	.invoke(invokers0.or_else(() => null))
+	 * 	.then(console.log) // "@ordo-pink/oath"
+	 *
+	 * const asdf0 = Oath.Try(() => promises.readFile("./asdf.json", "utf8"))
+	 * 	.and(str => Oath.Try(() => JSON.parse(str)))
+	 * 	.invoke(invokers0.or_else(() => null))
+	 *
+	 * asdf
+	 * 	.invoke(invokers0.or_else(() => null))
+	 * 	.then(console.log) // null
+	 * ```
+	 */
 	public static Try = <$TResolve, $TReject = Error>(
+		/**
+		 * A function to be tried.
+		 */
 		thunk: () => $TResolve,
+
+		/**
+		 * Define a handler that overrides the caught error.
+		 *
+		 * @optional
+		 */
 		on_error = (error: unknown) =>
 			error instanceof Error ? error : (new Error(String(error as any)) as any),
+
+		/**
+		 * Optional abort controller for cases when Oath was cancelled when it already
+		 * turned into a Promise.
+		 *
+		 * @optional
+		 */
 		abort_controller: AbortController = new AbortController(),
 	): Oath<Awaited<$TResolve>, $TReject> => {
 		return new Oath(async (resolve, reject) => {
@@ -132,6 +273,13 @@ export class Oath<$TResolve, $TReject = never> {
 
 	public static Merge = <$TSomeThings extends readonly unknown[] | [] | Record<string, unknown>>(
 		values: $TSomeThings,
+
+		/**
+		 * Optional abort controller for cases when Oath was cancelled when it already
+		 * turned into a Promise.
+		 *
+		 * @optional
+		 */
 		abort_controller: AbortController = new AbortController(),
 	): Oath<
 		$TSomeThings extends []
@@ -247,49 +395,177 @@ export class Oath<$TResolve, $TReject = never> {
 		}
 	}
 
+	/**
+	 * Abort controller for cases when Oath was cancelled when it already
+	 * turned into a Promise.
+	 */
 	_abort_controller: AbortController
 
 	// TODO: Define cata return type
 	cata: (
-		Resolved: <_TNewResolve>(value: $TResolve) => _TNewResolve,
-		Rejected: <_TNewReject>(err?: $TReject) => _TNewReject,
+		resolved: <_TNewResolve>(value: $TResolve) => _TNewResolve,
+		rejected: <_TNewReject>(err?: $TReject) => _TNewReject,
 	) => any
 
+	/**
+	 * @constructor
+	 */
 	public constructor(
 		// TODO: Define cata return type
 		cata: (
 			resolve: <_TNewResolve>(value: $TResolve) => _TNewResolve,
 			reject: <_TNewReject>(err?: $TReject) => _TNewReject,
 		) => any,
+
+		/**
+		 * Optional abort controller for cases when Oath was cancelled when it already
+		 * turned into a Promise.
+		 *
+		 * @optional
+		 */
 		abortController: AbortController = new AbortController(),
 	) {
 		this.cata = cata
 		this._abort_controller = abortController
 	}
 
+	/**
+	 * Indeed it is an Oath.
+	 *
+	 * @readonly
+	 */
 	public get is_oath(): boolean {
 		return true
 	}
 
+	/**
+	 * Returns true if `.cancel` was called on the Oath.
+	 *
+	 * @readonly
+	 */
 	public get is_cancelled(): boolean {
 		return this._abort_controller.signal.aborted
 	}
 
+	/**
+	 * Returns the reason of cancellation if the Oath was cancelled. Returns `undefined`
+	 * if it was not cancelled.
+	 *
+	 * NOTE: It is better to check if the Oath was cancelled using `oath.is_cancelled`.
+	 *
+	 * @todo Preserve cancellation reason type
+	 * @readonly
+	 */
 	public get cancellation_reason(): string | undefined {
 		return this.is_cancelled ? this._abort_controller.signal.reason : undefined
 	}
 
-	public cancel(reason = "Cancelled") {
+	/**
+	 * Cancel the execution of the Oath. It will reject with a cancellation reason and operators
+	 * will not be piped any further even for the rejected branch.
+	 *
+	 * @example
+	 * ```typescript
+	 * import { useEffect, useState } from "react"
+	 *
+	 * // A very much real life example
+	 * const UserName = (id: string) => {
+	 * 	const [name, set_name] = useState("")
+	 *
+	 * 	useEffect(() => {
+	 * 		const name0 = fetch(`http://api.com/users/${id}`)
+	 * 			.and(response => response.json())
+	 * 			.and(json => Oath.FromNullable(json?.name, () => ""))
+	 *
+	 * 		name0
+	 * 			.invoke(invokers0.force_resolve)
+	 * 			.then(set_name)
+	 *
+	 * 		return () => {
+	 * 			name0.cancel("Id - changed, React - rerendered, Memory - saved")
+	 * 		}
+	 * 	}, [id])
+	 *
+	 * 	return <div>{name}</div>
+	 * }
+	 * ```
+	 */
+	public cancel(
+		/**
+		 * Reason the Oath is cancelled with.
+		 *
+		 * @optional
+		 * @default "Cancelled"
+		 */
+		reason = "Cancelled",
+	): void {
 		this._abort_controller.abort(reason)
 	}
 
+	/**
+	 * Apply a custom operator to the current Oath. An operator is a function that accepts
+	 * the current Oath and returns a new Oath with any changes made to the current state
+	 * of the Oath (or no changes at all).
+	 *
+	 * There are a few importable operators available as separate functions or as `ops0`
+	 * object inside the `@ordo-pink/oath` package.
+	 *
+	 * @see {@link ops0 Operators}
+	 * @example
+	 * import { Oath, ops0, invokers0 } from "@ordo-pink/oath"
+	 *
+	 * const excellent_example0 = Oath.Resolve(1)
+	 * 	.pipe(ops0.map(x => x + 1))
+	 * 	.pipe(ops0.tap(console.log))
+	 * 	.pipe(ops0.map(x => x + 2))
+	 *
+	 * // Console output: <no output>
+	 *
+	 * excellent_example0
+	 * 	.invoke(invokers0.or_nothing)
+	 * 	.then(console.log)
+	 *
+	 * // Console output:
+	 * // 2
+	 * // 4
+	 */
 	public pipe<NewResolve, NewReject>(
+		/**
+		 * An operator function that will be added to the pipeline of Oath execution.
+		 *
+		 * @see {@link ops0 Operators}
+		 */
 		operator: (o: Oath<$TResolve, $TReject>) => Oath<NewResolve, NewReject>,
 	): Oath<NewResolve, NewReject> {
+		if (this.is_cancelled) return this as unknown as Oath<NewResolve, NewReject>
 		return operator(this)
 	}
 
+	/**
+	 * Transform Oath value similarly to `Promise.then`. Does not accept second function for rejected
+	 * case. Has a different name to avoid collisions with awaiting `Thenable`. Can be provided with
+	 * a resolver with any return type.
+	 *
+	 * - If the resolver returns an `Oath`, it works like `ops0.chain`
+	 * - If the resolver returns a `Promise`, it creates Oath from Promise and works like `ops0.chain`
+	 * - If the resolver returns any other value, it works like `ops0.map`
+	 *
+	 * @see {@link ops0 Operators}
+	 *
+	 * @example
+	 * ```typescript
+	 * Oath.Resolve(1)
+	 * 	.and(x => x + 1)
+	 * 	.and(x => Promise.resolve(x + 1))
+	 * 	.and(x => Oath.Resolve(x + 1))
+	 * 	.and(console.log)
+	 * 	.invoke(invokers0.or_nothing) // 4
+	 * ```
+	 */
 	public and<NewResolve, NewReject>(
+		/**
+		 * Handler for the value Oath resolved with.
+		 */
 		on_resolve: (
 			x: $TResolve,
 		) => PromiseLike<NewResolve> | Oath<NewResolve, NewReject> | NewResolve,
@@ -321,7 +597,24 @@ export class Oath<$TResolve, $TReject = never> {
 		)
 	}
 
+	/**
+	 * An equivalent of `Promise.catch`. Can be provided with a handler with any return type. Returns
+	 * an Oath that will resolve.
+
+	 * @example
+	 * ```typescript
+	 * Oath.Reject(1)
+	 * 	.fix(x => x + 1)
+	 * 	.and(x => Promise.resolve(x + 1))
+	 * 	.and(x => Oath.Resolve(x + 1))
+	 * 	.and(console.log)
+	 * 	.invoke(invokers0.or_nothing) // 4
+	 * ```
+	 */
 	public fix<_TNewResolve, _TNewReject = never>(
+		/**
+		 * Handler for the value Oath rejected with.
+		 */
 		on_reject: (
 			x: $TReject,
 		) => PromiseLike<_TNewResolve> | Oath<_TNewResolve, _TNewReject> | _TNewResolve,
@@ -331,9 +624,7 @@ export class Oath<$TResolve, $TReject = never> {
 			(resolve, reject) =>
 				this.fork(
 					a => {
-						if (this.is_cancelled) {
-							return reject(this.cancellation_reason as any)
-						}
+						if (this.is_cancelled) return reject(this.cancellation_reason as any)
 
 						try {
 							const forked: any = on_reject(a)

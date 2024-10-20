@@ -14,21 +14,21 @@ type _F = Thunk<Oath<void, void>>
 export const createSymlinks: _F = () =>
 	readdir0("./etc/init", { withFileTypes: true })
 		.tap(startSymlinksProgress)
-		.map(util.direntsToFiles)
-		.map(util.getNames)
+		.map(util.dirents_to_files)
+		.map(util.get_dirent_names)
 		.chain(runSymlinkCommands0)
 		.bimap(breakSymlinksProgress, finishSymlinksProgress)
 
 // --- Internal ---
 
-const _symlinksProgress = util.createProgress()
+const _symlinksProgress = util.create_progress()
 const startSymlinksProgress = () => _symlinksProgress.start("Creating symbolic links")
 const incSymlinksProgress = _symlinksProgress.inc
 const finishSymlinksProgress = _symlinksProgress.finish
 const breakSymlinksProgress = _symlinksProgress.break
 
 const _runSymlinkCommand0: Unary<string, Oath<void, Error>> = file =>
-	util.runCommand0(`ln -snf ./etc/init/${file} ${file}`).tap(incSymlinksProgress)
+	util.run_command(`ln -snf ./etc/init/${file} ${file}`).tap(incSymlinksProgress)
 const runSymlinkCommands0: Unary<string[], Oath<void[], Error>> = pipe(
 	map(_runSymlinkCommand0),
 	Oath.all,

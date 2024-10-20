@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: Copyright 2024, 谢尔盖||↓ and the Ordo.pink contributors
 // SPDX-License-Identifier: Unlicense
 
-import { Oath } from "./src/impl.ts"
+import { Oath, invokers0, ops0 } from "./index.ts"
 
 const times = new Array(100_000).fill(null)
 const avg = (arr: number[]): number => arr.reduce((acc, v) => acc + v, 0) / arr.length
@@ -21,12 +21,12 @@ const test_bimap = async () => {
 
 		await Oath.Resolve(1)
 			.pipe(
-				Oath.ops.bimap(
+				ops0.bimap(
 					x => (x as any) + 1,
 					x => x + 1,
 				),
 			)
-			.invoke(Oath.invokers.or_nothing)
+			.invoke(invokers0.or_nothing)
 
 		oath.push(performance.now() - time)
 	}
@@ -55,8 +55,8 @@ const test_map = async () => {
 		const time = performance.now()
 
 		await Oath.Resolve(1)
-			.pipe(Oath.ops.map(x => x + 1))
-			.invoke(Oath.invokers.or_nothing)
+			.pipe(ops0.map(x => x + 1))
+			.invoke(invokers0.or_nothing)
 
 		oath.push(performance.now() - time)
 	}
@@ -82,8 +82,8 @@ const test_chain = async () => {
 		const time = performance.now()
 
 		await Oath.Resolve(1)
-			.pipe(Oath.ops.chain(x => Oath.Resolve(x + 1)))
-			.invoke(Oath.invokers.or_nothing)
+			.pipe(ops0.chain(x => Oath.Resolve(x + 1)))
+			.invoke(invokers0.or_nothing)
 
 		oath.push(performance.now() - time)
 	}
@@ -110,7 +110,7 @@ const test_and = async () => {
 
 		await Oath.Resolve(1)
 			.and(x => x + 1)
-			.invoke(Oath.invokers.or_nothing)
+			.invoke(invokers0.or_nothing)
 
 		oath.push(performance.now() - time)
 	}
@@ -137,7 +137,7 @@ const test_fix = async () => {
 
 		await Oath.Reject(1)
 			.fix(x => x + 1)
-			.invoke(Oath.invokers.or_nothing)
+			.invoke(invokers0.or_nothing)
 
 		oath.push(performance.now() - time)
 	}

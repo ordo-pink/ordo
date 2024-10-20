@@ -16,7 +16,7 @@ export const precommit = () =>
 
 // --- Internal ---
 
-const spdxRecordsProgress = util.createProgress()
+const spdxRecordsProgress = util.create_progress()
 
 const startSPDXRecordProgress = () => spdxRecordsProgress.start("Creating missing SPDX records")
 
@@ -53,7 +53,7 @@ const createSPDXRecord0 = (path: string) =>
 			exists
 				? read_file0(`${space}/license`, "utf-8")
 						.map(license => (license === unlicense ? "Unlicense" : "AGPL-3.0-only"))
-						.map(license => util.getSPDXRecord(license))
+						.map(license => util.get_spdx_record(license))
 						.chain(spdx =>
 							read_file0(path, "utf-8").chain(content =>
 								(content as string).startsWith(spdx)
@@ -65,7 +65,7 @@ const createSPDXRecord0 = (path: string) =>
 		),
 	)
 
-const createLicensesProgress = util.createProgress()
+const createLicensesProgress = util.create_progress()
 
 const startLicenseGenerationProgress = () =>
 	createLicensesProgress.start("Creating missing licenses")
@@ -80,8 +80,8 @@ const checkAndCreateMissingLicenses0 = () =>
 
 const createLicenses0 = (space: "lib" | "srv" | "boot/src") =>
 	readdir0(space, { withFileTypes: true })
-		.map(util.direntsToDirs)
-		.map(util.getNames)
+		.map(util.dirents_to_dirs)
+		.map(util.get_dirent_names)
 		.chain(collectMissingLicensePaths0(space))
 		.chain(createLicenseFiles0)
 
@@ -97,7 +97,7 @@ const collectMissingLicensePaths0: Curry<Binary<string, string[], Oath<string[]>
 
 const createLicenseFiles0: Unary<string[], Oath<void[], Error>> = paths =>
 	Oath.all(
-		paths.map(path => util.createRepositoryFile0(path, unlicense).tap(createLicensesProgress.inc)),
+		paths.map(path => util.create_repository_file(path, unlicense).tap(createLicensesProgress.inc)),
 	)
 
-const unlicense = util.getLicense("Unlicense")
+const unlicense = util.get_license("Unlicense")

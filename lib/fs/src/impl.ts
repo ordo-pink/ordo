@@ -21,7 +21,7 @@ import { BigIntStats, Stats, promises, watch } from "fs"
 import { cwd } from "process"
 import { join } from "path"
 
-import { Oath, oathify } from "@ordo-pink/oath"
+import { Oath, ops0 } from "@ordo-pink/oath"
 import { noop } from "@ordo-pink/tau"
 
 export const get_parent_path = (path: string) => {
@@ -33,6 +33,13 @@ export const get_parent_path = (path: string) => {
 export const get_absolute_path = (path: string) => {
 	return join(cwd(), path)
 }
+
+const oathify =
+	<T extends (...args: any[]) => any>(f: T) =>
+	(
+		...args: Parameters<T>
+	): T extends (...args: any[]) => infer I ? Oath<Awaited<I>, Error> : never =>
+		Oath.FromPromise(() => f(...args)) as any
 
 export const mkdir0 = oathify(promises.mkdir)
 export const rmdir0 = oathify(promises.rm)
@@ -51,27 +58,25 @@ export const write_file_rec0 = (...[path, data, options]: Parameters<typeof writ
 	Oath.If(typeof path === "string", {
 		F: () => new Error("writeFileRecursive0 can only create files from string paths"),
 	})
-		.pipe(Oath.ops.chain(() => create_parent_if_not_exists0(path as string)))
-		.pipe(Oath.ops.chain(() => write_file0(path, data, options)))
+		.pipe(ops0.chain(() => create_parent_if_not_exists0(path as string)))
+		.pipe(ops0.chain(() => write_file0(path, data, options)))
 
 export const create_dir_if_not_exists0 = (path: string) =>
 	stat0(path)
 		.fix(() => mkdir_rec0(path))
-		.pipe(Oath.ops.map(noop))
+		.pipe(ops0.map(noop))
 
 export const create_parent_if_not_exists0 = (path: string) =>
-	Oath.Resolve(path)
-		.pipe(Oath.ops.map(get_parent_path))
-		.pipe(Oath.ops.chain(create_dir_if_not_exists0))
+	Oath.Resolve(path).pipe(ops0.map(get_parent_path)).pipe(ops0.chain(create_dir_if_not_exists0))
 
 export const file_exists0 = (path: string) =>
 	stat0(path)
-		.pipe(Oath.ops.map(stat => stat.isFile()))
+		.pipe(ops0.map(stat => stat.isFile()))
 		.fix(() => false)
 
 export const dir_exists0 = (path: string) =>
 	stat0(path)
-		.pipe(Oath.ops.map(stat => stat.isDirectory()))
+		.pipe(ops0.map(stat => stat.isDirectory()))
 		.fix(() => false)
 
 export const is_file0 = file_exists0

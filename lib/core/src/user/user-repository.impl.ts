@@ -19,8 +19,8 @@
 
 import { map } from "rxjs"
 
+import { Oath, ops0 } from "@ordo-pink/oath"
 import { O } from "@ordo-pink/option"
-import { Oath } from "@ordo-pink/oath"
 import { Result } from "@ordo-pink/result"
 
 import { CurrentUser } from "./user.impl"
@@ -62,13 +62,13 @@ export const CurrentUserRepositoryAsync: Ordo.User.Current.RepositoryAsyncStatic
 	Of: (id_host, fetch) => ({
 		get: token =>
 			Oath.Resolve("/account" satisfies Ordo.Routes.ID.GetAccount.Path)
-				.pipe(Oath.ops.map(path => id_host.concat(path)))
-				.pipe(Oath.ops.chain(url => Oath.FromPromise(() => fetch(url, create_request_init(token)))))
-				.pipe(Oath.ops.chain(response => Oath.FromPromise(() => response.json())))
-				.pipe(Oath.ops.rejected_map(error => eio_current_user_async(error)))
-				.pipe(Oath.ops.chain(get_response_result0))
-				.pipe(Oath.ops.chain(validate_dto0))
-				.pipe(Oath.ops.map(CurrentUser.FromDTO)),
+				.pipe(ops0.map(path => id_host.concat(path)))
+				.pipe(ops0.chain(url => Oath.FromPromise(() => fetch(url, create_request_init(token)))))
+				.pipe(ops0.chain(response => Oath.FromPromise(() => response.json())))
+				.pipe(ops0.rejected_map(error => eio_current_user_async(error)))
+				.pipe(ops0.chain(get_response_result0))
+				.pipe(ops0.chain(validate_dto0))
+				.pipe(ops0.map(CurrentUser.FromDTO)),
 
 		put: () => Oath.Reject(eio_current_user_async("TODO: UNIMPLEMENTED")),
 	}),

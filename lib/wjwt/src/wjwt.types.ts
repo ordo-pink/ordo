@@ -20,6 +20,7 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+// TODO Use promises
 import { Oath } from "@ordo-pink/oath"
 import { RRR } from "./wjwt.constants"
 import { UUIDv4 } from "@ordo-pink/tau"

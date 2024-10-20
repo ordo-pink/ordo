@@ -19,9 +19,9 @@
 
 import { type Context } from "koa"
 
+import { Oath, invokers0 } from "@ordo-pink/oath"
 import { create_koa_server, send_error, send_success } from "@ordo-pink/backend-utils"
 import { NotificationService } from "@ordo-pink/backend-service-offline-notifications"
-import { Oath } from "@ordo-pink/oath"
 import { TokenService } from "@ordo-pink/backend-service-token"
 import { UserService } from "@ordo-pink/backend-service-user"
 
@@ -73,7 +73,7 @@ export const create_id_server = async ({
 	}
 
 	await user_service.migrate().invoke(
-		Oath.invokers.or_else(() => {
+		invokers0.or_else(() => {
 			logger.error(`Failed to migrate users to v${UserService.ENTITY_VERSION}`)
 			process.exit(1)
 		}),

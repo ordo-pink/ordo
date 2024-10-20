@@ -17,7 +17,7 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { die, runCommand0 } from "@ordo-pink/binutil"
+import { die, run_command } from "@ordo-pink/binutil"
 import { getc } from "@ordo-pink/getc"
 
 const {
@@ -44,7 +44,7 @@ const build = `docker build --build-arg ORDO_ID_DOCKER_PORT=${ORDO_ID_PORT} --bu
 const login = `docker login --username ${ORDO_ID_DOCKER_REGISTRY_USERNAME} --password ${ORDO_ID_DOCKER_REGISTRY_PASSWORD} ${ORDO_ID_DOCKER_REGISTRY}`
 const publish = `docker push ${ORDO_ID_DOCKER_REGISTRY}/${ORDO_ID_DOCKER_REGISTRY_SCOPE}/id:${ORDO_ID_VERSION}`
 
-void runCommand0(build)
-	.chain(() => runCommand0(login))
-	.chain(() => runCommand0(publish))
+void run_command(build)
+	.chain(() => run_command(login))
+	.chain(() => run_command(publish))
 	.orElse(die())

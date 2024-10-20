@@ -1,7 +1,5 @@
-import { Oath } from "@ordo-pink/oath"
+import { Oath, ops0 } from "@ordo-pink/oath"
 import { RRR } from "../rrr"
-import { Result } from "@ordo-pink/result"
-import { map } from "rxjs"
 
 export const CacheContentRepository: Ordo.Content.RepositoryAsyncStatic = {
 	Of: () => {
@@ -27,13 +25,13 @@ export const CacheContentRepository: Ordo.Content.RepositoryAsyncStatic = {
 		return {
 			get: fsid =>
 				Oath.FromPromise(() => result_p)
-					.pipe(Oath.ops.chain(db => Oath.FromNullable(db)))
-					.pipe(Oath.ops.rejected_map(rrr => eio("Failed to access IndexedDB cache", rrr)))
-					.pipe(Oath.ops.map(db => db.transaction("content", "readonly")))
-					.pipe(Oath.ops.map(transaction => transaction.objectStore("content")))
-					.pipe(Oath.ops.map(storage => storage.get(fsid)))
+					.pipe(ops0.chain(db => Oath.FromNullable(db)))
+					.pipe(ops0.rejected_map(rrr => eio("Failed to access IndexedDB cache", rrr)))
+					.pipe(ops0.map(db => db.transaction("content", "readonly")))
+					.pipe(ops0.map(transaction => transaction.objectStore("content")))
+					.pipe(ops0.map(storage => storage.get(fsid)))
 					.pipe(
-						Oath.ops.chain(
+						ops0.chain(
 							result =>
 								new Oath((resolve, reject) => {
 									result.onsuccess = event => resolve((event.target as any)?.result ?? null)
@@ -43,13 +41,13 @@ export const CacheContentRepository: Ordo.Content.RepositoryAsyncStatic = {
 					),
 			put: (fsid, content) =>
 				Oath.Try(() => indexed_db.result)
-					.pipe(Oath.ops.chain(db => Oath.FromNullable(db)))
-					.pipe(Oath.ops.rejected_map(() => eio("Failed to access cache inside IndexedDB")))
-					.pipe(Oath.ops.map(db => db.transaction("content", "readwrite")))
-					.pipe(Oath.ops.map(transaction => transaction.objectStore("content")))
-					.pipe(Oath.ops.map(storage => storage.put(content, fsid)))
+					.pipe(ops0.chain(db => Oath.FromNullable(db)))
+					.pipe(ops0.rejected_map(() => eio("Failed to access cache inside IndexedDB")))
+					.pipe(ops0.map(db => db.transaction("content", "readwrite")))
+					.pipe(ops0.map(transaction => transaction.objectStore("content")))
+					.pipe(ops0.map(storage => storage.put(content, fsid)))
 					.pipe(
-						Oath.ops.chain(
+						ops0.chain(
 							result =>
 								new Oath((resolve, reject) => {
 									result.onsuccess = () => resolve(void 0)
@@ -64,4 +62,3 @@ export const CacheContentRepository: Ordo.Content.RepositoryAsyncStatic = {
 const LOCATION = "ContentRepository"
 
 const eio = RRR.codes.eio(LOCATION)
-const einval = RRR.codes.einval(LOCATION)

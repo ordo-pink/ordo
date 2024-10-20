@@ -5,19 +5,19 @@ import { camel, pascal, title } from "case"
 
 import { Binary, Curry, Ternary, Thunk, Unary, noop } from "@ordo-pink/tau"
 import {
-	createProgress,
-	createRepositoryFile0,
-	getLicense,
-	getSPDXRecord,
+	create_progress,
+	create_repository_file,
+	get_license,
+	get_spdx_record,
 } from "@ordo-pink/binutil"
 import { dir_exists0, get_absolute_path } from "@ordo-pink/fs"
-import type { License } from "@ordo-pink/binutil"
+import type { TLicenseType } from "@ordo-pink/binutil"
 import { Oath } from "@ordo-pink/oath"
 import { isReservedJavaScriptKeyword } from "@ordo-pink/rkwjs"
 
 // --- Public ---
 
-export const mksrv = (name: string, license: License) =>
+export const mksrv = (name: string, license: TLicenseType) =>
 	Oath.of(isReservedJavaScriptKeyword(name) ? `${name}-srv` : name)
 		.tap(initProgress)
 		.chain(name =>
@@ -30,21 +30,23 @@ export const mksrv = (name: string, license: License) =>
 
 // --- Internal ---
 
-const progress = createProgress()
+const progress = create_progress()
 
-const createFiles0: Ternary<string, string, License, Thunk<Oath<void, Error>>> =
+const createFiles0: Ternary<string, string, TLicenseType, Thunk<Oath<void, Error>>> =
 	(path, name, license) => () =>
 		Oath.all([
-			createRepositoryFile0(`${path}/license`, getLicense(license)).tap(progress.inc),
-			createRepositoryFile0(`${path}/readme.md`, readme(name)).tap(progress.inc),
-			createRepositoryFile0(`${path}/index.ts`, index(name, license)).tap(progress.inc),
-			createRepositoryFile0(`${path}/src/${name}.impl.ts`, impl(name, license)).tap(progress.inc),
-			createRepositoryFile0(`${path}/src/${name}.impl.test.ts`, test(name, license)).tap(
+			create_repository_file(`${path}/license`, get_license(license)).tap(progress.inc),
+			create_repository_file(`${path}/readme.md`, readme(name)).tap(progress.inc),
+			create_repository_file(`${path}/index.ts`, index(name, license)).tap(progress.inc),
+			create_repository_file(`${path}/src/${name}.impl.ts`, impl(name, license)).tap(progress.inc),
+			create_repository_file(`${path}/src/${name}.impl.test.ts`, test(name, license)).tap(
 				progress.inc,
 			),
-			createRepositoryFile0(`${path}/src/${name}.types.ts`, types(name, license)).tap(progress.inc),
-			createRepositoryFile0(`${path}/bin/run.ts`, run(name, license)).tap(progress.inc),
-			createRepositoryFile0(`${path}/bin/init.ts`, init(name, license)).tap(progress.inc),
+			create_repository_file(`${path}/src/${name}.types.ts`, types(name, license)).tap(
+				progress.inc,
+			),
+			create_repository_file(`${path}/bin/run.ts`, run(name, license)).tap(progress.inc),
+			create_repository_file(`${path}/bin/init.ts`, init(name, license)).tap(progress.inc),
 		]).map(progress.finish)
 
 const rejectIfExists0: Curry<Binary<string, boolean, Oath<void, string>>> = name => exists =>
@@ -54,16 +56,19 @@ const rejectIfExists0: Curry<Binary<string, boolean, Oath<void, string>>> = name
 		() => `"srv/${name}" already exists!`,
 	)
 
-const createFilesIfNotExists0: Binary<string, License, Unary<string, Oath<void, string | Error>>> =
-	(name, license) => path =>
-		dir_exists0(path)
-			.chain(rejectIfExists0(name))
-			.chain(createFiles0(path, name, license))
+const createFilesIfNotExists0: Binary<
+	string,
+	TLicenseType,
+	Unary<string, Oath<void, string | Error>>
+> = (name, license) => path =>
+	dir_exists0(path)
+		.chain(rejectIfExists0(name))
+		.chain(createFiles0(path, name, license))
 
 const initProgress: Unary<string, void> = name =>
 	progress.start(`Initializing new server application "${name}"`)
 
-const run = (name: string, license: License) => `${getSPDXRecord(license)}
+const run = (name: string, license: TLicenseType) => `${get_spdx_record(license)}
 
 // This file is run with bun when executing "bin/run".
 // Configure starting the app here.
@@ -71,7 +76,7 @@ const run = (name: string, license: License) => `${getSPDXRecord(license)}
 console.log("TODO: set up ${name}")
 `
 
-const init = (name: string, license: License) => `${getSPDXRecord(license)}
+const init = (name: string, license: TLicenseType) => `${get_spdx_record(license)}
 
 // This file is run with bun when executing "bin/init".
 // If you need something to be done before running the app, this is the right place to start.
@@ -80,22 +85,22 @@ const init = (name: string, license: License) => `${getSPDXRecord(license)}
 console.log("TODO: set up ${name} initialization")
 `
 
-const index = (name: string, license: License) => `${getSPDXRecord(license)}
+const index = (name: string, license: TLicenseType) => `${get_spdx_record(license)}
 export * from "./src/${name}.impl"
 export * from "./src/${name}.types"
 `
 
-const impl = (name: string, license: License) => `${getSPDXRecord(license)}
+const impl = (name: string, license: TLicenseType) => `${get_spdx_record(license)}
 import type { ${pascal(name)} } from "./${name}.types"
 
 export const ${camel(name)}: ${pascal(name)} = "${name}"
 `
 
-const types = (name: string, license: License) => `${getSPDXRecord(license)}
+const types = (name: string, license: TLicenseType) => `${get_spdx_record(license)}
 export type ${pascal(name)} = "${name}"
 `
 
-const test = (name: string, license: License) => `${getSPDXRecord(license)}
+const test = (name: string, license: TLicenseType) => `${get_spdx_record(license)}
 import { test, expect } from "bun:test"
 import { ${camel(name)} } from "./${name}.impl"
 

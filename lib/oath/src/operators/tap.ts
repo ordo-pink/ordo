@@ -3,7 +3,7 @@
 
 // deno-lint-ignore-file no-explicit-any
 
-import { Oath } from "../impl.ts"
+import { Oath } from "../oath.impl.ts"
 
 export const tap_oath =
 	<$TResolve, $TReject>(

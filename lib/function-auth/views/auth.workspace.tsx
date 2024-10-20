@@ -19,7 +19,7 @@
 
 import { useEffect } from "react"
 
-import { Oath } from "@ordo-pink/oath"
+import { Oath, invokers0, ops0 } from "@ordo-pink/oath"
 import { Switch } from "@ordo-pink/switch"
 import { use$ } from "@ordo-pink/frontend-react-hooks"
 
@@ -36,13 +36,13 @@ export default function Auth() {
 	useEffect(() => {
 		void Oath.FromNullable(action)
 			.pipe(
-				Oath.ops.chain(action =>
+				ops0.chain(action =>
 					Oath.If(SUPPORTED_ACTIONS.includes(action), {
 						F: () => commands.emit("cmd.auth.open_sign_in"),
 					}),
 				),
 			)
-			.invoke(Oath.invokers.or_nothing)
+			.invoke(invokers0.or_nothing)
 	}, [action, commands])
 
 	const Component = Switch.Match(action)

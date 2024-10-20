@@ -17,15 +17,14 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { resolve } from "path"
+import { resolve } from "node:path"
 
 import { defineConfig } from "vite"
-import react from "@vitejs/plugin-react-swc"
 import tsconfigPaths from "vite-tsconfig-paths"
 
 // https://vitejs.dev/config/
 export default defineConfig({
-	plugins: [react(), tsconfigPaths()],
+	plugins: [tsconfigPaths()],
 
 	define: {
 		"process.env.IS_PREACT": JSON.stringify("false"),

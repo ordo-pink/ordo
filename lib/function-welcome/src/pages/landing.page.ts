@@ -102,6 +102,7 @@ const HeroSectionImageLayer = (index: number) =>
 		const hosts = use(MaokaOrdo.Jabs.Hosts)
 
 		const background_image = `url(${hosts.static}/index-hero-layer-${index}.png)`
+		console.log(background_image)
 
 		use(MaokaJabs.set_class(`hero-layer hero-layer_${index}`))
 		use(MaokaJabs.set_style({ backgroundImage: background_image }))

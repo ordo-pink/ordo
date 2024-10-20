@@ -17,7 +17,7 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { die, runCommand0 } from "@ordo-pink/binutil"
+import { die, run_command } from "@ordo-pink/binutil"
 import { getc } from "@ordo-pink/getc"
 
 const { ORDO_STATIC_HOST, ORDO_ID_HOST, ORDO_WEB_HOST, ORDO_DT_HOST, ORDO_WORKSPACE_HOST } = getc([
@@ -28,7 +28,7 @@ const { ORDO_STATIC_HOST, ORDO_ID_HOST, ORDO_WEB_HOST, ORDO_DT_HOST, ORDO_WORKSP
 	"ORDO_WORKSPACE_HOST",
 ])
 
-void runCommand0("npm run build", {
+void run_command("npm run build", {
 	cwd: "./srv/my",
 	stdin: "inherit",
 	stderr: "inherit",

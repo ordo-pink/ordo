@@ -20,16 +20,17 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import type { Context, HttpMethod, RequiredRouterState, Route, RouteMap, TRouter } from "./types"
-import { Oath } from "@ordo-pink/oath"
+import { Oath, ops0 } from "@ordo-pink/oath"
 
-const checkMethod = (method: HttpMethod, request: Request) => request.method === method
-const checkRoute = (route: Route, request: Request) =>
+import type { Context, HttpMethod, RequiredRouterState, Route, RouteMap, TRouter } from "./types"
+
+const check_method = (method: HttpMethod, request: Request) => request.method === method
+const check_route = (route: Route, request: Request) =>
 	route instanceof RegExp
 		? route.test(new URL(request.url).pathname)
 		: new URL(request.url).pathname === route
 
-const createNativeResponse = (ctx: Context) =>
+const create_native_response = (ctx: Context) =>
 	new Response(ctx.res.body, { headers: ctx.res.headers, status: ctx.res.status })
 
 const router = <T extends RequiredRouterState = RequiredRouterState>(
@@ -50,24 +51,28 @@ const router = <T extends RequiredRouterState = RequiredRouterState>(
 				...ctx.state,
 			},
 		}),
-	orElse: onError => req =>
-		Oath.fromNullable(
-			routes.find(([m, r]) => ctx.state.checkMethod(m, req) && ctx.state.checkRoute(r, req)),
+	or_else: on_error => req =>
+		Oath.FromNullable(
+			routes.find(([m, r]) => ctx.state.check_method(m, req) && ctx.state.check_route(r, req)),
 		)
-			.chain(([, route, gear]) =>
-				Oath.of({ ...ctx, req, route, res: RoutaryResponse.empty() }).chain(ctx =>
-					gear(ctx)
-						.fix(onError)
-						.map(() => ctx),
+			.pipe(
+				ops0.chain(([, route, gear]) =>
+					Oath.Resolve({ ...ctx, req, route, res: RoutaryResponse.empty() }).pipe(
+						ops0.chain(ctx =>
+							gear(ctx)
+								.fix(on_error)
+								.pipe(ops0.map(() => ctx)),
+						),
+					),
 				),
 			)
 			.fix(() => {
 				const context = { ...ctx, res: RoutaryResponse.empty() }
-				onError(context)
+				on_error(context)
 
 				return context
 			})
-			.fork(() => void 0, createNativeResponse),
+			.fork(() => void 0, create_native_response as any),
 })
 
 export type CreateRouterOptions<T extends RequiredRouterState = RequiredRouterState> = {
@@ -79,7 +84,7 @@ export const Router = {
 		options: CreateRouterOptions<T> = {} as any,
 	) =>
 		router([], {
-			state: options.state ?? { checkMethod, checkRoute },
+			state: options.state ?? { check_method: check_method, check_route: check_route },
 		} as any),
 }
 

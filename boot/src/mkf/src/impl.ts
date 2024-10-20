@@ -16,7 +16,7 @@ import { isReservedJavaScriptKeyword } from "@ordo-pink/rkwjs"
 
 // --- Public ---
 
-const mpl = util.getLicense("AGPL-3.0-only")
+const mpl = util.get_license("AGPL-3.0-only")
 
 type _P = { space: string; path: string; createTest: boolean; fileExtension: "ts" | "tsx" }
 export const mkf = ({ space, path: initialPath, createTest, fileExtension }: _P) =>
@@ -46,7 +46,7 @@ export const mkf = ({ space, path: initialPath, createTest, fileExtension }: _P)
 
 // --- Internal ---
 
-const progress = util.createProgress()
+const progress = util.create_progress()
 
 const rejectIfSpaceDoesNotExist0: Curry<Binary<string, boolean, Oath<string, string>>> =
 	space => exists => (exists ? Oath.of(space) : Oath.Reject(`"${space}" does not exist`))
@@ -84,14 +84,14 @@ const createFiles0: Curry<Binary<_CF0P, string, Oath<void[], Error>>> =
 	({ parentPath, fileExtension, createTest, name }) =>
 	license =>
 		Oath.all([
-			util.createRepositoryFile0(
+			util.create_repository_file(
 				`${parentPath}/${name}.${fileExtension}`,
-				index(name, license as util.License),
+				index(name, license as util.TLicenseType),
 			),
 			createTest
-				? util.createRepositoryFile0(
+				? util.create_repository_file(
 						`${parentPath}/${name}.test.${fileExtension}`,
-						test(name, license as util.License),
+						test(name, license as util.TLicenseType),
 					)
 				: Oath.empty(),
 		])
@@ -106,12 +106,12 @@ const getSpaceLicenseType0: Curry<Binary<string, boolean, Oath<string, Error>>> 
 				)
 			: Oath.of("")
 
-const index = (name: string, license: util.License | "") =>
-	`${license ? util.getSPDXRecord(license).concat("\n") : ""}export const ${camel(
+const index = (name: string, license: util.TLicenseType | "") =>
+	`${license ? util.get_spdx_record(license).concat("\n") : ""}export const ${camel(
 		name,
 	)} = "${name}"`
-const test = (name: string, license: util.License | "") =>
-	`${license ? util.getSPDXRecord(license).concat("\n") : ""}import { test, expect } from "bun:test"
+const test = (name: string, license: util.TLicenseType | "") =>
+	`${license ? util.get_spdx_record(license).concat("\n") : ""}import { test, expect } from "bun:test"
 import { ${camel(name)} } from "./${name}"
 
 test("${name} should pass", () => {

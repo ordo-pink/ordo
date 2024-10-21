@@ -22,8 +22,8 @@ import { Maoka } from "@ordo-pink/maoka"
 import { MaokaJabs } from "@ordo-pink/maoka-jabs"
 import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
 
-export const ModalCloseButton = (should_show = false) => {
-	if (!should_show) return
+export const ModalCloseButton = (modal: Ordo.Modal.Instance | null) => {
+	if (!modal || !modal.show_close_button) return
 
 	return Maoka.create("button", ({ use }) => {
 		const commands = use(MaokaOrdo.Jabs.Commands)

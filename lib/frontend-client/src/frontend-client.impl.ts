@@ -24,7 +24,7 @@ import { type TLogger } from "@ordo-pink/logger"
 import { init_activities } from "./components/activities"
 import { init_activity_bar } from "./sections/activity-bar.section"
 import { init_background_task_display } from "./sections/background-task-display.section"
-// import { init_command_palette } from "./sections/command-palette.section"
+import { init_command_palette } from "./sections/command-palette.section"
 import { init_commands } from "./components/commands"
 // import { init_context_menu } from "./sections/context-menu.section"
 import { init_content } from "./components/content"
@@ -144,7 +144,7 @@ export const create_client = async ({ logger, is_dev, hosts }: P) => {
 	init_modal({ commands, logger, ctx: internal_context })
 	init_notifications({ logger, commands, ctx: internal_context })
 	init_activity_bar({ ctx: internal_context, logger, activities$, current_activity$ })
-	// init_command_palette(logger, commands, internal_context)
+	init_command_palette(logger, commands, internal_context)
 	// init_context_menu(logger, commands, internal_context)
 
 	const shared_function_context = {

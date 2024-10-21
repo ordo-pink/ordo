@@ -53,4 +53,7 @@ const on_modal_show: Ordo.Command.TCommandHandler<Ordo.Modal.Instance> = payload
 	$.next(O.Some({ render, show_close_button, on_unmount }))
 }
 
-const on_modal_hide = () => $.next(O.None())
+const on_modal_hide = () => {
+	$.getValue().unwrap()?.on_unmount?.()
+	$.next(O.None())
+}

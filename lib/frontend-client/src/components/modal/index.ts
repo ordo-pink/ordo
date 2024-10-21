@@ -17,7 +17,7 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { type Observable, pairwise } from "rxjs"
+import { type Observable } from "rxjs"
 
 import { Maoka } from "@ordo-pink/maoka"
 import { MaokaJabs } from "@ordo-pink/maoka-jabs"
@@ -36,7 +36,6 @@ export const ModalOverlay = (
 		use(MaokaOrdo.Context.provide(ctx))
 
 		let modal_state: Ordo.Modal.Instance | null = null
-		let unmount_prev_state: () => void = () => void 0
 
 		type TModalState = TOption<Ordo.Modal.Instance>
 
@@ -44,31 +43,28 @@ export const ModalOverlay = (
 
 		use(MaokaJabs.set_class("modal-overlay"))
 		use(MaokaJabs.listen("onclick", event => handle_click(event)))
-		use(MaokaOrdo.Jabs.subscribe($.pipe(pairwise()), (...state) => handle_modal_update(...state)))
 
-		const handle_click = (event: MouseEvent) => {
+		const handle_click = (event: Event) => {
 			if (!modal_state) return
+
 			event.stopPropagation()
-			unmount_prev_state()
 			commands.emit("cmd.application.modal.hide")
 		}
 
-		const handle_modal_update = ([prev_state, state]: [TModalState, TModalState]) => {
+		const handle_modal_update = (state: TModalState) => {
 			modal_state = state.unwrap() ?? null
-			unmount_prev_state = prev_state.unwrap()?.on_unmount ?? (() => void 0)
 			void refresh()
 		}
 
-		const handle_esc_key_down = (event: KeyboardEvent) => {
+		const handle_close = (event: KeyboardEvent) => {
 			if (event.key !== "Escape") return
-
-			event.stopPropagation()
-			commands.emit("cmd.application.modal.hide")
+			handle_click(event)
 		}
 
-		document.addEventListener("keydown", handle_esc_key_down)
+		use(MaokaOrdo.Jabs.subscribe($, state => handle_modal_update(state)))
+		document.addEventListener("keydown", handle_close)
 
-		on_unmount(() => document.removeEventListener("keydown", handle_esc_key_down))
+		on_unmount(() => document.removeEventListener("keydown", handle_close))
 
 		return () => {
 			if (modal_state) use(MaokaJabs.add_class("active"))

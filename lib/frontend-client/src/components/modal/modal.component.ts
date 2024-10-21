@@ -38,6 +38,6 @@ export const Modal = (modal: Ordo.Modal.Instance | null) =>
 			if (modal) use(MaokaJabs.add_class("active"))
 			else use(MaokaJabs.remove_class("active"))
 
-			return ModalCloseButton(modal?.show_close_button)
+			return ModalCloseButton(modal)
 		}
 	})

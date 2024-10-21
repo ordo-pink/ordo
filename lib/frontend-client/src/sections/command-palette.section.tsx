@@ -18,18 +18,15 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { BehaviorSubject, Subject, combineLatestWith, map, merge, scan, shareReplay } from "rxjs"
-import { Root, createRoot } from "react-dom/client"
-import { BsCommand } from "react-icons/bs"
 
+import { Maoka } from "@ordo-pink/maoka"
 import { type TLogger } from "@ordo-pink/logger"
 import { call_once } from "@ordo-pink/tau"
 
-import CommandPaletteModal from "./command-palette.component"
-import { TOrdoContext } from "@ordo-pink/core"
-import { create_ordo_context } from "@ordo-pink/frontend-react-hooks"
+import { CommandPalette } from "../components/command-palette"
 
 export const init_command_palette = call_once(
-	(logger: TLogger, commands: Ordo.Command.Commands, ctx: TOrdoContext) => {
+	(logger: TLogger, commands: Ordo.Command.Commands, ctx: Ordo.CreateFunction.Params) => {
 		logger.debug("🟡 Initialising command palette...")
 
 		commands.on("cmd.application.command_palette.show", on_show_custom_cp(commands, ctx))
@@ -54,10 +51,8 @@ export const init_command_palette = call_once(
 			})
 
 		commands.emit("cmd.application.command_palette.add", {
-			id: "command_palette.hide",
 			on_select: () => commands.emit("cmd.application.command_palette.toggle"),
 			readable_name: "t.common.components.command_palette.toggle",
-			Icon: BsCommand,
 			accelerator: "mod+shift+p",
 		})
 
@@ -75,48 +70,30 @@ export const init_command_palette = call_once(
 )
 
 export type TCommandPaletteState = {
-	items: Client.CommandPalette.Item[]
+	items: Ordo.CommandPalette.Instance[]
 	on_new_item?: (new_item: string) => any
 	multiple?: boolean
-	pinned_items?: Client.CommandPalette.Item[]
+	pinned_items?: Ordo.CommandPalette.Instance[]
 	shows_next_palette?: boolean
 }
 
 const custom_command_palette$ = new BehaviorSubject<TCommandPaletteState>({ items: [] })
 
-const Provider = create_ordo_context()
-
-const on_add_global_item = (item: Client.CommandPalette.Item) => add$.next(item)
+const on_add_global_item = (item: Ordo.CommandPalette.Instance) => add$.next(item)
 const on_remove_global_item = (id: string) => remove$.next(id)
 const on_show_custom_cp =
-	(commands: Ordo.Command.Commands, ctx: TOrdoContext) => (state: TCommandPaletteState) => {
-		let root: Root
-
+	(commands: Ordo.Command.Commands, ctx: Ordo.CreateFunction.Params) =>
+	(state: TCommandPaletteState) => {
 		commands.emit("cmd.application.modal.hide")
-
 		custom_command_palette$.next(state)
 
 		commands.emit("cmd.application.modal.show", {
 			on_unmount: () => {
-				root.unmount()
 				custom_command_palette$.next({ items: [] })
 			},
 			show_close_button: false,
 			render: div => {
-				root = createRoot(div)
-
-				// TODO: Drop React
-				root.render(
-					<Provider value={ctx}>
-						<CommandPaletteModal
-							items={state.items}
-							multiple={state.multiple}
-							on_new_item={state.on_new_item}
-							pinned_items={state.pinned_items}
-							shows_next_palette={true}
-						/>
-					</Provider>,
-				)
+				void Maoka.render_dom(div, CommandPalette(ctx))
 			},
 		})
 	}
@@ -125,24 +102,24 @@ const on_hide_custom_cp = (commands: Ordo.Command.Commands) => () => {
 }
 
 type AddP = (
-	item: Client.CommandPalette.Item,
+	item: Ordo.CommandPalette.Instance,
 ) => (state: TCommandPaletteState) => TCommandPaletteState
 const addP: AddP = item => state =>
-	state.items.some(({ id: commandName }) => commandName === item.id)
+	state.items.some(({ readable_name }) => readable_name === item.readable_name)
 		? state
 		: { ...state, items: [...state.items, item] }
 
 type RemoveP = (item: string) => (state: TCommandPaletteState) => TCommandPaletteState
 const removeP: RemoveP = id => state => ({
 	...state,
-	items: state.items.filter(a => a.id !== id),
+	items: state.items.filter(a => a.readable_name !== id),
 })
 
-const add$ = new Subject<Client.CommandPalette.Item>()
+const add$ = new Subject<Ordo.CommandPalette.Instance>()
 const remove$ = new Subject<string>()
 const global_command_palette$ = merge(add$.pipe(map(addP)), remove$.pipe(map(removeP))).pipe(
 	scan((acc, f) => f(acc), { items: [] } as {
-		items: Client.CommandPalette.Item[]
+		items: Ordo.CommandPalette.Instance[]
 		on_new_item?: (new_item: string) => any
 	}),
 	shareReplay(1),

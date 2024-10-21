@@ -18,13 +18,13 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { BsCookie } from "@ordo-pink/frontend-icons"
+import { Button } from "@ordo-pink/maoka-components"
 import { Maoka } from "@ordo-pink/maoka"
 import { MaokaJabs } from "@ordo-pink/maoka-jabs"
 import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
 import { NotificationType } from "@ordo-pink/core"
 
 import "./landing.page.css"
-import { Button } from "@ordo-pink/maoka-components"
 
 let modal_shown = false
 
@@ -121,7 +121,6 @@ const HeroSectionImageLayer = (index: number) =>
 		const hosts = use(MaokaOrdo.Jabs.Hosts)
 
 		const background_image = `url(${hosts.static}/index-hero-layer-${index}.png)`
-		console.log(background_image)
 
 		use(MaokaJabs.set_class(`hero-layer hero-layer_${index}`))
 		use(MaokaJabs.set_style({ backgroundImage: background_image }))

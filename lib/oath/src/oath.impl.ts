@@ -149,6 +149,8 @@ export class Oath<$TResolve, $TReject = never> {
 	 * a `null`. The Oath resolves with provided value otherwise. You can customise what the Oath
 	 * rejects with by providing a `on_null` function as a second argument.
 	 *
+	 * @see {@link invokers0}
+	 *
 	 * @example
 	 * ```typescript
 	 * Oath.FromNullable("Hello, world!", () => "Goodbye, world!")
@@ -186,7 +188,7 @@ export class Oath<$TResolve, $TReject = never> {
 	 * invoked or forked. If the Promise rejects, the Oath rejects with the same value. If the
 	 * Promise resolves, the Oath resolves with the same value. Since Promises do not provide
 	 * rejected branch type definitions, it is up to the programmer to specify the Oath rejection
-	 * type.
+	 * type. {@link Oath.Try} has the same behavior if provided with a thunk returning a Promise.
 	 *
 	 * @example
 	 * ```typescript
@@ -213,28 +215,21 @@ export class Oath<$TResolve, $TReject = never> {
 		new Oath((resolve, reject) => thunk().then(resolve, reject), abort_controller)
 
 	/**
-	 * Create an Oath that will lazily try to execute provided function and resolve
-	 * with the returned value if it succeeds, or reject with the caught error. It
-	 * also works with Promises - if the Promise returned by the function resolves,
-	 * the Oath resolves as well. If the Promise rejects, the Oath also rejects.
+	 * Create an Oath that will lazily execute the provided function and resolve if the function
+	 * succeeded or reject if the function threw. If the provided function returns a Promise,
+	 * `Oath.Try` works as {@link Oath.FromPromise}. Accepts an optional second parameter that
+	 * overrides
+	 *
+	 * @see {@link Oath.FromPromise}
+	 * @see {@link invokers0}.
 	 *
 	 * @example
 	 * ```typescript
-	 * import { promises } from "node:fs"
-	 *
-	 * const package0 = Oath.Try(() => promises.readFile("./package.json", "utf8"))
-	 * 	.and(str => Oath.Try(() => JSON.parse(str)))
+	 * Oath.Try(() => JSON.parse("{}"))
 	 * 	.invoke(invokers0.or_else(() => null))
+	 * 	.then(console.log) // {}
 	 *
-	 * package0
-	 * 	.invoke(invokers0.or_else(() => null))
-	 * 	.then(console.log) // "@ordo-pink/oath"
-	 *
-	 * const asdf0 = Oath.Try(() => promises.readFile("./asdf.json", "utf8"))
-	 * 	.and(str => Oath.Try(() => JSON.parse(str)))
-	 * 	.invoke(invokers0.or_else(() => null))
-	 *
-	 * asdf
+	 * Oath.Try(() => JSON.parse("}"))
 	 * 	.invoke(invokers0.or_else(() => null))
 	 * 	.then(console.log) // null
 	 * ```
@@ -271,6 +266,36 @@ export class Oath<$TResolve, $TReject = never> {
 		}, abort_controller)
 	}
 
+	/**
+	 * Invert multiple Oaths of values into a single Oath of multiple values. Supports "synchronous"
+	 * values, Promises, and Oaths. If any of the Promises or Oaths rejects - the result rejects with
+	 * the value of the first encountered rejection. If all Promises or Oaths resolve - the result
+	 * resolves with resolution of all values wrapped in the same structure they were provided. The
+	 * provided values may be an array or a record.
+	 *
+	 * @todo Make two separate methods for arrays and records.
+	 *
+	 * @see {@link invokers0}
+	 *
+	 * @example
+	 * ```typescript
+	 * Oath.Merge([1, Promise.resolve(2), Oath.Resolve(3)])
+	 * 	.invoke(invokers0.force_resolve)
+	 * 	.then(console.log) // [1,2,3]
+	 *
+	 * Oath.Merge({
+	 * 	ok: "OK",
+	 * 	ok_promise: Promise.resolve("OK"),
+	 * 	ok_oath: Oath.Resolve("OK"),
+	 * })
+	 * 	.invoke(invokers0.force_resolve)
+	 * 	.then(console.log) // { ok: "OK", ok_promise: "OK", ok_oath: "OK" }
+	 *
+	 * Oath.Merge({ yes: true, no: Oath.Reject("NO! The Oath rejected!") })
+	 * 	.invoke(invokers0.force_resolve)
+	 * 	.then(console.log) // "NO! The Oath rejected!"
+	 * ```
+	 */
 	public static Merge = <$TSomeThings extends readonly unknown[] | [] | Record<string, unknown>>(
 		values: $TSomeThings,
 
@@ -401,17 +426,35 @@ export class Oath<$TResolve, $TReject = never> {
 	 */
 	_abort_controller: AbortController
 
-	// TODO: Define cata return type
+	/**
+	 * Oath constructor and destructor, alpha and omega, yin and yang. You most probably don't need
+	 * it. For smoother expericence, use {@link Oath.invoke} instead.
+	 */
 	cata: (
 		resolved: <_TNewResolve>(value: $TResolve) => _TNewResolve,
 		rejected: <_TNewReject>(err?: $TReject) => _TNewReject,
 	) => any
 
 	/**
+	 * Instantiate an Oath the same way you would instantiate a new Promise. The difference
+	 * from a Promise is that Oath is lazy and it will not run before you {@link Oath.invoke invoke}
+	 * it.
+	 *
 	 * @constructor
+	 *
+	 * @see {@link invokers0}
+	 *
+	 * @example
+	 * ```typescript
+	 * new Oath((resolve, reject) => Math.random() > 0.5 ? resolve("beag") : reject("smol"))
+	 * 	.invoke(invokers0.force_resolve)
+	 * 	.then(console.log) // Sometimes "beag", sometimes "smol"
+	 * ```
 	 */
 	public constructor(
-		// TODO: Define cata return type
+		/**
+		 * @see {@link Oath.cata}
+		 */
 		cata: (
 			resolve: <_TNewResolve>(value: $TResolve) => _TNewResolve,
 			reject: <_TNewReject>(err?: $TReject) => _TNewReject,
@@ -439,7 +482,7 @@ export class Oath<$TResolve, $TReject = never> {
 	}
 
 	/**
-	 * Returns true if `.cancel` was called on the Oath.
+	 * Returns `true` if {@link Oath.cancel} was called.
 	 *
 	 * @readonly
 	 */
@@ -448,8 +491,8 @@ export class Oath<$TResolve, $TReject = never> {
 	}
 
 	/**
-	 * Returns the reason of cancellation if the Oath was cancelled. Returns `undefined`
-	 * if it was not cancelled.
+	 * Returns the reason of cancellation provided to {@link Oath.cancel}. Returns `undefined`
+	 * if the Oath was not cancelled.
 	 *
 	 * NOTE: It is better to check if the Oath was cancelled using `oath.is_cancelled`.
 	 *
@@ -461,32 +504,44 @@ export class Oath<$TResolve, $TReject = never> {
 	}
 
 	/**
-	 * Cancel the execution of the Oath. It will reject with a cancellation reason and operators
-	 * will not be piped any further even for the rejected branch.
+	 * Cancel the Oath. If the Oath has transformed to a Promise, the Promise will be cancelled
+	 * with rejection via {@link AbortController} using the provided cancellation reason. If the
+	 * Oath has not transformed to a Promise yet, it will reject any further operations and
+	 * eventually reject as a Promise. Operators that handle rejected branch are ignored as well
+	 * if the Oath was rejected.
+	 *
+	 * @see {@link Oath.and}
+	 * @see {@link invokers0}
 	 *
 	 * @example
-	 * ```typescript
-	 * import { useEffect, useState } from "react"
+	 * ```tsx
+	 * import React from "react"
 	 *
-	 * // A very much real life example
-	 * const UserName = (id: string) => {
-	 * 	const [name, set_name] = useState("")
+	 * const Book = (id: string) => {
+	 * 	const [book, set_book] = React.useState(null)
 	 *
-	 * 	useEffect(() => {
-	 * 		const name0 = fetch(`http://api.com/users/${id}`)
-	 * 			.and(response => response.json())
-	 * 			.and(json => Oath.FromNullable(json?.name, () => ""))
+	 * 	React.useEffect(() => {
+	 * 		const url = `https://test.api/books/${id}`
 	 *
-	 * 		name0
-	 * 			.invoke(invokers0.force_resolve)
-	 * 			.then(set_name)
+	 * 		const book0 = Oath.FromPromise(() => fetch(url))
+	 * 			.and(res => Oath.FromPromise(() => res.json()))
+	 * 			.and(book => set_book(book))
+	 *
+	 * 		book0.invoke(invokers0.or_else(() => set_book(null)))
 	 *
 	 * 		return () => {
-	 * 			name0.cancel("Id - changed, React - rerendered, Memory - saved")
+	 * 			book0.cancel("Component refreshed")
 	 * 		}
 	 * 	}, [id])
 	 *
-	 * 	return <div>{name}</div>
+	 * 	if (!book) return null
+	 *
+	 * 	return (
+	 * 		<div>
+	 * 			<h1>{book.title}</h1>
+	 * 			<p>{book.description}</p>
+	 * 		</div>
+	 * 	)
 	 * }
 	 * ```
 	 */
@@ -643,13 +698,39 @@ export class Oath<$TResolve, $TReject = never> {
 		)
 	}
 
-	// TODO: Use .cata
+	/**
+	 * Invokes an Oath with a given function. The function should accept the current Oath and
+	 * return a Promise. Using invoke itself does not trigger the Oath to start execution, it's
+	 * the {@link Oath.fork} that does the job. `Oath.invoke` is just a convenience method for
+	 * calling fork in different ways.
+	 *
+	 * @see {@link invokers0}
+	 *
+	 * @example
+	 * ```typescript
+	 * Oath.Resolve(1)
+	 * 	.invoke(oath => oath.fork(() => null, x => x)) // Simple custom invoker
+	 * 	.then(console.log) // 1
+	 * ```
+	 */
 	public invoke<NewResolve>(
 		invoker: (o: Oath<$TResolve, $TReject>) => Promise<NewResolve>,
 	): Promise<NewResolve> {
 		return invoker(this)
 	}
 
+	/**
+	 * Switch the Oath from lazy to eager mode. The Oath does not start execution before this
+	 * method is called. Accepts a rejection and resolution handler functions. Has a facade
+	 * {@link Oath.invoke} for simpler usage.
+	 *
+	 * @example
+	 * ```typescript
+	 * Oath.Resolve(1)
+	 * 	.fork(() => "rejected", () => "resolved")
+	 * 	.then(console.log) // "resolved"
+	 * ```
+	 */
 	public fork<_TNewResolve, _TNewReject>(
 		on_reject: (error: $TReject) => _TNewReject,
 		on_resolve: (value: $TResolve) => _TNewResolve,

@@ -45,6 +45,7 @@ export default create_function(
 			"cmd.application.command_palette.show",
 			"cmd.application.context_menu.show",
 			"cmd.metadata.rename",
+			"cmd.content.set",
 		],
 		queries: [
 			"application.commands",

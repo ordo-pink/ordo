@@ -1,7 +1,7 @@
 {
 	"compilerOptions": {
 		"outDir": "./var/dist",
-		"lib": ["ESNext"],
+		"lib": ["ESNext", "DOM"],
 		"allowJs": true,
 		"jsx": "preserve",
 		"esModuleInterop": true,

@@ -29,7 +29,7 @@ import { Button } from "@ordo-pink/maoka-components"
 let modal_shown = false
 
 // TODO Translations
-export default Maoka.create("div", ({ use, on_unmount }) => {
+export default Maoka.create("main", ({ use, on_unmount }) => {
 	const commands = use(MaokaOrdo.Jabs.Commands)
 	const { t } = use(MaokaOrdo.Jabs.Translations)
 
@@ -134,50 +134,25 @@ const HeroCardLogoText = Maoka.styled("span", { class: "logo_ordo-text" })
 const HeroSectionLayers = Maoka.styled("div", { class: "hero-layers" })
 const HeroCardLogoWrapper = Maoka.styled("h1", { class: "logo" })
 const HeroCardLogoSection = Maoka.styled("div", { class: "logo-section" })
-const HeroCardLogoAction = Maoka.styled("div", { class: "mt-12 flex items-center space-x-8" })
-const CallToActionSection = Maoka.styled("div", {
-	class:
-		"w-full max-w-2xl space-y-8 rounded-lg bg-gradient-to-br from-sky-200/80 via-indigo-200/80 to-indigo-200/80 px-8 py-4 shadow-lg md:py-12 dark:from-sky-950 dark:via-indigo-950 dark:to-indigo-950",
-})
-const CallToActionCard = Maoka.styled("div", { class: "flex flex-col space-y-8" })
+const HeroCardLogoAction = Maoka.styled("div", { class: "logo_action" })
+
+const ActionsContainer = Maoka.styled("div", { class: "actions-container" })
+
+const CallToActionSection = Maoka.styled("div", { class: "cta" })
+const CallToActionCard = Maoka.styled("div", { class: "cta_card" })
 const CallToActionLogoWraper = Maoka.styled("div")
-const CallToActionBetaText = Maoka.styled("h3", { class: "text-2xl font-bold" })
-const BetaStartedMessage = Maoka.styled("p", { class: "center ml-4 opacity-75" })
+const CallToActionBetaText = Maoka.styled("h3", { class: "cta_beta" })
+const BetaStartedMessage = Maoka.styled("p", { class: "cta_beta_started" })
 const CallToActionBetaLogo = (t_beta_started: string) =>
 	CallToActionLogoWraper(() => [
 		CallToActionBetaText(() => [
-			Token("text-purple-600 dark:text-orange-400", "const "),
-			Token("text-neutral-700 dark:text-white", "teβt "),
-			Token("text-purple-600 dark:text-orange-400", "= "),
-			Token("text-orange-600 dark:text-purple-400", "() "),
-			Token("align-middle text-purple-600 dark:text-orange-400", "⇒"),
+			Token("token_keyword", "const "),
+			Token("token_variable", "teβt "),
+			Token("token_keyword", "= "),
+			Token("token_scope", "() "),
+			Token("token_keyword", "⇒"),
 			BetaStartedMessage(() => t_beta_started),
 		]),
 	])
 
 const Token = (cls: string, text: string) => Maoka.styled("span", { class: cls })(() => text)
-const ActionsContainer = Maoka.styled("div", {
-	class: "flex flex-col items-center justify-between space-y-2 sm:flex-row sm:space-y-0",
-})
-
-/*
-<Button.Primary
-	onClick={e => {
-		e.preventDefault()
-
-		commands.emit("cmd.auth.open_sign_up")
-	}}
->
-	{t_sign_up}
-</Button.Primary>
-
-<Button.Secondary
-	onClick={e => {
-		e.preventDefault()
-
-		commands.emit("cmd.auth.open_sign_in")
-	}}
->
-	{t_sign_in}
-</Button.Secondary>
-*/

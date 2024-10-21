@@ -533,7 +533,6 @@ declare global {
 
 			type RenderParams = {
 				div: HTMLDivElement
-				is_loading: boolean
 				is_editable: boolean
 				is_embedded: boolean
 				content: Ordo.Content.Instance

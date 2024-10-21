@@ -18,7 +18,13 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { Maoka } from "@ordo-pink/maoka"
+import { MaokaJabs } from "@ordo-pink/maoka-jabs"
 import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
+
+type TOrdoTextEditorNode = {
+	type: string
+	value: string
+}
 
 export const RichText = (
 	metadata: Ordo.Metadata.Instance,
@@ -28,7 +34,42 @@ export const RichText = (
 	Maoka.create("div", ({ use }) => {
 		use(MaokaOrdo.Context.provide(ctx))
 
-		return () => [div(() => metadata.get_name()), div(() => String(content))]
+		const fsid = metadata.get_fsid()
+		const content_type = metadata.get_type()
+
+		const state: TOrdoTextEditorNode[] = content ? JSON.parse(content as string) : []
+
+		const commands = use(MaokaOrdo.Jabs.Commands)
+
+		use(MaokaJabs.set_class("p-2 size-full min-h-screen"))
+
+		const handle_line_change = (value: string, index: number) => {
+			if (!state[index]) state[index] = { type: "p", value }
+			else state[index].value = value
+
+			commands.emit("cmd.content.set", { fsid, content_type, content: JSON.stringify(state) })
+		}
+
+		// TODO Extract node type to enum
+		return () => [
+			...state.map((node, index) => Line(node, index, handle_line_change)),
+			Line({ type: "paragraph", value: "" }, state.length, handle_line_change),
+		]
 	})
 
-const div = Maoka.styled("div")
+const Line = (
+	node: TOrdoTextEditorNode,
+	index: number,
+	on_change: (value: string, index: number) => void,
+) =>
+	Maoka.create("div", ({ use }) => {
+		use(MaokaJabs.set_class("outline-none"))
+		use(MaokaJabs.set_attribute("contenteditable", "true"))
+		use(
+			MaokaJabs.listen("oninput", event => {
+				on_change((event.target as any).innerText, index)
+			}),
+		)
+
+		return () => node.value
+	})

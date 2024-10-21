@@ -44,7 +44,6 @@
 		"@types/react-dom": "^18.2.18",
 		"@types/react-helmet": "^6.1.11",
 		"@types/validator": "^13.11.1",
-		"@types/web": "^0.0.138",
 		"@typescript-eslint/eslint-plugin": "^6.20.0",
 		"@typescript-eslint/parser": "^6.20.0",
 		"@vituum/vite-plugin-postcss": "^1.1.0",

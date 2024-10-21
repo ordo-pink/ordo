@@ -48,3 +48,39 @@
 .logo_ordo-text {
 	@apply block text-7xl font-black tracking-widest first-letter:bg-gradient-to-tr first-letter:from-pink-500 first-letter:to-purple-500 first-letter:bg-clip-text first-letter:text-transparent sm:text-8xl sm:tracking-normal;
 }
+
+.logo_action {
+	@apply mt-12 flex items-center space-x-8;
+}
+
+.actions-container {
+	@apply flex flex-col items-center justify-between space-y-2 sm:flex-row sm:space-y-0;
+}
+
+.cta {
+	@apply w-full max-w-2xl space-y-8 rounded-lg bg-gradient-to-br from-sky-200/80 via-indigo-200/80 to-indigo-200/80 px-8 py-4 shadow-lg md:py-12 dark:from-sky-950 dark:via-indigo-950 dark:to-indigo-950;
+}
+
+.cta_card {
+	@apply flex flex-col space-y-8;
+}
+
+.cta_beta {
+	@apply text-2xl font-bold;
+}
+
+.cta_beta_started {
+	@apply ml-4 text-center opacity-75;
+}
+
+.token_keyword {
+	@apply text-purple-600 dark:text-orange-400;
+}
+
+.token_variable {
+	@apply text-neutral-700 dark:text-white;
+}
+
+.token_scope {
+	@apply text-orange-600 dark:text-purple-400;
+}

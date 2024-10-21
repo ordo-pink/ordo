@@ -27,7 +27,7 @@ export const create_welcome_workspace = (ctx: Ordo.CreateFunction.Params) =>
 		const $ = use(MaokaOrdo.Jabs.IsAuthenticated$)
 		const get_is_authenticated = use(MaokaOrdo.Jabs.from$($, false))
 
-		return async () => {
+		return () => {
 			const is_authenticated = get_is_authenticated()
 
 			return is_authenticated

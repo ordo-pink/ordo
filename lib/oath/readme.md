@@ -11,6 +11,38 @@ definition support to your asynchronous code.
 
 ![Underoath](https://media.tenor.com/iE19Xk9OOiwAAAAC/band-bassist.gif "Underoath")
 
+## Quick Start
+
+```typescript
+import React from "react"
+
+const Book = (id: string) => {
+	const [book, set_book] = React.useState(null)
+
+	React.useEffect(() => {
+		const url = `https://test.api/books/${id}`
+
+		const book0 = Oath.FromPromise(() => fetch(url))
+			.and(res => Oath.FromPromise(() => res.json()))
+			.and(book => set_book(book))
+
+		book0.invoke(invokers0.or_else(() => set_book(null)))
+
+		return () => {
+			book0.cancel("Component refreshed")
+		}
+	}, [id])
+
+	if (!book) return null
+
+	return (
+		<div>
+			<h1>{book.title}</h1>
+			<p>{book.description}</p>
+		</div>
+	)
+```
+
 ## License
 
 The Unlicense

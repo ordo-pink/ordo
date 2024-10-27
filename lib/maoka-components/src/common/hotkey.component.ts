@@ -36,13 +36,15 @@ export const Hotkey = (accelerator: string) =>
 		use(MaokaJabs.set_class("hotkey"))
 
 		const handle_keydown = (event: KeyboardEvent) => {
-			if (IGNORED_KEYS.includes(event.key)) return
+			const target = event.target as HTMLElement
+
+			// TODO Add textarea and div contenteditable
+			if (target.tagName === "INPUT" || IGNORED_KEYS.includes(event.key)) return
 
 			const hotkey = create_hotkey_string(event, false)
 
 			if (hotkey === accelerator) {
 				event.preventDefault()
-				event.stopPropagation()
 
 				if (element instanceof HTMLElement) element.click()
 			}

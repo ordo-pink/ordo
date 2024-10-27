@@ -19,6 +19,7 @@
 
 import { BehaviorSubject, Subject, combineLatestWith, map, merge, scan, shareReplay } from "rxjs"
 
+import { BsTerminal } from "@ordo-pink/frontend-icons"
 import { Maoka } from "@ordo-pink/maoka"
 import { type TLogger } from "@ordo-pink/logger"
 import { call_once } from "@ordo-pink/tau"
@@ -54,6 +55,8 @@ export const init_command_palette = call_once(
 			on_select: () => commands.emit("cmd.application.command_palette.toggle"),
 			readable_name: "t.common.components.command_palette.toggle",
 			accelerator: "mod+shift+p",
+			render_icon: div => div.appendChild(BsTerminal() as SVGSVGElement),
+			description: "t.common.components.command_palette.toggle_description",
 		})
 
 		let on_keydown: (event: KeyboardEvent) => void
@@ -69,21 +72,15 @@ export const init_command_palette = call_once(
 	},
 )
 
-export type TCommandPaletteState = {
-	items: Ordo.CommandPalette.Instance[]
-	on_new_item?: (new_item: string) => any
-	multiple?: boolean
-	pinned_items?: Ordo.CommandPalette.Instance[]
-	shows_next_palette?: boolean
-}
+const custom_command_palette$ = new BehaviorSubject<Ordo.CommandPalette.Instance>({
+	items: [],
+})
 
-const custom_command_palette$ = new BehaviorSubject<TCommandPaletteState>({ items: [] })
-
-const on_add_global_item = (item: Ordo.CommandPalette.Instance) => add$.next(item)
+const on_add_global_item = (item: Ordo.CommandPalette.Item) => add$.next(item)
 const on_remove_global_item = (id: string) => remove$.next(id)
 const on_show_custom_cp =
 	(commands: Ordo.Command.Commands, ctx: Ordo.CreateFunction.Params) =>
-	(state: TCommandPaletteState) => {
+	(state: Ordo.CommandPalette.Instance) => {
 		commands.emit("cmd.application.modal.hide")
 		custom_command_palette$.next(state)
 
@@ -93,7 +90,7 @@ const on_show_custom_cp =
 			},
 			show_close_button: false,
 			render: div => {
-				void Maoka.render_dom(div, CommandPalette(ctx))
+				void Maoka.render_dom(div, CommandPalette(custom_command_palette$, ctx))
 			},
 		})
 	}
@@ -102,24 +99,26 @@ const on_hide_custom_cp = (commands: Ordo.Command.Commands) => () => {
 }
 
 type AddP = (
-	item: Ordo.CommandPalette.Instance,
-) => (state: TCommandPaletteState) => TCommandPaletteState
+	item: Ordo.CommandPalette.Item,
+) => (state: Ordo.CommandPalette.Instance) => Ordo.CommandPalette.Instance
 const addP: AddP = item => state =>
 	state.items.some(({ readable_name }) => readable_name === item.readable_name)
 		? state
 		: { ...state, items: [...state.items, item] }
 
-type RemoveP = (item: string) => (state: TCommandPaletteState) => TCommandPaletteState
+type RemoveP = (
+	item: string,
+) => (state: Ordo.CommandPalette.Instance) => Ordo.CommandPalette.Instance
 const removeP: RemoveP = id => state => ({
 	...state,
 	items: state.items.filter(a => a.readable_name !== id),
 })
 
-const add$ = new Subject<Ordo.CommandPalette.Instance>()
+const add$ = new Subject<Ordo.CommandPalette.Item>()
 const remove$ = new Subject<string>()
 const global_command_palette$ = merge(add$.pipe(map(addP)), remove$.pipe(map(removeP))).pipe(
 	scan((acc, f) => f(acc), { items: [] } as {
-		items: Ordo.CommandPalette.Instance[]
+		items: Ordo.CommandPalette.Item[]
 		on_new_item?: (new_item: string) => any
 	}),
 	shareReplay(1),
@@ -142,19 +141,20 @@ const create_hotkey_string = (event: KeyboardEvent, isApple: boolean) => {
 	return hotkey
 }
 
-const on_input = (global_command_palette: TCommandPaletteState) => (event: KeyboardEvent) => {
-	if (IGNORED_KEYS.includes(event.key)) return
+const on_input =
+	(global_command_palette: Ordo.CommandPalette.Instance) => (event: KeyboardEvent) => {
+		if (IGNORED_KEYS.includes(event.key)) return
 
-	const hotkey = create_hotkey_string(event, false)
+		const hotkey = create_hotkey_string(event, false)
 
-	const command = global_command_palette.items.find(
-		item => item.accelerator && item.accelerator === hotkey,
-	)
+		const command = global_command_palette.items.find(
+			item => item.accelerator && item.accelerator === hotkey,
+		)
 
-	if (command) {
-		event.preventDefault()
-		event.stopPropagation()
+		if (command) {
+			event.preventDefault()
+			event.stopPropagation()
 
-		command.on_select()
+			command.on_select()
+		}
 	}
-}

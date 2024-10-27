@@ -19,7 +19,13 @@
 
 // import { BsCollection, BsEnvelope, BsQuestionOctagon, BsSendCheck } from "react-icons/bs"
 
-import { BS_COLLECTION } from "@ordo-pink/frontend-icons"
+import {
+	BS_COLLECTION,
+	BsCollection,
+	BsEnvelopeAt,
+	BsQuestionOctagon,
+	BsSendCheck,
+} from "@ordo-pink/frontend-icons"
 import { Maoka } from "@ordo-pink/maoka"
 import { create_function } from "@ordo-pink/core"
 
@@ -155,39 +161,38 @@ export default create_function(
 			commands.emit("cmd.application.router.navigate", "/"),
 		)
 
-		// commands.emit("cmd.application.command_palette.add", {
-		// 	readable_name: "t.welcome.command_palette.go_to_welcome_page",
-		// 	on_select: () => commands.emit("cmd.welcome.go_to_welcome_page"),
-		// 	accelerator: "mod+shift+h",
-		// 	Icon: BsCollection,
-		// })
+		commands.emit("cmd.application.command_palette.add", {
+			readable_name: "t.welcome.go_to_welcome_page",
+			on_select: () => commands.emit("cmd.welcome.go_to_welcome_page"),
+			accelerator: "mod+shift+h",
+			render_icon: div => div.appendChild(BsCollection() as SVGSVGElement),
+		})
 
-		// commands.on("cmd.welcome.open_support_palette", () => {
-		// 	commands.emit("cmd.application.command_palette.show", {
-		// 		items: [
-		// 			{
-		// 				readable_name: "t.welcome.command_palette.support.email",
-		// 				on_select: () => commands.emit("cmd.welcome.go_to_email_support"),
-		// 				accelerator: "1",
-		// 				Icon: BsEnvelope,
-		// 			},
-		// 			{
-		// 				readable_name: "t.welcome.command_palette.support.messenger",
-		// 				on_select: () => commands.emit("cmd.welcome.go_to_messenger_support"),
-		// 				accelerator: "2",
-		// 				Icon: BsSendCheck,
-		// 			},
-		// 		],
-		// 	})
-		// })
+		commands.on("cmd.welcome.open_support_palette", () => {
+			commands.emit("cmd.application.command_palette.show", {
+				items: [
+					{
+						readable_name: "t.welcome.command_palette.support.email",
+						on_select: () => commands.emit("cmd.welcome.go_to_email_support"),
+						accelerator: "1",
+						render_icon: div => div.appendChild(BsEnvelopeAt() as SVGSVGElement),
+					},
+					{
+						readable_name: "t.welcome.command_palette.support.messenger",
+						on_select: () => commands.emit("cmd.welcome.go_to_messenger_support"),
+						accelerator: "2",
+						render_icon: div => div.appendChild(BsSendCheck() as SVGSVGElement),
+					},
+				],
+			})
+		})
 
-		// commands.emit("cmd.application.command_palette.add", {
-		// 	readable_name: "t.welcome.command_palette.support.open_support_palette",
-		// 	on_select: () => commands.emit("cmd.welcome.open_support_palette"),
-		// 	accelerator: "mod+h", // TODO: Should work with mod+/
-		// 	Icon: BsQuestionOctagon,
-		// 	shows_next_palette: true,
-		// })
+		commands.emit("cmd.application.command_palette.add", {
+			readable_name: "t.welcome.command_palette.support.open_support_palette",
+			on_select: () => commands.emit("cmd.welcome.open_support_palette"),
+			accelerator: "mod+h", // TODO: Should work with mod+/
+			render_icon: div => div.appendChild(BsQuestionOctagon() as SVGSVGElement),
+		})
 
 		commands.emit("cmd.functions.activities.register", {
 			fid: ctx.fid,

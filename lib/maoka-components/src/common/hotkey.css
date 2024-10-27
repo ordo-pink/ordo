@@ -1,5 +1,5 @@
 .hotkey {
-	@apply hidden shrink-0 items-center justify-center space-x-1 rounded-md px-2 py-0.5 text-xs text-current md:flex;
+	@apply hidden shrink-0 items-center justify-center space-x-1 rounded-md px-2 py-0.5 text-center text-xs text-current md:flex;
 }
 
 .key-container {

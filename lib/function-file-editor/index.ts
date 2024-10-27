@@ -19,7 +19,7 @@
 
 // import { BsLayoutTextWindow } from "react-icons/bs"
 
-import { BS_LAYOUT_TEXT_WINDOW } from "@ordo-pink/frontend-icons"
+import { BS_LAYOUT_TEXT_WINDOW, BsLayoutTextWindow } from "@ordo-pink/frontend-icons"
 import { Maoka } from "@ordo-pink/maoka"
 import { create_function } from "@ordo-pink/core"
 
@@ -85,13 +85,12 @@ export default create_function(
 			},
 		})
 
-		// emit("cmd.application.command_palette.add", {
-		// 	id: "cmd.file_editor.open",
-		// 	on_select: () => emit("cmd.file_editor.open"),
-		// 	readable_name: "t.file_editor.command_palette.open",
-		// 	accelerator: "mod+e",
-		// 	Icon: BsLayoutTextWindow,
-		// })
+		emit("cmd.application.command_palette.add", {
+			on_select: () => emit("cmd.file_editor.open"),
+			readable_name: "t.file_editor.command_palette.open",
+			accelerator: "mod+e",
+			render_icon: div => div.appendChild(BsLayoutTextWindow() as SVGSVGElement),
+		})
 
 		emit("cmd.functions.activities.register", {
 			fid: ctx.fid,

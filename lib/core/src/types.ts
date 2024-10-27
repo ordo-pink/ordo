@@ -97,6 +97,7 @@ declare global {
 					search_placeholder: () => string
 					hide: () => string
 					toggle: () => string
+					toggle_description: () => string
 					exit_key_hint: () => string
 				}
 				sidebar: {
@@ -162,14 +163,14 @@ declare global {
 				hide: () => void
 			}
 			command_palette: {
-				add: () => Ordo.CommandPalette.Instance
+				add: () => Ordo.CommandPalette.Item
 				remove: () => string
 				toggle: () => void
 				show: () => {
-					items: Ordo.CommandPalette.Instance[]
+					items: Ordo.CommandPalette.Item[]
 					on_new_item?: (new_item: string) => unknown
 					multiple?: boolean
-					pinned_items?: Ordo.CommandPalette.Instance[]
+					pinned_items?: Ordo.CommandPalette.Item[]
 					shows_next_palette?: boolean
 				}
 				hide: () => void
@@ -1234,10 +1235,18 @@ declare global {
 		}
 
 		namespace CommandPalette {
+			type Instance = {
+				items: Ordo.CommandPalette.Item[]
+				on_new_item?: (new_item: string) => any
+				is_multiple?: boolean
+				pinned_items?: Ordo.CommandPalette.Item[]
+				max_items?: number
+			}
+
 			/**
 			 * Command palette item.
 			 */
-			type Instance = {
+			type Item = {
 				/**
 				 * Readable name of the command palette item. Put a translation key here, if you use i18n.
 				 */

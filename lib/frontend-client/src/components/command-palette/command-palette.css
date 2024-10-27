@@ -1,0 +1,7 @@
+.command-palette {
+	@apply flex h-dvh max-h-96 w-full flex-col space-y-1 py-2;
+}
+
+.command-palette_search {
+	@apply !w-[95dvw] !max-w-2xl !bg-transparent !shadow-none md:!w-[50dvw];
+}

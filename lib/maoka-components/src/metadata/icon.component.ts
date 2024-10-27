@@ -68,7 +68,7 @@ export const MetadataIcon = ({ metadata, custom_class = "" }: P) =>
 									commands.emit("cmd.application.command_palette.hide")
 								},
 								readable_name: `${emoji.icon} ${emoji.description}` as any,
-							}) satisfies Ordo.CommandPalette.Instance,
+							}) satisfies Ordo.CommandPalette.Item,
 					),
 				})
 			}),

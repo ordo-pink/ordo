@@ -1,0 +1,7 @@
+.input_label {
+	@apply w-full text-sm font-bold;
+}
+
+.input_text {
+	@apply w-full rounded-md border-0 bg-neutral-50 px-2 py-1 shadow-inner outline-none placeholder:text-neutral-500 focus:ring-0 sm:text-sm sm:leading-6 dark:bg-neutral-600;
+}

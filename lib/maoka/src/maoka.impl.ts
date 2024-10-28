@@ -128,6 +128,7 @@ const render_children = async (
 	element: T.TMaokaElement,
 ) => {
 	if (!get_children) return element
+	element.innerHTML = ""
 	let children = await get_children()
 	if (!children) return element
 

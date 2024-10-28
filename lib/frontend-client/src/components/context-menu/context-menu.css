@@ -1,0 +1,3 @@
+.context-menu {
+	@apply absolute z-[1000] w-[320px] rounded-sm bg-neutral-300 shadow-md dark:bg-neutral-700;
+}

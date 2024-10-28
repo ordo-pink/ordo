@@ -14,6 +14,10 @@
 	@apply bg-gradient-to-tr from-pink-300 to-rose-300 dark:from-pink-900 dark:to-rose-900;
 }
 
+.action-list-item.active-hover {
+	@apply hover:!bg-gradient-to-tr hover:!from-pink-300 hover:!to-rose-300 hover:dark:!from-pink-900 hover:dark:!to-rose-900;
+}
+
 .action-list-item_title {
 	@apply line-clamp-1 w-full cursor-pointer text-ellipsis;
 }

@@ -158,9 +158,9 @@ declare global {
 				hide: () => string
 			}
 			context_menu: {
-				add: () => Ordo.ContextMenu.Instance
+				add: () => Ordo.ContextMenu.Item
 				remove: () => string
-				show: <$TPayload>() => Omit<Ordo.ContextMenu.Menu<$TPayload>, "structure">
+				show: () => Omit<Ordo.ContextMenu.Instance, "structure">
 				hide: () => void
 			}
 			command_palette: {
@@ -1129,11 +1129,11 @@ declare global {
 			/**
 			 * Context menu item.
 			 */
-			type Instance = {
+			type Item = {
 				/**
 				 * Check whether the item needs to be shown.
 				 */
-				should_show: <$TPayload>(params: Ordo.ContextMenu.Params<$TPayload>) => boolean
+				should_show: (params: Ordo.ContextMenu.Params) => boolean
 
 				/**
 				 * @see ItemType
@@ -1169,7 +1169,7 @@ declare global {
 				 * @optional
 				 * @default () => false
 				 */
-				should_be_disabled?: <$TPayload>(params: Ordo.ContextMenu.Params<$TPayload>) => boolean
+				should_be_disabled?: (params: Ordo.ContextMenu.Params) => boolean
 
 				/**
 				 * This function allows you to override the incoming payload that will be passed to the command
@@ -1178,20 +1178,18 @@ declare global {
 				 * @optional
 				 * @default () => payload
 				 */
-				payload_creator?: <$TPayload, $TResult = $TPayload>(
-					params: Ordo.ContextMenu.Params<$TPayload>,
-				) => $TResult
+				payload_creator?: (params: Ordo.ContextMenu.Params) => unknown
 			}
 
 			/**
 			 * Context menu item method parameters.
 			 */
-			type Params<$TPayload> = { event: MouseEvent; payload?: $TPayload }
+			type Params = { event: MouseEvent; payload?: unknown }
 
 			/**
 			 * Context menu.
 			 */
-			type Menu<$TPayload> = {
+			type Instance = {
 				/**
 				 * Accepted mouse event.
 				 */
@@ -1200,7 +1198,7 @@ declare global {
 				/**
 				 * Payload to be passed to the context menu item methods.
 				 */
-				payload?: $TPayload
+				payload?: unknown
 
 				/**
 				 * Avoid showing create items.
@@ -1225,7 +1223,7 @@ declare global {
 				/**
 				 * Items to be shown in the context menu.
 				 */
-				structure: Ordo.ContextMenu.Instance[]
+				structure: Ordo.ContextMenu.Item[]
 			}
 		}
 

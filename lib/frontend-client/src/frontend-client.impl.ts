@@ -26,8 +26,8 @@ import { init_activity_bar } from "./sections/activity-bar.section"
 import { init_background_task_display } from "./sections/background-task-display.section"
 import { init_command_palette } from "./sections/command-palette.section"
 import { init_commands } from "./components/commands"
-// import { init_context_menu } from "./sections/context-menu.section"
 import { init_content } from "./components/content"
+import { init_context_menu } from "./sections/context-menu.section"
 import { init_fetch } from "./components/fetch"
 import { init_file_associations } from "./components/file-associations"
 import { init_hosts } from "./components/hosts"
@@ -145,7 +145,7 @@ export const create_client = async ({ logger, is_dev, hosts }: P) => {
 	init_notifications({ logger, commands, ctx: internal_context })
 	init_activity_bar({ ctx: internal_context, logger, activities$, current_activity$ })
 	init_command_palette(logger, commands, internal_context)
-	// init_context_menu(logger, commands, internal_context)
+	init_context_menu(logger, commands, internal_context)
 
 	const shared_function_context = {
 		get_commands,

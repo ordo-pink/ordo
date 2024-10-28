@@ -24,7 +24,7 @@ import "./action-list-item.css"
 
 export type TActionListItemProps = {
 	title: string
-	is_current?: boolean
+	is_current?: boolean | "hover"
 	on_click?: (event: MouseEvent) => void
 	render_icon?: (div: HTMLDivElement) => void
 	render_footer?: () => TMaokaComponent
@@ -44,8 +44,9 @@ export const ActionListItem = ({
 		use(MaokaJabs.listen("onclick", on_click))
 
 		return () => {
-			if (is_current) use(MaokaJabs.add_class("active"))
-			else use(MaokaJabs.remove_class("active"))
+			if (is_current === true) use(MaokaJabs.add_class("active"))
+			else if (is_current === "hover") use(MaokaJabs.add_class("active-hover"))
+			else use(MaokaJabs.remove_class("active", "active-hover"))
 
 			return Layout(() => [
 				Main(() => [Icon(render_icon), Title(() => title), render_info?.()]),
@@ -55,7 +56,6 @@ export const ActionListItem = ({
 	})
 
 const Title = Maoka.styled("div", { class: "action-list-item_title" })
-
 const Layout = Maoka.styled("div", { class: "action-list-item_layout" })
 const Main = Maoka.styled("div", { class: "action-list-item_main" })
 const Footer = Maoka.styled("div", { class: "action-list-item_footer" })

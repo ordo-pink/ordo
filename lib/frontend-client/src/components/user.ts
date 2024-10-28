@@ -27,7 +27,7 @@ import {
 	UserQuery,
 } from "@ordo-pink/core"
 import { O, type TOption } from "@ordo-pink/option"
-import { invokers0, Oath, ops0 } from "@ordo-pink/oath"
+import { Oath, invokers0, ops0 } from "@ordo-pink/oath"
 import { call_once, noop } from "@ordo-pink/tau"
 import { type AuthResponse } from "@ordo-pink/backend-server-id"
 import { CurrentUserManager } from "@ordo-pink/managers"

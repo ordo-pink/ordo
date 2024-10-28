@@ -17,8 +17,8 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import { Oath, invokers0, ops0 } from "@ordo-pink/oath"
 import { read_file0, write_file0 } from "@ordo-pink/fs"
-import { Oath } from "@ordo-pink/oath"
 import { die } from "@ordo-pink/binutil"
 import { getc } from "@ordo-pink/getc"
 import { keys_of } from "@ordo-pink/tau"
@@ -62,28 +62,40 @@ const main = () => {
 	}
 
 	void read_file0("./.env", "utf-8")
-		.map(str => (str as string).trim().split("\n"))
-		.map(lines => lines.map(line => line.trim().split("=")))
-		.map(lines =>
-			lines.reduce((acc, line) => ({ ...acc, [line[0]]: line[1] }), {} as Record<string, string>),
+		.pipe(ops0.map(str => (str as string).trim().split("\n")))
+		.pipe(ops0.map(lines => lines.map(line => line.trim().split("="))))
+		.pipe(
+			ops0.map(lines =>
+				lines.reduce((acc, line) => ({ ...acc, [line[0]]: line[1] }), {} as Record<string, string>),
+			),
 		)
-		.chain(env =>
-			Oath.from(() => generateKeyPairP()).map(({ priv, pub }) => ({
-				...env,
-				ORDO_ID_ACCESS_TOKEN_PRIVATE_KEY: priv,
-				ORDO_ID_ACCESS_TOKEN_PUBLIC_KEY: pub,
-			})),
+		.pipe(
+			ops0.chain(env =>
+				Oath.FromPromise(() => generateKeyPairP()).pipe(
+					ops0.map(({ priv, pub }) => ({
+						...env,
+						ORDO_ID_ACCESS_TOKEN_PRIVATE_KEY: priv,
+						ORDO_ID_ACCESS_TOKEN_PUBLIC_KEY: pub,
+					})),
+				),
+			),
 		)
-		.chain(env =>
-			Oath.from(() => generateKeyPairP()).map(({ priv, pub }) => ({
-				...env,
-				ORDO_ID_REFRESH_TOKEN_PRIVATE_KEY: priv,
-				ORDO_ID_REFRESH_TOKEN_PUBLIC_KEY: pub,
-			})),
+		.pipe(
+			ops0.chain(env =>
+				Oath.FromPromise(() => generateKeyPairP()).pipe(
+					ops0.map(({ priv, pub }) => ({
+						...env,
+						ORDO_ID_REFRESH_TOKEN_PRIVATE_KEY: priv,
+						ORDO_ID_REFRESH_TOKEN_PUBLIC_KEY: pub,
+					})),
+				),
+			),
 		)
-		.map(env => keys_of(env).reduce((acc, key) => acc.concat(`${key}=${env[key]}\n`), ""))
-		.chain(str => write_file0("./.env", str, "utf-8"))
-		.orElse(die())
+		.pipe(
+			ops0.map(env => keys_of(env).reduce((acc, key) => acc.concat(`${key}=${env[key]}\n`), "")),
+		)
+		.pipe(ops0.chain(str => write_file0("./.env", str, "utf-8")))
+		.invoke(invokers0.or_else(die()))
 }
 
 main()

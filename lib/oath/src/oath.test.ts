@@ -511,7 +511,7 @@ test("resolved oath.and should return a rejected oath of a value updated by the 
 		.and(x => Oath.Reject(x + 1))
 		.fork(
 			x => x,
-			x => (x as any) + 1,
+			x => x + 1,
 		)
 
 	expect(await resolved).toEqual(2)
@@ -530,7 +530,7 @@ test("resolved oath.and should return a rejected oath of a value updated by the 
 		.and(x => Promise.reject(x + 1))
 		.fork(
 			x => x,
-			x => (x as any) + 1,
+			x => x + 1,
 		)
 
 	expect(await resolved).toEqual(2)
@@ -538,7 +538,7 @@ test("resolved oath.and should return a rejected oath of a value updated by the 
 
 test("rejected oath.and should return a rejected oath of unchanged value", async () => {
 	const rejected = Oath.Reject(1)
-		.and(x => (x as any) + 1)
+		.and(x => x + 1)
 		.fork(
 			x => x,
 			x => x,

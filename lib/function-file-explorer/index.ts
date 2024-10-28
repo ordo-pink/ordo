@@ -20,8 +20,8 @@
 // import { BsFileEarmarkMinus, BsFileEarmarkPlus, BsPencil } from "react-icons/bs"
 
 import { BS_FOLDER_2_OPEN, BsFileEarmarkPlus } from "@ordo-pink/frontend-icons"
+import { ContextMenuItemType, Metadata, create_function } from "@ordo-pink/core"
 import { Maoka } from "@ordo-pink/maoka"
-import { ContextMenuItemType, create_function, Metadata } from "@ordo-pink/core"
 
 import { CreateFileModal } from "./src/components/create-file-modal.component"
 import { FileExplorer } from "./src/components/fe.component"
@@ -86,11 +86,10 @@ export default create_function(
 			}),
 		)
 
-		commands.on("cmd.metadata.show_rename_modal", fsid =>
+		commands.on("cmd.metadata.show_rename_modal", (/*fsid*/) =>
 			commands.emit("cmd.application.modal.show", {
-				render: div => void Maoka.render_dom(div, RenameFileModal(ctx, fsid)),
-			}),
-		)
+				render: div => void Maoka.render_dom(div, RenameFileModal(/*ctx, fsid*/)),
+			}),)
 
 		commands.on("cmd.metadata.show_create_modal", fsid =>
 			commands.emit("cmd.application.modal.show", {
@@ -116,7 +115,7 @@ export default create_function(
 		commands.emit("cmd.application.context_menu.add", {
 			command: "cmd.metadata.show_create_modal",
 			render_icon: div => div.appendChild(BsFileEarmarkPlus() as SVGSVGElement), // TODO: Move to icons
-			readable_name: "Create File", // TODO: Translations
+			readable_name: "Create File" as Ordo.I18N.TranslationKey, // TODO: Translations
 			should_show: ({ payload }) => Metadata.Validations.is_metadata(payload) || payload === "root",
 			payload_creator: ({ payload }) =>
 				Metadata.Validations.is_metadata(payload) ? payload.get_fsid() : null,
@@ -124,9 +123,9 @@ export default create_function(
 		})
 
 		commands.emit("cmd.application.context_menu.add", {
-			cmd: "cmd.metadata.show_rename_modal",
+			command: "cmd.metadata.show_rename_modal",
 			// render_icon: BsPencil, // TODO: Move to icons
-			readable_name: "Rename File", // TODO: Translations
+			readable_name: "Rename File" as Ordo.I18N.TranslationKey, // TODO: Translations
 			should_show: ({ payload }) => Metadata.Validations.is_metadata(payload),
 			payload_creator: ({ payload }) =>
 				Metadata.Validations.is_metadata(payload) && payload.get_fsid(),
@@ -134,9 +133,9 @@ export default create_function(
 		})
 
 		commands.emit("cmd.application.context_menu.add", {
-			cmd: "cmd.metadata.show_remove_modal",
+			command: "cmd.metadata.show_remove_modal",
 			// Icon: BsFileEarmarkMinus, // TODO: Move to icons
-			readable_name: "Remove File", // TODO: Translations
+			readable_name: "Remove File" as Ordo.I18N.TranslationKey, // TODO: Translations
 			should_show: ({ payload }) => Metadata.Validations.is_metadata(payload),
 			payload_creator: ({ payload }) =>
 				Metadata.Validations.is_metadata(payload) && payload.get_fsid(),

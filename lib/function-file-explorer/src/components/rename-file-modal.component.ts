@@ -19,17 +19,17 @@
 
 import {
 	Maoka,
-	type TMaokaChildren,
-	create,
-	listen,
-	set_attribute,
-	set_class,
-	set_inner_html,
+	// type TMaokaChildren,
+	// create,
+	// listen,
+	// set_attribute,
+	// set_class,
+	// set_inner_html,
 } from "@ordo-pink/maoka"
-import { get_commands, get_translations, ordo_context } from "@ordo-pink/maoka-ordo-jabs"
-import { BS_FILE_EARMARK_RICHTEXT } from "@ordo-pink/frontend-icons"
+// import { get_commands, get_translations, ordo_context } from "@ordo-pink/maoka-ordo-jabs"
+// import { BS_FILE_EARMARK_RICHTEXT } from "@ordo-pink/frontend-icons"
 
-export const RenameFileModal = (ctx: TCreateFunctionContext, fsid: FSID) =>
+export const RenameFileModal = (/* ctx: TCreateFunctionContext, fsid: FSID */) =>
 	Maoka.styled("div", {})(() => "A")
 // 	create("div", ({ use }) => {
 // 		use(ordo_context.provide(ctx))

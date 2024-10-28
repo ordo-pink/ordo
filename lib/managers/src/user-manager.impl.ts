@@ -19,7 +19,7 @@
 
 import { combineLatestWith, map } from "rxjs"
 
-import { invokers0, Oath, ops0 } from "@ordo-pink/oath"
+import { Oath, invokers0, ops0 } from "@ordo-pink/oath"
 import { O } from "@ordo-pink/option"
 import { noop } from "@ordo-pink/tau"
 

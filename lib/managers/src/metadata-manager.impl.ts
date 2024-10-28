@@ -21,7 +21,7 @@
 
 import { Metadata } from "@ordo-pink/core"
 // import { O } from "@ordo-pink/option"
-import { invokers0, Oath, ops0 } from "@ordo-pink/oath"
+import { Oath, invokers0, ops0 } from "@ordo-pink/oath"
 // import { noop } from "@ordo-pink/tau"
 
 import { type TMetadataManagerStatic } from "./metadata-manager.types"

@@ -17,16 +17,16 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import {
-	BsFileEarmark,
-	BsFileEarmarkBinary,
-	BsFileEarmarkRichText,
-	BsFolderOpen,
-} from "@ordo-pink/frontend-icons"
+// import {
+// 	BsFileEarmark,
+// 	BsFileEarmarkBinary,
+// 	BsFileEarmarkRichText,
+// 	BsFolderOpen,
+// } from "@ordo-pink/frontend-icons"
 import { Maoka } from "@ordo-pink/maoka"
-import { Switch } from "@ordo-pink/switch"
+// import { Switch } from "@ordo-pink/switch"
 
-export const FileExplorerFile = (metadata: TMetadata) => Maoka.styled("div", {}, () => "")
+export const FileExplorerFile = (/* metadata: TMetadata */) => Maoka.styled("div", {})(() => "")
 // 	create("div", ({ use }) => {
 // 		const commands = use(get_commands)
 

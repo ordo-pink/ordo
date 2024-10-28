@@ -10,10 +10,6 @@
 	@apply flex items-center space-x-2;
 }
 
-.action-list-item_footer {
-	@apply p-1;
-}
-
 .action-list-item.active {
 	@apply bg-gradient-to-tr from-pink-300 to-rose-300 dark:from-pink-900 dark:to-rose-900;
 }

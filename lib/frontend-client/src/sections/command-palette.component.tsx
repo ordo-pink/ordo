@@ -27,7 +27,7 @@ import { Switch } from "@ordo-pink/switch"
 import { noop } from "@ordo-pink/tau"
 import { use$ } from "@ordo-pink/frontend-react-hooks"
 
-import Accelerator from "@ordo-pink/frontend-react-components/accelerator"
+import Accelerator from "@ordo-pink/frontend-react-components/hotkey"
 import ActionListItem from "@ordo-pink/frontend-react-components/action-list-item"
 
 type P = {
@@ -279,7 +279,7 @@ export default function CommandPaletteModal({
 								readable_name={item.readable_name}
 								command_name={item.id}
 								Icon={item.Icon}
-								accelerator={item.accelerator}
+								hotkey={item.hotkey}
 								is_current={current_index === index && pointer_location === "selected"}
 								on_select={() => on_enter(index, "selected")}
 							/>
@@ -294,7 +294,7 @@ export default function CommandPaletteModal({
 							readable_name={item.readable_name}
 							command_name={item.id}
 							Icon={item.Icon}
-							accelerator={item.accelerator}
+							hotkey={item.hotkey}
 							is_current={current_index === index && pointer_location === "suggested"}
 							on_select={() => on_enter(index, "suggested")}
 						/>
@@ -317,7 +317,7 @@ export default function CommandPaletteModal({
 
 			{multiple ? (
 				<div className="text-center text-sm text-neutral-500">
-					<Accelerator inline accelerator="Esc" /> {t_command_palette_press_to_exit}
+					<Accelerator inline hotkey="Esc" /> {t_command_palette_press_to_exit}
 				</div>
 			) : null}
 		</div>
@@ -328,19 +328,12 @@ type TItemP = {
 	command_name: string
 	readable_name: keyof TFlatTranslations
 	Icon?: ComponentType | IconType
-	accelerator?: string
+	hotkey?: string
 	is_current: boolean
 	on_select: () => void
 }
-const Item = ({
-	command_name,
-	readable_name,
-	Icon,
-	accelerator,
-	is_current,
-	on_select,
-}: TItemP) => {
-	use$.accelerator(accelerator, on_select)
+const Item = ({ command_name, readable_name, Icon, hotkey, is_current, on_select }: TItemP) => {
+	use$.hotkey(hotkey, on_select)
 	const translate = use$.translation()
 	const t_readable_name = translate(readable_name) ?? readable_name
 
@@ -353,7 +346,7 @@ const Item = ({
 			current={is_current}
 			onClick={on_select}
 		>
-			{accelerator ? <Accelerator accelerator={accelerator} /> : null}
+			{hotkey ? <Accelerator hotkey={hotkey} /> : null}
 		</ActionListItem>
 	)
 }

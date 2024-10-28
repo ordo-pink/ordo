@@ -80,10 +80,6 @@ export default Maoka.create("main", ({ use, on_unmount }) => {
 		const t_try = t("t.welcome.landing_page.sections.hero.try_now_button")
 		const t_sign_up = t("t.welcome.landing_page.sections.hero.sign_up")
 
-		const sign_up_params = { text: t_sign_up, accelerator: "mod+u", on_click: handle_sign_up_click }
-		const try_now_params = { text: t_try, accelerator: "mod+enter", on_click: handle_try_click }
-		const learn_more_params = { text: t_more, on_click: handle_more_click, accelerator: "m" }
-
 		commands.emit("cmd.application.set_title", "t.welcome.landing_page.title")
 
 		return HeroSection(() => [
@@ -96,15 +92,32 @@ export default Maoka.create("main", ({ use, on_unmount }) => {
 				HeroCardContent(() => [
 					HeroCardLogoSection(() => [
 						HeroCardLogoWrapper(() => [t_bring_your_thoughts_to, HeroCardLogoText(() => t_ordo)]),
-						HeroCardLogoAction(() => Button.Neutral(learn_more_params)),
+						HeroCardLogoAction(() =>
+							Button.Neutral({
+								text: t_more,
+								on_click: handle_more_click,
+								hotkey: "m",
+								hotkey_options: { prevent_in_inputs: true },
+							}),
+						),
 					]),
 
 					CallToActionSection(() =>
 						CallToActionCard(() => [
 							CallToActionBetaLogo(`"${t_beta_started}"`),
 							ActionsContainer(() => [
-								Button.Primary(try_now_params),
-								Button.Neutral(sign_up_params),
+								Button.Primary({
+									text: t_try,
+									hotkey: "mod+enter",
+									on_click: handle_try_click,
+									hotkey_options: { prevent_in_inputs: true },
+								}),
+								Button.Neutral({
+									text: t_sign_up,
+									hotkey: "mod+u",
+									on_click: handle_sign_up_click,
+									hotkey_options: { prevent_in_inputs: true },
+								}),
 							]),
 						]),
 					),

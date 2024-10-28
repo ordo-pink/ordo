@@ -27,6 +27,7 @@ import type { TOption } from "@ordo-pink/option"
 import type { TResult } from "@ordo-pink/result"
 
 import type * as C from "./constants"
+import { TMaokaComponent } from "@ordo-pink/maoka"
 
 export type TDropIsPrefix<T extends string> = T extends `is_${infer U}` ? U : never
 
@@ -166,13 +167,7 @@ declare global {
 				add: () => Ordo.CommandPalette.Item
 				remove: () => string
 				toggle: () => void
-				show: () => {
-					items: Ordo.CommandPalette.Item[]
-					on_new_item?: (new_item: string) => unknown
-					multiple?: boolean
-					pinned_items?: Ordo.CommandPalette.Item[]
-					shows_next_palette?: boolean
-				}
+				show: () => Ordo.CommandPalette.Instance
 				hide: () => void
 			}
 			sidebar: {
@@ -1161,12 +1156,12 @@ declare global {
 				render_icon?: (div: HTMLDivElement) => void
 
 				/**
-				 * Keyboard accelerator for the context menu item. It only works while the context menu is
+				 * Keyboard hotkey for the context menu item. It only works while the context menu is
 				 * opened.
 				 *
 				 * @optional
 				 */
-				accelerator?: string
+				hotkey?: string
 
 				/**
 				 * Check whether the item needs to be shown disabled.
@@ -1262,17 +1257,20 @@ declare global {
 				 *
 				 * @optional
 				 */
-				render_icon?: (div: HTMLDivElement) => void
+				render_icon?: (div: HTMLDivElement) => void | Promise<void>
 
 				/**
-				 * Keyboard accelerator for the context menu item. It only works while the context menu is
+				 * Keyboard hotkey for the context menu item. It only works while the context menu is
 				 * opened.
 				 *
 				 * @optional
 				 */
-				accelerator?: string
+				hotkey?: string
 
 				description?: Ordo.I18N.TranslationKey
+
+				render_custom_footer?: () => TMaokaComponent // TODO Use standard render approach
+				render_custom_info?: () => TMaokaComponent // TODO Use standard render approach
 			}
 		}
 

@@ -242,7 +242,7 @@ export default create_function(
 					readable_name: "t.auth.user.open_settings",
 					Icon: BsGear,
 					on_select: () => commands.emit("cmd.user.open_settings"),
-					accelerator: "mod+,", // TODO: Fix using symbols
+					hotkey: "mod+,", // TODO: Fix using symbols
 				})
 
 				commands.emit("cmd.application.command_palette.add", {
@@ -250,7 +250,7 @@ export default create_function(
 					readable_name: "t.auth.user.open_achievements",
 					Icon: BsAward,
 					on_select: () => commands.emit("cmd.user.open_achievements"),
-					accelerator: "mod+y",
+					hotkey: "mod+y",
 				})
 			} else {
 				commands.off("cmd.auth.sign_out", on_sign_out)
@@ -273,7 +273,7 @@ export default create_function(
 					readable_name: "t.auth.pages.sign_in.label",
 					Icon: BsBoxArrowInRight,
 					on_select: () => commands.emit("cmd.auth.open_sign_in"),
-					accelerator: "mod+shift+l",
+					hotkey: "mod+shift+l",
 				})
 
 				commands.emit("cmd.application.command_palette.add", {
@@ -281,7 +281,7 @@ export default create_function(
 					readable_name: "t.auth.pages.sign_up.label",
 					Icon: BsBoxArrowUp,
 					on_select: () => commands.emit("cmd.auth.open_sign_up"),
-					accelerator: "mod+shift+r",
+					hotkey: "mod+shift+r",
 				})
 			}
 		})

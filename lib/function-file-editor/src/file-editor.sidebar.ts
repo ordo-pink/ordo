@@ -31,7 +31,7 @@ export const FileEditorSidebar = (ctx: Ordo.CreateFunction.Params) =>
 		let metadata: Ordo.Metadata.Instance[] = []
 
 		// TODO Detect
-		use(MaokaJabs.set_class("flex flex-col px-2 h-full", "file_editor_sidebar"))
+		use(MaokaJabs.set_class("flex flex-col p-2 h-full overflow-y-auto", "file_editor_sidebar"))
 
 		const commands = use(MaokaOrdo.Jabs.Commands)
 		const metadata_query = use(MaokaOrdo.Jabs.MetadataQuery)

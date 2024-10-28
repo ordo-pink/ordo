@@ -10,6 +10,7 @@ export type TMaokaElement = { [$TKey in keyof HTMLElement]: HTMLElement[$TKey] |
 	replaceChildren: (...children: TMaokaChild[]) => void
 	childNodes: HTMLElement["childNodes"]
 	onunmount: (() => void)[] | undefined
+	aftermount: (() => void)[] | undefined
 }
 
 export type TMaokaTextElement = Partial<{ [$TKey in keyof Text]: Text[$TKey] }> | string
@@ -83,10 +84,14 @@ export type TMaokaProps<$TElement extends TMaokaElement = TMaokaElement> = {
 
 	on_unmount: TMaokaOnUnmountFn
 
+	after_mount: TMaokaAfterMountFn
+
 	use: <_TResult>(jab: TMaokaJab<_TResult>) => _TResult
 }
 
 export type TMaokaOnUnmountFn = (f: () => void) => void
+
+export type TMaokaAfterMountFn = (f: () => void) => void
 
 /**
  * A callback function that returns children of the current Maoka component. It accepts a record of

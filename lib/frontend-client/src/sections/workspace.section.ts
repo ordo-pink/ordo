@@ -103,7 +103,7 @@ export const init_workspace = (
 	// 	readable_name: "t.common.components.sidebar.toggle",
 	// 	Icon: BsToggle2Off,
 	// 	on_select: () => commands.emit("cmd.application.sidebar.toggle"),
-	// 	accelerator: "mod+b",
+	// 	hotkey: "mod+b",
 	// })
 
 	// commands.emit("cmd.application.context_menu.add", {
@@ -117,7 +117,7 @@ export const init_workspace = (
 	// 		!sidebar$.value.disabled &&
 	// 		sidebar$.value.sizes[1] === 0,
 	// 	type: "update",
-	// 	accelerator: "mod+b",
+	// 	hotkey: "mod+b",
 	// })
 
 	// commands.emit("cmd.application.context_menu.add", {
@@ -135,7 +135,7 @@ export const init_workspace = (
 	// 		)
 	// 	},
 	// 	type: "update",
-	// 	accelerator: "mod+b",
+	// 	hotkey: "mod+b",
 	// })
 
 	let split: any

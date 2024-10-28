@@ -48,7 +48,7 @@
 // import { Switch } from "@ordo-pink/switch"
 // import { type TLogger } from "@ordo-pink/logger"
 
-// import Accelerator from "@ordo-pink/frontend-react-components/accelerator"
+// import Accelerator from "@ordo-pink/frontend-react-components/hotkey"
 // import ActionListItem from "@ordo-pink/frontend-react-components/action-list-item"
 // import Null from "@ordo-pink/frontend-react-components/null"
 // import RenderFromNullable from "@ordo-pink/frontend-react-components/render-from-nullable"
@@ -107,7 +107,7 @@
 // 		[menu, commands],
 // 	)
 
-// 	use$.accelerator("Esc", hide_context_menu, [menu])
+// 	use$.hotkey("Esc", hide_context_menu, [menu])
 
 // 	const menu_height = 40 * readers.concat(creators).concat(updaters).concat(removers).length
 
@@ -300,25 +300,25 @@
 // 	const payload = item.payload_creator ? item.payload_creator({ payload: p, event }) : p
 // 	const is_disabled = !!item.should_be_disabled && item.should_be_disabled({ event, payload })
 
-// 	const on_accelerator_used = () =>
+// 	const on_hotkey_used = () =>
 // 		Result.If(is_disabled).cata({
 // 			Ok: () => commands.emit("cmd.application.context_menu.hide"),
 // 			Err: () => commands.emit(item.cmd, payload),
 // 		})
 
-// 	use$.accelerator(item.accelerator, on_accelerator_used)
+// 	use$.hotkey(item.hotkey, on_hotkey_used)
 
 // 	return (
 // 		<ActionListItem
 // 			key={item.cmd}
 // 			Icon={item.Icon}
 // 			current={false}
-// 			onClick={on_accelerator_used}
+// 			onClick={on_hotkey_used}
 // 			text={item.readable_name}
 // 			disabled={is_disabled}
 // 		>
-// 			<RenderFromNullable having={item.accelerator}>
-// 				<Accelerator accelerator={item.accelerator!} />
+// 			<RenderFromNullable having={item.hotkey}>
+// 				<Accelerator hotkey={item.hotkey!} />
 // 			</RenderFromNullable>
 // 		</ActionListItem>
 // 	)

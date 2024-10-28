@@ -2,6 +2,10 @@
 	@apply hidden shrink-0 items-center justify-center space-x-1 rounded-md px-2 py-0.5 text-center text-xs text-current md:flex;
 }
 
+.hotkey.smol {
+	@apply px-1 py-0.5;
+}
+
 .key-container {
 	@apply min-w-8 rounded-md border border-b-2 border-r-2 border-current px-1 py-0.5 text-current;
 }

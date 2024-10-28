@@ -54,8 +54,8 @@ export const init_command_palette = call_once(
 		commands.emit("cmd.application.command_palette.add", {
 			on_select: () => commands.emit("cmd.application.command_palette.toggle"),
 			readable_name: "t.common.components.command_palette.toggle",
-			accelerator: "mod+shift+p",
-			render_icon: div => div.appendChild(BsTerminal() as SVGSVGElement),
+			hotkey: "mod+shift+p",
+			render_icon: div => void div.appendChild(BsTerminal() as SVGSVGElement),
 			description: "t.common.components.command_palette.toggle_description",
 		})
 
@@ -128,11 +128,11 @@ global_command_palette$.subscribe()
 
 const IGNORED_KEYS = ["Control", "Shift", "Alt", "Meta"]
 
-const create_hotkey_string = (event: KeyboardEvent, isApple: boolean) => {
+const create_hotkey_string = (event: KeyboardEvent, is_darwin: boolean) => {
 	let hotkey = ""
 
 	if (event.altKey) hotkey += "meta+"
-	if (event.ctrlKey) hotkey += isApple ? "ctrl+" : "mod+"
+	if (event.ctrlKey) hotkey += is_darwin ? "ctrl+" : "mod+"
 	if (event.metaKey) hotkey += "mod+"
 	if (event.shiftKey) hotkey += "shift+"
 
@@ -147,9 +147,7 @@ const on_input =
 
 		const hotkey = create_hotkey_string(event, false)
 
-		const command = global_command_palette.items.find(
-			item => item.accelerator && item.accelerator === hotkey,
-		)
+		const command = global_command_palette.items.find(item => item.hotkey && item.hotkey === hotkey)
 
 		if (command) {
 			event.preventDefault()

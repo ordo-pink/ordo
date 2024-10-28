@@ -19,7 +19,7 @@
 
 // import { BsFileEarmarkMinus, BsFileEarmarkPlus, BsPencil } from "react-icons/bs"
 
-import { BS_FOLDER_2_OPEN } from "@ordo-pink/frontend-icons"
+import { BS_FOLDER_2_OPEN, BsFileEarmarkPlus } from "@ordo-pink/frontend-icons"
 import { Maoka } from "@ordo-pink/maoka"
 import { create_function } from "@ordo-pink/core"
 
@@ -54,6 +54,8 @@ export default create_function(
 			"cmd.application.router.navigate",
 			"cmd.file_explorer.go_to_file",
 			"cmd.file_explorer.open_file_explorer",
+			"cmd.application.command_palette.add",
+			"cmd.metadata.show_create_modal",
 		],
 	},
 	ctx => {
@@ -95,6 +97,13 @@ export default create_function(
 				render: div => void Maoka.render_dom(div, CreateFileModal(ctx, fsid)),
 			}),
 		)
+
+		commands.emit("cmd.application.command_palette.add", {
+			on_select: () => commands.emit("cmd.metadata.show_create_modal", null),
+			hotkey: "mod+shift+n",
+			readable_name: "t.file_explorer.modals.create_file.title",
+			render_icon: div => void div.appendChild(BsFileEarmarkPlus() as SVGSVGElement),
+		})
 
 		commands.on("cmd.file_explorer.go_to_file", fsid =>
 			commands.emit("cmd.application.router.navigate", `/files/${fsid}`),

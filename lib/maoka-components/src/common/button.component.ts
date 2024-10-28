@@ -20,18 +20,19 @@
 import { Maoka } from "@ordo-pink/maoka"
 import { MaokaJabs } from "@ordo-pink/maoka-jabs"
 
-import { Hotkey } from "./hotkey.component"
+import { Hotkey, THotkeyOptions } from "./hotkey.component"
 
 import "./button.css"
 
 export type TButtonProps = {
 	on_click: (event: MouseEvent) => void
-	custom_class?: string
-	accelerator?: string
 	text: string
+	hotkey?: string
+	hotkey_options?: THotkeyOptions
+	custom_class?: string
 }
 
-const Default = ({ on_click, accelerator, text, custom_class = "" }: TButtonProps) =>
+const Default = ({ on_click, hotkey, text, custom_class = "", hotkey_options }: TButtonProps) =>
 	Maoka.create("button", ({ use, element }) => {
 		use(MaokaJabs.set_class("button", custom_class))
 		use(
@@ -41,7 +42,7 @@ const Default = ({ on_click, accelerator, text, custom_class = "" }: TButtonProp
 			}),
 		)
 
-		return () => [TextContainer(() => text), accelerator ? Hotkey(accelerator) : void 0]
+		return () => [TextContainer(() => text), hotkey ? Hotkey(hotkey, hotkey_options) : void 0]
 	})
 
 const TextContainer = Maoka.styled("div")

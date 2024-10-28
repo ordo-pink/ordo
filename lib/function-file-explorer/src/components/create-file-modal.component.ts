@@ -17,10 +17,10 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import { Button, Input } from "@ordo-pink/maoka-components"
 import { Maoka, type TMaokaElement } from "@ordo-pink/maoka"
 import { BS_FILE_EARMARK_PLUS } from "@ordo-pink/frontend-icons"
 import { BsFileEarmarkPlus } from "@ordo-pink/frontend-icons"
-import { Button } from "@ordo-pink/maoka-components"
 import { MaokaJabs } from "@ordo-pink/maoka-jabs"
 import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
 import { Switch } from "@ordo-pink/switch"
@@ -53,7 +53,7 @@ export const CreateFileModal = (
 				Button.Neutral({
 					on_click: () => emit("cmd.application.modal.hide"),
 					text: "Cancel",
-					accelerator: "escape",
+					hotkey: "escape",
 				}),
 				Button.Success({
 					on_click: () => {
@@ -61,7 +61,7 @@ export const CreateFileModal = (
 						emit("cmd.metadata.create", { name: state.name, parent, type })
 					},
 					text: "OK",
-					accelerator: "shift+enter",
+					hotkey: "enter",
 				}),
 			]),
 		]
@@ -211,35 +211,21 @@ const SelectItem = (
 	})
 
 const CreateFileModalInput = (handle_change: (event: Event) => void) =>
-	Maoka.create("label", () => {
+	Maoka.create("label", ({ use }) => {
+		const { t } = use(MaokaOrdo.Jabs.Translations)
+
 		return () => [
 			Maoka.create("div", ({ use }) => {
 				use(MaokaJabs.set_class("font-bold text-sm"))
-				const { t } = use(MaokaOrdo.Jabs.Translations)
-
 				return () => t("t.file_explorer.modals.create_file.input_label")
 			}),
 
-			Maoka.create("input", ({ use, element }) => {
-				const { t } = use(MaokaOrdo.Jabs.Translations)
-
-				use(MaokaJabs.listen("oninput", handle_change))
-				use(MaokaJabs.set_attribute("autofocus", "autofocus"))
-				use(
-					MaokaJabs.set_attribute(
-						"placeholder",
-						t("t.file_explorer.modals.create_file.input_placeholder"),
-					),
-				)
-
-				use(
-					MaokaJabs.set_class(
-						"w-full rounded-md border-0 px-2 py-1 shadow-inner focus:ring-0 sm:text-sm sm:leading-6",
-						"bg-neutral-50 dark:bg-neutral-600 placeholder:text-neutral-500",
-					),
-				)
-
-				if (element instanceof HTMLElement) element.focus()
+			Input.Text({
+				placeholder: t("t.file_explorer.modals.create_file.input_placeholder"),
+				autofocus: true,
+				custom_class:
+					"w-full rounded-md border-0 px-2 py-1 shadow-inner focus:ring-0 sm:text-sm sm:leading-6 bg-neutral-50 dark:bg-neutral-600 placeholder:text-neutral-500",
+				on_input: handle_change,
 			}),
 		]
 	})

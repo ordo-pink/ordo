@@ -34,6 +34,10 @@ export const create: T.TMaokaCreateComponentFn =
 				if (!element.onunmount) element.onunmount = []
 				element.onunmount.push(f)
 			},
+			after_mount: f => {
+				if (!element.aftermount) element.aftermount = []
+				element.aftermount.push(f)
+			},
 		} as T.TMaokaProps
 
 		if (!callback) return element
@@ -41,7 +45,15 @@ export const create: T.TMaokaCreateComponentFn =
 		get_children = await callback(props)
 		if (!get_children) return element
 
-		return render_children(create_element, root_element, root_id, get_children, element)
+		const children = await render_children(
+			create_element,
+			root_element,
+			root_id,
+			get_children,
+			element,
+		)
+
+		return children
 	}
 
 export const lazy = (callback: () => Promise<{ default: T.TMaokaComponent }>) =>
@@ -79,13 +91,26 @@ export const render_dom: T.TMaokaRenderDOMFn = async (root, component) => {
 		element.childNodes.forEach(child => unmount_element(child as any))
 	}
 
+	const after_mount_element = (element: T.TMaokaElement) => {
+		if (is_arr(element.aftermount) && element.aftermount.length > 0)
+			element.aftermount.forEach(f => f())
+
+		element.childNodes.forEach(child => after_mount_element(child as any))
+	}
+
 	const observer = new MutationObserver(records => {
 		for (const record of records) {
 			const removed_nodes = record.removedNodes as unknown as T.TMaokaElement[]
+			const mounted_nodes = record.addedNodes as unknown as T.TMaokaElement[]
 
 			for (let i = 0; i < removed_nodes.length; i++) {
 				const element = removed_nodes[i]
 				unmount_element(element)
+			}
+
+			for (let i = 0; i < mounted_nodes.length; i++) {
+				const element = mounted_nodes[i]
+				after_mount_element(element)
 			}
 		}
 	})

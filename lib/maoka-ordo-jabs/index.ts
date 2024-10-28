@@ -24,7 +24,7 @@ import {
 	ordo_context,
 	subscription,
 } from "./src/maoka-ordo-jabs.impl"
-import { get_descendents } from "./src/metadata-jabs.impl"
+import { get_ancestors, get_descendents } from "./src/metadata-jabs.impl"
 
 export const MaokaOrdo = {
 	Jabs: {
@@ -47,6 +47,7 @@ export const MaokaOrdo = {
 		computed,
 		Metadata: {
 			get_descendents,
+			get_ancestors,
 		},
 	},
 	Ops: {

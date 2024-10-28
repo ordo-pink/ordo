@@ -22,3 +22,20 @@ export const get_descendents =
 			}),
 		)
 	}
+
+export const get_ancestors =
+	(fsid?: Ordo.Metadata.FSID | null): TMaokaJab<() => Ordo.Metadata.Instance[]> =>
+	({ use, refresh }) => {
+		const metadata_query = use(get_metadata_query)
+
+		return use(
+			from$(metadata_query.$, [] as Ordo.Metadata.Instance[], (_, prev_value) => {
+				if (!fsid) return []
+
+				const new_ancestors = metadata_query.get_ancestors(fsid).cata(R.catas.or_else(() => []))
+				if (new_ancestors.length !== prev_value.length) void refresh()
+
+				return new_ancestors
+			}),
+		)
+	}

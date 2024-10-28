@@ -27,34 +27,45 @@ import "./hotkey.css"
 // TODO Move to jabs
 const isDarwin = navigator.appVersion.indexOf("Mac") !== -1
 
-export const Hotkey = (accelerator: string) =>
-	Maoka.create("div", ({ use, on_unmount, element }) => {
-		const split = accelerator.split("+")
+export type THotkeyOptions = {
+	prevent_in_inputs?: boolean
+	smol?: boolean
+	decoration_only?: boolean
+}
+
+export const Hotkey = (
+	hotkey: string,
+	options: THotkeyOptions = { prevent_in_inputs: false, smol: false, decoration_only: false },
+) =>
+	Maoka.create("div", ({ use, on_unmount, element, after_mount }) => {
+		const split = hotkey.split("+")
 
 		const symbol = split[split.length - 1].toLowerCase()
 
 		use(MaokaJabs.set_class("hotkey"))
+		if (options.smol) use(MaokaJabs.add_class("smol"))
 
 		const handle_keydown = (event: KeyboardEvent) => {
-			const target = event.target as HTMLElement
+			if (IGNORED_KEYS.includes(event.key) || options.decoration_only) return
 
-			// TODO Add textarea and div contenteditable
-			if (target.tagName === "INPUT" || IGNORED_KEYS.includes(event.key)) return
+			if (options.prevent_in_inputs) {
+				const target = event.target as HTMLElement
 
-			const hotkey = create_hotkey_string(event, false)
+				// TODO Add textarea and div contenteditable
+				if (target.tagName === "INPUT") return
+			}
 
-			if (hotkey === accelerator) {
+			const parsed_hotkey = create_hotkey_string(event, false)
+
+			if (parsed_hotkey === hotkey) {
 				event.preventDefault()
 
 				if (element instanceof HTMLElement) element.click()
 			}
 		}
 
-		document.addEventListener("keydown", handle_keydown)
-
-		on_unmount(() => {
-			document.removeEventListener("keydown", handle_keydown)
-		})
+		after_mount(() => document.addEventListener("keydown", handle_keydown))
+		on_unmount(() => document.removeEventListener("keydown", handle_keydown))
 
 		return () => [
 			Result.If(split.includes("ctrl")).cata(Result.catas.if_ok(() => ctrl)),
@@ -69,11 +80,11 @@ export const Hotkey = (accelerator: string) =>
 
 const IGNORED_KEYS = ["Control", "Shift", "Alt", "Meta"]
 
-const create_hotkey_string = (event: KeyboardEvent, isApple: boolean) => {
+const create_hotkey_string = (event: KeyboardEvent, is_darwin: boolean) => {
 	let hotkey = ""
 
 	if (event.altKey) hotkey += "meta+"
-	if (event.ctrlKey) hotkey += isApple ? "ctrl+" : "mod+"
+	if (event.ctrlKey) hotkey += is_darwin ? "ctrl+" : "mod+"
 	if (event.metaKey) hotkey += "mod+"
 	if (event.shiftKey) hotkey += "shift+"
 
@@ -92,6 +103,11 @@ const Key = (key: string) =>
 			.case("backspace", () => "⌫")
 			.case("enter", () => "⏎")
 			.case("escape", () => "Esc")
+			.case("tab", () => "⇥")
+			.case("arrowleft", () => "←")
+			.case("arrowright", () => "→")
+			.case("arrowup", () => "↑")
+			.case("arrowdown", () => "↓")
 			.default(() => key.toLocaleUpperCase()),
 	)
 

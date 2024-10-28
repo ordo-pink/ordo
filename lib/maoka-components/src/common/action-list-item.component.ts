@@ -60,9 +60,9 @@ const Layout = Maoka.styled("div", { class: "action-list-item_layout" })
 const Main = Maoka.styled("div", { class: "action-list-item_main" })
 const Footer = Maoka.styled("div", { class: "action-list-item_footer" })
 
-const Icon = (render_icon?: (div: HTMLDivElement) => void) =>
+const Icon = (render_icon?: (div: HTMLDivElement) => void | Promise<void>) =>
 	render_icon
-		? Maoka.create("div", ({ element }) => {
-				render_icon(element as unknown as HTMLDivElement)
+		? Maoka.create("div", async ({ element }) => {
+				await render_icon(element as unknown as HTMLDivElement)
 			})
 		: void 0

@@ -48,8 +48,8 @@ const Text = ({
 			Maoka.create("input", ({ use, element, after_mount }) => {
 				use(MaokaJabs.listen("oninput", on_input))
 				use(MaokaJabs.set_attribute("type", "text"))
+				use(MaokaJabs.set_class("input_text", custom_class))
 
-				if (custom_class) use(MaokaJabs.set_class("input_text", custom_class))
 				if (initial_value) use(MaokaJabs.set_attribute("value", initial_value))
 				if (placeholder) use(MaokaJabs.set_attribute("placeholder", placeholder))
 				if (autofocus) after_mount(() => element instanceof HTMLElement && element.focus())

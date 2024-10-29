@@ -19,6 +19,7 @@
 
 export * from "./src/common/action-list-item.component"
 export * from "./src/common/button.component"
+export * from "./src/common/dialog.component"
 export * from "./src/common/hotkey.component"
 export * from "./src/common/input.component"
 export * from "./src/common/link.component"

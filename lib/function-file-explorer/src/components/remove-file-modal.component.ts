@@ -17,71 +17,30 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-// import { get_commands, get_translations, ordo_context } from "@ordo-pink/maoka-ordo-jabs"
-// import { BS_FILE_EARMARK_X } from "@ordo-pink/frontend-icons"
+import { BsFileEarmarkMinus } from "@ordo-pink/frontend-icons"
+import { Dialog } from "@ordo-pink/maoka-components"
 import { Maoka } from "@ordo-pink/maoka"
+import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
 
-export const RemoveFileModal = (/*ctx: Ordo.CreateFunction.Params, fsid: Ordo.Metadata.FSID*/) =>
-	Maoka.styled("div", {})(() => "YAY")
-// 	Maoka.create("div", ({ use }) => {
-// 		use(ordo_context.provide(ctx))
-// 		use(set_class("p-4 w-96 flex flex-col gap-y-2"))
+export const RemoveFileModal = (ctx: Ordo.CreateFunction.Params, fsid: Ordo.Metadata.FSID) =>
+	Maoka.create("div", ({ use }) => {
+		use(MaokaOrdo.Context.provide(ctx))
 
-// 		const { t } = use(get_translations)
-// 		const commands = use(get_commands)
+		const { t } = use(MaokaOrdo.Jabs.Translations)
+		const commands = use(MaokaOrdo.Jabs.Commands)
 
-// 		const t_title = t("t.file_explorer.modals.remove_file.title")
-// 		const t_message = t("t.file_explorer.modals.remove_file.message")
+		const t_title = t("t.file_explorer.modals.remove_file.title")
+		const t_message = t("t.file_explorer.modals.remove_file.message")
 
-// 		return () => [
-// 			Header([TitleIcon, Title(t_title)]),
-// 			Body(t_message),
-// 			Footer([
-// 				CancelBtn,
-// 				OkBtn(() => {
-// 					commands.emit("cmd.data.metadata.remove", fsid)
-// 					commands.emit("cmd.application.modal.hide")
-// 				}),
-// 			]),
-// 		]
-// 	})
-
-// const Header = (children: TMaokaChildren) =>
-// 	create("div", ({ use }) => {
-// 		use(set_class("flex gap-x-2 items-center"))
-// 		return () => children
-// 	})
-
-// const TitleIcon = create("div", ({ use }) => use(set_inner_html(BS_FILE_EARMARK_X)))
-
-// const Title = (children: TMaokaChildren) =>
-// 	create("h2", ({ use }) => {
-// 		use(set_class("text-lg"))
-// 		return () => children
-// 	})
-
-// const Body = (children: TMaokaChildren) => create("div", () => () => children)
-
-// const Footer = (children: TMaokaChildren) =>
-// 	create("div", ({ use }) => {
-// 		use(set_class("flex justify-end items-center gap-x-2"))
-
-// 		return () => children
-// 	})
-
-// const OkBtn = (on_click: (event: MouseEvent) => void) =>
-// 	create("button", ({ use }) => {
-// 		use(set_class("border rounded-md px-4 py-1 text-sm"))
-// 		use(listen("onclick", on_click))
-
-// 		return () => "OK"
-// 	})
-
-// const CancelBtn = create("button", ({ use }) => {
-// 	const commands = use(get_commands)
-
-// 	use(set_class("px-4 py-1 text-sm"))
-// 	use(listen("onclick", () => commands.emit("cmd.application.modal.hide")))
-
-// 	return () => "Cancel"
-// })
+		return () =>
+			Dialog({
+				title: t_title,
+				render_icon: div => void div.appendChild(BsFileEarmarkMinus() as SVGSVGElement),
+				action: () => {
+					commands.emit("cmd.metadata.remove", fsid)
+					commands.emit("cmd.application.modal.hide")
+				},
+				action_text: "OK", // TODO Add translations
+				body: () => t_message,
+			})
+	})

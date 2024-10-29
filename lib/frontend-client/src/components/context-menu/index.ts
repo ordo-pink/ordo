@@ -25,6 +25,7 @@ import { MaokaJabs } from "@ordo-pink/maoka-jabs"
 import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
 
 import "./context-menu.css"
+import { ContextMenuItemType } from "@ordo-pink/core"
 
 export const ContextMenu = (
 	ctx: Ordo.CreateFunction.Params,
@@ -32,6 +33,7 @@ export const ContextMenu = (
 ) =>
 	Maoka.create("div", ({ use, on_unmount }) => {
 		use(MaokaOrdo.Context.provide(ctx))
+		use(MaokaJabs.set_class("context-menu"))
 
 		const { emit } = use(MaokaOrdo.Jabs.Commands)
 		const get_state = use(MaokaOrdo.Jabs.from$($, null, state => state))
@@ -54,14 +56,40 @@ export const ContextMenu = (
 			const right = fits_width ? "" : `${window.innerWidth - state.event.clientX}px`
 			const bottom = fits_height ? "" : `${window.innerHeight - state.event.clientY}px`
 
-			use(MaokaJabs.set_class("context-menu"))
 			use(MaokaJabs.set_style({ left, top, right, bottom }))
 
-			return state.structure
-				.filter(item => item.should_show({ event: state.event, payload: state.payload }))
-				.map(item => ContextMenuItem(item, state.payload, state.event))
+			const all_items = state.structure.filter(
+				item =>
+					((item.type === ContextMenuItemType.CREATE && !state.hide_create_items) ||
+						(item.type === ContextMenuItemType.UPDATE && !state.hide_update_items) ||
+						(item.type === ContextMenuItemType.READ && !state.hide_read_items) ||
+						(item.type === ContextMenuItemType.DELETE && !state.hide_delete_items)) &&
+					item.should_show({ event: state.event, payload: state.payload }),
+			)
+
+			if (all_items.length) {
+				state.event.stopPropagation()
+				state.event.preventDefault()
+			}
+
+			const create_items = all_items.filter(item => item.type === ContextMenuItemType.CREATE)
+			const read_items = all_items.filter(item => item.type === ContextMenuItemType.READ)
+			const update_items = all_items.filter(item => item.type === ContextMenuItemType.UPDATE)
+			const delete_items = all_items.filter(item => item.type === ContextMenuItemType.DELETE)
+
+			return [
+				...create_items.map(item => ContextMenuItem(item, state.payload, state.event)),
+				read_items.length && update_items.length && delete_items.length ? HR : void 0,
+				...read_items.map(item => ContextMenuItem(item, state.payload, state.event)),
+				update_items.length && delete_items.length ? HR : void 0,
+				...update_items.map(item => ContextMenuItem(item, state.payload, state.event)),
+				delete_items.length ? HR : void 0,
+				...delete_items.map(item => ContextMenuItem(item, state.payload, state.event)),
+			]
 		}
 	})
+
+const HR = Maoka.styled("hr", { class: "context-menu_divider" })(() => void 0)
 
 const ContextMenuItem = (item: Ordo.ContextMenu.Item, payload: any, event: MouseEvent) =>
 	Maoka.create("div", ({ use }) => {

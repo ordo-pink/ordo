@@ -5,6 +5,7 @@ import { R } from "@ordo-pink/result"
 import { type TMaokaJab } from "@ordo-pink/maoka"
 
 import { from$, get_metadata_query } from "./maoka-ordo-jabs.impl"
+import { Option } from "@ordo-pink/option"
 
 export const get_descendents =
 	(fsid?: Ordo.Metadata.FSID | null): TMaokaJab<() => Ordo.Metadata.Instance[]> =>
@@ -36,6 +37,30 @@ export const get_ancestors =
 				if (new_ancestors.length !== prev_value.length) void refresh()
 
 				return new_ancestors
+			}),
+		)
+	}
+
+export const get_by_fsid =
+	(fsid?: Ordo.Metadata.FSID | null): TMaokaJab<() => Ordo.Metadata.Instance | null> =>
+	({ use, refresh }) => {
+		const metadata_query = use(get_metadata_query)
+
+		return use(
+			from$<number, Ordo.Metadata.Instance | null>(metadata_query.$, null, (_, prev_value) => {
+				if (!fsid) return null
+
+				const metadata = metadata_query
+					.get_by_fsid(fsid)
+					.cata(R.catas.or_else(() => Option.None()))
+					.cata({ None: () => null, Some: x => x })
+
+				if (prev_value === metadata) return metadata
+				if (prev_value && prev_value.equals(metadata!)) return metadata
+
+				void refresh()
+
+				return metadata
 			}),
 		)
 	}

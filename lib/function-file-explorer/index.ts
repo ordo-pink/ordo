@@ -80,16 +80,17 @@ export default create_function(
 		})
 
 		// TODO: Move to metadata
-		commands.on("cmd.metadata.show_remove_modal", () =>
+		commands.on("cmd.metadata.show_remove_modal", fsid =>
 			commands.emit("cmd.application.modal.show", {
-				render: div => void Maoka.render_dom(div, RemoveFileModal(/*ctx, fsid*/)),
+				render: div => void Maoka.render_dom(div, RemoveFileModal(ctx, fsid)),
 			}),
 		)
 
-		commands.on("cmd.metadata.show_rename_modal", (/*fsid*/) =>
+		commands.on("cmd.metadata.show_rename_modal", fsid =>
 			commands.emit("cmd.application.modal.show", {
-				render: div => void Maoka.render_dom(div, RenameFileModal(/*ctx, fsid*/)),
-			}),)
+				render: div => void Maoka.render_dom(div, RenameFileModal(ctx, fsid)),
+			}),
+		)
 
 		commands.on("cmd.metadata.show_create_modal", fsid =>
 			commands.emit("cmd.application.modal.show", {

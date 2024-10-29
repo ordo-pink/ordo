@@ -1027,45 +1027,53 @@ declare global {
 			 */
 			type TCommandHandler<$TPayload> = (payload: $TPayload) => unknown
 
+			type OnFn = <$TKey extends Ordo.Command.Name>(
+				name: $TKey,
+				handler: TCommandHandler<Ordo.Command.Record[$TKey]>,
+			) => void
+
+			type OffFn = <$TKey extends Ordo.Command.Name>(
+				name: $TKey,
+				handler: TCommandHandler<Ordo.Command.Record[$TKey]>,
+			) => void
+
+			type EmitFn = <$TKey extends Ordo.Command.Name>(
+				name: $TKey,
+				...rest: Ordo.Command.Record[$TKey] extends void
+					? [key?: string]
+					: [payload: Ordo.Command.Record[$TKey], key?: string]
+			) => void
+
+			type CancelFn = <$TKey extends Ordo.Command.Name>(
+				name: $TKey,
+				payload?: Ordo.Command.Record[$TKey],
+				key?: string,
+			) => void
+
 			type Commands = {
 				/**
 				 * Append a listener to a given command.
 				 */
-				on: <$TKey extends Ordo.Command.Name>(
-					name: $TKey,
-					handler: TCommandHandler<Ordo.Command.Record[$TKey]>,
-				) => void
+				on: Ordo.Command.OnFn
 
 				/**
 				 * Remove given listener for a given command. Make sure you provide a reference to the same
 				 * function as you did when calling `on`.
 				 */
-				off: <$TKey extends Ordo.Command.Name>(
-					name: $TKey,
-					handler: TCommandHandler<Ordo.Command.Record[$TKey]>,
-				) => void
+				off: Ordo.Command.OffFn
 
 				/**
 				 * Emit given command with given payload. You can provide an optional key that you can use
 				 * later to apply targeted cancellation for the command. Emission does not happen if there
 				 * is a command with given key already.
 				 */
-				emit: <$TKey extends Ordo.Command.Name>(
-					name: $TKey,
-					...rest: Ordo.Command.Record[$TKey] extends void
-						? [key?: string]
-						: [payload: Ordo.Command.Record[$TKey], key?: string]
-				) => void
+				emit: Ordo.Command.EmitFn
 
 				/**
 				 * Cancel a command with given payload. If you provided a key when emitting the command,
 				 * you can provide it for targeted cancellation.
 				 */
-				cancel: <$TKey extends Ordo.Command.Name>(
-					name: $TKey,
-					payload?: Ordo.Command.Record[$TKey],
-					key?: string,
-				) => void
+				cancel: Ordo.Command.CancelFn
 			}
 		}
 

@@ -1,0 +1,15 @@
+.dialog {
+	@apply flex w-96 flex-col gap-y-2 p-4;
+}
+
+.dialog_header {
+	@apply flex items-center gap-x-2;
+}
+
+.dialog_title {
+	@apply text-lg;
+}
+
+.dialog_footer {
+	@apply flex items-center justify-end gap-x-2;
+}

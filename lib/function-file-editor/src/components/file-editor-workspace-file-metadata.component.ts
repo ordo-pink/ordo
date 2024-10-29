@@ -17,23 +17,36 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { CurrentUserReference, MetadataIcon } from "@ordo-pink/maoka-components"
+import { CurrentUserReference, Input, MetadataIcon } from "@ordo-pink/maoka-components"
 import { Maoka } from "@ordo-pink/maoka"
 import { MaokaJabs } from "@ordo-pink/maoka-jabs"
+import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
 
 export const FileMetadata = (metadata: Ordo.Metadata.Instance) =>
 	Maoka.create("div", ({ use }) => {
-		const metadata_name = metadata.get_name()
-		const metadata_last_update = metadata.get_updated_at()
+		const fsid = metadata.get_fsid()
+		const name = metadata.get_name()
+		const last_update = metadata.get_updated_at()
+
+		const { emit } = use(MaokaOrdo.Jabs.Commands)
 
 		use(MaokaJabs.add_class("p-2"))
 
 		return () => [
-			TitleSection(() => [MetadataIcon({ metadata }), Title(() => metadata_name)]),
-			AuthorSection(() => [
-				CurrentUserReference,
-				Timestamp(() => metadata_last_update.toLocaleString()),
+			TitleSection(() => [
+				MetadataIcon({ metadata }),
+
+				Input.Text({
+					custom_class: "font-extrabold !text-2xl cursor-text !w-full !bg-transparent !shadow-none",
+					initial_value: name,
+					on_input: event => {
+						const target = event.target as HTMLInputElement
+
+						emit("cmd.metadata.rename", { fsid, new_name: target.value })
+					},
+				}),
 			]),
+			AuthorSection(() => [CurrentUserReference, Timestamp(() => last_update.toLocaleString())]),
 		]
 	})
 
@@ -41,8 +54,5 @@ export const FileMetadata = (metadata: Ordo.Metadata.Instance) =>
 const Timestamp = Maoka.styled("time")
 
 const TitleSection = Maoka.styled("div", { class: "flex space-x-2 items-center text-2xl" })
-
-// TODO Editable title (take from `function-database`)
-const Title = Maoka.styled("h1", { class: "font-extrabold cursor-text w-full" })
 
 const AuthorSection = Maoka.styled("div", { class: "p-1 flex space-x-2 items-center text-sm" })

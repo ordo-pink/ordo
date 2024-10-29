@@ -17,9 +17,8 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Button, Input } from "@ordo-pink/maoka-components"
+import { Dialog, Input } from "@ordo-pink/maoka-components"
 import { Maoka, type TMaokaElement } from "@ordo-pink/maoka"
-import { BS_FILE_EARMARK_PLUS } from "@ordo-pink/frontend-icons"
 import { BsFileEarmarkPlus } from "@ordo-pink/frontend-icons"
 import { MaokaJabs } from "@ordo-pink/maoka-jabs"
 import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
@@ -31,7 +30,6 @@ export const CreateFileModal = (
 ) =>
 	Maoka.create("div", ({ use }) => {
 		use(MaokaOrdo.Context.provide(ctx))
-		use(MaokaJabs.set_class("p-4 w-96 flex flex-col gap-y-2"))
 
 		let type = "text/ordo"
 
@@ -41,43 +39,23 @@ export const CreateFileModal = (
 		const t_title = t("t.file_explorer.modals.create_file.title")
 		const state = { name: "" }
 
-		return () => [
-			Header(() => [TitleIcon, Title(() => t_title)]),
-			Body(() => [
-				CreateFileModalInput(event => void (state.name = (event.target as any).value)),
-				FileAssociationSelector((fa, selected_type) => {
-					type = selected_type
-				}),
-			]),
-			Footer(() => [
-				Button.Neutral({
-					on_click: () => emit("cmd.application.modal.hide"),
-					text: "Cancel",
-					hotkey: "escape",
-				}),
-				Button.Success({
-					on_click: () => {
-						emit("cmd.application.modal.hide")
-						emit("cmd.metadata.create", { name: state.name, parent, type })
-					},
-					text: "OK",
-					hotkey: "enter",
-				}),
-			]),
-		]
+		return () =>
+			Dialog({
+				title: t_title,
+				render_icon: div => void div.appendChild(BsFileEarmarkPlus() as SVGSVGElement),
+				action: () => {
+					emit("cmd.application.modal.hide")
+					emit("cmd.metadata.create", { name: state.name, parent, type })
+				},
+				action_text: "OK", // TODO Translations
+				body: () => [
+					CreateFileModalInput(event => void (state.name = (event.target as any).value)),
+					FileAssociationSelector((fa, selected_type) => {
+						type = selected_type
+					}),
+				],
+			})
 	})
-
-const Header = Maoka.styled("div", { class: "flex gap-x-2 items-center" })
-
-const Title = Maoka.styled("h2", { class: "text-lg" })
-
-const Body = Maoka.styled("div")
-
-const Footer = Maoka.styled("div", { class: "flex justify-end items-center gap-x-2" })
-
-const TitleIcon = Maoka.create("div", ({ use }) =>
-	use(MaokaJabs.set_inner_html(BS_FILE_EARMARK_PLUS)),
-)
 
 // TODO Extract select
 // TODO Add caret showing expanded-contracted status

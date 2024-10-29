@@ -59,11 +59,11 @@ export const ContextMenu = (
 
 			return state.structure
 				.filter(item => item.should_show({ event: state.event, payload: state.payload }))
-				.map(item => ContextMenuItem(item, state.payload))
+				.map(item => ContextMenuItem(item, state.payload, state.event))
 		}
 	})
 
-const ContextMenuItem = (item: Ordo.ContextMenu.Item, payload: any) =>
+const ContextMenuItem = (item: Ordo.ContextMenu.Item, payload: any, event: MouseEvent) =>
 	Maoka.create("div", ({ use }) => {
 		const { emit } = use(MaokaOrdo.Jabs.Commands)
 		const { t } = use(MaokaOrdo.Jabs.Translations)
@@ -72,8 +72,13 @@ const ContextMenuItem = (item: Ordo.ContextMenu.Item, payload: any) =>
 			ActionListItem({
 				title: t(item.readable_name),
 				is_current: "hover",
-				on_click: () =>
-					emit(item.command, item.payload_creator ? item.payload_creator(payload) : payload),
+				on_click: () => {
+					const current_payload = item.payload_creator
+						? item.payload_creator({ event, payload })
+						: payload
+
+					emit(item.command, current_payload)
+				},
 				render_icon: item.render_icon,
 			})
 	})

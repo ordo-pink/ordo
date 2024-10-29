@@ -19,7 +19,7 @@
 
 import { BehaviorSubject, Subject, combineLatestWith, map, merge, scan, shareReplay } from "rxjs"
 
-import { BsTerminal } from "@ordo-pink/frontend-icons"
+import { BsMenuButtonWideFill } from "@ordo-pink/frontend-icons"
 import { Maoka } from "@ordo-pink/maoka"
 import { type TLogger } from "@ordo-pink/logger"
 import { call_once } from "@ordo-pink/tau"
@@ -53,10 +53,9 @@ export const init_command_palette = call_once(
 
 		commands.emit("cmd.application.command_palette.add", {
 			on_select: () => commands.emit("cmd.application.command_palette.toggle"),
-			readable_name: "t.common.components.command_palette.toggle",
+			readable_name: "t.common.components.command_palette.reset",
 			hotkey: "mod+shift+p",
-			render_icon: div => void div.appendChild(BsTerminal() as SVGSVGElement),
-			description: "t.common.components.command_palette.toggle_description",
+			render_icon: div => void div.appendChild(BsMenuButtonWideFill() as SVGSVGElement),
 		})
 
 		let on_keydown: (event: KeyboardEvent) => void
@@ -85,13 +84,9 @@ const on_show_custom_cp =
 		custom_command_palette$.next(state)
 
 		commands.emit("cmd.application.modal.show", {
-			on_unmount: () => {
-				custom_command_palette$.next({ items: [] })
-			},
 			show_close_button: false,
-			render: div => {
-				void Maoka.render_dom(div, CommandPalette(custom_command_palette$, ctx))
-			},
+			on_unmount: () => custom_command_palette$.next({ items: [] }),
+			render: div => void Maoka.render_dom(div, CommandPalette(custom_command_palette$, ctx)),
 		})
 	}
 const on_hide_custom_cp = (commands: Ordo.Command.Commands) => () => {

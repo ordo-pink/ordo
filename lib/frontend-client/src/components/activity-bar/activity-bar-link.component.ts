@@ -26,6 +26,7 @@ import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
 type P = Pick<Ordo.Activity.Instance, "default_route"> &
 	Required<Pick<Ordo.Activity.Instance, "render_icon" | "routes" | "name">> & {
 		current_activity_name?: Ordo.Activity.Instance["name"]
+		on_click?: (event: MouseEvent) => void
 	}
 export const ActivityBarLink = ({
 	render_icon,
@@ -33,6 +34,7 @@ export const ActivityBarLink = ({
 	routes,
 	name,
 	current_activity_name,
+	on_click,
 }: P) =>
 	Maoka.create("a", ({ use }) => {
 		const activity_link = default_route ?? routes[0]
@@ -42,10 +44,12 @@ export const ActivityBarLink = ({
 		use(MaokaJabs.listen("onclick", event => handle_click(event)))
 
 		const { emit } = use(MaokaOrdo.Jabs.Commands)
-		const handle_click = (event: MouseEvent) => {
-			event.preventDefault()
-			emit("cmd.application.router.navigate", activity_link)
-		}
+		const handle_click = on_click
+			? on_click
+			: (event: MouseEvent) => {
+					event.preventDefault()
+					emit("cmd.application.router.navigate", activity_link)
+				}
 
 		return () => ActivityBarIcon({ name, render_icon, current_activity_name })
 	})

@@ -19,11 +19,13 @@
 
 import { type Observable } from "rxjs"
 
+import { BsMenuButtonWideFill } from "@ordo-pink/frontend-icons"
 import { Maoka } from "@ordo-pink/maoka"
 import { MaokaJabs } from "@ordo-pink/maoka-jabs"
 import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
 import { type TOption } from "@ordo-pink/option"
 
+import { ActivityBarIcon } from "./activity-bar-icon.component"
 import { ActivityBarLink } from "./activity-bar-link.component"
 
 import "./activity-bar.css"
@@ -54,16 +56,35 @@ export const ActivityBar = (
 			const activities = get_list()
 			const current_activity = get_current()
 
-			return activities.map(
-				({ name, routes, default_route, render_icon }) =>
-					render_icon &&
-					ActivityBarLink({
-						name,
-						routes,
-						default_route,
-						render_icon,
-						current_activity_name: current_activity?.name,
-					}),
-			)
+			return [
+				Maoka.create("span", ({ use }) => {
+					use(MaokaJabs.set_class("activity-bar_link"))
+					use(
+						MaokaJabs.listen("onclick", event => {
+							event.preventDefault()
+							event.stopPropagation()
+
+							commands.emit("cmd.application.command_palette.toggle")
+						}),
+					)
+
+					return () =>
+						ActivityBarIcon({
+							name: "Command Palette",
+							render_icon: span => void span.appendChild(BsMenuButtonWideFill() as SVGSVGElement),
+						})
+				}),
+				...activities.map(
+					({ name, routes, default_route, render_icon }) =>
+						render_icon &&
+						ActivityBarLink({
+							name,
+							routes,
+							default_route,
+							render_icon,
+							current_activity_name: current_activity?.name,
+						}),
+				),
+			]
 		}
 	})

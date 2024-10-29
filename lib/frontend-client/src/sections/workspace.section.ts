@@ -22,6 +22,7 @@ import { BehaviorSubject, Observable, noop, pairwise } from "rxjs"
 import Split from "split.js"
 
 import { ContextMenuItemType, RRR } from "@ordo-pink/core"
+import { BsToggle2Off } from "@ordo-pink/frontend-icons"
 import { Result } from "@ordo-pink/result"
 import { Switch } from "@ordo-pink/switch"
 import { type TLogger } from "@ordo-pink/logger"
@@ -100,17 +101,19 @@ export const init_workspace = (
 	})
 
 	commands.emit("cmd.application.context_menu.add", {
-		command: "cmd.application.sidebar.hide",
+		command: "cmd.application.sidebar.toggle",
 		// 	Icon: BsToggle2Off,
-		readable_name: "t.common.components.sidebar.hide",
+		render_icon: div => div.appendChild(BsToggle2Off() as SVGSVGElement),
+		readable_name: "t.common.components.sidebar.toggle",
 		should_show: ({ event }) => {
+			const target = event.target as Element
+
 			return (
-				((event.currentTarget as any).classList.contains("sidebar") ||
-					(event.currentTarget as any).classList.contains("activity-bar") ||
-					Boolean((event.currentTarget as any).closest(".sidebar")) ||
-					Boolean((event.currentTarget as any).closest(".activity-bar"))) &&
 				!sidebar$.value.disabled &&
-				sidebar$.value.sizes[1] !== 0
+				(target.classList.contains("sidebar") ||
+					target.classList.contains("activity-bar") ||
+					!!target.closest(".sidebar") ||
+					!!target.closest(".activity-bar"))
 			)
 		},
 		type: ContextMenuItemType.UPDATE,

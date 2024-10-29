@@ -97,8 +97,7 @@ declare global {
 				command_palette: {
 					search_placeholder: () => string
 					hide: () => string
-					toggle: () => string
-					toggle_description: () => string
+					reset: () => string
 					exit_key_hint: () => string
 				}
 				sidebar: {

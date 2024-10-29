@@ -19,7 +19,12 @@
 
 // import { BsFileEarmarkMinus, BsFileEarmarkPlus, BsPencil } from "react-icons/bs"
 
-import { BS_FOLDER_2_OPEN, BsFileEarmarkPlus } from "@ordo-pink/frontend-icons"
+import {
+	BS_FOLDER_2_OPEN,
+	BsFileEarmarkMinus,
+	BsFileEarmarkPlus,
+	BsFileEarmarkRichText,
+} from "@ordo-pink/frontend-icons"
 import { ContextMenuItemType, Metadata, create_function } from "@ordo-pink/core"
 import { Maoka } from "@ordo-pink/maoka"
 
@@ -116,7 +121,7 @@ export default create_function(
 		commands.emit("cmd.application.context_menu.add", {
 			command: "cmd.metadata.show_create_modal",
 			render_icon: div => div.appendChild(BsFileEarmarkPlus() as SVGSVGElement), // TODO: Move to icons
-			readable_name: "Create File" as Ordo.I18N.TranslationKey, // TODO: Translations
+			readable_name: "t.file_explorer.modals.create_file.title",
 			should_show: ({ payload }) => Metadata.Validations.is_metadata(payload) || payload === "root",
 			payload_creator: ({ payload }) =>
 				Metadata.Validations.is_metadata(payload) ? payload.get_fsid() : null,
@@ -125,8 +130,8 @@ export default create_function(
 
 		commands.emit("cmd.application.context_menu.add", {
 			command: "cmd.metadata.show_rename_modal",
-			// render_icon: BsPencil, // TODO: Move to icons
-			readable_name: "Rename File" as Ordo.I18N.TranslationKey, // TODO: Translations
+			render_icon: div => div.appendChild(BsFileEarmarkRichText() as SVGSVGElement),
+			readable_name: "t.file_explorer.modals.rename_file.title",
 			should_show: ({ payload }) => Metadata.Validations.is_metadata(payload),
 			payload_creator: ({ payload }) =>
 				Metadata.Validations.is_metadata(payload) && payload.get_fsid(),
@@ -135,8 +140,8 @@ export default create_function(
 
 		commands.emit("cmd.application.context_menu.add", {
 			command: "cmd.metadata.show_remove_modal",
-			// Icon: BsFileEarmarkMinus, // TODO: Move to icons
-			readable_name: "Remove File" as Ordo.I18N.TranslationKey, // TODO: Translations
+			render_icon: div => div.appendChild(BsFileEarmarkMinus() as SVGSVGElement),
+			readable_name: "t.file_explorer.modals.remove_file.title" as Ordo.I18N.TranslationKey,
 			should_show: ({ payload }) => Metadata.Validations.is_metadata(payload),
 			payload_creator: ({ payload }) =>
 				Metadata.Validations.is_metadata(payload) && payload.get_fsid(),

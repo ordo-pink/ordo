@@ -3,11 +3,11 @@
 }
 
 .activity-bar_link {
-	@apply no-underline;
+	@apply cursor-pointer no-underline transition-transform hover:scale-110;
 }
 
 .activity-bar_icon {
-	@apply text-neutral-800 dark:text-neutral-200;
+	@apply text-neutral-800 transition-colors hover:text-pink-700 dark:text-neutral-200 hover:dark:text-pink-300;
 }
 
 .activity-bar_icon.active {

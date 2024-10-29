@@ -28,9 +28,7 @@ export const register_common_translations = (logger: TLogger, commands: Ordo.Com
 			"t.common.components.command_palette.exit_key_hint": "to exit",
 			"t.common.components.command_palette.hide": "Hide Command Palette",
 			"t.common.components.command_palette.search_placeholder": "Search...",
-			"t.common.components.command_palette.toggle": "Toggle Command Palette",
-			"t.common.components.command_palette.toggle_description":
-				"Shows or hides Command Palette depending on its current state.",
+			"t.common.components.command_palette.reset": "Reset Command Palette",
 			"t.common.components.sidebar.hide": "Hide Sidebar",
 			"t.common.components.sidebar.show": "Show Sidebar",
 			"t.common.components.sidebar.toggle": "Toggle Sidebar",

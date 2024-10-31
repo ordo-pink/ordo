@@ -17,59 +17,188 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+// import { is_array, is_object, is_string } from "@ordo-pink/tau"
+import { BehaviorSubject } from "rxjs"
+
+import { is_array, is_string } from "@ordo-pink/tau"
 import { Maoka } from "@ordo-pink/maoka"
 import { MaokaJabs } from "@ordo-pink/maoka-jabs"
 import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
+import { R } from "@ordo-pink/result"
+import { Switch } from "@ordo-pink/switch"
 
-type TOrdoTextEditorNode = {
-	type: string
-	value: string
+type TOrdoRichTextEditorNode = { type: string }
+
+type TOrdoRichTextEditorInlineNode<$TValue = any> = TOrdoRichTextEditorNode & { value: $TValue }
+
+type TOrdoRichTextEditorBlockNode = TOrdoRichTextEditorNode & {
+	children: TOrdoRichTextEditorInlineNode<any>[]
 }
+
+type TEditorStructure = TOrdoRichTextEditorBlockNode[]
+type TEditorFocusPosition = { block_index: number; inline_index: number; offset: number }
+export type TEditorContext = {
+	position$: BehaviorSubject<TEditorFocusPosition>
+	structure$: BehaviorSubject<TEditorStructure>
+	add_block: (block: TOrdoRichTextEditorBlockNode, focus?: boolean) => void
+	add_inline: (inline: TOrdoRichTextEditorInlineNode, focus?: boolean) => void
+	add_new_line: (focus?: boolean) => void
+	set_position: (position: TEditorFocusPosition) => void
+}
+const editor_context = MaokaJabs.create_context<TEditorContext>()
 
 export const RichText = (
 	metadata: Ordo.Metadata.Instance,
 	content: Ordo.Content.Instance,
 	ctx: Ordo.CreateFunction.Params,
-) =>
-	Maoka.create("div", ({ use }) => {
-		use(MaokaOrdo.Context.provide(ctx))
-
-		const fsid = metadata.get_fsid()
-		const content_type = metadata.get_type()
-
-		const state: TOrdoTextEditorNode[] = content ? JSON.parse(content as string) : []
-
-		const commands = use(MaokaOrdo.Jabs.Commands)
-
-		use(MaokaJabs.set_class("p-2 size-full min-h-screen"))
-
-		const handle_line_change = (value: string, index: number) => {
-			if (!state[index]) state[index] = { type: "p", value }
-			else state[index].value = value
-
-			commands.emit("cmd.content.set", { fsid, content_type, content: JSON.stringify(state) })
-		}
-
-		// TODO Extract node type to enum
-		return () => [
-			...state.map((node, index) => Line(node, index, handle_line_change)),
-			Line({ type: "paragraph", value: "" }, state.length, handle_line_change),
-		]
+) => {
+	const position$ = new BehaviorSubject<TEditorFocusPosition>({
+		block_index: 0,
+		inline_index: 0,
+		offset: 0,
 	})
 
-const Line = (
-	node: TOrdoTextEditorNode,
-	index: number,
-	on_change: (value: string, index: number) => void,
-) =>
-	Maoka.create("div", ({ use }) => {
-		use(MaokaJabs.set_class("outline-none"))
+	const structure$ = new BehaviorSubject<TEditorStructure>([
+		{ type: "p", children: [{ type: "text", value: "" }] },
+	])
+
+	return Maoka.create("div", ({ use, refresh }) => {
+		use(MaokaJabs.set_class("p-2 size-full outline-none cursor-text"))
 		use(MaokaJabs.set_attribute("contenteditable", "true"))
+		use(MaokaOrdo.Context.provide(ctx))
 		use(
-			MaokaJabs.listen("oninput", event => {
-				on_change((event.target as any).innerText, index)
+			editor_context.provide({
+				position$,
+				structure$,
+				set_position: position => {
+					position$.next(position)
+					console.log(position)
+				},
+				// TODO Remove block
+				// TODO Remove inline
+				add_block: (block, focus = true) => {
+					const { position$, set_position } = use(editor_context.consume)
+					const position = position$.getValue()
+					const state = structure$.getValue()
+
+					// TODO Move chars from previous line
+
+					state.splice(position.block_index + 1, 0, block)
+
+					structure$.next(state)
+
+					if (focus)
+						set_position({ block_index: position.block_index + 1, inline_index: 0, offset: 0 })
+
+					void refresh()
+				},
+				add_new_line: (focus = true) => {
+					const { add_block } = use(editor_context.consume)
+
+					add_block({ type: "p", children: [{ type: "text", value: "" }] }, focus)
+				},
+				add_inline: inline => {
+					const { position$ } = use(editor_context.consume)
+					const position = position$.getValue()
+					const state = structure$.getValue()
+
+					state[position.block_index].children.splice(position.block_index, 0, inline)
+
+					structure$.next(state)
+				},
 			}),
 		)
 
-		return () => node.value
+		R.FromNullable(content)
+			.pipe(R.ops.chain(x => R.If(is_string(x), { T: () => x as string })))
+			.pipe(R.ops.chain(json => R.Try(() => JSON.parse(json))))
+			.pipe(R.ops.chain(x => R.If(is_array(x) && x.length > 0, { T: () => x })))
+			.cata({
+				Ok: x => structure$.next(x as TEditorStructure),
+				Err: () => structure$.next([{ type: "p", children: [{ type: "text", value: "" }] }]),
+			})
+
+		return () => {
+			const state = structure$.getValue()
+
+			return [...state.map((node, index) => Block(node, metadata, index))]
+		}
 	})
+}
+
+const Block = (
+	node: TOrdoRichTextEditorBlockNode,
+	metadata: Ordo.Metadata.Instance,
+	block_index: number,
+) =>
+	Maoka.create("div", ({ use }) => {
+		use(MaokaJabs.set_class("outline-none cursor-text"))
+		use(MaokaJabs.set_attribute("contenteditable", "false"))
+
+		return () =>
+			node.children.map((child, child_index) => Inline(child, metadata, block_index, child_index))
+	})
+
+const Inline = (
+	node: TOrdoRichTextEditorInlineNode,
+	metadata: Ordo.Metadata.Instance,
+	block_index: number,
+	inline_index: number,
+) =>
+	Switch.Match(node.type).default(() =>
+		Maoka.create("div", ({ use, element, after_mount, on_unmount }) => {
+			use(MaokaJabs.set_class("outline-none inline-block"))
+			use(MaokaJabs.set_attribute("contenteditable", "true"))
+
+			const fsid = metadata.get_fsid()
+			const content_type = metadata.get_type()
+
+			const commands = use(MaokaOrdo.Jabs.Commands)
+			const { position$, structure$, add_new_line, set_position } = use(editor_context.consume)
+
+			after_mount(() => {
+				const current_position = position$.getValue()
+
+				if (
+					current_position.block_index === block_index &&
+					current_position.inline_index === inline_index
+				) {
+					set_position({ block_index, inline_index, offset: 0 })
+					;(element as unknown as HTMLDivElement).focus()
+				}
+			})
+
+			use(
+				MaokaJabs.listen("onfocus", () => {
+					set_position({ block_index, inline_index, offset: 0 })
+				}),
+			)
+
+			const handle_keydown = (event: KeyboardEvent) => {
+				if (event.key === "Enter") {
+					event.preventDefault()
+					event.stopPropagation()
+
+					add_new_line()
+				}
+			}
+
+			document.addEventListener("keydown", handle_keydown)
+
+			on_unmount(() => document.removeEventListener("keydown", handle_keydown))
+
+			use(
+				MaokaJabs.listen("oninput", event => {
+					const state = structure$.getValue()
+					const target = event.target as HTMLDivElement
+
+					state[block_index].children[inline_index].value = target.innerText
+					structure$.next(state)
+
+					commands.emit("cmd.content.set", { fsid, content_type, content: JSON.stringify(state) })
+				}),
+			)
+
+			return () => node.value
+		}),
+	)

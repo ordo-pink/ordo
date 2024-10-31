@@ -166,7 +166,7 @@ const FileEditorDirectoryNameText = (metadata: Ordo.Metadata.Instance) =>
 		use(MaokaJabs.set_class(...file_editor_sidebar_directory_name_text_classes))
 
 		return () => [
-			Maoka.create("div", () => () => MetadataIcon({ metadata })),
+			Maoka.create("div", () => () => MetadataIcon({ metadata, show_emoji_picker: false })),
 			Maoka.create("div", ({ use }) => {
 				use(MaokaJabs.set_class("text-ellipsis line-clamp-1"))
 				return () => metadata.get_name()
@@ -177,7 +177,7 @@ const FileEditorDirectoryNameText = (metadata: Ordo.Metadata.Instance) =>
 const FileEditorDirectoryNameCaret = (fsid: Ordo.Metadata.FSID, click_listener: TMaokaJab) =>
 	Maoka.create("div", ({ use }) => {
 		use(click_listener)
-		use(MaokaJabs.set_class("cursor-pointer"))
+		use(MaokaJabs.set_class("cursor-pointer hover:scale-150 transition-all"))
 
 		return () =>
 			expanded_state[fsid]

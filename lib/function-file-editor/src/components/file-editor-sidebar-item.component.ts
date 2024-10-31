@@ -34,6 +34,8 @@ export const FileEditorSidebarItem = (
 	Maoka.create("div", ({ use, refresh, on_unmount }) => {
 		let metadata = initial_metadata
 
+		use(MaokaJabs.set_class("cursor-pointer"))
+
 		const commands = use(MaokaOrdo.Jabs.Commands)
 		const metadata_query = use(MaokaOrdo.Jabs.MetadataQuery)
 

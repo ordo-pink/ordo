@@ -25,8 +25,8 @@ import { R } from "@ordo-pink/result"
 import { Switch } from "@ordo-pink/switch"
 import { emojis } from "@ordo-pink/emojis"
 
-type P = { metadata: Ordo.Metadata.Instance; custom_class?: string }
-export const MetadataIcon = ({ metadata, custom_class = "" }: P) =>
+type P = { metadata: Ordo.Metadata.Instance; custom_class?: string; show_emoji_picker?: boolean }
+export const MetadataIcon = ({ metadata, custom_class = "", show_emoji_picker = true }: P) =>
 	Maoka.create("div", ({ use, refresh, on_unmount }) => {
 		let emoji = metadata.get_property("emoji_icon")
 
@@ -50,30 +50,31 @@ export const MetadataIcon = ({ metadata, custom_class = "" }: P) =>
 
 		use(MaokaJabs.set_class("cursor-pointer"))
 
-		use(
-			MaokaJabs.listen("onclick", event => {
-				event.stopPropagation()
+		if (show_emoji_picker)
+			use(
+				MaokaJabs.listen("onclick", event => {
+					event.stopPropagation()
 
-				commands.emit("cmd.application.command_palette.show", {
-					max_items: 20,
-					items: emojis.map(
-						emoji =>
-							({
-								on_select: () => {
-									commands.emit("cmd.metadata.set_property", {
-										fsid: metadata.get_fsid(),
-										key: "emoji_icon",
-										value: emoji.icon,
-									})
+					commands.emit("cmd.application.command_palette.show", {
+						max_items: 20,
+						items: emojis.map(
+							emoji =>
+								({
+									on_select: () => {
+										commands.emit("cmd.metadata.set_property", {
+											fsid: metadata.get_fsid(),
+											key: "emoji_icon",
+											value: emoji.icon,
+										})
 
-									commands.emit("cmd.application.command_palette.hide")
-								},
-								readable_name: `${emoji.icon} ${emoji.description}` as any,
-							}) satisfies Ordo.CommandPalette.Item,
-					),
-				})
-			}),
-		)
+										commands.emit("cmd.application.command_palette.hide")
+									},
+									readable_name: `${emoji.icon} ${emoji.description}` as any,
+								}) satisfies Ordo.CommandPalette.Item,
+						),
+					})
+				}),
+			)
 
 		return () => {
 			if (emoji.is_some)

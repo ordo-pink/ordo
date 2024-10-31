@@ -82,7 +82,10 @@ export const FileEditorSidebarFile = (metadata: Ordo.Metadata.Instance, depth = 
 					),
 				)
 
-			return [MetadataIcon({ metadata }), FileEditorFileName(metadata.get_name())]
+			return [
+				MetadataIcon({ metadata, show_emoji_picker: false }),
+				FileEditorFileName(metadata.get_name()),
+			]
 		}
 	})
 

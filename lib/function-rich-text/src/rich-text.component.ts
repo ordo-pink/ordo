@@ -121,7 +121,22 @@ export const RichText = (
 		return () => {
 			const state = structure$.getValue()
 
-			return [...state.map((node, index) => Block(node, metadata, index))]
+			return [
+				...state.map((node, block_index) =>
+					Maoka.create("div", ({ use }) => {
+						use(MaokaJabs.set_class("flex items-center space-x-2"))
+						use(MaokaJabs.set_attribute("contenteditable", "false"))
+
+						return () => [
+							Maoka.create("div", ({ use }) => {
+								use(MaokaJabs.set_class("w-12 text-right font-mono text-neutral-500"))
+								return () => String(block_index + 1)
+							}),
+							Block(node, metadata, block_index),
+						]
+					}),
+				),
+			]
 		}
 	})
 }

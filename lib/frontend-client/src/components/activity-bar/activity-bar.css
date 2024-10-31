@@ -1,5 +1,5 @@
 .activity-bar {
-	@apply flex h-full flex-col items-center justify-center space-y-4;
+	@apply flex items-center justify-center space-x-4 self-center rounded-lg p-2 backdrop-blur-sm md:flex-col md:space-x-0 md:space-y-4;
 }
 
 .activity-bar_link {

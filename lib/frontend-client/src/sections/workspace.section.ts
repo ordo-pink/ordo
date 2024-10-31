@@ -148,6 +148,7 @@ export const init_workspace = (
 		})
 	})
 
+	// TODO Add class to activity bar when there is sidebar
 	// TODO: Move classes away from HTML
 	sidebar$.subscribe(sidebar => {
 		Switch.OfTrue()

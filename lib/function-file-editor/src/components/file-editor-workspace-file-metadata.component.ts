@@ -26,7 +26,6 @@ export const FileMetadata = (metadata: Ordo.Metadata.Instance) =>
 	Maoka.create("div", ({ use }) => {
 		const fsid = metadata.get_fsid()
 		const name = metadata.get_name()
-		const last_update = metadata.get_updated_at()
 
 		const { emit } = use(MaokaOrdo.Jabs.Commands)
 
@@ -46,12 +45,21 @@ export const FileMetadata = (metadata: Ordo.Metadata.Instance) =>
 					},
 				}),
 			]),
-			AuthorSection(() => [CurrentUserReference, Timestamp(() => last_update.toLocaleString())]),
+			AuthorSection(() => [CurrentUserReference, Timestamp(fsid)]),
 		]
 	})
 
 // TODO time?
-const Timestamp = Maoka.styled("time")
+const Timestamp = (fsid: Ordo.Metadata.FSID) =>
+	Maoka.create("div", ({ use }) => {
+		const get_metadata = use(MaokaOrdo.Jabs.Metadata.get_by_fsid(fsid))
+
+		return () => {
+			const metadata = get_metadata()
+
+			return metadata?.get_updated_at().toLocaleString()
+		}
+	})
 
 const TitleSection = Maoka.styled("div", { class: "flex w-full space-x-2 items-center text-2xl" })
 

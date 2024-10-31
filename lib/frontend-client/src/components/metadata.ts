@@ -74,10 +74,7 @@ export const init_metadata: TInitMetadataFn = ({
 
 	// TODO Use metadata_commands directly for changing size
 	commands.on("cmd.metadata.set_size", ({ fsid, size }) =>
-		metadata_command.set_size(fsid, size).cata({
-			Ok: noop,
-			Err,
-		}),
+		metadata_command.set_size(fsid, size).cata({ Ok: noop, Err }),
 	)
 
 	commands.on("cmd.metadata.remove_labels", ({ fsid, labels }) =>

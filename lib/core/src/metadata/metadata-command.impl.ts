@@ -319,7 +319,7 @@ type TMetadataToTMetadataDTOFn = (metadata: Ordo.Metadata.Instance) => Ordo.Meta
 const _metadata_to_dto: TMetadataToTMetadataDTOFn = m => m.to_dto()
 
 type TResetUpdatedAtFn = (metadata: Ordo.Metadata.DTO) => Ordo.Metadata.DTO
-const _reset_updated_at: TResetUpdatedAtFn = override({ updated_at: Date.now() })
+const _reset_updated_at: TResetUpdatedAtFn = metadata => ({ ...metadata, updated_at: Date.now() })
 
 type TReplaceMetadataRFn = (
 	newValue: Ordo.Metadata.Instance,

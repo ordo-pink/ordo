@@ -53,6 +53,6 @@ export const FileMetadata = (metadata: Ordo.Metadata.Instance) =>
 // TODO time?
 const Timestamp = Maoka.styled("time")
 
-const TitleSection = Maoka.styled("div", { class: "flex space-x-2 items-center text-2xl" })
+const TitleSection = Maoka.styled("div", { class: "flex w-full space-x-2 items-center text-2xl" })
 
 const AuthorSection = Maoka.styled("div", { class: "p-1 flex space-x-2 items-center text-sm" })

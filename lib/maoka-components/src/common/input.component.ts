@@ -38,7 +38,9 @@ const Text = ({
 	custom_class = "",
 	autofocus = false,
 }: TInputProps) =>
-	Maoka.create("label", () => {
+	Maoka.create("label", ({ use }) => {
+		use(MaokaJabs.set_class("w-full"))
+
 		return () => [
 			Maoka.create("div", ({ use }) => {
 				use(MaokaJabs.set_class("input_label"))

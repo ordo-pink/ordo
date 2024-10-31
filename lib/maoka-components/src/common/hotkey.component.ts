@@ -29,13 +29,19 @@ const isDarwin = navigator.appVersion.indexOf("Mac") !== -1
 
 export type THotkeyOptions = {
 	prevent_in_inputs?: boolean
+	prevent_in_contenteditable?: boolean
 	smol?: boolean
 	decoration_only?: boolean
 }
 
 export const Hotkey = (
 	hotkey: string,
-	options: THotkeyOptions = { prevent_in_inputs: false, smol: false, decoration_only: false },
+	options: THotkeyOptions = {
+		prevent_in_inputs: false,
+		prevent_in_contenteditable: true,
+		smol: false,
+		decoration_only: false,
+	},
 ) =>
 	Maoka.create("div", ({ use, on_unmount, element, after_mount }) => {
 		const split = hotkey.split("+")

@@ -190,6 +190,8 @@ const Inline = (
 			)
 
 			const handle_keydown = (event: KeyboardEvent) => {
+				if (document.activeElement !== element) return
+
 				if (event.key === "Enter") {
 					event.preventDefault()
 					event.stopPropagation()

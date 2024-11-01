@@ -25,27 +25,10 @@ import { Maoka } from "@ordo-pink/maoka"
 import { MaokaJabs } from "@ordo-pink/maoka-jabs"
 import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
 import { R } from "@ordo-pink/result"
-import { Switch } from "@ordo-pink/switch"
 
-type TOrdoRichTextEditorNode = { type: string }
-
-type TOrdoRichTextEditorInlineNode<$TValue = any> = TOrdoRichTextEditorNode & { value: $TValue }
-
-type TOrdoRichTextEditorBlockNode = TOrdoRichTextEditorNode & {
-	children: TOrdoRichTextEditorInlineNode<any>[]
-}
-
-type TEditorStructure = TOrdoRichTextEditorBlockNode[]
-type TEditorFocusPosition = { block_index: number; inline_index: number; offset: number }
-export type TEditorContext = {
-	position$: BehaviorSubject<TEditorFocusPosition>
-	structure$: BehaviorSubject<TEditorStructure>
-	add_block: (block: TOrdoRichTextEditorBlockNode, focus?: boolean) => void
-	add_inline: (inline: TOrdoRichTextEditorInlineNode, focus?: boolean) => void
-	add_new_line: (focus?: boolean) => void
-	set_position: (position: TEditorFocusPosition) => void
-}
-const editor_context = MaokaJabs.create_context<TEditorContext>()
+import { type TEditorFocusPosition, type TEditorStructure } from "../rich-text.types"
+import { Line } from "./line.component"
+import { editor_context } from "../jabs/editor-context.jab"
 
 export const RichText = (
 	metadata: Ordo.Metadata.Instance,
@@ -55,7 +38,8 @@ export const RichText = (
 	const position$ = new BehaviorSubject<TEditorFocusPosition>({
 		block_index: 0,
 		inline_index: 0,
-		offset: 0,
+		anchor_offset: 0,
+		focus_offset: 0,
 	})
 
 	const structure$ = new BehaviorSubject<TEditorStructure>([
@@ -72,7 +56,16 @@ export const RichText = (
 				position$,
 				structure$,
 				set_position: position => {
-					position$.next(position)
+					if (!position.anchor_offset || !position.focus_offset) {
+						const selection = window.getSelection()
+
+						// TODO Watch range instead
+						position.anchor_offset = selection?.anchorOffset ?? 0
+						position.focus_offset = selection?.focusOffset ?? 0
+					}
+
+					console.log(position)
+					position$.next(position as TEditorFocusPosition)
 				},
 				// TODO Remove block
 				// TODO Remove inline
@@ -83,12 +76,33 @@ export const RichText = (
 
 					// TODO Move chars from previous line
 
+					const content = state[position.block_index]?.children[position.inline_index]
+
+					if (content) {
+						if (
+							position.anchor_offset < content.value.length &&
+							position.focus_offset < content.value.length
+						) {
+							const { anchor_offset, focus_offset } = position
+							const closest = anchor_offset > focus_offset ? focus_offset : anchor_offset
+							const furthest = anchor_offset < focus_offset ? focus_offset : anchor_offset
+
+							block.children[0].value = content.value.slice(furthest)
+							content.value = content.value.slice(0, closest)
+						}
+					}
+
 					state.splice(position.block_index + 1, 0, block)
 
 					structure$.next(state)
 
 					if (focus)
-						set_position({ block_index: position.block_index + 1, inline_index: 0, offset: 0 })
+						set_position({
+							block_index: position.block_index + 1,
+							inline_index: 0,
+							anchor_offset: 0,
+							focus_offset: 0,
+						})
 
 					void refresh()
 				},
@@ -121,117 +135,7 @@ export const RichText = (
 		return () => {
 			const state = structure$.getValue()
 
-			return [
-				...state.map((node, block_index) =>
-					Maoka.create("div", ({ use }) => {
-						use(MaokaJabs.set_class("flex items-center space-x-2"))
-						use(MaokaJabs.set_attribute("contenteditable", "false"))
-
-						return () => [
-							Maoka.create("div", ({ use }) => {
-								use(MaokaJabs.set_class("w-12 text-right font-mono text-neutral-500"))
-								return () => String(block_index + 1)
-							}),
-							Block(node, metadata, block_index),
-						]
-					}),
-				),
-			]
+			return [...state.map((node, block_index) => Line(node, metadata, block_index))]
 		}
 	})
 }
-
-const Block = (
-	node: TOrdoRichTextEditorBlockNode,
-	metadata: Ordo.Metadata.Instance,
-	block_index: number,
-) =>
-	Maoka.create("div", ({ use, element }) => {
-		use(MaokaJabs.set_class("outline-none cursor-text w-full"))
-		use(MaokaJabs.set_attribute("contenteditable", "false"))
-
-		use(
-			MaokaJabs.listen("onclick", event => {
-				event.stopPropagation()
-
-				if (!element.children) return
-
-				const last_child = element.children[element.children.length - 1]
-
-				if (!last_child || !(last_child instanceof HTMLElement)) return
-
-				last_child.focus()
-			}),
-		)
-
-		return () =>
-			node.children.map((child, child_index) => Inline(child, metadata, block_index, child_index))
-	})
-
-const Inline = (
-	node: TOrdoRichTextEditorInlineNode,
-	metadata: Ordo.Metadata.Instance,
-	block_index: number,
-	inline_index: number,
-) =>
-	Switch.Match(node.type).default(() =>
-		Maoka.create("div", ({ use, element, after_mount, on_unmount }) => {
-			use(MaokaJabs.set_class("outline-none inline-block"))
-			use(MaokaJabs.set_attribute("contenteditable", "true"))
-
-			const fsid = metadata.get_fsid()
-			const content_type = metadata.get_type()
-
-			const commands = use(MaokaOrdo.Jabs.Commands)
-			const { position$, structure$, add_new_line, set_position } = use(editor_context.consume)
-
-			after_mount(() => {
-				const current_position = position$.getValue()
-
-				if (
-					current_position.block_index === block_index &&
-					current_position.inline_index === inline_index
-				) {
-					set_position({ block_index, inline_index, offset: 0 })
-					;(element as unknown as HTMLDivElement).focus()
-				}
-			})
-
-			use(
-				MaokaJabs.listen("onfocus", event => {
-					event.stopPropagation()
-
-					set_position({ block_index, inline_index, offset: 0 })
-				}),
-			)
-
-			const handle_keydown = (event: KeyboardEvent) => {
-				if (document.activeElement !== element) return
-
-				if (event.key === "Enter") {
-					event.preventDefault()
-					event.stopPropagation()
-
-					add_new_line()
-				}
-			}
-
-			document.addEventListener("keydown", handle_keydown)
-
-			on_unmount(() => document.removeEventListener("keydown", handle_keydown))
-
-			use(
-				MaokaJabs.listen("oninput", event => {
-					const state = structure$.getValue()
-					const target = event.target as HTMLDivElement
-
-					state[block_index].children[inline_index].value = target.innerText
-					structure$.next(state)
-
-					commands.emit("cmd.content.set", { fsid, content_type, content: JSON.stringify(state) })
-				}),
-			)
-
-			return () => node.value
-		}),
-	)

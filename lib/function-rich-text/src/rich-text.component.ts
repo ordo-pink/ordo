@@ -63,16 +63,16 @@ export const RichText = (
 	])
 
 	return Maoka.create("div", ({ use, refresh }) => {
+		use(MaokaOrdo.Context.provide(ctx))
 		use(MaokaJabs.set_class("p-2 size-full outline-none cursor-text"))
 		use(MaokaJabs.set_attribute("contenteditable", "true"))
-		use(MaokaOrdo.Context.provide(ctx))
+
 		use(
 			editor_context.provide({
 				position$,
 				structure$,
 				set_position: position => {
 					position$.next(position)
-					console.log(position)
 				},
 				// TODO Remove block
 				// TODO Remove inline
@@ -146,9 +146,23 @@ const Block = (
 	metadata: Ordo.Metadata.Instance,
 	block_index: number,
 ) =>
-	Maoka.create("div", ({ use }) => {
-		use(MaokaJabs.set_class("outline-none cursor-text"))
+	Maoka.create("div", ({ use, element }) => {
+		use(MaokaJabs.set_class("outline-none cursor-text w-full"))
 		use(MaokaJabs.set_attribute("contenteditable", "false"))
+
+		use(
+			MaokaJabs.listen("onclick", event => {
+				event.stopPropagation()
+
+				if (!element.children) return
+
+				const last_child = element.children[element.children.length - 1]
+
+				if (!last_child || !(last_child instanceof HTMLElement)) return
+
+				last_child.focus()
+			}),
+		)
 
 		return () =>
 			node.children.map((child, child_index) => Inline(child, metadata, block_index, child_index))
@@ -184,7 +198,9 @@ const Inline = (
 			})
 
 			use(
-				MaokaJabs.listen("onfocus", () => {
+				MaokaJabs.listen("onfocus", event => {
+					event.stopPropagation()
+
 					set_position({ block_index, inline_index, offset: 0 })
 				}),
 			)

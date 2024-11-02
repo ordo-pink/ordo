@@ -6,6 +6,7 @@ import { Switch } from "@ordo-pink/switch"
 
 import { type TOrdoRichTextEditorInlineNode } from "../rich-text.types"
 import { editor_context_jab } from "../jabs/editor-context.jab"
+import { get_window_selection_offsets } from "../utils/selection.utils"
 
 export const Inline = (
 	node: TOrdoRichTextEditorInlineNode,
@@ -50,23 +51,6 @@ export const Inline = (
 				}
 			})
 
-			// use(
-			// 	MaokaJabs.listen("onfocus", event => {
-			// 		event.preventDefault()
-			// 		event.stopPropagation()
-
-			// 		const selection = window.getSelection()
-
-			// 		console.log(selection)
-
-			// 		// TODO Watch range instead
-			// 		const anchor_offset = selection?.anchorOffset ?? 0
-			// 		const focus_offset = selection?.focusOffset ?? 0
-
-			// 		set_caret_position({ block_index, inline_index, anchor_offset, focus_offset })
-			// 	}),
-			// )
-
 			use(
 				MaokaJabs.listen("onmouseup", event => {
 					event.stopPropagation()
@@ -106,11 +90,31 @@ export const Inline = (
 							// that `oninput` will take care of
 							if (is_first_block) return
 
-							if (is_selection_start && node.value.length === 0) {
+							if (is_selection_start) {
 								event.preventDefault()
 								event.stopPropagation()
 
-								return remove_block(block_index, "previous")
+								let refocus = true
+
+								if (node.value.length > 0) {
+									const state = state$.getValue()
+
+									if (inline_index > 0) {
+										state[block_index].children[inline_index - 1].value += node.value
+									} else {
+										const prev_block_last_inline_index = state[block_index - 1].children.length - 1
+										state[block_index - 1].children[prev_block_last_inline_index].value +=
+											node.value
+
+										refocus = false
+									}
+
+									state[block_index].children[inline_index].value = ""
+									state$.next(state)
+								}
+
+								// Safely remove the block since it does not contain any content
+								if (node.value.length === 0) return remove_block(block_index, refocus)
 							}
 						}
 
@@ -127,10 +131,7 @@ export const Inline = (
 
 				Switch.Match(event.key)
 					.case(["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"], () => {
-						const selection = window.getSelection()
-
-						const anchor_offset = selection?.anchorOffset ?? 0
-						const focus_offset = selection?.focusOffset ?? 0
+						const { anchor_offset, focus_offset } = get_window_selection_offsets()
 
 						set_caret_position({ block_index, inline_index, anchor_offset, focus_offset })
 					})
@@ -150,10 +151,7 @@ export const Inline = (
 					const state = state$.getValue()
 					const target = event.target as HTMLDivElement
 
-					const selection = window.getSelection()
-
-					const anchor_offset = selection?.anchorOffset ?? 0
-					const focus_offset = selection?.focusOffset ?? 0
+					const { anchor_offset, focus_offset } = get_window_selection_offsets()
 
 					set_caret_position({ block_index, inline_index, anchor_offset, focus_offset })
 

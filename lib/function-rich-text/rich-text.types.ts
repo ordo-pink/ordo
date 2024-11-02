@@ -22,10 +22,10 @@ export type TEditorFocusPosition = {
 export type TEditorContext = {
 	caret_position$: BehaviorSubject<TEditorFocusPosition>
 	state$: BehaviorSubject<TEditorState>
-	add_block: (block: TOrdoRichTextEditorBlockNode, focus?: boolean) => void
-	add_inline: (inline: TOrdoRichTextEditorInlineNode, focus?: boolean) => void
-	remove_block: (block_index: number, focus?: "next" | "previous") => void
+	add_block: (block: TOrdoRichTextEditorBlockNode, refocus?: boolean) => void
+	add_inline: (inline: TOrdoRichTextEditorInlineNode, refocus?: boolean) => void
+	remove_block: (block_index: number, refocus?: boolean) => void
 	// remove_inline: (block_index: number, inline_index: number, focus?: "next" | "previous") => void
-	add_new_line: (focus?: boolean) => void
+	add_new_line: (refocus?: boolean) => void
 	set_caret_position: TSetCaretPositionFn
 }

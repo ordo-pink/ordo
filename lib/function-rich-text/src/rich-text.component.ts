@@ -111,14 +111,18 @@ export const RichText = (
 
 					state$.next(state)
 				},
-				remove_block: (block_index, focus = "previous") => {
+				remove_block: (block_index, refocus = true) => {
 					const state = state$.getValue()
+
+					const prev_line_last_inline_index = state[block_index - 1].children.length - 1
+					const prev_line_offset =
+						state[block_index - 1].children[prev_line_last_inline_index].value.length
 
 					// If we drop the first element and there is only one element, put
 					// a paragraph instead
 					if (block_index === 0) {
 						// Set focus to next to preserve caret position on the same line
-						focus = "next"
+						refocus = true
 
 						if (state.length === 1) {
 							state[0] = { type: "p", children: [{ type: "text", value: "" }] }
@@ -127,7 +131,7 @@ export const RichText = (
 						state.splice(block_index, 1)
 					}
 
-					if (focus === "previous") {
+					if (refocus === true) {
 						const { set_caret_position } = use(editor_context_jab)
 
 						const state = state$.getValue()
@@ -140,6 +144,17 @@ export const RichText = (
 							inline_index,
 							anchor_offset: offset,
 							focus_offset: offset,
+						})
+					} else {
+						const { set_caret_position } = use(editor_context_jab)
+
+						const new_block_index = block_index - 1
+
+						set_caret_position({
+							block_index: new_block_index,
+							inline_index: prev_line_last_inline_index,
+							anchor_offset: prev_line_offset,
+							focus_offset: prev_line_offset,
 						})
 					}
 

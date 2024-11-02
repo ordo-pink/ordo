@@ -146,22 +146,16 @@ export const Inline = (
 			})
 
 			use(
-				MaokaJabs.listen("onselectstart", () => {
+				MaokaJabs.listen("oninput", event => {
+					const state = state$.getValue()
+					const target = event.target as HTMLDivElement
+
 					const selection = window.getSelection()
 
 					const anchor_offset = selection?.anchorOffset ?? 0
 					const focus_offset = selection?.focusOffset ?? 0
 
-					caret_position$.next({ block_index, anchor_offset, focus_offset, inline_index })
-				}),
-			)
-
-			use(
-				MaokaJabs.listen("oninput", event => {
-					const state = state$.getValue()
-					const target = event.target as HTMLDivElement
-
-					set_caret_position({ block_index, inline_index })
+					set_caret_position({ block_index, inline_index, anchor_offset, focus_offset })
 
 					state[block_index].children[inline_index].value = target.innerText
 					state$.next(state)

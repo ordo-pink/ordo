@@ -56,20 +56,11 @@ export const RichText = (
 				caret_position$,
 				state$,
 				set_caret_position: position => {
-					if (!position.anchor_offset || !position.focus_offset) {
-						const selection = window.getSelection()
-
-						// TODO Watch range instead
-						position.anchor_offset = selection?.anchorOffset ?? 0
-						position.focus_offset = selection?.focusOffset ?? 0
-					}
-
-					// console.log(position)
-					caret_position$.next(position as TEditorFocusPosition)
+					caret_position$.next(position)
 				},
 				// TODO Remove block
 				// TODO Remove inline
-				add_block: (block, focus = true) => {
+				add_block: (block, refocus = true) => {
 					const { caret_position$, set_caret_position } = use(editor_context.consume)
 					const caret_position = caret_position$.getValue()
 					const state = state$.getValue()
@@ -94,7 +85,7 @@ export const RichText = (
 
 					state$.next(state)
 
-					if (focus)
+					if (refocus)
 						set_caret_position({
 							block_index: block_index + 1,
 							inline_index: 0,
@@ -102,12 +93,14 @@ export const RichText = (
 							focus_offset: 0,
 						})
 
+					console.log(caret_position$.getValue())
+
 					void refresh()
 				},
-				add_new_line: (focus = true) => {
+				add_new_line: (refocus = true) => {
 					const { add_block } = use(editor_context.consume)
 
-					add_block({ type: "p", children: [{ type: "text", value: "" }] }, focus)
+					add_block({ type: "p", children: [{ type: "text", value: "" }] }, refocus)
 				},
 				add_inline: inline => {
 					const { caret_position$: caret_position$ } = use(editor_context.consume)

@@ -1,7 +1,5 @@
 import type { BehaviorSubject } from "rxjs" // TODO: Replace with view
 
-import type { PartlyRequired } from "@ordo-pink/tau"
-
 export type TOrdoRichTextEditorNode = { type: string }
 
 export type TOrdoRichTextEditorInlineNode<$TValue = any> = TOrdoRichTextEditorNode & {
@@ -12,9 +10,7 @@ export type TOrdoRichTextEditorBlockNode = TOrdoRichTextEditorNode & {
 	children: TOrdoRichTextEditorInlineNode<any>[]
 }
 
-export type TSetCaretPositionFn = (
-	position: PartlyRequired<TEditorFocusPosition, "block_index" | "inline_index">,
-) => void
+export type TSetCaretPositionFn = (position: TEditorFocusPosition) => void
 
 export type TEditorState = TOrdoRichTextEditorBlockNode[]
 export type TEditorFocusPosition = {

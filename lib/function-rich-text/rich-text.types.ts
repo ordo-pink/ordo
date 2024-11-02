@@ -12,7 +12,11 @@ export type TOrdoRichTextEditorBlockNode = TOrdoRichTextEditorNode & {
 	children: TOrdoRichTextEditorInlineNode<any>[]
 }
 
-export type TEditorStructure = TOrdoRichTextEditorBlockNode[]
+export type TSetCaretPositionFn = (
+	position: PartlyRequired<TEditorFocusPosition, "block_index" | "inline_index">,
+) => void
+
+export type TEditorState = TOrdoRichTextEditorBlockNode[]
 export type TEditorFocusPosition = {
 	block_index: number
 	inline_index: number
@@ -20,12 +24,12 @@ export type TEditorFocusPosition = {
 	focus_offset: number
 }
 export type TEditorContext = {
-	position$: BehaviorSubject<TEditorFocusPosition>
-	structure$: BehaviorSubject<TEditorStructure>
+	caret_position$: BehaviorSubject<TEditorFocusPosition>
+	state$: BehaviorSubject<TEditorState>
 	add_block: (block: TOrdoRichTextEditorBlockNode, focus?: boolean) => void
 	add_inline: (inline: TOrdoRichTextEditorInlineNode, focus?: boolean) => void
+	remove_block: (block_index: number, focus?: "next" | "previous") => void
+	// remove_inline: (block_index: number, inline_index: number, focus?: "next" | "previous") => void
 	add_new_line: (focus?: boolean) => void
-	set_position: (
-		position: PartlyRequired<TEditorFocusPosition, "block_index" | "inline_index">,
-	) => void
+	set_caret_position: TSetCaretPositionFn
 }

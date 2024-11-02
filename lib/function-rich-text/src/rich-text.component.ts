@@ -26,23 +26,23 @@ import { MaokaJabs } from "@ordo-pink/maoka-jabs"
 import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
 import { R } from "@ordo-pink/result"
 
-import { type TEditorFocusPosition, type TEditorStructure } from "../rich-text.types"
+import { type TEditorFocusPosition, type TEditorState } from "../rich-text.types"
+import { editor_context, editor_context_jab } from "../jabs/editor-context.jab"
 import { Line } from "./line.component"
-import { editor_context } from "../jabs/editor-context.jab"
 
 export const RichText = (
 	metadata: Ordo.Metadata.Instance,
 	content: Ordo.Content.Instance,
 	ctx: Ordo.CreateFunction.Params,
 ) => {
-	const position$ = new BehaviorSubject<TEditorFocusPosition>({
+	const caret_position$ = new BehaviorSubject<TEditorFocusPosition>({
 		block_index: 0,
 		inline_index: 0,
 		anchor_offset: 0,
 		focus_offset: 0,
 	})
 
-	const structure$ = new BehaviorSubject<TEditorStructure>([
+	const state$ = new BehaviorSubject<TEditorState>([
 		{ type: "p", children: [{ type: "text", value: "" }] },
 	])
 
@@ -53,9 +53,9 @@ export const RichText = (
 
 		use(
 			editor_context.provide({
-				position$,
-				structure$,
-				set_position: position => {
+				caret_position$,
+				state$,
+				set_caret_position: position => {
 					if (!position.anchor_offset || !position.focus_offset) {
 						const selection = window.getSelection()
 
@@ -64,26 +64,24 @@ export const RichText = (
 						position.focus_offset = selection?.focusOffset ?? 0
 					}
 
-					console.log(position)
-					position$.next(position as TEditorFocusPosition)
+					// console.log(position)
+					caret_position$.next(position as TEditorFocusPosition)
 				},
 				// TODO Remove block
 				// TODO Remove inline
 				add_block: (block, focus = true) => {
-					const { position$, set_position } = use(editor_context.consume)
-					const position = position$.getValue()
-					const state = structure$.getValue()
+					const { caret_position$, set_caret_position } = use(editor_context.consume)
+					const caret_position = caret_position$.getValue()
+					const state = state$.getValue()
+
+					const { block_index, inline_index, anchor_offset, focus_offset } = caret_position
 
 					// TODO Move chars from previous line
 
-					const content = state[position.block_index]?.children[position.inline_index]
+					const content = state[block_index]?.children[inline_index]
 
 					if (content) {
-						if (
-							position.anchor_offset < content.value.length &&
-							position.focus_offset < content.value.length
-						) {
-							const { anchor_offset, focus_offset } = position
+						if (anchor_offset < content.value.length && focus_offset < content.value.length) {
 							const closest = anchor_offset > focus_offset ? focus_offset : anchor_offset
 							const furthest = anchor_offset < focus_offset ? focus_offset : anchor_offset
 
@@ -92,13 +90,13 @@ export const RichText = (
 						}
 					}
 
-					state.splice(position.block_index + 1, 0, block)
+					state.splice(block_index + 1, 0, block)
 
-					structure$.next(state)
+					state$.next(state)
 
 					if (focus)
-						set_position({
-							block_index: position.block_index + 1,
+						set_caret_position({
+							block_index: block_index + 1,
 							inline_index: 0,
 							anchor_offset: 0,
 							focus_offset: 0,
@@ -112,13 +110,48 @@ export const RichText = (
 					add_block({ type: "p", children: [{ type: "text", value: "" }] }, focus)
 				},
 				add_inline: inline => {
-					const { position$ } = use(editor_context.consume)
-					const position = position$.getValue()
-					const state = structure$.getValue()
+					const { caret_position$: caret_position$ } = use(editor_context.consume)
+					const { block_index } = caret_position$.getValue()
+					const state = state$.getValue()
 
-					state[position.block_index].children.splice(position.block_index, 0, inline)
+					state[block_index].children.splice(block_index, 0, inline)
 
-					structure$.next(state)
+					state$.next(state)
+				},
+				remove_block: (block_index, focus = "previous") => {
+					const state = state$.getValue()
+
+					// If we drop the first element and there is only one element, put
+					// a paragraph instead
+					if (block_index === 0) {
+						// Set focus to next to preserve caret position on the same line
+						focus = "next"
+
+						if (state.length === 1) {
+							state[0] = { type: "p", children: [{ type: "text", value: "" }] }
+						}
+					} else {
+						state.splice(block_index, 1)
+					}
+
+					if (focus === "previous") {
+						const { set_caret_position } = use(editor_context_jab)
+
+						const state = state$.getValue()
+						const new_block_index = block_index - 1
+						const inline_index = state[new_block_index].children.length - 1
+						const offset = state[new_block_index].children[inline_index].value.length
+
+						set_caret_position({
+							block_index: new_block_index,
+							inline_index,
+							anchor_offset: offset,
+							focus_offset: offset,
+						})
+					}
+
+					state$.next(state)
+					void refresh()
 				},
 			}),
 		)
@@ -128,12 +161,12 @@ export const RichText = (
 			.pipe(R.ops.chain(json => R.Try(() => JSON.parse(json))))
 			.pipe(R.ops.chain(x => R.If(is_array(x) && x.length > 0, { T: () => x })))
 			.cata({
-				Ok: x => structure$.next(x as TEditorStructure),
-				Err: () => structure$.next([{ type: "p", children: [{ type: "text", value: "" }] }]),
+				Ok: state => state$.next(state as TEditorState),
+				Err: () => state$.next([{ type: "p", children: [{ type: "text", value: "" }] }]),
 			})
 
 		return () => {
-			const state = structure$.getValue()
+			const state = state$.getValue()
 
 			return [...state.map((node, block_index) => Line(node, metadata, block_index))]
 		}

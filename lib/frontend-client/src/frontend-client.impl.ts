@@ -171,9 +171,9 @@ export const create_client = async ({ logger, is_dev, hosts }: P) => {
 		.then(module => module.default)
 		.then(f => f(shared_function_context))
 
-	// void import("@ordo-pink/function-auth")
-	// 	.then(module => module.default)
-	// 	.then(f => f(shared_function_context))
+	void import("@ordo-pink/function-auth")
+		.then(module => module.default)
+		.then(f => f(shared_function_context))
 
 	// TODO: Fix positioning of activity bar content when activity is changed
 	await import("@ordo-pink/function-file-explorer")

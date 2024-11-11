@@ -30,34 +30,53 @@ export type TButtonProps = {
 	hotkey?: string
 	hotkey_options?: THotkeyOptions
 	custom_class?: string
+	disabled?: () => boolean
 }
 
-const Default = ({ on_click, hotkey, text, custom_class = "", hotkey_options }: TButtonProps) =>
+const Default = ({
+	on_click,
+	hotkey,
+	text,
+	custom_class = "",
+	hotkey_options,
+	disabled = () => false,
+}: TButtonProps) =>
 	Maoka.create("button", ({ use, element }) => {
 		use(MaokaJabs.set_class("button", custom_class))
-		use(
-			MaokaJabs.listen("onclick", event => {
-				if (element instanceof HTMLButtonElement) element.focus()
-				on_click(event)
-			}),
-		)
+		use(MaokaJabs.listen("onclick", event => handle_click(event)))
 
-		return () => [TextContainer(() => text), hotkey ? Hotkey(hotkey, hotkey_options) : void 0]
+		const handle_click = (event: MouseEvent) => {
+			if (element instanceof HTMLButtonElement) element.focus()
+			on_click(event)
+		}
+
+		return () => {
+			if (disabled()) use(MaokaJabs.set_attribute("disabled"))
+			else element?.removeAttribute?.("disabled") // TODO: Add jab
+
+			return [TextContainer(() => text), hotkey ? Hotkey(hotkey, hotkey_options) : void 0]
+		}
 	})
 
 const TextContainer = Maoka.styled("div")
 
 const Success = (params: TButtonProps) =>
-	Default({ ...params, custom_class: `success ${params.custom_class}` })
+	Default({ ...params, custom_class: add_button_spec("success", params.custom_class) })
 
 const Neutral = (params: TButtonProps) =>
-	Default({ ...params, custom_class: `neutral ${params.custom_class}` })
+	Default({ ...params, custom_class: add_button_spec("neutral", params.custom_class) })
 
 const Primary = (params: TButtonProps) =>
-	Default({ ...params, custom_class: `primary ${params.custom_class}` })
+	Default({ ...params, custom_class: add_button_spec("primary", params.custom_class) })
 
 export const Button = {
 	Neutral,
 	Success,
 	Primary,
+}
+
+const add_button_spec = (button_spec: string, custom_class?: string): string => {
+	if (!custom_class) return button_spec
+
+	return `${button_spec} ${custom_class}`
 }

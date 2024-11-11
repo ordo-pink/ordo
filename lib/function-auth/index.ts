@@ -17,21 +17,11 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import {
-	BsAward,
-	BsBoxArrowInDown,
-	BsBoxArrowInRight,
-	BsBoxArrowUp,
-	BsGear,
-	BsPersonCircle,
-} from "react-icons/bs"
-import { type Root, createRoot } from "react-dom/client"
-
-import { O, type TOption } from "@ordo-pink/option"
+import { Maoka } from "@ordo-pink/maoka"
 import { type TUnwrapOk } from "@ordo-pink/result"
 import { create_function } from "@ordo-pink/core"
 
-import Auth from "./views/auth.workspace"
+import { AuthWorkspace } from "./src/auth.workspace"
 
 declare global {
 	interface t {
@@ -117,7 +107,7 @@ const AUTH_KEYS = [] as const
 export type TAuthTranslationKey = (typeof AUTH_KEYS)[number]
 
 // TODO: Lazy translations installation
-const EN_TRANSLATIONS: Partial<Ordo.I18N.Translations> = {
+const EN_TRANSLATIONS: Partial<Ordo.I18N.TranslationKeys> = {
 	"t.auth.errors.sign_in.einval": "Provided input is invalid",
 	"t.auth.errors.sign_in.eio": "Error connecting to the server",
 	"t.auth.errors.sign_in.enoent": "User with provided credentials does not exist",
@@ -183,7 +173,6 @@ export default create_function(
 		],
 	},
 	ctx => {
-		const Provider = create_ordo_context()
 		const commands = ctx.get_commands()
 		const fetch = ctx.get_fetch()
 		const hosts_result = ctx.get_hosts()
@@ -224,31 +213,27 @@ export default create_function(
 				commands.on("cmd.user.open_settings", on_open_settings)
 
 				commands.emit("cmd.application.command_palette.add", {
-					id: "cmd.auth.sign_out",
 					readable_name: "t.auth.pages.sign_out.label",
-					Icon: BsBoxArrowInDown,
+					// Icon: BsBoxArrowInDown,
 					on_select: () => commands.emit("cmd.auth.sign_out"),
 				})
 
 				commands.emit("cmd.application.command_palette.add", {
-					id: "cmd.user.open_current_user_profile",
 					readable_name: "t.auth.user.open_current_user_profile",
-					Icon: BsPersonCircle,
+					// Icon: BsPersonCircle,
 					on_select: () => commands.emit("cmd.user.open_current_user_profile"),
 				})
 
 				commands.emit("cmd.application.command_palette.add", {
-					id: "cmd.user.open_settings",
 					readable_name: "t.auth.user.open_settings",
-					Icon: BsGear,
+					// Icon: BsGear,
 					on_select: () => commands.emit("cmd.user.open_settings"),
 					hotkey: "mod+,", // TODO: Fix using symbols
 				})
 
 				commands.emit("cmd.application.command_palette.add", {
-					id: "cmd.user.open_achievements",
 					readable_name: "t.auth.user.open_achievements",
-					Icon: BsAward,
+					// Icon: BsAward,
 					on_select: () => commands.emit("cmd.user.open_achievements"),
 					hotkey: "mod+y",
 				})
@@ -269,50 +254,32 @@ export default create_function(
 				commands.on("cmd.auth.open_sign_up", on_open_sign_up)
 
 				commands.emit("cmd.application.command_palette.add", {
-					id: "cmd.auth.open_sign_in",
 					readable_name: "t.auth.pages.sign_in.label",
-					Icon: BsBoxArrowInRight,
+					// Icon: BsBoxArrowInRight,
 					on_select: () => commands.emit("cmd.auth.open_sign_in"),
 					hotkey: "mod+shift+l",
 				})
 
 				commands.emit("cmd.application.command_palette.add", {
-					id: "cmd.auth.open_sign_up",
 					readable_name: "t.auth.pages.sign_up.label",
-					Icon: BsBoxArrowUp,
+					// Icon: BsBoxArrowUp,
 					on_select: () => commands.emit("cmd.auth.open_sign_up"),
 					hotkey: "mod+shift+r",
 				})
 			}
 		})
 
-		let workspace_root_option: TOption<Root> = O.None()
-
-		commands.emit("cmd.application.add_translations", {
-			lang: "en",
-			prefix: "auth",
-			translations: EN_TRANSLATIONS,
-		})
+		commands.emit("cmd.application.add_translations", { lang: "en", translations: EN_TRANSLATIONS })
 
 		commands.emit("cmd.functions.activities.register", {
 			fid: ctx.fid,
 			activity: {
 				name: "pink.ordo.auth.authentication",
 				routes: ["/auth/:action"],
-				default_route: "/auth/sign-in",
+				default_route: "/auth/authenticate",
 				is_background: false,
 				is_fullscreen: false,
-				render_workspace: div => {
-					workspace_root_option = O.Some(createRoot(div))
-					workspace_root_option.unwrap()!.render(
-						<Provider value={ctx}>
-							<Auth />
-						</Provider>,
-					)
-				},
-				on_unmount: () => {
-					workspace_root_option.pipe(O.ops.map(root => root.unmount()))
-				},
+				render_workspace: div => void Maoka.render_dom(div, AuthWorkspace(ctx)),
 			},
 		})
 	},

@@ -3,8 +3,8 @@
 
 import type * as T from "./maoka.types"
 
-export const create: T.TMaokaCreateComponentFn =
-	(name, callback) => async (create_element, root_element, root_id) => {
+export const create: T.TMaokaCreateComponentFn = (name, callback) => {
+	const result: T.TMaokaComponent = async (create_element, root_element, root_id) => {
 		const internal_id = crypto.randomUUID()
 		const element = create_element(name)
 
@@ -40,6 +40,11 @@ export const create: T.TMaokaCreateComponentFn =
 			},
 		} as T.TMaokaProps
 
+		result.element = element
+		result.id = internal_id
+		result.root_id = root_id
+		result.refresh = props.refresh
+
 		if (!callback) return element
 
 		get_children = await callback(props)
@@ -55,6 +60,9 @@ export const create: T.TMaokaCreateComponentFn =
 
 		return children
 	}
+
+	return result
+}
 
 export const lazy = (callback: () => Promise<{ default: T.TMaokaComponent }>) =>
 	callback().then(result => result.default)

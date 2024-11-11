@@ -21,8 +21,10 @@ import { type TMaokaProps } from "@ordo-pink/maoka"
 
 import { TNoSpace } from "./maoka-jabs.types"
 
-export const set_attribute = (key: string, value: string) => (ctx: TMaokaProps) =>
-	void ctx.element.setAttribute(key, value)
+export const set_attribute =
+	(key: string, value = "") =>
+	(ctx: TMaokaProps) =>
+		void ctx.element.setAttribute(key, value)
 
 export const set_class =
 	(...classes: string[]) =>

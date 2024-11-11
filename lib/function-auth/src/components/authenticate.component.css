@@ -1,0 +1,23 @@
+.auth {
+	@apply flex size-full flex-col items-center justify-center p-4;
+}
+
+.auth-form {
+	@apply flex w-96 max-w-full flex-col items-end space-y-2;
+}
+
+.auth-form_fieldset {
+	@apply w-full;
+}
+
+.auth_title {
+	@apply w-full text-center font-black uppercase leading-none sm:fixed sm:left-0 sm:right-0 sm:top-0 sm:mt-12 sm:p-4;
+}
+
+.auth_title_please {
+	@apply text-right text-sm font-normal sm:pr-4;
+}
+
+.auth_hint {
+	@apply w-full py-12 text-center;
+}

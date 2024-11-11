@@ -94,7 +94,7 @@ const create_hotkey_string = (event: KeyboardEvent, is_darwin: boolean) => {
 	if (event.metaKey) hotkey += "mod+"
 	if (event.shiftKey) hotkey += "shift+"
 
-	hotkey += event.key.toLocaleLowerCase()
+	hotkey += event.key?.toLocaleLowerCase()
 
 	return hotkey
 }

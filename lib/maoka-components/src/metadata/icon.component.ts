@@ -56,7 +56,7 @@ export const MetadataIcon = ({ metadata, custom_class = "", show_emoji_picker = 
 					event.stopPropagation()
 
 					commands.emit("cmd.application.command_palette.show", {
-						max_items: 20,
+						max_items: 100,
 						items: emojis.map(
 							emoji =>
 								({

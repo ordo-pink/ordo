@@ -7,9 +7,13 @@
 }
 
 .command-palette_items {
-	@apply w-full grow overflow-y-auto;
+	@apply w-full overflow-y-auto border-neutral-500 py-2 has-[div]:first-of-type:border-b;
 }
 
 .command-palette_hint {
 	@apply flex items-center justify-center text-center text-xs text-neutral-600 dark:text-neutral-400;
+}
+
+.command-palette_create-new-item-hint {
+	@apply flex items-center space-x-1 text-sm text-neutral-600 dark:text-neutral-400;
 }

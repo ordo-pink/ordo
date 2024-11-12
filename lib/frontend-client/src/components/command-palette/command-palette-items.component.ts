@@ -22,12 +22,14 @@ import { MaokaJabs } from "@ordo-pink/maoka-jabs"
 
 import { CommandPaletteItem } from "./command-palette-item.component"
 import { CurrentItemLocation } from "./constants"
+import { Hotkey } from "@ordo-pink/maoka-components"
 
 export const CommandPaletteItems = (
 	get_items: () => Ordo.CommandPalette.Item[],
 	get_current_index: () => number,
 	get_current_location: () => CurrentItemLocation,
 	assigned_location: CurrentItemLocation,
+	on_click: (index: number, location: CurrentItemLocation) => void,
 ) =>
 	Maoka.create("div", ({ use }) => {
 		use(MaokaJabs.set_class("command-palette_items"))
@@ -37,8 +39,25 @@ export const CommandPaletteItems = (
 			const current_index = get_current_index()
 			const location = get_current_location()
 
+			// TODO Translations
+			if (!items.length && assigned_location === CurrentItemLocation.SUGGESTED) {
+				return CreateNewItemHint(() => [
+					"press",
+					Hotkey("Enter", { smol: true, decoration_only: true }),
+					"to create",
+				])
+			}
+
 			return items.map((item, index) =>
-				CommandPaletteItem(item, location === assigned_location && current_index === index),
+				CommandPaletteItem(
+					item,
+					() => on_click(index, assigned_location),
+					location === assigned_location && current_index === index,
+				),
 			)
 		}
 	})
+
+const CreateNewItemHint = Maoka.styled("div", {
+	class: "action-list-item command-palette_create-new-item-hint",
+})

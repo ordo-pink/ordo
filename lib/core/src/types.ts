@@ -93,6 +93,9 @@ declare global {
 				support_messenger: () => string
 				contact_us: () => string
 			}
+			metadata: {
+				show_edit_labels_palette: () => string
+			}
 			components: {
 				command_palette: {
 					search_placeholder: () => string

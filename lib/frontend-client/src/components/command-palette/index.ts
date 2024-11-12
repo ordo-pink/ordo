@@ -43,6 +43,7 @@ export const CommandPalette = (
 		use(MaokaOrdo.Context.provide(ctx))
 		use(MaokaJabs.set_class("command-palette"))
 
+		let input = ""
 		let visible_items = [] as Ordo.CommandPalette.Item[]
 		let pinned_items = [] as Ordo.CommandPalette.Item[]
 		let current_item_index = 0
@@ -53,11 +54,19 @@ export const CommandPalette = (
 
 		const t_placeholder = t("t.common.components.command_palette.search_placeholder")
 
+		const handle_click = (index: number, location: CurrentItemLocation) => {
+			current_item_index = index
+			current_item_location = location
+
+			handle_enter()
+		}
+
 		const VisibleItems = CommandPaletteItems(
 			() => visible_items,
 			() => current_item_index,
 			() => current_item_location,
 			CurrentItemLocation.SUGGESTED,
+			handle_click,
 		)
 
 		const PinnedItems = CommandPaletteItems(
@@ -65,7 +74,13 @@ export const CommandPalette = (
 			() => current_item_index,
 			() => current_item_location,
 			CurrentItemLocation.PINNED,
+			handle_click,
 		)
+
+		const refresh_components = () => {
+			if (VisibleItems.refresh) void VisibleItems.refresh()
+			if (PinnedItems.refresh) void PinnedItems.refresh()
+		}
 
 		const get_state = use(
 			MaokaOrdo.Jabs.from$(cp$, { items: [] }, value => {
@@ -90,53 +105,86 @@ export const CommandPalette = (
 			Switch.Match(event.key)
 				.case("ArrowUp", handle_arrow_up)
 				.case("ArrowDown", handle_arrow_down)
-				.case("Tab", handle_tab)
+				.case("Tab", () => handle_tab(event))
 				.case("Enter", handle_enter)
 				.default(noop)
 
 		const handle_enter = () => {
-			if (!visible_items.length) return
+			const state = get_state()
+			const is_pinned = current_item_location === CurrentItemLocation.PINNED
+			const source = is_pinned ? pinned_items : visible_items
 
-			const invoke = visible_items[current_item_index].on_select
+			if (state.is_multiple) {
+				if (state.on_new_item && input && !visible_items[current_item_index] && !is_pinned) {
+					state.on_new_item?.(input)
 
-			emit("cmd.application.command_palette.hide")
-			invoke()
+					input = ""
+					current_item_index = 0
+				} else {
+					source[current_item_index].on_select()
+
+					if (is_pinned) {
+						visible_items.push(pinned_items[current_item_index])
+						pinned_items.splice(current_item_index, 1)
+					} else {
+						pinned_items.push(visible_items[current_item_index])
+						visible_items.splice(current_item_index, 1)
+					}
+
+					current_item_index = 0
+				}
+
+				if (is_pinned && source.length === 0) current_item_location = CurrentItemLocation.SUGGESTED
+
+				refresh_components()
+			} else {
+				const invoke = source[current_item_index].on_select
+				emit("cmd.application.command_palette.hide")
+				invoke()
+			}
 		}
 
 		const handle_arrow_up = () => {
-			if (!visible_items.length) return
+			const source =
+				current_item_location === CurrentItemLocation.PINNED ? pinned_items : visible_items
 
-			current_item_index =
-				current_item_index === 0 ? visible_items.length - 1 : current_item_index - 1
+			if (!source.length) return
 
-			if (VisibleItems.refresh) void VisibleItems.refresh()
+			current_item_index = current_item_index === 0 ? source.length - 1 : current_item_index - 1
+
+			refresh_components()
 		}
 
 		const handle_arrow_down = () => {
-			if (!visible_items.length) return
+			const source =
+				current_item_location === CurrentItemLocation.PINNED ? pinned_items : visible_items
 
-			current_item_index =
-				current_item_index === visible_items.length - 1 ? 0 : current_item_index + 1
+			if (!source.length) return
 
-			if (VisibleItems.refresh) void VisibleItems.refresh()
+			current_item_index = current_item_index === source.length - 1 ? 0 : current_item_index + 1
+
+			refresh_components()
 		}
 
-		const handle_tab = () => {
+		const handle_tab = (event: KeyboardEvent) => {
+			event.preventDefault()
+
 			const state = get_state()
 
 			if (!state.is_multiple) return
 
 			current_item_location =
-				current_item_location === CurrentItemLocation.PINNED
-					? CurrentItemLocation.SUGGESTED
-					: CurrentItemLocation.PINNED
+				current_item_location === CurrentItemLocation.SUGGESTED
+					? CurrentItemLocation.PINNED
+					: CurrentItemLocation.SUGGESTED
 
-			if (VisibleItems.refresh) void VisibleItems.refresh()
-			if (pinned_items && PinnedItems.refresh) void PinnedItems.refresh()
+			current_item_index = 0
+
+			refresh_components()
 		}
 
-		const handle_input_change = (event: Event) => {
-			const input = (event.target as HTMLInputElement)?.value
+		const handle_input = (event: Event) => {
+			input = (event.target as HTMLInputElement)?.value
 			const state = get_state()
 			const all = state.items
 
@@ -146,7 +194,7 @@ export const CommandPalette = (
 			visible_items = source.slice(0, length)
 			current_item_index = 0
 
-			if (VisibleItems.refresh) void VisibleItems.refresh()
+			refresh_components()
 		}
 
 		after_mount(() => document.addEventListener("keydown", handle_keydown))
@@ -156,37 +204,34 @@ export const CommandPalette = (
 			const state = get_state()
 
 			return [
-				Input.Text({
-					on_input: handle_input_change,
-					custom_class: "command-palette_search",
-					placeholder: t_placeholder,
-					autofocus: true,
-				}),
-
-				state.pinned_items ? PinnedItems : void 0,
-
-				VisibleItems,
-
-				Switch.OfTrue()
-					.case(!!state.pinned_items, () =>
-						Hint(() => [
-							Hotkey("arrowup", { smol: true, decoration_only: true }),
-							Hotkey("arrowdown", { smol: true, decoration_only: true }),
-							Hotkey("tab", { smol: true, decoration_only: true }),
-							Hotkey("enter", { smol: true, decoration_only: true }),
-							Hotkey("escape", { smol: true, decoration_only: true }),
-						]),
-					)
-					.default(() =>
-						Hint(() => [
-							Hotkey("arrowup", { smol: true, decoration_only: true }),
-							Hotkey("arrowdown", { smol: true, decoration_only: true }),
-							Hotkey("enter", { smol: true, decoration_only: true }),
-							Hotkey("escape", { smol: true, decoration_only: true }),
-						]),
-					),
+				SearchInput(t_placeholder, handle_input),
+				Maoka.styled("div", { class: "grow " })(() => [
+					state.is_multiple ? PinnedItems : void 0,
+					VisibleItems,
+				]),
+				state.is_multiple ? WithPinnedItemsHint : NoPinnedItemsHint,
 			]
 		}
 	})
 
 const Hint = Maoka.styled("div", { class: "command-palette_hint" })
+
+const SearchInput = (placeholder: string, on_input: (event: Event) => void) =>
+	Input.Text({ on_input, custom_class: "command-palette_search", placeholder, autofocus: true })
+
+const DisplayHotkey = (key: string) => Hotkey(key, { smol: true, decoration_only: true })
+
+const WithPinnedItemsHint = Hint(() => [
+	DisplayHotkey("arrowup"),
+	DisplayHotkey("arrowdown"),
+	DisplayHotkey("tab"),
+	DisplayHotkey("enter"),
+	DisplayHotkey("escape"),
+])
+
+const NoPinnedItemsHint = Hint(() => [
+	DisplayHotkey("arrowup"),
+	DisplayHotkey("arrowdown"),
+	DisplayHotkey("enter"),
+	DisplayHotkey("escape"),
+])

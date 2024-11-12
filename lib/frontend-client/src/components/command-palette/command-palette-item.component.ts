@@ -22,38 +22,25 @@ import { Maoka } from "@ordo-pink/maoka"
 import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
 
 export const CommandPaletteItem = (
-	{
-		readable_name,
-		on_select,
-		hotkey,
-		description,
-		render_icon,
-		render_custom_footer,
-		render_custom_info,
-	}: Ordo.CommandPalette.Item,
+	item: Ordo.CommandPalette.Item,
+	on_click: () => void,
 	is_current: boolean,
 ) =>
 	Maoka.create("div", ({ use, element, after_mount }) => {
 		const { t } = use(MaokaOrdo.Jabs.Translations)
-		const { emit } = use(MaokaOrdo.Jabs.Commands)
 
-		const title = t(readable_name)
-		const render_info = render_custom_info
-			? render_custom_info
-			: hotkey
-				? () => Hotkey(hotkey, { prevent_in_inputs: true })
+		const title = t(item.readable_name)
+		const render_info = item.render_custom_info
+			? item.render_custom_info
+			: item.hotkey
+				? () => Hotkey(item.hotkey!, { prevent_in_inputs: true })
 				: void 0
 
-		const render_footer = render_custom_footer
-			? render_custom_footer
-			: description
-				? () => Description(() => t(description))
+		const render_footer = item.render_custom_footer
+			? item.render_custom_footer
+			: item.description
+				? () => Description(() => t(item.description!))
 				: void 0
-
-		const on_click = () => {
-			emit("cmd.application.command_palette.hide")
-			on_select()
-		}
 
 		after_mount(() => {
 			if (is_current && !is_in_view(element as Element, element.parentElement!))
@@ -65,7 +52,7 @@ export const CommandPaletteItem = (
 				title,
 				is_current,
 				render_info,
-				render_icon,
+				render_icon: item.render_icon,
 				on_click,
 				render_footer,
 			})

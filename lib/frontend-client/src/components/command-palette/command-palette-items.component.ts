@@ -17,35 +17,28 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { type Observable } from "rxjs"
-
 import { Maoka } from "@ordo-pink/maoka"
 import { MaokaJabs } from "@ordo-pink/maoka-jabs"
-import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
 
 import { CommandPaletteItem } from "./command-palette-item.component"
 import { CurrentItemLocation } from "./constants"
 
 export const CommandPaletteItems = (
-	items$: Observable<Ordo.CommandPalette.Item[]>,
-	index$: Observable<number>,
-	location$: Observable<CurrentItemLocation>,
+	get_items: () => Ordo.CommandPalette.Item[],
+	get_current_index: () => number,
+	get_current_location: () => CurrentItemLocation,
 	assigned_location: CurrentItemLocation,
 ) =>
 	Maoka.create("div", ({ use }) => {
-		const get_items = use(MaokaOrdo.Jabs.from$(items$, []))
-		const get_current_selection = use(MaokaOrdo.Jabs.from$(index$, 0))
-		const get_location = use(MaokaOrdo.Jabs.from$(location$, CurrentItemLocation.SUGGESTED))
-
 		use(MaokaJabs.set_class("command-palette_items"))
 
 		return () => {
-			const current_selection = get_current_selection()
 			const items = get_items()
-			const location = get_location()
+			const current_index = get_current_index()
+			const location = get_current_location()
 
 			return items.map((item, index) =>
-				CommandPaletteItem(item, location === assigned_location && current_selection === index),
+				CommandPaletteItem(item, location === assigned_location && current_index === index),
 			)
 		}
 	})

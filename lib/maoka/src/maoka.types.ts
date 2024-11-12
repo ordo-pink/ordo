@@ -27,10 +27,10 @@ export type TMaokaComponent<$TElement extends TMaokaElement = TMaokaElement> = {
 		root_element: TMaokaElement,
 		root_id: string,
 	): Promise<TMaokaElement>
-	id: string
-	root_id: string
-	element: $TElement
-	refresh: () => Promise<void>
+	id?: string
+	root_id?: string
+	element?: $TElement
+	refresh?: () => Promise<void>
 }
 
 export type TMaokaJab<$TReturn = void> = (props: TMaokaProps) => $TReturn

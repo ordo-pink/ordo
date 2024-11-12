@@ -1,11 +1,30 @@
+// SPDX-FileCopyrightText: Copyright 2024, 谢尔盖||↓ and the Ordo.pink contributors
+// SPDX-License-Identifier: AGPL-3.0-only
+
+// Ordo.pink is an all-in-one team workspace.
+// Copyright (C) 2024  谢尔盖||↓ and the Ordo.pink contributors
+
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU Affero General Public License as published
+// by the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU Affero General Public License for more details.
+
+// You should have received a copy of the GNU Affero General Public License
+// along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
 import { NotificationType } from "@ordo-pink/core"
 import { Switch } from "@ordo-pink/switch"
 
-export const get_card_class = (type: Ordo.Notification.Instance["type"]) =>
+export const get_readable_type = (type: Ordo.Notification.Instance["type"]) =>
 	Switch.Match(type)
-		.case(NotificationType.INFO, () => "bg-sky-100 dark:bg-sky-800")
-		.case(NotificationType.QUESTION, () => "bg-violet-100 dark:bg-violet-800")
-		.case(NotificationType.RRR, () => "bg-rose-100 dark:bg-rose-800")
-		.case(NotificationType.SUCCESS, () => "bg-emerald-100 dark:bg-emerald-800")
-		.case(NotificationType.WARN, () => "bg-amber-100 dark:bg-amber-800")
-		.default(() => "bg-neutral-200 dark:bg-neutral-600")
+		.case(NotificationType.INFO, () => "info")
+		.case(NotificationType.QUESTION, () => "question")
+		.case(NotificationType.RRR, () => "rrr")
+		.case(NotificationType.SUCCESS, () => "success")
+		.case(NotificationType.WARN, () => "warn")
+		.default(() => "default")

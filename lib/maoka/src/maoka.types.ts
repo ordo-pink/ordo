@@ -10,6 +10,7 @@ export type TMaokaElement = { [$TKey in keyof HTMLElement]: HTMLElement[$TKey] |
 	replaceChildren: (...children: TMaokaChild[]) => void
 	childNodes: HTMLElement["childNodes"]
 	onunmount: (() => void)[] | undefined
+	aftermount: (() => void)[] | undefined
 }
 
 export type TMaokaTextElement = Partial<{ [$TKey in keyof Text]: Text[$TKey] }> | string
@@ -20,11 +21,17 @@ export type TMaokaCreateMaokaElementFn<$TElement extends TMaokaElement = TMaokaE
 
 export type TMaokaCreateComponentFn = (name: string, callback: TMaokaCallback) => TMaokaComponent
 
-export type TMaokaComponent<$TElement extends TMaokaElement = TMaokaElement> = (
-	create_element: TMaokaCreateMaokaElementFn<$TElement>,
-	root_element: TMaokaElement,
-	root_id: string,
-) => Promise<TMaokaElement>
+export type TMaokaComponent<$TElement extends TMaokaElement = TMaokaElement> = {
+	(
+		create_element: TMaokaCreateMaokaElementFn<$TElement>,
+		root_element: TMaokaElement,
+		root_id: string,
+	): Promise<TMaokaElement>
+	id?: string
+	root_id?: string
+	element?: $TElement
+	refresh?: () => Promise<void>
+}
 
 export type TMaokaJab<$TReturn = void> = (props: TMaokaProps) => $TReturn
 
@@ -32,7 +39,7 @@ export type TMaokaJab<$TReturn = void> = (props: TMaokaProps) => $TReturn
  * A Maoka component child. If the child is a Maoka component function, it will be called using the
  * same context as the parent Maoka component. If the child is a string, it will be rendered as
  * inner text of the parent. If the child is an HTML element, it will be appended to the parent. If
- * the child is undefined, it will not be rendered as a child but the changes made with the hooks
+ * the child is undefined, it will not be rendered as a child but the changes made with the jabs
  * will be applied.
  */
 export type TMaokaChild =
@@ -52,12 +59,12 @@ export type TMaokaChild =
 export type TMaokaChildren = TMaokaChild | TMaokaChild[]
 
 /**
- * A record of hooks that are provided by Maoka directly.
+ * A record of jabs that are provided by Maoka directly.
  */
 export type TMaokaProps<$TElement extends TMaokaElement = TMaokaElement> = {
 	/**
 	 * Get UUID of current Maoka component. This would probably only be useful for creating custom
-	 * hooks that accumulate a set of components to apply batch refresh calls. You would hardly ever
+	 * jabs that accumulate a set of components to apply batch refresh calls. You would hardly ever
 	 * need this in your application code.
 	 */
 	get id(): string
@@ -83,14 +90,18 @@ export type TMaokaProps<$TElement extends TMaokaElement = TMaokaElement> = {
 
 	on_unmount: TMaokaOnUnmountFn
 
-	use: <_TResult>(hook: TMaokaJab<_TResult>) => _TResult
+	after_mount: TMaokaAfterMountFn
+
+	use: <_TResult>(jab: TMaokaJab<_TResult>) => _TResult
 }
 
 export type TMaokaOnUnmountFn = (f: () => void) => void
 
+export type TMaokaAfterMountFn = (f: () => void) => void
+
 /**
  * A callback function that returns children of the current Maoka component. It accepts a record of
- * hooks available within the execution context of current Maoka root. If the callback does not
+ * jabs available within the execution context of current Maoka root. If the callback does not
  * return, the Maoka component will be rendered without children.
  *
  * @see TMaokaChildren

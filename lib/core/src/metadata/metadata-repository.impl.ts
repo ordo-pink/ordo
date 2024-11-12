@@ -19,7 +19,7 @@
 
 import { map } from "rxjs"
 
-import { Oath } from "@ordo-pink/oath"
+import { Oath, ops0 } from "@ordo-pink/oath"
 import { Result } from "@ordo-pink/result"
 
 import { RRR } from "../rrr"
@@ -58,7 +58,7 @@ export const MR = MetadataRepository
 // TODO: Use all three in Manager
 export const CacheMetadataRepository: Ordo.Metadata.RepositoryAsyncStatic = {
 	Of: () => {
-		const indexed_db = indexedDB.open("ordo.pink", 1)
+		const indexed_db = indexedDB.open("ordo.pink", 2)
 
 		const result_p = new Promise<IDBDatabase>((resolve, reject) => {
 			indexed_db.onupgradeneeded = () => {
@@ -80,16 +80,16 @@ export const CacheMetadataRepository: Ordo.Metadata.RepositoryAsyncStatic = {
 		return {
 			get: () =>
 				Oath.FromPromise(() => result_p)
-					.pipe(Oath.ops.chain(db => Oath.FromNullable(db)))
-					.pipe(Oath.ops.rejected_map(rrr => eio("Failed to access IndexedDB cache", rrr)))
-					.pipe(Oath.ops.rejected_tap(console.log))
-					.pipe(Oath.ops.map(db => db.transaction("metadata", "readonly")))
-					.pipe(Oath.ops.map(transaction => transaction.objectStore("metadata")))
-					.pipe(Oath.ops.map(storage => storage.get("items")))
+					.pipe(ops0.chain(db => Oath.FromNullable(db)))
+					.pipe(ops0.rejected_map(rrr => eio("Failed to access IndexedDB cache", rrr)))
+					.pipe(ops0.rejected_tap(console.log))
+					.pipe(ops0.map(db => db.transaction("metadata", "readonly")))
+					.pipe(ops0.map(transaction => transaction.objectStore("metadata")))
+					.pipe(ops0.map(storage => storage.get("items")))
 					.pipe(
-						Oath.ops.chain(
+						ops0.chain(
 							result =>
-								new Oath((resolve, reject) => {
+								new Oath<Ordo.Metadata.DTO[], Ordo.Rrr<"EIO">>((resolve, reject) => {
 									result.onsuccess = event => resolve((event.target as any)?.result ?? [])
 									result.onerror = () => reject(eio("Failed to access cache inside IndexedDB"))
 								}),
@@ -97,15 +97,15 @@ export const CacheMetadataRepository: Ordo.Metadata.RepositoryAsyncStatic = {
 					),
 			put: (_, metadata) =>
 				Oath.Try(() => indexed_db.result)
-					.pipe(Oath.ops.chain(db => Oath.FromNullable(db)))
-					.pipe(Oath.ops.rejected_map(() => eio("Failed to access cache inside IndexedDB")))
-					.pipe(Oath.ops.map(db => db.transaction("metadata", "readwrite")))
-					.pipe(Oath.ops.map(transaction => transaction.objectStore("metadata")))
-					.pipe(Oath.ops.map(storage => storage.put(metadata, "items")))
+					.pipe(ops0.chain(db => Oath.FromNullable(db)))
+					.pipe(ops0.rejected_map(() => eio("Failed to access cache inside IndexedDB")))
+					.pipe(ops0.map(db => db.transaction("metadata", "readwrite")))
+					.pipe(ops0.map(transaction => transaction.objectStore("metadata")))
+					.pipe(ops0.map(storage => storage.put(metadata, "items")))
 					.pipe(
-						Oath.ops.chain(
+						ops0.chain(
 							result =>
-								new Oath((resolve, reject) => {
+								new Oath<void, Ordo.Rrr<"EIO">>((resolve, reject) => {
 									result.onsuccess = () => resolve(void 0)
 									result.onerror = () => reject(eio("Failed to access cache inside IndexedDB"))
 								}),
@@ -119,9 +119,9 @@ export const RemoteMetadataRepository: Ordo.Metadata.RepositoryAsyncStatic = {
 	Of: (data_host, fetch) => ({
 		get: token =>
 			Oath.Try(() => fetch(`${data_host}`, { headers: { Authorization: `Bearer ${token}` } }))
-				.pipe(Oath.ops.chain(response => Oath.FromPromise(() => response.json())))
-				.pipe(Oath.ops.chain(r => Oath.If(r.success, { T: () => r.result, F: () => r.error })))
-				.pipe(Oath.ops.rejected_map(error => eio(error))),
+				.pipe(ops0.chain(response => Oath.FromPromise(() => response.json())))
+				.pipe(ops0.chain(r => Oath.If(r.success, { T: () => r.result, F: () => r.error })))
+				.pipe(ops0.rejected_map(error => eio(error))),
 
 		put: () => Oath.Reject(eio("TODO: UNIMPLEMENTED")),
 	}),

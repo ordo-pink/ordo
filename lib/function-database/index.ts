@@ -17,7 +17,7 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { BsFileEarmarkRichText, BsFileEarmarkRuled } from "@ordo-pink/frontend-icons"
+import { BsFileEarmarkRuled } from "@ordo-pink/frontend-icons"
 import { Maoka } from "@ordo-pink/maoka"
 import { create_function } from "@ordo-pink/core"
 
@@ -26,13 +26,6 @@ import { Database } from "./src/database.component"
 declare global {
 	interface t {
 		database: {
-			file_association: {
-				readable_name: () => string
-				description: () => string
-			}
-		}
-		// TODO Move to text editor
-		text: {
 			file_association: {
 				readable_name: () => string
 				description: () => string
@@ -50,6 +43,11 @@ export default create_function(
 			"cmd.metadata.show_create_modal",
 			"cmd.application.router.navigate",
 			"cmd.application.command_palette.show",
+			"cmd.application.context_menu.show",
+			"cmd.metadata.rename",
+			"cmd.content.set",
+			"cmd.metadata.set_property",
+			"cmd.application.command_palette.hide",
 		],
 		queries: [
 			"application.commands",
@@ -67,33 +65,6 @@ export default create_function(
 				"t.database.file_association.readable_name": "Database",
 				"t.database.file_association.description":
 					"This file represents a database where each row is a separate file contained inside the database.",
-
-				// TODO Move to text editor
-				"t.text.file_association.readable_name": "Rich Text",
-				"t.text.file_association.description":
-					"This is a rich text file that allows custom user input and embedding other files in read-only mode.",
-			},
-		})
-
-		// TODO Move to text editor
-		commands.emit("cmd.functions.file_associations.add", {
-			name: "pink.ordo.text",
-			types: [
-				{
-					name: "text/ordo",
-					readable_name: "t.text.file_association.readable_name",
-					description: "t.text.file_association.description",
-				},
-			],
-			render: ({ div }) =>
-				// TODO Replace with text editor
-				Maoka.render_dom(
-					div,
-					Maoka.create("div", () => () => "TODO"),
-				),
-			render_icon: span => {
-				span.appendChild(BsFileEarmarkRichText() as any)
-				return Promise.resolve()
 			},
 		})
 
@@ -106,7 +77,8 @@ export default create_function(
 					description: "t.database.file_association.description",
 				},
 			],
-			render: ({ div, metadata }) => Maoka.render_dom(div, Database(metadata, ctx)),
+			render: ({ div, metadata, content }) =>
+				Maoka.render_dom(div, Database(metadata, content, ctx)),
 			render_icon: span => span.replaceChildren(BsFileEarmarkRuled() as any),
 		})
 	},

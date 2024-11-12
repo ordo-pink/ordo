@@ -19,67 +19,77 @@
 
 import { watch } from "fs"
 
-import { die, direntsToDirs, getNames, runAsyncCommand0 } from "@ordo-pink/binutil"
+import { Oath, invokers0, ops0 } from "@ordo-pink/oath"
+import { die, dirents_to_dirs, get_dirent_names, run_async_command } from "@ordo-pink/binutil"
 import { dir_exists0, is_file0, readdir0 } from "@ordo-pink/fs"
 import { ConsoleLogger } from "@ordo-pink/logger"
-import { Oath } from "@ordo-pink/oath"
 import { getc } from "@ordo-pink/getc"
 
 const { ORDO_STATIC_ROOT } = getc(["ORDO_STATIC_ROOT"])
 
-void Oath.of("./srv")
-	.chain(path => readdir0(path, { withFileTypes: true }))
-	.map(direntsToDirs)
-	.map(getNames)
-	.map(names => names.map(name => `./srv/${name}/static`))
-	.chain(paths =>
-		Oath.all(paths.map(path => dir_exists0(path).map(exists => (exists ? path : false)))),
+void Oath.Resolve("./srv")
+	.pipe(ops0.chain(path => readdir0(path, { withFileTypes: true })))
+	.pipe(ops0.map(dirents_to_dirs))
+	.pipe(ops0.map(get_dirent_names))
+	.pipe(ops0.map(names => names.map(name => `./srv/${name}/static`)))
+	.pipe(
+		ops0.chain(paths =>
+			Oath.Merge(
+				paths.map(path => dir_exists0(path).pipe(ops0.map(exists => (exists ? path : false)))),
+			),
+		),
 	)
-	.map(items => items.filter(Boolean) as string[])
-	.chain(publicPaths =>
-		Oath.all(
+	.pipe(ops0.map(items => items.filter(Boolean) as string[]))
+	.and(publicPaths =>
+		Oath.Merge(
 			publicPaths.map(publicPath =>
-				readdir0(publicPath, { withFileTypes: true }).chain(dirents =>
-					Oath.all(
-						dirents.map(dirent => {
-							ConsoleLogger.info(
-								`STATIC copying file ${publicPath}/${dirent.name} -> ${ORDO_STATIC_ROOT}/${dirent.name}`,
-							)
+				readdir0(publicPath, { withFileTypes: true }).pipe(
+					ops0.chain(dirents =>
+						Oath.Merge(
+							dirents.map(dirent => {
+								ConsoleLogger.info(
+									`STATIC copying file ${publicPath}/${dirent.name} -> ${ORDO_STATIC_ROOT}/${dirent.name}`,
+								)
 
-							return is_file0(`${publicPath}/${dirent.name}`).map(isFile => {
-								isFile &&
-									void Bun.write(
-										`${ORDO_STATIC_ROOT}/${dirent.name}`,
-										Bun.file(`${publicPath}/${dirent.name}`),
-									)
+								return is_file0(`${publicPath}/${dirent.name}`).pipe(
+									ops0.map(isFile => {
+										isFile &&
+											void Bun.write(
+												`${ORDO_STATIC_ROOT}/${dirent.name}`,
+												Bun.file(`${publicPath}/${dirent.name}`),
+											)
 
-								// TODO: Copy directories
-							})
-						}),
+										// TODO: Copy directories
+									}),
+								)
+							}),
+						),
 					),
 				),
 			),
 		),
 	)
-	.orElse(die())
+	.invoke(invokers0.or_else(die()))
 
-void runAsyncCommand0("opt/bun run --watch srv/static/index.ts", {
+void run_async_command("opt/bun run --watch srv/static/index.ts", {
 	stdout: "pipe",
 	stderr: "pipe",
 	env: { ...process.env, FORCE_COLOR: "1" },
-}).orElse(die())
+}).invoke(invokers0.or_else(die()))
 
-void Oath.of("./srv")
-	.chain(path => readdir0(path, { withFileTypes: true }))
-	.map(direntsToDirs)
-	.map(getNames)
-	.map(names => names.map(name => `./srv/${name}/static`))
-	.chain(paths =>
-		Oath.all(paths.map(path => dir_exists0(path).map(exists => (exists ? path : false)))),
+void Oath.Resolve("./srv")
+	.pipe(ops0.chain(path => readdir0(path, { withFileTypes: true })))
+	.pipe(ops0.map(dirents_to_dirs))
+	.pipe(ops0.map(get_dirent_names))
+	.pipe(ops0.map(names => names.map(name => `./srv/${name}/static`)))
+	.pipe(
+		ops0.chain(paths =>
+			Oath.Merge(paths.map(path => dir_exists0(path).and(exists => (exists ? path : false)))),
+		),
 	)
-	.map(items => items.filter(Boolean) as string[])
-	.map(publicPaths =>
-		publicPaths.map(publicPath =>
+	.and(items => items.filter(Boolean) as string[])
+	.and(public_paths =>
+		public_paths.map(publicPath =>
 			watch(publicPath, { recursive: true }, (event, filename) => {
 				ConsoleLogger.info(
 					`STATIC copying file ${publicPath}/${filename} -> ${ORDO_STATIC_ROOT}/${filename}`,
@@ -89,4 +99,4 @@ void Oath.of("./srv")
 			}),
 		),
 	)
-	.orElse(die())
+	.invoke(invokers0.or_else(die()))

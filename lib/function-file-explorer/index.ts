@@ -19,9 +19,14 @@
 
 // import { BsFileEarmarkMinus, BsFileEarmarkPlus, BsPencil } from "react-icons/bs"
 
-import { BS_FOLDER_2_OPEN } from "@ordo-pink/frontend-icons"
+import {
+	BS_FOLDER_2_OPEN,
+	BsFileEarmarkMinus,
+	BsFileEarmarkPlus,
+	BsFileEarmarkRichText,
+} from "@ordo-pink/frontend-icons"
+import { ContextMenuItemType, Metadata, create_function } from "@ordo-pink/core"
 import { Maoka } from "@ordo-pink/maoka"
-import { create_function } from "@ordo-pink/core"
 
 import { CreateFileModal } from "./src/components/create-file-modal.component"
 import { FileExplorer } from "./src/components/fe.component"
@@ -54,6 +59,8 @@ export default create_function(
 			"cmd.application.router.navigate",
 			"cmd.file_explorer.go_to_file",
 			"cmd.file_explorer.open_file_explorer",
+			"cmd.application.command_palette.add",
+			"cmd.metadata.show_create_modal",
 		],
 	},
 	ctx => {
@@ -96,6 +103,13 @@ export default create_function(
 			}),
 		)
 
+		commands.emit("cmd.application.command_palette.add", {
+			on_select: () => commands.emit("cmd.metadata.show_create_modal", null),
+			hotkey: "mod+shift+n",
+			readable_name: "t.file_explorer.modals.create_file.title",
+			render_icon: div => void div.appendChild(BsFileEarmarkPlus() as SVGSVGElement),
+		})
+
 		commands.on("cmd.file_explorer.go_to_file", fsid =>
 			commands.emit("cmd.application.router.navigate", `/files/${fsid}`),
 		)
@@ -104,43 +118,43 @@ export default create_function(
 			commands.emit("cmd.application.router.navigate", "/files"),
 		)
 
-		// commands.emit("cmd.application.context_menu.add", {
-		// 	cmd: "cmd.metadata.show_create_modal",
-		// 	Icon: BsFileEarmarkPlus, // TODO: Move to icons
-		// 	readable_name: "Create File", // TODO: Translations
-		// 	should_show: ({ payload }) => Metadata.Validations.is_metadata(payload) || payload === "root",
-		// 	payload_creator: ({ payload }) =>
-		// 		Metadata.Validations.is_metadata(payload) ? payload.get_fsid() : null,
-		// 	type: "create",
-		// })
+		commands.emit("cmd.application.context_menu.add", {
+			command: "cmd.metadata.show_create_modal",
+			render_icon: div => div.appendChild(BsFileEarmarkPlus() as SVGSVGElement), // TODO: Move to icons
+			readable_name: "t.file_explorer.modals.create_file.title",
+			should_show: ({ payload }) => Metadata.Validations.is_metadata(payload) || payload === "root",
+			payload_creator: ({ payload }) =>
+				Metadata.Validations.is_metadata(payload) ? payload.get_fsid() : null,
+			type: ContextMenuItemType.CREATE,
+		})
 
-		// commands.emit("cmd.application.context_menu.add", {
-		// 	cmd: "cmd.metadata.show_rename_modal",
-		// 	Icon: BsPencil, // TODO: Move to icons
-		// 	readable_name: "Rename File", // TODO: Translations
-		// 	should_show: ({ payload }) => Metadata.Validations.is_metadata(payload),
-		// 	payload_creator: ({ payload }) =>
-		// 		Metadata.Validations.is_metadata(payload) && payload.get_fsid(),
-		// 	type: "update",
-		// })
+		commands.emit("cmd.application.context_menu.add", {
+			command: "cmd.metadata.show_rename_modal",
+			render_icon: div => div.appendChild(BsFileEarmarkRichText() as SVGSVGElement),
+			readable_name: "t.file_explorer.modals.rename_file.title",
+			should_show: ({ payload }) => Metadata.Validations.is_metadata(payload),
+			payload_creator: ({ payload }) =>
+				Metadata.Validations.is_metadata(payload) && payload.get_fsid(),
+			type: ContextMenuItemType.UPDATE,
+		})
 
-		// commands.emit("cmd.application.context_menu.add", {
-		// 	cmd: "cmd.metadata.show_remove_modal",
-		// 	Icon: BsFileEarmarkMinus, // TODO: Move to icons
-		// 	readable_name: "Remove File", // TODO: Translations
-		// 	should_show: ({ payload }) => Metadata.Validations.is_metadata(payload),
-		// 	payload_creator: ({ payload }) =>
-		// 		Metadata.Validations.is_metadata(payload) && payload.get_fsid(),
-		// 	type: "delete",
-		// })
+		commands.emit("cmd.application.context_menu.add", {
+			command: "cmd.metadata.show_remove_modal",
+			render_icon: div => div.appendChild(BsFileEarmarkMinus() as SVGSVGElement),
+			readable_name: "t.file_explorer.modals.remove_file.title" as Ordo.I18N.TranslationKey,
+			should_show: ({ payload }) => Metadata.Validations.is_metadata(payload),
+			payload_creator: ({ payload }) =>
+				Metadata.Validations.is_metadata(payload) && payload.get_fsid(),
+			type: ContextMenuItemType.DELETE,
+		})
 
 		commands.emit("cmd.functions.activities.register", {
 			fid: ctx.fid,
 			activity: {
 				name: "pink.ordo.file-explorer.activity",
 				routes: ["/files", "/files/:fsid"],
-				render_workspace: div => {
-					void Maoka.render_dom(div, FileExplorer(ctx))
+				render_workspace: async div => {
+					await Maoka.render_dom(div, FileExplorer(/*ctx*/))
 				},
 				render_icon: span => {
 					span.innerHTML = BS_FOLDER_2_OPEN

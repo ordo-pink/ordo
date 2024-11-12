@@ -17,11 +17,11 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { JTI, WJWT } from "@ordo-pink/wjwt"
+import { Oath, ops0 } from "@ordo-pink/oath"
 import { O } from "@ordo-pink/option"
-import { Oath } from "@ordo-pink/oath"
-import { RRR } from "@ordo-pink/managers"
+import { RRR } from "@ordo-pink/core"
 import { Switch } from "@ordo-pink/switch"
+import { WJWT } from "@ordo-pink/wjwt"
 
 import { type TAuthJWT, type TTokenServiceStatic } from "./types"
 
@@ -50,32 +50,30 @@ export const TokenService: TTokenServiceStatic = {
 			verify: (token, type) =>
 				wjwt(type)
 					.verify0(token)
-					.pipe(Oath.ops.rejected_map(error => einval(`verify -> error: ${error}`))),
+					.pipe(ops0.rejected_map(error => einval(`verify -> error: ${error}`))),
 
 			get_payload: (token, type) =>
 				wjwt(type)
 					.verify0(token)
-					.pipe(Oath.ops.chain(valid => Oath.If(valid, { T: () => token })))
-					.pipe(Oath.ops.chain(token => wjwt(type).decode0(token)))
-					.pipe(Oath.ops.rejected_map(error => einval(`get_payload -> error: ${error}`)))
-					.pipe(Oath.ops.map(jwt => jwt.payload as any))
+					.pipe(ops0.chain(valid => Oath.If(valid, { T: () => token })))
+					.pipe(ops0.chain(token => wjwt(type).decode0(token)))
+					.pipe(ops0.rejected_map(error => einval(`get_payload -> error: ${error}`)))
+					.pipe(ops0.map(jwt => jwt.payload as any))
 					.pipe(
-						Oath.ops.chain(payload =>
-							strategy
-								.get_token(payload.sub, payload.jti)
-								.pipe(Oath.ops.map(() => O.Some(payload))),
+						ops0.chain(payload =>
+							strategy.get_token(payload.sub, payload.jti).pipe(ops0.map(() => O.Some(payload))),
 						),
 					),
 
 			decode: token =>
 				wjwt("access")
 					.decode0(token)
-					.pipe(Oath.ops.map(jwt => O.Some(jwt as TAuthJWT)))
-					.pipe(Oath.ops.rejected_map(error => einval(`decode -> error: ${error}`))),
+					.pipe(ops0.map(jwt => O.Some(jwt as TAuthJWT)))
+					.pipe(ops0.rejected_map(error => einval(`decode -> error: ${error}`))),
 
 			create: ({ sub, aud = audience, data }) =>
 				Oath.Resolve({
-					jti: crypto.randomUUID() as JTI,
+					jti: crypto.randomUUID(),
 					iat: Math.floor(Date.now() / 1000),
 					iss: issuer,
 					aexp: Math.floor(Date.now() / 1000) + at_expire_in,
@@ -84,7 +82,7 @@ export const TokenService: TTokenServiceStatic = {
 					aud,
 				})
 					.pipe(
-						Oath.ops.chain(({ jti, iat, iss, aexp, rexp, sub, aud }) =>
+						ops0.chain(({ jti, iat, iss, aexp, rexp, sub, aud }) =>
 							Oath.Merge({
 								...data,
 								jti,
@@ -96,20 +94,20 @@ export const TokenService: TTokenServiceStatic = {
 								tokens: Oath.Merge({
 									access: access_wjwt
 										.sign0({ ...data, jti, iat, iss, exp: aexp, sub, aud })
-										.pipe(Oath.ops.rejected_map(e => einval(e))),
+										.pipe(ops0.rejected_map(e => einval(e))),
 									refresh: refresh_wjwt
 										.sign0({ ...data, jti, iat, iss, exp: rexp, sub, aud })
-										.pipe(Oath.ops.rejected_map(e => einval(e))),
+										.pipe(ops0.rejected_map(e => einval(e))),
 								}),
 							}).pipe(
-								Oath.ops.chain(res =>
-									strategy.set_token(sub, jti, res.tokens.refresh).pipe(Oath.ops.map(() => res)),
+								ops0.chain(res =>
+									strategy.set_token(sub, jti, res.tokens.refresh).pipe(ops0.map(() => res)),
 								),
 							),
 						),
 					)
 					.pipe(
-						Oath.ops.map(({ aud, exp, iat, iss, jti, lim, mfs, mxf, sbs, sub, tokens }) => ({
+						ops0.map(({ aud, exp, iat, iss, jti, lim, mfs, mxf, sbs, sub, tokens }) => ({
 							aud,
 							exp,
 							iat,

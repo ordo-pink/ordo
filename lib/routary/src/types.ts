@@ -24,8 +24,8 @@ import { Oath } from "@ordo-pink/oath"
 import { RoutaryResponse } from "./impl"
 
 export type RequiredRouterState = {
-	checkRoute: CheckRouteFn
-	checkMethod: CheckMethodFn
+	check_route: CheckRouteFn
+	check_method: CheckMethodFn
 }
 
 export type Gear<RouterState extends RequiredRouterState = RequiredRouterState> = (
@@ -74,5 +74,5 @@ export type TRouter<T extends RequiredRouterState = RequiredRouterState> = {
 	delete: (route: Route, gear: Gear<T>) => TRouter<T>
 	options: (route: Route, gear: Gear<T>) => TRouter<T>
 	each: RouterEachHandler<T>
-	orElse: RouterOrElseHandler<T>
+	or_else: RouterOrElseHandler<T>
 }

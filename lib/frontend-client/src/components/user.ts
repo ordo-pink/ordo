@@ -27,10 +27,10 @@ import {
 	UserQuery,
 } from "@ordo-pink/core"
 import { O, type TOption } from "@ordo-pink/option"
+import { Oath, invokers0, ops0 } from "@ordo-pink/oath"
 import { call_once, noop } from "@ordo-pink/tau"
 import { type AuthResponse } from "@ordo-pink/backend-server-id"
 import { CurrentUserManager } from "@ordo-pink/managers"
-import { Oath } from "@ordo-pink/oath"
 import { Result } from "@ordo-pink/result"
 import { Switch } from "@ordo-pink/switch"
 
@@ -56,24 +56,22 @@ export const init_user: TInitUserParams = call_once(
 
 		const refresh_token = Oath.Resolve({ path, method })
 			.pipe(
-				Oath.ops.tap(() => {
+				ops0.tap(() => {
 					logger.debug("Refreshing auth token...")
 					commands.emit("cmd.application.background_task.start_loading")
 				}),
 			)
 			.pipe(
-				Oath.ops.chain(({ path, method }) =>
+				ops0.chain(({ path, method }) =>
 					Oath.Try(() => fetch(hosts.id.concat(path), { method, credentials: "include" }))
-						.pipe(Oath.ops.chain(response => Oath.Try(() => response.json())))
-						.pipe(Oath.ops.rejected_map(e => einval(`refresh_token -> error: ${String(e)}`))),
+						.pipe(ops0.chain(response => Oath.Try(() => response.json())))
+						.pipe(ops0.rejected_map(e => einval(`refresh_token -> error: ${String(e)}`))),
 				),
 			)
+			.pipe(ops0.chain(res => Oath.If(res.success, { T: () => res.result, F: () => res.error })))
+			.pipe(ops0.tap(() => logger.debug("Auth token refreshed.")))
 			.pipe(
-				Oath.ops.chain(res => Oath.If(res.success, { T: () => res.result, F: () => res.error })),
-			)
-			.pipe(Oath.ops.tap(() => logger.debug("Auth token refreshed.")))
-			.pipe(
-				Oath.ops.map(auth => {
+				ops0.map(auth => {
 					commands.emit("cmd.application.background_task.reset_status")
 
 					auth$.next(O.Some(auth))
@@ -82,7 +80,7 @@ export const init_user: TInitUserParams = call_once(
 				}),
 			)
 
-		const or_cancel_state_changes = Oath.invokers.or_else(() => {
+		const or_cancel_state_changes = invokers0.or_else(() => {
 			commands.emit("cmd.application.background_task.reset_status")
 			auth$.next(O.None())
 			drop_timeout()
@@ -133,16 +131,16 @@ export const init_user: TInitUserParams = call_once(
 		// commands.on<cmd.user.refresh_info>("user.refresh", () => {
 		// 	const subscription = auth$.subscribe(auth => {
 		// 		void Oath.If(auth.is_some)
-		// 			.pipe(Oath.ops.map(() => auth))
-		// 			.pipe(Oath.ops.chain(auth => Oath.FromNullable(auth.unwrap()!.accessToken)))
-		// 			.pipe(Oath.ops.chain(at => Oath.Try(() => fetch(`${hosts.id}/account`, req_init(at)))))
-		// 			.pipe(Oath.ops.chain(response => Oath.FromPromise(() => response.json())))
-		// 			.pipe(Oath.ops.chain(r => Oath.If(r.success, { T: () => r.result, F: () => r.error })))
-		// 			.pipe(Oath.ops.map(user => current_user$.next(O.Some(user))))
-		// 			.pipe(Oath.ops.bitap(...unsubscribe(subscription)))
+		// 			.pipe(ops0.map(() => auth))
+		// 			.pipe(ops0.chain(auth => Oath.FromNullable(auth.unwrap()!.accessToken)))
+		// 			.pipe(ops0.chain(at => Oath.Try(() => fetch(`${hosts.id}/account`, req_init(at)))))
+		// 			.pipe(ops0.chain(response => Oath.FromPromise(() => response.json())))
+		// 			.pipe(ops0.chain(r => Oath.If(r.success, { T: () => r.result, F: () => r.error })))
+		// 			.pipe(ops0.map(user => current_user$.next(O.Some(user))))
+		// 			.pipe(ops0.bitap(...unsubscribe(subscription)))
 		// 			.invoke(
 		// 				// TODO: Better error handling
-		// 				Oath.invokers.or_else(error =>
+		// 				invokers0.or_else(error =>
 		// 					commands.emit<cmd.notification.show>("notification.show", {
 		// 						type: "rrr",
 		// 						title: "Ошибка получения данных о пользователе", // TODO: Move to i18n

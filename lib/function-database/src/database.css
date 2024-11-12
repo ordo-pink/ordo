@@ -1,0 +1,19 @@
+.database_view {
+	@apply p-4;
+}
+
+.database_border-color {
+	@apply border-neutral-300 dark:border-neutral-700;
+}
+
+.database_cell {
+	@apply database_border-color cursor-text break-all border-r px-2 py-1 last-of-type:border-l last-of-type:border-r-0;
+}
+
+.database_table-head_row {
+	@apply text-left;
+}
+
+.database_table-head_cell {
+	@apply database_border-color border-r px-2 py-1 text-sm font-normal text-neutral-500 last-of-type:border-l last-of-type:border-r-0;
+}

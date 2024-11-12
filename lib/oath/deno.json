@@ -1,0 +1,6 @@
+{
+	"name": "@ordo-pink/oath",
+	"version": "0.1.2",
+	"exports": "./index.ts",
+	"exclude": ["./benchmark.ts", "**/*.test.ts", ".npmignore"]
+}

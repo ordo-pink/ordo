@@ -19,18 +19,18 @@
 
 import type { Context } from "koa"
 
+import { Oath, ops0 } from "@ordo-pink/oath"
 import { type TUserService, UserService } from "@ordo-pink/backend-service-user"
-import { Oath } from "@ordo-pink/oath"
 import { RRR } from "@ordo-pink/core"
 import { from_option0 } from "@ordo-pink/tau"
 import { parse_body0 } from "@ordo-pink/backend-utils"
 
 export const confirm_email0: TFn = (ctx, { user_service }) =>
 	parse_body0<Ordo.Routes.ID.ConfirmEmail.RequestBody>(ctx, "object")
-		.pipe(Oath.ops.chain(extract_ctx0(user_service)))
-		.pipe(Oath.ops.chain(update_user0(user_service)))
-		.pipe(Oath.ops.map(UserService.serialise))
-		.pipe(Oath.ops.map(body => ({ status: 200, body })))
+		.pipe(ops0.chain(extract_ctx0(user_service)))
+		.pipe(ops0.chain(update_user0(user_service)))
+		.pipe(ops0.map(UserService.serialise))
+		.pipe(ops0.map(body => ({ status: 200, body })))
 
 // --- Internal ---
 
@@ -52,15 +52,15 @@ const extract_ctx0 =
 		Oath.Merge({
 			code: Oath.FromNullable(code, () => einval(`extract_ctx -> code: ${code}`)),
 			user: Oath.FromNullable(email)
-				.pipe(Oath.ops.rejected_map(() => einval(`extract_ctx -> email: ${email}`)))
+				.pipe(ops0.rejected_map(() => einval(`extract_ctx -> email: ${email}`)))
 				.pipe(
-					Oath.ops.chain(email =>
+					ops0.chain(email =>
 						user_service
 							.get_by_email(email)
-							.pipe(Oath.ops.chain(from_option0(() => enoent(`extract_ctx -> email: ${email}`)))),
+							.pipe(ops0.chain(from_option0(() => enoent(`extract_ctx -> email: ${email}`)))),
 					),
 				),
 		})
 
 const update_user0 = (user_service: TUserService) => (ctx: TCtx) =>
-	user_service.confirm_email(ctx.user.id).pipe(Oath.ops.map(() => ctx.user))
+	user_service.confirm_email(ctx.user.id).pipe(ops0.map(() => ctx.user))

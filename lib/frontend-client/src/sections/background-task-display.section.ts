@@ -24,7 +24,7 @@ import { Maoka } from "@ordo-pink/maoka"
 import { O } from "@ordo-pink/option"
 import { type TLogger } from "@ordo-pink/logger"
 
-import { BackgroundTaskStatusIndicator } from "../components/background-task-status"
+import { BackgroundTaskIndicator } from "../components/background-task-status"
 
 export const init_background_task_display = (logger: TLogger, commands: Ordo.Command.Commands) => {
 	logger.debug("🟡 Initialising background task indicator...")
@@ -42,7 +42,7 @@ export const init_background_task_display = (logger: TLogger, commands: Ordo.Com
 
 	O.FromNullable(document.querySelector("#background-task-indicator"))
 		.pipe(O.ops.chain(root => (root instanceof HTMLDivElement ? O.Some(root) : O.None())))
-		.pipe(O.ops.map(root => ({ root, component: BackgroundTaskStatusIndicator(bg_task$) })))
+		.pipe(O.ops.map(root => ({ root, component: BackgroundTaskIndicator(bg_task$) })))
 		.pipe(O.ops.map(({ root, component }) => Maoka.render_dom(root, component)))
 		.cata(O.catas.or_else(log_div_not_found(logger)))
 

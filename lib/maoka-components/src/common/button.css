@@ -1,0 +1,22 @@
+.button {
+	@apply flex flex-wrap items-center justify-center space-x-2 rounded-md px-4 py-1 text-sm outline-none transition-all duration-300;
+	@apply focus:!opacity-100 focus:ring-2 focus:ring-pink-600 focus:dark:ring-pink-400;
+	@apply active:!opacity-100 active:ring-2 active:ring-pink-600 active:dark:ring-pink-400;
+	@apply target:!opacity-100 target:ring-2 target:ring-pink-600 target:dark:ring-pink-400;
+}
+
+.button:disabled {
+	@apply animate-none cursor-not-allowed !bg-neutral-400 ring-0 hover:!scale-100 hover:!bg-neutral-400 dark:!bg-neutral-600 hover:dark:!bg-neutral-600;
+}
+
+.button.neutral {
+	@apply opacity-50 hover:opacity-100;
+}
+
+.button.success {
+	@apply bg-emerald-300 shadow-md hover:scale-110 hover:shadow-lg dark:bg-emerald-700;
+}
+
+.button.primary {
+	@apply bg-neutral-800 text-neutral-200 shadow-md hover:scale-110 hover:bg-pink-600 hover:shadow-lg dark:bg-neutral-200 dark:text-neutral-900 hover:dark:bg-pink-400;
+}

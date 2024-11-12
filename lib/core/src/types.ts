@@ -27,6 +27,7 @@ import type { TOption } from "@ordo-pink/option"
 import type { TResult } from "@ordo-pink/result"
 
 import type * as C from "./constants"
+import { TMaokaComponent } from "@ordo-pink/maoka"
 
 export type TDropIsPrefix<T extends string> = T extends `is_${infer U}` ? U : never
 
@@ -92,11 +93,14 @@ declare global {
 				support_messenger: () => string
 				contact_us: () => string
 			}
+			metadata: {
+				show_edit_labels_palette: () => string
+			}
 			components: {
 				command_palette: {
 					search_placeholder: () => string
 					hide: () => string
-					toggle: () => string
+					reset: () => string
 					exit_key_hint: () => string
 				}
 				sidebar: {
@@ -139,7 +143,7 @@ declare global {
 	 */
 	interface cmd {
 		application: {
-			set_title: () => { window_title: string; status_bar_title?: string }
+			set_title: () => Ordo.I18N.TranslationKey
 			add_translations: () => {
 				lang: ISO_639_1_Locale
 				translations: Partial<Record<Ordo.I18N.TranslationKey, string>>
@@ -156,22 +160,16 @@ declare global {
 				hide: () => string
 			}
 			context_menu: {
-				add: () => Ordo.ContextMenu.Instance
+				add: () => Ordo.ContextMenu.Item
 				remove: () => string
-				show: <$TPayload>() => Omit<Ordo.ContextMenu.Menu<$TPayload>, "structure">
+				show: () => Omit<Ordo.ContextMenu.Instance, "structure">
 				hide: () => void
 			}
 			command_palette: {
-				add: () => Ordo.CommandPalette.Instance
+				add: () => Ordo.CommandPalette.Item
 				remove: () => string
 				toggle: () => void
-				show: () => {
-					items: Ordo.CommandPalette.Instance[]
-					on_new_item?: (new_item: string) => unknown
-					multiple?: boolean
-					pinned_items?: Ordo.CommandPalette.Instance[]
-					shows_next_palette?: boolean
-				}
+				show: () => Ordo.CommandPalette.Instance
 				hide: () => void
 			}
 			sidebar: {
@@ -228,6 +226,7 @@ declare global {
 			add_links: () => { fsid: Ordo.Metadata.FSID; links: Ordo.Metadata.FSID[] }
 			remove_links: () => { fsid: Ordo.Metadata.FSID; links: Ordo.Metadata.FSID[] }
 			set_property: () => { fsid: Ordo.Metadata.FSID; key: string; value: any }
+			set_size: () => { fsid: Ordo.Metadata.FSID; size: number }
 		}
 		content: {
 			get: () => Ordo.Metadata.FSID
@@ -236,9 +235,8 @@ declare global {
 				name: string
 				parent: Ordo.Metadata.FSID | null
 				content: string | ArrayBuffer
-				content_type: string
+				type: string
 			}
-			drop: () => Ordo.Metadata.FSID
 		}
 	}
 
@@ -252,7 +250,7 @@ declare global {
 	 * type TFoo = Ordo.<whatever_you_need_from_here>
 	 * ```
 	 */
-	module Ordo {
+	namespace Ordo {
 		type Rrr<$TKey extends keyof typeof C.ErrorType = keyof typeof C.ErrorType> = {
 			key: $TKey
 			code: (typeof C.ErrorType)[$TKey]
@@ -285,12 +283,12 @@ declare global {
 		 * - **else**
 		 * 	- current achievement is displayed depending on its completion status
 		 */
-		module Achievement {
+		namespace Achievement {
 			/**
 			 * Achievement subscriber is designed to track user progress in terms of the achievement
 			 * as well as update/grant the achievement based of what the user has achieved.
 			 */
-			module Subscriber {
+			namespace Subscriber {
 				/**
 				 * Subscribe function params.
 				 *
@@ -392,18 +390,14 @@ declare global {
 			}
 		}
 
-		module Workspace {
+		namespace Workspace {
 			type WorkspaceSplitSize = [number, number]
 			type DisabledSidebar = { disabled: true }
 			type EnabledSidebar = { disabled: false; sizes: WorkspaceSplitSize }
 			type SidebarState = EnabledSidebar | DisabledSidebar
 		}
 
-		module Title {
-			type State = { window_title: string; status_bar_title?: string }
-		}
-
-		module CreateFunction {
+		namespace CreateFunction {
 			type QueryPermission =
 				| "application.title"
 				| "application.sidebar"
@@ -437,18 +431,18 @@ declare global {
 
 			// TODO Extract redundant types
 			type GetSidebarFn = () => TResult<Observable<Ordo.Workspace.SidebarState>, Ordo.Rrr<"EPERM">>
-			type GetTitleFn = () => TResult<Observable<Ordo.Title.State>, Ordo.Rrr<"EPERM">>
+			type GetTitleFn = () => TResult<Observable<string>, Ordo.Rrr<"EPERM">>
 			type GetHostsFn = () => TResult<Ordo.Hosts, Ordo.Rrr<"EPERM">>
 			type GetFetchFn = () => Ordo.Fetch
 			type GetLoggerFn = () => TLogger
 			type GetCommandsFn = () => Ordo.Command.Commands
 			type GetIsAuthenticatedFn = () => TResult<Observable<boolean>, Ordo.Rrr<"EPERM">>
 			type GetMetadataQueryFn = () => TResult<Ordo.Metadata.Query, Ordo.Rrr<"EPERM">>
+			type GetContentQueryFn = () => TResult<Ordo.Content.Query, Ordo.Rrr<"EPERM">>
 			type GetUserQueryFn = () => TResult<Ordo.User.Query, Ordo.Rrr<"EPERM">>
 			type GetCurrentLanguageFn = () => TResult<Observable<TwoLetterLocale>, Ordo.Rrr<"EPERM">>
 			type GetTranslationsFn = () => Observable<TOption<Ordo.I18N.Translations>>
 			type SetCurrentActivityFn = (name: string) => TResult<void, Ordo.Rrr<"EPERM" | "ENOENT">>
-			// type TGetContentQueryFn = () => TResult<TContentQuery, Ordo.Rrr<"EPERM">>>
 
 			type GetCurrentActivityFn = () => TResult<
 				Observable<TOption<Ordo.Activity.Instance>>,
@@ -487,11 +481,11 @@ declare global {
 				get_user_query: GetUserQueryFn
 				get_file_associations: GetFileAssociationsFn
 				get_current_file_association: GetCurrentFileAssociationFn
-				// get_content_query: TGetContentQueryFn
+				get_content_query: GetContentQueryFn
 			}
 		}
 
-		module I18N {
+		namespace I18N {
 			type TranslationKeys = TFlattenRecord<TRecordToKVUnion<t, "t">>
 			type TranslationKey = keyof TranslationKeys
 			type Translations = Record<TwoLetterLocale, Record<string, string>>
@@ -501,23 +495,23 @@ declare global {
 			}
 		}
 
-		module Activity {
+		namespace Activity {
 			type OnUnmountParams = { workspace: HTMLDivElement; sidebar: HTMLDivElement }
 
 			type Instance = {
 				name: string
 				routes: string[]
 				default_route?: string
-				render_workspace?: (div: HTMLDivElement) => Promise<void>
-				render_sidebar?: (div: HTMLDivElement) => Promise<void>
-				render_icon?: (span: HTMLSpanElement) => Promise<void>
+				render_workspace?: (div: HTMLDivElement) => void | Promise<void>
+				render_sidebar?: (div: HTMLDivElement) => void | Promise<void>
+				render_icon?: (span: HTMLSpanElement) => void | Promise<void>
 				on_unmount?: (params: Ordo.Activity.OnUnmountParams) => void
 				is_background?: boolean
 				is_fullscreen?: boolean
 			}
 		}
 
-		module FileAssociation {
+		namespace FileAssociation {
 			type RenderFn = (params: Ordo.FileAssociation.RenderParams) => void | Promise<void>
 
 			type RenderIconFn = (span: HTMLSpanElement) => void | Promise<void>
@@ -537,20 +531,19 @@ declare global {
 
 			type RenderParams = {
 				div: HTMLDivElement
-				is_loading: boolean
 				is_editable: boolean
 				is_embedded: boolean
-				content: string | ArrayBuffer | null
+				content: Ordo.Content.Instance
 				metadata: Ordo.Metadata.Instance
 			}
 		}
 
-		module User {
+		namespace User {
 			type Handle = `@${string}` // TODO Disallow forbidden chars
 			type ID = `${string}-${string}-${string}-${string}-${string}` // TODO Strict type
 			type Email = `${string}@${string}` // TODO Strict type
 
-			module Current {
+			namespace Current {
 				type DTO = Ordo.User.Public.DTO & {
 					email: Ordo.User.Email
 					email_confirmed: boolean
@@ -607,7 +600,7 @@ declare global {
 				}
 			}
 
-			module Public {
+			namespace Public {
 				type DTO = {
 					id: Ordo.User.ID
 					created_at: Date
@@ -675,7 +668,49 @@ declare global {
 			}
 		}
 
-		module Metadata {
+		namespace Content {
+			type Instance = string | ArrayBuffer | null
+
+			type Storage = Record<Ordo.Metadata.FSID, Ordo.Content.Instance>
+
+			type RepositoryStatic = {
+				Of: (content$: BehaviorSubject<Ordo.Content.Storage>) => Repository
+			}
+
+			type Repository = {
+				get: () => TResult<Ordo.Content.Storage, Ordo.Rrr<"EAGAIN">>
+				put: (content: Ordo.Content.Storage) => TResult<void, Ordo.Rrr<"EINVAL">>
+				get $(): Observable<number>
+			}
+
+			type RepositoryAsyncStatic = {
+				Of: (data_host: string, fetch: Ordo.Fetch) => RepositoryAsync
+			}
+
+			type RepositoryAsync = {
+				get: (
+					fsid: Ordo.Metadata.FSID,
+					token: string,
+				) => Oath<Ordo.Content.Instance, Ordo.Rrr<"EIO" | "EACCES" | "EINVAL" | "ENOENT">>
+				put: (
+					fsid: Ordo.Metadata.FSID,
+					content: Ordo.Content.Instance,
+					token: string,
+				) => Oath<void, Ordo.Rrr<"EINVAL" | "EACCES" | "EIO">>
+			}
+
+			type QueryStatic = {
+				Of: (repository: Ordo.Content.RepositoryAsync) => Ordo.Content.Query
+			}
+
+			type Query = {
+				get: (
+					fsid: Ordo.Metadata.FSID,
+				) => Oath<Ordo.Content.Instance, Ordo.Rrr<"EIO" | "EACCES" | "EINVAL" | "ENOENT">>
+			}
+		}
+
+		namespace Metadata {
 			type FSID = `${string}-${string}-${string}-${string}-${string}`
 			type Props = Readonly<Record<string, any>>
 
@@ -793,7 +828,7 @@ declare global {
 			type QueryOptions = { show_hidden?: boolean }
 
 			type QueryStatic = {
-				Of: (metadataRepository: Ordo.Metadata.Repository) => Query
+				Of: (repository: Ordo.Metadata.Repository) => Query
 			}
 
 			type Query = {
@@ -969,7 +1004,7 @@ declare global {
 			}
 		}
 
-		module Command {
+		namespace Command {
 			type Record = TFlattenRecord<TRecordToKVUnion<cmd, "cmd">>
 			type Name = keyof Record
 
@@ -994,49 +1029,57 @@ declare global {
 			 */
 			type TCommandHandler<$TPayload> = (payload: $TPayload) => unknown
 
+			type OnFn = <$TKey extends Ordo.Command.Name>(
+				name: $TKey,
+				handler: TCommandHandler<Ordo.Command.Record[$TKey]>,
+			) => void
+
+			type OffFn = <$TKey extends Ordo.Command.Name>(
+				name: $TKey,
+				handler: TCommandHandler<Ordo.Command.Record[$TKey]>,
+			) => void
+
+			type EmitFn = <$TKey extends Ordo.Command.Name>(
+				name: $TKey,
+				...rest: Ordo.Command.Record[$TKey] extends void
+					? [key?: string]
+					: [payload: Ordo.Command.Record[$TKey], key?: string]
+			) => void
+
+			type CancelFn = <$TKey extends Ordo.Command.Name>(
+				name: $TKey,
+				payload?: Ordo.Command.Record[$TKey],
+				key?: string,
+			) => void
+
 			type Commands = {
 				/**
 				 * Append a listener to a given command.
 				 */
-				on: <$TKey extends Ordo.Command.Name>(
-					name: $TKey,
-					handler: TCommandHandler<Ordo.Command.Record[$TKey]>,
-				) => void
+				on: Ordo.Command.OnFn
 
 				/**
 				 * Remove given listener for a given command. Make sure you provide a reference to the same
 				 * function as you did when calling `on`.
 				 */
-				off: <$TKey extends Ordo.Command.Name>(
-					name: $TKey,
-					handler: TCommandHandler<Ordo.Command.Record[$TKey]>,
-				) => void
+				off: Ordo.Command.OffFn
 
 				/**
 				 * Emit given command with given payload. You can provide an optional key that you can use
 				 * later to apply targeted cancellation for the command. Emission does not happen if there
 				 * is a command with given key already.
 				 */
-				emit: <$TKey extends Ordo.Command.Name>(
-					name: $TKey,
-					...rest: Ordo.Command.Record[$TKey] extends void
-						? [key?: string]
-						: [payload: Ordo.Command.Record[$TKey], key?: string]
-				) => void
+				emit: Ordo.Command.EmitFn
 
 				/**
 				 * Cancel a command with given payload. If you provided a key when emitting the command,
 				 * you can provide it for targeted cancellation.
 				 */
-				cancel: <$TKey extends Ordo.Command.Name>(
-					name: $TKey,
-					payload?: Ordo.Command.Record[$TKey],
-					key?: string,
-				) => void
+				cancel: Ordo.Command.CancelFn
 			}
 		}
 
-		module Modal {
+		namespace Modal {
 			type Instance = {
 				show_close_button?: boolean
 				on_unmount?: () => void
@@ -1044,7 +1087,7 @@ declare global {
 			}
 		}
 
-		module Router {
+		namespace Router {
 			/**
 			 * Route descriptor to be passed for navigating.
 			 */
@@ -1076,15 +1119,15 @@ declare global {
 			}
 		}
 
-		module Notification {
+		namespace Notification {
 			type Instance = {
 				id: string
 				type: C.NotificationType
 				title?: Ordo.I18N.TranslationKey
 				message: Ordo.I18N.TranslationKey
-				render_icon: (div: HTMLDivElement) => void
-				duration: number
-				on_click: () => void
+				render_icon?: (div: HTMLDivElement) => void
+				duration?: number
+				on_click?: () => void
 				// persist?: boolean
 				// payload?: T
 				// action?: (id: string, payload: T) => void
@@ -1092,15 +1135,15 @@ declare global {
 			}
 		}
 
-		module ContextMenu {
+		namespace ContextMenu {
 			/**
 			 * Context menu item.
 			 */
-			type Instance = {
+			type Item = {
 				/**
 				 * Check whether the item needs to be shown.
 				 */
-				should_show: <$TPayload>(params: Ordo.ContextMenu.Params<$TPayload>) => boolean
+				should_show: (params: Ordo.ContextMenu.Params) => boolean
 
 				/**
 				 * @see ItemType
@@ -1123,12 +1166,12 @@ declare global {
 				render_icon?: (div: HTMLDivElement) => void
 
 				/**
-				 * Keyboard accelerator for the context menu item. It only works while the context menu is
+				 * Keyboard hotkey for the context menu item. It only works while the context menu is
 				 * opened.
 				 *
 				 * @optional
 				 */
-				accelerator?: string
+				hotkey?: string
 
 				/**
 				 * Check whether the item needs to be shown disabled.
@@ -1136,7 +1179,7 @@ declare global {
 				 * @optional
 				 * @default () => false
 				 */
-				should_be_disabled?: <$TPayload>(params: Ordo.ContextMenu.Params<$TPayload>) => boolean
+				should_be_disabled?: (params: Ordo.ContextMenu.Params) => boolean
 
 				/**
 				 * This function allows you to override the incoming payload that will be passed to the command
@@ -1145,20 +1188,18 @@ declare global {
 				 * @optional
 				 * @default () => payload
 				 */
-				payload_creator?: <$TPayload, $TResult = $TPayload>(
-					params: Ordo.ContextMenu.Params<$TPayload>,
-				) => $TResult
+				payload_creator?: (params: Ordo.ContextMenu.Params) => unknown
 			}
 
 			/**
 			 * Context menu item method parameters.
 			 */
-			type Params<$TPayload> = { event: MouseEvent; payload?: $TPayload }
+			type Params = { event: MouseEvent; payload?: unknown }
 
 			/**
 			 * Context menu.
 			 */
-			type Menu<$TPayload> = {
+			type Instance = {
 				/**
 				 * Accepted mouse event.
 				 */
@@ -1167,7 +1208,7 @@ declare global {
 				/**
 				 * Payload to be passed to the context menu item methods.
 				 */
-				payload?: $TPayload
+				payload?: unknown
 
 				/**
 				 * Avoid showing create items.
@@ -1192,15 +1233,23 @@ declare global {
 				/**
 				 * Items to be shown in the context menu.
 				 */
-				structure: Ordo.ContextMenu.Instance[]
+				structure: Ordo.ContextMenu.Item[]
 			}
 		}
 
-		module CommandPalette {
+		namespace CommandPalette {
+			type Instance = {
+				items: Ordo.CommandPalette.Item[]
+				on_new_item?: (new_item: string) => any
+				is_multiple?: boolean
+				pinned_items?: Ordo.CommandPalette.Item[]
+				max_items?: number
+			}
+
 			/**
 			 * Command palette item.
 			 */
-			type Instance = {
+			type Item = {
 				/**
 				 * Readable name of the command palette item. Put a translation key here, if you use i18n.
 				 */
@@ -1216,21 +1265,24 @@ declare global {
 				 *
 				 * @optional
 				 */
-				render_icon?: (div: HTMLDivElement) => void
+				render_icon?: (div: HTMLDivElement) => void | Promise<void>
 
 				/**
-				 * Keyboard accelerator for the context menu item. It only works while the context menu is
+				 * Keyboard hotkey for the context menu item. It only works while the context menu is
 				 * opened.
 				 *
 				 * @optional
 				 */
-				accelerator?: string
+				hotkey?: string
 
 				description?: Ordo.I18N.TranslationKey
+
+				render_custom_footer?: () => TMaokaComponent // TODO Use standard render approach
+				render_custom_info?: () => TMaokaComponent // TODO Use standard render approach
 			}
 		}
 
-		module Routes {
+		namespace Routes {
 			type TSuccessResponse<T> = { success: true; result: T }
 			type TErrorResponse = { success: false; error: string }
 			type TTokenResult = {
@@ -1244,8 +1296,8 @@ declare global {
 				max_functions: Ordo.User.Current.DTO["max_functions"]
 			}
 
-			module DT {
-				module SyncMetadata {
+			namespace DT {
+				namespace SyncMetadata {
 					type Path = `/${Ordo.User.Current.DTO["id"]}`
 					type Method = "POST"
 					type Cookies = void
@@ -1255,7 +1307,7 @@ declare global {
 					type ResponseBody = string
 				}
 
-				module GetContent {
+				namespace GetContent {
 					type Path = `/${Ordo.User.Current.DTO["id"]}/${Ordo.Metadata.FSID}`
 					type Method = "GET"
 					type Cookies = void
@@ -1265,7 +1317,7 @@ declare global {
 					type ResponseBody = string | ArrayBuffer
 				}
 
-				module SetContent {
+				namespace SetContent {
 					type Path =
 						`/${Ordo.User.Current.DTO["id"]}/${Ordo.Metadata.FSID}/${Ordo.Metadata.DTO["type"]}`
 					type Method = "PUT"
@@ -1276,7 +1328,7 @@ declare global {
 					type ResponseBody = void
 				}
 
-				module CreateContent {
+				namespace CreateContent {
 					type Path = `/${Ordo.User.Current.DTO["id"]}`
 					type Url =
 						`${string}${Path}?name=${string}&parent=${Ordo.Metadata.DTO["parent"]}&content_type=${Ordo.Metadata.DTO["type"]}`
@@ -1289,8 +1341,8 @@ declare global {
 				}
 			}
 
-			module ID {
-				module UpdateInfo {
+			namespace ID {
+				namespace UpdateInfo {
 					type Path = "/account/info"
 					type Method = "PATCH"
 					type Cookies = void
@@ -1309,7 +1361,7 @@ declare global {
 					type Response = { status: StatusCode; body: ResponseBody }
 				}
 
-				module UpdateEmail {
+				namespace UpdateEmail {
 					type Path = "/account/email"
 					type Method = "PATCH"
 					type Cookies = void
@@ -1328,7 +1380,7 @@ declare global {
 					type Response = { status: StatusCode; body: ResponseBody }
 				}
 
-				module UpdateHandle {
+				namespace UpdateHandle {
 					type Path = "/account/handle"
 					type Method = "PATCH"
 					type Cookies = void
@@ -1347,7 +1399,7 @@ declare global {
 					type Response = { status: StatusCode; body: ResponseBody }
 				}
 
-				module UpdatePassword {
+				namespace UpdatePassword {
 					type Path = "/account/password"
 					type Method = "PATCH"
 					type Cookies = void
@@ -1366,7 +1418,7 @@ declare global {
 					type Response = { status: StatusCode; body: ResponseBody }
 				}
 
-				module ConfirmEmail {
+				namespace ConfirmEmail {
 					type Path = "/account/confirm-email"
 					type Url = `${string}${Path}?email=${string}&code=${string}` // TODO: Define host
 					type Method = "POST"
@@ -1386,7 +1438,7 @@ declare global {
 					type Response = { status: StatusCode; body: ResponseBody }
 				}
 
-				module GetAccount {
+				namespace GetAccount {
 					type Path = "/account"
 					type Method = "GET"
 					type Cookies = void
@@ -1405,7 +1457,7 @@ declare global {
 					type Response = { status: StatusCode; body: ResponseBody }
 				}
 
-				module GetUserByEmail {
+				namespace GetUserByEmail {
 					type Path = `/users/email/${string}`
 					type Method = "GET"
 					type Cookies = void
@@ -1424,7 +1476,7 @@ declare global {
 					type Response = { status: StatusCode; body: ResponseBody }
 				}
 
-				module GetUserByHandle {
+				namespace GetUserByHandle {
 					type Path = `/users/handle/${string}`
 					type Method = "GET"
 					type Cookies = void
@@ -1443,7 +1495,7 @@ declare global {
 					type Response = { status: StatusCode; body: ResponseBody }
 				}
 
-				module GetUserByID {
+				namespace GetUserByID {
 					type Path = `/users/id/${string}`
 					type Method = "GET"
 					type Cookies = void
@@ -1462,7 +1514,7 @@ declare global {
 					type Response = { status: StatusCode; body: ResponseBody }
 				}
 
-				module RefreshToken {
+				namespace RefreshToken {
 					type Path = "/account/refresh-token"
 					type Method = "POST"
 					type Cookies = { sub?: string; jti?: string }
@@ -1481,7 +1533,7 @@ declare global {
 					type Response = { status: StatusCode; body: ResponseBody }
 				}
 
-				module SignIn {
+				namespace SignIn {
 					type Path = "/account/sign-in"
 					type Method = "POST"
 					type Cookies = void
@@ -1500,7 +1552,7 @@ declare global {
 					type Response = { status: StatusCode; body: ResponseBody }
 				}
 
-				module SignUp {
+				namespace SignUp {
 					type Path = "/account/sign-up"
 					type Method = "POST"
 					type Cookies = void
@@ -1519,7 +1571,7 @@ declare global {
 					type Response = { status: StatusCode; body: ResponseBody }
 				}
 
-				module SignOut {
+				namespace SignOut {
 					type Path = "/account/sign-out"
 					type Method = "POST"
 					type Cookies = { sub?: SUB; jti?: JTI }
@@ -1538,7 +1590,7 @@ declare global {
 					type Response = { status: StatusCode }
 				}
 
-				module VerifyToken {
+				namespace VerifyToken {
 					type Path = "/account/verify-token"
 					type Method = "POST"
 					type Cookies = void

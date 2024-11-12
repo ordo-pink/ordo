@@ -21,7 +21,8 @@ import { BehaviorSubject, Observable, noop, pairwise } from "rxjs"
 // import { BsToggle2Off, BsToggle2On } from "react-icons/bs"
 import Split from "split.js"
 
-import { RRR } from "@ordo-pink/core"
+import { ContextMenuItemType, RRR } from "@ordo-pink/core"
+import { BsToggle2Off } from "@ordo-pink/frontend-icons"
 import { Result } from "@ordo-pink/result"
 import { Switch } from "@ordo-pink/switch"
 import { type TLogger } from "@ordo-pink/logger"
@@ -99,44 +100,25 @@ export const init_workspace = (
 		})
 	})
 
-	// commands.emit("cmd.application.command_palette.add", {
-	// 	readable_name: "t.common.components.sidebar.toggle",
-	// 	Icon: BsToggle2Off,
-	// 	on_select: () => commands.emit("cmd.application.sidebar.toggle"),
-	// 	accelerator: "mod+b",
-	// })
+	commands.emit("cmd.application.context_menu.add", {
+		command: "cmd.application.sidebar.toggle",
+		// 	Icon: BsToggle2Off,
+		render_icon: div => div.appendChild(BsToggle2Off() as SVGSVGElement),
+		readable_name: "t.common.components.sidebar.toggle",
+		should_show: ({ event }) => {
+			const target = event.target as Element
 
-	// commands.emit("cmd.application.context_menu.add", {
-	// 	cmd: "cmd.application.sidebar.show",
-	// 	readable_name: "t.common.components.sidebar.show",
-	// 	Icon: BsToggle2On,
-	// 	should_show: ({ event }) =>
-	// 		Boolean(event.currentTarget) &&
-	// 		(event.currentTarget.classList.contains("activity-bar") ||
-	// 			Boolean(event.currentTarget.closest(".activity-bar"))) &&
-	// 		!sidebar$.value.disabled &&
-	// 		sidebar$.value.sizes[1] === 0,
-	// 	type: "update",
-	// 	accelerator: "mod+b",
-	// })
-
-	// commands.emit("cmd.application.context_menu.add", {
-	// 	cmd: "cmd.application.sidebar.hide",
-	// 	readable_name: "t.common.components.sidebar.hide",
-	// 	Icon: BsToggle2Off,
-	// 	should_show: ({ event }) => {
-	// 		return (
-	// 			(event.currentTarget.classList.contains("sidebar") ||
-	// 				event.currentTarget.classList.contains("activity-bar") ||
-	// 				Boolean(event.currentTarget.closest(".sidebar")) ||
-	// 				Boolean(event.currentTarget.closest(".activity-bar"))) &&
-	// 			!sidebar$.value.disabled &&
-	// 			sidebar$.value.sizes[1] !== 0
-	// 		)
-	// 	},
-	// 	type: "update",
-	// 	accelerator: "mod+b",
-	// })
+			return (
+				!sidebar$.value.disabled &&
+				(target.classList.contains("sidebar") ||
+					target.classList.contains("activity-bar") ||
+					!!target.closest(".sidebar") ||
+					!!target.closest(".activity-bar"))
+			)
+		},
+		type: ContextMenuItemType.UPDATE,
+		hotkey: "mod+b",
+	})
 
 	let split: any
 
@@ -166,6 +148,7 @@ export const init_workspace = (
 		})
 	})
 
+	// TODO Add class to activity bar when there is sidebar
 	// TODO: Move classes away from HTML
 	sidebar$.subscribe(sidebar => {
 		Switch.OfTrue()

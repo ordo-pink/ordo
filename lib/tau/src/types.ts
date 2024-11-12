@@ -22,6 +22,11 @@
 
 export type Optional<T> = T | undefined
 
+export type PartlyRequired<T extends Record<string, unknown>, Include extends keyof T> = Required<
+	Pick<T, Include>
+> &
+	Partial<Omit<T, Include>>
+
 export type Method<A, T extends object, K extends keyof T> = Unary<A, T[K]>
 
 type CurryFirst<T> = T extends (x: infer U, ...rest: any) => any ? U : never

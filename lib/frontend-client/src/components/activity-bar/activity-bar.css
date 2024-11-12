@@ -1,0 +1,15 @@
+.activity-bar {
+	@apply flex items-center justify-center space-x-4 self-center rounded-lg p-2 backdrop-blur-sm md:flex-col md:space-x-0 md:space-y-4;
+}
+
+.activity-bar_link {
+	@apply cursor-pointer no-underline transition-transform hover:scale-110;
+}
+
+.activity-bar_icon {
+	@apply text-neutral-800 transition-colors hover:text-pink-700 dark:text-neutral-200 hover:dark:text-pink-300;
+}
+
+.activity-bar_icon.active {
+	@apply text-pink-500;
+}

@@ -28,7 +28,7 @@ export const register_common_translations = (logger: TLogger, commands: Ordo.Com
 			"t.common.components.command_palette.exit_key_hint": "to exit",
 			"t.common.components.command_palette.hide": "Hide Command Palette",
 			"t.common.components.command_palette.search_placeholder": "Search...",
-			"t.common.components.command_palette.toggle": "Toggle Command Palette",
+			"t.common.components.command_palette.reset": "Reset Command Palette",
 			"t.common.components.sidebar.hide": "Hide Sidebar",
 			"t.common.components.sidebar.show": "Show Sidebar",
 			"t.common.components.sidebar.toggle": "Toggle Sidebar",
@@ -37,6 +37,7 @@ export const register_common_translations = (logger: TLogger, commands: Ordo.Com
 			"t.common.urls.support_messenger": "https://t.me/ordo_pink",
 			"t.common.urls.twitter_x": "https://x.com/ordo_pink",
 			"t.common.state.loading": "Loading...",
+			"t.common.metadata.show_edit_labels_palette": "Edit labels...",
 		},
 	})
 

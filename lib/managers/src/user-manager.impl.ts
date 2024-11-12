@@ -19,8 +19,8 @@
 
 import { combineLatestWith, map } from "rxjs"
 
+import { Oath, invokers0, ops0 } from "@ordo-pink/oath"
 import { O } from "@ordo-pink/option"
-import { Oath } from "@ordo-pink/oath"
 import { noop } from "@ordo-pink/tau"
 
 import { TCurrentUserManagerStatic } from "./user-manager.types"
@@ -36,13 +36,13 @@ export const CurrentUserManager: TCurrentUserManagerStatic = {
 					map(([token_option, iteration]) => {
 						if (iteration === 0) {
 							void Oath.FromNullable(token_option.unwrap())
-								.pipe(Oath.ops.tap(() => on_state_change("get-remote")))
-								.pipe(Oath.ops.chain(remote_repo.get))
-								.pipe(Oath.ops.tap(() => on_state_change("get-remote-complete")))
-								.pipe(Oath.ops.map(user => local_repo.put(user)))
-								.pipe(Oath.ops.chain(res => res.cata({ Ok: Oath.Resolve, Err: Oath.Reject })))
+								.pipe(ops0.tap(() => on_state_change("get-remote")))
+								.pipe(ops0.chain(remote_repo.get))
+								.pipe(ops0.tap(() => on_state_change("get-remote-complete")))
+								.pipe(ops0.map(user => local_repo.put(user)))
+								.pipe(ops0.chain(res => res.cata({ Ok: Oath.Resolve, Err: Oath.Reject })))
 								.invoke(
-									Oath.invokers.or_else(() => {
+									invokers0.or_else(() => {
 										// TODO: Handle errors
 										on_state_change("get-remote-complete")
 									}),
@@ -55,11 +55,11 @@ export const CurrentUserManager: TCurrentUserManagerStatic = {
 						token_option.cata({
 							Some: token =>
 								void Oath.Resolve(local_repo.get())
-									.pipe(Oath.ops.chain(res => res.cata({ Ok: Oath.Resolve, Err: Oath.Reject })))
-									.pipe(Oath.ops.tap(() => on_state_change("put-remote")))
-									.pipe(Oath.ops.chain(metadata => remote_repo.put(token, metadata)))
+									.pipe(ops0.chain(res => res.cata({ Ok: Oath.Resolve, Err: Oath.Reject })))
+									.pipe(ops0.tap(() => on_state_change("put-remote")))
+									.pipe(ops0.chain(metadata => remote_repo.put(token, metadata)))
 									.invoke(
-										Oath.invokers.or_else(() => {
+										invokers0.or_else(() => {
 											// TODO: Handle errors
 											on_state_change("put-remote-complete")
 										}),

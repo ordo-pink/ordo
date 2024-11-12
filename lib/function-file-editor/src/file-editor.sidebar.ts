@@ -1,21 +1,40 @@
-import { MaokaOrdo, ordo_context } from "@ordo-pink/maoka-ordo-hooks"
+// SPDX-FileCopyrightText: Copyright 2024, 谢尔盖||↓ and the Ordo.pink contributors
+// SPDX-License-Identifier: AGPL-3.0-only
+
+// Ordo.pink is an all-in-one team workspace.
+// Copyright (C) 2024  谢尔盖||↓ and the Ordo.pink contributors
+
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU Affero General Public License as published
+// by the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU Affero General Public License for more details.
+
+// You should have received a copy of the GNU Affero General Public License
+// along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
 import { Maoka } from "@ordo-pink/maoka"
-import { MaokaHooks } from "@ordo-pink/maoka-hooks"
+import { MaokaJabs } from "@ordo-pink/maoka-jabs"
+import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
 import { R } from "@ordo-pink/result"
 
 import { FileEditorSidebarItem } from "./components/file-editor-sidebar-item.component"
 
 export const FileEditorSidebar = (ctx: Ordo.CreateFunction.Params) =>
 	Maoka.create("div", ({ use, refresh, on_unmount }) => {
-		use(ordo_context.provide(ctx))
+		use(MaokaOrdo.Context.provide(ctx))
 
 		let metadata: Ordo.Metadata.Instance[] = []
 
 		// TODO Detect
-		use(MaokaHooks.set_class("flex flex-col px-2 h-full", "file_editor_sidebar"))
+		use(MaokaJabs.set_class("flex flex-col p-2 h-full overflow-y-auto", "file_editor_sidebar"))
 
-		const commands = use(MaokaOrdo.Hooks.commands)
-		const metadata_query = use(MaokaOrdo.Hooks.metadata_query)
+		const commands = use(MaokaOrdo.Jabs.Commands)
+		const metadata_query = use(MaokaOrdo.Jabs.MetadataQuery)
 
 		const subscription = metadata_query.$.subscribe(() => {
 			metadata_query
@@ -32,15 +51,13 @@ export const FileEditorSidebar = (ctx: Ordo.CreateFunction.Params) =>
 		on_unmount(() => subscription.unsubscribe())
 
 		use(
-			MaokaHooks.listen("oncontextmenu", event => {
+			MaokaJabs.listen("oncontextmenu", event => {
 				event.preventDefault()
 				event.stopPropagation()
 
-				commands.emit("cmd.application.context_menu.show", {
-					event: event as any,
-					payload: "root",
-					hide_delete_items: true,
-				})
+				const payload = { event, payload: "root", hide_delete_items: true }
+
+				commands.emit("cmd.application.context_menu.show", payload)
 			}),
 		)
 

@@ -21,7 +21,10 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { expect, test } from "bun:test"
-import { SUB } from "./wjwt.types"
+
+import { N } from "@ordo-pink/tau"
+import { invokers0 } from "@ordo-pink/oath"
+
 import { WJWT } from "./wjwt"
 
 const payload = {
@@ -29,21 +32,21 @@ const payload = {
 	exp: Date.now() / 1000 + 600,
 	iat: Date.now(),
 	iss: "asdf",
-	jti: crypto.randomUUID() as SUB,
-	sub: crypto.randomUUID() as SUB,
+	jti: crypto.randomUUID(),
+	sub: crypto.randomUUID(),
 }
 const getEcdsaWjwt = async () => {
-	const { privateKey, publicKey } = (await crypto.subtle.generateKey(
+	const { privateKey, publicKey } = await crypto.subtle.generateKey(
 		{ name: "ECDSA", namedCurve: "P-256" },
 		true,
 		["sign", "verify"],
-	)) as CryptoKeyPair
+	)
 
 	return WJWT({ alg: { name: "ECDSA", hash: "SHA-256" } as any, privateKey, publicKey })
 }
 
 const getRsaWjwt = async () => {
-	const { privateKey, publicKey } = (await crypto.subtle.generateKey(
+	const { privateKey, publicKey } = await crypto.subtle.generateKey(
 		{
 			name: "RSA-PSS",
 			hash: "SHA-256",
@@ -52,7 +55,7 @@ const getRsaWjwt = async () => {
 		} as any,
 		false,
 		["sign", "verify"],
-	)) as CryptoKeyPair
+	)
 
 	return WJWT({
 		alg: {
@@ -69,14 +72,14 @@ const getRsaWjwt = async () => {
 
 test("wjwt should sign given payload with ECDSA", async () => {
 	const wjwt = await getEcdsaWjwt()
-	const signed = await wjwt.sign0(payload).orElse(() => null)
+	const signed = await wjwt.sign0(payload).invoke(invokers0.or_else(N))
 
 	expect(signed).toBeTypeOf("string")
 })
 
 test("wjwt should verify given token with ECDSA", async () => {
 	const wjwt = await getEcdsaWjwt()
-	const signed = await wjwt.sign0(payload).orElse(() => "")
+	const signed = await wjwt.sign0(payload).invoke(invokers0.or_else(() => ""))
 	const verified = await wjwt.verify0(signed).fork(
 		l => l,
 		r => r,
@@ -87,14 +90,14 @@ test("wjwt should verify given token with ECDSA", async () => {
 
 test("wjwt should sign given payload with RSA", async () => {
 	const wjwt = await getRsaWjwt()
-	const signed = await wjwt.sign0(payload).orElse(() => null)
+	const signed = await wjwt.sign0(payload).invoke(invokers0.or_else(N))
 
 	expect(signed).toBeTypeOf("string")
 })
 
 test("wjwt should verify given token with RSA", async () => {
 	const wjwt = await getRsaWjwt()
-	const signed = await wjwt.sign0(payload).orElse(() => "")
+	const signed = await wjwt.sign0(payload).invoke(invokers0.or_else(() => ""))
 	const verified = await wjwt.verify0(signed).fork(
 		l => l,
 		r => r,
@@ -105,8 +108,8 @@ test("wjwt should verify given token with RSA", async () => {
 
 test("wjwt should decode given token", async () => {
 	const wjwt = await getEcdsaWjwt()
-	const signed = await wjwt.sign0(payload).orElse(() => "")
-	const decoded = await wjwt.decode0(signed).orNothing()
+	const signed = await wjwt.sign0(payload).invoke(invokers0.or_else(() => ""))
+	const decoded = await wjwt.decode0(signed).invoke(invokers0.or_nothing)
 
 	expect(decoded && decoded.payload).toEqual(payload)
 })

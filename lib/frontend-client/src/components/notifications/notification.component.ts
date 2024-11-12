@@ -1,37 +1,70 @@
-import { Maoka } from "@ordo-pink/maoka"
-import { MaokaHooks } from "@ordo-pink/maoka-hooks"
+// SPDX-FileCopyrightText: Copyright 2024, 谢尔盖||↓ and the Ordo.pink contributors
+// SPDX-License-Identifier: AGPL-3.0-only
 
-import { NotificationContent } from "./notification-content.component"
+// Ordo.pink is an all-in-one team workspace.
+// Copyright (C) 2024  谢尔盖||↓ and the Ordo.pink contributors
+
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU Affero General Public License as published
+// by the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU Affero General Public License for more details.
+
+// You should have received a copy of the GNU Affero General Public License
+// along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+import { Maoka } from "@ordo-pink/maoka"
+import { MaokaJabs } from "@ordo-pink/maoka-jabs"
+import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
+import { noop } from "@ordo-pink/tau"
+
 import { NotificationHideButton } from "./notification-hide-button.component"
 import { NotificationIcon } from "./notification-icon.component"
 import { NotificationProgress } from "./notification-progress.component"
-import { get_card_class } from "./common"
+import { get_readable_type } from "./common"
 
 type P = Ordo.Notification.Instance
 export const Notification = ({ on_click, id, message, duration, render_icon, title, type }: P) => {
 	return Maoka.create("div", ({ use }) => {
-		use(MaokaHooks.set_class("relative inset-x-0 z-50 size-full"))
+		use(MaokaJabs.set_class("notification-card_container"))
+
+		const { t } = use(MaokaOrdo.Jabs.Translations)
 
 		if (on_click) {
-			use(MaokaHooks.add_class("cursor-pointer select-none"))
-			use(MaokaHooks.listen("onclick", on_click))
+			use(MaokaJabs.add_class("interactive"))
+			use(MaokaJabs.listen("onclick", on_click))
+		} else {
+			use(MaokaJabs.remove_class("interactive"))
+			use(MaokaJabs.listen("onclick", noop))
 		}
 
-		return () =>
-			Maoka.create("div", ({ use }) => {
-				use(
-					MaokaHooks.set_class(
-						"flex w-full max-w-lg items-center gap-x-4 rounded-lg px-4 py-2 shadow-sm",
-						get_card_class(type),
-					),
-				)
+		const card_type = get_readable_type(type)
+		const NotificationCard = create_notification_card(card_type)
 
-				return () => [
-					NotificationIcon({ render_icon, type }),
-					NotificationContent({ title, message }),
-					NotificationProgress({ id, duration, type }),
-					NotificationHideButton({ id, type }),
-				]
-			})
+		return () =>
+			NotificationCard(() => [
+				NotificationIcon({ render_icon, type }),
+				NotificationCardBody(() => [
+					title ? NotificationTitle(() => t(title)) : void 0,
+					NotificationMessage(() => t(message)),
+				]),
+				NotificationProgress({ id, duration, type }),
+				NotificationHideButton({ id, type }),
+			])
 	})
 }
+
+// --- Internal ---
+
+const create_notification_card = (card_type: string) =>
+	Maoka.styled("div", { class: `notification-card ${card_type}` })
+
+const NotificationCardBody = Maoka.styled("div", { class: "notification-card_body" })
+
+const NotificationMessage = Maoka.styled("p")
+
+const NotificationTitle = Maoka.styled("h2", { class: "notification-card_title" })

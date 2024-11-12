@@ -41,6 +41,7 @@ type TCreateFunctionInternalContext = {
 	get_user_query: CurryFIDFn<Ordo.CreateFunction.GetUserQueryFn>
 	get_file_associations: CurryFIDFn<Ordo.CreateFunction.GetFileAssociationsFn>
 	get_current_file_association: CurryFIDFn<Ordo.CreateFunction.GetCurrentFileAssociationFn>
+	get_content_query: CurryFIDFn<Ordo.CreateFunction.GetContentQueryFn>
 	// get_content_query: TGetContentQueryFn
 	known_functions: OrdoInternal.KnownFunctions
 }
@@ -64,6 +65,7 @@ export const create_function: TCreateFunctionFn =
 		get_current_language,
 		get_current_file_association,
 		get_file_associations,
+		get_content_query,
 	}) => {
 		const fid = known_functions.register(name, permissions)
 
@@ -86,6 +88,7 @@ export const create_function: TCreateFunctionFn =
 			get_sidebar: get_sidebar(fid),
 			get_current_file_association: get_current_file_association(fid),
 			get_file_associations: get_file_associations(fid),
+			get_content_query: get_content_query(fid),
 		}
 
 		return callback(context)

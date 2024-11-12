@@ -1,30 +1,52 @@
+// SPDX-FileCopyrightText: Copyright 2024, 谢尔盖||↓ and the Ordo.pink contributors
+// SPDX-License-Identifier: AGPL-3.0-only
+
+// Ordo.pink is an all-in-one team workspace.
+// Copyright (C) 2024  谢尔盖||↓ and the Ordo.pink contributors
+
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU Affero General Public License as published
+// by the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU Affero General Public License for more details.
+
+// You should have received a copy of the GNU Affero General Public License
+// along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
 import { Maoka } from "@ordo-pink/maoka"
-import { MaokaHooks } from "@ordo-pink/maoka-hooks"
-import { NotificationType } from "@ordo-pink/core"
-import { Switch } from "@ordo-pink/switch"
-import { get_commands } from "@ordo-pink/maoka-ordo-hooks"
+import { MaokaJabs } from "@ordo-pink/maoka-jabs"
+import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
+
+import { get_readable_type } from "./common"
 
 type P = Pick<Ordo.Notification.Instance, "id" | "type" | "duration">
 export const NotificationProgress = ({ id, type, duration }: P) => {
 	if (!duration) return
 
 	return Maoka.create("div", ({ use, refresh, on_unmount }) => {
-		let counter = 100
+		use(MaokaJabs.set_class("notification-card_progress"))
 
-		const { emit } = use(get_commands)
+		let progress = 100
+
+		const commands = use(MaokaOrdo.Jabs.Commands)
 		const interval = setInterval(() => {
-			counter = counter > 0 ? counter - 1 : 0
+			progress = progress > 0 ? progress - 1 : 0
 			void refresh()
 		}, duration * 10)
-
-		use(MaokaHooks.set_class("absolute inset-x-1.5 bottom-0 rounded-full shadow-inner"))
 
 		on_unmount(() => clearInterval(interval))
 
 		return () => {
-			if (counter === 0) return emit("cmd.application.notification.hide", id)
+			if (progress === 0) {
+				commands.emit("cmd.application.notification.hide", id)
+				return
+			}
 
-			return ProgressBarForeground({ progress: counter, type })
+			return ProgressBarForeground({ progress, type })
 		}
 	})
 }
@@ -34,15 +56,6 @@ export const NotificationProgress = ({ id, type, duration }: P) => {
 type P1 = Pick<Ordo.Notification.Instance, "type"> & { progress: number }
 const ProgressBarForeground = ({ progress, type }: P1) =>
 	Maoka.create("div", ({ use }) => {
-		use(MaokaHooks.set_class("h-1 rounded-full", get_progress_foreground_class(type)))
-		use(MaokaHooks.set_style({ width: progress.toFixed(0).concat("%") }))
+		use(MaokaJabs.set_class("notification-card_progress_foreground", get_readable_type(type)))
+		use(MaokaJabs.set_style({ width: progress.toFixed(0).concat("%") }))
 	})
-
-const get_progress_foreground_class = (type: Ordo.Notification.Instance["type"]) =>
-	Switch.Match(type)
-		.case(NotificationType.INFO, () => "bg-sky-300 dark:bg-sky-900")
-		.case(NotificationType.QUESTION, () => "bg-violet-300 dark:bg-violet-900")
-		.case(NotificationType.RRR, () => "bg-rose-300 dark:bg-rose-900")
-		.case(NotificationType.SUCCESS, () => "bg-emerald-300 dark:bg-emerald-900")
-		.case(NotificationType.WARN, () => "bg-amber-300 dark:bg-amber-900")
-		.default(() => "bg-neutral-300 dark:bg-neutral-900")

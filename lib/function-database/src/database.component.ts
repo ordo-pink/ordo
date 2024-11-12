@@ -1,177 +1,188 @@
-import { CurrentUserReference, Link, MetadataIcon } from "@ordo-pink/maoka-components"
-import { Maoka, type TMaokaChildren } from "@ordo-pink/maoka"
-import { OrdoHooks, ordo_context } from "@ordo-pink/maoka-ordo-hooks"
+// SPDX-FileCopyrightText: Copyright 2024, 谢尔盖||↓ and the Ordo.pink contributors
+// SPDX-License-Identifier: AGPL-3.0-only
+
+// Ordo.pink is an all-in-one team workspace.
+// Copyright (C) 2024  谢尔盖||↓ and the Ordo.pink contributors
+
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU Affero General Public License as published
+// by the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU Affero General Public License for more details.
+
+// You should have received a copy of the GNU Affero General Public License
+// along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+import { Button, CurrentUserReference, Link, MetadataIcon } from "@ordo-pink/maoka-components"
+import { Maoka, type TMaokaChildren, type TMaokaElement } from "@ordo-pink/maoka"
 import { BsPlus } from "@ordo-pink/frontend-icons"
-import { MaokaHooks } from "@ordo-pink/maoka-hooks"
+import { MaokaJabs } from "@ordo-pink/maoka-jabs"
+import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
 import { R } from "@ordo-pink/result"
+
+import "./database.css"
+import { DatabaseHead } from "./components/database-head.component"
 
 // TODO: Avoid unnecessary rerenders by narrowing down hooks
 
-const BORDER_COLOR_CLASS = "border-neutral-300 dark:border-neutral-700"
+type TDatabaseState = {
+	it_works?: boolean
+}
 
-export const Database = (metadata: Ordo.Metadata.Instance, ctx: Ordo.CreateFunction.Params) =>
-	Maoka.create("div", ({ use, refresh, on_unmount }) => {
-		let descendents: Ordo.Metadata.Instance[] = []
+export const Database = (
+	metadata: Ordo.Metadata.Instance,
+	content: Ordo.Content.Instance,
+	ctx: Ordo.CreateFunction.Params,
+) =>
+	Maoka.create("div", ({ use, refresh }) => {
+		const fsid = metadata.get_fsid()
+		const database_state: TDatabaseState = content ? JSON.parse(content as string) : {}
 
-		use(ordo_context.provide(ctx))
-		use(MaokaHooks.set_class("p-4"))
+		use(MaokaOrdo.Context.provide(ctx))
+		use(MaokaJabs.set_class("database_view"))
 
-		const metadata_query = use(OrdoHooks.metadata_query)
-
-		const subscription = metadata_query.$.subscribe(() => {
-			const metadata_descendents = metadata_query
-				.get_descendents(metadata.get_fsid())
-				.cata(R.catas.or_else(() => []))
-
-			if (descendents.length !== metadata_descendents.length) {
-				descendents = metadata_descendents
-				void refresh()
-			}
-		})
-
-		on_unmount(() => subscription.unsubscribe())
+		const commands = use(MaokaOrdo.Jabs.Commands)
+		const get_descendents = use(MaokaOrdo.Jabs.Metadata.get_descendents(fsid))
 
 		return () => {
-			return Maoka.create("table", ({ use }) => {
-				use(MaokaHooks.set_class(`w-full table-auto border-t ${BORDER_COLOR_CLASS}`))
+			return [
+				Button.Success({
+					on_click: () => {
+						database_state.it_works = !database_state.it_works
 
-				// TODO: Move to translations
-				// TODO: Add icons
-				const keys = [
-					"Name",
-					"Created At",
-					"Created By",
-					"Updated At",
-					"Updated By",
-					"Labels",
-					// "Links",
-					// "Size",
-				]
+						commands.emit("cmd.content.set", {
+							fsid,
+							content_type: "database/ordo",
+							content: JSON.stringify(database_state),
+						})
 
-				return () => [
-					Maoka.create("thead", () => {
-						return () =>
-							Maoka.create("tr", ({ use }) => {
-								use(MaokaHooks.set_class("text-left"))
+						void refresh()
+					},
+					text: "click me",
+				}),
+				Maoka.create("div", () => () => String(database_state.it_works)),
+				Maoka.create("table", ({ use }) => {
+					use(MaokaJabs.set_class("w-full table-auto border-t database_border-color"))
 
-								return () =>
-									keys.map(key =>
-										Maoka.create("th", ({ use }) => {
-											use(
-												MaokaHooks.set_class(
-													`border-r text-sm last-of-type:border-r-0 last-of-type:border-l ${BORDER_COLOR_CLASS} px-2 py-1 font-normal text-neutral-500`,
-												),
-											)
-											return () => key
-										}),
-									)
-							})
-					}),
+					// TODO: Move to translations
+					// TODO: Add icons
+					const keys = [
+						"Name",
+						"Created At",
+						"Created By",
+						"Updated At",
+						"Updated By",
+						"Labels",
+						// "Links",
+						// "Size",
+					]
 
-					Maoka.create("tbody", () => {
-						return () => [
-							...descendents.map(child =>
-								Maoka.create("tr", ({ use }) => {
-									use(MaokaHooks.set_class(`border-y ${BORDER_COLOR_CLASS}`))
+					return () => [
+						DatabaseHead(keys),
 
-									return () => [
-										FileNameCell(child),
-										Cell(child.get_created_at().toLocaleDateString()),
-										// Cell(UserReference(child.get_created_by())),
-										Cell(CurrentUserReference),
-										Cell(child.get_updated_at().toLocaleDateString()),
-										// Cell(UserReference(child.get_updated_by())),
-										Cell(CurrentUserReference),
-										Cell(child.get_labels().join(", ")),
-										// Cell(child.get_links().join(", ")),
-										// Cell(child.get_readable_size()),
-									]
-								}),
-							),
-
-							Maoka.create("tr", ({ use }) => {
-								const { emit } = use(OrdoHooks.commands)
-								use(MaokaHooks.set_class(`border-y ${BORDER_COLOR_CLASS}`))
-
-								return () =>
-									Maoka.create("td", ({ use }) => {
-										use(
-											MaokaHooks.set_class(
-												"px-2 py-1 text-neutral-500 text-sm flex items-center gap-x-1 cursor-pointer",
-											),
-										)
-
-										use(
-											MaokaHooks.listen("onclick", () => {
-												emit("cmd.metadata.show_create_modal", metadata.get_fsid())
-											}),
-										)
+						Maoka.create("tbody", () => {
+							return () => [
+								...get_descendents().map(child =>
+									Maoka.create("tr", ({ use }) => {
+										use(MaokaJabs.set_class("border-y database_border-color"))
 
 										return () => [
-											BsPlus(),
-											Maoka.create("div", () => () => "New"), // TODO: i18n
+											FileNameCell(child),
+											Cell(child.get_created_at().toLocaleDateString()),
+											// Cell(UserReference(child.get_created_by())),
+											Cell(CurrentUserReference),
+											Cell(child.get_updated_at().toLocaleDateString()),
+											// Cell(UserReference(child.get_updated_by())),
+											Cell(CurrentUserReference),
+											Cell(child.get_labels().join(", ")),
+											// Cell(child.get_links().join(", ")),
+											// Cell(child.get_readable_size()),
 										]
-									})
-							}),
-						]
-					}),
-				]
-			})
+									}),
+								),
+
+								Maoka.create("tr", ({ use }) => {
+									const { emit } = use(MaokaOrdo.Jabs.Commands)
+									use(MaokaJabs.set_class("border-y database_border-color"))
+
+									return () =>
+										Maoka.create("td", ({ use }) => {
+											use(
+												MaokaJabs.set_class(
+													"px-2 py-1 text-neutral-500 text-sm flex items-center gap-x-1 cursor-pointer",
+												),
+											)
+
+											use(
+												MaokaJabs.listen("onclick", () => {
+													emit("cmd.metadata.show_create_modal", metadata.get_fsid())
+												}),
+											)
+
+											return () => [
+												BsPlus() as TMaokaElement,
+												Maoka.create("div", () => () => "New"), // TODO: i18n
+											]
+										})
+								}),
+							]
+						}),
+					]
+				}),
+			]
 		}
 	})
 
-const cell_class = `break-all border-r last-of-type:border-r-0 last-of-type:border-l ${BORDER_COLOR_CLASS} px-2 py-1 cursor-text`
-
 const Cell = (value: TMaokaChildren, on_click?: (event: MouseEvent) => void) =>
 	Maoka.create("td", ({ use }) => {
-		use(MaokaHooks.set_class(cell_class))
-		if (on_click) use(MaokaHooks.listen("onclick", on_click))
+		use(MaokaJabs.set_class("database_cell"))
+		if (on_click) use(MaokaJabs.listen("onclick", on_click))
 
 		return () => value
 	})
 
 const FileNameCell = (metadata: Ordo.Metadata.Instance) =>
 	Maoka.create("td", ({ use }) => {
-		const { emit } = use(OrdoHooks.commands)
+		const { emit } = use(MaokaOrdo.Jabs.Commands)
 
-		use(MaokaHooks.set_class(cell_class, "font-semibold"))
-		use(
-			MaokaHooks.listen("oncontextmenu", event =>
-				emit("cmd.application.context_menu.show", {
-					event: event as any,
-					payload: metadata,
-				}),
-			),
-		)
+		const handle_context_menu = (event: MouseEvent) =>
+			emit("cmd.application.context_menu.show", { event, payload: metadata })
+
+		use(MaokaJabs.set_class("database_cell font-semibold"))
+		use(MaokaJabs.listen("oncontextmenu", handle_context_menu))
 
 		return () =>
 			Maoka.create("div", ({ use }) => {
 				const fsid = metadata.get_fsid()
 				const name = metadata.get_name()
 
-				use(MaokaHooks.set_class("flex gap-x-1 items-center"))
+				use(MaokaJabs.set_class("flex gap-x-1 items-center"))
 
 				return () => [
 					MetadataIcon({ metadata }),
 
 					Maoka.create("div", ({ use, element }) => {
-						const { emit } = use(OrdoHooks.commands)
-						const keydown_listener = MaokaHooks.listen("onkeydown", event => {
+						const { emit } = use(MaokaOrdo.Jabs.Commands)
+						const keydown_listener = MaokaJabs.listen("onkeydown", event => {
 							if (event.key !== "Enter" && event.key !== "Escape") return
 
 							event.preventDefault()
 							if (element instanceof HTMLElement) element.blur()
 						})
 
-						const blur_listener = MaokaHooks.listen("onblur", event => {
+						const blur_listener = MaokaJabs.listen("onblur", event => {
 							R.FromNullable(event.target as unknown as HTMLDivElement)
 								.pipe(R.ops.map(e => e.innerText))
 								.pipe(R.ops.chain(new_name => R.If(name !== new_name, { T: () => new_name })))
 								.cata(R.catas.if_ok(new_name => emit("cmd.metadata.rename", { fsid, new_name })))
 						})
 
-						use(MaokaHooks.set_attribute("contenteditable", "true"))
-						use(MaokaHooks.set_class("w-full outline-none"))
+						use(MaokaJabs.set_attribute("contenteditable", "true"))
+						use(MaokaJabs.set_class("w-full outline-none"))
 						use(keydown_listener)
 						use(blur_listener)
 

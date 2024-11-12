@@ -1,0 +1,23 @@
+.action-list-item {
+	@apply w-full cursor-pointer rounded-sm px-2 py-1 hover:bg-gradient-to-r hover:from-neutral-300 hover:to-stone-300 md:px-1 md:py-0.5 hover:dark:bg-gradient-to-r hover:dark:from-neutral-600 hover:dark:to-stone-600;
+}
+
+.action-list-item_layout {
+	@apply flex flex-col;
+}
+
+.action-list-item_main {
+	@apply flex items-center space-x-2;
+}
+
+.action-list-item.active {
+	@apply bg-gradient-to-tr from-pink-300 to-rose-300 dark:from-pink-900 dark:to-rose-900;
+}
+
+.action-list-item.active-hover {
+	@apply hover:!bg-gradient-to-tr hover:!from-pink-300 hover:!to-rose-300 hover:dark:!from-pink-900 hover:dark:!to-rose-900;
+}
+
+.action-list-item_title {
+	@apply line-clamp-1 w-full cursor-pointer text-ellipsis;
+}

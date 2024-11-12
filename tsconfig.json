@@ -1,12 +1,13 @@
 {
 	"compilerOptions": {
 		"outDir": "./var/dist",
-		"lib": ["ESNext"],
+		"lib": ["ESNext", "DOM"],
 		"allowJs": true,
 		"jsx": "preserve",
 		"esModuleInterop": true,
 		"allowSyntheticDefaultImports": true,
 		"strict": true,
+		"allowImportingTsExtensions": true,
 		"forceConsistentCasingInFileNames": true,
 		"noFallthroughCasesInSwitch": true,
 		"strictFunctionTypes": true,
@@ -19,7 +20,6 @@
 		"isolatedModules": true,
 		"target": "ESNext",
 		"module": "CommonJS",
-		"types": ["bun-types", "@types/web"],
 		"baseUrl": ".",
 		"paths": {
 			"@ordo-pink/*": ["./lib/*"]

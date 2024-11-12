@@ -18,7 +18,7 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { create_dir_if_not_exists0, mv0 } from "@ordo-pink/fs"
-import { die, runBunCommand0 } from "@ordo-pink/binutil"
+import { die, run_bun_command } from "@ordo-pink/binutil"
 import { Oath } from "@ordo-pink/oath"
 import { getc } from "@ordo-pink/getc"
 import { keys_of } from "@ordo-pink/tau"
@@ -34,7 +34,7 @@ const command = "build srv/id/index.ts --outfile=id --compile "
 const envDefinitions = defineEnv(env)
 
 void Oath.of(command.concat(envDefinitions))
-	.chain(runBunCommand0)
+	.chain(run_bun_command)
 	.chain(createOutDirectoryIfNotExists0)
 	.chain(moveCompiledFileToOutDirectory0)
 	.orElse(die())

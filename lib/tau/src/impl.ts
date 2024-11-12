@@ -19,9 +19,9 @@
 
 import { Oath } from "@ordo-pink/oath"
 import { TOption } from "@ordo-pink/option"
-
-import type * as Types from "./types"
 import { TResult } from "@ordo-pink/result"
+
+import type * as Types from "./types.ts"
 
 export const UUIDv4_RX = /^[0-9A-F]{8}-[0-9A-F]{4}-[4][0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$/i
 
@@ -161,3 +161,15 @@ export const from_option0 =
 
 export const from_result0 = <$TOk, $TErr>(result: TResult<$TOk, $TErr>): Oath<$TOk, $TErr> =>
 	result.cata({ Ok: Oath.Resolve, Err: Oath.Reject })
+
+export const fuzzy_check = (src: string, tgt: string, ratio: number) => {
+	const source = src.trim().toLowerCase()
+	const target = tgt.trim().toLowerCase()
+	let hits = 0
+
+	if (!target || source.indexOf(target) > -1) return true
+
+	for (let i = 0; i < target.length; i++) source.indexOf(target[i]) > -1 ? hits++ : hits--
+
+	return hits / src.length >= ratio
+}

@@ -21,15 +21,8 @@ import { Readable, Writable } from "stream"
 import { createReadStream, createWriteStream } from "fs"
 import { resolve } from "path"
 
-import { ContentPersistenceStrategy, Data, UnexpectedError } from "@ordo-pink/managers"
 import { create_parent_if_not_exists0, removeFile0, stat0, write_file0 } from "@ordo-pink/fs"
 import { Oath } from "@ordo-pink/oath"
-import { bimap_oath } from "@ordo-pink/oath/operators/bimap"
-import { chain_oath } from "@ordo-pink/oath/operators/chain"
-import { from_promise_oath } from "@ordo-pink/oath/constructors/from-promise"
-import { map_oath } from "@ordo-pink/oath/operators/map"
-import { rejected_map_oath } from "@ordo-pink/oath/operators/rejected-map"
-import { try_oath } from "@ordo-pink/oath/constructors/try"
 
 import { TPersistenceStrategyContentFSParams } from "./backend-persistence-strategy-content-fs.types"
 

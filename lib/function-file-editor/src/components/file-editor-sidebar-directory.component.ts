@@ -1,7 +1,26 @@
+// SPDX-FileCopyrightText: Copyright 2024, 谢尔盖||↓ and the Ordo.pink contributors
+// SPDX-License-Identifier: AGPL-3.0-only
+
+// Ordo.pink is an all-in-one team workspace.
+// Copyright (C) 2024  谢尔盖||↓ and the Ordo.pink contributors
+
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU Affero General Public License as published
+// by the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU Affero General Public License for more details.
+
+// You should have received a copy of the GNU Affero General Public License
+// along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
 import { BsCaretDown, BsCaretRight } from "@ordo-pink/frontend-icons"
-import { Maoka, type TMaokaJab } from "@ordo-pink/maoka"
-import { MaokaHooks } from "@ordo-pink/maoka-hooks"
-import { MaokaOrdo } from "@ordo-pink/maoka-ordo-hooks"
+import { Maoka, TMaokaElement, type TMaokaJab } from "@ordo-pink/maoka"
+import { MaokaJabs } from "@ordo-pink/maoka-jabs"
+import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
 import { Metadata } from "@ordo-pink/core"
 import { MetadataIcon } from "@ordo-pink/maoka-components"
 import { R } from "@ordo-pink/result"
@@ -12,33 +31,14 @@ import { equals } from "ramda"
 
 const expanded_state = {} as Record<Ordo.Metadata.FSID, boolean>
 
+const is_fsid = Metadata.Validations.is_fsid
+
 export const FileEditorSidebarDirectory = (metadata: Ordo.Metadata.Instance, depth = 0) =>
 	Maoka.create("div", ({ use, refresh }) => {
 		const fsid = metadata.get_fsid()
 
-		const metadata_query = use(MaokaOrdo.Hooks.metadata_query)
-
-		let route: Ordo.Router.Route | null = null
-		const $ = use(MaokaOrdo.Hooks.current_route)
-		const handle_current_route_change = (value: TOption<Ordo.Router.Route>) =>
-			R.FromOption(value, () => null)
-				.pipe(R.ops.chain(r => R.If(r.path !== route?.path, { T: () => r, F: () => r })))
-				.pipe(R.ops.chain(r => R.If(!equals(r, route), { T: () => r, F: () => r })))
-				.cata({
-					Ok: async updated_route => {
-						route = updated_route
-						await refresh()
-					},
-					Err: async null_or_same_route => {
-						// Skip since routes are equal
-						if (null_or_same_route || !route) return
-
-						route = null_or_same_route
-						await refresh()
-					},
-				})
-
-		use(MaokaOrdo.Hooks.subscription($, handle_current_route_change))
+		const metadata_query = use(MaokaOrdo.Jabs.MetadataQuery)
+		const get_route_params = use(MaokaOrdo.Jabs.RouteParams)
 
 		const on_caret_click = (event: MouseEvent) => {
 			event.stopPropagation()
@@ -51,19 +51,16 @@ export const FileEditorSidebarDirectory = (metadata: Ordo.Metadata.Instance, dep
 			// provided in route params (opened in the FileEditor workspace). It should also cover
 			// cases when user navigates to another file with a link.
 			// TODO check if it actually expands directories when navigating via a link.
-			R.FromNullable(route)
-				.pipe(R.ops.chain(MaokaOrdo.Ops.get_route_params))
-				.pipe(
-					R.ops.chain(({ fsid }) =>
-						R.If(Metadata.Validations.is_fsid(fsid), { T: () => fsid as Ordo.Metadata.FSID }),
-					),
-				)
+			R.Try(get_route_params)
+				.pipe(R.ops.chain(({ fsid }) => R.FromNullable(fsid)))
+				.pipe(R.ops.chain(x => R.If(is_fsid(x), { T: () => x as Ordo.Metadata.FSID })))
 				.pipe(R.ops.chain(fsid => metadata_query.get_ancestors(fsid)))
 				.cata(R.catas.if_ok(as => as.forEach(a => void (expanded_state[a.get_fsid()] = true))))
 
 			return metadata_query
 				.get_children(fsid)
 				.pipe(
+					// TODO Move to Metadata + add sorting from File Explorer (by name with numbers)
 					R.ops.map(is =>
 						is.sort((a, b) => {
 							const a_dir = metadata_query
@@ -111,7 +108,7 @@ const FileEditorDirectoryName = (
 		const fsid = metadata.get_fsid()
 
 		let route: Ordo.Router.Route | null = null
-		const $ = use(MaokaOrdo.Hooks.current_route)
+		const $ = use(MaokaOrdo.Jabs.CurrentRoute$)
 		const handle_current_route_change = (value: TOption<Ordo.Router.Route>) =>
 			R.FromOption(value, () => null)
 				.pipe(R.ops.chain(r => R.If(r.path !== route?.path, { T: () => r, F: () => r })))
@@ -130,30 +127,32 @@ const FileEditorDirectoryName = (
 					},
 				})
 
-		use(MaokaOrdo.Hooks.subscription($, handle_current_route_change))
+		use(MaokaOrdo.Jabs.subscribe($, handle_current_route_change))
 
-		const commands = use(MaokaOrdo.Hooks.commands)
+		const commands = use(MaokaOrdo.Jabs.Commands)
 
-		use(MaokaHooks.listen("onclick", () => commands.emit("cmd.file_editor.open_file", fsid)))
-		use(MaokaHooks.set_style({ paddingLeft: `${depth + 0.5}rem`, paddingRight: "0.5rem" }))
-		use(MaokaHooks.set_class(...file_editor_sidebar_directory_name_classes))
+		use(MaokaJabs.listen("onclick", () => commands.emit("cmd.file_editor.open_file", fsid)))
+		use(MaokaJabs.set_style({ paddingLeft: `${depth + 0.5}rem`, paddingRight: "0.5rem" }))
+		use(MaokaJabs.set_class(...file_editor_sidebar_directory_name_classes))
 
 		return () => {
-			if (route?.params?.fsid === fsid) use(MaokaHooks.add_class(directory_active))
-			else use(MaokaHooks.remove_class(...directory_active.split(" ")))
+			if (route?.params?.fsid === fsid) use(MaokaJabs.add_class(directory_active))
+			else use(MaokaJabs.remove_class(...directory_active.split(" ")))
 
 			return [
 				FileEditorDirectoryNameText(metadata),
-				FileEditorDirectoryNameCaret(fsid, MaokaHooks.listen("onclick", on_caret_click)),
+				FileEditorDirectoryNameCaret(fsid, MaokaJabs.listen("onclick", on_caret_click)),
 			]
 		}
 	})
 
-const directory_active = "bg-gradient-to-tr from-pink-900 to-rose-900"
+const directory_active =
+	"bg-gradient-to-tr from-pink-300 to-rose-300 dark:from-pink-900 from-pink-300 to-rose-300 dark:to-rose-900"
 
 const file_editor_sidebar_directory_name_classes = [
 	"flex justify-between items-center w-full rounded-sm",
-	"hover:bg-gradient-to-r hover:from-neutral-700 hover:to-stone-700",
+	"hover:bg-gradient-to-r hover:from-neutral-300 hover:to-stone-300",
+	"hover:dark:bg-gradient-to-r hover:dark:from-neutral-700 hover:dark:to-stone-700",
 	"file_editor_sidebar_directory_name",
 ]
 
@@ -164,12 +163,12 @@ const file_editor_sidebar_directory_name_text_classes = [
 
 const FileEditorDirectoryNameText = (metadata: Ordo.Metadata.Instance) =>
 	Maoka.create("div", ({ use }) => {
-		use(MaokaHooks.set_class(...file_editor_sidebar_directory_name_text_classes))
+		use(MaokaJabs.set_class(...file_editor_sidebar_directory_name_text_classes))
 
 		return () => [
-			Maoka.create("div", () => () => MetadataIcon({ metadata })),
+			Maoka.create("div", () => () => MetadataIcon({ metadata, show_emoji_picker: false })),
 			Maoka.create("div", ({ use }) => {
-				use(MaokaHooks.set_class("text-ellipsis line-clamp-1"))
+				use(MaokaJabs.set_class("text-ellipsis line-clamp-1"))
 				return () => metadata.get_name()
 			}),
 		]
@@ -178,10 +177,10 @@ const FileEditorDirectoryNameText = (metadata: Ordo.Metadata.Instance) =>
 const FileEditorDirectoryNameCaret = (fsid: Ordo.Metadata.FSID, click_listener: TMaokaJab) =>
 	Maoka.create("div", ({ use }) => {
 		use(click_listener)
-		use(MaokaHooks.set_class("cursor-pointer"))
+		use(MaokaJabs.set_class("cursor-pointer hover:scale-150 transition-all"))
 
 		return () =>
 			expanded_state[fsid]
-				? BsCaretDown("p-1 shrink-0 size-5")
-				: BsCaretRight("p-1 shrink-0 size-5 rotate-180")
+				? (BsCaretDown("p-1 shrink-0 size-5") as TMaokaElement)
+				: (BsCaretRight("p-1 shrink-0 size-5 rotate-180") as TMaokaElement)
 	})

@@ -22,31 +22,29 @@ import { Dirent } from "fs"
 import { SpawnOptions } from "bun"
 import chalk from "chalk"
 
+import { Oath, ops0 } from "@ordo-pink/oath"
 import { create_parent_if_not_exists0, file_exists0, is_file0, write_file0 } from "@ordo-pink/fs"
-import { Oath } from "@ordo-pink/oath"
-import { Unary } from "@ordo-pink/tau"
-import { try_oath } from "@ordo-pink/oath/constructors/try"
 
-import type { License } from "./types"
-import { chain_oath } from "@ordo-pink/oath/operators/chain"
-import { empty_oath } from "@ordo-pink/oath/constructors/empty"
-import { map_oath } from "@ordo-pink/oath/operators/map"
-import { merge_oath } from "@ordo-pink/oath/constructors/merge"
+import type { TLicenseType } from "./types"
 
-export const runAsyncCommand0: RunCommand = (command, options) =>
+export const run_async_command: TRunCommandFn = (command, options) =>
 	Oath.Resolve(Bun.spawn(command.trim().split(" "), options)).pipe(
-		chain_oath(proc =>
-			try_oath(async () => {
+		ops0.chain(proc =>
+			Oath.Try(async () => {
 				if (options?.stdout === "pipe" || options?.stdout === "inherit")
 					// @ts-ignore
 					for await (const chunk of proc.stdout) process.stdout.write(chunk)
+
+				if (options?.stderr === "pipe" || options?.stderr === "inherit")
+					// @ts-ignore
+					for await (const chunk of proc.stderr) process.stderr.write(chunk)
 			}),
 		),
 	)
 
-type RunCommand = (cmd: string, options?: SpawnOptions.OptionsObject) => Oath<void, Error>
-export const runCommand0: RunCommand = (command, options) =>
-	try_oath(() => {
+type TRunCommandFn = (cmd: string, options?: SpawnOptions.OptionsObject) => Oath<void, Error>
+export const run_command: TRunCommandFn = (command, options) =>
+	Oath.Try(() => {
 		const result = Bun.spawnSync(command.trim().split(" "), options)
 		const stderrString = result.stderr?.toString("utf8").trim()
 
@@ -60,10 +58,10 @@ export const die =
 		process.exit(code)
 	}
 
-export const runBunCommand0: RunCommand = (command, options) =>
-	runCommand0(`opt/bun ${command}`, options)
+export const run_bun_command: TRunCommandFn = (command, options) =>
+	run_command(`opt/bun ${command}`, options)
 
-export const createProgress = () => {
+export const create_progress = () => {
 	let currentLine = ""
 
 	return {
@@ -92,36 +90,36 @@ export const createProgress = () => {
 	}
 }
 
-const _direntIsFile: Unary<Dirent, boolean> = dirent => dirent.isFile()
-export const direntsToFiles: Unary<Dirent[], Dirent[]> = filter(_direntIsFile)
+const _dirent_is_file = (dirent: Dirent): boolean => dirent.isFile()
+export const dirents_to_files: (dirents: Dirent[]) => Dirent[] = filter(_dirent_is_file)
 
-const _direntIsDir: Unary<Dirent, boolean> = dirent => dirent.isDirectory()
-export const direntsToDirs: Unary<Dirent[], Dirent[]> = filter<Dirent>(_direntIsDir)
+const _dirent_is_dir = (dirent: Dirent): boolean => dirent.isDirectory()
+export const dirents_to_dirs: (dirents: Dirent[]) => Dirent[] = filter(_dirent_is_dir)
 
-const _getName: Unary<Dirent, string> = prop("name")
-export const getNames: Unary<Dirent[], string[]> = map(_getName)
+const _get_name: (dirent: Dirent) => string = prop("name")
+export const get_dirent_names: (dirents: Dirent[]) => string[] = map(_get_name)
 
-const _checkFileExists0: Unary<string, Oath<string | boolean>> = path =>
-	is_file0(path).pipe(map_oath(e => (e ? path : e)))
-export const checkFilesExist0: Unary<string[], Oath<(string | boolean)[]>> = pipe(
-	map(_checkFileExists0),
-	merge_oath,
+const _check_file_exists0 = (path: string): Oath<string | boolean> =>
+	is_file0(path).pipe(ops0.map(e => (e ? path : e)))
+export const check_files_exist: (paths: string[]) => Oath<(string | boolean)[]> = pipe(
+	map(_check_file_exists0),
+	Oath.Merge,
 )
 
-export const getExistingPaths: Unary<(string | boolean)[], string[]> = paths =>
+export const get_existing_paths = (paths: (string | boolean)[]): string[] =>
 	paths.filter(path => Boolean(path)) as string[]
 
-export const getCurrentYear = () => new Date(Date.now()).getFullYear()
+export const get_current_year = (): number => new Date(Date.now()).getFullYear()
 
-export const createRepositoryFile0 = (path: string, content: string) =>
+export const create_repository_file = (path: string, content: string) =>
 	create_parent_if_not_exists0(path)
-		.pipe(chain_oath(() => file_exists0(path)))
-		.pipe(chain_oath(exists => (exists ? empty_oath() : write_file0(path, content, "utf-8"))))
+		.pipe(ops0.chain(() => file_exists0(path)))
+		.pipe(ops0.chain(exists => (exists ? Oath.Empty() : write_file0(path, content, "utf-8"))))
 
 export const COPYRIGHT_OWNERS = "谢尔盖||↓ and the Ordo.pink contributors"
 
-export const getSPDXRecord = (license: License) => {
-	const year = getCurrentYear()
+export const get_spdx_record = (license: TLicenseType) => {
+	const year = get_current_year()
 
 	return `// SPDX-FileCopyrightText: Copyright ${year}, ${COPYRIGHT_OWNERS}
 // SPDX-License-Identifier: ${license}
@@ -148,8 +146,8 @@ ${
 }`
 }
 
-export const getLicense = (license: License) =>
-	license === "Unlicense" ? getUnlicense() : getAGPL()
+export const get_license = (license: TLicenseType) =>
+	license === "Unlicense" ? getUnlicense() : get_agpl_license()
 
 const getUnlicense = () => `This is free and unencumbered software released into the public domain.
 
@@ -172,7 +170,7 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 For more information, please refer to <http://unlicense.org/>
 `
 
-const getAGPL = () => `                    GNU AFFERO GENERAL PUBLIC LICENSE
+const get_agpl_license = () => `                    GNU AFFERO GENERAL PUBLIC LICENSE
 Version 3, 19 November 2007
 
 Copyright (C) 2007 Free Software Foundation, Inc. <https://fsf.org/>

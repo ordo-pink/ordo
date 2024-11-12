@@ -17,9 +17,9 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { die, runCommand0 } from "@ordo-pink/binutil"
+import { die, run_command } from "@ordo-pink/binutil"
 
-void runCommand0("opt/bun i", {
+void run_command("opt/bun i", {
 	cwd: "./srv/my",
 	stdin: "inherit",
 	stderr: "inherit",

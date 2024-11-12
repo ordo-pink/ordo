@@ -46,4 +46,6 @@ export type TInitCtx = {
 	auth$: Observable<TOption<AuthResponse>>
 	user_query: Ordo.User.Query
 	translate: Ordo.I18N.TranslateFn
+	metadata_query: Ordo.Metadata.Query
+	metadata_repository: Ordo.Metadata.Repository
 }

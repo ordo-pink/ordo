@@ -1,61 +1,75 @@
-import { type Observable, pairwise } from "rxjs"
+// SPDX-FileCopyrightText: Copyright 2024, 谢尔盖||↓ and the Ordo.pink contributors
+// SPDX-License-Identifier: AGPL-3.0-only
 
-import { MaokaOrdo, ordo_context } from "@ordo-pink/maoka-ordo-hooks"
+// Ordo.pink is an all-in-one team workspace.
+// Copyright (C) 2024  谢尔盖||↓ and the Ordo.pink contributors
+
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU Affero General Public License as published
+// by the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU Affero General Public License for more details.
+
+// You should have received a copy of the GNU Affero General Public License
+// along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+import { type Observable } from "rxjs"
+
 import { Maoka } from "@ordo-pink/maoka"
-import { MaokaHooks } from "@ordo-pink/maoka-hooks"
+import { MaokaJabs } from "@ordo-pink/maoka-jabs"
+import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
 import { type TOption } from "@ordo-pink/option"
 
 import { Modal } from "./modal.component"
+
+import "./modal.css"
 
 export const ModalOverlay = (
 	$: Observable<TOption<Ordo.Modal.Instance>>,
 	ctx: Ordo.CreateFunction.Params,
 ) =>
 	Maoka.create("div", ({ use, refresh, on_unmount }) => {
-		use(ordo_context.provide(ctx))
+		use(MaokaOrdo.Context.provide(ctx))
 
 		let modal_state: Ordo.Modal.Instance | null = null
-		let unmount_prev_state: () => void = () => void 0
 
-		const commands = use(MaokaOrdo.Hooks.commands)
+		type TModalState = TOption<Ordo.Modal.Instance>
 
-		const subscription = $.pipe(pairwise()).subscribe(([prev_state, state]) => {
-			modal_state = state.unwrap() ?? null
-			unmount_prev_state = prev_state.unwrap()?.on_unmount ?? (() => void 0)
-			void refresh()
-		})
+		const commands = use(MaokaOrdo.Jabs.Commands)
 
-		use(
-			MaokaHooks.listen("onclick", event => {
-				if (!modal_state) return
-				event.stopPropagation()
-				unmount_prev_state()
-				commands.emit("cmd.application.modal.hide")
-			}),
-		)
+		use(MaokaJabs.set_class("modal-overlay"))
+		use(MaokaJabs.listen("onclick", event => handle_click(event)))
 
-		const on_esc_key_press = (event: KeyboardEvent) => {
-			if (event.key !== "Escape") return
+		const handle_click = (event: Event) => {
+			if (!modal_state) return
 
 			event.stopPropagation()
 			commands.emit("cmd.application.modal.hide")
 		}
 
-		document.addEventListener("keydown", on_esc_key_press)
+		const handle_modal_update = (state: TModalState) => {
+			modal_state = state.unwrap() ?? null
+			void refresh()
+		}
 
-		on_unmount(() => {
-			subscription.unsubscribe()
-			document.removeEventListener("keydown", on_esc_key_press)
-		})
+		const handle_close = (event: KeyboardEvent) => {
+			if (event.key !== "Escape") return
+			handle_click(event)
+		}
+
+		use(MaokaOrdo.Jabs.subscribe($, state => handle_modal_update(state)))
+		document.addEventListener("keydown", handle_close)
+
+		on_unmount(() => document.removeEventListener("keydown", handle_close))
 
 		return () => {
-			use(MaokaHooks.set_class(get_overlay_class(!!modal_state)))
+			if (modal_state) use(MaokaJabs.add_class("active"))
+			else use(MaokaJabs.remove_class("active"))
 
 			return Modal(modal_state)
 		}
 	})
-
-const get_overlay_class = (is_visible: boolean) =>
-	is_visible
-		? "fixed inset-0 z-[500] backdrop-blur-sm flex h-screen w-screen items-center justify-center overflow-hidden bg-gradient-to-tr from-neutral-900/50 to-stone-900/50 p-4"
-		: "hidden"

@@ -19,25 +19,23 @@
 
 import { BehaviorSubject } from "rxjs"
 
-import { call_once, is_non_empty_string, is_string, is_undefined } from "@ordo-pink/tau"
 import { type TLogger } from "@ordo-pink/logger"
+import { call_once } from "@ordo-pink/tau"
 
-type TInitTitleStreamFn = (logger: TLogger, commands: Ordo.Command.Commands) => void
-export const init_title_display: TInitTitleStreamFn = call_once((logger, commands) => {
+type TInitTitleStreamFn = (
+	logger: TLogger,
+	commands: Ordo.Command.Commands,
+	translate: Ordo.I18N.TranslateFn,
+) => void
+export const init_title_display: TInitTitleStreamFn = call_once((logger, commands, translate) => {
 	logger.debug("🟡 Initialising title stream...")
 
-	commands.on(
-		"cmd.application.set_title",
-		state =>
-			is_non_empty_string(state.window_title) &&
-			(is_undefined(state.status_bar_title) || is_string(state.status_bar_title)) &&
-			title$.next(state),
-	)
+	commands.on("cmd.application.set_title", title => title$.next(title))
 
 	const title_element = document.querySelector("title") as HTMLTitleElement
 
-	title$.subscribe(({ window_title }) => {
-		title_element.innerText = `${window_title} | Ordo.pink`
+	title$.subscribe(title => {
+		title_element.innerText = `${translate(title)} | Ordo.pink`
 	})
 
 	logger.debug("🟢 Initialised title.")
@@ -45,6 +43,4 @@ export const init_title_display: TInitTitleStreamFn = call_once((logger, command
 
 // --- Internal ---
 
-const title$ = new BehaviorSubject<Ordo.Title.State>({
-	window_title: "Loading...",
-})
+const title$ = new BehaviorSubject<Ordo.I18N.TranslationKey>("t.common.state.loading")

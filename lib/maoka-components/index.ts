@@ -17,7 +17,12 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+export * from "./src/common/action-list-item.component"
+export * from "./src/common/button.component"
+export * from "./src/common/dialog.component"
+export * from "./src/common/hotkey.component"
+export * from "./src/common/input.component"
 export * from "./src/common/link.component"
-export * from "./src/metadata/icon.component"
 export * from "./src/common/loading-text.component"
+export * from "./src/metadata/icon.component"
 export * from "./src/user/user-reference.component"

@@ -17,7 +17,7 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { keys_of } from "@ordo-pink/tau"
+import { keys_of } from "@ordo-pink/tau/index.ts"
 
 export const getc = <K extends string>(variables?: K[]): { [Key in K]: string } => {
 	if (!variables) {

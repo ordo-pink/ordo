@@ -21,16 +21,18 @@ import { BehaviorSubject } from "rxjs"
 
 import {
 	CacheMetadataRepository,
+	ContextMenuItemType,
+	Metadata,
 	MetadataCommand,
 	MetadataQuery,
 	MetadataRepository,
 	NotificationType,
 	RRR,
 } from "@ordo-pink/core"
+import { is_string, noop } from "@ordo-pink/tau"
 import { MetadataManager } from "@ordo-pink/managers"
 import { Result } from "@ordo-pink/result"
 import { Switch } from "@ordo-pink/switch"
-import { noop } from "@ordo-pink/tau"
 
 import { type TInitCtx } from "../frontend-client.types"
 
@@ -52,7 +54,7 @@ export const init_metadata: TInitMetadataFn = ({
 	user_query,
 	fetch,
 }) => {
-	logger.debug("Initialising metadata...")
+	logger.debug("🟡 Initialising metadata...")
 
 	const metadata_repository = MetadataRepository.Of(metadata$)
 	const remote_metadata_repository = CacheMetadataRepository.Of(hosts.dt, fetch)
@@ -70,6 +72,11 @@ export const init_metadata: TInitMetadataFn = ({
 
 	commands.on("cmd.metadata.add_labels", ({ fsid, labels }) =>
 		metadata_command.add_labels(fsid, ...labels).cata({ Ok: noop, Err }),
+	)
+
+	// TODO Use metadata_commands directly for changing size
+	commands.on("cmd.metadata.set_size", ({ fsid, size }) =>
+		metadata_command.set_size(fsid, size).cata({ Ok: noop, Err }),
 	)
 
 	commands.on("cmd.metadata.remove_labels", ({ fsid, labels }) =>
@@ -102,6 +109,56 @@ export const init_metadata: TInitMetadataFn = ({
 		metadata_command.set_name(fsid, new_name).cata({ Ok: noop, Err }),
 	)
 
+	commands.on("cmd.metadata.show_edit_labels_palette", fsid => {
+		const show_labels_palette = () => {
+			const current_labels = metadata_query
+				.get_by_fsid(fsid)
+				.pipe(Result.ops.chain(Result.FromOption))
+				.pipe(Result.ops.map(metadata => metadata.get_labels()))
+				.cata(Result.catas.or_else(() => [] as Ordo.Metadata.Label[]))
+
+			const available_labels = metadata_query
+				.get()
+				.pipe(Result.ops.map(metadata => metadata.flatMap(item => item.get_labels())))
+				.pipe(Result.ops.map(labels => labels.filter(label => !current_labels.includes(label))))
+				.pipe(Result.ops.map(labels => [...new Set(labels)]))
+				.cata(Result.catas.or_else(() => [] as Ordo.Metadata.Label[]))
+
+			commands.emit("cmd.application.command_palette.show", {
+				is_multiple: true,
+				on_new_item: value => {
+					commands.emit("cmd.metadata.add_labels", { fsid, labels: [value] })
+					show_labels_palette()
+				},
+				items: available_labels.map(label => ({
+					readable_name: (is_string(label)
+						? label
+						: label.readable_name) as Ordo.I18N.TranslationKey,
+					on_select: () => commands.emit("cmd.metadata.add_labels", { fsid, labels: [label] }),
+				})),
+				max_items: 200,
+				pinned_items: current_labels.map(label => ({
+					readable_name: (is_string(label)
+						? label
+						: label.readable_name) as Ordo.I18N.TranslationKey,
+					on_select: () => commands.emit("cmd.metadata.remove_labels", { fsid, labels: [label] }),
+				})),
+			})
+		}
+
+		show_labels_palette()
+	})
+
+	commands.emit("cmd.application.context_menu.add", {
+		command: "cmd.metadata.show_edit_labels_palette",
+		// TODO render_icon: div => div.appendChild(BsFileEarmarkPlus() as SVGSVGElement),
+		readable_name: "t.common.metadata.show_edit_labels_palette", // TODO
+		should_show: ({ payload }) => Metadata.Validations.is_metadata(payload) || payload === "root",
+		payload_creator: ({ payload }) =>
+			Metadata.Validations.is_metadata(payload) ? payload.get_fsid() : null,
+		type: ContextMenuItemType.CREATE,
+	})
+
 	MetadataManager.of(metadata_repository, remote_metadata_repository, auth$, fetch).start(
 		state_change =>
 			Switch.Match(state_change)
@@ -113,7 +170,7 @@ export const init_metadata: TInitMetadataFn = ({
 				.default(noop),
 	)
 
-	logger.debug("Initialised metadata.")
+	logger.debug("🟢 Initialised metadata.")
 
 	return {
 		metadata_query,

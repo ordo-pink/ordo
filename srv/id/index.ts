@@ -19,9 +19,9 @@
 
 import chalk from "chalk"
 
+import { Oath, invokers0, ops0 } from "@ordo-pink/oath"
 import { ConsoleLogger } from "@ordo-pink/logger"
 import { EmailStrategyRusender } from "@ordo-pink/backend-email-strategy-rusender"
-import { Oath } from "@ordo-pink/oath"
 import { PersistenceStrategyTokenFS } from "@ordo-pink/backend-persistence-strategy-token-fs"
 // import { PersistenceStrategyUserDynamoDB } from "@ordo-pink/backend-persistence-strategy-user-dynamodb"
 import { PersistenceStrategyUserFS } from "@ordo-pink/backend-persistence-strategy-user-fs"
@@ -114,10 +114,10 @@ const main = async () => {
 
 const get_key = (key: string, type: "public" | "private") =>
 	Oath.FromNullable(key)
-		.pipe(Oath.ops.map(key => Buffer.from(key, "base64")))
-		.pipe(Oath.ops.map(buffer => new Uint8Array(buffer)))
+		.pipe(ops0.map(key => Buffer.from(key, "base64")))
+		.pipe(ops0.map(buffer => new Uint8Array(buffer)))
 		.pipe(
-			Oath.ops.chain(key =>
+			ops0.chain(key =>
 				Oath.FromPromise<CryptoKey>(() =>
 					type === "private"
 						? crypto.subtle.importKey("pkcs8", key, alg, true, ["sign"])
@@ -126,7 +126,7 @@ const get_key = (key: string, type: "public" | "private") =>
 			),
 		)
 		.invoke(
-			Oath.invokers.or_else(error => {
+			invokers0.or_else(error => {
 				logger.panic(error)
 				process.exit(1)
 			}),

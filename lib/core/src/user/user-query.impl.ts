@@ -20,17 +20,36 @@
 import { combineLatestWith, map } from "rxjs"
 
 import { O } from "@ordo-pink/option"
-import { Oath } from "@ordo-pink/oath"
+import { Result } from "@ordo-pink/result"
+import { ops0 } from "@ordo-pink/oath"
+
+import { CurrentUser } from "./user.impl"
+import { UserSubscription } from "../constants"
+
+const john_doe: Ordo.User.Current.Instance = CurrentUser.FromDTO({
+	created_at: new Date(Date.now()),
+	email: "john_doe@ordo.pink",
+	email_confirmed: false,
+	file_limit: -1,
+	handle: "@johndoe",
+	id: "58c0d190-0fe5-4daf-be12-5a1ad0b08edc",
+	installed_functions: [],
+	max_functions: 10,
+	max_upload_size: -1,
+	subscription: UserSubscription.FREE,
+	first_name: "John",
+	last_name: "Doe",
+})
 
 export const UserQuery: Ordo.User.QueryStatic = {
 	Of: (c_repo, k_repo) => ({
-		get_current: c_repo.get,
+		get_current: () => c_repo.get().cata({ Ok: Result.Ok, Err: () => Result.Ok(john_doe) }),
 		get_by_id: id =>
 			k_repo
 				.get()
-				.pipe(Oath.ops.map(users => O.FromNullable(users.find(u => u.get_id() === id))))
+				.pipe(ops0.map(users => O.FromNullable(users.find(u => u.get_id() === id))))
 				.pipe(
-					Oath.ops.tap(o => {
+					ops0.tap(o => {
 						if (o === O.None()) {
 							// TODO: Go get remote
 						}

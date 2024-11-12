@@ -17,4 +17,4 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-export type License = "AGPL-3.0-only" | "Unlicense"
+export type TLicenseType = "AGPL-3.0-only" | "Unlicense"

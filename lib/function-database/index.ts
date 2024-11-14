@@ -48,6 +48,7 @@ export default create_function(
 			"cmd.content.set",
 			"cmd.metadata.set_property",
 			"cmd.application.command_palette.hide",
+			"cmd.metadata.show_edit_labels_palette",
 		],
 		queries: [
 			"application.commands",

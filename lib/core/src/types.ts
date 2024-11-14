@@ -800,7 +800,7 @@ declare global {
 				| {
 						name: string
 						readable_name: string
-						color: string
+						color: C.LabelColor
 				  }
 
 			type RepositoryStatic = {

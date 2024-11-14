@@ -24,10 +24,32 @@ export const LIB_DIRECTORY_FSID = "1de21bf3-2277-4d3a-bbd3-d120eb8a49d0"
 export const ACTIVITY_BAR_WIDTH = 48
 export const SIDEBAR_WORKSPACE_GUTTER_WIDTH = 10
 
-export const enum BackgroundTaskStatus {
+export enum BackgroundTaskStatus {
 	NONE,
 	SAVING,
 	LOADING,
+	length,
+}
+
+export enum LabelColor {
+	DEFAULT,
+	RED,
+	ORANGE,
+	AMBER,
+	YELLOW,
+	LIME,
+	GREEN,
+	EMERALD,
+	TEAL,
+	CYAN,
+	SKY,
+	BLUE,
+	INDIGO,
+	VIOLET,
+	PURPLE,
+	FUCHSIA,
+	PINK,
+	ROSE,
 	length,
 }
 

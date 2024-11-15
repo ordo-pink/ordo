@@ -1,76 +1,76 @@
 .label {
-	@apply self-start rounded-sm px-1 py-0.5 text-xs shadow-sm;
+	@apply rounded-sm px-1 py-0.5 text-xs shadow-sm;
 	@apply duration-300 hover:scale-110 hover:transition-all;
 }
 
 .label.default {
-	@apply bg-neutral-400 dark:bg-neutral-600;
+	@apply bg-neutral-300 dark:bg-neutral-600;
 }
 
 .label.red {
-	@apply bg-red-400 dark:bg-red-600;
+	@apply bg-red-300 dark:bg-red-600;
 }
 
 .label.orange {
-	@apply bg-orange-400 dark:bg-orange-600;
+	@apply bg-orange-300 dark:bg-orange-600;
 }
 
 .label.amber {
-	@apply bg-amber-400 dark:bg-amber-600;
+	@apply bg-amber-300 dark:bg-amber-600;
 }
 
 .label.yellow {
-	@apply bg-yellow-400 dark:bg-yellow-600;
+	@apply bg-yellow-300 dark:bg-yellow-600;
 }
 
 .label.lime {
-	@apply bg-lime-400 dark:bg-lime-600;
+	@apply bg-lime-300 dark:bg-lime-600;
 }
 
 .label.green {
-	@apply bg-green-400 dark:bg-green-600;
+	@apply bg-green-300 dark:bg-green-600;
 }
 
 .label.emerald {
-	@apply bg-emerald-400 dark:bg-emerald-600;
+	@apply bg-emerald-300 dark:bg-emerald-600;
 }
 
 .label.teal {
-	@apply bg-teal-400 dark:bg-teal-600;
+	@apply bg-teal-300 dark:bg-teal-600;
 }
 
 .label.cyan {
-	@apply bg-cyan-400 dark:bg-cyan-600;
+	@apply bg-cyan-300 dark:bg-cyan-600;
 }
 
 .label.sky {
-	@apply bg-sky-400 dark:bg-sky-600;
+	@apply bg-sky-300 dark:bg-sky-600;
 }
 
 .label.blue {
-	@apply bg-blue-400 dark:bg-blue-600;
+	@apply bg-blue-300 dark:bg-blue-600;
 }
 
 .label.indigo {
-	@apply bg-indigo-400 dark:bg-indigo-600;
+	@apply bg-indigo-300 dark:bg-indigo-600;
 }
 
 .label.violet {
-	@apply bg-violet-400 dark:bg-violet-600;
+	@apply bg-violet-300 dark:bg-violet-600;
 }
 
 .label.purple {
-	@apply bg-purple-400 dark:bg-purple-600;
+	@apply bg-purple-300 dark:bg-purple-600;
 }
 
 .label.fuchsia {
-	@apply bg-fuchsia-400 dark:bg-fuchsia-600;
+	@apply bg-fuchsia-300 dark:bg-fuchsia-600;
 }
 
 .label.pink {
-	@apply bg-pink-400 dark:bg-pink-600;
+	@apply bg-pink-300 dark:bg-pink-600;
 }
 
 .label.rose {
-	@apply bg-rose-400 dark:bg-rose-600;
+	@apply bg-rose-300 dark:bg-rose-600;
 }

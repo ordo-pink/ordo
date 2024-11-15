@@ -38,16 +38,18 @@ export default create_function(
 	"pink.ordo.database",
 	{
 		commands: [
-			"cmd.functions.file_associations.add",
 			"cmd.application.add_translations",
-			"cmd.metadata.show_create_modal",
-			"cmd.application.router.navigate",
+			"cmd.application.command_palette.hide",
 			"cmd.application.command_palette.show",
 			"cmd.application.context_menu.show",
-			"cmd.metadata.rename",
+			"cmd.application.router.navigate",
 			"cmd.content.set",
+			"cmd.functions.file_associations.add",
+			"cmd.metadata.add_labels",
+			"cmd.metadata.rename",
 			"cmd.metadata.set_property",
-			"cmd.application.command_palette.hide",
+			"cmd.metadata.show_create_modal",
+			"cmd.metadata.show_edit_label_modal",
 			"cmd.metadata.show_edit_labels_palette",
 		],
 		queries: [

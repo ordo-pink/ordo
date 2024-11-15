@@ -18,7 +18,7 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { R, type TResult } from "@ordo-pink/result"
-import { alpha_sort, concat, is_string, override, thunk } from "@ordo-pink/tau"
+import { alpha_sort, concat, is_string, noop, override, thunk } from "@ordo-pink/tau"
 
 import { M, RRR, get_wrong_label, get_wrong_link } from "@ordo-pink/core"
 
@@ -99,6 +99,28 @@ export const MetadataCommand: Ordo.Metadata.CommandStatic = {
 					),
 				)
 				.pipe(R.ops.chain(lbls => MC.Of(m_repo, m_query, u_query).replace_labels(fsid, lbls))),
+
+		update_label: (old_label, new_label) =>
+			m_query
+				.get_by_labels([old_label])
+				.pipe(
+					R.ops.chain(metadata_collection =>
+						R.Merge(
+							metadata_collection.map(metadata => {
+								if (!metadata.has_label(old_label)) return
+
+								const fsid = metadata.get_fsid()
+								const index = metadata.get_label_index(old_label)
+								const labels = metadata.get_labels()
+
+								return R.Ok(labels)
+									.pipe(R.ops.map(labels => labels.toSpliced(index, 1, new_label)))
+									.pipe(R.ops.chain(ls => MC.Of(m_repo, m_query, u_query).replace_labels(fsid, ls)))
+							}),
+						),
+					),
+				)
+				.pipe(R.ops.map(noop)),
 
 		remove_labels: (fsid, ...labels) =>
 			_get_metadata_by_fsid_r(

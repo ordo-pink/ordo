@@ -5,14 +5,21 @@ import { is_string } from "@ordo-pink/tau"
 
 import "./label.css"
 
-export const Label = (label?: Ordo.Metadata.Label) =>
+export const Label = (label: Ordo.Metadata.Label, emit: Ordo.Command.EmitFn) =>
 	Maoka.create("div", ({ use }) => {
 		if (!label) return
 
-		const readable_name = is_string(label) ? label : label.readable_name
+		const readable_name = is_string(label) ? label : label.name
 		const color = is_string(label) ? LabelColor.DEFAULT : label.color
 
 		use(MaokaJabs.set_class(`label ${color_class[color]}`))
+		use(MaokaJabs.listen("onclick", event => handle_click(event)))
+
+		const handle_click = (event: MouseEvent) => {
+			event.stopPropagation()
+
+			emit("cmd.metadata.show_edit_label_modal", label)
+		}
 
 		return () => readable_name
 	})

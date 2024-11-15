@@ -7,7 +7,7 @@
 }
 
 .command-palette_items {
-	@apply w-full overflow-y-auto border-neutral-500 py-2 has-[div]:first-of-type:border-b;
+	@apply w-full overflow-y-auto border-neutral-500 has-[div]:first-of-type:border-b;
 }
 
 .command-palette_hint {

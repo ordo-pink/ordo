@@ -95,6 +95,7 @@ declare global {
 			}
 			metadata: {
 				show_edit_labels_palette: () => string
+				show_edit_label_modal: () => string
 			}
 			components: {
 				command_palette: {
@@ -216,6 +217,7 @@ declare global {
 			show_create_modal: () => Ordo.Metadata.FSID | null
 			show_remove_modal: () => Ordo.Metadata.FSID
 			show_rename_modal: () => Ordo.Metadata.FSID
+			show_edit_label_modal: () => Ordo.Metadata.Label
 			show_edit_labels_palette: () => Ordo.Metadata.FSID
 			show_edit_links_palette: () => Ordo.Metadata.FSID
 			remove: () => Ordo.Metadata.FSID
@@ -223,6 +225,7 @@ declare global {
 			move: () => { fsid: Ordo.Metadata.FSID; new_parent: Ordo.Metadata.FSID | null }
 			add_labels: () => { fsid: Ordo.Metadata.FSID; labels: Ordo.Metadata.Label[] }
 			remove_labels: () => { fsid: Ordo.Metadata.FSID; labels: Ordo.Metadata.Label[] }
+			edit_label: () => { old_label: Ordo.Metadata.Label; new_label: Ordo.Metadata.Label }
 			add_links: () => { fsid: Ordo.Metadata.FSID; links: Ordo.Metadata.FSID[] }
 			remove_links: () => { fsid: Ordo.Metadata.FSID; links: Ordo.Metadata.FSID[] }
 			set_property: () => { fsid: Ordo.Metadata.FSID; key: string; value: any }
@@ -758,7 +761,8 @@ declare global {
 				has_link_to: (link: Ordo.Metadata.FSID) => boolean
 				get_labels: () => Ordo.Metadata.Label[]
 				has_labels: () => boolean
-				has_label: (label: string) => boolean
+				has_label: (label: Ordo.Metadata.Label) => boolean
+				get_label_index: (label: Ordo.Metadata.Label) => number
 				get_type: () => string
 				get_created_at: () => Date
 				get_created_by: () => Ordo.User.ID
@@ -850,7 +854,7 @@ declare global {
 				) => TResult<TOption<Ordo.Metadata.Instance>, Ordo.Rrr<"EAGAIN" | "EINVAL">>
 
 				get_by_labels: (
-					labels: string[],
+					labels: Ordo.Metadata.Label[],
 					options?: QueryOptions,
 				) => TResult<Ordo.Metadata.Instance[], Ordo.Rrr<"EAGAIN" | "EINVAL">>
 
@@ -954,6 +958,11 @@ declare global {
 				remove_labels: (
 					fsid: Ordo.Metadata.FSID,
 					...labels: Ordo.Metadata.Label[]
+				) => TResult<void, Ordo.Rrr<"EAGAIN" | "EINVAL" | "ENOENT">>
+
+				update_label: (
+					old_label: Ordo.Metadata.Label,
+					new_label: Ordo.Metadata.Label,
 				) => TResult<void, Ordo.Rrr<"EAGAIN" | "EINVAL" | "ENOENT">>
 
 				replace_labels: (

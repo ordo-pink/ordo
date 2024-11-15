@@ -38,6 +38,7 @@ export const register_common_translations = (logger: TLogger, commands: Ordo.Com
 			"t.common.urls.twitter_x": "https://x.com/ordo_pink",
 			"t.common.state.loading": "Loading...",
 			"t.common.metadata.show_edit_labels_palette": "Edit labels...",
+			"t.common.metadata.show_edit_label_modal": "Edit label",
 		},
 	})
 

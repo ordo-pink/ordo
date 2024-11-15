@@ -17,14 +17,8 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import {
-	Button,
-	CurrentUserReference,
-	Label,
-	Link,
-	MetadataIcon,
-} from "@ordo-pink/maoka-components"
-import { Maoka, type TMaokaChildren, type TMaokaElement } from "@ordo-pink/maoka"
+import { Button, Label, Link, MetadataIcon } from "@ordo-pink/maoka-components"
+import { Maoka, type TMaokaElement } from "@ordo-pink/maoka"
 import { BsPlus } from "@ordo-pink/frontend-icons"
 import { MaokaJabs } from "@ordo-pink/maoka-jabs"
 import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
@@ -78,10 +72,6 @@ export const Database = (
 					// TODO: Add icons
 					const keys = [
 						"Name",
-						"Created At",
-						"Created By",
-						"Updated At",
-						"Updated By",
 						"Labels",
 						// "Links",
 						// "Size",
@@ -96,18 +86,7 @@ export const Database = (
 									Maoka.create("tr", ({ use }) => {
 										use(MaokaJabs.set_class("border-y database_border-color h-full"))
 
-										return () => [
-											FileNameCell(child),
-											Cell(child.get_created_at().toLocaleDateString()),
-											// Cell(UserReference(child.get_created_by())),
-											Cell(CurrentUserReference),
-											Cell(child.get_updated_at().toLocaleDateString()),
-											// Cell(UserReference(child.get_updated_by())),
-											Cell(CurrentUserReference),
-											LabelsCell(child),
-											// Cell(child.get_links().join(", ")),
-											// Cell(child.get_readable_size()),
-										]
+										return () => [FileNameCell(child), LabelsCell(child)]
 									}),
 								),
 
@@ -143,17 +122,17 @@ export const Database = (
 		}
 	})
 
-const Cell = (value: TMaokaChildren, on_click?: (event: MouseEvent) => void) =>
-	Maoka.create("td", ({ use }) => {
-		use(MaokaJabs.set_class("database_cell"))
-		if (on_click) use(MaokaJabs.listen("onclick", on_click))
+// const Cell = (value: TMaokaChildren, on_click?: (event: MouseEvent) => void) =>
+// 	Maoka.create("td", ({ use }) => {
+// 		use(MaokaJabs.set_class("database_cell"))
+// 		if (on_click) use(MaokaJabs.listen("onclick", on_click))
 
-		return () => value
-	})
+// 		return () => value
+// 	})
 
 const LabelsCell = (metadata: Ordo.Metadata.Instance) =>
 	Maoka.create("td", ({ use }) => {
-		use(MaokaJabs.set_class("flex flex-wrap gap-1 p-1 size-full cursor-pointer"))
+		use(MaokaJabs.set_class("flex items-start flex-wrap gap-1 p-1 size-full cursor-pointer"))
 		use(MaokaJabs.listen("onclick", () => handle_click()))
 
 		const commands = use(MaokaOrdo.Jabs.Commands)
@@ -162,7 +141,7 @@ const LabelsCell = (metadata: Ordo.Metadata.Instance) =>
 			commands.emit("cmd.metadata.show_edit_labels_palette", metadata.get_fsid())
 		}
 
-		return () => metadata.get_labels().map(label => Label(label))
+		return () => metadata.get_labels().map(label => Label(label, commands.emit))
 	})
 
 const FileNameCell = (metadata: Ordo.Metadata.Instance) =>

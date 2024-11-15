@@ -205,7 +205,7 @@ export const CommandPalette = (
 
 			return [
 				SearchInput(t_placeholder, handle_input),
-				Maoka.styled("div", { class: "grow " })(() => [
+				Maoka.styled("div", { class: "grow overflow-auto" })(() => [
 					state.is_multiple ? PinnedItems : void 0,
 					VisibleItems,
 				]),

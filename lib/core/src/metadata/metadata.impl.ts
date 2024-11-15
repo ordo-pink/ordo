@@ -19,7 +19,7 @@
 
 import { O } from "@ordo-pink/option"
 
-import { F } from "@ordo-pink/tau"
+import { F, is_string } from "@ordo-pink/tau"
 import { Switch } from "@ordo-pink/switch"
 
 import { MetadataValidations } from "./metadata-validations.impl"
@@ -66,8 +66,17 @@ export const Metadata: Ordo.Metadata.Static = {
 				None: () => O.None(),
 			}),
 		get_readable_size: () => get_readable_size(dto.size),
+		get_label_index: label =>
+			dto.labels.findIndex(x =>
+				is_string(label)
+					? x === label
+					: !is_string(x) &&
+						x.readable_name === label.name &&
+						x.color === label.color &&
+						x.name === label.name,
+			),
 		get_size: () => dto.size,
-		has_label: label => dto.labels.includes(label),
+		has_label: label => Metadata.FromDTO(dto).get_label_index(label) >= 0,
 		has_labels: () => dto.labels.length > 0,
 		has_links: () => dto.links.length > 0,
 		has_link_to: fsid => dto.links.includes(fsid),

@@ -27,7 +27,8 @@ import {
 } from "@ordo-pink/frontend-icons"
 import { ContextMenuItemType, Metadata, create_function } from "@ordo-pink/core"
 import { Maoka } from "@ordo-pink/maoka"
-import { Result } from "@ordo-pink/result"
+import { MetadataIcon } from "@ordo-pink/maoka-components"
+import { R } from "@ordo-pink/result"
 import { is_string } from "@ordo-pink/tau"
 
 import { CreateFileModal } from "./src/components/create-file-modal.component"
@@ -35,6 +36,7 @@ import { EditLabelModal } from "./src/components/edit-label-modal.component"
 import { FileExplorer } from "./src/components/fe.component"
 import { RemoveFileModal } from "./src/components/remove-file-modal.component"
 import { RenameFileModal } from "./src/components/rename-file-modal.component"
+import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
 
 export default create_function(
 	"pink.ordo.file-explorer",
@@ -64,10 +66,13 @@ export default create_function(
 			"cmd.metadata.add_labels",
 			"cmd.metadata.create",
 			"cmd.metadata.edit_label",
+			"cmd.metadata.move",
+			"cmd.metadata.remove_labels",
 			"cmd.metadata.remove",
 			"cmd.metadata.rename",
 			"cmd.metadata.show_create_modal",
 			"cmd.metadata.show_edit_label_modal",
+			"cmd.metadata.show_move_palette",
 		],
 	},
 	ctx => {
@@ -76,6 +81,7 @@ export default create_function(
 		logger.debug("🟡 Initialising file-explorer function...")
 
 		const commands = ctx.get_commands()
+		const mq = ctx.get_metadata_query().cata(R.catas.or_else(() => null as never))
 
 		commands.emit("cmd.application.add_translations", {
 			lang: "en",
@@ -110,6 +116,46 @@ export default create_function(
 			}),
 		)
 
+		commands.on("cmd.metadata.show_move_palette", fsid => {
+			const items = mq
+				.get()
+				.pipe(
+					R.ops.chain(all_metadata =>
+						mq.get_ancestors(fsid).pipe(R.ops.map(ancestors => [all_metadata, ancestors])),
+					),
+				)
+				.pipe(
+					R.ops.map(([all_metadata, ancestors]) =>
+						all_metadata.filter(
+							metadata =>
+								metadata.get_fsid() !== fsid &&
+								!ancestors.some(ancestor => metadata.equals(ancestor)),
+						),
+					),
+				)
+				.cata(R.catas.or_else(() => [] as Ordo.Metadata.Instance[]))
+
+			commands.emit("cmd.application.command_palette.show", {
+				items: items.map(
+					metadata =>
+						({
+							render_icon: div =>
+								Maoka.render_dom(
+									div,
+									Maoka.create("div", ({ use }) => {
+										use(MaokaOrdo.Context.provide(ctx))
+										return () => MetadataIcon({ metadata, show_emoji_picker: false })
+									}),
+								),
+							readable_name: metadata.get_name() as Ordo.I18N.TranslationKey,
+							on_select: () => {
+								commands.emit("cmd.metadata.move", { fsid, new_parent: metadata.get_fsid() })
+							},
+						}) satisfies Ordo.CommandPalette.Item,
+				),
+			})
+		})
+
 		commands.emit("cmd.application.command_palette.add", {
 			on_select: () => commands.emit("cmd.metadata.show_create_modal", null),
 			hotkey: "mod+shift+n",
@@ -134,23 +180,19 @@ export default create_function(
 		})
 
 		commands.on("cmd.metadata.show_edit_labels_palette", fsid => {
-			const metadata_query = ctx
-				.get_metadata_query()
-				.cata(Result.catas.or_else(() => null as never))
-
 			const show_labels_palette = () => {
-				const current_labels = metadata_query
+				const current_labels = mq
 					.get_by_fsid(fsid)
-					.pipe(Result.ops.chain(Result.FromOption))
-					.pipe(Result.ops.map(metadata => metadata.get_labels()))
-					.cata(Result.catas.or_else(() => [] as Ordo.Metadata.Label[]))
+					.pipe(R.ops.chain(R.FromOption))
+					.pipe(R.ops.map(metadata => metadata.get_labels()))
+					.cata(R.catas.or_else(() => [] as Ordo.Metadata.Label[]))
 
-				const available_labels = metadata_query
+				const available_labels = mq
 					.get()
-					.pipe(Result.ops.map(metadata => metadata.flatMap(item => item.get_labels())))
-					.pipe(Result.ops.map(labels => labels.filter(label => !current_labels.includes(label))))
-					.pipe(Result.ops.map(labels => [...new Set(labels)]))
-					.cata(Result.catas.or_else(() => [] as Ordo.Metadata.Label[]))
+					.pipe(R.ops.map(metadata => metadata.flatMap(item => item.get_labels())))
+					.pipe(R.ops.map(labels => labels.filter(label => !current_labels.includes(label))))
+					.pipe(R.ops.map(labels => [...new Set(labels)]))
+					.cata(R.catas.or_else(() => [] as Ordo.Metadata.Label[]))
 
 				commands.emit("cmd.application.command_palette.show", {
 					is_multiple: true,
@@ -177,7 +219,7 @@ export default create_function(
 			command: "cmd.metadata.show_edit_labels_palette",
 			// TODO render_icon: div => div.appendChild(BsFileEarmarkPlus() as SVGSVGElement),
 			readable_name: "t.common.metadata.show_edit_labels_palette", // TODO
-			should_show: ({ payload }) => Metadata.Validations.is_metadata(payload) || payload === "root",
+			should_show: ({ payload }) => Metadata.Validations.is_metadata(payload),
 			payload_creator: ({ payload }) =>
 				Metadata.Validations.is_metadata(payload) ? payload.get_fsid() : null,
 			type: ContextMenuItemType.CREATE,
@@ -191,6 +233,16 @@ export default create_function(
 			payload_creator: ({ payload }) =>
 				Metadata.Validations.is_metadata(payload) ? payload.get_fsid() : null,
 			type: ContextMenuItemType.CREATE,
+		})
+
+		commands.emit("cmd.application.context_menu.add", {
+			command: "cmd.metadata.show_move_palette",
+			// render_icon: div => div.appendChild(BsFileEarmarkPlus() as SVGSVGElement), // TODO: Move to icons
+			readable_name: "t.file_explorer.show_move_palette", // TODO Add translation,
+			should_show: ({ payload }) => Metadata.Validations.is_metadata(payload),
+			payload_creator: ({ payload }) =>
+				Metadata.Validations.is_metadata(payload) ? payload.get_fsid() : null,
+			type: ContextMenuItemType.UPDATE,
 		})
 
 		commands.emit("cmd.application.context_menu.add", {

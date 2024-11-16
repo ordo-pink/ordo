@@ -41,6 +41,23 @@ export const get_ancestors =
 		)
 	}
 
+export const get_children =
+	(fsid?: Ordo.Metadata.FSID | null): TMaokaJab<() => Ordo.Metadata.Instance[]> =>
+	({ use, refresh }) => {
+		const metadata_query = use(get_metadata_query)
+
+		return use(
+			from$(metadata_query.$, [] as Ordo.Metadata.Instance[], (_, prev_value) => {
+				if (!fsid) return []
+
+				const new_children = metadata_query.get_children(fsid).cata(R.catas.or_else(() => []))
+				if (new_children.length !== prev_value.length) void refresh()
+
+				return new_children
+			}),
+		)
+	}
+
 export const get_by_fsid =
 	(fsid?: Ordo.Metadata.FSID | null): TMaokaJab<() => Ordo.Metadata.Instance | null> =>
 	({ use, refresh }) => {

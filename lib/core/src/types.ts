@@ -218,6 +218,7 @@ declare global {
 			show_remove_modal: () => Ordo.Metadata.FSID
 			show_rename_modal: () => Ordo.Metadata.FSID
 			show_edit_label_modal: () => Ordo.Metadata.Label
+			show_move_palette: () => Ordo.Metadata.FSID
 			show_edit_labels_palette: () => Ordo.Metadata.FSID
 			show_edit_links_palette: () => Ordo.Metadata.FSID
 			remove: () => Ordo.Metadata.FSID

@@ -46,7 +46,7 @@ export const Database = (
 		use(MaokaJabs.set_class("database_view"))
 
 		const commands = use(MaokaOrdo.Jabs.Commands)
-		const get_descendents = use(MaokaOrdo.Jabs.Metadata.get_descendents(fsid))
+		const get_descendents = use(MaokaOrdo.Jabs.Metadata.get_children(fsid))
 
 		return () => {
 			return [
@@ -66,7 +66,7 @@ export const Database = (
 				}),
 				Maoka.create("div", () => () => String(database_state.it_works)),
 				Maoka.create("table", ({ use }) => {
-					use(MaokaJabs.set_class("w-full table-auto border-t database_border-color h-full"))
+					use(MaokaJabs.set_class("w-full border-t database_border-color h-full"))
 
 					// TODO: Move to translations
 					// TODO: Add icons

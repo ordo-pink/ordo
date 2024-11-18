@@ -61,10 +61,7 @@ export const Metadata: Ordo.Metadata.Static = {
 		get_links: () => [...dto.links],
 		get_parent: () => dto.parent,
 		get_property: key =>
-			O.FromNullable(dto.props).cata({
-				Some: props => (key in props ? O.Some(props[key]) : O.None()),
-				None: () => O.None(),
-			}),
+			O.FromNullable(dto.props).pipe(O.ops.chain(props => O.FromNullable(props[key]))),
 		get_readable_size: () => get_readable_size(dto.size),
 		get_label_index: label =>
 			dto.labels.findIndex(x =>

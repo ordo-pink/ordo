@@ -77,6 +77,13 @@ export const CommandPalette = (
 			handle_click,
 		)
 
+		const SearchInput = Input.Text({
+			on_input: event => handle_input(event),
+			custom_class: "command-palette_search",
+			placeholder: t_placeholder,
+			autofocus: true,
+		})
+
 		const refresh_components = () => {
 			if (VisibleItems.refresh) void VisibleItems.refresh()
 			if (PinnedItems.refresh) void PinnedItems.refresh()
@@ -115,10 +122,12 @@ export const CommandPalette = (
 			const source = is_pinned ? pinned_items : visible_items
 
 			if (state.is_multiple) {
+				input = ""
+				if (SearchInput.refresh) void SearchInput.refresh()
+
 				if (state.on_new_item && input && !visible_items[current_item_index] && !is_pinned) {
 					state.on_new_item?.(input)
 
-					input = ""
 					current_item_index = 0
 				} else {
 					source[current_item_index].on_select()
@@ -204,11 +213,10 @@ export const CommandPalette = (
 			const state = get_state()
 
 			return [
-				SearchInput(t_placeholder, handle_input),
-				Maoka.styled("div", { class: "grow overflow-auto" })(() => [
-					state.is_multiple ? PinnedItems : void 0,
-					VisibleItems,
-				]),
+				SearchInput,
+
+				ItemsWrapper(() => [state.is_multiple ? PinnedItems : void 0, VisibleItems]),
+
 				state.is_multiple ? WithPinnedItemsHint : NoPinnedItemsHint,
 			]
 		}
@@ -216,8 +224,7 @@ export const CommandPalette = (
 
 const Hint = Maoka.styled("div", { class: "command-palette_hint" })
 
-const SearchInput = (placeholder: string, on_input: (event: Event) => void) =>
-	Input.Text({ on_input, custom_class: "command-palette_search", placeholder, autofocus: true })
+const ItemsWrapper = Maoka.styled("div", { class: "grow overflow-auto" })
 
 const DisplayHotkey = (key: string) => Hotkey(key, { smol: true, decoration_only: true })
 

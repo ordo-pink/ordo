@@ -122,9 +122,6 @@ export const CommandPalette = (
 			const source = is_pinned ? pinned_items : visible_items
 
 			if (state.is_multiple) {
-				input = ""
-				if (SearchInput.refresh) void SearchInput.refresh()
-
 				if (state.on_new_item && input && !visible_items[current_item_index] && !is_pinned) {
 					state.on_new_item?.(input)
 
@@ -146,6 +143,9 @@ export const CommandPalette = (
 				if (is_pinned && source.length === 0) current_item_location = CurrentItemLocation.SUGGESTED
 
 				refresh_components()
+
+				input = ""
+				if (SearchInput.refresh) void SearchInput.refresh()
 			} else {
 				const invoke = source[current_item_index].on_select
 				emit("cmd.application.command_palette.hide")

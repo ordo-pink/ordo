@@ -17,6 +17,7 @@ export const Label = (label: Ordo.Metadata.Label, emit: Ordo.Command.EmitFn) =>
 
 		const handle_click = (event: MouseEvent) => {
 			event.stopPropagation()
+			event.preventDefault()
 
 			emit("cmd.metadata.show_edit_label_modal", label)
 		}

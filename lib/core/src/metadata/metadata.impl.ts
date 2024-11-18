@@ -92,13 +92,10 @@ export const Metadata: Ordo.Metadata.Static = {
 			return Switch.OfTrue()
 				.case(o_dto.fsid !== dto.fsid, F)
 				.case(o_dto.updated_at !== dto.updated_at, F)
-				.case(o_dto.updated_by !== dto.updated_by, F)
 				.default(
 					() =>
-						o_dto.fsid === dto.fsid &&
 						o_dto.created_at === dto.created_at &&
 						o_dto.created_by === dto.created_by &&
-						o_dto.updated_at === dto.updated_at &&
 						o_dto.updated_by === dto.updated_by,
 				)
 		},

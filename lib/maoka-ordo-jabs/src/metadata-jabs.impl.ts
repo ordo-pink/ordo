@@ -60,7 +60,7 @@ export const get_children =
 
 export const get_by_fsid =
 	(fsid?: Ordo.Metadata.FSID | null): TMaokaJab<() => Ordo.Metadata.Instance | null> =>
-	({ use, refresh }) => {
+	({ use }) => {
 		const metadata_query = use(get_metadata_query)
 
 		return use(
@@ -74,8 +74,6 @@ export const get_by_fsid =
 
 				if (prev_value === metadata) return metadata
 				if (prev_value && prev_value.equals(metadata!)) return metadata
-
-				void refresh()
 
 				return metadata
 			}),

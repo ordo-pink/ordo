@@ -22,6 +22,9 @@ import { MaokaJabs } from "@ordo-pink/maoka-jabs"
 
 import { ActionListItem } from "./action-list-item.component"
 
+import "./select.css"
+import { BsChevronDown } from "@ordo-pink/frontend-icons"
+
 export type TSelectOption<$TValue> = {
 	title: string
 	value: $TValue
@@ -39,6 +42,7 @@ export type TSelectProps<$TValue> = {
 export const Select = <$TValue>({ current_value, on_select, items }: TSelectProps<$TValue>) =>
 	Maoka.create("div", ({ use, refresh }) => {
 		use(MaokaJabs.set_attribute("tabindex", "1"))
+		use(MaokaJabs.set_class("relative"))
 
 		let is_active = false
 		let value = current_value
@@ -51,13 +55,28 @@ export const Select = <$TValue>({ current_value, on_select, items }: TSelectProp
 		}
 
 		const handle_inactive_select_click = () => {
-			is_active = true
+			is_active = !is_active
 			void refresh()
 		}
 
-		return () =>
+		return () => [
+			ActionListItem({
+				is_current: false,
+				title: value.title,
+				on_click: handle_inactive_select_click,
+				render_icon: div =>
+					div.replaceChildren(
+						is_active
+							? (BsChevronDown("rotate-180 transition-all") as SVGSVGElement)
+							: (BsChevronDown() as SVGSVGElement),
+					),
+				render_footer: value.render_footer,
+				render_info: value.render_info,
+			}),
 			is_active
-				? Maoka.create("div", () => {
+				? Maoka.create("div", ({ use }) => {
+						use(MaokaJabs.set_class("select_color-picker_options-wrapper"))
+
 						return () =>
 							items.map(item =>
 								ActionListItem({
@@ -70,12 +89,6 @@ export const Select = <$TValue>({ current_value, on_select, items }: TSelectProp
 								}),
 							)
 					})
-				: ActionListItem({
-						is_current: false,
-						title: value.title,
-						on_click: handle_inactive_select_click,
-						render_icon: value.render_icon,
-						render_footer: value.render_footer,
-						render_info: value.render_info,
-					})
+				: void 0,
+		]
 	})

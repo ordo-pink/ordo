@@ -37,7 +37,7 @@ export const EditLabelModal = (ctx: Ordo.CreateFunction.Params, label: Ordo.Meta
 		let name = initial_name
 		let color = initial_color
 
-		const color_items = color_class.map((_, i) => ({
+		const color_items = color_class.slice(0, -1).map((_, i) => ({
 			title: title_case(LabelColor[i]),
 			value: i as LabelColor,
 			render_info: () => LabelCircle(i),

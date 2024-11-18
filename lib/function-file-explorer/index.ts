@@ -27,6 +27,7 @@ import {
 } from "@ordo-pink/frontend-icons"
 import { ContextMenuItemType, Metadata, create_function } from "@ordo-pink/core"
 import { Maoka } from "@ordo-pink/maoka"
+import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
 import { MetadataIcon } from "@ordo-pink/maoka-components"
 import { R } from "@ordo-pink/result"
 import { is_string } from "@ordo-pink/tau"
@@ -36,7 +37,6 @@ import { EditLabelModal } from "./src/components/edit-label-modal.component"
 import { FileExplorer } from "./src/components/fe.component"
 import { RemoveFileModal } from "./src/components/remove-file-modal.component"
 import { RenameFileModal } from "./src/components/rename-file-modal.component"
-import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
 
 export default create_function(
 	"pink.ordo.file-explorer",
@@ -238,7 +238,7 @@ export default create_function(
 		commands.emit("cmd.application.context_menu.add", {
 			command: "cmd.metadata.show_move_palette",
 			// render_icon: div => div.appendChild(BsFileEarmarkPlus() as SVGSVGElement), // TODO: Move to icons
-			readable_name: "t.file_explorer.show_move_palette", // TODO Add translation,
+			readable_name: "t.file_explorer.show_move_palette" as Ordo.I18N.TranslationKey, // TODO Add translation,
 			should_show: ({ payload }) => Metadata.Validations.is_metadata(payload),
 			payload_creator: ({ payload }) =>
 				Metadata.Validations.is_metadata(payload) ? payload.get_fsid() : null,

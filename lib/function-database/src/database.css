@@ -7,7 +7,7 @@
 }
 
 .database_cell {
-	@apply database_border-color cursor-text break-all border-r px-2 py-1 last-of-type:border-l last-of-type:border-r-0;
+	@apply database_border-color cursor-text break-words border-r px-2 py-1 last-of-type:border-l last-of-type:border-r-0;
 }
 
 .database_table-head_row {

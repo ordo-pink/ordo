@@ -156,37 +156,44 @@ const FileNameCell = (metadata: Ordo.Metadata.Instance) =>
 
 		return () =>
 			Maoka.create("div", ({ use }) => {
-				const fsid = metadata.get_fsid()
-				const name = metadata.get_name()
+				use(MaokaJabs.set_class("flex items-start h-full"))
 
-				use(MaokaJabs.set_class("flex gap-x-1 items-center"))
+				return () =>
+					Maoka.create("div", ({ use }) => {
+						const fsid = metadata.get_fsid()
+						const name = metadata.get_name()
 
-				return () => [
-					MetadataIcon({ metadata }),
+						use(MaokaJabs.set_class("flex gap-x-1 items-center"))
 
-					Maoka.create("div", ({ use, element }) => {
-						const { emit } = use(MaokaOrdo.Jabs.Commands)
-						const keydown_listener = MaokaJabs.listen("onkeydown", event => {
-							if (event.key !== "Enter" && event.key !== "Escape") return
+						return () => [
+							MetadataIcon({ metadata }),
 
-							event.preventDefault()
-							if (element instanceof HTMLElement) element.blur()
-						})
+							Maoka.create("div", ({ use, element }) => {
+								const { emit } = use(MaokaOrdo.Jabs.Commands)
+								const keydown_listener = MaokaJabs.listen("onkeydown", event => {
+									if (event.key !== "Enter" && event.key !== "Escape") return
 
-						const blur_listener = MaokaJabs.listen("onblur", event => {
-							R.FromNullable(event.target as unknown as HTMLDivElement)
-								.pipe(R.ops.map(e => e.innerText))
-								.pipe(R.ops.chain(new_name => R.If(name !== new_name, { T: () => new_name })))
-								.cata(R.catas.if_ok(new_name => emit("cmd.metadata.rename", { fsid, new_name })))
-						})
+									event.preventDefault()
+									if (element instanceof HTMLElement) element.blur()
+								})
 
-						use(MaokaJabs.set_attribute("contenteditable", "true"))
-						use(MaokaJabs.set_class("w-full outline-none"))
-						use(keydown_listener)
-						use(blur_listener)
+								const blur_listener = MaokaJabs.listen("onblur", event => {
+									R.FromNullable(event.target as unknown as HTMLDivElement)
+										.pipe(R.ops.map(e => e.innerText))
+										.pipe(R.ops.chain(new_name => R.If(name !== new_name, { T: () => new_name })))
+										.cata(
+											R.catas.if_ok(new_name => emit("cmd.metadata.rename", { fsid, new_name })),
+										)
+								})
 
-						return () => Link({ href: `/editor/${metadata.get_fsid()}`, children: name })
-					}),
-				]
+								use(MaokaJabs.set_attribute("contenteditable", "true"))
+								use(MaokaJabs.set_class("w-full outline-none"))
+								use(keydown_listener)
+								use(blur_listener)
+
+								return () => Link({ href: `/editor/${metadata.get_fsid()}`, children: name })
+							}),
+						]
+					})
 			})
 	})

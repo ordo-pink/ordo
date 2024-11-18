@@ -173,3 +173,9 @@ export const fuzzy_check = (src: string, tgt: string, ratio: number) => {
 
 	return hits / src.length >= ratio
 }
+
+export const title_case = (str: string) =>
+	str
+		.split(" ")
+		.map(word => word.at(0)?.toUpperCase() + word.substring(1).toLowerCase())
+		.join(" ")

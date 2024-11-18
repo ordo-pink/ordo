@@ -67,10 +67,7 @@ export const Metadata: Ordo.Metadata.Static = {
 			dto.labels.findIndex(x =>
 				is_string(label)
 					? x === label
-					: !is_string(x) &&
-						x.readable_name === label.name &&
-						x.color === label.color &&
-						x.name === label.name,
+					: !is_string(x) && x.color === label.color && x.name === label.name,
 			),
 		get_size: () => dto.size,
 		has_label: label => Metadata.FromDTO(dto).get_label_index(label) >= 0,

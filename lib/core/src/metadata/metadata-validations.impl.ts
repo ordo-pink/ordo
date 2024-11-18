@@ -18,6 +18,7 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import * as TAU from "@ordo-pink/tau"
+import { LabelColor } from "../constants"
 
 export const are_labels = (labels: unknown): labels is Ordo.Metadata.Label[] =>
 	Array.isArray(labels) && TAU.check_all(is_label, labels)
@@ -57,12 +58,7 @@ export const is_label = (label: unknown): label is TAU.Unpack<Ordo.Metadata.Labe
 
 	if (TAU.is_non_empty_string(label)) return true
 
-	return (
-		TAU.is_object(y) &&
-		TAU.is_non_empty_string(y.name) &&
-		TAU.is_non_empty_string(y.color) &&
-		TAU.is_non_empty_string(y.readable_name)
-	)
+	return TAU.is_object(y) && TAU.is_non_empty_string(y.name) && TAU.lt(LabelColor.length)(y.color)
 }
 
 export const is_link = (link: unknown): link is TAU.Unpack<Ordo.Metadata.FSID> => TAU.is_uuid(link)

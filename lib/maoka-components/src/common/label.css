@@ -4,73 +4,73 @@
 }
 
 .label.default {
-	@apply bg-neutral-200 dark:bg-neutral-600;
+	@apply bg-neutral-200 dark:bg-neutral-600/75;
 }
 
 .label.red {
-	@apply bg-red-200 dark:bg-red-600;
+	@apply bg-red-200 dark:bg-red-600/75;
 }
 
 .label.orange {
-	@apply bg-orange-200 dark:bg-orange-600;
+	@apply bg-orange-200 dark:bg-orange-600/75;
 }
 
 .label.amber {
-	@apply bg-amber-200 dark:bg-amber-600;
+	@apply bg-amber-200 dark:bg-amber-600/75;
 }
 
 .label.yellow {
-	@apply bg-yellow-200 dark:bg-yellow-600;
+	@apply bg-yellow-200 dark:bg-yellow-600/75;
 }
 
 .label.lime {
-	@apply bg-lime-200 dark:bg-lime-600;
+	@apply bg-lime-200 dark:bg-lime-600/75;
 }
 
 .label.green {
-	@apply bg-green-200 dark:bg-green-600;
+	@apply bg-green-200 dark:bg-green-600/75;
 }
 
 .label.emerald {
-	@apply bg-emerald-200 dark:bg-emerald-600;
+	@apply bg-emerald-200 dark:bg-emerald-600/75;
 }
 
 .label.teal {
-	@apply bg-teal-200 dark:bg-teal-600;
+	@apply bg-teal-200 dark:bg-teal-600/75;
 }
 
 .label.cyan {
-	@apply bg-cyan-200 dark:bg-cyan-600;
+	@apply bg-cyan-200 dark:bg-cyan-600/75;
 }
 
 .label.sky {
-	@apply bg-sky-200 dark:bg-sky-600;
+	@apply bg-sky-200 dark:bg-sky-600/75;
 }
 
 .label.blue {
-	@apply bg-blue-200 dark:bg-blue-600;
+	@apply bg-blue-200 dark:bg-blue-600/75;
 }
 
 .label.indigo {
-	@apply bg-indigo-200 dark:bg-indigo-600;
+	@apply bg-indigo-200 dark:bg-indigo-600/75;
 }
 
 .label.violet {
-	@apply bg-violet-200 dark:bg-violet-600;
+	@apply bg-violet-200 dark:bg-violet-600/75;
 }
 
 .label.purple {
-	@apply bg-purple-200 dark:bg-purple-600;
+	@apply bg-purple-200 dark:bg-purple-600/75;
 }
 
 .label.fuchsia {
-	@apply bg-fuchsia-200 dark:bg-fuchsia-600;
+	@apply bg-fuchsia-200 dark:bg-fuchsia-600/75;
 }
 
 .label.pink {
-	@apply bg-pink-200 dark:bg-pink-600;
+	@apply bg-pink-200 dark:bg-pink-600/75;
 }
 
 .label.rose {
-	@apply bg-rose-200 dark:bg-rose-600;
+	@apply bg-rose-200 dark:bg-rose-600/75;
 }

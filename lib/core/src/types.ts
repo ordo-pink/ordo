@@ -804,7 +804,6 @@ declare global {
 				| string
 				| {
 						name: string
-						readable_name: string
 						color: C.LabelColor
 				  }
 

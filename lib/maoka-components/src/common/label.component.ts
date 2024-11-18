@@ -27,7 +27,7 @@ export const Label = (label: Ordo.Metadata.Label, emit: Ordo.Command.EmitFn) =>
 
 // --- Internal ---
 
-const color_class = [
+export const color_class = [
 	"default",
 	"red",
 	"orange",

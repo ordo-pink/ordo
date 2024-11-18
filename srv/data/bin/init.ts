@@ -17,7 +17,7 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Oath } from "@ordo-pink/oath"
+import { Oath, invokers0 } from "@ordo-pink/oath"
 import { create_dir_if_not_exists0 } from "@ordo-pink/fs"
 import { die } from "@ordo-pink/binutil"
 import { getc } from "@ordo-pink/getc"
@@ -27,7 +27,7 @@ const { ORDO_DT_DATA_PATH, ORDO_DT_CONTENT_PATH } = getc([
 	"ORDO_DT_CONTENT_PATH",
 ])
 
-void Oath.all([
+void Oath.Merge([
 	create_dir_if_not_exists0(ORDO_DT_DATA_PATH),
 	create_dir_if_not_exists0(ORDO_DT_CONTENT_PATH),
-]).orElse(die())
+]).invoke(invokers0.or_else(die()))

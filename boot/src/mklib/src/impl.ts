@@ -4,54 +4,50 @@
 import { camel, pascal, title } from "case"
 
 import { Binary, Curry, Ternary, Thunk, Unary, noop } from "@ordo-pink/tau"
+import { Oath, invokers0, ops0 } from "@ordo-pink/oath"
 import {
 	TLicenseType,
 	create_progress,
-	create_repository_file,
+	create_repository_file as echo,
 	get_license,
 	get_spdx_record,
 } from "@ordo-pink/binutil"
-import { Oath } from "@ordo-pink/oath"
 import { dir_exists0 } from "@ordo-pink/fs"
 import { isReservedJavaScriptKeyword } from "@ordo-pink/rkwjs"
 
 // --- Public ---
 
 export const mklib = (name: string, license: TLicenseType) =>
-	Oath.of(isReservedJavaScriptKeyword(name) ? `${name}-bin` : name)
-		.tap(initProgress)
-		.chain(name => Oath.of(`./lib/${name}`).chain(createFilesIfNotExists0(name, license)))
-		.orElse(e => {
-			progress.break(e)
-			return false
-		})
+	Oath.Resolve(isReservedJavaScriptKeyword(name) ? `${name}-bin` : name)
+		.pipe(ops0.tap(init_progress))
+		.and(name => Oath.Resolve(`./lib/${name}`).and(createFilesIfNotExists0(name, license)))
+		.invoke(
+			invokers0.or_else(e => {
+				progress.break(e)
+				return false
+			}),
+		)
 
 // --- Internal ---
 
 const progress = create_progress()
 
-const initProgress: Unary<string, void> = name =>
+const init_progress: Unary<string, void> = name =>
 	progress.start(`Initializing new library "${name}"`)
 
-const createFiles0: Ternary<string, string, TLicenseType, Thunk<Oath<void, Error>>> =
+const create_files: Ternary<string, string, TLicenseType, Thunk<Oath<void, Error>>> =
 	(path, name, license) => () =>
-		Oath.all([
-			create_repository_file(`${path}/license`, get_license(license)).tap(progress.inc),
-			create_repository_file(`${path}/readme.md`, readme(name)).tap(progress.inc),
-			create_repository_file(`${path}/index.ts`, index(name, license)).tap(progress.inc),
-			create_repository_file(`${path}/src/${name}.impl.ts`, impl(name, license)).tap(progress.inc),
-			create_repository_file(`${path}/src/${name}.test.ts`, test(name, license)).tap(progress.inc),
-			create_repository_file(`${path}/src/${name}.types.ts`, types(name, license)).tap(
-				progress.inc,
-			),
-		]).map(progress.finish)
+		Oath.Merge([
+			echo(`${path}/license`, get_license(license)).pipe(ops0.tap(progress.inc)),
+			echo(`${path}/readme.md`, readme(name)).pipe(ops0.tap(progress.inc)),
+			echo(`${path}/index.ts`, index(name, license)).pipe(ops0.tap(progress.inc)),
+			echo(`${path}/src/${name}.impl.ts`, impl(name, license)).pipe(ops0.tap(progress.inc)),
+			echo(`${path}/src/${name}.test.ts`, test(name, license)).pipe(ops0.tap(progress.inc)),
+			echo(`${path}/src/${name}.types.ts`, types(name, license)).pipe(ops0.tap(progress.inc)),
+		]).and(progress.finish)
 
-const rejectIfExists0: Curry<Binary<string, boolean, Oath<void, string>>> = name => exists =>
-	Oath.fromBoolean(
-		() => !exists,
-		noop,
-		() => `"lib/${name}" already exists!`,
-	)
+const reject_if_exists: Curry<Binary<string, boolean, Oath<void, string>>> = name => exists =>
+	Oath.If(!exists, { T: noop, F: () => `"lib/${name}" already exists!` })
 
 const createFilesIfNotExists0: Binary<
 	string,
@@ -59,8 +55,8 @@ const createFilesIfNotExists0: Binary<
 	Unary<string, Oath<void, string | Error>>
 > = (name, license) => path =>
 	dir_exists0(path)
-		.chain(rejectIfExists0(name))
-		.chain(createFiles0(path, name, license))
+		.and(reject_if_exists(name))
+		.and(create_files(path, name, license))
 
 // --- Internal ---
 

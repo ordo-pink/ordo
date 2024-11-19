@@ -47,8 +47,7 @@ export const is_updated_at = (timestamp: unknown): timestamp is Date =>
 	TAU.is_finite_non_negative_int(timestamp)
 
 export const is_props = <$TProps extends Ordo.Metadata.Props>(props?: $TProps): props is $TProps =>
-	props === undefined ||
-	TAU.keys_of(props).reduce((acc, key) => acc && is_prop_key(props[key]), true)
+	props === undefined || TAU.keys_of(props).reduce((acc, key) => acc && is_prop_key(key), true)
 
 export const is_parent = (parent: unknown): parent is Ordo.Metadata.FSID =>
 	parent === null || TAU.is_uuid(parent)

@@ -5,15 +5,7 @@ module.exports = {
 		node: true,
 	},
 	ignorePatterns: [".eslintrc.cjs", "*.config.js", "*.config.cjs", "*.js"],
-	extends: [
-		"eslint:recommended",
-		"plugin:@typescript-eslint/recommended-type-checked",
-		"plugin:react/recommended",
-		"plugin:react/jsx-runtime",
-		"plugin:react-hooks/recommended",
-		"plugin:tailwindcss/recommended",
-		"prettier",
-	],
+	extends: ["eslint:recommended", "plugin:@typescript-eslint/recommended-type-checked", "plugin:tailwindcss/recommended", "prettier"],
 	overrides: [
 		{
 			env: { node: true },
@@ -21,7 +13,7 @@ module.exports = {
 			parserOptions: { sourceType: "script" },
 		},
 		{
-			files: ["*.ts", "*.tsx", "*.js"],
+			files: ["*.ts", "*.js"],
 			parser: "@typescript-eslint/parser",
 		},
 	],
@@ -33,7 +25,7 @@ module.exports = {
 		project: ["./tsconfig.json"],
 		tsconfigRootDir: __dirname,
 	},
-	plugins: ["@typescript-eslint", "react", "tailwindcss"],
+	plugins: ["@typescript-eslint", "tailwindcss"],
 	rules: {
 		indent: "off",
 		"linebreak-style": ["error", "unix"],
@@ -51,11 +43,5 @@ module.exports = {
 		"@typescript-eslint/no-explicit-any": "off",
 		"tailwindcss/no-custom-classname": "off",
 		"tailwindcss/classnames-order": "off",
-		"react/prop-types": "off",
-	},
-	settings: {
-		react: {
-			version: "detect",
-		},
 	},
 }

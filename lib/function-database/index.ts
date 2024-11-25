@@ -53,6 +53,7 @@ export default create_function(
 			"cmd.content.set",
 			"cmd.functions.file_associations.add",
 			"cmd.metadata.add_labels",
+			"cmd.metadata.remove_labels",
 			"cmd.metadata.rename",
 			"cmd.metadata.set_property",
 			"cmd.metadata.show_create_modal",

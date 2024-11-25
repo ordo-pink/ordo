@@ -17,14 +17,15 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import { Maoka, type TMaokaElement } from "@ordo-pink/maoka"
+import { BsX } from "@ordo-pink/frontend-icons"
 import { LabelColor } from "@ordo-pink/core"
-import { Maoka } from "@ordo-pink/maoka"
 import { MaokaJabs } from "@ordo-pink/maoka-jabs"
 import { is_string } from "@ordo-pink/tau"
 
 import "./label.css"
 
-export const Label = (label: Ordo.Metadata.Label, emit: Ordo.Command.EmitFn) =>
+export const Label = (label: Ordo.Metadata.Label, emit: Ordo.Command.EmitFn, metadata?: Ordo.Metadata.Instance) =>
 	Maoka.create("div", ({ use }) => {
 		if (!label) return
 
@@ -41,10 +42,25 @@ export const Label = (label: Ordo.Metadata.Label, emit: Ordo.Command.EmitFn) =>
 			emit("cmd.metadata.show_edit_label_modal", label)
 		}
 
-		return () => readable_name
+		return () =>
+			metadata ? [TextWrapper(() => readable_name), RemoveLabel(metadata.get_fsid(), label, emit)] : TextWrapper(() => readable_name)
 	})
 
 // --- Internal ---
+
+const TextWrapper = Maoka.styled("div")
+
+const RemoveLabel = (fsid: Ordo.Metadata.FSID, label: Ordo.Metadata.Label, emit: Ordo.Command.EmitFn) =>
+	Maoka.create("div", ({ use }) => {
+		use(MaokaJabs.listen("onclick", event => handle_click(event)))
+
+		const handle_click = (event: MouseEvent) => {
+			event.stopPropagation()
+			emit("cmd.metadata.remove_labels", { fsid, labels: [label] })
+		}
+
+		return () => BsX("label_remove") as TMaokaElement
+	})
 
 export const color_class = [
 	"default",

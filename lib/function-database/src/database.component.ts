@@ -159,10 +159,11 @@ const LabelsCell = (fsid: Ordo.Metadata.FSID) =>
 
 		const handle_click = () => commands.emit("cmd.metadata.show_edit_labels_palette", fsid)
 
-		return () =>
-			get_metadata()
-				?.get_labels()
-				.map(label => Label(label, commands.emit))
+		return () => {
+			const metadata = get_metadata()
+
+			return metadata?.get_labels().map(label => Label(label, commands.emit, metadata))
+		}
 	})
 
 const FileNameCell = (metadata: Ordo.Metadata.Instance) =>

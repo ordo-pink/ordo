@@ -51,8 +51,7 @@ export const FileMetadata = (metadata: Ordo.Metadata.Instance) =>
 
 const LabelsSection = (fsid: Ordo.Metadata.FSID) =>
 	Maoka.create("div", ({ use }) => {
-		const label_section =
-			"flex flex-wrap gap-1 cursor-pointer rounded-sm hover:dark:bg-neutral-800 py-1"
+		const label_section = "flex flex-wrap gap-1 cursor-pointer rounded-sm hover:dark:bg-neutral-800 py-1 min-h-7"
 
 		use(MaokaJabs.set_class(label_section))
 		use(MaokaJabs.listen("onclick", () => handle_click()))

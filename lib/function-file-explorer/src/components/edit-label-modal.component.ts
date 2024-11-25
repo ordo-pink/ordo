@@ -43,9 +43,7 @@ export const EditLabelModal = (ctx: Ordo.CreateFunction.Params, label: Ordo.Meta
 			render_info: () => LabelCircle(i),
 		}))
 
-		const current_color = is_string_label
-			? color_items[0]
-			: color_items.find(item => item.value === label.color) ?? color_items[0] // TODO Log error, this is wrong
+		const current_color = is_string_label ? color_items[0] : color_items.find(item => item.value === label.color) ?? color_items[0] // TODO Log error, this is wrong
 
 		return () =>
 			Dialog({
@@ -53,10 +51,7 @@ export const EditLabelModal = (ctx: Ordo.CreateFunction.Params, label: Ordo.Meta
 				action: () => {
 					commands.emit("cmd.metadata.edit_label", {
 						old_label: label,
-						new_label:
-							is_string_label && color === LabelColor.DEFAULT
-								? name
-								: { color: is_string_label ? LabelColor.DEFAULT : color, name },
+						new_label: is_string_label && color === LabelColor.DEFAULT ? name : { color, name },
 					})
 
 					commands.emit("cmd.application.modal.hide")
@@ -92,5 +87,4 @@ export const EditLabelModal = (ctx: Ordo.CreateFunction.Params, label: Ordo.Meta
 			})
 	})
 
-const LabelCircle = (color: LabelColor) =>
-	Maoka.styled("div", { class: `label ${color_class[color]} size-3 !rounded-full` })(() => {})
+const LabelCircle = (color: LabelColor) => Maoka.styled("div", { class: `label ${color_class[color]} size-3 !rounded-full` })(() => {})

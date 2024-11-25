@@ -1,6 +1,11 @@
 .label {
 	@apply cursor-pointer rounded-sm px-1 py-0.5 text-xs shadow-sm;
-	@apply duration-300 hover:scale-110 hover:transition-all;
+	@apply hover:scale-105 hover:transition-all;
+	@apply flex items-center gap-x-1;
+}
+
+.label_remove {
+	@apply rounded-lg opacity-0 transition-all hover:bg-neutral-500/50 hover:opacity-100;
 }
 
 .label.default {

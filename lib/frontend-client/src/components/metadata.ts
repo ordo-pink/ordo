@@ -60,13 +60,15 @@ export const init_metadata: TInitMetadataFn = ({
 	const metadata_query = MetadataQuery.Of(metadata_repository)
 	const metadata_command = MetadataCommand.Of(metadata_repository, metadata_query, user_query)
 
-	const Err = (rrr: Ordo.Rrr) =>
+	const Err = (rrr: Ordo.Rrr) => {
+		console.error(rrr)
 		commands.emit("cmd.application.notification.show", {
 			message: (String(rrr.debug) as any) ?? "",
 			duration: 15,
 			title: `t.common.error.${rrr.key.toLocaleLowerCase()}` as any,
 			type: NotificationType.RRR,
 		})
+	}
 
 	commands.on("cmd.metadata.add_labels", ({ fsid, labels }) =>
 		metadata_command.add_labels(fsid, ...labels).cata({ Ok: noop, Err }),

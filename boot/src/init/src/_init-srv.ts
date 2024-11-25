@@ -4,35 +4,34 @@
 import { map, pipe } from "ramda"
 
 import * as util from "@ordo-pink/binutil"
+import { Oath, ops0 } from "@ordo-pink/oath"
 import type { Thunk, Unary } from "@ordo-pink/tau"
-import { Oath } from "@ordo-pink/oath"
 import { readdir0 } from "@ordo-pink/fs"
 
 // --- Public ---
 
 type _F = Thunk<Oath<void, void>>
-export const initSrv: _F = () =>
+export const init_srv: _F = () =>
 	readdir0("./srv", { withFileTypes: true })
-		.tap(startInitSrvProgress)
-		.map(util.dirents_to_dirs)
-		.map(util.get_dirent_names)
-		.map(dirsToInitFilePaths)
-		.chain(util.check_files_exist)
-		.map(util.get_existing_paths)
-		.chain(runInitCommands0)
-		.bimap(breakInitSrvProgress, finishInitSrvProgress)
+		.pipe(ops0.tap(() => progress.start("Initializing server applications")))
+		.and(util.dirents_to_dirs)
+		.and(util.get_dirent_names)
+		.and(dirs_to_init_file_paths)
+		.and(util.check_files_exist)
+		.and(util.get_existing_paths)
+		.and(run_init_commands)
+		.pipe(ops0.bimap(progress.break, progress.finish))
 
 // --- Internal ---
 
-const _intSrvProgress = util.create_progress()
-const startInitSrvProgress = () => _intSrvProgress.start("Initializing server applications")
-const incInitSrvProgress = _intSrvProgress.inc
-const finishInitSrvProgress = _intSrvProgress.finish
-const breakInitSrvProgress = _intSrvProgress.break
+const progress = util.create_progress()
 
-const _dirToInitFilePath: Unary<string, string> = dir => `./srv/${dir}/bin/init.ts`
-const dirsToInitFilePaths: Unary<string[], string[]> = map(_dirToInitFilePath)
+const dir_to_init_file_path: Unary<string, string> = dir => `./srv/${dir}/bin/init.ts`
+const dirs_to_init_file_paths: Unary<string[], string[]> = map(dir_to_init_file_path)
 
-const _runInitCommand0: Unary<string, Oath<void, Error>> = path =>
-	util.run_bun_command(`run ${path}`).tap(incInitSrvProgress)
-const runInitCommands0: Unary<string[], Oath<void[], Error>> = pipe(map(_runInitCommand0), Oath.all)
+const run_init_command: Unary<string, Oath<void, Error>> = path =>
+	util.run_bun_command(`run ${path}`).pipe(ops0.tap(progress.inc))
+const run_init_commands: Unary<string[], Oath<void[], Error>> = pipe(
+	map(run_init_command),
+	Oath.Merge,
+)

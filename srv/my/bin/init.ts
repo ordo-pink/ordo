@@ -18,9 +18,10 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { die, run_command } from "@ordo-pink/binutil"
+import { invokers0 } from "@ordo-pink/oath"
 
 void run_command("opt/bun i", {
 	cwd: "./srv/my",
 	stdin: "inherit",
 	stderr: "inherit",
-}).orElse(die())
+}).invoke(invokers0.or_else(die()))

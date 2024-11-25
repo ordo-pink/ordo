@@ -22,10 +22,8 @@ import { Dialog } from "@ordo-pink/maoka-components"
 import { Maoka } from "@ordo-pink/maoka"
 import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
 
-export const RemoveFileModal = (ctx: Ordo.CreateFunction.Params, fsid: Ordo.Metadata.FSID) =>
+export const RemoveFileModal = (fsid: Ordo.Metadata.FSID) =>
 	Maoka.create("div", ({ use }) => {
-		use(MaokaOrdo.Context.provide(ctx))
-
 		const { t } = use(MaokaOrdo.Jabs.Translations)
 		const commands = use(MaokaOrdo.Jabs.Commands)
 

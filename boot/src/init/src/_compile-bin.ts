@@ -4,48 +4,45 @@
 import { map, pipe } from "ramda"
 
 import * as util from "@ordo-pink/binutil"
+import { Oath, ops0 } from "@ordo-pink/oath"
 import type { Thunk, Unary } from "@ordo-pink/tau"
-import { Oath } from "@ordo-pink/oath"
 import { readdir0 } from "@ordo-pink/fs"
 
 // --- Public ---
 
 type _F = Thunk<Oath<void, void>>
-export const compileBin: _F = () =>
+export const compile_bin: _F = () =>
 	readdir0("./boot/src", { withFileTypes: true })
-		.tap(startCompileBinsProgress)
-		.map(util.dirents_to_dirs)
-		.map(util.get_dirent_names)
-		.chain(checkBinIndexFilesExist0)
-		.chain(runCompileBinCommands0)
-		.bimap(breakCompileBinsProgress, finishCompileBinsProgress)
+		.pipe(ops0.tap(() => progress.start("Compiling binaries")))
+		.and(util.dirents_to_dirs)
+		.and(util.get_dirent_names)
+		.and(check_bin_index_files_exist)
+		.and(run_compile_bin_commands)
+		.pipe(ops0.bimap(progress.break, progress.finish))
 
 // --- Internal ---
 
-const _compileBinsProgress = util.create_progress()
-const startCompileBinsProgress = () => _compileBinsProgress.start("Compiling binaries")
-const incCompileBinsProgress = _compileBinsProgress.inc
-const finishCompileBinsProgress = _compileBinsProgress.finish
-const breakCompileBinsProgress = _compileBinsProgress.break
+const progress = util.create_progress()
 
-const _binIndexPathToName: Unary<string, string> = path => path.slice(9, -9)
-const binIndexPathsToNames: Unary<string[], string[]> = map(_binIndexPathToName)
+const bin_index_path_to_name: Unary<string, string> = path => path.slice(9, -9)
+const binIndexPathsToNames: Unary<string[], string[]> = map(bin_index_path_to_name)
 
-const _nameToBinIndexPath: Unary<string, string> = name => `boot/src/${name}/index.ts`
-const namesToBinIndexPaths: Unary<string[], string[]> = map(_nameToBinIndexPath)
+const name_to_bin_index_path: Unary<string, string> = name => `boot/src/${name}/index.ts`
+const namesToBinIndexPaths: Unary<string[], string[]> = map(name_to_bin_index_path)
 
-const checkBinIndexFilesExist0: Unary<string[], Oath<string[]>> = names =>
-	Oath.of(namesToBinIndexPaths(names))
-		.chain(util.check_files_exist)
-		.map(util.get_existing_paths)
-		.map(binIndexPathsToNames)
+const check_bin_index_files_exist: Unary<string[], Oath<string[]>> = names =>
+	Oath.Resolve(namesToBinIndexPaths(names))
+		.and(util.check_files_exist)
+		.and(util.get_existing_paths)
+		.and(binIndexPathsToNames)
 
-const _runCompileBinCommand0: Unary<string, Oath<void, Error>> = file =>
+const run_compile_bin_command: Unary<string, Oath<void, Error>> = file =>
 	util
 		.run_bun_command(`build boot/src/${file}/index.ts --compile --outfile ${file}`)
-		.chain(() => util.run_command(`mv -f ${file} bin/${file}`))
-		.tap(incCompileBinsProgress)
-const runCompileBinCommands0: Unary<string[], Oath<void[], Error>> = pipe(
-	map(_runCompileBinCommand0),
-	Oath.all,
+		.and(() => util.run_command(`mv -f ${file} bin/${file}`))
+		.pipe(ops0.tap(progress.inc))
+
+const run_compile_bin_commands: Unary<string[], Oath<void[], Error>> = pipe(
+	map(run_compile_bin_command),
+	Oath.Merge,
 )

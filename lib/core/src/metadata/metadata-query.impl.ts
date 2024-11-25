@@ -84,7 +84,7 @@ export const MetadataQuery: Ordo.Metadata.QueryStatic = {
 			R.If(M.Validations.is_fsid(child))
 				.pipe(R.ops.err_map(() => inval(`has -> child: ${child}`)))
 				.pipe(R.ops.chain(() => MetadataQuery.Of(repo).get_children(fsid, options)))
-				.pipe(R.ops.map(is => is.some(i => i.is_child_of(fsid)))),
+				.pipe(R.ops.map(is => is.some(i => i.get_fsid() === child))),
 
 		get_incoming_links: (fsid, options) =>
 			R.If(M.Validations.is_fsid(fsid))
@@ -174,12 +174,9 @@ export const MQ = MetadataQuery
 
 // --- Internal ---
 
-type THasGivenNameAndParentFn = (
-	name: string,
-	parent: Ordo.Metadata.FSID | null,
-) => (item: Ordo.Metadata.Instance) => boolean
+type THasGivenNameAndParentFn = (name: string, parent: Ordo.Metadata.FSID | null) => (item: Ordo.Metadata.Instance) => boolean
 const _has_name_and_parent: THasGivenNameAndParentFn = (name, parent) => item =>
 	item.get_name() === name && item.get_parent() === parent
 
-type THasAllLabelsFn = (labels: string[]) => (item: Ordo.Metadata.Instance) => boolean
+type THasAllLabelsFn = (labels: Ordo.Metadata.Label[]) => (item: Ordo.Metadata.Instance) => boolean
 const has_all_labels: THasAllLabelsFn = ls => i => ls.every(l => i.get_labels().includes(l))

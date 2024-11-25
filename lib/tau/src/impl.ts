@@ -34,8 +34,7 @@ export type UUIDv4 = `${string}-${string}-${string}-${string}-${string}`
 
 export type AllKeysRequired<T extends Record<string, any>> = { [K in keyof T]: NonNullable<T[K]> }
 
-export const is_object = (x: unknown): x is Record<string, unknown> =>
-	x != null && typeof x === "object" && !Array.isArray(x)
+export const is_object = (x: unknown): x is Record<string, unknown> => x != null && typeof x === "object" && !Array.isArray(x)
 
 export const is_fn = <T = unknown, K = T>(x: unknown): x is (x: T) => K => typeof x == "function"
 export const is_true = (x: unknown): x is true => x === true
@@ -55,8 +54,7 @@ export const is_finite = (x: unknown): x is number => Number.isFinite(x)
 export const is_int = (x: unknown): x is number => Number.isInteger(x)
 export const is_nan = (x: unknown): x is number => Number.isNaN(x)
 export const is_infinite = (x: unknown): x is number => is_number(x) && !is_finite(x)
-export const is_finite_non_negative_int = (x: unknown): x is number =>
-	is_non_negative_number(x) && is_finite(x) && is_int(x)
+export const is_finite_non_negative_int = (x: unknown): x is number => is_non_negative_number(x) && is_finite(x) && is_int(x)
 export const is_uuid = (x: unknown): x is UUIDv4 => is_string(x) && UUIDv4_RX.test(x)
 export const is_empty_array = (x: unknown): boolean => is_array(x) && is_0(x.length)
 // TODO: Properly assign guard type
@@ -74,10 +72,8 @@ export const keys_of: Types._KeysOfFn = o => {
 	return Object.keys(o) as any
 }
 
-export const for_each_key = <T extends Record<string, unknown>>(
-	obj: T,
-	f: (key: keyof T) => void,
-) => keys_of(obj).forEach(key => f(key))
+export const for_each_key = <T extends Record<string, unknown>>(obj: T, f: (key: keyof T) => void) =>
+	keys_of(obj).forEach(key => f(key))
 
 export const extend =
 	<T extends Record<string, unknown>, N extends Record<string, unknown>>(f: (obj: T) => N) =>
@@ -97,15 +93,13 @@ export const call_once = <T extends any[], R>(fn: (...args: T) => R) => {
 	}
 }
 
-export const get_percentage = (total: number, current: number): number =>
-	Math.trunc((current / total) * 100)
+export const get_percentage = (total: number, current: number): number => Math.trunc((current / total) * 100)
 
 export const omit =
 	<T extends Record<string, unknown>, K extends (keyof T)[]>(...keys: K) =>
 	(obj: T): Omit<T, Types.Unpack<K>> =>
 		keys_of(obj).reduce(
-			(acc, key) =>
-				keys.includes(key) ? acc : ({ ...acc, [key]: obj[key] } as Omit<T, Types.Unpack<K>>),
+			(acc, key) => (keys.includes(key) ? acc : ({ ...acc, [key]: obj[key] } as Omit<T, Types.Unpack<K>>)),
 			{} as Omit<T, Types.Unpack<K>>,
 		)
 
@@ -131,10 +125,7 @@ export const alpha_sort =
 		direction === "ASC" ? a.localeCompare(b) : b.localeCompare(a)
 
 export const override =
-	<
-		_Object extends Record<string, unknown> = Record<string, unknown>,
-		__Increment extends Partial<_Object> = Partial<_Object>,
-	>(
+	<_Object extends Record<string, unknown> = Record<string, unknown>, __Increment extends Partial<_Object> = Partial<_Object>>(
 		increment: __Increment,
 	) =>
 	(obj: _Object): _Object => ({ ...obj, ...increment })
@@ -173,3 +164,11 @@ export const fuzzy_check = (src: string, tgt: string, ratio: number) => {
 
 	return hits / src.length >= ratio
 }
+
+export const title_case = (str: string) =>
+	str
+		.split(" ")
+		.map(word => word.at(0)?.toUpperCase() + word.substring(1).toLowerCase())
+		.join(" ")
+
+export const never = () => null as never

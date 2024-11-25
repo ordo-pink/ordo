@@ -17,7 +17,7 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { CurrentUserReference, Input, MetadataIcon } from "@ordo-pink/maoka-components"
+import { Input, Label, MetadataIcon } from "@ordo-pink/maoka-components"
 import { Maoka } from "@ordo-pink/maoka"
 import { MaokaJabs } from "@ordo-pink/maoka-jabs"
 import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
@@ -27,7 +27,7 @@ export const FileMetadata = (metadata: Ordo.Metadata.Instance) =>
 		const fsid = metadata.get_fsid()
 		const name = metadata.get_name()
 
-		const { emit } = use(MaokaOrdo.Jabs.Commands)
+		const commands = use(MaokaOrdo.Jabs.Commands)
 
 		use(MaokaJabs.add_class("p-2"))
 
@@ -36,31 +36,36 @@ export const FileMetadata = (metadata: Ordo.Metadata.Instance) =>
 				MetadataIcon({ metadata }),
 
 				Input.Text({
-					custom_class: "font-extrabold !text-2xl cursor-text !w-full !bg-transparent !shadow-none",
+					custom_class:
+						"hover:dark:!bg-neutral-800 rounded-sm font-extrabold !text-2xl cursor-text !w-full !bg-transparent !shadow-none",
 					initial_value: name,
 					on_input: event => {
 						const target = event.target as HTMLInputElement
-
-						emit("cmd.metadata.rename", { fsid, new_name: target.value })
+						commands.emit("cmd.metadata.rename", { fsid, new_name: target.value })
 					},
 				}),
 			]),
-			AuthorSection(() => [CurrentUserReference, Timestamp(fsid)]),
+			LabelsSection(metadata.get_fsid()),
 		]
 	})
 
-// TODO time?
-const Timestamp = (fsid: Ordo.Metadata.FSID) =>
+const LabelsSection = (fsid: Ordo.Metadata.FSID) =>
 	Maoka.create("div", ({ use }) => {
+		const label_section =
+			"flex flex-wrap gap-1 cursor-pointer rounded-sm hover:dark:bg-neutral-800 py-1"
+
+		use(MaokaJabs.set_class(label_section))
+		use(MaokaJabs.listen("onclick", () => handle_click()))
+
+		const commands = use(MaokaOrdo.Jabs.Commands)
 		const get_metadata = use(MaokaOrdo.Jabs.Metadata.get_by_fsid(fsid))
 
-		return () => {
-			const metadata = get_metadata()
+		const handle_click = () => commands.emit("cmd.metadata.show_edit_labels_palette", fsid)
 
-			return metadata?.get_updated_at().toLocaleString()
-		}
+		return () =>
+			get_metadata()
+				?.get_labels()
+				.map(label => Label(label, commands.emit))
 	})
 
 const TitleSection = Maoka.styled("div", { class: "flex w-full space-x-2 items-center text-2xl" })
-
-const AuthorSection = Maoka.styled("div", { class: "p-1 flex space-x-2 items-center text-sm" })

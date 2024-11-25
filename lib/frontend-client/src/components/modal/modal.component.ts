@@ -27,7 +27,7 @@ export const Modal = (modal: Ordo.Modal.Instance | null) =>
 		use(MaokaJabs.set_class("modal"))
 		use(MaokaJabs.listen("onclick", event => handle_click(event)))
 
-		if (modal) modal.render(current_element as unknown as HTMLDivElement)
+		if (modal) void modal.render(current_element as unknown as HTMLDivElement)
 
 		const handle_click = (event: MouseEvent) => {
 			if (!modal) return

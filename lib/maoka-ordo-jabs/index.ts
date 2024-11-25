@@ -1,6 +1,7 @@
 // SPDX-FileCopyrightText: Copyright 2024, 谢尔盖||↓ and the Ordo.pink contributors
 // SPDX-License-Identifier: Unlicense
 
+import { Maoka, TMaokaChildren } from "@ordo-pink/maoka"
 import { Result } from "@ordo-pink/result"
 import { keys_of } from "@ordo-pink/tau"
 
@@ -69,4 +70,11 @@ export const MaokaOrdo = {
 				),
 	},
 	Context: ordo_context,
+	Components: {
+		WithCtx: (ctx: Ordo.CreateFunction.Params, children: () => TMaokaChildren) =>
+			Maoka.create("div", ({ use }) => {
+				use(MaokaOrdo.Context.provide(ctx))
+				return children
+			}),
+	},
 }

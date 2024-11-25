@@ -91,10 +91,7 @@ export const MetadataCommand: Ordo.Metadata.CommandStatic = {
 				.pipe(
 					R.ops.map(lbls =>
 						concat(lbls, labels).sort((a, b) =>
-							alpha_sort("ASC")(
-								is_string(a) ? a : a.readable_name,
-								is_string(b) ? b : b.readable_name,
-							),
+							alpha_sort("ASC")(is_string(a) ? a : a.name, is_string(b) ? b : b.name),
 						),
 					),
 				)

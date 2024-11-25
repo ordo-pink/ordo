@@ -61,19 +61,13 @@ export const Metadata: Ordo.Metadata.Static = {
 		get_links: () => [...dto.links],
 		get_parent: () => dto.parent,
 		get_property: key =>
-			O.FromNullable(dto.props).cata({
-				Some: props => (key in props ? O.Some(props[key]) : O.None()),
-				None: () => O.None(),
-			}),
+			O.FromNullable(dto.props).pipe(O.ops.chain(props => O.FromNullable(props[key]))),
 		get_readable_size: () => get_readable_size(dto.size),
 		get_label_index: label =>
 			dto.labels.findIndex(x =>
 				is_string(label)
 					? x === label
-					: !is_string(x) &&
-						x.readable_name === label.name &&
-						x.color === label.color &&
-						x.name === label.name,
+					: !is_string(x) && x.color === label.color && x.name === label.name,
 			),
 		get_size: () => dto.size,
 		has_label: label => Metadata.FromDTO(dto).get_label_index(label) >= 0,
@@ -92,13 +86,10 @@ export const Metadata: Ordo.Metadata.Static = {
 			return Switch.OfTrue()
 				.case(o_dto.fsid !== dto.fsid, F)
 				.case(o_dto.updated_at !== dto.updated_at, F)
-				.case(o_dto.updated_by !== dto.updated_by, F)
 				.default(
 					() =>
-						o_dto.fsid === dto.fsid &&
 						o_dto.created_at === dto.created_at &&
 						o_dto.created_by === dto.created_by &&
-						o_dto.updated_at === dto.updated_at &&
 						o_dto.updated_by === dto.updated_by,
 				)
 		},

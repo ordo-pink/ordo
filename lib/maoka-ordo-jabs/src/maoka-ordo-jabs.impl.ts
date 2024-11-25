@@ -3,12 +3,12 @@
 
 import { type Observable } from "rxjs"
 
+import { is_fn, keys_of } from "@ordo-pink/tau"
 import { MaokaJabs } from "@ordo-pink/maoka-jabs"
 import { R } from "@ordo-pink/result"
 import { type TLogger } from "@ordo-pink/logger"
 import { type TMaokaJab } from "@ordo-pink/maoka"
 import { type TOption } from "@ordo-pink/option"
-import { keys_of } from "@ordo-pink/tau"
 
 export const ordo_context = MaokaJabs.create_context<Ordo.CreateFunction.Params>()
 
@@ -226,7 +226,17 @@ export const from$ =
 
 		const handle_stream_update = (new_value: $TValue) => {
 			const transformed_new_value = transformer_fn(new_value, value)
-			if (value !== transformed_new_value) {
+
+			const maybe_metadata = transformed_new_value as unknown as Ordo.Metadata.Instance
+			let should_refresh = true
+
+			if (maybe_metadata && maybe_metadata.equals && is_fn(maybe_metadata.equals)) {
+				should_refresh = maybe_metadata.equals(value) === false
+			} else {
+				should_refresh = value !== transformed_new_value
+			}
+
+			if (should_refresh) {
 				value = transformed_new_value
 				void refresh()
 			}

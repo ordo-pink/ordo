@@ -3,101 +3,98 @@
 
 import * as util from "@ordo-pink/binutil"
 import { Binary, Curry, Unary, noop } from "@ordo-pink/tau"
+import { Oath, invokers0, ops0 } from "@ordo-pink/oath"
 import { is_file0, read_file0, readdir0, write_file0 } from "@ordo-pink/fs"
-import { Oath } from "@ordo-pink/oath"
 
 // --- Public ---
 
 export const precommit = () =>
-	Oath.empty()
-		.chain(checkAndCreateMissingLicenses0)
-		.chain(checkAndCreateMissingSPDXRecords0)
-		.orElse(console.error)
+	Oath.Empty()
+		.and(create_licenses_if_not_exist)
+		.and(create_spdx_records_if_not_exist)
+		.invoke(invokers0.or_else(console.error))
 
 // --- Internal ---
 
-const spdxRecordsProgress = util.create_progress()
+const spdx_progress = util.create_progress()
 
-const startSPDXRecordProgress = () => spdxRecordsProgress.start("Creating missing SPDX records")
+const create_spdx_records_if_not_exist = () =>
+	Oath.Empty()
+		.pipe(ops0.tap(() => spdx_progress.start("Creating missing SPDX records")))
+		.and(() => create_spdx_records("lib"))
+		.and(() => create_spdx_records("srv"))
+		.and(() => create_spdx_records("boot/src"))
+		.pipe(ops0.bimap(spdx_progress.break, spdx_progress.finish))
 
-const checkAndCreateMissingSPDXRecords0 = () =>
-	Oath.empty()
-		.tap(startSPDXRecordProgress)
-		.chain(() => createSPDXRecords0("lib"))
-		.chain(() => createSPDXRecords0("srv"))
-		.chain(() => createSPDXRecords0("boot/src"))
-		.bimap(spdxRecordsProgress.break, spdxRecordsProgress.finish)
-
-const createSPDXRecords0: Unary<string, Oath<void[], Error>> = (path: string) =>
-	readdir0(path, { withFileTypes: true }).chain(dirents =>
-		Oath.all(
+const create_spdx_records: Unary<string, Oath<void[], Error>> = (path: string) =>
+	readdir0(path, { withFileTypes: true }).and(dirents =>
+		Oath.Merge(
 			dirents.map(dirent =>
 				dirent.isDirectory()
-					? createSPDXRecords0(`${path}/${dirent.name}`).map(noop)
+					? create_spdx_records(`${path}/${dirent.name}`).and(noop)
 					: dirent.name.endsWith(".ts") || dirent.name.endsWith(".tsx")
-						? createSPDXRecord0(`${path}/${dirent.name}`)
-						: Oath.empty(),
+						? create_spdx_record(`${path}/${dirent.name}`)
+						: Oath.Empty(),
 			),
 		),
 	)
 
-const createSPDXRecord0 = (path: string) =>
-	Oath.of(
+const create_spdx_record = (path: string) =>
+	Oath.Resolve(
 		path
 			.trim()
 			.split("/")
 			.slice(0, path.includes("boot/src") ? 3 : 2)
 			.join("/"),
-	).chain(space =>
-		is_file0(`${space}/license`).chain(exists =>
+	).and(space =>
+		is_file0(`${space}/license`).and(exists =>
 			exists
 				? read_file0(`${space}/license`, "utf-8")
-						.map(license => (license === unlicense ? "Unlicense" : "AGPL-3.0-only"))
-						.map(license => util.get_spdx_record(license))
-						.chain(spdx =>
-							read_file0(path, "utf-8").chain(content =>
+						.and(license => (license === unlicense ? "Unlicense" : "AGPL-3.0-only"))
+						.and(license => util.get_spdx_record(license))
+						.and(spdx =>
+							read_file0(path, "utf-8").and(content =>
 								(content as string).startsWith(spdx)
-									? Oath.empty()
-									: write_file0(path, `${spdx}\n${content as string}`).map(spdxRecordsProgress.inc),
+									? Oath.Empty()
+									: write_file0(path, `${spdx}\n${content as string}`).and(spdx_progress.inc),
 							),
 						)
-				: Oath.empty(),
+				: Oath.Empty(),
 		),
 	)
 
-const createLicensesProgress = util.create_progress()
+const license_progress = util.create_progress()
 
-const startLicenseGenerationProgress = () =>
-	createLicensesProgress.start("Creating missing licenses")
+const create_licenses_if_not_exist = () =>
+	Oath.Empty()
+		.pipe(ops0.tap(() => license_progress.start("Creating missing licenses")))
+		.and(() => create_licenses("lib"))
+		.and(() => create_licenses("srv"))
+		.and(() => create_licenses("boot/src"))
+		.pipe(ops0.bimap(license_progress.break, license_progress.finish))
 
-const checkAndCreateMissingLicenses0 = () =>
-	Oath.empty()
-		.tap(startLicenseGenerationProgress)
-		.chain(() => createLicenses0("lib"))
-		.chain(() => createLicenses0("srv"))
-		.chain(() => createLicenses0("boot/src"))
-		.bimap(createLicensesProgress.break, createLicensesProgress.finish)
-
-const createLicenses0 = (space: "lib" | "srv" | "boot/src") =>
+const create_licenses = (space: "lib" | "srv" | "boot/src") =>
 	readdir0(space, { withFileTypes: true })
-		.map(util.dirents_to_dirs)
-		.map(util.get_dirent_names)
-		.chain(collectMissingLicensePaths0(space))
-		.chain(createLicenseFiles0)
+		.and(util.dirents_to_dirs)
+		.and(util.get_dirent_names)
+		.and(collect_missing_license_paths(space))
+		.and(create_license_files)
 
-const collectMissingLicensePaths0: Curry<Binary<string, string[], Oath<string[]>>> =
+const collect_missing_license_paths: Curry<Binary<string, string[], Oath<string[]>>> =
 	space => dirs =>
-		Oath.all(
+		Oath.Merge(
 			dirs.map(dir =>
-				is_file0(`${space}/${dir}/license`).map(exists =>
+				is_file0(`${space}/${dir}/license`).and(exists =>
 					exists ? null : `${space}/${dir}/license`,
 				),
 			),
-		).map(paths => paths.filter(Boolean) as string[])
+		).and(paths => paths.filter(Boolean) as string[])
 
-const createLicenseFiles0: Unary<string[], Oath<void[], Error>> = paths =>
-	Oath.all(
-		paths.map(path => util.create_repository_file(path, unlicense).tap(createLicensesProgress.inc)),
+const create_license_files: Unary<string[], Oath<void[], Error>> = paths =>
+	Oath.Merge(
+		paths.map(path =>
+			util.create_repository_file(path, unlicense).pipe(ops0.tap(license_progress.inc)),
+		),
 	)
 
 const unlicense = util.get_license("Unlicense")

@@ -4,9 +4,7 @@
 import { TOption } from "@ordo-pink/option"
 import type { TSwitch } from "@ordo-pink/switch"
 
-export type TMatchResultFn = <$TOk, $TErr>(
-	result: TResult<$TOk, $TErr>,
-) => TSwitch<$TOk | $TErr, []>
+export type TMatchResultFn = <$TOk, $TErr>(result: TResult<$TOk, $TErr>) => TSwitch<$TOk | $TErr, []>
 
 type ArrayToUnion<$T> = $T extends Array<infer U> ? U : $T
 type RecordToUnion<$T extends Record<string, unknown>> = { [P in keyof $T]: $T[P] }[keyof $T]
@@ -31,14 +29,9 @@ export type TOkResultConstructorFn = <$TOk, $TErr = never>(ok: $TOk) => TResult<
 
 export type TErrResultConstructorFn = <$TErr, $TOk = never>(err: $TErr) => TResult<$TOk, $TErr>
 
-export type TFromOptionConstructorFn = <$TOk, $TErr = void>(
-	option: TOption<$TOk>,
-	on_none?: () => $TErr,
-) => TResult<$TOk, $TErr>
+export type TFromOptionConstructorFn = <$TOk, $TErr = void>(option: TOption<$TOk>, on_none?: () => $TErr) => TResult<$TOk, $TErr>
 
-export type TMergeResultConstructorFn = <
-	TSomeThings extends readonly unknown[] | [] | Record<string, unknown>,
->(
+export type TMergeResultConstructorFn = <TSomeThings extends readonly unknown[] | [] | Record<string, unknown>>(
 	results: TSomeThings,
 ) => TResult<
 	TSomeThings extends []
@@ -90,9 +83,7 @@ export type TBiChainResultOperatorFn = <$TOk, $TErr, $TNewOk, $TNewRrr>(
 	on_ok: (x: $TOk) => TResult<$TNewOk, $TNewRrr>,
 ) => (result: TResult<$TOk, $TErr>) => TResult<$TNewOk, $TNewRrr>
 
-export type TTapResultOperatorFn = <$TOk, $TErr>(
-	on_ok: (x: $TOk) => any,
-) => (result: TResult<$TOk, $TErr>) => TResult<$TOk, $TErr>
+export type TTapResultOperatorFn = <$TOk, $TErr>(on_ok: (x: $TOk) => any) => (result: TResult<$TOk, $TErr>) => TResult<$TOk, $TErr>
 
 export type TErrTapResultOperatorFn = <$TOk, $TErr>(
 	on_err: (x: $TErr) => any,
@@ -103,13 +94,9 @@ export type TBiTapResultOperatorFn = <$TOk, $TErr>(
 	on_ok: (x: $TOk) => any,
 ) => (result: TResult<$TOk, $TErr>) => TResult<$TOk, $TErr>
 
-export type TSwapResultOperatorFn = <$TOk, $TErr>() => (
-	result: TResult<$TOk, $TErr>,
-) => TResult<$TErr, $TOk>
+export type TSwapResultOperatorFn = <$TOk, $TErr>() => (result: TResult<$TOk, $TErr>) => TResult<$TErr, $TOk>
 
-export type TIsResultGuardFn<$TOk = unknown, $TErr = unknown> = (
-	x: unknown,
-) => x is TResult<$TOk, $TErr>
+export type TIsResultGuardFn<$TOk = unknown, $TErr = unknown> = (x: unknown) => x is TResult<$TOk, $TErr>
 
 export type TIsOkGuardFn = <_TOk, _TErr>(x: TResult<_TOk, _TErr>) => x is TResult<_TOk, never>
 
@@ -119,9 +106,9 @@ export type TOrElseCataFn = <_TOk, _TErr, _TNewErr>(
 	on_err: (err: _TErr) => _TNewErr,
 ) => { Ok: (on_ok: _TOk) => _TOk; Err: (err: _TErr) => _TNewErr }
 
-export type TIfOkCataFn = <_TOk, _TNewOk>(
-	on_ok: (ok: _TOk) => _TNewOk,
-) => { Ok: (on_ok: _TOk) => _TNewOk; Err: () => void }
+export type TExpectFn = <_TOk, _TErr>(on_err: (err: _TErr) => void) => { Ok: (on_ok: _TOk) => _TOk; Err: (err: _TErr) => never }
+
+export type TIfOkCataFn = <_TOk, _TNewOk>(on_ok: (ok: _TOk) => _TNewOk) => { Ok: (on_ok: _TOk) => _TNewOk; Err: () => void }
 
 export type TOrNothingCata = <_TOk>() => { Ok: (ok: _TOk) => _TOk; Err: () => undefined }
 
@@ -143,6 +130,7 @@ export type TResultStatic = {
 		or_nothing: TOrNothingCata
 		or_else: TOrElseCataFn
 		if_ok: TIfOkCataFn
+		expect: TExpectFn
 	}
 	ops: {
 		map: TMapResultOperatorFn
@@ -169,11 +157,6 @@ export type TResult<$TOk, $TErr> = {
 	 * @deprecated UNSAFE. Use `result.cata` instead.
 	 */
 	unwrap: () => $TOk | $TErr
-	pipe: <_TOk, _TErr>(
-		operator: (result: TResult<$TOk, $TErr>) => TResult<_TOk, _TErr>,
-	) => TResult<_TOk, _TErr>
-	cata: <_TOk, _TErr>(explosion: {
-		Ok: (ok: $TOk) => _TOk
-		Err: (err: $TErr) => _TErr
-	}) => _TOk | _TErr
+	pipe: <_TOk, _TErr>(operator: (result: TResult<$TOk, $TErr>) => TResult<_TOk, _TErr>) => TResult<_TOk, _TErr>
+	cata: <_TOk, _TErr>(explosion: { Ok: (ok: $TOk) => _TOk; Err: (err: $TErr) => _TErr }) => _TOk | _TErr
 }

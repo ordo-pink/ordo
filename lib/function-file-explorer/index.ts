@@ -86,6 +86,7 @@ export default create_function(
 				"t.file_explorer.modals.rename_file.title": "Rename File",
 				"t.file_explorer.modals.rename_file.input_label": "New name",
 				"t.file_explorer.modals.move.title": "Move...",
+				"t.file_explorer.modals.move.move_to_root": "Move to root directory",
 			},
 		})
 
@@ -222,6 +223,7 @@ declare global {
 				}
 				move: {
 					title: () => string
+					move_to_root: () => string
 				}
 				remove_file: {
 					title: () => string

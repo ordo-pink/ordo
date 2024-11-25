@@ -63,6 +63,7 @@ export default create_function(
 			"cmd.file_editor.open_file",
 			"cmd.file_editor.open",
 			"cmd.functions.activities.register",
+			"cmd.metadata.remove_labels",
 			"cmd.metadata.rename",
 			"cmd.metadata.set_property",
 			"cmd.metadata.show_create_modal",

@@ -43,7 +43,7 @@ export const get_ancestors =
 
 export const get_children =
 	(fsid?: Ordo.Metadata.FSID | null): TMaokaJab<() => Ordo.Metadata.Instance[]> =>
-	({ use, refresh }) => {
+	({ use }) => {
 		const metadata_query = use(get_metadata_query)
 
 		return use(
@@ -51,9 +51,15 @@ export const get_children =
 				if (!fsid) return []
 
 				const new_children = metadata_query.get_children(fsid).cata(R.catas.or_else(() => []))
-				if (new_children.length !== prev_value.length) void refresh()
 
-				return new_children
+				if (!prev_value) return new_children
+
+				const equals = new_children.reduce(
+					(acc, child, index) => (acc && prev_value[index] ? child.get_fsid() === prev_value[index]?.get_fsid() : false),
+					true,
+				)
+
+				return equals ? prev_value : new_children
 			}),
 		)
 	}

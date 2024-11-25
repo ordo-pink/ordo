@@ -15,5 +15,5 @@
 }
 
 .database_table-head_cell {
-	@apply database_border-color border-r px-2 py-1 text-sm font-normal text-neutral-500 last-of-type:border-l last-of-type:border-r-0;
+	@apply database_border-color cursor-pointer border-r px-2 py-1 text-sm font-bold text-neutral-500 last-of-type:border-l last-of-type:border-r-0;
 }

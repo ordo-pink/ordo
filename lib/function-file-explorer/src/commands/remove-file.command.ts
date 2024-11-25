@@ -5,6 +5,10 @@ import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
 
 import { RemoveFileModal } from "../components/remove-file-modal.component"
 
+/**
+ * Register `Remove` command in {@link Ordo.ContextMenu.Item Context Menu} of a
+ * {@link Ordo.Metadata.Instance}. The `Remove` command is irreversible.
+ */
 export const register_remove_file = (ctx: Ordo.CreateFunction.Params) => {
 	const commands = ctx.get_commands()
 
@@ -16,10 +20,10 @@ export const register_remove_file = (ctx: Ordo.CreateFunction.Params) => {
 
 	commands.emit("cmd.application.context_menu.add", {
 		command: "cmd.metadata.show_remove_modal",
-		render_icon: div => div.appendChild(BsFileEarmarkMinus() as SVGSVGElement),
-		readable_name: "t.file_explorer.modals.remove_file.title",
-		should_show: ({ payload }) => Metadata.Validations.is_metadata(payload),
 		payload_creator: ({ payload }) => Metadata.Validations.is_metadata(payload) && payload.get_fsid(),
+		readable_name: "t.file_explorer.modals.remove_file.title",
+		render_icon: div => div.appendChild(BsFileEarmarkMinus() as SVGSVGElement),
+		should_show: ({ payload }) => Metadata.Validations.is_metadata(payload),
 		type: ContextMenuItemType.DELETE,
 	})
 }

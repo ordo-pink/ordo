@@ -30,6 +30,13 @@ declare global {
 				readable_name: () => string
 				description: () => string
 			}
+			column_names: {
+				name: () => string
+				labels: () => string
+				created_at: () => string
+				updated_at: () => string
+				size: () => string
+			}
 		}
 	}
 }
@@ -52,12 +59,7 @@ export default create_function(
 			"cmd.metadata.show_edit_label_modal",
 			"cmd.metadata.show_edit_labels_palette",
 		],
-		queries: [
-			"application.commands",
-			"data.metadata_query",
-			"users.users_query",
-			"functions.file_associations",
-		],
+		queries: ["application.commands", "data.metadata_query", "users.users_query", "functions.file_associations"],
 	},
 	ctx => {
 		const commands = ctx.get_commands()
@@ -65,6 +67,11 @@ export default create_function(
 		commands.emit("cmd.application.add_translations", {
 			lang: "en",
 			translations: {
+				"t.database.column_names.created_at": "Created At",
+				"t.database.column_names.labels": "Labels",
+				"t.database.column_names.name": "Name",
+				"t.database.column_names.size": "Size",
+				"t.database.column_names.updated_at": "Last Updated",
 				"t.database.file_association.readable_name": "Database",
 				"t.database.file_association.description":
 					"This file represents a database where each row is a separate file contained inside the database.",
@@ -80,8 +87,7 @@ export default create_function(
 					description: "t.database.file_association.description",
 				},
 			],
-			render: ({ div, metadata, content }) =>
-				Maoka.render_dom(div, Database(metadata, content, ctx)),
+			render: ({ div, metadata, content }) => Maoka.render_dom(div, Database(metadata, content, ctx)),
 			render_icon: span => span.replaceChildren(BsFileEarmarkRuled() as any),
 		})
 	},

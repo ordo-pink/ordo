@@ -1,6 +1,6 @@
+import { BsFilesAlt, BsSlash } from "@ordo-pink/frontend-icons"
 import { ContextMenuItemType, Metadata } from "@ordo-pink/core"
 import { Result, type TResult } from "@ordo-pink/result"
-import { BsFilesAlt, BsSlash } from "@ordo-pink/frontend-icons"
 import { Maoka } from "@ordo-pink/maoka"
 import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
 import { MetadataIcon } from "@ordo-pink/maoka-components"
@@ -39,7 +39,7 @@ export const register_move_command = (ctx: Ordo.CreateFunction.Params) => {
 
 const add_descendents_r =
 	(fsid: Ordo.Metadata.FSID, metadata_query: Ordo.Metadata.Query) =>
-	<T>(x: T): TResult<[T, Ordo.Metadata.Instance[]], Ordo.Rrr<"EINVAL" | "ENOENT" | "EAGAIN">> =>
+	<$THead>(x: $THead): TResult<[$THead, Ordo.Metadata.Instance[]], Ordo.Rrr<"EINVAL" | "ENOENT" | "EAGAIN">> =>
 		metadata_query.get_descendents(fsid).pipe(Result.ops.map(descendents => [x, descendents]))
 
 const filter_destinations =

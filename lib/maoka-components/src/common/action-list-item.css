@@ -1,5 +1,5 @@
 .action-list-item {
-	@apply w-full cursor-pointer rounded-sm px-2 py-1 hover:bg-gradient-to-r hover:from-neutral-300 hover:to-stone-300 md:px-1 md:py-0.5 hover:dark:bg-gradient-to-r hover:dark:from-neutral-600 hover:dark:to-stone-600;
+	@apply w-full cursor-pointer rounded-sm px-2 py-1 hover:bg-gradient-to-br hover:from-neutral-100 hover:to-stone-100 md:px-1 md:py-0.5 hover:dark:bg-gradient-to-br hover:dark:from-neutral-600 hover:dark:to-stone-600;
 }
 
 .action-list-item_layout {
@@ -11,11 +11,11 @@
 }
 
 .action-list-item.active {
-	@apply bg-gradient-to-tr from-pink-300 to-rose-300 dark:from-pink-900 dark:to-rose-900;
+	@apply bg-gradient-to-br from-purple-400/50 to-pink-400/50 dark:from-pink-900 dark:to-rose-900;
 }
 
 .action-list-item.active-hover {
-	@apply hover:!bg-gradient-to-tr hover:!from-pink-300 hover:!to-rose-300 hover:dark:!from-pink-900 hover:dark:!to-rose-900;
+	@apply hover:!bg-gradient-to-br hover:!from-pink-300 hover:!to-rose-300 hover:dark:!from-pink-900 hover:dark:!to-rose-900;
 }
 
 .action-list-item_title {

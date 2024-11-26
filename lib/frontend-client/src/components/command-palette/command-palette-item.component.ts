@@ -21,11 +21,7 @@ import { ActionListItem, Hotkey } from "@ordo-pink/maoka-components"
 import { Maoka } from "@ordo-pink/maoka"
 import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
 
-export const CommandPaletteItem = (
-	item: Ordo.CommandPalette.Item,
-	on_click: () => void,
-	is_current: boolean,
-) =>
+export const CommandPaletteItem = (item: Ordo.CommandPalette.Item, on_click: () => void, is_current: boolean) =>
 	Maoka.create("div", ({ use, element, after_mount }) => {
 		const { t } = use(MaokaOrdo.Jabs.Translations)
 
@@ -33,7 +29,7 @@ export const CommandPaletteItem = (
 		const render_info = item.render_custom_info
 			? item.render_custom_info
 			: item.hotkey
-				? () => Hotkey(item.hotkey!, { prevent_in_inputs: true })
+				? () => Hotkey(item.hotkey!, { prevent_in_inputs: true, smol: true })
 				: void 0
 
 		const render_footer = item.render_custom_footer

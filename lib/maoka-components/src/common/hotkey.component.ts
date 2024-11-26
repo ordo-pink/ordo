@@ -23,6 +23,7 @@ import { Result } from "@ordo-pink/result"
 import { Switch } from "@ordo-pink/switch"
 
 import "./hotkey.css"
+import { title_case } from "@ordo-pink/tau"
 
 // TODO Move to jabs
 const isDarwin = navigator.appVersion.indexOf("Mac") !== -1
@@ -114,7 +115,7 @@ const Key = (key: string) =>
 			.case("arrowright", () => "→")
 			.case("arrowup", () => "↑")
 			.case("arrowdown", () => "↓")
-			.default(() => key.toLocaleUpperCase()),
+			.default(() => title_case(key)),
 	)
 
 const meta = isDarwin ? Key("⌥") : Key("Alt")

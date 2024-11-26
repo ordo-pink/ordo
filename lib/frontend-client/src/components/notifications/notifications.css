@@ -51,7 +51,7 @@
 }
 
 .notification-card_progress {
-	@apply absolute inset-x-1.5 bottom-0 rounded-full shadow-inner;
+	@apply absolute inset-x-1.5 bottom-0 rounded-full;
 }
 
 .notification-card_progress_foreground {

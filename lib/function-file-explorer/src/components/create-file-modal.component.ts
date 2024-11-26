@@ -24,10 +24,7 @@ import { MaokaJabs } from "@ordo-pink/maoka-jabs"
 import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
 import { Switch } from "@ordo-pink/switch"
 
-export const CreateFileModal = (
-	ctx: Ordo.CreateFunction.Params,
-	parent: Ordo.Metadata.FSID | null = null,
-) =>
+export const CreateFileModal = (ctx: Ordo.CreateFunction.Params, parent: Ordo.Metadata.FSID | null = null) =>
 	Maoka.create("div", ({ use }) => {
 		use(MaokaOrdo.Context.provide(ctx))
 
@@ -59,12 +56,9 @@ export const CreateFileModal = (
 
 // TODO Extract select
 // TODO Add caret showing expanded-contracted status
-const FileAssociationSelector = (
-	on_select_type: (file_association: Ordo.FileAssociation.Instance, type: string) => void,
-) =>
+const FileAssociationSelector = (on_select_type: (file_association: Ordo.FileAssociation.Instance, type: string) => void) =>
 	Maoka.create("div", ({ use, refresh, on_unmount }) => {
-		const select_class =
-			"relative bg-neutral-200 dark:bg-neutral-600 rounded-md mt-2 cursor-pointer"
+		const select_class = "relative bg-neutral-100 shadow-inner dark:bg-neutral-600 rounded-md mt-2 cursor-pointer"
 
 		let current_file_association: Ordo.FileAssociation.Instance | null = null
 		let current_type_index = 0
@@ -108,26 +102,18 @@ const FileAssociationSelector = (
 
 		return () => [
 			SelectItem(
-				current_file_association
-					? current_file_association.types[current_type_index]
-					: file_associations[0].types[0],
+				current_file_association ? current_file_association.types[current_type_index] : file_associations[0].types[0],
 				current_file_association ? current_file_association : file_associations[0],
 				handle_item_click,
 			),
 
 			is_expanded
 				? Maoka.create("div", ({ use }) => {
-						use(
-							MaokaJabs.set_class(
-								"absolute top-0 left-0 right-0 bg-neutral-200 dark:bg-neutral-600 rounded-md",
-							),
-						)
+						use(MaokaJabs.set_class("absolute top-0 left-0 right-0 bg-neutral-100 dark:bg-neutral-600 rounded-md"))
 
 						return () =>
 							file_associations.flatMap(file_association =>
-								file_association.types.map(type =>
-									SelectItem(type, file_association, handle_item_click, true),
-								),
+								file_association.types.map(type => SelectItem(type, file_association, handle_item_click, true)),
 							)
 					})
 				: void 0,
@@ -146,23 +132,16 @@ const SelectItem = (
 
 		const Icon = Switch.OfTrue()
 			.case(!!file_association.render_icon, () =>
-				Maoka.create("span", ({ element }) =>
-					file_association.render_icon!(element as HTMLElement),
-				),
+				Maoka.create("span", ({ element }) => file_association.render_icon!(element as HTMLElement)),
 			)
 			.default(() => BsFileEarmarkPlus())
 
 		return () => [
 			Maoka.create("div", ({ use }) => {
-				use(
-					MaokaJabs.set_class(
-						"p-2 rounded-none first-of-type:rounded-t-md last-of-type:rounded-b-md",
-					),
-				)
+				use(MaokaJabs.set_class("p-2 rounded-none first-of-type:rounded-t-md last-of-type:rounded-b-md"))
 
 				return () => {
-					if (is_select_active)
-						use(MaokaJabs.add_class("hover:bg-neutral-300 hover:dark:bg-neutral-800"))
+					if (is_select_active) use(MaokaJabs.add_class("hover:bg-neutral-300 hover:dark:bg-neutral-800"))
 
 					return [
 						Maoka.create("div", ({ use }) => {

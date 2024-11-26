@@ -7,7 +7,7 @@
 }
 
 .modal {
-	@apply relative hidden min-h-8 rounded-lg bg-neutral-100 shadow-xl dark:bg-neutral-700;
+	@apply relative hidden min-h-8 rounded-lg bg-white shadow-xl dark:bg-neutral-700;
 }
 
 .modal.active {

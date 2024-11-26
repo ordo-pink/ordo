@@ -7,7 +7,7 @@
 }
 
 .command-palette_items {
-	@apply w-full overflow-y-auto border-neutral-500 has-[div]:first-of-type:border-b;
+	@apply w-full overflow-y-auto border-neutral-200 first-of-type:border-none has-[div]:last-of-type:border-t dark:border-neutral-600;
 }
 
 .command-palette_hint {

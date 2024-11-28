@@ -36,7 +36,27 @@ declare global {
 				created_at: () => string
 				updated_at: () => string
 				size: () => string
+				links: () => string
+				parent: () => string
+				created_by: () => string
 			}
+			sorting_modal: {
+				context_menu: () => string
+			}
+			filter_modal: {
+				context_menu: () => string
+			}
+			columns_modal: {
+				context_menu: () => string
+			}
+		}
+	}
+
+	interface cmd {
+		database: {
+			show_sorting_modal: () => void
+			show_filter_modal: () => void
+			show_columns_modal: () => void
 		}
 	}
 }
@@ -48,7 +68,11 @@ export default create_function(
 			"cmd.application.add_translations",
 			"cmd.application.command_palette.hide",
 			"cmd.application.command_palette.show",
+			"cmd.application.context_menu.add",
 			"cmd.application.context_menu.show",
+			"cmd.application.context_menu.show",
+			"cmd.application.modal.hide",
+			"cmd.application.modal.show",
 			"cmd.application.router.navigate",
 			"cmd.content.set",
 			"cmd.functions.file_associations.add",
@@ -68,12 +92,18 @@ export default create_function(
 		commands.emit("cmd.application.add_translations", {
 			lang: "en",
 			translations: {
-				"t.database.column_names.created_at": "Created At",
+				"t.database.column_names.created_at": "Creation Date",
 				"t.database.column_names.labels": "Labels",
 				"t.database.column_names.name": "Name",
 				"t.database.column_names.size": "Size",
 				"t.database.column_names.updated_at": "Last Updated",
 				"t.database.file_association.readable_name": "Database",
+				"t.database.column_names.created_by": "Author",
+				"t.database.column_names.links": "Outgoing Links",
+				"t.database.column_names.parent": "Parent",
+				"t.database.columns_modal.context_menu": "Edit columns...",
+				"t.database.filter_modal.context_menu": "Edit filters...",
+				"t.database.sorting_modal.context_menu": "Edit sorting...",
 				"t.database.file_association.description":
 					"This file represents a database where each row is a separate file contained inside the database.",
 			},

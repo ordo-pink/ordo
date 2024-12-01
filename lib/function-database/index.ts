@@ -69,6 +69,7 @@ export default create_function(
 			"cmd.application.command_palette.hide",
 			"cmd.application.command_palette.show",
 			"cmd.application.context_menu.add",
+			"cmd.application.context_menu.remove",
 			"cmd.application.context_menu.show",
 			"cmd.application.context_menu.show",
 			"cmd.application.modal.hide",

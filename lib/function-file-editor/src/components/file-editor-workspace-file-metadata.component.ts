@@ -37,7 +37,7 @@ export const FileMetadata = (metadata: Ordo.Metadata.Instance) =>
 
 				Input.Text({
 					custom_class:
-						"hover:dark:!bg-neutral-800 rounded-sm font-extrabold !text-2xl cursor-text !w-full !bg-transparent !shadow-none",
+						"hover:dark:!bg-neutral-800 hover:!bg-neutral-200 rounded-sm font-extrabold !text-2xl cursor-text !w-full !bg-transparent !shadow-none",
 					initial_value: name,
 					on_input: event => {
 						const target = event.target as HTMLInputElement
@@ -51,7 +51,7 @@ export const FileMetadata = (metadata: Ordo.Metadata.Instance) =>
 
 const LabelsSection = (fsid: Ordo.Metadata.FSID) =>
 	Maoka.create("div", ({ use }) => {
-		const label_section = "flex flex-wrap gap-1 cursor-pointer rounded-sm hover:dark:bg-neutral-800 py-1 min-h-7"
+		const label_section = "flex flex-wrap gap-1 cursor-pointer rounded-sm hover:bg-neutral-200 hover:dark:bg-neutral-800 py-1 min-h-7"
 
 		use(MaokaJabs.set_class(label_section))
 		use(MaokaJabs.listen("onclick", () => handle_click()))
@@ -63,9 +63,14 @@ const LabelsSection = (fsid: Ordo.Metadata.FSID) =>
 
 		return () => {
 			const metadata = get_metadata()
+			const labels = metadata?.get_labels() ?? []
 
-			return metadata?.get_labels().map(label => Label(label, commands.emit, metadata))
+			return labels.length > 0
+				? metadata?.get_labels().map(label => Label(label, commands.emit, metadata))
+				: LabelsPlaceholder(() => "Add labels...") // TODO Translations
 		}
 	})
+
+const LabelsPlaceholder = Maoka.styled("div", { class: "text-sm text-neutral-400 dark:text-neutral-600" })
 
 const TitleSection = Maoka.styled("div", { class: "flex w-full space-x-2 items-center text-2xl" })

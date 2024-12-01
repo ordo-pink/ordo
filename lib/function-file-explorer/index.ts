@@ -17,7 +17,7 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { BS_FOLDER_2_OPEN, BsFileEarmarkPlus, BsFileEarmarkRichText } from "@ordo-pink/frontend-icons"
+import { BsFileEarmarkPlus, BsFileEarmarkRichText } from "@ordo-pink/frontend-icons"
 import { ContextMenuItemType, Metadata, create_function } from "@ordo-pink/core"
 import { Maoka } from "@ordo-pink/maoka"
 import { R } from "@ordo-pink/result"
@@ -25,7 +25,6 @@ import { is_string } from "@ordo-pink/tau"
 
 import { CreateFileModal } from "./src/components/create-file-modal.component"
 import { EditLabelModal } from "./src/components/edit-label-modal.component"
-import { FileExplorer } from "./src/components/fe.component"
 import { RenameFileModal } from "./src/components/rename-file-modal.component"
 import { register_move_command } from "./src/commands/move-file.command"
 import { register_remove_file } from "./src/commands/remove-file.command"
@@ -187,19 +186,19 @@ export default create_function(
 			type: ContextMenuItemType.UPDATE,
 		})
 
-		commands.emit("cmd.functions.activities.register", {
-			fid: ctx.fid,
-			activity: {
-				name: "pink.ordo.file-explorer.activity",
-				routes: ["/files", "/files/:fsid"],
-				render_workspace: async div => {
-					await Maoka.render_dom(div, FileExplorer(/*ctx*/))
-				},
-				render_icon: span => {
-					span.innerHTML = BS_FOLDER_2_OPEN
-				},
-			},
-		})
+		// commands.emit("cmd.functions.activities.register", {
+		// 	fid: ctx.fid,
+		// 	activity: {
+		// 		name: "pink.ordo.file-explorer.activity",
+		// 		routes: ["/files", "/files/:fsid"],
+		// 		render_workspace: async div => {
+		// 			await Maoka.render_dom(div, FileExplorer(/*ctx*/))
+		// 		},
+		// 		render_icon: span => {
+		// 			span.innerHTML = BS_FOLDER_2_OPEN
+		// 		},
+		// 	},
+		// })
 
 		logger.debug("🟢 Initialised file-explorer function.")
 	},

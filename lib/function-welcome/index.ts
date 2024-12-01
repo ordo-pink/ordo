@@ -19,12 +19,7 @@
 
 // import { BsCollection, BsEnvelope, BsQuestionOctagon, BsSendCheck } from "react-icons/bs"
 
-import {
-	BsCollection,
-	BsEnvelopeAt,
-	BsQuestionOctagon,
-	BsSendCheck,
-} from "@ordo-pink/frontend-icons"
+import { BsCollection, BsEnvelopeAt, BsQuestionOctagon, BsSendCheck } from "@ordo-pink/frontend-icons"
 import { Maoka } from "@ordo-pink/maoka"
 import { create_function } from "@ordo-pink/core"
 
@@ -88,6 +83,7 @@ export default create_function(
 			"application.fetch",
 			"application.hosts",
 			"users.current_user.is_authenticated",
+			"data.metadata_query",
 		],
 		commands: [
 			"cmd.application.add_translations",
@@ -104,12 +100,14 @@ export default create_function(
 			"cmd.application.set_title",
 			"cmd.auth.open_sign_in",
 			"cmd.auth.open_sign_up",
+			"cmd.content.set",
+			"cmd.file_editor.open",
 			"cmd.functions.activities.register",
+			"cmd.metadata.create",
 			"cmd.welcome.go_to_email_support",
 			"cmd.welcome.go_to_messenger_support",
 			"cmd.welcome.go_to_welcome_page",
 			"cmd.welcome.open_support_palette",
-			"cmd.file_editor.open",
 		],
 	},
 	ctx => {
@@ -144,8 +142,7 @@ export default create_function(
 					new_tab: true,
 				})
 
-			const on_messenger_support = (url: string) => () =>
-				emit("cmd.application.router.open_external", { url, new_tab: true })
+			const on_messenger_support = (url: string) => () => emit("cmd.application.router.open_external", { url, new_tab: true })
 
 			const email_support = ctx.translate("t.common.urls.support_email")
 			const messenger_support = ctx.translate("t.common.urls.support_messenger")

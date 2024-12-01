@@ -19,21 +19,16 @@ export const compile = () =>
 		.pipe(ops0.map(names_to_compile_script_paths))
 		.pipe(ops0.chain(check_files_exist))
 		.pipe(ops0.map(get_existing_paths))
-		.pipe(ops0.tap(start_progress))
+		.pipe(ops0.tap(() => progress.start("Building applications for production")))
 		.pipe(ops0.chain(run_compile_scripts))
-		.pipe(ops0.map(finish_progress))
+		.pipe(ops0.map(progress.finish))
 		.invoke(invokers0.or_else(console.error))
 
 // --- Internal ---
 
 const progress = create_progress()
 
-const start_progress = () => progress.start("Compiling binaries")
-const incProgress = () => progress.inc()
-const finish_progress = () => progress.finish()
-
-const names_to_compile_script_paths = (names: string[]) =>
-	names.map(name => `./srv/${name}/bin/compile.ts`)
+const names_to_compile_script_paths = (names: string[]) => names.map(name => `./srv/${name}/bin/build.ts`)
 const runCompileScript = (path: string) =>
-	run_bun_command(`run ${path}`, { stdout: "pipe", stderr: "pipe" }).pipe(ops0.tap(incProgress))
+	run_bun_command(`run ${path}`, { stdout: "pipe", stderr: "pipe" }).pipe(ops0.tap(progress.inc))
 const run_compile_scripts = (paths: string[]) => Oath.Merge(paths.map(runCompileScript))

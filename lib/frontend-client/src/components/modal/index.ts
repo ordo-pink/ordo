@@ -27,11 +27,9 @@ import { type TOption } from "@ordo-pink/option"
 import { Modal } from "./modal.component"
 
 import "./modal.css"
+import { ModalCloseButton } from "./close-button.component"
 
-export const ModalOverlay = (
-	$: Observable<TOption<Ordo.Modal.Instance>>,
-	ctx: Ordo.CreateFunction.Params,
-) =>
+export const ModalOverlay = ($: Observable<TOption<Ordo.Modal.Instance>>, ctx: Ordo.CreateFunction.Params) =>
 	Maoka.create("div", ({ use, refresh, on_unmount }) => {
 		use(MaokaOrdo.Context.provide(ctx))
 
@@ -70,6 +68,6 @@ export const ModalOverlay = (
 			if (modal_state) use(MaokaJabs.add_class("active"))
 			else use(MaokaJabs.remove_class("active"))
 
-			return Modal(modal_state)
+			return [Modal(modal_state), ModalCloseButton(modal_state)]
 		}
 	})

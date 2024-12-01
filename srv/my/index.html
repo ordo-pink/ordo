@@ -13,7 +13,7 @@
 	</head>
 	<body>
 		<div id="app"></div>
-		<div id="root" class="h-dvh overflow-hidden">
+		<div id="root" class="h-svh overflow-hidden">
 			<div class="flex size-full flex-col">
 				<!-- <div
 					id="status-bar"
@@ -33,10 +33,7 @@
 				<div class="flex size-full">
 					<main class="split flex size-full">
 						<div id="workspace" class="w-full overflow-auto" />
-						<div
-							id="sidebar"
-							class="sidebar hidden size-full bg-neutral-200 pr-12 dark:bg-neutral-900"
-						/>
+						<div id="sidebar" class="sidebar hidden size-full bg-neutral-200 pr-12 dark:bg-neutral-900" />
 					</main>
 					<div
 						id="activity-bar"
@@ -61,7 +58,7 @@
 
 			<div
 				id="notifications"
-				class="fixed bottom-0 right-0 z-50 flex w-full max-w-sm flex-col space-y-2 p-2"
+				class="fixed right-0 top-0 z-50 flex w-full max-w-sm flex-col space-y-2 p-2 md:bottom-0 md:top-auto"
 			></div>
 		</div>
 		<script type="module" src="/src/main.ts"></script>

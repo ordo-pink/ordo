@@ -46,9 +46,9 @@ type TRunCommandFn = (cmd: string, options?: SpawnOptions.OptionsObject) => Oath
 export const run_command: TRunCommandFn = (command, options) =>
 	Oath.Try(() => {
 		const result = Bun.spawnSync(command.trim().split(" "), options)
-		const stderrString = result.stderr?.toString("utf8").trim()
+		const stderr_string = result.stderr?.toString("utf8").trim()
 
-		if (!result.success || result.exitCode > 0) throw new Error(stderrString)
+		if (!result.success || result.exitCode > 0) throw new Error(stderr_string)
 	})
 
 export const die =
@@ -58,8 +58,7 @@ export const die =
 		process.exit(code)
 	}
 
-export const run_bun_command: TRunCommandFn = (command, options) =>
-	run_command(`opt/bun ${command}`, options)
+export const run_bun_command: TRunCommandFn = (command, options) => run_command(`opt/bun ${command}`, options)
 
 export const create_progress = () => {
 	let currentLine = ""
@@ -99,15 +98,10 @@ export const dirents_to_dirs: (dirents: Dirent[]) => Dirent[] = filter(_dirent_i
 const _get_name: (dirent: Dirent) => string = prop("name")
 export const get_dirent_names: (dirents: Dirent[]) => string[] = map(_get_name)
 
-const _check_file_exists0 = (path: string): Oath<string | boolean> =>
-	is_file0(path).pipe(ops0.map(e => (e ? path : e)))
-export const check_files_exist: (paths: string[]) => Oath<(string | boolean)[]> = pipe(
-	map(_check_file_exists0),
-	Oath.Merge,
-)
+const _check_file_exists0 = (path: string): Oath<string | boolean> => is_file0(path).pipe(ops0.map(e => (e ? path : e)))
+export const check_files_exist: (paths: string[]) => Oath<(string | boolean)[]> = pipe(map(_check_file_exists0), Oath.Merge)
 
-export const get_existing_paths = (paths: (string | boolean)[]): string[] =>
-	paths.filter(path => Boolean(path)) as string[]
+export const get_existing_paths = (paths: (string | boolean)[]): string[] => paths.filter(path => Boolean(path)) as string[]
 
 export const get_current_year = (): number => new Date(Date.now()).getFullYear()
 
@@ -146,8 +140,7 @@ ${
 }`
 }
 
-export const get_license = (license: TLicenseType) =>
-	license === "Unlicense" ? getUnlicense() : get_agpl_license()
+export const get_license = (license: TLicenseType) => (license === "Unlicense" ? getUnlicense() : get_agpl_license())
 
 const getUnlicense = () => `This is free and unencumbered software released into the public domain.
 

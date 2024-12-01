@@ -21,3 +21,5 @@ export enum SortingDirection {
 	ASC,
 	DESC,
 }
+
+export const DATABASE_CONTEXT_MENU_PAYLOAD = "ctx.database.payload"

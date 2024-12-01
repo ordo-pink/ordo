@@ -17,8 +17,8 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { BS_X } from "@ordo-pink/frontend-icons"
-import { Maoka } from "@ordo-pink/maoka"
+import { Maoka, type TMaokaElement } from "@ordo-pink/maoka"
+import { BsX } from "@ordo-pink/frontend-icons"
 import { MaokaJabs } from "@ordo-pink/maoka-jabs"
 import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
 
@@ -36,6 +36,6 @@ export const ModalCloseButton = (modal: Ordo.Modal.Instance | null) => {
 			commands.emit("cmd.application.modal.hide")
 		}
 
-		use(MaokaJabs.set_inner_html(BS_X))
+		return () => BsX() as TMaokaElement
 	})
 }

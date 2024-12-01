@@ -54,7 +54,8 @@
 }
 
 .actions-container {
-	@apply flex flex-col items-center justify-between space-y-2 sm:flex-row sm:space-y-0;
+	/* @apply flex flex-col items-center justify-between space-y-2 sm:flex-row sm:space-y-0; */
+	@apply flex flex-col items-center justify-center space-y-2 sm:flex-row sm:space-y-0;
 }
 
 .cta {

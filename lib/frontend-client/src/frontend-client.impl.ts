@@ -47,6 +47,19 @@ const APP_NAME = "pink.ordo.app"
 const APP_FID = Symbol.for(APP_NAME)
 const APP_FN = { fid: APP_FID, name: APP_NAME, permissions: { commands: [], queries: [] } }
 
+const indexed_db = indexedDB.open("ordo.pink", 3)
+
+indexed_db.onupgradeneeded = () => {
+	const db = indexed_db.result
+	if (!db.objectStoreNames.contains("content")) {
+		db.createObjectStore("content")
+	}
+
+	if (!db.objectStoreNames.contains("metadata")) {
+		db.createObjectStore("metadata")
+	}
+}
+
 // TODO: Move all HTML elements in index.html to `create_client`
 type P = { logger: TLogger; is_dev: boolean; hosts: Ordo.Hosts }
 export const create_client = async ({ logger, is_dev, hosts }: P) => {
@@ -167,28 +180,16 @@ export const create_client = async ({ logger, is_dev, hosts }: P) => {
 		get_content_query,
 	}
 
-	await import("@ordo-pink/function-welcome")
-		.then(module => module.default)
-		.then(f => f(shared_function_context))
+	await import("@ordo-pink/function-welcome").then(module => module.default).then(f => f(shared_function_context))
 
-	void import("@ordo-pink/function-auth")
-		.then(module => module.default)
-		.then(f => f(shared_function_context))
+	void import("@ordo-pink/function-auth").then(module => module.default).then(f => f(shared_function_context))
 
 	// TODO: Fix positioning of activity bar content when activity is changed
-	await import("@ordo-pink/function-file-explorer")
-		.then(module => module.default)
-		.then(f => f(shared_function_context))
+	await import("@ordo-pink/function-file-explorer").then(module => module.default).then(f => f(shared_function_context))
 
-	await import("@ordo-pink/function-file-editor")
-		.then(module => module.default)
-		.then(f => f(shared_function_context))
+	await import("@ordo-pink/function-file-editor").then(module => module.default).then(f => f(shared_function_context))
 
-	await import("@ordo-pink/function-rich-text")
-		.then(module => module.default)
-		.then(f => f(shared_function_context))
+	await import("@ordo-pink/function-rich-text").then(module => module.default).then(f => f(shared_function_context))
 
-	await import("@ordo-pink/function-database")
-		.then(module => module.default)
-		.then(f => f(shared_function_context))
+	await import("@ordo-pink/function-database").then(module => module.default).then(f => f(shared_function_context))
 }

@@ -63,9 +63,14 @@ const LabelsSection = (fsid: Ordo.Metadata.FSID) =>
 
 		return () => {
 			const metadata = get_metadata()
+			const labels = metadata?.get_labels() ?? []
 
-			return metadata?.get_labels().map(label => Label(label, commands.emit, metadata))
+			return labels.length > 0
+				? metadata?.get_labels().map(label => Label(label, commands.emit, metadata))
+				: LabelsPlaceholder(() => "Add labels...") // TODO Translations
 		}
 	})
+
+const LabelsPlaceholder = Maoka.styled("div", { class: "text-sm text-neutral-400 dark:text-neutral-600" })
 
 const TitleSection = Maoka.styled("div", { class: "flex w-full space-x-2 items-center text-2xl" })

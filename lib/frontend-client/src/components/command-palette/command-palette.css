@@ -1,5 +1,5 @@
 .command-palette {
-	@apply flex h-dvh max-h-96 w-full flex-col space-y-1 py-2;
+	@apply flex h-svh max-h-96 w-full flex-col space-y-1 py-2;
 }
 
 .command-palette_search {

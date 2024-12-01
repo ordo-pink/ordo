@@ -30,7 +30,7 @@
 }
 
 .card-container {
-	@apply fixed top-0 flex h-dvh w-screen items-center justify-center p-4 pr-[3.5rem] sm:p-12;
+	@apply fixed top-0 flex h-svh w-screen items-center justify-center p-4 sm:p-12;
 }
 
 .card {

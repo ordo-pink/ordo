@@ -83,11 +83,7 @@ export default Maoka.create("main", ({ use, on_unmount }) => {
 		commands.emit("cmd.application.set_title", "t.welcome.landing_page.title")
 
 		return HeroSection(() => [
-			HeroSectionLayers(() => [
-				HeroSectionImageLayer(0),
-				HeroSectionImageLayer(1),
-				HeroSectionImageLayer(2),
-			]),
+			HeroSectionLayers(() => [HeroSectionImageLayer(0), HeroSectionImageLayer(1), HeroSectionImageLayer(2)]),
 			HeroCard(() =>
 				HeroCardContent(() => [
 					HeroCardLogoSection(() => [
@@ -131,9 +127,7 @@ export default Maoka.create("main", ({ use, on_unmount }) => {
 
 const HeroSectionImageLayer = (index: number) =>
 	Maoka.create("div", ({ use }) => {
-		const hosts = use(MaokaOrdo.Jabs.Hosts)
-
-		const background_image = `url(${hosts.static}/index-hero-layer-${index}.png)`
+		const background_image = `url(/index-hero-layer-${index}.png)`
 
 		use(MaokaJabs.set_class(`hero-layer hero-layer_${index}`))
 		use(MaokaJabs.set_style({ backgroundImage: background_image }))

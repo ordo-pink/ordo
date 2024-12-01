@@ -35,7 +35,9 @@ export default defineConfig({
 		cssMinify: true,
 		minify: true,
 		assetsDir: "./static",
+		assetsInlineLimit: 4096,
 	},
+	assetsInclude: "./static/*",
 	server: {
 		port: Number(process.env.ORDO_WORKSPACE_PORT),
 	},

@@ -17,28 +17,12 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import { Oath, invokers0, ops0 } from "@ordo-pink/oath"
 import { die, run_command } from "@ordo-pink/binutil"
-import { getc } from "@ordo-pink/getc"
+import { readdir0 } from "@ordo-pink/fs"
 
-const { ORDO_STATIC_HOST, ORDO_ID_HOST, ORDO_WEB_HOST, ORDO_DT_HOST, ORDO_WORKSPACE_HOST } = getc([
-	"ORDO_STATIC_HOST",
-	"ORDO_ID_HOST",
-	"ORDO_WEB_HOST",
-	"ORDO_DT_HOST",
-	"ORDO_WORKSPACE_HOST",
-])
-
-void run_command("npm run build", {
-	cwd: "./srv/my",
-	stdin: "inherit",
-	stderr: "inherit",
-	env: {
-		...process.env,
-		VITE_ORDO_STATIC_HOST: ORDO_STATIC_HOST,
-		VITE_ORDO_ID_HOST: ORDO_ID_HOST,
-		VITE_ORDO_WEBSITE_HOST: ORDO_WEB_HOST,
-		VITE_ORDO_DT_HOST: ORDO_DT_HOST,
-		VITE_ORDO_WORKSPACE_HOST: ORDO_WORKSPACE_HOST,
-		NODE_ENV: "production",
-	},
-}).orElse(die())
+void run_command("rm -rf ./var/out/my")
+	.pipe(ops0.chain(() => run_command("npm run build", { cwd: "./srv/my", env: { ...process.env, NODE_ENV: "production" } })))
+	.pipe(ops0.chain(() => readdir0("./srv/my/static", { withFileTypes: true })))
+	.pipe(ops0.chain(files => Oath.Merge(files.map(f => Bun.write(`./var/out/my/${f.name}`, Bun.file(`./srv/my/static/${f.name}`))))))
+	.invoke(invokers0.or_else(die()))

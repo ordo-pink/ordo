@@ -34,6 +34,7 @@ export default defineConfig({
 		outDir: "../../var/out/my",
 		cssMinify: true,
 		minify: true,
+		assetsDir: "./static",
 	},
 	server: {
 		port: Number(process.env.ORDO_WORKSPACE_PORT),

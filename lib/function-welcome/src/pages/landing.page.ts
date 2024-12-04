@@ -32,7 +32,7 @@ let is_cookie_modal_shown = false
 
 // TODO Translations
 export default Maoka.create("main", ({ use, on_unmount }) => {
-	const commands = use(MaokaOrdo.Jabs.Commands)
+	const commands = use(MaokaOrdo.Jabs.Commands.get)
 	const { t } = use(MaokaOrdo.Jabs.Translations)
 	const metadata_query = use(MaokaOrdo.Jabs.MetadataQuery)
 

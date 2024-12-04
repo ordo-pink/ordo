@@ -35,10 +35,7 @@ import "./command-palette.css"
 // TODO Handle on_new_item
 // TODO Handle pinned_items
 // TODO Handle alternative layout characters
-export const CommandPalette = (
-	cp$: Observable<Ordo.CommandPalette.Instance>,
-	ctx: Ordo.CreateFunction.Params,
-) =>
+export const CommandPalette = (cp$: Observable<Ordo.CommandPalette.Instance>, ctx: Ordo.CreateFunction.Params) =>
 	Maoka.create("div", ({ use, on_unmount, after_mount }) => {
 		use(MaokaOrdo.Context.provide(ctx))
 		use(MaokaJabs.set_class("command-palette"))
@@ -49,7 +46,7 @@ export const CommandPalette = (
 		let current_item_index = 0
 		let current_item_location = CurrentItemLocation.SUGGESTED
 
-		const { emit } = use(MaokaOrdo.Jabs.Commands)
+		const { emit } = use(MaokaOrdo.Jabs.Commands.get)
 		const { t } = use(MaokaOrdo.Jabs.Translations)
 
 		const t_placeholder = t("t.common.components.command_palette.search_placeholder")
@@ -92,10 +89,7 @@ export const CommandPalette = (
 		const get_state = use(
 			MaokaOrdo.Jabs.from$(cp$, { items: [] }, value => {
 				current_item_index = 0
-				visible_items =
-					value.max_items && value.max_items > 0
-						? value.items.slice(0, value.max_items)
-						: value.items
+				visible_items = value.max_items && value.max_items > 0 ? value.items.slice(0, value.max_items) : value.items
 
 				if (VisibleItems.refresh) void VisibleItems.refresh()
 
@@ -154,8 +148,7 @@ export const CommandPalette = (
 		}
 
 		const handle_arrow_up = () => {
-			const source =
-				current_item_location === CurrentItemLocation.PINNED ? pinned_items : visible_items
+			const source = current_item_location === CurrentItemLocation.PINNED ? pinned_items : visible_items
 
 			if (!source.length) return
 
@@ -165,8 +158,7 @@ export const CommandPalette = (
 		}
 
 		const handle_arrow_down = () => {
-			const source =
-				current_item_location === CurrentItemLocation.PINNED ? pinned_items : visible_items
+			const source = current_item_location === CurrentItemLocation.PINNED ? pinned_items : visible_items
 
 			if (!source.length) return
 
@@ -183,9 +175,7 @@ export const CommandPalette = (
 			if (!state.is_multiple) return
 
 			current_item_location =
-				current_item_location === CurrentItemLocation.SUGGESTED
-					? CurrentItemLocation.PINNED
-					: CurrentItemLocation.SUGGESTED
+				current_item_location === CurrentItemLocation.SUGGESTED ? CurrentItemLocation.PINNED : CurrentItemLocation.SUGGESTED
 
 			current_item_index = 0
 

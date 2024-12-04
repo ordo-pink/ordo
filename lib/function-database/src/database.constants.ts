@@ -23,3 +23,6 @@ export enum SortingDirection {
 }
 
 export const DATABASE_CONTEXT_MENU_PAYLOAD = "ctx.database.payload"
+
+export const is_database_context_menu_payload = ({ payload }: Ordo.ContextMenu.Params) =>
+	payload === DATABASE_CONTEXT_MENU_PAYLOAD

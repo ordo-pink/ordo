@@ -33,7 +33,7 @@ export const FileEditorSidebar = (ctx: Ordo.CreateFunction.Params) =>
 		// TODO Detect
 		use(MaokaJabs.set_class("flex flex-col p-2 h-full overflow-y-auto", "file_editor_sidebar"))
 
-		const commands = use(MaokaOrdo.Jabs.Commands)
+		const commands = use(MaokaOrdo.Jabs.Commands.get)
 		const metadata_query = use(MaokaOrdo.Jabs.MetadataQuery)
 
 		const subscription = metadata_query.$.subscribe(() => {

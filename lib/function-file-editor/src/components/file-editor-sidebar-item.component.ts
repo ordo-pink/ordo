@@ -27,16 +27,13 @@ import { Switch } from "@ordo-pink/switch"
 import { FileEditorSidebarDirectory } from "./file-editor-sidebar-directory.component"
 import { FileEditorSidebarFile } from "./file-editor-sidebar-file.component"
 
-export const FileEditorSidebarItem = (
-	initial_metadata: Ordo.Metadata.Instance,
-	depth = 0,
-): TMaokaComponent =>
+export const FileEditorSidebarItem = (initial_metadata: Ordo.Metadata.Instance, depth = 0): TMaokaComponent =>
 	Maoka.create("div", ({ use, refresh, on_unmount }) => {
 		let metadata = initial_metadata
 
 		use(MaokaJabs.set_class("cursor-pointer"))
 
-		const commands = use(MaokaOrdo.Jabs.Commands)
+		const commands = use(MaokaOrdo.Jabs.Commands.get)
 		const metadata_query = use(MaokaOrdo.Jabs.MetadataQuery)
 
 		const subscription = metadata_query.$.subscribe(() => {

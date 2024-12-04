@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: Copyright 2024, 谢尔盖||↓ and the Ordo.pink contributors
 // SPDX-License-Identifier: Unlicense
 
-import { Maoka, TMaokaChildren } from "@ordo-pink/maoka"
+import { Maoka, TMaokaChildren, TMaokaJab } from "@ordo-pink/maoka"
 import { Result } from "@ordo-pink/result"
 import { keys_of } from "@ordo-pink/tau"
 
@@ -29,7 +29,19 @@ import { get_ancestors, get_by_fsid, get_children, get_descendents } from "./src
 
 export const MaokaOrdo = {
 	Jabs: {
-		Commands: get_commands,
+		Commands: {
+			get: get_commands,
+			add:
+				<$TKey extends Ordo.Command.Name>(
+					name: $TKey,
+					handler: Ordo.Command.TCommandHandler<Ordo.Command.Record[$TKey]>,
+				): TMaokaJab =>
+				({ use, on_unmount }) => {
+					const commands = use(MaokaOrdo.Jabs.Commands.get)
+					commands.on(name, handler)
+					on_unmount(() => commands.off(name, handler))
+				},
+		},
 		CurrentRoute$: get_current_route$,
 		Fetch: get_fetch,
 		Hosts: get_hosts,
@@ -44,6 +56,15 @@ export const MaokaOrdo = {
 		CurrentFileAssociation$: get_current_file_association$,
 		FileAssociations$: get_file_associations$,
 		RouteParams: get_route_params,
+		ContextMenu: {
+			add:
+				(item: Ordo.ContextMenu.Item): TMaokaJab =>
+				({ use, on_unmount }) => {
+					const commands = use(MaokaOrdo.Jabs.Commands.get)
+					commands.emit("cmd.application.context_menu.add", item)
+					on_unmount(() => commands.emit("cmd.application.context_menu.remove", item.command))
+				},
+		},
 		from$,
 		computed,
 		Metadata: {
@@ -76,5 +97,7 @@ export const MaokaOrdo = {
 				use(MaokaOrdo.Context.provide(ctx))
 				return children
 			}),
+		WithCtxCurry: (ctx: Ordo.CreateFunction.Params) => (children: () => TMaokaChildren) =>
+			MaokaOrdo.Components.WithCtx(ctx, children),
 	},
 }

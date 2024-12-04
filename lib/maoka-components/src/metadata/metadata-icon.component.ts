@@ -30,7 +30,7 @@ export const MetadataIcon = ({ metadata, custom_class = "", show_emoji_picker = 
 	Maoka.create("div", ({ use, refresh, on_unmount }) => {
 		let emoji = metadata.get_property("emoji_icon")
 
-		const commands = use(MaokaOrdo.Jabs.Commands)
+		const commands = use(MaokaOrdo.Jabs.Commands.get)
 		const metadata_query = use(MaokaOrdo.Jabs.MetadataQuery)
 
 		const subscription = metadata_query.$.subscribe(() => {
@@ -118,9 +118,7 @@ const Icon = ({ metadata, custom_class, has_children }: P2) =>
 		use(MaokaOrdo.Jabs.subscribe($, handle_file_associations_update))
 
 		return async () => {
-			const fa = file_associations.find(association =>
-				association.types.some(type => metadata_content_type === type.name),
-			)
+			const fa = file_associations.find(association => association.types.some(type => metadata_content_type === type.name))
 
 			if (fa && fa.render_icon) {
 				element.innerHTML = ""

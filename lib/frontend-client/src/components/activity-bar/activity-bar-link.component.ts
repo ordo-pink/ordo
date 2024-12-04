@@ -28,14 +28,7 @@ type P = Pick<Ordo.Activity.Instance, "default_route"> &
 		current_activity_name?: Ordo.Activity.Instance["name"]
 		on_click?: (event: MouseEvent) => void
 	}
-export const ActivityBarLink = ({
-	render_icon,
-	default_route,
-	routes,
-	name,
-	current_activity_name,
-	on_click,
-}: P) =>
+export const ActivityBarLink = ({ render_icon, default_route, routes, name, current_activity_name, on_click }: P) =>
 	Maoka.create("a", ({ use }) => {
 		const activity_link = default_route ?? routes[0]
 
@@ -43,7 +36,7 @@ export const ActivityBarLink = ({
 		use(MaokaJabs.set_attribute("href", activity_link))
 		use(MaokaJabs.listen("onclick", event => handle_click(event)))
 
-		const { emit } = use(MaokaOrdo.Jabs.Commands)
+		const { emit } = use(MaokaOrdo.Jabs.Commands.get)
 		const handle_click = on_click
 			? on_click
 			: (event: MouseEvent) => {

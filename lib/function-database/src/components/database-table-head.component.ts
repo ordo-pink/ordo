@@ -17,25 +17,27 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Maoka, TMaokaElement } from "@ordo-pink/maoka"
+import { Maoka, type TMaokaElement } from "@ordo-pink/maoka"
 import { BsCaretDown } from "@ordo-pink/frontend-icons"
 import { MaokaJabs } from "@ordo-pink/maoka-jabs"
 import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
 
 import { SortingDirection } from "../database.constants"
-import { type TDatabaseState } from "../database.types"
+import { database_context } from "../database.context"
 
-export const DatabaseHead = (
-	keys: Ordo.I18N.TranslationKey[],
-	state: TDatabaseState,
-	on_state_change: (new_state: TDatabaseState) => void,
-) => thead(() => tr(() => keys.map(key => th(key, state, on_state_change))))
+export const DatabaseTableHead = (keys: Ordo.I18N.TranslationKey[]) =>
+	TableHead(() => TableHeadRow(() => keys.map(key => TableHeadCell(key))))
 
-const thead = Maoka.styled("thead")
-const tr = Maoka.styled("tr", { class: "database_table-head_row" })
+// --- Internal ---
 
-const th = (key: Ordo.I18N.TranslationKey, state: TDatabaseState, on_state_change: (new_state: TDatabaseState) => void) =>
+const TableHead = Maoka.styled("thead")
+const TableHeadRow = Maoka.styled("tr", { class: "database_table-head_row" })
+
+// TODO: Add icons
+const TableHeadCell = (key: Ordo.I18N.TranslationKey) =>
 	Maoka.create("th", ({ use }) => {
+		const { get_db_state, on_db_state_change } = use(database_context.consume)
+
 		use(MaokaJabs.add_class("database_table-head_cell"))
 		use(MaokaJabs.listen("onclick", event => handle_click(event)))
 
@@ -43,6 +45,8 @@ const th = (key: Ordo.I18N.TranslationKey, state: TDatabaseState, on_state_chang
 
 		const handle_click = (event: MouseEvent) => {
 			event.preventDefault()
+
+			const state = get_db_state()
 
 			if (!state.sorting) state.sorting = {}
 
@@ -53,20 +57,24 @@ const th = (key: Ordo.I18N.TranslationKey, state: TDatabaseState, on_state_chang
 						? undefined
 						: SortingDirection.ASC
 
-			on_state_change(state)
+			on_db_state_change(state)
 		}
 
 		const t_key = t(key)
 
 		return () =>
-			CellContent(() => [
-				t_key,
-				state.sorting?.[key] === SortingDirection.ASC
-					? (BsCaretDown() as TMaokaElement)
-					: state.sorting?.[key] === SortingDirection.DESC
-						? (BsCaretDown("rotate-180") as TMaokaElement)
-						: void 0,
-			])
+			DatabaseTableCellContent(() => {
+				const state = get_db_state()
+
+				return [
+					t_key,
+					state.sorting?.[key] === SortingDirection.ASC
+						? (BsCaretDown() as TMaokaElement)
+						: state.sorting?.[key] === SortingDirection.DESC
+							? (BsCaretDown("rotate-180") as TMaokaElement)
+							: void 0,
+				]
+			})
 	})
 
-const CellContent = Maoka.styled("div", { class: "flex items-center justify-between" })
+const DatabaseTableCellContent = Maoka.styled("div", { class: "flex items-center justify-between" })

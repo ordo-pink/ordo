@@ -29,7 +29,7 @@ import { TOption } from "@ordo-pink/option"
 export const FileEditorSidebarFile = (metadata: Ordo.Metadata.Instance, depth = 0) =>
 	Maoka.create("div", ({ use, refresh }) => {
 		const fsid = metadata.get_fsid()
-		const { emit } = use(MaokaOrdo.Jabs.Commands)
+		const { emit } = use(MaokaOrdo.Jabs.Commands.get)
 
 		const file_editor_file_class = MaokaJabs.set_class(
 			"flex space-x-2 items-center rounded-sm",
@@ -72,20 +72,9 @@ export const FileEditorSidebarFile = (metadata: Ordo.Metadata.Instance, depth = 
 					),
 				)
 			else
-				use(
-					MaokaJabs.remove_class(
-						"bg-gradient-to-tr",
-						"to-rose-300",
-						"to-rose-300",
-						"dark:from-pink-900",
-						"dark:to-rose-900",
-					),
-				)
+				use(MaokaJabs.remove_class("bg-gradient-to-tr", "to-rose-300", "to-rose-300", "dark:from-pink-900", "dark:to-rose-900"))
 
-			return [
-				MetadataIcon({ metadata, show_emoji_picker: false }),
-				FileEditorFileName(metadata.get_name()),
-			]
+			return [MetadataIcon({ metadata, show_emoji_picker: false }), FileEditorFileName(metadata.get_name())]
 		}
 	})
 
@@ -95,7 +84,4 @@ const FileEditorFileName = (name: string) =>
 		return () => name
 	})
 
-const file_editor_file_text_classes = [
-	"text-ellipsis w-full line-clamp-1 cursor-pointer",
-	"file_editor_file_text",
-]
+const file_editor_file_text_classes = ["text-ellipsis w-full line-clamp-1 cursor-pointer", "file_editor_file_text"]

@@ -25,7 +25,7 @@ import { Switch } from "@ordo-pink/switch"
 export const TitleSetter = (metadata: Ordo.Metadata.Instance | null) =>
 	Maoka.create("div", ({ use }) => {
 		const metadata_query = use(MaokaOrdo.Jabs.MetadataQuery)
-		const { emit } = use(MaokaOrdo.Jabs.Commands)
+		const { emit } = use(MaokaOrdo.Jabs.Commands.get)
 
 		return () =>
 			get_metadata_with_ancestors(metadata, metadata_query)
@@ -36,10 +36,7 @@ export const TitleSetter = (metadata: Ordo.Metadata.Instance | null) =>
 				})
 	})
 
-const get_metadata_with_ancestors = (
-	metadata: Ordo.Metadata.Instance | null,
-	metadata_query: Ordo.Metadata.Query,
-) =>
+const get_metadata_with_ancestors = (metadata: Ordo.Metadata.Instance | null, metadata_query: Ordo.Metadata.Query) =>
 	R.FromNullable(metadata)
 		.pipe(R.ops.chain(metadata => metadata_query.get_ancestors(metadata.get_fsid())))
 		.pipe(R.ops.map(ancestors => ({ metadata: metadata!, ancestors })))

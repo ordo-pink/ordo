@@ -27,15 +27,12 @@ import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
 import "./context-menu.css"
 import { ContextMenuItemType } from "@ordo-pink/core"
 
-export const ContextMenu = (
-	ctx: Ordo.CreateFunction.Params,
-	$: Observable<Ordo.ContextMenu.Instance | null>,
-) =>
+export const ContextMenu = (ctx: Ordo.CreateFunction.Params, $: Observable<Ordo.ContextMenu.Instance | null>) =>
 	Maoka.create("div", ({ use, on_unmount }) => {
 		use(MaokaOrdo.Context.provide(ctx))
 		use(MaokaJabs.set_class("context-menu"))
 
-		const { emit } = use(MaokaOrdo.Jabs.Commands)
+		const { emit } = use(MaokaOrdo.Jabs.Commands.get)
 		const get_state = use(MaokaOrdo.Jabs.from$($, null, state => state))
 
 		const handle_click_outside = () => emit("cmd.application.context_menu.hide")
@@ -93,7 +90,7 @@ const HR = Maoka.styled("hr", { class: "context-menu_divider" })(() => void 0)
 
 const ContextMenuItem = (item: Ordo.ContextMenu.Item, payload: any, event: MouseEvent) =>
 	Maoka.create("div", ({ use }) => {
-		const { emit } = use(MaokaOrdo.Jabs.Commands)
+		const { emit } = use(MaokaOrdo.Jabs.Commands.get)
 		const { t } = use(MaokaOrdo.Jabs.Translations)
 
 		return () =>
@@ -101,9 +98,7 @@ const ContextMenuItem = (item: Ordo.ContextMenu.Item, payload: any, event: Mouse
 				title: t(item.readable_name),
 				is_current: "hover",
 				on_click: () => {
-					const current_payload = item.payload_creator
-						? item.payload_creator({ event, payload })
-						: payload
+					const current_payload = item.payload_creator ? item.payload_creator({ event, payload }) : payload
 
 					emit(item.command, current_payload)
 				},

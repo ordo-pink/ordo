@@ -27,7 +27,7 @@ export const FileMetadata = (metadata: Ordo.Metadata.Instance) =>
 		const fsid = metadata.get_fsid()
 		const name = metadata.get_name()
 
-		const commands = use(MaokaOrdo.Jabs.Commands)
+		const commands = use(MaokaOrdo.Jabs.Commands.get)
 
 		use(MaokaJabs.add_class("p-2"))
 
@@ -51,12 +51,13 @@ export const FileMetadata = (metadata: Ordo.Metadata.Instance) =>
 
 const LabelsSection = (fsid: Ordo.Metadata.FSID) =>
 	Maoka.create("div", ({ use }) => {
-		const label_section = "flex flex-wrap gap-1 cursor-pointer rounded-sm hover:bg-neutral-200 hover:dark:bg-neutral-800 py-1 min-h-7"
+		const label_section =
+			"flex flex-wrap gap-1 cursor-pointer rounded-sm hover:bg-neutral-200 hover:dark:bg-neutral-800 py-1 min-h-7"
 
 		use(MaokaJabs.set_class(label_section))
 		use(MaokaJabs.listen("onclick", () => handle_click()))
 
-		const commands = use(MaokaOrdo.Jabs.Commands)
+		const commands = use(MaokaOrdo.Jabs.Commands.get)
 		const get_metadata = use(MaokaOrdo.Jabs.Metadata.get_by_fsid(fsid))
 
 		const handle_click = () => commands.emit("cmd.metadata.show_edit_labels_palette", fsid)

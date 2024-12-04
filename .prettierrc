@@ -2,12 +2,13 @@
 	"semi": false,
 	"useTabs": true,
 	"arrowParens": "avoid",
-	"printWidth": 135,
+	"printWidth": 128,
 	"endOfLine": "lf",
 	"singleAttributePerLine": false,
 	"singleQuote": false,
 	"htmlWhitespaceSensitivity": "strict",
 	"proseWrap": "always",
 	"trailingComma": "all",
-	"plugins": ["prettier-plugin-tailwindcss"]
+	"plugins": ["prettier-plugin-tailwindcss"],
+	"bracketSpacing": true
 }

@@ -63,13 +63,9 @@ export const FileEditorSidebarDirectory = (metadata: Ordo.Metadata.Instance, dep
 					// TODO Move to Metadata + add sorting from File Explorer (by name with numbers)
 					R.ops.map(is =>
 						is.sort((a, b) => {
-							const a_dir = metadata_query
-								.has_children(a.get_fsid())
-								.cata(R.catas.or_else(() => false))
+							const a_dir = metadata_query.has_children(a.get_fsid()).cata(R.catas.or_else(() => false))
 
-							const b_dir = metadata_query
-								.has_children(b.get_fsid())
-								.cata(R.catas.or_else(() => false))
+							const b_dir = metadata_query.has_children(b.get_fsid()).cata(R.catas.or_else(() => false))
 
 							if (a_dir && !b_dir) return -1
 							if (b_dir && !a_dir) return 1
@@ -89,11 +85,7 @@ export const FileEditorSidebarDirectory = (metadata: Ordo.Metadata.Instance, dep
 
 // --- Internal ---
 
-const FileEditorDirectoryChildren = (
-	metadata: Ordo.Metadata.Instance,
-	children: Ordo.Metadata.Instance[],
-	depth: number,
-) =>
+const FileEditorDirectoryChildren = (metadata: Ordo.Metadata.Instance, children: Ordo.Metadata.Instance[], depth: number) =>
 	R.If(expanded_state[metadata.get_fsid()])
 		.pipe(R.ops.map(() => depth + 1))
 		.pipe(R.ops.map(depth => () => children.map(i => FileEditorSidebarItem(i, depth))))
@@ -129,7 +121,7 @@ const FileEditorDirectoryName = (
 
 		use(MaokaOrdo.Jabs.subscribe($, handle_current_route_change))
 
-		const commands = use(MaokaOrdo.Jabs.Commands)
+		const commands = use(MaokaOrdo.Jabs.Commands.get)
 
 		use(MaokaJabs.listen("onclick", () => commands.emit("cmd.file_editor.open_file", fsid)))
 		use(MaokaJabs.set_style({ paddingLeft: `${depth + 0.5}rem`, paddingRight: "0.5rem" }))

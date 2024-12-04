@@ -41,17 +41,13 @@ export const Inline = (
 			const fsid = metadata.get_fsid()
 			const content_type = metadata.get_type()
 
-			const commands = use(MaokaOrdo.Jabs.Commands)
-			const { caret_position$, state$, add_new_line, set_caret_position, remove_block } =
-				use(editor_context_jab)
+			const commands = use(MaokaOrdo.Jabs.Commands.get)
+			const { caret_position$, state$, add_new_line, set_caret_position, remove_block } = use(editor_context_jab)
 
 			after_mount(() => {
 				const current_position = caret_position$.getValue()
 
-				if (
-					current_position.block_index === block_index &&
-					current_position.inline_index === inline_index
-				) {
+				if (current_position.block_index === block_index && current_position.inline_index === inline_index) {
 					const el = element as unknown as HTMLInputElement
 					// set_position({ block_index, inline_index, anchor_offset: 0, focus_offset: 0 })
 					// el.focus()
@@ -122,8 +118,7 @@ export const Inline = (
 										state[block_index].children[inline_index - 1].value += node.value
 									} else {
 										const prev_block_last_inline_index = state[block_index - 1].children.length - 1
-										state[block_index - 1].children[prev_block_last_inline_index].value +=
-											node.value
+										state[block_index - 1].children[prev_block_last_inline_index].value += node.value
 
 										refocus = false
 									}

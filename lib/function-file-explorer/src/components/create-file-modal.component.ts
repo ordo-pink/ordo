@@ -31,7 +31,7 @@ export const CreateFileModal = (ctx: Ordo.CreateFunction.Params, parent: Ordo.Me
 		let type = "text/ordo"
 
 		const { t } = use(MaokaOrdo.Jabs.Translations)
-		const { emit } = use(MaokaOrdo.Jabs.Commands)
+		const { emit } = use(MaokaOrdo.Jabs.Commands.get)
 
 		const t_title = t("t.file_explorer.modals.create_file.title")
 		const state = { name: "" }

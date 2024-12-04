@@ -26,7 +26,7 @@ export const ModalCloseButton = (modal: Ordo.Modal.Instance | null) => {
 	if (!modal || !modal.show_close_button) return
 
 	return Maoka.create("button", ({ use }) => {
-		const commands = use(MaokaOrdo.Jabs.Commands)
+		const commands = use(MaokaOrdo.Jabs.Commands.get)
 
 		use(MaokaJabs.set_class("modal_close-button"))
 		use(MaokaJabs.listen("onclick", event => handle_click(event)))

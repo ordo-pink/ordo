@@ -28,7 +28,7 @@ import "./authenticate.component.css"
 export default Maoka.create("div", ({ use }) => {
 	use(MaokaJabs.add_class("auth"))
 
-	const commands = use(MaokaOrdo.Jabs.Commands)
+	const commands = use(MaokaOrdo.Jabs.Commands.get)
 
 	commands.emit("cmd.application.set_title", "t.auth.pages.sign_in.label")
 
@@ -76,12 +76,7 @@ const AuthentiateForm = Maoka.create("form", ({ use }) => {
 			validation_error_message: t_email_validation_error,
 		}
 
-		return [
-			Title,
-			StyledHint(() => t_hint),
-			EmailFieldSet(() => Input.Email(input_params)),
-			EnterBtn,
-		]
+		return [Title, StyledHint(() => t_hint), EmailFieldSet(() => Input.Email(input_params)), EnterBtn]
 	}
 })
 

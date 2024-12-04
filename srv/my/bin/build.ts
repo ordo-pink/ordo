@@ -17,13 +17,47 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Oath, invokers0, ops0 } from "@ordo-pink/oath"
-import { die, run_command } from "@ordo-pink/binutil"
-import { readdir0 } from "@ordo-pink/fs"
+import { promises } from "node:fs"
 
-void run_command("rm -rf ./var/out/my")
-	.pipe(ops0.chain(() => run_command("npm run build", { cwd: "./srv/my", env: { ...process.env, NODE_ENV: "production" } })))
-	.pipe(ops0.chain(() => readdir0("./srv/my/static", { withFileTypes: true })))
-	.pipe(ops0.chain(files => Oath.Merge(files.map(f => Bun.write(`./var/out/my/${f.name}`, Bun.file(`./srv/my/static/${f.name}`))))))
-	.pipe(ops0.chain(() => Oath.FromPromise(() => Bun.write("./var/out/my/_redirects", "/* /index.html 200"))))
-	.invoke(invokers0.or_else(die()))
+import { Oath, invokers0 } from "@ordo-pink/oath"
+import { die, run_command } from "@ordo-pink/binutil"
+import { map } from "@ordo-pink/tau"
+
+const main = () =>
+	run_command(clean_up_cmd)
+		.and(bundle_client_code)
+		.and(copy_static_files)
+		.and(setup_netlify_redirects)
+		.invoke(invokers0.or_else(die()))
+
+// --- Internal ---
+
+const src_dir = "./srv/my"
+const static_dir = `${src_dir}/static`
+const target_dir = "./var/out/my"
+
+const clean_up_cmd = `rm -rf ${target_dir}`
+
+const build_cmd = "npm run build"
+const build_cmd_options = { cwd: src_dir, env: { ...process.env, NODE_ENV: "production" } }
+
+const redirects_path = `${target_dir}/_redirects`
+const redirects_content = "/* /index.html 200"
+
+const bundle_client_code = () => run_command(build_cmd, build_cmd_options)
+
+const copy_static_files = () =>
+	Oath.FromPromise(() => promises.readdir(static_dir))
+		.and(map(files_to_paths))
+		.and(map(copy_file))
+		.and(Oath.Merge)
+
+const setup_netlify_redirects = () => Oath.FromPromise(() => Bun.write(redirects_path, redirects_content))
+
+const copy_file = ([source, target]: [string, string]): Promise<number> => Bun.write(target, Bun.file(source))
+
+const files_to_paths = (file: string): [string, string] => [`${static_dir}/${file}`, `${target_dir}/${file}`]
+
+// --- Invoke ---
+
+void main()

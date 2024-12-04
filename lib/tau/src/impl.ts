@@ -172,3 +172,8 @@ export const title_case = (str: string) =>
 		.join(" ")
 
 export const never = () => null as never
+
+export const map =
+	<T, U>(f: (item: T, index: number, collection: T[]) => U) =>
+	(arr: T[]) =>
+		arr.map(f)

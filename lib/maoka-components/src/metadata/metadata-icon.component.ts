@@ -28,6 +28,8 @@ import { emojis } from "@ordo-pink/emojis"
 type P = { metadata: Ordo.Metadata.Instance; custom_class?: string; show_emoji_picker?: boolean }
 export const MetadataIcon = ({ metadata, custom_class = "", show_emoji_picker = true }: P) =>
 	Maoka.create("div", ({ use, refresh, on_unmount }) => {
+		const icon_class = get_icon_class(custom_class)
+
 		let emoji = metadata.get_property("emoji_icon")
 
 		const commands = use(MaokaOrdo.Jabs.Commands.get)
@@ -95,8 +97,8 @@ export const MetadataIcon = ({ metadata, custom_class = "", show_emoji_picker = 
 				})
 
 			return metadata_query.has_children(metadata.get_fsid()).cata({
-				Err: () => Icon({ metadata, custom_class, has_children: false }),
-				Ok: has_children => Icon({ metadata, custom_class, has_children }),
+				Err: () => Icon({ metadata, custom_class: icon_class, has_children: false }),
+				Ok: has_children => Icon({ metadata, custom_class: icon_class, has_children }),
 			})
 		}
 	})
@@ -106,7 +108,6 @@ const Icon = ({ metadata, custom_class, has_children }: P2) =>
 	Maoka.create("div", ({ use, refresh, element }) => {
 		let file_associations: Ordo.FileAssociation.Instance[] = []
 
-		const icon_class = `ml-1 shrink-0 ${custom_class}`
 		const metadata_content_type = metadata.get_type()
 
 		const $ = use(MaokaOrdo.Jabs.FileAssociations$)
@@ -122,13 +123,18 @@ const Icon = ({ metadata, custom_class, has_children }: P2) =>
 
 			if (fa && fa.render_icon) {
 				element.innerHTML = ""
+				use(MaokaJabs.set_class(custom_class!))
 				await fa.render_icon(element as HTMLSpanElement)
 				return
 			}
 
 			return Switch.OfTrue()
-				.case(has_children, () => BsFolderOpen(icon_class) as TMaokaElement)
-				.case(metadata.get_size() === 0, () => BsFileEarmark(icon_class) as TMaokaElement)
-				.default(() => BsFileEarmarkBinary(icon_class) as TMaokaElement)
+				.case(has_children, () => BsFolderOpen(custom_class) as TMaokaElement)
+				.case(metadata.get_size() === 0, () => BsFileEarmark(custom_class) as TMaokaElement)
+				.default(() => BsFileEarmarkBinary(custom_class) as TMaokaElement)
 		}
 	})
+
+const ICON_CLASS = "px-[0.2rem] shrink-0"
+
+const get_icon_class = (custom_class?: string) => (custom_class ? `${ICON_CLASS} ${custom_class}` : ICON_CLASS)

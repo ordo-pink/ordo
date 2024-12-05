@@ -59,5 +59,5 @@ export const RESERVED_JAVASCRIPT_KEYWORDS = [
 	"with",
 ] as const
 
-export const isReservedJavaScriptKeyword = (x: unknown): x is T.ReservedJavaScriptKeyword =>
+export const is_reserved_javascript_keyword = (x: unknown): x is T.ReservedJavaScriptKeyword =>
 	typeof x === "string" && RESERVED_JAVASCRIPT_KEYWORDS.includes(x as T.ReservedJavaScriptKeyword)

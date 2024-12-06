@@ -60,34 +60,30 @@ export const die =
 
 export const run_bun_command: TRunCommandFn = (command, options) => run_command(`opt/bun ${command}`, options)
 
-export const create_progress = () => {
-	let currentLine = ""
+export const create_progress = (message = "") => ({
+	start: (msg: string) => {
+		message += msg
+		process.stdout.write(`${chalk.yellow("◌")} ${message}`)
+	},
+	inc: (msg = ".") => {
+		message += msg
+		process.stdout.write(msg)
+	},
+	finish: () => {
+		process.stdout.clearLine(0)
+		process.stdout.cursorTo(0)
+		process.stdout.write(`${chalk.green("✔")} ${message}\n`)
+		message = ""
+	},
+	break: (...details: any[]) => {
+		process.stdout.clearLine(0)
+		process.stdout.cursorTo(0)
+		process.stdout.write(`${chalk.red("✘")} ${message}\n`)
+		message = ""
 
-	return {
-		start: (msg: string) => {
-			currentLine += msg
-			process.stdout.write(`${chalk.yellow("◌")} ${currentLine}`)
-		},
-		inc: () => {
-			currentLine += "."
-			process.stdout.write(".")
-		},
-		finish: () => {
-			process.stdout.clearLine(0)
-			process.stdout.cursorTo(0)
-			process.stdout.write(`${chalk.green("✔")} ${currentLine}\n`)
-			currentLine = ""
-		},
-		break: (error: unknown) => {
-			process.stdout.clearLine(0)
-			process.stdout.cursorTo(0)
-			process.stdout.write(`${chalk.red("✘")} ${currentLine}\n`)
-			currentLine = ""
-
-			console.error((error as Error).message)
-		},
-	}
-}
+		console.error(...details)
+	},
+})
 
 const _dirent_is_file = (dirent: Dirent): boolean => dirent.isFile()
 export const dirents_to_files: (dirents: Dirent[]) => Dirent[] = filter(_dirent_is_file)
@@ -110,33 +106,35 @@ export const create_repository_file = (path: string, content: string) =>
 		.pipe(ops0.chain(() => file_exists0(path)))
 		.pipe(ops0.chain(exists => (exists ? Oath.Empty() : write_file0(path, content, "utf-8"))))
 
-export const COPYRIGHT_OWNERS = "谢尔盖||↓ and the Ordo.pink contributors"
+export const COPYRIGHT_OWNERS = "谢尔盖 ||↓ and the Ordo.pink contributors"
 
 export const get_spdx_record = (license: TLicenseType) => {
 	const year = get_current_year()
 
-	return `// SPDX-FileCopyrightText: Copyright ${year}, ${COPYRIGHT_OWNERS}
-// SPDX-License-Identifier: ${license}
+	return `/*
+ * SPDX-FileCopyrightText: Copyright ${year}, ${COPYRIGHT_OWNERS}
+ * SPDX-License-Identifier: ${license}
+ * 
 ${
 	license === "AGPL-3.0-only"
-		? `
-// Ordo.pink is an all-in-one team workspace.
-// Copyright (C) ${year}  ${COPYRIGHT_OWNERS}
-
-// This program is free software: you can redistribute it and/or modify
-// it under the terms of the GNU Affero General Public License as published
-// by the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-
-// This program is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU Affero General Public License for more details.
-
-// You should have received a copy of the GNU Affero General Public License
-// along with this program.  If not, see <https://www.gnu.org/licenses/>.
+		? ` * Ordo.pink is an all-in-one team workspace.
+ * Copyright (C) ${year}  ${COPYRIGHT_OWNERS}
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published
+ * by the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
 `
-		: ""
+		: " */\n"
 }`
 }
 

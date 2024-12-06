@@ -1,21 +1,23 @@
-// SPDX-FileCopyrightText: Copyright 2024, 谢尔盖||↓ and the Ordo.pink contributors
-// SPDX-License-Identifier: AGPL-3.0-only
-
-// Ordo.pink is an all-in-one team workspace.
-// Copyright (C) 2024  谢尔盖||↓ and the Ordo.pink contributors
-
-// This program is free software: you can redistribute it and/or modify
-// it under the terms of the GNU Affero General Public License as published
-// by the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-
-// This program is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU Affero General Public License for more details.
-
-// You should have received a copy of the GNU Affero General Public License
-// along with this program.  If not, see <https://www.gnu.org/licenses/>.
+/*
+ * SPDX-FileCopyrightText: Copyright 2024, 谢尔盖 ||↓ and the Ordo.pink contributors
+ * SPDX-License-Identifier: AGPL-3.0-only
+ *
+ * Ordo.pink is an all-in-one team workspace.
+ * Copyright (C) 2024  谢尔盖 ||↓ and the Ordo.pink contributors
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published
+ * by the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
 
 import { O } from "@ordo-pink/option"
 
@@ -25,16 +27,7 @@ import { Switch } from "@ordo-pink/switch"
 import { MetadataValidations } from "./metadata-validations.impl"
 
 export const Metadata: Ordo.Metadata.Static = {
-	Of: ({
-		name,
-		parent,
-		author_id: user,
-		type = "text/ordo",
-		labels = [],
-		links = [],
-		props = {} as any,
-		size = 0,
-	}) =>
+	Of: ({ name, parent, author_id: user, type = "text/ordo", labels = [], links = [], props = {} as any, size = 0 }) =>
 		Metadata.FromDTO({
 			fsid: crypto.randomUUID(),
 			created_at: Date.now(),
@@ -60,14 +53,11 @@ export const Metadata: Ordo.Metadata.Static = {
 		get_labels: () => dto.labels,
 		get_links: () => [...dto.links],
 		get_parent: () => dto.parent,
-		get_property: key =>
-			O.FromNullable(dto.props).pipe(O.ops.chain(props => O.FromNullable(props[key]))),
+		get_property: key => O.FromNullable(dto.props).pipe(O.ops.chain(props => O.FromNullable(props[key]))),
 		get_readable_size: () => get_readable_size(dto.size),
 		get_label_index: label =>
 			dto.labels.findIndex(x =>
-				is_string(label)
-					? x === label
-					: !is_string(x) && x.color === label.color && x.name === label.name,
+				is_string(label) ? x === label : !is_string(x) && x.color === label.color && x.name === label.name,
 			),
 		get_size: () => dto.size,
 		has_label: label => Metadata.FromDTO(dto).get_label_index(label) >= 0,
@@ -88,13 +78,10 @@ export const Metadata: Ordo.Metadata.Static = {
 				.case(o_dto.updated_at !== dto.updated_at, F)
 				.default(
 					() =>
-						o_dto.created_at === dto.created_at &&
-						o_dto.created_by === dto.created_by &&
-						o_dto.updated_by === dto.updated_by,
+						o_dto.created_at === dto.created_at && o_dto.created_by === dto.created_by && o_dto.updated_by === dto.updated_by,
 				)
 		},
-		is_item_of: o =>
-			Metadata.Validations.is_metadata_dto(o) && Metadata.FromDTO(o).equals(Metadata.FromDTO(dto)),
+		is_item_of: o => Metadata.Validations.is_metadata_dto(o) && Metadata.FromDTO(o).equals(Metadata.FromDTO(dto)),
 	}),
 	Validations: MetadataValidations,
 }

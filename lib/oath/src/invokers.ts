@@ -1,14 +1,15 @@
-// SPDX-FileCopyrightText: Copyright 2024, 谢尔盖||↓ and the Ordo.pink contributors
-// SPDX-License-Identifier: Unlicense
+/*
+ * SPDX-FileCopyrightText: Copyright 2024, 谢尔盖 ||↓ and the Ordo.pink contributors
+ * SPDX-License-Identifier: Unlicense
+ *
+ */
 
 // deno-lint-ignore-file no-explicit-any
 
 import type { Oath } from "./oath.impl.ts"
 
 export const invokers0 = {
-	force_resolve: <$TResolve, $TReject>(
-		o: Oath<$TResolve, $TReject>,
-	): Promise<$TResolve | $TReject> =>
+	force_resolve: <$TResolve, $TReject>(o: Oath<$TResolve, $TReject>): Promise<$TResolve | $TReject> =>
 		new Promise<$TResolve | $TReject>((resolve, reject) => {
 			o.is_cancelled ? reject(o.cancellation_reason) : o.cata(resolve as any, resolve as any)
 		}),

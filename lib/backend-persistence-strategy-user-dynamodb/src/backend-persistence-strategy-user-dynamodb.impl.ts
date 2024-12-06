@@ -1,21 +1,23 @@
-// SPDX-FileCopyrightText: Copyright 2024, 谢尔盖||↓ and the Ordo.pink contributors
-// SPDX-License-Identifier: AGPL-3.0-only
-
-// Ordo.pink is an all-in-one team workspace.
-// Copyright (C) 2024  谢尔盖||↓ and the Ordo.pink contributors
-
-// This program is free software: you can redistribute it and/or modify
-// it under the terms of the GNU Affero General Public License as published
-// by the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-
-// This program is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU Affero General Public License for more details.
-
-// You should have received a copy of the GNU Affero General Public License
-// along with this program.  If not, see <https://www.gnu.org/licenses/>.
+/*
+ * SPDX-FileCopyrightText: Copyright 2024, 谢尔盖 ||↓ and the Ordo.pink contributors
+ * SPDX-License-Identifier: AGPL-3.0-only
+ *
+ * Ordo.pink is an all-in-one team workspace.
+ * Copyright (C) 2024  谢尔盖 ||↓ and the Ordo.pink contributors
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published
+ * by the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
 
 import DynamoDB from "aws-sdk/clients/dynamodb"
 
@@ -31,13 +33,7 @@ let dynamo_db: DynamoDB
 
 export const PersistenceStrategyUserDynamoDB: Types.TPersistenceStrategyDynamoDBStatic = {
 	of: (dynamo_db_config: Types.TDynamoDBConfig) => {
-		const {
-			access_key: accessKeyId,
-			secret_key: secretAccessKey,
-			region,
-			endpoint,
-			table_name: tableName,
-		} = dynamo_db_config
+		const { access_key: accessKeyId, secret_key: secretAccessKey, region, endpoint, table_name: tableName } = dynamo_db_config
 		const TableName = tableName
 		const credentials = { accessKeyId, secretAccessKey }
 
@@ -148,35 +144,20 @@ const eio = RRR.codes.eio(LOCATION)
 const eexist = RRR.codes.eexist(LOCATION)
 const enoent = RRR.codes.enoent(LOCATION)
 
-const _check_not_exists_by_handle0 = (
-	params: Types.TDynamoDBConfig,
-	handle: Ordo.User.Current.Instance["handle"],
-) =>
+const _check_not_exists_by_handle0 = (params: Types.TDynamoDBConfig, handle: Ordo.User.Current.Instance["handle"]) =>
 	PersistenceStrategyUserDynamoDB.of(params)
 		.exists_by_handle(handle)
-		.pipe(
-			Oath.ops.chain(exists =>
-				Oath.If(!exists, { F: () => eexist(`create -> handle: ${handle}`) }),
-			),
-		)
+		.pipe(Oath.ops.chain(exists => Oath.If(!exists, { F: () => eexist(`create -> handle: ${handle}`) })))
 
-const _check_not_exists_by_id0 = (
-	params: Types.TDynamoDBConfig,
-	id: Ordo.User.Current.Instance["id"],
-) =>
+const _check_not_exists_by_id0 = (params: Types.TDynamoDBConfig, id: Ordo.User.Current.Instance["id"]) =>
 	PersistenceStrategyUserDynamoDB.of(params)
 		.exists_by_id(id)
 		.pipe(Oath.ops.chain(exists => Oath.If(!exists, { F: () => eexist(`create -> id: ${id}`) })))
 
-const _check_not_exists_by_email0 = (
-	params: Types.TDynamoDBConfig,
-	email: Ordo.User.Current.Instance["email"],
-) =>
+const _check_not_exists_by_email0 = (params: Types.TDynamoDBConfig, email: Ordo.User.Current.Instance["email"]) =>
 	PersistenceStrategyUserDynamoDB.of(params)
 		.exists_by_email(email)
-		.pipe(
-			Oath.ops.chain(exists => Oath.If(!exists, { F: () => eexist(`create -> email: ${email}`) })),
-		)
+		.pipe(Oath.ops.chain(exists => Oath.If(!exists, { F: () => eexist(`create -> email: ${email}`) })))
 
 const _serialise: Types.TSerialiseFn = user => ({
 	email: { S: user.email },

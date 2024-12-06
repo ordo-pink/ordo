@@ -1,30 +1,30 @@
-// SPDX-FileCopyrightText: Copyright 2024, 谢尔盖||↓ and the Ordo.pink contributors
-// SPDX-License-Identifier: AGPL-3.0-only
-
-// Ordo.pink is an all-in-one team workspace.
-// Copyright (C) 2024  谢尔盖||↓ and the Ordo.pink contributors
-
-// This program is free software: you can redistribute it and/or modify
-// it under the terms of the GNU Affero General Public License as published
-// by the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-
-// This program is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU Affero General Public License for more details.
-
-// You should have received a copy of the GNU Affero General Public License
-// along with this program.  If not, see <https://www.gnu.org/licenses/>.
+/*
+ * SPDX-FileCopyrightText: Copyright 2024, 谢尔盖 ||↓ and the Ordo.pink contributors
+ * SPDX-License-Identifier: AGPL-3.0-only
+ *
+ * Ordo.pink is an all-in-one team workspace.
+ * Copyright (C) 2024  谢尔盖 ||↓ and the Ordo.pink contributors
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published
+ * by the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
 
 // SPDX-FileCopyrightText: Copyright 2024, 谢尔盖||↓ and the Ordo.pink contributors
 // SPDX-License-Identifier: AGPL-3.0-only
 
 export type Optional<T> = T | undefined
 
-export type PartlyRequired<T extends Record<string, unknown>, Include extends keyof T> = Required<
-	Pick<T, Include>
-> &
+export type PartlyRequired<T extends Record<string, unknown>, Include extends keyof T> = Required<Pick<T, Include>> &
 	Partial<Omit<T, Include>>
 
 export type Method<A, T extends object, K extends keyof T> = Unary<A, T[K]>
@@ -105,10 +105,7 @@ export type ValidatorFn<Arg> = (arg: Arg) => boolean
  * @example ForbidCharacters<"*" | "+", "2+2"> -> never
  * @example ForbidCharacters<"*" | "+", "2-2"> -> "2-2"
  */
-export type ForbidCharacters<
-	Chars extends string,
-	Str extends string,
-> = Str extends `${string}${Chars}${string}` ? never : Str
+export type ForbidCharacters<Chars extends string, Str extends string> = Str extends `${string}${Chars}${string}` ? never : Str
 
 export type TSnakeToPascal<S extends string> = S extends `${infer A}_${infer B}`
 	? `${Capitalize<A>}${TSnakeToPascal<B>}`

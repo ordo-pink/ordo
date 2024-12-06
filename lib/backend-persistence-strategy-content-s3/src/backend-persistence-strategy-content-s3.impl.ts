@@ -1,33 +1,29 @@
-// SPDX-FileCopyrightText: Copyright 2024, 谢尔盖||↓ and the Ordo.pink contributors
-// SPDX-License-Identifier: AGPL-3.0-only
-
-// Ordo.pink is an all-in-one team workspace.
-// Copyright (C) 2024  谢尔盖||↓ and the Ordo.pink contributors
-
-// This program is free software: you can redistribute it and/or modify
-// it under the terms of the GNU Affero General Public License as published
-// by the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-
-// This program is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU Affero General Public License for more details.
-
-// You should have received a copy of the GNU Affero General Public License
-// along with this program.  If not, see <https://www.gnu.org/licenses/>.
+/*
+ * SPDX-FileCopyrightText: Copyright 2024, 谢尔盖 ||↓ and the Ordo.pink contributors
+ * SPDX-License-Identifier: AGPL-3.0-only
+ *
+ * Ordo.pink is an all-in-one team workspace.
+ * Copyright (C) 2024  谢尔盖 ||↓ and the Ordo.pink contributors
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published
+ * by the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
 
 import { DeleteObjectCommand, GetObjectCommand, S3Client } from "@aws-sdk/client-s3"
 import { PassThrough, Readable } from "stream"
 import { Upload } from "@aws-sdk/lib-storage"
 
-import {
-	ContentPersistenceStrategy,
-	Data,
-	FSID,
-	UnexpectedError,
-	UserID,
-} from "@ordo-pink/managers"
+import { ContentPersistenceStrategy, Data, FSID, UnexpectedError, UserID } from "@ordo-pink/managers"
 import { Oath } from "@ordo-pink/oath"
 import { bimap_oath } from "@ordo-pink/oath/operators/bimap"
 import { chain_oath } from "@ordo-pink/oath/operators/chain"
@@ -97,8 +93,7 @@ const getEmptyReadableStream = () => Readable.from([""])
 const s3DeleteObject0 = (s3: S3Client, Bucket: string) => (Key: string) =>
 	from_promise_oath(() => s3.send(new DeleteObjectCommand({ Bucket, Key })))
 
-const s3ReadObject0 = (s3: S3Client, Bucket: string) => (Key: string) =>
-	new S3DownloadStream({ Key, Bucket, s3 })
+const s3ReadObject0 = (s3: S3Client, Bucket: string) => (Key: string) => new S3DownloadStream({ Key, Bucket, s3 })
 
 const s3WriteObject0 = (s3: S3Client, Bucket: string, content: Readable) => (Key: string) =>
 	Oath.Resolve(new PassThrough())

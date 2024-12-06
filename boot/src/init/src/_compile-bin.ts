@@ -1,6 +1,3 @@
-// SPDX-FileCopyrightText: Copyright 2024, 谢尔盖||↓ and the Ordo.pink contributors
-// SPDX-License-Identifier: Unlicense
-
 import { map, pipe } from "ramda"
 
 import * as util from "@ordo-pink/binutil"
@@ -31,10 +28,7 @@ const name_to_bin_index_path: Unary<string, string> = name => `boot/src/${name}/
 const namesToBinIndexPaths: Unary<string[], string[]> = map(name_to_bin_index_path)
 
 const check_bin_index_files_exist: Unary<string[], Oath<string[]>> = names =>
-	Oath.Resolve(namesToBinIndexPaths(names))
-		.and(util.check_files_exist)
-		.and(util.get_existing_paths)
-		.and(binIndexPathsToNames)
+	Oath.Resolve(namesToBinIndexPaths(names)).and(util.check_files_exist).and(util.get_existing_paths).and(binIndexPathsToNames)
 
 const run_compile_bin_command: Unary<string, Oath<void, Error>> = file =>
 	util
@@ -42,7 +36,4 @@ const run_compile_bin_command: Unary<string, Oath<void, Error>> = file =>
 		.and(() => util.run_command(`mv -f ${file} bin/${file}`))
 		.pipe(ops0.tap(progress.inc))
 
-const run_compile_bin_commands: Unary<string[], Oath<void[], Error>> = pipe(
-	map(run_compile_bin_command),
-	Oath.Merge,
-)
+const run_compile_bin_commands: Unary<string[], Oath<void[], Error>> = pipe(map(run_compile_bin_command), Oath.Merge)

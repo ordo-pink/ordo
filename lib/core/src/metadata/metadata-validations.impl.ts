@@ -1,21 +1,23 @@
-// SPDX-FileCopyrightText: Copyright 2024, 谢尔盖||↓ and the Ordo.pink contributors
-// SPDX-License-Identifier: AGPL-3.0-only
-
-// Ordo.pink is an all-in-one team workspace.
-// Copyright (C) 2024  谢尔盖||↓ and the Ordo.pink contributors
-
-// This program is free software: you can redistribute it and/or modify
-// it under the terms of the GNU Affero General Public License as published
-// by the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-
-// This program is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU Affero General Public License for more details.
-
-// You should have received a copy of the GNU Affero General Public License
-// along with this program.  If not, see <https://www.gnu.org/licenses/>.
+/*
+ * SPDX-FileCopyrightText: Copyright 2024, 谢尔盖 ||↓ and the Ordo.pink contributors
+ * SPDX-License-Identifier: AGPL-3.0-only
+ *
+ * Ordo.pink is an all-in-one team workspace.
+ * Copyright (C) 2024  谢尔盖 ||↓ and the Ordo.pink contributors
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published
+ * by the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
 
 import * as TAU from "@ordo-pink/tau"
 import { LabelColor } from "../constants"
@@ -40,17 +42,14 @@ export const is_created_by = (author: unknown): author is Ordo.User.ID => TAU.is
 
 export const is_updated_by = (author: unknown): author is Ordo.User.ID => TAU.is_uuid(author)
 
-export const is_created_at = (timestamp: unknown): timestamp is Date =>
-	TAU.is_finite_non_negative_int(timestamp)
+export const is_created_at = (timestamp: unknown): timestamp is Date => TAU.is_finite_non_negative_int(timestamp)
 
-export const is_updated_at = (timestamp: unknown): timestamp is Date =>
-	TAU.is_finite_non_negative_int(timestamp)
+export const is_updated_at = (timestamp: unknown): timestamp is Date => TAU.is_finite_non_negative_int(timestamp)
 
 export const is_props = <$TProps extends Ordo.Metadata.Props>(props?: $TProps): props is $TProps =>
 	props === undefined || TAU.keys_of(props).reduce((acc, key) => acc && is_prop_key(key), true)
 
-export const is_parent = (parent: unknown): parent is Ordo.Metadata.FSID =>
-	parent === null || TAU.is_uuid(parent)
+export const is_parent = (parent: unknown): parent is Ordo.Metadata.FSID => parent === null || TAU.is_uuid(parent)
 
 export const is_label = (label: unknown): label is TAU.Unpack<Ordo.Metadata.Label> => {
 	const y = label as Ordo.Metadata.Label

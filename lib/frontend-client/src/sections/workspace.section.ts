@@ -1,21 +1,23 @@
-// SPDX-FileCopyrightText: Copyright 2024, 谢尔盖||↓ and the Ordo.pink contributors
-// SPDX-License-Identifier: AGPL-3.0-only
-
-// Ordo.pink is an all-in-one team workspace.
-// Copyright (C) 2024  谢尔盖||↓ and the Ordo.pink contributors
-
-// This program is free software: you can redistribute it and/or modify
-// it under the terms of the GNU Affero General Public License as published
-// by the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-
-// This program is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU Affero General Public License for more details.
-
-// You should have received a copy of the GNU Affero General Public License
-// along with this program.  If not, see <https://www.gnu.org/licenses/>.
+/*
+ * SPDX-FileCopyrightText: Copyright 2024, 谢尔盖 ||↓ and the Ordo.pink contributors
+ * SPDX-License-Identifier: AGPL-3.0-only
+ *
+ * Ordo.pink is an all-in-one team workspace.
+ * Copyright (C) 2024  谢尔盖 ||↓ and the Ordo.pink contributors
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published
+ * by the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
 
 import { BehaviorSubject, Observable, noop, pairwise } from "rxjs"
 // import { BsToggle2Off, BsToggle2On } from "react-icons/bs"
@@ -127,8 +129,7 @@ export const init_workspace = (
 	const workspace_element = document.querySelector("#workspace") as HTMLDivElement
 
 	current_activity$.pipe(pairwise()).subscribe(([prev, next]) => {
-		if (!prev.is_none)
-			prev.unwrap()!.on_unmount?.({ workspace: workspace_element, sidebar: sidebar_element })
+		if (!prev.is_none) prev.unwrap()!.on_unmount?.({ workspace: workspace_element, sidebar: sidebar_element })
 
 		void next.cata({
 			Some: async activity => {
@@ -171,28 +172,16 @@ export const init_workspace = (
 					dragInterval: window.innerWidth * 0.05,
 					onDrag: sizes => {
 						Switch.OfTrue()
-							.case(sizes[0] < 20, () =>
-								workspace_element.classList.replace("opacity-100", "opacity-0"),
-							)
-							.case(sizes[0] > 20, () =>
-								workspace_element.classList.replace("opacity-0", "opacity-100"),
-							)
+							.case(sizes[0] < 20, () => workspace_element.classList.replace("opacity-100", "opacity-0"))
+							.case(sizes[0] > 20, () => workspace_element.classList.replace("opacity-0", "opacity-100"))
 							.default(noop)
 
 						Switch.OfTrue()
-							.case(sizes[1] < 20, () =>
-								sidebar_element.classList.replace("opacity-100", "opacity-0"),
-							)
-							.case(sizes[1] > 20, () =>
-								sidebar_element.classList.replace("opacity-0", "opacity-100"),
-							)
+							.case(sizes[1] < 20, () => sidebar_element.classList.replace("opacity-100", "opacity-0"))
+							.case(sizes[1] > 20, () => sidebar_element.classList.replace("opacity-0", "opacity-100"))
 							.default(noop)
 					},
-					onDragEnd: sizes =>
-						commands.emit("cmd.application.sidebar.set_size", [
-							Math.round(sizes[0]),
-							Math.round(sizes[1]),
-						]),
+					onDragEnd: sizes => commands.emit("cmd.application.sidebar.set_size", [Math.round(sizes[0]), Math.round(sizes[1])]),
 				})
 			})
 			.case(!sidebar.disabled && !!split, () => {

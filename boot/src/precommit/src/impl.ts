@@ -1,6 +1,3 @@
-// SPDX-FileCopyrightText: Copyright 2024, 谢尔盖||↓ and the Ordo.pink contributors
-// SPDX-License-Identifier: Unlicense
-
 import * as util from "@ordo-pink/binutil"
 import { Binary, Curry, Unary, noop } from "@ordo-pink/tau"
 import { Oath, invokers0, ops0 } from "@ordo-pink/oath"
@@ -9,10 +6,7 @@ import { is_file0, read_file0, readdir0, write_file0 } from "@ordo-pink/fs"
 // --- Public ---
 
 export const precommit = () =>
-	Oath.Empty()
-		.and(create_licenses_if_not_exist)
-		.and(create_spdx_records_if_not_exist)
-		.invoke(invokers0.or_else(console.error))
+	Oath.Empty().and(create_licenses_if_not_exist).and(create_spdx_records_if_not_exist).invoke(invokers0.or_else(console.error))
 
 // --- Internal ---
 
@@ -80,21 +74,12 @@ const create_licenses = (space: "lib" | "srv" | "boot/src") =>
 		.and(collect_missing_license_paths(space))
 		.and(create_license_files)
 
-const collect_missing_license_paths: Curry<Binary<string, string[], Oath<string[]>>> =
-	space => dirs =>
-		Oath.Merge(
-			dirs.map(dir =>
-				is_file0(`${space}/${dir}/license`).and(exists =>
-					exists ? null : `${space}/${dir}/license`,
-				),
-			),
-		).and(paths => paths.filter(Boolean) as string[])
+const collect_missing_license_paths: Curry<Binary<string, string[], Oath<string[]>>> = space => dirs =>
+	Oath.Merge(
+		dirs.map(dir => is_file0(`${space}/${dir}/license`).and(exists => (exists ? null : `${space}/${dir}/license`))),
+	).and(paths => paths.filter(Boolean) as string[])
 
 const create_license_files: Unary<string[], Oath<void[], Error>> = paths =>
-	Oath.Merge(
-		paths.map(path =>
-			util.create_repository_file(path, unlicense).pipe(ops0.tap(license_progress.inc)),
-		),
-	)
+	Oath.Merge(paths.map(path => util.create_repository_file(path, unlicense).pipe(ops0.tap(license_progress.inc))))
 
 const unlicense = util.get_license("Unlicense")

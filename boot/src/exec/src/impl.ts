@@ -1,6 +1,3 @@
-// SPDX-FileCopyrightText: Copyright 2024, 谢尔盖||↓ and the Ordo.pink contributors
-// SPDX-License-Identifier: Unlicense
-
 import { Oath, invokers0, ops0 } from "@ordo-pink/oath"
 import { dir_exists0 } from "@ordo-pink/fs"
 import { run_async_command } from "@ordo-pink/binutil"
@@ -13,8 +10,7 @@ export const exec = (location?: string, command?: string) =>
 			ops0.chain(location =>
 				Oath.If(location.startsWith("lib") || location.startsWith("srv"), {
 					T: () => location,
-					F: () =>
-						`Provided location "${location}" is invalid. Only "lib/*" or "srv/*" locations are supported.`,
+					F: () => `Provided location "${location}" is invalid. Only "lib/*" or "srv/*" locations are supported.`,
 				}),
 			),
 		)

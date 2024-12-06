@@ -1,21 +1,23 @@
-// SPDX-FileCopyrightText: Copyright 2024, 谢尔盖||↓ and the Ordo.pink contributors
-// SPDX-License-Identifier: AGPL-3.0-only
-
-// Ordo.pink is an all-in-one team workspace.
-// Copyright (C) 2024  谢尔盖||↓ and the Ordo.pink contributors
-
-// This program is free software: you can redistribute it and/or modify
-// it under the terms of the GNU Affero General Public License as published
-// by the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-
-// This program is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU Affero General Public License for more details.
-
-// You should have received a copy of the GNU Affero General Public License
-// along with this program.  If not, see <https://www.gnu.org/licenses/>.
+/*
+ * SPDX-FileCopyrightText: Copyright 2024, 谢尔盖 ||↓ and the Ordo.pink contributors
+ * SPDX-License-Identifier: AGPL-3.0-only
+ *
+ * Ordo.pink is an all-in-one team workspace.
+ * Copyright (C) 2024  谢尔盖 ||↓ and the Ordo.pink contributors
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published
+ * by the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
 
 import type { Context } from "koa"
 
@@ -35,10 +37,7 @@ export const confirm_email0: TFn = (ctx, { user_service }) =>
 // --- Internal ---
 
 type TParams = { user_service: TUserService }
-type TFn = (
-	ctx: Context,
-	params: TParams,
-) => Oath<Ordo.Routes.ID.ConfirmEmail.Response, Ordo.Rrr<"EINVAL" | "EIO" | "ENOENT">>
+type TFn = (ctx: Context, params: TParams) => Oath<Ordo.Routes.ID.ConfirmEmail.Response, Ordo.Rrr<"EINVAL" | "EIO" | "ENOENT">>
 type TCtx = { user: User.InternalUser; code: string }
 
 const LOCATION = "confirm_email"
@@ -55,9 +54,7 @@ const extract_ctx0 =
 				.pipe(ops0.rejected_map(() => einval(`extract_ctx -> email: ${email}`)))
 				.pipe(
 					ops0.chain(email =>
-						user_service
-							.get_by_email(email)
-							.pipe(ops0.chain(from_option0(() => enoent(`extract_ctx -> email: ${email}`)))),
+						user_service.get_by_email(email).pipe(ops0.chain(from_option0(() => enoent(`extract_ctx -> email: ${email}`)))),
 					),
 				),
 		})

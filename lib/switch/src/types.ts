@@ -1,24 +1,8 @@
-// SPDX-FileCopyrightText: Copyright 2024, 谢尔盖||↓ and the Ordo.pink contributors
-// SPDX-License-Identifier: Unlicense
-
-// SPDX-FileCopyrightText: Copyright 2024, 谢尔盖||↓ and the Ordo.pink contributors
-// SPDX-License-Identifier: AGPL-3.0-only
-
-// Ordo.pink is an all-in-one team workspace.
-// Copyright (C) 2024  谢尔盖||↓ and the Ordo.pink contributors
-
-// This program is free software: you can redistribute it and/or modify
-// it under the terms of the GNU Affero General Public License as published
-// by the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-
-// This program is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU Affero General Public License for more details.
-
-// You should have received a copy of the GNU Affero General Public License
-// along with this program.  If not, see <https://www.gnu.org/licenses/>.
+/*
+ * SPDX-FileCopyrightText: Copyright 2024, 谢尔盖 ||↓ and the Ordo.pink contributors
+ * SPDX-License-Identifier: Unlicense
+ *
+ */
 
 import type { Unpack, ValidatorFn } from "@ordo-pink/tau"
 
@@ -32,18 +16,14 @@ export type TSwitchStatic = {
 	 *
 	 * @example `Switch.of(myVariableWithIDontKnowWhichThingInside)`
 	 */
-	of: <TResult extends unknown[] = [], TContext = unknown>(
-		x: TContext,
-	) => TSwitch<TContext, TResult>
+	of: <TResult extends unknown[] = [], TContext = unknown>(x: TContext) => TSwitch<TContext, TResult>
 
 	/**
 	 * A pointing interface to put the value into Switch.
 	 *
 	 * @example `Switch.of(myVariableWithIDontKnowWhichThingInside)`
 	 */
-	Match: <TResult extends unknown[] = [], TContext = unknown>(
-		x: TContext,
-	) => TSwitch<TContext, TResult>
+	Match: <TResult extends unknown[] = [], TContext = unknown>(x: TContext) => TSwitch<TContext, TResult>
 
 	/**
 	 * Create an empty switch that compares provided values against `true`.
@@ -99,11 +79,7 @@ export type TSwitch<$TContext, $TResult extends unknown[]> = {
 	 *
 	 * @example `Switch.of(myBoolean).case(true, () => "oh, thanks!").default(() => "You WHAT?")`
 	 */
-	default: <_TDefaultResult>(
-		on_none_matched: (x: $TContext) => _TDefaultResult,
-	) => Unpack<$TResult> | _TDefaultResult
+	default: <_TDefaultResult>(on_none_matched: (x: $TContext) => _TDefaultResult) => Unpack<$TResult> | _TDefaultResult
 
-	_: <_TDefaultResult>(
-		on_none_matched: (x: $TContext) => _TDefaultResult,
-	) => Unpack<$TResult> | _TDefaultResult
+	_: <_TDefaultResult>(on_none_matched: (x: $TContext) => _TDefaultResult) => Unpack<$TResult> | _TDefaultResult
 }

@@ -1,21 +1,23 @@
-// SPDX-FileCopyrightText: Copyright 2024, 谢尔盖||↓ and the Ordo.pink contributors
-// SPDX-License-Identifier: AGPL-3.0-only
-
-// Ordo.pink is an all-in-one team workspace.
-// Copyright (C) 2024  谢尔盖||↓ and the Ordo.pink contributors
-
-// This program is free software: you can redistribute it and/or modify
-// it under the terms of the GNU Affero General Public License as published
-// by the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-
-// This program is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU Affero General Public License for more details.
-
-// You should have received a copy of the GNU Affero General Public License
-// along with this program.  If not, see <https://www.gnu.org/licenses/>.
+/*
+ * SPDX-FileCopyrightText: Copyright 2024, 谢尔盖 ||↓ and the Ordo.pink contributors
+ * SPDX-License-Identifier: AGPL-3.0-only
+ *
+ * Ordo.pink is an all-in-one team workspace.
+ * Copyright (C) 2024  谢尔盖 ||↓ and the Ordo.pink contributors
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published
+ * by the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
 
 // import { is_array, is_object, is_string } from "@ordo-pink/tau"
 import { BehaviorSubject } from "rxjs"
@@ -30,11 +32,7 @@ import { type TEditorFocusPosition, type TEditorState } from "../rich-text.types
 import { editor_context, editor_context_jab } from "../jabs/editor-context.jab"
 import { Line } from "./line.component"
 
-export const RichText = (
-	metadata: Ordo.Metadata.Instance,
-	content: Ordo.Content.Instance,
-	ctx: Ordo.CreateFunction.Params,
-) => {
+export const RichText = (metadata: Ordo.Metadata.Instance, content: Ordo.Content.Instance, ctx: Ordo.CreateFunction.Params) => {
 	const caret_position$ = new BehaviorSubject<TEditorFocusPosition>({
 		block_index: 0,
 		inline_index: 0,
@@ -42,9 +40,7 @@ export const RichText = (
 		focus_offset: 0,
 	})
 
-	const state$ = new BehaviorSubject<TEditorState>([
-		{ type: "p", children: [{ type: "text", value: "" }] },
-	])
+	const state$ = new BehaviorSubject<TEditorState>([{ type: "p", children: [{ type: "text", value: "" }] }])
 
 	return Maoka.create("div", ({ use, refresh }) => {
 		use(MaokaOrdo.Context.provide(ctx))
@@ -115,8 +111,7 @@ export const RichText = (
 					const state = state$.getValue()
 
 					const prev_line_last_inline_index = state[block_index - 1].children.length - 1
-					const prev_line_offset =
-						state[block_index - 1].children[prev_line_last_inline_index].value.length
+					const prev_line_offset = state[block_index - 1].children[prev_line_last_inline_index].value.length
 
 					// If we drop the first element and there is only one element, put
 					// a paragraph instead

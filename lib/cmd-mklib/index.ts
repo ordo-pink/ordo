@@ -19,11 +19,13 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import { TCommandRecord } from "@ordo-pink/binutil"
+
 import { mklib_handler } from "./src/cmd-mklib.impl"
 
 // TODO Organise arguments, -shortoptions and --long-options into separate groups
 // TODO Extract licence option
-export const mklib_command = {
+export const mklib_command: TCommandRecord = {
 	mklib: {
 		help: "Create a new library in 'lib' with given name. Example: './bin mklib hello-world'",
 		handler: mklib_handler,

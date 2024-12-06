@@ -1,6 +1,3 @@
-// SPDX-FileCopyrightText: Copyright 2024, 谢尔盖||↓ and the Ordo.pink contributors
-// SPDX-License-Identifier: Unlicense
-
 import { map, pipe } from "ramda"
 
 import * as util from "@ordo-pink/binutil"
@@ -31,7 +28,4 @@ const dirs_to_init_file_paths: Unary<string[], string[]> = map(dir_to_init_file_
 
 const run_init_command: Unary<string, Oath<void, Error>> = path =>
 	util.run_bun_command(`run ${path}`).pipe(ops0.tap(progress.inc))
-const run_init_commands: Unary<string[], Oath<void[], Error>> = pipe(
-	map(run_init_command),
-	Oath.Merge,
-)
+const run_init_commands: Unary<string[], Oath<void[], Error>> = pipe(map(run_init_command), Oath.Merge)

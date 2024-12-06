@@ -1,6 +1,3 @@
-// SPDX-FileCopyrightText: Copyright 2024, 谢尔盖||↓ and the Ordo.pink contributors
-// SPDX-License-Identifier: Unlicense
-
 import { expect, test } from "bun:test"
 import { is_dir0, is_file0, read_file0, rmdir0 } from "@ordo-pink/fs"
 import { get_license } from "@ordo-pink/binutil"

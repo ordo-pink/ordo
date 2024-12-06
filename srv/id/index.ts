@@ -1,21 +1,23 @@
-// SPDX-FileCopyrightText: Copyright 2024, 谢尔盖||↓ and the Ordo.pink contributors
-// SPDX-License-Identifier: AGPL-3.0-only
-
-// Ordo.pink is an all-in-one team workspace.
-// Copyright (C) 2024  谢尔盖||↓ and the Ordo.pink contributors
-
-// This program is free software: you can redistribute it and/or modify
-// it under the terms of the GNU Affero General Public License as published
-// by the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-
-// This program is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU Affero General Public License for more details.
-
-// You should have received a copy of the GNU Affero General Public License
-// along with this program.  If not, see <https://www.gnu.org/licenses/>.
+/*
+ * SPDX-FileCopyrightText: Copyright 2024, 谢尔盖 ||↓ and the Ordo.pink contributors
+ * SPDX-License-Identifier: AGPL-3.0-only
+ *
+ * Ordo.pink is an all-in-one team workspace.
+ * Copyright (C) 2024  谢尔盖 ||↓ and the Ordo.pink contributors
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published
+ * by the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
 
 import chalk from "chalk"
 
@@ -34,12 +36,7 @@ const at_expire_in = Number(Bun.env.ORDO_ID_ACCESS_TOKEN_EXPIRE_IN)
 const rt_expire_in = Number(Bun.env.ORDO_ID_REFRESH_TOKEN_EXPIRE_IN)
 const website_host = Bun.env.ORDO_WEB_HOST!
 const logger = ConsoleLogger
-const origin = [
-	Bun.env.ORDO_DT_PRIVATE_HOST!,
-	Bun.env.ORDO_WORKSPACE_HOST!,
-	Bun.env.ORDO_WEB_HOST!,
-	Bun.env.ORDO_DT_HOST!,
-]
+const origin = [Bun.env.ORDO_DT_PRIVATE_HOST!, Bun.env.ORDO_WORKSPACE_HOST!, Bun.env.ORDO_WEB_HOST!, Bun.env.ORDO_DT_HOST!]
 
 const user_strategy_type = Bun.env.ORDO_ID_USER_PERSISTENCE_STRATEGY!
 const token_strategy_type = Bun.env.ORDO_ID_TOKEN_PERSISTENCE_STRATEGY!
@@ -107,9 +104,7 @@ const main = async () => {
 		notification_sender: { name: "Привет от Ordo.pink", email: "hello@ordo.pink" },
 	})
 
-	app.listen({ port: Number(port) }, () =>
-		logger.info(`ID running on http://localhost:${chalk.blue(port)}`),
-	)
+	app.listen({ port: Number(port) }, () => logger.info(`ID running on http://localhost:${chalk.blue(port)}`))
 }
 
 const get_key = (key: string, type: "public" | "private") =>

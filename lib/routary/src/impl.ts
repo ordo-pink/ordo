@@ -1,24 +1,8 @@
-// SPDX-FileCopyrightText: Copyright 2024, 谢尔盖||↓ and the Ordo.pink contributors
-// SPDX-License-Identifier: Unlicense
-
-// SPDX-FileCopyrightText: Copyright 2024, 谢尔盖||↓ and the Ordo.pink contributors
-// SPDX-License-Identifier: AGPL-3.0-only
-
-// Ordo.pink is an all-in-one team workspace.
-// Copyright (C) 2024  谢尔盖||↓ and the Ordo.pink contributors
-
-// This program is free software: you can redistribute it and/or modify
-// it under the terms of the GNU Affero General Public License as published
-// by the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-
-// This program is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU Affero General Public License for more details.
-
-// You should have received a copy of the GNU Affero General Public License
-// along with this program.  If not, see <https://www.gnu.org/licenses/>.
+/*
+ * SPDX-FileCopyrightText: Copyright 2024, 谢尔盖 ||↓ and the Ordo.pink contributors
+ * SPDX-License-Identifier: Unlicense
+ *
+ */
 
 import { Oath, ops0 } from "@ordo-pink/oath"
 
@@ -26,17 +10,12 @@ import type { Context, HttpMethod, RequiredRouterState, Route, RouteMap, TRouter
 
 const check_method = (method: HttpMethod, request: Request) => request.method === method
 const check_route = (route: Route, request: Request) =>
-	route instanceof RegExp
-		? route.test(new URL(request.url).pathname)
-		: new URL(request.url).pathname === route
+	route instanceof RegExp ? route.test(new URL(request.url).pathname) : new URL(request.url).pathname === route
 
 const create_native_response = (ctx: Context) =>
 	new Response(ctx.res.body, { headers: ctx.res.headers, status: ctx.res.status })
 
-const router = <T extends RequiredRouterState = RequiredRouterState>(
-	routes: RouteMap,
-	ctx: Context<T>,
-): TRouter<T> => ({
+const router = <T extends RequiredRouterState = RequiredRouterState>(routes: RouteMap, ctx: Context<T>): TRouter<T> => ({
 	delete: (route, handle) => router(routes, ctx).each(["DELETE"], route, handle) as any,
 	get: (route, handle) => router(routes, ctx).each(["GET"], route, handle) as any,
 	head: (route, handle) => router(routes, ctx).each(["HEAD"], route, handle) as any,
@@ -52,9 +31,7 @@ const router = <T extends RequiredRouterState = RequiredRouterState>(
 			},
 		}),
 	or_else: on_error => req =>
-		Oath.FromNullable(
-			routes.find(([m, r]) => ctx.state.check_method(m, req) && ctx.state.check_route(r, req)),
-		)
+		Oath.FromNullable(routes.find(([m, r]) => ctx.state.check_method(m, req) && ctx.state.check_route(r, req)))
 			.pipe(
 				ops0.chain(([, route, gear]) =>
 					Oath.Resolve({ ...ctx, req, route, res: RoutaryResponse.empty() }).pipe(
@@ -80,9 +57,7 @@ export type CreateRouterOptions<T extends RequiredRouterState = RequiredRouterSt
 }
 
 export const Router = {
-	create: <T extends RequiredRouterState = RequiredRouterState>(
-		options: CreateRouterOptions<T> = {} as any,
-	) =>
+	create: <T extends RequiredRouterState = RequiredRouterState>(options: CreateRouterOptions<T> = {} as any) =>
 		router([], {
 			state: options.state ?? { check_method: check_method, check_route: check_route },
 		} as any),

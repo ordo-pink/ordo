@@ -1,5 +1,8 @@
-// SPDX-FileCopyrightText: Copyright 2024, 谢尔盖||↓ and the Ordo.pink contributors
-// SPDX-License-Identifier: Unlicense
+/*
+ * SPDX-FileCopyrightText: Copyright 2024, 谢尔盖 ||↓ and the Ordo.pink contributors
+ * SPDX-License-Identifier: Unlicense
+ *
+ */
 
 import { type Observable } from "rxjs"
 
@@ -56,9 +59,7 @@ export const get_user_query: TMaokaJab<Ordo.User.Query> = ({ use }) => {
 	return use(computed("user_query", unwrap_user_query))
 }
 
-export const get_file_associations$: TMaokaJab<Observable<Ordo.FileAssociation.Instance[]>> = ({
-	use,
-}) => {
+export const get_file_associations$: TMaokaJab<Observable<Ordo.FileAssociation.Instance[]>> = ({ use }) => {
 	const { get_file_associations } = use(ordo_context.consume)
 	const logger = use(get_logger)
 
@@ -70,9 +71,7 @@ export const get_file_associations$: TMaokaJab<Observable<Ordo.FileAssociation.I
 	return use(computed("file_associations$", unwrap_file_associations$))
 }
 
-export const get_current_file_association$: TMaokaJab<
-	Observable<TOption<Ordo.FileAssociation.Instance>>
-> = ({ use }) => {
+export const get_current_file_association$: TMaokaJab<Observable<TOption<Ordo.FileAssociation.Instance>>> = ({ use }) => {
 	const { get_current_file_association } = use(ordo_context.consume)
 	const logger = use(get_logger)
 
@@ -178,21 +177,14 @@ export const get_route_params: TMaokaJab<() => Record<string, string | undefined
 const computed_state = {} as Record<string, Record<string, { deps?: any[]; value: any }>>
 
 export const computed =
-	<$TResult, $TDeps extends any[] = any[]>(
-		key: string,
-		callback: () => $TResult,
-		deps?: $TDeps,
-	): TMaokaJab<$TResult> =>
+	<$TResult, $TDeps extends any[] = any[]>(key: string, callback: () => $TResult, deps?: $TDeps): TMaokaJab<$TResult> =>
 	({ root_id }): $TResult => {
 		if (!computed_state[root_id]) computed_state[root_id] = {}
 		if (computed_state[root_id][key]) {
 			if (!deps) return computed_state[root_id][key].value
 
 			const deps_are_equal =
-				computed_state[root_id][key].deps?.reduce(
-					(acc, dep, index) => acc && dep === deps[index],
-					true,
-				) ?? true
+				computed_state[root_id][key].deps?.reduce((acc, dep, index) => acc && dep === deps[index], true) ?? true
 
 			if (deps_are_equal) return computed_state[root_id][key].value
 		}
@@ -205,10 +197,7 @@ export const computed =
 	}
 
 export const subscription =
-	<$TValue, $TTransformedValue = $TValue>(
-		$: Observable<$TValue>,
-		f: (value: $TValue) => $TTransformedValue,
-	): TMaokaJab =>
+	<$TValue, $TTransformedValue = $TValue>($: Observable<$TValue>, f: (value: $TValue) => $TTransformedValue): TMaokaJab =>
 	({ on_unmount }) => {
 		const subscription = $.subscribe(f)
 		on_unmount(() => subscription.unsubscribe())

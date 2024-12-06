@@ -1,22 +1,3 @@
-// SPDX-FileCopyrightText: Copyright 2024, 谢尔盖||↓ and the Ordo.pink contributors
-// SPDX-License-Identifier: AGPL-3.0-only
-
-// Ordo.pink is an all-in-one team workspace.
-// Copyright (C) 2024  谢尔盖||↓ and the Ordo.pink contributors
-
-// This program is free software: you can redistribute it and/or modify
-// it under the terms of the GNU Affero General Public License as published
-// by the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-
-// This program is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU Affero General Public License for more details.
-
-// You should have received a copy of the GNU Affero General Public License
-// along with this program.  If not, see <https://www.gnu.org/licenses/>.
-
 import { filter, map, pipe, prop } from "ramda"
 import { Dirent } from "fs"
 import { SpawnOptions } from "bun"
@@ -70,14 +51,12 @@ export const create_progress = (message = "") => ({
 		process.stdout.write(msg)
 	},
 	finish: () => {
-		process.stdout.clearLine(0)
-		process.stdout.cursorTo(0)
+		process.stdout.moveCursor(-message.length, -Math.floor(message.length / process.stdout.columns))
 		process.stdout.write(`${chalk.green("✔")} ${message}\n`)
 		message = ""
 	},
 	break: (...details: any[]) => {
-		process.stdout.clearLine(0)
-		process.stdout.cursorTo(0)
+		process.stdout.moveCursor(-message.length, -Math.floor(message.length / process.stdout.columns))
 		process.stdout.write(`${chalk.red("✘")} ${message}\n`)
 		message = ""
 
@@ -114,7 +93,7 @@ export const get_spdx_record = (license: TLicenseType) => {
 	return `/*
  * SPDX-FileCopyrightText: Copyright ${year}, ${COPYRIGHT_OWNERS}
  * SPDX-License-Identifier: ${license}
- * 
+ *
 ${
 	license === "AGPL-3.0-only"
 		? ` * Ordo.pink is an all-in-one team workspace.

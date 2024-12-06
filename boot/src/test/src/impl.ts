@@ -1,6 +1,3 @@
-// SPDX-FileCopyrightText: Copyright 2024, 谢尔盖||↓ and the Ordo.pink contributors
-// SPDX-License-Identifier: Unlicense
-
 import { identity } from "ramda"
 
 import { Oath, invokers0 } from "@ordo-pink/oath"

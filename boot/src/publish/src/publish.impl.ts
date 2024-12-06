@@ -1,7 +1,4 @@
 // SPDX-FileCopyrightText: Copyright 2024, 谢尔盖||↓ and the Ordo.pink contributors
-// SPDX-License-Identifier: Unlicense
-
-// SPDX-FileCopyrightText: Copyright 2024, 谢尔盖||↓ and the Ordo.pink contributors
 // SPDX-License-Identifier: MIT
 
 import { Oath, invokers0, ops0 } from "@ordo-pink/oath"
@@ -33,10 +30,7 @@ const progress = create_progress()
 
 const startProgress = () => progress.start("Building and publishing srvs")
 
-const namesToCompileScriptPaths = (names: string[]) =>
-	names.map(name => `./srv/${name}/bin/publish.ts`)
+const namesToCompileScriptPaths = (names: string[]) => names.map(name => `./srv/${name}/bin/publish.ts`)
 const runCompileScript = (path: string) =>
-	run_bun_command(`run ${path}`, { stdout: "pipe", stderr: "pipe" }).pipe(
-		ops0.bimap(progress.break, progress.inc),
-	)
+	run_bun_command(`run ${path}`, { stdout: "pipe", stderr: "pipe" }).pipe(ops0.bimap(progress.break, progress.inc))
 const runCompileScripts = (paths: string[]) => Oath.Merge(paths.map(runCompileScript))

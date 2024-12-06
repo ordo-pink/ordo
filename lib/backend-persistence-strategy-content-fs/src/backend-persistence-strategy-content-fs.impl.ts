@@ -1,21 +1,23 @@
-// SPDX-FileCopyrightText: Copyright 2024, 谢尔盖||↓ and the Ordo.pink contributors
-// SPDX-License-Identifier: AGPL-3.0-only
-
-// Ordo.pink is an all-in-one team workspace.
-// Copyright (C) 2024  谢尔盖||↓ and the Ordo.pink contributors
-
-// This program is free software: you can redistribute it and/or modify
-// it under the terms of the GNU Affero General Public License as published
-// by the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-
-// This program is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU Affero General Public License for more details.
-
-// You should have received a copy of the GNU Affero General Public License
-// along with this program.  If not, see <https://www.gnu.org/licenses/>.
+/*
+ * SPDX-FileCopyrightText: Copyright 2024, 谢尔盖 ||↓ and the Ordo.pink contributors
+ * SPDX-License-Identifier: AGPL-3.0-only
+ *
+ * Ordo.pink is an all-in-one team workspace.
+ * Copyright (C) 2024  谢尔盖 ||↓ and the Ordo.pink contributors
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published
+ * by the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
 
 import { Readable, Writable } from "stream"
 import { createReadStream, createWriteStream } from "fs"
@@ -69,17 +71,14 @@ export const ContentPersistenceStrategyFS = {
 
 const ok = () => "OK" as const
 
-const getPath = (root: string, uid: string, fsid: string): string =>
-	resolve(root, ...uid.split("-"), ...fsid.split("-"))
+const getPath = (root: string, uid: string, fsid: string): string => resolve(root, ...uid.split("-"), ...fsid.split("-"))
 
 const createParentDirIfNotExists0 = (path: string) =>
 	create_parent_if_not_exists0(path).pipe(bimap_oath(UnexpectedError, () => path))
 
-const getFileSize0 = (path: string) =>
-	stat0(path).pipe(bimap_oath(UnexpectedError, stat => Number(stat.size)))
+const getFileSize0 = (path: string) => stat0(path).pipe(bimap_oath(UnexpectedError, stat => Number(stat.size)))
 
-const createWriteStream0 = (path: string) =>
-	try_oath(() => createWriteStream(path, { autoClose: true }))
+const createWriteStream0 = (path: string) => try_oath(() => createWriteStream(path, { autoClose: true }))
 
 const awaitStreamWriteCompleteP = (file: Writable, content: Readable) =>
 	new Promise<void>((resolve, reject) => {
@@ -100,12 +99,7 @@ const readFileContent0 = (path: string) =>
 
 const writeFileContent0 = (content: Readable) => (path: string) =>
 	createWriteStream0(path)
-		.pipe(
-			chain_oath(file =>
-				from_promise_oath<void, Error>(() => awaitStreamWriteCompleteP(file, content)),
-			),
-		)
+		.pipe(chain_oath(file => from_promise_oath<void, Error>(() => awaitStreamWriteCompleteP(file, content))))
 		.pipe(bimap_oath(UnexpectedError, () => path))
 
-const createEmptyFileContent0 = (path: string) =>
-	write_file0(path, "", "utf8").pipe(rejected_map_oath(UnexpectedError))
+const createEmptyFileContent0 = (path: string) => write_file0(path, "", "utf8").pipe(rejected_map_oath(UnexpectedError))

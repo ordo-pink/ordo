@@ -1,21 +1,23 @@
-// SPDX-FileCopyrightText: Copyright 2024, 谢尔盖||↓ and the Ordo.pink contributors
-// SPDX-License-Identifier: AGPL-3.0-only
-
-// Ordo.pink is an all-in-one team workspace.
-// Copyright (C) 2024  谢尔盖||↓ and the Ordo.pink contributors
-
-// This program is free software: you can redistribute it and/or modify
-// it under the terms of the GNU Affero General Public License as published
-// by the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-
-// This program is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU Affero General Public License for more details.
-
-// You should have received a copy of the GNU Affero General Public License
-// along with this program.  If not, see <https://www.gnu.org/licenses/>.
+/*
+ * SPDX-FileCopyrightText: Copyright 2024, 谢尔盖 ||↓ and the Ordo.pink contributors
+ * SPDX-License-Identifier: AGPL-3.0-only
+ *
+ * Ordo.pink is an all-in-one team workspace.
+ * Copyright (C) 2024  谢尔盖 ||↓ and the Ordo.pink contributors
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published
+ * by the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
 
 import { Context } from "koa"
 
@@ -69,17 +71,13 @@ const update_auth_cookie =
 		set_auth_cookie(ctx, user.id, jti, expires)
 
 const get_user_by_id0 = (user_service: TUserService, id: UUIDv4) => () =>
-	user_service
-		.get_by_id(id)
-		.pipe(Oath.ops.chain(from_option0(() => enoent(`get_user_by_id -> id: ${id}`))))
+	user_service.get_by_id(id).pipe(Oath.ops.chain(from_option0(() => enoent(`get_user_by_id -> id: ${id}`))))
 
 const get_user_token0 =
 	({ user_service, token_service }: TParams) =>
 	({ sub, jti }: TCtx) =>
 		token_service.strategy
 			.get_token(sub, jti)
-			.pipe(
-				Oath.ops.chain(from_option0(() => eacces(`get_user_token -> sub: ${sub}, jti: ${jti}`))),
-			)
+			.pipe(Oath.ops.chain(from_option0(() => eacces(`get_user_token -> sub: ${sub}, jti: ${jti}`))))
 			.pipe(Oath.ops.chain(verify_token0(token_service)))
 			.pipe(Oath.ops.chain(get_user_by_id0(user_service, sub)))

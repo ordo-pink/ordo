@@ -1,5 +1,8 @@
-// SPDX-FileCopyrightText: Copyright 2024, 谢尔盖||↓ and the Ordo.pink contributors
-// SPDX-License-Identifier: Unlicense
+/*
+ * SPDX-FileCopyrightText: Copyright 2024, 谢尔盖 ||↓ and the Ordo.pink contributors
+ * SPDX-License-Identifier: Unlicense
+ *
+ */
 
 import { Maoka, TMaokaChildren, TMaokaJab } from "@ordo-pink/maoka"
 import { Result } from "@ordo-pink/result"

@@ -1,25 +1,34 @@
-// SPDX-FileCopyrightText: Copyright 2024, 谢尔盖||↓ and the Ordo.pink contributors
-// SPDX-License-Identifier: AGPL-3.0-only
-
-// Ordo.pink is an all-in-one team workspace.
-// Copyright (C) 2024  谢尔盖||↓ and the Ordo.pink contributors
-
-// This program is free software: you can redistribute it and/or modify
-// it under the terms of the GNU Affero General Public License as published
-// by the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-
-// This program is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU Affero General Public License for more details.
-
-// You should have received a copy of the GNU Affero General Public License
-// along with this program.  If not, see <https://www.gnu.org/licenses/>.
+/*
+ * SPDX-FileCopyrightText: Copyright 2024, 谢尔盖 ||↓ and the Ordo.pink contributors
+ * SPDX-License-Identifier: AGPL-3.0-only
+ *
+ * Ordo.pink is an all-in-one team workspace.
+ * Copyright (C) 2024  谢尔盖 ||↓ and the Ordo.pink contributors
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published
+ * by the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
 
 import { BehaviorSubject } from "rxjs"
 
-import { CacheMetadataRepository, MetadataCommand, MetadataQuery, MetadataRepository, NotificationType, RRR } from "@ordo-pink/core"
+import {
+	CacheMetadataRepository,
+	MetadataCommand,
+	MetadataQuery,
+	MetadataRepository,
+	NotificationType,
+	RRR,
+} from "@ordo-pink/core"
 import { MetadataManager } from "@ordo-pink/managers"
 import { Result } from "@ordo-pink/result"
 import { Switch } from "@ordo-pink/switch"
@@ -52,7 +61,9 @@ export const init_metadata: TInitMetadataFn = ({ auth$, logger, known_functions,
 		})
 	}
 
-	commands.on("cmd.metadata.add_labels", ({ fsid, labels }) => metadata_command.add_labels(fsid, ...labels).cata({ Ok: noop, Err }))
+	commands.on("cmd.metadata.add_labels", ({ fsid, labels }) =>
+		metadata_command.add_labels(fsid, ...labels).cata({ Ok: noop, Err }),
+	)
 
 	// TODO Use metadata_commands directly for changing size
 	commands.on("cmd.metadata.set_size", ({ fsid, size }) => metadata_command.set_size(fsid, size).cata({ Ok: noop, Err }))
@@ -67,7 +78,9 @@ export const init_metadata: TInitMetadataFn = ({ auth$, logger, known_functions,
 		metadata_command.create(params).cata({ Ok: noop, Err })
 	})
 
-	commands.on("cmd.metadata.move", ({ fsid, new_parent }) => metadata_command.set_parent(fsid, new_parent).cata({ Ok: noop, Err }))
+	commands.on("cmd.metadata.move", ({ fsid, new_parent }) =>
+		metadata_command.set_parent(fsid, new_parent).cata({ Ok: noop, Err }),
+	)
 
 	commands.on("cmd.metadata.remove", fsid => {
 		metadata_command.remove(fsid).cata({ Ok: noop, Err })
@@ -76,7 +89,9 @@ export const init_metadata: TInitMetadataFn = ({ auth$, logger, known_functions,
 
 	commands.on("cmd.metadata.add_links", ({ fsid, links }) => metadata_command.add_links(fsid, ...links).cata({ Ok: noop, Err }))
 
-	commands.on("cmd.metadata.remove_links", ({ fsid, links }) => metadata_command.remove_links(fsid, ...links).cata({ Ok: noop, Err }))
+	commands.on("cmd.metadata.remove_links", ({ fsid, links }) =>
+		metadata_command.remove_links(fsid, ...links).cata({ Ok: noop, Err }),
+	)
 
 	commands.on("cmd.metadata.rename", ({ fsid, new_name }) => metadata_command.set_name(fsid, new_name).cata({ Ok: noop, Err }))
 

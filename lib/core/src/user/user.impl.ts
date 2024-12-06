@@ -1,21 +1,23 @@
-// SPDX-FileCopyrightText: Copyright 2024, 谢尔盖||↓ and the Ordo.pink contributors
-// SPDX-License-Identifier: AGPL-3.0-only
-
-// Ordo.pink is an all-in-one team workspace.
-// Copyright (C) 2024  谢尔盖||↓ and the Ordo.pink contributors
-
-// This program is free software: you can redistribute it and/or modify
-// it under the terms of the GNU Affero General Public License as published
-// by the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-
-// This program is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU Affero General Public License for more details.
-
-// You should have received a copy of the GNU Affero General Public License
-// along with this program.  If not, see <https://www.gnu.org/licenses/>.
+/*
+ * SPDX-FileCopyrightText: Copyright 2024, 谢尔盖 ||↓ and the Ordo.pink contributors
+ * SPDX-License-Identifier: AGPL-3.0-only
+ *
+ * Ordo.pink is an all-in-one team workspace.
+ * Copyright (C) 2024  谢尔盖 ||↓ and the Ordo.pink contributors
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published
+ * by the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
 
 import isEmail from "validator/lib/isEmail"
 
@@ -24,14 +26,11 @@ import { Switch } from "@ordo-pink/switch"
 
 import { UserSubscription } from "../constants"
 
-const can_user_add_function = (dto: Ordo.User.Current.DTO) => () =>
-	dto.installed_functions.length < dto.max_functions
+const can_user_add_function = (dto: Ordo.User.Current.DTO) => () => dto.installed_functions.length < dto.max_functions
 
-const can_user_create_files = (dto: Ordo.User.Current.DTO) => (files: number) =>
-	files < dto.file_limit
+const can_user_create_files = (dto: Ordo.User.Current.DTO) => (files: number) => files < dto.file_limit
 
-const can_user_upload = (dto: Ordo.User.Current.DTO) => (bytes: number) =>
-	bytes <= dto.max_upload_size
+const can_user_upload = (dto: Ordo.User.Current.DTO) => (bytes: number) => bytes <= dto.max_upload_size
 
 const get_user_created_at = (dto: Ordo.User.Public.DTO) => () => new Date(dto.created_at)
 
@@ -47,8 +46,7 @@ const get_user_full_name = (dto: Ordo.User.Public.DTO) => () =>
 		.case(!!dto.first_name, () => dto.first_name!)
 		.default(() => dto.last_name!)
 
-const get_user_readable_name = (dto: Ordo.User.Public.DTO) => () =>
-	get_user_full_name(dto)() ?? dto.handle.slice(1)
+const get_user_readable_name = (dto: Ordo.User.Public.DTO) => () => get_user_full_name(dto)() ?? dto.handle.slice(1)
 
 const get_user_handle = (dto: Ordo.User.Public.DTO) => () => dto.handle
 
@@ -66,24 +64,18 @@ const get_user_subscription = (dto: Ordo.User.Public.DTO) => () => dto.subscript
 
 const is_user_email_confirmed = (dto: Ordo.User.Current.DTO) => () => dto.email_confirmed
 
-const is_user_newer_than = (dto: Ordo.User.Public.DTO) => (date: Date) =>
-	get_user_created_at(dto)() < date
+const is_user_newer_than = (dto: Ordo.User.Public.DTO) => (date: Date) => get_user_created_at(dto)() < date
 
-const is_user_older_than = (dto: Ordo.User.Public.DTO) => (date: Date) =>
-	get_user_created_at(dto)() > date
+const is_user_older_than = (dto: Ordo.User.Public.DTO) => (date: Date) => get_user_created_at(dto)() > date
 
-const is_user_subscription_paid = (dto: Ordo.User.Public.DTO) => () =>
-	dto.subscription > UserSubscription.FREE
+const is_user_subscription_paid = (dto: Ordo.User.Public.DTO) => () => dto.subscription > UserSubscription.FREE
 
 export const CurrentUserValidations: Ordo.User.Current.Validations = {
 	is_created_at: (x): x is Ordo.User.Current.DTO["created_at"] => TAU.is_date(x),
-	is_first_name: (x): x is Ordo.User.Current.DTO["first_name"] =>
-		TAU.is_undefined(x) || TAU.is_string(x),
-	is_handle: (x): x is Ordo.User.Current.DTO["handle"] =>
-		TAU.is_non_empty_string(x) && x.startsWith("@"),
+	is_first_name: (x): x is Ordo.User.Current.DTO["first_name"] => TAU.is_undefined(x) || TAU.is_string(x),
+	is_handle: (x): x is Ordo.User.Current.DTO["handle"] => TAU.is_non_empty_string(x) && x.startsWith("@"),
 	is_id: (x): x is Ordo.User.Current.DTO["id"] => TAU.is_uuid(x),
-	is_last_name: (x): x is Ordo.User.Current.DTO["last_name"] =>
-		TAU.is_undefined(x) || TAU.is_string(x),
+	is_last_name: (x): x is Ordo.User.Current.DTO["last_name"] => TAU.is_undefined(x) || TAU.is_string(x),
 	is_subscription: (x): x is Ordo.User.Current.DTO["subscription"] =>
 		TAU.is_number(x) && TAU.gte(0)(x) && TAU.lt(UserSubscription.length)(x),
 	is_email: (x): x is Ordo.User.Current.DTO["email"] => TAU.is_non_empty_string(x) && isEmail(x),
@@ -91,10 +83,8 @@ export const CurrentUserValidations: Ordo.User.Current.Validations = {
 	is_file_limit: (x): x is Ordo.User.Current.DTO["file_limit"] => TAU.is_positive_number(x),
 	is_installed_functions: (x): x is Ordo.User.Current.DTO["installed_functions"] =>
 		TAU.is_array(x) && TAU.check_all(TAU.is_non_empty_string, x),
-	is_max_functions: (x): x is Ordo.User.Current.DTO["max_functions"] =>
-		TAU.is_finite_non_negative_int(x),
-	is_max_upload_size: (x): x is Ordo.User.Current.DTO["max_upload_size"] =>
-		TAU.is_non_negative_number(x),
+	is_max_functions: (x): x is Ordo.User.Current.DTO["max_functions"] => TAU.is_finite_non_negative_int(x),
+	is_max_upload_size: (x): x is Ordo.User.Current.DTO["max_upload_size"] => TAU.is_non_negative_number(x),
 	is_dto: (x): x is Ordo.User.Current.DTO => {
 		const y = x as Ordo.User.Current.DTO
 
@@ -145,13 +135,10 @@ export const CurrentUser: Ordo.User.Current.Static = {
 
 export const PublicUserValidations: Ordo.User.Public.Validations = {
 	is_created_at: (x): x is Ordo.User.Public.DTO["created_at"] => TAU.is_date(x),
-	is_first_name: (x): x is Ordo.User.Public.DTO["first_name"] =>
-		TAU.is_undefined(x) || TAU.is_string(x),
-	is_handle: (x): x is Ordo.User.Public.DTO["handle"] =>
-		TAU.is_non_empty_string(x) && x.startsWith("@"),
+	is_first_name: (x): x is Ordo.User.Public.DTO["first_name"] => TAU.is_undefined(x) || TAU.is_string(x),
+	is_handle: (x): x is Ordo.User.Public.DTO["handle"] => TAU.is_non_empty_string(x) && x.startsWith("@"),
 	is_id: (x): x is Ordo.User.Public.DTO["id"] => TAU.is_uuid(x),
-	is_last_name: (x): x is Ordo.User.Public.DTO["last_name"] =>
-		TAU.is_undefined(x) || TAU.is_string(x),
+	is_last_name: (x): x is Ordo.User.Public.DTO["last_name"] => TAU.is_undefined(x) || TAU.is_string(x),
 	is_subscription: (x): x is Ordo.User.Public.DTO["subscription"] =>
 		TAU.is_number(x) && TAU.gte(0)(x) && TAU.lt(UserSubscription.length)(x),
 	is_dto: (x): x is Ordo.User.Public.DTO => {

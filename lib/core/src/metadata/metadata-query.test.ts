@@ -1,21 +1,23 @@
-// SPDX-FileCopyrightText: Copyright 2024, 谢尔盖||↓ and the Ordo.pink contributors
-// SPDX-License-Identifier: AGPL-3.0-only
-
-// Ordo.pink is an all-in-one team workspace.
-// Copyright (C) 2024  谢尔盖||↓ and the Ordo.pink contributors
-
-// This program is free software: you can redistribute it and/or modify
-// it under the terms of the GNU Affero General Public License as published
-// by the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-
-// This program is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU Affero General Public License for more details.
-
-// You should have received a copy of the GNU Affero General Public License
-// along with this program.  If not, see <https://www.gnu.org/licenses/>.
+/*
+ * SPDX-FileCopyrightText: Copyright 2024, 谢尔盖 ||↓ and the Ordo.pink contributors
+ * SPDX-License-Identifier: AGPL-3.0-only
+ *
+ * Ordo.pink is an all-in-one team workspace.
+ * Copyright (C) 2024  谢尔盖 ||↓ and the Ordo.pink contributors
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published
+ * by the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
 
 import { describe, expect, it } from "bun:test"
 import { BehaviorSubject } from "rxjs"
@@ -122,9 +124,7 @@ describe("MetadataQuery", () => {
 			it("should return None if no metadata was found with given FSID", () => {
 				m_repo.put([])
 
-				const result = m_query
-					.get_by_fsid(fsid)
-					.unwrap() as unknown as TOption<Ordo.Metadata.Instance>
+				const result = m_query.get_by_fsid(fsid).unwrap() as unknown as TOption<Ordo.Metadata.Instance>
 
 				expect(result.is_option && result.is_none).toBeTrue()
 			})
@@ -146,9 +146,7 @@ describe("MetadataQuery", () => {
 
 				m_repo.put([M.FromDTO(dto)])
 
-				const result = m_query
-					.get_by_fsid(fsid)
-					.unwrap() as unknown as TOption<Ordo.Metadata.Instance>
+				const result = m_query.get_by_fsid(fsid).unwrap() as unknown as TOption<Ordo.Metadata.Instance>
 
 				expect(result.is_option && result.is_some).toBeTrue()
 				expect(result.unwrap()!.to_dto()).toEqual(dto)
@@ -193,9 +191,7 @@ describe("MetadataQuery", () => {
 
 				m_repo.put([metadata])
 
-				const option = m_query
-					.get_by_name_and_parent("123", null)
-					.unwrap() as TOption<Ordo.Metadata.Instance>
+				const option = m_query.get_by_name_and_parent("123", null).unwrap() as TOption<Ordo.Metadata.Instance>
 				const result = option.unwrap()
 
 				expect(result).toEqual(metadata)
@@ -204,9 +200,7 @@ describe("MetadataQuery", () => {
 			it("should return none if metadata doesnt exist", () => {
 				m_repo.put([M.Of({ name: "a", parent: null, author_id: "a-a-a-a-a" })])
 
-				const option = m_query
-					.get_by_name_and_parent("b", null)
-					.unwrap() as TOption<Ordo.Metadata.Instance>
+				const option = m_query.get_by_name_and_parent("b", null).unwrap() as TOption<Ordo.Metadata.Instance>
 
 				expect(option.unwrap()).toEqual(O.None().unwrap() as any) // TODO
 			})
@@ -232,9 +226,7 @@ describe("MetadataQuery", () => {
 			it("should return EINVAL if parent is invalid", () => {
 				m_repo.put([M.Of({ name: "a", parent: null, author_id: "a-a-a-a-a" })])
 
-				const { location, key } = m_query
-					.get_by_name_and_parent("a", "" as any)
-					.unwrap() as Ordo.Rrr
+				const { location, key } = m_query.get_by_name_and_parent("a", "" as any).unwrap() as Ordo.Rrr
 
 				expect(location).toEqual("MetadataQuery")
 				expect(key).toEqual("EINVAL")
@@ -362,9 +354,7 @@ describe("MetadataQuery", () => {
 					child,
 				])
 
-				const result = m_query
-					.get_parent(child.get_fsid())
-					.unwrap() as TOption<Ordo.Metadata.Instance>
+				const result = m_query.get_parent(child.get_fsid()).unwrap() as TOption<Ordo.Metadata.Instance>
 				expect(result.unwrap()?.get_fsid()).toEqual(fsid)
 			})
 		})

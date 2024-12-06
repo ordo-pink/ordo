@@ -1,21 +1,23 @@
-// SPDX-FileCopyrightText: Copyright 2024, 谢尔盖||↓ and the Ordo.pink contributors
-// SPDX-License-Identifier: AGPL-3.0-only
-
-// Ordo.pink is an all-in-one team workspace.
-// Copyright (C) 2024  谢尔盖||↓ and the Ordo.pink contributors
-
-// This program is free software: you can redistribute it and/or modify
-// it under the terms of the GNU Affero General Public License as published
-// by the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-
-// This program is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU Affero General Public License for more details.
-
-// You should have received a copy of the GNU Affero General Public License
-// along with this program.  If not, see <https://www.gnu.org/licenses/>.
+/*
+ * SPDX-FileCopyrightText: Copyright 2024, 谢尔盖 ||↓ and the Ordo.pink contributors
+ * SPDX-License-Identifier: AGPL-3.0-only
+ *
+ * Ordo.pink is an all-in-one team workspace.
+ * Copyright (C) 2024  谢尔盖 ||↓ and the Ordo.pink contributors
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published
+ * by the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
 
 import { Maoka } from "@ordo-pink/maoka"
 import { type TUnwrapOk } from "@ordo-pink/result"
@@ -182,15 +184,11 @@ export default create_function(
 		const auth$ = auth_result.unwrap() as TUnwrapOk<typeof auth_result>
 
 		auth$.subscribe(is_authenticated => {
-			const on_open_sign_in = () =>
-				commands.emit("cmd.application.router.navigate", "/auth/sign-in")
-			const on_open_sign_up = () =>
-				commands.emit("cmd.application.router.navigate", "/auth/sign-up")
+			const on_open_sign_in = () => commands.emit("cmd.application.router.navigate", "/auth/sign-in")
+			const on_open_sign_up = () => commands.emit("cmd.application.router.navigate", "/auth/sign-up")
 			const on_open_user_profile = () => commands.emit("cmd.application.router.navigate", "/user")
-			const on_open_achievements = () =>
-				commands.emit("cmd.application.router.navigate", "/user/achievements")
-			const on_open_settings = () =>
-				commands.emit("cmd.application.router.navigate", "/user/settings")
+			const on_open_achievements = () => commands.emit("cmd.application.router.navigate", "/user/achievements")
+			const on_open_settings = () => commands.emit("cmd.application.router.navigate", "/user/settings")
 
 			const on_sign_out = () => {
 				const path: Ordo.Routes.ID.SignOut.Path = "/account/sign-out"
@@ -244,10 +242,7 @@ export default create_function(
 				commands.off("cmd.user.open_settings", on_open_settings)
 				commands.emit("cmd.application.command_palette.remove", "cmd.auth.sign_out")
 				commands.emit("cmd.application.command_palette.remove", "cmd.user.open_achievements")
-				commands.emit(
-					"cmd.application.command_palette.remove",
-					"cmd.user.open_current_user_profile",
-				)
+				commands.emit("cmd.application.command_palette.remove", "cmd.user.open_current_user_profile")
 				commands.emit("cmd.application.command_palette.remove", "cmd.user.open_settings")
 
 				commands.on("cmd.auth.open_sign_in", on_open_sign_in)

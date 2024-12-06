@@ -1,21 +1,23 @@
-// SPDX-FileCopyrightText: Copyright 2024, 谢尔盖||↓ and the Ordo.pink contributors
-// SPDX-License-Identifier: AGPL-3.0-only
-
-// Ordo.pink is an all-in-one team workspace.
-// Copyright (C) 2024  谢尔盖||↓ and the Ordo.pink contributors
-
-// This program is free software: you can redistribute it and/or modify
-// it under the terms of the GNU Affero General Public License as published
-// by the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-
-// This program is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU Affero General Public License for more details.
-
-// You should have received a copy of the GNU Affero General Public License
-// along with this program.  If not, see <https://www.gnu.org/licenses/>.
+/*
+ * SPDX-FileCopyrightText: Copyright 2024, 谢尔盖 ||↓ and the Ordo.pink contributors
+ * SPDX-License-Identifier: AGPL-3.0-only
+ *
+ * Ordo.pink is an all-in-one team workspace.
+ * Copyright (C) 2024  谢尔盖 ||↓ and the Ordo.pink contributors
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published
+ * by the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
 
 import type { AUD, Algorithm, ISS, JTI, JWT, JWTPayload, SUB } from "@ordo-pink/wjwt"
 import type { Oath } from "@ordo-pink/oath"
@@ -157,20 +159,14 @@ export type TTokenServiceStatic = {
 }
 
 export type TTokenService = {
-	verify: <$TType extends "access" | "refresh">(
-		token: string,
-		type: $TType,
-	) => Oath<boolean, TRrr<"EINVAL">>
+	verify: <$TType extends "access" | "refresh">(token: string, type: $TType) => Oath<boolean, TRrr<"EINVAL">>
 
 	get_payload: <$TType extends "access" | "refresh">(
 		token: string,
 		type: $TType,
 	) => Oath<TOption<TAuthTokenPayload>, TRrr<"EINVAL" | "EIO">>
 
-	decode: <$TType extends "access" | "refresh">(
-		token: string,
-		type: $TType,
-	) => Oath<TOption<TAuthJWT>, TRrr<"EINVAL">>
+	decode: <$TType extends "access" | "refresh">(token: string, type: $TType) => Oath<TOption<TAuthJWT>, TRrr<"EINVAL">>
 
 	create: (params: {
 		sub: SUB

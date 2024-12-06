@@ -1,21 +1,23 @@
-// SPDX-FileCopyrightText: Copyright 2024, 谢尔盖||↓ and the Ordo.pink contributors
-// SPDX-License-Identifier: AGPL-3.0-only
-
-// Ordo.pink is an all-in-one team workspace.
-// Copyright (C) 2024  谢尔盖||↓ and the Ordo.pink contributors
-
-// This program is free software: you can redistribute it and/or modify
-// it under the terms of the GNU Affero General Public License as published
-// by the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-
-// This program is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU Affero General Public License for more details.
-
-// You should have received a copy of the GNU Affero General Public License
-// along with this program.  If not, see <https://www.gnu.org/licenses/>.
+/*
+ * SPDX-FileCopyrightText: Copyright 2024, 谢尔盖 ||↓ and the Ordo.pink contributors
+ * SPDX-License-Identifier: AGPL-3.0-only
+ *
+ * Ordo.pink is an all-in-one team workspace.
+ * Copyright (C) 2024  谢尔盖 ||↓ and the Ordo.pink contributors
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published
+ * by the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
 
 import { R, type TResult } from "@ordo-pink/result"
 import { alpha_sort, concat, is_string, noop, override, thunk } from "@ordo-pink/tau"
@@ -36,11 +38,7 @@ export const MetadataCommand: Ordo.Metadata.CommandStatic = {
 				.pipe(R.ops.map(thunk(fsid)))
 				.pipe(R.ops.chain(_get_metadata_by_fsid_r("set name", m_query)))
 				.pipe(
-					R.ops.chain(m =>
-						_check_not_exists_by_name_r("set name", m_query, name, m.get_parent()).pipe(
-							R.ops.map(thunk(m)),
-						),
-					),
+					R.ops.chain(m => _check_not_exists_by_name_r("set name", m_query, name, m.get_parent()).pipe(R.ops.map(thunk(m)))),
 				)
 				.pipe(R.ops.map(_metadata_to_dto))
 				.pipe(R.ops.chain(_reset_updated_by_r(u_query)))
@@ -50,18 +48,11 @@ export const MetadataCommand: Ordo.Metadata.CommandStatic = {
 				.pipe(R.ops.chain(MC.Of(m_repo, m_query, u_query).replace)),
 
 		set_parent: (fsid, parent) =>
-			(parent === null
-				? R.Ok<any, any>(null)
-				: _get_metadata_by_fsid_r("set parent", m_query)(parent)
-			)
+			(parent === null ? R.Ok<any, any>(null) : _get_metadata_by_fsid_r("set parent", m_query)(parent))
 				.pipe(R.ops.map(thunk(fsid)))
 				.pipe(R.ops.chain(_get_metadata_by_fsid_r("set parent", m_query)))
 				.pipe(
-					R.ops.chain(m =>
-						_check_not_exists_by_name_r("set parent", m_query, m.get_name(), parent).pipe(
-							R.ops.map(thunk(m)),
-						),
-					),
+					R.ops.chain(m => _check_not_exists_by_name_r("set parent", m_query, m.get_name(), parent).pipe(R.ops.map(thunk(m)))),
 				)
 				.pipe(R.ops.chain(_err_on_circular_reference_r(m_query, fsid, parent)))
 				.pipe(R.ops.map(_metadata_to_dto))
@@ -90,9 +81,7 @@ export const MetadataCommand: Ordo.Metadata.CommandStatic = {
 				.pipe(R.ops.map(item => item.get_labels()))
 				.pipe(
 					R.ops.map(lbls =>
-						concat(lbls, labels).sort((a, b) =>
-							alpha_sort("ASC")(is_string(a) ? a : a.name, is_string(b) ? b : b.name),
-						),
+						concat(lbls, labels).sort((a, b) => alpha_sort("ASC")(is_string(a) ? a : a.name, is_string(b) ? b : b.name)),
 					),
 				)
 				.pipe(R.ops.chain(lbls => MC.Of(m_repo, m_query, u_query).replace_labels(fsid, lbls))),
@@ -206,11 +195,7 @@ export const MetadataCommand: Ordo.Metadata.CommandStatic = {
 			])
 				.pipe(R.ops.chain(u_query.get_current))
 				.pipe(R.ops.map(user => user.get_id()))
-				.pipe(
-					R.ops.map(id =>
-						M.Of({ name, parent, author_id: id, type, labels, links, props, size: size ?? 0 }),
-					),
-				)
+				.pipe(R.ops.map(id => M.Of({ name, parent, author_id: id, type, labels, links, props, size: size ?? 0 })))
 				.pipe(R.ops.chain(item => m_query.get().pipe(R.ops.map(items => items.concat(item)))))
 				.pipe(R.ops.chain(m_repo.put)),
 
@@ -220,18 +205,10 @@ export const MetadataCommand: Ordo.Metadata.CommandStatic = {
 				.pipe(R.ops.chain(_get_metadata_by_fsid_r("remove", m_query)))
 				.pipe(R.ops.map(thunk(void 0)))
 				.pipe(R.ops.chain(() => m_query.get_descendents(fsid, { show_hidden: true })))
-				.pipe(
-					R.ops.chain(descendents =>
-						m_query.get({ show_hidden: true }).pipe(R.ops.map(all => ({ all, descendents }))),
-					),
-				)
+				.pipe(R.ops.chain(descendents => m_query.get({ show_hidden: true }).pipe(R.ops.map(all => ({ all, descendents })))))
 				.pipe(
 					R.ops.map(({ all, descendents }) =>
-						all.filter(
-							item =>
-								item.get_fsid() !== fsid &&
-								!descendents.some(d => d.get_fsid() === item.get_fsid()),
-						),
+						all.filter(item => item.get_fsid() !== fsid && !descendents.some(d => d.get_fsid() === item.get_fsid())),
 					),
 				)
 				.pipe(R.ops.chain(m_repo.put)),
@@ -248,10 +225,7 @@ export const MC = MetadataCommand
 
 // --- Internal ---
 
-type TInputValidatorFn<$TInput> = (
-	location: string,
-	input: $TInput,
-) => TResult<boolean, Ordo.Rrr<"EINVAL">>
+type TInputValidatorFn<$TInput> = (location: string, input: $TInput) => TResult<boolean, Ordo.Rrr<"EINVAL">>
 
 const _check_fsid_r: TInputValidatorFn<Ordo.Metadata.FSID> = (location, fsid) =>
 	R.If(M.Validations.is_fsid(fsid), { F: () => inval(`${location} -> fsid: ${fsid}`) })
@@ -292,12 +266,7 @@ type TCheckExistsByNameAndParentRFn = (
 	name: string,
 	parent: Ordo.Metadata.FSID | null,
 ) => TResult<void, Ordo.Rrr<"EEXIST" | "EINVAL" | "EAGAIN">>
-const _check_not_exists_by_name_r: TCheckExistsByNameAndParentRFn = (
-	location,
-	query,
-	name,
-	parent,
-) =>
+const _check_not_exists_by_name_r: TCheckExistsByNameAndParentRFn = (location, query, name, parent) =>
 	query.get_by_name_and_parent(name, parent).pipe(
 		R.ops.chain(option =>
 			option.cata({
@@ -310,17 +279,11 @@ const _check_not_exists_by_name_r: TCheckExistsByNameAndParentRFn = (
 type TGetMetadataByFSIDRFn = (
 	location: string,
 	metadata_query: Ordo.Metadata.Query,
-) => (
-	fsid: Ordo.Metadata.FSID,
-) => TResult<Ordo.Metadata.Instance, Ordo.Rrr<"ENOENT" | "EAGAIN" | "EINVAL">>
+) => (fsid: Ordo.Metadata.FSID) => TResult<Ordo.Metadata.Instance, Ordo.Rrr<"ENOENT" | "EAGAIN" | "EINVAL">>
 const _get_metadata_by_fsid_r: TGetMetadataByFSIDRFn = (location, query) => fsid =>
 	query
 		.get_by_fsid(fsid)
-		.pipe(
-			R.ops.chain(item =>
-				item.cata({ Some: R.Ok, None: () => R.Err(inval(`${location} -> fsid: ${fsid}`)) }),
-			),
-		)
+		.pipe(R.ops.chain(item => item.cata({ Some: R.Ok, None: () => R.Err(inval(`${location} -> fsid: ${fsid}`)) })))
 
 type TResetUpdatedByRFn = (
 	user_query: Ordo.User.Query,
@@ -366,17 +329,14 @@ type TCheckCircularReferenceRFn = (
 	metadata_query: Ordo.Metadata.Query,
 	fsid: Ordo.Metadata.FSID,
 	parent: Ordo.Metadata.FSID | null,
-) => (
-	item: Ordo.Metadata.Instance,
-) => TResult<Ordo.Metadata.Instance, Ordo.Rrr<"ENXIO" | "EAGAIN" | "EINVAL" | "ENOENT">>
-const _err_on_circular_reference_r: TCheckCircularReferenceRFn =
-	(query, fsid, parent) => metadata =>
-		query
-			.get_descendents(fsid)
-			.pipe(
-				R.ops.chain(descendents =>
-					descendents.some(descendent => descendent.get_fsid() === parent)
-						? R.Err(enxio(`circular reference: ${parent} is descendent of ${fsid}`))
-						: R.Ok(metadata),
-				),
-			)
+) => (item: Ordo.Metadata.Instance) => TResult<Ordo.Metadata.Instance, Ordo.Rrr<"ENXIO" | "EAGAIN" | "EINVAL" | "ENOENT">>
+const _err_on_circular_reference_r: TCheckCircularReferenceRFn = (query, fsid, parent) => metadata =>
+	query
+		.get_descendents(fsid)
+		.pipe(
+			R.ops.chain(descendents =>
+				descendents.some(descendent => descendent.get_fsid() === parent)
+					? R.Err(enxio(`circular reference: ${parent} is descendent of ${fsid}`))
+					: R.Ok(metadata),
+			),
+		)

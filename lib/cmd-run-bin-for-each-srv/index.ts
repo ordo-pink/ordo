@@ -6,6 +6,7 @@
 import node_fs from "node:fs"
 import node_path from "node:path"
 
+import { noop } from "@ordo-pink/tau"
 import { run_async_command } from "@ordo-pink/binutil"
 
 export const run_bin_for_each_srv = async (bin_name: string): Promise<void> => {
@@ -13,7 +14,10 @@ export const run_bin_for_each_srv = async (bin_name: string): Promise<void> => {
 
 	for (const srv of srvs) {
 		const path = node_path.join("srv", srv, "bin", `${bin_name}.ts`)
+		const command_exists = await node_fs.promises.exists(path)
 
-		run_async_command(`opt/bun ${path}`, { stderr: "inherit", stdout: "inherit" })
+		if (!command_exists) continue
+
+		void run_async_command(`opt/bun ${path}`, { stderr: "pipe", stdout: "pipe" }).fork(console.error, noop)
 	}
 }

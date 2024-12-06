@@ -23,7 +23,10 @@ import { Oath, invokers0 } from "@ordo-pink/oath"
 import { die, run_command } from "@ordo-pink/binutil"
 
 const main = () =>
-	run_command(clean_up_cmd).and(bundle_client_code).and(setup_netlify_redirects).invoke(invokers0.or_else(die()))
+	run_command(clean_up_cmd, { stdout: "inherit", stderr: "inherit" })
+		.and(bundle_client_code)
+		.and(setup_netlify_redirects)
+		.invoke(invokers0.or_else(die()))
 
 // --- Internal ---
 
@@ -33,12 +36,17 @@ const target_dir = "./var/out/my"
 const clean_up_cmd = `rm -rf ${target_dir}`
 
 const build_cmd = "npm run build"
-const build_cmd_options = { cwd: src_dir, env: { ...process.env, NODE_ENV: "production" } }
 
 const redirects_path = `${target_dir}/_redirects`
 const redirects_content = "/* /index.html 200"
 
-const bundle_client_code = () => run_command(build_cmd, build_cmd_options)
+const bundle_client_code = () =>
+	run_command(build_cmd, {
+		cwd: src_dir,
+		stdout: "inherit",
+		stderr: "inherit",
+		env: { ...process.env, NODE_ENV: "production" },
+	})
 
 const setup_netlify_redirects = () => Oath.FromPromise(() => Bun.write(redirects_path, redirects_content))
 

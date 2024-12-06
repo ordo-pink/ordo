@@ -95,13 +95,14 @@ export const run_async_command: TRunCommandFn = (command, options) =>
 	Oath.Resolve(Bun.spawn(command.trim().split(" "), options)).pipe(
 		ops0.chain(proc =>
 			Oath.Try(async () => {
-				if (options?.stdout === "pipe" || options?.stdout === "inherit")
-					// @ts-ignore
-					for await (const chunk of proc.stdout) process.stdout.write(chunk)
-
-				if (options?.stderr === "pipe" || options?.stderr === "inherit")
-					// @ts-ignore
-					for await (const chunk of proc.stderr) process.stderr.write(chunk)
+				if (proc) {
+					if (proc && ((proc && options?.stdout === "pipe") || options?.stdout === "inherit"))
+						// @ts-ignore
+						for await (const chunk of proc.stdout) process.stdout.write(chunk)
+					if (proc && (options?.stderr === "pipe" || options?.stderr === "inherit"))
+						// @ts-ignore
+						for await (const chunk of proc.stderr) process.stderr.write(chunk)
+				}
 			}),
 		),
 	)

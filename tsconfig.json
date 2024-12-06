@@ -1,9 +1,8 @@
 {
 	"compilerOptions": {
-		"outDir": "./var/dist",
+		"outDir": "./var/out",
 		"lib": ["ESNext", "DOM"],
 		"allowJs": true,
-		"jsx": "preserve",
 		"esModuleInterop": true,
 		"allowSyntheticDefaultImports": true,
 		"strict": true,
@@ -27,11 +26,9 @@
 		}
 	},
 	"include": [
-		"./boot/src/**/*.ts",
+		"./boot/**/*.ts",
 		"./srv/**/*.ts",
-		"./srv/**/*.tsx",
 		"./lib/**/*.ts",
-		"./lib/**/*.tsx"
 	],
 	"exclude": ["node_modules"]
 }

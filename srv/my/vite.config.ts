@@ -19,19 +19,28 @@
 
 import { resolve } from "node:path"
 
+import { ViteImageOptimizer } from "vite-plugin-image-optimizer"
 import { defineConfig } from "vite"
 import tsconfigPaths from "vite-tsconfig-paths"
 
 // https://vitejs.dev/config/
 export default defineConfig({
-	plugins: [tsconfigPaths()],
+	plugins: [
+		tsconfigPaths(),
+		ViteImageOptimizer({
+			png: { quality: 80 },
+			jpeg: { quality: 75 },
+			webp: { quality: 80 },
+			avif: { quality: 70 },
+			svg: { plugins: [{ name: "removeViewBox" }, { name: "sortAttrs" }] },
+		}),
+	],
 
-	define: {
-		"process.env.IS_PREACT": JSON.stringify("false"),
-	},
+	publicDir: "./static",
 
 	build: {
 		outDir: "../../var/out/my",
+		emptyOutDir: true,
 		cssMinify: true,
 		minify: true,
 		assetsDir: "./static",
@@ -44,9 +53,7 @@ export default defineConfig({
 	resolve: {
 		alias: {
 			"@ordo-pink": resolve(__dirname, "../../lib"),
-			react: resolve(__dirname, "../../node_modules/react"),
-			"@types/react": resolve(__dirname, "../../node_modules/@types/react"),
-			"react-dom": resolve(__dirname, "../../node_modules/react-dom"),
+			"@static": resolve(__dirname, "./static"),
 		},
 	},
 	clearScreen: false,

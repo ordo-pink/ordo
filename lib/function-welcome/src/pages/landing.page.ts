@@ -26,6 +26,10 @@ import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
 import { Result } from "@ordo-pink/result"
 import { T } from "@ordo-pink/tau"
 
+import hero_layer_0 from "../static/index-hero-layer-0.png"
+import hero_layer_1 from "../static/index-hero-layer-1.png"
+import hero_layer_2 from "../static/index-hero-layer-2.png"
+
 import "./landing.page.css"
 
 let is_cookie_modal_shown = false
@@ -83,9 +87,9 @@ export default Maoka.create("main", ({ use, on_unmount }) => {
 		return HeroSection(() => [
 			HeroSectionLayers(() => [
 				// Floating hero section images
-				HeroSectionImageLayer(0),
-				HeroSectionImageLayer(1),
-				HeroSectionImageLayer(2),
+				HeroSectionImageLayer(hero_layer_0, 0),
+				HeroSectionImageLayer(hero_layer_1, 1),
+				HeroSectionImageLayer(hero_layer_2, 2),
 			]),
 			HeroCard(() =>
 				HeroCardContent(() => [
@@ -123,9 +127,9 @@ export default Maoka.create("main", ({ use, on_unmount }) => {
 
 // --- Internal ---
 
-const HeroSectionImageLayer = (index: number) =>
+const HeroSectionImageLayer = (image_path: string, index: number) =>
 	Maoka.create("div", ({ use }) => {
-		const background_image = `url(/index-hero-layer-${index}.png)`
+		const background_image = `url(${image_path})`
 
 		use(MaokaJabs.set_class(`hero-layer hero-layer_${index}`))
 		use(MaokaJabs.set_style({ backgroundImage: background_image }))

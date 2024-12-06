@@ -1,19 +1,22 @@
 import { Oath } from "@ordo-pink/oath"
 
 import commands from "./cmd"
+import { get_opts } from "@ordo-pink/binutil"
 
-const args = process.argv.slice(2)
+const all_args = process.argv.slice(2)
+
+const opts = get_opts(all_args)
 
 const main = () =>
-	Oath.FromNullable(args[0])
+	Oath.FromNullable(all_args[0])
 		.and(command_name => Oath.If(command_name === "--help", { T: show_help }).fix(() => command_name))
 		.and(command_name => Oath.FromNullable(commands[command_name]))
-		.and(command => Oath.Try(() => command.handler(args)))
+		.and(command => Oath.Try(() => command.handler(opts)))
 		.fork(educate, () => void 0)
 
 const educate = () => {
-	if (!args[0]) console.error("ERROR: Invalid usage: command not provided. Type './bin --help' for details.")
-	else console.error(`ERROR: Invalid usage: "${args[0]}" is not a valid command. Type './bin --help' for details.`)
+	if (!all_args[0]) console.error("ERROR: Invalid usage: command not provided. Type './bin --help' for details.")
+	else console.error(`ERROR: Invalid usage: "${all_args[0]}" is not a valid command. Type './bin --help' for details.`)
 
 	process.exit(1)
 }

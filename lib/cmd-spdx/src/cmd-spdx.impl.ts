@@ -22,14 +22,14 @@
 import node_fs from "node:fs"
 import node_path from "node:path"
 
-import { type TLicenseType, create_progress, get_license, get_spdx_record } from "@ordo-pink/binutil"
+import { type TCommandHandler, type TLicenseType, create_progress, get_license, get_spdx_record } from "@ordo-pink/binutil"
 import { Oath } from "@ordo-pink/oath"
 import { noop } from "@ordo-pink/tau"
 
 const unlicense = get_license("Unlicense")
 const progress = create_progress("Adding missing SPDX records")
 
-export const handle_spdx = async () => {
+export const handle_spdx: TCommandHandler = async () => {
 	await Oath.Merge([...(await create_licenses("lib")), ...(await create_licenses("srv"))])
 		.and(xs => Oath.Merge(xs.flatMap(x => x)))
 		.and(xs => xs.filter(Boolean))

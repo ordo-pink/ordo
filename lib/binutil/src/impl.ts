@@ -1,3 +1,24 @@
+/*
+ * SPDX-FileCopyrightText: Copyright 2024, 谢尔盖 ||↓ and the Ordo.pink contributors
+ * SPDX-License-Identifier: AGPL-3.0-only
+ *
+ * Ordo.pink is an all-in-one team workspace.
+ * Copyright (C) 2024  谢尔盖 ||↓ and the Ordo.pink contributors
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published
+ * by the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
 import { filter, map, pipe, prop } from "ramda"
 import { Dirent } from "fs"
 import { SpawnOptions } from "bun"
@@ -6,7 +27,69 @@ import chalk from "chalk"
 import { Oath, ops0 } from "@ordo-pink/oath"
 import { create_parent_if_not_exists0, file_exists0, is_file0, write_file0 } from "@ordo-pink/fs"
 
-import type { TLicenseType } from "./types"
+import type { TLicenseType, TOpts } from "./types"
+
+const is_long_option = (arg: string) => arg.startsWith("--")
+const is_short_option = (arg: string) => arg.startsWith("-")
+
+export const get_opts = (args: string[]): TOpts => {
+	const delimiter = args.indexOf("--")
+	const args_to_parse = delimiter >= 0 ? args.slice(0, delimiter) : args
+
+	const opts: TOpts = {
+		args: [],
+		long_options: {},
+		pass_through: delimiter >= 0 ? args.slice(delimiter + 1) : [],
+		short_options: {},
+	}
+
+	let index = 0
+
+	while (index < args_to_parse.length) {
+		if (!args_to_parse[index]) {
+			index++
+			continue
+		}
+
+		if (is_long_option(args_to_parse[index])) {
+			const value = args_to_parse[index + 1]
+
+			const value_is_arg = !!value && !is_long_option(value) && !is_short_option(value)
+
+			opts.long_options[args_to_parse[index].slice(2)] = value_is_arg ? value : true
+			index++
+
+			if (value_is_arg) index++
+
+			continue
+		}
+
+		if (is_short_option(args_to_parse[index])) {
+			const value = args_to_parse[index + 1]
+
+			const value_is_arg = !!value && !is_long_option(value) && !is_short_option(value)
+
+			let i = 1
+
+			while (i < args_to_parse[index].length - 1) {
+				opts.short_options[args_to_parse[index][i]] = true
+				i++
+			}
+
+			opts.short_options[args_to_parse[index].at(-1)!] = value_is_arg ? value : true
+			index++
+
+			if (value_is_arg) index++
+
+			continue
+		}
+
+		opts.args.push(args_to_parse[index])
+		index++
+	}
+
+	return opts
+}
 
 export const run_async_command: TRunCommandFn = (command, options) =>
 	Oath.Resolve(Bun.spawn(command.trim().split(" "), options)).pipe(
@@ -93,10 +176,10 @@ export const get_spdx_record = (license: TLicenseType) => {
 	return `/*
  * SPDX-FileCopyrightText: Copyright ${year}, ${COPYRIGHT_OWNERS}
  * SPDX-License-Identifier: ${license}
- *
 ${
 	license === "AGPL-3.0-only"
-		? ` * Ordo.pink is an all-in-one team workspace.
+		? ` *
+ * Ordo.pink is an all-in-one team workspace.
  * Copyright (C) ${year}  ${COPYRIGHT_OWNERS}
  *
  * This program is free software: you can redistribute it and/or modify

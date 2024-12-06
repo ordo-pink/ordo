@@ -1,7 +1,6 @@
 /*
  * SPDX-FileCopyrightText: Copyright 2024, 谢尔盖 ||↓ and the Ordo.pink contributors
  * SPDX-License-Identifier: Unlicense
- *
  */
 
 import { is_bool, is_false, is_fn, is_object, is_true, noop } from "@ordo-pink/tau"

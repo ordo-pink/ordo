@@ -24,12 +24,12 @@ import node_path from "node:path"
 
 import { pascal, snake, title } from "case"
 
-import { type TLicenseType, create_progress, get_license, get_spdx_record } from "@ordo-pink/binutil"
+import { type TCommandHandler, type TLicenseType, create_progress, get_license, get_spdx_record } from "@ordo-pink/binutil"
 import { is_reserved_javascript_keyword } from "@ordo-pink/rkwjs"
 
-export const mklib_handler = async (args: string[]): Promise<void> => {
-	const lib_name = args[1]
-	const license = "AGPL-3.0-only"
+export const mklib_handler: TCommandHandler = async opts => {
+	const lib_name = opts.args[1]
+	const license = opts.long_options["unlicense"] || opts.short_options["U"] ? "Unlicense" : "AGPL-3.0-only"
 
 	const progress = create_progress("Creating new library")
 

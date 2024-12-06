@@ -21,9 +21,18 @@
 
 export type TLicenseType = "AGPL-3.0-only" | "Unlicense"
 
+export type TCommandHandler = (opts: TOpts) => void | Promise<void>
+
 export type TCommand = {
-	handler: (args: string[]) => void | Promise<void>
+	handler: TCommandHandler
 	help: string
 }
 
 export type TCommandRecord = Record<string, TCommand>
+
+export type TOpts = {
+	long_options: Record<string, string | true>
+	short_options: Record<string, string | true>
+	pass_through: string[]
+	args: string[]
+}
